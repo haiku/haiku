@@ -164,6 +164,8 @@ private:
 									const Team::WatchpointEvent& event);
 	virtual void				DebugReportChanged(
 									const Team::DebugReportEvent& event);
+	virtual void				CoreFileChanged(
+									const Team::CoreFileChangedEvent& event);
 
 
 	// Function::Listener

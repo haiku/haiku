@@ -74,6 +74,8 @@ enum {
 enum {
 	MSG_CHOOSE_DEBUG_REPORT_LOCATION	= 'ccrl',
 	MSG_DEBUG_REPORT_SAVED				= 'drsa',
+	MSG_CHOOSE_CORE_FILE_LOCATION		= 'ccfl',
+	MSG_CORE_FILE_WRITTEN				= 'cfsa',
 	MSG_LOCATE_SOURCE_IF_NEEDED			= 'lsin',
 	MSG_SOURCE_ENTRY_QUERY_COMPLETE		= 'seqc',
 	MSG_CLEAR_STACK_TRACE				= 'clst',
@@ -375,13 +377,19 @@ TeamWindow::MessageReceived(BMessage* message)
 			break;
 		}
 		case MSG_CHOOSE_DEBUG_REPORT_LOCATION:
+		case MSG_CHOOSE_CORE_FILE_LOCATION:
 		{
 			try {
 				char filename[B_FILE_NAME_LENGTH];
-				UiUtils::ReportNameForTeam(fTeam, filename, sizeof(filename));
+				if (message->what == MSG_CHOOSE_DEBUG_REPORT_LOCATION)
+					UiUtils::ReportNameForTeam(fTeam, filename, sizeof(filename));
+				else
+					UiUtils::CoreFileNameForTeam(fTeam, filename, sizeof(filename));
 				BMessenger msgr(this);
 				fFilePanel = new BFilePanel(B_SAVE_PANEL, &msgr,
-					NULL, 0, false, new BMessage(MSG_GENERATE_DEBUG_REPORT));
+					NULL, 0, false, new BMessage(
+						message->what == MSG_CHOOSE_DEBUG_REPORT_LOCATION ?
+							MSG_GENERATE_DEBUG_REPORT : MSG_WRITE_CORE_FILE));
 				fFilePanel->SetSaveText(filename);
 				fFilePanel->Show();
 			} catch (...) {
@@ -391,6 +399,7 @@ TeamWindow::MessageReceived(BMessage* message)
 			break;
 		}
 		case MSG_GENERATE_DEBUG_REPORT:
+		case MSG_WRITE_CORE_FILE:
 		{
 			delete fFilePanel;
 			fFilePanel = NULL;
@@ -401,8 +410,12 @@ TeamWindow::MessageReceived(BMessage* message)
 				&& message->HasString("name")) {
 				path.SetTo(&ref);
 				path.Append(message->FindString("name"));
-				if (get_ref_for_path(path.Path(), &ref) == B_OK)
-					fListener->DebugReportRequested(&ref);
+				if (get_ref_for_path(path.Path(), &ref) == B_OK) {
+					if (message->what == MSG_GENERATE_DEBUG_REPORT)
+						fListener->DebugReportRequested(&ref);
+					else
+						fListener->WriteCoreFileRequested(&ref);
+				}
 			}
 			break;
 		}
@@ -419,6 +432,27 @@ TeamWindow::MessageReceived(BMessage* message)
 			}
 
 			BAlert *alert = new(std::nothrow) BAlert("Report saved",
+				data.String(), "Close");
+			if (alert == NULL)
+				break;
+
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
+			break;
+		}
+		case MSG_CORE_FILE_WRITTEN:
+		{
+			status_t finalStatus = message->GetInt32("status", B_OK);
+			BString data;
+			if (finalStatus == B_OK) {
+				data.SetToFormat("Core file successfully written to '%s'",
+					message->FindString("path"));
+			} else {
+				data.SetToFormat("Failed to write core file: '%s'",
+					strerror(finalStatus));
+			}
+
+			BAlert *alert = new(std::nothrow) BAlert("Core file written",
 				data.String(), "Close");
 			if (alert == NULL)
 				break;
@@ -1080,6 +1114,15 @@ TeamWindow::DebugReportChanged(const Team::DebugReportEvent& event)
 
 
 void
+TeamWindow::CoreFileChanged(const Team::CoreFileChangedEvent& event)
+{
+	BMessage message(MSG_CORE_FILE_WRITTEN);
+	message.AddString("path", event.GetTargetPath());
+	PostMessage(&message);
+}
+
+
+void
 TeamWindow::FunctionSourceCodeChanged(Function* function)
 {
 	TRACE_GUI("TeamWindow::FunctionSourceCodeChanged(%p): source: %p, "
@@ -1233,6 +1276,8 @@ TeamWindow::_Init()
 	fMenuBar->AddItem(menu);
 	item = new BMenuItem("Save debug report",
 		new BMessage(MSG_CHOOSE_DEBUG_REPORT_LOCATION));
+	item = new BMenuItem("Write core file",
+		new BMessage(MSG_CHOOSE_CORE_FILE_LOCATION));
 	menu->AddItem(item);
 	item->SetTarget(this);
 	item = new BMenuItem("Inspect memory",
