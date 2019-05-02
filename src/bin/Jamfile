@@ -118,6 +118,7 @@ StdBinCommands
 	resattr.cpp
 	screeninfo.cpp
 	setarch.cpp
+	setcontrollook.cpp
 	setdecor.cpp
 	settype.cpp
 	spybmessage.cpp
