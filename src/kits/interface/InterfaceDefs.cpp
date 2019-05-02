@@ -1336,7 +1336,7 @@ namespace BPrivate {
 
 
 /*!	\brief queries the server for the current decorator
-	\param ref entry_ref into which to store current decorator's location
+	\param path BString into which to store current decorator's location
 	\return boolean true/false
 */
 bool
@@ -1349,12 +1349,12 @@ get_decorator(BString& path)
 	if (link.FlushWithReply(code) != B_OK || code != B_OK)
 		return false;
 
- 	return link.ReadString(path) == B_OK;
+	return link.ReadString(path) == B_OK;
 }
 
 
 /*!	\brief Private function which sets the window decorator for the system.
-	\param entry_ref to the decorator to set
+	\param path BString with the path to the decorator to set
 
 	Will return detailed error status via status_t
 */
