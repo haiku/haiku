@@ -92,6 +92,9 @@ public:
 									bool subpixelOrdering);
 			bool				IsSubpixelOrderingRegular() const;
 
+			status_t			SetControlLook(const char* path);
+			const BString&		ControlLook() const;
+
 private:
 			void				_SetDefaults();
 			status_t			_Load();
@@ -112,6 +115,7 @@ private:
 			int32				fWorkspacesColumns;
 			int32				fWorkspacesRows;
 			BMessage			fWorkspaceMessages[kMaxWorkspaces];
+			BString				fControlLook;
 
 			server_read_only_memory& fShared;
 };

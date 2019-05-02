@@ -418,6 +418,8 @@ protected:
 
 extern BControlLook* be_control_look;
 
+extern "C" _EXPORT BControlLook *instantiate_control_look(image_id id);
+
 
 } // namespace BPrivate
 

@@ -162,6 +162,8 @@ static const char* kColorNames[kColorWhichCount] = {
 	NULL
 };
 
+static image_id sControlLookAddon = -1;
+
 
 namespace BPrivate {
 
@@ -1286,8 +1288,24 @@ _init_interface_kit_()
 	if (be_clipboard == NULL)
 		be_clipboard = new BClipboard(NULL);
 
-	// TODO: Could support different themes here in the future.
-	be_control_look = new HaikuControlLook();
+	BString path;
+	if (get_control_look(path) && path.Length() > 0) {
+		BControlLook* (*instantiate)(image_id);
+
+		sControlLookAddon = load_add_on(path.String());
+		if (sControlLookAddon >= 0
+			&& get_image_symbol(sControlLookAddon,
+				"instantiate_control_look",
+				B_SYMBOL_TYPE_TEXT, (void **)&instantiate) == B_OK) {
+			be_control_look = instantiate(sControlLookAddon);
+			if (be_control_look == NULL) {
+				unload_add_on(sControlLookAddon);
+				sControlLookAddon = -1;
+			}
+		}
+	}
+	if (be_control_look == NULL)
+		be_control_look = new HaikuControlLook();
 
 	_init_global_fonts_();
 
@@ -1324,6 +1342,13 @@ _fini_interface_kit_()
 
 	delete be_control_look;
 	be_control_look = NULL;
+
+	// Note: if we ever want to support live switching, we cannot just unload
+	// the old one since some thread might still be in a method of the object.
+	// maybe locking/unlocking all loopers around would ensure proper exit.
+	if (sControlLookAddon >= 0)
+		unload_add_on(sControlLookAddon);
+	sControlLookAddon = -1;
 
 	// TODO: Anything else?
 
@@ -1391,6 +1416,46 @@ preview_decorator(const BString& path, BWindow* window)
 	msg.AddString("preview", path.String());
 
 	return window->SetDecoratorSettings(msg);
+}
+
+
+/*!	\brief queries the server for the current ControlLook path
+	\param path BString into which to store current ControlLook's add-on path
+	\return boolean true/false
+*/
+bool
+get_control_look(BString& path)
+{
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_GET_CONTROL_LOOK);
+
+	int32 code;
+	if (link.FlushWithReply(code) != B_OK || code != B_OK)
+		return false;
+
+	return link.ReadString(path) == B_OK;
+}
+
+
+/*!	\brief Private function which sets the ControlLook for the system.
+	\param BString with the ControlLook add-on path to set
+
+	Will return detailed error status via status_t
+*/
+status_t
+set_control_look(const BString& path)
+{
+	BPrivate::AppServerLink link;
+
+	link.StartMessage(AS_SET_CONTROL_LOOK);
+
+	link.AttachString(path.String());
+
+	status_t error = B_OK;
+	if (link.FlushWithReply(error) != B_OK)
+		return B_ERROR;
+
+	return error;
 }
 
 

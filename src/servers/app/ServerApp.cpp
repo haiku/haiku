@@ -697,6 +697,39 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 
+		case AS_SET_CONTROL_LOOK:
+		{
+			STRACE(("ServerApp %s: Set ControlLook\n", Signature()));
+
+			BString path;
+			status_t error = B_ERROR;
+			if (link.ReadString(path) == B_OK) {
+				LockedDesktopSettings settings(fDesktop);
+				error = settings.SetControlLook(path.String());
+			}
+
+			fLink.StartMessage(error);
+			fLink.Flush();
+			break;
+		}
+
+		case AS_GET_CONTROL_LOOK:
+		{
+			STRACE(("ServerApp %s: Get ControlLook\n", Signature()));
+
+			if (fDesktop->LockSingleWindow()) {
+				DesktopSettings settings(fDesktop);
+
+				fLink.StartMessage(B_OK);
+				fLink.AttachString(settings.ControlLook().String());
+				fDesktop->UnlockSingleWindow();
+			} else
+				fLink.StartMessage(B_ERROR);
+
+			fLink.Flush();
+			break;
+		}
+
 		case AS_CREATE_BITMAP:
 		{
 			STRACE(("ServerApp %s: Received BBitmap creation request\n",

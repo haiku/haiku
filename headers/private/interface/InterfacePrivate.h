@@ -26,6 +26,9 @@ int32		get_bytes_per_row(color_space colorSpace, int32 width);
 void		get_workspaces_layout(uint32* _columns, uint32* _rows);
 void		set_workspaces_layout(uint32 columns, uint32 rows);
 
+bool		get_control_look(BString& path);
+status_t	set_control_look(const BString& path);
+
 }	// namespace BPrivate
 
 
