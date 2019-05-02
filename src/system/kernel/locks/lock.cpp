@@ -628,10 +628,9 @@ mutex_destroy(mutex* lock)
 	InterruptsSpinLocker locker(lock->lock);
 
 #if KDEBUG
-	if (lock->waiters != NULL && thread_get_current_thread_id()
-			!= lock->holder) {
-		panic("mutex_destroy(): there are blocking threads, but caller doesn't "
-			"hold the lock (%p)", lock);
+	if (lock->holder != -1 && thread_get_current_thread_id() != lock->holder) {
+		panic("mutex_destroy(): the lock (%p) is held by %" B_PRId32 ", not "
+			"by the caller", lock, lock->holder);
 		if (_mutex_lock(lock, &locker) != B_OK)
 			return;
 		locker.Lock();
@@ -688,6 +687,17 @@ mutex_switch_lock(mutex* from, mutex* to)
 	mutex_unlock(from);
 
 	return mutex_lock_threads_locked(to, &locker);
+}
+
+
+void
+mutex_transfer_lock(mutex* lock, thread_id thread)
+{
+#if KDEBUG
+	if (thread_get_current_thread_id() != lock->holder)
+		panic("mutex_transfer_lock(): current thread is not the lock holder!");
+	lock->holder = thread;
+#endif
 }
 
 

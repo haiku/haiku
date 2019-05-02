@@ -138,6 +138,7 @@ extern void mutex_init(mutex* lock, const char* name);
 extern void mutex_init_etc(mutex* lock, const char* name, uint32 flags);
 extern void mutex_destroy(mutex* lock);
 extern status_t mutex_switch_lock(mutex* from, mutex* to);
+extern void mutex_transfer_lock(mutex* lock, thread_id thread);
 	// Unlocks "from" and locks "to" such that unlocking and starting to wait
 	// for the lock is atomically. I.e. if "from" guards the object "to" belongs
 	// to, the operation is safe as long as "from" is held while destroying
@@ -261,22 +262,13 @@ mutex_unlock(mutex* lock)
 
 
 static inline void
-mutex_transfer_lock(mutex* lock, thread_id thread)
-{
-#if KDEBUG
-	lock->holder = thread;
-#endif
-}
-
-
-static inline void
 recursive_lock_transfer_lock(recursive_lock* lock, thread_id thread)
 {
 	if (lock->recursion != 1)
 		panic("invalid recursion level for lock transfer!");
 
 #if KDEBUG
-	lock->lock.holder = thread;
+	mutex_transfer_lock(&lock->lock, thread);
 #else
 	lock->holder = thread;
 #endif
