@@ -352,9 +352,10 @@ calloc(size_t nelem, size_t elsize)
 		goto ok;
 	if (size < (nelem * size)&& size < (elsize * size))
 		goto nomem;
-#endif
 
 ok:
+#endif
+
 	defer_signals();
 
 	ptr = pHeap->getHeap(pHeap->getHeapIndex()).malloc(size);
