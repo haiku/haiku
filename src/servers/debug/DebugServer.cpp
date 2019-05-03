@@ -39,8 +39,8 @@
 enum {
 	kActionKillTeam,
 	kActionDebugTeam,
-	kActionSaveReportTeam,
 	kActionWriteCoreFile,
+	kActionSaveReportTeam,
 	kActionPromptUser
 };
 
@@ -903,10 +903,10 @@ TeamDebugHandler::_HandleMessage(DebugMessage *message)
 		// if someone else kills our teams.
 		BAlert *alert = new BAlert(NULL, buffer.String(),
 			B_TRANSLATE("Terminate"), B_TRANSLATE("Debug"),
-			HANDOVER_USE_DEBUGGER ? B_TRANSLATE("Save report") : NULL,
+			B_TRANSLATE("Write core file"),
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-#if 0
-		alert->AddButton(B_TRANSLATE("Write core file"));
+#ifdef HANDOVER_USE_DEBUGGER
+		alert->AddButton(B_TRANSLATE("Save report"));
 #endif
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		debugAction = alert->Go();
