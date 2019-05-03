@@ -45,6 +45,8 @@ private:
 			void				_AdoptToCurrentDecor();
 			void				_AdoptInterfaceToCurrentDecor();
 
+			void				_BuildControlLookMenu();
+
 			bool				_DoubleScrollBarArrows();
 			void				_SetDoubleScrollBarArrows(bool doubleArrows);
 
@@ -55,11 +57,18 @@ private:
 			BMenuField*			fDecorMenuField;
 			BPopUpMenu*			fDecorMenu;
 
+			BButton*			fControlLookInfoButton;
+			BMenuField*			fControlLookMenuField;
+			BPopUpMenu*			fControlLookMenu;
+
 			FakeScrollBar*		fArrowStyleSingle;
 			FakeScrollBar*		fArrowStyleDouble;
 
 			BString				fSavedDecor;
 			BString				fCurrentDecor;
+
+			BString				fSavedControlLook;
+			BString				fCurrentControlLook;
 
 			bool				fSavedDoubleArrowsValue;
 };

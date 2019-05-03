@@ -17,15 +17,20 @@
 
 #include <Alert.h>
 #include <Alignment.h>
+#include <AppFileInfo.h>
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
 #include <CheckBox.h>
+#include <File.h>
 #include <InterfaceDefs.h>
+#include <InterfacePrivate.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
+#include <Path.h>
+#include <PathFinder.h>
 #include <PopUpMenu.h>
 #include <ScrollBar.h>
 #include <StringView.h>
@@ -47,6 +52,9 @@
 static const int32 kMsgSetDecor = 'deco';
 static const int32 kMsgDecorInfo = 'idec';
 
+static const int32 kMsgSetControlLook = 'ctlk';
+static const int32 kMsgControlLookInfo = 'iclk';
+
 static const int32 kMsgDoubleScrollBarArrows = 'dsba';
 
 static const int32 kMsgArrowStyleSingle = 'mass';
@@ -67,7 +75,10 @@ LookAndFeelSettingsView::LookAndFeelSettingsView(const char* name)
 	BView(name, 0),
 	fDecorInfoButton(NULL),
 	fDecorMenuField(NULL),
-	fDecorMenu(NULL)
+	fDecorMenu(NULL),
+	fControlLookInfoButton(NULL),
+	fControlLookMenuField(NULL),
+	fControlLookMenu(NULL)
 {
 	// Decorator menu
 	_BuildDecorMenu();
@@ -76,6 +87,15 @@ LookAndFeelSettingsView::LookAndFeelSettingsView(const char* name)
 
 	fDecorInfoButton = new BButton(B_TRANSLATE("About"),
 		new BMessage(kMsgDecorInfo));
+
+	// ControlLook menu
+	_BuildControlLookMenu();
+	fControlLookMenuField = new BMenuField("controllook",
+		B_TRANSLATE("ControlLook:"), fControlLookMenu);
+	fControlLookMenuField->SetToolTip(B_TRANSLATE("No effect on running applications"));
+
+	fControlLookInfoButton = new BButton(B_TRANSLATE("About"),
+		new BMessage(kMsgControlLookInfo));
 
 	// scroll bar arrow style
 	BBox* arrowStyleBox = new BBox("arrow style");
@@ -115,9 +135,12 @@ LookAndFeelSettingsView::LookAndFeelSettingsView(const char* name)
 		.Add(fDecorMenuField->CreateLabelLayoutItem(), 0, 0)
 		.Add(fDecorMenuField->CreateMenuBarLayoutItem(), 1, 0)
 		.Add(fDecorInfoButton, 2, 0)
-		.Add(scrollBarLabel, 0, 1)
-		.Add(arrowStyleBox, 1, 1)
-		.AddGlue(0, 2)
+		.Add(fControlLookMenuField->CreateLabelLayoutItem(), 0, 1)
+		.Add(fControlLookMenuField->CreateMenuBarLayoutItem(), 1, 1)
+		.Add(fControlLookInfoButton, 2, 1)
+		.Add(scrollBarLabel, 0, 2)
+		.Add(arrowStyleBox, 1, 2)
+		.AddGlue(0, 3)
 		.SetInsets(B_USE_WINDOW_SPACING);
 
 	// TODO : Decorator Preview Image?
@@ -139,6 +162,8 @@ LookAndFeelSettingsView::AttachedToWindow()
 
 	fDecorMenu->SetTargetForItems(this);
 	fDecorInfoButton->SetTarget(this);
+	fControlLookMenu->SetTargetForItems(this);
+	fControlLookInfoButton->SetTarget(this);
 	fArrowStyleSingle->SetTarget(this);
 	fArrowStyleDouble->SetTarget(this);
 
@@ -191,6 +216,45 @@ LookAndFeelSettingsView::MessageReceived(BMessage *msg)
 			break;
 		}
 
+		case kMsgSetControlLook:
+		{
+			BString newControlLook;
+			if (msg->FindString("control_look", &newControlLook) == B_OK) {
+				BPrivate::set_control_look(newControlLook);
+			}
+			break;
+		}
+
+		case kMsgControlLookInfo:
+		{
+			BString infoText(B_TRANSLATE("Default Haiku ControlLook"));
+			BString path;
+			if (!BPrivate::get_control_look(path))
+				break;
+
+			if (path.Length()) {
+				BFile file(path.String(), B_READ_ONLY);
+				if (file.InitCheck() != B_OK)
+					break;
+
+				BAppFileInfo info(&file);
+				struct version_info version;
+				if (info.InitCheck() != B_OK
+					|| info.GetVersionInfo(&version, B_APP_VERSION_KIND) != B_OK)
+					break;
+
+				infoText = version.short_info;
+				infoText << "\n" << version.long_info;
+			}
+
+			BAlert *infoAlert = new BAlert(B_TRANSLATE("About control look"),
+				infoText.String(), B_TRANSLATE("OK"));
+			infoAlert->SetFlags(infoAlert->Flags() | B_CLOSE_ON_ESCAPE);
+			infoAlert->Go();
+
+			break;
+		}
+
 		case kMsgArrowStyleSingle:
 			_SetDoubleScrollBarArrows(false);
 			break;
@@ -232,6 +296,52 @@ LookAndFeelSettingsView::_BuildDecorMenu()
 	}
 
 	_AdoptToCurrentDecor();
+}
+
+
+void
+LookAndFeelSettingsView::_BuildControlLookMenu()
+{
+	BPathFinder pathFinder;
+	BStringList paths;
+	BDirectory dir;
+	BString currentLook;
+
+	BPrivate::get_control_look(currentLook);
+
+	fControlLookMenu = new BPopUpMenu(B_TRANSLATE("Choose ControlLook"));
+
+	BMessage* message = new BMessage(kMsgSetControlLook);
+	message->AddString("control_look", "");
+
+	BMenuItem* item = new BMenuItem(B_TRANSLATE("Default"), message);
+	if (currentLook == "")
+		item->SetMarked(true);
+	fControlLookMenu->AddItem(item);
+
+	status_t error = pathFinder.FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY,
+		"control_look", paths);
+
+	for (int i = 0; i < paths.CountStrings(); ++i) {
+		if (error != B_OK || dir.SetTo(paths.StringAt(i)) != B_OK)
+			continue;
+
+		BEntry entry;
+		for (; dir.GetNextEntry(&entry) == B_OK;) {
+			BPath path(paths.StringAt(i), entry.Name());
+			BString name(entry.Name());
+			name.RemoveLast("ControlLook");
+			name.Trim();
+
+			message = new BMessage(kMsgSetControlLook);
+			message->AddString("control_look", path.Path());
+
+			item = new BMenuItem(name.String(), message);
+			if (currentLook == path.Path())
+				item->SetMarked(true);
+			fControlLookMenu->AddItem(item);
+		}
+	}
 }
 
 
@@ -310,6 +420,7 @@ void
 LookAndFeelSettingsView::SetDefaults()
 {
 	_SetDecor(fDecorUtility.DefaultDecorator());
+	BPrivate::set_control_look(BString(""));
 	_SetDoubleScrollBarArrows(false);
 }
 
