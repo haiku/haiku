@@ -4,6 +4,6 @@ resource app_version {
 	minor = 0,
 	variety = B_APPV_ALPHA,
 	internal = 0,
-	short_info = "Haiku Utilities", 
-    long_info  = "Haiku Utilities ©2007 Haiku, Inc."
+	short_info = "Haiku Utilities",
+	long_info  = "Haiku Utilities ©2007-2019 Haiku, Inc."
 };
