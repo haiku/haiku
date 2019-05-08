@@ -258,6 +258,33 @@ find_edid_mode(edid1_info& info, bool allowPalette)
 }
 
 
+static void
+vesa_fixups(void *settings)
+{
+	const char *oem_string = (const char *)sInfo.oem_string;
+
+	if (!strcmp(oem_string, "NVIDIA")) {
+		const char *arg = NULL;
+		int32 scaling = -1;
+
+		if (settings != NULL)
+			arg = get_driver_parameter(settings, "nvidia_scaling", NULL, "1");
+		if (arg != NULL)
+			scaling = strtol(arg, NULL, 0);
+
+		if (scaling > -1) {
+			dprintf("Setting nvidia scaling mode to %" B_PRId32 "\n", scaling);
+			struct bios_regs regs;
+			regs.eax = 0x4f14;
+			regs.ebx = 0x0102;
+			regs.ecx = scaling;
+			call_bios(0x10, &regs);
+		}
+	}
+
+}
+
+
 static bool
 get_mode_from_settings(void)
 {
@@ -267,6 +294,8 @@ get_mode_from_settings(void)
 	void *handle = load_driver_settings("vesa");
 	if (handle == NULL)
 		return false;
+
+	vesa_fixups(handle);
 
 	bool found = false;
 
@@ -439,29 +468,11 @@ vesa_get_vbe_info_block(vbe_info_block *info)
 }
 
 
-static void
-vesa_fixups(vbe_info_block *info)
-{
-	const char *oem_string = (const char *)info->oem_string;
-
-	if (!strcmp(oem_string, "NVIDIA")) {
-		dprintf("Disabling nvidia scaling.\n");
-		struct bios_regs regs;
-		regs.eax = 0x4f14;
-		regs.ebx = 0x0102;
-		regs.ecx = 1;	// centered unscaled
-		call_bios(0x10, &regs);
-	}
-}
-
-
 static status_t
 vesa_init(vbe_info_block *info, video_mode **_standardMode)
 {
 	if (vesa_get_vbe_info_block(info) != B_OK)
 		return B_ERROR;
-
-	vesa_fixups(info);
 
 	// fill mode list and find standard video mode
 

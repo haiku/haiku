@@ -2,3 +2,8 @@
 # mode {x-resolution} {y-resolution} {bitdepth},
 #   for example:
 #mode 1280 1024 32
+
+# Set NVIDIA scaling mode
+# 1: disable scaling completely
+# other modes are available depending on the BIOS
+#nvidia_scaling 1
