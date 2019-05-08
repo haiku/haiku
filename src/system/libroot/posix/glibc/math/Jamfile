@@ -17,10 +17,15 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		UsePrivateHeaders libroot ;
 
+		# ppc, m68k and arm use regular doubles as long doubles (through
+		# aliases), so they must be built without these files.
+		# FIXME: ppc should use ldbl-128ibm, and m68k should probably use
+		# ldbl-96 as for x86.
 		local longDoubleObjects ;
 		switch $(architecture) {
 			case ppc : longDoubleObjects = ;
 			case m68k : longDoubleObjects = ;
+			case arm : longDoubleObjects = ;
 			case * : longDoubleObjects = cabsl.c cargl.c cimagl.c conjl.c creall.c k_casinhl.c ;
 		}
 

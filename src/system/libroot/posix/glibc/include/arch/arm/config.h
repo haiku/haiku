@@ -188,6 +188,11 @@
 /* Mach/i386 specific: define if the `i386_set_gdt' RPC is available.  */
 #undef	HAVE_I386_SET_GDT
 
+/* arm does not support 128bit long doubles, so let's just use 64bit ones.
+ * This mcro aliases the long double symbols to the double implementation. */
+#define NO_LONG_DOUBLE 1
+#define __NO_LONG_DOUBLE_MATH 1
+
 /*
  */
 
