@@ -11,6 +11,7 @@ SimpleTest abort_test : abort_test.cpp ;
 SimpleTest SyslogTest : SyslogTest.cpp ;
 SimpleTest brk_test : brk_test.c ;
 SimpleTest calloc_test : calloc_test.c ;
+SimpleTest <test>chmod : chmod.cpp ;
 SimpleTest clearenv : clearenv.cpp ;
 SimpleTest dirent_test : dirent_test.cpp ;
 SimpleTest flock_test : flock_test.cpp ;

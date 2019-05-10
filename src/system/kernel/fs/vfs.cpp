@@ -26,6 +26,7 @@
 #include <fs_info.h>
 #include <fs_interface.h>
 #include <fs_volume.h>
+#include <NodeMonitor.h>
 #include <OS.h>
 #include <StorageDefs.h>
 
@@ -6606,8 +6607,10 @@ common_write_stat(struct file_descriptor* descriptor, const struct stat* stat,
 	FUNCTION(("common_write_stat(vnode = %p, stat = %p, statMask = %d)\n",
 		vnode, stat, statMask));
 
-	if ((descriptor->open_mode & O_RWMASK) == O_RDONLY)
+	if ((descriptor->open_mode & O_RWMASK) == O_RDONLY
+		&& (statMask & B_STAT_SIZE) != 0) {
 		return B_BAD_VALUE;
+	}
 
 	if (!HAS_FS_CALL(vnode, write_stat))
 		return B_READ_ONLY_DEVICE;
