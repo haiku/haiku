@@ -310,14 +310,14 @@ print_syscall(FILE *outputFile, Syscall* syscall, debug_post_syscall &message,
 	Context ctx(syscall, (char *)message.args, memoryReader,
 		    contentsFlags, decimal);
 
-	// print syscall name
+	// print syscall name, without the "_kern_"
 	if (colorize) {
 		print_to_string(&string, &length, "[%6ld] %s%s%s(",
-			message.origin.thread, kTerminalTextBlue, syscall->Name().c_str(),
-			kTerminalTextNormal);
+			message.origin.thread, kTerminalTextBlue,
+			syscall->Name().c_str() + 6, kTerminalTextNormal);
 	} else {
 		print_to_string(&string, &length, "[%6ld] %s(",
-			message.origin.thread, syscall->Name().c_str());
+			message.origin.thread, syscall->Name().c_str() + 6);
 	}
 
 	// print arguments
