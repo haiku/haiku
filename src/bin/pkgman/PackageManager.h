@@ -72,6 +72,7 @@ private:
 									fClientInstallationInterface;
 			bool				fInteractive;
 
+			bool				fShowProgress;
 			off_t				fLastBytes;
 			bigtime_t			fLastRateCalcTime;
 			float				fDownloadRate;

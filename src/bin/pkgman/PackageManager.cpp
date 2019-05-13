@@ -173,10 +173,13 @@ PackageManager::Warn(status_t error, const char* format, ...)
 void
 PackageManager::ProgressPackageDownloadStarted(const char* packageName)
 {
+	fShowProgress = isatty(STDOUT_FILENO);
 	fLastBytes = 0;
 	fLastRateCalcTime = system_time();
 	fDownloadRate = 0;
-	printf("  0%%");
+
+	if (fShowProgress)
+		printf("  0%%");
 }
 
 
@@ -186,7 +189,7 @@ PackageManager::ProgressPackageDownloadActive(const char* packageName,
 {
 	if (bytes == totalBytes)
 		fLastBytes = totalBytes;
-	if (!fInteractive)
+	if (!fShowProgress)
 		return;
 
 	// Do not update if nothing changed in the last 500ms
@@ -258,7 +261,7 @@ PackageManager::ProgressPackageDownloadActive(const char* packageName,
 void
 PackageManager::ProgressPackageDownloadComplete(const char* packageName)
 {
-	if (fInteractive) {
+	if (fShowProgress) {
 		// Erase the line, return to the start, and reset colors
 		printf("\r\33[2K\r\x1B[0m");
 	}
