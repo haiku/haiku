@@ -43,6 +43,7 @@
 #include <port.h>
 #include <posix/realtime_sem.h>
 #include <posix/xsi_semaphore.h>
+#include <safemode.h>
 #include <sem.h>
 #include <syscall_process_info.h>
 #include <syscall_load_image.h>
@@ -151,6 +152,7 @@ static ProcessGroupHashTable sGroupHash;
 static spinlock sGroupHashLock = B_SPINLOCK_INITIALIZER;
 
 static Team* sKernelTeam = NULL;
+static bool sDisableUserAddOns = false;
 
 // A list of process groups of children of dying session leaders that need to
 // be signalled, if they have become orphaned and contain stopped processes.
@@ -1575,6 +1577,8 @@ team_create_thread_start_internal(void* args)
 		|| user_memcpy(&programArgs->error_token, &teamArgs->error_token,
 				sizeof(uint32)) < B_OK
 		|| user_memcpy(&programArgs->umask, &teamArgs->umask, sizeof(mode_t)) < B_OK
+		|| user_memcpy(&programArgs->disable_user_addons,
+			&sDisableUserAddOns, sizeof(bool)) < B_OK
 		|| user_memcpy(userArgs, teamArgs->flat_args,
 				teamArgs->flat_args_size) < B_OK) {
 		// the team deletion process will clean this mess
@@ -2834,6 +2838,10 @@ team_init(kernel_args* args)
 
 	// stick it in the team hash
 	sTeamHash.Insert(sKernelTeam);
+
+	// check safe mode settings
+	sDisableUserAddOns = get_safemode_boolean(B_SAFEMODE_DISABLE_USER_ADD_ONS,
+		false);
 
 	add_debugger_command_etc("team", &dump_team_info,
 		"Dump info about a particular team",
