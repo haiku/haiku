@@ -1,9 +1,9 @@
 HaikuPorts repository files
 ==========================
 
-This directory contains RemotePackageRepository files
-which detail packages and repositories leveraged during
-Haiku's build process.
+The `build/jam/repositories/HaikuPorts` directory contains
+RemotePackageRepository files which detail packages and
+repositories leveraged during Haiku's build process.
 
 > Warning: The URL packages are obtained from
 > are determined by the sha256sum of the repository
@@ -35,7 +35,7 @@ Improvements are needed. Replace (ARCH) with architecture, (USER) with your non-
    docker exec -it $(docker ps | grep buildmaster_buildmaster_master_(ARCH) | awk '{ print $1 }') /bin/bash -l
 3) apt install vim python3
 4) edit the repository define, add the needed packages, _devel packages, and add base package to source section.
-5) ln -s /var/buildmaster/package_tools/package_repo /usr/bin/package_tools
+5) ln -s /var/buildmaster/package_tools/package_repo /usr/bin/package_repo
 6) export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/var/buildmaster/package_tools
 7) ./package_tools/hardlink_packages.py (ARCH) ./(ARCH) /var/packages/repository/master/(ARCH)/current/packages/ /var/packages/build-packages/master/
 8) exit; cp /var/lib/docker/volumes/buildmaster_data_master_(ARCH)/_data/(ARCH) /home/(USER)/(ARCH); chown (USER) /home/(USER)/(ARCH);
