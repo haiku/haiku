@@ -23,7 +23,7 @@ AddHaikuImagePackages [ FFilterByBuildFeatures
 	bash bc coreutils curl freetype icu libsolv zlib zstd
 
 	regular_image @{
-		bzip2 ctags diffutils expat ffmpeg findutils gawk glu grep gutenprint
+		bzip2 ctags diffutils expat ffmpeg findutils gawk glu grep gutenprint8
 		gzip ilmbase jasper jpeg
 		less libedit libicns libpcap libpng16 libwebp
 		mesa mesa_devel mesa_swpipe@!gcc2 mesa_swrast@gcc2
@@ -36,7 +36,7 @@ AddHaikuImageSourcePackages [ FFilterByBuildFeatures
 	bash bc coreutils
 
 	regular_image @{
-		ctags expat ffmpeg findutils gawk grep gutenprint
+		ctags expat ffmpeg findutils gawk grep gutenprint8
 		gzip
 		less libicns
 		sed sharutils
