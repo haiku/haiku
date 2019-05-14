@@ -271,7 +271,7 @@ device_set_softc(device_t dev, void *softc)
 	if (dev->softc == softc)
 		return;
 
-	if ((dev->flags & DEVICE_SOFTC_SET) != 0) {
+	if ((dev->flags & DEVICE_SOFTC_SET) == 0) {
 		// Not externally allocated. We own it so we must clean it up.
 		free(dev->softc);
 	}
@@ -458,7 +458,7 @@ device_delete_child(device_t parent, device_t child)
 		free((char *)parent->description);
 
 	// Delete softc if we were the ones to allocate it.
-	if ((parent->flags & DEVICE_SOFTC_SET) != 0)
+	if ((parent->flags & DEVICE_SOFTC_SET) == 0)
 		free(parent->softc);
 
 	free(parent);
