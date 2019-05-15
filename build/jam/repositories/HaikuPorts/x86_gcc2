@@ -49,12 +49,12 @@ RemotePackageRepository HaikuPorts
 	giflib6-5.0.5-5
 	giflib-5.1.4-2
 	giflib_devel-5.1.4-2
-	git-2.21.0-2
-	git_arch-2.21.0-2
-	git_cvs-2.21.0-2
-	git_daemon-2.21.0-2
-	git_email-2.21.0-2
-	git_svn-2.21.0-2
+	git-2.21.0-3
+	git_arch-2.21.0-3
+	git_cvs-2.21.0-3
+	git_daemon-2.21.0-3
+	git_email-2.21.0-3
+	git_svn-2.21.0-3
 	glu-9.0.0-7
 	glu_devel-9.0.0-7
 	grep-2.24-1
@@ -125,7 +125,7 @@ RemotePackageRepository HaikuPorts
 	openexr_devel-2.2.1-2
 	openjpeg-2.1.2-3
 	openjpeg_devel-2.1.2-3
-	openssh-7.9p1-1
+	openssh-7.9p1-2
 	openssl-1.0.2q-1
 	openssl_devel-1.0.2q-1
 	p7zip-9.20.1-7
@@ -135,7 +135,7 @@ RemotePackageRepository HaikuPorts
 	pe-2.4.5-8
 	perl-5.28.2-1
 	pkgconfig-0.29.2-3
-	python-2.7.16-1
+	python-2.7.16-2
 	qrencode_kdl_devel-3.4.4-2
 	readline6-6.3.8-2
 	readline-7.0.3-3
