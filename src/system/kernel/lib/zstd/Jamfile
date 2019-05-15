@@ -13,7 +13,7 @@ local zstdCommonSources =
 	xxhash.c
 	;
 local zstdDecSources =
-	huf_decompress.c zstd_decompress.c zstd_decompress_block.c
+	huf_decompress.c zstd_ddict.c zstd_decompress.c zstd_decompress_block.c
 	;
 
 LOCATE on [ FGristFiles $(zstdCommonSources) ] =
