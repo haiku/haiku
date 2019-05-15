@@ -1,8 +1,9 @@
 /*
- * Copyright 2006-2012, Haiku Inc. All rights reserved.
+ * Copyright 2011-2019, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Augustin Cavalier <waddlesplash>
  *		Michael Lotz <mmlr@mlotz.ch>
  *		Jian Chiang <j.jian.chiang@gmail.com>
  *		Jérôme Duval <jerome.duval@gmail.com>
@@ -134,9 +135,9 @@ private:
 
 			// Endpoint management
 			status_t			ConfigureEndpoint(uint8 slot, uint8 number,
-			                        uint8 type, bool directionIn, uint64 ringAddr,
-			                        uint16 interval, uint16 maxPacketSize,
-			                        uint16 maxFrameSize, usb_speed speed);
+									uint8 type, bool directionIn, uint64 ringAddr,
+									uint16 interval, uint16 maxPacketSize,
+									usb_speed speed);
 			status_t			_InsertEndpointForPipe(Pipe *pipe);
 			status_t			_RemoveEndpointForPipe(Pipe *pipe);
 

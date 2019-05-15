@@ -1395,8 +1395,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 
 	// configure the Control endpoint 0
 	if (ConfigureEndpoint(slot, 0, USB_OBJECT_CONTROL_PIPE, false,
-			device->trb_addr, 0, maxPacketSize, maxPacketSize & 0x7ff,
-			speed) != B_OK) {
+			device->trb_addr, 0, maxPacketSize, speed) != B_OK) {
 		TRACE_ERROR("unable to configure default control endpoint\n");
 		delete_area(device->input_ctx_area);
 		delete_area(device->device_ctx_area);
@@ -1646,8 +1645,7 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 
 		status_t status = ConfigureEndpoint(device->slot, id, pipe->Type(),
 			pipe->Direction() == Pipe::In, device->endpoints[id].trb_addr,
-			pipe->Interval(), pipe->MaxPacketSize(),
-			pipe->MaxPacketSize() & 0x7ff, usbDevice->Speed());
+			pipe->Interval(), pipe->MaxPacketSize(), usbDevice->Speed());
 		if (status != B_OK) {
 			TRACE_ERROR("unable to configure endpoint\n");
 			return status;
@@ -1846,8 +1844,7 @@ XHCI::_UnlinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 
 status_t
 XHCI::ConfigureEndpoint(uint8 slot, uint8 number, uint8 type, bool directionIn,
-    uint64 ringAddr, uint16 interval, uint16 maxPacketSize, uint16 maxFrameSize,
-    usb_speed speed)
+	uint64 ringAddr, uint16 interval, uint16 maxPacketSize, usb_speed speed)
 {
 	struct xhci_device* device = &fDevices[slot];
 
