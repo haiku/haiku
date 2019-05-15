@@ -1517,7 +1517,7 @@ Volume::_ChangeActivation(ActivationChangeRequest& request)
 				|| item->parentDirectoryID != fPackagesDirectory->NodeID()) {
 				ERROR("Volume::_ChangeActivation(): mismatching packages "
 					"directory\n");
-				RETURN_ERROR(B_BAD_VALUE);
+				RETURN_ERROR(B_MISMATCHED_VALUES);
 			}
 
 			Package* package = _FindPackage(item->name);
@@ -1526,21 +1526,21 @@ Volume::_ChangeActivation(ActivationChangeRequest& request)
 				if (package != NULL) {
 					ERROR("Volume::_ChangeActivation(): package to activate "
 						"already activated: \"%s\"\n", item->name);
-					RETURN_ERROR(B_BAD_VALUE);
+					RETURN_ERROR(B_NAME_IN_USE);
 				}
 				newPackageCount++;
 			} else if (item->type == PACKAGE_FS_DEACTIVATE_PACKAGE) {
 				if (package == NULL) {
 					ERROR("Volume::_ChangeActivation(): package to deactivate "
 						"not found: \"%s\"\n", item->name);
-					RETURN_ERROR(B_BAD_VALUE);
+					RETURN_ERROR(B_NAME_NOT_FOUND);
 				}
 				oldPackageCount++;
 			} else if (item->type == PACKAGE_FS_REACTIVATE_PACKAGE) {
 				if (package == NULL) {
 					ERROR("Volume::_ChangeActivation(): package to reactivate "
 						"not found: \"%s\"\n", item->name);
-					RETURN_ERROR(B_BAD_VALUE);
+					RETURN_ERROR(B_NAME_NOT_FOUND);
 				}
 				oldPackageCount++;
 				newPackageCount++;
@@ -1548,7 +1548,9 @@ Volume::_ChangeActivation(ActivationChangeRequest& request)
 				RETURN_ERROR(B_BAD_VALUE);
 		}
 	}
-INFORM("Volume::_ChangeActivation(): %" B_PRId32 " new packages, %" B_PRId32 " old packages\n", newPackageCount, oldPackageCount);
+
+	INFORM("Volume::_ChangeActivation(): %" B_PRId32 " new packages, %" B_PRId32
+		" old packages\n", newPackageCount, oldPackageCount);
 
 	// Things look good so far -- allocate reference arrays for the packages to
 	// add and remove.
@@ -1608,7 +1610,8 @@ INFORM("Volume::_ChangeActivation(): %" B_PRId32 " new packages, %" B_PRId32 " o
 		oldPackageReferences[oldPackageIndex++].SetTo(package);
 		_RemovePackageContent(package, NULL, true);
 		_RemovePackage(package);
-INFORM("package \"%s\" deactivated\n", package->FileName().Data());
+
+		INFORM("package \"%s\" deactivated\n", package->FileName().Data());
 	}
 // TODO: Since package removal cannot fail, consider adding the new packages
 // first. The reactivation case may make that problematic, since two packages
@@ -1627,7 +1630,7 @@ INFORM("package \"%s\" deactivated\n", package->FileName().Data());
 			_RemovePackage(package);
 			break;
 		}
-INFORM("package \"%s\" activated\n", package->FileName().Data());
+		INFORM("package \"%s\" activated\n", package->FileName().Data());
 	}
 
 	// Try to roll back the changes, if an error occurred.
