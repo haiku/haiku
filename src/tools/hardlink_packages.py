@@ -9,7 +9,7 @@
 
 import sys, os, subprocess, re, hashlib
 
-if len(sys.argv) > 5:
+if len(sys.argv) != 5:
 	print("usage: hardlink_packages.py [arch] [jam RemotePackageRepository file] "
 		+ "[prebuilt packages directory] [destination root directory]")
 	print("note that the [jam RemotePackageRepository file] will be modified.")
