@@ -243,6 +243,7 @@ RemotePackageRepository HaikuPorts
 	llvm_x86_clang-5.0.0-3
 	llvm_x86_clang_analysis-5.0.0-3
 	llvm_x86_libs-5.0.0-3
+	llvm7_x86_libs-7.0.1-1
 	mesa_x86-17.1.10-4
 	mesa_x86_devel-17.1.10-4
 	mesa_x86_swpipe-17.1.10-4
