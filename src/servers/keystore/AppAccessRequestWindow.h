@@ -37,7 +37,7 @@ private:
 		BButton* 					fDisallowButton;
 		BButton* 					fOnceButton;
 		BButton* 					fAlwaysButton;
-		StripeView*					fStripeView;
+		BStripeView*				fStripeView;
 
 };
 

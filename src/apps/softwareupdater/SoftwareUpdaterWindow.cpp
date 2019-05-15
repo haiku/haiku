@@ -55,7 +55,7 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 {
 	// Layout
 	BBitmap icon = GetIcon(32 * icon_layout_scale());
-	fStripeView = new StripeView(icon);
+	fStripeView = new BStripeView(icon);
 
 	fUpdateButton = new BButton(B_TRANSLATE("Update now"),
 		new BMessage(kMsgUpdateConfirmed));

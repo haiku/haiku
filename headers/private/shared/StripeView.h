@@ -16,9 +16,12 @@
 #include <View.h>
 
 
-class StripeView : public BView {
+namespace BPrivate {
+
+
+class BStripeView : public BView {
 public:
-							StripeView(BBitmap& icon);
+							BStripeView(BBitmap& icon);
 
 	virtual void			Draw(BRect updateRect);
 	virtual BSize			PreferredSize();
@@ -38,6 +41,12 @@ icon_layout_scale()
 {
 	return max_c(1, ((int32)be_plain_font->Size() + 15) / 16);
 }
+
+
+};
+
+
+using namespace BPrivate;
 
 
 #endif /* _STRIPE_VIEW_H */

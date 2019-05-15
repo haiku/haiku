@@ -18,7 +18,7 @@
 static const int kIconStripeWidth = 30;
 
 
-StripeView::StripeView(BBitmap& icon)
+BStripeView::BStripeView(BBitmap& icon)
 	:
 	BView("StripeView", B_WILL_DRAW),
 	fIcon(icon),
@@ -39,7 +39,7 @@ StripeView::StripeView(BBitmap& icon)
 
 
 void
-StripeView::Draw(BRect updateRect)
+BStripeView::Draw(BRect updateRect)
 {
 	if (fIconSize == 0)
 		return;
@@ -61,14 +61,14 @@ StripeView::Draw(BRect updateRect)
 
 
 BSize
-StripeView::PreferredSize()
+BStripeView::PreferredSize()
 {
 	return BSize(fPreferredWidth, B_SIZE_UNSET);
 }
 
 
 void
-StripeView::GetPreferredSize(float* _width, float* _height)
+BStripeView::GetPreferredSize(float* _width, float* _height)
 {
 	if (_width != NULL)
 		*_width = fPreferredWidth;
@@ -79,7 +79,7 @@ StripeView::GetPreferredSize(float* _width, float* _height)
 
 
 BSize
-StripeView::MaxSize()
+BStripeView::MaxSize()
 {
 	return BLayoutUtils::ComposeSize(ExplicitMaxSize(),
 		BSize(fPreferredWidth, B_SIZE_UNLIMITED));

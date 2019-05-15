@@ -175,7 +175,7 @@ private:
 			status_t			_ReadSettings(BMessage& settings);
 
 			BRect				fDefaultRect;
-			StripeView*			fStripeView;
+			BStripeView*		fStripeView;
 			BStringView*		fHeaderView;
 			BStringView*		fDetailView;
 			BButton*			fUpdateButton;

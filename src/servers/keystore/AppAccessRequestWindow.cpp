@@ -42,7 +42,7 @@ AppAccessRequestWindow::AppAccessRequestWindow(const char* keyringName,
 
 
 	BBitmap icon = GetIcon(32 * icon_layout_scale());
-	fStripeView = new StripeView(icon);
+	fStripeView = new BStripeView(icon);
 
 	float inset = ceilf(be_plain_font->Size() * 0.7);
 

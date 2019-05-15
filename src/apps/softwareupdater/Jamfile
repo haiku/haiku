@@ -7,7 +7,6 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src servers package ] ;
 Application SoftwareUpdater :
 	SoftwareUpdaterApp.cpp
 	SoftwareUpdaterWindow.cpp
-	StripeView.cpp
 	UpdateAction.cpp
 	UpdateManager.cpp
 	CheckAction.cpp
@@ -17,7 +16,7 @@ Application SoftwareUpdater :
 	# package_daemon
 	ProblemWindow.cpp
 	
-	: be localestub package translation libbnetapi.so [ TargetLibsupc++ ]
+	: be localestub package shared translation libbnetapi.so [ TargetLibsupc++ ]
 	: SoftwareUpdater.rdef
 ;
 

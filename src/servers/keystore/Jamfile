@@ -1,14 +1,14 @@
 SubDir HAIKU_TOP src servers keystore ;
 
 UsePrivateHeaders app ;
+UsePrivateHeaders shared ;
 
 Server keystore_server :
 	AppAccessRequestWindow.cpp
 	KeyRequestWindow.cpp
 	Keyring.cpp
 	KeyStoreServer.cpp
-	StripeView.cpp
-	: be localestub [ TargetLibstdc++ ]
+	: be localestub shared [ TargetLibstdc++ ]
 	: keystore_server.rdef
 ;
 
