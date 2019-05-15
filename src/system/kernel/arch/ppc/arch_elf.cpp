@@ -126,11 +126,12 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 	int i;
 	Elf32_Sym *sym;
 	int vlErr;
-	addr_t S = 0;	// symbol address
-	addr_t R = 0;	// section relative symbol address
 
-	addr_t G = 0;	// GOT address
-	addr_t L = 0;	// PLT address
+	Elf32_Addr S = 0;	// symbol address
+	addr_t R = 0;		// section relative symbol address
+
+	addr_t G = 0;		// GOT address
+	addr_t L = 0;		// PLT address
 
 	#define P	((addr_t)(image->text_region.delta + rel[i].r_offset))
 	#define A	((addr_t)rel[i].r_addend)
