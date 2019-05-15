@@ -1373,7 +1373,7 @@ Volume::_CommitTransaction(BMessage* message,
 		error = B_TRANSACTION_NO_MEMORY;
 	}
 
-	_result.SetError(B_TRANSACTION_OK);
+	_result.SetError(error);
 
 	// revert on error
 	if (error != B_TRANSACTION_OK)
