@@ -100,6 +100,8 @@ RemotePackageRepository HaikuPorts
 	libmodplug-0.8.9.0-1
 	libogg-1.3.3-2
 	libogg_devel-1.3.3-2
+	libopenmpt-0.4.4-3
+	libopenmpt_devel-0.4.4-3
 	libpcap-1.8.1-4
 	libpcap_devel-1.8.1-4
 	libpcre-8.42-1
@@ -245,6 +247,7 @@ RemotePackageRepository HaikuPorts
 	libicns
 	libidn2
 	libogg
+	libopenmpt
 	libpcap
 	libpcre
 	libpcre2
