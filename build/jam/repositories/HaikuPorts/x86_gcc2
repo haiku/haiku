@@ -217,6 +217,8 @@ RemotePackageRepository HaikuPorts
 	libmodplug_x86-0.8.9.0-1
 	libogg_x86-1.3.3-2
 	libogg_x86_devel-1.3.3-2
+	libopenmpt_x86-0.4.4-3
+	libopenmpt_x86_devel-0.4.4-3
 	libpng16_x86-1.6.37-1
 	libpng16_x86_devel-1.6.37-1
 	libsolv_x86-0.3.0_haiku_2014_12_22-3
@@ -335,6 +337,7 @@ RemotePackageRepository HaikuPorts
 	libmodplug
 	libogg
 	libogg_x86
+	libopenmpt_x86
 	libpcap
 	libpcre
 	libpcre2
