@@ -7,9 +7,9 @@
 # Copyright 2017-2019 Augustin Cavalier <waddlesplash>
 # Distributed under the terms of the MIT License.
 
-import sys, os, re, hashlib
+import sys, os, subprocess, re, hashlib
 
-if len(sys.argv) < 5:
+if len(sys.argv) > 5:
 	print("usage: hardlink_packages.py [arch] [jam RemotePackageRepository file] "
 		+ "[prebuilt packages directory] [destination root directory]")
 	print("note that the [jam RemotePackageRepository file] will be modified.")
@@ -17,7 +17,8 @@ if len(sys.argv) < 5:
 		+ " and a repo.info.template file (using $ARCH$)")
 	sys.exit(1)
 
-if os.system('package_repo') != 1:
+if subprocess.run(['package_repo'], None, None, None,
+		subprocess.DEVNULL, subprocess.PIPE).returncode != 1:
 	print("package_repo command does not seem to exist.")
 	sys.exit(1)
 
