@@ -4,7 +4,7 @@
 # Hardlink only packages used in the build from one directory to another,
 # and updates the RemotePackageRepository file at the same time.
 #
-# Copyright 2017 Augustin Cavalier <waddlesplash>
+# Copyright 2017-2019 Augustin Cavalier <waddlesplash>
 # Distributed under the terms of the MIT License.
 
 import sys, os, re, hashlib
@@ -15,6 +15,10 @@ if len(sys.argv) < 5:
 	print("note that the [jam RemotePackageRepository file] will be modified.")
 	print("note that [target directory] is assumed to have a 'packages' subdirectory, "
 		+ " and a repo.info.template file (using $ARCH$)")
+	sys.exit(1)
+
+if os.system('package_repo') != 1:
+	print("package_repo command does not seem to exist.")
 	sys.exit(1)
 
 args_arch = sys.argv[1]
