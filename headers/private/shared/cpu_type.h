@@ -483,7 +483,7 @@ get_cpu_type(char *vendorBuffer, size_t vendorSize, char *modelBuffer,
 	cpu_topology_node_info* topology = NULL;
 	get_cpu_topology_info(NULL, &topologyNodeCount);
 	if (topologyNodeCount != 0)
-		topology = new cpu_topology_node_info[topologyNodeCount];
+		topology = (cpu_topology_node_info*)calloc(topologyNodeCount, sizeof(cpu_topology_node_info));
 	get_cpu_topology_info(topology, &topologyNodeCount);
 
 	enum cpu_platform platform = B_CPU_UNKNOWN;
@@ -507,7 +507,7 @@ get_cpu_type(char *vendorBuffer, size_t vendorSize, char *modelBuffer,
 				break;
 		}
 	}
-	delete[] topology;
+	free(topology);
 
 	vendor = get_cpu_vendor_string(cpuVendor);
 	if (vendor == NULL)
@@ -529,7 +529,7 @@ get_rounded_cpu_speed(void)
 	cpu_topology_node_info* topology = NULL;
 	get_cpu_topology_info(NULL, &topologyNodeCount);
 	if (topologyNodeCount != 0)
-		topology = new cpu_topology_node_info[topologyNodeCount];
+		topology = (cpu_topology_node_info*)calloc(topologyNodeCount, sizeof(cpu_topology_node_info));
 	get_cpu_topology_info(topology, &topologyNodeCount);
 
 	uint64 cpuFrequency = 0;
@@ -539,7 +539,7 @@ get_rounded_cpu_speed(void)
 				break;
 		}
 	}
-	delete[] topology;
+	free(topology);
 
 	int target, frac, delta;
 	int freqs[] = { 100, 50, 25, 75, 33, 67, 20, 40, 60, 80, 10, 30, 70, 90 };
