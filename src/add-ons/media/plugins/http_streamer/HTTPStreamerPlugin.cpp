@@ -8,7 +8,7 @@
 
 #include "HTTPMediaIO.h"
 
-#include "debug.h"
+#include "MediaDebug.h"
 
 
 HTTPStreamer::HTTPStreamer()
