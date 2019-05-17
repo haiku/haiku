@@ -321,6 +321,9 @@ Device::Device(Object* parent, int8 hubAddress, uint8 hubPort,
 
 Device::~Device()
 {
+	// Unset fInitOK to indicate we are tearing down.
+	fInitOK = false;
+
 	delete fDefaultPipe;
 
 	if (fConfigurations == NULL) {
