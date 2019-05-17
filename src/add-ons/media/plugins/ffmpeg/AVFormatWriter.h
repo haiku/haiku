@@ -6,25 +6,23 @@
 #define AV_FORMAT_WRITER_H
 
 
-#include <Writer.h>
 #include <Locker.h>
 
-using namespace BCodecKit;
-
+#include "WriterPlugin.h"
 
 extern "C" {
 	#include "avformat.h"
 }
 
 
-class AVFormatWriter : public BWriter {
+class AVFormatWriter : public Writer {
 public:
 								AVFormatWriter();
 								~AVFormatWriter();
 
 	virtual	status_t			Init(const media_file_format* fileFormat);
 
-	virtual	status_t			SetMetaData(BMetaData* data);
+	virtual	status_t			SetCopyright(const char* copyright);
 	virtual	status_t			CommitHeader();
 	virtual	status_t			Flush();
 	virtual	status_t			Close();
@@ -34,8 +32,8 @@ public:
 									const media_codec_info* codecInfo);
 	virtual	status_t			FreeCookie(void* cookie);
 
-	virtual	status_t			SetMetaData(void* cookie,
-									BMetaData* data);
+	virtual	status_t			SetCopyright(void* cookie,
+									const char* copyright);
 
 	virtual	status_t			AddTrackInfo(void* cookie, uint32 code,
 									const void* data, size_t size,

@@ -73,7 +73,6 @@ rule HaikuImageGetSystemLibs
 			libalm.so
 			libbe.so libbsd.so libbnetapi.so
 			libbluetooth.so
-			libcodec.so
 			libdebug.so
 			libdebugger.so@primary
 			libdevice.so

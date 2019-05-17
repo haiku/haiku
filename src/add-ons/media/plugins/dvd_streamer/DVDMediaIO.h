@@ -13,10 +13,6 @@
 #include <dvdnav/dvdnav.h>
 
 
-using BCodecKit::BAdapterIO;
-using BCodecKit::BInputAdapter;
-
-
 class DVDMediaIO : public BAdapterIO
 {
 public:

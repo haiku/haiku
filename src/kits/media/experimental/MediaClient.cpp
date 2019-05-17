@@ -337,9 +337,6 @@ BMediaClient::Start()
 				remoteNode, fNode->TimeSource()->Now());
 	}
 
-	if (err != B_OK)
-		return err;
-
 	return BMediaRoster::CurrentRoster()->StartNode(
 		fNode->Node(), fNode->TimeSource()->Now());
 }

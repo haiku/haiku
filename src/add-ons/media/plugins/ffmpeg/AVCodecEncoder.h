@@ -6,10 +6,7 @@
 #define AVCODEC_ENCODER_H
 
 
-#include <Encoder.h>
 #include <MediaFormats.h>
-
-using namespace BCodecKit;
 
 extern "C" {
 	#include "avcodec.h"
@@ -17,11 +14,13 @@ extern "C" {
 	#include "libavutil/fifo.h"
 }
 
+#include "EncoderPlugin.h"
+
 
 typedef AVCodecID CodecID;
 
 
-class AVCodecEncoder : public BEncoder {
+class AVCodecEncoder : public Encoder {
 public:
 								AVCodecEncoder(uint32 codecID,
 									int bitRateScale);

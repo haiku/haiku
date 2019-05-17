@@ -28,35 +28,29 @@ DVDStreamer::~DVDStreamer()
 
 
 status_t
-DVDStreamer::Sniff(const BUrl& url)
+DVDStreamer::Sniff(const BUrl& url, BDataIO** source)
 {
 	BString path = url.UrlString();
 	BString protocol = url.Protocol();
 	if (protocol == "dvd") {
 		path = path.RemoveFirst("dvd://");
 	} else if (protocol == "file") {
-		path = path.RemoveFirst("file://");	
+		path = path.RemoveFirst("file://");
 	} else
 		return B_UNSUPPORTED;
 
 	DVDMediaIO* adapter = new DVDMediaIO(path);
 	status_t ret = adapter->Open();
 	if (ret == B_OK) {
-		fAdapter = adapter;
+		*source = adapter;
 		return B_OK;
 	}
 	delete adapter;
-	return ret;	
+	return ret;
 }
 
 
-BMediaIO*
-DVDStreamer::Adapter() const
-{
-	return fAdapter;
-}
-
-
+#if 0
 void
 DVDStreamer::MouseMoved(uint32 x, uint32 y)
 {
@@ -69,10 +63,18 @@ DVDStreamer::MouseDown(uint32 x, uint32 y)
 {
 	fAdapter->MouseDown(x, y);
 }
+#endif
 
 
-BStreamer*
+Streamer*
 DVDStreamerPlugin::NewStreamer()
 {
 	return new DVDStreamer();
+}
+
+
+MediaPlugin*
+instantiate_plugin()
+{
+	return new DVDStreamerPlugin();
 }

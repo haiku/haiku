@@ -11,8 +11,6 @@
 
 #include "rtsp.h"
 
-using BCodecKit::BAdapterIO;
-using BCodecKit::BInputAdapter;
 
 class HaikuRTSPClient;
 

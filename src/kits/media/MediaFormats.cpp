@@ -7,18 +7,17 @@
  *		Marcus Overhagen
  */
 
-#include <MediaFormats.h>
-
-#include <CodecRoster.h>
-#include <ObjectList.h>
-#include <Message.h>
-#include <Autolock.h>
 
 #include "AddOnManager.h"
 #include "DataExchange.h"
 #include "FormatManager.h"
 #include "MetaFormat.h"
 #include "MediaDebug.h"
+
+#include <MediaFormats.h>
+#include <ObjectList.h>
+#include <Message.h>
+#include <Autolock.h>
 
 #include <string.h>
 
@@ -35,8 +34,45 @@ get_next_encoder(int32* cookie, const media_file_format* fileFormat,
 	const media_format* inputFormat, media_format* _outputFormat,
 	media_codec_info* _codecInfo)
 {
-	return BCodecKit::BCodecRoster::GetNextEncoder(cookie, fileFormat,
-		inputFormat, _outputFormat, _codecInfo);
+	// TODO: If fileFormat is provided (existing apps also pass NULL),
+	// we could at least check fileFormat->capabilities against
+	// outputFormat->type without even contacting the server.
+
+	if (cookie == NULL || inputFormat == NULL || _codecInfo == NULL)
+		return B_BAD_VALUE;
+
+	while (true) {
+		media_codec_info candidateCodecInfo;
+		media_format_family candidateFormatFamily;
+		media_format candidateInputFormat;
+		media_format candidateOutputFormat;
+
+		status_t ret = AddOnManager::GetInstance()->GetCodecInfo(
+			&candidateCodecInfo, &candidateFormatFamily,
+			&candidateInputFormat, &candidateOutputFormat, *cookie);
+
+		if (ret != B_OK)
+			return ret;
+
+		*cookie = *cookie + 1;
+
+		if (fileFormat != NULL && candidateFormatFamily != B_ANY_FORMAT_FAMILY
+			&& fileFormat->family != B_ANY_FORMAT_FAMILY
+			&& fileFormat->family != candidateFormatFamily) {
+			continue;
+		}
+
+		if (!candidateInputFormat.Matches(inputFormat))
+			continue;
+
+		if (_outputFormat != NULL)
+			*_outputFormat = candidateOutputFormat;
+
+		*_codecInfo = candidateCodecInfo;
+		break;
+	}
+
+	return B_OK;
 }
 
 
@@ -46,16 +82,77 @@ get_next_encoder(int32* cookie, const media_file_format* fileFormat,
 	media_codec_info* _codecInfo, media_format* _acceptedInputFormat,
 	media_format* _acceptedOutputFormat)
 {
-	return BCodecKit::BCodecRoster::GetNextEncoder(cookie, fileFormat,
-		inputFormat, outputFormat, _codecInfo, _acceptedInputFormat,
-			_acceptedOutputFormat);
+	// TODO: If fileFormat is provided (existing apps also pass NULL),
+	// we could at least check fileFormat->capabilities against
+	// outputFormat->type without even contacting the server.
+
+	if (cookie == NULL || inputFormat == NULL || outputFormat == NULL
+		|| _codecInfo == NULL) {
+		return B_BAD_VALUE;
+	}
+
+	while (true) {
+		media_codec_info candidateCodecInfo;
+		media_format_family candidateFormatFamily;
+		media_format candidateInputFormat;
+		media_format candidateOutputFormat;
+
+		status_t ret = AddOnManager::GetInstance()->GetCodecInfo(
+			&candidateCodecInfo, &candidateFormatFamily, &candidateInputFormat,
+			&candidateOutputFormat, *cookie);
+				
+		if (ret != B_OK)
+			return ret;
+
+		*cookie = *cookie + 1;
+
+		if (fileFormat != NULL && candidateFormatFamily != B_ANY_FORMAT_FAMILY
+			&& fileFormat->family != B_ANY_FORMAT_FAMILY
+			&& fileFormat->family != candidateFormatFamily) {
+			continue;
+		}
+
+		if (!candidateInputFormat.Matches(inputFormat)
+			|| !candidateOutputFormat.Matches(outputFormat)) {
+			continue;
+		}
+
+		// TODO: These formats are currently way too generic. For example,
+		// an encoder may want to adjust video width to a multiple of 16,
+		// or overwrite the intput and or output color space. To make this
+		// possible, we actually have to instantiate an Encoder here and
+		// ask it to specifiy the format.
+		if (_acceptedInputFormat != NULL)
+			*_acceptedInputFormat = candidateInputFormat;
+		if (_acceptedOutputFormat != NULL)
+			*_acceptedOutputFormat = candidateOutputFormat;
+
+		*_codecInfo = candidateCodecInfo;
+		break;
+	}
+
+	return B_OK;
 }
 
 
 status_t
 get_next_encoder(int32* cookie, media_codec_info* _codecInfo)
 {
-	return BCodecKit::BCodecRoster::GetNextEncoder(cookie, _codecInfo);
+	if (cookie == NULL || _codecInfo == NULL)
+		return B_BAD_VALUE;
+
+	media_format_family formatFamily;
+	media_format inputFormat;
+	media_format outputFormat;
+
+	status_t ret = AddOnManager::GetInstance()->GetCodecInfo(_codecInfo,
+		&formatFamily, &inputFormat, &outputFormat, *cookie);
+	if (ret != B_OK)
+		return ret;
+
+	*cookie = *cookie + 1;
+
+	return B_OK;
 }
 
 
@@ -269,7 +366,7 @@ update_media_formats()
 
 	// We want the add-ons to register themselves with the format manager, so
 	// the list is up to date.
-	BCodecKit::BPrivate::AddOnManager::GetInstance()->RegisterAddOns();
+	AddOnManager::GetInstance()->RegisterAddOns();
 
 	BMessage reply;
 	FormatManager::GetInstance()->GetFormats(sLastFormatsUpdate, reply);
@@ -524,8 +621,10 @@ BMediaFormats::MakeFormatFor(const media_format_description* descriptions,
 	int32 descriptionCount, media_format* format, uint32 flags,
 	void* _reserved)
 {
-	return FormatManager::GetInstance()->MakeFormatFor(descriptions,
+	status_t status = FormatManager::GetInstance()->MakeFormatFor(descriptions,
 		descriptionCount, *format, flags, _reserved);
+
+	return status;
 }
 
 
@@ -539,3 +638,4 @@ BMediaFormats::MakeFormatFor(const media_format_description& description,
 	*_outFormat = inFormat;
 	return MakeFormatFor(&description, 1, _outFormat);
 }
+

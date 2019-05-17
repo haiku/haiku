@@ -1,19 +1,14 @@
 /*
- * Copyright 2016-2018, Dario Casalinuovo
+ * Copyright 2016, Dario Casalinuovo
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "HTTPStreamerPlugin.h"
 
-#include "MediaDebug.h"
+#include "HTTPMediaIO.h"
 
-
-B_DECLARE_CODEC_KIT_PLUGIN(
-	HTTPStreamerPlugin,
-	"http_streamer",
-	B_CODEC_KIT_PLUGIN_VERSION
-);
+#include "debug.h"
 
 
 HTTPStreamer::HTTPStreamer()
@@ -29,31 +24,30 @@ HTTPStreamer::~HTTPStreamer()
 
 
 status_t
-HTTPStreamer::Sniff(const BUrl& url)
+HTTPStreamer::Sniff(const BUrl& url, BDataIO** source)
 {
 	CALLED();
 
-	HTTPMediaIO* adapter = new HTTPMediaIO(url);
+	HTTPMediaIO* outSource = new HTTPMediaIO(url);
 
-	status_t ret = adapter->Open();
+	status_t ret = outSource->Open();
 	if (ret == B_OK) {
-		fAdapter = adapter;
+		*source = outSource;
 		return B_OK;
 	}
-	delete adapter;
+	delete outSource;
 	return ret;
 }
 
 
-BMediaIO*
-HTTPStreamer::Adapter() const
-{
-	return fAdapter;
-}
-
-
-BStreamer*
+Streamer*
 HTTPStreamerPlugin::NewStreamer()
 {
 	return new HTTPStreamer();
+}
+
+
+MediaPlugin *instantiate_plugin()
+{
+	return new HTTPStreamerPlugin();
 }

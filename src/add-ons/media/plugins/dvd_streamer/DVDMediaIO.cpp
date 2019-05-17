@@ -15,8 +15,6 @@
 
 #include "MediaDebug.h"
 
-using namespace BCodecKit;
-
 
 #define DVD_READ_CACHE 1
 
@@ -194,7 +192,7 @@ DVDMediaIO::HandleDVDEvent(int event, int len)
 			dvdnav_highlight_event_t* highlight_event
 				= (dvdnav_highlight_event_t*) fBuffer;
 			TRACE("DVDMediaIO::HandleDVDEvent: Button: %d\n",
-				highlight_event->buttonN);		
+				highlight_event->buttonN);
 			break;
 		}
 

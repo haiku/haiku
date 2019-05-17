@@ -12,6 +12,7 @@ class BufferManager;
 class NotificationManager;
 class MediaFilesManager;
 class AddOnManager;
+class FormatManager;
 
 extern AppManager* gAppManager;
 extern NodeManager* gNodeManager;
@@ -19,5 +20,6 @@ extern BufferManager* gBufferManager;
 extern NotificationManager* gNotificationManager;
 extern MediaFilesManager* gMediaFilesManager;
 extern AddOnManager* gAddOnManager;
+extern FormatManager* gFormatManager;
 
 #endif	// MEDIA_SERVER_H

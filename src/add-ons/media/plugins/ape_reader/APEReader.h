@@ -6,9 +6,7 @@
 #include "MonkeysAudioMIMEType.h"
 #include "PositionBridgeIO.h"
 
-#include "Reader.h"		// Haiku private header
-
-using namespace BCodecKit;
+#include "ReaderPlugin.h"		// Haiku private header
 
 
 const int32		BLOCK_COUNT = 1024*4;	// number of blocks, get from MACLib at once
@@ -16,7 +14,7 @@ const int32		BUFFER_SIZE = 1024*4;	// size of audio data passing to Media Kit
 const int32		MEDIA_FILE_FORMAT_VERSION = 100;	// media_file_format::version
 
 
-class	TAPEReader : public BReader
+class	TAPEReader : public Reader
 {
 public:
 	TAPEReader();
@@ -45,7 +43,7 @@ public:
 								size_t* oChunkSize, media_header* oMediaHeader);
 
 private:
-	typedef	BReader	SUPER;
+	typedef	Reader	SUPER;
 
 	bigtime_t			CurrentTime() const;
 	status_t			LoadAPECheck() const;
@@ -64,14 +62,17 @@ private:
 };
 
 
-class	TAPEReaderPlugin : public BReaderPlugin
+class	TAPEReaderPlugin : public ReaderPlugin
 {
 public:
 	TAPEReaderPlugin();
 	virtual	~TAPEReaderPlugin();
 
-	virtual	BReader* NewReader();
+	virtual	Reader*	NewReader();
 };
+
+
+MediaPlugin*	instantiate_plugin();
 
 
 #endif	// ___APEReader_H_

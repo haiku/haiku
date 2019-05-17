@@ -10,9 +10,7 @@
 #include <HttpRequest.h>
 #include <UrlProtocolRoster.h>
 
-#include "MediaDebug.h"
-
-using namespace BCodecKit;
+#include "debug.h"
 
 
 // 10 seconds timeout

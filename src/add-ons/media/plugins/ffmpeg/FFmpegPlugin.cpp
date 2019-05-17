@@ -4,7 +4,6 @@
  * Copyright (C) 2001 Axel Dörfler
  * Copyright (C) 2004 Marcus Overhagen
  * Copyright (C) 2009 Stephan Aßmus <superstippi@gmx.de>
- * Copyright (C) 2018 Dario Casalinuovo
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -41,17 +40,10 @@ extern "C" {
 #define ERROR(a...) fprintf(stderr, a)
 
 
-B_DECLARE_CODEC_KIT_PLUGIN(
-	FFmpegPlugin,
-	"ffmpeg",
-	B_CODEC_KIT_PLUGIN_VERSION
-);
-
-
 // #pragma mark -
 
 
-BDecoder*
+Decoder*
 FFmpegPlugin::NewDecoder(uint index)
 {
 // TODO: Confirm we can check index here.
@@ -61,7 +53,7 @@ FFmpegPlugin::NewDecoder(uint index)
 }
 
 
-BReader*
+Reader*
 FFmpegPlugin::NewReader()
 {
 	return new(std::nothrow) AVFormatReader();
@@ -75,7 +67,7 @@ FFmpegPlugin::GetSupportedFormats(media_format** _formats, size_t* _count)
 }
 
 
-BWriter*
+Writer*
 FFmpegPlugin::NewWriter()
 {
 	return new(std::nothrow) AVFormatWriter();
@@ -92,7 +84,7 @@ FFmpegPlugin::GetSupportedFileFormats(const media_file_format** _fileFormats,
 }
 
 
-BEncoder*
+Encoder*
 FFmpegPlugin::NewEncoder(const media_codec_info& codecInfo)
 {
 	for (size_t i = 0; i < gEncoderCount; i++) {
@@ -105,7 +97,7 @@ FFmpegPlugin::NewEncoder(const media_codec_info& codecInfo)
 }
 
 
-BEncoder*
+Encoder*
 FFmpegPlugin::NewEncoder(const media_format& format)
 {
 	for (size_t i = 0; i < gEncoderCount; i++) {
@@ -136,3 +128,14 @@ FFmpegPlugin::RegisterNextEncoder(int32* cookie, media_codec_info* _codecInfo,
 
 	return B_OK;
 }
+
+
+// #pragma mark -
+
+
+MediaPlugin*
+instantiate_plugin()
+{
+	return new(std::nothrow) FFmpegPlugin;
+}
+

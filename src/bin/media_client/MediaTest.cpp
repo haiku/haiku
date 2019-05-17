@@ -12,8 +12,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include <MediaDebug.h>
-
+#include <debug.h>
 
 #ifdef DEBUG
 #define DELAYED_MODE 1

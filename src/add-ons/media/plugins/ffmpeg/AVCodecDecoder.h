@@ -13,11 +13,9 @@
 
 //! libavcodec based decoder for Haiku
 
-#include <Decoder.h>
-#include <MediaFormats.h>
-#include <Reader.h>
 
-using namespace BCodecKit;
+#include <MediaFormats.h>
+
 
 extern "C" {
 	#include "avcodec.h"
@@ -29,6 +27,10 @@ extern "C" {
 	#include "swscale.h"
 	#include "timestamp.h"
 }
+
+
+#include "DecoderPlugin.h"
+#include "ReaderPlugin.h"
 
 #include "CodecTable.h"
 #include "gfx_util.h"
@@ -44,7 +46,7 @@ extern "C" {
 #endif
 
 
-class AVCodecDecoder : public BDecoder {
+class AVCodecDecoder : public Decoder {
 public:
 						AVCodecDecoder();
 

@@ -425,7 +425,7 @@ AVFormatWriter::Init(const media_file_format* fileFormat)
 
 
 status_t
-AVFormatWriter::SetMetaData(BMetaData* data)
+AVFormatWriter::SetCopyright(const char* copyright)
 {
 	TRACE("AVFormatWriter::SetCopyright(%s)\n", copyright);
 
@@ -541,9 +541,9 @@ AVFormatWriter::FreeCookie(void* _cookie)
 
 
 status_t
-AVFormatWriter::SetMetaData(void* cookie, BMetaData* data)
+AVFormatWriter::SetCopyright(void* cookie, const char* copyright)
 {
-	TRACE("AVFormatWriter::SetMetaData(%p)\n", cookie);
+	TRACE("AVFormatWriter::SetCopyright(%p, %s)\n", cookie, copyright);
 
 	return B_NOT_SUPPORTED;
 }
@@ -590,7 +590,7 @@ AVFormatWriter::_Write(void* cookie, uint8* buffer, int bufferSize)
 
 	AVFormatWriter* writer = reinterpret_cast<AVFormatWriter*>(cookie);
 
-	ssize_t written = writer->Target()->Write(buffer, bufferSize);
+	ssize_t written = writer->fTarget->Write(buffer, bufferSize);
 
 	TRACE_IO("  written: %ld\n", written);
 	return (int)written;
@@ -606,7 +606,7 @@ AVFormatWriter::_Seek(void* cookie, off_t offset, int whence)
 
 	AVFormatWriter* writer = reinterpret_cast<AVFormatWriter*>(cookie);
 
-	BMediaIO* mediaIO = dynamic_cast<BMediaIO*>(writer->Target());
+	BMediaIO* mediaIO = dynamic_cast<BMediaIO*>(writer->fTarget);
 	if (mediaIO == NULL)
 		return -1;
 

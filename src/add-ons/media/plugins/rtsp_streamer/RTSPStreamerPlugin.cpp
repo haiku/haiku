@@ -1,23 +1,10 @@
-/*
- * Copyright 2016-2019, Dario Casalinuovo
- * Distributed under the terms of the MIT License.
- */
 
 #include "RTSPStreamerPlugin.h"
 
 #include "RTSPMediaIO.h"
 
 
-B_DECLARE_CODEC_KIT_PLUGIN(
-	RTSPStreamerPlugin,
-	"rtsp_streamer",
-	B_CODEC_KIT_PLUGIN_VERSION
-);
-
-
 RTSPStreamer::RTSPStreamer()
-	:
-	BStreamer()
 {
 }
 
@@ -41,8 +28,14 @@ RTSPStreamer::Sniff(const BUrl& url, BDataIO** source)
 }
 
 
-BStreamer*
+Streamer*
 RTSPStreamerPlugin::NewStreamer()
 {
 	return new RTSPStreamer();
+}
+
+
+MediaPlugin *instantiate_plugin()
+{
+	return new RTSPStreamerPlugin();
 }

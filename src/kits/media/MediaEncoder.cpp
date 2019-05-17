@@ -9,15 +9,12 @@
 
 #include <MediaEncoder.h>
 
-#include <CodecRoster.h>
-#include <Encoder.h>
+#include <EncoderPlugin.h>
+#include <PluginManager.h>
 
 #include <new>
 
 #include "MediaDebug.h"
-
-using namespace BCodecKit;
-
 
 /*************************************************************
  * public BMediaEncoder
@@ -79,7 +76,7 @@ BMediaEncoder::SetTo(const media_format* outputFormat)
 		return fInitStatus;
 
 	media_format format = *outputFormat;
-	err = BCodecRoster::InstantiateEncoder(&fEncoder, format);
+	err = gPluginManager.CreateEncoder(&fEncoder, format);
 	if (fEncoder != NULL && err == B_OK) {
 		err = _AttachToEncoder();
 		if (err == B_OK)
@@ -97,7 +94,7 @@ BMediaEncoder::SetTo(const media_codec_info* mci)
 	CALLED();
 
 	ReleaseEncoder();
-	status_t err = BCodecRoster::InstantiateEncoder(&fEncoder, mci, 0);
+	status_t err = gPluginManager.CreateEncoder(&fEncoder, mci, 0);
 	if (fEncoder != NULL && err == B_OK) {
 		err = _AttachToEncoder();
 		if (err == B_OK) {
@@ -219,7 +216,7 @@ BMediaEncoder::ReleaseEncoder()
 {
 	CALLED();
 	if (fEncoder != NULL) {
-		BCodecRoster::ReleaseEncoder(fEncoder);
+		gPluginManager.DestroyEncoder(fEncoder);
 		fEncoder = NULL;
 	}
 	fInitStatus = B_NO_INIT;
@@ -229,7 +226,7 @@ BMediaEncoder::ReleaseEncoder()
 status_t
 BMediaEncoder::_AttachToEncoder()
 {
-	class MediaEncoderChunkWriter : public BChunkWriter {
+	class MediaEncoderChunkWriter : public ChunkWriter {
 		public:
 			MediaEncoderChunkWriter(BMediaEncoder* encoder)
 			{

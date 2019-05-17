@@ -6,35 +6,27 @@
 #define _DVD_STREAMER_PLUGIN_H
 
 
-#include <Streamer.h>
+#include "StreamerPlugin.h"
 
-#include "DVDMediaIO.h"
-
-using BCodecKit::BMediaIO;
-using BCodecKit::BStreamer;
-using BCodecKit::BStreamerPlugin;
-
-
-class DVDStreamer : public BStreamer
+class DVDStreamer : public Streamer
 {
 public:
 								DVDStreamer();
 	virtual						~DVDStreamer();
 
-	virtual status_t			Sniff(const BUrl& url);
-	virtual BMediaIO*			Adapter() const;
+	virtual status_t			Sniff(const BUrl& url, BDataIO**);
 
+#if 0
 	virtual void				MouseMoved(uint32 x, uint32 y);
 	virtual void				MouseDown(uint32 x, uint32 y);
-
-private:
-			DVDMediaIO*			fAdapter;
+#endif
 };
 
 
-class DVDStreamerPlugin : public BStreamerPlugin {
+class DVDStreamerPlugin : public StreamerPlugin
+{
 public:
-	virtual	BStreamer*			NewStreamer();
+	virtual	Streamer*			NewStreamer();
 };
 
 

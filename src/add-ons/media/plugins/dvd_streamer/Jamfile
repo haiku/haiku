@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src add-ons media plugins dvd_streamer ;
 
-# For MediaDebug.h
-UsePrivateHeaders media ;
+UsePrivateHeaders media shared ;
+UsePrivateHeaders [ FDirName media experimental ] ;
 
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
@@ -25,7 +25,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			DVDMediaIO.cpp
 			:
 			[ BuildFeatureAttribute libdvdnav : libraries ]
-			be codec shared
+			be media shared
 			[ TargetLibstdc++ ] [ TargetLibsupc++ ]
 		;
 	}

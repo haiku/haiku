@@ -8,10 +8,14 @@
 
 #include <MediaFormats.h>
 
-
-namespace BCodecKit {
-	class BEncoder;
+namespace BPrivate {
+	namespace media {
+		class Encoder;
+		class EncoderPlugin;
+	}
 }
+
+using namespace BPrivate::media;
 
 
 class BMediaEncoder {
@@ -80,7 +84,7 @@ private:
 			void				ReleaseEncoder();
 
 			uint32				_reserved_was_fEncoderMgr;
-			BCodecKit::BEncoder* fEncoder;
+			Encoder*			fEncoder;
 
 			int32				fEncoderID;
 			bool				fFormatValid;
