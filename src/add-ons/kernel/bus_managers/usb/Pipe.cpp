@@ -40,7 +40,18 @@ Pipe::InitCommon(int8 deviceAddress, uint8 endpointAddress, usb_speed speed,
 	fHubAddress = hubAddress;
 	fHubPort = hubPort;
 
+	fMaxBurst = 0;
+	fBytesPerInterval = 0;
+
 	GetBusManager()->NotifyPipeChange(this, USB_CHANGE_CREATED);
+}
+
+
+void
+Pipe::InitSuperSpeed(uint8 maxBurst, uint16 bytesPerInterval)
+{
+	fMaxBurst = maxBurst;
+	fBytesPerInterval = bytesPerInterval;
 }
 
 

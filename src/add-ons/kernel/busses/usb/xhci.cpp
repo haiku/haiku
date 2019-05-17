@@ -1395,7 +1395,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 
 	// configure the Control endpoint 0
 	if (ConfigureEndpoint(slot, 0, USB_OBJECT_CONTROL_PIPE, false,
-			device->trb_addr, 0, maxPacketSize, speed) != B_OK) {
+			device->trb_addr, 0, maxPacketSize, speed, 0, 0) != B_OK) {
 		TRACE_ERROR("unable to configure default control endpoint\n");
 		delete_area(device->input_ctx_area);
 		delete_area(device->device_ctx_area);
@@ -1645,7 +1645,8 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 
 		status_t status = ConfigureEndpoint(device->slot, id, pipe->Type(),
 			pipe->Direction() == Pipe::In, device->endpoints[id].trb_addr,
-			pipe->Interval(), pipe->MaxPacketSize(), usbDevice->Speed());
+			pipe->Interval(), pipe->MaxPacketSize(), usbDevice->Speed(),
+			pipe->MaxBurst(), pipe->BytesPerInterval());
 		if (status != B_OK) {
 			TRACE_ERROR("unable to configure endpoint\n");
 			return status;
@@ -1844,7 +1845,8 @@ XHCI::_UnlinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 
 status_t
 XHCI::ConfigureEndpoint(uint8 slot, uint8 number, uint8 type, bool directionIn,
-	uint64 ringAddr, uint16 interval, uint16 maxPacketSize, usb_speed speed)
+	uint64 ringAddr, uint16 interval, uint16 maxPacketSize, usb_speed speed,
+	uint8 maxBurst, uint16 bytesPerInterval)
 {
 	struct xhci_device* device = &fDevices[slot];
 
@@ -1903,21 +1905,18 @@ XHCI::ConfigureEndpoint(uint8 slot, uint8 number, uint8 type, bool directionIn,
 
 	// For non-isochronous endpoints, we want the controller to retry failed
 	// transfers, if possible. (XHCI 1.1 § 4.10.2.3 p189.)
-	if (!(type & USB_OBJECT_ISO_PIPE))
+	if ((type & USB_OBJECT_ISO_PIPE) == 0)
 		dwendpoint1 |= ENDPOINT_1_CERR(3);
 
-	// Assign maximum burst size.
-	// TODO: While computing the maximum burst this way is correct for USB2
-	// devices, it is merely acceptable for USB3 devices, which have a more
-	// correct value stored in the Companion Descriptor. (Further, this value
-	// in the USB3 Companion Descriptor is to be used for *all* endpoints, not
-	// just Interrupt and Isoch ones.)
-	uint8 maxBurst = (maxPacketSize & 0x1800) >> 11;
-	if (speed >= USB_SPEED_HIGHSPEED
-			&& (((type & USB_OBJECT_INTERRUPT_PIPE) != 0)
-				|| (type & USB_OBJECT_ISO_PIPE) != 0)) {
-		dwendpoint1 |= ENDPOINT_1_MAXBURST(maxBurst);
+	// Assign maximum burst size. For USB3 devices this is passed in; for
+	// all other devices we compute it. (XHCI 1.1 § 4.8.2 p154.)
+	if (speed == USB_SPEED_HIGHSPEED && (type & (USB_OBJECT_INTERRUPT_PIPE
+			| USB_OBJECT_ISO_PIPE)) != 0) {
+		maxBurst = (maxPacketSize & 0x1800) >> 11;
+	} else if (speed != USB_SPEED_SUPER) {
+		maxBurst = 0;
 	}
+	dwendpoint1 |= ENDPOINT_1_MAXBURST(maxBurst);
 
 	// Assign maximum packet size, set the ring address, and set the
 	// "Dequeue Cycle State" bit. (XHCI 1.1 § 6.2.3 Table 6-10 p430.)
@@ -1934,10 +1933,15 @@ XHCI::ConfigureEndpoint(uint8 slot, uint8 number, uint8 type, bool directionIn,
 	}
 
 	// Assign maximum ESIT payload. (XHCI 1.1 § 4.14.2 p250.)
-	// TODO: This computation is *only* correct for USB2 devices.
-	if (((type & USB_OBJECT_INTERRUPT_PIPE) != 0)
-			|| ((type & USB_OBJECT_ISO_PIPE) != 0)) {
-		dwendpoint4 |= ENDPOINT_4_MAXESITPAYLOAD((maxBurst + 1) * maxPacketSize);
+	if ((type & (USB_OBJECT_INTERRUPT_PIPE | USB_OBJECT_ISO_PIPE)) != 0) {
+		// TODO: For SuperSpeedPlus endpoints, there is yet another descriptor
+		// for isochronous endpoints that specifies the maximum ESIT payload.
+		// We don't fetch this yet, so just fall back to the USB2 computation
+		// method if bytesPerInterval is 0.
+		if (speed == USB_SPEED_SUPER && bytesPerInterval != 0)
+			dwendpoint4 |= ENDPOINT_4_MAXESITPAYLOAD(bytesPerInterval);
+		else if (speed >= USB_SPEED_HIGHSPEED)
+			dwendpoint4 |= ENDPOINT_4_MAXESITPAYLOAD((maxBurst + 1) * maxPacketSize);
 	}
 
 	_WriteContext(&device->input_ctx->endpoints[number].dwendpoint0,

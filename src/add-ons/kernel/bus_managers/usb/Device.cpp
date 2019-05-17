@@ -254,6 +254,22 @@ Device::Device(Object* parent, int8 hubAddress, uint8 hubPort,
 					break;
 				}
 
+				case USB_DESCRIPTOR_ENDPOINT_COMPANION: {
+					usb_endpoint_descriptor* desc = currentInterface
+						->endpoint[currentInterface->endpoint_count - 1].descr;
+					if ((uint8*)desc != (&configData[descriptorStart
+							- desc->length])) {
+						TRACE_ERROR("found endpoint companion descriptor not immediately "
+							"following endpoint descriptor, ignoring!\n");
+						break;
+					}
+					// TODO: It'd be nicer if we could store the endpoint companion
+					// descriptor along with the endpoint descriptor, but as the
+					// interface struct is public API, that would be an ABI break.
+
+					// fall through
+				}
+
 				default:
 					TRACE("got generic descriptor\n");
 					usb_generic_descriptor* genericDescriptor
@@ -472,6 +488,29 @@ Device::InitEndpoints(int32 interfaceIndex)
 			usb_endpoint_info* endpoint = &interfaceInfo->endpoint[i];
 			Pipe* pipe = NULL;
 
+			usb_endpoint_companion_descriptor* comp_descr = NULL;
+			if (fSpeed == USB_SPEED_SUPER) {
+				// We should have a companion descriptor for this device.
+				// Let's find it: it'll be the "i"th one.
+				size_t k = 0;
+				for (size_t j = 0; j < interfaceInfo->generic_count; j++) {
+					usb_descriptor* desc = interfaceInfo->generic[j];
+					if (desc->endpoint.descriptor_type
+							!= USB_DESCRIPTOR_ENDPOINT_COMPANION) {
+						continue;
+					}
+					if (k == i) {
+						comp_descr = (usb_endpoint_companion_descriptor*)desc;
+						break;
+					}
+					k++;
+				}
+				if (comp_descr == NULL) {
+					TRACE_ERROR("SuperSpeed device without an endpoint companion "
+						"descriptor!");
+				}
+			}
+
 			Pipe::pipeDirection direction = Pipe::Out;
 			if ((endpoint->descr->endpoint_address & 0x80) != 0)
 				direction = Pipe::In;
@@ -505,6 +544,10 @@ Device::InitEndpoints(int32 interfaceIndex)
 				endpoint->descr->endpoint_address & 0x0f,
 				fSpeed, direction, endpoint->descr->max_packet_size,
 				endpoint->descr->interval, fHubAddress, fHubPort);
+			if (comp_descr != NULL) {
+				pipe->InitSuperSpeed(comp_descr->max_burst,
+					comp_descr->bytes_per_interval);
+			}
 			endpoint->handle = pipe->USBID();
 		}
 	}

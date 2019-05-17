@@ -137,7 +137,8 @@ private:
 			status_t			ConfigureEndpoint(uint8 slot, uint8 number,
 									uint8 type, bool directionIn, uint64 ringAddr,
 									uint16 interval, uint16 maxPacketSize,
-									usb_speed speed);
+									usb_speed speed, uint8 maxBurst,
+									uint16 bytesPerInterval);
 			status_t			_InsertEndpointForPipe(Pipe *pipe);
 			status_t			_RemoveEndpointForPipe(Pipe *pipe);
 

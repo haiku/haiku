@@ -31,20 +31,11 @@ static usb_device_descriptor sXHCIRootHubDevice =
 };
 
 
-struct usb_endpoint_ss_comp_descriptor {
-	uint8	length;
-	uint8	descriptor_type;
-	uint16	burst;
-	uint8	attributes;
-	uint16	internal;
-} _PACKED;
-
-
 struct xhci_root_hub_configuration_s {
 	usb_configuration_descriptor	configuration;
 	usb_interface_descriptor		interface;
 	usb_endpoint_descriptor			endpoint;
-	usb_endpoint_ss_comp_descriptor	endpc;
+	usb_endpoint_companion_descriptor endpc;
 	usb_hub_descriptor				hub;
 } _PACKED;
 
@@ -86,7 +77,7 @@ static xhci_root_hub_configuration_s sXHCIRootHubConfig =
 
 	{ // endpoint companion descriptor
 		7,
-		0x30,
+		USB_DESCRIPTOR_ENDPOINT_COMPANION,
 		0,
 		0,
 		0
