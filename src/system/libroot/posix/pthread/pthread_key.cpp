@@ -35,7 +35,7 @@ get_key_destructor(uint32 key, int32& sequence)
 
 
 /*!	Function to get the thread specific value of a key in a lockless
-	way.
+	way. The thread specific value is reset to NULL.
 	\a sequence must be the sequence of the key table that this value
 	has to fit to.
 */
@@ -53,6 +53,8 @@ get_key_value(pthread_thread* thread, uint32 key, int32 sequence)
 
 		value = keyData.value;
 	} while (specificSequence != sequence);
+
+	keyData.value = NULL;
 
 	return value;
 }
