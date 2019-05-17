@@ -1726,7 +1726,9 @@ _memory_map_os(size_t size, size_t* offset) {
 	void* ptr = mmap(0, size + padding, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_UNINITIALIZED, -1, 0);
 #  endif
 	if ((ptr == MAP_FAILED) || !ptr) {
+#ifndef __HAIKU__
 		assert("Failed to map virtual memory block" == 0);
+#endif
 		return 0;
 	}
 #endif
