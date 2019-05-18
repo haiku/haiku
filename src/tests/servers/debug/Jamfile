@@ -2,4 +2,14 @@ SubDir HAIKU_TOP src tests servers debug ;
 
 AddSubDirSupportedPlatforms libbe_test ;
 
+UseHeaders [ FDirName $(HAIKU_TOP) src servers debug ] ;
+UsePrivateHeaders shared ;
+
 BinCommand crashing_app : crashing_app.cpp ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src servers debug ] ;
+SimpleTest DebugWindow :
+	DebugWindow.cpp DebugWindowTest.cpp 
+	: be localestub shared
+	: debug_server.rdef
+;
