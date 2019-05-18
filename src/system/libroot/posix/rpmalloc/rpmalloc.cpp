@@ -1716,7 +1716,7 @@ _memory_map_os(size_t size, size_t* offset) {
 	void* ptr = mmap(0, size + padding, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_UNINITIALIZED, (_memory_huge_pages ? VM_FLAGS_SUPERPAGE_SIZE_2MB : -1), 0);
 #  elif defined(__HAIKU__)
 	void* ptr;
-	area_id area = create_area("heap area", &ptr, B_RANDOMIZED_ANY_ADDRESS,
+	area_id area = create_area("heap area", &ptr, B_ANY_ADDRESS,
 		size + padding, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (area < 0)
 		ptr = MAP_FAILED;
