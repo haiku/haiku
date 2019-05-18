@@ -822,6 +822,18 @@ get_nearest_symbol_at_address(void* address, image_id* _imageID,
 	if (image == NULL)
 		return B_BAD_VALUE;
 
+	if (_imageID != NULL)
+		*_imageID = image->id;
+	if (_imagePath != NULL)
+		*_imagePath = image->path;
+	if (_imageName != NULL)
+		*_imageName = image->name;
+
+	// If the caller does not want the actual symbol name, only the image,
+	// we can just return immediately.
+	if (_symbolName == NULL && _type == NULL && _location == NULL)
+		return B_OK;
+
 	bool exactMatch = false;
 	elf_sym* foundSymbol = NULL;
 	addr_t foundLocation = (addr_t)NULL;
@@ -845,12 +857,6 @@ get_nearest_symbol_at_address(void* address, image_id* _imageID,
 		}
 	}
 
-	if (_imageID != NULL)
-		*_imageID = image->id;
-	if (_imagePath != NULL)
-		*_imagePath = image->path;
-	if (_imageName != NULL)
-		*_imageName = image->name;
 	if (_exactMatch != NULL)
 		*_exactMatch = exactMatch;
 
