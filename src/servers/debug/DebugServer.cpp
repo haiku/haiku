@@ -1,9 +1,12 @@
 /*
+ * Copyright 2019, Adrien Destugues, pulkomandy@pulkomandy.tk.
  * Copyright 2011-2014, Rene Gollent, rene@gollent.com.
  * Copyright 2005-2009, Ingo Weinhold, bonefish@users.sf.net.
  * Distributed under the terms of the MIT License.
  */
 
+
+#include "DebugWindow.h"
 
 #include <map>
 
@@ -13,16 +16,13 @@
 #include <strings.h>
 #include <unistd.h>
 
-#include <Alert.h>
 #include <AppMisc.h>
 #include <AutoDeleter.h>
 #include <Autolock.h>
-#include <Catalog.h>
 #include <debug_support.h>
 #include <Entry.h>
 #include <FindDirectory.h>
 #include <Invoker.h>
-#include <Locale.h>
 #include <Path.h>
 
 #include <DriverSettings.h>
@@ -36,27 +36,9 @@
 #include <util/DoublyLinkedList.h>
 
 
-enum {
-	kActionKillTeam,
-	kActionDebugTeam,
-	kActionWriteCoreFile,
-	kActionSaveReportTeam,
-	kActionPromptUser
-};
-
-
 static const char* kDebuggerSignature = "application/x-vnd.Haiku-Debugger";
 static const int32 MSG_DEBUG_THIS_TEAM = 'dbtt';
 
-
-//#define HANDOVER_USE_GDB 1
-#define HANDOVER_USE_DEBUGGER 1
-
-#undef B_TRANSLATION_CONTEXT
-#define B_TRANSLATION_CONTEXT "DebugServer"
-
-#define USE_GUI true
-	// define to false if the debug server shouldn't use GUI (i.e. an alert)
 
 //#define TRACE_DEBUG_SERVER
 #ifdef TRACE_DEBUG_SERVER
@@ -893,22 +875,10 @@ TeamDebugHandler::_HandleMessage(DebugMessage *message)
 		_NotifyAppServer(fTeam);
 		_NotifyRegistrar(fTeam, true, false);
 
-		BString buffer(
-			B_TRANSLATE("The application:\n\n      %app\n\n"
-			"has encountered an error which prevents it from continuing. Haiku "
-			"will terminate the application and clean up."));
-		buffer.ReplaceFirst("%app", fTeamInfo.args);
+		DebugWindow *alert = new DebugWindow(fTeamInfo.args);
 
 		// TODO: It would be nice if the alert would go away automatically
 		// if someone else kills our teams.
-		BAlert *alert = new BAlert(NULL, buffer.String(),
-			B_TRANSLATE("Terminate"), B_TRANSLATE("Debug"),
-			B_TRANSLATE("Write core file"),
-			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-#ifdef HANDOVER_USE_DEBUGGER
-		alert->AddButton(B_TRANSLATE("Save report"));
-#endif
-		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		debugAction = alert->Go();
 		if (debugAction < 0) {
 			// Happens when closed by escape key
