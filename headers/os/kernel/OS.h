@@ -7,8 +7,8 @@
 
 /** Kernel specific structures and functions */
 
-#include <sys/types.h>
 #include <stdarg.h>
+#include <sys/types.h>
 
 #include <SupportDefs.h>
 #include <StorageDefs.h>
