@@ -449,6 +449,7 @@ TermView::_PushLine(int cols, const VTermScreenCell* cells)
 
 	fScrollBuffer.AddItem(item, 0);
 
+	// Remove extra items if the scrollback gets too long
 	free(fScrollBuffer.RemoveItem(kScrollBackSize));
 
 	_UpdateScrollbar();
@@ -486,8 +487,20 @@ TermView::_UpdateScrollbar()
 int
 TermView::_PopLine(int cols, VTermScreenCell* cells)
 {
-	/* TODO can be used when switching to alt screen and when resizing */
-	return 0;
+	ScrollBufferItem* item = (ScrollBufferItem*)fScrollBuffer.RemoveItem(0l);
+	if (item == NULL)
+		return 0;
+
+	_UpdateScrollbar();
+	if (item->cols >= cols) {
+		memcpy(cells, item->cells, cols * sizeof(VTermScreenCell));
+	} else {
+		memcpy(cells, item->cells, item->cols * sizeof(VTermScreenCell));
+		for (int i = item->cols; i < cols; i++)
+			cells[i] = cells[i - 1];
+	}
+	free(item);
+	return 1;
 }
 
 
