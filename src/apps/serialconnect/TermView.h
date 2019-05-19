@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2015, Adrien Destugues, pulkomandy@gmail.com
+ * Copyright 2012-2019, Adrien Destugues, pulkomandy@pulkomandy.tk
  * Distributed under the terms of the MIT licence.
  */
 
@@ -28,6 +28,7 @@ class TermView: public BView
 				void		SetLineTerminator(BString bytes);
 
 				void		PushBytes(const char* bytes, const size_t length);
+				void		Clear();
 
 	private:
 				void		_Init();
@@ -42,13 +43,15 @@ class TermView: public BView
 				void		_MoveCursor(VTermPos pos, VTermPos oldPos,
 								int visible);
 				void		_PushLine(int cols, const VTermScreenCell* cells);
+				int			_PopLine(int cols, VTermScreenCell* cells);
+				void		_UpdateScrollbar();
 
 		static	int			_Damage(VTermRect rect, void* user);
 		static	int			_MoveCursor(VTermPos pos, VTermPos oldPos,
 								int visible, void* user);
 		static	int			_PushLine(int cols, const VTermScreenCell* cells,
 								void* user);
-		static	int			_PopLine(int cols, const VTermScreenCell* cells,
+		static	int			_PopLine(int cols, VTermScreenCell* cells,
 								void* user);
 
 	private:

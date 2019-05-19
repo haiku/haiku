@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2017, Adrien Destugues, pulkomandy@gmail.com
+ * Copyright 2012-2019, Adrien Destugues, pulkomandy@pulkomandy.tk
  * Distributed under the terms of the MIT licence.
  */
 
@@ -65,6 +65,7 @@ enum messageConstants {
 	kMsgProgress        = 'prog',
 	kMsgSettings        = 'stty',
 	kMsgSendFile        = 'sndf',
+	kMsgClear           = 'cler',
 };
 
 #endif

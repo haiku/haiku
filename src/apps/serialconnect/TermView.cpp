@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2015, Adrien Destugues, pulkomandy@gmail.com
+ * Copyright 2012-2019, Adrien Destugues, pulkomandy@pulkomandy.tk
  * Distributed under the terms of the MIT licence.
  */
 
@@ -266,6 +266,20 @@ TermView::PushBytes(const char* bytes, size_t length)
 }
 
 
+void
+TermView::Clear()
+{
+	while(fScrollBuffer.ItemAt(0)) {
+		free(fScrollBuffer.RemoveItem(0l));
+	}
+
+	vterm_state_reset(vterm_obtain_state(fTerm), 1);
+	vterm_screen_reset(fTermScreen, 1);
+
+	_UpdateScrollbar();
+}
+
+
 // #pragma mark -
 
 
@@ -437,6 +451,13 @@ TermView::_PushLine(int cols, const VTermScreenCell* cells)
 
 	free(fScrollBuffer.RemoveItem(kScrollBackSize));
 
+	_UpdateScrollbar();
+}
+
+
+void
+TermView::_UpdateScrollbar()
+{
 	int availableRows, availableCols;
 	vterm_get_size(fTerm, &availableRows, &availableCols);
 
@@ -459,6 +480,14 @@ TermView::_PushLine(int cols, const VTermScreenCell* cells)
 		scrollBar->SetProportion(availableRows * fFontHeight / range);
 		scrollBar->SetSteps(fFontHeight, fFontHeight * 3);
 	}
+}
+
+
+int
+TermView::_PopLine(int cols, VTermScreenCell* cells)
+{
+	/* TODO can be used when switching to alt screen and when resizing */
+	return 0;
 }
 
 
@@ -492,6 +521,14 @@ TermView::_PushLine(int cols, const VTermScreenCell* cells, void* user)
 }
 
 
+/* static */ int
+TermView::_PopLine(int cols, VTermScreenCell* cells, void* user)
+{
+	TermView* view = (TermView*)user;
+	return view->_PopLine(cols, cells);
+}
+
+
 const
 VTermScreenCallbacks TermView::sScreenCallbacks = {
 	&TermView::_Damage,
@@ -502,5 +539,5 @@ VTermScreenCallbacks TermView::sScreenCallbacks = {
 	/*.bell =*/ NULL,
 	/*.resize =*/ NULL,
 	&TermView::_PushLine,
-	/*.sb_popline =*/ NULL,
+	&TermView::_PopLine,
 };

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2017, Adrien Destugues, pulkomandy@pulkomandy.tk
+ * Copyright 2012-2019, Adrien Destugues, pulkomandy@pulkomandy.tk
  * Distributed under the terms of the MIT licence.
  */
 
@@ -58,6 +58,7 @@ SerialWindow::SerialWindow()
 	r.right = r.left + B_V_SCROLL_BAR_WIDTH;
 	r.top -= 1;
 	r.bottom -= B_H_SCROLL_BAR_HEIGHT - 1;
+
 	BScrollBar* scrollBar = new BScrollBar(r, "scrollbar", NULL, 0, 0,
 		B_VERTICAL);
 
@@ -81,17 +82,14 @@ SerialWindow::SerialWindow()
 	fConnectionMenu = new BMenu("Connection");
 	fFileMenu = new BMenu("File");
 	BMenu* settingsMenu = new BMenu("Settings");
+	BMenu* editMenu = new BMenu("Edit");
 
 	fConnectionMenu->SetRadioMode(true);
 
 	menuBar->AddItem(fConnectionMenu);
+	menuBar->AddItem(editMenu);
 	menuBar->AddItem(fFileMenu);
 	menuBar->AddItem(settingsMenu);
-
-	// TODO edit menu - what's in it ? Usual copy/paste would be nice but we
-	// need a way to select text in the window.
-	//BMenu* editMenu = new BMenu("Edit");
-	//menuBar->AddItem(editMenu);
 
 	BMenuItem* logFile = new BMenuItem("Log to file" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgLogfile));
@@ -118,6 +116,13 @@ SerialWindow::SerialWindow()
 	fFileMenu->AddItem(xmodemReceive);
 	xmodemReceive->SetEnabled(false);
 #endif
+
+	// Items for the edit menu
+	BMenuItem* clearScreen = new BMenuItem("Clear history",
+		new BMessage(kMsgClear));
+	editMenu->AddItem(clearScreen);
+
+	// TODO copy (when we have selection), paste
 
 	// Configuring all this by menus may be a bit unhandy. Make a setting
 	// window instead ?
@@ -438,6 +443,11 @@ void SerialWindow::MessageReceived(BMessage* message)
 				}
 			}
 
+			return;
+		}
+		case kMsgClear:
+		{
+			fTermView->Clear();
 			return;
 		}
 		case kMsgProgress:
