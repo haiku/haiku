@@ -269,8 +269,8 @@ TermView::PushBytes(const char* bytes, size_t length)
 void
 TermView::Clear()
 {
-	while(fScrollBuffer.ItemAt(0)) {
-		free(fScrollBuffer.RemoveItem(0l));
+	while (fScrollBuffer.ItemAt(0)) {
+		free(fScrollBuffer.RemoveItem((int32)0));
 	}
 
 	vterm_state_reset(vterm_obtain_state(fTerm), 1);
@@ -487,7 +487,8 @@ TermView::_UpdateScrollbar()
 int
 TermView::_PopLine(int cols, VTermScreenCell* cells)
 {
-	ScrollBufferItem* item = (ScrollBufferItem*)fScrollBuffer.RemoveItem(0l);
+	ScrollBufferItem* item =
+		(ScrollBufferItem*)fScrollBuffer.RemoveItem((int32)0);
 	if (item == NULL)
 		return 0;
 
