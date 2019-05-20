@@ -48,7 +48,7 @@ for platform in [ MultiBootSubDirSetup openfirmware ] {
 		:
 		:
 			boot_platform_generic_openfirmware.a
-			boot_platform_openfirmware_$(TARGET_ARCH).a
+			boot_platform_openfirmware_$(TARGET_ARCH).o
 		;
 
 #		SEARCH on [ FGristFiles $(genericPlatformSources) ]
