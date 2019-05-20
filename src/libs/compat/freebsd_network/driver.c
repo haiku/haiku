@@ -180,8 +180,6 @@ _fbsd_init_drivers(driver_t *drivers[])
 {
 	status_t status;
 	int p = 0;
-	pci_info* info;
-	device_t root;
 
 	status = init_mutexes();
 	if (status < B_OK)
@@ -209,13 +207,14 @@ _fbsd_init_drivers(driver_t *drivers[])
 	if (status < B_OK)
 		goto err6;
 
-	status = init_root_device(&root);
-	if (status != B_OK)
-		goto err7;
-	info = get_pci_info(root);
-
 	for (p = 0; sProbedDevices[p].driver != NULL; p++) {
-		device_t device = NULL;
+		pci_info* info;
+		device_t root, device = NULL;
+		status = init_root_device(&root);
+		if (status != B_OK)
+			break;
+
+		info = get_pci_info(root);
 		*info = sProbedDevices[p].info;
 
 		status = add_child_device(sProbedDevices[p].driver, root, &device);
@@ -228,25 +227,18 @@ _fbsd_init_drivers(driver_t *drivers[])
 				&& device_attach(device) == 0) {
 			dprintf("%s: init_driver(%p)\n", gDriverName,
 				sProbedDevices[p].driver);
-			status = init_root_device(&root);
-			if (status != B_OK)
-				break;
-			info = get_pci_info(root);
 		} else
-			device_delete_child(root, device);
+			device_delete_child(NULL, root);
 	}
 
 	if (gDeviceCount > 0)
 		return B_OK;
-
-	device_delete_child(NULL, root);
 
 	if (status == B_OK)
 		status = B_ERROR;
 
 err7:
 	uninit_wlan_stack();
-
 err6:
 	uninit_sysinit();
 	if (HAIKU_DRIVER_REQUIRES(FBSD_TASKQUEUES))
