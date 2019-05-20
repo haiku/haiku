@@ -5,20 +5,25 @@ ENTRY(_start)
 
 SECTIONS
 {
+	/* Execution address. The file is loaded at 0x4000 with its header,
+	 * then relocated here. */
 	. = 0x202000;
-
 	__text_begin = .;
 
+	/* keep text and data sections next to each other, as the loader in openboot
+	 * is not able to handle a hole between them.
+	 */
+
 	/* text/read-only data */
-	.text :	{ *(.text.start) /* Make sure entry point is at start of file */
+	.text :	{ 
+			  /* Make sure entry point is at start of file. Not required, since
+			   * it is set using ENTRY above, but it looks nicer and makes it
+			   * clearer we jumped at the correct address. */
+              *(.text.start)
+
 			  *(.text .text.* .gnu.linkonce.t.*)
 	          *(.rodata .rodata.* .gnu.linkonce.r.*)
 	          *(.sdata2) }
-
-	/* writable data  */
-	/* align to the same offset in the next page (for performance reasons
-	   (not that it really matters in the boot loader)) */
-	. = ALIGN(0x1000) + 0x1000 + (. & (0x1000 - 1));
 
 	.data : {
 		__ctor_list = .;
