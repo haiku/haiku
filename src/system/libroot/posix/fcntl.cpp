@@ -75,3 +75,23 @@ fcntl(int fd, int op, ...)
 
 	RETURN_AND_SET_ERRNO(error);
 }
+
+
+int
+posix_fadvise(int fd, off_t offset, off_t len, int advice)
+{
+	if (len < 0 || offset < 0 || advice < POSIX_FADV_NORMAL
+		|| advice > POSIX_FADV_NOREUSE) {
+		return EINVAL;
+	}
+
+	struct stat stat;
+	if (fstat(fd, &stat) < 0)
+		return EBADF;
+	if (S_ISFIFO(stat.st_mode))
+		return ESPIPE;
+
+	// Haiku does not use this information.
+	return 0;
+}
+

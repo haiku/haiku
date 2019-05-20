@@ -67,6 +67,14 @@
 #define AT_REMOVEDIR		0x04	/* unlinkat() */
 #define AT_EACCESS			0x08	/* faccessat() */
 
+/* file advisory information, unused by Haiku */
+#define POSIX_FADV_NORMAL		0	/* no advice */
+#define POSIX_FADV_SEQUENTIAL	1	/* expect sequential access */
+#define POSIX_FADV_RANDOM		2	/* expect access in a random order */
+#define POSIX_FADV_WILLNEED		3	/* expect access in the near future */
+#define POSIX_FADV_DONTNEED		4	/* expect no access in the near future */
+#define POSIX_FADV_NOREUSE		5	/* expect access only once */
+
 /* advisory file locking */
 
 struct flock {
@@ -89,6 +97,8 @@ extern int	open(const char *path, int openMode, ...);
 extern int	openat(int fd, const char *path, int openMode, ...);
 
 extern int	fcntl(int fd, int op, ...);
+
+extern int	posix_fadvise(int fd, off_t offset, off_t len, int advice);
 
 #ifdef __cplusplus
 }
