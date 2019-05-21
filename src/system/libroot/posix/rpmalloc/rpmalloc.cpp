@@ -142,7 +142,7 @@
 #  endif
 #endif
 
-#if defined( __x86_64__ ) || defined( _M_AMD64 ) || defined( _M_X64 ) || defined( _AMD64_ ) || defined( __arm64__ ) || defined( __aarch64__ )
+#if defined(__LLP64__) || defined(__LP64__)
 #  define ARCH_64BIT 1
 #else
 #  define ARCH_64BIT 0
