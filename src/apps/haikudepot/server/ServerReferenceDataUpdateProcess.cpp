@@ -11,6 +11,7 @@
 #include <time.h>
 
 #include <AutoDeleter.h>
+#include <AutoLocker.h>
 #include <Catalog.h>
 #include <FileIO.h>
 #include <Url.h>
@@ -63,6 +64,7 @@ BString
 ServerReferenceDataUpdateProcess::UrlPathComponent()
 {
 	BString result;
+	AutoLocker<BLocker> locker(fModel->Lock());
 	result.SetToFormat("/__reference/all-%s.json.gz",
 		fModel->Language().PreferredLanguage().Code());
 	return result;
@@ -128,7 +130,10 @@ ServerReferenceDataUpdateProcess::_ProcessNaturalLanguages(
 			naturalLanguage->IsPopular())));
 	}
 
-	fModel->Language().AddSupportedLanguages(result);
+	{
+		AutoLocker<BLocker> locker(fModel->Lock());
+		fModel->Language().AddSupportedLanguages(result);
+	}
 
 	printf("[%s] did add %" B_PRId32 " supported languages\n",
 		Name(), result.CountItems());

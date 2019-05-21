@@ -23,7 +23,7 @@
 LanguageMenuUtils::AddLanguagesToMenu(
 	const LanguageList& languages, BMenu* menu)
 {
-	if (languages.IsEmpty())
+	if (languages.IsEmpty() && Logger::IsInfoEnabled())
 		printf("there are no languages defined\n");
 
 	int32 addedPopular = LanguageMenuUtils::_AddLanguagesToMenu(

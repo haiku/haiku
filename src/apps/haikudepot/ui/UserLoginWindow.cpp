@@ -13,6 +13,7 @@
 
 #include <Alert.h>
 #include <Autolock.h>
+#include <AutoLocker.h>
 #include <Catalog.h>
 #include <Button.h>
 #include <LayoutBuilder.h>
@@ -47,7 +48,7 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 		B_FLOATING_WINDOW_LOOK, B_FLOATING_SUBSET_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS
 			| B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
-	fPreferredLanguageCode(model.Language().PreferredLanguage().Code()),
+	fPreferredLanguageCode(LANGUAGE_DEFAULT_CODE),
 	fModel(model),
 	fMode(NONE),
 	fWorkerThread(-1)
@@ -67,20 +68,24 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 		"", new BMessage(MSG_VALIDATE_FIELDS));
 	fRepeatPasswordField->TextView()->HideTyping(true);
 
-	// Construct languages popup
-	BPopUpMenu* languagesMenu = new BPopUpMenu(B_TRANSLATE("Language"));
-	fLanguageCodeField = new BMenuField("language",
-		B_TRANSLATE("Preferred language:"), languagesMenu);
+	{
+		AutoLocker<BLocker> locker(fModel.Lock());
+		fPreferredLanguageCode = fModel.Language().PreferredLanguage().Code();
+		// Construct languages popup
+		BPopUpMenu* languagesMenu = new BPopUpMenu(B_TRANSLATE("Language"));
+		fLanguageCodeField = new BMenuField("language",
+			B_TRANSLATE("Preferred language:"), languagesMenu);
 
-	LanguageMenuUtils::AddLanguagesToMenu(
-		fModel.Language().SupportedLanguages(),
-		languagesMenu);
-	languagesMenu->SetTargetForItems(this);
+		LanguageMenuUtils::AddLanguagesToMenu(
+			fModel.Language().SupportedLanguages(),
+			languagesMenu);
+		languagesMenu->SetTargetForItems(this);
 
-	printf("using preferred language code [%s]\n",
-		fPreferredLanguageCode.String());
-	LanguageMenuUtils::MarkLanguageInMenu(fPreferredLanguageCode,
-		languagesMenu);
+		printf("using preferred language code [%s]\n",
+			fPreferredLanguageCode.String());
+		LanguageMenuUtils::MarkLanguageInMenu(fPreferredLanguageCode,
+			languagesMenu);
+	}
 
 	fEmailField = new BTextControl(B_TRANSLATE("Email address:"), "", NULL);
 	fCaptchaView = new BitmapView("captcha view");

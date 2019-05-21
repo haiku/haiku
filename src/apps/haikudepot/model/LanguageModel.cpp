@@ -39,7 +39,7 @@ LanguageModel::LanguageModel()
 {
 	const Language defaultLanguage = _DeriveDefaultLanguage();
 	fSupportedLanguages.Add(LanguageRef(
-		new Language(defaultLanguage)));
+		new Language(defaultLanguage), true));
 	_SetPreferredLanguage(defaultLanguage);
 }
 

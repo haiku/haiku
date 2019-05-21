@@ -11,6 +11,7 @@
 #include <time.h>
 
 #include <AutoDeleter.h>
+#include <AutoLocker.h>
 #include <Catalog.h>
 #include <FileIO.h>
 #include <Url.h>
@@ -178,6 +179,7 @@ BString
 ServerRepositoryDataUpdateProcess::UrlPathComponent()
 {
 	BString result;
+	AutoLocker<BLocker> locker(fModel->Lock());
 	result.SetToFormat("/__repository/all-%s.json.gz",
 		fModel->Language().PreferredLanguage().Code());
 	return result;

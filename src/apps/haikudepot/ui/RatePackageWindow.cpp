@@ -11,6 +11,7 @@
 
 #include <Alert.h>
 #include <Autolock.h>
+#include <AutoLocker.h>
 #include <Catalog.h>
 #include <Button.h>
 #include <CheckBox.h>
@@ -191,7 +192,7 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame,
 	fTextEditor(new TextEditor(), true),
 	fRating(RATING_NONE),
 	fRatingDeterminate(false),
-	fCommentLanguageCode(fModel.Language().PreferredLanguage().Code()),
+	fCommentLanguageCode(LANGUAGE_DEFAULT_CODE),
 	fWorkerThread(-1)
 {
 	AddToSubset(parent);
@@ -242,17 +243,23 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame,
 	fStability = fStabilityCodes.ItemAt(0).Name();
 	stabilityMenu->ItemAt(0)->SetMarked(true);
 
-	// Construct languages popup
-	BPopUpMenu* languagesMenu = new BPopUpMenu(B_TRANSLATE("Language"));
-	fCommentLanguageField = new BMenuField("language",
-		B_TRANSLATE("Comment language:"), languagesMenu);
 
-	LanguageMenuUtils::AddLanguagesToMenu(
-		fModel.Language().SupportedLanguages(),
-		languagesMenu);
-	languagesMenu->SetTargetForItems(this);
-	LanguageMenuUtils::MarkLanguageInMenu(fCommentLanguageCode,
-		languagesMenu);
+	{
+		AutoLocker<BLocker> locker(fModel.Lock());
+		fCommentLanguageCode = fModel.Language().PreferredLanguage().Code();
+
+		// Construct languages popup
+		BPopUpMenu* languagesMenu = new BPopUpMenu(B_TRANSLATE("Language"));
+		fCommentLanguageField = new BMenuField("language",
+			B_TRANSLATE("Comment language:"), languagesMenu);
+
+		LanguageMenuUtils::AddLanguagesToMenu(
+			fModel.Language().SupportedLanguages(),
+			languagesMenu);
+		languagesMenu->SetTargetForItems(this);
+		LanguageMenuUtils::MarkLanguageInMenu(fCommentLanguageCode,
+			languagesMenu);
+	}
 
 	fRatingActiveCheckBox = new BCheckBox("rating active",
 		B_TRANSLATE("Other users can see this rating"),

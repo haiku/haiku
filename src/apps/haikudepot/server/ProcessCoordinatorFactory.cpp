@@ -7,6 +7,7 @@
 #include "ProcessCoordinatorFactory.h"
 
 #include <Autolock.h>
+#include <AutoLocker.h>
 
 #include <package/Context.h>
 #include <package/PackageRoster.h>
@@ -78,6 +79,8 @@ ProcessCoordinatorFactory::CreateBulkLoadCoordinator(
 	status_t repoNamesResult = roster.GetRepositoryNames(repoNames);
 
 	if (repoNamesResult == B_OK) {
+		AutoLocker<BLocker> locker(model->Lock());
+
 		for (int32 i = 0; i < repoNames.CountStrings(); i++) {
 			ProcessNode* processNode = new ProcessNode(
 				new ServerPkgDataUpdateProcess(
