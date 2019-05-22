@@ -1276,6 +1276,8 @@ TeamWindow::_Init()
 	fMenuBar->AddItem(menu);
 	item = new BMenuItem("Save debug report",
 		new BMessage(MSG_CHOOSE_DEBUG_REPORT_LOCATION));
+	menu->AddItem(item);
+	item->SetTarget(this);
 	item = new BMenuItem("Write core file",
 		new BMessage(MSG_CHOOSE_CORE_FILE_LOCATION));
 	menu->AddItem(item);
