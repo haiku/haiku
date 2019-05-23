@@ -139,8 +139,9 @@ rule ArchitectureSetup architecture
 		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-error=unused-but-set-variable
 			-Wno-error=deprecated -Wno-error=deprecated-declarations
 			-Wno-error=cpp -Wno-error=trigraphs ;
-		# But this one can stay.
-		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-error=cast-align ;
+		# But these can stay.
+		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-error=cast-align
+			-Wno-error=format-truncation ;
 	}
 
 	# debug flags
