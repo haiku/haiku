@@ -1,5 +1,6 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2019, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -8,6 +9,7 @@
 #include <algorithm>
 #include <stdio.h>
 
+#include <AutoLocker.h>
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <LayoutBuilder.h>
@@ -31,8 +33,8 @@ add_categories_to_menu(const CategoryList& categories, BMenu* menu)
 	for (int i = 0; i < categories.CountItems(); i++) {
 		const CategoryRef& category = categories.ItemAtFast(i);
 		BMessage* message = new BMessage(MSG_CATEGORY_SELECTED);
-		message->AddString("name", category->Name());
-		BMenuItem* item = new BMenuItem(category->Label(), message);
+		message->AddString("code", category->Code());
+		BMenuItem* item = new BMenuItem(category->Name(), message);
 		menu->AddItem(item);
 	}
 }
@@ -88,7 +90,6 @@ FilterView::AttachedToWindow()
 {
 	fShowField->Menu()->SetTargetForItems(Window());
 	fSearchTermsText->SetTarget(this);
-
 	fSearchTermsText->MakeFocus();
 }
 
@@ -113,7 +114,7 @@ FilterView::MessageReceived(BMessage* message)
 
 
 void
-FilterView::AdoptModel(const Model& model)
+FilterView::AdoptModel(Model& model)
 {
 	// Adopt categories
 	BMenu* showMenu = fShowField->Menu();
@@ -122,25 +123,47 @@ FilterView::AdoptModel(const Model& model)
 	showMenu->AddItem(new BMenuItem(B_TRANSLATE("All categories"),
 		new BMessage(MSG_CATEGORY_SELECTED)));
 
-	showMenu->AddItem(new BSeparatorItem());
+	AutoLocker<BLocker> locker(model.Lock());
+	CategoryList categories = model.Categories();
 
-	add_categories_to_menu(model.Categories(), showMenu);
-
-	bool foundSelectedCategory = false;
-	for (int32 i = 0; i < showMenu->CountItems(); i++) {
-		BMenuItem* item = showMenu->ItemAt(i);
-		BMessage* message = item->Message();
-		if (message == NULL)
-			continue;
-		BString category;
-		if (message->FindString("name", &category) == B_OK
-			&& model.Category() == category) {
-			item->SetMarked(true);
-			foundSelectedCategory = true;
-			break;
-		}
+	if (!categories.IsEmpty()) {
+		showMenu->AddItem(new BSeparatorItem());
+		add_categories_to_menu(categories, showMenu);
 	}
-	if (!foundSelectedCategory)
+
+	showMenu->SetEnabled(!categories.IsEmpty());
+
+	if (!_SelectCategoryCode(showMenu, model.Category()))
 		showMenu->ItemAt(0)->SetMarked(true);
 }
 
+
+/*! Tries to mark the menu item that corresponds to the supplied
+    category code.  If the supplied code was found and the item marked
+    then the method will return true.
+*/
+
+/*static*/ bool
+FilterView::_SelectCategoryCode(BMenu* menu, const BString& code)
+{
+	for (int32 i = 0; i < menu->CountItems(); i++) {
+		BMenuItem* item = menu->ItemAt(i);
+		if (_MatchesCategoryCode(item, code)) {
+			item->SetMarked(true);
+			return true;
+		}
+	}
+	return false;
+}
+
+
+/*static*/ bool
+FilterView::_MatchesCategoryCode(BMenuItem* item, const BString& code)
+{
+	BMessage* message = item->Message();
+	if (message == NULL)
+		return false;
+	BString itemCode;
+	message->FindString("code", &itemCode);
+	return itemCode == code;
+}

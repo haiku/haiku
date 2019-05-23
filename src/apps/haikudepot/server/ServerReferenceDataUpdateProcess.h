@@ -46,6 +46,8 @@ private:
 			status_t			_ProcessData(DumpExportReference* data);
 			status_t			_ProcessNaturalLanguages(
 									DumpExportReference* data);
+			status_t			_ProcessPkgCategories(
+									DumpExportReference* data);
 
 private:
 			Model*				fModel;

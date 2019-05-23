@@ -10,25 +10,23 @@
 
 #include "HaikuDepotConstants.h"
 #include "Logger.h"
+#include "LocaleUtils.h"
 
 
 static int32
 LanguagesCompareFn(const LanguageRef& l1, const LanguageRef& l2)
 {
-	const BLocale* locale = BLocaleRoster::Default()->GetDefaultLocale();
-	BCollator collator;
-
-	if (B_OK != locale->GetCollator(&collator)) {
-		debugger("unable to get the locale's collator");
-	}
-
+	BCollator* collator = LocaleUtils::GetSharedCollator();
 	BString name1;
 	BString name2;
+	int32 result = 0;
 
 	if (l1->GetName(name1) == B_OK && l2->GetName(name2) == B_OK)
-		return collator.Compare(name1.String(), name2.String());
+		result = collator->Compare(name1.String(), name2.String());
+	if (0 == result)
+		result = strcmp(l1->Code(), l2->Code());
 
-	return collator.Compare(l1->Code(), l2->Code());
+	return result;
 }
 
 

@@ -3,7 +3,7 @@
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2016-2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2019, Andrew Lindesay <apl@lindesay.co.nz>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -63,6 +63,7 @@ enum {
 	MSG_LOG_IN					= 'lgin',
 	MSG_LOG_OUT					= 'lgot',
 	MSG_AUTHORIZATION_CHANGED	= 'athc',
+	MSG_CATEGORIES_LIST_CHANGED	= 'clic',
 	MSG_PACKAGE_CHANGED			= 'pchd',
 	MSG_WORK_STATUS_CHANGE		= 'wsch',
 	MSG_WORK_STATUS_CLEAR		= 'wscl',
@@ -95,9 +96,9 @@ struct RefreshWorkerParameters {
 };
 
 
-class MessageModelListener : public ModelListener {
+class MainWindowModelListener : public ModelListener {
 public:
-	MessageModelListener(const BMessenger& messenger)
+	MainWindowModelListener(const BMessenger& messenger)
 		:
 		fMessenger(messenger)
 	{
@@ -107,6 +108,12 @@ public:
 	{
 		if (fMessenger.IsValid())
 			fMessenger.SendMessage(MSG_AUTHORIZATION_CHANGED);
+	}
+
+	virtual void CategoryListChanged()
+	{
+		if (fMessenger.IsValid())
+			fMessenger.SendMessage(MSG_CATEGORIES_LIST_CHANGED);
 	}
 
 private:
@@ -123,7 +130,7 @@ MainWindow::MainWindow(const BMessage& settings)
 	fUserMenu(NULL),
 	fLogInItem(NULL),
 	fLogOutItem(NULL),
-	fModelListener(new MessageModelListener(BMessenger(this)), true),
+	fModelListener(new MainWindowModelListener(BMessenger(this)), true),
 	fBulkLoadProcessCoordinator(NULL),
 	fSinglePackageMode(false)
 {
@@ -221,7 +228,7 @@ MainWindow::MainWindow(const BMessage& settings, const PackageInfoRef& package)
 	fUserMenu(NULL),
 	fLogInItem(NULL),
 	fLogOutItem(NULL),
-	fModelListener(new MessageModelListener(BMessenger(this)), true),
+	fModelListener(new MainWindowModelListener(BMessenger(this)), true),
 	fBulkLoadProcessCoordinator(NULL),
 	fSinglePackageMode(true)
 {
@@ -331,6 +338,10 @@ MainWindow::MessageReceived(BMessage* message)
 			_UpdateAuthorization();
 			break;
 
+		case MSG_CATEGORIES_LIST_CHANGED:
+			fFilterView->AdoptModel(fModel);
+			break;
+
 		case MSG_SHOW_FEATURED_PACKAGES:
 			// check to see if we aren't already on the current tab
 			if (fListTabs->Selection() ==
@@ -421,12 +432,12 @@ MainWindow::MessageReceived(BMessage* message)
 
 		case MSG_CATEGORY_SELECTED:
 		{
-			BString name;
-			if (message->FindString("name", &name) != B_OK)
-				name = "";
+			BString code;
+			if (message->FindString("code", &code) != B_OK)
+				code = "";
 			{
 				BAutolock locker(fModel.Lock());
-				fModel.SetCategory(name);
+				fModel.SetCategory(code);
 			}
 			_AdoptModel();
 			break;

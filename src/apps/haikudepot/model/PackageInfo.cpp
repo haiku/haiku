@@ -371,19 +371,16 @@ PublisherInfo::operator!=(const PublisherInfo& other) const
 PackageCategory::PackageCategory()
 	:
 	BReferenceable(),
-	fIcon(),
-	fLabel(),
+	fCode(),
 	fName()
 {
 }
 
 
-PackageCategory::PackageCategory(const BitmapRef& icon, const BString& label,
-		const BString& name)
+PackageCategory::PackageCategory(const BString& code, const BString& name)
 	:
 	BReferenceable(),
-	fIcon(icon),
-	fLabel(label),
+	fCode(code),
 	fName(name)
 {
 }
@@ -392,8 +389,7 @@ PackageCategory::PackageCategory(const BitmapRef& icon, const BString& label,
 PackageCategory::PackageCategory(const PackageCategory& other)
 	:
 	BReferenceable(),
-	fIcon(other.fIcon),
-	fLabel(other.fLabel),
+	fCode(other.fCode),
 	fName(other.fName)
 {
 }
@@ -402,8 +398,7 @@ PackageCategory::PackageCategory(const PackageCategory& other)
 PackageCategory&
 PackageCategory::operator=(const PackageCategory& other)
 {
-	fIcon = other.fIcon;
-	fLabel = other.fLabel;
+	fCode = other.fCode;
 	fName = other.fName;
 	return *this;
 }
@@ -412,9 +407,7 @@ PackageCategory::operator=(const PackageCategory& other)
 bool
 PackageCategory::operator==(const PackageCategory& other) const
 {
-	return fIcon == other.fIcon
-		&& fLabel == other.fLabel
-		&& fName == other.fName;
+	return fCode == other.fCode && fName == other.fName;
 }
 
 

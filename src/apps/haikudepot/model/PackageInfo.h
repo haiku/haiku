@@ -192,8 +192,7 @@ private:
 class PackageCategory : public BReferenceable {
 public:
 								PackageCategory();
-								PackageCategory(const BitmapRef& icon,
-									const BString& label,
+								PackageCategory(const BString& code,
 									const BString& name);
 								PackageCategory(const PackageCategory& other);
 
@@ -201,15 +200,12 @@ public:
 			bool				operator==(const PackageCategory& other) const;
 			bool				operator!=(const PackageCategory& other) const;
 
-			const BitmapRef&	Icon() const
-									{ return fIcon; }
-			const BString&		Label() const
-									{ return fLabel; }
+			const BString&		Code() const
+									{ return fCode; }
 			const BString&		Name() const
 									{ return fName; }
 private:
-			BitmapRef			fIcon;
-			BString				fLabel;
+			BString				fCode;
 			BString				fName;
 };
 

@@ -86,8 +86,8 @@ PackageFillingPkgListener::~PackageFillingPkgListener()
 	// TODO; performance could be improved by not needing the linear search
 
 inline int32
-PackageFillingPkgListener::IndexOfCategoryByName(
-	const BString& name) const
+PackageFillingPkgListener::IndexOfCategoryByCode(
+	const BString& code) const
 {
 	int32 i;
 	int32 categoryCount = fCategories.CountItems();
@@ -95,7 +95,7 @@ PackageFillingPkgListener::IndexOfCategoryByName(
 	for (i = 0; i < categoryCount; i++) {
 		const CategoryRef categoryRef = fCategories.ItemAtFast(i);
 
-		if (categoryRef->Name() == name)
+		if (categoryRef->Code() == code)
 			return i;
 	}
 
@@ -140,7 +140,7 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 
 	for (i = 0; i < countPkgCategories; i++) {
 		BString* categoryCode = pkg->PkgCategoriesItemAt(i)->Code();
-		int categoryIndex = IndexOfCategoryByName(*(categoryCode));
+		int categoryIndex = IndexOfCategoryByCode(*(categoryCode));
 
 		if (categoryIndex == -1) {
 			printf("unable to find the category for [%s]\n",

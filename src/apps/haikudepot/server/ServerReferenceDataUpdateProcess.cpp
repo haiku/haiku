@@ -107,8 +107,12 @@ ServerReferenceDataUpdateProcess::ProcessLocalData()
 status_t
 ServerReferenceDataUpdateProcess::_ProcessData(DumpExportReference* data)
 {
-	// more to come here later...
-	return _ProcessNaturalLanguages(data);
+	status_t result = B_OK;
+	if (result == B_OK)
+		result = _ProcessNaturalLanguages(data);
+	if (result == B_OK)
+		result = _ProcessPkgCategories(data);
+	return result;
 }
 
 
@@ -124,10 +128,13 @@ ServerReferenceDataUpdateProcess::_ProcessNaturalLanguages(
 	for (int32 i = 0; i < data->CountNaturalLanguages(); i++) {
 		DumpExportReferenceNaturalLanguage* naturalLanguage =
 			data->NaturalLanguagesItemAt(i);
-		result.Add(LanguageRef(new Language(
-			*(naturalLanguage->Code()),
-			*(naturalLanguage->Name()),
-			naturalLanguage->IsPopular())));
+		result.Add(LanguageRef(
+			new Language(
+				*(naturalLanguage->Code()),
+				*(naturalLanguage->Name()),
+				naturalLanguage->IsPopular()
+			),
+			true));
 	}
 
 	{
@@ -137,6 +144,35 @@ ServerReferenceDataUpdateProcess::_ProcessNaturalLanguages(
 
 	printf("[%s] did add %" B_PRId32 " supported languages\n",
 		Name(), result.CountItems());
+
+	return B_OK;
+}
+
+
+status_t
+ServerReferenceDataUpdateProcess::_ProcessPkgCategories(
+	DumpExportReference* data)
+{
+	printf("[%s] will populate %" B_PRId32 " pkg categories\n",
+		Name(), data->CountPkgCategories());
+
+	CategoryList result;
+
+	for (int32 i = 0; i < data->CountPkgCategories(); i++) {
+		DumpExportReferencePkgCategory* pkgCategory =
+			data->PkgCategoriesItemAt(i);
+		result.Add(CategoryRef(
+			new PackageCategory(
+				*(pkgCategory->Code()),
+				*(pkgCategory->Name())
+			),
+			true));
+	}
+
+	{
+		AutoLocker<BLocker> locker(fModel->Lock());
+		fModel->AddCategories(result);
+	}
 
 	return B_OK;
 }

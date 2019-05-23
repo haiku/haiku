@@ -14,15 +14,18 @@
 
 #include <Autolock.h>
 #include <Catalog.h>
+#include <Collator.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
 #include <KeyStore.h>
+#include <Locale.h>
 #include <LocaleRoster.h>
 #include <Message.h>
 #include <Path.h>
 
 #include "Logger.h"
+#include "LocaleUtils.h"
 #include "StorageUtils.h"
 #include "RepositoryUrlUtils.h"
 
@@ -103,7 +106,7 @@ public:
 			const CategoryRef& category = categories.ItemAtFast(i);
 			if (category.Get() == NULL)
 				continue;
-			if (category->Name() == fCategory)
+			if (category->Code() == fCategory)
 				return true;
 		}
 		return false;
@@ -311,44 +314,22 @@ is_develop_package(const PackageInfoRef& package)
 // #pragma mark - Model
 
 
+static int32
+PackageCategoryCompareFn(const CategoryRef& c1, const CategoryRef& c2)
+{
+	BCollator* collator = LocaleUtils::GetSharedCollator();
+	int32 result = collator->Compare(c1->Name().String(),
+		c2->Name().String());
+	if (result == 0)
+		result = c1->Code().Compare(c2->Code());
+	return result;
+}
+
+
 Model::Model()
 	:
 	fDepots(),
-
-	fCategoryAudio(new PackageCategory(
-		BitmapRef(),
-		B_TRANSLATE("Audio"), "audio"), true),
-	fCategoryBusiness(new PackageCategory(
-		BitmapRef(),
-		B_TRANSLATE("Business"), "business"), true),
-	fCategoryDevelopment(new PackageCategory(
-		BitmapRef(),
-		B_TRANSLATE("Development"), "development"), true),
-	fCategoryEducation(new PackageCategory(
-		BitmapRef(),
-		B_TRANSLATE("Education"), "education"), true),
-	fCategoryGames(new PackageCategory(
-		BitmapRef(),
-		B_TRANSLATE("Games"), "games"), true),
-	fCategoryGraphics(new PackageCategory(
-		BitmapRef(),
-		B_TRANSLATE("Graphics"), "graphics"), true),
-	fCategoryInternetAndNetwork(new PackageCategory(
-		BitmapRef(),
-		B_TRANSLATE("Internet & Network"), "internetandnetwork"), true),
-	fCategoryProductivity(new PackageCategory(
-		BitmapRef(),
-		B_TRANSLATE("Productivity"), "productivity"), true),
-	fCategoryScienceAndMathematics(new PackageCategory(
-		BitmapRef(),
-		B_TRANSLATE("Science & Mathematics"), "scienceandmathematics"), true),
-	fCategorySystemAndUtilities(new PackageCategory(
-		BitmapRef(),
-		B_TRANSLATE("System & Utilities"), "systemandutilities"), true),
-	fCategoryVideo(new PackageCategory(
-		BitmapRef(),
-		B_TRANSLATE("Video"), "video"), true),
-
+	fCategories(&PackageCategoryCompareFn, NULL),
 	fCategoryFilter(PackageFilterRef(new AnyFilter(), true)),
 	fDepotFilter(""),
 	fSearchTermsFilter(PackageFilterRef(new AnyFilter(), true)),
@@ -360,23 +341,6 @@ Model::Model()
 	fShowDevelopPackages(false)
 {
 	_UpdateIsFeaturedFilter();
-
-	// Don't forget to add new categories to this list:
-	fCategories.Add(fCategoryGames);
-	fCategories.Add(fCategoryBusiness);
-	fCategories.Add(fCategoryAudio);
-	fCategories.Add(fCategoryVideo);
-	fCategories.Add(fCategoryGraphics);
-	fCategories.Add(fCategoryEducation);
-	fCategories.Add(fCategoryProductivity);
-	fCategories.Add(fCategorySystemAndUtilities);
-	fCategories.Add(fCategoryInternetAndNetwork);
-	fCategories.Add(fCategoryDevelopment);
-	fCategories.Add(fCategoryScienceAndMathematics);
-	// TODO: The server will eventually support an API to
-	// get the defined categories and their translated names.
-	// This should then be used instead of hard-coded
-	// categories and translations in the app.
 }
 
 
@@ -1057,6 +1021,18 @@ Model::_NotifyAuthorizationChanged()
 }
 
 
+void
+Model::_NotifyCategoryListChanged()
+{
+	for (int32 i = fListeners.CountItems() - 1; i >= 0; i--) {
+		const ModelListenerRef& listener = fListeners.ItemAtFast(i);
+		if (listener.Get() != NULL)
+			listener->CategoryListChanged();
+	}
+}
+
+
+
 /*! This method will find the stored 'DepotInfo' that correlates to the
     supplied 'url' and will invoke the mapper function in order to get a
     replacement for the 'DepotInfo'.  The 'url' is a unique identifier
@@ -1116,4 +1092,29 @@ Model::_MaybeLogJsonRpcError(const BMessage &responsePayload,
 	} else {
 		printf("[%s] --> an undefined error has occurred\n", sourceDescription);
 	}
+}
+
+
+void
+Model::AddCategories(const CategoryList& categories)
+{
+	int32 i;
+	for (i = 0; i < categories.CountItems(); i++)
+		_AddCategory(categories.ItemAt(i));
+	_NotifyCategoryListChanged();
+}
+
+
+void
+Model::_AddCategory(const CategoryRef& category)
+{
+	int32 i;
+	for (i = 0; i < fCategories.CountItems(); i++) {
+		if (fCategories.ItemAt(i)->Code() == category->Code()) {
+			fCategories.Replace(i, category);
+			return;
+		}
+	}
+
+	fCategories.Add(category);
 }
