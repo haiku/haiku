@@ -66,7 +66,7 @@ FileSystemVisitor::Next()
 			put_vnode(fVolume->FSVolume(), fVolume->ToVnode(fCurrent));
 
 			if (status != B_OK) {
-				if (inode->IsDeleted())
+				if (inode != NULL && inode->IsDeleted())
 					continue;
 
 				status = OpenInodeFailed(status, fVolume->ToBlock(fCurrent),
