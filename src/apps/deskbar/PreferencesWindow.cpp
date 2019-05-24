@@ -50,8 +50,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 		B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE)
 {
 	// Initial settings (used by revert button)
-	memcpy(&fSettings, static_cast<TBarApp*>(be_app)->Settings(),
-		sizeof(desk_settings));
+	fSettings = *static_cast<TBarApp*>(be_app)->Settings();
 
 	// Menu controls
 	fMenuRecentDocuments = new BCheckBox(B_TRANSLATE("Recent documents:"),
