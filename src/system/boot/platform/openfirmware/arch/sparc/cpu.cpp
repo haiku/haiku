@@ -28,24 +28,16 @@ boot_arch_cpu_init(void)
 {
 	int32 busFrequency = 0;
 
-	int root = of_finddevice("/");
-	if (root == OF_FAILED) {
+	intptr_t cpus = of_finddevice("/");
+	if (cpus == OF_FAILED) {
 		printf("boot_arch_cpu_init(): Failed to open \"/\"!\n");
 		return B_ERROR;
 	}
 
-	of_getprop(root, "clock-frequency", &busFrequency, 4);
-		// we might find it in /cpus instead
-
-	// iterate through the "/cpus" node to find all CPUs
-	int cpus = of_finddevice("/cpus");
-	if (cpus == OF_FAILED) {
-		printf("boot_arch_cpu_init(): Failed to open \"/cpus\"!\n");
-		return B_ERROR;
-	}
+	of_getprop(cpus, "clock-frequency", &busFrequency, 4);
 
 	char cpuPath[256];
-	int cookie = 0;
+	intptr_t cookie = 0;
 	int cpuCount = 0;
 	while (of_get_next_device(&cookie, cpus, "cpu", cpuPath,
 			sizeof(cpuPath)) == B_OK) {
@@ -54,7 +46,7 @@ boot_arch_cpu_init(void)
 		// For the first CPU get the frequencies of CPU, bus, and time base.
 		// We assume they are the same for all CPUs.
 		if (cpuCount == 0) {
-			int cpu = of_finddevice(cpuPath);
+			intptr_t cpu = of_finddevice(cpuPath);
 			if (cpu == OF_FAILED) {
 				printf("boot_arch_cpu_init: Failed get CPU device node!\n");
 				return B_ERROR;
@@ -76,21 +68,13 @@ boot_arch_cpu_init(void)
 					"frequency!\n");
 				return B_ERROR;
 			}
-			int32 timeBaseFrequency;
-			if (of_getprop(cpu, "timebase-frequency", &timeBaseFrequency, 4)
-					== OF_FAILED) {
-				printf("boot_arch_cpu_init: Failed to get time base "
-					"frequency!\n");
-				return B_ERROR;
-			}
 
 			gKernelArgs.arch_args.cpu_frequency = clockFrequency;
 			gKernelArgs.arch_args.bus_frequency = busFrequency;
-			gKernelArgs.arch_args.time_base_frequency = timeBaseFrequency;
+			gKernelArgs.arch_args.time_base_frequency = clockFrequency;
 
 			TRACE(("  CPU clock frequency: %d\n", clockFrequency));
 			TRACE(("  bus clock frequency: %d\n", busFrequency));
-			TRACE(("  time base frequency: %d\n", timeBaseFrequency));
 		}
 
 		cpuCount++;
