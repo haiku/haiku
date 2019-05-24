@@ -33,7 +33,7 @@ NudgePointsCommand::NudgePointsCommand(VectorPath* path,
 					   0.0,
 					   1.0,
 					   1.0,
-					   count > 1 ? B_TRANSLATE("Nudge Control Points") : 
+					   count > 1 ? B_TRANSLATE("Nudge Control Points") :
 					   B_TRANSLATE("Nudge Control Point"),
 //					   count > 1 ? NUDGE_CONTROL_POINTS : NUDGE_CONTROL_POINT),
 					   -1),
@@ -48,7 +48,7 @@ NudgePointsCommand::NudgePointsCommand(VectorPath* path,
 	}
 	if (fCount > 0 && points) {
 		fPoints = new (nothrow) control_point[fCount];
-		memcpy(fPoints, points, fCount * sizeof(control_point));
+		memcpy((void*)fPoints, points, fCount * sizeof(control_point));
 	}
 }
 

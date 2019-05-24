@@ -52,7 +52,7 @@ TransformPointsCommand::TransformPointsCommand(
 		return;
 
 	memcpy(fIndices, indices, fCount * sizeof(int32));
-	memcpy(fPoints, points, fCount * sizeof(control_point));
+	memcpy((void*)fPoints, points, fCount * sizeof(control_point));
 
 	if (fTransformBox)
 		fTransformBox->AddListener(this);

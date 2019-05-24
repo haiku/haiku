@@ -336,7 +336,7 @@ BShape::AddShape(const BShape* otherShape)
 		otherData->opCount * sizeof(uint32));
 	data->opCount += otherData->opCount;
 
-	memcpy(data->ptList + data->ptCount, otherData->ptList,
+	memcpy((void*)(data->ptList + data->ptCount), otherData->ptList,
 		otherData->ptCount * sizeof(BPoint));
 	data->ptCount += otherData->ptCount;
 
@@ -568,7 +568,7 @@ BShape::SetData(int32 opCount, int32 ptCount, const uint32* opList,
 	fBuildingOp = data->opList[data->opCount - 1];
 
 	if (ptCount > 0) {
-		memcpy(data->ptList, ptList, ptCount * sizeof(BPoint));
+		memcpy((void*)data->ptList, ptList, ptCount * sizeof(BPoint));
 		data->ptCount = ptCount;
 	}
 }
@@ -620,7 +620,8 @@ BShape::AllocatePts(int32 count)
 	if (data->ptSize >= newSize)
 		return true;
 
-	BPoint* resizedArray = (BPoint*)realloc(data->ptList, newSize * sizeof(BPoint));
+	BPoint* resizedArray = (BPoint*)realloc((void*)data->ptList,
+		newSize * sizeof(BPoint));
 	if (resizedArray) {
 		data->ptList = resizedArray;
 		data->ptSize = newSize;

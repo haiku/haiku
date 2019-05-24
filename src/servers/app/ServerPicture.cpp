@@ -498,7 +498,7 @@ clip_to_picture(void* _canvas, int32 pictureToken, const BPoint& where,
 	ServerPicture* picture = canvas->GetPicture(pictureToken);
 	if (picture == NULL)
 		return;
-	AlphaMask* mask = new(std::nothrow) PictureAlphaMask(canvas->GetAlphaMask(), 
+	AlphaMask* mask = new(std::nothrow) PictureAlphaMask(canvas->GetAlphaMask(),
 		picture, *canvas->CurrentState(), where, clipToInverse);
 	canvas->SetAlphaMask(mask);
 	canvas->CurrentState()->GetAlphaMask()->SetCanvasGeometry(BPoint(0, 0),
@@ -836,7 +836,7 @@ clip_to_shape(void* _canvas, int32 opCount, const uint32 opList[],
 	shapeData.opList = (uint32*)malloc(opCount * sizeof(uint32));
 	memcpy(shapeData.opList, opList, opCount * sizeof(uint32));
 	shapeData.ptList = (BPoint*)malloc(ptCount * sizeof(BPoint));
-	memcpy(shapeData.ptList, ptList, ptCount * sizeof(BPoint));
+	memcpy((void*)shapeData.ptList, ptList, ptCount * sizeof(BPoint));
 
 	shapeData.opCount = opCount;
 	shapeData.opSize = opCount * sizeof(uint32);

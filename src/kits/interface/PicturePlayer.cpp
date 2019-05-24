@@ -126,7 +126,7 @@ draw_polygon(void* _context, size_t numPoints, const BPoint _points[],
 			return;
 	}
 
-	memcpy(points, _points, numPoints * sizeof(BPoint));
+	memcpy((void*)points, _points, numPoints * sizeof(BPoint));
 
 	((void (*)(void*, int32, BPoint*, bool))
 		context->function_table[fill ? 14 : 13])(context->user_data, numPoints,
@@ -205,7 +205,7 @@ set_clipping_rects(void* _context, size_t numRects, const BRect _rects[])
 			return;
 	}
 
-	memcpy(rects, _rects, numRects * sizeof(BRect));
+	memcpy((void*)rects, _rects, numRects * sizeof(BRect));
 
 	((void (*)(void*, BRect*, uint32))context->function_table[20])(
 		context->user_data, rects, numRects);

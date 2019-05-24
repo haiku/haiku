@@ -61,8 +61,8 @@ public:
 		opSize = other.opSize;
 		ptCount = other.ptCount;
 		ptSize = other.ptSize;
-		memcpy(opList, other.opList, opSize);
-		memcpy(ptList, other.ptList, ptSize);
+		memcpy((void*)opList, other.opList, opSize);
+		memcpy((void*)ptList, other.ptList, ptSize);
 	}
 
 	BRect DetermineBoundingBox() const

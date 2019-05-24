@@ -40,7 +40,7 @@
 
 
 #define obj_new(type, n)		((type *)malloc ((n) * sizeof(type)))
-#define obj_renew(p, type, n)	((type *)realloc (p, (n) * sizeof(type)))
+#define obj_renew(p, type, n)	((type *)realloc ((void *)p, (n) * sizeof(type)))
 #define obj_free				free
 
 #define ALLOC_CHUNKS 20
@@ -303,7 +303,7 @@ VectorPath::operator=(const VectorPath& from)
 	_SetPointCount(from.fPointCount);
 	fClosed = from.fClosed;
 	if (fPath) {
-		memcpy(fPath, from.fPath, fPointCount * sizeof(control_point));
+		memcpy((void*)fPath, from.fPath, fPointCount * sizeof(control_point));
 		fCachedBounds = from.fCachedBounds;
 	} else {
 		fprintf(stderr, "VectorPath() -> allocation failed in operator=!\n");

@@ -357,7 +357,7 @@ KeyboardLayout::_AddKey(const Key& key)
 	if (fKeyCount + 1 > fKeyCapacity) {
 		// enlarge array
 		int32 newCapacity = fKeyCapacity + 32;
-		Key* newKeys = (Key*)realloc(fKeys, newCapacity * sizeof(Key));
+		Key* newKeys = (Key*)realloc((void*)fKeys, newCapacity * sizeof(Key));
 		if (newKeys == NULL)
 			return false;
 

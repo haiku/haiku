@@ -164,7 +164,7 @@ BPolygon::_AddPoints(const BPoint* points, int32 count, bool computeBounds)
 		return false;
 	}
 
-	BPoint* newPoints = (BPoint*)realloc(fPoints, (fCount + count)
+	BPoint* newPoints = (BPoint*)realloc((void*)fPoints, (fCount + count)
 		* sizeof(BPoint));
 	if (newPoints == NULL) {
 		fprintf(stderr, "BPolygon::_AddPoints(%" B_PRId32 ") out of memory\n",
@@ -173,7 +173,7 @@ BPolygon::_AddPoints(const BPoint* points, int32 count, bool computeBounds)
 	}
 
 	fPoints = newPoints;
-	memcpy(fPoints + fCount, points, count * sizeof(BPoint));
+	memcpy((void*)(fPoints + fCount), points, count * sizeof(BPoint));
 	fCount += count;
 
 	if (computeBounds)
