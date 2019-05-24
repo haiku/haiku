@@ -1,5 +1,8 @@
 SubDir HAIKU_TOP src apps haikudepot ;
 
+# disable -Werror for this directory only
+SubDirC++Flags -Wno-error ;
+
 include [ FDirName $(HAIKU_TOP) src apps haikudepot build jam
 	HdsSchemaGenRules ] ;
 

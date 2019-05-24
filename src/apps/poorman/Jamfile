@@ -1,5 +1,8 @@
 SubDir HAIKU_TOP src apps poorman ;
 
+# disable -Werror for this directory only
+SubDirCcFlags -Wno-error ;
+
 SubDirCcFlags [ FDefines HAVE__PROGNAME=1 HAVE_FCNTL_H=1 HAVE_GRP_H=1 HAVE_MEMORY_H=1 HAVE_POLL_H=1 HAVE_SYS_POLL_H=1 TIME_WITH_SYS_TIME=1 HAVE_DIRENT_H=1 HAVE_STRERROR=1 HAVE_WAITPID=1 HAVE_VSNPRINTF=1 HAVE_SETSID=1 HAVE_SIGSET=1 HAVE_ATOLL=1 HAVE_UNISTD_H=1 HAVE_GETPAGESIZE=1 HAVE_MMAP=1 HAVE_SELECT=1 HAVE_POLL=1 HAVE_TM_GMTOFF=1 HAVE_SOCKLENT=1 HAVE_INT64T=1 ] ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps poorman libhttpd ] ;
@@ -42,20 +45,20 @@ Application PoorMan : PoorMan.cpp
 	PoorManSiteView.cpp
 	PoorManLogger.cpp
 	PoorManLoggingView.cpp
-	PoorManPreferencesWindow.cpp 
+	PoorManPreferencesWindow.cpp
 	PoorManApplication.cpp
 	constants.cpp
-	
+
 	# libhttpd
 	libhttpd.c
 	match.c
 	tdate_parse.c
-	
+
 	: be network tracker [ TargetLibstdc++ ] localestub
 	;
 
 
-DoCatalogs PoorMan : 
+DoCatalogs PoorMan :
 	x-vnd.Haiku-PoorMan
 	:
 	constants.cpp
