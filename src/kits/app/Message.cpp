@@ -2438,24 +2438,14 @@ BMessage::Add##typeName(const char* name, type val)							\
 status_t																	\
 BMessage::Find##typeName(const char* name, type* p) const					\
 {																			\
-	void* ptr = NULL;														\
-	ssize_t bytes = 0;														\
-	status_t error = B_OK;													\
-																			\
-	*p = type();															\
-	error = FindData(name, typeCode, 0, (const void**)&ptr, &bytes);		\
-																			\
-	if (error == B_OK)														\
-		memcpy(p, ptr, sizeof(type));										\
-																			\
-	return error;															\
+	return Find##typeName(name, 0, p);										\
 }																			\
 																			\
 																			\
 status_t																	\
 BMessage::Find##typeName(const char* name, int32 index, type* p) const		\
 {																			\
-	void* ptr = NULL;														\
+	type* ptr = NULL;														\
 	ssize_t bytes = 0;														\
 	status_t error = B_OK;													\
 																			\
@@ -2463,7 +2453,7 @@ BMessage::Find##typeName(const char* name, int32 index, type* p) const		\
 	error = FindData(name, typeCode, index, (const void**)&ptr, &bytes);	\
 																			\
 	if (error == B_OK)														\
-		memcpy(p, ptr, sizeof(type));										\
+		*p = *ptr;															\
 																			\
 	return error;															\
 }																			\
@@ -2957,13 +2947,13 @@ BMessage::FindMessenger(const char* name, int32 index,
 	if (messenger == NULL)
 		return B_BAD_VALUE;
 
-	void* data = NULL;
+	BMessenger* data = NULL;
 	ssize_t size = 0;
 	status_t error = FindData(name, B_MESSENGER_TYPE, index,
 		(const void**)&data, &size);
 
 	if (error == B_OK)
-		memcpy(messenger, data, sizeof(BMessenger));
+		*messenger = *data;
 	else
 		*messenger = BMessenger();
 
