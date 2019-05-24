@@ -17,20 +17,6 @@ public:
 	{
 	}
 
-	SourceLocation(const SourceLocation& other)
-		:
-		fLine(other.fLine),
-		fColumn(other.fColumn)
-	{
-	}
-
-	SourceLocation& operator=(const SourceLocation& other)
-	{
-		fLine = other.fLine;
-		fColumn = other.fColumn;
-		return *this;
-	}
-
 	bool operator==(const SourceLocation& other) const
 	{
 		return fLine == other.fLine && fColumn == other.fColumn;

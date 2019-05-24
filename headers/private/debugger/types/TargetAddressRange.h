@@ -26,20 +26,6 @@ public:
 	{
 	}
 
-	TargetAddressRange(const TargetAddressRange& other)
-		:
-		fStart(other.fStart),
-		fSize(other.fSize)
-	{
-	}
-
-	TargetAddressRange& operator=(const TargetAddressRange& other)
-	{
-		fStart = other.fStart;
-		fSize = other.fSize;
-		return *this;
-	}
-
 	bool operator==(const TargetAddressRange& other) const
 	{
 		return fStart == other.fStart && fSize == other.fSize;

@@ -32,7 +32,6 @@ public:
 									uint32 bitSize, uint32 valueType,
 									register_type type, bool calleePreserved);
 										// name will not be cloned
-								Register(const Register& other);
 
 			int32				Index() const		{ return fIndex; }
 			const char*			Name() const		{ return fName; }

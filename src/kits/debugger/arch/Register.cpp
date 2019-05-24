@@ -43,16 +43,3 @@ Register::Register(int32 index, const char* name, uint32 bitSize,
 			break;
 	}
 }
-
-
-Register::Register(const Register& other)
-	:
-	fIndex(other.fIndex),
-	fName(other.fName),
-	fBitSize(other.fBitSize),
-	fValueType(other.fValueType),
-	fFormat(other.fFormat),
-	fType(other.fType),
-	fCalleePreserved(other.fCalleePreserved)
-{
-}
