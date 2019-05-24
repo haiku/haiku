@@ -8,6 +8,7 @@ KernelMergeObject kernel_arch_sparc.o :
 	arch_debug_console.cpp
 	arch_elf.cpp
 	arch_int.cpp
+	arch_mmu.cpp
 	arch_platform.cpp
 	arch_real_time_clock.cpp
 	arch_smp.cpp

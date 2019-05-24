@@ -17,10 +17,10 @@
 extern intptr_t gChosen;
 
 
-template<typename AddressType>
+template<typename AddressType, typename SizeType>
 struct of_region {
 	AddressType base;
-	uint32 size;
+	SizeType size;
 } _PACKED;
 
 struct of_arguments {

@@ -13,6 +13,7 @@ for platform in [ MultiBootSubDirSetup openfirmware ] {
 	on $(platform) {
 
 		BootMergeObject boot_platform_openfirmware_sparc.o :
+			arch_mmu.cpp
 			arch_start_kernel.S
 			cpu.cpp
 			mmu.cpp

@@ -221,7 +221,7 @@ find_physical_memory_ranges(phys_addr_t &total)
 
 	// On 64-bit PowerPC systems (G5), our mem base range address is larger
 	if (regAddressCells == 2) {
-		struct of_region<uint64> regions[64];
+		struct of_region<uint64, uint32> regions[64];
 		int count = of_getprop(package, "reg", regions, sizeof(regions));
 		if (count == OF_FAILED)
 			count = of_getprop(memory, "reg", regions, sizeof(regions));
@@ -251,7 +251,7 @@ find_physical_memory_ranges(phys_addr_t &total)
 	}
 
 	// Otherwise, normal 32-bit PowerPC G3 or G4 have a smaller 32-bit one
-	struct of_region<uint32> regions[64];
+	struct of_region<uint32, uint32> regions[64];
 	int count = of_getprop(package, "reg", regions, sizeof(regions));
 	if (count == OF_FAILED)
 		count = of_getprop(memory, "reg", regions, sizeof(regions));

@@ -25,13 +25,8 @@
 #include "support.h"
 
 
-// set protection to WIMGNPP: -----PP
-// PP:	00 - no access
-//		01 - read only
-//		10 - read/write
-//		11 - read only
-#define PAGE_READ_ONLY	0x01
-#define PAGE_READ_WRITE	0x02
+#define PAGE_READ_ONLY	0x0002
+#define PAGE_READ_WRITE	0x0001
 
 // NULL is actually a possible physical address...
 //#define PHYSINVAL ((void *)-1)
@@ -45,7 +40,8 @@
 #endif
 
 
-uint32 sPageTableHashMask;
+unsigned int sMmuInstance;
+unsigned int sMemoryInstance;
 
 
 // begin and end of the boot loader
@@ -54,20 +50,35 @@ extern "C" uint8 _end;
 
 
 static status_t
+insert_virtual_range_to_keep(void *start, uint32 size)
+{
+	return insert_address_range(gKernelArgs.arch_args.virtual_ranges_to_keep,
+		&gKernelArgs.arch_args.num_virtual_ranges_to_keep,
+		MAX_VIRTUAL_RANGES_TO_KEEP, (addr_t)start, size);
+}
+
+
+static status_t
+remove_virtual_range_to_keep(void *start, uint32 size)
+{
+	return remove_address_range(gKernelArgs.arch_args.virtual_ranges_to_keep,
+		&gKernelArgs.arch_args.num_virtual_ranges_to_keep,
+		MAX_VIRTUAL_RANGES_TO_KEEP, (addr_t)start, size);
+}
+
+
+static status_t
 find_physical_memory_ranges(size_t &total)
 {
-	int memory;
 	dprintf("checking for memory...\n");
-	if (of_getprop(gChosen, "memory", &memory, sizeof(int)) == OF_FAILED)
-		return B_ERROR;
-	int package = of_instance_to_package(memory);
+	intptr_t package = of_instance_to_package(sMemoryInstance);
 
 	total = 0;
 
 	// Memory base addresses are provided in 32 or 64 bit flavors
 	// #address-cells and #size-cells matches the number of 32-bit 'cells'
 	// representing the length of the base address and size fields
-	int root = of_finddevice("/");
+	intptr_t root = of_finddevice("/");
 	int32 regAddressCells = of_address_cells(root);
 	int32 regSizeCells = of_size_cells(root);
 	if (regAddressCells == OF_FAILED || regSizeCells == OF_FAILED) {
@@ -76,50 +87,17 @@ find_physical_memory_ranges(size_t &total)
 		regSizeCells = 1;
 	}
 
-	// NOTE : Size Cells of 2 is possible in theory... but I haven't seen it yet.
-	if (regAddressCells > 2 || regSizeCells > 1) {
+	if (regAddressCells != 2 || regSizeCells != 2) {
 		panic("%s: Unsupported OpenFirmware cell count detected.\n"
 		"Address Cells: %" B_PRId32 "; Size Cells: %" B_PRId32
 		" (CPU > 64bit?).\n", __func__, regAddressCells, regSizeCells);
 		return B_ERROR;
 	}
 
-	// On 64-bit PowerPC systems (G5), our mem base range address is larger
-	if (regAddressCells == 2) {
-		struct of_region<uint64> regions[64];
-		int count = of_getprop(package, "reg", regions, sizeof(regions));
-		if (count == OF_FAILED)
-			count = of_getprop(memory, "reg", regions, sizeof(regions));
-		if (count == OF_FAILED)
-			return B_ERROR;
-		count /= sizeof(regions[0]);
-
-		for (int32 i = 0; i < count; i++) {
-			if (regions[i].size <= 0) {
-				dprintf("%d: empty region\n", i);
-				continue;
-			}
-			dprintf("%" B_PRIu32 ": base = %" B_PRIu64 ","
-				"size = %" B_PRIu32 "\n", i, regions[i].base, regions[i].size);
-
-			total += regions[i].size;
-
-			if (insert_physical_memory_range((addr_t)regions[i].base,
-					regions[i].size) != B_OK) {
-				dprintf("cannot map physical memory range "
-					"(num ranges = %" B_PRIu32 ")!\n",
-					gKernelArgs.num_physical_memory_ranges);
-				return B_ERROR;
-			}
-		}
-		return B_OK;
-	}
-
-	// Otherwise, normal 32-bit PowerPC G3 or G4 have a smaller 32-bit one
-	struct of_region<uint32> regions[64];
+	struct of_region<uint64, uint64> regions[64];
 	int count = of_getprop(package, "reg", regions, sizeof(regions));
 	if (count == OF_FAILED)
-		count = of_getprop(memory, "reg", regions, sizeof(regions));
+		count = of_getprop(sMemoryInstance, "reg", regions, sizeof(regions));
 	if (count == OF_FAILED)
 		return B_ERROR;
 	count /= sizeof(regions[0]);
@@ -129,8 +107,8 @@ find_physical_memory_ranges(size_t &total)
 			dprintf("%d: empty region\n", i);
 			continue;
 		}
-		dprintf("%" B_PRIu32 ": base = %" B_PRIu32 ","
-			"size = %" B_PRIu32 "\n", i, regions[i].base, regions[i].size);
+		dprintf("%" B_PRIu32 ": base = %" B_PRIx64 ","
+			"size = %" B_PRIx64 "\n", i, regions[i].base, regions[i].size);
 
 		total += regions[i].size;
 
@@ -168,7 +146,7 @@ is_physical_allocated(void *address, size_t size)
 
 
 static bool
-is_physical_memory(void *address, size_t size)
+is_physical_memory(void *address, size_t size = 1)
 {
 	return is_address_range_covered(gKernelArgs.physical_memory_range,
 		gKernelArgs.num_physical_memory_ranges, (addr_t)address, size);
@@ -176,26 +154,122 @@ is_physical_memory(void *address, size_t size)
 
 
 static bool
-is_physical_memory(void *address)
+map_range(void *virtualAddress, void *physicalAddress, size_t size, uint16 mode)
 {
-	return is_physical_memory(address, 1);
-}
+	// everything went fine, so lets mark the space as used.
+	int status = of_call_method(sMmuInstance, "map", 4, 0, mode, size,
+		virtualAddress, physicalAddress);
 
-
-static void
-map_page(void *virtualAddress, void *physicalAddress, uint8 mode)
-{
-	panic("%s: out of page table entries!\n", __func__);
-}
-
-
-static void
-map_range(void *virtualAddress, void *physicalAddress, size_t size, uint8 mode)
-{
-	for (uint32 offset = 0; offset < size; offset += B_PAGE_SIZE) {
-		map_page((void *)(intptr_t(virtualAddress) + offset),
-			(void *)(intptr_t(physicalAddress) + offset), mode);
+	if (status != 0) {
+		dprintf("map_range(base: %p, size: %" B_PRIuSIZE ") "
+			"mapping failed\n", virtualAddress, size);
+		return false;
 	}
+
+	return true;
+}
+
+
+static status_t
+find_allocated_ranges(void **_exceptionHandlers)
+{
+	// we have to preserve the OpenFirmware established mappings
+	// if we want to continue to use its service after we've
+	// taken over (we will probably need less translations once
+	// we have proper driver support for the target hardware).
+	intptr_t mmu = of_instance_to_package(sMmuInstance);
+
+	struct translation_map {
+		void *PhysicalAddress() {
+			int64_t p = data;
+			// Sign extend
+			p <<= 23;
+			p >>= 23;
+
+			// Remove low bits
+			p &= 0xFFFFFFFFFFFFE000ll;
+
+			return (void*)p;
+		}
+
+		int16_t Mode() {
+			int16_t mode;
+			if (data & 2)
+				mode = PAGE_READ_WRITE;
+			else
+				mode = PAGE_READ_ONLY;
+			return mode;
+		}
+
+		void	*virtual_address;
+		intptr_t length;
+		intptr_t data;
+	} translations[64];
+
+	int length = of_getprop(mmu, "translations", &translations,
+		sizeof(translations));
+	if (length == OF_FAILED) {
+		dprintf("Error: no OF translations.\n");
+		return B_ERROR;
+	}
+	length = length / sizeof(struct translation_map);
+	uint32 total = 0;
+	dprintf("found %d translations\n", length);
+
+	for (int i = 0; i < length; i++) {
+		struct translation_map *map = &translations[i];
+		bool keepRange = true;
+		TRACE("%i: map: %p, length %ld -> phy %p mode %d\n", i,
+			map->virtual_address, map->length,
+			map->PhysicalAddress(), map->Mode());
+
+		// insert range in physical allocated, if it points to physical memory
+
+		if (is_physical_memory(map->PhysicalAddress())
+			&& insert_physical_allocated_range((addr_t)map->PhysicalAddress(),
+				map->length) != B_OK) {
+			dprintf("cannot map physical allocated range "
+				"(num ranges = %" B_PRIu32 ")!\n",
+				gKernelArgs.num_physical_allocated_ranges);
+			return B_ERROR;
+		}
+
+		// insert range in virtual allocated
+
+		if (insert_virtual_allocated_range((addr_t)map->virtual_address,
+				map->length) != B_OK) {
+			dprintf("cannot map virtual allocated range "
+				"(num ranges = %" B_PRIu32 ")!\n",
+				gKernelArgs.num_virtual_allocated_ranges);
+		}
+
+		// insert range in virtual ranges to keep
+
+		if (keepRange) {
+			TRACE("%i: keeping free range starting at va %p\n", i,
+				map->virtual_address);
+
+			if (insert_virtual_range_to_keep(map->virtual_address,
+					map->length) != B_OK) {
+				dprintf("cannot map virtual range to keep "
+					"(num ranges = %" B_PRIu32 ")\n",
+					gKernelArgs.num_virtual_allocated_ranges);
+			}
+		}
+
+		total += map->length;
+	}
+	dprintf("total size kept: %" B_PRIu32 "\n", total);
+
+	// remove the boot loader code from the virtual ranges to keep in the
+	// kernel
+	if (remove_virtual_range_to_keep(&__text_begin, &_end - &__text_begin)
+			!= B_OK) {
+		dprintf("%s: Failed to remove boot loader range "
+			"from virtual ranges to keep.\n", __func__);
+	}
+
+	return B_OK;
 }
 
 
@@ -227,8 +301,9 @@ find_free_physical_range(size_t size)
 			= (void *)(addr_t)(gKernelArgs.physical_allocated_range[i].start
 				+ gKernelArgs.physical_allocated_range[i].size);
 		if (!is_physical_allocated(address, size)
-			&& is_physical_memory(address, size))
+			&& is_physical_memory(address, size)) {
 			return address;
+		}
 	}
 	return PHYSINVAL;
 }
@@ -278,8 +353,10 @@ arch_mmu_allocate(void *_virtualAddress, size_t size, uint8 _protection,
 	// If no address is given, use the KERNEL_BASE as base address, since
 	// that avoids trouble in the kernel, when we decide to keep the region.
 	void *virtualAddress = _virtualAddress;
+#if 0
 	if (!virtualAddress)
 		virtualAddress = (void*)KERNEL_BASE;
+#endif
 
 	// find free address large enough to hold "size"
 	virtualAddress = find_free_virtual_range(virtualAddress, size);
@@ -294,6 +371,19 @@ arch_mmu_allocate(void *_virtualAddress, size_t size, uint8 _protection,
 		return NULL;
 	}
 
+#if 0
+	intptr_t status;
+
+	/* claim the address */
+	status = of_call_method(sMmuInstance, "claim", 3, 1, 0, size,
+		virtualAddress, &_virtualAddress);
+	if (status != 0) {
+		dprintf("arch_mmu_allocate(base: %p, size: %" B_PRIuSIZE ") "
+			"failed to claim virtual address\n", virtualAddress, size);
+		return NULL;
+	}
+
+#endif
 	// we have a free virtual range for the allocation, now
 	// have a look for free physical memory as well (we assume
 	// that a) there is enough memory, and b) failing is fatal
@@ -308,12 +398,23 @@ arch_mmu_allocate(void *_virtualAddress, size_t size, uint8 _protection,
 
 	// everything went fine, so lets mark the space as used.
 
-	dprintf("mmu_alloc: va %p, pa %p, size %" B_PRIuSIZE "\n", virtualAddress,
-		physicalAddress, size);
+#if 0
+	void* _physicalAddress;
+	status = of_call_method(sMemoryInstance, "claim", 3, 1, physicalAddress,
+		1, size, &_physicalAddress);
+
+	if (status != 0) {
+		dprintf("arch_mmu_allocate(base: %p, size: %" B_PRIuSIZE ") "
+			"failed to claim physical address\n", physicalAddress, size);
+		return NULL;
+	}
+#endif
+
 	insert_virtual_allocated_range((addr_t)virtualAddress, size);
 	insert_physical_allocated_range((addr_t)physicalAddress, size);
 
-	map_range(virtualAddress, physicalAddress, size, protection);
+	if (!map_range(virtualAddress, physicalAddress, size, protection))
+		return NULL;
 
 	return virtualAddress;
 }
@@ -330,6 +431,7 @@ arch_mmu_free(void *address, size_t size)
 //	#pragma mark - OpenFirmware callbacks and public API
 
 
+#if 0
 static int
 map_callback(struct of_arguments *args)
 {
@@ -420,11 +522,13 @@ callback(struct of_arguments *args)
 
 	return OF_FAILED;
 }
+#endif
 
 
 extern "C" status_t
 arch_set_callback(void)
 {
+#if 0
 	// set OpenFirmware callbacks - it will ask us for memory after that
 	// instead of maintaining it itself
 
@@ -435,6 +539,7 @@ arch_set_callback(void)
 		return B_ERROR;
 	}
 	TRACE("old callback = %p; new callback = %p\n", oldCallback, callback);
+#endif
 
 	return B_OK;
 }
@@ -443,6 +548,15 @@ arch_set_callback(void)
 extern "C" status_t
 arch_mmu_init(void)
 {
+	if (of_getprop(gChosen, "mmu", &sMmuInstance, sizeof(int)) == OF_FAILED) {
+		dprintf("%s: Error: no OpenFirmware mmu\n", __func__);
+		return B_ERROR;
+	}
+
+	if (of_getprop(gChosen, "memory", &sMemoryInstance, sizeof(int)) == OF_FAILED) {
+		dprintf("%s: Error: no OpenFirmware memory\n", __func__);
+		return B_ERROR;
+	}
 	// get map of physical memory (fill in kernel_args structure)
 
 	size_t total;
@@ -451,6 +565,44 @@ arch_mmu_init(void)
 		return B_ERROR;
 	}
 	dprintf("total physical memory = %luMB\n", total / (1024 * 1024));
+
+	void *exceptionHandlers = (void *)-1;
+	if (find_allocated_ranges(&exceptionHandlers) != B_OK) {
+		dprintf("Error: find_allocated_ranges() failed\n");
+		return B_ERROR;
+	}
+
+#if 0
+	if (exceptionHandlers == (void *)-1) {
+		// TODO: create mapping for the exception handlers
+		dprintf("Error: no mapping for the exception handlers!\n");
+	}
+
+	// Set the Open Firmware memory callback. From now on the Open Firmware
+	// will ask us for memory.
+	arch_set_callback();
+
+	// set up new page table and turn on translation again
+	// TODO "set up new page table and turn on translation again" (see PPC)
+#endif
+
+	// set kernel args
+
+	dprintf("virt_allocated: %" B_PRIu32 "\n",
+		gKernelArgs.num_virtual_allocated_ranges);
+	dprintf("phys_allocated: %" B_PRIu32 "\n",
+		gKernelArgs.num_physical_allocated_ranges);
+	dprintf("phys_memory: %" B_PRIu32 "\n",
+		gKernelArgs.num_physical_memory_ranges);
+
+#if 0
+	// TODO set gKernelArgs.arch_args content if we have something to put in there
+	gKernelArgs.arch_args.page_table.start = (addr_t)sPageTable;
+	gKernelArgs.arch_args.page_table.size = tableSize;
+
+	gKernelArgs.arch_args.exception_handlers.start = (addr_t)exceptionHandlers;
+	gKernelArgs.arch_args.exception_handlers.size = B_PAGE_SIZE;
+#endif
 
 	return B_OK;
 }

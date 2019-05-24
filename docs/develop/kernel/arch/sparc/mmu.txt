@@ -1,0 +1,116 @@
+Notes on the Ultrasparc MMUs
+============================
+
+First, a word of warning: the MMU was different in SPARCv8 (32bit)
+implementations, and it was changed again on newer CPUs.
+
+The Ultrasparc-II we are supporting for now is documented in the Ultrasparc
+user manual. There were some minor changes in the Ultrasparc-III to accomodate
+larger physical addresses. This was then standardized as JPS1, and Fujitsu
+also implemented it.
+
+Later on, the design was changed again, for example Ultrasparc T2 (UA2005
+architecture) uses a different data structure format to enlarge, again, the
+physical and virtual address tags.
+
+For now te implementation is focused on Ultrasparc-II because that's what I
+have at hand, later on we will need support for the more recent systems.
+
+Ultrasparc-II MMU
+=================
+
+There are actually two separate units for the instruction and data address
+spaces, known as I-MMU and D-MMU. They each implement a TLB (translation
+lookaside buffer) for the recently accessed pages.
+
+This is pretty much all there is to the MMU hardware. No hardware page table
+walk is provided. However, there is some support for implementing a TSB
+(Translation Storage Buffer) in the form of providing a way to compute an
+address into that buffer where the data for a missing page could be.
+
+It is up to software to manage the TSB (globally or per-process) and in general
+keep track of the mappings. This means we are relatively free to manage things
+however we want, as long as eventually we can feed the iTLB and dTLB with the
+relevant data from the MMU trap handler.
+
+To make sure we can handle the fault without recursing, we need to pin a few
+items in place:
+
+In the TLB:
+- TLB miss handler code
+- TSB and any linked data that the TLB miss handler may need
+- asynchronous trap handlers and data
+
+In the TSB:
+- TSB-miss handling code
+- Interrupt handlers code and data
+
+So, from a given virtual address (assuming we are using only 8K pages and a
+512 entry TSB to keep things simple):
+
+VA63-44 are unused and must be a sign extension of bit 43
+VA43-22 are the 'tag' used to match a TSB entry with a virtual address
+VA21-13 are the offset in the TSB at which to find a candidate entry
+VA12-0 are the offset in the 8K page, and used to form PA12-0 for the access
+
+Inside the TLBs, VA63-13 is stored, so there can be multiple entries matching
+the same tag active at the same time, even when there is only one in the TSB.
+The entries are rotated using a simple LRU scheme, unless they are locked of
+course. Be careful to not fill a TLB with only locked entries! Also one must
+take care of not inserting a new mapping for a given VA without first removing
+any possible previous one (no need to worry about this when handling a TLB
+miss however, as in that case we obviously know that there was no previous
+entry).
+
+Entries also have a "context". This could for example be mapped to the process
+ID, allowing to easily clear all entries related to a specific context.
+
+TSB entries format
+==================
+
+Each entry is composed of two 64bit values: "Tag" and "Data". The data uses the
+same format as the TLB entries, however the tag is different.
+
+They are as follow:
+
+Tag
+---
+
+Bit 63: 'G' indicating a global entry, the context should be ignored.
+Bits 60-48: context ID (13 bits)
+Bits 41-0: VA63-22 as the 'tag' to identify this entry
+
+Data
+----
+
+Bit 63: 'V' indicating a valid entry, if it's 0 the entry is unused.
+Bits 62-61: size: 8K, 64K, 512K, 4MB
+Bit 60: NFO, indicating No Fault Only
+Bit 59: Invert Endianness of accesses to this page
+Bits 58-50: reserved for use by software
+Bits 49-41: reserved for diagnostics
+Bits 40-13: Physical Address<40-13>
+Bits 12-7: reserved for use by software
+Bit 6: Lock in TLB
+Bit 5: Cachable physical
+Bit 4: Cachable virtual
+Bit 3: Access has side effects (HW is mapped here, or DMA shared RAM)
+Bit 2: Privileged
+Bit 1: Writable
+Bit 0: Global
+
+TLB internal tag
+----------------
+
+Bits 63-13: VA<63-13>
+Bits 12-0: context ID
+
+Conveniently, a 512 entries TSB fits exactly in a 8K page, so it can be locked
+in the TLB with a single entry there. However, it may be a wise idea to instead
+map 64K (or more) of RAM locked as a single entry for all the things that needs
+to be accessed by the TLB miss trap handler, so we minimize the use of TLB
+entries.
+
+Likewise, it may be useful to use 64K pages instead of 8K whenever possible.
+The hardware provides some support for mixing the two sizes but it makes things
+a bit more complex. Let's start out with simpler things.
