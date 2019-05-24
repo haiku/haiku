@@ -18,28 +18,24 @@ rule ArchitectureSetup architecture
 		ccBaseFlags = -pipe ;
 	}
 
-	# disable strict aliasing on anything newer than gcc 2 as it may lead to
-	# unexpected results.
-	# TODO: remove the -fno-strict-aliasing option when all code has been
-	#		analyzed/fixed with regard to aliasing.
 	if $(gccVersion[1]) >= 3 {
+		# disable strict aliasing on anything newer than gcc 2 as it may lead to
+		# unexpected results.
+		# TODO: remove the -fno-strict-aliasing option when all code has been
+		#		analyzed/fixed with regard to aliasing.
 		ccBaseFlags += -fno-strict-aliasing ;
-	}
 
-	# Without this flag, GCC deletes many null-pointer checks that are
-	# technically undefined behavior (e.g. passing NULL to strdup, among
-	# others), which breaks both the kernel and various applications. See:
-	#  - https://freelists.org/post/haiku-development/hrev45320-Yet-another-nonobvious-effect-of-ftreevrp-optimization
-	#  - https://dev.haiku-os.org/ticket/13285#comment:8 (& subsequent comments)
-	#  - https://dev.haiku-os.org/ticket/10803#comment:4 (& subsequent comments)
-	# Note that the Linux also does the same:
-	#  - https://github.com/torvalds/linux/commit/a3ca86aea507904
-	if $(gccVersion[1]) >= 3 {
+		# Without this flag, GCC deletes many null-pointer checks that are
+		# technically undefined behavior (e.g. passing NULL to strdup, among
+		# others), which breaks both the kernel and various applications. See:
+		#  - https://freelists.org/post/haiku-development/hrev45320-Yet-another-nonobvious-effect-of-ftreevrp-optimization
+		#  - https://dev.haiku-os.org/ticket/13285#comment:8 (& subsequent comments)
+		#  - https://dev.haiku-os.org/ticket/10803#comment:4 (& subsequent comments)
+		# Note that the Linux also does the same:
+		#  - https://github.com/torvalds/linux/commit/a3ca86aea507904
 		ccBaseFlags += -fno-delete-null-pointer-checks ;
-	}
 
-	# disable some builtins that are incompatible with our definitions
-	if $(gccVersion[1]) >= 3 {
+		# disable some builtins that are incompatible with our definitions
 		ccBaseFlags += -fno-builtin-fork -fno-builtin-vfork ;
 	}
 
@@ -650,7 +646,7 @@ rule ArchitectureSetupWarnings architecture
 #	EnableWerror src add-ons kernel file_systems googlefs ;
 	EnableWerror src add-ons kernel file_systems iso9660 ;
 	EnableWerror src add-ons kernel file_systems layers ;
-	EnableWerror src add-ons kernel file_systems netfs ;
+#	EnableWerror src add-ons kernel file_systems netfs ;
 #	EnableWerror src add-ons kernel file_systems nfs ;
 	EnableWerror src add-ons kernel file_systems nfs4 ;
 #	EnableWerror src add-ons kernel file_systems ntfs ;
