@@ -17,11 +17,6 @@ if $(RUN_WITHOUT_APP_SERVER) != 0 {
 	SubDirC++Flags $(defines) ;
 }
 
-if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
-	SubDirCcFlags $(defines) ;
-	SubDirC++Flags $(defines) ;
-}
-
 SetSubDirSupportedPlatforms haiku libbe_test ;
 
 UseLibraryHeaders agg ;
