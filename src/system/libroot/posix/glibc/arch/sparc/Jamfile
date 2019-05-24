@@ -122,8 +122,7 @@ local genericSources =
 	w_remainder.c w_remainderf.c # w_remainderl.c
 	w_scalb.c w_scalbf.c # w_scalbl.c
 	w_sinh.c w_sinhf.c # w_sinhl.c
-	w_sqrt.c w_sqrtf.c # w_sqrtl.c
-	w_sqrtl_compat.c
+	w_sqrt.c w_sqrtf.c w_sqrtl.c
 	;
 
 
