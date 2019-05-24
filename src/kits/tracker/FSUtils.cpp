@@ -2424,7 +2424,7 @@ FSMakeOriginalName(char* name, BDirectory* destDir, const char* suffix)
 	fnum = 1;
 	strcpy(temp_name, name);
 	while (destDir->Contains(temp_name)) {
-		sprintf(temp_name, "%s %" B_PRId32, copybase, ++fnum);
+		snprintf(temp_name, sizeof(temp_name), "%s %" B_PRId32, copybase, ++fnum);
 
 		if (strlen(temp_name) > (B_FILE_NAME_LENGTH - 1)) {
 			// The name has grown too long. Maybe we just went from
@@ -2433,7 +2433,7 @@ FSMakeOriginalName(char* name, BDirectory* destDir, const char* suffix)
 			// truncate the 'root' name and continue.
 			// ??? should we reset fnum or not ???
 			root[strlen(root) - 1] = '\0';
-			sprintf(temp_name, "%s%s %" B_PRId32, root, suffix, fnum);
+			snprintf(temp_name, sizeof(temp_name), "%s%s %" B_PRId32, root, suffix, fnum);
 		}
 	}
 

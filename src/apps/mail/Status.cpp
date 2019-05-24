@@ -165,7 +165,8 @@ TStatusWindow::MessageReceived(BMessage* msg)
 							break;
 						if (result != EEXIST)
 							goto err_exit;
-						sprintf(newName, "%s_%" B_PRId32, name, index++);
+						snprintf(newName, B_FILE_NAME_LENGTH, "%s_%" B_PRId32,
+							name, index++);
 					}
 					dir.FindEntry(newName, &entry);
 					node = new BNodeInfo(&file);

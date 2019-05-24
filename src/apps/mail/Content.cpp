@@ -1845,8 +1845,10 @@ TTextView::Open(hyper_text *enclosure)
 						char baseName[B_FILE_NAME_LENGTH];
 						strcpy(baseName, enclosure->name ? enclosure->name : "enclosure");
 						strcpy(name, baseName);
-						for (int32 index = 0; dir.Contains(name); index++)
-							sprintf(name, "%s_%" B_PRId32, baseName, index);
+						for (int32 index = 0; dir.Contains(name); index++) {
+							snprintf(name, B_FILE_NAME_LENGTH, "%s_%" B_PRId32,
+								baseName, index);
+						}
 
 						BEntry entry(path.Path());
 						entry_ref ref;
@@ -2234,7 +2236,7 @@ TTextView::Reader::ParseMail(BMailContainer *container,
 			if (enclosure == NULL)
 				return false;
 
-			memset(enclosure, 0, sizeof(hyper_text));
+			memset((void*)enclosure, 0, sizeof(hyper_text));
 
 			enclosure->type = TYPE_ENCLOSURE;
 
@@ -2264,7 +2266,7 @@ TTextView::Reader::ParseMail(BMailContainer *container,
 			if (enclosure == NULL)
 				return false;
 
-			memset(enclosure, 0, sizeof(hyper_text));
+			memset((void*)enclosure, 0, sizeof(hyper_text));
 
 			enclosure->type = TYPE_ENCLOSURE;
 			enclosure->component = component;
@@ -2344,7 +2346,7 @@ TTextView::Reader::Process(const char *data, int32 data_len, bool isHeader)
 				if (enclosure == NULL)
 					return false;
 
-				memset(enclosure, 0, sizeof(hyper_text));
+				memset((void*)enclosure, 0, sizeof(hyper_text));
 				fView->GetSelection(&enclosure->text_start,
 					&enclosure->text_end);
 				enclosure->type = type;

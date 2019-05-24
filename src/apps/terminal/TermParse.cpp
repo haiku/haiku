@@ -1311,9 +1311,10 @@ TermParse::_DeviceStatusReport(int n)
 			}
 		case 6:
 			// Cursor position report requested
-			len = sprintf(sbuf, "\033[%" B_PRId32 ";%" B_PRId32 "R",
-					fBuffer->Cursor().y + 1,
-					fBuffer->Cursor().x + 1);
+			len = snprintf(sbuf, sizeof(sbuf),
+				"\033[%" B_PRId32 ";%" B_PRId32 "R",
+				fBuffer->Cursor().y + 1,
+				fBuffer->Cursor().x + 1);
 			write(fFd, sbuf, len);
 			break ;
 		default:

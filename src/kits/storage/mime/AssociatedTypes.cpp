@@ -376,7 +376,8 @@ AssociatedTypes::BuildAssociatedTypesTable()
 									BPrivate::Storage::to_lower(subtype);
 
 									char fulltype[B_PATH_NAME_LENGTH];
-									sprintf(fulltype, "%s/%s", supertype, subtype);
+									snprintf(fulltype, B_PATH_NAME_LENGTH, "%s/%s",
+										supertype, subtype);
 
 									// Process the subtype
 									ProcessType(fulltype);
