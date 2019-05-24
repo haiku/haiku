@@ -15,7 +15,6 @@ public:
 
 	inline TermPos()						: x(0), y(0) { }
 	inline TermPos(int32 x, int32 y)		: x(x), y(y) { }
-	inline TermPos(const TermPos& other)	: x(other.x), y(other.y) { }
 
 	inline void SetTo(int32 x, int32 y)
 	{
@@ -51,13 +50,6 @@ public:
 	inline bool operator>(const TermPos& other) const
 	{
 		return !(*this <= other);
-	}
-
-	inline TermPos& operator=(const TermPos& other)
-	{
-		x = other.x;
-		y = other.y;
-		return *this;
 	}
 };
 
