@@ -69,7 +69,7 @@ __BEGIN_CORTEX_NAMESPACE
 class _GroupInfoView :
 	public	BView {
 	typedef	BView _inherited;
-	
+
 public:												// ctor/dtor
 	_GroupInfoView(
 		BRect											frame,
@@ -77,12 +77,12 @@ public:												// ctor/dtor
 		const char*								name,
 		uint32										resizeMode =B_FOLLOW_LEFT|B_FOLLOW_TOP,
 		uint32										flags =B_WILL_DRAW|B_FRAME_EVENTS) :
-		
+
 		BView(frame, name, resizeMode, flags),
 		m_parent(parent),
 		m_plainFont(be_plain_font),
 		m_boldFont(be_bold_font) {
-		
+
 		_initViews();
 		_initColors();
 		_updateLayout();
@@ -97,25 +97,25 @@ public:												// BView
 		_updateLayout();
 		Invalidate();
 	}
-	
+
 	virtual void GetPreferredSize(
 		float*										width,
 		float*										height) {
 		font_height fh;
 		m_plainFont.GetHeight(&fh);
-		
+
 		*width = 0.0;
 		*height = (fh.ascent+fh.descent+fh.leading) * 2;
 		*height += 4.0; //+++++
 	}
-	
-	
+
+
 	virtual void Draw(
 		BRect											updateRect) {
-		
+
 		NodeGroup* g = m_parent->m_group;
 		BRect b = Bounds();
-		
+
 		// border
 		rgb_color hi = tint_color(ViewColor(), B_LIGHTEN_2_TINT);
 		rgb_color lo = tint_color(ViewColor(), B_DARKEN_2_TINT);
@@ -130,19 +130,19 @@ public:												// BView
 			b.LeftBottom(), b.RightBottom());
 		StrokeLine(
 			b.RightTop(), b.RightBottom());
-			
+
 		SetHighColor(255,255,255,255);
-		
+
 		// background +++++
-		
+
 		// name
 		BString name = g ? g->name() : "(no group)";
 		// +++++ constrain width
 		SetFont(&m_boldFont);
 		DrawString(name.String(), m_namePosition);
-		
+
 		SetFont(&m_plainFont);
-		
+
 		// node count
 		BString nodeCount;
 		if(g)
@@ -152,23 +152,23 @@ public:												// BView
 		nodeCount << ((nodeCount == "1") ? " node." : " nodes.");
 		// +++++ constrain width
 		DrawString(nodeCount.String(), m_nodeCountPosition);
-		
+
 		// status
 		BString status = "No errors.";
 		// +++++ constrain width
 		DrawString(status.String(), m_statusPosition);
 	}
-	
+
 	virtual void MouseDown(
 		BPoint										point) {
-		
+
 		NodeGroup* g = m_parent->m_group;
 		if(!g)
 			return;
-		
+
 		font_height fh;
 		m_boldFont.GetHeight(&fh);
-		
+
 		BRect nameBounds(
 			m_namePosition.x,
 			m_namePosition.y - fh.ascent,
@@ -202,11 +202,11 @@ public:												// implementation
 	void _updateLayout() {
 		float _edge_pad_x = 3.0;
 		float _edge_pad_y = 1.0;
-		
+
 		BRect b = Bounds();
 		font_height fh;
 		m_plainFont.GetHeight(&fh);
-		
+
 		float realWidth = b.Width() - (_edge_pad_x * 2);
 
 		m_maxNameWidth = realWidth * 0.7;
@@ -215,7 +215,7 @@ public:												// implementation
 		m_namePosition.y = _edge_pad_x + fh.ascent - 2.0;
 		m_nodeCountPosition = m_namePosition;
 		m_nodeCountPosition.x = m_maxNameWidth;
-		
+
 		m_maxStatusWidth = realWidth;
 		m_statusPosition.x = _edge_pad_x;
 		m_statusPosition.y = b.Height() - (fh.descent + fh.leading + _edge_pad_y);
@@ -223,16 +223,16 @@ public:												// implementation
 
 private:
 	TransportView*							m_parent;
-	
+
 	BFont												m_plainFont;
 	BFont												m_boldFont;
-	
+
 	BPoint											m_namePosition;
 	float												m_maxNameWidth;
-	
+
 	BPoint											m_nodeCountPosition;
 	float												m_maxNodeCountWidth;
-	
+
 	BPoint											m_statusPosition;
 	float												m_maxStatusWidth;
 };
@@ -241,11 +241,11 @@ __END_CORTEX_NAMESPACE
 // -------------------------------------------------------- //
 // *** ctors
 // -------------------------------------------------------- //
-	
+
 TransportView::TransportView(
 	NodeManager*						manager,
 	const char*							name) :
-	
+
 	BView(
 		BRect(),
 		name,
@@ -259,7 +259,7 @@ TransportView::TransportView(
 	_constructControls();
 //	_updateLayout(); deferred until AttachedToWindow(): 24aug99
 	_disableControls();
-	
+
 	SetViewColor(
 		tint_color(
 			ui_color(B_PANEL_BACKGROUND_COLOR),
@@ -272,10 +272,10 @@ TransportView::TransportView(
 
 void TransportView::AttachedToWindow() {
 	_inherited::AttachedToWindow();
-	
+
 	// finish layout
 	_updateLayout();
-	
+
 	// watch the node manager (for time-source create/delete notification)
 	RouteApp* app = dynamic_cast<RouteApp*>(be_app);
 	ASSERT(app);
@@ -284,7 +284,7 @@ void TransportView::AttachedToWindow() {
 
 void TransportView::AllAttached() {
 	_inherited::AllAttached();
-	
+
 	// set message targets for view-configuation controls
 	for(target_set::iterator it = m_localTargets.begin();
 		it != m_localTargets.end(); ++it) {
@@ -295,7 +295,7 @@ void TransportView::AllAttached() {
 
 void TransportView::DetachedFromWindow() {
 	_inherited::DetachedFromWindow();
-		
+
 	RouteApp* app = dynamic_cast<RouteApp*>(be_app);
 	ASSERT(app);
 	remove_observer(this, app->manager);
@@ -324,13 +324,13 @@ void TransportView::KeyDown(
 
 		default:
 			_inherited::KeyDown(bytes, count);
-	}	
+	}
 }
 
 
 void TransportView::MouseDown(
 	BPoint									where) {
-	
+
 	MakeFocus(true);
 }
 
@@ -343,11 +343,11 @@ void TransportView::MessageReceived(
 	BMessage*								message) {
 	status_t err;
 	uint32 groupID;
-	
+
 //	PRINT((
 //		"TransportView::MessageReceived()\n"));
 //	message->PrintToStream();
-	
+
 	switch(message->what) {
 
 		case NodeGroup::M_RELEASED:
@@ -364,15 +364,15 @@ void TransportView::MessageReceived(
 						"  mismatched groupID.\n"));
 					break;
 				}
-				
+
 				_releaseGroup();
-//				
+//
 //				BMessage m(M_REMOVE_OBSERVER);
 //				m.AddMessenger("observer", BMessenger(this));
 //				message->SendReply(&m);
 			}
 			break;
-			
+
 		case NodeGroup::M_OBSERVER_ADDED:
 			err = message->FindInt32("groupID", (int32*)&groupID);
 			if(err < B_OK) {
@@ -387,10 +387,10 @@ void TransportView::MessageReceived(
 					"  mismatched groupID; ignoring.\n"));
 				break;
 			}
-			
+
 			_enableControls();
 			break;
-			
+
 		case NodeGroup::M_TRANSPORT_STATE_CHANGED:
 			uint32 groupID;
 			err = message->FindInt32("groupID", (int32*)&groupID);
@@ -406,20 +406,20 @@ void TransportView::MessageReceived(
 					"  mismatched groupID; ignoring.\n"));
 				break;
 			}
-				
+
 			_updateTransportButtons();
 			break;
-			
+
 		case NodeGroup::M_TIME_SOURCE_CHANGED:
 			//_updateTimeSource(); +++++ check group?
 			break;
-			
+
 		case NodeGroup::M_RUN_MODE_CHANGED:
 			//_updateRunMode(); +++++ check group?
 			break;
-			
+
 		// * CONTROL PROCESSING
-		
+
 		case NodeGroup::M_SET_START_POSITION: {
 
 			if(!m_group)
@@ -429,7 +429,7 @@ void TransportView::MessageReceived(
 				m_regionStartView->value());
 			message->AddInt64("position", position);
 			BMessenger(m_group).SendMessage(message);
-			
+
 			// update start-button duty/label [e.moon 11oct99]
 			if(m_group->transportState() == NodeGroup::TRANSPORT_STOPPED)
 				_updateTransportButtons();
@@ -453,7 +453,7 @@ void TransportView::MessageReceived(
 
 			break;
 		}
-		
+
 		case M_SET_NAME:
 			{
 				const char* name;
@@ -469,7 +469,7 @@ void TransportView::MessageReceived(
 				}
 			}
 			break;
-		
+
 		case RouteAppNodeManager::M_TIME_SOURCE_CREATED:
 			_timeSourceCreated(message);
 			break;
@@ -498,12 +498,12 @@ void TransportView::_handleSelectGroup(
 			"* TransportView::_handleSelectGroup(): no groupID\n"));
 		return;
 	}
-	
+
 	if(m_group && groupID != m_group->id())
 		_releaseGroup();
-		
+
 	_selectGroup(groupID);
-	
+
 	Invalidate();
 }
 
@@ -516,7 +516,7 @@ void TransportView::_handleSelectGroup(
 void TransportView::_selectGroup(
 	uint32									groupID) {
 	status_t err;
-	
+
 	if(m_group)
 		_releaseGroup();
 
@@ -534,19 +534,19 @@ void TransportView::_selectGroup(
 			strerror(err)));
 		return;
 	}
-	
+
 	_observeGroup();
 }
 
 void TransportView::_observeGroup() {
 	ASSERT(m_group);
-	
+
 	add_observer(this, m_group);
 }
 
 void TransportView::_releaseGroup() {
 	ASSERT(m_group);
-	
+
 	remove_observer(this, m_group);
 	m_group = 0;
 }
@@ -591,7 +591,7 @@ void TransportView::_constructControls() {
 		this,
 		"infoView");
 	AddChild(m_infoView);
-	
+
 	m_runModeView = new BMenuField(
 		BRect(),
 		"runModeView",
@@ -613,8 +613,8 @@ void TransportView::_constructControls() {
 
 	m_fromLabel = new BStringView(BRect(), 0, "Roll from");
 	AddChild(m_fromLabel);
-	
-	
+
+
 	m = new BMessage(NodeGroup::M_SET_START_POSITION);
 	m_regionStartView = new NumericValControl(
 		BRect(),
@@ -622,15 +622,15 @@ void TransportView::_constructControls() {
 		m,
 		2, 4, // * DIGITS
 		false, ValControl::ALIGN_FLUSH_LEFT);
-		
-	// redirect view back to self.  this gives me the chance to 
-	// augment the message with the position before sending 
+
+	// redirect view back to self.  this gives me the chance to
+	// augment the message with the position before sending
 	_addLocalTarget(m_regionStartView);
 	AddChild(m_regionStartView);
 
 	m_toLabel = new BStringView(BRect(), 0, "to");
 	AddChild(m_toLabel);
-	
+
 	m = new BMessage(NodeGroup::M_SET_END_POSITION);
 	m_regionEndView = new NumericValControl(
 		BRect(),
@@ -638,9 +638,9 @@ void TransportView::_constructControls() {
 		m,
 		2, 4, // * DIGITS
 		false, ValControl::ALIGN_FLUSH_LEFT);
-		
-	// redirect view back to self.  this gives me the chance to 
-	// augment the message with the position before sending 
+
+	// redirect view back to self.  this gives me the chance to
+	// augment the message with the position before sending
 	_addLocalTarget(m_regionEndView);
 	AddChild(m_regionEndView);
 
@@ -654,7 +654,7 @@ void TransportView::_constructControls() {
 //
 //	_addGroupTarget(m_regionStartView);
 ////	m_regionStartView->TextView()->SetAlignment(B_ALIGN_RIGHT);
-//	
+//
 //	AddChild(m_regionStartView);
 //
 //	m = new BMessage(NodeGroup::M_SET_END_POSITION);
@@ -668,7 +668,7 @@ void TransportView::_constructControls() {
 //	_addGroupTarget(m_regionEndView);
 ////	m_regionEndView->TextView()->SetAlignment(B_ALIGN_RIGHT);
 //	AddChild(m_regionEndView);
-	
+
 	m = new BMessage(NodeGroup::M_START);
 	m_startButton = new BButton(
 		BRect(),
@@ -701,7 +701,7 @@ void TransportView::_constructControls() {
 // [e.moon 11oct99]
 bigtime_t TransportView::_scalePosition(
 	double									value) {
-	
+
 	return bigtime_t(value * 1000000.0);
 }
 
@@ -793,7 +793,7 @@ void TransportView::_populateTimeSourceMenu(
 		menu->AddItem(i);
 		_addGroupTarget(i);
 	}
-	
+
 //	BMessage* m;
 //	for(int n = 0; n < _time_sources; ++n) {
 //		m = new BMessage(NodeGroup::M_SET_TIME_SOURCE);
@@ -804,7 +804,7 @@ void TransportView::_populateTimeSourceMenu(
 //			sizeof(media_node));
 //		// +++++ copy media_node of associated time source!
 ////		m->AddInt32("timeSource", n);
-//		
+//
 //		BMenuItem* i = new BMenuItem(
 //				_time_source_strings[n], m);
 //		menu->AddItem(i);
@@ -818,7 +818,7 @@ void TransportView::_populateTimeSourceMenu(
 
 void TransportView::_addLocalTarget(
 	BInvoker*								invoker) {
-	
+
 	m_localTargets.push_back(invoker);
 	if(Window())
 		invoker->SetTarget(this);
@@ -826,7 +826,7 @@ void TransportView::_addLocalTarget(
 
 void TransportView::_addGroupTarget(
 	BInvoker*								invoker) {
-	
+
 	m_groupTargets.push_back(invoker);
 	if(m_group)
 		invoker->SetTarget(m_group);
@@ -849,7 +849,7 @@ void TransportView::_disableControls() {
 
 //	m_nameView->SetText("(no group)");
 	m_infoView->Invalidate();
-	
+
 	m_runModeView->SetEnabled(false);
 	m_runModeView->Menu()->Superitem()->SetLabel("(none)");
 
@@ -861,7 +861,7 @@ void TransportView::_disableControls() {
 
 	m_regionEndView->SetEnabled(false);
 	m_regionEndView->setValue(0);
-	
+
 	m_startButton->SetEnabled(false);
 	m_stopButton->SetEnabled(false);
 	m_prerollButton->SetEnabled(false);
@@ -892,14 +892,14 @@ void TransportView::_enableControls() {
 		BView* focused = w->CurrentFocus();
 		if(focused)
 			focused->MakeFocus(false);
-	}	
+	}
 
 //	BString nameViewText = m_group->name();
 //	nameViewText << ": " << m_group->countNodes() << " nodes.";
 //	m_nameView->SetText(nameViewText.String());
-	
+
 	m_infoView->Invalidate();
-	
+
 	m_runModeView->SetEnabled(true);
 	_updateRunMode();
 
@@ -907,14 +907,14 @@ void TransportView::_enableControls() {
 	_updateTimeSource();
 
 	_updateTransportButtons();
-	
+
 
 	// +++++ ick. hard-coded scaling factors make me queasy
-	
+
 	m_regionStartView->SetEnabled(true);
 	m_regionStartView->setValue(
 		((double)m_group->startPosition()) / 1000000.0);
-	
+
 	m_regionEndView->SetEnabled(true);
 	m_regionEndView->setValue(
 		((double)m_group->endPosition()) / 1000000.0);
@@ -928,7 +928,7 @@ void TransportView::_enableControls() {
 
 	if(w) {
 		w->EndViewTransaction();
-	}	
+	}
 
 //	PRINT((
 //		"*** DONE: _enableControls()\n"));
@@ -937,7 +937,7 @@ void TransportView::_enableControls() {
 void TransportView::_updateTransportButtons() {
 
 	ASSERT(m_group);
-	
+
 	switch(m_group->transportState()) {
 		case NodeGroup::TRANSPORT_INVALID:
 		case NodeGroup::TRANSPORT_STARTING:
@@ -946,7 +946,7 @@ void TransportView::_updateTransportButtons() {
 			m_stopButton->SetEnabled(false);
 			m_prerollButton->SetEnabled(false);
 			break;
-			
+
 		case NodeGroup::TRANSPORT_STOPPED:
 			m_startButton->SetEnabled(true);
 			m_stopButton->SetEnabled(false);
@@ -964,11 +964,11 @@ void TransportView::_updateTransportButtons() {
 	// based on group settings, set the start button to do either
 	// a simple start or a roll (atomic start/stop.) [e.moon 11oct99]
 	ASSERT(m_startButton->Message());
-	
+
 	// get current region settings
 	bigtime_t startPosition = _scalePosition(m_regionStartView->value());
 	bigtime_t endPosition = _scalePosition(m_regionEndView->value());
-	
+
 	// get current run-mode setting
 	uint32 runMode = 0;
 	BMenuItem* i = m_runModeView->Menu()->FindMarked();
@@ -979,7 +979,7 @@ void TransportView::_updateTransportButtons() {
 		endPosition > startPosition &&
 		(runMode == BMediaNode::B_OFFLINE ||
 			!m_group->canCycle())) {
-			
+
 		m_startButton->SetLabel("Roll");
 		m_startButton->Message()->what = NodeGroup::M_ROLL;
 
@@ -1017,27 +1017,27 @@ void TransportView::_updateTimeSource() {
 		BMessage* message = menu->ItemAt(n)->Message();
 		if(!message)
 			continue;
-			
+
 		ssize_t size = sizeof(media_node);
-		err = message->FindData(			
+		err = message->FindData(
 			"timeSourceNode",
 			B_RAW_TYPE,
 			&data,
 			&size);
 		if(err < B_OK)
 			continue;
-			
-		memcpy(&itemNode, data, sizeof(media_node));
+
+		itemNode = *((media_node*)data);
 		if(itemNode != tsNode)
 			continue;
-		
+
 		// found it
 		PRINT((
 			"### _updateTimeSource: %s\n",
 			menu->ItemAt(n)->Label()));
 		menu->ItemAt(n)->SetMarked(true);
 		break;
-	}	
+	}
 //	ASSERT(m_timeSourcePresets);
 //	int n;
 //	for(n = 0; n < _time_sources; ++n) {
@@ -1054,7 +1054,7 @@ void TransportView::_updateTimeSource() {
 }
 void TransportView::_updateRunMode() {
 	ASSERT(m_group);
-	
+
 	BMenu* menu = m_runModeView->Menu();
 	uint32 runMode = m_group->runMode() - 1; // real run mode starts at 1
 	ASSERT((uint32)menu->CountItems() > runMode);
@@ -1069,7 +1069,7 @@ void TransportView::_updateRunMode() {
 //	if(err == B_OK) {
 //		m_timeSources.push_back(node.node);
 //	}
-//	
+//
 //	err = m_manager->roster->GetSystemTimeSource(&m_timeSourcePresets[1]);
 //	if(err < B_OK) {
 //		PRINT((
@@ -1087,7 +1087,7 @@ void TransportView::_timeSourceCreated(
 	err = message->FindInt32("nodeID", &id);
 	if(err < B_OK)
 		return;
-		
+
 //	PRINT(("### _timeSourceCreated(): %" B_PRId32 "\n", id));
 	NodeRef* ref;
 	err = m_manager->getNodeRef(id, &ref);
@@ -1095,7 +1095,7 @@ void TransportView::_timeSourceCreated(
 		PRINT((
 			"!!! TransportView::_timeSourceCreated(): node %" B_PRId32 " doesn't exist\n",
 			id));
-		return; 
+		return;
 	}
 
 	char nameBuffer[B_MEDIA_NAME_LENGTH+16];
@@ -1125,7 +1125,7 @@ void TransportView::_timeSourceDeleted(
 	err = message->FindInt32("nodeID", &id);
 	if(err < B_OK)
 		return;
-		
+
 //	PRINT(("### _timeSourceDeleted(): %" B_PRId32 "\n", id));
 
 	BMenu* menu = m_timeSourceView->Menu();
@@ -1139,20 +1139,20 @@ void TransportView::_timeSourceDeleted(
 		BMessage* message = menu->ItemAt(n)->Message();
 		if(!message)
 			continue;
-			
+
 		ssize_t size = sizeof(media_node);
-		err = message->FindData(			
+		err = message->FindData(
 			"timeSourceNode",
 			B_RAW_TYPE,
 			&data,
 			&size);
 		if(err < B_OK)
 			continue;
-			
-		memcpy(&itemNode, data, sizeof(media_node));
+
+		itemNode = *((media_node*)data);
 		if(itemNode.node != id)
 			continue;
-		
+
 		// found it; remove the item
 		menu->RemoveItem(n);
 		break;
@@ -1190,7 +1190,7 @@ class TransportView::_layout_state {
 public:
 	_layout_state() {}
 
-	// +++++	
+	// +++++
 };
 
 inline float _menu_width(
@@ -1198,7 +1198,7 @@ inline float _menu_width(
 	const BFont* font) {
 
 	float max = 0.0;
-	
+
 	int total = menu->CountItems();
 	for(int n = 0; n < total; ++n) {
 		float w = font->StringWidth(
@@ -1206,7 +1206,7 @@ inline float _menu_width(
 		if(w > max)
 			max = w;
 	}
-	
+
 	return max;
 }
 
@@ -1227,10 +1227,10 @@ void TransportView::_updateLayout() // +++++
 	// * max label width
 	float maxLabelWidth = 0.0;
 	float w;
-	
+
 	maxLabelWidth = be_bold_font->StringWidth(
 		m_runModeView->Label());
-		
+
 	w = be_bold_font->StringWidth(
 		m_timeSourceView->Label());
 	if(w > maxLabelWidth)
@@ -1277,7 +1277,7 @@ void TransportView::_updateLayout() // +++++
 		viewWidth += (buttonSpan - columnWidth);
 
 //	float insideWidth = viewWidth - (_edge_pad_x*2);
-		
+
 	// * figure view height a row at a time
 	font_height fh;
 	be_plain_font->GetHeight(&fh);
@@ -1286,20 +1286,20 @@ void TransportView::_updateLayout() // +++++
 	float prefInfoWidth, prefInfoHeight;
 	m_infoView->GetPreferredSize(&prefInfoWidth, &prefInfoHeight);
 	float row_1_height = max(prefInfoHeight, _transport_button_height);
-	
+
 	float row1_y = _edge_pad_y;
 	float row2_y = row1_y + row_1_height + _transport_pad_y;
 	float row3_y = row2_y + lineHeight + _control_pad_y;
 //	float row4_y = row3_y + lineHeight + _control_pad_y + _transport_pad_y;
 //	float row5_y = row4_y + lineHeight + _control_pad_y;
 	float viewHeight = row3_y + lineHeight + _control_pad_y + _edge_pad_y;
-	
+
 	// Place controls
 	m_infoView->MoveTo(
 		column1_x+1.0, row1_y+1.0);
 	m_infoView->ResizeTo(
 		columnWidth, prefInfoHeight);
-		
+
 	BRect br(
 		column2_x, row1_y,
 		column2_x+_transport_button_width,
@@ -1326,7 +1326,7 @@ void TransportView::_updateLayout() // +++++
 		maxLabelWidth+_label_pad_x);
 	m_runModeView->SetAlignment(
 		B_ALIGN_LEFT);
-		
+
 	m_timeSourceView->MoveTo(
 		column2_x, row3_y);
 	m_timeSourceView->ResizeTo(
@@ -1343,27 +1343,27 @@ void TransportView::_updateLayout() // +++++
 //		B_FOLLOW_LEFT_RIGHT|B_FOLLOW_TOP);
 
 	// "FROM"
-	
+
 	BPoint rtLeftTop(column1_x, row2_y + 5.0);
 	BPoint rtRightBottom;
-	
+
 	m_fromLabel->MoveTo(rtLeftTop);
 	m_fromLabel->ResizeToPreferred();
 	rtRightBottom = rtLeftTop + BPoint(
 		m_fromLabel->Bounds().Width(),
 		m_fromLabel->Bounds().Height());
-	
-	
+
+
 	// (region-start)
 
 	rtLeftTop.x = rtRightBottom.x+4;
-	
+
 	m_regionStartView->MoveTo(rtLeftTop + BPoint(0.0, 2.0));
 	m_regionStartView->ResizeToPreferred();
 	rtRightBottom = rtLeftTop + BPoint(
 		m_regionStartView->Bounds().Width(),
 		m_regionStartView->Bounds().Height());
-	
+
 //	m_regionStartView->SetDivider(
 //		maxLabelWidth);
 //	m_regionStartView->TextView()->ResizeTo(
@@ -1379,11 +1379,11 @@ void TransportView::_updateLayout() // +++++
 	rtRightBottom = rtLeftTop + BPoint(
 		m_toLabel->Bounds().Width(),
 		m_toLabel->Bounds().Height());
-	
+
 	// (region-end)
 
 	rtLeftTop.x = rtRightBottom.x + 4;
-	
+
 	m_regionEndView->MoveTo(rtLeftTop + BPoint(0.0, 2.0));
 	m_regionEndView->ResizeToPreferred();
 //	m_regionEndView->SetDivider(
@@ -1400,7 +1400,7 @@ void TransportView::_updateLayout() // +++++
 	float targetHeight = (b.Height() < viewHeight) ?
 		viewHeight :
 		b.Height();
-	
+
 	// Resize view to fit contents
 	ResizeTo(targetWidth, targetHeight);
 
@@ -1429,6 +1429,6 @@ TransportView::~TransportView() {
 	if(m_layout)
 		delete m_layout;
 }
-	
+
 
 // END -- TransportView.cpp --

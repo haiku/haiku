@@ -465,7 +465,7 @@ LoggingConsumer::Disconnected(
 	mLogger->Log(LOG_DISCONNECTED, logMsg);
 
 	// wipe out our input record
-	memset(&mInput, 0, sizeof(mInput));
+	mInput = media_input();
 }
 
 status_t

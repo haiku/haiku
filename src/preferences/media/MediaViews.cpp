@@ -432,7 +432,7 @@ AudioSettingsView::_FillChannelMenu(const dormant_node_info* nodeInfo)
 
 			for (int32 i = 0; i < inputCount; i++) {
 				media_input* input = new media_input();
-				memcpy(input, &inputs[i], sizeof(*input));
+				*input = inputs[i];
 				ChannelMenuItem* channelItem = new ChannelMenuItem(input,
 					new BMessage(message));
 				fChannelMenu->AddItem(channelItem);

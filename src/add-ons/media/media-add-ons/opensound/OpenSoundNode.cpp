@@ -345,7 +345,7 @@ OpenSoundNode::OpenSoundNode(BMediaAddOn* addon, const char* name,
 	// initialize our preferred format object
 	// TODO: this should go away! should use engine's preferred for each afmt.
 #if 1
-	memset(&fPreferredFormat, 0, sizeof(fPreferredFormat));
+	fPreferredFormat = media_format();
 		// set everything to wildcard first
 	fPreferredFormat.type = B_MEDIA_RAW_AUDIO;
 	fPreferredFormat.u.raw_audio = media_multi_audio_format::wildcard;

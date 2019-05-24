@@ -61,12 +61,12 @@ uint32 OpenSoundDevice::convert_oss_format_to_media_format(int fmt)
 {
 	if (fmt & AFMT_FLOAT)
 		return media_raw_audio_format::B_AUDIO_FLOAT;
-	if (fmt & AFMT_S32_LE || 
-		fmt & AFMT_S24_LE || 
-		fmt & AFMT_S32_BE || 
+	if (fmt & AFMT_S32_LE ||
+		fmt & AFMT_S24_LE ||
+		fmt & AFMT_S32_BE ||
 		fmt & AFMT_S24_BE)
 		return media_raw_audio_format::B_AUDIO_INT;
-	if (fmt & AFMT_S16_LE || 
+	if (fmt & AFMT_S16_LE ||
 		fmt & AFMT_S16_BE) /* U16 unsupported */
 		return media_raw_audio_format::B_AUDIO_SHORT;
 	if (fmt & AFMT_S8)
@@ -81,15 +81,15 @@ int OpenSoundDevice::convert_oss_format_to_endian(int fmt)
 {
 	if (fmt & AFMT_FLOAT)
 		return B_MEDIA_HOST_ENDIAN;
-	if (fmt & AFMT_S32_LE || 
-		fmt & AFMT_S24_LE || 
-		fmt & AFMT_S16_LE || 
-		fmt & AFMT_U16_LE || 
+	if (fmt & AFMT_S32_LE ||
+		fmt & AFMT_S24_LE ||
+		fmt & AFMT_S16_LE ||
+		fmt & AFMT_U16_LE ||
 		fmt & AFMT_S24_PACKED)
 		return B_MEDIA_LITTLE_ENDIAN;
-	if (fmt & AFMT_S32_BE || 
-		fmt & AFMT_S24_BE || 
-		fmt & AFMT_S16_BE || 
+	if (fmt & AFMT_S32_BE ||
+		fmt & AFMT_S24_BE ||
+		fmt & AFMT_S16_BE ||
 		fmt & AFMT_U16_BE)
 		return B_MEDIA_BIG_ENDIAN;
 	if (fmt & AFMT_S8 ||
@@ -189,7 +189,7 @@ status_t OpenSoundDevice::get_media_format_description_for(int fmt, media_format
 {
 	int i;
 	for (i = 0; i < count; i++)
-		memset(&desc[i], 0, sizeof(media_format_description));
+		desc[i] = media_format_description();
 	if (count < 1)
 		return 0;
 	if (fmt & AFMT_SUPPORTED_PCM) {
@@ -366,13 +366,13 @@ status_t OpenSoundDevice::InitDriver()
 	CALLED();
 	PRINT(("OpenSoundDevice::InitDriver: %" B_PRId32 " engines, %" B_PRId32
 		" mixers\n", CountEngines(), CountMixers()));
-	
+
 	if (CountMixers()) {
 		;//...
 	}
-	
+
 	fInitCheckStatus = B_OK;
-	
+
 	return B_OK;
 }
 
@@ -398,7 +398,7 @@ OpenSoundDevice::AddEngine(oss_audioinfo *info)
 		delete engine;
 		return err;
 	}
-	fEngines.AddItem(engine);	
+	fEngines.AddItem(engine);
 	return B_OK;
 }
 
@@ -417,7 +417,7 @@ OpenSoundDevice::AddMixer(oss_mixerinfo *info)
 		delete mixer;
 		return err;
 	}
-	fMixers.AddItem(mixer);	
+	fMixers.AddItem(mixer);
 	return B_OK;
 }
 
