@@ -145,7 +145,7 @@ VectorPath::VectorPath(BMessage* archive)
 	if (archive->GetInfo("point", &typeFound, &countFound) >= B_OK
 		&& typeFound == B_POINT_TYPE
 		&& _SetPointCount(countFound)) {
-		memset(fPath, 0, fAllocCount * sizeof(control_point));
+		memset((void*)fPath, 0, fAllocCount * sizeof(control_point));
 
 		BPoint point;
 		BPoint pointIn;
@@ -322,7 +322,7 @@ VectorPath::operator==(const VectorPath& other) const
 {
 	if (fClosed != other.fClosed)
 		return false;
-	
+
 	if (fPointCount != other.fPointCount)
 		return false;
 
@@ -1073,7 +1073,7 @@ VectorPath::_SetPointCount(int32 count)
 			fPath = obj_new(control_point, fAllocCount);
 
 		if (fPath != NULL) {
-			memset(fPath + fPointCount, 0,
+			memset((void*)(fPath + fPointCount), 0,
 				(fAllocCount - fPointCount) * sizeof(control_point));
 		}
 	}

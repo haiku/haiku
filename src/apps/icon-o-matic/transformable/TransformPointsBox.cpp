@@ -57,7 +57,7 @@ TransformPointsBox::TransformPointsBox(CanvasView* view,
 						  fPoints[i].point_out.x, fPoints[i].point_out.y);
 				bounds = bounds | dummy;
 			} else {
-				memset(&fPoints[i], 0, sizeof(control_point));
+				memset((void*)&fPoints[i], 0, sizeof(control_point));
 			}
 		}
 	}

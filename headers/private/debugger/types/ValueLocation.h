@@ -72,7 +72,7 @@ struct ValuePieceLocation {
 
 	bool Copy(const ValuePieceLocation& other)
 	{
-		memcpy(this, &other, sizeof(ValuePieceLocation));
+		memcpy((void*)this, (void*)&other, sizeof(ValuePieceLocation));
 		if (type == VALUE_PIECE_LOCATION_IMPLICIT) {
 			void* tempValue = malloc(size);
 			if (tempValue == NULL) {

@@ -353,7 +353,7 @@ BVariant::_SetTo(const BVariant& other)
 			other.fReferenceable->AcquireReference();
 	}
 
-	memcpy(this, &other, sizeof(BVariant));
+	memcpy((void*)this, (void*)&other, sizeof(BVariant));
 }
 
 

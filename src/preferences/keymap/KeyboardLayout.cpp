@@ -842,7 +842,7 @@ KeyboardLayout::_InitFrom(const char* data)
 						state.mode = kKeyShape;
 						break;
 					case kKeyShape:
-						memset(&key, 0, sizeof(Key));
+						memset((void*)&key, 0, sizeof(Key));
 						if (!_GetShape(state, term.String(), key))
 							return B_BAD_VALUE;
 

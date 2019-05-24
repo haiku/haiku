@@ -27,8 +27,8 @@ virtual			~_BTextViewSupportBuffer_();
 		int32	ItemCount() const;
 
 protected:
-		int32	fExtraCount;	
-		int32	fItemCount;				
+		int32	fExtraCount;
+		int32	fItemCount;
 		int32	fBufferCount;
 		T*		fBuffer;
 };
@@ -61,7 +61,7 @@ _BTextViewSupportBuffer_<T>::InsertItemsAt(int32 inNumItems,
 {
 	if (inNumItems < 1)
 		return;
-	
+
 	inAtIndex = (inAtIndex > fItemCount) ? fItemCount : inAtIndex;
 	inAtIndex = (inAtIndex < 0) ? 0 : inAtIndex;
 
@@ -69,15 +69,16 @@ _BTextViewSupportBuffer_<T>::InsertItemsAt(int32 inNumItems,
 	int32 logSize = fItemCount * sizeof(T);
 	if ((logSize + delta) >= fBufferCount) {
 		fBufferCount = logSize + delta + (fExtraCount * sizeof(T));
-		fBuffer = (T*)realloc(fBuffer, fBufferCount);
+		fBuffer = (T*)realloc((void*)fBuffer, fBufferCount);
 		if (fBuffer == NULL)
 			debugger("InsertItemsAt(): reallocation failed");
 	}
-	
+
 	T* loc = fBuffer + inAtIndex;
-	memmove(loc + inNumItems, loc, (fItemCount - inAtIndex) * sizeof(T));
-	memcpy(loc, inItem, delta);
-	
+	memmove((void*)(loc + inNumItems), (void*)loc,
+		(fItemCount - inAtIndex) * sizeof(T));
+	memcpy((void*)loc, (void*)inItem, delta);
+
 	fItemCount += inNumItems;
 }
 
@@ -89,14 +90,14 @@ _BTextViewSupportBuffer_<T>::RemoveItemsAt(int32 inNumItems,
 {
 	if (inNumItems < 1)
 		return;
-	
+
 	inAtIndex = (inAtIndex > fItemCount - 1) ? (fItemCount - 1) : inAtIndex;
 	inAtIndex = (inAtIndex < 0) ? 0 : inAtIndex;
-	
+
 	T* loc = fBuffer + inAtIndex;
-	memmove(loc, loc + inNumItems, 
+	memmove(loc, loc + inNumItems,
 			(fItemCount - (inNumItems + inAtIndex)) * sizeof(T));
-	
+
 	int32 delta = inNumItems * sizeof(T);
 	int32 logSize = fItemCount * sizeof(T);
 	uint32 extraSize = fBufferCount - (logSize - delta);
@@ -106,7 +107,7 @@ _BTextViewSupportBuffer_<T>::RemoveItemsAt(int32 inNumItems,
 		if (fBuffer == NULL)
 			debugger("RemoveItemsAt(): reallocation failed");
 	}
-	
+
 	fItemCount -= inNumItems;
 }
 

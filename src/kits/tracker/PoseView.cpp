@@ -788,7 +788,7 @@ BPoseView::SavePoseLocations(BRect* frameIfDesktop)
 					extendedPoseInfo = (ExtendedPoseInfo*)
 						new char [size];
 
-					memset(extendedPoseInfo, 0, size);
+					memset((void*)extendedPoseInfo, 0, size);
 					extendedPoseInfo->fWorkspaces = 0xffffffff;
 					extendedPoseInfo->fInvisible = false;
 					extendedPoseInfo->fShowFromBootOnly = false;

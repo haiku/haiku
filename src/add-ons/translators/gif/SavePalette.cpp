@@ -198,11 +198,11 @@ SavePalette::SavePalette(int mode)
 {
 	if (IsValid()) {
 		if (fMode == WEB_SAFE_PALETTE) {
-			memcpy(pal, wsp, sizeof(rgb_color) * 256);
+			memcpy((void*)pal, wsp, sizeof(rgb_color) * 256);
 			fSize = 216;
 		} else if (fMode == BEOS_SYSTEM_PALETTE) {
 			color_map* map = (color_map*)system_colors();
-			memcpy(pal, map->color_list, sizeof(rgb_color) * 256);
+			memcpy((void*)pal, map->color_list, sizeof(rgb_color) * 256);
 			fSize = 256;
 		} else if (fMode == GREYSCALE_PALETTE) {
 			for (int i = 0; i < 256; i++) {
@@ -405,7 +405,7 @@ SavePalette::IndexForColor(uint8 red, uint8 green, uint8 blue, uint8 alpha)
 		}
 	} else {
 		int closestDistance = 255 * 255 * 3;
-	
+
 		if (fTransparentMode == AUTO_TRANSPARENCY) {
 			for (int i = 0; i < fTransparentIndex && closestDistance != 0;
 					i++) {

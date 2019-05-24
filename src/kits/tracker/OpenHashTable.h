@@ -474,7 +474,7 @@ OpenHashElementArray<Element>::Add()
 		memcpy(newData, fData, fSize * sizeof(Element));
 		free(fData);
 */
-		Element *newData = (Element*)realloc(fData,
+		Element *newData = (Element*)realloc((void*)fData,
 			(size_t)newSize * sizeof(Element));
 		if (!newData)
 			return NULL;
