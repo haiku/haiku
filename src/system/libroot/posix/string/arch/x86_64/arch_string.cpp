@@ -9,7 +9,7 @@
 #include <cstddef>
 #include <cstdint>
 
-#include <x86intrin.h>
+#include <emmintrin.h>
 
 
 namespace {
