@@ -83,7 +83,7 @@ VideoFileTexture::_Load(const char* fileName)
 
 			// specifiy the decoded format. we derive this information from
 			// the encoded format.
-			memset(&format, 0, sizeof(media_format));
+			format = media_format();
 			format.u.raw_video.last_active = (int32) (bounds.Height() - 1.0);
 			format.u.raw_video.orientation = B_VIDEO_TOP_LEFT_RIGHT;
 			format.u.raw_video.pixel_width_aspect = 1;
