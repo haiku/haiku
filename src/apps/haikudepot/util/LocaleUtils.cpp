@@ -4,6 +4,7 @@
  */
 #include "LocaleUtils.h"
 
+#include <stdlib.h>
 
 #include <Collator.h>
 #include <Locale.h>
