@@ -1,6 +1,6 @@
 resource app_signature "application/x-vnd.Haiku-PackageInstaller";
 
-resource app_name_catalog_entry "x-vnd.Haiku-PackageInstaller:System name:PackageInstaller";
+resource app_name_catalog_entry "x-vnd.Haiku-PackageInstaller:System name:LegacyPackageInstaller";
 
 resource file_types message {
 	"types" = "application/x-scode-UPkg"

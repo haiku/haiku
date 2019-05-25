@@ -25,7 +25,7 @@
 PackageWindow::PackageWindow(const entry_ref* ref)
 	:
 	BWindow(BRect(100, 100, 600, 300),
-		B_TRANSLATE_SYSTEM_NAME("PackageInstaller"),
+		B_TRANSLATE_SYSTEM_NAME("LegacyPackageInstaller"),
 		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	PackageView* view = new PackageView(ref);
