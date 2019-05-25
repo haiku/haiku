@@ -366,6 +366,7 @@ ActivityWindow::_AddDefaultView()
 			// The first view defaults to memory usage
 			view->AddDataSource(new UsedMemoryDataSource());
 			view->AddDataSource(new CachedMemoryDataSource());
+			view->AddDataSource(new SwapSpaceDataSource());
 			break;
 		case 2:
 			// The third view defaults to network in/out
