@@ -18,6 +18,7 @@ BCollator* LocaleUtils::sSharedCollator = NULL;
 LocaleUtils::GetSharedCollator()
 {
 	if (sSharedCollator == NULL) {
+		sSharedCollator = new BCollator();
 		GetCollator(sSharedCollator);
 	}
 
