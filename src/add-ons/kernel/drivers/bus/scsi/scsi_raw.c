@@ -67,8 +67,8 @@ raw_write(void *cookie, off_t position, const void *data, size_t *numBytes)
 }
 
 
-/** !!! keep this in sync with scsi_periph module !!! */
-
+/* TODO: sync with scsi_periph module, this has been updated there to use
+	user_memcpy */
 static status_t
 raw_command(raw_device_info *device, raw_device_command *cmd)
 {

@@ -15,6 +15,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <AutoDeleter.h>
 #include <kernel.h>
 #include <syscall_restart.h>
 
@@ -137,15 +138,37 @@ raw_command(scsi_periph_device_info *device, raw_device_command *cmd)
 		return B_NO_MEMORY;
 
 	request->flags = 0;
+	bool dataIn = (cmd->flags & B_RAW_DEVICE_DATA_IN) != 0;
+	bool dataOut = !dataIn && cmd->data_length != 0;
 
-	if (cmd->flags & B_RAW_DEVICE_DATA_IN)
+	void* buffer = cmd->data;
+	MemoryDeleter bufferDeleter;
+	if (buffer != NULL) {
+		if (IS_USER_ADDRESS(buffer)) {
+			buffer = malloc(cmd->data_length);
+			if (buffer == NULL) {
+				device->scsi->free_ccb(request);
+				return B_NO_MEMORY;
+			}
+			bufferDeleter.SetTo(buffer);
+			if (dataOut
+				&& user_memcpy(buffer, cmd->data, cmd->data_length) != B_OK) {
+				goto bad_address;
+			}
+		} else {
+			if (is_called_via_syscall())
+				goto bad_address;
+		}
+	}
+
+	if (dataIn)
 		request->flags |= SCSI_DIR_IN;
-	else if (cmd->data_length)
+	else if (dataOut)
 		request->flags |= SCSI_DIR_OUT;
 	else
 		request->flags |= SCSI_DIR_NONE;
 
-	request->data = (uint8*)cmd->data;
+	request->data = (uint8*)buffer;
 	request->sg_list = NULL;
 	request->data_length = cmd->data_length;
 	request->sort = -1;
@@ -162,10 +185,22 @@ raw_command(scsi_periph_device_info *device, raw_device_command *cmd)
 	cmd->cam_status = request->subsys_status;
 	cmd->scsi_status = request->device_status;
 
-	if ((request->subsys_status & SCSI_AUTOSNS_VALID) != 0 && cmd->sense_data) {
-		memcpy(cmd->sense_data, request->sense, min_c(cmd->sense_data_length,
-			(size_t)SCSI_MAX_SENSE_SIZE - request->sense_resid));
+	if ((request->subsys_status & SCSI_AUTOSNS_VALID) != 0
+		&& cmd->sense_data != NULL) {
+		size_t length = min_c(cmd->sense_data_length,
+			(size_t)SCSI_MAX_SENSE_SIZE - request->sense_resid);
+		if (IS_USER_ADDRESS(cmd->sense_data)) {
+			if (user_memcpy(cmd->sense_data, request->sense, length) != B_OK)
+				goto bad_address;
+		} else if (is_called_via_syscall()) {
+			goto bad_address;
+		} else {
+			memcpy(cmd->sense_data, request->sense, length);
+		}
 	}
+
+	if (dataIn && user_memcpy(cmd->data, buffer, cmd->data_length) != B_OK)
+		goto bad_address;
 
 	if ((cmd->flags & B_RAW_DEVICE_REPORT_RESIDUAL) != 0) {
 		// this is a bit strange, see Be's sample code where I pinched this from;
@@ -178,6 +213,11 @@ raw_command(scsi_periph_device_info *device, raw_device_command *cmd)
 	device->scsi->free_ccb(request);
 
 	return B_OK;
+
+bad_address:
+	device->scsi->free_ccb(request);
+
+	return B_BAD_ADDRESS;
 }
 
 
@@ -352,6 +392,8 @@ periph_ioctl(scsi_periph_handle_info *handle, int op, void *buffer,
 		case B_GET_MEDIA_STATUS:
 		{
 			status_t status = B_OK;
+			if (length < sizeof(status))
+				return B_BUFFER_OVERFLOW;
 
 			if (handle->device->removable)
 				status = periph_get_media_status(handle);
@@ -400,10 +442,14 @@ periph_ioctl(scsi_periph_handle_info *handle, int op, void *buffer,
 		}
 
 		case B_SCSI_INQUIRY:
+			if (length < sizeof(scsi_inquiry))
+				return B_BUFFER_OVERFLOW;
 			return inquiry(handle->device, (scsi_inquiry *)buffer);
 
 		case B_SCSI_PREVENT_ALLOW:
 			bool result;
+			if (length < sizeof(result))
+				return B_BUFFER_OVERFLOW;
 			if (IS_USER_ADDRESS(buffer)) {
 				if (user_memcpy(&result, buffer, sizeof(result)) != B_OK)
 					return B_BAD_ADDRESS;
@@ -415,8 +461,27 @@ periph_ioctl(scsi_periph_handle_info *handle, int op, void *buffer,
 			return prevent_allow(handle->device, result);
 
 		case B_RAW_DEVICE_COMMAND:
-			return raw_command(handle->device, (raw_device_command*)buffer);
-
+		{
+			raw_device_command command;
+			raw_device_command* commandBuffer;
+			if (length < sizeof(command))
+				return B_BUFFER_OVERFLOW;
+			if (IS_USER_ADDRESS(buffer)) {
+				if (user_memcpy(&command, buffer, sizeof(command)) != B_OK)
+					return B_BAD_ADDRESS;
+				commandBuffer = &command;
+			} else if (is_called_via_syscall()) {
+				return B_BAD_ADDRESS;
+			} else {
+				commandBuffer = (raw_device_command*)buffer;
+			}
+			status_t status = raw_command(handle->device, commandBuffer);
+			if (status == B_OK && commandBuffer == &command) {
+				if (user_memcpy(buffer, &command, sizeof(command)) != B_OK)
+					status = B_BAD_ADDRESS;
+			}
+			return status;
+		}
 		default:
 			if (handle->device->scsi->ioctl != NULL) {
 				return handle->device->scsi->ioctl(handle->device->scsi_device,
