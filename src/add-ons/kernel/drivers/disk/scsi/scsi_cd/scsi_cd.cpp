@@ -709,6 +709,8 @@ cd_uninit_device(void* _cookie)
 
 	delete info->io_scheduler;
 	delete info->dma_resource;
+	info->io_scheduler = NULL;
+	info->dma_resource = NULL;
 }
 
 
@@ -772,6 +774,9 @@ cd_read(void* cookie, off_t pos, void* buffer, size_t* _length)
 	if (status != B_OK)
 		return status;
 
+	if (handle->info->io_scheduler == NULL)
+		return B_DEV_NO_MEDIA;
+
 	status = handle->info->io_scheduler->ScheduleRequest(&request);
 	if (status != B_OK)
 		return status;
@@ -799,6 +804,9 @@ cd_write(void* cookie, off_t pos, const void* buffer, size_t* _length)
 	status_t status = request.Init(pos, (addr_t)buffer, length, true, 0);
 	if (status != B_OK)
 		return status;
+
+	if (handle->info->io_scheduler == NULL)
+		return B_DEV_NO_MEDIA;
 
 	status = handle->info->io_scheduler->ScheduleRequest(&request);
 	if (status != B_OK)
