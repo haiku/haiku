@@ -44,6 +44,9 @@
 #define RWTRACE(a...)
 
 
+#define INQUIRY_BASE_LENGTH 36
+
+
 AHCIPort::AHCIPort(AHCIController* controller, int index)
 	:
 	fController(controller),
@@ -659,8 +662,8 @@ AHCIPort::ScsiInquiry(scsi_ccb* request)
 		// TODO: Sense ILLEGAL REQUEST + INVALID FIELD IN CDB?
 		gSCSI->finished(request, 1);
 		return;
-	} else if (request->data_length < sizeof(scsiData)) {
-		ERROR("invalid request\n");
+	} else if (request->data_length < INQUIRY_BASE_LENGTH) {
+		ERROR("invalid request %" B_PRIu32 "\n", request->data_length);
 		request->subsys_status = SCSI_REQ_ABORTED;
 		gSCSI->finished(request, 1);
 		return;
@@ -1158,7 +1161,6 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb* request)
 				ASSERT(request->data_length == 0);
 				break;
 			case SCSI_DIR_IN:
-				ASSERT(request->data_length > 0);
 				break;
 			case SCSI_DIR_OUT:
 				isWrite = true;
