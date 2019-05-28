@@ -18,6 +18,7 @@
 #define BTRFS_MAX_TREE_DEPTH		8
 
 
+//! Tree traversal direction status, used by functions manipulating trees
 enum btree_traversing {
 	BTREE_FORWARD = 1,
 	BTREE_EXACT = 0,
@@ -68,17 +69,30 @@ public:
 									void** _value, uint32* _size = NULL,
 									uint32* _offset = NULL) const;
 
+			/*! Traverse from the root to fill in the path along the way
+			 * \return Current slot at leaf if successful, error code (out of memory,
+			 * no such entry, unmapped block) otherwise
+			 */
 			status_t			Traverse(btree_traversing type, Path* path,
 									const btrfs_key& key) const;
 
 			status_t			PreviousLeaf(Path* path) const;
 			status_t			NextLeaf(Path* path) const;
+			/*! Insert consecutive empty entries
+			 * \param num Number of entries to be inserted
+			 * \param startKey Slot to start inserting
+			 * \return Starting slot on success, error code otherwise
+			 */
 			status_t			MakeEntries(Transaction& transaction,
 									Path* path, const btrfs_key& startKey,
 									int num, int length);
+			//! MakeEntries and fill in them
 			status_t			InsertEntries(Transaction& transaction,
 									Path* path, btrfs_entry* entries,
 									void** data, int num);
+			/*! Like MakeEntries, but here entries are removed.
+			 * \param _data Location to store removed data
+			 */
 			status_t			RemoveEntries(Transaction& transaction,
 									Path* path, const btrfs_key& startKey,
 									void** _data, int num);
@@ -95,6 +109,10 @@ private:
 								BTree& operator=(const BTree& other);
 									// no implementation
 
+			/*! Search for key in the tree
+			 * \param _value Location to store item if search successful
+			 * \return B_OK when key found, error code otherwise
+			 */
 			status_t			_Find(Path* path, btrfs_key& key,
 									void** _value, uint32* _size,
 									uint32* _offset, btree_traversing type)
@@ -118,7 +136,7 @@ public:
 		Node(Volume* volume, off_t block);
 		~Node();
 
-			// just return from Header
+
 		uint64	LogicalAddress() const
 			{ return fNode->header.LogicalAddress(); }
 		uint64	Flags() const
@@ -146,9 +164,10 @@ public:
 		uint8*	ItemData(uint32 i) const
 			{ return (uint8*)Item(0) + Item(i)->Offset(); }
 
-		void	Keep();
+		//! Reset Node and decrements ref-count to the Node's block
 		void	Unset();
 
+		//! Load node at block offset from disk
 		void	SetTo(off_t block);
 		void	SetToWritable(off_t block, int32 transactionId, bool empty);
 		int		SpaceUsed() const;
@@ -156,10 +175,21 @@ public:
 
 		off_t	BlockNum() const { return fBlockNumber;}
 		bool	IsWritable() const { return fWritable; }
+
+		/*!
+		 * copy node header, items and items data
+		 * length is size to insert/remove
+		 * if node is a internal node, length isnt used
+		 * length = 0: Copy a whole
+		 * length < 0: removing
+		 * length > 0: inserting
+		 */
 		status_t	Copy(const Node* origin, uint32 start, uint32 end,
 						int length) const;
+		//! Shift data in items between start and end by offset length
 		status_t	MoveEntries(uint32 start, uint32 end, int length) const;
 
+		//! Searches for item slot in the node
 		status_t	SearchSlot(const btrfs_key& key, int* slot,
 						btree_traversing type) const;
 	private:
@@ -167,9 +197,18 @@ public:
 		Node& operator=(const Node&);
 			// no implementation
 
+		//! Internal function used by Copy
 		void	_Copy(const Node* origin, uint32 at, uint32 from, uint32 to,
 					int length) const;
 		status_t	_SpaceCheck(int length) const;
+
+		/*!
+		 * calculate used space except the header.
+		 * type is only for leaf node
+		 * type 1: only item space
+		 * type 2: only item data space
+		 * type 3: both type 1 and 2
+		 */
 		int		_CalculateSpace(uint32 from, uint32 to, uint8 type = 1) const;
 
 		btrfs_stream*		fNode;
@@ -184,6 +223,7 @@ public:
 		Path(BTree* tree);
 		~Path();
 
+
 		Node*		GetNode(int level, int* _slot = NULL) const;
 		Node*		SetNode(off_t block, int slot);
 		Node*		SetNode(const Node* node, int slot);
@@ -195,10 +235,36 @@ public:
 
 		int			Move(int level, int step);
 
+
+		/*!
+		* Allocate and copy block and do all the changes that it can.
+		* for now, we only copy-on-write tree block,
+		* file data is "nocow" by default.
+		*
+		*  o   parent  o
+		*  |    ===>    \
+		*  o           x o
+		*/
 		status_t	CopyOnWrite(Transaction& transaction, int level,
 						uint32 start, int num, int length);
+		/*!
+		* Copy-On-Write all internal nodes start from a specific level.
+		* level > 0: to root
+		* level <= 0: to leaf
+		*
+		*      path    cow-path       path    cow-path
+		*  =================================================
+		*      root    cow-root       root level < 0
+		*       |      |               |
+		*       n1     cow-n1         ...______
+		*       |      |               |       \
+		*       n2     cow-n2          n1     cow-n1
+		*       |      /               |        |
+		*      ...____/                n2     cow-n2
+		*       |                      |        |
+		*      leaf    level > 0      leaf    cow-leaf
+		*/
 		status_t	InternalCopy(Transaction& transaction, int level);
-
 		BTree*		Tree() const { return fTree; }
 	private:
 		Path(const Path&);
@@ -218,6 +284,7 @@ public:
 								~TreeIterator();
 
 			void				Rewind(bool inverse = false);
+			//! Set current key in the iterator
 			status_t			Find(const btrfs_key& key);
 			status_t			GetNextEntry(void** _value,
 									uint32* _size = NULL,
@@ -232,9 +299,11 @@ public:
 private:
 			friend class BTree;
 
+			//! Iterates through the tree in the specified direction
 			status_t			_Traverse(btree_traversing direction);
 			status_t			_Find(btree_traversing type, btrfs_key& key,
 									void** _value);
+			//! Like GetEntry in BTree::Path but checks type and moving
 			status_t			_GetEntry(btree_traversing type, void** _value,
 									uint32* _size, uint32* _offset);
 			// called by BTree

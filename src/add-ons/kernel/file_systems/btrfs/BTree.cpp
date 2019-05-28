@@ -52,13 +52,6 @@ BTree::Node::~Node()
 
 
 void
-BTree::Node::Keep()
-{
-	fNode = NULL;
-}
-
-
-void
 BTree::Node::Unset()
 {
 	if (fNode != NULL) {
@@ -141,13 +134,6 @@ BTree::Node::SearchSlot(const btrfs_key& key, int* slot, btree_traversing type)
 }
 
 
-/*
- * calculate used space except the header.
- * type is only for leaf node
- * type 1: only item space
- * type 2: only item data space
- * type 3: both type 1 and 2
- */
 int
 BTree::Node::_CalculateSpace(uint32 from, uint32 to, uint8 type) const
 {
@@ -223,14 +209,6 @@ BTree::Node::_SpaceCheck(int length) const
 }
 
 
-/*
- * copy node header, items and items data
- * length is size to insert/remove
- * if node is a internal node, length isnt used
- * length = 0: Copy a whole
- * length < 0: removing
- * length > 0: inserting
- */
 status_t
 BTree::Node::Copy(const Node* origin, uint32 start, uint32 end, int length)
 	const
@@ -268,8 +246,6 @@ BTree::Node::Copy(const Node* origin, uint32 start, uint32 end, int length)
 }
 
 
-/* Like copy but here we use memmove on current node.
- */
 status_t
 BTree::Node::MoveEntries(uint32 start, uint32 end, int length) const
 {
@@ -432,15 +408,6 @@ BTree::Path::SetEntry(int slot, const btrfs_entry& entry, void* value)
 }
 
 
-/*
- * Allocate and copy block and do all the changes that it can.
- * for now, we only copy-on-write tree block,
- * file data is "nocow" by default.
- *
- * 	o	parent	o
- * 	|	 ===> 	 \
- * 	o	      	x o
- */
 status_t
 BTree::Path::CopyOnWrite(Transaction& transaction, int level, uint32 start,
 	int num, int length)
@@ -504,22 +471,6 @@ BTree::Path::CopyOnWrite(Transaction& transaction, int level, uint32 start,
 }
 
 
-/* Copy-On-Write all internal nodes start from a specific level.
- * level > 0: to root
- * level <= 0: to leaf
- *
- *		path	cow-path       path    cow-path
- *	=================================================
- *		root	cow-root       root	level < 0
- *		 |  	|               |
- *		 n1 	cow-n1         ...______
- *		 |  	|               |       \
- *		 n2 	cow-n2          n1     cow-n1
- *		 |  	/               |        |
- *		...____/                n2     cow-n2
- *		 |  	                |        |
- *		leaf	level > 0      leaf    cow-leaf
- */
 status_t
 BTree::Path::InternalCopy(Transaction& transaction, int level)
 {
@@ -532,6 +483,8 @@ BTree::Path::InternalCopy(Transaction& transaction, int level)
 		from = level;
 		to = fTree->RootLevel();
 	} else {
+
+
 		from = 0;
 		to = std::abs(level);
 	}
@@ -616,9 +569,6 @@ btrfs_key::Compare(const btrfs_key& key) const
 }
 
 
-/* Traverse from root to fill in the path along way its finding.
- * Return current slot at leaf if successful.
- */
 status_t
 BTree::Traverse(btree_traversing type, Path* path, const btrfs_key& key)
 	const
@@ -664,11 +614,6 @@ BTree::Traverse(btree_traversing type, Path* path, const btrfs_key& key)
 }
 
 
-/*!	Searches the key in the tree, and stores the allocated found item in
-	_value, if successful.
-	Returns B_OK when the key could be found, B_ENTRY_NOT_FOUND if not.
-	It can also return other errors to indicate that something went wrong.
-*/
 status_t
 BTree::_Find(Path* path, btrfs_key& wanted, void** _value, uint32* _size,
 	uint32* _offset, btree_traversing type) const
@@ -719,10 +664,6 @@ BTree::FindExact(Path* path, btrfs_key& key, void** _value, uint32* _size,
 }
 
 
-/*
- * Insert "num" of consecutive empty entries start with slot of "startKey"
- * if successful return the starting slot, otherwise return error code.
- */
 status_t
 BTree::MakeEntries(Transaction& transaction, Path* path,
 	const btrfs_key& startKey, int num, int length)
@@ -752,8 +693,6 @@ BTree::MakeEntries(Transaction& transaction, Path* path,
 }
 
 
-/* MakeEntries and then fill in them.
- */
 status_t
 BTree::InsertEntries(Transaction& transaction, Path* path,
 	btrfs_entry* entries, void** data, int num)
@@ -785,10 +724,6 @@ BTree::InsertEntries(Transaction& transaction, Path* path,
 }
 
 
-/* Like MakeEntries, but here we remove entries instead.
- * Removed data stored in _data
- * May merge those functions into one.
- */
 status_t
 BTree::RemoveEntries(Transaction& transaction, Path* path,
 	const btrfs_key& startKey, void** _data, int num)
@@ -901,9 +836,6 @@ BTree::NextLeaf(Path* path) const
 }
 
 
-/* Set root infomation, to use this function root must be valid and
- * exists on disk.
- */
 status_t
 BTree::SetRoot(off_t logical, fsblock_t* block)
 {
@@ -988,8 +920,6 @@ TreeIterator::Rewind(bool inverse)
 }
 
 
-/*!	Iterates through the tree in the specified direction.
-*/
 status_t
 TreeIterator::_Traverse(btree_traversing direction)
 {
@@ -1003,7 +933,6 @@ TreeIterator::_Traverse(btree_traversing direction)
 }
 
 
-// Like GetEntry in BTree::Path but here we check the type and moving.
 status_t
 TreeIterator::_GetEntry(btree_traversing type, void** _value, uint32* _size,
 	uint32* _offset)
@@ -1041,8 +970,6 @@ TreeIterator::_GetEntry(btree_traversing type, void** _value, uint32* _size,
 }
 
 
-/*!	just sets the current key in the iterator.
-*/
 status_t
 TreeIterator::Find(const btrfs_key& key)
 {
