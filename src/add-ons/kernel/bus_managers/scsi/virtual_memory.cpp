@@ -63,27 +63,18 @@ get_iovec_memory_map(iovec *vec, size_t vec_count, size_t vec_offset, size_t len
 
 		vec_offset = 0;
 
-		if ((res = get_memory_map(range_start, range_len, &map[cur_idx],
-				max_entries - cur_idx)) != B_OK) {
+		cur_num_entries = max_entries - cur_idx;
+		if ((res = get_memory_map_etc(B_CURRENT_TEAM, range_start, range_len,
+				&map[cur_idx], &cur_num_entries)) != B_OK) {
 			// according to docu, no error is ever reported - argh!
 			SHOW_ERROR(1, "invalid io_vec passed (%s)", strerror(res));
 			return res;
 		}
 
-		// stupid: get_memory_map does neither tell how many sg blocks
-		// are used nor whether there were enough sg blocks at all;
-		// -> determine that manually
-		// TODO: Use get_memory_map_etc()!
 		cur_mapped_len = 0;
-		cur_num_entries = 0;
 
-		for (tmp_idx = cur_idx; tmp_idx < max_entries; ++tmp_idx) {
-			if (map[tmp_idx].size == 0)
-				break;
-
+		for (tmp_idx = cur_idx; tmp_idx < cur_idx + cur_num_entries; ++tmp_idx)
 			cur_mapped_len += map[tmp_idx].size;
-			++cur_num_entries;
-		}
 
 		if (cur_mapped_len == 0) {
 			panic("get_memory_map() returned empty list; left_len=%d, idx=%"
