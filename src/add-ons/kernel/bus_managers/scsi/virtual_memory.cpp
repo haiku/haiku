@@ -27,13 +27,13 @@
 
 status_t
 get_iovec_memory_map(iovec *vec, size_t vec_count, size_t vec_offset, size_t len,
-	physical_entry *map, size_t max_entries, size_t *num_entries, size_t *mapped_len)
+	physical_entry *map, uint32 max_entries, uint32 *num_entries, size_t *mapped_len)
 {
-	size_t cur_idx;
+	uint32 cur_idx;
 	size_t left_len;
 
 	SHOW_FLOW(3, "vec_count=%" B_PRIuSIZE ", vec_offset=%" B_PRIuSIZE ", len=%"
-		B_PRIuSIZE ", max_entries=%" B_PRIuSIZE, vec_count, vec_offset, len,
+		B_PRIuSIZE ", max_entries=%" B_PRIu32, vec_count, vec_offset, len,
 		max_entries);
 
 	// skip iovec blocks if needed
@@ -43,15 +43,16 @@ get_iovec_memory_map(iovec *vec, size_t vec_count, size_t vec_offset, size_t len
 		++vec;
 	}
 
-	for (left_len = len, cur_idx = 0; left_len > 0 && vec_count > 0 && cur_idx < max_entries;) {
+	for (left_len = len, cur_idx = 0; left_len > 0 && vec_count > 0
+		&& cur_idx < max_entries;) {
 		char *range_start;
 		size_t range_len;
 		status_t res;
-		size_t cur_num_entries, cur_mapped_len;
+		uint32 cur_num_entries, cur_mapped_len;
 		uint32 tmp_idx;
 
-		SHOW_FLOW( 3, "left_len=%d, vec_count=%d, cur_idx=%d",
-			(int)left_len, (int)vec_count, (int)cur_idx );
+		SHOW_FLOW( 3, "left_len=%d, vec_count=%d, cur_idx=%" B_PRIu32,
+			(int)left_len, (int)vec_count, cur_idx );
 
 		// map one iovec
 		range_start = (char *)vec->iov_base + vec_offset;
@@ -85,15 +86,16 @@ get_iovec_memory_map(iovec *vec, size_t vec_count, size_t vec_offset, size_t len
 		}
 
 		if (cur_mapped_len == 0) {
-			panic("get_memory_map() returned empty list; left_len=%d, idx=%d/%d",
-				(int)left_len, (int)cur_idx, (int)max_entries);
-			SHOW_ERROR(2, "get_memory_map() returned empty list; left_len=%d, idx=%d/%d",
-				(int)left_len, (int)cur_idx, (int)max_entries);
+			panic("get_memory_map() returned empty list; left_len=%d, idx=%"
+				B_PRIu32 "/%" B_PRIu32, (int)left_len, cur_idx, max_entries);
+			SHOW_ERROR(2, "get_memory_map() returned empty list; left_len=%d, "
+				"idx=%" B_PRIu32 "/%" B_PRIu32, (int)left_len, cur_idx,
+				max_entries);
 			return B_ERROR;
 		}
 
-		SHOW_FLOW( 3, "cur_num_entries=%d, cur_mapped_len=%x",
-			(int)cur_num_entries, (int)cur_mapped_len );
+		SHOW_FLOW( 3, "cur_num_entries=%" B_PRIu32 ", cur_mapped_len=%x",
+			cur_num_entries, (int)cur_mapped_len );
 
 		// try to combine with previous sg block
 		if (cur_num_entries > 0 && cur_idx > 0
@@ -101,7 +103,8 @@ get_iovec_memory_map(iovec *vec, size_t vec_count, size_t vec_offset, size_t len
 				== map[cur_idx - 1].address + map[cur_idx - 1].size) {
 			SHOW_FLOW0( 3, "combine with previous chunk" );
 			map[cur_idx - 1].size += map[cur_idx].size;
-			memcpy(&map[cur_idx], &map[cur_idx + 1], (cur_num_entries - 1) * sizeof(map[0]));
+			memcpy(&map[cur_idx], &map[cur_idx + 1],
+				(cur_num_entries - 1) * sizeof(map[0]));
 			--cur_num_entries;
 		}
 
@@ -118,7 +121,7 @@ get_iovec_memory_map(iovec *vec, size_t vec_count, size_t vec_offset, size_t len
 	*num_entries = cur_idx;
 	*mapped_len = len - left_len;
 
-	SHOW_FLOW( 3, "num_entries=%" B_PRIuSIZE ", mapped_len=%" B_PRIxSIZE,
+	SHOW_FLOW( 3, "num_entries=%" B_PRIu32 ", mapped_len=%" B_PRIxSIZE,
 		*num_entries, *mapped_len);
 
 	return B_OK;

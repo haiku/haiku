@@ -35,7 +35,7 @@ fill_temp_sg(scsi_ccb *ccb)
 		ccb->data,
 		ccb->data_length
 	};
-	size_t num_entries;
+	uint32 num_entries;
 	size_t mapped_len;
 	physical_entry *temp_sg = (physical_entry *)ccb->sg_list;
 
@@ -67,7 +67,7 @@ fill_temp_sg(scsi_ccb *ccb)
 
 			SHOW_FLOW(4, "addr=%#" B_PRIxPHYSADDR ", size=%" B_PRIxPHYSADDR
 				", max_len=%" B_PRIxADDR ", idx=%" B_PRId32 ", num=%"
-				B_PRIuSIZE, temp_sg[cur_idx].address, temp_sg[cur_idx].size,
+				B_PRIu32, temp_sg[cur_idx].address, temp_sg[cur_idx].size,
 				max_len, cur_idx, num_entries);
 
 			if (max_len < temp_sg[cur_idx].size) {

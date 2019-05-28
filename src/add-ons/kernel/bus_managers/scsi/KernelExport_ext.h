@@ -29,8 +29,8 @@ status_t get_iovec_memory_map(
 	size_t vec_offset, 			// number of bytes to skip at beginning of vec
 	size_t len, 				// number of bytes to analyze
 	physical_entry *map, 		// resulting memory map
-	size_t max_entries, 		// max number of entries in map
-	size_t *num_entries, 		// actual number of map entries used
+	uint32 max_entries, 		// max number of entries in map
+	uint32 *num_entries, 		// actual number of map entries used
 	size_t *mapped_len 			// actual number of bytes described by map
 );
 

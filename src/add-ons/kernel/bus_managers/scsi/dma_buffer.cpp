@@ -296,7 +296,7 @@ scsi_alloc_dma_buffer_sg_orig(dma_buffer *buffer, size_t size)
 
 	buffer->sg_count_max_orig = size / sizeof(physical_entry);
 
-	SHOW_INFO(3, "Got up to %" B_PRIuSIZE " S/G entries to original data",
+	SHOW_INFO(3, "Got up to %" B_PRIu32 " S/G entries to original data",
 		buffer->sg_count_max_orig);
 
 	return true;
