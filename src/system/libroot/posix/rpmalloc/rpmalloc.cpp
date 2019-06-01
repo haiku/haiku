@@ -1,9 +1,9 @@
-/* rpmalloc.c  -  Memory allocator  -  Public Domain  -  2016 Mattias Jansson / Rampant Pixels
+/* rpmalloc.c  -  Memory allocator  -  Public Domain  -  2016 Mattias Jansson
  *
  * This library provides a cross-platform lock free thread caching malloc implementation in C11.
  * The latest source code is always available at
  *
- * https://github.com/rampantpixels/rpmalloc
+ * https://github.com/mjansson/rpmalloc
  *
  * This library is put in the public domain; you can redistribute it and/or modify it without any restrictions.
  *
@@ -19,6 +19,10 @@
 #ifndef ENABLE_THREAD_CACHE
 //! Enable per-thread cache
 #define ENABLE_THREAD_CACHE       1
+#endif
+#ifndef ENABLE_ADAPTIVE_THREAD_CACHE
+//! Enable adaptive size of per-thread cache (still bounded by THREAD_CACHE_MULTIPLIER hard limit)
+#define ENABLE_ADAPTIVE_THREAD_CACHE  1
 #endif
 #ifndef ENABLE_GLOBAL_CACHE
 //! Enable global cache shared between all threads, requires thread cache
@@ -63,7 +67,7 @@
 
 #if ENABLE_THREAD_CACHE
 #ifndef ENABLE_UNLIMITED_CACHE
-//! Unlimited thread and global cache unified control
+//! Unlimited thread and global cache
 #define ENABLE_UNLIMITED_CACHE    0
 #endif
 #ifndef ENABLE_UNLIMITED_THREAD_CACHE
@@ -96,6 +100,11 @@
 #else
 #  undef ENABLE_GLOBAL_CACHE
 #  define ENABLE_GLOBAL_CACHE 0
+#endif
+
+#if !ENABLE_THREAD_CACHE || ENABLE_UNLIMITED_THREAD_CACHE
+#  undef ENABLE_ADAPTIVE_THREAD_CACHE
+#  define ENABLE_ADAPTIVE_THREAD_CACHE 0
 #endif
 
 #if DISABLE_UNMAP && !ENABLE_GLOBAL_CACHE
@@ -322,6 +331,16 @@ union span_data_t {
 	uint64_t compound;
 };
 
+#if ENABLE_ADAPTIVE_THREAD_CACHE
+struct span_use_t {
+	//! Current number of spans used (actually used, not in cache)
+	unsigned int current;
+	//! High water mark of spans used
+	unsigned int high;
+};
+typedef struct span_use_t span_use_t;
+#endif
+
 //A span can either represent a single span of memory pages with size declared by span_map_count configuration variable,
 //or a set of spans in a continuous region, a super span. Any reference to the term "span" usually refers to both a single
 //span or a super span. A super span can further be divided into multiple spans (or this, super spans), where the first
@@ -366,6 +385,10 @@ struct heap_t {
 #if ENABLE_THREAD_CACHE
 	//! List of free spans (single linked list)
 	span_t*      span_cache[LARGE_CLASS_COUNT];
+#endif
+#if ENABLE_ADAPTIVE_THREAD_CACHE
+	//! Current and high water mark of spans used per span count
+	span_use_t   span_use[LARGE_CLASS_COUNT];
 #endif
 	//! Mapped but unused spans
 	span_t*      span_reserve;
@@ -868,8 +891,21 @@ _memory_heap_cache_insert(heap_t* heap, span_t* span) {
 	_memory_span_list_push(&heap->span_cache[idx], span);
 #else
 	const size_t release_count = (!idx ? _memory_span_release_count : _memory_span_release_count_large);
-	if (_memory_span_list_push(&heap->span_cache[idx], span) <= (release_count * THREAD_CACHE_MULTIPLIER))
+	size_t current_cache_size = _memory_span_list_push(&heap->span_cache[idx], span);
+	if (current_cache_size <= release_count)
 		return;
+	const size_t hard_limit = release_count * THREAD_CACHE_MULTIPLIER;
+	if (current_cache_size <= hard_limit) {
+#if ENABLE_ADAPTIVE_THREAD_CACHE
+		//Require 25% of high water mark to remain in cache (and at least 1, if use is 0)
+		size_t high_mark = heap->span_use[idx].high;
+		const size_t min_limit = (high_mark >> 2) + release_count + 1;
+		if (current_cache_size < min_limit)
+			return;
+#else
+		return;
+#endif
+	}
 	heap->span_cache[idx] = _memory_span_list_split(span, release_count);
 	assert(span->data.list.size == release_count);
 #if ENABLE_STATISTICS
@@ -1016,6 +1052,12 @@ use_active:
 			return span;
 	}
 
+#if ENABLE_ADAPTIVE_THREAD_CACHE
+	++heap->span_use[0].current;
+	if (heap->span_use[0].current > heap->span_use[0].high)
+		heap->span_use[0].high = heap->span_use[0].current;
+#endif
+
 	//Mark span as owned by this heap and set base data
 	assert(span->span_count == 1);
 	span->size_class = (uint16_t)class_idx;
@@ -1051,6 +1093,11 @@ _memory_allocate_large_from_heap(heap_t* heap, size_t size) {
 	if (size & (_memory_span_size - 1))
 		++span_count;
 	size_t idx = span_count - 1;
+#if ENABLE_ADAPTIVE_THREAD_CACHE
+	++heap->span_use[idx].current;
+	if (heap->span_use[idx].current > heap->span_use[idx].high)
+		heap->span_use[idx].high = heap->span_use[idx].current;
+#endif
 
 	//Step 1: Find span in one of the cache levels
 	span_t* span = _memory_heap_cache_extract(heap, span_count);
@@ -1136,15 +1183,22 @@ _memory_deallocate_to_heap(heap_t* heap, span_t* span, void* p) {
 
 	//Check if the span will become completely free
 	if (block_data->free_count == ((count_t)size_class->block_count - 1)) {
-		//If it was active, reset counter. Otherwise, if not active, remove from
-		//partial free list if we had a previous free block (guard for classes with only 1 block)
-		if (is_active)
-			block_data->free_count = 0;
-		else if (block_data->free_count > 0)
-			_memory_span_list_doublelink_remove(&heap->size_cache[class_idx], span);
-
-		//Add to heap span cache
-		_memory_heap_cache_insert(heap, span);
+		if (is_active) {
+			//If it was active, reset free block list
+			++block_data->free_count;
+			block_data->first_autolink = 0;
+			block_data->free_list = 0;
+		} else {
+			//If not active, remove from partial free list if we had a previous free
+			//block (guard for classes with only 1 block) and add to heap cache
+			if (block_data->free_count > 0)
+				_memory_span_list_doublelink_remove(&heap->size_cache[class_idx], span);
+#if ENABLE_ADAPTIVE_THREAD_CACHE
+			if (heap->span_use[0].current)
+				--heap->span_use[0].current;
+#endif
+			_memory_heap_cache_insert(heap, span);
+		}
 		return;
 	}
 
@@ -1175,6 +1229,11 @@ _memory_deallocate_large_to_heap(heap_t* heap, span_t* span) {
 	assert(span->size_class - SIZE_CLASS_COUNT < LARGE_CLASS_COUNT);
 	assert(!(span->flags & SPAN_FLAG_MASTER) || !(span->flags & SPAN_FLAG_SUBSPAN));
 	assert((span->flags & SPAN_FLAG_MASTER) || (span->flags & SPAN_FLAG_SUBSPAN));
+#if ENABLE_ADAPTIVE_THREAD_CACHE
+	size_t idx = span->span_count - 1;
+	if (heap->span_use[idx].current)
+		--heap->span_use[idx].current;
+#endif
 	if ((span->span_count > 1) && !heap->spans_reserved) {
 		heap->span_reserve = span;
 		heap->spans_reserved = span->span_count;
@@ -1527,7 +1586,7 @@ rpmalloc_initialize_config(const rpmalloc_config_t* config) {
 	_memory_config.enable_huge_pages = _memory_huge_pages;
 
 	_memory_span_release_count = (_memory_span_map_count > 4 ? ((_memory_span_map_count < 64) ? _memory_span_map_count : 64) : 4);
-	_memory_span_release_count_large = (_memory_span_release_count > 4 ? (_memory_span_release_count / 2) : 2);
+	_memory_span_release_count_large = (_memory_span_release_count > 8 ? (_memory_span_release_count / 4) : 2);
 
 #if defined(__APPLE__) && ENABLE_PRELOAD
 	if (pthread_key_create(&_memory_thread_heap, 0))
@@ -1594,6 +1653,15 @@ rpmalloc_finalize(void) {
 				_memory_unmap_span(span);
 			}
 
+			for (size_t iclass = 0; iclass < SIZE_CLASS_COUNT; ++iclass) {
+				span_t* span = heap->active_span[iclass];
+				if (span && (heap->active_block[iclass].free_count == _memory_size_class[iclass].block_count)) {
+					heap->active_span[iclass] = 0;
+					heap->active_block[iclass].free_count = 0;
+					_memory_heap_cache_insert(heap, span);
+				}
+			}
+
 			//Free span caches (other thread might have deferred after the thread using this heap finalized)
 #if ENABLE_THREAD_CACHE
 			for (size_t iclass = 0; iclass < LARGE_CLASS_COUNT; ++iclass) {
@@ -1651,6 +1719,15 @@ rpmalloc_thread_finalize(void) {
 		return;
 
 	_memory_deallocate_deferred(heap);
+
+	for (size_t iclass = 0; iclass < SIZE_CLASS_COUNT; ++iclass) {
+		span_t* span = heap->active_span[iclass];
+		if (span && (heap->active_block[iclass].free_count == _memory_size_class[iclass].block_count)) {
+			heap->active_span[iclass] = 0;
+			heap->active_block[iclass].free_count = 0;
+			_memory_heap_cache_insert(heap, span);
+		}
+	}
 
 	//Release thread cache spans back to global cache
 #if ENABLE_THREAD_CACHE
