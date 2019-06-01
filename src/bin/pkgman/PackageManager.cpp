@@ -322,6 +322,9 @@ void
 PackageManager::ProgressApplyingChangesDone(InstalledRepository& repository)
 {
 	printf("[%s] Done.\n", repository.Name().String());
+
+	if (BPackageRoster().IsRebootNeeded())
+		printf("A reboot is necessary to complete the installation process.\n");
 }
 
 
