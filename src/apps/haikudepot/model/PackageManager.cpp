@@ -816,6 +816,16 @@ PackageManager::ProgressApplyingChangesDone(InstalledRepository& repository)
 {
 	for (int32 i = 0; i < fPackageProgressListeners.CountItems(); i++)
 		fPackageProgressListeners.ItemAt(i)->ApplyingChangesDone(repository);
+
+	if (BPackageRoster().IsRebootNeeded()) {
+		BString infoString(B_TRANSLATE("A reboot is necessary to complete the "
+			"installation process."));
+		BAlert* alert = new(std::nothrow) BAlert(B_TRANSLATE("Reboot required"),
+			infoString, B_TRANSLATE("Close"), NULL, NULL,
+			B_WIDTH_AS_USUAL, B_INFO_ALERT);
+		if (alert != NULL)
+			alert->Go();
+	}
 }
 
 
