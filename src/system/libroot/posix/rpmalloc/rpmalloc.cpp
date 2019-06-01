@@ -77,7 +77,7 @@
 #if !ENABLE_UNLIMITED_THREAD_CACHE
 //! Multiplier for thread cache (cache limit will be span release count multiplied by this value)
 #ifdef __HAIKU__
-#define THREAD_CACHE_MULTIPLIER 4
+#define THREAD_CACHE_MULTIPLIER 8
 #else
 #define THREAD_CACHE_MULTIPLIER 16
 #endif
