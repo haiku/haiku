@@ -102,8 +102,10 @@ status_t
 dosfs_initialize(int fd, partition_id partitionID, const char* name,
 	const char* parameterString, off_t partitionSize, disk_job_id job)
 {
-	dprintf("dosfs_initialize(%d, , '%s', '%s', %lld)\n", fd, name, parameterString, partitionSize);
-	if (sizeof(bootsector1216) != 512 || sizeof(bootsector32) != 512 || sizeof(fsinfosector32) != 512) {
+	dprintf("dosfs_initialize(%d, , '%s', '%s', %" B_PRIdOFF ")\n",
+		fd, name, parameterString, partitionSize);
+	if (sizeof(bootsector1216) != 512 || sizeof(bootsector32) != 512
+		|| sizeof(fsinfosector32) != 512) {
 		dprintf("dosfs: compilation error: struct alignment wrong\n");
 		return B_BAD_VALUE;
 	}
@@ -153,21 +155,40 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 		isRawDevice = true;
 
 	if (hasBiosGeometry) {
-		dprintf("dosfs: bios geometry: %ld heads, %ld cylinders, %ld sectors/track, %ld bytes/sector\n",
-			biosGeometry.head_count,biosGeometry.cylinder_count,biosGeometry.sectors_per_track,biosGeometry.bytes_per_sector);
+		dprintf("dosfs: bios geometry: %" B_PRIu32 " heads, "
+			"%" B_PRIu32 " cylinders, "
+			"%" B_PRIu32 " sectors/track, "
+			"%" B_PRIu32 " bytes/sector\n",
+			biosGeometry.head_count,
+			biosGeometry.cylinder_count,
+			biosGeometry.sectors_per_track,
+			biosGeometry.bytes_per_sector);
 	}
 	if (hasBiosGeometry) {
-		dprintf("dosfs: device geometry: %ld heads, %ld cylinders, %ld sectors/track, %ld bytes/sector\n",
-			deviceGeometry.head_count,deviceGeometry.cylinder_count,deviceGeometry.sectors_per_track,deviceGeometry.bytes_per_sector);
+		dprintf("dosfs: device geometry: %" B_PRIu32 " heads, "
+			"%" B_PRIu32 " cylinders, "
+			"%" B_PRIu32 " sectors/track, "
+			"%" B_PRIu32 " bytes/sector\n",
+			deviceGeometry.head_count,
+			deviceGeometry.cylinder_count,
+			deviceGeometry.sectors_per_track,
+			deviceGeometry.bytes_per_sector);
 	}
 	if (hasPartitionInfo) {
-		dprintf("dosfs: partition info: start at %Ld bytes (%Ld sectors), %Ld KB, %Ld MB, %Ld GB\n",
+		dprintf("dosfs: partition info: start at %" B_PRIdOFF " bytes "
+			"(%" B_PRIdOFF " sectors), "
+			"%" B_PRIdOFF " KB, "
+			"%" B_PRIdOFF " MB, "
+			"%" B_PRIdOFF " GB\n",
 			partitionInfo.offset,
 			partitionInfo.offset / 512,
 			partitionInfo.offset / 1024,
 			partitionInfo.offset / (1024 * 1024),
 			partitionInfo.offset / (1024 * 1024 * 1024));
-		dprintf("dosfs: partition info: size %Ld bytes, %Ld KB, %Ld MB, %Ld GB\n",
+		dprintf("dosfs: partition info: size %" B_PRIdOFF " bytes, "
+			"%" B_PRIdOFF " KB, "
+			"%" B_PRIdOFF " MB, "
+			"%" B_PRIdOFF " GB\n",
 			partitionInfo.size,
 			partitionInfo.size / 1024,
 			partitionInfo.size / (1024 * 1024),
@@ -182,7 +203,8 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 		dprintf("dosfs Error: geometry block size not 512 bytes\n");
 		return B_ERROR;
 	} else if (hasPartitionInfo && partitionInfo.logical_block_size != 512) {
-		dprintf("dosfs: partition logical block size is not 512, it's %ld bytes\n",
+		dprintf("dosfs: partition logical block size is not 512, "
+			"it's %" B_PRId32 " bytes\n",
 			partitionInfo.logical_block_size);
 	}
 
@@ -219,7 +241,11 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 		return B_ERROR;
 	}*/
 
-	dprintf("dosfs: size = %Ld bytes (%Ld sectors), %Ld KB, %Ld MB, %Ld GB\n",
+	dprintf("dosfs: size = %" B_PRIu64 " bytes "
+		"(%" B_PRIu64 " sectors), "
+		"%" B_PRIu64 " KB, "
+		"%" B_PRIu64 " MB, "
+		"%" B_PRIu64 " GB\n",
 		size,
 		size / 512,
 		size / 1024,
@@ -330,7 +356,7 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 	// RootDirSectors should now contain the size of the fat12/16 root directory, measured in sectors
 
 	dprintf("dosfs: fatbits = %d, clustersize = %d\n", fatbits, sectorPerCluster * 512);
-	dprintf("dosfs: FAT size is %ld sectors\n", FATSize);
+	dprintf("dosfs: FAT size is %" B_PRIu32 " sectors\n", FATSize);
 	dprintf("dosfs: disk label: %s\n", label);
 
 
@@ -431,7 +457,8 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 		ssize_t writesize = min_c(bytes_to_write, 65536);
 		written = write_pos(fd, pos, zerobuffer, writesize);
 		if (written != writesize) {
-			dprintf("dosfs Error: write error near sector %Ld\n",pos / 512);
+			dprintf("dosfs Error: write error near sector %" B_PRId64 "\n",
+				pos / 512);
 			free(zerobuffer);
 			return B_ERROR;
 		}
@@ -498,7 +525,8 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 	if (numFATs > 1) {
 		written = write_pos(fd, (reservedSectorCount + FATSize) * 512,sec,512);
 		if (written != 512) {
-			dprintf("dosfs Error: write error at sector %ld\n", reservedSectorCount + FATSize);
+			dprintf("dosfs Error: write error at sector %" B_PRIu32 "\n",
+				reservedSectorCount + FATSize);
 			return B_ERROR;
 		}
 	}
@@ -537,7 +565,8 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 		uint32 rootDirSector = reservedSectorCount + (numFATs * FATSize);
 		written = write_pos(fd, rootDirSector * 512, data, 512);
 		if (written != 512) {
-			dprintf("dosfs Error: write error at sector %ld\n", rootDirSector);
+			dprintf("dosfs Error: write error at sector %" B_PRIu32 "\n",
+				rootDirSector);
 			return B_ERROR;
 		}
 	} else if (fatbits == 32) {
@@ -549,7 +578,8 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 		written = write_pos(fd, rootDirSector * 512, cluster, size);
 		free(cluster);
 		if (written != size) {
-			dprintf("dosfs Error: write error at sector %ld\n", rootDirSector);
+			dprintf("dosfs Error: write error at sector %" B_PRIu32 "\n",
+				rootDirSector);
 			return B_ERROR;
 		}
 	}
