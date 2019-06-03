@@ -1,14 +1,21 @@
+ENGINE=docker
+#ENGINE=podman
+
+# Example mounting source code directory into container
+# (lets you "work on the code used to bootstrap" a bit easier)
+#EXTRA=-v $(HOME)/Code/haiku:/work/src/haiku
+
 default:
-	docker build . -t docker.io/haiku/bootstrap
+	${ENGINE} build . -t docker.io/haiku/bootstrap
 clean:
-	docker ps -q --filter=ancestor=docker.io/haiku/bootstrap | xargs -I {} docker kill {}
-	docker ps -a -q --filter=ancestor=docker.io/haiku/bootstrap | xargs -I {} docker rm {}
-	docker volume rm bootstrap_work
+	${ENGINE} ps -q --filter=ancestor=docker.io/haiku/bootstrap | xargs -I {} docker kill {}
+	${ENGINE} ps -a -q --filter=ancestor=docker.io/haiku/bootstrap | xargs -I {} docker rm {}
+	${ENGINE} volume rm bootstrap_work
 init:
-	docker run -v bootstrap_work:/work docker.io/haiku/bootstrap prep
+	${ENGINE} run -v bootstrap_work:/work docker.io/haiku/bootstrap prep
 crosstools:
-	docker run -e TARGET_ARCH=$(TARGET_ARCH) -v bootstrap_work:/work docker.io/haiku/bootstrap crosstools
+	${ENGINE} run -e TARGET_ARCH=$(TARGET_ARCH) -v bootstrap_work:/work ${EXTRA} docker.io/haiku/bootstrap crosstools
 bootstrap:
-	docker run -e TARGET_ARCH=$(TARGET_ARCH) -v bootstrap_work:/work docker.io/haiku/bootstrap bootstrap
+	${ENGINE} run -e TARGET_ARCH=$(TARGET_ARCH) -v bootstrap_work:/work ${EXTRA} docker.io/haiku/bootstrap bootstrap
 enter:
-	docker run -it -e TARGET_ARCH=$(TARGET_ARCH) -v bootstrap_work:/work docker.io/haiku/bootstrap /bin/bash -l
+	${ENGINE} run -it -e TARGET_ARCH=$(TARGET_ARCH) -v bootstrap_work:/work ${EXTRA} docker.io/haiku/bootstrap /bin/bash -l
