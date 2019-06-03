@@ -214,9 +214,9 @@ static FORCEINLINE void*   atomic_load_ptr(atomicptr_t* src) { return (void*)ato
 static FORCEINLINE void    atomic_store_ptr(atomicptr_t* dst, void* val) { atomic_set64(dst, (atomicptr_t)val); }
 static FORCEINLINE int     atomic_cas_ptr(atomicptr_t* dst, void* val, void* ref) { return atomic_test_and_set64(dst, (int64)val, (int64)ref) == (int64)ref; }
 #else
-static FORCEINLINE void*   atomic_load_ptr(atomicptr_t* src) { return (void*)atomic_get(src); }
-static FORCEINLINE void    atomic_store_ptr(atomicptr_t* dst, void* val) { atomic_set(dst, (atomicptr_t)val); }
-static FORCEINLINE int     atomic_cas_ptr(atomicptr_t* dst, void* val, void* ref) { return atomic_test_and_set(dst, (int32)val, (int32)ref) == (int32)ref; }
+static FORCEINLINE void*   atomic_load_ptr(atomicptr_t* src) { return (void*)atomic_get((int32*)src); }
+static FORCEINLINE void    atomic_store_ptr(atomicptr_t* dst, void* val) { atomic_set((int32*)dst, (atomicptr_t)val); }
+static FORCEINLINE int     atomic_cas_ptr(atomicptr_t* dst, void* val, void* ref) { return atomic_test_and_set((int32*)dst, (int32)val, (int32)ref) == (int32)ref; }
 #endif
 
 #else
