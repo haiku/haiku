@@ -46,7 +46,10 @@ print_index_type(const index_info &info, bool mkindexOutput)
 			return mkindexOutput ? "double" : "Double";
 
 		default:
-			sprintf(buffer, mkindexOutput ? "0x%08lx" : "Unknown type (0x%lx)", info.type);
+			sprintf(buffer, mkindexOutput
+				 ? "0x%08" B_PRIx32
+				 : "Unknown type (0x%" B_PRIx32 ")",
+					info.type);
 			return buffer;
 	}
 }
@@ -110,8 +113,10 @@ static void
 print_index_long_stat(const index_info &info, char *name)
 {
 	char modified[30];
-	strftime(modified, 30, "%m/%d/%Y %I:%M %p", localtime(&info.modification_time));
-	printf("%16s  %s  %8Ld %s\n", print_index_type(info, false), modified, info.size, name);
+	strftime(modified, 30, "%m/%d/%Y %I:%M %p",
+		localtime(&info.modification_time));
+	printf("%16s  %s  %8" B_PRIdOFF " %s\n",
+		print_index_type(info, false), modified, info.size, name);
 }
 
 
@@ -125,10 +130,10 @@ print_index_verbose_stat(const index_info &info, char *name)
 	if (typeString != NULL)
 		printf("%-10s\t", typeString);
 	else
-		printf("%ld\t", info.type);
+		printf("%" B_PRIu32 "\t", info.type);
 
 	// Size
-	printf("%10Ld  ", info.size);
+	printf("%10" B_PRIdOFF "  ", info.size);
 
 	// Created
 	char string[30];
@@ -182,7 +187,8 @@ main(int argc, char **argv)
 
 	indices = fs_open_index_dir(device);
 	if (indices == NULL) {
-		fprintf(stderr, "%s: can't open index dir of device %ld\n", argv[0], device);
+		fprintf(stderr, "%s: can't open index dir of device %" B_PRIdDEV "\n",
+			argv[0], device);
 		return -1;
 	}
 
