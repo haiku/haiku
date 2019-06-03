@@ -5,7 +5,7 @@ BootstrapPackageRepository HaikuPortsCross
 	haikuporter-0-1
 	:
 	# repository architecture packages (stage 0)
-	gcc_bootstrap-8.3.0_2019_06_02
+	gcc_bootstrap-8.3.0_2019_06_02-1
 	gcc_bootstrap_syslibs-8.3.0_2019_06_02-1
 	gcc_bootstrap_syslibs_devel-8.3.0_2019_06_02-1
 	:
