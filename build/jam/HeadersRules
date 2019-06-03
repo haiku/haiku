@@ -460,20 +460,23 @@ rule FStandardHeaders architecture
 		headers += [ FDirName $(HAIKU_OUTPUT_DIR) clang_headers ] ;
 	}
 
+	# Ordering here is important. We fill out things like limits.h and
+	# gcc only overrides if undefined.
+
 	# The c++ headers.
 	headers += [ C++HeaderDirectories $(architecture) ] ;
+
+	# Use glibc headers
+	headers += [ FDirName $(HAIKU_TOP) headers glibc ] ;
+
+	# Use posix headers directory
+	headers += [ FDirName $(HAIKU_TOP) headers posix ] ;
 
 	# The gcc headers.
 	headers += [ GccHeaderDirectories $(architecture) ] ;
 
 	# Use headers directory, to allow to do things like include <posix/string.h>
 	headers += [ FDirName $(HAIKU_TOP) headers ] ;
-
-	# Use posix headers directory
-	headers += [ FDirName $(HAIKU_TOP) headers posix ] ;
-
-	# Use glibc headers
-	headers += [ FDirName $(HAIKU_TOP) headers glibc ] ;
 
 	# Use public OS header directories
 	headers += [ FDirName $(HAIKU_TOP) headers os ] ;
