@@ -57,7 +57,12 @@ show_port_totals()
 	
 	left = max - used;
 	
-	printf("port: total: %5ld, used: %5ld, left: %5ld\n", max, used, left);
+	printf("port: total: %5" B_PRId32 ", "
+		"used: %5" B_PRId32 ", "
+		"left: %5" B_PRId32 "\n",
+			max,
+			used,
+			left);
 }
 
 
@@ -69,16 +74,16 @@ list_team_ports(team_id id)
 	team_info  this_team;
 	
 	if (get_team_info(id, &this_team) == B_BAD_TEAM_ID) {
-		printf("\nteam %ld unknown\n", id);
+		printf("\nteam %" B_PRId32 " unknown\n", id);
 		return;
 	}
 
-	printf("\nTEAM %4ld (%s):\n", id, this_team.args);
+	printf("\nTEAM %4" B_PRId32 " (%s):\n", id, this_team.args);
 	printf("   ID                         name  capacity  queued\n");
 	printf("----------------------------------------------------\n");
 	
 	while (get_next_port_info(id, &cookie, &this_port) == B_OK) {
-		printf("%5ld %28s  %8ld  %6ld\n",
+		printf("%5" B_PRId32 " %28s  %8" B_PRId32 "  %6" B_PRId32 "\n",
 		        this_port.port,
 		        this_port.name,
 		        this_port.capacity,
