@@ -668,6 +668,11 @@ ReaderImplBase::PackageAttributeHandler::HandleAttribute(
 				value.string);
 			break;
 
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_PRE_UNINSTALL_SCRIPT:
+			fPackageInfoValue.SetTo(B_PACKAGE_INFO_PRE_UNINSTALL_SCRIPTS,
+				value.string);
+			break;
+
 		default:
 			if (context->ignoreUnknownAttributes)
 				break;

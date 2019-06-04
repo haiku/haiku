@@ -178,7 +178,11 @@ The supported attributes are:
 - ``groups``: A list of names of Unix groups the packaged software requires.
 - ``post-install-scripts``: A list of paths of files included in the package,
   which shall be executed on package activation. Each path must start with
-  "boot/post-install/".
+  "boot/post-install/". All the files in that directory are also run on first
+  boot after installing or copying the OS to a new disk.
+- ``pre-uninstall-scripts``: A list of paths of files included in the package,
+  which shall be executed on package deactivation. For consistency, each path
+  should start with "boot/pre-uninstall/".
 
 Version Strings
 ---------------

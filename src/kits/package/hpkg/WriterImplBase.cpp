@@ -559,6 +559,10 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 	_AddStringAttributeList(B_HPKG_ATTRIBUTE_ID_PACKAGE_POST_INSTALL_SCRIPT,
 		packageInfo.PostInstallScripts(), attributeList);
 
+	// pre uninstall script list
+	_AddStringAttributeList(B_HPKG_ATTRIBUTE_ID_PACKAGE_PRE_UNINSTALL_SCRIPT,
+		packageInfo.PreUninstallScripts(), attributeList);
+
 	// checksum (optional, only exists in repositories)
 	_AddStringAttributeIfNotEmpty(B_HPKG_ATTRIBUTE_ID_PACKAGE_CHECKSUM,
 		packageInfo.Checksum(), attributeList);

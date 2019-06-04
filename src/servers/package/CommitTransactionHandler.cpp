@@ -391,13 +391,18 @@ CommitTransactionHandler::_ApplyChanges()
 	// move packages to activate to packages directory
 	_AddPackagesToActivate();
 
+	// run pre-uninstall scripts, before their packages vanish.
+	_RunPreUninstallScripts();
+
 	// activate/deactivate packages
 	_ChangePackageActivation(fAddedPackages, fRemovedPackages);
 
+	// run post-installation scripts
 	if (fVolumeStateIsActive) {
-		// run post-installation scripts
 		_RunPostInstallScripts();
 	} else {
+		// need to reboot to finish installation so queue up scripts as
+		// symbolic links in a work directory, which will run later.
 		_QueuePostInstallScripts();
 	}
 
@@ -1303,7 +1308,7 @@ CommitTransactionHandler::_RunPostInstallScripts()
 		const BStringList& scripts = package->Info().PostInstallScripts();
 		int32 count = scripts.CountStrings();
 		for (int32 i = 0; i < count; i++)
-			_RunPostInstallScript(package, scripts.StringAt(i));
+			_RunPostOrPreScript(package, scripts.StringAt(i), true);
 	}
 
 	fCurrentPackage = NULL;
@@ -1311,19 +1316,42 @@ CommitTransactionHandler::_RunPostInstallScripts()
 
 
 void
-CommitTransactionHandler::_RunPostInstallScript(Package* package,
-	const BString& script)
+CommitTransactionHandler::_RunPreUninstallScripts()
 {
+	// Note this runs in the correct order, so dependents get uninstalled before
+	// the packages they depend on.  No need for a reversed loop.
+	for (PackageSet::iterator it = fPackagesToDeactivate.begin();
+		it != fPackagesToDeactivate.end(); ++it) {
+		Package* package = *it;
+		fCurrentPackage = package;
+		const BStringList& scripts = package->Info().PreUninstallScripts();
+		int32 count = scripts.CountStrings();
+		for (int32 i = 0; i < count; i++)
+			_RunPostOrPreScript(package, scripts.StringAt(i), false);
+	}
+
+	fCurrentPackage = NULL;
+}
+
+
+void
+CommitTransactionHandler::_RunPostOrPreScript(Package* package,
+	const BString& script, bool postNotPre)
+{
+	const char *postOrPreInstallWording = postNotPre
+		? "post-installation" : "pre-uninstall";
 	BDirectory rootDir(&fVolume->RootDirectoryRef());
 	BPath scriptPath(&rootDir, script);
 	status_t error = scriptPath.InitCheck();
 	if (error != B_OK) {
-		ERROR("Volume::CommitTransactionHandler::_RunPostInstallScript(): "
-			"failed get path of post-installation script \"%s\" of package "
-			"%s: %s\n", script.String(), package->FileName().String(),
-			strerror(error));
-		_AddIssue(TransactionIssueBuilder(
-				BTransactionIssue::B_POST_INSTALL_SCRIPT_NOT_FOUND)
+		ERROR("Volume::CommitTransactionHandler::_RunPostOrPreScript(): "
+			"failed get path of %s script \"%s\" of package "
+			"%s: %s\n",
+			postOrPreInstallWording, script.String(),
+			package->FileName().String(), strerror(error));
+		_AddIssue(TransactionIssueBuilder(postNotPre
+				? BTransactionIssue::B_POST_INSTALL_SCRIPT_NOT_FOUND
+				: BTransactionIssue::B_PRE_UNINSTALL_SCRIPT_NOT_FOUND)
 			.SetPath1(script)
 			.SetSystemError(error));
 		return;
@@ -1332,19 +1360,21 @@ CommitTransactionHandler::_RunPostInstallScript(Package* package,
 	errno = 0;
 	int result = system(scriptPath.Path());
 	if (result != 0) {
-		ERROR("Volume::CommitTransactionHandler::_RunPostInstallScript(): "
-			"running post-installation script \"%s\" of package %s "
-			"failed: %d (errno: %s)\n", script.String(),
-			package->FileName().String(), result,
-			strerror(errno));
-		if (result < 0 && errno != 0) {
-			_AddIssue(TransactionIssueBuilder(
-					BTransactionIssue::B_POST_INSTALL_SCRIPT_FAILED)
+		ERROR("Volume::CommitTransactionHandler::_RunPostOrPreScript(): "
+			"running %s script \"%s\" of package %s "
+			"failed: %d (errno: %s)\n",
+			postOrPreInstallWording, script.String(),
+			package->FileName().String(), result, strerror(errno));
+		if (result < 0 || result == 127) { // bash shell returns 127 on failure.
+			_AddIssue(TransactionIssueBuilder(postNotPre
+					? BTransactionIssue::B_STARTING_POST_INSTALL_SCRIPT_FAILED
+					: BTransactionIssue::B_STARTING_PRE_UNINSTALL_SCRIPT_FAILED)
 				.SetPath1(BString(scriptPath.Path()))
 				.SetSystemError(errno));
-		} else {
-			_AddIssue(TransactionIssueBuilder(
-					BTransactionIssue::B_STARTING_POST_INSTALL_SCRIPT_FAILED)
+		} else { // positive is an exit code from the script itself.
+			_AddIssue(TransactionIssueBuilder(postNotPre
+					? BTransactionIssue::B_POST_INSTALL_SCRIPT_FAILED
+					: BTransactionIssue::B_PRE_UNINSTALL_SCRIPT_FAILED)
 				.SetPath1(BString(scriptPath.Path()))
 				.SetExitCode(result));
 		}

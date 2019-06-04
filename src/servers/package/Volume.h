@@ -160,7 +160,7 @@ private:
 			status_t			_InitLatestState();
 			status_t			_InitLatestStateFromActivatedPackages();
 			status_t			_GetActivePackages(int fd);
-			void				_RunQueuedScripts();
+			void				_RunQueuedScripts(); // TODO: Never called, fix?
 			bool				_CheckActivePackagesMatchLatestState(
 									PackageFSGetPackageInfosRequest* request);
 			void				_SetLatestState(VolumeState* state,

@@ -162,6 +162,18 @@ BTransactionIssue::ToString() const
 			messageTemplate = "The post-installation script "
 				" \"%path1%\" failed with exit code %exitCode%.";
 			break;
+		case B_PRE_UNINSTALL_SCRIPT_NOT_FOUND:
+			messageTemplate = "Failed to find pre-uninstall script "
+				" \"%path1%\": %error%.";
+			break;
+		case B_STARTING_PRE_UNINSTALL_SCRIPT_FAILED:
+			messageTemplate = "Failed to run pre-uninstall script "
+				" \"%path1%\": %error%.";
+			break;
+		case B_PRE_UNINSTALL_SCRIPT_FAILED:
+			messageTemplate = "The pre-uninstall script "
+				" \"%path1%\" failed with exit code %exitCode%.";
+			break;
 	}
 
 	BString message(messageTemplate);

@@ -127,7 +127,14 @@ Post-Installation Scripts
 =========================
 A package may include one or more post-installation scripts. The scripts are
 executed whenever the package is activated (for the first time, but also after
-package updates). They shall be placed in "boot/post-install" and declared
-explicitly by the package (via POST_INSTALL_SCRIPTS in the build recipe). A
-post-install script should be considered the last resort. It should only be
-used, if there's no reasonable alternative.
+package updates and first boot of a newly installed OS). They shall be placed
+in "boot/post-install" and declared explicitly by the package (via
+POST_INSTALL_SCRIPTS in the build recipe). A post-install script should be
+considered the last resort. It should only be used, if there's no reasonable
+alternative.  A typical use would be to create a desktop icon that the user
+can move around or delete.
+
+Pre-Uninstallation Scripts
+=========================
+These undo the effects of a post-installation script and usually are put
+into "boot/pre-uninstall".  A typical use is to remove desktop icons.

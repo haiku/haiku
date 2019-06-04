@@ -97,8 +97,10 @@ private:
 			void				_RevertUserGroupChanges();
 
 			void				_RunPostInstallScripts();
-			void				_RunPostInstallScript(Package* package,
-									const BString& script);
+			void				_RunPreUninstallScripts();
+			void				_RunPostOrPreScript(Package* package,
+									const BString& script,
+									bool postNotPre);
 
 			void				_QueuePostInstallScripts();
 
