@@ -175,25 +175,44 @@ status_t Initialize(int fatbits, const char *device, const char *label, bool nop
 		isRawDevice = true;
 
 	if (hasBiosGeometry) {
-		printf("bios geometry: %ld heads, %ld cylinders, %ld sectors/track, %ld bytes/sector\n",
-			biosGeometry.head_count,biosGeometry.cylinder_count,biosGeometry.sectors_per_track,biosGeometry.bytes_per_sector);
+		printf("bios geometry: %" B_PRIu32 " heads, "
+			"%" B_PRIu32 " cylinders, "
+			"%" B_PRIu32 " sectors/track, "
+			"%" B_PRIu32 " bytes/sector\n",
+				biosGeometry.head_count,
+				biosGeometry.cylinder_count,
+				biosGeometry.sectors_per_track,
+				biosGeometry.bytes_per_sector);
 	}
 	if (hasBiosGeometry) {
-		printf("device geometry: %ld heads, %ld cylinders, %ld sectors/track, %ld bytes/sector\n",
-			deviceGeometry.head_count,deviceGeometry.cylinder_count,deviceGeometry.sectors_per_track,deviceGeometry.bytes_per_sector);
+		printf("device geometry: %" B_PRIu32 " heads, "
+			"%" B_PRIu32 " cylinders, "
+			"%" B_PRIu32 " sectors/track, "
+			"%" B_PRIu32 " bytes/sector\n",
+				deviceGeometry.head_count,
+				deviceGeometry.cylinder_count,
+				deviceGeometry.sectors_per_track,
+				deviceGeometry.bytes_per_sector);
 	}
 	if (hasPartitionInfo) {
-		printf("partition info: start at %Ld bytes (%Ld sectors), %Ld KB, %Ld MB, %Ld GB\n",
-			partitionInfo.offset,
-			partitionInfo.offset / 512,
-			partitionInfo.offset / 1024,
-			partitionInfo.offset / (1024 * 1024),
-			partitionInfo.offset / (1024 * 1024 * 1024));
-		printf("partition info: size %Ld bytes, %Ld KB, %Ld MB, %Ld GB\n",
-			partitionInfo.size,
-			partitionInfo.size / 1024,
-			partitionInfo.size / (1024 * 1024),
-			partitionInfo.size / (1024 * 1024 * 1024));
+		printf("partition info: start at %" B_PRIdOFF " bytes "
+			"(%" B_PRIdOFF " sectors), "
+			"%" B_PRIdOFF " KB, "
+			"%" B_PRIdOFF " MB, "
+			"%" B_PRIdOFF " GB\n",
+				partitionInfo.offset,
+				partitionInfo.offset / 512,
+				partitionInfo.offset / 1024,
+				partitionInfo.offset / (1024 * 1024),
+				partitionInfo.offset / (1024 * 1024 * 1024));
+		printf("partition info: size %" B_PRIdOFF " bytes, "
+			"%" B_PRIdOFF " KB, "
+			"%" B_PRIdOFF " MB, "
+			"%" B_PRIdOFF " GB\n",
+				partitionInfo.size,
+				partitionInfo.size / 1024,
+				partitionInfo.size / (1024 * 1024),
+				partitionInfo.size / (1024 * 1024 * 1024));
 	}
 
 	if (!isRawDevice && !hasPartitionInfo) {
@@ -205,8 +224,9 @@ status_t Initialize(int fatbits, const char *device, const char *label, bool nop
 		close(fd);
 		return B_ERROR;
 	} else if (hasPartitionInfo && partitionInfo.logical_block_size != 512) {
-		printf("partition logical block size is not 512, it's %ld bytes\n",
-			partitionInfo.logical_block_size);
+		printf("partition logical block size is not 512, "
+			"it's %" B_PRId32 " bytes\n",
+				partitionInfo.logical_block_size);
 	}
 
 	if (hasDeviceGeometry && deviceGeometry.read_only) {
@@ -245,12 +265,16 @@ status_t Initialize(int fatbits, const char *device, const char *label, bool nop
 		return B_ERROR;
 	}*/
 
-	printf("size = %Ld bytes (%Ld sectors), %Ld KB, %Ld MB, %Ld GB\n",
-		size,
-		size / 512,
-		size / 1024,
-		size / (1024 * 1024),
-		size / (1024 * 1024 * 1024));
+	printf("size = %" B_PRIu64 " bytes "
+		"(%" B_PRIu64 " sectors), "
+		"%" B_PRIu64 " KB, "
+		"%" B_PRIu64 " MB, "
+		"%" B_PRIu64 " GB\n",
+			size,
+			size / 512,
+			size / 1024,
+			size / (1024 * 1024),
+			size / (1024 * 1024 * 1024));
 	
 	if (fatbits == 0) {
 		//auto determine fat type
@@ -358,7 +382,7 @@ status_t Initialize(int fatbits, const char *device, const char *label, bool nop
 	// RootDirSectors should now contain the size of the fat12/16 root directory, measured in sectors
 
 	printf("fatbits = %d, clustersize = %d\n", fatbits, sectorPerCluster * 512);
-	printf("FAT size is %ld sectors\n", FATSize);
+	printf("FAT size is %" B_PRIu32 " sectors\n", FATSize);
 	printf("disk label: %s\n", label);
 
 	char bootsector[512];
@@ -479,7 +503,8 @@ status_t Initialize(int fatbits, const char *device, const char *label, bool nop
 		ssize_t writesize = min_c(bytes_to_write, 65536);
 		written = write_pos(fd, pos, zerobuffer, writesize);
 		if (written != writesize) {
-			fprintf(stderr,"Error: write error near sector %Ld\n",pos / 512);
+			fprintf(stderr, "Error: write error near sector %" B_PRId64 "\n",
+				pos / 512);
 			close(fd);
 			free(zerobuffer);
 			return B_ERROR;
@@ -550,7 +575,8 @@ status_t Initialize(int fatbits, const char *device, const char *label, bool nop
 	if (numFATs > 1) {
 		written = write_pos(fd, (reservedSectorCount + FATSize) * 512,sec,512);
 		if (written != 512) {
-			fprintf(stderr,"Error: write error at sector %ld\n", reservedSectorCount + FATSize);
+			fprintf(stderr, "Error: write error at sector %" B_PRIu32 "\n",
+				reservedSectorCount + FATSize);
 			close(fd);
 			return B_ERROR;
 		}
@@ -591,7 +617,8 @@ status_t Initialize(int fatbits, const char *device, const char *label, bool nop
 		uint32 rootDirSector = reservedSectorCount + (numFATs * FATSize);
 		written = write_pos(fd, rootDirSector * 512, data, 512);
 		if (written != 512) {
-			fprintf(stderr,"Error: write error at sector %ld\n", rootDirSector);
+			fprintf(stderr, "Error: write error at sector %" B_PRIu32 "\n",
+				rootDirSector);
 			close(fd);
 			return B_ERROR;
 		}
@@ -609,7 +636,8 @@ status_t Initialize(int fatbits, const char *device, const char *label, bool nop
 		written = write_pos(fd, rootDirSector * 512, cluster, size);
 		free(cluster);
 		if (written != size) {
-			fprintf(stderr,"Error: write error at sector %ld\n", rootDirSector);
+			fprintf(stderr, "Error: write error at sector %" B_PRIu32 "\n",
+				rootDirSector);
 			close(fd);
 			return B_ERROR;
 		}
