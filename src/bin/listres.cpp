@@ -69,7 +69,7 @@ get_type(type_code type)
 			if (missed < 2)
 				sprintf(buffer, "'%c%c%c%c'", value[0], value[1], value[2], value[3]);
 			else
-				sprintf(buffer, "0x%08lx", type);
+				sprintf(buffer, "0x%08" B_PRIx32, type);
 			return buffer;
 		}
 	}
@@ -120,13 +120,13 @@ main(int argc, char *argv[])
 		size_t size;
 		int32 id;
 		while (resources.GetResourceInfo(index++, &type, &id, &name, &size)) {
-			printf("%11s %6ld %9ld  \"%s\"\n",
+			printf("%11s %6" B_PRId32 " %9ld  \"%s\"\n",
 				get_type(type), id, size, name);
 
 			total += size;
 		}
 	}
 
-	printf("\n%Ld bytes total in resources.\n", total);
+	printf("\n%" B_PRIdOFF " bytes total in resources.\n", total);
 	return 0;
 }
