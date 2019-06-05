@@ -162,7 +162,7 @@ main(int argc, char **argv)
 
 		signal(SIGUSR1, handle_usr1);
 
-		printf("Delaying %s by %lu seconds...\n",
+		printf("Delaying %s by %" B_PRIu32 " seconds...\n",
 			gReboot ? "reboot" : "shutdown", gTimeToSleep);
 
 		left = sleep(gTimeToSleep);
