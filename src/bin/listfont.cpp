@@ -140,16 +140,23 @@ main(int argc, char **argv)
 					printf(", ");
 
 				int32 tunedCount = font.CountTuned();
-				printf("%ld tuned", tunedCount);
+				printf("%" B_PRId32 " tuned", tunedCount);
 
 				if (displayTuned) {
 					printf(":");
 					for (int32 i = 0; i < tunedCount; i++) {
 						tuned_font_info info;
 						font.GetTunedInfo(i, &info);
-						printf("\n\t(size %4.1f, shear %5.3f, rot. %5.3f, flags 0x%lx, face 0x%x)",
-							info.size,
-							info.shear, info.rotation, info.flags, info.face);
+						printf("\n\t(size %4.1f, "
+							"shear %5.3f, "
+							"rot. %5.3f, "
+							"flags 0x%" B_PRIx32 ", "
+							"face 0x%x)",
+								info.size,
+								info.shear,
+								info.rotation,
+								info.flags,
+								info.face);
 					}
 				}
 			}
