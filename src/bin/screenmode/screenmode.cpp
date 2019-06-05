@@ -66,7 +66,7 @@ print_mode(const display_mode& displayMode, const screen_mode& mode)
 {
 	const display_timing& timing = displayMode.timing;
 
-	printf("%lu  %u %u %u %u  %u %u %u %u ", timing.pixel_clock / 1000,
+	printf("%" B_PRIu32 "  %u %u %u %u  %u %u %u %u ", timing.pixel_clock / 1000,
 		timing.h_display, timing.h_sync_start, timing.h_sync_end,
 		timing.h_total, timing.v_display, timing.v_sync_start,
 		timing.v_sync_end, timing.v_total);
@@ -78,7 +78,7 @@ print_mode(const display_mode& displayMode, const screen_mode& mode)
 		printf(" +VSync");
 	if ((timing.flags & B_TIMING_INTERLACED) != 0)
 		printf(" Interlace");
-	printf(" %lu\n", mode.BitsPerPixel());
+	printf(" %" B_PRId32 "\n", mode.BitsPerPixel());
 }
 
 
@@ -355,9 +355,13 @@ main(int argc, char** argv)
 				screenMode.Revert();
 		}
 	} else {
-		fprintf(stderr, "%s: Could not set screen mode %ldx%ldx%ld: %s\n",
-			kProgramName, newMode.width, newMode.height, newMode.BitsPerPixel(),
-			strerror(status));
+		fprintf(stderr,
+			"%s: Could not set screen mode "
+			"%" B_PRId32 "x%" B_PRId32 "x%" B_PRId32 ": "
+			"%s\n",
+				kProgramName,
+				newMode.width, newMode.height, newMode.BitsPerPixel(),
+				strerror(status));
 		return 1;
 	}
 
