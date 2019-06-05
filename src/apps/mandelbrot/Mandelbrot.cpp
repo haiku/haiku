@@ -28,7 +28,7 @@
 
 // #pragma mark - FractalView
 
-// #define TRACE_MANDELBROT_VIEW
+//#define TRACE_MANDELBROT_VIEW
 #ifdef TRACE_MANDELBROT_VIEW
 #	include <stdio.h>
 #	define TRACE(x...) printf(x)
