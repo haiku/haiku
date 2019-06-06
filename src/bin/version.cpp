@@ -56,9 +56,9 @@ get_version(const char *filename, version_kind kind, bool longFlag, bool numeric
 	}
 
 	if (numericalFlag) {
-		printf("%lu ", version.major);
-		printf("%lu ", version.middle);
-		printf("%lu ", version.minor);
+		printf("%" B_PRIu32 " ", version.major);
+		printf("%" B_PRIu32 " ", version.middle);
+		printf("%" B_PRIu32 " ", version.minor);
 
 		switch (version.variety) {
 			case B_DEVELOPMENT_VERSION:
@@ -86,7 +86,7 @@ get_version(const char *filename, version_kind kind, bool longFlag, bool numeric
 				break;	
 		}
 
-		printf("%lu\n", version.internal);
+		printf("%" B_PRIu32 "\n", version.internal);
 		return B_OK;
 	}
 
