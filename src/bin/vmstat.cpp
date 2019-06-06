@@ -74,13 +74,16 @@ main(int argc, char** argv)
 		return 1;
 	}
 
-	printf("max memory:\t\t%Lu\n", info.max_pages * B_PAGE_SIZE);
-	printf("free memory:\t\t%Lu\n", info.free_memory);
-	printf("needed memory:\t\t%Lu\n", info.needed_memory);
-	printf("block cache memory:\t%Lu\n", info.block_cache_pages * B_PAGE_SIZE);
-	printf("max swap space:\t\t%Lu\n", info.max_swap_pages * B_PAGE_SIZE);
-	printf("free swap space:\t%Lu\n", info.free_swap_pages * B_PAGE_SIZE);
-	printf("page faults:\t\t%lu\n", info.page_faults);
+	printf("max memory:\t\t%" B_PRIu64 "\n", info.max_pages * B_PAGE_SIZE);
+	printf("free memory:\t\t%" B_PRIu64 "\n", info.free_memory);
+	printf("needed memory:\t\t%" B_PRIu64 "\n", info.needed_memory);
+	printf("block cache memory:\t%" B_PRIu64 "\n",
+		info.block_cache_pages * B_PAGE_SIZE);
+	printf("max swap space:\t\t%" B_PRIu64 "\n",
+		info.max_swap_pages * B_PAGE_SIZE);
+	printf("free swap space:\t%" B_PRIu64 "\n",
+		info.free_swap_pages * B_PAGE_SIZE);
+	printf("page faults:\t\t%" B_PRIu32 "\n", info.page_faults);
 
 	if (periodically) {
 		puts("\npage faults  used memory    used swap  block cache");
