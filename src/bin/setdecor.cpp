@@ -99,7 +99,9 @@ main(int argc, char** argv)
 		for (int32 i = 0; i < count; ++i) {
 			decor = util->DecoratorAt(i);
 			if (decor == NULL) {
-				fprintf(stderr, "error NULL entry @ %li / %li - BUG BUG BUG\n",
+				fprintf(stderr,
+					"error NULL entry @ %" B_PRIi32 " / %" B_PRIi32
+					" - BUG BUG BUG\n",
 					i, count);
 				// return 2 to track DecorInfoUtility errors
 				return 2;
@@ -135,7 +137,9 @@ main(int argc, char** argv)
 		for (int32 i = 0; i < count; ++i) {
 			decor = util->DecoratorAt(i);
 			if (decor == NULL) {
-				fprintf(stderr, "error NULL entry @ %li / %li - BUG BUG BUG\n",
+				fprintf(stderr,
+					"error NULL entry @ %" B_PRIi32 " / %" B_PRIi32
+					" - BUG BUG BUG\n",
 					i, count);
 				// return 2 to track DecorInfoUtility errors
 				return 2;
