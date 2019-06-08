@@ -260,8 +260,8 @@ public:
 
 	void Dump() const
 	{
-		TPRINT(("key: {%lu, %lu, %Lu, %hu}\n", GetDirID(), GetObjectID(),
-			   GetOffset(), GetType()));
+		TPRINT(("key: {%" B_PRIu32 ", %" B_PRIu32 ", %" B_PRIu64 ", %hu}\n",
+			GetDirID(), GetObjectID(), GetOffset(), GetType()));
 	}
 
 private:

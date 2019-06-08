@@ -1527,7 +1527,8 @@ StreamReader::_ReadIndirectItem(off_t offset, void *buffer, size_t bufferSize)
 			bufferSize -= toRead;
 			buffer = (uint8*)buffer + toRead;
 		} else {
-			FATAL(("failed to get block %Lu\n", indirect.BlockNumberAt(i)));
+			FATAL(("failed to get block %" B_PRIu64 "\n",
+				indirect.BlockNumberAt(i)));
 			error = B_IO_ERROR;
 		}
 	}

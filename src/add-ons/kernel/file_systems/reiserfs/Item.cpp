@@ -206,11 +206,13 @@ Item::Check() const
 	uint32 location = fHeader->GetLocation();
 	if (location < itemSpaceOffset
 		|| location + fHeader->GetLen() > blockSize) {
-		FATAL(("WARNING: bad item %ld on node %Ld: it can not be located "
-			   "where it claims to be: (location: %lu, len: %u, "
-			   "item space offset: %lu, block size: %lu)!\n", GetIndex(),
-			   fNode->GetNumber(), location, fHeader->GetLen(),
-			   itemSpaceOffset, blockSize));
+		FATAL(("WARNING: bad item %" B_PRId32
+			" on node %" B_PRIu64 ": it can not be located "
+			"where it claims to be: (location: %" B_PRIu32 ", len: %u, "
+			"item space offset: %" B_PRIu32 ", "
+			"block size: %" B_PRIu32 ")!\n", GetIndex(),
+			fNode->GetNumber(), location, fHeader->GetLen(),
+			itemSpaceOffset, blockSize));
 		return B_BAD_DATA;
 	}
 	return B_OK;

@@ -284,9 +284,10 @@ Node::Check() const
 {
 	// check the minimal size of the node against its declared free space
 	if (GetFreeSpace() + sizeof(block_head) > GetBlockSize()) {
-		FATAL(("WARNING: bad node %Ld: it declares more free space than "
-			   "possibly being available (%u vs %lu)!\n", GetNumber(),
-			   GetFreeSpace(), GetBlockSize() - sizeof(block_head)));
+		FATAL(("WARNING: bad node %" B_PRIu64
+			": it declares more free space than "
+			"possibly being available (%u vs %lu)!\n", GetNumber(),
+			GetFreeSpace(), GetBlockSize() - sizeof(block_head)));
 		return B_BAD_DATA;
 	}
 	return B_OK;
@@ -351,10 +352,12 @@ InternalNode::Check() const
 	uint32 size = (const uint8*)(GetChilds() + (CountItems() + 1))
 				  - (const uint8*)GetData();
 	if (size + GetFreeSpace() > GetBlockSize()) {
-		FATAL(("WARNING: bad internal node %Ld: it declares more free space "
-			   "than possibly being available (size: %lu, block size: %lu, "
-			   "free space: %u)!\n", GetNumber(), size, GetBlockSize(),
-			   GetFreeSpace()));
+		FATAL(("WARNING: bad internal node %" B_PRIu64
+			": it declares more free space "
+			"than possibly being available (size: %" B_PRIu32 ", "
+			"block size: %" B_PRIu32 ", "
+			"free space: %u)!\n", GetNumber(), size, GetBlockSize(),
+			GetFreeSpace()));
 		return B_BAD_DATA;
 	}
 	return B_OK;
@@ -422,10 +425,12 @@ LeafNode::Check() const
 	// don't need to invoke it.
 	uint32 size = GetItemSpaceOffset();
 	if (size + GetFreeSpace() > GetBlockSize()) {
-		FATAL(("WARNING: bad leaf node %Ld: it declares more free space "
-			   "than possibly being available (min size: %lu, block size: "
-			   "%lu, free space: %u)!\n", GetNumber(), size, GetBlockSize(),
-			   GetFreeSpace()));
+		FATAL(("WARNING: bad leaf node %" B_PRIu64
+			": it declares more free space "
+			"than possibly being available "
+			"(min size: %" B_PRIu32 ", block size: "
+			"%" B_PRIu32 ", free space: %u)!\n",
+			GetNumber(), size, GetBlockSize(), GetFreeSpace()));
 		return B_BAD_DATA;
 	}
 	return B_OK;

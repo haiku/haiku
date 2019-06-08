@@ -346,8 +346,9 @@ Volume::FindVNode(uint32 dirID, uint32 objectID, VNode *node)
 	if (error == B_OK) {
 		error = fTree->FindStatItem(dirID, objectID, &item);
 		if (error != B_OK) {
-			FATAL(("Couldn't find stat item for node (%lu, %lu)\n",
-				   dirID, objectID));
+			FATAL(("Couldn't find stat item for node "
+				"(%" B_PRIu32 ", %" B_PRIu32 ")\n",
+				dirID, objectID));
 		}
 	}
 	// get the stat data
@@ -363,8 +364,9 @@ Volume::FindVNode(uint32 dirID, uint32 objectID, VNode *node)
 			node->SetParentID(entry->GetDirID(), entry->GetObjectID());
 		}
 		else {
-			FATAL(("failed to find `..' entry for dir node (%lu, %ld)\n",
-				   dirID, objectID));
+			FATAL(("failed to find `..' entry for dir node "
+				"(%" B_PRIu32 ", %" B_PRIu32 ")\n",
+				dirID, objectID));
 		}
 	}
 	return error;
@@ -584,8 +586,8 @@ Volume::_InitHashFunction()
 		// verify it
 		if (fHashFunction) {
 			if (_VerifyHashFunction(fHashFunction)) {
-				INFORM(("Directory hash function successfully detected: %lu\n",
-						code));
+				INFORM(("Directory hash function successfully detected: "
+						"%" B_PRIu32 "\n", code));
 			} else {
 				fHashFunction = NULL;
 				INFORM(("Detected directory hash function is not the right "

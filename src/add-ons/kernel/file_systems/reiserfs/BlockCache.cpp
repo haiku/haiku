@@ -68,8 +68,8 @@ BlockCache::~BlockCache()
 	fLock.Lock();
 	for (int32 i = 0; Block *block = fBlocks.ItemAt(i); i++) {
 		if (block->_GetRefCount() > 0) {
-			INFORM(("WARNING: block not put: %p (ref count: %ld)\n", block,
-					block->_GetRefCount()));
+			INFORM(("WARNING: block not put: %p (ref count: %" B_PRId32 ")\n",
+				block, block->_GetRefCount()));
 		}
 		delete block;
 	}

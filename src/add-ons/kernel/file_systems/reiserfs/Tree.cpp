@@ -68,8 +68,8 @@ Tree::Init(Volume *volume, Node *rootNode, uint32 treeHeight)
 	if (error == B_OK) {
 		if (treeHeight > kMaxTreeHeight) {
 			// we don't need to fail, as we can deal with that gracefully
-			INFORM(("WARNING: tree height greater maximal height: %lu\n",
-					treeHeight));
+			INFORM(("WARNING: tree height greater maximal height: %" B_PRIu32
+				"\n", treeHeight));
 		}
 		fVolume = volume;
 		fBlockCache = fVolume->GetBlockCache();

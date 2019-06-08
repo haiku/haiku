@@ -96,11 +96,13 @@ public:
 			uint32 location = entry->GetLocation();
 			if (location < GetEntryNameSpaceOffset() || location > GetLen()) {
 				// bad location
-				FATAL(("WARNING: bad dir entry %ld in item %ld on node %Ld: "
-					   "the entry's name location is %lu, which is outside the"
-					   "entry name space (%lu - %u)!\n", index, GetIndex(),
-					   fNode->GetNumber(), location, GetEntryNameSpaceOffset(),
-					   GetLen()));
+				FATAL(("WARNING: bad dir entry %" B_PRId32 " "
+					"in item %" B_PRId32 " on node %" B_PRIu64 ": "
+					"the entry's name location is %" B_PRIu32 ", "
+					"which is outside the entry name space "
+					"(%" B_PRIu32 " - %u)!\n",
+					index, GetIndex(), fNode->GetNumber(), location,
+					GetEntryNameSpaceOffset(), GetLen()));
 			} else {
 				// get the name
 				name = (char*)((uint8*)GetData() + location);
@@ -159,10 +161,11 @@ public:
 		// check whether the entry headers can possibly fit into the item
 		if (error == B_OK) {
 			if (GetEntryNameSpaceOffset() > GetLen()) {
-				FATAL(("WARNING: bad dir item %ld on node %Ld: the item has "
-					   "len %u and can thus impossibly contain %u entry "
-					   "headers!\n", GetIndex(), fNode->GetNumber(), GetLen(),
-					   GetEntryCount()));
+				FATAL(("WARNING: bad dir item %" B_PRId32 " "
+					"on node %" B_PRIu64 ": the item has "
+					"len %u and can thus impossibly contain %u entry "
+					"headers!\n", GetIndex(), fNode->GetNumber(), GetLen(),
+					GetEntryCount()));
 				return B_BAD_DATA;
 			}
 		}

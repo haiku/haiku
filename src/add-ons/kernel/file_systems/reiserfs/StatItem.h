@@ -237,9 +237,10 @@ public:
 			stat_data_v1 *data = (stat_data_v1*)GetData();
 			statData->SetTo(data, clone);
 		} else {
-			FATAL(("WARNING: bad stat item %ld on node %Ld: the item len "
-				   "(%u) does not match the len of any stat data format!\n",
-				   GetIndex(), fNode->GetNumber(), GetLen()));
+			FATAL(("WARNING: bad stat item %" B_PRId32 " "
+				"on node %" B_PRIu64 ": the item len "
+				"(%u) does not match the len of any stat data format!\n",
+				GetIndex(), fNode->GetNumber(), GetLen()));
 			error = B_BAD_DATA;
 		}
 		return error;
