@@ -229,7 +229,7 @@ compare(
 		}
 		if (!ignore && (!refresh || (linecount < (rows - 1)))) {
 
-			printf("%6ld %7.2f %7.2f %7.2f %4.1f %16s %s \n",
+			printf("%6" B_PRId32 " %7.2f %7.2f %7.2f %4.1f %16s %s \n",
 				it->thid,
 				total / 1000.0,
 				(double)(it->user_time / 1000),
