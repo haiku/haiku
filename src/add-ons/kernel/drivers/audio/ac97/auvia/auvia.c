@@ -469,7 +469,7 @@ auvia_init(auvia_dev * card)
 
 	pr = (*pci->read_pci_config)(card->info.bus, card->info.device, 
 		card->info.function, AUVIA_PCICONF_JUNK, 4);
-	PRINT(("AUVIA_PCICONF_JUNK before: %lx\n", pr));
+	PRINT(("AUVIA_PCICONF_JUNK before: %" B_PRIx32 "\n", pr));
 	pr &= ~AUVIA_PCICONF_ENABLES;
 	pr |= AUVIA_PCICONF_ACLINKENAB | AUVIA_PCICONF_ACNOTRST 
 		| AUVIA_PCICONF_ACVSR | AUVIA_PCICONF_ACSGD;
@@ -479,7 +479,7 @@ auvia_init(auvia_dev * card)
 	snooze(100); 
 	pr = (*pci->read_pci_config)(card->info.bus, card->info.device, 
 		card->info.function, AUVIA_PCICONF_JUNK, 4);
-	PRINT(("AUVIA_PCICONF_JUNK after: %lx\n", pr));
+	PRINT(("AUVIA_PCICONF_JUNK after: %" B_PRIx32 "\n", pr));
 
 	if(IS_8233(&card->config)) {
 		card->interrupt_mask = 
@@ -534,8 +534,9 @@ auvia_setup(auvia_dev * card)
 	if(card->info.device_id == VIATECH_8233_AC97_DEVICE_ID)
 		card->config.type |= TYPE_8233;
 	
-	PRINT(("%s deviceid = %#04x chiprev = %x model = %x enhanced at %lx\n", 
-		card->name, card->info.device_id, card->info.revision, 
+	PRINT(("%s deviceid = %#04x chiprev = %x model = %x enhanced "
+		"at %" B_PRIx32 "\n",
+		card->name, card->info.device_id, card->info.revision,
 		card->info.u.h0.subsystem_id, card->config.nabmbar));
 		
 	cmd = (*pci->read_pci_config)(card->info.bus, card->info.device, 
@@ -553,7 +554,7 @@ auvia_setup(auvia_dev * card)
 		(codec_reg_write)auvia_codec_write, &card->config,
 		card->config.subvendor_id, card->config.subsystem_id);
 
-	PRINT(("installing interrupt : %lx\n", card->config.irq));
+	PRINT(("installing interrupt : %" B_PRIx32 "\n", card->config.irq));
 	err = install_io_interrupt_handler(card->config.irq, auvia_int, card, 0);
 	if (err != B_OK) {
 		PRINT(("failed to install interrupt\n"));
@@ -606,7 +607,7 @@ init_driver(void)
 			}
 #endif
 			if (auvia_setup(&cards[num_cards])) {
-				PRINT(("Setup of auvia %ld failed\n", num_cards+1));
+				PRINT(("Setup of auvia %" B_PRId32 " failed\n", num_cards + 1));
 #ifdef __HAIKU__
 				(*pci->unreserve_device)(info.bus, info.device, info.function,
 					DRIVER_NAME, &cards[num_cards]);

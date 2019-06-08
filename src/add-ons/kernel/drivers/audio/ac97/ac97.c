@@ -313,7 +313,7 @@ ac97_attach(ac97_dev **_dev, codec_reg_read reg_read, codec_reg_write reg_write,
 	/* set record line in */
 	ac97_reg_update(dev, AC97_RECORD_SELECT, 0x0404);
 
-	LOG(("codec vendor id      = %#08lx\n", dev->codec_id));
+	LOG(("codec vendor id      = %#08" B_PRIx32 "\n", dev->codec_id));
 	LOG(("codec description     = %s\n", dev->codec_info));
 	LOG(("codec 3d enhancement = %s\n", dev->codec_3d_stereo_enhancement));
 
@@ -438,7 +438,10 @@ ac97_set_rate(ac97_dev *dev, uint8 reg, uint32 rate)
 
 	value = (uint32)((rate * 48000ULL) / dev->clock); /* need 64 bit calculation for rates 96000 or higher */
 
-	LOG(("ac97_set_rate: clock = %ld, rate = %ld, value = %ld\n", dev->clock, rate, value));
+	LOG(("ac97_set_rate: clock = %" B_PRIu32 ", "
+		"rate = %" B_PRIu32 ", "
+		"value = %" B_PRIu32 "\n",
+		dev->clock, rate, value));
 
 	/* if double rate audio is currently enabled, divide value by 2 */
 	if (ac97_reg_cached_read(dev, AC97_EXTENDED_STAT_CTRL) & 0x0002)
@@ -483,7 +486,7 @@ ac97_get_rate(ac97_dev *dev, uint8 reg, uint32 *rate)
 void
 ac97_set_clock(ac97_dev *dev, uint32 clock)
 {
-	LOG(("ac97_set_clock: clock = %ld\n", clock));
+	LOG(("ac97_set_clock: clock = %" B_PRIu32 "\n", clock));
 	dev->clock = clock;
 	ac97_detect_rates(dev);
 	ac97_dump_capabilities(dev);
@@ -756,7 +759,10 @@ ad1819_set_rate(ac97_dev *dev, uint8 reg, uint32 rate)
 
 	value = (uint32)((rate * 48000ULL) / dev->clock); /* need 64 bit calculation for rates 96000 or higher */
 
-	LOG(("ad1819_set_rate: clock = %ld, rate = %ld, value = %ld\n", dev->clock, rate, value));
+	LOG(("ad1819_set_rate: clock = %" B_PRIu32 ", "
+		"rate = %" B_PRIu32 ", "
+		"value = %" B_PRIu32 "\n",
+		dev->clock, rate, value));
 
 	if (value < 0x1B58 || value > 0xBB80)
 		return false;
