@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2017, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2019, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -435,6 +435,9 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	} else {
 		status = B_BAD_VALUE;
 		FATAL(("could not create root node!\n"));
+
+		// We need to wait for the block allocator to finish
+		fBlockAllocator.Uninitialize();
 		return status;
 	}
 
