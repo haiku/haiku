@@ -269,7 +269,8 @@ emuxki_pmem_alloc(emuxki_dev *card, size_t size)
 				    != silentpage)
 					break;
 			if (j == numblocks) {
-				PRINT(("emuxki_pmem_alloc : j == numblocks %ld\n", j));
+				PRINT(("emuxki_pmem_alloc : j == numblocks %" B_PRIu32 "\n",
+					j));
 				if ((mem = emuxki_mem_new(card, i, size)) == NULL) {
 					//splx(s);
 					return (NULL);
@@ -286,7 +287,8 @@ emuxki_pmem_alloc(emuxki_dev *card, size_t size)
 				//splx(s);
 				return mem->log_base;
 			} else {
-				PRINT(("emuxki_pmem_alloc : j != numblocks %ld\n", j));
+				PRINT(("emuxki_pmem_alloc : j != numblocks %" B_PRIu32 "\n",
+					j));
 				i += j;
 			}
 			//splx(s);
@@ -1310,7 +1312,8 @@ emuxki_voice_adc_rate(emuxki_voice *voice)
 			if (IS_AUDIGY(&voice->stream->card->config))
 				return EMU_A_ADCCR_SAMPLERATE_12;
 			else
-				PRINT(("recording sample_rate not supported : %lu\n", voice->sample_rate));
+				PRINT(("recording sample_rate not supported : %" B_PRIu32 "\n",
+					voice->sample_rate));
 			break;
 		case 11000:
 			if (IS_AUDIGY(&voice->stream->card->config))
@@ -1325,7 +1328,8 @@ emuxki_voice_adc_rate(emuxki_voice *voice)
 				return EMU_ADCCR_SAMPLERATE_8;
 			break;
 		default:
-			PRINT(("recording sample_rate not supported : %lu\n", voice->sample_rate));
+			PRINT(("recording sample_rate not supported : %" B_PRIu32 "\n",
+				voice->sample_rate));
 	}
 	return 0;
 }
@@ -2147,8 +2151,10 @@ emuxki_setup(emuxki_dev * card)
 	} else if (card->info.device_id == CREATIVELABS_AUDIGY2_VALUE_DEVICE_ID)
 		card->config.type |= TYPE_AUDIGY | TYPE_AUDIGY2 | TYPE_AUDIGY2_VALUE;
 
-	PRINT(("%s deviceid = %#04x chiprev = %x model = %x enhanced at %lx\n", card->name, card->info.device_id,
-		card->info.revision, card->info.u.h0.subsystem_id, card->config.nabmbar));
+	PRINT(("%s deviceid = %#04x chiprev = %x model = %x "
+		"enhanced at %" B_PRIx32 "\n",
+		card->name, card->info.device_id, card->info.revision,
+		card->info.u.h0.subsystem_id, card->config.nabmbar));
 
 	cmd = (*pci->read_pci_config)(card->info.bus, card->info.device, card->info.function, PCI_command, 2);
 	PRINT(("PCI command before: %x\n", cmd));
@@ -2191,9 +2197,12 @@ emuxki_setup(emuxki_dev * card)
 	ac97_init(&card->config);
 	ac97_amp_enable(&card->config, true);
 
-	PRINT(("codec vendor id      = %#08lx\n",ac97_get_vendor_id(&card->config)));
-	PRINT(("codec description     = %s\n",ac97_get_vendor_id_description(&card->config)));
-	PRINT(("codec 3d enhancement = %s\n",ac97_get_3d_stereo_enhancement(&card->config)));
+	PRINT(("codec vendor id      = %#08" B_PRIx32 "\n",
+		ac97_get_vendor_id(&card->config)));
+	PRINT(("codec description     = %s\n",
+		ac97_get_vendor_id_description(&card->config)));
+	PRINT(("codec 3d enhancement = %s\n",
+		ac97_get_3d_stereo_enhancement(&card->config)));
 
 	if (IS_AUDIGY2(&card->config)) {
 		emuxki_reg_write_32(&card->config, EMU_A_IOCFG,
@@ -2272,7 +2281,7 @@ emuxki_setup(emuxki_dev * card)
 		}
 	}
 
-	PRINT(("installing interrupt : %lx\n", card->config.irq));
+	PRINT(("installing interrupt : %" B_PRIx32 "\n", card->config.irq));
 	err = install_io_interrupt_handler(card->config.irq, emuxki_int, card, 0);
 	if (err != B_OK) {
 		PRINT(("failed to install interrupt\n"));
@@ -2945,7 +2954,8 @@ init_driver(void)
 			}
 #endif
 			if (emuxki_setup(&cards[num_cards])) {
-				PRINT(("Setup of emuxki %ld failed\n", num_cards+1));
+				PRINT(("Setup of emuxki %" B_PRId32 " failed\n",
+					num_cards + 1));
 #ifdef __HAIKU__
 				(*pci->unreserve_device)(info.bus, info.device, info.function,
 					DRIVER_NAME, &cards[num_cards]);

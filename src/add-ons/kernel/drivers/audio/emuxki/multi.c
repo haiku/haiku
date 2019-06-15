@@ -515,7 +515,7 @@ emuxki_create_controls_list(multi_dev *multi)
 	}
 
 	multi->control_count = index;
-	PRINT(("multi->control_count %lu\n", multi->control_count));
+	PRINT(("multi->control_count %" B_PRIu32 "\n", multi->control_count));
 	return B_OK;
 }
 
@@ -528,7 +528,8 @@ emuxki_get_mix(emuxki_dev *card, multi_mix_value_info * mmvi)
 	for (i = 0; i < mmvi->item_count; i++) {
 		id = mmvi->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
 		if (id < 0 || id >= card->multi.control_count) {
-			PRINT(("emuxki_get_mix : invalid control id requested : %li\n", id));
+			PRINT(("emuxki_get_mix : "
+				"invalid control id requested : %" B_PRIi32 "\n", id));
 			continue;
 		}
 		control = &card->multi.controls[id];
@@ -568,7 +569,8 @@ emuxki_set_mix(emuxki_dev *card, multi_mix_value_info * mmvi)
 	for (i = 0; i < mmvi->item_count; i++) {
 		id = mmvi->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
 		if (id < 0 || id >= card->multi.control_count) {
-			PRINT(("emuxki_set_mix : invalid control id requested : %li\n", id));
+			PRINT(("emuxki_set_mix : "
+				"invalid control id requested : %" B_PRIi32 "\n", id));
 			continue;
 		}
 		control = &card->multi.controls[id];
@@ -578,7 +580,8 @@ emuxki_set_mix(emuxki_dev *card, multi_mix_value_info * mmvi)
 			if (i+1<mmvi->item_count) {
 				id = mmvi->values[i + 1].id - EMU_MULTI_CONTROL_FIRSTID;
 				if (id < 0 || id >= card->multi.control_count) {
-					PRINT(("emuxki_set_mix : invalid control id requested : %li\n", id));
+					PRINT(("emuxki_set_mix : "
+						"invalid control id requested : %" B_PRIi32 "\n", id));
 				} else {
 					control2 = &card->multi.controls[id];
 					if (control2->mix_control.master != control->mix_control.id)
