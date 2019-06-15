@@ -299,6 +299,9 @@ esac
 # Only the ones from the source tree should be used.
 rm -rf "$installDir/$haikuMachine/sys-include"
 
+# remove the static libstdc++, only the shared one should be used
+rm -f "$installDir/$haikuMachine/lib/libstdc++.a"
+
 # remove the sysroot dir
 rm -rf "$sysrootDir"
 
