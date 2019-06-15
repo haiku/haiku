@@ -10,12 +10,15 @@ RUN apt-get install -y git nasm autoconf automake texinfo flex \
 	libcurl4-openssl-dev genisoimage libtool mtools gcc-multilib \
 	u-boot-tools util-linux device-tree-compiler bc
 
-# GCC Requirements
+# GCC requirements
 RUN apt-get install -y python
-# zlib Requirements
+# zlib requirements
 RUN apt-get install -y cmake
-# ICU Requirements
+# ICU requirements
 RUN apt-get install -y pkg-config
+# texinfo requirements
+RUN apt-get install -y libncurses-dev
+
 # Developer sundries (that won't impact bootstrap)
 RUN apt-get install -y vim nano
 RUN echo "source /usr/share/vim/vim80/defaults.vim" > ~/.vimrc
