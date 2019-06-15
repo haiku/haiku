@@ -137,8 +137,8 @@ extern void mutex_init(mutex* lock, const char* name);
 	// name is *not* cloned nor freed in mutex_destroy()
 extern void mutex_init_etc(mutex* lock, const char* name, uint32 flags);
 extern void mutex_destroy(mutex* lock);
-extern status_t mutex_switch_lock(mutex* from, mutex* to);
 extern void mutex_transfer_lock(mutex* lock, thread_id thread);
+extern status_t mutex_switch_lock(mutex* from, mutex* to);
 	// Unlocks "from" and locks "to" such that unlocking and starting to wait
 	// for the lock is atomically. I.e. if "from" guards the object "to" belongs
 	// to, the operation is safe as long as "from" is held while destroying
