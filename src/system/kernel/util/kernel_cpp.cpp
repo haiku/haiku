@@ -403,6 +403,7 @@ extern "C"
 void
 exit(int status)
 {
-	panic("exit() called with status code = %d!", status);
+	while (true)
+		panic("exit() called with status code = %d!", status);
 }
 
