@@ -225,9 +225,9 @@ dump_widget_inputs(hda_widget& widget)
 		int32 input = widget.inputs[i];
 
 		if ((int32)i != widget.active_input)
-			offset += sprintf(buffer + offset, "%ld ", input);
+			offset += sprintf(buffer + offset, "%" B_PRId32 " ", input);
 		else
-			offset += sprintf(buffer + offset, "<%ld> ", input);
+			offset += sprintf(buffer + offset, "<%" B_PRId32 "> ", input);
 	}
 
 	if (offset != 0)
@@ -247,8 +247,9 @@ dump_widget_amplifier_capabilities(hda_widget& widget, bool input)
 	if (capabilities == 0)
 		return;
 
-	TRACE("\t%s Amp: %sstep size: %f dB, # steps: %ld, offset to 0 dB: "
-		"%ld\n", input ? "In" : "Out",
+	TRACE("\t%s Amp: %sstep size: %f dB, # steps: %" B_PRIu32 ", "
+		"offset to 0 dB: %" B_PRIu32 "\n",
+		input ? "In" : "Out",
 		(capabilities & AMP_CAP_MUTE) != 0 ? "supports mute, " : "",
 		AMP_CAP_STEP_SIZE(capabilities),
 		AMP_CAP_NUM_STEPS(capabilities),
@@ -330,7 +331,7 @@ dump_audiogroup_widgets(hda_audio_group* audioGroup)
 		hda_widget& widget = audioGroup->widgets[i];
 		uint32 nodeID = audioGroup->widget_start + i;
 
-		TRACE("%ld: %s\n", nodeID, get_widget_type_name(widget.type));
+		TRACE("%" B_PRIu32 ": %s\n", nodeID, get_widget_type_name(widget.type));
 
 		switch (widget.type) {
 			case WT_AUDIO_OUTPUT:
@@ -595,7 +596,7 @@ hda_widget_get_connections(hda_audio_group* audioGroup, hda_widget* widget)
 				VID_GET_CONNECTION_LIST_ENTRY, i);
 			if (hda_send_verbs(audioGroup->codec, &verb, &response, 1)
 					!= B_OK) {
-				ERROR("Error parsing inputs for widget %ld!\n",
+				ERROR("Error parsing inputs for widget %" B_PRIu32 "!\n",
 					widget->node_id);
 				break;
 			}
@@ -609,8 +610,8 @@ hda_widget_get_connections(hda_audio_group* audioGroup, hda_widget* widget)
 			input &= ~rangeMask;
 
 			if (input < previousInput || previousInput == -1) {
-				ERROR("invalid range from %ld to %ld\n", previousInput,
-					input);
+				ERROR("invalid range from %" B_PRId32 " to %" B_PRId32 "\n",
+					previousInput, input);
 				continue;
 			}
 
@@ -732,12 +733,14 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 	if (hda_send_verbs(audioGroup->codec, verbs, resp, 3) != B_OK)
 		return B_ERROR;
 
-	TRACE("Audio Group: Output delay: %ld samples, Input delay: %ld "
+	TRACE("Audio Group: Output delay: %" B_PRIu32 " "
+		"samples, Input delay: %" B_PRIu32 " "
 		"samples, Beep Generator: %s\n", AUDIO_GROUP_CAP_OUTPUT_DELAY(resp[0]),
 		AUDIO_GROUP_CAP_INPUT_DELAY(resp[0]),
 		AUDIO_GROUP_CAP_BEEPGEN(resp[0]) ? "yes" : "no");
 
-	TRACE("  #GPIO: %ld, #GPO: %ld, #GPI: %ld, unsol: %s, wake: %s\n",
+	TRACE("  #GPIO: %" B_PRIu32 ", #GPO: %" B_PRIu32 ", #GPI: %" B_PRIu32 ", "
+		"unsol: %s, wake: %s\n",
 		GPIO_COUNT_NUM_GPIO(resp[1]), GPIO_COUNT_NUM_GPO(resp[1]),
 		GPIO_COUNT_NUM_GPI(resp[1]), GPIO_COUNT_GPIUNSOL(resp[1]) ? "yes" : "no",
 		GPIO_COUNT_GPIWAKE(resp[1]) ? "yes" : "no");
@@ -747,8 +750,8 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 	audioGroup->widget_start = SUB_NODE_COUNT_START(resp[2]);
 	audioGroup->widget_count = SUB_NODE_COUNT_TOTAL(resp[2]);
 
-	TRACE("  widget start %lu, count %lu\n", audioGroup->widget_start,
-		audioGroup->widget_count);
+	TRACE("  widget start %" B_PRIu32 ", count %" B_PRIu32 "\n",
+		audioGroup->widget_start, audioGroup->widget_count);
 
 	audioGroup->widgets = (hda_widget*)calloc(audioGroup->widget_count,
 		sizeof(*audioGroup->widgets));
@@ -818,7 +821,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 			hda_widget_get_amplifier_capabilities(audioGroup, &widget);
 		}
 
-		TRACE("%ld: %s\n", nodeID, get_widget_type_name(widget.type));
+		TRACE("%" B_PRIu32 ": %s\n", nodeID, get_widget_type_name(widget.type));
 
 		switch (widget.type) {
 			case WT_AUDIO_OUTPUT:
@@ -845,7 +848,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 					widget.d.pin.config = resp[0];
 					const char* location =
 						get_widget_location(CONF_DEFAULT_LOCATION(resp[0]));
-					TRACE("\t%s, %s%s%s, %s, %s, Association:%ld\n",
+					TRACE("\t%s, %s%s%s, %s, %s, Association:%" B_PRIu32 "\n",
 						kPortConnector[CONF_DEFAULT_CONNECTIVITY(resp[0])],
 						location ? location : "",
 						location ? " " : "",
@@ -907,7 +910,8 @@ hda_widget_find_output_path(hda_audio_group* audioGroup, hda_widget* widget,
 	switch (widget->type) {
 		case WT_AUDIO_OUTPUT:
 			widget->flags |= WIDGET_FLAG_OUTPUT_PATH;
-TRACE("      %*soutput: added output widget %ld\n", (int)depth * 2, "", widget->node_id);
+			TRACE("      %*soutput: added output widget %" B_PRIu32 "\n",
+				(int)depth * 2, "", widget->node_id);
 			return true;
 
 		case WT_AUDIO_MIXER:
@@ -931,11 +935,13 @@ TRACE("      %*soutput: added output widget %ld\n", (int)depth * 2, "", widget->
 						widget->active_input = i;
 
 					widget->flags |= WIDGET_FLAG_OUTPUT_PATH;
-TRACE("      %*soutput: added mixer/selector widget %ld\n", (int)depth * 2, "", widget->node_id);
+					TRACE("      %*soutput: added mixer/selector widget %"
+						B_PRIu32 "\n", (int)depth * 2, "", widget->node_id);
 					found = true;
 				}
 			}
-if (!found) TRACE("      %*soutput: not added mixer/selector widget %ld\n", (int)depth * 2, "", widget->node_id);
+			if (!found) TRACE("      %*soutput: not added mixer/selector widget %"
+					 B_PRIu32 "\n", (int)depth * 2, "", widget->node_id);
 			return found;
 		}
 
@@ -966,7 +972,8 @@ hda_widget_find_input_path(hda_audio_group* audioGroup, hda_widget* widget,
 					case PIN_DEV_LINE_IN:
 					case PIN_DEV_MIC_IN:
 						widget->flags |= WIDGET_FLAG_INPUT_PATH;
-TRACE("      %*sinput: added input widget %ld\n", (int)depth * 2, "", widget->node_id);
+						TRACE("      %*sinput: added input widget %" B_PRIu32 "\n",
+							(int)depth * 2, "", widget->node_id);
 						return true;
 					break;
 				}
@@ -993,11 +1000,13 @@ TRACE("      %*sinput: added input widget %ld\n", (int)depth * 2, "", widget->no
 						widget->active_input = i;
 
 					widget->flags |= WIDGET_FLAG_INPUT_PATH;
-TRACE("      %*sinput: added mixer/selector widget %ld\n", (int)depth * 2, "", widget->node_id);
+					TRACE("      %*sinput: added mixer/selector widget %"
+						B_PRIu32 "\n", (int)depth * 2, "", widget->node_id);
 					found = true;
 				}
 			}
-if (!found) TRACE("      %*sinput: not added mixer/selector widget %ld\n", (int)depth * 2, "", widget->node_id);
+			if (!found) TRACE("      %*sinput: not added mixer/selector widget %"
+				B_PRIu32 "\n", (int)depth * 2, "", widget->node_id);
 			return found;
 		}
 
@@ -1011,7 +1020,7 @@ hda_audio_group_build_output_tree(hda_audio_group* audioGroup, bool useMixer)
 {
 	bool found = false;
 
-TRACE("build output tree: %suse mixer\n", useMixer ? "" : "don't ");
+	TRACE("build output tree: %suse mixer\n", useMixer ? "" : "don't ");
 	for (uint32 i = 0; i < audioGroup->widget_count; i++) {
 		hda_widget& widget = audioGroup->widgets[i];
 
@@ -1026,18 +1035,20 @@ TRACE("build output tree: %suse mixer\n", useMixer ? "" : "don't ");
 			&& device != PIN_DEV_LINE_OUT)
 			continue;
 
-TRACE("  look at pin widget %ld (%ld inputs)\n", widget.node_id, widget.num_inputs);
+		TRACE("  look at pin widget %" B_PRIu32 " (%" B_PRIu32 " inputs)\n",
+			widget.node_id, widget.num_inputs);
 		for (uint32 j = 0; j < widget.num_inputs; j++) {
 			hda_widget* inputWidget = hda_audio_group_get_widget(audioGroup,
 				widget.inputs[j]);
-TRACE("    try widget %ld: %p\n", widget.inputs[j], inputWidget);
+			TRACE("    try widget %" B_PRIu32 ": %p\n",
+				widget.inputs[j], inputWidget);
 			if (inputWidget == NULL)
 				continue;
 
 			if (useMixer && inputWidget->type != WT_AUDIO_MIXER
 				&& inputWidget->type != WT_AUDIO_SELECTOR)
 				continue;
-TRACE("    widget %ld is candidate\n", inputWidget->node_id);
+			TRACE("    widget %" B_PRIu32 " is candidate\n", inputWidget->node_id);
 
 			bool alreadyUsed = false;
 			if (hda_widget_find_output_path(audioGroup, inputWidget, 0,
@@ -1045,7 +1056,7 @@ TRACE("    widget %ld is candidate\n", inputWidget->node_id);
 				|| (device == PIN_DEV_HEAD_PHONE_OUT && alreadyUsed)) {
 				// find the output path to an audio output widget
 				// or for headphones, an already used widget
-TRACE("    add pin widget %ld\n", widget.node_id);
+				TRACE("    add pin widget %" B_PRIu32 "\n", widget.node_id);
 				if (widget.active_input == -1)
 					widget.active_input = j;
 				widget.flags |= WIDGET_FLAG_OUTPUT_PATH;
@@ -1064,25 +1075,28 @@ hda_audio_group_build_input_tree(hda_audio_group* audioGroup)
 {
 	bool found = false;
 
-TRACE("build input tree\n");
+	TRACE("build input tree\n");
 	for (uint32 i = 0; i < audioGroup->widget_count; i++) {
 		hda_widget& widget = audioGroup->widgets[i];
 
 		if (widget.type != WT_AUDIO_INPUT)
 			continue;
 
-TRACE("  look at input widget %ld (%ld inputs)\n", widget.node_id, widget.num_inputs);
+		TRACE("  look at input widget %" B_PRIu32 " (%" B_PRIu32 " inputs)\n",
+			widget.node_id, widget.num_inputs);
 		for (uint32 j = 0; j < widget.num_inputs; j++) {
 			hda_widget* inputWidget = hda_audio_group_get_widget(audioGroup,
 				widget.inputs[j]);
-TRACE("    try widget %ld: %p\n", widget.inputs[j], inputWidget);
+			TRACE("    try widget %" B_PRIu32 ": %p\n",
+				widget.inputs[j], inputWidget);
 			if (inputWidget == NULL)
 				continue;
 
-TRACE("    widget %ld is candidate\n", inputWidget->node_id);
+			TRACE("    widget %" B_PRIu32 " is candidate\n",
+				inputWidget->node_id);
 
 			if (hda_widget_find_input_path(audioGroup, inputWidget, 0)) {
-TRACE("    add pin widget %ld\n", widget.node_id);
+				TRACE("    add pin widget %" B_PRIu32 "\n", widget.node_id);
 				if (widget.active_input == -1)
 					widget.active_input = j;
 				widget.flags |= WIDGET_FLAG_INPUT_PATH;
@@ -1101,7 +1115,7 @@ hda_audio_group_build_tree(hda_audio_group* audioGroup)
 {
 	if (!hda_audio_group_build_output_tree(audioGroup, true)) {
 		// didn't find a mixer path, try again without
-TRACE("try without mixer!\n");
+		TRACE("try without mixer!\n");
 		if (!hda_audio_group_build_output_tree(audioGroup, false))
 			return ENODEV;
 	}
@@ -1110,7 +1124,7 @@ TRACE("try without mixer!\n");
 		ERROR("build input tree failed\n");
 	}
 
-TRACE("build tree!\n");
+	TRACE("build tree!\n");
 
 	// select active connections
 
@@ -1130,7 +1144,8 @@ TRACE("build tree!\n");
 		corb_t verb = MAKE_VERB(audioGroup->codec->addr,
 			widget.node_id, VID_SET_CONNECTION_SELECT, widget.active_input);
 		if (hda_send_verbs(audioGroup->codec, &verb, NULL, 1) != B_OK)
-			ERROR("Setting output selector %ld failed on widget %ld!\n",
+			ERROR("Setting output selector %" B_PRIu32
+				" failed on widget %" B_PRIu32 "!\n",
 				widget.active_input, widget.node_id);
 	}
 
@@ -1152,7 +1167,7 @@ TRACE("build tree!\n");
 			MAKE_VERB(audioGroup->codec->addr,
 				audioGroup->widget.node_id, VID_SET_GPIO_DIR, gpio)
 		};
-		TRACE("Setting gpio 0x%lx\n", gpio);
+		TRACE("Setting gpio 0x%" B_PRIx32 "\n", gpio);
 		if (hda_send_verbs(audioGroup->codec, verb, NULL, 3) != B_OK)
 			ERROR("Setting gpio failed!\n");
 	}
@@ -1177,7 +1192,7 @@ hda_audio_group_switch_init(hda_audio_group* audioGroup)
 			corb_t verb = MAKE_VERB(audioGroup->codec->addr, widget.node_id,
 				VID_SET_UNSOLRESP, UNSOLRESP_ENABLE);
 			hda_send_verbs(audioGroup->codec, &verb, NULL, 1);
-			TRACE("Enabled unsolicited responses on widget %ld\n",
+			TRACE("Enabled unsolicited responses on widget %" B_PRIu32 "\n",
 				widget.node_id);
 		}
 	}
@@ -1201,7 +1216,7 @@ hda_audio_group_check_sense(hda_audio_group* audioGroup, bool disable)
 		uint32 response;
 		hda_send_verbs(audioGroup->codec, &verb, &response, 1);
 		disable = response & PIN_SENSE_PRESENCE_DETECT;
-		TRACE("sensed pin widget %ld, %d\n", widget.node_id, disable);
+		TRACE("sensed pin widget %" B_PRIu32 ", %d\n", widget.node_id, disable);
 
 		uint32 ctrl = hda_widget_prepare_pin_ctrl(audioGroup, &widget,
 				true);
@@ -1346,7 +1361,7 @@ hda_audio_group_get_widgets(hda_audio_group* audioGroup, hda_stream* stream)
 				uint32 ctrl = hda_widget_prepare_pin_ctrl(audioGroup, &widget,
 					flags == WIDGET_FLAG_OUTPUT_PATH);
 
-TRACE("ENABLE pin widget %ld\n", widget.node_id);
+				TRACE("ENABLE pin widget %" B_PRIu32 "\n", widget.node_id);
 				// FIXME: Force Pin Widget to unmute; enable hp/output
 				corb_t verb = MAKE_VERB(audioGroup->codec->addr,
 					widget.node_id,
@@ -1365,14 +1380,16 @@ TRACE("ENABLE pin widget %ld\n", widget.node_id);
 							result | EAPDBTL_ENABLE_EAPD);
 						hda_send_verbs(audioGroup->codec,
 							&verb, NULL, 1);
-TRACE("ENABLE EAPD pin widget %ld\n", widget.node_id);
+						TRACE("ENABLE EAPD pin widget %" B_PRIu32 "\n",
+							widget.node_id);
 					}
 				}
 			}
 
 			if (widget.capabilities.output_amplifier != 0) {
-TRACE("UNMUTE/SET OUTPUT GAIN widget %ld (offset %ld)\n", widget.node_id,
-	AMP_CAP_OFFSET(widget.capabilities.output_amplifier));
+				TRACE("UNMUTE/SET OUTPUT GAIN widget %" B_PRIu32 " "
+					"(offset %" B_PRIu32 ")\n", widget.node_id,
+					AMP_CAP_OFFSET(widget.capabilities.output_amplifier));
 				corb_t verb = MAKE_VERB(audioGroup->codec->addr,
 					widget.node_id,
 					VID_SET_AMPLIFIER_GAIN_MUTE,
@@ -1382,8 +1399,9 @@ TRACE("UNMUTE/SET OUTPUT GAIN widget %ld (offset %ld)\n", widget.node_id,
 				hda_send_verbs(audioGroup->codec, &verb, NULL, 1);
 			}
 			if (widget.capabilities.input_amplifier != 0) {
-TRACE("UNMUTE/SET INPUT GAIN widget %ld (offset %ld)\n", widget.node_id,
-	AMP_CAP_OFFSET(widget.capabilities.input_amplifier));
+				TRACE("UNMUTE/SET INPUT GAIN widget %" B_PRIu32 " "
+					"(offset %" B_PRIu32 ")\n", widget.node_id,
+					AMP_CAP_OFFSET(widget.capabilities.input_amplifier));
 				for (uint32 i = 0; i < widget.num_inputs; i++) {
 					corb_t verb = MAKE_VERB(audioGroup->codec->addr,
 						widget.node_id,
@@ -1510,10 +1528,14 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 	codec->major = response.major;
 	hda_codec_get_quirks(codec);
 
-	TRACE("Codec %ld Vendor: %04lx Product: %04lx, Revision: "
-		"%lu.%lu.%lu.%lu Quirks: %04lx\n", codecAddress, response.vendor,
-		response.device, response.major, response.minor, response.revision,
-		response.stepping, codec->quirks);
+	TRACE("Codec %" B_PRIu32 " Vendor: %04" B_PRIx32 " "
+		"Product: %04" B_PRIx32 ", "
+		"Revision: %" B_PRIu32 ".%" B_PRIu32 ".%" B_PRIu32 ".%" B_PRIu32 " "
+		"Quirks: %04" B_PRIx32 "\n",
+		codecAddress, response.vendor,
+		response.device,
+		response.major, response.minor, response.revision, response.stepping,
+		codec->quirks);
 
 	for (uint32 nodeID = response.start;
 			nodeID < response.start + response.count; nodeID++) {

@@ -17,7 +17,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define DEVFS_PATH_FORMAT	"audio/hmulti/hda/%lu"
+#define DEVFS_PATH_FORMAT	"audio/hmulti/hda/%" B_PRIu32
 #include <hmulti_audio.h>
 
 #include "hda_controller_defs.h"
