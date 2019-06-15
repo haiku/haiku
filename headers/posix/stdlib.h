@@ -55,8 +55,8 @@ extern void		*realloc(void *oldPointer, size_t newSize);
 extern void		abort(void);
 extern int		atexit(void (*func)(void));
 extern int		atfork(void (*func)(void));
-extern void		exit(int);
-extern void		_Exit(int);
+extern void		exit(int) __attribute__((noreturn));
+extern void		_Exit(int) __attribute__((noreturn));
 
 /* misc functions */
 extern char		*realpath(const char *path, char *resolved);
