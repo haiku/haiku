@@ -373,6 +373,11 @@ actions BootstrapRepositoryFetchPackage1
 			--all-dependencies $(HAIKU_PORTER_EXTRA_OPTIONS) \
 			--cross-devel-package "$haikuCrossDevelPackage" $portSpec
 	fi
+
+	if [ ! -e "$package" ]; then
+		echo "Supposedly built package $package does not exist; version mismatch?"
+		exit 1
+	fi
 }
 
 
