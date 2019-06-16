@@ -38,7 +38,7 @@ Application Terminal :
 	TitlePlaceholderMapper.cpp
 	VTKeyTbl.c
 	VTPrsTbl.c
-	: be localestub tracker textencoding
+	: be localestub shared tracker translation textencoding
 	[ TargetLibsupc++ ] [ TargetLibstdc++ ]
 	: Terminal.rdef XColors.rdef
 ;

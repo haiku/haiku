@@ -13,6 +13,7 @@
 #include <TabView.h>
 
 
+class BButton;
 class BPopUpMenu;
 class BScrollView;
 
@@ -64,6 +65,7 @@ private:
 			BRect				fInsets;
 			BScrollView*		fScrollView;
 			Listener*			fListener;
+			BButton*			fFullScreenButton;
 };
 
 

@@ -19,6 +19,8 @@
 
 #include <stdio.h>
 
+#include <BitmapButton.h>
+#include <Button.h>
 #include <Catalog.h>
 #include <Locale.h>
 #include <Message.h>
@@ -26,6 +28,9 @@
 #include <Screen.h>
 #include <ScrollView.h>
 #include <Window.h>
+
+#include "TermConst.h"
+#include "WindowIcon.h"
 
 
 // #pragma mark - SmartTabView
@@ -45,6 +50,18 @@ SmartTabView::SmartTabView(BRect frame, const char* name, button_width width,
 	frame.OffsetTo(B_ORIGIN);
 	ContainerView()->MoveTo(frame.LeftTop());
 	ContainerView()->ResizeTo(frame.Width(), frame.Height());
+
+	BRect buttonRect(frame);
+	buttonRect.left = frame.right - B_V_SCROLL_BAR_WIDTH + 1;
+	buttonRect.bottom = frame.top + TabHeight() - 1;
+	fFullScreenButton = new BBitmapButton(kWindowIconBits, kWindowIconWidth,
+		kWindowIconHeight, kWindowIconFormat, new BMessage(FULLSCREEN));
+	fFullScreenButton->SetResizingMode(B_FOLLOW_TOP | B_FOLLOW_RIGHT);
+	fFullScreenButton->MoveTo(buttonRect.LeftTop());
+	fFullScreenButton->ResizeTo(buttonRect.Width(), buttonRect.Height());
+	fFullScreenButton->Hide();
+
+	AddChild(fFullScreenButton);
 }
 
 
@@ -143,6 +160,7 @@ SmartTabView::AddTab(BView* target, BTab* tab)
 		// to tabbed mode
 		ContainerView()->ResizeBy(0, -TabHeight());
 		ContainerView()->MoveBy(0, TabHeight());
+		fFullScreenButton->Show();
 
 		// Make sure the content size stays the same, but take special care
 		// of full screen mode
@@ -202,6 +220,7 @@ SmartTabView::RemoveTab(int32 index)
 
 		ContainerView()->MoveBy(0, -TabHeight());
 		ContainerView()->ResizeBy(0, TabHeight());
+		fFullScreenButton->Hide();
 	}
 
 	return BTabView::RemoveTab(index);

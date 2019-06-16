@@ -1826,16 +1826,6 @@ TermWindow::_UpdateSessionTitle(int32 index)
 		fTitle.title = windowTitle;
 		SetTitle(fTitle.title);
 	}
-
-	// If fullscreen, add a tooltip with the title and a keyboard shortcut hint
-	if (fFullScreen) {
-		BString toolTip(fTitle.title);
-		toolTip += "\n(";
-		toolTip += B_TRANSLATE("Full screen");
-		toolTip += " (ALT " UTF8_ENTER "))";
-		termView->SetToolTip(toolTip.String());
-	} else
-		termView->SetToolTip((const char *)NULL);
 }
 
 
