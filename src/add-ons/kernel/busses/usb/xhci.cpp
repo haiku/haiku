@@ -1132,7 +1132,7 @@ XHCI::CreateDescriptor(uint32 trbCount, uint32 bufferCount, size_t bufferSize)
 	result->trb_left = 0;
 	result->next = NULL;
 
-	TRACE("CreateDescriptor allocated %p, buffer_size %ld, buffer_count %ld\n",
+	TRACE("CreateDescriptor allocated %p, buffer_size %ld, buffer_count %" B_PRIu32 "\n",
 		result, result->buffer_size, result->buffer_count);
 
 	return result;
