@@ -2562,7 +2562,9 @@ XHCI::SetTRDequeue(uint64 dequeue, uint16 stream, uint8 endpoint, uint8 slot)
 {
 	TRACE("Set TR Dequeue\n");
 	xhci_trb trb;
-	trb.address = dequeue;
+	trb.address = dequeue | ENDPOINT_2_DCS_BIT;
+		// The DCS bit is copied from the address field as in ConfigureEndpoint.
+		// (XHCI 1.1 § 4.6.10 p142.)
 	trb.status = TRB_2_STREAM(stream);
 	trb.flags = TRB_3_TYPE(TRB_TYPE_SET_TR_DEQUEUE)
 		| TRB_3_SLOT(slot) | TRB_3_ENDPOINT(endpoint);
