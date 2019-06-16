@@ -761,9 +761,11 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 	descriptor->trbs[index].status = TRB_2_IRQ(0);
 	descriptor->trbs[index].flags = TRB_3_TYPE(TRB_TYPE_STATUS_STAGE)
 			| ((directionIn && requestData->Length > 0) ? 0 : TRB_3_DIR_IN)
-			| TRB_3_IOC_BIT | TRB_3_CYCLE_BIT;
-		// Status Stage is an OUT transfer when the device is sending data.
-		// (XHCI 1.1 § 4.11.2.2 Table 4-6 p205.)
+			| TRB_3_CHAIN_BIT | TRB_3_CYCLE_BIT;
+		// Status Stage is an OUT transfer when the device is sending data
+		// (XHCI 1.2 § 4.11.2.2 Table 4-7 p213), and the CHAIN bit must be
+		// set when using an Event Data TRB (as _LinkDescriptorForPipe does)
+		// (XHCI 1.2 § 6.4.1.2.3 Table 6-31 p472)
 
 	descriptor->trb_used = index + 1;
 
@@ -831,16 +833,12 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 		remainingPackets -= packetsPerTrb;
 	}
 
-	// Set the IOC (Interrupt On Completion) bit so that we will get an event
-	// and interrupt for this TRB as the transfer will be finished.
-	// (XHCI 1.1 § 6.4.1.1 Table 6-22 p443.)
-	td->trbs[td->trb_used - 1].flags |= TRB_3_IOC_BIT;
-
 	// Set the ENT (Evaluate Next TRB) bit, so that the HC will not switch
 	// contexts before evaluating the Link TRB that _LinkDescriptorForPipe
 	// will insert, as otherwise there would be a race between us freeing
-	// and unlinking the descriptor, and the HC evaluating the Link TRB
-	// and thus getting back onto the main ring.
+	// and unlinking the descriptor, and the controller evaluating the Link TRB
+	// and thus getting back onto the main ring and executing the Event Data
+	// TRB that generates the interrupt for this transfer.
 	//
 	// Note that we *do not* unset the CHAIN bit in this TRB, thus including
 	// the Link TRB in this TD formally, which is required when using the
@@ -893,7 +891,7 @@ XHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 
 	if (StopEndpoint(false, endpoint->id + 1, endpoint->device->slot) == B_OK) {
 		// Clear the endpoint's TRBs.
-		memset(endpoint->trbs, 0, sizeof(xhci_trb) * XHCI_MAX_TRANSFERS);
+		memset(endpoint->trbs, 0, sizeof(xhci_trb) * XHCI_ENDPOINT_RING_SIZE);
 		endpoint->used = 0;
 		endpoint->current = 0;
 
@@ -1366,7 +1364,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 
 	device->trb_area = fStack->AllocateArea((void **)&device->trbs,
 		&device->trb_addr, sizeof(xhci_trb) * (XHCI_MAX_ENDPOINTS - 1)
-			* XHCI_MAX_TRANSFERS, "XHCI endpoint trbs");
+			* XHCI_ENDPOINT_RING_SIZE, "XHCI endpoint trbs");
 	if (device->trb_area < B_OK) {
 		TRACE_ERROR("unable to create a device trbs area\n");
 		delete_area(device->input_ctx_area);
@@ -1627,11 +1625,11 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 		device->endpoints[id].current = 0;
 
 		device->endpoints[id].trbs = device->trbs
-			+ id * XHCI_MAX_TRANSFERS;
+			+ id * XHCI_ENDPOINT_RING_SIZE;
 		device->endpoints[id].trb_addr = device->trb_addr
-			+ id * XHCI_MAX_TRANSFERS * sizeof(xhci_trb);
+			+ id * XHCI_ENDPOINT_RING_SIZE * sizeof(xhci_trb);
 		memset(device->endpoints[id].trbs, 0,
-			sizeof(xhci_trb) * XHCI_MAX_TRANSFERS);
+			sizeof(xhci_trb) * XHCI_ENDPOINT_RING_SIZE);
 
 		TRACE("_InsertEndpointForPipe trbs device %p endpoint %p\n",
 			device->trbs, device->endpoints[id].trbs);
@@ -1739,11 +1737,9 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 	if (mutex_trylock(&endpoint->lock) != B_OK)
 		mutex_lock(&endpoint->lock);
 
-	// We will be modifying 2 TRBs as part of linking a new descriptor:
-	// the "current" TRB (which will link to the passed descriptor), and
-	// the "next" (current + 1) TRB (which will be zeroed, as we have
-	// likely used it before.) Hence the "+ 1" in this check.
-	if ((endpoint->used + 1) >= XHCI_MAX_TRANSFERS) {
+	// "used" refers to the number of currently linked TDs, not the number of
+	// used TRBs on the ring (we use 2 TRBs on the ring per transfer.)
+	if (endpoint->used >= (XHCI_MAX_TRANSFERS - 1)) {
 		TRACE_ERROR("_LinkDescriptorForPipe max transfers count exceeded\n");
 		mutex_unlock(&endpoint->lock);
 		return B_BAD_VALUE;
@@ -1753,17 +1749,18 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 	descriptor->next = endpoint->td_head;
 	endpoint->td_head = descriptor;
 
-	uint8 current = endpoint->current;
-	uint8 next = (current + 1) % (XHCI_MAX_TRANSFERS);
+	const uint8 current = endpoint->current,
+		eventdata = current + 1;
+	uint8 next = eventdata + 1;
 
 	TRACE("_LinkDescriptorForPipe current %d, next %d\n", current, next);
 
-	// Compute next link.
-	addr_t addr = endpoint->trb_addr + next * sizeof(xhci_trb);
+	// Compute link.
+	addr_t addr = endpoint->trb_addr + eventdata * sizeof(xhci_trb);
 	descriptor->trbs[descriptor->trb_used].address = addr;
 	descriptor->trbs[descriptor->trb_used].status = TRB_2_IRQ(0);
 	descriptor->trbs[descriptor->trb_used].flags = TRB_3_TYPE(TRB_TYPE_LINK)
-		| TRB_3_CYCLE_BIT;
+		| TRB_3_CHAIN_BIT | TRB_3_CYCLE_BIT;
 
 #if !B_HOST_IS_LENDIAN
 	// Convert endianness.
@@ -1778,16 +1775,51 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 #endif
 
 	// Link the descriptor.
-	endpoint->trbs[next].address = 0;
-	endpoint->trbs[next].status = 0;
-	endpoint->trbs[next].flags = 0;
-
 	endpoint->trbs[current].address =
 		B_HOST_TO_LENDIAN_INT64(descriptor->trb_addr);
 	endpoint->trbs[current].status =
 		B_HOST_TO_LENDIAN_INT32(TRB_2_IRQ(0));
 	endpoint->trbs[current].flags =
 		B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_LINK));
+
+	// Set up the Event Data TRB (XHCI 1.2 § 4.11.5.2 p230.)
+	//
+	// We do this on the main ring for two reasons: first, to avoid a small
+	// potential race between the interrupt and the controller evaluating
+	// the link TRB to get back onto the ring; and second, because many
+	// controllers throw errors if the target of a Link TRB is not valid
+	// (i.e. does not have its Cycle Bit set.)
+	//
+	// We also set the "address" field, which the controller will copy
+	// verbatim into the TRB it posts to the event ring, to be the last
+	// "real" TRB in the TD; this will allow us to determine what transfer
+	// the resulting Transfer Event TRB refers to.
+	endpoint->trbs[eventdata].address =
+		B_HOST_TO_LENDIAN_INT64(descriptor->trb_addr
+			+ (descriptor->trb_used - 1) * sizeof(xhci_trb));
+	endpoint->trbs[eventdata].status =
+		B_HOST_TO_LENDIAN_INT32(TRB_2_IRQ(0));
+	endpoint->trbs[eventdata].flags =
+		B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_EVENT_DATA)
+			| TRB_3_IOC_BIT | TRB_3_CYCLE_BIT);
+
+	if (next == (XHCI_ENDPOINT_RING_SIZE - 1)) {
+		// We always use 2 TRBs per _Link..() call, so if "next" is the last
+		// TRB in the ring, we need to generate a link TRB at "next", and
+		// then wrap it to 0.
+		endpoint->trbs[next].address =
+			B_HOST_TO_LENDIAN_INT64(endpoint->trb_addr);
+		endpoint->trbs[next].status =
+			B_HOST_TO_LENDIAN_INT32(TRB_2_IRQ(0));
+		endpoint->trbs[next].flags =
+			B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_LINK) | TRB_3_CYCLE_BIT);
+
+		next = 0;
+	}
+
+	endpoint->trbs[next].address = 0;
+	endpoint->trbs[next].status = 0;
+	endpoint->trbs[next].flags = 0;
 
 	// Everything is ready, so write the cycle bit.
 	endpoint->trbs[current].flags |= B_HOST_TO_LENDIAN_INT32(TRB_3_CYCLE_BIT);
@@ -2300,18 +2332,14 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 {
 	TRACE("HandleTransferComplete trb %p\n", trb);
 
-	uint8 endpointNumber
-		= TRB_3_ENDPOINT_GET(B_LENDIAN_TO_HOST_INT32(trb->flags));
-	uint8 slot = TRB_3_SLOT_GET(B_LENDIAN_TO_HOST_INT32(trb->flags));
-	uint8 type = TRB_3_TYPE_GET(B_LENDIAN_TO_HOST_INT32(trb->flags));
+	const uint32 flags = B_LENDIAN_TO_HOST_INT32(trb->flags);
+	const uint8 endpointNumber = TRB_3_ENDPOINT_GET(flags),
+		slot = TRB_3_SLOT_GET(flags);
 
 	if (slot > fSlotCount)
 		TRACE_ERROR("invalid slot\n");
-	if (endpointNumber == 0 || endpointNumber >= XHCI_MAX_ENDPOINTS)
+	if (endpointNumber == 0 || endpointNumber >= XHCI_MAX_ENDPOINTS) {
 		TRACE_ERROR("invalid endpoint\n");
-	if (type == TRB_TYPE_EVENT_DATA) {
-		// TODO: Implement these. (Do we trigger any at present?)
-		TRACE_ERROR("event data TRBs are not handled yet!\n");
 		return;
 	}
 
@@ -2332,10 +2360,22 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 		return;
 	}
 
-	addr_t source = trb->address;
-	uint8 completionCode = TRB_2_COMP_CODE_GET(trb->status);
-	uint32 remainder = TRB_2_REM_GET(trb->status);
+	// In the case of an Event Data TRB, the "transferred" field refers
+	// to the actual number of bytes transferred across the whole TD.
+	// (XHCI 1.2 § 6.4.2.1 Table 6-38 p478.)
+	const uint8 completionCode = TRB_2_COMP_CODE_GET(trb->status);
+	int32 transferred = TRB_2_REM_GET(trb->status), remainder = -1;
 
+	TRACE("HandleTransferComplete: ed %d, code %d, transferred %d\n",
+		  (flags & TRB_3_EVENT_DATA_BIT), completionCode, transferred);
+
+	if ((flags & TRB_3_EVENT_DATA_BIT) == 0) {
+		TRACE_ALWAYS("got an interrupt for a non-Event Data TRB!\n");
+		remainder = transferred;
+		transferred = -1;
+	}
+
+	const phys_addr_t source = B_LENDIAN_TO_HOST_INT64(trb->address);
 	for (xhci_td *td = endpoint->td_head; td != NULL; td = td->next) {
 		int64 offset = (source - td->trb_addr) / sizeof(xhci_trb);
 		if (offset < 0 || offset >= td->trb_count)
@@ -2345,15 +2385,18 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 			td, offset);
 
 		// The TRB at offset trb_used will be the link TRB, which we do not
-		// care about (and should not generate an interrupt at all.)
-		// We really care about the properly last TRB, at index "count - 1".
-		// Additionally, if we have an unsuccessful completion code, the transfer
+		// care about (and should not generate an interrupt at all.) We really
+		// care about the properly last TRB, at index "count - 1", which the
+		// Event Data TRB that _LinkDescriptorForPipe creates points to.
+		//
+		// But if we have an unsuccessful completion code, the transfer
 		// likely failed midway; so just accept it anyway.
 		if (offset == (td->trb_used - 1) || completionCode != COMP_SUCCESS) {
 			_UnlinkDescriptorForPipe(td, endpoint);
 			endpointLocker.Unlock();
 
 			td->trb_completion_code = completionCode;
+			td->td_transferred = transferred;
 			td->trb_left = remainder;
 
 			// add descriptor to finished list
@@ -2366,7 +2409,7 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 			release_sem_etc(fFinishTransfersSem, 1, B_DO_NOT_RESCHEDULE);
 			TRACE("HandleTransferComplete td %p done\n", td);
 		} else {
-			TRACE_ERROR("successful TRB %" B_PRIxADDR " was found, but it wasn't "
+			TRACE_ERROR("successful TRB 0x%" B_PRIxADDR " was found, but it wasn't "
 				"the last in the TD!\n", source);
 		}
 		return;
@@ -2730,13 +2773,15 @@ XHCI::FinishTransfers()
 					break;
 			}
 
-			size_t actualLength = 0;
+			size_t actualLength = transfer->DataLength();
+			if (td->trb_completion_code != COMP_SUCCESS) {
+				actualLength = td->td_transferred;
+				if (td->td_transferred == -1)
+					actualLength = transfer->DataLength() - td->trb_left;
+				TRACE("transfer not successful, actualLength=%" B_PRIuSIZE "\n",
+					actualLength);
+			}
 			if (callbackStatus == B_OK) {
-				actualLength = transfer->DataLength();
-
-				if (td->trb_completion_code == COMP_SHORT_PACKET)
-					actualLength -= td->trb_left;
-
 				if (directionIn && actualLength > 0) {
 					TRACE("copying in iov count %ld\n", transfer->VectorCount());
 					transfer->PrepareKernelAccess();

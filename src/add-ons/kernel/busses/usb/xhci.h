@@ -33,6 +33,8 @@ enum xhci_state {
 	XHCI_STATE_CONFIGURED,
 };
 
+#define XHCI_ENDPOINT_RING_SIZE	(XHCI_MAX_TRANSFERS * 2 + 1)
+
 
 typedef struct xhci_td {
 	xhci_trb*	trbs;
@@ -47,7 +49,8 @@ typedef struct xhci_td {
 
 	Transfer*	transfer;
 	uint8		trb_completion_code;
-	uint32		trb_left;
+	int32		td_transferred;
+	int32		trb_left;
 
 	xhci_td*	next;
 } xhci_td;
@@ -63,7 +66,7 @@ typedef struct xhci_endpoint {
 	uint8			used;
 	uint8			current;
 
-	xhci_trb*		trbs; // [XHCI_MAX_TRANSFERS]
+	xhci_trb*		trbs; // [XHCI_ENDPOINT_RING_SIZE]
 	phys_addr_t 	trb_addr;
 } xhci_endpoint;
 
@@ -74,7 +77,7 @@ typedef struct xhci_device {
 	enum xhci_state state;
 	area_id trb_area;
 	phys_addr_t trb_addr;
-	struct xhci_trb *trbs; // [XHCI_MAX_ENDPOINTS - 1][XHCI_MAX_TRANSFERS]
+	struct xhci_trb *trbs; // [XHCI_MAX_ENDPOINTS - 1][XHCI_ENDPOINT_RING_SIZE]
 
 	area_id input_ctx_area;
 	phys_addr_t input_ctx_addr;

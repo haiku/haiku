@@ -272,6 +272,7 @@
 #define TRB_3_TC_BIT				(1U << 1)
 #define TRB_3_ENT_BIT				(1U << 1)
 #define TRB_3_ISP_BIT				(1U << 2)
+#define TRB_3_EVENT_DATA_BIT		(1U << 2)
 #define TRB_3_NSNOOP_BIT			(1U << 3)
 #define TRB_3_CHAIN_BIT				(1U << 4)
 #define TRB_3_IOC_BIT				(1U << 5)
