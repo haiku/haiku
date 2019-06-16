@@ -29,6 +29,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			AboutMenuItem.cpp
 			ArgumentVector.cpp
 			AttributeUtilities.cpp
+			BitmapButton.cpp
 			CalendarView.cpp
 			ColorQuantizer.cpp
 			CommandPipe.cpp

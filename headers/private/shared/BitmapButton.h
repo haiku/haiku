@@ -6,26 +6,29 @@
 #define BITMAP_BUTTON_H
 
 #include <Button.h>
+#include <Size.h>
 
 
 class BBitmap;
 
 
-class BitmapButton : public BButton {
+namespace BPrivate {
+
+class BBitmapButton : public BButton {
 public:
 	enum {
 		BUTTON_BACKGROUND = 0,
 		MENUBAR_BACKGROUND,
 	};
 
-								BitmapButton(const char* resourceName,
+								BBitmapButton(const char* resourceName,
 									BMessage* message);
 
-								BitmapButton(const uint8* bits, uint32 width,
+								BBitmapButton(const uint8* bits, uint32 width,
 									uint32 height, color_space format,
 									BMessage* message);
 
-	virtual						~BitmapButton();
+	virtual						~BBitmapButton();
 
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
@@ -39,6 +42,10 @@ private:
 			BBitmap*			fBitmap;
 			uint32				fBackgroundMode;
 };
+
+};
+
+using BPrivate::BBitmapButton;
 
 
 #endif // BITMAP_BUTTON_H

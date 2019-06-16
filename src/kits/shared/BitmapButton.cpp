@@ -15,7 +15,7 @@
 static const float kFrameInset = 2;
 
 
-BitmapButton::BitmapButton(const char* resourceName, BMessage* message)
+BBitmapButton::BBitmapButton(const char* resourceName, BMessage* message)
 	:
 	BButton("", message),
 	fBitmap(BTranslationUtils::GetBitmap(resourceName)),
@@ -24,7 +24,7 @@ BitmapButton::BitmapButton(const char* resourceName, BMessage* message)
 }
 
 
-BitmapButton::BitmapButton(const uint8* bits, uint32 width, uint32 height,
+BBitmapButton::BBitmapButton(const uint8* bits, uint32 width, uint32 height,
 		color_space format, BMessage* message)
 	:
 	BButton("", message),
@@ -35,14 +35,14 @@ BitmapButton::BitmapButton(const uint8* bits, uint32 width, uint32 height,
 }
 
 
-BitmapButton::~BitmapButton()
+BBitmapButton::~BBitmapButton()
 {
 	delete fBitmap;
 }
 
 
 BSize
-BitmapButton::MinSize()
+BBitmapButton::MinSize()
 {
 	BSize min(0, 0);
 	if (fBitmap) {
@@ -56,21 +56,21 @@ BitmapButton::MinSize()
 
 
 BSize
-BitmapButton::MaxSize()
+BBitmapButton::MaxSize()
 {
 	return BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED);
 }
 
 
 BSize
-BitmapButton::PreferredSize()
+BBitmapButton::PreferredSize()
 {
 	return MinSize();
 }
 
 
 void
-BitmapButton::Draw(BRect updateRect)
+BBitmapButton::Draw(BRect updateRect)
 {
 	BRect bounds(Bounds());
 	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
@@ -109,7 +109,7 @@ BitmapButton::Draw(BRect updateRect)
 
 
 void
-BitmapButton::SetBackgroundMode(uint32 mode)
+BBitmapButton::SetBackgroundMode(uint32 mode)
 {
 	if (fBackgroundMode != mode) {
 		fBackgroundMode = mode;

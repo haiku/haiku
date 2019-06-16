@@ -605,10 +605,10 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 		)
 	;
 
-	BitmapButton* toggleFullscreenButton = new BitmapButton(kWindowIconBits,
+	BBitmapButton* toggleFullscreenButton = new BBitmapButton(kWindowIconBits,
 		kWindowIconWidth, kWindowIconHeight, kWindowIconFormat,
 		new BMessage(TOGGLE_FULLSCREEN));
-	toggleFullscreenButton->SetBackgroundMode(BitmapButton::MENUBAR_BACKGROUND);
+	toggleFullscreenButton->SetBackgroundMode(BBitmapButton::MENUBAR_BACKGROUND);
 
 	BGroupLayout* menuBarGroup = BLayoutBuilder::Group<>(B_HORIZONTAL, 0.0)
 		.Add(mainMenu)

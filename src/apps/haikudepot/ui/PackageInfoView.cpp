@@ -36,7 +36,6 @@
 #include <package/hpkg/PackageContentHandler.h>
 #include <package/hpkg/PackageEntry.h>
 
-#include "BitmapButton.h"
 #include "BitmapView.h"
 #include "LinkView.h"
 #include "LinkedBitmapView.h"
