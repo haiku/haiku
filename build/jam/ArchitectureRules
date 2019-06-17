@@ -54,13 +54,6 @@ rule ArchitectureSetup architecture
 	}
 	ccBaseFlags += $(archFlags) ;
 
-	if $(cpu) = arm {
-		if $(HAIKU_CC_IS_CLANG_$(architecture)) != 1 {
-			# For stackcrawls - not supported by Clang
-			ccBaseFlags += -mapcs-frame ;
-		}
-	}
-
 	# activating graphite optimizations
 	if $(HAIKU_USE_GCC_GRAPHITE_$(architecture)) = 1 {
 		ccBaseFlags += -floop-interchange -ftree-loop-distribution
