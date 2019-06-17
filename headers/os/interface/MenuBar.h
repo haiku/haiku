@@ -79,6 +79,11 @@ public:
 
 	virtual status_t			Perform(perform_code code, void* data);
 
+protected:
+			void				StartMenuBar(int32 menuIndex,
+									bool sticky = true, bool showMenu = false,
+									BRect* special_rect = NULL);
+
 private:
 	friend class BWindow;
 	friend class BMenuField;
@@ -90,12 +95,6 @@ private:
 	virtual	void				_ReservedMenuBar4();
 
 			BMenuBar			&operator=(const BMenuBar &);
-
-	// TODO: Tracker uses this function so we can't change
-	// its signature without breaking it
-			void				StartMenuBar(int32 menuIndex,
-									bool sticky = true, bool showMenu = false,
-									BRect* special_rect = NULL);
 
 	static	int32				_TrackTask(void *arg);
 			BMenuItem*			_Track(int32 *action, int32 startIndex = -1,
