@@ -29,7 +29,7 @@ Token::Token()
 	:
 	string(""),
 	type(TOKEN_NONE),
-	value(0L),
+	value(),
 	position(0)
 {
 }
