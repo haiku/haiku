@@ -2409,12 +2409,12 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 			release_sem_etc(fFinishTransfersSem, 1, B_DO_NOT_RESCHEDULE);
 			TRACE("HandleTransferComplete td %p done\n", td);
 		} else {
-			TRACE_ERROR("successful TRB 0x%" B_PRIxADDR " was found, but it wasn't "
+			TRACE_ERROR("successful TRB 0x%" B_PRIxPHYSADDR " was found, but it wasn't "
 				"the last in the TD!\n", source);
 		}
 		return;
 	}
-	TRACE_ERROR("TRB 0x%" B_PRIxADDR " was not found in the endpoint!\n", source);
+	TRACE_ERROR("TRB 0x%" B_PRIxPHYSADDR " was not found in the endpoint!\n", source);
 }
 
 
