@@ -62,7 +62,7 @@ rule ArchitectureSetup architecture
 
 	# initial state for flags etc.
 	HAIKU_C++_$(architecture) ?= $(HAIKU_CC_$(architecture)) ;
-	HAIKU_LINK_$(architecture) = $(HAIKU_CC_$(architecture)) ;
+	HAIKU_LINK_$(architecture) ?= $(HAIKU_CC_$(architecture)) ;
 
 	HAIKU_CCFLAGS_$(architecture) += $(ccBaseFlags) -nostdinc ;
 	HAIKU_C++FLAGS_$(architecture) += $(ccBaseFlags) -nostdinc ;
