@@ -16,11 +16,11 @@
 
 #if defined(__HAIKU_LITTLE_ENDIAN)
 #	define LITTLE_ENDIAN	1234
-#	define BIG_ENDIAN		0
+#	define BIG_ENDIAN		4321
 #	define BYTE_ORDER		LITTLE_ENDIAN
 #elif defined(__HAIKU_BIG_ENDIAN)
 #	define BIG_ENDIAN		4321
-#	define LITTLE_ENDIAN	0
+#	define LITTLE_ENDIAN	1234
 #	define BYTE_ORDER		BIG_ENDIAN
 #endif
 
