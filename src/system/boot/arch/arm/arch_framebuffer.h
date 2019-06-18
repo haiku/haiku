@@ -48,7 +48,7 @@ public:
 
 protected:
 			addr_t			fBase;
-			addr_t			fPhysicalBase;
+			phys_addr_t		fPhysicalBase;
 			size_t			fSize;
 			int				fCurrentWidth;
 			int				fCurrentHeight;
