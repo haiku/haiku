@@ -247,7 +247,7 @@ rule KernelArchitectureSetup architecture
 			HAIKU_KERNEL_PLATFORM ?= u-boot ;
 			HAIKU_BOOT_TARGETS += u-boot ;
 
-			HAIKU_BOOT_SDIMAGE_SIZE ?= 128 ;
+			HAIKU_BOOT_SDIMAGE_SIZE ?= 32 ;
 			# SOC's like allwinner need an offset to skip the hardcoded initial loader
 			HAIKU_BOOT_SDIMAGE_BEGIN = 40950 ; # 512-byte sectors (divisible by 63)
 
@@ -260,8 +260,8 @@ rule KernelArchitectureSetup architecture
 			# We only need to fill in the FDT dtb
 			HAIKU_MMC_UBOOT_SCRIPT = "\
 			    test -e mmc 0 uEnv.txt && fatload mmc 0 ${scriptaddr} uEnv.txt && env import -t ${scriptaddr} ${filesize} \
-			    fatload mmc 0 ${kernel_addr_r} haiku_loader.u-boot \
-			    fatload mmc 0 ${ramdisk_addr_r} haiku-floppyboot.tgz.u-boot \
+			    fatload mmc 0 ${kernel_addr_r} haiku_loader.ub \
+			    fatload mmc 0 ${ramdisk_addr_r} haiku_floppyboot.ub \
 			    fatload mmc 0 ${fdt_addr_r} ${dtb} \
 			    fdt addr ${fdt_addr_r} \
 			    bootm ${kernel_addr_r} ${ramdisk_addr_r} ${fdt_addr_r}" ;
@@ -269,7 +269,7 @@ rule KernelArchitectureSetup architecture
 		case arm64 :
 			HAIKU_KERNEL_PLATFORM ?= efi ;
 
-			HAIKU_BOOT_SDIMAGE_SIZE ?= 128 ;
+			HAIKU_BOOT_SDIMAGE_SIZE ?= 32 ;
 			# SOC's like allwinner need an offset to skip the hardcoded initial loader
 			HAIKU_BOOT_SDIMAGE_BEGIN = 40950 ; # 512-byte sectors (divisible by 63)
 
