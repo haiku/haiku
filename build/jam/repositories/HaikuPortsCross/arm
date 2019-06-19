@@ -23,6 +23,7 @@ BootstrapPackageRepository HaikuPortsCross
 	flex_bootstrap-2.5.35-1
 	freetype_bootstrap-2.6.3-1
 	freetype_bootstrap_devel-2.6.3-1
+	gawk_bootstrap-3.1.8-2
 	grep_bootstrap-2.14-1
 	icu_bootstrap-57.1-2
 	icu_bootstrap_devel-57.1-2
@@ -53,6 +54,7 @@ BootstrapPackageRepository HaikuPortsCross
 	flex_bootstrap
 	freetype_bootstrap
 	mawk_bootstrap
+	gawk_bootstrap
 	gcc_bootstrap
 	grep_bootstrap
 	less_bootstrap
