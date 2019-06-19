@@ -22,6 +22,8 @@ RemotePackageRepository HaikuPorts
 	icu_devel-57.1-2
 	libsolv-0.3.0_haiku_2014_12_22-1
 	libsolv_devel-0.3.0_haiku_2014_12_22-1
+	ncurses6-6.0-1
+	ncurses6_devel-6.0-1
 	zlib-1.2.8-4
 	zlib_devel-1.2.8-4
 	:
@@ -74,7 +76,7 @@ RemotePackageRepository HaikuPorts
 	mesa
 	mkdepend
 	nano
-	ncurses
+	ncurses6
 	neon
 	openssh
 	openssl
