@@ -21,7 +21,14 @@
 #define asm __asm__
 #endif
 
+#if defined(__i386__) || defined(__amd64__)
 #define nvme_wmb()	__asm__ volatile("sfence" ::: "memory")
+#elif defined(__ARM__)
+#define nvme_wmb()	__asm__ volatile("mcr p15, 0, %0, c7, c10, 5" :: "r" (0) : "memory")
+#else
+#warning Implement nvme memory barrier for arch!
+#define nvme_wmb()	__asm__ volatile("" ::: "memory")
+#endif
 
 
 typedef uint8 __u8;
