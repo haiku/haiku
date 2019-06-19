@@ -3,7 +3,8 @@ ENGINE=docker
 
 # Example mounting source code directory into container
 # (lets you "work on the code used to bootstrap" a bit easier)
-#EXTRA=-v $(HOME)/Code/haiku:/work/src/haiku
+SOURCES=$(HOME)/Code
+EXTRA=-v $(HOME)/haiku:/work/src/haiku -v $(HOME)/buildtools:/work/src/buildtools
 
 default:
 	${ENGINE} build . -t docker.io/haiku/bootstrap
