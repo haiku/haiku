@@ -43,10 +43,10 @@ actions BuildUBootSDImage1
     # populate
     $(CP) $(2[2-2]) haiku_loader.ub
     MTOOLSRC=$(1).mtools mcopy haiku_loader.ub i:
-	$(RM) haiku_loader.ub
+    $(RM) haiku_loader.ub
     $(CP) $(2[3-3]) haiku_floppyboot.ub
     MTOOLSRC=$(1).mtools mcopy haiku_floppyboot.ub i:
-	$(RM) haiku_floppyboot.ub
+    $(RM) haiku_floppyboot.ub
     MTOOLSRC=$(1).mtools mcopy $(2[4-]) i:
     MTOOLSRC=$(1).mtools mcopy uEnv.txt i:
     # populate fdts
