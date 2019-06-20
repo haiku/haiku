@@ -53,8 +53,10 @@ debug_uart_from_fdt(const void *fdt)
 	const void *prop;
 	DebugUART *uart = NULL;
 
-	if (fdt == NULL)
+	if (fdt == NULL) {
+		TRACE("%s: No FDT found!\n", __func__);
 		return NULL;
+	}
 
 	name = fdt_get_alias(fdt, "serial");
 	if (name == NULL)
@@ -64,42 +66,48 @@ debug_uart_from_fdt(const void *fdt)
 	if (name == NULL)
 		name = fdt_get_alias(fdt, "uart0");
 	// TODO: else use /chosen linux,stdout-path
-	if (name == NULL)
+	if (name == NULL) {
+		TRACE("%s: No known FDT UART alias found!\n", __func__);
 		return NULL;
+	}
 
 	node = fdt_path_offset(fdt, name);
 
-	if (node < 0)
+	if (node < 0) {
+		TRACE("%s: FDT node not found!\n", __func__);
 		return NULL;
+	}
 
 	// determine the MMIO address
 	regs = fdt_get_device_reg(fdt, node, false);
 
-	if (regs == 0)
+	if (regs == 0) {
+		TRACE("%s: FDT UART regs not found!\n", __func__);
 		return NULL;
+	}
 
-	TRACE(("serial: using '%s', node %d @ %" B_PRIxPHYSADDR "\n",
-		name, node, regs));
+	TRACE("serial: using '%s', node %d @ %" B_PRIxPHYSADDR "\n",
+		name, node, regs);
 
 	// get the UART clock rate
 	prop = fdt_getprop(fdt, node, "clock-frequency", &len);
 	if (prop && len == 4) {
 		clock = fdt32_to_cpu(*(uint32_t *)prop);
-		TRACE(("serial: clock %ld\n", clock));
+		TRACE("serial: clock %ld\n", clock);
 	}
 
 	// get current speed (XXX: not yet passed over)
 	prop = fdt_getprop(fdt, node, "current-speed", &len);
 	if (prop && len == 4) {
 		speed = fdt32_to_cpu(*(uint32_t *)prop);
-		TRACE(("serial: speed %ld\n", speed));
+		TRACE("serial: speed %ld\n", speed);
 	}
 
 	// fdt_node_check_compatible returns 0 on match.
 
 	if (fdt_node_check_compatible(fdt, node, "ns16550a") == 0
 		|| fdt_node_check_compatible(fdt, node, "ns16550") == 0) {
-		TRACE(("serial: Found 8250 serial UART!\n"));
+		TRACE("serial: Found 8250 serial UART!\n");
 		uart = arch_get_uart_8250(regs, clock);
 	#if defined(__arm__)
 	} else if (fdt_node_check_compatible(fdt, node, "ti,omap3-uart") == 0
@@ -109,11 +117,11 @@ debug_uart_from_fdt(const void *fdt)
 		|| fdt_node_check_compatible(fdt, node, "ti,am4372-uart") == 0
 		|| fdt_node_check_compatible(fdt, node, "ti,dra742-uart") == 0) {
 		// TODO: ti,am* and ti,dr* have some special quirks.
-		TRACE(("serial: Found omap 8250 serial UART!\n"));
+		TRACE("serial: Found omap 8250 serial UART!\n");
 		uart = arch_get_uart_8250_omap(regs, clock);
 	} else if (fdt_node_check_compatible(fdt, node, "arm,pl011") == 0
 		|| fdt_node_check_compatible(fdt, node, "arm,primecell") == 0) {
-		TRACE(("serial: Found pl011 serial UART!\n"));
+		TRACE("serial: Found pl011 serial UART!\n");
 		uart = arch_get_uart_pl011(regs, clock);
 	#endif
 	} else {
