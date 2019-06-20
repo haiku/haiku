@@ -8,27 +8,23 @@
 #ifndef __NVME_ARCH_H__
 #define __NVME_ARCH_H__
 
+
 #include <OS.h>
+#include <arch_vm.h>
+#include <arch_atomic.h>
 
 
 #define NVME_ARCH_64 __HAIKU_ARCH_64_BIT
 #define NVME_MMIO_64BIT NVME_ARCH_64
 #define PAGE_SIZE B_PAGE_SIZE
-#define PAGE_SHIFT (12) // FIXME: values for other arches
 
 
 #ifndef asm
 #define asm __asm__
 #endif
 
-#if defined(__i386__) || defined(__amd64__)
-#define nvme_wmb()	__asm__ volatile("sfence" ::: "memory")
-#elif defined(__ARM__)
-#define nvme_wmb()	__asm__ volatile("mcr p15, 0, %0, c7, c10, 5" :: "r" (0) : "memory")
-#else
-#warning Implement nvme memory barrier for arch!
-#define nvme_wmb()	__asm__ volatile("" ::: "memory")
-#endif
+
+#define nvme_wmb() memory_write_barrier()
 
 
 typedef uint8 __u8;
