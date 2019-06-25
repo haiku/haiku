@@ -290,7 +290,7 @@ InitDevice(DeviceInfo& di)
 		(void**)&di.regs);
 
 	if (si.regsArea < 0) {
-		TRACE("Unable to map MMIO, error: 0x%lx\n", si.regsArea);
+		TRACE("Unable to map MMIO, error: 0x%" B_PRIx32 "\n", si.regsArea);
 		return si.regsArea;
 	}
 
@@ -302,7 +302,7 @@ InitDevice(DeviceInfo& di)
 		B_READ_AREA | B_WRITE_AREA);
 
 	if (di.gttArea < B_OK) {
-		TRACE("Unable to create GTT, error: 0x%lx\n", di.gttArea);
+		TRACE("Unable to create GTT, error: 0x%" B_PRIx32 "\n", di.gttArea);
 		return B_NO_MEMORY;
 	}
 
@@ -314,7 +314,8 @@ InitDevice(DeviceInfo& di)
 	status_t status = get_memory_map((void *)(di.gttAddr),
 		B_PAGE_SIZE, &entry, 1);
 	if (status < B_OK) {
-		TRACE("Unable to get physical address of GTT, error: 0x%lx\n", status);
+		TRACE("Unable to get physical address of GTT, "
+			"error: 0x%" B_PRIx32 "\n", status);
 		return status;
 	}
 
@@ -328,7 +329,8 @@ InitDevice(DeviceInfo& di)
 		B_ANY_ADDRESS, si.videoMemSize, B_FULL_LOCK,
 		B_READ_AREA | B_WRITE_AREA);
 	if (si.videoMemArea < B_OK) {
-		TRACE("Unable to create video memory, error: 0x%lx\n", si.videoMemArea);
+		TRACE("Unable to create video memory, error: 0x%" B_PRIx32 "\n",
+			si.videoMemArea);
 		return B_NO_MEMORY;
 	}
 
@@ -340,7 +342,7 @@ InitDevice(DeviceInfo& di)
 			B_PAGE_SIZE, &entry, 1);
 		if (status < B_OK) {
 			TRACE("Unable to get physical address of video memory page, error:"
-				" 0x%lx  offset: %ld\n", status, offset);
+				" 0x%" B_PRIx32 "  offset: %" B_PRId32 "\n", status, offset);
 			return status;
 		}
 
@@ -428,7 +430,7 @@ init_hardware(void)
 
 	status_t status = get_module(B_PCI_MODULE_NAME, (module_info**)&gPCI);
 	if (status != B_OK) {
-		TRACE("PCI module unavailable, error 0x%lx\n", status);
+		TRACE("PCI module unavailable, error 0x%" B_PRIx32 "\n", status);
 		return status;
 	}
 
@@ -454,7 +456,7 @@ init_driver(void)
 
 	status_t status = get_module(B_PCI_MODULE_NAME, (module_info**)&gPCI);
 	if (status != B_OK) {
-		TRACE("PCI module unavailable, error 0x%lx\n", status);
+		TRACE("PCI module unavailable, error 0x%" B_PRIx32 "\n", status);
 		return status;
 	}
 
@@ -496,7 +498,7 @@ init_driver(void)
 
 	gDeviceNames[count] = NULL;	// terminate list with null pointer
 
-	TRACE("init_driver() %ld supported devices\n", count);
+	TRACE("init_driver() %" B_PRIu32 " supported devices\n", count);
 
 	return B_OK;
 }
@@ -571,8 +573,8 @@ device_open(const char* name, uint32 /*flags*/, void** cookie)
 		*cookie = &di;		// send cookie to opener
 	}
 
-	TRACE("device_open() returning 0x%lx,  open count: %ld\n", status,
-		di.openCount);
+	TRACE("device_open() returning 0x%" B_PRIx32 ",  "
+		"open count: %" B_PRId32 "\n", status, di.openCount);
 	return status;
 }
 
@@ -634,7 +636,7 @@ device_free(void* dev)
 
 	gLock.Release();	// unlock driver
 
-	TRACE("exit device_free() openCount: %ld\n", di.openCount);
+	TRACE("exit device_free() openCount: %" B_PRId32 "\n", di.openCount);
 	return B_OK;
 }
 
@@ -644,7 +646,7 @@ device_ioctl(void* dev, uint32 msg, void* buffer, size_t bufferLength)
 {
 	DeviceInfo& di = *((DeviceInfo*)dev);
 
-	TRACE("device_ioctl(); ioctl: %lu, buffer: 0x%" B_PRIXADDR ", "
+	TRACE("device_ioctl(); ioctl: %" B_PRIu32 ", buffer: 0x%" B_PRIXADDR ", "
 		"bufLen: %lu\n", msg, (addr_t)buffer, bufferLength);
 
 	switch (msg) {
