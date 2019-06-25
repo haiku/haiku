@@ -471,10 +471,10 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 	bool ignoreOldFD = false;
 	bool ignoreNewFD = false;
 
-	if (oldFD == AT_FDCWD || oldPath != NULL && oldPath[0] == '/')
+	if (oldFD == AT_FDCWD || (oldPath != NULL && oldPath[0] == '/'))
 		ignoreOldFD = true;
 
-	if (newFD == AT_FDCWD || newPath != NULL && newPath[0] == '/')
+	if (newFD == AT_FDCWD || (newPath != NULL && newPath[0] == '/'))
 		ignoreNewFD = true;
 
 	if (ignoreOldFD && ignoreNewFD) {
