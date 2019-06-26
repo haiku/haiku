@@ -463,14 +463,22 @@ rule KernelArchitectureSetup architecture
 			case efi :
 				# efi bootloader is PIC
 				HAIKU_BOOT_$(bootTarget:U)_CCFLAGS += -fpic -fno-stack-protector
-					-fPIC -fshort-wchar -Wno-error=unused-variable -Wno-error=main
-					-mno-red-zone ;
+					-fPIC -fshort-wchar -Wno-error=unused-variable -Wno-error=main ;
 				HAIKU_BOOT_$(bootTarget:U)_C++FLAGS += -fpic -fno-stack-protector
-					-fPIC -fshort-wchar -Wno-error=unused-variable -Wno-error=main
-					-mno-red-zone ;
-				if $(HAIKU_CC_IS_CLANG_$(architecture)) != 1 {
-					HAIKU_BOOT_$(bootTarget:U)_CCFLAGS += -maccumulate-outgoing-args ;
-					HAIKU_BOOT_$(bootTarget:U)_C++FLAGS += -maccumulate-outgoing-args ;
+					-fPIC -fshort-wchar -Wno-error=unused-variable -Wno-error=main ;
+				switch $(cpu) {
+					case x86 :
+						if $(HAIKU_CC_IS_CLANG_$(architecture)) != 1 {
+							HAIKU_BOOT_$(bootTarget:U)_CCFLAGS += -maccumulate-outgoing-args ;
+							HAIKU_BOOT_$(bootTarget:U)_C++FLAGS += -maccumulate-outgoing-args ;
+						}
+					case x86_64 :
+						HAIKU_BOOT_$(bootTarget:U)_CCFLAGS += -mno-red-zone ;
+						HAIKU_BOOT_$(bootTarget:U)_C++FLAGS += -mno-red-zone ;
+						if $(HAIKU_CC_IS_CLANG_$(architecture)) != 1 {
+							HAIKU_BOOT_$(bootTarget:U)_CCFLAGS += -maccumulate-outgoing-args ;
+							HAIKU_BOOT_$(bootTarget:U)_C++FLAGS += -maccumulate-outgoing-args ;
+						}
 				}
 				HAIKU_BOOT_$(bootTarget:U)_LDFLAGS = -Bstatic -Bsymbolic
 					-nostdlib -znocombreloc -no-undefined ;
