@@ -1,4 +1,5 @@
 /*
+ * Copyright 2019, Bharathi Ramana Joshi, joshibharathiramana@gmail.com
  * Copyright 2019, Les De Ridder, les@lesderid.net
  * Copyright 2017, Chế Vũ Gia Hy, cvghy116@gmail.com.
  * Copyright 2011, Jérôme Duval, korli@users.berlios.de.
@@ -529,6 +530,26 @@ btrfs_open(fs_volume* /*_volume*/, fs_vnode* _node, int openMode,
 	*_cookie = cookie;
 
 	return B_OK;
+}
+
+
+status_t
+btrfs_write(fs_volume* _volume, fs_vnode* _node, void* _cookie, off_t pos,
+		const void* buffer, size_t* _length)
+{
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_node->private_node;
+
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
+
+	if (pos < 0)
+		return B_BAD_VALUE;
+
+	if (!inode->IsFile())
+		return B_BAD_VALUE;
+
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -1146,7 +1167,7 @@ fs_vnode_ops gBtrfsVnodeOps = {
 	&btrfs_close,
 	&btrfs_free_cookie,
 	&btrfs_read,
-	NULL,	//	fs_write,
+	&btrfs_write,
 
 	/* directory operations */
 	&btrfs_create_dir,
