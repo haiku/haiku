@@ -555,16 +555,6 @@ if [ `umask` -gt 22 ]; then
 	echo you will need to run \"git checkout\" again to fix this.
 	exit 1
 fi
-# ensure git checkout was not done with a restrictive umask
-if [ `stat -c '%a' "$sourceDir/data/system/boot/SetupEnvironment"` -lt 644 ]; then
-	echo "The source tree was cloned with a umask > 0022. It seems you"
-	echo have already corrected your umask, but not re-checked-out the
-	echo source tree. Try running:
-	echo "	git checkout --force"
-	echo to fix this problem.
-	exit 1
-fi
-
 
 # internal default parameter values
 #
@@ -582,6 +572,37 @@ gdbSources=
 
 if [ -z "$CC" ]; then
 	CC=gcc
+fi
+
+# detect the build platform
+case "${platform}" in
+	Darwin)  HOST_PLATFORM=darwin ;;
+	FreeBSD) HOST_PLATFORM=freebsd
+	         if [ "$HAIKU_HOST_USE_32BIT" = 1 ] ; then
+	         	echo Unsupported platform: FreeBSD ${platformMachine}
+	         	exit 1
+	         fi ;;
+	Haiku)   HOST_PLATFORM=haiku_host ;;
+	Linux)   HOST_PLATFORM=linux ;;
+	OpenBSD) HOST_PLATFORM=openbsd ;;
+	MINGW*)  HOST_PLATFORM=mingw ;;
+	*)       echo Unsupported platform: ${platform}
+	         exit 1 ;;
+esac
+
+case $HOST_PLATFORM in
+	darwin|freebsd|openbsd) statCmd='stat -f' ;;
+	*)                      statCmd='stat -c' ;;
+esac
+
+# ensure git checkout was not done with a restrictive umask
+if [ `$statCmd '%a' "$sourceDir/data/system/boot/SetupEnvironment"` -lt 644 ]; then
+	echo "The source tree was cloned with a umask > 0022. It seems you"
+	echo have already corrected your umask, but not re-checked-out the
+	echo source tree. Try running:
+	echo "	git checkout --force"
+	echo to fix this problem.
+	exit 1
 fi
 
 # exported (BuildSetup) default parameter values
@@ -770,22 +791,6 @@ while [ $# -gt 0 ] ; do
 		*)				echo Invalid argument: \`$1\'; exit 1;;
 	esac
 done
-
-# detect the build platform
-case "${platform}" in
-	Darwin)	HOST_PLATFORM=darwin ;;
-	FreeBSD)	HOST_PLATFORM=freebsd
-				if [ "$HAIKU_HOST_USE_32BIT" = 1 ] ; then
-					echo Unsupported platform: FreeBSD ${platformMachine}
-					exit 1
-				fi	;;
-	Haiku)	HOST_PLATFORM=haiku_host ;;
-	Linux)	HOST_PLATFORM=linux ;;
-	OpenBSD) HOST_PLATFORM=openbsd ;;
-	MINGW*) HOST_PLATFORM=mingw ;;
-	*)		echo Unsupported platform: ${platform}
-			exit 1 ;;
-esac
 
 # check for case-sensitive filesystem
 mkdir haikuCaseTest 2>/dev/null
