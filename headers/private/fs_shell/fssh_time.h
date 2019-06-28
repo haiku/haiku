@@ -50,15 +50,14 @@ struct fssh_tm {
 };
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* special timezone support */
 extern char *fssh_tzname[2];
 extern int 	fssh_daylight;
 extern long	fssh_timezone;
-
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 extern fssh_clock_t		fssh_clock(void);
 extern double			fssh_difftime(fssh_time_t time1, fssh_time_t time2);

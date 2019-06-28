@@ -12,8 +12,8 @@
 
 #if !USER
 #	include <KernelExport.h>
+#	include <OS.h>
 #endif
-#include <OS.h>
 #include <SupportDefs.h>
 
 

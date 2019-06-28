@@ -13,6 +13,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#ifdef __HAIKU__
+
 #include <OS.h>
 
 
@@ -109,6 +111,30 @@ dbg_printf_unlock()
 		release_sem(dbg_printf_sem);
 	}
 }
+
+#else
+
+status_t
+init_debugging()
+{
+	status_t error = B_OK;
+	return error;
+}
+status_t
+exit_debugging()
+{
+	status_t error = B_OK;
+	return error;
+}
+static inline bool
+dbg_printf_lock()
+{
+	return true;
+}
+static inline void
+dbg_printf_unlock(){}
+
+#endif
 
 
 void

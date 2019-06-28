@@ -10,8 +10,9 @@
 
 // This needs to be included before the fs_shell wrapper
 #include <zlib.h>
-#include <new>
+
 #include <util/AVLTree.h>
+#include <uuid.h>
 
 #include "fssh_api_wrapper.h"
 #include "fssh_auto_deleter.h"

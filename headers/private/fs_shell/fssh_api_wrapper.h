@@ -12,6 +12,9 @@
 #endif
 #include <stdlib.h>
 
+#undef __THROW
+#define __THROW
+
 #include "fssh_dirent.h"
 #include "fssh_errno.h"
 #include "fssh_fcntl.h"
