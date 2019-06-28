@@ -95,6 +95,17 @@ usb_raw_device_removed(void *cookie)
 	TRACE((DRIVER_NAME": device_removed(0x%p)\n", cookie));
 	raw_device *device = (raw_device *)cookie;
 
+	// cancel all pending transfers to make sure no one keeps waiting forever
+	// in syscalls.
+	const usb_configuration_info *configurationInfo =
+		gUSBModule->get_configuration(device->device);
+	if (configurationInfo != NULL) {
+		struct usb_interface_info* interface
+			= configurationInfo->interface->active;
+		for (unsigned int i = 0; i < interface->endpoint_count; i++)
+			gUSBModule->cancel_queued_transfers(interface->endpoint[i].handle);
+	}
+
 	mutex_lock(&gDeviceListLock);
 	if (gDeviceList == device) {
 		gDeviceList = (raw_device *)device->link;
