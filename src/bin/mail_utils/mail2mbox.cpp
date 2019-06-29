@@ -55,7 +55,7 @@ DisplayErrorMessage(const char* messageString = NULL, status_t errorNumber = 0,
 	}
 
 	if (errorNumber != 0) {
-		snprintf(errorBuffer, sizeof(errorBuffer), "%s: %s (%lx)"
+		snprintf(errorBuffer, sizeof(errorBuffer), "%s: %s (%" B_PRIx32 ")"
 			"has occured.", messageString, strerror(errorNumber), errorNumber);
 		messageString = errorBuffer;
 	}
