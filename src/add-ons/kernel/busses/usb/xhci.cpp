@@ -842,7 +842,7 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 	//
 	// Note that we *do not* unset the CHAIN bit in this TRB, thus including
 	// the Link TRB in this TD formally, which is required when using the
-	// ENT bit. (XHCI 1.1 § 4.12.3 p241.)
+	// ENT bit. (XHCI 1.2 § 4.12.3 p250.)
 	td->trbs[td->trb_used - 1].flags |= TRB_3_ENT_BIT;
 
 	if (!directionIn) {
@@ -1755,12 +1755,20 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 
 	TRACE("_LinkDescriptorForPipe current %d, next %d\n", current, next);
 
-	// Compute link.
+	// Add a Link TRB to the end of the descriptor.
 	addr_t addr = endpoint->trb_addr + eventdata * sizeof(xhci_trb);
 	descriptor->trbs[descriptor->trb_used].address = addr;
 	descriptor->trbs[descriptor->trb_used].status = TRB_2_IRQ(0);
 	descriptor->trbs[descriptor->trb_used].flags = TRB_3_TYPE(TRB_TYPE_LINK)
-		| TRB_3_CHAIN_BIT | TRB_3_CYCLE_BIT;
+		| TRB_3_CHAIN_BIT | TRB_3_ENT_BIT | TRB_3_CYCLE_BIT;
+		// It is specified that (XHCI 1.2 § 4.12.3 Note 2 p251) if the TRB
+		// following one with the ENT bit set is a Link TRB, the Link TRB
+		// shall be evaluated *and* the subsequent TRB shall be. Thus, the
+		// TRB_3_ENT_BIT here *should* be unnecessary, as the last TRB in
+		// this TD proper should already have the ENT bit set. But at least
+		// some hardware, it seems, does not necessarily obey the note, so
+		// we add the ENT bit on the Link TRB, too.
+
 
 #if !B_HOST_IS_LENDIAN
 	// Convert endianness.
