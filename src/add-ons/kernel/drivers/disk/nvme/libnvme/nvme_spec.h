@@ -72,8 +72,12 @@
 /*
  * Compile time assert check.
  */
-#ifdef static_assert
+#if __GNUC__ > 3
+#ifdef __cplusplus
 #define nvme_static_assert(cond, msg)	static_assert(cond, msg)
+#else
+#define nvme_static_assert(cond, msg)	_Static_assert(cond, msg)
+#endif
 #else
 #define nvme_static_assert(cond, msg)
 #endif
