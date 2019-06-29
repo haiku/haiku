@@ -139,7 +139,11 @@ void Radeon_WaitForIdle( device_info *di, bool acquire_lock, bool keep_lock )
 			snooze( 1 );
 		} while( system_time() - start_time < 1000000 );
 
-		SHOW_ERROR( 3, "Engine didn't become idle (rbbm_status=%lx, cp_stat=%lx, tlb_address=%lx, tlb_data=%lx)",
+		SHOW_ERROR( 3,
+			"Engine didn't become idle (rbbm_status=%" B_PRIx32 ", "
+			"cp_stat=%" B_PRIx32 ", "
+			"tlb_address=%" B_PRIx32 ", "
+			"tlb_data=%" B_PRIx32 ")",
 			INREG( di->regs, RADEON_RBBM_STATUS ),
 			INREG( di->regs, RADEON_CP_STAT ),
 			INREG( di->regs, RADEON_AIC_TLB_ADDR ),
@@ -345,7 +349,7 @@ static status_t initRingBuffer( device_info *di, int aring_size )
 	cp->ring.size = aring_size;
 	cp->ring.tail_mask = aring_size - 1;
 	OUTREG( regs, RADEON_CP_RB_BASE, cp->ring.vm_base );
-	SHOW_INFO( 3, "CP buffer address=%lx", cp->ring.vm_base );
+	SHOW_INFO( 3, "CP buffer address=%" B_PRIx32, cp->ring.vm_base );
 
 	// set ring buffer size
 	// (it's log2 of qwords)
@@ -409,7 +413,8 @@ static status_t initCPFeedback( device_info *di )
 	cp->feedback.head_mem_offset = offset;
 	cp->feedback.head_vm_address = MEM2GC( memory_type, cp->feedback.head_mem_offset );
 	OUTREG( regs, RADEON_CP_RB_RPTR_ADDR, cp->feedback.head_vm_address );
-	SHOW_INFO( 3, "CP read pointer buffer==%lx", cp->feedback.head_vm_address );
+	SHOW_INFO( 3, "CP read pointer buffer==%" B_PRIx32,
+		cp->feedback.head_vm_address );
 
 	// setup scratch register buffer
 	cp->feedback.scratch_mem_offset = offset + RADEON_SCRATCH_REG_OFFSET;
@@ -553,7 +558,7 @@ status_t Radeon_InitCP( device_info *di )
 		RADEON_ISYNC_WAIT_IDLEGUI |
 		RADEON_ISYNC_CPSCRATCH_IDLEGUI );
 
-	SHOW_FLOW( 3, "bus_cntl=%lx", INREG( di->regs, RADEON_BUS_CNTL ));
+	SHOW_FLOW( 3, "bus_cntl=%" B_PRIx32, INREG( di->regs, RADEON_BUS_CNTL ));
 
 	SHOW_FLOW0( 3, "Done" );
 

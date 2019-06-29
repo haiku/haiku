@@ -720,5 +720,5 @@ void Radeon_ProbeDevices(void)
 	devices->count = count;
 	devices->device_names[2 * count] = NULL;
 
-	SHOW_INFO(0, "%ld supported devices", count);
+	SHOW_INFO(0, "%" B_PRIu32 " supported devices", count);
 }

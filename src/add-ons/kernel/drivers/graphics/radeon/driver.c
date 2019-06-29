@@ -80,21 +80,21 @@ GetDriverSettings(void)
 		value = strtoul (item, &end, 0);
 		if (*end == '\0' && value <= 4) {
 			current_settings.loginfo = value;
-			SHOW_INFO( 1, "Log Info Level now %ld/4", value );
+			SHOW_INFO( 1, "Log Info Level now %" B_PRIu32 "/4", value );
 		}
 		
 		item = get_driver_parameter (settings_handle, "logflow", "2", "2");
 		value = strtoul (item, &end, 0);
 		if (*end == '\0' && value <= 4) {
 			current_settings.logflow = value;
-			SHOW_INFO( 1, "Log Flow Level now %ld/4", value );
+			SHOW_INFO( 1, "Log Flow Level now %" B_PRIu32 "/4", value );
 		}
 
 		item = get_driver_parameter (settings_handle, "logerror", "2", "2");
 		value = strtoul (item, &end, 0);
 		if (*end == '\0' && value <= 4) {
 			current_settings.logerror = value;
-			SHOW_INFO( 1, "Log Error Level now %ld/4", value );
+			SHOW_INFO( 1, "Log Error Level now %" B_PRIu32 "/4", value );
 		}
 		
 		current_settings.switchhead = get_driver_boolean_parameter (settings_handle, "switchhead", false, false);
@@ -217,7 +217,8 @@ open_hook(const char *name, uint32 flags, void **cookie)
 	device_info *di;
 	status_t result = B_OK;
 
-	SHOW_FLOW( 3, "name=%s, flags=%ld, cookie=0x%08lx", name, flags, (uint32)cookie );
+	SHOW_FLOW( 3, "name=%s, flags=%" B_PRIu32 ", cookie=0x%08" B_PRIx32,
+		name, flags, (uint32)cookie );
 
 	// find device info
 	while (devices->device_names[index]
@@ -239,7 +240,7 @@ open_hook(const char *name, uint32 flags, void **cookie)
 
 	RELEASE_BEN(devices->kernel);
 
-	SHOW_FLOW(3, "returning 0x%08lx", result);
+	SHOW_FLOW(3, "returning 0x%08" B_PRIx32, result);
 	return result;
 }
 
@@ -504,7 +505,7 @@ control_hook(void *dev, uint32 msg, void *buf, size_t len)
 	}
 	
 	if( result == B_DEV_INVALID_IOCTL )
-		SHOW_ERROR( 3, "Invalid ioctl call: code=0x%lx", msg );
+		SHOW_ERROR( 3, "Invalid ioctl call: code=0x%" B_PRIx32, msg );
 		
 	return result;
 }

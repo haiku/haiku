@@ -180,7 +180,7 @@ static status_t initGATT( GART_info *gart )
 		map_area_size, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
 		// TODO: We actually have a working malloc() in the kernel. Why create
 		// an area?
-	dprintf("pci_gart_map_area: %ld\n", map_area);
+	dprintf("pci_gart_map_area: %" B_PRId32 "\n", map_area);
 
 	get_memory_map( gart->buffer.ptr, gart->buffer.size, map, map_count );
 

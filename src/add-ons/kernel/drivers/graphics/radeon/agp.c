@@ -107,7 +107,8 @@ agp_list_info(agp_info ai)
 	/*
 		list capabilities
 	*/
-	SHOW_INFO(4, "This device supports AGP specification %ld.%ld;",
+	SHOW_INFO(4,
+		"This device supports AGP specification %" B_PRIu32 ".%" B_PRIu32 ";",
 		((ai.interface.capability_id & AGP_REV_MAJOR) >> AGP_REV_MAJOR_SHIFT),
 		((ai.interface.capability_id & AGP_REV_MINOR) >> AGP_REV_MINOR_SHIFT));
 
@@ -133,7 +134,7 @@ agp_list_info(agp_info ai)
 	if (ai.interface.status & AGP_SBA)
 		SHOW_INFO0(4, "Sideband adressing is supported");
 
-	SHOW_INFO(1, "%ld queued AGP requests can be handled.",
+	SHOW_INFO(1, "%" B_PRIu32 " queued AGP requests can be handled.",
 		((ai.interface.status & AGP_REQUEST) >> AGP_REQUEST_SHIFT) + 1);
 
 	/*
@@ -172,7 +173,7 @@ agp_list_active(uint32 cmd)
 	if (cmd & AGP_SBA)
 		SHOW_INFO0(4, "Sideband adressing is enabled");
 
-	SHOW_INFO(4, "Max. AGP queued request depth is set to %ld",
+	SHOW_INFO(4, "Max. AGP queued request depth is set to %" B_PRIu32,
 		(((cmd & AGP_REQUEST) >> AGP_REQUEST_SHIFT) + 1));
 
 	if (cmd & AGP_ENABLE)

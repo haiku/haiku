@@ -146,11 +146,11 @@ void Radeon_InitMemController( device_info *di )
 		Radeon_SetupMCAddresses_Direct/*Radeon_SetupMCAddresses_Safe*/( di );
 
 	SHOW_INFO0( 3, "Graphics card address mapping:" );
-	SHOW_INFO( 3, " local memory 0x%lx@0x%lx", 
+	SHOW_INFO( 3, " local memory 0x%" B_PRIx32 "@0x%" B_PRIx32,
 		si->memory[mt_local].virtual_size, si->memory[mt_local].virtual_addr_start );
-	SHOW_INFO( 3, " PCI GART 0x%lx@0x%lx", 
+	SHOW_INFO( 3, " PCI GART 0x%" B_PRIx32 "@0x%" B_PRIx32,
 		si->memory[mt_PCI].virtual_size, si->memory[mt_PCI].virtual_addr_start );
-	SHOW_INFO( 3, " disabled AGP GART 0x%lx@0x%lx", 
+	SHOW_INFO( 3, " disabled AGP GART 0x%" B_PRIx32 "@0x%" B_PRIx32,
 		si->memory[mt_AGP].virtual_size, si->memory[mt_AGP].virtual_addr_start );
 	
 	//si->nonlocal_mem = di->DMABuffer.ptr;

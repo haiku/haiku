@@ -104,7 +104,7 @@ static char *Radeon_FindRom( rom_info *ri )
 
 		// EK don't bother looking for signiture now, due to lack of consistancy.
 
-		SHOW_INFO( 2, "found ROM @0x%lx", segstart );
+		SHOW_INFO( 2, "found ROM @0x%" B_PRIx32, segstart );
 		return rom_base;
 	}
 
@@ -153,9 +153,11 @@ static void Radeon_GetPLLInfo( device_info *di )
 		di->pll.min_pll_freq = RADEON_BIOS16(pll_start + 78);
 		di->pll.ref_freq 	 = RADEON_BIOS16(pll_start + 82);
 
-		SHOW_INFO( 2, "TESTING ref_clk=%ld, ref_div=%ld, xclk=%ld, min_freq=%ld, max_freq=%ld from ATOM Bios",
-		di->pll.ref_freq, di->pll.ref_div, di->pll.xclk,
-		di->pll.min_pll_freq, di->pll.max_pll_freq );
+		SHOW_INFO( 2, "TESTING "
+			"ref_clk=%" B_PRIu32 ", ref_div=%" B_PRIu32 ", xclk=%" B_PRIu32 ", "
+			"min_freq=%" B_PRIu32 ", max_freq=%" B_PRIu32 " from ATOM Bios",
+			di->pll.ref_freq, di->pll.ref_div, di->pll.xclk,
+			di->pll.min_pll_freq, di->pll.max_pll_freq );
 
 		// Unused by beos driver so it appears...
 		// info->sclk = RADEON_BIOS32(pll_info_block + 8) / 100.0;
@@ -176,9 +178,11 @@ static void Radeon_GetPLLInfo( device_info *di )
 		di->pll.min_pll_freq = pll.PCLK_min_freq;
 		di->pll.max_pll_freq = pll.PCLK_max_freq;
 
-		SHOW_INFO( 2, "ref_clk=%ld, ref_div=%ld, xclk=%ld, min_freq=%ld, max_freq=%ld from Legacy BIOS",
-		di->pll.ref_freq, di->pll.ref_div, di->pll.xclk,
-		di->pll.min_pll_freq, di->pll.max_pll_freq );
+		SHOW_INFO( 2,
+			"ref_clk=%" B_PRIu32 ", ref_div=%" B_PRIu32 ", xclk=%" B_PRIu32 ", "
+			"min_freq=%" B_PRIu32 ", max_freq=%" B_PRIu32 " from Legacy BIOS",
+			di->pll.ref_freq, di->pll.ref_div, di->pll.xclk,
+			di->pll.min_pll_freq, di->pll.max_pll_freq );
 
 	}
 
@@ -741,7 +745,7 @@ static void Radeon_GetTMDSInfoFromBios( device_info *di )
 				   ((RADEON_BIOS8(tmp + i * 6 + 10) & 0x3f) << 6) |
 				   ((RADEON_BIOS8(tmp + i * 6 +  9) & 0xf) << 12) |
 				   ((RADEON_BIOS8(tmp + i * 6 + 11) & 0xf) << 16));
-				SHOW_ERROR( 2, "TMDS PLL from BIOS: %ld %lx",
+				SHOW_ERROR( 2, "TMDS PLL from BIOS: %" B_PRIu32 " %" B_PRIx32,
 				   di->tmds_pll[i].freq, di->tmds_pll[i].value);
 
 				if (maxfreq == di->tmds_pll[i].freq) {
@@ -807,7 +811,7 @@ static void Radeon_GetTMDSInfoFromBios( device_info *di )
     	for (i = 0; i < 4; i++) {
 	        di->tmds_pll[i].value = default_tmds_pll[di->asic][i].value;
 	        di->tmds_pll[i].freq = default_tmds_pll[di->asic][i].freq;
-	        SHOW_ERROR( 2, "TMDS PLL from DEFAULTS: %ld %lx",
+	        SHOW_ERROR( 2, "TMDS PLL from DEFAULTS: %" B_PRIu32 " %" B_PRIx32,
 				di->tmds_pll[i].freq, di->tmds_pll[i].value);
     	}
     }
@@ -949,8 +953,13 @@ static void Radeon_DetectRAM( device_info *di )
 	if (accessible > bar_size)
 	    accessible = bar_size;
 
-	SHOW_INFO( 0, "Detected total video RAM=%ldK, accessible=%ldK (PCI BAR=%ldK)"
-		, di->local_mem_size/1024, accessible/1024, bar_size/1024);
+	SHOW_INFO( 0,
+		"Detected total video RAM=%" B_PRIu32 "K, "
+		"accessible=%" B_PRIu32 "K "
+		"(PCI BAR=%" B_PRIu32 "K)",
+		di->local_mem_size / 1024,
+		accessible / 1024,
+		bar_size / 1024);
 	if (di->local_mem_size > accessible)
 	    di->local_mem_size = accessible;
 
@@ -1008,7 +1017,7 @@ static void Radeon_DetectRAM( device_info *di )
 		}
 	}
 
-	SHOW_INFO( 1, "%ld MB %s found on %d wide bus",
+	SHOW_INFO( 1, "%" B_PRIu32 " MB %s found on %d wide bus",
 		di->local_mem_size / 1024 / 1024, di->ram_type, di->ram.width);
 
 /*	if( di->local_mem_size > 64 * 1024 * 1024 ) {
