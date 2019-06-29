@@ -11,3 +11,6 @@ KernelAddon <driver>tty :
 	slave.cpp
 ;
 
+SEARCH on [ FGristFiles line_buffer.cpp ]
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel generic tty ] ;
+
