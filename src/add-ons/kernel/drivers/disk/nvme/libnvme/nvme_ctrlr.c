@@ -700,7 +700,7 @@ static int nvme_ctrlr_start(struct nvme_ctrlr *ctrlr)
 		return -1;
 
 	if (nvme_ctrlr_configure_aer(ctrlr) != 0)
-		return -1;
+		nvme_warning("controller does not support AER!\n");
 
 	nvme_ctrlr_set_supported_log_pages(ctrlr);
 	nvme_ctrlr_set_supported_features(ctrlr);
