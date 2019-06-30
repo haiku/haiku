@@ -18,8 +18,15 @@ DEFINES += HAIKU_BUILD_COMPATIBILITY_H ;
 	}
 
 	defines = [ FDefines $(defines) ] ;
+
+	local c++flags = ;
+	if $(HOST_GCC_VERSION[1]) >= 3 {
+		c++flags += -std=c++11 ;
+	}
+
 	SubDirCcFlags $(defines) -Wno-multichar ;
 	SubDirC++Flags $(defines) -Wno-multichar -fno-rtti ;
+	SubDirC++Flags $(defines) $(c++flags) -Wno-multichar -fno-rtti ;
 }
 
 # platform specific libraries
