@@ -185,7 +185,8 @@ got_one:
 		// the configuration has to be set yet (was not the current one)
 		DPRINTF_INFO((ID "add_device() - setting configuration...\n"));
 		if ((st = usb->set_configuration(dev, conf)) != B_OK) {
-			dprintf(ID "add_device() -> set_configuration() returns %ld\n", st);
+			dprintf(ID "add_device() -> "
+				"set_configuration() returns %" B_PRId32 "\n", st);
 			goto fail;
 		} else
 			DPRINTF_ERR((ID " ... success!\n"));
@@ -194,8 +195,8 @@ got_one:
 			// the interface we found is not the active one and has to be set
 			DPRINTF_INFO((ID "add_device() - setting interface: %p...\n", ii));
 			if ((st = usb->set_alt_interface(dev, ii)) != B_OK) {
-				dprintf(ID "add_device() -> set_alt_interface() returns %ld\n",
-					st);
+				dprintf(ID "add_device() -> "
+					"set_alt_interface() returns %" B_PRId32 "\n", st);
 				goto fail;
 			} else
 				DPRINTF_ERR((ID " ... success!\n"));
@@ -219,8 +220,8 @@ got_one:
 				&controlTransferLength);
 
 			if (st < B_OK) {
-				dprintf(ID "add_device() - control transfer 1 failed: %ld\n",
-					st);
+				dprintf(ID "add_device() - "
+					"control transfer 1 failed: %" B_PRId32 "\n", st);
 			}
 
 			// try up to five times to set the tablet to 'Wacom'-mode (enabling
@@ -235,8 +236,8 @@ got_one:
 					repData, &controlTransferLength);
 
 				if (st < B_OK) {
-					dprintf(ID "add_device() - control transfer 2 failed: %ld"
-						"\n", st);
+					dprintf(ID "add_device() - "
+						"control transfer 2 failed: %" B_PRId32 "\n", st);
 				}
 
 				// check if registers are set correctly
@@ -248,8 +249,8 @@ got_one:
 					retData, &controlTransferLength);
 
 				if (st < B_OK) {
-					dprintf(ID "add_device() - control transfer 3 failed: %ld"
-						"\n", st);
+					dprintf(ID "add_device() - "
+						"control transfer 3 failed: %" B_PRId32 "\n", st);
 				}
 
 				DPRINTF_INFO((ID "add_device() - retData: %u - %u\n",
@@ -323,7 +324,8 @@ device_added(usb_device dev, void** cookie)
 	// first see, if this device is already added
 	acquire_sem(sDeviceListLock);
 	for (device = sDeviceList; device; device = device->next) {
-		DPRINTF_ERR((ID "device_added() - old device: %ld\n", device->dev));
+		DPRINTF_ERR((ID "device_added() - old device: %" B_PRIu32 "\n",
+			device->dev));
 		if (device->dev == dev) {
 			DPRINTF_ERR((ID "device_added() - already added - done!\n"));
 			*cookie = (void*)device;
@@ -426,8 +428,8 @@ device_open(const char *dname, uint32 flags, void** cookie)
 						ret = device->notify_lock;
 						device->open--;
 						*cookie = NULL;
-						dprintf(ID "device_open() -> create_sem() returns %ld\n",
-							ret);
+						dprintf(ID "device_open() -> "
+							"create_sem() returns %" B_PRId32 "\n", ret);
 					} else {
 						ret = B_OK;
 					}
@@ -580,15 +582,15 @@ device_read(void* cookie, off_t pos, void* buf, size_t* count)
 					} else {
 						// an error happened during the interrupt transfer
 						*count = 0;
-						dprintf(ID "interrupt transfer - failure: %ld\n",
-							device->status);
+						dprintf(ID "interrupt transfer - "
+							"failure: %" B_PRIu32 "\n", device->status);
 						ret = B_ERROR;
 					}
 				}
 			} else {
 				*count = 0;
 				dprintf(ID "device_read(%p) name = \"%s%d\" -> error queuing "
-					"interrupt: %ld\n", cookie, kBasePublishPath,
+					"interrupt: %" B_PRId32 "\n", cookie, kBasePublishPath,
 					device->number, ret);
 			}
 		} else if (*count == 8) {
