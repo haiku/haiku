@@ -120,7 +120,7 @@ mapAtomBIOS(radeon_info &info, uint32 romBase, uint32 romSize)
 static status_t
 radeon_hd_getbios(radeon_info &info)
 {
-	TRACE("card(%ld): %s: called\n", info.id, __func__);
+	TRACE("card(%" B_PRId32 "): %s: called\n", info.id, __func__);
 
 	uint32 romBase = 0;
 	uint32 romSize = 0;
@@ -199,7 +199,7 @@ radeon_hd_getbios(radeon_info &info)
 static status_t
 radeon_hd_getbios_ni(radeon_info &info)
 {
-	TRACE("card(%ld): %s: called\n", info.id, __func__);
+	TRACE("card(%" B_PRId32 "): %s: called\n", info.id, __func__);
 	uint32 bus_cntl = read32(info.registers + R600_BUS_CNTL);
 	uint32 d1vga_control = read32(info.registers + AVIVO_D1VGA_CONTROL);
 	uint32 d2vga_control = read32(info.registers + AVIVO_D2VGA_CONTROL);
@@ -267,7 +267,7 @@ radeon_hd_getbios_ni(radeon_info &info)
 static status_t
 radeon_hd_getbios_r700(radeon_info &info)
 {
-	TRACE("card(%ld): %s: called\n", info.id, __func__);
+	TRACE("card(%" B_PRId32 "): %s: called\n", info.id, __func__);
 	uint32 viph_control = read32(info.registers + RADEON_VIPH_CONTROL);
 	uint32 bus_cntl = read32(info.registers + R600_BUS_CNTL);
 	uint32 d1vga_control = read32(info.registers + AVIVO_D1VGA_CONTROL);
@@ -340,7 +340,7 @@ radeon_hd_getbios_r700(radeon_info &info)
 static status_t
 radeon_hd_getbios_r600(radeon_info &info)
 {
-	TRACE("card(%ld): %s: called\n", info.id, __func__);
+	TRACE("card(%" B_PRId32 "): %s: called\n", info.id, __func__);
 	uint32 viph_control = read32(info.registers + RADEON_VIPH_CONTROL);
 	uint32 bus_cntl = read32(info.registers + R600_BUS_CNTL);
 	uint32 d1vga_control = read32(info.registers + AVIVO_D1VGA_CONTROL);
@@ -449,7 +449,7 @@ radeon_hd_getbios_r600(radeon_info &info)
 static status_t
 radeon_hd_getbios_avivo(radeon_info &info)
 {
-	TRACE("card(%ld): %s: called\n", info.id, __func__);
+	TRACE("card(%" B_PRId32 "): %s: called\n", info.id, __func__);
 	uint32 sepromControl = read32(info.registers + RADEON_SEPROM_CNTL1);
 	uint32 viphControl = read32(info.registers + RADEON_VIPH_CONTROL);
 	uint32 busControl = read32(info.registers + RV370_BUS_CNTL);
@@ -532,9 +532,9 @@ radeon_hd_pci_bar_mmio(uint16 chipsetID)
 status_t
 radeon_hd_init(radeon_info &info)
 {
-	TRACE("card(%ld): %s: called\n", info.id, __func__);
+	TRACE("card(%" B_PRId32 "): %s: called\n", info.id, __func__);
 
-	ERROR("%s: card(%ld): "
+	ERROR("%s: card(%" B_PRId32 "): "
 		"Radeon %s 1002:%" B_PRIX32 "\n", __func__, info.id,
 		radeon_chip_name[info.chipsetID], info.pciID);
 
@@ -545,7 +545,7 @@ radeon_hd_init(radeon_info &info)
 		ROUND_TO_PAGE_SIZE(sizeof(radeon_shared_info)), B_FULL_LOCK,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA);
 	if (info.shared_area < B_OK) {
-		ERROR("%s: card (%ld): couldn't map shared area!\n",
+		ERROR("%s: card (%" B_PRId32 "): couldn't map shared area!\n",
 			__func__, info.id);
 		return info.shared_area;
 	}
@@ -563,7 +563,7 @@ radeon_hd_init(radeon_info &info)
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA,
 		(void**)&info.registers);
 	if (mmioMapper.InitCheck() < B_OK) {
-		ERROR("%s: card (%ld): couldn't map memory I/O!\n",
+		ERROR("%s: card (%" B_PRId32 "): couldn't map memory I/O!\n",
 			__func__, info.id);
 		return info.registers_area;
 	}
@@ -636,7 +636,7 @@ radeon_hd_init(radeon_info &info)
 		B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 		(void**)&info.shared_info->frame_buffer);
 	if (frambufferMapper.InitCheck() < B_OK) {
-		ERROR("%s: card(%ld): couldn't map frame buffer!\n",
+		ERROR("%s: card(%" B_PRId32 "): couldn't map frame buffer!\n",
 			__func__, info.id);
 		return info.framebuffer_area;
 	}
@@ -707,9 +707,9 @@ radeon_hd_init(radeon_info &info)
 
 	// Check if a valid AtomBIOS image was found.
 	if (biosStatus != B_OK) {
-		ERROR("%s: card (%ld): couldn't find AtomBIOS rom!\n",
+		ERROR("%s: card (%" B_PRId32 "): couldn't find AtomBIOS rom!\n",
 			__func__, info.id);
-		ERROR("%s: card (%ld): exiting. Please open a bug ticket"
+		ERROR("%s: card (%" B_PRId32 "): exiting. Please open a bug ticket"
 			" at haiku-os.org with your /var/log/syslog\n",
 			__func__, info.id);
 		// Fallback to VESA (more likely crash app_server)
@@ -724,20 +724,21 @@ radeon_hd_init(radeon_info &info)
 		= (edid1_info*)get_boot_item(EDID_BOOT_INFO, NULL);
 
 	if (edidInfo != NULL) {
-		TRACE("card(%ld): %s found VESA EDID information.\n", info.id,
-			__func__);
+		TRACE("card(%" B_PRId32 "): %s found VESA EDID information.\n",
+			info.id, __func__);
 		info.shared_info->has_edid = true;
 		memcpy(&info.shared_info->edid_info, edidInfo, sizeof(edid1_info));
 	} else {
-		TRACE("card(%ld): %s didn't find VESA EDID modes.\n", info.id,
-			__func__);
+		TRACE("card(%" B_PRId32 "): %s didn't find VESA EDID modes.\n",
+			info.id, __func__);
 		info.shared_info->has_edid = false;
 	}
 
-	TRACE("card(%ld): %s completed successfully!\n", info.id, __func__);
+	TRACE("card(%" B_PRId32 "): %s completed successfully!\n",
+		info.id, __func__);
 
-	TRACE("card(%ld): GPU thermal status: %" B_PRId32 "C\n", info.id,
-		radeon_thermal_query(info) / 1000);
+	TRACE("card(%" B_PRId32 "): GPU thermal status: %" B_PRId32 "C\n",
+		info.id, radeon_thermal_query(info) / 1000);
 
 	return B_OK;
 }
@@ -746,7 +747,7 @@ radeon_hd_init(radeon_info &info)
 void
 radeon_hd_uninit(radeon_info &info)
 {
-	TRACE("card(%ld): %s called\n", info.id, __func__);
+	TRACE("card(%" B_PRId32 "): %s called\n", info.id, __func__);
 
 	delete_area(info.shared_area);
 	delete_area(info.registers_area);

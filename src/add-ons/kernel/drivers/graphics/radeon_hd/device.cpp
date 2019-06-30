@@ -213,7 +213,7 @@ device_ioctl(void* data, uint32 op, void* buffer, size_t bufferLength)
 			return B_OK;
 
 		default:
-			TRACE("%s: ioctl() unknown message %ld (length = %ld)\n",
+			TRACE("%s: ioctl() unknown message %" B_PRIu32 " (length = %ld)\n",
 				__func__, op, bufferLength);
 			break;
 	}

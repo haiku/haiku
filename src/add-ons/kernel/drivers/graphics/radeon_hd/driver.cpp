@@ -675,7 +675,7 @@ init_driver(void)
 		gDeviceInfo[found]->dceMinor = kSupportedDevices[type].dceMinor;
 		gDeviceInfo[found]->chipsetFlags = kSupportedDevices[type].chipsetFlags;
 
-		ERROR("%s: GPU(%ld) %s, revision = 0x%x\n", __func__, found,
+		ERROR("%s: GPU(%" B_PRId32 ") %s, revision = 0x%x\n", __func__, found,
 			kSupportedDevices[type].deviceName, info->revision);
 
 		found++;
