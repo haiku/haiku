@@ -212,6 +212,9 @@ SerialDevice::SetModes(struct termios *tios)
 bool
 SerialDevice::Service(struct tty *tty, uint32 op, void *buffer, size_t length)
 {
+	if (!fDeviceOpen)
+		return false;
+
 	if (tty != fMasterTTY)
 		return false;
 
@@ -453,6 +456,7 @@ SerialDevice::Close()
 
 	fStopThreads = true;
 	fInputStopped = false;
+	fDeviceOpen = false;
 
 	if (!fDeviceRemoved) {
 		gUSBModule->cancel_queued_transfers(fReadPipe);
@@ -473,7 +477,10 @@ SerialDevice::Close()
 	gTTYModule->tty_destroy(fMasterTTY);
 	gTTYModule->tty_destroy(fSlaveTTY);
 
-	fDeviceOpen = false;
+	fMasterTTY = NULL;
+	fSlaveTTY = NULL;
+	fSystemTTYCookie = NULL;
+	fDeviceTTYCookie = NULL;
 	return B_OK;
 }
 
