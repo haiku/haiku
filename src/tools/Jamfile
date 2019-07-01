@@ -4,9 +4,10 @@ UsePrivateBuildHeaders app storage ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src/bin ] ;
 
-local tools =
+local beapi_tools =
 	<build>catattr
 	<build>copyattr
+	<build>elf2aout
 	<build>generate_attribute_stores
 	<build>listattr
 	<build>mimeset
@@ -19,7 +20,7 @@ local tools =
 	<build>generate_boot_screen
 ;
 
-USES_BE_API on $(tools) = true ;
+USES_BE_API on $(beapi_tools) = true ;
 
 BuildPlatformMain <build>catattr : catattr.cpp : $(HOST_LIBBE) ;
 
@@ -31,6 +32,8 @@ BuildPlatformMain <build>create_image : create_image.cpp : $(HOST_LIBSUPC++) ;
 
 BuildPlatformMain <build>data_to_source : data_to_source.cpp
 	: $(HOST_LIBSUPC++) ;
+
+BuildPlatformMain <build>elf2aout : elf2aout.c : ;
 
 BuildPlatformMain <build>generate_attribute_stores
 	: generate_attribute_stores.cpp : $(HOST_LIBBE) $(HOST_LIBSUPC++) ;

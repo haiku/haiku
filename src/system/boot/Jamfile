@@ -28,17 +28,14 @@ rule BuildOpenFirmwareLoader {
 rule BuildAoutLoader {
 	local haikuLoader = $(1) ;
 	local bootLoader = $(2) ;
-	switch $(TARGET_ARCH) {
-		case sparc :
-			AOUT_FORMAT on $(haikuLoader) = a.out-sunos-big ;
-		case * :
-			Exit "Currently unsupported coff arch:" $(TARGET_ARCH) ;
-	}
+	ELF2AOUT on $(haikuLoader) = <build>elf2aout ;
+	Depends $(haikuLoader) : <build>elf2aout ;
 }
 
-actions BuildAoutLoader {
+actions BuildAoutLoader bind ELF2AOUT {
 	rm -f $(1)
-	$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -O $(AOUT_FORMAT) --impure -S $(2) $(1)
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	$(ELF2AOUT) -o $(1) $(2)
 }
 
 

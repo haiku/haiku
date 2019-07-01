@@ -3,6 +3,14 @@ OUTPUT_ARCH(sparc:v9)
 
 ENTRY(_start)
 
+PHDRS
+{
+	/* have a non-loadable program chunk with the headers, then a loadable one
+	 * with the actual data. This eases the work of elf2aout. */
+	headers PT_NULL FILEHDR PHDRS ;
+	text PT_LOAD ;
+}
+
 SECTIONS
 {
 	/* Execution address. The file is loaded at 0x4000 with its header,
@@ -23,7 +31,7 @@ SECTIONS
 
 			  *(.text .text.* .gnu.linkonce.t.*)
 	          *(.rodata .rodata.* .gnu.linkonce.r.*)
-	          *(.sdata2) }
+	          *(.sdata2) } :text
 
 	.data : {
 		__ctor_list = .;
@@ -34,7 +42,7 @@ SECTIONS
 		*(.data .gnu.linkonce.d.*)
 		*(.data.rel.ro.local .data.rel.ro*)
 		*(.got .got2)
-		*(.sdata .sdata.* .gnu.linkonce.s.* .fixup) }
+		*(.sdata .sdata.* .gnu.linkonce.s.* .fixup) } :text
 
 	/* uninitialized data (in same segment as writable data) */
 	__bss_start = .;
@@ -42,7 +50,7 @@ SECTIONS
 
 		*(.bss .bss.* .gnu.linkonce.b.*)
 		. = ALIGN(0x1000);
-	}
+	} :text
 
 	_end = . ;
 
