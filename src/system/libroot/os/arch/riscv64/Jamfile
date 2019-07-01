@@ -13,7 +13,11 @@ for architectureObject in [ MultiArchSubDirSetup riscv64 ] {
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
 		MergeObject <$(architecture)>os_arch_$(TARGET_ARCH).o :
+			stack_frame.c
+			system_time.c
+
 			tls.c
+			time.c
 			thread.c
 
 			generic_atomic.cpp
