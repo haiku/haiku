@@ -642,20 +642,6 @@ BHandler::_ObserverList()
 }
 
 
-BHandler::BHandler(const BHandler &)
-{
-	// No copy construction allowed.
-}
-
-
-BHandler &
-BHandler::operator=(const BHandler &)
-{
-	// No assignments allowed.
-	return *this;
-}
-
-
 void
 BHandler::SetLooper(BLooper* looper)
 {
@@ -682,6 +668,19 @@ _ReservedHandler1__8BHandler(BHandler* handler, uint32 what,
 	handler->BHandler::SendNotices(what, notice);
 }
 
+
+BHandler::BHandler(const BHandler &)
+{
+	// No copy construction allowed.
+}
+
+
+BHandler &
+BHandler::operator=(const BHandler &)
+{
+	// No assignments allowed.
+	return *this;
+}
 #endif
 
 void BHandler::_ReservedHandler2() {}

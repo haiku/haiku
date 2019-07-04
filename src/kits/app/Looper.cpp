@@ -832,6 +832,7 @@ void BLooper::_ReservedLooper5() {}
 void BLooper::_ReservedLooper6() {}
 
 
+#ifdef _BEOS_R5_COMPATIBLE_
 BLooper::BLooper(const BLooper& other)
 {
 	// Copy construction not allowed
@@ -844,6 +845,7 @@ BLooper::operator=(const BLooper& other)
 	// Looper copying not allowed
 	return *this;
 }
+#endif
 
 
 BLooper::BLooper(int32 priority, port_id port, const char* name)

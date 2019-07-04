@@ -168,6 +168,7 @@ void BMessageRunner::_ReservedMessageRunner5() {}
 void BMessageRunner::_ReservedMessageRunner6() {}
 
 
+#ifdef _BEOS_R5_COMPATIBLE_
 //! Privatized copy constructor to prevent usage.
 BMessageRunner::BMessageRunner(const BMessageRunner &)
 	:
@@ -182,6 +183,7 @@ BMessageRunner::operator=(const BMessageRunner&)
 {
 	return* this;
 }
+#endif
 
 
 /*!	Initializes the BMessageRunner.

@@ -1200,6 +1200,7 @@ void BMimeType::_ReservedMimeType2() {}
 void BMimeType::_ReservedMimeType3() {}
 
 
+#ifdef _BEOS_R5_COMPATIBLE_
 // assignment operator.
 // Unimplemented
 BMimeType&
@@ -1215,6 +1216,7 @@ BMimeType::operator=(const BMimeType &)
 BMimeType::BMimeType(const BMimeType &)
 {
 }
+#endif
 
 
 status_t
@@ -1240,7 +1242,7 @@ BMimeType::GetSupportedTypes(BMessage* types)
 	\c B_STRING_TYPE in \a types.
 
 	For each supported type the result of BMimeType::GetSupportingApps() will
-	afterwards include the signature of this application. 
+	afterwards include the signature of this application.
 
 	\a fullSync specifies whether or not any types that are no longer
 	listed as supported types as of this call to SetSupportedTypes() shall be

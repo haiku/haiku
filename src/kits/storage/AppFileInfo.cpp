@@ -65,7 +65,7 @@ static const int32 kIconForTypeResourceID		= 0;
 static const int32 kCatalogEntryResourceID		= 1;
 
 // R5 also exports these (Tracker is using them):
-// (maybe we better want to drop them silently and declare 
+// (maybe we better want to drop them silently and declare
 // the above in a public Haiku header - and use that one in
 // Tracker when compiled for Haiku)
 extern const uint32 MINI_ICON_TYPE, LARGE_ICON_TYPE;
@@ -578,7 +578,7 @@ BAppFileInfo::GetVersionInfo(version_info* info, version_kind kind) const
 	} else
 		return B_ERROR;
 
-	// return result	
+	// return result
 	return B_OK;
 }
 
@@ -958,6 +958,7 @@ void BAppFileInfo::_ReservedAppFileInfo2() {}
 void BAppFileInfo::_ReservedAppFileInfo3() {}
 
 
+#ifdef _BEOS_R5_COMPATIBLE_
 //!	Privatized assignment operator to prevent usage.
 BAppFileInfo&
 BAppFileInfo::operator=(const BAppFileInfo&)
@@ -970,6 +971,7 @@ BAppFileInfo::operator=(const BAppFileInfo&)
 BAppFileInfo::BAppFileInfo(const BAppFileInfo&)
 {
 }
+#endif
 
 
 /*!	Initializes a BMimeType to the signature of the associated file.
