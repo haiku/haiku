@@ -2834,6 +2834,10 @@ _user_disable_debugger(int state)
 status_t
 _user_install_default_debugger(port_id debuggerPort)
 {
+	// Do not allow non-root processes to install a default debugger.
+	if (geteuid() != 0)
+		return B_PERMISSION_DENIED;
+
 	// if supplied, check whether the port is a valid port
 	if (debuggerPort >= 0) {
 		port_info portInfo;
@@ -2855,6 +2859,14 @@ _user_install_default_debugger(port_id debuggerPort)
 port_id
 _user_install_team_debugger(team_id teamID, port_id debuggerPort)
 {
+	if (geteuid() != 0) {
+		Team* team = team_get_team_struct(teamID);
+		if (team == NULL)
+			return B_BAD_VALUE;
+		if (team->effective_uid != geteuid())
+			return B_PERMISSION_DENIED;
+	}
+
 	return install_team_debugger(teamID, debuggerPort, -1, false, false);
 }
 
