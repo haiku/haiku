@@ -1760,15 +1760,12 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 	descriptor->trbs[descriptor->trb_used].address = addr;
 	descriptor->trbs[descriptor->trb_used].status = TRB_2_IRQ(0);
 	descriptor->trbs[descriptor->trb_used].flags = TRB_3_TYPE(TRB_TYPE_LINK)
-		| TRB_3_CHAIN_BIT | TRB_3_ENT_BIT | TRB_3_CYCLE_BIT;
+		| TRB_3_CHAIN_BIT | TRB_3_CYCLE_BIT;
 		// It is specified that (XHCI 1.2 § 4.12.3 Note 2 p251) if the TRB
 		// following one with the ENT bit set is a Link TRB, the Link TRB
-		// shall be evaluated *and* the subsequent TRB shall be. Thus, the
-		// TRB_3_ENT_BIT here *should* be unnecessary, as the last TRB in
-		// this TD proper should already have the ENT bit set. But at least
-		// some hardware, it seems, does not necessarily obey the note, so
-		// we add the ENT bit on the Link TRB, too.
-
+		// shall be evaluated *and* the subsequent TRB shall be. Thus a
+		// TRB_3_ENT_BIT is unnecessary here; and from testing seems to
+		// break all transfers on a (very) small number of controllers.
 
 #if !B_HOST_IS_LENDIAN
 	// Convert endianness.
