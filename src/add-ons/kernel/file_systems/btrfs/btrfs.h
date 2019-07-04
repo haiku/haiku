@@ -20,6 +20,7 @@ typedef uint64 fsblock_t;		// filesystem block number
 
 #define BTRFS_NUM_ROOT_BACKUPS				4
 
+#define BTRFS_CSUM_SIZE						32
 
 struct btrfs_backup_roots {
 	uint64	root;
@@ -218,7 +219,7 @@ struct btrfs_device {
 
 
 struct btrfs_super_block {
-	uint8	checksum[32];
+	uint8	checksum[BTRFS_CSUM_SIZE];
 	uuid_t	fsid;
 	uint64	blocknum;
 	uint64	flags;

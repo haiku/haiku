@@ -175,6 +175,33 @@ btrfs_read_fs_info(fs_volume* _volume, struct fs_info* info)
 }
 
 
+static status_t
+btrfs_write_fs_info(fs_volume* _volume, const struct fs_info* info, uint32 mask)
+{
+	Volume* volume = (Volume*)_volume->private_volume;
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
+
+	if (mask & ~FS_WFITE_FSINFO_NAME != 0)
+		return B_NOT_SUPPORTED;
+
+	MutexLocker locker(volume->GetLock());
+	status_t status = B_BAD_VALUE;
+
+	if (mask & FS_WRITE_FSINFO_NAME) {
+		btrfs_super_block& superBlock = volume->SuperBlock();
+
+		strncpy(superBlock.label, info->volume_name,
+			sizeof(superBlock.label) - 1);
+		superBlock.label[sizeof(superBlock.label) - 1] = '\0';
+
+		status = volume->WriteSuperBlock();
+	}
+
+	return status;
+}
+
+
 //	#pragma mark -
 
 
@@ -1119,7 +1146,7 @@ btrfs_std_ops(int32 op, ...)
 fs_volume_ops gBtrfsVolumeOps = {
 	&btrfs_unmount,
 	&btrfs_read_fs_info,
-	NULL,	// write_fs_info()
+	&btrfs_write_fs_info,
 	NULL,	// fs_sync,
 	&btrfs_get_vnode,
 };
