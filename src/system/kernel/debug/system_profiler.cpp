@@ -1543,6 +1543,9 @@ stop_system_profiler()
 status_t
 _user_system_profiler_start(struct system_profiler_parameters* userParameters)
 {
+	if (geteuid() != 0)
+		return B_PERMISSION_DENIED;
+
 	// copy params to the kernel
 	struct system_profiler_parameters parameters;
 	if (userParameters == NULL || !IS_USER_ADDRESS(userParameters)
@@ -1606,6 +1609,9 @@ _user_system_profiler_start(struct system_profiler_parameters* userParameters)
 status_t
 _user_system_profiler_next_buffer(size_t bytesRead, uint64* _droppedEvents)
 {
+	if (geteuid() != 0)
+		return B_PERMISSION_DENIED;
+
 	if (_droppedEvents != NULL && !IS_USER_ADDRESS(_droppedEvents))
 		return B_BAD_ADDRESS;
 
@@ -1633,6 +1639,9 @@ _user_system_profiler_next_buffer(size_t bytesRead, uint64* _droppedEvents)
 status_t
 _user_system_profiler_stop()
 {
+	if (geteuid() != 0)
+		return B_PERMISSION_DENIED;
+
 	team_id team = thread_get_current_thread()->team->id;
 
 	InterruptsSpinLocker locker(sProfilerLock);
@@ -1652,6 +1661,9 @@ _user_system_profiler_stop()
 status_t
 _user_system_profiler_recorded(system_profiler_parameters* userParameters)
 {
+	if (geteuid() != 0)
+		return B_PERMISSION_DENIED;
+
 	if (userParameters == NULL || !IS_USER_ADDRESS(userParameters))
 		return B_BAD_ADDRESS;
 	if (sRecordedParameters == NULL)
