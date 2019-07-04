@@ -68,7 +68,7 @@ HIDReport::AddMainItem(global_item_state &globalState,
 
 	uint32 physicalMinimum = globalState.physical_minimum;
 	uint32 physicalMaximum = globalState.physical_maximum;
-	if (physicalMinimum > logicalMaximum)
+	if (physicalMinimum > physicalMaximum)
 		_SignExtend(physicalMinimum, physicalMaximum);
 
 	TRACE("\tglobal state:\n");
