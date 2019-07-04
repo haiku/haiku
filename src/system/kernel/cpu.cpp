@@ -367,6 +367,8 @@ _user_set_cpu_enabled(int32 cpu, bool enabled)
 {
 	int32 i, count;
 
+	if (geteuid() != 0)
+		return B_PERMISSION_DENIED;
 	if (cpu < 0 || cpu >= smp_get_num_cpus())
 		return B_BAD_VALUE;
 
