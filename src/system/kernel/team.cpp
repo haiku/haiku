@@ -2918,9 +2918,15 @@ team_is_valid(team_id id)
 	if (id <= 0)
 		return false;
 
-	InterruptsReadSpinLocker teamsLocker(sTeamHashLock);
+	return team_get_team_struct(id) != NULL;
+}
 
-	return team_get_team_struct_locked(id) != NULL;
+
+Team*
+team_get_team_struct(team_id id)
+{
+	InterruptsReadSpinLocker teamsLocker(sTeamHashLock);
+	return team_get_team_struct_locked(id);
 }
 
 

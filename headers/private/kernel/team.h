@@ -38,6 +38,7 @@ struct job_control_entry* team_get_death_entry(Team *team,
 			thread_id child, bool* _deleteEntry);
 void team_init_exit_info_on_error(Team* team);
 bool team_is_valid(team_id id);
+Team *team_get_team_struct(team_id id);
 Team *team_get_team_struct_locked(team_id id);
 int32 team_max_teams(void);
 int32 team_used_teams(void);
