@@ -187,7 +187,8 @@ CallgrindProfileResult::PrintResults(ImageProfileResultContainer* container)
 
 	// create the file name
 	char fileName[B_PATH_NAME_LENGTH];
-	snprintf(fileName, sizeof(fileName), "%s/callgrind.out.%ld.%s.%lldms",
+	snprintf(fileName, sizeof(fileName),
+		"%s/callgrind.out.%" B_PRId32 ".%s.%" B_PRId64 "ms",
 		gOptions.callgrind_directory, fEntity->EntityID(), entityName,
 		fTotalTicks * fInterval);
 
@@ -202,13 +203,14 @@ CallgrindProfileResult::PrintResults(ImageProfileResultContainer* container)
 	// write the header
 	fprintf(out, "version: 1\n");
 	fprintf(out, "creator: Haiku profile\n");
-	fprintf(out, "pid: %ld\n", fEntity->EntityID());
+	fprintf(out, "pid: %" B_PRId32 "\n", fEntity->EntityID());
 	fprintf(out, "cmd: %s\n", fEntity->EntityName());
 	fprintf(out, "part: 1\n\n");
 
 	fprintf(out, "positions: line\n");
 	fprintf(out, "events: Ticks Time\n");
-	fprintf(out, "summary: %lld %lld\n", fTotalTicks, fTotalTicks * fInterval);
+	fprintf(out, "summary: %" B_PRId64 " %" B_PRId64 "\n",
+		fTotalTicks, fTotalTicks * fInterval);
 
 	// get hit images
 	CallgrindImageProfileResult* images[container->CountImages()];
@@ -226,16 +228,16 @@ CallgrindProfileResult::PrintResults(ImageProfileResultContainer* container)
 
 			fprintf(out, "\n");
 			_PrintFunction(out, image, k, false);
-			fprintf(out, "0 %lld %lld\n", function.hits,
+			fprintf(out, "0 %" B_PRId64 " %" B_PRId64 "\n", function.hits,
 				function.hits * fInterval);
 
 			CallgrindCalledFunction* calledFunction = function.calledFunctions;
 			while (calledFunction != NULL) {
 				_PrintFunction(out, calledFunction->image,
 					calledFunction->function, true);
-				fprintf(out, "calls=%lld 0\n", calledFunction->hits);
-				fprintf(out, "0 %lld %lld\n", calledFunction->hits,
-					calledFunction->hits * fInterval);
+				fprintf(out, "calls=%" B_PRId64 " 0\n", calledFunction->hits);
+				fprintf(out, "0 %" B_PRId64 " %" B_PRId64 "\n",
+					calledFunction->hits, calledFunction->hits * fInterval);
 				calledFunction = calledFunction->next;
 			}
 		}
@@ -247,16 +249,17 @@ CallgrindProfileResult::PrintResults(ImageProfileResultContainer* container)
 
 		if (fUnkownTicks > 0) {
 			fprintf(out, "\nfn=unknown\n");
-			fprintf(out, "0 %lld\n", fUnkownTicks);
+			fprintf(out, "0 %" B_PRId64 "\n", fUnkownTicks);
 		}
 
 		if (fDroppedTicks > 0) {
 			fprintf(out, "\nfn=dropped\n");
-			fprintf(out, "0 %lld\n", fDroppedTicks);
+			fprintf(out, "0 %" B_PRId64 "\n", fDroppedTicks);
 		}
 	}
 
-	fprintf(out, "\ntotals: %lld %lld\n", fTotalTicks, fTotalTicks * fInterval);
+	fprintf(out, "\ntotals: %" B_PRId64 " %" B_PRId64 "\n",
+		fTotalTicks, fTotalTicks * fInterval);
 
 	fclose(out);
 }
@@ -290,22 +293,27 @@ CallgrindProfileResult::_PrintFunction(FILE* out,
 		// need to print the image name
 		int32 index = fNextImageOutputIndex++;
 		image->SetOutputIndex(index);
-		fprintf(out, "%sob=(%ld) %s:%ld\n", called ? "c" : "", index,
-			image->GetImage()->Name(), image->ID());
+		fprintf(out,
+			"%sob=(%" B_PRId32 ") %s:%" B_PRId32 "\n", called ? "c" : "",
+			index, image->GetImage()->Name(), image->ID());
 	} else {
 		// image is already known
 		// TODO: We may not need to print it at all!
-		fprintf(out, "%sob=(%ld)\n", called ? "c" : "", image->OutputIndex());
+		fprintf(out,
+			"%sob=(%" B_PRId32 ")\n", called ? "c" : "", image->OutputIndex());
 	}
 
 	CallgrindFunction& function = image->Functions()[functionIndex];
 	if (function.outputIndex == 0) {
 		// need to print the function name
 		function.outputIndex = fNextFunctionOutputIndex++;
-		fprintf(out, "%sfn=(%ld) %s\n", called ? "c" : "", function.outputIndex,
+		fprintf(out,
+			"%sfn=(%" B_PRId32 ") %s\n", called ? "c" : "",
+			function.outputIndex,
 			image->GetImage()->Symbols()[functionIndex]->Name());
 	} else {
 		// function is already known
-		fprintf(out, "%sfn=(%ld)\n", called ? "c" : "", function.outputIndex);
+		fprintf(out,
+			"%sfn=(%" B_PRId32 ")\n", called ? "c" : "", function.outputIndex);
 	}
 }

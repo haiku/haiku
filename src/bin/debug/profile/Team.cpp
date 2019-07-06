@@ -71,7 +71,8 @@ Team::Init(team_id teamID, port_id debuggerPort)
 	// install ourselves as the team debugger
 	fNubPort = install_team_debugger(teamID, debuggerPort);
 	if (fNubPort < 0) {
-		fprintf(stderr, "%s: Failed to install as debugger for team %ld: "
+		fprintf(stderr,
+			"%s: Failed to install as debugger for team %" B_PRId32 ": "
 			"%s\n", kCommandName, teamID, strerror(fNubPort));
 		return fNubPort;
 	}
@@ -79,7 +80,8 @@ Team::Init(team_id teamID, port_id debuggerPort)
 	// init debug context
 	error = init_debug_context(&fDebugContext, teamID, fNubPort);
 	if (error != B_OK) {
-		fprintf(stderr, "%s: Failed to init debug context for team %ld: "
+		fprintf(stderr,
+			"%s: Failed to init debug context for team %" B_PRId32 ": "
 			"%s\n", kCommandName, teamID, strerror(error));
 		return error;
 	}
@@ -112,13 +114,14 @@ Team::InitThread(Thread* thread)
 
 	// create the sample area
 	char areaName[B_OS_NAME_LENGTH];
-	snprintf(areaName, sizeof(areaName), "profiling samples %ld",
+	snprintf(areaName, sizeof(areaName), "profiling samples %" B_PRId32,
 		thread->ID());
 	void* samples;
 	area_id sampleArea = create_area(areaName, &samples, B_ANY_ADDRESS,
 		SAMPLE_AREA_SIZE, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (sampleArea < 0) {
-		fprintf(stderr, "%s: Failed to create sample area for thread %ld: "
+		fprintf(stderr,
+			"%s: Failed to create sample area for thread %" B_PRId32 ": "
 			"%s\n", kCommandName, thread->ID(), strerror(sampleArea));
 		return sampleArea;
 	}
@@ -160,7 +163,8 @@ Team::InitThread(Thread* thread)
 			B_DEBUG_START_PROFILER, &message, sizeof(message), &reply,
 			sizeof(reply));
 		if (error != B_OK || (error = reply.error) != B_OK) {
-			fprintf(stderr, "%s: Failed to start profiler for thread %ld: %s\n",
+			fprintf(stderr,
+				"%s: Failed to start profiler for thread %" B_PRId32 ": %s\n",
 				kCommandName, thread->ID(), strerror(error));
 			return error;
 		}

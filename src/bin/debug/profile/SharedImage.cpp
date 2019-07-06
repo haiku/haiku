@@ -44,7 +44,8 @@ SharedImage::Init(team_id owner, image_id imageID)
 		&lookupContext);
 	if (error != B_OK) {
 		fprintf(stderr, "%s: Failed to create symbol lookup context "
-			"for team %ld: %s\n", kCommandName, owner, strerror(error));
+			"for team %" B_PRId32 ": %s\n",
+			kCommandName, owner, strerror(error));
 		return error;
 	}
 
@@ -56,7 +57,8 @@ SharedImage::Init(team_id owner, image_id imageID)
 	error = debug_create_image_symbol_iterator(lookupContext, imageID,
 		&iterator);
 	if (error != B_OK) {
-		fprintf(stderr, "Failed to init symbol iterator for image %ld: %s\n",
+		fprintf(stderr,
+			"Failed to init symbol iterator for image %" B_PRId32 ": %s\n",
 			imageID, strerror(error));
 		debug_delete_symbol_lookup_context(lookupContext);
 		return error;
