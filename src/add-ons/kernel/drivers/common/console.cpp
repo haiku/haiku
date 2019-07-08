@@ -78,6 +78,8 @@ static struct console_desc {
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
+static int32 sOpenMask;
+
 
 static inline void
 update_cursor(struct console_desc *console, int x, int y)
@@ -659,6 +661,9 @@ _console_write(struct console_desc *console, const void *buffer, size_t length)
 static status_t
 console_open(const char *name, uint32 flags, void **cookie)
 {
+	if (atomic_or(&sOpenMask, 1) == 1)
+		return B_BUSY;
+
 	*cookie = &sConsole;
 
 	status_t status = get_module(sConsole.module_name, (module_info **)&sConsole.module);
@@ -676,6 +681,8 @@ console_freecookie(void *cookie)
 		put_module(sConsole.module_name);
 		sConsole.module = NULL;
 	}
+
+	atomic_and(&sOpenMask, ~1);
 
 	return B_OK;
 }
