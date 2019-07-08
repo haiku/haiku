@@ -2918,15 +2918,8 @@ team_is_valid(team_id id)
 	if (id <= 0)
 		return false;
 
-	return team_get_team_struct(id) != NULL;
-}
-
-
-Team*
-team_get_team_struct(team_id id)
-{
 	InterruptsReadSpinLocker teamsLocker(sTeamHashLock);
-	return team_get_team_struct_locked(id);
+	return team_get_team_struct_locked(id) != NULL;
 }
 
 
@@ -3018,6 +3011,17 @@ team_set_foreground_process_group(int32 ttyIndex, pid_t processGroupID)
 	session->foreground_group = processGroupID;
 
 	return B_OK;
+}
+
+
+uid_t
+team_geteuid(team_id id)
+{
+	InterruptsReadSpinLocker teamsLocker(sTeamHashLock);
+	Team* team = team_get_team_struct_locked(id);
+	if (team == NULL)
+		return (uid_t)-1;
+	return team->effective_uid;
 }
 
 

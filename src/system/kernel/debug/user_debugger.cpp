@@ -2859,13 +2859,8 @@ _user_install_default_debugger(port_id debuggerPort)
 port_id
 _user_install_team_debugger(team_id teamID, port_id debuggerPort)
 {
-	if (geteuid() != 0) {
-		Team* team = team_get_team_struct(teamID);
-		if (team == NULL)
-			return B_BAD_VALUE;
-		if (team->effective_uid != geteuid())
-			return B_PERMISSION_DENIED;
-	}
+	if (geteuid() != 0 && team_geteuid(teamID) != geteuid())
+		return B_PERMISSION_DENIED;
 
 	return install_team_debugger(teamID, debuggerPort, -1, false, false);
 }
