@@ -38,7 +38,6 @@ struct job_control_entry* team_get_death_entry(Team *team,
 			thread_id child, bool* _deleteEntry);
 void team_init_exit_info_on_error(Team* team);
 bool team_is_valid(team_id id);
-Team *team_get_team_struct(team_id id);
 Team *team_get_team_struct_locked(team_id id);
 int32 team_max_teams(void);
 int32 team_used_teams(void);
@@ -51,6 +50,7 @@ void team_set_job_control_state(Team* team, job_control_state newState,
 void team_set_controlling_tty(int32 index);
 int32 team_get_controlling_tty();
 status_t team_set_foreground_process_group(int32 ttyIndex, pid_t processGroup);
+uid_t team_geteuid(team_id id);
 
 status_t start_watching_team(team_id team, void (*hook)(team_id, void *),
 			void *data);
