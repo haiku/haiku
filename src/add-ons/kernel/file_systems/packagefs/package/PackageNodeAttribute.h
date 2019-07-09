@@ -19,6 +19,9 @@ class PackageNode;
 class PackageNodeAttribute
 	: public DoublyLinkedListLinkImpl<PackageNodeAttribute> {
 public:
+	static	void*				operator new(size_t size);
+	static	void				operator delete(void* block);
+
 								PackageNodeAttribute(uint32 type,
 									const PackageData& data);
 								~PackageNodeAttribute();

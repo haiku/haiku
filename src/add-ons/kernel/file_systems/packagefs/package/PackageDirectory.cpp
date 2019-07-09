@@ -7,6 +7,11 @@
 #include "PackageDirectory.h"
 #include "Package.h"
 
+#include "ClassCache.h"
+
+
+CLASS_CACHE(PackageDirectory);
+
 
 PackageDirectory::PackageDirectory(Package* package, mode_t mode)
 	:

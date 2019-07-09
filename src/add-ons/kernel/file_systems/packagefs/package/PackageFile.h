@@ -12,6 +12,9 @@
 
 class PackageFile : public PackageLeafNode {
 public:
+	static	void*				operator new(size_t size);
+	static	void				operator delete(void* block);
+
 								PackageFile(Package* package, mode_t mode,
 									const PackageData& data);
 	virtual						~PackageFile();

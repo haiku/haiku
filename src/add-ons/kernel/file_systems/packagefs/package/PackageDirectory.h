@@ -14,6 +14,9 @@
 class PackageDirectory : public PackageNode,
 	public DoublyLinkedListLinkImpl<PackageDirectory> {
 public:
+	static	void*				operator new(size_t size);
+	static	void				operator delete(void* block);
+
 								PackageDirectory(Package* package, mode_t mode);
 	virtual						~PackageDirectory();
 
