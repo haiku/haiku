@@ -465,7 +465,7 @@ RatePackageWindow::_SetWorkerThread(thread_id thread)
 }
 
 
-int32
+/*static*/ int32
 RatePackageWindow::_QueryRatingThreadEntry(void* data)
 {
 	RatePackageWindow* window = reinterpret_cast<RatePackageWindow*>(data);

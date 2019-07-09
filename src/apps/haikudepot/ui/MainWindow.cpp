@@ -48,6 +48,7 @@
 #include "support.h"
 #include "ScreenshotWindow.h"
 #include "UserLoginWindow.h"
+#include "UserUsageConditionsWindow.h"
 #include "WorkStatusView.h"
 
 
@@ -56,23 +57,24 @@
 
 
 enum {
-	MSG_BULK_LOAD_DONE		= 'mmwd',
-	MSG_REFRESH_REPOS			= 'mrrp',
-	MSG_MANAGE_REPOS			= 'mmrp',
-	MSG_SOFTWARE_UPDATER		= 'mswu',
-	MSG_LOG_IN					= 'lgin',
-	MSG_LOG_OUT					= 'lgot',
-	MSG_AUTHORIZATION_CHANGED	= 'athc',
-	MSG_CATEGORIES_LIST_CHANGED	= 'clic',
-	MSG_PACKAGE_CHANGED			= 'pchd',
-	MSG_WORK_STATUS_CHANGE		= 'wsch',
-	MSG_WORK_STATUS_CLEAR		= 'wscl',
+	MSG_BULK_LOAD_DONE						= 'mmwd',
+	MSG_REFRESH_REPOS						= 'mrrp',
+	MSG_MANAGE_REPOS						= 'mmrp',
+	MSG_SOFTWARE_UPDATER					= 'mswu',
+	MSG_LOG_IN								= 'lgin',
+	MSG_LOG_OUT								= 'lgot',
+	MSG_AUTHORIZATION_CHANGED				= 'athc',
+	MSG_CATEGORIES_LIST_CHANGED				= 'clic',
+	MSG_PACKAGE_CHANGED						= 'pchd',
+	MSG_WORK_STATUS_CHANGE					= 'wsch',
+	MSG_WORK_STATUS_CLEAR					= 'wscl',
+	MSG_VIEW_LATEST_USER_USAGE_CONDITIONS	= 'vluc',
 
-	MSG_SHOW_FEATURED_PACKAGES	= 'sofp',
-	MSG_SHOW_AVAILABLE_PACKAGES	= 'savl',
-	MSG_SHOW_INSTALLED_PACKAGES	= 'sins',
-	MSG_SHOW_SOURCE_PACKAGES	= 'ssrc',
-	MSG_SHOW_DEVELOP_PACKAGES	= 'sdvl'
+	MSG_SHOW_FEATURED_PACKAGES				= 'sofp',
+	MSG_SHOW_AVAILABLE_PACKAGES				= 'savl',
+	MSG_SHOW_INSTALLED_PACKAGES				= 'sins',
+	MSG_SHOW_SOURCE_PACKAGES				= 'ssrc',
+	MSG_SHOW_DEVELOP_PACKAGES				= 'sdvl'
 };
 
 
@@ -332,6 +334,10 @@ MainWindow::MessageReceived(BMessage* message)
 
 		case MSG_LOG_OUT:
 			fModel.SetUsername("");
+			break;
+
+		case MSG_VIEW_LATEST_USER_USAGE_CONDITIONS:
+			_ViewLatestUserUsageConditions();
 			break;
 
 		case MSG_AUTHORIZATION_CHANGED:
@@ -732,6 +738,11 @@ MainWindow::_BuildUserMenu(BMenuBar* menuBar)
 
 	fLogOutItem = new BMenuItem(B_TRANSLATE("Log out"),
 		new BMessage(MSG_LOG_OUT));
+	fUserMenu->AddItem(fLogOutItem);
+
+	fLogOutItem = new BMenuItem(B_TRANSLATE("View latest user usage conditions"
+		B_UTF8_ELLIPSIS),
+		new BMessage(MSG_VIEW_LATEST_USER_USAGE_CONDITIONS));
 	fUserMenu->AddItem(fLogOutItem);
 
 	menuBar->AddItem(fUserMenu);
@@ -1331,4 +1342,13 @@ MainWindow::_ShowScreenshot()
 		fScreenshotWindow->Activate();
 
 	fScreenshotWindow->Unlock();
+}
+
+
+void
+MainWindow::_ViewLatestUserUsageConditions()
+{
+	UserUsageConditionsWindow* window = new UserUsageConditionsWindow(
+		this, BRect(0, 0, 500, 400), fModel, LATEST);
+	window->Show();
 }

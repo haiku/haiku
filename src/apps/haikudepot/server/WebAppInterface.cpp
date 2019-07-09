@@ -411,6 +411,102 @@ WebAppInterface::RetrieveUserRating(const BString& packageName,
 }
 
 
+/*! \brief Returns data relating to the user usage conditions
+
+	\param code defines the version of the data to return or if empty then the
+		latest is returned.
+
+    This method will go to the server and get details relating to the user usage
+    conditions.  It does this in two API calls; first gets the details (the
+    minimum age) and in the second call, the text of the conditions is returned.
+*/
+
+status_t
+WebAppInterface::RetrieveUserUsageConditions(const BString& code,
+	UserUsageConditions& conditions)
+{
+	BMessage responseEnvelopeMessage;
+	status_t result = _RetrieveUserUsageConditionsMeta(code,
+		responseEnvelopeMessage);
+
+	if (result != B_OK)
+		return result;
+
+	BMessage resultMessage;
+	if (responseEnvelopeMessage.FindMessage("result", &resultMessage) != B_OK) {
+		fprintf(stderr, "bad response envelope missing 'result' entry\n");
+		return B_BAD_DATA;
+	}
+
+	BString metaDataCode;
+	double metaDataMinimumAge;
+	BString copyMarkdown;
+
+	if ( (resultMessage.FindString("code", &metaDataCode) != B_OK)
+		|| (resultMessage.FindDouble(
+			"minimumAge", &metaDataMinimumAge) != B_OK) ) {
+		printf("unexpected response from server with missing user usage "
+			"conditions data\n");
+		return B_BAD_DATA;
+	}
+
+	BMallocIO* copyMarkdownData = new BMallocIO();
+	result = _RetrieveUserUsageConditionsCopy(metaDataCode, copyMarkdownData);
+
+	if (result != B_OK)
+		return result;
+
+	conditions.SetCode(metaDataCode);
+	conditions.SetMinimumAge(metaDataMinimumAge);
+	conditions.SetCopyMarkdown(
+		BString(static_cast<const char*>(copyMarkdownData->Buffer()),
+			copyMarkdownData->BufferLength()));
+
+	return B_OK;
+}
+
+
+status_t
+WebAppInterface::_RetrieveUserUsageConditionsMeta(const BString& code,
+	BMessage& message)
+{
+	BMallocIO* requestEnvelopeData = new BMallocIO();
+	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
+
+	requestEnvelopeWriter.WriteObjectStart();
+	_WriteStandardJsonRpcEnvelopeValues(requestEnvelopeWriter,
+		"getUserUsageConditions");
+	requestEnvelopeWriter.WriteObjectName("params");
+	requestEnvelopeWriter.WriteArrayStart();
+
+	requestEnvelopeWriter.WriteObjectStart();
+
+	if (!code.IsEmpty()) {
+		requestEnvelopeWriter.WriteObjectName("code");
+		requestEnvelopeWriter.WriteString(code.String());
+	}
+
+	requestEnvelopeWriter.WriteObjectEnd();
+	requestEnvelopeWriter.WriteArrayEnd();
+	requestEnvelopeWriter.WriteObjectEnd();
+
+	// now fetch this information into an object.
+
+	return _SendJsonRequest("user", requestEnvelopeData,
+		_LengthAndSeekToZero(requestEnvelopeData), 0, message);
+}
+
+
+status_t
+WebAppInterface::_RetrieveUserUsageConditionsCopy(const BString& code,
+	BDataIO* stream)
+{
+	return _SendRawGetRequest(
+		BString("/__user/usageconditions/") << code << "/document.md",
+		stream);
+}
+
+
 status_t
 WebAppInterface::CreateUserRating(const BString& packageName,
 	const BPackageVersion& version,
@@ -555,36 +651,9 @@ status_t
 WebAppInterface::RetrieveScreenshot(const BString& code,
 	int32 width, int32 height, BDataIO* stream)
 {
-	BUrl url = ServerSettings::CreateFullUrl(
+	return _SendRawGetRequest(
 		BString("/__pkgscreenshot/") << code << ".png" << "?tw="
-			<< width << "&th=" << height);
-
-	bool isSecure = url.Protocol() == "https";
-
-	ProtocolListener listener(Logger::IsTraceEnabled());
-	listener.SetDownloadIO(stream);
-
-	BHttpHeaders headers;
-	ServerSettings::AugmentHeaders(headers);
-
-	BHttpRequest request(url, isSecure, "HTTP", &listener);
-	request.SetMethod(B_HTTP_GET);
-	request.SetHeaders(headers);
-
-	thread_id thread = request.Run();
-	wait_for_thread(thread, NULL);
-
-	const BHttpResult& result = dynamic_cast<const BHttpResult&>(
-		request.Result());
-
-	int32 statusCode = result.StatusCode();
-
-	if (statusCode == 200)
-		return B_OK;
-
-	fprintf(stderr, "failed to get screenshot from '%s': %" B_PRIi32 "\n",
-		url.UrlString().String(), statusCode);
-	return B_ERROR;
+			<< width << "&th=" << height, stream);
 }
 
 
@@ -827,6 +896,40 @@ WebAppInterface::_SendJsonRequest(const char* domain, const BString& jsonString,
 
 	return _SendJsonRequest(domain, data, jsonString.Length() - 1, flags,
 		reply);
+}
+
+
+status_t
+WebAppInterface::_SendRawGetRequest(const BString urlPathComponents,
+	BDataIO* stream)
+{
+	BUrl url = ServerSettings::CreateFullUrl(urlPathComponents);
+	bool isSecure = url.Protocol() == "https";
+
+	ProtocolListener listener(Logger::IsTraceEnabled());
+	listener.SetDownloadIO(stream);
+
+	BHttpHeaders headers;
+	ServerSettings::AugmentHeaders(headers);
+
+	BHttpRequest request(url, isSecure, "HTTP", &listener);
+	request.SetMethod(B_HTTP_GET);
+	request.SetHeaders(headers);
+
+	thread_id thread = request.Run();
+	wait_for_thread(thread, NULL);
+
+	const BHttpResult& result = dynamic_cast<const BHttpResult&>(
+		request.Result());
+
+	int32 statusCode = result.StatusCode();
+
+	if (statusCode == 200)
+		return B_OK;
+
+	fprintf(stderr, "failed to get data from '%s': %" B_PRIi32 "\n",
+		url.UrlString().String(), statusCode);
+	return B_ERROR;
 }
 
 

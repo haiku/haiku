@@ -2,8 +2,6 @@
  * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-
-
 #ifndef LOCAL_ICON_STORE_H
 #define LOCAL_ICON_STORE_H
 

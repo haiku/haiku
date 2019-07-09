@@ -101,6 +101,8 @@ private:
 			void				_RatePackage();
 			void				_ShowScreenshot();
 
+			void				_ViewLatestUserUsageConditions();
+
 private:
 			FilterView*			fFilterView;
 			TabView*			fListTabs;

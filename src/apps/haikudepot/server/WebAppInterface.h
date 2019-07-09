@@ -13,6 +13,7 @@
 #include <package/PackageVersion.h>
 
 #include "List.h"
+#include "UserUsageConditions.h"
 
 
 class BDataIO;
@@ -88,6 +89,10 @@ public:
 									int rating, bool active,
 									BMessage& message);
 
+			status_t			RetrieveUserUsageConditions(
+									const BString& code,
+									UserUsageConditions& conditions);
+
 			status_t			RetrieveScreenshot(
 									const BString& code,
 									int32 width, int32 height,
@@ -110,6 +115,13 @@ public:
 	static int32				ErrorCodeFromResponse(BMessage& response);
 
 private:
+			status_t			_SendRawGetRequest(
+									const BString urlPathComponents,
+									BDataIO* stream);
+			status_t			_RetrieveUserUsageConditionsMeta(
+									const BString& code, BMessage& message);
+			status_t			_RetrieveUserUsageConditionsCopy(
+									const BString& code, BDataIO* stream);
 			void				_WriteStandardJsonRpcEnvelopeValues(
 									BJsonWriter& writer,
 									const char* methodName);

@@ -143,6 +143,8 @@ local applicationSources =
 	ScrollableGroupView.cpp
 	SharedBitmap.cpp
 	UserLoginWindow.cpp
+	UserUsageConditions.cpp
+	UserUsageConditionsWindow.cpp
 	WorkStatusView.cpp
 
 	# network + server / local processes

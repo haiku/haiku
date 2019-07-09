@@ -27,6 +27,9 @@ enum {
 #define RATING_MIN						0.0f
 
 
+#define RGB_COLOR_WHITE						(rgb_color) { 255, 255, 255, 255 }
+
+
 #define HD_ERROR_BASE					(B_ERRORS_END + 1)
 #define HD_NETWORK_INACCESSIBLE			(HD_ERROR_BASE + 1)
 #define HD_CLIENT_TOO_OLD				(HD_ERROR_BASE + 2)
