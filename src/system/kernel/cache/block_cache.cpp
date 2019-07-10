@@ -114,6 +114,9 @@ typedef DoublyLinkedList<cached_block,
 		&cached_block::link> > block_list;
 
 struct cache_notification : DoublyLinkedListLinkImpl<cache_notification> {
+	static inline void* operator new(size_t size);
+	static inline void operator delete(void* block);
+
 	int32			transaction_id;
 	int32			events_pending;
 	int32			events;
@@ -123,6 +126,38 @@ struct cache_notification : DoublyLinkedListLinkImpl<cache_notification> {
 };
 
 typedef DoublyLinkedList<cache_notification> NotificationList;
+
+static object_cache* sCacheNotificationCache;
+
+struct cache_listener;
+typedef DoublyLinkedListLink<cache_listener> listener_link;
+
+struct cache_listener : cache_notification {
+	listener_link	link;
+};
+
+typedef DoublyLinkedList<cache_listener,
+	DoublyLinkedListMemberGetLink<cache_listener,
+		&cache_listener::link> > ListenerList;
+
+void*
+cache_notification::operator new(size_t size)
+{
+	// We can't really know whether something is a cache_notification or a
+	// cache_listener at runtime, so we just use one object_cache for both
+	// with the size set to that of the (slightly larger) cache_listener.
+	// In practice, the vast majority of cache_notifications are really
+	// cache_listeners, so this is a more than acceptable trade-off.
+	ASSERT(size <= sizeof(cache_listener));
+	return object_cache_alloc(sCacheNotificationCache, 0);
+}
+
+void
+cache_notification::operator delete(void* block)
+{
+	object_cache_free(sCacheNotificationCache, block, 0);
+}
+
 
 struct BlockHash {
 	typedef off_t			KeyType;
@@ -218,18 +253,6 @@ private:
 						int32 level);
 	cached_block*	_GetUnusedBlock();
 };
-
-struct cache_listener;
-typedef DoublyLinkedListLink<cache_listener> listener_link;
-
-struct cache_listener : cache_notification {
-	listener_link	link;
-};
-
-typedef DoublyLinkedList<cache_listener,
-	DoublyLinkedListMemberGetLink<cache_listener,
-		&cache_listener::link> > ListenerList;
-
 
 struct cache_transaction {
 	cache_transaction();
@@ -963,7 +986,7 @@ add_transaction_listener(block_cache* cache, cache_transaction* transaction,
 		}
 	}
 
-	cache_listener* listener = new(std::nothrow) cache_listener;
+	cache_listener* listener = new cache_listener;
 	if (listener == NULL)
 		return B_NO_MEMORY;
 
@@ -2660,6 +2683,11 @@ block_cache_init(void)
 	sBlockCache = create_object_cache_etc("cached blocks", sizeof(cached_block),
 		8, 0, 0, 0, CACHE_LARGE_SLAB, NULL, NULL, NULL, NULL);
 	if (sBlockCache == NULL)
+		return B_NO_MEMORY;
+
+	sCacheNotificationCache = create_object_cache("cache notifications",
+		sizeof(cache_listener), 8, NULL, NULL, NULL);
+	if (sCacheNotificationCache == NULL)
 		return B_NO_MEMORY;
 
 	new (&sCaches) DoublyLinkedList<block_cache>;
