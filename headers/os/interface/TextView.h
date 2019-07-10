@@ -287,10 +287,10 @@ private:
 			void				_ValidateLayoutData();
 			void				_ResetTextRect();
 
-			void				_HandleBackspace();
+			void				_HandleBackspace(int32 modifiers = -1);
 			void				_HandleArrowKey(uint32 arrowKey,
 									int32 modifiers = -1);
-			void				_HandleDelete();
+			void				_HandleDelete(int32 modifiers = -1);
 			void				_HandlePageKey(uint32 pageKey,
 									int32 modifiers = -1);
 			void				_HandleAlphaKey(const char* bytes,
@@ -450,17 +450,20 @@ private:
 			LayoutData*			fLayoutData;
 			int32				fLastClickOffset;
 
-			bool				fInstalledNavigateCommandWordwiseShortcuts;
-			bool				fInstalledNavigateOptionWordwiseShortcuts;
-			bool				fInstalledNavigateOptionLinewiseShortcuts;
-			bool				fInstalledNavigateHomeEndDocwiseShortcuts;
+			bool				fInstalledNavigateCommandWordwiseShortcuts : 1;
+			bool				fInstalledNavigateOptionWordwiseShortcuts : 1;
+			bool				fInstalledNavigateOptionLinewiseShortcuts : 1;
+			bool				fInstalledNavigateHomeEndDocwiseShortcuts : 1;
 
-			bool				fInstalledSelectCommandWordwiseShortcuts;
-			bool				fInstalledSelectOptionWordwiseShortcuts;
-			bool				fInstalledSelectOptionLinewiseShortcuts;
-			bool				fInstalledSelectHomeEndDocwiseShortcuts;
+			bool				fInstalledSelectCommandWordwiseShortcuts : 1;
+			bool				fInstalledSelectOptionWordwiseShortcuts : 1;
+			bool				fInstalledSelectOptionLinewiseShortcuts : 1;
+			bool				fInstalledSelectHomeEndDocwiseShortcuts : 1;
 
-			uint32				_reserved[5];
+			bool				fInstalledRemoveCommandWordwiseShortcuts : 1;
+			bool				fInstalledRemoveOptionWordwiseShortcuts : 1;
+
+			uint32				_reserved[6];
 };
 
 #endif	// _TEXTVIEW_H

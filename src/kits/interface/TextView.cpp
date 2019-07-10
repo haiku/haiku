@@ -196,6 +196,7 @@ static const float kVerticalScrollBarStep = 12.0;
 
 static const int32 kMsgNavigateArrow = '_NvA';
 static const int32 kMsgNavigatePage  = '_NvP';
+static const int32 kMsgRemoveWord    = '_RmW';
 
 
 static property_info sPropertyList[] = {
@@ -951,6 +952,17 @@ BTextView::MessageReceived(BMessage* message)
 			int32 key = message->GetInt32("key", 0);
 			int32 modifiers = message->GetInt32("modifiers", 0);
 			_HandlePageKey(key, modifiers);
+			break;
+		}
+
+		case kMsgRemoveWord:
+		{
+			int32 key = message->GetInt32("key", 0);
+			int32 modifiers = message->GetInt32("modifiers", 0);
+			if (key == B_DELETE)
+				_HandleDelete(modifiers);
+			else if (key == B_BACKSPACE)
+				_HandleBackspace(modifiers);
 			break;
 		}
 
@@ -3064,6 +3076,9 @@ BTextView::_InitObject(BRect textRect, const BFont* initialFont,
 	fInstalledSelectOptionLinewiseShortcuts = false;
 	fInstalledSelectHomeEndDocwiseShortcuts = false;
 
+	fInstalledRemoveCommandWordwiseShortcuts = false;
+	fInstalledRemoveOptionWordwiseShortcuts = false;
+
 	// We put these here instead of in the constructor initializer list
 	// to have less code duplication, and a single place where to do changes
 	// if needed.
@@ -3115,8 +3130,25 @@ BTextView::_InitObject(BRect textRect, const BFont* initialFont,
 
 //!	Handles when Backspace key is pressed.
 void
-BTextView::_HandleBackspace()
+BTextView::_HandleBackspace(int32 modifiers)
 {
+	if (modifiers < 0) {
+		BMessage* currentMessage = Window()->CurrentMessage();
+		if (currentMessage == NULL
+			|| currentMessage->FindInt32("modifiers", &modifiers) != B_OK) {
+			modifiers = 0;
+		}
+	}
+
+	bool controlKeyDown = (modifiers & B_CONTROL_KEY) != 0;
+	bool optionKeyDown  = (modifiers & B_OPTION_KEY)  != 0;
+	bool commandKeyDown = (modifiers & B_COMMAND_KEY) != 0;
+
+	if ((commandKeyDown || optionKeyDown) && !controlKeyDown) {
+		fSelStart = _PreviousWordStart(fCaretOffset - 1);
+		fSelEnd = fCaretOffset;
+	}
+
 	if (fUndo) {
 		TypingUndoBuffer* undoBuffer = dynamic_cast<TypingUndoBuffer*>(
 			fUndo);
@@ -3320,8 +3352,25 @@ BTextView::_HandleArrowKey(uint32 arrowKey, int32 modifiers)
 
 //!	Handles when the Delete key is pressed.
 void
-BTextView::_HandleDelete()
+BTextView::_HandleDelete(int32 modifiers)
 {
+	if (modifiers < 0) {
+		BMessage* currentMessage = Window()->CurrentMessage();
+		if (currentMessage == NULL
+			|| currentMessage->FindInt32("modifiers", &modifiers) != B_OK) {
+			modifiers = 0;
+		}
+	}
+
+	bool controlKeyDown = (modifiers & B_CONTROL_KEY) != 0;
+	bool optionKeyDown  = (modifiers & B_OPTION_KEY)  != 0;
+	bool commandKeyDown = (modifiers & B_COMMAND_KEY) != 0;
+
+	if ((commandKeyDown || optionKeyDown) && !controlKeyDown) {
+		fSelStart = fCaretOffset;
+		fSelEnd = _NextWordEnd(fCaretOffset) + 1;
+	}
+
 	if (fUndo) {
 		TypingUndoBuffer* undoBuffer = dynamic_cast<TypingUndoBuffer*>(
 			fUndo);
@@ -4972,6 +5021,20 @@ BTextView::_Activate()
 
 			fInstalledSelectCommandWordwiseShortcuts = true;
 		}
+		if (!Window()->HasShortcut(B_DELETE, B_COMMAND_KEY)
+			&& !Window()->HasShortcut(B_BACKSPACE, B_COMMAND_KEY)) {
+			message = new BMessage(kMsgRemoveWord);
+			message->AddInt32("key", B_DELETE);
+			message->AddInt32("modifiers", B_COMMAND_KEY);
+			Window()->AddShortcut(B_DELETE, B_COMMAND_KEY, message, this);
+
+			message = new BMessage(kMsgRemoveWord);
+			message->AddInt32("key", B_BACKSPACE);
+			message->AddInt32("modifiers", B_COMMAND_KEY);
+			Window()->AddShortcut(B_BACKSPACE, B_COMMAND_KEY, message, this);
+
+			fInstalledRemoveCommandWordwiseShortcuts = true;
+		}
 
 		if (!Window()->HasShortcut(B_LEFT_ARROW, B_OPTION_KEY)
 			&& !Window()->HasShortcut(B_RIGHT_ARROW, B_OPTION_KEY)) {
@@ -5003,6 +5066,20 @@ BTextView::_Activate()
 				message, this);
 
 			fInstalledSelectOptionWordwiseShortcuts = true;
+		}
+		if (!Window()->HasShortcut(B_DELETE, B_OPTION_KEY)
+			&& !Window()->HasShortcut(B_BACKSPACE, B_OPTION_KEY)) {
+			message = new BMessage(kMsgRemoveWord);
+			message->AddInt32("key", B_DELETE);
+			message->AddInt32("modifiers", B_OPTION_KEY);
+			Window()->AddShortcut(B_DELETE, B_OPTION_KEY, message, this);
+
+			message = new BMessage(kMsgRemoveWord);
+			message->AddInt32("key", B_BACKSPACE);
+			message->AddInt32("modifiers", B_OPTION_KEY);
+			Window()->AddShortcut(B_BACKSPACE, B_OPTION_KEY, message, this);
+
+			fInstalledRemoveOptionWordwiseShortcuts = true;
 		}
 
 		if (!Window()->HasShortcut(B_UP_ARROW, B_OPTION_KEY)
@@ -5098,6 +5175,11 @@ BTextView::_Deactivate()
 				B_COMMAND_KEY | B_SHIFT_KEY);
 			fInstalledSelectCommandWordwiseShortcuts = false;
 		}
+		if (fInstalledRemoveCommandWordwiseShortcuts) {
+			Window()->RemoveShortcut(B_DELETE, B_COMMAND_KEY);
+			Window()->RemoveShortcut(B_BACKSPACE, B_COMMAND_KEY);
+			fInstalledRemoveCommandWordwiseShortcuts = false;
+		}
 
 		if (fInstalledNavigateOptionWordwiseShortcuts) {
 			Window()->RemoveShortcut(B_LEFT_ARROW, B_OPTION_KEY);
@@ -5108,6 +5190,11 @@ BTextView::_Deactivate()
 			Window()->RemoveShortcut(B_LEFT_ARROW, B_OPTION_KEY | B_SHIFT_KEY);
 			Window()->RemoveShortcut(B_RIGHT_ARROW, B_OPTION_KEY | B_SHIFT_KEY);
 			fInstalledSelectOptionWordwiseShortcuts = false;
+		}
+		if (fInstalledRemoveOptionWordwiseShortcuts) {
+			Window()->RemoveShortcut(B_DELETE, B_OPTION_KEY);
+			Window()->RemoveShortcut(B_BACKSPACE, B_OPTION_KEY);
+			fInstalledRemoveOptionWordwiseShortcuts = false;
 		}
 
 		if (fInstalledNavigateOptionLinewiseShortcuts) {
