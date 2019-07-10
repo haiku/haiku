@@ -1598,21 +1598,24 @@ block_cache::_LowMemoryHandler(void* data, uint32 resources, int32 level)
 	// (if there is enough memory left, we don't free any)
 
 	block_cache* cache = (block_cache*)data;
+	if (cache->unused_block_count <= 1)
+		return;
+
 	int32 free = 0;
 	int32 secondsOld = 0;
 	switch (level) {
 		case B_NO_LOW_RESOURCE:
 			return;
 		case B_LOW_RESOURCE_NOTE:
-			free = cache->unused_block_count / 8;
+			free = cache->unused_block_count / 4;
 			secondsOld = 120;
 			break;
 		case B_LOW_RESOURCE_WARNING:
-			free = cache->unused_block_count / 4;
+			free = cache->unused_block_count / 2;
 			secondsOld = 10;
 			break;
 		case B_LOW_RESOURCE_CRITICAL:
-			free = cache->unused_block_count / 2;
+			free = cache->unused_block_count - 1;
 			secondsOld = 0;
 			break;
 	}
