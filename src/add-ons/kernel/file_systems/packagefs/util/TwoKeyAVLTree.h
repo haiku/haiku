@@ -6,6 +6,7 @@
 #define TWO_KEY_AVL_TREE_H
 
 
+#include <slab/Slab.h>
 #include <util/AVLTreeMap.h>
 
 
@@ -155,9 +156,37 @@ public:
 		fGetPrimaryKey(getPrimaryKey),
 		fGetSecondaryKey(getSecondaryKey)
 	{
+		fObjectCache = create_object_cache("packagefs TwoKeyAVLTreeNodes", sizeof(Node), 8,
+			NULL, NULL, NULL);
+		fObjectCacheRefs = new int32(1);
+	}
+	TwoKeyAVLTreeNodeStrategy(const TwoKeyAVLTreeNodeStrategy& other)
+		:
+		fPrimaryKeyCompare(other.fPrimaryKeyCompare),
+		fSecondaryKeyCompare(other.fSecondaryKeyCompare),
+		fGetPrimaryKey(other.fGetPrimaryKey),
+		fGetSecondaryKey(other.fGetSecondaryKey),
+		fObjectCache(other.fObjectCache),
+		fObjectCacheRefs(other.fObjectCacheRefs)
+	{
+		atomic_add(fObjectCacheRefs, 1);
+	}
+	~TwoKeyAVLTreeNodeStrategy()
+	{
+		atomic_add(fObjectCacheRefs, -1);
+		if (atomic_get(fObjectCacheRefs) == 0) {
+			delete_object_cache(fObjectCache);
+			delete fObjectCacheRefs;
+		}
 	}
 
 	struct Node : AVLTreeNode {
+		static void* operator new(size_t size, object_cache* cache) {
+			if (size != sizeof(Node) || !cache)
+				panic("unexpected size passed to operator new!");
+			return object_cache_alloc(cache, 0);
+		}
+
 		Node(const Value& value)
 			:
 			AVLTreeNode(),
@@ -170,12 +199,17 @@ public:
 
 	inline Node* Allocate(const Key& key, const Value& value) const
 	{
-		return new(nothrow) Node(value);
+		return new(fObjectCache) Node(value);
 	}
 
 	inline void Free(Node* node) const
 	{
-		delete node;
+		if (node == NULL)
+			return;
+
+		// There is no way to overload operator delete with extra parameters.
+		node->~Node();
+		object_cache_free(fObjectCache, node, 0);
 	}
 
 	// internal use (not part of the strategy)
@@ -228,6 +262,9 @@ private:
 	SecondaryKeyCompare	fSecondaryKeyCompare;
 	GetPrimaryKey		fGetPrimaryKey;
 	GetSecondaryKey		fGetSecondaryKey;
+
+	object_cache*		fObjectCache;
+	int32*				fObjectCacheRefs;
 };
 
 
