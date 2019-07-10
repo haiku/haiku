@@ -400,6 +400,99 @@ btrfs_read_stat(fs_volume* _volume, fs_vnode* _node, struct stat* stat)
 
 
 static status_t
+btrfs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
+	uint32 mask)
+{
+	FUNCTION();
+
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_node->private_node;
+
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
+
+	btrfs_inode& node = inode->Node();
+	bool updateTime = false;
+	uid_t uid = geteuid();
+
+	bool isOwnerOrRoot = uid == 0 || uid == (uid_t)node.UserID();
+	bool hasWriteAccess = inode->CheckPermissions(W_OK) == B_OK;
+
+	Transaction transaction(volume);
+
+	if ((mask & B_STAT_SIZE) != 0 && inode->Size() != stat->st_size) {
+		if (inode->IsDirectory())
+			return B_IS_A_DIRECTORY;
+		if (!inode->IsFile())
+			return B_BAD_VALUE;
+		if (!hasWriteAccess)
+			RETURN_ERROR(B_NOT_ALLOWED);
+
+		//TODO: implement file shrinking/growing
+		return B_NOT_SUPPORTED;
+	}
+
+	if ((mask & B_STAT_UID) != 0) {
+		if (uid != 0)
+			RETURN_ERROR(B_NOT_ALLOWED);
+		node.uid = B_HOST_TO_LENDIAN_INT32(stat->st_uid);
+		updateTime = true;
+	}
+
+	if ((mask & B_STAT_GID) != 0) {
+		if (!isOwnerOrRoot)
+			RETURN_ERROR(B_NOT_ALLOWED);
+		node.gid = B_HOST_TO_LENDIAN_INT32(stat->st_gid);
+		updateTime = true;
+	}
+
+	if ((mask & B_STAT_MODE) != 0) {
+		if (!isOwnerOrRoot)
+			RETURN_ERROR(B_NOT_ALLOWED);
+		PRINT(("original mode = %ld, stat->st_mode = %d\n", node.Mode(),
+			stat->st_mode));
+		node.mode = B_HOST_TO_LENDIAN_INT32((node.Mode() & ~S_IUMSK)
+			| (stat->st_mode & S_IUMSK));
+		updateTime = true;
+	}
+
+	if ((mask & B_STAT_CREATION_TIME) != 0) {
+		if (!isOwnerOrRoot && !hasWriteAccess)
+			RETURN_ERROR(B_NOT_ALLOWED);
+		btrfs_inode::SetTime(node.change_time, stat->st_crtim);
+	}
+
+	if ((mask & B_STAT_MODIFICATION_TIME) != 0) {
+		if (!isOwnerOrRoot && !hasWriteAccess)
+			RETURN_ERROR(B_NOT_ALLOWED);
+		btrfs_inode::SetTime(node.change_time, stat->st_mtim);
+	}
+
+	if ((mask & B_STAT_CHANGE_TIME) != 0 || updateTime) {
+		if (!isOwnerOrRoot && !hasWriteAccess)
+			RETURN_ERROR(B_NOT_ALLOWED);
+		if ((mask & B_STAT_CHANGE_TIME) == 0) {
+			uint64_t microseconds = real_time_clock_usecs();
+			struct timespec t;
+			t.tv_sec = microseconds / 1000000;
+			t.tv_nsec = microseconds % 1000000;
+			btrfs_inode::SetTime(node.change_time, t);
+		} else
+			btrfs_inode::SetTime(node.change_time, stat->st_ctim);
+	}
+
+	status_t status = transaction.Done();
+	if (status == B_OK) {
+		ino_t pid;
+		inode->FindParent(&pid);
+		notify_stat_changed(volume->ID(), pid, inode->ID(), mask);
+	}
+
+	return status;
+}
+
+
+static status_t
 btrfs_open(fs_volume* /*_volume*/, fs_vnode* _node, int openMode,
 	void** _cookie)
 {
@@ -1044,7 +1137,7 @@ fs_vnode_ops gBtrfsVnodeOps = {
 
 	&btrfs_access,
 	&btrfs_read_stat,
-	NULL,	// fs_write_stat,
+	&btrfs_write_stat,
 	NULL,	// fs_preallocate
 
 	/* file operations */
