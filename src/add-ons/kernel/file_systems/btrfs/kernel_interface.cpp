@@ -483,6 +483,51 @@ btrfs_read_link(fs_volume* _volume, fs_vnode* _node, char* buffer,
 }
 
 
+status_t
+btrfs_unlink(fs_volume* _volume, fs_vnode* _directory, const char* name)
+{
+	if (!strcmp(name, "..") || !strcmp(name, "."))
+		return B_NOT_ALLOWED;
+
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* directory = (Inode*)_directory->private_node;
+
+	status_t status = directory->CheckPermissions(W_OK);
+	if (status < B_OK)
+		return status;
+
+	Transaction transaction(volume);
+	BTree::Path path(volume->FSTree());
+
+	ino_t id;
+	status = DirectoryIterator(directory).Lookup(name, strlen(name), &id);
+	if (status != B_OK)
+		return status;
+
+	Inode inode(volume, id);
+	status = inode.InitCheck();
+	if (status != B_OK)
+		return status;
+
+	status = inode.Remove(transaction, &path);
+	if (status != B_OK)
+		return status;
+	status = inode.Dereference(transaction, &path, directory->ID(), name);
+	if (status != B_OK)
+		return status;
+
+	entry_cache_remove(volume->ID(), directory->ID(), name);
+
+	status = transaction.Done();
+	if (status == B_OK)
+		notify_entry_removed(volume->ID(), directory->ID(), name, id);
+	else
+		entry_cache_add(volume->ID(), directory->ID(), name, id);
+
+	return status;
+}
+
+
 //	#pragma mark - Directory functions
 
 
@@ -973,7 +1018,7 @@ fs_vnode_ops gBtrfsVnodeOps = {
 	NULL,	// fs_create_symlink,
 
 	NULL,	// fs_link,
-	NULL,	// fs_unlink,
+	&btrfs_unlink,
 	NULL,	// fs_rename,
 
 	&btrfs_access,
