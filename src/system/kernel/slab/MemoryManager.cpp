@@ -956,8 +956,8 @@ MemoryManager::_AllocateChunks(size_t chunkSize, uint32 chunkCount,
 		_AddArea(_PopFreeArea());
 		_RequestMaintenance();
 
-		_GetChunks(metaChunkList, chunkSize, chunkCount, _metaChunk, _chunk);
-		return B_OK;
+		return _GetChunks(metaChunkList, chunkSize, chunkCount, _metaChunk,
+			_chunk) ? B_OK : B_NO_MEMORY;
 	}
 
 	if ((flags & CACHE_DONT_LOCK_KERNEL_SPACE) != 0) {
@@ -1018,8 +1018,8 @@ MemoryManager::_AllocateChunks(size_t chunkSize, uint32 chunkCount,
 	}
 
 	_AddArea(area);
-	_GetChunks(metaChunkList, chunkSize, chunkCount, _metaChunk, _chunk);
-	return B_OK;
+	return _GetChunks(metaChunkList, chunkSize, chunkCount, _metaChunk,
+		_chunk) ? B_OK : B_NO_MEMORY;
 }
 
 
