@@ -226,6 +226,9 @@ struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
 	uint32			busy_writing_count;
 	bool			busy_writing_waiters;
 
+	bigtime_t		last_block_write;
+	bigtime_t		last_block_write_duration;
+
 	uint32			num_dirty_blocks;
 	bool			read_only;
 
@@ -1203,6 +1206,8 @@ BlockWriter::Write(cache_transaction* transaction, bool canUnlock)
 	qsort(fBlocks, fCount, sizeof(void*), &_CompareBlocks);
 	fDeletedTransaction = false;
 
+	bigtime_t start = system_time();
+
 	for (uint32 i = 0; i < fCount; i++) {
 		status_t status = _WriteBlock(fBlocks[i]);
 		if (status != B_OK) {
@@ -1216,8 +1221,16 @@ BlockWriter::Write(cache_transaction* transaction, bool canUnlock)
 		}
 	}
 
+	bigtime_t finish = system_time();
+
 	if (canUnlock)
 		mutex_lock(&fCache->lock);
+
+	if (fStatus == B_OK && fCount >= 8) {
+		fCache->last_block_write = finish;
+		fCache->last_block_write_duration = (fCache->last_block_write - start)
+			/ fCount;
+	}
 
 	for (uint32 i = 0; i < fCount; i++)
 		_BlockDone(fBlocks[i], transaction);
@@ -1392,6 +1405,8 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 	busy_reading_waiters(false),
 	busy_writing_count(0),
 	busy_writing_waiters(0),
+	last_block_write(0),
+	last_block_write_duration(0),
 	num_dirty_blocks(0),
 	read_only(readOnly)
 {
@@ -2538,8 +2553,8 @@ get_next_locked_block_cache(block_cache* last)
 static status_t
 block_notifier_and_writer(void* /*data*/)
 {
-	const bigtime_t kTimeout = 2000000LL;
-	bigtime_t timeout = kTimeout;
+	const bigtime_t kDefaultTimeout = 2000000LL;
+	bigtime_t timeout = kDefaultTimeout;
 
 	while (true) {
 		bigtime_t start = system_time();
@@ -2552,15 +2567,32 @@ block_notifier_and_writer(void* /*data*/)
 			continue;
 		}
 
-		// write 64 blocks of each block_cache every two seconds
-		// TODO: change this once we have an I/O scheduler
-		timeout = kTimeout;
+		// Write 64 blocks of each block_cache roughly every 2 seconds,
+		// potentially more or less depending on congestion and drive speeds
+		// (usually much less.) We do not want to queue everything at once
+		// because a future transaction might then get held up waiting for
+		// a specific block to be written.
+		timeout = kDefaultTimeout;
 		size_t usedMemory;
 		object_cache_get_usage(sBlockCache, &usedMemory);
 
 		block_cache* cache = NULL;
 		while ((cache = get_next_locked_block_cache(cache)) != NULL) {
+			// Give some breathing room: wait 2x the length of the potential
+			// maximum block count-sized write between writes, and also skip
+			// if there are more than 16 blocks currently being written.
+			const bigtime_t next = cache->last_block_write
+					+ cache->last_block_write_duration * 2 * 64;
+			if (cache->busy_writing_count > 16 || system_time() < next) {
+				if (cache->last_block_write_duration > 0) {
+					timeout = min_c(timeout,
+						cache->last_block_write_duration * 2 * 64);
+				}
+				continue;
+			}
+
 			BlockWriter writer(cache, 64);
+			bool hasMoreBlocks = false;
 
 			size_t cacheUsedMemory;
 			object_cache_get_usage(cache->buffer_cache, &cacheUsedMemory);
@@ -2573,10 +2605,11 @@ block_notifier_and_writer(void* /*data*/)
 
 				while (iterator.HasNext()) {
 					cached_block* block = iterator.Next();
-					if (block->CanBeWritten() && !writer.Add(block))
+					if (block->CanBeWritten() && !writer.Add(block)) {
+						hasMoreBlocks = true;
 						break;
+					}
 				}
-
 			} else {
 				TransactionTable::Iterator iterator(cache->transaction_hash);
 
@@ -2594,12 +2627,21 @@ block_notifier_and_writer(void* /*data*/)
 
 					bool hasLeftOvers;
 						// we ignore this one
-					if (!writer.Add(transaction, hasLeftOvers))
+					if (!writer.Add(transaction, hasLeftOvers)) {
+						hasMoreBlocks = true;
 						break;
+					}
 				}
 			}
 
 			writer.Write();
+
+			if (hasMoreBlocks && cache->last_block_write_duration > 0) {
+				// There are probably still more blocks that we could write, so
+				// see if we can decrease the timeout.
+				timeout = min_c(timeout,
+					cache->last_block_write_duration * 2 * 64);
+			}
 
 			if ((block_cache_used_memory() / B_PAGE_SIZE)
 					> vm_page_num_pages() / 2) {
