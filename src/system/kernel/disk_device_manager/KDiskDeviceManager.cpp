@@ -197,7 +197,7 @@ public:
 
 		if (strcmp(event->name, "raw") == 0) {
 			// a new raw device was added/removed
-			KPath path(B_PATH_NAME_LENGTH + 1);
+			KPath path;
 			if (path.InitCheck() != B_OK
 				|| vfs_entry_ref_to_path(event->device, event->directory,
 					event->name, true, path.LockBuffer(),

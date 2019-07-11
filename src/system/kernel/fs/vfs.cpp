@@ -44,6 +44,7 @@
 #include <KPath.h>
 #include <lock.h>
 #include <low_resource_manager.h>
+#include <slab/Slab.h>
 #include <syscalls.h>
 #include <syscall_restart.h>
 #include <tracing.h>
@@ -108,6 +109,7 @@
 #endif
 
 
+object_cache* sPathNameCache;
 const static size_t kMaxPathLength = 65536;
 	// The absolute maximum path length (for getcwd() - this is not depending
 	// on PATH_MAX
@@ -2233,7 +2235,8 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 				goto resolve_link_error;
 			}
 
-			buffer = (char*)malloc(bufferSize = B_PATH_NAME_LENGTH);
+			bufferSize = B_PATH_NAME_LENGTH;
+			buffer = (char*)object_cache_alloc(sPathNameCache, 0);
 			if (buffer == NULL) {
 				status = B_NO_MEMORY;
 				goto resolve_link_error;
@@ -2291,7 +2294,7 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 					ioContext, &nextVnode, &lastParentID);
 			}
 
-			free(buffer);
+			object_cache_free(sPathNameCache, buffer, 0);
 
 			if (status != B_OK) {
 				put_vnode(vnode);
@@ -4249,7 +4252,7 @@ vfs_get_vnode_from_path(const char* path, bool kernel, struct vnode** _vnode)
 	TRACE(("vfs_get_vnode_from_path: entry. path = '%s', kernel %d\n",
 		path, kernel));
 
-	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer;
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -4346,7 +4349,7 @@ vfs_get_fs_node_from_path(fs_volume* volume, const char* path,
 	TRACE(("vfs_get_fs_node_from_path(volume = %p, path = \"%s\", kernel %d)\n",
 		volume, path, kernel));
 
-	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer;
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -4396,7 +4399,7 @@ vfs_read_stat(int fd, const char* path, bool traverseLeafLink,
 
 	if (path != NULL) {
 		// path given: get the stat of the node referred to by (fd, path)
-		KPath pathBuffer(path, KPath::DEFAULT, B_PATH_NAME_LENGTH + 1);
+		KPath pathBuffer(path);
 		if (pathBuffer.InitCheck() != B_OK)
 			return B_NO_MEMORY;
 
@@ -4598,7 +4601,7 @@ vfs_create_special_node(const char* path, fs_vnode* subVnode, mode_t mode,
 
 	if (path) {
 		// We've got a path. Get the dir vnode and the leaf name.
-		KPath tmpPathBuffer(B_PATH_NAME_LENGTH + 1);
+		KPath tmpPathBuffer;
 		if (tmpPathBuffer.InitCheck() != B_OK)
 			return B_NO_MEMORY;
 
@@ -5340,6 +5343,11 @@ vfs_init(kernel_args* args)
 	if (sMountsTable == NULL
 			|| sMountsTable->Init(MOUNTS_HASH_TABLE_SIZE) != B_OK)
 		panic("vfs_init: error creating mounts hash table\n");
+
+	sPathNameCache = create_object_cache("path names",
+		B_PATH_NAME_LENGTH + 1, 8, NULL, NULL, NULL);
+	if (sPathNameCache == NULL)
+		panic("vfs_init: error creating path name object_cache\n");
 
 	node_monitor_init();
 
@@ -8166,7 +8174,7 @@ dev_t
 _kern_mount(const char* path, const char* device, const char* fsName,
 	uint32 flags, const char* args, size_t argsLength)
 {
-	KPath pathBuffer(path, KPath::DEFAULT, B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer(path);
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -8177,7 +8185,7 @@ _kern_mount(const char* path, const char* device, const char* fsName,
 status_t
 _kern_unmount(const char* path, uint32 flags)
 {
-	KPath pathBuffer(path, KPath::DEFAULT, B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer(path);
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -8305,7 +8313,7 @@ _kern_open_entry_ref(dev_t device, ino_t inode, const char* name, int openMode,
 int
 _kern_open(int fd, const char* path, int openMode, int perms)
 {
-	KPath pathBuffer(path, KPath::LAZY_ALLOC, B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer(path, KPath::LAZY_ALLOC);
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -8357,7 +8365,7 @@ _kern_open_dir_entry_ref(dev_t device, ino_t inode, const char* name)
 int
 _kern_open_dir(int fd, const char* path)
 {
-	KPath pathBuffer(path, KPath::LAZY_ALLOC, B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer(path, KPath::LAZY_ALLOC);
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -8418,7 +8426,7 @@ _kern_create_dir_entry_ref(dev_t device, ino_t inode, const char* name,
 status_t
 _kern_create_dir(int fd, const char* path, int perms)
 {
-	KPath pathBuffer(path, KPath::DEFAULT, B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer(path, KPath::DEFAULT);
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -8429,7 +8437,7 @@ _kern_create_dir(int fd, const char* path, int perms)
 status_t
 _kern_remove_dir(int fd, const char* path)
 {
-	KPath pathBuffer(path, KPath::LAZY_ALLOC, B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer(path, KPath::LAZY_ALLOC);
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -8458,7 +8466,7 @@ _kern_remove_dir(int fd, const char* path)
 status_t
 _kern_read_link(int fd, const char* path, char* buffer, size_t* _bufferSize)
 {
-	KPath pathBuffer(path, KPath::LAZY_ALLOC, B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer(path, KPath::LAZY_ALLOC);
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -8484,7 +8492,7 @@ _kern_read_link(int fd, const char* path, char* buffer, size_t* _bufferSize)
 status_t
 _kern_create_symlink(int fd, const char* path, const char* toPath, int mode)
 {
-	KPath pathBuffer(path, KPath::DEFAULT, B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer(path);
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -8497,8 +8505,8 @@ status_t
 _kern_create_link(int pathFD, const char* path, int toFD, const char* toPath,
 	bool traverseLeafLink)
 {
-	KPath pathBuffer(path, KPath::DEFAULT, B_PATH_NAME_LENGTH + 1);
-	KPath toPathBuffer(toPath, KPath::DEFAULT, B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer(path);
+	KPath toPathBuffer(toPath);
 	if (pathBuffer.InitCheck() != B_OK || toPathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -8523,7 +8531,7 @@ _kern_create_link(int pathFD, const char* path, int toFD, const char* toPath,
 status_t
 _kern_unlink(int fd, const char* path)
 {
-	KPath pathBuffer(path, KPath::DEFAULT, B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer(path);
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -8552,8 +8560,8 @@ _kern_unlink(int fd, const char* path)
 status_t
 _kern_rename(int oldFD, const char* oldPath, int newFD, const char* newPath)
 {
-	KPath oldPathBuffer(oldPath, KPath::DEFAULT, B_PATH_NAME_LENGTH + 1);
-	KPath newPathBuffer(newPath, KPath::DEFAULT, B_PATH_NAME_LENGTH + 1);
+	KPath oldPathBuffer(oldPath);
+	KPath newPathBuffer(newPath);
 	if (oldPathBuffer.InitCheck() != B_OK || newPathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -8565,7 +8573,7 @@ _kern_rename(int oldFD, const char* oldPath, int newFD, const char* newPath)
 status_t
 _kern_access(int fd, const char* path, int mode, bool effectiveUserGroup)
 {
-	KPath pathBuffer(path, KPath::LAZY_ALLOC, B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer(path, KPath::LAZY_ALLOC);
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -8661,7 +8669,7 @@ _kern_write_stat(int fd, const char* path, bool traverseLeafLink,
 
 	if (path != NULL) {
 		// path given: write the stat of the node referred to by (fd, path)
-		KPath pathBuffer(path, KPath::DEFAULT, B_PATH_NAME_LENGTH + 1);
+		KPath pathBuffer(path);
 		if (pathBuffer.InitCheck() != B_OK)
 			return B_NO_MEMORY;
 
@@ -8689,7 +8697,7 @@ _kern_write_stat(int fd, const char* path, bool traverseLeafLink,
 int
 _kern_open_attr_dir(int fd, const char* path, bool traverseLeafLink)
 {
-	KPath pathBuffer(path, KPath::LAZY_ALLOC, B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer(path, KPath::LAZY_ALLOC);
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -8701,7 +8709,7 @@ int
 _kern_open_attr(int fd, const char* path, const char* name, uint32 type,
 	int openMode)
 {
-	KPath pathBuffer(path, KPath::LAZY_ALLOC, B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer(path, KPath::LAZY_ALLOC);
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -8770,7 +8778,7 @@ _kern_getcwd(char* buffer, size_t size)
 status_t
 _kern_setcwd(int fd, const char* path)
 {
-	KPath pathBuffer(path, KPath::LAZY_ALLOC, B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer(path, KPath::LAZY_ALLOC);
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -8854,11 +8862,10 @@ _user_mount(const char* userPath, const char* userDevice,
 status_t
 _user_unmount(const char* userPath, uint32 flags)
 {
-	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
-
 	if (!IS_USER_ADDRESS(userPath))
 		return B_BAD_ADDRESS;
 
+	KPath pathBuffer;
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -8977,7 +8984,7 @@ _user_entry_ref_to_path(dev_t device, ino_t inode, const char* leaf,
 	if (!IS_USER_ADDRESS(userPath))
 		return B_BAD_ADDRESS;
 
-	KPath path(B_PATH_NAME_LENGTH + 1);
+	KPath path;
 	if (path.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -9020,7 +9027,7 @@ _user_normalize_path(const char* userPath, bool traverseLink, char* buffer)
 		return B_BAD_ADDRESS;
 
 	// copy path from userland
-	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer;
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 	char* path = pathBuffer.LockBuffer();
@@ -9071,7 +9078,7 @@ _user_open_entry_ref(dev_t device, ino_t inode, const char* userName,
 int
 _user_open(int fd, const char* userPath, int openMode, int perms)
 {
-	KPath path(B_PATH_NAME_LENGTH + 1);
+	KPath path;
 	if (path.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -9114,7 +9121,7 @@ _user_open_dir(int fd, const char* userPath)
 	if (userPath == NULL)
 		return dir_open(fd, NULL, false);
 
-	KPath path(B_PATH_NAME_LENGTH + 1);
+	KPath path;
 	if (path.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -9299,7 +9306,7 @@ _user_create_dir_entry_ref(dev_t device, ino_t inode, const char* userName,
 status_t
 _user_create_dir(int fd, const char* userPath, int perms)
 {
-	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer;
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -9318,7 +9325,7 @@ _user_create_dir(int fd, const char* userPath, int perms)
 status_t
 _user_remove_dir(int fd, const char* userPath)
 {
-	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer;
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -9340,7 +9347,7 @@ status_t
 _user_read_link(int fd, const char* userPath, char* userBuffer,
 	size_t* userBufferSize)
 {
-	KPath pathBuffer(B_PATH_NAME_LENGTH + 1), linkBuffer;
+	KPath pathBuffer, linkBuffer;
 	if (pathBuffer.InitCheck() != B_OK || linkBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -9386,8 +9393,8 @@ status_t
 _user_create_symlink(int fd, const char* userPath, const char* userToPath,
 	int mode)
 {
-	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
-	KPath toPathBuffer(B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer;
+	KPath toPathBuffer;
 	if (pathBuffer.InitCheck() != B_OK || toPathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -9411,8 +9418,8 @@ status_t
 _user_create_link(int pathFD, const char* userPath, int toFD,
 	const char* userToPath, bool traverseLeafLink)
 {
-	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
-	KPath toPathBuffer(B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer;
+	KPath toPathBuffer;
 	if (pathBuffer.InitCheck() != B_OK || toPathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -9440,7 +9447,7 @@ _user_create_link(int pathFD, const char* userPath, int toFD,
 status_t
 _user_unlink(int fd, const char* userPath)
 {
-	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer;
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -9460,8 +9467,8 @@ status_t
 _user_rename(int oldFD, const char* userOldPath, int newFD,
 	const char* userNewPath)
 {
-	KPath oldPathBuffer(B_PATH_NAME_LENGTH + 1);
-	KPath newPathBuffer(B_PATH_NAME_LENGTH + 1);
+	KPath oldPathBuffer;
+	KPath newPathBuffer;
 	if (oldPathBuffer.InitCheck() != B_OK || newPathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -9484,7 +9491,7 @@ _user_rename(int oldFD, const char* userOldPath, int newFD,
 status_t
 _user_create_fifo(int fd, const char* userPath, mode_t perms)
 {
-	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer;
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -9580,7 +9587,7 @@ _user_create_pipe(int* userFDs)
 status_t
 _user_access(int fd, const char* userPath, int mode, bool effectiveUserGroup)
 {
-	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer;
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -9614,7 +9621,7 @@ _user_read_stat(int fd, const char* userPath, bool traverseLink,
 		if (!IS_USER_ADDRESS(userPath))
 			return B_BAD_ADDRESS;
 
-		KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+		KPath pathBuffer;
 		if (pathBuffer.InitCheck() != B_OK)
 			return B_NO_MEMORY;
 
@@ -9671,7 +9678,7 @@ _user_write_stat(int fd, const char* userPath, bool traverseLeafLink,
 		if (!IS_USER_ADDRESS(userPath))
 			return B_BAD_ADDRESS;
 
-		KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+		KPath pathBuffer;
 		if (pathBuffer.InitCheck() != B_OK)
 			return B_NO_MEMORY;
 
@@ -9706,7 +9713,7 @@ _user_write_stat(int fd, const char* userPath, bool traverseLeafLink,
 int
 _user_open_attr_dir(int fd, const char* userPath, bool traverseLeafLink)
 {
-	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer;
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -9837,7 +9844,7 @@ _user_open_attr(int fd, const char* userPath, const char* userName,
 	if (status != B_OK)
 		return status;
 
-	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer;
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -9999,7 +10006,7 @@ _user_setcwd(int fd, const char* userPath)
 {
 	TRACE(("user_setcwd: path = %p\n", userPath));
 
-	KPath pathBuffer(B_PATH_NAME_LENGTH);
+	KPath pathBuffer;
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -10025,7 +10032,7 @@ _user_change_root(const char* userPath)
 		return B_NOT_ALLOWED;
 
 	// alloc path buffer
-	KPath pathBuffer(B_PATH_NAME_LENGTH);
+	KPath pathBuffer;
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 

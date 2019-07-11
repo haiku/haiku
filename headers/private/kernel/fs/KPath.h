@@ -23,14 +23,14 @@ public:
 		LAZY_ALLOC = 0x04
 	};
 public:
-								KPath(size_t bufferSize = B_PATH_NAME_LENGTH);
+								KPath(size_t bufferSize = B_PATH_NAME_LENGTH + 1);
 								KPath(const char* path, int32 flags = DEFAULT,
-									size_t bufferSize = B_PATH_NAME_LENGTH);
+									size_t bufferSize = B_PATH_NAME_LENGTH + 1);
 								KPath(const KPath& other);
 								~KPath();
 
 			status_t			SetTo(const char* path, int32 flags = DEFAULT,
-									size_t bufferSize = B_PATH_NAME_LENGTH);
+									size_t bufferSize = B_PATH_NAME_LENGTH + 1);
 			void				Adopt(KPath& other);
 
 			status_t			InitCheck() const;
@@ -67,6 +67,7 @@ public:
 
 private:
 			status_t			_AllocateBuffer();
+			void				_FreeBuffer();
 			status_t			_Normalize(const char* path,
 									bool traverseLeafLink);
 			void				_ChopTrailingSlashes();
