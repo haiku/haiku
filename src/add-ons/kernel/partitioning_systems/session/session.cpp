@@ -48,7 +48,7 @@ identify_partition(int fd, partition_data *partition, void **cookie)
 	float result = -1;
 	if ((partition->flags & B_PARTITION_IS_DEVICE) != 0
 		&& partition->block_size == 2048
-		&& ioctl(fd, B_GET_GEOMETRY, &geometry) == 0
+		&& ioctl(fd, B_GET_GEOMETRY, &geometry, sizeof(geometry)) == 0
 		&& geometry.device_type == B_CD) {
 		Disc *disc = new(std::nothrow) Disc(fd);
 		if (disc != NULL && disc->InitCheck() == B_OK) {

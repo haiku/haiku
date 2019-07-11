@@ -277,7 +277,8 @@ read_table_of_contents(int deviceFD, uint32 first_session, uchar* buffer,
 		memset(raw_command.sense_data, 0, raw_command.sense_data_length);
 		raw_command.timeout = kScsiTimeout;
 
-		if (ioctl(deviceFD, B_RAW_DEVICE_COMMAND, &raw_command) == 0) {
+		if (ioctl(deviceFD, B_RAW_DEVICE_COMMAND, &raw_command,
+				sizeof(raw_command)) == 0) {
 			if (raw_command.scsi_status == 0 && raw_command.cam_status == 1) {
 				// SUCCESS!!!
 				DBG(dump_full_table_of_contents(buffer, buffer_length));

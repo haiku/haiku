@@ -358,7 +358,7 @@ status_t
 KDiskDevice::GetMediaStatus(status_t* mediaStatus)
 {
 	status_t error = B_OK;
-	if (ioctl(fFD, B_GET_MEDIA_STATUS, mediaStatus) != 0)
+	if (ioctl(fFD, B_GET_MEDIA_STATUS, mediaStatus, sizeof(*mediaStatus)) != 0)
 		error = errno;
 	// maybe the device driver doesn't implement this ioctl -- see, if getting
 	// the device geometry succeeds
@@ -380,7 +380,7 @@ KDiskDevice::GetMediaStatus(status_t* mediaStatus)
 status_t
 KDiskDevice::GetGeometry(device_geometry* geometry)
 {
-	if (ioctl(fFD, B_GET_GEOMETRY, geometry) != 0)
+	if (ioctl(fFD, B_GET_GEOMETRY, geometry, sizeof(*geometry)) != 0)
 		return errno;
 	return B_OK;
 }

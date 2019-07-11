@@ -559,7 +559,7 @@ read_table_of_contents(int fd, uint32 track, uint8 format, uint8 *buffer,
 	raw.sense_data = senseData;
 	raw.sense_data_length = sizeof(kSenseSize);
 
-	if (ioctl(fd, B_RAW_DEVICE_COMMAND, &raw) == 0
+	if (ioctl(fd, B_RAW_DEVICE_COMMAND, &raw, sizeof(raw)) == 0
 		&& raw.scsi_status == 0 && raw.cam_status == 1) {
 		free(senseData);
 		return B_OK;
