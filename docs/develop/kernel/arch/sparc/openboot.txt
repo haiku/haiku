@@ -6,8 +6,13 @@ Executable format
 
 PowerPC uses COFF. Sparc uses a.out, which is a lot simpler. According to the
 spec, some fields should be zeroed out, but they say implementation may chose
-to allow other values, so it's possible a standard a.out file would work as
-well.
+to allow other values, so a standard a.out file works as well.
+
+It used to be possible to generate one with objcopy, but support was removed,
+so we now use elf2aout (imported from FreeBSD).
+
+The file is first loaded at 4000, then relocated to its load address (we use
+202000 and executed there)
 
 Openfirmware prompt
 ===================
@@ -47,7 +52,17 @@ Boot from network
 -----------------
 
 rarp:
-boot net
+boot net:,somefile
+(net is an alias to the network card and also sets the load address: /pci@1f,4000/network@1,1)
 
 dhcp:
 boot net:dhcp
+
+Debugging
+---------
+
+202000 dis (disassemble starting at 202000 until next return instruction)
+
+4000 1000 dump (dump 1000 bytes from address 4000)
+
+ctrace (backtrace)
