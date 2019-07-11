@@ -4401,16 +4401,7 @@ _user_get_extended_team_info(team_id teamID, uint32 flags, void* buffer,
 			uid_t	effective_uid;
 			gid_t	effective_gid;
 			char	name[B_OS_NAME_LENGTH];
-		};
-
-		ExtendedTeamData* teamClone
-			= (ExtendedTeamData*)malloc(sizeof(ExtendedTeamData));
-			// It would be nicer to use new, but then we'd have to use
-			// ObjectDeleter and declare the structure outside of the function
-			// due to template parameter restrictions.
-		if (teamClone == NULL)
-			return B_NO_MEMORY;
-		MemoryDeleter teamCloneDeleter(teamClone);
+		} teamClone;
 
 		io_context* ioContext;
 		{
@@ -4422,14 +4413,14 @@ _user_get_extended_team_info(team_id teamID, uint32 flags, void* buffer,
 			TeamLocker teamLocker(team, true);
 
 			// copy the data
-			teamClone->id = team->id;
-			strlcpy(teamClone->name, team->Name(), sizeof(teamClone->name));
-			teamClone->group_id = team->group_id;
-			teamClone->session_id = team->session_id;
-			teamClone->real_uid = team->real_uid;
-			teamClone->real_gid = team->real_gid;
-			teamClone->effective_uid = team->effective_uid;
-			teamClone->effective_gid = team->effective_gid;
+			teamClone.id = team->id;
+			strlcpy(teamClone.name, team->Name(), sizeof(teamClone.name));
+			teamClone.group_id = team->group_id;
+			teamClone.session_id = team->session_id;
+			teamClone.real_uid = team->real_uid;
+			teamClone.real_gid = team->real_gid;
+			teamClone.effective_uid = team->effective_uid;
+			teamClone.effective_gid = team->effective_gid;
 
 			// also fetch a reference to the I/O context
 			ioContext = team->io_context;
@@ -4439,14 +4430,14 @@ _user_get_extended_team_info(team_id teamID, uint32 flags, void* buffer,
 			&vfs_put_io_context);
 
 		// add the basic data to the info message
-		if (info.AddInt32("id", teamClone->id) != B_OK
-			|| info.AddString("name", teamClone->name) != B_OK
-			|| info.AddInt32("process group", teamClone->group_id) != B_OK
-			|| info.AddInt32("session", teamClone->session_id) != B_OK
-			|| info.AddInt32("uid", teamClone->real_uid) != B_OK
-			|| info.AddInt32("gid", teamClone->real_gid) != B_OK
-			|| info.AddInt32("euid", teamClone->effective_uid) != B_OK
-			|| info.AddInt32("egid", teamClone->effective_gid) != B_OK) {
+		if (info.AddInt32("id", teamClone.id) != B_OK
+			|| info.AddString("name", teamClone.name) != B_OK
+			|| info.AddInt32("process group", teamClone.group_id) != B_OK
+			|| info.AddInt32("session", teamClone.session_id) != B_OK
+			|| info.AddInt32("uid", teamClone.real_uid) != B_OK
+			|| info.AddInt32("gid", teamClone.real_gid) != B_OK
+			|| info.AddInt32("euid", teamClone.effective_uid) != B_OK
+			|| info.AddInt32("egid", teamClone.effective_gid) != B_OK) {
 			return B_NO_MEMORY;
 		}
 
