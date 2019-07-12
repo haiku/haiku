@@ -206,14 +206,14 @@ StreamBase::StreamBase(BMediaIO* source, BLocker* sourceLock,
 	// NOTE: Don't use streamLock here, it may not yet be initialized!
 
 	av_new_packet(&fPacket, 0);
-	memset(&fFormat, 0, sizeof(media_format));
+	fFormat.Clear();
 }
 
 
 StreamBase::~StreamBase()
 {
 	avformat_close_input(&fContext);
-	av_free_packet(&fPacket);
+	av_packet_unref(&fPacket);
 	if (fIOContext != NULL)
 		av_free(fIOContext->buffer);
 	av_free(fIOContext);
@@ -232,8 +232,8 @@ StreamBase::Open()
 		return B_NO_MEMORY;
 
 	// First try to identify the file using the MIME database, as ffmpeg
-	// (especially old versions) is not very good at this and relies on us
-	// to give it the file extension as an hint.
+	// is not very good at this and relies on us to give it the file extension
+	// as an hint.
 	// For this we need some valid data in the buffer, the first 512 bytes
 	// should do because our MIME sniffing never uses more.
 	const char* extension = NULL;
@@ -246,11 +246,6 @@ StreamBase::Open()
 			}
 		}
 	}
-
-	// If the format is not identified, try Amiga MOD-files, because these do
-	// not currently have a sniffing rule.
-	if (extension == NULL)
-		extension = ".mod";
 
 	// Allocate I/O context with buffer and hook functions, pass ourself as
 	// cookie.
@@ -432,7 +427,7 @@ StreamBase::Duration() const
 	fSource->GetFlags(&flags);
 
 	// "Mutable Size" (ie http streams) means we can't realistically compute
-	// a duration. So don't let ffmpeg giva (wrong) estimate in this case.
+	// a duration. So don't let ffmpeg give a (wrong) estimate in this case.
 	if ((flags & B_MEDIA_MUTABLE_SIZE) != 0)
 		return 0;
 
@@ -841,7 +836,7 @@ StreamBase::_NextPacket(bool reuse)
 		return B_OK;
 	}
 
-	av_free_packet(&fPacket);
+	av_packet_unref(&fPacket);
 
 	while (true) {
 		if (av_read_frame(fContext, &fPacket) < 0) {
@@ -856,7 +851,7 @@ StreamBase::_NextPacket(bool reuse)
 			break;
 
 		// This is a packet from another stream, ignore it.
-		av_free_packet(&fPacket);
+		av_packet_unref(&fPacket);
 	}
 
 	// Mark this packet with the new reuse flag.
@@ -962,7 +957,7 @@ AVFormatReader::Stream::Init(int32 virtualIndex)
 
 	// initialize the media_format for this stream
 	media_format* format = &fFormat;
-	memset(format, 0, sizeof(media_format));
+	format->Clear();
 
 	media_format_description description;
 
