@@ -42,8 +42,6 @@ public:
 
 			status_t			InitCheck();
 
-			BDataIO*			Source() const;
-
 			void				GetFileFormatInfo(
 									media_file_format* fileFormat) const;
 			status_t			GetMetaData(BMessage* _data) const;

@@ -173,13 +173,6 @@ MediaExtractor::InitCheck()
 }
 
 
-BDataIO*
-MediaExtractor::Source() const
-{
-	return fSource;
-}
-
-
 void
 MediaExtractor::GetFileFormatInfo(media_file_format* fileFormat) const
 {

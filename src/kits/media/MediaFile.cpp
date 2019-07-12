@@ -479,9 +479,9 @@ BMediaFile::_UnInit()
 
 	if (fDeleteSource) {
 		delete fSource;
-		fSource = NULL;
 		fDeleteSource = false;
 	}
+	fSource = NULL;
 
 	// Deleting the extractor or writer can cause unloading of the plugins.
 	// The source must be deleted before that, because it can come from a
@@ -523,8 +523,7 @@ BMediaFile::_InitReader(BDataIO* source, const BUrl* url, int32 flags)
 	if (fErr != B_OK)
 		return;
 
-	// Get the actual source from the extractor
-	fSource = fExtractor->Source();
+	fSource = source;
 
 	fExtractor->GetFileFormatInfo(&fMFI);
 	fTrackNum = fExtractor->StreamCount();
