@@ -525,7 +525,7 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 	}
 
 	// get device characteristics
-	if (ioctl(fd, B_GET_GEOMETRY, &geo) < 0) {
+	if (ioctl(fd, B_GET_GEOMETRY, &geo, sizeof(device_geometry)) < 0) {
 		struct stat st;
 		if (fstat(fd, &st) >= 0 && S_ISREG(st.st_mode)) {
 			/* support mounting disk images */

@@ -106,7 +106,7 @@ DeviceOpener::Open(const char* device, int mode)
 		if (_IsReadWrite(mode)) {
 			// check out if the device really allows for read/write access
 			device_geometry geometry;
-			if (!ioctl(fDevice, B_GET_GEOMETRY, &geometry)) {
+			if (!ioctl(fDevice, B_GET_GEOMETRY, &geometry, sizeof(device_geometry))) {
 				if (geometry.read_only) {
 					// reopen device read-only
 					close(fDevice);
@@ -166,7 +166,7 @@ status_t
 DeviceOpener::GetSize(off_t* _size, uint32* _blockSize)
 {
 	device_geometry geometry;
-	if (ioctl(fDevice, B_GET_GEOMETRY, &geometry) < 0) {
+	if (ioctl(fDevice, B_GET_GEOMETRY, &geometry, sizeof(device_geometry)) < 0) {
 		// maybe it's just a file
 		struct stat stat;
 		if (fstat(fDevice, &stat) < 0)

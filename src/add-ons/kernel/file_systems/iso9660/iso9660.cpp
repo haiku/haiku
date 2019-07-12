@@ -49,7 +49,7 @@ get_device_block_size(int fd)
 {
 	device_geometry geometry;
 
-	if (ioctl(fd, B_GET_GEOMETRY, &geometry) < 0)  {
+	if (ioctl(fd, B_GET_GEOMETRY, &geometry, sizeof(device_geometry)) < 0)  {
 		struct stat st;
 		if (fstat(fd, &st) < 0 || S_ISDIR(st.st_mode))
 			return 0;
@@ -628,7 +628,8 @@ ISOMount(const char *path, uint32 flags, iso9660_volume **_newVolume,
 
 	/* try to open the raw device to get access to the other sessions as well */
 	if (volume->fdOfSession >= 0) {
-		if (ioctl(volume->fdOfSession, B_GET_PARTITION_INFO, &partitionInfo) < 0) {
+		if (ioctl(volume->fdOfSession, B_GET_PARTITION_INFO, &partitionInfo,
+				sizeof(partition_info)) < 0) {
 			TRACE(("B_GET_PARTITION_INFO: ioctl returned error\n"));
 			strcpy(partitionInfo.device, path);
 		}

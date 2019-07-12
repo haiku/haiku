@@ -506,7 +506,7 @@ read_frames(int fd, off_t firstFrame, uint8 *buffer, size_t count)
 		read.buffer = (char *)buffer;
 		read.play = false;
 
-		if (ioctl(fd, B_SCSI_READ_CD, &read) < 0) {
+		if (ioctl(fd, B_SCSI_READ_CD, &read, sizeof(scsi_read_cd)) < 0) {
 			// drive couldn't read data - try again to read with a smaller block size
 			if (count == 1)
 				return errno;

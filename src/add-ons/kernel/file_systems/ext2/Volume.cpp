@@ -111,7 +111,7 @@ DeviceOpener::Open(const char* device, int mode)
 		if (_IsReadWrite(mode)) {
 			// check out if the device really allows for read/write access
 			device_geometry geometry;
-			if (!ioctl(fDevice, B_GET_GEOMETRY, &geometry)) {
+			if (!ioctl(fDevice, B_GET_GEOMETRY, &geometry, sizeof(device_geometry))) {
 				if (geometry.read_only) {
 					// reopen device read-only
 					close(fDevice);
@@ -171,7 +171,7 @@ status_t
 DeviceOpener::GetSize(off_t* _size, uint32* _blockSize)
 {
 	device_geometry geometry;
-	if (ioctl(fDevice, B_GET_GEOMETRY, &geometry) < 0) {
+	if (ioctl(fDevice, B_GET_GEOMETRY, &geometry, sizeof(device_geometry)) < 0) {
 		// maybe it's just a file
 		struct stat stat;
 		if (fstat(fDevice, &stat) < 0)
@@ -210,7 +210,7 @@ ext2_super_block::IsValid()
 			|| ReservedGDTBlocks() > (1UL << BlockShift()) / 4) {
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -283,7 +283,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 {
 	// flags |= B_MOUNT_READ_ONLY;
 		// we only support read-only for now
-	
+
 	if ((flags & B_MOUNT_READ_ONLY) != 0) {
 		TRACE("Volume::Mount(): Read only\n");
 	} else {
@@ -312,7 +312,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		FATAL("Volume::Mount(): Identify() failed\n");
 		return status;
 	}
-	
+
 	// check read-only features if mounting read-write
 	if (!IsReadOnly() && _UnsupportedReadOnlyFeatures(fSuperBlock) != 0)
 		return B_UNSUPPORTED;
@@ -345,7 +345,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	TRACE("block size %" B_PRIu32 ", num groups %" B_PRIu32 ", groups per "
 		"block %" B_PRIu32 ", first %" B_PRIu32 "\n", fBlockSize, fNumGroups,
 		fGroupsPerBlock, fFirstDataBlock);
-	
+
 	uint32 blockCount = (fNumGroups + fGroupsPerBlock - 1) / fGroupsPerBlock;
 
 	fGroupBlocks = (uint8**)malloc(blockCount * sizeof(uint8*));
@@ -366,7 +366,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	fBlockCache = opener.InitCache(NumBlocks(), fBlockSize);
 	if (fBlockCache == NULL)
 		return B_ERROR;
-	
+
 	TRACE("Volume::Mount(): Initialized block cache: %p\n", fBlockCache);
 
 	// initialize journal if mounted read-write
@@ -374,7 +374,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		(fSuperBlock.CompatibleFeatures() & EXT2_FEATURE_HAS_JOURNAL) != 0) {
 		// TODO: There should be a mount option to ignore the existent journal
 		if (fSuperBlock.JournalInode() != 0) {
-			fJournalInode = new(std::nothrow) Inode(this, 
+			fJournalInode = new(std::nothrow) Inode(this,
 				fSuperBlock.JournalInode());
 
 			if (fJournalInode == NULL)
@@ -526,7 +526,7 @@ Volume::_UnsupportedIncompatibleFeatures(ext2_super_block& superBlock)
 		| EXT2_INCOMPATIBLE_FEATURE_EXTENTS
 		| EXT2_INCOMPATIBLE_FEATURE_FLEX_GROUP;
 		/*| EXT2_INCOMPATIBLE_FEATURE_META_GROUP*/;
-	uint32 unsupported = superBlock.IncompatibleFeatures() 
+	uint32 unsupported = superBlock.IncompatibleFeatures()
 		& ~supportedIncompatible;
 
 	if (unsupported != 0) {
@@ -585,7 +585,7 @@ Volume::_GroupCheckSum(ext2_block_group *group, int32 index)
 		checksum = calculate_crc(checksum, (uint8*)&number, sizeof(number));
 		checksum = calculate_crc(checksum, (uint8*)group, 30);
 		if (Has64bitFeature()) {
-			checksum = calculate_crc(checksum, (uint8*)group + 34, 
+			checksum = calculate_crc(checksum, (uint8*)group + 34,
 				fGroupDescriptorSize - 34);
 		}
 	}
@@ -621,13 +621,13 @@ Volume::GetBlockGroup(int32 index, ext2_block_group** _group)
 		memcpy(fGroupBlocks[blockIndex], block, fBlockSize);
 
 		TRACE("group [%" B_PRId32 "]: inode table %" B_PRIu64 "\n", index,
-			((ext2_block_group*)(fGroupBlocks[blockIndex] + blockOffset 
+			((ext2_block_group*)(fGroupBlocks[blockIndex] + blockOffset
 				* fGroupDescriptorSize))->InodeTable(Has64bitFeature()));
 	}
 
 	*_group = (ext2_block_group*)(fGroupBlocks[blockIndex]
 		+ blockOffset * fGroupDescriptorSize);
-	if (HasChecksumFeature() 
+	if (HasChecksumFeature()
 		&& (*_group)->checksum != _GroupCheckSum(*_group, index)) {
 		return B_BAD_DATA;
 	}
@@ -653,7 +653,7 @@ Volume::WriteBlockGroup(Transaction& transaction, int32 index)
 
 	ext2_block_group *group = (ext2_block_group*)(fGroupBlocks[blockIndex]
 		+ blockOffset * fGroupDescriptorSize);
-	
+
 	group->checksum = _GroupCheckSum(group, index);
 	TRACE("Volume::WriteBlockGroup() checksum 0x%x for group %" B_PRId32 " "
 		"(free inodes %" B_PRIu32 ", unused %" B_PRIu32 ")\n", group->checksum,
@@ -677,13 +677,13 @@ Volume::WriteBlockGroup(Transaction& transaction, int32 index)
 status_t
 Volume::ActivateLargeFiles(Transaction& transaction)
 {
-	if ((fSuperBlock.ReadOnlyFeatures() 
+	if ((fSuperBlock.ReadOnlyFeatures()
 		& EXT2_READ_ONLY_FEATURE_LARGE_FILE) != 0)
 		return B_OK;
-	
+
 	fSuperBlock.SetReadOnlyFeatures(fSuperBlock.ReadOnlyFeatures()
 		| EXT2_READ_ONLY_FEATURE_LARGE_FILE);
-	
+
 	return WriteSuperBlock(transaction);
 }
 
@@ -691,13 +691,13 @@ Volume::ActivateLargeFiles(Transaction& transaction)
 status_t
 Volume::ActivateDirNLink(Transaction& transaction)
 {
-	if ((fSuperBlock.ReadOnlyFeatures() 
+	if ((fSuperBlock.ReadOnlyFeatures()
 		& EXT2_READ_ONLY_FEATURE_DIR_NLINK) != 0)
 		return B_OK;
-	
+
 	fSuperBlock.SetReadOnlyFeatures(fSuperBlock.ReadOnlyFeatures()
 		| EXT2_READ_ONLY_FEATURE_DIR_NLINK);
-	
+
 	return WriteSuperBlock(transaction);
 }
 
@@ -734,7 +734,7 @@ Volume::RemoveOrphan(Transaction& transaction, ino_t id)
 
 	ext2_inode* inode = (ext2_inode*)(block
 		+ InodeBlockIndex(currentID) * InodeSize());
-	
+
 	if (currentID == id) {
 		TRACE("Volume::RemoveOrphan(): First entry. Updating head to: %d\n",
 			(int)inode->NextOrphan());

@@ -560,7 +560,7 @@ udf_mount(fs_volume *_volume, const char *_device, uint32 flags,
 		//
 		// If that fails, you're just SOL.
 
-		if (ioctl(device, B_GET_PARTITION_INFO, &info) == 0) {
+		if (ioctl(device, B_GET_PARTITION_INFO, &info, sizeof(partition_info)) == 0) {
 			TRACE(("partition_info:\n"));
 			TRACE(("\toffset:             %Ld\n", info.offset));
 			TRACE(("\tsize:               %Ld\n", info.size));
@@ -571,7 +571,7 @@ udf_mount(fs_volume *_volume, const char *_device, uint32 flags,
 			_device = info.device;
 			deviceOffset = info.offset / info.logical_block_size;
 			numBlock = deviceOffset + info.size / info.logical_block_size;
-		} else if (ioctl(device, B_GET_GEOMETRY, &geometry) == 0) {
+		} else if (ioctl(device, B_GET_GEOMETRY, &geometry, sizeof(device_geometry)) == 0) {
 			TRACE(("geometry_info:\n"));
 			TRACE(("\tsectors_per_track: %ld\n", geometry.sectors_per_track));
 			TRACE(("\tcylinder_count:    %ld\n", geometry.cylinder_count));
