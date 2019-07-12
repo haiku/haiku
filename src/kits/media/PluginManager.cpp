@@ -86,7 +86,6 @@ public:
 		fData(NULL),
 		fPosition(NULL),
 		fMedia(NULL),
-		fBufferIO(NULL),
 		fDataIOAdapter(NULL),
 		fErr(B_NO_ERROR)
 	{
@@ -94,32 +93,17 @@ public:
 
 		fPosition = dynamic_cast<BPositionIO*>(source);
 		fMedia = dynamic_cast<BMediaIO*>(source);
-		fBufferIO = dynamic_cast<BBufferIO *>(source);
 		fData = source;
 
-		// No need to do additional buffering if we have
-		// a BBufferIO or a BMediaIO.
-		if (!IsMedia() && fBufferIO == NULL) {
-			// Source needs to be at least a BPositionIO to wrap with a BBufferIO
-			if (IsPosition()) {
-				fBufferIO = new(std::nothrow) BBufferIO(fPosition, 65536, false);
-				if (fBufferIO == NULL) {
-					fErr = B_NO_MEMORY;
-					return;
-				}
-				// We have to reset our parents reference too
-				fPosition = dynamic_cast<BPositionIO*>(fBufferIO);
-				fData = dynamic_cast<BDataIO*>(fPosition);
-			} else {
-				// In this case we have to supply our own form
-				// of pseudo-seekable object from a non-seekable
-				// BDataIO.
-				fDataIOAdapter = new DataIOAdapter(source);
-				fMedia = dynamic_cast<BMediaIO*>(fDataIOAdapter);
-				fPosition = dynamic_cast<BPositionIO*>(fDataIOAdapter);
-				fData = dynamic_cast<BDataIO*>(fDataIOAdapter);
-				TRACE("Unable to improve performance with a BufferIO\n");
-			}
+		if (!IsPosition()) {
+			// In this case we have to supply our own form
+			// of pseudo-seekable object from a non-seekable
+			// BDataIO.
+			fDataIOAdapter = new DataIOAdapter(source);
+			fMedia = dynamic_cast<BMediaIO*>(fDataIOAdapter);
+			fPosition = dynamic_cast<BPositionIO*>(fDataIOAdapter);
+			fData = dynamic_cast<BDataIO*>(fDataIOAdapter);
+			TRACE("Unable to improve performance with a BufferIO\n");
 		}
 
 		if (IsMedia())
@@ -130,9 +114,6 @@ public:
 
 	virtual	~BMediaIOWrapper()
 	{
-		if (fBufferIO != NULL)
-			delete fBufferIO;
-
 		if (fDataIOAdapter != NULL)
 			delete fDataIOAdapter;
 	}
@@ -212,7 +193,6 @@ private:
 	BDataIO*			fData;
 	BPositionIO*		fPosition;
 	BMediaIO*			fMedia;
-	BBufferIO*			fBufferIO;
 	DataIOAdapter*		fDataIOAdapter;
 
 	int32				fFlags;
