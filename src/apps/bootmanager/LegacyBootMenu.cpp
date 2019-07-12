@@ -612,7 +612,7 @@ LegacyBootMenu::_GetBIOSDrive(const char* device, int8& drive)
 	if (fd < 0)
 		return errno;
 
-	status_t status = ioctl(fd, B_GET_BIOS_DRIVE_ID, drive, 1);
+	status_t status = ioctl(fd, B_GET_BIOS_DRIVE_ID, &drive, 1);
 	close(fd);
 	return status;
 }
