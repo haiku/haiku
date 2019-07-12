@@ -56,7 +56,7 @@ error(const char* message, ...)
 
 	va_list args;
 	va_start(args, message);
-	
+
 	vsnprintf(buffer, sizeof(buffer), message, args);
 
 	va_end(args);
@@ -79,7 +79,7 @@ update_leds(int fd, uint32 modifiers)
 	if ((modifiers & B_SCROLL_LOCK) != 0)
 		lockIO[2] = 1;
 
-	ioctl(fd, KB_SET_LEDS, &lockIO);
+	ioctl(fd, KB_SET_LEDS, &lockIO, sizeof(lockIO));
 }
 
 
@@ -106,7 +106,8 @@ keyboard_reader(void* arg)
 
 	for (;;) {
 		raw_key_info rawKeyInfo;
-		if (ioctl(keyboard->device, KB_READ, &rawKeyInfo) != 0)
+		if (ioctl(keyboard->device, KB_READ, &rawKeyInfo,
+				sizeof(rawKeyInfo)) != 0)
 			break;
 
 		uint32 keycode = rawKeyInfo.keycode;
@@ -313,7 +314,7 @@ start_console(struct console* con)
 				continue;
 
 			snprintf(name, sizeof(name), "/dev/pt/%s", entry->d_name);
- 
+
 			con->tty_master_fd = open(name, O_RDWR);
 			if (con->tty_master_fd >= 0) {
 				snprintf(name, sizeof(name), "/dev/tt/%s", entry->d_name);

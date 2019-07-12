@@ -412,7 +412,7 @@ command_list(int argc, const char* const* argv)
 
 		// issue the request
 		ram_disk_ioctl_info request;
-		if (ioctl(fd, RAM_DISK_IOCTL_INFO, &request) < 0)
+		if (ioctl(fd, RAM_DISK_IOCTL_INFO, &request, sizeof(request)) < 0)
 			continue;
 
 		int32 rowIndex = table.CountRows();

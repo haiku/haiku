@@ -508,13 +508,13 @@ Services::_Listener()
 			if (connection.Type() == SOCK_STREAM) {
 				// accept incoming connection
 				int value = 1;
-				ioctl(i, FIONBIO, &value);
+				ioctl(i, FIONBIO, &value, sizeof(value));
 					// make sure we don't wait for the connection
 
 				socket = accept(connection.socket, NULL, NULL);
 
 				value = 0;
-				ioctl(i, FIONBIO, &value);
+				ioctl(i, FIONBIO, &value, sizeof(value));
 
 				if (socket < 0)
 					continue;

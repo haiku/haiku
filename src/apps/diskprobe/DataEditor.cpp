@@ -499,7 +499,8 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 	} else if (fIsDevice) {
 		device_geometry geometry;
 		int device = fFile.Dup();
-		if (device < 0 || ioctl(device, B_GET_GEOMETRY, &geometry) < 0) {
+		if (device < 0 || ioctl(device, B_GET_GEOMETRY, &geometry,
+				sizeof(geometry)) < 0) {
 			if (device >= 0)
 				close(device);
 			fFile.Unset();

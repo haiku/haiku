@@ -413,7 +413,7 @@ TabletDevice::_UpdateSettings()
 	if (get_click_speed(&fSettings.click_speed) != B_OK)
 		LOG_ERR("error when get_click_speed\n");
 	else
-		ioctl(fDevice, MS_SET_CLICKSPEED, &fSettings.click_speed);
+		ioctl(fDevice, MS_SET_CLICKSPEED, &fSettings.click_speed, sizeof(bigtime_t));
 }
 
 

@@ -118,7 +118,7 @@ get_device_icon(const char* device, void* icon, int32 size)
 	// attributes. Should those attributes override the icon returned by
 	// ioctl(,B_GET_ICON,)?
 	device_icon iconData = {size, icon};
-	if (ioctl(fd, B_GET_ICON, &iconData) != 0) {
+	if (ioctl(fd, B_GET_ICON, &iconData, sizeof(device_icon)) != 0) {
 		// legacy icon was not available, try vector icon
 		close(fd);
 
@@ -230,7 +230,7 @@ get_device_icon(const char* device, uint8** _data, size_t* _size,
 	// Try to get the icon by name first
 
 	char name[B_FILE_NAME_LENGTH];
-	if (ioctl(fd, B_GET_ICON_NAME, name) >= 0) {
+	if (ioctl(fd, B_GET_ICON_NAME, name, sizeof(name)) >= 0) {
 		status_t status = get_named_icon(name, _data, _size, _type);
 		if (status == B_OK) {
 			close(fd);

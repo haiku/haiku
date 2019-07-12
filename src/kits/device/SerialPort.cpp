@@ -20,8 +20,8 @@
 #include <termios.h>
 
 
-/* The directory where the serial driver publishes its devices */ 
-#define SERIAL_DIR "/dev/ports" 
+/* The directory where the serial driver publishes its devices */
+#define SERIAL_DIR "/dev/ports"
 
 // Scans a directory and adds the entries it founds as strings to the
 // given list
@@ -31,19 +31,19 @@ scan_directory(const char *directory, BList *list)
 	BEntry entry;
 	BDirectory dir(SERIAL_DIR);
 	char buf[B_OS_NAME_LENGTH];
-	
+
 	ASSERT(list != NULL);
 	while (dir.GetNextEntry(&entry) == B_OK) {
 		entry.GetName(buf);
 		list->AddItem(strdup(buf));
 	};
-	
+
 	return list->CountItems();
 }
 
 
 /*! \brief Creates and initializes a BSerialPort object.
-	
+
 	Query the driver, and builds a list of the available
 	serial ports.
 	The BSerialPort object is initialized to these values:
@@ -73,17 +73,17 @@ BSerialPort::BSerialPort()
 
 /*! \brief Frees the resources associated with the object.
 	Closes the port, if it's open, and deletes the devices list.
-*/ 
+*/
 BSerialPort::~BSerialPort()
 {
 	if (ffd >= 0)
 		close(ffd);
-	
+
 	if (fDevices != NULL) {
 		for (int32 count = fDevices->CountItems() - 1; count >= 0; count--)
 			free(fDevices->RemoveItem(count));
 		delete fDevices;
-	}	
+	}
 }
 
 
@@ -98,36 +98,36 @@ status_t
 BSerialPort::Open(const char *portName)
 {
 	char buf[64];
-	
+
 	if (portName == NULL)
 		return B_BAD_VALUE; // Heheee, we won't crash
-		
-	if (portName[0] != '/') 
+
+	if (portName[0] != '/')
 		snprintf(buf, 64, SERIAL_DIR"/%s", portName);
 	else
 		// A name like "/dev/ports/serial2" was passed
 		snprintf(buf, 64, "%s", portName);
-		
+
 	if (ffd >= 0) //If this port is already open, close it
 		close(ffd);
- 
+
 	// TODO: BeOS don't use O_EXCL, and this seems to lead
 	// to some issues. I added this flag having read some comments
 	// by Marco Nelissen on the annotated BeBook.
 	// I think BeOS uses O_RDWR|O_NONBLOCK here.
-	ffd = open(buf, O_RDWR | O_NONBLOCK | O_EXCL); 
-	
+	ffd = open(buf, O_RDWR | O_NONBLOCK | O_EXCL);
+
 	if (ffd >= 0) {
 		// we used open() with O_NONBLOCK flag to let it return immediately,
 		// but we want read/write operations to block if needed,
 		// so we clear that bit here.
 		int flags = fcntl(ffd, F_GETFL);
 		fcntl(ffd, F_SETFL, flags & ~O_NONBLOCK);
-				
+
 		_DriverControl();
 	}
-	// TODO: I wonder why the return type is a status_t, 
-	// since we (as BeOS does) return the descriptor number for the device... 
+	// TODO: I wonder why the return type is a status_t,
+	// since we (as BeOS does) return the descriptor number for the device...
 	return (ffd >= 0) ? ffd : errno;
 }
 
@@ -152,7 +152,7 @@ ssize_t
 BSerialPort::Read(void *buf, size_t count)
 {
 	ssize_t err = read(ffd, buf, count);
-	
+
 	return (err >= 0) ? err : errno;
 }
 
@@ -165,7 +165,7 @@ ssize_t
 BSerialPort::Write(const void *buf, size_t count)
 {
 	ssize_t err = write(ffd, buf, count);
-	
+
 	return (err >= 0) ? err : errno;
 }
 
@@ -190,9 +190,9 @@ BSerialPort::SetBlocking(bool Blocking)
 */
 status_t
 BSerialPort::SetTimeout(bigtime_t microSeconds)
-{	
+{
 	status_t err = B_BAD_VALUE;
-	
+
 	if (microSeconds == B_INFINITE_TIMEOUT || microSeconds <= 25000000) {
 		fTimeout = microSeconds;
 		_DriverControl();
@@ -225,7 +225,7 @@ BSerialPort::SetTimeout(bigtime_t microSeconds)
 	- \c B_115200_BPS
 	- \c B_230400_BPS
 	- \c B_31250_BPS
-	\return 
+	\return
 	- \c B_OK if all goes fine,
 	- an error code if something goes wrong.
 */
@@ -233,7 +233,7 @@ status_t
 BSerialPort::SetDataRate(data_rate bitsPerSecond)
 {
 	fBaudRate = bitsPerSecond;
-	
+
 	return _DriverControl();
 }
 
@@ -352,7 +352,7 @@ BSerialPort::SetFlowControl(uint32 method)
 
 
 /*! \brief Returns the selected flow control.
-	\return The flow control for the current open port.	
+	\return The flow control for the current open port.
 */
 uint32
 BSerialPort::FlowControl(void)
@@ -365,8 +365,8 @@ BSerialPort::FlowControl(void)
 status_t
 BSerialPort::SetDTR(bool asserted)
 {
-	status_t status = ioctl(ffd, TCSETDTR, &asserted);
-	
+	status_t status = ioctl(ffd, TCSETDTR, &asserted, sizeof(asserted));
+
 	return (status >= 0) ? status : errno;
 }
 
@@ -375,8 +375,8 @@ BSerialPort::SetDTR(bool asserted)
 status_t
 BSerialPort::SetRTS(bool asserted)
 {
-	status_t status = ioctl(ffd, TCSETRTS, &asserted);
-	
+	status_t status = ioctl(ffd, TCSETRTS, &asserted, sizeof(asserted));
+
 	return (status >= 0) ? status : errno;
 }
 
@@ -392,8 +392,8 @@ BSerialPort::NumCharsAvailable(int32 *numChars)
 	//No help from the BeBook...
 	if (ffd < 0)
 		return B_NO_INIT;
-	
-	// TODO: Implement ? 
+
+	// TODO: Implement ?
 	if (numChars)
 		*numChars = 0;
 	return B_OK;
@@ -406,11 +406,11 @@ BSerialPort::NumCharsAvailable(int32 *numChars)
 bool
 BSerialPort::IsCTS(void)
 {
-	unsigned int bits = ioctl(ffd, TCGETBITS, 0); 
-	
+	unsigned int bits = ioctl(ffd, TCGETBITS, 0);
+
 	if (bits & TCGB_CTS)
 		return true;
-		
+
 	return false;
 }
 
@@ -421,11 +421,11 @@ BSerialPort::IsCTS(void)
 bool
 BSerialPort::IsDSR(void)
 {
-	unsigned int bits = ioctl(ffd, TCGETBITS, 0); 
-	
+	unsigned int bits = ioctl(ffd, TCGETBITS, 0);
+
 	if (bits & TCGB_DSR)
 		return true;
-		
+
 	return false;
 }
 
@@ -436,11 +436,11 @@ BSerialPort::IsDSR(void)
 bool
 BSerialPort::IsRI(void)
 {
-	unsigned int bits = ioctl(ffd, TCGETBITS, 0); 
-	
+	unsigned int bits = ioctl(ffd, TCGETBITS, 0);
+
 	if (bits & TCGB_RI)
 		return true;
-		
+
 	return false;
 }
 
@@ -451,11 +451,11 @@ BSerialPort::IsRI(void)
 bool
 BSerialPort::IsDCD(void)
 {
-	unsigned int bits = ioctl(ffd, TCGETBITS, 0); 
-	
+	unsigned int bits = ioctl(ffd, TCGETBITS, 0);
+
 	if (bits & TCGB_DCD)
 		return true;
-		
+
 	return false;
 }
 
@@ -471,7 +471,7 @@ BSerialPort::WaitForInput(void)
 {
 	ssize_t size;
 	int err = ioctl(ffd, TCWAITEVENT, &size, sizeof size);
-	
+
 	return (err < B_OK) ? errno : size;
 }
 
@@ -484,14 +484,14 @@ int32
 BSerialPort::CountDevices()
 {
 	int32 count = 0;
-	
+
 	// Refresh devices list
 	_ScanDevices();
-	
+
 	if (fDevices != NULL)
 		count = fDevices->CountItems();
-	
-	return count;	
+
+	return count;
 }
 
 
@@ -508,7 +508,7 @@ BSerialPort::GetDeviceName(int32 n, char *name, size_t bufSize)
 {
 	status_t result = B_ERROR;
 	const char *dev = NULL;
-	
+
 	if (fDevices != NULL)
 		dev = static_cast<char*>(fDevices->ItemAt(n));
 
@@ -525,7 +525,7 @@ BSerialPort::GetDeviceName(int32 n, char *name, size_t bufSize)
 
 /*! \brief Build a list of available serial ports.
 	Query the serial driver about the available devices,
-	and build a list of them. 
+	and build a list of them.
 */
 void
 BSerialPort::_ScanDevices()
@@ -534,9 +534,9 @@ BSerialPort::_ScanDevices()
 	if (fDevices != NULL) {
 		for (int32 count = fDevices->CountItems() - 1; count >= 0; count--)
 			free(fDevices->RemoveItem(count));
-		
+
 		// Add devices to the list
-		scan_directory(SERIAL_DIR, fDevices);	
+		scan_directory(SERIAL_DIR, fDevices);
 	}
 }
 
@@ -551,67 +551,67 @@ BSerialPort::_DriverControl()
 {
 	struct termios options;
 	int err;
-	
+
 	if (ffd < 0)
 		return B_NO_INIT;
-	
-	//Load the current settings	
+
+	//Load the current settings
 	err = tcgetattr(ffd, &options);
 	if (err < 0)
 		return errno;
-		
-	// Reset all flags	
+
+	// Reset all flags
 	options.c_iflag &= ~(IXON | IXOFF | IXANY | INPCK);
 	options.c_cflag &= ~(CRTSCTS | CSIZE | CSTOPB | PARODD | PARENB);
 	options.c_lflag &= ~(ECHO | ECHONL | ISIG | ICANON);
-	
+
 	// Local line
 	options.c_cflag |= CLOCAL;
-	
+
 	//Set the flags to the wanted values
 	if (fFlow & B_HARDWARE_CONTROL)
 		options.c_cflag |= CRTSCTS;
-	
+
 	if (fFlow & B_SOFTWARE_CONTROL)
 		options.c_iflag |= (IXON | IXOFF);
-	
+
 	if (fStopBits & B_STOP_BITS_2)
 		options.c_cflag |= CSTOPB; // Set 2 stop bits
-	
+
 	if (fDataBits & B_DATA_BITS_8)
 		options.c_cflag |= CS8; // Set 8 data bits
-	
+
 	//Ok, set the parity now
 	if (fParityMode != B_NO_PARITY) {
 		options.c_cflag |= PARENB; //Enable parity
 		if (fParityMode == B_ODD_PARITY)
 			options.c_cflag |= PARODD; //Select odd parity
 	}
-	
-	//Set the baud rate		
+
+	//Set the baud rate
 	cfsetispeed(&options, fBaudRate);
 	cfsetospeed(&options, fBaudRate);
-	
+
 	//Set the timeout
-	options.c_cc[VTIME] = 0;	
+	options.c_cc[VTIME] = 0;
 	options.c_cc[VMIN] = 0;
 	if (fBlocking) {
 		if (fTimeout == B_INFINITE_TIMEOUT) {
 			options.c_cc[VMIN] = 1;
 		} else if (fTimeout != 0) {
-			int timeout = fTimeout / 100000; 
+			int timeout = fTimeout / 100000;
 			options.c_cc[VTIME] = (timeout == 0) ? 1 : timeout;
 		}
 	}
-	
-	//Ok, finished. Now tell the driver what we decided	
+
+	//Ok, finished. Now tell the driver what we decided
 	err = tcsetattr(ffd, TCSANOW, &options);
-	
-	return (err >= 0) ? err : errno;	
+
+	return (err >= 0) ? err : errno;
 }
 
 
-/* These functions are here to maintain Binary Compatibility */ 
+/* These functions are here to maintain Binary Compatibility */
 void BSerialPort::_ReservedSerialPort1() {}
 void BSerialPort::_ReservedSerialPort2() {}
 void BSerialPort::_ReservedSerialPort3() {}

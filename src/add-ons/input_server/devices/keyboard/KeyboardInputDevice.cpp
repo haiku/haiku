@@ -284,7 +284,8 @@ KeyboardDevice::_ControlThread()
 	memset(states, 0, sizeof(states));
 
 	if (fKeyboardID == 0) {
-		if (ioctl(fFD, KB_GET_KEYBOARD_ID, &fKeyboardID) == 0) {
+		if (ioctl(fFD, KB_GET_KEYBOARD_ID, &fKeyboardID,
+				sizeof(fKeyboardID)) == 0) {
 			BMessage message(IS_SET_KEYBOARD_ID);
 			message.AddInt16("id", fKeyboardID);
 			be_app->PostMessage(&message);
@@ -529,7 +530,7 @@ KeyboardDevice::_UpdateSettings(uint32 opcode)
 		if (get_key_repeat_rate(&fSettings.key_repeat_rate) != B_OK) {
 			LOG_ERR("error when get_key_repeat_rate\n");
 		} else if (ioctl(fFD, KB_SET_KEY_REPEAT_RATE,
-			&fSettings.key_repeat_rate) != B_OK) {
+				&fSettings.key_repeat_rate, sizeof(int32)) != B_OK) {
 			LOG_ERR("error when KB_SET_KEY_REPEAT_RATE, fd:%d\n", fFD);
 		}
 	}
@@ -538,7 +539,7 @@ KeyboardDevice::_UpdateSettings(uint32 opcode)
 		if (get_key_repeat_delay(&fSettings.key_repeat_delay) != B_OK) {
 			LOG_ERR("error when get_key_repeat_delay\n");
 		} else if (ioctl(fFD, KB_SET_KEY_REPEAT_DELAY,
-			&fSettings.key_repeat_delay) != B_OK) {
+				&fSettings.key_repeat_delay, sizeof(bigtime_t)) != B_OK) {
 			LOG_ERR("error when KB_SET_KEY_REPEAT_DELAY, fd:%d\n", fFD);
 		}
 	}
@@ -570,7 +571,7 @@ KeyboardDevice::_UpdateLEDs()
 	if ((fModifiers & B_SCROLL_LOCK) != 0)
 		lockIO[2] = 1;
 
-	ioctl(fFD, KB_SET_LEDS, &lockIO);
+	ioctl(fFD, KB_SET_LEDS, &lockIO, sizeof(lockIO));
 }
 
 
