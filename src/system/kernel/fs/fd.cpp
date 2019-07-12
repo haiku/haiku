@@ -925,8 +925,11 @@ _user_ioctl(int fd, uint32 op, void* buffer, size_t length)
 	TRACE(("user_ioctl: fd %d\n", fd));
 
 	// "buffer" is not always a pointer depending on "op", so we cannot
-	// check that it is a userland buffer here; the underlying implementation
-	// must do that.
+	// check that it is a userland buffer here. Instead we check that
+	// it is at least not within the bounds of kernel memory; as in
+	// the cases where it is a numeric constant it is usually a low one.
+	if (IS_KERNEL_ADDRESS(buffer))
+		return B_BAD_ADDRESS;
 
 	SyscallRestartWrapper<status_t> status;
 
