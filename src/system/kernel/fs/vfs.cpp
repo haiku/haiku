@@ -8809,6 +8809,7 @@ _user_mount(const char* userPath, const char* userDevice,
 		B_PATH_NAME_LENGTH);
 	if (status != B_OK)
 		return status;
+	path.UnlockBuffer();
 
 	if (userFileSystem != NULL) {
 		if (!IS_USER_ADDRESS(userFileSystem))
@@ -8827,6 +8828,7 @@ _user_mount(const char* userPath, const char* userDevice,
 			B_PATH_NAME_LENGTH);
 		if (status != B_OK)
 			return status;
+		device.UnlockBuffer();
 	}
 
 	if (userArgs != NULL && argsLength > 0) {
@@ -8847,8 +8849,6 @@ _user_mount(const char* userPath, const char* userDevice,
 			return status;
 		}
 	}
-	path.UnlockBuffer();
-	device.UnlockBuffer();
 
 	status = fs_mount(path.LockBuffer(),
 		userDevice != NULL ? device.Path() : NULL,
