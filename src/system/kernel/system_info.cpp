@@ -500,10 +500,26 @@ get_cpu_info(uint32 firstCPU, uint32 cpuCount, cpu_info* info)
 
 	uint32 count = std::min(cpuCount, smp_get_num_cpus() - firstCPU);
 
-	memset(info, 0, sizeof(cpu_info) * count);
+	// This function is called very often from userland by applications
+	// that display CPU usage information, so we want to keep this as
+	// optimized and touch as little as possible. Hence, no use of
+	// a temporary buffer.
+
+	if (IS_USER_ADDRESS(info)) {
+		if (user_memset(info, 0, sizeof(cpu_info) * count) != B_OK)
+			return B_BAD_ADDRESS;
+		set_ac();
+	} else {
+		memset(info, 0, sizeof(cpu_info) * count);
+	}
+
 	for (uint32 i = 0; i < count; i++) {
 		info[i].active_time = cpu_get_active_time(firstCPU + i);
 		info[i].enabled = !gCPU[firstCPU + i].disabled;
+	}
+
+	if (IS_USER_ADDRESS(info)) {
+		clear_ac();
 	}
 
 	return B_OK;
@@ -561,23 +577,8 @@ _user_get_cpu_info(uint32 firstCPU, uint32 cpuCount, cpu_info* userInfo)
 {
 	if (userInfo == NULL || !IS_USER_ADDRESS(userInfo))
 		return B_BAD_ADDRESS;
-	if (firstCPU >= (uint32)smp_get_num_cpus())
-		return B_BAD_VALUE;
-	if (cpuCount == 0)
-		return B_OK;
 
-	uint32 count = std::min(cpuCount, smp_get_num_cpus() - firstCPU);
-
-	cpu_info* cpuInfos = new(std::nothrow) cpu_info[count];
-	if (cpuInfos == NULL)
-		return B_NO_MEMORY;
-	ArrayDeleter<cpu_info> _(cpuInfos);
-
-	status_t error = get_cpu_info(firstCPU, count, cpuInfos);
-	if (error != B_OK)
-		return error;
-
-	return user_memcpy(userInfo, cpuInfos, sizeof(cpu_info) * count);
+	return get_cpu_info(firstCPU, cpuCount, userInfo);
 }
 
 
