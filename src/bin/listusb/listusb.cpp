@@ -306,7 +306,7 @@ DumpInfo(BUSBDevice& device, bool verbose)
 				index, sizeof(portStatus), (void*)&portStatus);
 			if (actualLength != sizeof(portStatus))
 				continue;
-			printf("      Port %d status....... %04x.%04x%s%s%s%s%s%s%s%s%s\n",
+			printf("      Port %d status....... %04x.%04x%s%s%s%s%s%s%s%s\n",
 				index, portStatus.status, portStatus.change,
 				portStatus.status & PORT_STATUS_CONNECTION ? " Connect": "",
 				portStatus.status & PORT_STATUS_ENABLE ? " Enable": "",
@@ -314,10 +314,6 @@ DumpInfo(BUSBDevice& device, bool verbose)
 				portStatus.status & PORT_STATUS_OVER_CURRENT ? " Overcurrent": "",
 				portStatus.status & PORT_STATUS_RESET ? " Reset": "",
 				portStatus.status & PORT_STATUS_POWER ? " Power": "",
-				portStatus.status & PORT_STATUS_CONNECTION
-					? (portStatus.status & PORT_STATUS_LOW_SPEED ? " Lowspeed"
-					: (portStatus.status & PORT_STATUS_HIGH_SPEED ? " Highspeed"
-						: " Fullspeed")) : "",
 				portStatus.status & PORT_STATUS_TEST ? " Test": "",
 				portStatus.status & PORT_STATUS_INDICATOR ? " Indicator": "");
 		}
