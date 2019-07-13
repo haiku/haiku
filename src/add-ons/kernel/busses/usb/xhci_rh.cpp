@@ -136,7 +136,7 @@ static xhci_root_hub_string_s sXHCIRootHubStrings[3] = {
 
 XHCIRootHub::XHCIRootHub(Object *rootObject, int8 deviceAddress)
 	:	Hub(rootObject, 0, rootObject->GetStack()->IndexOfBusManager(rootObject->GetBusManager()),
-			sXHCIRootHubDevice, deviceAddress, USB_SPEED_SUPER, true)
+			sXHCIRootHubDevice, deviceAddress, USB_SPEED_SUPERSPEED, true)
 {
 }
 

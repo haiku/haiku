@@ -262,7 +262,7 @@ Hub::Explore(change_item **changeList)
 					// This is for XHCI, which anyway rechecks the port speed
 					// This will in no way work for non-root USB3.0 Hubs
 					if (fDeviceDescriptor.usb_version == 0x300)
-						speed = USB_SPEED_SUPER;
+						speed = USB_SPEED_SUPERSPEED;
 					else if (fPortStatus[i].status & PORT_STATUS_LOW_SPEED)
 						speed = USB_SPEED_LOWSPEED;
 					else if (fPortStatus[i].status & PORT_STATUS_HIGH_SPEED)

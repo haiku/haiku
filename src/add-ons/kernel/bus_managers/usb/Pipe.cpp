@@ -367,7 +367,7 @@ ControlPipe::InitCommon(int8 deviceAddress, uint8 endpointAddress,
 		case USB_SPEED_HIGHSPEED:
 			maxPacketSize = 64;
 			break;
-		case USB_SPEED_SUPER:
+		case USB_SPEED_SUPERSPEED:
 			maxPacketSize = 512;
 			break;
 
