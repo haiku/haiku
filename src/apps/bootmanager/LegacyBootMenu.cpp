@@ -18,6 +18,7 @@
 #include <Catalog.h>
 #include <DataIO.h>
 #include <DiskDevice.h>
+#include <DiskDeviceTypes.h>
 #include <DiskDeviceRoster.h>
 #include <DiskDeviceVisitor.h>
 #include <Drivers.h>
@@ -318,7 +319,8 @@ LegacyBootMenu::CanBeInstalled(const BootDrive& drive)
 	PartitionVisitor visitor;
 	device.VisitEachDescendant(&visitor);
 
-	if (!visitor.HasPartitions())
+	if (!visitor.HasPartitions()
+			|| strcmp(device.ContentType(), kPartitionTypeIntel) != 0)
 		return B_ENTRY_NOT_FOUND;
 
 	// Enough space to write boot menu to drive?
