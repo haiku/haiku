@@ -104,7 +104,7 @@ name_for_type(BString& string, type_code type, const char* displayAs)
 			buffer[i] = '.';
 	}
 
-	snprintf(buffer + 6, sizeof(buffer), " (0x%" B_PRIx32 ")", type);
+	snprintf(buffer + 6, sizeof(buffer) - 6, " (0x%" B_PRIx32 ")", type);
 	string = buffer;
 }
 
