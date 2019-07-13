@@ -35,6 +35,7 @@ const uint SCROLL_CONTROL_CHANGED = '&scc';
 const uint TAP_CONTROL_CHANGED = '&tcc';
 const uint DEFAULT_SETTINGS = '&dse';
 const uint REVERT_SETTINGS = '&rse';
+const uint PADBLOCK_TIME_CHANGED = '&ptc';
 
 class DeviceListView;
 
@@ -96,6 +97,7 @@ private:
 			BSlider*		fScrollStepXSlider;
 			BSlider*		fScrollStepYSlider;
 			BSlider*		fScrollAccelSlider;
+			BSlider*		fPadBlockerSlider;
 			BSlider*		fTapSlider;
 			BButton*		fDefaultButton;
 			BButton*		fRevertButton;

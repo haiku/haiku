@@ -19,6 +19,7 @@ typedef struct {
 
 	uint8	tapgesture_sensibility;	// 0 : no tapgesture
 									// 20: very light tip is enough (default)
+	uint16  padblocker_threshold;	//0 to 100
 } touchpad_settings;
 
 
@@ -30,10 +31,10 @@ const static touchpad_settings kDefaultTouchpadSettings = {
 	7,
 	10,
 	10,
-	20
+	20,
+	30
 };
 
 #define TOUCHPAD_SETTINGS_FILE "Touchpad_settings"
-
 
 #endif	/* TOUCHPAD_SETTINGS_H */

@@ -1,0 +1,11 @@
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	variety = B_APPV_FINAL,
+	internal = 0,
+
+	short_info = "A filter to block the touchpad while typing",
+	long_info = "An input_server filter to block the touchpad while typing."
+};

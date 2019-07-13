@@ -266,7 +266,8 @@ TouchpadView::DrawSliders()
 
 TouchpadPrefView::TouchpadPrefView(BInputDevice* dev)
 	:
-	BGroupView()
+	BGroupView(),
+	fTouchpadPref(dev)
 {
 	SetupView();
 	// set view values
@@ -307,6 +308,16 @@ TouchpadPrefView::MessageReceived(BMessage* message)
 			fTouchpadPref.UpdateSettings();
 			break;
 
+		case PADBLOCK_TIME_CHANGED:
+			settings.padblocker_threshold = fPadBlockerSlider->Value();
+			// The maximum value means "disabled", but in the settings file that
+			// must be stored as 0
+			if (settings.padblocker_threshold == 1000)
+				settings.padblocker_threshold = 0;
+			fRevertButton->SetEnabled(true);
+			fTouchpadPref.UpdateSettings();
+			break;
+
 		case DEFAULT_SETTINGS:
 			fTouchpadPref.Defaults();
 			fRevertButton->SetEnabled(true);
@@ -336,6 +347,7 @@ TouchpadPrefView::AttachedToWindow()
 	fScrollStepXSlider->SetTarget(this);
 	fScrollStepYSlider->SetTarget(this);
 	fScrollAccelSlider->SetTarget(this);
+	fPadBlockerSlider->SetTarget(this);
 	fTapSlider->SetTarget(this);
 	fDefaultButton->SetTarget(this);
 	fRevertButton->SetTarget(this);
@@ -396,6 +408,14 @@ TouchpadPrefView::SetupView()
 	fScrollStepYSlider->SetLimitLabels(B_TRANSLATE("Slow"),
 		B_TRANSLATE("Fast"));
 
+	fPadBlockerSlider = new BSlider("padblocker",
+		B_TRANSLATE("Keyboard Lock Delay"),
+		new BMessage(PADBLOCK_TIME_CHANGED), 5, 1000, B_HORIZONTAL);
+	fPadBlockerSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
+	fPadBlockerSlider->SetHashMarkCount(10);
+	fPadBlockerSlider->SetLimitLabels(B_TRANSLATE("Quick"),
+		B_TRANSLATE("Never"));
+
 	fTwoFingerBox = new BCheckBox(B_TRANSLATE("Two finger scrolling"),
 		new BMessage(SCROLL_CONTROL_CHANGED));
 	fTwoFingerHorizontalBox = new BCheckBox(
@@ -432,21 +452,11 @@ TouchpadPrefView::SetupView()
 		* 1.5));
 	scrollPrefLayout->AddView(scrollPrefRightLayout);
 
-	BBox* tapBox = new BBox("tapbox");
-	tapBox->SetLabel(B_TRANSLATE("Tapping"));
-
-	BGroupLayout* tapPrefLayout = new BGroupLayout(B_HORIZONTAL);
-	tapPrefLayout->SetInsets(spacing, tapBox->TopBorderOffset() * 2 + spacing,
-		spacing, spacing);
-	tapBox->SetLayout(tapPrefLayout);
-
-	fTapSlider = new BSlider("tap_sens", B_TRANSLATE("Sensitivity"),
+	fTapSlider = new BSlider("tap_sens", B_TRANSLATE("Tapping sensitivity"),
 		new BMessage(TAP_CONTROL_CHANGED), 0, spacing * 2, B_HORIZONTAL);
 	fTapSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fTapSlider->SetHashMarkCount(7);
 	fTapSlider->SetLimitLabels(B_TRANSLATE("Off"), B_TRANSLATE("High"));
-
-	tapPrefLayout->AddView(fTapSlider);
 
 	fDefaultButton = new BButton(B_TRANSLATE("Defaults"),
 		new BMessage(DEFAULT_SETTINGS));
@@ -459,14 +469,15 @@ TouchpadPrefView::SetupView()
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.SetInsets(B_USE_WINDOW_SPACING)
 		.Add(scrollBox)
-		.Add(tapBox)
-			.Add(new BSeparatorView(B_HORIZONTAL))
-				.AddGroup(B_HORIZONTAL)
-				.Add(fDefaultButton)
-				.Add(fRevertButton)
-				.AddGlue()
-				.End()
-		.End();
+		.Add(fTapSlider)
+		.Add(fPadBlockerSlider)
+		.Add(new BSeparatorView(B_HORIZONTAL))
+			.AddGroup(B_HORIZONTAL)
+			.Add(fDefaultButton)
+			.Add(fRevertButton)
+			.AddGlue()
+		.End()
+	.End();
 }
 
 
@@ -484,4 +495,5 @@ TouchpadPrefView::SetValues(touchpad_settings* settings)
 	fScrollStepYSlider->SetValue(20 - settings->scroll_ystepsize / 2);
 	fScrollAccelSlider->SetValue(settings->scroll_acceleration);
 	fTapSlider->SetValue(settings->tapgesture_sensibility);
+	fPadBlockerSlider->SetValue(settings->padblocker_threshold);
 }

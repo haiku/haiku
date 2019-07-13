@@ -9,15 +9,18 @@
 
 #include "InputTouchpadPref.h"
 
-#include <List.h>
+#include <Entry.h>
 #include <FindDirectory.h>
 #include <File.h>
+#include <List.h>
 #include <String.h>
 
 #include <keyboard_mouse_driver.h>
 
 
-TouchpadPref::TouchpadPref()
+TouchpadPref::TouchpadPref(BInputDevice* device)
+	:
+	fTouchPad(device)
 {
 	// default center position
 	fWindowPosition.x = -1;
@@ -58,6 +61,7 @@ TouchpadPref::UpdateSettings()
 	msg.AddInt16("scroll_ystepsize", fSettings.scroll_ystepsize);
 	msg.AddInt8("scroll_acceleration", fSettings.scroll_acceleration);
 	msg.AddInt8("tapgesture_sensibility", fSettings.tapgesture_sensibility);
+	msg.AddInt32("padblocker_threshold", fSettings.padblocker_threshold);
 
 	return fTouchPad->Control(MS_SET_TOUCHPAD_SETTINGS, &msg);
 }

@@ -27,7 +27,7 @@
 
 class TouchpadPref {
 public:
-								TouchpadPref();
+								TouchpadPref(BInputDevice* device);
 			virtual				~TouchpadPref();
 
 			void				Revert();
