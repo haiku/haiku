@@ -359,15 +359,15 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 		return;
 	}
 
-	// create finisher service thread
-	fFinishThread = spawn_kernel_thread(FinishThread, "xhci finish thread",
+	// create event handler thread
+	fEventThread = spawn_kernel_thread(EventThread, "xhci event thread",
 		B_URGENT_PRIORITY, (void *)this);
-	resume_thread(fFinishThread);
+	resume_thread(fEventThread);
 
 	// create finisher service thread
-	fEventThread = spawn_kernel_thread(EventThread, "xhci event thread",
-		B_URGENT_DISPLAY_PRIORITY, (void *)this);
-	resume_thread(fEventThread);
+	fFinishThread = spawn_kernel_thread(FinishThread, "xhci finish thread",
+		B_URGENT_PRIORITY - 1, (void *)this);
+	resume_thread(fFinishThread);
 
 	// Find the right interrupt vector, using MSIs if available.
 	fIRQ = fPCIInfo->u.h0.interrupt_line;
