@@ -165,30 +165,36 @@ Stream::_SetupBuffers()
 		/ (fDevice->fUSBVersion < 0x0200 ? 1000 : 8000);
 	TRACE(INF, "packetSize:%ld\n", fPacketSize);
 
-	if (fArea == -1) {
-		fAreaSize = (sizeof(usb_iso_packet_descriptor) + fPacketSize)
-			* sampleSize * 1024 / fPacketSize;
-		TRACE(INF, "estimate fAreaSize:%d\n", fAreaSize);
-
-		// round up to B_PAGE_SIZE and create area
-		fAreaSize = (fAreaSize + (B_PAGE_SIZE - 1)) &~ (B_PAGE_SIZE - 1);
-		TRACE(INF, "rounded up fAreaSize:%d\n", fAreaSize);
-
-		fArea = create_area( (fIsInput) ? DRIVER_NAME "_record_area"
-			: DRIVER_NAME "_playback_area", (void**)&fDescriptors,
-			B_ANY_KERNEL_ADDRESS, fAreaSize, B_CONTIGUOUS,
-			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-
-		if (fArea < 0) {
-			TRACE(ERR, "Error of creating %#x - "
-				"bytes size buffer area:%#010x\n", fAreaSize, fArea);
-			fStatus = fArea;
-			return fStatus;
-		}
-
-		TRACE(INF, "Created area id:%d at addr:%#010x size:%#010lx\n",
-			fArea, fDescriptors, fAreaSize);
+	if (fPacketSize == 0) {
+		TRACE(ERR, "computed packet size is 0!");
+		return B_BAD_VALUE;
 	}
+
+	if (fArea != -1)
+		delete_area(fArea);
+
+	fAreaSize = (sizeof(usb_iso_packet_descriptor) + fPacketSize)
+		* sampleSize * 1024 / fPacketSize;
+	TRACE(INF, "estimate fAreaSize:%d\n", fAreaSize);
+
+	// round up to B_PAGE_SIZE and create area
+	fAreaSize = (fAreaSize + (B_PAGE_SIZE - 1)) &~ (B_PAGE_SIZE - 1);
+	TRACE(INF, "rounded up fAreaSize:%d\n", fAreaSize);
+
+	fArea = create_area( (fIsInput) ? DRIVER_NAME "_record_area"
+		: DRIVER_NAME "_playback_area", (void**)&fDescriptors,
+		B_ANY_KERNEL_ADDRESS, fAreaSize, B_CONTIGUOUS,
+		B_READ_AREA | B_WRITE_AREA);
+
+	if (fArea < 0) {
+		TRACE(ERR, "Error of creating %#x - "
+			"bytes size buffer area:%#010x\n", fAreaSize, fArea);
+		fStatus = fArea;
+		return fStatus;
+	}
+
+	TRACE(INF, "Created area id:%d at addr:%#010x size:%#010lx\n",
+		fArea, fDescriptors, fAreaSize);
 
 	// descriptors count
 	fDescriptorsCount = fAreaSize
