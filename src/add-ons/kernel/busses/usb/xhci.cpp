@@ -2380,9 +2380,14 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 		  (flags & TRB_3_EVENT_DATA_BIT), completionCode, transferred);
 
 	if ((flags & TRB_3_EVENT_DATA_BIT) == 0) {
-		TRACE_ALWAYS("got an interrupt for a non-Event Data TRB!\n");
+		TRACE("got an interrupt for a non-Event Data TRB!\n");
 		remainder = transferred;
 		transferred = -1;
+	}
+
+	if (completionCode != COMP_SUCCESS && completionCode != COMP_SHORT_PACKET) {
+		TRACE_ALWAYS("transfer error on slot %" B_PRId8 " endpoint %" B_PRId8
+			": %s\n", slot, endpointNumber, xhci_error_string(completionCode));
 	}
 
 	const phys_addr_t source = B_LENDIAN_TO_HOST_INT64(trb->address);
