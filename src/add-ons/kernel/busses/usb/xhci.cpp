@@ -2021,7 +2021,7 @@ XHCI::GetPortSpeed(uint8 index, usb_speed* speed)
 		*speed = USB_SPEED_SUPERSPEED;
 		break;
 	default:
-		TRACE_ALWAYS("nonstandard port speed %d, assuming SuperSpeed\n",
+		TRACE_ALWAYS("nonstandard port speed %" B_PRId32 ", assuming SuperSpeed\n",
 			PS_SPEED_GET(portStatus));
 		*speed = USB_SPEED_SUPERSPEED;
 		break;
