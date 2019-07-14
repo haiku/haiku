@@ -377,6 +377,7 @@ do_play(int argc, char** argv)
 		if (ioctl(sDevice, B_MULTI_BUFFER_EXCHANGE, &bufferInfo,
 				sizeof(multi_buffer_list)) < B_OK) {
 			printf("Getting buffers failed: %s\n", strerror(errno));
+			continue;
 		}
 
 		// fill buffer with data
