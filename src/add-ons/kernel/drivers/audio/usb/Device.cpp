@@ -832,7 +832,10 @@ Device::_SetupEndpoints()
 
 	if (fAudioControl.InitCheck() == B_OK && fStreams.Count() > 0) {
 		TRACE(INF, "Found device %#06x:%#06x\n", fVendorID, fProductID);
-		gUSBModule->set_configuration(fDevice, config);
+
+		status_t status = gUSBModule->set_configuration(fDevice, config);
+		if (status != B_OK)
+			return status;
 
 		for (int i = 0; i < fStreams.Count(); i++)
 			fStreams[i]->OnSetConfiguration(fDevice, config);

@@ -170,8 +170,10 @@ Stream::_SetupBuffers()
 		return B_BAD_VALUE;
 	}
 
-	if (fArea != -1)
+	if (fArea != -1) {
+		Stop();
 		delete_area(fArea);
+	}
 
 	fAreaSize = (sizeof(usb_iso_packet_descriptor) + fPacketSize)
 		* sampleSize * 1024 / fPacketSize;
@@ -441,9 +443,9 @@ Stream::SetGlobalFormat(multi_format_info* Format)
 		USB_AUDIO_SET_CUR, USB_AUDIO_SAMPLING_FREQ_CONTROL << 8,
 		address, sizeof(freq), &freq, &actualLength);
 
-	TRACE(ERR, "set_speed %02x%02x%02x for ep %#x %d: %x\n",
+	TRACE(ERR, "set_speed %02x%02x%02x for ep %#x %d: %s\n",
 		freq.bytes[0], freq.bytes[1], freq.bytes[2],
-		address, actualLength, status);
+		address, actualLength, strerror(status));
 	return status;
 }
 
