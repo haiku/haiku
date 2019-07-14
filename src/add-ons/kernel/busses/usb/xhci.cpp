@@ -2332,7 +2332,8 @@ XHCI::HandleCmdComplete(xhci_trb* trb)
 		fCmdResult[0] = trb->status;
 		fCmdResult[1] = B_LENDIAN_TO_HOST_INT32(trb->flags);
 		release_sem_etc(fCmdCompSem, 1, B_DO_NOT_RESCHEDULE);
-	}
+	} else
+		TRACE_ERROR("received command event for unknown command!\n")
 }
 
 
@@ -2459,6 +2460,7 @@ XHCI::DoCommand(xhci_trb* trb)
 
 	if (acquire_sem_etc(fCmdCompSem, 1, B_RELATIVE_TIMEOUT, 1 * 1000 * 1000) < B_OK) {
 		TRACE("Unable to obtain fCmdCompSem!\n");
+		fCmdAddr = 0;
 		Unlock();
 		return B_TIMED_OUT;
 	}
@@ -2483,6 +2485,7 @@ XHCI::DoCommand(xhci_trb* trb)
 	TRACE("Storing trb 0x%08" B_PRIx32 " 0x%08" B_PRIx32 "\n", trb->status,
 		trb->flags);
 
+	fCmdAddr = 0;
 	Unlock();
 	return status;
 }
