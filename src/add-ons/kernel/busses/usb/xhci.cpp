@@ -361,12 +361,12 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 
 	// create finisher service thread
 	fFinishThread = spawn_kernel_thread(FinishThread, "xhci finish thread",
-		B_NORMAL_PRIORITY, (void *)this);
+		B_URGENT_PRIORITY, (void *)this);
 	resume_thread(fFinishThread);
 
 	// create finisher service thread
 	fEventThread = spawn_kernel_thread(EventThread, "xhci event thread",
-		B_NORMAL_PRIORITY, (void *)this);
+		B_URGENT_DISPLAY_PRIORITY, (void *)this);
 	resume_thread(fEventThread);
 
 	// Find the right interrupt vector, using MSIs if available.
