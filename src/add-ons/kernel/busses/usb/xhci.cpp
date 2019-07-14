@@ -867,15 +867,15 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 status_t
 XHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 {
-	TRACE_ALWAYS("cancel queued transfers for pipe %p (%d)\n", pipe,
-		pipe->EndpointAddress());
-
 	xhci_endpoint *endpoint = (xhci_endpoint *)pipe->ControllerCookie();
 	if (endpoint == NULL || endpoint->trbs == NULL) {
 		// Someone's de-allocated this pipe or endpoint in the meantime.
 		// (Possibly AllocateDevice failed, and we were the temporary pipe.)
 		return B_NO_INIT;
 	}
+
+	TRACE_ALWAYS("cancel queued transfers (%" B_PRId8 ") for pipe %p (%d)\n",
+		endpoint->used, pipe, pipe->EndpointAddress());
 
 	MutexLocker endpointLocker(endpoint->lock);
 
@@ -890,7 +890,9 @@ XHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 	xhci_td* td_head = endpoint->td_head;
 	endpoint->td_head = NULL;
 
-	if (StopEndpoint(false, endpoint->id + 1, endpoint->device->slot) == B_OK) {
+	status_t status = StopEndpoint(false, endpoint->id + 1,
+		endpoint->device->slot);
+	if (status == B_OK) {
 		// Clear the endpoint's TRBs.
 		memset(endpoint->trbs, 0, sizeof(xhci_trb) * XHCI_ENDPOINT_RING_SIZE);
 		endpoint->used = 0;
@@ -905,7 +907,8 @@ XHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 	} else {
 		// We couldn't stop the endpoint. Most likely the device has been
 		// removed and the endpoint was stopped by the hardware.
-		TRACE("CancelQueuedTransfers: could not stop endpoint\n");
+		TRACE_ERROR("cancel queued transfers: could not stop endpoint: %s!\n",
+			strerror(status));
 	}
 
 	endpointLocker.Unlock();
