@@ -1,31 +1,30 @@
-1	dutch; flemish	x-vnd.Haiku.TextSearch	1792446159
-%s: Not enough room to escape the filename.	Grepper		%s: Niet genoeg ruimte om de bestandsnaam om te vormen.
-Trim to selection	GrepWindow		Beperken tot selectie
-Follow symbolic links	GrepWindow		Symbolische koppelingen volgen
-Close	GrepWindow		Sluiten
-Cancel	GrepWindow		Annuleren
-The unselected files will be removed from the list.	GrepWindow		De niet-geselecteerde bestanden zullen van de lijst verwijderd worden.
-Set target…	GrepWindow		Doel instellen...
+1	dutch; flemish	x-vnd.Haiku.TextSearch	293043021
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Kies alstublieft de bestanden die u in Tracker geselecteerd wilt hebben.
-Open files in Pe	GrepWindow		Open bestanden in Pe
-Copy text to clipboard	GrepWindow		Kopieer de tekst naar het klembord
-Settings	GrepWindow		Instellingen
-Select all	GrepWindow		Alles selecteren
-OK	GrepWindow		Oké
-Skip folders starting with a dot	GrepWindow		Mappen overslaan die met een punt (.) beginnen
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME kon één of meerdere mappen niet openen
-Search	GrepWindow		Zoeken
 Open selection	GrepWindow		Selectie openen
-Look in sub-folders	GrepWindow		In submappen zoeken
 Actions	GrepWindow		Acties
-File	GrepWindow		Bestand
-Encoding	GrepWindow		Codering
-History	GrepWindow		Geschiedenis
 New window	GrepWindow		Nieuw venster
-Please select the files you wish to keep searching.	GrepWindow		Selecteer alstublieft de bestanden waarin u wilt blijven zoeken. 
-TextSearch	GrepWindow		Text_search
+Encoding	GrepWindow		Codering
+OK	GrepWindow		Oké
+Close	GrepWindow		Sluiten
+Look in sub-folders	GrepWindow		In submappen zoeken
+%s: Not enough room to escape the filename.	Grepper		%s: Niet genoeg ruimte om de bestandsnaam om te vormen.
+Follow symbolic links	GrepWindow		Symbolische koppelingen volgen
+Text files only	GrepWindow		Alleen tekstbestanden
 Quit	GrepWindow		Afsluiten
 Show files in Tracker	GrepWindow		Toon bestanden in Tracker
-Case-sensitive	GrepWindow		Hoofd-/kleine lettergevoelig
-Text files only	GrepWindow		Alleen tekstbestanden
+Please select the files you wish to keep searching.	GrepWindow		Selecteer alstublieft de bestanden waarin u wilt blijven zoeken. 
+Trim to selection	GrepWindow		Beperken tot selectie
+Set target…	GrepWindow		Doel instellen...
+TextSearch	GrepWindow		Text_search
+Search	GrepWindow		Zoeken
+Copy text to clipboard	GrepWindow		Kopieer de tekst naar het klembord
 Show lines	GrepWindow		Toon regels
+The unselected files will be removed from the list.	GrepWindow		De niet-geselecteerde bestanden zullen van de lijst verwijderd worden.
+Skip folders starting with a dot	GrepWindow		Mappen overslaan die met een punt (.) beginnen
+Cancel	GrepWindow		Annuleren
+History	GrepWindow		Geschiedenis
+File	GrepWindow		Bestand
+Case-sensitive	GrepWindow		Hoofd-/kleine lettergevoelig
+Select all	GrepWindow		Alles selecteren
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME kon één of meerdere mappen niet openen
+Settings	GrepWindow		Instellingen

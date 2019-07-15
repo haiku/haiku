@@ -1,17 +1,17 @@
 1	english	x-vnd.Haiku-keystore_server	2429996361
-This application hasn't been granted access before.	AppAccessRequestWindow		该程序未获取访问权限。
-Unlock	KeyRequestWindow		解锁
-This application has been updated since it was last granted access.	AppAccessRequestWindow		该程序在最近授权访问后已进行更新。
-Allow always	AppAccessRequestWindow		总是允许
-Application keyring access	AppAccessRequestWindow		应用密匙访问
 to perform the following action:\n%accessString%\n\n	AppAccessRequestWindow		执行下述操作:\n%accessString%\n\n
-The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		应用程序:\n%signature% (%path%)\n\n
 This application doesn't yet have the required privileges.	AppAccessRequestWindow		该程序没有相应权限。
-Password:	KeyRequestWindow		密码:
-Cancel	KeyRequestWindow		取消
 Keyring:	KeyRequestWindow		密钥:
+requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		需要访问密匙:\n%keyringName%\n\n
+Application keyring access	AppAccessRequestWindow		应用密匙访问
+Disallow	AppAccessRequestWindow		不允许
+Allow once	AppAccessRequestWindow		本次允许
 Unlock keyring	KeyRequestWindow		解锁密钥
 An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		程序需要访问下述密钥，但是受到密码锁定。请输入密码以解锁密钥。\n密钥解锁后，将会保持解锁知道系统关闭或者密钥再次锁定。\n如果取消该对话框，密钥将会保持锁定。
-Allow once	AppAccessRequestWindow		本次允许
-Disallow	AppAccessRequestWindow		不允许
-requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		需要访问密匙:\n%keyringName%\n\n
+Password:	KeyRequestWindow		密码:
+Cancel	KeyRequestWindow		取消
+This application has been updated since it was last granted access.	AppAccessRequestWindow		该程序在最近授权访问后已进行更新。
+Allow always	AppAccessRequestWindow		总是允许
+Unlock	KeyRequestWindow		解锁
+The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		应用程序:\n%signature% (%path%)\n\n
+This application hasn't been granted access before.	AppAccessRequestWindow		该程序未获取访问权限。

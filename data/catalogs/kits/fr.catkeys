@@ -1,42 +1,42 @@
 1	french	x-vnd.Haiku-libbe	3337473349
-gamma	AboutWindow		gamma
-beta	AboutWindow		bêta
-%3.2f GiB	StringForSize		%3.2f Gio
-Written by:	AboutWindow		Écrit par :
-About %app%	AboutMenuItem		À propos de %app%
-Cut	TextView		Couper
-Version	AboutWindow		Version
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Impossible de créer le réplicant pour « %description ».\n%error
-Copy	TextView		Copier
-%3.2f KiB	StringForSize		%3.2f Kio
-alpha	AboutWindow		alpha
-Error	PrintJob		Erreur
-All Rights Reserved.	AboutWindow		Tous droits réservés.
 {0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# octet} other{# octets}}
-About %app%	AboutWindow		À propos de %app%
-No pages to print!	PrintJob		Aucune page à imprimer !
+All Rights Reserved.	AboutWindow		Tous droits réservés.
+gold master	AboutWindow		finale
+Undo	TextView		Annuler
+gamma	AboutWindow		gamma
+development	AboutWindow		développement
 OK	Dragger		OK
 OK	PrintJob		OK
-Green:	ColorControl		Vert :
-Version history:	AboutWindow		Historique des versions :
-Remove replicant	Dragger		Enlever le réplicant
-Select all	TextView		Sélectionner tout
-OK	AboutWindow		OK
-OK	ZombieReplicantView		OK
 Print Server is not responding.	PrintJob		Le serveur d’impression ne répond pas.
+About %app%	AboutMenuItem		À propos de %app%
+Warning	Dragger		Avertissement
+Green:	ColorControl		Vert :
+Redo	TextView		Refaire
+No pages to print!	PrintJob		Aucune page à imprimer !
+beta	AboutWindow		bêta
+OK	ZombieReplicantView		OK
+Cut	TextView		Couper
+%3.2f GiB	StringForSize		%3.2f Gio
+Can't delete this replicant from its original application. Life goes on.	Dragger		Impossible de supprimer ce réplicant à partir de son application d’origine. La vie continue.
+Error	ZombieReplicantView		Erreur
 Paste	TextView		Coller
+OK	AboutWindow		OK
 Special Thanks:	AboutWindow		Remerciements particuliers :
 %.2f TiB	StringForSize		%.2f Tio
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Impossible de localiser l’application du réplicant. Aucune signature d’application fournie.\n%error
-Redo	TextView		Refaire
-<empty>	Menu		<vide>
-Warning	Dragger		Avertissement
-Undo	TextView		Annuler
+Remove replicant	Dragger		Enlever le réplicant
+Version	AboutWindow		Version
 Red:	ColorControl		Rouge :
+<empty>	Menu		<vide>
+Copy	TextView		Copier
+Select all	TextView		Sélectionner tout
+alpha	AboutWindow		alpha
 %3.2f MiB	StringForSize		%3.2f Mio
+Error	PrintJob		Erreur
+About %app%	AboutWindow		À propos de %app%
 About %app…	Dragger		À propos de %app…
-development	AboutWindow		développement
-Error	ZombieReplicantView		Erreur
+Version history:	AboutWindow		Historique des versions :
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Impossible de localiser l’application du réplicant. Aucune signature d’application fournie.\n%error
+%3.2f KiB	StringForSize		%3.2f Kio
 Blue:	ColorControl		Bleu :
-gold master	AboutWindow		finale
-Can't delete this replicant from its original application. Life goes on.	Dragger		Impossible de supprimer ce réplicant à partir de son application d’origine. La vie continue.
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Impossible de créer le réplicant pour « %description ».\n%error
+Written by:	AboutWindow		Écrit par :

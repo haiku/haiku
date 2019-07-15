@@ -1,150 +1,130 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	3764618272
-Name	PackageListView		Nimi
-Available packages	MainWindow		Saatavilla olevat pakkaukset
-Open %DeskbarLink%	PackageManager		Avaa %DeskbarLink%
-OK	MainWindow		Valmis
-Close	RatePackageWindow		Sulje
-The captcha puzzle needs to be solved.	UserLoginWindow		Captcha-pulma on ratkaistava.
-Changelog	PackageInfoView		Muutosloki
-Your rating:	RatePackageWindow		Arvosanasi:
-The passwords do not match.	UserLoginWindow		Salasanat eivät täsmää.
-Log in…	MainWindow		Kirjaudu...
-Rate %Package%	RatePackageWindow		Anna pakkaukselle %Package% arvosana
-Stability:	RatePackageWindow		Stabiilisuus:
-Click a package to view information	PackageInfoView		Napsauta pakkausta tietojen katsomiseksi
-Other users can see this rating	RatePackageWindow		Muut käyttäjät voivat nähdä tämän arvosanan
-Stability	RatePackageWindow		Stabiilisuus
-No changelog available.	PackageInfoView		Mitään muutoslokia ei ole saatavilla.
-Description	PackageListView		Kuvaus
-Install	PackageManager		Asenna
-All repositories	MainWindow		Kaikki tietovarastot
-Source packages	MainWindow		Lähdekoodipakkaukset
-Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Todentaminen epäonnistui. Käyttäjä ei ole olemassa tai tarjottiin väärää salasanaa.
-Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Tilin luominen onnistui. Voit nyt antaa pakkauksille arvosanoja ja tehdä muita hyödyllisiä asioita.
-Tools	MainWindow		Työkalut
-HaikuDepot	System name		HaikuVarasto
-Close	UserLoginWindow		Sulje
-Rate package…	PackageInfoView		Anna pakkaukselle arvosana...
-Category	FilterView		Luokka
-Uninstall	PackageManager		Poista asennus
-An error occurred while obtaining the package list: %message%	MainWindow		Pakkausluetteloa haettaessa tapahtui virhe: %message%
-<no info>	PackageInfoView		<ei tietoja>
-Starting the package daemon failed:\n\n%Error%	App		Pakkaustaustaprosessin käynnistyminen epäonnistui:\n\n%Error%
-An error occurred while initializing the package manager: %message%	MainWindow		Pakkaushallintaa alustettaessa tapahtui virhe: %message%
-Email address:	UserLoginWindow		Sähköpostiosoite:
-Very unstable	RatePackageWindow		Hyvin epävakaa
-<Package contents not available for remote packages>	PackageContentsView		<Etäpakkausten sisältö ei ole saatavilla>
-The username is already taken. Please choose another.	UserLoginWindow		Käyttäjätunnus on jo varattu. Valitse toinen käyttäjätunnus.
-Close	PackageManager		Sulje
-Not logged in	MainWindow		Et ole kirjautunut sisään
-The authentication was successful.	UserLoginWindow		Tunnistautuminen onnistui.
-Installed packages	MainWindow		Asennetut paketit
-Status	PackageListView		Tila
-Switch account…	MainWindow		Vaihda tiliä...
-Ignore	UserLoginWindow		Ohita
-Your rating was updated.	RatePackageWindow		Arvosanasi päivitettiin.
-Language	UserLoginWindow		Kieli
-The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Salasana on liian heikko tai virheellinen. Käytä vähintään 8 merkkiä, joista vähintään 2 on numeroita ja 2 suuria kirjaimia.
-Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Arvosanasi kopiointi palvelimelle onnistui. Voit päivittää tai poistaa sen HaikuDepot-palvelimen webbisivulla.
-Show only featured packages	FilterView		Näytä vain käyttövalmiit pakkaukset
-Rate package	RatePackageWindow		Anna pakkaukselle arvosana
-Development	Model		Ohjelmakehitys
-Fatal error	PackageManager		Kriittinen virhe
-The user name needs to be at least 3 letters long.	UserLoginWindow		Käyttäjänimen on oltava vähintään 3 merkkiä pitkä.
-Log in	UserLoginWindow		Kirjaudu
-Repeat pass phrase:	UserLoginWindow		Toista salasana:
-Ratings	PackageInfoView		Arvosanat
-But none could be listed here, sorry.	UserLoginWindow		Tässä ei kyetty luetteloimaan mitään.
-System & Utilities	Model		Järjestelmä ja apuohjelmat
-Inactive	PackageListView		Ei käytössä
-The package action could not be scheduled: %Error%	PackageInfoView		Pakkaustoiminnon aikatauluttaminen epäonnistui: %Error%
-Science & Mathematics	Model		Tiede ja matematiikka
-(%Votes%)	PackageInfoView		(%Votes%)
-You have not solved the captcha puzzle correctly.	UserLoginWindow		Captcha-pulman ratkaisui onnistui.
-Success	UserLoginWindow		Valmis
-HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuVarasto tarvitsee toimiakseen pakkaustaustaprosessin, ja se ei näytä olevan käynnissä.\nHaluaisitko käynnistää sen nyt?
-Downloading:	PackageInfoView		Ladataan:
-Mostly stable	RatePackageWindow		Äärimmäisen stabiili
-Log out	MainWindow		Kirjaudu ulos
-Repository	PackageListView		Tietovarasto
-Education	Model		Koulutus
-This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Tämä pakkaus ei näytä olevan HaikuDepot-palvelimella, joten ei ole mahdollista luoda sille uutta arvosanaa tai muokata olemassaolevaa arvosanaa.
-Search terms:	FilterView		Hakusanat:
-%Version%	PackageInfoView		%Version%
-No user ratings available.	PackageInfoView		Käyttäjäarvosanoja ei ole saatavilla.
-Does not start	RatePackageWindow		Ei käynnisty
-An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Varastoa päivitettäessä tapahtui virhe: %error% (%details%)
-There are problems in the form:\n\n	UserLoginWindow		Muodossa on pulmia:\n\n
-Create account	UserLoginWindow		Luo tili
-Productivity	Model		Tuottavuus
-No, quit HaikuDepot	App		Ei, poistu HaikuVarastosta
-Authentication failed	UserLoginWindow		Todennus epäonnistui
-Logged in as %User%	MainWindow		Kirjautuneena tunnuksella %User%
-9999.99 KiB	PackageListView		9999.99 kibitavua
-Language	RatePackageWindow		Kieli
-User rating	RatePackageWindow		Käyttäjäarvosanat
-Size	PackageListView		Koko
-You need to be logged into an account before you can rate packages.	MainWindow		Sinun on kirjauduttava tilille ennen kuin voit antaa arvosanoja pakkauksille.
-User name:	UserLoginWindow		Käyttäjätunnus:
-Unstable but usable	RatePackageWindow		Epävakaa, mutta käyttökelpoinen
-The email address appears to be malformed.	UserLoginWindow		Sähköpostiosoite on vääränmuotoinen.
-Games	Model		Pelit
-Rating	PackageListView		Arvosana
-(%Votes%)	FeaturedPackagesView		(%Votes%)
-There was a puzzling response from the web service.	UserLoginWindow		Webbipalvelun vastaus oli pulmallinen.
-Graphics	Model		Grafiikka
-Local	MainWindow		Paikallinen
-Close	MainWindow		Sulje
-Preferred language:	UserLoginWindow		Ensisijainen kieli:
-Internet & Network	Model		Internet ja verkko
-Refresh repositories	MainWindow		Virkistä tietovarastoja
-Cancel	MainWindow		Peru
-Quit HaikuDepot	App		Poistu HaikuVarastosta
-Input validation	UserLoginWindow		Syötevalidointi
-Update	RatePackageWindow		Päivitä
-Video	Model		Video
-All categories	FilterView		Kaikki luokat
-Contents	PackageInfoView		Sisällöt
-An error occurred while refreshing the repository: %error%	MainWindow		Varastoa päivitettäessä tapahtui virhe: %error%
-Try again	App		Yritä uudelleen
-Login or Create account	MainWindow		Kirjaudu tai luo tili
-Pending…	PackageListView		Odottaa...
-{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# kohde} other{# kohdetta}}
-OK	PackageInfoView		Valmis
-Package daemon problem	App		Pakkaustaustaprosessipulma
-Uninstalled	PackageListView		Poistetut asennukset
-Show	MainWindow		Näytä
-Stable	RatePackageWindow		Vakaa
-Unknown	PackageListView		Tuntematon
-Comment language:	RatePackageWindow		Kommenttikieli:
-Pass phrase:	UserLoginWindow		Salasana:
-Screenshot	ScreenshotWindow		Kuvakaappaus
-Not specified	RatePackageWindow		Ei määritelty
-Available	PackageListView		Saatavilla
-Develop packages	MainWindow		Kehityspaketit
-%hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (versio %hd.version%)
-n/a	PackageInfoView		–
-If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Jos et tarjoa sähköpostiosoitetta, et kykene nollaamaan salasanaasi silloin kun unohdat sen.
- It responded with: 	UserLoginWindow		 Sen vastaus: 
-Authentication failed. Connection to the service failed.	UserLoginWindow		Todentaminen epäonnistui. Yhdistäminen palveluun epäonnistui.
-Cancel	RatePackageWindow		Peru
-Package action failed	PackageInfoView		Pakettitoiminta epäonnistui
-OK	UserLoginWindow		Valmis
-Send	RatePackageWindow		Lähetä
-Repositories	MainWindow		Tietovarastot
--	no package size		-
-Category:	FilterView		Luokka:
-Failed to create account	UserLoginWindow		Tilin luominen epäonnistui
+1	finnish	x-vnd.Haiku-HaikuDepot	2728680786
 Check for updates…	MainWindow		Tarkista päivitykset…
+Uninstall	PackageManager		Poista asennus
+(%Votes%)	FeaturedPackagesView		(%Votes%)
+Uninstalled	PackageListView		Poistetut asennukset
+Available packages	MainWindow		Saatavilla olevat pakkaukset
+Create account	UserLoginWindow		Luo tili
+Mostly stable	RatePackageWindow		Äärimmäisen stabiili
+Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Tilin luominen onnistui. Voit nyt antaa pakkauksille arvosanoja ja tehdä muita hyödyllisiä asioita.
+Rate package…	PackageInfoView		Anna pakkaukselle arvosana...
+Develop packages	MainWindow		Kehityspaketit
+Starting the package daemon failed:\n\n%Error%	App		Pakkaustaustaprosessin käynnistyminen epäonnistui:\n\n%Error%
+<no info>	PackageInfoView		<ei tietoja>
+No user ratings available.	PackageInfoView		Käyttäjäarvosanoja ei ole saatavilla.
+The user name needs to be at least 3 letters long.	UserLoginWindow		Käyttäjänimen on oltava vähintään 3 merkkiä pitkä.
+Failed to create account	UserLoginWindow		Tilin luominen epäonnistui
+Ignore	UserLoginWindow		Ohita
+Rating	PackageListView		Arvosana
+Show	MainWindow		Näytä
+Does not start	RatePackageWindow		Ei käynnisty
+But none could be listed here, sorry.	UserLoginWindow		Tässä ei kyetty luetteloimaan mitään.
 There are problems with the data you entered:\n\n	UserLoginWindow		Syöttämissäsi tiedoissa oli pulmia:\n\n
-Start package daemon	App		Käynnistä pakkaustaustaprosessi
-Manage repositories…	MainWindow		Hallinnoi tietovarastoja...
-Business	Model		Yritys
-Audio	Model		Ääni
+The authentication was successful.	UserLoginWindow		Tunnistautuminen onnistui.
+Not specified	RatePackageWindow		Ei määritelty
+Unstable but usable	RatePackageWindow		Epävakaa, mutta käyttökelpoinen
+Active	PackageListView		Käytössä
+Login or Create account	MainWindow		Kirjaudu tai luo tili
+<Package contents not available for remote packages>	PackageContentsView		<Etäpakkausten sisältö ei ole saatavilla>
+Ratings	PackageInfoView		Arvosanat
+Switch account…	MainWindow		Vaihda tiliä...
+Preferred language:	UserLoginWindow		Ensisijainen kieli:
+It was not possible to contact the web service.	UserLoginWindow		Webbipalveluun ei saatu yhteyttä.
+Name	PackageListView		Nimi
+Rate %Package%	RatePackageWindow		Anna pakkaukselle %Package% arvosana
+Quit HaikuDepot	App		Poistu HaikuVarastosta
+Category	FilterView		Luokka
+Installed packages	MainWindow		Asennetut paketit
+User rating	RatePackageWindow		Käyttäjäarvosanat
+Other users can see this rating	RatePackageWindow		Muut käyttäjät voivat nähdä tämän arvosanan
+Stable	RatePackageWindow		Vakaa
+Fatal error	PackageManager		Kriittinen virhe
+Package action failed	PackageInfoView		Pakettitoiminta epäonnistui
+No changelog available.	PackageInfoView		Mitään muutoslokia ei ole saatavilla.
+There are problems in the form:\n\n	UserLoginWindow		Muodossa on pulmia:\n\n
+There was a puzzling response from the web service.	UserLoginWindow		Webbipalvelun vastaus oli pulmallinen.
+Not logged in	MainWindow		Et ole kirjautunut sisään
+No, quit HaikuDepot	App		Ei, poistu HaikuVarastosta
+Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Arvosanasi kopiointi palvelimelle onnistui. Voit päivittää tai poistaa sen HaikuDepot-palvelimen webbisivulla.
+Available	PackageListView		Saatavilla
+Cancel	UserLoginWindow		Peru
+HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuVarasto tarvitsee toimiakseen pakkaustaustaprosessin, ja se ei näytä olevan käynnissä.\nHaluaisitko käynnistää sen nyt?
+Click a package to view information	PackageInfoView		Napsauta pakkausta tietojen katsomiseksi
+Contents	PackageInfoView		Sisällöt
+Close	PackageManager		Sulje
+Changelog	PackageInfoView		Muutosloki
 Rating not possible	MainWindow		Arvosanojen antaminen ei ole mahdollista
 About	PackageInfoView		Ohjelmasta
-Active	PackageListView		Käytössä
-It was not possible to contact the web service.	UserLoginWindow		Webbipalveluun ei saatu yhteyttä.
-Refreshing...	MainWindow		Päivitetään...
+Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Todentaminen epäonnistui. Käyttäjä ei ole olemassa tai tarjottiin väärää salasanaa.
+Very unstable	RatePackageWindow		Hyvin epävakaa
+Stability	RatePackageWindow		Stabiilisuus
+Send	RatePackageWindow		Lähetä
+Start package daemon	App		Käynnistä pakkaustaustaprosessi
+The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Salasana on liian heikko tai virheellinen. Käytä vähintään 8 merkkiä, joista vähintään 2 on numeroita ja 2 suuria kirjaimia.
+The package action could not be scheduled: %Error%	PackageInfoView		Pakkaustoiminnon aikatauluttaminen epäonnistui: %Error%
+Inactive	PackageListView		Ei käytössä
+Cancel	RatePackageWindow		Peru
+OK	MainWindow		Valmis
+{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# kohde} other{# kohdetta}}
+OK	PackageInfoView		Valmis
+Downloading:	PackageInfoView		Ladataan:
+Success	UserLoginWindow		Valmis
+Package daemon problem	App		Pakkaustaustaprosessipulma
+(%Votes%)	PackageInfoView		(%Votes%)
+Repository	PackageListView		Tietovarasto
+%hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (versio %hd.version%)
+Close	UserLoginWindow		Sulje
+Close	RatePackageWindow		Sulje
 Failed to create account: %s\n	UserLoginWindow		Tilin luominen epäonnistui: %s\n
-Cancel	UserLoginWindow		Peru
+Size	PackageListView		Koko
+Your rating:	RatePackageWindow		Arvosanasi:
+All categories	FilterView		Kaikki luokat
+Your rating was updated.	RatePackageWindow		Arvosanasi päivitettiin.
+n/a	PackageInfoView		–
+Repositories	MainWindow		Tietovarastot
+Cancel	MainWindow		Peru
+Refresh repositories	MainWindow		Virkistä tietovarastoja
+If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Jos et tarjoa sähköpostiosoitetta, et kykene nollaamaan salasanaasi silloin kun unohdat sen.
+Tools	MainWindow		Työkalut
+The passwords do not match.	UserLoginWindow		Salasanat eivät täsmää.
+This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Tämä pakkaus ei näytä olevan HaikuDepot-palvelimella, joten ei ole mahdollista luoda sille uutta arvosanaa tai muokata olemassaolevaa arvosanaa.
+Language	RatePackageWindow		Kieli
+Authentication failed. Connection to the service failed.	UserLoginWindow		Todentaminen epäonnistui. Yhdistäminen palveluun epäonnistui.
+Log out	MainWindow		Kirjaudu ulos
+Comment language:	RatePackageWindow		Kommenttikieli:
+Status	PackageListView		Tila
+The username is already taken. Please choose another.	UserLoginWindow		Käyttäjätunnus on jo varattu. Valitse toinen käyttäjätunnus.
+Update	RatePackageWindow		Päivitä
+Language	UserLoginWindow		Kieli
+OK	UserLoginWindow		Valmis
+Stability:	RatePackageWindow		Stabiilisuus:
+The captcha puzzle needs to be solved.	UserLoginWindow		Captcha-pulma on ratkaistava.
+Source packages	MainWindow		Lähdekoodipakkaukset
+-	no package size		-
+User name:	UserLoginWindow		Käyttäjätunnus:
+Try again	App		Yritä uudelleen
+Rate package	RatePackageWindow		Anna pakkaukselle arvosana
+The email address appears to be malformed.	UserLoginWindow		Sähköpostiosoite on vääränmuotoinen.
+You have not solved the captcha puzzle correctly.	UserLoginWindow		Captcha-pulman ratkaisui onnistui.
+Unknown	PackageListView		Tuntematon
+Log in	UserLoginWindow		Kirjaudu
+Logged in as %User%	MainWindow		Kirjautuneena tunnuksella %User%
+Email address:	UserLoginWindow		Sähköpostiosoite:
+Screenshot	ScreenshotWindow		Kuvakaappaus
+HaikuDepot	System name		HaikuVarasto
+Search terms:	FilterView		Hakusanat:
+Pending…	PackageListView		Odottaa...
+Repeat pass phrase:	UserLoginWindow		Toista salasana:
+Category:	FilterView		Luokka:
+Authentication failed	UserLoginWindow		Todennus epäonnistui
+Manage repositories…	MainWindow		Hallinnoi tietovarastoja...
+Description	PackageListView		Kuvaus
+Pass phrase:	UserLoginWindow		Salasana:
+Open %DeskbarLink%	PackageManager		Avaa %DeskbarLink%
+Install	PackageManager		Asenna
+Input validation	UserLoginWindow		Syötevalidointi
+Log in…	MainWindow		Kirjaudu...
+You need to be logged into an account before you can rate packages.	MainWindow		Sinun on kirjauduttava tilille ennen kuin voit antaa arvosanoja pakkauksille.
+9999.99 KiB	PackageListView		9999.99 kibitavua
+All repositories	MainWindow		Kaikki tietovarastot
+%Version%	PackageInfoView		%Version%

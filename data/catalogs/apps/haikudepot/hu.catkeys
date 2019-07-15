@@ -1,142 +1,123 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	3936195394
-Name	PackageListView		Név
-Available packages	MainWindow		Elérhető csomagok
-Open %DeskbarLink%	PackageManager		%DeskbarLink% megnyitása
-OK	MainWindow		OK
-Close	RatePackageWindow		Bezárás
-The captcha puzzle needs to be solved.	UserLoginWindow		A kapta kód megadása szükséges.
-Changelog	PackageInfoView		Változásnapló
-Your rating:	RatePackageWindow		Saját értékelés:
-The passwords do not match.	UserLoginWindow		A jelszavak nem egyeznek.
-Log in…	MainWindow		Bejelentkezés…
-Rate %Package%	RatePackageWindow		%Package% értékelése
-Stability:	RatePackageWindow		Stabilitás:
-Click a package to view information	PackageInfoView		Válasszon egy csomagot az információk megtekintéséhez
-Other users can see this rating	RatePackageWindow		A többi felhasználó számára látható az értékelés
-Stability	RatePackageWindow		Stabilitás
-No changelog available.	PackageInfoView		Nincs módosítás-előzmény
-Description	PackageListView		Leírás
-Install	PackageManager		Telepítés
-All repositories	MainWindow		Összes tároló
-Source packages	MainWindow		Forráskód csomagok
-Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Hitelesítési hiba. A felhasználó nem létezik vagy hibás jelszó került megadásra.
-Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		A fiók sikeresen létrehozva. Mostmár lehetőség van a csomagok értékelésére és további funkciókra.
-Tools	MainWindow		Eszközök
-HaikuDepot	System name		Raktár
-Close	UserLoginWindow		Bezárás
-Rate package…	PackageInfoView		Csomag értékelése…
-Category	FilterView		Kategória
+1	hungarian	x-vnd.Haiku-HaikuDepot	8619710
+Check for updates…	MainWindow		Frissítések keresése…
 Uninstall	PackageManager		Eltávolítás
-An error occurred while obtaining the package list: %message%	MainWindow		Hiba történt a csomagok letöltésekor %message%
-<no info>	PackageInfoView		<nincs információ>
-Starting the package daemon failed:\n\n%Error%	App		A csomag démon indítása sikertelen:\n\n%Error%
-An error occurred while initializing the package manager: %message%	MainWindow		Hiba történt a csomagkezelő indításakor: %message%
-Email address:	UserLoginWindow		E-mail cím:
-Very unstable	RatePackageWindow		Nagyon instabil
-<Package contents not available for remote packages>	PackageContentsView		<Távoli csomagok esetében a csomag tartalma nem érhető el>
-The username is already taken. Please choose another.	UserLoginWindow		Ez a felhasználónév már foglalt. Válasszon másikat.
-Close	PackageManager		Bezárás
-Not logged in	MainWindow		Nincs bejelentkezve
-The authentication was successful.	UserLoginWindow		A felhasználóazonosítás sikeres volt
-Installed packages	MainWindow		Telepített csomagok
-Status	PackageListView		Állapot
-Switch account…	MainWindow		Másik fiók…
-Ignore	UserLoginWindow		Mellőzés
-Your rating was updated.	RatePackageWindow		Az értékelés módosítása sikerült.
-Language	UserLoginWindow		Nyelv
-The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		A jelszó érvénytelen vagy könnyen megfejthető. A jelszónak legalább 8 karakterből kell álnia, illetve legalább 2 számot és 2 nagybetűt tartalmaz.
-Rate package	RatePackageWindow		Csomag értékelése
-Development	Model		Fejlesztés
-Fatal error	PackageManager		Végzetes hiba
-The user name needs to be at least 3 letters long.	UserLoginWindow		A felhasználói névnek legalább 3 karakter hosszúnak kell lennie.
-Log in	UserLoginWindow		Bejelentkezés
-Repeat pass phrase:	UserLoginWindow		Jelszó ismétlése:
-Ratings	PackageInfoView		Értékelés
-But none could be listed here, sorry.	UserLoginWindow		A felsoroltak közül egyik sem használható.
-System & Utilities	Model		Rendszer és eszközök
-Inactive	PackageListView		Inaktív
-The package action could not be scheduled: %Error%	PackageInfoView		A csomaggal történő művelet nem ütemezhető be: %Error%
-Science & Mathematics	Model		Tudomány és matematika
-(%Votes%)	PackageInfoView		(%Votes%)
-You have not solved the captcha puzzle correctly.	UserLoginWindow		A megadott kapta kód érvényes.
-Success	UserLoginWindow		Sikeres
-HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		A Raktárnak szüksége van a csomag démonra a helyes működéshez, de úgy látszik, hogy az nem fut.\nElindíthatom?
-Downloading:	PackageInfoView		Letöltés:
-Mostly stable	RatePackageWindow		Nagyrészt stabil
-Log out	MainWindow		Kijelentkezés
-Repository	PackageListView		Tároló
-Education	Model		Oktatás
-Search terms:	FilterView		Keresési feltétel:
-%Version%	PackageInfoView		%Version%
-No user ratings available.	PackageInfoView		Felhasználói értékelés nem áll rendelkezésre.
-Does not start	RatePackageWindow		Nem indul el
-An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Hiba történt a raktár frissítésekor: %error% (%details%)
-There are problems in the form:\n\n	UserLoginWindow		Az űrlap hibás:\n\n
-Create account	UserLoginWindow		Felhasználói fiók létrehozása
-Productivity	Model		Alkalmazások
-No, quit HaikuDepot	App		Nem, a Raktár bezárása.
-Authentication failed	UserLoginWindow		A hitelesítés sikertelen
-Logged in as %User%	MainWindow		Bejelentkezett mint %User%
-9999.99 KiB	PackageListView		9999.99 KiB
-Language	RatePackageWindow		Nyelv
-Size	PackageListView		Méret
-You need to be logged into an account before you can rate packages.	MainWindow		Csomag értékelése előtt be kell jelentkezni egy felhasználói fiókba.
-User name:	UserLoginWindow		Felhasználónév:
-Unstable but usable	RatePackageWindow		Instabil, de használható
-The email address appears to be malformed.	UserLoginWindow		Hibás az e-mail cím formátuma.
-Games	Model		Játékok
-Rating	PackageListView		Értékelés
 (%Votes%)	FeaturedPackagesView		(%Votes%)
-There was a puzzling response from the web service.	UserLoginWindow		A webes szolgáltatás rejtélyes választ adott.
-Graphics	Model		Grafika
-Local	MainWindow		Helyi
-Close	MainWindow		Bezárás
-Preferred language:	UserLoginWindow		Előnyben részesített nyelv:
-Internet & Network	Model		Internet és hálózat
-Refresh repositories	MainWindow		Tárolók frissítése
-Cancel	MainWindow		Mégse
-Quit HaikuDepot	App		Raktár bezárása
-Input validation	UserLoginWindow		Bevitel érvényesítése
-Update	RatePackageWindow		Frissítés
-Video	Model		Videó
-All categories	FilterView		Minden kategória
-Contents	PackageInfoView		Tartalom
-An error occurred while refreshing the repository: %error%	MainWindow		Hiba történt a raktár frissítése közben: %error%
-Try again	App		Próbálja újra
+Uninstalled	PackageListView		Eltávolítva
+Available packages	MainWindow		Elérhető csomagok
+Create account	UserLoginWindow		Felhasználói fiók létrehozása
+Mostly stable	RatePackageWindow		Nagyrészt stabil
+Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		A fiók sikeresen létrehozva. Mostmár lehetőség van a csomagok értékelésére és további funkciókra.
+Rate package…	PackageInfoView		Csomag értékelése…
+Develop packages	MainWindow		Fejlesztői csomagok
+Starting the package daemon failed:\n\n%Error%	App		A csomag démon indítása sikertelen:\n\n%Error%
+<no info>	PackageInfoView		<nincs információ>
+No user ratings available.	PackageInfoView		Felhasználói értékelés nem áll rendelkezésre.
+The user name needs to be at least 3 letters long.	UserLoginWindow		A felhasználói névnek legalább 3 karakter hosszúnak kell lennie.
+Failed to create account	UserLoginWindow		Nem sikerült a fiók létrehozása
+Ignore	UserLoginWindow		Mellőzés
+Rating	PackageListView		Értékelés
+Show	MainWindow		Megjelenítés
+Does not start	RatePackageWindow		Nem indul el
+But none could be listed here, sorry.	UserLoginWindow		A felsoroltak közül egyik sem használható.
+There are problems with the data you entered:\n\n	UserLoginWindow		Tévesen megadott adatok:\n\n
+The authentication was successful.	UserLoginWindow		A felhasználóazonosítás sikeres volt
+Not specified	RatePackageWindow		Nincs megadva
+Unstable but usable	RatePackageWindow		Instabil, de használható
+Active	PackageListView		Aktív
 Login or Create account	MainWindow		Belépés vagy fiók létrehozása
-Pending…	PackageListView		Folyamatban…
+<Package contents not available for remote packages>	PackageContentsView		<Távoli csomagok esetében a csomag tartalma nem érhető el>
+Ratings	PackageInfoView		Értékelés
+Switch account…	MainWindow		Másik fiók…
+Preferred language:	UserLoginWindow		Előnyben részesített nyelv:
+It was not possible to contact the web service.	UserLoginWindow		Nem sikerült elérni a webes szolgáltatást.
+Name	PackageListView		Név
+Rate %Package%	RatePackageWindow		%Package% értékelése
+Quit HaikuDepot	App		Raktár bezárása
+Category	FilterView		Kategória
+Installed packages	MainWindow		Telepített csomagok
+Other users can see this rating	RatePackageWindow		A többi felhasználó számára látható az értékelés
+Stable	RatePackageWindow		Stabil
+Fatal error	PackageManager		Végzetes hiba
+Package action failed	PackageInfoView		A csomag telepítése sikertelen
+No changelog available.	PackageInfoView		Nincs módosítás-előzmény
+There are problems in the form:\n\n	UserLoginWindow		Az űrlap hibás:\n\n
+There was a puzzling response from the web service.	UserLoginWindow		A webes szolgáltatás rejtélyes választ adott.
+Not logged in	MainWindow		Nincs bejelentkezve
+No, quit HaikuDepot	App		Nem, a Raktár bezárása.
+Available	PackageListView		Elérhető
+Cancel	UserLoginWindow		Mégse
+HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		A Raktárnak szüksége van a csomag démonra a helyes működéshez, de úgy látszik, hogy az nem fut.\nElindíthatom?
+Click a package to view information	PackageInfoView		Válasszon egy csomagot az információk megtekintéséhez
+Contents	PackageInfoView		Tartalom
+Close	PackageManager		Bezárás
+Changelog	PackageInfoView		Változásnapló
+About	PackageInfoView		Névjegy
+Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Hitelesítési hiba. A felhasználó nem létezik vagy hibás jelszó került megadásra.
+Very unstable	RatePackageWindow		Nagyon instabil
+Stability	RatePackageWindow		Stabilitás
+Send	RatePackageWindow		Küldés
+Start package daemon	App		Csomag démon indítása
+The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		A jelszó érvénytelen vagy könnyen megfejthető. A jelszónak legalább 8 karakterből kell álnia, illetve legalább 2 számot és 2 nagybetűt tartalmaz.
+The package action could not be scheduled: %Error%	PackageInfoView		A csomaggal történő művelet nem ütemezhető be: %Error%
+Inactive	PackageListView		Inaktív
+Cancel	RatePackageWindow		Mégse
+OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# elem} other{# elem}}
 OK	PackageInfoView		Rendben
-Uninstalled	PackageListView		Eltávolítva
-Show	MainWindow		Megjelenítés
-Stable	RatePackageWindow		Stabil
-Unknown	PackageListView		Ismeretlen
-Comment language:	RatePackageWindow		Hozzászólás nyelve:
-Pass phrase:	UserLoginWindow		Jelszó:
-Screenshot	ScreenshotWindow		Képernyőkép
-Not specified	RatePackageWindow		Nincs megadva
-Available	PackageListView		Elérhető
-Develop packages	MainWindow		Fejlesztői csomagok
-n/a	PackageInfoView		nincs értékelve
-If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		E-mail cím hiányában a jelszó helyreállítása nem lehetséges.
- It responded with: 	UserLoginWindow		Ezt válaszolta:
-Authentication failed. Connection to the service failed.	UserLoginWindow		A hitelesítés sikertelen. Nem tudtam kapcsolódni a szolgáltatáshoz.
-Cancel	RatePackageWindow		Mégse
-Package action failed	PackageInfoView		A csomag telepítése sikertelen
-OK	UserLoginWindow		Rendben
-Send	RatePackageWindow		Küldés
--	no package size		-
-Category:	FilterView		Kategória:
-Failed to create account	UserLoginWindow		Nem sikerült a fiók létrehozása
-Check for updates…	MainWindow		Frissítések keresése…
-There are problems with the data you entered:\n\n	UserLoginWindow		Tévesen megadott adatok:\n\n
-Start package daemon	App		Csomag démon indítása
-Manage repositories…	MainWindow		Csomagtárolók kezelése…
-Business	Model		Üzleti
-Audio	Model		Audió
-About	PackageInfoView		Névjegy
-Active	PackageListView		Aktív
-It was not possible to contact the web service.	UserLoginWindow		Nem sikerült elérni a webes szolgáltatást.
-Refreshing...	MainWindow		Frissítés…
+Downloading:	PackageInfoView		Letöltés:
+Success	UserLoginWindow		Sikeres
+(%Votes%)	PackageInfoView		(%Votes%)
+Repository	PackageListView		Tároló
+Close	UserLoginWindow		Bezárás
+Close	RatePackageWindow		Bezárás
 Failed to create account: %s\n	UserLoginWindow		%s létrehozása sikertelen\n
-Cancel	UserLoginWindow		Mégse
+Size	PackageListView		Méret
+Your rating:	RatePackageWindow		Saját értékelés:
+All categories	FilterView		Minden kategória
+Your rating was updated.	RatePackageWindow		Az értékelés módosítása sikerült.
+n/a	PackageInfoView		nincs értékelve
+Cancel	MainWindow		Mégse
+Refresh repositories	MainWindow		Tárolók frissítése
+If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		E-mail cím hiányában a jelszó helyreállítása nem lehetséges.
+Tools	MainWindow		Eszközök
+The passwords do not match.	UserLoginWindow		A jelszavak nem egyeznek.
+Language	RatePackageWindow		Nyelv
+Authentication failed. Connection to the service failed.	UserLoginWindow		A hitelesítés sikertelen. Nem tudtam kapcsolódni a szolgáltatáshoz.
+Log out	MainWindow		Kijelentkezés
+Comment language:	RatePackageWindow		Hozzászólás nyelve:
+Status	PackageListView		Állapot
+The username is already taken. Please choose another.	UserLoginWindow		Ez a felhasználónév már foglalt. Válasszon másikat.
+Update	RatePackageWindow		Frissítés
+Language	UserLoginWindow		Nyelv
+OK	UserLoginWindow		Rendben
+Stability:	RatePackageWindow		Stabilitás:
+The captcha puzzle needs to be solved.	UserLoginWindow		A kapta kód megadása szükséges.
+Source packages	MainWindow		Forráskód csomagok
+-	no package size		-
+User name:	UserLoginWindow		Felhasználónév:
+Try again	App		Próbálja újra
+Rate package	RatePackageWindow		Csomag értékelése
+The email address appears to be malformed.	UserLoginWindow		Hibás az e-mail cím formátuma.
+You have not solved the captcha puzzle correctly.	UserLoginWindow		A megadott kapta kód érvényes.
+Unknown	PackageListView		Ismeretlen
+Log in	UserLoginWindow		Bejelentkezés
+Logged in as %User%	MainWindow		Bejelentkezett mint %User%
+Email address:	UserLoginWindow		E-mail cím:
+Screenshot	ScreenshotWindow		Képernyőkép
+HaikuDepot	System name		Raktár
+Search terms:	FilterView		Keresési feltétel:
+Pending…	PackageListView		Folyamatban…
+Repeat pass phrase:	UserLoginWindow		Jelszó ismétlése:
+Category:	FilterView		Kategória:
+Authentication failed	UserLoginWindow		A hitelesítés sikertelen
+Manage repositories…	MainWindow		Csomagtárolók kezelése…
+Description	PackageListView		Leírás
+Pass phrase:	UserLoginWindow		Jelszó:
+Open %DeskbarLink%	PackageManager		%DeskbarLink% megnyitása
+Install	PackageManager		Telepítés
+Input validation	UserLoginWindow		Bevitel érvényesítése
+Log in…	MainWindow		Bejelentkezés…
+You need to be logged into an account before you can rate packages.	MainWindow		Csomag értékelése előtt be kell jelentkezni egy felhasználói fiókba.
+9999.99 KiB	PackageListView		9999.99 KiB
+All repositories	MainWindow		Összes tároló
+%Version%	PackageInfoView		%Version%

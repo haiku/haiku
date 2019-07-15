@@ -1,20 +1,20 @@
 1	greek, modern (1453-)	x-vnd.Haiku-Media	2605101563
-Couldn't add volume control in Deskbar: %s\n	Media views		Αδυναμία προσθήκης του εργαλείου έντασης ήχου στη Deskbar: %s\n
-Video input:	Media views		Είσοδος βίντεο:
-Defaults	Media views		Προεπιλογές
+Audio mixer	Media Window		Μίκτης ήχου
+Show volume control on Deskbar	Media views		Ένδειξη έντασης στο
 Quit	Media Window		Έξοδος
-Video settings	Media Window		Ρυθμίσεις εικόνας
-Video output:	Media views		Έξοδος βίντεο:
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Αδυναμία σύνδεσης με τον εξυπηρετητή πολυμέσων.\nΘα θέλατε να τον εκκινήσετε;
 Restart media services	Media views		Επανεκκίνηση υπηρεσιών πολυμέσων
+Couldn't add volume control in Deskbar: %s\n	Media views		Αδυναμία προσθήκης του εργαλείου έντασης ήχου στη Deskbar: %s\n
+Start media server	Media Window		Εκκίνηση εξυπηρετητή πολυμέσων
+Audio settings	Media Window		Ρυθμίσεις ήχου
 Couldn't remove volume control in Deskbar: %s\n	Media views		Αδυναμία αφαίρεσης του εργαλείου έντασης ήχου από τη Deskbar: %s\n
 Media	System name		Media
-Audio mixer	Media Window		Μίκτης ήχου
-This hardware has no controls.	Media Window		Το υλικό μέρος δεν έχει ελέγχους.
+Video output:	Media views		Έξοδος βίντεο:
 Audio output:	Media views		Έξοδος ήχου:
-Audio settings	Media Window		Ρυθμίσεις ήχου
-Start media server	Media Window		Εκκίνηση εξυπηρετητή πολυμέσων
-<none>	Media views		<κανένα>
-Channel:	Media views		Κανάλι:
-Show volume control on Deskbar	Media views		Ένδειξη έντασης στο
+Video input:	Media views		Είσοδος βίντεο:
 Audio input:	Media views		Είσοδος ήχου:
+<none>	Media views		<κανένα>
+This hardware has no controls.	Media Window		Το υλικό μέρος δεν έχει ελέγχους.
+Channel:	Media views		Κανάλι:
+Defaults	Media views		Προεπιλογές
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Αδυναμία σύνδεσης με τον εξυπηρετητή πολυμέσων.\nΘα θέλατε να τον εκκινήσετε;
+Video settings	Media Window		Ρυθμίσεις εικόνας

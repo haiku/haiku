@@ -1,166 +1,166 @@
 1	ukrainian	x-vnd.Be-MAIL	1865394837
-View	Mail		Вигляд
-%d - Date	Mail		%d - Дата
-Attach attributes:	Mail		Додати атрибути:
-Unknown	Mail		Невідомо
-Inconsistency occurred in the undo/redo buffer.	Mail		Невідповідність у буфері відміни/заміни.
-An error occurred trying to save the attachment.	Mail		Сталася помилка при збереженні вкладення.
-Copy to new	Mail		Копіювати до нового
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Зберегти як 'Нове'
-Edit	Mail		Редагувати
-Print	Mail		Друкувати
-<none>	Mail		<жодного>
-New mail message	Mail		Новий лист
-Untitled	Mail		Без назви
-Automatic	Mail		Автоматично
-Automatically mark mail as read:	Mail		Автоматично помітити як прочитане:
-helpful message	Mail		щасливе повідомлення
-Colored quotes:	Mail		Забарвлення цитат:
-Subject:	Mail		Тема:
-Reply to all	Mail		Відповісти всім
-Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Вкладення: %name% (Тип: %type%)
-Show icons & labels	Mail		Показати іконки і мітки
-Remove attachment	Mail		Видалити вкладення
-Button bar:	Mail		Панель кнопок:
-spam	B_USER_DIRECTORY/mail/spam		спам
-Beginner	Mail		Початківець
-Don't save	Mail		Не зберігати
-Expert	Mail		Експерт
-Reply account:	Mail		Обліковий запис для відповіді:
-Message	Mail		Повідомлення
-Settings…	Mail		Налаштування…
-Reply to sender	Mail		Відповісти відправникові
-There is no installed handler for URL links.	Mail		Не встановлено обробник посилань URL.
-Signature	Mail		Підпис
-Find again	Mail		Повторний пошук
-Bcc:	Mail		Bcc:
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основний текст містить %ld нерозкодованих символів. Можливо інше кодування спрацює краще? Виберіть Відправити якщо хочете зробити це не зважаючи(нерозкодований символ буде замінено таким що ситуативно підходить), або натисніть Відмінити щоб повернутися назад і виправити ситуацію.
-Signature:	Mail		Підпис:
-Save changes to this signature?	Mail		Зберегти зміни в цьому підписі?
-Cc:	Mail		Cc:
-Off	Mail		Вимкнути
-Find	Mail		Знайти
-Undo	Mail		Відмінити
-Date:	Mail		Дата:
-An error occurred trying to open this signature.	Mail		Помилка при спробі відкрити цей підпис.
-No file attributes, just plain data	Mail		Жодних атрибутів,тільки чисті дані
-Edit queries…	Mail		Редагувати запити…
-queries	B_USER_DIRECTORY/mail/queries		запити
-Paste	Mail		Вставити
-in	B_USER_DIRECTORY/mail/in		вхідні
-Save attachment…	Mail		Зберегти вкладення…
-Include file attributes in attachments	Mail		Включити файлові атрибути у вкладеннях
-OK	Mail		Гаразд
-Send	Mail		Відіслати
-Show icons only	Mail		Показувати тільки іконки
-Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Видалення вкладень з листа що пересилається не підтримується!\nЦе не працюватиме правильно.
-Hide	Mail		Сховати
-Forward without attachments	Mail		Переслати без вкладень
-Previous	Mail		Попередній
-Redo	Mail		Відмінити відміну
-Add enclosure…	Mail		Додати вкладення…
-Mail	System name		Пошта
-Print…	Mail		Друкувати…
-Warn unencodable:	Mail		Увага нерозкодоване:
-Quit	Mail		Завершити
-%n - Full name	Mail		%n - повне ім'я
- Read 	Mail		 Прочитаним 
-UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
-Trash	Mail		Кошик
-Default account:	Mail		Типовий обліковий запис:
-Size:	Mail		Розмір:
-Account from mail	Mail		Обліковий запис пошти
-Edit signatures…	Mail		Редагувати підписи…
-New	Mail		Новий
-Attachments: 	Mail		Вкладення: 
-On	Mail		Включити
-Set to %s	Mail		Встановити в %s
-Forward	Mail		Переслати
-E-mail draft could not be saved!	Mail		Чорновик листа не збережено!
-%e wrote:\\n	Mail		%e написав:\\n
-To:	Mail		До:
-Only files can be added as attachments.	Mail		Тільки файли можуть бути додані як вкладення.
-Previous message	Mail		Попередній лист
-Attachments:	Mail		Вкладення:
-Title:	Mail		Назва:
-<no account found>	Mail		<обліковий запис не знайдено>
-Find…	Mail		Знайти…
-Accounts…	Mail		Аккаунти…
-Mail preferences	Mail		Налаштування пошти
-Initial spell check mode:	Mail		Режим перевірки правопису:
-Leave same	Mail		Зберегти саме це
-Page setup…	Mail		Налаштувати сторінку…
-Text wrapping:	Mail		Обтікання тексту:
-Revert	Mail		Повернути
-File	Mail		Файл
-mail	B_USER_DIRECTORY/mail		пошта
-None	Mail		Жодного
-(Name unavailable)	Mail		(Ім'я недоступне)
-Copy link location	Mail		Скопіювати розміщення посилання
-out	B_USER_DIRECTORY/mail/out		вихідні
-Show header	Mail		Показати заголовок
-%e - E-mail address	Mail		%e - поштова адреса
-Resend	Mail		Відіслати повторно
-Show raw message	Mail		Показати лист
-\\n - Newline	Mail		\\n - Нова стрічка
-Start now	Mail		Запустити зараз
-Close	Mail		Закрити
-No matches	Mail		Не відповідати
-The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Mail_daemon не запущено. Лист стоїть в черзі і буде відправлений після запуску демона.
-Really delete this signature? This cannot be undone.	Mail		Дійсно видалити цей підпис? Це буде незворотним.
-Save this message as a draft before closing?	Mail		Зберегти це повідомлення як чернетку перед закриттям?
-Open	Mail		Відкрити
-draft	B_USER_DIRECTORY/mail/draft		чорновик
-Quote	Mail		Цитата
-Add	Mail		Додати
-Next message	Mail		Наступний лист
-User interface	Mail		Інтерфейс користувача
-Cancel	Mail		Відмінити
-Send message	Mail		Відіслати лист
-Remove enclosure	Mail		Видалити вкладення
-Sorry, could not find an application that supports the 'Person' data type.	Mail		Вибачте не знайдено жодного додатка що підтримує дані типу 'Person'.
-Delete	Mail		Видалити
-Don't send	Mail		Не надсилати
-Leave as '%s'	Mail		Зберегти як '%s'
-Copy	Mail		Копіювати
-Mail couldn't find its dictionary.	Mail		Пошта не може знайти цього словника.
-Reply preamble:	Mail		Вступ відповіді:
-Signatures	Mail		Підписи
-Next	Mail		Наступний
-Set to…	Mail		Встановити в…
-Use default account	Mail		Використати типовий обліковий запис
-Sorry	Mail		Вибачте
-Encoding:	Mail		Кодування:
-Font:	Mail		Шрифт:
-(Address unavailable)	Mail		(Адреса недоступна)
-Save address	Mail		Зберегти адресу
-Queries	Mail		Запити
-Send this message before closing?	Mail		Відіслати це повідомлення перед закриттям?
-Save	Mail		Зберегти
-Random	Mail		Випадковий
-Close and 	Mail		Закрити і 
-Save as draft	Mail		Зберегти як чорновик
-The mail_daemon could not be started:\n\t	Mail		Mail_daemon не запущено:\n\t
-Open attachment	Mail		Відкрити вкладення
-sent	B_USER_DIRECTORY/mail/sent		відіслати
-(Date unavailable)	Mail		(Дата недоступна)
-Put your favorite e-mail queries and query templates in this folder.	Mail		Покладіть улюблені поштові запити і шаблони запитів у цю теку.
-Spam	Mail		Спам
-Reply	Mail		Відповісти
-Encoding	Mail		Кодування:
-From:	Mail		Від:
-Couldn't open this signature. Sorry.	Mail		Прикро, неможливо відкрити цей підпис.
-Open draft	Mail		Відкрити чорновик
-Cut	Mail		Вирізати
-Check spelling	Mail		Перевірити правопис
 Set to Saved	Mail		Перемкнути до збереження
-Open this link	Mail		Відкрити це посилання
-Auto signature:	Mail		Автопідпис:
-Add signature	Mail		Додати підпис
-Need Tracker to move items to trash	Mail		Для видалення в Кошик потрібен Tracker
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основний текст містить %ld нерозкодованих символів. Можливо інше кодування спрацює краще? Виберіть Відправити якщо хочете зробити це не зважаючи(нерозкодований символ буде замінено таким що ситуативно підходить), або натисніть Відмінити щоб повернутися назад і виправити ситуацію.
+Text wrapping:	Mail		Обтікання тексту:
+Show icons & labels	Mail		Показати іконки і мітки
+(Date unavailable)	Mail		(Дата недоступна)
+Reply	Mail		Відповісти
+Next message	Mail		Наступний лист
 Mailing	Mail		Відправлення
 Unread	Mail		Нечитане
+Copy to new	Mail		Копіювати до нового
+Save as draft	Mail		Зберегти як чорновик
+Encoding:	Mail		Кодування:
+Print	Mail		Друкувати
+Encoding	Mail		Кодування:
+Default account:	Mail		Типовий обліковий запис:
+Message	Mail		Повідомлення
+Bcc:	Mail		Bcc:
+New	Mail		Новий
+Save	Mail		Зберегти
+Undo	Mail		Відмінити
+Button bar:	Mail		Панель кнопок:
+%e wrote:\\n	Mail		%e написав:\\n
+Save changes to this signature?	Mail		Зберегти зміни в цьому підписі?
+Save attachment…	Mail		Зберегти вкладення…
+Paste	Mail		Вставити
+E-mail draft could not be saved!	Mail		Чорновик листа не збережено!
+Don't send	Mail		Не надсилати
+sent	B_USER_DIRECTORY/mail/sent		відіслати
+Only files can be added as attachments.	Mail		Тільки файли можуть бути додані як вкладення.
+Close	Mail		Закрити
+Untitled	Mail		Без назви
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Видалення вкладень з листа що пересилається не підтримується!\nЦе не працюватиме правильно.
+Previous message	Mail		Попередній лист
+(Address unavailable)	Mail		(Адреса недоступна)
+Mail	System name		Пошта
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Вкладення: %name% (Тип: %type%)
+Copy link location	Mail		Скопіювати розміщення посилання
+Attachments: 	Mail		Вкладення: 
+Remove enclosure	Mail		Видалити вкладення
+Next	Mail		Наступний
+Attachments:	Mail		Вкладення:
+Show icons only	Mail		Показувати тільки іконки
+Subject:	Mail		Тема:
+OK	Mail		Гаразд
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
+Quit	Mail		Завершити
+Title:	Mail		Назва:
+Account from mail	Mail		Обліковий запис пошти
+%e - E-mail address	Mail		%e - поштова адреса
+Cc:	Mail		Cc:
+No matches	Mail		Не відповідати
+Queries	Mail		Запити
+Cut	Mail		Вирізати
+Reply to sender	Mail		Відповісти відправникові
+\\n - Newline	Mail		\\n - Нова стрічка
+Copy	Mail		Копіювати
+Add signature	Mail		Додати підпис
+%n - Full name	Mail		%n - повне ім'я
 Remove quote	Mail		Видалити цитату
+Signature	Mail		Підпис
+Use default account	Mail		Використати типовий обліковий запис
+draft	B_USER_DIRECTORY/mail/draft		чорновик
+Really delete this signature? This cannot be undone.	Mail		Дійсно видалити цей підпис? Це буде незворотним.
+spam	B_USER_DIRECTORY/mail/spam		спам
+Reply to all	Mail		Відповісти всім
+Cancel	Mail		Відмінити
+Off	Mail		Вимкнути
+Set to %s	Mail		Встановити в %s
+Signature:	Mail		Підпис:
+Forward without attachments	Mail		Переслати без вкладень
+queries	B_USER_DIRECTORY/mail/queries		запити
+View	Mail		Вигляд
+Signatures	Mail		Підписи
+On	Mail		Включити
+Find	Mail		Знайти
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Вибачте не знайдено жодного додатка що підтримує дані типу 'Person'.
+Date:	Mail		Дата:
+Expert	Mail		Експерт
+Automatically mark mail as read:	Mail		Автоматично помітити як прочитане:
+Close and 	Mail		Закрити і 
+Colored quotes:	Mail		Забарвлення цитат:
+Automatic	Mail		Автоматично
+Open this link	Mail		Відкрити це посилання
+Auto signature:	Mail		Автопідпис:
+Send	Mail		Відіслати
+Open draft	Mail		Відкрити чорновик
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Зберегти як 'Нове'
+Random	Mail		Випадковий
+Attach attributes:	Mail		Додати атрибути:
+Find again	Mail		Повторний пошук
+Size:	Mail		Розмір:
+To:	Mail		До:
+Need Tracker to move items to trash	Mail		Для видалення в Кошик потрібен Tracker
+The mail_daemon could not be started:\n\t	Mail		Mail_daemon не запущено:\n\t
+<no account found>	Mail		<обліковий запис не знайдено>
+Mail couldn't find its dictionary.	Mail		Пошта не може знайти цього словника.
+Mail preferences	Mail		Налаштування пошти
+helpful message	Mail		щасливе повідомлення
+ Read 	Mail		 Прочитаним 
+Font:	Mail		Шрифт:
+Accounts…	Mail		Аккаунти…
+Previous	Mail		Попередній
+Include file attributes in attachments	Mail		Включити файлові атрибути у вкладеннях
+Start now	Mail		Запустити зараз
+(Name unavailable)	Mail		(Ім'я недоступне)
 Move to trash	Mail		Видалити у Кошик
+<none>	Mail		<жодного>
+%d - Date	Mail		%d - Дата
+Check spelling	Mail		Перевірити правопис
+Redo	Mail		Відмінити відміну
+Leave as '%s'	Mail		Зберегти як '%s'
+Print…	Mail		Друкувати…
+Settings…	Mail		Налаштування…
+Warn unencodable:	Mail		Увага нерозкодоване:
+Trash	Mail		Кошик
+Show raw message	Mail		Показати лист
+Find…	Mail		Знайти…
 Select all	Mail		Виділити все
+Show header	Mail		Показати заголовок
+Reply account:	Mail		Обліковий запис для відповіді:
+Sorry	Mail		Вибачте
+Forward	Mail		Переслати
+Open attachment	Mail		Відкрити вкладення
+mail	B_USER_DIRECTORY/mail		пошта
+Save this message as a draft before closing?	Mail		Зберегти це повідомлення як чернетку перед закриттям?
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Mail_daemon не запущено. Лист стоїть в черзі і буде відправлений після запуску демона.
+None	Mail		Жодного
+Resend	Mail		Відіслати повторно
+Hide	Mail		Сховати
+From:	Mail		Від:
+No file attributes, just plain data	Mail		Жодних атрибутів,тільки чисті дані
+Add	Mail		Додати
+out	B_USER_DIRECTORY/mail/out		вихідні
+Send this message before closing?	Mail		Відіслати це повідомлення перед закриттям?
+in	B_USER_DIRECTORY/mail/in		вхідні
+Open	Mail		Відкрити
+Don't save	Mail		Не зберігати
+Leave same	Mail		Зберегти саме це
+An error occurred trying to save the attachment.	Mail		Сталася помилка при збереженні вкладення.
+Save address	Mail		Зберегти адресу
+Initial spell check mode:	Mail		Режим перевірки правопису:
+Edit queries…	Mail		Редагувати запити…
+There is no installed handler for URL links.	Mail		Не встановлено обробник посилань URL.
+File	Mail		Файл
+Reply preamble:	Mail		Вступ відповіді:
+New mail message	Mail		Новий лист
+An error occurred trying to open this signature.	Mail		Помилка при спробі відкрити цей підпис.
+Edit signatures…	Mail		Редагувати підписи…
+User interface	Mail		Інтерфейс користувача
+Quote	Mail		Цитата
+Inconsistency occurred in the undo/redo buffer.	Mail		Невідповідність у буфері відміни/заміни.
+Remove attachment	Mail		Видалити вкладення
+Set to…	Mail		Встановити в…
+Edit	Mail		Редагувати
+Page setup…	Mail		Налаштувати сторінку…
 An error occurred trying to save this signature.	Mail		Помилка при збереженні цього підпису.
+Beginner	Mail		Початківець
+Send message	Mail		Відіслати лист
+Delete	Mail		Видалити
+Put your favorite e-mail queries and query templates in this folder.	Mail		Покладіть улюблені поштові запити і шаблони запитів у цю теку.
+Spam	Mail		Спам
+Couldn't open this signature. Sorry.	Mail		Прикро, неможливо відкрити цей підпис.
+Revert	Mail		Повернути
+Unknown	Mail		Невідомо
+Add enclosure…	Mail		Додати вкладення…

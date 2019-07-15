@@ -1,51 +1,51 @@
 1	lithuanian	x-vnd.Haiku-Screen	1388881963
-yes	Screen		taip
-Use laptop panel:	Screen		Naudoti skreitinuko ekraną:
-15 bits/pixel, 32768 colors	Screen		15 bitų spalvos, iš viso 32768
-/other…	Screen		/kitas…
-16 bits/pixel, 65536 colors	Screen		16 bitų spalvos, iš viso 65536
-Revert	Screen		Atšaukti pakeitimus
-Swap displays:	Screen		Sukeisti ekranus:
-Combine displays:	Screen		Sujungti ekranus:
-Done	Screen		Atlikta
-Set background…	Screen		Pakeisti foną…
-Undo	Screen		Atšaukti
-if needed	Screen		jeigu reikia
-Screen preferences by the Haiku team	Screen		Ekrano nuostatos, sukurtos „Haiku“ komandos
-Screen	System name		Ekranas
-OK	Screen		Gerai
-Workspaces	Screen		Darbalaukiai
-The screen mode could not be set:\n\t%s\n	Screen		Ekrano veiksenos pakeisti nepavyko:\n\t%s\n
 no	Screen		ne
-Could not write VESA mode settings file:\n\t	Screen		Nepavyko įrašyti VESA veiksenos nuostatų failo:\n\t
-Type or use the left and right arrow keys.	Screen		Surinkite reikšmę, arba naudokitės rodyklių kairėn ir dešinėn klavišais.
-Warning	Screen		Įspėjimas
-Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Eilučių dažnis:\t%lu - %lu kHz\nKadrų dažnis:\t%lu - %lu Hz\n\nDidžiausias galimas taškų dažnis:\t%g MHz
-Keep	Screen		Palikti
-Unknown mode	Screen		Nežinoma veiksena
-disable	Screen		nejungti
-Columns:	Screen		Stulpeliai:
-All workspaces	Screen		Visi darbalaukiai
-always	Screen		visuomet
-32 bits/pixel, 16 Million colors	Screen		32 bitų spalvos, iš viso virš 16 milijonų
-Current workspace	Screen		Šis darbalaukis
-About	Screen		Apie
-24 bits/pixel, 16 Million colors	Screen		24 bitų spalvos, iš viso virš 16 milijonų
-horizontally	Screen		horizontaliai
-Other…	Screen		Kitas…
-Cancel	Screen		Atsisakyti
 bits/pixel	Screen		bitų
-Refresh rate:	Screen		Kadrų dažnis:
-Hz	Screen		Hz
-Do you wish to keep these settings?	Screen		Ar norite palikti šias nuostatas?
+15 bits/pixel, 32768 colors	Screen		15 bitų spalvos, iš viso 32768
 Rows:	Screen		Eilutės:
-vertically	Screen		vertikaliai
-Resolution:	Screen		Skiriamoji geba:
-Screen	Screen		Ekranas
 %.1f Hz	Screen		%.1f Hz
-8 bits/pixel, 256 colors	Screen		8 bitų, iš viso 256
-Apply	Screen		Taikyti
-Refresh rate	Screen		Kadrų dažnis
-%sSerial no.: %s	Screen		%sSerijinis numeris: %s
-Colors:	Screen		Spalvos:
+The screen mode could not be set:\n\t%s\n	Screen		Ekrano veiksenos pakeisti nepavyko:\n\t%s\n
+Keep	Screen		Palikti
+/other…	Screen		/kitas…
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Eilučių dažnis:\t%lu - %lu kHz\nKadrų dažnis:\t%lu - %lu Hz\n\nDidžiausias galimas taškų dažnis:\t%g MHz
+Refresh rate:	Screen		Kadrų dažnis:
 Video format:	Screen		Vaizdo formatas:
+Undo	Screen		Atšaukti
+OK	Screen		Gerai
+Current workspace	Screen		Šis darbalaukis
+vertically	Screen		vertikaliai
+All workspaces	Screen		Visi darbalaukiai
+Use laptop panel:	Screen		Naudoti skreitinuko ekraną:
+Could not write VESA mode settings file:\n\t	Screen		Nepavyko įrašyti VESA veiksenos nuostatų failo:\n\t
+Cancel	Screen		Atsisakyti
+Other…	Screen		Kitas…
+Screen	Screen		Ekranas
+Colors:	Screen		Spalvos:
+yes	Screen		taip
+Swap displays:	Screen		Sukeisti ekranus:
+%sSerial no.: %s	Screen		%sSerijinis numeris: %s
+8 bits/pixel, 256 colors	Screen		8 bitų, iš viso 256
+Revert	Screen		Atšaukti pakeitimus
+always	Screen		visuomet
+Warning	Screen		Įspėjimas
+24 bits/pixel, 16 Million colors	Screen		24 bitų spalvos, iš viso virš 16 milijonų
+Hz	Screen		Hz
+Workspaces	Screen		Darbalaukiai
+32 bits/pixel, 16 Million colors	Screen		32 bitų spalvos, iš viso virš 16 milijonų
+Done	Screen		Atlikta
+16 bits/pixel, 65536 colors	Screen		16 bitų spalvos, iš viso 65536
+Screen preferences by the Haiku team	Screen		Ekrano nuostatos, sukurtos „Haiku“ komandos
+Refresh rate	Screen		Kadrų dažnis
+if needed	Screen		jeigu reikia
+Combine displays:	Screen		Sujungti ekranus:
+Unknown mode	Screen		Nežinoma veiksena
+About	Screen		Apie
+Columns:	Screen		Stulpeliai:
+Resolution:	Screen		Skiriamoji geba:
+Apply	Screen		Taikyti
+horizontally	Screen		horizontaliai
+disable	Screen		nejungti
+Set background…	Screen		Pakeisti foną…
+Type or use the left and right arrow keys.	Screen		Surinkite reikšmę, arba naudokitės rodyklių kairėn ir dešinėn klavišais.
+Screen	System name		Ekranas
+Do you wish to keep these settings?	Screen		Ar norite palikti šias nuostatas?

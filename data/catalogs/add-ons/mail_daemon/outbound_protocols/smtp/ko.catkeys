@@ -1,12 +1,12 @@
 1	korean	x-vnd.Haiku-SMTP	2310792426
-SMTP server:	ConfigView		SMTP 서버: 
-Error while logging in to %serv	smtp		%serv에 로깅하는 중 에러 발생
-. The server says:\n	smtp		. 서버의 대답:\n
-ESMTP	ConfigView		ESMTP
-Connecting to server…	smtp		서버에 연결중...
-Error while opening connection to %serv	smtp		%serv에 연결을 여는 중 에러 발생
 POP3 authentication failed. The server said:\n	smtp		POP3 인증 싱패함. 서버는 말함:\n
 Destination:	ConfigView		대상:
-None	ConfigView		없음
-POP3 before SMTP	ConfigView		SMTP 전에 POP3
+Error while logging in to %serv	smtp		%serv에 로깅하는 중 에러 발생
+Connecting to server…	smtp		서버에 연결중...
+. The server says:\n	smtp		. 서버의 대답:\n
+Error while opening connection to %serv	smtp		%serv에 연결을 여는 중 에러 발생
 . The server said:\n	smtp		. 서버가 말함:\n
+None	ConfigView		없음
+SMTP server:	ConfigView		SMTP 서버: 
+ESMTP	ConfigView		ESMTP
+POP3 before SMTP	ConfigView		SMTP 전에 POP3

@@ -1,63 +1,63 @@
 1	portuguese (brazil)	x-vnd.Haiku-MediaConverter	3142509574
-Video using parameters form settings	MediaConverter		Vídeo utilizando definições de forma de parâmetros
-{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, um{O arquivo não foi reconhecido como um arquivo de mídia suportado:} outros{# arquivos não foram reconhecidos como arquivos de mídia suportados:}}
-Video encoding:	MediaConverter		Codificação de vídeo:
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
-No audio	Audio codecs list		Sem áudio
-Error	MediaConverter		Erro
-{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, um{# bit} outros{# bits}}
-Error loading a file	MediaConverter		Erro ao carregar um arquivo
-File Error	MediaConverter-FileInfo		Erro no Arquivo
-Open…	Menu		Abrir…
-Start [ms]: 	MediaConverter		Início [ms]:
-Output file '%filename' created	MediaConverter		Criado arquivo de saída '%filename'
-Output format	MediaConverter		Formato de saída
-End   [ms]: 	MediaConverter		Fim [ms]:
-MediaConverter	System name		Conversor de Mídia
-No video	Video codecs list		Nenhum vídeo
-Duration:	MediaConverter-FileInfo		Duração:
-OK	MediaConverter		OK
-%.1f kHz mono	MediaFileInfo		%.1f kHz mono
+Video quality: %3d%%	MediaConverter		Qualidade de vídeo: %3d%%
+Source files	MediaConverter		Arquivos fonte
 Error converting '%filename'	MediaConverter		Erro ao converter '%filename'
-Low	MediaConverter		Baixo
 Conversion completed	MediaConverter		Conversão concluída
 Audio:	MediaConverter-FileInfo		Áudio:
-OK	MediaConverter-FileInfo		OK
- seconds	MediaFileInfo		 segundos
-Source files	MediaConverter		Arquivos fonte
-{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, um{# quadro} outros{# quadros}}
-Cancelling	MediaConverter		Cancelando
-{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, um{# byte} outros{# bytes}}
-Error loading files	MediaConverter		Erro ao carregar arquivos
-Cancel	MediaConverter		Cancelar
-None available	Video codecs		Nenhum disponível
-Conversion cancelled	MediaConverter		Conversão cancelada
-No file selected	MediaConverter-FileInfo		Nenhum arquivo selecionado
-Select this folder	MediaConverter		Selecionar esta pasta
-Continue	MediaConverter		Continuar
-Encoder parameters	MediaConverter-EncoderWindow		Parâmetros do codificador
-Video:	MediaConverter-FileInfo		Vídeo:
-%d bit 	MediaFileInfo		%d bit
-Error creating '%filename'	MediaConverter		Erro ao criar '%filename'
-Video quality not supported	MediaConverter		Qualidade de vídeo não suportada
-Cancelling…	MediaConverter		Cancelando…
-File details	MediaConverter		Detalhes do arquivo
-Select	MediaConverter		Selecionar
-Quit	Menu		Sair
-Preview	MediaConverter		Pré-visualização
-File format:	MediaConverter		Formato de arquivo:
-None available	Audio codecs		Nenhum disponível
 MediaConverter+:SaveDirectory	MediaConverter		Conversor de Mídia+:Salvar Diretório
-Error launching: %strError%	MediaConverter		Erro ao lançar: %strError%
+Cancelling	MediaConverter		Cancelando
+None available	Audio codecs		Nenhum disponível
+No file selected	MediaConverter-FileInfo		Nenhum arquivo selecionado
 High	MediaConverter		Alto
-Drop media files onto this window	MediaConverter		Soltar arquivos de mídia sobre esta janela
-Audio encoding:	MediaConverter		Codificação de áudio:
-Audio quality not supported	MediaConverter		Qualidade de áudio não suportada
-File	Menu		Arquivo
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, um{O arquivo não foi reconhecido como um arquivo de mídia suportado:} outros{# arquivos não foram reconhecidos como arquivos de mídia suportados:}}
+File Error	MediaConverter-FileInfo		Erro no Arquivo
+None available	Video codecs		Nenhum disponível
+Output format	MediaConverter		Formato de saída
+%.1f kHz mono	MediaFileInfo		%.1f kHz mono
 %.1f kHz stereo	MediaFileInfo		%.1f kHz estéreo
-Convert	MediaConverter		Converter
-Video quality: %3d%%	MediaConverter		Qualidade de vídeo: %3d%%
-%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld canal
-Output folder	MediaConverter		Pasta de saída
+OK	MediaConverter		OK
+Error creating '%filename'	MediaConverter		Erro ao criar '%filename'
+Error loading a file	MediaConverter		Erro ao carregar um arquivo
+Encoder parameters	MediaConverter-EncoderWindow		Parâmetros do codificador
+Open…	Menu		Abrir…
+Audio encoding:	MediaConverter		Codificação de áudio:
 Audio quality: %3d%%	MediaConverter		Qualidade de áudio: %3d%%
+Cancelling…	MediaConverter		Cancelando…
+Output file '%filename' created	MediaConverter		Criado arquivo de saída '%filename'
+Output folder	MediaConverter		Pasta de saída
+ seconds	MediaFileInfo		 segundos
+Video using parameters form settings	MediaConverter		Vídeo utilizando definições de forma de parâmetros
+Video:	MediaConverter-FileInfo		Vídeo:
+Select	MediaConverter		Selecionar
+Conversion cancelled	MediaConverter		Conversão cancelada
+Low	MediaConverter		Baixo
+Error loading files	MediaConverter		Erro ao carregar arquivos
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, um{# bit} outros{# bits}}
+End   [ms]: 	MediaConverter		Fim [ms]:
+Cancel	MediaConverter		Cancelar
+OK	MediaConverter-FileInfo		OK
+Video encoding:	MediaConverter		Codificação de vídeo:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Um erro ocorreu lendo as informações do arquivo.\n\nErro :
+Error	MediaConverter		Erro
+File details	MediaConverter		Detalhes do arquivo
+No audio	Audio codecs list		Sem áudio
+Drop media files onto this window	MediaConverter		Soltar arquivos de mídia sobre esta janela
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, um{# quadro} outros{# quadros}}
+Quit	Menu		Sair
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, um{# byte} outros{# bytes}}
+Duration:	MediaConverter-FileInfo		Duração:
+MediaConverter	System name		Conversor de Mídia
+Error launching: %strError%	MediaConverter		Erro ao lançar: %strError%
+File format:	MediaConverter		Formato de arquivo:
+File	Menu		Arquivo
+Video quality not supported	MediaConverter		Qualidade de vídeo não suportada
+Select this folder	MediaConverter		Selecionar esta pasta
+%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld canal
+%d bit 	MediaFileInfo		%d bit
+No video	Video codecs list		Nenhum vídeo
+Continue	MediaConverter		Continuar
+Convert	MediaConverter		Converter
+Audio quality not supported	MediaConverter		Qualidade de áudio não suportada
+Preview	MediaConverter		Pré-visualização
+Start [ms]: 	MediaConverter		Início [ms]:

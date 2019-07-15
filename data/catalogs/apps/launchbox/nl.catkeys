@@ -1,34 +1,34 @@
 1	dutch; flemish	x-vnd.Haiku-LaunchBox	3016105370
-New	LaunchBox		Nieuw
 Set description…	LaunchBox		Naamgeving...
-Vertical layout	LaunchBox		Verticale lay-out
-OK	LaunchBox		Oké
-Pad 1	LaunchBox		Balk 1
-last chance	LaunchBox		laatste kans
-Quit	LaunchBox		Afsluiten
-Clear button	LaunchBox		Knop leegmaken
-LaunchBox	System name		LaunchBox
-Ignore double-click	LaunchBox		Negeer dubbelklik
-Auto-raise	LaunchBox		Automatisch bovenop
-Show on all workspaces	LaunchBox		Toon in alle werkplekken
-Show window border	LaunchBox		Toon vensterrand
-Pad	LaunchBox		Balk
-Icon size	LaunchBox		Icoongrootte
-Bummer	LaunchBox		Pech hebben
-Cancel	LaunchBox		Annuleren
-Remove button	LaunchBox		Knop verwijderen
-Horizontal layout	LaunchBox		Horizontale lay-out
-\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nHet starten van de applicatie met handtekening '%2' is mislukt.\n\nFout:
-Failed to launch '%1'.\n\nError:	LaunchBox		Het starten van '%1' is mislukt.\n\nFout:
-Name Panel	LaunchBox		Naampaneel
-Add button here	LaunchBox		Voeg hier knop toe
-Description for '%3'	LaunchBox		Beschrijving voor '%3'
-Settings	LaunchBox		Instellingen
-Failed to launch 'something', error in Pad data.	LaunchBox		Het starten van 'iets' is mislukt, fout in Paddata.
-Pad %1	LaunchBox		Balk %1
-Close	LaunchBox		Sluiten
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		'Open map'-commando kon niet naar Tracker gestuurd worden.\n\nError: 
-You can drag an icon here.	LaunchBox		Hierheen kunt u een icoon slepen.
-Clone	LaunchBox		Kloon
-launch popup	LaunchBox		Pop-up starten
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Deze balk echt sluiten?\n(De balk wordt niet onthouden.)
+OK	LaunchBox		Oké
+Ignore double-click	LaunchBox		Negeer dubbelklik
+Show on all workspaces	LaunchBox		Toon in alle werkplekken
+Name Panel	LaunchBox		Naampaneel
+Clone	LaunchBox		Kloon
+Description for '%3'	LaunchBox		Beschrijving voor '%3'
+Show window border	LaunchBox		Toon vensterrand
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nHet starten van de applicatie met handtekening '%2' is mislukt.\n\nFout:
+Failed to launch 'something', error in Pad data.	LaunchBox		Het starten van 'iets' is mislukt, fout in Paddata.
+LaunchBox	System name		LaunchBox
+Auto-raise	LaunchBox		Automatisch bovenop
+Icon size	LaunchBox		Icoongrootte
+Add button here	LaunchBox		Voeg hier knop toe
+Cancel	LaunchBox		Annuleren
+launch popup	LaunchBox		Pop-up starten
+Clear button	LaunchBox		Knop leegmaken
+Bummer	LaunchBox		Pech hebben
+last chance	LaunchBox		laatste kans
+You can drag an icon here.	LaunchBox		Hierheen kunt u een icoon slepen.
+Pad 1	LaunchBox		Balk 1
+Failed to launch '%1'.\n\nError:	LaunchBox		Het starten van '%1' is mislukt.\n\nFout:
+Settings	LaunchBox		Instellingen
+Vertical layout	LaunchBox		Verticale lay-out
+Pad	LaunchBox		Balk
+Close	LaunchBox		Sluiten
+Remove button	LaunchBox		Knop verwijderen
+Quit	LaunchBox		Afsluiten
+Horizontal layout	LaunchBox		Horizontale lay-out
+New	LaunchBox		Nieuw
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		'Open map'-commando kon niet naar Tracker gestuurd worden.\n\nError: 
+Pad %1	LaunchBox		Balk %1

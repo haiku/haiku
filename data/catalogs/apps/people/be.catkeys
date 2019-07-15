@@ -1,50 +1,50 @@
 1	belarusian	x-vnd.Be-PEPL	2332202134
-Edit	People		Правіць
-Error	People		Памылка
-City	People		Горад
-The file '%name%' could not be written.	People		Немагчыма запісаць файл '%name%'.
-none	Groups list		няма
-Configure attributes	People		Сканфігураваць атрыбуты
-Company	People		Кампанія
-%name% picture	People		Выява %name%
-Work phone	People		Рабочы тэлефон
-People	System name		Персоны
-New person	People		Новая персона
-Select all	People		Выбраць усё
-File	People		Файл
-Unnamed person	People		Неназваная асоба
-Could not create %s.	People		Не ўдалося стварыць %s.
-Country	People		Краіна
-Close	People		Закрыць
-Group	People		Група
-Nickname	People		Нік
-Quit	People		Выйсці
-Name	People		Імя
-Revert	People		Вярнуць
-Don't save	People		Не захоўваць
-Undo	People		Адмяніць
-E-mail	People		Эл. пошта
-Load image…	People		Загрузіць выяву…
-OK	People		ОК
-Remove image	People		Выдаліць выяву
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Не ўдалося запусціць наладкі FileTypes каб сканфігураваць атрыбуты файла Асобы.\n\nПамылка: 
-Home phone	People		Хатні тэлефон
-Save as…	People		Захаваць як…
-Redo	People		Перарабіць
-Save changes before closing?	People		Захаваць змены перад закрыццём?
-Paste	People		Уставіць
-Drop an image here,\nor use the contextual menu.	People		Перацягніце выяву сюды,\nці выкарыстайце кантэкстнае меню.
-Save	People		Захаваць
-Person	Short mimetype description		Персона
+Unnamed person	People		Неназваная асоба
 New person…	People		Новая персона…
 Address	People		Адрас
-URL	People		URL
-Sorry	People		Прабачце
 Zip	People		Zip-код
-Contact information for a person.	Long mimetype description		Кантактная інфармацыя для персоны.
-Fax	People		Факс
+Select all	People		Выбраць усё
+Could not create %s.	People		Не ўдалося стварыць %s.
+Quit	People		Выйсці
+Company	People		Кампанія
+Name	People		Імя
+The file '%name%' could not be written.	People		Немагчыма запісаць файл '%name%'.
 Contact name	People		Имя кантакта
-Cut	People		Выразаць
 Cancel	People		Адмена
+Edit	People		Правіць
+Save changes before closing?	People		Захаваць змены перад закрыццём?
+People	System name		Персоны
+Error	People		Памылка
+Revert	People		Вярнуць
+Country	People		Краіна
+Person	Short mimetype description		Персона
+New person	People		Новая персона
+Save	People		Захаваць
+Fax	People		Факс
+URL	People		URL
+%name% picture	People		Выява %name%
+Home phone	People		Хатні тэлефон
+none	Groups list		няма
+Save as…	People		Захаваць як…
+Cut	People		Выразаць
+Contact information for a person.	Long mimetype description		Кантактная інфармацыя для персоны.
+Remove image	People		Выдаліць выяву
+City	People		Горад
+Undo	People		Адмяніць
+Don't save	People		Не захоўваць
+Configure attributes	People		Сканфігураваць атрыбуты
+Work phone	People		Рабочы тэлефон
 State	People		Вобласць
+Nickname	People		Нік
+OK	People		ОК
+File	People		Файл
+Redo	People		Перарабіць
+Close	People		Закрыць
 Copy	People		Капіяваць
+Paste	People		Уставіць
+E-mail	People		Эл. пошта
+Group	People		Група
+Drop an image here,\nor use the contextual menu.	People		Перацягніце выяву сюды,\nці выкарыстайце кантэкстнае меню.
+Load image…	People		Загрузіць выяву…
+Sorry	People		Прабачце

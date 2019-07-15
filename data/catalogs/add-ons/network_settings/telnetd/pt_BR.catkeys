@@ -1,3 +1,3 @@
 1	portuguese (brazil)	x-vnd.Haiku-TelnetService	1209067113
-Telnet server	TelnetServiceAddOn		Servidor Telnet
 The Telnet server allows you to remotely access your machine with a terminal session using the telnet protocol.\n\nPlease note that it is an insecure and unencrypted connection.	TelnetServiceAddOn		O servidor Telnet permite que você acesse remotamente seu computador com uma sessão de terminal usando o protocolo telnet.\n\nPor favor, note que é uma conexão insegura e sem criptografia.
+Telnet server	TelnetServiceAddOn		Servidor Telnet

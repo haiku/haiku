@@ -1,57 +1,57 @@
 1	greek, modern (1453-)	x-vnd.Haiku-PoorMan	3137659009
-Website location	PoorMan		Τοποθεσία ιστοσελίδας
-Error Server	PoorMan		Σφάλμα Εξυπηρετητή
-Settings…	PoorMan		Ρυθμίσεις...
-Create PoorMan log	PoorMan		Δημιουργία καταγραφής PoorMan
-Shutting down.\n	PoorMan		Τερματισμός λειτουργίας.
-Hits: %lu	PoorMan		Επισκέψεις: %lu
-Web folder:	PoorMan		Φάκελος ιστού:
-Save log console selection	PoorMan		Αποθήκευση επιλεγμένης καταγραφής κονσόλας
-Run server	PoorMan		Εκκίνηση εξυπηρετητή
-PoorMan settings	PoorMan		Ρυθμίσεις PoorMan
-Clear hit counter	PoorMan		Καθαρισμός μετρητή επισκέψεων
-Copy	PoorMan		Αντιγραφή
-Max. simultaneous connections:	PoorMan		Μεγ. ταυτόχρονες συνδέσεις:
-Start page:	PoorMan		Αρχική σελίδα:
-done.\n	PoorMan		έγινε.\n
-Create	PoorMan		Δημιουργία
-Shutting down.	PoorMan		Γίνεται τερματισμός
+Select web folder	PoorMan		Επέλεξε φάκελο παγκόσμιου ιστού
+File logging	PoorMan		Αρχείο καταγραφής
 Website options	PoorMan		Επιλογές ιστοσελίδας
-File Name	PoorMan		Όνομα Αρχείου
-Clear console log	PoorMan		Καθαρισμός καταγραφής κονσόλας
-Advanced	PoorMan		Προχωρημένοι
-OK	PoorMan		Εντάξει
-Status: Stopped	PoorMan		Κατάσταση: Σταματημένο
-Dir Created	PoorMan		Ο Κατάλογος δημιουργήθηκε
-Quit	PoorMan		Έξοδος
-Hits: 0	PoorMan		Επισκέψεις: 0
-Save log console	PoorMan		Αποθήκευση καταγραφής κονσόλας
-Edit	PoorMan		Επεξεργασία
-Directory: (none)	PoorMan		Κατάλογος: (κανένα)
+Shutting down.	PoorMan		Γίνεται τερματισμός
+Error Dir	PoorMan		Σφάλμα Καταλόγου
+Web folder:	PoorMan		Φάκελος ιστού:
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Παρακαλώ επιλέξτε το φάκελο για να δημοσιεύσετε στον παγκόσμιο ιστό.\n\nΜπορείτε στο PoorMan να δημιουργήσετε ένα προεπιλεγμένο \"public_html \" στο προσωπικό σας φάκελο. \n Ή να επιλέξετε έναν από τους δικούς σας φακέλους αντ΄ αυτού.
 Log To Console	PoorMan		Καταγραφή στη Κονσόλα
-Status: Running	PoorMan		Κατάσταση: Εκτελείται
-Controls	PoorMan		Έλεγχοι
-Send file listing if there's no start page	PoorMan		Αποστολή παρουσίασης αρχείων αν δεν υπάρχει αρχική σελίδα.
-Error Dir	PoorMan		Σφάλμα Καταλόγου
-Select all	PoorMan		Επιλογή όλων
-File	PoorMan		Αρχείο
-Save console selections as…	PoorMan		Αποθήκευση επιλεγμένης κονσόλας ως…
-File logging	PoorMan		Αρχείο καταγραφής
-Select web folder	PoorMan		Επέλεξε φάκελο παγκόσμιου ιστού
-Logging view	PoorMan		Εμφάνιση καταγραφής
-Logging	PoorMan		Καταγραφή
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Ένας προεπιλεγμένος φάκελος παγκόσμιου ιστού έχει δημιουργηθεί στο \"/boot/home/public_html.\"\nΒεβαιωθείτε ότι υπάρχει ένα HTML αρχείο με το όνομα \"index.html \" σε αυτό το φάκελο.
-Clear log file	PoorMan		Εκκαθάριση αρχείου καταγραφής
-Log file name:	PoorMan		Όνομα αρχείου καταγραφής:
-Directory: 	PoorMan		Κατάλογος:
-Log To File	PoorMan		Καταγραφή σε αρχείο
-Done	PoorMan		Εντάξει
-Create log file	PoorMan		Δημιουργία αρχείου καταγραφής
+File Name	PoorMan		Όνομα Αρχείου
 Starting up... 	PoorMan		Γίνεται εκκίνηση...
-Site	PoorMan		Ιστοσελίδα
-Cancel	PoorMan		Άκυρο
-Cannot start the server	PoorMan		Αδυναμία εκκίνησης του εξυπηρετητή
 Select	PoorMan		Επιλογή
+Logging view	PoorMan		Εμφάνιση καταγραφής
 Save console as…	PoorMan		Αποθήκευση κονσόλας ως...
+Edit	PoorMan		Επεξεργασία
+Cancel	PoorMan		Άκυρο
+Directory: 	PoorMan		Κατάλογος:
+Hits: %lu	PoorMan		Επισκέψεις: %lu
+Hits: 0	PoorMan		Επισκέψεις: 0
+Shutting down.\n	PoorMan		Τερματισμός λειτουργίας.
+Select all	PoorMan		Επιλογή όλων
+Error Server	PoorMan		Σφάλμα Εξυπηρετητή
+Send file listing if there's no start page	PoorMan		Αποστολή παρουσίασης αρχείων αν δεν υπάρχει αρχική σελίδα.
+Create PoorMan log	PoorMan		Δημιουργία καταγραφής PoorMan
+Max. simultaneous connections:	PoorMan		Μεγ. ταυτόχρονες συνδέσεις:
+Done	PoorMan		Εντάξει
+Site	PoorMan		Ιστοσελίδα
+Cannot start the server	PoorMan		Αδυναμία εκκίνησης του εξυπηρετητή
+Create log file	PoorMan		Δημιουργία αρχείου καταγραφής
+Clear hit counter	PoorMan		Καθαρισμός μετρητή επισκέψεων
+Status: Stopped	PoorMan		Κατάσταση: Σταματημένο
+File	PoorMan		Αρχείο
+Settings…	PoorMan		Ρυθμίσεις...
+Log To File	PoorMan		Καταγραφή σε αρχείο
+Controls	PoorMan		Έλεγχοι
+Advanced	PoorMan		Προχωρημένοι
+Copy	PoorMan		Αντιγραφή
+Logging	PoorMan		Καταγραφή
+Clear console log	PoorMan		Καθαρισμός καταγραφής κονσόλας
+Run server	PoorMan		Εκκίνηση εξυπηρετητή
+Create	PoorMan		Δημιουργία
+done.\n	PoorMan		έγινε.\n
+PoorMan settings	PoorMan		Ρυθμίσεις PoorMan
 Console Logging	PoorMan		Καταγραφή κονσόλας
+Clear log file	PoorMan		Εκκαθάριση αρχείου καταγραφής
+Save log console selection	PoorMan		Αποθήκευση επιλεγμένης καταγραφής κονσόλας
+Log file name:	PoorMan		Όνομα αρχείου καταγραφής:
+Status: Running	PoorMan		Κατάσταση: Εκτελείται
+Directory: (none)	PoorMan		Κατάλογος: (κανένα)
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Ένας προεπιλεγμένος φάκελος παγκόσμιου ιστού έχει δημιουργηθεί στο \"/boot/home/public_html.\"\nΒεβαιωθείτε ότι υπάρχει ένα HTML αρχείο με το όνομα \"index.html \" σε αυτό το φάκελο.
+Dir Created	PoorMan		Ο Κατάλογος δημιουργήθηκε
+Save console selections as…	PoorMan		Αποθήκευση επιλεγμένης κονσόλας ως…
+Quit	PoorMan		Έξοδος
+Save log console	PoorMan		Αποθήκευση καταγραφής κονσόλας
+Start page:	PoorMan		Αρχική σελίδα:
+OK	PoorMan		Εντάξει
+Website location	PoorMan		Τοποθεσία ιστοσελίδας

@@ -1,74 +1,73 @@
-1	japanese	x-vnd.Haiku-Appearance	2499598353
-Plain font:	Font view		標準フォント:
-Control highlight	Colors tab		コントロールのハイライト
+1	japanese	x-vnd.Haiku-Appearance	583615507
 Control border	Colors tab		コントロールの境界
-Antialiasing type:	AntialiasingSettingsView		アンチエイリアス:
-Shadow	Colors tab		影
-On	AntialiasingSettingsView		有効
-Defaults	APRWindow		デフォルト
-Link hover	Colors tab		リンク (ポイント時)
-Grayscale	AntialiasingSettingsView		グレースケール
-Shine	Colors tab		光
-About	DecorSettingsView		情報
-About decorator	DecorSettingsView		デコレーターについて
+Control mark	Colors tab		コントロールの選択部
 Off	AntialiasingSettingsView		無効
-Link text	Colors tab		リンクテキスト
-Link active	Colors tab		リンク (選択中)
-Choose Decorator	DecorSettingsView		デコレーターを選択
+Window border	Colors tab		ウィンドウ枠
+Inactive window tab	Colors tab		非アクティブなウィンドウタブ
+Defaults	APRWindow		デフォルト
+Shadow	Colors tab		影
+Document background	Colors tab		ドキュメントの背景
+List background	Colors tab		リストの背景
+Fixed font:	Font view		等幅フォント:
+Appearance	System name		外観
+Reduce colored edges filter strength:	AntialiasingSettingsView		カラーエッジフィルターの強度を下げる
+Glyph hinting:	AntialiasingSettingsView		グリフのヒンティング:
+Menu item text	Colors tab		メニュー項目の文字
+About decorator	DecorSettingsView		デコレーターについて
+Antialiasing menu	AntialiasingSettingsView		アンチエイリアスメニュー
 Success	Colors tab		成功
-Inactive window tab text	Colors tab		非アクティブなウィンドウタブの文字
+About	DecorSettingsView		情報
+Shine	Colors tab		光
+Arrow style	DecorSettingsView		矢印のスタイル
+On	AntialiasingSettingsView		有効
+Decorator:	DecorSettingsView		デコレーター:
+Menu background	Colors tab		メニューの背景
+Revert	APRWindow		元に戻す
+List item text	Colors tab		リスト項目の文字
+OK	DecorSettingsView		OK
+Control text	Colors tab		コントロールの文字
+Look and feel	APRWindow		外観
+Selected menu item background	Colors tab		メニュー選択項目の背景
+Link active	Colors tab		リンク (選択中)
+Antialiasing	APRWindow		アンチエイリアス
+Menu font:	Font view		メニューフォント:
+Bold font:	Font view		太字フォント:
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\n作者:\n\t%decorAuthors\n\nURL: %decorURL\nライセンス: %decorLic\n\n%decorDesc\n
+Choose Decorator	DecorSettingsView		デコレーターを選択
+Strong	AntialiasingSettingsView		強い
 Failure	Colors tab		失敗
+Double:	DecorSettingsView		両方向:
+Selected menu item text	Colors tab		メニュー選択項目の文字
+Size:	Font Selection view		サイズ:
+Panel background	Colors tab		パネルの背景
+Plain font:	Font view		標準フォント:
+Window tab text	Colors tab		ウィンドウタブの文字
+Navigation pulse	Colors tab		ナビゲーションの点滅
+LCD subpixel	AntialiasingSettingsView		LCD サブピクセル
+Window tab	Colors tab		ウィンドウタブ
+Link text	Colors tab		リンクテキスト
+Tooltip background	Colors tab		ツールチップの背景
+Scroll bar thumb	Colors tab		スクロールバーサム
+Link visited	Colors tab		リンク (訪問済)
+Selected menu item border	Colors tab		メニュー選択項目の境界
+Tooltip text	Colors tab		ツールチップの文字
+Control background	Colors tab		コントロールの背景
+Selected list item text	Colors tab		リスト選択項目の文字
+Selected list item background	Colors tab		リスト選択項目の背景
+Inactive window tab text	Colors tab		非アクティブなウィンドウタブの文字
+Navigation base	Colors tab		ナビゲーション
+Fonts	APRWindow		フォント
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	古池や A frog jumps in, 水の音。
+Grayscale	AntialiasingSettingsView		グレースケール
+Antialiasing type:	AntialiasingSettingsView		アンチエイリアス:
+Panel text	Colors tab		パネルの文字
 Hinting menu	AntialiasingSettingsView		ヒンティングメニュー
 Scroll bar:	DecorSettingsView		スクロールバー:
-Document background	Colors tab		ドキュメントの背景
-Status bar	Colors tab		ステータスバー
-Revert	APRWindow		元に戻す
-Window tab	Colors tab		ウィンドウタブ
-Tooltip background	Colors tab		ツールチップの背景
-Selected menu item background	Colors tab		メニュー選択項目の背景
-Antialiasing	APRWindow		アンチエイリアス
-Navigation base	Colors tab		ナビゲーション
-Selected list item text	Colors tab		リスト選択項目の文字
-Window border	Colors tab		ウィンドウ枠
-Double:	DecorSettingsView		両方向:
-Window tab text	Colors tab		ウィンドウタブの文字
-Document text	Colors tab		ドキュメントの文字
-Navigation pulse	Colors tab		ナビゲーションの点滅
-Selected menu item text	Colors tab		メニュー選択項目の文字
-Menu background	Colors tab		メニューの背景
-List background	Colors tab		リストの背景
-OK	DecorSettingsView		OK
-Control mark	Colors tab		コントロールの選択部
-Size:	Font Selection view		サイズ:
-Link visited	Colors tab		リンク (訪問済)
-Decorator:	DecorSettingsView		デコレーター:
-Selected list item background	Colors tab		リスト選択項目の背景
-Panel background	Colors tab		パネルの背景
-Menu font:	Font view		メニューフォント:
-Colors	APRWindow		色
-Control background	Colors tab		コントロールの背景
-Inactive window tab	Colors tab		非アクティブなウィンドウタブ
-List item text	Colors tab		リスト項目の文字
-Appearance	System name		外観
-Fixed font:	Font view		等幅フォント:
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	古池や A frog jumps in, 水の音。
-%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\n作者:\n\t%decorAuthors\n\nURL: %decorURL\nライセンス: %decorLic\n\n%decorDesc\n
-Reduce colored edges filter strength:	AntialiasingSettingsView		カラーエッジフィルターの強度を下げる
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		このHaikuのビルドでは、グリフのヒンティングと組合せたサブピクセルベースのアンチエイリアスは特許問題の可能性を回避するため使用できません。有効にするには、Haikuをソースからビルドして、libfreetypeの設定ヘッダーファイル中の特定のオプションを有効にしなければなりません。
-Scroll bar thumb	Colors tab		スクロールバーサム
-Control text	Colors tab		コントロールの文字
-Single:	DecorSettingsView		一方向:
-Tooltip text	Colors tab		ツールチップの文字
-Bold font:	Font view		太字フォント:
-Inactive window border	Colors tab		非アクティブなウィンドウ枠
-Menu item text	Colors tab		メニュー項目の文字
-LCD subpixel	AntialiasingSettingsView		LCD サブピクセル
-Selected menu item border	Colors tab		メニュー選択項目の境界
-Strong	AntialiasingSettingsView		強い
-Panel text	Colors tab		パネルの文字
-Arrow style	DecorSettingsView		矢印のスタイル
 Monospaced fonts only	AntialiasingSettingsView		等幅フォントのみ有効
-Look and feel	APRWindow		外観
-Antialiasing menu	AntialiasingSettingsView		アンチエイリアスメニュー
-Fonts	APRWindow		フォント
-Glyph hinting:	AntialiasingSettingsView		グリフのヒンティング:
+Document text	Colors tab		ドキュメントの文字
+Inactive window border	Colors tab		非アクティブなウィンドウ枠
+Colors	APRWindow		色
+Control highlight	Colors tab		コントロールのハイライト
+Status bar	Colors tab		ステータスバー
+Link hover	Colors tab		リンク (ポイント時)
+Single:	DecorSettingsView		一方向:

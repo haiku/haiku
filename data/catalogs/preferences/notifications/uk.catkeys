@@ -1,35 +1,35 @@
 1	ukrainian	x-vnd.Haiku-Notifications	332239666
-An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Сталася помилка при збереженні налаштувань.\nМожливо бракує дискового простору.
-Add…	NotificationView		Додати…
-Status	NotificationView		Стан
-Revert	PrefletWin		Повернути
-Enable notifications	GeneralView		Включити оповіщення
-Window width:	GeneralView		Ширина вікна:
-This is a test notification message	PrefletWin		Це тестове повідомлення
-OK	PrefletWin		Гаразд
-Duration:	GeneralView		Тривалість:
-OK	NotificationView		Гаразд
-Application does not have a valid signature	NotificationView	Alert message	Додаток не має діючого підпису
-Follow Deskbar	GeneralView		Слідкувати за Deskbar
-Notifications	PrefletWin		Оповіщення
-Timeout:	GeneralView		Таймаут:
-Muted	NotificationView		Приглушити
-General	PrefletView		Основні
-Allowed	NotificationView		Дозволити
-Remove	NotificationView		Видалити
-Lower right	GeneralView		Нижній правий
-Notifications preflet sample	PrefletWin		Зразок префлета повідомлень
-Notifications	System name		Оповіщення
-Position:	GeneralView		Позиція:
-Applications	PrefletView		Програми
-Defaults	PrefletWin		Типове
-pixels	GeneralView		пікселі
-Application	NotificationView		Програма
-Width:	GeneralView		Ширина:
-seconds	GeneralView		секунд
-Mute notifications from this application	NotificationView		Відключити оповіщення для цієї програми
-Upper right	GeneralView		Верхній правий
- is already listed	NotificationView	Alert message	 вже перелічено
 Lower left	GeneralView		Нижній лівий
+Application does not have a valid signature	NotificationView	Alert message	Додаток не має діючого підпису
+Status	NotificationView		Стан
+Add…	NotificationView		Додати…
+Lower right	GeneralView		Нижній правий
+Muted	NotificationView		Приглушити
+Window width:	GeneralView		Ширина вікна:
+ is already listed	NotificationView	Alert message	 вже перелічено
+OK	PrefletWin		Гаразд
+Notifications	PrefletWin		Оповіщення
+Notifications preflet sample	PrefletWin		Зразок префлета повідомлень
+Mute notifications from this application	NotificationView		Відключити оповіщення для цієї програми
+pixels	GeneralView		пікселі
+seconds	GeneralView		секунд
+Revert	PrefletWin		Повернути
+Applications	PrefletView		Програми
+Timeout:	GeneralView		Таймаут:
+Upper right	GeneralView		Верхній правий
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Сталася помилка при збереженні налаштувань.\nМожливо бракує дискового простору.
+Defaults	PrefletWin		Типове
 Upper left	GeneralView		Верхній лівий
 Applications	NotificationView		Програми
+Width:	GeneralView		Ширина:
+General	PrefletView		Основні
+OK	NotificationView		Гаразд
+Follow Deskbar	GeneralView		Слідкувати за Deskbar
+Notifications	System name		Оповіщення
+Allowed	NotificationView		Дозволити
+Duration:	GeneralView		Тривалість:
+Application	NotificationView		Програма
+Enable notifications	GeneralView		Включити оповіщення
+This is a test notification message	PrefletWin		Це тестове повідомлення
+Remove	NotificationView		Видалити
+Position:	GeneralView		Позиція:

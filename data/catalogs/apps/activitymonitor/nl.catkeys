@@ -1,7 +1,8 @@
-1	dutch; flemish	x-vnd.Haiku-ActivityMonitor	3230060414
+1	dutch; flemish	x-vnd.Haiku-ActivityMonitor	1439119227
 P-faults	DataSource		P-onderbrekingen
 Media nodes	DataSource		Media-eenheid
 Threads	DataSource		Threads
+Always on top	ActivityWindow		Altijd bovenop
 Add graph	ActivityWindow		Voeg grafiek toe
 Teams	DataSource		Teams
 Network send	DataSource		Netwerk (uitgaand)

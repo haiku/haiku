@@ -1,74 +1,73 @@
-1	polish	x-vnd.Haiku-Appearance	2499598353
-Plain font:	Font view		Font zwykły:
-Control highlight	Colors tab		Podkreślenie kontrolki
+1	polish	x-vnd.Haiku-Appearance	583615507
 Control border	Colors tab		Obramowanie kontrolki
-Antialiasing type:	AntialiasingSettingsView		Typ antyaliasingu:
-Shadow	Colors tab		Cień
-On	AntialiasingSettingsView		Włącz
-Defaults	APRWindow		Przywróć domyślne
-Link hover	Colors tab		Zaznaczony odnośnik
-Grayscale	AntialiasingSettingsView		Skala odcieni szarości
-Shine	Colors tab		Połysk
-About	DecorSettingsView		Informacje
-About decorator	DecorSettingsView		O dekoratorze
+Control mark	Colors tab		Znak sterujący
 Off	AntialiasingSettingsView		Wyłącz
-Link text	Colors tab		Tekst odnośnika
-Link active	Colors tab		Aktywny odnośnik
-Choose Decorator	DecorSettingsView		Wybierz Dekorator
+Window border	Colors tab		Obramowanie okna
+Inactive window tab	Colors tab		Nieaktywna zakładka okna
+Defaults	APRWindow		Przywróć domyślne
+Shadow	Colors tab		Cień
+Document background	Colors tab		Tło dokumentu
+List background	Colors tab		Tło listy
+Fixed font:	Font view		Font o stałej szerokości:
+Appearance	System name		Wygląd
+Reduce colored edges filter strength:	AntialiasingSettingsView		Zmniejszenie siły kolorowych filtrów krawędzi:
+Glyph hinting:	AntialiasingSettingsView		Hintowanie fontów:
+Menu item text	Colors tab		Tekst elementu menu
+About decorator	DecorSettingsView		O dekoratorze
+Antialiasing menu	AntialiasingSettingsView		Menu antyaliasingu
 Success	Colors tab		Sukces
-Inactive window tab text	Colors tab		Tekst nieaktywnej zakładki okna
+About	DecorSettingsView		Informacje
+Shine	Colors tab		Połysk
+Arrow style	DecorSettingsView		Wygląd strzałek
+On	AntialiasingSettingsView		Włącz
+Decorator:	DecorSettingsView		Dekorator:
+Menu background	Colors tab		Tło menu
+Revert	APRWindow		Cofnij
+List item text	Colors tab		Tekst elementu listy
+OK	DecorSettingsView		OK
+Control text	Colors tab		Tekst kontrolki
+Look and feel	APRWindow		Wygląd i styl
+Selected menu item background	Colors tab		Tło zaznaczonego elementu menu
+Link active	Colors tab		Aktywny odnośnik
+Antialiasing	APRWindow		Antyaliasing
+Menu font:	Font view		Font menu:
+Bold font:	Font view		Font pogrubiony:
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutorzy:\n\t%decorAuthors\n\nURL: %decorURL\nLicencja: %decorLic\n\n%decorDesc\n
+Choose Decorator	DecorSettingsView		Wybierz Dekorator
+Strong	AntialiasingSettingsView		Silny
 Failure	Colors tab		Niepowodzenie
+Double:	DecorSettingsView		Podwójne:
+Selected menu item text	Colors tab		Tekst zaznaczonego elementu menu
+Size:	Font Selection view		Rozmiar:
+Panel background	Colors tab		Tło panelu
+Plain font:	Font view		Font zwykły:
+Window tab text	Colors tab		Tekst zakładki okna
+Navigation pulse	Colors tab		Puls nawigacji
+LCD subpixel	AntialiasingSettingsView		Podpikselowe LCD
+Window tab	Colors tab		Zakładka okna
+Link text	Colors tab		Tekst odnośnika
+Tooltip background	Colors tab		Tło podpowiedzi
+Scroll bar thumb	Colors tab		Pasek przewijania
+Link visited	Colors tab		Odwiedzony odnośnik
+Selected menu item border	Colors tab		Obramowanie zaznaczonego elementu menu
+Tooltip text	Colors tab		Tekst podpowiedzi
+Control background	Colors tab		Tło kontrolki
+Selected list item text	Colors tab		Tekst zaznaczonego elementu listy
+Selected list item background	Colors tab		Tło zaznaczonego elementu listy
+Inactive window tab text	Colors tab		Tekst nieaktywnej zakładki okna
+Navigation base	Colors tab		Nawigacja
+Fonts	APRWindow		Fonty
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Pchnąć w tę łódź jeża lub ośm skrzyń fig.
+Grayscale	AntialiasingSettingsView		Skala odcieni szarości
+Antialiasing type:	AntialiasingSettingsView		Typ antyaliasingu:
+Panel text	Colors tab		Tekst panelu
 Hinting menu	AntialiasingSettingsView		Menu hintingu
 Scroll bar:	DecorSettingsView		Pasek przewijania:
-Document background	Colors tab		Tło dokumentu
-Status bar	Colors tab		Pasek stanu
-Revert	APRWindow		Cofnij
-Window tab	Colors tab		Zakładka okna
-Tooltip background	Colors tab		Tło podpowiedzi
-Selected menu item background	Colors tab		Tło zaznaczonego elementu menu
-Antialiasing	APRWindow		Antyaliasing
-Navigation base	Colors tab		Nawigacja
-Selected list item text	Colors tab		Tekst zaznaczonego elementu listy
-Window border	Colors tab		Obramowanie okna
-Double:	DecorSettingsView		Podwójne:
-Window tab text	Colors tab		Tekst zakładki okna
-Document text	Colors tab		Tekst dokumentu
-Navigation pulse	Colors tab		Puls nawigacji
-Selected menu item text	Colors tab		Tekst zaznaczonego elementu menu
-Menu background	Colors tab		Tło menu
-List background	Colors tab		Tło listy
-OK	DecorSettingsView		OK
-Control mark	Colors tab		Znak sterujący
-Size:	Font Selection view		Rozmiar:
-Link visited	Colors tab		Odwiedzony odnośnik
-Decorator:	DecorSettingsView		Dekorator:
-Selected list item background	Colors tab		Tło zaznaczonego elementu listy
-Panel background	Colors tab		Tło panelu
-Menu font:	Font view		Font menu:
-Colors	APRWindow		Kolory
-Control background	Colors tab		Tło kontrolki
-Inactive window tab	Colors tab		Nieaktywna zakładka okna
-List item text	Colors tab		Tekst elementu listy
-Appearance	System name		Wygląd
-Fixed font:	Font view		Font o stałej szerokości:
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Pchnąć w tę łódź jeża lub ośm skrzyń fig.
-%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutorzy:\n\t%decorAuthors\n\nURL: %decorURL\nLicencja: %decorLic\n\n%decorDesc\n
-Reduce colored edges filter strength:	AntialiasingSettingsView		Zmniejszenie siły kolorowych filtrów krawędzi:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Antyaliasing podpikselowy w połączeniu z hintowaniem fontów jest niedostępny w tym buildzie Haiku w celu uniknięcia problemów patentowych. Aby włączyć tę funkcjonalność, musisz zbudować Haiku samemu i włączyć niektóre opcje w pliku nagłówkowym biblioteki libfreetype.
-Scroll bar thumb	Colors tab		Pasek przewijania
-Control text	Colors tab		Tekst kontrolki
-Single:	DecorSettingsView		Pojedyncze:
-Tooltip text	Colors tab		Tekst podpowiedzi
-Bold font:	Font view		Font pogrubiony:
-Inactive window border	Colors tab		Nieaktywne obramowanie okna
-Menu item text	Colors tab		Tekst elementu menu
-LCD subpixel	AntialiasingSettingsView		Podpikselowe LCD
-Selected menu item border	Colors tab		Obramowanie zaznaczonego elementu menu
-Strong	AntialiasingSettingsView		Silny
-Panel text	Colors tab		Tekst panelu
-Arrow style	DecorSettingsView		Wygląd strzałek
 Monospaced fonts only	AntialiasingSettingsView		Tylko fonty o stałej szerokości
-Look and feel	APRWindow		Wygląd i styl
-Antialiasing menu	AntialiasingSettingsView		Menu antyaliasingu
-Fonts	APRWindow		Fonty
-Glyph hinting:	AntialiasingSettingsView		Hintowanie fontów:
+Document text	Colors tab		Tekst dokumentu
+Inactive window border	Colors tab		Nieaktywne obramowanie okna
+Colors	APRWindow		Kolory
+Control highlight	Colors tab		Podkreślenie kontrolki
+Status bar	Colors tab		Pasek stanu
+Link hover	Colors tab		Zaznaczony odnośnik
+Single:	DecorSettingsView		Pojedyncze:

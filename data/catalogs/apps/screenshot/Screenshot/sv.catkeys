@@ -1,31 +1,31 @@
 1	swedish	x-vnd.haiku-screenshot	3958461128
-seconds	ScreenshotWindow		sekunder
-Desktop	ScreenshotWindow		Skrivbord
 Include window border	ScreenshotWindow		Inkludera fönsterkant
-Screenshot	System name		Skärmdump
-Select	ScreenshotWindow		Markera
+Overwrite	ScreenshotWindow		Skriv över
+Save in:	ScreenshotWindow		Spara i:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Misslyckades med att spara \"%s\":\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Denna fil finns redan.\n Är du säker på att du vill skriva över den?
+OK	ScreenshotWindow		OK
 The destination path exists but is not a folder.	ScreenshotWindow		Målsökvägen existerar men är inte en katalog.
-Capture active window	ScreenshotWindow		Fånga aktivt fönster
-Cancel	ScreenshotWindow		Avbryt
+Select	ScreenshotWindow		Markera
+Save as:	ScreenshotWindow		Spara som:
+seconds	ScreenshotWindow		sekunder
+New screenshot	ScreenshotWindow		Ny skärmdump
+Screenshot	System name		Skärmdump
+Desktop	ScreenshotWindow		Skrivbord
+Artwork folder	ScreenshotWindow		Illustrationsmapp
+Translator Settings	ScreenshotWindow		Översättningsinställningar
+Include mouse pointer	ScreenshotWindow		Inkludera muspekare
+overwrite	ScreenshotWindow		skriv över
+Settings…	ScreenshotWindow		Inställningar...
+Choose folder	ScreenshotWindow		Välj mapp
 Name:	ScreenshotWindow		Namn:
 Choose folder…	ScreenshotWindow		Välj mapp...
-This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Denna fil finns redan.\n Är du säker på att du vill skriva över den?
-Choose folder	ScreenshotWindow		Välj mapp
-Save	ScreenshotWindow		Spara
-Overwrite	ScreenshotWindow		Skriv över
 Please select	ScreenshotWindow		Vänligen välj
-Save as:	ScreenshotWindow		Spara som:
-Copy to clipboard	ScreenshotWindow		Kopiera till urklipp
-Save in:	ScreenshotWindow		Spara i:
-screenshot	Screenshot	Base filename of screenshot files	skärmdump
-New screenshot	ScreenshotWindow		Ny skärmdump
-Artwork folder	ScreenshotWindow		Illustrationsmapp
-Home folder	ScreenshotWindow		Hemmapp
 Failed to save screenshot	ScreenshotWindow		Misslyckades med att spara skärmdump
-OK	ScreenshotWindow		OK
-Settings…	ScreenshotWindow		Inställningar...
-overwrite	ScreenshotWindow		skriv över
+Cancel	ScreenshotWindow		Avbryt
 Delay:	ScreenshotWindow		Fördröjning:
-Error saving \"%s\":\n\t%s	ScreenshotWindow		Misslyckades med att spara \"%s\":\n\t%s
-Include mouse pointer	ScreenshotWindow		Inkludera muspekare
-Translator Settings	ScreenshotWindow		Översättningsinställningar
+Copy to clipboard	ScreenshotWindow		Kopiera till urklipp
+screenshot	Screenshot	Base filename of screenshot files	skärmdump
+Home folder	ScreenshotWindow		Hemmapp
+Save	ScreenshotWindow		Spara
+Capture active window	ScreenshotWindow		Fånga aktivt fönster

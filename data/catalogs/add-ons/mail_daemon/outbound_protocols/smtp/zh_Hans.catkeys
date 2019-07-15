@@ -1,14 +1,14 @@
 1	english	x-vnd.Haiku-SMTP	815985329
-SMTP server:	ConfigView		SMTP 服务器：
-Error while logging in to %serv	smtp		登陆服务器 %serv 失败
-Unencrypted	ConfigView		未加密
-. The server says:\n	smtp		。服务器回复：\n
-ESMTP	ConfigView		ESMTP
-Connecting to server…	smtp		连接到服务器...
-Error while opening connection to %serv	smtp		连接服务器 %serv 失败
 POP3 authentication failed. The server said:\n	smtp		POP3 认证失败。服务器回复：\n
 Destination:	ConfigView		目标：
+Error while logging in to %serv	smtp		登陆服务器 %serv 失败
+Connecting to server…	smtp		连接到服务器...
+Unencrypted	ConfigView		未加密
+. The server says:\n	smtp		。服务器回复：\n
+Error while opening connection to %serv	smtp		连接服务器 %serv 失败
+. The server said:\n	smtp		。服务器回复：\n
 None	ConfigView		无
+SMTP server:	ConfigView		SMTP 服务器：
+ESMTP	ConfigView		ESMTP
 POP3 before SMTP	ConfigView		POP3 位于 SMTP 之前
 SSL	ConfigView		SSL
-. The server said:\n	smtp		。服务器回复：\n

@@ -1,35 +1,35 @@
 1	romanian	x-vnd.Haiku-Notifications	332239666
-An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		A apărut o eroare la salvarea preferințelor.\nEste posibil că rămâneți fără spațiu pe hard disc.
-Add…	NotificationView		Adaugă…
-Status	NotificationView		Stare
-Revert	PrefletWin		Revenire
-Enable notifications	GeneralView		Activează înștiințări
-Window width:	GeneralView		Lățime fereastră:
-This is a test notification message	PrefletWin		Acesta este un mesaj de notificare test
-OK	PrefletWin		OK
-Duration:	GeneralView		Durată:
-OK	NotificationView		OK
-Application does not have a valid signature	NotificationView	Alert message	Aplicația nu are o semnătură validă
-Follow Deskbar	GeneralView		Urmărește Deskbar
-Notifications	PrefletWin		Înștiințări
-Timeout:	GeneralView		Pauză:
-Muted	NotificationView		Mutat
-General	PrefletView		General
-Allowed	NotificationView		Permis
-Remove	NotificationView		Elimină
-Lower right	GeneralView		Dreapta jos
-Notifications preflet sample	PrefletWin		Mostră de aplicație de preferințe ale notificărilor
-Notifications	System name		Înștiințări
-Position:	GeneralView		Poziție:
-Applications	PrefletView		Aplicații
-Defaults	PrefletWin		Implicite
-pixels	GeneralView		pixeli
-Application	NotificationView		Aplicație
-Width:	GeneralView		Lățime:
-seconds	GeneralView		secunde
-Mute notifications from this application	NotificationView		Mută notificări de la această aplicație
-Upper right	GeneralView		Dreapta sus
- is already listed	NotificationView	Alert message	 este deja listat
 Lower left	GeneralView		Stânga jos
+Application does not have a valid signature	NotificationView	Alert message	Aplicația nu are o semnătură validă
+Status	NotificationView		Stare
+Add…	NotificationView		Adaugă…
+Lower right	GeneralView		Dreapta jos
+Muted	NotificationView		Mutat
+Window width:	GeneralView		Lățime fereastră:
+ is already listed	NotificationView	Alert message	 este deja listat
+OK	PrefletWin		OK
+Notifications	PrefletWin		Înștiințări
+Notifications preflet sample	PrefletWin		Mostră de aplicație de preferințe ale notificărilor
+Mute notifications from this application	NotificationView		Mută notificări de la această aplicație
+pixels	GeneralView		pixeli
+seconds	GeneralView		secunde
+Revert	PrefletWin		Revenire
+Applications	PrefletView		Aplicații
+Timeout:	GeneralView		Pauză:
+Upper right	GeneralView		Dreapta sus
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		A apărut o eroare la salvarea preferințelor.\nEste posibil că rămâneți fără spațiu pe hard disc.
+Defaults	PrefletWin		Implicite
 Upper left	GeneralView		Stânga sus
 Applications	NotificationView		Aplicații
+Width:	GeneralView		Lățime:
+General	PrefletView		General
+OK	NotificationView		OK
+Follow Deskbar	GeneralView		Urmărește Deskbar
+Notifications	System name		Înștiințări
+Allowed	NotificationView		Permis
+Duration:	GeneralView		Durată:
+Application	NotificationView		Aplicație
+Enable notifications	GeneralView		Activează înștiințări
+This is a test notification message	PrefletWin		Acesta este un mesaj de notificare test
+Remove	NotificationView		Elimină
+Position:	GeneralView		Poziție:

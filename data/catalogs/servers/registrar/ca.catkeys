@@ -1,23 +1,23 @@
 1	catalan; valencian	x-vnd.haiku-registrar	2599857937
-Restart system	ShutdownProcess		Reinicia el sistema
-The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		L'aplicació \"%appName%\" podria estar bloquejada per un quadre modal.
-OK	ShutdownProcess		D'acord
-System is shut down	ShutdownProcess		S'està apagant el sistema
-It's now safe to turn off the computer.	ShutdownProcess		Ara és segur apagar l'ordinador.
 Cancel	ShutdownProcess		Anul·la
+OK	ShutdownProcess		D'acord
 Do you really want to shut down the system?	ShutdownProcess		Segur que voleu reiniciar el sistema?
-Asking other processes to quit.	ShutdownProcess		S'esta demanant als altres processos que surtin.
-Asking \"%appName%\" to quit.	ShutdownProcess		S'esta demanant a \"%appName%\" que surtin.
-%action%?	ShutdownProcess		%action%?
-Shutdown aborted	ShutdownProcess		S'ha aturat el procés d'aturada del sistema
-Restarting…	ShutdownProcess		S'està reiniciant...
-Asking background applications to quit.	ShutdownProcess		S'està demanant que s'aturin a les aplicacions en segon pla.
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		L'aplicació \"%appName%\" ha abortat el procés d'aturada.
-Tidying things up a bit.	ShutdownProcess		S'està fent una mica de neteja.
-Do you really want to restart the system?	ShutdownProcess		Segur que voleu reiniciar el sistema?
 Shutdown status	ShutdownProcess		Situació del tancament
-Cancel shutdown	ShutdownProcess		Anul·la l'aturada
-Kill application	ShutdownProcess		Mata l'aplicació
 Shut down	ShutdownProcess		Atura
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		L'aplicació \"%appName%\" podria estar bloquejada per un quadre modal.
+System is shut down	ShutdownProcess		S'està apagant el sistema
+Restart system	ShutdownProcess		Reinicia el sistema
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		L'aplicació \"%appName%\" ha abortat el procés d'aturada.
+Asking background applications to quit.	ShutdownProcess		S'està demanant que s'aturin a les aplicacions en segon pla.
+Do you really want to restart the system?	ShutdownProcess		Segur que voleu reiniciar el sistema?
 Restart	ShutdownProcess		Reinicia
+It's now safe to turn off the computer.	ShutdownProcess		Ara és segur apagar l'ordinador.
+Asking other processes to quit.	ShutdownProcess		S'esta demanant als altres processos que surtin.
+Cancel shutdown	ShutdownProcess		Anul·la l'aturada
+Restarting…	ShutdownProcess		S'està reiniciant...
+%action%?	ShutdownProcess		%action%?
+Tidying things up a bit.	ShutdownProcess		S'està fent una mica de neteja.
+Kill application	ShutdownProcess		Mata l'aplicació
+Shutdown aborted	ShutdownProcess		S'ha aturat el procés d'aturada del sistema
 Shutting down…	ShutdownProcess		S'està aturant...
+Asking \"%appName%\" to quit.	ShutdownProcess		S'esta demanant a \"%appName%\" que surtin.

@@ -1,13 +1,13 @@
 1	french	x-vnd.Haiku-SGITranslator	129108011
-Use compression:	SGIView		Utiliser la compression :
-SGITranslator Settings	SGITranslator		Réglages du traducteur SGI
-None	SGIView		Aucune
 SGI images	SGITranslator		Images SGI
-SGI image translator	SGITranslator		Traducteur d’images SGI
-\nbased on GIMP SGI plugin v1.5:\n	SGIView		\nbasé sur le plugin SGI v1.5 de GIMP :\n
-Version %d.%d.%d, %s	SGIView		Version %d.%d.%d, %s
-SGI image	SGITranslator		Image SGI
-RLE	SGIView		RLE
-SGI Settings	SGIMain		Réglages SGI
-written by:\n	SGIView		écrit par :\n
+Use compression:	SGIView		Utiliser la compression :
 SGI image translator	SGIView		Traducteur d’images SGI
+SGI image	SGITranslator		Image SGI
+SGITranslator Settings	SGITranslator		Réglages du traducteur SGI
+SGI Settings	SGIMain		Réglages SGI
+SGI image translator	SGITranslator		Traducteur d’images SGI
+None	SGIView		Aucune
+Version %d.%d.%d, %s	SGIView		Version %d.%d.%d, %s
+\nbased on GIMP SGI plugin v1.5:\n	SGIView		\nbasé sur le plugin SGI v1.5 de GIMP :\n
+RLE	SGIView		RLE
+written by:\n	SGIView		écrit par :\n

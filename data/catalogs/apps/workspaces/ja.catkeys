@@ -1,13 +1,13 @@
 1	japanese	x-vnd.Be-WORK	3927737357
-Invalid argument: %s\n	Workspaces		無効な引数: %s\n
 Quit	Workspaces		終了
-Workspaces	System name		ワークスペース
+Invalid argument: %s\n	Workspaces		無効な引数: %s\n
 Change workspace count…	Workspaces		ワークスペース数を変更…
-Remove replicant	Workspaces		レプリカントを削除
-Show window border	Workspaces		ウィンドウ枠を表示
-Auto-raise	Workspaces		自動的に表示
 Always on top	Workspaces		常に最前面に
-Switch on mouse wheel	Workspaces		マウスホイールで切り替える
-Live in the Deskbar	Workspaces		Deskbar 内で実行
+Show window border	Workspaces		ウィンドウ枠を表示
 Show window tab	Workspaces		ウィンドウタブを表示
+Auto-raise	Workspaces		自動的に表示
+Remove replicant	Workspaces		レプリカントを削除
+Live in the Deskbar	Workspaces		Deskbar 内で実行
 Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Usage: %s [options] [workspace]\nwhere \"options\" are:\n --notitle\t\ttitle bar removed, border and resize kept\n --noborder\t\ttitle, border, and resize removed\n --avoidfocus\t\tprevents the window from being the target of keyboard events\n --alwaysontop\t\tkeeps window on top\n --notmovable\t\twindow can't be moved around\n --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n
+Switch on mouse wheel	Workspaces		マウスホイールで切り替える
+Workspaces	System name		ワークスペース

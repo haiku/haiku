@@ -1,15 +1,15 @@
-1	english	x-vnd.Haiku-desklink	4132238754
-Control physical output	MediaReplicant		控件物理输出
-Couldn't launch 	MediaReplicant		无法启动
-Muted	MediaReplicant		已静音
-OK	MediaReplicant		确定
+1	english	x-vnd.Haiku-desklink	3759597613
+desklink	MediaReplicant	Title of an alert box	磁盘链接
 Sound preferences…	MediaReplicant		声音首选项...
+Muted	MediaReplicant		已静音
 %g dB	MediaReplicant		%g dB
-Open %name	DeskButton	Don't translate variable %name	打开 %name
-No media server running	VolumeControl		无媒体服务器运行
-Media preferences…	MediaReplicant		多媒体首选项...
+OK	MediaReplicant		确定
+Couldn't launch 	MediaReplicant		无法启动
+Volume	VolumeControl		卷
 Open MediaPlayer	MediaReplicant		打开媒体播放器
-desklink	MediaReplicant		磁盘链接
+Media preferences…	MediaReplicant		多媒体首选项...
 Options	MediaReplicant		选项
 Beep	MediaReplicant		蜂鸣
-Volume	VolumeControl		卷
+Open %name	DeskButton	Don't translate variable %name	打开 %name
+Control physical output	MediaReplicant		控件物理输出
+No media server running	VolumeControl		无媒体服务器运行

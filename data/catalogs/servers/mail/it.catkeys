@@ -1,19 +1,19 @@
 1	italian	x-vnd.Be-POST	2949558073
+No new messages	MailDaemon		Nessun nuovo messaggio
+No new messages	DeskbarView		Nessun nuovo messaggio
+Shutdown mail services	DeskbarView		Arresto servizi di posta elettronica
+Mail status	MailDaemon		Stato posta elettronica
 Fetching mail for %name	Notifier		Recupero della posta elettronica di %name in corso
-Check for mails only	DeskbarView		Controllare solo la posta in arrivo
-Send pending mails	DeskbarView		Inviare la posta in uscita
-{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Un nuovo messaggio} other{# nuovi messaggi}}
 {0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# nuovo messaggio} other{# nuovi messaggi}}
 {0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# nuovo messaggio} other{# nuovi messaggi}} per %name\n
+Create new message…	DeskbarView		Crea nuovo messaggio…
+Send pending mails	DeskbarView		Inviare la posta in uscita
+Settings…	DeskbarView		Impostazioni…
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Un nuovo messaggio} other{# nuovi messaggi}}
 New Messages	MailDaemon		Nuovi Messaggi
 <no accounts>	DeskbarView		<nessun account>
-Mail status	MailDaemon		Stato posta elettronica
-Shutdown mail services	DeskbarView		Arresto servizi di posta elettronica
-Sending mail for %name	Notifier		Invio della posta di %name in corso
-Create new message…	DeskbarView		Crea nuovo messaggio…
-No new messages	MailDaemon		Nessun nuovo messaggio
-Check for mail now	DeskbarView		Controllare adesso la posta in arrivo
-No new messages	DeskbarView		Nessun nuovo messaggio
-Mail daemon status log	MailDaemon		Log del server di posta elettronica
-Settings…	DeskbarView		Impostazioni…
 Mail status	Notifier		Stato posta elettronica
+Check for mails only	DeskbarView		Controllare solo la posta in arrivo
+Check for mail now	DeskbarView		Controllare adesso la posta in arrivo
+Sending mail for %name	Notifier		Invio della posta di %name in corso
+Mail daemon status log	MailDaemon		Log del server di posta elettronica

@@ -1,14 +1,14 @@
 1	portuguese (brazil)	x-vnd.Haiku-SMTP	815985329
-SMTP server:	ConfigView		Servidor SMTP:
-Error while logging in to %serv	smtp		Erro ao logar ao %serv
-Unencrypted	ConfigView		Não criptografado
-. The server says:\n	smtp		. O servidor disse:\n
-ESMTP	ConfigView		ESMTP
-Connecting to server…	smtp		Conectando ao servidor...
-Error while opening connection to %serv	smtp		Erro ao abrir conexão a %serv
 POP3 authentication failed. The server said:\n	smtp		Autenticação POP3 falhou. O servidor disse:\n
 Destination:	ConfigView		Destino:
+Error while logging in to %serv	smtp		Erro ao logar ao %serv
+Connecting to server…	smtp		Conectando ao servidor...
+Unencrypted	ConfigView		Não criptografado
+. The server says:\n	smtp		. O servidor disse:\n
+Error while opening connection to %serv	smtp		Erro ao abrir conexão a %serv
+. The server said:\n	smtp		. O servidor disse:\n
 None	ConfigView		Nenhum
+SMTP server:	ConfigView		Servidor SMTP:
+ESMTP	ConfigView		ESMTP
 POP3 before SMTP	ConfigView		POP3 antes de SMTP
 SSL	ConfigView		SSL
-. The server said:\n	smtp		. O servidor disse:\n

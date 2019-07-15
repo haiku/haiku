@@ -1,12 +1,12 @@
 1	portuguese (brazil)	x-vnd.Be-WORK	3614422175
-Invalid argument: %s\n	Workspaces		Argumento inválido: %s\n
 Quit	Workspaces		Sair
-Workspaces	System name		Espaços de Trabalho
+Invalid argument: %s\n	Workspaces		Argumento inválido: %s\n
 Change workspace count…	Workspaces		Alterar o número de ambientes de trabalho...
-Remove replicant	Workspaces		Remover replicante
-Show window border	Workspaces		Mostrar a borda da janela
-Auto-raise	Workspaces		Auto-levantar
 Always on top	Workspaces		Sempre no topo
-Live in the Deskbar	Workspaces		Ao vivo no Deskbar
+Show window border	Workspaces		Mostrar a borda da janela
 Show window tab	Workspaces		Exibi guia da janela
+Auto-raise	Workspaces		Auto-levantar
+Remove replicant	Workspaces		Remover replicante
+Live in the Deskbar	Workspaces		Ao vivo no Deskbar
 Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Utilização: %s [opções] [espaço de trabalho]\nonde \"opções\" são:\n--notitle\t \t barra de título removido, contorno e redimensionamento mantidos\n--noborder\t \t título, contorno e redimensionamento removidos\n--avoidfocus\t \t impede a janela de ser o alvo de eventos de teclado\n--alwaysontop\t \t mantém a janela no topo\n--notmovable\t \t a janela não pode ser movida\n--autoraise\t \t auto-levanta a janela do espaço de trabalho quando ela está na borda da tela\n--help\t \t mostra a ajuda e sai\ne \"espaço de trabalho\" é o número do Espaço de Trabalho para o qual alternar (0-31)\n
+Workspaces	System name		Espaços de Trabalho

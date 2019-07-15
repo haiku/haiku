@@ -1,54 +1,54 @@
 1	dutch; flemish	x-vnd.Haiku-Mail	2750130554
+Account settings	AutoConfigWindow		Accountinstellingen
+\t\t· Outgoing	Config Window		\t\t · Uitgaand
+An error occurred while creating the config view: %error.	Config Views		Bij het maken van de configuratieweergave is een fout opgetreden: %error.
+E-mail address:	E-Mail		E-mailadres
+Create new account	AutoConfigWindow		Een nieuw account aanmaken
+While sending and receiving	Config Window		Tijdens versturen en ontvangen
+Error!	Config Views		Fout!
+Apply	Config Window		Toepassen
+Incoming mail filters	Config Views		Filters voor binnenkomende mail
+Outgoing mail filters	Config Views		Filters voor uitgaande mail
+Server name:	E-Mail		Servernaam:
+Add	Config Window		Toevoegen
+Back	AutoConfigWindow		Terug
+Real name:	E-Mail		Echte naam:
+Real name:	Config Views		Echte naam:
+\t\t· E-mail filters	Config Window		\t\t · E-mailfilters
+Outgoing	E-Mail		Uitgaand
+Accounts	Config Window		Accounts
+Outgoing	Config Window		Uitgaand
+Remove	Config Views		Verwijderen
+Show notifications:	Config Window		Toon meldingen:
 Settings	Config Window		Instellingen
 Never	Config Window	show status window	Nooit
-While sending and receiving	Config Window		Tijdens versturen en ontvangen
-Incoming	Config Window		Binnenkomend
-Server name:	E-Mail		Servernaam:
-An error occurred while creating the config view: %error.	Config Views		Bij het maken van de configuratieweergave is een fout opgetreden: %error.
-OK	Config Window		Oké
-E-mail address:	E-Mail		E-mailadres
-Account name:	E-Mail		Accountnaam:
 Account name:	Config Views		Accountnaam:
-Create new account	AutoConfigWindow		Een nieuw account aanmaken
-OK	Config Views		Oké
-The filter could not be moved. Deleting filter.	Config Views		Het filter kon niet verplaatst worden. Filter wordt verwijderd.
-Revert	Config Window		Herstellen
-Login name:	E-Mail		Loginnaam:
-Incoming	E-Mail		Binnenkomend
-Password:	E-Mail		Wachtwoord:
-Accounts	Config Window		Accounts
-Finish	AutoConfigWindow		Voltooien
-Remove	Config Window		Verwijderen
-Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Maak een nieuw account aan met de Toevoegen-knop.\n\nVerwijder een account met de knop Verwijderen-knop.\n\nSelecteer een item uit de lijst om de instelling te wijzigen.
-Error!	Config Views		Fout!
-Server Name:	E-Mail		Servernaam:
-While sending	Config Window		Tijdens het versturen
-Show notifications:	Config Window		Toon meldingen:
+\t\t· Incoming	Config Window		\t\t · Binnenkomend
 Enter a valid e-mail address.	AutoConfigWindow		Vul een geldig e-mailadres in.
-Add	Config Window		Toevoegen
-Account settings	AutoConfigWindow		Accountinstellingen
-E-mail	System name		E-mail
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nDe algemene instellingen konden niet hersteld worden.\n\nFout bij het ophalen van de algemene instellingen:\n%s\n
-Real name:	Config Views		Echte naam:
-\t\t· Outgoing	Config Window		\t\t · Uitgaand
+Incoming	E-Mail		Binnenkomend
 Choose Protocol	E-Mail		Kies protocol
 Return address:	Config Views		Retouradres:
-Edit mailbox menu…	Config Window		Mailbox-menu aanpassen...
-Outgoing	E-Mail		Uitgaand
-\t\t· E-mail filters	Config Window		\t\t · E-mailfilters
-Remove	Config Views		Verwijderen
-\t\t· Incoming	Config Window		\t\t · Binnenkomend
-Next	AutoConfigWindow		Volgende
-Check every	Config Window		Controleer elke
-Back	AutoConfigWindow		Terug
-Incoming mail filters	Config Views		Filters voor binnenkomende mail
+Password:	E-Mail		Wachtwoord:
+Error retrieving general settings: %s\n	Config Window		Fout bij het ophalen van de algemene instellingen: %s \n
+The filter could not be moved. Deleting filter.	Config Views		Het filter kon niet verplaatst worden. Filter wordt verwijderd.
+OK	Config Views		Oké
+Revert	Config Window		Herstellen
+Incoming	Config Window		Binnenkomend
+Finish	AutoConfigWindow		Voltooien
+Add filter	Config Views		Filter toevoegen
 Account settings	Config Views		Accountinstellingen
 minutes	Config Window		minuten
-Error retrieving general settings: %s\n	Config Window		Fout bij het ophalen van de algemene instellingen: %s \n
-Real name:	E-Mail		Echte naam:
-Apply	Config Window		Toepassen
+E-mail	System name		E-mail
+Check every	Config Window		Controleer elke
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Maak een nieuw account aan met de Toevoegen-knop.\n\nVerwijder een account met de knop Verwijderen-knop.\n\nSelecteer een item uit de lijst om de instelling te wijzigen.
+Account name:	E-Mail		Accountnaam:
+Edit mailbox menu…	Config Window		Mailbox-menu aanpassen...
+Server Name:	E-Mail		Servernaam:
+Remove	Config Window		Verwijderen
+Login name:	E-Mail		Loginnaam:
+While sending	Config Window		Tijdens het versturen
+OK	Config Window		Oké
 OK	AutoConfigWindow		Oké
-Add filter	Config Views		Filter toevoegen
-Outgoing	Config Window		Uitgaand
-Outgoing mail filters	Config Views		Filters voor uitgaande mail
+Next	AutoConfigWindow		Volgende
 Error	Config Window		Fout

@@ -1,88 +1,88 @@
 1	portuguese (brazil)	x-vnd.Haiku-StyledEdit	727465241
-StyledEdit	System name		Estilo de Edição
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Este arquivo está marcado como somente leitura. Salvar alterações para o documento \"%s\"?
-Paste	Menus		Colar
-OK	LoadAlert		OK
-File	Menus		Arquivo
-???	LoadAlert		???
-Modified	StatusView		Modificado
-Lines:	Statistics		Linhas:
-Italic	Menus		Itálico
-Left	Menus		Esquerda
-Search backwards	FindandReplaceWindow		Pesquisar para trás
-Unlock file	StatusView		Desbloquear arquivo
-Size	Menus		Tamanho
-Save	QuitAlert		Salvar
-Page setup…	Menus		Configurar página…
-Print…	Menus		Imprimir…
-Can't undo	Menus		Impossível desfazer
-Save	Menus		Salvar
-Default	Menus		Padrões
-Replace with:	FindandReplaceWindow		Substituir com:
-Cancel	SaveAlert		Cancelar
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossível reverter, arquivo não encontrado: \"%s\".
-Case-sensitive	FindandReplaceWindow		Diferenciar maiúsculas/minúsculas
-Reload	NodeMonitorAlerts		Atualizar
-Replace in all windows	FindandReplaceWindow		Substituir em todas as janelas
-Wrap lines	Menus		Quebrar linhas
-Quit	Menus		Sair
-File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Arquivo \"%file%\" foi removido por outro aplicativo, recuperar?
 Document statistics	Statistics		Estatísticas do documento
-Cancel	RevertToSavedAlert		Cancelar
-Autodetect	Menus		Auto-detectar
-Document	Menus		Documento
-Save changes to the document \"%s\"? 	QuitAlert		Salvar as alterações ao documento \"%s\"? 
-Edit	Menus		Editar
-Revert	RevertToSavedAlert		Reverter
-Font	Menus		Fonte
-Replace all	FindandReplaceWindow		Substituir tudo
-Statistics…	Menus		Estatísticas…
-Default	Open_and_SaveAsPanel		Padrões
-Replace next	Menus		Substituir próximo
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" tem mudanças não salvas.\nReverter para a última versão salva?
-Cancel	FindandReplaceWindow		Cancelar
-Text encoding	Menus		Codificação de texto
-Close	Menus		Fechar
-Save	SaveAlert		Salvar
-Words:	Statistics		Palavras:
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Erro ao carregar \"%s\":\n\t Formato não suportado
-OK	RevertToSavedAlert		OK
-Don't save	QuitAlert		Não salvar
-Align	Menus		Alinhar
-Color	Menus		Cor
-OK	QuitAlert		OK
-Open…	Menus		Abrir...
-Center	Menus		Centralizado
-Unable to unlock file\n\t%s	QuitAlert		Não foi possível desbloquear o arquivo\n\t %s
-line %d, column %d	StatusView		linha %d, coluna %d
-OK	Statistics		OK
-New	Menus		Novo
-Wrap-around search	FindandReplaceWindow		Localizar em torno de
-Bold	Menus		Negrito
-Find selection	Menus		Localizar seleção
-Find:	FindandReplaceWindow		Localizar:
-Error saving \"%s\":\n%s	SaveAlert		Erro ao salvar \"%s\":\n%s
-Copy	Menus		Copiar
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossível reverter, arquivo não encontrado: \"%s\".
 Cut	Menus		Recortar
-File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Arquivo \"%file\" foi modificado por outro aplicativo, recarregar?
-Replace	FindandReplaceWindow		Substituir
-Find again	Menus		Localizar novamente
-Cancel	QuitAlert		Cancelar
-Find…	Menus		Localizar…
-Select all	Menus		Selecionar tudo
-Don't save	SaveAlert		Não salvar
-Recover	NodeMonitorAlerts		Recuperar
-Error loading \"%s\":\n\t%s	LoadAlert		Erro ao salvar \"%s\":\n%s
-Ignore	NodeMonitorAlerts		Ignorar
-Read-only	StatusView		Somente leitura
-Undo typing	QuitAlert		Desfazer digitação
+Center	Menus		Centralizado
+Wrap-around search	FindandReplaceWindow		Localizar em torno de
+Page setup…	Menus		Configurar página…
 Untitled 	StyledEditWindow		Sem título
-OK	SaveAlert		OK
+OK	Statistics		OK
 Find	FindandReplaceWindow		Localizar
-Encoding	Open_and_SaveAsPanel		Codificação
-Characters:	Statistics		Caracteres:
-Save as…	Menus		Salvar como...
-Redo typing	QuitAlert		Refazer digitação
-Reload…	Menus		Atualizar…
+New	Menus		Novo
+Document	Menus		Documento
+Search backwards	FindandReplaceWindow		Pesquisar para trás
+Find again	Menus		Localizar novamente
+Read-only	StatusView		Somente leitura
+Save	Menus		Salvar
+Cancel	QuitAlert		Cancelar
+Copy	Menus		Copiar
+Reload	NodeMonitorAlerts		Atualizar
+line %d, column %d	StatusView		linha %d, coluna %d
+Words:	Statistics		Palavras:
+???	LoadAlert		???
+Recover	NodeMonitorAlerts		Recuperar
+Error saving \"%s\":\n%s	SaveAlert		Erro ao salvar \"%s\":\n%s
+OK	RevertToSavedAlert		OK
+Unlock file	StatusView		Desbloquear arquivo
+Italic	Menus		Itálico
+Can't undo	Menus		Impossível desfazer
 Replace…	Menus		Substituir…
+File	Menus		Arquivo
+Bold	Menus		Negrito
+Paste	Menus		Colar
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Arquivo \"%file\" foi modificado por outro aplicativo, recarregar?
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Arquivo \"%file%\" foi removido por outro aplicativo, recuperar?
+Lines:	Statistics		Linhas:
+Replace in all windows	FindandReplaceWindow		Substituir em todas as janelas
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" tem mudanças não salvas.\nReverter para a última versão salva?
+Save	SaveAlert		Salvar
+Default	Open_and_SaveAsPanel		Padrões
+Cancel	RevertToSavedAlert		Cancelar
+Cancel	FindandReplaceWindow		Cancelar
+Statistics…	Menus		Estatísticas…
+Encoding	Open_and_SaveAsPanel		Codificação
+Replace all	FindandReplaceWindow		Substituir tudo
+Close	Menus		Fechar
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Erro ao carregar \"%s\":\n\t Formato não suportado
+Left	Menus		Esquerda
+Default	Menus		Padrões
+OK	SaveAlert		OK
+Color	Menus		Cor
+Save changes to the document \"%s\"? 	QuitAlert		Salvar as alterações ao documento \"%s\"? 
+StyledEdit	System name		Estilo de Edição
+Find:	FindandReplaceWindow		Localizar:
+Undo typing	QuitAlert		Desfazer digitação
+Error loading \"%s\":\n\t%s	LoadAlert		Erro ao salvar \"%s\":\n%s
+Don't save	SaveAlert		Não salvar
+Reload…	Menus		Atualizar…
+Print…	Menus		Imprimir…
+Quit	Menus		Sair
+Redo typing	QuitAlert		Refazer digitação
+Ignore	NodeMonitorAlerts		Ignorar
+Wrap lines	Menus		Quebrar linhas
+Text encoding	Menus		Codificação de texto
+Unable to unlock file\n\t%s	QuitAlert		Não foi possível desbloquear o arquivo\n\t %s
+Modified	StatusView		Modificado
+OK	LoadAlert		OK
+Save	QuitAlert		Salvar
+Case-sensitive	FindandReplaceWindow		Diferenciar maiúsculas/minúsculas
+Find selection	Menus		Localizar seleção
+Cancel	SaveAlert		Cancelar
+Find…	Menus		Localizar…
+Revert	RevertToSavedAlert		Reverter
+Size	Menus		Tamanho
+Autodetect	Menus		Auto-detectar
+Replace next	Menus		Substituir próximo
+OK	QuitAlert		OK
+Replace with:	FindandReplaceWindow		Substituir com:
+Edit	Menus		Editar
+Open…	Menus		Abrir...
+Save as…	Menus		Salvar como...
+Replace	FindandReplaceWindow		Substituir
+Characters:	Statistics		Caracteres:
+Don't save	QuitAlert		Não salvar
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Este arquivo está marcado como somente leitura. Salvar alterações para o documento \"%s\"?
+Align	Menus		Alinhar
+Font	Menus		Fonte
+Select all	Menus		Selecionar tudo
 Right	Menus		Direito

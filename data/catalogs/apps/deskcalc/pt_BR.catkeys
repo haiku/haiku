@@ -1,10 +1,10 @@
 1	portuguese (brazil)	x-vnd.Haiku-DeskCalc	1694821448
 Compact	CalcView		Compacto
-Scientific	CalcView		Científico
-DeskCalc	System name		Calculadora de Mesa
-Basic	CalcView		Básico
-Radians	CalcView		Radianos
-Enable Num Lock on startup	CalcView		Habilitar Num Lock na inicialização
 Calculating	CalcView		Calculando
-Degrees	CalcView		Graus
+Enable Num Lock on startup	CalcView		Habilitar Num Lock na inicialização
+Scientific	CalcView		Científico
+Radians	CalcView		Radianos
 Audio Feedback	CalcView		Retorno de áudio
+DeskCalc	System name		Calculadora de Mesa
+Degrees	CalcView		Graus
+Basic	CalcView		Básico

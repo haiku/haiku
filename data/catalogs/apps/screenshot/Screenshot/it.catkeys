@@ -1,31 +1,31 @@
 1	italian	x-vnd.haiku-screenshot	3958461128
-seconds	ScreenshotWindow		Secondi
-Desktop	ScreenshotWindow		Scrivania
 Include window border	ScreenshotWindow		Includi bordi finestra
-Screenshot	System name		Screenshot
-Select	ScreenshotWindow		Seleziona
+Overwrite	ScreenshotWindow		Sovrascrivi
+Save in:	ScreenshotWindow		Salva in:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Errore nel salvataggion di \"%s\":\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Questo file esiste già.\nSei sicuro di volerlo sovrascrivere?
+OK	ScreenshotWindow		OK
 The destination path exists but is not a folder.	ScreenshotWindow		Il percorso di destinazione esiste ma non è una cartella.
-Capture active window	ScreenshotWindow		Cattura la finestra attiva
-Cancel	ScreenshotWindow		Cancella
+Select	ScreenshotWindow		Seleziona
+Save as:	ScreenshotWindow		Salva come:
+seconds	ScreenshotWindow		Secondi
+New screenshot	ScreenshotWindow		Nuovo screenshot
+Screenshot	System name		Screenshot
+Desktop	ScreenshotWindow		Scrivania
+Artwork folder	ScreenshotWindow		Cartella Artwork
+Translator Settings	ScreenshotWindow		Impostazioni translator
+Include mouse pointer	ScreenshotWindow		Includi il puntatore del mouse
+overwrite	ScreenshotWindow		Sovrascrivi
+Settings…	ScreenshotWindow		Impostazioni
+Choose folder	ScreenshotWindow		Scegli cartella
 Name:	ScreenshotWindow		Nome:
 Choose folder…	ScreenshotWindow		Scegli una cartella…
-This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Questo file esiste già.\nSei sicuro di volerlo sovrascrivere?
-Choose folder	ScreenshotWindow		Scegli cartella
-Save	ScreenshotWindow		Salva
-Overwrite	ScreenshotWindow		Sovrascrivi
 Please select	ScreenshotWindow		Per favore seleziona
-Save as:	ScreenshotWindow		Salva come:
-Copy to clipboard	ScreenshotWindow		Copia nella clipboard
-Save in:	ScreenshotWindow		Salva in:
-screenshot	Screenshot	Base filename of screenshot files	istantanea
-New screenshot	ScreenshotWindow		Nuovo screenshot
-Artwork folder	ScreenshotWindow		Cartella Artwork
-Home folder	ScreenshotWindow		Cartella Home
 Failed to save screenshot	ScreenshotWindow		Errore nel salvataggio dell'istantanea dello schermo
-OK	ScreenshotWindow		OK
-Settings…	ScreenshotWindow		Impostazioni
-overwrite	ScreenshotWindow		Sovrascrivi
+Cancel	ScreenshotWindow		Cancella
 Delay:	ScreenshotWindow		Ritardo:
-Error saving \"%s\":\n\t%s	ScreenshotWindow		Errore nel salvataggion di \"%s\":\n\t%s
-Include mouse pointer	ScreenshotWindow		Includi il puntatore del mouse
-Translator Settings	ScreenshotWindow		Impostazioni translator
+Copy to clipboard	ScreenshotWindow		Copia nella clipboard
+screenshot	Screenshot	Base filename of screenshot files	istantanea
+Home folder	ScreenshotWindow		Cartella Home
+Save	ScreenshotWindow		Salva
+Capture active window	ScreenshotWindow		Cattura la finestra attiva

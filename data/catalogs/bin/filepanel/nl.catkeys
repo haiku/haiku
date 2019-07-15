@@ -1,20 +1,20 @@
 1	dutch; flemish	x-vnd.mmu_man.filepanel	1802971238
 display a load/save file panel\n	FilePanelApp		toon een laden/opslaan-paneel\n
-options:\n	FilePanelApp		opties:\n
-usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		gebruik: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n
--k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tsoort lemma dat geopend kan worden (naar smaak): elke combinatie van f, d, s (bestand (standaard), map, symlink)\n
-usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		gebruik: %s [-h] [-d folder] [-l|-s] [-t ttl] [-1] [-m] [-a pattern] [-f pattern]\n
--d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--map\topenen bij <map>\n
-%s not a valid option\n	FilePanelApp		%s is geen geldige optie\n
 short\tlong\tdescription\n	FilePanelApp		kort\tlang\tbeschrijving\n
-%s: this option requires a parameter\n	FilePanelApp		%s: deze optie heeft een parameter nodig\n
--l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tgebruik een 'laden' FilePanel (standaard)\n
--f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tniet geïmplementeerd\n
+%s not a valid option\n	FilePanelApp		%s is geen geldige optie\n
 -s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tgebruik een 'opslaan' FilePanel\n
--n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tstel de standaardnaam in voor opslag\n
--m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tmaakt het FilePanel modaal\n
+%s: this option requires a parameter\n	FilePanelApp		%s: deze optie heeft een parameter nodig\n
 -h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\ttoon gebruik\n
--a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tniet geïmplementeerd\n
--1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tsta slechts 1 bestand toe voor selectie\n
--t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tbepaal de FilePanel-venstertitel\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tgebruik een 'laden' FilePanel (standaard)\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tstel de standaardnaam in voor opslag\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tsoort lemma dat geopend kan worden (naar smaak): elke combinatie van f, d, s (bestand (standaard), map, symlink)\n
 %s: UNIMPLEMENTED\n	FilePanelApp		%s: NIET GEÏMPLEMENTEERD\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tbepaal de FilePanel-venstertitel\n
+-f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tniet geïmplementeerd\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		gebruik: %s [-h] [-d folder] [-l|-s] [-t ttl] [-1] [-m] [-a pattern] [-f pattern]\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tsta slechts 1 bestand toe voor selectie\n
+-a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tniet geïmplementeerd\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tmaakt het FilePanel modaal\n
+options:\n	FilePanelApp		opties:\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--map\topenen bij <map>\n
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		gebruik: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n

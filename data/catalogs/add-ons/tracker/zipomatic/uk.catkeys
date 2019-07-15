@@ -1,17 +1,17 @@
 1	ukrainian	x-vnd.haiku.zip-o-matic	2032806096
-Stop	file:ZipOMaticWindow.cpp		Зупинити
-Creating archive: %s	file:ZipOMaticWindow.cpp		Створення архіву: %s
-Continue	file:ZipOMaticWindow.cpp		Продовжити
-Preparing to archive	file:ZipperThread.cpp		Підготовка до архівації
 Drop files here.	file:ZipOMaticWindow.cpp		Перенесіть файли сюди.
 Filename: %s	file:ZipOMaticWindow.cpp		Ім'я файлу: %s
-You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Ви маєте {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} запущено.\n\n
-Let them continue	file:ZipOMatic.cpp		Нехай це продовжується
 Do you want to stop them?	file:ZipOMatic.cpp		Ви бажаєте зупинити це?
+Error creating archive	file:ZipOMaticWindow.cpp		Помилка створення архіву
+Stop them	file:ZipOMatic.cpp		Зупинити це
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Ви впевнені, що бажаєте зупинити створення цього архіву?
+Preparing to archive	file:ZipperThread.cpp		Підготовка до архівації
+Let them continue	file:ZipOMatic.cpp		Нехай це продовжується
+Continue	file:ZipOMaticWindow.cpp		Продовжити
+Archive created OK	file:ZipOMaticWindow.cpp		Архів успішно створено
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# file added.}, other{# files added.}}
+Stop	file:ZipOMaticWindow.cpp		Зупинити
 Stopped	file:ZipOMaticWindow.cpp		Зупинено
 Archive	file:ZipperThread.cpp		Архів
-Error creating archive	file:ZipOMaticWindow.cpp		Помилка створення архіву
-{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# file added.}, other{# files added.}}
-Archive created OK	file:ZipOMaticWindow.cpp		Архів успішно створено
-Stop them	file:ZipOMatic.cpp		Зупинити це
+Creating archive: %s	file:ZipOMaticWindow.cpp		Створення архіву: %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Ви маєте {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} запущено.\n\n

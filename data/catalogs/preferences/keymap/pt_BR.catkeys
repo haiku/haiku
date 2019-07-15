@@ -1,58 +1,58 @@
 1	portuguese (brazil)	x-vnd.Haiku-Keymap	1385051534
-Shift:	Modifier keys window	Shift key role name	Deslocar:
-Revert	Modifier keys window		Reverter
-Warning: left and right key roles do not match	Modifier keys window		Aviso: regras das teclas direita e esquerda não são iguais
-Scroll lock	Keyboard Layout View		Scroll lock
-Menu	Keyboard Layout View	Menu key	Menu
-Left control	Keyboard Layout View		Control esquerdo
-Tilde trigger	Keymap window		Acento til
-Grave trigger	Keymap window		Tecla morta
-Role	Modifier keys window	As in the role of a modifier key	Função
-Caps lock	Keyboard Layout View		Caps lock
-Select dead keys	Keymap window		Selecionar teclas de acento
-Cancel	Modifier keys window		Cancelar
-Command	Keyboard Layout View	Command key	Comando
-Defaults	Keymap window		Configurações padrão
-Quit	Keymap window		Sair
-Switch shortcut keys to Haiku mode	Keymap window		Alternar teclas de atalho para o modo Haiku
-Circumflex trigger	Keymap window		Tecla de circunflexo
-Diaeresis trigger	Keymap window		Tecla de trema
-Disabled	Modifier keys window	Do nothing	Desabilitado
-Open…	Keymap window		Abrir...
-Error: duplicate keys	Modifier keys window		Erro: chaves duplicadas
-System:	Keymap window		Sistema:
-Left command	Keyboard Layout View		Comando esquerdo
-Set modifier keys…	Keymap window		Definir modificador de teclas…
-Option:	Modifier keys window	Option key role name	Opção:
-Control	Keyboard Layout View	Control key	Control
-Left option	Keyboard Layout View		Opção esquerda
-Right control	Keyboard Layout View		Control direito
-Switch shortcut keys	Keymap window		Mudas as teclas de atalho
-Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tecla shift
-User:	Keymap window		Usuário:
-Right option	Keyboard Layout View		Opção da direita
-Right shift	Keyboard Layout View		Shift direito
 Key	Modifier keys window	As in a computer keyboard key	Tecla
+Right control	Keyboard Layout View		Control direito
+Option:	Modifier keys window	Option key role name	Opção:
+Cancel	Modifier keys window		Cancelar
+Sample and clipboard:	Keymap window		Amostra e área de transferência:
+Num lock	Keyboard Layout View		Num lock
+Switch shortcut keys to Windows/Linux mode	Keymap window		Alternar teclas de atalho para modo Windows/Linux
+Option	Keyboard Layout View	Option key	Opção
+Scroll lock	Keyboard Layout View		Scroll lock
+Right option	Keyboard Layout View		Opção da direita
+Revert	Modifier keys window		Reverter
+Set modifier keys	Modifier keys window		Definir teclas modificadoras
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Tecla Win/Cmd
+Command:	Modifier keys window	Command key role name	Command:
+Acute trigger	Keymap window		Tecla de acento agudo
+Modifier keys	Modifier keys window		Teclas modificadoras
+Save as…	Keymap window		Salvar como...
+Error: duplicate keys	Modifier keys window		Erro: chaves duplicadas
+Control	Keyboard Layout View	Control key	Control
+Remove	Keyboard Layout View		Remover
+Tilde trigger	Keymap window		Acento til
+Shift	Keyboard Layout View	Shift key	Shift
+Left command	Keyboard Layout View		Comando esquerdo
+(Current)	Keymap window		(Atual)
+Left option	Keyboard Layout View		Opção esquerda
+Warning: left and right key roles do not match	Modifier keys window		Aviso: regras das teclas direita e esquerda não são iguais
+Circumflex trigger	Keymap window		Tecla de circunflexo
+Caps lock	Keyboard Layout View		Caps lock
+Left shift	Keyboard Layout View		Shift esquerdo
+Left control	Keyboard Layout View		Control esquerdo
+Role	Modifier keys window	As in the role of a modifier key	Função
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Tecla control
 Control:	Modifier keys window	Control key role name	Controle:
-Remove	Keyboard Layout View		Remover
-Option	Keyboard Layout View	Option key	Opção
-Sample and clipboard:	Keymap window		Amostra e área de transferência:
-Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Tecla Alt/Opt
+Disabled	Modifier keys window	Do nothing	Desabilitado
+Select dead keys	Keymap window		Selecionar teclas de acento
+Right shift	Keyboard Layout View		Shift direito
 Layout	Keymap window		Disposição
-Switch shortcut keys to Windows/Linux mode	Keymap window		Alternar teclas de atalho para modo Windows/Linux
-Right command	Keyboard Layout View		Comando direito
 Revert	Keymap window		Reverter
-Command:	Modifier keys window	Command key role name	Command:
-Save as…	Keymap window		Salvar como...
-Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Tecla Win/Cmd
-File	Keymap window		Arquivo
-Num lock	Keyboard Layout View		Num lock
-(Current)	Keymap window		(Atual)
-Font	Keymap window		Fonte
+Grave trigger	Keymap window		Tecla morta
+Menu	Keyboard Layout View	Menu key	Menu
+Quit	Keymap window		Sair
+User:	Keymap window		Usuário:
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Tecla Alt/Opt
+Shift:	Modifier keys window	Shift key role name	Deslocar:
 Keymap	System name		Mapa do teclado
-Left shift	Keyboard Layout View		Shift esquerdo
-Shift	Keyboard Layout View	Shift key	Shift
-Set modifier keys	Modifier keys window		Definir teclas modificadoras
-Modifier keys	Modifier keys window		Teclas modificadoras
-Acute trigger	Keymap window		Tecla de acento agudo
+Set modifier keys…	Keymap window		Definir modificador de teclas…
+Switch shortcut keys to Haiku mode	Keymap window		Alternar teclas de atalho para o modo Haiku
+Defaults	Keymap window		Configurações padrão
+System:	Keymap window		Sistema:
+Switch shortcut keys	Keymap window		Mudas as teclas de atalho
+Right command	Keyboard Layout View		Comando direito
+Font	Keymap window		Fonte
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tecla shift
+Command	Keyboard Layout View	Command key	Comando
+File	Keymap window		Arquivo
+Diaeresis trigger	Keymap window		Tecla de trema
+Open…	Keymap window		Abrir...

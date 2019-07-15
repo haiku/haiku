@@ -1,17 +1,17 @@
 1	russian	x-vnd.Haiku-DataTranslations	4156631142
-DataTranslations	System name		Трансляция данных
-Cancel	DataTranslations		Отмена
+Path:	DataTranslations		Путь:
 Name:	DataTranslations		Имя:
+DataTranslations - Note	DataTranslations		Трансляция данных - Заметка
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Похоже, что файл '%name' не является транслятором и не будет установлен.
 Could not install %s:\n%s	DataTranslations		Невозможно установить %s:\n%s
-Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		С помощью этой панели можно изменить настройки трансляторов по умолчанию. Эти настройки также будут использоваться в приложениях, которые не предоставляют возможности изменять их самостоятельно.
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Файл с именем '%name' уже существует в папке Translators! Заменить существующий транслятор?
-DataTranslations - Note	DataTranslations		Трансляция данных - Заметка
-Overwrite	DataTranslations		Перезаписать
-Info:	DataTranslations		Инфо:
-Info	DataTranslations		Инфо
-Path:	DataTranslations		Путь:
-The new translator has been installed successfully.	DataTranslations		Новый транслятор был успешно установлен.
-DataTranslations - Error	DataTranslations		Трансляция данных - ошибка
 OK	DataTranslations		ОК
+Cancel	DataTranslations		Отмена
+Info:	DataTranslations		Инфо:
+DataTranslations - Error	DataTranslations		Трансляция данных - ошибка
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		С помощью этой панели можно изменить настройки трансляторов по умолчанию. Эти настройки также будут использоваться в приложениях, которые не предоставляют возможности изменять их самостоятельно.
+The new translator has been installed successfully.	DataTranslations		Новый транслятор был успешно установлен.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Файл с именем '%name' уже существует в папке Translators! Заменить существующий транслятор?
+DataTranslations	System name		Трансляция данных
+Info	DataTranslations		Инфо
+Overwrite	DataTranslations		Перезаписать
 Version:	DataTranslations		Версия:

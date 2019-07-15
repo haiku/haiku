@@ -1,7 +1,7 @@
 1	indonesian	x-vnd.Haiku-libpackage	2012114212
-Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Paket %s-%s tidak memiliki pencocokan yang sesuai dengan paket dasarnya \"%s\"
-Failed to get repository names	PackageManagerKit		Gagal mendapatkan nama repositori
-Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Gagal mendapatkan cache untuk repositori \"%s\". Skipping.
 Refreshing repository \"%s\" failed	PackageManagerKit		Menyegarkan repositori \"%s\" gagal
 Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Gagal mendapatkan konfigurasi untuk repositori \"%s\". lompati.
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Gagal mendapatkan cache untuk repositori \"%s\". Skipping.
+Failed to get repository names	PackageManagerKit		Gagal mendapatkan nama repositori
 Failed to remove transaction directory	PackageManagerKit		Gagal menghapus direktori transaksi
+Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Paket %s-%s tidak memiliki pencocokan yang sesuai dengan paket dasarnya \"%s\"

@@ -1,34 +1,33 @@
-1	polish	x-vnd.Haiku.TextSearch	172802561
-%s: Not enough room to escape the filename.	Grepper		%s: Niewystarczająca ilość miejsca do wyprowadzenia nazwy pliku.
-Trim to selection	GrepWindow		Zredukuj do zawartości
-Follow symbolic links	GrepWindow		Podążaj za dowiązaniami symbolicznymi
-Close	GrepWindow		Zamknij
-Cancel	GrepWindow		Anuluj
-The unselected files will be removed from the list.	GrepWindow		Niezaznaczone pliki zostaną usunięte z listy.
-Regular expression	GrepWindow		Wyrażenie regularne
-Set target…	GrepWindow		Ustaw cel…
+1	polish	x-vnd.Haiku.TextSearch	2968366719
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Wybierz pliki które chcesz zaznaczyć w Trackerze.
-Open files in Pe	GrepWindow		Otwórz pliki w Pe
 %appname% : %path%	GrepWindow		%appname% : %path%
-Copy text to clipboard	GrepWindow		Kopiuj tekst do schowka
-Settings	GrepWindow		Ustawienia
-Select all	GrepWindow		Zaznacz wszystko
-OK	GrepWindow		OK
-Skip folders starting with a dot	GrepWindow		Pomiń katalogi zaczynające się od kropki
-%APP_NAME couldn't open one or more folders.	GrepWindow		Aplikcaja %APP_NAME nie mogła otworzyć jednego lub więcej katalogów.
-Search	GrepWindow		Szukaj
 Open selection	GrepWindow		Otwarte zaznaczenie
-Look in sub-folders	GrepWindow		Szukaj w podkatalogach
 Actions	GrepWindow		Akcje
-File	GrepWindow		Plik
-Encoding	GrepWindow		Kodowanie
-History	GrepWindow		Historia
 New window	GrepWindow		Nowe okno
-Please select the files you wish to keep searching.	GrepWindow		Wybierz pliki dla których chcesz kontynuować wyszukiwanie.
-TextSearch	GrepWindow		TextSearch
+Encoding	GrepWindow		Kodowanie
+OK	GrepWindow		OK
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Close	GrepWindow		Zamknij
+Look in sub-folders	GrepWindow		Szukaj w podkatalogach
+%s: Not enough room to escape the filename.	Grepper		%s: Niewystarczająca ilość miejsca do wyprowadzenia nazwy pliku.
+Follow symbolic links	GrepWindow		Podążaj za dowiązaniami symbolicznymi
+Regular expression	GrepWindow		Wyrażenie regularne
+Text files only	GrepWindow		Tylko pliki tekstowe
 Quit	GrepWindow		Zakończ
 Show files in Tracker	GrepWindow		Pokaż pliki w Trackerze
-Case-sensitive	GrepWindow		Uwzględnij wielkość liter
-Text files only	GrepWindow		Tylko pliki tekstowe
+Please select the files you wish to keep searching.	GrepWindow		Wybierz pliki dla których chcesz kontynuować wyszukiwanie.
+Trim to selection	GrepWindow		Zredukuj do zawartości
+Set target…	GrepWindow		Ustaw cel…
+TextSearch	GrepWindow		TextSearch
+Search	GrepWindow		Szukaj
+Copy text to clipboard	GrepWindow		Kopiuj tekst do schowka
 Show lines	GrepWindow		Pokaż linie
-%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+The unselected files will be removed from the list.	GrepWindow		Niezaznaczone pliki zostaną usunięte z listy.
+Skip folders starting with a dot	GrepWindow		Pomiń katalogi zaczynające się od kropki
+Cancel	GrepWindow		Anuluj
+History	GrepWindow		Historia
+File	GrepWindow		Plik
+Case-sensitive	GrepWindow		Uwzględnij wielkość liter
+Select all	GrepWindow		Zaznacz wszystko
+%APP_NAME couldn't open one or more folders.	GrepWindow		Aplikcaja %APP_NAME nie mogła otworzyć jednego lub więcej katalogów.
+Settings	GrepWindow		Ustawienia

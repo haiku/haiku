@@ -1,17 +1,17 @@
 1	finnish	x-vnd.Haiku-DataTranslations	4156631142
-DataTranslations	System name		Tietomuunnosasetukset
-Cancel	DataTranslations		Peru
+Path:	DataTranslations		Polku:
 Name:	DataTranslations		Nimi:
+DataTranslations - Note	DataTranslations		Tietomuunnokset - Ilmoitus
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Kohde ’%name’ ei näytä olevan tietomuunnin ja sitä ei asenneta.
 Could not install %s:\n%s	DataTranslations		Kohteen %s asentaminen epäonnistui:\n%s
-Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Käytä tätä ohjauspaneelia niiden oletusasetusten asettamiseksi, joita käytetään kun sovellus ei ole määritellyt muita asetuksia.
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Kohde nimeltään ’%name’ on jo olemassa Translators-kansiossa! Pitäisikö olemassa oleva tietomuunnin korvata?
-DataTranslations - Note	DataTranslations		Tietomuunnokset - Ilmoitus
-Overwrite	DataTranslations		Korvaa
-Info:	DataTranslations		Tiedot:
-Info	DataTranslations		Tiedot
-Path:	DataTranslations		Polku:
-The new translator has been installed successfully.	DataTranslations		Uusi tietomuunnin on asennettu onnistuneesti.
-DataTranslations - Error	DataTranslations		Tietomuunnokset - Virhe
 OK	DataTranslations		Valmis
+Cancel	DataTranslations		Peru
+Info:	DataTranslations		Tiedot:
+DataTranslations - Error	DataTranslations		Tietomuunnokset - Virhe
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Käytä tätä ohjauspaneelia niiden oletusasetusten asettamiseksi, joita käytetään kun sovellus ei ole määritellyt muita asetuksia.
+The new translator has been installed successfully.	DataTranslations		Uusi tietomuunnin on asennettu onnistuneesti.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Kohde nimeltään ’%name’ on jo olemassa Translators-kansiossa! Pitäisikö olemassa oleva tietomuunnin korvata?
+DataTranslations	System name		Tietomuunnosasetukset
+Info	DataTranslations		Tiedot
+Overwrite	DataTranslations		Korvaa
 Version:	DataTranslations		Versio:

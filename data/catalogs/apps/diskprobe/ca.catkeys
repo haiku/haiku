@@ -1,132 +1,132 @@
 1	catalan; valencian	x-vnd.Haiku-DiskProbe	1806743923
-File offset: 	ProbeView		Desplaçament del fitxer: 
-%ld (native)	ProbeView		%ld (nadiu)
-64 bit unsigned value:	TypeEditors		Valor de 64 bits sense signe:
-Find again	ProbeView		Cerca de nou
-Text	FindWindow		Text
-Find…	ProbeView		Cerca...
-Case sensitive	FindWindow		Distingeix les majúscules de les minúscules
-Cancel	OpenWindow		Anul·la
-Close	AttributeWindow		Tanca
-File	ProbeView		Fitxer
-Attribute	ProbeView		Atribut
-Floating-point value:	TypeEditors		Valor de punt flotant:
-16 bit	TypeEditors		16 bits
-Attributes	ProbeView		Atributs
-Device offset: 	ProbeView		Desplaçament del dispositiu: 
-Selection	ProbeView		Selecció
-DiskProbe	System name		Provador del disc
-what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	què: '%.4s\n\n
-File	FileWindow		Fitxer
-OK	DiskProbe		D'acord
-Boolean	TypeEditors	This is the type of editor	Booleà
-Paste	ProbeView		Enganxa
-PNG format	TypeEditors		Format PNG
-Font size	ProbeView		Mida del tipus de lletra
-Attribute type: 	ProbeView		Tipus d'atribut: 
-Attribute	AttributeWindow		Atribut
-8 bit signed value:	TypeEditors		Valor de 8 bits amb signe:
-Number:	TypeEditors		Número:
-Save	ProbeView		Desa
-Stop	ProbeView		Atura
-Number editor	TypeEditors		Editor de números
-Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadecimal
-No type editor available	AttributeWindow		No hi ha cap editor de tipus de lletra disponible
-Double precision floating-point value:	TypeEditors		Valor de coma flotant de doble precisió:
-Device: 	ProbeView		Dispositiu: 
-Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Esteu segur que voleu suprimir l'atribut \"%s\" del fitxer \"%s\"?\n\nNo es possible desfer aquesta acció.
-Text	TypeEditors	This is the type of editor	Text
-8 bit unsigned value:	TypeEditors		Valor de 8 bits sense signe:
-Block	ProbeView		Bloc
-Back	ProbeView		Torna
-Device	ProbeView		Dispositiu
-Unknown type	TypeEditors		Tipus desconegut
-Block 0x%Lx	ProbeView		Bloc 0x%Lx
-Quit	FileWindow		Surt
-Undo	ProbeView		Desfés
-Close	ProbeView		Tanca
-Number	TypeEditors	This is the type of editor	Número
-Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Decimal
-16 bit signed value:	TypeEditors		Valor de 16 bits sense signe:
-String editor	TypeEditors		Editor de cadenes
-of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	de 0x0
-64 bit signed offset:	TypeEditors		Desplaçament amb signe de 64 bits:
-Boolean editor	TypeEditors		Editor de boleans
-Copy	ProbeView		Copia
-none	ProbeView	No attributes	cap
-Boolean value:	TypeEditors		Valor booleà:
-32 bit size or status:	TypeEditors		Mida o estat de 32 bits:
-8 bit palette	TypeEditors		paleta de 8 bits
-Fit	ProbeView	Size of fonts, fits to available room	Ajusta
-Probe device	OpenWindow		Prova del dispositiu
- (native)	ProbeView		 (nadiu)
-Unknown format	TypeEditors		Format desconegut
-Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadecimal
-MIME type:	TypeEditors		Tipus MIME:
-Page setup…	ProbeView		Arranjament de la pàgina...
-New…	FileWindow		Nou...
-DiskProbe request	AttributeWindow		Sol·licitud del Gestor de Discos
-Could not read image	TypeEditors	Image means here a picture file, not a disk image.	No s'ha pogut llegir la imatge
-Save changes before closing?	ProbeView		Voleu desar els canvis abans de tancar?
-Type editor	AttributeWindow		Editor del tipus de lletra
-Native: 0x%0*Lx	ProbeView		Nadiu: 0x%0*Lx
 Raw editor	AttributeWindow		Editor de dades en brut
-Message View	TypeEditors		Mostra el missatge
-DiskProbe request	ProbeView		Sol·licitud del Gestor de Discos
-32 bit unsigned size:	TypeEditors		Valor de 32 bits sense signe:
-Flattened bitmap	TypeEditors		Mapa de bits aplanat
-Open file…	FileWindow		Obre un fitxer...
-Next	ProbeView		Següent
-Close	FileWindow		Tanca
-Attribute: 	ProbeView		Atribut: 
-Remove from file	AttributeWindow		Suprimeix del fitxer
-Don't save	ProbeView		No el desis
-Previous	ProbeView		Anterior
-64 bit signed value:	TypeEditors		Valor de 64 bits amb signe:
-Icon	TypeEditors		Icona
-Block: 	ProbeView		Bloc: 
-Examine device:	OpenWindow		Navega pel dispositiu:
-Offset: 	ProbeView		Desplaçament: 
-OK	ProbeView		D'acord
-Add	ProbeView		Afegeix
-Edit	ProbeView		Edita
-Native: %Ld (0x%0*Lx)	ProbeView		Nadiu: %Ld (0x%0*Lx)
-32 bit unsigned value:	TypeEditors		Valor de 32 bits sense signe:
-Message	TypeEditors	This is the type of view	Missatge
-Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	No ha estat possible obrir \"%s\":\n%s
-Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Base
-Image view	TypeEditors	Image means here a picture file, not a disk image.	Mostra les imatges
-Cancel	AttributeWindow		Anul·la
-Type editor not supported	ProbeView		El tipus de tipus de lletra no és compatible
-MIME type editor	TypeEditors		Editor del tipus MIME
-Swapped: %Ld (0x%0*Lx)	ProbeView		Intercanviat: %Ld (0x%0*Lx)
-Find	FindWindow		Cerca
 Remove	AttributeWindow		Suprimeix
-Print…	ProbeView		Imprimeix...
-Block %Ld (0x%Lx)	ProbeView		Bloc %Ld (0x%Lx)
-Image	TypeEditors	This is the type of view	Imatge
-Could not open file \"%s\": %s\n	DiskProbe		No ha estat possible obrir el fitxer \"%s\": %s\n
-Select all	ProbeView		Selecciona-ho tot
-Probe file…	OpenWindow		Examina el fitxer...
-Icon view	TypeEditors		Mostra les icones
-Bookmarks	ProbeView		Adreces d'interès
-Mode:	FindWindow		Mode:
-15 bit	TypeEditors		15 bits
-Open device	FileWindow		Obre el dispositiu
-Could not find search string.	ProbeView		No ha estat possible cercar la cadena.
+Close	ProbeView		Tanca
+Boolean value:	TypeEditors		Valor booleà:
+File	ProbeView		Fitxer
+MIME type editor	TypeEditors		Editor del tipus MIME
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadecimal
 16 bit unsigned value:	TypeEditors		Valor de 16 bits sense signe:
+8 bit signed value:	TypeEditors		Valor de 8 bits amb signe:
+ (native)	ProbeView		 (nadiu)
 Attribute offset: 	ProbeView		Desplaçament de l'atribut: 
-View	ProbeView	This is the last menubar item 'File Edit Block View'	Visualitza
-Redo	ProbeView		Refés
-File: 	ProbeView		Fitxer: 
+Text	TypeEditors	This is the type of editor	Text
+File offset: 	ProbeView		Desplaçament del fitxer: 
+Add	ProbeView		Afegeix
+64 bit signed value:	TypeEditors		Valor de 64 bits amb signe:
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Esteu segur que voleu suprimir l'atribut \"%s\" del fitxer \"%s\"?\n\nNo es possible desfer aquesta acció.
+No type editor available	AttributeWindow		No hi ha cap editor de tipus de lletra disponible
+Print…	ProbeView		Imprimeix...
+New…	FileWindow		Nou...
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	què: '%.4s\n\n
+OK	DiskProbe		D'acord
+DiskProbe	System name		Provador del disc
+Back	ProbeView		Torna
+Device: 	ProbeView		Dispositiu: 
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Base
+Open file…	FileWindow		Obre un fitxer...
 32 bit unsigned pointer:	TypeEditors		Punter de 32 bits sense signe:
-of 	ProbeView		de 
-Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		No ha estat possible escriure al disc:\n%s\n\nSi sortiu es perdran tots els canvis..
-32 bit	TypeEditors		32 bits
-Cancel	ProbeView		Anul·la
-Swapped: 0x%0*Lx	ProbeView		Intercanviat: 0x%0*Lx
-Grayscale	TypeEditors		Escala de grisos
-32 bit signed value:	TypeEditors		Valor de 32 bits sense signe:
 DiskProbe request	DiskProbe		Sol·licitud del Gestor de Discos
-Type editor	ProbeView		Editor del tipus de lletra
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadecimal
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		No ha estat possible escriure al disc:\n%s\n\nSi sortiu es perdran tots els canvis..
+Examine device:	OpenWindow		Navega pel dispositiu:
+Number editor	TypeEditors		Editor de números
+Icon	TypeEditors		Icona
+Attribute	ProbeView		Atribut
+Don't save	ProbeView		No el desis
+Undo	ProbeView		Desfés
+Flattened bitmap	TypeEditors		Mapa de bits aplanat
+Block %Ld (0x%Lx)	ProbeView		Bloc %Ld (0x%Lx)
+Cancel	OpenWindow		Anul·la
+Unknown format	TypeEditors		Format desconegut
+File: 	ProbeView		Fitxer: 
+Swapped: %Ld (0x%0*Lx)	ProbeView		Intercanviat: %Ld (0x%0*Lx)
+Stop	ProbeView		Atura
+Cancel	ProbeView		Anul·la
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	No ha estat possible obrir \"%s\":\n%s
+Font size	ProbeView		Mida del tipus de lletra
+Type editor not supported	ProbeView		El tipus de tipus de lletra no és compatible
+Native: 0x%0*Lx	ProbeView		Nadiu: 0x%0*Lx
+Copy	ProbeView		Copia
+Redo	ProbeView		Refés
+Floating-point value:	TypeEditors		Valor de punt flotant:
+Cancel	AttributeWindow		Anul·la
+16 bit signed value:	TypeEditors		Valor de 16 bits sense signe:
+DiskProbe request	AttributeWindow		Sol·licitud del Gestor de Discos
+Next	ProbeView		Següent
+64 bit signed offset:	TypeEditors		Desplaçament amb signe de 64 bits:
+32 bit signed value:	TypeEditors		Valor de 32 bits sense signe:
+Could not find search string.	ProbeView		No ha estat possible cercar la cadena.
+Close	FileWindow		Tanca
+Unknown type	TypeEditors		Tipus desconegut
+Open device	FileWindow		Obre el dispositiu
+Number:	TypeEditors		Número:
+Quit	FileWindow		Surt
+Text	FindWindow		Text
+Block 0x%Lx	ProbeView		Bloc 0x%Lx
+Attribute	AttributeWindow		Atribut
+Mode:	FindWindow		Mode:
+16 bit	TypeEditors		16 bits
+32 bit size or status:	TypeEditors		Mida o estat de 32 bits:
+of 	ProbeView		de 
 Contents:	TypeEditors		Contingut:
+Could not open file \"%s\": %s\n	DiskProbe		No ha estat possible obrir el fitxer \"%s\": %s\n
+Probe file…	OpenWindow		Examina el fitxer...
+Block: 	ProbeView		Bloc: 
+Bookmarks	ProbeView		Adreces d'interès
+Probe device	OpenWindow		Prova del dispositiu
+none	ProbeView	No attributes	cap
+Case sensitive	FindWindow		Distingeix les majúscules de les minúscules
+32 bit unsigned value:	TypeEditors		Valor de 32 bits sense signe:
+Remove from file	AttributeWindow		Suprimeix del fitxer
+Attributes	ProbeView		Atributs
+Message	TypeEditors	This is the type of view	Missatge
+Message View	TypeEditors		Mostra el missatge
+Offset: 	ProbeView		Desplaçament: 
+Swapped: 0x%0*Lx	ProbeView		Intercanviat: 0x%0*Lx
+MIME type:	TypeEditors		Tipus MIME:
+Fit	ProbeView	Size of fonts, fits to available room	Ajusta
+Type editor	ProbeView		Editor del tipus de lletra
+File	FileWindow		Fitxer
+Grayscale	TypeEditors		Escala de grisos
+32 bit	TypeEditors		32 bits
+Native: %Ld (0x%0*Lx)	ProbeView		Nadiu: %Ld (0x%0*Lx)
+Device	ProbeView		Dispositiu
+Close	AttributeWindow		Tanca
+Type editor	AttributeWindow		Editor del tipus de lletra
+Save	ProbeView		Desa
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	de 0x0
+Attribute type: 	ProbeView		Tipus d'atribut: 
+15 bit	TypeEditors		15 bits
+Page setup…	ProbeView		Arranjament de la pàgina...
+Boolean	TypeEditors	This is the type of editor	Booleà
+Icon view	TypeEditors		Mostra les icones
+Select all	ProbeView		Selecciona-ho tot
+64 bit unsigned value:	TypeEditors		Valor de 64 bits sense signe:
+OK	ProbeView		D'acord
+Previous	ProbeView		Anterior
+Selection	ProbeView		Selecció
+Find	FindWindow		Cerca
+8 bit unsigned value:	TypeEditors		Valor de 8 bits sense signe:
+%ld (native)	ProbeView		%ld (nadiu)
+Attribute: 	ProbeView		Atribut: 
+Block	ProbeView		Bloc
+Find again	ProbeView		Cerca de nou
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Visualitza
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	No s'ha pogut llegir la imatge
+DiskProbe request	ProbeView		Sol·licitud del Gestor de Discos
+Double precision floating-point value:	TypeEditors		Valor de coma flotant de doble precisió:
+Image	TypeEditors	This is the type of view	Imatge
+Save changes before closing?	ProbeView		Voleu desar els canvis abans de tancar?
+PNG format	TypeEditors		Format PNG
+Number	TypeEditors	This is the type of editor	Número
+Edit	ProbeView		Edita
+String editor	TypeEditors		Editor de cadenes
+Boolean editor	TypeEditors		Editor de boleans
+Device offset: 	ProbeView		Desplaçament del dispositiu: 
+Find…	ProbeView		Cerca...
+8 bit palette	TypeEditors		paleta de 8 bits
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Decimal
+Image view	TypeEditors	Image means here a picture file, not a disk image.	Mostra les imatges
+Paste	ProbeView		Enganxa
+32 bit unsigned size:	TypeEditors		Valor de 32 bits sense signe:

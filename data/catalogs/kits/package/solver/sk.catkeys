@@ -1,38 +1,38 @@
 1	slovak	x-vnd.Haiku-libsolvsolver	3404387783
-%dependency% is provided by the system	SolverProblem		%dependency% poskytuje systém
-package %source% conflicts with %dependency% provided by %target%	SolverProblem		balík %source% je v konflikte s %dependency%, ktorý poskytuje %target%
-nothing provides requested %dependency%	SolverProblem		nič neposkytuje požadovaný %dependency%
-unspecified problem	SolverProblem		neurčený problém
-keep %source% despite its inferior architecture	SolverProblemSolution		ponechať %source% napriek jeho podradnej architektúre
-do not deinstall \"%selection%\"	SolverProblemSolution		neodinštalovať „%selection%“
-%source% has inferior architecture	SolverProblem		%source% má podradnú architektúru
-dependency problem	SolverProblem		problém so závislosťou
-do not keep %source% installed	SolverProblemSolution		neponechávať %source% nainštalovaný
-package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		balík %source% implicitne činí zastaralým %dependency%, ktorý poskytuje %target%
-do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		neodinštalovať všetky riešiteľné „%selection%“
-keep %source% from excluded repository	SolverProblemSolution		ponechať %source% mimo vynechaného zdroja softvéru
-install %selection% despite its old version	SolverProblemSolution		nainštalovať %selection% napriek jeho starej verzii
-allow downgrade of %source% to %target%	SolverProblemSolution		umožniť zníženie verzie %source% na %target%
-do not lock \"%selection%\"	SolverProblemSolution		nezamykať „%selection%“
-install %source% despite its inferior architecture	SolverProblemSolution		nainštalovať %source% napriek jeho podradnej architektúre
-do not install \"%selection%\"	SolverProblemSolution		neinštalovať „%selection%“
-do something	SolverProblemSolution		niečo urobiť
-do not install the most recent version of \"%selection%\"	SolverProblemSolution		neinštalovať najnovšiu verziu „%selection%“
-package %source% conflicts with %dependency% provided by itself	SolverProblem		balík %source% je v konflikte s %dependency%, ktorú sám poskytuje
-cannot install both %source% and %target%	SolverProblem		nie je možné nainštalovať %source% aj %target% zároveň
-allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		umožniť zmenu dodávateľa z „%sourceVendor%“ (%source%) na „%targetVendor%“ (%target%)
-install %source% from excluded repository	SolverProblemSolution		nainštalovať %source% z vynechaného zdroja softvéru
-keep old %source%	SolverProblemSolution		ponechať starý %source%
-conflicting requests	SolverProblem		konfliktné požiadavky
-package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		balík %source% požaduje %dependency%, ale žiadneho z poskytovateľov nemožno nainštalovať
-do not forbid installation of %source%	SolverProblemSolution		nezakazovať inštaláciu %source%
 allow architecture change of %source% to %target%	SolverProblemSolution		umožniť zmenu architektúry %source% na %target%
-allow name change of %source% to %target%	SolverProblemSolution		umožniť zmenu názvu %source% na %target%
+install %source% from excluded repository	SolverProblemSolution		nainštalovať %source% z vynechaného zdroja softvéru
+unspecified problem	SolverProblem		neurčený problém
+package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		balík %source% požaduje %dependency%, ale žiadneho z poskytovateľov nemožno nainštalovať
+package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		balík %source% implicitne činí zastaralým %dependency%, ktorý poskytuje %target%
+nothing provides requested %dependency%	SolverProblem		nič neposkytuje požadovaný %dependency%
+do not keep %source% installed	SolverProblemSolution		neponechávať %source% nainštalovaný
+do not deinstall \"%selection%\"	SolverProblemSolution		neodinštalovať „%selection%“
+install %source% despite its inferior architecture	SolverProblemSolution		nainštalovať %source% napriek jeho podradnej architektúre
+conflicting requests	SolverProblem		konfliktné požiadavky
+do not install the most recent version of \"%selection%\"	SolverProblemSolution		neinštalovať najnovšiu verziu „%selection%“
 allow replacement of %source% with %target%	SolverProblemSolution		umožniť náhradu %source% za %target%
-allow deinstallation of %source%	SolverProblemSolution		umožniť odinštalovanie %source%
-%source% does not belong to a distupgrade repository	SolverProblem		%source% nepatrí do zdroja softvéru distupgrade
 package %source% obsoletes %dependency% provided by %target%	SolverProblem		balík %source% činí zastaralým %dependency%, ktorý poskytuje %target%
-package %source% is not installable	SolverProblem		balík %source% nie je možné nainštalovať
+do not forbid installation of %source%	SolverProblemSolution		nezakazovať inštaláciu %source%
+allow downgrade of %source% to %target%	SolverProblemSolution		umožniť zníženie verzie %source% na %target%
+dependency problem	SolverProblem		problém so závislosťou
+%dependency% is provided by the system	SolverProblem		%dependency% poskytuje systém
+keep %source% despite its inferior architecture	SolverProblemSolution		ponechať %source% napriek jeho podradnej architektúre
+%source% does not belong to a distupgrade repository	SolverProblem		%source% nepatrí do zdroja softvéru distupgrade
 installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		nainštalovaný balík %source% činí zastaralým %dependency%, ktorý poskytuje %target%
+allow name change of %source% to %target%	SolverProblemSolution		umožniť zmenu názvu %source% na %target%
+package %source% conflicts with %dependency% provided by %target%	SolverProblem		balík %source% je v konflikte s %dependency%, ktorý poskytuje %target%
+do something	SolverProblemSolution		niečo urobiť
+install %selection% despite its old version	SolverProblemSolution		nainštalovať %selection% napriek jeho starej verzii
+cannot install both %source% and %target%	SolverProblem		nie je možné nainštalovať %source% aj %target% zároveň
+package %source% is not installable	SolverProblem		balík %source% nie je možné nainštalovať
 problem with installed package %source%	SolverProblem		problém s nainštalovaným balíkom %source%
+allow deinstallation of %source%	SolverProblemSolution		umožniť odinštalovanie %source%
+keep %source% from excluded repository	SolverProblemSolution		ponechať %source% mimo vynechaného zdroja softvéru
+keep old %source%	SolverProblemSolution		ponechať starý %source%
+package %source% conflicts with %dependency% provided by itself	SolverProblem		balík %source% je v konflikte s %dependency%, ktorú sám poskytuje
+allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		umožniť zmenu dodávateľa z „%sourceVendor%“ (%source%) na „%targetVendor%“ (%target%)
+do not lock \"%selection%\"	SolverProblemSolution		nezamykať „%selection%“
+do not install \"%selection%\"	SolverProblemSolution		neinštalovať „%selection%“
 nothing provides %dependency% needed by %source%	SolverProblem		nič neposkytuje %dependency%, ktorý potrebuje %source%
+%source% has inferior architecture	SolverProblem		%source% má podradnú architektúru
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		neodinštalovať všetky riešiteľné „%selection%“

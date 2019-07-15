@@ -1,49 +1,49 @@
 1	indonesian	x-vnd.Haiku-Time	3755504714
-GMT (UNIX compatible)	Time		GMT (Kompatibel UNIX)
 OK	Time		OKE
-Asia	Time		Asia
-\nNow: 	Time		\nSekarang: 
-Africa	Time		Afrika
+Message receiving failed	Time		Penerimaan pesan gagal
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Jam dan tanggal, ditulis oleh:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nHak cipta 2004-2012, Haiku.
+Australia	Time		Australia
+America	Time		Amerika
 Reset to default server list	Time		Reset ke daftar server bawaan
 Could not resolve server address	Time		Tidak dapat menemukan alamat server
-Stop	Time		Berhenti
-Australia	Time		Australia
-Preview time:	Time		Pratilik waktu:
-Synchronize	Time		Singkronkan
-Revert	Time		Pulihkan
-Pacific	Time		Pasifik
-Show day of week	Time		Tampilkan nama hari dalam sepekan
-Add	Time		Tambah
-Date and time	Time		Hari dan jam
-about	Time		tentang
-Local time (Windows compatible)	Time		Waktu lokal (kompatibel windows)
-Message receiving failed	Time		Penerimaan pesan gagal
 Set time zone	Time		Set zona waktu
+The following error occured while synchronizing:r\n%s: %s	Time		Pesan kesalahan berikut muncul ketika singkronisasi:r\n%s: %s
 Waiting for answer failed	Time		Gagal menunggu jawaban
-Hardware clock set to:	Time		Jam hardware diset ke:
+<Other>	Time		<Other>
+Received invalid time	Time		Menerima jam yang salah
+Remove	Time		Lepas
+Synchronize again	Time		Sinkronkan lagi
+Asia	Time		Asia
+Try all servers	Time		Coba semua server
+Time	Time		Jam
+Current time:	Time		Waktu saat ini:
 The following error occured while synchronizing:r\n%s	Time		Kesalahan berikut muncul ketika proses singkronisasi:r\n%s
 Europe	Time		Eropa
-Remove	Time		Lepas
-Time	Time		Jam
-Indian	Time		India
-Sending request failed	Time		Mengirim permintaan gagal
+Show day of week	Time		Tampilkan nama hari dalam sepekan
+Local time (Windows compatible)	Time		Waktu lokal (kompatibel windows)
+Hardware clock set to:	Time		Jam hardware diset ke:
 Arctic	Time		Arktik
-Display time with seconds	Time		Tampilkan jam dengan detik
-Time	System name		Jam
-America	Time		Amerika
-Synchronize at boot	Time		Sinkronisasi saat but
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Jam dan tanggal, ditulis oleh:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nHak cipta 2004-2012, Haiku.
-Received invalid time	Time		Menerima jam yang salah
 Antarctica	Time		Antartika
-Show time zone	Time		Tampilkan zona waktu
-Show clock in Deskbar	Time		Tampilkan jam di Deskbar
-The following error occured while synchronizing:r\n%s: %s	Time		Pesan kesalahan berikut muncul ketika singkronisasi:r\n%s: %s
-<Other>	Time		<Other>
-Current time:	Time		Waktu saat ini:
-Try all servers	Time		Coba semua server
+GMT (UNIX compatible)	Time		GMT (Kompatibel UNIX)
+Africa	Time		Afrika
+Stop	Time		Berhenti
 Time zone	Time		Zona waktu
-Could not create socket	Time		Tidak bisa membuat soket
-Synchronize again	Time		Sinkronkan lagi
 Clock	Time		Jam
 Network time	Time		Waktu jaringan
+Sending request failed	Time		Mengirim permintaan gagal
+Preview time:	Time		Pratilik waktu:
+\nNow: 	Time		\nSekarang: 
+Could not create socket	Time		Tidak bisa membuat soket
+Pacific	Time		Pasifik
 Atlantic	Time		Atlantik
+Show clock in Deskbar	Time		Tampilkan jam di Deskbar
+Display time with seconds	Time		Tampilkan jam dengan detik
+Time	System name		Jam
+about	Time		tentang
+Show time zone	Time		Tampilkan zona waktu
+Synchronize at boot	Time		Sinkronisasi saat but
+Indian	Time		India
+Revert	Time		Pulihkan
+Date and time	Time		Hari dan jam
+Synchronize	Time		Singkronkan
+Add	Time		Tambah

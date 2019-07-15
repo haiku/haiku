@@ -1,88 +1,88 @@
 1	russian	x-vnd.Haiku-StyledEdit	727465241
-StyledEdit	System name		Стильный редактор
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Этот файл отмечен только для чтения. Сохранить изменения в документе \"%s\"? 
-Paste	Menus		Вставить
-OK	LoadAlert		ОК
-File	Menus		Файл
-???	LoadAlert		???
-Modified	StatusView		Изменён
-Lines:	Statistics		Строк:
-Italic	Menus		Наклонный
-Left	Menus		По левому краю
-Search backwards	FindandReplaceWindow		Искать снизу вверх
-Unlock file	StatusView		Разблокировать
-Size	Menus		Размер
-Save	QuitAlert		Сохранить
-Page setup…	Menus		Настройка печати…
-Print…	Menus		Печать…
-Can't undo	Menus		Невозможно отменить
-Save	Menus		Сохранить
-Default	Menus		По умолчанию
-Replace with:	FindandReplaceWindow		Заменить на:
-Cancel	SaveAlert		Отмена
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Невозможно вернуть, файл не найден: \"%s\".
-Case-sensitive	FindandReplaceWindow		Учитывать регистр
-Reload	NodeMonitorAlerts		Перезагрузить
-Replace in all windows	FindandReplaceWindow		Заменить во всех окнах
-Wrap lines	Menus		Перенос строк
-Quit	Menus		Выход
-File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Файл \"%file%\" был удален другой программой, восстановить его?
 Document statistics	Statistics		Статистика документа
-Cancel	RevertToSavedAlert		Отмена
-Autodetect	Menus		Автоопределение
-Document	Menus		Документ
-Save changes to the document \"%s\"? 	QuitAlert		Сохранить изменения в файле \"%s\"? 
-Edit	Menus		Изменить
-Revert	RevertToSavedAlert		Вернуть
-Font	Menus		Шрифт
-Replace all	FindandReplaceWindow		Заменить все
-Statistics…	Menus		Статистика…
-Default	Open_and_SaveAsPanel		По умолчанию
-Replace next	Menus		Заменить далее
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" имеет несохраненные изменения.\nВернуться его до последней сохраненной версии?
-Cancel	FindandReplaceWindow		Отмена
-Text encoding	Menus		Кодировка
-Close	Menus		Закрыть
-Save	SaveAlert		Сохранить
-Words:	Statistics		Слов:
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Ошибка при открытии \"%s\":\n\tФормат не поддерживается
-OK	RevertToSavedAlert		ОК
-Don't save	QuitAlert		Не сохранять
-Align	Menus		Выровнять
-Color	Menus		Цвет
-OK	QuitAlert		ОК
-Open…	Menus		Открыть…
-Center	Menus		По центру
-Unable to unlock file\n\t%s	QuitAlert		Невозможно разблокировать файл\n\t%s
-line %d, column %d	StatusView		линия %d, позиция %d
-OK	Statistics		ОК
-New	Menus		Новый
-Wrap-around search	FindandReplaceWindow		Поиск по всему документу
-Bold	Menus		Жирный
-Find selection	Menus		Найти выделенное
-Find:	FindandReplaceWindow		Найти:
-Error saving \"%s\":\n%s	SaveAlert		Ошибка сохранения \"%s\":\n%s
-Copy	Menus		Копировать
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Невозможно вернуть, файл не найден: \"%s\".
 Cut	Menus		Вырезать
-File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Файл \"%file%\" был изменен другой программой, перезагрузить его?
-Replace	FindandReplaceWindow		Заменить
-Find again	Menus		Найти далее
-Cancel	QuitAlert		Отмена
-Find…	Menus		Найти…
-Select all	Menus		Выделить всё
-Don't save	SaveAlert		Не сохранять
-Recover	NodeMonitorAlerts		Восстановить
-Error loading \"%s\":\n\t%s	LoadAlert		Ошибка загрузки \"%s\":\n\t%s
-Ignore	NodeMonitorAlerts		Игнорировать
-Read-only	StatusView		Только чтение
-Undo typing	QuitAlert		Отменить ввод
+Center	Menus		По центру
+Wrap-around search	FindandReplaceWindow		Поиск по всему документу
+Page setup…	Menus		Настройка печати…
 Untitled 	StyledEditWindow		Новый документ 
-OK	SaveAlert		ОК
+OK	Statistics		ОК
 Find	FindandReplaceWindow		Найти
-Encoding	Open_and_SaveAsPanel		Кодировка
-Characters:	Statistics		Символов:
-Save as…	Menus		Сохранить как…
-Redo typing	QuitAlert		Повторить ввод
-Reload…	Menus		Перезагрузить…
+New	Menus		Новый
+Document	Menus		Документ
+Search backwards	FindandReplaceWindow		Искать снизу вверх
+Find again	Menus		Найти далее
+Read-only	StatusView		Только чтение
+Save	Menus		Сохранить
+Cancel	QuitAlert		Отмена
+Copy	Menus		Копировать
+Reload	NodeMonitorAlerts		Перезагрузить
+line %d, column %d	StatusView		линия %d, позиция %d
+Words:	Statistics		Слов:
+???	LoadAlert		???
+Recover	NodeMonitorAlerts		Восстановить
+Error saving \"%s\":\n%s	SaveAlert		Ошибка сохранения \"%s\":\n%s
+OK	RevertToSavedAlert		ОК
+Unlock file	StatusView		Разблокировать
+Italic	Menus		Наклонный
+Can't undo	Menus		Невозможно отменить
 Replace…	Menus		Заменить…
+File	Menus		Файл
+Bold	Menus		Жирный
+Paste	Menus		Вставить
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Файл \"%file%\" был изменен другой программой, перезагрузить его?
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Файл \"%file%\" был удален другой программой, восстановить его?
+Lines:	Statistics		Строк:
+Replace in all windows	FindandReplaceWindow		Заменить во всех окнах
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" имеет несохраненные изменения.\nВернуться его до последней сохраненной версии?
+Save	SaveAlert		Сохранить
+Default	Open_and_SaveAsPanel		По умолчанию
+Cancel	RevertToSavedAlert		Отмена
+Cancel	FindandReplaceWindow		Отмена
+Statistics…	Menus		Статистика…
+Encoding	Open_and_SaveAsPanel		Кодировка
+Replace all	FindandReplaceWindow		Заменить все
+Close	Menus		Закрыть
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Ошибка при открытии \"%s\":\n\tФормат не поддерживается
+Left	Menus		По левому краю
+Default	Menus		По умолчанию
+OK	SaveAlert		ОК
+Color	Menus		Цвет
+Save changes to the document \"%s\"? 	QuitAlert		Сохранить изменения в файле \"%s\"? 
+StyledEdit	System name		Стильный редактор
+Find:	FindandReplaceWindow		Найти:
+Undo typing	QuitAlert		Отменить ввод
+Error loading \"%s\":\n\t%s	LoadAlert		Ошибка загрузки \"%s\":\n\t%s
+Don't save	SaveAlert		Не сохранять
+Reload…	Menus		Перезагрузить…
+Print…	Menus		Печать…
+Quit	Menus		Выход
+Redo typing	QuitAlert		Повторить ввод
+Ignore	NodeMonitorAlerts		Игнорировать
+Wrap lines	Menus		Перенос строк
+Text encoding	Menus		Кодировка
+Unable to unlock file\n\t%s	QuitAlert		Невозможно разблокировать файл\n\t%s
+Modified	StatusView		Изменён
+OK	LoadAlert		ОК
+Save	QuitAlert		Сохранить
+Case-sensitive	FindandReplaceWindow		Учитывать регистр
+Find selection	Menus		Найти выделенное
+Cancel	SaveAlert		Отмена
+Find…	Menus		Найти…
+Revert	RevertToSavedAlert		Вернуть
+Size	Menus		Размер
+Autodetect	Menus		Автоопределение
+Replace next	Menus		Заменить далее
+OK	QuitAlert		ОК
+Replace with:	FindandReplaceWindow		Заменить на:
+Edit	Menus		Изменить
+Open…	Menus		Открыть…
+Save as…	Menus		Сохранить как…
+Replace	FindandReplaceWindow		Заменить
+Characters:	Statistics		Символов:
+Don't save	QuitAlert		Не сохранять
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Этот файл отмечен только для чтения. Сохранить изменения в документе \"%s\"? 
+Align	Menus		Выровнять
+Font	Menus		Шрифт
+Select all	Menus		Выделить всё
 Right	Menus		По правому краю

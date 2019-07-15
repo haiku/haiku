@@ -1,17 +1,16 @@
-1	italian	x-vnd.Haiku-MatchHeader	548057976
+1	italian	x-vnd.Haiku-MatchHeader	3544711400
+Delete message	ConfigView		Cancella messaggio
+Match \"%attribute\" against \"%regex\"	RuleFilter		Controlla \"%attribute\" rispetto a \"%regex\"
+Match header	RuleFilter		Intestazione corrispondente
+Set flags to	ConfigView		Imposta flag a
+<Choose account>	ConfigView		<Scegli un account>
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Carattere jolly come \"*spam*\".\nPrependi con \"REGEX:\" per utilizzare espressioni regolari.
+Then	ConfigView		Quindi
+If	ConfigView		Se
+Set as read	ConfigView		Segna come già letto
+Reply with	ConfigView		Rispondi con
 <Choose action>	ConfigView		<Scegli un'azione>
-Header field (e.g. Subject, From, ...)	ConfigView		Campo header (Soggetto, Da, ...)
+Move to	ConfigView		Sposta in
+this field is based on the action	ConfigView		questo campo è basato sull'azione
 Account	ConfigView		Account
 has	ConfigView		ha
-Move to	ConfigView		Sposta in
-Then	ConfigView		Quindi
-this field is based on the action	ConfigView		questo campo è basato sull'azione
-Delete message	ConfigView		Cancella messaggio
-<Choose account>	ConfigView		<Scegli un account>
-Set flags to	ConfigView		Imposta flag a
-Set as read	ConfigView		Segna come già letto
-Match header	RuleFilter		Intestazione corrispondente
-Reply with	ConfigView		Rispondi con
-If	ConfigView		Se
-Match \"%attribute\" against \"%regex\"	RuleFilter		Controlla \"%attribute\" rispetto a \"%regex\"
-Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Carattere jolly come \"*spam*\".\nPrependi con \"REGEX:\" per utilizzare espressioni regolari.

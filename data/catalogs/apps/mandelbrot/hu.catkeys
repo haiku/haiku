@@ -1,23 +1,23 @@
 1	hungarian	x-vnd.Haiku-Mandelbrot	1781779654
-About	MandelbrotWindow		Információk
-Julia	MandelbrotWindow		Júlia
-Grassland	MandelbrotWindow		Legelő
-Spring	MandelbrotWindow		Tavasz
-High contrast	MandelbrotWindow		Magas kontraszt
-Fire	MandelbrotWindow		Tűz
-Royal	MandelbrotWindow		Királyi
-File	MandelbrotWindow		Fájl
-Lightning	MandelbrotWindow		Villám
-Midnight	MandelbrotWindow		Éjfél
-Palette	MandelbrotWindow		Paletta
-Mandelbrot	MandelbrotWindow		Mandelbrot
 Burning Ship	MandelbrotWindow		Égő hajó
-Quit	MandelbrotWindow		Kilépés
-Frost	MandelbrotWindow		Zúzmara
+Grassland	MandelbrotWindow		Legelő
+Lightning	MandelbrotWindow		Villám
+About	MandelbrotWindow		Információk
+Palette	MandelbrotWindow		Paletta
 Set	MandelbrotWindow		Beállítás
-Iterations	MandelbrotWindow		Iterációk
-Mandelbrot	System name		Mandelbrot
-Deepfrost	MandelbrotWindow		Mély fagy
 Tricorn	MandelbrotWindow		Tricorn
-Multibrot	MandelbrotWindow		Multibrot
+Royal	MandelbrotWindow		Királyi
 Orbit Trap	MandelbrotWindow		Körkörös csapda
+Deepfrost	MandelbrotWindow		Mély fagy
+Quit	MandelbrotWindow		Kilépés
+File	MandelbrotWindow		Fájl
+Julia	MandelbrotWindow		Júlia
+Frost	MandelbrotWindow		Zúzmara
+Fire	MandelbrotWindow		Tűz
+Mandelbrot	System name		Mandelbrot
+Iterations	MandelbrotWindow		Iterációk
+High contrast	MandelbrotWindow		Magas kontraszt
+Multibrot	MandelbrotWindow		Multibrot
+Spring	MandelbrotWindow		Tavasz
+Midnight	MandelbrotWindow		Éjfél
+Mandelbrot	MandelbrotWindow		Mandelbrot

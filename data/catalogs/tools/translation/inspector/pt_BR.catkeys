@@ -1,30 +1,30 @@
 1	portuguese (brazil)	x.vnd.OBOS-Inspector	1686702095
-User Translators	ActiveTranslatorsWindow		Tradutores do Usuário
-No image available to save.	ImageWindow		Nenhuma imagem disponível para salvar.
-Sorry, unable to write the image file.	ImageView		Desculpe, não foi possível gravar o arquivo de imagem.
-Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Número de documentos: %1\n\nTradutor usado:\nNome: %2\nInformações: %3\nVersão: %4\n
-\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nTipo: '%1' (%2)\nGrupo: '%3' (%4)\nQualidade: %5\nRecursos: %6\nTipo MIME: %7\nNome: %8\n
-Bummer	ImageWindow		Bummer
-Last Page	ImageWindow		Última Página
 \nInput Formats:	ImageView		\nFormatos de Entrada:
-Sorry, unable to load the image.	ImageView		Desculpe, não foi possível carregar a imagem.
-Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Janela de Informação
-Active Translators	InspectorApp		Tradutores ativos
-Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Imagem: %1\nEspaço de cor: %2 (%3)\nDimensões: %4 x %5\nBytes por linha: %6\nTotal de Bytes: %7\n\nInformação de Identificação:\nString de identificação: %8\nTipo MIME: %9\nTipo: '%10' (%11)\nID do Tradutor: %12\nGrupo: '%13' (%14)\nQualidade: %15\nCapacidade: %16\n\nInformação de Extensão:\n
-\nOutput Formats:	ImageView		\nFormatos de Saída:
-Save feature not implemented yet.	ImageWindow		Recurso salvo ainda não implementado.
-First Page	ImageWindow		Primeira Página
 Next Page	ImageWindow		Próxima página
-\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nTradutor usado:\nNome: %1\nInformações: %2\nVersão: %3\n
-Info	ImageWindow		Informações
-OK	ImageWindow		OK
-Window	ImageWindow		Janela
-Quit	ImageWindow		Sair
-Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Documento selecionado: %1\n\nTradutor usado:\nNome: %2\nInformações: %3\nVersão: %4\n
-Active Translators	ImageWindow		Tradutores Ativos
-View	ImageWindow		Visualizar
 Previous Page	ImageWindow		Página Anterior
-OK	ImageView		OK
+Active Translators	InspectorApp		Tradutores ativos
 System Translators	ActiveTranslatorsWindow		Tradutores do Sistema
+\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nTipo: '%1' (%2)\nGrupo: '%3' (%4)\nQualidade: %5\nRecursos: %6\nTipo MIME: %7\nNome: %8\n
+OK	ImageWindow		OK
+View	ImageWindow		Visualizar
+Save feature not implemented yet.	ImageWindow		Recurso salvo ainda não implementado.
+Active Translators	ImageWindow		Tradutores Ativos
+Info	ImageWindow		Informações
+Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Imagem: %1\nEspaço de cor: %2 (%3)\nDimensões: %4 x %5\nBytes por linha: %6\nTotal de Bytes: %7\n\nInformação de Identificação:\nString de identificação: %8\nTipo MIME: %9\nTipo: '%10' (%11)\nID do Tradutor: %12\nGrupo: '%13' (%14)\nQualidade: %15\nCapacidade: %16\n\nInformação de Extensão:\n
+No image available to save.	ImageWindow		Nenhuma imagem disponível para salvar.
+OK	ImageView		OK
+Bummer	ImageWindow		Bummer
+\nOutput Formats:	ImageView		\nFormatos de Saída:
+Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Número de documentos: %1\n\nTradutor usado:\nNome: %2\nInformações: %3\nVersão: %4\n
+User Translators	ActiveTranslatorsWindow		Tradutores do Usuário
+Last Page	ImageWindow		Última Página
+\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nTradutor usado:\nNome: %1\nInformações: %2\nVersão: %3\n
 Unknown	ImageView		Desconhecido
+Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Janela de Informação
+Sorry, unable to load the image.	ImageView		Desculpe, não foi possível carregar a imagem.
 File	ImageWindow		Arquivo
+Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Documento selecionado: %1\n\nTradutor usado:\nNome: %2\nInformações: %3\nVersão: %4\n
+Quit	ImageWindow		Sair
+Sorry, unable to write the image file.	ImageView		Desculpe, não foi possível gravar o arquivo de imagem.
+Window	ImageWindow		Janela
+First Page	ImageWindow		Primeira Página

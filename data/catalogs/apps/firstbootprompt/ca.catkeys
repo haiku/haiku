@@ -1,8 +1,8 @@
 1	catalan; valencian	x-vnd.Haiku-FirstBootPrompt	2649051796
 Custom	BootPromptWindow		Personalitzat
-Boot to Desktop	BootPromptWindow		Arrenca a l'Escriptori
 Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Gràcies per provar el Haiku! esperem que us agradi!\n\nPodeu triar l'idioma i disposició del teclat preferits a la llista de l'esquerra. S'utilitzaran immediatament. Més endavant els podeu canviar fàcilment quan vulgueu a les preferències de l'Escriptori.\n\nVoleu executar l'instal·lador o continuar i arrencar l'Escriptori?\n
-Language	BootPromptWindow		Idioma
-Welcome to Haiku!	BootPromptWindow		Benvingut al Haiku!
-Run Installer	BootPromptWindow		Executa l'instal·lador
+Boot to Desktop	BootPromptWindow		Arrenca a l'Escriptori
 Keymap	BootPromptWindow		Mapa de tecles
+Welcome to Haiku!	BootPromptWindow		Benvingut al Haiku!
+Language	BootPromptWindow		Idioma
+Run Installer	BootPromptWindow		Executa l'instal·lador

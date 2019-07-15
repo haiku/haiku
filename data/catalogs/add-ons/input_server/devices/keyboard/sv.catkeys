@@ -1,10 +1,10 @@
 1	swedish	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
-Kill application	Team monitor		Döda program
-Quit application	Team monitor		Avsluta program
-Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Markera ett program i listan ovan och klicka på en av knapparna 'Döda program' eller 'Avsluta program' för att stänga den.\n\nHåll ner CONTROL+ALT+DEL i %ld sekunder för att starta om Haiku.
 If the application will not quit you may have to kill it.	Team monitor		Om programmet inte avslutas kan du behöva döda den.
-Force reboot	Team monitor		Framtvinga omstart
-Team monitor	Team monitor		Grupp Monitor
-(This team is a system component)	Team monitor		(Denna grupp är en systemkomponent)
+Quit application	Team monitor		Avsluta program
 Restart the desktop	Team monitor		Starta om Skrivbordet
+Force reboot	Team monitor		Framtvinga omstart
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Markera ett program i listan ovan och klicka på en av knapparna 'Döda program' eller 'Avsluta program' för att stänga den.\n\nHåll ner CONTROL+ALT+DEL i %ld sekunder för att starta om Haiku.
+Team monitor	Team monitor		Grupp Monitor
+Kill application	Team monitor		Döda program
 Cancel	Team monitor		Avbryt
+(This team is a system component)	Team monitor		(Denna grupp är en systemkomponent)

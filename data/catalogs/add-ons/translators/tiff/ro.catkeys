@@ -1,16 +1,16 @@
 1	romanian	x-vnd.Haiku-TIFFTranslator	2234713102
-LZW	TIFFView		LZW
-Version %d.%d.%d, %s	TIFFView		Versiune %d.%d.%d, %s
-identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: nu s-a putut configura dosarul\n
-TIFF image	TIFFTranslator		Imagine TIFF
 TIFF Library:	TIFFView		Bibliotecă TIFF:
-TIFF image translator	TIFFView		Traducător imagine TIFF
-None	TIFFView		Nimic
-TIFF images	TIFFTranslator		Imagini TIFF
-TIFFTranslator Settings	TIFFTranslator		Configurări TraducătorTIFF
-TIFF image translator	TIFFTranslator		Traducător imagine TIFF
 RLE (Packbits)	TIFFView		RLE (Packbits)
-TIFF Settings	TIFFMain		Configurări TIFF
-Use compression:	TIFFView		Utilizează comprimarea:
-identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: indice de document nevalid\n
 ZIP (Deflate)	TIFFView		ZIP (Dezumflare)
+identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: indice de document nevalid\n
+Use compression:	TIFFView		Utilizează comprimarea:
+TIFF image translator	TIFFView		Traducător imagine TIFF
+TIFF image	TIFFTranslator		Imagine TIFF
+TIFF Settings	TIFFMain		Configurări TIFF
+TIFF image translator	TIFFTranslator		Traducător imagine TIFF
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: nu s-a putut configura dosarul\n
+Version %d.%d.%d, %s	TIFFView		Versiune %d.%d.%d, %s
+TIFFTranslator Settings	TIFFTranslator		Configurări TraducătorTIFF
+LZW	TIFFView		LZW
+TIFF images	TIFFTranslator		Imagini TIFF
+None	TIFFView		Nimic

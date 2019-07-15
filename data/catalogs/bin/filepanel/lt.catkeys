@@ -1,20 +1,20 @@
 1	lithuanian	x-vnd.mmu_man.filepanel	1802971238
 display a load/save file panel\n	FilePanelApp		parodyti failo atvėrimo arba įrašymo langą\n
-options:\n	FilePanelApp		argumentai:\n
-usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		naudojimas: %s [--help] [--directory aplankas] [--load|--save] [--title ttl] [--single] [--modal] [--allow šablonas] [--forbid šablonas]\n
--k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tapriboti galimų atverti elementų tipus. Parametras – bet kokia simbolių f, d, s kombinacija (atitinka: failus (numatytasis atvejis), katalogus, simbolines nuorodas)\n
-usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		naudojimas: %s [-h]     [-d aplankas]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a šablonas]      [-f šablonas]\n
--d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tatverti <aplanke>\n
-%s not a valid option\n	FilePanelApp		%s nėra tinkamas argumentas\n
 short\tlong\tdescription\n	FilePanelApp		trumpasis\tilgasis\taprašas\n
-%s: this option requires a parameter\n	FilePanelApp		%s: šiam argumentui būtinas parametras\n
--l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tparodyti atvėrimo langą (numatytasis atvejis)\n
--f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tnerealizuota\n
+%s not a valid option\n	FilePanelApp		%s nėra tinkamas argumentas\n
 -s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tparodyti įrašymo langą\n
--n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tpasiūlyti numatytąjį failo vardą įrašymui\n
--m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tatverti modalinį langą\n
+%s: this option requires a parameter\n	FilePanelApp		%s: šiam argumentui būtinas parametras\n
 -h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tparodyti šią instrukciją\n
--a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tnerealizuota\n
--1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tleisti pasirinkti tik vieną failą\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tparodyti atvėrimo langą (numatytasis atvejis)\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tpasiūlyti numatytąjį failo vardą įrašymui\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tapriboti galimų atverti elementų tipus. Parametras – bet kokia simbolių f, d, s kombinacija (atitinka: failus (numatytasis atvejis), katalogus, simbolines nuorodas)\n
+%s: UNIMPLEMENTED\n	FilePanelApp		%s: NEREALIZUOTA\n
 -t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tnurodyti lango antraštę\n
-%s: UNIMPLEMENTED\n	FilePanelApp		%S: NEREALIZUOTA\n
+-f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tnerealizuota\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		naudojimas: %s [-h]     [-d aplankas]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a šablonas]      [-f šablonas]\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tleisti pasirinkti tik vieną failą\n
+-a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tnerealizuota\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tatverti modalinį langą\n
+options:\n	FilePanelApp		argumentai:\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tatverti <aplanke>\n
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		naudojimas: %s [--help] [--directory aplankas] [--load|--save] [--title ttl] [--single] [--modal] [--allow šablonas] [--forbid šablonas]\n

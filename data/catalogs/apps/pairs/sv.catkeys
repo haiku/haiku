@@ -1,18 +1,18 @@
 1	swedish	x-vnd.Haiku-Pairs	818003250
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Pairs hittade inte tillräckligt många vektor ikoner; det behövs %zu st, hittade %zu st.\n
-%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n \tskriven av Ralf Schülke\n \tCopyright 2008-2010, Haiku Inc.\n \n
+Pairs	System name		Par
+Quit	PairsWindow		Avsluta
+Medium	PairsWindow		Mellan
+Game	PairsWindow		Spel
 Expert (8x8)	PairsWindow		Expert (8x8)
-Beginner (4x4)	PairsWindow		Nybörjare (4x4)
+New	PairsWindow		Ny
+OK	Pairs		OK
+Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Pairs hittade inte tillräckligt många vektor ikoner; det behövs %zu st, hittade %zu st.\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Du har klarat spelet på {0, plural, one{# klick} other{# klick}}.\n
+Small	PairsWindow		Liten
+Size	PairsWindow		Storlek
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n \tskriven av Ralf Schülke\n \tCopyright 2008-2010, Haiku Inc.\n \n
 Quit game	PairsWindow		Avsluta spel
 Large	PairsWindow		Stor
-Small	PairsWindow		Liten
-Game	PairsWindow		Spel
-OK	Pairs		OK
-Size	PairsWindow		Storlek
-New	PairsWindow		Ny
+Beginner (4x4)	PairsWindow		Nybörjare (4x4)
 Intermediate (6x6)	PairsWindow		Medelmåtta (6x6)
-Quit	PairsWindow		Avsluta
-Pairs	System name		Par
 New game	PairsWindow		Nytt spel
-Medium	PairsWindow		Mellan

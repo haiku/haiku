@@ -1,49 +1,49 @@
 1	romanian	x-vnd.Haiku-Time	3755504714
-GMT (UNIX compatible)	Time		GMT (compatibil cu UNIX)
 OK	Time		OK
-Asia	Time		Asia
-\nNow: 	Time		\nAcum: 
-Africa	Time		Africa
+Message receiving failed	Time		Primirea mesajului a eșuat
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Oră și Dată, scris de:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
+Australia	Time		Australia
+America	Time		America
 Reset to default server list	Time		Restabilește la lista de server implicită
 Could not resolve server address	Time		Nu s-a putut rezolva adresa serverului
-Stop	Time		Oprește
-Australia	Time		Australia
-Preview time:	Time		Previzualizare oră:
-Synchronize	Time		Sincronizează
-Revert	Time		Inversează
-Pacific	Time		Pacific
-Show day of week	Time		Afișează ziua săptămânii
-Add	Time		Adaugă
-Date and time	Time		Dată și oră
-about	Time		despre
-Local time (Windows compatible)	Time		Ora locală (compatibil cu Windows)
-Message receiving failed	Time		Primirea mesajului a eșuat
 Set time zone	Time		Configurează fusul orar
+The following error occured while synchronizing:r\n%s: %s	Time		Următoarea eroare a apărut în timpul sincronizării:r\n%s: %s
 Waiting for answer failed	Time		Așteptarea pentru răspuns a eșuat
-Hardware clock set to:	Time		Ceasul hardware stabilit la:
+<Other>	Time		<Altele>
+Received invalid time	Time		S-a primit o oră invalidă
+Remove	Time		Elimină
+Synchronize again	Time		Sincronizează din nou
+Asia	Time		Asia
+Try all servers	Time		Încearcă toate serverele
+Time	Time		Oră
+Current time:	Time		Oră curentă:
 The following error occured while synchronizing:r\n%s	Time		Următoarea eroare a apărut în timpul sincronizării:r\n%s
 Europe	Time		Europa
-Remove	Time		Elimină
-Time	Time		Oră
-Indian	Time		Indian
-Sending request failed	Time		Trimiterea cererii a eșuat
+Show day of week	Time		Afișează ziua săptămânii
+Local time (Windows compatible)	Time		Ora locală (compatibil cu Windows)
+Hardware clock set to:	Time		Ceasul hardware stabilit la:
 Arctic	Time		Arctic
-Display time with seconds	Time		Afișează ceasul cu secunde
-Time	System name		Oră
-America	Time		America
-Synchronize at boot	Time		Sincronizează la pornirea sistemului
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Oră și Dată, scris de:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
-Received invalid time	Time		S-a primit o oră invalidă
 Antarctica	Time		Antarctica
-Show time zone	Time		Afișează fusul orar
-Show clock in Deskbar	Time		Afișează ceasul pe Deskbar
-The following error occured while synchronizing:r\n%s: %s	Time		Următoarea eroare a apărut în timpul sincronizării:r\n%s: %s
-<Other>	Time		<Altele>
-Current time:	Time		Oră curentă:
-Try all servers	Time		Încearcă toate serverele
+GMT (UNIX compatible)	Time		GMT (compatibil cu UNIX)
+Africa	Time		Africa
+Stop	Time		Oprește
 Time zone	Time		Fus orar
-Could not create socket	Time		Nu s-a putut crea socketul
-Synchronize again	Time		Sincronizează din nou
 Clock	Time		Ceas
 Network time	Time		Oră rețea
+Sending request failed	Time		Trimiterea cererii a eșuat
+Preview time:	Time		Previzualizare oră:
+\nNow: 	Time		\nAcum: 
+Could not create socket	Time		Nu s-a putut crea socketul
+Pacific	Time		Pacific
 Atlantic	Time		Atlantic
+Show clock in Deskbar	Time		Afișează ceasul pe Deskbar
+Display time with seconds	Time		Afișează ceasul cu secunde
+Time	System name		Oră
+about	Time		despre
+Show time zone	Time		Afișează fusul orar
+Synchronize at boot	Time		Sincronizează la pornirea sistemului
+Indian	Time		Indian
+Revert	Time		Inversează
+Date and time	Time		Dată și oră
+Synchronize	Time		Sincronizează
+Add	Time		Adaugă

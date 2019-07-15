@@ -1,60 +1,56 @@
-1	swedish	x-vnd.haiku-softwareupdater	3418694338
-No active network connection was found	UpdateManager	Error message	Ingen aktiv nätverksanslutning kunde hittas
-Cancel	SoftwareUpdaterWindow		Avbryt
-Packages are being updated	UpdateManager		Paketen håller på att uppdateras
-Update now	SoftwareUpdaterWindow		Uppdatera nu
-Updates did not complete	UpdateAction		Uppdateringen slutfördes inte
-Checking for updates	CheckManager		Letar efter uppdateringar
-%count% packages have available updates	CheckManager		%count% paket har nya uppdateringar
-SoftwareUpdater	System name		ProgramUppdatering
-Fatal error while checking for updates: %s\n	CheckAction		Ett allvarligt fel inträffade under sökning efter uppdateringar: %s\n
-No remote repositories are available	UpdateManager	Error message	Inga externa repositorier är tillgängliga
-No updates available	UpdateAction		Inga uppdateringar tillgängliga
-Downloading packages	UpdateManager		Laddar ner paket
-Attempting to cancel the updates...	SoftwareUpdaterWindow		Försöker att avbryta uppdateringarna...
-from repository	SoftwareUpdaterWindow	List item text	från repositorie
-Cancel	SoftwareUpdaterWindow	Alert button label	Avbryt
-Click here to install updates.	CheckManager		Klicka här för att installera uppdateringar.
-The following changes will be made:	SoftwareUpdaterWindow		Följande ändringar kommer att utföras:
-Available updates found	CheckManager		Tillgängliga uppdateringar hittades
-Checking for updates	SoftwareUpdaterWindow		Letar efter uppdateringar
-Quit	SoftwareUpdaterWindow	Alert button label	Avsluta
-Cancelling updates	SoftwareUpdaterWindow		Avbryter uppdateringar
+1	swedish	x-vnd.haiku-softwareupdater	4294742959
 Updating version	SoftwareUpdaterWindow	List item text	Uppdaterar version
-Applying changes	UpdateManager		Verkställer ändringar
-Quit	SoftwareUpdaterWindow		Avsluta
-No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Inga externa repositorier är tillgängliga. Var god verifiera att det finns något repositorie aktiverat i inställningspanelen Repositorier eller via kommandot 'pkgman'.
-There were no updates found.	UpdateAction		Inga uppdateringar hittades.
-Uninstalling version	SoftwareUpdaterWindow	List item text	Avinstallerar version
-Packages to be updated	SoftwareUpdaterWindow	List super item label	Paket som kommer att uppdateras
-Installing version	SoftwareUpdaterWindow	List item text	Installerar version
-Argument variables are no longer accepted\n	SoftwareUpdaterApp		Argumentvariabler accepteras inte längre\n
-Updates completed	UpdateManager		Uppdatering slutförd
-Invalid update type, cannot continue with updates	UpdateAction		Ogiltig uppdateringstyp, kan inte fortsätta att uppdatera
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Paket att avinstallera
-Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Uppdateringarna har inte slutförts. Är du säker på att du vill avsluta?
-Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Användande:   ProgramUppdatering <kommando> [ <alternativ> ]\nUppdaterar installerade paket.\n\nKommandon:\n  update     - Sök i repositorier efter uppdateringar för alla paket.\n  check        - Kolla efter tillgängliga uppdateringar och visa en lista med resultat.\n  full-sync   - Synkronisera alla installerade paket med repositoriernas paket.\n\nAlternativ:\n  -h eller --help         Skriv ut detta hjälpavsnitt\n  -v eller --verbose    Skriv ut mångordig information\n
-There were no updates found.	CheckAction		Inga uppdateringar kunde hittas.
-%i of %i	UpdateManager	Do not translate %i	%i av %i
-Updates found	SoftwareUpdaterWindow		Uppdateringar hittades
-to	SoftwareUpdaterWindow	List item text	till
-No updates available	CheckManager		Inga uppdateringar tillgängliga
-Don't quit	SoftwareUpdaterWindow		Avsluta inte
-Quit	SoftwareUpdaterWindow	Button label	Avsluta
-Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Klicka här för att köra ProgramUppdatering. Vissa uppdateringar kräver att en problemlösning väljs.
-Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Kontaktar repositorier för att leta efter paketuppdateringar.
-Unrecognized argument	SoftwareUpdaterApp	Error message	Argumentet känns inte igen
-Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Vänligen välj från dessa uppdateringsalternativ:\n\nUppdatera:\n\tUppdaterar alla installerade paket.\nFullständig synkronisering:\n\tSynkroniserar alla installerade paket med repositoriernas paket.
-Exception occurred while checking for updates: %s\n	CheckAction		Ett eller flera undantag uppstod under sökningen efter uppdateringar: %s\n
-Exception occurred while updating packages : %s\n	UpdateAction		Ett eller flera undantag uppstod under uppdateringen av paket: %s\n
-Update	SoftwareUpdaterWindow	Alert button label	Uppdatera
-New packages to be installed	SoftwareUpdaterWindow	List super item label	Nya paket att installera
-OK	UpdateManager		OK
-A reboot may be necessary to complete some updates.	UpdateManager		En omstart kan vara nödvändig för att slutföra vissa av uppdateringarna.
-Open Repositories	SoftwareUpdaterWindow	Alert button label	Öppna Repositorier
-Show more details	SoftwareUpdaterWindow		Visa fler detaljer
-Contacting software repositories to check for package updates.	CheckManager		Kontaktar repositorier för att leta efter uppdaterade paket.
-Full sync	SoftwareUpdaterWindow	Alert button label	Fullständig synkronisering
-No active network connection was found.\n	CheckManager		Ingen aktiv nätverksanslutning kunde hittas.\n
-OK	SoftwareUpdaterWindow		OK
+No active network connection was found	UpdateManager	Error message	Ingen aktiv nätverksanslutning kunde hittas
+Quit	SoftwareUpdaterWindow	Alert button label	Avsluta
 There were no updates found.	CheckManager		Inga uppdateringar kunde hittas.
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Uppdateringarna har inte slutförts. Är du säker på att du vill avsluta?
+Updates found	SoftwareUpdaterWindow		Uppdateringar hittades
+Update now	SoftwareUpdaterWindow		Uppdatera nu
+OK	UpdateManager		OK
+Unrecognized argument	SoftwareUpdaterApp	Error message	Argumentet känns inte igen
+There were no updates found.	CheckAction		Inga uppdateringar kunde hittas.
+No updates available	UpdateAction		Inga uppdateringar tillgängliga
+New packages to be installed	SoftwareUpdaterWindow	List super item label	Nya paket att installera
+Packages to be updated	SoftwareUpdaterWindow	List super item label	Paket som kommer att uppdateras
+to	SoftwareUpdaterWindow	List item text	till
+Contacting software repositories to check for package updates.	CheckManager		Kontaktar repositorier för att leta efter uppdaterade paket.
+Available updates found	CheckManager		Tillgängliga uppdateringar hittades
+from repository	SoftwareUpdaterWindow	List item text	från repositorie
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Kontaktar repositorier för att leta efter paketuppdateringar.
+Cancelling updates	SoftwareUpdaterWindow		Avbryter uppdateringar
+Cancel	SoftwareUpdaterWindow	Alert button label	Avbryt
+There were no updates found.	UpdateAction		Inga uppdateringar hittades.
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Vänligen välj från dessa uppdateringsalternativ:\n\nUppdatera:\n\tUppdaterar alla installerade paket.\nFullständig synkronisering:\n\tSynkroniserar alla installerade paket med repositoriernas paket.
+OK	SoftwareUpdaterWindow		OK
+The following changes will be made:	SoftwareUpdaterWindow		Följande ändringar kommer att utföras:
+Argument variables are no longer accepted\n	SoftwareUpdaterApp		Argumentvariabler accepteras inte längre\n
+Fatal error while checking for updates: %s\n	CheckAction		Ett allvarligt fel inträffade under sökning efter uppdateringar: %s\n
+SoftwareUpdater	System name		ProgramUppdatering
+No active network connection was found.\n	CheckManager		Ingen aktiv nätverksanslutning kunde hittas.\n
+Applying changes	UpdateManager		Verkställer ändringar
+Full sync	SoftwareUpdaterWindow	Alert button label	Fullständig synkronisering
+Quit	SoftwareUpdaterWindow	Button label	Avsluta
+Exception occurred while updating packages : %s\n	UpdateAction		Ett eller flera undantag uppstod under uppdateringen av paket: %s\n
+Exception occurred while checking for updates: %s\n	CheckAction		Ett eller flera undantag uppstod under sökningen efter uppdateringar: %s\n
+Packages are being updated	UpdateManager		Paketen håller på att uppdateras
+Cancel	SoftwareUpdaterWindow		Avbryt
+Don't quit	SoftwareUpdaterWindow		Avsluta inte
+Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Klicka här för att köra ProgramUppdatering. Vissa uppdateringar kräver att en problemlösning väljs.
+Checking for updates	SoftwareUpdaterWindow		Letar efter uppdateringar
+Updates completed	UpdateManager		Uppdatering slutförd
+Show more details	SoftwareUpdaterWindow		Visa fler detaljer
+Installing version	SoftwareUpdaterWindow	List item text	Installerar version
+Checking for updates	CheckManager		Letar efter uppdateringar
+No remote repositories are available	UpdateManager	Error message	Inga externa repositorier är tillgängliga
+Update	SoftwareUpdaterWindow	Alert button label	Uppdatera
+Updates did not complete	UpdateAction		Uppdateringen slutfördes inte
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Öppna Repositorier
+Invalid update type, cannot continue with updates	UpdateAction		Ogiltig uppdateringstyp, kan inte fortsätta att uppdatera
+Uninstalling version	SoftwareUpdaterWindow	List item text	Avinstallerar version
+%i of %i	UpdateManager	Do not translate %i	%i av %i
+Quit	SoftwareUpdaterWindow		Avsluta
+No updates available	CheckManager		Inga uppdateringar tillgängliga
+Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Användande:   ProgramUppdatering <kommando> [ <alternativ> ]\nUppdaterar installerade paket.\n\nKommandon:\n  update     - Sök i repositorier efter uppdateringar för alla paket.\n  check        - Kolla efter tillgängliga uppdateringar och visa en lista med resultat.\n  full-sync   - Synkronisera alla installerade paket med repositoriernas paket.\n\nAlternativ:\n  -h eller --help         Skriv ut detta hjälpavsnitt\n  -v eller --verbose    Skriv ut mångordig information\n
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Inga externa repositorier är tillgängliga. Var god verifiera att det finns något repositorie aktiverat i inställningspanelen Repositorier eller via kommandot 'pkgman'.
+Downloading packages	UpdateManager		Laddar ner paket

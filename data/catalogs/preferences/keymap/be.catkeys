@@ -1,57 +1,57 @@
 1	belarusian	x-vnd.Haiku-Keymap	2963866147
-Shift:	Modifier keys window	Shift key role name	Зрух:
-Revert	Modifier keys window		Вярнуць
-Warning: left and right key roles do not match	Modifier keys window		Ўвага: ролі левай і правай клявішы ня супадаюць
-Scroll lock	Keyboard Layout View		Scroll lock
-Menu	Keyboard Layout View	Menu key	Меню
-Left control	Keyboard Layout View		Левы control
-Tilde trigger	Keymap window		Tilde
-Grave trigger	Keymap window		Grave
-Role	Modifier keys window	As in the role of a modifier key	Роля
-Caps lock	Keyboard Layout View		Caps Lock
-Select dead keys	Keymap window		Пазначыць трыгеры (Dead Keys)
-Cancel	Modifier keys window		Адмяніць
-Command	Keyboard Layout View	Command key	Каманда:
-Defaults	Keymap window		Прадвызначаныя
-Quit	Keymap window		Выйсці
-Switch shortcut keys to Haiku mode	Keymap window		Пераключыць камбінацыі ў рэжым Haiku
-Circumflex trigger	Keymap window		Circumflex
-Diaeresis trigger	Keymap window		Diaeresis
-Disabled	Modifier keys window	Do nothing	Выключаны
-Open…	Keymap window		Адкрыць…
-Error: duplicate keys	Modifier keys window		Памылка: клавішы дуплікаты
-System:	Keymap window		Сістэмныя:
-Left command	Keyboard Layout View		Левы command
-Set modifier keys…	Keymap window		Усталяваць клавішы-мадыфікатары…
-Option:	Modifier keys window	Option key role name	Уласцівасць:
-Control	Keyboard Layout View	Control key	Control
-Left option	Keyboard Layout View		Левы option
-Right control	Keyboard Layout View		Правы control
-Switch shortcut keys	Keymap window		Пераключыць хуткія камбінацыі
-Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Клавіша Shift
-User:	Keymap window		Карыстач:
-Right option	Keyboard Layout View		Правы option
-Right shift	Keyboard Layout View		Правы shift
 Key	Modifier keys window	As in a computer keyboard key	Клавіша
+Right control	Keyboard Layout View		Правы control
+Option:	Modifier keys window	Option key role name	Уласцівасць:
+Cancel	Modifier keys window		Адмяніць
+Sample and clipboard:	Keymap window		Прыклад і буфер абмену:
+Num lock	Keyboard Layout View		Num lock
+Switch shortcut keys to Windows/Linux mode	Keymap window		Пераключыць камбінацыі у рэжым Windows/Linux
+Option	Keyboard Layout View	Option key	Параметр
+Scroll lock	Keyboard Layout View		Scroll lock
+Right option	Keyboard Layout View		Правы option
+Revert	Modifier keys window		Вярнуць
+Set modifier keys	Modifier keys window		Усталяваць клавішы-мадыфікатары
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Клавіша Win/Cmd
+Command:	Modifier keys window	Command key role name	Command:
+Acute trigger	Keymap window		Acute
+Modifier keys	Modifier keys window		Клавішы-мадыфікатары
+Save as…	Keymap window		Захаваць як…
+Error: duplicate keys	Modifier keys window		Памылка: клавішы дуплікаты
+Control	Keyboard Layout View	Control key	Control
+Tilde trigger	Keymap window		Tilde
+Shift	Keyboard Layout View	Shift key	Shift
+Left command	Keyboard Layout View		Левы command
+(Current)	Keymap window		(Бягучая)
+Left option	Keyboard Layout View		Левы option
+Warning: left and right key roles do not match	Modifier keys window		Ўвага: ролі левай і правай клявішы ня супадаюць
+Circumflex trigger	Keymap window		Circumflex
+Caps lock	Keyboard Layout View		Caps Lock
+Left shift	Keyboard Layout View		Левы shift
+Left control	Keyboard Layout View		Левы control
+Role	Modifier keys window	As in the role of a modifier key	Роля
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Клавіша Ctrl
 Control:	Modifier keys window	Control key role name	Control:
-Option	Keyboard Layout View	Option key	Параметр
-Sample and clipboard:	Keymap window		Прыклад і буфер абмену:
-Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Клавіша Alt/Opt
+Disabled	Modifier keys window	Do nothing	Выключаны
+Select dead keys	Keymap window		Пазначыць трыгеры (Dead Keys)
+Right shift	Keyboard Layout View		Правы shift
 Layout	Keymap window		Расклад клавіятуры
-Switch shortcut keys to Windows/Linux mode	Keymap window		Пераключыць камбінацыі у рэжым Windows/Linux
-Right command	Keyboard Layout View		Правы command
 Revert	Keymap window		Вярнуць
-Command:	Modifier keys window	Command key role name	Command:
-Save as…	Keymap window		Захаваць як…
-Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Клавіша Win/Cmd
-File	Keymap window		Файл
-Num lock	Keyboard Layout View		Num lock
-(Current)	Keymap window		(Бягучая)
-Font	Keymap window		Шрыфт
+Grave trigger	Keymap window		Grave
+Menu	Keyboard Layout View	Menu key	Меню
+Quit	Keymap window		Выйсці
+User:	Keymap window		Карыстач:
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Клавіша Alt/Opt
+Shift:	Modifier keys window	Shift key role name	Зрух:
 Keymap	System name		Мапа клавіятуры
-Left shift	Keyboard Layout View		Левы shift
-Shift	Keyboard Layout View	Shift key	Shift
-Set modifier keys	Modifier keys window		Усталяваць клавішы-мадыфікатары
-Modifier keys	Modifier keys window		Клавішы-мадыфікатары
-Acute trigger	Keymap window		Acute
+Set modifier keys…	Keymap window		Усталяваць клавішы-мадыфікатары…
+Switch shortcut keys to Haiku mode	Keymap window		Пераключыць камбінацыі ў рэжым Haiku
+Defaults	Keymap window		Прадвызначаныя
+System:	Keymap window		Сістэмныя:
+Switch shortcut keys	Keymap window		Пераключыць хуткія камбінацыі
+Right command	Keyboard Layout View		Правы command
+Font	Keymap window		Шрыфт
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Клавіша Shift
+Command	Keyboard Layout View	Command key	Каманда:
+File	Keymap window		Файл
+Diaeresis trigger	Keymap window		Diaeresis
+Open…	Keymap window		Адкрыць…

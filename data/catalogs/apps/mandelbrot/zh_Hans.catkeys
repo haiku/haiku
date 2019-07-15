@@ -1,13 +1,13 @@
 1	english	x-vnd.Haiku-Mandelbrot	3163309424
-About	MandelbrotWindow		关于
-Julia	MandelbrotWindow		茱莉亚
 Grassland	MandelbrotWindow		草地
-Spring	MandelbrotWindow		春意
-High contrast	MandelbrotWindow		高对比度
-Fire	MandelbrotWindow		火焰
-File	MandelbrotWindow		文件
+About	MandelbrotWindow		关于
 Palette	MandelbrotWindow		画板
-Mandelbrot	MandelbrotWindow		分形图形
 Quit	MandelbrotWindow		退出
-Iterations	MandelbrotWindow		迭代次数
+File	MandelbrotWindow		文件
+Julia	MandelbrotWindow		茱莉亚
+Fire	MandelbrotWindow		火焰
 Mandelbrot	System name		分形图形
+Iterations	MandelbrotWindow		迭代次数
+High contrast	MandelbrotWindow		高对比度
+Spring	MandelbrotWindow		春意
+Mandelbrot	MandelbrotWindow		分形图形

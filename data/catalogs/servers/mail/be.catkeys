@@ -1,16 +1,16 @@
 1	belarusian	x-vnd.Be-POST	825141276
+No new messages	MailDaemon		Няма новых паведамленняў
+No new messages	DeskbarView		Няма новых паведамленняў
+Shutdown mail services	DeskbarView		Спыніць паштовыя службы
+Mail status	MailDaemon		Статус Пошты
 Fetching mail for %name	Notifier		Атрымліваю пошту для %name
-Check for mails only	DeskbarView		Толькі праверыць пошту
+Create new message…	DeskbarView		Стварыць новае паведамленне…
 Send pending mails	DeskbarView		Даслаць паведамленні што чакаюць
+Settings…	DeskbarView		Наладкі…
 New Messages	MailDaemon		Новыя паведамленні
 <no accounts>	DeskbarView		<няма рахункаў>
-Mail status	MailDaemon		Статус Пошты
-Shutdown mail services	DeskbarView		Спыніць паштовыя службы
-Sending mail for %name	Notifier		Дасылаю пошту для %name
-Create new message…	DeskbarView		Стварыць новае паведамленне…
-No new messages	MailDaemon		Няма новых паведамленняў
-Check for mail now	DeskbarView		Праверыць пошту
-No new messages	DeskbarView		Няма новых паведамленняў
-Mail daemon status log	MailDaemon		Пратакол паштовай службы
-Settings…	DeskbarView		Наладкі…
 Mail status	Notifier		Статус пошты
+Check for mails only	DeskbarView		Толькі праверыць пошту
+Check for mail now	DeskbarView		Праверыць пошту
+Sending mail for %name	Notifier		Дасылаю пошту для %name
+Mail daemon status log	MailDaemon		Пратакол паштовай службы

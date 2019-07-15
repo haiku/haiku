@@ -1,23 +1,23 @@
 1	belarusian	x-vnd.haiku-registrar	2599857937
-Restart system	ShutdownProcess		Перазагрузіць сістэму
-The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Праграма \"%appName%\" магчыма блакавана мадальным вакном.
-OK	ShutdownProcess		ОК
-System is shut down	ShutdownProcess		Сістэма выключана
-It's now safe to turn off the computer.	ShutdownProcess		Зараз вы можаце выключыць кампутар.
 Cancel	ShutdownProcess		Адмена
+OK	ShutdownProcess		ОК
 Do you really want to shut down the system?	ShutdownProcess		Насамрэч жадаеце выключыць сістэму?
-Asking other processes to quit.	ShutdownProcess		Іншыя працэссы запрошаны скончыць працу.
-Asking \"%appName%\" to quit.	ShutdownProcess		Запрашаю \"%appName%\" скончыць працу.
-%action%?	ShutdownProcess		%action%?
-Shutdown aborted	ShutdownProcess		Выключэнне кампутару было спынена
-Restarting…	ShutdownProcess		Перазагрузка…
-Asking background applications to quit.	ShutdownProcess		Фонавыя працэссы запрошаны скончыць працу.
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Праграма \"%appName%\" перашкодзіла спыненню працы кампутара.
-Tidying things up a bit.	ShutdownProcess		Трэба крышку прыбраць.
-Do you really want to restart the system?	ShutdownProcess		Насамрэч жадаеце перазагрузіць сістэму?
 Shutdown status	ShutdownProcess		Статус спынення
-Cancel shutdown	ShutdownProcess		Адмяніць спыненне
-Kill application	ShutdownProcess		Знішчыць праграму
 Shut down	ShutdownProcess		Спыніць
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Праграма \"%appName%\" магчыма блакавана мадальным вакном.
+System is shut down	ShutdownProcess		Сістэма выключана
+Restart system	ShutdownProcess		Перазагрузіць сістэму
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Праграма \"%appName%\" перашкодзіла спыненню працы кампутара.
+Asking background applications to quit.	ShutdownProcess		Фонавыя працэссы запрошаны скончыць працу.
+Do you really want to restart the system?	ShutdownProcess		Насамрэч жадаеце перазагрузіць сістэму?
 Restart	ShutdownProcess		Перазапусціць
+It's now safe to turn off the computer.	ShutdownProcess		Зараз вы можаце выключыць кампутар.
+Asking other processes to quit.	ShutdownProcess		Іншыя працэссы запрошаны скончыць працу.
+Cancel shutdown	ShutdownProcess		Адмяніць спыненне
+Restarting…	ShutdownProcess		Перазагрузка…
+%action%?	ShutdownProcess		%action%?
+Tidying things up a bit.	ShutdownProcess		Трэба крышку прыбраць.
+Kill application	ShutdownProcess		Знішчыць праграму
+Shutdown aborted	ShutdownProcess		Выключэнне кампутару было спынена
 Shutting down…	ShutdownProcess		Спыненне…
+Asking \"%appName%\" to quit.	ShutdownProcess		Запрашаю \"%appName%\" скончыць працу.

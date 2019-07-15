@@ -1,21 +1,21 @@
 1	catalan; valencian	x-vnd.Haiku-JPEGTranslator	965709535
-Output quality	JPEGTranslator		Qualitat de la sortida
-JPEG images	JPEGTranslator		Imatges JPEG
-Prevent colors 'washing out'	JPEGTranslator		Evita que els colors s'esvaeixin
-JPEG Library Error: %s\n	be_jerror		S'ha produït un error de la Llibreria de JPEG: %s\n
-Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Usa el codi 0 CMYK per a cobrir amb tinta el 100%
-About	JPEGTranslator		Quant a
-©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBasat a la llibreria IJG ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\namb un pedaç pel suport per la codificació \"sense pèrdua\" de Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nAmb algunes rutines de conversió de color de Magnus Hellman\n\thttp://www.bebits.com/app/802\n
-Low	JPEGTranslator		Baixa
-Make file smaller (sligthtly worse quality)	JPEGTranslator		Fes que el fitxer sigui menor (a costa de la qualitat)
-None	JPEGTranslator		Cap
+Read	JPEGTranslator		Lectura
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Format Be Bitmap (JPEGTranslator)
 Show warning messages	JPEGTranslator		Mostra els missatges d'avís
-Output smoothing strength	JPEGTranslator		Nivell de suavitzat de la sortida
-High	JPEGTranslator		Alta
-Write	JPEGTranslator		Escriu
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Usa el codi 0 CMYK per a cobrir amb tinta el 100%
+JPEG Library Error: %s\n	be_jerror		S'ha produït un error de la Llibreria de JPEG: %s\n
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBasat a la llibreria IJG ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\namb un pedaç pel suport per la codificació \"sense pèrdua\" de Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nAmb algunes rutines de conversió de color de Magnus Hellman\n\thttp://www.bebits.com/app/802\n
+None	JPEGTranslator		Cap
+About	JPEGTranslator		Quant a
 Write black-and-white images as RGB24	JPEGTranslator		Desa les imatges en blanc i negre com a RGB24
-Read greyscale images as RGB32	JPEGTranslator		Llegeix les imatges d'escala de grisos com a RGB32
-Read	JPEGTranslator		Lectura
-JPEG Library Warning: %s\n	be_jerror		Avís de la llibreria del JPEG: %s\n
+Output smoothing strength	JPEGTranslator		Nivell de suavitzat de la sortida
 Use progressive compression	JPEGTranslator		Fes servir compressió progressiva
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Fes que el fitxer sigui menor (a costa de la qualitat)
+High	JPEGTranslator		Alta
+Read greyscale images as RGB32	JPEGTranslator		Llegeix les imatges d'escala de grisos com a RGB32
+Output quality	JPEGTranslator		Qualitat de la sortida
+Low	JPEGTranslator		Baixa
+Write	JPEGTranslator		Escriu
+Prevent colors 'washing out'	JPEGTranslator		Evita que els colors s'esvaeixin
+JPEG Library Warning: %s\n	be_jerror		Avís de la llibreria del JPEG: %s\n
+JPEG images	JPEGTranslator		Imatges JPEG

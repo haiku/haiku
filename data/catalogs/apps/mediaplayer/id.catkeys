@@ -1,32 +1,87 @@
-1	indonesian	x-vnd.Haiku-MediaPlayer	2249053190
-raw audio	MediaPlayer-InfoWin		audio mentah
-Location	MediaPlayer-InfoWin		Lokasi
-1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerika)
-%d kHz	MediaPlayer-InfoWin		%d kHz
-Stream settings	MediaPlayer-Main		Pengaturan aliran
-Video	MediaPlayer-InfoWin		Video
-(not supported)	MediaPlayer-InfoWin		(tidak didukung)
-ask every time	MediaPlayer-SettingsWindow		tanya tiap kali
-Close	MediaPlayer-Main		Tutup
-OK	MediaPlayer-SettingsWindow		OKE
-Medium	MediaPlayer-SettingsWindow		Medium
+1	indonesian	x-vnd.Haiku-MediaPlayer	4253895224
 Close	MediaPlayer-PlaylistWindow		Tutup
-File info…	MediaPlayer-Main		Info berkas…
-Copyright	MediaPlayer-InfoWin		Hak cipta
-Cancel	MediaPlayer-SettingsWindow		Batal
-Quit	MediaPlayer-Main		Keluar
-400% scale	MediaPlayer-Main		Skala 400%
-Audio	MediaPlayer-Main		Audio
-OK	MediaPlayer-Main		OKE
-Settings…	MediaPlayer-Main		Pengaturan…
-h	MediaPlayer-InfoWin	Hours	h
-Open	MediaPlayer-PlaylistWindow		Buka
+Volume of background clips	MediaPlayer-SettingsWindow		Volume dari klip latar
+Use hardware video overlays if available	MediaPlayer-SettingsWindow		Gunakan overlay dari perangkat kasar video bila tersedia
 Audio	MediaPlayer-InfoWin		Audio
+MediaPlayer	System name		MediaPlayer
+Muted	MediaPlayer-SettingsWindow		Diam
 OK	MediaPlayer-RemovePLItemsCmd		OKE
-50% scale	MediaPlayer-Main		Skala 50%
+raw audio	MediaPlayer-InfoWin		audio mentah
+Select all	MediaPlayer-PlaylistWindow		Pilih semua
+Move Entries	MediaPlayer-MovePLItemsCmd		Pindahkan Entri
+OK	MediaPlayer-Main		OKE
+Remove	MediaPlayer-PlaylistWindow		Hapus
+Resume:	MediaPlayer-SettingsWindow		Lanjut:
 Duration	MediaPlayer-InfoWin		Durasi
-Large	MediaPlayer-SettingsWindow		Besar
-Total duration: %s	MediaPlayer-PlaylistWindow		Total durasi: %s
-Hide interface	MediaPlayer-Main		Sembunyikan antarmuka
-Full screen	MediaPlayer-Main		Layara penuh
+Import Entries	MediaPlayer-ImportPLItemsCmd		Impor Entri
+Open file…	MediaPlayer-Main		Buka berkas…
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Skalakan kontrol dalam mode layar penuh
+View options	MediaPlayer-SettingsWindow		Opsi tampilan
+%d kHz	MediaPlayer-InfoWin		%d kHz
+Full volume	MediaPlayer-SettingsWindow		Suara penuh
+Location	MediaPlayer-InfoWin		Lokasi
+Medium	MediaPlayer-SettingsWindow		Medium
+%d Bit	MediaPlayer-InfoWin		%d Bit
+Close	MediaPlayer-Main		Tutup
+Save error	MediaPlayer-PlaylistWindow		Simpan galat
+Attributes	MediaPlayer-Main		Atribut
 Bottom of screen	MediaPlayer-SettingsWindow		Sisi bawah layar
+Copyright	MediaPlayer-InfoWin		Hak cipta
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Gagal menyimpan daftar putar.\n\nKesalahan: 
+Hide interface	MediaPlayer-Main		Sembunyikan antarmuka
+Error: 	MediaPlayer-Main		Galat: 
+Save	MediaPlayer-PlaylistWindow		Simpan
+Cancel	MediaPlayer-NetworkStream		Batal
+Nothing to Play	MediaPlayer-Main		Tidak ada yang dimainkan
+OK	MediaPlayer-SettingsWindow		OKE
+Remove Entries	MediaPlayer-RemovePLItemsCmd		Hapus Entri
+never	MediaPlayer-SettingsWindow		tidak pernah
+Open…	MediaPlayer-PlaylistWindow		Buka…
+Low volume	MediaPlayer-SettingsWindow		Volume kecil
+Audio	MediaPlayer-Main		Audio
+Quit	MediaPlayer-Main		Keluar
+Move Entry	MediaPlayer-MovePLItemsCmd		Pindah Entri
+Cancel	MediaPlayer-SettingsWindow		Batal
+Large	MediaPlayer-SettingsWindow		Besar
+Import Entry	MediaPlayer-ImportPLItemsCmd		Import entri
+unknown format	MediaPlayer-InfoWin		format tidak dikenal
+Total duration: %s	MediaPlayer-PlaylistWindow		Total durasi: %s
+%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
+Move into trash error	MediaPlayer-RemovePLItemsCmd		Galat pemindahan ke tong sampah
+50% scale	MediaPlayer-Main		Skala 50%
+Drop files to play	MediaPlayer-Main		Jatuhkan berkas untuk memutar
+Copy Entry	MediaPlayer-CopyPLItemsCmd		Salin Entri
+Open	MediaPlayer-PlaylistWindow		Buka
+always	MediaPlayer-SettingsWindow		selalu
+Stream settings	MediaPlayer-Main		Pengaturan aliran
+Video	MediaPlayer-Main		Video
+There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Tidak ada dekoder terinstal untuk menangani format berkas, atau dekoder tersebut mengalami masalah dengan versi spesifik dari format.
+Undo	MediaPlayer-PlaylistWindow		Batalkan
+Display mode	MediaPlayer-InfoWin		Mode tayang
+Small	MediaPlayer-SettingsWindow		Kecil
+Settings…	MediaPlayer-Main		Pengaturan…
+min	MediaPlayer-InfoWin	Minutes	min
+Video	MediaPlayer-InfoWin		Video
+File info…	MediaPlayer-Main		Info berkas…
+1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerika)
+Full screen	MediaPlayer-Main		Layara penuh
+OK	MediaPlayer-NetworkStream		OK
+100% scale	MediaPlayer-Main		Skala 100%
+Save	MediaPlayer-Main		Simpan
+200% scale	MediaPlayer-Main		Skala 200%
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Berkas '%filename' tidak bisa dibuka.\n\n
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Tak satupun yang ingin Anda putar tampak sebagai berkas media.
+Remove Entry	MediaPlayer-RemovePLItemsCmd		Hapus Entri
+Subtitle size:	MediaPlayer-SettingsWindow		Ukuran subtitle:
+raw video	MediaPlayer-InfoWin		video mentah
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Beberapa berkas tidak bisa dipindahkan ke tempat sampah.
+Save as…	MediaPlayer-PlaylistWindow		Simpan sebagai…
+Error: 	MediaPlayer-RemovePLItemsCmd		Galat: 
+300% scale	MediaPlayer-Main		Skala 300%
+Open	MediaPlayer-Main		Buka
+ask every time	MediaPlayer-SettingsWindow		tanya tiap kali
+(not supported)	MediaPlayer-InfoWin		(tidak didukung)
+Randomize	MediaPlayer-PlaylistWindow		Acak
+400% scale	MediaPlayer-Main		Skala 400%
+h	MediaPlayer-InfoWin	Hours	h
+OK	MediaPlayer-PlaylistWindow		OK

@@ -1,5 +1,5 @@
 1	hungarian	x-vnd.Haiku-libsolvsolver	1605065219
+unspecified problem	SolverProblem		meghatározatlan hiba
+nothing provides requested %dependency%	SolverProblem		semmi sem nyújta az igényelt %dependency% függőséget
 %dependency% is provided by the system	SolverProblem		%dependency% függőséget a rendszer nyújtja
 package %source% conflicts with %dependency% provided by %target%	SolverProblem		%source% csomag ütközik a %target% által nyújtott %dependency% függősggel
-nothing provides requested %dependency%	SolverProblem		semmi sem nyújta az igényelt %dependency% függőséget
-unspecified problem	SolverProblem		meghatározatlan hiba

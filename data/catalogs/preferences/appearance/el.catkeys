@@ -1,48 +1,47 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Appearance	963859935
-Control highlight	Colors tab		Έλεγχος φωτεινότητας
+1	greek, modern (1453-)	x-vnd.Haiku-Appearance	3342844385
 Control border	Colors tab		Έλεγχος περιγράμματος
-Antialiasing type:	AntialiasingSettingsView		Τύπος εξομάλυνσης:
-Shadow	Colors tab		Σκιά
-On	AntialiasingSettingsView		Ανοικτό
-Defaults	APRWindow		Προεπιλογές
-Grayscale	AntialiasingSettingsView		Κλίμακα του γκρι
-Shine	Colors tab		Λάμψη
-About	DecorSettingsView		Σχετικά
 Off	AntialiasingSettingsView		Κλειστό
-Choose Decorator	DecorSettingsView		Επιλέξετε Διακοσμητή
-Success	Colors tab		Επιτυχία
-Inactive window tab text	Colors tab		Κείμενο της αδρανής καρτέλας παράθυρου
-Failure	Colors tab		Αποτυχία
-Hinting menu	AntialiasingSettingsView		Μενού υποδείξεων
-Document background	Colors tab		Φόντο εγγράφου
-Revert	APRWindow		Επαναφορά
-Window tab	Colors tab		Καρτέλα παράθυρου
-Tooltip background	Colors tab		Φόντο αναδυόμενης συμβουλής
-Selected menu item background	Colors tab		Φόντο επιλεγμένου μενού
-Antialiasing	APRWindow		Εξομάλυνση
-Navigation base	Colors tab		Βάση πλοήγησης
 Window border	Colors tab		Περιθώριο Παραθύρου
-Window tab text	Colors tab		Κείμενο καρτέλας παράθυρου
-Document text	Colors tab		Κείμενο εγγράφου
-Navigation pulse	Colors tab		Παλμός πλοήγησης
-Selected menu item text	Colors tab		Επιλεγμένο κείμενο μενού
-Menu background	Colors tab		Φόντο μενού
-OK	DecorSettingsView		Εντάξει
-Panel background	Colors tab		Φόντο πλαισίου
-Colors	APRWindow		Χρώματα
-Control background	Colors tab		Έλεγχος φόντου
 Inactive window tab	Colors tab		Αδρανής καρτέλα παράθυρου
+Defaults	APRWindow		Προεπιλογές
+Shadow	Colors tab		Σκιά
+Document background	Colors tab		Φόντο εγγράφου
 Appearance	System name		Εμφάνιση
 Reduce colored edges filter strength:	AntialiasingSettingsView		Φίλτρο μείωσης έντονων χρωματισμένων άκρων:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Το υποεικονοστοιχείο που βασίζεται στην εξομάλυνση σε συνδυασμό με το υποδεικνυόμενο ανάγλυφο, δεν είναι διαθέσιμο σε αυτή την κατασκευή Haiku, για να αποφευχθούν πιθανά θέματα με διπλώματα ευρεσιτεχνίας. Για να ενεργοποιήσετε αυτήν τη δυνατότητα, θα πρέπει να φτιάξετε μόνοι σας το Haiku και να ενεργοποιήσετε ορισμένες επιλογές στην κεφαλίδα στη libfreetype διαμόρφωση.
-Control text	Colors tab		Κείμενο ελέγχου
-Tooltip text	Colors tab		Κείμενο αναδυόμενης συμβουλής
-Inactive window border	Colors tab		Ανενεργό περιθώριο παραθύρου
-Menu item text	Colors tab		Κείμενο μενού
-LCD subpixel	AntialiasingSettingsView		Υπο-εικονοστοιχείο LCD
-Selected menu item border	Colors tab		Περίγραμμα επιλεγμένου μενού
-Strong	AntialiasingSettingsView		Ισχυρό
-Panel text	Colors tab		Κείμενο πρόσοψης
-Monospaced fonts only	AntialiasingSettingsView		Μόνο σταθερές γραμματοσειρές
-Antialiasing menu	AntialiasingSettingsView		Μενού εξομάλυνσης
 Glyph hinting:	AntialiasingSettingsView		Υποδεικνυόμενο ανάγλυφο:
+Menu item text	Colors tab		Κείμενο μενού
+Antialiasing menu	AntialiasingSettingsView		Μενού εξομάλυνσης
+Success	Colors tab		Επιτυχία
+About	DecorSettingsView		Σχετικά
+Shine	Colors tab		Λάμψη
+On	AntialiasingSettingsView		Ανοικτό
+Menu background	Colors tab		Φόντο μενού
+Revert	APRWindow		Επαναφορά
+OK	DecorSettingsView		Εντάξει
+Control text	Colors tab		Κείμενο ελέγχου
+Selected menu item background	Colors tab		Φόντο επιλεγμένου μενού
+Antialiasing	APRWindow		Εξομάλυνση
+Choose Decorator	DecorSettingsView		Επιλέξετε Διακοσμητή
+Strong	AntialiasingSettingsView		Ισχυρό
+Failure	Colors tab		Αποτυχία
+Selected menu item text	Colors tab		Επιλεγμένο κείμενο μενού
+Panel background	Colors tab		Φόντο πλαισίου
+Window tab text	Colors tab		Κείμενο καρτέλας παράθυρου
+Navigation pulse	Colors tab		Παλμός πλοήγησης
+LCD subpixel	AntialiasingSettingsView		Υπο-εικονοστοιχείο LCD
+Window tab	Colors tab		Καρτέλα παράθυρου
+Tooltip background	Colors tab		Φόντο αναδυόμενης συμβουλής
+Selected menu item border	Colors tab		Περίγραμμα επιλεγμένου μενού
+Tooltip text	Colors tab		Κείμενο αναδυόμενης συμβουλής
+Control background	Colors tab		Έλεγχος φόντου
+Inactive window tab text	Colors tab		Κείμενο της αδρανής καρτέλας παράθυρου
+Navigation base	Colors tab		Βάση πλοήγησης
+Grayscale	AntialiasingSettingsView		Κλίμακα του γκρι
+Antialiasing type:	AntialiasingSettingsView		Τύπος εξομάλυνσης:
+Panel text	Colors tab		Κείμενο πρόσοψης
+Hinting menu	AntialiasingSettingsView		Μενού υποδείξεων
+Monospaced fonts only	AntialiasingSettingsView		Μόνο σταθερές γραμματοσειρές
+Document text	Colors tab		Κείμενο εγγράφου
+Inactive window border	Colors tab		Ανενεργό περιθώριο παραθύρου
+Colors	APRWindow		Χρώματα
+Control highlight	Colors tab		Έλεγχος φωτεινότητας

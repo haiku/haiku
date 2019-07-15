@@ -1,17 +1,46 @@
-1	indonesian	x-vnd.Haiku-PowerStatus	678063321
+1	indonesian	x-vnd.Haiku-PowerStatus	3173765686
 Design capacity low warning: 	PowerStatus		Desain peringatan kapasitas rendah: 
 Show percent	PowerStatus		Tampilkan persen
 Design capacity: 	PowerStatus		Kapasitas desain: 
  mW	PowerStatus		  mW
+The battery level is getting low, please plug in the device.	PowerStatus		Daya baterai semakin rendah, silakan tancapkan perangkat.
+Battery low	PowerStatus		Baterai lemah
 Type: 	PowerStatus		Tipe: 
+non-rechargeable	PowerStatus		tidak dapat diisi ulang
+Empty battery slot	PowerStatus		Slot baterai kosong
+ mV	PowerStatus		 mV
+Run in window	PowerStatus		Jalankan di jendela
 PowerStatus	System name		PowerStatus
  mWh	PowerStatus		 mWh
+Battery info…	PowerStatus		Info baterai…
+Damaged battery	PowerStatus		Baterai rusak
 Show time	PowerStatus		Tampilkan waktu
+Last full charge: 	PowerStatus		Pengisian penuh terakhir:
+Battery unused	PowerStatus		Baterai tidak digunakan
+Extended battery info	PowerStatus		Info baterai tambahan
  mA	PowerStatus		 mA
+Current rate: 	PowerStatus		Arus saat ini: 
+discharging	PowerStatus		pemakaian
+Show text label	PowerStatus		Tampilkan label teks
 About…	PowerStatus		Tentang…
 Model number: 	PowerStatus		Nomor model: 
+Install in Deskbar	PowerStatus		Pasang di Deskbar
+ mAh	PowerStatus		 mAh
 Capacity: 	PowerStatus		Kapasitas: 
+Battery discharging	PowerStatus		Pengosongan baterai
+Serial number: 	PowerStatus		Nomor seri: 
+Battery critical	PowerStatus		Baterai kritis
+Capacity granularity 1: 	PowerStatus		Ketelitian kapasitas 1: 
 OEM info: 	PowerStatus		Info OEM: 
+Design voltage: 	PowerStatus		Tegangan disain: 
+Battery charging	PowerStatus		Pengisian baterai
+The battery level is critical, please plug in the device immediately.	PowerStatus		Level baterai sangat genting, harap sambungkan perangkat segera.
+Design capacity warning: 	PowerStatus		Peringatan kapasitas desain: 
 Quit	PowerStatus		Keluar
+rechargeable	PowerStatus		dapat diisi ulang
+charging	PowerStatus		pengisian daya
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Anda dapat menjalankan PowerStatus di jendela atau menginstalnya di Deskbar.
+Show status icon	PowerStatus		Tampilkan ikon status
+Capacity granularity 2: 	PowerStatus		Ketelitian kapasitas 2: 
 Technology: 	PowerStatus		Teknologi: 
 no battery	PowerStatus		baterai tidak ada

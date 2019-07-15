@@ -1,17 +1,17 @@
 1	indonesian	x-vnd.Haiku-keystore_server	2429996361
-This application hasn't been granted access before.	AppAccessRequestWindow		Aplikasi ini belum diberikan akses sebelumnya.
-Unlock	KeyRequestWindow		Tak-terkunci
-This application has been updated since it was last granted access.	AppAccessRequestWindow		Aplikasi ini telah diperbarui sejak pemberian akses yang lalu.
-Allow always	AppAccessRequestWindow		Selalu ijinkan
-Application keyring access	AppAccessRequestWindow		Akses aplikasi keyring
 to perform the following action:\n%accessString%\n\n	AppAccessRequestWindow		untuk melakukan tindakan berikut:\n%accessString%\n\n
-The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		Aplikasi:\n%signature% (%path%)\n\n
 This application doesn't yet have the required privileges.	AppAccessRequestWindow		Aplikasi ini belum memiliki hak yang diperlukan.
-Password:	KeyRequestWindow		Sandi:
-Cancel	KeyRequestWindow		Batal
 Keyring:	KeyRequestWindow		Keyring:
+requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		minta akses ke keyring:\n%keyringName%\n\n
+Application keyring access	AppAccessRequestWindow		Akses aplikasi keyring
+Disallow	AppAccessRequestWindow		Dilarang
+Allow once	AppAccessRequestWindow		Ijinkan sekali
 Unlock keyring	KeyRequestWindow		Buka kunci keyring
 An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		Sebuah aplikasi ingin mengakses keyring di bawah, tetapi terkunci dengan passphrase. Masukkan passphrase untuk membuka keyring.\nJika Anda membuka keyring, itu tetap membuka sampai sistem dimatikan atau keyring tersebut secara manual terkunci lagi.\nJika Anda membatalkan dialog ini keyring akan tetap terkunci.
-Allow once	AppAccessRequestWindow		Ijinkan sekali
-Disallow	AppAccessRequestWindow		Dilarang
-requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		minta akses ke keyring:\n%keyringName%\n\n
+Password:	KeyRequestWindow		Sandi:
+Cancel	KeyRequestWindow		Batal
+This application has been updated since it was last granted access.	AppAccessRequestWindow		Aplikasi ini telah diperbarui sejak pemberian akses yang lalu.
+Allow always	AppAccessRequestWindow		Selalu ijinkan
+Unlock	KeyRequestWindow		Tak-terkunci
+The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		Aplikasi:\n%signature% (%path%)\n\n
+This application hasn't been granted access before.	AppAccessRequestWindow		Aplikasi ini belum diberikan akses sebelumnya.

@@ -1,16 +1,16 @@
 1	hungarian	x-vnd.haiku-package_daemon	1440586681
-Package problems	PackageProblem	Window title	Csomag-probléma
 Package changes	PackageResult	Window title	Változások
 uninstall package %s\n	PackageResult	Don't change '%s' variable	%s csomag eltávolítása\n
-install package %s from repository %s\n	PackageResult	Don't change '%s' variables	%s csomag telepítése %s tárolóból\n
-Apply changes	PackageResult		Módosítások alkalmazása
-solution %d:	PackageProblem	Don't change the %d variable	%d megoldása:
-Warning	PackageManager		Figyelem
-Retry	PackageProblem		Újra
-The following additional package changes have to be made:	PackageResult		A következő módosítások fognak megtörténni:
 ignore problem for now	PackageProblem		figyelmen kívül hagy
+solution %d:	PackageProblem	Don't change the %d variable	%d megoldása:
+The following problems have been encountered. Please select a solution for each:	PackageProblem		Az alábbi problémákat találtam. Válassz egy megoldási lehetőséget:
+Apply changes	PackageResult		Módosítások alkalmazása
+Package daemon	PackageManager		Csomagkezelő
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	%s csomag telepítése %s tárolóból\n
+The following additional package changes have to be made:	PackageResult		A következő módosítások fognak megtörténni:
+Warning	PackageManager		Figyelem
 Cancel	PackageProblem		Mégse
 don't activate package %source%	PackageProblem	don't change '%source%	ne aktiválja a %source% csomagot
-The following problems have been encountered. Please select a solution for each:	PackageProblem		Az alábbi problémákat találtam. Válassz egy megoldási lehetőséget:
-Package daemon	PackageManager		Csomagkezelő
 Cancel	PackageResult		Mégse
+Retry	PackageProblem		Újra
+Package problems	PackageProblem	Window title	Csomag-probléma

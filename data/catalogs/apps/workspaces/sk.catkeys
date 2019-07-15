@@ -1,13 +1,13 @@
 1	slovak	x-vnd.Be-WORK	3927737357
-Invalid argument: %s\n	Workspaces		Neplatný argument: %s\n
 Quit	Workspaces		Ukončiť
-Workspaces	System name		Pracovné plochy
+Invalid argument: %s\n	Workspaces		Neplatný argument: %s\n
 Change workspace count…	Workspaces		Zmeniť počet pracovných plôch…
-Remove replicant	Workspaces		Odstrániť replikanta
-Show window border	Workspaces		Zobraziť okraj okna
-Auto-raise	Workspaces		Automaticky aktivovať
 Always on top	Workspaces		Vždy na vrchu
-Switch on mouse wheel	Workspaces		Zapnúť koliesko myši
-Live in the Deskbar	Workspaces		Prebývať v Paneli
+Show window border	Workspaces		Zobraziť okraj okna
 Show window tab	Workspaces		Zobraziť záložku okna
+Auto-raise	Workspaces		Automaticky aktivovať
+Remove replicant	Workspaces		Odstrániť replikanta
+Live in the Deskbar	Workspaces		Prebývať v Paneli
 Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Použitie: %s [voľby] [pracovná_plocha]\nkde „voľby“ sú:\n  --notitle\t \t odstránený titulný pruh, ponechaný okraj a zmena veľkosti\n  --noborder\t \t odstránený titulný pruh, okraj a zmena veľkosti\n  --avoidfocus\t \t zabráni, aby bolo okno cieľom udalostí klávesnice\n  --alwaysontop\t \t bude udržiavať okno na vrchu\n  --notmovable\t \t oknom nemožno pohybovať\n  --autoraise\t \t automaticky presunúť okno na vrch pracovnej plochy keď je na okraji obrazovky\n  --help\t \t vypísať tohto pomocníka a skončiť\na „pracovná_plocha“ je číslo Pracovnej plochy, na ktorú sa má prepnúť (0-31)\n
+Switch on mouse wheel	Workspaces		Zapnúť koliesko myši
+Workspaces	System name		Pracovné plochy

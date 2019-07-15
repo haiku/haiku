@@ -1,23 +1,23 @@
 1	japanese	x-vnd.Haiku-Mandelbrot	1781779654
-About	MandelbrotWindow		このソフトウェアについて
-Julia	MandelbrotWindow		ジュリア
-Grassland	MandelbrotWindow		草原
-Spring	MandelbrotWindow		春
-High contrast	MandelbrotWindow		ハイコントラスト
-Fire	MandelbrotWindow		炎
-Royal	MandelbrotWindow		ロイヤル
-File	MandelbrotWindow		ファイル
-Lightning	MandelbrotWindow		稲妻
-Midnight	MandelbrotWindow		ミッドナイト
-Palette	MandelbrotWindow		パレット
-Mandelbrot	MandelbrotWindow		マンデルブロ
 Burning Ship	MandelbrotWindow		バーニングシップ
-Quit	MandelbrotWindow		終了
-Frost	MandelbrotWindow		フロスト
+Grassland	MandelbrotWindow		草原
+Lightning	MandelbrotWindow		稲妻
+About	MandelbrotWindow		このソフトウェアについて
+Palette	MandelbrotWindow		パレット
 Set	MandelbrotWindow		集合
-Iterations	MandelbrotWindow		反復回数
-Mandelbrot	System name		マンデルブロ
-Deepfrost	MandelbrotWindow		ディープフロスト
 Tricorn	MandelbrotWindow		トリコーン
-Multibrot	MandelbrotWindow		マルチブロ
+Royal	MandelbrotWindow		ロイヤル
 Orbit Trap	MandelbrotWindow		Orbit Trap
+Deepfrost	MandelbrotWindow		ディープフロスト
+Quit	MandelbrotWindow		終了
+File	MandelbrotWindow		ファイル
+Julia	MandelbrotWindow		ジュリア
+Frost	MandelbrotWindow		フロスト
+Fire	MandelbrotWindow		炎
+Mandelbrot	System name		マンデルブロ
+Iterations	MandelbrotWindow		反復回数
+High contrast	MandelbrotWindow		ハイコントラスト
+Multibrot	MandelbrotWindow		マルチブロ
+Spring	MandelbrotWindow		春
+Midnight	MandelbrotWindow		ミッドナイト
+Mandelbrot	MandelbrotWindow		マンデルブロ

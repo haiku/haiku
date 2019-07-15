@@ -1,17 +1,16 @@
-1	romanian	x-vnd.Haiku-MatchHeader	548057976
+1	romanian	x-vnd.Haiku-MatchHeader	3544711400
+Delete message	ConfigView		Șterge mesajul
+Match \"%attribute\" against \"%regex\"	RuleFilter		Potrivește \„%attribute\” peste \„%regex\”
+Match header	RuleFilter		Potrivește antet
+Set flags to	ConfigView		Stabilește indicatorii la
+<Choose account>	ConfigView		<Selectează contul>
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		O valoare de metacaracter precum \„*spam*\”.\nPrefixați cu \„REGEX:\” pentru a utiliza expresii regulate.
+Then	ConfigView		Atunci
+If	ConfigView		Dacă
+Set as read	ConfigView		Marchează ca citit
+Reply with	ConfigView		Răspunde cu
 <Choose action>	ConfigView		<Selectează acțiunea>
-Header field (e.g. Subject, From, ...)	ConfigView		Câmp antet (e.x. Subiect, De la, …)
+Move to	ConfigView		Mută la
+this field is based on the action	ConfigView		acest câmp este bazat pe acțiunea
 Account	ConfigView		Cont
 has	ConfigView		are
-Move to	ConfigView		Mută la
-Then	ConfigView		Atunci
-this field is based on the action	ConfigView		acest câmp este bazat pe acțiunea
-Delete message	ConfigView		Șterge mesajul
-<Choose account>	ConfigView		<Selectează contul>
-Set flags to	ConfigView		Stabilește indicatorii la
-Set as read	ConfigView		Marchează ca citit
-Match header	RuleFilter		Potrivește antet
-Reply with	ConfigView		Răspunde cu
-If	ConfigView		Dacă
-Match \"%attribute\" against \"%regex\"	RuleFilter		Potrivește \„%attribute\” peste \„%regex\”
-Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		O valoare de metacaracter precum \„*spam*\”.\nPrefixați cu \„REGEX:\” pentru a utiliza expresii regulate.

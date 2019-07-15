@@ -1,5 +1,5 @@
 1	korean	x-vnd.Haiku-notification_server	2022780929
 Warning	NotificationWindow		경고
+Notification	NotificationWindow		통지서비스
 OK	NotificationWindow		확인
 Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		일반 설정 모니터를 시작할 수 없습니다.\n실시간 필터 변화가 가능하지 않습니다..
-Notification	NotificationWindow		통지서비스

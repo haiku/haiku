@@ -1,58 +1,58 @@
 1	english	x-vnd.Haiku-Keymap	1385051534
-Shift:	Modifier keys window	Shift key role name	Shift：
-Revert	Modifier keys window		取消
-Warning: left and right key roles do not match	Modifier keys window		警告：左右键规则不匹配
-Scroll lock	Keyboard Layout View		滚动锁定
-Menu	Keyboard Layout View	Menu key	菜单
-Left control	Keyboard Layout View		左侧 Ctrl
-Tilde trigger	Keymap window		触发颚化字符
-Grave trigger	Keymap window		触发雕刻字符
-Role	Modifier keys window	As in the role of a modifier key	作用
-Caps lock	Keyboard Layout View		大小写锁定
-Select dead keys	Keymap window		选择废键：
-Cancel	Modifier keys window		取消
-Command	Keyboard Layout View	Command key	命令
-Defaults	Keymap window		默认
-Quit	Keymap window		退出
-Switch shortcut keys to Haiku mode	Keymap window		切换快捷键为Haiku模式
-Circumflex trigger	Keymap window		触发音调符号
-Diaeresis trigger	Keymap window		触发分音符号
-Disabled	Modifier keys window	Do nothing	禁用
-Open…	Keymap window		打开..
-Error: duplicate keys	Modifier keys window		错误：重复按键
-System:	Keymap window		系统：
-Left command	Keyboard Layout View		左侧 Command
-Set modifier keys…	Keymap window		设置修饰键…
-Option:	Modifier keys window	Option key role name	选项：
-Control	Keyboard Layout View	Control key	Control
-Left option	Keyboard Layout View		左侧 option
-Right control	Keyboard Layout View		右侧 Ctrl
-Switch shortcut keys	Keymap window		切换快捷键
-Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift 键
-User:	Keymap window		用户：
-Right option	Keyboard Layout View		右侧选项
-Right shift	Keyboard Layout View		右侧 shift 键
 Key	Modifier keys window	As in a computer keyboard key	按键
+Right control	Keyboard Layout View		右侧 Ctrl
+Option:	Modifier keys window	Option key role name	选项：
+Cancel	Modifier keys window		取消
+Sample and clipboard:	Keymap window		示例和剪贴板：
+Num lock	Keyboard Layout View		Mum 锁
+Switch shortcut keys to Windows/Linux mode	Keymap window		切换快捷键为 Windows/Linux 模式
+Option	Keyboard Layout View	Option key	选项
+Scroll lock	Keyboard Layout View		滚动锁定
+Right option	Keyboard Layout View		右侧选项
+Revert	Modifier keys window		取消
+Set modifier keys	Modifier keys window		设置修饰键
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd 键
+Command:	Modifier keys window	Command key role name	命令：
+Acute trigger	Keymap window		触发尖重音符
+Modifier keys	Modifier keys window		修饰键
+Save as…	Keymap window		保存为...
+Error: duplicate keys	Modifier keys window		错误：重复按键
+Control	Keyboard Layout View	Control key	Control
+Remove	Keyboard Layout View		删除
+Tilde trigger	Keymap window		触发颚化字符
+Shift	Keyboard Layout View	Shift key	Shift
+Left command	Keyboard Layout View		左侧 Command
+(Current)	Keymap window		（当前）
+Left option	Keyboard Layout View		左侧 option
+Warning: left and right key roles do not match	Modifier keys window		警告：左右键规则不匹配
+Circumflex trigger	Keymap window		触发音调符号
+Caps lock	Keyboard Layout View		大小写锁定
+Left shift	Keyboard Layout View		左侧 shift 键
+Left control	Keyboard Layout View		左侧 Ctrl
+Role	Modifier keys window	As in the role of a modifier key	作用
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl 键
 Control:	Modifier keys window	Control key role name	控制：
-Remove	Keyboard Layout View		删除
-Option	Keyboard Layout View	Option key	选项
-Sample and clipboard:	Keymap window		示例和剪贴板：
-Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt 键
+Disabled	Modifier keys window	Do nothing	禁用
+Select dead keys	Keymap window		选择废键：
+Right shift	Keyboard Layout View		右侧 shift 键
 Layout	Keymap window		布局
-Switch shortcut keys to Windows/Linux mode	Keymap window		切换快捷键为 Windows/Linux 模式
-Right command	Keyboard Layout View		右侧 Command键
 Revert	Keymap window		取消
-Command:	Modifier keys window	Command key role name	命令：
-Save as…	Keymap window		保存为...
-Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd 键
-File	Keymap window		文件
-Num lock	Keyboard Layout View		Mum 锁
-(Current)	Keymap window		（当前）
-Font	Keymap window		字体
+Grave trigger	Keymap window		触发雕刻字符
+Menu	Keyboard Layout View	Menu key	菜单
+Quit	Keymap window		退出
+User:	Keymap window		用户：
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt 键
+Shift:	Modifier keys window	Shift key role name	Shift：
 Keymap	System name		键盘映射
-Left shift	Keyboard Layout View		左侧 shift 键
-Shift	Keyboard Layout View	Shift key	Shift
-Set modifier keys	Modifier keys window		设置修饰键
-Modifier keys	Modifier keys window		修饰键
-Acute trigger	Keymap window		触发尖重音符
+Set modifier keys…	Keymap window		设置修饰键…
+Switch shortcut keys to Haiku mode	Keymap window		切换快捷键为Haiku模式
+Defaults	Keymap window		默认
+System:	Keymap window		系统：
+Switch shortcut keys	Keymap window		切换快捷键
+Right command	Keyboard Layout View		右侧 Command键
+Font	Keymap window		字体
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift 键
+Command	Keyboard Layout View	Command key	命令
+File	Keymap window		文件
+Diaeresis trigger	Keymap window		触发分音符号
+Open…	Keymap window		打开..

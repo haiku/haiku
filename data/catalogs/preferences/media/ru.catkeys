@@ -1,24 +1,24 @@
 1	russian	x-vnd.Haiku-Media	4205337498
-Couldn't add volume control in Deskbar: %s\n	Media views		Не удалось добавить регулятор громкости в Deskbar: %s\n
-Video input:	Media views		Видео вход:
-Warning!	Media Window		Внимание!
-Quit anyway	Media Window		Всё равно выйти
-Defaults	Media views		По умолчанию
-MIDI Settings	Media Window		Настройки MIDI
+Audio mixer	Media Window		Микшер
+Show volume control on Deskbar	Media views		Отображать регулятор громкости в Deskbar
 Quit	Media Window		Выход
-Video settings	Media Window		Настройки видео
-Video output:	Media views		Видео выход:
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Невозможно подключиться к медиа серверу.\nХотите запустить его?
 Restart media services	Media views		Перезапустить медиа службы
+Couldn't add volume control in Deskbar: %s\n	Media views		Не удалось добавить регулятор громкости в Deskbar: %s\n
+Start media server	Media Window		Запустить медиасервер
+Audio settings	Media Window		Настройки звука
+Quit anyway	Media Window		Всё равно выйти
 Couldn't remove volume control in Deskbar: %s\n	Media views		Не удалось удалить регулятор громкости из Deskbar: %s\n
 Media	System name		Медиа
-Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Закрытие медиа префлета сейчас остановит перезапуск медиа служб. В результате чего возможна нестабильная работа c медиа.
-Audio mixer	Media Window		Микшер
-This hardware has no controls.	Media Window		Это оборудование не имеет параметров настройки.
+Warning!	Media Window		Внимание!
+MIDI Settings	Media Window		Настройки MIDI
+Video output:	Media views		Видео выход:
 Audio output:	Media views		Аудио выход:
-Audio settings	Media Window		Настройки звука
-Start media server	Media Window		Запустить медиасервер
-<none>	Media views		<нет>
-Channel:	Media views		Канал:
-Show volume control on Deskbar	Media views		Отображать регулятор громкости в Deskbar
+Video input:	Media views		Видео вход:
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Закрытие медиа префлета сейчас остановит перезапуск медиа служб. В результате чего возможна нестабильная работа c медиа.
 Audio input:	Media views		Аудио вход:
+<none>	Media views		<нет>
+This hardware has no controls.	Media Window		Это оборудование не имеет параметров настройки.
+Channel:	Media views		Канал:
+Defaults	Media views		По умолчанию
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Невозможно подключиться к медиа серверу.\nХотите запустить его?
+Video settings	Media Window		Настройки видео

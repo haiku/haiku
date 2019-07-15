@@ -1,19 +1,19 @@
 1	swedish	x-vnd.Be-POST	2949558073
+No new messages	MailDaemon		inga nya meddelanden
+No new messages	DeskbarView		inga nya meddelanden
+Shutdown mail services	DeskbarView		Stäng av e-posttjänsterna
+Mail status	MailDaemon		E-post status
 Fetching mail for %name	Notifier		Hämtar e-post för %name
-Check for mails only	DeskbarView		Kontrollera bara e-post
-Send pending mails	DeskbarView		Skicka väntande meddelanden
-{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Ett nytt meddelande} other{# nya meddelanden}}
 {0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# nytt meddelande} other{# nya meddelanden}}
 {0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# nytt meddelande} other{# nya meddelanden}} för %name\n
+Create new message…	DeskbarView		Skapa nytt meddelande...
+Send pending mails	DeskbarView		Skicka väntande meddelanden
+Settings…	DeskbarView		Inställningar…
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Ett nytt meddelande} other{# nya meddelanden}}
 New Messages	MailDaemon		nya meddelanden
 <no accounts>	DeskbarView		<inga konton>
-Mail status	MailDaemon		E-post status
-Shutdown mail services	DeskbarView		Stäng av e-posttjänsterna
-Sending mail for %name	Notifier		Skickar e-post för %name
-Create new message…	DeskbarView		Skapa nytt meddelande...
-No new messages	MailDaemon		inga nya meddelanden
-Check for mail now	DeskbarView		Kontrollera e-post nu
-No new messages	DeskbarView		inga nya meddelanden
-Mail daemon status log	MailDaemon		Statuslog för e-postdemon
-Settings…	DeskbarView		Inställningar…
 Mail status	Notifier		E-post status
+Check for mails only	DeskbarView		Kontrollera bara e-post
+Check for mail now	DeskbarView		Kontrollera e-post nu
+Sending mail for %name	Notifier		Skickar e-post för %name
+Mail daemon status log	MailDaemon		Statuslog för e-postdemon

@@ -1,39 +1,36 @@
-1	english	x-vnd.Be-PRNT	4242582634
-Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		打印机：%printer_name%\n驱动：%driver%\n
-Waiting	JobListView		等待
-Print test page	PrintersWindow		打印测试页面
-page	JobListView		页面
-Cancel	AddPrinterDialog		取消
-Add printer	AddPrinterDialog		添加打印机
-Green	TestPageView		红
-Printers	PrintersWindow		打印机
-Add…	PrintersWindow		添加…
-Default Printer	PrinterListView		默认打印机
-Transport: %transport% %transport_address%	PrinterListView		传输: %transport% %transport_address%
-pages	JobListView		页
-Printers	System name		打印机
-Processing	JobListView		处理中
-Red	TestPageView		绿
-Printer name:	AddPrinterDialog		打印机名：
-Driver: %driver%	PrinterListView		驱动程序：%driver%
-Black	TestPageView		黑
-Restart job	PrintersWindow		重启任务
-Add	AddPrinterDialog		添加
-Make default	PrintersWindow		作为默认
-Transport: %transport% %transport_address%	TestPageView		传输：%transport% %transport_address%
-Cancel job	PrintersWindow		取消任务
-Yellow	TestPageView		黄
-Blue	TestPageView		蓝
+1	english	x-vnd.Be-PRNT	2786813915
 Remove	PrintersWindow		删除
+Red	TestPageView		绿
+Default Printer	PrinterListView		默认打印机
 <pick one>	AddPrinterDialog		<选择一个>
-Print jobs for 	PrintersWindow		打印任务
-Failed	JobListView		失败
-%.2f KB	JobListView		%.2f KB
-Magenta	TestPageView		品红
-Completed	JobListView		完成
-No printer found!	TransportMenu		未发现打印机！
-Print jobs: No printer selected	PrintersWindow		打印任务：未选中打印机
-Cyan	TestPageView		青
-Unknown status	JobListView		未知状态
 Connected to:	AddPrinterDialog		连接到：
+Make default	PrintersWindow		作为默认
+Cyan	TestPageView		青
+Completed	JobListView		完成
+Transport: %transport% %transport_address%	PrinterListView		传输: %transport% %transport_address%
+Failed	JobListView		失败
+Blue	TestPageView		蓝
+Waiting	JobListView		等待
+Processing	JobListView		处理中
+Cancel	AddPrinterDialog		取消
+Unknown status	JobListView		未知状态
+Add printer	AddPrinterDialog		添加打印机
+Printers	PrintersWindow		打印机
+No printer found!	TransportMenu		未发现打印机！
+Add…	PrintersWindow		添加…
+Magenta	TestPageView		品红
+Transport: %transport% %transport_address%	TestPageView		传输：%transport% %transport_address%
+Add	AddPrinterDialog		添加
+Print jobs: No printer selected	PrintersWindow		打印任务：未选中打印机
+Printer name:	AddPrinterDialog		打印机名：
+Yellow	TestPageView		黄
+Black	TestPageView		黑
 Printer type:	AddPrinterDialog		打印机类型：
+Printers	System name		打印机
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		打印机：%printer_name%\n驱动：%driver%\n
+Green	TestPageView		红
+Print test page	PrintersWindow		打印测试页面
+Restart job	PrintersWindow		重启任务
+Driver: %driver%	PrinterListView		驱动程序：%driver%
+Cancel job	PrintersWindow		取消任务
+%.2f KB	JobListView		%.2f KB

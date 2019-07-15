@@ -1,88 +1,88 @@
 1	korean	x-vnd.Haiku-Bluetooth	3550394259
-Display	DeviceClass		디스플레이
-Capturing	DeviceClass		갈무리중
-Printer	DeviceClass		프린터
-Uncategorized	DeviceClass		분류가 안됨
-1-17% utilized	DeviceClass		1-17% 활용
 Positioning	DeviceClass		위치잡이
-Rendering	DeviceClass		렌더링
-Phone	DeviceClass		전화기
-17-33% utilized	DeviceClass		17-33% 활용
-#ServerNotReady#Not Valid name	RemoteDevice		#서버가 준비가 안됨#올바른 이름이 아님
-Combo keyboard/pointing device	DeviceClass		콤보 키보드/위치 결정 장치
 Controller	DeviceClass		컨트롤러
-No service available	DeviceClass		가능한 서비스가 없음
-Wearable	DeviceClass	A wearable computer	착용가능한 컴퓨터
-Handheld	DeviceClass		포켓용 컴퓨터 
-Invalid device class!\n	DeviceClass		올바르지 않은 장치 클래스!\n
-Sensing device	DeviceClass		검출 장치
-Computer	DeviceClass		컴퓨터
-Cellular	DeviceClass		무선 전화기
-Microphone	DeviceClass		마이크
-Unknown (reserved) minor device class	DeviceClass		알 수 없는 (예약된) 마이너 장치 클래스
-Cordless	DeviceClass		무선
 Common ISDN access	DeviceClass		공용 종합 정보 통신망 연결
-83-99% utilized	DeviceClass		83-99% 활용
-Scanner	DeviceClass		스캐너
-Game	DeviceClass		게임기
-Gamepad	DeviceClass		게임패드
-(reserved)	DeviceClass		(예약됨)
-Desktop workstation	DeviceClass		데스크탑 워크스테이션
-Audio/Video	DeviceClass		오디오/비디오
-Glasses	DeviceClass		안경
+Unknown (reserved) minor device class	DeviceClass		알 수 없는 (예약된) 마이너 장치 클래스
+Uncategorized	DeviceClass		분류가 안됨
 Keyboard	DeviceClass		키보드
-Camera	DeviceClass		카메라
-Major class: 	DeviceClass		메이저 클래스:
-50-67% utilized	DeviceClass		50-67% 활용
-Card reader	DeviceClass		카드 리더기
-Set-top box	DeviceClass		셋톱 박스
-Helmet	DeviceClass		헬멧
-Laptop	DeviceClass		랩탑
-Car audio	DeviceClass		차량 오디오 장치
-SIM card reader	DeviceClass		SIM 카드 리더기
-Headphones	DeviceClass		헤드폰
-Information	DeviceClass		정보
-Remote control	DeviceClass		리모콘
-Service classes: 	DeviceClass		서비스 클래스:
-Pager	DeviceClass	A small radio device to receive short text messages	무선 호출기(삐삐)
-Object transfer	DeviceClass		물체 이동기
-Gaming/Toy	DeviceClass		게이밍/장난감
-Audio	DeviceClass		오디오
-Robot	DeviceClass		로봇
-Camcorder	DeviceClass		캠코더
-Digitizer tablet	DeviceClass		디지타이저 태블릿
-Loudspeaker	DeviceClass		스피커
-Joystick	DeviceClass		조이스틱
-LAN access	DeviceClass		근거리 통신망 연결
-Wrist watch	DeviceClass		손목 시계
-Minor class: 	DeviceClass		마이너 클래스:
-Networking	DeviceClass		네트워킹
-Portable audio	DeviceClass		휴대용 오디오
-Device conforms to the headset profile	DeviceClass		헤드셋 프로파일을 지키는 장치
-Hands-free	DeviceClass		핸즈프리
-#CommandFailed#Not Valid name	RemoteDevice		#명령 실패함#올바르지 않은 이름
-Vehicle	DeviceClass		차령
-Palm	DeviceClass	A palm-held device	손바닥 크기의 장치
-Video display and loudspeaker	DeviceClass		비디오 디스플레이와 스피커
-Peripheral	DeviceClass		주변 장치
-#NoOwnerError#Not Valid name	RemoteDevice		#소유자가 없는 에러#올바른 이름이 아님
-Wired modem or voice gateway	DeviceClass		유선 모뎀이나 음성 게이트웨이
-Jacket	DeviceClass		재킷
-Unspecified	DeviceClass		명시되지 않음
-Fully available	DeviceClass		충분히 가능
-67-83% utilized	DeviceClass		67-83% 활용
-Not implemented	RemoteDevice		구현 안됨
-#NotCompletedRequest#Not Valid name	RemoteDevice		#완료되지 않은 요청#올바르지 않은 이름
-Server	DeviceClass		서버
-Video conferencing	DeviceClass		화상 회의 시스템 
-Video camera	DeviceClass		비디오 카메라
-HiFi audio device	DeviceClass		하이파이 오디오 장치
 Smart phone	DeviceClass		스마트폰
-Telephony	DeviceClass		전화
-Doll/Action figure	DeviceClass		인형/액션 피규어
 VCR	DeviceClass		비디오 카세트 녹화기
-Video monitor	DeviceClass		비디오 모니터
-Pointing device	DeviceClass		위치 결정 장치
-Miscellaneous	DeviceClass		기타 장치
-33-50% utilized	DeviceClass		33-50% 활용
+Cellular	DeviceClass		무선 전화기
+Audio	DeviceClass		오디오
+Audio/Video	DeviceClass		오디오/비디오
+Car audio	DeviceClass		차량 오디오 장치
+Major class: 	DeviceClass		메이저 클래스:
+HiFi audio device	DeviceClass		하이파이 오디오 장치
+Microphone	DeviceClass		마이크
+Capturing	DeviceClass		갈무리중
+Jacket	DeviceClass		재킷
+50-67% utilized	DeviceClass		50-67% 활용
+Headphones	DeviceClass		헤드폰
 Imaging	DeviceClass		이미징
+Device conforms to the headset profile	DeviceClass		헤드셋 프로파일을 지키는 장치
+Remote control	DeviceClass		리모콘
+Fully available	DeviceClass		충분히 가능
+#CommandFailed#Not Valid name	RemoteDevice		#명령 실패함#올바르지 않은 이름
+Server	DeviceClass		서버
+No service available	DeviceClass		가능한 서비스가 없음
+Printer	DeviceClass		프린터
+Card reader	DeviceClass		카드 리더기
+Wired modem or voice gateway	DeviceClass		유선 모뎀이나 음성 게이트웨이
+#ServerNotReady#Not Valid name	RemoteDevice		#서버가 준비가 안됨#올바른 이름이 아님
+#NoOwnerError#Not Valid name	RemoteDevice		#소유자가 없는 에러#올바른 이름이 아님
+Camcorder	DeviceClass		캠코더
+#NotCompletedRequest#Not Valid name	RemoteDevice		#완료되지 않은 요청#올바르지 않은 이름
+17-33% utilized	DeviceClass		17-33% 활용
+Desktop workstation	DeviceClass		데스크탑 워크스테이션
+Unspecified	DeviceClass		명시되지 않음
+Miscellaneous	DeviceClass		기타 장치
+Robot	DeviceClass		로봇
+Vehicle	DeviceClass		차령
+LAN access	DeviceClass		근거리 통신망 연결
+Glasses	DeviceClass		안경
+Phone	DeviceClass		전화기
+Laptop	DeviceClass		랩탑
+67-83% utilized	DeviceClass		67-83% 활용
+Cordless	DeviceClass		무선
+Invalid device class!\n	DeviceClass		올바르지 않은 장치 클래스!\n
+Minor class: 	DeviceClass		마이너 클래스:
+Doll/Action figure	DeviceClass		인형/액션 피규어
+Not implemented	RemoteDevice		구현 안됨
+33-50% utilized	DeviceClass		33-50% 활용
+Gaming/Toy	DeviceClass		게이밍/장난감
+Video camera	DeviceClass		비디오 카메라
+Handheld	DeviceClass		포켓용 컴퓨터 
+Service classes: 	DeviceClass		서비스 클래스:
+Loudspeaker	DeviceClass		스피커
+83-99% utilized	DeviceClass		83-99% 활용
+SIM card reader	DeviceClass		SIM 카드 리더기
+Computer	DeviceClass		컴퓨터
+Scanner	DeviceClass		스캐너
+Wearable	DeviceClass	A wearable computer	착용가능한 컴퓨터
+Display	DeviceClass		디스플레이
+Gamepad	DeviceClass		게임패드
+Video monitor	DeviceClass		비디오 모니터
+Palm	DeviceClass	A palm-held device	손바닥 크기의 장치
+Joystick	DeviceClass		조이스틱
+Networking	DeviceClass		네트워킹
+Telephony	DeviceClass		전화
+Game	DeviceClass		게임기
+Video display and loudspeaker	DeviceClass		비디오 디스플레이와 스피커
+Wrist watch	DeviceClass		손목 시계
+Sensing device	DeviceClass		검출 장치
+Pointing device	DeviceClass		위치 결정 장치
+(reserved)	DeviceClass		(예약됨)
+Rendering	DeviceClass		렌더링
+Information	DeviceClass		정보
+Helmet	DeviceClass		헬멧
+Pager	DeviceClass	A small radio device to receive short text messages	무선 호출기(삐삐)
+Hands-free	DeviceClass		핸즈프리
+Digitizer tablet	DeviceClass		디지타이저 태블릿
+Portable audio	DeviceClass		휴대용 오디오
+Camera	DeviceClass		카메라
+1-17% utilized	DeviceClass		1-17% 활용
+Combo keyboard/pointing device	DeviceClass		콤보 키보드/위치 결정 장치
+Video conferencing	DeviceClass		화상 회의 시스템 
+Peripheral	DeviceClass		주변 장치
+Object transfer	DeviceClass		물체 이동기
+Set-top box	DeviceClass		셋톱 박스

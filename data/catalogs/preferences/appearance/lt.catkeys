@@ -1,68 +1,67 @@
-1	lithuanian	x-vnd.Haiku-Appearance	3908707383
-Plain font:	Font view		Paprastas šriftas:
-Control highlight	Colors tab		Valdiklių paryškinimas
+1	lithuanian	x-vnd.Haiku-Appearance	1992724537
 Control border	Colors tab		Valdiklių rėmeliai
-Antialiasing type:	AntialiasingSettingsView		Glodinimo būdas:
-Shadow	Colors tab		Šešėliai
-On	AntialiasingSettingsView		įjungta
-Defaults	APRWindow		Numatytosios reikšmės
-Grayscale	AntialiasingSettingsView		pilkumo tonai
-Shine	Colors tab		Švytėjimas
-About	DecorSettingsView		Apie
-About decorator	DecorSettingsView		Apie dekoruoklį
 Off	AntialiasingSettingsView		išjungta
-Choose Decorator	DecorSettingsView		Išsirinkite dekoruoklį
-Success	Colors tab		Sėkminga baigtis
-Inactive window tab text	Colors tab		Neaktyvių langų antraščių tekstas
-Failure	Colors tab		Nesėkminga baigtis
-Hinting menu	AntialiasingSettingsView		Taškinės korekcijos meniu
-Scroll bar:	DecorSettingsView		Slankjuostės:
+Window border	Colors tab		Veikiamojo lango rėmelis
+Inactive window tab	Colors tab		Foninių lango antraštės
+Defaults	APRWindow		Numatytosios reikšmės
+Shadow	Colors tab		Šešėliai
 Document background	Colors tab		Dokumento fonas
+List background	Colors tab		Sąrašo fonas
+Fixed font:	Font view		Lygiaplotis šriftas:
+Appearance	System name		Išvaizda
+Reduce colored edges filter strength:	AntialiasingSettingsView		Spalvotų kraštų filtro intensyvumas:
+Glyph hinting:	AntialiasingSettingsView		Rašmenų taškinė korekcija:
+Menu item text	Colors tab		Meniu elementų tekstas
+About decorator	DecorSettingsView		Apie dekoruoklį
+Antialiasing menu	AntialiasingSettingsView		Glodinimo meniu
+Success	Colors tab		Sėkminga baigtis
+About	DecorSettingsView		Apie
+Shine	Colors tab		Švytėjimas
+Arrow style	DecorSettingsView		Rodyklės stilius
+On	AntialiasingSettingsView		įjungta
+Decorator:	DecorSettingsView		Dekoruoklis:
+Menu background	Colors tab		Meniu fonas
 Revert	APRWindow		Atšaukti pakeitimus
-Window tab	Colors tab		Veikiamojo lango antraštė
-Tooltip background	Colors tab		Iškylančiųjų paaiškinimų fonas
+List item text	Colors tab		Sąrašo elemento tekstas
+OK	DecorSettingsView		Gerai
+Control text	Colors tab		Valdiklių tekstas
+Look and feel	APRWindow		Išvaizda ir jausena
 Selected menu item background	Colors tab		Veikiamojo meniu elemento fonas
 Antialiasing	APRWindow		Glodinimas
-Navigation base	Colors tab		Veikiamojo elemento (židinio) rėmelis
-Selected list item text	Colors tab		Veikiamojo meniu elemento tekstas
-Window border	Colors tab		Veikiamojo lango rėmelis
-Double:	DecorSettingsView		Dvigubas:
-Window tab text	Colors tab		Veikiamojo lango antraštės tekstas
-Document text	Colors tab		Dokumento tekstas
-Navigation pulse	Colors tab		Veikiamojo elemento (židinio) žybsniai
-Selected menu item text	Colors tab		Veikiamojo meniu elemento tekstas
-Menu background	Colors tab		Meniu fonas
-List background	Colors tab		Sąrašo fonas
-OK	DecorSettingsView		Gerai
-Size:	Font Selection view		Dydis:
-Decorator:	DecorSettingsView		Dekoruoklis:
-Selected list item background	Colors tab		Pasirinktojo sąrašo elemento fonas
-Panel background	Colors tab		Skydelių fonas
 Menu font:	Font view		Meniu šriftas:
-Colors	APRWindow		Spalvos
-Control background	Colors tab		Valdiklių fonas
-Inactive window tab	Colors tab		Foninių lango antraštės
-List item text	Colors tab		Sąrašo elemento tekstas
-Appearance	System name		Išvaizda
-Fixed font:	Font view		Lygiaplotis šriftas:
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Įlinkdama fechtuotojo špaga sublykčiojusi pragręžė apvalų arbūzą.
-%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutoriai:\n\t%decorAuthors\n\nTinklalapis: %decorURL\nLicencija: %decorLic\n\n%decorDesc\n
-Reduce colored edges filter strength:	AntialiasingSettingsView		Spalvotų kraštų filtro intensyvumas:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Subpikselinis glodinimas kartu su taškine korekcija šioje „Haiku“ versijoje yra neprieinamas, dėl galimų patentinių problemų. Norėdami įjungti šią galimybę, turite savarankiškai sukompiliuoti „Haiku“, įjungdami atitinkamas savybes „FreeType“ bibliotekos (libfreetype) antraštiniame derinimo faile.
-Scroll bar thumb	Colors tab		Slankiklis
-Control text	Colors tab		Valdiklių tekstas
-Single:	DecorSettingsView		Viengubas:
-Tooltip text	Colors tab		Iškylančiųjų paaiškinimų tekstas
 Bold font:	Font view		Pastorintas šriftas:
-Inactive window border	Colors tab		Foninių langų rėmeliai
-Menu item text	Colors tab		Meniu elementų tekstas
-LCD subpixel	AntialiasingSettingsView		subpikselinis LCD
-Selected menu item border	Colors tab		Veikiamojo meniu elemento rėmelis
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutoriai:\n\t%decorAuthors\n\nTinklalapis: %decorURL\nLicencija: %decorLic\n\n%decorDesc\n
+Choose Decorator	DecorSettingsView		Išsirinkite dekoruoklį
 Strong	AntialiasingSettingsView		Intensyvus
-Panel text	Colors tab		Skydelių tekstas
-Arrow style	DecorSettingsView		Rodyklės stilius
-Monospaced fonts only	AntialiasingSettingsView		tik lygiapločių šriftų
-Look and feel	APRWindow		Išvaizda ir jausena
-Antialiasing menu	AntialiasingSettingsView		Glodinimo meniu
+Failure	Colors tab		Nesėkminga baigtis
+Double:	DecorSettingsView		Dvigubas:
+Selected menu item text	Colors tab		Veikiamojo meniu elemento tekstas
+Size:	Font Selection view		Dydis:
+Panel background	Colors tab		Skydelių fonas
+Plain font:	Font view		Paprastas šriftas:
+Window tab text	Colors tab		Veikiamojo lango antraštės tekstas
+Navigation pulse	Colors tab		Veikiamojo elemento (židinio) žybsniai
+LCD subpixel	AntialiasingSettingsView		subpikselinis LCD
+Window tab	Colors tab		Veikiamojo lango antraštė
+Tooltip background	Colors tab		Iškylančiųjų paaiškinimų fonas
+Scroll bar thumb	Colors tab		Slankiklis
+Selected menu item border	Colors tab		Veikiamojo meniu elemento rėmelis
+Tooltip text	Colors tab		Iškylančiųjų paaiškinimų tekstas
+Control background	Colors tab		Valdiklių fonas
+Selected list item text	Colors tab		Veikiamojo meniu elemento tekstas
+Selected list item background	Colors tab		Pasirinktojo sąrašo elemento fonas
+Inactive window tab text	Colors tab		Neaktyvių langų antraščių tekstas
+Navigation base	Colors tab		Veikiamojo elemento (židinio) rėmelis
 Fonts	APRWindow		Šriftai
-Glyph hinting:	AntialiasingSettingsView		Rašmenų taškinė korekcija:
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Įlinkdama fechtuotojo špaga sublykčiojusi pragręžė apvalų arbūzą.
+Grayscale	AntialiasingSettingsView		pilkumo tonai
+Antialiasing type:	AntialiasingSettingsView		Glodinimo būdas:
+Panel text	Colors tab		Skydelių tekstas
+Hinting menu	AntialiasingSettingsView		Taškinės korekcijos meniu
+Scroll bar:	DecorSettingsView		Slankjuostės:
+Monospaced fonts only	AntialiasingSettingsView		tik lygiapločių šriftų
+Document text	Colors tab		Dokumento tekstas
+Inactive window border	Colors tab		Foninių langų rėmeliai
+Colors	APRWindow		Spalvos
+Control highlight	Colors tab		Valdiklių paryškinimas
+Single:	DecorSettingsView		Viengubas:

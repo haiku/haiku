@@ -1,31 +1,30 @@
-1	romanian	x-vnd.Haiku-PPMTranslator	2233502290
-Version %d.%d.%d, %s	PPMTranslator		Versiune %d.%d.%d, %s
+1	romanian	x-vnd.Haiku-PPMTranslator	292474603
+None	PPMTranslator		Nimic
 PPM Settings	PPMMain		Configurări PPM
-Based on PPMTranslator sample code	PPMTranslator		Bazat pe cod mostră PPMTranslator
-OK	PPMMain		OK
+System palette 8 bits	PPMTranslator		Paletă de sistem 8 biți
+Sample code copyright 1999, Be Incorporated	PPMTranslator		Cod mostră Copyright 1999, Be Incorporated
+Something is wrong with the PPMTranslator!	PPMMain		Ceva nu e în regulă cu PPMTranslator!
 Grayscale 8 bits	PPMTranslator		Scală de gri 8 biți
+Based on PPMTranslator sample code	PPMTranslator		Bazat pe cod mostră PPMTranslator
+RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 biți big-endian
+PPM image translator	PPMTranslator		Traducător imagine PPM
+Bitmap 1 bit	PPMTranslator		Bitmap 1 bit
+RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 biți big-endian
+PPMTranslator Settings	PPMTranslator		Configurări PPMTranslator
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 biți
+OK	PPMMain		OK
+CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 biți
 PPM image	PPMTranslator		Imagine PPM
+Input color space:	PPMTranslator		Intrare spațiu culoare:
+RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 biți big-endian
+RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 biți big-endian
+Write ASCII	PPMTranslator		Scrie ASCII
+RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 biți
+RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 biți big-endian
+RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 biți
+Version %d.%d.%d, %s	PPMTranslator		Versiune %d.%d.%d, %s
+CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 biți
+RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 biți
+RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 biți
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 bițî
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Format Bitmap Be (PPMTranslator)
-CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 biți
-Input color space:	PPMTranslator		Intrare spațiu culoare:
-CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 biți
-PPM image translator	PPMTranslator		Traducător imagine PPM
-bits/space	PPMTranslator		biți/spațiu
-RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 biți big-endian
-RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 biți big-endian
-RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 biți big-endian
-RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 biți
-Write ASCII	PPMTranslator		Scrie ASCII
-RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 biți
-None	PPMTranslator		Nimic
-RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 biți big-endian
-RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 biți
-Bitmap 1 bit	PPMTranslator		Bitmap 1 bit
-RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 biți big-endian
-RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 biți
-Sample code copyright 1999, Be Incorporated	PPMTranslator		Cod mostră Copyright 1999, Be Incorporated
-PPMTranslator Settings	PPMTranslator		Configurări PPMTranslator
-Something is wrong with the PPMTranslator!	PPMMain		Ceva nu e în regulă cu PPMTranslator!
-System palette 8 bits	PPMTranslator		Paletă de sistem 8 biți

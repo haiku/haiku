@@ -1,17 +1,17 @@
 1	polish	x-vnd.Haiku-keystore_server	2429996361
-This application hasn't been granted access before.	AppAccessRequestWindow		Ta aplikacji nie otrzymała jeszcze dostępu.
-Unlock	KeyRequestWindow		Odblokuj
-This application has been updated since it was last granted access.	AppAccessRequestWindow		Ta aplikacja została zaktualizowana od czasu otrzymania dostępu.
-Allow always	AppAccessRequestWindow		Pozwól zawsze
-Application keyring access	AppAccessRequestWindow		Dostęp do portfela
 to perform the following action:\n%accessString%\n\n	AppAccessRequestWindow		aby wykonać następującą akcję:\n%accessString%\n\n
-The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		Aplikacja:\n%signature% (%path%)\n\n
 This application doesn't yet have the required privileges.	AppAccessRequestWindow		Ta aplikacja nie posiada jeszcze wymaganych uprawnień.
-Password:	KeyRequestWindow		Hasło:
-Cancel	KeyRequestWindow		Anuluj
 Keyring:	KeyRequestWindow		Portfel:
+requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		prosi o dostęp do portfela:\n%keyringName%\n\n
+Application keyring access	AppAccessRequestWindow		Dostęp do portfela
+Disallow	AppAccessRequestWindow		Nie pozwalaj
+Allow once	AppAccessRequestWindow		Pozwól raz
 Unlock keyring	KeyRequestWindow		Odblokuj portfel
 An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		Aplikacja prosi o dostęp do poniższego portfela, ale jest on zabezpieczony hasłem. Wprowadź je, aby odblokować portfel.\nJeśli odblokujesz portfel, pozostanie on otwarty dopóki system nie zostanie zamknięty, lub dopóki nie zostanie zablokowany ręcznie.\nJeśli anulujesz, portfel pozostanie zablokowany.
-Allow once	AppAccessRequestWindow		Pozwól raz
-Disallow	AppAccessRequestWindow		Nie pozwalaj
-requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		prosi o dostęp do portfela:\n%keyringName%\n\n
+Password:	KeyRequestWindow		Hasło:
+Cancel	KeyRequestWindow		Anuluj
+This application has been updated since it was last granted access.	AppAccessRequestWindow		Ta aplikacja została zaktualizowana od czasu otrzymania dostępu.
+Allow always	AppAccessRequestWindow		Pozwól zawsze
+Unlock	KeyRequestWindow		Odblokuj
+The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		Aplikacja:\n%signature% (%path%)\n\n
+This application hasn't been granted access before.	AppAccessRequestWindow		Ta aplikacji nie otrzymała jeszcze dostępu.

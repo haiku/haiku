@@ -1,4 +1,4 @@
 1	english	x-vnd.Haiku-SystemLogger	57960782
-%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\n该后台进程用于采集所有系统消息，并将其写入系统日志 \"%s\"。\n\n
-OK	SyslogDaemon		确定
 Syslog Daemon	SyslogDaemon		Syslog 后台
+OK	SyslogDaemon		确定
+%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\n该后台进程用于采集所有系统消息，并将其写入系统日志 \"%s\"。\n\n

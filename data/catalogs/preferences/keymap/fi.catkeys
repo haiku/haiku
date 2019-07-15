@@ -1,127 +1,127 @@
 1	finnish	x-vnd.Haiku-Keymap	1039047705
-Croatian	KeymapNames		Kroatialainen
-Turkish (Type-Q)	KeymapNames		Turkkilainen (Type-Q)
-Icelandic	KeymapNames		Islantilainen
-Serbian (Cyrillic)	KeymapNames		Serbialainen (kyrillinen)
-Shift:	Modifier keys window	Shift key role name	Vaihtonäppäin:
-Revert	Modifier keys window		Palauta
-Estonian	KeymapNames		Eestiläinen
-Canadian-French	KeymapNames		Kanadalaisranskalainen
-Warning: left and right key roles do not match	Modifier keys window		Varoitus: vasemman ja oikean näppäimen roolit eivät täsmää
-Romanian	KeymapNames		Romanialainen
-Scroll lock	Keyboard Layout View		Vierityslukko
-Menu	Keyboard Layout View	Menu key	Valikko
-Left control	Keyboard Layout View		Vasen control-näppäin
-Tilde trigger	Keymap window		Aaltoviivaliipaisin
-Bulgarian (Phonetic)	KeymapNames		Bulgarialainen (foneettinen)
-Hungarian	KeymapNames		Unkarilainen
-Grave trigger	Keymap window		Gravisliipaisin
-Brazilian (ABNT2)	KeymapNames		Brasilialainen (ABNT2)
-Polish	KeymapNames		Puolalainen
-Role	Modifier keys window	As in the role of a modifier key	Rooli
-Caps lock	Keyboard Layout View		Vaihtolukko
-Spanish (Dvorak)	KeymapNames		Espanjalainen (Dvorak)
-Select dead keys	Keymap window		Valitse kuolleet näppäimet
-Belgian (point)	KeymapNames		Belgialainen (piste)
-Hebrew	KeymapNames		Heprealainen
-Russian (Mac)	KeymapNames		Venäläinen (Mac)
-United-Kingdom	KeymapNames		Isobritannialainen
-Swiss-French	KeymapNames		Sveitsiläisranskalainen
-Cancel	Modifier keys window		Peru
-Danish	KeymapNames		Tanskalainen
-Lithuanian	KeymapNames		Liettualainen
-Spanish	KeymapNames		Espanjalainen
-Command	Keyboard Layout View	Command key	Komento
-Macedonian	KeymapNames		Makedonialainen
-Irish	KeymapNames		Irlantilainen
-French (Mac)	KeymapNames		Ranskalainen (Mac)
-German (Mac)	KeymapNames		Saksalainen (Mac)
-Defaults	Keymap window		Oletukset
-Ukrainian (Mac)	KeymapNames		Ukrainalainen (Mac)
-Japanese	KeymapNames		Japanilainen
-Quit	Keymap window		Poistu
-Switch shortcut keys to Haiku mode	Keymap window		Vaihda pikanäppäimet Haiku-tilaan
-French (Bépo)	KeymapNames		Ranskalainen (Bépo)
-Circumflex trigger	Keymap window		Sirkumfleksiliipaisin
-Diaeresis trigger	Keymap window		Treemaliipaisin
-Ukrainian	KeymapNames		Ukrainalainen
-Disabled	Modifier keys window	Do nothing	Poissa käytöstä
-Dvorak (programmer's)	KeymapNames		Dvorak (ohjelmoijan)
-ISO-9995	KeymapNames		ISO-9995
-Albanian	KeymapNames		Albanialainen
-Open…	Keymap window		Avaa…
-Greek	KeymapNames		Kreikkalainen
-Error: duplicate keys	Modifier keys window		Virhe: kaksinkertaiset avaimet
-System:	Keymap window		Järjestelmä:
-Lithuanian (Standard)	KeymapNames		Liettualainen (vakio)
-Brazilian	KeymapNames		Brasilialainen
-Left command	Keyboard Layout View		Alt-näppäin
-Set modifier keys…	Keymap window		Aseta muuntonäppäimet...
-Option:	Modifier keys window	Option key role name	Valitsin:
-Belgian (comma)	KeymapNames		Belgialaienn (pilkku)
-Control	Keyboard Layout View	Control key	Control-näppäin
-Left option	Keyboard Layout View		Vasen valitsin
-Faeroese	KeymapNames		Färsaarelainen
-Right control	Keyboard Layout View		Oikea control-näppäin
-Svorak	KeymapNames		Svorak
-Switch shortcut keys	Keymap window		Vaihda pikanäppäimiä
-Russian (Udmurt, Komi, Mari)	KeymapNames		Venäläinen (udmurttilainen, komilainen, marilainen)
-German	KeymapNames		Saksalainen
-Swedish	KeymapNames		Ruotsalainen
-Russian	KeymapNames		Venäläinen
-Arabic (102)	KeymapNames		Arabialainen (102)
-Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Vaihtonäppäin
-User:	Keymap window		Käyttäjä:
-Turkish (Type-F)	KeymapNames		Turkkilainen (Type-F)
-Italian	KeymapNames		Italialainen
-Belarusian	KeymapNames		Valkovenäläinen
-Right option	Keyboard Layout View		Alt Gr-näppäin
-US-International	KeymapNames		US-kansainvälinen
-Dvorak	KeymapNames		Dvorak
-Russian (Yawert)	KeymapNames		Venäläinen (Yawert)
-Right shift	Keyboard Layout View		Oikea vaihtonäppäin
-Belarusian (Latin)	KeymapNames		Valkovenäläinen (latinalainen)
 Key	Modifier keys window	As in a computer keyboard key	Näppäin
-Dutch	KeymapNames		Hollantilainen
-Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl-näppäin
-Control:	Modifier keys window	Control key role name	Ohjain:
-Russian (Typewriter)	KeymapNames		Venäläinen (kirjoituskone)
-Slovene	KeymapNames		Slovenialainen
-Remove	Keyboard Layout View		Poista
-Option	Keyboard Layout View	Option key	Valitsin
-Sample and clipboard:	Keymap window		Näyte ja leikepöytä:
-Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt-näppäin
-Layout	Keymap window		Ulkoasu
-Serbian (Latin)	KeymapNames		Serbialainen (latinalainen)
-Esperanto	KeymapNames		Esperantolainen
-Switch shortcut keys to Windows/Linux mode	Keymap window		Vaihda pikanäppäimet Windows/Linux -tilaan
-Latin-American	KeymapNames		Latinalaisamerikkalainen
-Right command	Keyboard Layout View		Oikea komentonäppäin
-Revert	Keymap window		Palauta
-Command:	Modifier keys window	Command key role name	Komento:
-Polish (Typewriter)	KeymapNames		Puolalainen (kirjoituskone)
+Japanese	KeymapNames		Japanilainen
 US	KeymapNames		US
-Save as…	Keymap window		Tallenna nimellä…
-Swiss-German	KeymapNames		Sveitsiläissaksalainen
-Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd-näppäin
-French	KeymapNames		Ranskalainen
-File	Keymap window		Tiedosto
-Num lock	Keyboard Layout View		Numerolukko
-Bulgarian (Cyrillic)	KeymapNames		Bulgarialainen (kyrillinen)
-(Current)	Keymap window		(Nykyinen)
-Kazakh	KeymapNames		Kazakstanilainen
-Colemak	KeymapNames		Colemak
-Font	Keymap window		Kirjasin
-Belarusian (Mac)	KeymapNames		Valkovenäläinen (Mac)
-Keymap	System name		Näppäimistöasetukset
-Czech (Mac)	KeymapNames		Tšekkiläinen (Mac)
-Norwegian	KeymapNames		Norjalainen
-Left shift	Keyboard Layout View		Vasen vaihtonäppäin
-Czech	KeymapNames		Tšekkiläinen
-Shift	Keyboard Layout View	Shift key	Vaihtonäppäin
-Slovak	KeymapNames		Slovakkialainen
+Brazilian	KeymapNames		Brasilialainen
+Right control	Keyboard Layout View		Oikea control-näppäin
+Dvorak	KeymapNames		Dvorak
+Option:	Modifier keys window	Option key role name	Valitsin:
+Cancel	Modifier keys window		Peru
+Sample and clipboard:	Keymap window		Näyte ja leikepöytä:
+Polish	KeymapNames		Puolalainen
+Latin-American	KeymapNames		Latinalaisamerikkalainen
+Ukrainian	KeymapNames		Ukrainalainen
+United-Kingdom	KeymapNames		Isobritannialainen
+Turkish (Type-F)	KeymapNames		Turkkilainen (Type-F)
+Serbian (Cyrillic)	KeymapNames		Serbialainen (kyrillinen)
+Belgian (point)	KeymapNames		Belgialainen (piste)
 Finnish	KeymapNames		Suomalainen
+Num lock	Keyboard Layout View		Numerolukko
+Switch shortcut keys to Windows/Linux mode	Keymap window		Vaihda pikanäppäimet Windows/Linux -tilaan
+Option	Keyboard Layout View	Option key	Valitsin
+Spanish (Dvorak)	KeymapNames		Espanjalainen (Dvorak)
+Scroll lock	Keyboard Layout View		Vierityslukko
+US-International	KeymapNames		US-kansainvälinen
+Right option	Keyboard Layout View		Alt Gr-näppäin
+Turkish (Type-Q)	KeymapNames		Turkkilainen (Type-Q)
+Revert	Modifier keys window		Palauta
+Slovak	KeymapNames		Slovakkialainen
+Colemak	KeymapNames		Colemak
+Dvorak (programmer's)	KeymapNames		Dvorak (ohjelmoijan)
+German (Mac)	KeymapNames		Saksalainen (Mac)
+Arabic (102)	KeymapNames		Arabialainen (102)
+Belarusian (Mac)	KeymapNames		Valkovenäläinen (Mac)
+Croatian	KeymapNames		Kroatialainen
 Set modifier keys	Modifier keys window		Aseta muuntonäppäimet
-Portuguese	KeymapNames		Portugalilainen
-Modifier keys	Modifier keys window		Muuntonäppäimet
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd-näppäin
+Spanish	KeymapNames		Espanjalainen
+Ukrainian (Mac)	KeymapNames		Ukrainalainen (Mac)
+Command:	Modifier keys window	Command key role name	Komento:
+French (Bépo)	KeymapNames		Ranskalainen (Bépo)
+Russian (Typewriter)	KeymapNames		Venäläinen (kirjoituskone)
 Acute trigger	Keymap window		Akuuttiaksenttiliipaisin
+Italian	KeymapNames		Italialainen
+Modifier keys	Modifier keys window		Muuntonäppäimet
+Kazakh	KeymapNames		Kazakstanilainen
+Save as…	Keymap window		Tallenna nimellä…
+Lithuanian (Standard)	KeymapNames		Liettualainen (vakio)
+Error: duplicate keys	Modifier keys window		Virhe: kaksinkertaiset avaimet
+Bulgarian (Phonetic)	KeymapNames		Bulgarialainen (foneettinen)
+Canadian-French	KeymapNames		Kanadalaisranskalainen
+Hungarian	KeymapNames		Unkarilainen
+Control	Keyboard Layout View	Control key	Control-näppäin
+Irish	KeymapNames		Irlantilainen
+Remove	Keyboard Layout View		Poista
+Tilde trigger	Keymap window		Aaltoviivaliipaisin
+Shift	Keyboard Layout View	Shift key	Vaihtonäppäin
+Czech (Mac)	KeymapNames		Tšekkiläinen (Mac)
+Macedonian	KeymapNames		Makedonialainen
+Left command	Keyboard Layout View		Alt-näppäin
+Albanian	KeymapNames		Albanialainen
+(Current)	Keymap window		(Nykyinen)
+Left option	Keyboard Layout View		Vasen valitsin
+Esperanto	KeymapNames		Esperantolainen
+Belarusian	KeymapNames		Valkovenäläinen
+Warning: left and right key roles do not match	Modifier keys window		Varoitus: vasemman ja oikean näppäimen roolit eivät täsmää
+Circumflex trigger	Keymap window		Sirkumfleksiliipaisin
+Caps lock	Keyboard Layout View		Vaihtolukko
+Left shift	Keyboard Layout View		Vasen vaihtonäppäin
+Russian (Yawert)	KeymapNames		Venäläinen (Yawert)
+Bulgarian (Cyrillic)	KeymapNames		Bulgarialainen (kyrillinen)
+Left control	Keyboard Layout View		Vasen control-näppäin
+Swedish	KeymapNames		Ruotsalainen
+Role	Modifier keys window	As in the role of a modifier key	Rooli
+German	KeymapNames		Saksalainen
+Svorak	KeymapNames		Svorak
+Swiss-German	KeymapNames		Sveitsiläissaksalainen
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl-näppäin
+Czech	KeymapNames		Tšekkiläinen
+Russian (Udmurt, Komi, Mari)	KeymapNames		Venäläinen (udmurttilainen, komilainen, marilainen)
+Control:	Modifier keys window	Control key role name	Ohjain:
+Disabled	Modifier keys window	Do nothing	Poissa käytöstä
+Select dead keys	Keymap window		Valitse kuolleet näppäimet
+Right shift	Keyboard Layout View		Oikea vaihtonäppäin
+Russian (Mac)	KeymapNames		Venäläinen (Mac)
+Belarusian (Latin)	KeymapNames		Valkovenäläinen (latinalainen)
+Hebrew	KeymapNames		Heprealainen
+Layout	Keymap window		Ulkoasu
+Greek	KeymapNames		Kreikkalainen
+Revert	Keymap window		Palauta
+Grave trigger	Keymap window		Gravisliipaisin
+Menu	Keyboard Layout View	Menu key	Valikko
+Faeroese	KeymapNames		Färsaarelainen
+Quit	Keymap window		Poistu
+Polish (Typewriter)	KeymapNames		Puolalainen (kirjoituskone)
+French (Mac)	KeymapNames		Ranskalainen (Mac)
+User:	Keymap window		Käyttäjä:
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt-näppäin
+Estonian	KeymapNames		Eestiläinen
+Serbian (Latin)	KeymapNames		Serbialainen (latinalainen)
+French	KeymapNames		Ranskalainen
+Portuguese	KeymapNames		Portugalilainen
+Swiss-French	KeymapNames		Sveitsiläisranskalainen
+Shift:	Modifier keys window	Shift key role name	Vaihtonäppäin:
+Keymap	System name		Näppäimistöasetukset
+Slovene	KeymapNames		Slovenialainen
+Lithuanian	KeymapNames		Liettualainen
+Set modifier keys…	Keymap window		Aseta muuntonäppäimet...
+Switch shortcut keys to Haiku mode	Keymap window		Vaihda pikanäppäimet Haiku-tilaan
+Defaults	Keymap window		Oletukset
+ISO-9995	KeymapNames		ISO-9995
+System:	Keymap window		Järjestelmä:
+Switch shortcut keys	Keymap window		Vaihda pikanäppäimiä
+Belgian (comma)	KeymapNames		Belgialaienn (pilkku)
+Right command	Keyboard Layout View		Oikea komentonäppäin
+Norwegian	KeymapNames		Norjalainen
+Font	Keymap window		Kirjasin
+Danish	KeymapNames		Tanskalainen
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Vaihtonäppäin
+Russian	KeymapNames		Venäläinen
+Romanian	KeymapNames		Romanialainen
+Command	Keyboard Layout View	Command key	Komento
+File	Keymap window		Tiedosto
+Brazilian (ABNT2)	KeymapNames		Brasilialainen (ABNT2)
+Dutch	KeymapNames		Hollantilainen
+Diaeresis trigger	Keymap window		Treemaliipaisin
+Icelandic	KeymapNames		Islantilainen
+Open…	Keymap window		Avaa…

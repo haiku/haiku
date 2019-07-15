@@ -1,88 +1,88 @@
 1	spanish; castilian	x-vnd.Haiku-StyledEdit	727465241
-StyledEdit	System name		Edición con Estilo
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Este archivo está marcado como solo lectura. ¿Guardar cambios al documento \"%s\"? 
-Paste	Menus		Pegar
-OK	LoadAlert		Aceptar
-File	Menus		Archivo
-???	LoadAlert		¿¿¿???
-Modified	StatusView		Modificado
-Lines:	Statistics		Pauta
-Italic	Menus		Itálica
-Left	Menus		Izquierda
-Search backwards	FindandReplaceWindow		Buscar hacia atrás
-Unlock file	StatusView		Desbloquear archivo
-Size	Menus		Tamaño
-Save	QuitAlert		Guardar
-Page setup…	Menus		Configuarción de pagina...
-Print…	Menus		Imprimir...
-Can't undo	Menus		No se puede deshacer
-Save	Menus		Guardar
-Default	Menus		Predeterminado
-Replace with:	FindandReplaceWindow		Reemplazar con:
-Cancel	SaveAlert		Cancelar
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		No se puede revertir, archivo no encontrado: \"%s\".
-Case-sensitive	FindandReplaceWindow		Distinguir mayúsculas de minúsculas
-Reload	NodeMonitorAlerts		Recargar
-Replace in all windows	FindandReplaceWindow		Reemplazar en todas las ventanas
-Wrap lines	Menus		Ajustar líneas
-Quit	Menus		Quitar
-File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		El archivo \"%file%\" se removió por otra aplicación, ¿recuperarlo?
 Document statistics	Statistics		Estadísticas del documento
-Cancel	RevertToSavedAlert		Cancelar
-Autodetect	Menus		Autodetectar
-Document	Menus		Documento
-Save changes to the document \"%s\"? 	QuitAlert		¿Desea guardar los cambios realizados sobre el documento \"%s\"?
-Edit	Menus		Editar
-Revert	RevertToSavedAlert		Revertir
-Font	Menus		Tipografía
-Replace all	FindandReplaceWindow		Reemplazar todo
-Statistics…	Menus		Estadísticas...
-Default	Open_and_SaveAsPanel		Predeterminado
-Replace next	Menus		Reemplazar siguiente
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" tiene cambios sin guardar.\n¿Revertir a la última versión guardada? 
-Cancel	FindandReplaceWindow		Cancelar
-Text encoding	Menus		Codificación de texto
-Close	Menus		Cerrar
-Save	SaveAlert		Guardar
-Words:	Statistics		Palabras...
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Error cargando  \"%s\":\n\tFormato no soportado
-OK	RevertToSavedAlert		Aceptar
-Don't save	QuitAlert		No guardar
-Align	Menus		Alinear
-Color	Menus		Color
-OK	QuitAlert		Aceptar
-Open…	Menus		Abrir…
-Center	Menus		Centro
-Unable to unlock file\n\t%s	QuitAlert		No se pudo desbloquear el archivo:\n\t%s
-line %d, column %d	StatusView		Línea %d, columna %d
-OK	Statistics		OK
-New	Menus		Nuevo
-Wrap-around search	FindandReplaceWindow		Buscar desde el principio
-Bold	Menus		Negrita
-Find selection	Menus		Encontrar selección
-Find:	FindandReplaceWindow		Encontrar:
-Error saving \"%s\":\n%s	SaveAlert		Error guardando \"%s\":\n%s
-Copy	Menus		Copiar
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		No se puede revertir, archivo no encontrado: \"%s\".
 Cut	Menus		Cortar
-File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		El archivo \"%file%\" se modificó por otra aplicación, ¿recargarlo?
-Replace	FindandReplaceWindow		Reemplazar
-Find again	Menus		Buscar de nuevo
-Cancel	QuitAlert		Cancelar
-Find…	Menus		Buscar…
-Select all	Menus		Seleccionar todo
-Don't save	SaveAlert		No guardar
-Recover	NodeMonitorAlerts		Recuperar
-Error loading \"%s\":\n\t%s	LoadAlert		Error cargando \"%s\":\n\t%s
-Ignore	NodeMonitorAlerts		Ignorar
-Read-only	StatusView		Solo lectura
-Undo typing	QuitAlert		Deshacer lo escrito
+Center	Menus		Centro
+Wrap-around search	FindandReplaceWindow		Buscar desde el principio
+Page setup…	Menus		Configuarción de pagina...
 Untitled 	StyledEditWindow		Sin nombre
-OK	SaveAlert		Aceptar
+OK	Statistics		OK
 Find	FindandReplaceWindow		Buscar
-Encoding	Open_and_SaveAsPanel		Codificación
-Characters:	Statistics		Carácteres:
-Save as…	Menus		Guardar como...
-Redo typing	QuitAlert		rehacer lo escrito
-Reload…	Menus		Recargar…
+New	Menus		Nuevo
+Document	Menus		Documento
+Search backwards	FindandReplaceWindow		Buscar hacia atrás
+Find again	Menus		Buscar de nuevo
+Read-only	StatusView		Solo lectura
+Save	Menus		Guardar
+Cancel	QuitAlert		Cancelar
+Copy	Menus		Copiar
+Reload	NodeMonitorAlerts		Recargar
+line %d, column %d	StatusView		Línea %d, columna %d
+Words:	Statistics		Palabras...
+???	LoadAlert		¿¿¿???
+Recover	NodeMonitorAlerts		Recuperar
+Error saving \"%s\":\n%s	SaveAlert		Error guardando \"%s\":\n%s
+OK	RevertToSavedAlert		Aceptar
+Unlock file	StatusView		Desbloquear archivo
+Italic	Menus		Itálica
+Can't undo	Menus		No se puede deshacer
 Replace…	Menus		Reemplazar...
+File	Menus		Archivo
+Bold	Menus		Negrita
+Paste	Menus		Pegar
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		El archivo \"%file%\" se modificó por otra aplicación, ¿recargarlo?
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		El archivo \"%file%\" se removió por otra aplicación, ¿recuperarlo?
+Lines:	Statistics		Pauta
+Replace in all windows	FindandReplaceWindow		Reemplazar en todas las ventanas
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" tiene cambios sin guardar.\n¿Revertir a la última versión guardada? 
+Save	SaveAlert		Guardar
+Default	Open_and_SaveAsPanel		Predeterminado
+Cancel	RevertToSavedAlert		Cancelar
+Cancel	FindandReplaceWindow		Cancelar
+Statistics…	Menus		Estadísticas...
+Encoding	Open_and_SaveAsPanel		Codificación
+Replace all	FindandReplaceWindow		Reemplazar todo
+Close	Menus		Cerrar
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Error cargando  \"%s\":\n\tFormato no soportado
+Left	Menus		Izquierda
+Default	Menus		Predeterminado
+OK	SaveAlert		Aceptar
+Color	Menus		Color
+Save changes to the document \"%s\"? 	QuitAlert		¿Desea guardar los cambios realizados sobre el documento \"%s\"?
+StyledEdit	System name		Edición con Estilo
+Find:	FindandReplaceWindow		Encontrar:
+Undo typing	QuitAlert		Deshacer lo escrito
+Error loading \"%s\":\n\t%s	LoadAlert		Error cargando \"%s\":\n\t%s
+Don't save	SaveAlert		No guardar
+Reload…	Menus		Recargar…
+Print…	Menus		Imprimir...
+Quit	Menus		Quitar
+Redo typing	QuitAlert		rehacer lo escrito
+Ignore	NodeMonitorAlerts		Ignorar
+Wrap lines	Menus		Ajustar líneas
+Text encoding	Menus		Codificación de texto
+Unable to unlock file\n\t%s	QuitAlert		No se pudo desbloquear el archivo:\n\t%s
+Modified	StatusView		Modificado
+OK	LoadAlert		Aceptar
+Save	QuitAlert		Guardar
+Case-sensitive	FindandReplaceWindow		Distinguir mayúsculas de minúsculas
+Find selection	Menus		Encontrar selección
+Cancel	SaveAlert		Cancelar
+Find…	Menus		Buscar…
+Revert	RevertToSavedAlert		Revertir
+Size	Menus		Tamaño
+Autodetect	Menus		Autodetectar
+Replace next	Menus		Reemplazar siguiente
+OK	QuitAlert		Aceptar
+Replace with:	FindandReplaceWindow		Reemplazar con:
+Edit	Menus		Editar
+Open…	Menus		Abrir…
+Save as…	Menus		Guardar como...
+Replace	FindandReplaceWindow		Reemplazar
+Characters:	Statistics		Carácteres:
+Don't save	QuitAlert		No guardar
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Este archivo está marcado como solo lectura. ¿Guardar cambios al documento \"%s\"? 
+Align	Menus		Alinear
+Font	Menus		Tipografía
+Select all	Menus		Seleccionar todo
 Right	Menus		Derecha

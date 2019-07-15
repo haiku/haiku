@@ -1,4 +1,4 @@
 1	belarusian	x-vnd.Haiku-SystemLogger	57960782
-%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nГэты сервер дапамагае цэнтралізавана збіраць сістэмныя паведамленні і адказвае іх запіс файл пратаколу, які знаходзіцца тут: \"%s\".\n\n
-OK	SyslogDaemon		ОК
 Syslog Daemon	SyslogDaemon		Сістэмныя пратаколы
+OK	SyslogDaemon		ОК
+%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nГэты сервер дапамагае цэнтралізавана збіраць сістэмныя паведамленні і адказвае іх запіс файл пратаколу, які знаходзіцца тут: \"%s\".\n\n

@@ -1,5 +1,5 @@
 1	indonesian	x-vnd.Haiku-cmd-dstconfig	684321431
-Ask me later	dstcheck		Tanya saya nanti
-Manually adjust time…	dstcheck		Atur waktu manual...
 Keep this time	dstcheck		Simpan waktu ini
+Manually adjust time…	dstcheck		Atur waktu manual...
 Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		Perhatian!\n\nKarena perpindahan dari daylight saving time, Jam komputer anda mungkin satu jam mati.\nKomputer anda berpikir sekarang adalah %current time%.\n\nApakah ini waktu yang benar?
+Ask me later	dstcheck		Tanya saya nanti

@@ -1,20 +1,20 @@
 1	spanish; castilian	x-vnd.mmu_man.filepanel	1802971238
 display a load/save file panel\n	FilePanelApp		Despliega un panel Cargar/Guardar archivo\n
-options:\n	FilePanelApp		opciones:\n
-usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		Uso: %s [--help (ayuda)] [--directory folder (carpeta)] [--load]|--save (cargar o guardar)] [--title ttl (título)] [--single (solo)] [--modal] [--allow pattern (permitir patrón)] [--forbid pattern (prohibir patrón)]\n
--k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tkind (clase o tclase) de entradas que se pueden abrir (sabor): cualquier combinación de "f,d,s" (archivo (predeterminado), directorio, enlace simbólico)\n
-usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		Uso: %s [-h] [-d archivo] [-l|-s] [-t ttl] [-1] [-m] [-a diseño [-f diseño]\n
--d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directorio\tabierto en <folder>\n
-%s not a valid option\n	FilePanelApp		%s opción inválida\n
 short\tlong\tdescription\n	FilePanelApp		Corto\tlargo\tdescripción\n
-%s: this option requires a parameter\n	FilePanelApp		%s: esta opción requiere un parámetro\n
--l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-1\t--load\t(cargar) usar un panel cargar del tipo FilePanel (predeterminado)\n
--f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\t(prohibir) sin implementar\n
+%s not a valid option\n	FilePanelApp		%s opción inválida\n
 -s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\t(guardar) usar usa un panel guardar del tipo FilePanel\n
--n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\t(nombre) fija el nombre predeterminado para guardar\n
--m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\thace modal al FilePanel\n
+%s: this option requires a parameter\n	FilePanelApp		%s: esta opción requiere un parámetro\n
 -h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\t(ayuda) presenta el modo de uso\n
--a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\t(permitir) sin implementar\n
--1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\t(solo) permitir que solo se pueda seleccionar 1 archivo\n
--t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\t(titulo) establece el título de la ventana FilePanel\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-1\t--load\t(cargar) usar un panel cargar del tipo FilePanel (predeterminado)\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\t(nombre) fija el nombre predeterminado para guardar\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tkind (clase o tclase) de entradas que se pueden abrir (sabor): cualquier combinación de "f,d,s" (archivo (predeterminado), directorio, enlace simbólico)\n
 %s: UNIMPLEMENTED\n	FilePanelApp		%s: SIN IMPLEMENTAR\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\t(titulo) establece el título de la ventana FilePanel\n
+-f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\t(prohibir) sin implementar\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		Uso: %s [-h] [-d archivo] [-l|-s] [-t ttl] [-1] [-m] [-a diseño [-f diseño]\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\t(solo) permitir que solo se pueda seleccionar 1 archivo\n
+-a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\t(permitir) sin implementar\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\thace modal al FilePanel\n
+options:\n	FilePanelApp		opciones:\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directorio\tabierto en <folder>\n
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		Uso: %s [--help (ayuda)] [--directory folder (carpeta)] [--load]|--save (cargar o guardar)] [--title ttl (título)] [--single (solo)] [--modal] [--allow pattern (permitir patrón)] [--forbid pattern (prohibir patrón)]\n

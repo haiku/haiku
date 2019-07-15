@@ -1,74 +1,73 @@
-1	german	x-vnd.Haiku-Appearance	2499598353
-Plain font:	Font view		Normal:
-Control highlight	Colors tab		Steuerelement - Ausgewählt
+1	german	x-vnd.Haiku-Appearance	583615507
 Control border	Colors tab		Steuerelement - Rahmen
-Antialiasing type:	AntialiasingSettingsView		Kantenglättungstyp:
-Shadow	Colors tab		Schatten
-On	AntialiasingSettingsView		Ein
-Defaults	APRWindow		Standardwerte
-Link hover	Colors tab		Link (unter Mauszeiger)
-Grayscale	AntialiasingSettingsView		Graustufen
-Shine	Colors tab		Glanz
-About	DecorSettingsView		Über
-About decorator	DecorSettingsView		Dekorator Info
+Control mark	Colors tab		Steuerelement - Markierung
 Off	AntialiasingSettingsView		Aus
-Link text	Colors tab		Link Text
-Link active	Colors tab		Link (geklickt)
-Choose Decorator	DecorSettingsView		Dekorator wählen
+Window border	Colors tab		Fenster - Rahmen
+Inactive window tab	Colors tab		Reiter (inaktiv)
+Defaults	APRWindow		Standardwerte
+Shadow	Colors tab		Schatten
+Document background	Colors tab		Dokument - Hintergrund
+List background	Colors tab		Liste - Hintergrund
+Fixed font:	Font view		Feste Breite:
+Appearance	System name		Erscheinungsbild
+Reduce colored edges filter strength:	AntialiasingSettingsView		Farbsaumfilter:
+Glyph hinting:	AntialiasingSettingsView		Glyph-Hinting:
+Menu item text	Colors tab		Menü - Text
+About decorator	DecorSettingsView		Dekorator Info
+Antialiasing menu	AntialiasingSettingsView		Kantenglättungs-Menü
 Success	Colors tab		Erfolg
-Inactive window tab text	Colors tab		Reiter - Text (inaktiv)
+About	DecorSettingsView		Über
+Shine	Colors tab		Glanz
+Arrow style	DecorSettingsView		Scroll-Pfeile
+On	AntialiasingSettingsView		Ein
+Decorator:	DecorSettingsView		Dekorator:
+Menu background	Colors tab		Menü - Hintergrund
+Revert	APRWindow		Anfangswerte
+List item text	Colors tab		Liste - Text
+OK	DecorSettingsView		OK
+Control text	Colors tab		Steuerelement - Text
+Look and feel	APRWindow		Aussehen & Handhabung
+Selected menu item background	Colors tab		Menü - Hintergrund (ausgewählt)
+Link active	Colors tab		Link (geklickt)
+Antialiasing	APRWindow		Kantenglättung
+Menu font:	Font view		Menü:
+Bold font:	Font view		Fett:
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutoren:\n\t%decorAuthors\n\nURL: %decorURL\nLizens: %decorLic\n\n%decorDesc\n
+Choose Decorator	DecorSettingsView		Dekorator wählen
+Strong	AntialiasingSettingsView		Stark
 Failure	Colors tab		Fehler
+Double:	DecorSettingsView		Doppelt:
+Selected menu item text	Colors tab		Menü - Text (ausgewählt)
+Size:	Font Selection view		Größe:
+Panel background	Colors tab		Oberfläche - Hintergrund
+Plain font:	Font view		Normal:
+Window tab text	Colors tab		Reiter - Text
+Navigation pulse	Colors tab		Navigation - Leuchtfarbe
+LCD subpixel	AntialiasingSettingsView		LCD-Subpixel
+Window tab	Colors tab		Reiter
+Link text	Colors tab		Link Text
+Tooltip background	Colors tab		Tooltip - Hintergrund
+Scroll bar thumb	Colors tab		Scroll-Balken
+Link visited	Colors tab		Link (besucht)
+Selected menu item border	Colors tab		Menü - Rahmen (ausgewählt)
+Tooltip text	Colors tab		Tooltip - Text
+Control background	Colors tab		Steuerelement - Hintergrund
+Selected list item text	Colors tab		Liste - Text (ausgewählt)
+Selected list item background	Colors tab		Liste - Hintergrund (ausgewählt)
+Inactive window tab text	Colors tab		Reiter - Text (inaktiv)
+Navigation base	Colors tab		Navigation - Grundfarbe
+Fonts	APRWindow		Schriftarten
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Franz jagt im total verwahrlosten Taxi quer durch Bayern.
+Grayscale	AntialiasingSettingsView		Graustufen
+Antialiasing type:	AntialiasingSettingsView		Kantenglättungstyp:
+Panel text	Colors tab		Fenster - Text
 Hinting menu	AntialiasingSettingsView		Hinting-Menü
 Scroll bar:	DecorSettingsView		Scroll-Leiste:
-Document background	Colors tab		Dokument - Hintergrund
-Status bar	Colors tab		Statusleiste
-Revert	APRWindow		Anfangswerte
-Window tab	Colors tab		Reiter
-Tooltip background	Colors tab		Tooltip - Hintergrund
-Selected menu item background	Colors tab		Menü - Hintergrund (ausgewählt)
-Antialiasing	APRWindow		Kantenglättung
-Navigation base	Colors tab		Navigation - Grundfarbe
-Selected list item text	Colors tab		Liste - Text (ausgewählt)
-Window border	Colors tab		Fenster - Rahmen
-Double:	DecorSettingsView		Doppelt:
-Window tab text	Colors tab		Reiter - Text
-Document text	Colors tab		Dokument - Text
-Navigation pulse	Colors tab		Navigation - Leuchtfarbe
-Selected menu item text	Colors tab		Menü - Text (ausgewählt)
-Menu background	Colors tab		Menü - Hintergrund
-List background	Colors tab		Liste - Hintergrund
-OK	DecorSettingsView		OK
-Control mark	Colors tab		Steuerelement - Markierung
-Size:	Font Selection view		Größe:
-Link visited	Colors tab		Link (besucht)
-Decorator:	DecorSettingsView		Dekorator:
-Selected list item background	Colors tab		Liste - Hintergrund (ausgewählt)
-Panel background	Colors tab		Oberfläche - Hintergrund
-Menu font:	Font view		Menü:
-Colors	APRWindow		Farben
-Control background	Colors tab		Steuerelement - Hintergrund
-Inactive window tab	Colors tab		Reiter (inaktiv)
-List item text	Colors tab		Liste - Text
-Appearance	System name		Erscheinungsbild
-Fixed font:	Font view		Feste Breite:
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Franz jagt im total verwahrlosten Taxi quer durch Bayern.
-%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutoren:\n\t%decorAuthors\n\nURL: %decorURL\nLizens: %decorLic\n\n%decorDesc\n
-Reduce colored edges filter strength:	AntialiasingSettingsView		Farbsaumfilter:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Zur Vermeidung von möglichen Patentproblemen ist die Kombination von Subpixel-Kantenglättung und Glyph-Hinting deaktiviert. Um diese Funktion zu aktivieren, müssen spezielle Optionen im Konfigurationsheader der Freetype-Bibliothek freigeschaltet und anschließend Haiku neu kompiliert werden.
-Scroll bar thumb	Colors tab		Scroll-Balken
-Control text	Colors tab		Steuerelement - Text
-Single:	DecorSettingsView		Einfach:
-Tooltip text	Colors tab		Tooltip - Text
-Bold font:	Font view		Fett:
-Inactive window border	Colors tab		Fenster - Rahmen (inaktiv)
-Menu item text	Colors tab		Menü - Text
-LCD subpixel	AntialiasingSettingsView		LCD-Subpixel
-Selected menu item border	Colors tab		Menü - Rahmen (ausgewählt)
-Strong	AntialiasingSettingsView		Stark
-Panel text	Colors tab		Fenster - Text
-Arrow style	DecorSettingsView		Scroll-Pfeile
 Monospaced fonts only	AntialiasingSettingsView		Nur nicht-proportionale Schriften
-Look and feel	APRWindow		Aussehen & Handhabung
-Antialiasing menu	AntialiasingSettingsView		Kantenglättungs-Menü
-Fonts	APRWindow		Schriftarten
-Glyph hinting:	AntialiasingSettingsView		Glyph-Hinting:
+Document text	Colors tab		Dokument - Text
+Inactive window border	Colors tab		Fenster - Rahmen (inaktiv)
+Colors	APRWindow		Farben
+Control highlight	Colors tab		Steuerelement - Ausgewählt
+Status bar	Colors tab		Statusleiste
+Link hover	Colors tab		Link (unter Mauszeiger)
+Single:	DecorSettingsView		Einfach:

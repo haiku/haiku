@@ -1,38 +1,35 @@
-1	greek, modern (1453-)	x-vnd.Be-PRNT	2279754695
-Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Εκτυπωτής: %printer_name%\nDriver: %driver%\n
-Waiting	JobListView		Αναμονή
-Print test page	PrintersWindow		Εκτύπωση δοκιμαστικής σελίδας
-page	JobListView		σελίδα
-Cancel	AddPrinterDialog		Άκυρο
-Add printer	AddPrinterDialog		Προσθήκη εκτυπωτή
-Green	TestPageView		Πράσινο
-Printers	PrintersWindow		Εκτυπωτές
-Default Printer	PrinterListView		Προεπιλεγμένος εκτυπωτής
-Transport: %transport% %transport_address%	PrinterListView		Μεταφορά: %transport% %transport_address%
-pages	JobListView		σελίδες
-Printers	System name		Printers
-Processing	JobListView		Γίνεται επεξεργασία
-Red	TestPageView		Κόκκινο
-Printer name:	AddPrinterDialog		Όνομα εκτυπωτή:
-Driver: %driver%	PrinterListView		Οδηγός: %driver%
-Black	TestPageView		Μαύρο
-Restart job	PrintersWindow		Επανεκκίνηση εργασίας
-Add	AddPrinterDialog		Προσθήκη
-Make default	PrintersWindow		Ορισμός ως προεπιλογή
-Transport: %transport% %transport_address%	TestPageView		Μεταφορά: %transport% %transport_address%
-Cancel job	PrintersWindow		Ακύρωση εργασίας
-Yellow	TestPageView		Κίτρινο
-Blue	TestPageView		Μπλέ
+1	greek, modern (1453-)	x-vnd.Be-PRNT	823985976
 Remove	PrintersWindow		Αφαίρεση
+Red	TestPageView		Κόκκινο
+Default Printer	PrinterListView		Προεπιλεγμένος εκτυπωτής
 <pick one>	AddPrinterDialog		<διάλεξε ένα>
-Print jobs for 	PrintersWindow		Εργασίες εκτύπωσης για
-Failed	JobListView		Αποτυχημένο
-%.2f KB	JobListView		%.2f KB
-Magenta	TestPageView		Ματζέντα
-Completed	JobListView		Ολοκληρώθηκε
-No printer found!	TransportMenu		Δεν βρέθηκε εκτυπωτής!
-Print jobs: No printer selected	PrintersWindow		Εργασίες εκτύπωσης: Δεν επιλέχθηκε εκτυπωτής
-Cyan	TestPageView		Κυανό
-Unknown status	JobListView		Άγνωστη κατάσταση
 Connected to:	AddPrinterDialog		Συνδεδεμένο σε:
+Make default	PrintersWindow		Ορισμός ως προεπιλογή
+Cyan	TestPageView		Κυανό
+Completed	JobListView		Ολοκληρώθηκε
+Transport: %transport% %transport_address%	PrinterListView		Μεταφορά: %transport% %transport_address%
+Failed	JobListView		Αποτυχημένο
+Blue	TestPageView		Μπλέ
+Waiting	JobListView		Αναμονή
+Processing	JobListView		Γίνεται επεξεργασία
+Cancel	AddPrinterDialog		Άκυρο
+Unknown status	JobListView		Άγνωστη κατάσταση
+Add printer	AddPrinterDialog		Προσθήκη εκτυπωτή
+Printers	PrintersWindow		Εκτυπωτές
+No printer found!	TransportMenu		Δεν βρέθηκε εκτυπωτής!
+Magenta	TestPageView		Ματζέντα
+Transport: %transport% %transport_address%	TestPageView		Μεταφορά: %transport% %transport_address%
+Add	AddPrinterDialog		Προσθήκη
+Print jobs: No printer selected	PrintersWindow		Εργασίες εκτύπωσης: Δεν επιλέχθηκε εκτυπωτής
+Printer name:	AddPrinterDialog		Όνομα εκτυπωτή:
+Yellow	TestPageView		Κίτρινο
+Black	TestPageView		Μαύρο
 Printer type:	AddPrinterDialog		Τύπος εκτυπωτή:
+Printers	System name		Printers
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Εκτυπωτής: %printer_name%\nDriver: %driver%\n
+Green	TestPageView		Πράσινο
+Print test page	PrintersWindow		Εκτύπωση δοκιμαστικής σελίδας
+Restart job	PrintersWindow		Επανεκκίνηση εργασίας
+Driver: %driver%	PrinterListView		Οδηγός: %driver%
+Cancel job	PrintersWindow		Ακύρωση εργασίας
+%.2f KB	JobListView		%.2f KB

@@ -1,21 +1,21 @@
 1	korean	x-vnd.Haiku-JPEGTranslator	965709535
-Output quality	JPEGTranslator		출력 품질
-JPEG images	JPEGTranslator		JPEG 이미지들
-Prevent colors 'washing out'	JPEGTranslator		'씻어 내기' 색상 방지
-JPEG Library Error: %s\n	be_jerror		JPEG 라이브러리 에러: %s\n
-Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		0에서 100% 잉크 범위를 위한 CMYK 코드 사용
-About	JPEGTranslator		..에 관하여
-©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nIJG 라이브러리에 기반을 둠 © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\n에 \"손실없는\" 인코딩 지원 패치 만든  Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\n어떤 색상 공간 변환 루틴 만든 Magnus Hellman\n\thttp://www.bebits.com/app/802\n
-Low	JPEGTranslator		낮음
-Make file smaller (sligthtly worse quality)	JPEGTranslator		파일 작게 만듬(조금 품질이 저하됨)
-None	JPEGTranslator		없음
+Read	JPEGTranslator		읽기
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be 바트맵 형식 (JPEG변환기)
 Show warning messages	JPEGTranslator		경고 메세지 보기
-Output smoothing strength	JPEGTranslator		강한 스무딩 출력
-High	JPEGTranslator		높음
-Write	JPEGTranslator		쓰기
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		0에서 100% 잉크 범위를 위한 CMYK 코드 사용
+JPEG Library Error: %s\n	be_jerror		JPEG 라이브러리 에러: %s\n
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nIJG 라이브러리에 기반을 둠 © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\n에 \"손실없는\" 인코딩 지원 패치 만든  Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\n어떤 색상 공간 변환 루틴 만든 Magnus Hellman\n\thttp://www.bebits.com/app/802\n
+None	JPEGTranslator		없음
+About	JPEGTranslator		..에 관하여
 Write black-and-white images as RGB24	JPEGTranslator		RGB24로 검정과 흰색 이미지 쓰기
-Read greyscale images as RGB32	JPEGTranslator		RGB32로 단색조 이미지 읽기
-Read	JPEGTranslator		읽기
-JPEG Library Warning: %s\n	be_jerror		JPEG 라이브러리 경고: %s\n
+Output smoothing strength	JPEGTranslator		강한 스무딩 출력
 Use progressive compression	JPEGTranslator		진보적 압축 사용
+Make file smaller (sligthtly worse quality)	JPEGTranslator		파일 작게 만듬(조금 품질이 저하됨)
+High	JPEGTranslator		높음
+Read greyscale images as RGB32	JPEGTranslator		RGB32로 단색조 이미지 읽기
+Output quality	JPEGTranslator		출력 품질
+Low	JPEGTranslator		낮음
+Write	JPEGTranslator		쓰기
+Prevent colors 'washing out'	JPEGTranslator		'씻어 내기' 색상 방지
+JPEG Library Warning: %s\n	be_jerror		JPEG 라이브러리 경고: %s\n
+JPEG images	JPEGTranslator		JPEG 이미지들

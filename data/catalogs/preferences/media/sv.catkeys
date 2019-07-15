@@ -1,24 +1,24 @@
 1	swedish	x-vnd.Haiku-Media	4205337498
-Couldn't add volume control in Deskbar: %s\n	Media views		Kunde inte lägga till volymkontroll i Deskbar: %s\n
-Video input:	Media views		Videoingång:
-Warning!	Media Window		Varning!
-Quit anyway	Media Window		Avsluta ändå
-Defaults	Media views		Förval
-MIDI Settings	Media Window		MIDI Inställningar
+Audio mixer	Media Window		Ljudmixer
+Show volume control on Deskbar	Media views		Visa volymkontrollen i Deskbar
 Quit	Media Window		Avsluta
-Video settings	Media Window		Videoinställningar
-Video output:	Media views		Videoutgång:
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Kunde inte ansluta till mediaservern.\nVill du starta den ?
 Restart media services	Media views		Starta om mediatjänsterna
+Couldn't add volume control in Deskbar: %s\n	Media views		Kunde inte lägga till volymkontroll i Deskbar: %s\n
+Start media server	Media Window		Starta mediaservern
+Audio settings	Media Window		Ljudinställningar
+Quit anyway	Media Window		Avsluta ändå
 Couldn't remove volume control in Deskbar: %s\n	Media views		Kunde inte ta bort volymkontrollen från Deskbar: %s\n
 Media	System name		Media
-Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Avsluta Media nu kommer att starta om media servicen. Förmodligen kommer du att uppleva hispig/konstig eller otillgänglig media fuktionalitet.
-Audio mixer	Media Window		Ljudmixer
-This hardware has no controls.	Media Window		Hårdvaran saknar kontroller.
+Warning!	Media Window		Varning!
+MIDI Settings	Media Window		MIDI Inställningar
+Video output:	Media views		Videoutgång:
 Audio output:	Media views		Ljudutgång:
-Audio settings	Media Window		Ljudinställningar
-Start media server	Media Window		Starta mediaservern
-<none>	Media views		<ingen>
-Channel:	Media views		Kanal:
-Show volume control on Deskbar	Media views		Visa volymkontrollen i Deskbar
+Video input:	Media views		Videoingång:
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Avsluta Media nu kommer att starta om media servicen. Förmodligen kommer du att uppleva hispig/konstig eller otillgänglig media fuktionalitet.
 Audio input:	Media views		Ljudingång:
+<none>	Media views		<ingen>
+This hardware has no controls.	Media Window		Hårdvaran saknar kontroller.
+Channel:	Media views		Kanal:
+Defaults	Media views		Förval
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Kunde inte ansluta till mediaservern.\nVill du starta den ?
+Video settings	Media Window		Videoinställningar

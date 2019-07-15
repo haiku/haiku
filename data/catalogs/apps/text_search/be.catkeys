@@ -1,33 +1,32 @@
-1	belarusian	x-vnd.Haiku.TextSearch	3108411238
-%s: Not enough room to escape the filename.	Grepper		%s: Не хапае месца для перадання імя файла.
-Trim to selection	GrepWindow		Накласці на выдзяленне
-Follow symbolic links	GrepWindow		Прытрымлівацца сімвалічных спасылак
-Close	GrepWindow		Закрыць
-Cancel	GrepWindow		Адмена
-The unselected files will be removed from the list.	GrepWindow		Нявыбраныя файлы будуць выдалены са спісу.
-Set target…	GrepWindow		Прызначыць цэль…
+1	belarusian	x-vnd.Haiku.TextSearch	1609008100
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Калі ласка, выберыце файлы, якія вы жадалі б мець пазначанымі ў Трэкеры.
-Open files in Pe	GrepWindow		Адкрыць файлы ў Pe
 %appname% : %path%	GrepWindow		%appname% : %path%
-Copy text to clipboard	GrepWindow		Капіяваць у буфер
-Settings	GrepWindow		Наладкі
-Select all	GrepWindow		Выбраць усё
-OK	GrepWindow		ОК
-Skip folders starting with a dot	GrepWindow		Прапускаць каталогі, якія пачынаюцца з кропкі
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME не змог адкрыць адзін ці некалькі каталогаў.
-Search	GrepWindow		Пошук
 Open selection	GrepWindow		Адкрыць выдзяленне
-Look in sub-folders	GrepWindow		Глядзець у даччыных каталогах
 Actions	GrepWindow		Дзеянні
-File	GrepWindow		Файл
-Encoding	GrepWindow		Кадоўка
-History	GrepWindow		Гісторыя
 New window	GrepWindow		Новае вакно
-Please select the files you wish to keep searching.	GrepWindow		Калі ласка, выберыце файлы, якія жадаеце шукаць далей.
-TextSearch	GrepWindow		Пошук Тэксту
+Encoding	GrepWindow		Кадоўка
+OK	GrepWindow		ОК
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Close	GrepWindow		Закрыць
+Look in sub-folders	GrepWindow		Глядзець у даччыных каталогах
+%s: Not enough room to escape the filename.	Grepper		%s: Не хапае месца для перадання імя файла.
+Follow symbolic links	GrepWindow		Прытрымлівацца сімвалічных спасылак
+Text files only	GrepWindow		Толькі тэкставыя файлы
 Quit	GrepWindow		Выйсці
 Show files in Tracker	GrepWindow		Паказаць файлы ў Трэкеры
-Case-sensitive	GrepWindow		З улікам рэгістру
-Text files only	GrepWindow		Толькі тэкставыя файлы
+Please select the files you wish to keep searching.	GrepWindow		Калі ласка, выберыце файлы, якія жадаеце шукаць далей.
+Trim to selection	GrepWindow		Накласці на выдзяленне
+Set target…	GrepWindow		Прызначыць цэль…
+TextSearch	GrepWindow		Пошук Тэксту
+Search	GrepWindow		Пошук
+Copy text to clipboard	GrepWindow		Капіяваць у буфер
 Show lines	GrepWindow		Паказаць радкі
-%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+The unselected files will be removed from the list.	GrepWindow		Нявыбраныя файлы будуць выдалены са спісу.
+Skip folders starting with a dot	GrepWindow		Прапускаць каталогі, якія пачынаюцца з кропкі
+Cancel	GrepWindow		Адмена
+History	GrepWindow		Гісторыя
+File	GrepWindow		Файл
+Case-sensitive	GrepWindow		З улікам рэгістру
+Select all	GrepWindow		Выбраць усё
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME не змог адкрыць адзін ці некалькі каталогаў.
+Settings	GrepWindow		Наладкі

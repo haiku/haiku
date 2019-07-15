@@ -1,3 +1,3 @@
 1	romanian	x-vnd.Haiku-TelnetService	1209067113
-Telnet server	TelnetServiceAddOn		Server telnet
 The Telnet server allows you to remotely access your machine with a terminal session using the telnet protocol.\n\nPlease note that it is an insecure and unencrypted connection.	TelnetServiceAddOn		Serverul Telnet vă permite să accesați de la distanță calculatorul vostru cu o sesiune de terminal utilizând protocolul telnet.\n\nNotați că este o conexiune nesigură și necriptată.
+Telnet server	TelnetServiceAddOn		Server telnet

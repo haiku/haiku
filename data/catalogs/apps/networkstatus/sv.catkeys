@@ -1,22 +1,21 @@
-1	swedish	x-vnd.Haiku-NetworkStatus	1729819859
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		NätverksStatus hantering:\n\t--deskbar\tlägg till replikant till Deskbar\n\t--help\t\tskriv ut denna information och avsluta\n
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Du kan köra NätverksStatus i ett fönster eller installera det i Deskbar.
-<no wireless networks found>	NetworkStatusView		<inga trådlösa nätverk hittades>
-Run in window	NetworkStatus		Kör i fönster
-No link	NetworkStatusView		Ingen länk
-Install in Deskbar	NetworkStatus		Installera i Deskbar
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		Öppning av nätverksinställningarna misslyckades.\n\nFel:
+1	swedish	x-vnd.Haiku-NetworkStatus	3823341665
 Netmask	NetworkStatusView		Nätmask
-Broadcast	NetworkStatusView		Annonsera
-Unknown	NetworkStatusView		Okänd
-Network Status	NetworkStatusView		Nätverksstatus
-Ready	NetworkStatusView		Redo
-No stateful configuration	NetworkStatusView		Ingen förbindelseorienterad konfiguration
-%ifaceName information:\n	NetworkStatusView		%ifaceName information:\n
-Configuring	NetworkStatusView		Konfigurerar
-Address	NetworkStatusView		Adress
-OK	NetworkStatusView		OK
-NetworkStatus	System name		NätverksStatus
-Open network preferences…	NetworkStatusView		Öppna nätverksinställningar...
-Could not join wireless network:\n	NetworkStatusView		Kunde inte ansluta till trådlöst nätverk:\n
 Quit	NetworkStatusView		Avsluta
+Unknown	NetworkStatusView		Okänd
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Öppning av nätverksinställningarna misslyckades.\n\nFel:
+Install in Deskbar	NetworkStatus		Installera i Deskbar
+Open network preferences…	NetworkStatusView		Öppna nätverksinställningar...
+NetworkStatus	System name		NätverksStatus
+OK	NetworkStatusView		OK
+No link	NetworkStatusView		Ingen länk
+Could not join wireless network:\n	NetworkStatusView		Kunde inte ansluta till trådlöst nätverk:\n
+Ready	NetworkStatusView		Redo
+Network Status	NetworkStatusView		Nätverksstatus
+Address	NetworkStatusView		Adress
+No stateful configuration	NetworkStatusView		Ingen förbindelseorienterad konfiguration
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Du kan köra NätverksStatus i ett fönster eller installera det i Deskbar.
+Broadcast	NetworkStatusView		Annonsera
+%ifaceName information:\n	NetworkStatusView		%ifaceName information:\n
+Run in window	NetworkStatus		Kör i fönster
+<no wireless networks found>	NetworkStatusView		<inga trådlösa nätverk hittades>
+Configuring	NetworkStatusView		Konfigurerar

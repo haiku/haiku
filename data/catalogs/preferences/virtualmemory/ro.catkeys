@@ -1,20 +1,20 @@
 1	romanian	x-vnd.Haiku-VirtualMemory	2090796060
-Quit	SettingsWindow		Închidere
-Automatic swap management	SettingsWindow		Administrare interschimbare automată
-Turn off	SettingsWindow		Oprește
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Dezactivarea memoriei virtuale va avea efecte nedorite asupra stabilității sistemului odată ce memoria este utilizată.\nMemoria virtuală nu afectează perfomanța sistemului până la atingerea acestui punct.\n\nSigur doriți să o opriți?
 Requested swap file size:	SettingsWindow		Dimensiunea fișierului swap cerut:
-The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Configurările specificate în fișierul de configurări nu sunt valide. Puteți încărca valorile implicite sau să închideți.
-Defaults	SettingsWindow		Implicite
-Current Swap:	SettingsWindow		Interschimbare curentă:
-Use volume:	SettingsWindow		Utilizează volum:
-Keep enabled	SettingsWindow		Menține activat
-Revert	SettingsWindow		Revenire
 VirtualMemory	System name		MemorieVirtuală
-Use boot volume	SettingsWindow		Utilizează volumul de pornire
-Load defaults	SettingsWindow		Încarcă valorile implicite
 OK	VirtualMemoryApp		OK
+Use volume:	SettingsWindow		Utilizează volum:
+Turn off	SettingsWindow		Oprește
 Changes will take effect upon reboot.	SettingsWindow		Modificările vor apărea după repornire.
+Revert	SettingsWindow		Revenire
+Keep enabled	SettingsWindow		Menține activat
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Configurările specificate în fișierul de configurări nu sunt valide. Puteți încărca valorile implicite sau să închideți.
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		MemorieVirtuală\n\tscris de Axel Dörfler\n\tCopyright 2005, Haiku.\n
 The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		Nu s-a putut găsi volumul specificat în fișierul de configurări. Puteți folosi volumul de pornire sau să închideți.
+Current Swap:	SettingsWindow		Interschimbare curentă:
+Load defaults	SettingsWindow		Încarcă valorile implicite
+Use boot volume	SettingsWindow		Utilizează volumul de pornire
+Automatic swap management	SettingsWindow		Administrare interschimbare automată
+Defaults	SettingsWindow		Implicite
+Quit	SettingsWindow		Închidere
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Dezactivarea memoriei virtuale va avea efecte nedorite asupra stabilității sistemului odată ce memoria este utilizată.\nMemoria virtuală nu afectează perfomanța sistemului până la atingerea acestui punct.\n\nSigur doriți să o opriți?
 Enable virtual memory	SettingsWindow		Activează memoria virtuală

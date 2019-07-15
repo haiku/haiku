@@ -1,4 +1,4 @@
 1	french	x-vnd.Haiku-SystemLogger	57960782
-%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nCe démon est chargé de recueillir tous les messages systèmes et de les consigner dans le journal « %s ».\n\n
-OK	SyslogDaemon		OK
 Syslog Daemon	SyslogDaemon		Démon du Journal Système
+OK	SyslogDaemon		OK
+%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nCe démon est chargé de recueillir tous les messages systèmes et de les consigner dans le journal « %s ».\n\n

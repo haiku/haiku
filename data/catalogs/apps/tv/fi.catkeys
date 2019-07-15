@@ -1,27 +1,27 @@
 1	finnish	x-vnd.Haiku.TV	1995288111
-TV	MainWin		TV
-Channel	MainWin		Kanava
-Settings…	MainWin		Asetukset...
-Interface	MainWin		Käyttöliittymä
-Keep aspect ratio	MainWin		Säilytä kuvasuhde
-Previous channel	MainWin		Edellinen kanava
-Settings	MainWin		Asetukset
-TV	System name		TV
+No menu	MainWin		Ei valikkoa
 No border	MainWin		Ei rajoja
-Always on top	MainWin		Aina päällimmäisenä
-OK	MainWin		Valmis
-Quit	MainWin		Poistu
+force 704 x 576, display aspect 4:3	MainWin		pakota 704 x 576, näytön kuvasuhde 4:3
+Error, connecting to interface failed:\n\n	MainWin		Virhe, yhdistäminen käyttöliittymään epäonnistui:\n\n
+force 544 x 576, display aspect 4:3	MainWin		pakota 544 x 576, näytön kuvasuhde 4:3
 Full screen	MainWin		Kokoruutunäyttö
-Debug	MainWin		Vianjäljitys
 Scale to native size	MainWin		Skaalaa alkuperäiseen kokoon
 unknown	MainWin		tuntematon
 Next channel	MainWin		Seuraava kanava
-Error, interface is busy:\n\n	MainWin		Virhe, käyttöliittymä on varattu:\n\n
-None	MainWin		Ei mitään
-force 704 x 576, display aspect 4:3	MainWin		pakota 704 x 576, näytön kuvasuhde 4:3
+Keep aspect ratio	MainWin		Säilytä kuvasuhde
 DVB - Digital Video Broadcasting TV	MainWin		DVB - Digitaalinen videolähetystv
-force 544 x 576, display aspect 4:3	MainWin		pakota 544 x 576, näytön kuvasuhde 4:3
-pixel aspect ratio	MainWin		pikselin kuvasuhde
-No menu	MainWin		Ei valikkoa
-Error, connecting to interface failed:\n\n	MainWin		Virhe, yhdistäminen käyttöliittymään epäonnistui:\n\n
+Always on top	MainWin		Aina päällimmäisenä
+Debug	MainWin		Vianjäljitys
+Interface	MainWin		Käyttöliittymä
 force 720 x 576, display aspect 4:3	MainWin		pakota 730 x 576, näytön kuvasuhde 4:3
+Quit	MainWin		Poistu
+Channel	MainWin		Kanava
+Previous channel	MainWin		Edellinen kanava
+OK	MainWin		Valmis
+TV	MainWin		TV
+Settings	MainWin		Asetukset
+TV	System name		TV
+Settings…	MainWin		Asetukset...
+None	MainWin		Ei mitään
+Error, interface is busy:\n\n	MainWin		Virhe, käyttöliittymä on varattu:\n\n
+pixel aspect ratio	MainWin		pikselin kuvasuhde

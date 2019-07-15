@@ -1,5 +1,5 @@
 1	spanish; castilian	x-vnd.Haiku-ActivityMonitor	1155619009
-P-faults	DataSource		Averías de P
+P-faults	DataSource		Errores de página
 Media nodes	DataSource		Nodos de media
 Threads	DataSource		Hilos
 Always on top	ActivityWindow		Siempre visible

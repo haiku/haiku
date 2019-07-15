@@ -1,14 +1,14 @@
 1	finnish	x-vnd.Haiku-SMTP	815985329
-SMTP server:	ConfigView		SMTP-palvelin:
-Error while logging in to %serv	smtp		Virhe kirjauduttaessa palvelimeen %serv
-Unencrypted	ConfigView		Salaamaton
-. The server says:\n	smtp		. Palvelin sanoo:\n
-ESMTP	ConfigView		ESMTP
-Connecting to server…	smtp		Yhdistetään palvelimeen...
-Error while opening connection to %serv	smtp		Virhe avattaessa yhteyttä palvelimeen %serv
 POP3 authentication failed. The server said:\n	smtp		POP3-todennus epäonnistui. Palvelin sanoi:\n
 Destination:	ConfigView		Kohde:
+Error while logging in to %serv	smtp		Virhe kirjauduttaessa palvelimeen %serv
+Connecting to server…	smtp		Yhdistetään palvelimeen...
+Unencrypted	ConfigView		Salaamaton
+. The server says:\n	smtp		. Palvelin sanoo:\n
+Error while opening connection to %serv	smtp		Virhe avattaessa yhteyttä palvelimeen %serv
+. The server said:\n	smtp		. Palvelin sanoi:\n
 None	ConfigView		Ei mitään
+SMTP server:	ConfigView		SMTP-palvelin:
+ESMTP	ConfigView		ESMTP
 POP3 before SMTP	ConfigView		POP3-yhteyskäytäntö ennen SMTP-yhteyskäytäntöä
 SSL	ConfigView		SSL
-. The server said:\n	smtp		. Palvelin sanoi:\n

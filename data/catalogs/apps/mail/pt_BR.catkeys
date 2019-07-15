@@ -1,166 +1,166 @@
 1	portuguese (brazil)	x-vnd.Be-MAIL	1865394837
-View	Mail		Visualizar
-%d - Date	Mail		%d - Data
-Attach attributes:	Mail		Anexar Atributos:
-Unknown	Mail		Desconhecido
-Inconsistency occurred in the undo/redo buffer.	Mail		Ocorreu um erro de inconsistência na memória intermédia do Desfazer/Refazer.
-An error occurred trying to save the attachment.	Mail		Ocorreu um erro ao tentar salvar o anexo.
-Copy to new	Mail		Copiar para novo
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Deixar como 'Novo'
-Edit	Mail		Editar
-Print	Mail		Imprimir
-<none>	Mail		<nenhum>
-New mail message	Mail		Nova mensagem de correio
-Untitled	Mail		Sem título
-Automatic	Mail		Automático
-Automatically mark mail as read:	Mail		Marcar automaticamente correio como lido:
-helpful message	Mail		mensagem útil
-Colored quotes:	Mail		Citações coloridas:
-Subject:	Mail		Assunto:
-Reply to all	Mail		Responder a todos
-Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Compartimento: %name% (Tipo: %type%)
-Show icons & labels	Mail		Exibir ícones & rótulos
-Remove attachment	Mail		Remover anexo
-Button bar:	Mail		Barra de botões:
-spam	B_USER_DIRECTORY/mail/spam		mensagens não solicitadas
-Beginner	Mail		Iniciante
-Don't save	Mail		Não salvar
-Expert	Mail		Especialista
-Reply account:	Mail		Responder conta:
-Message	Mail		Mensagem
-Settings…	Mail		Definições…
-Reply to sender	Mail		Responder ao remetente
-There is no installed handler for URL links.	Mail		Não existe nenhum programa instalado para abrir links URL.
-Signature	Mail		Assinatura
-Find again	Mail		Localizar novamente
-Bcc:	Mail		Cco:
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		O texto principal contém %ld caracteres não codificáveis. Quem sabe um conjunto de caracteres diferente trabalhe melhor? Clique em Enviar para enviar a mensagem como está (um caractere substituto será usado no lugar dos não codificáveis) ou escolha Cancelar para voltar e tentar consertar isso.
-Signature:	Mail		Assinatura:
-Save changes to this signature?	Mail		Salvar alterações para esta assinatura?
-Cc:	Mail		Cc:
-Off	Mail		Desligar
-Find	Mail		Localizar
-Undo	Mail		Desfazer
-Date:	Mail		Data:
-An error occurred trying to open this signature.	Mail		Ocorreu um erro ao tentar abrir esta assinatura.
-No file attributes, just plain data	Mail		Sem atributos de arquivo, apenas dados simples
-Edit queries…	Mail		Editar consultas…
-queries	B_USER_DIRECTORY/mail/queries		consultas
-Paste	Mail		Colar
-in	B_USER_DIRECTORY/mail/in		em
-Save attachment…	Mail		Salvar anexo…
-Include file attributes in attachments	Mail		Incluir atributos de arquivos em anexos
-OK	Mail		OK
-Send	Mail		Enviar
-Show icons only	Mail		Exibir somente ícones
-Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Remover anexos de um correio encaminhado não foi ainda implementado!\nAinda não irá funcionar corretamente.
-Hide	Mail		Ocultar
-Forward without attachments	Mail		Encaminhar sem anexos
-Previous	Mail		Anterior
-Redo	Mail		Refazer
-Add enclosure…	Mail		Adicionar compartimento…
-Mail	System name		Correio
-Print…	Mail		Imprimir…
-Warn unencodable:	Mail		Avisar não codificável:
-Quit	Mail		Sair
-%n - Full name	Mail		%n - Nome completo
- Read 	Mail		  Ler  
-UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
-Trash	Mail		Lixeira
-Default account:	Mail		Conta padrão:
-Size:	Mail		Tamanho:
-Account from mail	Mail		Conta de correio
-Edit signatures…	Mail		Editar assinaturas…
-New	Mail		Novo
-Attachments: 	Mail		Anexos:  
-On	Mail		Ligar
-Set to %s	Mail		Definir para %s
-Forward	Mail		Encaminhar
-E-mail draft could not be saved!	Mail		Rascunho do correio não pôde ser salvo!
-%e wrote:\\n	Mail		%e escreveu:\\n
-To:	Mail		Para:
-Only files can be added as attachments.	Mail		Apenas arquivos podem ser adicionados como anexos.
-Previous message	Mail		Mensagem anterior
-Attachments:	Mail		Anexos:
-Title:	Mail		Título:
-<no account found>	Mail		<nenhuma conta encontrada>
-Find…	Mail		Localizar…
-Accounts…	Mail		Contas…
-Mail preferences	Mail		Preferências de correio
-Initial spell check mode:	Mail		Modo de verificação ortográfica inicial:
-Leave same	Mail		Deixar o mesmo
-Page setup…	Mail		Configurar página…
-Text wrapping:	Mail		Quebra de texto:
-Revert	Mail		Reverter
-File	Mail		Arquivo
-mail	B_USER_DIRECTORY/mail		correio
-None	Mail		Nenhum
-(Name unavailable)	Mail		(Nome indisponível)
-Copy link location	Mail		Copiar endereço do vínculo
-out	B_USER_DIRECTORY/mail/out		fora
-Show header	Mail		Exibir cabeçalho
-%e - E-mail address	Mail		%e - Endereço de correio eletrônico
-Resend	Mail		Reenviar
-Show raw message	Mail		Exibir a mensagem bruta
-\\n - Newline	Mail		\\n  - Nova linha
-Start now	Mail		Iniciar agora
-Close	Mail		Fechar
-No matches	Mail		Nenhuma correspondência
-The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		O mail_daemon não está executando. A mensagem está na fila e será enviada quando o mail_daemon iniciar.
-Really delete this signature? This cannot be undone.	Mail		Excluir realmente esta assinatura? Isto não poderá ser desfeito.
-Save this message as a draft before closing?	Mail		Salvar esta mensagem como um rascunho antes de fechar?
-Open	Mail		Abrir
-draft	B_USER_DIRECTORY/mail/draft		rascunho
-Quote	Mail		Citar
-Add	Mail		Adicionar
-Next message	Mail		Próxima mensagem
-User interface	Mail		Interface de usuário
-Cancel	Mail		Cancelar
-Send message	Mail		Enviar mensagem
-Remove enclosure	Mail		Remover compartimento
-Sorry, could not find an application that supports the 'Person' data type.	Mail		Desculpe, não foi possível encontrar um aplicativo que suporte o tipo de dados 'Pessoa'.
-Delete	Mail		Excluir
-Don't send	Mail		Não enviar
-Leave as '%s'	Mail		Deixar como '%s'
-Copy	Mail		Copiar
-Mail couldn't find its dictionary.	Mail		O correio não pôde encontrar seu dicionário.
-Reply preamble:	Mail		Responder preâmbulo:
-Signatures	Mail		Assinaturas
-Next	Mail		Próximo
-Set to…	Mail		Definir como…
-Use default account	Mail		Usar conta padrão
-Sorry	Mail		Desculpe
-Encoding:	Mail		Codificação:
-Font:	Mail		Fonte:
-(Address unavailable)	Mail		(Endereço indisponível)
-Save address	Mail		Salvar endereço
-Queries	Mail		Consultas
-Send this message before closing?	Mail		Enviar esta mensagem antes de fechar?
-Save	Mail		Salvar
-Random	Mail		Aleatório
-Close and 	Mail		Fechar e  
-Save as draft	Mail		Salvar como rascunho
-The mail_daemon could not be started:\n\t	Mail		O mail_daemon não pôde ser iniciado:\n\t
-Open attachment	Mail		Abrir anexo
-sent	B_USER_DIRECTORY/mail/sent		enviado
-(Date unavailable)	Mail		(Data indisponível)
-Put your favorite e-mail queries and query templates in this folder.	Mail		Ponha suas consultas de correio e de modelos preferidas nesta pasta.
-Spam	Mail		Mensagens não solicitadas
-Reply	Mail		Resposta
-Encoding	Mail		Codificação
-From:	Mail		De:
-Couldn't open this signature. Sorry.	Mail		Não foi possível abrir esta assinatura. Desculpe.
-Open draft	Mail		Abrir rascunho
-Cut	Mail		Recortar
-Check spelling	Mail		Verificar ortografia
 Set to Saved	Mail		Definir como Salvo
-Open this link	Mail		Abrir este vínculo
-Auto signature:	Mail		Auto assinatura:
-Add signature	Mail		Adicionar assinatura
-Need Tracker to move items to trash	Mail		Necessita do Rastreador (Tracker) para mover itens para a lixeira
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		O texto principal contém %ld caracteres não codificáveis. Quem sabe um conjunto de caracteres diferente trabalhe melhor? Clique em Enviar para enviar a mensagem como está (um caractere substituto será usado no lugar dos não codificáveis) ou escolha Cancelar para voltar e tentar consertar isso.
+Text wrapping:	Mail		Quebra de texto:
+Show icons & labels	Mail		Exibir ícones & rótulos
+(Date unavailable)	Mail		(Data indisponível)
+Reply	Mail		Resposta
+Next message	Mail		Próxima mensagem
 Mailing	Mail		Correspondência
 Unread	Mail		Não lido
+Copy to new	Mail		Copiar para novo
+Save as draft	Mail		Salvar como rascunho
+Encoding:	Mail		Codificação:
+Print	Mail		Imprimir
+Encoding	Mail		Codificação
+Default account:	Mail		Conta padrão:
+Message	Mail		Mensagem
+Bcc:	Mail		Cco:
+New	Mail		Novo
+Save	Mail		Salvar
+Undo	Mail		Desfazer
+Button bar:	Mail		Barra de botões:
+%e wrote:\\n	Mail		%e escreveu:\\n
+Save changes to this signature?	Mail		Salvar alterações para esta assinatura?
+Save attachment…	Mail		Salvar anexo…
+Paste	Mail		Colar
+E-mail draft could not be saved!	Mail		Rascunho do correio não pôde ser salvo!
+Don't send	Mail		Não enviar
+sent	B_USER_DIRECTORY/mail/sent		enviado
+Only files can be added as attachments.	Mail		Apenas arquivos podem ser adicionados como anexos.
+Close	Mail		Fechar
+Untitled	Mail		Sem título
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Remover anexos de um correio encaminhado não foi ainda implementado!\nAinda não irá funcionar corretamente.
+Previous message	Mail		Mensagem anterior
+(Address unavailable)	Mail		(Endereço indisponível)
+Mail	System name		Correio
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Compartimento: %name% (Tipo: %type%)
+Copy link location	Mail		Copiar endereço do vínculo
+Attachments: 	Mail		Anexos:  
+Remove enclosure	Mail		Remover compartimento
+Next	Mail		Próximo
+Attachments:	Mail		Anexos:
+Show icons only	Mail		Exibir somente ícones
+Subject:	Mail		Assunto:
+OK	Mail		OK
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
+Quit	Mail		Sair
+Title:	Mail		Título:
+Account from mail	Mail		Conta de correio
+%e - E-mail address	Mail		%e - Endereço de correio eletrônico
+Cc:	Mail		Cc:
+No matches	Mail		Nenhuma correspondência
+Queries	Mail		Consultas
+Cut	Mail		Recortar
+Reply to sender	Mail		Responder ao remetente
+\\n - Newline	Mail		\\n  - Nova linha
+Copy	Mail		Copiar
+Add signature	Mail		Adicionar assinatura
+%n - Full name	Mail		%n - Nome completo
 Remove quote	Mail		Remover citação
+Signature	Mail		Assinatura
+Use default account	Mail		Usar conta padrão
+draft	B_USER_DIRECTORY/mail/draft		rascunho
+Really delete this signature? This cannot be undone.	Mail		Excluir realmente esta assinatura? Isto não poderá ser desfeito.
+spam	B_USER_DIRECTORY/mail/spam		mensagens não solicitadas
+Reply to all	Mail		Responder a todos
+Cancel	Mail		Cancelar
+Off	Mail		Desligar
+Set to %s	Mail		Definir para %s
+Signature:	Mail		Assinatura:
+Forward without attachments	Mail		Encaminhar sem anexos
+queries	B_USER_DIRECTORY/mail/queries		consultas
+View	Mail		Visualizar
+Signatures	Mail		Assinaturas
+On	Mail		Ligar
+Find	Mail		Localizar
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Desculpe, não foi possível encontrar um aplicativo que suporte o tipo de dados 'Pessoa'.
+Date:	Mail		Data:
+Expert	Mail		Especialista
+Automatically mark mail as read:	Mail		Marcar automaticamente correio como lido:
+Close and 	Mail		Fechar e  
+Colored quotes:	Mail		Citações coloridas:
+Automatic	Mail		Automático
+Open this link	Mail		Abrir este vínculo
+Auto signature:	Mail		Auto assinatura:
+Send	Mail		Enviar
+Open draft	Mail		Abrir rascunho
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Deixar como 'Novo'
+Random	Mail		Aleatório
+Attach attributes:	Mail		Anexar Atributos:
+Find again	Mail		Localizar novamente
+Size:	Mail		Tamanho:
+To:	Mail		Para:
+Need Tracker to move items to trash	Mail		Necessita do Rastreador (Tracker) para mover itens para a lixeira
+The mail_daemon could not be started:\n\t	Mail		O mail_daemon não pôde ser iniciado:\n\t
+<no account found>	Mail		<nenhuma conta encontrada>
+Mail couldn't find its dictionary.	Mail		O correio não pôde encontrar seu dicionário.
+Mail preferences	Mail		Preferências de correio
+helpful message	Mail		mensagem útil
+ Read 	Mail		  Ler  
+Font:	Mail		Fonte:
+Accounts…	Mail		Contas…
+Previous	Mail		Anterior
+Include file attributes in attachments	Mail		Incluir atributos de arquivos em anexos
+Start now	Mail		Iniciar agora
+(Name unavailable)	Mail		(Nome indisponível)
 Move to trash	Mail		Mover para a lixeira
+<none>	Mail		<nenhum>
+%d - Date	Mail		%d - Data
+Check spelling	Mail		Verificar ortografia
+Redo	Mail		Refazer
+Leave as '%s'	Mail		Deixar como '%s'
+Print…	Mail		Imprimir…
+Settings…	Mail		Definições…
+Warn unencodable:	Mail		Avisar não codificável:
+Trash	Mail		Lixeira
+Show raw message	Mail		Exibir a mensagem bruta
+Find…	Mail		Localizar…
 Select all	Mail		Selecionar tudo
+Show header	Mail		Exibir cabeçalho
+Reply account:	Mail		Responder conta:
+Sorry	Mail		Desculpe
+Forward	Mail		Encaminhar
+Open attachment	Mail		Abrir anexo
+mail	B_USER_DIRECTORY/mail		correio
+Save this message as a draft before closing?	Mail		Salvar esta mensagem como um rascunho antes de fechar?
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		O mail_daemon não está executando. A mensagem está na fila e será enviada quando o mail_daemon iniciar.
+None	Mail		Nenhum
+Resend	Mail		Reenviar
+Hide	Mail		Ocultar
+From:	Mail		De:
+No file attributes, just plain data	Mail		Sem atributos de arquivo, apenas dados simples
+Add	Mail		Adicionar
+out	B_USER_DIRECTORY/mail/out		fora
+Send this message before closing?	Mail		Enviar esta mensagem antes de fechar?
+in	B_USER_DIRECTORY/mail/in		em
+Open	Mail		Abrir
+Don't save	Mail		Não salvar
+Leave same	Mail		Deixar o mesmo
+An error occurred trying to save the attachment.	Mail		Ocorreu um erro ao tentar salvar o anexo.
+Save address	Mail		Salvar endereço
+Initial spell check mode:	Mail		Modo de verificação ortográfica inicial:
+Edit queries…	Mail		Editar consultas…
+There is no installed handler for URL links.	Mail		Não existe nenhum programa instalado para abrir links URL.
+File	Mail		Arquivo
+Reply preamble:	Mail		Responder preâmbulo:
+New mail message	Mail		Nova mensagem de correio
+An error occurred trying to open this signature.	Mail		Ocorreu um erro ao tentar abrir esta assinatura.
+Edit signatures…	Mail		Editar assinaturas…
+User interface	Mail		Interface de usuário
+Quote	Mail		Citar
+Inconsistency occurred in the undo/redo buffer.	Mail		Ocorreu um erro de inconsistência na memória intermédia do Desfazer/Refazer.
+Remove attachment	Mail		Remover anexo
+Set to…	Mail		Definir como…
+Edit	Mail		Editar
+Page setup…	Mail		Configurar página…
 An error occurred trying to save this signature.	Mail		Ocorreu um erro ao tentar salvar esta assinatura.
+Beginner	Mail		Iniciante
+Send message	Mail		Enviar mensagem
+Delete	Mail		Excluir
+Put your favorite e-mail queries and query templates in this folder.	Mail		Ponha suas consultas de correio e de modelos preferidas nesta pasta.
+Spam	Mail		Mensagens não solicitadas
+Couldn't open this signature. Sorry.	Mail		Não foi possível abrir esta assinatura. Desculpe.
+Revert	Mail		Reverter
+Unknown	Mail		Desconhecido
+Add enclosure…	Mail		Adicionar compartimento…

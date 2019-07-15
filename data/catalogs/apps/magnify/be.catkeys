@@ -1,17 +1,13 @@
-1	belarusian	x-vnd.Haiku-Magnify	1986662371
-no clip msg\n	In console, when clipboard is empty after clicking Copy image		буфер пусты\n
-Make square	Magnify-Main		Зрабіць квадратным
-Copy image	Magnify-Main		Капіяваць выяву
-usage: magnify [size] (magnify size * size pixels)\n	Console		карыстанне: magnify [size] (павялічыць size * size пікселяў)\n
-Stick coordinates	Magnify-Main		Прыляпіць каардынаты
-magnify: size must be a multiple of 4\n	Console		magnify: памер павінен быць кратны 4\n
+1	belarusian	x-vnd.Haiku-Magnify	1150104797
 Decrease pixel size	Magnify-Main		Паменшыць памер пікселяў
+Increase pixel size	Magnify-Main		Павялічыць памер пікселяў
+Stick coordinates	Magnify-Main		Прыляпіць каардынаты
+Copy image	Magnify-Main		Капіяваць выяву
+Decrease window size	Magnify-Main		Паменшыць памер вакна
+Remove a crosshair	Magnify-Main		Выдаліць перакрыжаванне
+Add a crosshair	Magnify-Main		Дадаць перакрыжаванне
+Increase window size	Magnify-Main		Павялічыць памер вакна
+Save image	Magnify-Main		Захаваць выяву
 Magnify	System name		Лупа
 Info	Magnify-Main		Інфармацыя
-Remove a crosshair	Magnify-Main		Выдаліць перакрыжаванне
-Save image	Magnify-Main		Захаваць выяву
-Increase window size	Magnify-Main		Павялічыць памер вакна
-Decrease window size	Magnify-Main		Паменшыць памер вакна
-Increase pixel size	Magnify-Main		Павялічыць памер пікселяў
-  size must be > 4 and a multiple of 4\n	Console		  памер павiнны быць большым за 4 i кратны 4\n
-Add a crosshair	Magnify-Main		Дадаць перакрыжаванне
+Make square	Magnify-Main		Зрабіць квадратным

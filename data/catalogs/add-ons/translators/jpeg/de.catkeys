@@ -1,22 +1,22 @@
 1	german	x-vnd.Haiku-JPEGTranslator	3788699631
-Output quality	JPEGTranslator		Ausgabequalität
-JPEG images	JPEGTranslator		JPEG-Bilder
-Prevent colors 'washing out'	JPEGTranslator		'Ausgewaschene' Farben verhindern
-JPEG Library Error: %s\n	be_jerror		JPEG-Bibliothek, Fehler: %s\n
-Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Benutze CMYK-Code '0' als 100% Farbdeckung
-About	JPEGTranslator		Über
-©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBasierend auf der IJG-Bibliothek © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nmit dem \"verlustfreien\" Encoding-Unterstützungspatch von Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nmit einigen Farbraum-Konvertierungsroutinen von Magnus Hellman\n\thttp://www.bebits.com/app/802\n
-Low	JPEGTranslator		Niedrig
-Make file smaller (sligthtly worse quality)	JPEGTranslator		Kleinere Dateien (mit etwas schlechterer Qualität)
-None	JPEGTranslator		Keine
+Read	JPEGTranslator		Lesen
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be-Bitmap-Format (JPEGTranslator)
 Show warning messages	JPEGTranslator		Warnungen anzeigen
-Output smoothing strength	JPEGTranslator		Glättung
-High	JPEGTranslator		Hoch
-Write	JPEGTranslator		Schreiben
-Write black-and-white images as RGB24	JPEGTranslator		Schwarz-Weiß-Bilder als RGB24 ausgeben
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Benutze CMYK-Code '0' als 100% Farbdeckung
+JPEG Library Error: %s\n	be_jerror		JPEG-Bibliothek, Fehler: %s\n
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBasierend auf der IJG-Bibliothek © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nmit dem \"verlustfreien\" Encoding-Unterstützungspatch von Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nmit einigen Farbraum-Konvertierungsroutinen von Magnus Hellman\n\thttp://www.bebits.com/app/802\n
+None	JPEGTranslator		Keine
+About	JPEGTranslator		Über
 Version %d.%d.%d	JPEGTranslator		Version %d.%d.%d
-Read greyscale images as RGB32	JPEGTranslator		Graustufen-Bilder als RGB32 einlesen.
-Read	JPEGTranslator		Lesen
-JPEG Library Warning: %s\n	be_jerror		JPEG-Bibliothek, Warnung: %s\n
+Write black-and-white images as RGB24	JPEGTranslator		Schwarz-Weiß-Bilder als RGB24 ausgeben
+Output smoothing strength	JPEGTranslator		Glättung
 Use progressive compression	JPEGTranslator		Progressive Komprimierung
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Kleinere Dateien (mit etwas schlechterer Qualität)
+High	JPEGTranslator		Hoch
+Read greyscale images as RGB32	JPEGTranslator		Graustufen-Bilder als RGB32 einlesen.
+Output quality	JPEGTranslator		Ausgabequalität
+Low	JPEGTranslator		Niedrig
+Write	JPEGTranslator		Schreiben
+Prevent colors 'washing out'	JPEGTranslator		'Ausgewaschene' Farben verhindern
+JPEG Library Warning: %s\n	be_jerror		JPEG-Bibliothek, Warnung: %s\n
+JPEG images	JPEGTranslator		JPEG-Bilder

@@ -1,8 +1,8 @@
 1	english (united kingdom)	x-vnd.Haiku-Screen	1905453930
 15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 colours
-16 bits/pixel, 65536 colors	Screen		16 bits/pixel, 65536 colours
 OK	Screen		Alright
-32 bits/pixel, 16 Million colors	Screen		32 bits/pixel, 16 Million colours
-24 bits/pixel, 16 Million colors	Screen		24 bits/pixel, 16 Million colours
-8 bits/pixel, 256 colors	Screen		8 bits/pixel, 256 colours
 Colors:	Screen		Colours:
+8 bits/pixel, 256 colors	Screen		8 bits/pixel, 256 colours
+24 bits/pixel, 16 Million colors	Screen		24 bits/pixel, 16 Million colours
+32 bits/pixel, 16 Million colors	Screen		32 bits/pixel, 16 Million colours
+16 bits/pixel, 65536 colors	Screen		16 bits/pixel, 65536 colours

@@ -1,22 +1,21 @@
-1	finnish	x-vnd.Haiku-NetworkStatus	1729819859
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Verkkotilan valitsimet:\n\t--deskbar\tlisää kopio automaattisesti Työpöytäpalkkiin\n\t--help\t\ttulosta nämä tiedot ja poistu\n
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Voit suorittaa Verkontilan ikkunassa tai asentaa sen Työpöytäpalkkiin.
-<no wireless networks found>	NetworkStatusView		<langatonta verkkoa ei löytynyt>
-Run in window	NetworkStatus		Suorita ikkunassa
-No link	NetworkStatusView		Ei linkkiä
-Install in Deskbar	NetworkStatus		Asenna Työpöytäpalkkiin
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		Verkkoasetusohjelman käynnistyminen epäonnistui.\n\nVirhe: 
+1	finnish	x-vnd.Haiku-NetworkStatus	3823341665
 Netmask	NetworkStatusView		Verkkopeite
-Broadcast	NetworkStatusView		Yleislähetys
-Unknown	NetworkStatusView		Tuntematon
-Network Status	NetworkStatusView		Verkkotila
-Ready	NetworkStatusView		Valmis
-No stateful configuration	NetworkStatusView		Ei tilallista asetusta
-%ifaceName information:\n	NetworkStatusView		%ifaceName-tiedot:\n
-Configuring	NetworkStatusView		Asetetaan
-Address	NetworkStatusView		Osoite
-OK	NetworkStatusView		Valmis
-NetworkStatus	System name		Verkkotila
-Open network preferences…	NetworkStatusView		Avaa verkkoasetukset...
-Could not join wireless network:\n	NetworkStatusView		Liittyminen langattomaan verkkoon epäonnistui:\n
 Quit	NetworkStatusView		Lopeta
+Unknown	NetworkStatusView		Tuntematon
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Verkkoasetusohjelman käynnistyminen epäonnistui.\n\nVirhe: 
+Install in Deskbar	NetworkStatus		Asenna Työpöytäpalkkiin
+Open network preferences…	NetworkStatusView		Avaa verkkoasetukset...
+NetworkStatus	System name		Verkkotila
+OK	NetworkStatusView		Valmis
+No link	NetworkStatusView		Ei linkkiä
+Could not join wireless network:\n	NetworkStatusView		Liittyminen langattomaan verkkoon epäonnistui:\n
+Ready	NetworkStatusView		Valmis
+Network Status	NetworkStatusView		Verkkotila
+Address	NetworkStatusView		Osoite
+No stateful configuration	NetworkStatusView		Ei tilallista asetusta
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Voit suorittaa Verkontilan ikkunassa tai asentaa sen Työpöytäpalkkiin.
+Broadcast	NetworkStatusView		Yleislähetys
+%ifaceName information:\n	NetworkStatusView		%ifaceName-tiedot:\n
+Run in window	NetworkStatus		Suorita ikkunassa
+<no wireless networks found>	NetworkStatusView		<langatonta verkkoa ei löytynyt>
+Configuring	NetworkStatusView		Asetetaan

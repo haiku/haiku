@@ -1,31 +1,31 @@
 1	hungarian	x-vnd.haiku-screenshot	3958461128
-seconds	ScreenshotWindow		másodperc
-Desktop	ScreenshotWindow		Asztal
 Include window border	ScreenshotWindow		Az ablak keretének belefoglalása a képbe
-Screenshot	System name		Képernyőkép
-Select	ScreenshotWindow		Kiválasztás
+Overwrite	ScreenshotWindow		Felülírás
+Save in:	ScreenshotWindow		Mentés ide:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Mentési hiba \"%s\":\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		A fájl már létezik.\nBiztosan felül akarja írni?
+OK	ScreenshotWindow		Rendben
 The destination path exists but is not a folder.	ScreenshotWindow		A megadott útvonal létezik, de nem mappa.
-Capture active window	ScreenshotWindow		Kép az aktív ablakról
-Cancel	ScreenshotWindow		Mégse
+Select	ScreenshotWindow		Kiválasztás
+Save as:	ScreenshotWindow		Formátum:
+seconds	ScreenshotWindow		másodperc
+New screenshot	ScreenshotWindow		Új képernyőkép
+Screenshot	System name		Képernyőkép
+Desktop	ScreenshotWindow		Asztal
+Artwork folder	ScreenshotWindow		Artwork mappa
+Translator Settings	ScreenshotWindow		Fordító beállítások
+Include mouse pointer	ScreenshotWindow		Az egérkurzor belefoglalása a képbe
+overwrite	ScreenshotWindow		felülírás
+Settings…	ScreenshotWindow		Beállítások…
+Choose folder	ScreenshotWindow		Mappa kiválasztása
 Name:	ScreenshotWindow		Név:
 Choose folder…	ScreenshotWindow		Mappa kiválasztása…
-This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		A fájl már létezik.\nBiztosan felül akarja írni?
-Choose folder	ScreenshotWindow		Mappa kiválasztása
-Save	ScreenshotWindow		Mentés
-Overwrite	ScreenshotWindow		Felülírás
 Please select	ScreenshotWindow		Kérjük válasszon
-Save as:	ScreenshotWindow		Formátum:
-Copy to clipboard	ScreenshotWindow		Másolás a vágólapra
-Save in:	ScreenshotWindow		Mentés ide:
-screenshot	Screenshot	Base filename of screenshot files	képernyőkép
-New screenshot	ScreenshotWindow		Új képernyőkép
-Artwork folder	ScreenshotWindow		Artwork mappa
-Home folder	ScreenshotWindow		Saját mappa
 Failed to save screenshot	ScreenshotWindow		Nem sikerült a képernyőkép mentése.
-OK	ScreenshotWindow		Rendben
-Settings…	ScreenshotWindow		Beállítások…
-overwrite	ScreenshotWindow		felülírás
+Cancel	ScreenshotWindow		Mégse
 Delay:	ScreenshotWindow		Késleltetés:
-Error saving \"%s\":\n\t%s	ScreenshotWindow		Mentési hiba \"%s\":\n\t%s
-Include mouse pointer	ScreenshotWindow		Az egérkurzor belefoglalása a képbe
-Translator Settings	ScreenshotWindow		Fordító beállítások
+Copy to clipboard	ScreenshotWindow		Másolás a vágólapra
+screenshot	Screenshot	Base filename of screenshot files	képernyőkép
+Home folder	ScreenshotWindow		Saját mappa
+Save	ScreenshotWindow		Mentés
+Capture active window	ScreenshotWindow		Kép az aktív ablakról

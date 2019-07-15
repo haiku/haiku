@@ -1,20 +1,20 @@
 1	indonesian	x-vnd.Haiku-Touchpad	607725922
 Scrolling	TouchpadPrefView		Menggulir
-Touchpad	System name		Touchpad
-Revert	TouchpadPrefView		Kembali ke asal
 Tapping	TouchpadPrefView		Mengetuk
-Please confirm	TouchpadPrefView		Tolong konfirmasi
-Two finger scrolling	TouchpadPrefView		Menggulung dua jari
-Defaults	TouchpadPrefView		Bawaan
-Slow	TouchpadPrefView		Lambat
-Vertical	TouchpadPrefView		Vertikal
-High	TouchpadPrefView		Tinggi
-Horizontal scrolling	TouchpadPrefView		Gulungan Horisontal
-Fast	TouchpadPrefView		Cepat
-OK	TouchpadPrefView		Oke
-Acceleration	TouchpadPrefView		Akselerasi
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Area gulir baru sangat besar dan dapat menghambat operasi mouse normal. Apakah Anda benar-benar ingin mengubahnya?
-Horizontal	TouchpadPrefView		Horisontal
-Off	TouchpadPrefView		Mati
-Sensitivity	TouchpadPrefView		Sensitivitas
+Touchpad	System name		Touchpad
 Cancel	TouchpadPrefView		Batalkan
+OK	TouchpadPrefView		Oke
+Horizontal scrolling	TouchpadPrefView		Gulungan Horisontal
+Slow	TouchpadPrefView		Lambat
+Two finger scrolling	TouchpadPrefView		Menggulung dua jari
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Area gulir baru sangat besar dan dapat menghambat operasi mouse normal. Apakah Anda benar-benar ingin mengubahnya?
+Defaults	TouchpadPrefView		Bawaan
+High	TouchpadPrefView		Tinggi
+Off	TouchpadPrefView		Mati
+Fast	TouchpadPrefView		Cepat
+Vertical	TouchpadPrefView		Vertikal
+Please confirm	TouchpadPrefView		Tolong konfirmasi
+Acceleration	TouchpadPrefView		Akselerasi
+Horizontal	TouchpadPrefView		Horisontal
+Sensitivity	TouchpadPrefView		Sensitivitas
+Revert	TouchpadPrefView		Kembali ke asal

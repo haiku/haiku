@@ -1,38 +1,37 @@
-1	romanian	x-vnd.Haiku.TextSearch	3622532554
-%s: Not enough room to escape the filename.	Grepper		%s: Nu există spațiu suficient pentru a tasta numele de fișier.
-Trim to selection	GrepWindow		Potrivește la selecție
-Failed to open errors pipe!	Grepper		Nu s-a putut deschide canalul de erori!
-Follow symbolic links	GrepWindow		Urmărește legăturile simbolice
-Close	GrepWindow		Închide
-Cancel	GrepWindow		Anulează
-The unselected files will be removed from the list.	GrepWindow		Fișierele neselectate vor fi eliminate din listă.
-Regular expression	GrepWindow		Expresie regulată
-Set target…	GrepWindow		Configurează destinație…
-Failed to open output pipe!	Grepper		Nu s-a putut deschide canalul de ieșire!
+1	romanian	x-vnd.Haiku.TextSearch	2123129416
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Selectați fișierele pe care le doriți selectate pentru dumneavoastră în Tracker.
-Open files in Pe	GrepWindow		Deschide fișiere în Pe
 %appname% : %path%	GrepWindow		%appname% : %path%
-Copy text to clipboard	GrepWindow		Copiază text la clipboard
-Settings	GrepWindow		Configurări
-Select all	GrepWindow		Selectează tot
-OK	GrepWindow		OK
-Skip folders starting with a dot	GrepWindow		Omite dosarele care încep cu un punct
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME nu a putut deschide unul sau mai multe dosare.
-Search	GrepWindow		Caută
-Open selection	GrepWindow		Deschide selecție
-Look in sub-folders	GrepWindow		Caută în subdosare
-Actions	GrepWindow		Acțiuni
-File	GrepWindow		Fișier
-Encoding	GrepWindow		Codare
-History	GrepWindow		Istoric
 Failed to start xargs program!	Grepper		Nu s-a putut porni programul xargs!
+Open selection	GrepWindow		Deschide selecție
+Actions	GrepWindow		Acțiuni
 New window	GrepWindow		Fereastră nouă
-Failed to open input pipe!	Grepper		Nu s-a putut deschide canalul de intrare!
-Please select the files you wish to keep searching.	GrepWindow		Selectați fișierele pe care doriți să le căutați în continuare.
-TextSearch	GrepWindow		CăutareText
+Encoding	GrepWindow		Codare
+OK	GrepWindow		OK
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Close	GrepWindow		Închide
+Look in sub-folders	GrepWindow		Caută în subdosare
+%s: Not enough room to escape the filename.	Grepper		%s: Nu există spațiu suficient pentru a tasta numele de fișier.
+Follow symbolic links	GrepWindow		Urmărește legăturile simbolice
+Regular expression	GrepWindow		Expresie regulată
+Text files only	GrepWindow		Numai fișiere text
 Quit	GrepWindow		Închidere
 Show files in Tracker	GrepWindow		Afișează fișiere în Agentul de urmărire
-Case-sensitive	GrepWindow		Sensibil la majuscule
-Text files only	GrepWindow		Numai fișiere text
+Please select the files you wish to keep searching.	GrepWindow		Selectați fișierele pe care doriți să le căutați în continuare.
+Trim to selection	GrepWindow		Potrivește la selecție
+Set target…	GrepWindow		Configurează destinație…
+TextSearch	GrepWindow		CăutareText
+Failed to open input pipe!	Grepper		Nu s-a putut deschide canalul de intrare!
+Search	GrepWindow		Caută
+Copy text to clipboard	GrepWindow		Copiază text la clipboard
 Show lines	GrepWindow		Afișează linii
-%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Failed to open errors pipe!	Grepper		Nu s-a putut deschide canalul de erori!
+The unselected files will be removed from the list.	GrepWindow		Fișierele neselectate vor fi eliminate din listă.
+Skip folders starting with a dot	GrepWindow		Omite dosarele care încep cu un punct
+Failed to open output pipe!	Grepper		Nu s-a putut deschide canalul de ieșire!
+Cancel	GrepWindow		Anulează
+History	GrepWindow		Istoric
+File	GrepWindow		Fișier
+Case-sensitive	GrepWindow		Sensibil la majuscule
+Select all	GrepWindow		Selectează tot
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME nu a putut deschide unul sau mai multe dosare.
+Settings	GrepWindow		Configurări

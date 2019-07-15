@@ -1,9 +1,8 @@
-1	english (united kingdom)	x-vnd.Haiku-Appearance	4063047021
-Antialiasing type:	AntialiasingSettingsView		Anti-aliasing type:
-Grayscale	AntialiasingSettingsView		Greyscale
-Antialiasing	APRWindow		Anti-aliasing
-OK	DecorSettingsView		Alright
-Colors	APRWindow		Colours
+1	english (united kingdom)	x-vnd.Haiku-Appearance	2147064175
 Reduce colored edges filter strength:	AntialiasingSettingsView		Reduce coloured edges filter strength:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues in the USA. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.
 Antialiasing menu	AntialiasingSettingsView		Anti-aliasing menu
+OK	DecorSettingsView		Alright
+Antialiasing	APRWindow		Anti-aliasing
+Grayscale	AntialiasingSettingsView		Greyscale
+Antialiasing type:	AntialiasingSettingsView		Anti-aliasing type:
+Colors	APRWindow		Colours

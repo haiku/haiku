@@ -1,17 +1,17 @@
 1	indonesian	x-vnd.Haiku-DataTranslations	4156631142
-DataTranslations	System name		DataTranslations
-Cancel	DataTranslations		Batal
+Path:	DataTranslations		Lokasi:
 Name:	DataTranslations		Nama:
+DataTranslations - Note	DataTranslations		DataTranslations - Catatan
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Item '%name' tidak muncul sebagai Translator dan tidak akan dipasang.
 Could not install %s:\n%s	DataTranslations		Tidak bisa memasang %s:\n%s
-Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Gunakan panel kontrol ini untuk mengatur nilai bawaan untuk penerjemah, yang akan digunakan ketika tidak ada pengaturan lain yang ditentukan oleh aplikasi.
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Sebuah item bernama '%name' sudah ada di folder Penerjemah! Haruskah penerjemah yang ada akan ditimpa?
-DataTranslations - Note	DataTranslations		DataTranslations - Catatan
-Overwrite	DataTranslations		Timpa
-Info:	DataTranslations		Info:
-Info	DataTranslations		Info
-Path:	DataTranslations		Lokasi:
-The new translator has been installed successfully.	DataTranslations		Penerjemah baru telah berhasil dipasang.
-DataTranslations - Error	DataTranslations		DataTranslations - Kesalahan
 OK	DataTranslations		OKE
+Cancel	DataTranslations		Batal
+Info:	DataTranslations		Info:
+DataTranslations - Error	DataTranslations		DataTranslations - Kesalahan
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Gunakan panel kontrol ini untuk mengatur nilai bawaan untuk penerjemah, yang akan digunakan ketika tidak ada pengaturan lain yang ditentukan oleh aplikasi.
+The new translator has been installed successfully.	DataTranslations		Penerjemah baru telah berhasil dipasang.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Sebuah item bernama '%name' sudah ada di folder Penerjemah! Haruskah penerjemah yang ada akan ditimpa?
+DataTranslations	System name		DataTranslations
+Info	DataTranslations		Info
+Overwrite	DataTranslations		Timpa
 Version:	DataTranslations		Versi:

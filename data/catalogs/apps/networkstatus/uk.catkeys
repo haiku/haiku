@@ -1,22 +1,21 @@
-1	ukrainian	x-vnd.Haiku-NetworkStatus	1729819859
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Опції Стану мережі:\n\t--deskbar\tавтоматично додати реплікант до Deskbar\n\t--help\t\tвидрукувати це повідомлення і вийти\n
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Ви можете запустити Стан мережі у вікні або встановити у Deskbar.
-<no wireless networks found>	NetworkStatusView		<бездротова мережа не знайдена>
-Run in window	NetworkStatus		Запустити у вікні
-No link	NetworkStatusView		Посилання відсутнє
-Install in Deskbar	NetworkStatus		Встановити у Deskbar
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		Під'єднання мережевого придатку призупинене.\n\nПомилка: 
+1	ukrainian	x-vnd.Haiku-NetworkStatus	3823341665
 Netmask	NetworkStatusView		Маска мережі
-Broadcast	NetworkStatusView		Передача
-Unknown	NetworkStatusView		Невідомий
-Network Status	NetworkStatusView		Стан мережі
-Ready	NetworkStatusView		Готово
-No stateful configuration	NetworkStatusView		Немає стабільної конфігурації
-%ifaceName information:\n	NetworkStatusView		%ifaceName інформація:\n
-Configuring	NetworkStatusView		Конфігурування
-Address	NetworkStatusView		Адреса
-OK	NetworkStatusView		Гаразд
-NetworkStatus	System name		Стан мережі
-Open network preferences…	NetworkStatusView		Відкрити налаштування мережі…
-Could not join wireless network:\n	NetworkStatusView		Бездротові мережі не під'єднані:\n
 Quit	NetworkStatusView		Вийти
+Unknown	NetworkStatusView		Невідомий
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Під'єднання мережевого придатку призупинене.\n\nПомилка: 
+Install in Deskbar	NetworkStatus		Встановити у Deskbar
+Open network preferences…	NetworkStatusView		Відкрити налаштування мережі…
+NetworkStatus	System name		Стан мережі
+OK	NetworkStatusView		Гаразд
+No link	NetworkStatusView		Посилання відсутнє
+Could not join wireless network:\n	NetworkStatusView		Бездротові мережі не під'єднані:\n
+Ready	NetworkStatusView		Готово
+Network Status	NetworkStatusView		Стан мережі
+Address	NetworkStatusView		Адреса
+No stateful configuration	NetworkStatusView		Немає стабільної конфігурації
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Ви можете запустити Стан мережі у вікні або встановити у Deskbar.
+Broadcast	NetworkStatusView		Передача
+%ifaceName information:\n	NetworkStatusView		%ifaceName інформація:\n
+Run in window	NetworkStatus		Запустити у вікні
+<no wireless networks found>	NetworkStatusView		<бездротова мережа не знайдена>
+Configuring	NetworkStatusView		Конфігурування

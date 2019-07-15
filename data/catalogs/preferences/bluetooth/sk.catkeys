@@ -1,55 +1,49 @@
-1	slovak	x-vnd.Haiku-BluetoothPrefs	145165464
-About Bluetooth…	Window		O aplikácii Bluetooth…
-Handheld	Settings view		Handheld
-Default inquiry time:	Settings view		Predvolený čas zisťovania:
+1	slovak	x-vnd.Haiku-BluetoothPrefs	67867884
+Laptop	Settings view		Notebook
+Only from trusted devices	Settings view		Iba z dôveryhodných zariadení
+15 secs	Settings view		15 sekúnd
+Quit	main		Ukončiť
 Manufacturer: 	Device View		Výrobca: 
-Add device to list	Inquiry panel		Pridať zariadenie do zoznamu
-Starting scan...	Inquiry panel		Začína hľadanie...
-Smart phone	Settings view		Smartfón
-With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Poporili:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nĎakujeme jednotlivcom, ktorí pomohli...\n\nDodali/darovali hardvér:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEkonomicky:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nZáplatami:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTestovaním:\n - Petter H. Juliussen\nDali mi všetky vedomosti:\n - the yellowTAB team
-Server	Settings view		Server
-Stop bluetooth services…	Window		Zastaviť zariadenia Bluetooth…
-The Bluetooth services are not currently running on this system.	main		Služby Bluetooth momentálne na tomto systéme nebežia.
+Desktop	Settings view		Plocha
+Server	Window		Server
 Identify host as:	Settings view		Identifikovať hostiteľa ako:
 Refresh…	Remote devices		Obnoviť…
-Pair…	Remote devices		Spárovať…
-Incoming connections policy:	Settings view		Politika prichádzajúcich spojení:
-From all devices	Settings view		Zo všetkých zariadení
-Show name	Extended local device view		Zobraziť názov
 Local devices found on system:	Settings view		Lokálne zariadenia nájdené na systéme:
-Remaining %1 seconds	Inquiry panel		Zostáva %1 sekúnd
-Server	Window		Server
-Scanning completed.	Inquiry panel		Hľadanie dokončené.
+Service classes: 	Device View		Triedy služieb: 
+Remote devices	Window		Vzdialené zariadenia
+Settings	Window		Nastavenia
+Stop bluetooth services…	Window		Zastaviť zariadenia Bluetooth…
+61 secs	Settings view		61 sekúnd
+Add…	Remote devices		Pridať…
+As blocked	Remote devices		Ako blokované
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Na systéme nie je registrované žiadne lokálne zariadenie Bluetooth.
+Revert	Window		Vrátiť
+Refresh local devices…	Window		Obnoviť lokálne zariadenia…
+Disconnect	Remote devices		Odpojiť
+From all devices	Settings view		Zo všetkých zariadení
+Defaults	Window		Predvolené
+Start bluetooth services…	Window		Spustiť služby Bluetooth…
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Zistiť, či sú schopnosti Bluetooth vášho vzdialeného zariadenia aktivované. Stlačením „Zistenie“ spustíte hľadanie. Potrebný čas na zistenie názvov nie je známy, ale nemal by byť dlhší ako 3 sekundy na zariadenie. Potom ich budete môcť pridať do svojho hlavného zoznamu, kde sa s nimi budete môcť spárovať.
+Scanning progress	Inquiry panel		Priebeh hľadania
+Bluetooth	System name		Bluetooth
 Launch now	main		Spustiť teraz
 Remove	Remote devices		Odstrániť
-Quit	main		Ukončiť
-15 secs	Settings view		15 sekúnd
-Start bluetooth services…	Window		Spustiť služby Bluetooth…
-Policy...	Settings view		Politika...
-61 secs	Settings view		61 sekúnd
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Na systéme nie je registrované žiadne lokálne zariadenie Bluetooth.
-Identify us as...	Settings view		Identifikovať sa ako...
- packets: 	Device View		 pakety: 
-As blocked	Remote devices		Ako blokované
-Bluetooth	System name		Bluetooth
-Disconnect	Remote devices		Odpojiť
-Defaults	Window		Predvolené
-Inquiry	Inquiry panel		Zistenie
-Desktop	Settings view		Plocha
-Revert	Window		Vrátiť
-Remote devices	Window		Vzdialené zariadenia
-Laptop	Settings view		Notebook
-Discoverable	Extended local device view		Objaviteľné
-Service classes: 	Device View		Triedy služieb: 
-Settings	Window		Nastavenia
-Only from trusted devices	Settings view		Iba z dôveryhodných zariadení
-Scanning progress	Inquiry panel		Priebeh hľadania
 Always ask	Settings view		Vždy sa pýtať
-Retrieving name of %1	Inquiry panel		Zisťuje sa názov %1
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Zistiť, či sú schopnosti Bluetooth vášho vzdialeného zariadenia aktivované. Stlačením „Zistenie“ spustíte hľadanie. Potrebný čas na zistenie názvov nie je známy, ale nemal by byť dlhší ako 3 sekundy na zariadenie. Potom ich budete môcť pridať do svojho hlavného zoznamu, kde sa s nimi budete môcť spárovať.
-Authenticate	Extended local device view		Autentifikovať
-Refresh local devices…	Window		Obnoviť lokálne zariadenia…
-Pick device...	Settings view		Vybrať zariadenie...
-Retrieving names...	Inquiry panel		Získavajú sa názvy...
 Help	Window		Pomoc
-Add…	Remote devices		Pridať…
+Pair…	Remote devices		Spárovať…
+Retrieving name of %1	Inquiry panel		Zisťuje sa názov %1
+Inquiry	Inquiry panel		Zistenie
+Incoming connections policy:	Settings view		Politika prichádzajúcich spojení:
+Show name	Extended local device view		Zobraziť názov
+Add device to list	Inquiry panel		Pridať zariadenie do zoznamu
+Remaining %1 seconds	Inquiry panel		Zostáva %1 sekúnd
+The Bluetooth services are not currently running on this system.	main		Služby Bluetooth momentálne na tomto systéme nebežia.
+Discoverable	Extended local device view		Objaviteľné
+Authenticate	Extended local device view		Autentifikovať
+Smart phone	Settings view		Smartfón
+Scanning completed.	Inquiry panel		Hľadanie dokončené.
+Default inquiry time:	Settings view		Predvolený čas zisťovania:
+Server	Settings view		Server
+Handheld	Settings view		Handheld
+ packets: 	Device View		 pakety: 
+About Bluetooth…	Window		O aplikácii Bluetooth…

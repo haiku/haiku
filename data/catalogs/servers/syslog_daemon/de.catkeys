@@ -1,4 +1,4 @@
 1	german	x-vnd.Haiku-SystemLogger	57960782
-%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nDieser Daemon sammelt alle Systemmeldungen und schreibt sie in das systemweite Log nach \"%s\".\n\n
-OK	SyslogDaemon		OK
 Syslog Daemon	SyslogDaemon		Syslog Daemon
+OK	SyslogDaemon		OK
+%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nDieser Daemon sammelt alle Systemmeldungen und schreibt sie in das systemweite Log nach \"%s\".\n\n

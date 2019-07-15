@@ -1,24 +1,24 @@
 1	slovak	x-vnd.Haiku-Media	4205337498
-Couldn't add volume control in Deskbar: %s\n	Media views		Nepodarilo sa pridať ovládanie hlasitosti do Panela: %s\n
-Video input:	Media views		Video vstup:
-Warning!	Media Window		Upozornenie!
-Quit anyway	Media Window		Ukončiť napriek tomu
-Defaults	Media views		Predvolené
-MIDI Settings	Media Window		Nastavenia MIDI
+Audio mixer	Media Window		Zmiešavač zvuku
+Show volume control on Deskbar	Media views		Zobraziť na Paneli ovládanie hlasitosti
 Quit	Media Window		Ukončiť
-Video settings	Media Window		Video nastavenia
-Video output:	Media views		Video výstup:
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Nepodarilo sa pripojiť k multimediálnemu serveru.\nChcete ho spustiť?
 Restart media services	Media views		Reštartovať multimediálne služby
+Couldn't add volume control in Deskbar: %s\n	Media views		Nepodarilo sa pridať ovládanie hlasitosti do Panela: %s\n
+Start media server	Media Window		Spustiť multimediálny server
+Audio settings	Media Window		Nastavenia zvuku
+Quit anyway	Media Window		Ukončiť napriek tomu
 Couldn't remove volume control in Deskbar: %s\n	Media views		Nepodarilo sa odstrániť ovládanie hlasitosti z Panela: %s\n
 Media	System name		Multimédiá
-Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Ak Media teraz ukončíte, zastavíte reštartovanie multimediálnych služieb. To bude mať pravdepodobne za náseldok nefunkčné alebo nedostupné multimediálne funkcie.
-Audio mixer	Media Window		Zmiešavač zvuku
-This hardware has no controls.	Media Window		Tento hardvér nemá žiadne ovládacie prvky.
+Warning!	Media Window		Upozornenie!
+MIDI Settings	Media Window		Nastavenia MIDI
+Video output:	Media views		Video výstup:
 Audio output:	Media views		Zvukový výstup:
-Audio settings	Media Window		Nastavenia zvuku
-Start media server	Media Window		Spustiť multimediálny server
-<none>	Media views		<žiadne>
-Channel:	Media views		Kanál:
-Show volume control on Deskbar	Media views		Zobraziť na Paneli ovládanie hlasitosti
+Video input:	Media views		Video vstup:
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Ak Media teraz ukončíte, zastavíte reštartovanie multimediálnych služieb. To bude mať pravdepodobne za náseldok nefunkčné alebo nedostupné multimediálne funkcie.
 Audio input:	Media views		Zvukový vstup:
+<none>	Media views		<žiadne>
+This hardware has no controls.	Media Window		Tento hardvér nemá žiadne ovládacie prvky.
+Channel:	Media views		Kanál:
+Defaults	Media views		Predvolené
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Nepodarilo sa pripojiť k multimediálnemu serveru.\nChcete ho spustiť?
+Video settings	Media Window		Video nastavenia

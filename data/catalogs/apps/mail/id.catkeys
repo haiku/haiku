@@ -1,69 +1,134 @@
-1	indonesian	x-vnd.Be-MAIL	4033168402
-View	Mail		Melihat
-%d - Date	Mail		Tanggal - %d
-Attach attributes:	Mail		Lampirkan atribut:
-Unknown	Mail		Tidak diketahui
-Inconsistency occurred in the undo/redo buffer.	Mail		Inkonsistensi terjadi pada penyangga batal/ulang.
-An error occurred trying to save the attachment.	Mail		Terjadi kesalahan saat mencoba menyimpan lampiran.
-Copy to new	Mail		Salin ke baru
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Tinggalkan sebagai 'Baru'
-Edit	Mail		Edit
-Print	Mail		Cetak
-<none>	Mail		<none>
-New mail message	Mail		Pesan email baru
-Untitled	Mail		Tanpa judul
-Automatic	Mail		Otomatis
-Automatically mark mail as read:	Mail		Otomatis menandai email sebagai telah dibaca:
-helpful message	Mail		pesan bermanfaat
-Colored quotes:	Mail		Kutipan berwarna:
-Subject:	Mail		Subyek:
-Reply to all	Mail		Balas ke semua
-Show icons & labels	Mail		Tampilkan ikon dan label
-Remove attachment	Mail		Hapus lampiran
-Button bar:	Mail		Bilah tombol:
-spam	B_USER_DIRECTORY/mail/spam		spam
-Beginner	Mail		Pemula
-Don't save	Mail		Jangan simpan
-Expert	Mail		Ahli
-Reply account:	Mail		Balas akun:
-Message	Mail		Pesan
-Settings…	Mail		Pengaturan…
-Reply to sender	Mail		Balas ke pengirim
-There is no installed handler for URL links.	Mail		Tidak ada aplikasi pembuka yang terpasang untuk tautan URL.
-Signature	Mail		Tanda tangan
-Find again	Mail		Temukan lagi
-Bcc:	Mail		Bcc:
+1	indonesian	x-vnd.Be-MAIL	4268950118
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Teks utama Anda mengandung %ld karakter tak bisa terenkod. Mungkin set karakter lain akan bekerja lebih baik? Tekan kirim untuk tetap mengirim (sebuah karakter pengganti akan digunakan pada karakter yang tak terenkod), atau tekan Batal untuk kembali dan membetulkannya.
-Signature:	Mail		Tanda tangan:
-Save changes to this signature?	Mail		Simpan perubahan pada tanda tangan ini?
-Cc:	Mail		Cc:
-Off	Mail		Mati
-Find	Mail		Menemukan
+Show icons & labels	Mail		Tampilkan ikon dan label
+Reply	Mail		Balas
+Next message	Mail		Pesan selanjutnya
+Unread	Mail		Belum dibaca
+Copy to new	Mail		Salin ke baru
+Save as draft	Mail		Simpan sebagai draf
+Print	Mail		Cetak
+Message	Mail		Pesan
+Bcc:	Mail		Bcc:
+New	Mail		Baru
+Save	Mail		Simpan
 Undo	Mail		Batalkan
-Date:	Mail		Tanggal:
-An error occurred trying to open this signature.	Mail		Sebuah kesalahan terjadi ketika mencoba membuka tanda tangan ini.
-No file attributes, just plain data	Mail		Tidak ada atribut file, hanya data biasa
-Edit queries…	Mail		Sunting kueri…
-queries	B_USER_DIRECTORY/mail/queries		kueri
-Paste	Mail		Tempel
-in	B_USER_DIRECTORY/mail/in		di
+Button bar:	Mail		Bilah tombol:
+%e wrote:\\n	Mail		%e menulis:\\n
+Save changes to this signature?	Mail		Simpan perubahan pada tanda tangan ini?
 Save attachment…	Mail		Simpan lampiran…
-Include file attributes in attachments	Mail		Sertakan atribut berkas dalam lampiran
-OK	Mail		OKE
-Send	Mail		Kirim
-Show icons only	Mail		Tampilkan ikon saja
+Paste	Mail		Tempel
+E-mail draft could not be saved!	Mail		Draf surel tidak bisa disimpan!
+Don't send	Mail		Jangan kirim
+sent	B_USER_DIRECTORY/mail/sent		terkirim
+Only files can be added as attachments.	Mail		Hanya berkas yang bisa ditambahkan sebagai lampiran.
+Close	Mail		Tutup
+Untitled	Mail		Tanpa judul
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Menghapus lampiran dari surat yang diteruskan belum diterapkan\nItu belum akan berfungsi dengan benar.
-Hide	Mail		Sembunyikan
-Forward without attachments	Mail		Teruskan tanpa lampiran
-Previous	Mail		Sebelumnya
-Redo	Mail		Ulangi
-Add enclosure…	Mail		Tambah lampiran…
-Mail	System name		Surel
-Print…	Mail		Cetak…
-Warn unencodable:	Mail		Peringatan tak terenskripsi:
-Quit	Mail		Keluar
-Add	Mail		Tambah
-Font:	Mail		Fon:
+Previous message	Mail		Pesan sebelumnya
 (Address unavailable)	Mail		(Alamat tidak tersedia)
-Put your favorite e-mail queries and query templates in this folder.	Mail		Taruh kueri email favorite dan kueri templat anda dalam folder ini.
+Mail	System name		Surel
+Copy link location	Mail		Salin lokasi tautan
+Attachments: 	Mail		Lampiran: 
+Next	Mail		Selanjutnya
+Attachments:	Mail		Lampiran:
+Show icons only	Mail		Tampilkan ikon saja
+Subject:	Mail		Subyek:
+OK	Mail		OKE
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
+Quit	Mail		Keluar
+Title:	Mail		Judul:
+Account from mail	Mail		Akun dari surat
+%e - E-mail address	Mail		%e - Alamat surel
+Cc:	Mail		Cc:
+Cut	Mail		Potong
+Reply to sender	Mail		Balas ke pengirim
+\\n - Newline	Mail		\\n - Newline
+Copy	Mail		Salin
 Add signature	Mail		Tambah tanda tangan
+%n - Full name	Mail		%n - Nama Lengkap
+Remove quote	Mail		Hapus kutipan
+Signature	Mail		Tanda tangan
+draft	B_USER_DIRECTORY/mail/draft		draf
+spam	B_USER_DIRECTORY/mail/spam		spam
+Reply to all	Mail		Balas ke semua
+Cancel	Mail		Batal
+Off	Mail		Mati
+Set to %s	Mail		Set menjadi %s
+Signature:	Mail		Tanda tangan:
+Forward without attachments	Mail		Teruskan tanpa lampiran
+queries	B_USER_DIRECTORY/mail/queries		kueri
+View	Mail		Melihat
+Signatures	Mail		Tanda tangan
+Find	Mail		Menemukan
+Date:	Mail		Tanggal:
+Expert	Mail		Ahli
+Automatically mark mail as read:	Mail		Otomatis menandai email sebagai telah dibaca:
+Close and 	Mail		Tutup dan 
+Colored quotes:	Mail		Kutipan berwarna:
+Automatic	Mail		Otomatis
+Open this link	Mail		Buka tautan ini
+Send	Mail		Kirim
+Open draft	Mail		Buka draf
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Tinggalkan sebagai 'Baru'
+Random	Mail		Acak
+Attach attributes:	Mail		Lampirkan atribut:
+Find again	Mail		Temukan lagi
+Size:	Mail		Ukuran:
+To:	Mail		Untuk:
+The mail_daemon could not be started:\n\t	Mail		mail_daemon tidak bisa dijalankan:\n\t
+Mail couldn't find its dictionary.	Mail		Mail tidak dapat menemukan kamusnya.
+Mail preferences	Mail		Preferensi surat
+helpful message	Mail		pesan bermanfaat
+ Read 	Mail		 Baca 
+Font:	Mail		Fon:
+Accounts…	Mail		Akun…
+Previous	Mail		Sebelumnya
+Include file attributes in attachments	Mail		Sertakan atribut berkas dalam lampiran
+Start now	Mail		Mulai sekarang
+<none>	Mail		<none>
+%d - Date	Mail		Tanggal - %d
+Redo	Mail		Ulangi
+Leave as '%s'	Mail		Biarkan sebagai '%s'
+Print…	Mail		Cetak…
+Settings…	Mail		Pengaturan…
+Warn unencodable:	Mail		Peringatan tak terenskripsi:
+Trash	Mail		Sampah
+Show raw message	Mail		Tampilkan pesan mentah
+Find…	Mail		Cari…
+Select all	Mail		Pilih semua
+Show header	Mail		Tampilkan header
+Reply account:	Mail		Balas akun:
+Sorry	Mail		Sori
+Open attachment	Mail		Buka lampiran
+mail	B_USER_DIRECTORY/mail		surat
+Save this message as a draft before closing?	Mail		Simpan pesan ini sebagai draf sebelum ditutup?
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		mail_daemon tidak jalan. Pesan ini mengantre dan akan dikirim ketika mail_daemon dijalankan.
+Resend	Mail		Kirim ulang
+Hide	Mail		Sembunyikan
+From:	Mail		Dari:
+No file attributes, just plain data	Mail		Tidak ada atribut file, hanya data biasa
+Add	Mail		Tambah
+in	B_USER_DIRECTORY/mail/in		di
+Open	Mail		Buka
+Don't save	Mail		Jangan simpan
+An error occurred trying to save the attachment.	Mail		Terjadi kesalahan saat mencoba menyimpan lampiran.
+Edit queries…	Mail		Sunting kueri…
+There is no installed handler for URL links.	Mail		Tidak ada aplikasi pembuka yang terpasang untuk tautan URL.
+File	Mail		Berkas
+New mail message	Mail		Pesan email baru
+An error occurred trying to open this signature.	Mail		Sebuah kesalahan terjadi ketika mencoba membuka tanda tangan ini.
+Edit signatures…	Mail		Sunting tanda tangan…
+User interface	Mail		Antarmuka pengguna
+Quote	Mail		Kutipan
+Inconsistency occurred in the undo/redo buffer.	Mail		Inkonsistensi terjadi pada penyangga batal/ulang.
+Remove attachment	Mail		Hapus lampiran
+Set to…	Mail		Atur untuk…
+Edit	Mail		Edit
+Page setup…	Mail		Pengaturan halaman…
+Beginner	Mail		Pemula
+Send message	Mail		Kirim pesan
+Delete	Mail		Hapus
+Put your favorite e-mail queries and query templates in this folder.	Mail		Taruh kueri email favorite dan kueri templat anda dalam folder ini.
+Couldn't open this signature. Sorry.	Mail		Tidak dapat membuka tanda tangan ini. Sori.
+Unknown	Mail		Tidak diketahui
+Add enclosure…	Mail		Tambah lampiran…

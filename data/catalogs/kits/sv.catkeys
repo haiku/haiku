@@ -1,42 +1,42 @@
 1	swedish	x-vnd.Haiku-libbe	3337473349
-gamma	AboutWindow		gamma
-beta	AboutWindow		beta
-%3.2f GiB	StringForSize		%3.2f GiB
-Written by:	AboutWindow		Skrivet av:
-About %app%	AboutMenuItem		Om %app%
-Cut	TextView		Klippa ut
-Version	AboutWindow		Version
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Kan inte skapa replikanten för \"%description\".\n%error
-Copy	TextView		Kopiera
-%3.2f KiB	StringForSize		%3.2f KiB
-alpha	AboutWindow		alfa
-Error	PrintJob		Fel
-All Rights Reserved.	AboutWindow		Alla rättigheter resarverade.
 {0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte} other{# bytes}}
-About %app%	AboutWindow		Om %app%
-No pages to print!	PrintJob		Inga sidor att skriva ut!
+All Rights Reserved.	AboutWindow		Alla rättigheter resarverade.
+gold master	AboutWindow		guld mästare
+Undo	TextView		Ångra
+gamma	AboutWindow		gamma
+development	AboutWindow		utveckling
 OK	Dragger		OK
 OK	PrintJob		OK
-Green:	ColorControl		Grön:
-Version history:	AboutWindow		Versionshistorik:
-Remove replicant	Dragger		Ta bort replikant
-Select all	TextView		Markera allt
-OK	AboutWindow		OK
-OK	ZombieReplicantView		OK
 Print Server is not responding.	PrintJob		Utskriftservern svarar inte.
+About %app%	AboutMenuItem		Om %app%
+Warning	Dragger		Varning
+Green:	ColorControl		Grön:
+Redo	TextView		Gör om
+No pages to print!	PrintJob		Inga sidor att skriva ut!
+beta	AboutWindow		beta
+OK	ZombieReplicantView		OK
+Cut	TextView		Klippa ut
+%3.2f GiB	StringForSize		%3.2f GiB
+Can't delete this replicant from its original application. Life goes on.	Dragger		Kan inte ta bort replikanten från dess program. Livet fortsätter som vanligt.
+Error	ZombieReplicantView		Fel
 Paste	TextView		Klistra in
+OK	AboutWindow		OK
 Special Thanks:	AboutWindow		Särskilt tack till:
 %.2f TiB	StringForSize		%.2f TiB
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Kan inte hitta programmet för replikanten. Ingen programsignatur är angiven.\n%error
-Redo	TextView		Gör om
-<empty>	Menu		<tom>
-Warning	Dragger		Varning
-Undo	TextView		Ångra
+Remove replicant	Dragger		Ta bort replikant
+Version	AboutWindow		Version
 Red:	ColorControl		Röd:
+<empty>	Menu		<tom>
+Copy	TextView		Kopiera
+Select all	TextView		Markera allt
+alpha	AboutWindow		alfa
 %3.2f MiB	StringForSize		%3.2f MiB
+Error	PrintJob		Fel
+About %app%	AboutWindow		Om %app%
 About %app…	Dragger		Om %app...
-development	AboutWindow		utveckling
-Error	ZombieReplicantView		Fel
+Version history:	AboutWindow		Versionshistorik:
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Kan inte hitta programmet för replikanten. Ingen programsignatur är angiven.\n%error
+%3.2f KiB	StringForSize		%3.2f KiB
 Blue:	ColorControl		Blå:
-gold master	AboutWindow		guld mästare
-Can't delete this replicant from its original application. Life goes on.	Dragger		Kan inte ta bort replikanten från dess program. Livet fortsätter som vanligt.
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Kan inte skapa replikanten för \"%description\".\n%error
+Written by:	AboutWindow		Skrivet av:

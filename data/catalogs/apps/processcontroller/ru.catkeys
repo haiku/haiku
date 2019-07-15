@@ -1,50 +1,49 @@
-1	russian	x-vnd.Haiku-ProcessController	1761882987
-Memory usage	ProcessController		Использование памяти
-Kill this team!	ProcessController		Убить этот поток!
-Idle priority	ProcessController		Приоритет бездействия
-Restart Deskbar	ProcessController		Перезапустить Deskbar
-Custom priority	ProcessController		Заданный приоритет
-This team is already gone…	ProcessController		Этого приложения уже не существует…
+1	russian	x-vnd.Haiku-ProcessController	4131818684
 Error saving file	ProcessController		Ошибка при сохранении файла
-Real-time priority	ProcessController		Приоритет реального времени
-Power saving	ProcessController		Режим энергосбережения
-Your setting file could not be saved!\n(%s)	ProcessController		Невозможно сохранить настройки!\n(%s)
-What do you want to do with the team \"%s\"?	ProcessController		Что вы хотите сделать с потоком \"%s\"?
-This thread is already gone…	ProcessController		Этого потока уже не существует…
-Cancel	ProcessController		Отмена
 Display priority	ProcessController		Приоритет отображения
-Run in window	ProcessController		Запустить в окне
+That's no Fun!	ProcessController		Это не смешно!
+What do you want to do with the team \"%s\"?	ProcessController		Что вы хотите сделать с потоком \"%s\"?
+Your setting file could not be saved!\n(%s)	ProcessController		Невозможно сохранить настройки!\n(%s)
 Processor %d	ProcessController		Процессор %d
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
-ProcessController is already installed in Deskbar.	ProcessController		Контроллер процессов уже установлен в Deskbar.
-This is the last active processor...\nYou can't turn it off!	ProcessController		Это последний активный процессор...\nВы не можете его отключить!
-Info	ProcessController		Информация
-Quit application	ProcessController		Завершить приложение
+Live in the Deskbar	ProcessController		Отображать в Deskbar
+Kill this team!	ProcessController		Убить этот поток!
+OK	ProcessController		ОК
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Вы можете запустить контроллер процессов в окне или установить его в Deskbar.
+Real-time priority	ProcessController		Приоритет реального времени
+Custom priority	ProcessController		Заданный приоритет
+Debug this thread!	ProcessController		Отладить этот поток!
 Low priority	ProcessController		Низкий приортитет
+Urgent display priority	ProcessController		Срочный приоритет отображения
+Memory usage	ProcessController		Использование памяти
+Ok!	ProcessController		ОК!
+Normal priority	ProcessController		Нормальный приоритет
+Restart Deskbar	ProcessController		Перезапустить Deskbar
+About ProcessController…	ProcessController		О контроллере процессов…
+Usage: %s [-deskbar]\n	ProcessController		Использование: %s [-deskbar]\n
+Please confirm	ProcessController		Пожалуйста, подтвердите
+Urgent priority	ProcessController		Срочный приоритет
 What do you want to do with the thread \"%s\"?	ProcessController		Что вы хотите сделать с потоком \"%s\"?
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+Idle priority	ProcessController		Приоритет бездействия
+Real-time display priority	ProcessController		Приоритет отображения реального времени
+Threads and CPU usage	ProcessController		Потоки и загрузка ЦПУ
+Quit application	ProcessController		Завершить приложение
+Info	ProcessController		Информация
+Kill this thread!	ProcessController		Убить этот поток!
+This team is already gone…	ProcessController		Этого приложения уже не существует…
 Gone teams…	ProcessController		Завершённые приложения
+Quit an application	ProcessController		Завершить приложение
+Cancel	ProcessController		Отмена
+Install in Deskbar	ProcessController		Установить в Deskbar
+Debug this team!	ProcessController		Отладить этот поток!
+Low latency	ProcessController		Режим наименьших задержек
+ProcessController	System name		Контроллер процессов
 Lowest active priority	ProcessController		Низший приоритет
 Restart Tracker	ProcessController		Перезапустить Tracker
-Live in the Deskbar	ProcessController		Отображать в Deskbar
-Kill this thread!	ProcessController		Убить этот поток!
-Debug this thread!	ProcessController		Отладить этот поток!
-Normal priority	ProcessController		Нормальный приоритет
-New Terminal	ProcessController		Новый терминал
-Urgent priority	ProcessController		Срочный приоритет
-About ProcessController…	ProcessController		О контроллере процессов…
-Ok!	ProcessController		ОК!
-Quit an application	ProcessController		Завершить приложение
-Install in Deskbar	ProcessController		Установить в Deskbar
-Threads and CPU usage	ProcessController		Потоки и загрузка ЦПУ
-Urgent display priority	ProcessController		Срочный приоритет отображения
-Low latency	ProcessController		Режим наименьших задержек
-OK	ProcessController		ОК
-Damned!	ProcessController		Проклятье!
-Debug this team!	ProcessController		Отладить этот поток!
-Usage: %s [-deskbar]\n	ProcessController		Использование: %s [-deskbar]\n
-ProcessController	System name		Контроллер процессов
-Real-time display priority	ProcessController		Приоритет отображения реального времени
-Please confirm	ProcessController		Пожалуйста, подтвердите
 System resources & caches…	ProcessController		Системные ресурсы и кеш
-That's no Fun!	ProcessController		Это не смешно!
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Вы можете запустить контроллер процессов в окне или установить его в Deskbar.
+Damned!	ProcessController		Проклятье!
+New Terminal	ProcessController		Новый терминал
+Power saving	ProcessController		Режим энергосбережения
+ProcessController is already installed in Deskbar.	ProcessController		Контроллер процессов уже установлен в Deskbar.
+This thread is already gone…	ProcessController		Этого потока уже не существует…
+Run in window	ProcessController		Запустить в окне

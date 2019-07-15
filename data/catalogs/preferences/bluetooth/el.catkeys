@@ -1,49 +1,45 @@
-1	greek, modern (1453-)	x-vnd.Haiku-BluetoothPrefs	2825193795
-About Bluetooth…	Window		Περί Bluetooth...
-Handheld	Settings view		Φορητός
-Default inquiry time:	Settings view		Προκαθορισμένος χρόνος έρευνας:
+1	greek, modern (1453-)	x-vnd.Haiku-BluetoothPrefs	3311328897
+Laptop	Settings view		Φορητός Υπολογιστής
+Only from trusted devices	Settings view		Μόνο από αξιόπιστες συσκευές
+15 secs	Settings view		15 δευτερόλεπτα
+Quit	main		Έξοδος
 Manufacturer: 	Device View		Κατασκευαστής:
-Add device to list	Inquiry panel		Προσθήκη συσκευής στη λίστα
-Starting scan...	Inquiry panel		Έναρξη σάρωσης...
-Smart phone	Settings view		Smart phone
-Server	Settings view		Εξυπηρετητής
-Stop bluetooth services…	Window		Διακοπή υπηρεσιών bluetooth...
+Desktop	Settings view		Επιφάνεια εργασίας
+Server	Window		Εξυπηρετητής
 Identify host as:	Settings view		Αναγνώριση ξενιστή ως:
 Refresh…	Remote devices		Ανανέωση…
-Pair…	Remote devices		Ζευγάρι...
-Incoming connections policy:	Settings view		Εισερχόμενες συνδέσεις πολιτικής:
-From all devices	Settings view		Από όλες τις συσκευές
-Show name	Extended local device view		Εμφάνιση ονόματος
 Local devices found on system:	Settings view		Τοπικές συσκευές που βρέθηκαν στο σύστημα:
-Remaining %1 seconds	Inquiry panel		Απομένουν %1 δευτερόλεπτα
-Server	Window		Εξυπηρετητής
-Scanning completed.	Inquiry panel		Η ανίχνευση ολοκληρώθηκε.
-Remove	Remote devices		Αφαίρεσε
-Quit	main		Έξοδος
-15 secs	Settings view		15 δευτερόλεπτα
-Start bluetooth services…	Window		Έναρξη υπηρεσιών bluetooth...
-Policy...	Settings view		Πολιτική...
-61 secs	Settings view		61 δευτερόλεπτα
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Δεν υπάρχει καμία τοπική συσκευή Bluetooth που να έχει καταχωρηθεί στο σύστημα.
-Identify us as...	Settings view		Αναγνωρίστε μας ως...
-As blocked	Remote devices		Ως αποκλεισμένο
-Bluetooth	System name		Bluetooth
-Disconnect	Remote devices		Αποσύνδεση
-Defaults	Window		Προεπιλογές
-Inquiry	Inquiry panel		Αίτηση
-Desktop	Settings view		Επιφάνεια εργασίας
-Revert	Window		Επαναφορά
-Remote devices	Window		Απομακρυσμένες συσκευές
-Laptop	Settings view		Φορητός Υπολογιστής
-Discoverable	Extended local device view		Ορατό
 Service classes: 	Device View		Κατηγορίες υπηρεσιών:
+Remote devices	Window		Απομακρυσμένες συσκευές
 Settings	Window		Ρυθμίσεις
-Only from trusted devices	Settings view		Μόνο από αξιόπιστες συσκευές
-Scanning progress	Inquiry panel		Πρόοδος σάρωσης
-Always ask	Settings view		Πάντα ρώτα
-Retrieving name of %1	Inquiry panel		Ανάκτηση ονόματος του %1
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Ελέγξτε αν οι bluetooth δυνατότητες τις απομακρυσμένης συσκευής είναι ενεργές. Πατήστε ''Έρευνα'' για να ξεκινήσει η σάρωση. Ο απαιτούμενος χρόνος για την ανάκτηση των ονομάτων είναι άγνωστος, ωστόσο δεν πρέπει να πάρει πάνω από 3 δευτερόπλεπτα σε κάθε συσκευή. Ύστερα θα είστε σε θέση να τα προσθέσετε στην κύρια λίστα, οπού θα μπορείτε να τα ομαδοποιήσετε.
-Authenticate	Extended local device view		Αναγνώριση
-Retrieving names...	Inquiry panel		Ανάκτηση ονομάτων...
-Help	Window		Βοήθεια
+Stop bluetooth services…	Window		Διακοπή υπηρεσιών bluetooth...
+61 secs	Settings view		61 δευτερόλεπτα
 Add…	Remote devices		Προσθήκη…
+As blocked	Remote devices		Ως αποκλεισμένο
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Δεν υπάρχει καμία τοπική συσκευή Bluetooth που να έχει καταχωρηθεί στο σύστημα.
+Revert	Window		Επαναφορά
+Disconnect	Remote devices		Αποσύνδεση
+From all devices	Settings view		Από όλες τις συσκευές
+Defaults	Window		Προεπιλογές
+Start bluetooth services…	Window		Έναρξη υπηρεσιών bluetooth...
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Ελέγξτε αν οι bluetooth δυνατότητες τις απομακρυσμένης συσκευής είναι ενεργές. Πατήστε ''Έρευνα'' για να ξεκινήσει η σάρωση. Ο απαιτούμενος χρόνος για την ανάκτηση των ονομάτων είναι άγνωστος, ωστόσο δεν πρέπει να πάρει πάνω από 3 δευτερόπλεπτα σε κάθε συσκευή. Ύστερα θα είστε σε θέση να τα προσθέσετε στην κύρια λίστα, οπού θα μπορείτε να τα ομαδοποιήσετε.
+Scanning progress	Inquiry panel		Πρόοδος σάρωσης
+Bluetooth	System name		Bluetooth
+Remove	Remote devices		Αφαίρεσε
+Always ask	Settings view		Πάντα ρώτα
+Help	Window		Βοήθεια
+Pair…	Remote devices		Ζευγάρι...
+Retrieving name of %1	Inquiry panel		Ανάκτηση ονόματος του %1
+Inquiry	Inquiry panel		Αίτηση
+Incoming connections policy:	Settings view		Εισερχόμενες συνδέσεις πολιτικής:
+Show name	Extended local device view		Εμφάνιση ονόματος
+Add device to list	Inquiry panel		Προσθήκη συσκευής στη λίστα
+Remaining %1 seconds	Inquiry panel		Απομένουν %1 δευτερόλεπτα
+Discoverable	Extended local device view		Ορατό
+Authenticate	Extended local device view		Αναγνώριση
+Smart phone	Settings view		Smart phone
+Scanning completed.	Inquiry panel		Η ανίχνευση ολοκληρώθηκε.
+Default inquiry time:	Settings view		Προκαθορισμένος χρόνος έρευνας:
+Server	Settings view		Εξυπηρετητής
+Handheld	Settings view		Φορητός
+About Bluetooth…	Window		Περί Bluetooth...

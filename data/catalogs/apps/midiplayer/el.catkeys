@@ -1,18 +1,18 @@
 1	greek, modern (1453-)	x-vnd.Haiku-MidiPlayer	471142057
-None	Main Window		Κανένα
-Live input:	Main Window		Live είσοδος:
-Stop	Main Window		Διακοπή
-Cavern	Main Window		Σπήλαιο
-Volume:	Main Window		Ένταση:
-Reverb:	Main Window		Αντήχηση:
-OK	Main Window		Εντάξει
-Off	Main Window		Κλειστό
 Dungeon	Main Window		Dungeon
-Play	Main Window		Αναπαραγωγή
-Garage	Main Window		Γκαράζ
-Closet	Main Window		Θάλαμος
-MidiPlayer	System name		MidiPlayer
-Drop MIDI file here	Scope View		Αφήστε τα αρχεία MIDI εδώ
-Igor's lab	Main Window		Εργαστήριο του Igor
-Scope	Main Window		Επισκόπηση
 Could not load song	Main Window		Αδυναμία φόρτωσης της μελωδίας
+Igor's lab	Main Window		Εργαστήριο του Igor
+Off	Main Window		Κλειστό
+Volume:	Main Window		Ένταση:
+Closet	Main Window		Θάλαμος
+Scope	Main Window		Επισκόπηση
+Drop MIDI file here	Scope View		Αφήστε τα αρχεία MIDI εδώ
+None	Main Window		Κανένα
+Reverb:	Main Window		Αντήχηση:
+MidiPlayer	System name		MidiPlayer
+OK	Main Window		Εντάξει
+Stop	Main Window		Διακοπή
+Live input:	Main Window		Live είσοδος:
+Garage	Main Window		Γκαράζ
+Play	Main Window		Αναπαραγωγή
+Cavern	Main Window		Σπήλαιο

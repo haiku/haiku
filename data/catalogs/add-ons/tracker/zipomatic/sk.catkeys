@@ -1,17 +1,17 @@
 1	slovak	x-vnd.haiku.zip-o-matic	2032806096
-Stop	file:ZipOMaticWindow.cpp		Zastaviť
-Creating archive: %s	file:ZipOMaticWindow.cpp		Vytvára sa archív: %s
-Continue	file:ZipOMaticWindow.cpp		Pokračovať
-Preparing to archive	file:ZipperThread.cpp		Pripravuje sa na archiváciu
 Drop files here.	file:ZipOMaticWindow.cpp		Sem pretiahnite súbory.
 Filename: %s	file:ZipOMaticWindow.cpp		Názov súboru: %s
-You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Už {0, plural, one{beží jedna ďalšia inštancia} few{bežia # ďalšie inštancie} other{beží # ďalších inštancií}} Zip-O-Matic.\n\n
-Let them continue	file:ZipOMatic.cpp		Nechať ich pokračovať
 Do you want to stop them?	file:ZipOMatic.cpp		Chcete ich zastaviť?
+Error creating archive	file:ZipOMaticWindow.cpp		Chyba pri vytváraní archívu
+Stop them	file:ZipOMatic.cpp		Zastaviť ich
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Ste si istý, že chcete zastaviť vytvorenie tohto archívu?
+Preparing to archive	file:ZipperThread.cpp		Pripravuje sa na archiváciu
+Let them continue	file:ZipOMatic.cpp		Nechať ich pokračovať
+Continue	file:ZipOMaticWindow.cpp		Pokračovať
+Archive created OK	file:ZipOMaticWindow.cpp		Archív úspešne vytvorený
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# súbor pridaný} few{# súbory pridané} other{# súborov pridaných}}.
+Stop	file:ZipOMaticWindow.cpp		Zastaviť
 Stopped	file:ZipOMaticWindow.cpp		Zastavené
 Archive	file:ZipperThread.cpp		Archív
-Error creating archive	file:ZipOMaticWindow.cpp		Chyba pri vytváraní archívu
-{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# súbor pridaný} few{# súbory pridané} other{# súborov pridaných}}.
-Archive created OK	file:ZipOMaticWindow.cpp		Archív úspešne vytvorený
-Stop them	file:ZipOMatic.cpp		Zastaviť ich
+Creating archive: %s	file:ZipOMaticWindow.cpp		Vytvára sa archív: %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Už {0, plural, one{beží jedna ďalšia inštancia} few{bežia # ďalšie inštancie} other{beží # ďalších inštancií}} Zip-O-Matic.\n\n

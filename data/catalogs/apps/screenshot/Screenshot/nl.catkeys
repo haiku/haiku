@@ -1,25 +1,25 @@
 1	dutch; flemish	x-vnd.haiku-screenshot	4088965159
-seconds	ScreenshotWindow		seconden
-Desktop	ScreenshotWindow		Bureaublad
 Include window border	ScreenshotWindow		Vensterrand insluiten
-Screenshot	System name		Screenshot
-Select	ScreenshotWindow		Selecteren
-Capture active window	ScreenshotWindow		Leg het actieve venster vast
-Cancel	ScreenshotWindow		Annuleren
-Name:	ScreenshotWindow		Naam:
-Choose folder	ScreenshotWindow		Kies map
-Save	ScreenshotWindow		Opslaan
 Overwrite	ScreenshotWindow		Overschrijven
-Please select	ScreenshotWindow		Kies alstublieft
-Save as:	ScreenshotWindow		Opslaan als:
-Copy to clipboard	ScreenshotWindow		Kopieer naar het klembord
 Save in:	ScreenshotWindow		Opslaan in:
-screenshot	Screenshot	Base filename of screenshot files	schermafbeelding
+Select	ScreenshotWindow		Selecteren
+Save as:	ScreenshotWindow		Opslaan als:
+seconds	ScreenshotWindow		seconden
 New screenshot	ScreenshotWindow		Nieuwe schermafbeelding
+Screenshot	System name		Screenshot
+Desktop	ScreenshotWindow		Bureaublad
 Artwork folder	ScreenshotWindow		Artwork-map
-Home folder	ScreenshotWindow		Home-map
-Settings…	ScreenshotWindow		Instellingen...
-overwrite	ScreenshotWindow		overschrijven
-Delay:	ScreenshotWindow		Vertraging:
-Include mouse pointer	ScreenshotWindow		Muisaanwijzer insluiten
 Translator Settings	ScreenshotWindow		Omzetter-instellingen
+Include mouse pointer	ScreenshotWindow		Muisaanwijzer insluiten
+overwrite	ScreenshotWindow		overschrijven
+Settings…	ScreenshotWindow		Instellingen...
+Choose folder	ScreenshotWindow		Kies map
+Name:	ScreenshotWindow		Naam:
+Please select	ScreenshotWindow		Kies alstublieft
+Cancel	ScreenshotWindow		Annuleren
+Delay:	ScreenshotWindow		Vertraging:
+Copy to clipboard	ScreenshotWindow		Kopieer naar het klembord
+screenshot	Screenshot	Base filename of screenshot files	schermafbeelding
+Home folder	ScreenshotWindow		Home-map
+Save	ScreenshotWindow		Opslaan
+Capture active window	ScreenshotWindow		Leg het actieve venster vast

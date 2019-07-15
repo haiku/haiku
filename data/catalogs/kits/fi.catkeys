@@ -1,42 +1,42 @@
 1	finnish	x-vnd.Haiku-libbe	3337473349
-gamma	AboutWindow		gamma
-beta	AboutWindow		beeta
-%3.2f GiB	StringForSize		%3.2f gibitavua
-Written by:	AboutWindow		Tekijä:
-About %app%	AboutMenuItem		Ohjelmasta %app%
-Cut	TextView		Leikkaa
-Version	AboutWindow		Versio
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Kohteen ”%description” kopion luominen epäonnistui.\n%error
-Copy	TextView		Kopioi
-%3.2f KiB	StringForSize		%3.2f kibitavua
-alpha	AboutWindow		alfa
-Error	PrintJob		Virhe
-All Rights Reserved.	AboutWindow		All Rights Reserved.
 {0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# merkki} other{# merkkiä}
-About %app%	AboutWindow		Ohjelmasta %app%
-No pages to print!	PrintJob		Ei ole tulostettavia sivuja!
+All Rights Reserved.	AboutWindow		All Rights Reserved.
+gold master	AboutWindow		gold master
+Undo	TextView		Peru
+gamma	AboutWindow		gamma
+development	AboutWindow		ohjelmakehitys
 OK	Dragger		Valmis
 OK	PrintJob		Valmis
-Green:	ColorControl		Vihreä:
-Version history:	AboutWindow		Versiohistoria:
-Remove replicant	Dragger		Poista kopio
-Select all	TextView		Valitse kaikki
-OK	AboutWindow		Valmis
-OK	ZombieReplicantView		Valmis
 Print Server is not responding.	PrintJob		Tulostuspalvelin ei vastaa.
+About %app%	AboutMenuItem		Ohjelmasta %app%
+Warning	Dragger		Varoitus
+Green:	ColorControl		Vihreä:
+Redo	TextView		Tee uudelleen
+No pages to print!	PrintJob		Ei ole tulostettavia sivuja!
+beta	AboutWindow		beeta
+OK	ZombieReplicantView		Valmis
+Cut	TextView		Leikkaa
+%3.2f GiB	StringForSize		%3.2f gibitavua
+Can't delete this replicant from its original application. Life goes on.	Dragger		Alkuperäisen sovelluksen tämän kopion poistaminen epäonnistui. Elämä jatkuu.
+Error	ZombieReplicantView		Virhe
 Paste	TextView		Liitä
+OK	AboutWindow		Valmis
 Special Thanks:	AboutWindow		Erityiskiitokset:
 %.2f TiB	StringForSize		%.2f tebitavua
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Kopion sovelluksen paikantaminen epäonnistui. Sovellusallekirjoitusta ei ole tarjottu.\n%error
-Redo	TextView		Tee uudelleen
-<empty>	Menu		<tyhjä>
-Warning	Dragger		Varoitus
-Undo	TextView		Peru
+Remove replicant	Dragger		Poista kopio
+Version	AboutWindow		Versio
 Red:	ColorControl		Punainen:
+<empty>	Menu		<tyhjä>
+Copy	TextView		Kopioi
+Select all	TextView		Valitse kaikki
+alpha	AboutWindow		alfa
 %3.2f MiB	StringForSize		%3.2f mebitavua
+Error	PrintJob		Virhe
+About %app%	AboutWindow		Ohjelmasta %app%
 About %app…	Dragger		Ohjelmasta %app...
-development	AboutWindow		ohjelmakehitys
-Error	ZombieReplicantView		Virhe
+Version history:	AboutWindow		Versiohistoria:
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Kopion sovelluksen paikantaminen epäonnistui. Sovellusallekirjoitusta ei ole tarjottu.\n%error
+%3.2f KiB	StringForSize		%3.2f kibitavua
 Blue:	ColorControl		Sininen:
-gold master	AboutWindow		gold master
-Can't delete this replicant from its original application. Life goes on.	Dragger		Alkuperäisen sovelluksen tämän kopion poistaminen epäonnistui. Elämä jatkuu.
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Kohteen ”%description” kopion luominen epäonnistui.\n%error
+Written by:	AboutWindow		Tekijä:

@@ -1,13 +1,13 @@
 1	korean	x-vnd.Haiku-JPEG2000Translator	547915409
-Write	JPEG2000Translator		쓰기
-JPEG2000 images	JPEG2000Translator		JPEG2000 이미지들
-Output only codestream (.jpc)	JPEG2000Translator		출력 전용 코드스트림 (. jpc)
-Write black-and-white images as RGB24	JPEG2000Translator		RGB24로 검정과 흰색 이미지 쓰기
-Output quality	JPEG2000Translator		출력 품질
-Read	JPEG2000Translator		읽기
-©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nJasPer 라이브러리에 기반을 둠:\n© 1999-2000, Image Power, Inc. and\n캐나다 British Columbia 대학.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick의 jp2  코덱은 \"tutorial\"에 사용됨.\n\thttp://www.imagemagick.org/\n
-Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Be 비트맵 형식 (JPEG2000변환기)
-Low	JPEG2000Translator		낮음
-About	JPEG2000Translator		..에 관하여
 High	JPEG2000Translator		높음
+Low	JPEG2000Translator		낮음
+Output quality	JPEG2000Translator		출력 품질
+JPEG2000 images	JPEG2000Translator		JPEG2000 이미지들
+About	JPEG2000Translator		..에 관하여
+Write black-and-white images as RGB24	JPEG2000Translator		RGB24로 검정과 흰색 이미지 쓰기
+Read	JPEG2000Translator		읽기
 Read greyscale images as RGB32	JPEG2000Translator		RGB32로 단색조 이미지 읽기
+©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nJasPer 라이브러리에 기반을 둠:\n© 1999-2000, Image Power, Inc. and\n캐나다 British Columbia 대학.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick의 jp2  코덱은 \"tutorial\"에 사용됨.\n\thttp://www.imagemagick.org/\n
+Write	JPEG2000Translator		쓰기
+Output only codestream (.jpc)	JPEG2000Translator		출력 전용 코드스트림 (. jpc)
+Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Be 비트맵 형식 (JPEG2000변환기)

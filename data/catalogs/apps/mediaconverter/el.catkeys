@@ -1,54 +1,54 @@
 1	greek, modern (1453-)	x-vnd.Haiku-MediaConverter	1991546006
-Video using parameters form settings	MediaConverter		Βίντεο χρησιμοποιόντας τις ρυθμίσεις
-Video encoding:	MediaConverter		Κωδικοποίηση βίντεο:
-No audio	Audio codecs list		Χωρίς ήχο
-Error	MediaConverter		Σφάλμα
-Error loading a file	MediaConverter		Σφάλμα κατά τη φόρτωση ενός αρχείου
-File Error	MediaConverter-FileInfo		Σφάλμα Αρχείου
-Open…	Menu		Άνοιγμα...
-Start [ms]: 	MediaConverter		Αρχή [ms]:
-Output file '%filename' created	MediaConverter		Αρχείο εξόδου '%filename' φτιάχτηκε
-Output format	MediaConverter		Τύπος εξαγωγής
-End   [ms]: 	MediaConverter		Τέλος [ms]:
-MediaConverter	System name		Μετατροπέας Μέσων
-No video	Video codecs list		Χωρίς βίντεο
-Duration:	MediaConverter-FileInfo		Διάρκεια:
-OK	MediaConverter		Εντάξει
+Video quality: %3d%%	MediaConverter		Ποιότητα βίντεο: %3d%%
+Source files	MediaConverter		Πηγαία αρχεία
 Error converting '%filename'	MediaConverter		Σφάλμα κατά τη μετατροπή του '%filename'
-Low	MediaConverter		Χαμηλή
 Conversion completed	MediaConverter		Η μετατροπή ολοκληρώθηκε
 Audio:	MediaConverter-FileInfo		Ήχος:
-OK	MediaConverter-FileInfo		Εντάξει
-Source files	MediaConverter		Πηγαία αρχεία
-Cancelling	MediaConverter		Ακύρωση
-Error loading files	MediaConverter		Σφάλμα κατά τη φόρτωση των αρχείων
-Cancel	MediaConverter		Άκυρο
-None available	Video codecs		Κανένα διαθέσιμο
-Conversion cancelled	MediaConverter		Η μετατροπή ακυρώθηκε
-No file selected	MediaConverter-FileInfo		Δεν επιλέχτηκε αρχείο
-Select this folder	MediaConverter		Επιλέξτε αυτό τον φάκελο
-Continue	MediaConverter		Συνέχεια
-Encoder parameters	MediaConverter-EncoderWindow		Encoder parameters
-Video:	MediaConverter-FileInfo		Βίντεο:
-%d bit 	MediaFileInfo		%d bit
-Error creating '%filename'	MediaConverter		Σφάλμα κατά τη δημιουργία του '%filename'
-Video quality not supported	MediaConverter		Η ποιότητα βίντεο δεν υποστηρίζεται
-Cancelling…	MediaConverter		Ακύρωση…
-File details	MediaConverter		Λεπτομέρειες αρχείου
-Select	MediaConverter		Επιλογή
-Quit	Menu		Έξοδος
-Preview	MediaConverter		Προεπισκόπηση
-File format:	MediaConverter		Μορφή αρχείου:
-None available	Audio codecs		Κανένα διαθέσιμο
 MediaConverter+:SaveDirectory	MediaConverter		ΜετατροπέαςΠολυμέσων+:ΑποθήκευσηΚαταλόγου
-Error launching: %strError%	MediaConverter		Σφάλμα κατά την εκτέλεση του: %strError%
+Cancelling	MediaConverter		Ακύρωση
+None available	Audio codecs		Κανένα διαθέσιμο
+No file selected	MediaConverter-FileInfo		Δεν επιλέχτηκε αρχείο
 High	MediaConverter		Υψηλή
-Drop media files onto this window	MediaConverter		Drop media files onto this window
+File Error	MediaConverter-FileInfo		Σφάλμα Αρχείου
+None available	Video codecs		Κανένα διαθέσιμο
+Output format	MediaConverter		Τύπος εξαγωγής
+OK	MediaConverter		Εντάξει
+Error creating '%filename'	MediaConverter		Σφάλμα κατά τη δημιουργία του '%filename'
+Error loading a file	MediaConverter		Σφάλμα κατά τη φόρτωση ενός αρχείου
+Encoder parameters	MediaConverter-EncoderWindow		Encoder parameters
+Open…	Menu		Άνοιγμα...
 Audio encoding:	MediaConverter		Κωδικοποίηση ήχου:
-Audio quality not supported	MediaConverter		Η ποιότητα ήχου δεν υποστηρίζεται
-File	Menu		Αρχείο
-Convert	MediaConverter		Μετατροπή
-Video quality: %3d%%	MediaConverter		Ποιότητα βίντεο: %3d%%
-Output folder	MediaConverter		Φάκελος εξαγωγής
 Audio quality: %3d%%	MediaConverter		Ποιότητα ήχου: %3d%%
+Cancelling…	MediaConverter		Ακύρωση…
+Output file '%filename' created	MediaConverter		Αρχείο εξόδου '%filename' φτιάχτηκε
+Output folder	MediaConverter		Φάκελος εξαγωγής
+Video using parameters form settings	MediaConverter		Βίντεο χρησιμοποιόντας τις ρυθμίσεις
+Video:	MediaConverter-FileInfo		Βίντεο:
+Select	MediaConverter		Επιλογή
+Conversion cancelled	MediaConverter		Η μετατροπή ακυρώθηκε
+Low	MediaConverter		Χαμηλή
+Error loading files	MediaConverter		Σφάλμα κατά τη φόρτωση των αρχείων
+End   [ms]: 	MediaConverter		Τέλος [ms]:
+Cancel	MediaConverter		Άκυρο
+OK	MediaConverter-FileInfo		Εντάξει
+Video encoding:	MediaConverter		Κωδικοποίηση βίντεο:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Προέκυψε ένα σφάλμα κατά την ανάγνωση των πληροφοριών του αρχείου.\n\nΣφάλμα:
+Error	MediaConverter		Σφάλμα
+File details	MediaConverter		Λεπτομέρειες αρχείου
+No audio	Audio codecs list		Χωρίς ήχο
+Drop media files onto this window	MediaConverter		Drop media files onto this window
+Quit	Menu		Έξοδος
+Duration:	MediaConverter-FileInfo		Διάρκεια:
+MediaConverter	System name		Μετατροπέας Μέσων
+Error launching: %strError%	MediaConverter		Σφάλμα κατά την εκτέλεση του: %strError%
+File format:	MediaConverter		Μορφή αρχείου:
+File	Menu		Αρχείο
+Video quality not supported	MediaConverter		Η ποιότητα βίντεο δεν υποστηρίζεται
+Select this folder	MediaConverter		Επιλέξτε αυτό τον φάκελο
+%d bit 	MediaFileInfo		%d bit
+No video	Video codecs list		Χωρίς βίντεο
+Continue	MediaConverter		Συνέχεια
+Convert	MediaConverter		Μετατροπή
+Audio quality not supported	MediaConverter		Η ποιότητα ήχου δεν υποστηρίζεται
+Preview	MediaConverter		Προεπισκόπηση
+Start [ms]: 	MediaConverter		Αρχή [ms]:

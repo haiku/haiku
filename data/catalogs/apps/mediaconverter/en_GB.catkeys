@@ -1,6 +1,6 @@
 1	english (united kingdom)	x-vnd.Haiku-MediaConverter	3397622758
-Video using parameters form settings	MediaConverter		Video using parametres form settings
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{The file was not recognised as a supported media file:} other{# files were not recognised as supported media files:}}
 OK	MediaConverter		Alright
-OK	MediaConverter-FileInfo		Alright
 Encoder parameters	MediaConverter-EncoderWindow		Encoder parametres
+Video using parameters form settings	MediaConverter		Video using parametres form settings
+OK	MediaConverter-FileInfo		Alright

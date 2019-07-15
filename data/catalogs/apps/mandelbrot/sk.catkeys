@@ -1,23 +1,23 @@
 1	slovak	x-vnd.Haiku-Mandelbrot	1781779654
-About	MandelbrotWindow		O aplikácii
-Julia	MandelbrotWindow		Julia
-Grassland	MandelbrotWindow		Trávnatá krajina
-Spring	MandelbrotWindow		Jar
-High contrast	MandelbrotWindow		Vysoký kontrast
-Fire	MandelbrotWindow		Oheň
-Royal	MandelbrotWindow		Kráľovské
-File	MandelbrotWindow		Súbor
-Lightning	MandelbrotWindow		Blesk
-Midnight	MandelbrotWindow		Polnoc
-Palette	MandelbrotWindow		Paleta
-Mandelbrot	MandelbrotWindow		Mandelbrot
 Burning Ship	MandelbrotWindow		Horiaca loď
-Quit	MandelbrotWindow		Ukončiť
-Frost	MandelbrotWindow		Mráz
+Grassland	MandelbrotWindow		Trávnatá krajina
+Lightning	MandelbrotWindow		Blesk
+About	MandelbrotWindow		O aplikácii
+Palette	MandelbrotWindow		Paleta
 Set	MandelbrotWindow		Nastaviť
-Iterations	MandelbrotWindow		Iterácie
-Mandelbrot	System name		Mandelbrot
-Deepfrost	MandelbrotWindow		Hlboký mráz
 Tricorn	MandelbrotWindow		Trojrožec
-Multibrot	MandelbrotWindow		Multibrot
+Royal	MandelbrotWindow		Kráľovské
 Orbit Trap	MandelbrotWindow		Orbitová pasca
+Deepfrost	MandelbrotWindow		Hlboký mráz
+Quit	MandelbrotWindow		Ukončiť
+File	MandelbrotWindow		Súbor
+Julia	MandelbrotWindow		Julia
+Frost	MandelbrotWindow		Mráz
+Fire	MandelbrotWindow		Oheň
+Mandelbrot	System name		Mandelbrot
+Iterations	MandelbrotWindow		Iterácie
+High contrast	MandelbrotWindow		Vysoký kontrast
+Multibrot	MandelbrotWindow		Multibrot
+Spring	MandelbrotWindow		Jar
+Midnight	MandelbrotWindow		Polnoc
+Mandelbrot	MandelbrotWindow		Mandelbrot

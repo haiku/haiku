@@ -1,50 +1,50 @@
 1	russian	x-vnd.Be-PEPL	2332202134
-Edit	People		Изменить
-Error	People		Ошибка
-City	People		Город
-The file '%name%' could not be written.	People		Невозможно записать файл '%name%'.
-none	Groups list		пусто
-Configure attributes	People		Выбрать атрибуты
-Company	People		Компания
-%name% picture	People		Изображение для %name%
-Work phone	People		Рабочий телефон
-People	System name		Контакты
-New person	People		Новая персона
-Select all	People		Выделить всё
-File	People		Файл
-Unnamed person	People		Новая персона
-Could not create %s.	People		Невозможно создать %s.
-Country	People		Страна
-Close	People		Закрыть
-Group	People		Группа
-Nickname	People		Прозвище
-Quit	People		Выход
-Name	People		Имя
-Revert	People		Вернуть
-Don't save	People		Не сохранять
-Undo	People		Отменить
-E-mail	People		E-mail
-Load image…	People		Выбрать рисунок…
-OK	People		ОК
-Remove image	People		Удалить рисунок
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Не удалось запустить FileTypes для настройки атрибутов Персоны.\n\nОшибка: 
-Home phone	People		Домашний телефон
-Save as…	People		Сохранить как…
-Redo	People		Отменить
-Save changes before closing?	People		Сохранить изменения перед выходом?
-Paste	People		Вставить
-Drop an image here,\nor use the contextual menu.	People		Перенесите сюда фотографию\nили используйте контекстное меню.
-Save	People		Сохранить
-Person	Short mimetype description		Персона
+Unnamed person	People		Новая персона
 New person…	People		Новая персона…
 Address	People		Адрес
-URL	People		URL
-Sorry	People		Извините
 Zip	People		Индекс
-Contact information for a person.	Long mimetype description		Контактная информация для человека.
-Fax	People		Факс
+Select all	People		Выделить всё
+Could not create %s.	People		Невозможно создать %s.
+Quit	People		Выход
+Company	People		Компания
+Name	People		Имя
+The file '%name%' could not be written.	People		Невозможно записать файл '%name%'.
 Contact name	People		Имя контакта
-Cut	People		Вырезать
 Cancel	People		Отмена
+Edit	People		Изменить
+Save changes before closing?	People		Сохранить изменения перед выходом?
+People	System name		Контакты
+Error	People		Ошибка
+Revert	People		Вернуть
+Country	People		Страна
+Person	Short mimetype description		Персона
+New person	People		Новая персона
+Save	People		Сохранить
+Fax	People		Факс
+URL	People		URL
+%name% picture	People		Изображение для %name%
+Home phone	People		Домашний телефон
+none	Groups list		пусто
+Save as…	People		Сохранить как…
+Cut	People		Вырезать
+Contact information for a person.	Long mimetype description		Контактная информация для человека.
+Remove image	People		Удалить рисунок
+City	People		Город
+Undo	People		Отменить
+Don't save	People		Не сохранять
+Configure attributes	People		Выбрать атрибуты
+Work phone	People		Рабочий телефон
 State	People		Штат
+Nickname	People		Прозвище
+OK	People		ОК
+File	People		Файл
+Redo	People		Отменить
+Close	People		Закрыть
 Copy	People		Копировать
+Paste	People		Вставить
+E-mail	People		E-mail
+Group	People		Группа
+Drop an image here,\nor use the contextual menu.	People		Перенесите сюда фотографию\nили используйте контекстное меню.
+Load image…	People		Выбрать рисунок…
+Sorry	People		Извините

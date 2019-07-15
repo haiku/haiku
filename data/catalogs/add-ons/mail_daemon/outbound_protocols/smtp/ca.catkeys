@@ -1,14 +1,14 @@
 1	catalan; valencian	x-vnd.Haiku-SMTP	815985329
-SMTP server:	ConfigView		Servidor SMTP:
-Error while logging in to %serv	smtp		S'ha produït un error en registrar al %serv
-Unencrypted	ConfigView		Sense xifrar
-. The server says:\n	smtp		. El servidor diu:\n
-ESMTP	ConfigView		ESMTP
-Connecting to server…	smtp		S'està connectant al servidor...
-Error while opening connection to %serv	smtp		S'ha produït un error en obrir la connexió al servidor %serv
 POP3 authentication failed. The server said:\n	smtp		Ha fallat l'autenticació POP3. El servidor ha respost:\n
 Destination:	ConfigView		Destí:
+Error while logging in to %serv	smtp		S'ha produït un error en registrar al %serv
+Connecting to server…	smtp		S'està connectant al servidor...
+Unencrypted	ConfigView		Sense xifrar
+. The server says:\n	smtp		. El servidor diu:\n
+Error while opening connection to %serv	smtp		S'ha produït un error en obrir la connexió al servidor %serv
+. The server said:\n	smtp		. El servidor va dir:\n
 None	ConfigView		Cap
+SMTP server:	ConfigView		Servidor SMTP:
+ESMTP	ConfigView		ESMTP
 POP3 before SMTP	ConfigView		POP3 abans que SMTP
 SSL	ConfigView		SSL
-. The server said:\n	smtp		. El servidor va dir:\n

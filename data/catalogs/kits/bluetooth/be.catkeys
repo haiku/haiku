@@ -1,88 +1,88 @@
 1	belarusian	x-vnd.Haiku-Bluetooth	3550394259
-Display	DeviceClass		Экран
-Capturing	DeviceClass		Захват
-Printer	DeviceClass		Прынтэр
-Uncategorized	DeviceClass		Без катэгорыі
-1-17% utilized	DeviceClass		1-17% выкарыстана
 Positioning	DeviceClass		Размяшчэнне
-Rendering	DeviceClass		Рэндэрынг
-Phone	DeviceClass		Тэлефон
-17-33% utilized	DeviceClass		17-33% выкарыстана
-#ServerNotReady#Not Valid name	RemoteDevice		#СерверНеГатовы#Няправільнае імя
-Combo keyboard/pointing device	DeviceClass		Камбінаваная клавіатура/указальная прылада
 Controller	DeviceClass		Кантролер
-No service available	DeviceClass		Службы недаступныя
-Wearable	DeviceClass	A wearable computer	Пераносны
-Handheld	DeviceClass		Наладоннік
-Invalid device class!\n	DeviceClass		Неправільны клас прылады!\n
-Sensing device	DeviceClass		Прылада распазнавання дотыку
-Computer	DeviceClass		Кампутар
-Cellular	DeviceClass		Сотавы тэлефон
-Microphone	DeviceClass		Мікрафон
-Unknown (reserved) minor device class	DeviceClass		Нывядомы (рэзервовы) клас дробных прылад
-Cordless	DeviceClass		Бесшнуравая
 Common ISDN access	DeviceClass		Агульны ISDN доступ
-83-99% utilized	DeviceClass		83-99% выкарыстана
-Scanner	DeviceClass		Сканер
-Game	DeviceClass		Гульня
-Gamepad	DeviceClass		Геймпад
-(reserved)	DeviceClass		(рэзервовы)
-Desktop workstation	DeviceClass		Настольная рабочая станцыя
-Audio/Video	DeviceClass		Аўдыё
-Glasses	DeviceClass		Акуляры
+Unknown (reserved) minor device class	DeviceClass		Нывядомы (рэзервовы) клас дробных прылад
+Uncategorized	DeviceClass		Без катэгорыі
 Keyboard	DeviceClass		Клавіатура
-Camera	DeviceClass		Камера
-Major class: 	DeviceClass		Буйны клас: 
-50-67% utilized	DeviceClass		50-67% выкарыстана
-Card reader	DeviceClass		Карт-рыдэр
-Set-top box	DeviceClass		Set-top кампутар
-Helmet	DeviceClass		Шлём
-Laptop	DeviceClass		Ноутбук
-Car audio	DeviceClass		Аўтамабільнае аўдыё
-SIM card reader	DeviceClass		Прылада чытання SIM-картак
-Headphones	DeviceClass		Навушнікі
-Information	DeviceClass		Інфармацыя
-Remote control	DeviceClass		Дыстанцыйнае кіраванне
-Service classes: 	DeviceClass		Службовыя классы: 
-Pager	DeviceClass	A small radio device to receive short text messages	Пэйджар
-Object transfer	DeviceClass		Перадача аб'ектаў
-Gaming/Toy	DeviceClass		Гульня/Цацка
-Audio	DeviceClass		Аўдыё
-Robot	DeviceClass		Робат
-Camcorder	DeviceClass		Відэарэкордэр
-Digitizer tablet	DeviceClass		Сэнсарны планшэт
-Loudspeaker	DeviceClass		Гучнагаварыцель
-Joystick	DeviceClass		Джойсцік
-LAN access	DeviceClass		Доступ да LAN
-Wrist watch	DeviceClass		Наручны гадзіннік
-Minor class: 	DeviceClass		Дробны клас: 
-Networking	DeviceClass		Сеткавыя прылады
-Portable audio	DeviceClass		Партатыўнае аўдыё
-Device conforms to the headset profile	DeviceClass		Прылада адносіцца да профіля гарнітуры
-Hands-free	DeviceClass		Гарнітура
-#CommandFailed#Not Valid name	RemoteDevice		#КамандаНяўдалая#Няправільнае імя
-Vehicle	DeviceClass		Аўтамабіль
-Palm	DeviceClass	A palm-held device	Прылада Palm
-Video display and loudspeaker	DeviceClass		Відэаэкран і гучнагаварыцель
-Peripheral	DeviceClass		Перыферыя
-#NoOwnerError#Not Valid name	RemoteDevice		#НямаЎладальніка#Няправільнае імя
-Wired modem or voice gateway	DeviceClass		Шнуравы мадэм або лінія перадачы голасу
-Jacket	DeviceClass		Кажух
-Unspecified	DeviceClass		Невызначана
-Fully available	DeviceClass		Поўнасцю даступны
-67-83% utilized	DeviceClass		67-83% выкарыстана
-Not implemented	RemoteDevice		Не ажыццяўлено
-#NotCompletedRequest#Not Valid name	RemoteDevice		#НявыкананыЗапрос#Няправільнае імя
-Server	DeviceClass		Сервер
-Video conferencing	DeviceClass		Відэаканферэнцыя
-Video camera	DeviceClass		Відэакамера
-HiFi audio device	DeviceClass		HiFi аўдыё прылада
 Smart phone	DeviceClass		Смартфон
-Telephony	DeviceClass		Тэлефанія
-Doll/Action figure	DeviceClass		Кукла/Манекен
 VCR	DeviceClass		Відзік
-Video monitor	DeviceClass		Відэаманітор
-Pointing device	DeviceClass		Указальная прылада
-Miscellaneous	DeviceClass		Іншае
-33-50% utilized	DeviceClass		33-50% выкарыстана
+Cellular	DeviceClass		Сотавы тэлефон
+Audio	DeviceClass		Аўдыё
+Audio/Video	DeviceClass		Аўдыё
+Car audio	DeviceClass		Аўтамабільнае аўдыё
+Major class: 	DeviceClass		Буйны клас: 
+HiFi audio device	DeviceClass		HiFi аўдыё прылада
+Microphone	DeviceClass		Мікрафон
+Capturing	DeviceClass		Захват
+Jacket	DeviceClass		Кажух
+50-67% utilized	DeviceClass		50-67% выкарыстана
+Headphones	DeviceClass		Навушнікі
 Imaging	DeviceClass		Выяўленне
+Device conforms to the headset profile	DeviceClass		Прылада адносіцца да профіля гарнітуры
+Remote control	DeviceClass		Дыстанцыйнае кіраванне
+Fully available	DeviceClass		Поўнасцю даступны
+#CommandFailed#Not Valid name	RemoteDevice		#КамандаНяўдалая#Няправільнае імя
+Server	DeviceClass		Сервер
+No service available	DeviceClass		Службы недаступныя
+Printer	DeviceClass		Прынтэр
+Card reader	DeviceClass		Карт-рыдэр
+Wired modem or voice gateway	DeviceClass		Шнуравы мадэм або лінія перадачы голасу
+#ServerNotReady#Not Valid name	RemoteDevice		#СерверНеГатовы#Няправільнае імя
+#NoOwnerError#Not Valid name	RemoteDevice		#НямаЎладальніка#Няправільнае імя
+Camcorder	DeviceClass		Відэарэкордэр
+#NotCompletedRequest#Not Valid name	RemoteDevice		#НявыкананыЗапрос#Няправільнае імя
+17-33% utilized	DeviceClass		17-33% выкарыстана
+Desktop workstation	DeviceClass		Настольная рабочая станцыя
+Unspecified	DeviceClass		Невызначана
+Miscellaneous	DeviceClass		Іншае
+Robot	DeviceClass		Робат
+Vehicle	DeviceClass		Аўтамабіль
+LAN access	DeviceClass		Доступ да LAN
+Glasses	DeviceClass		Акуляры
+Phone	DeviceClass		Тэлефон
+Laptop	DeviceClass		Ноутбук
+67-83% utilized	DeviceClass		67-83% выкарыстана
+Cordless	DeviceClass		Бесшнуравая
+Invalid device class!\n	DeviceClass		Неправільны клас прылады!\n
+Minor class: 	DeviceClass		Дробны клас: 
+Doll/Action figure	DeviceClass		Кукла/Манекен
+Not implemented	RemoteDevice		Не ажыццяўлено
+33-50% utilized	DeviceClass		33-50% выкарыстана
+Gaming/Toy	DeviceClass		Гульня/Цацка
+Video camera	DeviceClass		Відэакамера
+Handheld	DeviceClass		Наладоннік
+Service classes: 	DeviceClass		Службовыя классы: 
+Loudspeaker	DeviceClass		Гучнагаварыцель
+83-99% utilized	DeviceClass		83-99% выкарыстана
+SIM card reader	DeviceClass		Прылада чытання SIM-картак
+Computer	DeviceClass		Кампутар
+Scanner	DeviceClass		Сканер
+Wearable	DeviceClass	A wearable computer	Пераносны
+Display	DeviceClass		Экран
+Gamepad	DeviceClass		Геймпад
+Video monitor	DeviceClass		Відэаманітор
+Palm	DeviceClass	A palm-held device	Прылада Palm
+Joystick	DeviceClass		Джойсцік
+Networking	DeviceClass		Сеткавыя прылады
+Telephony	DeviceClass		Тэлефанія
+Game	DeviceClass		Гульня
+Video display and loudspeaker	DeviceClass		Відэаэкран і гучнагаварыцель
+Wrist watch	DeviceClass		Наручны гадзіннік
+Sensing device	DeviceClass		Прылада распазнавання дотыку
+Pointing device	DeviceClass		Указальная прылада
+(reserved)	DeviceClass		(рэзервовы)
+Rendering	DeviceClass		Рэндэрынг
+Information	DeviceClass		Інфармацыя
+Helmet	DeviceClass		Шлём
+Pager	DeviceClass	A small radio device to receive short text messages	Пэйджар
+Hands-free	DeviceClass		Гарнітура
+Digitizer tablet	DeviceClass		Сэнсарны планшэт
+Portable audio	DeviceClass		Партатыўнае аўдыё
+Camera	DeviceClass		Камера
+1-17% utilized	DeviceClass		1-17% выкарыстана
+Combo keyboard/pointing device	DeviceClass		Камбінаваная клавіатура/указальная прылада
+Video conferencing	DeviceClass		Відэаканферэнцыя
+Peripheral	DeviceClass		Перыферыя
+Object transfer	DeviceClass		Перадача аб'ектаў
+Set-top box	DeviceClass		Set-top кампутар

@@ -1,54 +1,54 @@
 1	hungarian	x-vnd.Haiku-Mail	2750130554
+Account settings	AutoConfigWindow		Fiókbeállítások
+\t\t· Outgoing	Config Window		\t\t· Kimenő
+An error occurred while creating the config view: %error.	Config Views		Hiba történt a konfigurációs nézet létrehozása közben: %error.
+E-mail address:	E-Mail		E-mail cím:
+Create new account	AutoConfigWindow		Új fiók létrehozása
+While sending and receiving	Config Window		Küldéskor / fogadáskor
+Error!	Config Views		Hiba!
+Apply	Config Window		Alkalmaz
+Incoming mail filters	Config Views		Bejövő levelek szűrői
+Outgoing mail filters	Config Views		Kimenő levelek szűrői
+Server name:	E-Mail		Kiszolgáló neve:
+Add	Config Window		Hozzáadás
+Back	AutoConfigWindow		Vissza
+Real name:	E-Mail		Valódi név:
+Real name:	Config Views		Valódi név:
+\t\t· E-mail filters	Config Window		\t\t· E-mail szűrők
+Outgoing	E-Mail		Kimenő
+Accounts	Config Window		Fiókok
+Outgoing	Config Window		Kimenő
+Remove	Config Views		Eltávolítás
+Show notifications:	Config Window		Értesítések megjelenítése:
 Settings	Config Window		Beállítások
 Never	Config Window	show status window	Soha
-While sending and receiving	Config Window		Küldéskor / fogadáskor
-Incoming	Config Window		Bejövő
-Server name:	E-Mail		Kiszolgáló neve:
-An error occurred while creating the config view: %error.	Config Views		Hiba történt a konfigurációs nézet létrehozása közben: %error.
-OK	Config Window		Rendben
-E-mail address:	E-Mail		E-mail cím:
-Account name:	E-Mail		Fiók neve:
 Account name:	Config Views		Fiók neve:
-Create new account	AutoConfigWindow		Új fiók létrehozása
-OK	Config Views		Rendben
-The filter could not be moved. Deleting filter.	Config Views		Nem lehetett áthelyezni a szűrőt. A szűrő törlése.
-Revert	Config Window		Visszaállít
-Login name:	E-Mail		Felhasználó:
-Incoming	E-Mail		Bejövő
-Password:	E-Mail		Jelszó:
-Accounts	Config Window		Fiókok
-Finish	AutoConfigWindow		Befejezés
-Remove	Config Window		Eltávolítás
-Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Új fiók létrehozása a Hozzáadás gombbal.\n\nA kijelölt fiók eltávolítása az Eltávolítás gombbal.\n\nVálassz egy fiókot a listából annak beállításainak módosításához.
-Error!	Config Views		Hiba!
-Server Name:	E-Mail		Kiszolgáló neve:
-While sending	Config Window		Küldés közben
-Show notifications:	Config Window		Értesítések megjelenítése:
+\t\t· Incoming	Config Window		\t\t· Bejövő
 Enter a valid e-mail address.	AutoConfigWindow		Írjon be egy valós e-mail címet.
-Add	Config Window		Hozzáadás
-Account settings	AutoConfigWindow		Fiókbeállítások
-E-mail	System name		E-mail
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nAz általános beállítások visszaállítása sikertelen.\n\nHiba történt az általános beállítások beolvasása közben:\n%s\n
-Real name:	Config Views		Valódi név:
-\t\t· Outgoing	Config Window		\t\t· Kimenő
+Incoming	E-Mail		Bejövő
 Choose Protocol	E-Mail		Protokoll választása
 Return address:	Config Views		Válasz cím:
-Edit mailbox menu…	Config Window		Postafiókmenü szerkesztése…
-Outgoing	E-Mail		Kimenő
-\t\t· E-mail filters	Config Window		\t\t· E-mail szűrők
-Remove	Config Views		Eltávolítás
-\t\t· Incoming	Config Window		\t\t· Bejövő
-Next	AutoConfigWindow		Következő
-Check every	Config Window		Ellenőrzés gyakorisága:
-Back	AutoConfigWindow		Vissza
-Incoming mail filters	Config Views		Bejövő levelek szűrői
+Password:	E-Mail		Jelszó:
+Error retrieving general settings: %s\n	Config Window		Hiba történt az általános beállítások beolvasása közben:%s\n
+The filter could not be moved. Deleting filter.	Config Views		Nem lehetett áthelyezni a szűrőt. A szűrő törlése.
+OK	Config Views		Rendben
+Revert	Config Window		Visszaállít
+Incoming	Config Window		Bejövő
+Finish	AutoConfigWindow		Befejezés
+Add filter	Config Views		Szűrő hozzáadása
 Account settings	Config Views		Fiókbeállítások
 minutes	Config Window		percenként
-Error retrieving general settings: %s\n	Config Window		Hiba történt az általános beállítások beolvasása közben:%s\n
-Real name:	E-Mail		Valódi név:
-Apply	Config Window		Alkalmaz
+E-mail	System name		E-mail
+Check every	Config Window		Ellenőrzés gyakorisága:
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Új fiók létrehozása a Hozzáadás gombbal.\n\nA kijelölt fiók eltávolítása az Eltávolítás gombbal.\n\nVálassz egy fiókot a listából annak beállításainak módosításához.
+Account name:	E-Mail		Fiók neve:
+Edit mailbox menu…	Config Window		Postafiókmenü szerkesztése…
+Server Name:	E-Mail		Kiszolgáló neve:
+Remove	Config Window		Eltávolítás
+Login name:	E-Mail		Felhasználó:
+While sending	Config Window		Küldés közben
+OK	Config Window		Rendben
 OK	AutoConfigWindow		Rendben
-Add filter	Config Views		Szűrő hozzáadása
-Outgoing	Config Window		Kimenő
-Outgoing mail filters	Config Views		Kimenő levelek szűrői
+Next	AutoConfigWindow		Következő
 Error	Config Window		Hiba

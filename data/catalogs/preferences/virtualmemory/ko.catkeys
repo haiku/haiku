@@ -1,12 +1,12 @@
 1	korean	x-vnd.Haiku-VirtualMemory	1828586495
-Turn off	SettingsWindow		해제
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		현재 메모리에서 사용하는 가상메모리를 해제하면 시스템 안정성에 원치 않는 영향을 가져오게 될것입니다.\n메모리가 부족하게 뙬 때 까지는 가상메모리가 시스템 성능에 영향을 미치지 않을 것입니다.\n\n당신은 정말로 해제하겠습니까?
 Requested swap file size:	SettingsWindow		요청된 스왑 파일 크기:
-Defaults	SettingsWindow		기본설정
-Use volume:	SettingsWindow		사용하는 볼륨:
-Keep enabled	SettingsWindow		가능하도록 유지
-Revert	SettingsWindow		되돌리기
 VirtualMemory	System name		가상메모리
 OK	VirtualMemoryApp		확인
+Use volume:	SettingsWindow		사용하는 볼륨:
+Turn off	SettingsWindow		해제
+Revert	SettingsWindow		되돌리기
+Keep enabled	SettingsWindow		가능하도록 유지
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		가상메모리\n\tAxel Dörfler에 의해 작성됨\n\t저작권 2005, Haiku.\n
+Defaults	SettingsWindow		기본설정
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		현재 메모리에서 사용하는 가상메모리를 해제하면 시스템 안정성에 원치 않는 영향을 가져오게 될것입니다.\n메모리가 부족하게 뙬 때 까지는 가상메모리가 시스템 성능에 영향을 미치지 않을 것입니다.\n\n당신은 정말로 해제하겠습니까?
 Enable virtual memory	SettingsWindow		가상 메모리 사용

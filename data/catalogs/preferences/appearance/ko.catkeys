@@ -1,48 +1,47 @@
-1	korean	x-vnd.Haiku-Appearance	963859935
-Control highlight	Colors tab		컨트롤 강조
+1	korean	x-vnd.Haiku-Appearance	3342844385
 Control border	Colors tab		컨트롤 가장자리
-Antialiasing type:	AntialiasingSettingsView		안티앨리어싱 타입:
-Shadow	Colors tab		그림자
-On	AntialiasingSettingsView		켜기
-Defaults	APRWindow		기본설정
-Grayscale	AntialiasingSettingsView		그레이스케일
-Shine	Colors tab		밝은 부분
-About	DecorSettingsView		정보
 Off	AntialiasingSettingsView		끄기
-Choose Decorator	DecorSettingsView		장식 선택
-Success	Colors tab		성공
-Inactive window tab text	Colors tab		비활성화된 윈도우 탭 텍스트
-Failure	Colors tab		실패
-Hinting menu	AntialiasingSettingsView		암시 메뉴
-Document background	Colors tab		문서 배경
-Revert	APRWindow		되돌리기
-Window tab	Colors tab		윈도우 탭
-Tooltip background	Colors tab		말풍선 배경
-Selected menu item background	Colors tab		선택된 메뉴 아이템 배경
-Antialiasing	APRWindow		안티앨리어싱
-Navigation base	Colors tab		탐색창 배경
 Window border	Colors tab		창 가장자리
-Window tab text	Colors tab		윈도우 탭 텍스트
-Document text	Colors tab		문서 텍스트
-Navigation pulse	Colors tab		탐색창 번쩍
-Selected menu item text	Colors tab		선택된 메뉴 아이템 텍스트
-Menu background	Colors tab		메뉴 배경
-OK	DecorSettingsView		좋아요
-Panel background	Colors tab		패널 배경
-Colors	APRWindow		색상
-Control background	Colors tab		컨트롤 배경
 Inactive window tab	Colors tab		비활성화된 윈도우 탭
+Defaults	APRWindow		기본설정
+Shadow	Colors tab		그림자
+Document background	Colors tab		문서 배경
 Appearance	System name		외양
 Reduce colored edges filter strength:	AntialiasingSettingsView		색깔있는 가장자리 필터 강도 줄이기:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		서브픽셀 기반의 안티 앨리어싱과 문자모양 힌트와의 조합은 가능한 법적인 문제를 피하기 위해 이 Haiku 빌드에서는 가능하지 않습니다. 이 기능을 가능하게 하려면,당신 자신이 Haiku를 빌드해서 libfreetype 설정 헤더에서 어떤 옵션을 가능하게 해야합니다.
-Control text	Colors tab		컨트롤 텍스트
-Tooltip text	Colors tab		말풍선 텍스트
-Inactive window border	Colors tab		비활성화된 창 가장자리
-Menu item text	Colors tab		메뉴 아이템 텍스트
-LCD subpixel	AntialiasingSettingsView		LCD 서브픽셀
-Selected menu item border	Colors tab		선택된 메뉴 아이템 가장자리
-Strong	AntialiasingSettingsView		강하게
-Panel text	Colors tab		패널 텍스트
-Monospaced fonts only	AntialiasingSettingsView		고정폭 글꼴만 사용
-Antialiasing menu	AntialiasingSettingsView		안티앨리어싱 메뉴
 Glyph hinting:	AntialiasingSettingsView		문자모양 힌트:
+Menu item text	Colors tab		메뉴 아이템 텍스트
+Antialiasing menu	AntialiasingSettingsView		안티앨리어싱 메뉴
+Success	Colors tab		성공
+About	DecorSettingsView		정보
+Shine	Colors tab		밝은 부분
+On	AntialiasingSettingsView		켜기
+Menu background	Colors tab		메뉴 배경
+Revert	APRWindow		되돌리기
+OK	DecorSettingsView		좋아요
+Control text	Colors tab		컨트롤 텍스트
+Selected menu item background	Colors tab		선택된 메뉴 아이템 배경
+Antialiasing	APRWindow		안티앨리어싱
+Choose Decorator	DecorSettingsView		장식 선택
+Strong	AntialiasingSettingsView		강하게
+Failure	Colors tab		실패
+Selected menu item text	Colors tab		선택된 메뉴 아이템 텍스트
+Panel background	Colors tab		패널 배경
+Window tab text	Colors tab		윈도우 탭 텍스트
+Navigation pulse	Colors tab		탐색창 번쩍
+LCD subpixel	AntialiasingSettingsView		LCD 서브픽셀
+Window tab	Colors tab		윈도우 탭
+Tooltip background	Colors tab		말풍선 배경
+Selected menu item border	Colors tab		선택된 메뉴 아이템 가장자리
+Tooltip text	Colors tab		말풍선 텍스트
+Control background	Colors tab		컨트롤 배경
+Inactive window tab text	Colors tab		비활성화된 윈도우 탭 텍스트
+Navigation base	Colors tab		탐색창 배경
+Grayscale	AntialiasingSettingsView		그레이스케일
+Antialiasing type:	AntialiasingSettingsView		안티앨리어싱 타입:
+Panel text	Colors tab		패널 텍스트
+Hinting menu	AntialiasingSettingsView		암시 메뉴
+Monospaced fonts only	AntialiasingSettingsView		고정폭 글꼴만 사용
+Document text	Colors tab		문서 텍스트
+Inactive window border	Colors tab		비활성화된 창 가장자리
+Colors	APRWindow		색상
+Control highlight	Colors tab		컨트롤 강조

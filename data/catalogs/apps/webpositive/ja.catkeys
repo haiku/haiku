@@ -96,7 +96,7 @@ Remove	Download Window		除去
 Find	WebPositive Window		検索
 Find previous	WebPositive Window		前を検索
 Settings	WebPositive Window		設定
-(Finish: %date)	Download Window		(完了: %日)
+(Finish: %date)	Download Window		(完了: %date)
 Script console	WebPositive Window		スクリプトコンソール
 Name	Cookie Manager		名前
 Proxy server address:	Settings Window		アドレス:
@@ -127,13 +127,13 @@ Auto-hide interface in full screen mode	Settings Window		全画面表示で自�
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url の読み込みに失敗しました
 New tab	WebPositive Window		新規タブ
 Downloads in progress	WebPositive		ダウンロードが進行中です
-(Finish: %date - %duration left)	Download Window		(完了: %日 - 残り %時間)
+(Finish: %date - %duration left)	Download Window		(完了: %date - 残り %duration)
 Style:	Font Selection view		スタイル:
 General	Settings Window		一般
 View	WebPositive Window		表示
 Previous	WebPositive Window		前へ
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	ブックマークファイルの作成時にエラーが発生しました。\n\nエラー: %error
-(Finish: %date - Over %duration left)	Download Window		(完了: %日 - 残り %時間以上)
+(Finish: %date - Over %duration left)	Download Window		(完了: %date - 残り %duration以上)
 Bookmark error	WebPositive Window		ブックマークエラー
 Do you really want to clear the browsing history?	WebPositive Window		閲覧履歴を本当に消去しますか?
 Copy	WebPositive Window		コピー

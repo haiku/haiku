@@ -1,19 +1,19 @@
 1	japanese	x-vnd.Be-POST	2949558073
+No new messages	MailDaemon		新着メッセージはありません
+No new messages	DeskbarView		新着メッセージはありません
+Shutdown mail services	DeskbarView		終了
+Mail status	MailDaemon		メールの状況
 Fetching mail for %name	Notifier		%name からのメールを受信中
-Check for mails only	DeskbarView		メール受信のみ
-Send pending mails	DeskbarView		保留メールを送信
-{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{1 件の新着メッセージ} other{# 件の新着メッセージ}}
 {0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# 件の新着メッセージ} other{# 件の新着メッセージ}}
 {0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		%name 宛に {0, plural, one{# 件の新着メッセージ} other{# 件の新着メッセージ}}\n
+Create new message…	DeskbarView		新規メッセージ作成…
+Send pending mails	DeskbarView		保留メールを送信
+Settings…	DeskbarView		設定…
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{1 件の新着メッセージ} other{# 件の新着メッセージ}}
 New Messages	MailDaemon		新着メッセージ
 <no accounts>	DeskbarView		<アカウント無し>
-Mail status	MailDaemon		メールの状況
-Shutdown mail services	DeskbarView		終了
-Sending mail for %name	Notifier		%name へのメールを送信中
-Create new message…	DeskbarView		新規メッセージ作成…
-No new messages	MailDaemon		新着メッセージはありません
-Check for mail now	DeskbarView		今すぐメールをチェック
-No new messages	DeskbarView		新着メッセージはありません
-Mail daemon status log	MailDaemon		メールデーモン状況ログ
-Settings…	DeskbarView		設定…
 Mail status	Notifier		メールの状況
+Check for mails only	DeskbarView		メール受信のみ
+Check for mail now	DeskbarView		今すぐメールをチェック
+Sending mail for %name	Notifier		%name へのメールを送信中
+Mail daemon status log	MailDaemon		メールデーモン状況ログ

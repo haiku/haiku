@@ -1,27 +1,27 @@
 1	ukrainian	x-vnd.Haiku.TV	1995288111
-TV	MainWin		Телебачення
-Channel	MainWin		Канал
-Settings…	MainWin		Налаштування…
-Interface	MainWin		Інтерфейс
-Keep aspect ratio	MainWin		Зберегти співвідношення
-Previous channel	MainWin		Попередній канал
-Settings	MainWin		Налаштування
-TV	System name		Телебачення
+No menu	MainWin		Немає меню
 No border	MainWin		Без рамки
-Always on top	MainWin		Завжди поверх усіх
-OK	MainWin		Гаразд
-Quit	MainWin		Вийти
+force 704 x 576, display aspect 4:3	MainWin		примусово 704 x 576, співвідношення екрану 4:3
+Error, connecting to interface failed:\n\n	MainWin		Помилка, підключення до інтерфейсу не вдалось:\n\n
+force 544 x 576, display aspect 4:3	MainWin		примусово 544 x 576, співвідношення екрану 4:3
 Full screen	MainWin		Повний екран
-Debug	MainWin		Відладка
 Scale to native size	MainWin		Маштабувати до вихідного розміру
 unknown	MainWin		невідомий
 Next channel	MainWin		Наступний канал
-Error, interface is busy:\n\n	MainWin		Помилка, інтерфейс зайнятий:\n\n
-None	MainWin		Нічого
-force 704 x 576, display aspect 4:3	MainWin		примусово 704 x 576, співвідношення екрану 4:3
+Keep aspect ratio	MainWin		Зберегти співвідношення
 DVB - Digital Video Broadcasting TV	MainWin		DVB - цифрове ефірне ТБ
-force 544 x 576, display aspect 4:3	MainWin		примусово 544 x 576, співвідношення екрану 4:3
-pixel aspect ratio	MainWin		піксельна пропрорція
-No menu	MainWin		Немає меню
-Error, connecting to interface failed:\n\n	MainWin		Помилка, підключення до інтерфейсу не вдалось:\n\n
+Always on top	MainWin		Завжди поверх усіх
+Debug	MainWin		Відладка
+Interface	MainWin		Інтерфейс
 force 720 x 576, display aspect 4:3	MainWin		примусово 720 x 576, співвідношення екрану 4:3
+Quit	MainWin		Вийти
+Channel	MainWin		Канал
+Previous channel	MainWin		Попередній канал
+OK	MainWin		Гаразд
+TV	MainWin		Телебачення
+Settings	MainWin		Налаштування
+TV	System name		Телебачення
+Settings…	MainWin		Налаштування…
+None	MainWin		Нічого
+Error, interface is busy:\n\n	MainWin		Помилка, інтерфейс зайнятий:\n\n
+pixel aspect ratio	MainWin		піксельна пропрорція

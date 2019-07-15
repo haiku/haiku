@@ -1,38 +1,37 @@
-1	finnish	x-vnd.Haiku.TextSearch	3622532554
-%s: Not enough room to escape the filename.	Grepper		%s: Ei kylliksi tilaa tiedostonimen ohittamiseen.
-Trim to selection	GrepWindow		Leikkaa valintaan
-Failed to open errors pipe!	Grepper		Virheputken avaaminen epäonnistui!
-Follow symbolic links	GrepWindow		Seuraa symbolisia linkkejä
-Close	GrepWindow		Sulje
-Cancel	GrepWindow		Peru
-The unselected files will be removed from the list.	GrepWindow		Valitsemattomat tiedostot poistetaan luettelosta.
-Regular expression	GrepWindow		Säännöllinen lauseke
-Set target…	GrepWindow		Aseta kohde...
-Failed to open output pipe!	Grepper		Tulostusputken avaaminen epäonnistui!
+1	finnish	x-vnd.Haiku.TextSearch	2123129416
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Valitse tiedostot, jotka haluat valittaviksi Seuraajassa.
-Open files in Pe	GrepWindow		Avaa tiedostot Pe-editorissa
 %appname% : %path%	GrepWindow		%appname% : %path%
-Copy text to clipboard	GrepWindow		Kopioi teksti leikepöydälle
-Settings	GrepWindow		Asetukset
-Select all	GrepWindow		Valitse kaikki
-OK	GrepWindow		Valmis
-Skip folders starting with a dot	GrepWindow		Ohita kansiot, joiden nimet alkavat pisteellä
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME ei voinut avata yhtä tai useampaa kansiota.
-Search	GrepWindow		Hae
-Open selection	GrepWindow		Avaa valinta
-Look in sub-folders	GrepWindow		Etsi alikansioista
-Actions	GrepWindow		Toiminnot
-File	GrepWindow		Tiedosto
-Encoding	GrepWindow		Koodaus
-History	GrepWindow		Historia
 Failed to start xargs program!	Grepper		Xargs-ohjelman käynnistäminen epäonnistui!
+Open selection	GrepWindow		Avaa valinta
+Actions	GrepWindow		Toiminnot
 New window	GrepWindow		Uusi ikkuna
-Failed to open input pipe!	Grepper		Syöteputken avaaminen epäonnistui!
-Please select the files you wish to keep searching.	GrepWindow		Valitse tiedostot, jotka haluat pitää etsinnässä.
-TextSearch	GrepWindow		Tekstihaku
+Encoding	GrepWindow		Koodaus
+OK	GrepWindow		Valmis
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Close	GrepWindow		Sulje
+Look in sub-folders	GrepWindow		Etsi alikansioista
+%s: Not enough room to escape the filename.	Grepper		%s: Ei kylliksi tilaa tiedostonimen ohittamiseen.
+Follow symbolic links	GrepWindow		Seuraa symbolisia linkkejä
+Regular expression	GrepWindow		Säännöllinen lauseke
+Text files only	GrepWindow		Vain tekstitiedostot
 Quit	GrepWindow		Poistu
 Show files in Tracker	GrepWindow		Näytä tiedostot Seuraajassa
-Case-sensitive	GrepWindow		Kirjainkoosta riippuva
-Text files only	GrepWindow		Vain tekstitiedostot
+Please select the files you wish to keep searching.	GrepWindow		Valitse tiedostot, jotka haluat pitää etsinnässä.
+Trim to selection	GrepWindow		Leikkaa valintaan
+Set target…	GrepWindow		Aseta kohde...
+TextSearch	GrepWindow		Tekstihaku
+Failed to open input pipe!	Grepper		Syöteputken avaaminen epäonnistui!
+Search	GrepWindow		Hae
+Copy text to clipboard	GrepWindow		Kopioi teksti leikepöydälle
 Show lines	GrepWindow		Näytä rivit
-%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Failed to open errors pipe!	Grepper		Virheputken avaaminen epäonnistui!
+The unselected files will be removed from the list.	GrepWindow		Valitsemattomat tiedostot poistetaan luettelosta.
+Skip folders starting with a dot	GrepWindow		Ohita kansiot, joiden nimet alkavat pisteellä
+Failed to open output pipe!	Grepper		Tulostusputken avaaminen epäonnistui!
+Cancel	GrepWindow		Peru
+History	GrepWindow		Historia
+File	GrepWindow		Tiedosto
+Case-sensitive	GrepWindow		Kirjainkoosta riippuva
+Select all	GrepWindow		Valitse kaikki
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME ei voinut avata yhtä tai useampaa kansiota.
+Settings	GrepWindow		Asetukset

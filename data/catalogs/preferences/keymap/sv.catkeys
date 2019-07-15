@@ -1,127 +1,127 @@
 1	swedish	x-vnd.Haiku-Keymap	1039047705
-Croatian	KeymapNames		Kroatiska
-Turkish (Type-Q)	KeymapNames		Turkiska (Typ-Q)
-Icelandic	KeymapNames		Isländska
-Serbian (Cyrillic)	KeymapNames		Serbiska (Kyrilliska)
-Shift:	Modifier keys window	Shift key role name	Skift:
-Revert	Modifier keys window		Återställ
-Estonian	KeymapNames		Estländska
-Canadian-French	KeymapNames		Kanadensisk franska
-Warning: left and right key roles do not match	Modifier keys window		Warning: Höger och vänster roller matchar inte varandra
-Romanian	KeymapNames		Rumänska
-Scroll lock	Keyboard Layout View		Scroll lock
-Menu	Keyboard Layout View	Menu key	Meny
-Left control	Keyboard Layout View		vänster control
-Tilde trigger	Keymap window		Tilde trigger
-Bulgarian (Phonetic)	KeymapNames		Bulgariska (Fonetisk)
-Hungarian	KeymapNames		Ungerska
-Grave trigger	Keymap window		Grave trigger
-Brazilian (ABNT2)	KeymapNames		Brasilianska (ABNT2)
-Polish	KeymapNames		Polska
-Role	Modifier keys window	As in the role of a modifier key	Roll
-Caps lock	Keyboard Layout View		Caps Lock
-Spanish (Dvorak)	KeymapNames		Spanska (Dvorak)
-Select dead keys	Keymap window		Markera döda tangenter
-Belgian (point)	KeymapNames		Belgiska (punkt)
-Hebrew	KeymapNames		Hebreiska
-Russian (Mac)	KeymapNames		Ryska (Mac)
-United-Kingdom	KeymapNames		Storbritannien
-Swiss-French	KeymapNames		Schweizisk franska
-Cancel	Modifier keys window		Avbryt
-Danish	KeymapNames		Danska
-Lithuanian	KeymapNames		Litauiska
-Spanish	KeymapNames		Spanska
-Command	Keyboard Layout View	Command key	Kommando
-Macedonian	KeymapNames		Makedonska
-Irish	KeymapNames		Irländska
-French (Mac)	KeymapNames		Franska (Mac)
-German (Mac)	KeymapNames		Tyska (Mac)
-Defaults	Keymap window		Standardvärde
-Ukrainian (Mac)	KeymapNames		Ukrainska (Mac)
-Japanese	KeymapNames		Japanska
-Quit	Keymap window		Avsluta
-Switch shortcut keys to Haiku mode	Keymap window		Byt snabbtangentsknapp till Haikustandard
-French (Bépo)	KeymapNames		Franska (Bépo)
-Circumflex trigger	Keymap window		Circumflex trigger
-Diaeresis trigger	Keymap window		Diaeresis trigger
-Ukrainian	KeymapNames		Ukrainska
-Disabled	Modifier keys window	Do nothing	Inaktiverad
-Dvorak (programmer's)	KeymapNames		Dvorak (programmerares)
-ISO-9995	KeymapNames		ISO-9995
-Albanian	KeymapNames		Albanska
-Open…	Keymap window		Öppna…
-Greek	KeymapNames		Grekiska
-Error: duplicate keys	Modifier keys window		Fel: Upprepad tangenter
-System:	Keymap window		System:
-Lithuanian (Standard)	KeymapNames		Litauiska (Standard)
-Brazilian	KeymapNames		Brasilianska
-Left command	Keyboard Layout View		Vänster kommando
-Set modifier keys…	Keymap window		Sätt modifierings tangent...
-Option:	Modifier keys window	Option key role name	Alternativ:
-Belgian (comma)	KeymapNames		Belgiska (komma)
-Control	Keyboard Layout View	Control key	Kontroll
-Left option	Keyboard Layout View		Vänster alternativ
-Faeroese	KeymapNames		Färöisk
-Right control	Keyboard Layout View		Höger kontroll
-Svorak	KeymapNames		Dvorak
-Switch shortcut keys	Keymap window		Switch shortcut keys
-Russian (Udmurt, Komi, Mari)	KeymapNames		Ryska (udmurt, komi, mari)
-German	KeymapNames		Tyska
-Swedish	KeymapNames		Svenska
-Russian	KeymapNames		Ryska
-Arabic (102)	KeymapNames		Arabiska (102)
-Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Skifttangent
-User:	Keymap window		Användare:
-Turkish (Type-F)	KeymapNames		Turkiska (typ-F)
-Italian	KeymapNames		Italienska
-Belarusian	KeymapNames		Vitryska
-Right option	Keyboard Layout View		Höger alternativ
-US-International	KeymapNames		US-Internationell
-Dvorak	KeymapNames		Dvorak
-Russian (Yawert)	KeymapNames		Ryska (yawert)
-Right shift	Keyboard Layout View		Höger skift
-Belarusian (Latin)	KeymapNames		Vitryska (Latin)
 Key	Modifier keys window	As in a computer keyboard key	Tangent
-Dutch	KeymapNames		Holländska
-Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl-tangent
-Control:	Modifier keys window	Control key role name	Kontroll:
-Russian (Typewriter)	KeymapNames		Ryska (skrivmaskin)
-Slovene	KeymapNames		Slovenska
-Remove	Keyboard Layout View		Ta bort
-Option	Keyboard Layout View	Option key	Alternativ
-Sample and clipboard:	Keymap window		Exempel:
-Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt tangent
-Layout	Keymap window		Utseende
-Serbian (Latin)	KeymapNames		Serbiska (Latin)
-Esperanto	KeymapNames		Esperanto
-Switch shortcut keys to Windows/Linux mode	Keymap window		Byt snabbtangentsknapp till Windows/Linux-standard
-Latin-American	KeymapNames		Latinamerikansk
-Right command	Keyboard Layout View		Höger kommando
-Revert	Keymap window		Återställ
-Command:	Modifier keys window	Command key role name	Kommando:
-Polish (Typewriter)	KeymapNames		Polska (Skrivmaskin)
+Japanese	KeymapNames		Japanska
 US	KeymapNames		US
-Save as…	Keymap window		Spara som…
-Swiss-German	KeymapNames		Schweizisk tyska
-Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd tangent
-French	KeymapNames		Franska
-File	Keymap window		Arkiv
-Num lock	Keyboard Layout View		Num lock
-Bulgarian (Cyrillic)	KeymapNames		Bulgariska (Kyrillisk)
-(Current)	Keymap window		(Nuvarande)
-Kazakh	KeymapNames		Kazakiska
-Colemak	KeymapNames		Colemak
-Font	Keymap window		Typsnitt
-Belarusian (Mac)	KeymapNames		Vitryska (Mac)
-Keymap	System name		TangentUppsättning
-Czech (Mac)	KeymapNames		Tjeckiska (Mac)
-Norwegian	KeymapNames		Norska
-Left shift	Keyboard Layout View		Vänster skift
-Czech	KeymapNames		Tjeckiska
-Shift	Keyboard Layout View	Shift key	Skift
-Slovak	KeymapNames		Slovakiska
+Brazilian	KeymapNames		Brasilianska
+Right control	Keyboard Layout View		Höger kontroll
+Dvorak	KeymapNames		Dvorak
+Option:	Modifier keys window	Option key role name	Alternativ:
+Cancel	Modifier keys window		Avbryt
+Sample and clipboard:	Keymap window		Exempel:
+Polish	KeymapNames		Polska
+Latin-American	KeymapNames		Latinamerikansk
+Ukrainian	KeymapNames		Ukrainska
+United-Kingdom	KeymapNames		Storbritannien
+Turkish (Type-F)	KeymapNames		Turkiska (typ-F)
+Serbian (Cyrillic)	KeymapNames		Serbiska (Kyrilliska)
+Belgian (point)	KeymapNames		Belgiska (punkt)
 Finnish	KeymapNames		Finska
+Num lock	Keyboard Layout View		Num lock
+Switch shortcut keys to Windows/Linux mode	Keymap window		Byt snabbtangentsknapp till Windows/Linux-standard
+Option	Keyboard Layout View	Option key	Alternativ
+Spanish (Dvorak)	KeymapNames		Spanska (Dvorak)
+Scroll lock	Keyboard Layout View		Scroll lock
+US-International	KeymapNames		US-Internationell
+Right option	Keyboard Layout View		Höger alternativ
+Turkish (Type-Q)	KeymapNames		Turkiska (Typ-Q)
+Revert	Modifier keys window		Återställ
+Slovak	KeymapNames		Slovakiska
+Colemak	KeymapNames		Colemak
+Dvorak (programmer's)	KeymapNames		Dvorak (programmerares)
+German (Mac)	KeymapNames		Tyska (Mac)
+Arabic (102)	KeymapNames		Arabiska (102)
+Belarusian (Mac)	KeymapNames		Vitryska (Mac)
+Croatian	KeymapNames		Kroatiska
 Set modifier keys	Modifier keys window		Set modifierings tangent
-Portuguese	KeymapNames		Portugisiska
-Modifier keys	Modifier keys window		Modifierings tangenter
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd tangent
+Spanish	KeymapNames		Spanska
+Ukrainian (Mac)	KeymapNames		Ukrainska (Mac)
+Command:	Modifier keys window	Command key role name	Kommando:
+French (Bépo)	KeymapNames		Franska (Bépo)
+Russian (Typewriter)	KeymapNames		Ryska (skrivmaskin)
 Acute trigger	Keymap window		Acute trigger
+Italian	KeymapNames		Italienska
+Modifier keys	Modifier keys window		Modifierings tangenter
+Kazakh	KeymapNames		Kazakiska
+Save as…	Keymap window		Spara som…
+Lithuanian (Standard)	KeymapNames		Litauiska (Standard)
+Error: duplicate keys	Modifier keys window		Fel: Upprepad tangenter
+Bulgarian (Phonetic)	KeymapNames		Bulgariska (Fonetisk)
+Canadian-French	KeymapNames		Kanadensisk franska
+Hungarian	KeymapNames		Ungerska
+Control	Keyboard Layout View	Control key	Kontroll
+Irish	KeymapNames		Irländska
+Remove	Keyboard Layout View		Ta bort
+Tilde trigger	Keymap window		Tilde trigger
+Shift	Keyboard Layout View	Shift key	Skift
+Czech (Mac)	KeymapNames		Tjeckiska (Mac)
+Macedonian	KeymapNames		Makedonska
+Left command	Keyboard Layout View		Vänster kommando
+Albanian	KeymapNames		Albanska
+(Current)	Keymap window		(Nuvarande)
+Left option	Keyboard Layout View		Vänster alternativ
+Esperanto	KeymapNames		Esperanto
+Belarusian	KeymapNames		Vitryska
+Warning: left and right key roles do not match	Modifier keys window		Warning: Höger och vänster roller matchar inte varandra
+Circumflex trigger	Keymap window		Circumflex trigger
+Caps lock	Keyboard Layout View		Caps Lock
+Left shift	Keyboard Layout View		Vänster skift
+Russian (Yawert)	KeymapNames		Ryska (yawert)
+Bulgarian (Cyrillic)	KeymapNames		Bulgariska (Kyrillisk)
+Left control	Keyboard Layout View		vänster control
+Swedish	KeymapNames		Svenska
+Role	Modifier keys window	As in the role of a modifier key	Roll
+German	KeymapNames		Tyska
+Svorak	KeymapNames		Dvorak
+Swiss-German	KeymapNames		Schweizisk tyska
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl-tangent
+Czech	KeymapNames		Tjeckiska
+Russian (Udmurt, Komi, Mari)	KeymapNames		Ryska (udmurt, komi, mari)
+Control:	Modifier keys window	Control key role name	Kontroll:
+Disabled	Modifier keys window	Do nothing	Inaktiverad
+Select dead keys	Keymap window		Markera döda tangenter
+Right shift	Keyboard Layout View		Höger skift
+Russian (Mac)	KeymapNames		Ryska (Mac)
+Belarusian (Latin)	KeymapNames		Vitryska (Latin)
+Hebrew	KeymapNames		Hebreiska
+Layout	Keymap window		Utseende
+Greek	KeymapNames		Grekiska
+Revert	Keymap window		Återställ
+Grave trigger	Keymap window		Grave trigger
+Menu	Keyboard Layout View	Menu key	Meny
+Faeroese	KeymapNames		Färöisk
+Quit	Keymap window		Avsluta
+Polish (Typewriter)	KeymapNames		Polska (Skrivmaskin)
+French (Mac)	KeymapNames		Franska (Mac)
+User:	Keymap window		Användare:
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt tangent
+Estonian	KeymapNames		Estländska
+Serbian (Latin)	KeymapNames		Serbiska (Latin)
+French	KeymapNames		Franska
+Portuguese	KeymapNames		Portugisiska
+Swiss-French	KeymapNames		Schweizisk franska
+Shift:	Modifier keys window	Shift key role name	Skift:
+Keymap	System name		TangentUppsättning
+Slovene	KeymapNames		Slovenska
+Lithuanian	KeymapNames		Litauiska
+Set modifier keys…	Keymap window		Sätt modifierings tangent...
+Switch shortcut keys to Haiku mode	Keymap window		Byt snabbtangentsknapp till Haikustandard
+Defaults	Keymap window		Standardvärde
+ISO-9995	KeymapNames		ISO-9995
+System:	Keymap window		System:
+Switch shortcut keys	Keymap window		Switch shortcut keys
+Belgian (comma)	KeymapNames		Belgiska (komma)
+Right command	Keyboard Layout View		Höger kommando
+Norwegian	KeymapNames		Norska
+Font	Keymap window		Typsnitt
+Danish	KeymapNames		Danska
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Skifttangent
+Russian	KeymapNames		Ryska
+Romanian	KeymapNames		Rumänska
+Command	Keyboard Layout View	Command key	Kommando
+File	Keymap window		Arkiv
+Brazilian (ABNT2)	KeymapNames		Brasilianska (ABNT2)
+Dutch	KeymapNames		Holländska
+Diaeresis trigger	Keymap window		Diaeresis trigger
+Icelandic	KeymapNames		Isländska
+Open…	Keymap window		Öppna…

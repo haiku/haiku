@@ -1,23 +1,23 @@
 1	russian	x-vnd.haiku-registrar	2599857937
-Restart system	ShutdownProcess		Перезагрузить компьютер
-The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Приложение \"%appName%\" возможно заблокировано модальным окном или не отвечает.
-OK	ShutdownProcess		ОК
-System is shut down	ShutdownProcess		Система выключена
-It's now safe to turn off the computer.	ShutdownProcess		Теперь можно выключить компьютер.
 Cancel	ShutdownProcess		Отмена
+OK	ShutdownProcess		ОК
 Do you really want to shut down the system?	ShutdownProcess		Вы действительно хотите выключить компьютер?
-Asking other processes to quit.	ShutdownProcess		Завершение процессов.
-Asking \"%appName%\" to quit.	ShutdownProcess		Завершение приложения \"%appName%\".
-%action%?	ShutdownProcess		%action%?
-Shutdown aborted	ShutdownProcess		Выключение прервано
-Restarting…	ShutdownProcess		Перезагрузка…
-Asking background applications to quit.	ShutdownProcess		Завершение фоновых приложений.
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Приложение \"%appName%\" прервало процесс выключения.
-Tidying things up a bit.	ShutdownProcess		Подготовка системы к выключению.
-Do you really want to restart the system?	ShutdownProcess		Вы действительно хотите перезагрузить компьютер?
 Shutdown status	ShutdownProcess		Статус выключения
-Cancel shutdown	ShutdownProcess		Отменить выключение
-Kill application	ShutdownProcess		Убить приложение
 Shut down	ShutdownProcess		Выключить
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Приложение \"%appName%\" возможно заблокировано модальным окном или не отвечает.
+System is shut down	ShutdownProcess		Система выключена
+Restart system	ShutdownProcess		Перезагрузить компьютер
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Приложение \"%appName%\" прервало процесс выключения.
+Asking background applications to quit.	ShutdownProcess		Завершение фоновых приложений.
+Do you really want to restart the system?	ShutdownProcess		Вы действительно хотите перезагрузить компьютер?
 Restart	ShutdownProcess		Перезагрузить
+It's now safe to turn off the computer.	ShutdownProcess		Теперь можно выключить компьютер.
+Asking other processes to quit.	ShutdownProcess		Завершение процессов.
+Cancel shutdown	ShutdownProcess		Отменить выключение
+Restarting…	ShutdownProcess		Перезагрузка…
+%action%?	ShutdownProcess		%action%?
+Tidying things up a bit.	ShutdownProcess		Подготовка системы к выключению.
+Kill application	ShutdownProcess		Убить приложение
+Shutdown aborted	ShutdownProcess		Выключение прервано
 Shutting down…	ShutdownProcess		Выключение…
+Asking \"%appName%\" to quit.	ShutdownProcess		Завершение приложения \"%appName%\".

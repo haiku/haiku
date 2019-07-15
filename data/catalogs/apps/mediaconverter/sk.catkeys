@@ -1,68 +1,68 @@
 1	slovak	x-vnd.Haiku-MediaConverter	1322040280
-Video using parameters form settings	MediaConverter		Video používajúce parametre z nastavení
-{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Súbor nebol rozpoznaný ako podporovaný multimediálny súbor:} few{# súbory neboli rozpoznané ako podporované multimediálne súbory:} other{# súborov nebolo rozpoznaných ako podporované multimediálne súbory:}}
-Video encoding:	MediaConverter		Kódovanie videa:
+Input file not recognized as Audio or Video	MediaConverter		Vstupný súbor nebol rozpoznaný ako zvuk alebo video
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
-Error creating video.	MediaConverter		Chyba pri vytváraní videa.
-No audio	Audio codecs list		Bez zvuku
-Error	MediaConverter		Chyba
-{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} few{# bity} other{# bitov}}
-Error loading a file	MediaConverter		Chyba pri načítaní súboru
-File Error	MediaConverter-FileInfo		Chyba súboru
-Open…	Menu		Otvoriť…
-Start [ms]: 	MediaConverter		Začiatok [ms]: 
-Output file '%filename' created	MediaConverter		Vytvorený výstupný súbor „%filename“
-Output format	MediaConverter		Výstupný formát
-End   [ms]: 	MediaConverter		Koniec [ms]: 
-MediaConverter	System name		Konvertor multimédií
-No video	Video codecs list		Bez videa
-Duration:	MediaConverter-FileInfo		Trvanie:
-OK	MediaConverter		OK
-%.1f kHz mono	MediaFileInfo		%.1f kHz mono
+Video quality: %3d%%	MediaConverter		Kvalita videa: %3d%%
+Source files	MediaConverter		Zdrojové súbory
 Error converting '%filename'	MediaConverter		Chyba pri konverzii „%filename“
-Low	MediaConverter		Nízka
+Selected directory not found. Defaulting to /boot/home	MediaConverter		Zvolený adresár nebol nájdený. Používa sa predvolený adresár /boot/home
 Conversion completed	MediaConverter		Konverzia dokončená
 Audio:	MediaConverter-FileInfo		Zvuk:
-OK	MediaConverter-FileInfo		OK
- seconds	MediaFileInfo		 sekúnd
-Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Chyba pri zapisovaní: %strPath%. Predvolené umiestnenie: /boot/home
-Source files	MediaConverter		Zdrojové súbory
-Selected directory not found. Defaulting to /boot/home	MediaConverter		Zvolený adresár nebol nájdený. Používa sa predvolený adresár /boot/home
-{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# rámec} few{# rámce} other{# rámcov}}
-Cancelling	MediaConverter		Ruší sa
-{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# bajt} other{# bajty} other{# bajtov}}
-Error loading files	MediaConverter		Chyba pri načítaní súborov
-Cancel	MediaConverter		Zrušiť
-None available	Video codecs		Žiadny nie je dostupný
-Conversion cancelled	MediaConverter		Konverzia zrušená
-No file selected	MediaConverter-FileInfo		Žiadny súbor nie je vybraný
-Select this folder	MediaConverter		Vybrať tento priečinok
-Error creating track.	MediaConverter		Chyba pri vytváraní stopy.
-Continue	MediaConverter		Poračovať
-Encoder parameters	MediaConverter-EncoderWindow		Parametre kódovania
-Video:	MediaConverter-FileInfo		Video:
-%d bit 	MediaFileInfo		%d bit 
-Error creating '%filename'	MediaConverter		Chyba pri vyváraní „%filename“
-Video quality not supported	MediaConverter		Kvalita videa nie je podporovaná
-Cancelling…	MediaConverter		Ruší sa…
-File details	MediaConverter		Podrobnosti súborov
-Select	MediaConverter		Vybrať
-Quit	Menu		Ukončiť
-Preview	MediaConverter		Náhľad
-File format:	MediaConverter		Formát súboru:
-None available	Audio codecs		Žiadne nie sú dostupné
 MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:AdresárNaUloženie
-Error launching: %strError%	MediaConverter		Chyba pri spúšťaní: %strError%
+Error creating video.	MediaConverter		Chyba pri vytváraní videa.
+Cancelling	MediaConverter		Ruší sa
+None available	Audio codecs		Žiadne nie sú dostupné
+No file selected	MediaConverter-FileInfo		Žiadny súbor nie je vybraný
 High	MediaConverter		Vysoká
-Drop media files onto this window	MediaConverter		Pretiahnite súbory do tohto okna
-Audio encoding:	MediaConverter		Kódovanie zvuku:
-Audio quality not supported	MediaConverter		Kvalita zvuku nie je podporovaná
-File	Menu		Súbor
-Input file not recognized as Audio or Video	MediaConverter		Vstupný súbor nebol rozpoznaný ako zvuk alebo video
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Súbor nebol rozpoznaný ako podporovaný multimediálny súbor:} few{# súbory neboli rozpoznané ako podporované multimediálne súbory:} other{# súborov nebolo rozpoznaných ako podporované multimediálne súbory:}}
+File Error	MediaConverter-FileInfo		Chyba súboru
+None available	Video codecs		Žiadny nie je dostupný
+Output format	MediaConverter		Výstupný formát
+%.1f kHz mono	MediaFileInfo		%.1f kHz mono
 %.1f kHz stereo	MediaFileInfo		%.1f kHz stereo
-Convert	MediaConverter		Konvertovať
-Video quality: %3d%%	MediaConverter		Kvalita videa: %3d%%
-%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanál
-Output folder	MediaConverter		Výstupný priečinok
+OK	MediaConverter		OK
+Error creating '%filename'	MediaConverter		Chyba pri vyváraní „%filename“
+Error loading a file	MediaConverter		Chyba pri načítaní súboru
+Encoder parameters	MediaConverter-EncoderWindow		Parametre kódovania
+Open…	Menu		Otvoriť…
+Audio encoding:	MediaConverter		Kódovanie zvuku:
 Audio quality: %3d%%	MediaConverter		Kvalita zvuku: %3d%%
+Cancelling…	MediaConverter		Ruší sa…
+Output file '%filename' created	MediaConverter		Vytvorený výstupný súbor „%filename“
+Output folder	MediaConverter		Výstupný priečinok
+Error creating track.	MediaConverter		Chyba pri vytváraní stopy.
+ seconds	MediaFileInfo		 sekúnd
+Video using parameters form settings	MediaConverter		Video používajúce parametre z nastavení
+Video:	MediaConverter-FileInfo		Video:
+Select	MediaConverter		Vybrať
+Conversion cancelled	MediaConverter		Konverzia zrušená
+Low	MediaConverter		Nízka
+Error loading files	MediaConverter		Chyba pri načítaní súborov
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} few{# bity} other{# bitov}}
+End   [ms]: 	MediaConverter		Koniec [ms]: 
+Cancel	MediaConverter		Zrušiť
+OK	MediaConverter-FileInfo		OK
+Video encoding:	MediaConverter		Kódovanie videa:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Vyskytla sa chyba pri čítaní informácií súboru.\n\nChyba: 
+Error	MediaConverter		Chyba
+File details	MediaConverter		Podrobnosti súborov
+No audio	Audio codecs list		Bez zvuku
+Drop media files onto this window	MediaConverter		Pretiahnite súbory do tohto okna
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# rámec} few{# rámce} other{# rámcov}}
+Quit	Menu		Ukončiť
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# bajt} other{# bajty} other{# bajtov}}
+Duration:	MediaConverter-FileInfo		Trvanie:
+MediaConverter	System name		Konvertor multimédií
+Error launching: %strError%	MediaConverter		Chyba pri spúšťaní: %strError%
+File format:	MediaConverter		Formát súboru:
+File	Menu		Súbor
+Video quality not supported	MediaConverter		Kvalita videa nie je podporovaná
+Select this folder	MediaConverter		Vybrať tento priečinok
+%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanál
+%d bit 	MediaFileInfo		%d bit 
+No video	Video codecs list		Bez videa
+Continue	MediaConverter		Poračovať
+Convert	MediaConverter		Konvertovať
+Audio quality not supported	MediaConverter		Kvalita zvuku nie je podporovaná
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Chyba pri zapisovaní: %strPath%. Predvolené umiestnenie: /boot/home
+Preview	MediaConverter		Náhľad
+Start [ms]: 	MediaConverter		Začiatok [ms]: 

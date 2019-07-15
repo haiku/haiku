@@ -1,20 +1,20 @@
 1	finnish	x-vnd.mmu_man.filepanel	1802971238
 display a load/save file panel\n	FilePanelApp		näytä lataa/tallenna-tiedostopaneeli\n
-options:\n	FilePanelApp		valitsimet:\n
-usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		käyttö: %s [--help] [--directory kansio] [--load|--save] [--title ttl] [--single] [--modal] [--allow malli] [--forbid malli]\n
--k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\t minkäkaltaisia kohteita ei voida avata (tyyppi): kaikki f, d, s -yhdistelmät  (tiedosto (oletus), hakemisto, symbolinen linkki)\n
-usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		käyttö: %s [-h] [-d kansio] [-l|-s] [-t ttl] [-1] [-m] [-a malli] [-f malli]\n
--d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tavaa <kansio>ssa\n
-%s not a valid option\n	FilePanelApp		%s ei ole kelvollinen valitsin\n
 short\tlong\tdescription\n	FilePanelApp		lyhyt\tpitkä\tkuvaus\n
-%s: this option requires a parameter\n	FilePanelApp		%s: tämä valitsin vaatii parametrin\n
--l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tkäytä ladattua tiedostopaneelia (oletus)\n
--f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\ttoteuttamaton\n
+%s not a valid option\n	FilePanelApp		%s ei ole kelvollinen valitsin\n
 -s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tkäytä tallennettua tiedostopaneelia\n
--n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\taseta tallennusten oletusnimi\n
--m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\ttekee tiedostopaneelista pakollisen\n
+%s: this option requires a parameter\n	FilePanelApp		%s: tämä valitsin vaatii parametrin\n
 -h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tnäytä käyttö\n
--a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\ttoteuttamaton\n
--1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tsalli vain yhden tiedoston valinta\n
--t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\taseta tiedostopaneelin ikkunaotsikko\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tkäytä ladattua tiedostopaneelia (oletus)\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\taseta tallennusten oletusnimi\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\t minkäkaltaisia kohteita ei voida avata (tyyppi): kaikki f, d, s -yhdistelmät  (tiedosto (oletus), hakemisto, symbolinen linkki)\n
 %s: UNIMPLEMENTED\n	FilePanelApp		%s: TOTEUTTAMATON\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\taseta tiedostopaneelin ikkunaotsikko\n
+-f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\ttoteuttamaton\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		käyttö: %s [-h] [-d kansio] [-l|-s] [-t ttl] [-1] [-m] [-a malli] [-f malli]\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tsalli vain yhden tiedoston valinta\n
+-a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\ttoteuttamaton\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\ttekee tiedostopaneelista pakollisen\n
+options:\n	FilePanelApp		valitsimet:\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tavaa <kansio>ssa\n
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		käyttö: %s [--help] [--directory kansio] [--load|--save] [--title ttl] [--single] [--modal] [--allow malli] [--forbid malli]\n

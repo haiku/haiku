@@ -1,24 +1,24 @@
 1	greek, modern (1453-)	x-vnd.haiku-screenshot	4065094687
-seconds	ScreenshotWindow		δευτερόλεπτα
-Desktop	ScreenshotWindow		Επιφάνεια εργασίας
 Include window border	ScreenshotWindow		Περίληψη συνόρων παραθύρου
-Screenshot	System name		Screenshot
-Select	ScreenshotWindow		Επιλογή
-Capture active window	ScreenshotWindow		Σύλληψη ενεργού παραθύρου
-Cancel	ScreenshotWindow		Άκυρο
-Name:	ScreenshotWindow		Όνομα:
-Choose folder	ScreenshotWindow		Επιλογή καταλόγου
-Save	ScreenshotWindow		Αποθήκευση
-Please select	ScreenshotWindow		Παρακαλώ επιλέξτε
-Save as:	ScreenshotWindow		Αποθήκευση ως:
-Copy to clipboard	ScreenshotWindow		Αντιγραφή στο πρόχειρο
 Save in:	ScreenshotWindow		Αποθήκευση στο:
-screenshot	Screenshot	Base filename of screenshot files	στιγμιότυπο οθόνης
+Select	ScreenshotWindow		Επιλογή
+Save as:	ScreenshotWindow		Αποθήκευση ως:
+seconds	ScreenshotWindow		δευτερόλεπτα
 New screenshot	ScreenshotWindow		Νέο στιγμιότυπο οθόνης
+Screenshot	System name		Screenshot
+Desktop	ScreenshotWindow		Επιφάνεια εργασίας
 Artwork folder	ScreenshotWindow		Φάκελος γραφικών
-Home folder	ScreenshotWindow		Αρχικός φάκελος
-Settings…	ScreenshotWindow		Ρυθμίσεις...
-overwrite	ScreenshotWindow		αντικατάσταση
-Delay:	ScreenshotWindow		Καθυστέρηση:
-Include mouse pointer	ScreenshotWindow		Συμπεριλάβετε το δείκτη του ποντικιού
 Translator Settings	ScreenshotWindow		Ρυθμίσεις μεταφραστή
+Include mouse pointer	ScreenshotWindow		Συμπεριλάβετε το δείκτη του ποντικιού
+overwrite	ScreenshotWindow		αντικατάσταση
+Settings…	ScreenshotWindow		Ρυθμίσεις...
+Choose folder	ScreenshotWindow		Επιλογή καταλόγου
+Name:	ScreenshotWindow		Όνομα:
+Please select	ScreenshotWindow		Παρακαλώ επιλέξτε
+Cancel	ScreenshotWindow		Άκυρο
+Delay:	ScreenshotWindow		Καθυστέρηση:
+Copy to clipboard	ScreenshotWindow		Αντιγραφή στο πρόχειρο
+screenshot	Screenshot	Base filename of screenshot files	στιγμιότυπο οθόνης
+Home folder	ScreenshotWindow		Αρχικός φάκελος
+Save	ScreenshotWindow		Αποθήκευση
+Capture active window	ScreenshotWindow		Σύλληψη ενεργού παραθύρου

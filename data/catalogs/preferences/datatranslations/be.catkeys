@@ -1,17 +1,17 @@
 1	belarusian	x-vnd.Haiku-DataTranslations	4156631142
-DataTranslations	System name		Канвертары
-Cancel	DataTranslations		Адмена
+Path:	DataTranslations		Пуць:
 Name:	DataTranslations		Імя:
+DataTranslations - Note	DataTranslations		DataTranslations - Нататка
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		'%name' не з´яўляецца Канвертарам і таму не можа быць усталяваны.
 Could not install %s:\n%s	DataTranslations		Немагчыма усталяваць %s:\n%s
-Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		З дапамогай гэтай панэлі прызначце стандартныя наладкі якія будуць выкарыстаны канвертарам, які не прызначае адпаведныя наладкі самастойна.
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		'%name' ўжо існуе ў спісе ўсталяваных канвертараў! Перазапісаць яго?
-DataTranslations - Note	DataTranslations		DataTranslations - Нататка
-Overwrite	DataTranslations		Перазапісаць
-Info:	DataTranslations		Інфа:
-Info	DataTranslations		Інфа
-Path:	DataTranslations		Пуць:
-The new translator has been installed successfully.	DataTranslations		Новы канвертар паспяхова ўстаноўлены.
-DataTranslations - Error	DataTranslations		DataTranslations - Памылка
 OK	DataTranslations		ОК
+Cancel	DataTranslations		Адмена
+Info:	DataTranslations		Інфа:
+DataTranslations - Error	DataTranslations		DataTranslations - Памылка
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		З дапамогай гэтай панэлі прызначце стандартныя наладкі якія будуць выкарыстаны канвертарам, які не прызначае адпаведныя наладкі самастойна.
+The new translator has been installed successfully.	DataTranslations		Новы канвертар паспяхова ўстаноўлены.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		'%name' ўжо існуе ў спісе ўсталяваных канвертараў! Перазапісаць яго?
+DataTranslations	System name		Канвертары
+Info	DataTranslations		Інфа
+Overwrite	DataTranslations		Перазапісаць
 Version:	DataTranslations		Версія:

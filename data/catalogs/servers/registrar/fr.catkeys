@@ -1,23 +1,23 @@
 1	french	x-vnd.haiku-registrar	2599857937
-Restart system	ShutdownProcess		Redémarrer le système
-The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		L’application « %appName% » est peut-être bloquée sur une fenêtre modale.
-OK	ShutdownProcess		OK
-System is shut down	ShutdownProcess		Le système est arrêté
-It's now safe to turn off the computer.	ShutdownProcess		Vous pouvez maintenant éteindre votre ordinateur.
 Cancel	ShutdownProcess		Annuler
+OK	ShutdownProcess		OK
 Do you really want to shut down the system?	ShutdownProcess		Voulez-vous vraiment éteindre le système ?
-Asking other processes to quit.	ShutdownProcess		Arrêt demandé aux autres processus.
-Asking \"%appName%\" to quit.	ShutdownProcess		Arrêt de « %appName% » demandé.
-%action%?	ShutdownProcess		%action% ?
-Shutdown aborted	ShutdownProcess		Extinction interrompue
-Restarting…	ShutdownProcess		Redémarrage…
-Asking background applications to quit.	ShutdownProcess		Arrêt des tâches de fond demandé.
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		L’application « %appName% » a interrompu le processus d’arrêt.
-Tidying things up a bit.	ShutdownProcess		On calme un peu les choses.
-Do you really want to restart the system?	ShutdownProcess		Voulez-vous vraiment redémarrer le système ?
 Shutdown status	ShutdownProcess		État de l’extinction
-Cancel shutdown	ShutdownProcess		Annuler l’arrêt
-Kill application	ShutdownProcess		Tuer l’application
 Shut down	ShutdownProcess		Éteindre
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		L’application « %appName% » est peut-être bloquée sur une fenêtre modale.
+System is shut down	ShutdownProcess		Le système est arrêté
+Restart system	ShutdownProcess		Redémarrer le système
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		L’application « %appName% » a interrompu le processus d’arrêt.
+Asking background applications to quit.	ShutdownProcess		Arrêt des tâches de fond demandé.
+Do you really want to restart the system?	ShutdownProcess		Voulez-vous vraiment redémarrer le système ?
 Restart	ShutdownProcess		Redémarrer
+It's now safe to turn off the computer.	ShutdownProcess		Vous pouvez maintenant éteindre votre ordinateur.
+Asking other processes to quit.	ShutdownProcess		Arrêt demandé aux autres processus.
+Cancel shutdown	ShutdownProcess		Annuler l’arrêt
+Restarting…	ShutdownProcess		Redémarrage…
+%action%?	ShutdownProcess		%action% ?
+Tidying things up a bit.	ShutdownProcess		On calme un peu les choses.
+Kill application	ShutdownProcess		Tuer l’application
+Shutdown aborted	ShutdownProcess		Extinction interrompue
 Shutting down…	ShutdownProcess		Fermeture…
+Asking \"%appName%\" to quit.	ShutdownProcess		Arrêt de « %appName% » demandé.

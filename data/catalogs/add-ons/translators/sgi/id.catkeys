@@ -1,13 +1,13 @@
 1	indonesian	x-vnd.Haiku-SGITranslator	129108011
-Use compression:	SGIView		Pakai kompresi:
-SGITranslator Settings	SGITranslator		Pengaturan SGITranslator
-None	SGIView		Tak satupun
 SGI images	SGITranslator		Citra SGI
-SGI image translator	SGITranslator		Penterjemah citra SGI
-\nbased on GIMP SGI plugin v1.5:\n	SGIView		\nberdasarkan GIMP SGI plugin v1.5:\n
-Version %d.%d.%d, %s	SGIView		Versi %d.%d.%d, %s
-SGI image	SGITranslator		Citra SGI
-RLE	SGIView		RLE
-SGI Settings	SGIMain		Pengaturan SGI
-written by:\n	SGIView		Ditulis oleh:\n
+Use compression:	SGIView		Pakai kompresi:
 SGI image translator	SGIView		Penterjemah citra SGI
+SGI image	SGITranslator		Citra SGI
+SGITranslator Settings	SGITranslator		Pengaturan SGITranslator
+SGI Settings	SGIMain		Pengaturan SGI
+SGI image translator	SGITranslator		Penterjemah citra SGI
+None	SGIView		Tak satupun
+Version %d.%d.%d, %s	SGIView		Versi %d.%d.%d, %s
+\nbased on GIMP SGI plugin v1.5:\n	SGIView		\nberdasarkan GIMP SGI plugin v1.5:\n
+RLE	SGIView		RLE
+written by:\n	SGIView		Ditulis oleh:\n

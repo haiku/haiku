@@ -1,17 +1,13 @@
-1	lithuanian	x-vnd.Haiku-Magnify	1986662371
-no clip msg\n	In console, when clipboard is empty after clicking Copy image		iškarpinė tuščia\n
-Make square	Magnify-Main		Transformuoti į kvadratą
-Copy image	Magnify-Main		Kopijuoti paveikslą
-usage: magnify [size] (magnify size * size pixels)\n	Console		Naudojimas: magnify [dydis]\n
-Stick coordinates	Magnify-Main		Fiksuoti koordinates
-magnify: size must be a multiple of 4\n	Console		didintuvas: dydis turi būti skaičiaus 4 kartotinis\n
+1	lithuanian	x-vnd.Haiku-Magnify	1150104797
 Decrease pixel size	Magnify-Main		Sumažinti mastelį
+Increase pixel size	Magnify-Main		Padidinti mastelį
+Stick coordinates	Magnify-Main		Fiksuoti koordinates
+Copy image	Magnify-Main		Kopijuoti paveikslą
+Decrease window size	Magnify-Main		Sumažinti langą
+Remove a crosshair	Magnify-Main		Pašalinti kryžmę
+Add a crosshair	Magnify-Main		Pridėti kryžmę
+Increase window size	Magnify-Main		Padidinti langą
+Save image	Magnify-Main		Įrašyti paveikslą
 Magnify	System name		Didintuvas
 Info	Magnify-Main		Informacija
-Remove a crosshair	Magnify-Main		Pašalinti kryžmę
-Save image	Magnify-Main		Įrašyti paveikslą
-Increase window size	Magnify-Main		Padidinti langą
-Decrease window size	Magnify-Main		Sumažinti langą
-Increase pixel size	Magnify-Main		Padidinti mastelį
-  size must be > 4 and a multiple of 4\n	Console		dydis turi būti didesnis už 4 skaičiaus 4 kartotinis\n
-Add a crosshair	Magnify-Main		Pridėti kryžmę
+Make square	Magnify-Main		Transformuoti į kvadratą

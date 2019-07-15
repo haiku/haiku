@@ -1,14 +1,14 @@
 1	korean	x-vnd.Haiku-TIFFTranslator	4029790542
-LZW	TIFFView		LZW
-identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: 디렉토리를 설정 할 수 없음\n
-TIFF image	TIFFTranslator		TIFF 이미지
 TIFF Library:	TIFFView		TIFF 라이브러리:
-TIFF image translator	TIFFView		TIFF  이미지 변환기
-None	TIFFView		없음
-TIFF images	TIFFTranslator		TIFF 이미지들
-TIFFTranslator Settings	TIFFTranslator		TIFF 변환기 설정
-TIFF image translator	TIFFTranslator		TIFF  이미지 변환기
 RLE (Packbits)	TIFFView		RLE (Packbits)
-TIFF Settings	TIFFMain		TIFF 설정
-identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: 올바르지 않은 문서 인덱스\n
 ZIP (Deflate)	TIFFView		ZIP (Deflate)
+identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: 올바르지 않은 문서 인덱스\n
+TIFF image translator	TIFFView		TIFF  이미지 변환기
+TIFF image	TIFFTranslator		TIFF 이미지
+TIFF Settings	TIFFMain		TIFF 설정
+TIFF image translator	TIFFTranslator		TIFF  이미지 변환기
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: 디렉토리를 설정 할 수 없음\n
+TIFFTranslator Settings	TIFFTranslator		TIFF 변환기 설정
+LZW	TIFFView		LZW
+TIFF images	TIFFTranslator		TIFF 이미지들
+None	TIFFView		없음

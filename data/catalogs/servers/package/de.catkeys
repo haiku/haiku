@@ -1,16 +1,16 @@
 1	german	x-vnd.haiku-package_daemon	1440586681
-Package problems	PackageProblem	Window title	Paketprobleme
 Package changes	PackageResult	Window title	Paketänderungen
 uninstall package %s\n	PackageResult	Don't change '%s' variable	Paket %s deinstallieren\n
-install package %s from repository %s\n	PackageResult	Don't change '%s' variables	Paket %s von Repository %s installieren\n
-Apply changes	PackageResult		Änderungen anwenden
-solution %d:	PackageProblem	Don't change the %d variable	Lösung %d:
-Warning	PackageManager		Achtung
-Retry	PackageProblem		Wiederholen
-The following additional package changes have to be made:	PackageResult		Folgende weitere Paketänderungen sind nötig:
 ignore problem for now	PackageProblem		Problem vorerst ignorieren
+solution %d:	PackageProblem	Don't change the %d variable	Lösung %d:
+The following problems have been encountered. Please select a solution for each:	PackageProblem		Für jedes dieser aufgetretenen Probleme muss eine Lösung gewählt werden:
+Apply changes	PackageResult		Änderungen anwenden
+Package daemon	PackageManager		Paket Daemon
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	Paket %s von Repository %s installieren\n
+The following additional package changes have to be made:	PackageResult		Folgende weitere Paketänderungen sind nötig:
+Warning	PackageManager		Achtung
 Cancel	PackageProblem		Abbrechen
 don't activate package %source%	PackageProblem	don't change '%source%	Paket %source% nicht aktivieren
-The following problems have been encountered. Please select a solution for each:	PackageProblem		Für jedes dieser aufgetretenen Probleme muss eine Lösung gewählt werden:
-Package daemon	PackageManager		Paket Daemon
 Cancel	PackageResult		Abbrechen
+Retry	PackageProblem		Wiederholen
+Package problems	PackageProblem	Window title	Paketprobleme

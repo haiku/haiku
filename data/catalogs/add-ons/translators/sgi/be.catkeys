@@ -1,11 +1,11 @@
 1	belarusian	x-vnd.Haiku-SGITranslator	4153400005
-Use compression:	SGIView		Сціскваць:
-SGITranslator Settings	SGITranslator		Наладкі канвертара SGI
-None	SGIView		Ня трэба
 SGI images	SGITranslator		Выявы SGI
-SGI image translator	SGITranslator		Канвертар выяваў SGI
-SGI image	SGITranslator		Выява SGI
-RLE	SGIView		RLE
-SGI Settings	SGIMain		Наладкі SGI
-written by:\n	SGIView		распрацаваны:\n
+Use compression:	SGIView		Сціскваць:
 SGI image translator	SGIView		Канвертар выяваў SGI
+SGI image	SGITranslator		Выява SGI
+SGITranslator Settings	SGITranslator		Наладкі канвертара SGI
+SGI Settings	SGIMain		Наладкі SGI
+SGI image translator	SGITranslator		Канвертар выяваў SGI
+None	SGIView		Ня трэба
+RLE	SGIView		RLE
+written by:\n	SGIView		распрацаваны:\n

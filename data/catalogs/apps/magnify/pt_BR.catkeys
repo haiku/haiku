@@ -1,18 +1,14 @@
-1	portuguese (brazil)	x-vnd.Haiku-Magnify	3799879913
-no clip msg\n	In console, when clipboard is empty after clicking Copy image		nenhuma mensagem do clipboard\n
-Make square	Magnify-Main		Criar quadrado
-Copy image	Magnify-Main		Copiar imagem
-usage: magnify [size] (magnify size * size pixels)\n	Console		utilização: magnify [tamanho] (tamanho da ampliação * tamanho em pixels)\n 
+1	portuguese (brazil)	x-vnd.Haiku-Magnify	2963322339
+Decrease pixel size	Magnify-Main		Diminuir tamanho do pixel
+Increase pixel size	Magnify-Main		Aumentar tamanho do pixel
 Stick coordinates	Magnify-Main		Coordenadas do ponto de fixação
 %width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%largura x %altura  @ {0, plural, um{# pixel/pixel} outros{# pixels/pixel}}
-magnify: size must be a multiple of 4\n	Console		ampliar: tamanho deve ser um múltiplo de 4\n
-Decrease pixel size	Magnify-Main		Diminuir tamanho do pixel
+Copy image	Magnify-Main		Copiar imagem
+Decrease window size	Magnify-Main		Diminuir o tamanho da janela
+Remove a crosshair	Magnify-Main		Remover uma mira
+Add a crosshair	Magnify-Main		Adicionar uma mira
+Increase window size	Magnify-Main		Aumentar o tamanho da janela
+Save image	Magnify-Main		Salvar imagem
 Magnify	System name		Ampliar
 Info	Magnify-Main		Informações
-Remove a crosshair	Magnify-Main		Remover uma mira
-Save image	Magnify-Main		Salvar imagem
-Increase window size	Magnify-Main		Aumentar o tamanho da janela
-Decrease window size	Magnify-Main		Diminuir o tamanho da janela
-Increase pixel size	Magnify-Main		Aumentar tamanho do pixel
-  size must be > 4 and a multiple of 4\n	Console		tamanho deve ser > 4 e um múltiplo de 4\n
-Add a crosshair	Magnify-Main		Adicionar uma mira
+Make square	Magnify-Main		Criar quadrado

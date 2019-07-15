@@ -1,41 +1,41 @@
 1	indonesian	x-vnd.Haiku-Repositories	2658607939
-Completed	TaskLooper	Completed task status message	Terselesaikan
-Repositories	System name		Repositori
-There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Terjadi kesalahan saat mengaktifkan repositori %url%
-Remove this repository?	RepositoriesView	Removal alert confirmation message	Hapus repositori ini?
-Description	TaskLooper	Failed task error description	Keterangan
-Add	AddRepoWindow	Button label	Tambah
-URL	RepositoriesView	Column title	URL
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Repositori tidak bisa mengambil nama-nama repositori yang saat ini aktif.
-Keep trying	TaskTimer	Button label	Tetap mencoba
 This is not a valid URL.	AddRepoWindow	Add URL error message	Ini bukan merupakan URL yang valid
 Repository URL:	AddRepoWindow	Text box label	URL Repositori:
-Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Ada kesalahan mendapatkan konfigurasi repositori untuk %name%.
-Details	TaskLooper	Job log details header	Rincian
-Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Kabar baik! Tugas untuk repositori %name% diselesaikan.
-Status	RepositoriesView	Column title	Status
-Aborted	TaskLooper	Aborted task status message	Dibatalkan
-Remove all	RepositoriesView	Button label	Hapus semua
-Remove	RepositoriesView	Button label	Hapus
-Changes completed	RepositoriesView	Status view text	Perubahan selesai
-Name	RepositoriesView	Column title	Nama
-Enable	RepositoriesView	Button label	Mengizinkan
-Enable repositories to use with package management:	RepositoriesView	Label text	Pilih repositori yang akan digunakan oleh manajemen paket:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Terjadi kesalahan menyegarkan cache repositori untuk %name%
-Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Hanya satu URL untuk setiap repositori yang dapat diaktifkan. Silakan ubah pilihan Anda.
-Failed	TaskLooper	Failed task status message	Gagal
-OK	Constants	Button label	OKE
-Cancel task	TaskTimer	Button label	Batalkan tugas
-Remove these repositories?	RepositoriesView	Removal alert confirmation message	Hapus repositori ini?
-Cancel	Constants	Button label	Batal
-Changes pending:	RepositoriesView	Status view text	Perubahan tertunda:
 There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Ada kesalahan saat menonaktifkan repositori %name%
+Unknown	Constants	Unknown repository name	Tak diketahui
+Remove all	RepositoriesView	Button label	Hapus semua
+Enable repositories to use with package management:	RepositoriesView	Label text	Pilih repositori yang akan digunakan oleh manajemen paket:
+Disable	RepositoriesView	Button label	Menon-aktifkan
+Cancel task	TaskTimer	Button label	Batalkan tugas
+Changes completed	RepositoriesView	Status view text	Perubahan selesai
+Details	TaskLooper	Job log details header	Rincian
 Remove	Constants	Button label	Hapus
-Enable all	RepositoriesView	Button label	Aktifkan semua
-Stop and quit	RepositoriesWindow	Button label	Berhenti dan keluar
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Terjadi kesalahan saat mengaktifkan repositori %url%
+Remove this repository?	RepositoriesView	Removal alert confirmation message	Hapus repositori ini?
 The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	Tugas untuk repositori %name% mengambil waktu yang lama untuk selesai.
-Disable all	RepositoriesView	Button label	Nonaktifkan semua
+Completed	TaskLooper	Completed task status message	Terselesaikan
+OK	Constants	Button label	OKE
+Status	RepositoriesView	Column title	Status
+Name	RepositoriesView	Column title	Nama
+Add	AddRepoWindow	Button label	Tambah
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Repositori tidak bisa mengambil nama-nama repositori yang saat ini aktif.
+Enable all	RepositoriesView	Button label	Aktifkan semua
+Aborted	TaskLooper	Aborted task status message	Dibatalkan
+URL	RepositoriesView	Column title	URL
+Enable	RepositoriesView	Button label	Mengizinkan
+Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Ada kesalahan mendapatkan konfigurasi repositori untuk %name%.
+Description	TaskLooper	Failed task error description	Keterangan
+Failed	TaskLooper	Failed task status message	Gagal
+Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Kabar baik! Tugas untuk repositori %name% diselesaikan.
 Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Beberapa tugas masih berjalan. Hentikan tugas ini dan berhenti?
 This repository URL already exists.	RepositoriesView	Error message	URL repositori ini sudah ada.
-Disable	RepositoriesView	Button label	Menon-aktifkan
-Unknown	Constants	Unknown repository name	Tak diketahui
+Repositories	System name		Repositori
+Changes pending:	RepositoriesView	Status view text	Perubahan tertunda:
+Remove	RepositoriesView	Button label	Hapus
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	Hapus repositori ini?
+Keep trying	TaskTimer	Button label	Tetap mencoba
+Cancel	Constants	Button label	Batal
+Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Hanya satu URL untuk setiap repositori yang dapat diaktifkan. Silakan ubah pilihan Anda.
+Stop and quit	RepositoriesWindow	Button label	Berhenti dan keluar
+Disable all	RepositoriesView	Button label	Nonaktifkan semua

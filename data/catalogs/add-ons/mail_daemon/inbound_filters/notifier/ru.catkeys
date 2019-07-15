@@ -7,7 +7,7 @@ Beep	NotifierConfigView		Звуковой сигнал
 New mails notification	NotifierFilter		Уведомление о новой почте
 Central alert	NotifierConfigView		Центральное оповещение
 OK	NotifierFilter		OK
-New messages	NotifierFilter		Новое сообщение
+New messages	NotifierFilter		Новые сообщения
 Log window	NotifierConfigView		Окно журнала
 Keyboard LEDs	NotifierConfigView		Клавиатурные светодиоды
 Central beep	NotifierConfigView		Центральный звуковой сигнал

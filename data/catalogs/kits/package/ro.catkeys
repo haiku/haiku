@@ -1,7 +1,7 @@
 1	romanian	x-vnd.Haiku-libpackage	2012114212
-Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Pachetul %s-%s nu are un requires pereche pentru pachetul de bază \„%s\”
-Failed to get repository names	PackageManagerKit		Nu s-au putut obține numele de depozite
-Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Nu s-a putut obține cache-ul pentru depozitul \„%s\”. Se sare.
 Refreshing repository \"%s\" failed	PackageManagerKit		Reîmprospătarea depozitului \„%s\” a eșuat
 Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Nu s-a putut obține configurarea pentru depozitul \„%s\”. Se sare.
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Nu s-a putut obține cache-ul pentru depozitul \„%s\”. Se sare.
+Failed to get repository names	PackageManagerKit		Nu s-au putut obține numele de depozite
 Failed to remove transaction directory	PackageManagerKit		Nu s-a putut elimina dosarul de tranzacție
+Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Pachetul %s-%s nu are un requires pereche pentru pachetul de bază \„%s\”

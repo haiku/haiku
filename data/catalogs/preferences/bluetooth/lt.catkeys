@@ -1,51 +1,46 @@
-1	lithuanian	x-vnd.Haiku-BluetoothPrefs	1514658026
-About Bluetooth…	Window		Apie…
-Handheld	Settings view		delninukas
-Default inquiry time:	Settings view		Numatytasis žvalgymo laikas:
+1	lithuanian	x-vnd.Haiku-BluetoothPrefs	416765820
+Laptop	Settings view		skreitinis kompiuteris
+Only from trusted devices	Settings view		tik iš patikimų įrenginių
+15 secs	Settings view		15 sekundžių
+Quit	main		Baigti darbą
 Manufacturer: 	Device View		Gamintojas: 
-Add device to list	Inquiry panel		Pridėti įrenginį
-Starting scan...	Inquiry panel		Pradedamas žvalgymas…
-Smart phone	Settings view		Išmanusis telefonas
-Server	Settings view		serveris
-Stop bluetooth services…	Window		Stabdyti „Bluetooth“ tarnybas…
+Desktop	Settings view		stalinis kompiuteris
+Server	Window		Tarnyba
 Identify host as:	Settings view		Šios sistemos tipas:
 Refresh…	Remote devices		Atnaujinti…
-Pair…	Remote devices		Suporuoti…
-Incoming connections policy:	Settings view		Automatiškai priimti įeinančius ryšius:
-From all devices	Settings view		iš visų įrenginių
-Show name	Extended local device view		Rodyti vardą
 Local devices found on system:	Settings view		Vietiniai sistemoje rasti įrenginiai:
-Remaining %1 seconds	Inquiry panel		Liko %1 sek.
-Server	Window		Tarnyba
-Scanning completed.	Inquiry panel		Žvalgymas baigtas.
-Remove	Remote devices		Pašalinti
-Quit	main		Baigti darbą
-15 secs	Settings view		15 sekundžių
-Start bluetooth services…	Window		Paleisti „Bluetooth“ tarnybas…
-Policy...	Settings view		pasirinkite…
-61 secs	Settings view		61 sekundė
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Sistemoje nepavyko aptikti jokių vietinių „Bluetooth“ įrenginių.
-Identify us as...	Settings view		pasirinkite…
- packets: 	Device View		 paketai: 
-As blocked	Remote devices		Kaip blokuotas
-Bluetooth	System name		Bluetooth
-Disconnect	Remote devices		Atsijungti
-Defaults	Window		Numatytai
-Inquiry	Inquiry panel		Žvalgyti
-Desktop	Settings view		stalinis kompiuteris
-Revert	Window		Atšaukti pakeitimus
-Remote devices	Window		Nuotoliniai įrenginiai
-Laptop	Settings view		skreitinis kompiuteris
-Discoverable	Extended local device view		Aptinkamas
 Service classes: 	Device View		Tarnybų tipai: 
+Remote devices	Window		Nuotoliniai įrenginiai
 Settings	Window		Nuostatos
-Only from trusted devices	Settings view		tik iš patikimų įrenginių
-Scanning progress	Inquiry panel		Žvalgymo eiga
-Always ask	Settings view		visuomet atsiklausti
-Retrieving name of %1	Inquiry panel		Gaunamas %1 vardas
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Įsitikinkite, kad nuotoliniame įrenginyje įjungtas „Bluetooth“ ir spustelėkite mygtuką „Žvalgyti“. Laikas, reikalingas vardų gavimui, nėra žinomas, nors ir neturėtų viršyti 3 sekundžių vienam įrenginiui. Pridėję įrenginius į pagrindinį sąrašą, galėsite su jais suporuoti šią sistemą.
-Authenticate	Extended local device view		Nustatyti tapatybę
-Pick device...	Settings view		Parinkti įrenginį…
-Retrieving names...	Inquiry panel		Gaunami vardai…
-Help	Window		Pagalba
+Stop bluetooth services…	Window		Stabdyti „Bluetooth“ tarnybas…
+61 secs	Settings view		61 sekundė
 Add…	Remote devices		Pridėti…
+As blocked	Remote devices		Kaip blokuotas
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Sistemoje nepavyko aptikti jokių vietinių „Bluetooth“ įrenginių.
+Revert	Window		Atšaukti pakeitimus
+Disconnect	Remote devices		Atsijungti
+From all devices	Settings view		iš visų įrenginių
+Defaults	Window		Numatytai
+Start bluetooth services…	Window		Paleisti „Bluetooth“ tarnybas…
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Įsitikinkite, kad nuotoliniame įrenginyje įjungtas „Bluetooth“ ir spustelėkite mygtuką „Žvalgyti“. Laikas, reikalingas vardų gavimui, nėra žinomas, nors ir neturėtų viršyti 3 sekundžių vienam įrenginiui. Pridėję įrenginius į pagrindinį sąrašą, galėsite su jais suporuoti šią sistemą.
+Scanning progress	Inquiry panel		Žvalgymo eiga
+Bluetooth	System name		Bluetooth
+Remove	Remote devices		Pašalinti
+Always ask	Settings view		visuomet atsiklausti
+Help	Window		Pagalba
+Pair…	Remote devices		Suporuoti…
+Retrieving name of %1	Inquiry panel		Gaunamas %1 vardas
+Inquiry	Inquiry panel		Žvalgyti
+Incoming connections policy:	Settings view		Automatiškai priimti įeinančius ryšius:
+Show name	Extended local device view		Rodyti vardą
+Add device to list	Inquiry panel		Pridėti įrenginį
+Remaining %1 seconds	Inquiry panel		Liko %1 sek.
+Discoverable	Extended local device view		Aptinkamas
+Authenticate	Extended local device view		Nustatyti tapatybę
+Smart phone	Settings view		Išmanusis telefonas
+Scanning completed.	Inquiry panel		Žvalgymas baigtas.
+Default inquiry time:	Settings view		Numatytasis žvalgymo laikas:
+Server	Settings view		serveris
+Handheld	Settings view		delninukas
+ packets: 	Device View		 paketai: 
+About Bluetooth…	Window		Apie…

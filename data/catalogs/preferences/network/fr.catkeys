@@ -1,53 +1,53 @@
 1	french	x-vnd.Haiku-Network	1314732966
-Static	IntefaceAddressView		Statique
+Ethernet device	InterfaceListItem		Périphérique Ethernet
+Link speed:	IntefaceView		Vitesse du lien :
+disconnected	IntefaceView		déconnecté
+IP Address:	IntefaceAddressView		Adresse IP :
+WPA	WPA protected network		WPA
+Network:	IntefaceView		Réseau :
+Received:	IntefaceView		Reçu :
+New…	NetworkWindow		Nouveau…
+no link	InterfaceListItem		aucun lien
+Other	NetworkWindow		Autre
+Sent:	IntefaceView		Envoyé :
+Gateway:	IntefaceAddressView		Passerelle :
+The netmask defines your local network	IntefaceAddressView		Le masque réseau détermine votre réseau local
+Your IP address	IntefaceAddressView		Votre adresse IP
+DHCP	IntefaceAddressView		DHCP
+Dial Up	NetworkWindow		Connexion téléphonique
+Netmask:	IntefaceAddressView		Masque réseau :
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Services
-no link	InterfaceListItem		aucun lien
-WPA2	WPA2 protected network		WPA2
-Choose automatically	IntefaceView		Choisir automatiquement
-connected	IntefaceView		connecté
-Ethernet device	InterfaceListItem		Périphérique Ethernet
-The netmask defines your local network	IntefaceAddressView		Le masque réseau détermine votre réseau local
-Dial-up connection	InterfaceListItem		Connexion téléphonique
-%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
-Network	NetworkWindow		Réseau
-VPN connection	InterfaceListItem		connexion VPN
-Show network status in Deskbar	NetworkWindow		Afficher l’État du réseau dans la Deskbar
-The method for obtaining an IP address	IntefaceAddressView		Méthode d'obtention de l'adresse IP
-connected	InterfaceListItem		connecté
-disabled	InterfaceListItem		désactivé
-Dial Up	NetworkWindow		Connexion téléphonique
-Apply	IntefaceAddressView		Appliquer
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Échec de l’installation de l’État du réseau dans la Deskbar : %s
+Revert	NetworkWindow		Rétablir
+WEP	WEP protected network		WEP
+<no wireless networks found>	IntefaceView		<aucun réseau sans fil trouvé>
+connected	IntefaceView		connecté
+VPN	NetworkWindow		VPN
+Apply	IntefaceAddressView		Appliquer
+Disable	ServiceView		Désactiver
+WPA2	WPA2 protected network		WPA2
+Show network status in Deskbar	NetworkWindow		Afficher l’État du réseau dans la Deskbar
+Mode:	IntefaceAddressView		Mode :
+connected	InterfaceListItem		connecté
+Static	IntefaceAddressView		Statique
+launch error	NetworkWindow		erreur du lancement
+Renegotiate	IntefaceView		Renégocier
 MAC address:	IntefaceView		Adresse MAC :
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+disabled	InterfaceListItem		désactivé
+Dial-up connection	InterfaceListItem		Connexion téléphonique
+The method for obtaining an IP address	IntefaceAddressView		Méthode d'obtention de l'adresse IP
+Automatic	IntefaceAddressView		Automatique
+Choose automatically	IntefaceView		Choisir automatiquement
+Status:	IntefaceView		État :
+Disable	IntefaceView		Désactiver
+Manage…	NetworkWindow		Gérer…
+open	Open network		ouvrir
+Network	NetworkWindow		Réseau
+Your gateway to the internet	IntefaceAddressView		Votre passerelle vers l'internet
+Enable	ServiceView		Activer
+Ok	NetworkWindow		Valider
 Wireless device	InterfaceListItem		Périphérique sans fil
 Disabled	IntefaceAddressView		Désactivé
-Renegotiate	IntefaceView		Renégocier
-Ok	NetworkWindow		Valider
-Network:	IntefaceView		Réseau :
-launch error	NetworkWindow		erreur du lancement
-Other	NetworkWindow		Autre
-Automatic	IntefaceAddressView		Automatique
-Gateway:	IntefaceAddressView		Passerelle :
-Revert	NetworkWindow		Rétablir
-Enable	ServiceView		Activer
-disconnected	IntefaceView		déconnecté
-Status:	IntefaceView		État :
-Link speed:	IntefaceView		Vitesse du lien :
-Your gateway to the internet	IntefaceAddressView		Votre passerelle vers l'internet
-New…	NetworkWindow		Nouveau…
-DHCP	IntefaceAddressView		DHCP
-Mode:	IntefaceAddressView		Mode :
-WPA	WPA protected network		WPA
-Sent:	IntefaceView		Envoyé :
-open	Open network		ouvrir
-IP Address:	IntefaceAddressView		Adresse IP :
-VPN	NetworkWindow		VPN
-Received:	IntefaceView		Reçu :
-Disable	IntefaceView		Désactiver
-<no wireless networks found>	IntefaceView		<aucun réseau sans fil trouvé>
-Netmask:	IntefaceAddressView		Masque réseau :
-Disable	ServiceView		Désactiver
-Your IP address	IntefaceAddressView		Votre adresse IP
-Manage…	NetworkWindow		Gérer…
-WEP	WEP protected network		WEP
+VPN connection	InterfaceListItem		connexion VPN

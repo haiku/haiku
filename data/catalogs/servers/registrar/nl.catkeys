@@ -1,23 +1,23 @@
 1	dutch; flemish	x-vnd.haiku-registrar	2599857937
-Restart system	ShutdownProcess		Het systeem opnieuw opstarten
-The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Het is mogelijk dat de applicatie \"%appName%\" geblokkeerd is op een modaal paneel.
-OK	ShutdownProcess		OK
-System is shut down	ShutdownProcess		Het systeem is uitgeschakeld
-It's now safe to turn off the computer.	ShutdownProcess		Het is nu veilig om de computer af te sluiten.
 Cancel	ShutdownProcess		Annuleren
+OK	ShutdownProcess		OK
 Do you really want to shut down the system?	ShutdownProcess		Ben je zeker dat je het systeem wilt afsluiten?
-Asking other processes to quit.	ShutdownProcess		Andere processen worden verzocht te stoppen.
-Asking \"%appName%\" to quit.	ShutdownProcess		\"%appName%\" wordt gevraagd te stoppen.
-%action%?	ShutdownProcess		%action%?
-Shutdown aborted	ShutdownProcess		Afsluiten werd geannuleerd
-Restarting…	ShutdownProcess		Herstarten...
-Asking background applications to quit.	ShutdownProcess		De achtergrondapplicaties worden verzocht af te sluiten.
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		De applicatie \"%appName%\" heeft het afsluitproces geannuleerd.
-Tidying things up a bit.	ShutdownProcess		Enkele zaken worden nog wat op orde gebracht.
-Do you really want to restart the system?	ShutdownProcess		Ben je zeker dat je het systeem opnieuw wilt opstarten?
 Shutdown status	ShutdownProcess		Afsluitstatus
-Cancel shutdown	ShutdownProcess		Afsluiten annuleren
-Kill application	ShutdownProcess		Applicatie afbreken
 Shut down	ShutdownProcess		Afsluiten
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Het is mogelijk dat de applicatie \"%appName%\" geblokkeerd is op een modaal paneel.
+System is shut down	ShutdownProcess		Het systeem is uitgeschakeld
+Restart system	ShutdownProcess		Het systeem opnieuw opstarten
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		De applicatie \"%appName%\" heeft het afsluitproces geannuleerd.
+Asking background applications to quit.	ShutdownProcess		De achtergrondapplicaties worden verzocht af te sluiten.
+Do you really want to restart the system?	ShutdownProcess		Ben je zeker dat je het systeem opnieuw wilt opstarten?
 Restart	ShutdownProcess		Herstarten
+It's now safe to turn off the computer.	ShutdownProcess		Het is nu veilig om de computer af te sluiten.
+Asking other processes to quit.	ShutdownProcess		Andere processen worden verzocht te stoppen.
+Cancel shutdown	ShutdownProcess		Afsluiten annuleren
+Restarting…	ShutdownProcess		Herstarten...
+%action%?	ShutdownProcess		%action%?
+Tidying things up a bit.	ShutdownProcess		Enkele zaken worden nog wat op orde gebracht.
+Kill application	ShutdownProcess		Applicatie afbreken
+Shutdown aborted	ShutdownProcess		Afsluiten werd geannuleerd
 Shutting down…	ShutdownProcess		Aan het afsluiten...
+Asking \"%appName%\" to quit.	ShutdownProcess		\"%appName%\" wordt gevraagd te stoppen.

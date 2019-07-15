@@ -1,15 +1,13 @@
-1	polish	x-vnd.Haiku-GLifeScreensaver	1707534289
-Grid Border: %li	GLife ScreenSaver		Obramowanie siatki: %li
-Grid Width: 	GLife ScreenSaver		Szerokość siatki: 
-none	GLife ScreenSaver		brak
-Grid Height: 	GLife ScreenSaver		Wysokość siatki:
-%sx	GLife ScreenSaver	This is a factor: the x represents 'times'	%sx
+1	polish	x-vnd.Haiku-GLifeScreensaver	2074508370
+by Aaron Hill	GLife ScreenSaver		autorstwa Aarona Hilla
 None	GLife ScreenSaver		Brak
+none	GLife ScreenSaver		brak
+Grid Height: %li	GLife ScreenSaver		Wysokość siatki: %li
+Grid Width: 	GLife ScreenSaver		Szerokość siatki: 
+Grid Border: %li	GLife ScreenSaver		Obramowanie siatki: %li
+Grid Border: 	GLife ScreenSaver		Obramowanie siatki: 
+OpenGL \"Game of Life\"	GLife ScreenSaver		„Gra w Życie” (OpenGL)
+Grid Height: 	GLife ScreenSaver		Wysokość siatki:
 4x	GLife ScreenSaver	This is a factor: the x represents 'times'	4x
 Grid Width: %li	GLife ScreenSaver		Szerokość siatki: %li
-Grid Height: %li	GLife ScreenSaver		Wysokość siatki: %li
 Grid Life Delay: 	GLife ScreenSaver		Opóźnienie pomiędzy pokoleniami: 
-OpenGL \"Game of Life\"	GLife ScreenSaver		„Gra w Życie” (OpenGL)
-Grid Life Delay: %s	GLife ScreenSaver		Opóźnienie pomiędzy pokoleniami: %s
-Grid Border: 	GLife ScreenSaver		Obramowanie siatki: 
-by Aaron Hill	GLife ScreenSaver		autorstwa Aarona Hilla

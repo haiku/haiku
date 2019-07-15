@@ -1,55 +1,49 @@
-1	russian	x-vnd.Haiku-BluetoothPrefs	145165464
-About Bluetooth…	Window		О программе…
-Handheld	Settings view		Переносной
-Default inquiry time:	Settings view		Время запроса по умолчанию:
+1	russian	x-vnd.Haiku-BluetoothPrefs	67867884
+Laptop	Settings view		Ноутбук
+Only from trusted devices	Settings view		Только от доверенных устройств
+15 secs	Settings view		15 сек
+Quit	main		Выход
 Manufacturer: 	Device View		Производитель: 
-Add device to list	Inquiry panel		Добавить устройство в список
-Starting scan...	Inquiry panel		Начало сканирования…
-Smart phone	Settings view		Смартфон
-With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		С поддержкой:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nСпасибо всем тем, кто помог...\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nФинансово:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nПатчами:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nТестированием:\n - Petter H. Juliussen\nКто дал мне все знания:\n - the yellowTAB team
-Server	Settings view		Сервер
-Stop bluetooth services…	Window		Остановить службу bluetooth…
-The Bluetooth services are not currently running on this system.	main		Службы Bluetooth не запущены на этой системе.
+Desktop	Settings view		Рабочий стол
+Server	Window		Сервер
 Identify host as:	Settings view		Идентифицировать как:
 Refresh…	Remote devices		Обновить…
-Pair…	Remote devices		Пара…
-Incoming connections policy:	Settings view		Политика входящих соединений:
-From all devices	Settings view		От всех устройств
-Show name	Extended local device view		Показывать имя
 Local devices found on system:	Settings view		Локальные устройства, найденные в системе:
-Remaining %1 seconds	Inquiry panel		Осталось %1 секунд
-Server	Window		Сервер
-Scanning completed.	Inquiry panel		Сканирование завершено.
+Service classes: 	Device View		Служебные классы: 
+Remote devices	Window		Удалённые устройства
+Settings	Window		Настройки
+Stop bluetooth services…	Window		Остановить службу bluetooth…
+61 secs	Settings view		61 сек
+Add…	Remote devices		Добавить…
+As blocked	Remote devices		Как блокированный
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Не было найдено ни одного bluetooth устройства, зарегистрированного в системе.
+Revert	Window		Вернуть
+Refresh local devices…	Window		Обновить локальные устройства…
+Disconnect	Remote devices		Отключить
+From all devices	Settings view		От всех устройств
+Defaults	Window		По умолчанию
+Start bluetooth services…	Window		Запуск службы bluetooth…
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Убедитесь, что на удалённом устройстве активирован bluetooth. Чтобы начать сканирование, нажмите кнопку 'Запрос'. Время, необходимое для получения имён неизвестно, хотя не должно превышать 3-х секунд на одно устройство. После этого вы сможете подключиться к ним.
+Scanning progress	Inquiry panel		Прогресс сканирования
+Bluetooth	System name		Bluetooth
 Launch now	main		Запустить сейчас
 Remove	Remote devices		Удалить
-Quit	main		Выход
-15 secs	Settings view		15 сек
-Start bluetooth services…	Window		Запуск службы bluetooth…
-Policy...	Settings view		Политика…
-61 secs	Settings view		61 сек
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Не было найдено ни одного bluetooth устройства, зарегистрированного в системе.
-Identify us as...	Settings view		Идентифицировать нас как…
- packets: 	Device View		 пакетов: 
-As blocked	Remote devices		Как блокированный
-Bluetooth	System name		Bluetooth
-Disconnect	Remote devices		Отключить
-Defaults	Window		По умолчанию
-Inquiry	Inquiry panel		Запрос
-Desktop	Settings view		Рабочий стол
-Revert	Window		Вернуть
-Remote devices	Window		Удалённые устройства
-Laptop	Settings view		Ноутбук
-Discoverable	Extended local device view		Видимый
-Service classes: 	Device View		Служебные классы: 
-Settings	Window		Настройки
-Only from trusted devices	Settings view		Только от доверенных устройств
-Scanning progress	Inquiry panel		Прогресс сканирования
 Always ask	Settings view		Всегда спрашивать
-Retrieving name of %1	Inquiry panel		Получение имени %1
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Убедитесь, что на удалённом устройстве активирован bluetooth. Чтобы начать сканирование, нажмите кнопку 'Запрос'. Время, необходимое для получения имён неизвестно, хотя не должно превышать 3-х секунд на одно устройство. После этого вы сможете подключиться к ним.
-Authenticate	Extended local device view		Аутентифицировать
-Refresh local devices…	Window		Обновить локальные устройства…
-Pick device...	Settings view		Выбрать устройство...
-Retrieving names...	Inquiry panel		Получение имен…
 Help	Window		Помощь
-Add…	Remote devices		Добавить…
+Pair…	Remote devices		Пара…
+Retrieving name of %1	Inquiry panel		Получение имени %1
+Inquiry	Inquiry panel		Запрос
+Incoming connections policy:	Settings view		Политика входящих соединений:
+Show name	Extended local device view		Показывать имя
+Add device to list	Inquiry panel		Добавить устройство в список
+Remaining %1 seconds	Inquiry panel		Осталось %1 секунд
+The Bluetooth services are not currently running on this system.	main		Службы Bluetooth не запущены на этой системе.
+Discoverable	Extended local device view		Видимый
+Authenticate	Extended local device view		Аутентифицировать
+Smart phone	Settings view		Смартфон
+Scanning completed.	Inquiry panel		Сканирование завершено.
+Default inquiry time:	Settings view		Время запроса по умолчанию:
+Server	Settings view		Сервер
+Handheld	Settings view		Переносной
+ packets: 	Device View		 пакетов: 
+About Bluetooth…	Window		О программе…

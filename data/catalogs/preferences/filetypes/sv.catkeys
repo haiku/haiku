@@ -1,157 +1,157 @@
 1	swedish	x-vnd.Haiku-FileTypes	734679611
-Application types…	FileTypes Window		Programtyper...
-Description:	Application Types Window		Beskrivning:
-Args only	Application Type Window		Endast argument
-Recognition rule is not valid:\n\n	FileTypes Window		Igenkänningsregeln är inte giltig:\n\n
-Add group	New File Type Window		Lägg till grupp
-Remove	Application Type Window		Ta bort
-Select same type as	FileType Window		Välj samma typ som
-Remove icon	Icon View		Ta bort ikon
-Supported types	Application Type Window		Stödda typer
-Show icons in list	FileTypes Window		Visa ikoner i lista
-Type name:	FileTypes Window		Typnamn:
-Internal name:	New File Type Window		Internt namn:
-Choose type	Type List Window		Välj typ
-New file type	New File Type Window		Ny filtyp
-Rule:	FileTypes Window		Regel:
-Add icon…	Icon View		Lägg till ikon…
-Multiple files from \"%s\" file type	FileType Window		Flera filer från filtypen \"%s\"
-File type	FileType Window		Filtyp
-Could not change attributes	Attribute Window		Kan inte ändra attribut
-Could not retrieve preferred application of this file	Preferred App Menu		Kunde inte hämta förinställt program för denna fil
-Beta	Application Types Window		Beta
-Extensions:	FileTypes Window		Tillägg:
-Select same preferred application as	FileTypes Window		Välj samma förinställda program som
-Save	Application Type Window		Spara
-Could not retrieve application signature	Preferred App Menu		Kunde inte hämta programsignatur
-Add	Extension Window		Lägg till
-Select same preferred application as	FileType Window		Välj samma förinställda program som
-Cancel	Attribute Window		Avbryt
-Icon	Application Type Window		Ikon
-Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Att ta bort en filtyp kan inte ångras.\nÄr du säker på att du vill ta bort filtypen?
-Editable	Attribute Window	If Tracker allows to edit this attribute.	Redigerbar
-Multiple launch	Application Type Window		Starta flera
-(from application)	FileTypes Window		(från program)
-Could not set preferred application	FileTypes Window		Kunde inte ange förinställt program
-Group:	New File Type Window		Grupp:
-%1 application type	Application Type Window		%1 programtyp
-Done	Extension Window		Klar
-Application type	Application Type Window		Applikationstyp
-Done	Type List Window		Klart
-Attribute	Attribute Window		Attribut
-Show recognition rule	FileTypes Window		Visa igenkänningsregel
-FileTypes request	Preferred App Menu		Filtypsbegäran
-Could not open file	FileType Window		Kunde inte öppna filen
-Description:	FileTypes Window		Beskrivning:
-File	FileTypes Window		Arkiv
-Name:	Application Types Window		Namn:
-Group name:	New File Type Window		Gruppnamn:
-Preferred application	FileType Window		Förvalt program
-Progress	Application Types Window		Fortskridning:
-Set preferred application	Preferred App Menu		Välj förinställt program
-Don't save	Application Type Window		Spara inte
-Save changes before closing?	Application Type Window		Spara ändringar innan programmet avslutas?
-File	Application Type Window		Arkiv
-{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# Applikationstypen kan plockas bort} other{# Applikationstyperna kan plockas bort}}
-Version:	Application Type Window		Version:
-Select…	FileTypes Window		Välj...
-FileTypes request	FileTypes		FilTyper - fråga
-Open…	FileTypes Window		Öppna...
-Select…	FileType Window		Välj…
-Launch	Application Types Window		Starta
-Same as…	FileType Window	The same APPLICATION as ...	Samma som...
-Abort	Application Types Window		Avbryt
-FileTypes	FileTypes		FilTyper
-OK	FileTypes		OK
-Extra attributes	FileTypes Window		Extra attribut
-Development	Application Type Window		Utveckling
-Edit…	Application Types Window		Redigera...
-Icon	FileType Window		Ikon
-Final	Application Types Window		Slutgiltig
-Development	Application Types Window		Utveckling
-Open file	FileTypes		Öppna fil
-Special:	Attribute Window		Special:
-Alpha	Application Type Window		Alfa
-Add…	FileTypes Window		Lägg till...
-Signature:	Application Type Window		Signatur:
-Add…	Application Type Window		Lägg till…
-[Multiple files] file types	FileType Window		[Flera filer] filtyper
-Information	Application Types Window		Information
-Gamma	Application Types Window		Gamma
-Quit	FileTypes Window		Avsluta
-Select preferred application	FileType Window		Välj förinställda program
-Single launch	Application Type Window		Starta en
-Golden master	Application Types Window		Produktionsversion
-%s file type	FileType Window		%s filtyp
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Programmet \"%s\" stödjer inte denna filtyp.\nÄr du säker på att du vill använda den ändå?
-Type:	Attribute Window		Typ:
-Removing uninstalled application types	Application Types Window		Tar bort avinstallerade programtyper
-Done	Attribute Window		Klar
-no icon	FileTypes Window		ingen ikon
-Alpha	Application Types Window		Alfa
-Version	Application Types Window		Version
-Background app	Application Type Window		Bakgrundsprogram
-Add new group	New File Type Window		Lägg till ny grupp
-Move down	FileTypes Window		Flytta ner
-Cancel	Application Type Window		Avbryt
-Settings	FileTypes Window		Inställningar
-New resource file…	FileTypes Window		Ny resursfil...
-Cancel	New File Type Window		Avbryt
-Icon	FileTypes Window		Ikon
-Extension:	Extension Window		Tillägg:
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Borttagning av huvudtyp kan inte ångras.\nAlla filtyper som hör till huvudtypen kommer att gå förlorade!\n\nÄr du säker på att du vill fortsätta? För att ta bort en hel grupp, håll nere shift-tangenten och tryck på \"Ta bort\".
-Internal name:	FileTypes Window		Internt namn:
-Add	Attribute Window		Lägg till
-Close	Application Type Window		Stäng
-File recognition	FileTypes Window		Filigenkänning
-Remove uninstalled	Application Types Window		Ta bort avinstallerade
-Center	Attribute Window	Attribute column alignment in Tracker	Mitten
-Golden master	Application Type Window		Produktionsversion
-Could not open \"%s\":\n%s	FileTypes		Kunde inte öppna  \"%s\":\n%s
-Alignment:	Attribute Window		Linjering:
 Left	Attribute Window	Attribute column alignment in Tracker	Vänster
-Cancel	Extension Window		Avbryt
-Path:	Application Types Window		Sökväg:
-Application flags	Application Type Window		Programflaggor
-Cancel	Type List Window		Avbryt
-Move up	FileTypes Window		Flytta upp
-Description	FileTypes Window		Beskrivning
-Save request	Application Type Window		Spara begäran
-Beta	Application Type Window		Beta
-None	FileTypes Window		Ingen
-Remove	FileTypes Window		Ta bort
-Attribute name:	Attribute Window		Attributnamn:
-Extension	Extension Window		Tillägg
-Add type	New File Type Window		Lägg till typ
-Internal name:	Attribute Window		Internt namn:
-Show in Tracker…	Application Types Window		Visa i Tracker...
-Final	Application Type Window		Slutgiltig
-Width:	Attribute Window	Default column width in Tracker for this attribute.	Bredd:
-Display as:	Attribute Window	Tracker offers different display modes for attributes.	Visa som:
-This file type already exists	New File Type Window		Filtypen finns redan
-Same as…	FileTypes Window		Samma som...
-Exclusive launch	Application Type Window		Exklusiv start
-FileTypes	System name		FilTyper
-Application types	Application Types Window		Programtyper
-Could not remove file type: %s\n	FileTypes Window		Kunde inte ta bort filtypen: %s\n
-Signature:	Application Types Window		Signatur:
-Gamma	Application Type Window		Gamma
-Cancel	Preferred App Menu		Avbryt
-Cancel	FileTypes Window		Avbryt
-Select preferred application	FileTypes Window		Välj förinställt program
-Right	Attribute Window	Attribute column alignment in Tracker	Höger
-Default application	FileType Window		Förinställt program
-Long description:	Application Type Window		Lång beskrivning:
+Final	Application Types Window		Slutgiltig
 FileTypes request	FileTypes Window		FilTyper - begäran
-Version info	Application Type Window		Versionsinfo
-(from super type)	FileTypes Window		(från huvudtyp)
-Version:	Application Types Window		Version:
+This file type already exists	New File Type Window		Filtypen finns redan
 Preferred application	FileTypes Window		Förinställt program
-Short description:	Application Type Window		Kort beskrivning:
-File could not be opened	Preferred App Menu		Filen kunde inte öppnas
-Could not change file extensions	Extension Window		Kunde inte ändra filtillägget
-Edit icon…	Icon View		Redigera ikon...
+Launch	Application Types Window		Starta
+Removing uninstalled application types	Application Types Window		Tar bort avinstallerade programtyper
+Width:	Attribute Window	Default column width in Tracker for this attribute.	Bredd:
 Same as…	FileType Window	The same TYPE as ...	Samma som...
-Save into resource file…	Application Type Window		Spara till resursfil...
+(from super type)	FileTypes Window		(från huvudtyp)
+Select same preferred application as	FileTypes Window		Välj samma förinställda program som
+Could not change attributes	Attribute Window		Kan inte ändra attribut
+Icon	FileTypes Window		Ikon
+Add…	Application Type Window		Lägg till…
+Attribute name:	Attribute Window		Attributnamn:
+Long description:	Application Type Window		Lång beskrivning:
+Cancel	Preferred App Menu		Avbryt
+Remove	FileTypes Window		Ta bort
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Programmet \"%s\" stödjer inte denna filtyp.\nÄr du säker på att du vill använda den ändå?
+Remove	Application Type Window		Ta bort
+Gamma	Application Type Window		Gamma
+Cancel	Application Type Window		Avbryt
+Attribute	Attribute Window		Attribut
+Multiple launch	Application Type Window		Starta flera
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# Applikationstypen kan plockas bort} other{# Applikationstyperna kan plockas bort}}
+Edit…	Application Types Window		Redigera...
+Could not set preferred application	FileTypes Window		Kunde inte ange förinställt program
+Description	FileTypes Window		Beskrivning
+Signature:	Application Types Window		Signatur:
+None	FileTypes Window		Ingen
+Exclusive launch	Application Type Window		Exklusiv start
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Att ta bort en filtyp kan inte ångras.\nÄr du säker på att du vill ta bort filtypen?
+Cancel	New File Type Window		Avbryt
+Select same preferred application as	FileType Window		Välj samma förinställda program som
+Cancel	Type List Window		Avbryt
+Don't save	Application Type Window		Spara inte
+Center	Attribute Window	Attribute column alignment in Tracker	Mitten
+Done	Extension Window		Klar
+Development	Application Types Window		Utveckling
+Abort	Application Types Window		Avbryt
+Save	Application Type Window		Spara
+Same as…	FileType Window	The same APPLICATION as ...	Samma som...
+%1 application type	Application Type Window		%1 programtyp
+Icon	Application Type Window		Ikon
+Version:	Application Type Window		Version:
+Default application	FileType Window		Förinställt program
+Internal name:	New File Type Window		Internt namn:
+Extension:	Extension Window		Tillägg:
+Extensions:	FileTypes Window		Tillägg:
+Select preferred application	FileType Window		Välj förinställda program
+Description:	FileTypes Window		Beskrivning:
+Multiple files from \"%s\" file type	FileType Window		Flera filer från filtypen \"%s\"
+Add new group	New File Type Window		Lägg till ny grupp
+Remove uninstalled	Application Types Window		Ta bort avinstallerade
+File	Application Type Window		Arkiv
+Progress	Application Types Window		Fortskridning:
+Select…	FileType Window		Välj…
+Information	Application Types Window		Information
+Settings	FileTypes Window		Inställningar
+Done	Attribute Window		Klar
+FileTypes request	FileTypes		FilTyper - fråga
+Select same type as	FileType Window		Välj samma typ som
+Version:	Application Types Window		Version:
+Application types	Application Types Window		Programtyper
+(from application)	FileTypes Window		(från program)
+Description:	Application Types Window		Beskrivning:
+Name:	Application Types Window		Namn:
+File could not be opened	Preferred App Menu		Filen kunde inte öppnas
+Args only	Application Type Window		Endast argument
+Could not open \"%s\":\n%s	FileTypes		Kunde inte öppna  \"%s\":\n%s
+Right	Attribute Window	Attribute column alignment in Tracker	Höger
+Save changes before closing?	Application Type Window		Spara ändringar innan programmet avslutas?
+Background app	Application Type Window		Bakgrundsprogram
+Recognition rule is not valid:\n\n	FileTypes Window		Igenkänningsregeln är inte giltig:\n\n
+Show icons in list	FileTypes Window		Visa ikoner i lista
+Editable	Attribute Window	If Tracker allows to edit this attribute.	Redigerbar
+New resource file…	FileTypes Window		Ny resursfil...
+[Multiple files] file types	FileType Window		[Flera filer] filtyper
+Application type	Application Type Window		Applikationstyp
+Show in Tracker…	Application Types Window		Visa i Tracker...
+Type name:	FileTypes Window		Typnamn:
 Visible	Attribute Window		Synlig
+Select preferred application	FileTypes Window		Välj förinställt program
+Path:	Application Types Window		Sökväg:
 Could not install file type	New File Type Window		Kunde inte installera filtyp
+Same as…	FileTypes Window		Samma som...
+Golden master	Application Type Window		Produktionsversion
+FileTypes request	Preferred App Menu		Filtypsbegäran
+Single launch	Application Type Window		Starta en
+no icon	FileTypes Window		ingen ikon
+%s file type	FileType Window		%s filtyp
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Borttagning av huvudtyp kan inte ångras.\nAlla filtyper som hör till huvudtypen kommer att gå förlorade!\n\nÄr du säker på att du vill fortsätta? För att ta bort en hel grupp, håll nere shift-tangenten och tryck på \"Ta bort\".
+Add type	New File Type Window		Lägg till typ
+Remove icon	Icon View		Ta bort ikon
+Cancel	Extension Window		Avbryt
+Alignment:	Attribute Window		Linjering:
+Icon	FileType Window		Ikon
+Signature:	Application Type Window		Signatur:
+Development	Application Type Window		Utveckling
+Golden master	Application Types Window		Produktionsversion
+Add	Extension Window		Lägg till
+Open…	FileTypes Window		Öppna...
+Could not change file extensions	Extension Window		Kunde inte ändra filtillägget
+Could not open file	FileType Window		Kunde inte öppna filen
+Choose type	Type List Window		Välj typ
+Select…	FileTypes Window		Välj...
+File recognition	FileTypes Window		Filigenkänning
+Application types…	FileTypes Window		Programtyper...
+Add icon…	Icon View		Lägg till ikon…
+Cancel	FileTypes Window		Avbryt
+Save into resource file…	Application Type Window		Spara till resursfil...
+Special:	Attribute Window		Special:
+Type:	Attribute Window		Typ:
+Could not retrieve application signature	Preferred App Menu		Kunde inte hämta programsignatur
+Beta	Application Types Window		Beta
+Add group	New File Type Window		Lägg till grupp
+Cancel	Attribute Window		Avbryt
+Gamma	Application Types Window		Gamma
+Supported types	Application Type Window		Stödda typer
+Beta	Application Type Window		Beta
+Could not retrieve preferred application of this file	Preferred App Menu		Kunde inte hämta förinställt program för denna fil
+Application flags	Application Type Window		Programflaggor
+OK	FileTypes		OK
+Group name:	New File Type Window		Gruppnamn:
+Move up	FileTypes Window		Flytta upp
+Add	Attribute Window		Lägg till
+File	FileTypes Window		Arkiv
+Open file	FileTypes		Öppna fil
+Version info	Application Type Window		Versionsinfo
+Final	Application Type Window		Slutgiltig
+Preferred application	FileType Window		Förvalt program
+FileTypes	FileTypes		FilTyper
+Set preferred application	Preferred App Menu		Välj förinställt program
+New file type	New File Type Window		Ny filtyp
+Short description:	Application Type Window		Kort beskrivning:
+Save request	Application Type Window		Spara begäran
+Could not remove file type: %s\n	FileTypes Window		Kunde inte ta bort filtypen: %s\n
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	Visa som:
+Done	Type List Window		Klart
+Extra attributes	FileTypes Window		Extra attribut
+Group:	New File Type Window		Grupp:
+Alpha	Application Types Window		Alfa
+Close	Application Type Window		Stäng
+Extension	Extension Window		Tillägg
+Rule:	FileTypes Window		Regel:
+FileTypes	System name		FilTyper
+Version	Application Types Window		Version
+Quit	FileTypes Window		Avsluta
+File type	FileType Window		Filtyp
+Internal name:	FileTypes Window		Internt namn:
+Add…	FileTypes Window		Lägg till...
+Edit icon…	Icon View		Redigera ikon...
+Internal name:	Attribute Window		Internt namn:
+Show recognition rule	FileTypes Window		Visa igenkänningsregel
+Move down	FileTypes Window		Flytta ner
+Alpha	Application Type Window		Alfa

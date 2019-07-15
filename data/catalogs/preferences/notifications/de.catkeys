@@ -1,35 +1,35 @@
 1	german	x-vnd.Haiku-Notifications	332239666
-An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Das Speichern der Einstellungen ist fehlgeschlagen.\nMöglicherweise steht nicht genügend Speicherplatz zur Verfügung.
-Add…	NotificationView		Hinzu…
-Status	NotificationView		Status
-Revert	PrefletWin		Anfangswerte
-Enable notifications	GeneralView		Benachrichtigungen aktivieren
-Window width:	GeneralView		Fensterbreite:
-This is a test notification message	PrefletWin		Dies ist eine Testbenachrichtigung
-OK	PrefletWin		OK
-Duration:	GeneralView		Dauer:
-OK	NotificationView		OK
-Application does not have a valid signature	NotificationView	Alert message	Die Anwendung besitzt keine gültige Signatur
-Follow Deskbar	GeneralView		Deskbar folgen
-Notifications	PrefletWin		Notifications - Benachrichtigungen
-Timeout:	GeneralView		Anzeigezeit:
-Muted	NotificationView		Stumm
-General	PrefletView		Allgemein
-Allowed	NotificationView		Erlaubt
-Remove	NotificationView		Entfernen
-Lower right	GeneralView		Unten rechts
-Notifications preflet sample	PrefletWin		Benachrichtigungsbeispiel
-Notifications	System name		Benachrichtigungen
-Position:	GeneralView		Position:
-Applications	PrefletView		Anwendungen
-Defaults	PrefletWin		Standardwerte
-pixels	GeneralView		Pixel
-Application	NotificationView		Anwendung
-Width:	GeneralView		Breite:
-seconds	GeneralView		Sekunden
-Mute notifications from this application	NotificationView		Benachrichtigungen dieser Anwendung stummschalten
-Upper right	GeneralView		Oben rechts
- is already listed	NotificationView	Alert message	 wurde bereits hinzugefügt.
 Lower left	GeneralView		Unten links
+Application does not have a valid signature	NotificationView	Alert message	Die Anwendung besitzt keine gültige Signatur
+Status	NotificationView		Status
+Add…	NotificationView		Hinzu…
+Lower right	GeneralView		Unten rechts
+Muted	NotificationView		Stumm
+Window width:	GeneralView		Fensterbreite:
+ is already listed	NotificationView	Alert message	 wurde bereits hinzugefügt.
+OK	PrefletWin		OK
+Notifications	PrefletWin		Notifications - Benachrichtigungen
+Notifications preflet sample	PrefletWin		Benachrichtigungsbeispiel
+Mute notifications from this application	NotificationView		Benachrichtigungen dieser Anwendung stummschalten
+pixels	GeneralView		Pixel
+seconds	GeneralView		Sekunden
+Revert	PrefletWin		Anfangswerte
+Applications	PrefletView		Anwendungen
+Timeout:	GeneralView		Anzeigezeit:
+Upper right	GeneralView		Oben rechts
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Das Speichern der Einstellungen ist fehlgeschlagen.\nMöglicherweise steht nicht genügend Speicherplatz zur Verfügung.
+Defaults	PrefletWin		Standardwerte
 Upper left	GeneralView		Oben links
 Applications	NotificationView		Anwendungen
+Width:	GeneralView		Breite:
+General	PrefletView		Allgemein
+OK	NotificationView		OK
+Follow Deskbar	GeneralView		Deskbar folgen
+Notifications	System name		Benachrichtigungen
+Allowed	NotificationView		Erlaubt
+Duration:	GeneralView		Dauer:
+Application	NotificationView		Anwendung
+Enable notifications	GeneralView		Benachrichtigungen aktivieren
+This is a test notification message	PrefletWin		Dies ist eine Testbenachrichtigung
+Remove	NotificationView		Entfernen
+Position:	GeneralView		Position:

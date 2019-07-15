@@ -1,66 +1,66 @@
 1	german	x-vnd.Haiku-PoorMan	1829050509
-Website location	PoorMan		Website-Adresse
-Error Server	PoorMan		Serverfehler
-Settings…	PoorMan		Einstellungen…
-Create PoorMan log	PoorMan		Logdatei erstellen
-Shutting down.\n	PoorMan		Herunterfahren.\n
-Hits: %lu	PoorMan		Zugriffe: %lu
-Web folder:	PoorMan		Web-Ordner:
-Save log console selection	PoorMan		Auswahl der Logkonsole speichern
-Run server	PoorMan		Server starten
-PoorMan settings	PoorMan		Webserver-Einstellungen
-Clear hit counter	PoorMan		Zugriffszähler löschen
-Copy	PoorMan		Kopieren
-Max. simultaneous connections:	PoorMan		Max. gleichzeitige Verbindungen:
-Create public_html	PoorMan		public_html erzeugen
-Start page:	PoorMan		Startseite:
-done.\n	PoorMan		fertig.\n
-Create	PoorMan		Erstelle
-Shutting down.	PoorMan		Herunterfahren.
-Website options	PoorMan		Website-Optionen
-File Name	PoorMan		Dateiname
-Clear console log	PoorMan		Konsolenlog löschen
-Advanced	PoorMan		Erweitert
-OK	PoorMan		OK
-Status: Stopped	PoorMan		Status: Angehalten
-Dir Created	PoorMan		Ordner erstellt
-Log to file	PoorMan		In Datei loggen
-Quit	PoorMan		Beenden
-Hits: 0	PoorMan		Zugriffe: 0
-Save log console	PoorMan		Logkonsole speichern
-Edit	PoorMan		Bearbeiten
+Select web folder	PoorMan		Web-Ordner auswählen
+Console logging	PoorMan		In Konsole loggen
 Create Log File	PoorMan		Logdatei erstellen
-Log to console	PoorMan		In Konsole loggen
-Directory: (none)	PoorMan		Ordner: (keiner)
+File logging	PoorMan		In Datei loggen
+Website options	PoorMan		Website-Optionen
+Log to file	PoorMan		In Datei loggen
+Shutting down.	PoorMan		Herunterfahren.
+Error Dir	PoorMan		Fehlerverzeichnis
+Web folder:	PoorMan		Web-Ordner:
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Bitte den Ordner auswählen, der im Web veröffentlicht werden soll.\n\nDer Webserver kann den standardmäßigen \"public_html\" Ordner im home-Ordner erstellen oder einen frei zu wählenden Ordner benutzen.
 Log To Console	PoorMan		In Konsole loggen
-{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# Verbindung} other{# Verbindungen}}
-Connections	PoorMan		Verbindungen
-Status: Running	PoorMan		Status: Läuft
-Controls	PoorMan		Aktionen
-Send file listing if there's no start page	PoorMan		Dateiaufzählung senden, wenn keine Startseite vorhanden ist
-Error Dir	PoorMan		Fehlerverzeichnis
-Select all	PoorMan		Alles auswählen
-File	PoorMan		Datei
-File Logging	PoorMan		In Datei loggen
-Save console selections as…	PoorMan		Auswahl der Konsole speichern als…
-File logging	PoorMan		In Datei loggen
-Select web folder	PoorMan		Web-Ordner auswählen
-Logging view	PoorMan		Log-Ansicht
-Logging	PoorMan		Log
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Der Standard Web-Ordner \"/boot/home/public_html\" wurde erstellt.\nDarin muss sich eine HTML-Datei mit dem Namen \"index.html\" befinden.
-Clear log file	PoorMan		Logdatei leeren
-Log file name:	PoorMan		Logdatei-Name:
-Directory: 	PoorMan		Ordner:
-Log To File	PoorMan		In Datei loggen
-Done	PoorMan		Fertig
-Create log file	PoorMan		Logdatei erstellen
+File Name	PoorMan		Dateiname
 Starting up... 	PoorMan		Starte...
-Site	PoorMan		Website
-Cancel	PoorMan		Abbrechen
-Console logging	PoorMan		In Konsole loggen
-Cannot start the server	PoorMan		Der Server konnte nicht gestartet werden.
 Select	PoorMan		Auswählen
+Logging view	PoorMan		Log-Ansicht
 Save console as…	PoorMan		Konsole speichern als…
+Edit	PoorMan		Bearbeiten
+Cancel	PoorMan		Abbrechen
+Directory: 	PoorMan		Ordner:
+Hits: %lu	PoorMan		Zugriffe: %lu
+Hits: 0	PoorMan		Zugriffe: 0
+Shutting down.\n	PoorMan		Herunterfahren.\n
+Select all	PoorMan		Alles auswählen
+Error Server	PoorMan		Serverfehler
+Send file listing if there's no start page	PoorMan		Dateiaufzählung senden, wenn keine Startseite vorhanden ist
+Create PoorMan log	PoorMan		Logdatei erstellen
+Max. simultaneous connections:	PoorMan		Max. gleichzeitige Verbindungen:
+Done	PoorMan		Fertig
+Site	PoorMan		Website
+Cannot start the server	PoorMan		Der Server konnte nicht gestartet werden.
+Create log file	PoorMan		Logdatei erstellen
+Create public_html	PoorMan		public_html erzeugen
+Clear hit counter	PoorMan		Zugriffszähler löschen
+Status: Stopped	PoorMan		Status: Angehalten
+File	PoorMan		Datei
+Settings…	PoorMan		Einstellungen…
+Log To File	PoorMan		In Datei loggen
+Connections	PoorMan		Verbindungen
+Controls	PoorMan		Aktionen
+Log to console	PoorMan		In Konsole loggen
+Advanced	PoorMan		Erweitert
+Copy	PoorMan		Kopieren
+Logging	PoorMan		Log
 PoorMan	System name		Webserver
+Clear console log	PoorMan		Konsolenlog löschen
+Run server	PoorMan		Server starten
+Create	PoorMan		Erstelle
+{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# Verbindung} other{# Verbindungen}}
+done.\n	PoorMan		fertig.\n
+PoorMan settings	PoorMan		Webserver-Einstellungen
 Console Logging	PoorMan		In Konsole loggen
+Clear log file	PoorMan		Logdatei leeren
+Save log console selection	PoorMan		Auswahl der Logkonsole speichern
+File Logging	PoorMan		In Datei loggen
+Log file name:	PoorMan		Logdatei-Name:
+Status: Running	PoorMan		Status: Läuft
+Directory: (none)	PoorMan		Ordner: (keiner)
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Der Standard Web-Ordner \"/boot/home/public_html\" wurde erstellt.\nDarin muss sich eine HTML-Datei mit dem Namen \"index.html\" befinden.
+Dir Created	PoorMan		Ordner erstellt
+Save console selections as…	PoorMan		Auswahl der Konsole speichern als…
+Quit	PoorMan		Beenden
+Save log console	PoorMan		Logkonsole speichern
+Start page:	PoorMan		Startseite:
+OK	PoorMan		OK
+Website location	PoorMan		Website-Adresse

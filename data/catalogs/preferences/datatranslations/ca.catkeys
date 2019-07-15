@@ -1,17 +1,17 @@
 1	catalan; valencian	x-vnd.Haiku-DataTranslations	4156631142
-DataTranslations	System name		DataTranslations
-Cancel	DataTranslations		Anul·la
+Path:	DataTranslations		Camí:
 Name:	DataTranslations		Nom:
+DataTranslations - Note	DataTranslations		DataTranslations - Nota
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		L'element '%name' no sembla un Traductor i no serà instal·lat.
 Could not install %s:\n%s	DataTranslations		No ha estat possible instal·lar %s:\n%s
-Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Utilitzeu aquest tauler de control per indicar els valors predeterminats dels traductors, que es faran servir quan l'aplicació no n'indiqui cap.
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Ja hi ha un elements anomenat %name% a la carpeta dels Traductors! Voleu sobreescriure el traductor actual?
-DataTranslations - Note	DataTranslations		DataTranslations - Nota
-Overwrite	DataTranslations		Sobreescriu
-Info:	DataTranslations		Informació:
-Info	DataTranslations		Informació
-Path:	DataTranslations		Camí:
-The new translator has been installed successfully.	DataTranslations		El nou traductor s'ha instal·lat correctament.
-DataTranslations - Error	DataTranslations		DataTranslations - Error
 OK	DataTranslations		D'acord
+Cancel	DataTranslations		Anul·la
+Info:	DataTranslations		Informació:
+DataTranslations - Error	DataTranslations		DataTranslations - Error
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Utilitzeu aquest tauler de control per indicar els valors predeterminats dels traductors, que es faran servir quan l'aplicació no n'indiqui cap.
+The new translator has been installed successfully.	DataTranslations		El nou traductor s'ha instal·lat correctament.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Ja hi ha un elements anomenat %name% a la carpeta dels Traductors! Voleu sobreescriure el traductor actual?
+DataTranslations	System name		DataTranslations
+Info	DataTranslations		Informació
+Overwrite	DataTranslations		Sobreescriu
 Version:	DataTranslations		Versió:

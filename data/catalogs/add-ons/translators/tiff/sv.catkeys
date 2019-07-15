@@ -1,16 +1,16 @@
 1	swedish	x-vnd.Haiku-TIFFTranslator	2234713102
-LZW	TIFFView		LZW
-Version %d.%d.%d, %s	TIFFView		Version %d.%d.%d, %s
-identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: kunde inte ange mapp\n
-TIFF image	TIFFTranslator		TIFF-bild
 TIFF Library:	TIFFView		TIFF-bibliotek:
-TIFF image translator	TIFFView		TIFF-bildöversättare
-None	TIFFView		Ingen
-TIFF images	TIFFTranslator		TIFF-bilder
-TIFFTranslator Settings	TIFFTranslator		TIFF-bildinställningar
-TIFF image translator	TIFFTranslator		TIFF-bildöversättare
 RLE (Packbits)	TIFFView		RLE (Packbitar)
-TIFF Settings	TIFFMain		TIFF-inställningar
-Use compression:	TIFFView		Använd komprimering:
-identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: felaktigt dokumentindex\n
 ZIP (Deflate)	TIFFView		ZIP (Deflate)
+identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: felaktigt dokumentindex\n
+Use compression:	TIFFView		Använd komprimering:
+TIFF image translator	TIFFView		TIFF-bildöversättare
+TIFF image	TIFFTranslator		TIFF-bild
+TIFF Settings	TIFFMain		TIFF-inställningar
+TIFF image translator	TIFFTranslator		TIFF-bildöversättare
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: kunde inte ange mapp\n
+Version %d.%d.%d, %s	TIFFView		Version %d.%d.%d, %s
+TIFFTranslator Settings	TIFFTranslator		TIFF-bildinställningar
+LZW	TIFFView		LZW
+TIFF images	TIFFTranslator		TIFF-bilder
+None	TIFFView		Ingen

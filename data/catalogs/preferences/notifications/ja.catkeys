@@ -1,35 +1,35 @@
 1	japanese	x-vnd.Haiku-Notifications	332239666
-An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		設定の保存中にエラーが発生しました。\nディスクの空きが無いのかもしれません。
-Add…	NotificationView		追加…
-Status	NotificationView		ステータス
-Revert	PrefletWin		元に戻す
-Enable notifications	GeneralView		通知を有効にする
-Window width:	GeneralView		ウィンドウの幅:
-This is a test notification message	PrefletWin		これはテスト用の通知です
-OK	PrefletWin		OK
-Duration:	GeneralView		継続期間:
-OK	NotificationView		OK
-Application does not have a valid signature	NotificationView	Alert message	アプリケーションは有効なシグネチャーがありません
-Follow Deskbar	GeneralView		Deskbar に追随する
-Notifications	PrefletWin		通知
-Timeout:	GeneralView		タイムアウト:
-Muted	NotificationView		ミュート
-General	PrefletView		一般設定
-Allowed	NotificationView		許可された
-Remove	NotificationView		除去
-Lower right	GeneralView		右下
-Notifications preflet sample	PrefletWin		通知サンプル
-Notifications	System name		通知
-Position:	GeneralView		位置:
-Applications	PrefletView		アプリケーション
-Defaults	PrefletWin		デフォルト
-pixels	GeneralView		ピクセル
-Application	NotificationView		アプリケーション
-Width:	GeneralView		幅:
-seconds	GeneralView		秒
-Mute notifications from this application	NotificationView		このアプリケーションからの通知をミュートする
-Upper right	GeneralView		右上
- is already listed	NotificationView	Alert message	 はすでにリストにあリます
 Lower left	GeneralView		左下
+Application does not have a valid signature	NotificationView	Alert message	アプリケーションは有効なシグネチャーがありません
+Status	NotificationView		ステータス
+Add…	NotificationView		追加…
+Lower right	GeneralView		右下
+Muted	NotificationView		ミュート
+Window width:	GeneralView		ウィンドウの幅:
+ is already listed	NotificationView	Alert message	 はすでにリストにあリます
+OK	PrefletWin		OK
+Notifications	PrefletWin		通知
+Notifications preflet sample	PrefletWin		通知サンプル
+Mute notifications from this application	NotificationView		このアプリケーションからの通知をミュートする
+pixels	GeneralView		ピクセル
+seconds	GeneralView		秒
+Revert	PrefletWin		元に戻す
+Applications	PrefletView		アプリケーション
+Timeout:	GeneralView		タイムアウト:
+Upper right	GeneralView		右上
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		設定の保存中にエラーが発生しました。\nディスクの空きが無いのかもしれません。
+Defaults	PrefletWin		デフォルト
 Upper left	GeneralView		左上
 Applications	NotificationView		アプリケーション
+Width:	GeneralView		幅:
+General	PrefletView		一般設定
+OK	NotificationView		OK
+Follow Deskbar	GeneralView		Deskbar に追随する
+Notifications	System name		通知
+Allowed	NotificationView		許可された
+Duration:	GeneralView		継続期間:
+Application	NotificationView		アプリケーション
+Enable notifications	GeneralView		通知を有効にする
+This is a test notification message	PrefletWin		これはテスト用の通知です
+Remove	NotificationView		除去
+Position:	GeneralView		位置:

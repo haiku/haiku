@@ -1,50 +1,50 @@
 1	slovak	x-vnd.Be-PEPL	2332202134
-Edit	People		Upraviť
-Error	People		Chyba
-City	People		Mesto
-The file '%name%' could not be written.	People		Súbor „%name%“ nebolo možné zapísať.
-none	Groups list		žiadna
-Configure attributes	People		Nastaviť atribúty
-Company	People		Spoločnosť
-%name% picture	People		Obrázok %name%
-Work phone	People		Telefón do práce
-People	System name		Ľudia
-New person	People		Nová osoba
-Select all	People		Vybrať všetky
-File	People		Súbor
-Unnamed person	People		Nepomenovaná osoba
-Could not create %s.	People		Nebolo možné vytvoriť %s.
-Country	People		Krajina
-Close	People		Zatvoriť
-Group	People		Skupina
-Nickname	People		Prezývka
-Quit	People		Ukončiť
-Name	People		Meno
-Revert	People		Vrátiť
-Don't save	People		Neukladať
-Undo	People		Späť
-E-mail	People		E-mail
-Load image…	People		Načítať obrázok…
-OK	People		OK
-Remove image	People		Odstrániť obrázok
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Spustenie nastavenia typov súborov, aby sa nastavili atribúty Osoby, zlyhalo.\n\nChyba: 
-Home phone	People		Telefón domov
-Save as…	People		Uložiť ako…
-Redo	People		Opakovať
-Save changes before closing?	People		Uložiť zmeny pred ukončením?
-Paste	People		Vložiť
-Drop an image here,\nor use the contextual menu.	People		Sem pretiahnite obrázok\nalebo použite kontextové menu.
-Save	People		Uložiť
-Person	Short mimetype description		Osoba
+Unnamed person	People		Nepomenovaná osoba
 New person…	People		Nová osoba…
 Address	People		Adresa
-URL	People		URL
-Sorry	People		Prepáčte
 Zip	People		PSČ
-Contact information for a person.	Long mimetype description		Kontaktné informácie osoby.
-Fax	People		Fax
+Select all	People		Vybrať všetky
+Could not create %s.	People		Nebolo možné vytvoriť %s.
+Quit	People		Ukončiť
+Company	People		Spoločnosť
+Name	People		Meno
+The file '%name%' could not be written.	People		Súbor „%name%“ nebolo možné zapísať.
 Contact name	People		Meno kontaktu
-Cut	People		Vystrihnúť
 Cancel	People		Zrušiť
+Edit	People		Upraviť
+Save changes before closing?	People		Uložiť zmeny pred ukončením?
+People	System name		Ľudia
+Error	People		Chyba
+Revert	People		Vrátiť
+Country	People		Krajina
+Person	Short mimetype description		Osoba
+New person	People		Nová osoba
+Save	People		Uložiť
+Fax	People		Fax
+URL	People		URL
+%name% picture	People		Obrázok %name%
+Home phone	People		Telefón domov
+none	Groups list		žiadna
+Save as…	People		Uložiť ako…
+Cut	People		Vystrihnúť
+Contact information for a person.	Long mimetype description		Kontaktné informácie osoby.
+Remove image	People		Odstrániť obrázok
+City	People		Mesto
+Undo	People		Späť
+Don't save	People		Neukladať
+Configure attributes	People		Nastaviť atribúty
+Work phone	People		Telefón do práce
 State	People		Štát
+Nickname	People		Prezývka
+OK	People		OK
+File	People		Súbor
+Redo	People		Opakovať
+Close	People		Zatvoriť
 Copy	People		Kopírovať
+Paste	People		Vložiť
+E-mail	People		E-mail
+Group	People		Skupina
+Drop an image here,\nor use the contextual menu.	People		Sem pretiahnite obrázok\nalebo použite kontextové menu.
+Load image…	People		Načítať obrázok…
+Sorry	People		Prepáčte

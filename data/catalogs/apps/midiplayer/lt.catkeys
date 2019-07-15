@@ -1,18 +1,18 @@
 1	lithuanian	x-vnd.Haiku-MidiPlayer	471142057
-None	Main Window		Nieko
-Live input:	Main Window		Tiesioginė įvestis:
-Stop	Main Window		Stabdyti
-Cavern	Main Window		Urvas
-Volume:	Main Window		Garsis:
-Reverb:	Main Window		Aidas:
-OK	Main Window		Gerai
-Off	Main Window		Išjungti
 Dungeon	Main Window		Požemis
-Play	Main Window		Groti
-Garage	Main Window		Garažas
-Closet	Main Window		Vonia
-MidiPlayer	System name		MIDI grotuvas
-Drop MIDI file here	Scope View		Numeskite MIDI failą čia
-Igor's lab	Main Window		Igorio laboratorija
-Scope	Main Window		Osciloskopas
 Could not load song	Main Window		Kūrinio įkelti nepavyko
+Igor's lab	Main Window		Igorio laboratorija
+Off	Main Window		Išjungti
+Volume:	Main Window		Garsis:
+Closet	Main Window		Vonia
+Scope	Main Window		Osciloskopas
+Drop MIDI file here	Scope View		Numeskite MIDI failą čia
+None	Main Window		Nieko
+Reverb:	Main Window		Aidas:
+MidiPlayer	System name		MIDI grotuvas
+OK	Main Window		Gerai
+Stop	Main Window		Stabdyti
+Live input:	Main Window		Tiesioginė įvestis:
+Garage	Main Window		Garažas
+Play	Main Window		Groti
+Cavern	Main Window		Urvas

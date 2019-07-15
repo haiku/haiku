@@ -1,20 +1,20 @@
 1	belarusian	x-vnd.Haiku-VirtualMemory	2090796060
-Quit	SettingsWindow		Выйсці
-Automatic swap management	SettingsWindow		Вызначаць аўтаматычна
-Turn off	SettingsWindow		Адключыць
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Адмова ад ужывання уяўнай памяці можа спарадзіць нечаканыя праблемы ў функцыянаванні праграмаў падчас працы сістэмы ў рэжыме скарыстання усёй фізічнай памяці. Але майце на ўвазе, што да таго моманту як сістэма вычарпае ўсю фізічную памяць, наладкі ўяўнай памяці ніяк ня будуць ўплываць на агульную прадукцыйнасьць сістэмы.\n\nВы упэўнены у тым, што сістэма не павінна карыстацца уяўнаю памяццю?
 Requested swap file size:	SettingsWindow		Запатрабаваны памер уяўнай памяці:
-The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Наладкі захаваныя ў файле несапраўдныя. Вы можаце загрузіць дапомныя наладкі альбо выйсці.
-Defaults	SettingsWindow		Прадвызначаныя
-Current Swap:	SettingsWindow		Бягучы файл уяўнай памяці:
-Use volume:	SettingsWindow		Дыскавы том:
-Keep enabled	SettingsWindow		Захаваць актыўным
-Revert	SettingsWindow		Вярнуць
 VirtualMemory	System name		Уяўная памяць
-Use boot volume	SettingsWindow		Выкарыстаць загрузачны падзел
-Load defaults	SettingsWindow		Дапомныя
 OK	VirtualMemoryApp		Так
+Use volume:	SettingsWindow		Дыскавы том:
+Turn off	SettingsWindow		Адключыць
 Changes will take effect upon reboot.	SettingsWindow		Актуалізацыя зменаў патрабуе перастартавання сістэмы.
+Revert	SettingsWindow		Вярнуць
+Keep enabled	SettingsWindow		Захаваць актыўным
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Наладкі захаваныя ў файле несапраўдныя. Вы можаце загрузіць дапомныя наладкі альбо выйсці.
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Наладкі уяўнай памяці\n\tраспарацаваны Axel Dörfler\n\tCopyright 2005, Haiku.\n
 The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		Падзел прызначаны ў файле наладак ня знойдзены. Вы можаце скарыстаць загрузачны падзел альбо выйсці.
+Current Swap:	SettingsWindow		Бягучы файл уяўнай памяці:
+Load defaults	SettingsWindow		Дапомныя
+Use boot volume	SettingsWindow		Выкарыстаць загрузачны падзел
+Automatic swap management	SettingsWindow		Вызначаць аўтаматычна
+Defaults	SettingsWindow		Прадвызначаныя
+Quit	SettingsWindow		Выйсці
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Адмова ад ужывання уяўнай памяці можа спарадзіць нечаканыя праблемы ў функцыянаванні праграмаў падчас працы сістэмы ў рэжыме скарыстання усёй фізічнай памяці. Але майце на ўвазе, што да таго моманту як сістэма вычарпае ўсю фізічную памяць, наладкі ўяўнай памяці ніяк ня будуць ўплываць на агульную прадукцыйнасьць сістэмы.\n\nВы упэўнены у тым, што сістэма не павінна карыстацца уяўнаю памяццю?
 Enable virtual memory	SettingsWindow		Актывізаваць уяўную памяць

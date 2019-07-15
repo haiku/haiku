@@ -1,90 +1,90 @@
-1	indonesian	x-vnd.Haiku-CodyCam	1256689106
-Upload…	VideoConsumer.cpp		Unggah…
-Capturing Image…	VideoConsumer.cpp		Mengambil Gambar…
-Every 30 seconds	CodyCam		Setiap 30 detik
-File name:	CodyCam		Nama berkas:
-Last Capture: 	VideoConsumer.cpp		Pengambilan Terakhir: 
-Server login failed	VideoConsumer.cpp		Gagal masuk ke server
-Remote host has closed the connection.\n	FtpClient		Remote host telah menutup koneksi.\n
-Login:	CodyCam		Masuk:
-Format:	CodyCam		Format:
-Every 2 hours	CodyCam		Setiap 2 jam
-Closing the window\n	VideoConsumer.cpp		Menutup jendela\n
-login ID expected	CodyCam		ID login diharapkan
-Rate:	CodyCam		Laju:
-JPEG image	CodyCam		Gambar JPEG
-Capture Rate Menu	CodyCam		Menu Laju Penangkapan
-File %s # unterminated quote at end of file\n	SettingsHandler		Berkas %s # kutipan belum selesai pada akhir file\n
-Password:	CodyCam		Kata sandi:
-Passive FTP	CodyCam		FTP Pasif
+1	indonesian	x-vnd.Haiku-CodyCam	3200733765
 destination directory expected	CodyCam		direktori tujuan diharapkan
-password	CodyCam		kata sandi
-Directory:	CodyCam		Direktori:
-Every minute	CodyCam		Setiap menit
-read: %ld\n	SftpClient		baca: %ld\n
-Waiting…	CodyCam		Menunggu…
-Logging in…	VideoConsumer.cpp		Masuk…
-Server:	CodyCam		Peladen:
-server address expected	CodyCam		alamat peladen diharapkan
-Error creating output file	VideoConsumer.cpp		Galat membuat berkas keluaran
-unrecognized upload client specified	CodyCam		klien pengunggah yang ditentukan belum dikenal
-File %s ; Line %ld # unterminated quote\n	SettingsHandler		Berkas %s ; Baris %ld # kutipan tidak selesai\n
-Output	CodyCam		Keluaran
-Every 15 minutes	CodyCam		Setiap 15 menit
-Cannot find an available video stream	CodyCam		Tidak dapat menemukan aliran video yang tersedia
-Can't find an available connection to the video window	CodyCam		Tidak dapat menemukan ketersediaan koneksi ke jendela video
-Cannot get a time source	CodyCam		Tidak mendapatkan sumber waktu
-Every 8 hours	CodyCam		Setiap 8 jam
-Rename failed	VideoConsumer.cpp		Penamaan ulang gagal
-Cannot start time source!	CodyCam		Tidak dapat memulai sumber waktu!
-Cannot register the video window	CodyCam		Tidak dapat meregister jendela video
-CodyCam	System name		CodyCam
-Every 24 hours	CodyCam		Setiap 24 jam
-unknown command	SettingsHandler		perintah tidak dikenal
-Video settings	CodyCam		Pengaturan video
-still image filename expected	CodyCam		nama berkas gambar tak bergerak diharapkan
-invalid upload client %ld\n	VideoConsumer.cpp		upload klien %ld tidak valid\n
-Every 15 seconds	CodyCam		Setiap 15 detik
-Error writing output file	VideoConsumer.cpp		Galat menulis berkas keluaran
+reply: '%s'\n	SftpClient		balas: '%s'\n
+JPEG image	CodyCam		Gambar JPEG
+Remote host has closed the connection.\n	FtpClient		Remote host telah menutup koneksi.\n
 image file format expected	CodyCam		format berkas gambar diharapkan
-Type:	CodyCam		Tipe:
-Stop video	CodyCam		Hentikan video
-Locking the window\n	VideoConsumer.cpp		Kunci jendela\n
-File %s; Line %ld # %s	SettingsHandler		Berkas %s; Baris %ld # %s
-Couldn't find requested directory on server	VideoConsumer.cpp		Tidak dapat menemukan direktori yang diminta pada peladen
-Renaming…	VideoConsumer.cpp		Menamakan ulang…
-Local	CodyCam		Lokal
-Error setting type of output file	VideoConsumer.cpp		Galat pengaturan tipe dari file keluaran
-upload client name expected	CodyCam		nama klien pengunggah diharapkan
-SFTP	CodyCam		SFTP
-Connected…	VideoConsumer.cpp		Terkoneksi…
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <suppressed>  (kata sandi riil terkirim)\n
-File upload failed	VideoConsumer.cpp		Pengunggahan berkas gagal
-Every 5 minutes	CodyCam		Setiap 5 menit
-read: %d\n	SftpClient		baca: %d\n
-Capture controls	CodyCam		Kontrol penangkapan
-Every hour	CodyCam		Setiap jam
-Cannot connect the video source to the video window	CodyCam		Tidak dapat menghubungan sumber video ke jendela video
-capture rate expected	CodyCam		laju penangkapan diharapkan
-Error getting initial latency for the capture node	CodyCam		Galat mendapatkan latensi awal untuk titik pengambilan
-Send to…	CodyCam		Kirim ke…
+Every 30 minutes	CodyCam		Setiap 30 menit
+Capturing Image…	VideoConsumer.cpp		Mengambil Gambar…
+Cannot start time source!	CodyCam		Tidak dapat memulai sumber waktu!
+Waiting…	CodyCam		Menunggu…
+Passive FTP	CodyCam		FTP Pasif
+Every 10 minutes	CodyCam		Setiap 10 menit
+Every minute	CodyCam		Setiap menit
+Capture Rate Menu	CodyCam		Menu Laju Penangkapan
+Cannot seek time source!	CodyCam		Tidak dapat mencari sumber waktu!
+Server login failed	VideoConsumer.cpp		Gagal masuk ke server
 on or off expected	Settings	Do not translate 'on' and 'off'	hidup atau mati diharapkan
+invalid upload client %ld\n	VideoConsumer.cpp		upload klien %ld tidak valid\n
+Every 30 seconds	CodyCam		Setiap 30 detik
+Cannot create a video window	CodyCam		Tidak dapat membuat jendela video
+Cannot register the video window	CodyCam		Tidak dapat meregister jendela video
+capture rate expected	CodyCam		laju penangkapan diharapkan
 Quit	CodyCam		Keluar
+Cannot connect the video source to the video window	CodyCam		Tidak dapat menghubungan sumber video ke jendela video
+read: %d\n	SftpClient		baca: %d\n
+Every 2 hours	CodyCam		Setiap 2 jam
+Cannot get a time source	CodyCam		Tidak mendapatkan sumber waktu
+Every 4 hours	CodyCam		Setiap 4 jam
 cmd: '%s'\n	FtpClient		cmd: '%s'\n
 Never	CodyCam		Tidak pernah
-Cannot create a video window	CodyCam		Tidak dapat membuat jendela video
-Every 10 minutes	CodyCam		Setiap 10 menit
-Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Tidak dapat menemukan suatu sumber video.\nAnda perlu sebuah webcam untuk menggunakan CodyCam.
+Every 8 hours	CodyCam		Setiap 8 jam
 Cannot start the video source	CodyCam		Tidak dapat memulai sumber video
-Cannot start the video window	CodyCam		Tidak dapat memulai jendela video
+Cannot set the time source for the video source	CodyCam		Tidak bisa mengatur sumber waktu untuk video sumber
+Renaming…	VideoConsumer.cpp		Menamakan ulang…
+Send to…	CodyCam		Kirim ke…
+Password:	CodyCam		Kata sandi:
+still image filename expected	CodyCam		nama berkas gambar tak bergerak diharapkan
+File name:	CodyCam		Nama berkas:
+Directory:	CodyCam		Direktori:
+Error setting type of output file	VideoConsumer.cpp		Galat pengaturan tipe dari file keluaran
+Cannot find an available video stream	CodyCam		Tidak dapat menemukan aliran video yang tersedia
+Upload…	VideoConsumer.cpp		Unggah…
 password expected	CodyCam		kata sandi diharapkan
+PASS <suppressed>  (real password sent)\n	FtpClient		PASS <suppressed>  (kata sandi riil terkirim)\n
+SFTP	CodyCam		SFTP
+Output	CodyCam		Keluaran
+server address expected	CodyCam		alamat peladen diharapkan
+Cannot start the video window	CodyCam		Tidak dapat memulai jendela video
 reply: %d, %d\n	FtpClient		balas: %d, %d\n
-Cannot find the media roster	CodyCam		Tidak dapat menemukan daftar media
-Every 4 hours	CodyCam		Setiap 4 jam
-FTP	CodyCam		FTP
-Cannot seek time source!	CodyCam		Tidak dapat mencari sumber waktu!
-File	CodyCam		Berkas
+Cannot set the time source for the video window	CodyCam		Tidak bisa mengatur sumber waktu untuk jendela video
+Every 15 minutes	CodyCam		Setiap 15 menit
+Every 24 hours	CodyCam		Setiap 24 jam
 Image Format Menu	CodyCam		Menu Format Gambar
-Every 30 minutes	CodyCam		Setiap 30 menit
-reply: '%s'\n	SftpClient		balas: '%s'\n
+Every 5 minutes	CodyCam		Setiap 5 menit
+File upload failed	VideoConsumer.cpp		Pengunggahan berkas gagal
+Format:	CodyCam		Format:
 Start video	CodyCam		Mulai video
+Connected…	VideoConsumer.cpp		Terkoneksi…
+upload client name expected	CodyCam		nama klien pengunggah diharapkan
+Every 15 seconds	CodyCam		Setiap 15 detik
+Error getting initial latency for the capture node	CodyCam		Galat mendapatkan latensi awal untuk titik pengambilan
+password	CodyCam		kata sandi
+Local	CodyCam		Lokal
+Stop video	CodyCam		Hentikan video
+Last Capture: 	VideoConsumer.cpp		Pengambilan Terakhir: 
+Rate:	CodyCam		Laju:
+File %s ; Line %ld # unterminated quote\n	SettingsHandler		Berkas %s ; Baris %ld # kutipan tidak selesai\n
+File %s # unterminated quote at end of file\n	SettingsHandler		Berkas %s # kutipan belum selesai pada akhir file\n
+Couldn't find requested directory on server	VideoConsumer.cpp		Tidak dapat menemukan direktori yang diminta pada peladen
+Cannot find the media roster	CodyCam		Tidak dapat menemukan daftar media
+Type:	CodyCam		Tipe:
+Rename failed	VideoConsumer.cpp		Penamaan ulang gagal
+unrecognized upload client specified	CodyCam		klien pengunggah yang ditentukan belum dikenal
+Server:	CodyCam		Peladen:
+Login:	CodyCam		Masuk:
+File	CodyCam		Berkas
+read: %ld\n	SftpClient		baca: %ld\n
+Every hour	CodyCam		Setiap jam
+login ID expected	CodyCam		ID login diharapkan
+File %s; Line %ld # %s	SettingsHandler		Berkas %s; Baris %ld # %s
+Video settings	CodyCam		Pengaturan video
+Can't find an available connection to the video window	CodyCam		Tidak dapat menemukan ketersediaan koneksi ke jendela video
+FTP	CodyCam		FTP
+Error creating output file	VideoConsumer.cpp		Galat membuat berkas keluaran
+Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Tidak dapat menemukan suatu sumber video.\nAnda perlu sebuah webcam untuk menggunakan CodyCam.
+Logging in…	VideoConsumer.cpp		Masuk…
+CodyCam	System name		CodyCam
+Error writing output file	VideoConsumer.cpp		Galat menulis berkas keluaran
+unknown command	SettingsHandler		perintah tidak dikenal
+Capture controls	CodyCam		Kontrol penangkapan

@@ -1,4 +1,4 @@
 1	catalan; valencian	x-vnd.Haiku-SystemLogger	57960782
-%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nAquest dimoni recull tots els missatges del sistema i els escriu en un registre únic per tot el sistema ubicat a \"%s\".\n\n
-OK	SyslogDaemon		D'acord
 Syslog Daemon	SyslogDaemon		Dimoni del registre del sistema (Syslog)
+OK	SyslogDaemon		D'acord
+%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nAquest dimoni recull tots els missatges del sistema i els escriu en un registre únic per tot el sistema ubicat a \"%s\".\n\n

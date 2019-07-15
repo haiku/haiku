@@ -1,21 +1,17 @@
-1	finnish	x-vnd.Haiku-Magnify	931164741
-no clip msg\n	In console, when clipboard is empty after clicking Copy image		ei leikeviestiä\n
-Make square	Magnify-Main		Tee neliö
-Copy image	Magnify-Main		Kopioi kuva
-usage: magnify [size] (magnify size * size pixels)\n	Console		käyttö: magnify [koko] (suurennuskoko * pikselien koko)\n
-Freeze image	Magnify-Main		Jähmetä kuva
+1	finnish	x-vnd.Haiku-Magnify	94607167
+Decrease pixel size	Magnify-Main		Pienennä pikselikokoa
+Increase pixel size	Magnify-Main		Kasvata pikselin kokoa
 Stick coordinates	Magnify-Main		Tarttumiskoordinaatit
 %width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height @ {0, plural, one{# pikseli/pikseli} other{# pikseliä/pikseli}}
-Show info	Magnify-Main		Näytä tiedot
-magnify: size must be a multiple of 4\n	Console		suurenna: koon on oltava neljän monikerta\n
-Decrease pixel size	Magnify-Main		Pienennä pikselikokoa
+Copy image	Magnify-Main		Kopioi kuva
+Decrease window size	Magnify-Main		Pienennä ikkunan kokoa
+Remove a crosshair	Magnify-Main		Poista ristikkotähtäin
+Add a crosshair	Magnify-Main		Lisää ristikkotähtäin
+Freeze image	Magnify-Main		Jähmetä kuva
+Increase window size	Magnify-Main		Kasvata ikkunan kokoa
+Save image	Magnify-Main		Tallenna kuva
+Show grid	Magnify-Main		Näytä rasteri
 Magnify	System name		Suurennuslasi
 Info	Magnify-Main		Tiedot
-Remove a crosshair	Magnify-Main		Poista ristikkotähtäin
-Show grid	Magnify-Main		Näytä rasteri
-Save image	Magnify-Main		Tallenna kuva
-Increase window size	Magnify-Main		Kasvata ikkunan kokoa
-Decrease window size	Magnify-Main		Pienennä ikkunan kokoa
-Increase pixel size	Magnify-Main		Kasvata pikselin kokoa
-  size must be > 4 and a multiple of 4\n	Console		  koon on oltava > 4 ja neljän monikerta\n
-Add a crosshair	Magnify-Main		Lisää ristikkotähtäin
+Show info	Magnify-Main		Näytä tiedot
+Make square	Magnify-Main		Tee neliö

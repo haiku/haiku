@@ -1,84 +1,82 @@
-1	portuguese (brazil)	x-vnd.Haiku-Installer	3694689316
-Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		O Gerenciador de Inicialização, aplicação para configurar o menu de inicialização do Haiku, não pode ser carregado.
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		Você tem certeza que deseja abortar a instalação e reiniciar o sistema?
-Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Instalador\n\desenvolvido por Jérôme Duval e Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
-Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		A instalação está completa. O setor de inicialização foi escrito em '%s'. Pressione Sair para deixar o Instalador ou escolha uma nova partição para realizar outra instalação.
-Quit	InstallerApp		Sair
-Additional disk space required: 0.0 KiB	InstallerWindow		Espaço adicional de disco requerido: 0.0 KB
-Stop	InstallerWindow	In alert after pressing Stop	Parar
-Install progress:  	InstallerWindow		Progresso na instalação:  
-Starting Installation.	InstallProgress		Iniciando a instalação.
-Are you sure you want to abort the installation?	InstallerWindow		Está seguro de que quer cancelar a instalação?
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Você tem certeza que deseja instalar no atual disco de inicialização? O Instalador irá reiniciar seu computador se você continuar.
-Quit Boot Manager	InstallerWindow		Sair do Gerenciador de Inicialização
-Stop	InstallerWindow		Parar
-OK	InstallerApp		OK
-Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Escolha o disco de origem e o disco de destinação nos menus pop-ups. Então clique em \"Iniciar\".
-Failed to launch Boot Manager	InstallerWindow		Falhou ao carregar o Gerenciador de Inicialização
-Install from:	InstallerWindow		Instalar de:
-%1ld of %2ld	InstallerWindow	number of files copied	%1ld de %2ld
-IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMAÇÕES IMPORTANTES ANTES DE INSTALAR O HAIKU\n\n
-Continue	InstallerWindow	In alert after pressing Stop	Continuar
-Write boot sector to '%s'	InstallerWindow		Escrever setor de inicialização para '%s'
-Collecting copy information.	InstallProgress		Coletando informações para cópia.
-Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Escolha o disco de origem no menu pop-up. Então clique em \"Iniciar\".
-Quit Boot Manager and DriveSetup	InstallerWindow		Sair do Gerenciador de Inicialização e do Configurador de Drive
-Quit	InstallerWindow		Sair
-Welcome to the Haiku Installer!\n\n	InstallerApp		Bem vindo ao Instalador do Haiku!\n\n
-Boot sector successfully written.	InstallProgress		O setor de inicialização foi escrito com sucesso.
+1	portuguese (brazil)	x-vnd.Haiku-Installer	1520226307
 Performing installation.	InstallProgress		Fazendo a instalação.
+Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Escolha o disco de origem no menu pop-up. Então clique em \"Iniciar\".
+Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Por favor feche o Configurador de Disco antes de fechar o Instalador.
+No optional packages available.	PackagesView		Nenhum pacote opcional disponível.
+Restart system	InstallerWindow		Reiniciar o sistema
+The mount point could not be retrieved.	InstallProgress		O ponto de montagem não pôde ser recuperado.
+<none>	InstallerWindow	No partition available	<nenhum>
+Please choose target	InstallerWindow		Por favor, escolha um alvo
+Cancel	InstallProgress		Cancelar
+Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Instalação concluída. O setor de inicialização foi gravado em '%s'. Pressione Reiniciar para reiniciar o computador ou escolha um novo volume para realizar outra instalação.
+Are you sure you want to to stop the installation?	InstallerWindow		Tem certeza de que deseja parar a instalação?
+Installer	System name		Instalador
+Unknown Type	InstallProgress	Partition content type	Tipo Desconhecido
+Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Pressione o botão Começar para instalar do '%1s' para '%2s'.
+Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Escolha o disco que você quer instalar no menu pop-up. Então clique em \"Iniciar\".
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		A instalação está completa. O setor de inicialização foi escrito em '%s'. Pressione Sair para deixar o Instalador ou escolha uma nova partição para realizar outra instalação.
+README	InstallerApp		LEIAME
+Quit	InstallerWindow		Sair
+Write boot sector to '%s'	InstallerWindow		Escrever setor de inicialização para '%s'
+Boot sector not written because of an internal error.	InstallProgress		Setor de inicialização não gravado por causa de um erro interno.
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Configurador de Unidade, o aplicativo para configurar partições de disco, não pôde ser carregado. 
+Welcome to the Haiku Installer!\n\n	InstallerApp		Bem vindo ao Instalador do Haiku!\n\n
+?? of ??	InstallerWindow	Unknown progress	?? de ??
+Quit Boot Manager	InstallerWindow		Sair do Gerenciador de Inicialização
+Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Executando o Gerenciador de Inicialização...\n\nFeche o Gerenciador de Inicialização para continuar com a instalação.
+Quit DriveSetup	InstallerWindow		Sair do Configurador de Drive
+Write boot sector	InstallerWindow		Gravar o setor de inicialização
+%1ld of %2ld	InstallerWindow	number of files copied	%1ld de %2ld
+Install from:	InstallerWindow		Instalar de:
+Additional disk space required: 0.0 KiB	InstallerWindow		Espaço adicional de disco requerido: 0.0 KB
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)  Quando iniciar com sucesso no Haiku pela primeira vez, certifique-se de ler a documentação \"Bem vindo\" e \"Guia do Usuário\". Existem vínculos na Área de Trabalho e nos marcadores do WebPositive.\n\n
+???	InstallerWindow	Unknown currently copied item	???
+Install anyway	InstallProgress		Instalar mesmo assim
+Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Escolha o disco de origem e o disco de destinação nos menus pop-ups. Então clique em \"Iniciar\".
+Hide optional packages	InstallerWindow		Esconder items opcionais
+???	InstallerWindow	Unknown partition name	???
+Quit	InstallerApp		Sair
+OK	InstallerWindow		OK
+Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Por favor feche os programas Gerenciador de Inicialização e o Configurador de Drive antes de fechar a janela do Instalador
+Failed to launch Boot Manager	InstallerWindow		Falhou ao carregar o Gerenciador de Inicialização
+Try installing anyway	InstallProgress		Tente instalar de qualquer maneira
+IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMAÇÕES IMPORTANTES ANTES DE INSTALAR O HAIKU\n\n
+Additional disk space required: %s	InstallerWindow		Espaço adicional em disco requerido: %s
+Stop	InstallerWindow	In alert after pressing Stop	Parar
+Boot sector successfully written.	InstallProgress		O setor de inicialização foi escrito com sucesso.
+An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Um erro foi encontrado e a instalação não foi concluída:\n\nErro:  %s
+Restart	InstallerWindow		Reiniciar
+The disk can't be mounted. Please choose a different disk.	InstallProgress		O disco não pode ser montado. Por favor escolha um disco diferente.
+Begin	InstallerWindow		Início
+Collecting copy information.	InstallProgress		Coletando informações para cópia.
+Show optional packages	InstallerWindow		Mostrar items opcionais
+The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		O disco destino não tem espaço suficiente. Tente escolher um disco diferente ou escolha não instalar os items opcionais.
+Installation canceled.	InstallProgress		Instalação cancelada.
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		O volume de destino não está vazio. Está seguro de que deseja instalar mesmo assim:\n\nNota: A pasta 'sistema' será uma cópia limpa do volume de origem mas irá conservar sua pasta de definições, todas as outras pastas serão mescladas, ao passo que arquivos e vínculos que existam em ambos os volumes serão sobreescritos com a versão do volume de origem.
+OK	InstallerApp		OK
+Are you sure you want to abort the installation?	InstallerWindow		Está seguro de que quer cancelar a instalação?
+Stop	InstallerWindow		Parar
+Cancel	InstallerWindow		Cancelar
+Continue	InstallerWindow	In alert after pressing Stop	Continuar
+No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Nenhuma partição que seja compatível para a instalação foi encontrada. Por favor, configure suas partições e inicializar pelo menos uma partição com o Sistema de Arquivos Be.
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Abrir o utilitário Configurador de Drive para particionar\nos HDs disponíveis e outras mídias.\nAs partições podem ser inicializadas com o Sistema de Arquivos\nBe necessário para uma partição de inicialização do\nHaiku.
+Scanning for disks…	InstallerWindow		Analisando os discos…
+Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Executando Configuração de Unidade…\n\nFechar Configuração de Unidade para continuar com a instalação.
+Abort	InstallerWindow		Cancelar
+The partition can't be mounted. Please choose a different partition.	InstallProgress		A partição não pode ser montada. Por favor escolha uma partição diferente.
+Set up partitions…	InstallerWindow		Configurar as partições...
+Install progress:  	InstallerWindow		Progresso na instalação:  
+You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Você não pode instalar o conteúdo de um disco dentro dele mesmo. Por favor escolha um disco diferente.
+Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		O Gerenciador de Inicialização, aplicação para configurar o menu de inicialização do Haiku, não pode ser carregado.
+Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Por favor feche a janela do Gerenciador de Inicialização antes de fechar a janela do Instalador.
+OK	InstallProgress		OK
+Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Executando Gerenciador de Inicialização e Configuração de Unidade…\n\nFeche ambos os aplicativos para continuar com a instalação.
+Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Você tem certeza que deseja instalar no atual disco de inicialização? O Instalador irá reiniciar seu computador se você continuar.
+Onto:	InstallerWindow		Para:
+Quit Boot Manager and DriveSetup	InstallerWindow		Sair do Gerenciador de Inicialização e do Configurador de Drive
+Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Instalador\n\desenvolvido por Jérôme Duval e Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
+Tools	InstallerWindow		Ferramentas
 scanning…	InstallerWindow		analisando…
 Set up boot menu	InstallerWindow		Configurar o menu de inicialização
-Abort	InstallerWindow		Cancelar
-Finishing Installation.	InstallProgress		Terminando a instalação.
-Restart	InstallerWindow		Reiniciar
-README	InstallerApp		LEIAME
-The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		O disco destino não tem espaço suficiente. Tente escolher um disco diferente ou escolha não instalar os items opcionais.
-Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Por favor feche os programas Gerenciador de Inicialização e o Configurador de Drive antes de fechar a janela do Instalador
-Scanning for disks…	InstallerWindow		Analisando os discos…
-The disk can't be mounted. Please choose a different disk.	InstallProgress		O disco não pode ser montado. Por favor escolha um disco diferente.
-?? of ??	InstallerWindow	Unknown progress	?? de ??
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Abrir o utilitário Configurador de Drive para particionar\nos HDs disponíveis e outras mídias.\nAs partições podem ser inicializadas com o Sistema de Arquivos\nBe necessário para uma partição de inicialização do\nHaiku.
-Show optional packages	InstallerWindow		Mostrar items opcionais
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Nenhuma partição que seja compatível para a instalação foi encontrada. Por favor, configure suas partições e inicializar pelo menos uma partição com o Sistema de Arquivos Be.
-Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Escolha o disco que você quer instalar no menu pop-up. Então clique em \"Iniciar\".
-Unknown Type	InstallProgress	Partition content type	Tipo Desconhecido
-<none>	InstallerWindow	No partition available	<nenhum>
-Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Instalação concluída. O setor de inicialização foi gravado em '%s'. Pressione Reiniciar para reiniciar o computador ou escolha um novo volume para realizar outra instalação.
-Installation canceled.	InstallProgress		Instalação cancelada.
-Installer	System name		Instalador
-You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Você não pode instalar o conteúdo de um disco dentro dele mesmo. Por favor escolha um disco diferente.
-???	InstallerWindow	Unknown currently copied item	???
-Quit DriveSetup	InstallerWindow		Sair do Configurador de Drive
-Hide optional packages	InstallerWindow		Esconder items opcionais
-Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Por favor feche o Configurador de Disco antes de fechar o Instalador.
-Restart system	InstallerWindow		Reiniciar o sistema
-OK	InstallerWindow		OK
-Set up partitions…	InstallerWindow		Configurar as partições...
-The partition can't be mounted. Please choose a different partition.	InstallProgress		A partição não pode ser montada. Por favor escolha uma partição diferente.
-Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Executando o Gerenciador de Inicialização...\n\nFeche o Gerenciador de Inicialização para continuar com a instalação.
-Install anyway	InstallProgress		Instalar mesmo assim
-An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Um erro foi encontrado e a instalação não foi concluída:\n\nErro:  %s
-Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Pressione o botão Começar para instalar do '%1s' para '%2s'.
-Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Executando Configuração de Unidade…\n\nFechar Configuração de Unidade para continuar com a instalação.
-OK	InstallProgress		OK
-Please choose target	InstallerWindow		Por favor, escolha um alvo
-???	InstallerWindow	Unknown partition name	???
-Begin	InstallerWindow		Início
-Write boot sector	InstallerWindow		Gravar o setor de inicialização
-Cancel	InstallerWindow		Cancelar
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Configurador de Unidade, o aplicativo para configurar partições de disco, não pôde ser carregado. 
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		O volume de destino não está vazio. Está seguro de que deseja instalar mesmo assim:\n\nNota: A pasta 'sistema' será uma cópia limpa do volume de origem mas irá conservar sua pasta de definições, todas as outras pastas serão mescladas, ao passo que arquivos e vínculos que existam em ambos os volumes serão sobreescritos com a versão do volume de origem.
-No optional packages available.	PackagesView		Nenhum pacote opcional disponível.
 Continue	InstallerApp		Continuar
-Boot sector not written because of an internal error.	InstallProgress		Setor de inicialização não gravado por causa de um erro interno.
-Additional disk space required: %s	InstallerWindow		Espaço adicional em disco requerido: %s
-Cancel	InstallProgress		Cancelar
-Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Executando Gerenciador de Inicialização e Configuração de Unidade…\n\nFeche ambos os aplicativos para continuar com a instalação.
-Try installing anyway	InstallProgress		Tente instalar de qualquer maneira
-Are you sure you want to to stop the installation?	InstallerWindow		Tem certeza de que deseja parar a instalação?
-Onto:	InstallerWindow		Para:
-Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Por favor feche a janela do Gerenciador de Inicialização antes de fechar a janela do Instalador.
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)  Quando iniciar com sucesso no Haiku pela primeira vez, certifique-se de ler a documentação \"Bem vindo\" e \"Guia do Usuário\". Existem vínculos na Área de Trabalho e nos marcadores do WebPositive.\n\n
-Tools	InstallerWindow		Ferramentas
-The mount point could not be retrieved.	InstallProgress		O ponto de montagem não pôde ser recuperado.
+Are you sure you want to abort the installation and restart the system?	InstallerWindow		Você tem certeza que deseja abortar a instalação e reiniciar o sistema?

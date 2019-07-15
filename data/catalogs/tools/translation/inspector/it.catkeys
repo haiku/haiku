@@ -1,32 +1,32 @@
 1	italian	x.vnd.OBOS-Inspector	577867100
-User Translators	ActiveTranslatorsWindow		Translator Utente
-No image available to save.	ImageWindow		Nessuna immagine disponibile per il salvataggio.
-Sorry, unable to write the image file.	ImageView		Impossibile scrivere il file immagine.
-Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Numero di documenti:%1\n\nTranslator Utilizzato:\nNome: %2\nInfo: %3\nVersione: %4\n
-\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nTipo: '%1' (%2)\nGruppo: '%3' (%4)\nQualità: %5\nCapacità: %6\nMIME Type: %7\nNome: %8\n
-Bummer	ImageWindow		Errore
-Last Page	ImageWindow		Ultima Pagina
 \nInput Formats:	ImageView		\nFormati di input:
-Sorry, unable to load the image.	ImageView		Impossibile caricare l'immagine.
-Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Informazioni
-Active Translators	InspectorApp		Translator Attivi
-Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Immagine: %1\nModello colore: %2 (%3)\nDimensioni: %4 x %5\nByte per riga: %6\nByte totali: %7\n\nInformazioni di identificazione:\nID Stringa: %8\nMIME Type: %9\nTipo: '%10' (%11)\nTranslator ID: %12\nGruppo: '%13' (%14)\nQualità: %15\nCapacità: %16\n\nInformazione estensione:\n
-\nOutput Formats:	ImageView		\nFormati di output:
-Save feature not implemented yet.	ImageWindow		Il salvataggio non è ancora stato implementato.
-First Page	ImageWindow		Prima pagina
 Next Page	ImageWindow		Pagina successiva
-\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nTranslator Utilizzato:\nNome: %1\nInformazione: %2\nVersione: %3\n
-Info	ImageWindow		Informazioni
+Previous Page	ImageWindow		Pagina Precedente
+Active Translators	InspectorApp		Translator Attivi
+System Translators	ActiveTranslatorsWindow		Translator di Sistema
+\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nTipo: '%1' (%2)\nGruppo: '%3' (%4)\nQualità: %5\nCapacità: %6\nMIME Type: %7\nNome: %8\n
 OK	ImageWindow		OK
-Window	ImageWindow		Finestra
-Quit	ImageWindow		Esci
-Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Documento selezionato: %1\n\nTranslator Usato:\nNome: %2\nInformazione: %3\nVersione: %4\n
-Active Translators	ImageWindow		Translator Attivi
 View	ImageWindow		Visualizza
 Open…	ImageWindow		Apri…
-Previous Page	ImageWindow		Pagina Precedente
+Save feature not implemented yet.	ImageWindow		Il salvataggio non è ancora stato implementato.
+Active Translators	ImageWindow		Translator Attivi
+Info	ImageWindow		Informazioni
+Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Immagine: %1\nModello colore: %2 (%3)\nDimensioni: %4 x %5\nByte per riga: %6\nByte totali: %7\n\nInformazioni di identificazione:\nID Stringa: %8\nMIME Type: %9\nTipo: '%10' (%11)\nTranslator ID: %12\nGruppo: '%13' (%14)\nQualità: %15\nCapacità: %16\n\nInformazione estensione:\n
+No image available to save.	ImageWindow		Nessuna immagine disponibile per il salvataggio.
 OK	ImageView		OK
-System Translators	ActiveTranslatorsWindow		Translator di Sistema
-Save…	ImageWindow		Salva…
+Bummer	ImageWindow		Errore
+\nOutput Formats:	ImageView		\nFormati di output:
+Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Numero di documenti:%1\n\nTranslator Utilizzato:\nNome: %2\nInfo: %3\nVersione: %4\n
+User Translators	ActiveTranslatorsWindow		Translator Utente
+Last Page	ImageWindow		Ultima Pagina
+\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nTranslator Utilizzato:\nNome: %1\nInformazione: %2\nVersione: %3\n
 Unknown	ImageView		Sconosciuto
+Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Informazioni
+Sorry, unable to load the image.	ImageView		Impossibile caricare l'immagine.
 File	ImageWindow		File
+Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Documento selezionato: %1\n\nTranslator Usato:\nNome: %2\nInformazione: %3\nVersione: %4\n
+Quit	ImageWindow		Esci
+Sorry, unable to write the image file.	ImageView		Impossibile scrivere il file immagine.
+Save…	ImageWindow		Salva…
+Window	ImageWindow		Finestra
+First Page	ImageWindow		Prima pagina

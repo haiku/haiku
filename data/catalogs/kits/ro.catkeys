@@ -1,42 +1,42 @@
 1	romanian	x-vnd.Haiku-libbe	3337473349
-gamma	AboutWindow		gamma
-beta	AboutWindow		beta
-%3.2f GiB	StringForSize		%3.2f GiB
-Written by:	AboutWindow		Scris de:
-About %app%	AboutMenuItem		Despre %app%
-Cut	TextView		Taie
-Version	AboutWindow		Versiune
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nu se poate crea copie pentru \"%description\".\n%error
-Copy	TextView		Copiază
-%3.2f KiB	StringForSize		%3.2f KiB
-alpha	AboutWindow		alfa
-Error	PrintJob		Eroare
-All Rights Reserved.	AboutWindow		Toate drepturile rezervate.
 {0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte} other{# bytes}}
-About %app%	AboutWindow		Despre %app%
-No pages to print!	PrintJob		Fără pagini de imprimat!
+All Rights Reserved.	AboutWindow		Toate drepturile rezervate.
+gold master	AboutWindow		versiune finală
+Undo	TextView		Refă
+gamma	AboutWindow		gamma
+development	AboutWindow		dezvoltare
 OK	Dragger		OK
 OK	PrintJob		OK
-Green:	ColorControl		Verde:
-Version history:	AboutWindow		Istoricul versiunii:
-Remove replicant	Dragger		Elimină copie
-Select all	TextView		Selectează toate
-OK	AboutWindow		OK
-OK	ZombieReplicantView		OK
 Print Server is not responding.	PrintJob		Serverul de imprimare nu răspunde.
+About %app%	AboutMenuItem		Despre %app%
+Warning	Dragger		Avertisment
+Green:	ColorControl		Verde:
+Redo	TextView		Repetă
+No pages to print!	PrintJob		Fără pagini de imprimat!
+beta	AboutWindow		beta
+OK	ZombieReplicantView		OK
+Cut	TextView		Taie
+%3.2f GiB	StringForSize		%3.2f GiB
+Can't delete this replicant from its original application. Life goes on.	Dragger		Nu se poate șterge această copie din locația originală. Viața merge mai departe.
+Error	ZombieReplicantView		Eroare
 Paste	TextView		Lipește
+OK	AboutWindow		OK
 Special Thanks:	AboutWindow		Mulţumiri speciale:
 %.2f TiB	StringForSize		%.2f TiB
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nu se poate găsi aplicația pentru copie. Nu a fost furnizată nicio semnătură de aplicație.\n%error
-Redo	TextView		Repetă
-<empty>	Menu		<liber>
-Warning	Dragger		Avertisment
-Undo	TextView		Refă
+Remove replicant	Dragger		Elimină copie
+Version	AboutWindow		Versiune
 Red:	ColorControl		Roșu:
+<empty>	Menu		<liber>
+Copy	TextView		Copiază
+Select all	TextView		Selectează toate
+alpha	AboutWindow		alfa
 %3.2f MiB	StringForSize		%3.2f MiB
+Error	PrintJob		Eroare
+About %app%	AboutWindow		Despre %app%
 About %app…	Dragger		Despre %app…
-development	AboutWindow		dezvoltare
-Error	ZombieReplicantView		Eroare
+Version history:	AboutWindow		Istoricul versiunii:
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nu se poate găsi aplicația pentru copie. Nu a fost furnizată nicio semnătură de aplicație.\n%error
+%3.2f KiB	StringForSize		%3.2f KiB
 Blue:	ColorControl		Albastru:
-gold master	AboutWindow		versiune finală
-Can't delete this replicant from its original application. Life goes on.	Dragger		Nu se poate șterge această copie din locația originală. Viața merge mai departe.
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nu se poate crea copie pentru \"%description\".\n%error
+Written by:	AboutWindow		Scris de:

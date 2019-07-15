@@ -1,35 +1,35 @@
 1	hungarian	x-vnd.Haiku-Notifications	332239666
-An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Nem sikerült menteni a beállításokat.\nLehetséges, hogy nincsen több szabad hely a lemezen.
-Add…	NotificationView		Új…
-Status	NotificationView		Állapot
-Revert	PrefletWin		Visszaállít
-Enable notifications	GeneralView		Értesítések engedélyezése
-Window width:	GeneralView		Ablakszélesség:
-This is a test notification message	PrefletWin		Ez egy próba értesítés
-OK	PrefletWin		Rendben
-Duration:	GeneralView		Időtartam:
-OK	NotificationView		Rendben
-Application does not have a valid signature	NotificationView	Alert message	Az alkalmazásnak nincs érvényes azonosítója
-Follow Deskbar	GeneralView		Asztalsáv követése
-Notifications	PrefletWin		Értesítések
-Timeout:	GeneralView		Kikapcsolás:
-Muted	NotificationView		Némítva
-General	PrefletView		Általános
-Allowed	NotificationView		Engedélyezve
-Remove	NotificationView		Eltávolítás
-Lower right	GeneralView		Jobb alsó
-Notifications preflet sample	PrefletWin		Próba értesítés
-Notifications	System name		Értesítések
-Position:	GeneralView		Pozíció:
-Applications	PrefletView		Programok
-Defaults	PrefletWin		Alapértékek
-pixels	GeneralView		képpont
-Application	NotificationView		Program
-Width:	GeneralView		Szélesség:
-seconds	GeneralView		másodperc
-Mute notifications from this application	NotificationView		Az alkalmazás értesítéseinek némítása
-Upper right	GeneralView		Jobb felső
- is already listed	NotificationView	Alert message	már szerepel a listában
 Lower left	GeneralView		Bal alsó
+Application does not have a valid signature	NotificationView	Alert message	Az alkalmazásnak nincs érvényes azonosítója
+Status	NotificationView		Állapot
+Add…	NotificationView		Új…
+Lower right	GeneralView		Jobb alsó
+Muted	NotificationView		Némítva
+Window width:	GeneralView		Ablakszélesség:
+ is already listed	NotificationView	Alert message	már szerepel a listában
+OK	PrefletWin		Rendben
+Notifications	PrefletWin		Értesítések
+Notifications preflet sample	PrefletWin		Próba értesítés
+Mute notifications from this application	NotificationView		Az alkalmazás értesítéseinek némítása
+pixels	GeneralView		képpont
+seconds	GeneralView		másodperc
+Revert	PrefletWin		Visszaállít
+Applications	PrefletView		Programok
+Timeout:	GeneralView		Kikapcsolás:
+Upper right	GeneralView		Jobb felső
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Nem sikerült menteni a beállításokat.\nLehetséges, hogy nincsen több szabad hely a lemezen.
+Defaults	PrefletWin		Alapértékek
 Upper left	GeneralView		Bal felső
 Applications	NotificationView		Programok
+Width:	GeneralView		Szélesség:
+General	PrefletView		Általános
+OK	NotificationView		Rendben
+Follow Deskbar	GeneralView		Asztalsáv követése
+Notifications	System name		Értesítések
+Allowed	NotificationView		Engedélyezve
+Duration:	GeneralView		Időtartam:
+Application	NotificationView		Program
+Enable notifications	GeneralView		Értesítések engedélyezése
+This is a test notification message	PrefletWin		Ez egy próba értesítés
+Remove	NotificationView		Eltávolítás
+Position:	GeneralView		Pozíció:

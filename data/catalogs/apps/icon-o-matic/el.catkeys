@@ -1,193 +1,193 @@
 1	greek, modern (1453-)	x-vnd.haiku-icon_o_matic	2885914752
-Select All	Icon-O-Matic-PathManipulator		Επιλογή όλων
-Add Style	Icon-O-Matic-AddStylesCmd		Προσθήκη Στυλ
-Color (#%02x%02x%02x)	Style name after dropping a color		Χρώμα (#%02x%02x%02x)
-Add	Icon-O-Matic-StylesList		Προσθήκη
-Move Shape	Icon-O-Matic-MoveShapesCommand		Μετακίνηση Σχήματος
-Opening the document failed!	Icon-O-Matic-Main		Αδύνατο το άνοιγμα του εγγράφου
-Reset transformation	Icon-O-Matic-ShapesList		Επαναφορά πληροφοριών
-Move Paths	Icon-O-Matic-MovePathsCmd		Μετακίνηση Μονοπατιών
 None	Icon-O-Matic-Properties		Κανένα
-New	Icon-O-Matic-Menu-File		Νέο
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Το Ico-O-Matic μπορεί να μην είδε όλα τα δεδομένα από το SVG στη φόρτωση. Με την διαγραφή αυτού του αρχείου, οι πληροφορίες αυτές θα χαθούν.
-Paste Properties	Icon-O-Matic-Properties		Επικόλληση Ιδιοτήτων
-Stroke	Transformation		Κτύπημα
-Closed	Icon-O-Matic-PropertyNames		Κλειστό
-Remove Path	Icon-O-Matic-RemovePathsCmd		Αφαίρεση Μονοπατιού
-Add shape with path	Icon-O-Matic-Menu-Shape		Προσθήκη σχήματος με μονοπάτι
-Select	Icon-O-Matic-Properties		Επιλογή
-Height	Icon-O-Matic-PropertyNames		Ύψος
-Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Αφαίρεση Μετασχηματιστών
-Width	Icon-O-Matic-PropertyNames		Πλάτος
-Transformation	Icon-O-Matic-TransformationBoxStates		Μετασχηματισμός
-Duplicate	Icon-O-Matic-ShapesList		Διπλότυπο
-<unkown property>	Icon-O-Matic-PropertyNames		<άγνωστη ιδιότητα>
-Linear	Icon-O-Matic-StyleTypes		Γραμμική
-Assign Path	Icon-O-Matic-AddPathsCmd		Ανάθεση μονοπατιού
-Move	Icon-O-Matic-TransformationBoxStates		Μετακίνηση
-Flip Control Points	Icon-O-Matic-FlipPointsCmd		Αλλαγή σημείων ελένχου
-warning	Icon-O-Matic-SVGExport		προειδοποίησης
-Copy	Icon-O-Matic-Properties		Αντιγραφή
-Miter Limit	Icon-O-Matic-PropertyNames		Όριο miter
-OK	Icon-O-Matic-ColorPicker		Εντάξει
-Remove Control Point	Icon-O-Matic-RemovePointsCmd		Αφαίρεση Σημείου Ελέγχου
-Bleep!	Exporter - Continue in error dialog		Εκπομπή Σήματος!
-Add circle	Icon-O-Matic-PathsList		Προσθήκη κύκλου
-Shorten	Icon-O-Matic-PropertyNames		Σμίκρινση
-bad news	Title of error alert		άσχημα νέα
-Remove Paths	Icon-O-Matic-RemovePathsCmd		Αφαίρεση Μονοπατιών
-Scale Y	Icon-O-Matic-PropertyNames		Κλίμακα Υ
-Add Control Point	Icon-O-Matic-AddPointCmd		Προσθήκη Σημείου Ελέγχου
-Untitled	Icon-O-Matic-Main		Χωρίς τίτλο
-Multi Set 	Multi Set (property name)		Πολλαπλό σετάρισμα
-any of the other lists to	Empty property list - 2nd line		των λιστών σε
-Save as…	Icon-O-Matic-Menu-File		Αποθήκευση ως...
-Change Color	Icon-O-Matic-SetColorCmd		Αλλαγή χρώματος
-Style	Icon-O-Matic-Menus		Στυλ
-<modify path>	Icon-O-Matic-PathCmd		<τροποποίηση μονοπατιού>
-Opening the icon failed!	Icon-O-Matic-Main		Αδύνατο το άνοιγμα του εικονιδίου!
-Error: 	Icon-O-Matic-Main		Σφάλμα:
-Rotate indices backwards	Icon-O-Matic-PathsList		Περιστροφή δεικτών προς τα πίσω 
-Name	Icon-O-Matic-PropertyNames		Όνομα
-bad news	Icon-O-Matic-Exporter		άσχημα νέα
-<nothing to undo>	Icon-O-Matic-Menu-Edit		<τίποτε προς επαναφορά>
-Off	Icon-O-Matic-Menu-Settings		Σβηστό
-Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Πάγωμα Σχήματος
-PNG Set	Icon-O-Matic-SavePanel		Σετ PNG
-Joins	Icon-O-Matic-PropertyNames		Ενώσεις
-Remove Style	Icon-O-Matic-RemoveStylesCmd		Αφαίρεση Στυλ
-Scale X	Icon-O-Matic-PropertyNames		Κλίμακα Χ
-Set 	Set (property name)		Όρισε
-Cancel	Icon-O-Matic-SVGExport		Άκυρο
-Add shape with style	Icon-O-Matic-Menu-Shape		Προσθήκη σχήματος με στυλ
-Remove Shape	Icon-O-Matic-RemoveShapesCmd		Αφαίρεση Σχήματος
-Reverse	Icon-O-Matic-PathsList		Αντιστροφή
-HVIF Source Code	Icon-O-Matic-SavePanel		HVIF Πηγαίος Κώδικας
-Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Επαναφορά Μεταμορφώσεων
-All	Icon-O-Matic-Properties		Όλα
-Multi Paste Properties	Icon-O-Matic-Properties		Ιδιότητες πολλαπλής επικόλλησης
-Undo	Icon-O-Matic-Main		Αναίρεση
-Click on a shape above	Empty transformers list - 1st line		Κλικ σε ένα σχήμα από πάνω
-Add Shape	Icon-O-Matic-AddShapesCmd		Προσθήκη Σχήματος
-Contour	Transformation		Περίγραμμα
-<nothing to redo>	Icon-O-Matic-Menu-Edit		<τίποτε προς επανάληψη>
-Perspective	Transformation		Προοπτική
-Move Transformer	Icon-O-Matic-MoveTransformersCmd		Μεταφορά μεταμορφώσεων
-Opacity	Icon-O-Matic-PropertyNames		Αδιαφάνεια
-Add with path	Icon-O-Matic-ShapesList		Προσθήκη με μονοπάτι
-Gradient type	Icon-O-Matic-StyleTypes		Τύπος Gradient
-Icon-O-Matic	System name		Icon-O-Matic
-Cancel	Icon-O-Matic-Menu-Settings		Ακύρωση
-Modify Control Point	Icon-O-Matic-ChangePointCmd		Τροποποίηση Σημείου Ελέγχου
-Saving your document failed!	Icon-O-Matic-Exporter		Η αποθήκευση του εγγράφου απέτυχε!
-edit it's properties here.	Empty property list - 3rd line		επεξεργασία ιδιοτήτων εδώ
-Split	Icon-O-Matic-PathManipulator		Χωρισμός
-Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Ειδοποίηση σημείων ελέγχου
-Remove	Icon-O-Matic-StylesList		Αφαίρεση
-Add with path & style	Icon-O-Matic-ShapesList		Προσθήκη με μονοπάτι & στυλ
-META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON Ιδιότητα
-Translation Y	Icon-O-Matic-PropertyNames		Μετάφραση Υ
-Rotate	Icon-O-Matic-TransformationBoxStates		Περιστροφή
-Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Αφαίρεση Μεταμορφωτή
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Περιστροφή μονοπατιού
-Add Transformer	Icon-O-Matic-AddTransformersCmd		Προσθήκη μεταμόρφωσης
-Remove	Icon-O-Matic-PathsList		Αφαίρεση
-Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Ειδοποίηση σημείου ελέγχου
-Pick a color	Icon-O-Matic-ColorPicker		Διάλεξε ένα χρώμα
-Quit	Icon-O-Matic-Menu-File		Έξοδος
-Export	Icon-O-Matic-Menu-File		Εξαγωγή
-No	Icon-O-Matic-StyledTextImport		Όχι
-Rotate indices forwards	Icon-O-Matic-PathsList		Περιστροφή δεικτών προς τα εμπρός
-Unassign Path	Icon-O-Matic-UnassignPathCmd		Αφαίρεση μονοπατιού
-load error	Icon-O-Matic-SVGImport		σφάλμα φόρτωσης
-Move Shapes	Icon-O-Matic-MoveShapesCommand		Μετακίνηση Σχημάτων
-Remove Styles	Icon-O-Matic-RemoveStylesCmd		Αφαίρεση Στυλ
-Add	Icon-O-Matic-TransformersList		Προσθήκη
-Color	Icon-O-Matic-StyleTypes		Χρώμα
-Settings…	Icon-O-Matic-SavePanel		Ρυθμίσεις...
-Remove	Icon-O-Matic-PathManipulator		Αφαίρεση
-Radial	Icon-O-Matic-StyleTypes		Ακτινωτά
-Perspective	Icon-O-Matic-TransformersList		Προοπτική
-Add shape with path & style	Icon-O-Matic-Menu-Shape		Προσθήκη σχήματος με μονοπάτι & στυλ
-Gradient	Icon-O-Matic-StyleTypes		Κλίση
-Min LOD	Icon-O-Matic-PropertyNames		Ελάχιστο LOD
-BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON Ιδιότητα
-Invert selection	Icon-O-Matic-Properties		Αντιστροφή επιλεγμένου
-Export as…	Icon-O-Matic-Menu-File		Εξαγωγή ως...
-Transformation	Transformation		Μετασχηματισμός
-Click on an object in	Empty property list - 1st line		Κλικ σε αντικείμενο σε
-Move Transformers	Icon-O-Matic-MoveTransformersCmd		Μετακίνηση Μετασχηματιστών
-Move Styles	Icon-O-Matic-MoveStylesCmd		Μετακίνηση Στυλ
-Reset transformation	Icon-O-Matic-StylesList		Επαναφορά μεταμόρφωσης
-Max LOD	Icon-O-Matic-PropertyNames		Μέγιστο LOD
-Transformer	Icon-O-Matic-Menus		Μεταμορφωτής
-Flip	Icon-O-Matic-PathManipulator		Αναστροφή
-Conic	Icon-O-Matic-StyleTypes		Κονικό
-Split Control Points	Icon-O-Matic-SplitPointsCmd		Μοίρασμα σημείων ελένχου
-Save	Icon-O-Matic-Menu-Settings		Αποθήκευση
 Add empty	Icon-O-Matic-ShapesList		Προσθήκη άδειου
-Close	Icon-O-Matic-Menu-File		Κλείσιμο
-Cancel	Icon-O-Matic-ColorPicker		Άκυρο
-Paste	Icon-O-Matic-Properties		Επικόλληση
-Shape	Icon-O-Matic-Menus		Σχήμα
-Translation X	Icon-O-Matic-PropertyNames		Μετάφραση Χ
-Properties	Icon-O-Matic-Menus		Ιδιότητες
-Move Pivot	Icon-O-Matic-TransformationBoxStates		Μετακίνηση Άξονα
-Path	Icon-O-Matic-Menus		Μονοπάτι
-Freeze transformation	Icon-O-Matic-ShapesList		Πάγωμα μεταμόρφωσης
-File	Icon-O-Matic-Menus		Αρχείο
-Error: 	Icon-O-Matic-Exporter		Σφάλμα:
-Add Transformers	Icon-O-Matic-AddTransformersCmd		Προσθήκη μεταμορφοτών
-Diamond	Icon-O-Matic-StyleTypes		Διαμάντι
-Path	Icon-O-Matic-PropertyNames		Μονοπάτι
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Αδύνατο το άνοιγμα του αρχείου '%s' ως SVG.\n\nΣφάλμα: %s
-Swatches	Icon-O-Matic-Menus		Δείγματα
-<unavailable>	Icon-O-Matic-StyleTypes		<μη διαθέσιμο>
-Rotation	Icon-O-Matic-PropertyNames		Περιστροφή
-Add with style	Icon-O-Matic-ShapesList		Προσθήκη με στυλ
-Add	Icon-O-Matic-PathsList		Προσθήκη
-Add Shapes	Icon-O-Matic-AddShapesCmd		Προσθήκη Σχημάτων
-Move Style	Icon-O-Matic-MoveStylesCmd		Μετακίνηση Στυλ
-Bummer	Cancel button - error alert		Κρίμα
-Snap to grid	Icon-O-Matic-Menu-Settings		Συγκράτηση στο πλέγμα
-Remove	Icon-O-Matic-ShapesList		Αφαίρεση
-Yes	Icon-O-Matic-StyledTextImport		Ναι
-Transformation	Icon-O-Matic-TransformersList		Μετασχηματισμός
-Add Styles	Icon-O-Matic-AddStylesCmd		Προσθήκη Στυλ
-Remove Control Points	Icon-O-Matic-RemovePointsCmd		Αφαίρεση Σημείων Ελέγχου
-Format	Icon-O-Matic-SavePanel		Μορφή
-Add rect	Icon-O-Matic-PathsList		Προσθήκη rect
-Edit	Icon-O-Matic-Menus		Επεξεργασία
-Duplicate	Icon-O-Matic-StylesList		Διπλότυπο
-Caps	Icon-O-Matic-PropertyNames		Caps
-Transform	Icon-O-Matic-PathManipulator		Μεταμόρφωση
-Add Paths	Icon-O-Matic-AddPathsCmd		Προσθήκη Μονοπατιών
-Style type	Icon-O-Matic-StyleTypes		Τύπος στύλ
-Assign Style	Icon-O-Matic-AssignStyleCmd		Αντιστοίχιση Στυλ
-Add Path	Icon-O-Matic-AddPathsCmd		Προσθήκη Μονοπατιού
+Opening the icon failed!	Icon-O-Matic-Main		Αδύνατο το άνοιγμα του εικονιδίου!
+Add with path	Icon-O-Matic-ShapesList		Προσθήκη με μονοπάτι
+Copy	Icon-O-Matic-Properties		Αντιγραφή
 Color	Icon-O-Matic-PropertyNames		Χρώμα
-Insert Control Point	Icon-O-Matic-InsertPointCmd		Εισαγωγή Σημείου Ελέγχου
-Flip Control Point	Icon-O-Matic-FlipPointsCmd		εναλλαγή σημείων ελένχου
-Redo	Icon-O-Matic-Main		Επανάληψη
-Assign Paths	Icon-O-Matic-AddPathsCmd		Εκχώρηση μονοπάτιών
-OK	Icon-O-Matic-SVGImport		Εντάξει
-Multi paste	Icon-O-Matic-Properties		πολλαπλή επικόλληση
-to attach transformers.	Empty transformers list - 2nd line		να επισυνάψετε μετασχηματιστές.
+Format	Icon-O-Matic-SavePanel		Μορφή
+Move Shapes	Icon-O-Matic-MoveShapesCommand		Μετακίνηση Σχημάτων
+Color	Icon-O-Matic-StyleTypes		Χρώμα
+Select	Icon-O-Matic-Properties		Επιλογή
+Reset transformation	Icon-O-Matic-ShapesList		Επαναφορά πληροφοριών
+Duplicate	Icon-O-Matic-StylesList		Διπλότυπο
+Rotate	Icon-O-Matic-TransformationBoxStates		Περιστροφή
+Remove Control Points	Icon-O-Matic-RemovePointsCmd		Αφαίρεση Σημείων Ελέγχου
+Shorten	Icon-O-Matic-PropertyNames		Σμίκρινση
+Unassign Path	Icon-O-Matic-UnassignPathCmd		Αφαίρεση μονοπατιού
+Paste	Icon-O-Matic-Properties		Επικόλληση
+Detect Orient.	Icon-O-Matic-PropertyNames		Εντοπισμός Orient. 
+Click on a shape above	Empty transformers list - 1st line		Κλικ σε ένα σχήμα από πάνω
+Close	Icon-O-Matic-Menu-File		Κλείσιμο
+Add rect	Icon-O-Matic-PathsList		Προσθήκη rect
+Rotation	Icon-O-Matic-PropertyNames		Περιστροφή
+Multi Paste Properties	Icon-O-Matic-Properties		Ιδιότητες πολλαπλής επικόλλησης
+Bleep!	Exporter - Continue in error dialog		Εκπομπή Σήματος!
+Transform	Icon-O-Matic-PathManipulator		Μεταμόρφωση
+Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Αφαίρεση Μεταμορφωτή
+META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON Ιδιότητα
+Add shape with style	Icon-O-Matic-Menu-Shape		Προσθήκη σχήματος με στυλ
+Assign Path	Icon-O-Matic-AddPathsCmd		Ανάθεση μονοπατιού
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Επαναφορά μετασχηματισμού
-Reverse Path	Icon-O-Matic-ReversePathCmd		Αντίστροφο Μονοπάτι
-Scale	Icon-O-Matic-TransformationBoxStates		Κλίμακα
-Duplicate	Icon-O-Matic-PathsList		Διπλότυπο
-Save	Icon-O-Matic-Menu-File		Αποθήκευση
-Append…	Icon-O-Matic-Menu-File		Προσάρτηση...
-Move Path	Icon-O-Matic-MovePathsCmd		Μετακίνηση Μονοπατιού
-Overwrite	Icon-O-Matic-SVGExport		Αντικατάσταση
-Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Πάγωμα Σχημάτων
+Transformation	Transformation		Μετασχηματισμός
+Remove	Icon-O-Matic-StylesList		Αφαίρεση
+Cancel	Icon-O-Matic-Menu-Settings		Ακύρωση
+Assign Style	Icon-O-Matic-AssignStyleCmd		Αντιστοίχιση Στυλ
+Transformation	Icon-O-Matic-TransformationBoxStates		Μετασχηματισμός
+Closed	Icon-O-Matic-PropertyNames		Κλειστό
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Διαίρεση σημείου ελέγχου
+<nothing to redo>	Icon-O-Matic-Menu-Edit		<τίποτε προς επανάληψη>
+Height	Icon-O-Matic-PropertyNames		Ύψος
+Add Shape	Icon-O-Matic-AddShapesCmd		Προσθήκη Σχήματος
+warning	Icon-O-Matic-SVGExport		προειδοποίησης
+File	Icon-O-Matic-Menus		Αρχείο
+Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Καθαρισμός Μονοπατιού
+Move Style	Icon-O-Matic-MoveStylesCmd		Μετακίνηση Στυλ
+Properties	Icon-O-Matic-Menus		Ιδιότητες
+Path	Icon-O-Matic-PropertyNames		Μονοπάτι
+Add Control Point	Icon-O-Matic-AddPointCmd		Προσθήκη Σημείου Ελέγχου
+Path	Icon-O-Matic-Menus		Μονοπάτι
+Stroke	Transformation		Κτύπημα
+Flip	Icon-O-Matic-PathManipulator		Αναστροφή
+Select All	Icon-O-Matic-PathManipulator		Επιλογή όλων
+Opacity	Icon-O-Matic-PropertyNames		Αδιαφάνεια
+OK	Icon-O-Matic-ColorPicker		Εντάξει
+Error: 	Icon-O-Matic-Main		Σφάλμα:
+bad news	Icon-O-Matic-Exporter		άσχημα νέα
+Saving your document failed!	Icon-O-Matic-Exporter		Η αποθήκευση του εγγράφου απέτυχε!
+Snap to grid	Icon-O-Matic-Menu-Settings		Συγκράτηση στο πλέγμα
+Opening the document failed!	Icon-O-Matic-Main		Αδύνατο το άνοιγμα του εγγράφου
+Shape	Icon-O-Matic-Menus		Σχήμα
+Add with path & style	Icon-O-Matic-ShapesList		Προσθήκη με μονοπάτι & στυλ
+<unavailable>	Icon-O-Matic-StyleTypes		<μη διαθέσιμο>
+Min LOD	Icon-O-Matic-PropertyNames		Ελάχιστο LOD
+Reverse Path	Icon-O-Matic-ReversePathCmd		Αντίστροφο Μονοπάτι
+Move Transformers	Icon-O-Matic-MoveTransformersCmd		Μετακίνηση Μετασχηματιστών
+Add	Icon-O-Matic-TransformersList		Προσθήκη
+Paste Properties	Icon-O-Matic-Properties		Επικόλληση Ιδιοτήτων
+Undo	Icon-O-Matic-Main		Αναίρεση
+Scale X	Icon-O-Matic-PropertyNames		Κλίμακα Χ
+Add	Icon-O-Matic-PathsList		Προσθήκη
+Add Styles	Icon-O-Matic-AddStylesCmd		Προσθήκη Στυλ
+Remove	Icon-O-Matic-PathManipulator		Αφαίρεση
+Duplicate	Icon-O-Matic-ShapesList		Διπλότυπο
+Contour	Transformation		Περίγραμμα
+Perspective	Icon-O-Matic-TransformersList		Προοπτική
+Move Paths	Icon-O-Matic-MovePathsCmd		Μετακίνηση Μονοπατιών
+Rounding	Icon-O-Matic-PropertyNames		Στρογγυλοποίηση
+Joins	Icon-O-Matic-PropertyNames		Ενώσεις
+Cancel	Icon-O-Matic-ColorPicker		Άκυρο
+Duplicate	Icon-O-Matic-PathsList		Διπλότυπο
+Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Αφαίρεση Σχημάτων
+Save	Icon-O-Matic-Menu-Settings		Αποθήκευση
+Export as…	Icon-O-Matic-Menu-File		Εξαγωγή ως...
+Error: 	Icon-O-Matic-Exporter		Σφάλμα:
+Move Path	Icon-O-Matic-MovePathsCmd		Μετακίνηση Μονοπατιού
+Remove Paths	Icon-O-Matic-RemovePathsCmd		Αφαίρεση Μονοπατιών
+Assign Paths	Icon-O-Matic-AddPathsCmd		Εκχώρηση μονοπάτιών
+Diamond	Icon-O-Matic-StyleTypes		Διαμάντι
+Add Style	Icon-O-Matic-AddStylesCmd		Προσθήκη Στυλ
+Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Ειδοποίηση σημείων ελέγχου
+Move Styles	Icon-O-Matic-MoveStylesCmd		Μετακίνηση Στυλ
+Add shape with path	Icon-O-Matic-Menu-Shape		Προσθήκη σχήματος με μονοπάτι
+Translation X	Icon-O-Matic-PropertyNames		Μετάφραση Χ
+Flip Control Points	Icon-O-Matic-FlipPointsCmd		Αλλαγή σημείων ελένχου
+Add Transformers	Icon-O-Matic-AddTransformersCmd		Προσθήκη μεταμορφοτών
+BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON Ιδιότητα
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Το Ico-O-Matic μπορεί να μην είδε όλα τα δεδομένα από το SVG στη φόρτωση. Με την διαγραφή αυτού του αρχείου, οι πληροφορίες αυτές θα χαθούν.
+Rotate indices backwards	Icon-O-Matic-PathsList		Περιστροφή δεικτών προς τα πίσω 
+Overwrite	Icon-O-Matic-SVGExport		Αντικατάσταση
+Modify Control Point	Icon-O-Matic-ChangePointCmd		Τροποποίηση Σημείου Ελέγχου
+Cancel	Icon-O-Matic-SVGExport		Άκυρο
 Open…	Icon-O-Matic-Menu-File		Άνοιγμα...
+Redo	Icon-O-Matic-Main		Επανάληψη
+Change Color	Icon-O-Matic-SetColorCmd		Αλλαγή χρώματος
+Remove	Icon-O-Matic-ShapesList		Αφαίρεση
+PNG Set	Icon-O-Matic-SavePanel		Σετ PNG
+to attach transformers.	Empty transformers list - 2nd line		να επισυνάψετε μετασχηματιστές.
+Linear	Icon-O-Matic-StyleTypes		Γραμμική
+any of the other lists to	Empty property list - 2nd line		των λιστών σε
+Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Ειδοποίηση σημείου ελέγχου
+Flip Control Point	Icon-O-Matic-FlipPointsCmd		εναλλαγή σημείων ελένχου
+Add Paths	Icon-O-Matic-AddPathsCmd		Προσθήκη Μονοπατιών
+Color (#%02x%02x%02x)	Style name after dropping a color		Χρώμα (#%02x%02x%02x)
+Clean up	Icon-O-Matic-PathsList		Καθαρισμός
+Remove Style	Icon-O-Matic-RemoveStylesCmd		Αφαίρεση Στυλ
+Split	Icon-O-Matic-PathManipulator		Χωρισμός
+Move	Icon-O-Matic-TransformationBoxStates		Μετακίνηση
+Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Επαναφορά Μεταμορφώσεων
+Split Control Points	Icon-O-Matic-SplitPointsCmd		Μοίρασμα σημείων ελένχου
+Remove Control Point	Icon-O-Matic-RemovePointsCmd		Αφαίρεση Σημείου Ελέγχου
+Conic	Icon-O-Matic-StyleTypes		Κονικό
+Name	Icon-O-Matic-PropertyNames		Όνομα
+Multi paste	Icon-O-Matic-Properties		πολλαπλή επικόλληση
+Add Shapes	Icon-O-Matic-AddShapesCmd		Προσθήκη Σχημάτων
+Reset transformation	Icon-O-Matic-StylesList		Επαναφορά μεταμόρφωσης
+Add Transformer	Icon-O-Matic-AddTransformersCmd		Προσθήκη μεταμόρφωσης
+Reverse	Icon-O-Matic-PathsList		Αντιστροφή
+Move Pivot	Icon-O-Matic-TransformationBoxStates		Μετακίνηση Άξονα
+Remove	Icon-O-Matic-PathsList		Αφαίρεση
+Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Αφαίρεση Μετασχηματιστών
+Style type	Icon-O-Matic-StyleTypes		Τύπος στύλ
+Quit	Icon-O-Matic-Menu-File		Έξοδος
+Remove Styles	Icon-O-Matic-RemoveStylesCmd		Αφαίρεση Στυλ
+Gradient	Icon-O-Matic-StyleTypes		Κλίση
+bad news	Title of error alert		άσχημα νέα
+Insert Control Point	Icon-O-Matic-InsertPointCmd		Εισαγωγή Σημείου Ελέγχου
+Add shape with path & style	Icon-O-Matic-Menu-Shape		Προσθήκη σχήματος με μονοπάτι & στυλ
+Move Shape	Icon-O-Matic-MoveShapesCommand		Μετακίνηση Σχήματος
+Radial	Icon-O-Matic-StyleTypes		Ακτινωτά
+Caps	Icon-O-Matic-PropertyNames		Caps
+OK	Icon-O-Matic-SVGImport		Εντάξει
+Append…	Icon-O-Matic-Menu-File		Προσάρτηση...
+Scale Y	Icon-O-Matic-PropertyNames		Κλίμακα Υ
+Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Αδύνατο το άνοιγμα του αρχείου '%s' ως SVG.\n\nΣφάλμα: %s
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Χρώμα (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Επεξεργασία Gradient
-Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Καθαρισμός Μονοπατιού
-Rounding	Icon-O-Matic-PropertyNames		Στρογγυλοποίηση
-Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Αφαίρεση Σχημάτων
-Clean up	Icon-O-Matic-PathsList		Καθαρισμός
-Detect Orient.	Icon-O-Matic-PropertyNames		Εντοπισμός Orient. 
+Set 	Set (property name)		Όρισε
+Rotate indices forwards	Icon-O-Matic-PathsList		Περιστροφή δεικτών προς τα εμπρός
+Click on an object in	Empty property list - 1st line		Κλικ σε αντικείμενο σε
+Save	Icon-O-Matic-Menu-File		Αποθήκευση
+No	Icon-O-Matic-StyledTextImport		Όχι
+Add circle	Icon-O-Matic-PathsList		Προσθήκη κύκλου
+Freeze transformation	Icon-O-Matic-ShapesList		Πάγωμα μεταμόρφωσης
+Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Πάγωμα Σχημάτων
+Miter Limit	Icon-O-Matic-PropertyNames		Όριο miter
+Untitled	Icon-O-Matic-Main		Χωρίς τίτλο
+Max LOD	Icon-O-Matic-PropertyNames		Μέγιστο LOD
+Add Path	Icon-O-Matic-AddPathsCmd		Προσθήκη Μονοπατιού
+load error	Icon-O-Matic-SVGImport		σφάλμα φόρτωσης
+Transformation	Icon-O-Matic-TransformersList		Μετασχηματισμός
+Save as…	Icon-O-Matic-Menu-File		Αποθήκευση ως...
+Swatches	Icon-O-Matic-Menus		Δείγματα
+<modify path>	Icon-O-Matic-PathCmd		<τροποποίηση μονοπατιού>
+HVIF Source Code	Icon-O-Matic-SavePanel		HVIF Πηγαίος Κώδικας
+Icon-O-Matic	System name		Icon-O-Matic
+<nothing to undo>	Icon-O-Matic-Menu-Edit		<τίποτε προς επαναφορά>
+Add	Icon-O-Matic-StylesList		Προσθήκη
+Translation Y	Icon-O-Matic-PropertyNames		Μετάφραση Υ
+Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Πάγωμα Σχήματος
+Scale	Icon-O-Matic-TransformationBoxStates		Κλίμακα
+Remove Shape	Icon-O-Matic-RemoveShapesCmd		Αφαίρεση Σχήματος
+All	Icon-O-Matic-Properties		Όλα
+Transformer	Icon-O-Matic-Menus		Μεταμορφωτής
+Invert selection	Icon-O-Matic-Properties		Αντιστροφή επιλεγμένου
+<unkown property>	Icon-O-Matic-PropertyNames		<άγνωστη ιδιότητα>
+Pick a color	Icon-O-Matic-ColorPicker		Διάλεξε ένα χρώμα
+Multi Set 	Multi Set (property name)		Πολλαπλό σετάρισμα
+Settings…	Icon-O-Matic-SavePanel		Ρυθμίσεις...
+Add with style	Icon-O-Matic-ShapesList		Προσθήκη με στυλ
+New	Icon-O-Matic-Menu-File		Νέο
+Yes	Icon-O-Matic-StyledTextImport		Ναι
+Remove Path	Icon-O-Matic-RemovePathsCmd		Αφαίρεση Μονοπατιού
+Gradient type	Icon-O-Matic-StyleTypes		Τύπος Gradient
+Move Transformer	Icon-O-Matic-MoveTransformersCmd		Μεταφορά μεταμορφώσεων
+Perspective	Transformation		Προοπτική
+Export	Icon-O-Matic-Menu-File		Εξαγωγή
+Width	Icon-O-Matic-PropertyNames		Πλάτος
+Bummer	Cancel button - error alert		Κρίμα
+Style	Icon-O-Matic-Menus		Στυλ
+edit it's properties here.	Empty property list - 3rd line		επεξεργασία ιδιοτήτων εδώ
+Off	Icon-O-Matic-Menu-Settings		Σβηστό
+Edit	Icon-O-Matic-Menus		Επεξεργασία

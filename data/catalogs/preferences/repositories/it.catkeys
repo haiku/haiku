@@ -1,41 +1,41 @@
 1	italian	x-vnd.Haiku-Repositories	2658607939
-Completed	TaskLooper	Completed task status message	Completato
-Repositories	System name		Repository
-There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	C'è stato un errore nell'attivazione del repository %url%
-Remove this repository?	RepositoriesView	Removal alert confirmation message	Rimuovere questo repository?
-Description	TaskLooper	Failed task error description	Descrizione
-Add	AddRepoWindow	Button label	Aggiungi
-URL	RepositoriesView	Column title	URL
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Repositories non è in grado di recuperare i nomi dei repository correntemente attivati.
-Keep trying	TaskTimer	Button label	Continua a provare
 This is not a valid URL.	AddRepoWindow	Add URL error message	URL non valido.
 Repository URL:	AddRepoWindow	Text box label	URL del Repository:
-Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Errore nell'estrazione della configurazione del repository %name%.
-Details	TaskLooper	Job log details header	Dettagli
-Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Buone notizie! Le attività legate al repository %name% sono state completate.
-Status	RepositoriesView	Column title	Stato
-Aborted	TaskLooper	Aborted task status message	Annullato
-Remove all	RepositoriesView	Button label	Rimuovi tutti
-Remove	RepositoriesView	Button label	Rimuovi
-Changes completed	RepositoriesView	Status view text	Cambiamenti effettuati
-Name	RepositoriesView	Column title	Nome
-Enable	RepositoriesView	Button label	Abilita
-Enable repositories to use with package management:	RepositoriesView	Label text	Abilita i repository da utilizzare nel gestore dei pacchetti:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	C'è stato un errore nel refresh della cache del repository %name%
-Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Solo un URL per ogni repository può essere attivato. Per favore modifica le tue selezioni.
-Failed	TaskLooper	Failed task status message	Fallito
-OK	Constants	Button label	OK
-Cancel task	TaskTimer	Button label	Cancella attività
-Remove these repositories?	RepositoriesView	Removal alert confirmation message	Rimuovere questi repository?
-Cancel	Constants	Button label	Annulla
-Changes pending:	RepositoriesView	Status view text	Cambiamenti in corso:
 There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	C'è stato un errore nel disabilitare il repository %name%
+Unknown	Constants	Unknown repository name	Sconosciuto
+Remove all	RepositoriesView	Button label	Rimuovi tutti
+Enable repositories to use with package management:	RepositoriesView	Label text	Abilita i repository da utilizzare nel gestore dei pacchetti:
+Disable	RepositoriesView	Button label	Disabilita
+Cancel task	TaskTimer	Button label	Cancella attività
+Changes completed	RepositoriesView	Status view text	Cambiamenti effettuati
+Details	TaskLooper	Job log details header	Dettagli
 Remove	Constants	Button label	Rimuovi
-Enable all	RepositoriesView	Button label	Abilita tutto
-Stop and quit	RepositoriesWindow	Button label	Ferma ed esci
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	C'è stato un errore nell'attivazione del repository %url%
+Remove this repository?	RepositoriesView	Removal alert confirmation message	Rimuovere questo repository?
 The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	L'attività legata al repository %name% sta impiegando molto tempo per il completamento.
-Disable all	RepositoriesView	Button label	Disabilita tutto
+Completed	TaskLooper	Completed task status message	Completato
+OK	Constants	Button label	OK
+Status	RepositoriesView	Column title	Stato
+Name	RepositoriesView	Column title	Nome
+Add	AddRepoWindow	Button label	Aggiungi
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Repositories non è in grado di recuperare i nomi dei repository correntemente attivati.
+Enable all	RepositoriesView	Button label	Abilita tutto
+Aborted	TaskLooper	Aborted task status message	Annullato
+URL	RepositoriesView	Column title	URL
+Enable	RepositoriesView	Button label	Abilita
+Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Errore nell'estrazione della configurazione del repository %name%.
+Description	TaskLooper	Failed task error description	Descrizione
+Failed	TaskLooper	Failed task status message	Fallito
+Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Buone notizie! Le attività legate al repository %name% sono state completate.
 Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Alcune attività sono ancora in corso. Arrestarle e uscire?
 This repository URL already exists.	RepositoriesView	Error message	Questo URL di repository esiste già.
-Disable	RepositoriesView	Button label	Disabilita
-Unknown	Constants	Unknown repository name	Sconosciuto
+Repositories	System name		Repository
+Changes pending:	RepositoriesView	Status view text	Cambiamenti in corso:
+Remove	RepositoriesView	Button label	Rimuovi
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	Rimuovere questi repository?
+Keep trying	TaskTimer	Button label	Continua a provare
+Cancel	Constants	Button label	Annulla
+Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Solo un URL per ogni repository può essere attivato. Per favore modifica le tue selezioni.
+Stop and quit	RepositoriesWindow	Button label	Ferma ed esci
+Disable all	RepositoriesView	Button label	Disabilita tutto

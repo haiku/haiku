@@ -1,15 +1,15 @@
 1	swedish	x-vnd.Haiku-Sounds	1784495232
-Sound file:	HWindow		Ljudfil:
 Sounds	System name		Ljud
+Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Ljud\nSkrivet av\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n Ursprungligen skrivet av Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
 No such file or directory	HEventList		Ingen sådan fil eller katalog
-OK	SoundsHApp		OK
-OK	HEventList		OK
 OK	HWindow		OK
+Other…	HWindow		Andra...
+OK	SoundsHApp		OK
+Sound file:	HWindow		Ljudfil:
 This is not an audio file.	HWindow		Detta är ingen ljudfil.
+<none>	HEventList		<ingen>
+OK	HEventList		OK
 About Sounds	SoundsHApp		Om Ljud
 Sound	HEventList		Ljud
 Event	HEventList		Händelse
-<none>	HEventList		<ingen>
-Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Ljud\nSkrivet av\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n Ursprungligen skrivet av Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
 <none>	HWindow		<ingen>
-Other…	HWindow		Andra...

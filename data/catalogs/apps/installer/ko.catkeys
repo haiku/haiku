@@ -1,60 +1,58 @@
-1	korean	x-vnd.Haiku-Installer	1271056548
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		당신은 설치를 중단하고 시스템을 다시 시작하겠습니까?
-Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tJérôme Duval 과 Stephan Aßmus 작성\n\tCopyright 2005-2010, Haiku.\n\n
-Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		설치가 완료됨.  부트 섹터는 '%s'에 기록되었습니다.  나가기를 눌려서 설치프로그램을 나가거나 새로운 설치 볼륨을 선택해서 다른 설치를 할 수 있습니다.
-Quit	InstallerApp		나가기
-Additional disk space required: 0.0 KiB	InstallerWindow		추가로 요구되는 디스크 용량 0.0 KiB
-Stop	InstallerWindow	In alert after pressing Stop	정지
-Install progress:  	InstallerWindow		설치 과정:  
-Starting Installation.	InstallProgress		설치 시작.
-Are you sure you want to abort the installation?	InstallerWindow		당산은 정말로 설치를 취소하기를 원합니까?
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		당신은 현재의 부팅 디스크에 설치하겠습니까? 만약 당신이 계속 진행한다면 설치프로그램은  컴퓨터를 재부팅하게 될 것입니다.
-Quit Boot Manager	InstallerWindow		부트 관리자 나가기
-Stop	InstallerWindow		정지
-OK	InstallerApp		확인
-Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		팝업 메뉴에서 원본 디스크와 대상 디스크를 선택하십시오. 그리고 \"시작\"을 클릭하십시오.
-Install from:	InstallerWindow		원본:
-%1ld of %2ld	InstallerWindow	number of files copied	%1ld 의 %2ld
-IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		HAIKU를 설치하기 전의 중요 정보!\n\n
-Continue	InstallerWindow	In alert after pressing Stop	계속
-Write boot sector to '%s'	InstallerWindow		부트 섹터는 '%s'에 기록됨
-Collecting copy information.	InstallProgress		복사 정보 모으는 중.
-Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		팝업 메뉴에서 원본 디스크를 선택하십시오. 그리고 \"시작\"을 클릭하십시오.
-Quit Boot Manager and DriveSetup	InstallerWindow		부트관리자와 드라이브 설정 나가기
-Quit	InstallerWindow		나가기
-Welcome to the Haiku Installer!\n\n	InstallerApp		Haiku 설치프로그램에 오신 것을 환영합니다!\n\n
-Boot sector successfully written.	InstallProgress		부트 섹터가 성공적으로 기록되었습니다.
+1	korean	x-vnd.Haiku-Installer	3391560835
 Performing installation.	InstallProgress		설치 작업중.
-scanning…	InstallerWindow		탐색중…
-Set up boot menu	InstallerWindow		부트 메뉴 설정
-Abort	InstallerWindow		취소
-Finishing Installation.	InstallProgress		설치 완료중.
-Restart	InstallerWindow		다시 시작
-README	InstallerApp		README
-The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		대상 디스크에는 충분한 공간이 없습니다. 다른 디스크를 선택하거나 설치 옵션 항목을 선택 해제하기 바랍니다.
-Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		설치 창을 닫기 전에 부트 관리자와 드라이브 설정 창을 닫아주십시오.
-Scanning for disks…	InstallerWindow		디스크 검색중…
-The disk can't be mounted. Please choose a different disk.	InstallProgress		이 디스크는 마운트 할 수 없습니다. 다른 디스크를 선택해 주십시오.
-?? of ??	InstallerWindow	Unknown progress	?? 의 ??
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		사용가능한 하드디스크와 다른 미디어의 \파티션을 만들기 위해 드라이브 설정 유틸리티를 시작합니다.\n파티션은 Haiku 부트 파티션에 필요한 \nBe 파일 시스템으로 \n초기화합니다.
-Show optional packages	InstallerWindow		선택적인 패키지 보기
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		설치에 적합한 어떤 파티션도 찾을 수 없습니다. 파티션을 준비해서 최소한 하나의 파티션을 Be 파일 시스템으로 초기화하십시오.
-Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		팝업 메뉴에서 설치할 디스크를 선택하십시오. 그리고 \"시작\"을 클릭하십시오
-Unknown Type	InstallProgress	Partition content type	알수 없는 형식
-<none>	InstallerWindow	No partition available	<없음>
-Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		설치가 완료되었습니다. 부트 섹터는 '%s'에 기록되었습니다. 다시 시작을 눌려서 컴퓨터를 다시 시작하거나 새 목적 볼륨을 선택해서 다른 설치작업을 할 수도 있습니다.
-Installation canceled.	InstallProgress		설치가 취소됨.
-Installer	System name		설치프로그램
-You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		당신은 이 디스크에 설치 할 수 없습니다. 다른 디스크를 선택하십시오.
-???	InstallerWindow	Unknown currently copied item	???
-Quit DriveSetup	InstallerWindow		드라이브설정 나가기
-Hide optional packages	InstallerWindow		선택적인 패키지 숨기기
+Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		팝업 메뉴에서 원본 디스크를 선택하십시오. 그리고 \"시작\"을 클릭하십시오.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		설치프로그램 창을 닫기 전에 드라이브설정 창을 닫기 바랍니다.
 Restart system	InstallerWindow		시스템 재시작
-OK	InstallerWindow		확인
-Set up partitions…	InstallerWindow		파티션 설정…
-The partition can't be mounted. Please choose a different partition.	InstallProgress		이 파티션을 마운트 할 수 없습니다.다른 파티션을 선탹해 주십시오.
+<none>	InstallerWindow	No partition available	<없음>
+Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		설치가 완료되었습니다. 부트 섹터는 '%s'에 기록되었습니다. 다시 시작을 눌려서 컴퓨터를 다시 시작하거나 새 목적 볼륨을 선택해서 다른 설치작업을 할 수도 있습니다.
+Installer	System name		설치프로그램
+Unknown Type	InstallProgress	Partition content type	알수 없는 형식
+Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		팝업 메뉴에서 설치할 디스크를 선택하십시오. 그리고 \"시작\"을 클릭하십시오
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		설치가 완료됨.  부트 섹터는 '%s'에 기록되었습니다.  나가기를 눌려서 설치프로그램을 나가거나 새로운 설치 볼륨을 선택해서 다른 설치를 할 수 있습니다.
+README	InstallerApp		README
+Quit	InstallerWindow		나가기
+Write boot sector to '%s'	InstallerWindow		부트 섹터는 '%s'에 기록됨
+Welcome to the Haiku Installer!\n\n	InstallerApp		Haiku 설치프로그램에 오신 것을 환영합니다!\n\n
+?? of ??	InstallerWindow	Unknown progress	?? 의 ??
+Quit Boot Manager	InstallerWindow		부트 관리자 나가기
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		부팅 관리자가 실행줌압니다...\n\n부팅 관리자를 닫고 설치를 계속 하십시오.
-OK	InstallProgress		확인
+Quit DriveSetup	InstallerWindow		드라이브설정 나가기
+%1ld of %2ld	InstallerWindow	number of files copied	%1ld 의 %2ld
+Install from:	InstallerWindow		원본:
+Additional disk space required: 0.0 KiB	InstallerWindow		추가로 요구되는 디스크 용량 0.0 KiB
+???	InstallerWindow	Unknown currently copied item	???
+Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		팝업 메뉴에서 원본 디스크와 대상 디스크를 선택하십시오. 그리고 \"시작\"을 클릭하십시오.
+Hide optional packages	InstallerWindow		선택적인 패키지 숨기기
 ???	InstallerWindow	Unknown partition name	???
+Quit	InstallerApp		나가기
+OK	InstallerWindow		확인
+Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		설치 창을 닫기 전에 부트 관리자와 드라이브 설정 창을 닫아주십시오.
+IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		HAIKU를 설치하기 전의 중요 정보!\n\n
+Stop	InstallerWindow	In alert after pressing Stop	정지
+Boot sector successfully written.	InstallProgress		부트 섹터가 성공적으로 기록되었습니다.
+Restart	InstallerWindow		다시 시작
+The disk can't be mounted. Please choose a different disk.	InstallProgress		이 디스크는 마운트 할 수 없습니다. 다른 디스크를 선택해 주십시오.
+Collecting copy information.	InstallProgress		복사 정보 모으는 중.
+Show optional packages	InstallerWindow		선택적인 패키지 보기
+The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		대상 디스크에는 충분한 공간이 없습니다. 다른 디스크를 선택하거나 설치 옵션 항목을 선택 해제하기 바랍니다.
+Installation canceled.	InstallProgress		설치가 취소됨.
+OK	InstallerApp		확인
+Are you sure you want to abort the installation?	InstallerWindow		당산은 정말로 설치를 취소하기를 원합니까?
+Stop	InstallerWindow		정지
+Continue	InstallerWindow	In alert after pressing Stop	계속
+No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		설치에 적합한 어떤 파티션도 찾을 수 없습니다. 파티션을 준비해서 최소한 하나의 파티션을 Be 파일 시스템으로 초기화하십시오.
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		사용가능한 하드디스크와 다른 미디어의 \파티션을 만들기 위해 드라이브 설정 유틸리티를 시작합니다.\n파티션은 Haiku 부트 파티션에 필요한 \nBe 파일 시스템으로 \n초기화합니다.
+Scanning for disks…	InstallerWindow		디스크 검색중…
+Abort	InstallerWindow		취소
+The partition can't be mounted. Please choose a different partition.	InstallProgress		이 파티션을 마운트 할 수 없습니다.다른 파티션을 선탹해 주십시오.
+Set up partitions…	InstallerWindow		파티션 설정…
+Install progress:  	InstallerWindow		설치 과정:  
+You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		당신은 이 디스크에 설치 할 수 없습니다. 다른 디스크를 선택하십시오.
+OK	InstallProgress		확인
+Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		당신은 현재의 부팅 디스크에 설치하겠습니까? 만약 당신이 계속 진행한다면 설치프로그램은  컴퓨터를 재부팅하게 될 것입니다.
+Quit Boot Manager and DriveSetup	InstallerWindow		부트관리자와 드라이브 설정 나가기
+Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tJérôme Duval 과 Stephan Aßmus 작성\n\tCopyright 2005-2010, Haiku.\n\n
+scanning…	InstallerWindow		탐색중…
+Set up boot menu	InstallerWindow		부트 메뉴 설정
 Continue	InstallerApp		계속
+Are you sure you want to abort the installation and restart the system?	InstallerWindow		당신은 설치를 중단하고 시스템을 다시 시작하겠습니까?

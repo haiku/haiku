@@ -1,88 +1,88 @@
 1	polish	x-vnd.Haiku-Bluetooth	3550394259
-Display	DeviceClass		Wyświetlacz
-Capturing	DeviceClass		Urządzenie przechwytujące
-Printer	DeviceClass		Drukarka
-Uncategorized	DeviceClass		Urządzenie nieskategoryzowane
-1-17% utilized	DeviceClass		1-17% wykorzystane
 Positioning	DeviceClass		Urządzenie pozycjonujące
-Rendering	DeviceClass		Urządzenie renderujące
-Phone	DeviceClass		Telefon
-17-33% utilized	DeviceClass		17-33% wykorzystane
-#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Not Valid name
-Combo keyboard/pointing device	DeviceClass		Klawiatura z urządzeniem wskazującym
 Controller	DeviceClass		Kontroler
-No service available	DeviceClass		Brak dostępnej usługi
-Wearable	DeviceClass	A wearable computer	Komputer przenośny
-Handheld	DeviceClass		Handheld
-Invalid device class!\n	DeviceClass		Niepoprawna klasa urządzenia!\n
-Sensing device	DeviceClass		Czujniki
-Computer	DeviceClass		Komputer
-Cellular	DeviceClass		Komórka
-Microphone	DeviceClass		Mikrofon
-Unknown (reserved) minor device class	DeviceClass		Nieznana (ukryta) klasa urządzenia
-Cordless	DeviceClass		Urządzenie bezprzewodowe
 Common ISDN access	DeviceClass		Urządzenie dostępowe ISDN
-83-99% utilized	DeviceClass		83-99% wykorzystane
-Scanner	DeviceClass		Skaner
-Game	DeviceClass		Gra
-Gamepad	DeviceClass		Gamepad
-(reserved)	DeviceClass		(ukryty)
-Desktop workstation	DeviceClass		Komputerowa stacja robocza
-Audio/Video	DeviceClass		Urządzenie audio/wideo
-Glasses	DeviceClass		Okulary cyfrowe
+Unknown (reserved) minor device class	DeviceClass		Nieznana (ukryta) klasa urządzenia
+Uncategorized	DeviceClass		Urządzenie nieskategoryzowane
 Keyboard	DeviceClass		Klawiatura
-Camera	DeviceClass		Aparat
-Major class: 	DeviceClass		Klasa główna: 
-50-67% utilized	DeviceClass		50-67% wykorzystane
-Card reader	DeviceClass		Czytnik kart
-Set-top box	DeviceClass		Dekoder STB
-Helmet	DeviceClass		Kask
-Laptop	DeviceClass		Laptop
-Car audio	DeviceClass		Samochodowy system audio
-SIM card reader	DeviceClass		Czytnik kart SIM
-Headphones	DeviceClass		Słuchawki
-Information	DeviceClass		Informacja
-Remote control	DeviceClass		Pilot
-Service classes: 	DeviceClass		Klasy usługi: 
-Pager	DeviceClass	A small radio device to receive short text messages	Pager
-Object transfer	DeviceClass		Urządzenie transferujące
-Gaming/Toy	DeviceClass		Zabawka
-Audio	DeviceClass		Urządzenie audio
-Robot	DeviceClass		Robot
-Camcorder	DeviceClass		Kamera wideo
-Digitizer tablet	DeviceClass		Tablet
-Loudspeaker	DeviceClass		Głośniki
-Joystick	DeviceClass		Joystick
-LAN access	DeviceClass		Urządzenie dostępowe LAN
-Wrist watch	DeviceClass		Zegarek na rękę
-Minor class: 	DeviceClass		Klasa drugorzędna: 
-Networking	DeviceClass		Urządzenie sieciowe
-Portable audio	DeviceClass		Przenośne urządzenie audio
-Device conforms to the headset profile	DeviceClass		Urządzenie dopasowuje się do profilu słuchawek headset
-Hands-free	DeviceClass		Urządzenie głośnomówiące
-#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Not Valid name
-Vehicle	DeviceClass		Pojazd
-Palm	DeviceClass	A palm-held device	Urządzenie typu Palm
-Video display and loudspeaker	DeviceClass		Wyświetlacz z głośnikami
-Peripheral	DeviceClass		Urządzenie peryferyjne
-#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Not Valid name
-Wired modem or voice gateway	DeviceClass		Modem kablowy lub bramka głosowa
-Jacket	DeviceClass		Osłona
-Unspecified	DeviceClass		Niesprecyzowany rodzaj urządzenia
-Fully available	DeviceClass		W pełni dostępne
-67-83% utilized	DeviceClass		67-83% wykorzystane
-Not implemented	RemoteDevice		Niezaimplementowane
-#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Not Valid name
-Server	DeviceClass		Serwer
-Video conferencing	DeviceClass		Urządzenie do prowadzenia wideokonferencji
-Video camera	DeviceClass		Kamera
-HiFi audio device	DeviceClass		Urządzenie audio HiFi
 Smart phone	DeviceClass		Telefon typu smartphone
-Telephony	DeviceClass		Urządzenie telefoniczne
-Doll/Action figure	DeviceClass		Lalka
 VCR	DeviceClass		Magnetowid
-Video monitor	DeviceClass		Monitor
-Pointing device	DeviceClass		Urządzenie wskazujące
-Miscellaneous	DeviceClass		Rozmaite
-33-50% utilized	DeviceClass		33-50% wykorzystane
+Cellular	DeviceClass		Komórka
+Audio	DeviceClass		Urządzenie audio
+Audio/Video	DeviceClass		Urządzenie audio/wideo
+Car audio	DeviceClass		Samochodowy system audio
+Major class: 	DeviceClass		Klasa główna: 
+HiFi audio device	DeviceClass		Urządzenie audio HiFi
+Microphone	DeviceClass		Mikrofon
+Capturing	DeviceClass		Urządzenie przechwytujące
+Jacket	DeviceClass		Osłona
+50-67% utilized	DeviceClass		50-67% wykorzystane
+Headphones	DeviceClass		Słuchawki
 Imaging	DeviceClass		Urządzenie przetwarzające obraz
+Device conforms to the headset profile	DeviceClass		Urządzenie dopasowuje się do profilu słuchawek headset
+Remote control	DeviceClass		Pilot
+Fully available	DeviceClass		W pełni dostępne
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Not Valid name
+Server	DeviceClass		Serwer
+No service available	DeviceClass		Brak dostępnej usługi
+Printer	DeviceClass		Drukarka
+Card reader	DeviceClass		Czytnik kart
+Wired modem or voice gateway	DeviceClass		Modem kablowy lub bramka głosowa
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Not Valid name
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Not Valid name
+Camcorder	DeviceClass		Kamera wideo
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Not Valid name
+17-33% utilized	DeviceClass		17-33% wykorzystane
+Desktop workstation	DeviceClass		Komputerowa stacja robocza
+Unspecified	DeviceClass		Niesprecyzowany rodzaj urządzenia
+Miscellaneous	DeviceClass		Rozmaite
+Robot	DeviceClass		Robot
+Vehicle	DeviceClass		Pojazd
+LAN access	DeviceClass		Urządzenie dostępowe LAN
+Glasses	DeviceClass		Okulary cyfrowe
+Phone	DeviceClass		Telefon
+Laptop	DeviceClass		Laptop
+67-83% utilized	DeviceClass		67-83% wykorzystane
+Cordless	DeviceClass		Urządzenie bezprzewodowe
+Invalid device class!\n	DeviceClass		Niepoprawna klasa urządzenia!\n
+Minor class: 	DeviceClass		Klasa drugorzędna: 
+Doll/Action figure	DeviceClass		Lalka
+Not implemented	RemoteDevice		Niezaimplementowane
+33-50% utilized	DeviceClass		33-50% wykorzystane
+Gaming/Toy	DeviceClass		Zabawka
+Video camera	DeviceClass		Kamera
+Handheld	DeviceClass		Handheld
+Service classes: 	DeviceClass		Klasy usługi: 
+Loudspeaker	DeviceClass		Głośniki
+83-99% utilized	DeviceClass		83-99% wykorzystane
+SIM card reader	DeviceClass		Czytnik kart SIM
+Computer	DeviceClass		Komputer
+Scanner	DeviceClass		Skaner
+Wearable	DeviceClass	A wearable computer	Komputer przenośny
+Display	DeviceClass		Wyświetlacz
+Gamepad	DeviceClass		Gamepad
+Video monitor	DeviceClass		Monitor
+Palm	DeviceClass	A palm-held device	Urządzenie typu Palm
+Joystick	DeviceClass		Joystick
+Networking	DeviceClass		Urządzenie sieciowe
+Telephony	DeviceClass		Urządzenie telefoniczne
+Game	DeviceClass		Gra
+Video display and loudspeaker	DeviceClass		Wyświetlacz z głośnikami
+Wrist watch	DeviceClass		Zegarek na rękę
+Sensing device	DeviceClass		Czujniki
+Pointing device	DeviceClass		Urządzenie wskazujące
+(reserved)	DeviceClass		(ukryty)
+Rendering	DeviceClass		Urządzenie renderujące
+Information	DeviceClass		Informacja
+Helmet	DeviceClass		Kask
+Pager	DeviceClass	A small radio device to receive short text messages	Pager
+Hands-free	DeviceClass		Urządzenie głośnomówiące
+Digitizer tablet	DeviceClass		Tablet
+Portable audio	DeviceClass		Przenośne urządzenie audio
+Camera	DeviceClass		Aparat
+1-17% utilized	DeviceClass		1-17% wykorzystane
+Combo keyboard/pointing device	DeviceClass		Klawiatura z urządzeniem wskazującym
+Video conferencing	DeviceClass		Urządzenie do prowadzenia wideokonferencji
+Peripheral	DeviceClass		Urządzenie peryferyjne
+Object transfer	DeviceClass		Urządzenie transferujące
+Set-top box	DeviceClass		Dekoder STB

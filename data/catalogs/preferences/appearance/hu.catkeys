@@ -1,74 +1,73 @@
-1	hungarian	x-vnd.Haiku-Appearance	2499598353
-Plain font:	Font view		Alap betűtípus:
-Control highlight	Colors tab		Kiválasztott vezérlőelem
+1	hungarian	x-vnd.Haiku-Appearance	583615507
 Control border	Colors tab		Vezérlőelem kerete
-Antialiasing type:	AntialiasingSettingsView		Élsimítás módja:
-Shadow	Colors tab		Árnyék
-On	AntialiasingSettingsView		Be
-Defaults	APRWindow		Eredeti
-Link hover	Colors tab		Kijelölt hivatkozás
-Grayscale	AntialiasingSettingsView		Szürkeárnyalat
-Shine	Colors tab		Ragyogás színe
-About	DecorSettingsView		Névjegy
-About decorator	DecorSettingsView		Dekoráció névjegye
+Control mark	Colors tab		Vezérlőelem jelölése
 Off	AntialiasingSettingsView		Ki
-Link text	Colors tab		Hivatkozás szövege
-Link active	Colors tab		Aktív hivatkozás
-Choose Decorator	DecorSettingsView		Dekoráció kiválasztása
+Window border	Colors tab		Ablakkeret
+Inactive window tab	Colors tab		Inaktív ablak füle
+Defaults	APRWindow		Eredeti
+Shadow	Colors tab		Árnyék
+Document background	Colors tab		Dokumentum háttere
+List background	Colors tab		Lista háttere
+Fixed font:	Font view		Rögzített szélességű betűtípus:
+Appearance	System name		Megjelenés
+Reduce colored edges filter strength:	AntialiasingSettingsView		A színezett betűszélek szűrőjének erősségi szintje:
+Glyph hinting:	AntialiasingSettingsView		Betűképek körvonala:
+Menu item text	Colors tab		Menüelem-szöveg
+About decorator	DecorSettingsView		Dekoráció névjegye
+Antialiasing menu	AntialiasingSettingsView		Élsimítási menü
 Success	Colors tab		Sikerült
-Inactive window tab text	Colors tab		Inaktív ablak címszövege
+About	DecorSettingsView		Névjegy
+Shine	Colors tab		Ragyogás színe
+Arrow style	DecorSettingsView		Nyíl stílusa
+On	AntialiasingSettingsView		Be
+Decorator:	DecorSettingsView		Dekoráció:
+Menu background	Colors tab		Menü háttere
+Revert	APRWindow		Visszaállít
+List item text	Colors tab		Listaelem
+OK	DecorSettingsView		Rendben
+Control text	Colors tab		Vezérlőelem szövege
+Look and feel	APRWindow		Arculat
+Selected menu item background	Colors tab		Kiválasztott menüelem háttere
+Link active	Colors tab		Aktív hivatkozás
+Antialiasing	APRWindow		Élsimítás
+Menu font:	Font view		Menü betűtípusa:
+Bold font:	Font view		Félkövér betű:
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nKészítette:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n
+Choose Decorator	DecorSettingsView		Dekoráció kiválasztása
+Strong	AntialiasingSettingsView		Erős
 Failure	Colors tab		Nem sikerült
+Double:	DecorSettingsView		Dupla:
+Selected menu item text	Colors tab		Kiválasztott menüelem
+Size:	Font Selection view		Méret:
+Panel background	Colors tab		Panel háttere
+Plain font:	Font view		Alap betűtípus:
+Window tab text	Colors tab		Ablakfül szövege
+Navigation pulse	Colors tab		Navigációs pulzálás
+LCD subpixel	AntialiasingSettingsView		LCD-szubpixel
+Window tab	Colors tab		Ablakfül
+Link text	Colors tab		Hivatkozás szövege
+Tooltip background	Colors tab		Eszköztár háttere
+Scroll bar thumb	Colors tab		Görgetősáv megjelenése
+Link visited	Colors tab		Meglátogatott hivatkozás
+Selected menu item border	Colors tab		Kiválasztott menüelem szegélye
+Tooltip text	Colors tab		Buboréksúgó szövege
+Control background	Colors tab		Kiválasztás háttere
+Selected list item text	Colors tab		Kiválasztott listaelem
+Selected list item background	Colors tab		Kiválasztott listaelem háttere
+Inactive window tab text	Colors tab		Inaktív ablak címszövege
+Navigation base	Colors tab		Navigációs alapszín
+Fonts	APRWindow		Betűtípusok
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Árvíztűrő tükörfúrógép.
+Grayscale	AntialiasingSettingsView		Szürkeárnyalat
+Antialiasing type:	AntialiasingSettingsView		Élsimítás módja:
+Panel text	Colors tab		Panel szövege
 Hinting menu	AntialiasingSettingsView		Körvonalmenü
 Scroll bar:	DecorSettingsView		Görgetősáv:
-Document background	Colors tab		Dokumentum háttere
-Status bar	Colors tab		Állapotsor
-Revert	APRWindow		Visszaállít
-Window tab	Colors tab		Ablakfül
-Tooltip background	Colors tab		Eszköztár háttere
-Selected menu item background	Colors tab		Kiválasztott menüelem háttere
-Antialiasing	APRWindow		Élsimítás
-Navigation base	Colors tab		Navigációs alapszín
-Selected list item text	Colors tab		Kiválasztott listaelem
-Window border	Colors tab		Ablakkeret
-Double:	DecorSettingsView		Dupla:
-Window tab text	Colors tab		Ablakfül szövege
-Document text	Colors tab		Dokumentumszöveg
-Navigation pulse	Colors tab		Navigációs pulzálás
-Selected menu item text	Colors tab		Kiválasztott menüelem
-Menu background	Colors tab		Menü háttere
-List background	Colors tab		Lista háttere
-OK	DecorSettingsView		Rendben
-Control mark	Colors tab		Vezérlőelem jelölése
-Size:	Font Selection view		Méret:
-Link visited	Colors tab		Meglátogatott hivatkozás
-Decorator:	DecorSettingsView		Dekoráció:
-Selected list item background	Colors tab		Kiválasztott listaelem háttere
-Panel background	Colors tab		Panel háttere
-Menu font:	Font view		Menü betűtípusa:
-Colors	APRWindow		Színek
-Control background	Colors tab		Kiválasztás háttere
-Inactive window tab	Colors tab		Inaktív ablak füle
-List item text	Colors tab		Listaelem
-Appearance	System name		Megjelenés
-Fixed font:	Font view		Rögzített szélességű betűtípus:
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Árvíztűrő tükörfúrógép.
-%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nKészítette:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n
-Reduce colored edges filter strength:	AntialiasingSettingsView		A színezett betűszélek szűrőjének erősségi szintje:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		A betűkép-körvonalasítással összevont szubpixel-alapú élsimítás nem használható a Haiku ezen kiadásában, mivel lehetséges szabadalmi viták forrása lehet. E funckió használatához magának kell megépítenie saját Haiku-rendszerét és beállítania bizonyos opciókat a libfreetype konfigurációs fejlécében.
-Scroll bar thumb	Colors tab		Görgetősáv megjelenése
-Control text	Colors tab		Vezérlőelem szövege
-Single:	DecorSettingsView		Egyszeres:
-Tooltip text	Colors tab		Buboréksúgó szövege
-Bold font:	Font view		Félkövér betű:
-Inactive window border	Colors tab		Inaktív ablakkeret
-Menu item text	Colors tab		Menüelem-szöveg
-LCD subpixel	AntialiasingSettingsView		LCD-szubpixel
-Selected menu item border	Colors tab		Kiválasztott menüelem szegélye
-Strong	AntialiasingSettingsView		Erős
-Panel text	Colors tab		Panel szövege
-Arrow style	DecorSettingsView		Nyíl stílusa
 Monospaced fonts only	AntialiasingSettingsView		Csak rögzített szélességű betűtípusok
-Look and feel	APRWindow		Arculat
-Antialiasing menu	AntialiasingSettingsView		Élsimítási menü
-Fonts	APRWindow		Betűtípusok
-Glyph hinting:	AntialiasingSettingsView		Betűképek körvonala:
+Document text	Colors tab		Dokumentumszöveg
+Inactive window border	Colors tab		Inaktív ablakkeret
+Colors	APRWindow		Színek
+Control highlight	Colors tab		Kiválasztott vezérlőelem
+Status bar	Colors tab		Állapotsor
+Link hover	Colors tab		Kijelölt hivatkozás
+Single:	DecorSettingsView		Egyszeres:

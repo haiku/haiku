@@ -1,35 +1,35 @@
 1	swedish	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		Hämta ögonblicksbild
-Could not set Sudoku:\n%s\n	SudokuWindow		Kunde inte ställa in Sudoku:\n%s\n
-Export as…	SudokuWindow		Exportera som...
-OK	SudokuWindow		OK
-New	SudokuWindow		Ny
-Abort	ProgressWindow		Avbryt
-Sudoku	System name		Sudoku
-Could not open \"%s\":\n%s\n	SudokuWindow		Kunde inte öppna \"%s\":\n%s\n
-Easy	SudokuWindow		Lätt
-Open file…	SudokuWindow		Öppna fil...
-Solve single field	SudokuWindow		Lös ett fält
-Solve	SudokuWindow		Lös
-Redo	SudokuWindow		Gör om
 File	SudokuWindow		Arkiv
-Advanced	SudokuWindow		Avancerat
-Start again	SudokuWindow		Starta igen
-HTML	SudokuWindow		HTML
-Sudoku request	SudokuWindow		Sudoku undrar
-Copy	SudokuWindow		Kopiera
-Mark valid hints	SudokuWindow		Markera korrekta minnesmarkeringar
-Sudoku solved - congratulations!\n	SudokuWindow		Sudoku löst - grattis!\n
+Mark invalid values	SudokuWindow		Markera felaktiga värden
+Solve single field	SudokuWindow		Lös ett fält
 Hard	SudokuWindow		Svår
-Snapshot current	SudokuWindow		Ta ögonblicksbild
+Start again	SudokuWindow		Starta igen
+New	SudokuWindow		Ny
+Easy	SudokuWindow		Lätt
+Undo	SudokuWindow		Ångra
+Export as…	SudokuWindow		Exportera som...
+Quit	SudokuWindow		Avsluta
+Redo	SudokuWindow		Gör om
+Could not open \"%s\":\n%s\n	SudokuWindow		Kunde inte öppna \"%s\":\n%s\n
+Blank	SudokuWindow		Tom
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku löst - grattis!\n
 Text	SudokuWindow		Text
+Copy	SudokuWindow		Kopiera
+Solve	SudokuWindow		Lös
+HTML	SudokuWindow		HTML
+Advanced	SudokuWindow		Avancerat
+Set all hints	SudokuWindow		Sätt alla ledrådar
+Searching for removable values	SudokuGenerator		Letar efter värden som kan tas bort
+Abort	ProgressWindow		Avbryt
+Could not set Sudoku:\n%s\n	SudokuWindow		Kunde inte ställa in Sudoku:\n%s\n
+Help	SudokuWindow		Hjälp
+OK	SudokuWindow		OK
+Sudoku	System name		Sudoku
+Progress monitor	ProgressWindow		Förloppsindikator
 Creating solvable field	SudokuGenerator		Skapar lösbart fält
 View	SudokuWindow		Visa
-Progress monitor	ProgressWindow		Förloppsindikator
-Set all hints	SudokuWindow		Sätt alla ledrådar
-Mark invalid values	SudokuWindow		Markera felaktiga värden
-Blank	SudokuWindow		Tom
-Help	SudokuWindow		Hjälp
-Searching for removable values	SudokuGenerator		Letar efter värden som kan tas bort
-Undo	SudokuWindow		Ångra
-Quit	SudokuWindow		Avsluta
+Snapshot current	SudokuWindow		Ta ögonblicksbild
+Mark valid hints	SudokuWindow		Markera korrekta minnesmarkeringar
+Sudoku request	SudokuWindow		Sudoku undrar
+Open file…	SudokuWindow		Öppna fil...

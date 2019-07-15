@@ -1,20 +1,20 @@
 1	english	x-vnd.Haiku-MidiPlayer	1046133011
-None	Main Window		无
-Live input:	Main Window		保持输入：
-Stop	Main Window		停止
 This tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	这个小程序\n能够播放成千的\n美妙动听歌曲
-Cavern	Main Window		洞穴
-Volume:	Main Window		声音：
-Reverb:	Main Window		混音：
-OK	Main Window		确定
-Loading instruments…	Scope View		加载设备…
-Off	Main Window		关闭
 Dungeon	Main Window		古墓
-Play	Main Window		播放
-Garage	Main Window		车库
-Closet	Main Window		密室
-MidiPlayer	System name		Midi播放器
-Drop MIDI file here	Scope View		把 MIDI 文件放在此处
-Igor's lab	Main Window		伊戈尔的实验室
-Scope	Main Window		显示范围
 Could not load song	Main Window		无法载入音乐文件
+Igor's lab	Main Window		伊戈尔的实验室
+Off	Main Window		关闭
+Loading instruments…	Scope View		加载设备…
+Volume:	Main Window		声音：
+Closet	Main Window		密室
+Scope	Main Window		显示范围
+Drop MIDI file here	Scope View		把 MIDI 文件放在此处
+None	Main Window		无
+Reverb:	Main Window		混音：
+MidiPlayer	System name		Midi播放器
+OK	Main Window		确定
+Stop	Main Window		停止
+Live input:	Main Window		保持输入：
+Garage	Main Window		车库
+Play	Main Window		播放
+Cavern	Main Window		洞穴

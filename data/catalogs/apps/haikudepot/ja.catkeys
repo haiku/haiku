@@ -1,150 +1,130 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	3764618272
-Name	PackageListView		名前
-Available packages	MainWindow		使用可能なパッケージ
-Open %DeskbarLink%	PackageManager		%DeskbarLink% を開く
-OK	MainWindow		OK
-Close	RatePackageWindow		閉じる
-The captcha puzzle needs to be solved.	UserLoginWindow		Captcha パズルを解く必要があります。
-Changelog	PackageInfoView		変更履歴
-Your rating:	RatePackageWindow		評価:
-The passwords do not match.	UserLoginWindow		パスワードが一致しません。
-Log in…	MainWindow		ログイン…
-Rate %Package%	RatePackageWindow		%Package% を評価
-Stability:	RatePackageWindow		安定度:
-Click a package to view information	PackageInfoView		パッケージをクリックして情報を見る
-Other users can see this rating	RatePackageWindow		ほかのユーザーがこの評価を見ることができます
-Stability	RatePackageWindow		安定度
-No changelog available.	PackageInfoView		変更記録はありません。
-Description	PackageListView		説明
-Install	PackageManager		インストール
-All repositories	MainWindow		すべてのリポジトリ
-Source packages	MainWindow		ソースパッケージ
-Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		認証に失敗しました。ユーザーが存在しないか、不正なパスワードが入力されました。
-Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		アカウントが正常に作成されました。これからパッケージの評価やほかの便利なことができます。
-Tools	MainWindow		ツール
-HaikuDepot	System name		HaikuDepot
-Close	UserLoginWindow		閉じる
-Rate package…	PackageInfoView		パッケージを評価…
-Category	FilterView		分類
-Uninstall	PackageManager		アンインストール
-An error occurred while obtaining the package list: %message%	MainWindow		次のパッケージリストの取得中にエラーが発生しました: %message%
-<no info>	PackageInfoView		<情報無し>
-Starting the package daemon failed:\n\n%Error%	App		パッケージデーモンの起動に失敗しました:\n\n%Error%
-An error occurred while initializing the package manager: %message%	MainWindow		パッケージマネジャーの初期化中にエラーが発生しました: %message%
-Email address:	UserLoginWindow		メールアドレス:
-Very unstable	RatePackageWindow		非常に不安定
-<Package contents not available for remote packages>	PackageContentsView		<リモートパッケージには利用できません>
-The username is already taken. Please choose another.	UserLoginWindow		ユーザー名はすでに使われています。他の名前を選んでください。
-Close	PackageManager		閉じる
-Not logged in	MainWindow		ログインしていません
-The authentication was successful.	UserLoginWindow		認証に成功しました。
-Installed packages	MainWindow		インストール済みパッケージ
-Status	PackageListView		状態
-Switch account…	MainWindow		アカウントの切り替え…
-Ignore	UserLoginWindow		無視
-Your rating was updated.	RatePackageWindow		評価が更新されました。
-Language	UserLoginWindow		言語
-The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		パスワードが弱すぎるか不正です。8 文字以上で、数字が 2 文字以上、大文字が 2 文字以上のパスワードを使用してください。
-Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		評価が正常に更新されました。HaikuDepot Server のウェブサイトで評価を更新または削除できます。
-Show only featured packages	FilterView		おすすめパッケージのみ表示
-Rate package	RatePackageWindow		パッケージを評価
-Development	Model		開発
-Fatal error	PackageManager		致命的なエラー
-The user name needs to be at least 3 letters long.	UserLoginWindow		ユーザー名は少なくとも 3 文字は必要です。
-Log in	UserLoginWindow		ログイン
-Repeat pass phrase:	UserLoginWindow		パスフレーズの再入力:
-Ratings	PackageInfoView		評価
-But none could be listed here, sorry.	UserLoginWindow		すみません。しかし、ここにはなにもリストされていません。
-System & Utilities	Model		システム & ユーティリティ
-Inactive	PackageListView		無効
-The package action could not be scheduled: %Error%	PackageInfoView		パッケージアクションを予約できませんでした: %Error%
-Science & Mathematics	Model		科学 & 数学
-(%Votes%)	PackageInfoView		(%Votes%)
-You have not solved the captcha puzzle correctly.	UserLoginWindow		Captcha パズルを正しく解いていません。
-Success	UserLoginWindow		成功
-HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot はパッケージデーモンが動作することを必要とします。 そしてそれは動作していないようです。\n今起動しますか?
-Downloading:	PackageInfoView		ダウンロード中:
-Mostly stable	RatePackageWindow		ほとんど安定
-Log out	MainWindow		ログアウト
-Repository	PackageListView		リポジトリ
-Education	Model		教育
-This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		このパッケージは HaikuDepot Server 上には無いようです。従って新規の評価の作成や既存の評価の更新はできません。
-Search terms:	FilterView		検索:
-%Version%	PackageInfoView		%Version%
-No user ratings available.	PackageInfoView		ユーザー評価はありません。
-Does not start	RatePackageWindow		開始しない
-An error occurred while refreshing the repository: %error% (%details%)	MainWindow		リポジトリの更新中にエラーが発生しました: %error% (%details%)
-There are problems in the form:\n\n	UserLoginWindow		次のフォームに問題があります:\n\n
-Create account	UserLoginWindow		アカウントの作成
-Productivity	Model		ビジネス
-No, quit HaikuDepot	App		いいえ、HaikuDepot を終了します
-Authentication failed	UserLoginWindow		認証に失敗しました
-Logged in as %User%	MainWindow		%User% としてログイン
-9999.99 KiB	PackageListView		9999.99 KiB
-Language	RatePackageWindow		言語
-User rating	RatePackageWindow		ユーザーによる評価
-Size	PackageListView		サイズ
-You need to be logged into an account before you can rate packages.	MainWindow		パッケージを評価する前にアカウントにログインする必要があります。
-User name:	UserLoginWindow		ユーザー名:
-Unstable but usable	RatePackageWindow		不安定であるが有用
-The email address appears to be malformed.	UserLoginWindow		メールアドレスが不正なようです。
-Games	Model		ゲーム
-Rating	PackageListView		評価
-(%Votes%)	FeaturedPackagesView		(%Votes%)
-There was a puzzling response from the web service.	UserLoginWindow		ウェブサービスから不可解なレスポンスがあった。
-Graphics	Model		グラフィック
-Local	MainWindow		ローカル
-Close	MainWindow		閉じる
-Preferred language:	UserLoginWindow		優先言語:
-Internet & Network	Model		インターネット & ネットワーク
-Refresh repositories	MainWindow		リポジトリの更新
-Cancel	MainWindow		キャンセル
-Quit HaikuDepot	App		HaikuDepot を終了
-Input validation	UserLoginWindow		入力検証
-Update	RatePackageWindow		更新
-Video	Model		ビデオ
-All categories	FilterView		すべての分類
-Contents	PackageInfoView		内容
-An error occurred while refreshing the repository: %error%	MainWindow		リポジトリの更新中にエラーが発生しました: %error%
-Try again	App		再試行
-Login or Create account	MainWindow		ログインまたはアカウントの作成
-Pending…	PackageListView		保留中…
-{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# アイテム} other{# アイテム}}
-OK	PackageInfoView		OK
-Package daemon problem	App		パッケージデーモンの問題
-Uninstalled	PackageListView		アンインストール済み
-Show	MainWindow		表示
-Stable	RatePackageWindow		安定
-Unknown	PackageListView		不明
-Comment language:	RatePackageWindow		コメント言語:
-Pass phrase:	UserLoginWindow		パスフレーズ:
-Screenshot	ScreenshotWindow		スクリーンショット
-Not specified	RatePackageWindow		指定なし
-Available	PackageListView		利用可能
-Develop packages	MainWindow		開発用パッケージ
-%hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (バージョン %hd.version%)
-n/a	PackageInfoView		利用不可
-If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		メールアドレスを入力しない場合、パスワードを忘れた時にリセットできないでしょう。
- It responded with: 	UserLoginWindow		 次に反応する: 
-Authentication failed. Connection to the service failed.	UserLoginWindow		認証が失敗しました。サービスへの接続が失敗しました。
-Cancel	RatePackageWindow		キャンセル
-Package action failed	PackageInfoView		パッケージアクションに失敗しました
-OK	UserLoginWindow		OK
-Send	RatePackageWindow		送信する
-Repositories	MainWindow		リポジトリ
--	no package size		-
-Category:	FilterView		分類:
-Failed to create account	UserLoginWindow		アカウントの作成に失敗しました
+1	japanese	x-vnd.Haiku-HaikuDepot	2728680786
 Check for updates…	MainWindow		更新をチェック…
+Uninstall	PackageManager		アンインストール
+(%Votes%)	FeaturedPackagesView		(%Votes%)
+Uninstalled	PackageListView		アンインストール済み
+Available packages	MainWindow		使用可能なパッケージ
+Create account	UserLoginWindow		アカウントの作成
+Mostly stable	RatePackageWindow		ほとんど安定
+Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		アカウントが正常に作成されました。これからパッケージの評価やほかの便利なことができます。
+Rate package…	PackageInfoView		パッケージを評価…
+Develop packages	MainWindow		開発用パッケージ
+Starting the package daemon failed:\n\n%Error%	App		パッケージデーモンの起動に失敗しました:\n\n%Error%
+<no info>	PackageInfoView		<情報無し>
+No user ratings available.	PackageInfoView		ユーザー評価はありません。
+The user name needs to be at least 3 letters long.	UserLoginWindow		ユーザー名は少なくとも 3 文字は必要です。
+Failed to create account	UserLoginWindow		アカウントの作成に失敗しました
+Ignore	UserLoginWindow		無視
+Rating	PackageListView		評価
+Show	MainWindow		表示
+Does not start	RatePackageWindow		起動しない
+But none could be listed here, sorry.	UserLoginWindow		すみません。しかし、ここにはなにもリストされていません。
 There are problems with the data you entered:\n\n	UserLoginWindow		入力したデーターに問題があります:\n\n
-Start package daemon	App		パッケージデーモンを起動
-Manage repositories…	MainWindow		リポジトリの管理…
-Business	Model		ビジネス
-Audio	Model		オーディオ
+The authentication was successful.	UserLoginWindow		認証に成功しました。
+Not specified	RatePackageWindow		指定なし
+Unstable but usable	RatePackageWindow		不安定であるが使用できる
+Active	PackageListView		有効
+Login or Create account	MainWindow		ログインまたはアカウントの作成
+<Package contents not available for remote packages>	PackageContentsView		<リモートパッケージには利用できません>
+Ratings	PackageInfoView		評価
+Switch account…	MainWindow		アカウントの切り替え…
+Preferred language:	UserLoginWindow		優先言語:
+It was not possible to contact the web service.	UserLoginWindow		ウェブサービスにコンタクトできませんでした。
+Name	PackageListView		名前
+Rate %Package%	RatePackageWindow		%Package% を評価
+Quit HaikuDepot	App		HaikuDepot を終了
+Category	FilterView		分類
+Installed packages	MainWindow		インストール済みパッケージ
+User rating	RatePackageWindow		ユーザーによる評価
+Other users can see this rating	RatePackageWindow		ほかのユーザーがこの評価を見ることができます
+Stable	RatePackageWindow		安定
+Fatal error	PackageManager		致命的なエラー
+Package action failed	PackageInfoView		パッケージアクションに失敗しました
+No changelog available.	PackageInfoView		変更記録はありません。
+There are problems in the form:\n\n	UserLoginWindow		次のフォームに問題があります:\n\n
+There was a puzzling response from the web service.	UserLoginWindow		ウェブサービスから不可解なレスポンスがあった。
+Not logged in	MainWindow		ログインしていません
+No, quit HaikuDepot	App		いいえ、HaikuDepot を終了します
+Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		評価が正常に更新されました。HaikuDepot Server のウェブサイトで評価を更新または削除できます。
+Available	PackageListView		利用可能
+Cancel	UserLoginWindow		キャンセル
+HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot はパッケージデーモンが動作することを必要とします。 そしてそれは動作していないようです。\n今起動しますか?
+Click a package to view information	PackageInfoView		パッケージをクリックして情報を見る
+Contents	PackageInfoView		内容
+Close	PackageManager		閉じる
+Changelog	PackageInfoView		変更履歴
 Rating not possible	MainWindow		評価不能
 About	PackageInfoView		パッケージについて
-Active	PackageListView		有効
-It was not possible to contact the web service.	UserLoginWindow		ウェブサービスにコンタクトできませんでした。
-Refreshing...	MainWindow		更新中...
+Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		認証に失敗しました。ユーザーが存在しないか、不正なパスワードが入力されました。
+Very unstable	RatePackageWindow		非常に不安定
+Stability	RatePackageWindow		安定度
+Send	RatePackageWindow		送信する
+Start package daemon	App		パッケージデーモンを起動
+The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		パスワードが弱すぎるか不正です。8 文字以上で、数字が 2 文字以上、大文字が 2 文字以上のパスワードを使用してください。
+The package action could not be scheduled: %Error%	PackageInfoView		パッケージアクションを予約できませんでした: %Error%
+Inactive	PackageListView		無効
+Cancel	RatePackageWindow		キャンセル
+OK	MainWindow		OK
+{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# アイテム} other{# アイテム}}
+OK	PackageInfoView		OK
+Downloading:	PackageInfoView		ダウンロード中:
+Success	UserLoginWindow		成功
+Package daemon problem	App		パッケージデーモンの問題
+(%Votes%)	PackageInfoView		(%Votes%)
+Repository	PackageListView		リポジトリ
+%hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (バージョン %hd.version%)
+Close	UserLoginWindow		閉じる
+Close	RatePackageWindow		閉じる
 Failed to create account: %s\n	UserLoginWindow		次のアカウントの作成に失敗しました: %s\n
-Cancel	UserLoginWindow		キャンセル
+Size	PackageListView		サイズ
+Your rating:	RatePackageWindow		評価:
+All categories	FilterView		すべての分類
+Your rating was updated.	RatePackageWindow		評価が更新されました。
+n/a	PackageInfoView		利用不可
+Repositories	MainWindow		リポジトリ
+Cancel	MainWindow		キャンセル
+Refresh repositories	MainWindow		リポジトリの更新
+If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		メールアドレスを入力しない場合、パスワードを忘れた時にリセットできないでしょう。
+Tools	MainWindow		ツール
+The passwords do not match.	UserLoginWindow		パスワードが一致しません。
+This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		このパッケージは HaikuDepot Server 上には無いようです。従って新規の評価の作成や既存の評価の更新はできません。
+Language	RatePackageWindow		言語
+Authentication failed. Connection to the service failed.	UserLoginWindow		認証が失敗しました。サービスへの接続が失敗しました。
+Log out	MainWindow		ログアウト
+Comment language:	RatePackageWindow		コメント言語:
+Status	PackageListView		状態
+The username is already taken. Please choose another.	UserLoginWindow		ユーザー名はすでに使われています。他の名前を選んでください。
+Update	RatePackageWindow		更新
+Language	UserLoginWindow		言語
+OK	UserLoginWindow		OK
+Stability:	RatePackageWindow		安定度:
+The captcha puzzle needs to be solved.	UserLoginWindow		Captcha パズルを解く必要があります。
+Source packages	MainWindow		ソースパッケージ
+-	no package size		-
+User name:	UserLoginWindow		ユーザー名:
+Try again	App		再試行
+Rate package	RatePackageWindow		パッケージを評価
+The email address appears to be malformed.	UserLoginWindow		メールアドレスが不正なようです。
+You have not solved the captcha puzzle correctly.	UserLoginWindow		Captcha パズルを正しく解いていません。
+Unknown	PackageListView		不明
+Log in	UserLoginWindow		ログイン
+Logged in as %User%	MainWindow		%User% としてログイン
+Email address:	UserLoginWindow		メールアドレス:
+Screenshot	ScreenshotWindow		スクリーンショット
+HaikuDepot	System name		HaikuDepot
+Search terms:	FilterView		検索:
+Pending…	PackageListView		保留中…
+Repeat pass phrase:	UserLoginWindow		パスフレーズの再入力:
+Category:	FilterView		分類:
+Authentication failed	UserLoginWindow		認証に失敗しました
+Manage repositories…	MainWindow		リポジトリの管理…
+Description	PackageListView		説明
+Pass phrase:	UserLoginWindow		パスフレーズ:
+Open %DeskbarLink%	PackageManager		%DeskbarLink% を開く
+Install	PackageManager		インストール
+Input validation	UserLoginWindow		入力検証
+Log in…	MainWindow		ログイン…
+You need to be logged into an account before you can rate packages.	MainWindow		パッケージを評価する前にアカウントにログインする必要があります。
+9999.99 KiB	PackageListView		9999.99 KiB
+All repositories	MainWindow		すべてのリポジトリ
+%Version%	PackageInfoView		%Version%

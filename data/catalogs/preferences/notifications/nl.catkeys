@@ -1,13 +1,13 @@
 1	dutch; flemish	x-vnd.Haiku-Notifications	213548865
-Revert	PrefletWin		Herstellen
-Enable notifications	GeneralView		Aankondigingen aanzetten
 Window width:	GeneralView		Vensterbreedte:
 OK	PrefletWin		Oké
-OK	NotificationView		Oké
 Notifications	PrefletWin		Aankondigingen
-General	PrefletView		Algemeen
-Allowed	NotificationView		Toegestaan
-Notifications	System name		Aankondigingen
+Revert	PrefletWin		Herstellen
 Applications	PrefletView		Toepassingen
-Application	NotificationView		Toepassing
 Applications	NotificationView		Toepassingen
+General	PrefletView		Algemeen
+OK	NotificationView		Oké
+Notifications	System name		Aankondigingen
+Allowed	NotificationView		Toegestaan
+Application	NotificationView		Toepassing
+Enable notifications	GeneralView		Aankondigingen aanzetten

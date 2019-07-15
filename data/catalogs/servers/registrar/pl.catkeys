@@ -1,23 +1,23 @@
 1	polish	x-vnd.haiku-registrar	2599857937
-Restart system	ShutdownProcess		Uruchom system ponownie
-The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Aplikacja „%appName%” może być zablokowana na modalnym panelu.
-OK	ShutdownProcess		OK
-System is shut down	ShutdownProcess		System jest wyłączony.
-It's now safe to turn off the computer.	ShutdownProcess		Teraz można bezpiecznie wyłączyć komputer.
 Cancel	ShutdownProcess		Anuluj
+OK	ShutdownProcess		OK
 Do you really want to shut down the system?	ShutdownProcess		Czy na pewno chcesz wyłączyć system?
-Asking other processes to quit.	ShutdownProcess		Sprawdzanie innych procesów w celu zakończenia.
-Asking \"%appName%\" to quit.	ShutdownProcess		Sprawdzanie „%appName%” w celu zakończenia.
-%action%?	ShutdownProcess		%action%?
-Shutdown aborted	ShutdownProcess		Zamknięcie przerwane
-Restarting…	ShutdownProcess		Ponowne uruchamianie…
-Asking background applications to quit.	ShutdownProcess		Pytanie aplikacji działających w tle o zakończenie.
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Aplikacja „%appName%” przerwała proces wyłączania.
-Tidying things up a bit.	ShutdownProcess		Porządkowanie rzeczy.
-Do you really want to restart the system?	ShutdownProcess		Czy na pewno chcesz ponownie uruchomić system?
 Shutdown status	ShutdownProcess		Status zamykania
-Cancel shutdown	ShutdownProcess		Anulowanie wyłączenia
-Kill application	ShutdownProcess		Zabij aplikację
 Shut down	ShutdownProcess		Wyłączanie systemu
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Aplikacja „%appName%” może być zablokowana na modalnym panelu.
+System is shut down	ShutdownProcess		System jest wyłączony.
+Restart system	ShutdownProcess		Uruchom system ponownie
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Aplikacja „%appName%” przerwała proces wyłączania.
+Asking background applications to quit.	ShutdownProcess		Pytanie aplikacji działających w tle o zakończenie.
+Do you really want to restart the system?	ShutdownProcess		Czy na pewno chcesz ponownie uruchomić system?
 Restart	ShutdownProcess		Uruchom ponownie
+It's now safe to turn off the computer.	ShutdownProcess		Teraz można bezpiecznie wyłączyć komputer.
+Asking other processes to quit.	ShutdownProcess		Sprawdzanie innych procesów w celu zakończenia.
+Cancel shutdown	ShutdownProcess		Anulowanie wyłączenia
+Restarting…	ShutdownProcess		Ponowne uruchamianie…
+%action%?	ShutdownProcess		%action%?
+Tidying things up a bit.	ShutdownProcess		Porządkowanie rzeczy.
+Kill application	ShutdownProcess		Zabij aplikację
+Shutdown aborted	ShutdownProcess		Zamknięcie przerwane
 Shutting down…	ShutdownProcess		Wyłączanie...
+Asking \"%appName%\" to quit.	ShutdownProcess		Sprawdzanie „%appName%” w celu zakończenia.

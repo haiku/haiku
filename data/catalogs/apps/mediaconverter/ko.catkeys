@@ -1,54 +1,54 @@
 1	korean	x-vnd.Haiku-MediaConverter	1991546006
-Video using parameters form settings	MediaConverter		매개 변수 폼 설정을 사용한 동영상
-Video encoding:	MediaConverter		동영상 인코딩
-No audio	Audio codecs list		오디오 파일 없음
-Error	MediaConverter		오류
-Error loading a file	MediaConverter		파일 불러오는 중에 오류 발생
-File Error	MediaConverter-FileInfo		파일 에러
-Open…	Menu		열기...
-Start [ms]: 	MediaConverter		시작 [ms]: 
-Output file '%filename' created	MediaConverter		출력파일 '%filename' 만들어짐
-Output format	MediaConverter		출력 형식
-End   [ms]: 	MediaConverter		끝  [ms]: 
-MediaConverter	System name		미디어변환기
-No video	Video codecs list		동영상 없음
-Duration:	MediaConverter-FileInfo		재생시간:
-OK	MediaConverter		확인
+Video quality: %3d%%	MediaConverter		동영상 화질: %3d%%
+Source files	MediaConverter		소스 파일
 Error converting '%filename'	MediaConverter		'%filename' 변환 중에 오류 발생
-Low	MediaConverter		낮음
 Conversion completed	MediaConverter		변환 완료됨
 Audio:	MediaConverter-FileInfo		오디오:
-OK	MediaConverter-FileInfo		확인
-Source files	MediaConverter		소스 파일
-Cancelling	MediaConverter		취소중
-Error loading files	MediaConverter		파일들  불러오는 중에 오류 발생
-Cancel	MediaConverter		취소
-None available	Video codecs		가능한 것이 없음
-Conversion cancelled	MediaConverter		변환이 취소됨
-No file selected	MediaConverter-FileInfo		선택된 파일이 없음
-Select this folder	MediaConverter		이 폴더 선택
-Continue	MediaConverter		계속
-Encoder parameters	MediaConverter-EncoderWindow		인코더 매개변수
-Video:	MediaConverter-FileInfo		동영상:
-%d bit 	MediaFileInfo		%d 비트
-Error creating '%filename'	MediaConverter		'%filename' 만드는 중에 오류 발생
-Video quality not supported	MediaConverter		동영상 화질은 지원하지 않음
-Cancelling…	MediaConverter		취소하는 중...
-File details	MediaConverter		파일의 세부사항
-Select	MediaConverter		선택
-Quit	Menu		끝내기
-Preview	MediaConverter		미리보기
-File format:	MediaConverter		파일 형식:
-None available	Audio codecs		가능한 것이 없음
 MediaConverter+:SaveDirectory	MediaConverter		마디어변환기+:저장디렉토리
-Error launching: %strError%	MediaConverter		시작 중 오류 발생: %strError%
+Cancelling	MediaConverter		취소중
+None available	Audio codecs		가능한 것이 없음
+No file selected	MediaConverter-FileInfo		선택된 파일이 없음
 High	MediaConverter		높음
-Drop media files onto this window	MediaConverter		이 창에 미디어 파일 떨어트리기
+File Error	MediaConverter-FileInfo		파일 에러
+None available	Video codecs		가능한 것이 없음
+Output format	MediaConverter		출력 형식
+OK	MediaConverter		확인
+Error creating '%filename'	MediaConverter		'%filename' 만드는 중에 오류 발생
+Error loading a file	MediaConverter		파일 불러오는 중에 오류 발생
+Encoder parameters	MediaConverter-EncoderWindow		인코더 매개변수
+Open…	Menu		열기...
 Audio encoding:	MediaConverter		오디오 인코딩:
-Audio quality not supported	MediaConverter		오디오 음질은 지원하지 않음
-File	Menu		파일
-Convert	MediaConverter		변환
-Video quality: %3d%%	MediaConverter		동영상 화질: %3d%%
-Output folder	MediaConverter		출력 폴더
 Audio quality: %3d%%	MediaConverter		오디오 음질: %3d%%
+Cancelling…	MediaConverter		취소하는 중...
+Output file '%filename' created	MediaConverter		출력파일 '%filename' 만들어짐
+Output folder	MediaConverter		출력 폴더
+Video using parameters form settings	MediaConverter		매개 변수 폼 설정을 사용한 동영상
+Video:	MediaConverter-FileInfo		동영상:
+Select	MediaConverter		선택
+Conversion cancelled	MediaConverter		변환이 취소됨
+Low	MediaConverter		낮음
+Error loading files	MediaConverter		파일들  불러오는 중에 오류 발생
+End   [ms]: 	MediaConverter		끝  [ms]: 
+Cancel	MediaConverter		취소
+OK	MediaConverter-FileInfo		확인
+Video encoding:	MediaConverter		동영상 인코딩
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		파일 정보를 읽는 중에 오류가 발생했습니다.\n\n오류: 
+Error	MediaConverter		오류
+File details	MediaConverter		파일의 세부사항
+No audio	Audio codecs list		오디오 파일 없음
+Drop media files onto this window	MediaConverter		이 창에 미디어 파일 떨어트리기
+Quit	Menu		끝내기
+Duration:	MediaConverter-FileInfo		재생시간:
+MediaConverter	System name		미디어변환기
+Error launching: %strError%	MediaConverter		시작 중 오류 발생: %strError%
+File format:	MediaConverter		파일 형식:
+File	Menu		파일
+Video quality not supported	MediaConverter		동영상 화질은 지원하지 않음
+Select this folder	MediaConverter		이 폴더 선택
+%d bit 	MediaFileInfo		%d 비트
+No video	Video codecs list		동영상 없음
+Continue	MediaConverter		계속
+Convert	MediaConverter		변환
+Audio quality not supported	MediaConverter		오디오 음질은 지원하지 않음
+Preview	MediaConverter		미리보기
+Start [ms]: 	MediaConverter		시작 [ms]: 

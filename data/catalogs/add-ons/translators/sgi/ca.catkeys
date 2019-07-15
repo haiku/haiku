@@ -1,11 +1,11 @@
 1	catalan; valencian	x-vnd.Haiku-SGITranslator	4153400005
-Use compression:	SGIView		Usa la compressió:
-SGITranslator Settings	SGITranslator		Paràmetres del SGITranslator
-None	SGIView		Cap
 SGI images	SGITranslator		Imatges SGI
-SGI image translator	SGITranslator		Traductor d'imatges SGI
-SGI image	SGITranslator		Imatge SGI
-RLE	SGIView		RLE
-SGI Settings	SGIMain		Paràmetres del SGI
-written by:\n	SGIView		escrit per:\n
+Use compression:	SGIView		Usa la compressió:
 SGI image translator	SGIView		Traductor d'imatges SGI
+SGI image	SGITranslator		Imatge SGI
+SGITranslator Settings	SGITranslator		Paràmetres del SGITranslator
+SGI Settings	SGIMain		Paràmetres del SGI
+SGI image translator	SGITranslator		Traductor d'imatges SGI
+None	SGIView		Cap
+RLE	SGIView		RLE
+written by:\n	SGIView		escrit per:\n

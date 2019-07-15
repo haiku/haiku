@@ -1,61 +1,61 @@
 1	korean	x-vnd.Haiku-BootManager	3355843558
-The boot manager has been successfully installed on your system.	BootManagerController		부팅 관리자를 당신의 시스템에 설치하는 데 성공했습니다.
-After two seconds	DefaultPartitionPage		2초 후에
-Uninstall Boot Manager	UninstallPage	Title	부팅 관리자 제거
 At least one partition must be selected!	BootManagerController		최소한 하나의 파티션을 선택해야 합니다!
-Restore MBR	BootManagerController	Button	MBR 복구
-Hard Drive	DrivesPage	Default disk name	하드 드라이브
-USB Drive	DrivesPage	Default disk name	USB 드라이브
-The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		부트 장치의 마스터 부트 레코드(MBR):\n\t%s\n는 지금 디스크에 저장될 것입니다. MBR 정보를 저장할 파일을 선택해 주십시오.\n\만약 설치가 잘못되었거나 나중에 부트 메뉴를 지우려면, 간단히 부트맨 프로그램을 실행시키고 '제거'옵션을 선택하면 됩니다.
-About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	%file로부터 %disk 의 마스터 부트 레코드(MBR)를 반대로 복구합니다 . 계속하겠습니까?
-An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		부트 메뉴 기록 중에 에러가 발생했습니다. 마스터 부트 레코드가 파괴되었을 수도 있으모로, 당장 MBR을 복구해야합니다!
-Partitions	PartitionsPage	Title	파티션
-Timeout: %s	DefaultPartitionPage		시간초과: %s
-Select	FileSelectionPage	Button	선택
-Cannot access!	DrivesPage	Cannot install	접근 할 수 없음!
-Uninstall boot manager	BootManagerController	Title	부트관리자 제거
-After four seconds	DefaultPartitionPage		4초 후에
-Uninstallation of boot menu failed	BootManagerController	Title	부트메뉴 제거 실패
-Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		복구할 마스터 부트 레코드(MBR) 저장 파일을 선택해 주십시오. 이것은 부트 관리자를 처음 설치할 때 만들어진 파일입니다.
-Next	WizardView	Button	다음
-Uninstallation of boot menu completed	BootManagerController	Title	부트 메뉴 제거 완료
-Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		부트 관리자를 설치하거나 제거하기릏 원하는 드라이브를 선택하십시오.
-Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		기본 파티션과 제한시간을 지정하십시오.\n부팅 메뉴는 다른 파티션을 선택하지 않으면 지정한 시간이 지난 후에 기본 파티션으로 부팅하게될 것입니다. 당신은 또한 부팅 메뉴가 파티션을 선택하는  동안 무한정 기다릴 수 있습니다.\n부팅 중에 'ALT'키를 누르면 시간 제한은 없어 지게됩니다.
-After one second	DefaultPartitionPage		1초 후에
-The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		다음과 같은 파티션이 발견되었습니다. 부트 메뉴에 포함시킬 파티션 옆에있는 확인란을 선택하십시오. 또한 부팅 메뉴에 표시하고 싶은대로 파티션의 이름을 설정할 수 있습니다.
-After one minute	DefaultPartitionPage		1분 후에
-The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		부트 장치(%DISK)의 마스터 부트 레코드는 %FILE로부터 복구 성공했습니다.
-Write boot menu	BootManagerController	Button	부트 메뉴 기록
-The Master Boot Record could not be restored!	BootManagerController		마스터 부트 레코드를 복구 할 수 없습니다!
-Uninstall	DrivesPage	Button	제거
-Default Partition	DefaultPartitionPage	Title	기본 파티션
-After five seconds	DefaultPartitionPage		5초 후에
-Back	BootManagerController	Button	뒤로
-Installation of boot menu completed	BootManagerController	Title	부트 메뉴 설치 완료
-Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Unnamed %d
-File:	FileSelectionPage	Text control label	파일:
-Previous	WizardView	Button	이전
-Install	DrivesPage	Button	설치
-About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		부팅 디스크 (%s)에 다음과 같은 부팅 메뉴를 작성할 것입니다. 계속하기 전에 아래 정보를 확인하십시오.
-Unknown	LegacyBootMenu	Text is shown for an unknown partition type	알 수 없음
-Update	DrivesPage	Button	갱신
-Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		복구할 마스터 부트 레코드(MBR) 저장 파일을 선택해 주십시오. 이것은 부트 관리자를 처음 설치할 때 만들어진 파일입니다.
-Drives	DrivesPage	Title	드라이브
 No space available!	DrivesPage	Cannot install	공간이 부족함!
-Never	DefaultPartitionPage		절대 안함
-Partition table not compatible	BootManagerController	Title	파티션 테이블이 호환되지 않음
-Old Master Boot Record saved	BootManagerController	Title	오래된 마스터 부트 레코드가 저장됨
 Boot Manager is unable to read the partition table!	BootManagerController		부팅 관리자는 파티션 테이블을 읽을 수 없습니다!
-Error reading partition table	BootManagerController	Title	파티션 테이블 읽는 중 에러 발생
+Immediately	DefaultPartitionPage		즉시
+Uninstall Boot Manager	UninstallPage	Title	부팅 관리자 제거
+Unknown	LegacyBootMenu	Text is shown for an unknown partition type	알 수 없음
 Installation of boot menu failed	BootManagerController	Title	부트 메뉴 설치 실패
 Backup Master Boot Record	BootManagerController	Title	마스터 부트 레코드 백업
-About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		부트 메뉴의 정보를 디스크에 기록합니다.계속 하겠습니까?
+Cannot access!	DrivesPage	Cannot install	접근 할 수 없음!
+After one second	DefaultPartitionPage		1초 후에
 The old Master Boot Record was successfully saved to %s.	BootManagerController		이전의 마스터 부트 레코드를 %s로 저장하는 데 성공했습니다.
-Default Partition:	DefaultPartitionPage	Menu field label	기본 파티션
-Partitions	DefaultPartitionPage	Pop up menu title	파티션
-BootManager	System name		부팅관리자
+Never	DefaultPartitionPage		절대 안함
 Summary	BootManagerController	Title	요약
-OK	BootManagerController	Button	확인
-Immediately	DefaultPartitionPage		즉시
-Done	BootManagerController	Button	완료
+An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		부트 메뉴 기록 중에 에러가 발생했습니다. 마스터 부트 레코드가 파괴되었을 수도 있으모로, 당장 MBR을 복구해야합니다!
 After three seconds	DefaultPartitionPage		3초 후에
+Write boot menu	BootManagerController	Button	부트 메뉴 기록
+OK	BootManagerController	Button	확인
+Uninstall boot manager	BootManagerController	Title	부트관리자 제거
+About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		부팅 디스크 (%s)에 다음과 같은 부팅 메뉴를 작성할 것입니다. 계속하기 전에 아래 정보를 확인하십시오.
+Uninstall	DrivesPage	Button	제거
+Update	DrivesPage	Button	갱신
+The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		부트 장치의 마스터 부트 레코드(MBR):\n\t%s\n는 지금 디스크에 저장될 것입니다. MBR 정보를 저장할 파일을 선택해 주십시오.\n\만약 설치가 잘못되었거나 나중에 부트 메뉴를 지우려면, 간단히 부트맨 프로그램을 실행시키고 '제거'옵션을 선택하면 됩니다.
+Default Partition	DefaultPartitionPage	Title	기본 파티션
+Installation of boot menu completed	BootManagerController	Title	부트 메뉴 설치 완료
+After one minute	DefaultPartitionPage		1분 후에
+Select	FileSelectionPage	Button	선택
+USB Drive	DrivesPage	Default disk name	USB 드라이브
+Restore MBR	BootManagerController	Button	MBR 복구
+Hard Drive	DrivesPage	Default disk name	하드 드라이브
+Drives	DrivesPage	Title	드라이브
+The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		다음과 같은 파티션이 발견되었습니다. 부트 메뉴에 포함시킬 파티션 옆에있는 확인란을 선택하십시오. 또한 부팅 메뉴에 표시하고 싶은대로 파티션의 이름을 설정할 수 있습니다.
+After five seconds	DefaultPartitionPage		5초 후에
+Timeout: %s	DefaultPartitionPage		시간초과: %s
+The Master Boot Record could not be restored!	BootManagerController		마스터 부트 레코드를 복구 할 수 없습니다!
+Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		부트 관리자를 설치하거나 제거하기릏 원하는 드라이브를 선택하십시오.
+After four seconds	DefaultPartitionPage		4초 후에
+Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Unnamed %d
+About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		부트 메뉴의 정보를 디스크에 기록합니다.계속 하겠습니까?
+Partitions	DefaultPartitionPage	Pop up menu title	파티션
+Default Partition:	DefaultPartitionPage	Menu field label	기본 파티션
+Next	WizardView	Button	다음
+Previous	WizardView	Button	이전
+Uninstallation of boot menu failed	BootManagerController	Title	부트메뉴 제거 실패
+Old Master Boot Record saved	BootManagerController	Title	오래된 마스터 부트 레코드가 저장됨
+Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		기본 파티션과 제한시간을 지정하십시오.\n부팅 메뉴는 다른 파티션을 선택하지 않으면 지정한 시간이 지난 후에 기본 파티션으로 부팅하게될 것입니다. 당신은 또한 부팅 메뉴가 파티션을 선택하는  동안 무한정 기다릴 수 있습니다.\n부팅 중에 'ALT'키를 누르면 시간 제한은 없어 지게됩니다.
+Partitions	PartitionsPage	Title	파티션
+Uninstallation of boot menu completed	BootManagerController	Title	부트 메뉴 제거 완료
+After two seconds	DefaultPartitionPage		2초 후에
+Partition table not compatible	BootManagerController	Title	파티션 테이블이 호환되지 않음
+The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		부트 장치(%DISK)의 마스터 부트 레코드는 %FILE로부터 복구 성공했습니다.
+Done	BootManagerController	Button	완료
+BootManager	System name		부팅관리자
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		복구할 마스터 부트 레코드(MBR) 저장 파일을 선택해 주십시오. 이것은 부트 관리자를 처음 설치할 때 만들어진 파일입니다.
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		복구할 마스터 부트 레코드(MBR) 저장 파일을 선택해 주십시오. 이것은 부트 관리자를 처음 설치할 때 만들어진 파일입니다.
+About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	%file로부터 %disk 의 마스터 부트 레코드(MBR)를 반대로 복구합니다 . 계속하겠습니까?
+Install	DrivesPage	Button	설치
+File:	FileSelectionPage	Text control label	파일:
+Error reading partition table	BootManagerController	Title	파티션 테이블 읽는 중 에러 발생
+Back	BootManagerController	Button	뒤로
+The boot manager has been successfully installed on your system.	BootManagerController		부팅 관리자를 당신의 시스템에 설치하는 데 성공했습니다.

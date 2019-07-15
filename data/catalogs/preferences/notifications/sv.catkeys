@@ -1,35 +1,35 @@
 1	swedish	x-vnd.Haiku-Notifications	332239666
-An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Ett fel uppstod när inställningarna skulle sparas.\nEn möjlighet är att du har slut på diskutrymme.
-Add…	NotificationView		Lägg till…
-Status	NotificationView		Status
-Revert	PrefletWin		Återgå
-Enable notifications	GeneralView		Aktivera aviseringar
-Window width:	GeneralView		Fönsterbredd:
-This is a test notification message	PrefletWin		Detta är ett test av ett underrättelsemeddelande
-OK	PrefletWin		OK
-Duration:	GeneralView		Varaktighet:
-OK	NotificationView		OK
-Application does not have a valid signature	NotificationView	Alert message	Applikationen har inte en giltig signatur
-Follow Deskbar	GeneralView		Följ Deskbar
-Notifications	PrefletWin		Aviseringar
-Timeout:	GeneralView		Timeout:
-Muted	NotificationView		Tystad
-General	PrefletView		Allmän
-Allowed	NotificationView		Tillåten
-Remove	NotificationView		Ta bort
-Lower right	GeneralView		Nere till höger
-Notifications preflet sample	PrefletWin		Test av underrättelsepanel
-Notifications	System name		Aviseringar
-Position:	GeneralView		Position:
-Applications	PrefletView		Program
-Defaults	PrefletWin		Förinställt värde
-pixels	GeneralView		pixlar
-Application	NotificationView		Applikation
-Width:	GeneralView		Bredd:
-seconds	GeneralView		sekunder
-Mute notifications from this application	NotificationView		Tysta ner underrättelser från denna applikation
-Upper right	GeneralView		Uppe till höger
- is already listed	NotificationView	Alert message	är redan listad
 Lower left	GeneralView		Nere till vänster
+Application does not have a valid signature	NotificationView	Alert message	Applikationen har inte en giltig signatur
+Status	NotificationView		Status
+Add…	NotificationView		Lägg till…
+Lower right	GeneralView		Nere till höger
+Muted	NotificationView		Tystad
+Window width:	GeneralView		Fönsterbredd:
+ is already listed	NotificationView	Alert message	är redan listad
+OK	PrefletWin		OK
+Notifications	PrefletWin		Aviseringar
+Notifications preflet sample	PrefletWin		Test av underrättelsepanel
+Mute notifications from this application	NotificationView		Tysta ner underrättelser från denna applikation
+pixels	GeneralView		pixlar
+seconds	GeneralView		sekunder
+Revert	PrefletWin		Återgå
+Applications	PrefletView		Program
+Timeout:	GeneralView		Timeout:
+Upper right	GeneralView		Uppe till höger
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Ett fel uppstod när inställningarna skulle sparas.\nEn möjlighet är att du har slut på diskutrymme.
+Defaults	PrefletWin		Förinställt värde
 Upper left	GeneralView		Uppe till vänster
 Applications	NotificationView		Program
+Width:	GeneralView		Bredd:
+General	PrefletView		Allmän
+OK	NotificationView		OK
+Follow Deskbar	GeneralView		Följ Deskbar
+Notifications	System name		Aviseringar
+Allowed	NotificationView		Tillåten
+Duration:	GeneralView		Varaktighet:
+Application	NotificationView		Applikation
+Enable notifications	GeneralView		Aktivera aviseringar
+This is a test notification message	PrefletWin		Detta är ett test av ett underrättelsemeddelande
+Remove	NotificationView		Ta bort
+Position:	GeneralView		Position:

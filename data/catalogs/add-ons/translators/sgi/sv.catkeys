@@ -1,13 +1,13 @@
 1	swedish	x-vnd.Haiku-SGITranslator	129108011
-Use compression:	SGIView		Använd komprimering:
-SGITranslator Settings	SGITranslator		SGI-översättningsinställningar
-None	SGIView		Ingen
 SGI images	SGITranslator		SGI-bilder
-SGI image translator	SGITranslator		SGI-bildöversättare
-\nbased on GIMP SGI plugin v1.5:\n	SGIView		\nbaserad på GIMP SGI plugin v1.5:\n
-Version %d.%d.%d, %s	SGIView		Version %d.%d.%d, %s
-SGI image	SGITranslator		SGI-bild
-RLE	SGIView		RLE
-SGI Settings	SGIMain		SGI-inställningar
-written by:\n	SGIView		skrivet av:\n
+Use compression:	SGIView		Använd komprimering:
 SGI image translator	SGIView		SGI-bildöversättare
+SGI image	SGITranslator		SGI-bild
+SGITranslator Settings	SGITranslator		SGI-översättningsinställningar
+SGI Settings	SGIMain		SGI-inställningar
+SGI image translator	SGITranslator		SGI-bildöversättare
+None	SGIView		Ingen
+Version %d.%d.%d, %s	SGIView		Version %d.%d.%d, %s
+\nbased on GIMP SGI plugin v1.5:\n	SGIView		\nbaserad på GIMP SGI plugin v1.5:\n
+RLE	SGIView		RLE
+written by:\n	SGIView		skrivet av:\n

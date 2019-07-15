@@ -1,68 +1,68 @@
 1	slovak	x-vnd.Haiku-BootManager	3886671855
-The boot manager has been successfully installed on your system.	BootManagerController		Správca zavádzania bol úspešne nainštalovaný na váš systém.
-After two seconds	DefaultPartitionPage		Po dvoch sekundách
-Uninstall Boot Manager	UninstallPage	Title	Odinštalovať Správcu zavádzania
+Old Master Boot Record backup failure	BootManagerController	Title	Zlyhalo zálohovanie starého MBR
 At least one partition must be selected!	BootManagerController		Musí byť vybraná aspoň jedna disková oblasť!
+No space available!	DrivesPage	Cannot install	Nie je voľné miesto!
+Boot Manager is unable to read the partition table!	BootManagerController		Správca zavádzania nedokáže prečítať tabuľku oblastí!
+Immediately	DefaultPartitionPage		Okamžite
+Uninstall Boot Manager	UninstallPage	Title	Odinštalovať Správcu zavádzania
+Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Neznámy
+Installation of boot menu failed	BootManagerController	Title	Inštalácia menu zavádzača zlyhala
+Backup Master Boot Record	BootManagerController	Title	Zálohovať MBR
+Cannot access!	DrivesPage	Cannot install	Nie je možný prístup!
+After one second	DefaultPartitionPage		Po jednej sekunde
+The old Master Boot Record was successfully saved to %s.	BootManagerController		Starý MBR bol úspešne uložený do %s.
+Quit	WizardView	Button	Ukončiť
+Never	DefaultPartitionPage		Nikdy
+Summary	BootManagerController	Title	Zhrnutie
+An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Vyskytla sa chyba počas zapisovania menu zavádzača. MBR môže byť zničený. Mali by ste ihneď obnoviť MBR!
+After three seconds	DefaultPartitionPage		Po troch sekundách
+Write boot menu	BootManagerController	Button	Zapísať menu zavádzača
+OK	BootManagerController	Button	OK
+Uninstall boot manager	BootManagerController	Title	Odinštalovať Správcu zavádzania
+About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Chystá sa zápis nasledovného menu zavádzača na zavádzací disk (%s). Prosím, overte nasledovné informácie predtým, než budete pokračovať.
+The first partition on the disk starts too early and does not leave enough space free for a boot menu.\nBoot Manager needs 2 KiB available space before the first partition.	BootManagerController		Prvá oblasť na disku začína príliš zavčasu a nenecháva dostatok voľného miesta pre zavádzacie menu.\nSprávca zavádzania potrebuje 2 KiB voľného miesta pred prvou oblasťou.
+Uninstall	DrivesPage	Button	Odinštalovať
+Update	DrivesPage	Button	Aktualizovať
+The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		MBR zavádzacieho zariadenia:\n\t %s\nsa teraz uloží na disk. Prosím, zvoľte súbor, kam sa uloží MBR.\n\nAk sa niečo v inštalácii pokazí alebo jednoducho neskôr budete chcieť odstrániť menu zavádzača, jednoducho spustite program Správca zavádzania a zvoľte možnosť „Odinštalovať“.
+Default Partition	DefaultPartitionPage	Title	Prevolená disková oblasť
+Installation of boot menu completed	BootManagerController	Title	Inštalácia menu zavádzača dokončená
+After one minute	DefaultPartitionPage		Po jednej minúte
+Select	FileSelectionPage	Button	Vybrať
+USB Drive	DrivesPage	Default disk name	Disk USB
 Restore MBR	BootManagerController	Button	Obnoviť MBR
 Hard Drive	DrivesPage	Default disk name	Pevný disk
-USB Drive	DrivesPage	Default disk name	Disk USB
-The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		MBR zavádzacieho zariadenia:\n\t %s\nsa teraz uloží na disk. Prosím, zvoľte súbor, kam sa uloží MBR.\n\nAk sa niečo v inštalácii pokazí alebo jednoducho neskôr budete chcieť odstrániť menu zavádzača, jednoducho spustite program Správca zavádzania a zvoľte možnosť „Odinštalovať“.
-About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Chystáte sa obnoviť MBR disku %disk zo súboru %file. Chcete pokračovať?
-First partition starts too early	BootManagerController	Title	Prvá disková oblasť začína príliš zavčasu
-An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Vyskytla sa chyba počas zapisovania menu zavádzača. MBR môže byť zničený. Mali by ste ihneď obnoviť MBR!
-Partitions	PartitionsPage	Title	Oblasti
-Timeout: %s	DefaultPartitionPage		Časový interval: %s
-Select	FileSelectionPage	Button	Vybrať
-Incompatible format!	DrivesPage	Cannot install	Nekompatibilný formát!
-Cannot access!	DrivesPage	Cannot install	Nie je možný prístup!
-Uninstall boot manager	BootManagerController	Title	Odinštalovať Správcu zavádzania
-After four seconds	DefaultPartitionPage		Po štyroch sekundách
-Uninstallation of boot menu failed	BootManagerController	Title	Odinštalovanie menu zavádzača zlyhalo
-Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Prosím, nájdite súbor s uloženým MBR, z ktorého chcete obnoviť MBR. Tento súbor bol vytvorený, keď ste prvýkrát nainštalovali Správcu zavádzania.
-Next	WizardView	Button	Ďalej
-Uninstallation of boot menu completed	BootManagerController	Title	Odinštalovanie menu zavádzača dokončené
-Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Prosím, vyberte disk, kam chcete nainštalovať alebo odinštalovať správcu zavádzania.
-Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Prosím, uveďte predvolenú diskovú oblasť a časový interval.\nMenu zavádzača načíta predvolenú oblasť po vypršaní intervalu ak si nevyberiete inú. Môžete tiež nechať menu čakať bez intervalu, kým sami nezvolíte oblasť\nAk chcete vypnúť časový interval pri zavádzaní, držte stlačený kláves „Alt“.
-After one second	DefaultPartitionPage		Po jednej sekunde
-The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Boli zistené nasledovné oblasti. Prosím, zaškrtnite pole vedľa oblastí, ktoré chcete zahrnúť do menu zavádzača. Môžete tiež nastaviť názvy oblastí, aké chcete aby sa zobrazovali v menu zavádzača.
-After one minute	DefaultPartitionPage		Po jednej minúte
-The old Master Boot Record could not be saved to %s. You can continue the installation but there will be no way to uninstall the boot menu.	BootManagerController		Starý Master Boot Record sa nepodarilo uložiť do %s. Môžete pokračovať v inštalácii, ale to nebude možné odinštalovať menu zavádzača systému.
-The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		MBR zavádzacieho zariadenia (%DISK) bol úspešne obnovený zo súboru %FILE.
-Quit	WizardView	Button	Ukončiť
-Write boot menu	BootManagerController	Button	Zapísať menu zavádzača
-The Master Boot Record could not be restored!	BootManagerController		MBR nebolo možné obnoviť!
-Uninstall	DrivesPage	Button	Odinštalovať
-Default Partition	DefaultPartitionPage	Title	Prevolená disková oblasť
-After five seconds	DefaultPartitionPage		Po piatich sekundách
-Back	BootManagerController	Button	Späť
-Installation of boot menu completed	BootManagerController	Title	Inštalácia menu zavádzača dokončená
-Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Nepomenovaný %d
-File:	FileSelectionPage	Text control label	Súbor:
-Previous	WizardView	Button	Späť
-The first partition on the disk starts too early and does not leave enough space free for a boot menu.\nBoot Manager needs 2 KiB available space before the first partition.	BootManagerController		Prvá oblasť na disku začína príliš zavčasu a nenecháva dostatok voľného miesta pre zavádzacie menu.\nSprávca zavádzania potrebuje 2 KiB voľného miesta pred prvou oblasťou.
-Install	DrivesPage	Button	Nainštalovať
-About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Chystá sa zápis nasledovného menu zavádzača na zavádzací disk (%s). Prosím, overte nasledovné informácie predtým, než budete pokračovať.
-Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Neznámy
-Update	DrivesPage	Button	Aktualizovať
-Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Prosím, nájdite súbor s uloženým MBR, z ktorého chcete obnoviť MBR. Tento súbor bol vytvorený, keď ste prvýkrát nainštalovali Správcu zavádzania.
 Drives	DrivesPage	Title	Disky
-No space available!	DrivesPage	Cannot install	Nie je voľné miesto!
-Never	DefaultPartitionPage		Nikdy
-Partition table not compatible	BootManagerController	Title	Tabuľka oblastí nie je kompatibilná
-Old Master Boot Record saved	BootManagerController	Title	Starý MBR je uložený
-Old Master Boot Record backup failure	BootManagerController	Title	Zlyhalo zálohovanie starého MBR
-Boot Manager is unable to read the partition table!	BootManagerController		Správca zavádzania nedokáže prečítať tabuľku oblastí!
-Error reading partition table	BootManagerController	Title	Chyba pri čítaní tabuľky oblastí
-Installation of boot menu failed	BootManagerController	Title	Inštalácia menu zavádzača zlyhala
+The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Boli zistené nasledovné oblasti. Prosím, zaškrtnite pole vedľa oblastí, ktoré chcete zahrnúť do menu zavádzača. Môžete tiež nastaviť názvy oblastí, aké chcete aby sa zobrazovali v menu zavádzača.
+After five seconds	DefaultPartitionPage		Po piatich sekundách
+Timeout: %s	DefaultPartitionPage		Časový interval: %s
+The Master Boot Record could not be restored!	BootManagerController		MBR nebolo možné obnoviť!
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		Tabuľka diskových oblastí prvého disku nie je kompatibilná so Správcom zavádzania.\nSprávca zavádzania dokáže pracovať len s oblasťami IBM PC MBR.
-Backup Master Boot Record	BootManagerController	Title	Zálohovať MBR
+Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Prosím, vyberte disk, kam chcete nainštalovať alebo odinštalovať správcu zavádzania.
+After four seconds	DefaultPartitionPage		Po štyroch sekundách
+Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Nepomenovaný %d
+First partition starts too early	BootManagerController	Title	Prvá disková oblasť začína príliš zavčasu
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Chystá sa zápis menu zavádzača na disk. Ste si istý, že chcete pokračovať?
-The old Master Boot Record was successfully saved to %s.	BootManagerController		Starý MBR bol úspešne uložený do %s.
-Default Partition:	DefaultPartitionPage	Menu field label	Predvolená oblasť:
 Partitions	DefaultPartitionPage	Pop up menu title	Oblasti
-BootManager	System name		Správca zavádzania
-Summary	BootManagerController	Title	Zhrnutie
-OK	BootManagerController	Button	OK
-Immediately	DefaultPartitionPage		Okamžite
+Default Partition:	DefaultPartitionPage	Menu field label	Predvolená oblasť:
+Next	WizardView	Button	Ďalej
+Previous	WizardView	Button	Späť
+Uninstallation of boot menu failed	BootManagerController	Title	Odinštalovanie menu zavádzača zlyhalo
+Incompatible format!	DrivesPage	Cannot install	Nekompatibilný formát!
+Old Master Boot Record saved	BootManagerController	Title	Starý MBR je uložený
+Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Prosím, uveďte predvolenú diskovú oblasť a časový interval.\nMenu zavádzača načíta predvolenú oblasť po vypršaní intervalu ak si nevyberiete inú. Môžete tiež nechať menu čakať bez intervalu, kým sami nezvolíte oblasť\nAk chcete vypnúť časový interval pri zavádzaní, držte stlačený kláves „Alt“.
+Partitions	PartitionsPage	Title	Oblasti
+Uninstallation of boot menu completed	BootManagerController	Title	Odinštalovanie menu zavádzača dokončené
+After two seconds	DefaultPartitionPage		Po dvoch sekundách
+Partition table not compatible	BootManagerController	Title	Tabuľka oblastí nie je kompatibilná
+The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		MBR zavádzacieho zariadenia (%DISK) bol úspešne obnovený zo súboru %FILE.
 Done	BootManagerController	Button	Hotovo
-After three seconds	DefaultPartitionPage		Po troch sekundách
+BootManager	System name		Správca zavádzania
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Prosím, nájdite súbor s uloženým MBR, z ktorého chcete obnoviť MBR. Tento súbor bol vytvorený, keď ste prvýkrát nainštalovali Správcu zavádzania.
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Prosím, nájdite súbor s uloženým MBR, z ktorého chcete obnoviť MBR. Tento súbor bol vytvorený, keď ste prvýkrát nainštalovali Správcu zavádzania.
+About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Chystáte sa obnoviť MBR disku %disk zo súboru %file. Chcete pokračovať?
+Install	DrivesPage	Button	Nainštalovať
+File:	FileSelectionPage	Text control label	Súbor:
+Error reading partition table	BootManagerController	Title	Chyba pri čítaní tabuľky oblastí
+Back	BootManagerController	Button	Späť
+The boot manager has been successfully installed on your system.	BootManagerController		Správca zavádzania bol úspešne nainštalovaný na váš systém.
+The old Master Boot Record could not be saved to %s. You can continue the installation but there will be no way to uninstall the boot menu.	BootManagerController		Starý Master Boot Record sa nepodarilo uložiť do %s. Môžete pokračovať v inštalácii, ale to nebude možné odinštalovať menu zavádzača systému.

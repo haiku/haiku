@@ -1,21 +1,17 @@
-1	japanese	x-vnd.Haiku-Magnify	931164741
-no clip msg\n	In console, when clipboard is empty after clicking Copy image		クリップボードにコピーされていません\n
-Make square	Magnify-Main		正方形を作成
-Copy image	Magnify-Main		イメージをコピー
-usage: magnify [size] (magnify size * size pixels)\n	Console		usage: magnify [size] (magnify size * size pixels)\n
-Freeze image	Magnify-Main		画像を固定
+1	japanese	x-vnd.Haiku-Magnify	94607167
+Decrease pixel size	Magnify-Main		ピクセルサイズを小さく
+Increase pixel size	Magnify-Main		ピクセルサイズを大きく
 Stick coordinates	Magnify-Main		座標を固定
 %width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height  @ {0, plural, one{# ピクセル/ピクセル} other{# ピクセル/ピクセル}}
-Show info	Magnify-Main		情報の表示
-magnify: size must be a multiple of 4\n	Console		拡大鏡: サイズは 4 の倍数でなければなりません\n
-Decrease pixel size	Magnify-Main		ピクセルサイズを小さく
+Copy image	Magnify-Main		イメージをコピー
+Decrease window size	Magnify-Main		ウィンドウを小さく
+Remove a crosshair	Magnify-Main		十字カーソルを削除
+Add a crosshair	Magnify-Main		十字カーソルを追加
+Freeze image	Magnify-Main		画像を固定
+Increase window size	Magnify-Main		ウィンドウを大きく
+Save image	Magnify-Main		イメージを保存
+Show grid	Magnify-Main		グリッドの表示
 Magnify	System name		拡大鏡
 Info	Magnify-Main		情報
-Remove a crosshair	Magnify-Main		十字カーソルを削除
-Show grid	Magnify-Main		グリッドの表示
-Save image	Magnify-Main		イメージを保存
-Increase window size	Magnify-Main		ウィンドウを大きく
-Decrease window size	Magnify-Main		ウィンドウを小さく
-Increase pixel size	Magnify-Main		ピクセルサイズを大きく
-  size must be > 4 and a multiple of 4\n	Console		サイズは 4 より大きな 4 の倍数でなければなりません\n
-Add a crosshair	Magnify-Main		十字カーソルを追加
+Show info	Magnify-Main		情報の表示
+Make square	Magnify-Main		正方形を作成

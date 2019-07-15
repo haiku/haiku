@@ -1,17 +1,17 @@
 1	italian	x-vnd.Haiku-keystore_server	2429996361
-This application hasn't been granted access before.	AppAccessRequestWindow		Questa applicazione non ha mai ottenuto l'accesso in passato.
-Unlock	KeyRequestWindow		Sblocca
-This application has been updated since it was last granted access.	AppAccessRequestWindow		L'applicazione ha subito un aggiornamento dall'ultima esecuzione.
-Allow always	AppAccessRequestWindow		Consenti sempre
-Application keyring access	AppAccessRequestWindow		Accesso dell'applicazione alla keyring
 to perform the following action:\n%accessString%\n\n	AppAccessRequestWindow		per eseguire la seguente azione:\n%accessString%\n\n
-The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		L'applicazione:\n%signature% (%path%)\n\n
 This application doesn't yet have the required privileges.	AppAccessRequestWindow		L'applicazione non ha ancora ottenute i privilegi necessari.
-Password:	KeyRequestWindow		Password:
-Cancel	KeyRequestWindow		Annulla
 Keyring:	KeyRequestWindow		Keyring:
+requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		richiede l'accesso alla keyring:\n%keyringName%\n\n
+Application keyring access	AppAccessRequestWindow		Accesso dell'applicazione alla keyring
+Disallow	AppAccessRequestWindow		Ritira il consenso
+Allow once	AppAccessRequestWindow		Consenti una volta sola
 Unlock keyring	KeyRequestWindow		Sblocca keyring
 An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		Un'applicazione ha richiesto l'accesso ad una keyring protetta da password. Inserire la password per sbloccarla.\nLa keyring sbloccata resterà in questo stato fino all'uscita da Haiku oppure quando sarà nuovamente protetta con una password.\nSe annulli l'azione, la keyring resterà bloccata.
-Allow once	AppAccessRequestWindow		Consenti una volta sola
-Disallow	AppAccessRequestWindow		Ritira il consenso
-requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		richiede l'accesso alla keyring:\n%keyringName%\n\n
+Password:	KeyRequestWindow		Password:
+Cancel	KeyRequestWindow		Annulla
+This application has been updated since it was last granted access.	AppAccessRequestWindow		L'applicazione ha subito un aggiornamento dall'ultima esecuzione.
+Allow always	AppAccessRequestWindow		Consenti sempre
+Unlock	KeyRequestWindow		Sblocca
+The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		L'applicazione:\n%signature% (%path%)\n\n
+This application hasn't been granted access before.	AppAccessRequestWindow		Questa applicazione non ha mai ottenuto l'accesso in passato.

@@ -1,27 +1,27 @@
 1	english	x-vnd.haiku-screenshot	3896204963
-seconds	ScreenshotWindow		秒
-Desktop	ScreenshotWindow		桌面
 Include window border	ScreenshotWindow		包含窗体边框
-Screenshot	System name		屏幕截图
+Overwrite	ScreenshotWindow		覆盖
+Save in:	ScreenshotWindow		保存到：
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		文件已存在。\n 是否进行文件替换？
 Select	ScreenshotWindow		选择
-Capture active window	ScreenshotWindow		捕捉活动窗口
-Cancel	ScreenshotWindow		取消
+Save as:	ScreenshotWindow		保存为：
+seconds	ScreenshotWindow		秒
+New screenshot	ScreenshotWindow		新建屏幕截图
+Screenshot	System name		屏幕截图
+Desktop	ScreenshotWindow		桌面
+Artwork folder	ScreenshotWindow		插图文件夹
+Translator Settings	ScreenshotWindow		转换器设置
+Include mouse pointer	ScreenshotWindow		包含鼠标指针
+overwrite	ScreenshotWindow		覆盖
+Settings…	ScreenshotWindow		设置...
+Choose folder	ScreenshotWindow		选择文件夹
 Name:	ScreenshotWindow		名称：
 Choose folder…	ScreenshotWindow		选择文件夹…
-This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		文件已存在。\n 是否进行文件替换？
-Choose folder	ScreenshotWindow		选择文件夹
-Save	ScreenshotWindow		保存
-Overwrite	ScreenshotWindow		覆盖
 Please select	ScreenshotWindow		请选择
-Save as:	ScreenshotWindow		保存为：
-Copy to clipboard	ScreenshotWindow		复制到剪贴板
-Save in:	ScreenshotWindow		保存到：
-screenshot	Screenshot	Base filename of screenshot files	屏幕截图
-New screenshot	ScreenshotWindow		新建屏幕截图
-Artwork folder	ScreenshotWindow		插图文件夹
-Home folder	ScreenshotWindow		主文件夹
-Settings…	ScreenshotWindow		设置...
-overwrite	ScreenshotWindow		覆盖
+Cancel	ScreenshotWindow		取消
 Delay:	ScreenshotWindow		延迟：
-Include mouse pointer	ScreenshotWindow		包含鼠标指针
-Translator Settings	ScreenshotWindow		转换器设置
+Copy to clipboard	ScreenshotWindow		复制到剪贴板
+screenshot	Screenshot	Base filename of screenshot files	屏幕截图
+Home folder	ScreenshotWindow		主文件夹
+Save	ScreenshotWindow		保存
+Capture active window	ScreenshotWindow		捕捉活动窗口

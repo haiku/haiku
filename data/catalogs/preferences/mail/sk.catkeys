@@ -1,54 +1,54 @@
 1	slovak	x-vnd.Haiku-Mail	2750130554
+Account settings	AutoConfigWindow		Nastavenie účtu
+\t\t· Outgoing	Config Window		\t \t · Odchádzajúce
+An error occurred while creating the config view: %error.	Config Views		Vyskytla sa chyba počas vytvárania zobrazenia len na čítanie: %error.
+E-mail address:	E-Mail		Emailová adresa:
+Create new account	AutoConfigWindow		Vytvoriť nový účet
+While sending and receiving	Config Window		Počas odosielania a prijímania
+Error!	Config Views		Chyba!
+Apply	Config Window		Použiť
+Incoming mail filters	Config Views		Filtre prichádzajúcej pošty
+Outgoing mail filters	Config Views		Filtre odchádzajúcej pošty
+Server name:	E-Mail		Názov servera:
+Add	Config Window		Pridať
+Back	AutoConfigWindow		Späť
+Real name:	E-Mail		Skutočné meno:
+Real name:	Config Views		Skutočné meno:
+\t\t· E-mail filters	Config Window		\t \t · Filtre pošty
+Outgoing	E-Mail		Odchádzajúce
+Accounts	Config Window		Účty
+Outgoing	Config Window		Odchádzajúce
+Remove	Config Views		Odstrániť
+Show notifications:	Config Window		Zobrazovať upozornenia:
 Settings	Config Window		Nastavenie
 Never	Config Window	show status window	Nikdy
-While sending and receiving	Config Window		Počas odosielania a prijímania
-Incoming	Config Window		Prichádzajúce
-Server name:	E-Mail		Názov servera:
-An error occurred while creating the config view: %error.	Config Views		Vyskytla sa chyba počas vytvárania zobrazenia len na čítanie: %error.
-OK	Config Window		OK
-E-mail address:	E-Mail		Emailová adresa:
-Account name:	E-Mail		Názov účtu:
 Account name:	Config Views		Názov účtu:
-Create new account	AutoConfigWindow		Vytvoriť nový účet
-OK	Config Views		OK
-The filter could not be moved. Deleting filter.	Config Views		Filter nebolo možné presunúť. Filter sa zmaže.
-Revert	Config Window		Vrátiť
-Login name:	E-Mail		Prihlasovacie meno:
-Incoming	E-Mail		Prichádzajúce
-Password:	E-Mail		Heslo:
-Accounts	Config Window		Účty
-Finish	AutoConfigWindow		Dokončiť
-Remove	Config Window		Odstrániť
-Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Vytvorte nový účet pomocou tlačidla Pridať.\n\nOdstráňte účet pomocou tlačidla Odstrániť na vybranej položke.\n\nVyberte položku v zozname ak chcete zmeniť jej nastavenie.
-Error!	Config Views		Chyba!
-Server Name:	E-Mail		Názov servera:
-While sending	Config Window		Počas odosielania
-Show notifications:	Config Window		Zobrazovať upozornenia:
+\t\t· Incoming	Config Window		\t \t · Prichádzajúce
 Enter a valid e-mail address.	AutoConfigWindow		Zadajte platnú emailovú adresu.
-Add	Config Window		Pridať
-Account settings	AutoConfigWindow		Nastavenie účtu
-E-mail	System name		Email
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nVšeobecné nastavenia nebolo možné vrátiť.\n\nChyba pri získavaní všeobecných nastavení:\n%s\n
-Real name:	Config Views		Skutočné meno:
-\t\t· Outgoing	Config Window		\t \t · Odchádzajúce
+Incoming	E-Mail		Prichádzajúce
 Choose Protocol	E-Mail		Vybrať protokol
 Return address:	Config Views		Návratová adresa:
-Edit mailbox menu…	Config Window		Upraviť menu poštovej schránky…
-Outgoing	E-Mail		Odchádzajúce
-\t\t· E-mail filters	Config Window		\t \t · Filtre pošty
-Remove	Config Views		Odstrániť
-\t\t· Incoming	Config Window		\t \t · Prichádzajúce
-Next	AutoConfigWindow		Ďalej
-Check every	Config Window		Kontrolovať každých
-Back	AutoConfigWindow		Späť
-Incoming mail filters	Config Views		Filtre prichádzajúcej pošty
+Password:	E-Mail		Heslo:
+Error retrieving general settings: %s\n	Config Window		Chyba pri získavaní všeobecných nastavení: %s\n
+The filter could not be moved. Deleting filter.	Config Views		Filter nebolo možné presunúť. Filter sa zmaže.
+OK	Config Views		OK
+Revert	Config Window		Vrátiť
+Incoming	Config Window		Prichádzajúce
+Finish	AutoConfigWindow		Dokončiť
+Add filter	Config Views		Pridať server
 Account settings	Config Views		Nastavenia účtu
 minutes	Config Window		minút
-Error retrieving general settings: %s\n	Config Window		Chyba pri získavaní všeobecných nastavení: %s\n
-Real name:	E-Mail		Skutočné meno:
-Apply	Config Window		Použiť
+E-mail	System name		Email
+Check every	Config Window		Kontrolovať každých
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Vytvorte nový účet pomocou tlačidla Pridať.\n\nOdstráňte účet pomocou tlačidla Odstrániť na vybranej položke.\n\nVyberte položku v zozname ak chcete zmeniť jej nastavenie.
+Account name:	E-Mail		Názov účtu:
+Edit mailbox menu…	Config Window		Upraviť menu poštovej schránky…
+Server Name:	E-Mail		Názov servera:
+Remove	Config Window		Odstrániť
+Login name:	E-Mail		Prihlasovacie meno:
+While sending	Config Window		Počas odosielania
+OK	Config Window		OK
 OK	AutoConfigWindow		OK
-Add filter	Config Views		Pridať server
-Outgoing	Config Window		Odchádzajúce
-Outgoing mail filters	Config Views		Filtre odchádzajúcej pošty
+Next	AutoConfigWindow		Ďalej
 Error	Config Window		Chyba

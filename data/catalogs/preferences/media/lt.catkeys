@@ -1,20 +1,20 @@
 1	lithuanian	x-vnd.Haiku-Media	2605101563
-Couldn't add volume control in Deskbar: %s\n	Media views		Nepavyko garso valdiklio patalpinti pranešimų srityje: %s\n
-Video input:	Media views		Vaizdo įvestis:
-Defaults	Media views		Numatytosios reikšmės
+Audio mixer	Media Window		Garsų maišiklis
+Show volume control on Deskbar	Media views		Patalpinti garso valdiklį pranešimų srityje
 Quit	Media Window		Baigti darbą
-Video settings	Media Window		Vaizdo nuostatos
-Video output:	Media views		Vaizdo išvestis:
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Nepavyko prisijungti prie įvairialypės terpės tarnybos.\nAr norite, kad ji būtų paleista?
 Restart media services	Media views		Perleisti įvairialypės terpės tarnybas
+Couldn't add volume control in Deskbar: %s\n	Media views		Nepavyko garso valdiklio patalpinti pranešimų srityje: %s\n
+Start media server	Media Window		Paleisti įvairialypės terpės tarnybą
+Audio settings	Media Window		Garso nuostatos
 Couldn't remove volume control in Deskbar: %s\n	Media views		Nepavyko garso valdiklio pašalinti iš pranešimų srities: %s\n
 Media	System name		Įvairialypė terpė
-Audio mixer	Media Window		Garsų maišiklis
-This hardware has no controls.	Media Window		Ši aparatūra nederinama.
+Video output:	Media views		Vaizdo išvestis:
 Audio output:	Media views		Garso išvestis:
-Audio settings	Media Window		Garso nuostatos
-Start media server	Media Window		Paleisti įvairialypės terpės tarnybą
-<none>	Media views		<nėra>
-Channel:	Media views		Kanalas:
-Show volume control on Deskbar	Media views		Patalpinti garso valdiklį pranešimų srityje
+Video input:	Media views		Vaizdo įvestis:
 Audio input:	Media views		Garso įvestis:
+<none>	Media views		<nėra>
+This hardware has no controls.	Media Window		Ši aparatūra nederinama.
+Channel:	Media views		Kanalas:
+Defaults	Media views		Numatytosios reikšmės
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Nepavyko prisijungti prie įvairialypės terpės tarnybos.\nAr norite, kad ji būtų paleista?
+Video settings	Media Window		Vaizdo nuostatos

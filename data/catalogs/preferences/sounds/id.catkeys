@@ -1,15 +1,15 @@
 1	indonesian	x-vnd.Haiku-Sounds	1784495232
-Sound file:	HWindow		Berkas suara:
 Sounds	System name		Suara
+Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sounds\n  Dipersembahkan oleh :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Karya asli dari Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
 No such file or directory	HEventList		Tidak ada berkas atau direktori seperti itu
-OK	SoundsHApp		Oke
-OK	HEventList		Oke
 OK	HWindow		Oke
+Other…	HWindow		Lain...
+OK	SoundsHApp		Oke
+Sound file:	HWindow		Berkas suara:
 This is not an audio file.	HWindow		Ini bukan file audio.
+<none>	HEventList		<none>
+OK	HEventList		Oke
 About Sounds	SoundsHApp		Tentang Sounds
 Sound	HEventList		Suara
 Event	HEventList		Peristiwa
-<none>	HEventList		<none>
-Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sounds\n  Dipersembahkan oleh :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Karya asli dari Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
 <none>	HWindow		<none>
-Other…	HWindow		Lain...

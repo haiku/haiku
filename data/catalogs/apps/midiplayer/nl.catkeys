@@ -1,18 +1,18 @@
 1	dutch; flemish	x-vnd.Haiku-MidiPlayer	471142057
-None	Main Window		Geen
-Live input:	Main Window		Live input:
-Stop	Main Window		Stop
-Cavern	Main Window		Grot
-Volume:	Main Window		Volume:
-Reverb:	Main Window		Galm:
-OK	Main Window		Oké
-Off	Main Window		Uit
 Dungeon	Main Window		Kerker
-Play	Main Window		Afspelen
-Garage	Main Window		Garage
-Closet	Main Window		WC
-MidiPlayer	System name		MidiPlayer
-Drop MIDI file here	Scope View		Sleep MIDI-bestand hierheen
-Igor's lab	Main Window		Igor's lab
-Scope	Main Window		Scoop
 Could not load song	Main Window		Nummer kon niet geladen worden
+Igor's lab	Main Window		Igor's lab
+Off	Main Window		Uit
+Volume:	Main Window		Volume:
+Closet	Main Window		WC
+Scope	Main Window		Scoop
+Drop MIDI file here	Scope View		Sleep MIDI-bestand hierheen
+None	Main Window		Geen
+Reverb:	Main Window		Galm:
+MidiPlayer	System name		MidiPlayer
+OK	Main Window		Oké
+Stop	Main Window		Stop
+Live input:	Main Window		Live input:
+Garage	Main Window		Garage
+Play	Main Window		Afspelen
+Cavern	Main Window		Grot

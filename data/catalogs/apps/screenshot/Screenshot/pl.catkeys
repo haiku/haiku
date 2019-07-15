@@ -1,31 +1,31 @@
 1	polish	x-vnd.haiku-screenshot	3958461128
-seconds	ScreenshotWindow		sekund
-Desktop	ScreenshotWindow		Pulpit
 Include window border	ScreenshotWindow		Dołącz obramowanie okna
-Screenshot	System name		Zrzut ekranu
-Select	ScreenshotWindow		Wybierz
+Overwrite	ScreenshotWindow		Nadpisz
+Save in:	ScreenshotWindow		Zapisz w:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Błąd zapisu „%s”:\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Ten plik już istnieje.\n Na pewno chcesz go nadpisać?
+OK	ScreenshotWindow		OK
 The destination path exists but is not a folder.	ScreenshotWindow		Ścieżka docelowa istnieje, ale nie jest katalogiem.
-Capture active window	ScreenshotWindow		Przechwyć aktywne okno
-Cancel	ScreenshotWindow		Anuluj
+Select	ScreenshotWindow		Wybierz
+Save as:	ScreenshotWindow		Zapisz jako:
+seconds	ScreenshotWindow		sekund
+New screenshot	ScreenshotWindow		Nowy zrzut ekranu
+Screenshot	System name		Zrzut ekranu
+Desktop	ScreenshotWindow		Pulpit
+Artwork folder	ScreenshotWindow		Katalog na obrazki
+Translator Settings	ScreenshotWindow		Ustawienia translatora
+Include mouse pointer	ScreenshotWindow		Pokaż wskaźnik myszy
+overwrite	ScreenshotWindow		nadpisz
+Settings…	ScreenshotWindow		Ustawienia…
+Choose folder	ScreenshotWindow		Wybierz katalog
 Name:	ScreenshotWindow		Nazwa:
 Choose folder…	ScreenshotWindow		Wybierz katalog…
-This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Ten plik już istnieje.\n Na pewno chcesz go nadpisać?
-Choose folder	ScreenshotWindow		Wybierz katalog
-Save	ScreenshotWindow		Zapisz
-Overwrite	ScreenshotWindow		Nadpisz
 Please select	ScreenshotWindow		Proszę wybrać
-Save as:	ScreenshotWindow		Zapisz jako:
-Copy to clipboard	ScreenshotWindow		Kopiuj do schowka
-Save in:	ScreenshotWindow		Zapisz w:
-screenshot	Screenshot	Base filename of screenshot files	zrzut_ekranu
-New screenshot	ScreenshotWindow		Nowy zrzut ekranu
-Artwork folder	ScreenshotWindow		Katalog na obrazki
-Home folder	ScreenshotWindow		Katalog domowy
 Failed to save screenshot	ScreenshotWindow		Nie można zapisać zrzutu ekranu
-OK	ScreenshotWindow		OK
-Settings…	ScreenshotWindow		Ustawienia…
-overwrite	ScreenshotWindow		nadpisz
+Cancel	ScreenshotWindow		Anuluj
 Delay:	ScreenshotWindow		Opóźnienie:
-Error saving \"%s\":\n\t%s	ScreenshotWindow		Błąd zapisu „%s”:\n\t%s
-Include mouse pointer	ScreenshotWindow		Pokaż wskaźnik myszy
-Translator Settings	ScreenshotWindow		Ustawienia translatora
+Copy to clipboard	ScreenshotWindow		Kopiuj do schowka
+screenshot	Screenshot	Base filename of screenshot files	zrzut_ekranu
+Home folder	ScreenshotWindow		Katalog domowy
+Save	ScreenshotWindow		Zapisz
+Capture active window	ScreenshotWindow		Przechwyć aktywne okno

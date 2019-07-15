@@ -1,31 +1,30 @@
-1	japanese	x-vnd.Haiku-PPMTranslator	2233502290
-Version %d.%d.%d, %s	PPMTranslator		バージョン %d.%d.%d, %s
+1	japanese	x-vnd.Haiku-PPMTranslator	292474603
+None	PPMTranslator		無し
 PPM Settings	PPMMain		PPM 設定
-Based on PPMTranslator sample code	PPMTranslator		PPM トランスレーターのサンプルコードに基づく
-OK	PPMMain		OK
+System palette 8 bits	PPMTranslator		システムパレット 8 ビット
+Sample code copyright 1999, Be Incorporated	PPMTranslator		Sample code copyright 1999, Be Incorporated
+Something is wrong with the PPMTranslator!	PPMMain		PPM トランスレーターに問題があります!
 Grayscale 8 bits	PPMTranslator		グレースケール 8 ビット
+Based on PPMTranslator sample code	PPMTranslator		PPM トランスレーターのサンプルコードに基づく
+RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 ビット ビッグエンディアン
+PPM image translator	PPMTranslator		PPM イメージトランスレーター
+Bitmap 1 bit	PPMTranslator		ビットマップ 1 ビット
+RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 ビット ビッグエンディアン
+PPMTranslator Settings	PPMTranslator		PPM トランスレーター設定
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 ビット
+OK	PPMMain		OK
+CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 ビット
 PPM image	PPMTranslator		PPM イメージ
+Input color space:	PPMTranslator		入力色空間:
+RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 ビット ビッグエンディアン
+RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 ビット ビッグエンディアン
+Write ASCII	PPMTranslator		ASCII形式で書きだす
+RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 ビット
+RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 ビット ビッグエンディアン
+RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 ビット
+Version %d.%d.%d, %s	PPMTranslator		バージョン %d.%d.%d, %s
+CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 ビット
+RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 ビット
+RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 ビット
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 ビット
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Be ビットマップフォーマット (PPMトランスレーター)
-CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 ビット
-Input color space:	PPMTranslator		入力色空間:
-CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 ビット
-PPM image translator	PPMTranslator		PPM イメージトランスレーター
-bits/space	PPMTranslator		bits/space
-RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 ビット ビッグエンディアン
-RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 ビット ビッグエンディアン
-RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 ビット ビッグエンディアン
-RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 ビット
-Write ASCII	PPMTranslator		ASCII形式で書きだす
-RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 ビット
-None	PPMTranslator		無し
-RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 ビット ビッグエンディアン
-RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 ビット
-Bitmap 1 bit	PPMTranslator		ビットマップ 1 ビット
-RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 ビット ビッグエンディアン
-RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 ビット
-Sample code copyright 1999, Be Incorporated	PPMTranslator		Sample code copyright 1999, Be Incorporated
-PPMTranslator Settings	PPMTranslator		PPM トランスレーター設定
-Something is wrong with the PPMTranslator!	PPMMain		PPM トランスレーターに問題があります!
-System palette 8 bits	PPMTranslator		システムパレット 8 ビット

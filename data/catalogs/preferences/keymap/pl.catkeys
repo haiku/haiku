@@ -1,63 +1,63 @@
 1	polish	x-vnd.Haiku-Keymap	1980403819
-Croatian	KeymapNames		Chorwacki
-Icelandic	KeymapNames		Islandzki
-Shift:	Modifier keys window	Shift key role name	Shift:
-Revert	Modifier keys window		Cofnij
-Warning: left and right key roles do not match	Modifier keys window		Uwaga: przeznaczenie klawiszy lewego i prawego się nie zgadzają
-Scroll lock	Keyboard Layout View		Scroll Lock
-Menu	Keyboard Layout View	Menu key	Menu
-Left control	Keyboard Layout View		Lewy Ctrl
-Tilde trigger	Keymap window		Wywołanie tyldy
-Grave trigger	Keymap window		Wywołanie ciężkie
-Polish	KeymapNames		Polski
-Role	Modifier keys window	As in the role of a modifier key	Rola
-Caps lock	Keyboard Layout View		Caps Lock
-Select dead keys	Keymap window		Wybierz martwe klawisze
-Cancel	Modifier keys window		Anuluj
-Command	Keyboard Layout View	Command key	Polecenie
-Defaults	Keymap window		Przywróć domyślne
-Quit	Keymap window		Zakończ
-Switch shortcut keys to Haiku mode	Keymap window		Zmień klawisze skrótów w tryb Haiku
-Circumflex trigger	Keymap window		Wywołanie akcentu
-Diaeresis trigger	Keymap window		Wywołanie diarezy
-Ukrainian	KeymapNames		Ukraiński
-Disabled	Modifier keys window	Do nothing	Wyłączony
-Open…	Keymap window		Otwórz…
-Error: duplicate keys	Modifier keys window		Błąd: zduplikowane klawisze
-System:	Keymap window		System:
-Left command	Keyboard Layout View		Lewy Command
-Set modifier keys…	Keymap window		Ustaw klawisze modyfikujące…
-Option:	Modifier keys window	Option key role name	Opcja:
-Control	Keyboard Layout View	Control key	Kontrol
-Left option	Keyboard Layout View		Lewy Option
-Right control	Keyboard Layout View		Prawy Ctrl
-Switch shortcut keys	Keymap window		Zmień klawisze skrótów
-Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Klawisz Shift
-User:	Keymap window		Użytkownik:
-Right option	Keyboard Layout View		Prawy Option
-Right shift	Keyboard Layout View		Prawy Shift
 Key	Modifier keys window	As in a computer keyboard key	Klawisz
+Right control	Keyboard Layout View		Prawy Ctrl
+Option:	Modifier keys window	Option key role name	Opcja:
+Cancel	Modifier keys window		Anuluj
+Sample and clipboard:	Keymap window		Przykład i schowek:
+Polish	KeymapNames		Polski
+Ukrainian	KeymapNames		Ukraiński
+Num lock	Keyboard Layout View		Num Lock
+Switch shortcut keys to Windows/Linux mode	Keymap window		Zmień klawisze skrótów w tryb Windows/Linuks
+Option	Keyboard Layout View	Option key	Opcja
+Scroll lock	Keyboard Layout View		Scroll Lock
+Right option	Keyboard Layout View		Prawy Option
+Revert	Modifier keys window		Cofnij
+Croatian	KeymapNames		Chorwacki
+Set modifier keys	Modifier keys window		Ustaw klawisze kodyfikujące
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Klawisz Win/Cmd 
+Command:	Modifier keys window	Command key role name	Polecenie:
+Acute trigger	Keymap window		Wywołanie ostre
+Modifier keys	Modifier keys window		Klawisze modyfikujące
+Save as…	Keymap window		Zapisz jako…
+Error: duplicate keys	Modifier keys window		Błąd: zduplikowane klawisze
+Control	Keyboard Layout View	Control key	Kontrol
+Remove	Keyboard Layout View		Usuń
+Tilde trigger	Keymap window		Wywołanie tyldy
+Shift	Keyboard Layout View	Shift key	Shift
+Left command	Keyboard Layout View		Lewy Command
+(Current)	Keymap window		(Bieżący)
+Left option	Keyboard Layout View		Lewy Option
+Esperanto	KeymapNames		Esperanto
+Warning: left and right key roles do not match	Modifier keys window		Uwaga: przeznaczenie klawiszy lewego i prawego się nie zgadzają
+Circumflex trigger	Keymap window		Wywołanie akcentu
+Caps lock	Keyboard Layout View		Caps Lock
+Left shift	Keyboard Layout View		Lewy Shift
+Left control	Keyboard Layout View		Lewy Ctrl
+Role	Modifier keys window	As in the role of a modifier key	Rola
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Klawisz Ctrl
 Control:	Modifier keys window	Control key role name	Kontrol:
-Remove	Keyboard Layout View		Usuń
-Option	Keyboard Layout View	Option key	Opcja
-Sample and clipboard:	Keymap window		Przykład i schowek:
-Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Klawisz Alt/Opt
+Disabled	Modifier keys window	Do nothing	Wyłączony
+Select dead keys	Keymap window		Wybierz martwe klawisze
+Right shift	Keyboard Layout View		Prawy Shift
 Layout	Keymap window		Układ
-Esperanto	KeymapNames		Esperanto
-Switch shortcut keys to Windows/Linux mode	Keymap window		Zmień klawisze skrótów w tryb Windows/Linuks
-Right command	Keyboard Layout View		Prawy Command
 Revert	Keymap window		Cofnij
-Command:	Modifier keys window	Command key role name	Polecenie:
-Save as…	Keymap window		Zapisz jako…
-Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Klawisz Win/Cmd 
-File	Keymap window		Plik
-Num lock	Keyboard Layout View		Num Lock
-(Current)	Keymap window		(Bieżący)
-Font	Keymap window		Font
+Grave trigger	Keymap window		Wywołanie ciężkie
+Menu	Keyboard Layout View	Menu key	Menu
+Quit	Keymap window		Zakończ
+User:	Keymap window		Użytkownik:
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Klawisz Alt/Opt
+Shift:	Modifier keys window	Shift key role name	Shift:
 Keymap	System name		Układ klawiatury
-Left shift	Keyboard Layout View		Lewy Shift
-Shift	Keyboard Layout View	Shift key	Shift
-Set modifier keys	Modifier keys window		Ustaw klawisze kodyfikujące
-Modifier keys	Modifier keys window		Klawisze modyfikujące
-Acute trigger	Keymap window		Wywołanie ostre
+Set modifier keys…	Keymap window		Ustaw klawisze modyfikujące…
+Switch shortcut keys to Haiku mode	Keymap window		Zmień klawisze skrótów w tryb Haiku
+Defaults	Keymap window		Przywróć domyślne
+System:	Keymap window		System:
+Switch shortcut keys	Keymap window		Zmień klawisze skrótów
+Right command	Keyboard Layout View		Prawy Command
+Font	Keymap window		Font
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Klawisz Shift
+Command	Keyboard Layout View	Command key	Polecenie
+File	Keymap window		Plik
+Diaeresis trigger	Keymap window		Wywołanie diarezy
+Icelandic	KeymapNames		Islandzki
+Open…	Keymap window		Otwórz…

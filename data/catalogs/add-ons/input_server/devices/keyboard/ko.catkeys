@@ -1,10 +1,10 @@
 1	korean	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
-Kill application	Team monitor		응용프로그램 죽이기
-Quit application	Team monitor		응용프로그램 끝내기
-Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		목록 위에서 응용프로그램을 선택하고 '응용프로그램 죽이기'와 '응용프로그램 끝내기' 단추 중의 하나를 프로그램을 닫기 위해 클릭하십시오.\n\nCONTROL+ALT+DELETE를  누르면 %ld 초 후에 다시 부팅할 것입니다.
 If the application will not quit you may have to kill it.	Team monitor		응용 프로그램이 종료되지 않으면 그것을 죽일 수 있습니다.
-Force reboot	Team monitor		강제로 재부팅
-Team monitor	Team monitor		팀 모니터
-(This team is a system component)	Team monitor		(이 팀은 시스템 구성요소임)
+Quit application	Team monitor		응용프로그램 끝내기
 Restart the desktop	Team monitor		데스크탑 다시 시작
+Force reboot	Team monitor		강제로 재부팅
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		목록 위에서 응용프로그램을 선택하고 '응용프로그램 죽이기'와 '응용프로그램 끝내기' 단추 중의 하나를 프로그램을 닫기 위해 클릭하십시오.\n\nCONTROL+ALT+DELETE를  누르면 %ld 초 후에 다시 부팅할 것입니다.
+Team monitor	Team monitor		팀 모니터
+Kill application	Team monitor		응용프로그램 죽이기
 Cancel	Team monitor		취소
+(This team is a system component)	Team monitor		(이 팀은 시스템 구성요소임)

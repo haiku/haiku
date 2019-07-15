@@ -1,83 +1,82 @@
-1	korean	x-vnd.Haiku-Terminal	2984117946
-Not found.	Terminal TermWindow		찾을수 없음.
-Switch Terminals	Terminal TermWindow		터미널 전환
-Change directory	Terminal TermView		디렉토리 바꾸기
-OK	Terminal TermWindow		확인
-New Terminal	Terminal TermWindow		새 터미널
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		터미널은 이 셀을 실행할 수 없습니다  미안합니다.
-Match case	Terminal FindWindow		대소문자 구분
-Quit	Terminal TermWindow		나가기
-Use default shell	Terminal Shell		기본 셀 사용
-Confirm exit if active programs exist	Terminal AppearancePrefView		만약 활성화된 프로그램이 있으면 확인하고 나가기
-The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		이 패턴은 탭 제목에서 사용됩니다. 다음과 같은 자리 맞추개가 \n사용됨:\n
-Select all	Terminal TermWindow		모두 선택
-Close tab	Terminal TermWindow		탭 닫기
-Save to file…	Terminal PrefWindow		파일로 저장…
-Window title:	Terminal AppearancePrefView		창 이름:
-Font:	Terminal AppearancePrefView		글꼴:
-Copy here	Terminal TermView		여기에 복사
-Really close?	Terminal TermWindow		진짜로 닫겠습니까?
-Copy	Terminal TermWindow		복사
-Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	터미널
-Window title:	Terminal TermWindow		창 이름:
-Unrecognized option \"%s\"\n	Terminal arguments parsing		인식할 수 없는 옵션 \"%s\"\n
-%app% settings	Terminal PrefWindow	window title	%app% 설정
-Cancel	Terminal SetTitleWindow		취소
-Increase	Terminal TermWindow		크게
-Settings	Terminal TermWindow		환경 설정
-Selected text	Terminal AppearancePrefView		텍스트 선택
-Find	Terminal FindWindow		찾기
-Appearance	Terminal PrefWindow		외양
-Tab title:	Terminal AppearancePrefView		탭 이름:
-OK	Terminal SetTitleWindow		확인
-Background	Terminal AppearancePrefView		배경
-Use selection	Terminal FindWindow		선텍된 부분 사용
-The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		이 작업 \"%1\"은 여전히 실행중입니다.\n만약 탭을 닫으면,이 프로세스는 죽을 것입니다.
-Cannot execute \"%command\":\n\t%error	Terminal Shell		\"%command\" 실행할 수 없음:\n\t%error
-Window title…	Terminal TermWindow		창 이름...
-Full screen	Terminal TermWindow		전체 화면
-Page setup…	Terminal TermWindow		페이지 설정...
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		다음 작업은 여전히 실행중입니다:\n\n\t%1\n\n\n만약 터미넣을 닫으면,이 프로세스는 죽을 것입니다
-Insert path	Terminal TermView		경로 삽입
-Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku 터미널l\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui 와 Takashi Murai.\n\n사용법: %s [옵션] [셀]\n
-No search string was entered.	Terminal TermWindow		찾을 문자열이 입력되지 않았습니다.
-Set window title	Terminal TermWindow		창 이름 설정
-Terminal	System name		터미널
+1	korean	x-vnd.Haiku-Terminal	2677418285
 Close other tabs	Terminal TermWindow		다른 탭 닫기
-Match word	Terminal FindWindow		일치하는 단어
-Nothing is selected.	Terminal TermWindow		선택된 것이 없습니다.
-Text not found.	Terminal TermWindow		텍스트를 찾을 수 없습니다.
-Find…	Terminal TermWindow		찾기...
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		이 작업 \"%1\"은 여전히 실행중입니다.\n만약 터미넣을 닫으면,이 프로세스는 죽을 것입니다.
-Move here	Terminal TermView		여기로 이동
-Error!	Terminal getString		에러!
-New tab	Terminal TermWindow		새 탭
-Selected background	Terminal AppearancePrefView		선택된 배경
-Decrease	Terminal TermWindow		작게
-Create link here	Terminal TermView		여기에 링크 만들기
-Close	Terminal TermWindow		닫기
-Text	Terminal AppearancePrefView		텍스트
-Clear all	Terminal TermWindow		모두 지우기
+Insert path	Terminal TermView		경로 삽입
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		터미널은 이 셀을 실행할 수 없습니다  미안합니다.
 Text encoding	Terminal TermWindow		텍스트 인코딩
-Close window	Terminal TermWindow		창 닫기
-Set tab title	Terminal TermWindow		탭 이름 설정
-Settings…	Terminal TermWindow		환경 설정...
-Abort	Terminal Shell		정보
+OK	Terminal SetTitleWindow		확인
 Edit	Terminal TermWindow		편집
-Color:	Terminal AppearancePrefView		색상:
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		이 패턴은 창 제목에서 사용됩니다. 다음과 같은 자리 맞추개가 \n사용됨:\n
-Print	Terminal TermWindow		인쇄
-Use text:	Terminal FindWindow		텍스트 사용:
-Cancel	Terminal TermWindow		취소
-OK	Terminal TermApp		확인
-Find failed	Terminal TermWindow		찾기 실패
-Search forward	Terminal FindWindow		앞으로 찾기
+Select all	Terminal TermWindow		모두 선택
+Confirm exit if active programs exist	Terminal AppearancePrefView		만약 활성화된 프로그램이 있으면 확인하고 나가기
+Copy	Terminal TermWindow		복사
 Edit tab title…	Terminal TermWindow		탭 이름 편집...
-Find previous	Terminal TermWindow		이전 찾기
-Tab title:	Terminal TermWindow		탭 이름:
-Find next	Terminal TermWindow		다음 찾기
-Close active tab	Terminal TermWindow		활성된 탭 닫기
-Paste	Terminal TermWindow		붙여넣기
-Shell 	Terminal TermWindow		셀
-Cancel	Terminal TermView		취소
+Print	Terminal TermWindow		인쇄
+Settings	Terminal TermWindow		환경 설정
+%app% settings	Terminal PrefWindow	window title	%app% 설정
 Use default	Terminal SetTitleWindow		기본 설정 사용
+Close tab	Terminal TermWindow		탭 닫기
+Selected background	Terminal AppearancePrefView		선택된 배경
+Error!	Terminal getString		에러!
+Set tab title	Terminal TermWindow		탭 이름 설정
+Appearance	Terminal PrefWindow		외양
+Create link here	Terminal TermView		여기에 링크 만들기
+Selected text	Terminal AppearancePrefView		텍스트 선택
+Change directory	Terminal TermView		디렉토리 바꾸기
+Page setup…	Terminal TermWindow		페이지 설정...
+Cancel	Terminal TermView		취소
+Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	터미널
+Use selection	Terminal FindWindow		선텍된 부분 사용
+Find next	Terminal TermWindow		다음 찾기
+Window title:	Terminal AppearancePrefView		창 이름:
+New tab	Terminal TermWindow		새 탭
+Window title…	Terminal TermWindow		창 이름...
+Cannot execute \"%command\":\n\t%error	Terminal Shell		\"%command\" 실행할 수 없음:\n\t%error
+Terminal	System name		터미널
+Really close?	Terminal TermWindow		진짜로 닫겠습니까?
+OK	Terminal TermApp		확인
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		이 작업 \"%1\"은 여전히 실행중입니다.\n만약 터미넣을 닫으면,이 프로세스는 죽을 것입니다.
+Unrecognized option \"%s\"\n	Terminal arguments parsing		인식할 수 없는 옵션 \"%s\"\n
+Tab title:	Terminal AppearancePrefView		탭 이름:
+Text not found.	Terminal TermWindow		텍스트를 찾을 수 없습니다.
+Find failed	Terminal TermWindow		찾기 실패
+Match word	Terminal FindWindow		일치하는 단어
+New Terminal	Terminal TermWindow		새 터미널
+Quit	Terminal TermWindow		나가기
+Match case	Terminal FindWindow		대소문자 구분
+Find previous	Terminal TermWindow		이전 찾기
+Close	Terminal TermWindow		닫기
+Save to file…	Terminal PrefWindow		파일로 저장…
+Background	Terminal AppearancePrefView		배경
+Cancel	Terminal TermWindow		취소
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		이 작업 \"%1\"은 여전히 실행중입니다.\n만약 탭을 닫으면,이 프로세스는 죽을 것입니다.
+Full screen	Terminal TermWindow		전체 화면
+Shell 	Terminal TermWindow		셀
+Tab title:	Terminal TermWindow		탭 이름:
+Window title:	Terminal TermWindow		창 이름:
+Switch Terminals	Terminal TermWindow		터미널 전환
+Decrease	Terminal TermWindow		작게
+Settings…	Terminal TermWindow		환경 설정...
+Cancel	Terminal SetTitleWindow		취소
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		이 패턴은 창 제목에서 사용됩니다. 다음과 같은 자리 맞추개가 \n사용됨:\n
+Use text:	Terminal FindWindow		텍스트 사용:
+Close active tab	Terminal TermWindow		활성된 탭 닫기
+Nothing is selected.	Terminal TermWindow		선택된 것이 없습니다.
+Find	Terminal FindWindow		찾기
+The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		이 패턴은 탭 제목에서 사용됩니다. 다음과 같은 자리 맞추개가 \n사용됨:\n
+Font:	Terminal AppearancePrefView		글꼴:
+Paste	Terminal TermWindow		붙여넣기
+Copy here	Terminal TermView		여기에 복사
+Use default shell	Terminal Shell		기본 셀 사용
+Color:	Terminal AppearancePrefView		색상:
+Text	Terminal AppearancePrefView		텍스트
+Not found.	Terminal TermWindow		찾을수 없음.
+Find…	Terminal TermWindow		찾기...
+No search string was entered.	Terminal TermWindow		찾을 문자열이 입력되지 않았습니다.
+Move here	Terminal TermView		여기로 이동
+Abort	Terminal Shell		정보
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		다음 작업은 여전히 실행중입니다:\n\n\t%1\n\n\n만약 터미넣을 닫으면,이 프로세스는 죽을 것입니다
+Set window title	Terminal TermWindow		창 이름 설정
+Increase	Terminal TermWindow		크게
+OK	Terminal TermWindow		확인
+Close window	Terminal TermWindow		창 닫기
+Clear all	Terminal TermWindow		모두 지우기
+Search forward	Terminal FindWindow		앞으로 찾기

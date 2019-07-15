@@ -1,27 +1,27 @@
 1	russian	x-vnd.Haiku.TV	1995288111
-TV	MainWin		Телевидение
-Channel	MainWin		Канал
-Settings…	MainWin		Настройки…
-Interface	MainWin		Интерфейс
-Keep aspect ratio	MainWin		Поддерживать соотношение сторон
-Previous channel	MainWin		Предыдущий канал
-Settings	MainWin		Настройки
-TV	System name		Телевидение
+No menu	MainWin		Без меню
 No border	MainWin		Без рамки
-Always on top	MainWin		Всегда сверху
-OK	MainWin		ОК
-Quit	MainWin		Выход
+force 704 x 576, display aspect 4:3	MainWin		Форсировать 704 x 576, соотношение 4:3
+Error, connecting to interface failed:\n\n	MainWin		Ошибка, не удалось подключиться к интерфейсу:\n\n
+force 544 x 576, display aspect 4:3	MainWin		Форсировать 544 x 576, соотношение 4:3
 Full screen	MainWin		На весь экран
-Debug	MainWin		Отладка
 Scale to native size	MainWin		Оригинальный размер
 unknown	MainWin		неизвестно
 Next channel	MainWin		Следующий канал
-Error, interface is busy:\n\n	MainWin		Ошибка, интерфейс занят:\n\n
-None	MainWin		Нет
-force 704 x 576, display aspect 4:3	MainWin		Форсировать 704 x 576, соотношение 4:3
+Keep aspect ratio	MainWin		Поддерживать соотношение сторон
 DVB - Digital Video Broadcasting TV	MainWin		DVB - Цифровое Видео Вещание
-force 544 x 576, display aspect 4:3	MainWin		Форсировать 544 x 576, соотношение 4:3
-pixel aspect ratio	MainWin		Пиксельное соотношение сторон
-No menu	MainWin		Без меню
-Error, connecting to interface failed:\n\n	MainWin		Ошибка, не удалось подключиться к интерфейсу:\n\n
+Always on top	MainWin		Всегда сверху
+Debug	MainWin		Отладка
+Interface	MainWin		Интерфейс
 force 720 x 576, display aspect 4:3	MainWin		Форсировать 720 x 576, соотношение 4:3
+Quit	MainWin		Выход
+Channel	MainWin		Канал
+Previous channel	MainWin		Предыдущий канал
+OK	MainWin		ОК
+TV	MainWin		Телевидение
+Settings	MainWin		Настройки
+TV	System name		Телевидение
+Settings…	MainWin		Настройки…
+None	MainWin		Нет
+Error, interface is busy:\n\n	MainWin		Ошибка, интерфейс занят:\n\n
+pixel aspect ratio	MainWin		Пиксельное соотношение сторон

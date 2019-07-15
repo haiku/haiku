@@ -1,131 +1,131 @@
 1	greek, modern (1453-)	x-vnd.Haiku-DiskProbe	2206273117
-File offset: 	ProbeView		Μετατόπιση αρχείου:
-%ld (native)	ProbeView		%ld (φυσικό)
-64 bit unsigned value:	TypeEditors		64 bit μη-υπογεγραμμένη τιμή:
-Find again	ProbeView		Εύρεση ξανά
-Text	FindWindow		Κείμενο
-Find…	ProbeView		Εύρεση...
-Case sensitive	FindWindow		Ταίριασμα πεζών/κεφαλαίων
-Cancel	OpenWindow		Άκυρο
-Close	AttributeWindow		Κλείσιμο
-File	ProbeView		Αρχείο
-Attribute	ProbeView		Ιδιότητα
-Floating-point value:	TypeEditors		Τιμή κινητής-υποδιαστολής:
-16 bit	TypeEditors		16 bit
-Attributes	ProbeView		Ιδιότητες
-Device offset: 	ProbeView		Μετατόπιση συσκευής:
-Selection	ProbeView		Επιλογή
-DiskProbe	System name		DiskProbe
-what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	τι: '%.4s'\n\n
-File	FileWindow		Αρχείο
-OK	DiskProbe		Εντάξει
-Boolean	TypeEditors	This is the type of editor	Boolean
-Paste	ProbeView		Επικόλληση
-PNG format	TypeEditors		Μορφοποίηση PNG
-Font size	ProbeView		Μέγεθος γραμματοσειράς
-Attribute type: 	ProbeView		Τύπος ιδιότητας:
-Attribute	AttributeWindow		Ιδιότητα
-8 bit signed value:	TypeEditors		8 bit υπογεγραμμένη τιμή:
-Number:	TypeEditors		Αριθμός:
-Save	ProbeView		Αποθήκευση
-Stop	ProbeView		Σταμάτημα
-Number editor	TypeEditors		Επεξεργαστής αριθμού
-Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
-No type editor available	AttributeWindow		Μη διαθέσιμος επεξεργαστής τύπου
-Double precision floating-point value:	TypeEditors		Τιμή κινητής-υποδιαστολής διπλής ακριβείας:
-Device: 	ProbeView		Συσκευή:
-Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Πράγματι θέλετε να διαγράψετε την ιδιότητα \"%s\" από το αρχείο \"%s\";\n\nΔεν θα μπορείτε να αναιρέσετε αυτήν την ενέργεια.
-Text	TypeEditors	This is the type of editor	Κείμενο
-8 bit unsigned value:	TypeEditors		8 bit μη-υπογεγραμμένη τιμή:
-Block	ProbeView		Μπλοκ
-Back	ProbeView		Επιστροφή
-Device	ProbeView		Συσκευή
-Unknown type	TypeEditors		Άγνωστος τύπος
-Block 0x%Lx	ProbeView		Μπλοκ 0x%Lx
-Quit	FileWindow		Έξοδος
-Undo	ProbeView		Αναίρεση
-Close	ProbeView		Κλείσιμο
-Number	TypeEditors	This is the type of editor	Αριθμός
-Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Δεκαδικός
-16 bit signed value:	TypeEditors		16 bit υπογεγραμμένη τιμή:
-String editor	TypeEditors		Επεξεργαστής συμβολοσειράς
-of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	από 0x0
-64 bit signed offset:	TypeEditors		64 bit υπογεγραμμένη μετατόπιση:
-Boolean editor	TypeEditors		Επεξεργαστής Boolean
-Copy	ProbeView		Αντιγραφή
-none	ProbeView	No attributes	κανένα
-Boolean value:	TypeEditors		Τιμή Boolean:
-32 bit size or status:	TypeEditors		32 bit μέγεθος ή κατάσταση:
-8 bit palette	TypeEditors		Παλέτα 8 bit
-Fit	ProbeView	Size of fonts, fits to available room	Ταίριασμα
-Probe device	OpenWindow		Συσκευή διερεύνισης
-Unknown format	TypeEditors		Άγνωστη μορφοποίηση
-Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Δεκαεξαδικό
-MIME type:	TypeEditors		Τύπος MIME:
-Page setup…	ProbeView		Διαμόρφωση σελίδας...
-New…	FileWindow		Νέο...
-DiskProbe request	AttributeWindow		DiskProbe αίτηση
-Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Αδυναμία ανάγνωσης της εικόνας
-Save changes before closing?	ProbeView		Να αποθηκευτούν οι αλλαγές πριν το κλείσιμο;
-Type editor	AttributeWindow		Επεξεργαστής τύπου
-Native: 0x%0*Lx	ProbeView		Φυσικό: 0x%0*Lx
 Raw editor	AttributeWindow		Επεξεργαστής Raw
-Message View	TypeEditors		Προβολή μηνύματος
-DiskProbe request	ProbeView		DiskProbe αίτηση
-32 bit unsigned size:	TypeEditors		32 bit μη-υπογεγραμμένο μέγεθος:
-Flattened bitmap	TypeEditors		Ισοπέδωμένη εικόνα bitmap
-Open file…	FileWindow		Άνοιγμα αρχείου...
-Next	ProbeView		Επόμενο
-Close	FileWindow		Κλείσιμο
-Attribute: 	ProbeView		Ιδιότητα:
-Remove from file	AttributeWindow		Διαγραφή από το αρχείο
-Don't save	ProbeView		Χωρίς αποθήκευση
-Previous	ProbeView		Προηγούμενο
-64 bit signed value:	TypeEditors		64 bit υπογεγραμμένη τιμή:
-Icon	TypeEditors		Εικονίδιο
-Block: 	ProbeView		Μπλοκ
-Examine device:	OpenWindow		Εξέταση συσκευής:
-Offset: 	ProbeView		Μετατόπιση:
-OK	ProbeView		Εντάξει
-Add	ProbeView		Προσθήκη
-Edit	ProbeView		Επεξεργασία
-Native: %Ld (0x%0*Lx)	ProbeView		Φυσικό: %Ld (0x%0*Lx)
-32 bit unsigned value:	TypeEditors		32 bit μη-υπογεγραμμένη τιμή:
-Message	TypeEditors	This is the type of view	Μήνυμα
-Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Αδυναμία ανοίγματος \"%s\":\n%s
-Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Βαση
-Image view	TypeEditors	Image means here a picture file, not a disk image.	Προβολή εικόνας
-Cancel	AttributeWindow		Άκυρο
-Type editor not supported	ProbeView		Ο επεξεργαστής τύπου δεν υποστηρίζεται
-MIME type editor	TypeEditors		Επεξεργαστής τύπου MIME
-Swapped: %Ld (0x%0*Lx)	ProbeView		Ανταλλάχτηκαν: %Ld (0x%0*Lx)
-Find	FindWindow		Εύρεση
 Remove	AttributeWindow		Διαγραφή
-Print…	ProbeView		Εκτύπωση...
-Block %Ld (0x%Lx)	ProbeView		Μπλοκ %Ld (0x%Lx)
-Image	TypeEditors	This is the type of view	Εικόνα
-Could not open file \"%s\": %s\n	DiskProbe		Αδυναμία ανοίγματος του αρχείου \"%s\": %s\n
-Select all	ProbeView		Επιλογή όλων
-Probe file…	OpenWindow		Αρχείο probe...
-Icon view	TypeEditors		Προβολή εικονίδιου
-Bookmarks	ProbeView		Σελιδοδείκτες
-Mode:	FindWindow		Λειτουργία:
-15 bit	TypeEditors		15 bit
-Open device	FileWindow		Άνοιγμα συσκευής
-Could not find search string.	ProbeView		Αδυναμία εύρεσης της συμβολοσειράς.
+Close	ProbeView		Κλείσιμο
+Boolean value:	TypeEditors		Τιμή Boolean:
+File	ProbeView		Αρχείο
+MIME type editor	TypeEditors		Επεξεργαστής τύπου MIME
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Δεκαεξαδικό
 16 bit unsigned value:	TypeEditors		16 bit μη-υπογεγραμμένη τιμή:
+8 bit signed value:	TypeEditors		8 bit υπογεγραμμένη τιμή:
 Attribute offset: 	ProbeView		Μετατόπιση ιδιότητας:
-View	ProbeView	This is the last menubar item 'File Edit Block View'	Προβολή
-Redo	ProbeView		Μη αναίρεση
-File: 	ProbeView		Αρχείο:
+Text	TypeEditors	This is the type of editor	Κείμενο
+File offset: 	ProbeView		Μετατόπιση αρχείου:
+Add	ProbeView		Προσθήκη
+64 bit signed value:	TypeEditors		64 bit υπογεγραμμένη τιμή:
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Πράγματι θέλετε να διαγράψετε την ιδιότητα \"%s\" από το αρχείο \"%s\";\n\nΔεν θα μπορείτε να αναιρέσετε αυτήν την ενέργεια.
+No type editor available	AttributeWindow		Μη διαθέσιμος επεξεργαστής τύπου
+Print…	ProbeView		Εκτύπωση...
+New…	FileWindow		Νέο...
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	τι: '%.4s'\n\n
+OK	DiskProbe		Εντάξει
+DiskProbe	System name		DiskProbe
+Back	ProbeView		Επιστροφή
+Device: 	ProbeView		Συσκευή:
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Βαση
+Open file…	FileWindow		Άνοιγμα αρχείου...
 32 bit unsigned pointer:	TypeEditors		32 bit μη-υπογεγραμμένος δείκτης:
-of 	ProbeView		από
-Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Η εγγραφή στο αρχείο απέτυχε:\n%s\n\nΌλες οι αλλαγές θα χαθούν όταν βγείτε.
-32 bit	TypeEditors		32 bit
-Cancel	ProbeView		Άκυρο
-Swapped: 0x%0*Lx	ProbeView		Ανταλλάχτηκαν: 0x%0*Lx
-Grayscale	TypeEditors		Κλίμακα του γκρι
-32 bit signed value:	TypeEditors		32 bit προσημασμένη τιμή:
 DiskProbe request	DiskProbe		DiskProbe αίτηση
-Type editor	ProbeView		Επεξεργαστής τύπου
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Η εγγραφή στο αρχείο απέτυχε:\n%s\n\nΌλες οι αλλαγές θα χαθούν όταν βγείτε.
+Examine device:	OpenWindow		Εξέταση συσκευής:
+Number editor	TypeEditors		Επεξεργαστής αριθμού
+Icon	TypeEditors		Εικονίδιο
+Attribute	ProbeView		Ιδιότητα
+Don't save	ProbeView		Χωρίς αποθήκευση
+Undo	ProbeView		Αναίρεση
+Flattened bitmap	TypeEditors		Ισοπέδωμένη εικόνα bitmap
+Block %Ld (0x%Lx)	ProbeView		Μπλοκ %Ld (0x%Lx)
+Cancel	OpenWindow		Άκυρο
+Unknown format	TypeEditors		Άγνωστη μορφοποίηση
+File: 	ProbeView		Αρχείο:
+Swapped: %Ld (0x%0*Lx)	ProbeView		Ανταλλάχτηκαν: %Ld (0x%0*Lx)
+Stop	ProbeView		Σταμάτημα
+Cancel	ProbeView		Άκυρο
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Αδυναμία ανοίγματος \"%s\":\n%s
+Font size	ProbeView		Μέγεθος γραμματοσειράς
+Type editor not supported	ProbeView		Ο επεξεργαστής τύπου δεν υποστηρίζεται
+Native: 0x%0*Lx	ProbeView		Φυσικό: 0x%0*Lx
+Copy	ProbeView		Αντιγραφή
+Redo	ProbeView		Μη αναίρεση
+Floating-point value:	TypeEditors		Τιμή κινητής-υποδιαστολής:
+Cancel	AttributeWindow		Άκυρο
+16 bit signed value:	TypeEditors		16 bit υπογεγραμμένη τιμή:
+DiskProbe request	AttributeWindow		DiskProbe αίτηση
+Next	ProbeView		Επόμενο
+64 bit signed offset:	TypeEditors		64 bit υπογεγραμμένη μετατόπιση:
+32 bit signed value:	TypeEditors		32 bit προσημασμένη τιμή:
+Could not find search string.	ProbeView		Αδυναμία εύρεσης της συμβολοσειράς.
+Close	FileWindow		Κλείσιμο
+Unknown type	TypeEditors		Άγνωστος τύπος
+Open device	FileWindow		Άνοιγμα συσκευής
+Number:	TypeEditors		Αριθμός:
+Quit	FileWindow		Έξοδος
+Text	FindWindow		Κείμενο
+Block 0x%Lx	ProbeView		Μπλοκ 0x%Lx
+Attribute	AttributeWindow		Ιδιότητα
+Mode:	FindWindow		Λειτουργία:
+16 bit	TypeEditors		16 bit
+32 bit size or status:	TypeEditors		32 bit μέγεθος ή κατάσταση:
+of 	ProbeView		από
 Contents:	TypeEditors		Περιεχόμενα:
+Could not open file \"%s\": %s\n	DiskProbe		Αδυναμία ανοίγματος του αρχείου \"%s\": %s\n
+Probe file…	OpenWindow		Αρχείο probe...
+Block: 	ProbeView		Μπλοκ
+Bookmarks	ProbeView		Σελιδοδείκτες
+Probe device	OpenWindow		Συσκευή διερεύνισης
+none	ProbeView	No attributes	κανένα
+Case sensitive	FindWindow		Ταίριασμα πεζών/κεφαλαίων
+32 bit unsigned value:	TypeEditors		32 bit μη-υπογεγραμμένη τιμή:
+Remove from file	AttributeWindow		Διαγραφή από το αρχείο
+Attributes	ProbeView		Ιδιότητες
+Message	TypeEditors	This is the type of view	Μήνυμα
+Message View	TypeEditors		Προβολή μηνύματος
+Offset: 	ProbeView		Μετατόπιση:
+Swapped: 0x%0*Lx	ProbeView		Ανταλλάχτηκαν: 0x%0*Lx
+MIME type:	TypeEditors		Τύπος MIME:
+Fit	ProbeView	Size of fonts, fits to available room	Ταίριασμα
+Type editor	ProbeView		Επεξεργαστής τύπου
+File	FileWindow		Αρχείο
+Grayscale	TypeEditors		Κλίμακα του γκρι
+32 bit	TypeEditors		32 bit
+Native: %Ld (0x%0*Lx)	ProbeView		Φυσικό: %Ld (0x%0*Lx)
+Device	ProbeView		Συσκευή
+Close	AttributeWindow		Κλείσιμο
+Type editor	AttributeWindow		Επεξεργαστής τύπου
+Save	ProbeView		Αποθήκευση
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	από 0x0
+Attribute type: 	ProbeView		Τύπος ιδιότητας:
+15 bit	TypeEditors		15 bit
+Page setup…	ProbeView		Διαμόρφωση σελίδας...
+Boolean	TypeEditors	This is the type of editor	Boolean
+Icon view	TypeEditors		Προβολή εικονίδιου
+Select all	ProbeView		Επιλογή όλων
+64 bit unsigned value:	TypeEditors		64 bit μη-υπογεγραμμένη τιμή:
+OK	ProbeView		Εντάξει
+Previous	ProbeView		Προηγούμενο
+Selection	ProbeView		Επιλογή
+Find	FindWindow		Εύρεση
+8 bit unsigned value:	TypeEditors		8 bit μη-υπογεγραμμένη τιμή:
+%ld (native)	ProbeView		%ld (φυσικό)
+Attribute: 	ProbeView		Ιδιότητα:
+Block	ProbeView		Μπλοκ
+Find again	ProbeView		Εύρεση ξανά
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Προβολή
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Αδυναμία ανάγνωσης της εικόνας
+DiskProbe request	ProbeView		DiskProbe αίτηση
+Double precision floating-point value:	TypeEditors		Τιμή κινητής-υποδιαστολής διπλής ακριβείας:
+Image	TypeEditors	This is the type of view	Εικόνα
+Save changes before closing?	ProbeView		Να αποθηκευτούν οι αλλαγές πριν το κλείσιμο;
+PNG format	TypeEditors		Μορφοποίηση PNG
+Number	TypeEditors	This is the type of editor	Αριθμός
+Edit	ProbeView		Επεξεργασία
+String editor	TypeEditors		Επεξεργαστής συμβολοσειράς
+Boolean editor	TypeEditors		Επεξεργαστής Boolean
+Device offset: 	ProbeView		Μετατόπιση συσκευής:
+Find…	ProbeView		Εύρεση...
+8 bit palette	TypeEditors		Παλέτα 8 bit
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Δεκαδικός
+Image view	TypeEditors	Image means here a picture file, not a disk image.	Προβολή εικόνας
+Paste	ProbeView		Επικόλληση
+32 bit unsigned size:	TypeEditors		32 bit μη-υπογεγραμμένο μέγεθος:

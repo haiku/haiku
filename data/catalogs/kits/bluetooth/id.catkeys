@@ -1,88 +1,88 @@
 1	indonesian	x-vnd.Haiku-Bluetooth	3550394259
-Display	DeviceClass		Tampilan
-Capturing	DeviceClass		Menangkap
-Printer	DeviceClass		Pencetak
-Uncategorized	DeviceClass		Tak terkategori
-1-17% utilized	DeviceClass		terpakai 1-17%
 Positioning	DeviceClass		Memposisikan
-Rendering	DeviceClass		Pencitraan
-Phone	DeviceClass		Telepon
-17-33% utilized	DeviceClass		terpakai 17-33%
-#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Bukan nama yang benar
-Combo keyboard/pointing device	DeviceClass		Combo keyboard/alat penunjuk
 Controller	DeviceClass		Kontroler
-No service available	DeviceClass		Servis tidak tersedia
-Wearable	DeviceClass	A wearable computer	Dapat dipakai
-Handheld	DeviceClass		Handheld
-Invalid device class!\n	DeviceClass		Kelas perangkat tidak valid!\n
-Sensing device	DeviceClass		Perangkat penginderaan
-Computer	DeviceClass		Komputer
-Cellular	DeviceClass		Seluler
-Microphone	DeviceClass		Mikrofon
-Unknown (reserved) minor device class	DeviceClass		Tak diketahui (cadangan) kelas alat minor
-Cordless	DeviceClass		Nirkabel
 Common ISDN access	DeviceClass		Akses ISDN umum
-83-99% utilized	DeviceClass		dimanfaatkan 83-99%
-Scanner	DeviceClass		Pemindai
-Game	DeviceClass		Permainan
-Gamepad	DeviceClass		Gamepad
-(reserved)	DeviceClass		(cadangan)
-Desktop workstation	DeviceClass		Desktop workstation
-Audio/Video	DeviceClass		Audio/Video
-Glasses	DeviceClass		Kacamata
+Unknown (reserved) minor device class	DeviceClass		Tak diketahui (cadangan) kelas alat minor
+Uncategorized	DeviceClass		Tak terkategori
 Keyboard	DeviceClass		Papan ketik
-Camera	DeviceClass		Kamera
-Major class: 	DeviceClass		Kelas besar: 
-50-67% utilized	DeviceClass		terpakai 50-67%
-Card reader	DeviceClass		Pembaca kartu
-Set-top box	DeviceClass		Kotak set-top
-Helmet	DeviceClass		Helm
-Laptop	DeviceClass		Leptop
-Car audio	DeviceClass		Audio mobil
-SIM card reader	DeviceClass		Pembaca kartu SIM
-Headphones	DeviceClass		Headphone
-Information	DeviceClass		Informasi
-Remote control	DeviceClass		Remot kontrol
-Service classes: 	DeviceClass		Kelas layanan: 
-Pager	DeviceClass	A small radio device to receive short text messages	Pager
-Object transfer	DeviceClass		Transfer objek
-Gaming/Toy	DeviceClass		Permainan/Mainan
-Audio	DeviceClass		Audio
-Robot	DeviceClass		Robot
-Camcorder	DeviceClass		Camcorder
-Digitizer tablet	DeviceClass		Tablet digitizer
-Loudspeaker	DeviceClass		Loudspeaker
-Joystick	DeviceClass		Joystick
-LAN access	DeviceClass		Akses LAN
-Wrist watch	DeviceClass		Jam tangan
-Minor class: 	DeviceClass		Kelas kecil: 
-Networking	DeviceClass		Jaringan
-Portable audio	DeviceClass		Audio portabel
-Device conforms to the headset profile	DeviceClass		Perangkat sesuai dengan profil headset
-Hands-free	DeviceClass		Bebas-genggam
-#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Nama tidak valid
-Vehicle	DeviceClass		Kendaraan
-Palm	DeviceClass	A palm-held device	Palm
-Video display and loudspeaker	DeviceClass		Penampil video dan loudspeaker
-Peripheral	DeviceClass		Peripheral
-#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Nama tidak valid
-Wired modem or voice gateway	DeviceClass		Modem kabel atau gateway suara
-Jacket	DeviceClass		Jaket
-Unspecified	DeviceClass		Tak-ditentukan
-Fully available	DeviceClass		Sepenuhnya tersedia
-67-83% utilized	DeviceClass		terpakai 67-83%
-Not implemented	RemoteDevice		Tidak diimplementasikan
-#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Nama tidak valid
-Server	DeviceClass		Server
-Video conferencing	DeviceClass		Konferensi video
-Video camera	DeviceClass		Video kamera
-HiFi audio device	DeviceClass		Perangkat audio HiFi
 Smart phone	DeviceClass		Smart phone
-Telephony	DeviceClass		Telepon
-Doll/Action figure	DeviceClass		Boneka/Gambar bergerak
 VCR	DeviceClass		VCR
-Video monitor	DeviceClass		Video monitor
-Pointing device	DeviceClass		Alat penunjuk
-Miscellaneous	DeviceClass		Serba neka
-33-50% utilized	DeviceClass		terpakai 33-50%
+Cellular	DeviceClass		Seluler
+Audio	DeviceClass		Audio
+Audio/Video	DeviceClass		Audio/Video
+Car audio	DeviceClass		Audio mobil
+Major class: 	DeviceClass		Kelas besar: 
+HiFi audio device	DeviceClass		Perangkat audio HiFi
+Microphone	DeviceClass		Mikrofon
+Capturing	DeviceClass		Menangkap
+Jacket	DeviceClass		Jaket
+50-67% utilized	DeviceClass		terpakai 50-67%
+Headphones	DeviceClass		Headphone
 Imaging	DeviceClass		Pencitraan
+Device conforms to the headset profile	DeviceClass		Perangkat sesuai dengan profil headset
+Remote control	DeviceClass		Remot kontrol
+Fully available	DeviceClass		Sepenuhnya tersedia
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Nama tidak valid
+Server	DeviceClass		Server
+No service available	DeviceClass		Servis tidak tersedia
+Printer	DeviceClass		Pencetak
+Card reader	DeviceClass		Pembaca kartu
+Wired modem or voice gateway	DeviceClass		Modem kabel atau gateway suara
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Bukan nama yang benar
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Nama tidak valid
+Camcorder	DeviceClass		Camcorder
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Nama tidak valid
+17-33% utilized	DeviceClass		terpakai 17-33%
+Desktop workstation	DeviceClass		Desktop workstation
+Unspecified	DeviceClass		Tak-ditentukan
+Miscellaneous	DeviceClass		Serba neka
+Robot	DeviceClass		Robot
+Vehicle	DeviceClass		Kendaraan
+LAN access	DeviceClass		Akses LAN
+Glasses	DeviceClass		Kacamata
+Phone	DeviceClass		Telepon
+Laptop	DeviceClass		Leptop
+67-83% utilized	DeviceClass		terpakai 67-83%
+Cordless	DeviceClass		Nirkabel
+Invalid device class!\n	DeviceClass		Kelas perangkat tidak valid!\n
+Minor class: 	DeviceClass		Kelas kecil: 
+Doll/Action figure	DeviceClass		Boneka/Gambar bergerak
+Not implemented	RemoteDevice		Tidak diimplementasikan
+33-50% utilized	DeviceClass		terpakai 33-50%
+Gaming/Toy	DeviceClass		Permainan/Mainan
+Video camera	DeviceClass		Video kamera
+Handheld	DeviceClass		Handheld
+Service classes: 	DeviceClass		Kelas layanan: 
+Loudspeaker	DeviceClass		Loudspeaker
+83-99% utilized	DeviceClass		dimanfaatkan 83-99%
+SIM card reader	DeviceClass		Pembaca kartu SIM
+Computer	DeviceClass		Komputer
+Scanner	DeviceClass		Pemindai
+Wearable	DeviceClass	A wearable computer	Dapat dipakai
+Display	DeviceClass		Tampilan
+Gamepad	DeviceClass		Gamepad
+Video monitor	DeviceClass		Video monitor
+Palm	DeviceClass	A palm-held device	Palm
+Joystick	DeviceClass		Joystick
+Networking	DeviceClass		Jaringan
+Telephony	DeviceClass		Telepon
+Game	DeviceClass		Permainan
+Video display and loudspeaker	DeviceClass		Penampil video dan loudspeaker
+Wrist watch	DeviceClass		Jam tangan
+Sensing device	DeviceClass		Perangkat penginderaan
+Pointing device	DeviceClass		Alat penunjuk
+(reserved)	DeviceClass		(cadangan)
+Rendering	DeviceClass		Pencitraan
+Information	DeviceClass		Informasi
+Helmet	DeviceClass		Helm
+Pager	DeviceClass	A small radio device to receive short text messages	Pager
+Hands-free	DeviceClass		Bebas-genggam
+Digitizer tablet	DeviceClass		Tablet digitizer
+Portable audio	DeviceClass		Audio portabel
+Camera	DeviceClass		Kamera
+1-17% utilized	DeviceClass		terpakai 1-17%
+Combo keyboard/pointing device	DeviceClass		Combo keyboard/alat penunjuk
+Video conferencing	DeviceClass		Konferensi video
+Peripheral	DeviceClass		Peripheral
+Object transfer	DeviceClass		Transfer objek
+Set-top box	DeviceClass		Kotak set-top

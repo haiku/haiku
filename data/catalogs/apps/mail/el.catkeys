@@ -1,31 +1,31 @@
 1	greek, modern (1453-)	x-vnd.Be-MAIL	3165492866
-View	Mail		Προβολή
-%d - Date	Mail		%d - Ημερομηνία
-Attach attributes:	Mail		Επισύναψη ιδιοτήτων:
-Inconsistency occurred in the undo/redo buffer.	Mail		Παρουσιάστηκε ασυνέπεια κατά την αναίρεση/ακύρωση αναίρεσης της ενδιάμεσης μνήμης
-An error occurred trying to save the attachment.	Mail		Παρουσιάστηκε ένα σφάλμα, κατά την αποθήκευση του συνημμένου.
-Copy to new	Mail		Αντιγραφή σε νέο
-Edit	Mail		Επεξεργασία
-Print	Mail		Εκτύπωση
-<none>	Mail		<κανένα>
-New mail message	Mail		Νέο μήνυμα ταχυδρομείου
-Automatic	Mail		Αυτόματο
-Automatically mark mail as read:	Mail		Αυτόματο μαρκάρισμα μηνύματος ως αναγνωσμένο:
-helpful message	Mail		βοηθητικό μήνυμα
-Colored quotes:	Mail		Έγχρωμες παραθέσεις:
-Subject:	Mail		Θέμα:
-Reply to all	Mail		Απάντηση σε όλους
-Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Εισαγωγή: %name% (Tύπος: %type%)
 Show icons & labels	Mail		Εμφάνιση εικονιδίων & ετικετών
-Remove attachment	Mail		Διαγραφή συνημμένου
-Button bar:	Mail		Μπάρα πλήκτρου:
-spam	B_USER_DIRECTORY/mail/spam		ανεπιθύμητη αλληλογραφία
-Beginner	Mail		Αρχάριος
-Don't save	Mail		Χωρίς αποθήκευση
-Expert	Mail		Έμπειρος
-Reply account:	Mail		Απάντηση λογαριασμού:
+Copy to new	Mail		Αντιγραφή σε νέο
+Print	Mail		Εκτύπωση
 Message	Mail		Μήνυμα
+Button bar:	Mail		Μπάρα πλήκτρου:
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Εισαγωγή: %name% (Tύπος: %type%)
+Subject:	Mail		Θέμα:
 Reply to sender	Mail		Απάντηση στον αποστολέα
-There is no installed handler for URL links.	Mail		Δεν έχει εγκατασταθεί χειριστής για τις συνδέσεις URL.
 Signature	Mail		Υπογραφή
+spam	B_USER_DIRECTORY/mail/spam		ανεπιθύμητη αλληλογραφία
+Reply to all	Mail		Απάντηση σε όλους
+View	Mail		Προβολή
+Expert	Mail		Έμπειρος
+Automatically mark mail as read:	Mail		Αυτόματο μαρκάρισμα μηνύματος ως αναγνωσμένο:
+Colored quotes:	Mail		Έγχρωμες παραθέσεις:
+Automatic	Mail		Αυτόματο
+Attach attributes:	Mail		Επισύναψη ιδιοτήτων:
 Find again	Mail		Εύρεση ξανά
+helpful message	Mail		βοηθητικό μήνυμα
+<none>	Mail		<κανένα>
+%d - Date	Mail		%d - Ημερομηνία
+Reply account:	Mail		Απάντηση λογαριασμού:
+Don't save	Mail		Χωρίς αποθήκευση
+An error occurred trying to save the attachment.	Mail		Παρουσιάστηκε ένα σφάλμα, κατά την αποθήκευση του συνημμένου.
+There is no installed handler for URL links.	Mail		Δεν έχει εγκατασταθεί χειριστής για τις συνδέσεις URL.
+New mail message	Mail		Νέο μήνυμα ταχυδρομείου
+Inconsistency occurred in the undo/redo buffer.	Mail		Παρουσιάστηκε ασυνέπεια κατά την αναίρεση/ακύρωση αναίρεσης της ενδιάμεσης μνήμης
+Remove attachment	Mail		Διαγραφή συνημμένου
+Edit	Mail		Επεξεργασία
+Beginner	Mail		Αρχάριος

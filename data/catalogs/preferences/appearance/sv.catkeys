@@ -1,74 +1,73 @@
-1	swedish	x-vnd.Haiku-Appearance	2499598353
-Plain font:	Font view		Vanlig font:
-Control highlight	Colors tab		Framhävd kontroll
+1	swedish	x-vnd.Haiku-Appearance	583615507
 Control border	Colors tab		Kontrollkant
-Antialiasing type:	AntialiasingSettingsView		Kantutjämningstyp:
-Shadow	Colors tab		Skugga
-On	AntialiasingSettingsView		På
-Defaults	APRWindow		Förval
-Link hover	Colors tab		Hovrande länk
-Grayscale	AntialiasingSettingsView		Gråskala
-Shine	Colors tab		Ljusstyrka
-About	DecorSettingsView		Om
-About decorator	DecorSettingsView		Om decorator
+Control mark	Colors tab		Kontroll märke
 Off	AntialiasingSettingsView		Av
-Link text	Colors tab		Länktext
-Link active	Colors tab		Aktiv länk
-Choose Decorator	DecorSettingsView		Välj dekor
+Window border	Colors tab		Fönsterkant
+Inactive window tab	Colors tab		Flikfärg för inaktiva fönster
+Defaults	APRWindow		Förval
+Shadow	Colors tab		Skugga
+Document background	Colors tab		Dokument bakgrund
+List background	Colors tab		Lista bakgrund
+Fixed font:	Font view		Fixerad font:
+Appearance	System name		Utseende
+Reduce colored edges filter strength:	AntialiasingSettingsView		Minska färgintensitet på färgade kanter:
+Glyph hinting:	AntialiasingSettingsView		Betona typsnitt:
+Menu item text	Colors tab		Menyalternativstext
+About decorator	DecorSettingsView		Om decorator
+Antialiasing menu	AntialiasingSettingsView		Kantutjämningsmeny
 Success	Colors tab		Framgång
-Inactive window tab text	Colors tab		Fliktext för inaktiva fönster
+About	DecorSettingsView		Om
+Shine	Colors tab		Ljusstyrka
+Arrow style	DecorSettingsView		Pil stil
+On	AntialiasingSettingsView		På
+Decorator:	DecorSettingsView		Dekor:
+Menu background	Colors tab		Menybakgrund
+Revert	APRWindow		Återgå
+List item text	Colors tab		List objekt text
+OK	DecorSettingsView		OK
+Control text	Colors tab		Kontrolltext
+Look and feel	APRWindow		Utseende och beteende
+Selected menu item background	Colors tab		Bakgrund för valt menyalternativ
+Link active	Colors tab		Aktiv länk
+Antialiasing	APRWindow		Kantutjämning
+Menu font:	Font view		Menu font:
+Bold font:	Font view		Fetstil
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nUpphovsmän:\n\t%decorAuthors\n\nURL: %decorURL\nLisens: %decorLic\n\n%decorDesc\n
+Choose Decorator	DecorSettingsView		Välj dekor
+Strong	AntialiasingSettingsView		Framhävd
 Failure	Colors tab		Misslyckande
+Double:	DecorSettingsView		Dubbel
+Selected menu item text	Colors tab		Textfärg för valt menyalternativ
+Size:	Font Selection view		Storlek:
+Panel background	Colors tab		Panelbakgrund
+Plain font:	Font view		Vanlig font:
+Window tab text	Colors tab		Fönsterflik text
+Navigation pulse	Colors tab		Navigeringspuls
+LCD subpixel	AntialiasingSettingsView		LCD-subpixel
+Window tab	Colors tab		Fösterflik
+Link text	Colors tab		Länktext
+Tooltip background	Colors tab		Hjälprutsbakgrund
+Scroll bar thumb	Colors tab		Rullbar märke
+Link visited	Colors tab		Besök länk
+Selected menu item border	Colors tab		Kantfärg för valt menyalternativ
+Tooltip text	Colors tab		Hjälprutstext
+Control background	Colors tab		Kontrollbakgrund
+Selected list item text	Colors tab		Textfärg för valt menyalternativ
+Selected list item background	Colors tab		Bakgrund för valt menyalternativ
+Inactive window tab text	Colors tab		Fliktext för inaktiva fönster
+Navigation base	Colors tab		Navigeringsbas
+Fonts	APRWindow		Typsnitt
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Flygande bäckasiner söka strax hwila på mjuka tuvor.
+Grayscale	AntialiasingSettingsView		Gråskala
+Antialiasing type:	AntialiasingSettingsView		Kantutjämningstyp:
+Panel text	Colors tab		Paneltext
 Hinting menu	AntialiasingSettingsView		Betoningsmeny
 Scroll bar:	DecorSettingsView		Rullningslist:
-Document background	Colors tab		Dokument bakgrund
-Status bar	Colors tab		Statusrad
-Revert	APRWindow		Återgå
-Window tab	Colors tab		Fösterflik
-Tooltip background	Colors tab		Hjälprutsbakgrund
-Selected menu item background	Colors tab		Bakgrund för valt menyalternativ
-Antialiasing	APRWindow		Kantutjämning
-Navigation base	Colors tab		Navigeringsbas
-Selected list item text	Colors tab		Textfärg för valt menyalternativ
-Window border	Colors tab		Fönsterkant
-Double:	DecorSettingsView		Dubbel
-Window tab text	Colors tab		Fönsterflik text
-Document text	Colors tab		Dokument text
-Navigation pulse	Colors tab		Navigeringspuls
-Selected menu item text	Colors tab		Textfärg för valt menyalternativ
-Menu background	Colors tab		Menybakgrund
-List background	Colors tab		Lista bakgrund
-OK	DecorSettingsView		OK
-Control mark	Colors tab		Kontroll märke
-Size:	Font Selection view		Storlek:
-Link visited	Colors tab		Besök länk
-Decorator:	DecorSettingsView		Dekor:
-Selected list item background	Colors tab		Bakgrund för valt menyalternativ
-Panel background	Colors tab		Panelbakgrund
-Menu font:	Font view		Menu font:
-Colors	APRWindow		Färger
-Control background	Colors tab		Kontrollbakgrund
-Inactive window tab	Colors tab		Flikfärg för inaktiva fönster
-List item text	Colors tab		List objekt text
-Appearance	System name		Utseende
-Fixed font:	Font view		Fixerad font:
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Flygande bäckasiner söka strax hwila på mjuka tuvor.
-%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nUpphovsmän:\n\t%decorAuthors\n\nURL: %decorURL\nLisens: %decorLic\n\n%decorDesc\n
-Reduce colored edges filter strength:	AntialiasingSettingsView		Minska färgintensitet på färgade kanter:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Subpixel-baserad kantutjämning i kombination med betoning av typsnitt är inte tillgängligt i färdigbyggda Haiku för att undvika patentproblem. För att aktivera denna funktionalitet, måste du själv kompilera Haiku och välja särskilda val i libfreetypes konfigurationshuvud.
-Scroll bar thumb	Colors tab		Rullbar märke
-Control text	Colors tab		Kontrolltext
-Single:	DecorSettingsView		Enkel:
-Tooltip text	Colors tab		Hjälprutstext
-Bold font:	Font view		Fetstil
-Inactive window border	Colors tab		Inaktiverad fönsterkant
-Menu item text	Colors tab		Menyalternativstext
-LCD subpixel	AntialiasingSettingsView		LCD-subpixel
-Selected menu item border	Colors tab		Kantfärg för valt menyalternativ
-Strong	AntialiasingSettingsView		Framhävd
-Panel text	Colors tab		Paneltext
-Arrow style	DecorSettingsView		Pil stil
 Monospaced fonts only	AntialiasingSettingsView		Endast typsnitt med fast bredd
-Look and feel	APRWindow		Utseende och beteende
-Antialiasing menu	AntialiasingSettingsView		Kantutjämningsmeny
-Fonts	APRWindow		Typsnitt
-Glyph hinting:	AntialiasingSettingsView		Betona typsnitt:
+Document text	Colors tab		Dokument text
+Inactive window border	Colors tab		Inaktiverad fönsterkant
+Colors	APRWindow		Färger
+Control highlight	Colors tab		Framhävd kontroll
+Status bar	Colors tab		Statusrad
+Link hover	Colors tab		Hovrande länk
+Single:	DecorSettingsView		Enkel:

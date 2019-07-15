@@ -1,53 +1,53 @@
 1	ukrainian	x-vnd.Haiku-Network	1314732966
-Static	IntefaceAddressView		Статичний
+Ethernet device	InterfaceListItem		Мережева карта
+Link speed:	IntefaceView		Швидкість з'єднання:
+disconnected	IntefaceView		від'єднати
+IP Address:	IntefaceAddressView		IP адреса:
+WPA	WPA protected network		WPA
+Network:	IntefaceView		Мережа:
+Received:	IntefaceView		Отримати:
+New…	NetworkWindow		Новий…
+no link	InterfaceListItem		немає з'єднання
+Other	NetworkWindow		Інший
+Sent:	IntefaceView		Відправити:
+Gateway:	IntefaceAddressView		Шлюз:
+The netmask defines your local network	IntefaceAddressView		Нетмаска визначає вашу локальну мережу
+Your IP address	IntefaceAddressView		Ваша IP адреса
+DHCP	IntefaceAddressView		DHCP
+Dial Up	NetworkWindow		Dial Up
+Netmask:	IntefaceAddressView		Нетмаска:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Служби
-no link	InterfaceListItem		немає з'єднання
-WPA2	WPA2 protected network		WPA2
-Choose automatically	IntefaceView		Вибрати автоматично
-connected	IntefaceView		під'єднано
-Ethernet device	InterfaceListItem		Мережева карта
-The netmask defines your local network	IntefaceAddressView		Нетмаска визначає вашу локальну мережу
-Dial-up connection	InterfaceListItem		Під'єднання Dial-up
-%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
-Network	NetworkWindow		Мережа
-VPN connection	InterfaceListItem		Під'єднання VPN
-Show network status in Deskbar	NetworkWindow		Показати стан мережі у Deskbar'і
-The method for obtaining an IP address	IntefaceAddressView		Спосіб отримання IP адреси
-connected	InterfaceListItem		під'єднання
-disabled	InterfaceListItem		заборонити
-Dial Up	NetworkWindow		Dial Up
-Apply	IntefaceAddressView		Застосовувати
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Встановлення Стан'у Мережі у Deskbar призупинено: %s
+Revert	NetworkWindow		Повернути
+WEP	WEP protected network		WEP
+<no wireless networks found>	IntefaceView		<бездротових з'єднань не виявлено>
+connected	IntefaceView		під'єднано
+VPN	NetworkWindow		VPN
+Apply	IntefaceAddressView		Застосовувати
+Disable	ServiceView		Заборонити
+WPA2	WPA2 protected network		WPA2
+Show network status in Deskbar	NetworkWindow		Показати стан мережі у Deskbar'і
+Mode:	IntefaceAddressView		Режим:
+connected	InterfaceListItem		під'єднання
+Static	IntefaceAddressView		Статичний
+launch error	NetworkWindow		помилка з'єднання
+Renegotiate	IntefaceView		Переукласти
 MAC address:	IntefaceView		MAC адреса:
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+disabled	InterfaceListItem		заборонити
+Dial-up connection	InterfaceListItem		Під'єднання Dial-up
+The method for obtaining an IP address	IntefaceAddressView		Спосіб отримання IP адреси
+Automatic	IntefaceAddressView		Автоматично
+Choose automatically	IntefaceView		Вибрати автоматично
+Status:	IntefaceView		Стан:
+Disable	IntefaceView		Заборонити
+Manage…	NetworkWindow		Керування…
+open	Open network		відкрити
+Network	NetworkWindow		Мережа
+Your gateway to the internet	IntefaceAddressView		Ваш інтернет шлюз
+Enable	ServiceView		Увімкнути
+Ok	NetworkWindow		Гаразд
 Wireless device	InterfaceListItem		Бездротова карта
 Disabled	IntefaceAddressView		Заборонити
-Renegotiate	IntefaceView		Переукласти
-Ok	NetworkWindow		Гаразд
-Network:	IntefaceView		Мережа:
-launch error	NetworkWindow		помилка з'єднання
-Other	NetworkWindow		Інший
-Automatic	IntefaceAddressView		Автоматично
-Gateway:	IntefaceAddressView		Шлюз:
-Revert	NetworkWindow		Повернути
-Enable	ServiceView		Увімкнути
-disconnected	IntefaceView		від'єднати
-Status:	IntefaceView		Стан:
-Link speed:	IntefaceView		Швидкість з'єднання:
-Your gateway to the internet	IntefaceAddressView		Ваш інтернет шлюз
-New…	NetworkWindow		Новий…
-DHCP	IntefaceAddressView		DHCP
-Mode:	IntefaceAddressView		Режим:
-WPA	WPA protected network		WPA
-Sent:	IntefaceView		Відправити:
-open	Open network		відкрити
-IP Address:	IntefaceAddressView		IP адреса:
-VPN	NetworkWindow		VPN
-Received:	IntefaceView		Отримати:
-Disable	IntefaceView		Заборонити
-<no wireless networks found>	IntefaceView		<бездротових з'єднань не виявлено>
-Netmask:	IntefaceAddressView		Нетмаска:
-Disable	ServiceView		Заборонити
-Your IP address	IntefaceAddressView		Ваша IP адреса
-Manage…	NetworkWindow		Керування…
-WEP	WEP protected network		WEP
+VPN connection	InterfaceListItem		Під'єднання VPN

@@ -1,42 +1,41 @@
-1	german	x-vnd.Haiku-Shortcuts	986541402
-OK	ShortcutsWindow		OK
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Die Tastenbelegung konnte nicht gespeichert werden.
-Cancel	ShortcutsWindow		Abbrechen
-Append KeySet…	ShortcutsWindow		Tastenbelegung anfügen…
-Control	ShortcutsSpec	Name for modifier on keyboard	Strg
-Key	ShortcutsWindow		Taste
-Open KeySet…	ShortcutsWindow		Tastenbelegung öffnen…
-Error, NULL state description?	ShortcutsSpec		Fehler, NULL Status Beschreibung?
-Revert to saved	ShortcutsWindow		Gespeicherten Stand herstellen
-*InsertString \"Your Text Here\"	ShortcutsWindow		*Zeichen einfügen \"Hier der Text\"
+1	german	x-vnd.Haiku-Shortcuts	1611284793
 *MouseUp	ShortcutsWindow		*Maustaste losgelassen
-(Choose application with file requester)	ShortcutsWindow		(Eine Anwendung per Datei-Dialog wählen)
-*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht geladen werden.
-*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		Maus nach oben ins linke Eck und Maustaste 1 drücken
-Option	ShortcutsSpec	Name for modifier on keyboard	Option
-Save	ShortcutsWindow		Speichern
-*MouseButton 1	ShortcutsWindow		*Maustaste 1 drücken
-*MoveMouse +20 +0	ShortcutsWindow		*Maus 20 Pixel nach rechts bewegen
-Save changes before closing?	ShortcutsWindow		Änderungen vor dem Schließen speichern?
-Command	ShortcutsSpec	Name for modifier on keyboard	Befehl
-Remove selected shortcut	ShortcutsWindow		Markierten Eintrag entfernen
-Add new shortcut	ShortcutsWindow		Neue Tasten-Kombi
-Save & apply	ShortcutsWindow		Speichern & anwenden
-*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*Öffne Suche-Dialog
-Append	ShortcutsWindow		Anhängen
-File	ShortcutsWindow		Datei
-Quit	ShortcutsWindow		Beenden
-*MouseDown	ShortcutsWindow		*Maus gedrückt
-Don't save	ShortcutsWindow		Verwerfen
 Application	ShortcutsWindow		Anwendung
-Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Option	ShortcutsSpec	Name for modifier on keyboard	Option
+Save changes before closing?	ShortcutsWindow		Änderungen vor dem Schließen speichern?
+Revert to saved	ShortcutsWindow		Gespeicherten Stand herstellen
+Don't save	ShortcutsWindow		Verwerfen
+*MouseDown	ShortcutsWindow		*Maus gedrückt
 *Beep	ShortcutsWindow		*Piepton
-*MoveMouseTo 50% 50%	ShortcutsWindow		*Maus zur Bildschirmmitte bewegen
-Save KeySet as…	ShortcutsWindow		Tastenbelegung speichern unter…
-Open	ShortcutsWindow		Öffnen
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht gelesen werden.
-Select	ShortcutsWindow		Auswählen
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht gespeichert werden.
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Die Tastenbelegung konnte nicht gespeichert werden.
+Save	ShortcutsWindow		Speichern
 Oh no	ShortcutsWindow		Herrje!
+Key	ShortcutsWindow		Taste
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*Öffne Suche-Dialog
+Select	ShortcutsWindow		Auswählen
 Shortcuts	System name		Tastenkürzel
+Quit	ShortcutsWindow		Beenden
+(Choose application with file requester)	ShortcutsWindow		(Eine Anwendung per Datei-Dialog wählen)
+Cancel	ShortcutsWindow		Abbrechen
+*MoveMouse +20 +0	ShortcutsWindow		*Maus 20 Pixel nach rechts bewegen
+Control	ShortcutsSpec	Name for modifier on keyboard	Strg
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht gelesen werden.
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht gespeichert werden.
+*InsertString \"Your Text Here\"	ShortcutsWindow		*Zeichen einfügen \"Hier der Text\"
+Remove selected shortcut	ShortcutsWindow		Markierten Eintrag entfernen
+Error, NULL state description?	ShortcutsSpec		Fehler, NULL Status Beschreibung?
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht geladen werden.
+Save & apply	ShortcutsWindow		Speichern & anwenden
+Open	ShortcutsWindow		Öffnen
+Append	ShortcutsWindow		Anhängen
+Save KeySet as…	ShortcutsWindow		Tastenbelegung speichern unter…
+Append KeySet…	ShortcutsWindow		Tastenbelegung anfügen…
+*MouseButton 1	ShortcutsWindow		*Maustaste 1 drücken
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		Maus nach oben ins linke Eck und Maustaste 1 drücken
+OK	ShortcutsWindow		OK
+Add new shortcut	ShortcutsWindow		Neue Tasten-Kombi
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Open KeySet…	ShortcutsWindow		Tastenbelegung öffnen…
+File	ShortcutsWindow		Datei
+*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
+*MoveMouseTo 50% 50%	ShortcutsWindow		*Maus zur Bildschirmmitte bewegen

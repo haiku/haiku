@@ -1,19 +1,19 @@
 1	french	x-vnd.Be-POST	2949558073
+No new messages	MailDaemon		Aucun nouveau message
+No new messages	DeskbarView		Aucun nouveau message
+Shutdown mail services	DeskbarView		Arrêter les services de messagerie
+Mail status	MailDaemon		État du courrier
 Fetching mail for %name	Notifier		Récupération des mails de %name
-Check for mails only	DeskbarView		Vérifier seulement les courriels
-Send pending mails	DeskbarView		Envoyer les courriels en attente
-{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Un nouveau message} other{# nouveaux messages}}
 {0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# nouveau message} other{# nouveaux messages}}
 {0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# nouveau message} other{# nouveaux messages}} pour %name\n
+Create new message…	DeskbarView		Créer un nouveau message…
+Send pending mails	DeskbarView		Envoyer les courriels en attente
+Settings…	DeskbarView		Réglages…
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Un nouveau message} other{# nouveaux messages}}
 New Messages	MailDaemon		Nouveaux Messages
 <no accounts>	DeskbarView		<aucun compte>
-Mail status	MailDaemon		État du courrier
-Shutdown mail services	DeskbarView		Arrêter les services de messagerie
-Sending mail for %name	Notifier		Envoi des mails de %name
-Create new message…	DeskbarView		Créer un nouveau message…
-No new messages	MailDaemon		Aucun nouveau message
-Check for mail now	DeskbarView		Vérifier les courriels maintenant
-No new messages	DeskbarView		Aucun nouveau message
-Mail daemon status log	MailDaemon		Journal d’état du démon de courrier
-Settings…	DeskbarView		Réglages…
 Mail status	Notifier		État du courrier
+Check for mails only	DeskbarView		Vérifier seulement les courriels
+Check for mail now	DeskbarView		Vérifier les courriels maintenant
+Sending mail for %name	Notifier		Envoi des mails de %name
+Mail daemon status log	MailDaemon		Journal d’état du démon de courrier

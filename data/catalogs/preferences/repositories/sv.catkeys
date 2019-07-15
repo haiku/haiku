@@ -1,41 +1,41 @@
 1	swedish	x-vnd.Haiku-Repositories	2658607939
-Completed	TaskLooper	Completed task status message	Slutförd
-Repositories	System name		Repositorier
-There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Ett fel inträffade vid aktivering av repositoriet %url%
-Remove this repository?	RepositoriesView	Removal alert confirmation message	Vill du ta bort det markerade repositoriet?
-Description	TaskLooper	Failed task error description	Beskrivning
-Add	AddRepoWindow	Button label	Lägg till
-URL	RepositoriesView	Column title	URL
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Repositorier kunde inte hämta namnen på de aktiverade repositorierna.
-Keep trying	TaskTimer	Button label	Fortsätt försöka
 This is not a valid URL.	AddRepoWindow	Add URL error message	Detta är inte en giltig URL.
 Repository URL:	AddRepoWindow	Text box label	Repositoriets URL:
-Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Fel vid hämtning av repositoriumkonfiguration för %name%.
-Details	TaskLooper	Job log details header	Detaljer
-Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Goda nyheter! Aktiviteten för repositoriet %name% slutfördes.
-Status	RepositoriesView	Column title	Status
-Aborted	TaskLooper	Aborted task status message	Avbruten
-Remove all	RepositoriesView	Button label	Ta bort alla
-Remove	RepositoriesView	Button label	Ta bort
-Changes completed	RepositoriesView	Status view text	Ändringar slutförda
-Name	RepositoriesView	Column title	Namn
-Enable	RepositoriesView	Button label	Aktivera
-Enable repositories to use with package management:	RepositoriesView	Label text	Aktivera repositorier att använda med pakethanteraren:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Ett fel inträffade vid uppdatering av cache för repositoriet %name%
-Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Endast en URL för varje repositorium kan bli aktiverat. Vänligen ändra dina val.
-Failed	TaskLooper	Failed task status message	Misslyckades
-OK	Constants	Button label	OK
-Cancel task	TaskTimer	Button label	Avbryt aktivitet
-Remove these repositories?	RepositoriesView	Removal alert confirmation message	Vill du ta bort dessa repositorier?
-Cancel	Constants	Button label	Avbryt
-Changes pending:	RepositoriesView	Status view text	Ändringar som väntar:
 There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Det uppstod ett fel vid inaktivering av repositoriet %name%
+Unknown	Constants	Unknown repository name	Okänd
+Remove all	RepositoriesView	Button label	Ta bort alla
+Enable repositories to use with package management:	RepositoriesView	Label text	Aktivera repositorier att använda med pakethanteraren:
+Disable	RepositoriesView	Button label	Inaktivera
+Cancel task	TaskTimer	Button label	Avbryt aktivitet
+Changes completed	RepositoriesView	Status view text	Ändringar slutförda
+Details	TaskLooper	Job log details header	Detaljer
 Remove	Constants	Button label	Ta bort
-Enable all	RepositoriesView	Button label	Aktivera alla
-Stop and quit	RepositoriesWindow	Button label	Stoppa och avsluta
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Ett fel inträffade vid aktivering av repositoriet %url%
+Remove this repository?	RepositoriesView	Removal alert confirmation message	Vill du ta bort det markerade repositoriet?
 The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	Aktiviteten för repositoriet %name% verkar ta lång tid att slutföra
-Disable all	RepositoriesView	Button label	Inaktivera alla
+Completed	TaskLooper	Completed task status message	Slutförd
+OK	Constants	Button label	OK
+Status	RepositoriesView	Column title	Status
+Name	RepositoriesView	Column title	Namn
+Add	AddRepoWindow	Button label	Lägg till
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Repositorier kunde inte hämta namnen på de aktiverade repositorierna.
+Enable all	RepositoriesView	Button label	Aktivera alla
+Aborted	TaskLooper	Aborted task status message	Avbruten
+URL	RepositoriesView	Column title	URL
+Enable	RepositoriesView	Button label	Aktivera
+Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Fel vid hämtning av repositoriumkonfiguration för %name%.
+Description	TaskLooper	Failed task error description	Beskrivning
+Failed	TaskLooper	Failed task status message	Misslyckades
+Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Goda nyheter! Aktiviteten för repositoriet %name% slutfördes.
 Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Några aktiviteter körs fortfarande. Vill du stoppa dessa och avsluta?
 This repository URL already exists.	RepositoriesView	Error message	Den angivna adressen till repositoriet finns redan.
-Disable	RepositoriesView	Button label	Inaktivera
-Unknown	Constants	Unknown repository name	Okänd
+Repositories	System name		Repositorier
+Changes pending:	RepositoriesView	Status view text	Ändringar som väntar:
+Remove	RepositoriesView	Button label	Ta bort
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	Vill du ta bort dessa repositorier?
+Keep trying	TaskTimer	Button label	Fortsätt försöka
+Cancel	Constants	Button label	Avbryt
+Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Endast en URL för varje repositorium kan bli aktiverat. Vänligen ändra dina val.
+Stop and quit	RepositoriesWindow	Button label	Stoppa och avsluta
+Disable all	RepositoriesView	Button label	Inaktivera alla

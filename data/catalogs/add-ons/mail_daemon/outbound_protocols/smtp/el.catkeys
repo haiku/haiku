@@ -1,14 +1,14 @@
 1	greek, modern (1453-)	x-vnd.Haiku-SMTP	815985329
-SMTP server:	ConfigView		Εξυπηρετητής SMTP:
-Error while logging in to %serv	smtp		Σφάλμα κατα τη σύνδεση στο %serv
-Unencrypted	ConfigView		Μη κρυπτογραφημένο
-. The server says:\n	smtp		Ο εξυπηρετητής αποκρίθηκε:\n
-ESMTP	ConfigView		ESMTP
-Connecting to server…	smtp		Σύνδεση στον εξυπηρετητή...
-Error while opening connection to %serv	smtp		Σφάλμα κατά το άνοιγμα σύνδεσης στο %serv
 POP3 authentication failed. The server said:\n	smtp		Η πιστοποίηση POP3 απέτυχε. Ο εξυπηρετητής αποκρίθηκε:\n
 Destination:	ConfigView		Προορισμός:
+Error while logging in to %serv	smtp		Σφάλμα κατα τη σύνδεση στο %serv
+Connecting to server…	smtp		Σύνδεση στον εξυπηρετητή...
+Unencrypted	ConfigView		Μη κρυπτογραφημένο
+. The server says:\n	smtp		Ο εξυπηρετητής αποκρίθηκε:\n
+Error while opening connection to %serv	smtp		Σφάλμα κατά το άνοιγμα σύνδεσης στο %serv
+. The server said:\n	smtp		Ο εξυπηρετητής αποκρίθηκε:\n
 None	ConfigView		Κανένα
+SMTP server:	ConfigView		Εξυπηρετητής SMTP:
+ESMTP	ConfigView		ESMTP
 POP3 before SMTP	ConfigView		POP3 πρίν από SMTP
 SSL	ConfigView		SSL
-. The server said:\n	smtp		Ο εξυπηρετητής αποκρίθηκε:\n

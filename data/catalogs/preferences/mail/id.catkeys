@@ -1,52 +1,54 @@
-1	indonesian	x-vnd.Haiku-Mail	517023466
+1	indonesian	x-vnd.Haiku-Mail	2750130554
+Account settings	AutoConfigWindow		Pengaturan akun
+\t\t· Outgoing	Config Window		\t\t· Keluaran
+An error occurred while creating the config view: %error.	Config Views		Terjadi kesalahan saat membuat tampilan konfigurasi: %error.
+E-mail address:	E-Mail		Alamat email:
+Create new account	AutoConfigWindow		Buat akun baru
+While sending and receiving	Config Window		Saat mengirim dan menerima
+Error!	Config Views		Galat!
+Apply	Config Window		Terapkan
+Incoming mail filters	Config Views		Penyaring surat masuk
+Outgoing mail filters	Config Views		Filter email keluar
+Server name:	E-Mail		Nama server:
+Add	Config Window		Tambah
+Back	AutoConfigWindow		Sebelumnya
+Real name:	E-Mail		Nama sebenarnya:
+Real name:	Config Views		Nama asli:
+\t\t· E-mail filters	Config Window		\t\t· Penyaring surel
+Outgoing	E-Mail		Keluaran
+Accounts	Config Window		Akun
+Outgoing	Config Window		Keluaran
+Remove	Config Views		Hapus
+Show notifications:	Config Window		Tampikan notifikasi:
 Settings	Config Window		Pengaturan
 Never	Config Window	show status window	Tidak pernah
-While sending and receiving	Config Window		Saat mengirim dan menerima
-Incoming	Config Window		Masuk
-Server name:	E-Mail		Nama server:
-An error occurred while creating the config view: %error.	Config Views		Terjadi kesalahan saat membuat tampilan konfigurasi: %error.
-OK	Config Window		OK
-E-mail address:	E-Mail		Alamat email:
-Account name:	E-Mail		Nama akun:
 Account name:	Config Views		Nama akun:
-Create new account	AutoConfigWindow		Buat akun baru
-OK	Config Views		OKE
-The filter could not be moved. Deleting filter.	Config Views		Filter tidak bisa dipindahkan. Menghapus filter.
-Revert	Config Window		Pulihkan
-Login name:	E-Mail		Nama login:
-Incoming	E-Mail		Masuk
-Password:	E-Mail		Sandi:
-Accounts	Config Window		Akun
-Finish	AutoConfigWindow		Selesai
-Remove	Config Window		Hapus
-Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Buat akun baru dengan tombol tambah.\n\nHapus akun dengan tombol hapus pada item yang dipilih.\n\nPilih item dalam daftar untuk mengubah pengaturannya.
-Error!	Config Views		Galat!
-Server Name:	E-Mail		Nama Server:
-While sending	Config Window		Saat mengirim
-Show notifications:	Config Window		Tampikan notifikasi:
+\t\t· Incoming	Config Window		\t\t· Masuk
 Enter a valid e-mail address.	AutoConfigWindow		Masukan alamat surel valid.
-Add	Config Window		Tambah
-Account settings	AutoConfigWindow		Pengaturan akun
-E-mail	System name		E-mail
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nPengaturan umum tidak dapat dipulihkan.\n\nTerjadi kesalahan mengambil pengaturan umum:\n%s\n
-Real name:	Config Views		Nama asli:
-\t\t· Outgoing	Config Window		\t\t· Keluaran
+Incoming	E-Mail		Masuk
 Choose Protocol	E-Mail		Pilih protokol
 Return address:	Config Views		Alamat pengembalian:
-Edit mailbox menu…	Config Window		Sunting menu mailbox…
-Outgoing	E-Mail		Keluaran
-\t\t· E-mail filters	Config Window		\t\t· Penyaring surel
-Remove	Config Views		Hapus
-\t\t· Incoming	Config Window		\t\t· Masuk
-Check every	Config Window		Periksa setiap
-Incoming mail filters	Config Views		Penyaring surat masuk
+Password:	E-Mail		Sandi:
+Error retrieving general settings: %s\n	Config Window		Ada kesalahan saat mengambil pengaturan umum: %s\n
+The filter could not be moved. Deleting filter.	Config Views		Filter tidak bisa dipindahkan. Menghapus filter.
+OK	Config Views		OKE
+Revert	Config Window		Pulihkan
+Incoming	Config Window		Masuk
+Finish	AutoConfigWindow		Selesai
+Add filter	Config Views		Tambahkan filter
 Account settings	Config Views		Pengaturan akun
 minutes	Config Window		menit
-Error retrieving general settings: %s\n	Config Window		Ada kesalahan saat mengambil pengaturan umum: %s\n
-Real name:	E-Mail		Nama sebenarnya:
-Apply	Config Window		Terapkan
+E-mail	System name		E-mail
+Check every	Config Window		Periksa setiap
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Buat akun baru dengan tombol tambah.\n\nHapus akun dengan tombol hapus pada item yang dipilih.\n\nPilih item dalam daftar untuk mengubah pengaturannya.
+Account name:	E-Mail		Nama akun:
+Edit mailbox menu…	Config Window		Sunting menu mailbox…
+Server Name:	E-Mail		Nama Server:
+Remove	Config Window		Hapus
+Login name:	E-Mail		Nama login:
+While sending	Config Window		Saat mengirim
+OK	Config Window		OK
 OK	AutoConfigWindow		OKE
-Add filter	Config Views		Tambahkan filter
-Outgoing	Config Window		Keluaran
-Outgoing mail filters	Config Views		Filter email keluar
+Next	AutoConfigWindow		Selanjutnya
 Error	Config Window		Kesalahan

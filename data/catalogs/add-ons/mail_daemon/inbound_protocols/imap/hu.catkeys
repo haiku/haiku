@@ -1,14 +1,12 @@
-1	hungarian	x-vnd.Haiku-IMAP	478742289
-Destination:	imap_config		Mappa:
-SSL	imap_config		SSL
-Ok	IMAPFolderConfig		Rendben
-status	IMAPFolderConfig		állapot
-Configure IMAP Folders	imap_config		IMAP mappák módosítása
-Cancel	IMAPFolderConfig		Mégse
-No encryption	imap_config		Nem titkosított
-Apply	IMAPFolderConfig		Alkalmaz
-Fetching IMAP folders, have patience...	IMAPFolderConfig		IMAP mappák letöltése, kis türelmet…
+1	hungarian	x-vnd.Haiku-IMAP	3072419505
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Nem tudtam kapcsolódni \"%server%\" kiszolgálóhoz:\n%error%
-IMAP Folders	IMAPFolderConfig		IMAP mappák
-Update subcription of IMAP folders, have patience...	IMAPFolderConfig		IMAP mappák frissítése, türelem…
 Failed to fetch available storage.	IMAPFolderConfig		Nem sikerült letölteni az elérhető tárhely mennyiségét.
+Cancel	IMAPFolderConfig		Mégse
+Ok	IMAPFolderConfig		Rendben
+No encryption	imap_config		Nem titkosított
+Configure IMAP Folders	imap_config		IMAP mappák módosítása
+SSL	imap_config		SSL
+Apply	IMAPFolderConfig		Alkalmaz
+status	IMAPFolderConfig		állapot
+IMAP Folders	IMAPFolderConfig		IMAP mappák
+Destination:	imap_config		Mappa:

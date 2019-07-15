@@ -1,6 +1,6 @@
 1	spanish; castilian	x-vnd.Haiku-debug_server	2134779566
-Write core file	DebugServer		Escribir archivo de depuración
-Terminate	DebugServer		Terminar
 Debug	DebugServer		Depurar
-Save report	DebugServer		Guardar reporte
+Terminate	DebugServer		Terminar
 The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		La aplicación:\n\n %app\n\nha encontrado un error el cual le impide continuar. Haiku terminará con la aplicación y la limpiará.
+Save report	DebugServer		Guardar reporte
+Write core file	DebugServer		Escribir archivo de depuración

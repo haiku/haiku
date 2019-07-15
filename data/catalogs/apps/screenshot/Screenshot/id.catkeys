@@ -1,31 +1,31 @@
 1	indonesian	x-vnd.haiku-screenshot	3958461128
-seconds	ScreenshotWindow		detik
-Desktop	ScreenshotWindow		Desktop
 Include window border	ScreenshotWindow		Sertakan perbatasan jendela
-Screenshot	System name		Cuplikan layar
-Select	ScreenshotWindow		Pilih
+Overwrite	ScreenshotWindow		Timpa
+Save in:	ScreenshotWindow		Simpan di:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Terjadi kesalahan menyimpan \"%s\":\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Berkas ini sudah ada.\n Apakah anda yakin ingin menimpanya?
+OK	ScreenshotWindow		OKE
 The destination path exists but is not a folder.	ScreenshotWindow		Jalur tujuan ada tetapi bukan folder.
-Capture active window	ScreenshotWindow		Menangkap jendela aktif
-Cancel	ScreenshotWindow		Batal
+Select	ScreenshotWindow		Pilih
+Save as:	ScreenshotWindow		Simpan sebagai:
+seconds	ScreenshotWindow		detik
+New screenshot	ScreenshotWindow		Cuplikan layar baru
+Screenshot	System name		Cuplikan layar
+Desktop	ScreenshotWindow		Desktop
+Artwork folder	ScreenshotWindow		Folder artwork
+Translator Settings	ScreenshotWindow		Pengaturan penerjemah
+Include mouse pointer	ScreenshotWindow		Sertakan penunjuk mouse
+overwrite	ScreenshotWindow		timpa
+Settings…	ScreenshotWindow		Pengaturan...
+Choose folder	ScreenshotWindow		Pilih folder
 Name:	ScreenshotWindow		Nama:
 Choose folder…	ScreenshotWindow		Pilih folder…
-This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Berkas ini sudah ada.\n Apakah anda yakin ingin menimpanya?
-Choose folder	ScreenshotWindow		Pilih folder
-Save	ScreenshotWindow		Simpan
-Overwrite	ScreenshotWindow		Timpa
 Please select	ScreenshotWindow		Silakan pilih
-Save as:	ScreenshotWindow		Simpan sebagai:
-Copy to clipboard	ScreenshotWindow		Salin ke clipboard
-Save in:	ScreenshotWindow		Simpan di:
-screenshot	Screenshot	Base filename of screenshot files	cuplikan layar
-New screenshot	ScreenshotWindow		Cuplikan layar baru
-Artwork folder	ScreenshotWindow		Folder artwork
-Home folder	ScreenshotWindow		Folder rumah
 Failed to save screenshot	ScreenshotWindow		Gagal menyimpan cuplikan layar
-OK	ScreenshotWindow		OKE
-Settings…	ScreenshotWindow		Pengaturan...
-overwrite	ScreenshotWindow		timpa
+Cancel	ScreenshotWindow		Batal
 Delay:	ScreenshotWindow		Penundaan:
-Error saving \"%s\":\n\t%s	ScreenshotWindow		Terjadi kesalahan menyimpan \"%s\":\n\t%s
-Include mouse pointer	ScreenshotWindow		Sertakan penunjuk mouse
-Translator Settings	ScreenshotWindow		Pengaturan penerjemah
+Copy to clipboard	ScreenshotWindow		Salin ke clipboard
+screenshot	Screenshot	Base filename of screenshot files	cuplikan layar
+Home folder	ScreenshotWindow		Folder rumah
+Save	ScreenshotWindow		Simpan
+Capture active window	ScreenshotWindow		Menangkap jendela aktif

@@ -1,30 +1,30 @@
 1	belarusian	x.vnd.OBOS-Inspector	1686702095
-User Translators	ActiveTranslatorsWindow		Канвертары Карыстача
-No image available to save.	ImageWindow		Няма выяў для захавання.
-Sorry, unable to write the image file.	ImageView		Прабачце, немагчыма запісаць файл выявы.
-Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Колькасць Дакументаў: %1\n\nУжыты Канвертар:\nІмя: %2\nІнфа: %3\nВерсія: %4\n
-\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nТып: '%1' (%2)\nГрупа: '%3' (%4)\nЯкасць: %5\nМагчымасці: %6\nMIME Type: %7\nІмя: %8\n
-Bummer	ImageWindow		Свінства
-Last Page	ImageWindow		Апошняя старонка
 \nInput Formats:	ImageView		\nФарматы ўводу:
-Sorry, unable to load the image.	ImageView		Прабачце, немагчыма загрузіць выяву.
-Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Інфавакно
-Active Translators	InspectorApp		Актыўныя канвертары
-Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Выява: %1\nКолеры: %2 (%3)\nПамеры: %4 x %5\nБайтаў у Радку: %6\nУсяго байтаў: %7\n\nІнфа:\nID страка: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nГрупа: '%13' (%14)\nЯкасць: %15\nМагчымасці: %16\n\nІнфа пра пашырэнне:\n
-\nOutput Formats:	ImageView		\nФарматы вываду:
-Save feature not implemented yet.	ImageWindow		Функцыя захавання пакуль не здзейснена.
-First Page	ImageWindow		Першая старонка
 Next Page	ImageWindow		Наступная старонка
-\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nУжыты Канвертар:\nІмя: %1\nІнфа: %2\nВерсія: %3\n
-Info	ImageWindow		Інфа
-OK	ImageWindow		ОК
-Window	ImageWindow		Вакно
-Quit	ImageWindow		Выйсці
-Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Выбраны Дакумент: %1\n\nУжыты Канвертар:\nІмя: %2\nІнфа: %3\nВерсія: %4\n
-Active Translators	ImageWindow		Актыўныя Канвертары
-View	ImageWindow		Від
 Previous Page	ImageWindow		Папярэдняя старонка
-OK	ImageView		ОК
+Active Translators	InspectorApp		Актыўныя канвертары
 System Translators	ActiveTranslatorsWindow		Сістэмныя Канвертары
+\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nТып: '%1' (%2)\nГрупа: '%3' (%4)\nЯкасць: %5\nМагчымасці: %6\nMIME Type: %7\nІмя: %8\n
+OK	ImageWindow		ОК
+View	ImageWindow		Від
+Save feature not implemented yet.	ImageWindow		Функцыя захавання пакуль не здзейснена.
+Active Translators	ImageWindow		Актыўныя Канвертары
+Info	ImageWindow		Інфа
+Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Выява: %1\nКолеры: %2 (%3)\nПамеры: %4 x %5\nБайтаў у Радку: %6\nУсяго байтаў: %7\n\nІнфа:\nID страка: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nГрупа: '%13' (%14)\nЯкасць: %15\nМагчымасці: %16\n\nІнфа пра пашырэнне:\n
+No image available to save.	ImageWindow		Няма выяў для захавання.
+OK	ImageView		ОК
+Bummer	ImageWindow		Свінства
+\nOutput Formats:	ImageView		\nФарматы вываду:
+Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Колькасць Дакументаў: %1\n\nУжыты Канвертар:\nІмя: %2\nІнфа: %3\nВерсія: %4\n
+User Translators	ActiveTranslatorsWindow		Канвертары Карыстача
+Last Page	ImageWindow		Апошняя старонка
+\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nУжыты Канвертар:\nІмя: %1\nІнфа: %2\nВерсія: %3\n
 Unknown	ImageView		Невядомы
+Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Інфавакно
+Sorry, unable to load the image.	ImageView		Прабачце, немагчыма загрузіць выяву.
 File	ImageWindow		Файл
+Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Выбраны Дакумент: %1\n\nУжыты Канвертар:\nІмя: %2\nІнфа: %3\nВерсія: %4\n
+Quit	ImageWindow		Выйсці
+Sorry, unable to write the image file.	ImageView		Прабачце, немагчыма запісаць файл выявы.
+Window	ImageWindow		Вакно
+First Page	ImageWindow		Першая старонка

@@ -1,17 +1,17 @@
 1	dutch; flemish	x-vnd.Haiku-DataTranslations	4156631142
-DataTranslations	System name		DataTranslations
-Cancel	DataTranslations		Annuleren
+Path:	DataTranslations		Pad:
 Name:	DataTranslations		Naam:
+DataTranslations - Note	DataTranslations		DataOmzetting - Opmerking
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Het item '%name' lijkt geen Translator te zijn en zal niet geïnstalleerd worden.
 Could not install %s:\n%s	DataTranslations		%s kon niet geïnstalleerd worden:\n%s
-Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Gebruik dit controlepaneel om de standaardwaarden voor de vertalingen in te stellen, die gebruikt zullen worden als er geen andere instellingen gespecifieerd worden door een applicatie.
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Er bestaat reeds een item met de naam '%name' in de Vertalingersmap!  Moet de bestaande vertaling overschreven worden?
-DataTranslations - Note	DataTranslations		DataOmzetting - Opmerking
-Overwrite	DataTranslations		Overschrijven
-Info:	DataTranslations		Info:
-Info	DataTranslations		info
-Path:	DataTranslations		Pad:
-The new translator has been installed successfully.	DataTranslations		De nieuwe omzetter werd met succes geïnstalleerd.
-DataTranslations - Error	DataTranslations		DataOmzetting - Fout
 OK	DataTranslations		Oké
+Cancel	DataTranslations		Annuleren
+Info:	DataTranslations		Info:
+DataTranslations - Error	DataTranslations		DataOmzetting - Fout
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Gebruik dit controlepaneel om de standaardwaarden voor de vertalingen in te stellen, die gebruikt zullen worden als er geen andere instellingen gespecifieerd worden door een applicatie.
+The new translator has been installed successfully.	DataTranslations		De nieuwe omzetter werd met succes geïnstalleerd.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Er bestaat reeds een item met de naam '%name' in de Vertalingersmap!  Moet de bestaande vertaling overschreven worden?
+DataTranslations	System name		DataTranslations
+Info	DataTranslations		info
+Overwrite	DataTranslations		Overschrijven
 Version:	DataTranslations		Versie:

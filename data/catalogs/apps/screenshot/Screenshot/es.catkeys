@@ -1,31 +1,31 @@
 1	spanish; castilian	x-vnd.haiku-screenshot	3958461128
-seconds	ScreenshotWindow		segundos
-Desktop	ScreenshotWindow		Escritorio
 Include window border	ScreenshotWindow		Incuir el borde de la ventana
-Screenshot	System name		Captura de pantallia
-Select	ScreenshotWindow		Seleccionar
+Overwrite	ScreenshotWindow		Sobrescribir
+Save in:	ScreenshotWindow		Guardar en:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Error guardando \"%s\":\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		El archivo ya existe.\n¿Está seguro de que desea sobrescribirlo?
+OK	ScreenshotWindow		Aceptar
 The destination path exists but is not a folder.	ScreenshotWindow		La ruta de destino existe, pero no es una carpeta.
-Capture active window	ScreenshotWindow		Capturar la ventana actual
-Cancel	ScreenshotWindow		Cancelar
+Select	ScreenshotWindow		Seleccionar
+Save as:	ScreenshotWindow		Guardar como:
+seconds	ScreenshotWindow		segundos
+New screenshot	ScreenshotWindow		Nueva captura
+Screenshot	System name		Captura de pantallia
+Desktop	ScreenshotWindow		Escritorio
+Artwork folder	ScreenshotWindow		Carpeta de Artwork
+Translator Settings	ScreenshotWindow		Ajustes de traducción
+Include mouse pointer	ScreenshotWindow		Incluir el puntero del ratón
+overwrite	ScreenshotWindow		Sobreescribir
+Settings…	ScreenshotWindow		Ajustes...
+Choose folder	ScreenshotWindow		Elegir carpeta
 Name:	ScreenshotWindow		Nombre:
 Choose folder…	ScreenshotWindow		Elegir carpeta…
-This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		El archivo ya existe.\n¿Está seguro de que desea sobrescribirlo?
-Choose folder	ScreenshotWindow		Elegir carpeta
-Save	ScreenshotWindow		Guardar
-Overwrite	ScreenshotWindow		Sobrescribir
 Please select	ScreenshotWindow		Por favor elija
-Save as:	ScreenshotWindow		Guardar como:
-Copy to clipboard	ScreenshotWindow		Copiar al portapapeles
-Save in:	ScreenshotWindow		Guardar en:
-screenshot	Screenshot	Base filename of screenshot files	Captura
-New screenshot	ScreenshotWindow		Nueva captura
-Artwork folder	ScreenshotWindow		Carpeta de Artwork
-Home folder	ScreenshotWindow		Carpeta home
 Failed to save screenshot	ScreenshotWindow		Fallo al guardar captura de pantalla
-OK	ScreenshotWindow		Aceptar
-Settings…	ScreenshotWindow		Ajustes...
-overwrite	ScreenshotWindow		Sobreescribir
+Cancel	ScreenshotWindow		Cancelar
 Delay:	ScreenshotWindow		Espera:
-Error saving \"%s\":\n\t%s	ScreenshotWindow		Error guardando \"%s\":\n\t%s
-Include mouse pointer	ScreenshotWindow		Incluir el puntero del ratón
-Translator Settings	ScreenshotWindow		Ajustes de traducción
+Copy to clipboard	ScreenshotWindow		Copiar al portapapeles
+screenshot	Screenshot	Base filename of screenshot files	Captura
+Home folder	ScreenshotWindow		Carpeta home
+Save	ScreenshotWindow		Guardar
+Capture active window	ScreenshotWindow		Capturar la ventana actual

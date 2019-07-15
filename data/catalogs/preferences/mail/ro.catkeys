@@ -1,54 +1,54 @@
 1	romanian	x-vnd.Haiku-Mail	2750130554
+Account settings	AutoConfigWindow		Configurări cont
+\t\t· Outgoing	Config Window		\t\t· De plecare
+An error occurred while creating the config view: %error.	Config Views		A apărut o eroare în timpul creării vizualizării config: %error.
+E-mail address:	E-Mail		Adresă email:
+Create new account	AutoConfigWindow		Creează un cont nou
+While sending and receiving	Config Window		În timp ce se trimite și se recepționează
+Error!	Config Views		Eroare!
+Apply	Config Window		Aplică
+Incoming mail filters	Config Views		Filtre mailuri de intrare
+Outgoing mail filters	Config Views		Filtre mail de plecare
+Server name:	E-Mail		Nume server:
+Add	Config Window		Adaugă
+Back	AutoConfigWindow		Înapoi
+Real name:	E-Mail		Nume real:
+Real name:	Config Views		Nume real:
+\t\t· E-mail filters	Config Window		\t\t· Filtre email
+Outgoing	E-Mail		De plecare
+Accounts	Config Window		Conturi
+Outgoing	Config Window		De plecare
+Remove	Config Views		Elimină
+Show notifications:	Config Window		Afișează notificări:
 Settings	Config Window		Configurări
 Never	Config Window	show status window	Niciodată
-While sending and receiving	Config Window		În timp ce se trimite și se recepționează
-Incoming	Config Window		De primire
-Server name:	E-Mail		Nume server:
-An error occurred while creating the config view: %error.	Config Views		A apărut o eroare în timpul creării vizualizării config: %error.
-OK	Config Window		OK
-E-mail address:	E-Mail		Adresă email:
-Account name:	E-Mail		Nume cont:
 Account name:	Config Views		Nume cont:
-Create new account	AutoConfigWindow		Creează un cont nou
-OK	Config Views		OK
-The filter could not be moved. Deleting filter.	Config Views		Filtrul nu a putut fi mișcat. Se șterge filtrul.
-Revert	Config Window		Revenire
-Login name:	E-Mail		Nume de autentificare:
-Incoming	E-Mail		De primire
-Password:	E-Mail		Parolă:
-Accounts	Config Window		Conturi
-Finish	AutoConfigWindow		Termină
-Remove	Config Window		Elimină
-Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Creează un cont nou cu butonul Adaugă.\n\nȘterge un cont cu butonul Elimină pe elementul selectat.\n\nSelectează un element din listă pentru a-i schimba configurările.
-Error!	Config Views		Eroare!
-Server Name:	E-Mail		Nume server:
-While sending	Config Window		În timp ce se trimite
-Show notifications:	Config Window		Afișează notificări:
+\t\t· Incoming	Config Window		\t\t· De primire
 Enter a valid e-mail address.	AutoConfigWindow		Introdu o adresă de email validă.
-Add	Config Window		Adaugă
-Account settings	AutoConfigWindow		Configurări cont
-E-mail	System name		Email
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nConfigurările generale nu au putut fi inversate.\n\nEroare la obținerea configurărilor generale:\n%s\n
-Real name:	Config Views		Nume real:
-\t\t· Outgoing	Config Window		\t\t· De plecare
+Incoming	E-Mail		De primire
 Choose Protocol	E-Mail		Alege protocol
 Return address:	Config Views		Întoarce adresa:
-Edit mailbox menu…	Config Window		Editează meniul căsuței de mail…
-Outgoing	E-Mail		De plecare
-\t\t· E-mail filters	Config Window		\t\t· Filtre email
-Remove	Config Views		Elimină
-\t\t· Incoming	Config Window		\t\t· De primire
-Next	AutoConfigWindow		Înainte
-Check every	Config Window		Verifică la fiecare
-Back	AutoConfigWindow		Înapoi
-Incoming mail filters	Config Views		Filtre mailuri de intrare
+Password:	E-Mail		Parolă:
+Error retrieving general settings: %s\n	Config Window		Eroare la obținerea configurărilor generale: %s\n
+The filter could not be moved. Deleting filter.	Config Views		Filtrul nu a putut fi mișcat. Se șterge filtrul.
+OK	Config Views		OK
+Revert	Config Window		Revenire
+Incoming	Config Window		De primire
+Finish	AutoConfigWindow		Termină
+Add filter	Config Views		Adaugă filtru
 Account settings	Config Views		Configurări cont
 minutes	Config Window		minute
-Error retrieving general settings: %s\n	Config Window		Eroare la obținerea configurărilor generale: %s\n
-Real name:	E-Mail		Nume real:
-Apply	Config Window		Aplică
+E-mail	System name		Email
+Check every	Config Window		Verifică la fiecare
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Creează un cont nou cu butonul Adaugă.\n\nȘterge un cont cu butonul Elimină pe elementul selectat.\n\nSelectează un element din listă pentru a-i schimba configurările.
+Account name:	E-Mail		Nume cont:
+Edit mailbox menu…	Config Window		Editează meniul căsuței de mail…
+Server Name:	E-Mail		Nume server:
+Remove	Config Window		Elimină
+Login name:	E-Mail		Nume de autentificare:
+While sending	Config Window		În timp ce se trimite
+OK	Config Window		OK
 OK	AutoConfigWindow		OK
-Add filter	Config Views		Adaugă filtru
-Outgoing	Config Window		De plecare
-Outgoing mail filters	Config Views		Filtre mail de plecare
+Next	AutoConfigWindow		Înainte
 Error	Config Window		Eroare

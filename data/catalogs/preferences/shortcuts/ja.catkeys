@@ -1,42 +1,41 @@
-1	japanese	x-vnd.Haiku-Shortcuts	986541402
-OK	ShortcutsWindow		OK
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		キーセットを保存できませんでした。
-Cancel	ShortcutsWindow		中止
-Append KeySet…	ShortcutsWindow		キーセットの追加…
-Control	ShortcutsSpec	Name for modifier on keyboard	Control
-Key	ShortcutsWindow		Key
-Open KeySet…	ShortcutsWindow		キーセットを開く…
-Error, NULL state description?	ShortcutsSpec		エラー、記述がありません?\n
-Revert to saved	ShortcutsWindow		前回保存したときの状態に戻す
-*InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"テキストをここに\"
+1	japanese	x-vnd.Haiku-Shortcuts	1611284793
 *MouseUp	ShortcutsWindow		*MouseUp
-(Choose application with file requester)	ShortcutsWindow		(ファイルリクエスタと共にアプリケーションを選択)
-*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		キーセットファイルを開けませんでした！
-*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
-Option	ShortcutsSpec	Name for modifier on keyboard	オプション
-Save	ShortcutsWindow		保存
-*MouseButton 1	ShortcutsWindow		*MouseButton 1
-*MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
-Save changes before closing?	ShortcutsWindow		閉じる前に変更を保存しますか?
-Command	ShortcutsSpec	Name for modifier on keyboard	コマンド
-Remove selected shortcut	ShortcutsWindow		選択部を削除
-Add new shortcut	ShortcutsWindow		新規作成
-Save & apply	ShortcutsWindow		保存して適用
-*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
-Append	ShortcutsWindow		追加
-File	ShortcutsWindow		ファイル
-Quit	ShortcutsWindow		終了
-*MouseDown	ShortcutsWindow		*MouseDown
-Don't save	ShortcutsWindow		保存しない
 Application	ShortcutsWindow		アプリケーション
-Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Option	ShortcutsSpec	Name for modifier on keyboard	オプション
+Save changes before closing?	ShortcutsWindow		閉じる前に変更を保存しますか?
+Revert to saved	ShortcutsWindow		前回保存したときの状態に戻す
+Don't save	ShortcutsWindow		保存しない
+*MouseDown	ShortcutsWindow		*MouseDown
 *Beep	ShortcutsWindow		*Beep
-*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%
-Save KeySet as…	ShortcutsWindow		キーセットを名前を付けて保存…
-Open	ShortcutsWindow		開く
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		キーセットファイルを解析できませんでした。
-Select	ShortcutsWindow		選択
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		キーセットファイルを保存できませんでした!
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		キーセットを保存できませんでした。
+Save	ShortcutsWindow		保存
 Oh no	ShortcutsWindow		Oh no
+Key	ShortcutsWindow		Key
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
+Select	ShortcutsWindow		選択
 Shortcuts	System name		キーボードショートカット
+Quit	ShortcutsWindow		終了
+(Choose application with file requester)	ShortcutsWindow		(ファイルリクエスタと共にアプリケーションを選択)
+Cancel	ShortcutsWindow		中止
+*MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
+Control	ShortcutsSpec	Name for modifier on keyboard	Control
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		キーセットファイルを解析できませんでした。
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		キーセットファイルを保存できませんでした!
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"テキストをここに\"
+Remove selected shortcut	ShortcutsWindow		選択部を削除
+Error, NULL state description?	ShortcutsSpec		エラー、記述がありません?\n
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		キーセットファイルを開けませんでした！
+Save & apply	ShortcutsWindow		保存して適用
+Open	ShortcutsWindow		開く
+Append	ShortcutsWindow		追加
+Save KeySet as…	ShortcutsWindow		キーセットを名前を付けて保存…
+Append KeySet…	ShortcutsWindow		キーセットの追加…
+*MouseButton 1	ShortcutsWindow		*MouseButton 1
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
+OK	ShortcutsWindow		OK
+Add new shortcut	ShortcutsWindow		新規作成
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Open KeySet…	ShortcutsWindow		キーセットを開く…
+File	ShortcutsWindow		ファイル
+*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
+*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%

@@ -1,17 +1,16 @@
-1	russian	x-vnd.Haiku-MatchHeader	548057976
+1	russian	x-vnd.Haiku-MatchHeader	3544711400
+Delete message	ConfigView		Удалить сообщение
+Match \"%attribute\" against \"%regex\"	RuleFilter		Совпадает \"%attribute\" с\"%regex\"
+Match header	RuleFilter		Совпадающий заголовок
+Set flags to	ConfigView		Установить флаги в
+<Choose account>	ConfigView		<Выбрать учётную запись>
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Подставить значение как \"*spam*\".\nПрефикс \"REGEX:\" используется для регулярных выражений.
+Then	ConfigView		Тогда
+If	ConfigView		Если
+Set as read	ConfigView		Отметить как прочитанное
+Reply with	ConfigView		Ответить с
 <Choose action>	ConfigView		<Выберите действие>
-Header field (e.g. Subject, From, ...)	ConfigView		Поле заголовка (например, Тема, От, ...)
+Move to	ConfigView		Переместить в
+this field is based on the action	ConfigView		это поле зависит от действия
 Account	ConfigView		Аккаунт
 has	ConfigView		содержит
-Move to	ConfigView		Переместить в
-Then	ConfigView		Тогда
-this field is based on the action	ConfigView		это поле зависит от действия
-Delete message	ConfigView		Удалить сообщение
-<Choose account>	ConfigView		<Выбрать учётную запись>
-Set flags to	ConfigView		Установить флаги в
-Set as read	ConfigView		Отметить как прочитанное
-Match header	RuleFilter		Совпадающий заголовок
-Reply with	ConfigView		Ответить с
-If	ConfigView		Если
-Match \"%attribute\" against \"%regex\"	RuleFilter		Совпадает \"%attribute\" с\"%regex\"
-Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Подставить значение как \"*spam*\".\nПрефикс \"REGEX:\" используется для регулярных выражений.

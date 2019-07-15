@@ -1,7 +1,6 @@
-1	korean	x-vnd.Haiku-IMAP	3950045582
-Destination:	imap_config		대상:
-status	IMAPFolderConfig		상태
-Apply	IMAPFolderConfig		더하기
-Fetching IMAP folders, have patience...	IMAPFolderConfig		IMAP 폴더 가져오는 중, 인내심을 가지십시오 ...
-IMAP Folders	IMAPFolderConfig		IMAP 폴더들
+1	korean	x-vnd.Haiku-IMAP	3213145085
 Failed to fetch available storage.	IMAPFolderConfig		사용 가능한 저장소를 가져오는 데 실패했습니다.
+Apply	IMAPFolderConfig		더하기
+status	IMAPFolderConfig		상태
+IMAP Folders	IMAPFolderConfig		IMAP 폴더들
+Destination:	imap_config		대상:

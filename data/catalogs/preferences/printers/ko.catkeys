@@ -1,38 +1,35 @@
-1	korean	x-vnd.Be-PRNT	2279754695
-Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		프린터: %printer_name%\n드라이버: %driver%\n
-Waiting	JobListView		기다리는 중
-Print test page	PrintersWindow		시험 페이지 인쇄
-page	JobListView		페이지
-Cancel	AddPrinterDialog		취소
-Add printer	AddPrinterDialog		프린터 추가
-Green	TestPageView		녹색
-Printers	PrintersWindow		프린터들
-Default Printer	PrinterListView		기본 프린터
-Transport: %transport% %transport_address%	PrinterListView		전송: %transport% %transport_address%
-pages	JobListView		페이지
-Printers	System name		프린터
-Processing	JobListView		작업중
-Red	TestPageView		빨강
-Printer name:	AddPrinterDialog		프린터 이름:
-Driver: %driver%	PrinterListView		드라이버: %driver%
-Black	TestPageView		검정
-Restart job	PrintersWindow		작업 다시 시작
-Add	AddPrinterDialog		추가
-Make default	PrintersWindow		기본으로 설정
-Transport: %transport% %transport_address%	TestPageView		전송: %transport% %transport_address%
-Cancel job	PrintersWindow		작업 취소
-Yellow	TestPageView		노랑
-Blue	TestPageView		파랑
+1	korean	x-vnd.Be-PRNT	823985976
 Remove	PrintersWindow		제거
+Red	TestPageView		빨강
+Default Printer	PrinterListView		기본 프린터
 <pick one>	AddPrinterDialog		<하나 선택>
-Print jobs for 	PrintersWindow		인쇄 작업에 대해
-Failed	JobListView		실패함
-%.2f KB	JobListView		%.2f 킬로바이트
-Magenta	TestPageView		자홍색
-Completed	JobListView		완료됨
-No printer found!	TransportMenu		어떤 프린터도 찾을 수 없음!
-Print jobs: No printer selected	PrintersWindow		인쇄 작업: 선택된 프린터가 없음
-Cyan	TestPageView		청록색
-Unknown status	JobListView		알수 없는 상태
 Connected to:	AddPrinterDialog		연결된 곳:
+Make default	PrintersWindow		기본으로 설정
+Cyan	TestPageView		청록색
+Completed	JobListView		완료됨
+Transport: %transport% %transport_address%	PrinterListView		전송: %transport% %transport_address%
+Failed	JobListView		실패함
+Blue	TestPageView		파랑
+Waiting	JobListView		기다리는 중
+Processing	JobListView		작업중
+Cancel	AddPrinterDialog		취소
+Unknown status	JobListView		알수 없는 상태
+Add printer	AddPrinterDialog		프린터 추가
+Printers	PrintersWindow		프린터들
+No printer found!	TransportMenu		어떤 프린터도 찾을 수 없음!
+Magenta	TestPageView		자홍색
+Transport: %transport% %transport_address%	TestPageView		전송: %transport% %transport_address%
+Add	AddPrinterDialog		추가
+Print jobs: No printer selected	PrintersWindow		인쇄 작업: 선택된 프린터가 없음
+Printer name:	AddPrinterDialog		프린터 이름:
+Yellow	TestPageView		노랑
+Black	TestPageView		검정
 Printer type:	AddPrinterDialog		프린터 종류:
+Printers	System name		프린터
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		프린터: %printer_name%\n드라이버: %driver%\n
+Green	TestPageView		녹색
+Print test page	PrintersWindow		시험 페이지 인쇄
+Restart job	PrintersWindow		작업 다시 시작
+Driver: %driver%	PrinterListView		드라이버: %driver%
+Cancel job	PrintersWindow		작업 취소
+%.2f KB	JobListView		%.2f 킬로바이트

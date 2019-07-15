@@ -1,19 +1,19 @@
 1	lithuanian	x-vnd.Haiku-Login	2683778354
-Error: %1	Login App		Klaida: %1
-Hide password	Login View		Nerodyti slaptažodžio
-Desktop	Desktop Window		Darbalaukis
 Invalid login!	Login View		Netinkamas naudotojo vardas!
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tPaleisti nuostatų keitimo veiksena, leidžiančia tinkinti darbalaukį.\n
-OK	Login View		Gerai
-error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	klaida %s\n
-Login:	Login View		Naudotojo vardas:
 Error	Login App		Klaida
-Unimplemented	Login App		Nerealizuota
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tPaleisti nuostatų keitimo veiksena, leidžiančia tinkinti darbalaukį.\n
 Welcome to Haiku	Login Window		Sveiki! Čia „Haiku“
-Reboot	Login View		Paleisti iš naujo
-Login application for Haiku\nUsage:\n	Login App		Prisijungimo prie „Haiku“ programa\nNaudojimas:\n
-Info	Login App		Informacija
 Halt	Login View		Išjungti
-Password:	Login View		Slaptažodis:
-OK	Login App		Gerai
+Login application for Haiku\nUsage:\n	Login App		Prisijungimo prie „Haiku“ programa\nNaudojimas:\n
 --nonmodal\tDo not make the window modal\n	Login App		--nonmodal\t Nepaversti lango modaliniu\n
+Desktop	Desktop Window		Darbalaukis
+Hide password	Login View		Nerodyti slaptažodžio
+Reboot	Login View		Paleisti iš naujo
+OK	Login View		Gerai
+Info	Login App		Informacija
+Login:	Login View		Naudotojo vardas:
+Password:	Login View		Slaptažodis:
+Unimplemented	Login App		Nerealizuota
+OK	Login App		Gerai
+Error: %1	Login App		Klaida: %1
+error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	klaida %s\n

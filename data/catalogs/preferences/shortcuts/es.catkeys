@@ -1,42 +1,41 @@
-1	spanish; castilian	x-vnd.Haiku-Shortcuts	986541402
-OK	ShortcutsWindow		Aceptar
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Atajos no pudo guardar tu conjunto de teclas.
-Cancel	ShortcutsWindow		Cancelar
-Append KeySet…	ShortcutsWindow		Anexar conjunto de claves ...
-Control	ShortcutsSpec	Name for modifier on keyboard	Control
-Key	ShortcutsWindow		Tecla
-Open KeySet…	ShortcutsWindow		Abrir el conjunto de claves
-Error, NULL state description?	ShortcutsSpec		Error, ¿descripción de estado nula?
-Revert to saved	ShortcutsWindow		Volver guardar
-*InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Tu texto aquí\"
+1	spanish; castilian	x-vnd.Haiku-Shortcuts	1611284793
 *MouseUp	ShortcutsWindow		*Ratón arriba
-(Choose application with file requester)	ShortcutsWindow		(Elegir la aplicación que solicita la aplicación)
-*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Atajos no pudo abrir tu conjunto de claves!
-*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
-Option	ShortcutsSpec	Name for modifier on keyboard	Opción
-Save	ShortcutsWindow		Guardar
-*MouseButton 1	ShortcutsWindow		*Botóndelratón 1
-*MoveMouse +20 +0	ShortcutsWindow		*MovimientodelRatón +20 +0
-Save changes before closing?	ShortcutsWindow		¿Guardar cambios antes de cerrar?
-Command	ShortcutsSpec	Name for modifier on keyboard	Comando
-Remove selected shortcut	ShortcutsWindow		Eliminar el atajo seleccionado
-Add new shortcut	ShortcutsWindow		Añadir un nuevo atajo
-Save & apply	ShortcutsWindow		Guardar y aplicar
-*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*aplicación enviar mensaje/x-vnd.Be-TRAK 'Tfnd'
-Append	ShortcutsWindow		Añadir
-File	ShortcutsWindow		Archivo
-Quit	ShortcutsWindow		Quitar
-*MouseDown	ShortcutsWindow		*RatónAbajo
-Don't save	ShortcutsWindow		No guardar
 Application	ShortcutsWindow		Aplicación
-Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Option	ShortcutsSpec	Name for modifier on keyboard	Opción
+Save changes before closing?	ShortcutsWindow		¿Guardar cambios antes de cerrar?
+Revert to saved	ShortcutsWindow		Volver guardar
+Don't save	ShortcutsWindow		No guardar
+*MouseDown	ShortcutsWindow		*RatónAbajo
 *Beep	ShortcutsWindow		*Pitido
-*MoveMouseTo 50% 50%	ShortcutsWindow		*Movimientodelratóna 50% 50%
-Save KeySet as…	ShortcutsWindow		Guardar el conjunto de claves como....
-Open	ShortcutsWindow		Abrir
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Atajos no puedo analizar el archivo del conjunto de claves
-Select	ShortcutsWindow		Seleccionar
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Atajos no pudo guardar tu archivo KeySet
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Atajos no pudo guardar tu conjunto de teclas.
+Save	ShortcutsWindow		Guardar
 Oh no	ShortcutsWindow		Oh no
+Key	ShortcutsWindow		Tecla
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*aplicación enviar mensaje/x-vnd.Be-TRAK 'Tfnd'
+Select	ShortcutsWindow		Seleccionar
 Shortcuts	System name		Atajos
+Quit	ShortcutsWindow		Quitar
+(Choose application with file requester)	ShortcutsWindow		(Elegir la aplicación que solicita la aplicación)
+Cancel	ShortcutsWindow		Cancelar
+*MoveMouse +20 +0	ShortcutsWindow		*MovimientodelRatón +20 +0
+Control	ShortcutsSpec	Name for modifier on keyboard	Control
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Atajos no puedo analizar el archivo del conjunto de claves
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Atajos no pudo guardar tu archivo KeySet
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Tu texto aquí\"
+Remove selected shortcut	ShortcutsWindow		Eliminar el atajo seleccionado
+Error, NULL state description?	ShortcutsSpec		Error, ¿descripción de estado nula?
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Atajos no pudo abrir tu conjunto de claves!
+Save & apply	ShortcutsWindow		Guardar y aplicar
+Open	ShortcutsWindow		Abrir
+Append	ShortcutsWindow		Añadir
+Save KeySet as…	ShortcutsWindow		Guardar el conjunto de claves como....
+Append KeySet…	ShortcutsWindow		Anexar conjunto de claves ...
+*MouseButton 1	ShortcutsWindow		*Botóndelratón 1
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
+OK	ShortcutsWindow		Aceptar
+Add new shortcut	ShortcutsWindow		Añadir un nuevo atajo
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Open KeySet…	ShortcutsWindow		Abrir el conjunto de claves
+File	ShortcutsWindow		Archivo
+*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
+*MoveMouseTo 50% 50%	ShortcutsWindow		*Movimientodelratóna 50% 50%

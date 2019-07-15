@@ -1,20 +1,20 @@
 1	lithuanian	x-vnd.Haiku-VirtualMemory	2090796060
-Quit	SettingsWindow		Baigti darbą
-Automatic swap management	SettingsWindow		Valdyti automatiškai
-Turn off	SettingsWindow		Išjungti
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Virtualiosios atminties išjungimas gali turėti neigiamos įtakos sistemos stabilumui, kai fizinė atmintis visiškai užsipildys.\nVirtualioji atmintis neįtakoja sistemos našumo tol, kol yra laisvos fizinės atminties.\n\nAr tikrai norite išjungti virtualiąją atmintį?
 Requested swap file size:	SettingsWindow		Reikalingas sukeitimų failo dydis:
-The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Nuostatų faile įrašytos negalimos nuostatos. Galite įkelti numatytąsias nuostatas arba baigti darbą.
-Defaults	SettingsWindow		Numatytai
-Current Swap:	SettingsWindow		Esama virtualioji atmintis:
-Use volume:	SettingsWindow		Naudoti tomą:
-Keep enabled	SettingsWindow		Palikti įjungtą
-Revert	SettingsWindow		Atšaukti pakeitimus
 VirtualMemory	System name		Virtualioji atmintis
-Use boot volume	SettingsWindow		Naudoti paleidimo tomą
-Load defaults	SettingsWindow		Įkelti numatytąsias
 OK	VirtualMemoryApp		Gerai
+Use volume:	SettingsWindow		Naudoti tomą:
+Turn off	SettingsWindow		Išjungti
 Changes will take effect upon reboot.	SettingsWindow		Pakeitimai įsigalios, paleidus sistemą iš naujo.
+Revert	SettingsWindow		Atšaukti pakeitimus
+Keep enabled	SettingsWindow		Palikti įjungtą
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Nuostatų faile įrašytos negalimos nuostatos. Galite įkelti numatytąsias nuostatas arba baigti darbą.
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Virtualioji atmintis\n\tparašyta Axel'io Dörfler'io\n\t© 2005, Haiku.\n
 The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		Nuostatų faile nurodytas tomas nerastas. Galima naudoti paleidimo tomą arba baigti darbą.
+Current Swap:	SettingsWindow		Esama virtualioji atmintis:
+Load defaults	SettingsWindow		Įkelti numatytąsias
+Use boot volume	SettingsWindow		Naudoti paleidimo tomą
+Automatic swap management	SettingsWindow		Valdyti automatiškai
+Defaults	SettingsWindow		Numatytai
+Quit	SettingsWindow		Baigti darbą
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Virtualiosios atminties išjungimas gali turėti neigiamos įtakos sistemos stabilumui, kai fizinė atmintis visiškai užsipildys.\nVirtualioji atmintis neįtakoja sistemos našumo tol, kol yra laisvos fizinės atminties.\n\nAr tikrai norite išjungti virtualiąją atmintį?
 Enable virtual memory	SettingsWindow		Įjungti virtualiąją atmintį

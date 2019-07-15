@@ -1,44 +1,38 @@
-1	finnish	x-vnd.Be-PRNT	686411231
-Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Tulostin: %printer_name%\nAjuri:   %driver%\n
-Waiting	JobListView		Odotetaan
-Print test page	PrintersWindow		Tulosta testisivu
- pending jobs	PrinterListView		 odottamassa olevat työt
-page	JobListView		sivu
-Cancel	AddPrinterDialog		Peru
-Test page	PrintersWindow		Testaussivu
-Add printer	AddPrinterDialog		Lisää tulostin
-Green	TestPageView		Vihreä
-Printers	PrintersWindow		Tulostimet
-Add…	PrintersWindow		Lisää...
-No pending jobs	PrinterListView		Ei odottamassa olevia töitä
-Default Printer	PrinterListView		Oletustulostin
-Transport: %transport% %transport_address%	PrinterListView		Siirto: %transport% %transport_address%
-pages	JobListView		sivua
-Printers	System name		Tulostinasetukset
-Processing	JobListView		Käsitellään
-Red	TestPageView		Punainen
-Printer name:	AddPrinterDialog		Tulostinnimi:
-Driver: %driver%	PrinterListView		Ajuri: %driver%
-Black	TestPageView		Musta
-Restart job	PrintersWindow		Käynnistä työ uudelleen
-Add	AddPrinterDialog		Lisää
-Make default	PrintersWindow		Aseta oletusarvoksi
-Transport: %transport% %transport_address%	TestPageView		Siirto: %transport% %transport_address%
-Cancel job	PrintersWindow		Peru työ
-Yellow	TestPageView		Keltainen
-Blue	TestPageView		Sininen
-Remove	PrintersWindow		Poista
-<pick one>	AddPrinterDialog		<poimi yksi>
-Print jobs for 	PrintersWindow		Tulosta työt tulostimelle 
-Failed	JobListView		Epäonnistui
-%.2f KB	JobListView		%.2f kilotavua
-Magenta	TestPageView		Sinipunainen
-Completed	JobListView		Valmis
-No printer found!	TransportMenu		Tulostinta ei löytynyt!
-Print jobs: No printer selected	PrintersWindow		Tulostustyöt: Tulostinta ei ole valittu
-Cyan	TestPageView		Sinivihreä
-Unknown status	JobListView		Tuntematon tila
-1 pending job	PrinterListView		1 odottamassa oleva työ
-Connected to:	AddPrinterDialog		Yhdistetty kohteeseen:
-Printer type:	AddPrinterDialog		Tulostintyyppi:
+1	finnish	x-vnd.Be-PRNT	2042381362
 Test page	TestPageView		Testaussivu
+Remove	PrintersWindow		Poista
+Red	TestPageView		Punainen
+Default Printer	PrinterListView		Oletustulostin
+<pick one>	AddPrinterDialog		<poimi yksi>
+Connected to:	AddPrinterDialog		Yhdistetty kohteeseen:
+Make default	PrintersWindow		Aseta oletusarvoksi
+Cyan	TestPageView		Sinivihreä
+Completed	JobListView		Valmis
+Test page	PrintersWindow		Testaussivu
+Transport: %transport% %transport_address%	PrinterListView		Siirto: %transport% %transport_address%
+Failed	JobListView		Epäonnistui
+Blue	TestPageView		Sininen
+Waiting	JobListView		Odotetaan
+Processing	JobListView		Käsitellään
+Cancel	AddPrinterDialog		Peru
+Unknown status	JobListView		Tuntematon tila
+Add printer	AddPrinterDialog		Lisää tulostin
+Printers	PrintersWindow		Tulostimet
+No printer found!	TransportMenu		Tulostinta ei löytynyt!
+Add…	PrintersWindow		Lisää...
+Magenta	TestPageView		Sinipunainen
+Transport: %transport% %transport_address%	TestPageView		Siirto: %transport% %transport_address%
+Add	AddPrinterDialog		Lisää
+Print jobs: No printer selected	PrintersWindow		Tulostustyöt: Tulostinta ei ole valittu
+Printer name:	AddPrinterDialog		Tulostinnimi:
+Yellow	TestPageView		Keltainen
+Black	TestPageView		Musta
+Printer type:	AddPrinterDialog		Tulostintyyppi:
+Printers	System name		Tulostinasetukset
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Tulostin: %printer_name%\nAjuri:   %driver%\n
+Green	TestPageView		Vihreä
+Print test page	PrintersWindow		Tulosta testisivu
+Restart job	PrintersWindow		Käynnistä työ uudelleen
+Driver: %driver%	PrinterListView		Ajuri: %driver%
+Cancel job	PrintersWindow		Peru työ
+%.2f KB	JobListView		%.2f kilotavua

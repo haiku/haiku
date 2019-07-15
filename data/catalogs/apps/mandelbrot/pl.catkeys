@@ -1,23 +1,23 @@
 1	polish	x-vnd.Haiku-Mandelbrot	1781779654
-About	MandelbrotWindow		O programie
-Julia	MandelbrotWindow		Julia
-Grassland	MandelbrotWindow		Łąka
-Spring	MandelbrotWindow		Wiosna
-High contrast	MandelbrotWindow		Wysoki kontrast
-Fire	MandelbrotWindow		Ogień
-Royal	MandelbrotWindow		Królewska
-File	MandelbrotWindow		Plik
-Lightning	MandelbrotWindow		Piorun
-Midnight	MandelbrotWindow		Północ
-Palette	MandelbrotWindow		Paleta
-Mandelbrot	MandelbrotWindow		Mandelbrot
 Burning Ship	MandelbrotWindow		Płonący statek
-Quit	MandelbrotWindow		Zakończ
-Frost	MandelbrotWindow		Szron
+Grassland	MandelbrotWindow		Łąka
+Lightning	MandelbrotWindow		Piorun
+About	MandelbrotWindow		O programie
+Palette	MandelbrotWindow		Paleta
 Set	MandelbrotWindow		Zbiór
-Iterations	MandelbrotWindow		Liczba iteracji
-Mandelbrot	System name		Mandelbrot
-Deepfrost	MandelbrotWindow		Mróz
 Tricorn	MandelbrotWindow		Tricorn
-Multibrot	MandelbrotWindow		Multibrot
+Royal	MandelbrotWindow		Królewska
 Orbit Trap	MandelbrotWindow		Orbit Trap
+Deepfrost	MandelbrotWindow		Mróz
+Quit	MandelbrotWindow		Zakończ
+File	MandelbrotWindow		Plik
+Julia	MandelbrotWindow		Julia
+Frost	MandelbrotWindow		Szron
+Fire	MandelbrotWindow		Ogień
+Mandelbrot	System name		Mandelbrot
+Iterations	MandelbrotWindow		Liczba iteracji
+High contrast	MandelbrotWindow		Wysoki kontrast
+Multibrot	MandelbrotWindow		Multibrot
+Spring	MandelbrotWindow		Wiosna
+Midnight	MandelbrotWindow		Północ
+Mandelbrot	MandelbrotWindow		Mandelbrot

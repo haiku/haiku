@@ -1,133 +1,133 @@
 1	english	x-vnd.Haiku-DiskProbe	2944605311
-File offset: 	ProbeView		文件偏移量：
-%ld (native)	ProbeView		%ld（本地）
-64 bit unsigned value:	TypeEditors		64位无符号数：
-Find again	ProbeView		重新查找
-Text	FindWindow		文本
-Find…	ProbeView		查找...
-Case sensitive	FindWindow		事件敏感
-Cancel	OpenWindow		取消
-Close	AttributeWindow		关闭
-File	ProbeView		文件
-Attribute	ProbeView		属性
-Floating-point value:	TypeEditors		浮点数：
-16 bit	TypeEditors		16位
-Attributes	ProbeView		属性
-Device offset: 	ProbeView		硬件偏移量：
-Selection	ProbeView		选择
-DiskProbe	System name		磁盘扫描器
-what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	什么：‘%.4s’\n\n
-File	FileWindow		文件
-OK	DiskProbe		确定
-Boolean	TypeEditors	This is the type of editor	布尔值
-Paste	ProbeView		粘贴
-PNG format	TypeEditors		PNG 格式
-Font size	ProbeView		字体大小
-Attribute type: 	ProbeView		属性类型：
-Attribute	AttributeWindow		属性
-8 bit signed value:	TypeEditors		8位有符号数：
-Number:	TypeEditors		序列号：
-Save	ProbeView		保存
-Stop	ProbeView		停止
-Number editor	TypeEditors		序列号编辑器
-Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	十六进制
-No type editor available	AttributeWindow		无可用的类型编辑器
-Double precision floating-point value:	TypeEditors		双精度浮点型数：
-Device: 	ProbeView		硬件设备：
-Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		是否删除属性 \"%s\" 确定该文件为\"%s\"?\n\n删除之后将无法恢复。
-Text	TypeEditors	This is the type of editor	文本
-8 bit unsigned value:	TypeEditors		8位无符号数：
-Block	ProbeView		块
-Back	ProbeView		返回
-Device	ProbeView		硬件设备
-Unknown type	TypeEditors		未知类型
-Block 0x%Lx	ProbeView		块 0x%Lx
-Quit	FileWindow		退出
-Undo	ProbeView		撤销
-Close	ProbeView		关闭
-Number	TypeEditors	This is the type of editor	数字
-Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	十进制
-16 bit signed value:	TypeEditors		16为有符号数：
-String editor	TypeEditors		字符编辑器
-of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	/ 0x0
-64 bit signed offset:	TypeEditors		64位有符号偏移量：
-Boolean editor	TypeEditors		布尔编辑器
-Copy	ProbeView		复制
-none	ProbeView	No attributes	无
-Boolean value:	TypeEditors		布尔值：
-32 bit size or status:	TypeEditors		32位大小或状态：
-8 bit palette	TypeEditors		8位调色板
-Fit	ProbeView	Size of fonts, fits to available room	适应
-Probe device	OpenWindow		查找硬件
- (native)	ProbeView		（本地）
-Unknown format	TypeEditors		未知类型
-Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	十六进制
-MIME type:	TypeEditors		MIME 类型：
-Page setup…	ProbeView		页面设置...
-New…	FileWindow		新建…
-DiskProbe request	AttributeWindow		磁盘扫描器要求
-Could not read image	TypeEditors	Image means here a picture file, not a disk image.	无法读取图像
-Save changes before closing?	ProbeView		关闭之前保存？
-Type editor	AttributeWindow		类型编辑器
-Native: 0x%0*Lx	ProbeView		本地：0x%0*Lx
 Raw editor	AttributeWindow		Raw 编辑器
-Message View	TypeEditors		信息视图
-DiskProbe request	ProbeView		磁盘扫描器要求
-32 bit unsigned size:	TypeEditors		32位无符号大小：
-Flattened bitmap	TypeEditors		平面位图
-Open file…	FileWindow		打开文件…
-Next	ProbeView		下一个
-Close	FileWindow		关闭
-Attribute: 	ProbeView		属性：
-Remove from file	AttributeWindow		从文件中删除
-Don't save	ProbeView		不保存
-Previous	ProbeView		前一个
-64 bit signed value:	TypeEditors		64位有符号数：
-Icon	TypeEditors		图标
-Block: 	ProbeView		块：
-Examine device:	OpenWindow		检测硬件：
-Offset: 	ProbeView		偏移量： 
-OK	ProbeView		确定
-Add	ProbeView		添加
-Edit	ProbeView		编辑
-Native: %Ld (0x%0*Lx)	ProbeView		本地：%Ld（0x%0*Lx）
-32 bit unsigned value:	TypeEditors		32位无符号数：
-Message	TypeEditors	This is the type of view	消息
-Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	无法打开 \“%s\”：\n%s
-Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	权数
-Image view	TypeEditors	Image means here a picture file, not a disk image.	图像视图
-Cancel	AttributeWindow		取消
-Type editor not supported	ProbeView		类型编辑器不支持
+Remove	AttributeWindow		删除
+Close	ProbeView		关闭
+Boolean value:	TypeEditors		布尔值：
+File	ProbeView		文件
 Block size	ProbeView	Menu item. This is in the same menu window than 'Base' and 'Font size'	块大小
 MIME type editor	TypeEditors		MIME 类型编辑器
-Swapped: %Ld (0x%0*Lx)	ProbeView		交换：%Ld（0x%0*Lx）
-Find	FindWindow		查找
-Remove	AttributeWindow		删除
-Print…	ProbeView		打印...
-Block %Ld (0x%Lx)	ProbeView		块 %Ld（0x%Lx）
-Image	TypeEditors	This is the type of view	图像
-Could not open file \"%s\": %s\n	DiskProbe		无法打开文件 \"%s\"：%s\n
-Select all	ProbeView		全选
-Probe file…	OpenWindow		查询文件中…
-Icon view	TypeEditors		图标视图
-Bookmarks	ProbeView		书签
-Mode:	FindWindow		模式：
-15 bit	TypeEditors		15 位
-Open device	FileWindow		打开硬件
-Could not find search string.	ProbeView		无法找到搜索字符串。
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	十六进制
 16 bit unsigned value:	TypeEditors		16 位无符号数：
+8 bit signed value:	TypeEditors		8位有符号数：
+ (native)	ProbeView		（本地）
 Attribute offset: 	ProbeView		属性偏移：
-View	ProbeView	This is the last menubar item 'File Edit Block View'	视图
-Redo	ProbeView		重复
-File: 	ProbeView		文件：
+Text	TypeEditors	This is the type of editor	文本
+File offset: 	ProbeView		文件偏移量：
+Add	ProbeView		添加
+64 bit signed value:	TypeEditors		64位有符号数：
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		是否删除属性 \"%s\" 确定该文件为\"%s\"?\n\n删除之后将无法恢复。
+No type editor available	AttributeWindow		无可用的类型编辑器
+Print…	ProbeView		打印...
+New…	FileWindow		新建…
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	什么：‘%.4s’\n\n
+OK	DiskProbe		确定
+DiskProbe	System name		磁盘扫描器
+Back	ProbeView		返回
+Device: 	ProbeView		硬件设备：
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	权数
+Open file…	FileWindow		打开文件…
 32 bit unsigned pointer:	TypeEditors		32 位无符号浮点数：
-of 	ProbeView		of
-Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		写入文件失败：\n%s\n\n退出之后所有的设置将会丢失。
-32 bit	TypeEditors		32 位
-Cancel	ProbeView		取消
-Swapped: 0x%0*Lx	ProbeView		交换：0x%0*Lx
-Grayscale	TypeEditors		灰度模式
-32 bit signed value:	TypeEditors		32 位有符号数：
 DiskProbe request	DiskProbe		DiskProbe 要求
-Type editor	ProbeView		类型编辑器
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	十六进制
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		写入文件失败：\n%s\n\n退出之后所有的设置将会丢失。
+Examine device:	OpenWindow		检测硬件：
+Number editor	TypeEditors		序列号编辑器
+Icon	TypeEditors		图标
+Attribute	ProbeView		属性
+Don't save	ProbeView		不保存
+Undo	ProbeView		撤销
+Flattened bitmap	TypeEditors		平面位图
+Block %Ld (0x%Lx)	ProbeView		块 %Ld（0x%Lx）
+Cancel	OpenWindow		取消
+Unknown format	TypeEditors		未知类型
+File: 	ProbeView		文件：
+Swapped: %Ld (0x%0*Lx)	ProbeView		交换：%Ld（0x%0*Lx）
+Stop	ProbeView		停止
+Cancel	ProbeView		取消
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	无法打开 \“%s\”：\n%s
+Font size	ProbeView		字体大小
+Type editor not supported	ProbeView		类型编辑器不支持
+Native: 0x%0*Lx	ProbeView		本地：0x%0*Lx
+Copy	ProbeView		复制
+Redo	ProbeView		重复
+Floating-point value:	TypeEditors		浮点数：
+Cancel	AttributeWindow		取消
+16 bit signed value:	TypeEditors		16为有符号数：
+DiskProbe request	AttributeWindow		磁盘扫描器要求
+Next	ProbeView		下一个
+64 bit signed offset:	TypeEditors		64位有符号偏移量：
+32 bit signed value:	TypeEditors		32 位有符号数：
+Could not find search string.	ProbeView		无法找到搜索字符串。
+Close	FileWindow		关闭
+Unknown type	TypeEditors		未知类型
+Open device	FileWindow		打开硬件
+Number:	TypeEditors		序列号：
+Quit	FileWindow		退出
+Text	FindWindow		文本
+Block 0x%Lx	ProbeView		块 0x%Lx
+Attribute	AttributeWindow		属性
+Mode:	FindWindow		模式：
+16 bit	TypeEditors		16位
+32 bit size or status:	TypeEditors		32位大小或状态：
+of 	ProbeView		of
 Contents:	TypeEditors		内容：
+Could not open file \"%s\": %s\n	DiskProbe		无法打开文件 \"%s\"：%s\n
+Probe file…	OpenWindow		查询文件中…
+Block: 	ProbeView		块：
+Bookmarks	ProbeView		书签
+Probe device	OpenWindow		查找硬件
+none	ProbeView	No attributes	无
+Case sensitive	FindWindow		事件敏感
+32 bit unsigned value:	TypeEditors		32位无符号数：
+Remove from file	AttributeWindow		从文件中删除
+Attributes	ProbeView		属性
+Message	TypeEditors	This is the type of view	消息
+Message View	TypeEditors		信息视图
+Offset: 	ProbeView		偏移量： 
+Swapped: 0x%0*Lx	ProbeView		交换：0x%0*Lx
+MIME type:	TypeEditors		MIME 类型：
+Fit	ProbeView	Size of fonts, fits to available room	适应
+Type editor	ProbeView		类型编辑器
+File	FileWindow		文件
+Grayscale	TypeEditors		灰度模式
+32 bit	TypeEditors		32 位
+Native: %Ld (0x%0*Lx)	ProbeView		本地：%Ld（0x%0*Lx）
+Device	ProbeView		硬件设备
+Close	AttributeWindow		关闭
+Type editor	AttributeWindow		类型编辑器
+Save	ProbeView		保存
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	/ 0x0
+Attribute type: 	ProbeView		属性类型：
+15 bit	TypeEditors		15 位
+Page setup…	ProbeView		页面设置...
+Boolean	TypeEditors	This is the type of editor	布尔值
+Icon view	TypeEditors		图标视图
+Select all	ProbeView		全选
+64 bit unsigned value:	TypeEditors		64位无符号数：
+OK	ProbeView		确定
+Previous	ProbeView		前一个
+Selection	ProbeView		选择
+Find	FindWindow		查找
+8 bit unsigned value:	TypeEditors		8位无符号数：
+%ld (native)	ProbeView		%ld（本地）
+Attribute: 	ProbeView		属性：
+Block	ProbeView		块
+Find again	ProbeView		重新查找
+View	ProbeView	This is the last menubar item 'File Edit Block View'	视图
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	无法读取图像
+DiskProbe request	ProbeView		磁盘扫描器要求
+Double precision floating-point value:	TypeEditors		双精度浮点型数：
+Image	TypeEditors	This is the type of view	图像
+Save changes before closing?	ProbeView		关闭之前保存？
+PNG format	TypeEditors		PNG 格式
+Number	TypeEditors	This is the type of editor	数字
+Edit	ProbeView		编辑
+String editor	TypeEditors		字符编辑器
+Boolean editor	TypeEditors		布尔编辑器
+Device offset: 	ProbeView		硬件偏移量：
+Find…	ProbeView		查找...
+8 bit palette	TypeEditors		8位调色板
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	十进制
+Image view	TypeEditors	Image means here a picture file, not a disk image.	图像视图
+Paste	ProbeView		粘贴
+32 bit unsigned size:	TypeEditors		32位无符号大小：

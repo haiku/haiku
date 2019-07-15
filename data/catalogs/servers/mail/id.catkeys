@@ -1,19 +1,19 @@
 1	indonesian	x-vnd.Be-POST	2949558073
+No new messages	MailDaemon		Tak ada pesan baru
+No new messages	DeskbarView		Tak ada pesan baru
+Shutdown mail services	DeskbarView		Layanan email dimatikan
+Mail status	MailDaemon		Status mail
 Fetching mail for %name	Notifier		Mengambil mail untuk %name
-Check for mails only	DeskbarView		Cek hanya surat saja
-Send pending mails	DeskbarView		Kirim surat tertahan
-{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{One new message} other{# new messages}}
 {0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# new message} other{# new messages}}
 {0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# new message} other{# new messages}} untuk %name\n
+Create new message…	DeskbarView		Buat pesan baru...
+Send pending mails	DeskbarView		Kirim surat tertahan
+Settings…	DeskbarView		Setting...
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{One new message} other{# new messages}}
 New Messages	MailDaemon		Pesan baru
 <no accounts>	DeskbarView		<tak ada akun>
-Mail status	MailDaemon		Status mail
-Shutdown mail services	DeskbarView		Layanan email dimatikan
-Sending mail for %name	Notifier		Kirim surat untuk %name
-Create new message…	DeskbarView		Buat pesan baru...
-No new messages	MailDaemon		Tak ada pesan baru
-Check for mail now	DeskbarView		Cek surat sekarang
-No new messages	DeskbarView		Tak ada pesan baru
-Mail daemon status log	MailDaemon		Status log mail daemon
-Settings…	DeskbarView		Setting...
 Mail status	Notifier		Status mail
+Check for mails only	DeskbarView		Cek hanya surat saja
+Check for mail now	DeskbarView		Cek surat sekarang
+Sending mail for %name	Notifier		Kirim surat untuk %name
+Mail daemon status log	MailDaemon		Status log mail daemon

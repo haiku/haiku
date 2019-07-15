@@ -1,20 +1,20 @@
 1	polish	x-vnd.Haiku-Login	336867745
-Error: %1	Login App		Błąd: %1
-Hide password	Login View		Ukryj hasło
-Desktop	Desktop Window		Pulpit
 Invalid login!	Login View		Nieprawidłowy login!
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tUruchom w trybie edycyjnym aby umożliwić dostosowywanie pulpitu.\n
-OK	Login View		OK
-error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	błąd %s\n
-Login:	Login View		Login:
 Error	Login App		Błąd
-Unimplemented	Login App		Niezaimplementowane
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tUruchom w trybie edycyjnym aby umożliwić dostosowywanie pulpitu.\n
 Welcome to Haiku	Login Window		Witamy w Haiku
-Reboot	Login View		Uruchom ponownie
-Login application for Haiku\nUsage:\n	Login App		Aplikacja logująca dla Haiku\nUżycie:\n
-Info	Login App		Info
 Halt	Login View		Zatrzymaj
-Password:	Login View		Hasło:
-OK	Login App		OK
+Login application for Haiku\nUsage:\n	Login App		Aplikacja logująca dla Haiku\nUżycie:\n
 --nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tNie twórz okna modalnego\n
+Desktop	Desktop Window		Pulpit
+Hide password	Login View		Ukryj hasło
+Reboot	Login View		Uruchom ponownie
 You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Możesz dostosować pulpit pokazany za aplikacją logowania poprzez upuszczanie replikantów.\n\nKiedy skończysz, zakończ aplikację (Cmd-Q).
+OK	Login View		OK
+Info	Login App		Info
+Login:	Login View		Login:
+Password:	Login View		Hasło:
+Unimplemented	Login App		Niezaimplementowane
+OK	Login App		OK
+Error: %1	Login App		Błąd: %1
+error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	błąd %s\n

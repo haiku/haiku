@@ -1,166 +1,166 @@
 1	hungarian	x-vnd.Be-MAIL	1865394837
-View	Mail		Nézet
-%d - Date	Mail		%d - dátum
-Attach attributes:	Mail		Jellemzők csatolása:
-Unknown	Mail		Ismeretlen
-Inconsistency occurred in the undo/redo buffer.	Mail		Kavarodás történt a visszavon/újra tárolóban.
-An error occurred trying to save the attachment.	Mail		Hiba történt a mellékletek csatolása közben.
-Copy to new	Mail		Másolás újba
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Megőrzés 'Új'-ként
-Edit	Mail		Szerkesztés
-Print	Mail		Nyomtatás
-<none>	Mail		<nincs>
-New mail message	Mail		Új levél írása
-Untitled	Mail		Névtelen
-Automatic	Mail		Automatikus
-Automatically mark mail as read:	Mail		Automatikusan olvasottként jelölés:
-helpful message	Mail		segítőkész üzenet
-Colored quotes:	Mail		Színezett idézetek:
-Subject:	Mail		Tárgy:
-Reply to all	Mail		Válasz mindenkinek
-Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Ebben: %name% (Típus: %type%)
-Show icons & labels	Mail		Ikonok és feliratok
-Remove attachment	Mail		Eltávolítás
-Button bar:	Mail		Gombsor:
-spam	B_USER_DIRECTORY/mail/spam		Levélszemét
-Beginner	Mail		Kezdő
-Don't save	Mail		Ne mentse
-Expert	Mail		Haladó
-Reply account:	Mail		Válaszcím:
-Message	Mail		Levél
-Settings…	Mail		Beállítások…
-Reply to sender	Mail		Válasz a feladónak
-There is no installed handler for URL links.	Mail		Az URL-linkeket nem lehet mivel lekezelni.
-Signature	Mail		Aláírás
-Find again	Mail		Keresés ismétlése
-Bcc:	Mail		Titkos másolat:
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		A szöveg %ld nem kódolható karaktert tartalmaz. Lehetséges, hogy egy másik karakterkészlet jobb lenne? Kattintson a „Küldés”-re, ha mindenképp el akarja küldeni így (egy helyettesítő karakter fog megjelenni a nem kódolható karakter helyén), vagy térjen vissza, és javítsa ki azt.
-Signature:	Mail		Aláírás
-Save changes to this signature?	Mail		Elmenti a módosított aláírást?
-Cc:	Mail		Másolat:
-Off	Mail		Ki
-Find	Mail		Keresés
-Undo	Mail		Visszavon
-Date:	Mail		Dátum:
-An error occurred trying to open this signature.	Mail		Hiba történt az aláírás megnyitásakor.
-No file attributes, just plain data	Mail		Csak maga a fájl csatolása.
-Edit queries…	Mail		Lekérdezés szerkesztése…
-queries	B_USER_DIRECTORY/mail/queries		Lekérdezések
-Paste	Mail		Beillesztés
-in	B_USER_DIRECTORY/mail/in		Bejövő
-Save attachment…	Mail		Mentés…
-Include file attributes in attachments	Mail		Csatolás egy külön fájlként.
-OK	Mail		Rendben
-Send	Mail		Küldés
-Show icons only	Mail		Csak ikonok megjelenítése
-Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		A melléklet törlése a továbbított levélből még nem lehetséges.
-Hide	Mail		Elrejtés
-Forward without attachments	Mail		Továbbítás mellékletek nélkül
-Previous	Mail		Előző
-Redo	Mail		Újra
-Add enclosure…	Mail		Melléklet hozzáadása…
-Mail	System name		Levelezés
-Print…	Mail		Nyomtatás…
-Warn unencodable:	Mail		Figyelemztetés nem kódolható szövegnél:
-Quit	Mail		Kilépés
-%n - Full name	Mail		%n - Teljes neve
- Read 	Mail		Olvas
-UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
-Trash	Mail		Szemetes
-Default account:	Mail		Alapértelemzett fiók:
-Size:	Mail		Méret:
-Account from mail	Mail		Levél alapján
-Edit signatures…	Mail		Aláírás szerkesztése…
-New	Mail		Új
-Attachments: 	Mail		Mellékletek:
-On	Mail		Be
-Set to %s	Mail		Megjelölés: %s
-Forward	Mail		Tovább
-E-mail draft could not be saved!	Mail		Hiba történt a piszkozat mentése közben!
-%e wrote:\\n	Mail		%e:\\n
-To:	Mail		Címzett:
-Only files can be added as attachments.	Mail		Csak fájlok adhatóak a levélhez mellékletként.
-Previous message	Mail		Előző levél
-Attachments:	Mail		Mellékletek:
-Title:	Mail		Cím:
-<no account found>	Mail		<nem található fiók>
-Find…	Mail		Keresés…
-Accounts…	Mail		Fiókok…
-Mail preferences	Mail		Beállítások
-Initial spell check mode:	Mail		Helyesírás ellenőrzése:
-Leave same	Mail		Hagyja azonosan
-Page setup…	Mail		Oldalbeállítás…
-Text wrapping:	Mail		Szöveg tördelése:
-Revert	Mail		Visszaállít
-File	Mail		Fájl
-mail	B_USER_DIRECTORY/mail		Levelek
-None	Mail		Nincs
-(Name unavailable)	Mail		(A név nem elérhető)
-Copy link location	Mail		Hivatkozás címének másolása
-out	B_USER_DIRECTORY/mail/out		Kimenő
-Show header	Mail		Fejléc megjelenítése
-%e - E-mail address	Mail		%e - E-mail cím
-Resend	Mail		Újraküldés
-Show raw message	Mail		A nyers levél megjelenítése
-\\n - Newline	Mail		\\n - Új sor
-Start now	Mail		Kezdés most
-Close	Mail		Bezárás
-No matches	Mail		Nincs találat
-The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		A mail_daemon nem fut.  A levelek akkor lesznek fogadva/küldve ha majd a mail_daemon elindul.
-Really delete this signature? This cannot be undone.	Mail		Biztosan törli az aláírást? Ez nem vonható vissza.
-Save this message as a draft before closing?	Mail		Menti ezt az üzenetet piszkozatként bezárás előtt?
-Open	Mail		Megnyitás
-draft	B_USER_DIRECTORY/mail/draft		Piszkozat
-Quote	Mail		Idézet
-Add	Mail		Hozzáadás
-Next message	Mail		Következő levél
-User interface	Mail		Felhasználói felület
-Cancel	Mail		Mégse
-Send message	Mail		Levél küldése
-Remove enclosure	Mail		Melléklet eltávolítása
-Sorry, could not find an application that supports the 'Person' data type.	Mail		Sajnálom, de nem található olyan program, ami támogatja a 'Névjegy' formátumot.
-Delete	Mail		Törlés
-Don't send	Mail		Ne küldje
-Leave as '%s'	Mail		Hagyja „%s”-ként
-Copy	Mail		Másolás
-Mail couldn't find its dictionary.	Mail		Nem található a szótár.
-Reply preamble:	Mail		Válasz:
-Signatures	Mail		Aláírás
-Next	Mail		Következő
-Set to…	Mail		Megjelöl…
-Use default account	Mail		Alapértelmezett fiók használata
-Sorry	Mail		Sajnálom
-Encoding:	Mail		Kódolás:
-Font:	Mail		Betűtípus:
-(Address unavailable)	Mail		(A cím nem elérhető)
-Save address	Mail		Cím mentése
-Queries	Mail		Lekérdezések
-Send this message before closing?	Mail		Elküldi ezt az üzenetet bezárás előtt?
-Save	Mail		Mentés
-Random	Mail		Véletlen
-Close and 	Mail		Bezárás és …
-Save as draft	Mail		Mentés piszkozatként
-The mail_daemon could not be started:\n\t	Mail		A mail_daemon nem indítható:\n\t
-Open attachment	Mail		Megnyitás
-sent	B_USER_DIRECTORY/mail/sent		Elküldött
-(Date unavailable)	Mail		(A dátum nem elérhető)
-Put your favorite e-mail queries and query templates in this folder.	Mail		Helyezze a kedvenc lekérdezéseket és a lekérdezési sablonokat ebbe a mappába.
-Spam	Mail		Levélszemét
-Reply	Mail		Válasz
-Encoding	Mail		Kódolás
-From:	Mail		Feladó:
-Couldn't open this signature. Sorry.	Mail		Sajnálom, de nem nyitható meg ez az aláírás.
-Open draft	Mail		Piszkozat megnyitása
-Cut	Mail		Kivágás
-Check spelling	Mail		Helyesírás-ellenőrzés
 Set to Saved	Mail		Mentésre jelöl
-Open this link	Mail		Hovatkozás megnyitása
-Auto signature:	Mail		Automatikus aláírás:
-Add signature	Mail		Aláírás hozzáfűzése
-Need Tracker to move items to trash	Mail		Szükség van a Nyomkövetőre a Szemetesbe mozgatáshoz
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		A szöveg %ld nem kódolható karaktert tartalmaz. Lehetséges, hogy egy másik karakterkészlet jobb lenne? Kattintson a „Küldés”-re, ha mindenképp el akarja küldeni így (egy helyettesítő karakter fog megjelenni a nem kódolható karakter helyén), vagy térjen vissza, és javítsa ki azt.
+Text wrapping:	Mail		Szöveg tördelése:
+Show icons & labels	Mail		Ikonok és feliratok
+(Date unavailable)	Mail		(A dátum nem elérhető)
+Reply	Mail		Válasz
+Next message	Mail		Következő levél
 Mailing	Mail		Levelezés
 Unread	Mail		Olvasatlan
+Copy to new	Mail		Másolás újba
+Save as draft	Mail		Mentés piszkozatként
+Encoding:	Mail		Kódolás:
+Print	Mail		Nyomtatás
+Encoding	Mail		Kódolás
+Default account:	Mail		Alapértelemzett fiók:
+Message	Mail		Levél
+Bcc:	Mail		Titkos másolat:
+New	Mail		Új
+Save	Mail		Mentés
+Undo	Mail		Visszavon
+Button bar:	Mail		Gombsor:
+%e wrote:\\n	Mail		%e:\\n
+Save changes to this signature?	Mail		Elmenti a módosított aláírást?
+Save attachment…	Mail		Mentés…
+Paste	Mail		Beillesztés
+E-mail draft could not be saved!	Mail		Hiba történt a piszkozat mentése közben!
+Don't send	Mail		Ne küldje
+sent	B_USER_DIRECTORY/mail/sent		Elküldött
+Only files can be added as attachments.	Mail		Csak fájlok adhatóak a levélhez mellékletként.
+Close	Mail		Bezárás
+Untitled	Mail		Névtelen
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		A melléklet törlésének támogatása a továbbított levélből még nincs elkészítve.\nEmiatt nem is fog az elvárások szerint működni.
+Previous message	Mail		Előző levél
+(Address unavailable)	Mail		(A cím nem elérhető)
+Mail	System name		Levelezés
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Ebben: %name% (Típus: %type%)
+Copy link location	Mail		Hivatkozás címének másolása
+Attachments: 	Mail		Mellékletek:
+Remove enclosure	Mail		Melléklet eltávolítása
+Next	Mail		Következő
+Attachments:	Mail		Mellékletek:
+Show icons only	Mail		Csak ikonok megjelenítése
+Subject:	Mail		Tárgy:
+OK	Mail		Rendben
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
+Quit	Mail		Kilépés
+Title:	Mail		Cím:
+Account from mail	Mail		Levél alapján
+%e - E-mail address	Mail		%e - E-mail cím
+Cc:	Mail		Másolat:
+No matches	Mail		Nincs találat
+Queries	Mail		Lekérdezések
+Cut	Mail		Kivágás
+Reply to sender	Mail		Válasz a feladónak
+\\n - Newline	Mail		\\n - Új sor
+Copy	Mail		Másolás
+Add signature	Mail		Aláírás hozzáfűzése
+%n - Full name	Mail		%n - Teljes neve
 Remove quote	Mail		Idézet eltávolítása
+Signature	Mail		Aláírás
+Use default account	Mail		Alapértelmezett fiók használata
+draft	B_USER_DIRECTORY/mail/draft		Piszkozat
+Really delete this signature? This cannot be undone.	Mail		Biztosan törli az aláírást? Ez nem vonható vissza.
+spam	B_USER_DIRECTORY/mail/spam		Levélszemét
+Reply to all	Mail		Válasz mindenkinek
+Cancel	Mail		Mégse
+Off	Mail		Ki
+Set to %s	Mail		Megjelölés: %s
+Signature:	Mail		Aláírás
+Forward without attachments	Mail		Továbbítás mellékletek nélkül
+queries	B_USER_DIRECTORY/mail/queries		Lekérdezések
+View	Mail		Nézet
+Signatures	Mail		Aláírás
+On	Mail		Be
+Find	Mail		Keresés
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Sajnálom, de nem található olyan program, ami támogatja a 'Névjegy' formátumot.
+Date:	Mail		Dátum:
+Expert	Mail		Haladó
+Automatically mark mail as read:	Mail		Automatikusan olvasottként jelölés:
+Close and 	Mail		Bezárás és …
+Colored quotes:	Mail		Színezett idézetek:
+Automatic	Mail		Automatikus
+Open this link	Mail		Hovatkozás megnyitása
+Auto signature:	Mail		Automatikus aláírás:
+Send	Mail		Küldés
+Open draft	Mail		Piszkozat megnyitása
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Megőrzés 'Új'-ként
+Random	Mail		Véletlen
+Attach attributes:	Mail		Jellemzők csatolása:
+Find again	Mail		Keresés ismétlése
+Size:	Mail		Méret:
+To:	Mail		Címzett:
+Need Tracker to move items to trash	Mail		Szükség van a Nyomkövetőre a Szemetesbe mozgatáshoz
+The mail_daemon could not be started:\n\t	Mail		A mail_daemon nem indítható:\n\t
+<no account found>	Mail		<nem található fiók>
+Mail couldn't find its dictionary.	Mail		Nem található a szótár.
+Mail preferences	Mail		Beállítások
+helpful message	Mail		segítőkész üzenet
+ Read 	Mail		Olvas
+Font:	Mail		Betűtípus:
+Accounts…	Mail		Fiókok…
+Previous	Mail		Előző
+Include file attributes in attachments	Mail		Csatolás egy külön fájlként.
+Start now	Mail		Kezdés most
+(Name unavailable)	Mail		(A név nem elérhető)
 Move to trash	Mail		Áthelyezés a Szemetesbe
+<none>	Mail		<nincs>
+%d - Date	Mail		%d - dátum
+Check spelling	Mail		Helyesírás-ellenőrzés
+Redo	Mail		Újra
+Leave as '%s'	Mail		Hagyja „%s”-ként
+Print…	Mail		Nyomtatás…
+Settings…	Mail		Beállítások…
+Warn unencodable:	Mail		Figyelemztetés nem kódolható szövegnél:
+Trash	Mail		Szemetes
+Show raw message	Mail		A nyers levél megjelenítése
+Find…	Mail		Keresés…
 Select all	Mail		Összes kijelölése
+Show header	Mail		Fejléc megjelenítése
+Reply account:	Mail		Válaszcím:
+Sorry	Mail		Sajnálom
+Forward	Mail		Tovább
+Open attachment	Mail		Megnyitás
+mail	B_USER_DIRECTORY/mail		Levelek
+Save this message as a draft before closing?	Mail		Menti ezt az üzenetet piszkozatként bezárás előtt?
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		A mail_daemon nem fut.  A levelek akkor lesznek fogadva/küldve ha majd a mail_daemon elindul.
+None	Mail		Nincs
+Resend	Mail		Újraküldés
+Hide	Mail		Elrejtés
+From:	Mail		Feladó:
+No file attributes, just plain data	Mail		Csak maga a fájl csatolása.
+Add	Mail		Hozzáadás
+out	B_USER_DIRECTORY/mail/out		Kimenő
+Send this message before closing?	Mail		Elküldi ezt az üzenetet bezárás előtt?
+in	B_USER_DIRECTORY/mail/in		Bejövő
+Open	Mail		Megnyitás
+Don't save	Mail		Ne mentse
+Leave same	Mail		Hagyja azonosan
+An error occurred trying to save the attachment.	Mail		Hiba történt a mellékletek csatolása közben.
+Save address	Mail		Cím mentése
+Initial spell check mode:	Mail		Helyesírás ellenőrzése:
+Edit queries…	Mail		Lekérdezés szerkesztése…
+There is no installed handler for URL links.	Mail		Az URL-linkeket nem lehet mivel lekezelni.
+File	Mail		Fájl
+Reply preamble:	Mail		Válasz:
+New mail message	Mail		Új levél írása
+An error occurred trying to open this signature.	Mail		Hiba történt az aláírás megnyitásakor.
+Edit signatures…	Mail		Aláírás szerkesztése…
+User interface	Mail		Felhasználói felület
+Quote	Mail		Idézet
+Inconsistency occurred in the undo/redo buffer.	Mail		Kavarodás történt a visszavon/újra tárolóban.
+Remove attachment	Mail		Eltávolítás
+Set to…	Mail		Megjelöl…
+Edit	Mail		Szerkesztés
+Page setup…	Mail		Oldalbeállítás…
 An error occurred trying to save this signature.	Mail		Hiba történt az aláírás mentése közben.
+Beginner	Mail		Kezdő
+Send message	Mail		Levél küldése
+Delete	Mail		Törlés
+Put your favorite e-mail queries and query templates in this folder.	Mail		Helyezze a kedvenc lekérdezéseket és a lekérdezési sablonokat ebbe a mappába.
+Spam	Mail		Levélszemét
+Couldn't open this signature. Sorry.	Mail		Sajnálom, de nem nyitható meg ez az aláírás.
+Revert	Mail		Visszaállít
+Unknown	Mail		Ismeretlen
+Add enclosure…	Mail		Melléklet hozzáadása…

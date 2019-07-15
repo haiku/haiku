@@ -1,5 +1,5 @@
 1	russian	x-vnd.Haiku-ActivityMonitor	1155619009
-P-faults	DataSource		Ошибки страниц
+P-faults	DataSource		Отказы страниц
 Media nodes	DataSource		Медиа узлы
 Threads	DataSource		Потоки
 Always on top	ActivityWindow		Поверх всех окон
@@ -18,10 +18,10 @@ Settings	ActivityWindow		Настройки
 Receiving	DataSource		Прием
 Settings…	ActivityWindow		Настройки…
 Ports	DataSource		Порты
-Page faults	DataSource		Ошибки страниц
+Page faults	DataSource		Отказы страниц
 Sending	DataSource		Отправка
 Cache	DataSource		Кэш
-%.1f faults/s	DataSource		%.1f ошибок/с
+%.1f faults/s	DataSource		%.1f отказов/с
 Update time interval:	SettingsWindow		Интервал обновления:
 TX	DataSource	Shorter version for Sending	Передача
 Quit	ActivityWindow		Выход

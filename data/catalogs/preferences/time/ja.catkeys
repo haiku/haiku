@@ -1,49 +1,49 @@
 1	japanese	x-vnd.Haiku-Time	3755504714
-GMT (UNIX compatible)	Time		GMT (UNIX 互換)
 OK	Time		OK
-Asia	Time		アジア
-\nNow: 	Time		 \n現在:
-Africa	Time		アフリカ
+Message receiving failed	Time		メッセージの取得に失敗しました
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		日付と時刻 作者:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
+Australia	Time		オーストラリア
+America	Time		アメリカ
 Reset to default server list	Time		デフォルトのサーバーリストにリセット
 Could not resolve server address	Time		サーバーアドレスを解決できませんでした
-Stop	Time		中断
-Australia	Time		オーストラリア
-Preview time:	Time		プレビュー:
-Synchronize	Time		同期
-Revert	Time		元に戻す
-Pacific	Time		太平洋
-Show day of week	Time		曜日を表示
-Add	Time		追加
-Date and time	Time		日付と時刻
-about	Time		このソフトウェアについて
-Local time (Windows compatible)	Time		現地時刻 (Windows 互換)
-Message receiving failed	Time		メッセージの取得に失敗しました
 Set time zone	Time		タイムゾーンを設定
+The following error occured while synchronizing:r\n%s: %s	Time		同期中に次のエラーが発生しました:\n%s: %s
 Waiting for answer failed	Time		返答待ちに失敗しました
-Hardware clock set to:	Time		ハードウェアクロックを設定:
+<Other>	Time		<その他>
+Received invalid time	Time		不正な時刻を受け取りました
+Remove	Time		削除
+Synchronize again	Time		再同期
+Asia	Time		アジア
+Try all servers	Time		すべてのサーバーを試す
+Time	Time		日付と時刻
+Current time:	Time		現在時刻:
 The following error occured while synchronizing:r\n%s	Time		同期中に次のエラーが発生しました:\n%s
 Europe	Time		ヨーロッパ
-Remove	Time		削除
-Time	Time		日付と時刻
-Indian	Time		インド
-Sending request failed	Time		リクエストの送信に失敗しました
+Show day of week	Time		曜日を表示
+Local time (Windows compatible)	Time		現地時刻 (Windows 互換)
+Hardware clock set to:	Time		ハードウェアクロックを設定:
 Arctic	Time		北極
-Display time with seconds	Time		秒を表示
-Time	System name		日付と時刻
-America	Time		アメリカ
-Synchronize at boot	Time		起動時に同期
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		日付と時刻 作者:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
-Received invalid time	Time		不正な時刻を受け取りました
 Antarctica	Time		南極
-Show time zone	Time		タイムゾーンを表示
-Show clock in Deskbar	Time		Deskbar に時計を表示
-The following error occured while synchronizing:r\n%s: %s	Time		同期中に次のエラーが発生しました:\n%s: %s
-<Other>	Time		<その他>
-Current time:	Time		現在時刻:
-Try all servers	Time		すべてのサーバーを試す
+GMT (UNIX compatible)	Time		GMT (UNIX 互換)
+Africa	Time		アフリカ
+Stop	Time		中断
 Time zone	Time		タイムゾーン
-Could not create socket	Time		ソケットを作成できませんでした。
-Synchronize again	Time		再同期
 Clock	Time		時計
 Network time	Time		ネットワークタイム
+Sending request failed	Time		リクエストの送信に失敗しました
+Preview time:	Time		プレビュー:
+\nNow: 	Time		 \n現在:
+Could not create socket	Time		ソケットを作成できませんでした。
+Pacific	Time		太平洋
 Atlantic	Time		大西洋
+Show clock in Deskbar	Time		Deskbar に時計を表示
+Display time with seconds	Time		秒を表示
+Time	System name		日付と時刻
+about	Time		このソフトウェアについて
+Show time zone	Time		タイムゾーンを表示
+Synchronize at boot	Time		起動時に同期
+Indian	Time		インド
+Revert	Time		元に戻す
+Date and time	Time		日付と時刻
+Synchronize	Time		同期
+Add	Time		追加

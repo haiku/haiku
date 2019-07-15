@@ -1,88 +1,88 @@
 1	german	x-vnd.Haiku-StyledEdit	727465241
-StyledEdit	System name		Texteditor
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Diese Datei ist als schreibgeschützt gekennzeichnet. Änderungen am Dokument \"%s\" speichern?
-Paste	Menus		Einfügen
-OK	LoadAlert		OK
-File	Menus		Datei
-???	LoadAlert		???
-Modified	StatusView		Geändert
-Lines:	Statistics		Zeilen:
-Italic	Menus		Kursiv
-Left	Menus		Links
-Search backwards	FindandReplaceWindow		Rückwärts suchen
-Unlock file	StatusView		Datei entsperren
-Size	Menus		Größe
-Save	QuitAlert		Speichern
-Page setup…	Menus		Seite einrichten…
-Print…	Menus		Drucken…
-Can't undo	Menus		Rückgängig nicht möglich
-Save	Menus		Speichern
-Default	Menus		Standard
-Replace with:	FindandReplaceWindow		Ersetzen durch:
-Cancel	SaveAlert		Abbrechen
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rückgängig machen unmöglich, die Datei wurde nicht gefunden: \"%s\".
-Case-sensitive	FindandReplaceWindow		Groß-/Kleinschreibung beachten
-Reload	NodeMonitorAlerts		Neu laden
-Replace in all windows	FindandReplaceWindow		In allen Fenstern ersetzen
-Wrap lines	Menus		Zeilenumbruch
-Quit	Menus		Beenden
-File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Die Datei \"%file%\" wurde von einer anderen Anwendung entfernt. Soll sie wiederhergestellt werden?
 Document statistics	Statistics		Dokument-Statistik
-Cancel	RevertToSavedAlert		Abbrechen
-Autodetect	Menus		Automatisch
-Document	Menus		Dokument
-Save changes to the document \"%s\"? 	QuitAlert		Geändertes Dokument \"%s\" speichern? 
-Edit	Menus		Bearbeiten
-Revert	RevertToSavedAlert		Wiederherstellen
-Font	Menus		Schrift
-Replace all	FindandReplaceWindow		Alle ersetzen
-Statistics…	Menus		Statistik…
-Default	Open_and_SaveAsPanel		Standard
-Replace next	Menus		Weiter ersetzen
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" enthält ungespeicherte Änderungen.\nZuletzt gespeicherte Version wiederherstellen?
-Cancel	FindandReplaceWindow		Abbrechen
-Text encoding	Menus		Zeichenkodierung
-Close	Menus		Schließen
-Save	SaveAlert		Speichern
-Words:	Statistics		Wörter:
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Fehler beim Öffnen von \"%s\":\n\tDas Dateiformat wird nicht unterstützt.
-OK	RevertToSavedAlert		OK
-Don't save	QuitAlert		Verwerfen
-Align	Menus		Ausrichtung
-Color	Menus		Farbe
-OK	QuitAlert		OK
-Open…	Menus		Öffnen…
-Center	Menus		Zentriert
-Unable to unlock file\n\t%s	QuitAlert		Die Datei '%s' konnte nicht entsperrt werden.
-line %d, column %d	StatusView		Zeile %d, Spalte %d
-OK	Statistics		OK
-New	Menus		Neu
-Wrap-around search	FindandReplaceWindow		Gesamtes Dokument durchsuchen
-Bold	Menus		Fett
-Find selection	Menus		Auswahl suchen
-Find:	FindandReplaceWindow		Suche:
-Error saving \"%s\":\n%s	SaveAlert		Fehler beim Speichern von \"%s\":\n%s
-Copy	Menus		Kopieren
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rückgängig machen unmöglich, die Datei wurde nicht gefunden: \"%s\".
 Cut	Menus		Ausschneiden
-File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Die Datei \"%file%\" wurde von einer anderen Anwendung verändert.\nSoll sie neu geladen werden?
-Replace	FindandReplaceWindow		Ersetzen
-Find again	Menus		Weitersuchen
-Cancel	QuitAlert		Abbrechen
-Find…	Menus		Suchen…
-Select all	Menus		Alles auswählen
-Don't save	SaveAlert		Verwerfen
-Recover	NodeMonitorAlerts		Wiederherstellen
-Error loading \"%s\":\n\t%s	LoadAlert		Fehler beim Laden von \"%s\":\n\t%s
-Ignore	NodeMonitorAlerts		Ignorieren
-Read-only	StatusView		Schreibgeschützt
-Undo typing	QuitAlert		Rückgängig: Eingabe
+Center	Menus		Zentriert
+Wrap-around search	FindandReplaceWindow		Gesamtes Dokument durchsuchen
+Page setup…	Menus		Seite einrichten…
 Untitled 	StyledEditWindow		Unbenannt
-OK	SaveAlert		OK
+OK	Statistics		OK
 Find	FindandReplaceWindow		Suchen
-Encoding	Open_and_SaveAsPanel		Kodierung
-Characters:	Statistics		Zeichen:
-Save as…	Menus		Speichern unter…
-Redo typing	QuitAlert		Wiederholen: Eingabe
-Reload…	Menus		Neu laden…
+New	Menus		Neu
+Document	Menus		Dokument
+Search backwards	FindandReplaceWindow		Rückwärts suchen
+Find again	Menus		Weitersuchen
+Read-only	StatusView		Schreibgeschützt
+Save	Menus		Speichern
+Cancel	QuitAlert		Abbrechen
+Copy	Menus		Kopieren
+Reload	NodeMonitorAlerts		Neu laden
+line %d, column %d	StatusView		Zeile %d, Spalte %d
+Words:	Statistics		Wörter:
+???	LoadAlert		???
+Recover	NodeMonitorAlerts		Wiederherstellen
+Error saving \"%s\":\n%s	SaveAlert		Fehler beim Speichern von \"%s\":\n%s
+OK	RevertToSavedAlert		OK
+Unlock file	StatusView		Datei entsperren
+Italic	Menus		Kursiv
+Can't undo	Menus		Rückgängig nicht möglich
 Replace…	Menus		Ersetzen…
+File	Menus		Datei
+Bold	Menus		Fett
+Paste	Menus		Einfügen
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Die Datei \"%file%\" wurde von einer anderen Anwendung verändert.\nSoll sie neu geladen werden?
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Die Datei \"%file%\" wurde von einer anderen Anwendung entfernt. Soll sie wiederhergestellt werden?
+Lines:	Statistics		Zeilen:
+Replace in all windows	FindandReplaceWindow		In allen Fenstern ersetzen
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" enthält ungespeicherte Änderungen.\nZuletzt gespeicherte Version wiederherstellen?
+Save	SaveAlert		Speichern
+Default	Open_and_SaveAsPanel		Standard
+Cancel	RevertToSavedAlert		Abbrechen
+Cancel	FindandReplaceWindow		Abbrechen
+Statistics…	Menus		Statistik…
+Encoding	Open_and_SaveAsPanel		Kodierung
+Replace all	FindandReplaceWindow		Alle ersetzen
+Close	Menus		Schließen
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Fehler beim Öffnen von \"%s\":\n\tDas Dateiformat wird nicht unterstützt.
+Left	Menus		Links
+Default	Menus		Standard
+OK	SaveAlert		OK
+Color	Menus		Farbe
+Save changes to the document \"%s\"? 	QuitAlert		Geändertes Dokument \"%s\" speichern? 
+StyledEdit	System name		Texteditor
+Find:	FindandReplaceWindow		Suche:
+Undo typing	QuitAlert		Rückgängig: Eingabe
+Error loading \"%s\":\n\t%s	LoadAlert		Fehler beim Laden von \"%s\":\n\t%s
+Don't save	SaveAlert		Verwerfen
+Reload…	Menus		Neu laden…
+Print…	Menus		Drucken…
+Quit	Menus		Beenden
+Redo typing	QuitAlert		Wiederholen: Eingabe
+Ignore	NodeMonitorAlerts		Ignorieren
+Wrap lines	Menus		Zeilenumbruch
+Text encoding	Menus		Zeichenkodierung
+Unable to unlock file\n\t%s	QuitAlert		Die Datei '%s' konnte nicht entsperrt werden.
+Modified	StatusView		Geändert
+OK	LoadAlert		OK
+Save	QuitAlert		Speichern
+Case-sensitive	FindandReplaceWindow		Groß-/Kleinschreibung beachten
+Find selection	Menus		Auswahl suchen
+Cancel	SaveAlert		Abbrechen
+Find…	Menus		Suchen…
+Revert	RevertToSavedAlert		Wiederherstellen
+Size	Menus		Größe
+Autodetect	Menus		Automatisch
+Replace next	Menus		Weiter ersetzen
+OK	QuitAlert		OK
+Replace with:	FindandReplaceWindow		Ersetzen durch:
+Edit	Menus		Bearbeiten
+Open…	Menus		Öffnen…
+Save as…	Menus		Speichern unter…
+Replace	FindandReplaceWindow		Ersetzen
+Characters:	Statistics		Zeichen:
+Don't save	QuitAlert		Verwerfen
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Diese Datei ist als schreibgeschützt gekennzeichnet. Änderungen am Dokument \"%s\" speichern?
+Align	Menus		Ausrichtung
+Font	Menus		Schrift
+Select all	Menus		Alles auswählen
 Right	Menus		Rechts

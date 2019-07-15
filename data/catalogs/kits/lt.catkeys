@@ -1,39 +1,39 @@
 1	lithuanian	x-vnd.Haiku-libbe	297520911
-gamma	AboutWindow		gama
-beta	AboutWindow		beta
-%3.2f GiB	StringForSize		%3.2f GiB
-Written by:	AboutWindow		Sukūrė:
-About %app%	AboutMenuItem		Apie „%app%“
-Cut	TextView		Iškirpti
-Version	AboutWindow		Versija
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nepavyko sukurti „%description“ replikanto.\n%error
-Copy	TextView		Kopijuoti
-%3.2f KiB	StringForSize		%3.2f KiB
-alpha	AboutWindow		alfa
-Error	PrintJob		Klaida
 All Rights Reserved.	AboutWindow		Visos teisės saugomos.
-About %app%	AboutWindow		Apie „%app%“
+gold master	AboutWindow		galutinė
+Undo	TextView		Atšaukti
+gamma	AboutWindow		gama
+development	AboutWindow		vystoma
 OK	Dragger		Gerai
 OK	PrintJob		Gerai
-Green:	ColorControl		Žalia:
-Version history:	AboutWindow		Versijų istorija:
-Remove replicant	Dragger		Pašalinti replikantą
-OK	AboutWindow		Gerai
-OK	ZombieReplicantView		Gerai
 Print Server is not responding.	PrintJob		Spausdinimo serveris neatsako.
+About %app%	AboutMenuItem		Apie „%app%“
+Warning	Dragger		Įspėjimas
+Green:	ColorControl		Žalia:
+Redo	TextView		Grąžinti
+beta	AboutWindow		beta
+OK	ZombieReplicantView		Gerai
+Cut	TextView		Iškirpti
+%3.2f GiB	StringForSize		%3.2f GiB
+Can't delete this replicant from its original application. Life goes on.	Dragger		Šio replikanto pašalinti iš jo pirminės programos nepavyko. Gyvenimas tęsiasi.
+Error	ZombieReplicantView		Klaida
 Paste	TextView		Įdėti
+OK	AboutWindow		Gerai
 Special Thanks:	AboutWindow		Ypatingos padėkos:
 %.2f TiB	StringForSize		%.2f TiB
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nepavyko rasti replikantą suteikiančios programos. Nepateiktas programos identifikatorius.\n%error
-Redo	TextView		Grąžinti
-<empty>	Menu		<tuščia>
-Warning	Dragger		Įspėjimas
-Undo	TextView		Atšaukti
+Remove replicant	Dragger		Pašalinti replikantą
+Version	AboutWindow		Versija
 Red:	ColorControl		Raudona:
+<empty>	Menu		<tuščia>
+Copy	TextView		Kopijuoti
+alpha	AboutWindow		alfa
 %3.2f MiB	StringForSize		%3.2f MiB
+Error	PrintJob		Klaida
+About %app%	AboutWindow		Apie „%app%“
 About %app…	Dragger		Apie programą „%app“…
-development	AboutWindow		vystoma
-Error	ZombieReplicantView		Klaida
+Version history:	AboutWindow		Versijų istorija:
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nepavyko rasti replikantą suteikiančios programos. Nepateiktas programos identifikatorius.\n%error
+%3.2f KiB	StringForSize		%3.2f KiB
 Blue:	ColorControl		Mėlyna:
-gold master	AboutWindow		galutinė
-Can't delete this replicant from its original application. Life goes on.	Dragger		Šio replikanto pašalinti iš jo pirminės programos nepavyko. Gyvenimas tęsiasi.
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nepavyko sukurti „%description“ replikanto.\n%error
+Written by:	AboutWindow		Sukūrė:

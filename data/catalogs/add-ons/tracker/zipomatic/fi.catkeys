@@ -1,17 +1,17 @@
 1	finnish	x-vnd.haiku.zip-o-matic	2032806096
-Stop	file:ZipOMaticWindow.cpp		Pysäytä
-Creating archive: %s	file:ZipOMaticWindow.cpp		Luodaan arkisto: %s
-Continue	file:ZipOMaticWindow.cpp		Jatka
-Preparing to archive	file:ZipperThread.cpp		Valmistellaan arkistointia
 Drop files here.	file:ZipOMaticWindow.cpp		Pudota tiedostot tähän.
 Filename: %s	file:ZipOMaticWindow.cpp		Tiedostonimi: %s
-You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Sinulla on {0, plural, one{# Zip-O-Matic-ohjelma} other{# Zip-O-Matic-ohjelmaa}} käynnissä.\n\n
-Let them continue	file:ZipOMatic.cpp		Salli niiden jatkaa
 Do you want to stop them?	file:ZipOMatic.cpp		Haluatko pysäyttää ne?
+Error creating archive	file:ZipOMaticWindow.cpp		Arkiston luonnissa tapahtui virhe
+Stop them	file:ZipOMatic.cpp		Pysäytä ne
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Oletko varma, että haluat pysäyttää tämän arkiston luomisen?
+Preparing to archive	file:ZipperThread.cpp		Valmistellaan arkistointia
+Let them continue	file:ZipOMatic.cpp		Salli niiden jatkaa
+Continue	file:ZipOMaticWindow.cpp		Jatka
+Archive created OK	file:ZipOMaticWindow.cpp		Arkisto luotu valmiiksi
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# tiedosto lisätty.} other{# tiedostoa lisätty.}}
+Stop	file:ZipOMaticWindow.cpp		Pysäytä
 Stopped	file:ZipOMaticWindow.cpp		Pysäytetty
 Archive	file:ZipperThread.cpp		Arkisto
-Error creating archive	file:ZipOMaticWindow.cpp		Arkiston luonnissa tapahtui virhe
-{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# tiedosto lisätty.} other{# tiedostoa lisätty.}}
-Archive created OK	file:ZipOMaticWindow.cpp		Arkisto luotu valmiiksi
-Stop them	file:ZipOMatic.cpp		Pysäytä ne
+Creating archive: %s	file:ZipOMaticWindow.cpp		Luodaan arkisto: %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Sinulla on {0, plural, one{# Zip-O-Matic-ohjelma} other{# Zip-O-Matic-ohjelmaa}} käynnissä.\n\n

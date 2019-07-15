@@ -1,33 +1,33 @@
 1	catalan; valencian	x-vnd.Haiku-LaunchBox	990189726
-New	LaunchBox		Nou
 Set description…	LaunchBox		Indica la descripció...
-Vertical layout	LaunchBox		Disposició vertical:
-OK	LaunchBox		D'acord
-Pad 1	LaunchBox		Barra 1
-last chance	LaunchBox		darrera oportunitat
-Quit	LaunchBox		Surt
-Open containing folder	LaunchBox		Obre la carpeta que el conté
-Clear button	LaunchBox		Botó de neteja
-LaunchBox	System name		Executa
-Ignore double-click	LaunchBox		Ignora els clics dobles
-Auto-raise	LaunchBox		Autoelevació
-Show on all workspaces	LaunchBox		Mostra-ho a tots els espais de treball
-Show window border	LaunchBox		Mostra la vora de la finestra
-Icon size	LaunchBox		Mida de la icona
-Cancel	LaunchBox		Anul·la
-Remove button	LaunchBox		Elimina el botó
-Horizontal layout	LaunchBox		Disposició horitzontal
-\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nNo ha estat possible executar l'aplicació amb la signatura '%2'.\n\nError:
-Failed to launch '%1'.\n\nError:	LaunchBox		No ha estat possible executar '%1'.\n\nError:
-Name Panel	LaunchBox		Tauler del nom
-Add button here	LaunchBox		Afegeix un botó aquí
-Description for '%3'	LaunchBox		Descripció de '%3'
-Settings	LaunchBox		Paràmetres
-Failed to launch 'something', error in Pad data.	LaunchBox		No ha estat possible executar 'quelcom', hi ha hagut un error amb les dades de la barra.
-Pad %1	LaunchBox		Barra %1
-Close	LaunchBox		Tanca
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		No ha estat possible enviar la 'carpeta oberta' al Rastrejador.\n\nError: 
-You can drag an icon here.	LaunchBox		Podeu deixar anar la icona aquí:
-Clone	LaunchBox		Clona
-launch popup	LaunchBox		obre la finestra emergent
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Esteu segur que voleu tancar aquesta barra?\n(No es recordarà la barra)
+OK	LaunchBox		D'acord
+Ignore double-click	LaunchBox		Ignora els clics dobles
+Show on all workspaces	LaunchBox		Mostra-ho a tots els espais de treball
+Name Panel	LaunchBox		Tauler del nom
+Clone	LaunchBox		Clona
+Description for '%3'	LaunchBox		Descripció de '%3'
+Show window border	LaunchBox		Mostra la vora de la finestra
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nNo ha estat possible executar l'aplicació amb la signatura '%2'.\n\nError:
+Failed to launch 'something', error in Pad data.	LaunchBox		No ha estat possible executar 'quelcom', hi ha hagut un error amb les dades de la barra.
+LaunchBox	System name		Executa
+Auto-raise	LaunchBox		Autoelevació
+Icon size	LaunchBox		Mida de la icona
+Open containing folder	LaunchBox		Obre la carpeta que el conté
+Add button here	LaunchBox		Afegeix un botó aquí
+Cancel	LaunchBox		Anul·la
+launch popup	LaunchBox		obre la finestra emergent
+Clear button	LaunchBox		Botó de neteja
+last chance	LaunchBox		darrera oportunitat
+You can drag an icon here.	LaunchBox		Podeu deixar anar la icona aquí:
+Pad 1	LaunchBox		Barra 1
+Failed to launch '%1'.\n\nError:	LaunchBox		No ha estat possible executar '%1'.\n\nError:
+Settings	LaunchBox		Paràmetres
+Vertical layout	LaunchBox		Disposició vertical:
+Close	LaunchBox		Tanca
+Remove button	LaunchBox		Elimina el botó
+Quit	LaunchBox		Surt
+Horizontal layout	LaunchBox		Disposició horitzontal
+New	LaunchBox		Nou
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		No ha estat possible enviar la 'carpeta oberta' al Rastrejador.\n\nError: 
+Pad %1	LaunchBox		Barra %1

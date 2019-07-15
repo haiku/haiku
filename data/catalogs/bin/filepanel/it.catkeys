@@ -1,20 +1,20 @@
 1	italian	x-vnd.mmu_man.filepanel	1802971238
 display a load/save file panel\n	FilePanelApp		visualizza un pannello di load/save file\n
-options:\n	FilePanelApp		opzioni:\n
-usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		uso: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n
--k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tTipo di voci che possono essere aperte: ogni combinazione di f, d, s (file (default), directory, symlink)\n
-usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		uso: %s [-h]     [-d cartella]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a schema]      [-f schema]\n
--d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tapri su <cartella>\n
-%s not a valid option\n	FilePanelApp		%s non è un opzione valida\n
 short\tlong\tdescription\n	FilePanelApp		short\tlong\tdescrizione\n
-%s: this option requires a parameter\n	FilePanelApp		%s: questa opzione richiede un parametro\n
--l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tusa un load FilePanel (default)\n
--f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tnon implementato\n
+%s not a valid option\n	FilePanelApp		%s non è un opzione valida\n
 -s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tusa un save FilePanel\n
--n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\timposta il nome predefinito per il salvataggio\n
--m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\trendi il FilePanel modale\n
+%s: this option requires a parameter\n	FilePanelApp		%s: questa opzione richiede un parametro\n
 -h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tvisualizza uso\n
--a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tnon implementato\n
--1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tè consentito selezionare solo un file\n
--t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\timposta il titolo della finestra del FilePanel\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tusa un load FilePanel (default)\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\timposta il nome predefinito per il salvataggio\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tTipo di voci che possono essere aperte: ogni combinazione di f, d, s (file (default), directory, symlink)\n
 %s: UNIMPLEMENTED\n	FilePanelApp		%s: NON IMPLEMENTATO\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\timposta il titolo della finestra del FilePanel\n
+-f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tnon implementato\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		uso: %s [-h]     [-d cartella]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a schema]      [-f schema]\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tè consentito selezionare solo un file\n
+-a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tnon implementato\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\trendi il FilePanel modale\n
+options:\n	FilePanelApp		opzioni:\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tapri su <cartella>\n
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		uso: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n

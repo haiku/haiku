@@ -1,20 +1,20 @@
 1	catalan; valencian	x-vnd.Haiku-Touchpad	607725922
 Scrolling	TouchpadPrefView		Desplaçament
-Touchpad	System name		Ratolí tàctil
-Revert	TouchpadPrefView		Reverteix
 Tapping	TouchpadPrefView		Fent un toc
-Please confirm	TouchpadPrefView		Si us plau, confirmeu-ho
-Two finger scrolling	TouchpadPrefView		Desplaçament amb dos dits
-Defaults	TouchpadPrefView		Valors predeterminats
-Slow	TouchpadPrefView		Lenta
-Vertical	TouchpadPrefView		Vertical
-High	TouchpadPrefView		Alta
-Horizontal scrolling	TouchpadPrefView		Desplaçament horitzontal
-Fast	TouchpadPrefView		Ràpida
-OK	TouchpadPrefView		D'acord
-Acceleration	TouchpadPrefView		Acceleració
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La nova àrea de desplaçament és massa gran el que pot dificultar el funcionament normal del ratolí. Esteu segur que la voleu canviar?
-Horizontal	TouchpadPrefView		Horitzontal
-Off	TouchpadPrefView		Desactivat
-Sensitivity	TouchpadPrefView		Sensibilitat
+Touchpad	System name		Ratolí tàctil
 Cancel	TouchpadPrefView		Anul·la
+OK	TouchpadPrefView		D'acord
+Horizontal scrolling	TouchpadPrefView		Desplaçament horitzontal
+Slow	TouchpadPrefView		Lenta
+Two finger scrolling	TouchpadPrefView		Desplaçament amb dos dits
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La nova àrea de desplaçament és massa gran el que pot dificultar el funcionament normal del ratolí. Esteu segur que la voleu canviar?
+Defaults	TouchpadPrefView		Valors predeterminats
+High	TouchpadPrefView		Alta
+Off	TouchpadPrefView		Desactivat
+Fast	TouchpadPrefView		Ràpida
+Vertical	TouchpadPrefView		Vertical
+Please confirm	TouchpadPrefView		Si us plau, confirmeu-ho
+Acceleration	TouchpadPrefView		Acceleració
+Horizontal	TouchpadPrefView		Horitzontal
+Sensitivity	TouchpadPrefView		Sensibilitat
+Revert	TouchpadPrefView		Reverteix

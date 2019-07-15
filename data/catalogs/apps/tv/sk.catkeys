@@ -1,27 +1,27 @@
 1	slovak	x-vnd.Haiku.TV	1995288111
-TV	MainWin		TV
-Channel	MainWin		Kanál
-Settings…	MainWin		Nastavenie…
-Interface	MainWin		Rozhranie
-Keep aspect ratio	MainWin		Zachovať pomer strán
-Previous channel	MainWin		Predošlý kanál
-Settings	MainWin		Nastavenia
-TV	System name		TV
+No menu	MainWin		Bez menu
 No border	MainWin		Bez okraja
-Always on top	MainWin		Vždy na vrchu
-OK	MainWin		OK
-Quit	MainWin		Ukončiť
+force 704 x 576, display aspect 4:3	MainWin		vynútiť 704 x 576, pomer strán 4:3
+Error, connecting to interface failed:\n\n	MainWin		Chyba, pripojenie na rozhranie zlyhalo:\n\n
+force 544 x 576, display aspect 4:3	MainWin		vynútiť 544 x 576, pomer strán 4:3
 Full screen	MainWin		Celoobrazovkový režim
-Debug	MainWin		Ladenie
 Scale to native size	MainWin		Zmeniť mierku na natívnu veľkosť
 unknown	MainWin		neznáme
 Next channel	MainWin		Ďalší kanál
-Error, interface is busy:\n\n	MainWin		Chyba, rozhranie je zaneprázdnené:\n\n
-None	MainWin		Žiadne
-force 704 x 576, display aspect 4:3	MainWin		vynútiť 704 x 576, pomer strán 4:3
+Keep aspect ratio	MainWin		Zachovať pomer strán
 DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
-force 544 x 576, display aspect 4:3	MainWin		vynútiť 544 x 576, pomer strán 4:3
-pixel aspect ratio	MainWin		pomer strán pixlov
-No menu	MainWin		Bez menu
-Error, connecting to interface failed:\n\n	MainWin		Chyba, pripojenie na rozhranie zlyhalo:\n\n
+Always on top	MainWin		Vždy na vrchu
+Debug	MainWin		Ladenie
+Interface	MainWin		Rozhranie
 force 720 x 576, display aspect 4:3	MainWin		vynútiť 720 x 576, pomer strán 4:3
+Quit	MainWin		Ukončiť
+Channel	MainWin		Kanál
+Previous channel	MainWin		Predošlý kanál
+OK	MainWin		OK
+TV	MainWin		TV
+Settings	MainWin		Nastavenia
+TV	System name		TV
+Settings…	MainWin		Nastavenie…
+None	MainWin		Žiadne
+Error, interface is busy:\n\n	MainWin		Chyba, rozhranie je zaneprázdnené:\n\n
+pixel aspect ratio	MainWin		pomer strán pixlov

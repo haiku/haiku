@@ -1,35 +1,35 @@
 1	french	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		Restaurer le cliché
-Could not set Sudoku:\n%s\n	SudokuWindow		Impossible d’initialiser Sudoku :\n%s\n
-Export as…	SudokuWindow		Exporter sous…
-OK	SudokuWindow		OK
-New	SudokuWindow		Nouveau
-Abort	ProgressWindow		Abandon
-Sudoku	System name		Sudoku
-Could not open \"%s\":\n%s\n	SudokuWindow		Impossible d’ouvrir « %s » :\n%s\n
-Easy	SudokuWindow		Facile
-Open file…	SudokuWindow		Ouvrir un fichier…
-Solve single field	SudokuWindow		Résoudre une case
-Solve	SudokuWindow		Résoudre
-Redo	SudokuWindow		Rétablir
 File	SudokuWindow		Fichier
-Advanced	SudokuWindow		Expérimenté
-Start again	SudokuWindow		Recommencer
-HTML	SudokuWindow		HTML
-Sudoku request	SudokuWindow		Demande de Sudoku
-Copy	SudokuWindow		Copier
-Mark valid hints	SudokuWindow		Marquer les consignes valides
-Sudoku solved - congratulations!\n	SudokuWindow		Sudoku résolu - félicitations !\n
+Mark invalid values	SudokuWindow		Marquer les valeurs invalides
+Solve single field	SudokuWindow		Résoudre une case
 Hard	SudokuWindow		Difficile
-Snapshot current	SudokuWindow		Prendre un cliché
+Start again	SudokuWindow		Recommencer
+New	SudokuWindow		Nouveau
+Easy	SudokuWindow		Facile
+Undo	SudokuWindow		Annuler
+Export as…	SudokuWindow		Exporter sous…
+Quit	SudokuWindow		Quitter
+Redo	SudokuWindow		Rétablir
+Could not open \"%s\":\n%s\n	SudokuWindow		Impossible d’ouvrir « %s » :\n%s\n
+Blank	SudokuWindow		Vide
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku résolu - félicitations !\n
 Text	SudokuWindow		Texte
+Copy	SudokuWindow		Copier
+Solve	SudokuWindow		Résoudre
+HTML	SudokuWindow		HTML
+Advanced	SudokuWindow		Expérimenté
+Set all hints	SudokuWindow		Mettre toutes les indications
+Searching for removable values	SudokuGenerator		Recherche des cases effaçables
+Abort	ProgressWindow		Abandon
+Could not set Sudoku:\n%s\n	SudokuWindow		Impossible d’initialiser Sudoku :\n%s\n
+Help	SudokuWindow		Aide
+OK	SudokuWindow		OK
+Sudoku	System name		Sudoku
+Progress monitor	ProgressWindow		Moniteur de progression
 Creating solvable field	SudokuGenerator		Création d’un champ solvable
 View	SudokuWindow		Vue
-Progress monitor	ProgressWindow		Moniteur de progression
-Set all hints	SudokuWindow		Mettre toutes les indications
-Mark invalid values	SudokuWindow		Marquer les valeurs invalides
-Blank	SudokuWindow		Vide
-Help	SudokuWindow		Aide
-Searching for removable values	SudokuGenerator		Recherche des cases effaçables
-Undo	SudokuWindow		Annuler
-Quit	SudokuWindow		Quitter
+Snapshot current	SudokuWindow		Prendre un cliché
+Mark valid hints	SudokuWindow		Marquer les consignes valides
+Sudoku request	SudokuWindow		Demande de Sudoku
+Open file…	SudokuWindow		Ouvrir un fichier…

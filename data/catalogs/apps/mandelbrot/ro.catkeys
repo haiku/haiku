@@ -1,23 +1,23 @@
 1	romanian	x-vnd.Haiku-Mandelbrot	1781779654
-About	MandelbrotWindow		Despre
-Julia	MandelbrotWindow		Iulia
-Grassland	MandelbrotWindow		Pășune
-Spring	MandelbrotWindow		Primăvară
-High contrast	MandelbrotWindow		Contrast mare
-Fire	MandelbrotWindow		Foc
-Royal	MandelbrotWindow		Regal
-File	MandelbrotWindow		Fișier
-Lightning	MandelbrotWindow		Fulger
-Midnight	MandelbrotWindow		Miezul nopții
-Palette	MandelbrotWindow		Paletă
-Mandelbrot	MandelbrotWindow		Mandelbrot
 Burning Ship	MandelbrotWindow		Navă aprinsă
-Quit	MandelbrotWindow		Închidere
-Frost	MandelbrotWindow		Îngheț
+Grassland	MandelbrotWindow		Pășune
+Lightning	MandelbrotWindow		Fulger
+About	MandelbrotWindow		Despre
+Palette	MandelbrotWindow		Paletă
 Set	MandelbrotWindow		Stabilire
-Iterations	MandelbrotWindow		Iterații
-Mandelbrot	System name		Mandelbrot
-Deepfrost	MandelbrotWindow		Îngheț profund
 Tricorn	MandelbrotWindow		Tricorn
-Multibrot	MandelbrotWindow		Multibrot
+Royal	MandelbrotWindow		Regal
 Orbit Trap	MandelbrotWindow		Capcană pe orbită
+Deepfrost	MandelbrotWindow		Îngheț profund
+Quit	MandelbrotWindow		Închidere
+File	MandelbrotWindow		Fișier
+Julia	MandelbrotWindow		Iulia
+Frost	MandelbrotWindow		Îngheț
+Fire	MandelbrotWindow		Foc
+Mandelbrot	System name		Mandelbrot
+Iterations	MandelbrotWindow		Iterații
+High contrast	MandelbrotWindow		Contrast mare
+Multibrot	MandelbrotWindow		Multibrot
+Spring	MandelbrotWindow		Primăvară
+Midnight	MandelbrotWindow		Miezul nopții
+Mandelbrot	MandelbrotWindow		Mandelbrot

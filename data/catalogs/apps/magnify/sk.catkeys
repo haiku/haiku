@@ -1,21 +1,17 @@
-1	slovak	x-vnd.Haiku-Magnify	931164741
-no clip msg\n	In console, when clipboard is empty after clicking Copy image		správa prázdna schránka\n
-Make square	Magnify-Main		Urobiť štvorec
-Copy image	Magnify-Main		Kopírovať obrázok
-usage: magnify [size] (magnify size * size pixels)\n	Console		použitie: magnify [veľkosť] (veľkosť zväčšenia * veľkosť pixlov)\n
-Freeze image	Magnify-Main		Zmraziť obraz
+1	slovak	x-vnd.Haiku-Magnify	94607167
+Decrease pixel size	Magnify-Main		Zmenšiť veľkosť pixla
+Increase pixel size	Magnify-Main		Zväčšiť veľkosť pixla
 Stick coordinates	Magnify-Main		Prilepiť súradnice
 %width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height  @ {0, plural, one{# pixel/pixel} few{# pixely/pixel} other{# pixelov/pixel}}
-Show info	Magnify-Main		Zobraziť informácie
-magnify: size must be a multiple of 4\n	Console		lupa: veľkosť musí byť násobok 4\n
-Decrease pixel size	Magnify-Main		Zmenšiť veľkosť pixla
+Copy image	Magnify-Main		Kopírovať obrázok
+Decrease window size	Magnify-Main		Zmenšiť veľkosť okna
+Remove a crosshair	Magnify-Main		Odstrániť mušku
+Add a crosshair	Magnify-Main		Pridať mušku
+Freeze image	Magnify-Main		Zmraziť obraz
+Increase window size	Magnify-Main		Zväčšiť veľkosť okna
+Save image	Magnify-Main		Uložiť obrázok
+Show grid	Magnify-Main		Zobraziť mriežku
 Magnify	System name		Lupa
 Info	Magnify-Main		Info
-Remove a crosshair	Magnify-Main		Odstrániť mušku
-Show grid	Magnify-Main		Zobraziť mriežku
-Save image	Magnify-Main		Uložiť obrázok
-Increase window size	Magnify-Main		Zväčšiť veľkosť okna
-Decrease window size	Magnify-Main		Zmenšiť veľkosť okna
-Increase pixel size	Magnify-Main		Zväčšiť veľkosť pixla
-  size must be > 4 and a multiple of 4\n	Console		  veľkosť musí byť > 4 a musí byť násobkom 4\n
-Add a crosshair	Magnify-Main		Pridať mušku
+Show info	Magnify-Main		Zobraziť informácie
+Make square	Magnify-Main		Urobiť štvorec

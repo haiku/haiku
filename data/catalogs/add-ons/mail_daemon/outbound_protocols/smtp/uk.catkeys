@@ -1,14 +1,14 @@
 1	ukrainian	x-vnd.Haiku-SMTP	815985329
-SMTP server:	ConfigView		SMTP-сервер:
-Error while logging in to %serv	smtp		Помилка при авторизації на %serv
-Unencrypted	ConfigView		Без шифрування
-. The server says:\n	smtp		. Сервер відповідає:\n
-ESMTP	ConfigView		ESMTP
-Connecting to server…	smtp		З'єднання з сервером…
-Error while opening connection to %serv	smtp		Помилка відкриття з'єднання з %serv
 POP3 authentication failed. The server said:\n	smtp		Аутентифікація POP3 не вдалась. Сервер повідомив:\n
 Destination:	ConfigView		Призначення:
+Error while logging in to %serv	smtp		Помилка при авторизації на %serv
+Connecting to server…	smtp		З'єднання з сервером…
+Unencrypted	ConfigView		Без шифрування
+. The server says:\n	smtp		. Сервер відповідає:\n
+Error while opening connection to %serv	smtp		Помилка відкриття з'єднання з %serv
+. The server said:\n	smtp		. Сервер відповідає:\n
 None	ConfigView		Жодного
+SMTP server:	ConfigView		SMTP-сервер:
+ESMTP	ConfigView		ESMTP
 POP3 before SMTP	ConfigView		POP3 перед SMTP
 SSL	ConfigView		SSL
-. The server said:\n	smtp		. Сервер відповідає:\n

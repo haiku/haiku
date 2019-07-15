@@ -1,10 +1,10 @@
 1	lithuanian	x-vnd.Haiku-DeskCalc	1694821448
 Compact	CalcView		Kompaktiškas
-Scientific	CalcView		Mokslinis
-DeskCalc	System name		Skaičiuotuvas
-Basic	CalcView		Paprastas
-Radians	CalcView		Radianai
-Enable Num Lock on startup	CalcView		Aktyvinti skaitmenis paleidimo metu
 Calculating	CalcView		Skaičiuojama
-Degrees	CalcView		Laipsniai
+Enable Num Lock on startup	CalcView		Aktyvinti skaitmenis paleidimo metu
+Scientific	CalcView		Mokslinis
+Radians	CalcView		Radianai
 Audio Feedback	CalcView		Įjungti garsus
+DeskCalc	System name		Skaičiuotuvas
+Degrees	CalcView		Laipsniai
+Basic	CalcView		Paprastas

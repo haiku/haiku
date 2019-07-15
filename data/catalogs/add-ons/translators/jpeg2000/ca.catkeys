@@ -1,13 +1,13 @@
 1	catalan; valencian	x-vnd.Haiku-JPEG2000Translator	547915409
-Write	JPEG2000Translator		Escriu
-JPEG2000 images	JPEG2000Translator		Imatges JPEG2000
-Output only codestream (.jpc)	JPEG2000Translator		Treu només el codi del flux (.jpg)
-Write black-and-white images as RGB24	JPEG2000Translator		Desa les imatges en blanc i negre com a RGB24
-Output quality	JPEG2000Translator		Qualitat de la sortida
-Read	JPEG2000Translator		Llegiu
-©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nBasat en la llibreria JasPer:\n© 1999-2000, Image Power, Inc. i\nla Universitat de British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nEl còdec jp2 de ImageMagick s'ha usat com a \"programa d'aprenentatge\".\n\thttp://www.imagemagick.org/\n
-Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Format Be Bitmap (JPEG2000Translator)
-Low	JPEG2000Translator		Baixa
-About	JPEG2000Translator		Quant a
 High	JPEG2000Translator		Alta
+Low	JPEG2000Translator		Baixa
+Output quality	JPEG2000Translator		Qualitat de la sortida
+JPEG2000 images	JPEG2000Translator		Imatges JPEG2000
+About	JPEG2000Translator		Quant a
+Write black-and-white images as RGB24	JPEG2000Translator		Desa les imatges en blanc i negre com a RGB24
+Read	JPEG2000Translator		Llegiu
 Read greyscale images as RGB32	JPEG2000Translator		Llegeix les imatges d'escala de grisos com a RGB32
+©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nBasat en la llibreria JasPer:\n© 1999-2000, Image Power, Inc. i\nla Universitat de British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nEl còdec jp2 de ImageMagick s'ha usat com a \"programa d'aprenentatge\".\n\thttp://www.imagemagick.org/\n
+Write	JPEG2000Translator		Escriu
+Output only codestream (.jpc)	JPEG2000Translator		Treu només el codi del flux (.jpg)
+Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Format Be Bitmap (JPEG2000Translator)

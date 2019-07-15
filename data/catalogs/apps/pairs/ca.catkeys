@@ -1,11 +1,11 @@
 1	catalan; valencian	x-vnd.Haiku-Pairs	2647083837
-Expert (8x8)	PairsWindow		Expert (8x8)
-Beginner (4x4)	PairsWindow		Novell (4x4)
-Quit game	PairsWindow		Deixa la partida
-Game	PairsWindow		Partida
-Size	PairsWindow		Mida
-New	PairsWindow		Nou
-Intermediate (6x6)	PairsWindow		Nivell mig (6x6)
-Quit	PairsWindow		Surt
 Pairs	System name		Parelles
+Quit	PairsWindow		Surt
+Game	PairsWindow		Partida
+Expert (8x8)	PairsWindow		Expert (8x8)
+New	PairsWindow		Nou
+Size	PairsWindow		Mida
+Quit game	PairsWindow		Deixa la partida
+Beginner (4x4)	PairsWindow		Novell (4x4)
+Intermediate (6x6)	PairsWindow		Nivell mig (6x6)
 New game	PairsWindow		Partida nova

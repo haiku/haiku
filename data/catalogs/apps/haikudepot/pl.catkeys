@@ -1,141 +1,122 @@
-1	polish	x-vnd.Haiku-HaikuDepot	455766332
-Name	PackageListView		Nazwa
-Available packages	MainWindow		Dostępne pakiety
-Open %DeskbarLink%	PackageManager		Otwórz %DeskbarLink%
-OK	MainWindow		OK
-Close	RatePackageWindow		Zamknij
-The captcha puzzle needs to be solved.	UserLoginWindow		Musisz rozwiązać test CAPTCHA.
-Changelog	PackageInfoView		Dziennik zmian
-Your rating:	RatePackageWindow		Twoja ocena:
-The passwords do not match.	UserLoginWindow		Hasła nie zgadzają się.
-Log in…	MainWindow		Zaloguj się…
-Rate %Package%	RatePackageWindow		Oceń %Package%
-Stability:	RatePackageWindow		Stabilność:
-Click a package to view information	PackageInfoView		Kliknij na pakiet, aby zobaczyć informacje
-Other users can see this rating	RatePackageWindow		Inni użytkownicy będą mogli zobaczyć tę ocenę
-Stability	RatePackageWindow		Stabilność
-No changelog available.	PackageInfoView		Dziennik zmian nie jest dostępny.
-Description	PackageListView		Opis
-Install	PackageManager		Zainstaluj
-All repositories	MainWindow		Wszystkie repozytoria
-Source packages	MainWindow		Pakiety źródłowe
-Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Autoryzacja nie powiodła się. Użytkownik nie istnieje lub podano złe hasło.
-Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Konto zostało utworzone. Możesz teraz oceniać pakiety oraz robić inne przydatne rzeczy.
-Tools	MainWindow		Narzędzia
-HaikuDepot	System name		HaikuDepot
-Close	UserLoginWindow		Zamknij
-Rate package…	PackageInfoView		Oceń pakiet…
-Category	FilterView		Kategoria
+1	polish	x-vnd.Haiku-HaikuDepot	823157944
 Uninstall	PackageManager		Usuń
-An error occurred while obtaining the package list: %message%	MainWindow		Wystąpił błąd podczas próby uzyskania listy pakietów: %message%
-<no info>	PackageInfoView		<brak informacji>
-Starting the package daemon failed:\n\n%Error%	App		Uruchamianie demona pakietów nie powiodło się:\n\n%Error%
-An error occurred while initializing the package manager: %message%	MainWindow		Wystąpił błąd podczas inicjalizacji menedżera pakietów: %message%
-Email address:	UserLoginWindow		Adres e-mail:
-Very unstable	RatePackageWindow		Bardzo niestabilny
-<Package contents not available for remote packages>	PackageContentsView		<Podgląd zawartości nie jest dostępny dla zdalnych pakietów>
-The username is already taken. Please choose another.	UserLoginWindow		Ta nazwa użytkownika jest już zajęta. Wybierz inną.
-Close	PackageManager		Zamknij
-Not logged in	MainWindow		Niezalogowany
-The authentication was successful.	UserLoginWindow		Autoryzacja powiodła się.
-Installed packages	MainWindow		Zainstalowane pakiety
-Status	PackageListView		Status
-Switch account…	MainWindow		Przełącz konto…
-Ignore	UserLoginWindow		Ignoruj
-Language	UserLoginWindow		Język
-The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Hasło jest zbyt słabe lub niepoprawne. Użyj minimum 8 znaków, w tym co najmniej 2 cyfr i 2 wielkich liter.
-Rate package	RatePackageWindow		Oceń pakiet
-Development	Model		Programowanie
-Fatal error	PackageManager		Błąd krytyczny
-The user name needs to be at least 3 letters long.	UserLoginWindow		Nazwa użytkownika powinna składać się z co najmniej 3 znaków.
-Log in	UserLoginWindow		Zaloguj
-Repeat pass phrase:	UserLoginWindow		Powtórz hasło:
-Ratings	PackageInfoView		Oceny
-But none could be listed here, sorry.	UserLoginWindow		Ale żaden nie mógł zostać tutaj wyświetlony.
-System & Utilities	Model		System & narzędzia
-Inactive	PackageListView		Nieaktywny
-The package action could not be scheduled: %Error%	PackageInfoView		Akcja dla pakietu nie mogła zostać dodana do kolejki: %Error%
-Science & Mathematics	Model		Nauka & matematyka
-(%Votes%)	PackageInfoView		(%Votes%)
-You have not solved the captcha puzzle correctly.	UserLoginWindow		Nie udało ci się przejść testu CAPTCHA.
-Success	UserLoginWindow		Powodzenie
-HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot wymaga demona pakietów do działania, a ten wydaje się nie być uruchomiony.\nCzy chcesz go uruchomić?
-Downloading:	PackageInfoView		Pobieranie:
-Mostly stable	RatePackageWindow		Całkiem stabilny
-Log out	MainWindow		Wyloguj
-Repository	PackageListView		Repozytorium
-Education	Model		Edukacja
-Search terms:	FilterView		Szukana fraza:
-%Version%	PackageInfoView		%Version%
-No user ratings available.	PackageInfoView		Brak ocen użytkowników.
-Does not start	RatePackageWindow		Nie uruchamia się
-An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Wystąpił błąd podczas odświeżania repozytorium: %error% (%details%)
-There are problems in the form:\n\n	UserLoginWindow		W formularzu występują problemy:\n\n
-Create account	UserLoginWindow		Utwórz konto
-Productivity	Model		Programy użytkowe
-No, quit HaikuDepot	App		Nie, zakończ HaikuDepot
-Authentication failed	UserLoginWindow		Autoryzacja nie powiodła się
-Logged in as %User%	MainWindow		Zalogowano jako %User%
-9999.99 KiB	PackageListView		9999.99 KiB
-Language	RatePackageWindow		Język
-Size	PackageListView		Rozmiar
-You need to be logged into an account before you can rate packages.	MainWindow		Musisz być zalogowany, aby móc oceniać pakiety.
-User name:	UserLoginWindow		Nazwa użytkownika:
-Unstable but usable	RatePackageWindow		Niestabilny, ale używalny
-The email address appears to be malformed.	UserLoginWindow		Adres e-mail wygląda na zniekształcony.
-Games	Model		Gry
-Rating	PackageListView		Ocena
 (%Votes%)	FeaturedPackagesView		(%Votes%)
-There was a puzzling response from the web service.	UserLoginWindow		Odebrano dziwną odpowiedź od usługi sieciowej.
-Graphics	Model		Grafika
-Local	MainWindow		Lokalne
-Close	MainWindow		Zamknij
-Preferred language:	UserLoginWindow		Preferowany język:
-Internet & Network	Model		Internet i sieć
-Refresh repositories	MainWindow		Odśwież repozytoria
-Cancel	MainWindow		Anuluj
-Quit HaikuDepot	App		Zakończ HaikuDepot
-Input validation	UserLoginWindow		Walidacja wejścia
-Update	RatePackageWindow		Zaktualizuj
-Video	Model		Wideo
-All categories	FilterView		Wszystkie kategorie
-Contents	PackageInfoView		Zawartość
-An error occurred while refreshing the repository: %error%	MainWindow		Wystąpił błąd podczas odświeżania repozytorium: %error%
-Try again	App		Spróbuj ponownie
+Uninstalled	PackageListView		Niezainstalowany
+Available packages	MainWindow		Dostępne pakiety
+Create account	UserLoginWindow		Utwórz konto
+Mostly stable	RatePackageWindow		Całkiem stabilny
+Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Konto zostało utworzone. Możesz teraz oceniać pakiety oraz robić inne przydatne rzeczy.
+Rate package…	PackageInfoView		Oceń pakiet…
+Develop packages	MainWindow		Pakiety deweloperskie
+Starting the package daemon failed:\n\n%Error%	App		Uruchamianie demona pakietów nie powiodło się:\n\n%Error%
+<no info>	PackageInfoView		<brak informacji>
+No user ratings available.	PackageInfoView		Brak ocen użytkowników.
+The user name needs to be at least 3 letters long.	UserLoginWindow		Nazwa użytkownika powinna składać się z co najmniej 3 znaków.
+Failed to create account	UserLoginWindow		Nie udało się utworzyć konta
+Ignore	UserLoginWindow		Ignoruj
+Rating	PackageListView		Ocena
+Show	MainWindow		Pokaż
+Does not start	RatePackageWindow		Nie uruchamia się
+But none could be listed here, sorry.	UserLoginWindow		Ale żaden nie mógł zostać tutaj wyświetlony.
+There are problems with the data you entered:\n\n	UserLoginWindow		We wprowadzonych danych występują problemy:\n\n
+The authentication was successful.	UserLoginWindow		Autoryzacja powiodła się.
+Not specified	RatePackageWindow		Nieokreślony
+Unstable but usable	RatePackageWindow		Niestabilny, ale używalny
+Active	PackageListView		Aktywny
 Login or Create account	MainWindow		Zaloguj lub utwórz konto
-Pending…	PackageListView		Oczekiwanie…
+<Package contents not available for remote packages>	PackageContentsView		<Podgląd zawartości nie jest dostępny dla zdalnych pakietów>
+Ratings	PackageInfoView		Oceny
+Switch account…	MainWindow		Przełącz konto…
+Preferred language:	UserLoginWindow		Preferowany język:
+It was not possible to contact the web service.	UserLoginWindow		Nie udało się połączyć z usługą sieciową.
+Name	PackageListView		Nazwa
+Rate %Package%	RatePackageWindow		Oceń %Package%
+Quit HaikuDepot	App		Zakończ HaikuDepot
+Category	FilterView		Kategoria
+Installed packages	MainWindow		Zainstalowane pakiety
+Other users can see this rating	RatePackageWindow		Inni użytkownicy będą mogli zobaczyć tę ocenę
+Stable	RatePackageWindow		Stabilny
+Fatal error	PackageManager		Błąd krytyczny
+Package action failed	PackageInfoView		Akcja dla pakietu nie powiodła się
+No changelog available.	PackageInfoView		Dziennik zmian nie jest dostępny.
+There are problems in the form:\n\n	UserLoginWindow		W formularzu występują problemy:\n\n
+There was a puzzling response from the web service.	UserLoginWindow		Odebrano dziwną odpowiedź od usługi sieciowej.
+Not logged in	MainWindow		Niezalogowany
+No, quit HaikuDepot	App		Nie, zakończ HaikuDepot
+Available	PackageListView		Dostępny
+Cancel	UserLoginWindow		Anuluj
+HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot wymaga demona pakietów do działania, a ten wydaje się nie być uruchomiony.\nCzy chcesz go uruchomić?
+Click a package to view information	PackageInfoView		Kliknij na pakiet, aby zobaczyć informacje
+Contents	PackageInfoView		Zawartość
+Close	PackageManager		Zamknij
+Changelog	PackageInfoView		Dziennik zmian
+About	PackageInfoView		O pakiecie
+Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Autoryzacja nie powiodła się. Użytkownik nie istnieje lub podano złe hasło.
+Very unstable	RatePackageWindow		Bardzo niestabilny
+Stability	RatePackageWindow		Stabilność
+Send	RatePackageWindow		Wyślij
+Start package daemon	App		Uruchom demona pakietów
+The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Hasło jest zbyt słabe lub niepoprawne. Użyj minimum 8 znaków, w tym co najmniej 2 cyfr i 2 wielkich liter.
+The package action could not be scheduled: %Error%	PackageInfoView		Akcja dla pakietu nie mogła zostać dodana do kolejki: %Error%
+Inactive	PackageListView		Nieaktywny
+Cancel	RatePackageWindow		Anuluj
+OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# element} few{# elementy} many{# elementów} other{# elementu}}
 OK	PackageInfoView		OK
-Uninstalled	PackageListView		Niezainstalowany
-Show	MainWindow		Pokaż
-Stable	RatePackageWindow		Stabilny
-Unknown	PackageListView		Nieznany
-Comment language:	RatePackageWindow		Język komentarza:
-Pass phrase:	UserLoginWindow		Hasło:
-Screenshot	ScreenshotWindow		Zrzut ekranu
-Not specified	RatePackageWindow		Nieokreślony
-Available	PackageListView		Dostępny
-Develop packages	MainWindow		Pakiety deweloperskie
-n/a	PackageInfoView		Nie dotyczy
-If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Jeśli nie podasz adresu e-mail, nie będziesz mógł zresetować hasła, jeśli go zapomnisz.
- It responded with: 	UserLoginWindow		Odpowiedź:
-Authentication failed. Connection to the service failed.	UserLoginWindow		Autoryzacja nie powiodła się. Nie udało się połączyć z usługą sieciową.
-Cancel	RatePackageWindow		Anuluj
-Package action failed	PackageInfoView		Akcja dla pakietu nie powiodła się
-OK	UserLoginWindow		OK
-Send	RatePackageWindow		Wyślij
-Repositories	MainWindow		Repozytoria
--	no package size		-
-Category:	FilterView		Kategoria:
-Failed to create account	UserLoginWindow		Nie udało się utworzyć konta
-There are problems with the data you entered:\n\n	UserLoginWindow		We wprowadzonych danych występują problemy:\n\n
-Start package daemon	App		Uruchom demona pakietów
-Manage repositories…	MainWindow		Zarządzaj repozytoriami…
-Business	Model		Firma
-Audio	Model		Dźwięk
-About	PackageInfoView		O pakiecie
-Active	PackageListView		Aktywny
-It was not possible to contact the web service.	UserLoginWindow		Nie udało się połączyć z usługą sieciową.
-Refreshing...	MainWindow		Odświeżanie...
+Downloading:	PackageInfoView		Pobieranie:
+Success	UserLoginWindow		Powodzenie
+(%Votes%)	PackageInfoView		(%Votes%)
+Repository	PackageListView		Repozytorium
+Close	UserLoginWindow		Zamknij
+Close	RatePackageWindow		Zamknij
 Failed to create account: %s\n	UserLoginWindow		Nie udało się utworzyć konta: %s\n
-Cancel	UserLoginWindow		Anuluj
+Size	PackageListView		Rozmiar
+Your rating:	RatePackageWindow		Twoja ocena:
+All categories	FilterView		Wszystkie kategorie
+n/a	PackageInfoView		Nie dotyczy
+Repositories	MainWindow		Repozytoria
+Cancel	MainWindow		Anuluj
+Refresh repositories	MainWindow		Odśwież repozytoria
+If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Jeśli nie podasz adresu e-mail, nie będziesz mógł zresetować hasła, jeśli go zapomnisz.
+Tools	MainWindow		Narzędzia
+The passwords do not match.	UserLoginWindow		Hasła nie zgadzają się.
+Language	RatePackageWindow		Język
+Authentication failed. Connection to the service failed.	UserLoginWindow		Autoryzacja nie powiodła się. Nie udało się połączyć z usługą sieciową.
+Log out	MainWindow		Wyloguj
+Comment language:	RatePackageWindow		Język komentarza:
+Status	PackageListView		Status
+The username is already taken. Please choose another.	UserLoginWindow		Ta nazwa użytkownika jest już zajęta. Wybierz inną.
+Update	RatePackageWindow		Zaktualizuj
+Language	UserLoginWindow		Język
+OK	UserLoginWindow		OK
+Stability:	RatePackageWindow		Stabilność:
+The captcha puzzle needs to be solved.	UserLoginWindow		Musisz rozwiązać test CAPTCHA.
+Source packages	MainWindow		Pakiety źródłowe
+-	no package size		-
+User name:	UserLoginWindow		Nazwa użytkownika:
+Try again	App		Spróbuj ponownie
+Rate package	RatePackageWindow		Oceń pakiet
+The email address appears to be malformed.	UserLoginWindow		Adres e-mail wygląda na zniekształcony.
+You have not solved the captcha puzzle correctly.	UserLoginWindow		Nie udało ci się przejść testu CAPTCHA.
+Unknown	PackageListView		Nieznany
+Log in	UserLoginWindow		Zaloguj
+Logged in as %User%	MainWindow		Zalogowano jako %User%
+Email address:	UserLoginWindow		Adres e-mail:
+Screenshot	ScreenshotWindow		Zrzut ekranu
+HaikuDepot	System name		HaikuDepot
+Search terms:	FilterView		Szukana fraza:
+Pending…	PackageListView		Oczekiwanie…
+Repeat pass phrase:	UserLoginWindow		Powtórz hasło:
+Category:	FilterView		Kategoria:
+Authentication failed	UserLoginWindow		Autoryzacja nie powiodła się
+Manage repositories…	MainWindow		Zarządzaj repozytoriami…
+Description	PackageListView		Opis
+Pass phrase:	UserLoginWindow		Hasło:
+Open %DeskbarLink%	PackageManager		Otwórz %DeskbarLink%
+Install	PackageManager		Zainstaluj
+Input validation	UserLoginWindow		Walidacja wejścia
+Log in…	MainWindow		Zaloguj się…
+You need to be logged into an account before you can rate packages.	MainWindow		Musisz być zalogowany, aby móc oceniać pakiety.
+9999.99 KiB	PackageListView		9999.99 KiB
+All repositories	MainWindow		Wszystkie repozytoria
+%Version%	PackageInfoView		%Version%

@@ -1,94 +1,93 @@
-1	finnish	x-vnd.Haiku-DriveSetup	2321187933
-DriveSetup	System name		Levyasema-asetukset
-Could not acquire partitioning information.	MainWindow		Osiointitietojen hakeminen epäonnistui.
+1	finnish	x-vnd.Haiku-DriveSetup	2076471502
 Cancel	AbstractParametersPanel		Peru
-Delete	MainWindow		Poista
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki valitun osion tiedot katoavat palauttamattomasti, jos teet niin!
-Rescan	MainWindow		Etsi uudelleen
-OK	MainWindow		Valmis
-There's no space on the partition where a child partition could be created.	MainWindow		Osiolla ei ole mitään tilaa, johon olisi voitu luoda tytärosio.
-Could not unmount partition	MainWindow		Osion irrottaminen epäonnistui
-Initialize	InitializeParametersPanel		Alusta
-OK	AbstractParametersPanel		Valmis
-<empty>	PartitionList		<tyhjä>
-Unable to find the selected partition by ID.	MainWindow		Valitun osion löytäminen tunnisteen perusteella epäonnistui.
-Select a partition from the list below.	DiskView		Valitse osio alapuolella olevasta luettelosta.
-No disk devices have been recognized.	DiskView		Levyasemia ei tunnistettu.
-Failed to initialize the disk %s!\n	MainWindow		Levyn %s alustus epäonnistui!\n
-The selected disk is read-only.	MainWindow		Valittu levy on kirjoitussuojattu.
-Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa osion ”%s”? Samaa kysytään uudelleen ennen muutosten kirjoittamista levylle.
-Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Pitäisikö irrottaminen pakottaa?\n\nHuomaa: Jos sovellus parhaillaan kirjoittaa taltiolle, irrottaminen saattaa aiheuttaa datan katoamista.\n
-Could not mount partition %s.	MainWindow		Osion %s liittäminen epäonnistui.
-The partition %s has been successfully formatted.\n	MainWindow		Osion %s alustus onnistui.\n
-Change parameters	MainWindow		Vaihda parametreja
-The partition %s is already unmounted.	MainWindow		Osio %s on jo liitetty.
-Failed to delete the partition. No changes have been written to disk.	MainWindow		Osion poistaminen epäonnistui. Mitään muutoksia ei ole kirjoitettu levylle.
-Could not delete the selected partition.	MainWindow		Valitun osion poistaminen epäonnistui.
-Initialize	MainWindow		Alusta
-Error: 	MainWindow	in any error alert	Virhe: 
-Partition %ld	DiskView		Osio %ld
-<empty>	DiskView		<tyhjä>
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Osion %s alustus epäonnistui. (Mitään ei ole kirjoitettu levylle.)
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki osion tiedot katoavat palauttamattomasti, jos teet niin!
-Mounted at	PartitionList		Liittämispiste:
-There was an error acquiring the partition row.	MainWindow		Osioriviä haettaessa syntyi virhe.
-You need to select a partition entry from the list.	MainWindow		Sinun täytyy valita osiorivi luettelosta.
-The currently selected partition does not have a parent partition.	MainWindow		Nykyisellä valitulla osiolla ei ole yläosiota.
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki valitun osion tiedot katoavat palauttamattomasti, jos teet niin!
-Write changes	MainWindow		Kirjoita muutokset
-There was an error preparing the disk for modifications.	MainWindow		Tapahtui virhe valmisteltaessa levyä muutoksia varten.
-The partition %s is already mounted.	MainWindow		Osio %s on jo liitetty.
-Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa osion? Samaa kysytään uudelleen ennen muutosten kirjoittamista levylle.
-Partition name:	ChangeParametersPanel		Osionimi:
-Change	ChangeParametersPanel		Vaihda
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki levyn %s tiedot katoavat palauttamattomasti, jos teet niin!
-Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat poistaa valitun osion?\n\nKaikki osion tiedot katoavat palauttamattomasti, jos teet niin!
-Create…	MainWindow		Luo…
-Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa raakadatamuotoisen levyn? (Useimmat ihmiset jakavat levyn ensin osioihin) Asiaa kysytään uudelleen ennen muutosten tallentamista levylle.
-The disk has been successfully initialized.\n	MainWindow		Levyn alustus onnistui.\n
 Could not unmount partition %s.	MainWindow		Osion %s irrottaminen epäonnistui.
-Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Osion parametrien vaihtaminen epäonnistui. Levylle ei ole kirjoitettu mitään muutoksia.
-Failed to format the partition %s!\n	MainWindow		Osion %s alustus epäonnistui!\n
-Mount	MainWindow		Liitä
-Partition type	PartitionList		Osiotyyppi
-The panel experienced a problem!	MainWindow		Paneelissa oli pulma!
-Change parameters…	MainWindow		Vaihda parametreja...
-Device	PartitionList		Laite
-Disk	MainWindow		Levy
-Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Oletko varma, etä haluat alustaa valitun levyn? Kaikki olemassaolevat tiedot katoavat. Samaa kysytään uudelleen ennen kuin muutokset kirjoitetaan levylle.\n
-Partition size	CreateParametersPanel		Osiokoko
-Device	DiskView		Laite
-Active	PartitionList		Aktiivinen
-Volume name	PartitionList		Taltionimi
-Continue	MainWindow		Jatka
-Cannot delete the selected partition.	MainWindow		Valitun osion poistaminen epäonnistui.
 Mount all	MainWindow		Liitä kaikki
-End: %s	Support		Loppu: %s
-The panel could not return successfully.	MainWindow		Paneelin paluu epäonnistui.
-Cancel	MainWindow		Peru
+Format	MainWindow		Alusta
+Disk	MainWindow		Levy
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki valitun osion tiedot katoavat palauttamattomasti, jos teet niin!
+Device	PartitionList		Laite
+Could not change the parameters of the selected partition.	MainWindow		Valitun osion parametrien vaihtaminen epäonnistui.
+Initialize	MainWindow		Alusta
+OK	MainWindow		Valmis
 Delete partition	MainWindow		Poista osio
-Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Oletko varma, että haluat vaihtaa valitun osion parametreja?\n\nMuut käyttöjärjestelmät eivät ehkä enää tunnista osiota!
-Disk system \"%s\" not found!	MainWindow		Levyjärjestelmää ”%s” ei löytynyt!
-Eject	MainWindow		Poista asemasta
-Partition	MainWindow		Osio
+Error: 	MainWindow	in any error alert	Virhe: 
+Could not delete the selected partition.	MainWindow		Valitun osion poistaminen epäonnistui.
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Oletko varma, etä haluat alustaa valitun levyn? Kaikki olemassaolevat tiedot katoavat. Samaa kysytään uudelleen ennen kuin muutokset kirjoitetaan levylle.\n
+The panel experienced a problem!	MainWindow		Paneelissa oli pulma!
+Device	DiskView		Laite
+There was an error preparing the disk for modifications.	MainWindow		Tapahtui virhe valmisteltaessa levyä muutoksia varten.
+The disk has been successfully initialized.\n	MainWindow		Levyn alustus onnistui.\n
+Unmount	MainWindow		Irrota
+Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Pitäisikö irrottaminen pakottaa?\n\nHuomaa: Jos sovellus parhaillaan kirjoittaa taltiolle, irrottaminen saattaa aiheuttaa datan katoamista.\n
+Failed to format the partition %s!\n	MainWindow		Osion %s alustus epäonnistui!\n
+Partition size	CreateParametersPanel		Osiokoko
 Validation of the given parameters failed.	MainWindow		Annettujen parametrien todentaminen epäonnistui.
+The partition %s is currently mounted.	MainWindow		Osio %s on nykyisin liitetty.
+Cancel	MainWindow		Peru
+<empty>	PartitionList		<tyhjä>
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa osion ”%s”? Samaa kysytään uudelleen ennen muutosten kirjoittamista levylle.
+DriveSetup	System name		Levyasema-asetukset
+Mounted at	PartitionList		Liittämispiste:
+Create…	MainWindow		Luo…
 Force unmount	MainWindow		Pakota irrottaminen
+Write changes	MainWindow		Kirjoita muutokset
+Change parameters	MainWindow		Vaihda parametreja
+Validation of the given creation parameters failed.	MainWindow		Annettujen luontiparametrien todentaminen epäonnistui.
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Osion %s alustus epäonnistui. (Mitään ei ole kirjoitettu levylle.)
+Partition	MainWindow		Osio
+Eject	MainWindow		Poista asemasta
+There was an error acquiring the partition row.	MainWindow		Osioriviä haettaessa syntyi virhe.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki levyn %s tiedot katoavat palauttamattomasti, jos teet niin!
+Rescan	MainWindow		Etsi uudelleen
+Failed to initialize the disk %s!\n	MainWindow		Levyn %s alustus epäonnistui!\n
+Disk system \"%s\" not found!	MainWindow		Levyjärjestelmää ”%s” ei löytynyt!
+Delete	MainWindow		Poista
+Surface test (not implemented)	MainWindow		Pintatesti (ei toteutettu)
+Partition type:	ChangeParametersPanel		Osiotyyppi:
+The panel could not return successfully.	MainWindow		Paneelin paluu epäonnistui.
+Parameters	PartitionList		Parametrit
+Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Osion parametrien vaihtaminen epäonnistui. Levylle ei ole kirjoitettu mitään muutoksia.
+Could not acquire partitioning information.	MainWindow		Osiointitietojen hakeminen epäonnistui.
+Cannot delete the selected partition.	MainWindow		Valitun osion poistaminen epäonnistui.
+Partition %ld	DiskView		Osio %ld
+There's no space on the partition where a child partition could be created.	MainWindow		Osiolla ei ole mitään tilaa, johon olisi voitu luoda tytärosio.
+Continue	MainWindow		Jatka
+<empty>	DiskView		<tyhjä>
+No disk devices have been recognized.	DiskView		Levyasemia ei tunnistettu.
+Could not mount partition %s.	MainWindow		Osion %s liittäminen epäonnistui.
+Failed to delete the partition. No changes have been written to disk.	MainWindow		Osion poistaminen epäonnistui. Mitään muutoksia ei ole kirjoitettu levylle.
+Change parameters…	MainWindow		Vaihda parametreja...
+Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa osion? Samaa kysytään uudelleen ennen muutosten kirjoittamista levylle.
+Could not unmount partition	MainWindow		Osion irrottaminen epäonnistui
+The selected disk is read-only.	MainWindow		Valittu levy on kirjoitussuojattu.
 Create	CreateParametersPanel		Luo
 File system	PartitionList		Tiedostojärjestelmä
-Validation of the given creation parameters failed.	MainWindow		Annettujen luontiparametrien todentaminen epäonnistui.
-Partition type:	ChangeParametersPanel		Osiotyyppi:
-Size	PartitionList		Koko
-Wipe (not implemented)	MainWindow		Alustus (ei ole toteutettu)
-Validation of the given initialization parameters failed.	MainWindow		Annettujen alustusparametrien todentaminen epäonnistui.
+The partition %s is already unmounted.	MainWindow		Osio %s on jo liitetty.
 The selected partition does not contain a partitioning system.	MainWindow		Valittu osio ei sisällä osiointijärjestelmää.
-Offset: %s	Support		Siirrososoite: %s
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki osion %s tiedot kadotetaan palauttamattomasti, jos teet niin!
-The partition %s is currently mounted.	MainWindow		Osio %s on nykyisin liitetty.
-Surface test (not implemented)	MainWindow		Pintatesti (ei toteutettu)
-Format	MainWindow		Alusta
-Could not change the parameters of the selected partition.	MainWindow		Valitun osion parametrien vaihtaminen epäonnistui.
-Parameters	PartitionList		Parametrit
-Creation of the partition has failed.	MainWindow		Osion luominen epäonnistui.
+End: %s	Support		Loppu: %s
+Partition type	PartitionList		Osiotyyppi
+Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Oletko varma, että haluat vaihtaa valitun osion parametreja?\n\nMuut käyttöjärjestelmät eivät ehkä enää tunnista osiota!
+Unable to find the selected partition by ID.	MainWindow		Valitun osion löytäminen tunnisteen perusteella epäonnistui.
 The currently selected partition is not empty.	MainWindow		Nykyinen valittu osio ei ole tyhjä.
+The currently selected partition does not have a parent partition.	MainWindow		Nykyisellä valitulla osiolla ei ole yläosiota.
+Wipe (not implemented)	MainWindow		Alustus (ei ole toteutettu)
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa raakadatamuotoisen levyn? (Useimmat ihmiset jakavat levyn ensin osioihin) Asiaa kysytään uudelleen ennen muutosten tallentamista levylle.
+Validation of the given initialization parameters failed.	MainWindow		Annettujen alustusparametrien todentaminen epäonnistui.
+OK	AbstractParametersPanel		Valmis
+You need to select a partition entry from the list.	MainWindow		Sinun täytyy valita osiorivi luettelosta.
+Offset: %s	Support		Siirrososoite: %s
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki valitun osion tiedot katoavat palauttamattomasti, jos teet niin!
+Select a partition from the list below.	DiskView		Valitse osio alapuolella olevasta luettelosta.
+Active	PartitionList		Aktiivinen
+Volume name	PartitionList		Taltionimi
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat poistaa valitun osion?\n\nKaikki osion tiedot katoavat palauttamattomasti, jos teet niin!
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki osion tiedot katoavat palauttamattomasti, jos teet niin!
 Failed to format the partition. No changes have been written to disk.	MainWindow		Osion alustaminen epäonnistui. Mitään muutoksia ei ole kirjoitettu levylle.
-Unmount	MainWindow		Irrota
+Change	ChangeParametersPanel		Vaihda
+The partition %s has been successfully formatted.\n	MainWindow		Osion %s alustus onnistui.\n
+Partition name:	ChangeParametersPanel		Osionimi:
+The partition %s is already mounted.	MainWindow		Osio %s on jo liitetty.
+Size	PartitionList		Koko
+Creation of the partition has failed.	MainWindow		Osion luominen epäonnistui.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki osion %s tiedot kadotetaan palauttamattomasti, jos teet niin!
+Mount	MainWindow		Liitä

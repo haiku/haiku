@@ -1,22 +1,21 @@
-1	spanish; castilian	x-vnd.Haiku-NetworkStatus	1729819859
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Opciones del estado de red:\n\t--barra del escritorio\tautomáticamente agregar replicante a la barra del escritorio\n\t--ayuda\t\timprimir esta informacion y salir\n
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Puedes arrancar NetworkStatus en una ventana o instalarlo en la Barra de escritorio
-<no wireless networks found>	NetworkStatusView		<no se pudo encontrar redes inalámbricas>
-Run in window	NetworkStatus		Ejecutar en ventana
-No link	NetworkStatusView		sin enlace
-Install in Deskbar	NetworkStatus		Instalar en la barra de escritorio
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		lanzamiento de la red falló.\n\nError:
+1	spanish; castilian	x-vnd.Haiku-NetworkStatus	3823341665
 Netmask	NetworkStatusView		Máscara de red
-Broadcast	NetworkStatusView		Transmisión
-Unknown	NetworkStatusView		Desconocido
-Network Status	NetworkStatusView		Estado de la red
-Ready	NetworkStatusView		Listo
-No stateful configuration	NetworkStatusView		Ninguna configuración con estado
-%ifaceName information:\n	NetworkStatusView		%ifaceName información:\n
-Configuring	NetworkStatusView		Configurando
-Address	NetworkStatusView		Dirección
-OK	NetworkStatusView		Aceptar
-NetworkStatus	System name		NetworkStatus
-Open network preferences…	NetworkStatusView		Abrir preferencias de red ...
-Could not join wireless network:\n	NetworkStatusView		No se pudo conectar a la red inalámbrica:\n
 Quit	NetworkStatusView		Salir
+Unknown	NetworkStatusView		Desconocido
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		lanzamiento de la red falló.\n\nError:
+Install in Deskbar	NetworkStatus		Instalar en la barra de escritorio
+Open network preferences…	NetworkStatusView		Abrir preferencias de red ...
+NetworkStatus	System name		NetworkStatus
+OK	NetworkStatusView		Aceptar
+No link	NetworkStatusView		sin enlace
+Could not join wireless network:\n	NetworkStatusView		No se pudo conectar a la red inalámbrica:\n
+Ready	NetworkStatusView		Listo
+Network Status	NetworkStatusView		Estado de la red
+Address	NetworkStatusView		Dirección
+No stateful configuration	NetworkStatusView		Ninguna configuración con estado
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Puedes arrancar NetworkStatus en una ventana o instalarlo en la Barra de escritorio
+Broadcast	NetworkStatusView		Transmisión
+%ifaceName information:\n	NetworkStatusView		%ifaceName información:\n
+Run in window	NetworkStatus		Ejecutar en ventana
+<no wireless networks found>	NetworkStatusView		<no se pudo encontrar redes inalámbricas>
+Configuring	NetworkStatusView		Configurando

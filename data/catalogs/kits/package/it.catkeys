@@ -1,7 +1,7 @@
 1	italian	x-vnd.Haiku-libpackage	2012114212
-Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Il pacchetto %s-%s non ha un requisito corrispondente per il suo pacchetto base \"%s\"
-Failed to get repository names	PackageManagerKit		Impossibile ottenere i nomi dei repository
-Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Errore nel recupero della cache per il repository \"%s\". Saltato.
 Refreshing repository \"%s\" failed	PackageManagerKit		Impossibile aggiornare il repository \"%s\"
 Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Errore nel recupero della configurazione del repository \"%s\". Saltato.
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Errore nel recupero della cache per il repository \"%s\". Saltato.
+Failed to get repository names	PackageManagerKit		Impossibile ottenere i nomi dei repository
 Failed to remove transaction directory	PackageManagerKit		Errore nella rimozione della cartella delle transazioni
+Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Il pacchetto %s-%s non ha un requisito corrispondente per il suo pacchetto base \"%s\"

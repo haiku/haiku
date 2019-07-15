@@ -1,35 +1,35 @@
 1	japanese	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		スナップショットを戻す
-Could not set Sudoku:\n%s\n	SudokuWindow		数独を設定できませんでした:\n%s\n
-Export as…	SudokuWindow		別形式でエクスポート…
-OK	SudokuWindow		OK
-New	SudokuWindow		新規ゲーム
-Abort	ProgressWindow		中断
-Sudoku	System name		数独
-Could not open \"%s\":\n%s\n	SudokuWindow		\"%s\" を開けませんでした。\n%s\n
-Easy	SudokuWindow		初級
-Open file…	SudokuWindow		ファイルを開く…
-Solve single field	SudokuWindow		1箇所回答を表示
-Solve	SudokuWindow		回答を表示
-Redo	SudokuWindow		やり直し
 File	SudokuWindow		ファイル
-Advanced	SudokuWindow		中級
-Start again	SudokuWindow		ゲームをやり直す
-HTML	SudokuWindow		HTML
-Sudoku request	SudokuWindow		数独リクエスト
-Copy	SudokuWindow		コピー
-Mark valid hints	SudokuWindow		正解のヒントを表示
-Sudoku solved - congratulations!\n	SudokuWindow		数独が解けました - おめでとう!\n
+Mark invalid values	SudokuWindow		正しくない値を表示
+Solve single field	SudokuWindow		1箇所回答を表示
 Hard	SudokuWindow		上級
-Snapshot current	SudokuWindow		スナップショットを作成
+Start again	SudokuWindow		ゲームをやり直す
+New	SudokuWindow		新規ゲーム
+Easy	SudokuWindow		初級
+Undo	SudokuWindow		元に戻す
+Export as…	SudokuWindow		別形式でエクスポート…
+Quit	SudokuWindow		終了
+Redo	SudokuWindow		やり直し
+Could not open \"%s\":\n%s\n	SudokuWindow		\"%s\" を開けませんでした。\n%s\n
+Blank	SudokuWindow		空のフィールド
+Sudoku solved - congratulations!\n	SudokuWindow		数独が解けました - おめでとう!\n
 Text	SudokuWindow		テキスト
+Copy	SudokuWindow		コピー
+Solve	SudokuWindow		回答を表示
+HTML	SudokuWindow		HTML
+Advanced	SudokuWindow		中級
+Set all hints	SudokuWindow		すべてのヒントを設定
+Searching for removable values	SudokuGenerator		除ける数値を探索中
+Abort	ProgressWindow		中断
+Could not set Sudoku:\n%s\n	SudokuWindow		数独を設定できませんでした:\n%s\n
+Help	SudokuWindow		ヘルプ
+OK	SudokuWindow		OK
+Sudoku	System name		数独
+Progress monitor	ProgressWindow		進行モニター
 Creating solvable field	SudokuGenerator		回答可能なフィールドを作成中
 View	SudokuWindow		表示
-Progress monitor	ProgressWindow		進行モニター
-Set all hints	SudokuWindow		すべてのヒントを設定
-Mark invalid values	SudokuWindow		正しくない値を表示
-Blank	SudokuWindow		空のフィールド
-Help	SudokuWindow		ヘルプ
-Searching for removable values	SudokuGenerator		除ける数値を探索中
-Undo	SudokuWindow		元に戻す
-Quit	SudokuWindow		終了
+Snapshot current	SudokuWindow		スナップショットを作成
+Mark valid hints	SudokuWindow		正解のヒントを表示
+Sudoku request	SudokuWindow		数独リクエスト
+Open file…	SudokuWindow		ファイルを開く…

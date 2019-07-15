@@ -1,45 +1,44 @@
-1	korean	x-vnd.Haiku-ProcessController	2886374724
-Memory usage	ProcessController		메모리 사용량
-Idle priority	ProcessController		노는 우선순위
-Restart Deskbar	ProcessController		데스크바 다시 시작
-Custom priority	ProcessController		사용자 정의 우선순위
-This team is already gone…	ProcessController		이 팀은 이미 사라짐...
+1	korean	x-vnd.Haiku-ProcessController	961343125
 Error saving file	ProcessController		파일 저장중 오류 발생
-Real-time priority	ProcessController		실시간 우선순위
-Your setting file could not be saved!\n(%s)	ProcessController		당신의 설정 파일을 저장할 수 없습니다!\n(%s)
-This thread is already gone…	ProcessController		이 쓰레드는 이미 사라짐...
-Cancel	ProcessController		취소
 Display priority	ProcessController		디스플레이 우선순위
-Run in window	ProcessController		창으로 실행
+That's no Fun!	ProcessController		재미 없어요! 
+Your setting file could not be saved!\n(%s)	ProcessController		당신의 설정 파일을 저장할 수 없습니다!\n(%s)
 Processor %d	ProcessController		프로세서 %d
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
-ProcessController is already installed in Deskbar.	ProcessController		프로세스제어기는 이미 데스크바에 설치되었습니다.
-This is the last active processor...\nYou can't turn it off!	ProcessController		이것은 마지막 활성된 프로세서입니다...\n당신은 이것을 끌 수 없습니다!
-Info	ProcessController		정보
-Quit application	ProcessController		어플리케이션 끝내기
+Live in the Deskbar	ProcessController		데스크바에서 살리기
+OK	ProcessController		확인
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		당신은 프로세스제어기를 창으로 실행시키거나 데스크바에 설치할 수 있습니다.
+Real-time priority	ProcessController		실시간 우선순위
+Custom priority	ProcessController		사용자 정의 우선순위
+Debug this thread!	ProcessController		이 쓰레드 디버그!
 Low priority	ProcessController		낮은 우선순위
+Urgent display priority	ProcessController		긴급 디스플레이 우선순위
+Memory usage	ProcessController		메모리 사용량
+Ok!	ProcessController		확인!
+Normal priority	ProcessController		보통 우선순위
+Restart Deskbar	ProcessController		데스크바 다시 시작
+About ProcessController…	ProcessController		프로세스제어기에 관하여...
+Usage: %s [-deskbar]\n	ProcessController		사용법: %s [-deskbar]\n
+Please confirm	ProcessController		확인해주십시오
+Urgent priority	ProcessController		긴급 우선순위
 What do you want to do with the thread \"%s\"?	ProcessController		쓰레드 \"%s\"를 어떻게 하기를 원합니까?
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+Idle priority	ProcessController		노는 우선순위
+Real-time display priority	ProcessController		실시간 디스플레이 우선순위
+Threads and CPU usage	ProcessController		쓰레드와 시피유 사용량
+Quit application	ProcessController		어플리케이션 끝내기
+Info	ProcessController		정보
+Kill this thread!	ProcessController		이 쓰레드 죽이기!
+This team is already gone…	ProcessController		이 팀은 이미 사라짐...
 Gone teams…	ProcessController		팀은 사라짐...
+Quit an application	ProcessController		어플리케이션 나가기
+Cancel	ProcessController		취소
+Install in Deskbar	ProcessController		데스크바에 설치
+ProcessController	System name		프로세스제어기
 Lowest active priority	ProcessController		가장 낮은 활성 우선순위
 Restart Tracker	ProcessController		트랙커 다시 시작
-Live in the Deskbar	ProcessController		데스크바에서 살리기
-Kill this thread!	ProcessController		이 쓰레드 죽이기!
-Debug this thread!	ProcessController		이 쓰레드 디버그!
-Normal priority	ProcessController		보통 우선순위
-New Terminal	ProcessController		새 터미널
-Urgent priority	ProcessController		긴급 우선순위
-About ProcessController…	ProcessController		프로세스제어기에 관하여...
-Ok!	ProcessController		확인!
-Quit an application	ProcessController		어플리케이션 나가기
-Install in Deskbar	ProcessController		데스크바에 설치
-Threads and CPU usage	ProcessController		쓰레드와 시피유 사용량
-Urgent display priority	ProcessController		긴급 디스플레이 우선순위
-OK	ProcessController		확인
-Damned!	ProcessController		제기랄!
-Usage: %s [-deskbar]\n	ProcessController		사용법: %s [-deskbar]\n
-ProcessController	System name		프로세스제어기
-Real-time display priority	ProcessController		실시간 디스플레이 우선순위
-Please confirm	ProcessController		확인해주십시오
 System resources & caches…	ProcessController		시스템 자원 & 캐쉬...
-That's no Fun!	ProcessController		재미 없어요! 
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		당신은 프로세스제어기를 창으로 실행시키거나 데스크바에 설치할 수 있습니다.
+Damned!	ProcessController		제기랄!
+New Terminal	ProcessController		새 터미널
+ProcessController is already installed in Deskbar.	ProcessController		프로세스제어기는 이미 데스크바에 설치되었습니다.
+This thread is already gone…	ProcessController		이 쓰레드는 이미 사라짐...
+Run in window	ProcessController		창으로 실행

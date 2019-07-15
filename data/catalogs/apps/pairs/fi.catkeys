@@ -1,18 +1,18 @@
 1	finnish	x-vnd.Haiku-Pairs	818003250
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Parit-ohjelmalla ei ole tarpeeksi vektorikuvakkeita aloittamista varten; se tarvitsee vähintään %zu, löytyi %zu.\n
-%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\ttekijä: Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n
+Pairs	System name		Parit
+Quit	PairsWindow		Lopeta
+Medium	PairsWindow		Keskikokoinen
+Game	PairsWindow		Peli
 Expert (8x8)	PairsWindow		Guru (8x8)
-Beginner (4x4)	PairsWindow		Aloittelija (4x4)
+New	PairsWindow		Uusi
+OK	Pairs		Valmis
+Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Parit-ohjelmalla ei ole tarpeeksi vektorikuvakkeita aloittamista varten; se tarvitsee vähintään %zu, löytyi %zu.\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Ratkaisit pelin {0, monikko, yksi{# napsauksella} muut{# napsauksella}}.\n
+Small	PairsWindow		Pieni
+Size	PairsWindow		Koko
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\ttekijä: Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n
 Quit game	PairsWindow		Lopeta peli
 Large	PairsWindow		Suuri
-Small	PairsWindow		Pieni
-Game	PairsWindow		Peli
-OK	Pairs		Valmis
-Size	PairsWindow		Koko
-New	PairsWindow		Uusi
+Beginner (4x4)	PairsWindow		Aloittelija (4x4)
 Intermediate (6x6)	PairsWindow		Keskitaso (6x6)
-Quit	PairsWindow		Lopeta
-Pairs	System name		Parit
 New game	PairsWindow		Uusi peli
-Medium	PairsWindow		Keskikokoinen

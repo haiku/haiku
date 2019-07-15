@@ -1,15 +1,15 @@
 1	korean	x-vnd.Be-POST	2300835729
+No new messages	MailDaemon		새 메세지가 없음
+No new messages	DeskbarView		세 메세지들이 없음
+Shutdown mail services	DeskbarView		메일 서비스 끝내기
+Mail status	MailDaemon		메일 상태
 Fetching mail for %name	Notifier		%name 메일 가져오는 중
-Check for mails only	DeskbarView		메일만 확인
+Create new message…	DeskbarView		새 메세지 만들기...
 Send pending mails	DeskbarView		대기중인 메일 보내기
 New Messages	MailDaemon		새 메세지
 <no accounts>	DeskbarView		<계정 없음>
-Mail status	MailDaemon		메일 상태
-Shutdown mail services	DeskbarView		메일 서비스 끝내기
-Sending mail for %name	Notifier		%name 메일 보내는 중
-Create new message…	DeskbarView		새 메세지 만들기...
-No new messages	MailDaemon		새 메세지가 없음
-Check for mail now	DeskbarView		지금 메일 확인
-No new messages	DeskbarView		세 메세지들이 없음
-Mail daemon status log	MailDaemon		메일 데몬 상태 로그
 Mail status	Notifier		메일 상태
+Check for mails only	DeskbarView		메일만 확인
+Check for mail now	DeskbarView		지금 메일 확인
+Sending mail for %name	Notifier		%name 메일 보내는 중
+Mail daemon status log	MailDaemon		메일 데몬 상태 로그

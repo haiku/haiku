@@ -1,20 +1,20 @@
 1	slovak	x-vnd.Haiku-Login	336867745
-Error: %1	Login App		Chyba: %1
-Hide password	Login View		Skryť heslo
-Desktop	Desktop Window		Plocha
 Invalid login!	Login View		Neplatné prihlasovacie meno!
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\t Spustiť v režime úpravy políc umožňujúcom prispôsobiť plochu.\n
-OK	Login View		OK
-error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	chyba %s\n
-Login:	Login View		Prihlasovacie meno:
 Error	Login App		Chyba
-Unimplemented	Login App		Neimplementované
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\t Spustiť v režime úpravy políc umožňujúcom prispôsobiť plochu.\n
 Welcome to Haiku	Login Window		Vitajte v Haiku
-Reboot	Login View		Reštartovať
-Login application for Haiku\nUsage:\n	Login App		Prihlasovacia aplikácia Haiku\n Použitie:\n
-Info	Login App		Informácie
 Halt	Login View		Vypnúť
-Password:	Login View		Heslo:
-OK	Login App		OK
+Login application for Haiku\nUsage:\n	Login App		Prihlasovacia aplikácia Haiku\n Použitie:\n
 --nonmodal\tDo not make the window modal\n	Login App		--nonmodal\t Nevytvárať okno ako modálne\n
+Desktop	Desktop Window		Plocha
+Hide password	Login View		Skryť heslo
+Reboot	Login View		Reštartovať
 You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Pracovnú plochu zobrazenú za aplikáciou Prihlásenie môžete upraviť tým, že na ňu pretiahnete replikantov.\n\nPo skončení stačí ukončiť aplikáciu (Cmd-Q).
+OK	Login View		OK
+Info	Login App		Informácie
+Login:	Login View		Prihlasovacie meno:
+Password:	Login View		Heslo:
+Unimplemented	Login App		Neimplementované
+OK	Login App		OK
+Error: %1	Login App		Chyba: %1
+error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	chyba %s\n

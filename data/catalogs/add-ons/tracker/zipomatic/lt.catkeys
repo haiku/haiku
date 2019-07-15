@@ -1,15 +1,15 @@
 1	lithuanian	x-vnd.haiku.zip-o-matic	1573273374
-Stop	file:ZipOMaticWindow.cpp		Stabdyti
-Creating archive: %s	file:ZipOMaticWindow.cpp		Archyvo kūrimas: %s
-Continue	file:ZipOMaticWindow.cpp		Tęsti
-Preparing to archive	file:ZipperThread.cpp		Ruošiamasi archyvuoti
 Drop files here.	file:ZipOMaticWindow.cpp		Archyvuotinus failus meskite čia.
 Filename: %s	file:ZipOMaticWindow.cpp		Failo vardas: %s
-Let them continue	file:ZipOMatic.cpp		Pratęsti
 Do you want to stop them?	file:ZipOMatic.cpp		Nutraukti kūrimą?
+Error creating archive	file:ZipOMaticWindow.cpp		Klaida kuriant archyvą.
+Stop them	file:ZipOMatic.cpp		Sustabdyti vykdymą
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Ar tikrai norite nutraukti archyvo kūrimą?
+Preparing to archive	file:ZipperThread.cpp		Ruošiamasi archyvuoti
+Let them continue	file:ZipOMatic.cpp		Pratęsti
+Continue	file:ZipOMaticWindow.cpp		Tęsti
+Archive created OK	file:ZipOMaticWindow.cpp		Archyvas sėkmingai sukurtas.
+Stop	file:ZipOMaticWindow.cpp		Stabdyti
 Stopped	file:ZipOMaticWindow.cpp		Sustabdyta
 Archive	file:ZipperThread.cpp		Archyvas
-Error creating archive	file:ZipOMaticWindow.cpp		Klaida kuriant archyvą.
-Archive created OK	file:ZipOMaticWindow.cpp		Archyvas sėkmingai sukurtas.
-Stop them	file:ZipOMatic.cpp		Sustabdyti vykdymą
+Creating archive: %s	file:ZipOMaticWindow.cpp		Archyvo kūrimas: %s

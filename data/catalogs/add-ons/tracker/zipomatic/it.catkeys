@@ -1,17 +1,17 @@
 1	italian	x-vnd.haiku.zip-o-matic	2032806096
-Stop	file:ZipOMaticWindow.cpp		Interrompi
-Creating archive: %s	file:ZipOMaticWindow.cpp		Creazione archivio: %s
-Continue	file:ZipOMaticWindow.cpp		Continua
-Preparing to archive	file:ZipperThread.cpp		Preparazione all'archiviazione
 Drop files here.	file:ZipOMaticWindow.cpp		Trascina qui i file.
 Filename: %s	file:ZipOMaticWindow.cpp		Nome del file: %s
-You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matic}} attivi.\n\n
-Let them continue	file:ZipOMatic.cpp		Falli proseguire
 Do you want to stop them?	file:ZipOMatic.cpp		Vuoi interrompere?
+Error creating archive	file:ZipOMaticWindow.cpp		Errore nella creazione dell'archivio
+Stop them	file:ZipOMatic.cpp		Interrompili
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Sei sicuro di voler interrompere la creazione di questo archivio?
+Preparing to archive	file:ZipperThread.cpp		Preparazione all'archiviazione
+Let them continue	file:ZipOMatic.cpp		Falli proseguire
+Continue	file:ZipOMaticWindow.cpp		Continua
+Archive created OK	file:ZipOMaticWindow.cpp		Archivio creato con successo
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# file aggiunto.} other{# files aggiunti.}}
+Stop	file:ZipOMaticWindow.cpp		Interrompi
 Stopped	file:ZipOMaticWindow.cpp		Interrotto
 Archive	file:ZipperThread.cpp		Archivio
-Error creating archive	file:ZipOMaticWindow.cpp		Errore nella creazione dell'archivio
-{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# file aggiunto.} other{# files aggiunti.}}
-Archive created OK	file:ZipOMaticWindow.cpp		Archivio creato con successo
-Stop them	file:ZipOMatic.cpp		Interrompili
+Creating archive: %s	file:ZipOMaticWindow.cpp		Creazione archivio: %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matic}} attivi.\n\n

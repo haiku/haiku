@@ -1,50 +1,50 @@
 1	hungarian	x-vnd.Be-PEPL	2332202134
-Edit	People		Szerkesztés
-Error	People		Hiba
-City	People		Város
-The file '%name%' could not be written.	People		A(z) '%name%' fájl írása sikertelen volt.
-none	Groups list		nincs
-Configure attributes	People		Jellemzők beállítása
-Company	People		Cég
-%name% picture	People		%name% kép
-Work phone	People		Munkahelyi telefon
-People	System name		Névjegyek
-New person	People		Új névjegy
-Select all	People		Mind kijelölése
-File	People		Fájl
-Unnamed person	People		Névtelen személy
-Could not create %s.	People		%s létrehozása sikertelen.
-Country	People		Ország
-Close	People		Bezárás
-Group	People		Csoport
-Nickname	People		Becenév
-Quit	People		Kilépés
-Name	People		Név
-Revert	People		Visszaállít
-Don't save	People		Ne mentse
-Undo	People		Visszavonás
-E-mail	People		E-mail
-Load image…	People		Kép betöltése…
-OK	People		Rendben
-Remove image	People		Kép eltávolítása
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Nem sikerül elindítani a Fájltípusok programot a névjegy jellemzőinek beállításához.\n\nHiba:
-Home phone	People		Otthoni telefon
-Save as…	People		Mentés másként…
-Redo	People		Újra
-Save changes before closing?	People		Menti a változtatásokat kilépés előtt?
-Paste	People		Beillesztés
-Drop an image here,\nor use the contextual menu.	People		Húzzon ide egy képet,\nvagy válasszon a menüben.
-Save	People		Mentés
-Person	Short mimetype description		Névjegy
+Unnamed person	People		Névtelen személy
 New person…	People		Új névjegy…
 Address	People		Cím
-URL	People		URL
-Sorry	People		Sajnálom
 Zip	People		Irányítószám
-Contact information for a person.	Long mimetype description		Elérhetőség információk.
-Fax	People		Fax
+Select all	People		Mind kijelölése
+Could not create %s.	People		%s létrehozása sikertelen.
+Quit	People		Kilépés
+Company	People		Cég
+Name	People		Név
+The file '%name%' could not be written.	People		A(z) '%name%' fájl írása sikertelen volt.
 Contact name	People		Kapcsolat neve
-Cut	People		Kivágás
 Cancel	People		Mégse
+Edit	People		Szerkesztés
+Save changes before closing?	People		Menti a változtatásokat kilépés előtt?
+People	System name		Névjegyek
+Error	People		Hiba
+Revert	People		Visszaállít
+Country	People		Ország
+Person	Short mimetype description		Névjegy
+New person	People		Új névjegy
+Save	People		Mentés
+Fax	People		Fax
+URL	People		URL
+%name% picture	People		%name% kép
+Home phone	People		Otthoni telefon
+none	Groups list		nincs
+Save as…	People		Mentés másként…
+Cut	People		Kivágás
+Contact information for a person.	Long mimetype description		Elérhetőség információk.
+Remove image	People		Kép eltávolítása
+City	People		Város
+Undo	People		Visszavonás
+Don't save	People		Ne mentse
+Configure attributes	People		Jellemzők beállítása
+Work phone	People		Munkahelyi telefon
 State	People		Megye
+Nickname	People		Becenév
+OK	People		Rendben
+File	People		Fájl
+Redo	People		Újra
+Close	People		Bezárás
 Copy	People		Másolás
+Paste	People		Beillesztés
+E-mail	People		E-mail
+Group	People		Csoport
+Drop an image here,\nor use the contextual menu.	People		Húzzon ide egy képet,\nvagy válasszon a menüben.
+Load image…	People		Kép betöltése…
+Sorry	People		Sajnálom

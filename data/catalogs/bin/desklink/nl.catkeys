@@ -1,16 +1,16 @@
-1	dutch; flemish	x-vnd.Haiku-desklink	3940727097
-Control physical output	MediaReplicant		Controleer fysieke uitvoer
-Couldn't launch 	MediaReplicant		Kon niet gestart worden
-Muted	MediaReplicant		Geluid uitgezet
-OK	MediaReplicant		OK
+1	dutch; flemish	x-vnd.Haiku-desklink	3568085956
+desklink	MediaReplicant	Title of an alert box	desklink
 Sound preferences…	MediaReplicant		Geluidsvoorkeuren...
+Muted	MediaReplicant		Geluid uitgezet
 %g dB	MediaReplicant		%g dB
-Open %name	DeskButton	Don't translate variable %name	%name openen
-No media server running	VolumeControl		Geen mediaserver actief
-Media preferences…	MediaReplicant		Mediavoorkeuren...
-%d dB	VolumeControl		%d dB
+OK	MediaReplicant		OK
+Couldn't launch 	MediaReplicant		Kon niet gestart worden
+Volume	VolumeControl		Volume
 Open MediaPlayer	MediaReplicant		MediaPlayer openen
-desklink	MediaReplicant		desklink
+%d dB	VolumeControl		%d dB
+Media preferences…	MediaReplicant		Mediavoorkeuren...
 Options	MediaReplicant		Opties
 Beep	MediaReplicant		Geluidssignaal
-Volume	VolumeControl		Volume
+Open %name	DeskButton	Don't translate variable %name	%name openen
+Control physical output	MediaReplicant		Controleer fysieke uitvoer
+No media server running	VolumeControl		Geen mediaserver actief

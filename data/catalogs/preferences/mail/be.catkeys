@@ -1,50 +1,50 @@
 1	belarusian	x-vnd.Haiku-Mail	688530788
+Account settings	AutoConfigWindow		Наладкі рахунка
+\t\t· Outgoing	Config Window		\t\t· Выходны
+E-mail address:	E-Mail		Адрас E-mail:
+Create new account	AutoConfigWindow		Стварыць новы рахунак
+While sending and receiving	Config Window		Пры адпраўцы і атрыманні
+Apply	Config Window		Прымяніць
+Incoming mail filters	Config Views		Уваходныя фільтры пошты
+Outgoing mail filters	Config Views		Фільтры выходнай пошты
+Server name:	E-Mail		Імя серверу:
+Add	Config Window		Дадаць
+Back	AutoConfigWindow		Назад
+Real name:	E-Mail		Рэальнае імя:
+Real name:	Config Views		Рэальнае імя:
+\t\t· E-mail filters	Config Window		\t\t· Фільтры е-пошты
+Outgoing	E-Mail		Выходны
+Accounts	Config Window		Акаунты
+Outgoing	Config Window		Выходны
+Remove	Config Views		Выдаліць
 Settings	Config Window		Наладкі
 Never	Config Window	show status window	Ніколі
-While sending and receiving	Config Window		Пры адпраўцы і атрыманні
-Incoming	Config Window		Уваходны
-Server name:	E-Mail		Імя серверу:
-OK	Config Window		ОК
-E-mail address:	E-Mail		Адрас E-mail:
-Account name:	E-Mail		Імя акаунта:
 Account name:	Config Views		Імя акаунту:
-Create new account	AutoConfigWindow		Стварыць новы рахунак
-OK	Config Views		ОК
-The filter could not be moved. Deleting filter.	Config Views		Немагчыма перамесціць фільтар. Фільтар выдаляецца.
-Revert	Config Window		Адмяніць
-Login name:	E-Mail		Імя карыстача:
-Incoming	E-Mail		Уваходны
-Password:	E-Mail		Пароль:
-Accounts	Config Window		Акаунты
-Finish	AutoConfigWindow		Скончыць
-Remove	Config Window		Выдаліць
-Server Name:	E-Mail		Імя сервера:
-While sending	Config Window		Пры адапраўленні
+\t\t· Incoming	Config Window		\t\t· Уваходны
 Enter a valid e-mail address.	AutoConfigWindow		Увядзіце адрас е-пошты.
-Add	Config Window		Дадаць
-Account settings	AutoConfigWindow		Наладкі рахунка
-E-mail	System name		Е-Пошта
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nАгульныя опцыі немагчыма адмяніць.\n\nПамылка пры атрыманні агульных опцый:\n%s\n
-Real name:	Config Views		Рэальнае імя:
-\t\t· Outgoing	Config Window		\t\t· Выходны
+Incoming	E-Mail		Уваходны
 Choose Protocol	E-Mail		Выбраць пратакол
 Return address:	Config Views		Адрас звароту:
-Edit mailbox menu…	Config Window		Правіць меню паштовай скрыні…
-Outgoing	E-Mail		Выходны
-\t\t· E-mail filters	Config Window		\t\t· Фільтры е-пошты
-Remove	Config Views		Выдаліць
-\t\t· Incoming	Config Window		\t\t· Уваходны
-Next	AutoConfigWindow		Далей
-Check every	Config Window		Правяраць кожныя
-Back	AutoConfigWindow		Назад
-Incoming mail filters	Config Views		Уваходныя фільтры пошты
+Password:	E-Mail		Пароль:
+Error retrieving general settings: %s\n	Config Window		Памылка пры атрыманні агульных наладак: %s\n
+The filter could not be moved. Deleting filter.	Config Views		Немагчыма перамесціць фільтар. Фільтар выдаляецца.
+OK	Config Views		ОК
+Revert	Config Window		Адмяніць
+Incoming	Config Window		Уваходны
+Finish	AutoConfigWindow		Скончыць
+Add filter	Config Views		Дадаць фільтр
 Account settings	Config Views		Наладкі акаунту
 minutes	Config Window		хвілін
-Error retrieving general settings: %s\n	Config Window		Памылка пры атрыманні агульных наладак: %s\n
-Real name:	E-Mail		Рэальнае імя:
-Apply	Config Window		Прымяніць
+E-mail	System name		Е-Пошта
+Check every	Config Window		Правяраць кожныя
+Account name:	E-Mail		Імя акаунта:
+Edit mailbox menu…	Config Window		Правіць меню паштовай скрыні…
+Server Name:	E-Mail		Імя сервера:
+Remove	Config Window		Выдаліць
+Login name:	E-Mail		Імя карыстача:
+While sending	Config Window		Пры адапраўленні
+OK	Config Window		ОК
 OK	AutoConfigWindow		ОК
-Add filter	Config Views		Дадаць фільтр
-Outgoing	Config Window		Выходны
-Outgoing mail filters	Config Views		Фільтры выходнай пошты
+Next	AutoConfigWindow		Далей
 Error	Config Window		Памылка

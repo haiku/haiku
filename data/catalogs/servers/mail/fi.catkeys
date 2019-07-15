@@ -1,19 +1,19 @@
 1	finnish	x-vnd.Be-POST	2949558073
+No new messages	MailDaemon		Ei uusia viestejä
+No new messages	DeskbarView		Ei uusia viestejä
+Shutdown mail services	DeskbarView		Sulje sähköpostipalvelut
+Mail status	MailDaemon		Sähköpostitila
 Fetching mail for %name	Notifier		Noudetaan sähköpostia vastaanottajalle %name
-Check for mails only	DeskbarView		Tarkista vain sähköpostit
-Send pending mails	DeskbarView		Lähetä odottamassa olevat sähköpostit
-{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Yksi uusi viesti} other{# uutta viestiä}}
 {0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# uusi viesti} other{# uutta viestiä}}
 {0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# uusi viesti} other{# uutta viestiä}} lähettäjältä %name\n
+Create new message…	DeskbarView		Luo uusi viesti...
+Send pending mails	DeskbarView		Lähetä odottamassa olevat sähköpostit
+Settings…	DeskbarView		Asetukset…
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Yksi uusi viesti} other{# uutta viestiä}}
 New Messages	MailDaemon		Uudet viestit
 <no accounts>	DeskbarView		<ei tiliä>
-Mail status	MailDaemon		Sähköpostitila
-Shutdown mail services	DeskbarView		Sulje sähköpostipalvelut
-Sending mail for %name	Notifier		Lähetetään sähköpostia vastaanottajalle %name
-Create new message…	DeskbarView		Luo uusi viesti...
-No new messages	MailDaemon		Ei uusia viestejä
-Check for mail now	DeskbarView		Tarkista sähköposti nyt
-No new messages	DeskbarView		Ei uusia viestejä
-Mail daemon status log	MailDaemon		Sähköpostitaustaohjelman tilaloki
-Settings…	DeskbarView		Asetukset…
 Mail status	Notifier		Sähköpostitila
+Check for mails only	DeskbarView		Tarkista vain sähköpostit
+Check for mail now	DeskbarView		Tarkista sähköposti nyt
+Sending mail for %name	Notifier		Lähetetään sähköpostia vastaanottajalle %name
+Mail daemon status log	MailDaemon		Sähköpostitaustaohjelman tilaloki

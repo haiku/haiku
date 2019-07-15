@@ -1,35 +1,35 @@
 1	hungarian	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		Mentett állás visszaállítása
-Could not set Sudoku:\n%s\n	SudokuWindow		Nem sikerült beállítani ezt:\n%s\n
-Export as…	SudokuWindow		Exportálás…
-OK	SudokuWindow		Rendben
-New	SudokuWindow		Új
-Abort	ProgressWindow		Megszakítás
-Sudoku	System name		Sudoku
-Could not open \"%s\":\n%s\n	SudokuWindow		Nem lehetett megnyitni: %s\n%s\n
-Easy	SudokuWindow		Könnyű
-Open file…	SudokuWindow		Fájl megnyitása…
-Solve single field	SudokuWindow		Egy mező megoldása
-Solve	SudokuWindow		Megoldás
-Redo	SudokuWindow		Újra
 File	SudokuWindow		Fájl
-Advanced	SudokuWindow		Haladó
-Start again	SudokuWindow		Újrakezdés
-HTML	SudokuWindow		HTML
-Sudoku request	SudokuWindow		Sudoku kérés
-Copy	SudokuWindow		Másolás
-Mark valid hints	SudokuWindow		Érvényes mezők megjelölése
-Sudoku solved - congratulations!\n	SudokuWindow		Sudoku megoldva - gratulálunk!\n
+Mark invalid values	SudokuWindow		Érvénytelen mezők bejelölése
+Solve single field	SudokuWindow		Egy mező megoldása
 Hard	SudokuWindow		Nehéz
-Snapshot current	SudokuWindow		Jelenlegi állás mentése
+Start again	SudokuWindow		Újrakezdés
+New	SudokuWindow		Új
+Easy	SudokuWindow		Könnyű
+Undo	SudokuWindow		Visszavonás
+Export as…	SudokuWindow		Exportálás…
+Quit	SudokuWindow		Kilépés
+Redo	SudokuWindow		Újra
+Could not open \"%s\":\n%s\n	SudokuWindow		Nem lehetett megnyitni: \"%s\":\n%s\n
+Blank	SudokuWindow		Üres
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku megoldva - gratulálunk!\n
 Text	SudokuWindow		Szöveg
+Copy	SudokuWindow		Másolás
+Solve	SudokuWindow		Megoldás
+HTML	SudokuWindow		HTML
+Advanced	SudokuWindow		Haladó
+Set all hints	SudokuWindow		Összes javaslat
+Searching for removable values	SudokuGenerator		Eltávolítható értékek keresése
+Abort	ProgressWindow		Megszakítás
+Could not set Sudoku:\n%s\n	SudokuWindow		Nem sikerült beállítani ezt:\n%s\n
+Help	SudokuWindow		Segítség
+OK	SudokuWindow		Rendben
+Sudoku	System name		Sudoku
+Progress monitor	ProgressWindow		Állapot kijelzése
 Creating solvable field	SudokuGenerator		Megoldható mező készítése
 View	SudokuWindow		Nézet
-Progress monitor	ProgressWindow		Állapot kijelzése
-Set all hints	SudokuWindow		Összes javaslat
-Mark invalid values	SudokuWindow		Érvénytelen mezők bejelölése
-Blank	SudokuWindow		Üres
-Help	SudokuWindow		Segítség
-Searching for removable values	SudokuGenerator		Eltávolítható értékek keresése
-Undo	SudokuWindow		Visszavonás
-Quit	SudokuWindow		Kilépés
+Snapshot current	SudokuWindow		Jelenlegi állás mentése
+Mark valid hints	SudokuWindow		Érvényes mezők megjelölése
+Sudoku request	SudokuWindow		Sudoku kérés
+Open file…	SudokuWindow		Fájl megnyitása…

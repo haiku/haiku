@@ -1,54 +1,54 @@
 1	finnish	x-vnd.Haiku-Mail	2750130554
+Account settings	AutoConfigWindow		Tiliasetukset
+\t\t· Outgoing	Config Window		\t\t· Lähtevä
+An error occurred while creating the config view: %error.	Config Views		Asetusnäkymää luodessa tapahtui virhe: %error.
+E-mail address:	E-Mail		Sähköpostiosoite:
+Create new account	AutoConfigWindow		Luo uusi tili
+While sending and receiving	Config Window		Lähetettäessä ja vastaanotettaessa
+Error!	Config Views		Virhe!
+Apply	Config Window		Käytä
+Incoming mail filters	Config Views		Tulevan postin suodattimet
+Outgoing mail filters	Config Views		Lähtevän postin suodattimet
+Server name:	E-Mail		Palvelinnimi:
+Add	Config Window		Lisää
+Back	AutoConfigWindow		Takaisin
+Real name:	E-Mail		Oikea nimi:
+Real name:	Config Views		Oikea nimi:
+\t\t· E-mail filters	Config Window		\t\t· Sähköpostisuodattimet
+Outgoing	E-Mail		Lähtevä
+Accounts	Config Window		Tilit
+Outgoing	Config Window		Lähtevä
+Remove	Config Views		Poista
+Show notifications:	Config Window		Näytä ilmoitukset:
 Settings	Config Window		Asetukset
 Never	Config Window	show status window	Ei koskaan
-While sending and receiving	Config Window		Lähetettäessä ja vastaanotettaessa
-Incoming	Config Window		Tuleva
-Server name:	E-Mail		Palvelinnimi:
-An error occurred while creating the config view: %error.	Config Views		Asetusnäkymää luodessa tapahtui virhe: %error.
-OK	Config Window		Valmis
-E-mail address:	E-Mail		Sähköpostiosoite:
-Account name:	E-Mail		Tilinimi:
 Account name:	Config Views		Tilin nimi:
-Create new account	AutoConfigWindow		Luo uusi tili
-OK	Config Views		Valmis
-The filter could not be moved. Deleting filter.	Config Views		Suodattimen siirtäminen epäonnistui. Poistetaan suodatin.
-Revert	Config Window		Palauta
-Login name:	E-Mail		Kirjautumisnimi:
-Incoming	E-Mail		Tuleva
-Password:	E-Mail		Salasana:
-Accounts	Config Window		Tilit
-Finish	AutoConfigWindow		Valmis
-Remove	Config Window		Poista
-Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Luo uusi tili Lisää-painikkeella.\n\nPoista tili valitusta kohdasta Poista-painikkeella.\n\nValitse rivi luettelosta sen asetusten muuttamiseksi.
-Error!	Config Views		Virhe!
-Server Name:	E-Mail		Palvelinnimi:
-While sending	Config Window		Lähetettäessä
-Show notifications:	Config Window		Näytä ilmoitukset:
+\t\t· Incoming	Config Window		\t\t· Tuleva
 Enter a valid e-mail address.	AutoConfigWindow		Kirjoita kelvollinen sähköpostiosoite.
-Add	Config Window		Lisää
-Account settings	AutoConfigWindow		Tiliasetukset
-E-mail	System name		Sähköpostiasetukset
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nYleisasetusten palauttaminen epäonnistui.\n\nVirhe noudettaessa yleisasetuksia:\n%s\n
-Real name:	Config Views		Oikea nimi:
-\t\t· Outgoing	Config Window		\t\t· Lähtevä
+Incoming	E-Mail		Tuleva
 Choose Protocol	E-Mail		Valitse yhteyskäytäntö
 Return address:	Config Views		Paluuosoite:
-Edit mailbox menu…	Config Window		Muokkaa sähköpostilaatikkovalikkoa...
-Outgoing	E-Mail		Lähtevä
-\t\t· E-mail filters	Config Window		\t\t· Sähköpostisuodattimet
-Remove	Config Views		Poista
-\t\t· Incoming	Config Window		\t\t· Tuleva
-Next	AutoConfigWindow		Seuraava
-Check every	Config Window		Tarkista joka
-Back	AutoConfigWindow		Takaisin
-Incoming mail filters	Config Views		Tulevan postin suodattimet
+Password:	E-Mail		Salasana:
+Error retrieving general settings: %s\n	Config Window		Virhe noudettaessa yleisasetuksia: %s\n
+The filter could not be moved. Deleting filter.	Config Views		Suodattimen siirtäminen epäonnistui. Poistetaan suodatin.
+OK	Config Views		Valmis
+Revert	Config Window		Palauta
+Incoming	Config Window		Tuleva
+Finish	AutoConfigWindow		Valmis
+Add filter	Config Views		Lisää suodatin
 Account settings	Config Views		Tiliasetukset
 minutes	Config Window		minuuttia
-Error retrieving general settings: %s\n	Config Window		Virhe noudettaessa yleisasetuksia: %s\n
-Real name:	E-Mail		Oikea nimi:
-Apply	Config Window		Käytä
+E-mail	System name		Sähköpostiasetukset
+Check every	Config Window		Tarkista joka
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Luo uusi tili Lisää-painikkeella.\n\nPoista tili valitusta kohdasta Poista-painikkeella.\n\nValitse rivi luettelosta sen asetusten muuttamiseksi.
+Account name:	E-Mail		Tilinimi:
+Edit mailbox menu…	Config Window		Muokkaa sähköpostilaatikkovalikkoa...
+Server Name:	E-Mail		Palvelinnimi:
+Remove	Config Window		Poista
+Login name:	E-Mail		Kirjautumisnimi:
+While sending	Config Window		Lähetettäessä
+OK	Config Window		Valmis
 OK	AutoConfigWindow		Valmis
-Add filter	Config Views		Lisää suodatin
-Outgoing	Config Window		Lähtevä
-Outgoing mail filters	Config Views		Lähtevän postin suodattimet
+Next	AutoConfigWindow		Seuraava
 Error	Config Window		Virhe

@@ -1,20 +1,20 @@
 1	swedish	x-vnd.Haiku-Touchpad	607725922
 Scrolling	TouchpadPrefView		Svepning
-Touchpad	System name		Pekplatta
-Revert	TouchpadPrefView		Återställ
 Tapping	TouchpadPrefView		Knackning
-Please confirm	TouchpadPrefView		Vänligen bekräfta
-Two finger scrolling	TouchpadPrefView		Tvåfingersvepning
-Defaults	TouchpadPrefView		Förval
-Slow	TouchpadPrefView		Långsam
-Vertical	TouchpadPrefView		Vertikal
-High	TouchpadPrefView		Hög
-Horizontal scrolling	TouchpadPrefView		Horisontell svepning
-Fast	TouchpadPrefView		Snabb
-OK	TouchpadPrefView		OK
-Acceleration	TouchpadPrefView		Acceleration
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Den nya svepningsytan är så stor att den kan hindra normal användning. Vill du verkligen ändra inställningen?
-Horizontal	TouchpadPrefView		Horisontell
-Off	TouchpadPrefView		Av
-Sensitivity	TouchpadPrefView		Känslighet
+Touchpad	System name		Pekplatta
 Cancel	TouchpadPrefView		Avbryt
+OK	TouchpadPrefView		OK
+Horizontal scrolling	TouchpadPrefView		Horisontell svepning
+Slow	TouchpadPrefView		Långsam
+Two finger scrolling	TouchpadPrefView		Tvåfingersvepning
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Den nya svepningsytan är så stor att den kan hindra normal användning. Vill du verkligen ändra inställningen?
+Defaults	TouchpadPrefView		Förval
+High	TouchpadPrefView		Hög
+Off	TouchpadPrefView		Av
+Fast	TouchpadPrefView		Snabb
+Vertical	TouchpadPrefView		Vertikal
+Please confirm	TouchpadPrefView		Vänligen bekräfta
+Acceleration	TouchpadPrefView		Acceleration
+Horizontal	TouchpadPrefView		Horisontell
+Sensitivity	TouchpadPrefView		Känslighet
+Revert	TouchpadPrefView		Återställ

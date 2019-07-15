@@ -1,48 +1,47 @@
-1	belarusian	x-vnd.Haiku-Pulse	2324471783
-OK	PrefsWindow		ОК
-Quit	DeskbarPulseView		Выйсці
-Mini mode	DeskbarPulseView		Міні рэжым
-Remove replicant	CPUButton		Выдаліць рэпліканта
-Active color	ConfigView		Актыўны колер
-Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Карыстанне: [--mini] [-w шырыня] [--width=шырыня]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
-Fade colors	ConfigView		Колеры марнення
-%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nРаспрацаваны David Ramsey і Arve Hjønnevåg\nПерагледжаны Daniel Switkin\n
-OK	DeskbarPulseView		ОК
-Deskbar mode	PrefsWindow		Рэжым Deskbar
-%.2f GHz	NormalPulseView		%.2f ГГц
-Normal mode	PrefsWindow		Звычайны рэжым
-Defaults	PrefsWindow		Прадвызначаныя
-Normal mode	MiniPulseView		Звычайны рэжым
-Error	PulseApp		Памылка
-Info	PulseView		Інфа
-Deskbar	CPUButton		Deskbar
-Frame color	ConfigView		Колер рамкі
-Mini mode	PrefsWindow		Міні-рэжым
-OK	PulseApp		ОК
-Bar colors	ConfigView		Колеры панэлі
-Settings…	PulseView		Наладкі…
-You can't disable the last active CPU.	PulseView		Вы не можаце выключыць апошні актыўны ЦП.
-Info	PulseApp		Інфа
-Info	CPUButton		Інфа
-OK	PulseView		ОК
-Deskbar menu	CPUButton		Меню Deskbar
-About Pulse…	PulseView		Пра Пульс…
-Deskbar mode	MiniPulseView		Рэжым Deskbar
-Quit	MiniPulseView		Выйсці
-Pulse	System name		Пульс
-Pulse	NormalPulseView		Пульс
-%ld MHz	NormalPulseView		%ld МГц
-Deskbar mode	NormalPulseView		Рэжым Deskbar
-Pulse	PulseApp		Пульс
-Width of icon:	ConfigView		Шырыня іконкі:
-You can't disable the last active CPU.	CPUButton		Вы не можаце выключыць апошні актыўны ЦП.
+1	belarusian	x-vnd.Haiku-Pulse	3788463253
 Normal mode	DeskbarPulseView		Звычайны рэжым
-OK	CPUButton		ОК
-About Pulse…	CPUButton		Пра Пульс…
-Removing from Deskbar failed.\n%s	DeskbarPulseView		Немагчыма выдаліць з Deskbar.\n%s
-Mini mode	NormalPulseView		Міні-рэжым
+Info	CPUButton		Інфа
+Quit	DeskbarPulseView		Выйсці
 Info	DeskbarPulseView		Інфа
-Pulse settings	PulseWindow		Наладкі Пульса
-Idle color	ConfigView		Неактыўны колер
-Installing in Deskbar failed\n%s	PulseApp		Немагчыма ўсталяваць у Deskbar.\n%s
+Normal mode	MiniPulseView		Звычайны рэжым
+Frame color	ConfigView		Колер рамкі
+Error	PulseApp		Памылка
+Bar colors	ConfigView		Колеры панэлі
+%.2f GHz	NormalPulseView		%.2f ГГц
+Defaults	PrefsWindow		Прадвызначаныя
+%ld MHz	NormalPulseView		%ld МГц
+Mini mode	PrefsWindow		Міні-рэжым
 CPU progress bar	NormalPulseView		Панель прагрэсу ЦП
+Fade colors	ConfigView		Колеры марнення
+About Pulse…	PulseView		Пра Пульс…
+Pulse	NormalPulseView		Пульс
+Deskbar mode	NormalPulseView		Рэжым Deskbar
+Remove replicant	CPUButton		Выдаліць рэпліканта
+You can't disable the last active CPU.	PulseView		Вы не можаце выключыць апошні актыўны ЦП.
+Width of icon:	ConfigView		Шырыня іконкі:
+Deskbar mode	MiniPulseView		Рэжым Deskbar
+OK	PulseView		ОК
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nРаспрацаваны David Ramsey і Arve Hjønnevåg\nПерагледжаны Daniel Switkin\n
+OK	PrefsWindow		ОК
+Pulse	PulseApp		Пульс
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Немагчыма выдаліць з Deskbar.\n%s
+OK	PulseApp		ОК
+About Pulse…	CPUButton		Пра Пульс…
+Deskbar mode	PrefsWindow		Рэжым Deskbar
+Mini mode	DeskbarPulseView		Міні рэжым
+You can't disable the last active CPU.	CPUButton		Вы не можаце выключыць апошні актыўны ЦП.
+OK	CPUButton		ОК
+Deskbar	CPUButton		Deskbar
+Settings…	PulseView		Наладкі…
+Deskbar menu	CPUButton		Меню Deskbar
+Mini mode	NormalPulseView		Міні-рэжым
+Quit	MiniPulseView		Выйсці
+Info	PulseView		Інфа
+OK	DeskbarPulseView		ОК
+Info	PulseApp		Інфа
+Pulse	System name		Пульс
+Active color	ConfigView		Актыўны колер
+Installing in Deskbar failed\n%s	PulseApp		Немагчыма ўсталяваць у Deskbar.\n%s
+Idle color	ConfigView		Неактыўны колер
+Normal mode	PrefsWindow		Звычайны рэжым
+Pulse settings	PulseWindow		Наладкі Пульса

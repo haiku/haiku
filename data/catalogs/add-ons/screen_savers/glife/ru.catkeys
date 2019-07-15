@@ -1,15 +1,13 @@
-1	russian	x-vnd.Haiku-GLifeScreensaver	1707534289
-Grid Border: %li	GLife ScreenSaver		Граница сетки: %li
-Grid Width: 	GLife ScreenSaver		Ширина сетки: 
-none	GLife ScreenSaver		нет
-Grid Height: 	GLife ScreenSaver		Высота сетки: 
-%sx	GLife ScreenSaver	This is a factor: the x represents 'times'	%sx
+1	russian	x-vnd.Haiku-GLifeScreensaver	2074508370
+by Aaron Hill	GLife ScreenSaver		разработал Aaron Hill
 None	GLife ScreenSaver		Нет
+none	GLife ScreenSaver		нет
+Grid Height: %li	GLife ScreenSaver		Высота сетки: %li
+Grid Width: 	GLife ScreenSaver		Ширина сетки: 
+Grid Border: %li	GLife ScreenSaver		Граница сетки: %li
+Grid Border: 	GLife ScreenSaver		Граница сетки: 
+OpenGL \"Game of Life\"	GLife ScreenSaver		OpenGL \"Игра Жизнь\"
+Grid Height: 	GLife ScreenSaver		Высота сетки: 
 4x	GLife ScreenSaver	This is a factor: the x represents 'times'	4x
 Grid Width: %li	GLife ScreenSaver		Ширина сетки: %li
-Grid Height: %li	GLife ScreenSaver		Высота сетки: %li
 Grid Life Delay: 	GLife ScreenSaver		Задержка сетки Жизнь: 
-OpenGL \"Game of Life\"	GLife ScreenSaver		OpenGL \"Игра Жизнь\"
-Grid Life Delay: %s	GLife ScreenSaver		Задержка сетки Жизнь: %s
-Grid Border: 	GLife ScreenSaver		Граница сетки: 
-by Aaron Hill	GLife ScreenSaver		разработал Aaron Hill

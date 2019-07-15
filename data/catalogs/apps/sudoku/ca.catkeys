@@ -1,32 +1,32 @@
 1	catalan; valencian	x-vnd.Haiku-Sudoku	283857338
-Could not set Sudoku:\n%s\n	SudokuWindow		No ha estat possible iniciar el Sudoku:\n%s\n
-Export as…	SudokuWindow		Exporta com a...
-OK	SudokuWindow		D'acord
-New	SudokuWindow		Nou
-Abort	ProgressWindow		Interromp
-Sudoku	System name		Sudoku
-Could not open \"%s\":\n%s\n	SudokuWindow		No ha estat possible obrir \"%s\":\n%s\n
-Easy	SudokuWindow		Fàcil
-Open file…	SudokuWindow		Obre un fitxer...
-Solve single field	SudokuWindow		Resol una casella
-Solve	SudokuWindow		Resol
-Redo	SudokuWindow		Refés
 File	SudokuWindow		Fitxer
-Advanced	SudokuWindow		Avançat
-Start again	SudokuWindow		Torna a començar
-HTML	SudokuWindow		HTML
-Sudoku request	SudokuWindow		Demana un Sudoku
-Copy	SudokuWindow		Copia
-Mark valid hints	SudokuWindow		Marca les pistes no vàlides
-Sudoku solved - congratulations!\n	SudokuWindow		Heu resolt el Sudoku - Enhorabona!\n
+Mark invalid values	SudokuWindow		Marca els valors no vàlids
+Solve single field	SudokuWindow		Resol una casella
 Hard	SudokuWindow		Difícil
+Start again	SudokuWindow		Torna a començar
+New	SudokuWindow		Nou
+Easy	SudokuWindow		Fàcil
+Undo	SudokuWindow		Desfés
+Export as…	SudokuWindow		Exporta com a...
+Quit	SudokuWindow		Surt
+Redo	SudokuWindow		Refés
+Could not open \"%s\":\n%s\n	SudokuWindow		No ha estat possible obrir \"%s\":\n%s\n
+Blank	SudokuWindow		En blanc
+Sudoku solved - congratulations!\n	SudokuWindow		Heu resolt el Sudoku - Enhorabona!\n
 Text	SudokuWindow		Text
+Copy	SudokuWindow		Copia
+Solve	SudokuWindow		Resol
+HTML	SudokuWindow		HTML
+Advanced	SudokuWindow		Avançat
+Searching for removable values	SudokuGenerator		S'estan cercant els valors eliminables
+Abort	ProgressWindow		Interromp
+Could not set Sudoku:\n%s\n	SudokuWindow		No ha estat possible iniciar el Sudoku:\n%s\n
+Help	SudokuWindow		Ajuda
+OK	SudokuWindow		D'acord
+Sudoku	System name		Sudoku
+Progress monitor	ProgressWindow		Indicador de progrés
 Creating solvable field	SudokuGenerator		S'esta creant un camp resoluble
 View	SudokuWindow		Visualitza
-Progress monitor	ProgressWindow		Indicador de progrés
-Mark invalid values	SudokuWindow		Marca els valors no vàlids
-Blank	SudokuWindow		En blanc
-Help	SudokuWindow		Ajuda
-Searching for removable values	SudokuGenerator		S'estan cercant els valors eliminables
-Undo	SudokuWindow		Desfés
-Quit	SudokuWindow		Surt
+Mark valid hints	SudokuWindow		Marca les pistes no vàlides
+Sudoku request	SudokuWindow		Demana un Sudoku
+Open file…	SudokuWindow		Obre un fitxer...

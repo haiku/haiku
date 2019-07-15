@@ -1,20 +1,20 @@
 1	korean	x-vnd.Haiku-Media	2605101563
-Couldn't add volume control in Deskbar: %s\n	Media views		데스크바에서 음량 제어판을 더할 수 없음: %s\n
-Video input:	Media views		비디오 입력:
-Defaults	Media views		기본설정
+Audio mixer	Media Window		오디오 믹서
+Show volume control on Deskbar	Media views		데스크바에 볼륨 컨트롤 보여주기
 Quit	Media Window		나가기
-Video settings	Media Window		비디오 설정
-Video output:	Media views		비디오 출력:
-Could not connect to the media server.\nWould you like to start it ?	Media Window		미디어 서버에 연결 할 수 없습니다.\n 당신은 시작시키시겠습니까?
 Restart media services	Media views		미디어 서비스 재시작
+Couldn't add volume control in Deskbar: %s\n	Media views		데스크바에서 음량 제어판을 더할 수 없음: %s\n
+Start media server	Media Window		미디어 서버 시작
+Audio settings	Media Window		오디오 설정
 Couldn't remove volume control in Deskbar: %s\n	Media views		데스크바에서 음량 제어판을 제거 할 수 없음: %s\n
 Media	System name		미디어
-Audio mixer	Media Window		오디오 믹서
-This hardware has no controls.	Media Window		이 하드웨어는 어떤 컨트롤도 없습니다.
+Video output:	Media views		비디오 출력:
 Audio output:	Media views		오디오 출력:
-Audio settings	Media Window		오디오 설정
-Start media server	Media Window		미디어 서버 시작
-<none>	Media views		<없음>
-Channel:	Media views		채널:
-Show volume control on Deskbar	Media views		데스크바에 볼륨 컨트롤 보여주기
+Video input:	Media views		비디오 입력:
 Audio input:	Media views		오디오 입력:
+<none>	Media views		<없음>
+This hardware has no controls.	Media Window		이 하드웨어는 어떤 컨트롤도 없습니다.
+Channel:	Media views		채널:
+Defaults	Media views		기본설정
+Could not connect to the media server.\nWould you like to start it ?	Media Window		미디어 서버에 연결 할 수 없습니다.\n 당신은 시작시키시겠습니까?
+Video settings	Media Window		비디오 설정

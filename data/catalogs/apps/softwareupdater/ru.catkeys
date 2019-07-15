@@ -1,53 +1,56 @@
-1	russian	x-vnd.haiku-softwareupdater	1853831864
-No active network connection was found	UpdateManager	Error message	Отсутствует соединение с сетью
-Cancel	SoftwareUpdaterWindow		Отмена
-Packages are being updated	UpdateManager		Пакеты были обновлены
-Update now	SoftwareUpdaterWindow		Обновить сейчас
-Updates did not complete	UpdateAction		Обновление не было завершено
-Checking for updates	CheckManager		Проверка обновлений
-%count% packages have available updates	CheckManager		Для %count% пакетов имеются обновления
-SoftwareUpdater	System name		Обновление программ
-Fatal error while checking for updates: %s\n	CheckAction		Ошибка при проверки обновлений: %s\n
-No remote repositories are available	UpdateManager	Error message	Нет доступных репозиториев
-No updates available	UpdateAction		Обновления отсутствуют
-Downloading packages	UpdateManager		Загрузка пакетов
-Attempting to cancel the updates...	SoftwareUpdaterWindow		Попытка отменить обновления...
-from repository	SoftwareUpdaterWindow	List item text	из репозитория
-Cancel	SoftwareUpdaterWindow	Alert button label	Отмена
-Click here to install updates.	CheckManager		Нажмите здесь, чтобы установить обновления.
-The following changes will be made:	SoftwareUpdaterWindow		Будут произведены следующие изменения:
-Available updates found	CheckManager		Найдены доступные обновления
-Checking for updates	SoftwareUpdaterWindow		Проверка наличия обновлений
-Quit	SoftwareUpdaterWindow	Alert button label	Выйти
-Cancelling updates	SoftwareUpdaterWindow		Отмена обновлений
-Updating version	SoftwareUpdaterWindow	List item text	Обновляемая версии
-Applying changes	UpdateManager		Применение изменений
-Quit	SoftwareUpdaterWindow		Выйти
-No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Нет доступных репозиториев. Пожалуйста проверьте, включены ли они используя панель Репозитории или команду 'pkgman'.
-There were no updates found.	UpdateAction		Обновления не были найдены.
-Uninstalling version	SoftwareUpdaterWindow	List item text	Удаляемая версия
-Packages to be updated	SoftwareUpdaterWindow	List super item label	Пакеты, которые будут обновлены
-Installing version	SoftwareUpdaterWindow	List item text	Устанавливаемая версия
-Updates completed	UpdateManager		Обновление завершено
-Invalid update type, cannot continue with updates	UpdateAction		Неверный тип обновления, невозможно продолжить
+1	russian	x-vnd.haiku-softwareupdater	4294742959
+Updating version	SoftwareUpdaterWindow	List item text	Обновляемая версия
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Пакеты, которые будут удалены
-Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Обновление не было завершено, вы уверены, что хотите выйти?
-There were no updates found.	CheckAction		Обновлений найдено не было.
-%i of %i	UpdateManager	Do not translate %i	%i из %i
-Updates found	SoftwareUpdaterWindow		Найдены обновления
-to	SoftwareUpdaterWindow	List item text	до
-No updates available	CheckManager		Обновления недоступны
-Don't quit	SoftwareUpdaterWindow		Не выходить
-Quit	SoftwareUpdaterWindow	Button label	Выйти
-Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Проверка репозиториев на наличие обновлений.
-Unrecognized argument	SoftwareUpdaterApp	Error message	Нераспознанный аргумент
-Update	SoftwareUpdaterWindow	Alert button label	Обновить
-New packages to be installed	SoftwareUpdaterWindow	List super item label	Будут установлены новые пакеты
-OK	UpdateManager		OK
-A reboot may be necessary to complete some updates.	UpdateManager		Возможно потребуется перезагрузка, чтобы завершить некоторые обновления.
-Open Repositories	SoftwareUpdaterWindow	Alert button label	Открыть Репозитории
-Show more details	SoftwareUpdaterWindow		Показать больше информации
-Full sync	SoftwareUpdaterWindow	Alert button label	Полная синхронизация
-No active network connection was found.\n	CheckManager		Не найдено активных сетевых адаптеров.\n
-OK	SoftwareUpdaterWindow		OK
+No active network connection was found	UpdateManager	Error message	Отсутствует соединение с сетью
+Quit	SoftwareUpdaterWindow	Alert button label	Выйти
 There were no updates found.	CheckManager		Обновлений не было найдено.
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Обновление не было завершено, вы уверены, что хотите выйти?
+Updates found	SoftwareUpdaterWindow		Найдены обновления
+Update now	SoftwareUpdaterWindow		Обновить сейчас
+OK	UpdateManager		OK
+Unrecognized argument	SoftwareUpdaterApp	Error message	Нераспознанный аргумент
+There were no updates found.	CheckAction		Обновлений найдено не было.
+No updates available	UpdateAction		Обновления отсутствуют
+New packages to be installed	SoftwareUpdaterWindow	List super item label	Будут установлены новые пакеты
+Packages to be updated	SoftwareUpdaterWindow	List super item label	Пакеты, которые будут обновлены
+to	SoftwareUpdaterWindow	List item text	до
+Contacting software repositories to check for package updates.	CheckManager		Устанавливаем связь с репозиториями для проверки обновлений.
+Available updates found	CheckManager		Найдены доступные обновления
+from repository	SoftwareUpdaterWindow	List item text	из репозитория
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Проверка репозиториев на наличие обновлений.
+Cancelling updates	SoftwareUpdaterWindow		Отмена обновлений
+Cancel	SoftwareUpdaterWindow	Alert button label	Отмена
+There were no updates found.	UpdateAction		Обновления не были найдены.
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Пожалуйста, выберите вариант обновления:\n\nОбновить:\n\tОбновляет все установленные пакеты.\nСинхронизировать всё:\n\tСинхронизирует установленные пакеты с репозиториями.
+OK	SoftwareUpdaterWindow		OK
+The following changes will be made:	SoftwareUpdaterWindow		Будут произведены следующие изменения:
+Argument variables are no longer accepted\n	SoftwareUpdaterApp		Переменные аргумента более не принимаются\n
+Fatal error while checking for updates: %s\n	CheckAction		Ошибка при проверки обновлений: %s\n
+SoftwareUpdater	System name		Обновление программ
+No active network connection was found.\n	CheckManager		Не найдено активных сетевых адаптеров.\n
+Applying changes	UpdateManager		Применение изменений
+Full sync	SoftwareUpdaterWindow	Alert button label	Полная синхронизация
+Quit	SoftwareUpdaterWindow	Button label	Выйти
+Exception occurred while updating packages : %s\n	UpdateAction		При обновлении пакетов произошла ошибка: %s\n
+Exception occurred while checking for updates: %s\n	CheckAction		При проверке обновлений произошла ошибка: %s\n
+Packages are being updated	UpdateManager		Пакеты были обновлены
+Cancel	SoftwareUpdaterWindow		Отмена
+Don't quit	SoftwareUpdaterWindow		Не выходить
+Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Нажмите здесь, чтобы запустить Обновление программ. Некоторые обновления потребуют выбора решения.
+Checking for updates	SoftwareUpdaterWindow		Проверка наличия обновлений
+Updates completed	UpdateManager		Обновление завершено
+Show more details	SoftwareUpdaterWindow		Показать больше информации
+Installing version	SoftwareUpdaterWindow	List item text	Устанавливаемая версия
+Checking for updates	CheckManager		Проверка обновлений
+No remote repositories are available	UpdateManager	Error message	Нет доступных репозиториев
+Update	SoftwareUpdaterWindow	Alert button label	Обновить
+Updates did not complete	UpdateAction		Обновление не было завершено
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Открыть Репозитории
+Invalid update type, cannot continue with updates	UpdateAction		Неверный тип обновления, невозможно продолжить
+Uninstalling version	SoftwareUpdaterWindow	List item text	Удаляемая версия
+%i of %i	UpdateManager	Do not translate %i	%i из %i
+Quit	SoftwareUpdaterWindow		Выйти
+No updates available	CheckManager		Обновления недоступны
+Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Использование:  SoftwareUpdater <command> [ <option> ]\nОбновляет установленные пакеты.\n\nКоманды:\n  update     - Искать в репозиториях обновления для всех пакетов.\n  check      - Проверить доступные обновления, но только отобразить уведомление с результатами.\n  full-sync  - Синхронизировать установленные пакеты с репозиториями.\n\nОпции:\n  -h или --help       Вызвать эту справку по использованию\n  -v или --verbose    Вывести подробную информацию\n
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Нет доступных репозиториев. Пожалуйста проверьте, включены ли они используя панель Репозитории или команду 'pkgman'.
+Downloading packages	UpdateManager		Загрузка пакетов

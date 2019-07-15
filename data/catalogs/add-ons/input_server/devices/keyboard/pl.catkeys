@@ -1,10 +1,10 @@
 1	polish	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
-Kill application	Team monitor		Zabij aplikację
-Quit application	Team monitor		Zakończ aplikację
-Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Wybierz aplikację z listy powyżej i kliknij jeden z przycisków – „Zabij aplikację” lub „Zakończ aplikację” – w celu zamknięcia jej.\n\nPrzytrzymaj Ctrl+Alt+Delete przez %ld sekund, żeby uruchomić komputer ponownie.
 If the application will not quit you may have to kill it.	Team monitor		Jeżeli aplikacja nie zakończy działania, być może trzeba będzie ją zabić.
-Force reboot	Team monitor		Wymuś ponowne uruchomienie komputera
-Team monitor	Team monitor		Monitor zespołów
-(This team is a system component)	Team monitor		(Ten zespół jest komponentem systemu)
+Quit application	Team monitor		Zakończ aplikację
 Restart the desktop	Team monitor		Uruchom pulpit ponownie
+Force reboot	Team monitor		Wymuś ponowne uruchomienie komputera
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Wybierz aplikację z listy powyżej i kliknij jeden z przycisków – „Zabij aplikację” lub „Zakończ aplikację” – w celu zamknięcia jej.\n\nPrzytrzymaj Ctrl+Alt+Delete przez %ld sekund, żeby uruchomić komputer ponownie.
+Team monitor	Team monitor		Monitor zespołów
+Kill application	Team monitor		Zabij aplikację
 Cancel	Team monitor		Anuluj
+(This team is a system component)	Team monitor		(Ten zespół jest komponentem systemu)

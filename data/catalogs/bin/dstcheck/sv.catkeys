@@ -1,5 +1,5 @@
 1	swedish	x-vnd.Haiku-cmd-dstconfig	684321431
-Ask me later	dstcheck		Fråga mig senare
-Manually adjust time…	dstcheck		Ställ in tiden manuellt...
 Keep this time	dstcheck		Använd denna tid
+Manually adjust time…	dstcheck		Ställ in tiden manuellt...
 Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		Observera!\n \n Efter som din dator har ändrats från sommartid så kan klockan gå en timme fel.\n Din dator tror att klockan är %current time%.\n \n Är det rätt tid??
+Ask me later	dstcheck		Fråga mig senare

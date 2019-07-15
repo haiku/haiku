@@ -1,155 +1,155 @@
 1	swedish	x-vnd.Haiku-MediaPlayer	1313616492
-raw audio	MediaPlayer-InfoWin		raw-ljud
-Location	MediaPlayer-InfoWin		Plats
-1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikanskt format)
-%d kHz	MediaPlayer-InfoWin		%d kHz
-Stream settings	MediaPlayer-Main		Ströminställningar
-<unknown>	PlaylistItem-album		<okänd>
-Scale controls in full screen mode	MediaPlayer-SettingsWindow		Skala kontroller i fullskärmsläge
-Video	MediaPlayer-InfoWin		Video
-Subtitle size:	MediaPlayer-SettingsWindow		Undertextsstorlek:
-Save Playlist	MediaPlayer-PlaylistWindow		Spara spellista
-<no media>	MediaPlayer-InfoWin		<ingen media>
-(not supported)	MediaPlayer-InfoWin		(stöds inte)
-None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Ingen av filerna som du ville spela verkar vara mediafiler.
-Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Kunde inte spara spellistan.\n\nFel:
-ask every time	MediaPlayer-SettingsWindow		fråga varje gång
-%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
-New player…	MediaPlayer-Main		Ny spelare...
-100% scale	MediaPlayer-Main		Skala till 100%
-Subtitle placement:	MediaPlayer-SettingsWindow		Undertextsplacering:
-Close	MediaPlayer-Main		Stäng
-Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Några filer kunde inte flyttas till Papperskorgen.
-<unknown>	MediaPlayer-InfoWin		<okänd>
-Open	MediaPlayer-Main		Öppna
-OK	MediaPlayer-SettingsWindow		OK
-Track %d	MediaPlayer-Main		Spår %d
-2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
-Display mode	MediaPlayer-InfoWin		Visningsläge
-Medium	MediaPlayer-SettingsWindow		Medium
-Open network stream	MediaPlayer-NetworkStream		Öppna nätverksström
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Flytta post till Papperskorgen
 Close	MediaPlayer-PlaylistWindow		Stäng
-Open…	MediaPlayer-PlaylistWindow		Öppna...
-Undo	MediaPlayer-PlaylistWindow		Ångra
-Stream URL:	MediaPlayer-NetworkStream		URL för ström:
+Volume of background clips	MediaPlayer-SettingsWindow		Volym för bakgrundsklipp
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Använd hårdvarutäckning för video om möjligt
-File info…	MediaPlayer-Main		Filinformation...
-Overlay	MediaPlayer-InfoWin		Överlagring
-Remove Entry	MediaPlayer-RemovePLItemsCmd		Ta bort post
-Close window after playing audio	MediaPlayer-SettingsWindow		Stäng fönstret efter att ljud har spelats upp
-Full volume	MediaPlayer-SettingsWindow		Högsta volym
-Drop files to play	MediaPlayer-Main		Släpp filer för att spela upp
-Copyright	MediaPlayer-InfoWin		Upphovsrätt
-Cancel	MediaPlayer-SettingsWindow		Avbryt
-Loop audio	MediaPlayer-SettingsWindow		Spela upp ljud som slinga
-Container	MediaPlayer-InfoWin		Behållare
-Nothing to Play	MediaPlayer-Main		Inget att spela upp
+Audio	MediaPlayer-InfoWin		Ljud
+Subtitle placement:	MediaPlayer-SettingsWindow		Undertextsplacering:
+MediaPlayer	System name		MediaSpelare
+Audio track	MediaPlayer-Main		Ljudspår
 Muted	MediaPlayer-SettingsWindow		Tyst läge aktiverat
-Quit	MediaPlayer-Main		Avsluta
+OK	MediaPlayer-RemovePLItemsCmd		OK
+Open Playlist	MediaPlayer-PlaylistWindow		Öppna spellista
+Subtitles	MediaPlayer-Main		Bildtext
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Ett internt fel inträffade i %app%. Filen kunde inte öppnas.
+DrawBitmap	MediaPlayer-InfoWin		Rita Bitmap
+File info	MediaPlayer-InfoWin		Filinformation
+raw audio	MediaPlayer-InfoWin		raw-ljud
+Select all	MediaPlayer-PlaylistWindow		Markera alla
+New player…	MediaPlayer-Main		Ny spelare...
+Move Entries	MediaPlayer-MovePLItemsCmd		Flytta poster
+OK	MediaPlayer-Main		OK
+Remove	MediaPlayer-PlaylistWindow		Ta bort
+<unknown>	MediaPlayer-InfoWin		<okänd>
 Resume:	MediaPlayer-SettingsWindow		Återuppta:
+Duration	MediaPlayer-InfoWin		Speltid
+Import Entries	MediaPlayer-ImportPLItemsCmd		Importera poster
+Open network stream	MediaPlayer-Main		Öppna nätverksström
+Move file to Trash	MediaPlayer-PlaylistWindow		Flytta filen till Papperskorgen
+Open file…	MediaPlayer-Main		Öppna fil...
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Skala kontroller i fullskärmsläge
+View options	MediaPlayer-SettingsWindow		Visningsalternativ
+%d kHz	MediaPlayer-InfoWin		%d kHz
+Full volume	MediaPlayer-SettingsWindow		Högsta volym
+<untitled>	PlaylistItem-title		<odöpt>
+Start media server	MediaPlayer-Main		Starta mediaserver
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Det verkar som att mediaservern inte körs.\nVill du starta den?
+Location	MediaPlayer-InfoWin		Plats
+Medium	MediaPlayer-SettingsWindow		Medium
+Play mode	MediaPlayer-SettingsWindow		Uppspelningsläge
+Playlist	MediaPlayer-PlaylistWindow		Spellista
+%d Bit	MediaPlayer-InfoWin		%d Bit
+Track	Audio Track Menu		Spår
+Close	MediaPlayer-Main		Stäng
+Save error	MediaPlayer-PlaylistWindow		Sparningsfel
+Attributes	MediaPlayer-Main		Attribut
+Bottom of screen	MediaPlayer-SettingsWindow		Nedtill på skärmen
+MediaPlayer settings	MediaPlayer-SettingsWindow		MediaSpelarens inställningar
+Copyright	MediaPlayer-InfoWin		Upphovsrätt
+Invalid URL inserted!	MediaPlayer-NetworkStream		Ogiltig URL angiven!
+Aspect ratio	MediaPlayer-Main		Bildförhållande
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Kunde inte spara spellistan.\n\nFel:
+<no media>	MediaPlayer-InfoWin		<ingen media>
+Hide interface	MediaPlayer-Main		Göm gränssnitt
+Error: 	MediaPlayer-Main		Fel:
+Video track	MediaPlayer-Main		Videospår
+Playlist…	MediaPlayer-Main		Spellista...
+<unnamed media>	MediaPlayer-InfoWin		<inget namn media>
+Save	MediaPlayer-PlaylistWindow		Spara
+Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Slumpa poster
+Cancel	MediaPlayer-NetworkStream		Avbryt
+Nothing to Play	MediaPlayer-Main		Inget att spela upp
+OK	MediaPlayer-SettingsWindow		OK
+Remove Entries	MediaPlayer-RemovePLItemsCmd		Ta bort poster
+never	MediaPlayer-SettingsWindow		aldrig
+Loop audio	MediaPlayer-SettingsWindow		Spela upp ljud som slinga
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Internt fel (felformaterat meddelande). Kunde inte spara spellistan.
+Open…	MediaPlayer-PlaylistWindow		Öppna...
+Revert	MediaPlayer-SettingsWindow		Återställ
+Low volume	MediaPlayer-SettingsWindow		Låg volym
+Audio	MediaPlayer-Main		Ljud
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# Kanaler}}
+Quit	MediaPlayer-Main		Avsluta
+Redo	MediaPlayer-PlaylistWindow		Gör om
+Move Entry	MediaPlayer-MovePLItemsCmd		Flytta post
+<unknown>	PlaylistItem-author		<okänd>
+Cancel	MediaPlayer-SettingsWindow		Avbryt
+Large	MediaPlayer-SettingsWindow		Stor
+Import Entry	MediaPlayer-ImportPLItemsCmd		Importera post
+unknown format	MediaPlayer-InfoWin		okänt format
+Track %d	MediaPlayer-Main		Spår %d
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Alla filer kunde inte flyttas till Papperskorgen.
+Total duration: %s	MediaPlayer-PlaylistWindow		Totallängd: %s
+%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
+Move into trash error	MediaPlayer-RemovePLItemsCmd		Fel vid flyttning till papperskorgen
+50% scale	MediaPlayer-Main		Skala till 50%
+Drop files to play	MediaPlayer-Main		Släpp filer för att spela upp
+Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopiera post
+Close window after playing audio	MediaPlayer-SettingsWindow		Stäng fönstret efter att ljud har spelats upp
+Edit	MediaPlayer-PlaylistWindow		Redigera
+Copy Entries	MediaPlayer-CopyPLItemsCmd		Kopiera poster
+Always on top	MediaPlayer-Main		Alltid överst
+Open	MediaPlayer-PlaylistWindow		Öppna
+always	MediaPlayer-SettingsWindow		alltid
+Loop video	MediaPlayer-SettingsWindow		Spela upp video som slinga
+Stream URL:	MediaPlayer-NetworkStream		URL för ström:
+<unknown>	PlaylistItem-album		<okänd>
+Stream settings	MediaPlayer-Main		Ströminställningar
+none	Subtitles menu		ingen
+Save Playlist	MediaPlayer-PlaylistWindow		Spara spellista
+Overlay	MediaPlayer-InfoWin		Överlagring
+2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
+Rating	MediaPlayer-Main		Betyg
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Internt fel (slut på minne). Misslyckades att spara filen.
 Video	MediaPlayer-Main		Video
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Det finns ingen avkodare installerad som kan hantera filformatet, eller så har avkodaren problem med filformatsversionen.
-Import Entry	MediaPlayer-ImportPLItemsCmd		Importera post
-400% scale	MediaPlayer-Main		Skala till 400%
-Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Misslyckades att spara spellistan:\n\nFel:
-Move Entries	MediaPlayer-MovePLItemsCmd		Flytta poster
-Audio	MediaPlayer-Main		Ljud
-Open Playlist	MediaPlayer-PlaylistWindow		Öppna spellista
-MediaPlayer	System name		MediaSpelare
-OK	MediaPlayer-Main		OK
+Lock Peaks	MediaPlayer-PeakView		Markera toppvärden
+none	Audio track menu		ingen
+Open network stream	MediaPlayer-NetworkStream		Öppna nätverksström
+Automatically start playing	MediaPlayer-SettingsWindow		Starta uppspelning automatiskt
+Undo	MediaPlayer-PlaylistWindow		Ångra
+Display mode	MediaPlayer-InfoWin		Visningsläge
+Bottom of video	MediaPlayer-SettingsWindow		Botten av videon
+Small	MediaPlayer-SettingsWindow		Liten
 Settings…	MediaPlayer-Main		Inställningar...
-MediaPlayer settings	MediaPlayer-SettingsWindow		MediaSpelarens inställningar
-never	MediaPlayer-SettingsWindow		aldrig
-h	MediaPlayer-InfoWin	Hours	h
-Select all	MediaPlayer-PlaylistWindow		Markera alla
-Move Entry	MediaPlayer-MovePLItemsCmd		Flytta post
-Open	MediaPlayer-PlaylistWindow		Öppna
-The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Filen '%filename' kunde inte öppnas.\n\n
-Error: 	MediaPlayer-RemovePLItemsCmd		Fel:
-Audio	MediaPlayer-InfoWin		Ljud
-Move into trash error	MediaPlayer-RemovePLItemsCmd		Fel vid flyttning till papperskorgen
-Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Internt fel (felformaterat meddelande). Kunde inte spara spellistan.
-%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Ett internt fel inträffade i %app%. Filen kunde inte öppnas.
+min	MediaPlayer-InfoWin	Minutes	min
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Misslyckades att spara spellistan:\n\nFel:
+Video	MediaPlayer-InfoWin		Video
+File info…	MediaPlayer-Main		Filinformation...
+1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikanskt format)
+<unnamed>	PlaylistItem-name		<odöpt>
+Track	Video Track Menu		Spår
+Full screen	MediaPlayer-Main		Fullskärmsläge
+OK	MediaPlayer-NetworkStream		OK
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Internt fel (låsning misslyckades). Kunde inte spara spellistan.
+100% scale	MediaPlayer-Main		Skala till 100%
+<nothing to redo>	MediaPlayer-PlaylistWindow		<inget att göra om>
+Bad URL	MediaPlayer-NetworkStream		Felaktig URL
+Save	MediaPlayer-Main		Spara
 Close window after playing video	MediaPlayer-SettingsWindow		Stäng fönstret efter att video har spelats upp
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Skala filmer mjukt (icketäckande läge)
-OK	MediaPlayer-RemovePLItemsCmd		OK
-Open network stream	MediaPlayer-Main		Öppna nätverksström
-50% scale	MediaPlayer-Main		Skala till 50%
-Subtitles	MediaPlayer-Main		Bildtext
-Audio track	MediaPlayer-Main		Ljudspår
-Import Entries	MediaPlayer-ImportPLItemsCmd		Importera poster
-No aspect correction	MediaPlayer-Main		Korrigera inte förhållande
-Automatically start playing	MediaPlayer-SettingsWindow		Starta uppspelning automatiskt
-Track	Video Track Menu		Spår
-Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Internt fel (låsning misslyckades). Kunde inte spara spellistan.
-View options	MediaPlayer-SettingsWindow		Visningsalternativ
-none	MediaPlayer-Main		ingen
-Play mode	MediaPlayer-SettingsWindow		Uppspelningsläge
-Remove Entries	MediaPlayer-RemovePLItemsCmd		Ta bort poster
-Video track	MediaPlayer-Main		Videospår
-Loop video	MediaPlayer-SettingsWindow		Spela upp video som slinga
-Attributes	MediaPlayer-Main		Attribut
-All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Alla filer kunde inte flyttas till Papperskorgen.
-<untitled>	PlaylistItem-title		<odöpt>
-Track	Audio Track Menu		Spår
-unknown format	MediaPlayer-InfoWin		okänt format
-<nothing to redo>	MediaPlayer-PlaylistWindow		<inget att göra om>
-Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Flytta poster till Papperskorgen
 200% scale	MediaPlayer-Main		Skala till 200%
-It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Det verkar som att mediaservern inte körs.\nVill du starta den?
-Duration	MediaPlayer-InfoWin		Speltid
-Aspect ratio	MediaPlayer-Main		Bildförhållande
-Error: 	MediaPlayer-Main		Fel:
-Large	MediaPlayer-SettingsWindow		Stor
-Bottom of video	MediaPlayer-SettingsWindow		Botten av videon
-DrawBitmap	MediaPlayer-InfoWin		Rita Bitmap
-always	MediaPlayer-SettingsWindow		alltid
-Total duration: %s	MediaPlayer-PlaylistWindow		Totallängd: %s
-<unnamed media>	MediaPlayer-InfoWin		<inget namn media>
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Filen '%filename' kunde inte öppnas.\n\n
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Ingen av filerna som du ville spela verkar vara mediafiler.
+Remove Entry	MediaPlayer-RemovePLItemsCmd		Ta bort post
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Flytta poster till Papperskorgen
+Subtitle size:	MediaPlayer-SettingsWindow		Undertextsstorlek:
+No aspect correction	MediaPlayer-Main		Korrigera inte förhållande
 raw video	MediaPlayer-InfoWin		raw video
-Volume of background clips	MediaPlayer-SettingsWindow		Volym för bakgrundsklipp
-Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Internt fel (slut på minne). Misslyckades att spara filen.
-Hide interface	MediaPlayer-Main		Göm gränssnitt
+Container	MediaPlayer-InfoWin		Behållare
+none	MediaPlayer-Main		ingen
 Open clips	MediaPlayer-Main		Öppna klipp
-Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopiera post
-none	Subtitles menu		ingen
-Move file to Trash	MediaPlayer-PlaylistWindow		Flytta filen till Papperskorgen
-Invalid URL inserted!	MediaPlayer-NetworkStream		Ogiltig URL angiven!
-OK	MediaPlayer-NetworkStream		OK
-min	MediaPlayer-InfoWin	Minutes	min
-Small	MediaPlayer-SettingsWindow		Liten
-Randomize	MediaPlayer-PlaylistWindow		Slumpa
-Off	Subtitles menu		Av
-Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Slumpa poster
-Revert	MediaPlayer-SettingsWindow		Återställ
-Edit	MediaPlayer-PlaylistWindow		Redigera
-Start media server	MediaPlayer-Main		Starta mediaserver
-%.3f fps	MediaPlayer-InfoWin		%.3f fps
-Bad URL	MediaPlayer-NetworkStream		Felaktig URL
-{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# Kanaler}}
-<unnamed>	PlaylistItem-name		<odöpt>
-OK	MediaPlayer-PlaylistWindow		OK
-none	Audio track menu		ingen
-Cancel	MediaPlayer-NetworkStream		Avbryt
-Playlist…	MediaPlayer-Main		Spellista...
-<unknown>	PlaylistItem-author		<okänd>
-Save as…	MediaPlayer-PlaylistWindow		Spara som...
-Copy Entries	MediaPlayer-CopyPLItemsCmd		Kopiera poster
-Redo	MediaPlayer-PlaylistWindow		Gör om
-Always on top	MediaPlayer-Main		Alltid överst
-Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Flytta post till Papperskorgen
-Save	MediaPlayer-Main		Spara
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Några filer kunde inte flyttas till Papperskorgen.
 <nothing to undo>	MediaPlayer-PlaylistWindow		<inget att ångra>
-File info	MediaPlayer-InfoWin		Filinformation
-Save	MediaPlayer-PlaylistWindow		Spara
-%d Bit	MediaPlayer-InfoWin		%d Bit
-Remove	MediaPlayer-PlaylistWindow		Ta bort
-Full screen	MediaPlayer-Main		Fullskärmsläge
-Open file…	MediaPlayer-Main		Öppna fil...
+Save as…	MediaPlayer-PlaylistWindow		Spara som...
+Error: 	MediaPlayer-RemovePLItemsCmd		Fel:
 300% scale	MediaPlayer-Main		Skala till 300%
-Bottom of screen	MediaPlayer-SettingsWindow		Nedtill på skärmen
-Save error	MediaPlayer-PlaylistWindow		Sparningsfel
-Rating	MediaPlayer-Main		Betyg
-Playlist	MediaPlayer-PlaylistWindow		Spellista
-Lock Peaks	MediaPlayer-PeakView		Markera toppvärden
-Low volume	MediaPlayer-SettingsWindow		Låg volym
+Open	MediaPlayer-Main		Öppna
+ask every time	MediaPlayer-SettingsWindow		fråga varje gång
+(not supported)	MediaPlayer-InfoWin		(stöds inte)
+Randomize	MediaPlayer-PlaylistWindow		Slumpa
+%.3f fps	MediaPlayer-InfoWin		%.3f fps
+Off	Subtitles menu		Av
+400% scale	MediaPlayer-Main		Skala till 400%
+h	MediaPlayer-InfoWin	Hours	h
+OK	MediaPlayer-PlaylistWindow		OK

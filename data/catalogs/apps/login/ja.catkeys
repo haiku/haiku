@@ -1,20 +1,20 @@
 1	japanese	x-vnd.Haiku-Login	336867745
-Error: %1	Login App		エラー: %1
-Hide password	Login View		パスワードを隠す
-Desktop	Desktop Window		デスクトップ
 Invalid login!	Login View		ログインが無効です!
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n
-OK	Login View		OK
-error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	エラー %s\n
-Login:	Login View		ログイン:
 Error	Login App		エラー
-Unimplemented	Login App		未実装です。
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n
 Welcome to Haiku	Login Window		Haiku へようこそ
-Reboot	Login View		再起動
-Login application for Haiku\nUsage:\n	Login App		Login application for Haiku\nUsage:\n
-Info	Login App		情報
 Halt	Login View		停止
-Password:	Login View		パスワード:
-OK	Login App		OK
+Login application for Haiku\nUsage:\n	Login App		Login application for Haiku\nUsage:\n
 --nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tDo not make the window modal\n
+Desktop	Desktop Window		デスクトップ
+Hide password	Login View		パスワードを隠す
+Reboot	Login View		再起動
 You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Login アプリケーションの背後のデスクトップをレプリカントをドロップすることでカスタマイズできます。\n\n完了後、アプリケーションを終了してください (Cmd-Q)。
+OK	Login View		OK
+Info	Login App		情報
+Login:	Login View		ログイン:
+Password:	Login View		パスワード:
+Unimplemented	Login App		未実装です。
+OK	Login App		OK
+Error: %1	Login App		エラー: %1
+error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	エラー %s\n

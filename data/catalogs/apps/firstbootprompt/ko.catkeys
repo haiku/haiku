@@ -1,7 +1,7 @@
 1	korean	x-vnd.Haiku-FirstBootPrompt	988630706
 Custom	BootPromptWindow		사용자 정의
 Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	하이쿠를 이용해 주셔서 감사합니다! 우리는 당신이 이것을 좋아하게 되기를 바랍니다!\n\n왼쪽의 목록에서 키보드 배열과 선호하는 언어를 선택할수 있고.그것은 바로 사용될것입니다. 당신은 나중에 바탕 화면에서 모든 설정을 쉽게 그때 그때 변경할 수 있습니다.\n\n당신은 설치 프로그램을 실행하거나 바탕 화면으로 부팅을 계속 하시겠습니까?\n참고:다른 언어를 위하여, 참고사항이 추가될 수 있습니다: \"참고: Haiku 응용프로그과 다른 구성요소의 지역화는 사실상 계속 진행중입니다. 당신은 자주 번역되지않은 문자열을 만나게 될것입니다. 그러나 만약 당신이 원한다면, 당신은 <www.haiku-os.org>에서 작업에 가입할 수 있습니다.\"
-Language	BootPromptWindow		언어
-Welcome to Haiku!	BootPromptWindow		Haiku에 오신 것을 환영합니다!
-Run Installer	BootPromptWindow		설치프로그램 실행
 Keymap	BootPromptWindow		키보드배열
+Welcome to Haiku!	BootPromptWindow		Haiku에 오신 것을 환영합니다!
+Language	BootPromptWindow		언어
+Run Installer	BootPromptWindow		설치프로그램 실행

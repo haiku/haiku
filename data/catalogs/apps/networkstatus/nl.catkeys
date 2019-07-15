@@ -1,22 +1,21 @@
-1	dutch; flemish	x-vnd.Haiku-NetworkStatus	1729819859
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		NetwerkStatus-opties:\n\t--deskbar\tvoeg automatisch een replicant toe aan Deskbar\n\t--help\t\tprint deze info en exit\n
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		U kunt NetwerkStatus in een venster uitvoeren, of in Deskbar installeren
-<no wireless networks found>	NetworkStatusView		<geen draadloze netwerken gevonden>
-Run in window	NetworkStatus		Actief in een venster
-No link	NetworkStatusView		Er is geen link
-Install in Deskbar	NetworkStatus		Installeren in Deskbar
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		Opstarten van het netwerk is mislukt.\n\nFoutmelding:
+1	dutch; flemish	x-vnd.Haiku-NetworkStatus	3823341665
 Netmask	NetworkStatusView		Netwerkmasker
-Broadcast	NetworkStatusView		Broadcast
-Unknown	NetworkStatusView		Onbekend
-Network Status	NetworkStatusView		Netwerkstatus
-Ready	NetworkStatusView		Gereed
-No stateful configuration	NetworkStatusView		Geen stateful-configuratie
-%ifaceName information:\n	NetworkStatusView		%ifaceName informatie:\n
-Configuring	NetworkStatusView		Bezig met instellen
-Address	NetworkStatusView		Adres
-OK	NetworkStatusView		Oké
-NetworkStatus	System name		Netwerkstatus
-Open network preferences…	NetworkStatusView		Open netwerkvoorkeuren...
-Could not join wireless network:\n	NetworkStatusView		Kon niet aansluiten bij draadloos netwerk:\n
 Quit	NetworkStatusView		Afsluiten
+Unknown	NetworkStatusView		Onbekend
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Opstarten van het netwerk is mislukt.\n\nFoutmelding:
+Install in Deskbar	NetworkStatus		Installeren in Deskbar
+Open network preferences…	NetworkStatusView		Open netwerkvoorkeuren...
+NetworkStatus	System name		Netwerkstatus
+OK	NetworkStatusView		Oké
+No link	NetworkStatusView		Er is geen link
+Could not join wireless network:\n	NetworkStatusView		Kon niet aansluiten bij draadloos netwerk:\n
+Ready	NetworkStatusView		Gereed
+Network Status	NetworkStatusView		Netwerkstatus
+Address	NetworkStatusView		Adres
+No stateful configuration	NetworkStatusView		Geen stateful-configuratie
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		U kunt NetwerkStatus in een venster uitvoeren, of in Deskbar installeren
+Broadcast	NetworkStatusView		Broadcast
+%ifaceName information:\n	NetworkStatusView		%ifaceName informatie:\n
+Run in window	NetworkStatus		Actief in een venster
+<no wireless networks found>	NetworkStatusView		<geen draadloze netwerken gevonden>
+Configuring	NetworkStatusView		Bezig met instellen

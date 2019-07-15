@@ -1,16 +1,16 @@
 1	slovak	x-vnd.haiku-package_daemon	1440586681
-Package problems	PackageProblem	Window title	Problémy balíkov
 Package changes	PackageResult	Window title	Zmeny balíkov
 uninstall package %s\n	PackageResult	Don't change '%s' variable	odinštalovať balík %s\n
-install package %s from repository %s\n	PackageResult	Don't change '%s' variables	nainštalovať balík %s zo zdroja softvéru %s\n
-Apply changes	PackageResult		Použiť zmeny
-solution %d:	PackageProblem	Don't change the %d variable	riešenie %d:
-Warning	PackageManager		Upozornenie
-Retry	PackageProblem		Skúsiť znova
-The following additional package changes have to be made:	PackageResult		Je potrebné vykonať nasledovné zmeny balíkov:
 ignore problem for now	PackageProblem		nateraz problém ignorovať
+solution %d:	PackageProblem	Don't change the %d variable	riešenie %d:
+The following problems have been encountered. Please select a solution for each:	PackageProblem		Narazili sme na nasledovné problémy. Prosím, vyberte riešenie každého z nich:
+Apply changes	PackageResult		Použiť zmeny
+Package daemon	PackageManager		Démon balíka
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	nainštalovať balík %s zo zdroja softvéru %s\n
+The following additional package changes have to be made:	PackageResult		Je potrebné vykonať nasledovné zmeny balíkov:
+Warning	PackageManager		Upozornenie
 Cancel	PackageProblem		Zrušiť
 don't activate package %source%	PackageProblem	don't change '%source%	neaktivovať balík %source%
-The following problems have been encountered. Please select a solution for each:	PackageProblem		Narazili sme na nasledovné problémy. Prosím, vyberte riešenie každého z nich:
-Package daemon	PackageManager		Démon balíka
 Cancel	PackageResult		Zrušiť
+Retry	PackageProblem		Skúsiť znova
+Package problems	PackageProblem	Window title	Problémy balíkov

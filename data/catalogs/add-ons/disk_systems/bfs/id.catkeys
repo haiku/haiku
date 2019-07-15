@@ -1,8 +1,7 @@
-1	indonesian	x-vnd.Haiku-BFSAddOn	1074880496
+1	indonesian	x-vnd.Haiku-BFSAddOn	3514982252
 Enable query support	BFS_Initialize_Parameter		Aktifkan dukungan kueri
-2048 (Recommended)	BFS_Initialize_Parameter		2048 (Direkomendasikan)
+Name:	BFS_Initialize_Parameter		Nama:
 8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (Kebanyakan berkas besar)
-Disabling query support may speed up certain file system operations, but should only be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		Menonaktifkan dukungan kueri akan bisa mempercepat beberapa operasi sistem file, tetapi seharusnya hanya digunakan jika seseorang yakin bahwa hal tersebut tidak membutuhkan kueri.\nVolume apa saja yang diharapkan sebagai boot Haiku harus mengaktifkan dukungan Kueri.
+2048 (Recommended)	BFS_Initialize_Parameter		2048 (Direkomendasikan)
 1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (Kebanyakan berkas kecil)
 Blocksize:	BFS_Initialize_Parameter		Ukuranblok:
-Name:	BFS_Initialize_Parameter		Nama:

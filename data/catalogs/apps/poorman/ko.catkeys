@@ -1,57 +1,57 @@
 1	korean	x-vnd.Haiku-PoorMan	3137659009
-Website location	PoorMan		웹사이트 위치
-Error Server	PoorMan		오류 서버
-Settings…	PoorMan		설정...
-Create PoorMan log	PoorMan		PoorMan 로그 만들기
-Shutting down.\n	PoorMan		멈추는 중.\n
-Hits: %lu	PoorMan		히트: %lu
-Web folder:	PoorMan		웹 폴더:
-Save log console selection	PoorMan		로그 콘솔에서 선택된 부분 저장
-Run server	PoorMan		서버 실행
-PoorMan settings	PoorMan		PoorMan 설정
-Clear hit counter	PoorMan		히트 수 지우기
-Copy	PoorMan		복사
-Max. simultaneous connections:	PoorMan		최대. 동시 연결:
-Start page:	PoorMan		시작 페이지:
-done.\n	PoorMan		완료.\n
-Create	PoorMan		만들기
-Shutting down.	PoorMan		정지하는 중.
+Select web folder	PoorMan		웹 폴더 선택
+File logging	PoorMan		파일 로깅
 Website options	PoorMan		웹사이트 옵션
-File Name	PoorMan		파일 이름
-Clear console log	PoorMan		콘솔 로그 지우기
-Advanced	PoorMan		고급
-OK	PoorMan		확인
-Status: Stopped	PoorMan		상태:정지됨
-Dir Created	PoorMan		디렉토리 만듬
-Quit	PoorMan		끝내기
-Hits: 0	PoorMan		히트:0
-Save log console	PoorMan		로그 콘솔 저장
-Edit	PoorMan		편집
-Directory: (none)	PoorMan		디렉토리: (없음)
+Shutting down.	PoorMan		정지하는 중.
+Error Dir	PoorMan		오류 디렉토리
+Web folder:	PoorMan		웹 폴더:
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		웹 발행할 폴더를 선택해 주십시오.\n\n당신은 PoorMan이 만든 기본 \"public_html\"을 당신의 홈 폴더에 가지고 있어야 합니다.\.\n아니면 당신의 폴더중의 하나를 대신 선택 할 수도 있습니다.
 Log To Console	PoorMan		로그를 콘솔로
-Status: Running	PoorMan		상태:실행중
-Controls	PoorMan		제어
-Send file listing if there's no start page	PoorMan		만약 시작 페이지가 없으면 파일 목록을 보내기
-Error Dir	PoorMan		오류 디렉토리
-Select all	PoorMan		모두 선택
-File	PoorMan		파일
-Save console selections as…	PoorMan		콘솔에서 선택된 부분 다른 이름으로 저장...
-File logging	PoorMan		파일 로깅
-Select web folder	PoorMan		웹 폴더 선택
-Logging view	PoorMan		로깅 보기
-Logging	PoorMan		로깅
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		기본 웹 폴더가 \"/boot/home/public_html\"에 만들어 졌습니다.\n \"index.html\"란 이름의 HTML파일이 이 폴더에 있는지 확인하십시오.
-Clear log file	PoorMan		로그 파일 지우기
-Log file name:	PoorMan		로그 파일 이름:
-Directory: 	PoorMan		디렉토리:
-Log To File	PoorMan		로그를 파일로
-Done	PoorMan		완료
-Create log file	PoorMan		로그 파일 만들기
+File Name	PoorMan		파일 이름
 Starting up... 	PoorMan		시작하는 중...
-Site	PoorMan		사이트
-Cancel	PoorMan		취소
-Cannot start the server	PoorMan		서버를 시작 할 수 없음
 Select	PoorMan		선택
+Logging view	PoorMan		로깅 보기
 Save console as…	PoorMan		콘솔을 다른 이름으로 저장...
+Edit	PoorMan		편집
+Cancel	PoorMan		취소
+Directory: 	PoorMan		디렉토리:
+Hits: %lu	PoorMan		히트: %lu
+Hits: 0	PoorMan		히트:0
+Shutting down.\n	PoorMan		멈추는 중.\n
+Select all	PoorMan		모두 선택
+Error Server	PoorMan		오류 서버
+Send file listing if there's no start page	PoorMan		만약 시작 페이지가 없으면 파일 목록을 보내기
+Create PoorMan log	PoorMan		PoorMan 로그 만들기
+Max. simultaneous connections:	PoorMan		최대. 동시 연결:
+Done	PoorMan		완료
+Site	PoorMan		사이트
+Cannot start the server	PoorMan		서버를 시작 할 수 없음
+Create log file	PoorMan		로그 파일 만들기
+Clear hit counter	PoorMan		히트 수 지우기
+Status: Stopped	PoorMan		상태:정지됨
+File	PoorMan		파일
+Settings…	PoorMan		설정...
+Log To File	PoorMan		로그를 파일로
+Controls	PoorMan		제어
+Advanced	PoorMan		고급
+Copy	PoorMan		복사
+Logging	PoorMan		로깅
+Clear console log	PoorMan		콘솔 로그 지우기
+Run server	PoorMan		서버 실행
+Create	PoorMan		만들기
+done.\n	PoorMan		완료.\n
+PoorMan settings	PoorMan		PoorMan 설정
 Console Logging	PoorMan		콘솔 로깅
+Clear log file	PoorMan		로그 파일 지우기
+Save log console selection	PoorMan		로그 콘솔에서 선택된 부분 저장
+Log file name:	PoorMan		로그 파일 이름:
+Status: Running	PoorMan		상태:실행중
+Directory: (none)	PoorMan		디렉토리: (없음)
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		기본 웹 폴더가 \"/boot/home/public_html\"에 만들어 졌습니다.\n \"index.html\"란 이름의 HTML파일이 이 폴더에 있는지 확인하십시오.
+Dir Created	PoorMan		디렉토리 만듬
+Save console selections as…	PoorMan		콘솔에서 선택된 부분 다른 이름으로 저장...
+Quit	PoorMan		끝내기
+Save log console	PoorMan		로그 콘솔 저장
+Start page:	PoorMan		시작 페이지:
+OK	PoorMan		확인
+Website location	PoorMan		웹사이트 위치

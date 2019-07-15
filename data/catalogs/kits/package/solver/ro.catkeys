@@ -1,38 +1,38 @@
 1	romanian	x-vnd.Haiku-libsolvsolver	3404387783
-%dependency% is provided by the system	SolverProblem		%dependency% este furnizat de către sistem
-package %source% conflicts with %dependency% provided by %target%	SolverProblem		pachetul %source% este în conficlt cu %dependency% furnizat de %target%
-nothing provides requested %dependency%	SolverProblem		nimic nu furnizează %dependency% cerută
-unspecified problem	SolverProblem		problemă nespecificată
-keep %source% despite its inferior architecture	SolverProblemSolution		păstrează %source% în ciuda arhitecturii inferioare
-do not deinstall \"%selection%\"	SolverProblemSolution		nu dezinstala \„%selection%\”
-%source% has inferior architecture	SolverProblem		%source% are o arhitectură inferioară
-dependency problem	SolverProblem		problemă de dependențe
-do not keep %source% installed	SolverProblemSolution		nu păstra %source% instalat
-package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		pachetul %source% face să fie depășită implicit %dependency% furnizată de %target%
-do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		nu dezinstala toate lucrurile care se pot rezolva \„%selection%\”
-keep %source% from excluded repository	SolverProblemSolution		păstrează %source% din depozitul exclus
-install %selection% despite its old version	SolverProblemSolution		instalează %selection% chiar dacă există versiunea veche
-allow downgrade of %source% to %target%	SolverProblemSolution		permite retrogradarea a %source% la %target%
-do not lock \"%selection%\"	SolverProblemSolution		nu bloca \„%selection%\”
-install %source% despite its inferior architecture	SolverProblemSolution		instalează %source% chiar dacă are o arhitectură inferioară
-do not install \"%selection%\"	SolverProblemSolution		nu instala \„%selection%\”
-do something	SolverProblemSolution		face ceva
-do not install the most recent version of \"%selection%\"	SolverProblemSolution		nu instala cea mai recentă versiune a \„%selection%\”
-package %source% conflicts with %dependency% provided by itself	SolverProblem		pachetul %source% se află în conflict cu %dependency% furnizată de el însuși
-cannot install both %source% and %target%	SolverProblem		nu se pot instala atât %source% cât și %target%
-allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		permite modificarea vânzătorului de la \„%sourceVendor%\” (%source%) la \„%targetVendor%\” (%target%)
-install %source% from excluded repository	SolverProblemSolution		instalează %source% din depozitul exclus
-keep old %source%	SolverProblemSolution		păstrează %source% veche
-conflicting requests	SolverProblem		cereri în conflict
-package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		pachetul %source% necesită %dependency% dar nu se pot instala niciunul dintre furnizori
-do not forbid installation of %source%	SolverProblemSolution		nu interzice instalarea a %source%
 allow architecture change of %source% to %target%	SolverProblemSolution		permite modificarea arhitecturii a %source% la %target%
-allow name change of %source% to %target%	SolverProblemSolution		permite modificarea numelui a %source% la %target%
+install %source% from excluded repository	SolverProblemSolution		instalează %source% din depozitul exclus
+unspecified problem	SolverProblem		problemă nespecificată
+package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		pachetul %source% necesită %dependency% dar nu se pot instala niciunul dintre furnizori
+package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		pachetul %source% face să fie depășită implicit %dependency% furnizată de %target%
+nothing provides requested %dependency%	SolverProblem		nimic nu furnizează %dependency% cerută
+do not keep %source% installed	SolverProblemSolution		nu păstra %source% instalat
+do not deinstall \"%selection%\"	SolverProblemSolution		nu dezinstala \„%selection%\”
+install %source% despite its inferior architecture	SolverProblemSolution		instalează %source% chiar dacă are o arhitectură inferioară
+conflicting requests	SolverProblem		cereri în conflict
+do not install the most recent version of \"%selection%\"	SolverProblemSolution		nu instala cea mai recentă versiune a \„%selection%\”
 allow replacement of %source% with %target%	SolverProblemSolution		permite înlocuirea a %source% cu %target%
-allow deinstallation of %source%	SolverProblemSolution		permite dezinstalarea a %source%
-%source% does not belong to a distupgrade repository	SolverProblem		%source% nu aparține unui depozit distupgrade
 package %source% obsoletes %dependency% provided by %target%	SolverProblem		pachetul %source% face să fie depășită %dependency% furnizată de %target%
-package %source% is not installable	SolverProblem		pachetul %source% nu se poate instala
+do not forbid installation of %source%	SolverProblemSolution		nu interzice instalarea a %source%
+allow downgrade of %source% to %target%	SolverProblemSolution		permite retrogradarea a %source% la %target%
+dependency problem	SolverProblem		problemă de dependențe
+%dependency% is provided by the system	SolverProblem		%dependency% este furnizat de către sistem
+keep %source% despite its inferior architecture	SolverProblemSolution		păstrează %source% în ciuda arhitecturii inferioare
+%source% does not belong to a distupgrade repository	SolverProblem		%source% nu aparține unui depozit distupgrade
 installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		pachetul instalat %source% face să fie depășită %dependency% furnizată de %target%
+allow name change of %source% to %target%	SolverProblemSolution		permite modificarea numelui a %source% la %target%
+package %source% conflicts with %dependency% provided by %target%	SolverProblem		pachetul %source% este în conficlt cu %dependency% furnizat de %target%
+do something	SolverProblemSolution		face ceva
+install %selection% despite its old version	SolverProblemSolution		instalează %selection% chiar dacă există versiunea veche
+cannot install both %source% and %target%	SolverProblem		nu se pot instala atât %source% cât și %target%
+package %source% is not installable	SolverProblem		pachetul %source% nu se poate instala
 problem with installed package %source%	SolverProblem		problemă la instalarea pachetului %source%
+allow deinstallation of %source%	SolverProblemSolution		permite dezinstalarea a %source%
+keep %source% from excluded repository	SolverProblemSolution		păstrează %source% din depozitul exclus
+keep old %source%	SolverProblemSolution		păstrează %source% veche
+package %source% conflicts with %dependency% provided by itself	SolverProblem		pachetul %source% se află în conflict cu %dependency% furnizată de el însuși
+allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		permite modificarea vânzătorului de la \„%sourceVendor%\” (%source%) la \„%targetVendor%\” (%target%)
+do not lock \"%selection%\"	SolverProblemSolution		nu bloca \„%selection%\”
+do not install \"%selection%\"	SolverProblemSolution		nu instala \„%selection%\”
 nothing provides %dependency% needed by %source%	SolverProblem		nimic nu furnizează %dependency% necesitată de %source%
+%source% has inferior architecture	SolverProblem		%source% are o arhitectură inferioară
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		nu dezinstala toate lucrurile care se pot rezolva \„%selection%\”

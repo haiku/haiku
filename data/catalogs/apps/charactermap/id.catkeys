@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-CharacterMap	3823485487
+1	indonesian	x-vnd.Haiku-CharacterMap	2309284868
 Enclosed alphanumerics	UnicodeBlocks		Alfanumerik tertutup
 Basic Latin	UnicodeBlocks		Bahasa Latin dasar
 Cyrillic extended C	UnicodeBlocks		Cyrillic extended C
@@ -14,27 +14,80 @@ Old Hungarian	UnicodeBlocks		Old Hungarian
 Khmer	UnicodeBlocks		Khmer
 Supplementary private use area A	UnicodeBlocks		Supplementary private use area A
 Hanunoo	UnicodeBlocks		Hanunoo
+Linear B ideograms	UnicodeBlocks		Ideogram B linear
+Devanagari	UnicodeBlocks		Devanagari
 Armenian	UnicodeBlocks		Armenia
 Mathematical operators	UnicodeBlocks		Operator matematik
+General punctuation	UnicodeBlocks		Tanda baca umum
+Miscellaneous technical	UnicodeBlocks		Serbaneka teknis
 Arabic	UnicodeBlocks		Arab
+Ethiopic extended	UnicodeBlocks		Perluasan Ethiopia
 Arrows	UnicodeBlocks		Panah
 Font	CharacterWindow		Fon
+Gujarati	UnicodeBlocks		Gujarat
 Cuneiform	UnicodeBlocks		Runcing
 Balinese	UnicodeBlocks		Bali
+Cham	UnicodeBlocks		Kamboja
 Specials	UnicodeBlocks		Spesial
 Khmer symbols	UnicodeBlocks		Simbol Khmer
+Tagbanwa	UnicodeBlocks		Tagbanwa
+Kanbun	UnicodeBlocks		Kanbun
+Syriac	UnicodeBlocks		Suryani
+CJK compatibility ideographs Supplement	UnicodeBlocks		Suplemen kompatibilitas ideograf CJK
 Musical symbols	UnicodeBlocks		Simbol musikal
+Hangul syllables	UnicodeBlocks		Suku kata Hangul
 Coptic	UnicodeBlocks		Koptik
+Tai Le	UnicodeBlocks		Tai le
 Mahjong tiles	UnicodeBlocks		Ubin Mahjong
+Spacing modifier letters	UnicodeBlocks		Huruf pengubah spasi
+Aegean numbers	UnicodeBlocks		Angka Aegea
+CJK strokes	UnicodeBlocks		Ketukan CJK
+Old italic	UnicodeBlocks		Italik kuno
+Supplemental arrows B	UnicodeBlocks		Panah tambahan B
+Cyrillic extended A	UnicodeBlocks		Perluasan Cyrillic A
+Kharoshthi	UnicodeBlocks		Kharoshthi
+Combining half marks	UnicodeBlocks		Menggabungkan setengah tanda
+Cyrillic	UnicodeBlocks		Cyrillic
 Katakana	UnicodeBlocks		Katakana
+Block elements	UnicodeBlocks		Elemen blok
+Clear	CharacterWindow		Bersih
 Sundanese	UnicodeBlocks		Sunda
+Miscellaneous mathematical symbols A	UnicodeBlocks		Simbol matematika lain-lain A
+Cyrillic supplement	UnicodeBlocks		Suplemen Cyrillic
 IPA extensions	UnicodeBlocks		Ekstensi IPA
+Thaana	UnicodeBlocks		Thaana
+Ogham	UnicodeBlocks		Ogham
+Combining diacritical marks for symbols	UnicodeBlocks		Kombinasi tanda diakritikal untuk simbol
+Syloti Nagri	UnicodeBlocks		Syloti Nagri
+Arabic supplement	UnicodeBlocks		Arab suplemen
+Latin extended C	UnicodeBlocks		Latin C diperluas
+Ethiopic	UnicodeBlocks		Ethiopik
+Bengali	UnicodeBlocks		Bengali
+Filter:	CharacterWindow		Saring:
+Hangul compatibility Jamo	UnicodeBlocks		Hangul kompatibilitas Jamo
+Hiragana	UnicodeBlocks		Hiragana
 Tagalog	UnicodeBlocks		Tagalog
+Buginese	UnicodeBlocks		Bugis
+Bopomofo	UnicodeBlocks		Bopomofo
+Code	CharacterWindow		Kode
+Lepcha	UnicodeBlocks		Lepcha
+Sinhala	UnicodeBlocks		Sinhala
+Ancient Greek musical notation	UnicodeBlocks		Notasi musikal Yunani Kuno
+Early Dynastic Cuneiform	UnicodeBlocks		Tulisan runcing awal dinasti 
 Geometric shapes	UnicodeBlocks		Bentuk Geometrik
+Tamil	UnicodeBlocks		Tamil
 Currency symbols	UnicodeBlocks		Simbol mata uang
+Anatolian hieroglyphs	UnicodeBlocks		Hieroglif Anatolia
+Marchen	UnicodeBlocks		Marchen
+Ugaritic	UnicodeBlocks		Ugaritik
+Tangut	UnicodeBlocks		Tangut
 File	CharacterWindow		Berkas
+Cherokee	UnicodeBlocks		Cherokee
+Miscellaneous symbols	UnicodeBlocks		Simbol lainnya
 Old Persian	UnicodeBlocks		Persia lama
 Myanmar	UnicodeBlocks		Myanmar
+Byzantine musical symbols	UnicodeBlocks		Simbol musikal Romawi Timur
+Oriya	UnicodeBlocks		Oriya
 Tibetan	UnicodeBlocks		Tibet
 Ancient Greek numbers	UnicodeBlocks		Angka Yunani lama
 Mongolian supplement	UnicodeBlocks		Suplemen mongolia

@@ -1,49 +1,49 @@
 1	swedish	x-vnd.Haiku-Time	3755504714
-GMT (UNIX compatible)	Time		GMT (UNIX kompatibel)
 OK	Time		OK
-Asia	Time		Asien
-\nNow: 	Time		\nNu: 
-Africa	Time		Afrika
+Message receiving failed	Time		Kunde inte ta emot meddelandet
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date, Skriven av:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
+Australia	Time		Australien
+America	Time		Amerika
 Reset to default server list	Time		Återställ till förinställt värde
 Could not resolve server address	Time		Det gick inte att namnupplösa serveradressen
-Stop	Time		Stoppa
-Australia	Time		Australien
-Preview time:	Time		Förhandsvisa tid:
-Synchronize	Time		Synkronisera
-Revert	Time		Återställ
-Pacific	Time		Stilla havet
-Show day of week	Time		Visa veckodag
-Add	Time		Lägg till
-Date and time	Time		Datum och tid
-about	Time		om
-Local time (Windows compatible)	Time		Lokal tid (Windows kompatibel)
-Message receiving failed	Time		Kunde inte ta emot meddelandet
 Set time zone	Time		Ange tidzon
+The following error occured while synchronizing:r\n%s: %s	Time		Följande fel uppstod vid synkronisering:r\n%s: %s
 Waiting for answer failed	Time		Fick inget svar
-Hardware clock set to:	Time		Hårdvaruklockans tid:
+<Other>	Time		<Annan>
+Received invalid time	Time		Tog emot en ogiltig tid
+Remove	Time		Ta bort
+Synchronize again	Time		Synkronisera igen
+Asia	Time		Asien
+Try all servers	Time		Prova alla servrarna
+Time	Time		Tid
+Current time:	Time		Aktuell tid:
 The following error occured while synchronizing:r\n%s	Time		Följande fel uppstod vid synkronisering:r\n%s
 Europe	Time		Europa
-Remove	Time		Ta bort
-Time	Time		Tid
-Indian	Time		Indien
-Sending request failed	Time		Misslyckades att skicka förfrågan
+Show day of week	Time		Visa veckodag
+Local time (Windows compatible)	Time		Lokal tid (Windows kompatibel)
+Hardware clock set to:	Time		Hårdvaruklockans tid:
 Arctic	Time		Arktis
-Display time with seconds	Time		Visa tid med sekunder
-Time	System name		Tid
-America	Time		Amerika
-Synchronize at boot	Time		Synkronisera vid uppstart
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date, Skriven av:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
-Received invalid time	Time		Tog emot en ogiltig tid
 Antarctica	Time		Antarktis
-Show time zone	Time		Ange tidzon
-Show clock in Deskbar	Time		Visa klockan i deskbaren
-The following error occured while synchronizing:r\n%s: %s	Time		Följande fel uppstod vid synkronisering:r\n%s: %s
-<Other>	Time		<Annan>
-Current time:	Time		Aktuell tid:
-Try all servers	Time		Prova alla servrarna
+GMT (UNIX compatible)	Time		GMT (UNIX kompatibel)
+Africa	Time		Afrika
+Stop	Time		Stoppa
 Time zone	Time		Tidzon
-Could not create socket	Time		Kunde inte skapa en socket
-Synchronize again	Time		Synkronisera igen
 Clock	Time		Klockan
 Network time	Time		Internettid
+Sending request failed	Time		Misslyckades att skicka förfrågan
+Preview time:	Time		Förhandsvisa tid:
+\nNow: 	Time		\nNu: 
+Could not create socket	Time		Kunde inte skapa en socket
+Pacific	Time		Stilla havet
 Atlantic	Time		Atlanten
+Show clock in Deskbar	Time		Visa klockan i deskbaren
+Display time with seconds	Time		Visa tid med sekunder
+Time	System name		Tid
+about	Time		om
+Show time zone	Time		Ange tidzon
+Synchronize at boot	Time		Synkronisera vid uppstart
+Indian	Time		Indien
+Revert	Time		Återställ
+Date and time	Time		Datum och tid
+Synchronize	Time		Synkronisera
+Add	Time		Lägg till

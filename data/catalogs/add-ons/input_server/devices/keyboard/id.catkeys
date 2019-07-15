@@ -1,10 +1,10 @@
 1	indonesian	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
-Kill application	Team monitor		Matikan aplikasi
-Quit application	Team monitor		Menghentikan aplikasi
-Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Pilih aplikasi dari daftar diatas dan klik satu dari tombol 'matikan aplikasi' dan 'Meninggalkan aplikasi' untuk menutupnya.\n\nTahan CONTROL+ALT+DELETE for %ld detik untuk restart.
 If the application will not quit you may have to kill it.	Team monitor		Jika aplikasi tidak mau keluar anda mungkin harus mematikannya.
-Force reboot	Team monitor		Paksa restart
-Team monitor	Team monitor		Monitor tim
-(This team is a system component)	Team monitor		(Tim ini adalah komponen sistem)
+Quit application	Team monitor		Menghentikan aplikasi
 Restart the desktop	Team monitor		Restart desktop
+Force reboot	Team monitor		Paksa restart
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Pilih aplikasi dari daftar diatas dan klik satu dari tombol 'matikan aplikasi' dan 'Meninggalkan aplikasi' untuk menutupnya.\n\nTahan CONTROL+ALT+DELETE for %ld detik untuk restart.
+Team monitor	Team monitor		Monitor tim
+Kill application	Team monitor		Matikan aplikasi
 Cancel	Team monitor		Batal
+(This team is a system component)	Team monitor		(Tim ini adalah komponen sistem)

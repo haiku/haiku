@@ -1,18 +1,18 @@
 1	russian	x-vnd.Haiku-Pairs	818003250
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Не найдено достаточно векторных значков для начала игры; необходимо по крайней мере %zu, найдено %zu.\n
-%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tразработал Ralf Schülke\n\tВсе права защищены (с) 2008-2010, Haiku Inc.\n\n
+Pairs	System name		Пары
+Quit	PairsWindow		Выход
+Medium	PairsWindow		Средняя
+Game	PairsWindow		Игра
 Expert (8x8)	PairsWindow		Эксперт (8x8)
-Beginner (4x4)	PairsWindow		Новичок (4x4)
+New	PairsWindow		Новая
+OK	Pairs		ОК
+Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Не найдено достаточно векторных значков для начала игры; необходимо по крайней мере %zu, найдено %zu.\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Вы завершили игру в {0, plural, one{# клик} few{# клика} other{# кликов}}.\n
+Small	PairsWindow		Маленькая
+Size	PairsWindow		Размер
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tразработал Ralf Schülke\n\tВсе права защищены (с) 2008-2010, Haiku Inc.\n\n
 Quit game	PairsWindow		Выход
 Large	PairsWindow		Большая
-Small	PairsWindow		Маленькая
-Game	PairsWindow		Игра
-OK	Pairs		ОК
-Size	PairsWindow		Размер
-New	PairsWindow		Новая
+Beginner (4x4)	PairsWindow		Новичок (4x4)
 Intermediate (6x6)	PairsWindow		Средний (6x6)
-Quit	PairsWindow		Выход
-Pairs	System name		Пары
 New game	PairsWindow		Новая игра
-Medium	PairsWindow		Средняя

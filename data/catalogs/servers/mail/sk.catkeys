@@ -1,19 +1,19 @@
 1	slovak	x-vnd.Be-POST	2949558073
+No new messages	MailDaemon		Žiadne nové správy
+No new messages	DeskbarView		Žiadne nové správy
+Shutdown mail services	DeskbarView		Vypnúť poštové služby
+Mail status	MailDaemon		Stav pošty
 Fetching mail for %name	Notifier		Sťahuje sa pošta účtu %name
-Check for mails only	DeskbarView		Iba skontrolovať poštu
-Send pending mails	DeskbarView		Poslať čakajúcu poštu
-{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{jedna nová správa} few{# nové správy} other{# nových správ}}
 {0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# nová správa} few{# nové správy} other{# nových správ}}
 {0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# nová správa} few{# nové správy} other{# nových správ}} pre %name\n
+Create new message…	DeskbarView		Vytvoriť novú správu…
+Send pending mails	DeskbarView		Poslať čakajúcu poštu
+Settings…	DeskbarView		Nastavenia…
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{jedna nová správa} few{# nové správy} other{# nových správ}}
 New Messages	MailDaemon		Nové správy
 <no accounts>	DeskbarView		<žiadne účty>
-Mail status	MailDaemon		Stav pošty
-Shutdown mail services	DeskbarView		Vypnúť poštové služby
-Sending mail for %name	Notifier		Posiela sa pošta účtu %name
-Create new message…	DeskbarView		Vytvoriť novú správu…
-No new messages	MailDaemon		Žiadne nové správy
-Check for mail now	DeskbarView		Skontrolovať poštu teraz
-No new messages	DeskbarView		Žiadne nové správy
-Mail daemon status log	MailDaemon		Stavový záznam poštového démona
-Settings…	DeskbarView		Nastavenia…
 Mail status	Notifier		Stav pošty
+Check for mails only	DeskbarView		Iba skontrolovať poštu
+Check for mail now	DeskbarView		Skontrolovať poštu teraz
+Sending mail for %name	Notifier		Posiela sa pošta účtu %name
+Mail daemon status log	MailDaemon		Stavový záznam poštového démona

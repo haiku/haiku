@@ -1,69 +1,68 @@
-1	portuguese (brazil)	x-vnd.Haiku-Appearance	727801787
-Plain font:	Font view		Fonte plana:
-Control highlight	Colors tab		Realce do controle
+1	portuguese (brazil)	x-vnd.Haiku-Appearance	3106786237
 Control border	Colors tab		Borda do controle
-Antialiasing type:	AntialiasingSettingsView		Tipo de suavização de serrilhado:
-Shadow	Colors tab		Sombra
-On	AntialiasingSettingsView		Ligado
-Defaults	APRWindow		Padrões
-Grayscale	AntialiasingSettingsView		Escala de cinza
-Shine	Colors tab		Brilho
-About	DecorSettingsView		Sobre
-About decorator	DecorSettingsView		Sobre o decorador
+Control mark	Colors tab		Marca de controle
 Off	AntialiasingSettingsView		Desligado
-Choose Decorator	DecorSettingsView		Escolher Decorador
-Success	Colors tab		Sucesso
-Inactive window tab text	Colors tab		Texto da aba de janela inativa
-Failure	Colors tab		Falha
-Hinting menu	AntialiasingSettingsView		Menu de sugestão
-Scroll bar:	DecorSettingsView		Barra de rolagem:
+Window border	Colors tab		Margem da janela
+Inactive window tab	Colors tab		Aba da janela inativa
+Defaults	APRWindow		Padrões
+Shadow	Colors tab		Sombra
 Document background	Colors tab		Plano de fundo do documento
+List background	Colors tab		Plano de fundo da lista
+Fixed font:	Font view		Fonte de largura fixa:
+Appearance	System name		Aparência
+Reduce colored edges filter strength:	AntialiasingSettingsView		Reduzir a força do filtro de bordas coloridas:
+Glyph hinting:	AntialiasingSettingsView		Sugestão de glifo:
+Menu item text	Colors tab		Texto de item de menu
+About decorator	DecorSettingsView		Sobre o decorador
+Antialiasing menu	AntialiasingSettingsView		Menu de suavização de serrilhado
+Success	Colors tab		Sucesso
+About	DecorSettingsView		Sobre
+Shine	Colors tab		Brilho
+Arrow style	DecorSettingsView		Estilo da seta
+On	AntialiasingSettingsView		Ligado
+Decorator:	DecorSettingsView		Decorador:
+Menu background	Colors tab		Plano de fundo de menu
 Revert	APRWindow		Reverter
-Window tab	Colors tab		Aba da janela
-Tooltip background	Colors tab		Plano de fundo das dicas
+List item text	Colors tab		Texto do item da lista
+OK	DecorSettingsView		OK
+Control text	Colors tab		Texto do controle
+Look and feel	APRWindow		Olhar e sentir
 Selected menu item background	Colors tab		Plano de fundo do item de menu selecionado
 Antialiasing	APRWindow		Suavização de serrilhado
-Navigation base	Colors tab		Base de navegação
-Selected list item text	Colors tab		Texto do item da lista selecionado
-Window border	Colors tab		Margem da janela
-Double:	DecorSettingsView		Duplo:
-Window tab text	Colors tab		Texto da aba da Janela
-Document text	Colors tab		Texto do documento
-Navigation pulse	Colors tab		Navegação de pulso
-Selected menu item text	Colors tab		Texto do item do menu selecionado
-Menu background	Colors tab		Plano de fundo de menu
-List background	Colors tab		Plano de fundo da lista
-OK	DecorSettingsView		OK
-Control mark	Colors tab		Marca de controle
-Size:	Font Selection view		Tamanho:
-Decorator:	DecorSettingsView		Decorador:
-Selected list item background	Colors tab		Plano de fundo do item de lista selecionado
-Panel background	Colors tab		Plano de fundo do painel
 Menu font:	Font view		Fonte de menu:
-Colors	APRWindow		Cores
-Control background	Colors tab		Plano de fundo do controle
-Inactive window tab	Colors tab		Aba da janela inativa
-List item text	Colors tab		Texto do item da lista
-Appearance	System name		Aparência
-Fixed font:	Font view		Fonte de largura fixa:
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Yuri viu um pequeno jabuti xereta e dez cegonhas felizes comendo kiwi.
-%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutores:\n\t %decorAuthors\n\nURL: %decorURL\nLicença: %decorLic\n\n%decorDesc\n
-Reduce colored edges filter strength:	AntialiasingSettingsView		Reduzir a força do filtro de bordas coloridas:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		A possibilidade de usar o antiserrilhamento baseado em Subpíxeis juntamente com o alisamento de glifos não está disponível nesta versão do Haiku para evitar possíveis problemas com patentes. Para habilitar esta funcionalidade, você terá que compilar o Haiku e ativar certas opções no cabeçalho de configuração da libfreetype.
-Scroll bar thumb	Colors tab		Botão da barra de rolagem
-Control text	Colors tab		Texto do controle
-Single:	DecorSettingsView		Único:
-Tooltip text	Colors tab		Texto da dica
 Bold font:	Font view		Negrito:
-Inactive window border	Colors tab		Margem inativa de janela
-Menu item text	Colors tab		Texto de item de menu
-LCD subpixel	AntialiasingSettingsView		Subpixel LCD
-Selected menu item border	Colors tab		Borda do item de menu selecionado
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutores:\n\t %decorAuthors\n\nURL: %decorURL\nLicença: %decorLic\n\n%decorDesc\n
+Choose Decorator	DecorSettingsView		Escolher Decorador
 Strong	AntialiasingSettingsView		Forte
-Panel text	Colors tab		Texto de janela de diálogo
-Arrow style	DecorSettingsView		Estilo da seta
-Monospaced fonts only	AntialiasingSettingsView		Apenas fontes monoespaçadas
-Look and feel	APRWindow		Olhar e sentir
-Antialiasing menu	AntialiasingSettingsView		Menu de suavização de serrilhado
+Failure	Colors tab		Falha
+Double:	DecorSettingsView		Duplo:
+Selected menu item text	Colors tab		Texto do item do menu selecionado
+Size:	Font Selection view		Tamanho:
+Panel background	Colors tab		Plano de fundo do painel
+Plain font:	Font view		Fonte plana:
+Window tab text	Colors tab		Texto da aba da Janela
+Navigation pulse	Colors tab		Navegação de pulso
+LCD subpixel	AntialiasingSettingsView		Subpixel LCD
+Window tab	Colors tab		Aba da janela
+Tooltip background	Colors tab		Plano de fundo das dicas
+Scroll bar thumb	Colors tab		Botão da barra de rolagem
+Selected menu item border	Colors tab		Borda do item de menu selecionado
+Tooltip text	Colors tab		Texto da dica
+Control background	Colors tab		Plano de fundo do controle
+Selected list item text	Colors tab		Texto do item da lista selecionado
+Selected list item background	Colors tab		Plano de fundo do item de lista selecionado
+Inactive window tab text	Colors tab		Texto da aba de janela inativa
+Navigation base	Colors tab		Base de navegação
 Fonts	APRWindow		Fontes
-Glyph hinting:	AntialiasingSettingsView		Sugestão de glifo:
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Yuri viu um pequeno jabuti xereta e dez cegonhas felizes comendo kiwi.
+Grayscale	AntialiasingSettingsView		Escala de cinza
+Antialiasing type:	AntialiasingSettingsView		Tipo de suavização de serrilhado:
+Panel text	Colors tab		Texto de janela de diálogo
+Hinting menu	AntialiasingSettingsView		Menu de sugestão
+Scroll bar:	DecorSettingsView		Barra de rolagem:
+Monospaced fonts only	AntialiasingSettingsView		Apenas fontes monoespaçadas
+Document text	Colors tab		Texto do documento
+Inactive window border	Colors tab		Margem inativa de janela
+Colors	APRWindow		Cores
+Control highlight	Colors tab		Realce do controle
+Single:	DecorSettingsView		Único:

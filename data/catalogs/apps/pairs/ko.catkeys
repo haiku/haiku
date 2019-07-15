@@ -1,11 +1,11 @@
 1	korean	x-vnd.Haiku-Pairs	2647083837
-Expert (8x8)	PairsWindow		전문가 (8x8)
-Beginner (4x4)	PairsWindow		초보자 (4x4)
-Quit game	PairsWindow		게임 나가기
-Game	PairsWindow		게임
-Size	PairsWindow		크기
-New	PairsWindow		새 게임
-Intermediate (6x6)	PairsWindow		중급자 (6x6)
-Quit	PairsWindow		나가기
 Pairs	System name		짝맞추기
+Quit	PairsWindow		나가기
+Game	PairsWindow		게임
+Expert (8x8)	PairsWindow		전문가 (8x8)
+New	PairsWindow		새 게임
+Size	PairsWindow		크기
+Quit game	PairsWindow		게임 나가기
+Beginner (4x4)	PairsWindow		초보자 (4x4)
+Intermediate (6x6)	PairsWindow		중급자 (6x6)
 New game	PairsWindow		새 게임

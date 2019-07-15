@@ -1,35 +1,35 @@
 1	portuguese (brazil)	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		Restaurar instantâneo
-Could not set Sudoku:\n%s\n	SudokuWindow		Não foi possível definir Sudoku:\n%s\n
-Export as…	SudokuWindow		Exportar como…
-OK	SudokuWindow		OK
-New	SudokuWindow		Novo
-Abort	ProgressWindow		Cancelar
-Sudoku	System name		Sudoku
-Could not open \"%s\":\n%s\n	SudokuWindow		Não foi possível abrir \"%s\":\n%s\n
-Easy	SudokuWindow		Fácil
-Open file…	SudokuWindow		Abrir arquivo…
-Solve single field	SudokuWindow		Resolver único campo
-Solve	SudokuWindow		Resolver
-Redo	SudokuWindow		Refazer
 File	SudokuWindow		Arquivo
-Advanced	SudokuWindow		Avançado
-Start again	SudokuWindow		Iniciar novamente
-HTML	SudokuWindow		HTML
-Sudoku request	SudokuWindow		Solicitação Sudoku
-Copy	SudokuWindow		Copiar
-Mark valid hints	SudokuWindow		Marcar dicas válidas
-Sudoku solved - congratulations!\n	SudokuWindow		Sudoku resolvido - parabéns!\n
+Mark invalid values	SudokuWindow		Marcar valores inválidos
+Solve single field	SudokuWindow		Resolver único campo
 Hard	SudokuWindow		Difícil
-Snapshot current	SudokuWindow		Instantâneo atual
+Start again	SudokuWindow		Iniciar novamente
+New	SudokuWindow		Novo
+Easy	SudokuWindow		Fácil
+Undo	SudokuWindow		Desfazer
+Export as…	SudokuWindow		Exportar como…
+Quit	SudokuWindow		Sair
+Redo	SudokuWindow		Refazer
+Could not open \"%s\":\n%s\n	SudokuWindow		Não foi possível abrir \"%s\":\n%s\n
+Blank	SudokuWindow		Vazio
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku resolvido - parabéns!\n
 Text	SudokuWindow		Texto
+Copy	SudokuWindow		Copiar
+Solve	SudokuWindow		Resolver
+HTML	SudokuWindow		HTML
+Advanced	SudokuWindow		Avançado
+Set all hints	SudokuWindow		Defina todas as dicas
+Searching for removable values	SudokuGenerator		Procurando por valores removíveis
+Abort	ProgressWindow		Cancelar
+Could not set Sudoku:\n%s\n	SudokuWindow		Não foi possível definir Sudoku:\n%s\n
+Help	SudokuWindow		Ajuda
+OK	SudokuWindow		OK
+Sudoku	System name		Sudoku
+Progress monitor	ProgressWindow		Monitor de progresso
 Creating solvable field	SudokuGenerator		Criando campo solucionável
 View	SudokuWindow		Visualizar
-Progress monitor	ProgressWindow		Monitor de progresso
-Set all hints	SudokuWindow		Defina todas as dicas
-Mark invalid values	SudokuWindow		Marcar valores inválidos
-Blank	SudokuWindow		Vazio
-Help	SudokuWindow		Ajuda
-Searching for removable values	SudokuGenerator		Procurando por valores removíveis
-Undo	SudokuWindow		Desfazer
-Quit	SudokuWindow		Sair
+Snapshot current	SudokuWindow		Instantâneo atual
+Mark valid hints	SudokuWindow		Marcar dicas válidas
+Sudoku request	SudokuWindow		Solicitação Sudoku
+Open file…	SudokuWindow		Abrir arquivo…

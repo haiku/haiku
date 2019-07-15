@@ -1,55 +1,49 @@
-1	indonesian	x-vnd.Haiku-BluetoothPrefs	145165464
-About Bluetooth…	Window		Tentang Bluetooth…
-Handheld	Settings view		Perangkat genggam
-Default inquiry time:	Settings view		Waktu penyelidikan bawaan:
+1	indonesian	x-vnd.Haiku-BluetoothPrefs	67867884
+Laptop	Settings view		Leptop
+Only from trusted devices	Settings view		Hanya dari perangkat terpercaya
+15 secs	Settings view		15 detik
+Quit	main		Berhenti
 Manufacturer: 	Device View		Pabrikan: 
-Add device to list	Inquiry panel		Tambah alat ke daftar
-Starting scan...	Inquiry panel		Mulai menindai...
-Smart phone	Settings view		Ponsel pintar
-With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Dengan dukungan:\n- Mika Lindqvist\n- Adrien Destugues\n- Maksym Yevmenkin\n\nTerima kasih kepada individu yang menolong...\n\nPengiriman/donasi hardware :\n- Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n- Edwin Erik Amsler\n- Dennis d'Entremont\n- Luroh\n- Pieter Panman\n\nSecara ekonomi:\n- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n- Matt M, Doug F, Hubert H,\n- Sebastian B, Andrew M, Jared E,\n- Frederik H, Tom S, Ferry B,\n- Greg G, David F, Richard S, Martin W:\n\ndengan tambalan:\n- Michael Weirauch\n- Fredrik Ekdahl\n- Raynald Lesieur\n- Andreas Färber\n- Joerg Meyer\nTest:\n- Petter H. Juliussen\nYang memberikan kepada saya semua pengetahuan:\n- the yellowTAB team
-Server	Settings view		Server
-Stop bluetooth services…	Window		Menghentikan layanan bluetooth...
-The Bluetooth services are not currently running on this system.	main		Layanan Bluetooth saat ini tidak berjalan pada sistem ini.
+Desktop	Settings view		Desktop
+Server	Window		Server
 Identify host as:	Settings view		Identifikas host sebagai:
 Refresh…	Remote devices		Refres…
-Pair…	Remote devices		Pasangkan...
-Incoming connections policy:	Settings view		Kebijakan koneksi masuk:
-From all devices	Settings view		Dari semua perangkat
-Show name	Extended local device view		Tampilkan nama
 Local devices found on system:	Settings view		Perangkat lokal ditemukan pada sistem:
-Remaining %1 seconds	Inquiry panel		Sisa %1 detik
-Server	Window		Server
-Scanning completed.	Inquiry panel		Pemindaian selesai.
+Service classes: 	Device View		Kelas layanan: 
+Remote devices	Window		Perangkat remote
+Settings	Window		Pengaturan
+Stop bluetooth services…	Window		Menghentikan layanan bluetooth...
+61 secs	Settings view		61 detik
+Add…	Remote devices		Tambah...
+As blocked	Remote devices		Sebagai diblokir
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Tidak ada perangkat lokal Bluetooth terdaftar pada sistem.
+Revert	Window		Pulihkan
+Refresh local devices…	Window		Refresh perangkat lokal...
+Disconnect	Remote devices		Memutuskan
+From all devices	Settings view		Dari semua perangkat
+Defaults	Window		Bawaan
+Start bluetooth services…	Window		Mulai layanan bluetooth ...
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Periksa bahwa kemampuan Bluetooth dari perangkat remote Anda diaktifkan. Tekan 'Selidiki' untuk memulai pemindaian. Waktu yang dibutuhkan untuk pengambilan nama-nama tidak diketahui, meskipun seharusnya tidak lebih dari 3 detik per perangkat. Setelah itu Anda akan dapat menambahkannya ke daftar utama anda, di mana anda akan dapat memasangkan dengan mereka.
+Scanning progress	Inquiry panel		Proses pemindaian
+Bluetooth	System name		Bluetooth
 Launch now	main		Luncurkan sekarang
 Remove	Remote devices		Melepaskan
-Quit	main		Berhenti
-15 secs	Settings view		15 detik
-Start bluetooth services…	Window		Mulai layanan bluetooth ...
-Policy...	Settings view		Kebijakan...
-61 secs	Settings view		61 detik
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Tidak ada perangkat lokal Bluetooth terdaftar pada sistem.
-Identify us as...	Settings view		Identifikasi kami sebagai...
- packets: 	Device View		 paket: 
-As blocked	Remote devices		Sebagai diblokir
-Bluetooth	System name		Bluetooth
-Disconnect	Remote devices		Memutuskan
-Defaults	Window		Bawaan
-Inquiry	Inquiry panel		Selidiki
-Desktop	Settings view		Desktop
-Revert	Window		Pulihkan
-Remote devices	Window		Perangkat remote
-Laptop	Settings view		Leptop
-Discoverable	Extended local device view		Dapat dicari
-Service classes: 	Device View		Kelas layanan: 
-Settings	Window		Pengaturan
-Only from trusted devices	Settings view		Hanya dari perangkat terpercaya
-Scanning progress	Inquiry panel		Proses pemindaian
 Always ask	Settings view		Selalu tanya
-Retrieving name of %1	Inquiry panel		Mengambil nama dari %1
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Periksa bahwa kemampuan Bluetooth dari perangkat remote Anda diaktifkan. Tekan 'Selidiki' untuk memulai pemindaian. Waktu yang dibutuhkan untuk pengambilan nama-nama tidak diketahui, meskipun seharusnya tidak lebih dari 3 detik per perangkat. Setelah itu Anda akan dapat menambahkannya ke daftar utama anda, di mana anda akan dapat memasangkan dengan mereka.
-Authenticate	Extended local device view		Otentifikasi
-Refresh local devices…	Window		Refresh perangkat lokal...
-Pick device...	Settings view		Pilih perangkat...
-Retrieving names...	Inquiry panel		Mengambil nama...
 Help	Window		Tolong
-Add…	Remote devices		Tambah...
+Pair…	Remote devices		Pasangkan...
+Retrieving name of %1	Inquiry panel		Mengambil nama dari %1
+Inquiry	Inquiry panel		Selidiki
+Incoming connections policy:	Settings view		Kebijakan koneksi masuk:
+Show name	Extended local device view		Tampilkan nama
+Add device to list	Inquiry panel		Tambah alat ke daftar
+Remaining %1 seconds	Inquiry panel		Sisa %1 detik
+The Bluetooth services are not currently running on this system.	main		Layanan Bluetooth saat ini tidak berjalan pada sistem ini.
+Discoverable	Extended local device view		Dapat dicari
+Authenticate	Extended local device view		Otentifikasi
+Smart phone	Settings view		Ponsel pintar
+Scanning completed.	Inquiry panel		Pemindaian selesai.
+Default inquiry time:	Settings view		Waktu penyelidikan bawaan:
+Server	Settings view		Server
+Handheld	Settings view		Perangkat genggam
+ packets: 	Device View		 paket: 
+About Bluetooth…	Window		Tentang Bluetooth…

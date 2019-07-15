@@ -1,11 +1,11 @@
 1	greek, modern (1453-)	x-vnd.Haiku-Pairs	2647083837
-Expert (8x8)	PairsWindow		Προχωρημένος (8x8)
-Beginner (4x4)	PairsWindow		Αρχάριος (4x4)
-Quit game	PairsWindow		Έξοδος παιχνιδιού
-Game	PairsWindow		Παιχνίδι
-Size	PairsWindow		Μέγεθος
-New	PairsWindow		Νέο
-Intermediate (6x6)	PairsWindow		Ενδιάμεσος (6x6)
-Quit	PairsWindow		Έξοδος
 Pairs	System name		Pairs
+Quit	PairsWindow		Έξοδος
+Game	PairsWindow		Παιχνίδι
+Expert (8x8)	PairsWindow		Προχωρημένος (8x8)
+New	PairsWindow		Νέο
+Size	PairsWindow		Μέγεθος
+Quit game	PairsWindow		Έξοδος παιχνιδιού
+Beginner (4x4)	PairsWindow		Αρχάριος (4x4)
+Intermediate (6x6)	PairsWindow		Ενδιάμεσος (6x6)
 New game	PairsWindow		Νέο παιχνίδι

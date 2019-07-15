@@ -1,50 +1,50 @@
 1	catalan; valencian	x-vnd.Haiku-Mail	688530788
+Account settings	AutoConfigWindow		Paràmetres del compte
+\t\t· Outgoing	Config Window		\t\t· Sortint
+E-mail address:	E-Mail		Adreça de correu:
+Create new account	AutoConfigWindow		Obre un compte nou
+While sending and receiving	Config Window		Mentre s'estigui enviant i rebent
+Apply	Config Window		Aplica
+Incoming mail filters	Config Views		Filtres del correu entrant
+Outgoing mail filters	Config Views		Filtres del correu de sortida
+Server name:	E-Mail		Nom del servidor:
+Add	Config Window		Afegeix
+Back	AutoConfigWindow		Anterior
+Real name:	E-Mail		Nom real:
+Real name:	Config Views		Nom real:
+\t\t· E-mail filters	Config Window		\t\t· Filtres de correu
+Outgoing	E-Mail		Sortint
+Accounts	Config Window		Comptes
+Outgoing	Config Window		Sortint
+Remove	Config Views		Suprimeix
 Settings	Config Window		Paràmetres
 Never	Config Window	show status window	Mai
-While sending and receiving	Config Window		Mentre s'estigui enviant i rebent
-Incoming	Config Window		Entrada
-Server name:	E-Mail		Nom del servidor:
-OK	Config Window		D'acord
-E-mail address:	E-Mail		Adreça de correu:
-Account name:	E-Mail		Nom del compte:
 Account name:	Config Views		Nom del compte:
-Create new account	AutoConfigWindow		Obre un compte nou
-OK	Config Views		D'acord
-The filter could not be moved. Deleting filter.	Config Views		No ha estat possible moure el filtre. Així que s'està suprimint.
-Revert	Config Window		Reverteix
-Login name:	E-Mail		Nom d'usuari:
-Incoming	E-Mail		Entrada
-Password:	E-Mail		Contrasenya:
-Accounts	Config Window		Comptes
-Finish	AutoConfigWindow		Acaba
-Remove	Config Window		Suprimeix
-Server Name:	E-Mail		Nom del servidor:
-While sending	Config Window		Mentre s'està enviant
+\t\t· Incoming	Config Window		\t\t· Entrant
 Enter a valid e-mail address.	AutoConfigWindow		Introduïu una adreça de correu electrònic vàlida.
-Add	Config Window		Afegeix
-Account settings	AutoConfigWindow		Paràmetres del compte
-E-mail	System name		Correu electrònic
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nNo ha estat possible de recuperar les preferències generals.\n\nS'ha produït un error en recuperar les preferències :\n%s\n
-Real name:	Config Views		Nom real:
-\t\t· Outgoing	Config Window		\t\t· Sortint
+Incoming	E-Mail		Entrada
 Choose Protocol	E-Mail		Escolliu un protocol
 Return address:	Config Views		Adreça de retorn:
-Edit mailbox menu…	Config Window		Edita el menú de la bústia d'entrada...
-Outgoing	E-Mail		Sortint
-\t\t· E-mail filters	Config Window		\t\t· Filtres de correu
-Remove	Config Views		Suprimeix
-\t\t· Incoming	Config Window		\t\t· Entrant
-Next	AutoConfigWindow		Següent
-Check every	Config Window		Comprova cada
-Back	AutoConfigWindow		Anterior
-Incoming mail filters	Config Views		Filtres del correu entrant
+Password:	E-Mail		Contrasenya:
+Error retrieving general settings: %s\n	Config Window		S'ha produït un error en recuperar les preferències : %s\n
+The filter could not be moved. Deleting filter.	Config Views		No ha estat possible moure el filtre. Així que s'està suprimint.
+OK	Config Views		D'acord
+Revert	Config Window		Reverteix
+Incoming	Config Window		Entrada
+Finish	AutoConfigWindow		Acaba
+Add filter	Config Views		Afegeix un filtre
 Account settings	Config Views		Configuració del compte
 minutes	Config Window		minuts
-Error retrieving general settings: %s\n	Config Window		S'ha produït un error en recuperar les preferències : %s\n
-Real name:	E-Mail		Nom real:
-Apply	Config Window		Aplica
+E-mail	System name		Correu electrònic
+Check every	Config Window		Comprova cada
+Account name:	E-Mail		Nom del compte:
+Edit mailbox menu…	Config Window		Edita el menú de la bústia d'entrada...
+Server Name:	E-Mail		Nom del servidor:
+Remove	Config Window		Suprimeix
+Login name:	E-Mail		Nom d'usuari:
+While sending	Config Window		Mentre s'està enviant
+OK	Config Window		D'acord
 OK	AutoConfigWindow		D'acord
-Add filter	Config Views		Afegeix un filtre
-Outgoing	Config Window		Sortint
-Outgoing mail filters	Config Views		Filtres del correu de sortida
+Next	AutoConfigWindow		Següent
 Error	Config Window		Error

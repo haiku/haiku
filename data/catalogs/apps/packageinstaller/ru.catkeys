@@ -1,64 +1,63 @@
-1	russian	x-vnd.Haiku-PackageInstaller	3292779285
-The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Объект с именем '%s' уже существует по данному пути.\nЗаменить этот объект тем, что находится в данном пакете или пропустить его?
-The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Папка с именем '%s' уже существует по данному пути.\nЗаменить эту папку той, что находится в данном пакете или пропустить ее?
-Install to:	PackageView		Установить в:
-OK	PackageView		ОК
-Accept	PackageTextViewer		Принять
-No package selected.	UninstallView		Ни один пакет не выбран.
+1	russian	x-vnd.Haiku-PackageInstaller	3110601390
+Package description	UninstallView		Описание пакета
+none	PackageView		нет
 Continue	PackageInstall		Продолжить
+Running post-installation scripts	PackageInstall		Выполнение постинсталляционных скриптов
+Package installer	PackageView		Установщик пакетов
+All existing files will be skipped?	PackageView		Все существующие файлы будут заменены?
+Replace	PackageView		Заменить
+All existing files will be replaced?	PackageView		Все существующие файлы будут заменены?
+Other…	PackageView		Другой…
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Символьная ссылка с именем '%s' уже существует по данному пути.\nЗаменить ссылку на ту, что находится в этом пакете или пропустить ее?
+Stop	PackageStatus		Остановить
+Install to:	PackageView		Установить в:
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Данный пакет уже установлен в вашей системе. Хотите удалить существующий и продолжить установку?
+Skip all	PackageView		Пропустить все
+The installation of the package has been aborted.	PackageView		Установка пакета была прервана.
+No installation type selected	PackageView		Не выбран тип установки
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Вы хотите запомнить это решение до конца этой установки?\n
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Выбранный пакет не был удалён из вашей системы. Файл инсталляции этого пакета возможно поврежден.
+Install…	UninstallView		Установить…
+The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Объект с именем '%s' уже существует по данному пути.\nЗаменить этот объект тем, что находится в данном пакете или пропустить его?
+Installing files and folders	PackageInstall		Установка файлов и папок
+Installed packages	UninstallWindow		Установленные пакеты
 Remove	UninstallView		Удалить
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Не удалось установить запрошенный пакет. Возможно это случилось из-за проблем файлами данного пакета. Пожалуйста, обратитесь к поставщику пакета.
-Image not loaded correctly	PackageImageViewer		Изображение некорректно загружено
-No package selected.	PackageInfo		Ни один пакет не выбран.
-The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Данный пакет уже установлен в вашей системе. Хотите удалить существующий и продолжить установку?
-Do you want to remember this decision for the rest of this installation?\n	PackageView		Вы хотите запомнить это решение до конца этой установки?\n
-Installed packages	UninstallWindow		Установленные пакеты
-There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Обнаружилась несоответствие размера файла в пакете. Этот пакет мог бы быть испорчен или быть измененным после его создания. Вы все еще хотите продолжить?
-Error while installing the package\n	PackageView		Ошибка во время установки пакета\n
-Disclaimer	PackageTextViewer		Заявление об отказе от ответственности
-%name% (%size% free)	PackageView		%name% (%size% свободно)
-The installation of the package has been aborted.	PackageView		Установка пакета была прервана.
-Done	PackageInstall		Готово
-All existing files will be replaced?	PackageView		Все существующие файлы будут заменены?
-Preparing package	PackageInstall		Подготовка пакета
-No package available.	PackageInfo		Нет доступных пакетов.
-none	PackageView		нет
-Install %name%	PackageView		Установить %name%
-Stop	PackageStatus		Остановить
-Other…	PackageView		Другой…
-No installation type selected	PackageView		Не выбран тип установки
-Installing files and folders	PackageInstall		Установка файлов и папок
-Package installer	PackageView		Установщик пакетов
-Install…	UninstallView		Установить…
-Skip all	PackageView		Пропустить все
-Running post-installation scripts	PackageInstall		Выполнение постинсталляционных скриптов
-Skip	PackageView		Пропустить
-The package you requested has been successfully installed on your system.	PackageView		Пакет, который вы просили, был успешно установлен на вашей системе.
-Error! \"%s\" is not a valid path.\n	Packageinstaller main		Ошибка! \"%s\" не является правильным путем.\n
-Installation type:	PackageView		Тип установки:
-Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Ошибка (%s)! Не удалось открыть \"%s\".\n
-Finishing installation	PackageInstall		Завершение установки
-Installing package	PackageStatus		Установка пакета
-Ask again	PackageView		Спрашивать снова
-Abort	PackageView		Прервать
-Replace all	PackageView		Заменить все
-Package description	UninstallView		Описание пакета
-Decline	PackageTextViewer		Отклонить
-All existing files will be skipped?	PackageView		Все существующие файлы будут заменены?
-Continue	PackageInfo		Продолжить
-%index% of %total%	PackageInstall		%index% из %total%
-The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Файл с именем '%s' уже существует по данному пути.\nЗаменить файл тем, что находится в данном пакете или пропустить его?
-The package you selected has been successfully removed from your system.	UninstallView		Выбранный пакет был успешно удалён из системы.
-Abort	PackageInfo		Прервать
-PackageInstaller	System name		Установщик пакетов
-Abort	PackageInstall		Прервать
-%name% (%size%)	PackageView		%name% (%size%)
-Continue	PackageTextViewer		Продолжить
-Begin	PackageView		Установить
 OK	UninstallView		ОК
-The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Символьная ссылка с именем '%s' уже существует по данному пути.\nЗаменить ссылку на ту, что находится в этом пакете или пропустить ее?
-The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Выбранный пакет не был удалён из вашей системы. Файл инсталляции этого пакета возможно поврежден.
-The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Скрипт с именем '%s' уже существует по данному пути.\nЗаменить этот скрипт тем, что находится в данном пакете или пропустить его?
-Replace	PackageView		Заменить
+Accept	PackageTextViewer		Принять
+Abort	PackageView		Прервать
+Disclaimer	PackageTextViewer		Заявление об отказе от ответственности
+Preparing package	PackageInstall		Подготовка пакета
+The package you requested has been successfully installed on your system.	PackageView		Пакет, который вы просили, был успешно установлен на вашей системе.
 Installation progress	PackageView		Прогресс установки
+Decline	PackageTextViewer		Отклонить
+Continue	PackageTextViewer		Продолжить
+Installing package	PackageStatus		Установка пакета
+Install %name%	PackageView		Установить %name%
+%index% of %total%	PackageInstall		%index% из %total%
+No package selected.	UninstallView		Ни один пакет не выбран.
+%name% (%size% free)	PackageView		%name% (%size% свободно)
+Error while installing the package\n	PackageView		Ошибка во время установки пакета\n
+Finishing installation	PackageInstall		Завершение установки
+No package available.	PackageInfo		Нет доступных пакетов.
+The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Скрипт с именем '%s' уже существует по данному пути.\nЗаменить этот скрипт тем, что находится в данном пакете или пропустить его?
+Installation type:	PackageView		Тип установки:
+The package you selected has been successfully removed from your system.	UninstallView		Выбранный пакет был успешно удалён из системы.
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Обнаружилась несоответствие размера файла в пакете. Этот пакет мог бы быть испорчен или быть измененным после его создания. Вы все еще хотите продолжить?
+%name% (%size%)	PackageView		%name% (%size%)
+Abort	PackageInstall		Прервать
+The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Файл с именем '%s' уже существует по данному пути.\nЗаменить файл тем, что находится в данном пакете или пропустить его?
+Replace all	PackageView		Заменить все
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Файл пакета не может быть прочитан.\nОдна из возможных причин этого может бы быть то, что требуемый файл не является корректным BeOS .pkg файлом.
+Continue	PackageInfo		Продолжить
+No package selected.	PackageInfo		Ни один пакет не выбран.
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Ошибка! \"%s\" не является правильным путем.\n
+The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Папка с именем '%s' уже существует по данному пути.\nЗаменить эту папку той, что находится в данном пакете или пропустить ее?
+Ask again	PackageView		Спрашивать снова
+Begin	PackageView		Установить
+OK	PackageView		ОК
+Abort	PackageInfo		Прервать
+Done	PackageInstall		Готово
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Ошибка (%s)! Не удалось открыть \"%s\".\n
+Skip	PackageView		Пропустить
+Image not loaded correctly	PackageImageViewer		Изображение некорректно загружено

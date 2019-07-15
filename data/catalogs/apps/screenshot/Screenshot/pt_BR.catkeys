@@ -1,27 +1,27 @@
 1	portuguese (brazil)	x-vnd.haiku-screenshot	3896204963
-seconds	ScreenshotWindow		segundos
-Desktop	ScreenshotWindow		Desktop
 Include window border	ScreenshotWindow		Incluir borda da janela
-Screenshot	System name		Captura de Tela
+Overwrite	ScreenshotWindow		Sobrescrever
+Save in:	ScreenshotWindow		Salvar em:
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Este arquivo já existe.\n Deseja realmente sobrescrevê-lo?
 Select	ScreenshotWindow		Escolher
-Capture active window	ScreenshotWindow		Capturar janela ativa
-Cancel	ScreenshotWindow		Cancelar
+Save as:	ScreenshotWindow		Salvar como:
+seconds	ScreenshotWindow		segundos
+New screenshot	ScreenshotWindow		Nova captura
+Screenshot	System name		Captura de Tela
+Desktop	ScreenshotWindow		Desktop
+Artwork folder	ScreenshotWindow		Pasta de Artes
+Translator Settings	ScreenshotWindow		Configurações do tradutor
+Include mouse pointer	ScreenshotWindow		Incluir ponteiro do mouse
+overwrite	ScreenshotWindow		sobrescrever
+Settings…	ScreenshotWindow		Configurações...
+Choose folder	ScreenshotWindow		Escolher pasta
 Name:	ScreenshotWindow		Nome:
 Choose folder…	ScreenshotWindow		Escolha a pasta...
-This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Este arquivo já existe.\n Deseja realmente sobrescrevê-lo?
-Choose folder	ScreenshotWindow		Escolher pasta
-Save	ScreenshotWindow		Salvar
-Overwrite	ScreenshotWindow		Sobrescrever
 Please select	ScreenshotWindow		Por favor escolha
-Save as:	ScreenshotWindow		Salvar como:
-Copy to clipboard	ScreenshotWindow		Copiar para área de transferência
-Save in:	ScreenshotWindow		Salvar em:
-screenshot	Screenshot	Base filename of screenshot files	captura
-New screenshot	ScreenshotWindow		Nova captura
-Artwork folder	ScreenshotWindow		Pasta de Artes
-Home folder	ScreenshotWindow		Pasta Home
-Settings…	ScreenshotWindow		Configurações...
-overwrite	ScreenshotWindow		sobrescrever
+Cancel	ScreenshotWindow		Cancelar
 Delay:	ScreenshotWindow		Atraso:
-Include mouse pointer	ScreenshotWindow		Incluir ponteiro do mouse
-Translator Settings	ScreenshotWindow		Configurações do tradutor
+Copy to clipboard	ScreenshotWindow		Copiar para área de transferência
+screenshot	Screenshot	Base filename of screenshot files	captura
+Home folder	ScreenshotWindow		Pasta Home
+Save	ScreenshotWindow		Salvar
+Capture active window	ScreenshotWindow		Capturar janela ativa

@@ -1,55 +1,49 @@
-1	swedish	x-vnd.Haiku-BluetoothPrefs	145165464
-About Bluetooth…	Window		Om Bluetooth…
-Handheld	Settings view		Handhållen
-Default inquiry time:	Settings view		Förvald frågotid:
+1	swedish	x-vnd.Haiku-BluetoothPrefs	67867884
+Laptop	Settings view		Bärbar dator
+Only from trusted devices	Settings view		Endast från betrodda källor
+15 secs	Settings view		15 s
+Quit	main		Avsluta
 Manufacturer: 	Device View		Tillverkare:
-Add device to list	Inquiry panel		Lägg till enhet till istan
-Starting scan...	Inquiry panel		Startar avsökning...
-Smart phone	Settings view		Telefon
-With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Med stöd från:\n- Mika Lindqvist\n- Adrien Destugues\n- Maksym Yevmenkin\n\nTack till individerna som hjälpt till med...\n\nAtt sända och skänka hårdvara:\n- Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n- Edwin Erik Amsler\n- Dennis d'Entremont\n- Luroh\n- Pieter Panman\n\nEkonomi:\n- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n- Matt M, Doug F, Hubert H,\n- Sebastian B, Andrew M, Jared E,\n- Frederik H, Tom S, Ferry B,\n- Greg G, David F, Richard S, Martin W:\n\nMed patchning:\n- Michael Weirauch\n- Fredrik Ekdahl\n- Raynald Lesieur\n- Andreas Färber\n- Joerg Meyer\nTestning:\n- Petter H. Juliussen\nSom gav mig all kunskap:\n- yellowTAB -teamet
-Server	Settings view		Server
-Stop bluetooth services…	Window		Stoppa Bluetooth-tjänster…
-The Bluetooth services are not currently running on this system.	main		Bluetoothtjänsten körs för närvarande inte på detta system.
+Desktop	Settings view		Skrivbord
+Server	Window		Server
 Identify host as:	Settings view		Identifiera värd som:
 Refresh…	Remote devices		Uppdatera…
-Pair…	Remote devices		Par…
-Incoming connections policy:	Settings view		Policy för inkommande förbindelser:
-From all devices	Settings view		För alla enheter
-Show name	Extended local device view		Visa namn
 Local devices found on system:	Settings view		Lokala enheter funna på systemet:
-Remaining %1 seconds	Inquiry panel		Återstår %1 sekunder
-Server	Window		Server
-Scanning completed.	Inquiry panel		Avsökning klar.
+Service classes: 	Device View		Tjänsteklasser:
+Remote devices	Window		Fjärrenheter
+Settings	Window		Inställningar
+Stop bluetooth services…	Window		Stoppa Bluetooth-tjänster…
+61 secs	Settings view		61 s
+Add…	Remote devices		Lägg till…
+As blocked	Remote devices		Som blockerad
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Inga lokala enheter funna på systemet
+Revert	Window		Återgå
+Refresh local devices…	Window		Uppdatera lokala enheter…
+Disconnect	Remote devices		Koppla från
+From all devices	Settings view		För alla enheter
+Defaults	Window		Förval
+Start bluetooth services…	Window		Starta Bluetooth-tjänster…
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Verifiera att bluetoot här aktiverat på din enhet. Klicka på Fråga för att söka. Tidsåtgång för åtgärden är okänd, men bör inte ta mer än tre sekunder per enhet. Efter detta kommer du att kunna lägga till dem till din huvudlista, där du kan para ihop dem i förfrågan-panelen.
+Scanning progress	Inquiry panel		Genomsökningsstatus
+Bluetooth	System name		Bluetooth
 Launch now	main		Starta nu
 Remove	Remote devices		Ta bort
-Quit	main		Avsluta
-15 secs	Settings view		15 s
-Start bluetooth services…	Window		Starta Bluetooth-tjänster…
-Policy...	Settings view		Policy...
-61 secs	Settings view		61 s
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Inga lokala enheter funna på systemet
-Identify us as...	Settings view		Identifiera som...
- packets: 	Device View		Paketer:
-As blocked	Remote devices		Som blockerad
-Bluetooth	System name		Bluetooth
-Disconnect	Remote devices		Koppla från
-Defaults	Window		Förval
-Inquiry	Inquiry panel		Förfrågan
-Desktop	Settings view		Skrivbord
-Revert	Window		Återgå
-Remote devices	Window		Fjärrenheter
-Laptop	Settings view		Bärbar dator
-Discoverable	Extended local device view		Synlig
-Service classes: 	Device View		Tjänsteklasser:
-Settings	Window		Inställningar
-Only from trusted devices	Settings view		Endast från betrodda källor
-Scanning progress	Inquiry panel		Genomsökningsstatus
 Always ask	Settings view		Fråga alltid
-Retrieving name of %1	Inquiry panel		Hämtar namn från %1
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Verifiera att bluetoot här aktiverat på din enhet. Klicka på Fråga för att söka. Tidsåtgång för åtgärden är okänd, men bör inte ta mer än tre sekunder per enhet. Efter detta kommer du att kunna lägga till dem till din huvudlista, där du kan para ihop dem i förfrågan-panelen.
-Authenticate	Extended local device view		Autentisera
-Refresh local devices…	Window		Uppdatera lokala enheter…
-Pick device...	Settings view		Välj enhet...
-Retrieving names...	Inquiry panel		Hämtar namn...
 Help	Window		Hjälp
-Add…	Remote devices		Lägg till…
+Pair…	Remote devices		Par…
+Retrieving name of %1	Inquiry panel		Hämtar namn från %1
+Inquiry	Inquiry panel		Förfrågan
+Incoming connections policy:	Settings view		Policy för inkommande förbindelser:
+Show name	Extended local device view		Visa namn
+Add device to list	Inquiry panel		Lägg till enhet till istan
+Remaining %1 seconds	Inquiry panel		Återstår %1 sekunder
+The Bluetooth services are not currently running on this system.	main		Bluetoothtjänsten körs för närvarande inte på detta system.
+Discoverable	Extended local device view		Synlig
+Authenticate	Extended local device view		Autentisera
+Smart phone	Settings view		Telefon
+Scanning completed.	Inquiry panel		Avsökning klar.
+Default inquiry time:	Settings view		Förvald frågotid:
+Server	Settings view		Server
+Handheld	Settings view		Handhållen
+ packets: 	Device View		Paketer:
+About Bluetooth…	Window		Om Bluetooth…

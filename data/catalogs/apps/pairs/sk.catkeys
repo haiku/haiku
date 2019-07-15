@@ -1,18 +1,18 @@
 1	slovak	x-vnd.Haiku-Pairs	818003250
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Hra Dvojice nenašla dostatok vektorových ikon, aby mohla začať. Potrebuje ich aspoň %zu, našlo %zu.\n
-%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tnapísal Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n
+Pairs	System name		Dvojice
+Quit	PairsWindow		Ukončiť
+Medium	PairsWindow		Stredné
+Game	PairsWindow		Hra
 Expert (8x8)	PairsWindow		Expert (8x8)
-Beginner (4x4)	PairsWindow		Začiatočník (4x4)
+New	PairsWindow		Nová
+OK	Pairs		OK
+Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Hra Dvojice nenašla dostatok vektorových ikon, aby mohla začať. Potrebuje ich aspoň %zu, našlo %zu.\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Dokončili ste hru na {0, plural, one{# kliknutie} few{# kliknutia} other{# kliknutí}}.\n
+Small	PairsWindow		Malé
+Size	PairsWindow		Veľkosť
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tnapísal Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n
 Quit game	PairsWindow		Ukončiť hru
 Large	PairsWindow		Veľké
-Small	PairsWindow		Malé
-Game	PairsWindow		Hra
-OK	Pairs		OK
-Size	PairsWindow		Veľkosť
-New	PairsWindow		Nová
+Beginner (4x4)	PairsWindow		Začiatočník (4x4)
 Intermediate (6x6)	PairsWindow		Pokročilý (6x6)
-Quit	PairsWindow		Ukončiť
-Pairs	System name		Dvojice
 New game	PairsWindow		Nová hra
-Medium	PairsWindow		Stredné

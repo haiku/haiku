@@ -1,49 +1,49 @@
 1	hungarian	x-vnd.Haiku-Time	3755504714
-GMT (UNIX compatible)	Time		GMT (UNIX kompatibilis)
 OK	Time		Rendben
-Asia	Time		Ázsia
-\nNow: 	Time		\nMost:
-Africa	Time		Afrika
+Message receiving failed	Time		Sikertelen üzenetfogadás
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Dátum és idő, készítette:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\n Copyright 2004-2012, Haiku.
+Australia	Time		Ausztrália
+America	Time		Amerika
 Reset to default server list	Time		Eredeti kiszolgálólista visszaállìtása
 Could not resolve server address	Time		Nem sikerült feloldani a kiszolgáló címét
-Stop	Time		Leállítás
-Australia	Time		Ausztrália
-Preview time:	Time		Idő előnézete:
-Synchronize	Time		Szinkronizálás
-Revert	Time		Visszaállít
-Pacific	Time		Csendes-óceán
-Show day of week	Time		A hét napjának megjelenítése
-Add	Time		Hozzáadás
-Date and time	Time		Dátum és idő
-about	Time		névjegy
-Local time (Windows compatible)	Time		Helyi idő (Windows kompatibilis)
-Message receiving failed	Time		Sikertelen üzenetfogadás
 Set time zone	Time		Időzóna beállítása
+The following error occured while synchronizing:r\n%s: %s	Time		A következő hiba történt szinkronizálás közben:r\n%s: %s
 Waiting for answer failed	Time		Nem érkezett válasz
-Hardware clock set to:	Time		A hardveres óra beállítva erre:
+<Other>	Time		<Egyéb>
+Received invalid time	Time		Érvénytelen idő érkezett
+Remove	Time		Eltávolítás
+Synchronize again	Time		Szinkronizálás újra
+Asia	Time		Ázsia
+Try all servers	Time		Összes kiszolgáló kipróbálása
+Time	Time		Idő
+Current time:	Time		Jelenlegi idő:
 The following error occured while synchronizing:r\n%s	Time		A következő hiba történt szinkronizálás közben:r\n%s
 Europe	Time		Európa
-Remove	Time		Eltávolítás
-Time	Time		Idő
-Indian	Time		India
-Sending request failed	Time		Sikertelen kérelemküldés
+Show day of week	Time		A hét napjának megjelenítése
+Local time (Windows compatible)	Time		Helyi idő (Windows kompatibilis)
+Hardware clock set to:	Time		A hardveres óra beállítva erre:
 Arctic	Time		Arktisz
-Display time with seconds	Time		Másodpercek megjelenítése
-Time	System name		Dátum és idő
-America	Time		Amerika
-Synchronize at boot	Time		Szinkronizálás indításkor
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Dátum és idő, készítette:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\n Copyright 2004-2012, Haiku.
-Received invalid time	Time		Érvénytelen idő érkezett
 Antarctica	Time		Antarktisz
-Show time zone	Time		Időzóna megjelenítése
-Show clock in Deskbar	Time		Óra az Asztalsávon
-The following error occured while synchronizing:r\n%s: %s	Time		A következő hiba történt szinkronizálás közben:r\n%s: %s
-<Other>	Time		<Egyéb>
-Current time:	Time		Jelenlegi idő:
-Try all servers	Time		Összes kiszolgáló kipróbálása
+GMT (UNIX compatible)	Time		GMT (UNIX kompatibilis)
+Africa	Time		Afrika
+Stop	Time		Leállítás
 Time zone	Time		Időzóna
-Could not create socket	Time		Socket készítése sikertelen
-Synchronize again	Time		Szinkronizálás újra
 Clock	Time		Óra
 Network time	Time		Hálózati idő
+Sending request failed	Time		Sikertelen kérelemküldés
+Preview time:	Time		Idő előnézete:
+\nNow: 	Time		\nMost:
+Could not create socket	Time		Socket készítése sikertelen
+Pacific	Time		Csendes-óceán
 Atlantic	Time		Atlanti-óceán
+Show clock in Deskbar	Time		Óra az Asztalsávon
+Display time with seconds	Time		Másodpercek megjelenítése
+Time	System name		Dátum és idő
+about	Time		névjegy
+Show time zone	Time		Időzóna megjelenítése
+Synchronize at boot	Time		Szinkronizálás indításkor
+Indian	Time		India
+Revert	Time		Visszaállít
+Date and time	Time		Dátum és idő
+Synchronize	Time		Szinkronizálás
+Add	Time		Hozzáadás

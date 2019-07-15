@@ -1,38 +1,35 @@
-1	lithuanian	x-vnd.Be-PRNT	2279754695
-Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Spausdintuvas: %printer_name%\nTvarkyklė: %driver%\n
-Waiting	JobListView		Laukia
-Print test page	PrintersWindow		Spausdinti bandomąjį puslapį
-page	JobListView		puslapis
-Cancel	AddPrinterDialog		Atsisakyti
-Add printer	AddPrinterDialog		Spausdintuvo pridėjimas
-Green	TestPageView		Žalia
-Printers	PrintersWindow		Spausdintuvai
-Default Printer	PrinterListView		Numatytasis spausdintuvas
-Transport: %transport% %transport_address%	PrinterListView		Transportas: %transport% %transport_address%
-pages	JobListView		psl.
-Printers	System name		Spausdintuvai
-Processing	JobListView		Apdorojama
-Red	TestPageView		Raudona
-Printer name:	AddPrinterDialog		Spausdintuvo vardas:
-Driver: %driver%	PrinterListView		Tvarkyklė: %driver%
-Black	TestPageView		Juoda
-Restart job	PrintersWindow		Pradėti užduotį iš naujo
-Add	AddPrinterDialog		Pridėti
-Make default	PrintersWindow		Skirti numatytuoju
-Transport: %transport% %transport_address%	TestPageView		Transportas: %transport% %transport_address%
-Cancel job	PrintersWindow		Atšaukti užduotį
-Yellow	TestPageView		Geltona
-Blue	TestPageView		Mėlyna
+1	lithuanian	x-vnd.Be-PRNT	823985976
 Remove	PrintersWindow		Pašalinti
+Red	TestPageView		Raudona
+Default Printer	PrinterListView		Numatytasis spausdintuvas
 <pick one>	AddPrinterDialog		<parinkite>
-Print jobs for 	PrintersWindow		Spausdinimo užduotys, skirtos 
-Failed	JobListView		Nepavyko
-%.2f KB	JobListView		%.2f KB
-Magenta	TestPageView		Purpurinė
-Completed	JobListView		Užbaigta
-No printer found!	TransportMenu		Jokių spausdintuvų nerasta!
-Print jobs: No printer selected	PrintersWindow		Spausdinimo užduotys: nepasirinktas joks spausdintuvas
-Cyan	TestPageView		Žydra
-Unknown status	JobListView		Būsena nežinoma
 Connected to:	AddPrinterDialog		Prijungtas prie:
+Make default	PrintersWindow		Skirti numatytuoju
+Cyan	TestPageView		Žydra
+Completed	JobListView		Užbaigta
+Transport: %transport% %transport_address%	PrinterListView		Transportas: %transport% %transport_address%
+Failed	JobListView		Nepavyko
+Blue	TestPageView		Mėlyna
+Waiting	JobListView		Laukia
+Processing	JobListView		Apdorojama
+Cancel	AddPrinterDialog		Atsisakyti
+Unknown status	JobListView		Būsena nežinoma
+Add printer	AddPrinterDialog		Spausdintuvo pridėjimas
+Printers	PrintersWindow		Spausdintuvai
+No printer found!	TransportMenu		Jokių spausdintuvų nerasta!
+Magenta	TestPageView		Purpurinė
+Transport: %transport% %transport_address%	TestPageView		Transportas: %transport% %transport_address%
+Add	AddPrinterDialog		Pridėti
+Print jobs: No printer selected	PrintersWindow		Spausdinimo užduotys: nepasirinktas joks spausdintuvas
+Printer name:	AddPrinterDialog		Spausdintuvo vardas:
+Yellow	TestPageView		Geltona
+Black	TestPageView		Juoda
 Printer type:	AddPrinterDialog		Spausdintuvo tipas:
+Printers	System name		Spausdintuvai
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Spausdintuvas: %printer_name%\nTvarkyklė: %driver%\n
+Green	TestPageView		Žalia
+Print test page	PrintersWindow		Spausdinti bandomąjį puslapį
+Restart job	PrintersWindow		Pradėti užduotį iš naujo
+Driver: %driver%	PrinterListView		Tvarkyklė: %driver%
+Cancel job	PrintersWindow		Atšaukti užduotį
+%.2f KB	JobListView		%.2f KB

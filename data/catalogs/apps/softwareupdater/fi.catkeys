@@ -1,59 +1,55 @@
-1	finnish	x-vnd.haiku-softwareupdater	3202862496
-No active network connection was found	UpdateManager	Error message	Yhtään aktiivista verkkoyhteyttä ei löytynyt
-Cancel	SoftwareUpdaterWindow		Peru
-Packages are being updated	UpdateManager		Pakkauksia päivitetään
-Update now	SoftwareUpdaterWindow		Päivitä nyt
-Updates did not complete	UpdateAction		Päivitykset eivät valmistuneet
-Checking for updates	CheckManager		Tarkistetaan päivityksiä
-%count% packages have available updates	CheckManager		%count% pakkauksessa on päivityksiä
-SoftwareUpdater	System name		Ohjelmistopäivittäjä
-Fatal error while checking for updates: %s\n	CheckAction		Vakava virhe päivitysten tarkistuksessa: %s\n
-No remote repositories are available	UpdateManager	Error message	Yhtään etätietovarastoa ei ole käytettävissä
-No updates available	UpdateAction		Ei ole yhtään päivitystä
-Downloading packages	UpdateManager		Ladataan pakkauksia
-Attempting to cancel the updates...	SoftwareUpdaterWindow		Yritetään perua päivitykset...
-from repository	SoftwareUpdaterWindow	List item text	tietovarastosta
-Cancel	SoftwareUpdaterWindow	Alert button label	Peru
-Click here to install updates.	CheckManager		Päivitysten asentamiseksi napsauta tästä.
-The following changes will be made:	SoftwareUpdaterWindow		Tehdään seuraavat muutokset:
-Available updates found	CheckManager		Löydettiin saatavilla olevia päivityksiä
-Checking for updates	SoftwareUpdaterWindow		Tarkistetaan päivityksiä
-Quit	SoftwareUpdaterWindow	Alert button label	Poistu
-Cancelling updates	SoftwareUpdaterWindow		Perutaan päivityksiä
+1	finnish	x-vnd.haiku-softwareupdater	4078911117
 Updating version	SoftwareUpdaterWindow	List item text	Päivitetään versio
-Applying changes	UpdateManager		Toteutetaan muutokset
-Quit	SoftwareUpdaterWindow		Poistu
-No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Yhtään etätietovarastoa ei ole käytettävissä. Varmista, että jotkut tietovarastot ovat käytettävissä käyttäen Tietovarastot-asetusohjelmaa tai ’pkgman’-komentoa.
-There were no updates found.	UpdateAction		Yhtään päivitystä ei löytynyt.
-Uninstalling version	SoftwareUpdaterWindow	List item text	Poistetaan asennettu versio
-Packages to be updated	SoftwareUpdaterWindow	List super item label	Päivitettävät pakkaukset
-Installing version	SoftwareUpdaterWindow	List item text	Asennetaan versiota
-Argument variables are no longer accepted\n	SoftwareUpdaterApp		Argumenttimuuttujia ei enää hyväksytä\n
-Updates completed	UpdateManager		Päivitykset valmiina
-Invalid update type, cannot continue with updates	UpdateAction		Virheellinen päivitystyyppi, päivitysten jatkaminen epäonnistui
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Poistettavat asennetut pakkaukset
-Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Päivitykset eivät ole valmiina, oletko varma, että haluat poistua?
-Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Käyttö:  Ohjelmistopäivittäjä <komento> [ <valitsin> ]\nPäivittää asennettuja pakkauksia.\n\nKomennot:\n  update     - Etsii tietovarastoista kaikkien pakkausten päivityksiä.\n  check      - Tarkistaa käytettävissä olevat päivitykset, mutta näyttää vain ilmoituksen tuloksista.\n  full-sync  - Synkronoi asennetut pakkauset tietovaraston kanssa.\n\nValitsimet:\n  -h tai --help       Tulosta tämä opasteteksti\n  -v tai --verbose    Tulosta tiedot laveasti\n
-There were no updates found.	CheckAction		Päivityksiä ei löytynyt.
-%i of %i	UpdateManager	Do not translate %i	%i / %i
-Updates found	SoftwareUpdaterWindow		Päivityksiä löytyi
-No updates available	CheckManager		Ei päivityksiä
-Don't quit	SoftwareUpdaterWindow		Älä poistu
-Quit	SoftwareUpdaterWindow	Button label	Poistu
-Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Suorita Ohjelmistopäivittäjä napsauttamalla tästä. Jotkut päivitykset vaativat pulmaratkaisun valittavaksi.
-Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Otetaan yhteyttä tietovarastoihin pakkauspäivitysten tarkistamiseksi.
-Unrecognized argument	SoftwareUpdaterApp	Error message	Tunnistamaton argumentti
-Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Valitse näistä päivitysvalitsimista:\n\nUpdate:\n\tPäivittää kaikki asennetut pakkaukset.\nFull sync:\n\tSynkronoi asennetut pakkaukset tietovaraston kanssa.
-Exception occurred while checking for updates: %s\n	CheckAction		Päivitysten tarkistuksessa tapahtui poikkeusvirhe: %s\n
-Exception occurred while updating packages : %s\n	UpdateAction		Pakkausten päivityksessä tapahtui poikkeusvirhe : %s\n
-Update	SoftwareUpdaterWindow	Alert button label	Päivitä
-New packages to be installed	SoftwareUpdaterWindow	List super item label	Uudet asennettavat pakkaukset
-OK	UpdateManager		Valmis
-A reboot may be necessary to complete some updates.	UpdateManager		Uudelleenkäynnistäminen voi olla välttämätön joidenkin päivitysten saattamiseksi valmiiksi.
-Open Repositories	SoftwareUpdaterWindow	Alert button label	Avaa tietovarastot
-Show more details	SoftwareUpdaterWindow		Näytä lisätietoja
-Contacting software repositories to check for package updates.	CheckManager		Otetaan yhteyttä ohjelmistotietovarastoihin pakkauspäivitysten tarkistamiseksi.
-Full sync	SoftwareUpdaterWindow	Alert button label	Täysi synkronointi
-No active network connection was found.\n	CheckManager		Yhtään aktiivista verkkoyhteyttä ei löytynyt.\n
-OK	SoftwareUpdaterWindow		Valmis
+No active network connection was found	UpdateManager	Error message	Yhtään aktiivista verkkoyhteyttä ei löytynyt
+Quit	SoftwareUpdaterWindow	Alert button label	Poistu
 There were no updates found.	CheckManager		Päivityksiä ei löytynyt.
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Päivitykset eivät ole valmiina, oletko varma, että haluat poistua?
+Updates found	SoftwareUpdaterWindow		Päivityksiä löytyi
+Update now	SoftwareUpdaterWindow		Päivitä nyt
+OK	UpdateManager		Valmis
+Unrecognized argument	SoftwareUpdaterApp	Error message	Tunnistamaton argumentti
+There were no updates found.	CheckAction		Päivityksiä ei löytynyt.
+No updates available	UpdateAction		Ei ole yhtään päivitystä
+New packages to be installed	SoftwareUpdaterWindow	List super item label	Uudet asennettavat pakkaukset
+Packages to be updated	SoftwareUpdaterWindow	List super item label	Päivitettävät pakkaukset
+Contacting software repositories to check for package updates.	CheckManager		Otetaan yhteyttä ohjelmistotietovarastoihin pakkauspäivitysten tarkistamiseksi.
+Available updates found	CheckManager		Löydettiin saatavilla olevia päivityksiä
+from repository	SoftwareUpdaterWindow	List item text	tietovarastosta
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Otetaan yhteyttä tietovarastoihin pakkauspäivitysten tarkistamiseksi.
+Cancelling updates	SoftwareUpdaterWindow		Perutaan päivityksiä
+Cancel	SoftwareUpdaterWindow	Alert button label	Peru
+There were no updates found.	UpdateAction		Yhtään päivitystä ei löytynyt.
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Valitse näistä päivitysvalitsimista:\n\nUpdate:\n\tPäivittää kaikki asennetut pakkaukset.\nFull sync:\n\tSynkronoi asennetut pakkaukset tietovaraston kanssa.
+OK	SoftwareUpdaterWindow		Valmis
+The following changes will be made:	SoftwareUpdaterWindow		Tehdään seuraavat muutokset:
+Argument variables are no longer accepted\n	SoftwareUpdaterApp		Argumenttimuuttujia ei enää hyväksytä\n
+Fatal error while checking for updates: %s\n	CheckAction		Vakava virhe päivitysten tarkistuksessa: %s\n
+SoftwareUpdater	System name		Ohjelmistopäivittäjä
+No active network connection was found.\n	CheckManager		Yhtään aktiivista verkkoyhteyttä ei löytynyt.\n
+Applying changes	UpdateManager		Toteutetaan muutokset
+Full sync	SoftwareUpdaterWindow	Alert button label	Täysi synkronointi
+Quit	SoftwareUpdaterWindow	Button label	Poistu
+Exception occurred while updating packages : %s\n	UpdateAction		Pakkausten päivityksessä tapahtui poikkeusvirhe : %s\n
+Exception occurred while checking for updates: %s\n	CheckAction		Päivitysten tarkistuksessa tapahtui poikkeusvirhe: %s\n
+Packages are being updated	UpdateManager		Pakkauksia päivitetään
+Cancel	SoftwareUpdaterWindow		Peru
+Don't quit	SoftwareUpdaterWindow		Älä poistu
+Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Suorita Ohjelmistopäivittäjä napsauttamalla tästä. Jotkut päivitykset vaativat pulmaratkaisun valittavaksi.
+Checking for updates	SoftwareUpdaterWindow		Tarkistetaan päivityksiä
+Updates completed	UpdateManager		Päivitykset valmiina
+Show more details	SoftwareUpdaterWindow		Näytä lisätietoja
+Installing version	SoftwareUpdaterWindow	List item text	Asennetaan versiota
+Checking for updates	CheckManager		Tarkistetaan päivityksiä
+No remote repositories are available	UpdateManager	Error message	Yhtään etätietovarastoa ei ole käytettävissä
+Update	SoftwareUpdaterWindow	Alert button label	Päivitä
+Updates did not complete	UpdateAction		Päivitykset eivät valmistuneet
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Avaa tietovarastot
+Invalid update type, cannot continue with updates	UpdateAction		Virheellinen päivitystyyppi, päivitysten jatkaminen epäonnistui
+Uninstalling version	SoftwareUpdaterWindow	List item text	Poistetaan asennettu versio
+%i of %i	UpdateManager	Do not translate %i	%i / %i
+Quit	SoftwareUpdaterWindow		Poistu
+No updates available	CheckManager		Ei päivityksiä
+Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Käyttö:  Ohjelmistopäivittäjä <komento> [ <valitsin> ]\nPäivittää asennettuja pakkauksia.\n\nKomennot:\n  update     - Etsii tietovarastoista kaikkien pakkausten päivityksiä.\n  check      - Tarkistaa käytettävissä olevat päivitykset, mutta näyttää vain ilmoituksen tuloksista.\n  full-sync  - Synkronoi asennetut pakkauset tietovaraston kanssa.\n\nValitsimet:\n  -h tai --help       Tulosta tämä opasteteksti\n  -v tai --verbose    Tulosta tiedot laveasti\n
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Yhtään etätietovarastoa ei ole käytettävissä. Varmista, että jotkut tietovarastot ovat käytettävissä käyttäen Tietovarastot-asetusohjelmaa tai ’pkgman’-komentoa.
+Downloading packages	UpdateManager		Ladataan pakkauksia

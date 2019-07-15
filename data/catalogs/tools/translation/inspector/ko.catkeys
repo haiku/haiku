@@ -1,30 +1,30 @@
 1	korean	x.vnd.OBOS-Inspector	1686702095
-User Translators	ActiveTranslatorsWindow		사용자 번역자
-No image available to save.	ImageWindow		저장 가능한 이미지가 없습니다.
-Sorry, unable to write the image file.	ImageView		미안합니다,이미지파일에 기록 할 수 없습니다.
-Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		문서 번호: %1\n\n번역자 사용:\n이름: %2\n정보: %3\n버젼: %4\n
-\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\n형식: '%1' (%2)\n그룹: '%3' (%4)\n품질: %5\n능력: %6\nMIME 형식: %7\n이름: %8\n
-Bummer	ImageWindow		실망
-Last Page	ImageWindow		마지막 페이지
 \nInput Formats:	ImageView		\n입력 형식:
-Sorry, unable to load the image.	ImageView		미안합니다,이미지를 불러 올 수 없습니다.
-Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	정보 창
-Active Translators	InspectorApp		활동하는 번역자
-Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		이미지: %1\n색공간: %2 (%3)\n넓이: %4 x %5\n행당 바이트: %6\n전체 바이트: %7\n\n식별 정보:\nID 문자열: %8\nMIME 형식: %9\n형식: '%10' (%11)\n번역자 ID: %12\n그룹: '%13' (%14)\n품질: %15\n능력: %16\n\n확장 정보:\n
-\nOutput Formats:	ImageView		\n출력 형식:
-Save feature not implemented yet.	ImageWindow		저장 기능은 아직 구현되지 않았습니다.
-First Page	ImageWindow		첫 페이지
 Next Page	ImageWindow		다음 페이지
-\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\n번역자 사용:\n이름: %1\n정보: %2\n버젼: %3\n
-Info	ImageWindow		정보
-OK	ImageWindow		확인
-Window	ImageWindow		창
-Quit	ImageWindow		나가기
-Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		선택된 문사: %1\n\n번역자 사용:\n이름: %2\n정보: %3\n버젼: %4\n
-Active Translators	ImageWindow		활동하는 번역자
-View	ImageWindow		보기
 Previous Page	ImageWindow		이전 페이지
-OK	ImageView		확인
+Active Translators	InspectorApp		활동하는 번역자
 System Translators	ActiveTranslatorsWindow		시스템 번역자
+\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\n형식: '%1' (%2)\n그룹: '%3' (%4)\n품질: %5\n능력: %6\nMIME 형식: %7\n이름: %8\n
+OK	ImageWindow		확인
+View	ImageWindow		보기
+Save feature not implemented yet.	ImageWindow		저장 기능은 아직 구현되지 않았습니다.
+Active Translators	ImageWindow		활동하는 번역자
+Info	ImageWindow		정보
+Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		이미지: %1\n색공간: %2 (%3)\n넓이: %4 x %5\n행당 바이트: %6\n전체 바이트: %7\n\n식별 정보:\nID 문자열: %8\nMIME 형식: %9\n형식: '%10' (%11)\n번역자 ID: %12\n그룹: '%13' (%14)\n품질: %15\n능력: %16\n\n확장 정보:\n
+No image available to save.	ImageWindow		저장 가능한 이미지가 없습니다.
+OK	ImageView		확인
+Bummer	ImageWindow		실망
+\nOutput Formats:	ImageView		\n출력 형식:
+Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		문서 번호: %1\n\n번역자 사용:\n이름: %2\n정보: %3\n버젼: %4\n
+User Translators	ActiveTranslatorsWindow		사용자 번역자
+Last Page	ImageWindow		마지막 페이지
+\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\n번역자 사용:\n이름: %1\n정보: %2\n버젼: %3\n
 Unknown	ImageView		알 수 없음
+Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	정보 창
+Sorry, unable to load the image.	ImageView		미안합니다,이미지를 불러 올 수 없습니다.
 File	ImageWindow		파일
+Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		선택된 문사: %1\n\n번역자 사용:\n이름: %2\n정보: %3\n버젼: %4\n
+Quit	ImageWindow		나가기
+Sorry, unable to write the image file.	ImageView		미안합니다,이미지파일에 기록 할 수 없습니다.
+Window	ImageWindow		창
+First Page	ImageWindow		첫 페이지

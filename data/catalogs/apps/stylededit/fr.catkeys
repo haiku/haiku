@@ -1,88 +1,88 @@
 1	french	x-vnd.Haiku-StyledEdit	727465241
-StyledEdit	System name		Éditeur stylé
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ce fichier est en lecture seule. Voulez-vous sauvegarder les modifications dans le document « %s » ? 
-Paste	Menus		Coller
-OK	LoadAlert		OK
-File	Menus		Fichier
-???	LoadAlert		???
-Modified	StatusView		Modifié
-Lines:	Statistics		Lignes :
-Italic	Menus		Italique
-Left	Menus		À gauche
-Search backwards	FindandReplaceWindow		Chercher en arrière
-Unlock file	StatusView		Déverrouiller le fichier
-Size	Menus		Taille
-Save	QuitAlert		Sauvegarder
-Page setup…	Menus		Mise en page…
-Print…	Menus		Imprimer…
-Can't undo	Menus		Impossible d’annuler
-Save	Menus		Sauvegarder
-Default	Menus		Défaut
-Replace with:	FindandReplaceWindow		Remplacer par :
-Cancel	SaveAlert		Annuler
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rétablissement impossible, fichier non trouvé : « %s ».
-Case-sensitive	FindandReplaceWindow		Sensible à la casse
-Reload	NodeMonitorAlerts		Recharger
-Replace in all windows	FindandReplaceWindow		Remplacer dans toutes les fenêtres
-Wrap lines	Menus		Retour à la ligne
-Quit	Menus		Quitter
-File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Le fichier « %file% » a été supprimé par une autre application, voulez-vous le restaurer ?
 Document statistics	Statistics		Statistiques du document
-Cancel	RevertToSavedAlert		Annuler
-Autodetect	Menus		Détection automatique
-Document	Menus		Document
-Save changes to the document \"%s\"? 	QuitAlert		Enregistrer les modifications du document « %s » ? 
-Edit	Menus		Édition
-Revert	RevertToSavedAlert		Rétablir
-Font	Menus		Police
-Replace all	FindandReplaceWindow		Tout remplacer
-Statistics…	Menus		Statistiques…
-Default	Open_and_SaveAsPanel		Défaut
-Replace next	Menus		Remplacer le suivant
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		« %s » a des modifications en suspens.\nVoulez-vous rétablir la dernière version sauvegardée ? 
-Cancel	FindandReplaceWindow		Annuler
-Text encoding	Menus		Encodage du texte
-Close	Menus		Fermer
-Save	SaveAlert		Sauvegarder
-Words:	Statistics		Mots :
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Erreur de chargement de « %s » :\n\tFormat inconnu
-OK	RevertToSavedAlert		OK
-Don't save	QuitAlert		Ne pas enregistrer
-Align	Menus		Aligner
-Color	Menus		Couleur
-OK	QuitAlert		OK
-Open…	Menus		Ouvrir…
-Center	Menus		Centré
-Unable to unlock file\n\t%s	QuitAlert		Impossible de déverrouiller le fichier\n\t%s
-line %d, column %d	StatusView		ligne %d, colonne %d
-OK	Statistics		OK
-New	Menus		Nouveau
-Wrap-around search	FindandReplaceWindow		Recherche en boucle
-Bold	Menus		Gras
-Find selection	Menus		Chercher la sélection
-Find:	FindandReplaceWindow		Chercher :
-Error saving \"%s\":\n%s	SaveAlert		Erreur à l’enregistrement de « %s » :\n%s
-Copy	Menus		Copier
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rétablissement impossible, fichier non trouvé : « %s ».
 Cut	Menus		Couper
-File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Le fichier « %file% » a été modifié par une autre application, voulez-vous le recharger ?
-Replace	FindandReplaceWindow		Remplacer
-Find again	Menus		Chercher encore
-Cancel	QuitAlert		Annuler
-Find…	Menus		Chercher…
-Select all	Menus		Selectionner tout
-Don't save	SaveAlert		Ne pas enregistrer
-Recover	NodeMonitorAlerts		Récupérer
-Error loading \"%s\":\n\t%s	LoadAlert		Erreur au de chargement de « %s » :\n\t%s
-Ignore	NodeMonitorAlerts		Ignorer
-Read-only	StatusView		Lecture seule
-Undo typing	QuitAlert		Annuler la saisie
+Center	Menus		Centré
+Wrap-around search	FindandReplaceWindow		Recherche en boucle
+Page setup…	Menus		Mise en page…
 Untitled 	StyledEditWindow		Sans titre
-OK	SaveAlert		OK
+OK	Statistics		OK
 Find	FindandReplaceWindow		Trouver
-Encoding	Open_and_SaveAsPanel		Encodage
-Characters:	Statistics		Caractères :
-Save as…	Menus		Enregistrer sous…
-Redo typing	QuitAlert		Rétablir la saisie
-Reload…	Menus		Recharger…
+New	Menus		Nouveau
+Document	Menus		Document
+Search backwards	FindandReplaceWindow		Chercher en arrière
+Find again	Menus		Chercher encore
+Read-only	StatusView		Lecture seule
+Save	Menus		Sauvegarder
+Cancel	QuitAlert		Annuler
+Copy	Menus		Copier
+Reload	NodeMonitorAlerts		Recharger
+line %d, column %d	StatusView		ligne %d, colonne %d
+Words:	Statistics		Mots :
+???	LoadAlert		???
+Recover	NodeMonitorAlerts		Récupérer
+Error saving \"%s\":\n%s	SaveAlert		Erreur à l’enregistrement de « %s » :\n%s
+OK	RevertToSavedAlert		OK
+Unlock file	StatusView		Déverrouiller le fichier
+Italic	Menus		Italique
+Can't undo	Menus		Impossible d’annuler
 Replace…	Menus		Remplacer…
+File	Menus		Fichier
+Bold	Menus		Gras
+Paste	Menus		Coller
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Le fichier « %file% » a été modifié par une autre application, voulez-vous le recharger ?
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Le fichier « %file% » a été supprimé par une autre application, voulez-vous le restaurer ?
+Lines:	Statistics		Lignes :
+Replace in all windows	FindandReplaceWindow		Remplacer dans toutes les fenêtres
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		« %s » a des modifications en suspens.\nVoulez-vous rétablir la dernière version sauvegardée ? 
+Save	SaveAlert		Sauvegarder
+Default	Open_and_SaveAsPanel		Défaut
+Cancel	RevertToSavedAlert		Annuler
+Cancel	FindandReplaceWindow		Annuler
+Statistics…	Menus		Statistiques…
+Encoding	Open_and_SaveAsPanel		Encodage
+Replace all	FindandReplaceWindow		Tout remplacer
+Close	Menus		Fermer
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Erreur de chargement de « %s » :\n\tFormat inconnu
+Left	Menus		À gauche
+Default	Menus		Défaut
+OK	SaveAlert		OK
+Color	Menus		Couleur
+Save changes to the document \"%s\"? 	QuitAlert		Enregistrer les modifications du document « %s » ? 
+StyledEdit	System name		Éditeur stylé
+Find:	FindandReplaceWindow		Chercher :
+Undo typing	QuitAlert		Annuler la saisie
+Error loading \"%s\":\n\t%s	LoadAlert		Erreur au de chargement de « %s » :\n\t%s
+Don't save	SaveAlert		Ne pas enregistrer
+Reload…	Menus		Recharger…
+Print…	Menus		Imprimer…
+Quit	Menus		Quitter
+Redo typing	QuitAlert		Rétablir la saisie
+Ignore	NodeMonitorAlerts		Ignorer
+Wrap lines	Menus		Retour à la ligne
+Text encoding	Menus		Encodage du texte
+Unable to unlock file\n\t%s	QuitAlert		Impossible de déverrouiller le fichier\n\t%s
+Modified	StatusView		Modifié
+OK	LoadAlert		OK
+Save	QuitAlert		Sauvegarder
+Case-sensitive	FindandReplaceWindow		Sensible à la casse
+Find selection	Menus		Chercher la sélection
+Cancel	SaveAlert		Annuler
+Find…	Menus		Chercher…
+Revert	RevertToSavedAlert		Rétablir
+Size	Menus		Taille
+Autodetect	Menus		Détection automatique
+Replace next	Menus		Remplacer le suivant
+OK	QuitAlert		OK
+Replace with:	FindandReplaceWindow		Remplacer par :
+Edit	Menus		Édition
+Open…	Menus		Ouvrir…
+Save as…	Menus		Enregistrer sous…
+Replace	FindandReplaceWindow		Remplacer
+Characters:	Statistics		Caractères :
+Don't save	QuitAlert		Ne pas enregistrer
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ce fichier est en lecture seule. Voulez-vous sauvegarder les modifications dans le document « %s » ? 
+Align	Menus		Aligner
+Font	Menus		Police
+Select all	Menus		Selectionner tout
 Right	Menus		À droite

@@ -1,57 +1,57 @@
 1	lithuanian	x-vnd.Haiku-Keymap	2963866147
-Shift:	Modifier keys window	Shift key role name	Antrasis lygis:
-Revert	Modifier keys window		Atšaukti pakeitimus
-Warning: left and right key roles do not match	Modifier keys window		Dėmesio! Dešinės ir kairės pusės valdymo klavišų funkcijos nesutampa
-Scroll lock	Keyboard Layout View		Slinkti
-Menu	Keyboard Layout View	Menu key	Meniu
-Left control	Keyboard Layout View		Kairysis Vald
-Tilde trigger	Keymap window		Riestinis kirtis (tildė)
-Grave trigger	Keymap window		Kairinis kirtis (gravis)
-Role	Modifier keys window	As in the role of a modifier key	Funkcija
-Caps lock	Keyboard Layout View		Didž
-Select dead keys	Keymap window		Kombinaciniai klavišai
-Cancel	Modifier keys window		Atsisakyti
-Command	Keyboard Layout View	Command key	Komanda
-Defaults	Keymap window		Numatytai
-Quit	Keymap window		Baigti darbą
-Switch shortcut keys to Haiku mode	Keymap window		Naudoti „Haiku“ valdymo klavišus
-Circumflex trigger	Keymap window		Stogelis
-Diaeresis trigger	Keymap window		Du taškai viršuje (umliautas)
-Disabled	Modifier keys window	Do nothing	Joks
-Open…	Keymap window		Atverti…
-Error: duplicate keys	Modifier keys window		Klaida: klavišai dubliuojasi
-System:	Keymap window		Sistemos išdėstymai:
-Left command	Keyboard Layout View		Kairysis Kom
-Set modifier keys…	Keymap window		Nustatyti valdymo klavišus…
-Option:	Modifier keys window	Option key role name	Alternatyva:
-Control	Keyboard Layout View	Control key	Valdymas
-Left option	Keyboard Layout View		Kairysis Alt
-Right control	Keyboard Layout View		Dešinysis Vald
-Switch shortcut keys	Keymap window		Sukeisti Valdymo ir Komandos klavišus
-Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Lyg2 klavišas
-User:	Keymap window		Naudotojo išdėstymai:
-Right option	Keyboard Layout View		Dešinysis Alt
-Right shift	Keyboard Layout View		Dešinysis Lyg2
 Key	Modifier keys window	As in a computer keyboard key	Klavišas
+Right control	Keyboard Layout View		Dešinysis Vald
+Option:	Modifier keys window	Option key role name	Alternatyva:
+Cancel	Modifier keys window		Atsisakyti
+Sample and clipboard:	Keymap window		Vieta pabandymui:
+Num lock	Keyboard Layout View		Skaitmenys
+Switch shortcut keys to Windows/Linux mode	Keymap window		Naudoti „Windows“ ir „Linux“ valdymo klavišus
+Option	Keyboard Layout View	Option key	Alternatyva
+Scroll lock	Keyboard Layout View		Slinkti
+Right option	Keyboard Layout View		Dešinysis Alt
+Revert	Modifier keys window		Atšaukti pakeitimus
+Set modifier keys	Modifier keys window		Nustatyti valdymo klavišus
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd klavišas
+Command:	Modifier keys window	Command key role name	Komanda:
+Acute trigger	Keymap window		Dešininis kirtis (akūtas)
+Modifier keys	Modifier keys window		Valdymo klavišai
+Save as…	Keymap window		Įrašyti kaip…
+Error: duplicate keys	Modifier keys window		Klaida: klavišai dubliuojasi
+Control	Keyboard Layout View	Control key	Valdymas
+Tilde trigger	Keymap window		Riestinis kirtis (tildė)
+Shift	Keyboard Layout View	Shift key	Lyg2
+Left command	Keyboard Layout View		Kairysis Kom
+(Current)	Keymap window		(Esamas)
+Left option	Keyboard Layout View		Kairysis Alt
+Warning: left and right key roles do not match	Modifier keys window		Dėmesio! Dešinės ir kairės pusės valdymo klavišų funkcijos nesutampa
+Circumflex trigger	Keymap window		Stogelis
+Caps lock	Keyboard Layout View		Didž
+Left shift	Keyboard Layout View		Kairysis Lyg2
+Left control	Keyboard Layout View		Kairysis Vald
+Role	Modifier keys window	As in the role of a modifier key	Funkcija
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Vald klavišas
 Control:	Modifier keys window	Control key role name	Valdymas:
-Option	Keyboard Layout View	Option key	Alternatyva
-Sample and clipboard:	Keymap window		Vieta pabandymui:
-Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt klavišas
+Disabled	Modifier keys window	Do nothing	Joks
+Select dead keys	Keymap window		Kombinaciniai klavišai
+Right shift	Keyboard Layout View		Dešinysis Lyg2
 Layout	Keymap window		Klaviatūra
-Switch shortcut keys to Windows/Linux mode	Keymap window		Naudoti „Windows“ ir „Linux“ valdymo klavišus
-Right command	Keyboard Layout View		Dešinysis Kom
 Revert	Keymap window		Atšaukti pakeitimus
-Command:	Modifier keys window	Command key role name	Komanda:
-Save as…	Keymap window		Įrašyti kaip…
-Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd klavišas
-File	Keymap window		Failas
-Num lock	Keyboard Layout View		Skaitmenys
-(Current)	Keymap window		(Esamas)
-Font	Keymap window		Šriftas
+Grave trigger	Keymap window		Kairinis kirtis (gravis)
+Menu	Keyboard Layout View	Menu key	Meniu
+Quit	Keymap window		Baigti darbą
+User:	Keymap window		Naudotojo išdėstymai:
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt klavišas
+Shift:	Modifier keys window	Shift key role name	Antrasis lygis:
 Keymap	System name		Klavišų išdėstymas
-Left shift	Keyboard Layout View		Kairysis Lyg2
-Shift	Keyboard Layout View	Shift key	Lyg2
-Set modifier keys	Modifier keys window		Nustatyti valdymo klavišus
-Modifier keys	Modifier keys window		Valdymo klavišai
-Acute trigger	Keymap window		Dešininis kirtis (akūtas)
+Set modifier keys…	Keymap window		Nustatyti valdymo klavišus…
+Switch shortcut keys to Haiku mode	Keymap window		Naudoti „Haiku“ valdymo klavišus
+Defaults	Keymap window		Numatytai
+System:	Keymap window		Sistemos išdėstymai:
+Switch shortcut keys	Keymap window		Sukeisti Valdymo ir Komandos klavišus
+Right command	Keyboard Layout View		Dešinysis Kom
+Font	Keymap window		Šriftas
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Lyg2 klavišas
+Command	Keyboard Layout View	Command key	Komanda
+File	Keymap window		Failas
+Diaeresis trigger	Keymap window		Du taškai viršuje (umliautas)
+Open…	Keymap window		Atverti…

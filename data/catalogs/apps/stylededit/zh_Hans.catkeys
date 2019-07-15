@@ -1,88 +1,88 @@
 1	english	x-vnd.Haiku-StyledEdit	727465241
-StyledEdit	System name		StyledEdit
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		文件标记为只读。是否将修改保存到文档 \"%s\" ?
-Paste	Menus		粘贴
-OK	LoadAlert		确定
-File	Menus		文件
-???	LoadAlert		???
-Modified	StatusView		已修改
-Lines:	Statistics		行数：
-Italic	Menus		斜体
-Left	Menus		居左
-Search backwards	FindandReplaceWindow		后台搜索
-Unlock file	StatusView		解锁文件
-Size	Menus		大小
-Save	QuitAlert		保存
-Page setup…	Menus		页面设置…
-Print…	Menus		打印…
-Can't undo	Menus		无法撤销
-Save	Menus		保存
-Default	Menus		默认
-Replace with:	FindandReplaceWindow		替换为：
-Cancel	SaveAlert		取消
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		无法恢复，文件未找到：\"%s\"。
-Case-sensitive	FindandReplaceWindow		区分大小写
-Reload	NodeMonitorAlerts		重新载入
-Replace in all windows	FindandReplaceWindow		在所有窗口进行替换
-Wrap lines	Menus		收起
-Quit	Menus		退出
-File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		\"%file%\" 文件已被其他应用删除，是否恢复该文件？
 Document statistics	Statistics		文档统计
-Cancel	RevertToSavedAlert		取消
-Autodetect	Menus		自动删除
-Document	Menus		文档
-Save changes to the document \"%s\"? 	QuitAlert		将所做更改存入文档\"%s\"中吗?
-Edit	Menus		编辑
-Revert	RevertToSavedAlert		取消
-Font	Menus		字体
-Replace all	FindandReplaceWindow		全部替换
-Statistics…	Menus		统计...
-Default	Open_and_SaveAsPanel		默认
-Replace next	Menus		替换文本
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" 有未保存的更改。\n恢复到最近保存版本？
-Cancel	FindandReplaceWindow		取消
-Text encoding	Menus		文本编码
-Close	Menus		关闭
-Save	SaveAlert		保存
-Words:	Statistics		字数：
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		加载 \"%s\"出错！:\n\t不支持的格式
-OK	RevertToSavedAlert		确定
-Don't save	QuitAlert		不保存
-Align	Menus		对齐
-Color	Menus		颜色
-OK	QuitAlert		确定
-Open…	Menus		打开…
-Center	Menus		居中
-Unable to unlock file\n\t%s	QuitAlert		无法解锁文件\n\t%s
-line %d, column %d	StatusView		行 %d, 列 %d
-OK	Statistics		确定
-New	Menus		新建
-Wrap-around search	FindandReplaceWindow		循环搜索
-Bold	Menus		粗体
-Find selection	Menus		搜索选中
-Find:	FindandReplaceWindow		查找：
-Error saving \"%s\":\n%s	SaveAlert		保存\"%s\"出错:\n%s
-Copy	Menus		复制
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		无法恢复，文件未找到：\"%s\"。
 Cut	Menus		剪切
-File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		文件 \"%file%\" 已由其他程序修改，是否重新载入？
-Replace	FindandReplaceWindow		替换
-Find again	Menus		再次查找
-Cancel	QuitAlert		取消
-Find…	Menus		查找…
-Select all	Menus		全选
-Don't save	SaveAlert		不保存
-Recover	NodeMonitorAlerts		恢复
-Error loading \"%s\":\n\t%s	LoadAlert		加载错误 \"%s\"\n\t%s
-Ignore	NodeMonitorAlerts		忽略
-Read-only	StatusView		只读
-Undo typing	QuitAlert		取消输入
+Center	Menus		居中
+Wrap-around search	FindandReplaceWindow		循环搜索
+Page setup…	Menus		页面设置…
 Untitled 	StyledEditWindow		未命名
-OK	SaveAlert		确定
+OK	Statistics		确定
 Find	FindandReplaceWindow		查找
-Encoding	Open_and_SaveAsPanel		编码
-Characters:	Statistics		字符数：
-Save as…	Menus		保存为...
-Redo typing	QuitAlert		重复输入
-Reload…	Menus		重新载入…
+New	Menus		新建
+Document	Menus		文档
+Search backwards	FindandReplaceWindow		后台搜索
+Find again	Menus		再次查找
+Read-only	StatusView		只读
+Save	Menus		保存
+Cancel	QuitAlert		取消
+Copy	Menus		复制
+Reload	NodeMonitorAlerts		重新载入
+line %d, column %d	StatusView		行 %d, 列 %d
+Words:	Statistics		字数：
+???	LoadAlert		???
+Recover	NodeMonitorAlerts		恢复
+Error saving \"%s\":\n%s	SaveAlert		保存\"%s\"出错:\n%s
+OK	RevertToSavedAlert		确定
+Unlock file	StatusView		解锁文件
+Italic	Menus		斜体
+Can't undo	Menus		无法撤销
 Replace…	Menus		替换…
+File	Menus		文件
+Bold	Menus		粗体
+Paste	Menus		粘贴
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		文件 \"%file%\" 已由其他程序修改，是否重新载入？
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		\"%file%\" 文件已被其他应用删除，是否恢复该文件？
+Lines:	Statistics		行数：
+Replace in all windows	FindandReplaceWindow		在所有窗口进行替换
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" 有未保存的更改。\n恢复到最近保存版本？
+Save	SaveAlert		保存
+Default	Open_and_SaveAsPanel		默认
+Cancel	RevertToSavedAlert		取消
+Cancel	FindandReplaceWindow		取消
+Statistics…	Menus		统计...
+Encoding	Open_and_SaveAsPanel		编码
+Replace all	FindandReplaceWindow		全部替换
+Close	Menus		关闭
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		加载 \"%s\"出错！:\n\t不支持的格式
+Left	Menus		居左
+Default	Menus		默认
+OK	SaveAlert		确定
+Color	Menus		颜色
+Save changes to the document \"%s\"? 	QuitAlert		将所做更改存入文档\"%s\"中吗?
+StyledEdit	System name		StyledEdit
+Find:	FindandReplaceWindow		查找：
+Undo typing	QuitAlert		取消输入
+Error loading \"%s\":\n\t%s	LoadAlert		加载错误 \"%s\"\n\t%s
+Don't save	SaveAlert		不保存
+Reload…	Menus		重新载入…
+Print…	Menus		打印…
+Quit	Menus		退出
+Redo typing	QuitAlert		重复输入
+Ignore	NodeMonitorAlerts		忽略
+Wrap lines	Menus		收起
+Text encoding	Menus		文本编码
+Unable to unlock file\n\t%s	QuitAlert		无法解锁文件\n\t%s
+Modified	StatusView		已修改
+OK	LoadAlert		确定
+Save	QuitAlert		保存
+Case-sensitive	FindandReplaceWindow		区分大小写
+Find selection	Menus		搜索选中
+Cancel	SaveAlert		取消
+Find…	Menus		查找…
+Revert	RevertToSavedAlert		取消
+Size	Menus		大小
+Autodetect	Menus		自动删除
+Replace next	Menus		替换文本
+OK	QuitAlert		确定
+Replace with:	FindandReplaceWindow		替换为：
+Edit	Menus		编辑
+Open…	Menus		打开…
+Save as…	Menus		保存为...
+Replace	FindandReplaceWindow		替换
+Characters:	Statistics		字符数：
+Don't save	QuitAlert		不保存
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		文件标记为只读。是否将修改保存到文档 \"%s\" ?
+Align	Menus		对齐
+Font	Menus		字体
+Select all	Menus		全选
 Right	Menus		居右

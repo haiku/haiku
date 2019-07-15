@@ -1,33 +1,32 @@
-1	slovak	x-vnd.Haiku.TextSearch	3108411238
-%s: Not enough room to escape the filename.	Grepper		%s: nedostatok miesta na vloženie únikových klauzúl do názvu súboru.
-Trim to selection	GrepWindow		Orezať na výber
-Follow symbolic links	GrepWindow		Nasledovať symbolické odkazy
-Close	GrepWindow		Zatvoriť
-Cancel	GrepWindow		Zrušiť
-The unselected files will be removed from the list.	GrepWindow		Nevybrané súbory budú odstránené zo zoznamu.
-Set target…	GrepWindow		Nastaviť cieľ…
+1	slovak	x-vnd.Haiku.TextSearch	1609008100
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Prosím, vyberte súbory, ktoré chcete mať vybrané v Trackeri.
-Open files in Pe	GrepWindow		Otvoriť súbory v Pe
 %appname% : %path%	GrepWindow		%appname% : %path%
-Copy text to clipboard	GrepWindow		Skopírovať text do schránky
-Settings	GrepWindow		Nastavenia
-Select all	GrepWindow		Vybrať všetky
-OK	GrepWindow		OK
-Skip folders starting with a dot	GrepWindow		Preskakovať priečinky začínajce bodkou
-%APP_NAME couldn't open one or more folders.	GrepWindow		Aplikácii %APP_NAME sa nepodarilo otvoriť jeden alebo viac priečinkov.
-Search	GrepWindow		Hľadať
 Open selection	GrepWindow		Otvoriť výber
-Look in sub-folders	GrepWindow		Hľadať v podpriečinkoch
 Actions	GrepWindow		Operácie
-File	GrepWindow		Súbor
-Encoding	GrepWindow		Kódovanie
-History	GrepWindow		História
 New window	GrepWindow		Nové okno
-Please select the files you wish to keep searching.	GrepWindow		Prosím, vyberte súbory, v ktorých chcete ďalej hľadať.
-TextSearch	GrepWindow		Hľadanie textu
+Encoding	GrepWindow		Kódovanie
+OK	GrepWindow		OK
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Close	GrepWindow		Zatvoriť
+Look in sub-folders	GrepWindow		Hľadať v podpriečinkoch
+%s: Not enough room to escape the filename.	Grepper		%s: nedostatok miesta na vloženie únikových klauzúl do názvu súboru.
+Follow symbolic links	GrepWindow		Nasledovať symbolické odkazy
+Text files only	GrepWindow		Iba textové súbory
 Quit	GrepWindow		Ukončiť
 Show files in Tracker	GrepWindow		Zobraziť súbory v Trackeri
-Case-sensitive	GrepWindow		Rozlišovať veľkosť písmen
-Text files only	GrepWindow		Iba textové súbory
+Please select the files you wish to keep searching.	GrepWindow		Prosím, vyberte súbory, v ktorých chcete ďalej hľadať.
+Trim to selection	GrepWindow		Orezať na výber
+Set target…	GrepWindow		Nastaviť cieľ…
+TextSearch	GrepWindow		Hľadanie textu
+Search	GrepWindow		Hľadať
+Copy text to clipboard	GrepWindow		Skopírovať text do schránky
 Show lines	GrepWindow		Zobrazovať riadky
-%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+The unselected files will be removed from the list.	GrepWindow		Nevybrané súbory budú odstránené zo zoznamu.
+Skip folders starting with a dot	GrepWindow		Preskakovať priečinky začínajce bodkou
+Cancel	GrepWindow		Zrušiť
+History	GrepWindow		História
+File	GrepWindow		Súbor
+Case-sensitive	GrepWindow		Rozlišovať veľkosť písmen
+Select all	GrepWindow		Vybrať všetky
+%APP_NAME couldn't open one or more folders.	GrepWindow		Aplikácii %APP_NAME sa nepodarilo otvoriť jeden alebo viac priečinkov.
+Settings	GrepWindow		Nastavenia

@@ -1,12 +1,12 @@
 1	greek, modern (1453-)	x-vnd.Haiku-MatchHeader	1349121828
-<Choose action>	ConfigView		<Επιλέξτε ενέργεια>
-has	ConfigView		έχει
-Move to	ConfigView		Μεταφορά σε
-Then	ConfigView		Τότε
-this field is based on the action	ConfigView		Αυτό το πεδίο βασίζεται σε
 Delete message	ConfigView		Διαγραφή μηνύματος
-<Choose account>	ConfigView		<Επιλέξτε λογαριασμό>
 Set flags to	ConfigView		Θέση σημαιών σε
+<Choose account>	ConfigView		<Επιλέξτε λογαριασμό>
+Then	ConfigView		Τότε
+If	ConfigView		Αν
 Set as read	ConfigView		Θέση όπως διαβάζονται
 Reply with	ConfigView		Απάντηση με
-If	ConfigView		Αν
+<Choose action>	ConfigView		<Επιλέξτε ενέργεια>
+Move to	ConfigView		Μεταφορά σε
+this field is based on the action	ConfigView		Αυτό το πεδίο βασίζεται σε
+has	ConfigView		έχει

@@ -1,17 +1,17 @@
 1	korean	x-vnd.Haiku-DataTranslations	4156631142
-DataTranslations	System name		데이타변환
-Cancel	DataTranslations		취소
+Path:	DataTranslations		경로:
 Name:	DataTranslations		이름:
+DataTranslations - Note	DataTranslations		데이타변환 - 주의
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		이 아이템 '%name'은 변환기로 보여지지 않습니다 그래서 설치가 되지 않을 것입니다.
 Could not install %s:\n%s	DataTranslations		%s를 설치 할 수 없음:\n%s
-Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		응용프로그램에 위해 지정된 다른 값이 없을때, 제어판을 사용해서 설정된 변환기의 기본 값이 사용됩니다.
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		'%name'랑 이름의 아이템은 이미 변환기 폴더에 존재합니다!존재하는 변환기에 덮어 쓰겠습니까?
-DataTranslations - Note	DataTranslations		데이타변환 - 주의
-Overwrite	DataTranslations		덮어쓰기
-Info:	DataTranslations		정보:
-Info	DataTranslations		정보
-Path:	DataTranslations		경로:
-The new translator has been installed successfully.	DataTranslations		새로운 번환기가 성공적으로 설치되었습니다.
-DataTranslations - Error	DataTranslations		데이타변환 - 에러
 OK	DataTranslations		확인
+Cancel	DataTranslations		취소
+Info:	DataTranslations		정보:
+DataTranslations - Error	DataTranslations		데이타변환 - 에러
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		응용프로그램에 위해 지정된 다른 값이 없을때, 제어판을 사용해서 설정된 변환기의 기본 값이 사용됩니다.
+The new translator has been installed successfully.	DataTranslations		새로운 번환기가 성공적으로 설치되었습니다.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		'%name'랑 이름의 아이템은 이미 변환기 폴더에 존재합니다!존재하는 변환기에 덮어 쓰겠습니까?
+DataTranslations	System name		데이타변환
+Info	DataTranslations		정보
+Overwrite	DataTranslations		덮어쓰기
 Version:	DataTranslations		버젼:

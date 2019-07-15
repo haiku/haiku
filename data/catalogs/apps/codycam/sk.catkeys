@@ -1,92 +1,90 @@
-1	slovak	x-vnd.Haiku-CodyCam	3408488515
-Upload…	VideoConsumer.cpp		Nahrať…
-Capturing Image…	VideoConsumer.cpp		Zachytáva sa obrázok…
-Every 30 seconds	CodyCam		Každých 30 sekúnd
-File name:	CodyCam		Názov súboru:
-Last Capture: 	VideoConsumer.cpp		Posledné zachytenie: 
-Server login failed	VideoConsumer.cpp		Prihlásenie k serveru zlyhalo
-Remote host has closed the connection.\n	FtpClient		Vzdialený hostiteľ zatvoril spojenie.\n
-Login:	CodyCam		Prihlasovacie meno:
-Format:	CodyCam		Formát:
-Every 2 hours	CodyCam		Každé 2 hodiny
-Closing the window\n	VideoConsumer.cpp		Zatvára sa okno\n
-login ID expected	CodyCam		očakávalo sa prihlasovacie meno
-Rate:	CodyCam		Interval:
-JPEG image	CodyCam		Obrázok JPEG
-Capture Rate Menu	CodyCam		Menu intervalu zachytávania
-File %s # unterminated quote at end of file\n	SettingsHandler		Súbor %s # neukončená úvodzovka na konci súboru\n
-Password:	CodyCam		Heslo:
-Passive FTP	CodyCam		Pasívne FTP
+1	slovak	x-vnd.Haiku-CodyCam	3200733765
 destination directory expected	CodyCam		očakával sa cieľový adresár
-password	CodyCam		heslo
-Directory:	CodyCam		Adresár:
-Every minute	CodyCam		Každú minútu
-read: %ld\n	SftpClient		prečítané: %ld\n
-Waiting…	CodyCam		Čaká sa…
-Logging in…	VideoConsumer.cpp		Prihlasuje sa…
-Server:	CodyCam		Server:
-server address expected	CodyCam		očakávala sa adresa servera
-Error creating output file	VideoConsumer.cpp		Chyba pri vytváraní výstupného súboru
-unrecognized upload client specified	CodyCam		uvedený nerozpoznaný nahrávací klient
-File %s ; Line %ld # unterminated quote\n	SettingsHandler		Súbor %s; riadok %ld # neukončená úvodzovka\n
-Output	CodyCam		Výstup
-Every 15 minutes	CodyCam		Každých 15 minút
-Cannot find an available video stream	CodyCam		Nenájdený dostupný video stream
-Can't find an available connection to the video window	CodyCam		Nebolo nájdené dostupné spojenie s oknom s videom
-Cannot get a time source	CodyCam		Nebolo možné získať zdroj času
-Every 8 hours	CodyCam		Každých 8 hodín
-Rename failed	VideoConsumer.cpp		Premenovanie zlyhalo
-Cannot start time source!	CodyCam		Nebolo možné spustiť zdroj času!
-Cannot register the video window	CodyCam		Nebolo možné zaregistrovať okno s videom
-CodyCam	System name		CodyCam
-Every 24 hours	CodyCam		Každých 24 hodín
-unknown command	SettingsHandler		neznámy príkaz
-Video settings	CodyCam		Nastavenia videa
-still image filename expected	CodyCam		očakával sa názov obrázka
-invalid upload client %ld\n	VideoConsumer.cpp		neplatný klient nahrávania %ld\n
-Every 15 seconds	CodyCam		Každých 15 sekúnd
-Error writing output file	VideoConsumer.cpp		Chyba pri zápise výstupného súboru
+reply: '%s'\n	SftpClient		odpoveď: „%s“\n
+JPEG image	CodyCam		Obrázok JPEG
+Remote host has closed the connection.\n	FtpClient		Vzdialený hostiteľ zatvoril spojenie.\n
 image file format expected	CodyCam		očakával sa formát obrázka
-Cannot set the time source for the video source	CodyCam		Nie je možné nastaviť časový zdroj zdroja videa
-Type:	CodyCam		Typ:
-Cannot set the time source for the video window	CodyCam		Nie je možné nastaviť časový zdroj okna videa
-Stop video	CodyCam		Zastaviť video
-Locking the window\n	VideoConsumer.cpp		Zamyká sa okno\n
-File %s; Line %ld # %s	SettingsHandler		Súbor %s; riadok %ld # %s
-Couldn't find requested directory on server	VideoConsumer.cpp		Nebol nájdený požadovaný adresár na serveri
-Renaming…	VideoConsumer.cpp		Premenováva sa…
-Local	CodyCam		Lokálne
-Error setting type of output file	VideoConsumer.cpp		Chyba pri nastavovaní typu výstupu
-upload client name expected	CodyCam		očakával sa názov nahrávacieho klienta
-SFTP	CodyCam		SFTP
-Connected…	VideoConsumer.cpp		Pripojené…
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <skryté>  (skutočné odoslané heslo)\n
-File upload failed	VideoConsumer.cpp		Nahranie súboru zlyhalo
-Every 5 minutes	CodyCam		Každých 5 minút
-read: %d\n	SftpClient		prečítané: %d\n
-Capture controls	CodyCam		Ovládacie prvky zachytávania
-Every hour	CodyCam		Každú hodinu
-Cannot connect the video source to the video window	CodyCam		Nebolo možné spojiť zdroj videa s oknom s videom
-capture rate expected	CodyCam		očakávaný interval zachytávania
-Error getting initial latency for the capture node	CodyCam		Chyba pri zisťovaní úvodnej latencie uzla zachytávania
-Send to…	CodyCam		Poslať kam…
+Every 30 minutes	CodyCam		Každých 30 minút
+Capturing Image…	VideoConsumer.cpp		Zachytáva sa obrázok…
+Cannot start time source!	CodyCam		Nebolo možné spustiť zdroj času!
+Waiting…	CodyCam		Čaká sa…
+Passive FTP	CodyCam		Pasívne FTP
+Every 10 minutes	CodyCam		Každých 10 minút
+Every minute	CodyCam		Každú minútu
+Capture Rate Menu	CodyCam		Menu intervalu zachytávania
+Cannot seek time source!	CodyCam		Nie je možné posunúť sa na zdroj času!
+Server login failed	VideoConsumer.cpp		Prihlásenie k serveru zlyhalo
 on or off expected	Settings	Do not translate 'on' and 'off'	očakávalo sa „on“ alebo „off“
+invalid upload client %ld\n	VideoConsumer.cpp		neplatný klient nahrávania %ld\n
+Every 30 seconds	CodyCam		Každých 30 sekúnd
+Cannot create a video window	CodyCam		Nebolo možné vytvoriť okno s videom
+Cannot register the video window	CodyCam		Nebolo možné zaregistrovať okno s videom
+capture rate expected	CodyCam		očakávaný interval zachytávania
 Quit	CodyCam		Ukončiť
+Cannot connect the video source to the video window	CodyCam		Nebolo možné spojiť zdroj videa s oknom s videom
+read: %d\n	SftpClient		prečítané: %d\n
+Every 2 hours	CodyCam		Každé 2 hodiny
+Cannot get a time source	CodyCam		Nebolo možné získať zdroj času
+Every 4 hours	CodyCam		Každé 4 hodiny
 cmd: '%s'\n	FtpClient		príkaz: „%s“\n
 Never	CodyCam		Nikdy
-Cannot create a video window	CodyCam		Nebolo možné vytvoriť okno s videom
-Every 10 minutes	CodyCam		Každých 10 minút
-Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Nepodarilo sa nájsť zdroj videa.\nAby ste mohli používať CodyCam, potrebujete webovú kameru.
+Every 8 hours	CodyCam		Každých 8 hodín
 Cannot start the video source	CodyCam		Nebolo možné spustiť zdroj videa
-Cannot start the video window	CodyCam		Nebolo možné spustiť okno s videom
+Cannot set the time source for the video source	CodyCam		Nie je možné nastaviť časový zdroj zdroja videa
+Renaming…	VideoConsumer.cpp		Premenováva sa…
+Send to…	CodyCam		Poslať kam…
+Password:	CodyCam		Heslo:
+still image filename expected	CodyCam		očakával sa názov obrázka
+File name:	CodyCam		Názov súboru:
+Directory:	CodyCam		Adresár:
+Error setting type of output file	VideoConsumer.cpp		Chyba pri nastavovaní typu výstupu
+Cannot find an available video stream	CodyCam		Nenájdený dostupný video stream
+Upload…	VideoConsumer.cpp		Nahrať…
 password expected	CodyCam		očakávalo sa heslo
+PASS <suppressed>  (real password sent)\n	FtpClient		PASS <skryté>  (skutočné odoslané heslo)\n
+SFTP	CodyCam		SFTP
+Output	CodyCam		Výstup
+server address expected	CodyCam		očakávala sa adresa servera
+Cannot start the video window	CodyCam		Nebolo možné spustiť okno s videom
 reply: %d, %d\n	FtpClient		odpoveď: %d, %d\n
-Cannot find the media roster	CodyCam		Nie je možné nájsť zoznam médií
-Every 4 hours	CodyCam		Každé 4 hodiny
-FTP	CodyCam		FTP
-Cannot seek time source!	CodyCam		Nie je možné posunúť sa na zdroj času!
-File	CodyCam		Súbor
+Cannot set the time source for the video window	CodyCam		Nie je možné nastaviť časový zdroj okna videa
+Every 15 minutes	CodyCam		Každých 15 minút
+Every 24 hours	CodyCam		Každých 24 hodín
 Image Format Menu	CodyCam		Menu formátu obrázka
-Every 30 minutes	CodyCam		Každých 30 minút
-reply: '%s'\n	SftpClient		odpoveď: „%s“\n
+Every 5 minutes	CodyCam		Každých 5 minút
+File upload failed	VideoConsumer.cpp		Nahranie súboru zlyhalo
+Format:	CodyCam		Formát:
 Start video	CodyCam		Spustiť video
+Connected…	VideoConsumer.cpp		Pripojené…
+upload client name expected	CodyCam		očakával sa názov nahrávacieho klienta
+Every 15 seconds	CodyCam		Každých 15 sekúnd
+Error getting initial latency for the capture node	CodyCam		Chyba pri zisťovaní úvodnej latencie uzla zachytávania
+password	CodyCam		heslo
+Local	CodyCam		Lokálne
+Stop video	CodyCam		Zastaviť video
+Last Capture: 	VideoConsumer.cpp		Posledné zachytenie: 
+Rate:	CodyCam		Interval:
+File %s ; Line %ld # unterminated quote\n	SettingsHandler		Súbor %s; riadok %ld # neukončená úvodzovka\n
+File %s # unterminated quote at end of file\n	SettingsHandler		Súbor %s # neukončená úvodzovka na konci súboru\n
+Couldn't find requested directory on server	VideoConsumer.cpp		Nebol nájdený požadovaný adresár na serveri
+Cannot find the media roster	CodyCam		Nie je možné nájsť zoznam médií
+Type:	CodyCam		Typ:
+Rename failed	VideoConsumer.cpp		Premenovanie zlyhalo
+unrecognized upload client specified	CodyCam		uvedený nerozpoznaný nahrávací klient
+Server:	CodyCam		Server:
+Login:	CodyCam		Prihlasovacie meno:
+File	CodyCam		Súbor
+read: %ld\n	SftpClient		prečítané: %ld\n
+Every hour	CodyCam		Každú hodinu
+login ID expected	CodyCam		očakávalo sa prihlasovacie meno
+File %s; Line %ld # %s	SettingsHandler		Súbor %s; riadok %ld # %s
+Video settings	CodyCam		Nastavenia videa
+Can't find an available connection to the video window	CodyCam		Nebolo nájdené dostupné spojenie s oknom s videom
+FTP	CodyCam		FTP
+Error creating output file	VideoConsumer.cpp		Chyba pri vytváraní výstupného súboru
+Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Nepodarilo sa nájsť zdroj videa.\nAby ste mohli používať CodyCam, potrebujete webovú kameru.
+Logging in…	VideoConsumer.cpp		Prihlasuje sa…
+CodyCam	System name		CodyCam
+Error writing output file	VideoConsumer.cpp		Chyba pri zápise výstupného súboru
+unknown command	SettingsHandler		neznámy príkaz
+Capture controls	CodyCam		Ovládacie prvky zachytávania

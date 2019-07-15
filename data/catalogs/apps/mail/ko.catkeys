@@ -1,32 +1,32 @@
 1	korean	x-vnd.Be-MAIL	4168631549
-View	Mail		보기
-%d - Date	Mail		%d - 날짜
-Attach attributes:	Mail		파일 첨부:
-Inconsistency occurred in the undo/redo buffer.	Mail		되돌리기/다시실행 버퍼에서 불일치가 발생했습니다.
-An error occurred trying to save the attachment.	Mail		첨부 파일을 저장중에 에러가 발생했습니다.
-Copy to new	Mail		새 메일로 복사
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	'새 메세지'로 남겨둠
-Edit	Mail		편집
-Print	Mail		인쇄
-<none>	Mail		<없음>
-New mail message	Mail		새 이메일 메세지
-Automatic	Mail		자동
-Automatically mark mail as read:	Mail		자동으로 메일을 읽은 것으로 표시:
-helpful message	Mail		도움이 되는 메세지
-Colored quotes:	Mail		색깔있는 인용문:
-Subject:	Mail		제목:
-Reply to all	Mail		전체 답장
-Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	첨부파일: %name% (종류: %type%)
 Show icons & labels	Mail		아이콘&라벨 보기
-Remove attachment	Mail		첨부파일 제거
-Button bar:	Mail		버튼 바
-spam	B_USER_DIRECTORY/mail/spam		스팸
-Beginner	Mail		초보자
-Don't save	Mail		저장 안함
-Expert	Mail		전문가
-Reply account:	Mail		회신 계정:
+Copy to new	Mail		새 메일로 복사
+Print	Mail		인쇄
 Message	Mail		메세지
+Button bar:	Mail		버튼 바
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	첨부파일: %name% (종류: %type%)
+Subject:	Mail		제목:
 Reply to sender	Mail		보낸 사람에게 답장
-There is no installed handler for URL links.	Mail		URL 링크에 연결된 처리기가 없습니다.
 Signature	Mail		서명
+spam	B_USER_DIRECTORY/mail/spam		스팸
+Reply to all	Mail		전체 답장
+View	Mail		보기
+Expert	Mail		전문가
+Automatically mark mail as read:	Mail		자동으로 메일을 읽은 것으로 표시:
+Colored quotes:	Mail		색깔있는 인용문:
+Automatic	Mail		자동
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	'새 메세지'로 남겨둠
+Attach attributes:	Mail		파일 첨부:
 Find again	Mail		다시 찾기
+helpful message	Mail		도움이 되는 메세지
+<none>	Mail		<없음>
+%d - Date	Mail		%d - 날짜
+Reply account:	Mail		회신 계정:
+Don't save	Mail		저장 안함
+An error occurred trying to save the attachment.	Mail		첨부 파일을 저장중에 에러가 발생했습니다.
+There is no installed handler for URL links.	Mail		URL 링크에 연결된 처리기가 없습니다.
+New mail message	Mail		새 이메일 메세지
+Inconsistency occurred in the undo/redo buffer.	Mail		되돌리기/다시실행 버퍼에서 불일치가 발생했습니다.
+Remove attachment	Mail		첨부파일 제거
+Edit	Mail		편집
+Beginner	Mail		초보자

@@ -1,22 +1,22 @@
 1	hungarian	x-vnd.Haiku-JPEGTranslator	3788699631
-Output quality	JPEGTranslator		Kimeneti minőség
-JPEG images	JPEGTranslator		JPEG kép
-Prevent colors 'washing out'	JPEGTranslator		Elmosódott színek megelőzése
-JPEG Library Error: %s\n	be_jerror		JPEG funkciótár hiba: %s\n
-Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Használjon CMYK kódot (0 a 100%-os tintaszint)
-About	JPEGTranslator		Névjegy
-©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nA IJG funkciótár alapján ©1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nKen Murchison \"veszteségmentes\" kódolás támogatás-patchéveln\thttp://www.oceana.com/ftp/ljpeg/\n\nMagnus Hellman pár színskála konverziós algoritmusával \n\thttp://www.bebits.com/app/802\n
-Low	JPEGTranslator		Alacsony
-Make file smaller (sligthtly worse quality)	JPEGTranslator		Fájl összezsugorítása (kicsit ront a minőségen)
-None	JPEGTranslator		Nincs
+Read	JPEGTranslator		Olvasás
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be Bittérkép Formátum (JPEGÉrtelmező)
 Show warning messages	JPEGTranslator		Figyelmeztető üzenetek megjelenítése
-Output smoothing strength	JPEGTranslator		Kimeneti simítás erőssége
-High	JPEGTranslator		Magas
-Write	JPEGTranslator		Írás
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		A 0 CMYK kód használata 100%-os tintaszintnél
+JPEG Library Error: %s\n	be_jerror		JPEG funkciótár hiba: %s\n
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nA IJG funkciótár alapján © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nKen Murchison \"veszteségmentes\" kódolás támogatás-patchével\n\thttp://www.oceana.com/ftp/ljpeg/\n\nMagnus Hellman pár színskála konverziós algoritmusával\n\thttp://www.bebits.com/app/802\n
+None	JPEGTranslator		Nincs
+About	JPEGTranslator		Névjegy
+Version %d.%d.%d	JPEGTranslator		Verzió: %d.%d.%d
 Write black-and-white images as RGB24	JPEGTranslator		Fekete-fehér képek írása RGB24-ként
-Version %d.%d.%d	JPEGTranslator		Verzió: %d.%d.%d, %s
-Read greyscale images as RGB32	JPEGTranslator		Szürkeárnyalatos képek olvasása RGB32-ként
-Read	JPEGTranslator		Olvasás
-JPEG Library Warning: %s\n	be_jerror		JPEG funkciótár figyelmeztetés: %s\n
+Output smoothing strength	JPEGTranslator		Kimeneti simítás erőssége
 Use progressive compression	JPEGTranslator		Progresszív tömörítés használata
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Fájl összezsugorítása (kicsit ront a minőségen)
+High	JPEGTranslator		Magas
+Read greyscale images as RGB32	JPEGTranslator		Szürkeárnyalatos képek olvasása RGB32-ként
+Output quality	JPEGTranslator		Kimeneti minőség
+Low	JPEGTranslator		Alacsony
+Write	JPEGTranslator		Írás
+Prevent colors 'washing out'	JPEGTranslator		Elmosódott színek megelőzése
+JPEG Library Warning: %s\n	be_jerror		JPEG funkciótár figyelmeztetés: %s\n
+JPEG images	JPEGTranslator		JPEG kép

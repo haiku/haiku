@@ -1,88 +1,88 @@
 1	catalan; valencian	x-vnd.Haiku-Bluetooth	3550394259
-Display	DeviceClass		Pantalla
-Capturing	DeviceClass		Captura
-Printer	DeviceClass		Impressora
-Uncategorized	DeviceClass		Sense categoria
-1-17% utilized	DeviceClass		Utilitzat entre l'1 i el 17%
 Positioning	DeviceClass		Posicionament
-Rendering	DeviceClass		Renderitzat
-Phone	DeviceClass		Telèfon
-17-33% utilized	DeviceClass		Utilitzat entre el 17 i el 33%
-#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#No és un nom vàlid
-Combo keyboard/pointing device	DeviceClass		Teclat combinat o dispositiu senyalador
 Controller	DeviceClass		Controlador
-No service available	DeviceClass		No hi ha cap servei disponible
-Wearable	DeviceClass	A wearable computer	Dispositiu integrat a la indumentària
-Handheld	DeviceClass		Agenda electrònica
-Invalid device class!\n	DeviceClass		La classe del dispositiu no és vàlida!\n
-Sensing device	DeviceClass		Sensor
-Computer	DeviceClass		Ordinador
-Cellular	DeviceClass		Telèfon mòbil
-Microphone	DeviceClass		Micròfon
-Unknown (reserved) minor device class	DeviceClass		Classe de dispositiu menor desconeguda (reservada)
-Cordless	DeviceClass		Sense fil
 Common ISDN access	DeviceClass		Accés ISDN genèric
-83-99% utilized	DeviceClass		Utilitzat entre el 83 i el 99%
-Scanner	DeviceClass		Escànner
-Game	DeviceClass		Joc
-Gamepad	DeviceClass		Teclat de jocs
-(reserved)	DeviceClass		(reservat)
-Desktop workstation	DeviceClass		Estació de treball d'escriptori
-Audio/Video	DeviceClass		Àudio/Vídeo
-Glasses	DeviceClass		Ulleres
+Unknown (reserved) minor device class	DeviceClass		Classe de dispositiu menor desconeguda (reservada)
+Uncategorized	DeviceClass		Sense categoria
 Keyboard	DeviceClass		Teclat
-Camera	DeviceClass		Càmera
-Major class: 	DeviceClass		Classe principal: 
-50-67% utilized	DeviceClass		Utilitzat entre el 50 i el 67%
-Card reader	DeviceClass		Lector de targetes
-Set-top box	DeviceClass		Dispositiu extern
-Helmet	DeviceClass		Casc
-Laptop	DeviceClass		Portàtil
-Car audio	DeviceClass		Dispositiu àudio per a vehicles
-SIM card reader	DeviceClass		Lector de targetes SIM
-Headphones	DeviceClass		Auriculars
-Information	DeviceClass		Informació
-Remote control	DeviceClass		Comandament a distància
-Service classes: 	DeviceClass		Classes de serveis: 
-Pager	DeviceClass	A small radio device to receive short text messages	Buscapersones
-Object transfer	DeviceClass		Transferidor d'objectes
-Gaming/Toy	DeviceClass		Joc o joguina
-Audio	DeviceClass		Àudio
-Robot	DeviceClass		Robot
-Camcorder	DeviceClass		Gravadora de vídeo
-Digitizer tablet	DeviceClass		Taula digitalitzadora
-Loudspeaker	DeviceClass		Altaveu
-Joystick	DeviceClass		Palanca de control
-LAN access	DeviceClass		Accés LAN
-Wrist watch	DeviceClass		Rellotge de polsera
-Minor class: 	DeviceClass		Classe secundària: 
-Networking	DeviceClass		Xarxa
-Portable audio	DeviceClass		Àudio portàtil
-Device conforms to the headset profile	DeviceClass		El dispositiu concorda amb el perfil dels auriculars
-Hands-free	DeviceClass		Mans lliures
-#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed# No és un nom vàlid
-Vehicle	DeviceClass		Vehicle
-Palm	DeviceClass	A palm-held device	Palm
-Video display and loudspeaker	DeviceClass		Pantalla de vídeo i altaveus
-Peripheral	DeviceClass		Perifèric
-#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError# No és un nom vàlid
-Wired modem or voice gateway	DeviceClass		Mòdem o passarel·la de veu
-Jacket	DeviceClass		Jaqueta
-Unspecified	DeviceClass		Sense especificar
-Fully available	DeviceClass		Totalment disponible
-67-83% utilized	DeviceClass		Utilitzat entre el 67 i el 83%
-Not implemented	RemoteDevice		No s'ha implementat
-#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest# No és un nom vàlid
-Server	DeviceClass		Servidor
-Video conferencing	DeviceClass		Videoconferència
-Video camera	DeviceClass		Càmera de vídeo
-HiFi audio device	DeviceClass		Dispositiu d'àudio d'alta fidelitat
 Smart phone	DeviceClass		Telèfon intel·ligent
-Telephony	DeviceClass		Telefonia
-Doll/Action figure	DeviceClass		Nina o figura amb moviment
 VCR	DeviceClass		Magnetoscopi
-Video monitor	DeviceClass		Monitor de vídeo
-Pointing device	DeviceClass		Dispositiu senyalador
-Miscellaneous	DeviceClass		Variat
-33-50% utilized	DeviceClass		Utilitzat entre el 33 i el 50%
+Cellular	DeviceClass		Telèfon mòbil
+Audio	DeviceClass		Àudio
+Audio/Video	DeviceClass		Àudio/Vídeo
+Car audio	DeviceClass		Dispositiu àudio per a vehicles
+Major class: 	DeviceClass		Classe principal: 
+HiFi audio device	DeviceClass		Dispositiu d'àudio d'alta fidelitat
+Microphone	DeviceClass		Micròfon
+Capturing	DeviceClass		Captura
+Jacket	DeviceClass		Jaqueta
+50-67% utilized	DeviceClass		Utilitzat entre el 50 i el 67%
+Headphones	DeviceClass		Auriculars
 Imaging	DeviceClass		Imatges
+Device conforms to the headset profile	DeviceClass		El dispositiu concorda amb el perfil dels auriculars
+Remote control	DeviceClass		Comandament a distància
+Fully available	DeviceClass		Totalment disponible
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed# No és un nom vàlid
+Server	DeviceClass		Servidor
+No service available	DeviceClass		No hi ha cap servei disponible
+Printer	DeviceClass		Impressora
+Card reader	DeviceClass		Lector de targetes
+Wired modem or voice gateway	DeviceClass		Mòdem o passarel·la de veu
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#No és un nom vàlid
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError# No és un nom vàlid
+Camcorder	DeviceClass		Gravadora de vídeo
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest# No és un nom vàlid
+17-33% utilized	DeviceClass		Utilitzat entre el 17 i el 33%
+Desktop workstation	DeviceClass		Estació de treball d'escriptori
+Unspecified	DeviceClass		Sense especificar
+Miscellaneous	DeviceClass		Variat
+Robot	DeviceClass		Robot
+Vehicle	DeviceClass		Vehicle
+LAN access	DeviceClass		Accés LAN
+Glasses	DeviceClass		Ulleres
+Phone	DeviceClass		Telèfon
+Laptop	DeviceClass		Portàtil
+67-83% utilized	DeviceClass		Utilitzat entre el 67 i el 83%
+Cordless	DeviceClass		Sense fil
+Invalid device class!\n	DeviceClass		La classe del dispositiu no és vàlida!\n
+Minor class: 	DeviceClass		Classe secundària: 
+Doll/Action figure	DeviceClass		Nina o figura amb moviment
+Not implemented	RemoteDevice		No s'ha implementat
+33-50% utilized	DeviceClass		Utilitzat entre el 33 i el 50%
+Gaming/Toy	DeviceClass		Joc o joguina
+Video camera	DeviceClass		Càmera de vídeo
+Handheld	DeviceClass		Agenda electrònica
+Service classes: 	DeviceClass		Classes de serveis: 
+Loudspeaker	DeviceClass		Altaveu
+83-99% utilized	DeviceClass		Utilitzat entre el 83 i el 99%
+SIM card reader	DeviceClass		Lector de targetes SIM
+Computer	DeviceClass		Ordinador
+Scanner	DeviceClass		Escànner
+Wearable	DeviceClass	A wearable computer	Dispositiu integrat a la indumentària
+Display	DeviceClass		Pantalla
+Gamepad	DeviceClass		Teclat de jocs
+Video monitor	DeviceClass		Monitor de vídeo
+Palm	DeviceClass	A palm-held device	Palm
+Joystick	DeviceClass		Palanca de control
+Networking	DeviceClass		Xarxa
+Telephony	DeviceClass		Telefonia
+Game	DeviceClass		Joc
+Video display and loudspeaker	DeviceClass		Pantalla de vídeo i altaveus
+Wrist watch	DeviceClass		Rellotge de polsera
+Sensing device	DeviceClass		Sensor
+Pointing device	DeviceClass		Dispositiu senyalador
+(reserved)	DeviceClass		(reservat)
+Rendering	DeviceClass		Renderitzat
+Information	DeviceClass		Informació
+Helmet	DeviceClass		Casc
+Pager	DeviceClass	A small radio device to receive short text messages	Buscapersones
+Hands-free	DeviceClass		Mans lliures
+Digitizer tablet	DeviceClass		Taula digitalitzadora
+Portable audio	DeviceClass		Àudio portàtil
+Camera	DeviceClass		Càmera
+1-17% utilized	DeviceClass		Utilitzat entre l'1 i el 17%
+Combo keyboard/pointing device	DeviceClass		Teclat combinat o dispositiu senyalador
+Video conferencing	DeviceClass		Videoconferència
+Peripheral	DeviceClass		Perifèric
+Object transfer	DeviceClass		Transferidor d'objectes
+Set-top box	DeviceClass		Dispositiu extern

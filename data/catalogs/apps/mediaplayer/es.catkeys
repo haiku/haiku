@@ -1,155 +1,155 @@
 1	spanish; castilian	x-vnd.Haiku-MediaPlayer	1313616492
-raw audio	MediaPlayer-InfoWin		audio bruto
-Location	MediaPlayer-InfoWin		Ubicación
-1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
-%d kHz	MediaPlayer-InfoWin		%d kHz
-Stream settings	MediaPlayer-Main		Configuración de transmisión
-<unknown>	PlaylistItem-album		<desconocido>
-Scale controls in full screen mode	MediaPlayer-SettingsWindow		Escalar controles en modo de pantalla completa
-Video	MediaPlayer-InfoWin		Video
-Subtitle size:	MediaPlayer-SettingsWindow		Tamaño de subtítulo:
-Save Playlist	MediaPlayer-PlaylistWindow		Guardar lista de reproducción
-<no media>	MediaPlayer-InfoWin		<sin medios>
-(not supported)	MediaPlayer-InfoWin		(sin implementar)
-None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Ninguno de los archivos que quería reproducir parecen ser archivos multimedia.
-Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Guardar la lista de reproducción falló.\n\nError:
-ask every time	MediaPlayer-SettingsWindow		preguntar cada vez
-%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
-New player…	MediaPlayer-Main		Nuevo reproductor de medios...
-100% scale	MediaPlayer-Main		Escala al 100%
-Subtitle placement:	MediaPlayer-SettingsWindow		Posición del subtítulo
-Close	MediaPlayer-Main		Cerrar
-Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		No se pudo poner algunos archivos en la papelera.
-<unknown>	MediaPlayer-InfoWin		<desconocido>
-Open	MediaPlayer-Main		Abrir
-OK	MediaPlayer-SettingsWindow		Aceptar
-Track %d	MediaPlayer-Main		Pista %d
-2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
-Display mode	MediaPlayer-InfoWin		Modo de visualización
-Medium	MediaPlayer-SettingsWindow		Mediano
-Open network stream	MediaPlayer-NetworkStream		Abrir transmisión de red
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Enviar entrada a la papelera
 Close	MediaPlayer-PlaylistWindow		Cerrar
-Open…	MediaPlayer-PlaylistWindow		Abrir...
-Undo	MediaPlayer-PlaylistWindow		Deshacer
-Stream URL:	MediaPlayer-NetworkStream		URL de streaming:
+Volume of background clips	MediaPlayer-SettingsWindow		Volumen de secuencias de fondo
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Usar capas de hardware de video si es posible.
-File info…	MediaPlayer-Main		Información del archivo...
-Overlay	MediaPlayer-InfoWin		Superposición
-Remove Entry	MediaPlayer-RemovePLItemsCmd		Eliminar entrada
-Close window after playing audio	MediaPlayer-SettingsWindow		Cerrar ventana después de reproducir audio
-Full volume	MediaPlayer-SettingsWindow		Máximo volumen
-Drop files to play	MediaPlayer-Main		Arrastrar archivos a reproducir
-Copyright	MediaPlayer-InfoWin		Derechos de autor
-Cancel	MediaPlayer-SettingsWindow		Cancelar
-Loop audio	MediaPlayer-SettingsWindow		Repetir audio
-Container	MediaPlayer-InfoWin		Contenedor
-Nothing to Play	MediaPlayer-Main		Nada para reproducir
+Audio	MediaPlayer-InfoWin		Audio
+Subtitle placement:	MediaPlayer-SettingsWindow		Posición del subtítulo
+MediaPlayer	System name		MediaPlayer
+Audio track	MediaPlayer-Main		Pista de audio
 Muted	MediaPlayer-SettingsWindow		Silencio
-Quit	MediaPlayer-Main		Salir
+OK	MediaPlayer-RemovePLItemsCmd		Aceptar
+Open Playlist	MediaPlayer-PlaylistWindow		Abrir lista de reproducción
+Subtitles	MediaPlayer-Main		Subtítulos
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% ha encontrado un error interno. No se ha podido abrir el archivo.
+DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
+File info	MediaPlayer-InfoWin		Información del archivo
+raw audio	MediaPlayer-InfoWin		audio bruto
+Select all	MediaPlayer-PlaylistWindow		Seleccionar todo
+New player…	MediaPlayer-Main		Nuevo reproductor de medios...
+Move Entries	MediaPlayer-MovePLItemsCmd		Mover entradas
+OK	MediaPlayer-Main		Aceptar
+Remove	MediaPlayer-PlaylistWindow		Quitar
+<unknown>	MediaPlayer-InfoWin		<desconocido>
 Resume:	MediaPlayer-SettingsWindow		Continuar:
+Duration	MediaPlayer-InfoWin		Duración
+Import Entries	MediaPlayer-ImportPLItemsCmd		Importar entradas
+Open network stream	MediaPlayer-Main		Abrir transmisión de red
+Move file to Trash	MediaPlayer-PlaylistWindow		Mover archivo a la papelera
+Open file…	MediaPlayer-Main		Abrir archivo...
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Escalar controles en modo de pantalla completa
+View options	MediaPlayer-SettingsWindow		Ver opciones
+%d kHz	MediaPlayer-InfoWin		%d kHz
+Full volume	MediaPlayer-SettingsWindow		Máximo volumen
+<untitled>	PlaylistItem-title		<sin título>
+Start media server	MediaPlayer-Main		Iniciar servidor de medios
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Parece el servidor de medios no está ejecutando.\n¿Quiere iniciarlo?
+Location	MediaPlayer-InfoWin		Ubicación
+Medium	MediaPlayer-SettingsWindow		Mediano
+Play mode	MediaPlayer-SettingsWindow		Modo de reproducción
+Playlist	MediaPlayer-PlaylistWindow		Lista de temas
+%d Bit	MediaPlayer-InfoWin		%d Bit
+Track	Audio Track Menu		Pista
+Close	MediaPlayer-Main		Cerrar
+Save error	MediaPlayer-PlaylistWindow		Error al guardar
+Attributes	MediaPlayer-Main		Atributos
+Bottom of screen	MediaPlayer-SettingsWindow		Parte inferior de la pantalla
+MediaPlayer settings	MediaPlayer-SettingsWindow		Configuración del Reproductor de Media
+Copyright	MediaPlayer-InfoWin		Derechos de autor
+Invalid URL inserted!	MediaPlayer-NetworkStream		URL inválida.
+Aspect ratio	MediaPlayer-Main		Relación de aspecto:
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Guardar la lista de reproducción falló.\n\nError:
+<no media>	MediaPlayer-InfoWin		<sin medios>
+Hide interface	MediaPlayer-Main		Esconder interfaz
+Error: 	MediaPlayer-Main		Error:
+Video track	MediaPlayer-Main		Pista de vídeo
+Playlist…	MediaPlayer-Main		Lista de reproducción...
+<unnamed media>	MediaPlayer-InfoWin		<multimedia sin nombrar>
+Save	MediaPlayer-PlaylistWindow		Guardar
+Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Desordenar las entradas
+Cancel	MediaPlayer-NetworkStream		Cancelar
+Nothing to Play	MediaPlayer-Main		Nada para reproducir
+OK	MediaPlayer-SettingsWindow		Aceptar
+Remove Entries	MediaPlayer-RemovePLItemsCmd		Eliminar entradas
+never	MediaPlayer-SettingsWindow		nunca
+Loop audio	MediaPlayer-SettingsWindow		Repetir audio
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Error interno (mensaje incorrecto). Guardar la lista de reproducción falló.
+Open…	MediaPlayer-PlaylistWindow		Abrir...
+Revert	MediaPlayer-SettingsWindow		Revertir
+Low volume	MediaPlayer-SettingsWindow		Volumen bajo
+Audio	MediaPlayer-Main		Audio
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} otros{# Channels}}
+Quit	MediaPlayer-Main		Salir
+Redo	MediaPlayer-PlaylistWindow		Rehacer
+Move Entry	MediaPlayer-MovePLItemsCmd		Mover entrada
+<unknown>	PlaylistItem-author		<desconocido>
+Cancel	MediaPlayer-SettingsWindow		Cancelar
+Large	MediaPlayer-SettingsWindow		Grande
+Import Entry	MediaPlayer-ImportPLItemsCmd		Importar entrada
+unknown format	MediaPlayer-InfoWin		formato desconocido
+Track %d	MediaPlayer-Main		Pista %d
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		No se pudo poner todos los archivos en la papelera.
+Total duration: %s	MediaPlayer-PlaylistWindow		Duración total: %s
+%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
+Move into trash error	MediaPlayer-RemovePLItemsCmd		Error al mover a la papelera
+50% scale	MediaPlayer-Main		Escala al 50%
+Drop files to play	MediaPlayer-Main		Arrastrar archivos a reproducir
+Copy Entry	MediaPlayer-CopyPLItemsCmd		Copiar entrada
+Close window after playing audio	MediaPlayer-SettingsWindow		Cerrar ventana después de reproducir audio
+Edit	MediaPlayer-PlaylistWindow		Editar
+Copy Entries	MediaPlayer-CopyPLItemsCmd		Copiar entradas
+Always on top	MediaPlayer-Main		Siempre al frente
+Open	MediaPlayer-PlaylistWindow		Abrir
+always	MediaPlayer-SettingsWindow		siempre
+Loop video	MediaPlayer-SettingsWindow		Repetir video
+Stream URL:	MediaPlayer-NetworkStream		URL de streaming:
+<unknown>	PlaylistItem-album		<desconocido>
+Stream settings	MediaPlayer-Main		Configuración de transmisión
+none	Subtitles menu		ninguno
+Save Playlist	MediaPlayer-PlaylistWindow		Guardar lista de reproducción
+Overlay	MediaPlayer-InfoWin		Superposición
+2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
+Rating	MediaPlayer-Main		Valoración
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Error interno (sin memoria ). Guardar lista de reproducción falló.
 Video	MediaPlayer-Main		Video
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		No hay decodificador para manejar el formato del archivo, o el decodificador tiene problemas con esta versión del formato.
-Import Entry	MediaPlayer-ImportPLItemsCmd		Importar entrada
-400% scale	MediaPlayer-Main		Escala al 400%
-Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Guardar la lista de reproducción falló:\n\nError:
-Move Entries	MediaPlayer-MovePLItemsCmd		Mover entradas
-Audio	MediaPlayer-Main		Audio
-Open Playlist	MediaPlayer-PlaylistWindow		Abrir lista de reproducción
-MediaPlayer	System name		MediaPlayer
-OK	MediaPlayer-Main		Aceptar
+Lock Peaks	MediaPlayer-PeakView		Bloquear picos
+none	Audio track menu		ninguno
+Open network stream	MediaPlayer-NetworkStream		Abrir transmisión de red
+Automatically start playing	MediaPlayer-SettingsWindow		Empezar a reproducir automáticamente
+Undo	MediaPlayer-PlaylistWindow		Deshacer
+Display mode	MediaPlayer-InfoWin		Modo de visualización
+Bottom of video	MediaPlayer-SettingsWindow		Parte inferior del vídeo
+Small	MediaPlayer-SettingsWindow		Pequeño
 Settings…	MediaPlayer-Main		Configuración...
-MediaPlayer settings	MediaPlayer-SettingsWindow		Configuración del Reproductor de Media
-never	MediaPlayer-SettingsWindow		nunca
-h	MediaPlayer-InfoWin	Hours	h
-Select all	MediaPlayer-PlaylistWindow		Seleccionar todo
-Move Entry	MediaPlayer-MovePLItemsCmd		Mover entrada
-Open	MediaPlayer-PlaylistWindow		Abrir
-The file '%filename' could not be opened.\n\n	MediaPlayer-Main		El archivo '%filename' no se pudo abrir.\n\n
-Error: 	MediaPlayer-RemovePLItemsCmd		Error:
-Audio	MediaPlayer-InfoWin		Audio
-Move into trash error	MediaPlayer-RemovePLItemsCmd		Error al mover a la papelera
-Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Error interno (mensaje incorrecto). Guardar la lista de reproducción falló.
-%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% ha encontrado un error interno. No se ha podido abrir el archivo.
+min	MediaPlayer-InfoWin	Minutes	min
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Guardar la lista de reproducción falló:\n\nError:
+Video	MediaPlayer-InfoWin		Video
+File info…	MediaPlayer-Main		Información del archivo...
+1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
+<unnamed>	PlaylistItem-name		<sin nombre>
+Track	Video Track Menu		Pista
+Full screen	MediaPlayer-Main		Pantalla completa
+OK	MediaPlayer-NetworkStream		Aceptar
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Error interno (bloquear falló). Guardar la lista de reproducción falló.
+100% scale	MediaPlayer-Main		Escala al 100%
+<nothing to redo>	MediaPlayer-PlaylistWindow		<nada para rehacer>
+Bad URL	MediaPlayer-NetworkStream		URL incorrecta
+Save	MediaPlayer-Main		Guardar
 Close window after playing video	MediaPlayer-SettingsWindow		Cerrar ventana después de reproducir video
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Escalar las películas suavemente (en modo non-overlay)
-OK	MediaPlayer-RemovePLItemsCmd		Aceptar
-Open network stream	MediaPlayer-Main		Abrir transmisión de red
-50% scale	MediaPlayer-Main		Escala al 50%
-Subtitles	MediaPlayer-Main		Subtítulos
-Audio track	MediaPlayer-Main		Pista de audio
-Import Entries	MediaPlayer-ImportPLItemsCmd		Importar entradas
-No aspect correction	MediaPlayer-Main		Sin corrección de aspecto
-Automatically start playing	MediaPlayer-SettingsWindow		Empezar a reproducir automáticamente
-Track	Video Track Menu		Pista
-Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Error interno (bloquear falló). Guardar la lista de reproducción falló.
-View options	MediaPlayer-SettingsWindow		Ver opciones
-none	MediaPlayer-Main		ninguno
-Play mode	MediaPlayer-SettingsWindow		Modo de reproducción
-Remove Entries	MediaPlayer-RemovePLItemsCmd		Eliminar entradas
-Video track	MediaPlayer-Main		Pista de vídeo
-Loop video	MediaPlayer-SettingsWindow		Repetir video
-Attributes	MediaPlayer-Main		Atributos
-All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		No se pudo poner todos los archivos en la papelera.
-<untitled>	PlaylistItem-title		<sin título>
-Track	Audio Track Menu		Pista
-unknown format	MediaPlayer-InfoWin		formato desconocido
-<nothing to redo>	MediaPlayer-PlaylistWindow		<nada para rehacer>
-Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Enviar entradas a la papelera
 200% scale	MediaPlayer-Main		Escala al 200%
-It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Parece el servidor de medios no está ejecutando.\n¿Quiere iniciarlo?
-Duration	MediaPlayer-InfoWin		Duración
-Aspect ratio	MediaPlayer-Main		Relación de aspecto:
-Error: 	MediaPlayer-Main		Error:
-Large	MediaPlayer-SettingsWindow		Grande
-Bottom of video	MediaPlayer-SettingsWindow		Parte inferior del vídeo
-DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
-always	MediaPlayer-SettingsWindow		siempre
-Total duration: %s	MediaPlayer-PlaylistWindow		Duración total: %s
-<unnamed media>	MediaPlayer-InfoWin		<multimedia sin nombrar>
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		El archivo '%filename' no se pudo abrir.\n\n
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Ninguno de los archivos que quería reproducir parecen ser archivos multimedia.
+Remove Entry	MediaPlayer-RemovePLItemsCmd		Eliminar entrada
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Enviar entradas a la papelera
+Subtitle size:	MediaPlayer-SettingsWindow		Tamaño de subtítulo:
+No aspect correction	MediaPlayer-Main		Sin corrección de aspecto
 raw video	MediaPlayer-InfoWin		video bruto
-Volume of background clips	MediaPlayer-SettingsWindow		Volumen de secuencias de fondo
-Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Error interno (sin memoria ). Guardar lista de reproducción falló.
-Hide interface	MediaPlayer-Main		Esconder interfaz
+Container	MediaPlayer-InfoWin		Contenedor
+none	MediaPlayer-Main		ninguno
 Open clips	MediaPlayer-Main		Abrir las secuencias
-Copy Entry	MediaPlayer-CopyPLItemsCmd		Copiar entrada
-none	Subtitles menu		ninguno
-Move file to Trash	MediaPlayer-PlaylistWindow		Mover archivo a la papelera
-Invalid URL inserted!	MediaPlayer-NetworkStream		URL inválida.
-OK	MediaPlayer-NetworkStream		Aceptar
-min	MediaPlayer-InfoWin	Minutes	min
-Small	MediaPlayer-SettingsWindow		Pequeño
-Randomize	MediaPlayer-PlaylistWindow		Aleatorio
-Off	Subtitles menu		Apagar
-Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Desordenar las entradas
-Revert	MediaPlayer-SettingsWindow		Revertir
-Edit	MediaPlayer-PlaylistWindow		Editar
-Start media server	MediaPlayer-Main		Iniciar servidor de medios
-%.3f fps	MediaPlayer-InfoWin		%.3f fps
-Bad URL	MediaPlayer-NetworkStream		URL incorrecta
-{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} otros{# Channels}}
-<unnamed>	PlaylistItem-name		<sin nombre>
-OK	MediaPlayer-PlaylistWindow		Aceptar
-none	Audio track menu		ninguno
-Cancel	MediaPlayer-NetworkStream		Cancelar
-Playlist…	MediaPlayer-Main		Lista de reproducción...
-<unknown>	PlaylistItem-author		<desconocido>
-Save as…	MediaPlayer-PlaylistWindow		Guardar como...
-Copy Entries	MediaPlayer-CopyPLItemsCmd		Copiar entradas
-Redo	MediaPlayer-PlaylistWindow		Rehacer
-Always on top	MediaPlayer-Main		Siempre al frente
-Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Enviar entrada a la papelera
-Save	MediaPlayer-Main		Guardar
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		No se pudo poner algunos archivos en la papelera.
 <nothing to undo>	MediaPlayer-PlaylistWindow		<nada para deshacer>
-File info	MediaPlayer-InfoWin		Información del archivo
-Save	MediaPlayer-PlaylistWindow		Guardar
-%d Bit	MediaPlayer-InfoWin		%d Bit
-Remove	MediaPlayer-PlaylistWindow		Quitar
-Full screen	MediaPlayer-Main		Pantalla completa
-Open file…	MediaPlayer-Main		Abrir archivo...
+Save as…	MediaPlayer-PlaylistWindow		Guardar como...
+Error: 	MediaPlayer-RemovePLItemsCmd		Error:
 300% scale	MediaPlayer-Main		Escala al 300%
-Bottom of screen	MediaPlayer-SettingsWindow		Parte inferior de la pantalla
-Save error	MediaPlayer-PlaylistWindow		Error al guardar
-Rating	MediaPlayer-Main		Valoración
-Playlist	MediaPlayer-PlaylistWindow		Lista de temas
-Lock Peaks	MediaPlayer-PeakView		Bloquear picos
-Low volume	MediaPlayer-SettingsWindow		Volumen bajo
+Open	MediaPlayer-Main		Abrir
+ask every time	MediaPlayer-SettingsWindow		preguntar cada vez
+(not supported)	MediaPlayer-InfoWin		(sin implementar)
+Randomize	MediaPlayer-PlaylistWindow		Aleatorio
+%.3f fps	MediaPlayer-InfoWin		%.3f fps
+Off	Subtitles menu		Apagar
+400% scale	MediaPlayer-Main		Escala al 400%
+h	MediaPlayer-InfoWin	Hours	h
+OK	MediaPlayer-PlaylistWindow		Aceptar

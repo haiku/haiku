@@ -1,20 +1,20 @@
 1	japanese	x-vnd.mmu_man.filepanel	1802971238
 display a load/save file panel\n	FilePanelApp		読込・保存パネルを表示する\n
-options:\n	FilePanelApp		オプション:\n
-usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n
--k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n
-usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		usage: %s [-h] [-d folder] [-l|-s] [-t ttl] [-1] [-m] [-a pattern] [-f pattern]\n
--d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\topen at <folder>\n
-%s not a valid option\n	FilePanelApp		%s は正しいオプションではありません\n
 short\tlong\tdescription\n	FilePanelApp		短い\t長い\t概要\n
-%s: this option requires a parameter\n	FilePanelApp		%s: このオプションにはパラメータが必要です\n
--l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tuse a load FilePanel (default)\n
--f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tunimplemented\n
+%s not a valid option\n	FilePanelApp		%s は正しいオプションではありません\n
 -s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tuse a save FilePanel\n
--n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tset the default name for saving\n
--m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tmakes the FilePanel modal\n
+%s: this option requires a parameter\n	FilePanelApp		%s: このオプションにはパラメータが必要です\n
 -h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tdisplay usage\n
--a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tunimplemented\n
--1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tallow only 1 file to be selected\n
--t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tset the FilePanel window title\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tuse a load FilePanel (default)\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tset the default name for saving\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n
 %s: UNIMPLEMENTED\n	FilePanelApp		%s: 未実装\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tset the FilePanel window title\n
+-f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tunimplemented\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		usage: %s [-h] [-d folder] [-l|-s] [-t ttl] [-1] [-m] [-a pattern] [-f pattern]\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tallow only 1 file to be selected\n
+-a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tunimplemented\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tmakes the FilePanel modal\n
+options:\n	FilePanelApp		オプション:\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\topen at <folder>\n
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n

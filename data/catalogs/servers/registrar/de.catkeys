@@ -1,23 +1,23 @@
 1	german	x-vnd.haiku-registrar	2599857937
-Restart system	ShutdownProcess		Neustarten
-The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Die Anwendung \"%appName%\" könnte durch ein Dialog-Fenster blockiert sein.
-OK	ShutdownProcess		OK
-System is shut down	ShutdownProcess		Das System wurde heruntergefahren.
-It's now safe to turn off the computer.	ShutdownProcess		Der Rechner kann jetzt ausgeschaltet werden.
 Cancel	ShutdownProcess		Abbrechen
+OK	ShutdownProcess		OK
 Do you really want to shut down the system?	ShutdownProcess		Soll das System wirklich heruntergefahren werden?
-Asking other processes to quit.	ShutdownProcess		Andere Prozesse werden beendet.
-Asking \"%appName%\" to quit.	ShutdownProcess		\"%appName%\" wird beendet.
-%action%?	ShutdownProcess		%action%?
-Shutdown aborted	ShutdownProcess		Das Herunterfahren wurde abgebrochen.
-Restarting…	ShutdownProcess		Neustart…
-Asking background applications to quit.	ShutdownProcess		Hintergrund-Anwendungen werden beendet.
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Das Herunterfahren wurde durch die Anwendung \"%appName%\" abgebrochen.
-Tidying things up a bit.	ShutdownProcess		Aufräumarbeiten laufen…
-Do you really want to restart the system?	ShutdownProcess		Soll das System wirklich neu gestartet werden?
 Shutdown status	ShutdownProcess		Ausschalt-Status
-Cancel shutdown	ShutdownProcess		Ausschalten abbrechen
-Kill application	ShutdownProcess		Anwendung beenden
 Shut down	ShutdownProcess		Ausschalten
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Die Anwendung \"%appName%\" könnte durch ein Dialog-Fenster blockiert sein.
+System is shut down	ShutdownProcess		Das System wurde heruntergefahren.
+Restart system	ShutdownProcess		Neustarten
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Das Herunterfahren wurde durch die Anwendung \"%appName%\" abgebrochen.
+Asking background applications to quit.	ShutdownProcess		Hintergrund-Anwendungen werden beendet.
+Do you really want to restart the system?	ShutdownProcess		Soll das System wirklich neu gestartet werden?
 Restart	ShutdownProcess		Neustarten
+It's now safe to turn off the computer.	ShutdownProcess		Der Rechner kann jetzt ausgeschaltet werden.
+Asking other processes to quit.	ShutdownProcess		Andere Prozesse werden beendet.
+Cancel shutdown	ShutdownProcess		Ausschalten abbrechen
+Restarting…	ShutdownProcess		Neustart…
+%action%?	ShutdownProcess		%action%?
+Tidying things up a bit.	ShutdownProcess		Aufräumarbeiten laufen…
+Kill application	ShutdownProcess		Anwendung beenden
+Shutdown aborted	ShutdownProcess		Das Herunterfahren wurde abgebrochen.
 Shutting down…	ShutdownProcess		Rechner wird heruntergefahren…
+Asking \"%appName%\" to quit.	ShutdownProcess		\"%appName%\" wird beendet.

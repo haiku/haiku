@@ -1,53 +1,53 @@
 1	finnish	x-vnd.Haiku-Network	1314732966
-Static	IntefaceAddressView		Staattinen
+Ethernet device	InterfaceListItem		Ethernet-laite
+Link speed:	IntefaceView		Yhteysnopeus:
+disconnected	IntefaceView		katkaistu
+IP Address:	IntefaceAddressView		IP-osoite:
+WPA	WPA protected network		WPA
+Network:	IntefaceView		Verkko:
+Received:	IntefaceView		Vastaanotettu:
+New…	NetworkWindow		Uusi...
+no link	InterfaceListItem		ei yhteyttä
+Other	NetworkWindow		Muu
+Sent:	IntefaceView		Lähetetty:
+Gateway:	IntefaceAddressView		Yhdyskäytävä:
+The netmask defines your local network	IntefaceAddressView		Verkkopeite määrittää paikallisen verkkosi
+Your IP address	IntefaceAddressView		IP-osoitteesi
+DHCP	IntefaceAddressView		DHCP
+Dial Up	NetworkWindow		Puhelinverkkoyhteys
+Netmask:	IntefaceAddressView		Verkkopeite:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Palvelut
-no link	InterfaceListItem		ei yhteyttä
-WPA2	WPA2 protected network		WPA2
-Choose automatically	IntefaceView		Valitse automaattisesti
-connected	IntefaceView		yhdistetty
-Ethernet device	InterfaceListItem		Ethernet-laite
-The netmask defines your local network	IntefaceAddressView		Verkkopeite määrittää paikallisen verkkosi
-Dial-up connection	InterfaceListItem		Valintayhteys
-%name% (%authenticationMode%)	WirelessNetworkMenuItem		%nimi% (%authenticationMode%)
-Network	NetworkWindow		Verkko
-VPN connection	InterfaceListItem		VPN-yhteys
-Show network status in Deskbar	NetworkWindow		Näytä verkkotila Työkalupalkissa
-The method for obtaining an IP address	IntefaceAddressView		IP-osoitteen hakemismenettely
-connected	InterfaceListItem		yhdistetty
-disabled	InterfaceListItem		poissa käytöstä
-Dial Up	NetworkWindow		Puhelinverkkoyhteys
-Apply	IntefaceAddressView		Käytä
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Verkkotilan asentaminen Työkalupalkkiin epäonnistui: %s
+Revert	NetworkWindow		Palauta
+WEP	WEP protected network		WEP
+<no wireless networks found>	IntefaceView		<langatonta verkkoa ei löytynyt>
+connected	IntefaceView		yhdistetty
+VPN	NetworkWindow		VPN
+Apply	IntefaceAddressView		Käytä
+Disable	ServiceView		Poista käytöstä
+WPA2	WPA2 protected network		WPA2
+Show network status in Deskbar	NetworkWindow		Näytä verkkotila Työkalupalkissa
+Mode:	IntefaceAddressView		Tila:
+connected	InterfaceListItem		yhdistetty
+Static	IntefaceAddressView		Staattinen
+launch error	NetworkWindow		käynnistysvirhe
+Renegotiate	IntefaceView		Neuvottele uudelleen
 MAC address:	IntefaceView		MAC-osoite:
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%nimi% (%authenticationMode%)
+disabled	InterfaceListItem		poissa käytöstä
+Dial-up connection	InterfaceListItem		Valintayhteys
+The method for obtaining an IP address	IntefaceAddressView		IP-osoitteen hakemismenettely
+Automatic	IntefaceAddressView		Automaattinen
+Choose automatically	IntefaceView		Valitse automaattisesti
+Status:	IntefaceView		Tila:
+Disable	IntefaceView		Poista käytöstä
+Manage…	NetworkWindow		Hallitse...
+open	Open network		avaa
+Network	NetworkWindow		Verkko
+Your gateway to the internet	IntefaceAddressView		Yhdyskäytäväsi internettiin
+Enable	ServiceView		Ota käyttöön
+Ok	NetworkWindow		Valmis
 Wireless device	InterfaceListItem		Langaton laite
 Disabled	IntefaceAddressView		Poissa käytöstä
-Renegotiate	IntefaceView		Neuvottele uudelleen
-Ok	NetworkWindow		Valmis
-Network:	IntefaceView		Verkko:
-launch error	NetworkWindow		käynnistysvirhe
-Other	NetworkWindow		Muu
-Automatic	IntefaceAddressView		Automaattinen
-Gateway:	IntefaceAddressView		Yhdyskäytävä:
-Revert	NetworkWindow		Palauta
-Enable	ServiceView		Ota käyttöön
-disconnected	IntefaceView		katkaistu
-Status:	IntefaceView		Tila:
-Link speed:	IntefaceView		Yhteysnopeus:
-Your gateway to the internet	IntefaceAddressView		Yhdyskäytäväsi internettiin
-New…	NetworkWindow		Uusi...
-DHCP	IntefaceAddressView		DHCP
-Mode:	IntefaceAddressView		Tila:
-WPA	WPA protected network		WPA
-Sent:	IntefaceView		Lähetetty:
-open	Open network		avaa
-IP Address:	IntefaceAddressView		IP-osoite:
-VPN	NetworkWindow		VPN
-Received:	IntefaceView		Vastaanotettu:
-Disable	IntefaceView		Poista käytöstä
-<no wireless networks found>	IntefaceView		<langatonta verkkoa ei löytynyt>
-Netmask:	IntefaceAddressView		Verkkopeite:
-Disable	ServiceView		Poista käytöstä
-Your IP address	IntefaceAddressView		IP-osoitteesi
-Manage…	NetworkWindow		Hallitse...
-WEP	WEP protected network		WEP
+VPN connection	InterfaceListItem		VPN-yhteys

@@ -1,13 +1,13 @@
 1	finnish	x-vnd.Be-WORK	3927737357
-Invalid argument: %s\n	Workspaces		Virheellinen argumentti: %s\n
 Quit	Workspaces		Poistu
-Workspaces	System name		Työtilat
+Invalid argument: %s\n	Workspaces		Virheellinen argumentti: %s\n
 Change workspace count…	Workspaces		Vaihda työtilalukumäärää...
-Remove replicant	Workspaces		Poista kopio
-Show window border	Workspaces		Näytä ikkunaraja
-Auto-raise	Workspaces		Nosta automaattisesti
 Always on top	Workspaces		Aina päällimmäisenä
-Switch on mouse wheel	Workspaces		Vaihda hiiren rullalla
-Live in the Deskbar	Workspaces		Liveseuranta Työpöytäpalkissa
+Show window border	Workspaces		Näytä ikkunaraja
 Show window tab	Workspaces		Näytä ikkunavälilehti
+Auto-raise	Workspaces		Nosta automaattisesti
+Remove replicant	Workspaces		Poista kopio
+Live in the Deskbar	Workspaces		Liveseuranta Työpöytäpalkissa
 Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Käyttö: %s [valitsimet] [työtila]\nmissä ”valitsimet” ovat:\n --notitle\t\totsikkopalkki poistettu, rajat ja koon muuttaminen säilytetty\n --noborder\t\totsikko, raja ja koon muuttaminen poistettu\n --avoidfocus\t\testää ikkunaa olemasta näppäimistötoimintojen kohde\n --alwaysontop\t\tpitää ikkunan aina ylimmäisenä\n --notmovable\t\tikkunaa ei voi siirtää\n --autoraise\t\tnostaa työtilaikkunaa automaattisesti, kun se se on näytön reunalla\n --help\t\tnäyttää tämän opasteen ja poistuu\nja ”työtila” on niiden työtilojen lukumäärä, johon voidaan vaihtaa (0-31)\n
+Switch on mouse wheel	Workspaces		Vaihda hiiren rullalla
+Workspaces	System name		Työtilat

@@ -1,9 +1,9 @@
 1	catalan; valencian	x-vnd.Haiku-Notifications	525245920
-Revert	PrefletWin		Reverteix
-Enable notifications	GeneralView		Habilita les notificacions
 OK	PrefletWin		D'acord
-General	PrefletView		General
-Allowed	NotificationView		Permès
-Notifications	System name		Notificacions
-Application	NotificationView		Aplicació
+Revert	PrefletWin		Reverteix
 Applications	NotificationView		Aplicacions
+General	PrefletView		General
+Notifications	System name		Notificacions
+Allowed	NotificationView		Permès
+Application	NotificationView		Aplicació
+Enable notifications	GeneralView		Habilita les notificacions

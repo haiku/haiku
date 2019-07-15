@@ -1,23 +1,23 @@
 1	swedish	x-vnd.haiku-registrar	2599857937
-Restart system	ShutdownProcess		Starta om
-The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Programmet \"%appName%\" kan vara blockerat av en dialogruta.
-OK	ShutdownProcess		OK
-System is shut down	ShutdownProcess		Systemet är avstängt
-It's now safe to turn off the computer.	ShutdownProcess		Nu är det säkert att slå av datorn.
 Cancel	ShutdownProcess		Avbryt
+OK	ShutdownProcess		OK
 Do you really want to shut down the system?	ShutdownProcess		Är du säker på att du vill stänga av Haiku?
-Asking other processes to quit.	ShutdownProcess		Ber alla processer att avsluta.
-Asking \"%appName%\" to quit.	ShutdownProcess		Ber \"%appName%\" att avsluta.
-%action%?	ShutdownProcess		%action%?
-Shutdown aborted	ShutdownProcess		Avstängningen avbröts
-Restarting…	ShutdownProcess		Startar om...
-Asking background applications to quit.	ShutdownProcess		Ber bakgrundsprogrammen att avsluta.
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Programmet \"%appName%\" avbröt avstängningen.
-Tidying things up a bit.	ShutdownProcess		Städar upp lite.
-Do you really want to restart the system?	ShutdownProcess		Vill du verkligen starta om systemet?
 Shutdown status	ShutdownProcess		Avslutar Haiku
-Cancel shutdown	ShutdownProcess		Avbryt avstängning
-Kill application	ShutdownProcess		Avsluta program
 Shut down	ShutdownProcess		Stäng av
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Programmet \"%appName%\" kan vara blockerat av en dialogruta.
+System is shut down	ShutdownProcess		Systemet är avstängt
+Restart system	ShutdownProcess		Starta om
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Programmet \"%appName%\" avbröt avstängningen.
+Asking background applications to quit.	ShutdownProcess		Ber bakgrundsprogrammen att avsluta.
+Do you really want to restart the system?	ShutdownProcess		Vill du verkligen starta om systemet?
 Restart	ShutdownProcess		Starta om
+It's now safe to turn off the computer.	ShutdownProcess		Nu är det säkert att slå av datorn.
+Asking other processes to quit.	ShutdownProcess		Ber alla processer att avsluta.
+Cancel shutdown	ShutdownProcess		Avbryt avstängning
+Restarting…	ShutdownProcess		Startar om...
+%action%?	ShutdownProcess		%action%?
+Tidying things up a bit.	ShutdownProcess		Städar upp lite.
+Kill application	ShutdownProcess		Avsluta program
+Shutdown aborted	ShutdownProcess		Avstängningen avbröts
 Shutting down…	ShutdownProcess		Stänger av...
+Asking \"%appName%\" to quit.	ShutdownProcess		Ber \"%appName%\" att avsluta.

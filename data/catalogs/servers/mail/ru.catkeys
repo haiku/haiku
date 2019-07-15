@@ -1,19 +1,19 @@
 1	russian	x-vnd.Be-POST	2949558073
+No new messages	MailDaemon		Нет новых сообщений
+No new messages	DeskbarView		Нет новых сообщений
+Shutdown mail services	DeskbarView		Выключить почтовые службы
+Mail status	MailDaemon		Статус почты
 Fetching mail for %name	Notifier		Получение почты для %name
-Check for mails only	DeskbarView		Только проверить почту
-Send pending mails	DeskbarView		Отправить почту в ожидании
-{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Одно новое сообщение} few{# новых сообщения} other{# новых сообщений}}
 {0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# новое сообщение} few{# новых сообщения} other{# новый сообщений}}
 {0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# новое сообщение} few{# новых сообщения} other{# новый сообщений}} для %name\n
+Create new message…	DeskbarView		Создать сообщение…
+Send pending mails	DeskbarView		Отправить почту в ожидании
+Settings…	DeskbarView		Настройки…
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Одно новое сообщение} few{# новых сообщения} other{# новых сообщений}}
 New Messages	MailDaemon		Новые сообщения
 <no accounts>	DeskbarView		<нет аккаунтов>
-Mail status	MailDaemon		Статус почты
-Shutdown mail services	DeskbarView		Выключить почтовые службы
-Sending mail for %name	Notifier		Отправка почты для %name
-Create new message…	DeskbarView		Создать сообщение…
-No new messages	MailDaemon		Нет новых сообщений
-Check for mail now	DeskbarView		Проверить почту
-No new messages	DeskbarView		Нет новых сообщений
-Mail daemon status log	MailDaemon		Журнал почтового демона
-Settings…	DeskbarView		Настройки…
 Mail status	Notifier		Статус почты
+Check for mails only	DeskbarView		Только проверить почту
+Check for mail now	DeskbarView		Проверить почту
+Sending mail for %name	Notifier		Отправка почты для %name
+Mail daemon status log	MailDaemon		Журнал почтового демона

@@ -1,53 +1,53 @@
 1	indonesian	x-vnd.Haiku-Network	1314732966
-Static	IntefaceAddressView		Statis
+Ethernet device	InterfaceListItem		Perangkat ethernet
+Link speed:	IntefaceView		Kecepatan jalur:
+disconnected	IntefaceView		terputus
+IP Address:	IntefaceAddressView		Alamat IP:
+WPA	WPA protected network		WPA
+Network:	IntefaceView		Jaringan:
+Received:	IntefaceView		Diterima:
+New…	NetworkWindow		Baru...
+no link	InterfaceListItem		tak ada link
+Other	NetworkWindow		Lainnya
+Sent:	IntefaceView		Terkirim
+Gateway:	IntefaceAddressView		Gateway:
+The netmask defines your local network	IntefaceAddressView		Netmask mendefinisikan jaringan lokal anda
+Your IP address	IntefaceAddressView		Alamat IP Anda
+DHCP	IntefaceAddressView		DHCP
+Dial Up	NetworkWindow		Dial Up
+Netmask:	IntefaceAddressView		Netmask:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Layanan
-no link	InterfaceListItem		tak ada link
-WPA2	WPA2 protected network		WPA2
-Choose automatically	IntefaceView		Pilih otomatis
-connected	IntefaceView		terhubung
-Ethernet device	InterfaceListItem		Perangkat ethernet
-The netmask defines your local network	IntefaceAddressView		Netmask mendefinisikan jaringan lokal anda
-Dial-up connection	InterfaceListItem		Koneksi dial-up
-%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
-Network	NetworkWindow		Jaringan
-VPN connection	InterfaceListItem		Koneksi VPN
-Show network status in Deskbar	NetworkWindow		Tampilkan status jaringan di Deskbar
-The method for obtaining an IP address	IntefaceAddressView		Metode untuk memperoleh alamat IP
-connected	InterfaceListItem		terhubung
-disabled	InterfaceListItem		dilumpuhkan
-Dial Up	NetworkWindow		Dial Up
-Apply	IntefaceAddressView		Terapkan
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Memasang NetworkStatus di Deskbar gagal: %s
+Revert	NetworkWindow		Pulihkan
+WEP	WEP protected network		WEP
+<no wireless networks found>	IntefaceView		<no wireless networks found>
+connected	IntefaceView		terhubung
+VPN	NetworkWindow		VPN
+Apply	IntefaceAddressView		Terapkan
+Disable	ServiceView		Dilumpuhkan
+WPA2	WPA2 protected network		WPA2
+Show network status in Deskbar	NetworkWindow		Tampilkan status jaringan di Deskbar
+Mode:	IntefaceAddressView		Mode:
+connected	InterfaceListItem		terhubung
+Static	IntefaceAddressView		Statis
+launch error	NetworkWindow		memunculkan galat
+Renegotiate	IntefaceView		Renegoisasi
 MAC address:	IntefaceView		Alamat MAC:
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+disabled	InterfaceListItem		dilumpuhkan
+Dial-up connection	InterfaceListItem		Koneksi dial-up
+The method for obtaining an IP address	IntefaceAddressView		Metode untuk memperoleh alamat IP
+Automatic	IntefaceAddressView		Otomatis
+Choose automatically	IntefaceView		Pilih otomatis
+Status:	IntefaceView		Status:
+Disable	IntefaceView		Dilumpuhkan
+Manage…	NetworkWindow		Kelola...
+open	Open network		buka
+Network	NetworkWindow		Jaringan
+Your gateway to the internet	IntefaceAddressView		Gateway anda ke internet
+Enable	ServiceView		Dimungkinkan
+Ok	NetworkWindow		Oke
 Wireless device	InterfaceListItem		Perangkat nirkabel
 Disabled	IntefaceAddressView		Dilumpuhkan
-Renegotiate	IntefaceView		Renegoisasi
-Ok	NetworkWindow		Oke
-Network:	IntefaceView		Jaringan:
-launch error	NetworkWindow		memunculkan galat
-Other	NetworkWindow		Lainnya
-Automatic	IntefaceAddressView		Otomatis
-Gateway:	IntefaceAddressView		Gateway:
-Revert	NetworkWindow		Pulihkan
-Enable	ServiceView		Dimungkinkan
-disconnected	IntefaceView		terputus
-Status:	IntefaceView		Status:
-Link speed:	IntefaceView		Kecepatan jalur:
-Your gateway to the internet	IntefaceAddressView		Gateway anda ke internet
-New…	NetworkWindow		Baru...
-DHCP	IntefaceAddressView		DHCP
-Mode:	IntefaceAddressView		Mode:
-WPA	WPA protected network		WPA
-Sent:	IntefaceView		Terkirim
-open	Open network		buka
-IP Address:	IntefaceAddressView		Alamat IP:
-VPN	NetworkWindow		VPN
-Received:	IntefaceView		Diterima:
-Disable	IntefaceView		Dilumpuhkan
-<no wireless networks found>	IntefaceView		<no wireless networks found>
-Netmask:	IntefaceAddressView		Netmask:
-Disable	ServiceView		Dilumpuhkan
-Your IP address	IntefaceAddressView		Alamat IP Anda
-Manage…	NetworkWindow		Kelola...
-WEP	WEP protected network		WEP
+VPN connection	InterfaceListItem		Koneksi VPN

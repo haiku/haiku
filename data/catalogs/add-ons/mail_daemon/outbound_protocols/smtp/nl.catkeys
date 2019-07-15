@@ -1,14 +1,14 @@
 1	dutch; flemish	x-vnd.Haiku-SMTP	815985329
-SMTP server:	ConfigView		SMTP server:
-Error while logging in to %serv	smtp		Fout bij het inloggen in %serv
-Unencrypted	ConfigView		Onversleuteld
-. The server says:\n	smtp		. De server zegt:\n
-ESMTP	ConfigView		ESMTP
-Connecting to server…	smtp		Verbinden met de server...
-Error while opening connection to %serv	smtp		Fout tijdens het openen van de connectie met %serv
 POP3 authentication failed. The server said:\n	smtp		POP3 authenticatie gefaald. De server zegt:\n
 Destination:	ConfigView		Doel:
+Error while logging in to %serv	smtp		Fout bij het inloggen in %serv
+Connecting to server…	smtp		Verbinden met de server...
+Unencrypted	ConfigView		Onversleuteld
+. The server says:\n	smtp		. De server zegt:\n
+Error while opening connection to %serv	smtp		Fout tijdens het openen van de connectie met %serv
+. The server said:\n	smtp		. De server zei:\n
 None	ConfigView		Geen
+SMTP server:	ConfigView		SMTP server:
+ESMTP	ConfigView		ESMTP
 POP3 before SMTP	ConfigView		POP3 voor SMTP
 SSL	ConfigView		SSL
-. The server said:\n	smtp		. De server zei:\n

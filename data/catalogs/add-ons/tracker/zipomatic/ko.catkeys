@@ -1,15 +1,15 @@
 1	korean	x-vnd.haiku.zip-o-matic	1573273374
-Stop	file:ZipOMaticWindow.cpp		정지
-Creating archive: %s	file:ZipOMaticWindow.cpp		압축파일 만드는 중: %s
-Continue	file:ZipOMaticWindow.cpp		계속
-Preparing to archive	file:ZipperThread.cpp		압축하기 위해 준비중
 Drop files here.	file:ZipOMaticWindow.cpp		여기에 파일 떨어트려주세요.
 Filename: %s	file:ZipOMaticWindow.cpp		파일이름: %s
-Let them continue	file:ZipOMatic.cpp		작업 계속
 Do you want to stop them?	file:ZipOMatic.cpp		당신은 작업을 중단하시겠습니까?
+Error creating archive	file:ZipOMaticWindow.cpp		압축파일 만드는 중에 에러 발생
+Stop them	file:ZipOMatic.cpp		작업 정지
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		압축파일 만드는 것을 중단하시겠습니까?
+Preparing to archive	file:ZipperThread.cpp		압축하기 위해 준비중
+Let them continue	file:ZipOMatic.cpp		작업 계속
+Continue	file:ZipOMaticWindow.cpp		계속
+Archive created OK	file:ZipOMaticWindow.cpp		압축파일 만들기 성공
+Stop	file:ZipOMaticWindow.cpp		정지
 Stopped	file:ZipOMaticWindow.cpp		정지됨
 Archive	file:ZipperThread.cpp		압축파일
-Error creating archive	file:ZipOMaticWindow.cpp		압축파일 만드는 중에 에러 발생
-Archive created OK	file:ZipOMaticWindow.cpp		압축파일 만들기 성공
-Stop them	file:ZipOMatic.cpp		작업 정지
+Creating archive: %s	file:ZipOMaticWindow.cpp		압축파일 만드는 중: %s

@@ -1,27 +1,27 @@
 1	italian	x-vnd.Haiku.TV	1995288111
-TV	MainWin		TV
-Channel	MainWin		Canale
-Settings…	MainWin		Impostazioni…
-Interface	MainWin		Interfaccia
-Keep aspect ratio	MainWin		Conserva proporzioni
-Previous channel	MainWin		Canale precedente
-Settings	MainWin		Impostazioni
-TV	System name		TV
+No menu	MainWin		Nessun menu
 No border	MainWin		Nessun bordo
-Always on top	MainWin		Sempre in primo piano
-OK	MainWin		OK
-Quit	MainWin		Esci
+force 704 x 576, display aspect 4:3	MainWin		forza a 704 × 576, mostra aspetto in 4:3
+Error, connecting to interface failed:\n\n	MainWin		Errore, connessione all'interfaccia fallita:\n\n
+force 544 x 576, display aspect 4:3	MainWin		forza a 544 x 576, mostra aspetto in 4:3
 Full screen	MainWin		Schermo intero
-Debug	MainWin		Debug
 Scale to native size	MainWin		Dimensioni originali
 unknown	MainWin		sconosciuto
 Next channel	MainWin		Canale seguente
-Error, interface is busy:\n\n	MainWin		Errore, l'interfaccia è occupata:\n\n
-None	MainWin		Nessuno
-force 704 x 576, display aspect 4:3	MainWin		forza a 704 × 576, mostra aspetto in 4:3
+Keep aspect ratio	MainWin		Conserva proporzioni
 DVB - Digital Video Broadcasting TV	MainWin		DVB - Trasmissione TV Video Digitale
-force 544 x 576, display aspect 4:3	MainWin		forza a 544 x 576, mostra aspetto in 4:3
-pixel aspect ratio	MainWin		aspetto pixel
-No menu	MainWin		Nessun menu
-Error, connecting to interface failed:\n\n	MainWin		Errore, connessione all'interfaccia fallita:\n\n
+Always on top	MainWin		Sempre in primo piano
+Debug	MainWin		Debug
+Interface	MainWin		Interfaccia
 force 720 x 576, display aspect 4:3	MainWin		forza a 720 x 576, mostra aspetto in 4:3
+Quit	MainWin		Esci
+Channel	MainWin		Canale
+Previous channel	MainWin		Canale precedente
+OK	MainWin		OK
+TV	MainWin		TV
+Settings	MainWin		Impostazioni
+TV	System name		TV
+Settings…	MainWin		Impostazioni…
+None	MainWin		Nessuno
+Error, interface is busy:\n\n	MainWin		Errore, l'interfaccia è occupata:\n\n
+pixel aspect ratio	MainWin		aspetto pixel

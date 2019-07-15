@@ -1,20 +1,20 @@
 1	romanian	x-vnd.Haiku-Login	336867745
-Error: %1	Login App		Eroare: %1
-Hide password	Login View		Ascunde parola
-Desktop	Desktop Window		Desktop
 Invalid login!	Login View		Login invalid!
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tLansați în modul de editare raft pentru a permite personalizarea dektopului.\n
-OK	Login View		OK
-error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	eroare %s\n
-Login:	Login View		Login:
 Error	Login App		Eroare
-Unimplemented	Login App		Neimplementat
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tLansați în modul de editare raft pentru a permite personalizarea dektopului.\n
 Welcome to Haiku	Login Window		Bine ați venit la Haiku
-Reboot	Login View		Restartează
-Login application for Haiku\nUsage:\n	Login App		Aplicație de login pentru Haiku\nUtilizare:\n
-Info	Login App		Info
 Halt	Login View		Oprește
-Password:	Login View		Parolă:
-OK	Login App		OK
+Login application for Haiku\nUsage:\n	Login App		Aplicație de login pentru Haiku\nUtilizare:\n
 --nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tNu face fereastra modală\n
+Desktop	Desktop Window		Desktop
+Hide password	Login View		Ascunde parola
+Reboot	Login View		Restartează
 You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Puteți personaliza desktop-ul afișat în spatele aplicației de Autentificare prin plasarea replicanților pe acesta.\n\nCând ați terminat, închideți doar aplicația (Cmd-Q).
+OK	Login View		OK
+Info	Login App		Info
+Login:	Login View		Login:
+Password:	Login View		Parolă:
+Unimplemented	Login App		Neimplementat
+OK	Login App		OK
+Error: %1	Login App		Eroare: %1
+error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	eroare %s\n

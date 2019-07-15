@@ -1,41 +1,41 @@
 1	japanese	x-vnd.Haiku-Repositories	2658607939
-Completed	TaskLooper	Completed task status message	完了
-Repositories	System name		リポジトリ
-There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	リポジトリ  %url% を有効にする際にエラーが発生しました。
-Remove this repository?	RepositoriesView	Removal alert confirmation message	リポジトリを削除しますか?
-Description	TaskLooper	Failed task error description	説明
-Add	AddRepoWindow	Button label	追加
-URL	RepositoriesView	Column title	URL
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	現在有効なリポジトリの名前を読み出せません。
-Keep trying	TaskTimer	Button label	トライを続ける
 This is not a valid URL.	AddRepoWindow	Add URL error message	これは有効な URL ではありません。
 Repository URL:	AddRepoWindow	Text box label	リポジトリの URL:
-Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	 %name% のリポジトリ設定の取得時にエラーが発生しました。
-Details	TaskLooper	Job log details header	詳細
-Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	良いニュースです! リポジトリ %name% のタスクが完了しました。
-Status	RepositoriesView	Column title	状況
-Aborted	TaskLooper	Aborted task status message	中断
-Remove all	RepositoriesView	Button label	すべて削除
-Remove	RepositoriesView	Button label	削除
-Changes completed	RepositoriesView	Status view text	変更が完了しました
-Name	RepositoriesView	Column title	名前
-Enable	RepositoriesView	Button label	有効
-Enable repositories to use with package management:	RepositoriesView	Label text	パッケージ管理で使用するリポジトリを有効にしてください:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	%name% のリポジトリキャッシュの更新時にエラーが発生しました。
-Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	それぞれのリポジトリに対して、URL はひとつだけが使用可能です。選択を変更してください。
-Failed	TaskLooper	Failed task status message	失敗
-OK	Constants	Button label	OK
-Cancel task	TaskTimer	Button label	タスクをキャンセル
-Remove these repositories?	RepositoriesView	Removal alert confirmation message	これらのリポジトリを削除しますか?
-Cancel	Constants	Button label	キャンセル
-Changes pending:	RepositoriesView	Status view text	変更の保留中:
 There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	リポジトリ %name% を無効にする際にエラーが発生しました。
+Unknown	Constants	Unknown repository name	不明
+Remove all	RepositoriesView	Button label	すべて削除
+Enable repositories to use with package management:	RepositoriesView	Label text	パッケージ管理で使用するリポジトリを有効にしてください:
+Disable	RepositoriesView	Button label	無効
+Cancel task	TaskTimer	Button label	タスクをキャンセル
+Changes completed	RepositoriesView	Status view text	変更が完了しました
+Details	TaskLooper	Job log details header	詳細
 Remove	Constants	Button label	削除
-Enable all	RepositoriesView	Button label	すべて有効
-Stop and quit	RepositoriesWindow	Button label	停止して終了
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	リポジトリ  %url% を有効にする際にエラーが発生しました。
+Remove this repository?	RepositoriesView	Removal alert confirmation message	リポジトリを削除しますか?
 The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	リポジトリ %name% のタスクは完了まで時間がかかります。
-Disable all	RepositoriesView	Button label	すべて無効
+Completed	TaskLooper	Completed task status message	完了
+OK	Constants	Button label	OK
+Status	RepositoriesView	Column title	状況
+Name	RepositoriesView	Column title	名前
+Add	AddRepoWindow	Button label	追加
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	現在有効なリポジトリの名前を読み出せません。
+Enable all	RepositoriesView	Button label	すべて有効
+Aborted	TaskLooper	Aborted task status message	中断
+URL	RepositoriesView	Column title	URL
+Enable	RepositoriesView	Button label	有効
+Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	 %name% のリポジトリ設定の取得時にエラーが発生しました。
+Description	TaskLooper	Failed task error description	説明
+Failed	TaskLooper	Failed task status message	失敗
+Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	良いニュースです! リポジトリ %name% のタスクが完了しました。
 Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	一部のタスクがまだ実行中です。これらのタスクを停止して終了しますか?
 This repository URL already exists.	RepositoriesView	Error message	このリポジトリの URL はすでに存在します。
-Disable	RepositoriesView	Button label	無効
-Unknown	Constants	Unknown repository name	不明
+Repositories	System name		リポジトリ
+Changes pending:	RepositoriesView	Status view text	変更の保留中:
+Remove	RepositoriesView	Button label	削除
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	これらのリポジトリを削除しますか?
+Keep trying	TaskTimer	Button label	トライを続ける
+Cancel	Constants	Button label	キャンセル
+Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	それぞれのリポジトリに対して、URL はひとつだけが使用可能です。選択を変更してください。
+Stop and quit	RepositoriesWindow	Button label	停止して終了
+Disable all	RepositoriesView	Button label	すべて無効

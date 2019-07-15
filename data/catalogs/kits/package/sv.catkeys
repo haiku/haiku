@@ -1,7 +1,7 @@
 1	swedish	x-vnd.Haiku-libpackage	2012114212
-Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Paketet %s-%s har inga matchande beroenden för dess baspaket \"%s\"
-Failed to get repository names	PackageManagerKit		Misslyckades med att hämta namn på repositorier
-Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Misslyckades med att hämta cache för repositoriet \"%s\". Hoppar över.
 Refreshing repository \"%s\" failed	PackageManagerKit		Uppdateringen av repositoriet \"%s\" misslyckades
 Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Misslyckades med att hämta konfigurationen för repositoriet \"%s\". Hoppar över.
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Misslyckades med att hämta cache för repositoriet \"%s\". Hoppar över.
+Failed to get repository names	PackageManagerKit		Misslyckades med att hämta namn på repositorier
 Failed to remove transaction directory	PackageManagerKit		Misslyckades med att ta bort transaktionsmappen
+Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Paketet %s-%s har inga matchande beroenden för dess baspaket \"%s\"

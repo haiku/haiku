@@ -1,155 +1,155 @@
 1	italian	x-vnd.Haiku-MediaPlayer	1313616492
-raw audio	MediaPlayer-InfoWin		audio grezzo
-Location	MediaPlayer-InfoWin		Luogo
-1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
-%d kHz	MediaPlayer-InfoWin		%d kHz
-Stream settings	MediaPlayer-Main		Impostazioni del flusso
-<unknown>	PlaylistItem-album		<sconosciuto>
-Scale controls in full screen mode	MediaPlayer-SettingsWindow		Ridimensiona controlli nella modalità a schermo intero
-Video	MediaPlayer-InfoWin		Video
-Subtitle size:	MediaPlayer-SettingsWindow		Dimensione dei sottotitoli:
-Save Playlist	MediaPlayer-PlaylistWindow		Salva elenco di riproduzione
-<no media>	MediaPlayer-InfoWin		<nessun media>
-(not supported)	MediaPlayer-InfoWin		(non supportato)
-None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Nessuno dei file da riprodurre sembra essere in un formato multimediale.
-Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Salvataggio dell'elenco di riproduzione non riuscito.\n\nErrore: 
-ask every time	MediaPlayer-SettingsWindow		chiedi sempre
-%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
-New player…	MediaPlayer-Main		Nuova riproduzione…
-100% scale	MediaPlayer-Main		Scala 100%
-Subtitle placement:	MediaPlayer-SettingsWindow		Posizione dei sottotitoli:
-Close	MediaPlayer-Main		Chiudi
-Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Impossibile spostare alcuni file nel Cestino.
-<unknown>	MediaPlayer-InfoWin		<sconosciuto>
-Open	MediaPlayer-Main		Apri
-OK	MediaPlayer-SettingsWindow		OK
-Track %d	MediaPlayer-Main		Traccia %d
-2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
-Display mode	MediaPlayer-InfoWin		Modalità visualizzazione
-Medium	MediaPlayer-SettingsWindow		Medi
-Open network stream	MediaPlayer-NetworkStream		Apri stream di rete
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Sposta elemento nel Cestino
 Close	MediaPlayer-PlaylistWindow		Chiudi
-Open…	MediaPlayer-PlaylistWindow		Apri…
-Undo	MediaPlayer-PlaylistWindow		Annulla
-Stream URL:	MediaPlayer-NetworkStream		URL dello stream:
+Volume of background clips	MediaPlayer-SettingsWindow		Volume delle clip di sottofondo
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Usa gli overlay video hardware, se disponibili
-File info…	MediaPlayer-Main		Informazioni sul file…
-Overlay	MediaPlayer-InfoWin		Overlay
-Remove Entry	MediaPlayer-RemovePLItemsCmd		Elimina elemento
-Close window after playing audio	MediaPlayer-SettingsWindow		Chiudi la finestra al termine della riproduzione audio
-Full volume	MediaPlayer-SettingsWindow		Volume massimo
-Drop files to play	MediaPlayer-Main		Trascina qui i file da riprodurre
-Copyright	MediaPlayer-InfoWin		Copyright
-Cancel	MediaPlayer-SettingsWindow		Annulla
-Loop audio	MediaPlayer-SettingsWindow		Riproduci audio ciclicamente
-Container	MediaPlayer-InfoWin		Contenitore
-Nothing to Play	MediaPlayer-Main		Nulla da riprodurre
+Audio	MediaPlayer-InfoWin		Audio
+Subtitle placement:	MediaPlayer-SettingsWindow		Posizione dei sottotitoli:
+MediaPlayer	System name		MediaPlayer
+Audio track	MediaPlayer-Main		Traccia audio
 Muted	MediaPlayer-SettingsWindow		Muto
-Quit	MediaPlayer-Main		Esci
+OK	MediaPlayer-RemovePLItemsCmd		OK
+Open Playlist	MediaPlayer-PlaylistWindow		Apri elenco di riproduzione
+Subtitles	MediaPlayer-Main		Sottotitoli
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% è incorso in un errore interno. Il file non può essere aperto.
+DrawBitmap	MediaPlayer-InfoWin		Disegna bitmap
+File info	MediaPlayer-InfoWin		Informazioni sul file…
+raw audio	MediaPlayer-InfoWin		audio grezzo
+Select all	MediaPlayer-PlaylistWindow		Seleziona tutto
+New player…	MediaPlayer-Main		Nuova riproduzione…
+Move Entries	MediaPlayer-MovePLItemsCmd		Sposta elementi
+OK	MediaPlayer-Main		OK
+Remove	MediaPlayer-PlaylistWindow		Elimina
+<unknown>	MediaPlayer-InfoWin		<sconosciuto>
 Resume:	MediaPlayer-SettingsWindow		Riprendi:
+Duration	MediaPlayer-InfoWin		Durata
+Import Entries	MediaPlayer-ImportPLItemsCmd		Importa elementi
+Open network stream	MediaPlayer-Main		Apri stream di rete
+Move file to Trash	MediaPlayer-PlaylistWindow		Sposta file nel Cestino
+Open file…	MediaPlayer-Main		Apri file…
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Ridimensiona controlli nella modalità a schermo intero
+View options	MediaPlayer-SettingsWindow		Opzioni di visualizzazione
+%d kHz	MediaPlayer-InfoWin		%d kHz
+Full volume	MediaPlayer-SettingsWindow		Volume massimo
+<untitled>	PlaylistItem-title		<senza titolo>
+Start media server	MediaPlayer-Main		Avvia il media server
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Sembra che il media server non sia in esecuzione.\nAvviarlo?
+Location	MediaPlayer-InfoWin		Luogo
+Medium	MediaPlayer-SettingsWindow		Medi
+Play mode	MediaPlayer-SettingsWindow		Modalità di riproduzione
+Playlist	MediaPlayer-PlaylistWindow		Elenco di riproduzione
+%d Bit	MediaPlayer-InfoWin		%d bit
+Track	Audio Track Menu		Traccia
+Close	MediaPlayer-Main		Chiudi
+Save error	MediaPlayer-PlaylistWindow		Errore durante il salvataggio
+Attributes	MediaPlayer-Main		Attributi
+Bottom of screen	MediaPlayer-SettingsWindow		Parte inferiore dello schermo
+MediaPlayer settings	MediaPlayer-SettingsWindow		Impostazioni di MediaPlayer
+Copyright	MediaPlayer-InfoWin		Copyright
+Invalid URL inserted!	MediaPlayer-NetworkStream		Immesso URL invalido!
+Aspect ratio	MediaPlayer-Main		Proporzioni
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Salvataggio dell'elenco di riproduzione non riuscito.\n\nErrore: 
+<no media>	MediaPlayer-InfoWin		<nessun media>
+Hide interface	MediaPlayer-Main		Nascondi interfaccia
+Error: 	MediaPlayer-Main		Errore: 
+Video track	MediaPlayer-Main		Traccia video
+Playlist…	MediaPlayer-Main		Elenco di riproduzione…
+<unnamed media>	MediaPlayer-InfoWin		<media senza nome>
+Save	MediaPlayer-PlaylistWindow		Salva
+Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Rendi casuali gli elementi
+Cancel	MediaPlayer-NetworkStream		Annulla
+Nothing to Play	MediaPlayer-Main		Nulla da riprodurre
+OK	MediaPlayer-SettingsWindow		OK
+Remove Entries	MediaPlayer-RemovePLItemsCmd		Rimuovi elementi
+never	MediaPlayer-SettingsWindow		mai
+Loop audio	MediaPlayer-SettingsWindow		Riproduci audio ciclicamente
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Errore interno (messaggio malformato). Fallito il salvataggio dell'Elenco di riproduzione.
+Open…	MediaPlayer-PlaylistWindow		Apri…
+Revert	MediaPlayer-SettingsWindow		Ripristina
+Low volume	MediaPlayer-SettingsWindow		Volume basso
+Audio	MediaPlayer-Main		Audio
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# Canali}}
+Quit	MediaPlayer-Main		Esci
+Redo	MediaPlayer-PlaylistWindow		Ripeti
+Move Entry	MediaPlayer-MovePLItemsCmd		Sposta elemento
+<unknown>	PlaylistItem-author		<sconosciuto>
+Cancel	MediaPlayer-SettingsWindow		Annulla
+Large	MediaPlayer-SettingsWindow		Grandi
+Import Entry	MediaPlayer-ImportPLItemsCmd		Importa elemento
+unknown format	MediaPlayer-InfoWin		formato sconosciuto
+Track %d	MediaPlayer-Main		Traccia %d
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Impossibile spostare tutti i file nel Cestino
+Total duration: %s	MediaPlayer-PlaylistWindow		Durata totale: %s
+%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
+Move into trash error	MediaPlayer-RemovePLItemsCmd		Spostamento nel Cestino non riuscito
+50% scale	MediaPlayer-Main		Scala 50%
+Drop files to play	MediaPlayer-Main		Trascina qui i file da riprodurre
+Copy Entry	MediaPlayer-CopyPLItemsCmd		Copia elemento
+Close window after playing audio	MediaPlayer-SettingsWindow		Chiudi la finestra al termine della riproduzione audio
+Edit	MediaPlayer-PlaylistWindow		Modifica
+Copy Entries	MediaPlayer-CopyPLItemsCmd		Copia elementi
+Always on top	MediaPlayer-Main		Sempre in primo piano
+Open	MediaPlayer-PlaylistWindow		Apri
+always	MediaPlayer-SettingsWindow		sempre
+Loop video	MediaPlayer-SettingsWindow		Riproduci video ciclicamente
+Stream URL:	MediaPlayer-NetworkStream		URL dello stream:
+<unknown>	PlaylistItem-album		<sconosciuto>
+Stream settings	MediaPlayer-Main		Impostazioni del flusso
+none	Subtitles menu		nessuno
+Save Playlist	MediaPlayer-PlaylistWindow		Salva elenco di riproduzione
+Overlay	MediaPlayer-InfoWin		Overlay
+2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
+Rating	MediaPlayer-Main		Giudizio
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Errore interno (memoria piena). Salvataggio dell'elenco di riproduzione non riuscito.
 Video	MediaPlayer-Main		Video
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Non sono stati installati decoder specifici per questo formato, oppure il decoder ha un problema con questa versione del formato.
-Import Entry	MediaPlayer-ImportPLItemsCmd		Importa elemento
-400% scale	MediaPlayer-Main		Scala 400%
-Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Salvataggio elenco di riproduzione non riuscito:\n\nErrore: 
-Move Entries	MediaPlayer-MovePLItemsCmd		Sposta elementi
-Audio	MediaPlayer-Main		Audio
-Open Playlist	MediaPlayer-PlaylistWindow		Apri elenco di riproduzione
-MediaPlayer	System name		MediaPlayer
-OK	MediaPlayer-Main		OK
+Lock Peaks	MediaPlayer-PeakView		Blocca picchi
+none	Audio track menu		nessuno
+Open network stream	MediaPlayer-NetworkStream		Apri stream di rete
+Automatically start playing	MediaPlayer-SettingsWindow		Comincia a riprodurre automaticamente
+Undo	MediaPlayer-PlaylistWindow		Annulla
+Display mode	MediaPlayer-InfoWin		Modalità visualizzazione
+Bottom of video	MediaPlayer-SettingsWindow		Parte inferiore dello schermo
+Small	MediaPlayer-SettingsWindow		Piccoli
 Settings…	MediaPlayer-Main		Impostazioni…
-MediaPlayer settings	MediaPlayer-SettingsWindow		Impostazioni di MediaPlayer
-never	MediaPlayer-SettingsWindow		mai
-h	MediaPlayer-InfoWin	Hours	h
-Select all	MediaPlayer-PlaylistWindow		Seleziona tutto
-Move Entry	MediaPlayer-MovePLItemsCmd		Sposta elemento
-Open	MediaPlayer-PlaylistWindow		Apri
-The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Il file '%filename' non può essere aperto.\n\n
-Error: 	MediaPlayer-RemovePLItemsCmd		Errore: 
-Audio	MediaPlayer-InfoWin		Audio
-Move into trash error	MediaPlayer-RemovePLItemsCmd		Spostamento nel Cestino non riuscito
-Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Errore interno (messaggio malformato). Fallito il salvataggio dell'Elenco di riproduzione.
-%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% è incorso in un errore interno. Il file non può essere aperto.
+min	MediaPlayer-InfoWin	Minutes	min
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Salvataggio elenco di riproduzione non riuscito:\n\nErrore: 
+Video	MediaPlayer-InfoWin		Video
+File info…	MediaPlayer-Main		Informazioni sul file…
+1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
+<unnamed>	PlaylistItem-name		<senza nome>
+Track	Video Track Menu		Traccia
+Full screen	MediaPlayer-Main		Schermo intero
+OK	MediaPlayer-NetworkStream		OK
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Errore interno (errore nel lock). Fallito il salvataggio della playlist.
+100% scale	MediaPlayer-Main		Scala 100%
+<nothing to redo>	MediaPlayer-PlaylistWindow		<niente da ripetere>
+Bad URL	MediaPlayer-NetworkStream		URL errato
+Save	MediaPlayer-Main		Salva
 Close window after playing video	MediaPlayer-SettingsWindow		Chiudi la finestra al termine della riproduzione video
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Scala i filmati in modo fluido (modalità non-overlay)
-OK	MediaPlayer-RemovePLItemsCmd		OK
-Open network stream	MediaPlayer-Main		Apri stream di rete
-50% scale	MediaPlayer-Main		Scala 50%
-Subtitles	MediaPlayer-Main		Sottotitoli
-Audio track	MediaPlayer-Main		Traccia audio
-Import Entries	MediaPlayer-ImportPLItemsCmd		Importa elementi
-No aspect correction	MediaPlayer-Main		Nessuna correzione dell'aspetto
-Automatically start playing	MediaPlayer-SettingsWindow		Comincia a riprodurre automaticamente
-Track	Video Track Menu		Traccia
-Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Errore interno (errore nel lock). Fallito il salvataggio della playlist.
-View options	MediaPlayer-SettingsWindow		Opzioni di visualizzazione
-none	MediaPlayer-Main		nessuno
-Play mode	MediaPlayer-SettingsWindow		Modalità di riproduzione
-Remove Entries	MediaPlayer-RemovePLItemsCmd		Rimuovi elementi
-Video track	MediaPlayer-Main		Traccia video
-Loop video	MediaPlayer-SettingsWindow		Riproduci video ciclicamente
-Attributes	MediaPlayer-Main		Attributi
-All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Impossibile spostare tutti i file nel Cestino
-<untitled>	PlaylistItem-title		<senza titolo>
-Track	Audio Track Menu		Traccia
-unknown format	MediaPlayer-InfoWin		formato sconosciuto
-<nothing to redo>	MediaPlayer-PlaylistWindow		<niente da ripetere>
-Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Sposta elementi nel Cestino
 200% scale	MediaPlayer-Main		Scala 200%
-It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Sembra che il media server non sia in esecuzione.\nAvviarlo?
-Duration	MediaPlayer-InfoWin		Durata
-Aspect ratio	MediaPlayer-Main		Proporzioni
-Error: 	MediaPlayer-Main		Errore: 
-Large	MediaPlayer-SettingsWindow		Grandi
-Bottom of video	MediaPlayer-SettingsWindow		Parte inferiore dello schermo
-DrawBitmap	MediaPlayer-InfoWin		Disegna bitmap
-always	MediaPlayer-SettingsWindow		sempre
-Total duration: %s	MediaPlayer-PlaylistWindow		Durata totale: %s
-<unnamed media>	MediaPlayer-InfoWin		<media senza nome>
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Il file '%filename' non può essere aperto.\n\n
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Nessuno dei file da riprodurre sembra essere in un formato multimediale.
+Remove Entry	MediaPlayer-RemovePLItemsCmd		Elimina elemento
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Sposta elementi nel Cestino
+Subtitle size:	MediaPlayer-SettingsWindow		Dimensione dei sottotitoli:
+No aspect correction	MediaPlayer-Main		Nessuna correzione dell'aspetto
 raw video	MediaPlayer-InfoWin		video grezzo
-Volume of background clips	MediaPlayer-SettingsWindow		Volume delle clip di sottofondo
-Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Errore interno (memoria piena). Salvataggio dell'elenco di riproduzione non riuscito.
-Hide interface	MediaPlayer-Main		Nascondi interfaccia
+Container	MediaPlayer-InfoWin		Contenitore
+none	MediaPlayer-Main		nessuno
 Open clips	MediaPlayer-Main		Apri clip
-Copy Entry	MediaPlayer-CopyPLItemsCmd		Copia elemento
-none	Subtitles menu		nessuno
-Move file to Trash	MediaPlayer-PlaylistWindow		Sposta file nel Cestino
-Invalid URL inserted!	MediaPlayer-NetworkStream		Immesso URL invalido!
-OK	MediaPlayer-NetworkStream		OK
-min	MediaPlayer-InfoWin	Minutes	min
-Small	MediaPlayer-SettingsWindow		Piccoli
-Randomize	MediaPlayer-PlaylistWindow		Casuale
-Off	Subtitles menu		Disattivi
-Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Rendi casuali gli elementi
-Revert	MediaPlayer-SettingsWindow		Ripristina
-Edit	MediaPlayer-PlaylistWindow		Modifica
-Start media server	MediaPlayer-Main		Avvia il media server
-%.3f fps	MediaPlayer-InfoWin		%.3f fps
-Bad URL	MediaPlayer-NetworkStream		URL errato
-{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# Canali}}
-<unnamed>	PlaylistItem-name		<senza nome>
-OK	MediaPlayer-PlaylistWindow		OK
-none	Audio track menu		nessuno
-Cancel	MediaPlayer-NetworkStream		Annulla
-Playlist…	MediaPlayer-Main		Elenco di riproduzione…
-<unknown>	PlaylistItem-author		<sconosciuto>
-Save as…	MediaPlayer-PlaylistWindow		Salva come…
-Copy Entries	MediaPlayer-CopyPLItemsCmd		Copia elementi
-Redo	MediaPlayer-PlaylistWindow		Ripeti
-Always on top	MediaPlayer-Main		Sempre in primo piano
-Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Sposta elemento nel Cestino
-Save	MediaPlayer-Main		Salva
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Impossibile spostare alcuni file nel Cestino.
 <nothing to undo>	MediaPlayer-PlaylistWindow		<niente da annullare>
-File info	MediaPlayer-InfoWin		Informazioni sul file…
-Save	MediaPlayer-PlaylistWindow		Salva
-%d Bit	MediaPlayer-InfoWin		%d bit
-Remove	MediaPlayer-PlaylistWindow		Elimina
-Full screen	MediaPlayer-Main		Schermo intero
-Open file…	MediaPlayer-Main		Apri file…
+Save as…	MediaPlayer-PlaylistWindow		Salva come…
+Error: 	MediaPlayer-RemovePLItemsCmd		Errore: 
 300% scale	MediaPlayer-Main		Scala 300%
-Bottom of screen	MediaPlayer-SettingsWindow		Parte inferiore dello schermo
-Save error	MediaPlayer-PlaylistWindow		Errore durante il salvataggio
-Rating	MediaPlayer-Main		Giudizio
-Playlist	MediaPlayer-PlaylistWindow		Elenco di riproduzione
-Lock Peaks	MediaPlayer-PeakView		Blocca picchi
-Low volume	MediaPlayer-SettingsWindow		Volume basso
+Open	MediaPlayer-Main		Apri
+ask every time	MediaPlayer-SettingsWindow		chiedi sempre
+(not supported)	MediaPlayer-InfoWin		(non supportato)
+Randomize	MediaPlayer-PlaylistWindow		Casuale
+%.3f fps	MediaPlayer-InfoWin		%.3f fps
+Off	Subtitles menu		Disattivi
+400% scale	MediaPlayer-Main		Scala 400%
+h	MediaPlayer-InfoWin	Hours	h
+OK	MediaPlayer-PlaylistWindow		OK

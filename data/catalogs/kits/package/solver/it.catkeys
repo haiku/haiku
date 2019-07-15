@@ -1,38 +1,38 @@
 1	italian	x-vnd.Haiku-libsolvsolver	3404387783
-%dependency% is provided by the system	SolverProblem		%dependency% è già fornito dal sistema
-package %source% conflicts with %dependency% provided by %target%	SolverProblem		il pacchetto %source% genera un conflitto con %dependency% fornita da %target%
-nothing provides requested %dependency%	SolverProblem		nessuno fornisce la richiesta %dependency%
-unspecified problem	SolverProblem		problema non specificato
-keep %source% despite its inferior architecture	SolverProblemSolution		mantieni %source% nonostante l'architettura di livello inferiore
-do not deinstall \"%selection%\"	SolverProblemSolution		non rimuovere \"%selection%\"
-%source% has inferior architecture	SolverProblem		%source% ha una architettura di livello inferiore
-dependency problem	SolverProblem		problema di dipendenza
-do not keep %source% installed	SolverProblemSolution		non tenere installato %source%
-package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		il pacchetto %source% rende implicitamente obsoleta %dependency% fornita da %target%
-do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		se risolvibili, non disinstallare \"%selection%\"
-keep %source% from excluded repository	SolverProblemSolution		mantieni %source% dal repository escluso
-install %selection% despite its old version	SolverProblemSolution		installa %selection% nonostante sia una vecchia versione
-allow downgrade of %source% to %target%	SolverProblemSolution		consenti il downgrade di %source% a %target%
-do not lock \"%selection%\"	SolverProblemSolution		non bloccare \"%selection%\"
-install %source% despite its inferior architecture	SolverProblemSolution		installa %source% nonostante sia di un'architettura di livello inferiore
-do not install \"%selection%\"	SolverProblemSolution		non installare \"%selection%\"
-do something	SolverProblemSolution		fai qualcosa
-do not install the most recent version of \"%selection%\"	SolverProblemSolution		non installare la versione più recente di \"%selection%\"
-package %source% conflicts with %dependency% provided by itself	SolverProblem		il pacchetto %source% va in conflitto con %dependency% fornito da se stesso
-cannot install both %source% and %target%	SolverProblem		impossibile installare sia %source% che %target%
-allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		consenti modifiche da parte del fornitore da \"%sourceVendor%\" (%source%) a \"%targetVendor%\" (%target%)
-install %source% from excluded repository	SolverProblemSolution		installa %source% dal repository escluso
-keep old %source%	SolverProblemSolution		tieni il vecchio %source%
-conflicting requests	SolverProblem		richieste in conflitto
-package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		il pacchetto %source% richiede %dependency%, ma nessuno dei pacchetti cha la fornisce può essere installato
-do not forbid installation of %source%	SolverProblemSolution		non vietare l'installazione di %source%
 allow architecture change of %source% to %target%	SolverProblemSolution		consenti cambio di architettura da %source% a %target%
-allow name change of %source% to %target%	SolverProblemSolution		consenti rinomina di %source% su %target%
+install %source% from excluded repository	SolverProblemSolution		installa %source% dal repository escluso
+unspecified problem	SolverProblem		problema non specificato
+package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		il pacchetto %source% richiede %dependency%, ma nessuno dei pacchetti cha la fornisce può essere installato
+package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		il pacchetto %source% rende implicitamente obsoleta %dependency% fornita da %target%
+nothing provides requested %dependency%	SolverProblem		nessuno fornisce la richiesta %dependency%
+do not keep %source% installed	SolverProblemSolution		non tenere installato %source%
+do not deinstall \"%selection%\"	SolverProblemSolution		non rimuovere \"%selection%\"
+install %source% despite its inferior architecture	SolverProblemSolution		installa %source% nonostante sia di un'architettura di livello inferiore
+conflicting requests	SolverProblem		richieste in conflitto
+do not install the most recent version of \"%selection%\"	SolverProblemSolution		non installare la versione più recente di \"%selection%\"
 allow replacement of %source% with %target%	SolverProblemSolution		consenti sostituzione di %source% con %target%
-allow deinstallation of %source%	SolverProblemSolution		consenti la rimozione di %source%
-%source% does not belong to a distupgrade repository	SolverProblem		%source% non appartiene a un repository 'distupgrade'
 package %source% obsoletes %dependency% provided by %target%	SolverProblem		il pacchetto %source% rende obsoleta %dependency% fornita da %target%
-package %source% is not installable	SolverProblem		il pacchetto %source% non è installabile
+do not forbid installation of %source%	SolverProblemSolution		non vietare l'installazione di %source%
+allow downgrade of %source% to %target%	SolverProblemSolution		consenti il downgrade di %source% a %target%
+dependency problem	SolverProblem		problema di dipendenza
+%dependency% is provided by the system	SolverProblem		%dependency% è già fornito dal sistema
+keep %source% despite its inferior architecture	SolverProblemSolution		mantieni %source% nonostante l'architettura di livello inferiore
+%source% does not belong to a distupgrade repository	SolverProblem		%source% non appartiene a un repository 'distupgrade'
 installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		il pacchetto installato %source% rende obsoleta %dependency% fornita da %target%
+allow name change of %source% to %target%	SolverProblemSolution		consenti rinomina di %source% su %target%
+package %source% conflicts with %dependency% provided by %target%	SolverProblem		il pacchetto %source% genera un conflitto con %dependency% fornita da %target%
+do something	SolverProblemSolution		fai qualcosa
+install %selection% despite its old version	SolverProblemSolution		installa %selection% nonostante sia una vecchia versione
+cannot install both %source% and %target%	SolverProblem		impossibile installare sia %source% che %target%
+package %source% is not installable	SolverProblem		il pacchetto %source% non è installabile
 problem with installed package %source%	SolverProblem		problema con il pacchetto installato %source%
+allow deinstallation of %source%	SolverProblemSolution		consenti la rimozione di %source%
+keep %source% from excluded repository	SolverProblemSolution		mantieni %source% dal repository escluso
+keep old %source%	SolverProblemSolution		tieni il vecchio %source%
+package %source% conflicts with %dependency% provided by itself	SolverProblem		il pacchetto %source% va in conflitto con %dependency% fornito da se stesso
+allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		consenti modifiche da parte del fornitore da \"%sourceVendor%\" (%source%) a \"%targetVendor%\" (%target%)
+do not lock \"%selection%\"	SolverProblemSolution		non bloccare \"%selection%\"
+do not install \"%selection%\"	SolverProblemSolution		non installare \"%selection%\"
 nothing provides %dependency% needed by %source%	SolverProblem		nessuno è in grado di fornire %dependency% richiesta da %source%
+%source% has inferior architecture	SolverProblem		%source% ha una architettura di livello inferiore
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		se risolvibili, non disinstallare \"%selection%\"

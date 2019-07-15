@@ -1,27 +1,35 @@
-1	indonesian	x-vnd.Haiku-Sudoku	3095678633
-Export as…	SudokuWindow		Ekspor sebagai...
-OK	SudokuWindow		OKE
-New	SudokuWindow		Baru
-Abort	ProgressWindow		Batalkan
-Sudoku	System name		Sudoku
-Easy	SudokuWindow		Mudah
-Open file…	SudokuWindow		Buka berkas...
-Solve single field	SudokuWindow		Selesaikan bidang tunggal
-Solve	SudokuWindow		Selesaikan
+1	indonesian	x-vnd.Haiku-Sudoku	3382377306
+Restore snapshot	SudokuWindow		Pulihkan snapshot
 File	SudokuWindow		Berkas
-Advanced	SudokuWindow		Tingkat lanjut
-Start again	SudokuWindow		Mulai lagi
-HTML	SudokuWindow		HTML
-Copy	SudokuWindow		Salin
-Mark valid hints	SudokuWindow		Tandai petunjuk yang benar
-Sudoku solved - congratulations!\n	SudokuWindow		Sudoku diselesaikan - Selamat!\n
+Mark invalid values	SudokuWindow		Tandai isian yang salah
+Solve single field	SudokuWindow		Selesaikan bidang tunggal
 Hard	SudokuWindow		Sulit
+Start again	SudokuWindow		Mulai lagi
+New	SudokuWindow		Baru
+Easy	SudokuWindow		Mudah
+Undo	SudokuWindow		Batalkan
+Export as…	SudokuWindow		Ekspor sebagai...
+Quit	SudokuWindow		Keluar
+Redo	SudokuWindow		Ulangi
+Could not open \"%s\":\n%s\n	SudokuWindow		Tidak bisa membuka \"%s\":\n%s\n
+Blank	SudokuWindow		Kosong
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku diselesaikan - Selamat!\n
+Text	SudokuWindow		Teks
+Copy	SudokuWindow		Salin
+Solve	SudokuWindow		Selesaikan
+HTML	SudokuWindow		HTML
+Advanced	SudokuWindow		Tingkat lanjut
+Set all hints	SudokuWindow		Atur semua petunjuk
+Searching for removable values	SudokuGenerator		Mencari nilai yang dapat dihapus
+Abort	ProgressWindow		Batalkan
+Could not set Sudoku:\n%s\n	SudokuWindow		Tidak bisa memuat Sudoku:\n%s\n
+Help	SudokuWindow		Bantuan
+OK	SudokuWindow		OKE
+Sudoku	System name		Sudoku
+Progress monitor	ProgressWindow		Monitor kemajuan
 Creating solvable field	SudokuGenerator		Buat bidang yang bisa diselesaikan
 View	SudokuWindow		Tamplikan
-Progress monitor	ProgressWindow		Monitor kemajuan
-Set all hints	SudokuWindow		Atur semua petunjuk
-Mark invalid values	SudokuWindow		Tandai isian yang salah
-Blank	SudokuWindow		Kosong
-Help	SudokuWindow		Bantuan
-Searching for removable values	SudokuGenerator		Mencari nilai yang dapat dihapus
-Quit	SudokuWindow		Keluar
+Snapshot current	SudokuWindow		Snapshot sekarang
+Mark valid hints	SudokuWindow		Tandai petunjuk yang benar
+Sudoku request	SudokuWindow		Permintaan sudoku
+Open file…	SudokuWindow		Buka berkas...

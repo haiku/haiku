@@ -1,16 +1,13 @@
-1	korean	x-vnd.Haiku-Magnify	698518753
-no clip msg\n	In console, when clipboard is empty after clicking Copy image		클립보드 메세지 없음\n
-Make square	Magnify-Main		정사각형 만들기
-Copy image	Magnify-Main		이미지 복사
-usage: magnify [size] (magnify size * size pixels)\n	Console		사용법: magnify [크기] (확대기 크기 * 크기 픽셀)\n
-Stick coordinates	Magnify-Main		좌표 고정
-magnify: size must be a multiple of 4\n	Console		확대기:크기는 반드시 4의 배수가 되어야 합니다\n
+1	korean	x-vnd.Haiku-Magnify	1150104797
 Decrease pixel size	Magnify-Main		픽셀 크기 줄이기
+Increase pixel size	Magnify-Main		픽셀 크기 늘리기
+Stick coordinates	Magnify-Main		좌표 고정
+Copy image	Magnify-Main		이미지 복사
+Decrease window size	Magnify-Main		창 크기 줄이기
+Remove a crosshair	Magnify-Main		십자선 제거
+Add a crosshair	Magnify-Main		십자선 더하기
+Increase window size	Magnify-Main		창 크기 늘리기
+Save image	Magnify-Main		이미지 저장
 Magnify	System name		확대기
 Info	Magnify-Main		정보
-Remove a crosshair	Magnify-Main		십자선 제거
-Save image	Magnify-Main		이미지 저장
-Increase window size	Magnify-Main		창 크기 늘리기
-Decrease window size	Magnify-Main		창 크기 줄이기
-Increase pixel size	Magnify-Main		픽셀 크기 늘리기
-Add a crosshair	Magnify-Main		십자선 더하기
+Make square	Magnify-Main		정사각형 만들기

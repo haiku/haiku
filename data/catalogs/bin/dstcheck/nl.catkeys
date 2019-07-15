@@ -1,5 +1,5 @@
 1	dutch; flemish	x-vnd.Haiku-cmd-dstconfig	684321431
-Ask me later	dstcheck		Vraag dat later
-Manually adjust time…	dstcheck		De tijd handmatig instellen...
 Keep this time	dstcheck		Deze tijd behouden
+Manually adjust time…	dstcheck		De tijd handmatig instellen...
 Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		Pas op!\n\nVanwege het ingaan van de zomer- of wintertijd, kan de klok van uw computer er een uur naast zitten.\nUw computer denkt nu dat het %current time% is.\n\nIs dit de juiste tijd?
+Ask me later	dstcheck		Vraag dat later

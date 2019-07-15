@@ -1,38 +1,37 @@
-1	swedish	x-vnd.Haiku.TextSearch	3622532554
-%s: Not enough room to escape the filename.	Grepper		%s: Saknar utrymme för att koda om filnamnet.
-Trim to selection	GrepWindow		Avgränsa sökning till markerade filer
-Failed to open errors pipe!	Grepper		Misslyckades med att öppna feldataenhet!
-Follow symbolic links	GrepWindow		Följ symboliska länkar
-Close	GrepWindow		Stäng
-Cancel	GrepWindow		Avbryt
-The unselected files will be removed from the list.	GrepWindow		De omarkerade filerna kommer att tas bort från listan.
-Regular expression	GrepWindow		Reguljärt uttryck
-Set target…	GrepWindow		Ange mål...
-Failed to open output pipe!	Grepper		Misslyckades med att öppna utdataenhet!
+1	swedish	x-vnd.Haiku.TextSearch	2123129416
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Markera de filer du vill ska markeras i Tracker.
-Open files in Pe	GrepWindow		Öppna filerna i Pe
 %appname% : %path%	GrepWindow		%appname% : %path%
-Copy text to clipboard	GrepWindow		Kopiera text till urklipp
-Settings	GrepWindow		Inställningar
-Select all	GrepWindow		Markera allt
-OK	GrepWindow		OK
-Skip folders starting with a dot	GrepWindow		Hoppa över dolda mappar
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME kunde inte öppna en eller flera kataloger.
-Search	GrepWindow		Sök
-Open selection	GrepWindow		Öppna markering
-Look in sub-folders	GrepWindow		Sök i underkataloger
-Actions	GrepWindow		Kommandon
-File	GrepWindow		Arkiv
-Encoding	GrepWindow		Teckenuppsättning
-History	GrepWindow		Historik
 Failed to start xargs program!	Grepper		Misslyckades med att starta xargs-program!
+Open selection	GrepWindow		Öppna markering
+Actions	GrepWindow		Kommandon
 New window	GrepWindow		Nytt fönster
-Failed to open input pipe!	Grepper		Misslyckades med att öppna indataenhet!
-Please select the files you wish to keep searching.	GrepWindow		Var god markera de filer du önskar fortsätta söka i.
-TextSearch	GrepWindow		TextSök
+Encoding	GrepWindow		Teckenuppsättning
+OK	GrepWindow		OK
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Close	GrepWindow		Stäng
+Look in sub-folders	GrepWindow		Sök i underkataloger
+%s: Not enough room to escape the filename.	Grepper		%s: Saknar utrymme för att koda om filnamnet.
+Follow symbolic links	GrepWindow		Följ symboliska länkar
+Regular expression	GrepWindow		Reguljärt uttryck
+Text files only	GrepWindow		Endast textfiler
 Quit	GrepWindow		Avsluta
 Show files in Tracker	GrepWindow		Visa filer i Tracker
-Case-sensitive	GrepWindow		Skilj på små/stora bokstäver
-Text files only	GrepWindow		Endast textfiler
+Please select the files you wish to keep searching.	GrepWindow		Var god markera de filer du önskar fortsätta söka i.
+Trim to selection	GrepWindow		Avgränsa sökning till markerade filer
+Set target…	GrepWindow		Ange mål...
+TextSearch	GrepWindow		TextSök
+Failed to open input pipe!	Grepper		Misslyckades med att öppna indataenhet!
+Search	GrepWindow		Sök
+Copy text to clipboard	GrepWindow		Kopiera text till urklipp
 Show lines	GrepWindow		Visa rader
-%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Failed to open errors pipe!	Grepper		Misslyckades med att öppna feldataenhet!
+The unselected files will be removed from the list.	GrepWindow		De omarkerade filerna kommer att tas bort från listan.
+Skip folders starting with a dot	GrepWindow		Hoppa över dolda mappar
+Failed to open output pipe!	Grepper		Misslyckades med att öppna utdataenhet!
+Cancel	GrepWindow		Avbryt
+History	GrepWindow		Historik
+File	GrepWindow		Arkiv
+Case-sensitive	GrepWindow		Skilj på små/stora bokstäver
+Select all	GrepWindow		Markera allt
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME kunde inte öppna en eller flera kataloger.
+Settings	GrepWindow		Inställningar

@@ -1,4 +1,4 @@
 1	romanian	x-vnd.Haiku-SystemLogger	57960782
-%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nAcest serviciu este responsabil pentru colectarea tuturor mesajelor de sistem și scrierea lor în jurnalul systemului la \"%s\".\n\n
-OK	SyslogDaemon		OK
 Syslog Daemon	SyslogDaemon		Serviciu Syslog
+OK	SyslogDaemon		OK
+%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nAcest serviciu este responsabil pentru colectarea tuturor mesajelor de sistem și scrierea lor în jurnalul systemului la \"%s\".\n\n

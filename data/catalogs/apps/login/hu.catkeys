@@ -1,20 +1,20 @@
 1	hungarian	x-vnd.Haiku-Login	336867745
-Error: %1	Login App		Hiba: %1
-Hide password	Login View		Jelszó elrejtése
-Desktop	Desktop Window		Asztal
 Invalid login!	Login View		Érvénytelen felhasználónév!
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tIndítás szerkesztési módban, hogy lehessen szerkeszteni az Asztalt.\n
-OK	Login View		Rendben
-error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	hiba %s\n
-Login:	Login View		Felhasználónév:
 Error	Login App		Hiba
-Unimplemented	Login App		Nincs még megvalósítva
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tIndítás szerkesztési módban, hogy lehessen szerkeszteni az Asztalt.\n
 Welcome to Haiku	Login Window		Üdvözöljük a Haikuban
-Reboot	Login View		Újraindítás
-Login application for Haiku\nUsage:\n	Login App		A Haiku bejelentkezési programja\nHasználat:\n
-Info	Login App		Infó
 Halt	Login View		Megszakítás
-Password:	Login View		Jelszó:
-OK	Login App		Rendben
+Login application for Haiku\nUsage:\n	Login App		A Haiku bejelentkezési programja\nHasználat:\n
 --nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tKikapcsolja az ablak modálisságát\n
+Desktop	Desktop Window		Asztal
+Hide password	Login View		Jelszó elrejtése
+Reboot	Login View		Újraindítás
 You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		A bejelentkező képernyő mögötti asztal megjelenését személyre szabhatjuk replikánsok behúzásával a bejelentkező alkalmazásba.\n\nA művelet végeztével csupán ki kell lépni az alkalmazásból (Cmd-Q).
+OK	Login View		Rendben
+Info	Login App		Infó
+Login:	Login View		Felhasználónév:
+Password:	Login View		Jelszó:
+Unimplemented	Login App		Nincs még megvalósítva
+OK	Login App		Rendben
+Error: %1	Login App		Hiba: %1
+error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	hiba %s\n

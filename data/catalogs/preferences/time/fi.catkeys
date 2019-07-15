@@ -1,49 +1,49 @@
 1	finnish	x-vnd.Haiku-Time	3755504714
-GMT (UNIX compatible)	Time		Greenwichin aika (UNIX-yhteensopiva)
 OK	Time		Valmis
-Asia	Time		Aasia
-\nNow: 	Time		\nNyt: 
-Africa	Time		Afrikka
+Message receiving failed	Time		Viestin vastaanotto epäonnistui
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date, tekijät:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
+Australia	Time		Australia
+America	Time		Amerikka
 Reset to default server list	Time		Nollaa oletuspalvelinluettelo
 Could not resolve server address	Time		Palvelinosoitteen ratkaiseminen epäonnistui
-Stop	Time		Pysäytä
-Australia	Time		Australia
-Preview time:	Time		Esikatseluaika:
-Synchronize	Time		Synkronoi
-Revert	Time		Palauta
-Pacific	Time		Tyyni valtameri
-Show day of week	Time		Näytä viikonpäivä
-Add	Time		Lisää
-Date and time	Time		Päivämäärä ja aika
-about	Time		Ohjelmasta
-Local time (Windows compatible)	Time		Paikallinen aika (Windows-yhteensopiva)
-Message receiving failed	Time		Viestin vastaanotto epäonnistui
 Set time zone	Time		Aseta aikavyöhyke
+The following error occured while synchronizing:r\n%s: %s	Time		Seuraava virhe tapahtui synkronoinnin aikana:r\n%s: %s
 Waiting for answer failed	Time		Vastauksen odottaminen epäonnistui
-Hardware clock set to:	Time		Laitteistokellon ajaksi asetettu:
+<Other>	Time		<Muut>
+Received invalid time	Time		Vastaanotettiin virheellinen aika
+Remove	Time		Poista
+Synchronize again	Time		Synkronoi uudelleen
+Asia	Time		Aasia
+Try all servers	Time		Yritä kaikkia palvelimia
+Time	Time		Aika
+Current time:	Time		Nykyinen aika:
 The following error occured while synchronizing:r\n%s	Time		Seuraava virhe tapahtui synkronoinnin aikana:r\n%s
 Europe	Time		Eurooppa
-Remove	Time		Poista
-Time	Time		Aika
-Indian	Time		Intia
-Sending request failed	Time		Pyynnön lähettäminen epäonnistui
+Show day of week	Time		Näytä viikonpäivä
+Local time (Windows compatible)	Time		Paikallinen aika (Windows-yhteensopiva)
+Hardware clock set to:	Time		Laitteistokellon ajaksi asetettu:
 Arctic	Time		Pohjoinen napaseutu
-Display time with seconds	Time		Näytä aika sekunteina
-Time	System name		Aika-asetukset
-America	Time		Amerikka
-Synchronize at boot	Time		Synkronoi käynnistyksen yhteydessä
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date, tekijät:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
-Received invalid time	Time		Vastaanotettiin virheellinen aika
 Antarctica	Time		Etelänapamanner
-Show time zone	Time		Näytä aikavyöhyke
-Show clock in Deskbar	Time		Näytä kello Työpöytäpalkissa
-The following error occured while synchronizing:r\n%s: %s	Time		Seuraava virhe tapahtui synkronoinnin aikana:r\n%s: %s
-<Other>	Time		<Muut>
-Current time:	Time		Nykyinen aika:
-Try all servers	Time		Yritä kaikkia palvelimia
+GMT (UNIX compatible)	Time		Greenwichin aika (UNIX-yhteensopiva)
+Africa	Time		Afrikka
+Stop	Time		Pysäytä
 Time zone	Time		Aikavyöhyke
-Could not create socket	Time		Vastakkeen luominen epäonnistui
-Synchronize again	Time		Synkronoi uudelleen
 Clock	Time		Kello
 Network time	Time		Verkkoaika
+Sending request failed	Time		Pyynnön lähettäminen epäonnistui
+Preview time:	Time		Esikatseluaika:
+\nNow: 	Time		\nNyt: 
+Could not create socket	Time		Vastakkeen luominen epäonnistui
+Pacific	Time		Tyyni valtameri
 Atlantic	Time		Atlantin valtameri
+Show clock in Deskbar	Time		Näytä kello Työpöytäpalkissa
+Display time with seconds	Time		Näytä aika sekunteina
+Time	System name		Aika-asetukset
+about	Time		Ohjelmasta
+Show time zone	Time		Näytä aikavyöhyke
+Synchronize at boot	Time		Synkronoi käynnistyksen yhteydessä
+Indian	Time		Intia
+Revert	Time		Palauta
+Date and time	Time		Päivämäärä ja aika
+Synchronize	Time		Synkronoi
+Add	Time		Lisää

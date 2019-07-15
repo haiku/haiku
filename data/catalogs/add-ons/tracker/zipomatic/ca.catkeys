@@ -1,15 +1,15 @@
 1	catalan; valencian	x-vnd.haiku.zip-o-matic	1573273374
-Stop	file:ZipOMaticWindow.cpp		Atura
-Creating archive: %s	file:ZipOMaticWindow.cpp		S'està creant l'arxiu: %s
-Continue	file:ZipOMaticWindow.cpp		Continua
-Preparing to archive	file:ZipperThread.cpp		S'està preparant per arxivar-ho
 Drop files here.	file:ZipOMaticWindow.cpp		Deixeu anar els fitxers aquí.
 Filename: %s	file:ZipOMaticWindow.cpp		Nom del fitxer: %s
-Let them continue	file:ZipOMatic.cpp		Deixa que continuïn
 Do you want to stop them?	file:ZipOMatic.cpp		Voleu aturar-los?
+Error creating archive	file:ZipOMaticWindow.cpp		S'ha produït un error en crear l'arxiu
+Stop them	file:ZipOMatic.cpp		Atura'ls
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Esteu segur que no voleu generar aquest fitxer?
+Preparing to archive	file:ZipperThread.cpp		S'està preparant per arxivar-ho
+Let them continue	file:ZipOMatic.cpp		Deixa que continuïn
+Continue	file:ZipOMaticWindow.cpp		Continua
+Archive created OK	file:ZipOMaticWindow.cpp		L'arxiu s'ha generat correctament
+Stop	file:ZipOMaticWindow.cpp		Atura
 Stopped	file:ZipOMaticWindow.cpp		Aturat
 Archive	file:ZipperThread.cpp		Arxiva
-Error creating archive	file:ZipOMaticWindow.cpp		S'ha produït un error en crear l'arxiu
-Archive created OK	file:ZipOMaticWindow.cpp		L'arxiu s'ha generat correctament
-Stop them	file:ZipOMatic.cpp		Atura'ls
+Creating archive: %s	file:ZipOMaticWindow.cpp		S'està creant l'arxiu: %s

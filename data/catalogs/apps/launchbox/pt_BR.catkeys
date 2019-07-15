@@ -1,35 +1,35 @@
 1	portuguese (brazil)	x-vnd.Haiku-LaunchBox	3692177981
-New	LaunchBox		Novo
 Set description…	LaunchBox		Editar descrição...
-Vertical layout	LaunchBox		Layout vertical
-OK	LaunchBox		OK
-Pad 1	LaunchBox		Barra 1
-last chance	LaunchBox		última chance
-Quit	LaunchBox		Sair
-Open containing folder	LaunchBox		Abrir conteúdo da pasta
-Clear button	LaunchBox		Botão limpar
-LaunchBox	System name		LaunchBox
-Ignore double-click	LaunchBox		Ignorar clique duplo
-Auto-raise	LaunchBox		Auto sobrepor
-Show on all workspaces	LaunchBox		Mostrar em todos os espaços de trabalho
-Show window border	LaunchBox		Mostrar borda da janela
-Pad	LaunchBox		Barra
-Icon size	LaunchBox		Tamanho do ícone
-Bummer	LaunchBox		Bobão!
-Cancel	LaunchBox		Cancelar
-Remove button	LaunchBox		Remover botão
-Horizontal layout	LaunchBox		Orientação horizontal
-\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nFalhou ao lançar aplicação com assinatura '%2'.\n\nErro:
-Failed to launch '%1'.\n\nError:	LaunchBox		Falhou ao lançar '%1'.\n\nErro:
-Name Panel	LaunchBox		Nome do painel
-Add button here	LaunchBox		Adicionar botão aqui
-Description for '%3'	LaunchBox		Descrição para '%3'
-Settings	LaunchBox		Configurações
-Failed to launch 'something', error in Pad data.	LaunchBox		Falhou ao lançar 'algo', erro nos dados da Plataforma.
-Pad %1	LaunchBox		Plataforma %1
-Close	LaunchBox		Fechar
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Falha em enviar o comando 'open folder' para o Tracker.\n\nErro:
-You can drag an icon here.	LaunchBox		Você pode arrastar um ícone aqui.
-Clone	LaunchBox		Clonar
-launch popup	LaunchBox		lançar popup
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Deseja fechar esta barra?\n(A barra não será lembrada.)
+OK	LaunchBox		OK
+Ignore double-click	LaunchBox		Ignorar clique duplo
+Show on all workspaces	LaunchBox		Mostrar em todos os espaços de trabalho
+Name Panel	LaunchBox		Nome do painel
+Clone	LaunchBox		Clonar
+Description for '%3'	LaunchBox		Descrição para '%3'
+Show window border	LaunchBox		Mostrar borda da janela
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nFalhou ao lançar aplicação com assinatura '%2'.\n\nErro:
+Failed to launch 'something', error in Pad data.	LaunchBox		Falhou ao lançar 'algo', erro nos dados da Plataforma.
+LaunchBox	System name		LaunchBox
+Auto-raise	LaunchBox		Auto sobrepor
+Icon size	LaunchBox		Tamanho do ícone
+Open containing folder	LaunchBox		Abrir conteúdo da pasta
+Add button here	LaunchBox		Adicionar botão aqui
+Cancel	LaunchBox		Cancelar
+launch popup	LaunchBox		lançar popup
+Clear button	LaunchBox		Botão limpar
+Bummer	LaunchBox		Bobão!
+last chance	LaunchBox		última chance
+You can drag an icon here.	LaunchBox		Você pode arrastar um ícone aqui.
+Pad 1	LaunchBox		Barra 1
+Failed to launch '%1'.\n\nError:	LaunchBox		Falhou ao lançar '%1'.\n\nErro:
+Settings	LaunchBox		Configurações
+Vertical layout	LaunchBox		Layout vertical
+Pad	LaunchBox		Barra
+Close	LaunchBox		Fechar
+Remove button	LaunchBox		Remover botão
+Quit	LaunchBox		Sair
+Horizontal layout	LaunchBox		Orientação horizontal
+New	LaunchBox		Novo
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Falha em enviar o comando 'open folder' para o Tracker.\n\nErro:
+Pad %1	LaunchBox		Plataforma %1

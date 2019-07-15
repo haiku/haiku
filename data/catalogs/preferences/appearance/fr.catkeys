@@ -1,74 +1,73 @@
-1	french	x-vnd.Haiku-Appearance	2499598353
-Plain font:	Font view		Police simple :
-Control highlight	Colors tab		Mise en valeur de contrôle
+1	french	x-vnd.Haiku-Appearance	583615507
 Control border	Colors tab		Bordure des contrôles
-Antialiasing type:	AntialiasingSettingsView		Type de lissage :
-Shadow	Colors tab		Ombre
-On	AntialiasingSettingsView		Activé
-Defaults	APRWindow		Défaut
-Link hover	Colors tab		Lien survolé
-Grayscale	AntialiasingSettingsView		Niveaux de gris
-Shine	Colors tab		Lumière
-About	DecorSettingsView		À propos
-About decorator	DecorSettingsView		À propos du décorateur
+Control mark	Colors tab		Point de contrôle
 Off	AntialiasingSettingsView		Désactivé
-Link text	Colors tab		Texte du lien
-Link active	Colors tab		Lien actif
-Choose Decorator	DecorSettingsView		Choisir un décorateur
+Window border	Colors tab		Bordure de fenêtre
+Inactive window tab	Colors tab		Titres des fenêtres inactives
+Defaults	APRWindow		Défaut
+Shadow	Colors tab		Ombre
+Document background	Colors tab		Arrière plan du document
+List background	Colors tab		Arrière-plan de la liste
+Fixed font:	Font view		Police à chasse fixe :
+Appearance	System name		Apparence
+Reduce colored edges filter strength:	AntialiasingSettingsView		Intensité du filtre de réduction des bords de couleurs :
+Glyph hinting:	AntialiasingSettingsView		Consigne de glyphes :
+Menu item text	Colors tab		Texte des éléments de menu
+About decorator	DecorSettingsView		À propos du décorateur
+Antialiasing menu	AntialiasingSettingsView		Menu lissage
 Success	Colors tab		Réussite
-Inactive window tab text	Colors tab		Texte des titres de fenêtres inactives
+About	DecorSettingsView		À propos
+Shine	Colors tab		Lumière
+Arrow style	DecorSettingsView		Style de flèche
+On	AntialiasingSettingsView		Activé
+Decorator:	DecorSettingsView		Décorateur :
+Menu background	Colors tab		Arrière plan de menu
+Revert	APRWindow		Rétablir
+List item text	Colors tab		Texte de l’élément de la liste
+OK	DecorSettingsView		OK
+Control text	Colors tab		Texte des contrôles
+Look and feel	APRWindow		Aspect et comportement
+Selected menu item background	Colors tab		Arrière plan de l’élément sélectionnée dans le menu
+Link active	Colors tab		Lien actif
+Antialiasing	APRWindow		Lissage
+Menu font:	Font view		Police des menus :
+Bold font:	Font view		Caractères gras :
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAuteurs :\n\t%decorAuthors\n\nURL : %decorURL\nLicence : %decorLic\n\n%decorDesc\n
+Choose Decorator	DecorSettingsView		Choisir un décorateur
+Strong	AntialiasingSettingsView		Épais
 Failure	Colors tab		Échec
+Double:	DecorSettingsView		Double :
+Selected menu item text	Colors tab		Texte de l’élément sélectionné dans le menu
+Size:	Font Selection view		Taille :
+Panel background	Colors tab		Arrière plan des panneaux
+Plain font:	Font view		Police simple :
+Window tab text	Colors tab		Texte des titres de fenêtres
+Navigation pulse	Colors tab		Pulsation de navigation
+LCD subpixel	AntialiasingSettingsView		Sous-pixel LCD
+Window tab	Colors tab		Titre des fenêtres
+Link text	Colors tab		Texte du lien
+Tooltip background	Colors tab		Arrière plan des bulles d’aide
+Scroll bar thumb	Colors tab		Curseur de défilement
+Link visited	Colors tab		Lien visité
+Selected menu item border	Colors tab		Bordure de l’élément sélectionné dans le menu
+Tooltip text	Colors tab		Texte des bulles d’aide
+Control background	Colors tab		Arrière plan des contrôles
+Selected list item text	Colors tab		Texte de l’élément sélectionné dans la liste
+Selected list item background	Colors tab		Arrière plan de l’élément sélectionnée dans la liste
+Inactive window tab text	Colors tab		Texte des titres de fenêtres inactives
+Navigation base	Colors tab		Base de navigation
+Fonts	APRWindow		Polices
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Voix ambiguë d’un cœur qui au zéphyr préfère les jattes de kiwis. 0123456789
+Grayscale	AntialiasingSettingsView		Niveaux de gris
+Antialiasing type:	AntialiasingSettingsView		Type de lissage :
+Panel text	Colors tab		Texte des panneaux
 Hinting menu	AntialiasingSettingsView		Menu ajustement
 Scroll bar:	DecorSettingsView		Barre de défilement :
-Document background	Colors tab		Arrière plan du document
-Status bar	Colors tab		Barre d'état
-Revert	APRWindow		Rétablir
-Window tab	Colors tab		Titre des fenêtres
-Tooltip background	Colors tab		Arrière plan des bulles d’aide
-Selected menu item background	Colors tab		Arrière plan de l’élément sélectionnée dans le menu
-Antialiasing	APRWindow		Lissage
-Navigation base	Colors tab		Base de navigation
-Selected list item text	Colors tab		Texte de l’élément sélectionné dans la liste
-Window border	Colors tab		Bordure de fenêtre
-Double:	DecorSettingsView		Double :
-Window tab text	Colors tab		Texte des titres de fenêtres
-Document text	Colors tab		Texte du document
-Navigation pulse	Colors tab		Pulsation de navigation
-Selected menu item text	Colors tab		Texte de l’élément sélectionné dans le menu
-Menu background	Colors tab		Arrière plan de menu
-List background	Colors tab		Arrière-plan de la liste
-OK	DecorSettingsView		OK
-Control mark	Colors tab		Point de contrôle
-Size:	Font Selection view		Taille :
-Link visited	Colors tab		Lien visité
-Decorator:	DecorSettingsView		Décorateur :
-Selected list item background	Colors tab		Arrière plan de l’élément sélectionnée dans la liste
-Panel background	Colors tab		Arrière plan des panneaux
-Menu font:	Font view		Police des menus :
-Colors	APRWindow		Couleurs
-Control background	Colors tab		Arrière plan des contrôles
-Inactive window tab	Colors tab		Titres des fenêtres inactives
-List item text	Colors tab		Texte de l’élément de la liste
-Appearance	System name		Apparence
-Fixed font:	Font view		Police à chasse fixe :
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Voix ambiguë d’un cœur qui au zéphyr préfère les jattes de kiwis. 0123456789
-%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAuteurs :\n\t%decorAuthors\n\nURL : %decorURL\nLicence : %decorLic\n\n%decorDesc\n
-Reduce colored edges filter strength:	AntialiasingSettingsView		Intensité du filtre de réduction des bords de couleurs :
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Le lissage sous-pixel n’est pas disponible en même temps que les consignes de glyphes dans cette version d’Haiku afin d’éviter des problèmes de brevets logiciels. Pour activer cette fonctionnalité, vous devez compiler Haiku vous-même et activer certaines options dans l’en-tête de configuration de libfreetype.
-Scroll bar thumb	Colors tab		Curseur de défilement
-Control text	Colors tab		Texte des contrôles
-Single:	DecorSettingsView		Simple :
-Tooltip text	Colors tab		Texte des bulles d’aide
-Bold font:	Font view		Caractères gras :
-Inactive window border	Colors tab		Bordure de fenêtre inactive
-Menu item text	Colors tab		Texte des éléments de menu
-LCD subpixel	AntialiasingSettingsView		Sous-pixel LCD
-Selected menu item border	Colors tab		Bordure de l’élément sélectionné dans le menu
-Strong	AntialiasingSettingsView		Épais
-Panel text	Colors tab		Texte des panneaux
-Arrow style	DecorSettingsView		Style de flèche
 Monospaced fonts only	AntialiasingSettingsView		Seulement les polices à chasse fixe
-Look and feel	APRWindow		Aspect et comportement
-Antialiasing menu	AntialiasingSettingsView		Menu lissage
-Fonts	APRWindow		Polices
-Glyph hinting:	AntialiasingSettingsView		Consigne de glyphes :
+Document text	Colors tab		Texte du document
+Inactive window border	Colors tab		Bordure de fenêtre inactive
+Colors	APRWindow		Couleurs
+Control highlight	Colors tab		Mise en valeur de contrôle
+Status bar	Colors tab		Barre d'état
+Link hover	Colors tab		Lien survolé
+Single:	DecorSettingsView		Simple :

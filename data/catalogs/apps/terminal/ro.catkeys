@@ -1,116 +1,114 @@
-1	romanian	x-vnd.Haiku-Terminal	1269023683
-Not found.	Terminal TermWindow		Nu a fost găsit.
-Switch Terminals	Terminal TermWindow		Comută terminale
-Change directory	Terminal TermView		Modifică dosar
-Cursor	Terminal AppearancePrefView		Cursor
-Professional	Terminal colors scheme		Profesional
-OK	Terminal TermWindow		OK
-New Terminal	Terminal TermWindow		Terminal nou
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminalul nu a putut porni shell. Îmi pare rău.
-Match case	Terminal FindWindow		Potrivire caz
-Quit	Terminal TermWindow		Închidere
-Use default shell	Terminal Shell		Utilizează shell implicit
-Confirm exit if active programs exist	Terminal AppearancePrefView		Confirmă ieșirea dacă există programe active
-The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Tiparul care specifică titlul tabului curent. Următoarele marcaje\npot fi utilizate:\n
-Select all	Terminal TermWindow		Selectează tot
-Close tab	Terminal TermWindow		Închide tab
-Save to file…	Terminal PrefWindow		Salvează în fișier…
-Window title:	Terminal AppearancePrefView		Titlu fereastră:
-Font:	Terminal AppearancePrefView		Font:
-Copy here	Terminal TermView		Copiază aici
-Really close?	Terminal TermWindow		Sigur închideți?
-Copy	Terminal TermWindow		Copiază
-Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
-Color scheme:	Terminal AppearancePrefView		Schemă de culori:
-Window title:	Terminal TermWindow		Titlu fereastră:
-Unrecognized option \"%s\"\n	Terminal arguments parsing		Opțiune nerecunoscută \"%s\"\n
-Blue	Terminal colors scheme		Albastru
-Custom	Terminal colors scheme		Personalizat
-Encoding:	Terminal AppearancePrefView		Codare:
-%app% settings	Terminal PrefWindow	window title	%app% configurări
-Cancel	Terminal SetTitleWindow		Anulează
-Increase	Terminal TermWindow		Mărește
-Settings	Terminal TermWindow		Configurări
-Window size	Terminal TermWindow		Dimensiune fereastră
-Selected text	Terminal AppearancePrefView		Text selectat
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tDosarul curent de lucru al procesului active din\n\t\t\ttabul curent. Opțional numărul maxim de componente ale căii\n\t\t\tpoate fi specificat. E.g. '%2d' pentru cel mult două componente.\n\t%T\t-\tNumele aplicației Terminal pentru localizarea curentă.\n\t%e\t-\tCodarea tabului curent. Nu se afișează pentru UTF-8.\n\t%i\t-\tIndicele ferestrei.\n\t%p\t-\tNumele procesului activ din tabul curent.\n\t%t\t-\tTitlul tabului curent.
-Find	Terminal FindWindow		Găsește
-The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Modelul care specifică titlurile ferestrei. Următorii înlocuitori\npot fi utilizați:
-Appearance	Terminal PrefWindow		Aspect
-Tab title:	Terminal AppearancePrefView		Titlu tab:
-OK	Terminal SetTitleWindow		OK
-Background	Terminal AppearancePrefView		Fundal
-Use selection	Terminal FindWindow		Utilizează selecție
-The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Procesul \"%1\" încă rulează.\nDacă închideți tabul, procesul va fi oprit.
-Cannot execute \"%command\":\n\t%error	Terminal Shell		Nu se poate executa \"%command\":\n\t%error
-  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		  -h,     --help               printează acest ajutor\n  -t,     --title              configurează titlu fereastră\n  -f,     --fullscreen         pornește ecran complet\n
-Window title…	Terminal TermWindow		Titlu fereastră…
-Full screen	Terminal TermWindow		Pe tot ecranul
-Page setup…	Terminal TermWindow		Configurări pagină…
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Următoarele procese încă rulează:\n\n\t%1\n\nDacă închideți Terminalul, procesele vor fi oprite.
-Custom	Terminal AppearancePrefView	Window size	Personalizat
-Insert path	Terminal TermView		Inserează cale
-Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminal Haiku\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui și Takashi Murai.\n\nUtilizare: %s [OPTION] [SHELL]\n
-Window size:	Terminal AppearancePrefView		Dimensiune fereastră:
-No search string was entered.	Terminal TermWindow		Nu s-a introdus un șir de căutat.
-Font size	Terminal TermWindow		Dimensiune font
-Blinking cursor	Terminal AppearancePrefView		Cursor clipitor
-Set window title	Terminal TermWindow		Setează titlu fereastră
-Revert	Terminal PrefWindow		Revenire
-Terminal	System name		Terminal
-Copy path	Terminal TermView		Copiază calea
+1	romanian	x-vnd.Haiku-Terminal	722771482
 Close other tabs	Terminal TermWindow		Închide alte taburi
-Defaults	Terminal PrefWindow		Implicite
-Match word	Terminal FindWindow		Potrivire cuvânt
-Nothing is selected.	Terminal TermWindow		Nimic nu este selectat.
-Text not found.	Terminal TermWindow		Nu s-a găsit textul.
-Find…	Terminal TermWindow		Căutare…
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Procesul \"%1\" încă rulează.\nDacă închideți Terminalul, procesul va fi oprit.
-Move here	Terminal TermView		Mută aici
+Insert path	Terminal TermView		Inserează cale
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminalul nu a putut porni shell. Îmi pare rău.
+Text encoding	Terminal TermWindow		Codificare text
+OK	Terminal SetTitleWindow		OK
+Edit	Terminal TermWindow		Editează
+Select all	Terminal TermWindow		Selectează tot
+Confirm exit if active programs exist	Terminal AppearancePrefView		Confirmă ieșirea dacă există programe active
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tDosarul curent de lucru al procesului active din\n\t\t\ttabul curent. Opțional numărul maxim de componente ale căii\n\t\t\tpoate fi specificat. E.g. '%2d' pentru cel mult două componente.\n\t%T\t-\tNumele aplicației Terminal pentru localizarea curentă.\n\t%e\t-\tCodarea tabului curent. Nu se afișează pentru UTF-8.\n\t%i\t-\tIndicele ferestrei.\n\t%p\t-\tNumele procesului activ din tabul curent.\n\t%t\t-\tTitlul tabului curent.
+Solarized Dark	Terminal colors scheme		Întuneric solarizat
+Copy	Terminal TermWindow		Copiază
 Retro	Terminal colors scheme		Retro
-Error!	Terminal getString		Eroare!
-New tab	Terminal TermWindow		Tab nou
+Edit tab title…	Terminal TermWindow		Editează titlu tab…
+Print	Terminal TermWindow		Tipărește
+Settings	Terminal TermWindow		Configurări
+%app% settings	Terminal PrefWindow	window title	%app% configurări
+Use default	Terminal SetTitleWindow		Utilizează implicit
+Close tab	Terminal TermWindow		Închide tab
 Selected background	Terminal AppearancePrefView		Fundal selectat
-Slate	Terminal colors scheme		Tablă
-Text under cursor	Terminal AppearancePrefView		Text sub cursor
-Midnight	Terminal colors scheme		Miezul nopții
-Decrease	Terminal TermWindow		Micșorează
-Default	Terminal colors scheme		Implicit
+Error!	Terminal getString		Eroare!
+Set tab title	Terminal TermWindow		Setează titlu tab
+Appearance	Terminal PrefWindow		Aspect
+Encoding:	Terminal AppearancePrefView		Codare:
 Create link here	Terminal TermView		Creează legătură aici
+Custom	Terminal AppearancePrefView	Window size	Personalizat
+Selected text	Terminal AppearancePrefView		Text selectat
+Change directory	Terminal TermView		Modifică dosar
+Page setup…	Terminal TermWindow		Configurări pagină…
+Slate	Terminal colors scheme		Tablă
+Defaults	Terminal PrefWindow		Implicite
+Cancel	Terminal TermView		Anulează
+Revert	Terminal PrefWindow		Revenire
+Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
+Use selection	Terminal FindWindow		Utilizează selecție
+Find next	Terminal TermWindow		Găsește următorul
+Copy link location	Terminal TermView		Copiază locația legăturii
+Window title:	Terminal AppearancePrefView		Titlu fereastră:
+New tab	Terminal TermWindow		Tab nou
+Allow bold text	Terminal AppearancePrefView		Permite text aldin
+Window title…	Terminal TermWindow		Titlu fereastră…
+Blue	Terminal colors scheme		Albastru
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Nu se poate executa \"%command\":\n\t%error
+Open path	Terminal TermView		Deschide calea
+Terminal	System name		Terminal
+Font size	Terminal TermWindow		Dimensiune font
+Custom	Terminal colors scheme		Personalizat
+Really close?	Terminal TermWindow		Sigur închideți?
+OK	Terminal TermApp		OK
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Procesul \"%1\" încă rulează.\nDacă închideți Terminalul, procesul va fi oprit.
+Unrecognized option \"%s\"\n	Terminal arguments parsing		Opțiune nerecunoscută \"%s\"\n
+Tab title:	Terminal AppearancePrefView		Titlu tab:
+Text not found.	Terminal TermWindow		Nu s-a găsit textul.
+Find failed	Terminal TermWindow		Găsește eșuat
+Match word	Terminal FindWindow		Potrivire cuvânt
+Color scheme:	Terminal AppearancePrefView		Schemă de culori:
+New Terminal	Terminal TermWindow		Terminal nou
+Quit	Terminal TermWindow		Închidere
+Match case	Terminal FindWindow		Potrivire caz
+Find previous	Terminal TermWindow		Găsește precedent
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Modelul care specifică titlurile taburilor. Următorii înlocuitori\npot fi utilizați:
 Close	Terminal TermWindow		Închide
-Text	Terminal AppearancePrefView		Text
-Clear all	Terminal TermWindow		Eliberează tot
-Text encoding	Terminal TermWindow		Codificare text
-Allow bold text	Terminal AppearancePrefView		Permite text aldin
-Close window	Terminal TermWindow		Închide fereastră
+Save to file…	Terminal PrefWindow		Salvează în fișier…
+Background	Terminal AppearancePrefView		Fundal
+Copy path	Terminal TermView		Copiază calea
+Window size	Terminal TermWindow		Dimensiune fereastră
 Copy absolute path	Terminal TermView		Copiază calea absolută
-Save as default	Terminal TermWindow		Salvează ca implicit
-Set tab title	Terminal TermWindow		Setează titlu tab
-Settings…	Terminal TermWindow		Configurări…
-Abort	Terminal Shell		Renunță
-Open link	Terminal TermView		Deschide linkul
-Solarized Light	Terminal colors scheme		Lumină solarizată
-Edit	Terminal TermWindow		Editează
-Color:	Terminal AppearancePrefView		Culoare:
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Tiparul care specifică titlul ferestrei. Următoarele marcaje\npot fi utilizate:\n
-Print	Terminal TermWindow		Tipărește
-Use text:	Terminal FindWindow		Utilizează text:
 Cancel	Terminal TermWindow		Anulează
-OK	Terminal TermApp		OK
-Find failed	Terminal TermWindow		Găsește eșuat
-Search forward	Terminal FindWindow		Caută înainte
-Edit tab title…	Terminal TermWindow		Editează titlu tab…
-Open path	Terminal TermView		Deschide calea
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDosarul curent de lucru al procesului activ.\n\t\t\tOpțional numărul maxim de componente ale căii pot fi\n\t\t\tspecificate. E.g. '%2d' pentru cel mult două componente.\n\t%i\t-\tIndicele tabului.\n\t%e\t-\tCodarea tabului curent. Nu se afișează pentru UTF-8.\n\t%p\t-\tNumele procesului activ.\n\t%%\t-\tCaracterul '%'.
-Find previous	Terminal TermWindow		Găsește precedent
-Copy link location	Terminal TermView		Copiază locația legăturii
-Tab title:	Terminal TermWindow		Titlu tab:
-Find next	Terminal TermWindow		Găsește următorul
-Close active tab	Terminal TermWindow		Închide tabul activ
-\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tCaracterul '%'.\n\t%<\t-\tÎncepe o secțiune care va fi afișată doar dacă un substituent\n\t\t\tnu va fi după aceea liber.\n\t%>\t-\tÎncepe o secțiune care va fi afișată doar dacă un substituent\n\t\t\tîntre o secțiune precedentă %< și aceasta nu este liber.\n\t%-\t-\tTermină o secțiune %< sau %>.\n\nOrice caractere non-alfanumerice între '%' și litera de formatare vor insera doar un spațiu\ndacă valoarea substituentului nu este liberă. Va adăuga la secțiunea %<.
-Paste	Terminal TermWindow		Lipește
-Solarized Dark	Terminal colors scheme		Întuneric solarizat
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Procesul \"%1\" încă rulează.\nDacă închideți tabul, procesul va fi oprit.
+Cursor	Terminal AppearancePrefView		Cursor
+Full screen	Terminal TermWindow		Pe tot ecranul
 Shell 	Terminal TermWindow		Shell 
-Cancel	Terminal TermView		Anulează
-Use default	Terminal SetTitleWindow		Utilizează implicit
+Midnight	Terminal colors scheme		Miezul nopții
+\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tCaracterul '%'.\n\t%<\t-\tÎncepe o secțiune care va fi afișată doar dacă un substituent\n\t\t\tnu va fi după aceea liber.\n\t%>\t-\tÎncepe o secțiune care va fi afișată doar dacă un substituent\n\t\t\tîntre o secțiune precedentă %< și aceasta nu este liber.\n\t%-\t-\tTermină o secțiune %< sau %>.\n\nOrice caractere non-alfanumerice între '%' și litera de formatare vor insera doar un spațiu\ndacă valoarea substituentului nu este liberă. Va adăuga la secțiunea %<.
+Tab title:	Terminal TermWindow		Titlu tab:
+Window title:	Terminal TermWindow		Titlu fereastră:
+Default	Terminal colors scheme		Implicit
+Window size:	Terminal AppearancePrefView		Dimensiune fereastră:
+Switch Terminals	Terminal TermWindow		Comută terminale
+Decrease	Terminal TermWindow		Micșorează
+Settings…	Terminal TermWindow		Configurări…
+Cancel	Terminal SetTitleWindow		Anulează
+Blinking cursor	Terminal AppearancePrefView		Cursor clipitor
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Tiparul care specifică titlul ferestrei. Următoarele marcaje\npot fi utilizate:\n
+Use text:	Terminal FindWindow		Utilizează text:
+Close active tab	Terminal TermWindow		Închide tabul activ
+Save as default	Terminal TermWindow		Salvează ca implicit
+Nothing is selected.	Terminal TermWindow		Nimic nu este selectat.
+Find	Terminal FindWindow		Găsește
+The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Tiparul care specifică titlul tabului curent. Următoarele marcaje\npot fi utilizate:\n
+Professional	Terminal colors scheme		Profesional
+Font:	Terminal AppearancePrefView		Font:
+Paste	Terminal TermWindow		Lipește
+The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Modelul care specifică titlurile ferestrei. Următorii înlocuitori\npot fi utilizați:
+Copy here	Terminal TermView		Copiază aici
+Use default shell	Terminal Shell		Utilizează shell implicit
+Color:	Terminal AppearancePrefView		Culoare:
+Open link	Terminal TermView		Deschide linkul
+Text	Terminal AppearancePrefView		Text
+Not found.	Terminal TermWindow		Nu a fost găsit.
+Find…	Terminal TermWindow		Căutare…
+No search string was entered.	Terminal TermWindow		Nu s-a introdus un șir de căutat.
+Text under cursor	Terminal AppearancePrefView		Text sub cursor
+Move here	Terminal TermView		Mută aici
+Abort	Terminal Shell		Renunță
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDosarul curent de lucru al procesului activ.\n\t\t\tOpțional numărul maxim de componente ale căii pot fi\n\t\t\tspecificate. E.g. '%2d' pentru cel mult două componente.\n\t%i\t-\tIndicele tabului.\n\t%e\t-\tCodarea tabului curent. Nu se afișează pentru UTF-8.\n\t%p\t-\tNumele procesului activ.\n\t%%\t-\tCaracterul '%'.
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Următoarele procese încă rulează:\n\n\t%1\n\nDacă închideți Terminalul, procesele vor fi oprite.
+Set window title	Terminal TermWindow		Setează titlu fereastră
+Increase	Terminal TermWindow		Mărește
+OK	Terminal TermWindow		OK
+Close window	Terminal TermWindow		Închide fereastră
+Solarized Light	Terminal colors scheme		Lumină solarizată
+Clear all	Terminal TermWindow		Eliberează tot
+Search forward	Terminal FindWindow		Caută înainte

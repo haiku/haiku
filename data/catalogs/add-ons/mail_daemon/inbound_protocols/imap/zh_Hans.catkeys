@@ -1,14 +1,12 @@
-1	english	x-vnd.Haiku-IMAP	478742289
-Destination:	imap_config		目标位置：
-SSL	imap_config		SSL
-Ok	IMAPFolderConfig		确定
-status	IMAPFolderConfig		状态
-Configure IMAP Folders	imap_config		配置 IMAP 目录
-Cancel	IMAPFolderConfig		取消
-No encryption	imap_config		无加密
-Apply	IMAPFolderConfig		应用
-Fetching IMAP folders, have patience...	IMAPFolderConfig		获取 IMAP 目录，请耐心等待...
+1	english	x-vnd.Haiku-IMAP	3072419505
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		无法连接服务器 \"%server%\":\n%error%
-IMAP Folders	IMAPFolderConfig		IMAP 目录
-Update subcription of IMAP folders, have patience...	IMAPFolderConfig		更新 IMAP 目录订阅，请耐心等待...
 Failed to fetch available storage.	IMAPFolderConfig		获取可用存储失败
+Cancel	IMAPFolderConfig		取消
+Ok	IMAPFolderConfig		确定
+No encryption	imap_config		无加密
+Configure IMAP Folders	imap_config		配置 IMAP 目录
+SSL	imap_config		SSL
+Apply	IMAPFolderConfig		应用
+status	IMAPFolderConfig		状态
+IMAP Folders	IMAPFolderConfig		IMAP 目录
+Destination:	imap_config		目标位置：

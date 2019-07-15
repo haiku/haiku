@@ -1,8 +1,8 @@
 1	indonesian	x-vnd.Haiku-FirstBootPrompt	2649051796
 Custom	BootPromptWindow		Gubahan
-Boot to Desktop	BootPromptWindow		Boot ke Desktop
 Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Terima kasih sudah mencoba Haiku! Kami harap anda menyukainya!\n\nAnda dapat memilih tata bahasa dan tata letak keyboard pilihan dari daftar di sebelah kiri yang kemudian akan digunakan secara instan. Anda dapat dengan mudah mengubah kedua pengaturan dari Desktop nanti dengan cepat.\n\nApakah Anda ingin menjalankan Installer atau melanjutkan boot ke Desktop?\n
-Language	BootPromptWindow		Bahasa
-Welcome to Haiku!	BootPromptWindow		Selamat datang di Haiku!
-Run Installer	BootPromptWindow		Jalankan Installer
+Boot to Desktop	BootPromptWindow		Boot ke Desktop
 Keymap	BootPromptWindow		Keymap
+Welcome to Haiku!	BootPromptWindow		Selamat datang di Haiku!
+Language	BootPromptWindow		Bahasa
+Run Installer	BootPromptWindow		Jalankan Installer

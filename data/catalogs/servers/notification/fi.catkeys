@@ -1,5 +1,5 @@
 1	finnish	x-vnd.Haiku-notification_server	2022780929
 Warning	NotificationWindow		Varoitus
+Notification	NotificationWindow		Ilmoitus
 OK	NotificationWindow		Valmis
 Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Yleisasetusten valvonnan käynnistäminen epäonnistui.\nAjantasainen suodatin otettiin pois käytöstä.
-Notification	NotificationWindow		Ilmoitus

@@ -1,40 +1,40 @@
 1	dutch; flemish	x-vnd.Haiku-Shortcuts	372053878
-OK	ShortcutsWindow		Oké
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Sneltoetsen was niet in staat om uw toetsencombinatie op te slaan.
-Cancel	ShortcutsWindow		Annuleren
-Append KeySet…	ShortcutsWindow		Toevoegen toetsencombinatie...
-Control	ShortcutsSpec	Name for modifier on keyboard	Control
-Key	ShortcutsWindow		Toets
-Open KeySet…	ShortcutsWindow		Openen toetsencombinatie...
-Error, NULL state description?	ShortcutsSpec		Fout, NULL-statusbeschrijving?
-Revert to saved	ShortcutsWindow		Herstellen naar opgeslagen data
-*InsertString \"Your Text Here\"	ShortcutsWindow		*VoegTekstIn \"Uw Tekst Hier\"
 *MouseUp	ShortcutsWindow		*MuisOmhoog
-(Choose application with file requester)	ShortcutsWindow		(Kies een toepassing met een bestandskiezer)
-*LaunchHandler text/html	ShortcutsWindow		*StartAfhandelaar text/html
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Sneltoetsen kon uw toetsencombinatiebestand niet openen!
-*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Meerdere \"*VerplaatsMuisNaar 100% 0\" \"*MuisKnop 1\"
-Save	ShortcutsWindow		Opslaan
-*MouseButton 1	ShortcutsWindow		*Muisknop 1
-*MoveMouse +20 +0	ShortcutsWindow		*VerplaatsMuis +20 +0
-Save changes before closing?	ShortcutsWindow		Wijzigingen opslaan alvorens te sluiten?
-Remove selected shortcut	ShortcutsWindow		Geselecteerde sneltoets verwijderen
-Add new shortcut	ShortcutsWindow		Nieuwe sneltoets toevoegen
-Save & apply	ShortcutsWindow		Opslaan & toepassen
-*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*VerzendBericht toepassing/x-vnd.Be-TRAK 'Tfnd'
-Append	ShortcutsWindow		Toevoegen
-File	ShortcutsWindow		Bestand
-Quit	ShortcutsWindow		Afsluiten
-*MouseDown	ShortcutsWindow		*MuisNeer
-Don't save	ShortcutsWindow		Niet opslaan
 Application	ShortcutsWindow		Toepassing
-Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Save changes before closing?	ShortcutsWindow		Wijzigingen opslaan alvorens te sluiten?
+Revert to saved	ShortcutsWindow		Herstellen naar opgeslagen data
+Don't save	ShortcutsWindow		Niet opslaan
+*MouseDown	ShortcutsWindow		*MuisNeer
 *Beep	ShortcutsWindow		*Piep
-*MoveMouseTo 50% 50%	ShortcutsWindow		*VerplaatsMuisNaar 50% 50%
-Save KeySet as…	ShortcutsWindow		Toetsencombinatie opslaan als...
-Open	ShortcutsWindow		Openen
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Sneltoetsen was niet in staat om uw toetsencombinatiebestand te lezen!
-Select	ShortcutsWindow		Selecteren
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Sneltoetsen was niet in staat om uw toetsencombinatiebestand op te slaan!
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Sneltoetsen was niet in staat om uw toetsencombinatie op te slaan.
+Save	ShortcutsWindow		Opslaan
 Oh no	ShortcutsWindow		Oh nee
+Key	ShortcutsWindow		Toets
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*VerzendBericht toepassing/x-vnd.Be-TRAK 'Tfnd'
+Select	ShortcutsWindow		Selecteren
 Shortcuts	System name		Snelkoppelingen
+Quit	ShortcutsWindow		Afsluiten
+(Choose application with file requester)	ShortcutsWindow		(Kies een toepassing met een bestandskiezer)
+Cancel	ShortcutsWindow		Annuleren
+*MoveMouse +20 +0	ShortcutsWindow		*VerplaatsMuis +20 +0
+Control	ShortcutsSpec	Name for modifier on keyboard	Control
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Sneltoetsen was niet in staat om uw toetsencombinatiebestand te lezen!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Sneltoetsen was niet in staat om uw toetsencombinatiebestand op te slaan!
+*InsertString \"Your Text Here\"	ShortcutsWindow		*VoegTekstIn \"Uw Tekst Hier\"
+Remove selected shortcut	ShortcutsWindow		Geselecteerde sneltoets verwijderen
+Error, NULL state description?	ShortcutsSpec		Fout, NULL-statusbeschrijving?
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Sneltoetsen kon uw toetsencombinatiebestand niet openen!
+Save & apply	ShortcutsWindow		Opslaan & toepassen
+Open	ShortcutsWindow		Openen
+Append	ShortcutsWindow		Toevoegen
+Save KeySet as…	ShortcutsWindow		Toetsencombinatie opslaan als...
+Append KeySet…	ShortcutsWindow		Toevoegen toetsencombinatie...
+*MouseButton 1	ShortcutsWindow		*Muisknop 1
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Meerdere \"*VerplaatsMuisNaar 100% 0\" \"*MuisKnop 1\"
+OK	ShortcutsWindow		Oké
+Add new shortcut	ShortcutsWindow		Nieuwe sneltoets toevoegen
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Open KeySet…	ShortcutsWindow		Openen toetsencombinatie...
+File	ShortcutsWindow		Bestand
+*LaunchHandler text/html	ShortcutsWindow		*StartAfhandelaar text/html
+*MoveMouseTo 50% 50%	ShortcutsWindow		*VerplaatsMuisNaar 50% 50%

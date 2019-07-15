@@ -1,38 +1,38 @@
 1	finnish	x-vnd.Haiku-libsolvsolver	3404387783
-%dependency% is provided by the system	SolverProblem		järjestelmä tarjoaa riippuvuuden %dependency%
-package %source% conflicts with %dependency% provided by %target%	SolverProblem		pakkauksessa %source% on ristiriita riippuvuuteen %dependency%, jonka %target% tarjoaa
-nothing provides requested %dependency%	SolverProblem		mikään ei tarjoa pyydettyä riippuvuutta %dependency%
-unspecified problem	SolverProblem		määrittelemätön pulma
-keep %source% despite its inferior architecture	SolverProblemSolution		pidä %source% huolimatta sen ala-arvoisesta arkkitehtuurista
-do not deinstall \"%selection%\"	SolverProblemSolution		älä asenna valintaa ”%selection%” uudelleen
-%source% has inferior architecture	SolverProblem		lähteen %source% arkkitehtuuri on ala-arvoinen
-dependency problem	SolverProblem		riippuvuuspulma
-do not keep %source% installed	SolverProblemSolution		älä pidä lähdettä %source% asennettuna
-package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		pakkaus %source% vanhentaa epäsuorasti riippuvuuden %dependency%, jonka kohde %target% tarjoaa
-do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		älä asenna uudestaan kaikkia uudelleen ratkaistavissa olevia ”%selection%”-valintoja
-keep %source% from excluded repository	SolverProblemSolution		pidä %source% poistetusta tietovarastosta
-install %selection% despite its old version	SolverProblemSolution		asenna %selection%, vaikka versio on vanha
-allow downgrade of %source% to %target%	SolverProblemSolution		salli lähteen %source% version alentaminen kohteelle %target%
-do not lock \"%selection%\"	SolverProblemSolution		älä lukitse valintaa ”%selection%”
-install %source% despite its inferior architecture	SolverProblemSolution		asenna %source%, vaikka sen arkkitehtuuri on ala-arvoinen
-do not install \"%selection%\"	SolverProblemSolution		älä asenna valintaa ”%selection%”
-do something	SolverProblemSolution		tee jotain
-do not install the most recent version of \"%selection%\"	SolverProblemSolution		älä asenna valinnan ”%selection%” viimeisintä versiota
-package %source% conflicts with %dependency% provided by itself	SolverProblem		pakkaus %source% on ristiriidassa sen itsensä tarjoaman riippuvuuden %dependency% kanssa
-cannot install both %source% and %target%	SolverProblem		sekä lähteen %source% että kohteen %target% asennus epäonnistui
-allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		salli myyjämuutos lähteestä ”%sourceVendor%” (%source%) kohteeksi ”%targetVendor%” (%target%)
-install %source% from excluded repository	SolverProblemSolution		asenna %source% poistetusta tietovarastosta
-keep old %source%	SolverProblemSolution		pidä vanha %source% -lähde
-conflicting requests	SolverProblem		ristiriitaiset pyynnöt
-package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		pakkaus %source% vaatii riippuvuuden %dependency%, mutta yhtään tarjoajaa ei ole asennettu
-do not forbid installation of %source%	SolverProblemSolution		älä kiellä lähteen %source% asennusta
 allow architecture change of %source% to %target%	SolverProblemSolution		salli lähteen %source% arkkitehtuurimuutos kohteelle %target%
-allow name change of %source% to %target%	SolverProblemSolution		salli lähteen %source% nimenmuutos kohteelle %target%
+install %source% from excluded repository	SolverProblemSolution		asenna %source% poistetusta tietovarastosta
+unspecified problem	SolverProblem		määrittelemätön pulma
+package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		pakkaus %source% vaatii riippuvuuden %dependency%, mutta yhtään tarjoajaa ei ole asennettu
+package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		pakkaus %source% vanhentaa epäsuorasti riippuvuuden %dependency%, jonka kohde %target% tarjoaa
+nothing provides requested %dependency%	SolverProblem		mikään ei tarjoa pyydettyä riippuvuutta %dependency%
+do not keep %source% installed	SolverProblemSolution		älä pidä lähdettä %source% asennettuna
+do not deinstall \"%selection%\"	SolverProblemSolution		älä asenna valintaa ”%selection%” uudelleen
+install %source% despite its inferior architecture	SolverProblemSolution		asenna %source%, vaikka sen arkkitehtuuri on ala-arvoinen
+conflicting requests	SolverProblem		ristiriitaiset pyynnöt
+do not install the most recent version of \"%selection%\"	SolverProblemSolution		älä asenna valinnan ”%selection%” viimeisintä versiota
 allow replacement of %source% with %target%	SolverProblemSolution		salli lähteen %source% korvaus kohteella %target%
-allow deinstallation of %source%	SolverProblemSolution		salli kohteen %source% uudelleenasennus
-%source% does not belong to a distupgrade repository	SolverProblem		%source% ei kuulu jakeluversion päivitystietovarastoon
 package %source% obsoletes %dependency% provided by %target%	SolverProblem		pakkaus %source% tekee vanhentuneeksi riippuvuuden %dependency%, jonka %target% tarjosi
-package %source% is not installable	SolverProblem		pakkaus %source% ei ole asennettavissa
+do not forbid installation of %source%	SolverProblemSolution		älä kiellä lähteen %source% asennusta
+allow downgrade of %source% to %target%	SolverProblemSolution		salli lähteen %source% version alentaminen kohteelle %target%
+dependency problem	SolverProblem		riippuvuuspulma
+%dependency% is provided by the system	SolverProblem		järjestelmä tarjoaa riippuvuuden %dependency%
+keep %source% despite its inferior architecture	SolverProblemSolution		pidä %source% huolimatta sen ala-arvoisesta arkkitehtuurista
+%source% does not belong to a distupgrade repository	SolverProblem		%source% ei kuulu jakeluversion päivitystietovarastoon
 installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		asennettu pakkaus %source% tekee vanhentuneeksi riippuvuuden %dependency%, jonka %target% tarjosi
+allow name change of %source% to %target%	SolverProblemSolution		salli lähteen %source% nimenmuutos kohteelle %target%
+package %source% conflicts with %dependency% provided by %target%	SolverProblem		pakkauksessa %source% on ristiriita riippuvuuteen %dependency%, jonka %target% tarjoaa
+do something	SolverProblemSolution		tee jotain
+install %selection% despite its old version	SolverProblemSolution		asenna %selection%, vaikka versio on vanha
+cannot install both %source% and %target%	SolverProblem		sekä lähteen %source% että kohteen %target% asennus epäonnistui
+package %source% is not installable	SolverProblem		pakkaus %source% ei ole asennettavissa
 problem with installed package %source%	SolverProblem		pulma asennetussa pakkauksessa %source%
+allow deinstallation of %source%	SolverProblemSolution		salli kohteen %source% uudelleenasennus
+keep %source% from excluded repository	SolverProblemSolution		pidä %source% poistetusta tietovarastosta
+keep old %source%	SolverProblemSolution		pidä vanha %source% -lähde
+package %source% conflicts with %dependency% provided by itself	SolverProblem		pakkaus %source% on ristiriidassa sen itsensä tarjoaman riippuvuuden %dependency% kanssa
+allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		salli myyjämuutos lähteestä ”%sourceVendor%” (%source%) kohteeksi ”%targetVendor%” (%target%)
+do not lock \"%selection%\"	SolverProblemSolution		älä lukitse valintaa ”%selection%”
+do not install \"%selection%\"	SolverProblemSolution		älä asenna valintaa ”%selection%”
 nothing provides %dependency% needed by %source%	SolverProblem		mikään ei tarjoa riippuvuutta %dependency%, jota %source% tarvitsee
+%source% has inferior architecture	SolverProblem		lähteen %source% arkkitehtuuri on ala-arvoinen
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		älä asenna uudestaan kaikkia uudelleen ratkaistavissa olevia ”%selection%”-valintoja

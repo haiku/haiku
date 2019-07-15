@@ -1,17 +1,16 @@
-1	ukrainian	x-vnd.Haiku-MatchHeader	548057976
+1	ukrainian	x-vnd.Haiku-MatchHeader	3544711400
+Delete message	ConfigView		Видалити повідомлення
+Match \"%attribute\" against \"%regex\"	RuleFilter		Узгодити \"%attribute\" знову \"%regex\"
+Match header	RuleFilter		Узгодити заголовок
+Set flags to	ConfigView		Встановити прапори до
+<Choose account>	ConfigView		<Вибрати обліковий запис>
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Маска, наприклад, \"*spam*\".\nПриставка з\"REGEX:\" у випадку вживання регулярних виразів.
+Then	ConfigView		Тоді
+If	ConfigView		Якщо
+Set as read	ConfigView		Позначити як прочитані
+Reply with	ConfigView		Відповісти з
 <Choose action>	ConfigView		<Вибрати дію>
-Header field (e.g. Subject, From, ...)	ConfigView		Поле заголовка (наприклад Тема, Від, ...)
+Move to	ConfigView		Перемістити до
+this field is based on the action	ConfigView		це поле базується на дії
 Account	ConfigView		Обліковий запис
 has	ConfigView		має
-Move to	ConfigView		Перемістити до
-Then	ConfigView		Тоді
-this field is based on the action	ConfigView		це поле базується на дії
-Delete message	ConfigView		Видалити повідомлення
-<Choose account>	ConfigView		<Вибрати обліковий запис>
-Set flags to	ConfigView		Встановити прапори до
-Set as read	ConfigView		Позначити як прочитані
-Match header	RuleFilter		Узгодити заголовок
-Reply with	ConfigView		Відповісти з
-If	ConfigView		Якщо
-Match \"%attribute\" against \"%regex\"	RuleFilter		Узгодити \"%attribute\" знову \"%regex\"
-Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Маска, наприклад, \"*spam*\".\nПриставка з\"REGEX:\" у випадку вживання регулярних виразів.

@@ -1,45 +1,34 @@
-1	lithuanian	x-vnd.Haiku-HaikuDepot	1426156857
+1	lithuanian	x-vnd.Haiku-HaikuDepot	428608888
+Uninstall	PackageManager		Išdiegti
+(%Votes%)	FeaturedPackagesView		(%Votes%)
+Uninstalled	PackageListView		Išdiegti
+Rate package…	PackageInfoView		Įvertinti paketą…
+<no info>	PackageInfoView		<informacijos nėra>
+No user ratings available.	PackageInfoView		Naudotojų įvertinimų nėra.
+Rating	PackageListView		Įvertinimas
+Active	PackageListView		Aktyvus
+Ratings	PackageInfoView		Įvertinimai
 Name	PackageListView		Pavadinimas
-Close	RatePackageWindow		Užverti
-Changelog	PackageInfoView		Pakeitimų žurnalas
-Click a package to view information	PackageInfoView		Spustelėkite paketą jo informacijai pamatyti
+Fatal error	PackageManager		Kritinė klaida
 No changelog available.	PackageInfoView		Pakeitimų žurnalas neprieinamas.
+Available	PackageListView		Prieinamas
+Click a package to view information	PackageInfoView		Spustelėkite paketą jo informacijai pamatyti
+Close	PackageManager		Užverti
+Changelog	PackageInfoView		Pakeitimų žurnalas
+About	PackageInfoView		Apie
+Send	RatePackageWindow		Siųsti
+Inactive	PackageListView		Neaktyvus
+Downloading:	PackageInfoView		Parsiunčiamas:
+(%Votes%)	PackageInfoView		(%Votes%)
+Close	UserLoginWindow		Užverti
+Close	RatePackageWindow		Užverti
+n/a	PackageInfoView		n/d
+Tools	MainWindow		Priemonės
+Status	PackageListView		Būsena
+Unknown	PackageListView		Nežinoma
+HaikuDepot	System name		Paketų tvarkytuvė
+Search terms:	FilterView		Ieškomi žodžiai:
+Pending…	PackageListView		Laukiama…
 Description	PackageListView		Aprašas
 Install	PackageManager		Įdiegti
-Tools	MainWindow		Priemonės
-HaikuDepot	System name		Paketų tvarkytuvė
-Close	UserLoginWindow		Užverti
-Rate package…	PackageInfoView		Įvertinti paketą…
-Uninstall	PackageManager		Išdiegti
-<no info>	PackageInfoView		<informacijos nėra>
-An error occurred while initializing the package manager: %message%	MainWindow		Inicijuojant paketų tvarkytuvę, įvyko klaida: %message%
-Close	PackageManager		Užverti
-Status	PackageListView		Būsena
-Development	Model		Programuotojams
-Fatal error	PackageManager		Kritinė klaida
-Ratings	PackageInfoView		Įvertinimai
-Inactive	PackageListView		Neaktyvus
-(%Votes%)	PackageInfoView		(%Votes%)
-Downloading:	PackageInfoView		Parsiunčiamas:
-Search terms:	FilterView		Ieškomi žodžiai:
 %Version%	PackageInfoView		%Version%
-No user ratings available.	PackageInfoView		Naudotojų įvertinimų nėra.
-An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Atnaujinant saugyklos turinį, įvyko klaida: %error% (%details%)
-Productivity	Model		Raštinė
-Games	Model		Žaidimai
-Rating	PackageListView		Įvertinimas
-(%Votes%)	FeaturedPackagesView		(%Votes%)
-Graphics	Model		Grafika
-Local	MainWindow		Vietinis
-Close	MainWindow		Užverti
-Video	Model		Video
-An error occurred while refreshing the repository: %error%	MainWindow		Atnaujinant saugyklos turinį, įvyko klaida: %error%
-Pending…	PackageListView		Laukiama…
-Uninstalled	PackageListView		Išdiegti
-Unknown	PackageListView		Nežinoma
-Available	PackageListView		Prieinamas
-n/a	PackageInfoView		n/d
-Send	RatePackageWindow		Siųsti
-Audio	Model		Audio
-About	PackageInfoView		Apie
-Active	PackageListView		Aktyvus

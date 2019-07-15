@@ -1,5 +1,5 @@
 1	catalan; valencian	x-vnd.Haiku-ProcessController	159968082
 Your setting file could not be saved!\n(%s)	ProcessController		o ha estat possible desar les vostres preferències!\n(%s)
-Cancel	ProcessController		Anul·la
-Ok!	ProcessController		D'acord!
 OK	ProcessController		D'acord
+Ok!	ProcessController		D'acord!
+Cancel	ProcessController		Anul·la

@@ -1,20 +1,20 @@
 1	spanish; castilian	x-vnd.Haiku-Touchpad	607725922
 Scrolling	TouchpadPrefView		Desplazamiento
-Touchpad	System name		Touchpad
-Revert	TouchpadPrefView		Revertir
 Tapping	TouchpadPrefView		Golpeando
-Please confirm	TouchpadPrefView		Por favor, Confime
-Two finger scrolling	TouchpadPrefView		Desplazamiento con dos dedos
-Defaults	TouchpadPrefView		Valores predeterminados
-Slow	TouchpadPrefView		Lento
-Vertical	TouchpadPrefView		Vertical
-High	TouchpadPrefView		Alta
-Horizontal scrolling	TouchpadPrefView		Desplazamiento Horizontal
-Fast	TouchpadPrefView		Rápido
-OK	TouchpadPrefView		Aceptar
-Acceleration	TouchpadPrefView		Aceleración
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		El nuevo área de scroll es demasiado larga y puede impedir la operación normal del mouse. ¿Realmente quiere cambiarlo?
-Horizontal	TouchpadPrefView		Horizontal
-Off	TouchpadPrefView		Desactivado
-Sensitivity	TouchpadPrefView		Sensibilidad
+Touchpad	System name		Touchpad
 Cancel	TouchpadPrefView		Cancelar
+OK	TouchpadPrefView		Aceptar
+Horizontal scrolling	TouchpadPrefView		Desplazamiento Horizontal
+Slow	TouchpadPrefView		Lento
+Two finger scrolling	TouchpadPrefView		Desplazamiento con dos dedos
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		El nuevo área de scroll es demasiado larga y puede impedir la operación normal del mouse. ¿Realmente quiere cambiarlo?
+Defaults	TouchpadPrefView		Valores predeterminados
+High	TouchpadPrefView		Alta
+Off	TouchpadPrefView		Desactivado
+Fast	TouchpadPrefView		Rápido
+Vertical	TouchpadPrefView		Vertical
+Please confirm	TouchpadPrefView		Por favor, Confime
+Acceleration	TouchpadPrefView		Aceleración
+Horizontal	TouchpadPrefView		Horizontal
+Sensitivity	TouchpadPrefView		Sensibilidad
+Revert	TouchpadPrefView		Revertir

@@ -1,50 +1,50 @@
 1	portuguese (brazil)	x-vnd.Be-PEPL	2332202134
-Edit	People		Editar
-Error	People		Erro
-City	People		Cidade
-The file '%name%' could not be written.	People		O arquivo '%name%' não pôde ser gravado.
-none	Groups list		nenhum
-Configure attributes	People		Configurar atributos
-Company	People		Empresa
-%name% picture	People		%name% picture
-Work phone	People		Fone comercial
-People	System name		Pessoas
-New person	People		Nova pessoa
-Select all	People		Selecionar tudo
-File	People		Arquivo
-Unnamed person	People		pessoa não nomeada
-Could not create %s.	People		Não foi possível criar %s.
-Country	People		País
-Close	People		Fechar
-Group	People		Grupo
-Nickname	People		Apelido
-Quit	People		Sair
-Name	People		Nome
-Revert	People		Reverter
-Don't save	People		Não salvar
-Undo	People		Desfazer
-E-mail	People		E-mail
-Load image…	People		Carregar imagem…
-OK	People		OK
-Remove image	People		Remover imagem
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Lançamento do preflet FileTypes para configurar atributos de Pessoa falhou.\n\nErro: 
-Home phone	People		Fone residencial
-Save as…	People		Salvar como...
-Redo	People		Refazer
-Save changes before closing?	People		Salvar mudanças antes de fechar?
-Paste	People		Colar
-Drop an image here,\nor use the contextual menu.	People		Solte uma imagem aqui,\nou use o menu de contexto.
-Save	People		Salvar
-Person	Short mimetype description		Pessoa
+Unnamed person	People		pessoa não nomeada
 New person…	People		Nova pessoa...
 Address	People		Endereço
-URL	People		URL
-Sorry	People		Desculpe
 Zip	People		CEP
-Contact information for a person.	Long mimetype description		Informação de contato de uma pessoa
-Fax	People		Fax
+Select all	People		Selecionar tudo
+Could not create %s.	People		Não foi possível criar %s.
+Quit	People		Sair
+Company	People		Empresa
+Name	People		Nome
+The file '%name%' could not be written.	People		O arquivo '%name%' não pôde ser gravado.
 Contact name	People		Nome do contato
-Cut	People		Recortar
 Cancel	People		Cancelar
+Edit	People		Editar
+Save changes before closing?	People		Salvar mudanças antes de fechar?
+People	System name		Pessoas
+Error	People		Erro
+Revert	People		Reverter
+Country	People		País
+Person	Short mimetype description		Pessoa
+New person	People		Nova pessoa
+Save	People		Salvar
+Fax	People		Fax
+URL	People		URL
+%name% picture	People		%name% picture
+Home phone	People		Fone residencial
+none	Groups list		nenhum
+Save as…	People		Salvar como...
+Cut	People		Recortar
+Contact information for a person.	Long mimetype description		Informação de contato de uma pessoa
+Remove image	People		Remover imagem
+City	People		Cidade
+Undo	People		Desfazer
+Don't save	People		Não salvar
+Configure attributes	People		Configurar atributos
+Work phone	People		Fone comercial
 State	People		Estado
+Nickname	People		Apelido
+OK	People		OK
+File	People		Arquivo
+Redo	People		Refazer
+Close	People		Fechar
 Copy	People		Copiar
+Paste	People		Colar
+E-mail	People		E-mail
+Group	People		Grupo
+Drop an image here,\nor use the contextual menu.	People		Solte uma imagem aqui,\nou use o menu de contexto.
+Load image…	People		Carregar imagem…
+Sorry	People		Desculpe

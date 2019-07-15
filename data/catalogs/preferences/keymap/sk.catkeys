@@ -1,58 +1,58 @@
 1	slovak	x-vnd.Haiku-Keymap	1385051534
-Shift:	Modifier keys window	Shift key role name	Posun:
-Revert	Modifier keys window		Vrátiť
-Warning: left and right key roles do not match	Modifier keys window		Upozornenie: role ľavého a pravého klávesu sa líšia
-Scroll lock	Keyboard Layout View		Scroll Lock
-Menu	Keyboard Layout View	Menu key	Menu
-Left control	Keyboard Layout View		Ľavý control
-Tilde trigger	Keymap window		Spúšťač tilda
-Grave trigger	Keymap window		Spúšťač apostrof
-Role	Modifier keys window	As in the role of a modifier key	Úloha
-Caps lock	Keyboard Layout View		Caps Lock
-Select dead keys	Keymap window		Vyberte mŕtve klávesy
-Cancel	Modifier keys window		Zrušiť
-Command	Keyboard Layout View	Command key	Príkaz
-Defaults	Keymap window		Predvolené
-Quit	Keymap window		Ukončiť
-Switch shortcut keys to Haiku mode	Keymap window		Vymeniť skratkové klávesy na režim Haiku
-Circumflex trigger	Keymap window		Spúšťač vokáň
-Diaeresis trigger	Keymap window		Spúšťač rozluky
-Disabled	Modifier keys window	Do nothing	Vypnuté
-Open…	Keymap window		Otvoriť…
-Error: duplicate keys	Modifier keys window		Chyba: Duplicitné kľúče
-System:	Keymap window		Systém:
-Left command	Keyboard Layout View		Ľavý command
-Set modifier keys…	Keymap window		Nastaviť klávesy modifikátorov…
-Option:	Modifier keys window	Option key role name	Voľba:
-Control	Keyboard Layout View	Control key	Control
-Left option	Keyboard Layout View		Ľavý alt
-Right control	Keyboard Layout View		Pravý control
-Switch shortcut keys	Keymap window		Vymeniť skratkové klávesy
-Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Kláves Shift
-User:	Keymap window		Používateľ:
-Right option	Keyboard Layout View		Pravý alt
-Right shift	Keyboard Layout View		Pravý shift
 Key	Modifier keys window	As in a computer keyboard key	Kláves
+Right control	Keyboard Layout View		Pravý control
+Option:	Modifier keys window	Option key role name	Voľba:
+Cancel	Modifier keys window		Zrušiť
+Sample and clipboard:	Keymap window		Vzor a schránka:
+Num lock	Keyboard Layout View		Num Lock
+Switch shortcut keys to Windows/Linux mode	Keymap window		Vymeniť skratkové klávesy na režim Windows/Linux
+Option	Keyboard Layout View	Option key	Alt
+Scroll lock	Keyboard Layout View		Scroll Lock
+Right option	Keyboard Layout View		Pravý alt
+Revert	Modifier keys window		Vrátiť
+Set modifier keys	Modifier keys window		Nastaviť modifikačné klávesy
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Kláves Win/Cmd
+Command:	Modifier keys window	Command key role name	Príkaz:
+Acute trigger	Keymap window		Spúšťač dĺžeň
+Modifier keys	Modifier keys window		Modifikačné klávesy
+Save as…	Keymap window		Uložiť ako…
+Error: duplicate keys	Modifier keys window		Chyba: Duplicitné kľúče
+Control	Keyboard Layout View	Control key	Control
+Remove	Keyboard Layout View		Odstrániť
+Tilde trigger	Keymap window		Spúšťač tilda
+Shift	Keyboard Layout View	Shift key	Shift
+Left command	Keyboard Layout View		Ľavý command
+(Current)	Keymap window		(aktuálne)
+Left option	Keyboard Layout View		Ľavý alt
+Warning: left and right key roles do not match	Modifier keys window		Upozornenie: role ľavého a pravého klávesu sa líšia
+Circumflex trigger	Keymap window		Spúšťač vokáň
+Caps lock	Keyboard Layout View		Caps Lock
+Left shift	Keyboard Layout View		Ľavý shift
+Left control	Keyboard Layout View		Ľavý control
+Role	Modifier keys window	As in the role of a modifier key	Úloha
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Kláves Ctrl
 Control:	Modifier keys window	Control key role name	Control:
-Remove	Keyboard Layout View		Odstrániť
-Option	Keyboard Layout View	Option key	Alt
-Sample and clipboard:	Keymap window		Vzor a schránka:
-Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Kláves Alt/Opt
+Disabled	Modifier keys window	Do nothing	Vypnuté
+Select dead keys	Keymap window		Vyberte mŕtve klávesy
+Right shift	Keyboard Layout View		Pravý shift
 Layout	Keymap window		Rozloženie
-Switch shortcut keys to Windows/Linux mode	Keymap window		Vymeniť skratkové klávesy na režim Windows/Linux
-Right command	Keyboard Layout View		Pravý command
 Revert	Keymap window		Vrátiť
-Command:	Modifier keys window	Command key role name	Príkaz:
-Save as…	Keymap window		Uložiť ako…
-Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Kláves Win/Cmd
-File	Keymap window		Súbor
-Num lock	Keyboard Layout View		Num Lock
-(Current)	Keymap window		(aktuálne)
-Font	Keymap window		Písmo
+Grave trigger	Keymap window		Spúšťač apostrof
+Menu	Keyboard Layout View	Menu key	Menu
+Quit	Keymap window		Ukončiť
+User:	Keymap window		Používateľ:
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Kláves Alt/Opt
+Shift:	Modifier keys window	Shift key role name	Posun:
 Keymap	System name		Mapa kláves
-Left shift	Keyboard Layout View		Ľavý shift
-Shift	Keyboard Layout View	Shift key	Shift
-Set modifier keys	Modifier keys window		Nastaviť modifikačné klávesy
-Modifier keys	Modifier keys window		Modifikačné klávesy
-Acute trigger	Keymap window		Spúšťač dĺžeň
+Set modifier keys…	Keymap window		Nastaviť klávesy modifikátorov…
+Switch shortcut keys to Haiku mode	Keymap window		Vymeniť skratkové klávesy na režim Haiku
+Defaults	Keymap window		Predvolené
+System:	Keymap window		Systém:
+Switch shortcut keys	Keymap window		Vymeniť skratkové klávesy
+Right command	Keyboard Layout View		Pravý command
+Font	Keymap window		Písmo
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Kláves Shift
+Command	Keyboard Layout View	Command key	Príkaz
+File	Keymap window		Súbor
+Diaeresis trigger	Keymap window		Spúšťač rozluky
+Open…	Keymap window		Otvoriť…

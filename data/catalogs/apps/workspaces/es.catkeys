@@ -1,13 +1,13 @@
 1	spanish; castilian	x-vnd.Be-WORK	3927737357
-Invalid argument: %s\n	Workspaces		Argumento inválido: %s\n
 Quit	Workspaces		Salir
-Workspaces	System name		Áreas de trabajo
+Invalid argument: %s\n	Workspaces		Argumento inválido: %s\n
 Change workspace count…	Workspaces		Cambio de área de trabajo 
-Remove replicant	Workspaces		Remover replicante
-Show window border	Workspaces		Mostrar el borde de la ventana
-Auto-raise	Workspaces		Autoaumento
 Always on top	Workspaces		Siempre en la parte superior
-Switch on mouse wheel	Workspaces		Cambiar con rueda de scroll del mouse
-Live in the Deskbar	Workspaces		Vivo en escritorio
+Show window border	Workspaces		Mostrar el borde de la ventana
 Show window tab	Workspaces		Mostrar pestaña de ventana
+Auto-raise	Workspaces		Autoaumento
+Remove replicant	Workspaces		Remover replicante
+Live in the Deskbar	Workspaces		Vivo en escritorio
 Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Uso: %s [opciones] [espacio de trabajo]\ndonde \"opciones\" son:\n--notitle\t\tbarra de título removida, se mantienen borde y retamaño\n--noborder\t\tse remueven título, borde y retamaño\n--avoidfocus\t\tevita que la ventaja sea objetivo de eventos de teclado\n--alwaysontop\t\tmantiene la ventana en la parte superior\n--notmovable\t\tla ventana no se puede mover\n--autoraise\t\tautolevantar la ventana de trabajo cuando esté en la orilla\n--help\t\tdesplegar esta ayuda y salir\ny \"espacio de trabajo\" es el número del espacio de trabajo al cual cambiar (0-31)\n
+Switch on mouse wheel	Workspaces		Cambiar con rueda de scroll del mouse
+Workspaces	System name		Áreas de trabajo

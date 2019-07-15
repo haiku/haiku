@@ -1,17 +1,17 @@
 1	french	x-vnd.Haiku-keystore_server	2429996361
-This application hasn't been granted access before.	AppAccessRequestWindow		L’accès n’a pas encore été octroyé à cette application.
-Unlock	KeyRequestWindow		Déverrouiller
-This application has been updated since it was last granted access.	AppAccessRequestWindow		Cette application a été mise à jour depuis que l’accès lui a été accordé.
-Allow always	AppAccessRequestWindow		Toujours autoriser
-Application keyring access	AppAccessRequestWindow		Gestionnaire de mots de passe
 to perform the following action:\n%accessString%\n\n	AppAccessRequestWindow		pour effectuer les actions suivantes :\n%accessString%\n\n
-The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		L’application:\n%signature% (%path%)\n\n
 This application doesn't yet have the required privileges.	AppAccessRequestWindow		L’application n’a pas encore les privilèges requis.
-Password:	KeyRequestWindow		Mot de passe :
-Cancel	KeyRequestWindow		Annuler
 Keyring:	KeyRequestWindow		Trousseau :
+requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		demande d’accès au trousseau :\n%keyringName%\n\n
+Application keyring access	AppAccessRequestWindow		Gestionnaire de mots de passe
+Disallow	AppAccessRequestWindow		Rejeter
+Allow once	AppAccessRequestWindow		Autoriser cette fois
 Unlock keyring	KeyRequestWindow		Déverrouiller le trousseau
 An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		Une application veut accéder au trousseau de clés ci-dessous, mais il est verrouillé par un mot de passe. Veuillez entrer le mot de passe pour déverrouiller le trousseau.\nSi vous déverrouillez le trousseau, il restera ouvert jusqu’à ce que le système soit arrêté ou que le trousseau soit verrouillé manuellement.\nSi vous quittez cette boîte de dialogue, le trousseau de clés restera verrouillé.
-Allow once	AppAccessRequestWindow		Autoriser cette fois
-Disallow	AppAccessRequestWindow		Rejeter
-requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		demande d’accès au trousseau :\n%keyringName%\n\n
+Password:	KeyRequestWindow		Mot de passe :
+Cancel	KeyRequestWindow		Annuler
+This application has been updated since it was last granted access.	AppAccessRequestWindow		Cette application a été mise à jour depuis que l’accès lui a été accordé.
+Allow always	AppAccessRequestWindow		Toujours autoriser
+Unlock	KeyRequestWindow		Déverrouiller
+The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		L’application:\n%signature% (%path%)\n\n
+This application hasn't been granted access before.	AppAccessRequestWindow		L’accès n’a pas encore été octroyé à cette application.

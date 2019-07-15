@@ -1,35 +1,35 @@
 1	polish	x-vnd.Haiku-LaunchBox	3692177981
-New	LaunchBox		Nowy
 Set description…	LaunchBox		Ustaw opis…
-Vertical layout	LaunchBox		Układ pionowy
-OK	LaunchBox		OK
-Pad 1	LaunchBox		Panel 1
-last chance	LaunchBox		ostatnia szansa
-Quit	LaunchBox		Zakończ
-Open containing folder	LaunchBox		Otwórz katalog docelowy
-Clear button	LaunchBox		Wyczyść przycisk
-LaunchBox	System name		LaunchBox
-Ignore double-click	LaunchBox		Ignoruj dwuklik
-Auto-raise	LaunchBox		Autoaktywacja
-Show on all workspaces	LaunchBox		Pokaż na wszystkich przestrzeniach roboczych
-Show window border	LaunchBox		Pokaż obramowanie okna
-Pad	LaunchBox		Panel
-Icon size	LaunchBox		Rozmiar ikon
-Bummer	LaunchBox		Lipa
-Cancel	LaunchBox		Anuluj
-Remove button	LaunchBox		Usuń przycisk
-Horizontal layout	LaunchBox		Układ poziomy
-\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nNie udało się uruchomić aplikacji z sygnaturą „%2”.\n\nBłąd:
-Failed to launch '%1'.\n\nError:	LaunchBox		Nie udało się uruchomić „%1”.\n\nBłąd:
-Name Panel	LaunchBox		Panel nazeweniczy
-Add button here	LaunchBox		Dodaj przycisk tutaj
-Description for '%3'	LaunchBox		Opis dla „%3”
-Settings	LaunchBox		Ustawienia
-Failed to launch 'something', error in Pad data.	LaunchBox		Nie udało się uruchomić „czegoś”, błąd w danych panelu.
-Pad %1	LaunchBox		Panel %1
-Close	LaunchBox		Zamknij
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Błąd przy wysyłaniu komendy „otwórz katalog” do Trackera.\n\nBłąd: 
-You can drag an icon here.	LaunchBox		Możesz upuścić ikonę w tym miejscu.
-Clone	LaunchBox		Klonuj
-launch popup	LaunchBox		uruchom pop-up
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Na pewno zamknąć ten panel?\n(Nie zostanie on zapamiętany.)
+OK	LaunchBox		OK
+Ignore double-click	LaunchBox		Ignoruj dwuklik
+Show on all workspaces	LaunchBox		Pokaż na wszystkich przestrzeniach roboczych
+Name Panel	LaunchBox		Panel nazeweniczy
+Clone	LaunchBox		Klonuj
+Description for '%3'	LaunchBox		Opis dla „%3”
+Show window border	LaunchBox		Pokaż obramowanie okna
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nNie udało się uruchomić aplikacji z sygnaturą „%2”.\n\nBłąd:
+Failed to launch 'something', error in Pad data.	LaunchBox		Nie udało się uruchomić „czegoś”, błąd w danych panelu.
+LaunchBox	System name		LaunchBox
+Auto-raise	LaunchBox		Autoaktywacja
+Icon size	LaunchBox		Rozmiar ikon
+Open containing folder	LaunchBox		Otwórz katalog docelowy
+Add button here	LaunchBox		Dodaj przycisk tutaj
+Cancel	LaunchBox		Anuluj
+launch popup	LaunchBox		uruchom pop-up
+Clear button	LaunchBox		Wyczyść przycisk
+Bummer	LaunchBox		Lipa
+last chance	LaunchBox		ostatnia szansa
+You can drag an icon here.	LaunchBox		Możesz upuścić ikonę w tym miejscu.
+Pad 1	LaunchBox		Panel 1
+Failed to launch '%1'.\n\nError:	LaunchBox		Nie udało się uruchomić „%1”.\n\nBłąd:
+Settings	LaunchBox		Ustawienia
+Vertical layout	LaunchBox		Układ pionowy
+Pad	LaunchBox		Panel
+Close	LaunchBox		Zamknij
+Remove button	LaunchBox		Usuń przycisk
+Quit	LaunchBox		Zakończ
+Horizontal layout	LaunchBox		Układ poziomy
+New	LaunchBox		Nowy
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Błąd przy wysyłaniu komendy „otwórz katalog” do Trackera.\n\nBłąd: 
+Pad %1	LaunchBox		Panel %1

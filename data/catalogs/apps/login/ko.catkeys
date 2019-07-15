@@ -1,19 +1,19 @@
 1	korean	x-vnd.Haiku-Login	2683778354
-Error: %1	Login App		오류 %1
-Hide password	Login View		암호 숨기기
-Desktop	Desktop Window		바탕화면
 Invalid login!	Login View		올바르지 않은 로그인!
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\t바탕화면을 사용자 정의하도록 선반 편집 모드를 띄웁니다.\n
-OK	Login View		확인
-error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	오류 %s\n
-Login:	Login View		로그인:
 Error	Login App		오류
-Unimplemented	Login App		구현되지 않음
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\t바탕화면을 사용자 정의하도록 선반 편집 모드를 띄웁니다.\n
 Welcome to Haiku	Login Window		Haiku의 세계로 오신 것을 환영합니다!
-Reboot	Login View		다시 시작
-Login application for Haiku\nUsage:\n	Login App		Haiku의 로그인 응용프로그램\n사용법:\n
-Info	Login App		정보
 Halt	Login View		멈추기
-Password:	Login View		암호:
-OK	Login App		확인
+Login application for Haiku\nUsage:\n	Login App		Haiku의 로그인 응용프로그램\n사용법:\n
 --nonmodal\tDo not make the window modal\n	Login App		-nonmodal\t창 모양을 만들지 않음\n
+Desktop	Desktop Window		바탕화면
+Hide password	Login View		암호 숨기기
+Reboot	Login View		다시 시작
+OK	Login View		확인
+Info	Login App		정보
+Login:	Login View		로그인:
+Password:	Login View		암호:
+Unimplemented	Login App		구현되지 않음
+OK	Login App		확인
+Error: %1	Login App		오류 %1
+error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	오류 %s\n

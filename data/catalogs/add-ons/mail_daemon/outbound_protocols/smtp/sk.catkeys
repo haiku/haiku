@@ -1,14 +1,14 @@
 1	slovak	x-vnd.Haiku-SMTP	815985329
-SMTP server:	ConfigView		Server SMTP:
-Error while logging in to %serv	smtp		Chyba pri prihlasovaní k %serv
-Unencrypted	ConfigView		Nešifrované
-. The server says:\n	smtp		. Server hovorí:\n
-ESMTP	ConfigView		ESMTP
-Connecting to server…	smtp		Pripájanie k serveru…
-Error while opening connection to %serv	smtp		Chyba počas otvárania spojenia s %serv
 POP3 authentication failed. The server said:\n	smtp		Autentifikácia POP3 zlyhala. Server povedal:\n
 Destination:	ConfigView		Cieľ:
+Error while logging in to %serv	smtp		Chyba pri prihlasovaní k %serv
+Connecting to server…	smtp		Pripájanie k serveru…
+Unencrypted	ConfigView		Nešifrované
+. The server says:\n	smtp		. Server hovorí:\n
+Error while opening connection to %serv	smtp		Chyba počas otvárania spojenia s %serv
+. The server said:\n	smtp		. Server povedal:\n
 None	ConfigView		Žiadne
+SMTP server:	ConfigView		Server SMTP:
+ESMTP	ConfigView		ESMTP
 POP3 before SMTP	ConfigView		POP3, potom SMTP
 SSL	ConfigView		SSL
-. The server said:\n	smtp		. Server povedal:\n

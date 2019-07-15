@@ -1,20 +1,20 @@
 1	belarusian	x-vnd.mmu_man.filepanel	1802971238
 display a load/save file panel\n	FilePanelApp		паказаць панель загрузкі/захавання\n
-options:\n	FilePanelApp		опцыі:\n
-usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		карыстанне: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n
--k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tтыпы данных, якія могуць быць адкрыты: любая камбінацыя f, d, s (файл (прадвызначаны), дырэкторыя, спасылка)\n
-usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		карыстанне: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n
--d\t--directory\topen at <folder>\n	FilePanelApp		-d\t --directory\t адкрыць у <каталозе>\n
-%s not a valid option\n	FilePanelApp		%s - няправільная опцыя\n
 short\tlong\tdescription\n	FilePanelApp		кароткае\tдоўгае\tапісанне\n
-%s: this option requires a parameter\n	FilePanelApp		%s гэтая опцыя патрабуе параметр\n
--l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tужываць панель закрузкі (прадвызначана)\n
--f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tнерэалізавана\n
+%s not a valid option\n	FilePanelApp		%s - няправільная опцыя\n
 -s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t --save\t ужываць панель захавання\n
--n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tазначыць стандартнае імя для захавання\n
--m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tробіць панель мадальнай\n
+%s: this option requires a parameter\n	FilePanelApp		%s гэтая опцыя патрабуе параметр\n
 -h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tпаказаць ключы\n
--a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tнерэалізавана\n
--1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tдазволіць выбіраць толькі 1 файл\n
--t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tпазначыць імя вакна панелі\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tужываць панель закрузкі (прадвызначана)\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tазначыць стандартнае імя для захавання\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tтыпы данных, якія могуць быць адкрыты: любая камбінацыя f, d, s (файл (прадвызначаны), дырэкторыя, спасылка)\n
 %s: UNIMPLEMENTED\n	FilePanelApp		%s: НЕРЭАЛІЗАВАНА\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tпазначыць імя вакна панелі\n
+-f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tнерэалізавана\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		карыстанне: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tдазволіць выбіраць толькі 1 файл\n
+-a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tнерэалізавана\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tробіць панель мадальнай\n
+options:\n	FilePanelApp		опцыі:\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t --directory\t адкрыць у <каталозе>\n
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		карыстанне: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n

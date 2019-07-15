@@ -1,35 +1,35 @@
 1	spanish; castilian	x-vnd.Haiku-Notifications	332239666
-An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Ha ocurrido un error al guardar las preferencias.\nEs posible que no haya suficiente espacio en disco.
-Add…	NotificationView		Añadir…
-Status	NotificationView		Estado
-Revert	PrefletWin		Revertir
-Enable notifications	GeneralView		Permitir notificaciones
-Window width:	GeneralView		Ancho de ventana:
-This is a test notification message	PrefletWin		Este es un mensaje de notificación de prueba
-OK	PrefletWin		Aceptar
-Duration:	GeneralView		Duración:
-OK	NotificationView		Aceptar
-Application does not have a valid signature	NotificationView	Alert message	La aplicación no tiene una firma válida
-Follow Deskbar	GeneralView		Seguir la barra de escritorio
-Notifications	PrefletWin		Notificaciones
-Timeout:	GeneralView		Límite de tiempo:
-Muted	NotificationView		Silenciada
-General	PrefletView		General
-Allowed	NotificationView		Permitida
-Remove	NotificationView		Quitar
-Lower right	GeneralView		Inferior derecha
-Notifications preflet sample	PrefletWin		Muestra de notificación de un comando de preferencias
-Notifications	System name		Notificaciones
-Position:	GeneralView		Posición:
-Applications	PrefletView		Aplicaciones
-Defaults	PrefletWin		Predeterminados
-pixels	GeneralView		píxeles
-Application	NotificationView		Aplicación
-Width:	GeneralView		Ancho:
-seconds	GeneralView		segundos
-Mute notifications from this application	NotificationView		Silenciar las notificaciones de esta aplicación
-Upper right	GeneralView		Superior derecha
- is already listed	NotificationView	Alert message	 ya está en la lista
 Lower left	GeneralView		Inferior izquierda
+Application does not have a valid signature	NotificationView	Alert message	La aplicación no tiene una firma válida
+Status	NotificationView		Estado
+Add…	NotificationView		Añadir…
+Lower right	GeneralView		Inferior derecha
+Muted	NotificationView		Silenciada
+Window width:	GeneralView		Ancho de ventana:
+ is already listed	NotificationView	Alert message	 ya está en la lista
+OK	PrefletWin		Aceptar
+Notifications	PrefletWin		Notificaciones
+Notifications preflet sample	PrefletWin		Muestra de notificación de un comando de preferencias
+Mute notifications from this application	NotificationView		Silenciar las notificaciones de esta aplicación
+pixels	GeneralView		píxeles
+seconds	GeneralView		segundos
+Revert	PrefletWin		Revertir
+Applications	PrefletView		Aplicaciones
+Timeout:	GeneralView		Límite de tiempo:
+Upper right	GeneralView		Superior derecha
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Ha ocurrido un error al guardar las preferencias.\nEs posible que no haya suficiente espacio en disco.
+Defaults	PrefletWin		Predeterminados
 Upper left	GeneralView		Superior izquierda
 Applications	NotificationView		Aplicaciones
+Width:	GeneralView		Ancho:
+General	PrefletView		General
+OK	NotificationView		Aceptar
+Follow Deskbar	GeneralView		Seguir la barra de escritorio
+Notifications	System name		Notificaciones
+Allowed	NotificationView		Permitida
+Duration:	GeneralView		Duración:
+Application	NotificationView		Aplicación
+Enable notifications	GeneralView		Permitir notificaciones
+This is a test notification message	PrefletWin		Este es un mensaje de notificación de prueba
+Remove	NotificationView		Quitar
+Position:	GeneralView		Posición:

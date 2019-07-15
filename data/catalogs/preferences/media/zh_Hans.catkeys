@@ -1,24 +1,24 @@
 1	english	x-vnd.Haiku-Media	4205337498
-Couldn't add volume control in Deskbar: %s\n	Media views		无法添加音量控件到桌面栏：%s\n
-Video input:	Media views		视频输入:
-Warning!	Media Window		警告！
-Quit anyway	Media Window		强制退出
-Defaults	Media views		默认
-MIDI Settings	Media Window		MIDI 设置
+Audio mixer	Media Window		音频混合器
+Show volume control on Deskbar	Media views		在桌面栏中显示声音控制
 Quit	Media Window		退出
-Video settings	Media Window		视频设置
-Video output:	Media views		视频输出：
-Could not connect to the media server.\nWould you like to start it ?	Media Window		链接 media server 失败.\n是否重新启动 ?
 Restart media services	Media views		重启多媒体服务
+Couldn't add volume control in Deskbar: %s\n	Media views		无法添加音量控件到桌面栏：%s\n
+Start media server	Media Window		启动 media server
+Audio settings	Media Window		音频设置
+Quit anyway	Media Window		强制退出
 Couldn't remove volume control in Deskbar: %s\n	Media views		无法移除桌面栏中的音量控件：%s\n
 Media	System name		多媒体
-Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		退出媒体播放器将会中止媒体服务重新启动。将会出现未知情况或者媒体功能不可用。
-Audio mixer	Media Window		音频混合器
-This hardware has no controls.	Media Window		硬件控制失败。
+Warning!	Media Window		警告！
+MIDI Settings	Media Window		MIDI 设置
+Video output:	Media views		视频输出：
 Audio output:	Media views		音频输出：
-Audio settings	Media Window		音频设置
-Start media server	Media Window		启动 media server
-<none>	Media views		<无>
-Channel:	Media views		频道：
-Show volume control on Deskbar	Media views		在桌面栏中显示声音控制
+Video input:	Media views		视频输入:
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		退出媒体播放器将会中止媒体服务重新启动。将会出现未知情况或者媒体功能不可用。
 Audio input:	Media views		音频输入：
+<none>	Media views		<无>
+This hardware has no controls.	Media Window		硬件控制失败。
+Channel:	Media views		频道：
+Defaults	Media views		默认
+Could not connect to the media server.\nWould you like to start it ?	Media Window		链接 media server 失败.\n是否重新启动 ?
+Video settings	Media Window		视频设置

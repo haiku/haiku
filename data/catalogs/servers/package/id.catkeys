@@ -1,16 +1,16 @@
 1	indonesian	x-vnd.haiku-package_daemon	1440586681
-Package problems	PackageProblem	Window title	Masalah paket
 Package changes	PackageResult	Window title	Perubahan paket
 uninstall package %s\n	PackageResult	Don't change '%s' variable	melepas paket %s\n
-install package %s from repository %s\n	PackageResult	Don't change '%s' variables	memasang paket %s dari repositori %s\n
-Apply changes	PackageResult		Terapkan perubahan
-solution %d:	PackageProblem	Don't change the %d variable	penyelesaian %d:
-Warning	PackageManager		Peringatan
-Retry	PackageProblem		Coba lagi
-The following additional package changes have to be made:	PackageResult		Perubahan paket tambahan berikut harus dilakukan:
 ignore problem for now	PackageProblem		abaikan masalah untuk saat ini
+solution %d:	PackageProblem	Don't change the %d variable	penyelesaian %d:
+The following problems have been encountered. Please select a solution for each:	PackageProblem		Masalah-masalah berikut telah ditemui. Silakan pilih solusi untuk masing-masing:
+Apply changes	PackageResult		Terapkan perubahan
+Package daemon	PackageManager		Daemon paket
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	memasang paket %s dari repositori %s\n
+The following additional package changes have to be made:	PackageResult		Perubahan paket tambahan berikut harus dilakukan:
+Warning	PackageManager		Peringatan
 Cancel	PackageProblem		Batalkan
 don't activate package %source%	PackageProblem	don't change '%source%	jangan aktifkan paket %source%
-The following problems have been encountered. Please select a solution for each:	PackageProblem		Masalah-masalah berikut telah ditemui. Silakan pilih solusi untuk masing-masing:
-Package daemon	PackageManager		Daemon paket
 Cancel	PackageResult		Batalkan
+Retry	PackageProblem		Coba lagi
+Package problems	PackageProblem	Window title	Masalah paket

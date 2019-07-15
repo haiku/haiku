@@ -1,68 +1,68 @@
 1	hungarian	x-vnd.Haiku-MediaConverter	1322040280
-Video using parameters form settings	MediaConverter		Videó a beállítások paramétereivel
-{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{A fájl nem felismerhető média formátumú:} other{# fájl nem felismerhető média formátumú:}}
-Video encoding:	MediaConverter		Videó kódolása:
+Input file not recognized as Audio or Video	MediaConverter		A bemeneti fájl nem azonosítható hang- vagy videóként
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
-Error creating video.	MediaConverter		Nem sikerült létrehozni a videót.
-No audio	Audio codecs list		Nincs hang
-Error	MediaConverter		Hiba
-{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bit}}
-Error loading a file	MediaConverter		Hiba történt a fájl betöltése során
-File Error	MediaConverter-FileInfo		Fájlhiba
-Open…	Menu		Megnyitás…
-Start [ms]: 	MediaConverter		Kezdet [ms]:
-Output file '%filename' created	MediaConverter		A(z) '%filename' kimeneti fájl létre lett hozva.
-Output format	MediaConverter		Kimeneti formátum
-End   [ms]: 	MediaConverter		Vége [ms]:
-MediaConverter	System name		Médiaátalakító
-No video	Video codecs list		Nincs videó
-Duration:	MediaConverter-FileInfo		Időtartam:
-OK	MediaConverter		Rendben
-%.1f kHz mono	MediaFileInfo		%.1f kHz mono
+Video quality: %3d%%	MediaConverter		Videó minősége: %3d%%
+Source files	MediaConverter		Forrásfájlok
 Error converting '%filename'	MediaConverter		Hiba történt a(z) '%filename' fájl átalakítása közben
-Low	MediaConverter		Alacsony
+Selected directory not found. Defaulting to /boot/home	MediaConverter		A választott mappa nem található. Használom az alapértelmezettet: /boot/home
 Conversion completed	MediaConverter		Átalakítás kész
 Audio:	MediaConverter-FileInfo		Hang:
-OK	MediaConverter-FileInfo		Rendben
- seconds	MediaFileInfo		 másodperc
-Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Nem sikerült írni a megadott útvonalra: %strPath%. Használom az alapértelmezettet: /boot/home
-Source files	MediaConverter		Forrásfájlok
-Selected directory not found. Defaulting to /boot/home	MediaConverter		A választott mappa nem található. Használom az alapértelmezettet: /boot/home
-{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# képkocka} other{# képkocka}}
-Cancelling	MediaConverter		Megszakítás folyamatban
-{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# bájt} other{# bájt}}
-Error loading files	MediaConverter		Hiba történt a fájlok betöltése során
-Cancel	MediaConverter		Mégse
-None available	Video codecs		Nincs elérhető
-Conversion cancelled	MediaConverter		Konvertálás megszakítva
-No file selected	MediaConverter-FileInfo		Nincs fájl kiválasztva
-Select this folder	MediaConverter		E mappa kijelölése
-Error creating track.	MediaConverter		Nem sikerült létrehozni a sávot.
-Continue	MediaConverter		Folytatás
-Encoder parameters	MediaConverter-EncoderWindow		Kódoló paraméterei
-Video:	MediaConverter-FileInfo		Videó:
-%d bit 	MediaFileInfo		%d bit
-Error creating '%filename'	MediaConverter		Hiba történt a(z) '%filename' fájl létrehozása közben
-Video quality not supported	MediaConverter		Nem támogatott videóminőség
-Cancelling…	MediaConverter		Megszakítás…
-File details	MediaConverter		Fájl részletei
-Select	MediaConverter		Kijelölés
-Quit	Menu		Kilépés
-Preview	MediaConverter		Előnézet
-File format:	MediaConverter		Fájlformátum:
-None available	Audio codecs		Nincs elérhető
 MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
-Error launching: %strError%	MediaConverter		Hiba történt a %strError% indítása közben
+Error creating video.	MediaConverter		Nem sikerült létrehozni a videót.
+Cancelling	MediaConverter		Megszakítás folyamatban
+None available	Audio codecs		Nincs elérhető
+No file selected	MediaConverter-FileInfo		Nincs fájl kiválasztva
 High	MediaConverter		Magas
-Drop media files onto this window	MediaConverter		Húzzon médiafájlokat erre az ablakra
-Audio encoding:	MediaConverter		Audió kódolása:
-Audio quality not supported	MediaConverter		Ez a hangminőség nem támogatott
-File	Menu		Fájl
-Input file not recognized as Audio or Video	MediaConverter		A bemeneti fájl nem azonosítható hang- vagy videóként
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{A fájl nem felismerhető média formátumú:} other{# fájl nem felismerhető média formátumú:}}
+File Error	MediaConverter-FileInfo		Fájlhiba
+None available	Video codecs		Nincs elérhető
+Output format	MediaConverter		Kimeneti formátum
+%.1f kHz mono	MediaFileInfo		%.1f kHz mono
 %.1f kHz stereo	MediaFileInfo		%.1f kHz stereo
-Convert	MediaConverter		Átalakítás
-Video quality: %3d%%	MediaConverter		Videó minősége: %3d%%
-%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld csatorna
-Output folder	MediaConverter		Kimeneti mappa
+OK	MediaConverter		Rendben
+Error creating '%filename'	MediaConverter		Hiba történt a(z) '%filename' fájl létrehozása közben
+Error loading a file	MediaConverter		Hiba történt a fájl betöltése során
+Encoder parameters	MediaConverter-EncoderWindow		Kódoló paraméterei
+Open…	Menu		Megnyitás…
+Audio encoding:	MediaConverter		Audió kódolása:
 Audio quality: %3d%%	MediaConverter		Audió minősége: %3d%%
+Cancelling…	MediaConverter		Megszakítás…
+Output file '%filename' created	MediaConverter		A(z) '%filename' kimeneti fájl létre lett hozva.
+Output folder	MediaConverter		Kimeneti mappa
+Error creating track.	MediaConverter		Nem sikerült létrehozni a sávot.
+ seconds	MediaFileInfo		 másodperc
+Video using parameters form settings	MediaConverter		Videó a beállítások paramétereivel
+Video:	MediaConverter-FileInfo		Videó:
+Select	MediaConverter		Kijelölés
+Conversion cancelled	MediaConverter		Konvertálás megszakítva
+Low	MediaConverter		Alacsony
+Error loading files	MediaConverter		Hiba történt a fájlok betöltése során
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bit}}
+End   [ms]: 	MediaConverter		Vége [ms]:
+Cancel	MediaConverter		Mégse
+OK	MediaConverter-FileInfo		Rendben
+Video encoding:	MediaConverter		Videó kódolása:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Hiba történt a fájl beolvasása közben.\n\nHiba:
+Error	MediaConverter		Hiba
+File details	MediaConverter		Fájl részletei
+No audio	Audio codecs list		Nincs hang
+Drop media files onto this window	MediaConverter		Húzzon médiafájlokat erre az ablakra
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# képkocka} other{# képkocka}}
+Quit	Menu		Kilépés
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# bájt} other{# bájt}}
+Duration:	MediaConverter-FileInfo		Időtartam:
+MediaConverter	System name		Médiaátalakító
+Error launching: %strError%	MediaConverter		Hiba történt a %strError% indítása közben
+File format:	MediaConverter		Fájlformátum:
+File	Menu		Fájl
+Video quality not supported	MediaConverter		Nem támogatott videóminőség
+Select this folder	MediaConverter		E mappa kijelölése
+%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld csatorna
+%d bit 	MediaFileInfo		%d bit
+No video	Video codecs list		Nincs videó
+Continue	MediaConverter		Folytatás
+Convert	MediaConverter		Átalakítás
+Audio quality not supported	MediaConverter		Ez a hangminőség nem támogatott
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Nem sikerült írni a megadott útvonalra: %strPath%. Használom az alapértelmezettet: /boot/home
+Preview	MediaConverter		Előnézet
+Start [ms]: 	MediaConverter		Kezdet [ms]:

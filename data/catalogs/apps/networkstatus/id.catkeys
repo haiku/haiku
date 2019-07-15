@@ -1,22 +1,21 @@
-1	indonesian	x-vnd.Haiku-NetworkStatus	1729819859
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Pilihan StatusJaringan:\n\t--deskbar\tsecara otomatis menambahan replicant ke Deskbar\n\t--help\t\tcetak info ini dan keluar\n
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Anda dapat menjalankan StatusJaringan di sebuah Jendela atau memasangnya di Deksbar.
-<no wireless networks found>	NetworkStatusView		<tidak ditemukan jaringan nirkabel>
-Run in window	NetworkStatus		Jalankan di jendela
-No link	NetworkStatusView		Tak ada tautan
-Install in Deskbar	NetworkStatus		Pasang di Deskbar
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		Gagal meluncurkan preflet jaringan.\n\nkesalahan: 
+1	indonesian	x-vnd.Haiku-NetworkStatus	3823341665
 Netmask	NetworkStatusView		Netmask
-Broadcast	NetworkStatusView		Broadcast
-Unknown	NetworkStatusView		Takdiketahui
-Network Status	NetworkStatusView		Status Jaringan
-Ready	NetworkStatusView		Siap
-No stateful configuration	NetworkStatusView		Takada konfigurasi tersimpan
-%ifaceName information:\n	NetworkStatusView		%ifaceName informasi:\n
-Configuring	NetworkStatusView		Mengkonfigurasikan
-Address	NetworkStatusView		Alamat
-OK	NetworkStatusView		OKE
-NetworkStatus	System name		StatusJaringan
-Open network preferences…	NetworkStatusView		Buka preferensi jaringan...
-Could not join wireless network:\n	NetworkStatusView		Tidak bisa gabung ke jaringan nirkabel:\n
 Quit	NetworkStatusView		Keluar
+Unknown	NetworkStatusView		Takdiketahui
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Gagal meluncurkan preflet jaringan.\n\nkesalahan: 
+Install in Deskbar	NetworkStatus		Pasang di Deskbar
+Open network preferences…	NetworkStatusView		Buka preferensi jaringan...
+NetworkStatus	System name		StatusJaringan
+OK	NetworkStatusView		OKE
+No link	NetworkStatusView		Tak ada tautan
+Could not join wireless network:\n	NetworkStatusView		Tidak bisa gabung ke jaringan nirkabel:\n
+Ready	NetworkStatusView		Siap
+Network Status	NetworkStatusView		Status Jaringan
+Address	NetworkStatusView		Alamat
+No stateful configuration	NetworkStatusView		Takada konfigurasi tersimpan
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Anda dapat menjalankan StatusJaringan di sebuah Jendela atau memasangnya di Deksbar.
+Broadcast	NetworkStatusView		Broadcast
+%ifaceName information:\n	NetworkStatusView		%ifaceName informasi:\n
+Run in window	NetworkStatus		Jalankan di jendela
+<no wireless networks found>	NetworkStatusView		<tidak ditemukan jaringan nirkabel>
+Configuring	NetworkStatusView		Mengkonfigurasikan

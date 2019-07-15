@@ -1,62 +1,62 @@
 1	indonesian	x-vnd.Haiku-StyledEdit	2697854206
-StyledEdit	System name		StyledEdit
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Berkas ini ditandai hanya baca. Simpan perubahan ke dokumen \"%s\"? 
-Paste	Menus		Tempel
-OK	LoadAlert		OKE
-File	Menus		Berkas
-???	LoadAlert		???
-Modified	StatusView		Termodifikasi
-Lines:	Statistics		Baris:
-Italic	Menus		Miring
-Left	Menus		Kiri
-Search backwards	FindandReplaceWindow		Cari mundur
-Unlock file	StatusView		Buka kunci berkas
-Size	Menus		Ukuran
-Save	QuitAlert		Simpan
-Page setup…	Menus		Pengaturan halaman…
-Print…	Menus		Cetak…
-Can't undo	Menus		Tidak dapat membatalkan
-Save	Menus		Simpan
-Replace with:	FindandReplaceWindow		Ganti dengan:
-Cancel	SaveAlert		Batal
-Reload	NodeMonitorAlerts		Muat ulang
 Document statistics	Statistics		Statistik dokumen
-Cancel	RevertToSavedAlert		Batal
-Document	Menus		Dokumen
-Save changes to the document \"%s\"? 	QuitAlert		Simpan perubahan ke dokumen \"%s\"? 
-Font	Menus		Fon
-Replace all	FindandReplaceWindow		Ganti semua
-Statistics…	Menus		Statistik…
-Cancel	FindandReplaceWindow		Batal
-Close	Menus		Tutup
-Save	SaveAlert		Simpan
-Words:	Statistics		Kata:
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Galat memuat  \"%s\":\n\tFormat tidak didukung
-OK	RevertToSavedAlert		OKE
-Don't save	QuitAlert		Jangan simpan
-Color	Menus		Warna
-OK	QuitAlert		OKE
-Open…	Menus		Buka…
 Center	Menus		Tengah
-Unable to unlock file\n\t%s	QuitAlert		Tidak dapat buka kunci berkas\n\t%s
-line %d, column %d	StatusView		baris %d, kolom %d
+Page setup…	Menus		Pengaturan halaman…
 OK	Statistics		OKE
-New	Menus		Baru
-Bold	Menus		Tebal
-Copy	Menus		Salin
-Replace	FindandReplaceWindow		Ganti
-Find again	Menus		Cari lagi
-Cancel	QuitAlert		Batal
-Find…	Menus		Cari…
-Select all	Menus		Pilih semua
-Don't save	SaveAlert		Jangan simpan
-Recover	NodeMonitorAlerts		Pemulihan
-Error loading \"%s\":\n\t%s	LoadAlert		Galat memuat \"%s\":\n\t%s
-Ignore	NodeMonitorAlerts		Abaikan
-Read-only	StatusView		Hanya baca
-OK	SaveAlert		OKE
 Find	FindandReplaceWindow		Cari
-Save as…	Menus		Simpan sebagai…
-Reload…	Menus		Muat ulang…
+New	Menus		Baru
+Document	Menus		Dokumen
+Search backwards	FindandReplaceWindow		Cari mundur
+Find again	Menus		Cari lagi
+Read-only	StatusView		Hanya baca
+Save	Menus		Simpan
+Cancel	QuitAlert		Batal
+Copy	Menus		Salin
+Reload	NodeMonitorAlerts		Muat ulang
+line %d, column %d	StatusView		baris %d, kolom %d
+Words:	Statistics		Kata:
+???	LoadAlert		???
+Recover	NodeMonitorAlerts		Pemulihan
+OK	RevertToSavedAlert		OKE
+Unlock file	StatusView		Buka kunci berkas
+Italic	Menus		Miring
+Can't undo	Menus		Tidak dapat membatalkan
 Replace…	Menus		Ganti…
+File	Menus		Berkas
+Bold	Menus		Tebal
+Paste	Menus		Tempel
+Lines:	Statistics		Baris:
+Save	SaveAlert		Simpan
+Cancel	RevertToSavedAlert		Batal
+Cancel	FindandReplaceWindow		Batal
+Statistics…	Menus		Statistik…
+Replace all	FindandReplaceWindow		Ganti semua
+Close	Menus		Tutup
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Galat memuat  \"%s\":\n\tFormat tidak didukung
+Left	Menus		Kiri
+OK	SaveAlert		OKE
+Color	Menus		Warna
+Save changes to the document \"%s\"? 	QuitAlert		Simpan perubahan ke dokumen \"%s\"? 
+StyledEdit	System name		StyledEdit
+Error loading \"%s\":\n\t%s	LoadAlert		Galat memuat \"%s\":\n\t%s
+Don't save	SaveAlert		Jangan simpan
+Reload…	Menus		Muat ulang…
+Print…	Menus		Cetak…
+Ignore	NodeMonitorAlerts		Abaikan
+Unable to unlock file\n\t%s	QuitAlert		Tidak dapat buka kunci berkas\n\t%s
+Modified	StatusView		Termodifikasi
+OK	LoadAlert		OKE
+Save	QuitAlert		Simpan
+Cancel	SaveAlert		Batal
+Find…	Menus		Cari…
+Size	Menus		Ukuran
+OK	QuitAlert		OKE
+Replace with:	FindandReplaceWindow		Ganti dengan:
+Open…	Menus		Buka…
+Save as…	Menus		Simpan sebagai…
+Replace	FindandReplaceWindow		Ganti
+Don't save	QuitAlert		Jangan simpan
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Berkas ini ditandai hanya baca. Simpan perubahan ke dokumen \"%s\"? 
+Font	Menus		Fon
+Select all	Menus		Pilih semua
 Right	Menus		Kanan

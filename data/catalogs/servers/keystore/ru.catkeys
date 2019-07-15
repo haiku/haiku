@@ -1,17 +1,17 @@
 1	russian	x-vnd.Haiku-keystore_server	2429996361
-This application hasn't been granted access before.	AppAccessRequestWindow		Этому приложению не выдавался доступ ранее.
-Unlock	KeyRequestWindow		Разблокировать
-This application has been updated since it was last granted access.	AppAccessRequestWindow		Это приложение было обновлено после того как ему выдавался доступ последний раз.
-Allow always	AppAccessRequestWindow		Разрешать всегда
-Application keyring access	AppAccessRequestWindow		Доступ приложения к брелку
 to perform the following action:\n%accessString%\n\n	AppAccessRequestWindow		чтобы выполнить следующее действие:\n%accessString%\n\n
-The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		Приложение:\n%signature% (%path%)\n\n
 This application doesn't yet have the required privileges.	AppAccessRequestWindow		Приложение не имеет требуемых привилегий.
-Password:	KeyRequestWindow		Пароль:
-Cancel	KeyRequestWindow		Отмена
 Keyring:	KeyRequestWindow		Брелок:
+requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		запрашивает доступ к брелку:\n%keyringName%\n\n
+Application keyring access	AppAccessRequestWindow		Доступ приложения к брелку
+Disallow	AppAccessRequestWindow		Запретить
+Allow once	AppAccessRequestWindow		Разрешить однократно
 Unlock keyring	KeyRequestWindow		Разблокировать брелок
 An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		Приложение хочет получить доступ к брелку, но он заблокирован паролем. Пожалуйста, введите пароль, чтобы разблокировать его.\nПосле разблокировки брелок будет разблокирован пока система не будет выключена или брелок не будет заблокирован снова вручную.\nЕсли вы нажмете Отмена, то брелок останется заблокированным.
-Allow once	AppAccessRequestWindow		Разрешить однократно
-Disallow	AppAccessRequestWindow		Запретить
-requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		запрашивает доступ к брелку:\n%keyringName%\n\n
+Password:	KeyRequestWindow		Пароль:
+Cancel	KeyRequestWindow		Отмена
+This application has been updated since it was last granted access.	AppAccessRequestWindow		Это приложение было обновлено после того как ему выдавался доступ последний раз.
+Allow always	AppAccessRequestWindow		Разрешать всегда
+Unlock	KeyRequestWindow		Разблокировать
+The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		Приложение:\n%signature% (%path%)\n\n
+This application hasn't been granted access before.	AppAccessRequestWindow		Этому приложению не выдавался доступ ранее.

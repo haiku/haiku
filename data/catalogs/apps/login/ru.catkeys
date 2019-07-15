@@ -1,20 +1,20 @@
 1	russian	x-vnd.Haiku-Login	336867745
-Error: %1	Login App		Ошибка: %1
-Hide password	Login View		Скрыть пароль
-Desktop	Desktop Window		Рабочий стол
 Invalid login!	Login View		Неправильный логин!
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tЗапустить в режиме редактирования для модификации рабочего стола.\n
-OK	Login View		OK
-error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	ошибка %s\n
-Login:	Login View		Имя пользователя:
 Error	Login App		Ошибка
-Unimplemented	Login App		Не реализовано
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tЗапустить в режиме редактирования для модификации рабочего стола.\n
 Welcome to Haiku	Login Window		Добро пожаловать в Haiku
-Reboot	Login View		Перезагрузить
-Login application for Haiku\nUsage:\n	Login App		Вход в Haiku\nИспользование:\n
-Info	Login App		Информация
 Halt	Login View		Выключение
-Password:	Login View		Пароль:
-OK	Login App		OK
+Login application for Haiku\nUsage:\n	Login App		Вход в Haiku\nИспользование:\n
 --nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tНе делать окно модальным\n
+Desktop	Desktop Window		Рабочий стол
+Hide password	Login View		Скрыть пароль
+Reboot	Login View		Перезагрузить
 You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Для настройки рабочего стола, отображаемого за приложением Вход в систему, перетащите на него репликант.\n\nКогда вы закончите просто завершите приложение (Cmd-Q).
+OK	Login View		OK
+Info	Login App		Информация
+Login:	Login View		Имя пользователя:
+Password:	Login View		Пароль:
+Unimplemented	Login App		Не реализовано
+OK	Login App		OK
+Error: %1	Login App		Ошибка: %1
+error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	ошибка %s\n

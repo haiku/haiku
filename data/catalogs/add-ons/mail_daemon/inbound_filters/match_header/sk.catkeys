@@ -1,17 +1,16 @@
-1	slovak	x-vnd.Haiku-MatchHeader	548057976
+1	slovak	x-vnd.Haiku-MatchHeader	3544711400
+Delete message	ConfigView		Zmazať správu
+Match \"%attribute\" against \"%regex\"	RuleFilter		Zhoda \"%attribute\" voči \"%regex\"
+Match header	RuleFilter		Zhoda hlavičky
+Set flags to	ConfigView		Nastaviť príznaky na
+<Choose account>	ConfigView		<Vyberte účet>
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Hodnota so zástupnými znakmi ako napr. „*spam*“.\nPoužite predponu „REGEX:“ ak chcete použiť regulárny výraz.
+Then	ConfigView		potom
+If	ConfigView		ak
+Set as read	ConfigView		Nastaviť ako prečítané
+Reply with	ConfigView		Odpovedať pomocou
 <Choose action>	ConfigView		<Vyberte operáciu>
-Header field (e.g. Subject, From, ...)	ConfigView		Pole hlavičky (napr. Predmet, Od, ...)
+Move to	ConfigView		Presunúť do
+this field is based on the action	ConfigView		toto pole je založené na operácii
 Account	ConfigView		Účet
 has	ConfigView		má
-Move to	ConfigView		Presunúť do
-Then	ConfigView		potom
-this field is based on the action	ConfigView		toto pole je založené na operácii
-Delete message	ConfigView		Zmazať správu
-<Choose account>	ConfigView		<Vyberte účet>
-Set flags to	ConfigView		Nastaviť príznaky na
-Set as read	ConfigView		Nastaviť ako prečítané
-Match header	RuleFilter		Zhoda hlavičky
-Reply with	ConfigView		Odpovedať pomocou
-If	ConfigView		ak
-Match \"%attribute\" against \"%regex\"	RuleFilter		Zhoda \"%attribute\" voči \"%regex\"
-Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Hodnota so zástupnými znakmi ako napr. „*spam*“.\nPoužite predponu „REGEX:“ ak chcete použiť regulárny výraz.

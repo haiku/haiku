@@ -1,14 +1,14 @@
 1	polish	x-vnd.Haiku-SMTP	815985329
-SMTP server:	ConfigView		Serwer SMTP:
-Error while logging in to %serv	smtp		Błąd podczas logowania do %serv
-Unencrypted	ConfigView		Nieszyfrowane
-. The server says:\n	smtp		. Serwer mówi:\n
-ESMTP	ConfigView		ESMTP
-Connecting to server…	smtp		Łączenie z serwerem…
-Error while opening connection to %serv	smtp		Błąd podczas otwierania połączenia do %serv
 POP3 authentication failed. The server said:\n	smtp		Nieudane uwierzytelnianie POP3. Serwer odpowiedział:\n
 Destination:	ConfigView		Katalog docelowy:
+Error while logging in to %serv	smtp		Błąd podczas logowania do %serv
+Connecting to server…	smtp		Łączenie z serwerem…
+Unencrypted	ConfigView		Nieszyfrowane
+. The server says:\n	smtp		. Serwer mówi:\n
+Error while opening connection to %serv	smtp		Błąd podczas otwierania połączenia do %serv
+. The server said:\n	smtp		. Serwer odpowiedział:\n
 None	ConfigView		Brak
+SMTP server:	ConfigView		Serwer SMTP:
+ESMTP	ConfigView		ESMTP
 POP3 before SMTP	ConfigView		POP3 przed SMTP
 SSL	ConfigView		SSL
-. The server said:\n	smtp		. Serwer odpowiedział:\n

@@ -1,27 +1,27 @@
 1	korean	x-vnd.Haiku.TV	1995288111
-TV	MainWin		티비
-Channel	MainWin		채널
-Settings…	MainWin		설정...
-Interface	MainWin		인터페이스
-Keep aspect ratio	MainWin		가로 세로 비율 유지
-Previous channel	MainWin		이전 채널
-Settings	MainWin		설정
-TV	System name		티비
+No menu	MainWin		메뉴 없음
 No border	MainWin		틀 제거
-Always on top	MainWin		항상 위에
-OK	MainWin		확인
-Quit	MainWin		나가기
+force 704 x 576, display aspect 4:3	MainWin		704 x 576 올림,  가로 세로 비율 4:3 보여주기
+Error, connecting to interface failed:\n\n	MainWin		에러,인터페이스 연결 실패함:\n\n
+force 544 x 576, display aspect 4:3	MainWin		544 x 576 올림,  가로 세로 비율 4:3 보여주기
 Full screen	MainWin		전체 화면
-Debug	MainWin		디버그
 Scale to native size	MainWin		원래 크기로 학대
 unknown	MainWin		알 수 없음
 Next channel	MainWin		다음 채널
-Error, interface is busy:\n\n	MainWin		에러,인터페이스가 바쁨:\n\n
-None	MainWin		없음
-force 704 x 576, display aspect 4:3	MainWin		704 x 576 올림,  가로 세로 비율 4:3 보여주기
+Keep aspect ratio	MainWin		가로 세로 비율 유지
 DVB - Digital Video Broadcasting TV	MainWin		DVB -디지털 비디오 방송 TV
-force 544 x 576, display aspect 4:3	MainWin		544 x 576 올림,  가로 세로 비율 4:3 보여주기
-pixel aspect ratio	MainWin		픽셀 가로 세로 비율
-No menu	MainWin		메뉴 없음
-Error, connecting to interface failed:\n\n	MainWin		에러,인터페이스 연결 실패함:\n\n
+Always on top	MainWin		항상 위에
+Debug	MainWin		디버그
+Interface	MainWin		인터페이스
 force 720 x 576, display aspect 4:3	MainWin		720 x 576 올림,  가로 세로 비율 4:3 보여주기
+Quit	MainWin		나가기
+Channel	MainWin		채널
+Previous channel	MainWin		이전 채널
+OK	MainWin		확인
+TV	MainWin		티비
+Settings	MainWin		설정
+TV	System name		티비
+Settings…	MainWin		설정...
+None	MainWin		없음
+Error, interface is busy:\n\n	MainWin		에러,인터페이스가 바쁨:\n\n
+pixel aspect ratio	MainWin		픽셀 가로 세로 비율

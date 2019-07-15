@@ -1,10 +1,10 @@
 1	indonesian	x-vnd.Haiku-DeskCalc	1694821448
 Compact	CalcView		Ringkas
-Scientific	CalcView		Ilmiah
-DeskCalc	System name		DeskCalc
-Basic	CalcView		Dasar
-Radians	CalcView		Radian
-Enable Num Lock on startup	CalcView		Aktifkan Num Lock pada saat mulai
 Calculating	CalcView		Menghitung
-Degrees	CalcView		Derajat
+Enable Num Lock on startup	CalcView		Aktifkan Num Lock pada saat mulai
+Scientific	CalcView		Ilmiah
+Radians	CalcView		Radian
 Audio Feedback	CalcView		Umpanbalik suara
+DeskCalc	System name		DeskCalc
+Degrees	CalcView		Derajat
+Basic	CalcView		Dasar

@@ -1,4 +1,4 @@
 1	russian	x-vnd.Haiku-SystemLogger	57960782
-%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nЭтот демон ответственен за сбор всех системный сообщений и записи из в системный лог файл \"%s\".\n\n
-OK	SyslogDaemon		ОК
 Syslog Daemon	SyslogDaemon		Syslog демон
+OK	SyslogDaemon		ОК
+%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nЭтот демон ответственен за сбор всех системный сообщений и записи из в системный лог файл \"%s\".\n\n

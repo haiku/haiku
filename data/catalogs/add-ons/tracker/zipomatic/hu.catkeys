@@ -1,17 +1,17 @@
 1	hungarian	x-vnd.haiku.zip-o-matic	2032806096
-Stop	file:ZipOMaticWindow.cpp		Leállítás
-Creating archive: %s	file:ZipOMaticWindow.cpp		Archívum létrehozása: „%s”
-Continue	file:ZipOMaticWindow.cpp		Folytatás
-Preparing to archive	file:ZipperThread.cpp		Archíválás előkészítése
 Drop files here.	file:ZipOMaticWindow.cpp		Húzza ide a fájlokat.
 Filename: %s	file:ZipOMaticWindow.cpp		Fájlnév: „%s”
-You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Jelenleg {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matic}} fut.\n\n
-Let them continue	file:ZipOMatic.cpp		Hadd legyen folytatva
 Do you want to stop them?	file:ZipOMatic.cpp		Le szeretné állítani?
+Error creating archive	file:ZipOMaticWindow.cpp		Hiba az archívum létrehozása közben.
+Stop them	file:ZipOMatic.cpp		Legyen megállítva
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Biztosan le szeretné állítani az archívum létrehozását?
+Preparing to archive	file:ZipperThread.cpp		Archíválás előkészítése
+Let them continue	file:ZipOMatic.cpp		Hadd legyen folytatva
+Continue	file:ZipOMaticWindow.cpp		Folytatás
+Archive created OK	file:ZipOMaticWindow.cpp		Az archívum elkészült.
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# fájl hozzáadva.} other{# fájl hozzáadva.}}
+Stop	file:ZipOMaticWindow.cpp		Leállítás
 Stopped	file:ZipOMaticWindow.cpp		Megállítva
 Archive	file:ZipperThread.cpp		Archívum
-Error creating archive	file:ZipOMaticWindow.cpp		Hiba az archívum létrehozása közben.
-{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# fájl hozzáadva.} other{# fájl hozzáadva.}}
-Archive created OK	file:ZipOMaticWindow.cpp		Az archívum elkészült.
-Stop them	file:ZipOMatic.cpp		Legyen megállítva
+Creating archive: %s	file:ZipOMaticWindow.cpp		Archívum létrehozása: „%s”
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Jelenleg {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matic}} fut.\n\n

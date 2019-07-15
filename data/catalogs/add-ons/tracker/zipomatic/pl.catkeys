@@ -1,17 +1,17 @@
 1	polish	x-vnd.haiku.zip-o-matic	2032806096
-Stop	file:ZipOMaticWindow.cpp		Zatrzymaj
-Creating archive: %s	file:ZipOMaticWindow.cpp		Tworzenie archiwum: %s
-Continue	file:ZipOMaticWindow.cpp		Wznów
-Preparing to archive	file:ZipperThread.cpp		Przygotowanie do archiwizacji
 Drop files here.	file:ZipOMaticWindow.cpp		Przeciągnij pliki tutaj.
 Filename: %s	file:ZipOMaticWindow.cpp		Nazwa pliku: %s
-You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Masz {0, plural, one{uruchomioną # kopię} few{uruchiomione # kopie} many{uruchomionych # kopii} other{uruchomione # kopii}} Zip-O-Matic.\n\n
-Let them continue	file:ZipOMatic.cpp		Pozwól im kontynuować
 Do you want to stop them?	file:ZipOMatic.cpp		Chcesz je zatrzymać?
+Error creating archive	file:ZipOMaticWindow.cpp		Błąd podczas tworzenia archiwum
+Stop them	file:ZipOMatic.cpp		Zatrzymaj je
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Na pewno chcesz przerwać tworzenie tego archiwum?
+Preparing to archive	file:ZipperThread.cpp		Przygotowanie do archiwizacji
+Let them continue	file:ZipOMatic.cpp		Pozwól im kontynuować
+Continue	file:ZipOMaticWindow.cpp		Wznów
+Archive created OK	file:ZipOMaticWindow.cpp		Archiwum utworzono pomyślnie
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{Dodano # plik.} few{Dodano # pliki.} many{Dodano # plików.} other{Dodano # pliku.}}
+Stop	file:ZipOMaticWindow.cpp		Zatrzymaj
 Stopped	file:ZipOMaticWindow.cpp		Zatrzymane
 Archive	file:ZipperThread.cpp		Archiwum
-Error creating archive	file:ZipOMaticWindow.cpp		Błąd podczas tworzenia archiwum
-{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{Dodano # plik.} few{Dodano # pliki.} many{Dodano # plików.} other{Dodano # pliku.}}
-Archive created OK	file:ZipOMaticWindow.cpp		Archiwum utworzono pomyślnie
-Stop them	file:ZipOMatic.cpp		Zatrzymaj je
+Creating archive: %s	file:ZipOMaticWindow.cpp		Tworzenie archiwum: %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Masz {0, plural, one{uruchomioną # kopię} few{uruchiomione # kopie} many{uruchomionych # kopii} other{uruchomione # kopii}} Zip-O-Matic.\n\n

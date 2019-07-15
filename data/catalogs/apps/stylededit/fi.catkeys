@@ -1,88 +1,88 @@
 1	finnish	x-vnd.Haiku-StyledEdit	727465241
-StyledEdit	System name		Tyylitetty editori
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Tämä tiedosto on merkitty kirjoitussuojatuksi. Tallennetaanko muutokset asiakirjaan ”%s”? 
-Paste	Menus		Liitä
-OK	LoadAlert		Valmis
-File	Menus		Tiedosto
-???	LoadAlert		???
-Modified	StatusView		Muokattu
-Lines:	Statistics		Rivejä:
-Italic	Menus		Kursivointi
-Left	Menus		Vasen
-Search backwards	FindandReplaceWindow		Etsi taaksepäin
-Unlock file	StatusView		Poista tiedoston lukitus
-Size	Menus		Koko
-Save	QuitAlert		Tallenna
-Page setup…	Menus		Sivuasetus...
-Print…	Menus		Tulosta...
-Can't undo	Menus		Ei voi perua
-Save	Menus		Tallenna
-Default	Menus		Oletus
-Replace with:	FindandReplaceWindow		Korvaa sisällöllä:
-Cancel	SaveAlert		Peru
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Palauttaminen epäonnistui, tiedostoa ei löytynyt: ”%s”.
-Case-sensitive	FindandReplaceWindow		Kirjainkoosta riippuva
-Reload	NodeMonitorAlerts		Lataa uudelleen
-Replace in all windows	FindandReplaceWindow		Korvaa kaikissa ikkunoissa
-Wrap lines	Menus		Rivitä
-Quit	Menus		Lopeta
-File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Jokin muu sovellus poisti tiedoston ”%file%”, palautetaanko se?
 Document statistics	Statistics		Asiakirjan tilastot
-Cancel	RevertToSavedAlert		Peru
-Autodetect	Menus		Automaattinen tunnistus
-Document	Menus		Asiakirja
-Save changes to the document \"%s\"? 	QuitAlert		Tallenna muutokset asiakirjaan ”%s”? 
-Edit	Menus		Muokkaa
-Revert	RevertToSavedAlert		Palauta
-Font	Menus		Kirjasin
-Replace all	FindandReplaceWindow		Korvaa kaikki
-Statistics…	Menus		Tilastot...
-Default	Open_and_SaveAsPanel		Oletus
-Replace next	Menus		Korvaa seuraava
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		tiedostossa ”%s” tallentamattomia muutoksia.\nPalautetaanko se viimeiseen tallennettuun versioon? 
-Cancel	FindandReplaceWindow		Peru
-Text encoding	Menus		Tekstikoodaus
-Close	Menus		Sulje
-Save	SaveAlert		Tallenna
-Words:	Statistics		Sanoja:
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Virhe ladattaessa ”%s”:\n\tTukematon muoto
-OK	RevertToSavedAlert		Valmis
-Don't save	QuitAlert		Älä tallenna
-Align	Menus		Tasaa
-Color	Menus		Väri
-OK	QuitAlert		Valmis
-Open…	Menus		Avaa…
-Center	Menus		Keskitä
-Unable to unlock file\n\t%s	QuitAlert		Tiedoston lukituksen poisto epäonnistui\n\t%s
-line %d, column %d	StatusView		rivi %d, sarake %d
-OK	Statistics		Valmis
-New	Menus		Uusi
-Wrap-around search	FindandReplaceWindow		Kierrätä haku alkuun
-Bold	Menus		Lihavointi
-Find selection	Menus		Hakuvalinta
-Find:	FindandReplaceWindow		Haku:
-Error saving \"%s\":\n%s	SaveAlert		Virhe tallennettaessa ”%s”:\n%s
-Copy	Menus		Kopioi
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Palauttaminen epäonnistui, tiedostoa ei löytynyt: ”%s”.
 Cut	Menus		Leikkaa
-File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Jokin toinen sovellus muokkasi tiedostoa ”%file%”, ladataanko se uudelleen?
-Replace	FindandReplaceWindow		Korvaa
-Find again	Menus		Hae uudelleen
-Cancel	QuitAlert		Peru
-Find…	Menus		Hae…
-Select all	Menus		Valitse kaikki
-Don't save	SaveAlert		Älä tallenna
-Recover	NodeMonitorAlerts		Palauta
-Error loading \"%s\":\n\t%s	LoadAlert		Virhe ladattaessa ”%s”:\n\t%s
-Ignore	NodeMonitorAlerts		Ohita
-Read-only	StatusView		Kirjoitussuojattu
-Undo typing	QuitAlert		Peru kirjoitus
+Center	Menus		Keskitä
+Wrap-around search	FindandReplaceWindow		Kierrätä haku alkuun
+Page setup…	Menus		Sivuasetus...
 Untitled 	StyledEditWindow		Otsikoton 
-OK	SaveAlert		Valmis
+OK	Statistics		Valmis
 Find	FindandReplaceWindow		Haku
-Encoding	Open_and_SaveAsPanel		Koodaus
-Characters:	Statistics		Merkkejä:
-Save as…	Menus		Tallenna nimellä...
-Redo typing	QuitAlert		Toista kirjoitus
-Reload…	Menus		Lataa uudelleen…
+New	Menus		Uusi
+Document	Menus		Asiakirja
+Search backwards	FindandReplaceWindow		Etsi taaksepäin
+Find again	Menus		Hae uudelleen
+Read-only	StatusView		Kirjoitussuojattu
+Save	Menus		Tallenna
+Cancel	QuitAlert		Peru
+Copy	Menus		Kopioi
+Reload	NodeMonitorAlerts		Lataa uudelleen
+line %d, column %d	StatusView		rivi %d, sarake %d
+Words:	Statistics		Sanoja:
+???	LoadAlert		???
+Recover	NodeMonitorAlerts		Palauta
+Error saving \"%s\":\n%s	SaveAlert		Virhe tallennettaessa ”%s”:\n%s
+OK	RevertToSavedAlert		Valmis
+Unlock file	StatusView		Poista tiedoston lukitus
+Italic	Menus		Kursivointi
+Can't undo	Menus		Ei voi perua
 Replace…	Menus		Korvaa…
+File	Menus		Tiedosto
+Bold	Menus		Lihavointi
+Paste	Menus		Liitä
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Jokin toinen sovellus muokkasi tiedostoa ”%file%”, ladataanko se uudelleen?
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Jokin muu sovellus poisti tiedoston ”%file%”, palautetaanko se?
+Lines:	Statistics		Rivejä:
+Replace in all windows	FindandReplaceWindow		Korvaa kaikissa ikkunoissa
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		tiedostossa ”%s” tallentamattomia muutoksia.\nPalautetaanko se viimeiseen tallennettuun versioon? 
+Save	SaveAlert		Tallenna
+Default	Open_and_SaveAsPanel		Oletus
+Cancel	RevertToSavedAlert		Peru
+Cancel	FindandReplaceWindow		Peru
+Statistics…	Menus		Tilastot...
+Encoding	Open_and_SaveAsPanel		Koodaus
+Replace all	FindandReplaceWindow		Korvaa kaikki
+Close	Menus		Sulje
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Virhe ladattaessa ”%s”:\n\tTukematon muoto
+Left	Menus		Vasen
+Default	Menus		Oletus
+OK	SaveAlert		Valmis
+Color	Menus		Väri
+Save changes to the document \"%s\"? 	QuitAlert		Tallenna muutokset asiakirjaan ”%s”? 
+StyledEdit	System name		Tyylitetty editori
+Find:	FindandReplaceWindow		Haku:
+Undo typing	QuitAlert		Peru kirjoitus
+Error loading \"%s\":\n\t%s	LoadAlert		Virhe ladattaessa ”%s”:\n\t%s
+Don't save	SaveAlert		Älä tallenna
+Reload…	Menus		Lataa uudelleen…
+Print…	Menus		Tulosta...
+Quit	Menus		Lopeta
+Redo typing	QuitAlert		Toista kirjoitus
+Ignore	NodeMonitorAlerts		Ohita
+Wrap lines	Menus		Rivitä
+Text encoding	Menus		Tekstikoodaus
+Unable to unlock file\n\t%s	QuitAlert		Tiedoston lukituksen poisto epäonnistui\n\t%s
+Modified	StatusView		Muokattu
+OK	LoadAlert		Valmis
+Save	QuitAlert		Tallenna
+Case-sensitive	FindandReplaceWindow		Kirjainkoosta riippuva
+Find selection	Menus		Hakuvalinta
+Cancel	SaveAlert		Peru
+Find…	Menus		Hae…
+Revert	RevertToSavedAlert		Palauta
+Size	Menus		Koko
+Autodetect	Menus		Automaattinen tunnistus
+Replace next	Menus		Korvaa seuraava
+OK	QuitAlert		Valmis
+Replace with:	FindandReplaceWindow		Korvaa sisällöllä:
+Edit	Menus		Muokkaa
+Open…	Menus		Avaa…
+Save as…	Menus		Tallenna nimellä...
+Replace	FindandReplaceWindow		Korvaa
+Characters:	Statistics		Merkkejä:
+Don't save	QuitAlert		Älä tallenna
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Tämä tiedosto on merkitty kirjoitussuojatuksi. Tallennetaanko muutokset asiakirjaan ”%s”? 
+Align	Menus		Tasaa
+Font	Menus		Kirjasin
+Select all	Menus		Valitse kaikki
 Right	Menus		Oikea

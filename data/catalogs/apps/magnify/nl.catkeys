@@ -1,17 +1,13 @@
-1	dutch; flemish	x-vnd.Haiku-Magnify	1986662371
-no clip msg\n	In console, when clipboard is empty after clicking Copy image		geen clip msg\n
-Make square	Magnify-Main		Vierkant maken
-Copy image	Magnify-Main		Afbeelding kopiëren
-usage: magnify [size] (magnify size * size pixels)\n	Console		gebruik: magnify [grootte] (vergroot grootte * grootte pixels)\n
-Stick coordinates	Magnify-Main		Coördinaten vasthouden
-magnify: size must be a multiple of 4\n	Console		vergroten: grootte moet een veelvoud van 4 zijn\n
+1	dutch; flemish	x-vnd.Haiku-Magnify	1150104797
 Decrease pixel size	Magnify-Main		Pixelgrootte verkleinen
+Increase pixel size	Magnify-Main		Pixelformaat vergroten
+Stick coordinates	Magnify-Main		Coördinaten vasthouden
+Copy image	Magnify-Main		Afbeelding kopiëren
+Decrease window size	Magnify-Main		Venster verkleinen
+Remove a crosshair	Magnify-Main		Een dradenkruis verwijderen
+Add a crosshair	Magnify-Main		Een dradenkruis toevoegen
+Increase window size	Magnify-Main		Venster vergroten
+Save image	Magnify-Main		Afbeelding opslaan
 Magnify	System name		Magnify
 Info	Magnify-Main		Info
-Remove a crosshair	Magnify-Main		Een dradenkruis verwijderen
-Save image	Magnify-Main		Afbeelding opslaan
-Increase window size	Magnify-Main		Venster vergroten
-Decrease window size	Magnify-Main		Venster verkleinen
-Increase pixel size	Magnify-Main		Pixelformaat vergroten
-  size must be > 4 and a multiple of 4\n	Console		grootte moet > 4 en een veelvoud van 4 zijn\n
-Add a crosshair	Magnify-Main		Een dradenkruis toevoegen
+Make square	Magnify-Main		Vierkant maken

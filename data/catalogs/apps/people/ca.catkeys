@@ -1,50 +1,50 @@
 1	catalan; valencian	x-vnd.Be-PEPL	2332202134
-Edit	People		Edita
-Error	People		Error
-City	People		Localitat
-The file '%name%' could not be written.	People		No s'ha pogut escriure el fitxer '%name%'
-none	Groups list		cap
-Configure attributes	People		Configura els atributs
-Company	People		Empresa
-%name% picture	People		Imatge %name%
-Work phone	People		Telèfon de la feina
-People	System name		Persones
-New person	People		Persona nova
-Select all	People		Selecciona-ho tot
-File	People		Fitxer
-Unnamed person	People		Anònim
-Could not create %s.	People		No s'ha pogut crear %s.
-Country	People		País
-Close	People		Tanca
-Group	People		Grup
-Nickname	People		Sobrenom
-Quit	People		Surt
-Name	People		Nom
-Revert	People		Reverteix
-Don't save	People		No ho desis
-Undo	People		Desfés
-E-mail	People		Adreça de correu electrònic
-Load image…	People		Carrega la imatge...
-OK	People		D'acord
-Remove image	People		Suprimeix la imatge
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Ha fallat l'execució de les preferències dels fitxers per configurar els atributs de les persones.\n\nError: 
-Home phone	People		Telèfon de casa
-Save as…	People		Anomena i desa…
-Redo	People		Refés
-Save changes before closing?	People		Voleu desar els canvis abans de tancar?
-Paste	People		Enganxa
-Drop an image here,\nor use the contextual menu.	People		Deixeu anar una imatge aquí,\no bé fey servir el menú contextual.
-Save	People		Desa
-Person	Short mimetype description		Persona
+Unnamed person	People		Anònim
 New person…	People		Persona nova...
 Address	People		Adreça
-URL	People		URL
-Sorry	People		Disculpeu
 Zip	People		Codi postal
-Contact information for a person.	Long mimetype description		Informació per contactar la persona.
-Fax	People		Fax
+Select all	People		Selecciona-ho tot
+Could not create %s.	People		No s'ha pogut crear %s.
+Quit	People		Surt
+Company	People		Empresa
+Name	People		Nom
+The file '%name%' could not be written.	People		No s'ha pogut escriure el fitxer '%name%'
 Contact name	People		Nom del contacte
-Cut	People		Retalla
 Cancel	People		Anul·la
+Edit	People		Edita
+Save changes before closing?	People		Voleu desar els canvis abans de tancar?
+People	System name		Persones
+Error	People		Error
+Revert	People		Reverteix
+Country	People		País
+Person	Short mimetype description		Persona
+New person	People		Persona nova
+Save	People		Desa
+Fax	People		Fax
+URL	People		URL
+%name% picture	People		Imatge %name%
+Home phone	People		Telèfon de casa
+none	Groups list		cap
+Save as…	People		Anomena i desa…
+Cut	People		Retalla
+Contact information for a person.	Long mimetype description		Informació per contactar la persona.
+Remove image	People		Suprimeix la imatge
+City	People		Localitat
+Undo	People		Desfés
+Don't save	People		No ho desis
+Configure attributes	People		Configura els atributs
+Work phone	People		Telèfon de la feina
 State	People		Estat
+Nickname	People		Sobrenom
+OK	People		D'acord
+File	People		Fitxer
+Redo	People		Refés
+Close	People		Tanca
 Copy	People		Còpia
+Paste	People		Enganxa
+E-mail	People		Adreça de correu electrònic
+Group	People		Grup
+Drop an image here,\nor use the contextual menu.	People		Deixeu anar una imatge aquí,\no bé fey servir el menú contextual.
+Load image…	People		Carrega la imatge...
+Sorry	People		Disculpeu

@@ -1,55 +1,54 @@
-1	catalan; valencian	x-vnd.Haiku-Terminal	1600825685
-Not found.	Terminal TermWindow		No s'ha trobat.
-Switch Terminals	Terminal TermWindow		Intercanvia els Terminals
-Change directory	Terminal TermView		Canvia la carpeta
-Cursor	Terminal AppearancePrefView		Cursor
-Professional	Terminal colors scheme		Professional
-OK	Terminal TermWindow		D'acord
-New Terminal	Terminal TermWindow		Obre un terminal
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		El terminal no ha pogut obrir l'intèrpret de les ordres. Ho sentim.
-Match case	Terminal FindWindow		Coincidència de majúscules i minúscules
-Quit	Terminal TermWindow		Surt
-Use default shell	Terminal Shell		Usa l'intèrpret d'ordres per omissió
-Select all	Terminal TermWindow		Selecciona-ho tot
-Close tab	Terminal TermWindow		Tanca la pestanya
-Save to file…	Terminal PrefWindow		Desa a un fitxer...
-Window title:	Terminal AppearancePrefView		Títol de la finestra:
-Font:	Terminal AppearancePrefView		Tipus de lletra:
-Copy here	Terminal TermView		Copia-ho aquí
-Really close?	Terminal TermWindow		Esteu segur que voleu sortir?
-Copy	Terminal TermWindow		Copia
-Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
-Color scheme:	Terminal AppearancePrefView		Esquema de colors:
-Window title:	Terminal TermWindow		Títol de la finestra:
-Unrecognized option \"%s\"\n	Terminal arguments parsing		Opció no reconeguda \"%s\"\n
-Blue	Terminal colors scheme		Blau
-Custom	Terminal colors scheme		Personalitzat
-%app% settings	Terminal PrefWindow	window title	Paràmetres del %app%
-Cancel	Terminal SetTitleWindow		Anul·la
-Increase	Terminal TermWindow		Incrementa
-Settings	Terminal TermWindow		Paràmetres
-Find	Terminal FindWindow		Cerca
-OK	Terminal SetTitleWindow		D'acord
-Cannot execute \"%command\":\n\t%error	Terminal Shell		No ha estat possible executar l'ordre \"%command\":\n\t%error
-  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		  -h,     --help               mostra aquesta ajuda\n  -t,     --title              defineix el títol de la finestra\n  -f,     --fullscreen         comença a pantalla completa\n
-Custom	Terminal AppearancePrefView	Window size	Personalitzat
-Terminal	System name		Terminal
+1	catalan; valencian	x-vnd.Haiku-Terminal	1361273145
 Close other tabs	Terminal TermWindow		Tanca les altres pestanyes
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		El terminal no ha pogut obrir l'intèrpret de les ordres. Ho sentim.
+OK	Terminal SetTitleWindow		D'acord
+Edit	Terminal TermWindow		Edita
+Select all	Terminal TermWindow		Selecciona-ho tot
+Copy	Terminal TermWindow		Copia
+Edit tab title…	Terminal TermWindow		Edita el títol de la pestanya...
+Settings	Terminal TermWindow		Paràmetres
+%app% settings	Terminal PrefWindow	window title	Paràmetres del %app%
+Close tab	Terminal TermWindow		Tanca la pestanya
+Custom	Terminal AppearancePrefView	Window size	Personalitzat
+Change directory	Terminal TermView		Canvia la carpeta
+Cancel	Terminal TermView		Anul·la
+Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
+Find next	Terminal TermWindow		Cerca el següent
+Copy link location	Terminal TermView		Copia la ubicació de l'enllaç
+Window title:	Terminal AppearancePrefView		Títol de la finestra:
+Blue	Terminal colors scheme		Blau
+Cannot execute \"%command\":\n\t%error	Terminal Shell		No ha estat possible executar l'ordre \"%command\":\n\t%error
+Open path	Terminal TermView		Obre el camí
+Terminal	System name		Terminal
+Custom	Terminal colors scheme		Personalitzat
+Really close?	Terminal TermWindow		Esteu segur que voleu sortir?
+OK	Terminal TermApp		D'acord
+Unrecognized option \"%s\"\n	Terminal arguments parsing		Opció no reconeguda \"%s\"\n
+Find failed	Terminal TermWindow		Ha fallat la cerca
+Color scheme:	Terminal AppearancePrefView		Esquema de colors:
+New Terminal	Terminal TermWindow		Obre un terminal
+Quit	Terminal TermWindow		Surt
+Match case	Terminal FindWindow		Coincidència de majúscules i minúscules
+Find previous	Terminal TermWindow		Cerca l'anterior
+Close	Terminal TermWindow		Tanca
+Save to file…	Terminal PrefWindow		Desa a un fitxer...
+Cancel	Terminal TermWindow		Anul·la
+Cursor	Terminal AppearancePrefView		Cursor
+Window title:	Terminal TermWindow		Títol de la finestra:
+Switch Terminals	Terminal TermWindow		Intercanvia els Terminals
+Settings…	Terminal TermWindow		Paràmetres…
+Cancel	Terminal SetTitleWindow		Anul·la
+Close active tab	Terminal TermWindow		Tanca la pestanya activa
+Find	Terminal FindWindow		Cerca
+Professional	Terminal colors scheme		Professional
+Font:	Terminal AppearancePrefView		Tipus de lletra:
+Paste	Terminal TermWindow		Enganxa
+Copy here	Terminal TermView		Copia-ho aquí
+Use default shell	Terminal Shell		Usa l'intèrpret d'ordres per omissió
+Open link	Terminal TermView		Obre l'enllaç
+Not found.	Terminal TermWindow		No s'ha trobat.
 Find…	Terminal TermWindow		Cerca…
 Move here	Terminal TermView		Mou aquí
-Close	Terminal TermWindow		Tanca
+Increase	Terminal TermWindow		Incrementa
+OK	Terminal TermWindow		D'acord
 Close window	Terminal TermWindow		Tanca la finestra
-Settings…	Terminal TermWindow		Paràmetres…
-Open link	Terminal TermView		Obre l'enllaç
-Edit	Terminal TermWindow		Edita
-Cancel	Terminal TermWindow		Anul·la
-OK	Terminal TermApp		D'acord
-Find failed	Terminal TermWindow		Ha fallat la cerca
-Edit tab title…	Terminal TermWindow		Edita el títol de la pestanya...
-Open path	Terminal TermView		Obre el camí
-Find previous	Terminal TermWindow		Cerca l'anterior
-Copy link location	Terminal TermView		Copia la ubicació de l'enllaç
-Find next	Terminal TermWindow		Cerca el següent
-Close active tab	Terminal TermWindow		Tanca la pestanya activa
-Paste	Terminal TermWindow		Enganxa
-Cancel	Terminal TermView		Anul·la

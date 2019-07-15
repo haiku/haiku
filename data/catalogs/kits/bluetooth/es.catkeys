@@ -1,88 +1,88 @@
 1	spanish; castilian	x-vnd.Haiku-Bluetooth	3550394259
-Display	DeviceClass		Visualización 
-Capturing	DeviceClass		Capturando
-Printer	DeviceClass		Impresora
-Uncategorized	DeviceClass		Sin categoría
-1-17% utilized	DeviceClass		1-17% utilizada
 Positioning	DeviceClass		Posicionamiento
-Rendering	DeviceClass		Renderizado
-Phone	DeviceClass		Teléfono
-17-33% utilized	DeviceClass		17-33% utilizada
-#ServerNotReady#Not Valid name	RemoteDevice		#ServidorNoListo#Nombre no válido
-Combo keyboard/pointing device	DeviceClass		Combinación teclado/dispositivo apuntador
 Controller	DeviceClass		Controlador
-No service available	DeviceClass		Sin servicio disponible
-Wearable	DeviceClass	A wearable computer	Utilizable
-Handheld	DeviceClass		Computadora de mano
-Invalid device class!\n	DeviceClass		Clase de dispositivo inválida\n
-Sensing device	DeviceClass		Dispositivo de dirección
-Computer	DeviceClass		Computadora
-Cellular	DeviceClass		Celular
-Microphone	DeviceClass		Micrófono
-Unknown (reserved) minor device class	DeviceClass		Clase de dispositivo menor desconocida (reservada)
-Cordless	DeviceClass		Sin cable
 Common ISDN access	DeviceClass		Acceso común de ISDN
-83-99% utilized	DeviceClass		83-99% utilizada
-Scanner	DeviceClass		Escáner
-Game	DeviceClass		Juego
-Gamepad	DeviceClass		Palanca de control
-(reserved)	DeviceClass		(reservado)
-Desktop workstation	DeviceClass		Estación de trabajo de escritorio
-Audio/Video	DeviceClass		Audio/Vídeo
-Glasses	DeviceClass		Lentes
+Unknown (reserved) minor device class	DeviceClass		Clase de dispositivo menor desconocida (reservada)
+Uncategorized	DeviceClass		Sin categoría
 Keyboard	DeviceClass		Teclado
-Camera	DeviceClass		Cámara
-Major class: 	DeviceClass		Clase mayor:
-50-67% utilized	DeviceClass		50-67% utilizada
-Card reader	DeviceClass		Lector de tarjetas
-Set-top box	DeviceClass		Modulo de conexión
-Helmet	DeviceClass		Casco
-Laptop	DeviceClass		Ordenador portátil
-Car audio	DeviceClass		Audio de coche
-SIM card reader	DeviceClass		Lector de tarjetas SIM
-Headphones	DeviceClass		Audífonos
-Information	DeviceClass		Información
-Remote control	DeviceClass		Control remoto
-Service classes: 	DeviceClass		Clases de servicios
-Pager	DeviceClass	A small radio device to receive short text messages	Buscapersonas
-Object transfer	DeviceClass		Transferencia de objeto
-Gaming/Toy	DeviceClass		Juego/Juguete
-Audio	DeviceClass		Audio
-Robot	DeviceClass		Robot
-Camcorder	DeviceClass		Videocámara
-Digitizer tablet	DeviceClass		Tableta digitalizadora
-Loudspeaker	DeviceClass		Altavoz
-Joystick	DeviceClass		Palanca de control
-LAN access	DeviceClass		Acceso a LAN
-Wrist watch	DeviceClass		Reloj de pulsera
-Minor class: 	DeviceClass		Clase menor:
-Networking	DeviceClass		Redes
-Portable audio	DeviceClass		Audio portátil
-Device conforms to the headset profile	DeviceClass		El dispositivo cumple con el perfil auricular
-Hands-free	DeviceClass		Manos libres
-#CommandFailed#Not Valid name	RemoteDevice		#ComandoFalló#nombre no válido
-Vehicle	DeviceClass		Vehículo
-Palm	DeviceClass	A palm-held device	Palm
-Video display and loudspeaker	DeviceClass		Pantalla de vídeo y altavoz
-Peripheral	DeviceClass		Periférico
-#NoOwnerError#Not Valid name	RemoteDevice		#Errorsindueño#Nombre no válido
-Wired modem or voice gateway	DeviceClass		Módem con conexión de cable o gateway de voz
-Jacket	DeviceClass		Conexión
-Unspecified	DeviceClass		Sin especificar
-Fully available	DeviceClass		Plenamente disponible
-67-83% utilized	DeviceClass		67-83% utilizada
-Not implemented	RemoteDevice		Sin implementar
-#NotCompletedRequest#Not Valid name	RemoteDevice		#SolicitudNoCompleta#Nombre no válido
-Server	DeviceClass		Servidor
-Video conferencing	DeviceClass		Videoconferencia
-Video camera	DeviceClass		Videocámara
-HiFi audio device	DeviceClass		Dispositivo de audio HiFi
 Smart phone	DeviceClass		Teléfono inteligente
-Telephony	DeviceClass		Telefonía
-Doll/Action figure	DeviceClass		Muñeco/Figura de Acción
 VCR	DeviceClass		VCR
-Video monitor	DeviceClass		Monitor de vídeo
-Pointing device	DeviceClass		Dispositivo apuntador
-Miscellaneous	DeviceClass		Diverso
-33-50% utilized	DeviceClass		33-50% utilizada
+Cellular	DeviceClass		Celular
+Audio	DeviceClass		Audio
+Audio/Video	DeviceClass		Audio/Vídeo
+Car audio	DeviceClass		Audio de coche
+Major class: 	DeviceClass		Clase mayor:
+HiFi audio device	DeviceClass		Dispositivo de audio HiFi
+Microphone	DeviceClass		Micrófono
+Capturing	DeviceClass		Capturando
+Jacket	DeviceClass		Conexión
+50-67% utilized	DeviceClass		50-67% utilizada
+Headphones	DeviceClass		Audífonos
 Imaging	DeviceClass		Imágenes
+Device conforms to the headset profile	DeviceClass		El dispositivo cumple con el perfil auricular
+Remote control	DeviceClass		Control remoto
+Fully available	DeviceClass		Plenamente disponible
+#CommandFailed#Not Valid name	RemoteDevice		#ComandoFalló#nombre no válido
+Server	DeviceClass		Servidor
+No service available	DeviceClass		Sin servicio disponible
+Printer	DeviceClass		Impresora
+Card reader	DeviceClass		Lector de tarjetas
+Wired modem or voice gateway	DeviceClass		Módem con conexión de cable o gateway de voz
+#ServerNotReady#Not Valid name	RemoteDevice		#ServidorNoListo#Nombre no válido
+#NoOwnerError#Not Valid name	RemoteDevice		#Errorsindueño#Nombre no válido
+Camcorder	DeviceClass		Videocámara
+#NotCompletedRequest#Not Valid name	RemoteDevice		#SolicitudNoCompleta#Nombre no válido
+17-33% utilized	DeviceClass		17-33% utilizada
+Desktop workstation	DeviceClass		Estación de trabajo de escritorio
+Unspecified	DeviceClass		Sin especificar
+Miscellaneous	DeviceClass		Diverso
+Robot	DeviceClass		Robot
+Vehicle	DeviceClass		Vehículo
+LAN access	DeviceClass		Acceso a LAN
+Glasses	DeviceClass		Lentes
+Phone	DeviceClass		Teléfono
+Laptop	DeviceClass		Ordenador portátil
+67-83% utilized	DeviceClass		67-83% utilizada
+Cordless	DeviceClass		Sin cable
+Invalid device class!\n	DeviceClass		Clase de dispositivo inválida\n
+Minor class: 	DeviceClass		Clase menor:
+Doll/Action figure	DeviceClass		Muñeco/Figura de Acción
+Not implemented	RemoteDevice		Sin implementar
+33-50% utilized	DeviceClass		33-50% utilizada
+Gaming/Toy	DeviceClass		Juego/Juguete
+Video camera	DeviceClass		Videocámara
+Handheld	DeviceClass		Computadora de mano
+Service classes: 	DeviceClass		Clases de servicios
+Loudspeaker	DeviceClass		Altavoz
+83-99% utilized	DeviceClass		83-99% utilizada
+SIM card reader	DeviceClass		Lector de tarjetas SIM
+Computer	DeviceClass		Computadora
+Scanner	DeviceClass		Escáner
+Wearable	DeviceClass	A wearable computer	Utilizable
+Display	DeviceClass		Visualización 
+Gamepad	DeviceClass		Palanca de control
+Video monitor	DeviceClass		Monitor de vídeo
+Palm	DeviceClass	A palm-held device	Palm
+Joystick	DeviceClass		Palanca de control
+Networking	DeviceClass		Redes
+Telephony	DeviceClass		Telefonía
+Game	DeviceClass		Juego
+Video display and loudspeaker	DeviceClass		Pantalla de vídeo y altavoz
+Wrist watch	DeviceClass		Reloj de pulsera
+Sensing device	DeviceClass		Dispositivo de dirección
+Pointing device	DeviceClass		Dispositivo apuntador
+(reserved)	DeviceClass		(reservado)
+Rendering	DeviceClass		Renderizado
+Information	DeviceClass		Información
+Helmet	DeviceClass		Casco
+Pager	DeviceClass	A small radio device to receive short text messages	Buscapersonas
+Hands-free	DeviceClass		Manos libres
+Digitizer tablet	DeviceClass		Tableta digitalizadora
+Portable audio	DeviceClass		Audio portátil
+Camera	DeviceClass		Cámara
+1-17% utilized	DeviceClass		1-17% utilizada
+Combo keyboard/pointing device	DeviceClass		Combinación teclado/dispositivo apuntador
+Video conferencing	DeviceClass		Videoconferencia
+Peripheral	DeviceClass		Periférico
+Object transfer	DeviceClass		Transferencia de objeto
+Set-top box	DeviceClass		Modulo de conexión

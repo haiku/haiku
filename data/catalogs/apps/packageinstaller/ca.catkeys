@@ -1,8 +1,8 @@
 1	catalan; valencian	x-vnd.Haiku-PackageInstaller	291262722
-OK	PackageView		D'acord
-Accept	PackageTextViewer		Accepta
 Continue	PackageInstall		Continua
-Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Error (%s)! No ha estat possible obrir \"%s\".\n
-Continue	PackageInfo		Continua
-Continue	PackageTextViewer		Continua
 OK	UninstallView		D'acord
+Accept	PackageTextViewer		Accepta
+Continue	PackageTextViewer		Continua
+Continue	PackageInfo		Continua
+OK	PackageView		D'acord
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Error (%s)! No ha estat possible obrir \"%s\".\n

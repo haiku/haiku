@@ -1,21 +1,17 @@
-1	german	x-vnd.Haiku-Magnify	931164741
-no clip msg\n	In console, when clipboard is empty after clicking Copy image		no clip msg\n
-Make square	Magnify-Main		Quadratisches Fenster
-Copy image	Magnify-Main		Bild kopieren
-usage: magnify [size] (magnify size * size pixels)\n	Console		Gebrauch: Magnify [Größe] (Fenstergröße * Pixelgröße)\n
-Freeze image	Magnify-Main		Bild einfrieren
+1	german	x-vnd.Haiku-Magnify	94607167
+Decrease pixel size	Magnify-Main		Pixel verkleinern
+Increase pixel size	Magnify-Main		Pixel vergrößern
 Stick coordinates	Magnify-Main		Koordinaten einfrieren
 %width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height  @ {0, plural, one{# Pixel/Pixel} other{# Pixel/Pixel}}
-Show info	Magnify-Main		Info anzeigen
-magnify: size must be a multiple of 4\n	Console		magnify: Größe muss ein Vielfaches von 4 sein\n
-Decrease pixel size	Magnify-Main		Pixel verkleinern
+Copy image	Magnify-Main		Bild kopieren
+Decrease window size	Magnify-Main		Fenster verkleinern
+Remove a crosshair	Magnify-Main		Fadenkreuz entfernen
+Add a crosshair	Magnify-Main		Fadenkreuz hinzufügen
+Freeze image	Magnify-Main		Bild einfrieren
+Increase window size	Magnify-Main		Fenster vergrößern
+Save image	Magnify-Main		Bild speichern
+Show grid	Magnify-Main		Raster anzeigen
 Magnify	System name		Lupe
 Info	Magnify-Main		Info
-Remove a crosshair	Magnify-Main		Fadenkreuz entfernen
-Show grid	Magnify-Main		Raster anzeigen
-Save image	Magnify-Main		Bild speichern
-Increase window size	Magnify-Main		Fenster vergrößern
-Decrease window size	Magnify-Main		Fenster verkleinern
-Increase pixel size	Magnify-Main		Pixel vergrößern
-  size must be > 4 and a multiple of 4\n	Console		Größe muss > 4 und ein Vielfaches von 4 sein\n
-Add a crosshair	Magnify-Main		Fadenkreuz hinzufügen
+Show info	Magnify-Main		Info anzeigen
+Make square	Magnify-Main		Quadratisches Fenster

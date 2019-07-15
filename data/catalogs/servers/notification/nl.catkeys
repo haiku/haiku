@@ -1,5 +1,5 @@
 1	dutch; flemish	x-vnd.Haiku-notification_server	2022780929
 Warning	NotificationWindow		Waarschuwing
+Notification	NotificationWindow		Melding
 OK	NotificationWindow		OK
 Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		De monitor voor algemene instellingen kon niet gestart worden.\nLive filterwijzigingen werden uitgeschakeld.
-Notification	NotificationWindow		Melding

@@ -1,28 +1,27 @@
-1	korean	x-vnd.Haiku-PPMTranslator	2956874952
+1	korean	x-vnd.Haiku-PPMTranslator	1015847265
+None	PPMTranslator		없음
 PPM Settings	PPMMain		PPM 설정
-Based on PPMTranslator sample code	PPMTranslator		PPMTranslator 샘플 코드에 기반을 둠
-OK	PPMMain		확인
+System palette 8 bits	PPMTranslator		시스템 팔레트 8 비트
+Sample code copyright 1999, Be Incorporated	PPMTranslator		샘플 코드 copyright 1999, Be Incorporated
+Something is wrong with the PPMTranslator!	PPMMain		뭔가 PPMTranslator 잘못입니다!
 Grayscale 8 bits	PPMTranslator		흑백 8 b 비트
+Based on PPMTranslator sample code	PPMTranslator		PPMTranslator 샘플 코드에 기반을 둠
+RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 비트 빅-엔디언
+Bitmap 1 bit	PPMTranslator		비트맵 1 비트
+RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 비트 빅-엔디언
+PPMTranslator Settings	PPMTranslator		PPM변환기 설정
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 비트
+OK	PPMMain		확인
+CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 바트
 PPM image	PPMTranslator		PPM 이미지
+RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 비트 빅-엔디언
+RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 비트 빅-엔디언
+Write ASCII	PPMTranslator		ASCII 기록
+RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 비트
+RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 비트 빅-엔디언
+RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 비트
+CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 비트
+RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 바트
+RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 비트
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 비트
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Be 비트맵 형식 (PPM변환기)
-CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 바트
-CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 비트
-bits/space	PPMTranslator		비트/공간
-RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 비트 빅-엔디언
-RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 비트 빅-엔디언
-RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 비트 빅-엔디언
-RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 비트
-Write ASCII	PPMTranslator		ASCII 기록
-RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 비트
-None	PPMTranslator		없음
-RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 비트 빅-엔디언
-RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 비트
-Bitmap 1 bit	PPMTranslator		비트맵 1 비트
-RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 비트 빅-엔디언
-RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 바트
-Sample code copyright 1999, Be Incorporated	PPMTranslator		샘플 코드 copyright 1999, Be Incorporated
-PPMTranslator Settings	PPMTranslator		PPM변환기 설정
-Something is wrong with the PPMTranslator!	PPMMain		뭔가 PPMTranslator 잘못입니다!
-System palette 8 bits	PPMTranslator		시스템 팔레트 8 비트

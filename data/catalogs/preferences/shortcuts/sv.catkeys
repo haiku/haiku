@@ -1,42 +1,41 @@
-1	swedish	x-vnd.Haiku-Shortcuts	986541402
-OK	ShortcutsWindow		OK
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Genvägar kunde inte spara din genvägsuppsättning.
-Cancel	ShortcutsWindow		Avbryt
-Append KeySet…	ShortcutsWindow		Lägg till…
-Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
-Key	ShortcutsWindow		Tangent
-Open KeySet…	ShortcutsWindow		Öppna…
-Error, NULL state description?	ShortcutsSpec		Fel: NULL i tillståndsbeskrivning?
-Revert to saved	ShortcutsWindow		Återgå till sparade
-*InsertString \"Your Text Here\"	ShortcutsWindow		*InfogaSträng \"Din text\"
+1	swedish	x-vnd.Haiku-Shortcuts	1611284793
 *MouseUp	ShortcutsWindow		*MusnappUpp
-(Choose application with file requester)	ShortcutsWindow		(Välj applikation i filväljarfönstret)
-*LaunchHandler text/html	ShortcutsWindow		*StartHanterare text/html
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Genvägar kunde inte öppna din tagentuppsättning!
-*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Flera \"*FlyttaMusTill 100% 0\" \"*Musknapp 1\"
-Option	ShortcutsSpec	Name for modifier on keyboard	Alternativ
-Save	ShortcutsWindow		Spara
-*MouseButton 1	ShortcutsWindow		*Musknapp 1
-*MoveMouse +20 +0	ShortcutsWindow		*FlyttaMusenTill +20 +0
-Save changes before closing?	ShortcutsWindow		Spara ändringar innan programmet avslutas?
-Command	ShortcutsSpec	Name for modifier on keyboard	Kommando
-Remove selected shortcut	ShortcutsWindow		Ta bort
-Add new shortcut	ShortcutsWindow		Lägg till
-Save & apply	ShortcutsWindow		Spara
-*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SkickaMeddelande application/x-vnd.Be-TRAK 'Tfnd'
-Append	ShortcutsWindow		Lägg till
-File	ShortcutsWindow		Arkiv
-Quit	ShortcutsWindow		Avsluta
-*MouseDown	ShortcutsWindow		*MusknappNer
-Don't save	ShortcutsWindow		Spara inte
 Application	ShortcutsWindow		Applikation
-Shift	ShortcutsSpec	Name for modifier on keyboard	Skift
+Option	ShortcutsSpec	Name for modifier on keyboard	Alternativ
+Save changes before closing?	ShortcutsWindow		Spara ändringar innan programmet avslutas?
+Revert to saved	ShortcutsWindow		Återgå till sparade
+Don't save	ShortcutsWindow		Spara inte
+*MouseDown	ShortcutsWindow		*MusknappNer
 *Beep	ShortcutsWindow		*Pip
-*MoveMouseTo 50% 50%	ShortcutsWindow		*FlyttaMuspekareTill 50% 50%
-Save KeySet as…	ShortcutsWindow		Spara som...
-Open	ShortcutsWindow		Öppna
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Genvägar kunde inte läsa dina inställningar!
-Select	ShortcutsWindow		Välj
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Genvägar kunde inte spara dina inställningar!
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Genvägar kunde inte spara din genvägsuppsättning.
+Save	ShortcutsWindow		Spara
 Oh no	ShortcutsWindow		Åh nej!
+Key	ShortcutsWindow		Tangent
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SkickaMeddelande application/x-vnd.Be-TRAK 'Tfnd'
+Select	ShortcutsWindow		Välj
 Shortcuts	System name		Genvägar
+Quit	ShortcutsWindow		Avsluta
+(Choose application with file requester)	ShortcutsWindow		(Välj applikation i filväljarfönstret)
+Cancel	ShortcutsWindow		Avbryt
+*MoveMouse +20 +0	ShortcutsWindow		*FlyttaMusenTill +20 +0
+Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Genvägar kunde inte läsa dina inställningar!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Genvägar kunde inte spara dina inställningar!
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InfogaSträng \"Din text\"
+Remove selected shortcut	ShortcutsWindow		Ta bort
+Error, NULL state description?	ShortcutsSpec		Fel: NULL i tillståndsbeskrivning?
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Genvägar kunde inte öppna din tagentuppsättning!
+Save & apply	ShortcutsWindow		Spara
+Open	ShortcutsWindow		Öppna
+Append	ShortcutsWindow		Lägg till
+Save KeySet as…	ShortcutsWindow		Spara som...
+Append KeySet…	ShortcutsWindow		Lägg till…
+*MouseButton 1	ShortcutsWindow		*Musknapp 1
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Flera \"*FlyttaMusTill 100% 0\" \"*Musknapp 1\"
+OK	ShortcutsWindow		OK
+Add new shortcut	ShortcutsWindow		Lägg till
+Shift	ShortcutsSpec	Name for modifier on keyboard	Skift
+Open KeySet…	ShortcutsWindow		Öppna…
+File	ShortcutsWindow		Arkiv
+*LaunchHandler text/html	ShortcutsWindow		*StartHanterare text/html
+*MoveMouseTo 50% 50%	ShortcutsWindow		*FlyttaMuspekareTill 50% 50%

@@ -1,47 +1,47 @@
 1	belarusian	x-vnd.Haiku-Time	2676925183
-GMT (UNIX compatible)	Time		GMT (як у UNIX)
 OK	Time		ОК
-Asia	Time		Азія
-\nNow: 	Time		\nЗараз: 
-Africa	Time		Афрыка
-Stop	Time		Спыніць
-Australia	Time		Аўстралія
-Preview time:	Time		Праглядзець час:
-Synchronize	Time		Сінхранізаваць
-Revert	Time		Адвярнуць
-Pacific	Time		Ціхі акіян
-Show day of week	Time		Паказваць дзень тыдню
-Add	Time		Дадаць
-Date and time	Time		Дата і Час
-about	Time		пра праграму
-Local time (Windows compatible)	Time		Лакальны час (як у Windows)
 Message receiving failed	Time		Памылка атрымання паведамлення
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date, распрацавана:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
+Australia	Time		Аўстралія
+America	Time		Амерыка
 Set time zone	Time		Пазначыць часавы пояс
+The following error occured while synchronizing:r\n%s: %s	Time		Памылка падчас сінхранізацыі:r\n%s: %s
 Waiting for answer failed	Time		Памылка падчас чакання адказу
-Hardware clock set to:	Time		Гадзіннік кампутара усталяваны на:
+<Other>	Time		<Іншае>
+Received invalid time	Time		Атрыманы несапраўдны час
+Remove	Time		Выдаліць
+Synchronize again	Time		Сінхранізаваць ізноў
+Asia	Time		Азія
+Try all servers	Time		Паспрабаваць усе серверы
+Time	Time		Час
+Current time:	Time		Сапраўдны час:
 The following error occured while synchronizing:r\n%s	Time		Памылка падчас сінхранізацыі:r\n%s
 Europe	Time		Эўропа
-Remove	Time		Выдаліць
-Time	Time		Час
-Indian	Time		Індыя
-Sending request failed	Time		Немагчыма адаслаць запыт
+Show day of week	Time		Паказваць дзень тыдню
+Local time (Windows compatible)	Time		Лакальны час (як у Windows)
+Hardware clock set to:	Time		Гадзіннік кампутара усталяваны на:
 Arctic	Time		Арктыка
-Display time with seconds	Time		Паказваць час з секундамі
-Time	System name		Дата і Час
-America	Time		Амерыка
-Synchronize at boot	Time		Сінхранізаваць падчас старту
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date, распрацавана:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
-Received invalid time	Time		Атрыманы несапраўдны час
 Antarctica	Time		Антарктыка
-Show time zone	Time		Паказаць часавы пояс
-Show clock in Deskbar	Time		Паказваць гадзіннік у Deskbar-ы
-The following error occured while synchronizing:r\n%s: %s	Time		Памылка падчас сінхранізацыі:r\n%s: %s
-<Other>	Time		<Іншае>
-Current time:	Time		Сапраўдны час:
-Try all servers	Time		Паспрабаваць усе серверы
+GMT (UNIX compatible)	Time		GMT (як у UNIX)
+Africa	Time		Афрыка
+Stop	Time		Спыніць
 Time zone	Time		Часавы пояс
-Could not create socket	Time		Немагчыма стварыць сеткавы сокет
-Synchronize again	Time		Сінхранізаваць ізноў
 Clock	Time		Гадзіннік
 Network time	Time		Сеткавы час
+Sending request failed	Time		Немагчыма адаслаць запыт
+Preview time:	Time		Праглядзець час:
+\nNow: 	Time		\nЗараз: 
+Could not create socket	Time		Немагчыма стварыць сеткавы сокет
+Pacific	Time		Ціхі акіян
 Atlantic	Time		Атлантыка
+Show clock in Deskbar	Time		Паказваць гадзіннік у Deskbar-ы
+Display time with seconds	Time		Паказваць час з секундамі
+Time	System name		Дата і Час
+about	Time		пра праграму
+Show time zone	Time		Паказаць часавы пояс
+Synchronize at boot	Time		Сінхранізаваць падчас старту
+Indian	Time		Індыя
+Revert	Time		Адвярнуць
+Date and time	Time		Дата і Час
+Synchronize	Time		Сінхранізаваць
+Add	Time		Дадаць

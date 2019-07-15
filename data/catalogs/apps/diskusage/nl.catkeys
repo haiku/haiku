@@ -1,5 +1,7 @@
-1	dutch; flemish	x-vnd.Haiku-DiskUsage	1435170580
+1	dutch; flemish	x-vnd.Haiku-DiskUsage	2951688400
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% voor {0, plural, one{# bestand} other{# bestanden}}
 Scanning %refName%	Scanner		%refName% scannen
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d bestanden
 Size	Info Window		Grootte
 Rescan	Pie View		Opnieuw scannen
 Kind	Info Window		Soort
@@ -9,9 +11,13 @@ Path	Info Window		Pad
 Scan	Status View		Scannen
 Rescan	Status View		Opnieuw scannen
 file unavailable	Status View		bestand niet beschikbaar
+Get info	Pie View		Informatie ophalen
 DiskUsage	System name		DiskUsage
 Created	Info Window		Gemaakt
 Modified	Info Window		Aangepast
+Abort	Status View		Afbreken
+Open with	Pie View		Openen met
 Open	Pie View		Openen
+{0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# bestand} other{# bestanden}}
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
 Free on %refName%	Scanner		Vrij op %refName%

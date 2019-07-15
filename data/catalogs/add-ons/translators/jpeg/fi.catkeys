@@ -1,22 +1,22 @@
 1	finnish	x-vnd.Haiku-JPEGTranslator	3788699631
-Output quality	JPEGTranslator		Tulostuslaatu
-JPEG images	JPEGTranslator		JPEG-kuvat
-Prevent colors 'washing out'	JPEGTranslator		Estää värejä ’huuhtoutumasta pois’
-JPEG Library Error: %s\n	be_jerror		JPEG-kirjastovirhe: %s\n
-Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Käytä CMYK-koodia mustepeitolla 0...100 %
-About	JPEGTranslator		Ohjelmasta
-©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nPerustuu IJG-kirjastoon © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nsekä Ken Murchison ”häviötön”-koodaustukikorjaukseen\n\thttp://www.oceana.com/ftp/ljpeg/\n\nMukana on joitakin Magnus Hellmanin väritilamuunnosrutiineja\n\thttp://www.bebits.com/app/802\n
-Low	JPEGTranslator		Alhainen
-Make file smaller (sligthtly worse quality)	JPEGTranslator		Tee tiedosto pienemmäksi (lievästi huononnettu laatu)
-None	JPEGTranslator		Ei mikään
+Read	JPEGTranslator		Lue
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be-bittikarttamuoto (JPEG-muunnin)
 Show warning messages	JPEGTranslator		Näytä varoitussanomat
-Output smoothing strength	JPEGTranslator		Tulostuskiillotusvoimakkuus
-High	JPEGTranslator		Korkea
-Write	JPEGTranslator		Kirjoita
-Write black-and-white images as RGB24	JPEGTranslator		Kirjoita mustavalkoisia kuvia RGB24-väreinä
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Käytä CMYK-koodia mustepeitolla 0...100 %
+JPEG Library Error: %s\n	be_jerror		JPEG-kirjastovirhe: %s\n
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nPerustuu IJG-kirjastoon © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nsekä Ken Murchison ”häviötön”-koodaustukikorjaukseen\n\thttp://www.oceana.com/ftp/ljpeg/\n\nMukana on joitakin Magnus Hellmanin väritilamuunnosrutiineja\n\thttp://www.bebits.com/app/802\n
+None	JPEGTranslator		Ei mikään
+About	JPEGTranslator		Ohjelmasta
 Version %d.%d.%d	JPEGTranslator		Versio %d.%d.%d
-Read greyscale images as RGB32	JPEGTranslator		Lue harmaaskaalavärejä RGB32-väreinä
-Read	JPEGTranslator		Lue
-JPEG Library Warning: %s\n	be_jerror		JPEG-kirjastovaroitus: %s\n
+Write black-and-white images as RGB24	JPEGTranslator		Kirjoita mustavalkoisia kuvia RGB24-väreinä
+Output smoothing strength	JPEGTranslator		Tulostuskiillotusvoimakkuus
 Use progressive compression	JPEGTranslator		Käytä progressiivista tiivistystä
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Tee tiedosto pienemmäksi (lievästi huononnettu laatu)
+High	JPEGTranslator		Korkea
+Read greyscale images as RGB32	JPEGTranslator		Lue harmaaskaalavärejä RGB32-väreinä
+Output quality	JPEGTranslator		Tulostuslaatu
+Low	JPEGTranslator		Alhainen
+Write	JPEGTranslator		Kirjoita
+Prevent colors 'washing out'	JPEGTranslator		Estää värejä ’huuhtoutumasta pois’
+JPEG Library Warning: %s\n	be_jerror		JPEG-kirjastovaroitus: %s\n
+JPEG images	JPEGTranslator		JPEG-kuvat

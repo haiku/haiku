@@ -1,13 +1,13 @@
-1	korean	x-vnd.Haiku-desklink	3734721410
-Control physical output	MediaReplicant		물리 출력 제어
-Couldn't launch 	MediaReplicant		실행 불가
-OK	MediaReplicant		확인
+1	korean	x-vnd.Haiku-desklink	3362080269
+desklink	MediaReplicant	Title of an alert box	데스크링크
 Sound preferences…	MediaReplicant		사운드 환경설정...
 %g dB	MediaReplicant		%g 데시벨
-No media server running	VolumeControl		동작 중인 미디어 서버가 없음
-Media preferences…	MediaReplicant		미디어 환경설정...
+OK	MediaReplicant		확인
+Couldn't launch 	MediaReplicant		실행 불가
+Volume	VolumeControl		음량
 Open MediaPlayer	MediaReplicant		미디어재생기 열기
-desklink	MediaReplicant		데스크링크
+Media preferences…	MediaReplicant		미디어 환경설정...
 Options	MediaReplicant		옵션
 Beep	MediaReplicant		비프
-Volume	VolumeControl		음량
+Control physical output	MediaReplicant		물리 출력 제어
+No media server running	VolumeControl		동작 중인 미디어 서버가 없음

@@ -1,157 +1,157 @@
 1	japanese	x-vnd.Haiku-FileTypes	734679611
-Application types…	FileTypes Window		アプリケーションタイプ…
-Description:	Application Types Window		説明:
-Args only	Application Type Window		引数のみ
-Recognition rule is not valid:\n\n	FileTypes Window		認識ルールが無効です:\n\n
-Add group	New File Type Window		グループを追加
-Remove	Application Type Window		削除
-Select same type as	FileType Window		このアプリケーションと同じタイプを選ぶ
-Remove icon	Icon View		アイコンを削除
-Supported types	Application Type Window		対応しているタイプ
-Show icons in list	FileTypes Window		リストにアイコンを表示
-Type name:	FileTypes Window		タイプ名:
-Internal name:	New File Type Window		内部名:
-Choose type	Type List Window		タイプを選択
-New file type	New File Type Window		新規ファイルタイプ
-Rule:	FileTypes Window		ルール:
-Add icon…	Icon View		アイコンを追加…
-Multiple files from \"%s\" file type	FileType Window		\"%s\"というファイルタイプで始まる複数ファイル
-File type	FileType Window		ファイルタイプ
-Could not change attributes	Attribute Window		属性を変更できません
-Could not retrieve preferred application of this file	Preferred App Menu		このファイルの優先アプリケーションを検索できませんでした。
-Beta	Application Types Window		ベータ版
-Extensions:	FileTypes Window		拡張子:
-Select same preferred application as	FileTypes Window		このタイプと同じ優先アプリケーションを選ぶ
-Save	Application Type Window		保存
-Could not retrieve application signature	Preferred App Menu		アプリケーションの署名を読みだせませんでした。
-Add	Extension Window		追加
-Select same preferred application as	FileType Window		このタイプと同じ優先アプリケーションを選ぶ
-Cancel	Attribute Window		中止
-Icon	Application Type Window		アイコン
-Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		ファイルタイプの削除は撤回できません。\nそれでも削除を実行しますか?
-Editable	Attribute Window	If Tracker allows to edit this attribute.	編集可能
-Multiple launch	Application Type Window		複数起動可能
-(from application)	FileTypes Window		(アプリケーションから)
-Could not set preferred application	FileTypes Window		優先アプリケーションを設定できませんでした
-Group:	New File Type Window		グループ:
-%1 application type	Application Type Window		%1のアプリケーションタイプ
-Done	Extension Window		完了
-Application type	Application Type Window		アプリケーションタイプ
-Done	Type List Window		完了
-Attribute	Attribute Window		属性
-Show recognition rule	FileTypes Window		認識ルールを表示
-FileTypes request	Preferred App Menu		ファイルタイプの登録
-Could not open file	FileType Window		ファイルを開けません
-Description:	FileTypes Window		説明:
-File	FileTypes Window		ファイル
-Name:	Application Types Window		名前:
-Group name:	New File Type Window		グループ名:
-Preferred application	FileType Window		優先アプリケーション
-Progress	Application Types Window		進行状況
-Set preferred application	Preferred App Menu		優先アプリケーションを設定する
-Don't save	Application Type Window		保存しない
-Save changes before closing?	Application Type Window		閉じる前に変更を保存しますか?
-File	Application Type Window		ファイル
-{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# 個のアプリケーションタイプが削除される可能性があります} other{# 個のアプリケーションタイプが削除される可能性があります}}
-Version:	Application Type Window		バージョン:
-Select…	FileTypes Window		選択…
-FileTypes request	FileTypes		ファイルタイプの登録
-Open…	FileTypes Window		開く…
-Select…	FileType Window		選択…
-Launch	Application Types Window		起動
-Same as…	FileType Window	The same APPLICATION as ...	このアプリケーションと同様…
-Abort	Application Types Window		中断
-FileTypes	FileTypes		FileTypes
-OK	FileTypes		OK
-Extra attributes	FileTypes Window		拡張属性
-Development	Application Type Window		開発
-Edit…	Application Types Window		編集…
-Icon	FileType Window		アイコン
-Final	Application Types Window		リリース版
-Development	Application Types Window		開発
-Open file	FileTypes		ファイルを開く
-Special:	Attribute Window		特別:
-Alpha	Application Type Window		アルファ版
-Add…	FileTypes Window		追加…
-Signature:	Application Type Window		署名:
-Add…	Application Type Window		追加…
-[Multiple files] file types	FileType Window		[複数ファイル] ファイルタイプ
-Information	Application Types Window		情報
-Gamma	Application Types Window		ガンマ版
-Quit	FileTypes Window		終了
-Select preferred application	FileType Window		優先アプリケーションを選択する
-Single launch	Application Type Window		複数同時起動不可
-Golden master	Application Types Window		ゴールデンマスター
-%s file type	FileType Window		%sのファイルタイプ
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		\"%s\" アプリケーションはこのファイルタイプに対応していません。\nそれでも設定しますか?
-Type:	Attribute Window		タイプ:
-Removing uninstalled application types	Application Types Window		アンイントール済アプリケーションのタイプを削除します
-Done	Attribute Window		完了
-no icon	FileTypes Window		アイコン無し
-Alpha	Application Types Window		アルファ版
-Version	Application Types Window		バージョン
-Background app	Application Type Window		バックグラウンド実行
-Add new group	New File Type Window		新規グループを追加
-Move down	FileTypes Window		下へ移動
-Cancel	Application Type Window		中止
-Settings	FileTypes Window		設定
-New resource file…	FileTypes Window		新規リソースファイル…
-Cancel	New File Type Window		中止
-Icon	FileTypes Window		アイコン
-Extension:	Extension Window		拡張子:
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		スーパータイプの削除は取り消せません。\n削除されるスーパータイプに属するファイルタイプはすべて削除されます！\n\nそれでも削除を実行しますか?グループ全体を削除するには、シフトキーを押しながら\"削除\"を押してください。
-Internal name:	FileTypes Window		内部的な名前:
-Add	Attribute Window		追加
-Close	Application Type Window		閉じる
-File recognition	FileTypes Window		ファイルの認識
-Remove uninstalled	Application Types Window		アンインストール済を削除
-Center	Attribute Window	Attribute column alignment in Tracker	中央揃え
-Golden master	Application Type Window		ゴールデンマスター
-Could not open \"%s\":\n%s	FileTypes		\"%s\" が開けません:\n%s
-Alignment:	Attribute Window		配置:
 Left	Attribute Window	Attribute column alignment in Tracker	左揃え
-Cancel	Extension Window		中止
-Path:	Application Types Window		パス:
-Application flags	Application Type Window		アプリケーションフラグ
-Cancel	Type List Window		中止
-Move up	FileTypes Window		上へ移動
-Description	FileTypes Window		説明
-Save request	Application Type Window		登録したファイルタイプの保存
-Beta	Application Type Window		ベータ版
-None	FileTypes Window		無し
-Remove	FileTypes Window		削除
-Attribute name:	Attribute Window		属性の名前:
-Extension	Extension Window		拡張子
-Add type	New File Type Window		タイプの追加
-Internal name:	Attribute Window		内部名:
-Show in Tracker…	Application Types Window		Trackerに表示…
-Final	Application Type Window		リリース版
-Width:	Attribute Window	Default column width in Tracker for this attribute.	幅:
-Display as:	Attribute Window	Tracker offers different display modes for attributes.	表示形式:
-This file type already exists	New File Type Window		このファイルタイプはすでに存在します。
-Same as…	FileTypes Window		このタイプと同様…
-Exclusive launch	Application Type Window		排他的起動
-FileTypes	System name		FileTypes
-Application types	Application Types Window		アプリケーションタイプ
-Could not remove file type: %s\n	FileTypes Window		ファイルタイプ %s を削除できません\n
-Signature:	Application Types Window		署名:
-Gamma	Application Type Window		ガンマ版
-Cancel	Preferred App Menu		中止
-Cancel	FileTypes Window		中止
-Select preferred application	FileTypes Window		優先アプリケーションを選択する
-Right	Attribute Window	Attribute column alignment in Tracker	右揃え
-Default application	FileType Window		デフォルトアプリケーション
-Long description:	Application Type Window		詳細説明:
+Final	Application Types Window		リリース版
 FileTypes request	FileTypes Window		ファイルタイプの登録
-Version info	Application Type Window		バージョン情報
-(from super type)	FileTypes Window		(スーパータイプから)
-Version:	Application Types Window		バージョン:
+This file type already exists	New File Type Window		このファイルタイプはすでに存在します。
 Preferred application	FileTypes Window		優先アプリケーション
-Short description:	Application Type Window		簡単な説明:
-File could not be opened	Preferred App Menu		ファイルを開けませんでした
-Could not change file extensions	Extension Window		ファイル拡張子の変更はできませんでした
-Edit icon…	Icon View		アイコンの編集…
+Launch	Application Types Window		起動
+Removing uninstalled application types	Application Types Window		アンイントール済アプリケーションのタイプを削除します
+Width:	Attribute Window	Default column width in Tracker for this attribute.	幅:
 Same as…	FileType Window	The same TYPE as ...	このタイプと同様…
-Save into resource file…	Application Type Window		リソースファイルに保存…
+(from super type)	FileTypes Window		(スーパータイプから)
+Select same preferred application as	FileTypes Window		このタイプと同じ優先アプリケーションを選ぶ
+Could not change attributes	Attribute Window		属性を変更できません
+Icon	FileTypes Window		アイコン
+Add…	Application Type Window		追加…
+Attribute name:	Attribute Window		属性の名前:
+Long description:	Application Type Window		詳細説明:
+Cancel	Preferred App Menu		中止
+Remove	FileTypes Window		削除
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		\"%s\" アプリケーションはこのファイルタイプに対応していません。\nそれでも設定しますか?
+Remove	Application Type Window		削除
+Gamma	Application Type Window		ガンマ版
+Cancel	Application Type Window		中止
+Attribute	Attribute Window		属性
+Multiple launch	Application Type Window		複数起動可能
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# 個のアプリケーションタイプが削除される可能性があります} other{# 個のアプリケーションタイプが削除される可能性があります}}
+Edit…	Application Types Window		編集…
+Could not set preferred application	FileTypes Window		優先アプリケーションを設定できませんでした
+Description	FileTypes Window		説明
+Signature:	Application Types Window		署名:
+None	FileTypes Window		無し
+Exclusive launch	Application Type Window		排他的起動
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		ファイルタイプの削除は撤回できません。\nそれでも削除を実行しますか?
+Cancel	New File Type Window		中止
+Select same preferred application as	FileType Window		このタイプと同じ優先アプリケーションを選ぶ
+Cancel	Type List Window		中止
+Don't save	Application Type Window		保存しない
+Center	Attribute Window	Attribute column alignment in Tracker	中央揃え
+Done	Extension Window		完了
+Development	Application Types Window		開発
+Abort	Application Types Window		中断
+Save	Application Type Window		保存
+Same as…	FileType Window	The same APPLICATION as ...	このアプリケーションと同様…
+%1 application type	Application Type Window		%1のアプリケーションタイプ
+Icon	Application Type Window		アイコン
+Version:	Application Type Window		バージョン:
+Default application	FileType Window		デフォルトアプリケーション
+Internal name:	New File Type Window		内部名:
+Extension:	Extension Window		拡張子:
+Extensions:	FileTypes Window		拡張子:
+Select preferred application	FileType Window		優先アプリケーションを選択する
+Description:	FileTypes Window		説明:
+Multiple files from \"%s\" file type	FileType Window		\"%s\"というファイルタイプで始まる複数ファイル
+Add new group	New File Type Window		新規グループを追加
+Remove uninstalled	Application Types Window		アンインストール済を削除
+File	Application Type Window		ファイル
+Progress	Application Types Window		進行状況
+Select…	FileType Window		選択…
+Information	Application Types Window		情報
+Settings	FileTypes Window		設定
+Done	Attribute Window		完了
+FileTypes request	FileTypes		ファイルタイプの登録
+Select same type as	FileType Window		このアプリケーションと同じタイプを選ぶ
+Version:	Application Types Window		バージョン:
+Application types	Application Types Window		アプリケーションタイプ
+(from application)	FileTypes Window		(アプリケーションから)
+Description:	Application Types Window		説明:
+Name:	Application Types Window		名前:
+File could not be opened	Preferred App Menu		ファイルを開けませんでした
+Args only	Application Type Window		引数のみ
+Could not open \"%s\":\n%s	FileTypes		\"%s\" が開けません:\n%s
+Right	Attribute Window	Attribute column alignment in Tracker	右揃え
+Save changes before closing?	Application Type Window		閉じる前に変更を保存しますか?
+Background app	Application Type Window		バックグラウンド実行
+Recognition rule is not valid:\n\n	FileTypes Window		認識ルールが無効です:\n\n
+Show icons in list	FileTypes Window		リストにアイコンを表示
+Editable	Attribute Window	If Tracker allows to edit this attribute.	編集可能
+New resource file…	FileTypes Window		新規リソースファイル…
+[Multiple files] file types	FileType Window		[複数ファイル] ファイルタイプ
+Application type	Application Type Window		アプリケーションタイプ
+Show in Tracker…	Application Types Window		Trackerに表示…
+Type name:	FileTypes Window		タイプ名:
 Visible	Attribute Window		表示する
+Select preferred application	FileTypes Window		優先アプリケーションを選択する
+Path:	Application Types Window		パス:
 Could not install file type	New File Type Window		ファイルタイプをインストールできませんでした
+Same as…	FileTypes Window		このタイプと同様…
+Golden master	Application Type Window		ゴールデンマスター
+FileTypes request	Preferred App Menu		ファイルタイプの登録
+Single launch	Application Type Window		複数同時起動不可
+no icon	FileTypes Window		アイコン無し
+%s file type	FileType Window		%sのファイルタイプ
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		スーパータイプの削除は取り消せません。\n削除されるスーパータイプに属するファイルタイプはすべて削除されます！\n\nそれでも削除を実行しますか?グループ全体を削除するには、シフトキーを押しながら\"削除\"を押してください。
+Add type	New File Type Window		タイプの追加
+Remove icon	Icon View		アイコンを削除
+Cancel	Extension Window		中止
+Alignment:	Attribute Window		配置:
+Icon	FileType Window		アイコン
+Signature:	Application Type Window		署名:
+Development	Application Type Window		開発
+Golden master	Application Types Window		ゴールデンマスター
+Add	Extension Window		追加
+Open…	FileTypes Window		開く…
+Could not change file extensions	Extension Window		ファイル拡張子の変更はできませんでした
+Could not open file	FileType Window		ファイルを開けません
+Choose type	Type List Window		タイプを選択
+Select…	FileTypes Window		選択…
+File recognition	FileTypes Window		ファイルの認識
+Application types…	FileTypes Window		アプリケーションタイプ…
+Add icon…	Icon View		アイコンを追加…
+Cancel	FileTypes Window		中止
+Save into resource file…	Application Type Window		リソースファイルに保存…
+Special:	Attribute Window		特別:
+Type:	Attribute Window		タイプ:
+Could not retrieve application signature	Preferred App Menu		アプリケーションの署名を読みだせませんでした。
+Beta	Application Types Window		ベータ版
+Add group	New File Type Window		グループを追加
+Cancel	Attribute Window		中止
+Gamma	Application Types Window		ガンマ版
+Supported types	Application Type Window		対応しているタイプ
+Beta	Application Type Window		ベータ版
+Could not retrieve preferred application of this file	Preferred App Menu		このファイルの優先アプリケーションを検索できませんでした。
+Application flags	Application Type Window		アプリケーションフラグ
+OK	FileTypes		OK
+Group name:	New File Type Window		グループ名:
+Move up	FileTypes Window		上へ移動
+Add	Attribute Window		追加
+File	FileTypes Window		ファイル
+Open file	FileTypes		ファイルを開く
+Version info	Application Type Window		バージョン情報
+Final	Application Type Window		リリース版
+Preferred application	FileType Window		優先アプリケーション
+FileTypes	FileTypes		FileTypes
+Set preferred application	Preferred App Menu		優先アプリケーションを設定する
+New file type	New File Type Window		新規ファイルタイプ
+Short description:	Application Type Window		簡単な説明:
+Save request	Application Type Window		登録したファイルタイプの保存
+Could not remove file type: %s\n	FileTypes Window		ファイルタイプ %s を削除できません\n
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	表示形式:
+Done	Type List Window		完了
+Extra attributes	FileTypes Window		拡張属性
+Group:	New File Type Window		グループ:
+Alpha	Application Types Window		アルファ版
+Close	Application Type Window		閉じる
+Extension	Extension Window		拡張子
+Rule:	FileTypes Window		ルール:
+FileTypes	System name		FileTypes
+Version	Application Types Window		バージョン
+Quit	FileTypes Window		終了
+File type	FileType Window		ファイルタイプ
+Internal name:	FileTypes Window		内部的な名前:
+Add…	FileTypes Window		追加…
+Edit icon…	Icon View		アイコンの編集…
+Internal name:	Attribute Window		内部名:
+Show recognition rule	FileTypes Window		認識ルールを表示
+Move down	FileTypes Window		下へ移動
+Alpha	Application Type Window		アルファ版

@@ -1,14 +1,12 @@
-1	slovak	x-vnd.Haiku-IMAP	478742289
-Destination:	imap_config		Cieľ:
-SSL	imap_config		SSL
-Ok	IMAPFolderConfig		OK
-status	IMAPFolderConfig		stav
-Configure IMAP Folders	imap_config		Nastavenie priečinkov IMAP
-Cancel	IMAPFolderConfig		Zrušiť
-No encryption	imap_config		Bez šifrovania
-Apply	IMAPFolderConfig		Použiť
-Fetching IMAP folders, have patience...	IMAPFolderConfig		Sťahujú sa priečinky IMAP, strpenie...
+1	slovak	x-vnd.Haiku-IMAP	3072419505
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Nepodarilo sa pripojiť k serveru „%server%“:\n%error%
-IMAP Folders	IMAPFolderConfig		Priečinky IMAP
-Update subcription of IMAP folders, have patience...	IMAPFolderConfig		Aktualizujú sa odbery priečinkov IMAP. Prosíme o strpenie...
 Failed to fetch available storage.	IMAPFolderConfig		Nepodarilo sa zistiť dostupné úložné miesto.
+Cancel	IMAPFolderConfig		Zrušiť
+Ok	IMAPFolderConfig		OK
+No encryption	imap_config		Bez šifrovania
+Configure IMAP Folders	imap_config		Nastavenie priečinkov IMAP
+SSL	imap_config		SSL
+Apply	IMAPFolderConfig		Použiť
+status	IMAPFolderConfig		stav
+IMAP Folders	IMAPFolderConfig		Priečinky IMAP
+Destination:	imap_config		Cieľ:

@@ -1,17 +1,16 @@
-1	spanish; castilian	x-vnd.Haiku-MatchHeader	548057976
+1	spanish; castilian	x-vnd.Haiku-MatchHeader	3544711400
+Delete message	ConfigView		Borrar mensaje
+Match \"%attribute\" against \"%regex\"	RuleFilter		Concordar \"%attribute\" contra \"%regex\"
+Match header	RuleFilter		Cabecera concordante
+Set flags to	ConfigView		Seleccionar banderas a 
+<Choose account>	ConfigView		<Elegir cuenta>
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Valor de comodín como \"*spam*\.\nPrefijos con \"REGEX:\" para utilizar expresiones regulares.
+Then	ConfigView		Luego
+If	ConfigView		Si
+Set as read	ConfigView		Marcar como leído
+Reply with	ConfigView		Responder con
 <Choose action>	ConfigView		<Elegir acción>
-Header field (e.g. Subject, From, ...)	ConfigView		Campos de cabecera (p. ej.: asunto, de, ...)
+Move to	ConfigView		Mover a 
+this field is based on the action	ConfigView		este campo está basado en la acción
 Account	ConfigView		Cuenta
 has	ConfigView		tiene
-Move to	ConfigView		Mover a 
-Then	ConfigView		Luego
-this field is based on the action	ConfigView		este campo está basado en la acción
-Delete message	ConfigView		Borrar mensaje
-<Choose account>	ConfigView		<Elegir cuenta>
-Set flags to	ConfigView		Seleccionar banderas a 
-Set as read	ConfigView		Marcar como leído
-Match header	RuleFilter		Cabecera concordante
-Reply with	ConfigView		Responder con
-If	ConfigView		Si
-Match \"%attribute\" against \"%regex\"	RuleFilter		Concordar \"%attribute\" contra \"%regex\"
-Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Valor de comodín como \"*spam*\.\nPrefijos con \"REGEX:\" para utilizar expresiones regulares.

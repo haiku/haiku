@@ -1,35 +1,35 @@
 1	russian	x-vnd.Haiku-LaunchBox	3692177981
-New	LaunchBox		Создать
 Set description…	LaunchBox		Изменить описание…
-Vertical layout	LaunchBox		Расположить вертикально
-OK	LaunchBox		ОК
-Pad 1	LaunchBox		Панель 1
-last chance	LaunchBox		последний шанс
-Quit	LaunchBox		Выход
-Open containing folder	LaunchBox		Открыть содержащую папку
-Clear button	LaunchBox		Очистить кнопку
-LaunchBox	System name		Панель запуска
-Ignore double-click	LaunchBox		Игнорировать двойной щелчок
-Auto-raise	LaunchBox		Всплывать при наведении
-Show on all workspaces	LaunchBox		Отображать на всех рабочих столах
-Show window border	LaunchBox		Отображать рамку окна
-Pad	LaunchBox		Панель
-Icon size	LaunchBox		Размер значков
-Bummer	LaunchBox		Облом
-Cancel	LaunchBox		Отмена
-Remove button	LaunchBox		Удалить кнопку
-Horizontal layout	LaunchBox		Расположить горизонтально
-\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nНе удалось запустить приложение с сигнатурой '%2'.\n\nОшибка:
-Failed to launch '%1'.\n\nError:	LaunchBox		Не удалось запустить '%1'.\n\nОшибка:
-Name Panel	LaunchBox		Название панели
-Add button here	LaunchBox		Добавить кнопку
-Description for '%3'	LaunchBox		Описание для '%3'
-Settings	LaunchBox		Настройки
-Failed to launch 'something', error in Pad data.	LaunchBox		Не удалось запустить 'something', ошибка в данных панели.
-Pad %1	LaunchBox		Панель %1
-Close	LaunchBox		Закрыть
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Не удалось послать команду "открыть папку" в Tracker.\n\nОшибка: 
-You can drag an icon here.	LaunchBox		Вы можете перетащить значок сюда.
-Clone	LaunchBox		Дублировать
-launch popup	LaunchBox		launch popup
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Вы действительно хотите закрыть эту панель?\n(Эта панель не сохранится)
+OK	LaunchBox		ОК
+Ignore double-click	LaunchBox		Игнорировать двойной щелчок
+Show on all workspaces	LaunchBox		Отображать на всех рабочих столах
+Name Panel	LaunchBox		Название панели
+Clone	LaunchBox		Дублировать
+Description for '%3'	LaunchBox		Описание для '%3'
+Show window border	LaunchBox		Отображать рамку окна
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nНе удалось запустить приложение с сигнатурой '%2'.\n\nОшибка:
+Failed to launch 'something', error in Pad data.	LaunchBox		Не удалось запустить 'something', ошибка в данных панели.
+LaunchBox	System name		Панель запуска
+Auto-raise	LaunchBox		Всплывать при наведении
+Icon size	LaunchBox		Размер значков
+Open containing folder	LaunchBox		Открыть содержащую папку
+Add button here	LaunchBox		Добавить кнопку
+Cancel	LaunchBox		Отмена
+launch popup	LaunchBox		launch popup
+Clear button	LaunchBox		Очистить кнопку
+Bummer	LaunchBox		Облом
+last chance	LaunchBox		последний шанс
+You can drag an icon here.	LaunchBox		Вы можете перетащить значок сюда.
+Pad 1	LaunchBox		Панель 1
+Failed to launch '%1'.\n\nError:	LaunchBox		Не удалось запустить '%1'.\n\nОшибка:
+Settings	LaunchBox		Настройки
+Vertical layout	LaunchBox		Расположить вертикально
+Pad	LaunchBox		Панель
+Close	LaunchBox		Закрыть
+Remove button	LaunchBox		Удалить кнопку
+Quit	LaunchBox		Выход
+Horizontal layout	LaunchBox		Расположить горизонтально
+New	LaunchBox		Создать
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Не удалось послать команду "открыть папку" в Tracker.\n\nОшибка: 
+Pad %1	LaunchBox		Панель %1

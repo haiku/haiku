@@ -1,17 +1,17 @@
 1	german	x-vnd.haiku.zip-o-matic	2032806096
-Stop	file:ZipOMaticWindow.cpp		Abbrechen
-Creating archive: %s	file:ZipOMaticWindow.cpp		Archiv wird erzeugt: %s
-Continue	file:ZipOMaticWindow.cpp		Fortsetzen
-Preparing to archive	file:ZipperThread.cpp		Archivierung wird vorbereitet
 Drop files here.	file:ZipOMaticWindow.cpp		Dateien hier fallen lassen.
 Filename: %s	file:ZipOMaticWindow.cpp		Dateiname: %s
-You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Es laufen {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}}.\n\n
-Let them continue	file:ZipOMatic.cpp		Fortsetzen zulassen
 Do you want to stop them?	file:ZipOMatic.cpp		Soll abgebrochen werden?
+Error creating archive	file:ZipOMaticWindow.cpp		Fehler beim Erzeugen des Archivs
+Stop them	file:ZipOMatic.cpp		Abbrechen
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Soll die Archivierung wirklich abgebrochen werden?
+Preparing to archive	file:ZipperThread.cpp		Archivierung wird vorbereitet
+Let them continue	file:ZipOMatic.cpp		Fortsetzen zulassen
+Continue	file:ZipOMaticWindow.cpp		Fortsetzen
+Archive created OK	file:ZipOMaticWindow.cpp		Archiv wurde fehlerfrei erzeugt
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# Datei wurde hinzugefügt.} other{# Dateien wurden hinzugefügt.}}
+Stop	file:ZipOMaticWindow.cpp		Abbrechen
 Stopped	file:ZipOMaticWindow.cpp		Abgebrochen
 Archive	file:ZipperThread.cpp		Archiv
-Error creating archive	file:ZipOMaticWindow.cpp		Fehler beim Erzeugen des Archivs
-{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# Datei wurde hinzugefügt.} other{# Dateien wurden hinzugefügt.}}
-Archive created OK	file:ZipOMaticWindow.cpp		Archiv wurde fehlerfrei erzeugt
-Stop them	file:ZipOMatic.cpp		Abbrechen
+Creating archive: %s	file:ZipOMaticWindow.cpp		Archiv wird erzeugt: %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Es laufen {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}}.\n\n

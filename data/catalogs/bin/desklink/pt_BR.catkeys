@@ -1,15 +1,15 @@
-1	portuguese (brazil)	x-vnd.Haiku-desklink	4132238754
-Control physical output	MediaReplicant		Controle de saída física
-Couldn't launch 	MediaReplicant		Não pode carregar
-Muted	MediaReplicant		Mudo
-OK	MediaReplicant		Ok
+1	portuguese (brazil)	x-vnd.Haiku-desklink	3759597613
+desklink	MediaReplicant	Title of an alert box	atalho
 Sound preferences…	MediaReplicant		Configurações de Som...
+Muted	MediaReplicant		Mudo
 %g dB	MediaReplicant		%g dB
-Open %name	DeskButton	Don't translate variable %name	Abrir %name
-No media server running	VolumeControl		Não há servidor de som ativo
-Media preferences…	MediaReplicant		Configurações de Mídia...
+OK	MediaReplicant		Ok
+Couldn't launch 	MediaReplicant		Não pode carregar
+Volume	VolumeControl		Volume
 Open MediaPlayer	MediaReplicant		Abrir MediaPlayer
-desklink	MediaReplicant		atalho
+Media preferences…	MediaReplicant		Configurações de Mídia...
 Options	MediaReplicant		Opções
 Beep	MediaReplicant		bip
-Volume	VolumeControl		Volume
+Open %name	DeskButton	Don't translate variable %name	Abrir %name
+Control physical output	MediaReplicant		Controle de saída física
+No media server running	VolumeControl		Não há servidor de som ativo

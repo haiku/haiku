@@ -1,16 +1,16 @@
 1	german	x-vnd.Haiku-TIFFTranslator	2234713102
-LZW	TIFFView		LZW
-Version %d.%d.%d, %s	TIFFView		Version %d.%d.%d, %s
-identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: Ordner konnte nicht gesetzt werden\n
-TIFF image	TIFFTranslator		TIFF-Bild
 TIFF Library:	TIFFView		TIFF-Bibliothek:
-TIFF image translator	TIFFView		TIFF-Bild-Translator
-None	TIFFView		Keine
-TIFF images	TIFFTranslator		TIFF-Bilder
-TIFFTranslator Settings	TIFFTranslator		TIFFTranslator-Einstellungen
-TIFF image translator	TIFFTranslator		TIFF-Bild-Translator
 RLE (Packbits)	TIFFView		RLE (Packbits)
-TIFF Settings	TIFFMain		TIFF-Einstellungen
-Use compression:	TIFFView		Komprimierung:
-identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: ungültiger Dokument-Index\n
 ZIP (Deflate)	TIFFView		ZIP (Deflate)
+identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: ungültiger Dokument-Index\n
+Use compression:	TIFFView		Komprimierung:
+TIFF image translator	TIFFView		TIFF-Bild-Translator
+TIFF image	TIFFTranslator		TIFF-Bild
+TIFF Settings	TIFFMain		TIFF-Einstellungen
+TIFF image translator	TIFFTranslator		TIFF-Bild-Translator
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: Ordner konnte nicht gesetzt werden\n
+Version %d.%d.%d, %s	TIFFView		Version %d.%d.%d, %s
+TIFFTranslator Settings	TIFFTranslator		TIFFTranslator-Einstellungen
+LZW	TIFFView		LZW
+TIFF images	TIFFTranslator		TIFF-Bilder
+None	TIFFView		Keine

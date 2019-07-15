@@ -1,17 +1,17 @@
 1	french	x-vnd.Haiku-DataTranslations	4156631142
-DataTranslations	System name		TraductionDeDonnées
-Cancel	DataTranslations		Annuler
+Path:	DataTranslations		Chemin :
 Name:	DataTranslations		Nom :
+DataTranslations - Note	DataTranslations		DataTranslations - Notes
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		L’élément « %name » ne semble pas être un traducteur et ne sera pas installé.
 Could not install %s:\n%s	DataTranslations		Impossible d’installer %s :\n%s
-Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Utilisez ce panneau de contrôle pour définir les paramètres par défaut des traducteurs à utiliser quand l’application ne spécifie aucun autre réglage.
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Un élément nommé « %name » existe déjà dans le dossier des traducteurs ! Faut-il remplacer le traducteur existant ?
-DataTranslations - Note	DataTranslations		DataTranslations - Notes
-Overwrite	DataTranslations		Remplacer
-Info:	DataTranslations		Information :
-Info	DataTranslations		Information
-Path:	DataTranslations		Chemin :
-The new translator has been installed successfully.	DataTranslations		Le nouveau traducteur a été installé avec succès.
-DataTranslations - Error	DataTranslations		TraductionDeDonnées - Erreur
 OK	DataTranslations		OK
+Cancel	DataTranslations		Annuler
+Info:	DataTranslations		Information :
+DataTranslations - Error	DataTranslations		TraductionDeDonnées - Erreur
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Utilisez ce panneau de contrôle pour définir les paramètres par défaut des traducteurs à utiliser quand l’application ne spécifie aucun autre réglage.
+The new translator has been installed successfully.	DataTranslations		Le nouveau traducteur a été installé avec succès.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Un élément nommé « %name » existe déjà dans le dossier des traducteurs ! Faut-il remplacer le traducteur existant ?
+DataTranslations	System name		TraductionDeDonnées
+Info	DataTranslations		Information
+Overwrite	DataTranslations		Remplacer
 Version:	DataTranslations		Version :

@@ -1,20 +1,20 @@
 1	korean	x-vnd.Haiku-Touchpad	607725922
 Scrolling	TouchpadPrefView		스크롤
-Touchpad	System name		터치패드
-Revert	TouchpadPrefView		되돌리기
 Tapping	TouchpadPrefView		톡톡 두드리기
-Please confirm	TouchpadPrefView		확인해주십시오
-Two finger scrolling	TouchpadPrefView		두 손가락 스크롤
-Defaults	TouchpadPrefView		기본설정
-Slow	TouchpadPrefView		느리게
-Vertical	TouchpadPrefView		수직
-High	TouchpadPrefView		높게
-Horizontal scrolling	TouchpadPrefView		수평 스크롤링
-Fast	TouchpadPrefView		빠르게
-OK	TouchpadPrefView		확인
-Acceleration	TouchpadPrefView		가속
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		새로운 스크롤 영역은 너무 커서 보통 마우스 작업에 방해를 줄 수 있습니다. 당신은 정말로 바꾸겟습니까?
-Horizontal	TouchpadPrefView		수평
-Off	TouchpadPrefView		끄기
-Sensitivity	TouchpadPrefView		민감도
+Touchpad	System name		터치패드
 Cancel	TouchpadPrefView		취소
+OK	TouchpadPrefView		확인
+Horizontal scrolling	TouchpadPrefView		수평 스크롤링
+Slow	TouchpadPrefView		느리게
+Two finger scrolling	TouchpadPrefView		두 손가락 스크롤
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		새로운 스크롤 영역은 너무 커서 보통 마우스 작업에 방해를 줄 수 있습니다. 당신은 정말로 바꾸겟습니까?
+Defaults	TouchpadPrefView		기본설정
+High	TouchpadPrefView		높게
+Off	TouchpadPrefView		끄기
+Fast	TouchpadPrefView		빠르게
+Vertical	TouchpadPrefView		수직
+Please confirm	TouchpadPrefView		확인해주십시오
+Acceleration	TouchpadPrefView		가속
+Horizontal	TouchpadPrefView		수평
+Sensitivity	TouchpadPrefView		민감도
+Revert	TouchpadPrefView		되돌리기

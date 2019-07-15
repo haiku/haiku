@@ -1,74 +1,74 @@
 1	french	x-vnd.Haiku-MediaConverter	2251404027
-Video using parameters form settings	MediaConverter		La vidéo utilise les paramètres de réglages
-{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Le fichier n’est pas un média supporté :} other{# fichiers ne sont des médias supportés :}}
-Video encoding:	MediaConverter		Encodage vidéo :
-Writing video track: %d%% complete	MediaConverter		Écriture de la piste vidéo : %d %%
+Writing audio track: %d%% complete	MediaConverter		Écriture de la piste audio : %d %%
+Input file not recognized as Audio or Video	MediaConverter		Le fichier d'entrée n'est pas reconnu comme un fichier audio ou vidéo
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2f fps
-Error creating video.	MediaConverter		Erreur lors de la création de la vidéo.
-No audio	Audio codecs list		Pas de son
-Error	MediaConverter		Erreur
-{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bits}}
-Error loading a file	MediaConverter		Erreur au chargement d’un fichier
-File Error	MediaConverter-FileInfo		Erreur Fichier
-Open…	Menu		Ouvrir…
-Start [ms]: 	MediaConverter		Début [ms] : 
-Output file '%filename' created	MediaConverter		Le fichier cible « %filename » a été créé
-Output format	MediaConverter		Format de sortie
-End   [ms]: 	MediaConverter		Fin [ms] : 
-MediaConverter	System name		Convertisseur de média
-Error writing audio frame %ld	MediaConverter		Erreur d’écriture de la trame audio %ld
-No video	Video codecs list		Pas de vidéo
-Duration:	MediaConverter-FileInfo		Durée :
-OK	MediaConverter		OK
-%.1f kHz mono	MediaFileInfo		%.1f kHz mono
+Video quality: %3d%%	MediaConverter		Qualité vidéo : %3d%%
+Source files	MediaConverter		Fichiers sources
+Error writing video frame %ld	MediaConverter		Erreur d’écriture de la trame vidéo %ld
 Error converting '%filename'	MediaConverter		Erreur à la conversion de « %filename »
-Low	MediaConverter		Basse
+Selected directory not found. Defaulting to /boot/home	MediaConverter		Le dossier sélectionné est introuvable. Dossier de repli : /boot/home
 Conversion completed	MediaConverter		Conversion achevée
 Audio:	MediaConverter-FileInfo		Audio :
-OK	MediaConverter-FileInfo		OK
- seconds	MediaFileInfo		 secondes
-Error writing video frame %ld	MediaConverter		Erreur d’écriture de la trame vidéo %ld
-Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Erreur d'écriture à l'emplacement: %strPath%. Emplacement de repli : /boot/home
-Source files	MediaConverter		Fichiers sources
-Selected directory not found. Defaulting to /boot/home	MediaConverter		Le dossier sélectionné est introuvable. Dossier de repli : /boot/home
-{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# trame} other{# trames}}
-Cancelling	MediaConverter		Annulation
-{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# octet} other{# octets}}
-Error loading files	MediaConverter		Erreur de chargement des fichiers
-Cancel	MediaConverter		Annuler
-Error read audio frame %ld	MediaConverter		Erreur de lecture de la trame audio %ld
-None available	Video codecs		Aucun disponible
-Conversion cancelled	MediaConverter		Conversion annulée
-No file selected	MediaConverter-FileInfo		Aucun fichier sélectionné
-Select this folder	MediaConverter		Sélectionner ce dossier
-Error creating track.	MediaConverter		Erreur lors de la création de la piste.
-Continue	MediaConverter		Continuer
-Encoder parameters	MediaConverter-EncoderWindow		Paramètres d’encodage
-Video:	MediaConverter-FileInfo		Vidéo :
-%d bit 	MediaFileInfo		%d bits 
-Error creating '%filename'	MediaConverter		Erreur à la création de « %filename »
-Video quality not supported	MediaConverter		Qualité vidéo non prise en charge
-Cancelling…	MediaConverter		Annulation…
-File details	MediaConverter		Détails du fichier
-Select	MediaConverter		Sélectionner
-Quit	Menu		Quitter
-Error read video frame %ld	MediaConverter		Erreur de lecture de la trame vidéo %ld
-Preview	MediaConverter		Aperçu
-File format:	MediaConverter		Format de fichier :
-None available	Audio codecs		Aucun disponible
 MediaConverter+:SaveDirectory	MediaConverter		MédiaConvertisseur+ : Dossier d’enregistrement
-Error launching: %strError%	MediaConverter		Erreur de lancement : %strError%
+Error creating video.	MediaConverter		Erreur lors de la création de la vidéo.
+Cancelling	MediaConverter		Annulation
+None available	Audio codecs		Aucun disponible
+No file selected	MediaConverter-FileInfo		Aucun fichier sélectionné
 High	MediaConverter		Haute
-Writing audio track: %d%% complete	MediaConverter		Écriture de la piste audio : %d %%
-Drop media files onto this window	MediaConverter		Déposez les médias à convertir dans cette fenêtre
-Audio encoding:	MediaConverter		Encodage audio :
-Audio quality not supported	MediaConverter		Qualité audio non prise en charge
-File	Menu		Fichier
-Input file not recognized as Audio or Video	MediaConverter		Le fichier d'entrée n'est pas reconnu comme un fichier audio ou vidéo
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Le fichier n’est pas un média supporté :} other{# fichiers ne sont des médias supportés :}}
+File Error	MediaConverter-FileInfo		Erreur Fichier
+None available	Video codecs		Aucun disponible
+Output format	MediaConverter		Format de sortie
+%.1f kHz mono	MediaFileInfo		%.1f kHz mono
 %.1f kHz stereo	MediaFileInfo		%.1f kHz stéréo
-Convert	MediaConverter		Convertir
-Video quality: %3d%%	MediaConverter		Qualité vidéo : %3d%%
-%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld canaux
-Output folder	MediaConverter		Dossier de sortie
+OK	MediaConverter		OK
+Error creating '%filename'	MediaConverter		Erreur à la création de « %filename »
+Error loading a file	MediaConverter		Erreur au chargement d’un fichier
+Encoder parameters	MediaConverter-EncoderWindow		Paramètres d’encodage
+Open…	Menu		Ouvrir…
+Audio encoding:	MediaConverter		Encodage audio :
 Audio quality: %3d%%	MediaConverter		Qualité audio : %3d%%
+Cancelling…	MediaConverter		Annulation…
+Output file '%filename' created	MediaConverter		Le fichier cible « %filename » a été créé
+Output folder	MediaConverter		Dossier de sortie
+Error creating track.	MediaConverter		Erreur lors de la création de la piste.
+ seconds	MediaFileInfo		 secondes
+Video using parameters form settings	MediaConverter		La vidéo utilise les paramètres de réglages
+Video:	MediaConverter-FileInfo		Vidéo :
+Select	MediaConverter		Sélectionner
+Conversion cancelled	MediaConverter		Conversion annulée
+Low	MediaConverter		Basse
+Error loading files	MediaConverter		Erreur de chargement des fichiers
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bits}}
+End   [ms]: 	MediaConverter		Fin [ms] : 
+Cancel	MediaConverter		Annuler
+OK	MediaConverter-FileInfo		OK
+Error read audio frame %ld	MediaConverter		Erreur de lecture de la trame audio %ld
+Video encoding:	MediaConverter		Encodage vidéo :
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Une erreur est survenue lors de la lecture des informations du fichier.\n\nErreur : 
+Error	MediaConverter		Erreur
+File details	MediaConverter		Détails du fichier
+No audio	Audio codecs list		Pas de son
+Drop media files onto this window	MediaConverter		Déposez les médias à convertir dans cette fenêtre
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# trame} other{# trames}}
+Quit	Menu		Quitter
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# octet} other{# octets}}
+Duration:	MediaConverter-FileInfo		Durée :
+MediaConverter	System name		Convertisseur de média
+Error launching: %strError%	MediaConverter		Erreur de lancement : %strError%
+File format:	MediaConverter		Format de fichier :
+Error writing audio frame %ld	MediaConverter		Erreur d’écriture de la trame audio %ld
+File	Menu		Fichier
+Video quality not supported	MediaConverter		Qualité vidéo non prise en charge
+Select this folder	MediaConverter		Sélectionner ce dossier
+Error read video frame %ld	MediaConverter		Erreur de lecture de la trame vidéo %ld
+%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld canaux
+%d bit 	MediaFileInfo		%d bits 
+No video	Video codecs list		Pas de vidéo
+Continue	MediaConverter		Continuer
+Convert	MediaConverter		Convertir
+Audio quality not supported	MediaConverter		Qualité audio non prise en charge
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Erreur d'écriture à l'emplacement: %strPath%. Emplacement de repli : /boot/home
+Writing video track: %d%% complete	MediaConverter		Écriture de la piste vidéo : %d %%
+Preview	MediaConverter		Aperçu
+Start [ms]: 	MediaConverter		Début [ms] : 

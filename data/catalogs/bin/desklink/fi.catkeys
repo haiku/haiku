@@ -1,16 +1,16 @@
-1	finnish	x-vnd.Haiku-desklink	3940727097
-Control physical output	MediaReplicant		Ohjaa fyysistä tulostetta
-Couldn't launch 	MediaReplicant		Käynnistäminen epäonnistui 
-Muted	MediaReplicant		Vaimennettu
-OK	MediaReplicant		Valmis
+1	finnish	x-vnd.Haiku-desklink	3568085956
+desklink	MediaReplicant	Title of an alert box	työpöytälinkki
 Sound preferences…	MediaReplicant		Ääniasetukset...
+Muted	MediaReplicant		Vaimennettu
 %g dB	MediaReplicant		%g dB
-Open %name	DeskButton	Don't translate variable %name	Avaa %name
-No media server running	VolumeControl		Mediapalvelin ei ole käynnissä
-Media preferences…	MediaReplicant		Media-asetukset...
-%d dB	VolumeControl		%d dB
+OK	MediaReplicant		Valmis
+Couldn't launch 	MediaReplicant		Käynnistäminen epäonnistui 
+Volume	VolumeControl		Äänenvoimakkuus
 Open MediaPlayer	MediaReplicant		Avaa mediasoitin
-desklink	MediaReplicant		työpöytälinkki
+%d dB	VolumeControl		%d dB
+Media preferences…	MediaReplicant		Media-asetukset...
 Options	MediaReplicant		Valitsimet
 Beep	MediaReplicant		Piip
-Volume	VolumeControl		Äänenvoimakkuus
+Open %name	DeskButton	Don't translate variable %name	Avaa %name
+Control physical output	MediaReplicant		Ohjaa fyysistä tulostetta
+No media server running	VolumeControl		Mediapalvelin ei ole käynnissä

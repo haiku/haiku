@@ -1,20 +1,20 @@
 1	catalan; valencian	x-vnd.Haiku-VirtualMemory	2090796060
-Quit	SettingsWindow		Surt
-Automatic swap management	SettingsWindow		Gestió automàtica de l'intercanvi
-Turn off	SettingsWindow		Desactiva
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Desactivar la memòria virtual pertorba el sistema quan la memòria està plena.\nLa memòria virtual no afecta al rendiment fins que s'arriba en aquest punt.\n\nEsteu segur que la voleu desactivar ?
 Requested swap file size:	SettingsWindow		Mida del fitxer d'intercanvi demanat:
-The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Els valors indicats al fitxer de preferències no són vàlids. Podeu carregar els valors predeterminats o bé sortir.
-Defaults	SettingsWindow		Valors predeterminats
-Current Swap:	SettingsWindow		Intercanvi actual:
-Use volume:	SettingsWindow		Utilitza el volum:
-Keep enabled	SettingsWindow		Manté actiu
-Revert	SettingsWindow		Reverteix
 VirtualMemory	System name		Memòria Virtual
-Use boot volume	SettingsWindow		Utilitza el volum d'arrencada
-Load defaults	SettingsWindow		Carrega els valors predeterminats
 OK	VirtualMemoryApp		D'acord
+Use volume:	SettingsWindow		Utilitza el volum:
+Turn off	SettingsWindow		Desactiva
 Changes will take effect upon reboot.	SettingsWindow		Els canvis s'aplicaran quan es reinicii el sistema.
+Revert	SettingsWindow		Reverteix
+Keep enabled	SettingsWindow		Manté actiu
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Els valors indicats al fitxer de preferències no són vàlids. Podeu carregar els valors predeterminats o bé sortir.
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tescrit per Axel Dörfler\n\tCopyright 2005, Haiku.\n
 The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		No s'ha trobat el volum indicat a les preferències. Podeu fer servir el volum d'arrencada o bé sortir.
+Current Swap:	SettingsWindow		Intercanvi actual:
+Load defaults	SettingsWindow		Carrega els valors predeterminats
+Use boot volume	SettingsWindow		Utilitza el volum d'arrencada
+Automatic swap management	SettingsWindow		Gestió automàtica de l'intercanvi
+Defaults	SettingsWindow		Valors predeterminats
+Quit	SettingsWindow		Surt
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Desactivar la memòria virtual pertorba el sistema quan la memòria està plena.\nLa memòria virtual no afecta al rendiment fins que s'arriba en aquest punt.\n\nEsteu segur que la voleu desactivar ?
 Enable virtual memory	SettingsWindow		Activa la memòria virtual

@@ -1,8 +1,8 @@
 1	english (united kingdom)	x-vnd.Haiku-Installer	3878314559
-OK	InstallerApp		Alright
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Choose the source and destination disc from the pop-up menus. Then click \"Begin\".
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialised with the\nBe File System needed for a Haiku boot\npartition.
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		No partitions have been found that are suitable for installation. Please set up partitions and initialise at least one partition with the Be File System.
-Installation canceled.	InstallProgress		Installation cancelled.
 OK	InstallerWindow		Alright
+Installation canceled.	InstallProgress		Installation cancelled.
+OK	InstallerApp		Alright
+No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		No partitions have been found that are suitable for installation. Please set up partitions and initialise at least one partition with the Be File System.
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialised with the\nBe File System needed for a Haiku boot\npartition.
 OK	InstallProgress		Alright

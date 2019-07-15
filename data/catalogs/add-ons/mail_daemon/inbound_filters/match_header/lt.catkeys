@@ -1,12 +1,12 @@
 1	lithuanian	x-vnd.Haiku-MatchHeader	1349121828
-<Choose action>	ConfigView		<parinkite veiksmą>
-has	ConfigView		turi
-Move to	ConfigView		perkelti į
-Then	ConfigView		tuomet
-this field is based on the action	ConfigView		šio lauko galimos reikšmės priklauso nuo veiksmo
 Delete message	ConfigView		pašalinti laišką
-<Choose account>	ConfigView		<parinkite paskyrą>
 Set flags to	ConfigView		nustatyti požymius į
+<Choose account>	ConfigView		<parinkite paskyrą>
+Then	ConfigView		tuomet
+If	ConfigView		Kai
 Set as read	ConfigView		pažymėti kaip skaitytą
 Reply with	ConfigView		atsakyti naudojant
-If	ConfigView		Kai
+<Choose action>	ConfigView		<parinkite veiksmą>
+Move to	ConfigView		perkelti į
+this field is based on the action	ConfigView		šio lauko galimos reikšmės priklauso nuo veiksmo
+has	ConfigView		turi

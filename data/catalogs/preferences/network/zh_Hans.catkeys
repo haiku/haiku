@@ -1,52 +1,52 @@
 1	english	x-vnd.Haiku-Network	3083801279
-Static	IntefaceAddressView		静态
+Ethernet device	InterfaceListItem		以太网设备
+Link speed:	IntefaceView		连接速度：
+disconnected	IntefaceView		断开连接
+IP Address:	IntefaceAddressView		IP 地址：
+WPA	WPA protected network		WPA
+Network:	IntefaceView		网络：
+Received:	IntefaceView		收到：
+New…	NetworkWindow		新建...
+no link	InterfaceListItem		无连接
+Other	NetworkWindow		其他
+Sent:	IntefaceView		发送：
+Gateway:	IntefaceAddressView		网关：
+The netmask defines your local network	IntefaceAddressView		子网掩码定义您的本地网络
+Your IP address	IntefaceAddressView		您的 IP 地址
+DHCP	IntefaceAddressView		DHCP
+Dial Up	NetworkWindow		拨号
+Netmask:	IntefaceAddressView		子网掩码：
 EAP	EAP protected network		EAP
 Services	NetworkWindow		服务
-no link	InterfaceListItem		无连接
-WPA2	WPA2 protected network		WPA2
-connected	IntefaceView		已连接
-Ethernet device	InterfaceListItem		以太网设备
-The netmask defines your local network	IntefaceAddressView		子网掩码定义您的本地网络
-Dial-up connection	InterfaceListItem		拨号连接
-%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
-Network	NetworkWindow		网络
-VPN connection	InterfaceListItem		VPN 连接
-Show network status in Deskbar	NetworkWindow		在桌面栏显示网络状态
-The method for obtaining an IP address	IntefaceAddressView		获取 IP 地址的方式
-connected	InterfaceListItem		已连接
-disabled	InterfaceListItem		禁用
-Dial Up	NetworkWindow		拨号
-Apply	IntefaceAddressView		应用
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		在桌面栏安装网络状态失败: %s
+Revert	NetworkWindow		恢复
+WEP	WEP protected network		WEP
+<no wireless networks found>	IntefaceView		<未发现无线网络>
+connected	IntefaceView		已连接
+VPN	NetworkWindow		VPN
+Apply	IntefaceAddressView		应用
+Disable	ServiceView		禁用
+WPA2	WPA2 protected network		WPA2
+Show network status in Deskbar	NetworkWindow		在桌面栏显示网络状态
+Mode:	IntefaceAddressView		模式：
+connected	InterfaceListItem		已连接
+Static	IntefaceAddressView		静态
+launch error	NetworkWindow		启动错误
+Renegotiate	IntefaceView		重新协商
 MAC address:	IntefaceView		MAC 地址：
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+disabled	InterfaceListItem		禁用
+Dial-up connection	InterfaceListItem		拨号连接
+The method for obtaining an IP address	IntefaceAddressView		获取 IP 地址的方式
+Automatic	IntefaceAddressView		自动
+Status:	IntefaceView		状态：
+Disable	IntefaceView		禁用
+Manage…	NetworkWindow		管理...
+open	Open network		打开
+Network	NetworkWindow		网络
+Your gateway to the internet	IntefaceAddressView		您的互联网网关
+Enable	ServiceView		启用
+Ok	NetworkWindow		确定
 Wireless device	InterfaceListItem		无线设备
 Disabled	IntefaceAddressView		禁用
-Renegotiate	IntefaceView		重新协商
-Ok	NetworkWindow		确定
-Network:	IntefaceView		网络：
-launch error	NetworkWindow		启动错误
-Other	NetworkWindow		其他
-Automatic	IntefaceAddressView		自动
-Gateway:	IntefaceAddressView		网关：
-Revert	NetworkWindow		恢复
-Enable	ServiceView		启用
-disconnected	IntefaceView		断开连接
-Status:	IntefaceView		状态：
-Link speed:	IntefaceView		连接速度：
-Your gateway to the internet	IntefaceAddressView		您的互联网网关
-New…	NetworkWindow		新建...
-DHCP	IntefaceAddressView		DHCP
-Mode:	IntefaceAddressView		模式：
-WPA	WPA protected network		WPA
-Sent:	IntefaceView		发送：
-open	Open network		打开
-IP Address:	IntefaceAddressView		IP 地址：
-VPN	NetworkWindow		VPN
-Received:	IntefaceView		收到：
-Disable	IntefaceView		禁用
-<no wireless networks found>	IntefaceView		<未发现无线网络>
-Netmask:	IntefaceAddressView		子网掩码：
-Disable	ServiceView		禁用
-Your IP address	IntefaceAddressView		您的 IP 地址
-Manage…	NetworkWindow		管理...
-WEP	WEP protected network		WEP
+VPN connection	InterfaceListItem		VPN 连接

@@ -1,13 +1,13 @@
 1	french	x-vnd.Be-WORK	3927737357
-Invalid argument: %s\n	Workspaces		Argument invalide : %s\n
 Quit	Workspaces		Quitter
-Workspaces	System name		Bureaux
+Invalid argument: %s\n	Workspaces		Argument invalide : %s\n
 Change workspace count…	Workspaces		Changer le nombre de bureaux virtuels…
-Remove replicant	Workspaces		Retirer les réplicants
-Show window border	Workspaces		Montrer la bordure de fenêtre
-Auto-raise	Workspaces		Auto-montée
 Always on top	Workspaces		Toujours au dessus
-Switch on mouse wheel	Workspaces		Basculer avec la molette de souris
-Live in the Deskbar	Workspaces		Loger dans la Deskbar
+Show window border	Workspaces		Montrer la bordure de fenêtre
 Show window tab	Workspaces		Afficher l’onglet de la fenêtre
+Auto-raise	Workspaces		Auto-montée
+Remove replicant	Workspaces		Retirer les réplicants
+Live in the Deskbar	Workspaces		Loger dans la Deskbar
 Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Utilisation : %s [options] [bureaux]\noù les \"options\" peuvent être :\n  --notitle\t\tla barre de titre est retirée, les bordures et le redimensionnement sont conservés\n  --noborder\t\tla barre de titre, les bordures et le redimensionnement sont retirés\n  --avoidfocus\t\tempêche que la fenêtre soit la cible des événements claviers\n  --alwaysontop\t\tgarde la fenêtre au dessus\n  --notmovable\t\tla fenêtre ne peut pas être déplacée\n  --autoraise\t\tmonte la fenêtre des bureaux quand elle est au coin de l’écran\n  --help\t\taffiche cette aide et sort\net où \"bureaux\" est le nombre de bureaux virtuels parmi lesquels basculer (0-31)\n
+Switch on mouse wheel	Workspaces		Basculer avec la molette de souris
+Workspaces	System name		Bureaux

@@ -1,50 +1,50 @@
 1	english	x-vnd.Be-PEPL	2332202134
-Edit	People		编辑
-Error	People		错误
-City	People		城市
-The file '%name%' could not be written.	People		文件 '%name%' 无法写入。
-none	Groups list		无
-Configure attributes	People		配置属性
-Company	People		公司
-%name% picture	People		%name% 照片
-Work phone	People		工作电话
-People	System name		联系人
-New person	People		新建联系人
-Select all	People		全选
-File	People		文件
-Unnamed person	People		未命名联系人
-Could not create %s.	People		无法创建 %s。
-Country	People		国家
-Close	People		关闭
-Group	People		联系组
-Nickname	People		昵称
-Quit	People		退出
-Name	People		名字
-Revert	People		恢复
-Don't save	People		不保存
-Undo	People		取消
-E-mail	People		电子邮箱
-Load image…	People		载入图像...
-OK	People		确定
-Remove image	People		删除图像
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		启用文件类型首选项配置 Person 属性失败。\n\n错误：
-Home phone	People		家庭电话
-Save as…	People		保存为...
-Redo	People		重复
-Save changes before closing?	People		关闭前是否保存修改？
-Paste	People		粘贴
-Drop an image here,\nor use the contextual menu.	People		向这里拖动图像，\n或者使用上下文菜单。
-Save	People		保存
-Person	Short mimetype description		联系人
+Unnamed person	People		未命名联系人
 New person…	People		新建联系人...
 Address	People		地址
-URL	People		网址
-Sorry	People		对不起
 Zip	People		邮政编码
-Contact information for a person.	Long mimetype description		联系方式。
-Fax	People		传真
+Select all	People		全选
+Could not create %s.	People		无法创建 %s。
+Quit	People		退出
+Company	People		公司
+Name	People		名字
+The file '%name%' could not be written.	People		文件 '%name%' 无法写入。
 Contact name	People		联系人姓名
-Cut	People		剪切
 Cancel	People		取消
+Edit	People		编辑
+Save changes before closing?	People		关闭前是否保存修改？
+People	System name		联系人
+Error	People		错误
+Revert	People		恢复
+Country	People		国家
+Person	Short mimetype description		联系人
+New person	People		新建联系人
+Save	People		保存
+Fax	People		传真
+URL	People		网址
+%name% picture	People		%name% 照片
+Home phone	People		家庭电话
+none	Groups list		无
+Save as…	People		保存为...
+Cut	People		剪切
+Contact information for a person.	Long mimetype description		联系方式。
+Remove image	People		删除图像
+City	People		城市
+Undo	People		取消
+Don't save	People		不保存
+Configure attributes	People		配置属性
+Work phone	People		工作电话
 State	People		州
+Nickname	People		昵称
+OK	People		确定
+File	People		文件
+Redo	People		重复
+Close	People		关闭
 Copy	People		复制
+Paste	People		粘贴
+E-mail	People		电子邮箱
+Group	People		联系组
+Drop an image here,\nor use the contextual menu.	People		向这里拖动图像，\n或者使用上下文菜单。
+Load image…	People		载入图像...
+Sorry	People		对不起

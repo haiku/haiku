@@ -1,48 +1,47 @@
-1	romanian	x-vnd.Haiku-Pulse	2324471783
-OK	PrefsWindow		OK
-Quit	DeskbarPulseView		Închidere
-Mini mode	DeskbarPulseView		Mod mini
-Remove replicant	CPUButton		Elimină replicant
-Active color	ConfigView		Culoare activă
-Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Utilizare: Puls [--mini] [-w lățime] [--width=lățime]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
-Fade colors	ConfigView		Culori translucide
-%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nDe David Ramsey și Arve Hjønnevåg\nRevizuit de Daniel Switkin\n
-OK	DeskbarPulseView		OK
-Deskbar mode	PrefsWindow		Mod bară de desktop
-%.2f GHz	NormalPulseView		%.2f GHz
-Normal mode	PrefsWindow		Mod normal
-Defaults	PrefsWindow		Implicite
-Normal mode	MiniPulseView		Mod normal
-Error	PulseApp		Eroare
-Info	PulseView		Detalii
-Deskbar	CPUButton		Bară de desktop
-Frame color	ConfigView		Culoare cadru
-Mini mode	PrefsWindow		Mod mini
-OK	PulseApp		OK
-Bar colors	ConfigView		Culori bară
-Settings…	PulseView		Configurări…
-You can't disable the last active CPU.	PulseView		Nu puteți dezactiva ultimul CPU activ.
-Info	PulseApp		Detalii
-Info	CPUButton		Info
-OK	PulseView		OK
-Deskbar menu	CPUButton		Meniul barei de desktop
-About Pulse…	PulseView		Despre Pulse…
-Deskbar mode	MiniPulseView		Mod bară de desktop
-Quit	MiniPulseView		Închidere
-Pulse	System name		Puls
-Pulse	NormalPulseView		Puls
-%ld MHz	NormalPulseView		%ld MHz
-Deskbar mode	NormalPulseView		Mod bară de desktop
-Pulse	PulseApp		Puls
-Width of icon:	ConfigView		Lățimea pictogramei:
-You can't disable the last active CPU.	CPUButton		Nu puteți dezactiva ultimul CPU activ.
+1	romanian	x-vnd.Haiku-Pulse	3788463253
 Normal mode	DeskbarPulseView		Mod normal
-OK	CPUButton		OK
-About Pulse…	CPUButton		Despre Pulse…
-Removing from Deskbar failed.\n%s	DeskbarPulseView		Eliminarea de pe Deskbar a eșuat.\n%s
-Mini mode	NormalPulseView		Mod mini
+Info	CPUButton		Info
+Quit	DeskbarPulseView		Închidere
 Info	DeskbarPulseView		Info
-Pulse settings	PulseWindow		Configurări Pulse
-Idle color	ConfigView		Culoare în așteptare
-Installing in Deskbar failed\n%s	PulseApp		Instalarea pe Deskbar a eșuat\n%s
+Normal mode	MiniPulseView		Mod normal
+Frame color	ConfigView		Culoare cadru
+Error	PulseApp		Eroare
+Bar colors	ConfigView		Culori bară
+%.2f GHz	NormalPulseView		%.2f GHz
+Defaults	PrefsWindow		Implicite
+%ld MHz	NormalPulseView		%ld MHz
+Mini mode	PrefsWindow		Mod mini
 CPU progress bar	NormalPulseView		Bara de progres a CPU
+Fade colors	ConfigView		Culori translucide
+About Pulse…	PulseView		Despre Pulse…
+Pulse	NormalPulseView		Puls
+Deskbar mode	NormalPulseView		Mod bară de desktop
+Remove replicant	CPUButton		Elimină replicant
+You can't disable the last active CPU.	PulseView		Nu puteți dezactiva ultimul CPU activ.
+Width of icon:	ConfigView		Lățimea pictogramei:
+Deskbar mode	MiniPulseView		Mod bară de desktop
+OK	PulseView		OK
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nDe David Ramsey și Arve Hjønnevåg\nRevizuit de Daniel Switkin\n
+OK	PrefsWindow		OK
+Pulse	PulseApp		Puls
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Eliminarea de pe Deskbar a eșuat.\n%s
+OK	PulseApp		OK
+About Pulse…	CPUButton		Despre Pulse…
+Deskbar mode	PrefsWindow		Mod bară de desktop
+Mini mode	DeskbarPulseView		Mod mini
+You can't disable the last active CPU.	CPUButton		Nu puteți dezactiva ultimul CPU activ.
+OK	CPUButton		OK
+Deskbar	CPUButton		Bară de desktop
+Settings…	PulseView		Configurări…
+Deskbar menu	CPUButton		Meniul barei de desktop
+Mini mode	NormalPulseView		Mod mini
+Quit	MiniPulseView		Închidere
+Info	PulseView		Detalii
+OK	DeskbarPulseView		OK
+Info	PulseApp		Detalii
+Pulse	System name		Puls
+Active color	ConfigView		Culoare activă
+Installing in Deskbar failed\n%s	PulseApp		Instalarea pe Deskbar a eșuat\n%s
+Idle color	ConfigView		Culoare în așteptare
+Normal mode	PrefsWindow		Mod normal
+Pulse settings	PulseWindow		Configurări Pulse

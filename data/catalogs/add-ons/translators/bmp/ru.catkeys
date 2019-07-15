@@ -6,4 +6,4 @@ BMP image translator	BMPView		Транслятор BMP изображений
 BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	BMP image (Формат MS, %d бит
 BMP Settings	BMPMain		Настройки BMP транслятора
 Version %d.%d.%d, %s	BMPView		Версия %d.%d.%d, %s
-BMP image translator	BMPTranslator		Транслятор BMP изображений
+BMP image translator	BMPTranslator		Транслятор точечных рисунков BMP

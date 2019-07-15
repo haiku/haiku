@@ -1,41 +1,41 @@
 1	portuguese (brazil)	x-vnd.Haiku-Shortcuts	1611284793
-OK	ShortcutsWindow		OK
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		O Atalhos não pode salvar sua combinação de teclas
-Cancel	ShortcutsWindow		Cancelar
-Append KeySet…	ShortcutsWindow		Juntar combinação de teclas...
-Control	ShortcutsSpec	Name for modifier on keyboard	Control
-Key	ShortcutsWindow		Tecla
-Open KeySet…	ShortcutsWindow		Abrir combinação de teclas...
-Error, NULL state description?	ShortcutsSpec		Erro, descrição de estado NULL?
-Revert to saved	ShortcutsWindow		Reverter para salvo
-*InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Seu Texto Aqui\"
 *MouseUp	ShortcutsWindow		*MouseUp
-(Choose application with file requester)	ShortcutsWindow		(Escolha um aplicativo que contenha um requerente de arquivo)
-*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		O Atalhos não pode abrir seu arquivo de combinação de teclas!
-*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
-Option	ShortcutsSpec	Name for modifier on keyboard	Opção
-Save	ShortcutsWindow		Salvar
-*MouseButton 1	ShortcutsWindow		*Botão do Mouse 1
-*MoveMouse +20 +0	ShortcutsWindow		*Mover Mouse +20 +0
-Save changes before closing?	ShortcutsWindow		Salvar alterações antes de fechar?
-Remove selected shortcut	ShortcutsWindow		Remover atalho selecionado
-Add new shortcut	ShortcutsWindow		Adicionar novo atalho
-Save & apply	ShortcutsWindow		Salvar & aplicar
-*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*Enviar Mensagem application/x-vnd.Be-TRAK 'Tfnd'
-Append	ShortcutsWindow		Juntar
-File	ShortcutsWindow		Arquivo
-Quit	ShortcutsWindow		Sair
-*MouseDown	ShortcutsWindow		*Mouse para Baixo
-Don't save	ShortcutsWindow		Não salvar
 Application	ShortcutsWindow		Aplicativo
-Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Option	ShortcutsSpec	Name for modifier on keyboard	Opção
+Save changes before closing?	ShortcutsWindow		Salvar alterações antes de fechar?
+Revert to saved	ShortcutsWindow		Reverter para salvo
+Don't save	ShortcutsWindow		Não salvar
+*MouseDown	ShortcutsWindow		*Mouse para Baixo
 *Beep	ShortcutsWindow		*Alarme sonoro
-*MoveMouseTo 50% 50%	ShortcutsWindow		*Mover Mouse Para 50% 50%
-Save KeySet as…	ShortcutsWindow		Salvar combinação de teclas como...
-Open	ShortcutsWindow		Abrir
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		O Atalhos não pode analisar seu arquivo de combinação de teclas!
-Select	ShortcutsWindow		Selecionar
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		O Atalhos não pode salvar seu arquivo combinação de teclas!
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		O Atalhos não pode salvar sua combinação de teclas
+Save	ShortcutsWindow		Salvar
 Oh no	ShortcutsWindow		Oh não!
+Key	ShortcutsWindow		Tecla
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*Enviar Mensagem application/x-vnd.Be-TRAK 'Tfnd'
+Select	ShortcutsWindow		Selecionar
 Shortcuts	System name		Atalhos
+Quit	ShortcutsWindow		Sair
+(Choose application with file requester)	ShortcutsWindow		(Escolha um aplicativo que contenha um requerente de arquivo)
+Cancel	ShortcutsWindow		Cancelar
+*MoveMouse +20 +0	ShortcutsWindow		*Mover Mouse +20 +0
+Control	ShortcutsSpec	Name for modifier on keyboard	Control
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		O Atalhos não pode analisar seu arquivo de combinação de teclas!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		O Atalhos não pode salvar seu arquivo combinação de teclas!
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Seu Texto Aqui\"
+Remove selected shortcut	ShortcutsWindow		Remover atalho selecionado
+Error, NULL state description?	ShortcutsSpec		Erro, descrição de estado NULL?
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		O Atalhos não pode abrir seu arquivo de combinação de teclas!
+Save & apply	ShortcutsWindow		Salvar & aplicar
+Open	ShortcutsWindow		Abrir
+Append	ShortcutsWindow		Juntar
+Save KeySet as…	ShortcutsWindow		Salvar combinação de teclas como...
+Append KeySet…	ShortcutsWindow		Juntar combinação de teclas...
+*MouseButton 1	ShortcutsWindow		*Botão do Mouse 1
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
+OK	ShortcutsWindow		OK
+Add new shortcut	ShortcutsWindow		Adicionar novo atalho
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Open KeySet…	ShortcutsWindow		Abrir combinação de teclas...
+File	ShortcutsWindow		Arquivo
+*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
+*MoveMouseTo 50% 50%	ShortcutsWindow		*Mover Mouse Para 50% 50%

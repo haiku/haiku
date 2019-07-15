@@ -1,21 +1,21 @@
 1	lithuanian	x-vnd.Haiku-JPEGTranslator	965709535
-Output quality	JPEGTranslator		Išvesties kokybė
-JPEG images	JPEGTranslator		JPEG paveikslai
-Prevent colors 'washing out'	JPEGTranslator		Neleisti spalvoms išsilieti
-JPEG Library Error: %s\n	be_jerror		JPEG bibliotekos klaida: %s\n
-Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Šimtaprocentiniam padengimui rašalu naudoti CMYK kodus su nuliais
-About	JPEGTranslator		Apie
-©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nSukurta IJG bibliotekos pagrindu, ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nsu nenuostolingo glaudinimo pataisa, kurios autorius – Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nKai kurių spalvų erdvių konvertavimo procedūrų autorius – Magnus Hellman\n\thttp://www.bebits.com/app/802\n
-Low	JPEGTranslator		Žema
-Make file smaller (sligthtly worse quality)	JPEGTranslator		Sumažinti failą (šiek tiek prastesnės kokybės sąskaita)
-None	JPEGTranslator		Nėra
+Read	JPEGTranslator		Skaitymas
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		„Be“ paveikslų formatas (JPEG keitiklis)
 Show warning messages	JPEGTranslator		Rodyti įspėjimus
-Output smoothing strength	JPEGTranslator		Išvesties glodinimo stiprumas
-High	JPEGTranslator		Aukšta
-Write	JPEGTranslator		Rašymas
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Šimtaprocentiniam padengimui rašalu naudoti CMYK kodus su nuliais
+JPEG Library Error: %s\n	be_jerror		JPEG bibliotekos klaida: %s\n
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nSukurta IJG bibliotekos pagrindu, ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nsu nenuostolingo glaudinimo pataisa, kurios autorius – Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nKai kurių spalvų erdvių konvertavimo procedūrų autorius – Magnus Hellman\n\thttp://www.bebits.com/app/802\n
+None	JPEGTranslator		Nėra
+About	JPEGTranslator		Apie
 Write black-and-white images as RGB24	JPEGTranslator		Rašyti juodai baltus paveikslus kaip 24 bitų spalvotus
-Read greyscale images as RGB32	JPEGTranslator		Atverti pilkumo tonais užkoduotus paveikslus kaip 32 bitų spalvotus
-Read	JPEGTranslator		Skaitymas
-JPEG Library Warning: %s\n	be_jerror		JPEG bibliotekos įspėjimas: %s\n
+Output smoothing strength	JPEGTranslator		Išvesties glodinimo stiprumas
 Use progressive compression	JPEGTranslator		Naudoti progresinį paveikslų kodavimą
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Sumažinti failą (šiek tiek prastesnės kokybės sąskaita)
+High	JPEGTranslator		Aukšta
+Read greyscale images as RGB32	JPEGTranslator		Atverti pilkumo tonais užkoduotus paveikslus kaip 32 bitų spalvotus
+Output quality	JPEGTranslator		Išvesties kokybė
+Low	JPEGTranslator		Žema
+Write	JPEGTranslator		Rašymas
+Prevent colors 'washing out'	JPEGTranslator		Neleisti spalvoms išsilieti
+JPEG Library Warning: %s\n	be_jerror		JPEG bibliotekos įspėjimas: %s\n
+JPEG images	JPEGTranslator		JPEG paveikslai

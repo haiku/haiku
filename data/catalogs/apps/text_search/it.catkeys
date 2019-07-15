@@ -1,38 +1,37 @@
-1	italian	x-vnd.Haiku.TextSearch	3622532554
-%s: Not enough room to escape the filename.	Grepper		%s: Non c'è abbastanza spazio per ripulire il nome del file.
-Trim to selection	GrepWindow		Riduci alla selezione
-Failed to open errors pipe!	Grepper		Impossibile aprire la pipe degli errori!
-Follow symbolic links	GrepWindow		Segui collegamenti simbolici
-Close	GrepWindow		Chiudi
-Cancel	GrepWindow		Annulla
-The unselected files will be removed from the list.	GrepWindow		I file non selezionati verranno rimossi dalla lista.
-Regular expression	GrepWindow		Espressione regolare
-Set target…	GrepWindow		Seleziona destinazione…
-Failed to open output pipe!	Grepper		Impossibile aprire la pipe di output!
+1	italian	x-vnd.Haiku.TextSearch	2123129416
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Scegli i file che desideri che vengano selezionati per te nel Tracker.
-Open files in Pe	GrepWindow		Apri i file con Pe
 %appname% : %path%	GrepWindow		%appname% : %path%
-Copy text to clipboard	GrepWindow		Copia il testo nella clipboard
-Settings	GrepWindow		Impostazioni
-Select all	GrepWindow		Seleziona tutto
-OK	GrepWindow		OK
-Skip folders starting with a dot	GrepWindow		Tralascia le cartelle che iniziano con un punto
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME non può aprire una o più cartelle.
-Search	GrepWindow		Trova
-Open selection	GrepWindow		Apri quanto selezionato
-Look in sub-folders	GrepWindow		Cerca nelle sotto-cartelle
-Actions	GrepWindow		Azioni
-File	GrepWindow		File
-Encoding	GrepWindow		Codifica
-History	GrepWindow		Cronologia
 Failed to start xargs program!	Grepper		Impossibile avviare applicativo xargs!
+Open selection	GrepWindow		Apri quanto selezionato
+Actions	GrepWindow		Azioni
 New window	GrepWindow		Nuova finestra
-Failed to open input pipe!	Grepper		Impossibile aprire la pipe di input!
-Please select the files you wish to keep searching.	GrepWindow		Seleziona i file sui quali desideri continuare la ricerca.
-TextSearch	GrepWindow		Ricerca Testo
+Encoding	GrepWindow		Codifica
+OK	GrepWindow		OK
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Close	GrepWindow		Chiudi
+Look in sub-folders	GrepWindow		Cerca nelle sotto-cartelle
+%s: Not enough room to escape the filename.	Grepper		%s: Non c'è abbastanza spazio per ripulire il nome del file.
+Follow symbolic links	GrepWindow		Segui collegamenti simbolici
+Regular expression	GrepWindow		Espressione regolare
+Text files only	GrepWindow		Solo file di testo
 Quit	GrepWindow		Esci
 Show files in Tracker	GrepWindow		Mostra i file nel Tracker
-Case-sensitive	GrepWindow		Sensibile alle maiuscole/minuscole
-Text files only	GrepWindow		Solo file di testo
+Please select the files you wish to keep searching.	GrepWindow		Seleziona i file sui quali desideri continuare la ricerca.
+Trim to selection	GrepWindow		Riduci alla selezione
+Set target…	GrepWindow		Seleziona destinazione…
+TextSearch	GrepWindow		Ricerca Testo
+Failed to open input pipe!	Grepper		Impossibile aprire la pipe di input!
+Search	GrepWindow		Trova
+Copy text to clipboard	GrepWindow		Copia il testo nella clipboard
 Show lines	GrepWindow		Mostra linee
-%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Failed to open errors pipe!	Grepper		Impossibile aprire la pipe degli errori!
+The unselected files will be removed from the list.	GrepWindow		I file non selezionati verranno rimossi dalla lista.
+Skip folders starting with a dot	GrepWindow		Tralascia le cartelle che iniziano con un punto
+Failed to open output pipe!	Grepper		Impossibile aprire la pipe di output!
+Cancel	GrepWindow		Annulla
+History	GrepWindow		Cronologia
+File	GrepWindow		File
+Case-sensitive	GrepWindow		Sensibile alle maiuscole/minuscole
+Select all	GrepWindow		Seleziona tutto
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME non può aprire una o più cartelle.
+Settings	GrepWindow		Impostazioni

@@ -1,42 +1,41 @@
-1	italian	x-vnd.Haiku-Shortcuts	986541402
-OK	ShortcutsWindow		OK
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Shortcuts non è stato capace di salvare le tue impostazioni di tasti.
-Cancel	ShortcutsWindow		Annulla
-Append KeySet…	ShortcutsWindow		Accoda Impostazione Tasti…
-Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
-Key	ShortcutsWindow		Tasto
-Open KeySet…	ShortcutsWindow		Apri Impostazione Tasti…
-Error, NULL state description?	ShortcutsSpec		Errore: probabile descrizione di stato NULL
-Revert to saved	ShortcutsWindow		Ripristina quanto salvato
-*InsertString \"Your Text Here\"	ShortcutsWindow		*InserisciStringa \"Qui il tuo testo\"
+1	italian	x-vnd.Haiku-Shortcuts	1611284793
 *MouseUp	ShortcutsWindow		*MouseRilasciato
-(Choose application with file requester)	ShortcutsWindow		(Seleziona applicazione con la finestra di richiesta file)
-*LaunchHandler text/html	ShortcutsWindow		*AvviaGestore text/html
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di aprire il vostro file di impostazione tasti!
-*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multiplo \"*MuoviMouseVerso 100% 0\" \"*TastoMouse 1\"
-Option	ShortcutsSpec	Name for modifier on keyboard	Opzione
-Save	ShortcutsWindow		Salva
-*MouseButton 1	ShortcutsWindow		*TastoMouse 1
-*MoveMouse +20 +0	ShortcutsWindow		*MuoviMouse +20 +0
-Save changes before closing?	ShortcutsWindow		Salvare le modifiche prima di uscire?
-Command	ShortcutsSpec	Name for modifier on keyboard	Comando
-Remove selected shortcut	ShortcutsWindow		Rimuovi scorciatoia selezionata
-Add new shortcut	ShortcutsWindow		Aggiungi nuova scorciatoia
-Save & apply	ShortcutsWindow		Salva e applica
-*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*InviaMessaggio application/x-vnd.Be-TRAK 'Tfnd'
-Append	ShortcutsWindow		Accoda
-File	ShortcutsWindow		File
-Quit	ShortcutsWindow		Esci
-*MouseDown	ShortcutsWindow		*MousePremuto
-Don't save	ShortcutsWindow		Non salvare
 Application	ShortcutsWindow		Applicazione
-Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Option	ShortcutsSpec	Name for modifier on keyboard	Opzione
+Save changes before closing?	ShortcutsWindow		Salvare le modifiche prima di uscire?
+Revert to saved	ShortcutsWindow		Ripristina quanto salvato
+Don't save	ShortcutsWindow		Non salvare
+*MouseDown	ShortcutsWindow		*MousePremuto
 *Beep	ShortcutsWindow		*Bip
-*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%
-Save KeySet as…	ShortcutsWindow		Salva Impostazione tasti come…
-Open	ShortcutsWindow		Apri
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di elaborare il tuo file di impostazione tasti!
-Select	ShortcutsWindow		Seleziona
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di salvare il tuo file di impostazione tasti!
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Shortcuts non è stato capace di salvare le tue impostazioni di tasti.
+Save	ShortcutsWindow		Salva
 Oh no	ShortcutsWindow		Oh no
+Key	ShortcutsWindow		Tasto
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*InviaMessaggio application/x-vnd.Be-TRAK 'Tfnd'
+Select	ShortcutsWindow		Seleziona
 Shortcuts	System name		Scorciatoie
+Quit	ShortcutsWindow		Esci
+(Choose application with file requester)	ShortcutsWindow		(Seleziona applicazione con la finestra di richiesta file)
+Cancel	ShortcutsWindow		Annulla
+*MoveMouse +20 +0	ShortcutsWindow		*MuoviMouse +20 +0
+Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di elaborare il tuo file di impostazione tasti!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di salvare il tuo file di impostazione tasti!
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InserisciStringa \"Qui il tuo testo\"
+Remove selected shortcut	ShortcutsWindow		Rimuovi scorciatoia selezionata
+Error, NULL state description?	ShortcutsSpec		Errore: probabile descrizione di stato NULL
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di aprire il vostro file di impostazione tasti!
+Save & apply	ShortcutsWindow		Salva e applica
+Open	ShortcutsWindow		Apri
+Append	ShortcutsWindow		Accoda
+Save KeySet as…	ShortcutsWindow		Salva Impostazione tasti come…
+Append KeySet…	ShortcutsWindow		Accoda Impostazione Tasti…
+*MouseButton 1	ShortcutsWindow		*TastoMouse 1
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multiplo \"*MuoviMouseVerso 100% 0\" \"*TastoMouse 1\"
+OK	ShortcutsWindow		OK
+Add new shortcut	ShortcutsWindow		Aggiungi nuova scorciatoia
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Open KeySet…	ShortcutsWindow		Apri Impostazione Tasti…
+File	ShortcutsWindow		File
+*LaunchHandler text/html	ShortcutsWindow		*AvviaGestore text/html
+*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%

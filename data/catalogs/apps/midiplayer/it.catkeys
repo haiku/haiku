@@ -1,20 +1,20 @@
 1	italian	x-vnd.Haiku-MidiPlayer	1046133011
-None	Main Window		Nessuno
-Live input:	Main Window		Ingresso diretto:
-Stop	Main Window		Interrompi
 This tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Questo piccola applicazione\nSa come suonare\nMigliaia di canzoncine sdolcinate
-Cavern	Main Window		Caverna
-Volume:	Main Window		Volume:
-Reverb:	Main Window		Riverbero:
-OK	Main Window		OK
-Loading instruments…	Scope View		Caricamento strumenti…
-Off	Main Window		Disattivo
 Dungeon	Main Window		Segreta
-Play	Main Window		Riproduci
-Garage	Main Window		Garage
-Closet	Main Window		Ripostiglio
-MidiPlayer	System name		MidiPlayer
-Drop MIDI file here	Scope View		Trascina un file MIDI qui
-Igor's lab	Main Window		Laboratorio di Igor
-Scope	Main Window		Oscilloscopio
 Could not load song	Main Window		Impossibile caricare la canzone
+Igor's lab	Main Window		Laboratorio di Igor
+Off	Main Window		Disattivo
+Loading instruments…	Scope View		Caricamento strumenti…
+Volume:	Main Window		Volume:
+Closet	Main Window		Ripostiglio
+Scope	Main Window		Oscilloscopio
+Drop MIDI file here	Scope View		Trascina un file MIDI qui
+None	Main Window		Nessuno
+Reverb:	Main Window		Riverbero:
+MidiPlayer	System name		MidiPlayer
+OK	Main Window		OK
+Stop	Main Window		Interrompi
+Live input:	Main Window		Ingresso diretto:
+Garage	Main Window		Garage
+Play	Main Window		Riproduci
+Cavern	Main Window		Caverna

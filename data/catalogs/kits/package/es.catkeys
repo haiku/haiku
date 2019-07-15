@@ -1,6 +1,7 @@
-1	spanish; castilian	x-vnd.Haiku-libpackage	1277128177
-Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		El paquete %s-%s no posee un requerimiento coincidente para el paquete base \"%s\"
-Failed to get repository names	PackageManagerKit		Hubo un error al obtener los nombres de los repositorios
-Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Hubo un error al obtener el cache para el repositorio \"%s\". Omitiendo.
+1	spanish; castilian	x-vnd.Haiku-libpackage	2012114212
 Refreshing repository \"%s\" failed	PackageManagerKit		Falló la actualización del repositorio \"%s\"
 Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Hubo un error obteniendo configuración del repositorio \"%s\". Omitiendo.
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Hubo un error al obtener el cache para el repositorio \"%s\". Omitiendo.
+Failed to get repository names	PackageManagerKit		Hubo un error al obtener los nombres de los repositorios
+Failed to remove transaction directory	PackageManagerKit		Hubo un error al quitar el directorio de transacciones
+Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		El paquete %s-%s no posee un requerimiento coincidente para el paquete base \"%s\"

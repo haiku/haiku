@@ -1,48 +1,48 @@
 1	korean	x-vnd.Be-PEPL	3273435274
-Edit	People		편집
-Error	People		오류
-City	People		도시
-The file '%name%' could not be written.	People		이 파일 '%name%'을 쓸 수 없습니다.
-none	Groups list		없음
-Configure attributes	People		속성 설정
-Company	People		회사
-%name% picture	People		%name% 사진
-Work phone	People		직장 전화
-People	System name		사람들
-New person	People		새 사람
-Select all	People		모두 선택
-File	People		파일
-Unnamed person	People		이름 없는 사람
-Could not create %s.	People		%s를 만들 수 없음.
-Country	People		나라
-Close	People		닫기
-Group	People		그룹
-Nickname	People		별명
-Quit	People		끝내기
-Name	People		이름
-Revert	People		취소
-Undo	People		되돌리기
-E-mail	People		이 메일
-Load image…	People		이미지 불러오기...
-OK	People		확인
-Remove image	People		이미지 지우기
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		사람 속성을 설정하기 위해 파일형식 설정판 실행이 실패햇습니다.\n\n오류: 
-Home phone	People		집 전화
-Save as…	People		다른 이름으로 저장...
-Redo	People		다시 실행
-Paste	People		붙여넣기
-Drop an image here,\nor use the contextual menu.	People		여기에  그림을 떨어트리거나,\n 단축메뉴를 사용하십시오.
-Save	People		저장
-Person	Short mimetype description		사람
+Unnamed person	People		이름 없는 사람
 New person…	People		새 사람...
 Address	People		주소
-URL	People		URL
-Sorry	People		미안합니다
 Zip	People		우편번호
-Contact information for a person.	Long mimetype description		사람의 연락처 정보
-Fax	People		팩스
+Select all	People		모두 선택
+Could not create %s.	People		%s를 만들 수 없음.
+Quit	People		끝내기
+Company	People		회사
+Name	People		이름
+The file '%name%' could not be written.	People		이 파일 '%name%'을 쓸 수 없습니다.
 Contact name	People		연락처 이름
-Cut	People		잘라내기
 Cancel	People		취소
+Edit	People		편집
+People	System name		사람들
+Error	People		오류
+Revert	People		취소
+Country	People		나라
+Person	Short mimetype description		사람
+New person	People		새 사람
+Save	People		저장
+Fax	People		팩스
+URL	People		URL
+%name% picture	People		%name% 사진
+Home phone	People		집 전화
+none	Groups list		없음
+Save as…	People		다른 이름으로 저장...
+Cut	People		잘라내기
+Contact information for a person.	Long mimetype description		사람의 연락처 정보
+Remove image	People		이미지 지우기
+City	People		도시
+Undo	People		되돌리기
+Configure attributes	People		속성 설정
+Work phone	People		직장 전화
 State	People		주
+Nickname	People		별명
+OK	People		확인
+File	People		파일
+Redo	People		다시 실행
+Close	People		닫기
 Copy	People		복사
+Paste	People		붙여넣기
+E-mail	People		이 메일
+Group	People		그룹
+Drop an image here,\nor use the contextual menu.	People		여기에  그림을 떨어트리거나,\n 단축메뉴를 사용하십시오.
+Load image…	People		이미지 불러오기...
+Sorry	People		미안합니다

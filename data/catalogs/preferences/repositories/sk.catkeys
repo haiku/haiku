@@ -1,41 +1,41 @@
 1	slovak	x-vnd.Haiku-Repositories	2658607939
-Completed	TaskLooper	Completed task status message	Hotovo
-Repositories	System name		Zdroje softvéru
-There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Vyskytla sa chyba pri zapínaní zdroja softvéru %url%
-Remove this repository?	RepositoriesView	Removal alert confirmation message	Odstrániť tento zdroj softvéru?
-Description	TaskLooper	Failed task error description	Popis
-Add	AddRepoWindow	Button label	Pridať
-URL	RepositoriesView	Column title	URL
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Aplikácii Zdroje softvéru sa nepodarilo zistiť názvy momentálne zapnutých zdrojov softvéru.
-Keep trying	TaskTimer	Button label	Skúšať ďalej
 This is not a valid URL.	AddRepoWindow	Add URL error message	Toto nie je platná adresa URL.
 Repository URL:	AddRepoWindow	Text box label	URL zdroja softvéru:
-Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Chyba pri získavaní konfigurácie zdroja softvéru %name%.
-Details	TaskLooper	Job log details header	Podrobnosti
-Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Dobré správy! Úloha so zdrojom softvéru %name% bola dokončená.
-Status	RepositoriesView	Column title	Stav
-Aborted	TaskLooper	Aborted task status message	Zrušené
-Remove all	RepositoriesView	Button label	Odstrániť všetky
-Remove	RepositoriesView	Button label	Odstrániť
-Changes completed	RepositoriesView	Status view text	Zmeny dokončené
-Name	RepositoriesView	Column title	Názov
-Enable	RepositoriesView	Button label	Zapnúť
-Enable repositories to use with package management:	RepositoriesView	Label text	Zapnúť zdroje softvéru na správu balíkov:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Vyskytla sa chyba pri obnovovaní vyrovnávacej pamäte zdrojov softvéru pre %name%
-Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Je možné zapnúť iba jednu adresu URL pre každý zdroj softvéru. Prosím, zmeňte svoj výber.
-Failed	TaskLooper	Failed task status message	Chyba
-OK	Constants	Button label	OK
-Cancel task	TaskTimer	Button label	Zrušiť úlohu
-Remove these repositories?	RepositoriesView	Removal alert confirmation message	Odstrániť tieto zdroje softvéru?
-Cancel	Constants	Button label	Zrušiť
-Changes pending:	RepositoriesView	Status view text	Čakajúce zmeny:
 There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Vyskytla sa chyba pri vypínaní zdroja softvéru %name%
+Unknown	Constants	Unknown repository name	Neznámy
+Remove all	RepositoriesView	Button label	Odstrániť všetky
+Enable repositories to use with package management:	RepositoriesView	Label text	Zapnúť zdroje softvéru na správu balíkov:
+Disable	RepositoriesView	Button label	Vypnúť
+Cancel task	TaskTimer	Button label	Zrušiť úlohu
+Changes completed	RepositoriesView	Status view text	Zmeny dokončené
+Details	TaskLooper	Job log details header	Podrobnosti
 Remove	Constants	Button label	Odstrániť
-Enable all	RepositoriesView	Button label	Zapnúť všetky
-Stop and quit	RepositoriesWindow	Button label	Zastaviť a ukončiť
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Vyskytla sa chyba pri zapínaní zdroja softvéru %url%
+Remove this repository?	RepositoriesView	Removal alert confirmation message	Odstrániť tento zdroj softvéru?
 The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	Úloha so zdrojom softvéru %name% trvá príliš dlho.
-Disable all	RepositoriesView	Button label	Vypnúť všetky
+Completed	TaskLooper	Completed task status message	Hotovo
+OK	Constants	Button label	OK
+Status	RepositoriesView	Column title	Stav
+Name	RepositoriesView	Column title	Názov
+Add	AddRepoWindow	Button label	Pridať
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Aplikácii Zdroje softvéru sa nepodarilo zistiť názvy momentálne zapnutých zdrojov softvéru.
+Enable all	RepositoriesView	Button label	Zapnúť všetky
+Aborted	TaskLooper	Aborted task status message	Zrušené
+URL	RepositoriesView	Column title	URL
+Enable	RepositoriesView	Button label	Zapnúť
+Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Chyba pri získavaní konfigurácie zdroja softvéru %name%.
+Description	TaskLooper	Failed task error description	Popis
+Failed	TaskLooper	Failed task status message	Chyba
+Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Dobré správy! Úloha so zdrojom softvéru %name% bola dokončená.
 Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Niektoré úlohy ešte bežia. Zastaviť ich a ukončiť?
 This repository URL already exists.	RepositoriesView	Error message	Adresa URL zdroja softvéru už existuje.
-Disable	RepositoriesView	Button label	Vypnúť
-Unknown	Constants	Unknown repository name	Neznámy
+Repositories	System name		Zdroje softvéru
+Changes pending:	RepositoriesView	Status view text	Čakajúce zmeny:
+Remove	RepositoriesView	Button label	Odstrániť
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	Odstrániť tieto zdroje softvéru?
+Keep trying	TaskTimer	Button label	Skúšať ďalej
+Cancel	Constants	Button label	Zrušiť
+Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Je možné zapnúť iba jednu adresu URL pre každý zdroj softvéru. Prosím, zmeňte svoj výber.
+Stop and quit	RepositoriesWindow	Button label	Zastaviť a ukončiť
+Disable all	RepositoriesView	Button label	Vypnúť všetky

@@ -1,20 +1,20 @@
 1	belarusian	x-vnd.Haiku-Media	2605101563
-Couldn't add volume control in Deskbar: %s\n	Media views		Не ўдалося дадаць элемент кіравання гучнасцю у Deskbar: %s\n
-Video input:	Media views		Відэа ўваход:
-Defaults	Media views		Прадвызначаныя
+Audio mixer	Media Window		Аўдыё мікшар
+Show volume control on Deskbar	Media views		Усталяваць кіраванне гукам у Deskbar
 Quit	Media Window		Выйсці
-Video settings	Media Window		Наладкі відэа
-Video output:	Media views		Відэа Выхад:
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Немагчыма далучыцца да медыясервера.\n Жадаеце яго стартаваць ?
 Restart media services	Media views		Перазапусціць медыясервер
+Couldn't add volume control in Deskbar: %s\n	Media views		Не ўдалося дадаць элемент кіравання гучнасцю у Deskbar: %s\n
+Start media server	Media Window		Запусціць медыясервер
+Audio settings	Media Window		Наладкі гука
 Couldn't remove volume control in Deskbar: %s\n	Media views		Не ўдалося выдаліць элемент кіравання гучнасцю з Deskbar: %s\n
 Media	System name		Медыя
-Audio mixer	Media Window		Аўдыё мікшар
-This hardware has no controls.	Media Window		Гэтая апаратура не мае элементаў кіравання.
+Video output:	Media views		Відэа Выхад:
 Audio output:	Media views		Гукавы выхад:
-Audio settings	Media Window		Наладкі гука
-Start media server	Media Window		Запусціць медыясервер
-<none>	Media views		<няма>
-Channel:	Media views		Канал:
-Show volume control on Deskbar	Media views		Усталяваць кіраванне гукам у Deskbar
+Video input:	Media views		Відэа ўваход:
 Audio input:	Media views		Гукавы ўваход:
+<none>	Media views		<няма>
+This hardware has no controls.	Media Window		Гэтая апаратура не мае элементаў кіравання.
+Channel:	Media views		Канал:
+Defaults	Media views		Прадвызначаныя
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Немагчыма далучыцца да медыясервера.\n Жадаеце яго стартаваць ?
+Video settings	Media Window		Наладкі відэа

@@ -1,48 +1,47 @@
-1	korean	x-vnd.Haiku-Pulse	2324471783
-OK	PrefsWindow		확인
-Quit	DeskbarPulseView		나가기
-Mini mode	DeskbarPulseView		최소 모드
-Remove replicant	CPUButton		복제품 제거
-Active color	ConfigView		활성부분 색상
-Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		사용법: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
-Fade colors	ConfigView		페이드 색상
-%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nDavid Ramsey 와 Arve Hjønnevåg에 의하여\nby Daniel Switkin 고침\n
-OK	DeskbarPulseView		확인
-Deskbar mode	PrefsWindow		데스크바 모드
-%.2f GHz	NormalPulseView		%.2f GHz
-Normal mode	PrefsWindow		정상 모드
-Defaults	PrefsWindow		기본
-Normal mode	MiniPulseView		정상 모드
-Error	PulseApp		오류
-Info	PulseView		정보
-Deskbar	CPUButton		데스크바
-Frame color	ConfigView		프레임 색상
-Mini mode	PrefsWindow		최소 모드
-OK	PulseApp		확인
-Bar colors	ConfigView		바 색상
-Settings…	PulseView		환경 설정...
-You can't disable the last active CPU.	PulseView		당신은 마지막으로 활성화된 CPU를 불활성화할 수 없습니다.
-Info	PulseApp		정보
-Info	CPUButton		정보
-OK	PulseView		확인
-Deskbar menu	CPUButton		데스크바 메뉴
-About Pulse…	PulseView		펄스 정보...
-Deskbar mode	MiniPulseView		데스크바 모드
-Quit	MiniPulseView		나가기
-Pulse	System name		펄스
-Pulse	NormalPulseView		펄스
-%ld MHz	NormalPulseView		%ld MHz
-Deskbar mode	NormalPulseView		데스크바 모드
-Pulse	PulseApp		펄스
-Width of icon:	ConfigView		아이콘 넓이
-You can't disable the last active CPU.	CPUButton		당신은 마지막으로 활성화된 CPU를 불활성화할 수 없습니다.
+1	korean	x-vnd.Haiku-Pulse	3788463253
 Normal mode	DeskbarPulseView		정상 모드
-OK	CPUButton		확인
-About Pulse…	CPUButton		펄스 정보...
-Removing from Deskbar failed.\n%s	DeskbarPulseView		대스크바에서 지우기 실패함.\n%s
-Mini mode	NormalPulseView		최소 모드
+Info	CPUButton		정보
+Quit	DeskbarPulseView		나가기
 Info	DeskbarPulseView		정보
-Pulse settings	PulseWindow		펄스 설정
-Idle color	ConfigView		쉬는 부분 색상
-Installing in Deskbar failed\n%s	PulseApp		대스크바에 설치 실패함.\n%s
+Normal mode	MiniPulseView		정상 모드
+Frame color	ConfigView		프레임 색상
+Error	PulseApp		오류
+Bar colors	ConfigView		바 색상
+%.2f GHz	NormalPulseView		%.2f GHz
+Defaults	PrefsWindow		기본
+%ld MHz	NormalPulseView		%ld MHz
+Mini mode	PrefsWindow		최소 모드
 CPU progress bar	NormalPulseView		CPU 진행 바
+Fade colors	ConfigView		페이드 색상
+About Pulse…	PulseView		펄스 정보...
+Pulse	NormalPulseView		펄스
+Deskbar mode	NormalPulseView		데스크바 모드
+Remove replicant	CPUButton		복제품 제거
+You can't disable the last active CPU.	PulseView		당신은 마지막으로 활성화된 CPU를 불활성화할 수 없습니다.
+Width of icon:	ConfigView		아이콘 넓이
+Deskbar mode	MiniPulseView		데스크바 모드
+OK	PulseView		확인
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nDavid Ramsey 와 Arve Hjønnevåg에 의하여\nby Daniel Switkin 고침\n
+OK	PrefsWindow		확인
+Pulse	PulseApp		펄스
+Removing from Deskbar failed.\n%s	DeskbarPulseView		대스크바에서 지우기 실패함.\n%s
+OK	PulseApp		확인
+About Pulse…	CPUButton		펄스 정보...
+Deskbar mode	PrefsWindow		데스크바 모드
+Mini mode	DeskbarPulseView		최소 모드
+You can't disable the last active CPU.	CPUButton		당신은 마지막으로 활성화된 CPU를 불활성화할 수 없습니다.
+OK	CPUButton		확인
+Deskbar	CPUButton		데스크바
+Settings…	PulseView		환경 설정...
+Deskbar menu	CPUButton		데스크바 메뉴
+Mini mode	NormalPulseView		최소 모드
+Quit	MiniPulseView		나가기
+Info	PulseView		정보
+OK	DeskbarPulseView		확인
+Info	PulseApp		정보
+Pulse	System name		펄스
+Active color	ConfigView		활성부분 색상
+Installing in Deskbar failed\n%s	PulseApp		대스크바에 설치 실패함.\n%s
+Idle color	ConfigView		쉬는 부분 색상
+Normal mode	PrefsWindow		정상 모드
+Pulse settings	PulseWindow		펄스 설정

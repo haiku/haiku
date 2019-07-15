@@ -1,48 +1,47 @@
-1	korean	x-vnd.Haiku-PackageInstaller	4227257412
-Install to:	PackageView		설치할 곳:
-OK	PackageView		확인
-Accept	PackageTextViewer		허용
-No package selected.	UninstallView		선택된 패키지가 없음.
-Continue	PackageInstall		계속
-The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		당신의 시스템에 요청된 패키지설치하는 데 실패했습니다. 대상 패키지에 문제가 있을 수도 있으므로. 패키지 배포자에게 이 문제를 상의하십시오.
-Image not loaded correctly	PackageImageViewer		이미지를 올바르게 불러 올 수 없음
-No package selected.	PackageInfo		선택된 패키지가 없음.
-The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		지정된 패키지는 이미 당신의 시스템에 설치되었습니다. 존재하는 것을 제거하고 설치를 계속하겠습니까?
-Do you want to remember this decision for the rest of this installation?\n	PackageView		당신은 설치의 나머지에 대해 결정을 기억하겠습니까?\n
-There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		패키지 파일의 파일 크기가 맞지 않는 것 같습니다. 이 패키지가 망가졌거나 만들어진 후에 고쳐진 것 같습니다. 계속하시겠습니까?
-Error while installing the package\n	PackageView		패키지 설치 중 오류 발생\n
-Disclaimer	PackageTextViewer		거부
-The installation of the package has been aborted.	PackageView		패키지 설치가 취소되었습니다.
-Done	PackageInstall		완료
-All existing files will be replaced?	PackageView		모든 존재하는 파일을 바꾸겠습니까?
-Preparing package	PackageInstall		패키지 준비중
-No package available.	PackageInfo		가능한 패키지가 없음
+1	korean	x-vnd.Haiku-PackageInstaller	4045079517
 none	PackageView		없음
-Stop	PackageStatus		정지
-Other…	PackageView		기타...
-No installation type selected	PackageView		선택된 설치 형식이 없음
-Installing files and folders	PackageInstall		파일과 폴더 설치중
-Package installer	PackageView		패키지 설치프로그램
-Skip all	PackageView		모두 지나치기
+Continue	PackageInstall		계속
 Running post-installation scripts	PackageInstall		설치-전 스크립트 실행중
-Skip	PackageView		넘어가기
-The package you requested has been successfully installed on your system.	PackageView		당신이 선택한 패키지를 시스템에 설치가 성공했습니다.
-Error! \"%s\" is not a valid path.\n	Packageinstaller main		오류! \"%s\"는 올바른 경로가 아닙니다.\n
-Installation type:	PackageView		설치 형식:
-Error (%s)! Could not open \"%s\".\n	Packageinstaller main		오류 (%s)! \"%s\"를 열 수 없음.\n
-Finishing installation	PackageInstall		설치 완료중
-Installing package	PackageStatus		패키지 설치중
-Ask again	PackageView		다시 묻기
-Abort	PackageView		취소
-Replace all	PackageView		모두 바꾸기
-Decline	PackageTextViewer		거부
+Package installer	PackageView		패키지 설치프로그램
 All existing files will be skipped?	PackageView		모든 존재하는 파일을 무시하겠습니까?
-Continue	PackageInfo		계속
-Abort	PackageInfo		정보
-PackageInstaller	System name		패키지설치
-Abort	PackageInstall		정보
-Continue	PackageTextViewer		계속
-OK	UninstallView		확인
 Replace	PackageView		바꾸기
+All existing files will be replaced?	PackageView		모든 존재하는 파일을 바꾸겠습니까?
+Other…	PackageView		기타...
+Stop	PackageStatus		정지
+Install to:	PackageView		설치할 곳:
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		지정된 패키지는 이미 당신의 시스템에 설치되었습니다. 존재하는 것을 제거하고 설치를 계속하겠습니까?
+Skip all	PackageView		모두 지나치기
+The installation of the package has been aborted.	PackageView		패키지 설치가 취소되었습니다.
+No installation type selected	PackageView		선택된 설치 형식이 없음
+Do you want to remember this decision for the rest of this installation?\n	PackageView		당신은 설치의 나머지에 대해 결정을 기억하겠습니까?\n
+Installing files and folders	PackageInstall		파일과 폴더 설치중
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		당신의 시스템에 요청된 패키지설치하는 데 실패했습니다. 대상 패키지에 문제가 있을 수도 있으므로. 패키지 배포자에게 이 문제를 상의하십시오.
+OK	UninstallView		확인
+Accept	PackageTextViewer		허용
+Abort	PackageView		취소
+Disclaimer	PackageTextViewer		거부
+Preparing package	PackageInstall		패키지 준비중
+The package you requested has been successfully installed on your system.	PackageView		당신이 선택한 패키지를 시스템에 설치가 성공했습니다.
 Installation progress	PackageView		설치 과정
+Decline	PackageTextViewer		거부
+Continue	PackageTextViewer		계속
+Installing package	PackageStatus		패키지 설치중
+No package selected.	UninstallView		선택된 패키지가 없음.
+Error while installing the package\n	PackageView		패키지 설치 중 오류 발생\n
+Finishing installation	PackageInstall		설치 완료중
+No package available.	PackageInfo		가능한 패키지가 없음
+Installation type:	PackageView		설치 형식:
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		패키지 파일의 파일 크기가 맞지 않는 것 같습니다. 이 패키지가 망가졌거나 만들어진 후에 고쳐진 것 같습니다. 계속하시겠습니까?
+Abort	PackageInstall		정보
+Replace all	PackageView		모두 바꾸기
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		이 패키지를 읽을 수 없습니다.\n이에 대한 가능한 이유중의 하나는 요구한 파일이 올바른 BeOS .pkg 패키지가 아닐 수도 있다는 것입니다.
+Continue	PackageInfo		계속
+No package selected.	PackageInfo		선택된 패키지가 없음.
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		오류! \"%s\"는 올바른 경로가 아닙니다.\n
+Ask again	PackageView		다시 묻기
+OK	PackageView		확인
+Abort	PackageInfo		정보
+Done	PackageInstall		완료
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		오류 (%s)! \"%s\"를 열 수 없음.\n
+Skip	PackageView		넘어가기
+Image not loaded correctly	PackageImageViewer		이미지를 올바르게 불러 올 수 없음

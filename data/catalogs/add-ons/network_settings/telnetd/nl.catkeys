@@ -1,3 +1,3 @@
 1	dutch; flemish	x-vnd.Haiku-TelnetService	1209067113
-Telnet server	TelnetServiceAddOn		Telnet-server
 The Telnet server allows you to remotely access your machine with a terminal session using the telnet protocol.\n\nPlease note that it is an insecure and unencrypted connection.	TelnetServiceAddOn		De Telnet-server geeft u vanaf een afstand toegang tot uw machine middels een terminal-sessie over het telnet-protocol.\n\nLet erop dat dit een onveilige en onversleutelde verbinding is.
+Telnet server	TelnetServiceAddOn		Telnet-server

@@ -1,12 +1,12 @@
 1	korean	x-vnd.Haiku-MatchHeader	1349121828
-<Choose action>	ConfigView		<할 일 선택>
-has	ConfigView		가지고
-Move to	ConfigView		이동
-Then	ConfigView		보다
-this field is based on the action	ConfigView		이 필드는 행동을 기반으로 함
 Delete message	ConfigView		메세지 지우기
-<Choose account>	ConfigView		<계정 선택>
 Set flags to	ConfigView		플래그 설정
+<Choose account>	ConfigView		<계정 선택>
+Then	ConfigView		보다
+If	ConfigView		만약
 Set as read	ConfigView		읽은 상태로 설정
 Reply with	ConfigView		로 회신
-If	ConfigView		만약
+<Choose action>	ConfigView		<할 일 선택>
+Move to	ConfigView		이동
+this field is based on the action	ConfigView		이 필드는 행동을 기반으로 함
+has	ConfigView		가지고

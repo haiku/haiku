@@ -1,23 +1,23 @@
 1	finnish	x-vnd.haiku-registrar	2599857937
-Restart system	ShutdownProcess		Järjestelmän uudelleenkäynnistys
-The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Sovellus ”%appName%” saattaa olla pakollisen paneelin estämä.
-OK	ShutdownProcess		Valmis
-System is shut down	ShutdownProcess		Järjestelmä on suljettu
-It's now safe to turn off the computer.	ShutdownProcess		Nyt on turvallista sulkea tietokone.
 Cancel	ShutdownProcess		Peru
+OK	ShutdownProcess		Valmis
 Do you really want to shut down the system?	ShutdownProcess		Haluatko todella sulkea järjestelmän?
-Asking other processes to quit.	ShutdownProcess		Pyydetään muita prosesseja lopettamaan.
-Asking \"%appName%\" to quit.	ShutdownProcess		Pyydetään sovellusta ”%appName%” lopettamaan.
-%action%?	ShutdownProcess		%action%?
-Shutdown aborted	ShutdownProcess		Lopettaminen keskeytetty
-Restarting…	ShutdownProcess		Käynnistetään uudelleen…
-Asking background applications to quit.	ShutdownProcess		Pyydetään taustasovelluksia lopettamaan.
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Sovellus ”%appName%” on keskeyttänyt sammuttamisprosessin.
-Tidying things up a bit.	ShutdownProcess		Siistitään paikkoja pikkuisen.
-Do you really want to restart the system?	ShutdownProcess		Haluatko todella käynnistää järjestelmän uudelleen?
 Shutdown status	ShutdownProcess		Sammuttamistila
-Cancel shutdown	ShutdownProcess		Peru sammuttaminen
-Kill application	ShutdownProcess		Tuhoa sovellus
 Shut down	ShutdownProcess		Sammuta
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Sovellus ”%appName%” saattaa olla pakollisen paneelin estämä.
+System is shut down	ShutdownProcess		Järjestelmä on suljettu
+Restart system	ShutdownProcess		Järjestelmän uudelleenkäynnistys
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Sovellus ”%appName%” on keskeyttänyt sammuttamisprosessin.
+Asking background applications to quit.	ShutdownProcess		Pyydetään taustasovelluksia lopettamaan.
+Do you really want to restart the system?	ShutdownProcess		Haluatko todella käynnistää järjestelmän uudelleen?
 Restart	ShutdownProcess		Käynnistä uudelleen
+It's now safe to turn off the computer.	ShutdownProcess		Nyt on turvallista sulkea tietokone.
+Asking other processes to quit.	ShutdownProcess		Pyydetään muita prosesseja lopettamaan.
+Cancel shutdown	ShutdownProcess		Peru sammuttaminen
+Restarting…	ShutdownProcess		Käynnistetään uudelleen…
+%action%?	ShutdownProcess		%action%?
+Tidying things up a bit.	ShutdownProcess		Siistitään paikkoja pikkuisen.
+Kill application	ShutdownProcess		Tuhoa sovellus
+Shutdown aborted	ShutdownProcess		Lopettaminen keskeytetty
 Shutting down…	ShutdownProcess		Sammutetaan...
+Asking \"%appName%\" to quit.	ShutdownProcess		Pyydetään sovellusta ”%appName%” lopettamaan.

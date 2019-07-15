@@ -1,23 +1,23 @@
 1	korean	x-vnd.Haiku-Keymap	140876782
+Sample and clipboard:	Keymap window		샘플과 클립보드:
+Switch shortcut keys to Windows/Linux mode	Keymap window		윈도우즈/리녹스 모드로 단축키 바꾸기
 Revert	Modifier keys window		되돌리기
+Acute trigger	Keymap window		어큐트 트리거
+Save as…	Keymap window		다른 이름으로 저장…
 Tilde trigger	Keymap window		물결표 트리거
-Grave trigger	Keymap window		그레이브 트리거
-Select dead keys	Keymap window		데드키 선택
-Quit	Keymap window		나가기
-Switch shortcut keys to Haiku mode	Keymap window		Haiku 모드로 단축키 바꾸기
+(Current)	Keymap window		(현재)
 Circumflex trigger	Keymap window		서컴플렉스 트리거
-Diaeresis trigger	Keymap window		분음기호 트리거
-Open…	Keymap window		열기…
+Select dead keys	Keymap window		데드키 선택
+Layout	Keymap window		배치
+Revert	Keymap window		되돌리기
+Grave trigger	Keymap window		그레이브 트리거
+Quit	Keymap window		나가기
+User:	Keymap window		사용자:
+Keymap	System name		키보드배열
+Switch shortcut keys to Haiku mode	Keymap window		Haiku 모드로 단축키 바꾸기
 System:	Keymap window		시스템:
 Switch shortcut keys	Keymap window		단축키 바꾸기
-User:	Keymap window		사용자:
-Sample and clipboard:	Keymap window		샘플과 클립보드:
-Layout	Keymap window		배치
-Switch shortcut keys to Windows/Linux mode	Keymap window		윈도우즈/리녹스 모드로 단축키 바꾸기
-Revert	Keymap window		되돌리기
-Save as…	Keymap window		다른 이름으로 저장…
-File	Keymap window		파일
-(Current)	Keymap window		(현재)
 Font	Keymap window		글꼴
-Keymap	System name		키보드배열
-Acute trigger	Keymap window		어큐트 트리거
+File	Keymap window		파일
+Diaeresis trigger	Keymap window		분음기호 트리거
+Open…	Keymap window		열기…

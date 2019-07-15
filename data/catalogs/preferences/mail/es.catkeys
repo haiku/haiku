@@ -1,54 +1,54 @@
 1	spanish; castilian	x-vnd.Haiku-Mail	2750130554
+Account settings	AutoConfigWindow		Configuración de la cuenta
+\t\t· Outgoing	Config Window		\t\t· Saliente
+An error occurred while creating the config view: %error.	Config Views		Ocurrió un error al crear la vista de configuración: %error.
+E-mail address:	E-Mail		Dirección de correo electrónico:
+Create new account	AutoConfigWindow		Crear una nueva cuenta
+While sending and receiving	Config Window		Mientras se envíe y reciba
+Error!	Config Views		¡Error!
+Apply	Config Window		Aplicar
+Incoming mail filters	Config Views		Filtros de correo entrante
+Outgoing mail filters	Config Views		Filtros de correo saliente
+Server name:	E-Mail		Nombre del servidor:
+Add	Config Window		Añadir
+Back	AutoConfigWindow		Anterior
+Real name:	E-Mail		Nombre real:
+Real name:	Config Views		Nombre verdadero:
+\t\t· E-mail filters	Config Window		\t\t· Filtros de correo
+Outgoing	E-Mail		Saliente
+Accounts	Config Window		Cuentas
+Outgoing	Config Window		Saliente
+Remove	Config Views		Eliminar
+Show notifications:	Config Window		Mostrar notificaciones:
 Settings	Config Window		Configuración
 Never	Config Window	show status window	Nunca
-While sending and receiving	Config Window		Mientras se envíe y reciba
-Incoming	Config Window		Entrante
-Server name:	E-Mail		Nombre del servidor:
-An error occurred while creating the config view: %error.	Config Views		Ocurrió un error al crear la vista de configuración: %error.
-OK	Config Window		Aceptar
-E-mail address:	E-Mail		Dirección de correo electrónico:
-Account name:	E-Mail		Nombre de la cuenta:
 Account name:	Config Views		Nombre de la cuenta:
-Create new account	AutoConfigWindow		Crear una nueva cuenta
-OK	Config Views		Aceptar
-The filter could not be moved. Deleting filter.	Config Views		El filtro no se pudo mover. Eliminando el filtro.
-Revert	Config Window		Revertir
-Login name:	E-Mail		Nombre de usuario:
-Incoming	E-Mail		Entrante
-Password:	E-Mail		Contraseña:
-Accounts	Config Window		Cuentas
-Finish	AutoConfigWindow		Terminar
-Remove	Config Window		Eliminar
-Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Crear una nueva cuenta con el botón Añadir.\n\nEliminar una cuenta con el botón Borrar en el objeto seleccionado.\n\nSeleccione un objeto en la lista para cambiar sus propiedades.
-Error!	Config Views		¡Error!
-Server Name:	E-Mail		Nombre del servidor:
-While sending	Config Window		Mientras se envia
-Show notifications:	Config Window		Mostrar notificaciones:
+\t\t· Incoming	Config Window		\t\t· Entrante
 Enter a valid e-mail address.	AutoConfigWindow		Introduzca una dirección de correo válida.
-Add	Config Window		Añadir
-Account settings	AutoConfigWindow		Configuración de la cuenta
-E-mail	System name		Correo electrónico
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nLa configuración general no se pudo revertir\n\nError al recuperar la configuración general:\n%s\n
-Real name:	Config Views		Nombre verdadero:
-\t\t· Outgoing	Config Window		\t\t· Saliente
+Incoming	E-Mail		Entrante
 Choose Protocol	E-Mail		Selecciona un protocolo
 Return address:	Config Views		Remitente:
-Edit mailbox menu…	Config Window		Editar menú del buzón de correo...
-Outgoing	E-Mail		Saliente
-\t\t· E-mail filters	Config Window		\t\t· Filtros de correo
-Remove	Config Views		Eliminar
-\t\t· Incoming	Config Window		\t\t· Entrante
-Next	AutoConfigWindow		Siguiente
-Check every	Config Window		Revisar cada
-Back	AutoConfigWindow		Anterior
-Incoming mail filters	Config Views		Filtros de correo entrante
+Password:	E-Mail		Contraseña:
+Error retrieving general settings: %s\n	Config Window		Error al recuperar la configuración general: %s\n
+The filter could not be moved. Deleting filter.	Config Views		El filtro no se pudo mover. Eliminando el filtro.
+OK	Config Views		Aceptar
+Revert	Config Window		Revertir
+Incoming	Config Window		Entrante
+Finish	AutoConfigWindow		Terminar
+Add filter	Config Views		Agregar filtro
 Account settings	Config Views		Configuraciónes de cuenta
 minutes	Config Window		minutos
-Error retrieving general settings: %s\n	Config Window		Error al recuperar la configuración general: %s\n
-Real name:	E-Mail		Nombre real:
-Apply	Config Window		Aplicar
+E-mail	System name		Correo electrónico
+Check every	Config Window		Revisar cada
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Crear una nueva cuenta con el botón Añadir.\n\nEliminar una cuenta con el botón Borrar en el objeto seleccionado.\n\nSeleccione un objeto en la lista para cambiar sus propiedades.
+Account name:	E-Mail		Nombre de la cuenta:
+Edit mailbox menu…	Config Window		Editar menú del buzón de correo...
+Server Name:	E-Mail		Nombre del servidor:
+Remove	Config Window		Eliminar
+Login name:	E-Mail		Nombre de usuario:
+While sending	Config Window		Mientras se envia
+OK	Config Window		Aceptar
 OK	AutoConfigWindow		Aceptar
-Add filter	Config Views		Agregar filtro
-Outgoing	Config Window		Saliente
-Outgoing mail filters	Config Views		Filtros de correo saliente
+Next	AutoConfigWindow		Siguiente
 Error	Config Window		Error

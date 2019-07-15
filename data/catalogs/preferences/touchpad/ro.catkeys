@@ -1,20 +1,20 @@
 1	romanian	x-vnd.Haiku-Touchpad	607725922
 Scrolling	TouchpadPrefView		Derulare
-Touchpad	System name		Touchpad
-Revert	TouchpadPrefView		Revenire
 Tapping	TouchpadPrefView		Atingere
-Please confirm	TouchpadPrefView		Confirmați
-Two finger scrolling	TouchpadPrefView		Derulare cu două degete
-Defaults	TouchpadPrefView		Implicite
-Slow	TouchpadPrefView		Încet
-Vertical	TouchpadPrefView		Vertical
-High	TouchpadPrefView		Înalt
-Horizontal scrolling	TouchpadPrefView		Derulare orizontală
-Fast	TouchpadPrefView		Repede
-OK	TouchpadPrefView		OK
-Acceleration	TouchpadPrefView		Accelerare
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Noua zonă de derulare este foarte largă și ar putea să împiedice mișcări normale ale mouse-ului. Sigur doriți să o schimbați?
-Horizontal	TouchpadPrefView		Orizontal
-Off	TouchpadPrefView		Oprit
-Sensitivity	TouchpadPrefView		Sensibilitate
+Touchpad	System name		Touchpad
 Cancel	TouchpadPrefView		Anulează
+OK	TouchpadPrefView		OK
+Horizontal scrolling	TouchpadPrefView		Derulare orizontală
+Slow	TouchpadPrefView		Încet
+Two finger scrolling	TouchpadPrefView		Derulare cu două degete
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Noua zonă de derulare este foarte largă și ar putea să împiedice mișcări normale ale mouse-ului. Sigur doriți să o schimbați?
+Defaults	TouchpadPrefView		Implicite
+High	TouchpadPrefView		Înalt
+Off	TouchpadPrefView		Oprit
+Fast	TouchpadPrefView		Repede
+Vertical	TouchpadPrefView		Vertical
+Please confirm	TouchpadPrefView		Confirmați
+Acceleration	TouchpadPrefView		Accelerare
+Horizontal	TouchpadPrefView		Orizontal
+Sensitivity	TouchpadPrefView		Sensibilitate
+Revert	TouchpadPrefView		Revenire

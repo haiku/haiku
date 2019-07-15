@@ -1,74 +1,74 @@
 1	romanian	x-vnd.Haiku-MediaConverter	2251404027
-Video using parameters form settings	MediaConverter		Video ce utilizează configurările parametrilor de formular
-{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Fișierul nu a fost recunoscut ca fișier media suportat:} other{# fișiere nu au fost recunoscute ca fișiere media suportate:}}
-Video encoding:	MediaConverter		Codare video:
-Writing video track: %d%% complete	MediaConverter		Se scrie pista video: %d%% complet
+Writing audio track: %d%% complete	MediaConverter		Se scrie pista video: %d%% complet
+Input file not recognized as Audio or Video	MediaConverter		Fișierul de intrare nu este recunoscut ca audio sau video
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
-Error creating video.	MediaConverter		Eroare la crearea videoului.
-No audio	Audio codecs list		Fără audio
-Error	MediaConverter		Eroare
-{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# biți}}
-Error loading a file	MediaConverter		Eroare la încărcarea unui fișier
-File Error	MediaConverter-FileInfo		Eroare fișier
-Open…	Menu		Deschide…
-Start [ms]: 	MediaConverter		Start [ms]: 
-Output file '%filename' created	MediaConverter		Fișierul de ieșire '%filename' a fost creat
-Output format	MediaConverter		Format de ieșire
-End   [ms]: 	MediaConverter		Final   [ms]: 
-MediaConverter	System name		ConvertorMedia
-Error writing audio frame %ld	MediaConverter		Eroare la scrierea cadrului audio %ld
-No video	Video codecs list		Fără video
-Duration:	MediaConverter-FileInfo		Durată:
-OK	MediaConverter		OK
-%.1f kHz mono	MediaFileInfo		%.1f kHz mono
+Video quality: %3d%%	MediaConverter		Calitate video: %3d%%
+Source files	MediaConverter		Fișiere sursă
+Error writing video frame %ld	MediaConverter		Eroare la scrierea cadrului video %ld
 Error converting '%filename'	MediaConverter		Eroare la convertirea '%filename'
-Low	MediaConverter		Jos
+Selected directory not found. Defaulting to /boot/home	MediaConverter		Nu s-a putut găsi dosarul selectat. Se întoarce implicit la /boot/home
 Conversion completed	MediaConverter		Conversie completă
 Audio:	MediaConverter-FileInfo		Audio:
-OK	MediaConverter-FileInfo		OK
- seconds	MediaFileInfo		 secunde
-Error writing video frame %ld	MediaConverter		Eroare la scrierea cadrului video %ld
-Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Eroare la scrierea la locația: %strPath%. Se întoarce implicit la locația: /boot/home
-Source files	MediaConverter		Fișiere sursă
-Selected directory not found. Defaulting to /boot/home	MediaConverter		Nu s-a putut găsi dosarul selectat. Se întoarce implicit la /boot/home
-{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# cadru} other{# cadre}}
-Cancelling	MediaConverter		Se anulează
-{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# octet} other{# octeți}}
-Error loading files	MediaConverter		Eroare la încărcarea fișierelor
-Cancel	MediaConverter		Anulează
-Error read audio frame %ld	MediaConverter		Eroare la citirea cadrului audio %ld
-None available	Video codecs		Nimic disponibil
-Conversion cancelled	MediaConverter		Conversie anulată
-No file selected	MediaConverter-FileInfo		Niciun fișier selectat
-Select this folder	MediaConverter		Selectează acest dosar
-Error creating track.	MediaConverter		Eroare la crearea pistei.
-Continue	MediaConverter		Continuă
-Encoder parameters	MediaConverter-EncoderWindow		Parametri de codor
-Video:	MediaConverter-FileInfo		Video:
-%d bit 	MediaFileInfo		%d bit 
-Error creating '%filename'	MediaConverter		Eroare la crearea '%filename'
-Video quality not supported	MediaConverter		Calitate video nesuportată
-Cancelling…	MediaConverter		Se anulează…
-File details	MediaConverter		Detalii fișier
-Select	MediaConverter		Selectează
-Quit	Menu		Închidere
-Error read video frame %ld	MediaConverter		Eroare la citirea cadrului video %ld
-Preview	MediaConverter		Previzualizare
-File format:	MediaConverter		Format fișier:
-None available	Audio codecs		Nimic disponibil
 MediaConverter+:SaveDirectory	MediaConverter		ConvertorMedia+:DosarSalvare
-Error launching: %strError%	MediaConverter		Eroare la lansare: %strError%
+Error creating video.	MediaConverter		Eroare la crearea videoului.
+Cancelling	MediaConverter		Se anulează
+None available	Audio codecs		Nimic disponibil
+No file selected	MediaConverter-FileInfo		Niciun fișier selectat
 High	MediaConverter		Sus
-Writing audio track: %d%% complete	MediaConverter		Se scrie pista video: %d%% complet
-Drop media files onto this window	MediaConverter		Plasează fișiere media în această fereastră
-Audio encoding:	MediaConverter		Codare audio:
-Audio quality not supported	MediaConverter		Calitate audio nesuportată
-File	Menu		Fișier
-Input file not recognized as Audio or Video	MediaConverter		Fișierul de intrare nu este recunoscut ca audio sau video
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Fișierul nu a fost recunoscut ca fișier media suportat:} other{# fișiere nu au fost recunoscute ca fișiere media suportate:}}
+File Error	MediaConverter-FileInfo		Eroare fișier
+None available	Video codecs		Nimic disponibil
+Output format	MediaConverter		Format de ieșire
+%.1f kHz mono	MediaFileInfo		%.1f kHz mono
 %.1f kHz stereo	MediaFileInfo		%.1f kHz stereo
-Convert	MediaConverter		Convertește
-Video quality: %3d%%	MediaConverter		Calitate video: %3d%%
-%.1f kHz %ld channel	MediaFileInfo		%.1f kHz Canal %ld
-Output folder	MediaConverter		Dosar de ieșire
+OK	MediaConverter		OK
+Error creating '%filename'	MediaConverter		Eroare la crearea '%filename'
+Error loading a file	MediaConverter		Eroare la încărcarea unui fișier
+Encoder parameters	MediaConverter-EncoderWindow		Parametri de codor
+Open…	Menu		Deschide…
+Audio encoding:	MediaConverter		Codare audio:
 Audio quality: %3d%%	MediaConverter		Calitate audio: %3d%%
+Cancelling…	MediaConverter		Se anulează…
+Output file '%filename' created	MediaConverter		Fișierul de ieșire '%filename' a fost creat
+Output folder	MediaConverter		Dosar de ieșire
+Error creating track.	MediaConverter		Eroare la crearea pistei.
+ seconds	MediaFileInfo		 secunde
+Video using parameters form settings	MediaConverter		Video ce utilizează configurările parametrilor de formular
+Video:	MediaConverter-FileInfo		Video:
+Select	MediaConverter		Selectează
+Conversion cancelled	MediaConverter		Conversie anulată
+Low	MediaConverter		Jos
+Error loading files	MediaConverter		Eroare la încărcarea fișierelor
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# biți}}
+End   [ms]: 	MediaConverter		Final   [ms]: 
+Cancel	MediaConverter		Anulează
+OK	MediaConverter-FileInfo		OK
+Error read audio frame %ld	MediaConverter		Eroare la citirea cadrului audio %ld
+Video encoding:	MediaConverter		Codare video:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		A apărut o eroare la citirea informațiilor despre fișier.\n\nEroare : 
+Error	MediaConverter		Eroare
+File details	MediaConverter		Detalii fișier
+No audio	Audio codecs list		Fără audio
+Drop media files onto this window	MediaConverter		Plasează fișiere media în această fereastră
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# cadru} other{# cadre}}
+Quit	Menu		Închidere
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# octet} other{# octeți}}
+Duration:	MediaConverter-FileInfo		Durată:
+MediaConverter	System name		ConvertorMedia
+Error launching: %strError%	MediaConverter		Eroare la lansare: %strError%
+File format:	MediaConverter		Format fișier:
+Error writing audio frame %ld	MediaConverter		Eroare la scrierea cadrului audio %ld
+File	Menu		Fișier
+Video quality not supported	MediaConverter		Calitate video nesuportată
+Select this folder	MediaConverter		Selectează acest dosar
+Error read video frame %ld	MediaConverter		Eroare la citirea cadrului video %ld
+%.1f kHz %ld channel	MediaFileInfo		%.1f kHz Canal %ld
+%d bit 	MediaFileInfo		%d bit 
+No video	Video codecs list		Fără video
+Continue	MediaConverter		Continuă
+Convert	MediaConverter		Convertește
+Audio quality not supported	MediaConverter		Calitate audio nesuportată
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Eroare la scrierea la locația: %strPath%. Se întoarce implicit la locația: /boot/home
+Writing video track: %d%% complete	MediaConverter		Se scrie pista video: %d%% complet
+Preview	MediaConverter		Previzualizare
+Start [ms]: 	MediaConverter		Start [ms]: 

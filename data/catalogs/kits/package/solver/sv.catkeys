@@ -1,38 +1,38 @@
 1	swedish	x-vnd.Haiku-libsolvsolver	3404387783
-%dependency% is provided by the system	SolverProblem		%dependency% tillhandahålls av systemet
-package %source% conflicts with %dependency% provided by %target%	SolverProblem		paketet %source% är i konflikt med %dependency% som tillhandahålls av %target%
-nothing provides requested %dependency%	SolverProblem		inget tillhandahåller det begärda paketet %dependency%
-unspecified problem	SolverProblem		ospecificerat problem
-keep %source% despite its inferior architecture	SolverProblemSolution		behåll %source% trots dess underlägsna arkitektur
-do not deinstall \"%selection%\"	SolverProblemSolution		avinstallera inte \"%selection%\"
-%source% has inferior architecture	SolverProblem		%source% har en underlägsen arkitektur
-dependency problem	SolverProblem		problem med beroenden
-do not keep %source% installed	SolverProblemSolution		låt inte %source% vara installerad
-package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		paketet %source% implisivt föråldrar %dependency% som tillhandahålls av %target%
-do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		avinstallera inte alla upplösliga \"%selection%\"
-keep %source% from excluded repository	SolverProblemSolution		behåll %source% från det exkluderade repositoriet
-install %selection% despite its old version	SolverProblemSolution		installera %selection% trots dess äldre version
-allow downgrade of %source% to %target%	SolverProblemSolution		tillåt nedgradering av %source% till %target%
-do not lock \"%selection%\"	SolverProblemSolution		lås inte \"%selection%\"
-install %source% despite its inferior architecture	SolverProblemSolution		installera %source% trots dess underlägsna arkitektur
-do not install \"%selection%\"	SolverProblemSolution		installera inte \"%selection%\"
-do something	SolverProblemSolution		gör nånting
-do not install the most recent version of \"%selection%\"	SolverProblemSolution		installera inte den senaste versionen av \"%selection%\"
-package %source% conflicts with %dependency% provided by itself	SolverProblem		paketet %source% är i konflikt med %dependency% som tillhandahålls av sig själv
-cannot install both %source% and %target%	SolverProblem		kan inte installera både %source% och %target%
-allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		tillåt ändring av utgivare från \"%sourceVendor%\" (%source%) till \"%targetVendor%\" (%target%)
-install %source% from excluded repository	SolverProblemSolution		installera %source% från exkluderat repositorium
-keep old %source%	SolverProblemSolution		spara äldre %source%
-conflicting requests	SolverProblem		konflikterande förfrågningar
-package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		paketet %source% kräver %dependency%, men ingen av leverantörerna kan installeras
-do not forbid installation of %source%	SolverProblemSolution		förbjud inte installation av %source%
 allow architecture change of %source% to %target%	SolverProblemSolution		tillåt ändring av arkitektur av %source% till %target%
-allow name change of %source% to %target%	SolverProblemSolution		tillåt namnändring av %source% till %target%
+install %source% from excluded repository	SolverProblemSolution		installera %source% från exkluderat repositorium
+unspecified problem	SolverProblem		ospecificerat problem
+package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		paketet %source% kräver %dependency%, men ingen av leverantörerna kan installeras
+package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		paketet %source% implisivt föråldrar %dependency% som tillhandahålls av %target%
+nothing provides requested %dependency%	SolverProblem		inget tillhandahåller det begärda paketet %dependency%
+do not keep %source% installed	SolverProblemSolution		låt inte %source% vara installerad
+do not deinstall \"%selection%\"	SolverProblemSolution		avinstallera inte \"%selection%\"
+install %source% despite its inferior architecture	SolverProblemSolution		installera %source% trots dess underlägsna arkitektur
+conflicting requests	SolverProblem		konflikterande förfrågningar
+do not install the most recent version of \"%selection%\"	SolverProblemSolution		installera inte den senaste versionen av \"%selection%\"
 allow replacement of %source% with %target%	SolverProblemSolution		tillåt ersättning av %source% med %target%
-allow deinstallation of %source%	SolverProblemSolution		tillåt avinstallation av %source%
-%source% does not belong to a distupgrade repository	SolverProblem		%source% tillhör inte ett repositorium för distributionsuppgradering
 package %source% obsoletes %dependency% provided by %target%	SolverProblem		paketet %source% föråldrar %dependency% som tillhandahålls av %target%
-package %source% is not installable	SolverProblem		paketet %source% är inte installerbart
+do not forbid installation of %source%	SolverProblemSolution		förbjud inte installation av %source%
+allow downgrade of %source% to %target%	SolverProblemSolution		tillåt nedgradering av %source% till %target%
+dependency problem	SolverProblem		problem med beroenden
+%dependency% is provided by the system	SolverProblem		%dependency% tillhandahålls av systemet
+keep %source% despite its inferior architecture	SolverProblemSolution		behåll %source% trots dess underlägsna arkitektur
+%source% does not belong to a distupgrade repository	SolverProblem		%source% tillhör inte ett repositorium för distributionsuppgradering
 installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		det installerade paketet %source% föråldrar %dependency% som tillhandahålls av %target%
+allow name change of %source% to %target%	SolverProblemSolution		tillåt namnändring av %source% till %target%
+package %source% conflicts with %dependency% provided by %target%	SolverProblem		paketet %source% är i konflikt med %dependency% som tillhandahålls av %target%
+do something	SolverProblemSolution		gör nånting
+install %selection% despite its old version	SolverProblemSolution		installera %selection% trots dess äldre version
+cannot install both %source% and %target%	SolverProblem		kan inte installera både %source% och %target%
+package %source% is not installable	SolverProblem		paketet %source% är inte installerbart
 problem with installed package %source%	SolverProblem		problem med det installerade paketet %source%
+allow deinstallation of %source%	SolverProblemSolution		tillåt avinstallation av %source%
+keep %source% from excluded repository	SolverProblemSolution		behåll %source% från det exkluderade repositoriet
+keep old %source%	SolverProblemSolution		spara äldre %source%
+package %source% conflicts with %dependency% provided by itself	SolverProblem		paketet %source% är i konflikt med %dependency% som tillhandahålls av sig själv
+allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		tillåt ändring av utgivare från \"%sourceVendor%\" (%source%) till \"%targetVendor%\" (%target%)
+do not lock \"%selection%\"	SolverProblemSolution		lås inte \"%selection%\"
+do not install \"%selection%\"	SolverProblemSolution		installera inte \"%selection%\"
 nothing provides %dependency% needed by %source%	SolverProblem		inget tillhandahåller %dependency% som krävs av %source%
+%source% has inferior architecture	SolverProblem		%source% har en underlägsen arkitektur
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		avinstallera inte alla upplösliga \"%selection%\"

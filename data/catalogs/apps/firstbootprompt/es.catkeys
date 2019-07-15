@@ -1,8 +1,8 @@
 1	spanish; castilian	x-vnd.Haiku-FirstBootPrompt	2649051796
 Custom	BootPromptWindow		Personalizado
-Boot to Desktop	BootPromptWindow		Arrancar al escritorio
 Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	¡Gracias por probar Haiku! ¡Esperamos que le agrade!\n\nPuede seleccionar su idioma y distribución de teclado preferidos de la lista de la izquierda donde podrán utilizarse instantáneamente. Después se pueden cambiar fácilmente ambas configuraciones desde el Escritorio al vuelo. Nota: Traducir aplicaciones y otros componentes de Haiku es un trabajo en proceso continuo. Probablemente se encuentren líneas sin traducir, pero si lo desea, puede unirse al trabajo en https://www.haiku-os.org/.\n\n¿Desea ejecutar el instalador o continuar inicializando el escritorio?\n
-Language	BootPromptWindow		Idioma
-Welcome to Haiku!	BootPromptWindow		¡Bienvenido a Haiku!
-Run Installer	BootPromptWindow		Ejecutar instalador
+Boot to Desktop	BootPromptWindow		Arrancar al escritorio
 Keymap	BootPromptWindow		Distribución de teclado
+Welcome to Haiku!	BootPromptWindow		¡Bienvenido a Haiku!
+Language	BootPromptWindow		Idioma
+Run Installer	BootPromptWindow		Ejecutar instalador

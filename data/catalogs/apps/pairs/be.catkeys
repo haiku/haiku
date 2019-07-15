@@ -1,16 +1,16 @@
 1	belarusian	x-vnd.Haiku-Pairs	2193803529
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Ня знойдзена дастаткова вектарных значкаў каб пачаць гульню; патрабуецца найменш %zu, наяўна %zu.\n
+Pairs	System name		Пары
+Quit	PairsWindow		Выйсці
+Medium	PairsWindow		Сярэдняя
+Game	PairsWindow		Гульня
 Expert (8x8)	PairsWindow		Майстар (8x8)
-Beginner (4x4)	PairsWindow		Пачаткоўца (4x4)
+New	PairsWindow		Новая
+OK	Pairs		ОК
+Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Ня знойдзена дастаткова вектарных значкаў каб пачаць гульню; патрабуецца найменш %zu, наяўна %zu.\n
+Small	PairsWindow		Малая
+Size	PairsWindow		Памер
 Quit game	PairsWindow		Выйсці з гульні
 Large	PairsWindow		Вялікая
-Small	PairsWindow		Малая
-Game	PairsWindow		Гульня
-OK	Pairs		ОК
-Size	PairsWindow		Памер
-New	PairsWindow		Новая
+Beginner (4x4)	PairsWindow		Пачаткоўца (4x4)
 Intermediate (6x6)	PairsWindow		Сярэднячок (6x6)
-Quit	PairsWindow		Выйсці
-Pairs	System name		Пары
 New game	PairsWindow		Новая гульня
-Medium	PairsWindow		Сярэдняя

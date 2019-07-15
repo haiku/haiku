@@ -1,18 +1,18 @@
 1	romanian	x-vnd.Haiku-Pairs	818003250
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Pairs nu a găsit destule pictograme vector pentru a porni; are nevoie de cel putin %zu, s-au găsit %zu.\n
-%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tscris de Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n
+Pairs	System name		Perechi
+Quit	PairsWindow		Închidere
+Medium	PairsWindow		Mediu
+Game	PairsWindow		Joc
 Expert (8x8)	PairsWindow		Avansat (8x8)
-Beginner (4x4)	PairsWindow		Începător (4x4)
+New	PairsWindow		Nou
+OK	Pairs		OK
+Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Pairs nu a găsit destule pictograme vector pentru a porni; are nevoie de cel putin %zu, s-au găsit %zu.\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Ați completat jocul în {0, plural, one{# click} other{# clicks}}.\n
+Small	PairsWindow		Mic
+Size	PairsWindow		Dimensiune
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tscris de Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n
 Quit game	PairsWindow		Închide jocul
 Large	PairsWindow		Mare
-Small	PairsWindow		Mic
-Game	PairsWindow		Joc
-OK	Pairs		OK
-Size	PairsWindow		Dimensiune
-New	PairsWindow		Nou
+Beginner (4x4)	PairsWindow		Începător (4x4)
 Intermediate (6x6)	PairsWindow		Mediu (6x6)
-Quit	PairsWindow		Închidere
-Pairs	System name		Perechi
 New game	PairsWindow		Joc nou
-Medium	PairsWindow		Mediu

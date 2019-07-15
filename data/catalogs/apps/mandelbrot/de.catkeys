@@ -1,23 +1,23 @@
 1	german	x-vnd.Haiku-Mandelbrot	1781779654
-About	MandelbrotWindow		Über
-Julia	MandelbrotWindow		Julia
-Grassland	MandelbrotWindow		Grasland
-Spring	MandelbrotWindow		Frühling
-High contrast	MandelbrotWindow		Hoher Kontrast
-Fire	MandelbrotWindow		Feuer
-Royal	MandelbrotWindow		Royal
-File	MandelbrotWindow		Datei
-Lightning	MandelbrotWindow		Blitze
-Midnight	MandelbrotWindow		Mitternacht
-Palette	MandelbrotWindow		Palette
-Mandelbrot	MandelbrotWindow		Mandelbrot
 Burning Ship	MandelbrotWindow		Brennendes Schiff
-Quit	MandelbrotWindow		Beenden
-Frost	MandelbrotWindow		Frost
+Grassland	MandelbrotWindow		Grasland
+Lightning	MandelbrotWindow		Blitze
+About	MandelbrotWindow		Über
+Palette	MandelbrotWindow		Palette
 Set	MandelbrotWindow		Menge
-Iterations	MandelbrotWindow		Iterationen
-Mandelbrot	System name		Mandelbrot
-Deepfrost	MandelbrotWindow		Eiskälte
 Tricorn	MandelbrotWindow		Tricorn
-Multibrot	MandelbrotWindow		Multibrot
+Royal	MandelbrotWindow		Royal
 Orbit Trap	MandelbrotWindow		Orbitalfalle
+Deepfrost	MandelbrotWindow		Eiskälte
+Quit	MandelbrotWindow		Beenden
+File	MandelbrotWindow		Datei
+Julia	MandelbrotWindow		Julia
+Frost	MandelbrotWindow		Frost
+Fire	MandelbrotWindow		Feuer
+Mandelbrot	System name		Mandelbrot
+Iterations	MandelbrotWindow		Iterationen
+High contrast	MandelbrotWindow		Hoher Kontrast
+Multibrot	MandelbrotWindow		Multibrot
+Spring	MandelbrotWindow		Frühling
+Midnight	MandelbrotWindow		Mitternacht
+Mandelbrot	MandelbrotWindow		Mandelbrot

@@ -1,42 +1,41 @@
-1	hungarian	x-vnd.Haiku-Shortcuts	986541402
-OK	ShortcutsWindow		Rendben
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		A Parancsgombok nem tudta elmenteni a beállításait.
-Cancel	ShortcutsWindow		Mégse
-Append KeySet…	ShortcutsWindow		Gyorsbillentyű hozzáadása…
-Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
-Key	ShortcutsWindow		Billentyű
-Open KeySet…	ShortcutsWindow		Gyorsbillentyű megnyitása…
-Error, NULL state description?	ShortcutsSpec		Hiba, NULL állapotleírás?
-Revert to saved	ShortcutsWindow		Visszaállítás az elmentettre
-*InsertString \"Your Text Here\"	ShortcutsWindow		*KarakterekBeszúrása \"Ide írja a szöveget\"
+1	hungarian	x-vnd.Haiku-Shortcuts	1611284793
 *MouseUp	ShortcutsWindow		*EgérFel
-(Choose application with file requester)	ShortcutsWindow		(A fájlkérővel válasszon programot)
-*LaunchHandler text/html	ShortcutsWindow		*Indítás text/html
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		A Parancsgombok nem tudta megnyitni a beállításfájlját!
-*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*EgérMozgatásIde 100% 0\" \"*EgérGomb 1\"
-Option	ShortcutsSpec	Name for modifier on keyboard	Opció
-Save	ShortcutsWindow		Mentés
-*MouseButton 1	ShortcutsWindow		*EgérGomb 1
-*MoveMouse +20 +0	ShortcutsWindow		*EgérMozgatás +20 +0
-Save changes before closing?	ShortcutsWindow		Menti a változtatásokat kilépés előtt?
-Command	ShortcutsSpec	Name for modifier on keyboard	Parancs
-Remove selected shortcut	ShortcutsWindow		Kiválasztott gyorsbillentyű eltávolítása
-Add new shortcut	ShortcutsWindow		Új gyorsbillentyű hozzáadása
-Save & apply	ShortcutsWindow		Mentés és alkalmazás
-*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*ÜzenetKüldés application/x-vnd.Be-TRAK 'Tfnd'
-Append	ShortcutsWindow		Hozzáfűzés
-File	ShortcutsWindow		Fájl
-Quit	ShortcutsWindow		Kilépés
-*MouseDown	ShortcutsWindow		*EgérLe
-Don't save	ShortcutsWindow		Ne mentse
 Application	ShortcutsWindow		Program
-Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Option	ShortcutsSpec	Name for modifier on keyboard	Opció
+Save changes before closing?	ShortcutsWindow		Menti a változtatásokat kilépés előtt?
+Revert to saved	ShortcutsWindow		Visszaállítás az elmentettre
+Don't save	ShortcutsWindow		Ne mentse
+*MouseDown	ShortcutsWindow		*EgérLe
 *Beep	ShortcutsWindow		*Sípolás
-*MoveMouseTo 50% 50%	ShortcutsWindow		*EgérMozgatásIde 50% 50%
-Save KeySet as…	ShortcutsWindow		Beállítások mentése másként…
-Open	ShortcutsWindow		Megnyitás
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		A Parancsgombok nem tudta beolvasni a beállításait!
-Select	ShortcutsWindow		Kiválasztás
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		A Parancsgombok nem tudta elmenteni a beállításait!
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		A Parancsgombok nem tudta elmenteni a beállításait.
+Save	ShortcutsWindow		Mentés
 Oh no	ShortcutsWindow		Ó jaj
+Key	ShortcutsWindow		Billentyű
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*ÜzenetKüldés application/x-vnd.Be-TRAK 'Tfnd'
+Select	ShortcutsWindow		Kiválasztás
 Shortcuts	System name		Parancsgombok
+Quit	ShortcutsWindow		Kilépés
+(Choose application with file requester)	ShortcutsWindow		(A fájlkérővel válasszon programot)
+Cancel	ShortcutsWindow		Mégse
+*MoveMouse +20 +0	ShortcutsWindow		*EgérMozgatás +20 +0
+Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		A Parancsgombok nem tudta beolvasni a beállításait!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		A Parancsgombok nem tudta elmenteni a beállításait!
+*InsertString \"Your Text Here\"	ShortcutsWindow		*KarakterekBeszúrása \"Ide írja a szöveget\"
+Remove selected shortcut	ShortcutsWindow		Kiválasztott gyorsbillentyű eltávolítása
+Error, NULL state description?	ShortcutsSpec		Hiba, NULL állapotleírás?
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		A Parancsgombok nem tudta megnyitni a beállításfájlját!
+Save & apply	ShortcutsWindow		Mentés és alkalmazás
+Open	ShortcutsWindow		Megnyitás
+Append	ShortcutsWindow		Hozzáfűzés
+Save KeySet as…	ShortcutsWindow		Beállítások mentése másként…
+Append KeySet…	ShortcutsWindow		Gyorsbillentyű hozzáadása…
+*MouseButton 1	ShortcutsWindow		*EgérGomb 1
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*EgérMozgatásIde 100% 0\" \"*EgérGomb 1\"
+OK	ShortcutsWindow		Rendben
+Add new shortcut	ShortcutsWindow		Új gyorsbillentyű hozzáadása
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Open KeySet…	ShortcutsWindow		Gyorsbillentyű megnyitása…
+File	ShortcutsWindow		Fájl
+*LaunchHandler text/html	ShortcutsWindow		*Indítás text/html
+*MoveMouseTo 50% 50%	ShortcutsWindow		*EgérMozgatásIde 50% 50%

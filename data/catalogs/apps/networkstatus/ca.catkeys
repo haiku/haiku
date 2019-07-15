@@ -1,21 +1,20 @@
-1	catalan; valencian	x-vnd.Haiku-NetworkStatus	1398030553
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Opcions de l'EstatDeLaXarxa :\n\t--deskbar\tafegeix automàticament un replicant a la BarraDeLEscriptori\n\t--help\t\tmostra aquesta ajuda i surt\n
-<no wireless networks found>	NetworkStatusView		<no s'ha trobat cap xarxa sense fil>
-Run in window	NetworkStatus		Executa en una finestra
-No link	NetworkStatusView		Cap enllaç
-Install in Deskbar	NetworkStatus		Instal·la-ho a la Barra de l'Escriptori
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		Ha fallat l'execució de les preferències de xarxa.\n\nError : 
+1	catalan; valencian	x-vnd.Haiku-NetworkStatus	3491552359
 Netmask	NetworkStatusView		Màscara de xarxa
-Broadcast	NetworkStatusView		Difusió
-Unknown	NetworkStatusView		Desconegut
-Network Status	NetworkStatusView		Estat de la xarxa
-Ready	NetworkStatusView		Preparat
-No stateful configuration	NetworkStatusView		No hi ha cap configuració dinàmica
-%ifaceName information:\n	NetworkStatusView		Informació de %ifaceName:\n
-Configuring	NetworkStatusView		S'està configurant
-Address	NetworkStatusView		Adreça
-OK	NetworkStatusView		D'acord
-NetworkStatus	System name		EstatDeLaXarxa
-Open network preferences…	NetworkStatusView		Obre les preferències de la xarxa...
-Could not join wireless network:\n	NetworkStatusView		No ha estat possible connectar a la xarxa sense fil:\n
 Quit	NetworkStatusView		Surt
+Unknown	NetworkStatusView		Desconegut
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Ha fallat l'execució de les preferències de xarxa.\n\nError : 
+Install in Deskbar	NetworkStatus		Instal·la-ho a la Barra de l'Escriptori
+Open network preferences…	NetworkStatusView		Obre les preferències de la xarxa...
+NetworkStatus	System name		EstatDeLaXarxa
+OK	NetworkStatusView		D'acord
+No link	NetworkStatusView		Cap enllaç
+Could not join wireless network:\n	NetworkStatusView		No ha estat possible connectar a la xarxa sense fil:\n
+Ready	NetworkStatusView		Preparat
+Network Status	NetworkStatusView		Estat de la xarxa
+Address	NetworkStatusView		Adreça
+No stateful configuration	NetworkStatusView		No hi ha cap configuració dinàmica
+Broadcast	NetworkStatusView		Difusió
+%ifaceName information:\n	NetworkStatusView		Informació de %ifaceName:\n
+Run in window	NetworkStatus		Executa en una finestra
+<no wireless networks found>	NetworkStatusView		<no s'ha trobat cap xarxa sense fil>
+Configuring	NetworkStatusView		S'està configurant

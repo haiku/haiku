@@ -1,35 +1,35 @@
 1	polish	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		Przywróć migawkę
-Could not set Sudoku:\n%s\n	SudokuWindow		Nie można ustawić Sudoku:\n%s\n
-Export as…	SudokuWindow		Eksportuj jako…
-OK	SudokuWindow		OK
-New	SudokuWindow		Nowy
-Abort	ProgressWindow		Przerwij
-Sudoku	System name		Sudoku
-Could not open \"%s\":\n%s\n	SudokuWindow		Nie można otworzyć „%s”:\n%s\n
-Easy	SudokuWindow		Łatwy
-Open file…	SudokuWindow		Otwórz plik…
-Solve single field	SudokuWindow		Rozwiąż pojedyncze pole
-Solve	SudokuWindow		Rozwiąż
-Redo	SudokuWindow		Ponów
 File	SudokuWindow		Plik
-Advanced	SudokuWindow		Zaawansowany
-Start again	SudokuWindow		Rozpocznij jeszcze raz
-HTML	SudokuWindow		HTML
-Sudoku request	SudokuWindow		Żądanie Sudoku
-Copy	SudokuWindow		Kopiuj
-Mark valid hints	SudokuWindow		Oznacz prawidłowe podpowiedzi
-Sudoku solved - congratulations!\n	SudokuWindow		Sudoku rozwiązane - gratulacje!\n
+Mark invalid values	SudokuWindow		Oznacz nieprawidłowe wartości
+Solve single field	SudokuWindow		Rozwiąż pojedyncze pole
 Hard	SudokuWindow		Trudny
-Snapshot current	SudokuWindow		Utwórz migawkę
+Start again	SudokuWindow		Rozpocznij jeszcze raz
+New	SudokuWindow		Nowy
+Easy	SudokuWindow		Łatwy
+Undo	SudokuWindow		Cofnij
+Export as…	SudokuWindow		Eksportuj jako…
+Quit	SudokuWindow		Zakończ
+Redo	SudokuWindow		Ponów
+Could not open \"%s\":\n%s\n	SudokuWindow		Nie można otworzyć „%s”:\n%s\n
+Blank	SudokuWindow		Puste
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku rozwiązane - gratulacje!\n
 Text	SudokuWindow		Tekst
+Copy	SudokuWindow		Kopiuj
+Solve	SudokuWindow		Rozwiąż
+HTML	SudokuWindow		HTML
+Advanced	SudokuWindow		Zaawansowany
+Set all hints	SudokuWindow		Ustaw wszystkie podpowiedzi
+Searching for removable values	SudokuGenerator		Szukanie wartości wymiennych
+Abort	ProgressWindow		Przerwij
+Could not set Sudoku:\n%s\n	SudokuWindow		Nie można ustawić Sudoku:\n%s\n
+Help	SudokuWindow		Pomoc
+OK	SudokuWindow		OK
+Sudoku	System name		Sudoku
+Progress monitor	ProgressWindow		Monitor postępu
 Creating solvable field	SudokuGenerator		Tworzenie rozwiązywalnego pola
 View	SudokuWindow		Widok
-Progress monitor	ProgressWindow		Monitor postępu
-Set all hints	SudokuWindow		Ustaw wszystkie podpowiedzi
-Mark invalid values	SudokuWindow		Oznacz nieprawidłowe wartości
-Blank	SudokuWindow		Puste
-Help	SudokuWindow		Pomoc
-Searching for removable values	SudokuGenerator		Szukanie wartości wymiennych
-Undo	SudokuWindow		Cofnij
-Quit	SudokuWindow		Zakończ
+Snapshot current	SudokuWindow		Utwórz migawkę
+Mark valid hints	SudokuWindow		Oznacz prawidłowe podpowiedzi
+Sudoku request	SudokuWindow		Żądanie Sudoku
+Open file…	SudokuWindow		Otwórz plik…

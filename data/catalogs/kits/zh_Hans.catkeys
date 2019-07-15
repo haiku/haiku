@@ -1,42 +1,42 @@
 1	english	x-vnd.Haiku-libbe	3337473349
-gamma	AboutWindow		伽马
-beta	AboutWindow		beta
-%3.2f GiB	StringForSize		%3.2f GiB
-Written by:	AboutWindow		编写：
-About %app%	AboutMenuItem		关于 %app%
-Cut	TextView		剪切
-Version	AboutWindow		版本
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		无法为 \"%description\" 创建克隆控件。\n%error
-Copy	TextView		复制
-%3.2f KiB	StringForSize		%3.2f KiB
-alpha	AboutWindow		测试
-Error	PrintJob		错误
-All Rights Reserved.	AboutWindow		保留所有权利
 {0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# 字节} other{# 字节}}
-About %app%	AboutWindow		关于 %app%
-No pages to print!	PrintJob		无打印页！
+All Rights Reserved.	AboutWindow		保留所有权利
+gold master	AboutWindow		最终测试版
+Undo	TextView		撤销
+gamma	AboutWindow		伽马
+development	AboutWindow		开发
 OK	Dragger		确定
 OK	PrintJob		确定
-Green:	ColorControl		绿色:
-Version history:	AboutWindow		版本历史：
-Remove replicant	Dragger		删除克隆控件
-Select all	TextView		全选
-OK	AboutWindow		确定
-OK	ZombieReplicantView		确定
 Print Server is not responding.	PrintJob		打印服务未响应。
+About %app%	AboutMenuItem		关于 %app%
+Warning	Dragger		警告
+Green:	ColorControl		绿色:
+Redo	TextView		恢复
+No pages to print!	PrintJob		无打印页！
+beta	AboutWindow		beta
+OK	ZombieReplicantView		确定
+Cut	TextView		剪切
+%3.2f GiB	StringForSize		%3.2f GiB
+Can't delete this replicant from its original application. Life goes on.	Dragger		无法从原始应用中删除克隆控件。它将继续存在。
+Error	ZombieReplicantView		错误
 Paste	TextView		粘贴
+OK	AboutWindow		确定
 Special Thanks:	AboutWindow		特别感谢：
 %.2f TiB	StringForSize		%.2f TiB
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		无法定位克隆控件应用。未提供应用程序署名。\n%error
-Redo	TextView		恢复
-<empty>	Menu		<空>
-Warning	Dragger		警告
-Undo	TextView		撤销
+Remove replicant	Dragger		删除克隆控件
+Version	AboutWindow		版本
 Red:	ColorControl		红色:
+<empty>	Menu		<空>
+Copy	TextView		复制
+Select all	TextView		全选
+alpha	AboutWindow		测试
 %3.2f MiB	StringForSize		%3.2f MiB
+Error	PrintJob		错误
+About %app%	AboutWindow		关于 %app%
 About %app…	Dragger		关于 %app...
-development	AboutWindow		开发
-Error	ZombieReplicantView		错误
+Version history:	AboutWindow		版本历史：
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		无法定位克隆控件应用。未提供应用程序署名。\n%error
+%3.2f KiB	StringForSize		%3.2f KiB
 Blue:	ColorControl		蓝色:
-gold master	AboutWindow		最终测试版
-Can't delete this replicant from its original application. Life goes on.	Dragger		无法从原始应用中删除克隆控件。它将继续存在。
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		无法为 \"%description\" 创建克隆控件。\n%error
+Written by:	AboutWindow		编写：

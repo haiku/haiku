@@ -1,16 +1,16 @@
 1	swedish	x-vnd.haiku-package_daemon	1440586681
-Package problems	PackageProblem	Window title	Paketproblem
 Package changes	PackageResult	Window title	Paketförändringar
 uninstall package %s\n	PackageResult	Don't change '%s' variable	avinstallera paket %s\n
-install package %s from repository %s\n	PackageResult	Don't change '%s' variables	installera paket %s från repository %s\n
-Apply changes	PackageResult		Tillämpa förändringar
-solution %d:	PackageProblem	Don't change the %d variable	lösning %d:
-Warning	PackageManager		Varning
-Retry	PackageProblem		Försök igen
-The following additional package changes have to be made:	PackageResult		Följande ytterligare paketförändringar måste göras:
 ignore problem for now	PackageProblem		ignorera problemet för tillfället
+solution %d:	PackageProblem	Don't change the %d variable	lösning %d:
+The following problems have been encountered. Please select a solution for each:	PackageProblem		Följande problem har påträffats. Välj en lösning för varje:
+Apply changes	PackageResult		Tillämpa förändringar
+Package daemon	PackageManager		Paketdemon
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	installera paket %s från repository %s\n
+The following additional package changes have to be made:	PackageResult		Följande ytterligare paketförändringar måste göras:
+Warning	PackageManager		Varning
 Cancel	PackageProblem		Avbryt
 don't activate package %source%	PackageProblem	don't change '%source%	aktivera inte paket %source%
-The following problems have been encountered. Please select a solution for each:	PackageProblem		Följande problem har påträffats. Välj en lösning för varje:
-Package daemon	PackageManager		Paketdemon
 Cancel	PackageResult		Avbryt
+Retry	PackageProblem		Försök igen
+Package problems	PackageProblem	Window title	Paketproblem

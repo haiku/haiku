@@ -1,127 +1,127 @@
 1	japanese	x-vnd.Haiku-Keymap	1039047705
-Croatian	KeymapNames		クロアチア語
-Turkish (Type-Q)	KeymapNames		トルコ語 (Type-Q)
-Icelandic	KeymapNames		アイスランド語
-Serbian (Cyrillic)	KeymapNames		セルビア語 (Cyrillic)
-Shift:	Modifier keys window	Shift key role name	Shift:
-Revert	Modifier keys window		元に戻す
-Estonian	KeymapNames		エストニア語
-Canadian-French	KeymapNames		フランス語 (カナダ)
-Warning: left and right key roles do not match	Modifier keys window		警告: 左右のキーの機能が一致しません
-Romanian	KeymapNames		ルーマニア語
-Scroll lock	Keyboard Layout View		Scroll lock
-Menu	Keyboard Layout View	Menu key	メニューキー
-Left control	Keyboard Layout View		左 Control キー
-Tilde trigger	Keymap window		チルダのトリガー
-Bulgarian (Phonetic)	KeymapNames		ブルガリア語 (Phonetic)
-Hungarian	KeymapNames		ハンガリー語
-Grave trigger	Keymap window		グレイヴアクセントのトリガー
-Brazilian (ABNT2)	KeymapNames		ブラジル語 (ABNT2)
-Polish	KeymapNames		ポーランド語
-Role	Modifier keys window	As in the role of a modifier key	役割
-Caps lock	Keyboard Layout View		Caps lock
-Spanish (Dvorak)	KeymapNames		スペイン語 (Dvorak)
-Select dead keys	Keymap window		デッドキーの選択
-Belgian (point)	KeymapNames		ベルギー語 (point)
-Hebrew	KeymapNames		ヘブライ語
-Russian (Mac)	KeymapNames		ロシア語 (Mac)
-United-Kingdom	KeymapNames		英語 (United-Kingdom)
-Swiss-French	KeymapNames		フランス語 (スイス)
-Cancel	Modifier keys window		中止
-Danish	KeymapNames		デンマーク語
-Lithuanian	KeymapNames		リトアニア語
-Spanish	KeymapNames		スペイン語
-Command	Keyboard Layout View	Command key	Command
-Macedonian	KeymapNames		マケドニア語
-Irish	KeymapNames		アイルランド語
-French (Mac)	KeymapNames		フランス語 (Mac)
-German (Mac)	KeymapNames		ドイツ語 (Mac)
-Defaults	Keymap window		デフォルト
-Ukrainian (Mac)	KeymapNames		ウクライナ語 (Mac)
-Japanese	KeymapNames		日本語
-Quit	Keymap window		終了
-Switch shortcut keys to Haiku mode	Keymap window		ショートカットキースイッチを Haiku モードにする
-French (Bépo)	KeymapNames		フランス語 (Bépo)
-Circumflex trigger	Keymap window		サーカムフレックスのトリガー
-Diaeresis trigger	Keymap window		ウムラウトのトリガー
-Ukrainian	KeymapNames		ウクライナ語
-Disabled	Modifier keys window	Do nothing	無効
-Dvorak (programmer's)	KeymapNames		Dvorak (プログラマー用)
-ISO-9995	KeymapNames		ISO-9995
-Albanian	KeymapNames		アルバニア語
-Open…	Keymap window		開く…
-Greek	KeymapNames		ギリシア語
-Error: duplicate keys	Modifier keys window		エラー: 重複したキー
-System:	Keymap window		システム:
-Lithuanian (Standard)	KeymapNames		リトアニア語 (標準)
-Brazilian	KeymapNames		ブラジル語
-Left command	Keyboard Layout View		左 Command キー
-Set modifier keys…	Keymap window		修飾キーを設定…
-Option:	Modifier keys window	Option key role name	Option:
-Belgian (comma)	KeymapNames		ベルギー語 (comma)
-Control	Keyboard Layout View	Control key	Control:
-Left option	Keyboard Layout View		左 Option キー
-Faeroese	KeymapNames		フェロー語
-Right control	Keyboard Layout View		右 Control キー
-Svorak	KeymapNames		Svorak
-Switch shortcut keys	Keymap window		ショートカットキーのスイッチ
-Russian (Udmurt, Komi, Mari)	KeymapNames		ロシア語 (ウドムルト語, コミ語, マリ語)
-German	KeymapNames		ドイツ語
-Swedish	KeymapNames		スウェーデン語
-Russian	KeymapNames		ロシア語
-Arabic (102)	KeymapNames		アラビア語 (102)
-Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift キー
-User:	Keymap window		ユーザー:
-Turkish (Type-F)	KeymapNames		トルコ語 (Type-F)
-Italian	KeymapNames		イタリア語
-Belarusian	KeymapNames		ベラルーシ語
-Right option	Keyboard Layout View		右 Option キー
-US-International	KeymapNames		英語 (US-International)
-Dvorak	KeymapNames		Dvorak
-Russian (Yawert)	KeymapNames		ロシア語 (Yawert)
-Right shift	Keyboard Layout View		右 Shift キー
-Belarusian (Latin)	KeymapNames		ベラルーシ語 (Latin)
 Key	Modifier keys window	As in a computer keyboard key	キー
-Dutch	KeymapNames		オランダ語
-Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl キー
-Control:	Modifier keys window	Control key role name	Control:
-Russian (Typewriter)	KeymapNames		ロシア語 (Typewriter)
-Slovene	KeymapNames		スロベニア語
-Remove	Keyboard Layout View		削除
-Option	Keyboard Layout View	Option key	オプションキー:
-Sample and clipboard:	Keymap window		サンプル＆クリップボード
-Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt キー
-Layout	Keymap window		レイアウト
-Serbian (Latin)	KeymapNames		セルビア語 (Latin)
-Esperanto	KeymapNames		エスペラント語
-Switch shortcut keys to Windows/Linux mode	Keymap window		ショートカットキースイッチを Windows/Linux モードにする
-Latin-American	KeymapNames		ラテンアメリカ言語
-Right command	Keyboard Layout View		右 Command キー
-Revert	Keymap window		元に戻す
-Command:	Modifier keys window	Command key role name	Command:
-Polish (Typewriter)	KeymapNames		ポーランド語 (Typewriter)
+Japanese	KeymapNames		日本語
 US	KeymapNames		英語 (US)
-Save as…	Keymap window		名前を付けて保存…
-Swiss-German	KeymapNames		ドイツ語 (スイス)
-Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd キー
-French	KeymapNames		フランス語
-File	Keymap window		ファイル
-Num lock	Keyboard Layout View		Num lock
-Bulgarian (Cyrillic)	KeymapNames		ブルガリア語 (Cyrillic)
-(Current)	Keymap window		(使用中キーマップ)
-Kazakh	KeymapNames		カザフ語
-Colemak	KeymapNames		Colemak
-Font	Keymap window		フォント
-Belarusian (Mac)	KeymapNames		ベラルーシ語 (Mac)
-Keymap	System name		キーマップ
-Czech (Mac)	KeymapNames		チェコ語 (Mac)
-Norwegian	KeymapNames		ノルウェー語
-Left shift	Keyboard Layout View		左 Shift キー
-Czech	KeymapNames		チェコ語
-Shift	Keyboard Layout View	Shift key	シフトキー:
-Slovak	KeymapNames		スロバキア語
+Brazilian	KeymapNames		ブラジル語
+Right control	Keyboard Layout View		右 Control キー
+Dvorak	KeymapNames		Dvorak
+Option:	Modifier keys window	Option key role name	Option:
+Cancel	Modifier keys window		中止
+Sample and clipboard:	Keymap window		サンプル＆クリップボード
+Polish	KeymapNames		ポーランド語
+Latin-American	KeymapNames		ラテンアメリカ言語
+Ukrainian	KeymapNames		ウクライナ語
+United-Kingdom	KeymapNames		英語 (United-Kingdom)
+Turkish (Type-F)	KeymapNames		トルコ語 (Type-F)
+Serbian (Cyrillic)	KeymapNames		セルビア語 (Cyrillic)
+Belgian (point)	KeymapNames		ベルギー語 (point)
 Finnish	KeymapNames		フィンランド語
+Num lock	Keyboard Layout View		Num lock
+Switch shortcut keys to Windows/Linux mode	Keymap window		ショートカットキースイッチを Windows/Linux モードにする
+Option	Keyboard Layout View	Option key	オプションキー:
+Spanish (Dvorak)	KeymapNames		スペイン語 (Dvorak)
+Scroll lock	Keyboard Layout View		Scroll lock
+US-International	KeymapNames		英語 (US-International)
+Right option	Keyboard Layout View		右 Option キー
+Turkish (Type-Q)	KeymapNames		トルコ語 (Type-Q)
+Revert	Modifier keys window		元に戻す
+Slovak	KeymapNames		スロバキア語
+Colemak	KeymapNames		Colemak
+Dvorak (programmer's)	KeymapNames		Dvorak (プログラマー用)
+German (Mac)	KeymapNames		ドイツ語 (Mac)
+Arabic (102)	KeymapNames		アラビア語 (102)
+Belarusian (Mac)	KeymapNames		ベラルーシ語 (Mac)
+Croatian	KeymapNames		クロアチア語
 Set modifier keys	Modifier keys window		修飾キーを設定
-Portuguese	KeymapNames		ポルトガル語
-Modifier keys	Modifier keys window		修飾キー
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd キー
+Spanish	KeymapNames		スペイン語
+Ukrainian (Mac)	KeymapNames		ウクライナ語 (Mac)
+Command:	Modifier keys window	Command key role name	Command:
+French (Bépo)	KeymapNames		フランス語 (Bépo)
+Russian (Typewriter)	KeymapNames		ロシア語 (Typewriter)
 Acute trigger	Keymap window		アキュートアクセントのトリガー
+Italian	KeymapNames		イタリア語
+Modifier keys	Modifier keys window		修飾キー
+Kazakh	KeymapNames		カザフ語
+Save as…	Keymap window		名前を付けて保存…
+Lithuanian (Standard)	KeymapNames		リトアニア語 (標準)
+Error: duplicate keys	Modifier keys window		エラー: 重複したキー
+Bulgarian (Phonetic)	KeymapNames		ブルガリア語 (Phonetic)
+Canadian-French	KeymapNames		フランス語 (カナダ)
+Hungarian	KeymapNames		ハンガリー語
+Control	Keyboard Layout View	Control key	Control:
+Irish	KeymapNames		アイルランド語
+Remove	Keyboard Layout View		削除
+Tilde trigger	Keymap window		チルダのトリガー
+Shift	Keyboard Layout View	Shift key	シフトキー:
+Czech (Mac)	KeymapNames		チェコ語 (Mac)
+Macedonian	KeymapNames		マケドニア語
+Left command	Keyboard Layout View		左 Command キー
+Albanian	KeymapNames		アルバニア語
+(Current)	Keymap window		(使用中キーマップ)
+Left option	Keyboard Layout View		左 Option キー
+Esperanto	KeymapNames		エスペラント語
+Belarusian	KeymapNames		ベラルーシ語
+Warning: left and right key roles do not match	Modifier keys window		警告: 左右のキーの機能が一致しません
+Circumflex trigger	Keymap window		サーカムフレックスのトリガー
+Caps lock	Keyboard Layout View		Caps lock
+Left shift	Keyboard Layout View		左 Shift キー
+Russian (Yawert)	KeymapNames		ロシア語 (Yawert)
+Bulgarian (Cyrillic)	KeymapNames		ブルガリア語 (Cyrillic)
+Left control	Keyboard Layout View		左 Control キー
+Swedish	KeymapNames		スウェーデン語
+Role	Modifier keys window	As in the role of a modifier key	役割
+German	KeymapNames		ドイツ語
+Svorak	KeymapNames		Svorak
+Swiss-German	KeymapNames		ドイツ語 (スイス)
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl キー
+Czech	KeymapNames		チェコ語
+Russian (Udmurt, Komi, Mari)	KeymapNames		ロシア語 (ウドムルト語, コミ語, マリ語)
+Control:	Modifier keys window	Control key role name	Control:
+Disabled	Modifier keys window	Do nothing	無効
+Select dead keys	Keymap window		デッドキーの選択
+Right shift	Keyboard Layout View		右 Shift キー
+Russian (Mac)	KeymapNames		ロシア語 (Mac)
+Belarusian (Latin)	KeymapNames		ベラルーシ語 (Latin)
+Hebrew	KeymapNames		ヘブライ語
+Layout	Keymap window		レイアウト
+Greek	KeymapNames		ギリシア語
+Revert	Keymap window		元に戻す
+Grave trigger	Keymap window		グレイヴアクセントのトリガー
+Menu	Keyboard Layout View	Menu key	メニューキー
+Faeroese	KeymapNames		フェロー語
+Quit	Keymap window		終了
+Polish (Typewriter)	KeymapNames		ポーランド語 (Typewriter)
+French (Mac)	KeymapNames		フランス語 (Mac)
+User:	Keymap window		ユーザー:
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt キー
+Estonian	KeymapNames		エストニア語
+Serbian (Latin)	KeymapNames		セルビア語 (Latin)
+French	KeymapNames		フランス語
+Portuguese	KeymapNames		ポルトガル語
+Swiss-French	KeymapNames		フランス語 (スイス)
+Shift:	Modifier keys window	Shift key role name	Shift:
+Keymap	System name		キーマップ
+Slovene	KeymapNames		スロベニア語
+Lithuanian	KeymapNames		リトアニア語
+Set modifier keys…	Keymap window		修飾キーを設定…
+Switch shortcut keys to Haiku mode	Keymap window		ショートカットキースイッチを Haiku モードにする
+Defaults	Keymap window		デフォルト
+ISO-9995	KeymapNames		ISO-9995
+System:	Keymap window		システム:
+Switch shortcut keys	Keymap window		ショートカットキーのスイッチ
+Belgian (comma)	KeymapNames		ベルギー語 (comma)
+Right command	Keyboard Layout View		右 Command キー
+Norwegian	KeymapNames		ノルウェー語
+Font	Keymap window		フォント
+Danish	KeymapNames		デンマーク語
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift キー
+Russian	KeymapNames		ロシア語
+Romanian	KeymapNames		ルーマニア語
+Command	Keyboard Layout View	Command key	Command
+File	Keymap window		ファイル
+Brazilian (ABNT2)	KeymapNames		ブラジル語 (ABNT2)
+Dutch	KeymapNames		オランダ語
+Diaeresis trigger	Keymap window		ウムラウトのトリガー
+Icelandic	KeymapNames		アイスランド語
+Open…	Keymap window		開く…

@@ -1,39 +1,39 @@
 1	catalan; valencian	x-vnd.Haiku-libbe	297520911
-gamma	AboutWindow		gamma
-beta	AboutWindow		beta
-%3.2f GiB	StringForSize		%3.2f GiB
-Written by:	AboutWindow		Escrit per:
-About %app%	AboutMenuItem		Quant a %app%
-Cut	TextView		Retalla
-Version	AboutWindow		Versió
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		No es possible replicar \"%description\".\n%error
-Copy	TextView		Copia
-%3.2f KiB	StringForSize		%3.2f KiB
-alpha	AboutWindow		alfa
-Error	PrintJob		S'ha produït un error
 All Rights Reserved.	AboutWindow		Tots els drets reservats.
-About %app%	AboutWindow		Quant a %app%
+gold master	AboutWindow		mestre daurat
+Undo	TextView		Desfés
+gamma	AboutWindow		gamma
+development	AboutWindow		desenvolupament
 OK	Dragger		D'acord
 OK	PrintJob		D'acord
-Green:	ColorControl		Verd:
-Version history:	AboutWindow		Historial de versions:
-Remove replicant	Dragger		Suprimeix la replica
-OK	AboutWindow		D'acord
-OK	ZombieReplicantView		D'acord
 Print Server is not responding.	PrintJob		El servidor d'impressió no respon.
+About %app%	AboutMenuItem		Quant a %app%
+Warning	Dragger		Avís
+Green:	ColorControl		Verd:
+Redo	TextView		Refés
+beta	AboutWindow		beta
+OK	ZombieReplicantView		D'acord
+Cut	TextView		Retalla
+%3.2f GiB	StringForSize		%3.2f GiB
+Can't delete this replicant from its original application. Life goes on.	Dragger		No ha estat possible suprimir aquest replicant de la seva aplicació original. Continuem.
+Error	ZombieReplicantView		Error
 Paste	TextView		Enganxa
+OK	AboutWindow		D'acord
 Special Thanks:	AboutWindow		Agraïments especials:
 %.2f TiB	StringForSize		%.2f TiB
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		No eś troba l'aplicació del replicant. No s'ha facilitat cap firma de l'aplicació.\n%error
-Redo	TextView		Refés
-<empty>	Menu		<buit>
-Warning	Dragger		Avís
-Undo	TextView		Desfés
+Remove replicant	Dragger		Suprimeix la replica
+Version	AboutWindow		Versió
 Red:	ColorControl		Vermell:
+<empty>	Menu		<buit>
+Copy	TextView		Copia
+alpha	AboutWindow		alfa
 %3.2f MiB	StringForSize		%3.2f MiB
+Error	PrintJob		S'ha produït un error
+About %app%	AboutWindow		Quant a %app%
 About %app…	Dragger		Quan a %app…
-development	AboutWindow		desenvolupament
-Error	ZombieReplicantView		Error
+Version history:	AboutWindow		Historial de versions:
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		No eś troba l'aplicació del replicant. No s'ha facilitat cap firma de l'aplicació.\n%error
+%3.2f KiB	StringForSize		%3.2f KiB
 Blue:	ColorControl		Blau:
-gold master	AboutWindow		mestre daurat
-Can't delete this replicant from its original application. Life goes on.	Dragger		No ha estat possible suprimir aquest replicant de la seva aplicació original. Continuem.
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		No es possible replicar \"%description\".\n%error
+Written by:	AboutWindow		Escrit per:

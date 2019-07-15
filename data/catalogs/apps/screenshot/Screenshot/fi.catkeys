@@ -1,31 +1,31 @@
 1	finnish	x-vnd.haiku-screenshot	3958461128
-seconds	ScreenshotWindow		sekuntia
-Desktop	ScreenshotWindow		Työpöytä
 Include window border	ScreenshotWindow		Sisällytä ikkunaraja
-Screenshot	System name		Näytönkaappaus
-Select	ScreenshotWindow		Valitse
+Overwrite	ScreenshotWindow		Korvaa
+Save in:	ScreenshotWindow		Tallenna kohteeseen:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Virhe tallennettaessa ”%s”:\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Tiedosto on jo olemassa.\n Haluako todella korvata sen?
+OK	ScreenshotWindow		Valmis
 The destination path exists but is not a folder.	ScreenshotWindow		Kohdepolku on oleamassa, mutta se ei ole kansio.
-Capture active window	ScreenshotWindow		Kaappaa aktiivinen ikkuna
-Cancel	ScreenshotWindow		Peru
+Select	ScreenshotWindow		Valitse
+Save as:	ScreenshotWindow		Tallenna nimellä:
+seconds	ScreenshotWindow		sekuntia
+New screenshot	ScreenshotWindow		Uusi näytönkaappaus
+Screenshot	System name		Näytönkaappaus
+Desktop	ScreenshotWindow		Työpöytä
+Artwork folder	ScreenshotWindow		Taideteoskansio
+Translator Settings	ScreenshotWindow		Muunninasetukset
+Include mouse pointer	ScreenshotWindow		Sisällytä hiiriosoitin
+overwrite	ScreenshotWindow		korvaa
+Settings…	ScreenshotWindow		Asetukset...
+Choose folder	ScreenshotWindow		Valitse kansio
 Name:	ScreenshotWindow		Nimi:
 Choose folder…	ScreenshotWindow		Valitse kansio...
-This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Tiedosto on jo olemassa.\n Haluako todella korvata sen?
-Choose folder	ScreenshotWindow		Valitse kansio
-Save	ScreenshotWindow		Tallenna
-Overwrite	ScreenshotWindow		Korvaa
 Please select	ScreenshotWindow		Valitse
-Save as:	ScreenshotWindow		Tallenna nimellä:
-Copy to clipboard	ScreenshotWindow		Kopioi leikepöydälle
-Save in:	ScreenshotWindow		Tallenna kohteeseen:
-screenshot	Screenshot	Base filename of screenshot files	näytönkaappaus
-New screenshot	ScreenshotWindow		Uusi näytönkaappaus
-Artwork folder	ScreenshotWindow		Taideteoskansio
-Home folder	ScreenshotWindow		Kotikansio
 Failed to save screenshot	ScreenshotWindow		Näyttökaappauksen tallentaminen epäonnistui
-OK	ScreenshotWindow		Valmis
-Settings…	ScreenshotWindow		Asetukset...
-overwrite	ScreenshotWindow		korvaa
+Cancel	ScreenshotWindow		Peru
 Delay:	ScreenshotWindow		Viive:
-Error saving \"%s\":\n\t%s	ScreenshotWindow		Virhe tallennettaessa ”%s”:\n\t%s
-Include mouse pointer	ScreenshotWindow		Sisällytä hiiriosoitin
-Translator Settings	ScreenshotWindow		Muunninasetukset
+Copy to clipboard	ScreenshotWindow		Kopioi leikepöydälle
+screenshot	Screenshot	Base filename of screenshot files	näytönkaappaus
+Home folder	ScreenshotWindow		Kotikansio
+Save	ScreenshotWindow		Tallenna
+Capture active window	ScreenshotWindow		Kaappaa aktiivinen ikkuna

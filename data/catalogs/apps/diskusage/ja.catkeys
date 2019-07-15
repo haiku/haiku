@@ -1,5 +1,5 @@
 1	japanese	x-vnd.Haiku-DiskUsage	2951688400
-%size% in {0, plural, one{# file} other{# files}}	Info Window		 {0, plural, one{# ファイル} other{# ファイル}}, %size%
+%size% in {0, plural, one{# file} other{# files}}	Info Window		{0, plural, one{# ファイル} other{# ファイル}}, %size%
 Scanning %refName%	Scanner		%refName%をスキャン中
 %d files	Status View	For UI layouting only, use the longest plural form for your language	%d 個のファイル
 Size	Info Window		サイズ

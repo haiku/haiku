@@ -1,13 +1,13 @@
 1	russian	x-vnd.Haiku-SGITranslator	129108011
-Use compression:	SGIView		Использовать сжатие:
-SGITranslator Settings	SGITranslator		Настройки SGI транслятора
-None	SGIView		Без сжатия
 SGI images	SGITranslator		SGI изображения
-SGI image translator	SGITranslator		Транслятор SGI изображений
-\nbased on GIMP SGI plugin v1.5:\n	SGIView		\nоснован на плагине GIMP SGI v1.5:\n
-Version %d.%d.%d, %s	SGIView		Версия %d.%d.%d, %s
-SGI image	SGITranslator		SGI изображение
-RLE	SGIView		кодирования повторов (RLE)
-SGI Settings	SGIMain		Настройки SGI транслятора
-written by:\n	SGIView		разработан:\n
+Use compression:	SGIView		Использовать сжатие:
 SGI image translator	SGIView		Транслятор SGI изображений
+SGI image	SGITranslator		SGI изображение
+SGITranslator Settings	SGITranslator		Настройки SGI транслятора
+SGI Settings	SGIMain		Настройки SGI транслятора
+SGI image translator	SGITranslator		Транслятор SGI изображений
+None	SGIView		Без сжатия
+Version %d.%d.%d, %s	SGIView		Версия %d.%d.%d, %s
+\nbased on GIMP SGI plugin v1.5:\n	SGIView		\nоснован на плагине GIMP SGI v1.5:\n
+RLE	SGIView		кодирования повторов (RLE)
+written by:\n	SGIView		разработан:\n

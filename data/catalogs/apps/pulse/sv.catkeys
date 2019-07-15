@@ -1,48 +1,47 @@
-1	swedish	x-vnd.Haiku-Pulse	2324471783
-OK	PrefsWindow		OK
-Quit	DeskbarPulseView		Avsluta
-Mini mode	DeskbarPulseView		Komprimerat läge
-Remove replicant	CPUButton		Ta bort replikant
-Active color	ConfigView		Aktiv färg
-Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Hantering: Pulse [--mini] [-w bredd] [--width=bredd]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
-Fade colors	ConfigView		Tona färger
-%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nAv David Ramsey och Arve Hjønnevåg\nReviderad av Daniel Switkin\n
-OK	DeskbarPulseView		OK
-Deskbar mode	PrefsWindow		Deskbar-läge
-%.2f GHz	NormalPulseView		%.2f GHz
-Normal mode	PrefsWindow		Normalläge
-Defaults	PrefsWindow		Förval
-Normal mode	MiniPulseView		Normalläge
-Error	PulseApp		Fel
-Info	PulseView		Information
-Deskbar	CPUButton		Deskbar
-Frame color	ConfigView		Ramfärg
-Mini mode	PrefsWindow		Komprimerat läge
-OK	PulseApp		OK
-Bar colors	ConfigView		Bandfärg
-Settings…	PulseView		Inställningar...
-You can't disable the last active CPU.	PulseView		Du kan inte inaktivera den sista aktiva CPUn.
-Info	PulseApp		Information
-Info	CPUButton		Information
-OK	PulseView		OK
-Deskbar menu	CPUButton		Deskbar meny
-About Pulse…	PulseView		Om Puls...
-Deskbar mode	MiniPulseView		Deskbar-läge
-Quit	MiniPulseView		Avsluta
-Pulse	System name		Puls
-Pulse	NormalPulseView		Puls
-%ld MHz	NormalPulseView		%ld MHz
-Deskbar mode	NormalPulseView		Deskbar-läge
-Pulse	PulseApp		Puls
-Width of icon:	ConfigView		Ikonbredd:
-You can't disable the last active CPU.	CPUButton		Du kan inte inaktivera den sista aktiva CPUn.
+1	swedish	x-vnd.Haiku-Pulse	3788463253
 Normal mode	DeskbarPulseView		Normalläge
-OK	CPUButton		OK
-About Pulse…	CPUButton		Om Puls...
-Removing from Deskbar failed.\n%s	DeskbarPulseView		Misslyckades att ta bort från Deskbar.\n%s
-Mini mode	NormalPulseView		Komprimerat läge
+Info	CPUButton		Information
+Quit	DeskbarPulseView		Avsluta
 Info	DeskbarPulseView		Information
-Pulse settings	PulseWindow		Pulsinställningar
-Idle color	ConfigView		Overksam färg
-Installing in Deskbar failed\n%s	PulseApp		Misslyckades att installera i Deskbar\n%s
+Normal mode	MiniPulseView		Normalläge
+Frame color	ConfigView		Ramfärg
+Error	PulseApp		Fel
+Bar colors	ConfigView		Bandfärg
+%.2f GHz	NormalPulseView		%.2f GHz
+Defaults	PrefsWindow		Förval
+%ld MHz	NormalPulseView		%ld MHz
+Mini mode	PrefsWindow		Komprimerat läge
 CPU progress bar	NormalPulseView		CPU progressband
+Fade colors	ConfigView		Tona färger
+About Pulse…	PulseView		Om Puls...
+Pulse	NormalPulseView		Puls
+Deskbar mode	NormalPulseView		Deskbar-läge
+Remove replicant	CPUButton		Ta bort replikant
+You can't disable the last active CPU.	PulseView		Du kan inte inaktivera den sista aktiva CPUn.
+Width of icon:	ConfigView		Ikonbredd:
+Deskbar mode	MiniPulseView		Deskbar-läge
+OK	PulseView		OK
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nAv David Ramsey och Arve Hjønnevåg\nReviderad av Daniel Switkin\n
+OK	PrefsWindow		OK
+Pulse	PulseApp		Puls
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Misslyckades att ta bort från Deskbar.\n%s
+OK	PulseApp		OK
+About Pulse…	CPUButton		Om Puls...
+Deskbar mode	PrefsWindow		Deskbar-läge
+Mini mode	DeskbarPulseView		Komprimerat läge
+You can't disable the last active CPU.	CPUButton		Du kan inte inaktivera den sista aktiva CPUn.
+OK	CPUButton		OK
+Deskbar	CPUButton		Deskbar
+Settings…	PulseView		Inställningar...
+Deskbar menu	CPUButton		Deskbar meny
+Mini mode	NormalPulseView		Komprimerat läge
+Quit	MiniPulseView		Avsluta
+Info	PulseView		Information
+OK	DeskbarPulseView		OK
+Info	PulseApp		Information
+Pulse	System name		Puls
+Active color	ConfigView		Aktiv färg
+Installing in Deskbar failed\n%s	PulseApp		Misslyckades att installera i Deskbar\n%s
+Idle color	ConfigView		Overksam färg
+Normal mode	PrefsWindow		Normalläge
+Pulse settings	PulseWindow		Pulsinställningar

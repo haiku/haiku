@@ -1,5 +1,5 @@
 1	japanese	x-vnd.Haiku-cmd-dstconfig	684321431
-Ask me later	dstcheck		あとで確認する
-Manually adjust time…	dstcheck		手動で時刻を設定する…
 Keep this time	dstcheck		この時刻を保持する
+Manually adjust time…	dstcheck		手動で時刻を設定する…
 Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		注意!\n\nサマータイムから変更したので、コンピューターの時間は １時間ずれている可能性があります。\nコンピューターは現在時間を %current time% と予想します。\n\nこれは正しい時間ですか?
+Ask me later	dstcheck		あとで確認する

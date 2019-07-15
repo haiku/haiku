@@ -1,27 +1,27 @@
 1	spanish; castilian	x-vnd.Haiku.TV	1995288111
-TV	MainWin		Televisión
-Channel	MainWin		Canal
-Settings…	MainWin		Ajustes…
-Interface	MainWin		Interfaz
-Keep aspect ratio	MainWin		Mantener relación de aspecto
-Previous channel	MainWin		Canal anterior
-Settings	MainWin		Ajustes
-TV	System name		TV
+No menu	MainWin		Sin menú
 No border	MainWin		Sin márgenes
-Always on top	MainWin		Siempre por encima
-OK	MainWin		Aceptar
-Quit	MainWin		Salir
+force 704 x 576, display aspect 4:3	MainWin		Forzar  704 x 576,  aspecto de pantalla 4:3
+Error, connecting to interface failed:\n\n	MainWin		Error, la conexión con la interfaz falló:\n\n
+force 544 x 576, display aspect 4:3	MainWin		Forzar 544 x 576, aspecto de pantalla 4:3
 Full screen	MainWin		Pantalla completa
-Debug	MainWin		Depurar
 Scale to native size	MainWin		Escalar a tamaño nativo
 unknown	MainWin		desconocido
 Next channel	MainWin		Siguiente canal
-Error, interface is busy:\n\n	MainWin		Error, la interfaz está ocupada:\n\n
-None	MainWin		Ninguno
-force 704 x 576, display aspect 4:3	MainWin		Forzar  704 x 576,  aspecto de pantalla 4:3
+Keep aspect ratio	MainWin		Mantener relación de aspecto
 DVB - Digital Video Broadcasting TV	MainWin		DVB-Emisión digital de video
-force 544 x 576, display aspect 4:3	MainWin		Forzar 544 x 576, aspecto de pantalla 4:3
-pixel aspect ratio	MainWin		proporción del pixel
-No menu	MainWin		Sin menú
-Error, connecting to interface failed:\n\n	MainWin		Error, la conexión con la interfaz falló:\n\n
+Always on top	MainWin		Siempre por encima
+Debug	MainWin		Depurar
+Interface	MainWin		Interfaz
 force 720 x 576, display aspect 4:3	MainWin		Dispositivo 720 x 576, aspecto de pantalla 4:3
+Quit	MainWin		Salir
+Channel	MainWin		Canal
+Previous channel	MainWin		Canal anterior
+OK	MainWin		Aceptar
+TV	MainWin		Televisión
+Settings	MainWin		Ajustes
+TV	System name		TV
+Settings…	MainWin		Ajustes…
+None	MainWin		Ninguno
+Error, interface is busy:\n\n	MainWin		Error, la interfaz está ocupada:\n\n
+pixel aspect ratio	MainWin		proporción del pixel

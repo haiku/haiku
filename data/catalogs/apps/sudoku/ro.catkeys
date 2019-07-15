@@ -1,35 +1,35 @@
 1	romanian	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		Restaurează instantaneu
-Could not set Sudoku:\n%s\n	SudokuWindow		Nu s-a putut stabili Sudoku:\n%s\n
-Export as…	SudokuWindow		Exportă ca…
-OK	SudokuWindow		OK
-New	SudokuWindow		Nou
-Abort	ProgressWindow		Anulează
-Sudoku	System name		Sudoku
-Could not open \"%s\":\n%s\n	SudokuWindow		Nu s-a putut deschide \"%s\":\n%s\n
-Easy	SudokuWindow		Simplu
-Open file…	SudokuWindow		Deschidere fișier…
-Solve single field	SudokuWindow		Rezolvă câmp unic
-Solve	SudokuWindow		Rezolvare
-Redo	SudokuWindow		Repetă
 File	SudokuWindow		Fișier
-Advanced	SudokuWindow		Avansat
-Start again	SudokuWindow		Pornește din nou
-HTML	SudokuWindow		HTML
-Sudoku request	SudokuWindow		Cerere Sudoku
-Copy	SudokuWindow		Copiere
-Mark valid hints	SudokuWindow		Marchează indicii valide
-Sudoku solved - congratulations!\n	SudokuWindow		Sudoku rezolvat - felicitări!\n
+Mark invalid values	SudokuWindow		Marchează valorile nevalide
+Solve single field	SudokuWindow		Rezolvă câmp unic
 Hard	SudokuWindow		Dificil
-Snapshot current	SudokuWindow		Instantaneu curent
+Start again	SudokuWindow		Pornește din nou
+New	SudokuWindow		Nou
+Easy	SudokuWindow		Simplu
+Undo	SudokuWindow		Anulează
+Export as…	SudokuWindow		Exportă ca…
+Quit	SudokuWindow		Închidere
+Redo	SudokuWindow		Repetă
+Could not open \"%s\":\n%s\n	SudokuWindow		Nu s-a putut deschide \"%s\":\n%s\n
+Blank	SudokuWindow		Spațiu
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku rezolvat - felicitări!\n
 Text	SudokuWindow		Text
+Copy	SudokuWindow		Copiere
+Solve	SudokuWindow		Rezolvare
+HTML	SudokuWindow		HTML
+Advanced	SudokuWindow		Avansat
+Set all hints	SudokuWindow		Stabilește toate indiciile
+Searching for removable values	SudokuGenerator		Se caută valorile care se pot elimina
+Abort	ProgressWindow		Anulează
+Could not set Sudoku:\n%s\n	SudokuWindow		Nu s-a putut stabili Sudoku:\n%s\n
+Help	SudokuWindow		Ajutor
+OK	SudokuWindow		OK
+Sudoku	System name		Sudoku
+Progress monitor	ProgressWindow		Monitor progres
 Creating solvable field	SudokuGenerator		Creare câmp rezolvabil
 View	SudokuWindow		Vizualizare
-Progress monitor	ProgressWindow		Monitor progres
-Set all hints	SudokuWindow		Stabilește toate indiciile
-Mark invalid values	SudokuWindow		Marchează valorile nevalide
-Blank	SudokuWindow		Spațiu
-Help	SudokuWindow		Ajutor
-Searching for removable values	SudokuGenerator		Se caută valorile care se pot elimina
-Undo	SudokuWindow		Anulează
-Quit	SudokuWindow		Închidere
+Snapshot current	SudokuWindow		Instantaneu curent
+Mark valid hints	SudokuWindow		Marchează indicii valide
+Sudoku request	SudokuWindow		Cerere Sudoku
+Open file…	SudokuWindow		Deschidere fișier…

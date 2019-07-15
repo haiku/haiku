@@ -1,199 +1,199 @@
 1	lithuanian	x-vnd.haiku-icon_o_matic	1929083132
-Select All	Icon-O-Matic-PathManipulator		Pažymėti viską
-Add Style	Icon-O-Matic-AddStylesCmd		Pridėti stilių
-Color (#%02x%02x%02x)	Style name after dropping a color		Spalva (#%02x%02x%02x)
-Add	Icon-O-Matic-StylesList		Pridėti
-Move Shape	Icon-O-Matic-MoveShapesCommand		Perkelti figūrą
-Opening the document failed!	Icon-O-Matic-Main		Nepavyko atverti dokumento!
-Reset transformation	Icon-O-Matic-ShapesList		Atšaukti transformaciją
-Move Paths	Icon-O-Matic-MovePathsCmd		Perkelti kreives
 None	Icon-O-Matic-Properties		Nieko
-New	Icon-O-Matic-Menu-File		Naujas
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Gali būti, jog, atverdama šį SVG failą, programa nesuinterpretavo visų jo duomenų. Jeigu perrašysite failą, jūs prarasite tuos duomenis.
-Paste Properties	Icon-O-Matic-Properties		Įdėti savybes
-Stroke	Transformation		Linija
-Closed	Icon-O-Matic-PropertyNames		Uždaras
-Remove Path	Icon-O-Matic-RemovePathsCmd		Pašalinti kreivę
-Add shape with path	Icon-O-Matic-Menu-Shape		Pridėti figūrą su kreive
-Select	Icon-O-Matic-Properties		Pažymėti
-Height	Icon-O-Matic-PropertyNames		Aukštis
-Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Pašalinti transformatorius
-Width	Icon-O-Matic-PropertyNames		Plotis
-Transformation	Icon-O-Matic-TransformationBoxStates		Transformacija
-Duplicate	Icon-O-Matic-ShapesList		Dubliuoti
-<unkown property>	Icon-O-Matic-PropertyNames		<nežinoma savybė>
-Linear	Icon-O-Matic-StyleTypes		Tiesinis
-Assign Path	Icon-O-Matic-AddPathsCmd		Priskirti kreivę
-Move	Icon-O-Matic-TransformationBoxStates		Perkelti
-Flip Control Points	Icon-O-Matic-FlipPointsCmd		Apversti valdymo taškus
-warning	Icon-O-Matic-SVGExport		įspėjimas
-Copy	Icon-O-Matic-Properties		Kopijuoti
-Miter Limit	Icon-O-Matic-PropertyNames		Aštrumas
-OK	Icon-O-Matic-ColorPicker		Gerai
-Remove Control Point	Icon-O-Matic-RemovePointsCmd		Pašalinti valdymo tašką
-Bleep!	Exporter - Continue in error dialog		Po velnių!
-Add circle	Icon-O-Matic-PathsList		Pridėti apskritimą
-Shorten	Icon-O-Matic-PropertyNames		Trumpinti
-bad news	Title of error alert		prastos naujienos
-Remove Paths	Icon-O-Matic-RemovePathsCmd		Pašalinti kreives
-Scale Y	Icon-O-Matic-PropertyNames		Ištempti Y ašyje
-Add Control Point	Icon-O-Matic-AddPointCmd		Pridėti valdymo tašką
-Untitled	Icon-O-Matic-Main		Be pavadinimo
-Multi Set 	Multi Set (property name)		Multiaibė 
-any of the other lists to	Empty property list - 2nd line		bet kuriame kitame sąraše
-Save as…	Icon-O-Matic-Menu-File		Įrašyti kaip…
-Don't save	Icon-O-Matic-Menu-Settings		Neįrašyti
-Change Color	Icon-O-Matic-SetColorCmd		Pakeisti spalvą
-Style	Icon-O-Matic-Menus		Stilius
-<modify path>	Icon-O-Matic-PathCmd		<pakeisti kreivę>
-Opening the icon failed!	Icon-O-Matic-Main		Piktogramos atverti nepavyko!
-Error: 	Icon-O-Matic-Main		Klaida: 
-Rotate indices backwards	Icon-O-Matic-PathsList		Perkelti galus atgal
-Name	Icon-O-Matic-PropertyNames		Pavadinimas
-bad news	Icon-O-Matic-Exporter		prastos naujienos
-<nothing to undo>	Icon-O-Matic-Menu-Edit		<nėra ką atšaukti>
-Off	Icon-O-Matic-Menu-Settings		Tinklelio nerodyti
-Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Fiksuoti figūrą
-PNG Set	Icon-O-Matic-SavePanel		PNG rinkinys
-Joins	Icon-O-Matic-PropertyNames		Sujungimai
-Remove Style	Icon-O-Matic-RemoveStylesCmd		Pašalinti stilių
-Scale X	Icon-O-Matic-PropertyNames		Ištempti X ašyje
-Set 	Set (property name)		Aibė 
-Cancel	Icon-O-Matic-SVGExport		Atsisakyti
-Add shape with style	Icon-O-Matic-Menu-Shape		Pridėti figūrą su stiliumi
-Remove Shape	Icon-O-Matic-RemoveShapesCmd		Pašalinti figūrą
-Reverse	Icon-O-Matic-PathsList		Pakeisti kreivės kryptį
-HVIF Source Code	Icon-O-Matic-SavePanel		HVIF pirminis tekstas
-Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Atšaukti transformacijas
-Settings	Icon-O-Matic-Menus		Nuostatos
-All	Icon-O-Matic-Properties		Viską
-Multi Paste Properties	Icon-O-Matic-Properties		Įklijuoti daug savybių
-Undo	Icon-O-Matic-Main		Atšaukti:
-Click on a shape above	Empty transformers list - 1st line		Spustelėkite figūrą aukščiau
-Add Shape	Icon-O-Matic-AddShapesCmd		Pridėti figūrą
-Contour	Transformation		Kontūras
-Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Ar įrašyti piktogramos pakeitimus prieš ją užveriant?
-<nothing to redo>	Icon-O-Matic-Menu-Edit		<nėra ką grąžinti>
-Perspective	Transformation		Perspektyva
-Move Transformer	Icon-O-Matic-MoveTransformersCmd		Perkelti transformatorių
-Opacity	Icon-O-Matic-PropertyNames		Neskaidrumas
-Add with path	Icon-O-Matic-ShapesList		Pridėti su kreive
-Export icon	Dialog title		Eksportuoti piktogramą
-Gradient type	Icon-O-Matic-StyleTypes		Gradiento tipas
-Icon-O-Matic	System name		Piktogramų rengyklė
-Cancel	Icon-O-Matic-Menu-Settings		Atsisakyti
-Modify Control Point	Icon-O-Matic-ChangePointCmd		Pakeisti valdymo tašką
-Saving your document failed!	Icon-O-Matic-Exporter		Dokumento įrašyti nepavyko!
-edit it's properties here.	Empty property list - 3rd line		kad čia galėtumėte keisti jo savybes.
-Split	Icon-O-Matic-PathManipulator		Perskelti
-Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Stumtelėti valdymo taškus
-Remove	Icon-O-Matic-StylesList		Pašalinti
-Add with path & style	Icon-O-Matic-ShapesList		Pridėti su kreive ir stiliumi
-META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON požymis
-Translation Y	Icon-O-Matic-PropertyNames		Y poslinkis
-Rotate	Icon-O-Matic-TransformationBoxStates		Pasukti
-Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Pašalinti transformatorių
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Perkelti kreivės galus
-Add Transformer	Icon-O-Matic-AddTransformersCmd		Pridėti transformatorių
-Remove	Icon-O-Matic-PathsList		Pašalinti
-Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Stumtelėti valdymo tašką
-Pick a color	Icon-O-Matic-ColorPicker		Parinkite spalvą
-Quit	Icon-O-Matic-Menu-File		Baigti darbą
-Export	Icon-O-Matic-Menu-File		Eksportuoti
-No	Icon-O-Matic-StyledTextImport		Ne
-Rotate indices forwards	Icon-O-Matic-PathsList		Perkelti galus pirmyn
-Unassign Path	Icon-O-Matic-UnassignPathCmd		Pašalinti kreivės priskyrimą
-load error	Icon-O-Matic-SVGImport		įkėlimo klaida
-Move Shapes	Icon-O-Matic-MoveShapesCommand		Perkelti figūras
-Remove Styles	Icon-O-Matic-RemoveStylesCmd		Pašalinti stilius
-Add	Icon-O-Matic-TransformersList		Pridėti
-Color	Icon-O-Matic-StyleTypes		Spalva
-Settings…	Icon-O-Matic-SavePanel		Nuostatos…
-Remove	Icon-O-Matic-PathManipulator		Pašalinti
-Radial	Icon-O-Matic-StyleTypes		Spindulinis
-Perspective	Icon-O-Matic-TransformersList		Perspektyva
-Add shape with path & style	Icon-O-Matic-Menu-Shape		Pridėti figūrą su kreive ir stiliumi
-Gradient	Icon-O-Matic-StyleTypes		Gradientas
-Min LOD	Icon-O-Matic-PropertyNames		Maž. det. lyg.
-BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON požymis
-Invert selection	Icon-O-Matic-Properties		Invertuoti žymėjimą
-Drop shapes	Icon-O-Matic-ShapesList		Pašalinti formas
-Export as…	Icon-O-Matic-Menu-File		Eksportuoti kaip…
-Transformation	Transformation		Transformacija
-Click on an object in	Empty property list - 1st line		Spustelėkite objektą
-Move Transformers	Icon-O-Matic-MoveTransformersCmd		Perkelti transformatorius
-Move Styles	Icon-O-Matic-MoveStylesCmd		Perkelti stilius
-Reset transformation	Icon-O-Matic-StylesList		Atšaukti transformaciją
-Max LOD	Icon-O-Matic-PropertyNames		Didž. det. lyg.
-Transformer	Icon-O-Matic-Menus		Transformatorius
-Flip	Icon-O-Matic-PathManipulator		Apversti
-Conic	Icon-O-Matic-StyleTypes		Kūginis
-Split Control Points	Icon-O-Matic-SplitPointsCmd		Perskelti valdymo taškus
-Save	Icon-O-Matic-Menu-Settings		Įrašyti
 Add empty	Icon-O-Matic-ShapesList		Pridėti tuščią
-Close	Icon-O-Matic-Menu-File		Užverti
-Cancel	Icon-O-Matic-ColorPicker		Atsisakyti
-Paste	Icon-O-Matic-Properties		Įdėti
-Shape	Icon-O-Matic-Menus		Figūra
-Translation X	Icon-O-Matic-PropertyNames		X poslinkis
-Properties	Icon-O-Matic-Menus		Savybės
-Move Pivot	Icon-O-Matic-TransformationBoxStates		Perkelti sukimo centrą
-Path	Icon-O-Matic-Menus		Kreivė
-Freeze transformation	Icon-O-Matic-ShapesList		Fiksuoti transformaciją
-File	Icon-O-Matic-Menus		Failas
-Error: 	Icon-O-Matic-Exporter		Klaida: 
-Add Transformers	Icon-O-Matic-AddTransformersCmd		Pridėti transformatorius
-Diamond	Icon-O-Matic-StyleTypes		Rombinis
-Path	Icon-O-Matic-PropertyNames		Kreivė
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Nepavyko atverti failo „%s“ kaip SVG dokumento.\n\nKlaida: %s
-Swatches	Icon-O-Matic-Menus		Paletė
-<unavailable>	Icon-O-Matic-StyleTypes		<nepasiekiamas>
-Rotation	Icon-O-Matic-PropertyNames		Pasukimas
-Add with style	Icon-O-Matic-ShapesList		Pridėti su stiliumi
-Add	Icon-O-Matic-PathsList		Pridėti
-Add Shapes	Icon-O-Matic-AddShapesCmd		Pridėti figūras
-Move Style	Icon-O-Matic-MoveStylesCmd		Perkelti stilių
-Bummer	Cancel button - error alert		Vaje
-Snap to grid	Icon-O-Matic-Menu-Settings		Kibti prie tinklelio
-Remove	Icon-O-Matic-ShapesList		Pašalinti
-Yes	Icon-O-Matic-StyledTextImport		Taip
-Transformation	Icon-O-Matic-TransformersList		Transformacija
-Add Styles	Icon-O-Matic-AddStylesCmd		Pridėti stilius
-Remove Control Points	Icon-O-Matic-RemovePointsCmd		Pašalinti valdymo taškus
-Format	Icon-O-Matic-SavePanel		Formatas:
-Add rect	Icon-O-Matic-PathsList		Pridėti stačiakampį
-Edit	Icon-O-Matic-Menus		Taisa
-Duplicate	Icon-O-Matic-StylesList		Dubliuoti
-Caps	Icon-O-Matic-PropertyNames		Galai
-Transform	Icon-O-Matic-PathManipulator		Transformuoti
-Add Paths	Icon-O-Matic-AddPathsCmd		Pridėti kreives
-Style type	Icon-O-Matic-StyleTypes		Stiliaus tipas
-Assign Style	Icon-O-Matic-AssignStyleCmd		Priskirti stilių
-Add Path	Icon-O-Matic-AddPathsCmd		Pridėti kreivę
+Opening the icon failed!	Icon-O-Matic-Main		Piktogramos atverti nepavyko!
+Add with path	Icon-O-Matic-ShapesList		Pridėti su kreive
+Copy	Icon-O-Matic-Properties		Kopijuoti
 Color	Icon-O-Matic-PropertyNames		Spalva
-Insert Control Point	Icon-O-Matic-InsertPointCmd		Įterpti valdymo tašką
-Flip Control Point	Icon-O-Matic-FlipPointsCmd		Apversti valdymo tašką
-Redo	Icon-O-Matic-Main		Grąžinti:
-Assign Paths	Icon-O-Matic-AddPathsCmd		Priskirti kreives
-OK	Icon-O-Matic-SVGImport		Gerai
-Multi paste	Icon-O-Matic-Properties		Daugybinis įklijavimas
-to attach transformers.	Empty transformers list - 2nd line		kad galėtumėte priskirti transformatorius.
+Format	Icon-O-Matic-SavePanel		Formatas:
+Move Shapes	Icon-O-Matic-MoveShapesCommand		Perkelti figūras
+Color	Icon-O-Matic-StyleTypes		Spalva
+Select	Icon-O-Matic-Properties		Pažymėti
+Reset transformation	Icon-O-Matic-ShapesList		Atšaukti transformaciją
+Duplicate	Icon-O-Matic-StylesList		Dubliuoti
+Rotate	Icon-O-Matic-TransformationBoxStates		Pasukti
+Remove Control Points	Icon-O-Matic-RemovePointsCmd		Pašalinti valdymo taškus
+Shorten	Icon-O-Matic-PropertyNames		Trumpinti
+Unassign Path	Icon-O-Matic-UnassignPathCmd		Pašalinti kreivės priskyrimą
+Paste	Icon-O-Matic-Properties		Įdėti
+Detect Orient.	Icon-O-Matic-PropertyNames		Aptikti orient.
+Click on a shape above	Empty transformers list - 1st line		Spustelėkite figūrą aukščiau
+Close	Icon-O-Matic-Menu-File		Užverti
+Add rect	Icon-O-Matic-PathsList		Pridėti stačiakampį
+Rotation	Icon-O-Matic-PropertyNames		Pasukimas
+Multi Paste Properties	Icon-O-Matic-Properties		Įklijuoti daug savybių
+Bleep!	Exporter - Continue in error dialog		Po velnių!
+Transform	Icon-O-Matic-PathManipulator		Transformuoti
+Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Pašalinti transformatorių
+META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON požymis
+Add shape with style	Icon-O-Matic-Menu-Shape		Pridėti figūrą su stiliumi
+Assign Path	Icon-O-Matic-AddPathsCmd		Priskirti kreivę
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Atšaukti transformaciją
-Reverse Path	Icon-O-Matic-ReversePathCmd		Pakeisti kreivės kryptį
-Scale	Icon-O-Matic-TransformationBoxStates		Keisti dydį
-Duplicate	Icon-O-Matic-PathsList		Dubliuoti
-Save	Icon-O-Matic-Menu-File		Įrašyti
-Append…	Icon-O-Matic-Menu-File		Pridėti…
-Move Path	Icon-O-Matic-MovePathsCmd		Perkelti kreivę
-Overwrite	Icon-O-Matic-SVGExport		Perrašyti
-Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Fiksuoti figūras
+Transformation	Transformation		Transformacija
+Remove	Icon-O-Matic-StylesList		Pašalinti
+Cancel	Icon-O-Matic-Menu-Settings		Atsisakyti
+Assign Style	Icon-O-Matic-AssignStyleCmd		Priskirti stilių
+Transformation	Icon-O-Matic-TransformationBoxStates		Transformacija
+Closed	Icon-O-Matic-PropertyNames		Uždaras
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Perkelti valdymo tašką
-Open…	Icon-O-Matic-Menu-File		Atverti…
+<nothing to redo>	Icon-O-Matic-Menu-Edit		<nėra ką grąžinti>
+Height	Icon-O-Matic-PropertyNames		Aukštis
+Add Shape	Icon-O-Matic-AddShapesCmd		Pridėti figūrą
+warning	Icon-O-Matic-SVGExport		įspėjimas
+File	Icon-O-Matic-Menus		Failas
+Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Išvalyti kreivę
+Move Style	Icon-O-Matic-MoveStylesCmd		Perkelti stilių
+Properties	Icon-O-Matic-Menus		Savybės
+Path	Icon-O-Matic-PropertyNames		Kreivė
+Add Control Point	Icon-O-Matic-AddPointCmd		Pridėti valdymo tašką
+Path	Icon-O-Matic-Menus		Kreivė
+Stroke	Transformation		Linija
+Flip	Icon-O-Matic-PathManipulator		Apversti
+Select All	Icon-O-Matic-PathManipulator		Pažymėti viską
+Opacity	Icon-O-Matic-PropertyNames		Neskaidrumas
+OK	Icon-O-Matic-ColorPicker		Gerai
+Error: 	Icon-O-Matic-Main		Klaida: 
+bad news	Icon-O-Matic-Exporter		prastos naujienos
+Saving your document failed!	Icon-O-Matic-Exporter		Dokumento įrašyti nepavyko!
+Snap to grid	Icon-O-Matic-Menu-Settings		Kibti prie tinklelio
+Opening the document failed!	Icon-O-Matic-Main		Nepavyko atverti dokumento!
+Shape	Icon-O-Matic-Menus		Figūra
+Add with path & style	Icon-O-Matic-ShapesList		Pridėti su kreive ir stiliumi
+<unavailable>	Icon-O-Matic-StyleTypes		<nepasiekiamas>
+Min LOD	Icon-O-Matic-PropertyNames		Maž. det. lyg.
+Reverse Path	Icon-O-Matic-ReversePathCmd		Pakeisti kreivės kryptį
+Move Transformers	Icon-O-Matic-MoveTransformersCmd		Perkelti transformatorius
+Add	Icon-O-Matic-TransformersList		Pridėti
+Paste Properties	Icon-O-Matic-Properties		Įdėti savybes
+Undo	Icon-O-Matic-Main		Atšaukti:
+Settings	Icon-O-Matic-Menus		Nuostatos
+Scale X	Icon-O-Matic-PropertyNames		Ištempti X ašyje
+Add	Icon-O-Matic-PathsList		Pridėti
+Add Styles	Icon-O-Matic-AddStylesCmd		Pridėti stilius
+Remove	Icon-O-Matic-PathManipulator		Pašalinti
+Duplicate	Icon-O-Matic-ShapesList		Dubliuoti
+Contour	Transformation		Kontūras
+Perspective	Icon-O-Matic-TransformersList		Perspektyva
 Save icon	Dialog title		Įrašyti piktogramą
+Move Paths	Icon-O-Matic-MovePathsCmd		Perkelti kreives
+Rounding	Icon-O-Matic-PropertyNames		Apvalinimas
+Joins	Icon-O-Matic-PropertyNames		Sujungimai
+Cancel	Icon-O-Matic-ColorPicker		Atsisakyti
+Duplicate	Icon-O-Matic-PathsList		Dubliuoti
+Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Pašalinti figūras
+Save	Icon-O-Matic-Menu-Settings		Įrašyti
+Export as…	Icon-O-Matic-Menu-File		Eksportuoti kaip…
+Error: 	Icon-O-Matic-Exporter		Klaida: 
+Move Path	Icon-O-Matic-MovePathsCmd		Perkelti kreivę
+Remove Paths	Icon-O-Matic-RemovePathsCmd		Pašalinti kreives
+Assign Paths	Icon-O-Matic-AddPathsCmd		Priskirti kreives
+Diamond	Icon-O-Matic-StyleTypes		Rombinis
+Add Style	Icon-O-Matic-AddStylesCmd		Pridėti stilių
+Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Stumtelėti valdymo taškus
+Move Styles	Icon-O-Matic-MoveStylesCmd		Perkelti stilius
+Don't save	Icon-O-Matic-Menu-Settings		Neįrašyti
+Add shape with path	Icon-O-Matic-Menu-Shape		Pridėti figūrą su kreive
+Translation X	Icon-O-Matic-PropertyNames		X poslinkis
+Flip Control Points	Icon-O-Matic-FlipPointsCmd		Apversti valdymo taškus
+Add Transformers	Icon-O-Matic-AddTransformersCmd		Pridėti transformatorius
+BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON požymis
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Gali būti, jog, atverdama šį SVG failą, programa nesuinterpretavo visų jo duomenų. Jeigu perrašysite failą, jūs prarasite tuos duomenis.
+Rotate indices backwards	Icon-O-Matic-PathsList		Perkelti galus atgal
+Overwrite	Icon-O-Matic-SVGExport		Perrašyti
+Modify Control Point	Icon-O-Matic-ChangePointCmd		Pakeisti valdymo tašką
+Cancel	Icon-O-Matic-SVGExport		Atsisakyti
+Open…	Icon-O-Matic-Menu-File		Atverti…
+Redo	Icon-O-Matic-Main		Grąžinti:
+Change Color	Icon-O-Matic-SetColorCmd		Pakeisti spalvą
+Remove	Icon-O-Matic-ShapesList		Pašalinti
+Drop shapes	Icon-O-Matic-ShapesList		Pašalinti formas
+PNG Set	Icon-O-Matic-SavePanel		PNG rinkinys
+to attach transformers.	Empty transformers list - 2nd line		kad galėtumėte priskirti transformatorius.
+Linear	Icon-O-Matic-StyleTypes		Tiesinis
+any of the other lists to	Empty property list - 2nd line		bet kuriame kitame sąraše
+Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Stumtelėti valdymo tašką
+Flip Control Point	Icon-O-Matic-FlipPointsCmd		Apversti valdymo tašką
+Add Paths	Icon-O-Matic-AddPathsCmd		Pridėti kreives
+Color (#%02x%02x%02x)	Style name after dropping a color		Spalva (#%02x%02x%02x)
+Clean up	Icon-O-Matic-PathsList		Sutvarkyti
+Remove Style	Icon-O-Matic-RemoveStylesCmd		Pašalinti stilių
+Split	Icon-O-Matic-PathManipulator		Perskelti
+Move	Icon-O-Matic-TransformationBoxStates		Perkelti
+Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Atšaukti transformacijas
+Split Control Points	Icon-O-Matic-SplitPointsCmd		Perskelti valdymo taškus
+Remove Control Point	Icon-O-Matic-RemovePointsCmd		Pašalinti valdymo tašką
+Conic	Icon-O-Matic-StyleTypes		Kūginis
+Name	Icon-O-Matic-PropertyNames		Pavadinimas
+Multi paste	Icon-O-Matic-Properties		Daugybinis įklijavimas
+Add Shapes	Icon-O-Matic-AddShapesCmd		Pridėti figūras
+Reset transformation	Icon-O-Matic-StylesList		Atšaukti transformaciją
+Add Transformer	Icon-O-Matic-AddTransformersCmd		Pridėti transformatorių
+Reverse	Icon-O-Matic-PathsList		Pakeisti kreivės kryptį
+Move Pivot	Icon-O-Matic-TransformationBoxStates		Perkelti sukimo centrą
+Remove	Icon-O-Matic-PathsList		Pašalinti
+Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Pašalinti transformatorius
+Style type	Icon-O-Matic-StyleTypes		Stiliaus tipas
+Quit	Icon-O-Matic-Menu-File		Baigti darbą
+Remove Styles	Icon-O-Matic-RemoveStylesCmd		Pašalinti stilius
+Gradient	Icon-O-Matic-StyleTypes		Gradientas
+bad news	Title of error alert		prastos naujienos
+Insert Control Point	Icon-O-Matic-InsertPointCmd		Įterpti valdymo tašką
+Add shape with path & style	Icon-O-Matic-Menu-Shape		Pridėti figūrą su kreive ir stiliumi
+Move Shape	Icon-O-Matic-MoveShapesCommand		Perkelti figūrą
+Radial	Icon-O-Matic-StyleTypes		Spindulinis
+Caps	Icon-O-Matic-PropertyNames		Galai
+OK	Icon-O-Matic-SVGImport		Gerai
+Append…	Icon-O-Matic-Menu-File		Pridėti…
+Scale Y	Icon-O-Matic-PropertyNames		Ištempti Y ašyje
+Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Nepavyko atverti failo „%s“ kaip SVG dokumento.\n\nKlaida: %s
+Export icon	Dialog title		Eksportuoti piktogramą
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Spalva (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Keisti gradientą
-Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Išvalyti kreivę
-Rounding	Icon-O-Matic-PropertyNames		Apvalinimas
-Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Pašalinti figūras
-Clean up	Icon-O-Matic-PathsList		Sutvarkyti
-Detect Orient.	Icon-O-Matic-PropertyNames		Aptikti orient.
+Set 	Set (property name)		Aibė 
+Rotate indices forwards	Icon-O-Matic-PathsList		Perkelti galus pirmyn
+Click on an object in	Empty property list - 1st line		Spustelėkite objektą
+Save	Icon-O-Matic-Menu-File		Įrašyti
+No	Icon-O-Matic-StyledTextImport		Ne
+Add circle	Icon-O-Matic-PathsList		Pridėti apskritimą
+Freeze transformation	Icon-O-Matic-ShapesList		Fiksuoti transformaciją
+Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Fiksuoti figūras
+Miter Limit	Icon-O-Matic-PropertyNames		Aštrumas
+Untitled	Icon-O-Matic-Main		Be pavadinimo
+Max LOD	Icon-O-Matic-PropertyNames		Didž. det. lyg.
+Add Path	Icon-O-Matic-AddPathsCmd		Pridėti kreivę
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Ar įrašyti piktogramos pakeitimus prieš ją užveriant?
+load error	Icon-O-Matic-SVGImport		įkėlimo klaida
+Transformation	Icon-O-Matic-TransformersList		Transformacija
+Save as…	Icon-O-Matic-Menu-File		Įrašyti kaip…
+Swatches	Icon-O-Matic-Menus		Paletė
+<modify path>	Icon-O-Matic-PathCmd		<pakeisti kreivę>
+HVIF Source Code	Icon-O-Matic-SavePanel		HVIF pirminis tekstas
+Icon-O-Matic	System name		Piktogramų rengyklė
+<nothing to undo>	Icon-O-Matic-Menu-Edit		<nėra ką atšaukti>
+Add	Icon-O-Matic-StylesList		Pridėti
+Translation Y	Icon-O-Matic-PropertyNames		Y poslinkis
+Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Fiksuoti figūrą
+Scale	Icon-O-Matic-TransformationBoxStates		Keisti dydį
+Remove Shape	Icon-O-Matic-RemoveShapesCmd		Pašalinti figūrą
+All	Icon-O-Matic-Properties		Viską
+Transformer	Icon-O-Matic-Menus		Transformatorius
+Invert selection	Icon-O-Matic-Properties		Invertuoti žymėjimą
+<unkown property>	Icon-O-Matic-PropertyNames		<nežinoma savybė>
+Pick a color	Icon-O-Matic-ColorPicker		Parinkite spalvą
+Multi Set 	Multi Set (property name)		Multiaibė 
+Settings…	Icon-O-Matic-SavePanel		Nuostatos…
+Add with style	Icon-O-Matic-ShapesList		Pridėti su stiliumi
+New	Icon-O-Matic-Menu-File		Naujas
+Yes	Icon-O-Matic-StyledTextImport		Taip
+Remove Path	Icon-O-Matic-RemovePathsCmd		Pašalinti kreivę
+Gradient type	Icon-O-Matic-StyleTypes		Gradiento tipas
+Move Transformer	Icon-O-Matic-MoveTransformersCmd		Perkelti transformatorių
+Perspective	Transformation		Perspektyva
+Export	Icon-O-Matic-Menu-File		Eksportuoti
+Width	Icon-O-Matic-PropertyNames		Plotis
+Bummer	Cancel button - error alert		Vaje
+Style	Icon-O-Matic-Menus		Stilius
+edit it's properties here.	Empty property list - 3rd line		kad čia galėtumėte keisti jo savybes.
+Off	Icon-O-Matic-Menu-Settings		Tinklelio nerodyti
+Edit	Icon-O-Matic-Menus		Taisa

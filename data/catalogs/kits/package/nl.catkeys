@@ -1,7 +1,7 @@
 1	dutch; flemish	x-vnd.Haiku-libpackage	2012114212
-Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Pakket %s-%s heeft geen bijbehorende vereisten voor zijn basispakket \"%s\"
-Failed to get repository names	PackageManagerKit		Het ophalen van de namen van de namen van de archieven is mislukt
-Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Het is niet gelukt om de cache voor het archief \"%s\" op te halen. Deze wordt overgeslagen.
 Refreshing repository \"%s\" failed	PackageManagerKit		Het verversen van het archief \"%s\" is mislukt
 Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Het ophalen van de configuratie voor het archief \"%s\" is mislukt. Deze wordt overgeslagen.
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Het is niet gelukt om de cache voor het archief \"%s\" op te halen. Deze wordt overgeslagen.
+Failed to get repository names	PackageManagerKit		Het ophalen van de namen van de namen van de archieven is mislukt
 Failed to remove transaction directory	PackageManagerKit		Het verwijderen van de transactiemap is mislukt
+Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Pakket %s-%s heeft geen bijbehorende vereisten voor zijn basispakket \"%s\"

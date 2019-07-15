@@ -1,26 +1,26 @@
 1	lithuanian	x-vnd.haiku-screenshot	363809141
-seconds	ScreenshotWindow		sek.
-Desktop	ScreenshotWindow		Darbalaukis
 Include window border	ScreenshotWindow		Įtraukti lango rėmelį
-Screenshot	System name		Nuotrauka
-Select	ScreenshotWindow		Rinktis
-Capture active window	ScreenshotWindow		Fotografuoti tik aktyvų langą
-Cancel	ScreenshotWindow		Atsisakyti
-Name:	ScreenshotWindow		Failo vardas:
-This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Toks failas jau egzistuoja.\n Ar tikrai norite jį perrašyti?
-Choose folder	ScreenshotWindow		Parinkite aplanką
-Save	ScreenshotWindow		Įrašyti
 Overwrite	ScreenshotWindow		Perrašyti
-Please select	ScreenshotWindow		Pasirinkite
-Save as:	ScreenshotWindow		Failo formatas:
-Copy to clipboard	ScreenshotWindow		Kopijuoti į iškarpinę
 Save in:	ScreenshotWindow		Įrašyti į:
-screenshot	Screenshot	Base filename of screenshot files	nuotrauka
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Toks failas jau egzistuoja.\n Ar tikrai norite jį perrašyti?
+Select	ScreenshotWindow		Rinktis
+Save as:	ScreenshotWindow		Failo formatas:
+seconds	ScreenshotWindow		sek.
 New screenshot	ScreenshotWindow		Nauja nuotrauka
+Screenshot	System name		Nuotrauka
+Desktop	ScreenshotWindow		Darbalaukis
 Artwork folder	ScreenshotWindow		Paveikslų aplankas
-Home folder	ScreenshotWindow		Namų aplankas
-Settings…	ScreenshotWindow		Nuostatos…
-overwrite	ScreenshotWindow		Perrašyti
-Delay:	ScreenshotWindow		Uždelsti:
-Include mouse pointer	ScreenshotWindow		Įtraukti pelės žymeklį
 Translator Settings	ScreenshotWindow		Keitiklio nuostatos
+Include mouse pointer	ScreenshotWindow		Įtraukti pelės žymeklį
+overwrite	ScreenshotWindow		Perrašyti
+Settings…	ScreenshotWindow		Nuostatos…
+Choose folder	ScreenshotWindow		Parinkite aplanką
+Name:	ScreenshotWindow		Failo vardas:
+Please select	ScreenshotWindow		Pasirinkite
+Cancel	ScreenshotWindow		Atsisakyti
+Delay:	ScreenshotWindow		Uždelsti:
+Copy to clipboard	ScreenshotWindow		Kopijuoti į iškarpinę
+screenshot	Screenshot	Base filename of screenshot files	nuotrauka
+Home folder	ScreenshotWindow		Namų aplankas
+Save	ScreenshotWindow		Įrašyti
+Capture active window	ScreenshotWindow		Fotografuoti tik aktyvų langą

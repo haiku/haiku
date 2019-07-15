@@ -1,79 +1,74 @@
-1	korean	x-vnd.Haiku-Devices	2599896782
-Manufacturer	DeviceSCSI		제조사
-Order by:	DevicesView		정렬:
-ACPI controller	Device		ACPI 제어기
-Memory controller	Device		메모리 제어기
-Driver used	DevicePCI		사용된 장치
-CD-ROM	DeviceSCSI		시디-롬
-ISA bus	Device		ISA 버스
-ACPI bus	Device		ACPI 버스
-ISA bus	DevicesView		ISA 버스
-Docking station	Device		도킹 스테이션
-Computer	Device		컴퓨터
-Unknown device	Device		알 수 없는 장치
-Class Info:\t\t\t\t: %classInfo%	DeviceACPI		클래스 정보:\t\t\t\t: %classInfo%
-Processor	DeviceSCSI		프로세서
-RBC	DeviceSCSI		RBC
-Detailed	DevicesView		상세 정보
-Category	DevicesView		종류
-Quit	DevicesView		나가기
-Device paths	Device		장치 경로
-Scanner	DeviceSCSI		스캐너
-Printer	DeviceSCSI		프린터
-Processor	Device		프로세서
-Optical Drive	DeviceSCSI		광학 드라이브
-ACPI Processor Namespace '%2'	DeviceACPI		ACPI 프로세서 이름공간 '%2'
-Bridge	DeviceSCSI		브리지
-unknown	Device		알 수 없음
-ACPI Information	DeviceACPI		ACPI 정보
-Generic system peripheral	Device		일반 시스템 주변 기기
-Not implemented	DevicePCI		아직 구현안됨
-Disk Drive	DeviceSCSI		디스크 드라이브
-Not implemented	DeviceACPI		아직 구현안됨
-Device name	DevicePCI		장치 이름
-Display controller	Device		디스플레이 컨트롤러
-Mass storage controller	Device		대용량 저장 장치 컨트롤러
-Input device controller	Device		입력 장치 컨트롤러
-Network controller	Device		네트워크 컨트롤러
-Device class	DeviceSCSI		장치 클래스
-Device name	DeviceACPI		장치 이름
-Driver used	Device		드라이버 사용
-Other	DeviceSCSI		기타
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		장치 이름\t\t\t\t: %Name%\n제조자\t\t\t: %Manufacturer%\n사용된 드라이버\t\t\t\t: %DriverUsed%\n드라이버 경로\t: %DevicePaths%
-ACPI Thermal Zone	DeviceACPI		ACPI 터미널 지역
-Communications	DeviceSCSI		통신
-Bus	DevicesView		버스
-Communication controller	Device		통신 컨트롤러
-Manufacturer	DeviceACPI		제조사
-PCI bus	Device		PCI 버스
-ACPI System Indicator	DeviceACPI		ACPI 시스템 지시기
-None	Device		없음
-PCI bus	DevicesView		PCI 버스
-Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		클래스 정보:
-Basic information	DevicesView		기본 정보
-PCI Information	DevicePCI		PCI 정보
-Manufacturer:	Device		제조자:
+1	korean	x-vnd.Haiku-Devices	2225036477
 ACPI bus	DevicesView		ACPI 버스
-Changer	DeviceSCSI		교환기
-ACPI System Bus	DeviceACPI		ACPI 시스템 버스
 Devices	System name		장치
-Worm	DeviceSCSI		웜
-Multimedia controller	Device		멀티미디어 컨트롤러
-Unknown	DevicePCI		알 수 없음
-Device name:	Device		장치 이름:
+Processor	Device		프로세서
+ACPI Information	DeviceACPI		ACPI 정보
+Detailed	DevicesView		상세 정보
 Computer	DevicesView		컴퓨터
-Value	PropertyList		값
-Report compatibility	DevicesView		호환성 보고
-Device	Device		장치
-Signal processing controller	Device		신호 처리 컨트롤러
-Serial bus controller	Device		시리얼 버스 컨트롤러
-Wireless controller	Device		무선 컨트롤러
-ACPI node '%1'	DeviceACPI		ACPI 노드 '%1'
-Device name	Device		장치 이름
+Communications	DeviceSCSI		통신
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		클래스 정보:
+Mass storage controller	Device		대용량 저장 장치 컨트롤러
+Printer	DeviceSCSI		프린터
+ACPI Processor Namespace '%2'	DeviceACPI		ACPI 프로세서 이름공간 '%2'
 Manufacturer	Device		제조사
-Manufacturer	DevicePCI		제조사
-Bridge	Device		브리지
+Device name:	Device		장치 이름:
+Scanner	DeviceSCSI		스캐너
+Memory controller	Device		메모리 제어기
 Unknown device	DevicesView		알 수 없는 장치
-Device name	DeviceSCSI		장치 이름
-Device paths	DevicePCI		장치 경로
+Unknown	DevicePCI		알 수 없음
+ACPI node '%1'	DeviceACPI		ACPI 노드 '%1'
+Optical Drive	DeviceSCSI		광학 드라이브
+Manufacturer	DeviceSCSI		제조사
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		장치 이름\t\t\t\t: %Name%\n제조자\t\t\t: %Manufacturer%\n사용된 드라이버\t\t\t\t: %DriverUsed%\n드라이버 경로\t: %DevicePaths%
+Device name	Device		장치 이름
+Device class	DeviceSCSI		장치 클래스
+Device	Device		장치
+Input device controller	Device		입력 장치 컨트롤러
+PCI bus	DevicesView		PCI 버스
+ACPI System Indicator	DeviceACPI		ACPI 시스템 지시기
+ACPI System Bus	DeviceACPI		ACPI 시스템 버스
+PCI Information	DevicePCI		PCI 정보
+Changer	DeviceSCSI		교환기
+Serial bus controller	Device		시리얼 버스 컨트롤러
+Category	DevicesView		종류
+RBC	DeviceSCSI		RBC
+None	Device		없음
+Device paths	Device		장치 경로
+Unknown device	Device		알 수 없는 장치
+Wireless controller	Device		무선 컨트롤러
+Generic system peripheral	Device		일반 시스템 주변 기기
+Value	PropertyList		값
 Devices	DevicesView		장치
+Device name	DeviceACPI		장치 이름
+Display controller	Device		디스플레이 컨트롤러
+Basic information	DevicesView		기본 정보
+Bus	DevicesView		버스
+Device name	DevicePCI		장치 이름
+Disk Drive	DeviceSCSI		디스크 드라이브
+Other	DeviceSCSI		기타
+Report compatibility	DevicesView		호환성 보고
+Computer	Device		컴퓨터
+PCI bus	Device		PCI 버스
+Order by:	DevicesView		정렬:
+ACPI Thermal Zone	DeviceACPI		ACPI 터미널 지역
+Multimedia controller	Device		멀티미디어 컨트롤러
+Quit	DevicesView		나가기
+ISA bus	Device		ISA 버스
+ISA bus	DevicesView		ISA 버스
+Processor	DeviceSCSI		프로세서
+Manufacturer:	Device		제조자:
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		클래스 정보:\t\t\t\t: %classInfo%
+Bridge	Device		브리지
+Worm	DeviceSCSI		웜
+CD-ROM	DeviceSCSI		시디-롬
+Manufacturer	DevicePCI		제조사
+Bridge	DeviceSCSI		브리지
+Signal processing controller	Device		신호 처리 컨트롤러
+Device name	DeviceSCSI		장치 이름
+Docking station	Device		도킹 스테이션
+ACPI controller	Device		ACPI 제어기
+Network controller	Device		네트워크 컨트롤러
+Driver used	Device		드라이버 사용
+Communication controller	Device		통신 컨트롤러
+ACPI bus	Device		ACPI 버스
+unknown	Device		알 수 없음

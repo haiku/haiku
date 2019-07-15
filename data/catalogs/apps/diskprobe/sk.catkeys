@@ -1,133 +1,133 @@
 1	slovak	x-vnd.Haiku-DiskProbe	2944605311
-File offset: 	ProbeView		Ofset súboru: 
-%ld (native)	ProbeView		%ld (natívne)
-64 bit unsigned value:	TypeEditors		64-bitová hodnota bez znamienka:
-Find again	ProbeView		Nájsť znova
-Text	FindWindow		Text
-Find…	ProbeView		Nájsť…
-Case sensitive	FindWindow		Rozlišovať veľkosť písmen
-Cancel	OpenWindow		Zrušiť
-Close	AttributeWindow		Zatvoriť
-File	ProbeView		Súbor
-Attribute	ProbeView		Atribút
-Floating-point value:	TypeEditors		Hodnota s pohyblivou desatinnou čiarkou:
-16 bit	TypeEditors		16-bitová
-Attributes	ProbeView		Atribúty
-Device offset: 	ProbeView		Ofset zariadenia: 
-Selection	ProbeView		Výber
-DiskProbe	System name		Disková sonda
-what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	čo: „%.4s“\n\n
-File	FileWindow		Súbor
-OK	DiskProbe		OK
-Boolean	TypeEditors	This is the type of editor	Pravdivostná hodnota
-Paste	ProbeView		Vložiť
-PNG format	TypeEditors		Formát PNG
-Font size	ProbeView		Veľkosť písma
-Attribute type: 	ProbeView		Typ atribútu: 
-Attribute	AttributeWindow		Atribút
-8 bit signed value:	TypeEditors		8-bitová hodnota bez znamienka:
-Number:	TypeEditors		Číslo:
-Save	ProbeView		Uložiť
-Stop	ProbeView		Zastaviť
-Number editor	TypeEditors		Editor čísiel
-Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Šestnástkové číslo
-No type editor available	AttributeWindow		Editor typov nie je dostupný
-Double precision floating-point value:	TypeEditors		Hodnota s pohyblivou desatinnou čiarkou s dvojitou presnosťou:
-Device: 	ProbeView		Zariadenie: 
-Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Skutočne chcete odstrániť atribút „%s“ zo súboru „%s“?\n\nTúto operáciu nemožno vrátiť.
-Text	TypeEditors	This is the type of editor	Text
-8 bit unsigned value:	TypeEditors		8-bitová hodnota bez znamienka:
-Block	ProbeView		Blok
-Back	ProbeView		Späť
-Device	ProbeView		Zariadenie
-Unknown type	TypeEditors		Neznámy typ
-Block 0x%Lx	ProbeView		Blok 0x%Lx
-Quit	FileWindow		Ukončiť
-Undo	ProbeView		Vrátiť
-Close	ProbeView		Zatvoriť
-Number	TypeEditors	This is the type of editor	Číslo
-Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Desiatkové číslo
-16 bit signed value:	TypeEditors		16-bitová hodnota so znamienkom:
-String editor	TypeEditors		Editor reťazcov
-of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	z 0x0
-64 bit signed offset:	TypeEditors		64-bitová hodnota so znamienkom:
-Boolean editor	TypeEditors		Editor pravdivostných hodnôt
-Copy	ProbeView		Kopírovať
-none	ProbeView	No attributes	žiadne
-Boolean value:	TypeEditors		Pravdivostná hodnota:
-32 bit size or status:	TypeEditors		32-bitová veľkosť alebo stav:
-8 bit palette	TypeEditors		8-bitivá paleta
-Fit	ProbeView	Size of fonts, fits to available room	Prispôsobiť veľkosť
-Probe device	OpenWindow		Sondovať zariadenie
- (native)	ProbeView		 (natívne)
-Unknown format	TypeEditors		Neznámy formát
-Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Šestnástková
-MIME type:	TypeEditors		Typ MIME:
-Page setup…	ProbeView		Nastavenie stránky…
-New…	FileWindow		Nový…
-DiskProbe request	AttributeWindow		Požiadavka Diskovej sondy
-Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Nepodarilo sa načítať obrázok
-Save changes before closing?	ProbeView		Uložiť zmeny pred ukončením?
-Type editor	AttributeWindow		Editor typov
-Native: 0x%0*Lx	ProbeView		Natívne: 0x%0*Lx
 Raw editor	AttributeWindow		Editor nespracovaných hodnôt
-Message View	TypeEditors		Zobrazenie správy
-DiskProbe request	ProbeView		Požiadavka Diskovej sondy
-32 bit unsigned size:	TypeEditors		32-bitová veľkosť bez znamienka:
-Flattened bitmap	TypeEditors		Sploštená bitová mapa
-Open file…	FileWindow		Otvoriť súbor…
-Next	ProbeView		Ďalší
-Close	FileWindow		Zatvoriť
-Attribute: 	ProbeView		Atribút: 
-Remove from file	AttributeWindow		Odstrániť zo súboru
-Don't save	ProbeView		Neukladať
-Previous	ProbeView		Späť
-64 bit signed value:	TypeEditors		64-bitová hodnota so znamienkom:
-Icon	TypeEditors		Ikona
-Block: 	ProbeView		Blok: 
-Examine device:	OpenWindow		Preskúmať zariadenie:
-Offset: 	ProbeView		Ofset: 
-OK	ProbeView		OK
-Add	ProbeView		Pridať
-Edit	ProbeView		Upraviť
-Native: %Ld (0x%0*Lx)	ProbeView		Natívne: %Ld (0x%0*Lx)
-32 bit unsigned value:	TypeEditors		32-bitová hodnota bez znamienka:
-Message	TypeEditors	This is the type of view	Správa
-Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Nepodarilo sa otvoriť „%s“:\n%s
-Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Sústava
-Image view	TypeEditors	Image means here a picture file, not a disk image.	Zobrazenie obrázka
-Cancel	AttributeWindow		Zrušiť
-Type editor not supported	ProbeView		Editor typov nie je podporovaný
+Remove	AttributeWindow		Odstrániť
+Close	ProbeView		Zatvoriť
+Boolean value:	TypeEditors		Pravdivostná hodnota:
+File	ProbeView		Súbor
 Block size	ProbeView	Menu item. This is in the same menu window than 'Base' and 'Font size'	Veľkosť bloku
 MIME type editor	TypeEditors		Editor typov MIME
-Swapped: %Ld (0x%0*Lx)	ProbeView		Vymenené: %Ld (0x%0*Lx)
-Find	FindWindow		Nájsť
-Remove	AttributeWindow		Odstrániť
-Print…	ProbeView		Tlačiť…
-Block %Ld (0x%Lx)	ProbeView		Blok %Ld (0x%Lx)
-Image	TypeEditors	This is the type of view	Obrázok
-Could not open file \"%s\": %s\n	DiskProbe		Nepodarilo sa otvoriť súbor „%s“: %s\n
-Select all	ProbeView		Vybrať všetky
-Probe file…	OpenWindow		Sondovať súbor…
-Icon view	TypeEditors		Zobrazenie ikon
-Bookmarks	ProbeView		Záložky
-Mode:	FindWindow		Režim:
-15 bit	TypeEditors		15-bitový
-Open device	FileWindow		Otvoriť zariadenie
-Could not find search string.	ProbeView		Nepodarilo sa nájsť vyhľadávací reťazec.
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Šestnástková
 16 bit unsigned value:	TypeEditors		16-bitová hodnota bez znamienka:
+8 bit signed value:	TypeEditors		8-bitová hodnota bez znamienka:
+ (native)	ProbeView		 (natívne)
 Attribute offset: 	ProbeView		Ofset atribútu: 
-View	ProbeView	This is the last menubar item 'File Edit Block View'	Zobraziť
-Redo	ProbeView		Opakovať
-File: 	ProbeView		Súbor: 
+Text	TypeEditors	This is the type of editor	Text
+File offset: 	ProbeView		Ofset súboru: 
+Add	ProbeView		Pridať
+64 bit signed value:	TypeEditors		64-bitová hodnota so znamienkom:
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Skutočne chcete odstrániť atribút „%s“ zo súboru „%s“?\n\nTúto operáciu nemožno vrátiť.
+No type editor available	AttributeWindow		Editor typov nie je dostupný
+Print…	ProbeView		Tlačiť…
+New…	FileWindow		Nový…
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	čo: „%.4s“\n\n
+OK	DiskProbe		OK
+DiskProbe	System name		Disková sonda
+Back	ProbeView		Späť
+Device: 	ProbeView		Zariadenie: 
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Sústava
+Open file…	FileWindow		Otvoriť súbor…
 32 bit unsigned pointer:	TypeEditors		32-bitový ukazovateľ bez znamienka:
-of 	ProbeView		z 
-Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Zápis do súboru zlyhal:\n%s\n\nVšetky zmeny sa po ukončení stratia.
-32 bit	TypeEditors		32-bitový
-Cancel	ProbeView		Zrušiť
-Swapped: 0x%0*Lx	ProbeView		Vymenené: 0x%0*Lx
-Grayscale	TypeEditors		Odtiene šedej
-32 bit signed value:	TypeEditors		32-bitová hodnota so znamienkom:
 DiskProbe request	DiskProbe		Požiadavka Diskovej sondy
-Type editor	ProbeView		Editor typov
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Šestnástkové číslo
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Zápis do súboru zlyhal:\n%s\n\nVšetky zmeny sa po ukončení stratia.
+Examine device:	OpenWindow		Preskúmať zariadenie:
+Number editor	TypeEditors		Editor čísiel
+Icon	TypeEditors		Ikona
+Attribute	ProbeView		Atribút
+Don't save	ProbeView		Neukladať
+Undo	ProbeView		Vrátiť
+Flattened bitmap	TypeEditors		Sploštená bitová mapa
+Block %Ld (0x%Lx)	ProbeView		Blok %Ld (0x%Lx)
+Cancel	OpenWindow		Zrušiť
+Unknown format	TypeEditors		Neznámy formát
+File: 	ProbeView		Súbor: 
+Swapped: %Ld (0x%0*Lx)	ProbeView		Vymenené: %Ld (0x%0*Lx)
+Stop	ProbeView		Zastaviť
+Cancel	ProbeView		Zrušiť
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Nepodarilo sa otvoriť „%s“:\n%s
+Font size	ProbeView		Veľkosť písma
+Type editor not supported	ProbeView		Editor typov nie je podporovaný
+Native: 0x%0*Lx	ProbeView		Natívne: 0x%0*Lx
+Copy	ProbeView		Kopírovať
+Redo	ProbeView		Opakovať
+Floating-point value:	TypeEditors		Hodnota s pohyblivou desatinnou čiarkou:
+Cancel	AttributeWindow		Zrušiť
+16 bit signed value:	TypeEditors		16-bitová hodnota so znamienkom:
+DiskProbe request	AttributeWindow		Požiadavka Diskovej sondy
+Next	ProbeView		Ďalší
+64 bit signed offset:	TypeEditors		64-bitová hodnota so znamienkom:
+32 bit signed value:	TypeEditors		32-bitová hodnota so znamienkom:
+Could not find search string.	ProbeView		Nepodarilo sa nájsť vyhľadávací reťazec.
+Close	FileWindow		Zatvoriť
+Unknown type	TypeEditors		Neznámy typ
+Open device	FileWindow		Otvoriť zariadenie
+Number:	TypeEditors		Číslo:
+Quit	FileWindow		Ukončiť
+Text	FindWindow		Text
+Block 0x%Lx	ProbeView		Blok 0x%Lx
+Attribute	AttributeWindow		Atribút
+Mode:	FindWindow		Režim:
+16 bit	TypeEditors		16-bitová
+32 bit size or status:	TypeEditors		32-bitová veľkosť alebo stav:
+of 	ProbeView		z 
 Contents:	TypeEditors		Obsah:
+Could not open file \"%s\": %s\n	DiskProbe		Nepodarilo sa otvoriť súbor „%s“: %s\n
+Probe file…	OpenWindow		Sondovať súbor…
+Block: 	ProbeView		Blok: 
+Bookmarks	ProbeView		Záložky
+Probe device	OpenWindow		Sondovať zariadenie
+none	ProbeView	No attributes	žiadne
+Case sensitive	FindWindow		Rozlišovať veľkosť písmen
+32 bit unsigned value:	TypeEditors		32-bitová hodnota bez znamienka:
+Remove from file	AttributeWindow		Odstrániť zo súboru
+Attributes	ProbeView		Atribúty
+Message	TypeEditors	This is the type of view	Správa
+Message View	TypeEditors		Zobrazenie správy
+Offset: 	ProbeView		Ofset: 
+Swapped: 0x%0*Lx	ProbeView		Vymenené: 0x%0*Lx
+MIME type:	TypeEditors		Typ MIME:
+Fit	ProbeView	Size of fonts, fits to available room	Prispôsobiť veľkosť
+Type editor	ProbeView		Editor typov
+File	FileWindow		Súbor
+Grayscale	TypeEditors		Odtiene šedej
+32 bit	TypeEditors		32-bitový
+Native: %Ld (0x%0*Lx)	ProbeView		Natívne: %Ld (0x%0*Lx)
+Device	ProbeView		Zariadenie
+Close	AttributeWindow		Zatvoriť
+Type editor	AttributeWindow		Editor typov
+Save	ProbeView		Uložiť
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	z 0x0
+Attribute type: 	ProbeView		Typ atribútu: 
+15 bit	TypeEditors		15-bitový
+Page setup…	ProbeView		Nastavenie stránky…
+Boolean	TypeEditors	This is the type of editor	Pravdivostná hodnota
+Icon view	TypeEditors		Zobrazenie ikon
+Select all	ProbeView		Vybrať všetky
+64 bit unsigned value:	TypeEditors		64-bitová hodnota bez znamienka:
+OK	ProbeView		OK
+Previous	ProbeView		Späť
+Selection	ProbeView		Výber
+Find	FindWindow		Nájsť
+8 bit unsigned value:	TypeEditors		8-bitová hodnota bez znamienka:
+%ld (native)	ProbeView		%ld (natívne)
+Attribute: 	ProbeView		Atribút: 
+Block	ProbeView		Blok
+Find again	ProbeView		Nájsť znova
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Zobraziť
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Nepodarilo sa načítať obrázok
+DiskProbe request	ProbeView		Požiadavka Diskovej sondy
+Double precision floating-point value:	TypeEditors		Hodnota s pohyblivou desatinnou čiarkou s dvojitou presnosťou:
+Image	TypeEditors	This is the type of view	Obrázok
+Save changes before closing?	ProbeView		Uložiť zmeny pred ukončením?
+PNG format	TypeEditors		Formát PNG
+Number	TypeEditors	This is the type of editor	Číslo
+Edit	ProbeView		Upraviť
+String editor	TypeEditors		Editor reťazcov
+Boolean editor	TypeEditors		Editor pravdivostných hodnôt
+Device offset: 	ProbeView		Ofset zariadenia: 
+Find…	ProbeView		Nájsť…
+8 bit palette	TypeEditors		8-bitivá paleta
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Desiatkové číslo
+Image view	TypeEditors	Image means here a picture file, not a disk image.	Zobrazenie obrázka
+Paste	ProbeView		Vložiť
+32 bit unsigned size:	TypeEditors		32-bitová veľkosť bez znamienka:

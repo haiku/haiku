@@ -1,74 +1,73 @@
-1	slovak	x-vnd.Haiku-Appearance	2499598353
-Plain font:	Font view		Základné písmo:
-Control highlight	Colors tab		Zvýraznenie ovládacieho prvku
+1	slovak	x-vnd.Haiku-Appearance	583615507
 Control border	Colors tab		Okraj ovládacieho prvku
-Antialiasing type:	AntialiasingSettingsView		Typ antialiasingu:
-Shadow	Colors tab		Tieň
-On	AntialiasingSettingsView		Zapnuté
-Defaults	APRWindow		Predvoľby
-Link hover	Colors tab		Podržanie myši nad odkazom
-Grayscale	AntialiasingSettingsView		Stupne šedej
-Shine	Colors tab		Svit
-About	DecorSettingsView		O aplikácii
-About decorator	DecorSettingsView		O dekorátore
+Control mark	Colors tab		Riadiaca značka
 Off	AntialiasingSettingsView		Vypnutý
-Link text	Colors tab		Text odkazu
-Link active	Colors tab		Aktívny odkaz
-Choose Decorator	DecorSettingsView		Vyberte dekorátor
+Window border	Colors tab		Okraj okna
+Inactive window tab	Colors tab		Záložka neaktívneho okna
+Defaults	APRWindow		Predvoľby
+Shadow	Colors tab		Tieň
+Document background	Colors tab		Pozadie dokumentu
+List background	Colors tab		Pozadie zoznamu
+Fixed font:	Font view		Písmo s pevnou šírkou:
+Appearance	System name		Vzhľad
+Reduce colored edges filter strength:	AntialiasingSettingsView		Zmenšiť silu filtra farebných hrán:
+Glyph hinting:	AntialiasingSettingsView		Tipy grafém:
+Menu item text	Colors tab		Text položky menu
+About decorator	DecorSettingsView		O dekorátore
+Antialiasing menu	AntialiasingSettingsView		Menu antialiasing
 Success	Colors tab		Úspešné
-Inactive window tab text	Colors tab		Text záložky neaktívneho okna
+About	DecorSettingsView		O aplikácii
+Shine	Colors tab		Svit
+Arrow style	DecorSettingsView		Štýl šípky
+On	AntialiasingSettingsView		Zapnuté
+Decorator:	DecorSettingsView		Dekorátor:
+Menu background	Colors tab		Pozadie menu
+Revert	APRWindow		Vrátiť
+List item text	Colors tab		Text položky menu
+OK	DecorSettingsView		OK
+Control text	Colors tab		Text ovládacieho prvku
+Look and feel	APRWindow		Správanie a vzhľad
+Selected menu item background	Colors tab		Pozadie položky zvoleného menu
+Link active	Colors tab		Aktívny odkaz
+Antialiasing	APRWindow		Antialiasing
+Menu font:	Font view		Písmo menu:
+Bold font:	Font view		Hrubé písmo:
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutori:\n\t%decorAuthors\n\nURL: %decorURL\nLicencia: %decorLic\n\n%decorDesc\n
+Choose Decorator	DecorSettingsView		Vyberte dekorátor
+Strong	AntialiasingSettingsView		Hrubý
 Failure	Colors tab		Zlyhanie
+Double:	DecorSettingsView		Dvojité:
+Selected menu item text	Colors tab		Text položky zvoleného menu
+Size:	Font Selection view		Veľkosť:
+Panel background	Colors tab		Pozadie panelu
+Plain font:	Font view		Základné písmo:
+Window tab text	Colors tab		Text záložky okna
+Navigation pulse	Colors tab		Pulz navigácie
+LCD subpixel	AntialiasingSettingsView		LCD subpixel
+Window tab	Colors tab		Záložka okna
+Link text	Colors tab		Text odkazu
+Tooltip background	Colors tab		Pozadie tipov
+Scroll bar thumb	Colors tab		Palec posuvníka
+Link visited	Colors tab		Navštívený odkaz
+Selected menu item border	Colors tab		Okraj vybranej položky menu
+Tooltip text	Colors tab		Text tipu
+Control background	Colors tab		Pozadie ovládacieho prvku
+Selected list item text	Colors tab		Text zvolenej položky menu
+Selected list item background	Colors tab		Pozadie zvolenej položky menu
+Inactive window tab text	Colors tab		Text záložky neaktívneho okna
+Navigation base	Colors tab		Základ navigácie
+Fonts	APRWindow		Písma
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Kŕdeľ ďatľov učí koňa obhrýzať kôru a žrať mäso.
+Grayscale	AntialiasingSettingsView		Stupne šedej
+Antialiasing type:	AntialiasingSettingsView		Typ antialiasingu:
+Panel text	Colors tab		Text panelu
 Hinting menu	AntialiasingSettingsView		Menu s tipmi
 Scroll bar:	DecorSettingsView		Posuvník:
-Document background	Colors tab		Pozadie dokumentu
-Status bar	Colors tab		Stavový panel
-Revert	APRWindow		Vrátiť
-Window tab	Colors tab		Záložka okna
-Tooltip background	Colors tab		Pozadie tipov
-Selected menu item background	Colors tab		Pozadie položky zvoleného menu
-Antialiasing	APRWindow		Antialiasing
-Navigation base	Colors tab		Základ navigácie
-Selected list item text	Colors tab		Text zvolenej položky menu
-Window border	Colors tab		Okraj okna
-Double:	DecorSettingsView		Dvojité:
-Window tab text	Colors tab		Text záložky okna
-Document text	Colors tab		Text dokumentu
-Navigation pulse	Colors tab		Pulz navigácie
-Selected menu item text	Colors tab		Text položky zvoleného menu
-Menu background	Colors tab		Pozadie menu
-List background	Colors tab		Pozadie zoznamu
-OK	DecorSettingsView		OK
-Control mark	Colors tab		Riadiaca značka
-Size:	Font Selection view		Veľkosť:
-Link visited	Colors tab		Navštívený odkaz
-Decorator:	DecorSettingsView		Dekorátor:
-Selected list item background	Colors tab		Pozadie zvolenej položky menu
-Panel background	Colors tab		Pozadie panelu
-Menu font:	Font view		Písmo menu:
-Colors	APRWindow		Farby
-Control background	Colors tab		Pozadie ovládacieho prvku
-Inactive window tab	Colors tab		Záložka neaktívneho okna
-List item text	Colors tab		Text položky menu
-Appearance	System name		Vzhľad
-Fixed font:	Font view		Písmo s pevnou šírkou:
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Kŕdeľ ďatľov učí koňa obhrýzať kôru a žrať mäso.
-%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutori:\n\t%decorAuthors\n\nURL: %decorURL\nLicencia: %decorLic\n\n%decorDesc\n
-Reduce colored edges filter strength:	AntialiasingSettingsView		Zmenšiť silu filtra farebných hrán:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Subpixlový antialiasing v kombinácii s tipmi grafém nie je v tomto zostavení Haiku dostupný, aby sme sa vyhli možným problémom s pantentmi. Ak chcete túto možnosť zapnúť, musíte si Haiku zostaviť sami a zapnúť isté voľby v konfiguračnom hlavičkovom súbore libfreetype.
-Scroll bar thumb	Colors tab		Palec posuvníka
-Control text	Colors tab		Text ovládacieho prvku
-Single:	DecorSettingsView		Jednoduché:
-Tooltip text	Colors tab		Text tipu
-Bold font:	Font view		Hrubé písmo:
-Inactive window border	Colors tab		Okraj neaktívneho okna
-Menu item text	Colors tab		Text položky menu
-LCD subpixel	AntialiasingSettingsView		LCD subpixel
-Selected menu item border	Colors tab		Okraj vybranej položky menu
-Strong	AntialiasingSettingsView		Hrubý
-Panel text	Colors tab		Text panelu
-Arrow style	DecorSettingsView		Štýl šípky
 Monospaced fonts only	AntialiasingSettingsView		Iba písma s pevnou šírkou znaku
-Look and feel	APRWindow		Správanie a vzhľad
-Antialiasing menu	AntialiasingSettingsView		Menu antialiasing
-Fonts	APRWindow		Písma
-Glyph hinting:	AntialiasingSettingsView		Tipy grafém:
+Document text	Colors tab		Text dokumentu
+Inactive window border	Colors tab		Okraj neaktívneho okna
+Colors	APRWindow		Farby
+Control highlight	Colors tab		Zvýraznenie ovládacieho prvku
+Status bar	Colors tab		Stavový panel
+Link hover	Colors tab		Podržanie myši nad odkazom
+Single:	DecorSettingsView		Jednoduché:

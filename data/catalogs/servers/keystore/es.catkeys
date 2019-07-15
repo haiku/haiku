@@ -1,17 +1,17 @@
 1	spanish; castilian	x-vnd.Haiku-keystore_server	2429996361
-This application hasn't been granted access before.	AppAccessRequestWindow		A esta aplicación no se le ha otorgado acceso anteriormente.
-Unlock	KeyRequestWindow		Desbloquear
-This application has been updated since it was last granted access.	AppAccessRequestWindow		Está aplicación ha sido actualizada desde la última vez que se le otorgó acceso.
-Allow always	AppAccessRequestWindow		Permitir siempre
-Application keyring access	AppAccessRequestWindow		Acceso a la aplicación del depósito de claves
 to perform the following action:\n%accessString%\n\n	AppAccessRequestWindow		para realizar la siguiente acción:\n%accessString%\n\n
-The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		La aplicación:\n%signature% (%path%)\n\n
 This application doesn't yet have the required privileges.	AppAccessRequestWindow		Esta aplicación aún no tiene los privilegios necesarios.
-Password:	KeyRequestWindow		Contraseña:
-Cancel	KeyRequestWindow		Cancelar
 Keyring:	KeyRequestWindow		Depósito de claves:
+requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		pide acceso al depósito:\n%keyringName%\n\n
+Application keyring access	AppAccessRequestWindow		Acceso a la aplicación del depósito de claves
+Disallow	AppAccessRequestWindow		Denegar
+Allow once	AppAccessRequestWindow		Permitir una vez
 Unlock keyring	KeyRequestWindow		Desbloquear depósito
 An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		Una aplicación desea acceder al depósito de claves indicado, pero se encuentra bloqueado con una contraseña. Por favor ingrese la contraseña para desbloquear el depósito de claves.\nSi usted desbloquea el depósito de claves, el mismo permanecerá desbloqueado hasta que el sistema sea apagado o el depósito sea manualmente bloqueado.\nSi usted cancela este diálogo el depósito de claves permanecerá bloqueado.
-Allow once	AppAccessRequestWindow		Permitir una vez
-Disallow	AppAccessRequestWindow		Denegar
-requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		pide acceso al depósito:\n%keyringName%\n\n
+Password:	KeyRequestWindow		Contraseña:
+Cancel	KeyRequestWindow		Cancelar
+This application has been updated since it was last granted access.	AppAccessRequestWindow		Está aplicación ha sido actualizada desde la última vez que se le otorgó acceso.
+Allow always	AppAccessRequestWindow		Permitir siempre
+Unlock	KeyRequestWindow		Desbloquear
+The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		La aplicación:\n%signature% (%path%)\n\n
+This application hasn't been granted access before.	AppAccessRequestWindow		A esta aplicación no se le ha otorgado acceso anteriormente.

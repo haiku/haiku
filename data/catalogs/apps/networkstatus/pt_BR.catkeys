@@ -1,22 +1,21 @@
-1	portuguese (brazil)	x-vnd.Haiku-NetworkStatus	1729819859
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Opções do Status de Rede:\n\t--deskbar\tautomaticamente adicionar replicante na Deskbar\n\t--ajuda\t\timprimir esta informação e sair\n
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Você pode executar NetworkStatus em uma janela ou instalá-lo na Deskbar.
-<no wireless networks found>	NetworkStatusView		<nenhuma rede sem fio encontrada>
-Run in window	NetworkStatus		Executar em janela
-No link	NetworkStatusView		Nenhum vínculo
-Install in Deskbar	NetworkStatus		Instalar na Deskbar
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		Falha ao abrir as preferências de Rede.\n\nErro:
+1	portuguese (brazil)	x-vnd.Haiku-NetworkStatus	3823341665
 Netmask	NetworkStatusView		Máscara de rede
-Broadcast	NetworkStatusView		Transmissão
-Unknown	NetworkStatusView		Desconhecido
-Network Status	NetworkStatusView		Status da rede
-Ready	NetworkStatusView		Pronto
-No stateful configuration	NetworkStatusView		Nenhuma configuração definida
-%ifaceName information:\n	NetworkStatusView		%ifaceName informação:\n
-Configuring	NetworkStatusView		Configurando
-Address	NetworkStatusView		Endereço
-OK	NetworkStatusView		OK
-NetworkStatus	System name		Status de rede
-Open network preferences…	NetworkStatusView		Abrir preferências de Rede...
-Could not join wireless network:\n	NetworkStatusView		Não foi possível conectar à rede sem fio:\n
 Quit	NetworkStatusView		Sair
+Unknown	NetworkStatusView		Desconhecido
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Falha ao abrir as preferências de Rede.\n\nErro:
+Install in Deskbar	NetworkStatus		Instalar na Deskbar
+Open network preferences…	NetworkStatusView		Abrir preferências de Rede...
+NetworkStatus	System name		Status de rede
+OK	NetworkStatusView		OK
+No link	NetworkStatusView		Nenhum vínculo
+Could not join wireless network:\n	NetworkStatusView		Não foi possível conectar à rede sem fio:\n
+Ready	NetworkStatusView		Pronto
+Network Status	NetworkStatusView		Status da rede
+Address	NetworkStatusView		Endereço
+No stateful configuration	NetworkStatusView		Nenhuma configuração definida
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Você pode executar NetworkStatus em uma janela ou instalá-lo na Deskbar.
+Broadcast	NetworkStatusView		Transmissão
+%ifaceName information:\n	NetworkStatusView		%ifaceName informação:\n
+Run in window	NetworkStatus		Executar em janela
+<no wireless networks found>	NetworkStatusView		<nenhuma rede sem fio encontrada>
+Configuring	NetworkStatusView		Configurando

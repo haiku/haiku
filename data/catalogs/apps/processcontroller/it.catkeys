@@ -1,50 +1,49 @@
-1	italian	x-vnd.Haiku-ProcessController	1761882987
-Memory usage	ProcessController		Uso della memoria
-Kill this team!	ProcessController		Termina questo team!
-Idle priority	ProcessController		Priorità inattivo
-Restart Deskbar	ProcessController		Riavvia la Deskbar
-Custom priority	ProcessController		Priorità personalizzata
-This team is already gone…	ProcessController		Questo team è già terminato...
+1	italian	x-vnd.Haiku-ProcessController	4131818684
 Error saving file	ProcessController		Errore nel salvataggio del file
-Real-time priority	ProcessController		Priorità in tempo reale
-Power saving	ProcessController		Risparmio energetico
-Your setting file could not be saved!\n(%s)	ProcessController		Il tuo file impostazioni non può essere salvato!\n(%s)
-What do you want to do with the team \"%s\"?	ProcessController		Cosa intendi fare con il team \"%s\"?
-This thread is already gone…	ProcessController		Questo thread è già terminato...
-Cancel	ProcessController		Cancella
 Display priority	ProcessController		Priorità visualizzazione
-Run in window	ProcessController		Esegui in finestra
+That's no Fun!	ProcessController		Non è divertente!
+What do you want to do with the team \"%s\"?	ProcessController		Cosa intendi fare con il team \"%s\"?
+Your setting file could not be saved!\n(%s)	ProcessController		Il tuo file impostazioni non può essere salvato!\n(%s)
 Processor %d	ProcessController		Processore %d
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
-ProcessController is already installed in Deskbar.	ProcessController		Gestione Processi è già installato nella Deskbar
-This is the last active processor...\nYou can't turn it off!	ProcessController		Questo è l'ultimo processore attivo...\nNon puoi spegnerlo!
-Info	ProcessController		Informazioni
-Quit application	ProcessController		Chiudi applicazione
+Live in the Deskbar	ProcessController		Live nella Deskbar
+Kill this team!	ProcessController		Termina questo team!
+OK	ProcessController		OK
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		È possibile eseguire Gestione Processi in una finestra o installarlo nella Deskbar.
+Real-time priority	ProcessController		Priorità in tempo reale
+Custom priority	ProcessController		Priorità personalizzata
+Debug this thread!	ProcessController		Esegui il debug di questo thread!
 Low priority	ProcessController		Bassa priorità
+Urgent display priority	ProcessController		Priorità video urgente
+Memory usage	ProcessController		Uso della memoria
+Ok!	ProcessController		OK!
+Normal priority	ProcessController		Priorità normale
+Restart Deskbar	ProcessController		Riavvia la Deskbar
+About ProcessController…	ProcessController		Informazioni su Gestione Processi...
+Usage: %s [-deskbar]\n	ProcessController		Utilizzo: %s [-deskbar]\n
+Please confirm	ProcessController		Conferma
+Urgent priority	ProcessController		Priorità urgente
 What do you want to do with the thread \"%s\"?	ProcessController		Cosa si vuole fare con il thread \"%s\"?
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+Idle priority	ProcessController		Priorità inattivo
+Real-time display priority	ProcessController		Priorità video in tempo reale
+Threads and CPU usage	ProcessController		Thread e uso della CPU
+Quit application	ProcessController		Chiudi applicazione
+Info	ProcessController		Informazioni
+Kill this thread!	ProcessController		Termina questo thread!
+This team is already gone…	ProcessController		Questo team è già terminato…
 Gone teams…	ProcessController		Team terminati...
+Quit an application	ProcessController		Chiudi un'applcazione
+Cancel	ProcessController		Cancella
+Install in Deskbar	ProcessController		Installa nella Deskbar
+Debug this team!	ProcessController		Effettua il debug di questo team!
+Low latency	ProcessController		Bassa latenza
+ProcessController	System name		Gestione Processi
 Lowest active priority	ProcessController		Priorità più bassa attiva
 Restart Tracker	ProcessController		Riavvia il Tracker
-Live in the Deskbar	ProcessController		Live nella Deskbar
-Kill this thread!	ProcessController		Termina questo thread!
-Debug this thread!	ProcessController		Esegui il debug di questo thread!
-Normal priority	ProcessController		Priorità normale
-New Terminal	ProcessController		Nuovo Terminale
-Urgent priority	ProcessController		Priorità urgente
-About ProcessController…	ProcessController		Informazioni su Gestione Processi...
-Ok!	ProcessController		OK!
-Quit an application	ProcessController		Chiudi un'applcazione
-Install in Deskbar	ProcessController		Installa nella Deskbar
-Threads and CPU usage	ProcessController		Thread e uso della CPU
-Urgent display priority	ProcessController		Priorità video urgente
-Low latency	ProcessController		Bassa latenza
-OK	ProcessController		OK
-Damned!	ProcessController		Accidenti!
-Debug this team!	ProcessController		Effettua il debug di questo team!
-Usage: %s [-deskbar]\n	ProcessController		Utilizzo: %s [-deskbar]\n
-ProcessController	System name		Gestione Processi
-Real-time display priority	ProcessController		Priorità video in tempo reale
-Please confirm	ProcessController		Conferma
 System resources & caches…	ProcessController		Risorse di sistema & cache
-That's no Fun!	ProcessController		Non è divertente!
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		È possibile eseguire Gestione Processi in una finestra o installarlo nella Deskbar.
+Damned!	ProcessController		Accidenti!
+New Terminal	ProcessController		Nuovo Terminale
+Power saving	ProcessController		Risparmio energetico
+ProcessController is already installed in Deskbar.	ProcessController		Gestione Processi è già installato nella Deskbar
+This thread is already gone…	ProcessController		Questo thread è già terminato…
+Run in window	ProcessController		Esegui in finestra

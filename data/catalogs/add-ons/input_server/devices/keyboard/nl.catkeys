@@ -1,10 +1,10 @@
 1	dutch; flemish	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
-Kill application	Team monitor		Toepassing afbreken
-Quit application	Team monitor		Toepassing afsluiten
-Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Selecteer een applicatie van de bovenstaande lijst en klik op de knoppen 'Toepassing afbreken' of 'Toepassing sluiten' om het af te sluiten.\n\nHoud CONTROL+ALT+DELETE  voor %ld seconden ingedrukt om te te herstarten.
 If the application will not quit you may have to kill it.	Team monitor		Als de toepassing niet afsluit moet je het misschien afbreken.
-Force reboot	Team monitor		Forceer herstart
-Team monitor	Team monitor		Teammonitor
-(This team is a system component)	Team monitor		(Dit team is een systeemcomponent)
+Quit application	Team monitor		Toepassing afsluiten
 Restart the desktop	Team monitor		Start het bureaublad opnieuw
+Force reboot	Team monitor		Forceer herstart
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Selecteer een applicatie van de bovenstaande lijst en klik op de knoppen 'Toepassing afbreken' of 'Toepassing sluiten' om het af te sluiten.\n\nHoud CONTROL+ALT+DELETE  voor %ld seconden ingedrukt om te te herstarten.
+Team monitor	Team monitor		Teammonitor
+Kill application	Team monitor		Toepassing afbreken
 Cancel	Team monitor		Annuleren
+(This team is a system component)	Team monitor		(Dit team is een systeemcomponent)

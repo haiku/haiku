@@ -1,38 +1,37 @@
-1	hungarian	x-vnd.Haiku.TextSearch	3622532554
-%s: Not enough room to escape the filename.	Grepper		%s: Nincs elég hely kihagyni a fájlnevet.
-Trim to selection	GrepWindow		Kijelölés kivágása
-Failed to open errors pipe!	Grepper		Nem tudtam megnyitni az átmeneti fájlt.
-Follow symbolic links	GrepWindow		Szimbolikus linkek követése
-Close	GrepWindow		Bezárás
-Cancel	GrepWindow		Mégse
-The unselected files will be removed from the list.	GrepWindow		A ki nem választott fájlok el lesznek távolítva a listáról.
-Regular expression	GrepWindow		Reguláris kifejezés
-Set target…	GrepWindow		Cél megadása…
-Failed to open output pipe!	Grepper		Nem sikerült megnyitni a kimeneti eszközt
+1	hungarian	x-vnd.Haiku.TextSearch	2123129416
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Válassza ki azokat a fájlokat a Nyomkövetőben, melyek kijelölésre kerüljenek.
-Open files in Pe	GrepWindow		Fájlok megnyitása Pe-ben
 %appname% : %path%	GrepWindow		%appname% : %path%
-Copy text to clipboard	GrepWindow		Szöveg másolása a vágólapra
-Settings	GrepWindow		Beállítások
-Select all	GrepWindow		Összes kijelölése
-OK	GrepWindow		Rendben
-Skip folders starting with a dot	GrepWindow		Ponttal kezdődő mappák átugrása
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME nem tudott megnyitni egy, vagy több mappát.
-Search	GrepWindow		Keresés
-Open selection	GrepWindow		Kijelölés megnyitása
-Look in sub-folders	GrepWindow		Keresés almappákban is
-Actions	GrepWindow		Műveletek
-File	GrepWindow		Fájl
-Encoding	GrepWindow		Kódolás
-History	GrepWindow		Előzmények
 Failed to start xargs program!	Grepper		Az xargs indítása sikertelen!
+Open selection	GrepWindow		Kijelölés megnyitása
+Actions	GrepWindow		Műveletek
 New window	GrepWindow		Új ablak
-Failed to open input pipe!	Grepper		Nem sikerült megnyitni a bementi eszközt
-Please select the files you wish to keep searching.	GrepWindow		Kérjük, válassza ki azokat a fájlokat amelyekben folytatni kívánja a keresést.
-TextSearch	GrepWindow		Szövegkeresés
+Encoding	GrepWindow		Kódolás
+OK	GrepWindow		Rendben
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Close	GrepWindow		Bezárás
+Look in sub-folders	GrepWindow		Keresés almappákban is
+%s: Not enough room to escape the filename.	Grepper		%s: Nincs elég hely kihagyni a fájlnevet.
+Follow symbolic links	GrepWindow		Szimbolikus linkek követése
+Regular expression	GrepWindow		Reguláris kifejezés
+Text files only	GrepWindow		Csak szövegfájlokban
 Quit	GrepWindow		Kilépés
 Show files in Tracker	GrepWindow		Fájlok megjelenítése a Nyomkövetőben
-Case-sensitive	GrepWindow		Betűérzékeny
-Text files only	GrepWindow		Csak szövegfájlokban
+Please select the files you wish to keep searching.	GrepWindow		Kérjük, válassza ki azokat a fájlokat amelyekben folytatni kívánja a keresést.
+Trim to selection	GrepWindow		Kijelölés kivágása
+Set target…	GrepWindow		Cél megadása…
+TextSearch	GrepWindow		Szövegkeresés
+Failed to open input pipe!	Grepper		Nem sikerült megnyitni a bementi eszközt
+Search	GrepWindow		Keresés
+Copy text to clipboard	GrepWindow		Szöveg másolása a vágólapra
 Show lines	GrepWindow		Sorok megjelenítése
-%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Failed to open errors pipe!	Grepper		Nem tudtam megnyitni az átmeneti fájlt.
+The unselected files will be removed from the list.	GrepWindow		A ki nem választott fájlok el lesznek távolítva a listáról.
+Skip folders starting with a dot	GrepWindow		Ponttal kezdődő mappák átugrása
+Failed to open output pipe!	Grepper		Nem sikerült megnyitni a kimeneti eszközt
+Cancel	GrepWindow		Mégse
+History	GrepWindow		Előzmények
+File	GrepWindow		Fájl
+Case-sensitive	GrepWindow		Betűérzékeny
+Select all	GrepWindow		Összes kijelölése
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME nem tudott megnyitni egy, vagy több mappát.
+Settings	GrepWindow		Beállítások

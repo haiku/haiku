@@ -1,11 +1,11 @@
 1	greek, modern (1453-)	x-vnd.Haiku-SGITranslator	4153400005
-Use compression:	SGIView		Χρήση συμπίεσης:
-SGITranslator Settings	SGITranslator		Ρυθμίσεις μεταφραστή SGI
-None	SGIView		Κανένα
 SGI images	SGITranslator		SGI εικόνες
-SGI image translator	SGITranslator		Μεταφραστής είκονας SGI
-SGI image	SGITranslator		SGI εικόνα
-RLE	SGIView		RLE
-SGI Settings	SGIMain		SGI Ρυθμίσεις
-written by:\n	SGIView		γράφτηκε από τον:\n
+Use compression:	SGIView		Χρήση συμπίεσης:
 SGI image translator	SGIView		Μεταφραστής είκονας SGI
+SGI image	SGITranslator		SGI εικόνα
+SGITranslator Settings	SGITranslator		Ρυθμίσεις μεταφραστή SGI
+SGI Settings	SGIMain		SGI Ρυθμίσεις
+SGI image translator	SGITranslator		Μεταφραστής είκονας SGI
+None	SGIView		Κανένα
+RLE	SGIView		RLE
+written by:\n	SGIView		γράφτηκε από τον:\n

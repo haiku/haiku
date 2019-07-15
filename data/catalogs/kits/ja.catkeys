@@ -1,42 +1,42 @@
 1	japanese	x-vnd.Haiku-libbe	3337473349
-gamma	AboutWindow		γ
-beta	AboutWindow		β
-%3.2f GiB	StringForSize		%3.2f GiB
-Written by:	AboutWindow		作者:
-About %app%	AboutMenuItem		%app% について
-Cut	TextView		切り取り
-Version	AboutWindow		バージョン
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		\"%description\" 用のレプリカントを作成できません。\n%error
-Copy	TextView		コピー
-%3.2f KiB	StringForSize		%3.2f KiB
-alpha	AboutWindow		α
-Error	PrintJob		エラー
-All Rights Reserved.	AboutWindow		All Rights Reserved.
 {0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# バイト} other{# バイト}}
-About %app%	AboutWindow		%app% について
-No pages to print!	PrintJob		印刷するページがありません。
+All Rights Reserved.	AboutWindow		All Rights Reserved.
+gold master	AboutWindow		ゴールデンマスター
+Undo	TextView		元に戻す
+gamma	AboutWindow		γ
+development	AboutWindow		開発版
 OK	Dragger		OK
 OK	PrintJob		OK
-Green:	ColorControl		緑:
-Version history:	AboutWindow		改訂履歴:
-Remove replicant	Dragger		レプリカントを削除
-Select all	TextView		すべて選択
-OK	AboutWindow		OK
-OK	ZombieReplicantView		OK
 Print Server is not responding.	PrintJob		プリントサーバーが応答しません。
+About %app%	AboutMenuItem		%app% について
+Warning	Dragger		警告
+Green:	ColorControl		緑:
+Redo	TextView		やり直し
+No pages to print!	PrintJob		印刷するページがありません。
+beta	AboutWindow		β
+OK	ZombieReplicantView		OK
+Cut	TextView		切り取り
+%3.2f GiB	StringForSize		%3.2f GiB
+Can't delete this replicant from its original application. Life goes on.	Dragger		このレプリカントを元々のアプリケーションから削除することはできません。現状を維持します。
+Error	ZombieReplicantView		エラー
 Paste	TextView		貼り付け
+OK	AboutWindow		OK
 Special Thanks:	AboutWindow		Special Thanks:
 %.2f TiB	StringForSize		%.2f TiB
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		このレプリカント用のアプリケーションを見つけることができません。アプリケーション識別子が提供されていません。\n%error
-Redo	TextView		やり直し
-<empty>	Menu		<空>
-Warning	Dragger		警告
-Undo	TextView		元に戻す
+Remove replicant	Dragger		レプリカントを削除
+Version	AboutWindow		バージョン
 Red:	ColorControl		赤:
+<empty>	Menu		<空>
+Copy	TextView		コピー
+Select all	TextView		すべて選択
+alpha	AboutWindow		α
 %3.2f MiB	StringForSize		%3.2f MiB
+Error	PrintJob		エラー
+About %app%	AboutWindow		%app% について
 About %app…	Dragger		%appについて…
-development	AboutWindow		開発版
-Error	ZombieReplicantView		エラー
+Version history:	AboutWindow		改訂履歴:
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		このレプリカント用のアプリケーションを見つけることができません。アプリケーション識別子が提供されていません。\n%error
+%3.2f KiB	StringForSize		%3.2f KiB
 Blue:	ColorControl		青:
-gold master	AboutWindow		ゴールデンマスター
-Can't delete this replicant from its original application. Life goes on.	Dragger		このレプリカントを元々のアプリケーションから削除することはできません。現状を維持します。
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		\"%description\" 用のレプリカントを作成できません。\n%error
+Written by:	AboutWindow		作者:

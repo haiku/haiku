@@ -1,44 +1,50 @@
-1	indonesian	x-vnd.Be-PEPL	2087122955
-Edit	People		Sunting
-Error	People		Galat
-City	People		Kota
-The file '%name%' could not be written.	People		Berkas '%name%' tidak dapat ditulis.
-none	Groups list		tiada
-Configure attributes	People		Atur atribut
-Company	People		Perusahaan
-%name% picture	People		gambar %name%
-Work phone	People		Telepon kerja
-People	System name		Orang
-New person	People		Orang baru
-Select all	People		Pilih semua
-File	People		Berkas
-Could not create %s.	People		Tidak dapat membuat %s.
-Country	People		Negara
-Close	People		Tutup
-Group	People		Grup
-Nickname	People		Julukan
-Quit	People		Keluar
-Name	People		Nama
-Don't save	People		Jangan simpan
-E-mail	People		Surel
-Load image…	People		Memuat gambar…
-OK	People		OK
-Remove image	People		Hilangkan gambar
-Home phone	People		Telepon rumah
-Save as…	People		Simpan sebagai…
-Save changes before closing?	People		Simpan perubahan sebelum penutupan?
-Paste	People		Tempel
-Drop an image here,\nor use the contextual menu.	People		Jatuhkan gambar di sini,\natau gunakan menu kontekstual.
-Save	People		Simpan
-Person	Short mimetype description		Orang
+1	indonesian	x-vnd.Be-PEPL	2332202134
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Meluncurkan prefile FileTypes untuk mengonfigurasi atribut Person telah gagal.\n\nKesalahan: 
+Unnamed person	People		Orang belum dinamai
 New person…	People		Orang baru…
 Address	People		Alamat
-URL	People		URL
-Sorry	People		Sori
-Zip	People		Kode Pos
-Contact information for a person.	Long mimetype description		Informasi kontak untuk seseorang.
-Fax	People		Fax
+Zip	People		Kode pos
+Select all	People		Pilih semua
+Could not create %s.	People		Tidak dapat membuat %s.
+Quit	People		Keluar
+Company	People		Perusahaan
+Name	People		Nama
+The file '%name%' could not be written.	People		Berkas '%name%' tidak dapat ditulis.
 Contact name	People		Nama kontak
-Cut	People		Potong
 Cancel	People		Batalkan
+Edit	People		Sunting
+Save changes before closing?	People		Simpan perubahan sebelum penutupan?
+People	System name		Orang
+Error	People		Galat
+Revert	People		Pulihkan
+Country	People		Negara
+Person	Short mimetype description		Orang
+New person	People		Orang baru
+Save	People		Simpan
+Fax	People		Fax
+URL	People		URL
+%name% picture	People		gambar %name%
+Home phone	People		Telepon rumah
+none	Groups list		tiada
+Save as…	People		Simpan sebagai…
+Cut	People		Potong
+Contact information for a person.	Long mimetype description		Informasi kontak untuk seseorang.
+Remove image	People		Hilangkan gambar
+City	People		Kota
+Undo	People		Batalkan
+Don't save	People		Jangan simpan
+Configure attributes	People		Atur atribut
+Work phone	People		Telepon kerja
+State	People		Wilayah
+Nickname	People		Julukan
+OK	People		OK
+File	People		Berkas
+Redo	People		Ulangi
+Close	People		Tutup
 Copy	People		Salin
+Paste	People		Tempel
+E-mail	People		Surel
+Group	People		Grup
+Drop an image here,\nor use the contextual menu.	People		Jatuhkan gambar di sini,\natau gunakan menu kontekstual.
+Load image…	People		Memuat gambar…
+Sorry	People		Sori

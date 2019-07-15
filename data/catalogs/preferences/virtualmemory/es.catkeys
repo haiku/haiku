@@ -1,20 +1,20 @@
 1	spanish; castilian	x-vnd.Haiku-VirtualMemory	2090796060
-Quit	SettingsWindow		Salir
-Automatic swap management	SettingsWindow		Administración de intercambio automática
-Turn off	SettingsWindow		Desactivar
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Desactivar la memoria virtual tendrá efectos negativos sobre la estabilidad del sistema una vez que se agote la memoria RAM.\nLa memoria virtual no afecta el rendimiento del sistema hasta que no se alcance este punto.\n\n¿Está seguro de querer desactivarla?
 Requested swap file size:	SettingsWindow		Tamaño del archivo de intercambio solicitado:
-The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Las opciones especificadas en el archivo de ajustes son inválidas. Puede cargar los valores predeterminados o salir.
-Defaults	SettingsWindow		Valores predeterminados
-Current Swap:	SettingsWindow		Intercambio actual:
-Use volume:	SettingsWindow		Usar volumen:
-Keep enabled	SettingsWindow		Mantener activada
-Revert	SettingsWindow		Revertir
 VirtualMemory	System name		VirtualMemory
-Use boot volume	SettingsWindow		Usar volumen de arranque
-Load defaults	SettingsWindow		Cargar predeterminados
 OK	VirtualMemoryApp		Aceptar
+Use volume:	SettingsWindow		Usar volumen:
+Turn off	SettingsWindow		Desactivar
 Changes will take effect upon reboot.	SettingsWindow		Los cambios tendrán efecto al reiniciar.
+Revert	SettingsWindow		Revertir
+Keep enabled	SettingsWindow		Mantener activada
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Las opciones especificadas en el archivo de ajustes son inválidas. Puede cargar los valores predeterminados o salir.
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tescrito por Axel Dörfler\n\tCopyright 2005, Haiku.\n
 The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		El volumen especificado en el archivo de opciones no se pudo encontrar. Puede usarse el volumen de arranque o salir.
+Current Swap:	SettingsWindow		Intercambio actual:
+Load defaults	SettingsWindow		Cargar predeterminados
+Use boot volume	SettingsWindow		Usar volumen de arranque
+Automatic swap management	SettingsWindow		Administración de intercambio automática
+Defaults	SettingsWindow		Valores predeterminados
+Quit	SettingsWindow		Salir
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Desactivar la memoria virtual tendrá efectos negativos sobre la estabilidad del sistema una vez que se agote la memoria RAM.\nLa memoria virtual no afecta el rendimiento del sistema hasta que no se alcance este punto.\n\n¿Está seguro de querer desactivarla?
 Enable virtual memory	SettingsWindow		Activar memoria virtual

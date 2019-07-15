@@ -1,127 +1,127 @@
 1	indonesian	x-vnd.Haiku-Keymap	1039047705
-Croatian	KeymapNames		Kroasia
-Turkish (Type-Q)	KeymapNames		Turki  (Type-Q)
-Icelandic	KeymapNames		Islandia
-Serbian (Cyrillic)	KeymapNames		Serbia (Cyrillic)
-Shift:	Modifier keys window	Shift key role name	Shift:
-Revert	Modifier keys window		Pulihkan
-Estonian	KeymapNames		Estonia
-Canadian-French	KeymapNames		Kanada-perancis
-Warning: left and right key roles do not match	Modifier keys window		Peringatan: key-role kiri dan kanan tidak cocok
-Romanian	KeymapNames		Rumania
-Scroll lock	Keyboard Layout View		Scroll lock
-Menu	Keyboard Layout View	Menu key	Menu
-Left control	Keyboard Layout View		Tombol kontrol kiri
-Tilde trigger	Keymap window		Pemicu tilde
-Bulgarian (Phonetic)	KeymapNames		Bulgaria (fonetis)
-Hungarian	KeymapNames		Hungaria
-Grave trigger	Keymap window		Pemicu grave
-Brazilian (ABNT2)	KeymapNames		Brazil (ABNT2)
-Polish	KeymapNames		Polandia
-Role	Modifier keys window	As in the role of a modifier key	Peran
-Caps lock	Keyboard Layout View		Caps lock
-Spanish (Dvorak)	KeymapNames		Spanyol (Dvorak)
-Select dead keys	Keymap window		Pilih tombol mati
-Belgian (point)	KeymapNames		Belgia (point)
-Hebrew	KeymapNames		Ibrani
-Russian (Mac)	KeymapNames		Rusia (Mac)
-United-Kingdom	KeymapNames		Inggris Raya
-Swiss-French	KeymapNames		Swiss-perancis
-Cancel	Modifier keys window		Batal
-Danish	KeymapNames		Denmark
-Lithuanian	KeymapNames		Lithuania
-Spanish	KeymapNames		Spanyol
-Command	Keyboard Layout View	Command key	Perintah
-Macedonian	KeymapNames		Makedonia
-Irish	KeymapNames		Irlandia
-French (Mac)	KeymapNames		Perancis (Mac)
-German (Mac)	KeymapNames		Jerman (Mac)
-Defaults	Keymap window		Bawaan
-Ukrainian (Mac)	KeymapNames		Ukraina (Mac)
-Japanese	KeymapNames		Jepang
-Quit	Keymap window		Keluar
-Switch shortcut keys to Haiku mode	Keymap window		Beralih shortcut kunci untuk modus Haiku
-French (Bépo)	KeymapNames		Perancis (Bépo)
-Circumflex trigger	Keymap window		Pemicu sirkomfleks
-Diaeresis trigger	Keymap window		Pemicu diaeresis
-Ukrainian	KeymapNames		Ukraina
-Disabled	Modifier keys window	Do nothing	Dinonaktifkan
-Dvorak (programmer's)	KeymapNames		Dvorak (programmer)
-ISO-9995	KeymapNames		ISO-9995
-Albanian	KeymapNames		Albania
-Open…	Keymap window		Buka…
-Greek	KeymapNames		Yunani
-Error: duplicate keys	Modifier keys window		Kesalahan: terjadi duplikat tuts
-System:	Keymap window		Sistem:
-Lithuanian (Standard)	KeymapNames		Lithuania (Standard)
-Brazilian	KeymapNames		Brazil
-Left command	Keyboard Layout View		Perintah kiri
-Set modifier keys…	Keymap window		Atur tombol pengubah...
-Option:	Modifier keys window	Option key role name	Pilihan:
-Belgian (comma)	KeymapNames		Belgia (koma)
-Control	Keyboard Layout View	Control key	Kontrol
-Left option	Keyboard Layout View		Pilihan kiri
-Faeroese	KeymapNames		Faeroese
-Right control	Keyboard Layout View		Control kanan
-Svorak	KeymapNames		Shorak
-Switch shortcut keys	Keymap window		Tukar tombol pintas
-Russian (Udmurt, Komi, Mari)	KeymapNames		Russia (Udmurt, Komi, Mari)
-German	KeymapNames		Jerman
-Swedish	KeymapNames		Swedia
-Russian	KeymapNames		Russia
-Arabic (102)	KeymapNames		Arabi (102)
-Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tombol shift
-User:	Keymap window		Pengguna:
-Turkish (Type-F)	KeymapNames		Turki (Type-F)
-Italian	KeymapNames		Italia
-Belarusian	KeymapNames		Belarusia
-Right option	Keyboard Layout View		Pilihan kanan
-US-International	KeymapNames		AS-Internasional
-Dvorak	KeymapNames		Dvorak
-Russian (Yawert)	KeymapNames		Russia (Yawert)
-Right shift	Keyboard Layout View		Shift kanan
-Belarusian (Latin)	KeymapNames		Belarusia (Latin)
 Key	Modifier keys window	As in a computer keyboard key	Tombol
-Dutch	KeymapNames		Belanda
-Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Tombol ctrl
-Control:	Modifier keys window	Control key role name	Kontrol:
-Russian (Typewriter)	KeymapNames		Russia (Mesin ketik)
-Slovene	KeymapNames		Slovene
-Remove	Keyboard Layout View		Hapus
-Option	Keyboard Layout View	Option key	Pilihan
-Sample and clipboard:	Keymap window		Sampel dan clipboard:
-Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Tombol Alt/Opt
-Layout	Keymap window		Tata letak
-Serbian (Latin)	KeymapNames		Serbia (Latin)
-Esperanto	KeymapNames		Esperanto
-Switch shortcut keys to Windows/Linux mode	Keymap window		Beralih tombol pintas untuk modus Windows/Linux
-Latin-American	KeymapNames		Amerika Latin
-Right command	Keyboard Layout View		Perintah kanan
-Revert	Keymap window		Pulihkan
-Command:	Modifier keys window	Command key role name	Perintah:
-Polish (Typewriter)	KeymapNames		Polandia (Mesin ketik)
+Japanese	KeymapNames		Jepang
 US	KeymapNames		AS
-Save as…	Keymap window		Simpan sebagai:
-Swiss-German	KeymapNames		Swiss-Jerman
-Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Tombol Win/Cmd
-French	KeymapNames		Perancis
-File	Keymap window		Berkas
-Num lock	Keyboard Layout View		Num lock
-Bulgarian (Cyrillic)	KeymapNames		Bulgaria (Cyrillic)
-(Current)	Keymap window		(Saat ini)
-Kazakh	KeymapNames		Kazakhtan
-Colemak	KeymapNames		Colemak
-Font	Keymap window		Fon
-Belarusian (Mac)	KeymapNames		Belarusia (Mac)
-Keymap	System name		Keymap
-Czech (Mac)	KeymapNames		Ceko (Mac)
-Norwegian	KeymapNames		Norwegia
-Left shift	Keyboard Layout View		Shift kiri
-Czech	KeymapNames		Ceko
-Shift	Keyboard Layout View	Shift key	Shift
-Slovak	KeymapNames		Slovakia
+Brazilian	KeymapNames		Brazil
+Right control	Keyboard Layout View		Control kanan
+Dvorak	KeymapNames		Dvorak
+Option:	Modifier keys window	Option key role name	Pilihan:
+Cancel	Modifier keys window		Batal
+Sample and clipboard:	Keymap window		Sampel dan clipboard:
+Polish	KeymapNames		Polandia
+Latin-American	KeymapNames		Amerika Latin
+Ukrainian	KeymapNames		Ukraina
+United-Kingdom	KeymapNames		Inggris Raya
+Turkish (Type-F)	KeymapNames		Turki (Type-F)
+Serbian (Cyrillic)	KeymapNames		Serbia (Cyrillic)
+Belgian (point)	KeymapNames		Belgia (point)
 Finnish	KeymapNames		Finlandia
+Num lock	Keyboard Layout View		Num lock
+Switch shortcut keys to Windows/Linux mode	Keymap window		Beralih tombol pintas untuk modus Windows/Linux
+Option	Keyboard Layout View	Option key	Pilihan
+Spanish (Dvorak)	KeymapNames		Spanyol (Dvorak)
+Scroll lock	Keyboard Layout View		Scroll lock
+US-International	KeymapNames		AS-Internasional
+Right option	Keyboard Layout View		Pilihan kanan
+Turkish (Type-Q)	KeymapNames		Turki  (Type-Q)
+Revert	Modifier keys window		Pulihkan
+Slovak	KeymapNames		Slovakia
+Colemak	KeymapNames		Colemak
+Dvorak (programmer's)	KeymapNames		Dvorak (programmer)
+German (Mac)	KeymapNames		Jerman (Mac)
+Arabic (102)	KeymapNames		Arabi (102)
+Belarusian (Mac)	KeymapNames		Belarusia (Mac)
+Croatian	KeymapNames		Kroasia
 Set modifier keys	Modifier keys window		Atur tombol pengubah
-Portuguese	KeymapNames		Portugis
-Modifier keys	Modifier keys window		Tombol pengubah
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Tombol Win/Cmd
+Spanish	KeymapNames		Spanyol
+Ukrainian (Mac)	KeymapNames		Ukraina (Mac)
+Command:	Modifier keys window	Command key role name	Perintah:
+French (Bépo)	KeymapNames		Perancis (Bépo)
+Russian (Typewriter)	KeymapNames		Russia (Mesin ketik)
 Acute trigger	Keymap window		Pemicu akut
+Italian	KeymapNames		Italia
+Modifier keys	Modifier keys window		Tombol pengubah
+Kazakh	KeymapNames		Kazakhtan
+Save as…	Keymap window		Simpan sebagai:
+Lithuanian (Standard)	KeymapNames		Lithuania (Standard)
+Error: duplicate keys	Modifier keys window		Kesalahan: terjadi duplikat tuts
+Bulgarian (Phonetic)	KeymapNames		Bulgaria (fonetis)
+Canadian-French	KeymapNames		Kanada-perancis
+Hungarian	KeymapNames		Hungaria
+Control	Keyboard Layout View	Control key	Kontrol
+Irish	KeymapNames		Irlandia
+Remove	Keyboard Layout View		Hapus
+Tilde trigger	Keymap window		Pemicu tilde
+Shift	Keyboard Layout View	Shift key	Shift
+Czech (Mac)	KeymapNames		Ceko (Mac)
+Macedonian	KeymapNames		Makedonia
+Left command	Keyboard Layout View		Perintah kiri
+Albanian	KeymapNames		Albania
+(Current)	Keymap window		(Saat ini)
+Left option	Keyboard Layout View		Pilihan kiri
+Esperanto	KeymapNames		Esperanto
+Belarusian	KeymapNames		Belarusia
+Warning: left and right key roles do not match	Modifier keys window		Peringatan: key-role kiri dan kanan tidak cocok
+Circumflex trigger	Keymap window		Pemicu sirkomfleks
+Caps lock	Keyboard Layout View		Caps lock
+Left shift	Keyboard Layout View		Shift kiri
+Russian (Yawert)	KeymapNames		Russia (Yawert)
+Bulgarian (Cyrillic)	KeymapNames		Bulgaria (Cyrillic)
+Left control	Keyboard Layout View		Tombol kontrol kiri
+Swedish	KeymapNames		Swedia
+Role	Modifier keys window	As in the role of a modifier key	Peran
+German	KeymapNames		Jerman
+Svorak	KeymapNames		Shorak
+Swiss-German	KeymapNames		Swiss-Jerman
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Tombol ctrl
+Czech	KeymapNames		Ceko
+Russian (Udmurt, Komi, Mari)	KeymapNames		Russia (Udmurt, Komi, Mari)
+Control:	Modifier keys window	Control key role name	Kontrol:
+Disabled	Modifier keys window	Do nothing	Dinonaktifkan
+Select dead keys	Keymap window		Pilih tombol mati
+Right shift	Keyboard Layout View		Shift kanan
+Russian (Mac)	KeymapNames		Rusia (Mac)
+Belarusian (Latin)	KeymapNames		Belarusia (Latin)
+Hebrew	KeymapNames		Ibrani
+Layout	Keymap window		Tata letak
+Greek	KeymapNames		Yunani
+Revert	Keymap window		Pulihkan
+Grave trigger	Keymap window		Pemicu grave
+Menu	Keyboard Layout View	Menu key	Menu
+Faeroese	KeymapNames		Faeroese
+Quit	Keymap window		Keluar
+Polish (Typewriter)	KeymapNames		Polandia (Mesin ketik)
+French (Mac)	KeymapNames		Perancis (Mac)
+User:	Keymap window		Pengguna:
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Tombol Alt/Opt
+Estonian	KeymapNames		Estonia
+Serbian (Latin)	KeymapNames		Serbia (Latin)
+French	KeymapNames		Perancis
+Portuguese	KeymapNames		Portugis
+Swiss-French	KeymapNames		Swiss-perancis
+Shift:	Modifier keys window	Shift key role name	Shift:
+Keymap	System name		Keymap
+Slovene	KeymapNames		Slovene
+Lithuanian	KeymapNames		Lithuania
+Set modifier keys…	Keymap window		Atur tombol pengubah...
+Switch shortcut keys to Haiku mode	Keymap window		Beralih shortcut kunci untuk modus Haiku
+Defaults	Keymap window		Bawaan
+ISO-9995	KeymapNames		ISO-9995
+System:	Keymap window		Sistem:
+Switch shortcut keys	Keymap window		Tukar tombol pintas
+Belgian (comma)	KeymapNames		Belgia (koma)
+Right command	Keyboard Layout View		Perintah kanan
+Norwegian	KeymapNames		Norwegia
+Font	Keymap window		Fon
+Danish	KeymapNames		Denmark
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tombol shift
+Russian	KeymapNames		Russia
+Romanian	KeymapNames		Rumania
+Command	Keyboard Layout View	Command key	Perintah
+File	Keymap window		Berkas
+Brazilian (ABNT2)	KeymapNames		Brazil (ABNT2)
+Dutch	KeymapNames		Belanda
+Diaeresis trigger	Keymap window		Pemicu diaeresis
+Icelandic	KeymapNames		Islandia
+Open…	Keymap window		Buka…

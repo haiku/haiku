@@ -1,8 +1,7 @@
-1	dutch; flemish	x-vnd.Haiku-BFSAddOn	1074880496
+1	dutch; flemish	x-vnd.Haiku-BFSAddOn	3514982252
 Enable query support	BFS_Initialize_Parameter		Ondersteuning voor queries inschakelen
-2048 (Recommended)	BFS_Initialize_Parameter		2048 (aanbevolen)
+Name:	BFS_Initialize_Parameter		Naam:
 8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (vooral grote bestanden)
-Disabling query support may speed up certain file system operations, but should only be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		Query-ondersteuning uitschakelen kan bepaalde operaties op het bestandssysteem versnellen, maar dit moet alleen gebruikt worden als je zeker bent dat je geen queries nodig hebt.\nEen volume dat bedoeld is om Haiku mee op te starten moet query-ondersteuning ingeschakeld hebben.
+2048 (Recommended)	BFS_Initialize_Parameter		2048 (aanbevolen)
 1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (vooral kleine bestanden)
 Blocksize:	BFS_Initialize_Parameter		Blokgrootte:
-Name:	BFS_Initialize_Parameter		Naam:

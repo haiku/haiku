@@ -1,6 +1,6 @@
 1	hungarian	x-vnd.Haiku-debug_server	2134779566
-Write core file	DebugServer		Memória-lenyomat (core) készítése
-Terminate	DebugServer		Megszakítás
 Debug	DebugServer		Hibakeresés
-Save report	DebugServer		Jelentés mentése
+Terminate	DebugServer		Megszakítás
 The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		A következő program:\n\n %app\n\nhibába ütközött, és nem tud tovább futni. A Haiku leállítja a programot.
+Save report	DebugServer		Jelentés mentése
+Write core file	DebugServer		Memória-lenyomat (core) készítése

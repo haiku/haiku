@@ -1,19 +1,19 @@
 1	polish	x-vnd.Be-POST	2949558073
+No new messages	MailDaemon		Brak nowych wiadomości
+No new messages	DeskbarView		Brak nowych wiadomości
+Shutdown mail services	DeskbarView		Wyłącz usługi poczty
+Mail status	MailDaemon		Status poczty
 Fetching mail for %name	Notifier		Pobieranie poczty dla konta %name
-Check for mails only	DeskbarView		Sprawdź tylko pocztę
-Send pending mails	DeskbarView		Wyślij oczekującą pocztę
-{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Jedna nowa wiadomość} few{# nowe wiadomości} many{# nowych wiadomości} other{# nowej wiadomości}}
 {0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# nowa wiadomość} few{# nowe wiadomości} many{# nowych wiadomości} other{# nowej wiadomości}}
 {0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# nowa wiadomość} few{# nowe wiadomości} many{# nowych wiadomości} other{# nowej wiadomości}} na koncie %name\n
+Create new message…	DeskbarView		Utwórz nową wiadomość…
+Send pending mails	DeskbarView		Wyślij oczekującą pocztę
+Settings…	DeskbarView		Ustawienia…
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Jedna nowa wiadomość} few{# nowe wiadomości} many{# nowych wiadomości} other{# nowej wiadomości}}
 New Messages	MailDaemon		Nowe wiadomości
 <no accounts>	DeskbarView		<brak kont>
-Mail status	MailDaemon		Status poczty
-Shutdown mail services	DeskbarView		Wyłącz usługi poczty
-Sending mail for %name	Notifier		Wysyłanie poczty z konta %name
-Create new message…	DeskbarView		Utwórz nową wiadomość…
-No new messages	MailDaemon		Brak nowych wiadomości
-Check for mail now	DeskbarView		Sprawdź pocztę teraz
-No new messages	DeskbarView		Brak nowych wiadomości
-Mail daemon status log	MailDaemon		Plik logów serwera poczty
-Settings…	DeskbarView		Ustawienia…
 Mail status	Notifier		Status poczty
+Check for mails only	DeskbarView		Sprawdź tylko pocztę
+Check for mail now	DeskbarView		Sprawdź pocztę teraz
+Sending mail for %name	Notifier		Wysyłanie poczty z konta %name
+Mail daemon status log	MailDaemon		Plik logów serwera poczty

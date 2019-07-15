@@ -1,40 +1,40 @@
 1	catalan; valencian	x-vnd.Haiku-Shortcuts	2129039959
-OK	ShortcutsWindow		D'acord
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Les Dreceres no ha pogut desar el vostre joc de claus.
-Cancel	ShortcutsWindow		Anul·la
-Append KeySet…	ShortcutsWindow		Afegeix un joc de claus...
-Control	ShortcutsSpec	Name for modifier on keyboard	Control
-Key	ShortcutsWindow		Clau
-Open KeySet…	ShortcutsWindow		Obre un joc de claus...
-Revert to saved	ShortcutsWindow		Torna al desat
-*InsertString \"Your Text Here\"	ShortcutsWindow		*Insereix Text \"el vostre text aquí \"
 *MouseUp	ShortcutsWindow		*Ratolí amunt
-(Choose application with file requester)	ShortcutsWindow		(Trieu una aplicació que demani un fitxer)
-*LaunchHandler text/html	ShortcutsWindow		*Gestor de llançament text/html
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Les Dreceres no han pogut obrir el vostre fitxer del joc de claus!
-*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Múltiple \"*Mou el ratolí a 100% 0\" \"*Botó 1 del ratolí\"
-Option	ShortcutsSpec	Name for modifier on keyboard	Opció
-Save	ShortcutsWindow		Desa
-*MouseButton 1	ShortcutsWindow		*Botó 1 del ratolí
-*MoveMouse +20 +0	ShortcutsWindow		*Mou el ratolí +20 +0
-Save changes before closing?	ShortcutsWindow		Voleu desar els canvis abans de tancar?
-Remove selected shortcut	ShortcutsWindow		Suprimeix la drecera seleccionada
-Add new shortcut	ShortcutsWindow		Afegeix una drecera nova
-Save & apply	ShortcutsWindow		Desa i aplica-ho
-*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*Aplicació Envia Missatge/x-vnd.Be-TRAK 'Tfnd'
-Append	ShortcutsWindow		Afegeix
-File	ShortcutsWindow		Fitxer
-Quit	ShortcutsWindow		Surt
-*MouseDown	ShortcutsWindow		*Ratolí a baix
-Don't save	ShortcutsWindow		No ho desis
 Application	ShortcutsWindow		Aplicació
-Shift	ShortcutsSpec	Name for modifier on keyboard	Majúscules
+Option	ShortcutsSpec	Name for modifier on keyboard	Opció
+Save changes before closing?	ShortcutsWindow		Voleu desar els canvis abans de tancar?
+Revert to saved	ShortcutsWindow		Torna al desat
+Don't save	ShortcutsWindow		No ho desis
+*MouseDown	ShortcutsWindow		*Ratolí a baix
 *Beep	ShortcutsWindow		*Timbre
-*MoveMouseTo 50% 50%	ShortcutsWindow		*Mou el ratolí a 50% 50%
-Save KeySet as…	ShortcutsWindow		Anomena i desa el conjunt de claus...
-Open	ShortcutsWindow		Obre
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Les Dreceres no han pogut analitzar el vostre fitxer del conjunt de claus!
-Select	ShortcutsWindow		Seleccioneu
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Les Dreceres no han pogut desar el vostre fitxer del conjunt de claus!
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Les Dreceres no ha pogut desar el vostre joc de claus.
+Save	ShortcutsWindow		Desa
 Oh no	ShortcutsWindow		Oh no!
+Key	ShortcutsWindow		Clau
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*Aplicació Envia Missatge/x-vnd.Be-TRAK 'Tfnd'
+Select	ShortcutsWindow		Seleccioneu
 Shortcuts	System name		Dreceres
+Quit	ShortcutsWindow		Surt
+(Choose application with file requester)	ShortcutsWindow		(Trieu una aplicació que demani un fitxer)
+Cancel	ShortcutsWindow		Anul·la
+*MoveMouse +20 +0	ShortcutsWindow		*Mou el ratolí +20 +0
+Control	ShortcutsSpec	Name for modifier on keyboard	Control
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Les Dreceres no han pogut analitzar el vostre fitxer del conjunt de claus!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Les Dreceres no han pogut desar el vostre fitxer del conjunt de claus!
+*InsertString \"Your Text Here\"	ShortcutsWindow		*Insereix Text \"el vostre text aquí \"
+Remove selected shortcut	ShortcutsWindow		Suprimeix la drecera seleccionada
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Les Dreceres no han pogut obrir el vostre fitxer del joc de claus!
+Save & apply	ShortcutsWindow		Desa i aplica-ho
+Open	ShortcutsWindow		Obre
+Append	ShortcutsWindow		Afegeix
+Save KeySet as…	ShortcutsWindow		Anomena i desa el conjunt de claus...
+Append KeySet…	ShortcutsWindow		Afegeix un joc de claus...
+*MouseButton 1	ShortcutsWindow		*Botó 1 del ratolí
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Múltiple \"*Mou el ratolí a 100% 0\" \"*Botó 1 del ratolí\"
+OK	ShortcutsWindow		D'acord
+Add new shortcut	ShortcutsWindow		Afegeix una drecera nova
+Shift	ShortcutsSpec	Name for modifier on keyboard	Majúscules
+Open KeySet…	ShortcutsWindow		Obre un joc de claus...
+File	ShortcutsWindow		Fitxer
+*LaunchHandler text/html	ShortcutsWindow		*Gestor de llançament text/html
+*MoveMouseTo 50% 50%	ShortcutsWindow		*Mou el ratolí a 50% 50%

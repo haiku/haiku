@@ -1,88 +1,88 @@
 1	lithuanian	x-vnd.Haiku-Bluetooth	3550394259
-Display	DeviceClass		Ekranas
-Capturing	DeviceClass		Informacijos paėmimas
-Printer	DeviceClass		Spausdintuvas
-Uncategorized	DeviceClass		Be kategorijos
-1-17% utilized	DeviceClass		Apkrautas 1–17%
 Positioning	DeviceClass		Padėties nustatymo įrenginys
-Rendering	DeviceClass		Informacijos pateikimas
-Phone	DeviceClass		Telefonas
-17-33% utilized	DeviceClass		Apkrautas 17–33%
-#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Vardas negalimas
-Combo keyboard/pointing device	DeviceClass		Klaviatūra ir manipuliatorius
 Controller	DeviceClass		Valdiklis
-No service available	DeviceClass		Paslaugos neteikiamos
-Wearable	DeviceClass	A wearable computer	Dėvimas
-Handheld	DeviceClass		Rankinis
-Invalid device class!\n	DeviceClass		Negalima įrenginio klasė!\n
-Sensing device	DeviceClass		Jutiklinis įrenginys
-Computer	DeviceClass		Kompiuteris
-Cellular	DeviceClass		Mobilusis telefonas
-Microphone	DeviceClass		Mikrofonas
-Unknown (reserved) minor device class	DeviceClass		Nežinoma (rezervuota) tikslesnioji įrenginio klasė
-Cordless	DeviceClass		Belaidis
 Common ISDN access	DeviceClass		Bendra ISDN prieiga
-83-99% utilized	DeviceClass		Apkrautas 83–99%
-Scanner	DeviceClass		Skeneris
-Game	DeviceClass		Žaidimas
-Gamepad	DeviceClass		Žaidimų pultas
-(reserved)	DeviceClass		(rezervuota)
-Desktop workstation	DeviceClass		Stalinis kompiuteris
-Audio/Video	DeviceClass		Garsas / vaizdas
-Glasses	DeviceClass		Akiniai
+Unknown (reserved) minor device class	DeviceClass		Nežinoma (rezervuota) tikslesnioji įrenginio klasė
+Uncategorized	DeviceClass		Be kategorijos
 Keyboard	DeviceClass		Klaviatūra
-Camera	DeviceClass		Kamera
-Major class: 	DeviceClass		Bendroji klasė:
-50-67% utilized	DeviceClass		Apkrautas 50–67%
-Card reader	DeviceClass		Kortelių skaitytuvas
-Set-top box	DeviceClass		Skaitmeninės televizijos imtuvas
-Helmet	DeviceClass		Šalmas
-Laptop	DeviceClass		Skreitinis kompiuteris
-Car audio	DeviceClass		Automobilinė garso sistema
-SIM card reader	DeviceClass		SIM kortelių skaitytuvas
-Headphones	DeviceClass		Ausinės
-Information	DeviceClass		Informacija
-Remote control	DeviceClass		Nuotolinio valdymo pultelis
-Service classes: 	DeviceClass		Tarnybų klasės: 
-Pager	DeviceClass	A small radio device to receive short text messages	Pranešimų gaviklis
-Object transfer	DeviceClass		Objektų perdavimas
-Gaming/Toy	DeviceClass		Žaidimas / žaislas
-Audio	DeviceClass		Garsas
-Robot	DeviceClass		Robotas
-Camcorder	DeviceClass		Įrašanti vaizdo kamera
-Digitizer tablet	DeviceClass		Planšetė
-Loudspeaker	DeviceClass		Garsiakalbis
-Joystick	DeviceClass		Vairasvirtė
-LAN access	DeviceClass		Prieiga prie vietinio tinklo
-Wrist watch	DeviceClass		Rankinis laikrodis
-Minor class: 	DeviceClass		Tikslesnioji klasė:
-Networking	DeviceClass		Tinklas
-Portable audio	DeviceClass		Ausinukas
-Device conforms to the headset profile	DeviceClass		Įrenginys tenkina ausinių su mikrofonu profilį
-Hands-free	DeviceClass		Laisvų rankų įrenginys
-#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Vardas negalimas
-Vehicle	DeviceClass		Automobilis
-Palm	DeviceClass	A palm-held device	Delninukas
-Video display and loudspeaker	DeviceClass		Vaizduoklis su garsiakalbiu
-Peripheral	DeviceClass		Periferinis įrenginys
-#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Vardas negalimas
-Wired modem or voice gateway	DeviceClass		Laidinis modemas arba balso šliuzas
-Jacket	DeviceClass		Striukė
-Unspecified	DeviceClass		Nenurodyta
-Fully available	DeviceClass		Neapkrautas
-67-83% utilized	DeviceClass		Apkrautas 67–83%
-Not implemented	RemoteDevice		Nerealizuota
-#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Vardas negalimas
-Server	DeviceClass		Serveris
-Video conferencing	DeviceClass		Vaizdo konferencijų įrenginys
-Video camera	DeviceClass		Vaizdo kamera
-HiFi audio device	DeviceClass		Aukštos kokybės garso įrenginys
 Smart phone	DeviceClass		Išmanusis telefonas
-Telephony	DeviceClass		Telefonija
-Doll/Action figure	DeviceClass		Lėlė arba figūrėlė
 VCR	DeviceClass		Vaizdo magnetofonas
-Video monitor	DeviceClass		Vaizdo monitorius
-Pointing device	DeviceClass		Manipuliatorius
-Miscellaneous	DeviceClass		Įvairūs
-33-50% utilized	DeviceClass		Apkrova 33–50%
+Cellular	DeviceClass		Mobilusis telefonas
+Audio	DeviceClass		Garsas
+Audio/Video	DeviceClass		Garsas / vaizdas
+Car audio	DeviceClass		Automobilinė garso sistema
+Major class: 	DeviceClass		Bendroji klasė:
+HiFi audio device	DeviceClass		Aukštos kokybės garso įrenginys
+Microphone	DeviceClass		Mikrofonas
+Capturing	DeviceClass		Informacijos paėmimas
+Jacket	DeviceClass		Striukė
+50-67% utilized	DeviceClass		Apkrautas 50–67%
+Headphones	DeviceClass		Ausinės
 Imaging	DeviceClass		Vaizdinė informacija
+Device conforms to the headset profile	DeviceClass		Įrenginys tenkina ausinių su mikrofonu profilį
+Remote control	DeviceClass		Nuotolinio valdymo pultelis
+Fully available	DeviceClass		Neapkrautas
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Vardas negalimas
+Server	DeviceClass		Serveris
+No service available	DeviceClass		Paslaugos neteikiamos
+Printer	DeviceClass		Spausdintuvas
+Card reader	DeviceClass		Kortelių skaitytuvas
+Wired modem or voice gateway	DeviceClass		Laidinis modemas arba balso šliuzas
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Vardas negalimas
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Vardas negalimas
+Camcorder	DeviceClass		Įrašanti vaizdo kamera
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Vardas negalimas
+17-33% utilized	DeviceClass		Apkrautas 17–33%
+Desktop workstation	DeviceClass		Stalinis kompiuteris
+Unspecified	DeviceClass		Nenurodyta
+Miscellaneous	DeviceClass		Įvairūs
+Robot	DeviceClass		Robotas
+Vehicle	DeviceClass		Automobilis
+LAN access	DeviceClass		Prieiga prie vietinio tinklo
+Glasses	DeviceClass		Akiniai
+Phone	DeviceClass		Telefonas
+Laptop	DeviceClass		Skreitinis kompiuteris
+67-83% utilized	DeviceClass		Apkrautas 67–83%
+Cordless	DeviceClass		Belaidis
+Invalid device class!\n	DeviceClass		Negalima įrenginio klasė!\n
+Minor class: 	DeviceClass		Tikslesnioji klasė:
+Doll/Action figure	DeviceClass		Lėlė arba figūrėlė
+Not implemented	RemoteDevice		Nerealizuota
+33-50% utilized	DeviceClass		Apkrova 33–50%
+Gaming/Toy	DeviceClass		Žaidimas / žaislas
+Video camera	DeviceClass		Vaizdo kamera
+Handheld	DeviceClass		Rankinis
+Service classes: 	DeviceClass		Tarnybų klasės: 
+Loudspeaker	DeviceClass		Garsiakalbis
+83-99% utilized	DeviceClass		Apkrautas 83–99%
+SIM card reader	DeviceClass		SIM kortelių skaitytuvas
+Computer	DeviceClass		Kompiuteris
+Scanner	DeviceClass		Skeneris
+Wearable	DeviceClass	A wearable computer	Dėvimas
+Display	DeviceClass		Ekranas
+Gamepad	DeviceClass		Žaidimų pultas
+Video monitor	DeviceClass		Vaizdo monitorius
+Palm	DeviceClass	A palm-held device	Delninukas
+Joystick	DeviceClass		Vairasvirtė
+Networking	DeviceClass		Tinklas
+Telephony	DeviceClass		Telefonija
+Game	DeviceClass		Žaidimas
+Video display and loudspeaker	DeviceClass		Vaizduoklis su garsiakalbiu
+Wrist watch	DeviceClass		Rankinis laikrodis
+Sensing device	DeviceClass		Jutiklinis įrenginys
+Pointing device	DeviceClass		Manipuliatorius
+(reserved)	DeviceClass		(rezervuota)
+Rendering	DeviceClass		Informacijos pateikimas
+Information	DeviceClass		Informacija
+Helmet	DeviceClass		Šalmas
+Pager	DeviceClass	A small radio device to receive short text messages	Pranešimų gaviklis
+Hands-free	DeviceClass		Laisvų rankų įrenginys
+Digitizer tablet	DeviceClass		Planšetė
+Portable audio	DeviceClass		Ausinukas
+Camera	DeviceClass		Kamera
+1-17% utilized	DeviceClass		Apkrautas 1–17%
+Combo keyboard/pointing device	DeviceClass		Klaviatūra ir manipuliatorius
+Video conferencing	DeviceClass		Vaizdo konferencijų įrenginys
+Peripheral	DeviceClass		Periferinis įrenginys
+Object transfer	DeviceClass		Objektų perdavimas
+Set-top box	DeviceClass		Skaitmeninės televizijos imtuvas

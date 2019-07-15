@@ -1,48 +1,47 @@
-1	dutch; flemish	x-vnd.Haiku-Pulse	2324471783
-OK	PrefsWindow		Oké
-Quit	DeskbarPulseView		Afsluiten
-Mini mode	DeskbarPulseView		Minimodus
-Remove replicant	CPUButton		Replicant verwijderen
-Active color	ConfigView		Actief-kleur
-Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Gebruik: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
-Fade colors	ConfigView		Kleuren vervagen
-%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nDoor David Ramsey en Arve Hjønnevåg\nHerzien door Daniel Switkin\n
-OK	DeskbarPulseView		Oké
-Deskbar mode	PrefsWindow		Deskbarmodus
-%.2f GHz	NormalPulseView		%.2f GHz
-Normal mode	PrefsWindow		Normale modus
-Defaults	PrefsWindow		Standaardinstellingen
-Normal mode	MiniPulseView		Normale modus
-Error	PulseApp		Fout
-Info	PulseView		Info
-Deskbar	CPUButton		Deskbar
-Frame color	ConfigView		Kaderkleur
-Mini mode	PrefsWindow		Minimodus
-OK	PulseApp		Oké
-Bar colors	ConfigView		Werkbalk-kleuren
-Settings…	PulseView		Instellingen...
-You can't disable the last active CPU.	PulseView		U kunt de laatste actieve CPU niet uitschakelen.
-Info	PulseApp		Info
-Info	CPUButton		Info
-OK	PulseView		Oké
-Deskbar menu	CPUButton		Deskbarmenu
-About Pulse…	PulseView		Over Pulse...
-Deskbar mode	MiniPulseView		Deskbarmodus
-Quit	MiniPulseView		Afsluiten
-Pulse	System name		Pulse
-Pulse	NormalPulseView		Pulse
-%ld MHz	NormalPulseView		%ld MHz
-Deskbar mode	NormalPulseView		Deskbar-modus
-Pulse	PulseApp		Pulse
-Width of icon:	ConfigView		Icoonbreedte:
-You can't disable the last active CPU.	CPUButton		U kunt de laatste actieve CPU niet uitschakelen.
+1	dutch; flemish	x-vnd.Haiku-Pulse	3788463253
 Normal mode	DeskbarPulseView		Standaardmodus
-OK	CPUButton		Oké
-About Pulse…	CPUButton		Over Pulse...
-Removing from Deskbar failed.\n%s	DeskbarPulseView		Het verwijderen van Deskbar is mislukt.\n%s
-Mini mode	NormalPulseView		Minimodus
+Info	CPUButton		Info
+Quit	DeskbarPulseView		Afsluiten
 Info	DeskbarPulseView		Info
-Pulse settings	PulseWindow		Pulse-instellingen
-Idle color	ConfigView		Inactief-kleur
-Installing in Deskbar failed\n%s	PulseApp		Het installeren in Deskbar is mislukt\n%s
+Normal mode	MiniPulseView		Normale modus
+Frame color	ConfigView		Kaderkleur
+Error	PulseApp		Fout
+Bar colors	ConfigView		Werkbalk-kleuren
+%.2f GHz	NormalPulseView		%.2f GHz
+Defaults	PrefsWindow		Standaardinstellingen
+%ld MHz	NormalPulseView		%ld MHz
+Mini mode	PrefsWindow		Minimodus
 CPU progress bar	NormalPulseView		CPU-voortgangsbalk
+Fade colors	ConfigView		Kleuren vervagen
+About Pulse…	PulseView		Over Pulse...
+Pulse	NormalPulseView		Pulse
+Deskbar mode	NormalPulseView		Deskbar-modus
+Remove replicant	CPUButton		Replicant verwijderen
+You can't disable the last active CPU.	PulseView		U kunt de laatste actieve CPU niet uitschakelen.
+Width of icon:	ConfigView		Icoonbreedte:
+Deskbar mode	MiniPulseView		Deskbarmodus
+OK	PulseView		Oké
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nDoor David Ramsey en Arve Hjønnevåg\nHerzien door Daniel Switkin\n
+OK	PrefsWindow		Oké
+Pulse	PulseApp		Pulse
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Het verwijderen van Deskbar is mislukt.\n%s
+OK	PulseApp		Oké
+About Pulse…	CPUButton		Over Pulse...
+Deskbar mode	PrefsWindow		Deskbarmodus
+Mini mode	DeskbarPulseView		Minimodus
+You can't disable the last active CPU.	CPUButton		U kunt de laatste actieve CPU niet uitschakelen.
+OK	CPUButton		Oké
+Deskbar	CPUButton		Deskbar
+Settings…	PulseView		Instellingen...
+Deskbar menu	CPUButton		Deskbarmenu
+Mini mode	NormalPulseView		Minimodus
+Quit	MiniPulseView		Afsluiten
+Info	PulseView		Info
+OK	DeskbarPulseView		Oké
+Info	PulseApp		Info
+Pulse	System name		Pulse
+Active color	ConfigView		Actief-kleur
+Installing in Deskbar failed\n%s	PulseApp		Het installeren in Deskbar is mislukt\n%s
+Idle color	ConfigView		Inactief-kleur
+Normal mode	PrefsWindow		Normale modus
+Pulse settings	PulseWindow		Pulse-instellingen

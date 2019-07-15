@@ -1,48 +1,47 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Pulse	2324471783
-OK	PrefsWindow		Εντάξει
-Quit	DeskbarPulseView		Έξοδος
-Mini mode	DeskbarPulseView		Μίνι λειτουργία
-Remove replicant	CPUButton		Διαγραφή αντίγραφου
-Active color	ConfigView		Ενεργό χρώμα
-Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Χρήση: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
-Fade colors	ConfigView		Αχνά χρώματα
-%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nΑπό τους David Ramsey και Arve Hjønnevåg\nΑναθεωρήθηκε από τον Daniel Switkin\n
-OK	DeskbarPulseView		Εντάξει
-Deskbar mode	PrefsWindow		Λειτουργία Deskbar
-%.2f GHz	NormalPulseView		%.2f GHz
-Normal mode	PrefsWindow		Κανονική λειτουργία
-Defaults	PrefsWindow		Προεπιλογές
-Normal mode	MiniPulseView		Κανονική λειτουργία
-Error	PulseApp		Σφάλμα
-Info	PulseView		Πληροφορίες
-Deskbar	CPUButton		Μπάρα εργασιών
-Frame color	ConfigView		Χρώμα πλαισίου
-Mini mode	PrefsWindow		Μίνι λειτουργία
-OK	PulseApp		Εντάξει
-Bar colors	ConfigView		Χρώματα μπάρας
-Settings…	PulseView		Ρυθμίσεις...
-You can't disable the last active CPU.	PulseView		Δεν μπορείτε να απενεργοποιήσετε τον τελευταίο ενεργό Επεξεργαστή.
-Info	PulseApp		Πληροφορίες
-Info	CPUButton		Πληροφορίες
-OK	PulseView		Εντάξει
-Deskbar menu	CPUButton		Μενού μπάρας εργασιών
-About Pulse…	PulseView		Περί Παλμός...
-Deskbar mode	MiniPulseView		Λειτουργία Deskbar
-Quit	MiniPulseView		Έξοδος
-Pulse	System name		Παλμός
-Pulse	NormalPulseView		Παλμός
-%ld MHz	NormalPulseView		%ld MHz
-Deskbar mode	NormalPulseView		Λειτουργία Deskbar
-Pulse	PulseApp		Παλμός
-Width of icon:	ConfigView		Πλάτος εικονιδίου:
-You can't disable the last active CPU.	CPUButton		Δεν μπορείτε να απενεργοποιήσετε τον τελευταίο ενεργό Επεξεργαστή.
+1	greek, modern (1453-)	x-vnd.Haiku-Pulse	3788463253
 Normal mode	DeskbarPulseView		Κανονική λειτουργία
-OK	CPUButton		Εντάξει
-About Pulse…	CPUButton		Περί Παλμός...
-Removing from Deskbar failed.\n%s	DeskbarPulseView		Η κατάργηση από τη Deskbar απέτυχε.\n%s
-Mini mode	NormalPulseView		Μίνι λειτουργία
+Info	CPUButton		Πληροφορίες
+Quit	DeskbarPulseView		Έξοδος
 Info	DeskbarPulseView		Πληροφορίες
-Pulse settings	PulseWindow		Παλμός ρυθμίσεις
-Idle color	ConfigView		Χρώμα αδράνειας
-Installing in Deskbar failed\n%s	PulseApp		Η εγκατάσταση στη Deskbar απέτυχε\n%s
+Normal mode	MiniPulseView		Κανονική λειτουργία
+Frame color	ConfigView		Χρώμα πλαισίου
+Error	PulseApp		Σφάλμα
+Bar colors	ConfigView		Χρώματα μπάρας
+%.2f GHz	NormalPulseView		%.2f GHz
+Defaults	PrefsWindow		Προεπιλογές
+%ld MHz	NormalPulseView		%ld MHz
+Mini mode	PrefsWindow		Μίνι λειτουργία
 CPU progress bar	NormalPulseView		Μπάρα προόδου Επεξεργαστή
+Fade colors	ConfigView		Αχνά χρώματα
+About Pulse…	PulseView		Περί Παλμός...
+Pulse	NormalPulseView		Παλμός
+Deskbar mode	NormalPulseView		Λειτουργία Deskbar
+Remove replicant	CPUButton		Διαγραφή αντίγραφου
+You can't disable the last active CPU.	PulseView		Δεν μπορείτε να απενεργοποιήσετε τον τελευταίο ενεργό Επεξεργαστή.
+Width of icon:	ConfigView		Πλάτος εικονιδίου:
+Deskbar mode	MiniPulseView		Λειτουργία Deskbar
+OK	PulseView		Εντάξει
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nΑπό τους David Ramsey και Arve Hjønnevåg\nΑναθεωρήθηκε από τον Daniel Switkin\n
+OK	PrefsWindow		Εντάξει
+Pulse	PulseApp		Παλμός
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Η κατάργηση από τη Deskbar απέτυχε.\n%s
+OK	PulseApp		Εντάξει
+About Pulse…	CPUButton		Περί Παλμός...
+Deskbar mode	PrefsWindow		Λειτουργία Deskbar
+Mini mode	DeskbarPulseView		Μίνι λειτουργία
+You can't disable the last active CPU.	CPUButton		Δεν μπορείτε να απενεργοποιήσετε τον τελευταίο ενεργό Επεξεργαστή.
+OK	CPUButton		Εντάξει
+Deskbar	CPUButton		Μπάρα εργασιών
+Settings…	PulseView		Ρυθμίσεις...
+Deskbar menu	CPUButton		Μενού μπάρας εργασιών
+Mini mode	NormalPulseView		Μίνι λειτουργία
+Quit	MiniPulseView		Έξοδος
+Info	PulseView		Πληροφορίες
+OK	DeskbarPulseView		Εντάξει
+Info	PulseApp		Πληροφορίες
+Pulse	System name		Παλμός
+Active color	ConfigView		Ενεργό χρώμα
+Installing in Deskbar failed\n%s	PulseApp		Η εγκατάσταση στη Deskbar απέτυχε\n%s
+Idle color	ConfigView		Χρώμα αδράνειας
+Normal mode	PrefsWindow		Κανονική λειτουργία
+Pulse settings	PulseWindow		Παλμός ρυθμίσεις

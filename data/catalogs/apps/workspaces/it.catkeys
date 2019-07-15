@@ -1,13 +1,13 @@
 1	italian	x-vnd.Be-WORK	3927737357
-Invalid argument: %s\n	Workspaces		Argomento non valido: %s\n
 Quit	Workspaces		Esci
-Workspaces	System name		Spazi di lavoro
+Invalid argument: %s\n	Workspaces		Argomento non valido: %s\n
 Change workspace count…	Workspaces		Modifica il numero di workspace…
-Remove replicant	Workspaces		Rimuovi replicante
-Show window border	Workspaces		Mostra i bordi della finestra
-Auto-raise	Workspaces		Automaticamente in primo piano
 Always on top	Workspaces		Sempre in primo piano
-Switch on mouse wheel	Workspaces		Cambia con la rotellina del mouse
-Live in the Deskbar	Workspaces		Visualizza nel Deskbar
+Show window border	Workspaces		Mostra i bordi della finestra
 Show window tab	Workspaces		Mostra l'etichetta della finestra
+Auto-raise	Workspaces		Automaticamente in primo piano
+Remove replicant	Workspaces		Rimuovi replicante
+Live in the Deskbar	Workspaces		Visualizza nel Deskbar
 Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Uso: %s [opzioni] [workspace]\ndove le \"opzioni\" possono essere:\n  --notitle\t\trimuovi barra del titolo e mantieni bordi e ridimensionamento\n  --noborder\t\trimuovi barra del titolo, bordi e ridimensionamento\n  --avoidfocus\t\tl'uso della tastiera non causa lo spostamento del focus sulla finestra\n  --alwaysontop\t\tmantiene la finestra sempre visibile\n  --notmovable\t\tla finestra non può essere spostata\n  --autoraise\t\tattiva automaticamente la finestra quando si trova ai bordi dello schermo\n  --help\t\tmostra questo help ed esci\ne \"workspace\" è il numero dei workspace da creare (da 0 a 31)\n
+Switch on mouse wheel	Workspaces		Cambia con la rotellina del mouse
+Workspaces	System name		Spazi di lavoro

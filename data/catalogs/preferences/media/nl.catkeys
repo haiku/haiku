@@ -1,23 +1,23 @@
 1	dutch; flemish	x-vnd.Haiku-Media	3383826947
-Couldn't add volume control in Deskbar: %s\n	Media views		De volumebesturing kon niet aan Deskbar worden toegevoegd: %s\n
-Video input:	Media views		Video-invoer:
-Warning!	Media Window		Waarschuwing!
-Quit anyway	Media Window		Toch afsluiten
-Defaults	Media views		Standaardwaarden
-MIDI Settings	Media Window		MIDI-instellingen
+Audio mixer	Media Window		Audiomixer
+Show volume control on Deskbar	Media views		Toon volumebediening in Deskbar
 Quit	Media Window		Afsluiten
-Video settings	Media Window		Video-instellingen
-Video output:	Media views		Video-output:
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Kon geen verbinding met mediaserver maken.\nWilt u hem starten?
 Restart media services	Media views		Mediaservices herstarten
+Couldn't add volume control in Deskbar: %s\n	Media views		De volumebesturing kon niet aan Deskbar worden toegevoegd: %s\n
+Start media server	Media Window		Mediaserver starten
+Audio settings	Media Window		Audio-instellingen
+Quit anyway	Media Window		Toch afsluiten
 Couldn't remove volume control in Deskbar: %s\n	Media views		De volumebesturing kon niet van de Deskbar verwijderd worden: %s\n
 Media	System name		Media
-Audio mixer	Media Window		Audiomixer
-This hardware has no controls.	Media Window		Deze hardware heeft geen bedieningselementen.
+Warning!	Media Window		Waarschuwing!
+MIDI Settings	Media Window		MIDI-instellingen
+Video output:	Media views		Video-output:
 Audio output:	Media views		Audio-output:
-Audio settings	Media Window		Audio-instellingen
-Start media server	Media Window		Mediaserver starten
-<none>	Media views		<geen>
-Channel:	Media views		Kanaal:
-Show volume control on Deskbar	Media views		Toon volumebediening in Deskbar
+Video input:	Media views		Video-invoer:
 Audio input:	Media views		Audio-input:
+<none>	Media views		<geen>
+This hardware has no controls.	Media Window		Deze hardware heeft geen bedieningselementen.
+Channel:	Media views		Kanaal:
+Defaults	Media views		Standaardwaarden
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Kon geen verbinding met mediaserver maken.\nWilt u hem starten?
+Video settings	Media Window		Video-instellingen

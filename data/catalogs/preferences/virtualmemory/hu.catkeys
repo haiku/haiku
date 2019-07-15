@@ -1,20 +1,20 @@
 1	hungarian	x-vnd.Haiku-VirtualMemory	2090796060
-Quit	SettingsWindow		Kilépés
-Automatic swap management	SettingsWindow		Automatikus memória-kezelés
-Turn off	SettingsWindow		Kikapcsol
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		A virtuális memória kikapcsolása egyes esetekkor nem kívánt hatással lehet a rendszer stabilitására.\nAmíg a rendszermemória el nem fogy, addig a virtuális memória használatára nincs szükség.\n\nBiztosan ki szeretné kapcsolni ezt a funkciót?
 Requested swap file size:	SettingsWindow		Az igényelt fájl mérete:
-The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		A beállítások fájlban lévő adatok érvénytelenek. Betöltheti az eredeti beállításokat, vagy kiléphet.
-Defaults	SettingsWindow		Eredeti
-Current Swap:	SettingsWindow		Jelenlegi fájl:
-Use volume:	SettingsWindow		Lemez:
-Keep enabled	SettingsWindow		Tartsa bekapcsolva
-Revert	SettingsWindow		Visszaállít
 VirtualMemory	System name		Virtuális memória
-Use boot volume	SettingsWindow		Használja a rendszer lemezt
-Load defaults	SettingsWindow		Eredeti beállítások betöltése
 OK	VirtualMemoryApp		Rendben
+Use volume:	SettingsWindow		Lemez:
+Turn off	SettingsWindow		Kikapcsol
 Changes will take effect upon reboot.	SettingsWindow		A változtatások csak újraindítás után válnak érvényessé!
+Revert	SettingsWindow		Visszaállít
+Keep enabled	SettingsWindow		Tartsa bekapcsolva
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		A beállítások fájlban lévő adatok érvénytelenek. Betöltheti az eredeti beállításokat, vagy kiléphet.
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Virtuális memória\n\tÍrta Axel Dörfler\n\tCopyright 2005, Haiku.\n
 The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		A beállítások fájlban megadott lemez nem található. Használhatja a rendszer lemezt, vagy kiléphet.
+Current Swap:	SettingsWindow		Jelenlegi fájl:
+Load defaults	SettingsWindow		Eredeti beállítások betöltése
+Use boot volume	SettingsWindow		Használja a rendszer lemezt
+Automatic swap management	SettingsWindow		Automatikus memória-kezelés
+Defaults	SettingsWindow		Eredeti
+Quit	SettingsWindow		Kilépés
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		A virtuális memória kikapcsolása egyes esetekkor nem kívánt hatással lehet a rendszer stabilitására.\nAmíg a rendszermemória el nem fogy, addig a virtuális memória használatára nincs szükség.\n\nBiztosan ki szeretné kapcsolni ezt a funkciót?
 Enable virtual memory	SettingsWindow		Virtuális memória engedélyezése

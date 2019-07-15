@@ -1,27 +1,27 @@
 1	polish	x-vnd.Haiku.TV	1995288111
-TV	MainWin		Telewizja
-Channel	MainWin		Kanał
-Settings…	MainWin		Ustawienia…
-Interface	MainWin		Interfejs
-Keep aspect ratio	MainWin		Zachowaj proporcje
-Previous channel	MainWin		Poprzedni kanał
-Settings	MainWin		Ustawienia
-TV	System name		TV
+No menu	MainWin		Bez menu
 No border	MainWin		Bez ramki
-Always on top	MainWin		Zawsze na wierzchu
-OK	MainWin		OK
-Quit	MainWin		Zakończ
+force 704 x 576, display aspect 4:3	MainWin		wymuś 704 x 576, proporcje 4:3
+Error, connecting to interface failed:\n\n	MainWin		Błąd, nie można podłączyć interfejsu:\n\n
+force 544 x 576, display aspect 4:3	MainWin		wymuś 544 x 576, proporcje 4:3
 Full screen	MainWin		Pełny ekran
-Debug	MainWin		Debuguj
 Scale to native size	MainWin		Zeskaluj do oryginalnego rozmiaru
 unknown	MainWin		nieznany
 Next channel	MainWin		Następny kanał
-Error, interface is busy:\n\n	MainWin		Błąd, interfejs zajęty:\n\n
-None	MainWin		Puste
-force 704 x 576, display aspect 4:3	MainWin		wymuś 704 x 576, proporcje 4:3
+Keep aspect ratio	MainWin		Zachowaj proporcje
 DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
-force 544 x 576, display aspect 4:3	MainWin		wymuś 544 x 576, proporcje 4:3
-pixel aspect ratio	MainWin		proporcje pikseli
-No menu	MainWin		Bez menu
-Error, connecting to interface failed:\n\n	MainWin		Błąd, nie można podłączyć interfejsu:\n\n
+Always on top	MainWin		Zawsze na wierzchu
+Debug	MainWin		Debuguj
+Interface	MainWin		Interfejs
 force 720 x 576, display aspect 4:3	MainWin		wymuś 720 x 576, proporcje 4:3
+Quit	MainWin		Zakończ
+Channel	MainWin		Kanał
+Previous channel	MainWin		Poprzedni kanał
+OK	MainWin		OK
+TV	MainWin		Telewizja
+Settings	MainWin		Ustawienia
+TV	System name		TV
+Settings…	MainWin		Ustawienia…
+None	MainWin		Puste
+Error, interface is busy:\n\n	MainWin		Błąd, interfejs zajęty:\n\n
+pixel aspect ratio	MainWin		proporcje pikseli

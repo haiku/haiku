@@ -1,38 +1,37 @@
-1	indonesian	x-vnd.Haiku.TextSearch	3622532554
-%s: Not enough room to escape the filename.	Grepper		%s: Tidak cukup ruang untuk lepas dari nama file.
-Trim to selection	GrepWindow		Pangkas ke seleksi
-Failed to open errors pipe!	Grepper		Gagal membuka pipa galat!
-Follow symbolic links	GrepWindow		Ikuti tautan simbolik
-Close	GrepWindow		Tutup
-Cancel	GrepWindow		Batal
-The unselected files will be removed from the list.	GrepWindow		File yang tidak dipilih akan dihapus dari daftar.
-Regular expression	GrepWindow		Regular expression
-Set target…	GrepWindow		Tentukan target…
-Failed to open output pipe!	Grepper		Gagal membuka pipa keluaran!
+1	indonesian	x-vnd.Haiku.TextSearch	2123129416
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Silakan pilih file yang ingin Anda pilih untuk Anda di Tracker.
-Open files in Pe	GrepWindow		Buka file di Pe
 %appname% : %path%	GrepWindow		%appname% : %path%
-Copy text to clipboard	GrepWindow		Salin teks ke papan klip
-Settings	GrepWindow		Pengaturan
-Select all	GrepWindow		Pilih Semua
-OK	GrepWindow		Oke
-Skip folders starting with a dot	GrepWindow		Lewati folder yang dimulai dengan titik
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME tidak bisa membuka satu atau lebih folder.
-Search	GrepWindow		Pencarian
-Open selection	GrepWindow		Buka seleksi
-Look in sub-folders	GrepWindow		Lihat di sub-folder
-Actions	GrepWindow		Tindakan
-File	GrepWindow		Berkas
-Encoding	GrepWindow		Penyandian
-History	GrepWindow		Sejarah
 Failed to start xargs program!	Grepper		Gagal memulai program xargs!
+Open selection	GrepWindow		Buka seleksi
+Actions	GrepWindow		Tindakan
 New window	GrepWindow		Jendela baru
-Failed to open input pipe!	Grepper		Gagal membuka pipa masukan!
-Please select the files you wish to keep searching.	GrepWindow		Silakan pilih file yang ingin Anda cari.
-TextSearch	GrepWindow		TextSearch
+Encoding	GrepWindow		Penyandian
+OK	GrepWindow		Oke
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Close	GrepWindow		Tutup
+Look in sub-folders	GrepWindow		Lihat di sub-folder
+%s: Not enough room to escape the filename.	Grepper		%s: Tidak cukup ruang untuk lepas dari nama file.
+Follow symbolic links	GrepWindow		Ikuti tautan simbolik
+Regular expression	GrepWindow		Regular expression
+Text files only	GrepWindow		Hanya file teks
 Quit	GrepWindow		Berhenti
 Show files in Tracker	GrepWindow		Tampilkan file di Tracker
-Case-sensitive	GrepWindow		sensitif besar-kecil
-Text files only	GrepWindow		Hanya file teks
+Please select the files you wish to keep searching.	GrepWindow		Silakan pilih file yang ingin Anda cari.
+Trim to selection	GrepWindow		Pangkas ke seleksi
+Set target…	GrepWindow		Tentukan target…
+TextSearch	GrepWindow		TextSearch
+Failed to open input pipe!	Grepper		Gagal membuka pipa masukan!
+Search	GrepWindow		Pencarian
+Copy text to clipboard	GrepWindow		Salin teks ke papan klip
 Show lines	GrepWindow		Tampilkan garis
-%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Failed to open errors pipe!	Grepper		Gagal membuka pipa galat!
+The unselected files will be removed from the list.	GrepWindow		File yang tidak dipilih akan dihapus dari daftar.
+Skip folders starting with a dot	GrepWindow		Lewati folder yang dimulai dengan titik
+Failed to open output pipe!	Grepper		Gagal membuka pipa keluaran!
+Cancel	GrepWindow		Batal
+History	GrepWindow		Sejarah
+File	GrepWindow		Berkas
+Case-sensitive	GrepWindow		sensitif besar-kecil
+Select all	GrepWindow		Pilih Semua
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME tidak bisa membuka satu atau lebih folder.
+Settings	GrepWindow		Pengaturan

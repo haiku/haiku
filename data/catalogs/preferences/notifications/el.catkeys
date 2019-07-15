@@ -1,13 +1,13 @@
 1	greek, modern (1453-)	x-vnd.Haiku-Notifications	213548865
-Revert	PrefletWin		Επαναφορά
-Enable notifications	GeneralView		Ενεργοποίηση κοινοποιήσεων
 Window width:	GeneralView		Πλάτος παράθυρου:
 OK	PrefletWin		Εντάξει
-OK	NotificationView		Εντάξει
 Notifications	PrefletWin		Κοινοποιήσεις
-General	PrefletView		Γενικά
-Allowed	NotificationView		Επιτρεπτό
-Notifications	System name		Notifications
+Revert	PrefletWin		Επαναφορά
 Applications	PrefletView		Εφαρμογές
-Application	NotificationView		Εφαρμογή
 Applications	NotificationView		Εφαρμογές
+General	PrefletView		Γενικά
+OK	NotificationView		Εντάξει
+Notifications	System name		Notifications
+Allowed	NotificationView		Επιτρεπτό
+Application	NotificationView		Εφαρμογή
+Enable notifications	GeneralView		Ενεργοποίηση κοινοποιήσεων

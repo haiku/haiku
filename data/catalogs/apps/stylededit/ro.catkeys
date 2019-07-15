@@ -1,88 +1,88 @@
 1	romanian	x-vnd.Haiku-StyledEdit	727465241
-StyledEdit	System name		EditorText
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Acest fișier este marcat ca protejat la scriere. Salvați modificările la documentul \"%s\"? 
-Paste	Menus		Lipește
-OK	LoadAlert		OK
-File	Menus		Fișier
-???	LoadAlert		???
-Modified	StatusView		Modificat
-Lines:	Statistics		Linii:
-Italic	Menus		Cursiv
-Left	Menus		Stânga
-Search backwards	FindandReplaceWindow		Caută înapoi
-Unlock file	StatusView		Deblocare fișier
-Size	Menus		Dimensiune
-Save	QuitAlert		Salvează
-Page setup…	Menus		Configurări pagină…
-Print…	Menus		Tipărește…
-Can't undo	Menus		Nu se poate reface
-Save	Menus		Salvează
-Default	Menus		Implicit
-Replace with:	FindandReplaceWindow		Înlocuiește cu:
-Cancel	SaveAlert		Anulează
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nu se poate reveni, nu s-a găsit fișierul: \"%s\".
-Case-sensitive	FindandReplaceWindow		Sensibil la majuscule
-Reload	NodeMonitorAlerts		Reîncărcare
-Replace in all windows	FindandReplaceWindow		Înlocuiește în toate ferestrele
-Wrap lines	Menus		Încadrează linii
-Quit	Menus		Închidere
-File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Fișierul \"%file%\" a fost eliminat de altă aplicație, îl recuperați?
 Document statistics	Statistics		Statistici document
-Cancel	RevertToSavedAlert		Anulează
-Autodetect	Menus		Detectează automat
-Document	Menus		Document
-Save changes to the document \"%s\"? 	QuitAlert		Se salvează modificările la documentul \"%s\"? 
-Edit	Menus		Editează
-Revert	RevertToSavedAlert		Revenire
-Font	Menus		Font
-Replace all	FindandReplaceWindow		Înlocuiește tot
-Statistics…	Menus		Statistici…
-Default	Open_and_SaveAsPanel		Implicit
-Replace next	Menus		Înlocuiește următorul
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" are caractere nesalvate.\nReveniți la ultima versiune salvată? 
-Cancel	FindandReplaceWindow		Anulează
-Text encoding	Menus		Codare text
-Close	Menus		Închide
-Save	SaveAlert		Salvează
-Words:	Statistics		Cuvinte:
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Eroare la încărcarea lui \"%s\":\n\tFormat nesuportat
-OK	RevertToSavedAlert		OK
-Don't save	QuitAlert		Nu salva
-Align	Menus		Aliniază
-Color	Menus		Culoare
-OK	QuitAlert		OK
-Open…	Menus		Deschide…
-Center	Menus		Centru
-Unable to unlock file\n\t%s	QuitAlert		Nu s-a putut debloca fișierul\n\t%s
-line %d, column %d	StatusView		linia %d, coloana %d
-OK	Statistics		OK
-New	Menus		Nou
-Wrap-around search	FindandReplaceWindow		Căutare încadrează împrejur
-Bold	Menus		Aldin
-Find selection	Menus		Găsește selecție
-Find:	FindandReplaceWindow		Găsește:
-Error saving \"%s\":\n%s	SaveAlert		Eroare la salvarea lui \"%s\":\n%s
-Copy	Menus		Copiază
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nu se poate reveni, nu s-a găsit fișierul: \"%s\".
 Cut	Menus		Taie
-File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Fișierul \"%file%\" a fost modificat de altă aplicație, îl reîncărcați?
-Replace	FindandReplaceWindow		Înlocuiește
-Find again	Menus		Găsește din nou
-Cancel	QuitAlert		Anulează
-Find…	Menus		Găsește…
-Select all	Menus		Selectează tot
-Don't save	SaveAlert		Nu salva
-Recover	NodeMonitorAlerts		Recuperează
-Error loading \"%s\":\n\t%s	LoadAlert		Eroare la încărcarea lui \"%s\":\n\t%s
-Ignore	NodeMonitorAlerts		Ignoră
-Read-only	StatusView		Protejat la scriere
-Undo typing	QuitAlert		Refă tastarea
+Center	Menus		Centru
+Wrap-around search	FindandReplaceWindow		Căutare încadrează împrejur
+Page setup…	Menus		Configurări pagină…
 Untitled 	StyledEditWindow		Fără titlu 
-OK	SaveAlert		OK
+OK	Statistics		OK
 Find	FindandReplaceWindow		Găsește
-Encoding	Open_and_SaveAsPanel		Codare
-Characters:	Statistics		Caractere:
-Save as…	Menus		Salvează ca…
-Redo typing	QuitAlert		Repetă tastarea
-Reload…	Menus		Reîncărcare…
+New	Menus		Nou
+Document	Menus		Document
+Search backwards	FindandReplaceWindow		Caută înapoi
+Find again	Menus		Găsește din nou
+Read-only	StatusView		Protejat la scriere
+Save	Menus		Salvează
+Cancel	QuitAlert		Anulează
+Copy	Menus		Copiază
+Reload	NodeMonitorAlerts		Reîncărcare
+line %d, column %d	StatusView		linia %d, coloana %d
+Words:	Statistics		Cuvinte:
+???	LoadAlert		???
+Recover	NodeMonitorAlerts		Recuperează
+Error saving \"%s\":\n%s	SaveAlert		Eroare la salvarea lui \"%s\":\n%s
+OK	RevertToSavedAlert		OK
+Unlock file	StatusView		Deblocare fișier
+Italic	Menus		Cursiv
+Can't undo	Menus		Nu se poate reface
 Replace…	Menus		Înlocuiește…
+File	Menus		Fișier
+Bold	Menus		Aldin
+Paste	Menus		Lipește
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Fișierul \"%file%\" a fost modificat de altă aplicație, îl reîncărcați?
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Fișierul \"%file%\" a fost eliminat de altă aplicație, îl recuperați?
+Lines:	Statistics		Linii:
+Replace in all windows	FindandReplaceWindow		Înlocuiește în toate ferestrele
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" are caractere nesalvate.\nReveniți la ultima versiune salvată? 
+Save	SaveAlert		Salvează
+Default	Open_and_SaveAsPanel		Implicit
+Cancel	RevertToSavedAlert		Anulează
+Cancel	FindandReplaceWindow		Anulează
+Statistics…	Menus		Statistici…
+Encoding	Open_and_SaveAsPanel		Codare
+Replace all	FindandReplaceWindow		Înlocuiește tot
+Close	Menus		Închide
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Eroare la încărcarea lui \"%s\":\n\tFormat nesuportat
+Left	Menus		Stânga
+Default	Menus		Implicit
+OK	SaveAlert		OK
+Color	Menus		Culoare
+Save changes to the document \"%s\"? 	QuitAlert		Se salvează modificările la documentul \"%s\"? 
+StyledEdit	System name		EditorText
+Find:	FindandReplaceWindow		Găsește:
+Undo typing	QuitAlert		Refă tastarea
+Error loading \"%s\":\n\t%s	LoadAlert		Eroare la încărcarea lui \"%s\":\n\t%s
+Don't save	SaveAlert		Nu salva
+Reload…	Menus		Reîncărcare…
+Print…	Menus		Tipărește…
+Quit	Menus		Închidere
+Redo typing	QuitAlert		Repetă tastarea
+Ignore	NodeMonitorAlerts		Ignoră
+Wrap lines	Menus		Încadrează linii
+Text encoding	Menus		Codare text
+Unable to unlock file\n\t%s	QuitAlert		Nu s-a putut debloca fișierul\n\t%s
+Modified	StatusView		Modificat
+OK	LoadAlert		OK
+Save	QuitAlert		Salvează
+Case-sensitive	FindandReplaceWindow		Sensibil la majuscule
+Find selection	Menus		Găsește selecție
+Cancel	SaveAlert		Anulează
+Find…	Menus		Găsește…
+Revert	RevertToSavedAlert		Revenire
+Size	Menus		Dimensiune
+Autodetect	Menus		Detectează automat
+Replace next	Menus		Înlocuiește următorul
+OK	QuitAlert		OK
+Replace with:	FindandReplaceWindow		Înlocuiește cu:
+Edit	Menus		Editează
+Open…	Menus		Deschide…
+Save as…	Menus		Salvează ca…
+Replace	FindandReplaceWindow		Înlocuiește
+Characters:	Statistics		Caractere:
+Don't save	QuitAlert		Nu salva
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Acest fișier este marcat ca protejat la scriere. Salvați modificările la documentul \"%s\"? 
+Align	Menus		Aliniază
+Font	Menus		Font
+Select all	Menus		Selectează tot
 Right	Menus		Dreapta

@@ -1,44 +1,38 @@
-1	dutch; flemish	x-vnd.Be-PRNT	686411231
-Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Printer: %printer_name%\nDriver:   %driver%\n
-Waiting	JobListView		Bezig met wachten
-Print test page	PrintersWindow		Druk een testpagina af
- pending jobs	PrinterListView		 taken in de wachtrij
-page	JobListView		pagina
-Cancel	AddPrinterDialog		Annuleren
-Test page	PrintersWindow		Testpagina
-Add printer	AddPrinterDialog		Printer toevoegen
-Green	TestPageView		Groen
-Printers	PrintersWindow		Printers
-Add…	PrintersWindow		Toevoegen…
-No pending jobs	PrinterListView		Geen taken in de wachtrij
-Default Printer	PrinterListView		Standaardprinter
-Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
-pages	JobListView		pagina's
-Printers	System name		Printers
-Processing	JobListView		Bezig met verwerken
-Red	TestPageView		Rood
-Printer name:	AddPrinterDialog		Printernaam:
-Driver: %driver%	PrinterListView		Stuurprogramma: %driver%
-Black	TestPageView		Zwart
-Restart job	PrintersWindow		Taak herstarten
-Add	AddPrinterDialog		Toevoegen
-Make default	PrintersWindow		Standaard maken
-Transport: %transport% %transport_address%	TestPageView		Transport: %transport% %transport_address%
-Cancel job	PrintersWindow		Taak annuleren
-Yellow	TestPageView		Geel
-Blue	TestPageView		Blauw
-Remove	PrintersWindow		Verwijderen
-<pick one>	AddPrinterDialog		<kies één>
-Print jobs for 	PrintersWindow		Afdruktaken voor
-Failed	JobListView		Mislukt
-%.2f KB	JobListView		%.2f KB
-Magenta	TestPageView		Magenta
-Completed	JobListView		Voltooid
-No printer found!	TransportMenu		Er werd geen printer gevonden!
-Print jobs: No printer selected	PrintersWindow		Afdruktaken: Geen printer geselecteerd
-Cyan	TestPageView		Cyaan
-Unknown status	JobListView		Onbekende status
-1 pending job	PrinterListView		1 taak in de wachtrij
-Connected to:	AddPrinterDialog		Verbonden met:
-Printer type:	AddPrinterDialog		Printertype:
+1	dutch; flemish	x-vnd.Be-PRNT	2042381362
 Test page	TestPageView		Testpagina
+Remove	PrintersWindow		Verwijderen
+Red	TestPageView		Rood
+Default Printer	PrinterListView		Standaardprinter
+<pick one>	AddPrinterDialog		<kies één>
+Connected to:	AddPrinterDialog		Verbonden met:
+Make default	PrintersWindow		Standaard maken
+Cyan	TestPageView		Cyaan
+Completed	JobListView		Voltooid
+Test page	PrintersWindow		Testpagina
+Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
+Failed	JobListView		Mislukt
+Blue	TestPageView		Blauw
+Waiting	JobListView		Bezig met wachten
+Processing	JobListView		Bezig met verwerken
+Cancel	AddPrinterDialog		Annuleren
+Unknown status	JobListView		Onbekende status
+Add printer	AddPrinterDialog		Printer toevoegen
+Printers	PrintersWindow		Printers
+No printer found!	TransportMenu		Er werd geen printer gevonden!
+Add…	PrintersWindow		Toevoegen…
+Magenta	TestPageView		Magenta
+Transport: %transport% %transport_address%	TestPageView		Transport: %transport% %transport_address%
+Add	AddPrinterDialog		Toevoegen
+Print jobs: No printer selected	PrintersWindow		Afdruktaken: Geen printer geselecteerd
+Printer name:	AddPrinterDialog		Printernaam:
+Yellow	TestPageView		Geel
+Black	TestPageView		Zwart
+Printer type:	AddPrinterDialog		Printertype:
+Printers	System name		Printers
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Printer: %printer_name%\nDriver:   %driver%\n
+Green	TestPageView		Groen
+Print test page	PrintersWindow		Druk een testpagina af
+Restart job	PrintersWindow		Taak herstarten
+Driver: %driver%	PrinterListView		Stuurprogramma: %driver%
+Cancel job	PrintersWindow		Taak annuleren
+%.2f KB	JobListView		%.2f KB

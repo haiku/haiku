@@ -1,50 +1,50 @@
 1	swedish	x-vnd.Be-PEPL	2332202134
-Edit	People		Redigera
-Error	People		Fel
-City	People		Stad
-The file '%name%' could not be written.	People		Filen '%name%' kunde inte skrivas till.
-none	Groups list		ingen
-Configure attributes	People		Ställ in attribut
-Company	People		Företag
-%name% picture	People		%name% bild
-Work phone	People		Arbetstelefon
-People	System name		Personer
-New person	People		Ny person
-Select all	People		Markera allt
-File	People		Arkiv
-Unnamed person	People		Namnlös person
-Could not create %s.	People		Kunde inte skapa %s.
-Country	People		Land
-Close	People		Stäng
-Group	People		Grupp
-Nickname	People		Smeknamn
-Quit	People		Avsluta
-Name	People		Namn
-Revert	People		Återställ
-Don't save	People		Spara inte
-Undo	People		Ångra
-E-mail	People		E-post
-Load image…	People		Välj bild...
-OK	People		OK
-Remove image	People		Ta bort bild
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Misslyckades att starta FilTyper för redigering av attribut.\n\nFel:
-Home phone	People		Hemtelefon
-Save as…	People		Spara som...
-Redo	People		Gör om
-Save changes before closing?	People		Spara ändringar innan avslut?
-Paste	People		Klistra in
-Drop an image here,\nor use the contextual menu.	People		Släpp en bild här,\neller använd högerklicksmenyn.
-Save	People		Spara
-Person	Short mimetype description		Person
+Unnamed person	People		Namnlös person
 New person…	People		Ny person...
 Address	People		Adress
-URL	People		URL
-Sorry	People		Tyvärr
 Zip	People		Postnummer
-Contact information for a person.	Long mimetype description		Kontaktinformation för en person.
-Fax	People		Fax
+Select all	People		Markera allt
+Could not create %s.	People		Kunde inte skapa %s.
+Quit	People		Avsluta
+Company	People		Företag
+Name	People		Namn
+The file '%name%' could not be written.	People		Filen '%name%' kunde inte skrivas till.
 Contact name	People		Kontaktnamn
-Cut	People		Klipp ut
 Cancel	People		Avbryt
+Edit	People		Redigera
+Save changes before closing?	People		Spara ändringar innan avslut?
+People	System name		Personer
+Error	People		Fel
+Revert	People		Återställ
+Country	People		Land
+Person	Short mimetype description		Person
+New person	People		Ny person
+Save	People		Spara
+Fax	People		Fax
+URL	People		URL
+%name% picture	People		%name% bild
+Home phone	People		Hemtelefon
+none	Groups list		ingen
+Save as…	People		Spara som...
+Cut	People		Klipp ut
+Contact information for a person.	Long mimetype description		Kontaktinformation för en person.
+Remove image	People		Ta bort bild
+City	People		Stad
+Undo	People		Ångra
+Don't save	People		Spara inte
+Configure attributes	People		Ställ in attribut
+Work phone	People		Arbetstelefon
 State	People		Region
+Nickname	People		Smeknamn
+OK	People		OK
+File	People		Arkiv
+Redo	People		Gör om
+Close	People		Stäng
 Copy	People		Kopiera
+Paste	People		Klistra in
+E-mail	People		E-post
+Group	People		Grupp
+Drop an image here,\nor use the contextual menu.	People		Släpp en bild här,\neller använd högerklicksmenyn.
+Load image…	People		Välj bild...
+Sorry	People		Tyvärr

@@ -1,50 +1,50 @@
 1	french	x-vnd.Be-PEPL	2332202134
-Edit	People		Éditer
-Error	People		Erreur
-City	People		Ville
-The file '%name%' could not be written.	People		Impossible d’écrire le fichier « %name% ».
-none	Groups list		aucun
-Configure attributes	People		Configurer les attributs
-Company	People		Société
-%name% picture	People		Photo de %name%
-Work phone	People		Téléphone professionnel
-People	System name		Personnes
-New person	People		Nouvelle personne
-Select all	People		Sélectionner tout
-File	People		Fichier
-Unnamed person	People		Anonyme
-Could not create %s.	People		Impossible de créer %s.
-Country	People		Pays
-Close	People		Fermer
-Group	People		Groupe
-Nickname	People		Surnom
-Quit	People		Quitter
-Name	People		Nom
-Revert	People		Rétablir
-Don't save	People		Ne pas sauvegarder
-Undo	People		Annuler
-E-mail	People		E-mail
-Load image…	People		Charger une image…
-OK	People		OK
-Remove image	People		Supprimer l’image
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Le lancement des préférences de fichiers pour configurer les attributs sur les personnes a échoué.\n\nErreur : 
-Home phone	People		Téléphone du domicile
-Save as…	People		Enregistrer sous…
-Redo	People		Rétablir
-Save changes before closing?	People		Voulez-vous enregistrer les modifications avant de fermer ?
-Paste	People		Coller
-Drop an image here,\nor use the contextual menu.	People		Déposez une image ici,\nou utilisez le menu contextuel.
-Save	People		Enregistrer
-Person	Short mimetype description		Personne
+Unnamed person	People		Anonyme
 New person…	People		Nouvelle personne…
 Address	People		Adresse
-URL	People		URL
-Sorry	People		Désolé
 Zip	People		Code postal
-Contact information for a person.	Long mimetype description		Informations pour contacter la personne.
-Fax	People		Fax
+Select all	People		Sélectionner tout
+Could not create %s.	People		Impossible de créer %s.
+Quit	People		Quitter
+Company	People		Société
+Name	People		Nom
+The file '%name%' could not be written.	People		Impossible d’écrire le fichier « %name% ».
 Contact name	People		Nom du contact
-Cut	People		Couper
 Cancel	People		Annuler
+Edit	People		Éditer
+Save changes before closing?	People		Voulez-vous enregistrer les modifications avant de fermer ?
+People	System name		Personnes
+Error	People		Erreur
+Revert	People		Rétablir
+Country	People		Pays
+Person	Short mimetype description		Personne
+New person	People		Nouvelle personne
+Save	People		Enregistrer
+Fax	People		Fax
+URL	People		URL
+%name% picture	People		Photo de %name%
+Home phone	People		Téléphone du domicile
+none	Groups list		aucun
+Save as…	People		Enregistrer sous…
+Cut	People		Couper
+Contact information for a person.	Long mimetype description		Informations pour contacter la personne.
+Remove image	People		Supprimer l’image
+City	People		Ville
+Undo	People		Annuler
+Don't save	People		Ne pas sauvegarder
+Configure attributes	People		Configurer les attributs
+Work phone	People		Téléphone professionnel
 State	People		État
+Nickname	People		Surnom
+OK	People		OK
+File	People		Fichier
+Redo	People		Rétablir
+Close	People		Fermer
 Copy	People		Copier
+Paste	People		Coller
+E-mail	People		E-mail
+Group	People		Groupe
+Drop an image here,\nor use the contextual menu.	People		Déposez une image ici,\nou utilisez le menu contextuel.
+Load image…	People		Charger une image…
+Sorry	People		Désolé

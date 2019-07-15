@@ -1,10 +1,10 @@
 1	french	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
-Kill application	Team monitor		Tuer l’application
-Quit application	Team monitor		Quitter l’application
-Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Sélectionnez une application dans la liste ci-dessus et cliquez sur l’un des boutons « Tuer l’application » ou « Quitter l’application » pour la fermer.\n\nMaintenez Ctrl+Alt+Suppr enfoncés %ld secondes pour redémarrer.
 If the application will not quit you may have to kill it.	Team monitor		Si l’application ne se ferme pas, vous pourriez avoir à la tuer.
-Force reboot	Team monitor		Forcer le redémarrage
-Team monitor	Team monitor		Moniteur de processus
-(This team is a system component)	Team monitor		(Ce processus est un composant du système)
+Quit application	Team monitor		Quitter l’application
 Restart the desktop	Team monitor		Redémarrer le Bureau
+Force reboot	Team monitor		Forcer le redémarrage
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Sélectionnez une application dans la liste ci-dessus et cliquez sur l’un des boutons « Tuer l’application » ou « Quitter l’application » pour la fermer.\n\nMaintenez Ctrl+Alt+Suppr enfoncés %ld secondes pour redémarrer.
+Team monitor	Team monitor		Moniteur de processus
+Kill application	Team monitor		Tuer l’application
 Cancel	Team monitor		Annuler
+(This team is a system component)	Team monitor		(Ce processus est un composant du système)

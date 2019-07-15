@@ -1,72 +1,72 @@
 1	dutch; flemish	x-vnd.Haiku-StyledEdit	537696910
-StyledEdit	System name		StyledEdit
-Paste	Menus		Plakken
-OK	LoadAlert		Oké
-File	Menus		Bestand
-???	LoadAlert		???
-Lines:	Statistics		Regels:
-Italic	Menus		Cursief
-Left	Menus		Links
-Search backwards	FindandReplaceWindow		Achteruit zoeken
-Size	Menus		Grootte
-Save	QuitAlert		Opslaan
-Page setup…	Menus		Pagina-configuratie...
-Print…	Menus		Afdrukken...
-Can't undo	Menus		Kan niet ongedaan maken
-Save	Menus		Opslaan
-Default	Menus		Standaard
-Replace with:	FindandReplaceWindow		Vervangen door:
-Cancel	SaveAlert		Annuleren
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan niet herstellen, het bestand \"%s\" werd niet gevonden.
-Case-sensitive	FindandReplaceWindow		Hoofdlettergevoelig
-Replace in all windows	FindandReplaceWindow		Vervang in alle vensters
-Wrap lines	Menus		Regels afbreken
-Quit	Menus		Sluiten
 Document statistics	Statistics		Documentstatistieken
-Cancel	RevertToSavedAlert		Annuleren
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan niet herstellen, het bestand \"%s\" werd niet gevonden.
+Cut	Menus		Knippen
+Center	Menus		Centreren
+Wrap-around search	FindandReplaceWindow		Rondgaand zoeken
+Page setup…	Menus		Pagina-configuratie...
+Untitled 	StyledEditWindow		Naamloos
+OK	Statistics		Oké
+Find	FindandReplaceWindow		Zoeken
+New	Menus		Nieuw
 Document	Menus		Document
-Save changes to the document \"%s\"? 	QuitAlert		Veranderingen aan het document \"%s\" opslaan? 
-Edit	Menus		Bewerken
-Font	Menus		Lettertype
-Replace all	FindandReplaceWindow		Alles vervangen
-Statistics…	Menus		Statistieken...
-Default	Open_and_SaveAsPanel		Standaard
-Replace next	Menus		Volgende vervangen
-Cancel	FindandReplaceWindow		Annuleren
-Close	Menus		Sluiten
-Save	SaveAlert		Opslaan
+Search backwards	FindandReplaceWindow		Achteruit zoeken
+Find again	Menus		Opnieuw zoeken
+Save	Menus		Opslaan
+Cancel	QuitAlert		Annuleren
+Copy	Menus		Kopiëren
 Words:	Statistics		Woorden:
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Fout bij 't laden van \"%s\":\n\tNiet-ondersteund formaat
+???	LoadAlert		???
+Error saving \"%s\":\n%s	SaveAlert		Fout bij opslaan van \"%s\":\n%s
 OK	RevertToSavedAlert		Oké
+Italic	Menus		Cursief
+Can't undo	Menus		Kan niet ongedaan maken
+Replace…	Menus		Vervangen...
+File	Menus		Bestand
+Bold	Menus		Vet
+Paste	Menus		Plakken
+Lines:	Statistics		Regels:
+Replace in all windows	FindandReplaceWindow		Vervang in alle vensters
+Save	SaveAlert		Opslaan
+Default	Open_and_SaveAsPanel		Standaard
+Cancel	RevertToSavedAlert		Annuleren
+Cancel	FindandReplaceWindow		Annuleren
+Statistics…	Menus		Statistieken...
+Encoding	Open_and_SaveAsPanel		Codering
+Replace all	FindandReplaceWindow		Alles vervangen
+Close	Menus		Sluiten
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Fout bij 't laden van \"%s\":\n\tNiet-ondersteund formaat
+Left	Menus		Links
+Default	Menus		Standaard
+OK	SaveAlert		Oké
+Color	Menus		Kleur
+Save changes to the document \"%s\"? 	QuitAlert		Veranderingen aan het document \"%s\" opslaan? 
+StyledEdit	System name		StyledEdit
+Find:	FindandReplaceWindow		Vind:
+Undo typing	QuitAlert		Typen ongedaan maken
+Error loading \"%s\":\n\t%s	LoadAlert		Fout bij het laden van \"%s\":\n\t%s
+Don't save	SaveAlert		Niet opslaan
+Print…	Menus		Afdrukken...
+Quit	Menus		Sluiten
+Redo typing	QuitAlert		Opnieuw typen
+Wrap lines	Menus		Regels afbreken
+OK	LoadAlert		Oké
+Save	QuitAlert		Opslaan
+Case-sensitive	FindandReplaceWindow		Hoofdlettergevoelig
+Find selection	Menus		Selectie vinden
+Cancel	SaveAlert		Annuleren
+Find…	Menus		Zoeken...
+Size	Menus		Grootte
+Replace next	Menus		Volgende vervangen
+OK	QuitAlert		Oké
+Replace with:	FindandReplaceWindow		Vervangen door:
+Edit	Menus		Bewerken
+Open…	Menus		Openen…
+Save as…	Menus		Opslaan als...
+Replace	FindandReplaceWindow		Vervangen
+Characters:	Statistics		Karakters:
 Don't save	QuitAlert		Niet opslaan
 Align	Menus		Uitlijnen
-Color	Menus		Kleur
-OK	QuitAlert		Oké
-Open…	Menus		Openen…
-Center	Menus		Centreren
-OK	Statistics		Oké
-New	Menus		Nieuw
-Wrap-around search	FindandReplaceWindow		Rondgaand zoeken
-Bold	Menus		Vet
-Find selection	Menus		Selectie vinden
-Find:	FindandReplaceWindow		Vind:
-Error saving \"%s\":\n%s	SaveAlert		Fout bij opslaan van \"%s\":\n%s
-Copy	Menus		Kopiëren
-Cut	Menus		Knippen
-Replace	FindandReplaceWindow		Vervangen
-Find again	Menus		Opnieuw zoeken
-Cancel	QuitAlert		Annuleren
-Find…	Menus		Zoeken...
+Font	Menus		Lettertype
 Select all	Menus		Alles selecteren
-Don't save	SaveAlert		Niet opslaan
-Error loading \"%s\":\n\t%s	LoadAlert		Fout bij het laden van \"%s\":\n\t%s
-Undo typing	QuitAlert		Typen ongedaan maken
-Untitled 	StyledEditWindow		Naamloos
-OK	SaveAlert		Oké
-Find	FindandReplaceWindow		Zoeken
-Encoding	Open_and_SaveAsPanel		Codering
-Characters:	Statistics		Karakters:
-Save as…	Menus		Opslaan als...
-Redo typing	QuitAlert		Opnieuw typen
-Replace…	Menus		Vervangen...
 Right	Menus		Rechts

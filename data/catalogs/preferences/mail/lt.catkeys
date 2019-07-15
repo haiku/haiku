@@ -1,50 +1,50 @@
 1	lithuanian	x-vnd.Haiku-Mail	688530788
+Account settings	AutoConfigWindow		Paskyros nuostatos
+\t\t· Outgoing	Config Window		\t\t· Siuntimas
+E-mail address:	E-Mail		El. pašto adresas:
+Create new account	AutoConfigWindow		Naujos paskyros kūrimas
+While sending and receiving	Config Window		siunčiant ir gaunant
+Apply	Config Window		Taikyti
+Incoming mail filters	Config Views		Gaunamų laiškų filtrai
+Outgoing mail filters	Config Views		Siunčiamų laiškų filtrai
+Server name:	E-Mail		Serverio vardas:
+Add	Config Window		Pridėti
+Back	AutoConfigWindow		Atgal
+Real name:	E-Mail		Asmenvardis:
+Real name:	Config Views		Asmenvardis:
+\t\t· E-mail filters	Config Window		\t\t· El. pašto filtrai
+Outgoing	E-Mail		Pašto siuntimas
+Accounts	Config Window		Paskyros
+Outgoing	Config Window		Pašto siuntimas
+Remove	Config Views		Pašalinti
 Settings	Config Window		Nuostatos
 Never	Config Window	show status window	niekada
-While sending and receiving	Config Window		siunčiant ir gaunant
-Incoming	Config Window		Pašto gavimas
-Server name:	E-Mail		Serverio vardas:
-OK	Config Window		Gerai
-E-mail address:	E-Mail		El. pašto adresas:
-Account name:	E-Mail		Paskyros pavadinimas:
 Account name:	Config Views		Paskyros pavadinimas:
-Create new account	AutoConfigWindow		Naujos paskyros kūrimas
-OK	Config Views		Gerai
-The filter could not be moved. Deleting filter.	Config Views		Filtro perkelti nepavyko. Filtras šalinamas.
-Revert	Config Window		Atšaukti pakeitimus
-Login name:	E-Mail		Abonento vardas:
-Incoming	E-Mail		Pašto gavimas
-Password:	E-Mail		Slaptažodis:
-Accounts	Config Window		Paskyros
-Finish	AutoConfigWindow		Atlikta
-Remove	Config Window		Pašalinti
-Server Name:	E-Mail		Serverio vardas:
-While sending	Config Window		siunčiant
+\t\t· Incoming	Config Window		\t\t· Gavimas
 Enter a valid e-mail address.	AutoConfigWindow		Įveskite galiojantį elektroninio pašto adresą.
-Add	Config Window		Pridėti
-Account settings	AutoConfigWindow		Paskyros nuostatos
-E-mail	System name		El. paštas
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nAtšaukti bendrųjų nuostatų pakeitimų nepavyko.\n\nKlaida gaunant bendrąsias nuostatas:\n%s\n
-Real name:	Config Views		Asmenvardis:
-\t\t· Outgoing	Config Window		\t\t· Siuntimas
+Incoming	E-Mail		Pašto gavimas
 Choose Protocol	E-Mail		Išsirinkite protokolą
 Return address:	Config Views		Atgalinis adresas:
-Edit mailbox menu…	Config Window		Keisti pašto dėžutės meniu…
-Outgoing	E-Mail		Pašto siuntimas
-\t\t· E-mail filters	Config Window		\t\t· El. pašto filtrai
-Remove	Config Views		Pašalinti
-\t\t· Incoming	Config Window		\t\t· Gavimas
-Next	AutoConfigWindow		Toliau
-Check every	Config Window		Tikrinti kas
-Back	AutoConfigWindow		Atgal
-Incoming mail filters	Config Views		Gaunamų laiškų filtrai
+Password:	E-Mail		Slaptažodis:
+Error retrieving general settings: %s\n	Config Window		Klaida gaunant bendrąsias nuostatas: %s\n
+The filter could not be moved. Deleting filter.	Config Views		Filtro perkelti nepavyko. Filtras šalinamas.
+OK	Config Views		Gerai
+Revert	Config Window		Atšaukti pakeitimus
+Incoming	Config Window		Pašto gavimas
+Finish	AutoConfigWindow		Atlikta
+Add filter	Config Views		Pridėti filtrą
 Account settings	Config Views		Paskyros nuostatos
 minutes	Config Window		min.
-Error retrieving general settings: %s\n	Config Window		Klaida gaunant bendrąsias nuostatas: %s\n
-Real name:	E-Mail		Asmenvardis:
-Apply	Config Window		Taikyti
+E-mail	System name		El. paštas
+Check every	Config Window		Tikrinti kas
+Account name:	E-Mail		Paskyros pavadinimas:
+Edit mailbox menu…	Config Window		Keisti pašto dėžutės meniu…
+Server Name:	E-Mail		Serverio vardas:
+Remove	Config Window		Pašalinti
+Login name:	E-Mail		Abonento vardas:
+While sending	Config Window		siunčiant
+OK	Config Window		Gerai
 OK	AutoConfigWindow		Gerai
-Add filter	Config Views		Pridėti filtrą
-Outgoing	Config Window		Pašto siuntimas
-Outgoing mail filters	Config Views		Siunčiamų laiškų filtrai
+Next	AutoConfigWindow		Toliau
 Error	Config Window		Klaida

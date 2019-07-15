@@ -1,50 +1,50 @@
 1	lithuanian	x-vnd.Be-PEPL	2332202134
-Edit	People		Taisa
-Error	People		Klaida
-City	People		Miestas
-The file '%name%' could not be written.	People		Failo „%name%“ įrašyti nepavyko.
-none	Groups list		jokia
-Configure attributes	People		Tvarkyti požymius
-Company	People		Organizacija
-%name% picture	People		%name% (nuotrauka)
-Work phone	People		Darbo telefonas
-People	System name		Žmonės
-New person	People		Naujas adresatas
-Select all	People		Pažymėti viską
-File	People		Failas
-Unnamed person	People		Neįvardintas asmuo
-Could not create %s.	People		Nepavyko sukurti %s.
-Country	People		Valstybė
-Close	People		Užverti
-Group	People		Grupė
-Nickname	People		Slapyvardis
-Quit	People		Baigti darbą
-Name	People		Vardas
-Revert	People		Atšaukti pakeitimus
-Don't save	People		Neįrašyti
-Undo	People		Atšaukti
-E-mail	People		El. paštas
-Load image…	People		Parinkti paveikslą…
-OK	People		Gerai
-Remove image	People		Pašalinti paveikslą
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Nepavyko atverti failų tipų nuostatų lango, kuriame būtų tvarkoma asmenų požymių aibė.\n\nKlaida: 
-Home phone	People		Namų telefonas
-Save as…	People		Įrašyti kaip…
-Redo	People		Grąžinti
-Save changes before closing?	People		Ar įrašyti paketimus prieš užveriant?
-Paste	People		Įdėti
-Drop an image here,\nor use the contextual menu.	People		Numeskite paveikslą čia, arba\npasinaudokite kontekstiniu meniu.
-Save	People		Įrašyti
-Person	Short mimetype description		Asmuo
+Unnamed person	People		Neįvardintas asmuo
 New person…	People		Naujas asmuo…
 Address	People		Adresas
-URL	People		URL adresas
-Sorry	People		Apgailestaujame
 Zip	People		Pašto kodas
-Contact information for a person.	Long mimetype description		Asmens (adresato) kontaktinė informacija.
-Fax	People		Faksas
+Select all	People		Pažymėti viską
+Could not create %s.	People		Nepavyko sukurti %s.
+Quit	People		Baigti darbą
+Company	People		Organizacija
+Name	People		Vardas
+The file '%name%' could not be written.	People		Failo „%name%“ įrašyti nepavyko.
 Contact name	People		Asmens vardas
-Cut	People		Iškirpti
 Cancel	People		Atsisakyti
+Edit	People		Taisa
+Save changes before closing?	People		Ar įrašyti paketimus prieš užveriant?
+People	System name		Žmonės
+Error	People		Klaida
+Revert	People		Atšaukti pakeitimus
+Country	People		Valstybė
+Person	Short mimetype description		Asmuo
+New person	People		Naujas adresatas
+Save	People		Įrašyti
+Fax	People		Faksas
+URL	People		URL adresas
+%name% picture	People		%name% (nuotrauka)
+Home phone	People		Namų telefonas
+none	Groups list		jokia
+Save as…	People		Įrašyti kaip…
+Cut	People		Iškirpti
+Contact information for a person.	Long mimetype description		Asmens (adresato) kontaktinė informacija.
+Remove image	People		Pašalinti paveikslą
+City	People		Miestas
+Undo	People		Atšaukti
+Don't save	People		Neįrašyti
+Configure attributes	People		Tvarkyti požymius
+Work phone	People		Darbo telefonas
 State	People		Valstija
+Nickname	People		Slapyvardis
+OK	People		Gerai
+File	People		Failas
+Redo	People		Grąžinti
+Close	People		Užverti
 Copy	People		Kopijuoti
+Paste	People		Įdėti
+E-mail	People		El. paštas
+Group	People		Grupė
+Drop an image here,\nor use the contextual menu.	People		Numeskite paveikslą čia, arba\npasinaudokite kontekstiniu meniu.
+Load image…	People		Parinkti paveikslą…
+Sorry	People		Apgailestaujame

@@ -1,47 +1,47 @@
 1	lithuanian	x-vnd.Haiku-Time	2676925183
-GMT (UNIX compatible)	Time		Pasaulinis (Grinvičo) laikas (suderinama su UNIX)
 OK	Time		Gerai
-Asia	Time		Azija
-\nNow: 	Time		\nDabar: 
-Africa	Time		Afrika
-Stop	Time		Stabdyti
-Australia	Time		Australija
-Preview time:	Time		Laikas, kuris bus rodomas:
-Synchronize	Time		Sinchronizuoti
-Revert	Time		Atšaukti pakeitimus
-Pacific	Time		Ramusis vandenynas
-Show day of week	Time		Rodyti savaitės dieną
-Add	Time		Pridėti
-Date and time	Time		Data ir laikas
-about	Time		Apie
-Local time (Windows compatible)	Time		Vietinis laikas (suderinama su „Windows“)
 Message receiving failed	Time		Nepavyko gauti pranešimo
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Laikas ir data. Programos autoriai:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\n© 2004-2012, „Haiku“,
+Australia	Time		Australija
+America	Time		Amerika
 Set time zone	Time		Pakeisti laiko juostą
+The following error occured while synchronizing:r\n%s: %s	Time		Bandant sinchronizuoti, susidurta su šia klaida:\n%s: %s
 Waiting for answer failed	Time		Atsakymas negautas
-Hardware clock set to:	Time		Aparatiniame šio įrenginio laikrodyje nustatytas:
+<Other>	Time		<Kita>
+Received invalid time	Time		Gautas negalimas laikas
+Remove	Time		Pašalinti
+Synchronize again	Time		Sinchronizuoti vėl
+Asia	Time		Azija
+Try all servers	Time		Bandyti visus serverius
+Time	Time		Laikas
+Current time:	Time		Dabartinis laikas:
 The following error occured while synchronizing:r\n%s	Time		Bandant sinchronizuoti, susidurta su šia klaida:\n%s
 Europe	Time		Europa
-Remove	Time		Pašalinti
-Time	Time		Laikas
-Indian	Time		Indijos vandenynas
-Sending request failed	Time		Užklausos išsiųsti nepavyko
+Show day of week	Time		Rodyti savaitės dieną
+Local time (Windows compatible)	Time		Vietinis laikas (suderinama su „Windows“)
+Hardware clock set to:	Time		Aparatiniame šio įrenginio laikrodyje nustatytas:
 Arctic	Time		Arktis
-Display time with seconds	Time		Rodyti sekundes
-Time	System name		Laikas
-America	Time		Amerika
-Synchronize at boot	Time		Sinchronizuoti įkeliant sistemą
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Laikas ir data. Programos autoriai:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\n© 2004-2012, „Haiku“,
-Received invalid time	Time		Gautas negalimas laikas
 Antarctica	Time		Antarktis
-Show time zone	Time		Rodyti laiko juostą
-Show clock in Deskbar	Time		Rodyti laikrodį pranešimų srityje
-The following error occured while synchronizing:r\n%s: %s	Time		Bandant sinchronizuoti, susidurta su šia klaida:\n%s: %s
-<Other>	Time		<Kita>
-Current time:	Time		Dabartinis laikas:
-Try all servers	Time		Bandyti visus serverius
+GMT (UNIX compatible)	Time		Pasaulinis (Grinvičo) laikas (suderinama su UNIX)
+Africa	Time		Afrika
+Stop	Time		Stabdyti
 Time zone	Time		Laiko juosta
-Could not create socket	Time		Nepavyko sukurti lizdo
-Synchronize again	Time		Sinchronizuoti vėl
 Clock	Time		Laikrodis
 Network time	Time		Sinchronizavimas
+Sending request failed	Time		Užklausos išsiųsti nepavyko
+Preview time:	Time		Laikas, kuris bus rodomas:
+\nNow: 	Time		\nDabar: 
+Could not create socket	Time		Nepavyko sukurti lizdo
+Pacific	Time		Ramusis vandenynas
 Atlantic	Time		Atlanto vandenynas
+Show clock in Deskbar	Time		Rodyti laikrodį pranešimų srityje
+Display time with seconds	Time		Rodyti sekundes
+Time	System name		Laikas
+about	Time		Apie
+Show time zone	Time		Rodyti laiko juostą
+Synchronize at boot	Time		Sinchronizuoti įkeliant sistemą
+Indian	Time		Indijos vandenynas
+Revert	Time		Atšaukti pakeitimus
+Date and time	Time		Data ir laikas
+Synchronize	Time		Sinchronizuoti
+Add	Time		Pridėti

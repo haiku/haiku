@@ -1,38 +1,35 @@
-1	belarusian	x-vnd.Be-PRNT	2279754695
-Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Прынтэр: %printer_name%\nДрайвер:  %driver%\n
-Waiting	JobListView		Чаканне
-Print test page	PrintersWindow		Надрукаваць тэставую старонку
-page	JobListView		старонка
-Cancel	AddPrinterDialog		Адмена
-Add printer	AddPrinterDialog		Дадаць прынтэр
-Green	TestPageView		Зялёны
-Printers	PrintersWindow		Прынтэры
-Default Printer	PrinterListView		Прадвызначаны прынтэр
-Transport: %transport% %transport_address%	PrinterListView		Транспорт: %transport% %transport_address%
-pages	JobListView		старонкаў
-Printers	System name		Прынтэры
-Processing	JobListView		Апрацоўка
-Red	TestPageView		Чырвоны
-Printer name:	AddPrinterDialog		Імя прынтэра:
-Driver: %driver%	PrinterListView		Драйвер: %driver%
-Black	TestPageView		Чорны
-Restart job	PrintersWindow		Пачаць нанова
-Add	AddPrinterDialog		Дадаць
-Make default	PrintersWindow		Зрабіць прадвызначаным
-Transport: %transport% %transport_address%	TestPageView		Транспарт: %transport% %transport_address%
-Cancel job	PrintersWindow		Адмяніць заданне
-Yellow	TestPageView		Жоўты
-Blue	TestPageView		Сіні
+1	belarusian	x-vnd.Be-PRNT	823985976
 Remove	PrintersWindow		Выдаліць
+Red	TestPageView		Чырвоны
+Default Printer	PrinterListView		Прадвызначаны прынтэр
 <pick one>	AddPrinterDialog		<выберыце адно>
-Print jobs for 	PrintersWindow		Заданні друку для 
-Failed	JobListView		Не ўдалося
-%.2f KB	JobListView		%.2f КБ
-Magenta	TestPageView		Пурпурны
-Completed	JobListView		Скончана
-No printer found!	TransportMenu		Прынтэры не знойдзены!
-Print jobs: No printer selected	PrintersWindow		Заданні друку: Не выбраны прынтэр
-Cyan	TestPageView		Блакітны
-Unknown status	JobListView		Невядомы стан
 Connected to:	AddPrinterDialog		Падключаны да:
+Make default	PrintersWindow		Зрабіць прадвызначаным
+Cyan	TestPageView		Блакітны
+Completed	JobListView		Скончана
+Transport: %transport% %transport_address%	PrinterListView		Транспорт: %transport% %transport_address%
+Failed	JobListView		Не ўдалося
+Blue	TestPageView		Сіні
+Waiting	JobListView		Чаканне
+Processing	JobListView		Апрацоўка
+Cancel	AddPrinterDialog		Адмена
+Unknown status	JobListView		Невядомы стан
+Add printer	AddPrinterDialog		Дадаць прынтэр
+Printers	PrintersWindow		Прынтэры
+No printer found!	TransportMenu		Прынтэры не знойдзены!
+Magenta	TestPageView		Пурпурны
+Transport: %transport% %transport_address%	TestPageView		Транспарт: %transport% %transport_address%
+Add	AddPrinterDialog		Дадаць
+Print jobs: No printer selected	PrintersWindow		Заданні друку: Не выбраны прынтэр
+Printer name:	AddPrinterDialog		Імя прынтэра:
+Yellow	TestPageView		Жоўты
+Black	TestPageView		Чорны
 Printer type:	AddPrinterDialog		Тып прынтэру:
+Printers	System name		Прынтэры
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Прынтэр: %printer_name%\nДрайвер:  %driver%\n
+Green	TestPageView		Зялёны
+Print test page	PrintersWindow		Надрукаваць тэставую старонку
+Restart job	PrintersWindow		Пачаць нанова
+Driver: %driver%	PrinterListView		Драйвер: %driver%
+Cancel job	PrintersWindow		Адмяніць заданне
+%.2f KB	JobListView		%.2f КБ

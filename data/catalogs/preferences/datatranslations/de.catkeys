@@ -1,17 +1,17 @@
 1	german	x-vnd.Haiku-DataTranslations	4156631142
-DataTranslations	System name		Datenkonvertierung
-Cancel	DataTranslations		Abbrechen
+Path:	DataTranslations		Pfad:
 Name:	DataTranslations		Name:
+DataTranslations - Note	DataTranslations		Datenkonvertierung - Notiz
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Das Objekt '%name' scheint kein Translator zu sein und kann daher nicht installiert werden.
 Could not install %s:\n%s	DataTranslations		Kann %s nicht installieren:\n%s
-Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Dieses Fenster dient zum Festlegen von Standardwerten für die verschiedenen Translatoren. Sie werden benutzt falls in einer Anwendung keine eigenen Einstellungen vorgenommen wurden.
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Es exististiert bereits ein Objekt mit dem Namen '%name' im Translator-Ordner! Soll der bereits vorhandene Translator überschrieben werden?
-DataTranslations - Note	DataTranslations		Datenkonvertierung - Notiz
-Overwrite	DataTranslations		Überschreiben
-Info:	DataTranslations		Info:
-Info	DataTranslations		Info
-Path:	DataTranslations		Pfad:
-The new translator has been installed successfully.	DataTranslations		Der neue Translator wurde erfolgreich installiert.
-DataTranslations - Error	DataTranslations		Datenkonvertierung - Fehler
 OK	DataTranslations		OK
+Cancel	DataTranslations		Abbrechen
+Info:	DataTranslations		Info:
+DataTranslations - Error	DataTranslations		Datenkonvertierung - Fehler
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Dieses Fenster dient zum Festlegen von Standardwerten für die verschiedenen Translatoren. Sie werden benutzt falls in einer Anwendung keine eigenen Einstellungen vorgenommen wurden.
+The new translator has been installed successfully.	DataTranslations		Der neue Translator wurde erfolgreich installiert.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Es exististiert bereits ein Objekt mit dem Namen '%name' im Translator-Ordner! Soll der bereits vorhandene Translator überschrieben werden?
+DataTranslations	System name		Datenkonvertierung
+Info	DataTranslations		Info
+Overwrite	DataTranslations		Überschreiben
 Version:	DataTranslations		Version:

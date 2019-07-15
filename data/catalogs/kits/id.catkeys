@@ -1,42 +1,42 @@
 1	indonesian	x-vnd.Haiku-libbe	3337473349
-gamma	AboutWindow		gamma
-beta	AboutWindow		beta
-%3.2f GiB	StringForSize		%3.2f GiB
-Written by:	AboutWindow		Ditulis oleh:
-About %app%	AboutMenuItem		Tentang %app%
-Cut	TextView		Potong
-Version	AboutWindow		Versi
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Tidak dapat menciptakan replicant untuk \"%description\".\n%error
-Copy	TextView		Salin
-%3.2f KiB	StringForSize		%3.2f KiB
-alpha	AboutWindow		alpha
-Error	PrintJob		Galat
-All Rights Reserved.	AboutWindow		Hak Cipta dilindungi undang-undang.
 {0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte} other{# bytes}}
-About %app%	AboutWindow		Tentang %app%
-No pages to print!	PrintJob		Tidak ada halaman untuk dicetak!
+All Rights Reserved.	AboutWindow		Hak Cipta dilindungi undang-undang.
+gold master	AboutWindow		master emas
+Undo	TextView		Batal
+gamma	AboutWindow		gamma
+development	AboutWindow		pengembangan
 OK	Dragger		OKE
 OK	PrintJob		OKE
-Green:	ColorControl		Hijau:
-Version history:	AboutWindow		Sejarah versi:
-Remove replicant	Dragger		Hapus replicant
-Select all	TextView		Pilih semua
-OK	AboutWindow		OKE
-OK	ZombieReplicantView		OKE
 Print Server is not responding.	PrintJob		Server Cetak tidak merespon.
+About %app%	AboutMenuItem		Tentang %app%
+Warning	Dragger		Peringatan
+Green:	ColorControl		Hijau:
+Redo	TextView		Ulangi
+No pages to print!	PrintJob		Tidak ada halaman untuk dicetak!
+beta	AboutWindow		beta
+OK	ZombieReplicantView		OKE
+Cut	TextView		Potong
+%3.2f GiB	StringForSize		%3.2f GiB
+Can't delete this replicant from its original application. Life goes on.	Dragger		Tidak dapat menghapus replicant ini dari aplikasi aslinya. Hidup terus berlanjut.
+Error	ZombieReplicantView		Galat
 Paste	TextView		Tempel
+OK	AboutWindow		OKE
 Special Thanks:	AboutWindow		Terima kasih terkhusus:
 %.2f TiB	StringForSize		%.2f TiB
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Tidak dapat menemukan aplikasi untuk replicant tersebut. Tidak ada tanda tangan aplikasi yang disediakan.\n%error
-Redo	TextView		Ulangi
-<empty>	Menu		<kosong>
-Warning	Dragger		Peringatan
-Undo	TextView		Batal
+Remove replicant	Dragger		Hapus replicant
+Version	AboutWindow		Versi
 Red:	ColorControl		Merah:
+<empty>	Menu		<kosong>
+Copy	TextView		Salin
+Select all	TextView		Pilih semua
+alpha	AboutWindow		alpha
 %3.2f MiB	StringForSize		%3.2f MiB
+Error	PrintJob		Galat
+About %app%	AboutWindow		Tentang %app%
 About %app…	Dragger		Tentang %app…
-development	AboutWindow		pengembangan
-Error	ZombieReplicantView		Galat
+Version history:	AboutWindow		Sejarah versi:
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Tidak dapat menemukan aplikasi untuk replicant tersebut. Tidak ada tanda tangan aplikasi yang disediakan.\n%error
+%3.2f KiB	StringForSize		%3.2f KiB
 Blue:	ColorControl		Biru:
-gold master	AboutWindow		master emas
-Can't delete this replicant from its original application. Life goes on.	Dragger		Tidak dapat menghapus replicant ini dari aplikasi aslinya. Hidup terus berlanjut.
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Tidak dapat menciptakan replicant untuk \"%description\".\n%error
+Written by:	AboutWindow		Ditulis oleh:

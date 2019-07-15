@@ -1,9 +1,9 @@
 1	portuguese (brazil)	x-vnd.Haiku-keystore_server	1147091869
-This application hasn't been granted access before.	AppAccessRequestWindow		A este aplicativo não foi concedido acesso previamente.
-Unlock	KeyRequestWindow		Desbloquear
+requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		solicita acesso ao chaveiro:\n%keyringName%\n\n
+Application keyring access	AppAccessRequestWindow		Acesso ao chaveiro do aplicativo
+Disallow	AppAccessRequestWindow		Proibir
+Allow once	AppAccessRequestWindow		Permitir uma vez
 This application has been updated since it was last granted access.	AppAccessRequestWindow		Este aplicativo foi atualizado desde que perdeu o acesso concedido.
 Allow always	AppAccessRequestWindow		Permitir sempre
-Application keyring access	AppAccessRequestWindow		Acesso ao chaveiro do aplicativo
-Allow once	AppAccessRequestWindow		Permitir uma vez
-Disallow	AppAccessRequestWindow		Proibir
-requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		solicita acesso ao chaveiro:\n%keyringName%\n\n
+Unlock	KeyRequestWindow		Desbloquear
+This application hasn't been granted access before.	AppAccessRequestWindow		A este aplicativo não foi concedido acesso previamente.

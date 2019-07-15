@@ -1,3 +1,12 @@
-1	indonesian	x-vnd.Haiku-Pulse	624124470
+1	indonesian	x-vnd.Haiku-Pulse	1887527162
+Quit	DeskbarPulseView		Keluar
+Error	PulseApp		Kesalahan
+Bar colors	ConfigView		Batang warna
+%ld MHz	NormalPulseView		%ld MHz
 About Pulse…	PulseView		Tentang Pulse…
+OK	PrefsWindow		OKE
 About Pulse…	CPUButton		Tentang Pulse…
+Mini mode	DeskbarPulseView		Mode mini
+Settings…	PulseView		Pengaturan
+Quit	MiniPulseView		Keluar
+Info	PulseView		Info

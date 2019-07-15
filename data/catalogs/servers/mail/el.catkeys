@@ -1,15 +1,15 @@
 1	greek, modern (1453-)	x-vnd.Be-POST	2300835729
+No new messages	MailDaemon		Δεν υπάρχουν νέα μυνήματα.
+No new messages	DeskbarView		Δεν υπάρχουν νέα μυνήματα.
+Shutdown mail services	DeskbarView		Κλείσιμο υπηρεσιών αλληλογραφίας
+Mail status	MailDaemon		Κατάσταση αλληλογραφίας
 Fetching mail for %name	Notifier		Κατέβασμα μηνυμάτων από %name
-Check for mails only	DeskbarView		Ελεγχος για νέα μηνύματα μόνο
+Create new message…	DeskbarView		Δημιουργία μηνύματος...
 Send pending mails	DeskbarView		Αποστολή αλληλογραφίας στην ουρά
 New Messages	MailDaemon		Νέα Μυνήματα
 <no accounts>	DeskbarView		<κανένας λογαριασμός>
-Mail status	MailDaemon		Κατάσταση αλληλογραφίας
-Shutdown mail services	DeskbarView		Κλείσιμο υπηρεσιών αλληλογραφίας
-Sending mail for %name	Notifier		Αποστολή μηνύματος από %name
-Create new message…	DeskbarView		Δημιουργία μηνύματος...
-No new messages	MailDaemon		Δεν υπάρχουν νέα μυνήματα.
-Check for mail now	DeskbarView		Έλεγχος αλληλογραφίας τώρα
-No new messages	DeskbarView		Δεν υπάρχουν νέα μυνήματα.
-Mail daemon status log	MailDaemon		Κατάσταση του δέμονα αλληλογραφίας
 Mail status	Notifier		Κατάσταση αλληλογραφίας
+Check for mails only	DeskbarView		Ελεγχος για νέα μηνύματα μόνο
+Check for mail now	DeskbarView		Έλεγχος αλληλογραφίας τώρα
+Sending mail for %name	Notifier		Αποστολή μηνύματος από %name
+Mail daemon status log	MailDaemon		Κατάσταση του δέμονα αλληλογραφίας

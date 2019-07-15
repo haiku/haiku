@@ -1,20 +1,20 @@
 1	finnish	x-vnd.Haiku-Login	336867745
-Error: %1	Login App		Virhe: %1
-Hide password	Login View		Piilota salasana
-Desktop	Desktop Window		Työpöytä
 Invalid login!	Login View		Virheellinen kirjautuminen!
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tKäynnistää itsemuokkaustilan työpöydän muokkaamisen sallimiseksi.\n
-OK	Login View		Valmis
-error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	virhe %s\n
-Login:	Login View		Kirjaudu:
 Error	Login App		Virhe
-Unimplemented	Login App		Toteuttamaton
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tKäynnistää itsemuokkaustilan työpöydän muokkaamisen sallimiseksi.\n
 Welcome to Haiku	Login Window		Tervetuloa Haikuun
-Reboot	Login View		Käynnistä uudelleen
-Login application for Haiku\nUsage:\n	Login App		Kirjautumissovellus Haikulle\nKäyttö:\n
-Info	Login App		Tiedot
 Halt	Login View		Keskeytä
-Password:	Login View		Salasana:
-OK	Login App		Valmis
+Login application for Haiku\nUsage:\n	Login App		Kirjautumissovellus Haikulle\nKäyttö:\n
 --nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tÄlä tee ikkunasta välitöntä toimintaa vaativaa\n
+Desktop	Desktop Window		Työpöytä
+Hide password	Login View		Piilota salasana
+Reboot	Login View		Käynnistä uudelleen
 You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Voit räätälöidä Kirjautumissovelluksen jälkeen näytettävää työpöytää pudottamalla kopiot siihen.\n\nKun olet valmis, poistu vain sovelluksesta (Cmd-Q).
+OK	Login View		Valmis
+Info	Login App		Tiedot
+Login:	Login View		Kirjaudu:
+Password:	Login View		Salasana:
+Unimplemented	Login App		Toteuttamaton
+OK	Login App		Valmis
+Error: %1	Login App		Virhe: %1
+error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	virhe %s\n

@@ -1,29 +1,28 @@
-1	belarusian	x-vnd.Haiku-PPMTranslator	797856484
+1	belarusian	x-vnd.Haiku-PPMTranslator	3151796093
+None	PPMTranslator		Адсутнічае
 PPM Settings	PPMMain		Наладкі PPM
-Based on PPMTranslator sample code	PPMTranslator		Грунтуецца на зыходным тэксце прыкладу PPMTranslator
-OK	PPMMain		ОК
+System palette 8 bits	PPMTranslator		Сістэмная палета 8 бітаў
+Sample code copyright 1999, Be Incorporated	PPMTranslator		Ліцэнзія '1999, Be Incorporated' на выкарыстанне зыходнага коду прыкладаў
+Something is wrong with the PPMTranslator!	PPMMain		Увага! Канвертар PPM мае нейкія праблемы!
 Grayscale 8 bits	PPMTranslator		Шэракаляровы 8 біт
+Based on PPMTranslator sample code	PPMTranslator		Грунтуецца на зыходным тэксце прыкладу PPMTranslator
+RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 бітаў (big-endian)
+PPM image translator	PPMTranslator		Канвертар выяваў PPM
+Bitmap 1 bit	PPMTranslator		Бітмап 1 біт
+RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 бітаў (big-endian)
+PPMTranslator Settings	PPMTranslator		Наладкі канвертара PPM
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 біт
+OK	PPMMain		ОК
+CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 біт
 PPM image	PPMTranslator		Выява PPM
+RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 бітаў (big-endian)
+RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 бітаў (big-endian)
+Write ASCII	PPMTranslator		Запісваць ў ASCII
+RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 бітаў
+RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 бітаў (big-endian)
+RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 бітаў
+CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 біт
+RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 бітаў
+RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 бітаў
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 біт
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Фармат бітмапу BeOS (Канвертар PPM)
-CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 біт
-CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 біт
-PPM image translator	PPMTranslator		Канвертар выяваў PPM
-bits/space	PPMTranslator		бітаў/ліст
-RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 бітаў (big-endian)
-RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 бітаў (big-endian)
-RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 бітаў (big-endian)
-RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 бітаў
-Write ASCII	PPMTranslator		Запісваць ў ASCII
-RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 бітаў
-None	PPMTranslator		Адсутнічае
-RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 бітаў (big-endian)
-RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 бітаў
-Bitmap 1 bit	PPMTranslator		Бітмап 1 біт
-RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 бітаў (big-endian)
-RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 бітаў
-Sample code copyright 1999, Be Incorporated	PPMTranslator		Ліцэнзія '1999, Be Incorporated' на выкарыстанне зыходнага коду прыкладаў
-PPMTranslator Settings	PPMTranslator		Наладкі канвертара PPM
-Something is wrong with the PPMTranslator!	PPMMain		Увага! Канвертар PPM мае нейкія праблемы!
-System palette 8 bits	PPMTranslator		Сістэмная палета 8 бітаў

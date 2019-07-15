@@ -1,22 +1,21 @@
-1	lithuanian	x-vnd.Haiku-NetworkStatus	1729819859
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		„NetworkStatus“ argumentai:\n\t--deskbar\tpatalpinti replikantą pranešimų srityje\n\t--help\t\tišvesti šią instrukciją ir baigti darbą\n
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Šią programą galite paleisti atskirame lange arba patalpinti pranešimų srityje.
-<no wireless networks found>	NetworkStatusView		<belaidžių tinklų nerasta>
-Run in window	NetworkStatus		Paleisti lange
-No link	NetworkStatusView		Ryšio nėra
-Install in Deskbar	NetworkStatus		Patalpinti pranešimų srityje
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		Tinklo nuostatų atverti nepavyko.\n\nKlaida:
+1	lithuanian	x-vnd.Haiku-NetworkStatus	3823341665
 Netmask	NetworkStatusView		Tinklo kaukė
-Broadcast	NetworkStatusView		Transliacinis
-Unknown	NetworkStatusView		Nežinomas
-Network Status	NetworkStatusView		Tinklo būsena
-Ready	NetworkStatusView		Tinkle
-No stateful configuration	NetworkStatusView		Pilnavertės konfigūracijos nėra
-%ifaceName information:\n	NetworkStatusView		%ifaceName būsena:\n
-Configuring	NetworkStatusView		Konfigūruojama
-Address	NetworkStatusView		IP adresas
-OK	NetworkStatusView		Gerai
-NetworkStatus	System name		Tinklo būsena
-Open network preferences…	NetworkStatusView		Atverti tinklo nuostatas…
-Could not join wireless network:\n	NetworkStatusView		Prisijungti prie belaidžio tinklo nepavyko:\n
 Quit	NetworkStatusView		Baigti darbą
+Unknown	NetworkStatusView		Nežinomas
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Tinklo nuostatų atverti nepavyko.\n\nKlaida:
+Install in Deskbar	NetworkStatus		Patalpinti pranešimų srityje
+Open network preferences…	NetworkStatusView		Atverti tinklo nuostatas…
+NetworkStatus	System name		Tinklo būsena
+OK	NetworkStatusView		Gerai
+No link	NetworkStatusView		Ryšio nėra
+Could not join wireless network:\n	NetworkStatusView		Prisijungti prie belaidžio tinklo nepavyko:\n
+Ready	NetworkStatusView		Tinkle
+Network Status	NetworkStatusView		Tinklo būsena
+Address	NetworkStatusView		IP adresas
+No stateful configuration	NetworkStatusView		Pilnavertės konfigūracijos nėra
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Šią programą galite paleisti atskirame lange arba patalpinti pranešimų srityje.
+Broadcast	NetworkStatusView		Transliacinis
+%ifaceName information:\n	NetworkStatusView		%ifaceName būsena:\n
+Run in window	NetworkStatus		Paleisti lange
+<no wireless networks found>	NetworkStatusView		<belaidžių tinklų nerasta>
+Configuring	NetworkStatusView		Konfigūruojama

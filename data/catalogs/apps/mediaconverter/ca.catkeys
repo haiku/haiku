@@ -1,9 +1,9 @@
 1	catalan; valencian	x-vnd.Haiku-MediaConverter	820560844
-Open…	Menu		Obre...
-OK	MediaConverter		D'acord
-OK	MediaConverter-FileInfo		D'acord
 Cancelling	MediaConverter		S'està cancel·lant
-Cancel	MediaConverter		Anul·la
-Conversion cancelled	MediaConverter		S'ha cancel·lat la conversió
-Continue	MediaConverter		Continua
+OK	MediaConverter		D'acord
+Open…	Menu		Obre...
 Cancelling…	MediaConverter		S'està cancel·lant...
+Conversion cancelled	MediaConverter		S'ha cancel·lat la conversió
+Cancel	MediaConverter		Anul·la
+OK	MediaConverter-FileInfo		D'acord
+Continue	MediaConverter		Continua

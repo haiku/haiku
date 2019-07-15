@@ -1,20 +1,20 @@
 1	japanese	x-vnd.Haiku-MidiPlayer	1046133011
-None	Main Window		無し
-Live input:	Main Window		ライブ入力:
-Stop	Main Window		中止
 This tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	This tiny program\nKnows how to play thousands of\nCheesy sounding songs
-Cavern	Main Window		Cavern (洞くつ)
-Volume:	Main Window		音量:
-Reverb:	Main Window		リバーブ:
-OK	Main Window		OK
-Loading instruments…	Scope View		インストゥルメントを読み込んでいます…
-Off	Main Window		無効
 Dungeon	Main Window		Dungeon (地下牢)
-Play	Main Window		再生
-Garage	Main Window		Garage (ガレージ)
-Closet	Main Window		Closet (クローゼット)
-MidiPlayer	System name		MIDI プレーヤー
-Drop MIDI file here	Scope View		ここに MIDI ファイルをドロップ
-Igor's lab	Main Window		Igor's lab (実験室)
-Scope	Main Window		Scope (スコープ)
 Could not load song	Main Window		ファイルの読み込みに失敗
+Igor's lab	Main Window		Igor's lab (実験室)
+Off	Main Window		無効
+Loading instruments…	Scope View		インストゥルメントを読み込んでいます…
+Volume:	Main Window		音量:
+Closet	Main Window		Closet (クローゼット)
+Scope	Main Window		Scope (スコープ)
+Drop MIDI file here	Scope View		ここに MIDI ファイルをドロップ
+None	Main Window		無し
+Reverb:	Main Window		リバーブ:
+MidiPlayer	System name		MIDI プレーヤー
+OK	Main Window		OK
+Stop	Main Window		中止
+Live input:	Main Window		ライブ入力:
+Garage	Main Window		Garage (ガレージ)
+Play	Main Window		再生
+Cavern	Main Window		Cavern (洞くつ)

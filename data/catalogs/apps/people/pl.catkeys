@@ -1,50 +1,50 @@
 1	polish	x-vnd.Be-PEPL	2332202134
-Edit	People		Edycja
-Error	People		Błąd
-City	People		Miasto
-The file '%name%' could not be written.	People		Plik „%name%” nie mógł zostać zapisany.
-none	Groups list		brak
-Configure attributes	People		Konfiguracja atrybutów
-Company	People		Firma
-%name% picture	People		%name% zdjęcie
-Work phone	People		Telefon do pracy
-People	System name		Ludzie
-New person	People		Nowa osoba
-Select all	People		Zaznacz wszystkie
-File	People		Plik
-Unnamed person	People		Nienazwana osoba
-Could not create %s.	People		Nie można utworzyć %s.
-Country	People		Kraj
-Close	People		Zamknij
-Group	People		Grupa
-Nickname	People		Pseudonim
-Quit	People		Zakończ
-Name	People		Imię i nazwisko
-Revert	People		Cofnij
-Don't save	People		Nie zapisuj
-Undo	People		Cofnij
-E-mail	People		E-mail
-Load image…	People		Wczytaj obraz…
-OK	People		OK
-Remove image	People		Usuń obraz
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Uruchomienie panelu FileTypes, aby skonfigurować atrybuty osoby nie powiodło się.\n\nBłąd: 
-Home phone	People		Telefon domowy
-Save as…	People		Zapisz jako…
-Redo	People		Powtórz
-Save changes before closing?	People		Czy zapisać zmiany przed zamknięciem?
-Paste	People		Wklej
-Drop an image here,\nor use the contextual menu.	People		Upuść obraz tutaj\nlub użyj menu kontekstowego.
-Save	People		Zapisz
-Person	Short mimetype description		Osoba
+Unnamed person	People		Nienazwana osoba
 New person…	People		Nowa osoba…
 Address	People		Adres
-URL	People		Adres URL
-Sorry	People		Przykro nam
 Zip	People		Kod pocztowy
-Contact information for a person.	Long mimetype description		Informacje kontaktowe osoby.
-Fax	People		Faks
+Select all	People		Zaznacz wszystkie
+Could not create %s.	People		Nie można utworzyć %s.
+Quit	People		Zakończ
+Company	People		Firma
+Name	People		Imię i nazwisko
+The file '%name%' could not be written.	People		Plik „%name%” nie mógł zostać zapisany.
 Contact name	People		Imię i nazwisko
-Cut	People		Wytnij
 Cancel	People		Anuluj
+Edit	People		Edycja
+Save changes before closing?	People		Czy zapisać zmiany przed zamknięciem?
+People	System name		Ludzie
+Error	People		Błąd
+Revert	People		Cofnij
+Country	People		Kraj
+Person	Short mimetype description		Osoba
+New person	People		Nowa osoba
+Save	People		Zapisz
+Fax	People		Faks
+URL	People		Adres URL
+%name% picture	People		%name% zdjęcie
+Home phone	People		Telefon domowy
+none	Groups list		brak
+Save as…	People		Zapisz jako…
+Cut	People		Wytnij
+Contact information for a person.	Long mimetype description		Informacje kontaktowe osoby.
+Remove image	People		Usuń obraz
+City	People		Miasto
+Undo	People		Cofnij
+Don't save	People		Nie zapisuj
+Configure attributes	People		Konfiguracja atrybutów
+Work phone	People		Telefon do pracy
 State	People		Województwo
+Nickname	People		Pseudonim
+OK	People		OK
+File	People		Plik
+Redo	People		Powtórz
+Close	People		Zamknij
 Copy	People		Kopiuj
+Paste	People		Wklej
+E-mail	People		E-mail
+Group	People		Grupa
+Drop an image here,\nor use the contextual menu.	People		Upuść obraz tutaj\nlub użyj menu kontekstowego.
+Load image…	People		Wczytaj obraz…
+Sorry	People		Przykro nam

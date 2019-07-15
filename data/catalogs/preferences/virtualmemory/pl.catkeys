@@ -1,20 +1,20 @@
 1	polish	x-vnd.Haiku-VirtualMemory	2090796060
-Quit	SettingsWindow		Wyjdź
-Automatic swap management	SettingsWindow		Automatyczne zarządzanie przestrzenią wymiany
-Turn off	SettingsWindow		Wyłącz
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Wyłączenie pamięci wirtualnej może mieć niepożądany wpływ na stabilność systemu, gdy cała dostępna pamięć zostanie zużyta.\nPamięć wirtualna nie wpływa na wydajność systemu, aż do tego momentu.\n\nNa pewno chcesz ją wyłączyc?
 Requested swap file size:	SettingsWindow		Docelowy rozmiar pliku wymiany:
-The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Ustawienia określone w pliku ustawień są nieprawidłowe. Możesz załadować ustawienia domyślne lub zakończyć.
-Defaults	SettingsWindow		Przywróć domyślne
-Current Swap:	SettingsWindow		Aktualny plik wymiany:
-Use volume:	SettingsWindow		Użyj woluminu:
-Keep enabled	SettingsWindow		Pozostaw włączoną
-Revert	SettingsWindow		Cofnij
 VirtualMemory	System name		PamięćWirtualna
-Use boot volume	SettingsWindow		Użyj woluminu rozruchowego
-Load defaults	SettingsWindow		Załaduj ustawienia domyślne
 OK	VirtualMemoryApp		OK
+Use volume:	SettingsWindow		Użyj woluminu:
+Turn off	SettingsWindow		Wyłącz
 Changes will take effect upon reboot.	SettingsWindow		Zmiany zostaną zastosowane po ponownym uruchomieniu.
+Revert	SettingsWindow		Cofnij
+Keep enabled	SettingsWindow		Pozostaw włączoną
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Ustawienia określone w pliku ustawień są nieprawidłowe. Możesz załadować ustawienia domyślne lub zakończyć.
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Pamięc wirtualna\n\tstworzona przez Axel Dörfler\n\tCopyright 2005, Haiku.\n
 The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		Wolumin określony w pliku ustawień, nie może zostać odnaleziony. Możesz użyć woluminu rozruchowego lub zamknąć.
+Current Swap:	SettingsWindow		Aktualny plik wymiany:
+Load defaults	SettingsWindow		Załaduj ustawienia domyślne
+Use boot volume	SettingsWindow		Użyj woluminu rozruchowego
+Automatic swap management	SettingsWindow		Automatyczne zarządzanie przestrzenią wymiany
+Defaults	SettingsWindow		Przywróć domyślne
+Quit	SettingsWindow		Wyjdź
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Wyłączenie pamięci wirtualnej może mieć niepożądany wpływ na stabilność systemu, gdy cała dostępna pamięć zostanie zużyta.\nPamięć wirtualna nie wpływa na wydajność systemu, aż do tego momentu.\n\nNa pewno chcesz ją wyłączyc?
 Enable virtual memory	SettingsWindow		Włącz pamięć wirtualną

@@ -1,38 +1,38 @@
 1	japanese	x-vnd.Haiku-libsolvsolver	3404387783
-%dependency% is provided by the system	SolverProblem		%dependency% はシステムが提供する
-package %source% conflicts with %dependency% provided by %target%	SolverProblem		パッケージ %source% は、%target% が提供する %dependency% と競合します
-nothing provides requested %dependency%	SolverProblem		要求された %dependency% を提供するものがない
-unspecified problem	SolverProblem		詳細不明の問題
-keep %source% despite its inferior architecture	SolverProblemSolution		下位のアーキテクチャですが、%source% を保持する
-do not deinstall \"%selection%\"	SolverProblemSolution		\"%selection%\" のアンインストール不可
-%source% has inferior architecture	SolverProblem		%source% は下位のアーキテクチャーです
-dependency problem	SolverProblem		依存関係の問題
-do not keep %source% installed	SolverProblemSolution		%source% をインストールしたままにしない
-package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		パッケージ %source% は、%target% が提供する %dependency% を暗黙的に廃止する
-do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		すべての解決方法 \"%selection%\"  をアンインストールしない
-keep %source% from excluded repository	SolverProblemSolution		除外されたリポジトリから %source% を保持する
-install %selection% despite its old version	SolverProblemSolution		古いバージョンですが、%selection% をインストールする
-allow downgrade of %source% to %target%	SolverProblemSolution		%source% から %target% へのダウングレードを許可する
-do not lock \"%selection%\"	SolverProblemSolution		\"%selection%\" をロックしない
-install %source% despite its inferior architecture	SolverProblemSolution		下位のアーキテクチャですが、%source% をインストールする
-do not install \"%selection%\"	SolverProblemSolution		\"%selection%\" をインストールしない
-do something	SolverProblemSolution		何らかを行う
-do not install the most recent version of \"%selection%\"	SolverProblemSolution		\"%selection%\" の最新バージョンをインストールしない
-package %source% conflicts with %dependency% provided by itself	SolverProblem		パッケージ %source% は自身が提供する %dependency% と競合する
-cannot install both %source% and %target%	SolverProblem		%source% と %target% の両方をインストールできません
-allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		\"%sourceVendor%\" (%source%) から \"%targetVendor%\" (%target%) へのベンダーの変更を許可する
-install %source% from excluded repository	SolverProblemSolution		除外されたリポジトリから %source% をインストールする
-keep old %source%	SolverProblemSolution		古い %source% を保持する
-conflicting requests	SolverProblem		矛盾する要求
-package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		パッケージ %source% は、%dependency% を必要としますが、プロバイダがインストールできません
-do not forbid installation of %source%	SolverProblemSolution		%source%のインストールを禁止できません
 allow architecture change of %source% to %target%	SolverProblemSolution		%source% から %target%へのアーキテクチャの変更を許可する
-allow name change of %source% to %target%	SolverProblemSolution		%source% から %target%への名称の変更を許可する
+install %source% from excluded repository	SolverProblemSolution		除外されたリポジトリから %source% をインストールする
+unspecified problem	SolverProblem		詳細不明の問題
+package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		パッケージ %source% は、%dependency% を必要としますが、プロバイダがインストールできません
+package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		パッケージ %source% は、%target% が提供する %dependency% を暗黙的に廃止する
+nothing provides requested %dependency%	SolverProblem		要求された %dependency% を提供するものがない
+do not keep %source% installed	SolverProblemSolution		%source% をインストールしたままにしない
+do not deinstall \"%selection%\"	SolverProblemSolution		\"%selection%\" のアンインストール不可
+install %source% despite its inferior architecture	SolverProblemSolution		下位のアーキテクチャですが、%source% をインストールする
+conflicting requests	SolverProblem		矛盾する要求
+do not install the most recent version of \"%selection%\"	SolverProblemSolution		\"%selection%\" の最新バージョンをインストールしない
 allow replacement of %source% with %target%	SolverProblemSolution		%source% から %target%への置換えを許可する
-allow deinstallation of %source%	SolverProblemSolution		%source% のアンインストールを許可する
-%source% does not belong to a distupgrade repository	SolverProblem		%source% は、distupgrade リポジトリの一部ではありません
 package %source% obsoletes %dependency% provided by %target%	SolverProblem		パッケージ %source% は、%target% が提供する %dependency% を廃止する
-package %source% is not installable	SolverProblem		パッケージ %source% はインストールできません
+do not forbid installation of %source%	SolverProblemSolution		%source%のインストールを禁止できません
+allow downgrade of %source% to %target%	SolverProblemSolution		%source% から %target% へのダウングレードを許可する
+dependency problem	SolverProblem		依存関係の問題
+%dependency% is provided by the system	SolverProblem		%dependency% はシステムが提供する
+keep %source% despite its inferior architecture	SolverProblemSolution		下位のアーキテクチャですが、%source% を保持する
+%source% does not belong to a distupgrade repository	SolverProblem		%source% は、distupgrade リポジトリの一部ではありません
 installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		インストール済パッケージ %source% は、%target% が提供する %dependency% を廃止する
+allow name change of %source% to %target%	SolverProblemSolution		%source% から %target%への名称の変更を許可する
+package %source% conflicts with %dependency% provided by %target%	SolverProblem		パッケージ %source% は、%target% が提供する %dependency% と競合します
+do something	SolverProblemSolution		何らかを行う
+install %selection% despite its old version	SolverProblemSolution		古いバージョンですが、%selection% をインストールする
+cannot install both %source% and %target%	SolverProblem		%source% と %target% の両方をインストールできません
+package %source% is not installable	SolverProblem		パッケージ %source% はインストールできません
 problem with installed package %source%	SolverProblem		インストール済パッケージ %source% に問題があります
+allow deinstallation of %source%	SolverProblemSolution		%source% のアンインストールを許可する
+keep %source% from excluded repository	SolverProblemSolution		除外されたリポジトリから %source% を保持する
+keep old %source%	SolverProblemSolution		古い %source% を保持する
+package %source% conflicts with %dependency% provided by itself	SolverProblem		パッケージ %source% は自身が提供する %dependency% と競合する
+allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		\"%sourceVendor%\" (%source%) から \"%targetVendor%\" (%target%) へのベンダーの変更を許可する
+do not lock \"%selection%\"	SolverProblemSolution		\"%selection%\" をロックしない
+do not install \"%selection%\"	SolverProblemSolution		\"%selection%\" をインストールしない
 nothing provides %dependency% needed by %source%	SolverProblem		%source% が必要とする%dependency% を提供するものがありません
+%source% has inferior architecture	SolverProblem		%source% は下位のアーキテクチャーです
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		すべての解決方法 \"%selection%\"  をアンインストールしない

@@ -1,50 +1,50 @@
 1	japanese	x-vnd.Be-PEPL	2332202134
-Edit	People		編集
-Error	People		エラー
-City	People		市町村
-The file '%name%' could not be written.	People		ファイル '%name%' を書き込めませんでした。
-none	Groups list		無し
-Configure attributes	People		属性を編集
-Company	People		会社
-%name% picture	People		%name% の画像
-Work phone	People		勤務先の電話番号
-People	System name		People
-New person	People		新規作成
-Select all	People		すべて選択
-File	People		ファイル
-Unnamed person	People		名無し
-Could not create %s.	People		%s を作成できませんでした。
-Country	People		国
-Close	People		閉じる
-Group	People		グループ
-Nickname	People		ニックネーム
-Quit	People		終了
-Name	People		名前
-Revert	People		元に戻す
-Don't save	People		保存しない
-Undo	People		元に戻す
-E-mail	People		E-mail
-Load image…	People		イメージを読み込む…
-OK	People		OK
-Remove image	People		イメージを削除する
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Person 属性を設定する FileTypes の起動に失敗しました。\n\nエラー:
-Home phone	People		自宅の電話番号
-Save as…	People		名前を付けて保存…
-Redo	People		やり直し
-Save changes before closing?	People		閉じる前に変更を保存しますか?
-Paste	People		貼り付け
-Drop an image here,\nor use the contextual menu.	People		画像をここにドロップしてください。\nまたは、コンテクストメニューを使ってください。
-Save	People		保存
-Person	Short mimetype description		人物
+Unnamed person	People		名無し
 New person…	People		新規作成…
 Address	People		住所
-URL	People		URL
-Sorry	People		すみません
 Zip	People		郵便番号
-Contact information for a person.	Long mimetype description		連絡先情報
-Fax	People		ファックス
+Select all	People		すべて選択
+Could not create %s.	People		%s を作成できませんでした。
+Quit	People		終了
+Company	People		会社
+Name	People		名前
+The file '%name%' could not be written.	People		ファイル '%name%' を書き込めませんでした。
 Contact name	People		担当者名
-Cut	People		切り取り
 Cancel	People		中止
+Edit	People		編集
+Save changes before closing?	People		閉じる前に変更を保存しますか?
+People	System name		People
+Error	People		エラー
+Revert	People		元に戻す
+Country	People		国
+Person	Short mimetype description		人物
+New person	People		新規作成
+Save	People		保存
+Fax	People		ファックス
+URL	People		URL
+%name% picture	People		%name% の画像
+Home phone	People		自宅の電話番号
+none	Groups list		無し
+Save as…	People		名前を付けて保存…
+Cut	People		切り取り
+Contact information for a person.	Long mimetype description		連絡先情報
+Remove image	People		イメージを削除する
+City	People		市町村
+Undo	People		元に戻す
+Don't save	People		保存しない
+Configure attributes	People		属性を編集
+Work phone	People		勤務先の電話番号
 State	People		都道府県
+Nickname	People		ニックネーム
+OK	People		OK
+File	People		ファイル
+Redo	People		やり直し
+Close	People		閉じる
 Copy	People		コピー
+Paste	People		貼り付け
+E-mail	People		E-mail
+Group	People		グループ
+Drop an image here,\nor use the contextual menu.	People		画像をここにドロップしてください。\nまたは、コンテクストメニューを使ってください。
+Load image…	People		イメージを読み込む…
+Sorry	People		すみません

@@ -1,132 +1,133 @@
-1	lithuanian	x-vnd.Haiku-DiskProbe	1806743923
-File offset: 	ProbeView		Poslinkis faile: 
-%ld (native)	ProbeView		%ld (prigimtinis)
-64 bit unsigned value:	TypeEditors		64 bitų reikšmė be ženklo:
-Find again	ProbeView		Ieškoti kito
-Text	FindWindow		Tekstas
-Find…	ProbeView		Ieškoti…
-Case sensitive	FindWindow		Paisyti raidžių registro
-Cancel	OpenWindow		Atsisakyti
-Close	AttributeWindow		Užverti
-File	ProbeView		Failas
-Attribute	ProbeView		Požymis
-Floating-point value:	TypeEditors		Slankiojo kablelio reikšmė:
-16 bit	TypeEditors		16 bitų
-Attributes	ProbeView		Požymiai
-Device offset: 	ProbeView		Poslinkis įrenginyje: 
-Selection	ProbeView		Atranka
-DiskProbe	System name		Disko tyriklis
-what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	kas: '%.4s'\n\n
-File	FileWindow		Failas
-OK	DiskProbe		Gerai
-Boolean	TypeEditors	This is the type of editor	Loginis
-Paste	ProbeView		Įdėti
-PNG format	TypeEditors		PNG formatas
-Font size	ProbeView		Šrifto dydis
-Attribute type: 	ProbeView		Požymio tipas: 
-Attribute	AttributeWindow		Požymis
-8 bit signed value:	TypeEditors		8 bitų skaičius su ženklu:
-Number:	TypeEditors		Skaičius:
-Save	ProbeView		Įrašyti
-Stop	ProbeView		Stabdyti
-Number editor	TypeEditors		Skaičiaus taisymas
-Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Šešioliktainė
-No type editor available	AttributeWindow		Nėra šio tipo požymių redaktoriaus
-Double precision floating-point value:	TypeEditors		Dvigubo tikslumo slankaus kablelio reikšmė:
-Device: 	ProbeView		Įrenginys: 
-Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Ar tikrai norite pašalinti požymį „%s“ iš failo „%s“?\n\nŠis veiksmas negrįžtamas.
-Text	TypeEditors	This is the type of editor	Tekstas
-8 bit unsigned value:	TypeEditors		8 bitų reikšmė be ženklo:
-Block	ProbeView		Blokas
-Back	ProbeView		Grįžti atgal
-Device	ProbeView		Įrenginys
-Unknown type	TypeEditors		Nežinomas tipas
-Block 0x%Lx	ProbeView		Blokas 0x%Lx
-Quit	FileWindow		Baigti darbą
-Undo	ProbeView		Atšaukti
-Close	ProbeView		Užverti
-Number	TypeEditors	This is the type of editor	Skaičius
-Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Dešimtainė
-16 bit signed value:	TypeEditors		16 bitų reikšmė su ženklu:
-String editor	TypeEditors		Eilučių redaktorius
-of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	iš 0x0
-64 bit signed offset:	TypeEditors		64 bitų poslinkis su ženklu:
-Boolean editor	TypeEditors		Loginis redaktorius
-Copy	ProbeView		Kopijuoti
-none	ProbeView	No attributes	nėra
-Boolean value:	TypeEditors		Loginė reikšmė:
-32 bit size or status:	TypeEditors		32 bitų dydis arba būsena:
-8 bit palette	TypeEditors		8 bitų paletė
-Fit	ProbeView	Size of fonts, fits to available room	Optimalus
-Probe device	OpenWindow		Tirti įrenginį
- (native)	ProbeView		(prigimtinis)
-Unknown format	TypeEditors		Formatas nežinomas
-Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Šešioliktainė
-MIME type:	TypeEditors		MIME tipas:
-Page setup…	ProbeView		Puslapio nuostatos…
-New…	FileWindow		Naujas langas…
-DiskProbe request	AttributeWindow		Disko tyriklio užklausa
-Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Nepavyko perskaityti paveikslo
-Save changes before closing?	ProbeView		Ar įrašyti pakeitimus prieš užveriant?
-Type editor	AttributeWindow		Požymio redaktorius
-Native: 0x%0*Lx	ProbeView		Prigimtinė reikšmė: 0x%0*Lx
+1	lithuanian	x-vnd.Haiku-DiskProbe	2944605311
 Raw editor	AttributeWindow		Neapdorotų duomenų redaktorius
-Message View	TypeEditors		Pranešimo rodymas
-DiskProbe request	ProbeView		Disko tyriklio užklausa
-32 bit unsigned size:	TypeEditors		32 bitų dydis be ženklo:
-Flattened bitmap	TypeEditors		Suplotas paveikslėlis
-Open file…	FileWindow		Atverti failą…
-Next	ProbeView		Kitas
-Close	FileWindow		Užverti
-Attribute: 	ProbeView		Požymis:
-Remove from file	AttributeWindow		Pašalinti iš failo
-Don't save	ProbeView		Neįrašyti
-Previous	ProbeView		Ankstesnis
-64 bit signed value:	TypeEditors		64 bitų reikšmė su ženklu: 
-Icon	TypeEditors		Piktograma
-Block: 	ProbeView		Blokas:
-Examine device:	OpenWindow		Tirti įrenginį:
-Offset: 	ProbeView		Poslinkis:
-OK	ProbeView		Gerai
-Add	ProbeView		Pridėti
-Edit	ProbeView		Taisa
-Native: %Ld (0x%0*Lx)	ProbeView		Prigimtinė reikšmė: %Ld (0x%0*Lx)
-32 bit unsigned value:	TypeEditors		32 bitų reikšmė be ženklo:
-Message	TypeEditors	This is the type of view	Pranešimas
-Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Atverti „%s“ nepavyko:\n%s
-Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Skaičiavimo sistema
-Image view	TypeEditors	Image means here a picture file, not a disk image.	Paveikslo peržiūra
-Cancel	AttributeWindow		Atsisakyti
-Type editor not supported	ProbeView		Šio tipo požymių redaktorius nepalaikomas
-MIME type editor	TypeEditors		MIME tipo redaktorius
-Swapped: %Ld (0x%0*Lx)	ProbeView		Sukeitus baitų eiliškumą: %Ld (0x%0*Lx)
-Find	FindWindow		Ieškoti
 Remove	AttributeWindow		Pašalinti
-Print…	ProbeView		Spausdinti…
-Block %Ld (0x%Lx)	ProbeView		%Ld blokas (0x%Lx)
-Image	TypeEditors	This is the type of view	Paveikslas
-Could not open file \"%s\": %s\n	DiskProbe		Failo „%s“ atverti nepavyko: %s\n
-Select all	ProbeView		Pažymėti viską
-Probe file…	OpenWindow		Tirti failą…
-Icon view	TypeEditors		Piktogramos peržiūra
-Bookmarks	ProbeView		Žymelės
-Mode:	FindWindow		Veiksena:
-15 bit	TypeEditors		15 bitų
-Open device	FileWindow		Atverti įrenginį
-Could not find search string.	ProbeView		Ieškotos sekos rasti nepavyko.
+Close	ProbeView		Užverti
+Boolean value:	TypeEditors		Loginė reikšmė:
+File	ProbeView		Failas
+Block size	ProbeView	Menu item. This is in the same menu window than 'Base' and 'Font size'	Bloko dydis
+MIME type editor	TypeEditors		MIME tipo redaktorius
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Šešioliktainė
 16 bit unsigned value:	TypeEditors		16 bitų reikšmė be ženklo:
+8 bit signed value:	TypeEditors		8 bitų skaičius su ženklu:
+ (native)	ProbeView		(prigimtinis)
 Attribute offset: 	ProbeView		Poslinkis požymyje:
-View	ProbeView	This is the last menubar item 'File Edit Block View'	Rodymas
-Redo	ProbeView		Grąžinti
-File: 	ProbeView		Failas:
+Text	TypeEditors	This is the type of editor	Tekstas
+File offset: 	ProbeView		Poslinkis faile: 
+Add	ProbeView		Pridėti
+64 bit signed value:	TypeEditors		64 bitų reikšmė su ženklu: 
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Ar tikrai norite pašalinti požymį „%s“ iš failo „%s“?\n\nŠis veiksmas negrįžtamas.
+No type editor available	AttributeWindow		Nėra šio tipo požymių redaktoriaus
+Print…	ProbeView		Spausdinti…
+New…	FileWindow		Naujas langas…
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	kas: '%.4s'\n\n
+OK	DiskProbe		Gerai
+DiskProbe	System name		Disko tyriklis
+Back	ProbeView		Grįžti atgal
+Device: 	ProbeView		Įrenginys: 
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Skaičiavimo sistema
+Open file…	FileWindow		Atverti failą…
 32 bit unsigned pointer:	TypeEditors		32 bitų rodyklė be ženklo:
-of 	ProbeView		iš
-Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Failo įrašyti nepavyko:\n%s\n\nBaigus programos darbą, visi pakeitimai bus prarasti.
-32 bit	TypeEditors		32 bitų
-Cancel	ProbeView		Atsisakyti
-Swapped: 0x%0*Lx	ProbeView		Sukeitus baitų eiliškumą: 0x%0*Lx
-Grayscale	TypeEditors		Pilkumo tonai
-32 bit signed value:	TypeEditors		32 bitų reikšmė su ženklu:
 DiskProbe request	DiskProbe		Disko tyriklio užklausa
-Type editor	ProbeView		Požymio redaktorius
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Šešioliktainė
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Failo įrašyti nepavyko:\n%s\n\nBaigus programos darbą, visi pakeitimai bus prarasti.
+Examine device:	OpenWindow		Tirti įrenginį:
+Number editor	TypeEditors		Skaičiaus taisymas
+Icon	TypeEditors		Piktograma
+Attribute	ProbeView		Požymis
+Don't save	ProbeView		Neįrašyti
+Undo	ProbeView		Atšaukti
+Flattened bitmap	TypeEditors		Suplotas paveikslėlis
+Block %Ld (0x%Lx)	ProbeView		%Ld blokas (0x%Lx)
+Cancel	OpenWindow		Atsisakyti
+Unknown format	TypeEditors		Formatas nežinomas
+File: 	ProbeView		Failas:
+Swapped: %Ld (0x%0*Lx)	ProbeView		Sukeitus baitų eiliškumą: %Ld (0x%0*Lx)
+Stop	ProbeView		Stabdyti
+Cancel	ProbeView		Atsisakyti
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Atverti „%s“ nepavyko:\n%s
+Font size	ProbeView		Šrifto dydis
+Type editor not supported	ProbeView		Šio tipo požymių redaktorius nepalaikomas
+Native: 0x%0*Lx	ProbeView		Prigimtinė reikšmė: 0x%0*Lx
+Copy	ProbeView		Kopijuoti
+Redo	ProbeView		Grąžinti
+Floating-point value:	TypeEditors		Slankiojo kablelio reikšmė:
+Cancel	AttributeWindow		Atsisakyti
+16 bit signed value:	TypeEditors		16 bitų reikšmė su ženklu:
+DiskProbe request	AttributeWindow		Disko tyriklio užklausa
+Next	ProbeView		Kitas
+64 bit signed offset:	TypeEditors		64 bitų poslinkis su ženklu:
+32 bit signed value:	TypeEditors		32 bitų reikšmė su ženklu:
+Could not find search string.	ProbeView		Ieškotos sekos rasti nepavyko.
+Close	FileWindow		Užverti
+Unknown type	TypeEditors		Nežinomas tipas
+Open device	FileWindow		Atverti įrenginį
+Number:	TypeEditors		Skaičius:
+Quit	FileWindow		Baigti darbą
+Text	FindWindow		Tekstas
+Block 0x%Lx	ProbeView		Blokas 0x%Lx
+Attribute	AttributeWindow		Požymis
+Mode:	FindWindow		Veiksena:
+16 bit	TypeEditors		16 bitų
+32 bit size or status:	TypeEditors		32 bitų dydis arba būsena:
+of 	ProbeView		iš
 Contents:	TypeEditors		Turinys:
+Could not open file \"%s\": %s\n	DiskProbe		Failo „%s“ atverti nepavyko: %s\n
+Probe file…	OpenWindow		Tirti failą…
+Block: 	ProbeView		Blokas:
+Bookmarks	ProbeView		Žymelės
+Probe device	OpenWindow		Tirti įrenginį
+none	ProbeView	No attributes	nėra
+Case sensitive	FindWindow		Paisyti raidžių registro
+32 bit unsigned value:	TypeEditors		32 bitų reikšmė be ženklo:
+Remove from file	AttributeWindow		Pašalinti iš failo
+Attributes	ProbeView		Požymiai
+Message	TypeEditors	This is the type of view	Pranešimas
+Message View	TypeEditors		Pranešimo rodymas
+Offset: 	ProbeView		Poslinkis:
+Swapped: 0x%0*Lx	ProbeView		Sukeitus baitų eiliškumą: 0x%0*Lx
+MIME type:	TypeEditors		MIME tipas:
+Fit	ProbeView	Size of fonts, fits to available room	Optimalus
+Type editor	ProbeView		Požymio redaktorius
+File	FileWindow		Failas
+Grayscale	TypeEditors		Pilkumo tonai
+32 bit	TypeEditors		32 bitų
+Native: %Ld (0x%0*Lx)	ProbeView		Prigimtinė reikšmė: %Ld (0x%0*Lx)
+Device	ProbeView		Įrenginys
+Close	AttributeWindow		Užverti
+Type editor	AttributeWindow		Požymio redaktorius
+Save	ProbeView		Įrašyti
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	iš 0x0
+Attribute type: 	ProbeView		Požymio tipas: 
+15 bit	TypeEditors		15 bitų
+Page setup…	ProbeView		Puslapio nuostatos…
+Boolean	TypeEditors	This is the type of editor	Loginis
+Icon view	TypeEditors		Piktogramos peržiūra
+Select all	ProbeView		Pažymėti viską
+64 bit unsigned value:	TypeEditors		64 bitų reikšmė be ženklo:
+OK	ProbeView		Gerai
+Previous	ProbeView		Ankstesnis
+Selection	ProbeView		Atranka
+Find	FindWindow		Ieškoti
+8 bit unsigned value:	TypeEditors		8 bitų reikšmė be ženklo:
+%ld (native)	ProbeView		%ld (prigimtinis)
+Attribute: 	ProbeView		Požymis:
+Block	ProbeView		Blokas
+Find again	ProbeView		Ieškoti kito
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Rodymas
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Nepavyko perskaityti paveikslo
+DiskProbe request	ProbeView		Disko tyriklio užklausa
+Double precision floating-point value:	TypeEditors		Dvigubo tikslumo slankaus kablelio reikšmė:
+Image	TypeEditors	This is the type of view	Paveikslas
+Save changes before closing?	ProbeView		Ar įrašyti pakeitimus prieš užveriant?
+PNG format	TypeEditors		PNG formatas
+Number	TypeEditors	This is the type of editor	Skaičius
+Edit	ProbeView		Taisa
+String editor	TypeEditors		Eilučių redaktorius
+Boolean editor	TypeEditors		Loginis redaktorius
+Device offset: 	ProbeView		Poslinkis įrenginyje: 
+Find…	ProbeView		Ieškoti…
+8 bit palette	TypeEditors		8 bitų paletė
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Dešimtainė
+Image view	TypeEditors	Image means here a picture file, not a disk image.	Paveikslo peržiūra
+Paste	ProbeView		Įdėti
+32 bit unsigned size:	TypeEditors		32 bitų dydis be ženklo:

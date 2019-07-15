@@ -1,29 +1,29 @@
 1	lithuanian	x-vnd.Haiku-Shortcuts	4120254175
-OK	ShortcutsWindow		Gerai
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Sparčiųjų klavišų rinkinio įrašyti nepavyko.
-Cancel	ShortcutsWindow		Atsisakyti
-Append KeySet…	ShortcutsWindow		Įterpti sparčiųjų klavišų rinkinį…
-Control	ShortcutsSpec	Name for modifier on keyboard	Vald
-Key	ShortcutsWindow		Klavišas
-Open KeySet…	ShortcutsWindow		Atverti sparčiųjų klavišų rinkinį…
-Revert to saved	ShortcutsWindow		Grįžti prie įrašyto
-(Choose application with file requester)	ShortcutsWindow		(Atverti programos parinkimo langą)
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Sparčiųjų klavišų rinkinio atverti nepavyko!
-Save	ShortcutsWindow		Įrašyti
-Save changes before closing?	ShortcutsWindow		Ar įrašyti pakeitimus prieš užveriant?
-Remove selected shortcut	ShortcutsWindow		Pašalinti pažymėtąjį klavišų derinį
-Add new shortcut	ShortcutsWindow		Pridėti naują klavišų derinį
-Save & apply	ShortcutsWindow		Įrašyti ir taikyti
-Append	ShortcutsWindow		Įterpti
-File	ShortcutsWindow		Failas
-Quit	ShortcutsWindow		Baigti darbą
-Don't save	ShortcutsWindow		Neįrašyti
 Application	ShortcutsWindow		Programa
-Shift	ShortcutsSpec	Name for modifier on keyboard	Lyg2
-Save KeySet as…	ShortcutsWindow		Įrašyti sparčiųjų klavišų rinkinį kaip…
-Open	ShortcutsWindow		Atverti
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Sparčiųjų klavišų rinkinio išanalizuoti nepavyko!
-Select	ShortcutsWindow		Pažymėti
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Sparčiųjų klavišų rinkinio įrašyti nepavyko!
+Save changes before closing?	ShortcutsWindow		Ar įrašyti pakeitimus prieš užveriant?
+Revert to saved	ShortcutsWindow		Grįžti prie įrašyto
+Don't save	ShortcutsWindow		Neįrašyti
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Sparčiųjų klavišų rinkinio įrašyti nepavyko.
+Save	ShortcutsWindow		Įrašyti
 Oh no	ShortcutsWindow		O, ne!
+Key	ShortcutsWindow		Klavišas
+Select	ShortcutsWindow		Pažymėti
 Shortcuts	System name		Spartieji klavišai
+Quit	ShortcutsWindow		Baigti darbą
+(Choose application with file requester)	ShortcutsWindow		(Atverti programos parinkimo langą)
+Cancel	ShortcutsWindow		Atsisakyti
+Control	ShortcutsSpec	Name for modifier on keyboard	Vald
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Sparčiųjų klavišų rinkinio išanalizuoti nepavyko!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Sparčiųjų klavišų rinkinio įrašyti nepavyko!
+Remove selected shortcut	ShortcutsWindow		Pašalinti pažymėtąjį klavišų derinį
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Sparčiųjų klavišų rinkinio atverti nepavyko!
+Save & apply	ShortcutsWindow		Įrašyti ir taikyti
+Open	ShortcutsWindow		Atverti
+Append	ShortcutsWindow		Įterpti
+Save KeySet as…	ShortcutsWindow		Įrašyti sparčiųjų klavišų rinkinį kaip…
+Append KeySet…	ShortcutsWindow		Įterpti sparčiųjų klavišų rinkinį…
+OK	ShortcutsWindow		Gerai
+Add new shortcut	ShortcutsWindow		Pridėti naują klavišų derinį
+Shift	ShortcutsSpec	Name for modifier on keyboard	Lyg2
+Open KeySet…	ShortcutsWindow		Atverti sparčiųjų klavišų rinkinį…
+File	ShortcutsWindow		Failas

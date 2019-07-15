@@ -1,53 +1,53 @@
 1	ukrainian	x-vnd.Haiku-Screen	4090394050
-yes	Screen		так
-Use laptop panel:	Screen		Використовувати панель ноутбука:
-15 bits/pixel, 32768 colors	Screen		15 біт/піксель, 32768 кольорів
-/other…	Screen		/інше…
-16 bits/pixel, 65536 colors	Screen		16 біт/піксель, 65536 кольорів
-Revert	Screen		Повернути
-Swap displays:	Screen		Поміняти дисплеї:
-Combine displays:	Screen		Обє'днати дисплеї:
-Done	Screen		Готово
-Set background…	Screen		Встановити тло…
-Undo	Screen		Відмінити
-if needed	Screen		якщо потрібно
-Screen preferences by the Haiku team	Screen		Налаштування екрану від команди Haiku
-Settings will revert in %seconds.	Screen		Налаштування повернуться через %seconds.
-Screen	System name		Екран
-OK	Screen		Гаразд
-Workspaces	Screen		Робочі простори
-The screen mode could not be set:\n\t%s\n	Screen		Режим екрану не може бути встановлений:\n\t%s\n
 no	Screen		ні
-Could not write VESA mode settings file:\n\t	Screen		Не вдалося записати файл налаштувань режиму VESA :\n\t
-Type or use the left and right arrow keys.	Screen		Введіть або використовуйте стрілочки вправо вліво.
-Warning	Screen		Увага
-Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Горизонтальна частота:\t%lu - %lu kHz\nВертикальна частота:\t%lu - %lu Hz\n\nМаксимально пікселів:\t%g MHz
-Keep	Screen		Зберегти
-Unknown mode	Screen		Невідомий режим
-disable	Screen		вимкнути
-Columns:	Screen		Стовбці:
-All workspaces	Screen		Всі робочі простори
-always	Screen		завжди
-32 bits/pixel, 16 Million colors	Screen		32біти/піксель, 16 мільйонів кольорів
-Current workspace	Screen		Поточний робочий простір
-About	Screen		Про
-24 bits/pixel, 16 Million colors	Screen		24біти/піксель, 16 міліонів кольорів
-horizontally	Screen		горизонтально
-Other…	Screen		Інше…
-Cancel	Screen		Скасувати
 bits/pixel	Screen		бітів/піксель
-Refresh rate:	Screen		Частота оновлення:
-Hz	Screen		Hz
-Do you wish to keep these settings?	Screen		Ви бажаєте зберегти ці налаштування?
-Confirm changes	Screen		Підтвердити зміни
+15 bits/pixel, 32768 colors	Screen		15 біт/піксель, 32768 кольорів
 Rows:	Screen		Стрічки:
-vertically	Screen		вертикально
-Resolution:	Screen		Роздільча здатність:
-Screen	Screen		Екран
 %.1f Hz	Screen		%.1f Hz
-8 bits/pixel, 256 colors	Screen		8 бітів/піксель, 256 кольорів
-Apply	Screen		Прийняти
-Refresh rate	Screen		Частота оновлення
-%sSerial no.: %s	Screen		%sSerial no.: %s
-Colors:	Screen		Кольори:
+The screen mode could not be set:\n\t%s\n	Screen		Режим екрану не може бути встановлений:\n\t%s\n
+Keep	Screen		Зберегти
+/other…	Screen		/інше…
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Горизонтальна частота:\t%lu - %lu kHz\nВертикальна частота:\t%lu - %lu Hz\n\nМаксимально пікселів:\t%g MHz
+Refresh rate:	Screen		Частота оновлення:
 Video format:	Screen		Відео формат:
+Undo	Screen		Відмінити
+OK	Screen		Гаразд
+Current workspace	Screen		Поточний робочий простір
+vertically	Screen		вертикально
+All workspaces	Screen		Всі робочі простори
+Use laptop panel:	Screen		Використовувати панель ноутбука:
+Could not write VESA mode settings file:\n\t	Screen		Не вдалося записати файл налаштувань режиму VESA :\n\t
+Settings will revert in %seconds.	Screen		Налаштування повернуться через %seconds.
+Cancel	Screen		Скасувати
+Other…	Screen		Інше…
+Screen	Screen		Екран
+Colors:	Screen		Кольори:
+yes	Screen		так
+Swap displays:	Screen		Поміняти дисплеї:
+%sSerial no.: %s	Screen		%sSerial no.: %s
+8 bits/pixel, 256 colors	Screen		8 бітів/піксель, 256 кольорів
+Revert	Screen		Повернути
+always	Screen		завжди
+Confirm changes	Screen		Підтвердити зміни
+Warning	Screen		Увага
+24 bits/pixel, 16 Million colors	Screen		24біти/піксель, 16 міліонів кольорів
+Hz	Screen		Hz
+Workspaces	Screen		Робочі простори
+32 bits/pixel, 16 Million colors	Screen		32біти/піксель, 16 мільйонів кольорів
+Done	Screen		Готово
+16 bits/pixel, 65536 colors	Screen		16 біт/піксель, 65536 кольорів
+Screen preferences by the Haiku team	Screen		Налаштування екрану від команди Haiku
+Refresh rate	Screen		Частота оновлення
+if needed	Screen		якщо потрібно
+Combine displays:	Screen		Обє'днати дисплеї:
+Unknown mode	Screen		Невідомий режим
+About	Screen		Про
+Columns:	Screen		Стовбці:
+Resolution:	Screen		Роздільча здатність:
+Apply	Screen		Прийняти
+horizontally	Screen		горизонтально
+disable	Screen		вимкнути
+Set background…	Screen		Встановити тло…
+Type or use the left and right arrow keys.	Screen		Введіть або використовуйте стрілочки вправо вліво.
+Screen	System name		Екран
+Do you wish to keep these settings?	Screen		Ви бажаєте зберегти ці налаштування?

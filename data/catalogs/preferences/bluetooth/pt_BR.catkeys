@@ -1,51 +1,46 @@
-1	portuguese (brazil)	x-vnd.Haiku-BluetoothPrefs	1514658026
-About Bluetooth…	Window		Sobre Bluetooth…
-Handheld	Settings view		Handheld
-Default inquiry time:	Settings view		Tempo de consulta padrão:
+1	portuguese (brazil)	x-vnd.Haiku-BluetoothPrefs	416765820
+Laptop	Settings view		Laptop
+Only from trusted devices	Settings view		Apenas dos dispositivos de confiança
+15 secs	Settings view		15 segs.
+Quit	main		Sair
 Manufacturer: 	Device View		Fabricante
-Add device to list	Inquiry panel		Adicionar dispositivo à lista
-Starting scan...	Inquiry panel		Pesquisando...
-Smart phone	Settings view		Smartphone
-Server	Settings view		Servidor
-Stop bluetooth services…	Window		Parar serviços bluetooth…
+Desktop	Settings view		Desktop
+Server	Window		Servidor
 Identify host as:	Settings view		Identificar host como:
 Refresh…	Remote devices		Atualizar...
-Pair…	Remote devices		Par...
-Incoming connections policy:	Settings view		Política de conexões de entrada:
-From all devices	Settings view		De todos os dispositivos
-Show name	Extended local device view		Exibir nome
 Local devices found on system:	Settings view		Dispositivos locais encontrados no sistema:
-Remaining %1 seconds	Inquiry panel		Restando %1 segundos
-Server	Window		Servidor
-Scanning completed.	Inquiry panel		Varredura concluída.
-Remove	Remote devices		Remover
-Quit	main		Sair
-15 secs	Settings view		15 segs.
-Start bluetooth services…	Window		Iniciar serviços bluetooth…
-Policy...	Settings view		Política...
-61 secs	Settings view		61 segs.
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Não existe nenhum dispositivo local Bluetooth registado no sistema.
-Identify us as...	Settings view		Identificar-nos como…
- packets: 	Device View		pacotes:
-As blocked	Remote devices		Como bloqueado
-Bluetooth	System name		Bluetooth
-Disconnect	Remote devices		Desconectar
-Defaults	Window		Padrões
-Inquiry	Inquiry panel		Inquérito
-Desktop	Settings view		Desktop
-Revert	Window		Reverter
-Remote devices	Window		Dispositivos remotos
-Laptop	Settings view		Laptop
-Discoverable	Extended local device view		Visível
 Service classes: 	Device View		Classes de serviço:
+Remote devices	Window		Dispositivos remotos
 Settings	Window		Configurações
-Only from trusted devices	Settings view		Apenas dos dispositivos de confiança
-Scanning progress	Inquiry panel		Progresso da varredura
-Always ask	Settings view		Sempre perguntar
-Retrieving name of %1	Inquiry panel		Buscando nome de %1
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Verifique que as capacidades Bluetooth do seu dispositivo remoto estão ativadas. Pressione o botão 'Consulta' para iniciar a pesquisa. O tempo necessário para a obtenção dos nomes é desconhecido embora não deva demorar mais que 3 segundos para cada dispositivo. Depois você poderá adicioná-los à sua lista principal, onde poderá emparelhá-los.
-Authenticate	Extended local device view		Autenticar
-Pick device...	Settings view		Selecionar dispositivo…
-Retrieving names...	Inquiry panel		Obtendo nomes...
-Help	Window		Ajuda
+Stop bluetooth services…	Window		Parar serviços bluetooth…
+61 secs	Settings view		61 segs.
 Add…	Remote devices		Adicionar…
+As blocked	Remote devices		Como bloqueado
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Não existe nenhum dispositivo local Bluetooth registado no sistema.
+Revert	Window		Reverter
+Disconnect	Remote devices		Desconectar
+From all devices	Settings view		De todos os dispositivos
+Defaults	Window		Padrões
+Start bluetooth services…	Window		Iniciar serviços bluetooth…
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Verifique que as capacidades Bluetooth do seu dispositivo remoto estão ativadas. Pressione o botão 'Consulta' para iniciar a pesquisa. O tempo necessário para a obtenção dos nomes é desconhecido embora não deva demorar mais que 3 segundos para cada dispositivo. Depois você poderá adicioná-los à sua lista principal, onde poderá emparelhá-los.
+Scanning progress	Inquiry panel		Progresso da varredura
+Bluetooth	System name		Bluetooth
+Remove	Remote devices		Remover
+Always ask	Settings view		Sempre perguntar
+Help	Window		Ajuda
+Pair…	Remote devices		Par...
+Retrieving name of %1	Inquiry panel		Buscando nome de %1
+Inquiry	Inquiry panel		Inquérito
+Incoming connections policy:	Settings view		Política de conexões de entrada:
+Show name	Extended local device view		Exibir nome
+Add device to list	Inquiry panel		Adicionar dispositivo à lista
+Remaining %1 seconds	Inquiry panel		Restando %1 segundos
+Discoverable	Extended local device view		Visível
+Authenticate	Extended local device view		Autenticar
+Smart phone	Settings view		Smartphone
+Scanning completed.	Inquiry panel		Varredura concluída.
+Default inquiry time:	Settings view		Tempo de consulta padrão:
+Server	Settings view		Servidor
+Handheld	Settings view		Handheld
+ packets: 	Device View		pacotes:
+About Bluetooth…	Window		Sobre Bluetooth…

@@ -1,73 +1,74 @@
-1	dutch; flemish	x-vnd.Haiku-DriveSetup	4204093483
-DriveSetup	System name		DriveSetup
+1	dutch; flemish	x-vnd.Haiku-DriveSetup	1648050905
 Cancel	AbstractParametersPanel		Annuleren
-Delete	MainWindow		Verwijderen
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\nU zult alle gegevens op de geselecteerde partitie onherroepelijk kwijt zijn als u dit doet!
-Rescan	MainWindow		Opnieuw afzoeken
-OK	MainWindow		Oké
-There's no space on the partition where a child partition could be created.	MainWindow		De partitie heeft geen ruimte waarin een onderliggende partitie kan worden gemaakt.
-Could not unmount partition	MainWindow		Kon partitie niet onttrekken.
-Initialize	InitializeParametersPanel		Initialiseren
-OK	AbstractParametersPanel		Oké
-<empty>	PartitionList		<leeg>
-Unable to find the selected partition by ID.	MainWindow		Kan de geselecteerde partitie niet vinden op basis van ID.
-Select a partition from the list below.	DiskView		Selecteer een partitie uit onderstaande lijst.
-No disk devices have been recognized.	DiskView		Er werden geen schijfapparaten herkend.
-Failed to initialize the disk %s!\n	MainWindow		Initialisatie van de schijf %s is mislukt!\n
-The selected disk is read-only.	MainWindow		De geselecteerde schijf is alleen-lezen.
-Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Weet u zeker dat u de partitie \"%s\" wilt formatteren? U krijgt deze vraag nogmaals voordat de wijzigingen op de schijf weggeschreven worden.
-Could not mount partition %s.	MainWindow		Kon partitie %s niet betrekken.
-The partition %s has been successfully formatted.\n	MainWindow		De partitie %s werd met succes geformatteerd.\n
-The partition %s is already unmounted.	MainWindow		De partitie %s is al onttrokken.
-Failed to delete the partition. No changes have been written to disk.	MainWindow		Kon de partitie niet verwijderen. Er werden geen veranderingen naar de schijf geschreven.
-Could not delete the selected partition.	MainWindow		Kon de geselecteerde partitie niet verwijderen.
-Initialize	MainWindow		Initialiseren
-Error: 	MainWindow	in any error alert	Fout:
-Partition %ld	DiskView		Partitie %ld
-<empty>	DiskView		<leeg>
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisatie van de partitie %s is mislukt. (Er werd niets naar de schijf geschreven.)
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\nU zult alle gegevens op de partitie onherroepelijk kwijt zijn als u dit doet!
-Mounted at	PartitionList		Betrokken bij
-There was an error acquiring the partition row.	MainWindow		Er is een fout ontstaan bij het verkrijgen van de partitieregel.
-You need to select a partition entry from the list.	MainWindow		U dient een partitie uit de lijst te selecteren.
-The currently selected partition does not have a parent partition.	MainWindow		De nu geselecteerde partitie heeft geen bovenliggende partitie.
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\nU zult alle gegevens op de geselecteerde schijf onherroepelijk kwijt zijn als u dit doet!
-Write changes	MainWindow		Veranderingen schrijven
-There was an error preparing the disk for modifications.	MainWindow		Fout tijdens het voorbereiden van de schijf voor aanpassingen.
-The partition %s is already mounted.	MainWindow		De partitie %s is al betrokken.
-Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Weet u zeker dat u de partitie wilt formatteren? U krijgt deze vraag nogmaals voordat de wijzigingen op de schijf weggeschreven worden.
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\n&U zult alle gegevens op de %s schijf onherroepelijk kwijt zijn als u dit doet!
-Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de geselecteerde partitie wilt verwijderen?\n\nU zult alle gegevens op de partitie onherroepelijk kwijt zijn als u dit doet!
-Create…	MainWindow		Maken…
-The disk has been successfully initialized.\n	MainWindow		De schijf werd met succes geïnitialiseerd.\n
 Could not unmount partition %s.	MainWindow		Kon partitie %s niet onttrekken.
-Failed to format the partition %s!\n	MainWindow		Formatteren van partitie %s is mislukt!\n
-Mount	MainWindow		Betrekken
-Device	PartitionList		Apparaat
+Mount all	MainWindow		Alles betrekken
+Format	MainWindow		Formatteren
 Disk	MainWindow		Schijf
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\nU zult alle gegevens op de geselecteerde partitie onherroepelijk kwijt zijn als u dit doet!
+Device	PartitionList		Apparaat
+Initialize	MainWindow		Initialiseren
+OK	MainWindow		Oké
+Delete partition	MainWindow		Partitie verwijderen
+Error: 	MainWindow	in any error alert	Fout:
+Could not delete the selected partition.	MainWindow		Kon de geselecteerde partitie niet verwijderen.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Weet u zeker at u de geselecteerde schijf wilt initialiseren? Alle gegevens zullen verloren gaan. Het zal u nogmaals gevraagd worden voordat de gegevens naar de schrijf geschreven zullen worden.\n
 Device	DiskView		Apparaat
-Active	PartitionList		Actief
-Volume name	PartitionList		Naam gegevensdrager
-Continue	MainWindow		Doorgaan
-Cannot delete the selected partition.	MainWindow		Kan de geselecteerde partitie niet verwijderen.
-Mount all	MainWindow		Alles betrekken
+There was an error preparing the disk for modifications.	MainWindow		Fout tijdens het voorbereiden van de schijf voor aanpassingen.
+The disk has been successfully initialized.\n	MainWindow		De schijf werd met succes geïnitialiseerd.\n
+Unmount	MainWindow		Onttrekken
+Failed to format the partition %s!\n	MainWindow		Formatteren van partitie %s is mislukt!\n
+The partition %s is currently mounted.	MainWindow		De partitie %s is op dit moment gekoppeld.
 Cancel	MainWindow		Annuleren
-Delete partition	MainWindow		Partitie verwijderen
-Eject	MainWindow		Uitwerpen
-Partition	MainWindow		Partitie
-File system	PartitionList		Bestandssysteem
+<empty>	PartitionList		<leeg>
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Weet u zeker dat u de partitie \"%s\" wilt formatteren? U krijgt deze vraag nogmaals voordat de wijzigingen op de schijf weggeschreven worden.
+DriveSetup	System name		DriveSetup
+Mounted at	PartitionList		Betrokken bij
+Create…	MainWindow		Maken…
+Write changes	MainWindow		Veranderingen schrijven
 Validation of the given creation parameters failed.	MainWindow		Natrekken van de gegeven creatieparameters is mislukt.
-Size	PartitionList		Grootte
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisatie van de partitie %s is mislukt. (Er werd niets naar de schijf geschreven.)
+Partition	MainWindow		Partitie
+Eject	MainWindow		Uitwerpen
+There was an error acquiring the partition row.	MainWindow		Er is een fout ontstaan bij het verkrijgen van de partitieregel.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\n&U zult alle gegevens op de %s schijf onherroepelijk kwijt zijn als u dit doet!
+Rescan	MainWindow		Opnieuw afzoeken
+Failed to initialize the disk %s!\n	MainWindow		Initialisatie van de schijf %s is mislukt!\n
+Delete	MainWindow		Verwijderen
+Surface test (not implemented)	MainWindow		Oppervlaktetest (niet geïmplementeerd)
+Parameters	PartitionList		Parameters
+Could not acquire partitioning information.	MainWindow		Kon niet alle partitioneringsinformatie verkrijgen.
+Cannot delete the selected partition.	MainWindow		Kan de geselecteerde partitie niet verwijderen.
+Partition %ld	DiskView		Partitie %ld
+There's no space on the partition where a child partition could be created.	MainWindow		De partitie heeft geen ruimte waarin een onderliggende partitie kan worden gemaakt.
+Continue	MainWindow		Doorgaan
+<empty>	DiskView		<leeg>
+No disk devices have been recognized.	DiskView		Er werden geen schijfapparaten herkend.
+Could not mount partition %s.	MainWindow		Kon partitie %s niet betrekken.
+Failed to delete the partition. No changes have been written to disk.	MainWindow		Kon de partitie niet verwijderen. Er werden geen veranderingen naar de schijf geschreven.
+Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Weet u zeker dat u de partitie wilt formatteren? U krijgt deze vraag nogmaals voordat de wijzigingen op de schijf weggeschreven worden.
+Could not unmount partition	MainWindow		Kon partitie niet onttrekken.
+The selected disk is read-only.	MainWindow		De geselecteerde schijf is alleen-lezen.
+File system	PartitionList		Bestandssysteem
+The partition %s is already unmounted.	MainWindow		De partitie %s is al onttrokken.
+The selected partition does not contain a partitioning system.	MainWindow		De geselecteerde partitie bevat geen partitioneringssysteem.
+Unable to find the selected partition by ID.	MainWindow		Kan de geselecteerde partitie niet vinden op basis van ID.
+The currently selected partition is not empty.	MainWindow		De nu geselecteerde partitie is niet leeg.
+The currently selected partition does not have a parent partition.	MainWindow		De nu geselecteerde partitie heeft geen bovenliggende partitie.
 Wipe (not implemented)	MainWindow		Wissen (niet geïmplementeerd)
 Validation of the given initialization parameters failed.	MainWindow		Natrekken van de opgegeven initialisatieparameters is mislukt.
-The selected partition does not contain a partitioning system.	MainWindow		De geselecteerde partitie bevat geen partitioneringssysteem.
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\nU zult alle gegevens op de %s partitie onherroepelijk kwijt zijn als u dit doet!
-The partition %s is currently mounted.	MainWindow		De partitie %s is op dit moment gekoppeld.
-Surface test (not implemented)	MainWindow		Oppervlaktetest (niet geïmplementeerd)
-Format	MainWindow		Formatteren
-Parameters	PartitionList		Parameters
-Creation of the partition has failed.	MainWindow		Creatie van de partitie is mislukt.
-The currently selected partition is not empty.	MainWindow		De nu geselecteerde partitie is niet leeg.
+OK	AbstractParametersPanel		Oké
+You need to select a partition entry from the list.	MainWindow		U dient een partitie uit de lijst te selecteren.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\nU zult alle gegevens op de geselecteerde schijf onherroepelijk kwijt zijn als u dit doet!
+Select a partition from the list below.	DiskView		Selecteer een partitie uit onderstaande lijst.
+Active	PartitionList		Actief
+Volume name	PartitionList		Naam gegevensdrager
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de geselecteerde partitie wilt verwijderen?\n\nU zult alle gegevens op de partitie onherroepelijk kwijt zijn als u dit doet!
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\nU zult alle gegevens op de partitie onherroepelijk kwijt zijn als u dit doet!
 Failed to format the partition. No changes have been written to disk.	MainWindow		Kon de partitie niet formatteren. Er werden geen veranderingen naar de schijf geschreven.
-Unmount	MainWindow		Onttrekken
+Change	ChangeParametersPanel		Wijzigen
+The partition %s has been successfully formatted.\n	MainWindow		De partitie %s werd met succes geformatteerd.\n
+The partition %s is already mounted.	MainWindow		De partitie %s is al betrokken.
+Size	PartitionList		Grootte
+Creation of the partition has failed.	MainWindow		Creatie van de partitie is mislukt.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\nU zult alle gegevens op de %s partitie onherroepelijk kwijt zijn als u dit doet!
+Mount	MainWindow		Betrekken

@@ -1,20 +1,20 @@
 1	slovak	x-vnd.Haiku-MidiPlayer	1046133011
-None	Main Window		Žiadna
-Live input:	Main Window		Živý vstup:
-Stop	Main Window		Zastaviť
 This tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Tento drobný program\ndokáže prehrať tisíce\nlacno znejúcich piesní
-Cavern	Main Window		Jaskyňa
-Volume:	Main Window		Hlasitosť:
-Reverb:	Main Window		Ozvena:
-OK	Main Window		OK
-Loading instruments…	Scope View		Načítajú sa nástroje…
-Off	Main Window		Vypnúť
 Dungeon	Main Window		Temnica
-Play	Main Window		Prehrať
-Garage	Main Window		Garáž
-Closet	Main Window		Skriňa
-MidiPlayer	System name		Prehrávač MIDI
-Drop MIDI file here	Scope View		Sem pretiahnite súbor MIDI
-Igor's lab	Main Window		Igorovo laboratórium
-Scope	Main Window		Rozsah
 Could not load song	Main Window		Nepodarilo sa načítať pieseň
+Igor's lab	Main Window		Igorovo laboratórium
+Off	Main Window		Vypnúť
+Loading instruments…	Scope View		Načítajú sa nástroje…
+Volume:	Main Window		Hlasitosť:
+Closet	Main Window		Skriňa
+Scope	Main Window		Rozsah
+Drop MIDI file here	Scope View		Sem pretiahnite súbor MIDI
+None	Main Window		Žiadna
+Reverb:	Main Window		Ozvena:
+MidiPlayer	System name		Prehrávač MIDI
+OK	Main Window		OK
+Stop	Main Window		Zastaviť
+Live input:	Main Window		Živý vstup:
+Garage	Main Window		Garáž
+Play	Main Window		Prehrať
+Cavern	Main Window		Jaskyňa

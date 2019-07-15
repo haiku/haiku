@@ -1,29 +1,28 @@
-1	lithuanian	x-vnd.Haiku-PPMTranslator	797856484
+1	lithuanian	x-vnd.Haiku-PPMTranslator	3151796093
+None	PPMTranslator		jokia
 PPM Settings	PPMMain		PPM nuostatos
-Based on PPMTranslator sample code	PPMTranslator		Sukurta PPM keitiklio pavyzdinio kodo pagrindu
-OK	PPMMain		Gerai
+System palette 8 bits	PPMTranslator		sisteminė 8 bitų paletė
+Sample code copyright 1999, Be Incorporated	PPMTranslator		Pavyzdinio kodo autorių teisės priklauso „Be Incorporated“, © 1999
+Something is wrong with the PPMTranslator!	PPMMain		Su PPM keitikliu kažkas ne taip!
 Grayscale 8 bits	PPMTranslator		8 bitų pilkumo tonai
+Based on PPMTranslator sample code	PPMTranslator		Sukurta PPM keitiklio pavyzdinio kodo pagrindu
+RGB 8:8:8 32 bits big-endian	PPMTranslator		RŽM 8:8:8 32 bitų, mažėjantys baitai
+PPM image translator	PPMTranslator		PPM paveikslų keitiklis
+Bitmap 1 bit	PPMTranslator		1 bito paveikslas
+RGB 5:6:5 16 bits big-endian	PPMTranslator		RŽM 5:6:5 16 bitų, mažėjantys baitai
+PPMTranslator Settings	PPMTranslator		PPM keitiklio nuostatos
 CMY 8:8:8 32 bits	PPMTranslator		ŽPG 8:8:8 32 bitų
+OK	PPMMain		Gerai
+CMYA 8:8:8:8 32 bits	PPMTranslator		ŽPGA 8:8:8:8 32 bitų
 PPM image	PPMTranslator		PPM paveikslas
+RGB 5:5:5 16 bits big-endian	PPMTranslator		RŽM 5:5:5 16 bitų, mažėjantys baitai
+RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RŽMA 5:5:5:1 16 bitų, mažėjantys baitai
+Write ASCII	PPMTranslator		Rašyti ASCII baitais
+RGB 5:6:5 16 bits	PPMTranslator		RŽM 5:6:5, 16 bitų
+RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RŽMA 8:8:8:8 32 bitų, mažėjantys baitai
+RGBA 8:8:8:8 32 bits	PPMTranslator		RŽMA 8:8:8:8 32 bitų
+CMYK 8:8:8:8 32 bits	PPMTranslator		ŽPGJ 8:8:8:8 32 bitų
+RGB 8:8:8 32 bits	PPMTranslator		RŽM 8:8:8 32 bitų
+RGB 5:5:5 16 bits	PPMTranslator		RŽM 5:5:5 16 bitų
 RGBA 5:5:5:1 16 bits	PPMTranslator		RŽMA 5:5:5:1 16 bitų
 Be Bitmap Format (PPMTranslator)	PPMTranslator		„Be“ paveikslų formatas (PPM keitiklis)
-CMYA 8:8:8:8 32 bits	PPMTranslator		ŽPGA 8:8:8:8 32 bitų
-CMYK 8:8:8:8 32 bits	PPMTranslator		ŽPGJ 8:8:8:8 32 bitų
-PPM image translator	PPMTranslator		PPM paveikslų keitiklis
-bits/space	PPMTranslator		bitų/erdvėje
-RGB 8:8:8 32 bits big-endian	PPMTranslator		RŽM 8:8:8 32 bitų, mažėjantys baitai
-RGB 5:6:5 16 bits big-endian	PPMTranslator		RŽM 5:6:5 16 bitų, mažėjantys baitai
-RGB 5:5:5 16 bits big-endian	PPMTranslator		RŽM 5:5:5 16 bitų, mažėjantys baitai
-RGB 5:6:5 16 bits	PPMTranslator		RŽM 5:6:5, 16 bitų
-Write ASCII	PPMTranslator		Rašyti ASCII baitais
-RGBA 8:8:8:8 32 bits	PPMTranslator		RŽMA 8:8:8:8 32 bitų
-None	PPMTranslator		jokia
-RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RŽMA 5:5:5:1 16 bitų, mažėjantys baitai
-RGB 5:5:5 16 bits	PPMTranslator		RŽM 5:5:5 16 bitų
-Bitmap 1 bit	PPMTranslator		1 bito paveikslas
-RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RŽMA 8:8:8:8 32 bitų, mažėjantys baitai
-RGB 8:8:8 32 bits	PPMTranslator		RŽM 8:8:8 32 bitų
-Sample code copyright 1999, Be Incorporated	PPMTranslator		Pavyzdinio kodo autorių teisės priklauso „Be Incorporated“, © 1999
-PPMTranslator Settings	PPMTranslator		PPM keitiklio nuostatos
-Something is wrong with the PPMTranslator!	PPMMain		Su PPM keitikliu kažkas ne taip!
-System palette 8 bits	PPMTranslator		sisteminė 8 bitų paletė

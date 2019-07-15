@@ -1,17 +1,17 @@
 1	ukrainian	x-vnd.Haiku-DataTranslations	4156631142
-DataTranslations	System name		DataTranslations
-Cancel	DataTranslations		Скасувати
+Path:	DataTranslations		Шлях:
 Name:	DataTranslations		І’мя:
+DataTranslations - Note	DataTranslations		Перетворення даних — Примітка
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Елемент '%name' не є транслятором і не може бути встановленим.
 Could not install %s:\n%s	DataTranslations		Неможливо встановити %s:\n%s
-Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Використовуйте цю панель керування, щоб встановити стандартні значення для трансляторів, які використовуватимуться, коли програма не задає жодних інших параметрів.
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Елемент з назвою '%name' повністю присутній у теці перетворювачів! Переписати існуючий перетворювач?
-DataTranslations - Note	DataTranslations		Перетворення даних — Примітка
-Overwrite	DataTranslations		Перезаписати
-Info:	DataTranslations		Інформація:
-Info	DataTranslations		Інформація
-Path:	DataTranslations		Шлях:
-The new translator has been installed successfully.	DataTranslations		Новий перетворювач успішно встановлено.
-DataTranslations - Error	DataTranslations		Перетворення даних - Помилка
 OK	DataTranslations		Гаразд
+Cancel	DataTranslations		Скасувати
+Info:	DataTranslations		Інформація:
+DataTranslations - Error	DataTranslations		Перетворення даних - Помилка
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Використовуйте цю панель керування, щоб встановити стандартні значення для трансляторів, які використовуватимуться, коли програма не задає жодних інших параметрів.
+The new translator has been installed successfully.	DataTranslations		Новий перетворювач успішно встановлено.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Елемент з назвою '%name' повністю присутній у теці перетворювачів! Переписати існуючий перетворювач?
+DataTranslations	System name		DataTranslations
+Info	DataTranslations		Інформація
+Overwrite	DataTranslations		Перезаписати
 Version:	DataTranslations		Версія:

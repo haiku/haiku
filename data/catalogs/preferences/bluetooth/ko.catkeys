@@ -1,49 +1,45 @@
-1	korean	x-vnd.Haiku-BluetoothPrefs	2825193795
-About Bluetooth…	Window		블루투스 정보...
-Handheld	Settings view		핸드헬드
-Default inquiry time:	Settings view		기본 조회 시간:
+1	korean	x-vnd.Haiku-BluetoothPrefs	3311328897
+Laptop	Settings view		랩탑
+Only from trusted devices	Settings view		오직 신뢰할 수 있는 장치만
+15 secs	Settings view		15 초
+Quit	main		끝내기
 Manufacturer: 	Device View		생산자:
-Add device to list	Inquiry panel		목록에 장치 추가
-Starting scan...	Inquiry panel		탐색 시작중...
-Smart phone	Settings view		스마트폰
-Server	Settings view		서버
-Stop bluetooth services…	Window		블루투스 서비스 정지…
+Desktop	Settings view		데스크탑
+Server	Window		서버
 Identify host as:	Settings view		호스트 식별:
 Refresh…	Remote devices		새로 고침…
-Pair…	Remote devices		페어…
-Incoming connections policy:	Settings view		입중계 연결 정책:
-From all devices	Settings view		모든 장치에서
-Show name	Extended local device view		이름 보기
 Local devices found on system:	Settings view		시스템에서 찾아낸 지역 장치:
-Remaining %1 seconds	Inquiry panel		남은 %1 초
-Server	Window		서버
-Scanning completed.	Inquiry panel		탐색 완료.
-Remove	Remote devices		제거
-Quit	main		끝내기
-15 secs	Settings view		15 초
-Start bluetooth services…	Window		블루투스 서비스 시작…
-Policy...	Settings view		정책...
-61 secs	Settings view		61 초
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		어떤 블루투스 지역장치도 시스템에 등록된 것이 없습니다.
-Identify us as...	Settings view		식별하기..
-As blocked	Remote devices		마찬가지로 차단
-Bluetooth	System name		블루투스
-Disconnect	Remote devices		연결끊김
-Defaults	Window		기본설정
-Inquiry	Inquiry panel		조회
-Desktop	Settings view		데스크탑
-Revert	Window		되돌리기
-Remote devices	Window		원격 장치
-Laptop	Settings view		랩탑
-Discoverable	Extended local device view		발견
 Service classes: 	Device View		서비스 클래스: 
+Remote devices	Window		원격 장치
 Settings	Window		설정
-Only from trusted devices	Settings view		오직 신뢰할 수 있는 장치만
-Scanning progress	Inquiry panel		탐색 작업중
-Always ask	Settings view		항상 묻기
-Retrieving name of %1	Inquiry panel		% 1 가져오는 이름
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		원격 장치의 블루투스 기능이 활성화 되어있는지 확인바랍니다. '조회' 를 누르면 탐색하기 시작합니다. 이름 검색을 위해 필요한 시간은 알려져 있지 않습니다, 하지만 장치마다 3초 이상 걸리지 않을 것입니다. 당신이 그것들을 어디서 페어하든지, 이후 당신의 기본 목록에 추가 할 수 있을 것입니다.
-Authenticate	Extended local device view		인증
-Retrieving names...	Inquiry panel		이름 검색중..
-Help	Window		도움말
+Stop bluetooth services…	Window		블루투스 서비스 정지…
+61 secs	Settings view		61 초
 Add…	Remote devices		추가…
+As blocked	Remote devices		마찬가지로 차단
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		어떤 블루투스 지역장치도 시스템에 등록된 것이 없습니다.
+Revert	Window		되돌리기
+Disconnect	Remote devices		연결끊김
+From all devices	Settings view		모든 장치에서
+Defaults	Window		기본설정
+Start bluetooth services…	Window		블루투스 서비스 시작…
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		원격 장치의 블루투스 기능이 활성화 되어있는지 확인바랍니다. '조회' 를 누르면 탐색하기 시작합니다. 이름 검색을 위해 필요한 시간은 알려져 있지 않습니다, 하지만 장치마다 3초 이상 걸리지 않을 것입니다. 당신이 그것들을 어디서 페어하든지, 이후 당신의 기본 목록에 추가 할 수 있을 것입니다.
+Scanning progress	Inquiry panel		탐색 작업중
+Bluetooth	System name		블루투스
+Remove	Remote devices		제거
+Always ask	Settings view		항상 묻기
+Help	Window		도움말
+Pair…	Remote devices		페어…
+Retrieving name of %1	Inquiry panel		% 1 가져오는 이름
+Inquiry	Inquiry panel		조회
+Incoming connections policy:	Settings view		입중계 연결 정책:
+Show name	Extended local device view		이름 보기
+Add device to list	Inquiry panel		목록에 장치 추가
+Remaining %1 seconds	Inquiry panel		남은 %1 초
+Discoverable	Extended local device view		발견
+Authenticate	Extended local device view		인증
+Smart phone	Settings view		스마트폰
+Scanning completed.	Inquiry panel		탐색 완료.
+Default inquiry time:	Settings view		기본 조회 시간:
+Server	Settings view		서버
+Handheld	Settings view		핸드헬드
+About Bluetooth…	Window		블루투스 정보...

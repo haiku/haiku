@@ -1,3 +1,5 @@
-1	lithuanian	x-vnd.Haiku-cmd-dstconfig	81357278
-Ask me later	dstcheck		Paklausti vėliau
+1	lithuanian	x-vnd.Haiku-cmd-dstconfig	684321431
+Keep this time	dstcheck		Toliau naudoti šį laiką
 Manually adjust time…	dstcheck		Patikslinti laikrodį rankiniu būdu…
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		Dėmesio!\n\nDėl sezoninio laikrodžio persukimo gali būti, jog jūsų kompiuterio laikrodis rodo laiką su vienos valandos paklaida.\nKompiuterio laikas dabar yra %current time%.\n\nAr šis laikas teisingas?
+Ask me later	dstcheck		Paklausti vėliau

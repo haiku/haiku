@@ -1,26 +1,26 @@
 1	belarusian	x-vnd.haiku-screenshot	363809141
-seconds	ScreenshotWindow		секунд
-Desktop	ScreenshotWindow		Рабочы стол
 Include window border	ScreenshotWindow		Уключыць мяжу вакна
-Screenshot	System name		Здымак экрана
-Select	ScreenshotWindow		Выбраць
-Capture active window	ScreenshotWindow		Захваціць актыўнае вакно
-Cancel	ScreenshotWindow		Адмена
-Name:	ScreenshotWindow		Імя:
-This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Гэты файл ужо існуе.\n Вы ўпэўнены што жадаеце яго перапісаць?
-Choose folder	ScreenshotWindow		Выберыце каталог
-Save	ScreenshotWindow		Захаваць
 Overwrite	ScreenshotWindow		Перазапiсаць
-Please select	ScreenshotWindow		Калі ласка, выберыце
-Save as:	ScreenshotWindow		Захаваць як:
-Copy to clipboard	ScreenshotWindow		Капіяваць у буфер
 Save in:	ScreenshotWindow		Захаваць у:
-screenshot	Screenshot	Base filename of screenshot files	здымак
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Гэты файл ужо існуе.\n Вы ўпэўнены што жадаеце яго перапісаць?
+Select	ScreenshotWindow		Выбраць
+Save as:	ScreenshotWindow		Захаваць як:
+seconds	ScreenshotWindow		секунд
 New screenshot	ScreenshotWindow		Новы здымак экрану
+Screenshot	System name		Здымак экрана
+Desktop	ScreenshotWindow		Рабочы стол
 Artwork folder	ScreenshotWindow		Каталог малюнкаў
-Home folder	ScreenshotWindow		Хатні каталог
-Settings…	ScreenshotWindow		Наладкі…
-overwrite	ScreenshotWindow		перазапіс
-Delay:	ScreenshotWindow		Затрымка:
-Include mouse pointer	ScreenshotWindow		Уключыць курсор мышы
 Translator Settings	ScreenshotWindow		Наладкі канвертара
+Include mouse pointer	ScreenshotWindow		Уключыць курсор мышы
+overwrite	ScreenshotWindow		перазапіс
+Settings…	ScreenshotWindow		Наладкі…
+Choose folder	ScreenshotWindow		Выберыце каталог
+Name:	ScreenshotWindow		Імя:
+Please select	ScreenshotWindow		Калі ласка, выберыце
+Cancel	ScreenshotWindow		Адмена
+Delay:	ScreenshotWindow		Затрымка:
+Copy to clipboard	ScreenshotWindow		Капіяваць у буфер
+screenshot	Screenshot	Base filename of screenshot files	здымак
+Home folder	ScreenshotWindow		Хатні каталог
+Save	ScreenshotWindow		Захаваць
+Capture active window	ScreenshotWindow		Захваціць актыўнае вакно

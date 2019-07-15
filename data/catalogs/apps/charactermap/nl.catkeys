@@ -1,12 +1,14 @@
-1	dutch; flemish	x-vnd.Haiku-CharacterMap	56063163
+1	dutch; flemish	x-vnd.Haiku-CharacterMap	1628042138
 Enclosed alphanumerics	UnicodeBlocks		Alfanumeriek omcirkeld
 Basic Latin	UnicodeBlocks		Basis-Latijns
 View	CharacterWindow		Beeld
+Cherokee supplement	UnicodeBlocks		Cherokee (toevoeging)
 Latin-1 supplement	UnicodeBlocks		Latijns-1 (toevoeging)
 Hebrew	UnicodeBlocks		Hebreeuws
 Georgian supplement	UnicodeBlocks		Georgisch (toevoeging)
 CJK unified ideographs	UnicodeBlocks		CJK-ideogrammen (verenigd)
 Modifier tone letters	UnicodeBlocks		Modifier-toonletters
+Old Hungarian	UnicodeBlocks		Oud-Hongaars
 Khmer	UnicodeBlocks		Khmer
 Supplementary private use area A	UnicodeBlocks		Toegevoegde ruimte A voor persoonlijk gebruik
 Hanunoo	UnicodeBlocks		Hanunóo
@@ -91,12 +93,14 @@ Code	CharacterWindow		Code
 Lepcha	UnicodeBlocks		Lepcha
 Sinhala	UnicodeBlocks		Singalees
 Ancient Greek musical notation	UnicodeBlocks		Oud-Griekse muzieknotatie
+Early Dynastic Cuneiform	UnicodeBlocks		Vroegdynastisch spijkerschrift
 Geometric shapes	UnicodeBlocks		Geometrische vormen
 Letterlike symbols	UnicodeBlocks		Letterachtige symbolen
 Hangul Jamo	UnicodeBlocks		Hangul Jamo
 Tamil	UnicodeBlocks		Tamil
 Currency symbols	UnicodeBlocks		Geldsoortsymbolen
 Combining diacritical marks	UnicodeBlocks		Combinerende diakretische tekens
+Anatolian hieroglyphs	UnicodeBlocks		Anatolische hiërogliefen
 Supplement punctuation	UnicodeBlocks		Toegevoegde interpunctie
 Unified Canadian Aboriginal syllabics	UnicodeBlocks		Verenigde Canadese inheemse syllabics 
 Ugaritic	UnicodeBlocks		Ugaritisch
@@ -107,7 +111,9 @@ Cherokee	UnicodeBlocks		Cherokee
 Tags	UnicodeBlocks		Tags
 Cypriot syllabary	UnicodeBlocks		Cyprisch (syllabisch)
 Counting rod numerals	UnicodeBlocks		Telstokcijfers
+Ideographic symbols and punctuation	UnicodeBlocks		Ideografische symbolen en interpunctie
 Latin extended A	UnicodeBlocks		Latijns (uitgebreid) A
+Tangut components	UnicodeBlocks		Tangut-componenten
 Miscellaneous symbols	UnicodeBlocks		Gevarieerde symbolen
 Saurashtra	UnicodeBlocks		Saurashtra
 Optical character recognition	UnicodeBlocks		Optische tekenherkenning
@@ -122,7 +128,9 @@ Ancient Greek numbers	UnicodeBlocks		Oud-Griekse cijfers
 Vai	UnicodeBlocks		Vai
 Yi Radicals	UnicodeBlocks		Yi-basiskarakters
 Cyrillic extended B	UnicodeBlocks		Cyrillisch (uitgebreid) B
+Supplemental Symbols and Pictographs	UnicodeBlocks		Aanvullende symbolen en pictografisch schrift
 Quit	CharacterWindow		Afsluiten
+Ancient symbols	UnicodeBlocks		Antieke symbolen
 Braille patterns	UnicodeBlocks		Braille-patronen
 New Tai Lue	UnicodeBlocks		Nieuw Tai Lue
 Runic	UnicodeBlocks		Runen
@@ -160,6 +168,7 @@ Alphabetic presentation forms	UnicodeBlocks		Alfabetische presentatievormen
 Halfwidth and fullwidth forms	UnicodeBlocks		Halfbrede en volledig brede vormen
 Lydian	UnicodeBlocks		Lydisch
 Ethiopic supplement	UnicodeBlocks		Ethiopisch (toevoegsel)
+Glagolitic supplement	UnicodeBlocks		Glagolitisch (toevoeging)
 Latin extended B	UnicodeBlocks		Latijns (uitgebreid) B
 Box drawing	UnicodeBlocks		Kadertekens
 Mathematical alphanumeric symbols	UnicodeBlocks		Wiskundige alfanumerische symbolen

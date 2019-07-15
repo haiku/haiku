@@ -1,14 +1,12 @@
-1	dutch; flemish	x-vnd.Haiku-IMAP	478742289
-Destination:	imap_config		Doel:
-SSL	imap_config		SSL
-Ok	IMAPFolderConfig		Okee
-status	IMAPFolderConfig		status
-Configure IMAP Folders	imap_config		IMAP-mappen configureren
-Cancel	IMAPFolderConfig		Annuleren
-No encryption	imap_config		Geen versleuteling
-Apply	IMAPFolderConfig		Toepassen
-Fetching IMAP folders, have patience...	IMAPFolderConfig		IMAP mappen ophalen, heb geduld...
+1	dutch; flemish	x-vnd.Haiku-IMAP	3072419505
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Kan niet met de server \"%server%\" verbinden:\n%error%
-IMAP Folders	IMAPFolderConfig		IMAP Mappen
-Update subcription of IMAP folders, have patience...	IMAPFolderConfig		Abonnementen op IMAP-mappen bijwerken, een ogenblik…
 Failed to fetch available storage.	IMAPFolderConfig		Fout bij het ophalen van de beschikbare opslag.
+Cancel	IMAPFolderConfig		Annuleren
+Ok	IMAPFolderConfig		Okee
+No encryption	imap_config		Geen versleuteling
+Configure IMAP Folders	imap_config		IMAP-mappen configureren
+SSL	imap_config		SSL
+Apply	IMAPFolderConfig		Toepassen
+status	IMAPFolderConfig		status
+IMAP Folders	IMAPFolderConfig		IMAP Mappen
+Destination:	imap_config		Doel:

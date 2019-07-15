@@ -1,11 +1,11 @@
 1	korean	x-vnd.Haiku-SGITranslator	4153400005
-Use compression:	SGIView		사용할 압축방법:
-SGITranslator Settings	SGITranslator		SGI변환기 설정
-None	SGIView		없음
 SGI images	SGITranslator		SGI 이미지들
-SGI image translator	SGITranslator		SGI 이미지 변환기
-SGI image	SGITranslator		SGI 이미지
-RLE	SGIView		RLE
-SGI Settings	SGIMain		SGI 설정
-written by:\n	SGIView		만든 이:\n
+Use compression:	SGIView		사용할 압축방법:
 SGI image translator	SGIView		SGI 이미지 변환기
+SGI image	SGITranslator		SGI 이미지
+SGITranslator Settings	SGITranslator		SGI변환기 설정
+SGI Settings	SGIMain		SGI 설정
+SGI image translator	SGITranslator		SGI 이미지 변환기
+None	SGIView		없음
+RLE	SGIView		RLE
+written by:\n	SGIView		만든 이:\n

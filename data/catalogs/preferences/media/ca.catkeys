@@ -1,20 +1,20 @@
 1	catalan; valencian	x-vnd.Haiku-Media	2605101563
-Couldn't add volume control in Deskbar: %s\n	Media views		No ha estat possible afegir el control de volum a la Barra de l'Escriptori: %s\n
-Video input:	Media views		Entrada de vídeo:
-Defaults	Media views		Valors predeterminats
+Audio mixer	Media Window		Mesclador d'àudio
+Show volume control on Deskbar	Media views		Mostra el control de a la Barra de l'Escriptori
 Quit	Media Window		Surt
-Video settings	Media Window		Paràmetres de vídeo
-Video output:	Media views		Sortida de vídeo:
-Could not connect to the media server.\nWould you like to start it ?	Media Window		No ha estat possible connectar amb el servidor de suports.\nEl voleu iniciar ?
 Restart media services	Media views		Reinicia els serveis de suports
+Couldn't add volume control in Deskbar: %s\n	Media views		No ha estat possible afegir el control de volum a la Barra de l'Escriptori: %s\n
+Start media server	Media Window		Inicia el servidor de suports
+Audio settings	Media Window		Paràmetres d'àudio
 Couldn't remove volume control in Deskbar: %s\n	Media views		No ha estat possible suprimir el control de volum de la Barra de l'Escriptori: %s\n
 Media	System name		Suport
-Audio mixer	Media Window		Mesclador d'àudio
-This hardware has no controls.	Media Window		Aquest maquinari no disposa de controls.
+Video output:	Media views		Sortida de vídeo:
 Audio output:	Media views		Sortida d'àudio:
-Audio settings	Media Window		Paràmetres d'àudio
-Start media server	Media Window		Inicia el servidor de suports
-<none>	Media views		<cap>
-Channel:	Media views		Canal:
-Show volume control on Deskbar	Media views		Mostra el control de a la Barra de l'Escriptori
+Video input:	Media views		Entrada de vídeo:
 Audio input:	Media views		Entrada d'àudio:
+<none>	Media views		<cap>
+This hardware has no controls.	Media Window		Aquest maquinari no disposa de controls.
+Channel:	Media views		Canal:
+Defaults	Media views		Valors predeterminats
+Could not connect to the media server.\nWould you like to start it ?	Media Window		No ha estat possible connectar amb el servidor de suports.\nEl voleu iniciar ?
+Video settings	Media Window		Paràmetres de vídeo

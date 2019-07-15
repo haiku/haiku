@@ -1,18 +1,18 @@
 1	english	x-vnd.Haiku-Pairs	818003250
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	对对碰未发现足够适量图标，无法启动；至少需要 %zu 个图标，当前仅发现 %zu 个图标。\n
-%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\t由 Ralf Schülke 编写\n\t版权所有 2008-2010, Haiku Inc.\n\n
+Pairs	System name		对对碰
+Quit	PairsWindow		退出
+Medium	PairsWindow		中图标
+Game	PairsWindow		游戏
 Expert (8x8)	PairsWindow		骨灰级(8x8)
-Beginner (4x4)	PairsWindow		菜鸟级 (4x4)
+New	PairsWindow		新建
+OK	Pairs		确定
+Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	对对碰未发现足够适量图标，无法启动；至少需要 %zu 个图标，当前仅发现 %zu 个图标。\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		您使用 {0, plural, one{# click} other{# clicks}} 完成了游戏。\n
+Small	PairsWindow		小图标
+Size	PairsWindow		大小
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\t由 Ralf Schülke 编写\n\t版权所有 2008-2010, Haiku Inc.\n\n
 Quit game	PairsWindow		退出游戏
 Large	PairsWindow		大图标
-Small	PairsWindow		小图标
-Game	PairsWindow		游戏
-OK	Pairs		确定
-Size	PairsWindow		大小
-New	PairsWindow		新建
+Beginner (4x4)	PairsWindow		菜鸟级 (4x4)
 Intermediate (6x6)	PairsWindow		中鸟级 (6x6)
-Quit	PairsWindow		退出
-Pairs	System name		对对碰
 New game	PairsWindow		新游戏
-Medium	PairsWindow		中图标

@@ -1,38 +1,38 @@
 1	dutch; flemish	x-vnd.Haiku-Keymap	4022885915
-Shift:	Modifier keys window	Shift key role name	Shift:
-Revert	Modifier keys window		Herstellen
-Tilde trigger	Keymap window		Tilde-activeerder
-Grave trigger	Keymap window		Accent grave-activeerder
-Role	Modifier keys window	As in the role of a modifier key	Rol
-Select dead keys	Keymap window		Selecteer dode toetsen
-Cancel	Modifier keys window		Annuleren
-Quit	Keymap window		Afsluiten
-Switch shortcut keys to Haiku mode	Keymap window		Snelkoppelingstoetsen omschakelen naar Haiku-modus
-Circumflex trigger	Keymap window		Circumflex-activeerder
-Diaeresis trigger	Keymap window		Trema-activeerder
-Disabled	Modifier keys window	Do nothing	Uitgeschakeld
-Open…	Keymap window		Openen...
-System:	Keymap window		Systeem:
-Set modifier keys…	Keymap window		Optietoetsen instellen…
-Option:	Modifier keys window	Option key role name	Optie:
-Switch shortcut keys	Keymap window		Snelkoppelingstoetsen omschakelen
-Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shifttoets
-User:	Keymap window		Gebruiker:
 Key	Modifier keys window	As in a computer keyboard key	Toets
+Option:	Modifier keys window	Option key role name	Optie:
+Cancel	Modifier keys window		Annuleren
+Sample and clipboard:	Keymap window		Voorbeeld en klembord:
+Switch shortcut keys to Windows/Linux mode	Keymap window		Snelkoppelingstoetsen omschakelen naar Windows/Linux-modus
+Revert	Modifier keys window		Herstellen
+Set modifier keys	Modifier keys window		Modificatietoetsen instellen
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd-toets
+Command:	Modifier keys window	Command key role name	Command:
+Acute trigger	Keymap window		Accent aigu-activeerder
+Modifier keys	Modifier keys window		Modificatietoetsen
+Save as…	Keymap window		Opslaan als...
+Tilde trigger	Keymap window		Tilde-activeerder
+(Current)	Keymap window		(Huidig)
+Circumflex trigger	Keymap window		Circumflex-activeerder
+Role	Modifier keys window	As in the role of a modifier key	Rol
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl-toets
 Control:	Modifier keys window	Control key role name	Besturingselement:
-Sample and clipboard:	Keymap window		Voorbeeld en klembord:
-Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt-toets
+Disabled	Modifier keys window	Do nothing	Uitgeschakeld
+Select dead keys	Keymap window		Selecteer dode toetsen
 Layout	Keymap window		Lay-out
-Switch shortcut keys to Windows/Linux mode	Keymap window		Snelkoppelingstoetsen omschakelen naar Windows/Linux-modus
 Revert	Keymap window		Herstellen
-Command:	Modifier keys window	Command key role name	Command:
-Save as…	Keymap window		Opslaan als...
-Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd-toets
-File	Keymap window		Bestand
-(Current)	Keymap window		(Huidig)
-Font	Keymap window		Lettertype
+Grave trigger	Keymap window		Accent grave-activeerder
+Quit	Keymap window		Afsluiten
+User:	Keymap window		Gebruiker:
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt-toets
+Shift:	Modifier keys window	Shift key role name	Shift:
 Keymap	System name		Toetsenbordindeling
-Set modifier keys	Modifier keys window		Modificatietoetsen instellen
-Modifier keys	Modifier keys window		Modificatietoetsen
-Acute trigger	Keymap window		Accent aigu-activeerder
+Set modifier keys…	Keymap window		Optietoetsen instellen…
+Switch shortcut keys to Haiku mode	Keymap window		Snelkoppelingstoetsen omschakelen naar Haiku-modus
+System:	Keymap window		Systeem:
+Switch shortcut keys	Keymap window		Snelkoppelingstoetsen omschakelen
+Font	Keymap window		Lettertype
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shifttoets
+File	Keymap window		Bestand
+Diaeresis trigger	Keymap window		Trema-activeerder
+Open…	Keymap window		Openen...

@@ -1,49 +1,49 @@
 1	russian	x-vnd.Haiku-Time	3755504714
-GMT (UNIX compatible)	Time		По Гринвичу (совместимо с UNIX)
 OK	Time		ОК
-Asia	Time		Азия
-\nNow: 	Time		\nСейчас: 
-Africa	Time		Африка
+Message receiving failed	Time		Не удалось получить данные
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Дата & Время, разработан:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nВсе права защищены 2004-2012, Haiku.
+Australia	Time		Австралия
+America	Time		Америка
 Reset to default server list	Time		Восстановить список серверов по умолчанию
 Could not resolve server address	Time		Невозможно определить доменное имя сервера
-Stop	Time		Остановить
-Australia	Time		Австралия
-Preview time:	Time		Предварительное время:
-Synchronize	Time		Синхронизировать
-Revert	Time		Вернуть
-Pacific	Time		Тихий океан
-Show day of week	Time		Показывать день недели
-Add	Time		Добавить
-Date and time	Time		Дата и время
-about	Time		о программе
-Local time (Windows compatible)	Time		Местное время (совместимо с Windows)
-Message receiving failed	Time		Не удалось получить данные
 Set time zone	Time		Установить часовой пояс
+The following error occured while synchronizing:r\n%s: %s	Time		При синхронизации произошла следующая ошибка:r\n%s: %s
 Waiting for answer failed	Time		Истекло время ожидания
-Hardware clock set to:	Time		Часы настроены на:
+<Other>	Time		<Другой>
+Received invalid time	Time		Получено неверное время
+Remove	Time		Удалить
+Synchronize again	Time		Синхронизировать снова
+Asia	Time		Азия
+Try all servers	Time		Пробовать все сервера
+Time	Time		Время
+Current time:	Time		Текущее время:
 The following error occured while synchronizing:r\n%s	Time		При синхронизации произошла следующая ошибка:r\n%s
 Europe	Time		Европа
-Remove	Time		Удалить
-Time	Time		Время
-Indian	Time		Индийский океан
-Sending request failed	Time		Не удалось отправить запрос
+Show day of week	Time		Показывать день недели
+Local time (Windows compatible)	Time		Местное время (совместимо с Windows)
+Hardware clock set to:	Time		Часы настроены на:
 Arctic	Time		Арктика
-Display time with seconds	Time		Показывать секунды
-Time	System name		Время
-America	Time		Америка
-Synchronize at boot	Time		Синхронизировать при загрузке
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Дата & Время, разработан:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nВсе права защищены 2004-2012, Haiku.
-Received invalid time	Time		Получено неверное время
 Antarctica	Time		Антарктида
-Show time zone	Time		Показывать часовой пояс
-Show clock in Deskbar	Time		Отображать часы в Deskbar
-The following error occured while synchronizing:r\n%s: %s	Time		При синхронизации произошла следующая ошибка:r\n%s: %s
-<Other>	Time		<Другой>
-Current time:	Time		Текущее время:
-Try all servers	Time		Пробовать все сервера
+GMT (UNIX compatible)	Time		По Гринвичу (совместимо с UNIX)
+Africa	Time		Африка
+Stop	Time		Остановить
 Time zone	Time		Часовой пояс
-Could not create socket	Time		Не удалось создать сокет
-Synchronize again	Time		Синхронизировать снова
 Clock	Time		Часы
 Network time	Time		Синхронизация
+Sending request failed	Time		Не удалось отправить запрос
+Preview time:	Time		Предварительное время:
+\nNow: 	Time		\nСейчас: 
+Could not create socket	Time		Не удалось создать сокет
+Pacific	Time		Тихий океан
 Atlantic	Time		Атлантика
+Show clock in Deskbar	Time		Отображать часы в Deskbar
+Display time with seconds	Time		Показывать секунды
+Time	System name		Время
+about	Time		о программе
+Show time zone	Time		Показывать часовой пояс
+Synchronize at boot	Time		Синхронизировать при загрузке
+Indian	Time		Индийский океан
+Revert	Time		Вернуть
+Date and time	Time		Дата и время
+Synchronize	Time		Синхронизировать
+Add	Time		Добавить

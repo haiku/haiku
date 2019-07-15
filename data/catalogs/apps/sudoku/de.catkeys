@@ -1,35 +1,35 @@
 1	german	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		Spielstand wiederherstellen
-Could not set Sudoku:\n%s\n	SudokuWindow		Sudoku konnte nicht erstellt werden:\n%s\n
-Export as…	SudokuWindow		Exportieren als…
-OK	SudokuWindow		OK
-New	SudokuWindow		Neu
-Abort	ProgressWindow		Abbrechen
-Sudoku	System name		Sudoku
-Could not open \"%s\":\n%s\n	SudokuWindow		\"%s\" konnte nicht geöffnet werden:\n%s\n
-Easy	SudokuWindow		Einfach
-Open file…	SudokuWindow		Datei öffnen…
-Solve single field	SudokuWindow		Ein Feld lösen
-Solve	SudokuWindow		Auflösen
-Redo	SudokuWindow		Wiederholen
 File	SudokuWindow		Datei
-Advanced	SudokuWindow		Fortgeschritten
-Start again	SudokuWindow		Von vorn beginnen
-HTML	SudokuWindow		HTML
-Sudoku request	SudokuWindow		Sudoku Anfrage
-Copy	SudokuWindow		Kopieren
-Mark valid hints	SudokuWindow		Gültige Zahlen hervorheben
-Sudoku solved - congratulations!\n	SudokuWindow		Sudoku gelöst - Glückwunsch!\n
+Mark invalid values	SudokuWindow		Falsche Zahlen markieren
+Solve single field	SudokuWindow		Ein Feld lösen
 Hard	SudokuWindow		Schwer
-Snapshot current	SudokuWindow		Spielstand merken
+Start again	SudokuWindow		Von vorn beginnen
+New	SudokuWindow		Neu
+Easy	SudokuWindow		Einfach
+Undo	SudokuWindow		Rückgängig
+Export as…	SudokuWindow		Exportieren als…
+Quit	SudokuWindow		Beenden
+Redo	SudokuWindow		Wiederholen
+Could not open \"%s\":\n%s\n	SudokuWindow		\"%s\" konnte nicht geöffnet werden:\n%s\n
+Blank	SudokuWindow		Leer
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku gelöst - Glückwunsch!\n
 Text	SudokuWindow		Text
+Copy	SudokuWindow		Kopieren
+Solve	SudokuWindow		Auflösen
+HTML	SudokuWindow		HTML
+Advanced	SudokuWindow		Fortgeschritten
+Set all hints	SudokuWindow		Alle Hinweise zeigen
+Searching for removable values	SudokuGenerator		Suche nach entfernbaren Werten läuft
+Abort	ProgressWindow		Abbrechen
+Could not set Sudoku:\n%s\n	SudokuWindow		Sudoku konnte nicht erstellt werden:\n%s\n
+Help	SudokuWindow		Hilfe
+OK	SudokuWindow		OK
+Sudoku	System name		Sudoku
+Progress monitor	ProgressWindow		Fortschrittsanzeige
 Creating solvable field	SudokuGenerator		Lösbare Felder werden erstellt
 View	SudokuWindow		Ansicht
-Progress monitor	ProgressWindow		Fortschrittsanzeige
-Set all hints	SudokuWindow		Alle Hinweise zeigen
-Mark invalid values	SudokuWindow		Falsche Zahlen markieren
-Blank	SudokuWindow		Leer
-Help	SudokuWindow		Hilfe
-Searching for removable values	SudokuGenerator		Suche nach entfernbaren Werten läuft
-Undo	SudokuWindow		Rückgängig
-Quit	SudokuWindow		Beenden
+Snapshot current	SudokuWindow		Spielstand merken
+Mark valid hints	SudokuWindow		Gültige Zahlen hervorheben
+Sudoku request	SudokuWindow		Sudoku Anfrage
+Open file…	SudokuWindow		Datei öffnen…

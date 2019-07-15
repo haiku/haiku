@@ -1,17 +1,17 @@
 1	finnish	x-vnd.Haiku-keystore_server	2429996361
-This application hasn't been granted access before.	AppAccessRequestWindow		Tälle sovellukselle ei ole annettu käyttöoikeuksia aiemmin.
-Unlock	KeyRequestWindow		Avaa lukitus
-This application has been updated since it was last granted access.	AppAccessRequestWindow		Tätä sovellusta on päivitetty viimeisen myönnetyn käyttöoikeuden jälkeen.
-Allow always	AppAccessRequestWindow		Salli aina
-Application keyring access	AppAccessRequestWindow		Pääsy sovellusavainrenkaaseen
 to perform the following action:\n%accessString%\n\n	AppAccessRequestWindow		seuraavan toiminnon suorittamiseksi:\n%accessString%\n\n
-The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		Sovellus:\n%signature% (%path%)\n\n
 This application doesn't yet have the required privileges.	AppAccessRequestWindow		Sovelluksella ei ole vielä vaadittuja käyttöoikeuksia.
-Password:	KeyRequestWindow		Salasana:
-Cancel	KeyRequestWindow		Peru
 Keyring:	KeyRequestWindow		#document
+requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		pyytää pääsyä avainrenkaaseen:\n%keyringName%\n\n
+Application keyring access	AppAccessRequestWindow		Pääsy sovellusavainrenkaaseen
+Disallow	AppAccessRequestWindow		Älä salli
+Allow once	AppAccessRequestWindow		#document
 Unlock keyring	KeyRequestWindow		Avaa avainnippu
 An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		Sovellus haluaa pääsyn alla olevaan avainrenkaaseen, mutta se on lukittu salasanalauseella. Kirjoita salasana avainrenkaan avaamiseksi.\nJos avaat avainrenkaan, se pysyy avoinna kunnes järjestelmä suljetaan tai avainrengas lukitaan taas manuaalisesti.\nJos perut tämän valintaikkunan, avainrengas pysyy lukittuna.
-Allow once	AppAccessRequestWindow		#document
-Disallow	AppAccessRequestWindow		Älä salli
-requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		pyytää pääsyä avainrenkaaseen:\n%keyringName%\n\n
+Password:	KeyRequestWindow		Salasana:
+Cancel	KeyRequestWindow		Peru
+This application has been updated since it was last granted access.	AppAccessRequestWindow		Tätä sovellusta on päivitetty viimeisen myönnetyn käyttöoikeuden jälkeen.
+Allow always	AppAccessRequestWindow		Salli aina
+Unlock	KeyRequestWindow		Avaa lukitus
+The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		Sovellus:\n%signature% (%path%)\n\n
+This application hasn't been granted access before.	AppAccessRequestWindow		Tälle sovellukselle ei ole annettu käyttöoikeuksia aiemmin.

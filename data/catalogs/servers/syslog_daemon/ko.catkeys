@@ -1,4 +1,4 @@
 1	korean	x-vnd.Haiku-SystemLogger	57960782
-%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\n이 데몬은 모든 시스템 메시지를 수집하여 전체 시스템 로그\"%s\" 에 기록을 담당함.\n\n
-OK	SyslogDaemon		확인
 Syslog Daemon	SyslogDaemon		Syslog 데몬
+OK	SyslogDaemon		확인
+%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\n이 데몬은 모든 시스템 메시지를 수집하여 전체 시스템 로그\"%s\" 에 기록을 담당함.\n\n

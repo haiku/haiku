@@ -1,23 +1,23 @@
 1	romanian	x-vnd.haiku-registrar	2599857937
-Restart system	ShutdownProcess		Repornire sistem
-The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Aplicația \"%appName%\" pare a fi blocată pe un panou modal.
-OK	ShutdownProcess		OK
-System is shut down	ShutdownProcess		Sistemul este oprit
-It's now safe to turn off the computer.	ShutdownProcess		Acum este sigur să închideți calculatorul.
 Cancel	ShutdownProcess		Anulează
+OK	ShutdownProcess		OK
 Do you really want to shut down the system?	ShutdownProcess		Sigur doriți să opriți sistemul?
-Asking other processes to quit.	ShutdownProcess		Cerere altor procese să termine.
-Asking \"%appName%\" to quit.	ShutdownProcess		Cerere \"%appName%\" să termine.
-%action%?	ShutdownProcess		%action%?
-Shutdown aborted	ShutdownProcess		Oprire anulată
-Restarting…	ShutdownProcess		Repornire…
-Asking background applications to quit.	ShutdownProcess		Cerere aplicațiilor de fond să termine.
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Applicația \"%appName%\" a eșuat procesul de oprire.
-Tidying things up a bit.	ShutdownProcess		Aranjez lucrurile un pic.
-Do you really want to restart the system?	ShutdownProcess		Sigur doriți să reporniți sistemul?
 Shutdown status	ShutdownProcess		Stare oprire
-Cancel shutdown	ShutdownProcess		Anulează oprirea
-Kill application	ShutdownProcess		Omoară aplicația
 Shut down	ShutdownProcess		Oprire
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Aplicația \"%appName%\" pare a fi blocată pe un panou modal.
+System is shut down	ShutdownProcess		Sistemul este oprit
+Restart system	ShutdownProcess		Repornire sistem
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Applicația \"%appName%\" a eșuat procesul de oprire.
+Asking background applications to quit.	ShutdownProcess		Cerere aplicațiilor de fond să termine.
+Do you really want to restart the system?	ShutdownProcess		Sigur doriți să reporniți sistemul?
 Restart	ShutdownProcess		Repornire
+It's now safe to turn off the computer.	ShutdownProcess		Acum este sigur să închideți calculatorul.
+Asking other processes to quit.	ShutdownProcess		Cerere altor procese să termine.
+Cancel shutdown	ShutdownProcess		Anulează oprirea
+Restarting…	ShutdownProcess		Repornire…
+%action%?	ShutdownProcess		%action%?
+Tidying things up a bit.	ShutdownProcess		Aranjez lucrurile un pic.
+Kill application	ShutdownProcess		Omoară aplicația
+Shutdown aborted	ShutdownProcess		Oprire anulată
 Shutting down…	ShutdownProcess		Se oprește…
+Asking \"%appName%\" to quit.	ShutdownProcess		Cerere \"%appName%\" să termine.

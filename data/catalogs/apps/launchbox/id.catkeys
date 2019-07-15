@@ -1,35 +1,35 @@
 1	indonesian	x-vnd.Haiku-LaunchBox	3692177981
-New	LaunchBox		Baru
 Set description…	LaunchBox		Atur deskripsi…
-Vertical layout	LaunchBox		Tata letak vertikal
-OK	LaunchBox		OKE
-Pad 1	LaunchBox		Pad 1
-last chance	LaunchBox		kesempatan terakhir
-Quit	LaunchBox		Keluar
-Open containing folder	LaunchBox		Buka folder yang berisi
-Clear button	LaunchBox		Bersihkan tombol
-LaunchBox	System name		LaunchBox
-Ignore double-click	LaunchBox		Abaikan klik dua kali
-Auto-raise	LaunchBox		Oto-bangkit
-Show on all workspaces	LaunchBox		Tampilkan di semua workspace
-Show window border	LaunchBox		Tampilkan batas jendela
-Pad	LaunchBox		Pad
-Icon size	LaunchBox		Ukuran ikon
-Bummer	LaunchBox		Gelandangan
-Cancel	LaunchBox		Batal
-Remove button	LaunchBox		Lepaskan tombol
-Horizontal layout	LaunchBox		Tata letak horizontal
-\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nGagal meluncurkan aplikasi dengan tanda tangan '%2'.\n\nKesalahan:
-Failed to launch '%1'.\n\nError:	LaunchBox		Gagal meluncurkan '%1'.\n\nKesalahan:
-Name Panel	LaunchBox		Panel Nama
-Add button here	LaunchBox		Tambah tombol di sini
-Description for '%3'	LaunchBox		Deskripsi untuk '%3'
-Settings	LaunchBox		Pengaturan
-Failed to launch 'something', error in Pad data.	LaunchBox		Gagal meluncurkan 'sesuatu', kesalahan dalam data Pad.
-Pad %1	LaunchBox		Pad %1
-Close	LaunchBox		Tutup
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Gagal mengirim perintah 'buka folder' ke Tracker.\n\nKesalahan: 
-You can drag an icon here.	LaunchBox		Anda dapat menyeret ikon di sini.
-Clone	LaunchBox		Klon
-launch popup	LaunchBox		luncurkan popup
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Sungguhan menutup pad ini?\n(Padnya tidak akan diingat.)
+OK	LaunchBox		OKE
+Ignore double-click	LaunchBox		Abaikan klik dua kali
+Show on all workspaces	LaunchBox		Tampilkan di semua workspace
+Name Panel	LaunchBox		Panel Nama
+Clone	LaunchBox		Klon
+Description for '%3'	LaunchBox		Deskripsi untuk '%3'
+Show window border	LaunchBox		Tampilkan batas jendela
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nGagal meluncurkan aplikasi dengan tanda tangan '%2'.\n\nKesalahan:
+Failed to launch 'something', error in Pad data.	LaunchBox		Gagal meluncurkan 'sesuatu', kesalahan dalam data Pad.
+LaunchBox	System name		LaunchBox
+Auto-raise	LaunchBox		Oto-bangkit
+Icon size	LaunchBox		Ukuran ikon
+Open containing folder	LaunchBox		Buka folder yang berisi
+Add button here	LaunchBox		Tambah tombol di sini
+Cancel	LaunchBox		Batal
+launch popup	LaunchBox		luncurkan popup
+Clear button	LaunchBox		Bersihkan tombol
+Bummer	LaunchBox		Gelandangan
+last chance	LaunchBox		kesempatan terakhir
+You can drag an icon here.	LaunchBox		Anda dapat menyeret ikon di sini.
+Pad 1	LaunchBox		Pad 1
+Failed to launch '%1'.\n\nError:	LaunchBox		Gagal meluncurkan '%1'.\n\nKesalahan:
+Settings	LaunchBox		Pengaturan
+Vertical layout	LaunchBox		Tata letak vertikal
+Pad	LaunchBox		Pad
+Close	LaunchBox		Tutup
+Remove button	LaunchBox		Lepaskan tombol
+Quit	LaunchBox		Keluar
+Horizontal layout	LaunchBox		Tata letak horizontal
+New	LaunchBox		Baru
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Gagal mengirim perintah 'buka folder' ke Tracker.\n\nKesalahan: 
+Pad %1	LaunchBox		Pad %1

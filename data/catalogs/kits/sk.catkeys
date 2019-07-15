@@ -1,42 +1,42 @@
 1	slovak	x-vnd.Haiku-libbe	3337473349
-gamma	AboutWindow		gama
-beta	AboutWindow		beta
-%3.2f GiB	StringForSize		%3.2f GiB
-Written by:	AboutWindow		Napísal:
-About %app%	AboutMenuItem		O aplikácii %app%
-Cut	TextView		Vystrihnúť
-Version	AboutWindow		Verzia
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nemožno vytvoriť replikanta pre „%description“.\n%error
-Copy	TextView		Kopírovať
-%3.2f KiB	StringForSize		%3.2f KiB
-alpha	AboutWindow		alfa
-Error	PrintJob		Chyba
-All Rights Reserved.	AboutWindow		Všetky práva vyhradené.
 {0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# bajt} few{# bajty} other{# bajtov}}
-About %app%	AboutWindow		O aplikácii %app%
-No pages to print!	PrintJob		Nie je čo tlačiť!
+All Rights Reserved.	AboutWindow		Všetky práva vyhradené.
+gold master	AboutWindow		gold master
+Undo	TextView		Späť
+gamma	AboutWindow		gama
+development	AboutWindow		vývoj
 OK	Dragger		OK
 OK	PrintJob		OK
-Green:	ColorControl		Zelená:
-Version history:	AboutWindow		História verzií:
-Remove replicant	Dragger		Odstrániť replikanta
-Select all	TextView		Vybrať všetko
-OK	AboutWindow		OK
-OK	ZombieReplicantView		OK
 Print Server is not responding.	PrintJob		Tlačový server neodpovedá.
+About %app%	AboutMenuItem		O aplikácii %app%
+Warning	Dragger		Upozornenie
+Green:	ColorControl		Zelená:
+Redo	TextView		Opakovať
+No pages to print!	PrintJob		Nie je čo tlačiť!
+beta	AboutWindow		beta
+OK	ZombieReplicantView		OK
+Cut	TextView		Vystrihnúť
+%3.2f GiB	StringForSize		%3.2f GiB
+Can't delete this replicant from its original application. Life goes on.	Dragger		Nemožno zmazať tohto replikanta z jeho pôvodnej aplikácie. C'est la vie.
+Error	ZombieReplicantView		Chyba
 Paste	TextView		Vložiť
+OK	AboutWindow		OK
 Special Thanks:	AboutWindow		Zvláštne poďakovanie:
 %.2f TiB	StringForSize		%.2f TiB
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nemožno nájsť aplikáciu pre replikanta. Nebol dodaný žiaden podpis aplikácie.\n%error
-Redo	TextView		Opakovať
-<empty>	Menu		<prázdne>
-Warning	Dragger		Upozornenie
-Undo	TextView		Späť
+Remove replicant	Dragger		Odstrániť replikanta
+Version	AboutWindow		Verzia
 Red:	ColorControl		Červená:
+<empty>	Menu		<prázdne>
+Copy	TextView		Kopírovať
+Select all	TextView		Vybrať všetko
+alpha	AboutWindow		alfa
 %3.2f MiB	StringForSize		%3.2f MiB
+Error	PrintJob		Chyba
+About %app%	AboutWindow		O aplikácii %app%
 About %app…	Dragger		O aplikácii %app…
-development	AboutWindow		vývoj
-Error	ZombieReplicantView		Chyba
+Version history:	AboutWindow		História verzií:
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nemožno nájsť aplikáciu pre replikanta. Nebol dodaný žiaden podpis aplikácie.\n%error
+%3.2f KiB	StringForSize		%3.2f KiB
 Blue:	ColorControl		Modrá:
-gold master	AboutWindow		gold master
-Can't delete this replicant from its original application. Life goes on.	Dragger		Nemožno zmazať tohto replikanta z jeho pôvodnej aplikácie. C'est la vie.
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nemožno vytvoriť replikanta pre „%description“.\n%error
+Written by:	AboutWindow		Napísal:

@@ -1,16 +1,16 @@
 1	spanish; castilian	x-vnd.haiku-package_daemon	1440586681
-Package problems	PackageProblem	Window title	Problemas del paquete
 Package changes	PackageResult	Window title	Cambios del paquete
 uninstall package %s\n	PackageResult	Don't change '%s' variable	desinstalar paquete %s\n
-install package %s from repository %s\n	PackageResult	Don't change '%s' variables	instalar paquete %s desde el repositorio %s\n
-Apply changes	PackageResult		Aplicar cambios
-solution %d:	PackageProblem	Don't change the %d variable	solución %d:
-Warning	PackageManager		Advertencia
-Retry	PackageProblem		Reintentar
-The following additional package changes have to be made:	PackageResult		Tienen que realizarse los siguientes cambios adicionales de paquetes:
 ignore problem for now	PackageProblem		ignorar los problemas por el momento
+solution %d:	PackageProblem	Don't change the %d variable	solución %d:
+The following problems have been encountered. Please select a solution for each:	PackageProblem		Se han encontrado los siguientes problemas. Por favor elige una solución para cada uno:
+Apply changes	PackageResult		Aplicar cambios
+Package daemon	PackageManager		Proceso en segundo plano de paquetes
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	instalar paquete %s desde el repositorio %s\n
+The following additional package changes have to be made:	PackageResult		Tienen que realizarse los siguientes cambios adicionales de paquetes:
+Warning	PackageManager		Advertencia
 Cancel	PackageProblem		Cancelar
 don't activate package %source%	PackageProblem	don't change '%source%	no activar el paquete %source%
-The following problems have been encountered. Please select a solution for each:	PackageProblem		Se han encontrado los siguientes problemas. Por favor elige una solución para cada uno:
-Package daemon	PackageManager		Proceso en segundo plano de paquetes
 Cancel	PackageResult		Cancelar
+Retry	PackageProblem		Reintentar
+Package problems	PackageProblem	Window title	Problemas del paquete

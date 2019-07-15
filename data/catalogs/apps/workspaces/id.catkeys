@@ -1,13 +1,13 @@
 1	indonesian	x-vnd.Be-WORK	3927737357
-Invalid argument: %s\n	Workspaces		Argumen tidak valid: %s\n
 Quit	Workspaces		Keluar
-Workspaces	System name		Area kerja
+Invalid argument: %s\n	Workspaces		Argumen tidak valid: %s\n
 Change workspace count…	Workspaces		Ubah hitungan workspace...
-Remove replicant	Workspaces		Buang replicant
-Show window border	Workspaces		Tampilkan batas jendela
-Auto-raise	Workspaces		Muncul otomatis
 Always on top	Workspaces		Selalu di atas
-Switch on mouse wheel	Workspaces		Berpindah dengan roda mouse
-Live in the Deskbar	Workspaces		Langsung di Deskbar
+Show window border	Workspaces		Tampilkan batas jendela
 Show window tab	Workspaces		Tampilkan tab jendela
+Auto-raise	Workspaces		Muncul otomatis
+Remove replicant	Workspaces		Buang replicant
+Live in the Deskbar	Workspaces		Langsung di Deskbar
 Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Penggunaan: %s [options] [workspace]\ndimana \"pilihan\" adalah:\n  --notitle\t\tbar judul dihapus, perbatasan dan resize terus\n  --noborder\t\tbar judul, perbatasan dan resize dihilangkan\n  --avoidfocus\t\tcegah jendela dari menjadi target even keyboard\n  --alwaysontop\t\tjaga jendela selalu diatas\n  --notmovable\t\tjendela tidak bisa dipindahkan\n  --autoraise\t\totomatis muncul bila jendela diujung batas layar\n  --help\t\ttampilan pertolongan ini dan keluar\ndan \"workspace\" adalah jumlah Workspace yang mau dipindahkan (0-31)\n
+Switch on mouse wheel	Workspaces		Berpindah dengan roda mouse
+Workspaces	System name		Area kerja

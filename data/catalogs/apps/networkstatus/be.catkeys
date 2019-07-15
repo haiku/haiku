@@ -1,22 +1,21 @@
-1	belarusian	x-vnd.Haiku-NetworkStatus	1729819859
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Опцыі NetworkStatus:\n\t--deskbar\tдадаваць дупліканта да Deskbar аўтаматычна\n\t--help\t\tпаказаць гэты тэкст і выйсці\n
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Вы можаце запусціць NetworkStatus у вакне або усталяваць на Deskbar.
-<no wireless networks found>	NetworkStatusView		<бесшнуравыя сеткі не знойдзеныя>
-Run in window	NetworkStatus		Запускаць у вакне
-No link	NetworkStatusView		Няма спасылкі
-Install in Deskbar	NetworkStatus		Усталяваць на Deskbar
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		Не ўдалося запусціць сеткавыя наладкі.\n\nПамылка: 
+1	belarusian	x-vnd.Haiku-NetworkStatus	3823341665
 Netmask	NetworkStatusView		Маска сеткі
-Broadcast	NetworkStatusView		Вяшчанне
-Unknown	NetworkStatusView		Невядомае
-Network Status	NetworkStatusView		Статус сеткі
-Ready	NetworkStatusView		Гатовы
-No stateful configuration	NetworkStatusView		Няма канфігурацыі для ўліку стану пратакола
-%ifaceName information:\n	NetworkStatusView		Інфармацыя пра %ifaceName:\n
-Configuring	NetworkStatusView		Наладка
-Address	NetworkStatusView		Адрас
-OK	NetworkStatusView		ОК
-NetworkStatus	System name		Статус сеткі
-Open network preferences…	NetworkStatusView		Адкрыць наладкі сеткі…
-Could not join wireless network:\n	NetworkStatusView		Не ўдалося далучыцца да бесшнуравой сеткі:\n
 Quit	NetworkStatusView		Выйсці
+Unknown	NetworkStatusView		Невядомае
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Не ўдалося запусціць сеткавыя наладкі.\n\nПамылка: 
+Install in Deskbar	NetworkStatus		Усталяваць на Deskbar
+Open network preferences…	NetworkStatusView		Адкрыць наладкі сеткі…
+NetworkStatus	System name		Статус сеткі
+OK	NetworkStatusView		ОК
+No link	NetworkStatusView		Няма спасылкі
+Could not join wireless network:\n	NetworkStatusView		Не ўдалося далучыцца да бесшнуравой сеткі:\n
+Ready	NetworkStatusView		Гатовы
+Network Status	NetworkStatusView		Статус сеткі
+Address	NetworkStatusView		Адрас
+No stateful configuration	NetworkStatusView		Няма канфігурацыі для ўліку стану пратакола
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Вы можаце запусціць NetworkStatus у вакне або усталяваць на Deskbar.
+Broadcast	NetworkStatusView		Вяшчанне
+%ifaceName information:\n	NetworkStatusView		Інфармацыя пра %ifaceName:\n
+Run in window	NetworkStatus		Запускаць у вакне
+<no wireless networks found>	NetworkStatusView		<бесшнуравыя сеткі не знойдзеныя>
+Configuring	NetworkStatusView		Наладка

@@ -1,31 +1,31 @@
 1	ukrainian	x-vnd.haiku-screenshot	3958461128
-seconds	ScreenshotWindow		секунд
-Desktop	ScreenshotWindow		Робочий стіл
 Include window border	ScreenshotWindow		Включаючи межу вікна
-Screenshot	System name		Знімок екрану
-Select	ScreenshotWindow		Вибрати
+Overwrite	ScreenshotWindow		Переписати
+Save in:	ScreenshotWindow		Зберегти в:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Помилка збереження \"%s\":\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Цей файл вже існує.\nВи впевнені, що бажаєте перезаписати його?
+OK	ScreenshotWindow		Гаразд
 The destination path exists but is not a folder.	ScreenshotWindow		Шлях по замовчуванню присутній але це не тека.
-Capture active window	ScreenshotWindow		Захопити активне вікно
-Cancel	ScreenshotWindow		Відмінити
+Select	ScreenshotWindow		Вибрати
+Save as:	ScreenshotWindow		Зберегти як:
+seconds	ScreenshotWindow		секунд
+New screenshot	ScreenshotWindow		Новий знімок екрана
+Screenshot	System name		Знімок екрану
+Desktop	ScreenshotWindow		Робочий стіл
+Artwork folder	ScreenshotWindow		Тека Artwork
+Translator Settings	ScreenshotWindow		Налаштування транслятора
+Include mouse pointer	ScreenshotWindow		Включаючи курсор
+overwrite	ScreenshotWindow		переписати
+Settings…	ScreenshotWindow		Налаштування…
+Choose folder	ScreenshotWindow		Виберіть теку
 Name:	ScreenshotWindow		Ім'я:
 Choose folder…	ScreenshotWindow		Виберіть теку…
-This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Цей файл вже існує.\nВи впевнені, що бажаєте перезаписати його?
-Choose folder	ScreenshotWindow		Виберіть теку
-Save	ScreenshotWindow		Зберегти
-Overwrite	ScreenshotWindow		Переписати
 Please select	ScreenshotWindow		Виберіть будь-ласка
-Save as:	ScreenshotWindow		Зберегти як:
-Copy to clipboard	ScreenshotWindow		Копіювати до буфера обміну
-Save in:	ScreenshotWindow		Зберегти в:
-screenshot	Screenshot	Base filename of screenshot files	знімок екрана
-New screenshot	ScreenshotWindow		Новий знімок екрана
-Artwork folder	ScreenshotWindow		Тека Artwork
-Home folder	ScreenshotWindow		Тека Home
 Failed to save screenshot	ScreenshotWindow		Збереження знімку екрана призупинене
-OK	ScreenshotWindow		Гаразд
-Settings…	ScreenshotWindow		Налаштування…
-overwrite	ScreenshotWindow		переписати
+Cancel	ScreenshotWindow		Відмінити
 Delay:	ScreenshotWindow		Затримка:
-Error saving \"%s\":\n\t%s	ScreenshotWindow		Помилка збереження \"%s\":\n\t%s
-Include mouse pointer	ScreenshotWindow		Включаючи курсор
-Translator Settings	ScreenshotWindow		Налаштування транслятора
+Copy to clipboard	ScreenshotWindow		Копіювати до буфера обміну
+screenshot	Screenshot	Base filename of screenshot files	знімок екрана
+Home folder	ScreenshotWindow		Тека Home
+Save	ScreenshotWindow		Зберегти
+Capture active window	ScreenshotWindow		Захопити активне вікно

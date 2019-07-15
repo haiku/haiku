@@ -1,50 +1,50 @@
 1	finnish	x-vnd.Be-PEPL	2332202134
-Edit	People		Muokkaa
-Error	People		Virhe
-City	People		Kaupunki
-The file '%name%' could not be written.	People		Kirjoittaminen tiedostoon ’%name%’ epäonnistui.
-none	Groups list		ei mitään
-Configure attributes	People		Asetusattribuutit
-Company	People		Yritys
-%name% picture	People		%name% -kuva
-Work phone	People		Työpuhelin
-People	System name		Ihmiset
-New person	People		Uusi henkilö
-Select all	People		Valitse kaikki
-File	People		Tiedosto
-Unnamed person	People		Nimetön henkilö
-Could not create %s.	People		Kohteen %s luominen epäonnistui.
-Country	People		Maa
-Close	People		Sulje
-Group	People		Ryhmä
-Nickname	People		Lempinimi
-Quit	People		Lopeta
-Name	People		Nimi
-Revert	People		Palauta
-Don't save	People		Älä tallenna
-Undo	People		Peru
-E-mail	People		Sähköposti
-Load image…	People		Lataa kuva…
-OK	People		Valmis
-Remove image	People		Poista kuva
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Tiedostotyypit-asetusohjelman käynnistäminen Henkilö-attribuuttien asettamiseksi epäonnistui.\n\nVirhe: 
-Home phone	People		Kotipuhelin
-Save as…	People		Tallenna nimellä...
-Redo	People		Tee uudelleen
-Save changes before closing?	People		Tallennetaanko muutokset ennen sulkemista?
-Paste	People		Liitä
-Drop an image here,\nor use the contextual menu.	People		Pudota kuva tänne, tai käytä\nasiayhteysvalikkoa.
-Save	People		Tallenna
-Person	Short mimetype description		Henkilö
+Unnamed person	People		Nimetön henkilö
 New person…	People		Uusi henkilö...
 Address	People		Osoite
-URL	People		Verkko-osoite
-Sorry	People		Valitan
 Zip	People		Postinumero
-Contact information for a person.	Long mimetype description		Henkilön yhteystiedot.
-Fax	People		Faksi
+Select all	People		Valitse kaikki
+Could not create %s.	People		Kohteen %s luominen epäonnistui.
+Quit	People		Lopeta
+Company	People		Yritys
+Name	People		Nimi
+The file '%name%' could not be written.	People		Kirjoittaminen tiedostoon ’%name%’ epäonnistui.
 Contact name	People		Yhteysnimi
-Cut	People		Leikkaa
 Cancel	People		Peru
+Edit	People		Muokkaa
+Save changes before closing?	People		Tallennetaanko muutokset ennen sulkemista?
+People	System name		Ihmiset
+Error	People		Virhe
+Revert	People		Palauta
+Country	People		Maa
+Person	Short mimetype description		Henkilö
+New person	People		Uusi henkilö
+Save	People		Tallenna
+Fax	People		Faksi
+URL	People		Verkko-osoite
+%name% picture	People		%name% -kuva
+Home phone	People		Kotipuhelin
+none	Groups list		ei mitään
+Save as…	People		Tallenna nimellä...
+Cut	People		Leikkaa
+Contact information for a person.	Long mimetype description		Henkilön yhteystiedot.
+Remove image	People		Poista kuva
+City	People		Kaupunki
+Undo	People		Peru
+Don't save	People		Älä tallenna
+Configure attributes	People		Asetusattribuutit
+Work phone	People		Työpuhelin
 State	People		Valtio
+Nickname	People		Lempinimi
+OK	People		Valmis
+File	People		Tiedosto
+Redo	People		Tee uudelleen
+Close	People		Sulje
 Copy	People		Kopioi
+Paste	People		Liitä
+E-mail	People		Sähköposti
+Group	People		Ryhmä
+Drop an image here,\nor use the contextual menu.	People		Pudota kuva tänne, tai käytä\nasiayhteysvalikkoa.
+Load image…	People		Lataa kuva…
+Sorry	People		Valitan

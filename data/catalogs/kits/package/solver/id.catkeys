@@ -1,38 +1,38 @@
 1	indonesian	x-vnd.Haiku-libsolvsolver	3404387783
-%dependency% is provided by the system	SolverProblem		%dependency% disediakan oleh sistem
-package %source% conflicts with %dependency% provided by %target%	SolverProblem		paket %source% konflik dengan %dependency% yang disediakan oleh %target%
-nothing provides requested %dependency%	SolverProblem		tidak ada yang menyediakan %dependency%
-unspecified problem	SolverProblem		masalah tidak spesifik
-keep %source% despite its inferior architecture	SolverProblemSolution		menyimpan %source% meski arsitekturnya inferior
-do not deinstall \"%selection%\"	SolverProblemSolution		jangan melepas \"%selection%\"
-%source% has inferior architecture	SolverProblem		%source% memiliki arsitektur inferior
-dependency problem	SolverProblem		masalah ketergantungan
-do not keep %source% installed	SolverProblemSolution		jangan disimpan %source% yang terpasang
-package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		paket %source% secara implisit obsolet %dependency% disediakan oleh %target%
-do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		jangan hilangkan semua yang bisa dipecahkan \"%selection%\"
-keep %source% from excluded repository	SolverProblemSolution		jaga %source% dari repositori yang dikecualikan
-install %selection% despite its old version	SolverProblemSolution		pasang %selection% meskipun versi lama
-allow downgrade of %source% to %target%	SolverProblemSolution		ijinkan turun versi dari %source% ke %target%
-do not lock \"%selection%\"	SolverProblemSolution		jangan mengunci \"%selection%\"
-install %source% despite its inferior architecture	SolverProblemSolution		pasang %source% meski arsitekturnya inferior
-do not install \"%selection%\"	SolverProblemSolution		jangan memasang \"%selection%\"
-do something	SolverProblemSolution		lakukan sesuatu
-do not install the most recent version of \"%selection%\"	SolverProblemSolution		jangan menginstal versi terbaru dari of \"%selection%\"
-package %source% conflicts with %dependency% provided by itself	SolverProblem		paket %source% konflik dengan %dependency% disediakan oleh paket itu sendiri
-cannot install both %source% and %target%	SolverProblem		tidak dapat menginstal kedua %source% dan %target%
-allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		izinkan vendor merubah dari \"%sourceVendor%\" (%source%) ke \"%targetVendor%\" (%target%)
-install %source% from excluded repository	SolverProblemSolution		pasang %source% dari repositori yang dikecualikan
-keep old %source%	SolverProblemSolution		pertahankan %source% lama
-conflicting requests	SolverProblem		permintaan saling bertentangan
-package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		paket %source% membutuhkan %dependency%, tetapi tidak ada penyedia yang dapat diinstal
-do not forbid installation of %source%	SolverProblemSolution		jangan melarang instalasi dari %source%
 allow architecture change of %source% to %target%	SolverProblemSolution		ijinkan perubahan arsitektur dari %source% ke %target%
-allow name change of %source% to %target%	SolverProblemSolution		izinkan perubahan nama dari %source% ke %target%
+install %source% from excluded repository	SolverProblemSolution		pasang %source% dari repositori yang dikecualikan
+unspecified problem	SolverProblem		masalah tidak spesifik
+package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		paket %source% membutuhkan %dependency%, tetapi tidak ada penyedia yang dapat diinstal
+package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		paket %source% secara implisit obsolet %dependency% disediakan oleh %target%
+nothing provides requested %dependency%	SolverProblem		tidak ada yang menyediakan %dependency%
+do not keep %source% installed	SolverProblemSolution		jangan disimpan %source% yang terpasang
+do not deinstall \"%selection%\"	SolverProblemSolution		jangan melepas \"%selection%\"
+install %source% despite its inferior architecture	SolverProblemSolution		pasang %source% meski arsitekturnya inferior
+conflicting requests	SolverProblem		permintaan saling bertentangan
+do not install the most recent version of \"%selection%\"	SolverProblemSolution		jangan menginstal versi terbaru dari of \"%selection%\"
 allow replacement of %source% with %target%	SolverProblemSolution		ijinkan penggantian dari %source% dengan %target%
-allow deinstallation of %source%	SolverProblemSolution		ijinkan pelepasan dari %source%
-%source% does not belong to a distupgrade repository	SolverProblem		%source% bukan milik repositori distupgrade
 package %source% obsoletes %dependency% provided by %target%	SolverProblem		paket %source% obsolet %dependency% disediakan oleh %target%
-package %source% is not installable	SolverProblem		paket %source% tidak dapat dipasang
+do not forbid installation of %source%	SolverProblemSolution		jangan melarang instalasi dari %source%
+allow downgrade of %source% to %target%	SolverProblemSolution		ijinkan turun versi dari %source% ke %target%
+dependency problem	SolverProblem		masalah ketergantungan
+%dependency% is provided by the system	SolverProblem		%dependency% disediakan oleh sistem
+keep %source% despite its inferior architecture	SolverProblemSolution		menyimpan %source% meski arsitekturnya inferior
+%source% does not belong to a distupgrade repository	SolverProblem		%source% bukan milik repositori distupgrade
 installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		paket yang diinstal %source% obsolet %dependency% yang disediakan oleh %target%
+allow name change of %source% to %target%	SolverProblemSolution		izinkan perubahan nama dari %source% ke %target%
+package %source% conflicts with %dependency% provided by %target%	SolverProblem		paket %source% konflik dengan %dependency% yang disediakan oleh %target%
+do something	SolverProblemSolution		lakukan sesuatu
+install %selection% despite its old version	SolverProblemSolution		pasang %selection% meskipun versi lama
+cannot install both %source% and %target%	SolverProblem		tidak dapat menginstal kedua %source% dan %target%
+package %source% is not installable	SolverProblem		paket %source% tidak dapat dipasang
 problem with installed package %source%	SolverProblem		terjadi masalah dengan paket terpasang %source%
+allow deinstallation of %source%	SolverProblemSolution		ijinkan pelepasan dari %source%
+keep %source% from excluded repository	SolverProblemSolution		jaga %source% dari repositori yang dikecualikan
+keep old %source%	SolverProblemSolution		pertahankan %source% lama
+package %source% conflicts with %dependency% provided by itself	SolverProblem		paket %source% konflik dengan %dependency% disediakan oleh paket itu sendiri
+allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		izinkan vendor merubah dari \"%sourceVendor%\" (%source%) ke \"%targetVendor%\" (%target%)
+do not lock \"%selection%\"	SolverProblemSolution		jangan mengunci \"%selection%\"
+do not install \"%selection%\"	SolverProblemSolution		jangan memasang \"%selection%\"
 nothing provides %dependency% needed by %source%	SolverProblem		tidak ada yang menyediakan %dependency% yang dibutuhkan %source%
+%source% has inferior architecture	SolverProblem		%source% memiliki arsitektur inferior
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		jangan hilangkan semua yang bisa dipecahkan \"%selection%\"

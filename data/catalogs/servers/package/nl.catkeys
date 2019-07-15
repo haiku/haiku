@@ -1,16 +1,16 @@
 1	dutch; flemish	x-vnd.haiku-package_daemon	1440586681
-Package problems	PackageProblem	Window title	Pakketproblemen
 Package changes	PackageResult	Window title	Pakketwijzigingen
 uninstall package %s\n	PackageResult	Don't change '%s' variable	pakket verwijderen %s\n
-install package %s from repository %s\n	PackageResult	Don't change '%s' variables	pakket %s van de catalogus %s installeren\n
-Apply changes	PackageResult		Wijzigingen toepassen
-solution %d:	PackageProblem	Don't change the %d variable	oplossing %d:
-Warning	PackageManager		Waarschuwing
-Retry	PackageProblem		Opnieuw proberen
-The following additional package changes have to be made:	PackageResult		De volgende additionele pakketwijzingen moeten gemaakt worden:
 ignore problem for now	PackageProblem		probleem voor nu negeren
+solution %d:	PackageProblem	Don't change the %d variable	oplossing %d:
+The following problems have been encountered. Please select a solution for each:	PackageProblem		De volgende problemen zijn gevonden. Kies voor elk een oplossing:
+Apply changes	PackageResult		Wijzigingen toepassen
+Package daemon	PackageManager		Pakket-daemon
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	pakket %s van de catalogus %s installeren\n
+The following additional package changes have to be made:	PackageResult		De volgende additionele pakketwijzingen moeten gemaakt worden:
+Warning	PackageManager		Waarschuwing
 Cancel	PackageProblem		Annuleren
 don't activate package %source%	PackageProblem	don't change '%source%	pakket %source% niet activeren
-The following problems have been encountered. Please select a solution for each:	PackageProblem		De volgende problemen zijn gevonden. Kies voor elk een oplossing:
-Package daemon	PackageManager		Pakket-daemon
 Cancel	PackageResult		Annuleren
+Retry	PackageProblem		Opnieuw proberen
+Package problems	PackageProblem	Window title	Pakketproblemen

@@ -1,31 +1,30 @@
-1	hungarian	x-vnd.Haiku-PPMTranslator	2233502290
-Version %d.%d.%d, %s	PPMTranslator		Verzió: %d.%d.%d %s
+1	hungarian	x-vnd.Haiku-PPMTranslator	292474603
+None	PPMTranslator		Nincs
 PPM Settings	PPMMain		PPM beállítások
-Based on PPMTranslator sample code	PPMTranslator		A PPM értelemző mintakódja alapján
-OK	PPMMain		Rendben
+System palette 8 bits	PPMTranslator		Rendszerpaletta 8-bites
+Sample code copyright 1999, Be Incorporated	PPMTranslator		Mintakód copyright 1999, Be Incorporated
+Something is wrong with the PPMTranslator!	PPMMain		Valami nincs rendben a PPMÉrtelemzővel!
 Grayscale 8 bits	PPMTranslator		Szürekárnyalatos 8-bites
+Based on PPMTranslator sample code	PPMTranslator		A PPM értelemző mintakódja alapján
+RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32-bites nagy-endián
+PPM image translator	PPMTranslator		PPM kép értelmező
+Bitmap 1 bit	PPMTranslator		1-bites bittérkép
+RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16-bites nagy-endián
+PPMTranslator Settings	PPMTranslator		PPMÉrtelemző beállítások
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32-bites
+OK	PPMMain		Rendben
+CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32-bites
 PPM image	PPMTranslator		PPM kép
+Input color space:	PPMTranslator		Bemeneti színskála:
+RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16-bites nagy-endián
+RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16-bites nagy-endián
+Write ASCII	PPMTranslator		ASCII írása
+RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16-bites
+RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32-bites nagy-endián
+RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32-bites
+Version %d.%d.%d, %s	PPMTranslator		Verzió: %d.%d.%d %s
+CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32-bites
+RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32-bites
+RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16-bites
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16-bites
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Be Bittépkép Formátum (PPMÉrtelmező)
-CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32-bites
-Input color space:	PPMTranslator		Bemeneti színskála:
-CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32-bites
-PPM image translator	PPMTranslator		PPM kép értelmező
-bits/space	PPMTranslator		bit/hely
-RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32-bites nagy-endián
-RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16-bites nagy-endián
-RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16-bites nagy-endián
-RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16-bites
-Write ASCII	PPMTranslator		ASCII írása
-RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32-bites
-None	PPMTranslator		Nincs
-RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16-bites nagy-endián
-RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16-bites
-Bitmap 1 bit	PPMTranslator		1-bites bittérkép
-RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32-bites nagy-endián
-RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32-bites
-Sample code copyright 1999, Be Incorporated	PPMTranslator		Mintakód copyright 1999, Be Incorporated
-PPMTranslator Settings	PPMTranslator		PPMÉrtelemző beállítások
-Something is wrong with the PPMTranslator!	PPMMain		Valami nincs rendben a PPMÉrtelemzővel!
-System palette 8 bits	PPMTranslator		Rendszerpaletta 8-bites

@@ -1,133 +1,133 @@
 1	finnish	x-vnd.Haiku-DiskProbe	2944605311
-File offset: 	ProbeView		Tiedostosiirros: 
-%ld (native)	ProbeView		%ld (alkuperäinen)
-64 bit unsigned value:	TypeEditors		64-bittinen etumerkitön arvo:
-Find again	ProbeView		Hae uudelleen
-Text	FindWindow		Teksti
-Find…	ProbeView		Hae…
-Case sensitive	FindWindow		Kirjainkoosta riippuva
-Cancel	OpenWindow		Peru
-Close	AttributeWindow		Sulje
-File	ProbeView		Tiedosto
-Attribute	ProbeView		Attribuutti
-Floating-point value:	TypeEditors		Liukulukuarvo:
-16 bit	TypeEditors		16-bittinen
-Attributes	ProbeView		Attribuutit
-Device offset: 	ProbeView		Laitesiirros: 
-Selection	ProbeView		Valinta
-DiskProbe	System name		Levyasemakoestin
-what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	mikä: ’%.4s’\n\n
-File	FileWindow		Tiedosto
-OK	DiskProbe		Valmis
-Boolean	TypeEditors	This is the type of editor	Boolean
-Paste	ProbeView		Liitä
-PNG format	TypeEditors		PNG-muoto
-Font size	ProbeView		Kirjasinkoko
-Attribute type: 	ProbeView		Attribuuttityyppi: 
-Attribute	AttributeWindow		Attribuutti
-8 bit signed value:	TypeEditors		8-bittinen etumerkillinen arvo:
-Number:	TypeEditors		Numero:
-Save	ProbeView		Tallenna
-Stop	ProbeView		Pysäytä
-Number editor	TypeEditors		Numeromuokkain
-Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Heksadesimaali
-No type editor available	AttributeWindow		Tyyppimuokkainta ei ole käytettävissä
-Double precision floating-point value:	TypeEditors		Kaksoistarkkuuden liukulukuarvo:
-Device: 	ProbeView		Laite: 
-Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Haluatko todella poistaa attribuutin ”%s” tiedostosta ”%s”?\n\nTätä toimintoa ei voi perua.
-Text	TypeEditors	This is the type of editor	Teksti
-8 bit unsigned value:	TypeEditors		8-bittinen etumerkitön arvo:
-Block	ProbeView		Lohko
-Back	ProbeView		Takaisin
-Device	ProbeView		Laite
-Unknown type	TypeEditors		Tuntematon tyyppi
-Block 0x%Lx	ProbeView		Lohko 0x%Lx
-Quit	FileWindow		Lopeta
-Undo	ProbeView		Peru
-Close	ProbeView		Sulje
-Number	TypeEditors	This is the type of editor	Numero
-Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Desimaali
-16 bit signed value:	TypeEditors		16-bittinen etumerkillinen arvo:
-String editor	TypeEditors		Merkkijonomuokkain
-of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	/ 0x0
-64 bit signed offset:	TypeEditors		64-bittinen etumerkillinen siirros:
-Boolean editor	TypeEditors		Boolean-muokkain
-Copy	ProbeView		Kopioi
-none	ProbeView	No attributes	ei mitään
-Boolean value:	TypeEditors		Boolean-arvo:
-32 bit size or status:	TypeEditors		32-bittinen koko tai tila:
-8 bit palette	TypeEditors		8-bittinen paletti
-Fit	ProbeView	Size of fonts, fits to available room	Sopii
-Probe device	OpenWindow		Koesta laite
- (native)	ProbeView		 (alkuperäinen)
-Unknown format	TypeEditors		Tuntematon muoto
-Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Heksadesimaali
-MIME type:	TypeEditors		MIME-tyyppi:
-Page setup…	ProbeView		Sivuasetukset…
-New…	FileWindow		Uusi…
-DiskProbe request	AttributeWindow		Levykoestajapyyntö
-Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Kuvatiedoston lukeminen epäonnistui
-Save changes before closing?	ProbeView		Tallennatko muutokset ennen sulkemista?
-Type editor	AttributeWindow		Tyyppimuokkain
-Native: 0x%0*Lx	ProbeView		Kotoperäinen: 0x%0*Lx
 Raw editor	AttributeWindow		Raakamuokkain
-Message View	TypeEditors		Viestinäkymä
-DiskProbe request	ProbeView		Levykoestajapyyntö
-32 bit unsigned size:	TypeEditors		32-bittinen etumerkitön koko:
-Flattened bitmap	TypeEditors		Litistetty bittikarttatiedosto
-Open file…	FileWindow		Avaa tiedosto…
-Next	ProbeView		Seuraava
-Close	FileWindow		Sulje
-Attribute: 	ProbeView		Attribuutti: 
-Remove from file	AttributeWindow		Poista tiedostosta
-Don't save	ProbeView		Älä tallenna
-Previous	ProbeView		Edellinen
-64 bit signed value:	TypeEditors		64-bittinen etumerkillinen arvo:
-Icon	TypeEditors		Kuvake
-Block: 	ProbeView		Lohko: 
-Examine device:	OpenWindow		Tutki laitetta:
-Offset: 	ProbeView		Siirros: 
-OK	ProbeView		Valmis
-Add	ProbeView		Lisää
-Edit	ProbeView		Muokkaa
-Native: %Ld (0x%0*Lx)	ProbeView		Alkuperäinen: %Ld (0x%0*Lx)
-32 bit unsigned value:	TypeEditors		32-bittinen etumerkitön arvo:
-Message	TypeEditors	This is the type of view	Viesti
-Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Puskurin ”%s” avaus epäonnistui:\n%s
-Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Kantaluku
-Image view	TypeEditors	Image means here a picture file, not a disk image.	Kuvanäkymä
-Cancel	AttributeWindow		Peru
-Type editor not supported	ProbeView		Tyyppimuokkainta ei tueta
+Remove	AttributeWindow		Poista
+Close	ProbeView		Sulje
+Boolean value:	TypeEditors		Boolean-arvo:
+File	ProbeView		Tiedosto
 Block size	ProbeView	Menu item. This is in the same menu window than 'Base' and 'Font size'	Lohkokoko
 MIME type editor	TypeEditors		MIME-tyyppimuokkain
-Swapped: %Ld (0x%0*Lx)	ProbeView		Siiretty näennäismuistiin: %Ld (0x%0*Lx)
-Find	FindWindow		Haku
-Remove	AttributeWindow		Poista
-Print…	ProbeView		Tulosta…
-Block %Ld (0x%Lx)	ProbeView		Lohko %Ld (0x%Lx)
-Image	TypeEditors	This is the type of view	Kuva
-Could not open file \"%s\": %s\n	DiskProbe		Tiedoston ”%s” avaus epäonnistui: %s\n
-Select all	ProbeView		Valitse kaikki
-Probe file…	OpenWindow		Koesta tiedostoa…
-Icon view	TypeEditors		Kuvakenäkymä
-Bookmarks	ProbeView		Kirjanmerkit
-Mode:	FindWindow		Tila:
-15 bit	TypeEditors		15-bittinen
-Open device	FileWindow		Avaa laite
-Could not find search string.	ProbeView		Hakumerkkijonon löytäminen epäonnistui.
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Heksadesimaali
 16 bit unsigned value:	TypeEditors		16-bittinen etumerkitön arvo:
+8 bit signed value:	TypeEditors		8-bittinen etumerkillinen arvo:
+ (native)	ProbeView		 (alkuperäinen)
 Attribute offset: 	ProbeView		Attribuuttisiirros: 
-View	ProbeView	This is the last menubar item 'File Edit Block View'	Näkymä
-Redo	ProbeView		Tee uudelleen
-File: 	ProbeView		Tiedosto: 
+Text	TypeEditors	This is the type of editor	Teksti
+File offset: 	ProbeView		Tiedostosiirros: 
+Add	ProbeView		Lisää
+64 bit signed value:	TypeEditors		64-bittinen etumerkillinen arvo:
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Haluatko todella poistaa attribuutin ”%s” tiedostosta ”%s”?\n\nTätä toimintoa ei voi perua.
+No type editor available	AttributeWindow		Tyyppimuokkainta ei ole käytettävissä
+Print…	ProbeView		Tulosta…
+New…	FileWindow		Uusi…
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	mikä: ’%.4s’\n\n
+OK	DiskProbe		Valmis
+DiskProbe	System name		Levyasemakoestin
+Back	ProbeView		Takaisin
+Device: 	ProbeView		Laite: 
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Kantaluku
+Open file…	FileWindow		Avaa tiedosto…
 32 bit unsigned pointer:	TypeEditors		32-bittinen etumerkitön osoitin:
-of 	ProbeView		/ 
-Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Tiedostoon kirjoittaminen epäonnistui:\n%s\n\nKaikki muutokset katoavat, kun poistut.
-32 bit	TypeEditors		32-bittinen
-Cancel	ProbeView		Peru
-Swapped: 0x%0*Lx	ProbeView		Siirretty näennäismuistiin: 0x%0*Lx
-Grayscale	TypeEditors		Harmaasävy
-32 bit signed value:	TypeEditors		32-bittinen etumerkillinen arvo:
 DiskProbe request	DiskProbe		Levykoestajapyyntö
-Type editor	ProbeView		Tyyppimuokkain
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Heksadesimaali
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Tiedostoon kirjoittaminen epäonnistui:\n%s\n\nKaikki muutokset katoavat, kun poistut.
+Examine device:	OpenWindow		Tutki laitetta:
+Number editor	TypeEditors		Numeromuokkain
+Icon	TypeEditors		Kuvake
+Attribute	ProbeView		Attribuutti
+Don't save	ProbeView		Älä tallenna
+Undo	ProbeView		Peru
+Flattened bitmap	TypeEditors		Litistetty bittikarttatiedosto
+Block %Ld (0x%Lx)	ProbeView		Lohko %Ld (0x%Lx)
+Cancel	OpenWindow		Peru
+Unknown format	TypeEditors		Tuntematon muoto
+File: 	ProbeView		Tiedosto: 
+Swapped: %Ld (0x%0*Lx)	ProbeView		Siiretty näennäismuistiin: %Ld (0x%0*Lx)
+Stop	ProbeView		Pysäytä
+Cancel	ProbeView		Peru
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Puskurin ”%s” avaus epäonnistui:\n%s
+Font size	ProbeView		Kirjasinkoko
+Type editor not supported	ProbeView		Tyyppimuokkainta ei tueta
+Native: 0x%0*Lx	ProbeView		Kotoperäinen: 0x%0*Lx
+Copy	ProbeView		Kopioi
+Redo	ProbeView		Tee uudelleen
+Floating-point value:	TypeEditors		Liukulukuarvo:
+Cancel	AttributeWindow		Peru
+16 bit signed value:	TypeEditors		16-bittinen etumerkillinen arvo:
+DiskProbe request	AttributeWindow		Levykoestajapyyntö
+Next	ProbeView		Seuraava
+64 bit signed offset:	TypeEditors		64-bittinen etumerkillinen siirros:
+32 bit signed value:	TypeEditors		32-bittinen etumerkillinen arvo:
+Could not find search string.	ProbeView		Hakumerkkijonon löytäminen epäonnistui.
+Close	FileWindow		Sulje
+Unknown type	TypeEditors		Tuntematon tyyppi
+Open device	FileWindow		Avaa laite
+Number:	TypeEditors		Numero:
+Quit	FileWindow		Lopeta
+Text	FindWindow		Teksti
+Block 0x%Lx	ProbeView		Lohko 0x%Lx
+Attribute	AttributeWindow		Attribuutti
+Mode:	FindWindow		Tila:
+16 bit	TypeEditors		16-bittinen
+32 bit size or status:	TypeEditors		32-bittinen koko tai tila:
+of 	ProbeView		/ 
 Contents:	TypeEditors		Sisältö:
+Could not open file \"%s\": %s\n	DiskProbe		Tiedoston ”%s” avaus epäonnistui: %s\n
+Probe file…	OpenWindow		Koesta tiedostoa…
+Block: 	ProbeView		Lohko: 
+Bookmarks	ProbeView		Kirjanmerkit
+Probe device	OpenWindow		Koesta laite
+none	ProbeView	No attributes	ei mitään
+Case sensitive	FindWindow		Kirjainkoosta riippuva
+32 bit unsigned value:	TypeEditors		32-bittinen etumerkitön arvo:
+Remove from file	AttributeWindow		Poista tiedostosta
+Attributes	ProbeView		Attribuutit
+Message	TypeEditors	This is the type of view	Viesti
+Message View	TypeEditors		Viestinäkymä
+Offset: 	ProbeView		Siirros: 
+Swapped: 0x%0*Lx	ProbeView		Siirretty näennäismuistiin: 0x%0*Lx
+MIME type:	TypeEditors		MIME-tyyppi:
+Fit	ProbeView	Size of fonts, fits to available room	Sopii
+Type editor	ProbeView		Tyyppimuokkain
+File	FileWindow		Tiedosto
+Grayscale	TypeEditors		Harmaasävy
+32 bit	TypeEditors		32-bittinen
+Native: %Ld (0x%0*Lx)	ProbeView		Alkuperäinen: %Ld (0x%0*Lx)
+Device	ProbeView		Laite
+Close	AttributeWindow		Sulje
+Type editor	AttributeWindow		Tyyppimuokkain
+Save	ProbeView		Tallenna
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	/ 0x0
+Attribute type: 	ProbeView		Attribuuttityyppi: 
+15 bit	TypeEditors		15-bittinen
+Page setup…	ProbeView		Sivuasetukset…
+Boolean	TypeEditors	This is the type of editor	Boolean
+Icon view	TypeEditors		Kuvakenäkymä
+Select all	ProbeView		Valitse kaikki
+64 bit unsigned value:	TypeEditors		64-bittinen etumerkitön arvo:
+OK	ProbeView		Valmis
+Previous	ProbeView		Edellinen
+Selection	ProbeView		Valinta
+Find	FindWindow		Haku
+8 bit unsigned value:	TypeEditors		8-bittinen etumerkitön arvo:
+%ld (native)	ProbeView		%ld (alkuperäinen)
+Attribute: 	ProbeView		Attribuutti: 
+Block	ProbeView		Lohko
+Find again	ProbeView		Hae uudelleen
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Näkymä
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Kuvatiedoston lukeminen epäonnistui
+DiskProbe request	ProbeView		Levykoestajapyyntö
+Double precision floating-point value:	TypeEditors		Kaksoistarkkuuden liukulukuarvo:
+Image	TypeEditors	This is the type of view	Kuva
+Save changes before closing?	ProbeView		Tallennatko muutokset ennen sulkemista?
+PNG format	TypeEditors		PNG-muoto
+Number	TypeEditors	This is the type of editor	Numero
+Edit	ProbeView		Muokkaa
+String editor	TypeEditors		Merkkijonomuokkain
+Boolean editor	TypeEditors		Boolean-muokkain
+Device offset: 	ProbeView		Laitesiirros: 
+Find…	ProbeView		Hae…
+8 bit palette	TypeEditors		8-bittinen paletti
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Desimaali
+Image view	TypeEditors	Image means here a picture file, not a disk image.	Kuvanäkymä
+Paste	ProbeView		Liitä
+32 bit unsigned size:	TypeEditors		32-bittinen etumerkitön koko:

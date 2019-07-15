@@ -1,35 +1,35 @@
 1	ukrainian	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		Поновити знімок
-Could not set Sudoku:\n%s\n	SudokuWindow		Неможливо встановити Судоку: \n%s\n
-Export as…	SudokuWindow		Експортувати як…
-OK	SudokuWindow		Гаразд
-New	SudokuWindow		Новий
-Abort	ProgressWindow		Припинити
-Sudoku	System name		Судоку
-Could not open \"%s\":\n%s\n	SudokuWindow		Неможливо відкрити \"%s\":\n%s\n
-Easy	SudokuWindow		Простий
-Open file…	SudokuWindow		Відкрити файл…
-Solve single field	SudokuWindow		Вирішити одне поле
-Solve	SudokuWindow		Розв'язати
-Redo	SudokuWindow		Відмінити відміну
 File	SudokuWindow		Файл
-Advanced	SudokuWindow		Підвищений
-Start again	SudokuWindow		Розпочати знову
-HTML	SudokuWindow		HTML
-Sudoku request	SudokuWindow		Запит Судоку
-Copy	SudokuWindow		Копіювати
-Mark valid hints	SudokuWindow		Позначати правильні підказки
-Sudoku solved - congratulations!\n	SudokuWindow		Вітаємо - Судоку розв'язане!\n
+Mark invalid values	SudokuWindow		Позначати помилки
+Solve single field	SudokuWindow		Вирішити одне поле
 Hard	SudokuWindow		Складний
-Snapshot current	SudokuWindow		Зробити знімок
+Start again	SudokuWindow		Розпочати знову
+New	SudokuWindow		Новий
+Easy	SudokuWindow		Простий
+Undo	SudokuWindow		Скасувати
+Export as…	SudokuWindow		Експортувати як…
+Quit	SudokuWindow		Вихід
+Redo	SudokuWindow		Відмінити відміну
+Could not open \"%s\":\n%s\n	SudokuWindow		Неможливо відкрити \"%s\":\n%s\n
+Blank	SudokuWindow		Порожній
+Sudoku solved - congratulations!\n	SudokuWindow		Вітаємо - Судоку розв'язане!\n
 Text	SudokuWindow		Текст
+Copy	SudokuWindow		Копіювати
+Solve	SudokuWindow		Розв'язати
+HTML	SudokuWindow		HTML
+Advanced	SudokuWindow		Підвищений
+Set all hints	SudokuWindow		Встановити підказки
+Searching for removable values	SudokuGenerator		Пошук значень для вилучення
+Abort	ProgressWindow		Припинити
+Could not set Sudoku:\n%s\n	SudokuWindow		Неможливо встановити Судоку: \n%s\n
+Help	SudokuWindow		Довідка
+OK	SudokuWindow		Гаразд
+Sudoku	System name		Судоку
+Progress monitor	ProgressWindow		Монітор ходу
 Creating solvable field	SudokuGenerator		Створити поле для розв'язку
 View	SudokuWindow		Вигляд
-Progress monitor	ProgressWindow		Монітор ходу
-Set all hints	SudokuWindow		Встановити підказки
-Mark invalid values	SudokuWindow		Позначати помилки
-Blank	SudokuWindow		Порожній
-Help	SudokuWindow		Довідка
-Searching for removable values	SudokuGenerator		Пошук значень для вилучення
-Undo	SudokuWindow		Скасувати
-Quit	SudokuWindow		Вихід
+Snapshot current	SudokuWindow		Зробити знімок
+Mark valid hints	SudokuWindow		Позначати правильні підказки
+Sudoku request	SudokuWindow		Запит Судоку
+Open file…	SudokuWindow		Відкрити файл…

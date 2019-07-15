@@ -1,39 +1,36 @@
-1	portuguese (brazil)	x-vnd.Be-PRNT	4242582634
-Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Impressora: %printer_name%\nDriver: %driver%\n
-Waiting	JobListView		Aguardando
-Print test page	PrintersWindow		Imprimir página de teste
-page	JobListView		página
-Cancel	AddPrinterDialog		Cancelar
-Add printer	AddPrinterDialog		Adicionar impressora
-Green	TestPageView		Verde
-Printers	PrintersWindow		Impressoras
-Add…	PrintersWindow		Adicionar...
-Default Printer	PrinterListView		Impressora padrão
-Transport: %transport% %transport_address%	PrinterListView		Transporte: %transport% %transport_address%
-pages	JobListView		páginas
-Printers	System name		Impressoras
-Processing	JobListView		Processando
-Red	TestPageView		Vermelho
-Printer name:	AddPrinterDialog		Nome da impressora:
-Driver: %driver%	PrinterListView		Driver: %driver%
-Black	TestPageView		Preto
-Restart job	PrintersWindow		Reiniciar tarefa
-Add	AddPrinterDialog		Adicionar
-Make default	PrintersWindow		Tornar padrão
-Transport: %transport% %transport_address%	TestPageView		Transporte: %transport% %transport_adress%
-Cancel job	PrintersWindow		Cancelar tarefa
-Yellow	TestPageView		Amarelo
-Blue	TestPageView		Azul
+1	portuguese (brazil)	x-vnd.Be-PRNT	2786813915
 Remove	PrintersWindow		Remover
+Red	TestPageView		Vermelho
+Default Printer	PrinterListView		Impressora padrão
 <pick one>	AddPrinterDialog		<escolha uma>
-Print jobs for 	PrintersWindow		Tarefas de impressão para
-Failed	JobListView		Falhou
-%.2f KB	JobListView		%.2fb KB
-Magenta	TestPageView		Magenta
-Completed	JobListView		Completos
-No printer found!	TransportMenu		Nenhuma impressora encontrada!
-Print jobs: No printer selected	PrintersWindow		Tarefas de impressão: nenhuma impressora selecionada.
-Cyan	TestPageView		Ciano
-Unknown status	JobListView		Status desconhecido
 Connected to:	AddPrinterDialog		Conectado a:
+Make default	PrintersWindow		Tornar padrão
+Cyan	TestPageView		Ciano
+Completed	JobListView		Completos
+Transport: %transport% %transport_address%	PrinterListView		Transporte: %transport% %transport_address%
+Failed	JobListView		Falhou
+Blue	TestPageView		Azul
+Waiting	JobListView		Aguardando
+Processing	JobListView		Processando
+Cancel	AddPrinterDialog		Cancelar
+Unknown status	JobListView		Status desconhecido
+Add printer	AddPrinterDialog		Adicionar impressora
+Printers	PrintersWindow		Impressoras
+No printer found!	TransportMenu		Nenhuma impressora encontrada!
+Add…	PrintersWindow		Adicionar...
+Magenta	TestPageView		Magenta
+Transport: %transport% %transport_address%	TestPageView		Transporte: %transport% %transport_adress%
+Add	AddPrinterDialog		Adicionar
+Print jobs: No printer selected	PrintersWindow		Tarefas de impressão: nenhuma impressora selecionada.
+Printer name:	AddPrinterDialog		Nome da impressora:
+Yellow	TestPageView		Amarelo
+Black	TestPageView		Preto
 Printer type:	AddPrinterDialog		Tipo de impressora:
+Printers	System name		Impressoras
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Impressora: %printer_name%\nDriver: %driver%\n
+Green	TestPageView		Verde
+Print test page	PrintersWindow		Imprimir página de teste
+Restart job	PrintersWindow		Reiniciar tarefa
+Driver: %driver%	PrinterListView		Driver: %driver%
+Cancel job	PrintersWindow		Cancelar tarefa
+%.2f KB	JobListView		%.2fb KB

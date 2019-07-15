@@ -1,14 +1,14 @@
 1	portuguese (brazil)	x-vnd.Haiku-JPEG2000Translator	3265915643
-Write	JPEG2000Translator		Gravar
-JPEG2000 images	JPEG2000Translator		Imagens JPEG 2000
-Version %d.%d.%d	JPEG2000Translator		Versão %d.%d.%d
-Output only codestream (.jpc)	JPEG2000Translator		Fluxo de código apenas de saída (.jpc)
-Write black-and-white images as RGB24	JPEG2000Translator		Gravar imagens preto e brancas como RGB24
-Output quality	JPEG2000Translator		Qualidade da saída
-Read	JPEG2000Translator		Ler
-©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nBaseado na biblioteca JasPer:\n© 1999-2000, Image Power, Inc. e\nUniversidade da Columbia Britânica, Canadá.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nCodec jp2 do ImageMagick foi usado como \"tutorial\".\n\thttp://www.imagemagick.org/\n
-Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Formato de Mapa de Bits Be (Tradutor JPEG2000)
-Low	JPEG2000Translator		Baixo
-About	JPEG2000Translator		Sobre
 High	JPEG2000Translator		Alto
+Low	JPEG2000Translator		Baixo
+Output quality	JPEG2000Translator		Qualidade da saída
+JPEG2000 images	JPEG2000Translator		Imagens JPEG 2000
+About	JPEG2000Translator		Sobre
+Write black-and-white images as RGB24	JPEG2000Translator		Gravar imagens preto e brancas como RGB24
+Version %d.%d.%d	JPEG2000Translator		Versão %d.%d.%d
+Read	JPEG2000Translator		Ler
 Read greyscale images as RGB32	JPEG2000Translator		Ler imagens em tons de cinza como RGB32
+©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nBaseado na biblioteca JasPer:\n© 1999-2000, Image Power, Inc. e\nUniversidade da Columbia Britânica, Canadá.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nCodec jp2 do ImageMagick foi usado como \"tutorial\".\n\thttp://www.imagemagick.org/\n
+Write	JPEG2000Translator		Gravar
+Output only codestream (.jpc)	JPEG2000Translator		Fluxo de código apenas de saída (.jpc)
+Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Formato de Mapa de Bits Be (Tradutor JPEG2000)

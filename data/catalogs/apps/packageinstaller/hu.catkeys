@@ -1,60 +1,59 @@
-1	hungarian	x-vnd.Haiku-PackageInstaller	3900768
-Install to:	PackageView		Telepítés ide:
-OK	PackageView		Rendben
-Accept	PackageTextViewer		Elfogadás
-No package selected.	UninstallView		Nincs csomag kiválasztva.
+1	hungarian	x-vnd.Haiku-PackageInstaller	4116690169
+Package description	UninstallView		Leírás
+none	PackageView		nincs
 Continue	PackageInstall		Folytatás
+Running post-installation scripts	PackageInstall		Telepítés utáni parancsfájlok futtatása
+Package installer	PackageView		Csomagtelepítő
+All existing files will be skipped?	PackageView		Minden létező fájl átugrása?
+Replace	PackageView		Csere
+All existing files will be replaced?	PackageView		Minden létező fájl felül legyen írva?
+Other…	PackageView		Egyéb…
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		A '%s' nevű hivatkozás már létezik a megadott útvonalon.\nKicseréljem a csomagban találhatóval vagy ugorjam át?
+Stop	PackageStatus		Leállítás
+Install to:	PackageView		Telepítés ide:
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		A megadott csomag már fel van telepítve a rendszerre. Eltávolítsuk a már telepítettet, és folytassuk a telepítést?
+Skip all	PackageView		Összes átugrása
+The installation of the package has been aborted.	PackageView		A csomag telepítése meg lett szakítva
+No installation type selected	PackageView		Nincs másféle telepítéstípus kiválasztva
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Megjegyezzük ezt a választást ennek a telepítésnek az idejére?\n
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		A kijelölt csomagot nem sikerült eltávolítani. A megadott csomag információs fájlja sérült lehet.
+Install…	UninstallView		Telepítés…
+Installing files and folders	PackageInstall		Fájlok és mappák telepítése
+Installed packages	UninstallWindow		Telepített csomagok
 Remove	UninstallView		Eltávolítás
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		A kért csomag telepítése a rendszerre sikertelen volt. Lehet, hogy ez a cél csomagfájl hibája miatt következett be. Kérjük, vegye fel a kapcsolatot a csomag terjesztőjével.
-Image not loaded correctly	PackageImageViewer		A lemezkép betöltése sikertelen
-No package selected.	PackageInfo		Nincs csomag kiválasztva.
-The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		A megadott csomag már fel van telepítve a rendszerre. Eltávolítsuk a már telepítettet, és folytassuk a telepítést?
-Do you want to remember this decision for the rest of this installation?\n	PackageView		Megjegyezzük ezt a választást ennek a telepítésnek az idejére?\n
-Installed packages	UninstallWindow		Telepített csomagok
-There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		A fájlméretek a csomagfájlban nem egyeznek. A csomag korrupt lehet, vagy lehet, hogy az elkészítése után módosították. Biztos folytatni kívánja?
-Error while installing the package\n	PackageView		Hiba történt a csomag telepítése közben\n
-Disclaimer	PackageTextViewer		Jogi nyilatkozat
-%name% (%size% free)	PackageView		%name% (%size% szabad)
-The installation of the package has been aborted.	PackageView		A csomag telepítése meg lett szakítva
-Done	PackageInstall		Kész
-All existing files will be replaced?	PackageView		Minden létező fájl felül legyen írva?
-Preparing package	PackageInstall		Csomag előkészítése
-No package available.	PackageInfo		Nincs elérhető csomag.
-none	PackageView		nincs
-Install %name%	PackageView		%name% telepítése
-Stop	PackageStatus		Leállítás
-Other…	PackageView		Egyéb…
-No installation type selected	PackageView		Nincs másféle telepítéstípus kiválasztva
-Installing files and folders	PackageInstall		Fájlok és mappák telepítése
-Package installer	PackageView		Csomagtelepítő
-Install…	UninstallView		Telepítés…
-Skip all	PackageView		Összes átugrása
-Running post-installation scripts	PackageInstall		Telepítés utáni parancsfájlok futtatása
-Skip	PackageView		Átugrás
-The package you requested has been successfully installed on your system.	PackageView		A kért csomag sikeresen fel lett telepítve a rendszerre.
-Error! \"%s\" is not a valid path.\n	Packageinstaller main		Hiba! Érvénytelen útvonal: %s.\n
-Installation type:	PackageView		Telepítés típusa:
-Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Hiba (%s)! Nem nyitható meg:  \"%s\".\n
-Finishing installation	PackageInstall		Telepítés befejezése
-Installing package	PackageStatus		Csomag telepítése
-Ask again	PackageView		Kérdezze újból
-Abort	PackageView		Megszakítás
-Replace all	PackageView		Összes cseréje
-Package description	UninstallView		Leírás
-Decline	PackageTextViewer		Visszautasítás
-All existing files will be skipped?	PackageView		Minden létező fájl átugrása?
-Continue	PackageInfo		Folytatás
-%index% of %total%	PackageInstall		%index% / %total%
-The package you selected has been successfully removed from your system.	UninstallView		A kijelölt csomagot sikeresen eltávolítottam.
-Abort	PackageInfo		Megszakítás
-PackageInstaller	System name		Csomagtelepítő
-Abort	PackageInstall		Megszakítás
-%name% (%size%)	PackageView		%name% (%size%)
-Continue	PackageTextViewer		Folytatás
-Begin	PackageView		Kezdés
 OK	UninstallView		Rendben
-The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		A '%s' nevű hivatkozás már létezik a megadott útvonalon.\nKicseréljem a csomagban találhatóval vagy ugorjam át?
-The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		A kijelölt csomagot nem sikerült eltávolítani. A megadott csomag információs fájlja sérült lehet.
-Replace	PackageView		Csere
+Accept	PackageTextViewer		Elfogadás
+Abort	PackageView		Megszakítás
+Disclaimer	PackageTextViewer		Jogi nyilatkozat
+Preparing package	PackageInstall		Csomag előkészítése
+The package you requested has been successfully installed on your system.	PackageView		A kért csomag sikeresen fel lett telepítve a rendszerre.
 Installation progress	PackageView		Telepítés állapota
+Decline	PackageTextViewer		Visszautasítás
+Continue	PackageTextViewer		Folytatás
+Installing package	PackageStatus		Csomag telepítése
+Install %name%	PackageView		%name% telepítése
+%index% of %total%	PackageInstall		%index% / %total%
+No package selected.	UninstallView		Nincs csomag kiválasztva.
+%name% (%size% free)	PackageView		%name% (%size% szabad)
+Error while installing the package\n	PackageView		Hiba történt a csomag telepítése közben\n
+Finishing installation	PackageInstall		Telepítés befejezése
+No package available.	PackageInfo		Nincs elérhető csomag.
+Installation type:	PackageView		Telepítés típusa:
+The package you selected has been successfully removed from your system.	UninstallView		A kijelölt csomagot sikeresen eltávolítottam.
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		A fájlméretek a csomagfájlban nem egyeznek. A csomag korrupt lehet, vagy lehet, hogy az elkészítése után módosították. Biztos folytatni kívánja?
+%name% (%size%)	PackageView		%name% (%size%)
+Abort	PackageInstall		Megszakítás
+Replace all	PackageView		Összes cseréje
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		A csomagfájl nem olvasható.\nLehet, hogy nem érvényes BeOS .pkg csomagformátumban van.
+Continue	PackageInfo		Folytatás
+No package selected.	PackageInfo		Nincs csomag kiválasztva.
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Hiba! Érvénytelen útvonal: \"%s\".\n
+Ask again	PackageView		Kérdezze újból
+Begin	PackageView		Kezdés
+OK	PackageView		Rendben
+Abort	PackageInfo		Megszakítás
+Done	PackageInstall		Kész
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Hiba (%s)! Nem nyitható meg:  \"%s\".\n
+Skip	PackageView		Átugrás
+Image not loaded correctly	PackageImageViewer		A lemezkép betöltése sikertelen

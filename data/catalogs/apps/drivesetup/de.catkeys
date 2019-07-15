@@ -1,94 +1,93 @@
-1	german	x-vnd.Haiku-DriveSetup	2321187933
-DriveSetup	System name		Datenträgerverwaltung
-Could not acquire partitioning information.	MainWindow		Partitionierungsinformationen konnten nicht ermittelt werden.
+1	german	x-vnd.Haiku-DriveSetup	2076471502
 Cancel	AbstractParametersPanel		Abbrechen
-Delete	MainWindow		Löschen
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Soll die Änderungen jetzt auf den Datenträger geschrieben werden?\n\nAlle Daten auf der gewählten Partition gehen dabei unwiderruflich verloren!
-Rescan	MainWindow		Aktualisieren
-OK	MainWindow		OK
-There's no space on the partition where a child partition could be created.	MainWindow		Es gibt keinen Platz auf der Partition, in der eine Tochterpartition angelegt werden könnte.
-Could not unmount partition	MainWindow		Partition konnte nicht ausgehangen werden.
-Initialize	InitializeParametersPanel		Initialisieren
-OK	AbstractParametersPanel		OK
-<empty>	PartitionList		<leer>
-Unable to find the selected partition by ID.	MainWindow		Die ausgewählte Partition konnte anhand ihrer ID nicht gefunden werden.
-Select a partition from the list below.	DiskView		Bitte eine Partition aus der unten stehenden Liste wählen.
-No disk devices have been recognized.	DiskView		Es wurden keine Datenträger erkannt.
-Failed to initialize the disk %s!\n	MainWindow		Initialisierung der Partition \"%s\" fehlgeschlagen!\n
-The selected disk is read-only.	MainWindow		Vom ausgewählten Datenträger ist schreibgeschützt.
-Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition \"%s\" wirklich formatiert werden? Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.
-Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Soll das Aushängen erzwungen werden?\n\nAchtung: Sollte der Datenträger gerade durch eine Anwendung beschrieben werden, können beim erzwungenen Aushängen Daten verloren gehen.\n
-Could not mount partition %s.	MainWindow		Die Partition \"%s\" konnte nicht eingehangen werden.
-The partition %s has been successfully formatted.\n	MainWindow		Die Partition \"%s\" wurde erfolgreich formatiert.\n
-Change parameters	MainWindow		Parameter ändern
-The partition %s is already unmounted.	MainWindow		Die Partition \"%s\" ist bereits ausgehangen.
-Failed to delete the partition. No changes have been written to disk.	MainWindow		Das Löschen der Partition ist fehlgeschlagen. Der Datenträger blieb unverändert.
-Could not delete the selected partition.	MainWindow		Die gewählte Partition konnte nicht gelöscht werden.
-Initialize	MainWindow		Initialisieren
-Error: 	MainWindow	in any error alert	Fehler: 
-Partition %ld	DiskView		Partition %ld
-<empty>	DiskView		<leer>
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisierung der Partition \"%s\" fehlgeschlagen. Der Datenträger blieb unverändert.
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf der Partition gehen dabei unwiderruflich verloren!
-Mounted at	PartitionList		Eingehangen als
-There was an error acquiring the partition row.	MainWindow		Es ist ein interner Fehler aufgetreten.
-You need to select a partition entry from the list.	MainWindow		Bitte einen Partitionseintrag aus der Liste wählen.
-The currently selected partition does not have a parent partition.	MainWindow		Die ausgewählte Partition hat keine übergeordnete Partition.
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf dem gewählten Datenträger gehen dabei unwiderruflich verloren!
-Write changes	MainWindow		Änderungen schreiben
-There was an error preparing the disk for modifications.	MainWindow		Beim Vorbereiten der Änderungen trat ein interner Fehler auf.
-The partition %s is already mounted.	MainWindow		Die Partition \"%s\" ist bereits eingehangen.
-Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition wirklich formatiert werden? Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.
-Partition name:	ChangeParametersPanel		Partitionsname:
-Change	ChangeParametersPanel		Ändern
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf dem Medium \"%s\" gehen dabei unwiderruflich verloren!
-Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sollen die gewählte Partition wirklich gelöscht werden?\n\nAlle dort vorhandenen Daten gehen dabei unwiderruflich verloren!
-Create…	MainWindow		Anlegen…
-Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Soll der Datenträger tatsächlich direkt formattiert werden? (Normalerweise wird zuvor mit einem Partitionierungssystem initialisiert.) Bevor die Änderungen durchgeführt werden, wird nochmals nachgefragt.
-The disk has been successfully initialized.\n	MainWindow		Der Datenträger wurde erfolgreich initialisiert.\n
 Could not unmount partition %s.	MainWindow		Partition \"%s\" konnte nicht ausgehangen werden.
-Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Die Parameter der Partition konnten nicht geändert werden. Es wurde nichts auf die Disk geschrieben.
-Failed to format the partition %s!\n	MainWindow		Formatierung der Partition \"%s\" fehlgeschlagen!\n
-Mount	MainWindow		Einhängen
-Partition type	PartitionList		Partitionstyp:
-The panel experienced a problem!	MainWindow		Es gab ein Problem mit dem Panel!
-Change parameters…	MainWindow		Parameter ändern…
-Device	PartitionList		Gerät
-Disk	MainWindow		Datenträger
-Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Soll der ausgewählte Datenträger wirklich formatiert werden? Alle Daten werden verloren gehen. Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.\n
-Partition size	CreateParametersPanel		Partitionsgröße
-Device	DiskView		Gerät
-Active	PartitionList		Aktiv
-Volume name	PartitionList		Datenträgername
-Continue	MainWindow		Weiter
-Cannot delete the selected partition.	MainWindow		Gewählte Partition konnte nicht gelöscht werden.
 Mount all	MainWindow		Alle einhängen
-End: %s	Support		Ende: %s
-The panel could not return successfully.	MainWindow		Das Fenster meldete sich nicht mehr zurück.
-Cancel	MainWindow		Abbrechen
+Format	MainWindow		Formatieren
+Disk	MainWindow		Datenträger
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Soll die Änderungen jetzt auf den Datenträger geschrieben werden?\n\nAlle Daten auf der gewählten Partition gehen dabei unwiderruflich verloren!
+Device	PartitionList		Gerät
+Could not change the parameters of the selected partition.	MainWindow		Die Parameter der ausgewählten Partition konnten nicht geändert werden.
+Initialize	MainWindow		Initialisieren
+OK	MainWindow		OK
 Delete partition	MainWindow		Partition löschen
-Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Sollen die Parameter der ausgewählten Partition wirklich geändert werden?\n\nAndere Betriebssysteme können die Partition unter Umständen nicht mehr erkennen!
-Disk system \"%s\" not found!	MainWindow		Medienschema \"%s\" nicht gefunden!
-Eject	MainWindow		Auswerfen
-Partition	MainWindow		Partition
+Error: 	MainWindow	in any error alert	Fehler: 
+Could not delete the selected partition.	MainWindow		Die gewählte Partition konnte nicht gelöscht werden.
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Soll der ausgewählte Datenträger wirklich formatiert werden? Alle Daten werden verloren gehen. Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.\n
+The panel experienced a problem!	MainWindow		Es gab ein Problem mit dem Panel!
+Device	DiskView		Gerät
+There was an error preparing the disk for modifications.	MainWindow		Beim Vorbereiten der Änderungen trat ein interner Fehler auf.
+The disk has been successfully initialized.\n	MainWindow		Der Datenträger wurde erfolgreich initialisiert.\n
+Unmount	MainWindow		Aushängen
+Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Soll das Aushängen erzwungen werden?\n\nAchtung: Sollte der Datenträger gerade durch eine Anwendung beschrieben werden, können beim erzwungenen Aushängen Daten verloren gehen.\n
+Failed to format the partition %s!\n	MainWindow		Formatierung der Partition \"%s\" fehlgeschlagen!\n
+Partition size	CreateParametersPanel		Partitionsgröße
 Validation of the given parameters failed.	MainWindow		Die Überprüfung der angegebenen Parameter ist fehlgeschlagen.
+The partition %s is currently mounted.	MainWindow		Die Partition \"%s\" ist momentan eingehangen.
+Cancel	MainWindow		Abbrechen
+<empty>	PartitionList		<leer>
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition \"%s\" wirklich formatiert werden? Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.
+DriveSetup	System name		Datenträgerverwaltung
+Mounted at	PartitionList		Eingehangen als
+Create…	MainWindow		Anlegen…
 Force unmount	MainWindow		Aushängen erzwingen
+Write changes	MainWindow		Änderungen schreiben
+Change parameters	MainWindow		Parameter ändern
+Validation of the given creation parameters failed.	MainWindow		Die Überprüfung der zum Anlegen angegebenen Parameter ist fehlgeschlagen.
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisierung der Partition \"%s\" fehlgeschlagen. Der Datenträger blieb unverändert.
+Partition	MainWindow		Partition
+Eject	MainWindow		Auswerfen
+There was an error acquiring the partition row.	MainWindow		Es ist ein interner Fehler aufgetreten.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf dem Medium \"%s\" gehen dabei unwiderruflich verloren!
+Rescan	MainWindow		Aktualisieren
+Failed to initialize the disk %s!\n	MainWindow		Initialisierung der Partition \"%s\" fehlgeschlagen!\n
+Disk system \"%s\" not found!	MainWindow		Medienschema \"%s\" nicht gefunden!
+Delete	MainWindow		Löschen
+Surface test (not implemented)	MainWindow		Oberflächentest (nicht implementiert)
+Partition type:	ChangeParametersPanel		Partitionstyp:
+The panel could not return successfully.	MainWindow		Das Fenster meldete sich nicht mehr zurück.
+Parameters	PartitionList		Parameter
+Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Die Parameter der Partition konnten nicht geändert werden. Es wurde nichts auf die Disk geschrieben.
+Could not acquire partitioning information.	MainWindow		Partitionierungsinformationen konnten nicht ermittelt werden.
+Cannot delete the selected partition.	MainWindow		Gewählte Partition konnte nicht gelöscht werden.
+Partition %ld	DiskView		Partition %ld
+There's no space on the partition where a child partition could be created.	MainWindow		Es gibt keinen Platz auf der Partition, in der eine Tochterpartition angelegt werden könnte.
+Continue	MainWindow		Weiter
+<empty>	DiskView		<leer>
+No disk devices have been recognized.	DiskView		Es wurden keine Datenträger erkannt.
+Could not mount partition %s.	MainWindow		Die Partition \"%s\" konnte nicht eingehangen werden.
+Failed to delete the partition. No changes have been written to disk.	MainWindow		Das Löschen der Partition ist fehlgeschlagen. Der Datenträger blieb unverändert.
+Change parameters…	MainWindow		Parameter ändern…
+Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition wirklich formatiert werden? Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.
+Could not unmount partition	MainWindow		Partition konnte nicht ausgehangen werden.
+The selected disk is read-only.	MainWindow		Vom ausgewählten Datenträger ist schreibgeschützt.
 Create	CreateParametersPanel		Anlegen
 File system	PartitionList		Dateisystem
-Validation of the given creation parameters failed.	MainWindow		Die Überprüfung der zum Anlegen angegebenen Parameter ist fehlgeschlagen.
-Partition type:	ChangeParametersPanel		Partitionstyp:
-Size	PartitionList		Größe
-Wipe (not implemented)	MainWindow		Löschen (nicht implementiert)
-Validation of the given initialization parameters failed.	MainWindow		Die Überprüfung der zum Initialisieren angegebenen Parameter ist fehlgeschlagen.
+The partition %s is already unmounted.	MainWindow		Die Partition \"%s\" ist bereits ausgehangen.
 The selected partition does not contain a partitioning system.	MainWindow		Die ausgewählte Partition enthält kein Partitionierungssystem.
-Offset: %s	Support		Versatz: %s
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf der Partition \"%s\" gehen dabei unwiderruflich verloren!
-The partition %s is currently mounted.	MainWindow		Die Partition \"%s\" ist momentan eingehangen.
-Surface test (not implemented)	MainWindow		Oberflächentest (nicht implementiert)
-Format	MainWindow		Formatieren
-Could not change the parameters of the selected partition.	MainWindow		Die Parameter der ausgewählten Partition konnten nicht geändert werden.
-Parameters	PartitionList		Parameter
-Creation of the partition has failed.	MainWindow		Anlegen der Parition schlug fehl.
+End: %s	Support		Ende: %s
+Partition type	PartitionList		Partitionstyp:
+Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Sollen die Parameter der ausgewählten Partition wirklich geändert werden?\n\nAndere Betriebssysteme können die Partition unter Umständen nicht mehr erkennen!
+Unable to find the selected partition by ID.	MainWindow		Die ausgewählte Partition konnte anhand ihrer ID nicht gefunden werden.
 The currently selected partition is not empty.	MainWindow		Die gewählte Partition ist nicht leer.
+The currently selected partition does not have a parent partition.	MainWindow		Die ausgewählte Partition hat keine übergeordnete Partition.
+Wipe (not implemented)	MainWindow		Löschen (nicht implementiert)
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Soll der Datenträger tatsächlich direkt formattiert werden? (Normalerweise wird zuvor mit einem Partitionierungssystem initialisiert.) Bevor die Änderungen durchgeführt werden, wird nochmals nachgefragt.
+Validation of the given initialization parameters failed.	MainWindow		Die Überprüfung der zum Initialisieren angegebenen Parameter ist fehlgeschlagen.
+OK	AbstractParametersPanel		OK
+You need to select a partition entry from the list.	MainWindow		Bitte einen Partitionseintrag aus der Liste wählen.
+Offset: %s	Support		Versatz: %s
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf dem gewählten Datenträger gehen dabei unwiderruflich verloren!
+Select a partition from the list below.	DiskView		Bitte eine Partition aus der unten stehenden Liste wählen.
+Active	PartitionList		Aktiv
+Volume name	PartitionList		Datenträgername
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sollen die gewählte Partition wirklich gelöscht werden?\n\nAlle dort vorhandenen Daten gehen dabei unwiderruflich verloren!
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf der Partition gehen dabei unwiderruflich verloren!
 Failed to format the partition. No changes have been written to disk.	MainWindow		Das Formatieren der Partition ist fehlgeschlagen. Der Datenträger blieb unverändert.
-Unmount	MainWindow		Aushängen
+Change	ChangeParametersPanel		Ändern
+The partition %s has been successfully formatted.\n	MainWindow		Die Partition \"%s\" wurde erfolgreich formatiert.\n
+Partition name:	ChangeParametersPanel		Partitionsname:
+The partition %s is already mounted.	MainWindow		Die Partition \"%s\" ist bereits eingehangen.
+Size	PartitionList		Größe
+Creation of the partition has failed.	MainWindow		Anlegen der Parition schlug fehl.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf der Partition \"%s\" gehen dabei unwiderruflich verloren!
+Mount	MainWindow		Einhängen

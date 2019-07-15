@@ -1,3 +1,3 @@
 1	indonesian	x-vnd.Haiku-TelnetService	1209067113
-Telnet server	TelnetServiceAddOn		Server telnet
 The Telnet server allows you to remotely access your machine with a terminal session using the telnet protocol.\n\nPlease note that it is an insecure and unencrypted connection.	TelnetServiceAddOn		Server Telnet memungkinkan Anda mengakses komputer Anda dari jarak jauh dengan sesi terminal menggunakan protokol telnet.\n\nHarap dicatat bahwa ini adalah koneksi yang tidak aman dan tidak terenkripsi.
+Telnet server	TelnetServiceAddOn		Server telnet

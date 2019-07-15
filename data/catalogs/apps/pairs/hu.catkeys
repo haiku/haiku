@@ -1,18 +1,18 @@
 1	hungarian	x-vnd.Haiku-Pairs	818003250
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Nem találtam elegendő vektoros ikon az induláshoz; legalább %zu szükséges, de csak %zu taláható.\n
-%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tkészítette: Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n
+Pairs	System name		Párok
+Quit	PairsWindow		Kilépés
+Medium	PairsWindow		Közepes
+Game	PairsWindow		Játék
 Expert (8x8)	PairsWindow		Mester (8x8)
-Beginner (4x4)	PairsWindow		Kezdő (4x4)
+New	PairsWindow		Új
+OK	Pairs		Rendben
+Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Nem találtam elegendő vektoros ikon az induláshoz; legalább %zu szükséges, de csak %zu taláható.\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		A játékot {0, plural, one{# kattintással} other{# kattintással}} fejezte be.\n
+Small	PairsWindow		Kicsi
+Size	PairsWindow		Méret
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tkészítette: Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n
 Quit game	PairsWindow		Kilépés a játékból
 Large	PairsWindow		Nagy
-Small	PairsWindow		Kicsi
-Game	PairsWindow		Játék
-OK	Pairs		Rendben
-Size	PairsWindow		Méret
-New	PairsWindow		Új
+Beginner (4x4)	PairsWindow		Kezdő (4x4)
 Intermediate (6x6)	PairsWindow		Haladó (6x6)
-Quit	PairsWindow		Kilépés
-Pairs	System name		Párok
 New game	PairsWindow		Új játék
-Medium	PairsWindow		Közepes

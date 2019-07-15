@@ -1,20 +1,20 @@
 1	finnish	x-vnd.Haiku-MidiPlayer	1046133011
-None	Main Window		Ei mikään
-Live input:	Main Window		Live-syöte:
-Stop	Main Window		Pysäytä
 This tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Pienoisohjelma\nvoi soittaa tuhansia\ntosilauluja
-Cavern	Main Window		Luola
-Volume:	Main Window		Äänenvoimakkuus:
-Reverb:	Main Window		Kaikuefekti:
-OK	Main Window		Valmis
-Loading instruments…	Scope View		Ladataan soittimet...
-Off	Main Window		Pois päältä
 Dungeon	Main Window		Tyrmä
-Play	Main Window		Soita
-Garage	Main Window		Korjaamo
-Closet	Main Window		Kaappi
-MidiPlayer	System name		MIDI-soitin
-Drop MIDI file here	Scope View		Pudota MIDI-tiedosto tänne
-Igor's lab	Main Window		Igorin labra
-Scope	Main Window		Näkyvyysalue
 Could not load song	Main Window		Laulun lataus epäonnistui
+Igor's lab	Main Window		Igorin labra
+Off	Main Window		Pois päältä
+Loading instruments…	Scope View		Ladataan soittimet...
+Volume:	Main Window		Äänenvoimakkuus:
+Closet	Main Window		Kaappi
+Scope	Main Window		Näkyvyysalue
+Drop MIDI file here	Scope View		Pudota MIDI-tiedosto tänne
+None	Main Window		Ei mikään
+Reverb:	Main Window		Kaikuefekti:
+MidiPlayer	System name		MIDI-soitin
+OK	Main Window		Valmis
+Stop	Main Window		Pysäytä
+Live input:	Main Window		Live-syöte:
+Garage	Main Window		Korjaamo
+Play	Main Window		Soita
+Cavern	Main Window		Luola

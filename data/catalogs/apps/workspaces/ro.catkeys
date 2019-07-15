@@ -1,13 +1,13 @@
 1	romanian	x-vnd.Be-WORK	3927737357
-Invalid argument: %s\n	Workspaces		Argument nevalid: %s\n
 Quit	Workspaces		Închidere
-Workspaces	System name		Spații de lucru
+Invalid argument: %s\n	Workspaces		Argument nevalid: %s\n
 Change workspace count…	Workspaces		Modifică numărul de spații de lucru…
-Remove replicant	Workspaces		Elimină replicant
-Show window border	Workspaces		Afișează margine fereastră
-Auto-raise	Workspaces		Auto-lansare
 Always on top	Workspaces		Întotdeauna deasupra
-Switch on mouse wheel	Workspaces		Comută la roata mouse-ului
-Live in the Deskbar	Workspaces		Direct în Deskbar
+Show window border	Workspaces		Afișează margine fereastră
 Show window tab	Workspaces		Afișează tab-ul ferestrei
+Auto-raise	Workspaces		Auto-lansare
+Remove replicant	Workspaces		Elimină replicant
+Live in the Deskbar	Workspaces		Direct în Deskbar
 Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Utilizare: %s [options] [workspace]\nunde \"options\" sunt:\n  --notitle\t\tbara de titlu eliminată, margine și redimensionare păstrate\n  --noborder\t\ttitlu, margine și redimensionare eliminate\n  --avoidfocus\t\tprevine fereastra din a fi ținta evenimentelor de tastatură\n  --alwaysontop\t\tpăstrează fereastra deasupra\n  --notmovable\t\tfereastra nu poate fi mutată împrejur\n  --autoraise\t\tridicarea automată a ferestrei spațiului de lucru atunci când este la marginea ecranului\n  --help\t\tafișează acest ajutor și ieșire\nși \"workspace\" este numărul de spații de lucru la care se poate comuta (0-31)\n
+Switch on mouse wheel	Workspaces		Comută la roata mouse-ului
+Workspaces	System name		Spații de lucru

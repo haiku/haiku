@@ -1,16 +1,13 @@
-1	catalan; valencian	x-vnd.Haiku-Magnify	3758515047
-Make square	Magnify-Main		Fes un quadrat
-Copy image	Magnify-Main		Copia la imatge
-usage: magnify [size] (magnify size * size pixels)\n	Console		ús: lupa [size] (mida de la lupa * mida dels píxels)\n
-Stick coordinates	Magnify-Main		Fixa les coordenades
-magnify: size must be a multiple of 4\n	Console		lupa: la mida ha de ser un múltiple de 4\n
+1	catalan; valencian	x-vnd.Haiku-Magnify	1150104797
 Decrease pixel size	Magnify-Main		Redueix la mida del píxel
+Increase pixel size	Magnify-Main		Incrementa la mida del píxel
+Stick coordinates	Magnify-Main		Fixa les coordenades
+Copy image	Magnify-Main		Copia la imatge
+Decrease window size	Magnify-Main		Redueix l'amplada de la finestra
+Remove a crosshair	Magnify-Main		Suprimeix un visor
+Add a crosshair	Magnify-Main		Afegeix un visor
+Increase window size	Magnify-Main		Augmenta l'amplada de la finestra
+Save image	Magnify-Main		Desa la imatge
 Magnify	System name		Lupa
 Info	Magnify-Main		Informació
-Remove a crosshair	Magnify-Main		Suprimeix un visor
-Save image	Magnify-Main		Desa la imatge
-Increase window size	Magnify-Main		Augmenta l'amplada de la finestra
-Decrease window size	Magnify-Main		Redueix l'amplada de la finestra
-Increase pixel size	Magnify-Main		Incrementa la mida del píxel
-  size must be > 4 and a multiple of 4\n	Console		  la mida ha de ser > 4 i un múltiple de 4\n
-Add a crosshair	Magnify-Main		Afegeix un visor
+Make square	Magnify-Main		Fes un quadrat

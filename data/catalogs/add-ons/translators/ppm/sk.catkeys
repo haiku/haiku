@@ -1,31 +1,30 @@
-1	slovak	x-vnd.Haiku-PPMTranslator	2233502290
-Version %d.%d.%d, %s	PPMTranslator		Verzia %d.%d.%d, %s
+1	slovak	x-vnd.Haiku-PPMTranslator	292474603
+None	PPMTranslator		Žiadne
 PPM Settings	PPMMain		Nastavenia PPM
-Based on PPMTranslator sample code	PPMTranslator		Založené na vzorovom kóde PPMTranslator
-OK	PPMMain		OK
+System palette 8 bits	PPMTranslator		Systémová paleta 8 bitov
+Sample code copyright 1999, Be Incorporated	PPMTranslator		Vzorový kód Copyright 1999, Be Incorporated
+Something is wrong with the PPMTranslator!	PPMMain		Niečo v PPMTranslator sa pokazilo!
 Grayscale 8 bits	PPMTranslator		Stupne šedej 8 bitov
+Based on PPMTranslator sample code	PPMTranslator		Založené na vzorovom kóde PPMTranslator
+RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 bitov big-endian
+PPM image translator	PPMTranslator		Prekladač obrázkov PPM
+Bitmap 1 bit	PPMTranslator		Bitmapa 1 bit
+RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 bitov big-endian
+PPMTranslator Settings	PPMTranslator		Nastavenia PPMTranslator
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 bitov
+OK	PPMMain		OK
+CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bitov
 PPM image	PPMTranslator		Obrázok PPM
+Input color space:	PPMTranslator		Vstupný farebný priestor:
+RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 bitov big-endian
+RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bitov big-endian
+Write ASCII	PPMTranslator		Zapísať ASCII
+RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 bitov
+RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 bitov big-endian
+RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 bitov
+Version %d.%d.%d, %s	PPMTranslator		Verzia %d.%d.%d, %s
+CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 bitov
+RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 bitov
+RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 bitov
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 bitov
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Be Bitmap Format (PPMTranslator)
-CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bitov
-Input color space:	PPMTranslator		Vstupný farebný priestor:
-CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 bitov
-PPM image translator	PPMTranslator		Prekladač obrázkov PPM
-bits/space	PPMTranslator		bitov/priestor
-RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 bitov big-endian
-RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 bitov big-endian
-RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 bitov big-endian
-RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 bitov
-Write ASCII	PPMTranslator		Zapísať ASCII
-RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 bitov
-None	PPMTranslator		Žiadne
-RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bitov big-endian
-RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 bitov
-Bitmap 1 bit	PPMTranslator		Bitmapa 1 bit
-RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 bitov big-endian
-RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 bitov
-Sample code copyright 1999, Be Incorporated	PPMTranslator		Vzorový kód Copyright 1999, Be Incorporated
-PPMTranslator Settings	PPMTranslator		Nastavenia PPMTranslator
-Something is wrong with the PPMTranslator!	PPMMain		Niečo v PPMTranslator sa pokazilo!
-System palette 8 bits	PPMTranslator		Systémová paleta 8 bitov

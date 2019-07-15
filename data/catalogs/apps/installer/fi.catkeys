@@ -1,88 +1,86 @@
-1	finnish	x-vnd.Haiku-Installer	4172072111
-Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Käynnistyshallinnan, Haikun käynnistysvalikon asettamissovelluksen käynnistäminen epäonnistui.
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		Oletko varma, että haluat keskeyttää asennuksen ja käynnistää järjestelmän uudelleen?
-Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Asennusohjelma\n\ttekijät: Jérôme Duval ja Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
-Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Asennus valmis. Käynnistyssektori kirjoitettiin levylle ’%s’. Jätä asennusohjelma painamalla Lopeta-painiketta tai valitse uusi kohdetaltio toisen asennuksen suorittamiseksi.
-Quit	InstallerApp		Lopeta
-Additional disk space required: 0.0 KiB	InstallerWindow		Vaadittu lisälevytilaa: 0.0 kibitavua
-Stop	InstallerWindow	In alert after pressing Stop	Pysäytä
-Install progress:  	InstallerWindow		Asennuksen eteneminen:  
-Starting Installation.	InstallProgress		Aloitetaan asennus.
-Are you sure you want to abort the installation?	InstallerWindow		Oletko varma, että haluat keskeyttää asentamisen?
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Oletko varma, että haluat asentaa nykyiselle käynnistyslevylle? Asennusohjelman on käynnistettävä tietokoneesi uudelleen, jos jatkat.
-Quit Boot Manager	InstallerWindow		Lopeta Käynnistyshallinta
-Stop	InstallerWindow		Pysäytä
-OK	InstallerApp		Valmis
-Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Valitse lähde- ja kohdelevyt ponnahdusvalikoista. Napsauta sitten ”Aloita”.
-Failed to launch Boot Manager	InstallerWindow		Käynnistyshallinnan käynnistäminen epäonnistui
-Install from:	InstallerWindow		Asenna levyltä:
-%1ld of %2ld	InstallerWindow	number of files copied	%1ld / %2ld
-IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		TÄRKEITÄ TIETOJA ENNEN HAIKUN ASENTAMISTA\n\n
-Continue	InstallerWindow	In alert after pressing Stop	Jatka
-Write boot sector to '%s'	InstallerWindow		Kirjoita käynnistyssektori levylle ’%s’
-Collecting copy information.	InstallProgress		Kerätään kopiointitietoja.
-Have fun and thanks for trying out Haiku!	InstallerApp		Pidä hauskaa ja kiitos, että kokeilet Haikua!
-Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Valitse lähdelevy ponnahdusvalikosta. Napsauta sitten ”Aloita”.
-Quit Boot Manager and DriveSetup	InstallerWindow		Poistu Käynnistyshallinnasta ja Levyasema-asetuksista
-Quit	InstallerWindow		Poistu
-Welcome to the Haiku Installer!\n\n	InstallerApp		Tervetuloa Haiku-asennusohjelmaan!\n\n
-Boot sector successfully written.	InstallProgress		Käynnistyssektorin kirjoittaminen onnistui.
+1	finnish	x-vnd.Haiku-Installer	1997609102
 Performing installation.	InstallProgress		Suoritetaan asennus.
-scanning…	InstallerWindow		etsitään…
-Set up boot menu	InstallerWindow		Aseta käynnistysvalikko
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   Asennusohjelma tekee itse Haiku-osiosta käynnistettävän, mutta se ei integroi Haikua olemassaoleviin käynnistysvalikoihin. Jos sinulla on jo GRUB asennettuna, voit lisätä Haikun siihen.\nYksityiskohtaiset ohjeet löydät Haikun käynnistysoppaasta webbisivultamme osoitteesta https://www.haiku-os.org/guides/booting.\nTai voit asettaa käynnistysvalikon Asennusohjelman ”Työkalut”-valikosta, katso Käyttäjäoppaan aihe sovelluksesta ”Käynnistyshallinta”.\n\n\n
-Abort	InstallerWindow		Keskeytä
-Finishing Installation.	InstallProgress		Lopetetaan asennusta.
-Restart	InstallerWindow		Käynnistä uudelleen
-README	InstallerApp		LUEMINUT
-The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Kohdelevyllä ei ehkä ole riittävästi tilaa. Kokeile eri levyn valitsemista tai jätä valitsematta valinnaisten kohteiden asentaminen.
-Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Sulje ensin Käynnistyshallinta- ja Levyasema-asetusikkunat ennen asennusohjelman ikkunan sulkemista.
-Scanning for disks…	InstallerWindow		Etsitään levyjä…
-The disk can't be mounted. Please choose a different disk.	InstallProgress		Levyä ei voitu liittää. Valitse eri levy.
-?? of ??	InstallerWindow	Unknown progress	?? / ??
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Käynnistä Levyasema-asetukset -apuohjelma osioimaan\nkäytettävissä olevat kiintolevyt ja muut mediat.\nOsioita voidaan alustaa\nBe-tiedostojärjestelmään, jota tarvitaan Haiku-käynnistys-\nosioon.
-Show optional packages	InstallerWindow		Näytä valinnaiset pakkaukset
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Ei löytynyt yhtään asentamiseen sopivaa osiota. Aseta osiot ja alusta vähintään yksi Be-tiedostojärjestelmään.
-Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Valitse ponnahdusvalikosta levy, jolle haluat asentaa. Napsauta sitten ”Aloita”.
-Unknown Type	InstallProgress	Partition content type	Tuntematon tyyppi
-<none>	InstallerWindow	No partition available	<ei mitään>
-Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Asennus valmis. Käynnistyssektori kirjoitettiin levylle ’%s’. Paina Käynnistä uudelleen -painiketta tietokoneen käynnistämiseksi uudelleen tai valitse uusi kohdetaltio toisen asennuksen suorittamiseksi.
-Installation canceled.	InstallProgress		Asennus peruttu.
-Installer	System name		Asennusohjelma
-You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Et voi asentaa levyn sisältöä itseensä. Valitse eri levy.
-???	InstallerWindow	Unknown currently copied item	???
-Quit DriveSetup	InstallerWindow		Poistu Levyasema-asetuksista
-Hide optional packages	InstallerWindow		Piilota valinnaiset pakkaukset
+Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Valitse lähdelevy ponnahdusvalikosta. Napsauta sitten ”Aloita”.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Sulje ”Levyasema-asetukset”-ikkuna ennen Asennusohjelman ikkunan sulkemista.
-Restart system	InstallerWindow		Käynnistä järjestelmä uudelleen
-1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Jos asennat Haikun oikealle laitteistolle (etkä emulaattorin sisälle), saatat haluta valmistella levyaseman osion toisessa käyttöjärjestelmässä (voit esimerkiksi käyttää GParted Live-CD:tä, joka kykenee muuttamaan olemassaolevien osioiden kokoa lisätilan tekemiseksi).\nVoit asettaa osiot myös käynnistämällä Levyasema-asetukset-sovelluksen Asennusohjelmasta, mutta et pysty muuttamaan olemassaolevan osion kokoa kyseisellä sovelluksella. Vaikka Levyasema-asetukset-ohjelma on testattu aika perusteellisesti vuosien mittaan, on suositeltavaa ottaa ajantasaiset varmuuskopiot järjestelmäsi muista osioista. Varmuuden vuoksi…
-OK	InstallerWindow		Valmis
-Set up partitions…	InstallerWindow		Aseta osiot…
-The partition can't be mounted. Please choose a different partition.	InstallProgress		Osiota ei voi liittää. Valitse eri osio.
-Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Suoritetaan Käynnistyshallintaa…\n\nSulje Käynnistyshallinta asennuksen jatkamiseksi.
-Install anyway	InstallProgress		Asenna kaikesta huolimatta
-An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Kohdattiin virhe ja asennus ei onnistunut:\n\nVirhe:  %s
-Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Paina Aloita-painiketta asentaaksesi levyltä ’%1s’ levylle ’%2s’.
-Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Suoritetaan Levyasema-asetuksia…\n\nSulje Levyasema-asetukset asennuksen jatkamiseksi.
-OK	InstallProgress		Valmis
-Please choose target	InstallerWindow		Valitse kohde
-???	InstallerWindow	Unknown partition name	???
-Begin	InstallerWindow		Aloita
-Write boot sector	InstallerWindow		Kirjoita käynnistyssektori
-Cancel	InstallerWindow		Peru
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Levyasema-asetukset -sovelluksen käynnistäminen osioiden asettamiseksi epäonnistui.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Kohdetaltio ei ole tyhjä. Oletko varma, että haluat silti asentaa sille?\n\nHuomaa: Kansio 'system' on puhdas kopio lähdetaltiolta, mutta säilyttää settings-kansion, kaikki muut kansiota yhdistetään, kun taas tiedostot ja linkit, jotka ovat olemassa sekä lähde- että kohdetaltiolla korvataan lähdetaltion versiolla.
 No optional packages available.	PackagesView		Valinnaisia pakkauksia ei ole saatavilla.
-Continue	InstallerApp		Jatka
-This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Tämä on beeta-laatuinen ohjelmisto! Se tarkoittaa, että on olemassa riski menettää tärkeää dataa. Tee usein varmuuskopioita! Sinua on varoitettu.\n\n\n
-Boot sector not written because of an internal error.	InstallProgress		Käynnistyssektoria ei kirjoitettu sisäisen virheen vuoksi.
-Additional disk space required: %s	InstallerWindow		Vaadittu lisälevytilaa: %s
-Cancel	InstallProgress		Peru
-Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Suoritetaan Käynnistyshallinta ja Levyasema-asetukset…\n\nSulje molemmat sovellukset asennuksen jatkamiseksi.
-Try installing anyway	InstallProgress		Yritä asentaa kaikesta huolimatta
-Are you sure you want to to stop the installation?	InstallerWindow		Oletko varma, että haluat pysäyttää asennuksen?
-Onto:	InstallerWindow		levylle:
-Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Sulje Käynnistyshallintaikkuna ennen Asennusohjelmaikkunan sulkemista.
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Kun käynnistät Haikun onnistuneesti ensimmäisen kerran, lue varmuuden vuoksi ”Tervetuloa”- ja ”Käyttäjäopas” -asiakirjamme. Niihin löytyy linkit työpöydältä ja WebPositive-selaimen kirjanmerkeistä.\n\n
-Tools	InstallerWindow		Työkalut
+Restart system	InstallerWindow		Käynnistä järjestelmä uudelleen
 The mount point could not be retrieved.	InstallProgress		Liittämispisteen noutaminen epäonnistui.
+<none>	InstallerWindow	No partition available	<ei mitään>
+Please choose target	InstallerWindow		Valitse kohde
+Cancel	InstallProgress		Peru
+Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Asennus valmis. Käynnistyssektori kirjoitettiin levylle ’%s’. Paina Käynnistä uudelleen -painiketta tietokoneen käynnistämiseksi uudelleen tai valitse uusi kohdetaltio toisen asennuksen suorittamiseksi.
+Are you sure you want to to stop the installation?	InstallerWindow		Oletko varma, että haluat pysäyttää asennuksen?
+Installer	System name		Asennusohjelma
+Unknown Type	InstallProgress	Partition content type	Tuntematon tyyppi
+Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Paina Aloita-painiketta asentaaksesi levyltä ’%1s’ levylle ’%2s’.
+Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Valitse ponnahdusvalikosta levy, jolle haluat asentaa. Napsauta sitten ”Aloita”.
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Asennus valmis. Käynnistyssektori kirjoitettiin levylle ’%s’. Jätä asennusohjelma painamalla Lopeta-painiketta tai valitse uusi kohdetaltio toisen asennuksen suorittamiseksi.
+README	InstallerApp		LUEMINUT
+Quit	InstallerWindow		Poistu
+Write boot sector to '%s'	InstallerWindow		Kirjoita käynnistyssektori levylle ’%s’
+Boot sector not written because of an internal error.	InstallProgress		Käynnistyssektoria ei kirjoitettu sisäisen virheen vuoksi.
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Levyasema-asetukset -sovelluksen käynnistäminen osioiden asettamiseksi epäonnistui.
+Welcome to the Haiku Installer!\n\n	InstallerApp		Tervetuloa Haiku-asennusohjelmaan!\n\n
+?? of ??	InstallerWindow	Unknown progress	?? / ??
+Quit Boot Manager	InstallerWindow		Lopeta Käynnistyshallinta
+Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Suoritetaan Käynnistyshallintaa…\n\nSulje Käynnistyshallinta asennuksen jatkamiseksi.
+Quit DriveSetup	InstallerWindow		Poistu Levyasema-asetuksista
+Write boot sector	InstallerWindow		Kirjoita käynnistyssektori
+%1ld of %2ld	InstallerWindow	number of files copied	%1ld / %2ld
+Install from:	InstallerWindow		Asenna levyltä:
+Additional disk space required: 0.0 KiB	InstallerWindow		Vaadittu lisälevytilaa: 0.0 kibitavua
+This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Tämä on beeta-laatuinen ohjelmisto! Se tarkoittaa, että on olemassa riski menettää tärkeää dataa. Tee usein varmuuskopioita! Sinua on varoitettu.\n\n\n
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Kun käynnistät Haikun onnistuneesti ensimmäisen kerran, lue varmuuden vuoksi ”Tervetuloa”- ja ”Käyttäjäopas” -asiakirjamme. Niihin löytyy linkit työpöydältä ja WebPositive-selaimen kirjanmerkeistä.\n\n
+???	InstallerWindow	Unknown currently copied item	???
+Install anyway	InstallProgress		Asenna kaikesta huolimatta
+1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Jos asennat Haikun oikealle laitteistolle (etkä emulaattorin sisälle), saatat haluta valmistella levyaseman osion toisessa käyttöjärjestelmässä (voit esimerkiksi käyttää GParted Live-CD:tä, joka kykenee muuttamaan olemassaolevien osioiden kokoa lisätilan tekemiseksi).\nVoit asettaa osiot myös käynnistämällä Levyasema-asetukset-sovelluksen Asennusohjelmasta, mutta et pysty muuttamaan olemassaolevan osion kokoa kyseisellä sovelluksella. Vaikka Levyasema-asetukset-ohjelma on testattu aika perusteellisesti vuosien mittaan, on suositeltavaa ottaa ajantasaiset varmuuskopiot järjestelmäsi muista osioista. Varmuuden vuoksi…
+Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Valitse lähde- ja kohdelevyt ponnahdusvalikoista. Napsauta sitten ”Aloita”.
+Hide optional packages	InstallerWindow		Piilota valinnaiset pakkaukset
+???	InstallerWindow	Unknown partition name	???
+Have fun and thanks for trying out Haiku!	InstallerApp		Pidä hauskaa ja kiitos, että kokeilet Haikua!
+Quit	InstallerApp		Lopeta
+OK	InstallerWindow		Valmis
+Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Sulje ensin Käynnistyshallinta- ja Levyasema-asetusikkunat ennen asennusohjelman ikkunan sulkemista.
+Failed to launch Boot Manager	InstallerWindow		Käynnistyshallinnan käynnistäminen epäonnistui
+Try installing anyway	InstallProgress		Yritä asentaa kaikesta huolimatta
+IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		TÄRKEITÄ TIETOJA ENNEN HAIKUN ASENTAMISTA\n\n
+Additional disk space required: %s	InstallerWindow		Vaadittu lisälevytilaa: %s
+Stop	InstallerWindow	In alert after pressing Stop	Pysäytä
+Boot sector successfully written.	InstallProgress		Käynnistyssektorin kirjoittaminen onnistui.
+An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Kohdattiin virhe ja asennus ei onnistunut:\n\nVirhe:  %s
+Restart	InstallerWindow		Käynnistä uudelleen
+The disk can't be mounted. Please choose a different disk.	InstallProgress		Levyä ei voitu liittää. Valitse eri levy.
+Begin	InstallerWindow		Aloita
+Collecting copy information.	InstallProgress		Kerätään kopiointitietoja.
+Show optional packages	InstallerWindow		Näytä valinnaiset pakkaukset
+The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Kohdelevyllä ei ehkä ole riittävästi tilaa. Kokeile eri levyn valitsemista tai jätä valitsematta valinnaisten kohteiden asentaminen.
+Installation canceled.	InstallProgress		Asennus peruttu.
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Kohdetaltio ei ole tyhjä. Oletko varma, että haluat silti asentaa sille?\n\nHuomaa: Kansio 'system' on puhdas kopio lähdetaltiolta, mutta säilyttää settings-kansion, kaikki muut kansiota yhdistetään, kun taas tiedostot ja linkit, jotka ovat olemassa sekä lähde- että kohdetaltiolla korvataan lähdetaltion versiolla.
+OK	InstallerApp		Valmis
+Are you sure you want to abort the installation?	InstallerWindow		Oletko varma, että haluat keskeyttää asentamisen?
+Stop	InstallerWindow		Pysäytä
+Cancel	InstallerWindow		Peru
+Continue	InstallerWindow	In alert after pressing Stop	Jatka
+No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Ei löytynyt yhtään asentamiseen sopivaa osiota. Aseta osiot ja alusta vähintään yksi Be-tiedostojärjestelmään.
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Käynnistä Levyasema-asetukset -apuohjelma osioimaan\nkäytettävissä olevat kiintolevyt ja muut mediat.\nOsioita voidaan alustaa\nBe-tiedostojärjestelmään, jota tarvitaan Haiku-käynnistys-\nosioon.
+Scanning for disks…	InstallerWindow		Etsitään levyjä…
+Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Suoritetaan Levyasema-asetuksia…\n\nSulje Levyasema-asetukset asennuksen jatkamiseksi.
+Abort	InstallerWindow		Keskeytä
+The partition can't be mounted. Please choose a different partition.	InstallProgress		Osiota ei voi liittää. Valitse eri osio.
+Set up partitions…	InstallerWindow		Aseta osiot…
+Install progress:  	InstallerWindow		Asennuksen eteneminen:  
+You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Et voi asentaa levyn sisältöä itseensä. Valitse eri levy.
+Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Käynnistyshallinnan, Haikun käynnistysvalikon asettamissovelluksen käynnistäminen epäonnistui.
+Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Sulje Käynnistyshallintaikkuna ennen Asennusohjelmaikkunan sulkemista.
+OK	InstallProgress		Valmis
+Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Suoritetaan Käynnistyshallinta ja Levyasema-asetukset…\n\nSulje molemmat sovellukset asennuksen jatkamiseksi.
+Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Oletko varma, että haluat asentaa nykyiselle käynnistyslevylle? Asennusohjelman on käynnistettävä tietokoneesi uudelleen, jos jatkat.
+Onto:	InstallerWindow		levylle:
+Quit Boot Manager and DriveSetup	InstallerWindow		Poistu Käynnistyshallinnasta ja Levyasema-asetuksista
+Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Asennusohjelma\n\ttekijät: Jérôme Duval ja Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
+Tools	InstallerWindow		Työkalut
+scanning…	InstallerWindow		etsitään…
+2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   Asennusohjelma tekee itse Haiku-osiosta käynnistettävän, mutta se ei integroi Haikua olemassaoleviin käynnistysvalikoihin. Jos sinulla on jo GRUB asennettuna, voit lisätä Haikun siihen.\nYksityiskohtaiset ohjeet löydät Haikun käynnistysoppaasta webbisivultamme osoitteesta https://www.haiku-os.org/guides/booting.\nTai voit asettaa käynnistysvalikon Asennusohjelman ”Työkalut”-valikosta, katso Käyttäjäoppaan aihe sovelluksesta ”Käynnistyshallinta”.\n\n\n
+Set up boot menu	InstallerWindow		Aseta käynnistysvalikko
+Continue	InstallerApp		Jatka
+Are you sure you want to abort the installation and restart the system?	InstallerWindow		Oletko varma, että haluat keskeyttää asennuksen ja käynnistää järjestelmän uudelleen?

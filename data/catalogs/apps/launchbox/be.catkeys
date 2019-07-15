@@ -1,35 +1,35 @@
 1	belarusian	x-vnd.Haiku-LaunchBox	3692177981
-New	LaunchBox		Новы
 Set description…	LaunchBox		Прызначыць апісанне…
-Vertical layout	LaunchBox		Вертыкальная расстаноўка
-OK	LaunchBox		ОК
-Pad 1	LaunchBox		Падложка 1
-last chance	LaunchBox		апошняя магчымасць
-Quit	LaunchBox		Выйсці
-Open containing folder	LaunchBox		Адкрыць папку, якая змяшчае аб'ект
-Clear button	LaunchBox		Ачысціць кнопку
-LaunchBox	System name		СтартПалічка
-Ignore double-click	LaunchBox		Ігнараваць падвойны клік
-Auto-raise	LaunchBox		Аўта-выплыванне
-Show on all workspaces	LaunchBox		Паказаць на ўсіх рабочых сталах
-Show window border	LaunchBox		Паказаць мяжу вакна
-Pad	LaunchBox		Падложка
-Icon size	LaunchBox		Памер іконак
-Bummer	LaunchBox		Якая непрыемнасць
-Cancel	LaunchBox		Адмена
-Remove button	LaunchBox		Выдаліць кнопку
-Horizontal layout	LaunchBox		Гарызантальная расстаноўка
-\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nНемагчыма запусціць праграму (сігнатура праграмы '%2').\n\nПамылка:
-Failed to launch '%1'.\n\nError:	LaunchBox		Немагчыма запусціць '%1'.\n\nПамылка:
-Name Panel	LaunchBox		Назавіце Панель
-Add button here	LaunchBox		Дадайце кнопку тут
-Description for '%3'	LaunchBox		Апісанне для '%3'
-Settings	LaunchBox		Наладкі
-Failed to launch 'something', error in Pad data.	LaunchBox		Не ўдалося запусціць 'нешта', памылка дадзеных Pad.
-Pad %1	LaunchBox		Блокнот %1
-Close	LaunchBox		Закрыць
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Не ўдалося адаслаць Трэкеру каманду 'адкрыць каталог'.\n\nПамылка: 
-You can drag an icon here.	LaunchBox		Можаце перацягнуць сюды іконку.
-Clone	LaunchBox		Кланіраваць
-launch popup	LaunchBox		запусіць выпадальнае меню
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Сапраўды закрыць падложку?\n(Потым не вернеце)
+OK	LaunchBox		ОК
+Ignore double-click	LaunchBox		Ігнараваць падвойны клік
+Show on all workspaces	LaunchBox		Паказаць на ўсіх рабочых сталах
+Name Panel	LaunchBox		Назавіце Панель
+Clone	LaunchBox		Кланіраваць
+Description for '%3'	LaunchBox		Апісанне для '%3'
+Show window border	LaunchBox		Паказаць мяжу вакна
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nНемагчыма запусціць праграму (сігнатура праграмы '%2').\n\nПамылка:
+Failed to launch 'something', error in Pad data.	LaunchBox		Не ўдалося запусціць 'нешта', памылка дадзеных Pad.
+LaunchBox	System name		СтартПалічка
+Auto-raise	LaunchBox		Аўта-выплыванне
+Icon size	LaunchBox		Памер іконак
+Open containing folder	LaunchBox		Адкрыць папку, якая змяшчае аб'ект
+Add button here	LaunchBox		Дадайце кнопку тут
+Cancel	LaunchBox		Адмена
+launch popup	LaunchBox		запусіць выпадальнае меню
+Clear button	LaunchBox		Ачысціць кнопку
+Bummer	LaunchBox		Якая непрыемнасць
+last chance	LaunchBox		апошняя магчымасць
+You can drag an icon here.	LaunchBox		Можаце перацягнуць сюды іконку.
+Pad 1	LaunchBox		Падложка 1
+Failed to launch '%1'.\n\nError:	LaunchBox		Немагчыма запусціць '%1'.\n\nПамылка:
+Settings	LaunchBox		Наладкі
+Vertical layout	LaunchBox		Вертыкальная расстаноўка
+Pad	LaunchBox		Падложка
+Close	LaunchBox		Закрыць
+Remove button	LaunchBox		Выдаліць кнопку
+Quit	LaunchBox		Выйсці
+Horizontal layout	LaunchBox		Гарызантальная расстаноўка
+New	LaunchBox		Новы
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Не ўдалося адаслаць Трэкеру каманду 'адкрыць каталог'.\n\nПамылка: 
+Pad %1	LaunchBox		Блокнот %1

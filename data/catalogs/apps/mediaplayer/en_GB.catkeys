@@ -1,15 +1,15 @@
 1	english (united kingdom)	x-vnd.Haiku-MediaPlayer	765283508
-Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Some of the files could not be moved to the Rubbish Bin.
-OK	MediaPlayer-SettingsWindow		Alright
-OK	MediaPlayer-Main		Alright
-Move into trash error	MediaPlayer-RemovePLItemsCmd		Move to rubbish error
-Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Scale videos smoothly (non-overlay mode)
-OK	MediaPlayer-RemovePLItemsCmd		Alright
-All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Not all of the files could be moved into the Rubbish Bin.
-Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Remove Entries to Rubbish Bin
-Move file to Trash	MediaPlayer-PlaylistWindow		Move file to the Rubbish Bin
-OK	MediaPlayer-NetworkStream		Alright
-Randomize	MediaPlayer-PlaylistWindow		Randomise
-Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Randomise Entries
-OK	MediaPlayer-PlaylistWindow		Alright
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Remove Entry to Rubbish Bin
+OK	MediaPlayer-RemovePLItemsCmd		Alright
+OK	MediaPlayer-Main		Alright
+Move file to Trash	MediaPlayer-PlaylistWindow		Move file to the Rubbish Bin
+Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Randomise Entries
+OK	MediaPlayer-SettingsWindow		Alright
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Not all of the files could be moved into the Rubbish Bin.
+Move into trash error	MediaPlayer-RemovePLItemsCmd		Move to rubbish error
+OK	MediaPlayer-NetworkStream		Alright
+Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Scale videos smoothly (non-overlay mode)
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Remove Entries to Rubbish Bin
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Some of the files could not be moved to the Rubbish Bin.
+Randomize	MediaPlayer-PlaylistWindow		Randomise
+OK	MediaPlayer-PlaylistWindow		Alright

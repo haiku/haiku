@@ -1,15 +1,13 @@
-1	ukrainian	x-vnd.Haiku-GLifeScreensaver	1707534289
-Grid Border: %li	GLife ScreenSaver		Межа сітки: %li
-Grid Width: 	GLife ScreenSaver		Ширина сітки: 
-none	GLife ScreenSaver		жодного
-Grid Height: 	GLife ScreenSaver		Висота сiтки: 
-%sx	GLife ScreenSaver	This is a factor: the x represents 'times'	%sx
+1	ukrainian	x-vnd.Haiku-GLifeScreensaver	2074508370
+by Aaron Hill	GLife ScreenSaver		автор Aaron Hill
 None	GLife ScreenSaver		Жодного
+none	GLife ScreenSaver		жодного
+Grid Height: %li	GLife ScreenSaver		Висота сітки: %li
+Grid Width: 	GLife ScreenSaver		Ширина сітки: 
+Grid Border: %li	GLife ScreenSaver		Межа сітки: %li
+Grid Border: 	GLife ScreenSaver		Межа сітки: 
+OpenGL \"Game of Life\"	GLife ScreenSaver		OpenGL \"Гра Життя\"
+Grid Height: 	GLife ScreenSaver		Висота сiтки: 
 4x	GLife ScreenSaver	This is a factor: the x represents 'times'	4x
 Grid Width: %li	GLife ScreenSaver		Ширина сітки: %li
-Grid Height: %li	GLife ScreenSaver		Висота сітки: %li
 Grid Life Delay: 	GLife ScreenSaver		Затримка сітки Життя: 
-OpenGL \"Game of Life\"	GLife ScreenSaver		OpenGL \"Гра Життя\"
-Grid Life Delay: %s	GLife ScreenSaver		Затримка сітки Життя: %s
-Grid Border: 	GLife ScreenSaver		Межа сітки: 
-by Aaron Hill	GLife ScreenSaver		автор Aaron Hill

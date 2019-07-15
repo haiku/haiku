@@ -1,68 +1,74 @@
-1	indonesian	x-vnd.Haiku-MediaConverter	1322040280
-Video using parameters form settings	MediaConverter		Video menggunakan parameter dari form pengaturan  
-{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}
-Video encoding:	MediaConverter		Enkode video:
+1	indonesian	x-vnd.Haiku-MediaConverter	2251404027
+Writing audio track: %d%% complete	MediaConverter		Menulis trek audio: %d%% lengkap
+Input file not recognized as Audio or Video	MediaConverter		Berkas masukan tidak dikenali sebagai Audio atau Video
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
-Error creating video.	MediaConverter		Terjadi kesalahan saat membuat video.
-No audio	Audio codecs list		Tidak ada suara
-Error	MediaConverter		Kesalahan
-{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bits}}
-Error loading a file	MediaConverter		Galat memuat berkas
-File Error	MediaConverter-FileInfo		Galat Berkas
-Open…	Menu		Buka…
-Start [ms]: 	MediaConverter		Mulai [ms]: 
-Output file '%filename' created	MediaConverter		Berkas keluaran '%filename' dibuat
-Output format	MediaConverter		Format keluaran
-End   [ms]: 	MediaConverter		Akhir  [ms]: 
-MediaConverter	System name		MediaConverter
-No video	Video codecs list		Tak ada Video
-Duration:	MediaConverter-FileInfo		Durasi:
-OK	MediaConverter		Oke
-%.1f kHz mono	MediaFileInfo		%.1f kHz mono
+Video quality: %3d%%	MediaConverter		Kualitas video: %3d%%
+Source files	MediaConverter		Berkas sumber
+Error writing video frame %ld	MediaConverter		Ada kesalahan menulis frame video %ld
 Error converting '%filename'	MediaConverter		Ada galat saat mengonversi '%filename'
-Low	MediaConverter		Rendah
+Selected directory not found. Defaulting to /boot/home	MediaConverter		Direktori yang dipilih tidak ditemukan. Atur standar ke /boot/home
 Conversion completed	MediaConverter		Konversi selesai
 Audio:	MediaConverter-FileInfo		Audio:
-OK	MediaConverter-FileInfo		Oke
- seconds	MediaFileInfo		 detik
-Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Ada galat menulis ke lokasi: %strPath%. Membuat standar ke lokasi: /boot/home
-Source files	MediaConverter		Berkas sumber
-Selected directory not found. Defaulting to /boot/home	MediaConverter		Direktori yang dipilih tidak ditemukan. Atur standar ke /boot/home
-{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# frame} other{# frames}}
-Cancelling	MediaConverter		Membatalkan
-{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# bytes}}
-Error loading files	MediaConverter		Ada galat saat memuat berkas
-Cancel	MediaConverter		Batalkan
-None available	Video codecs		Tak ada yang tersedia
-Conversion cancelled	MediaConverter		Konversi dibatalkan
-No file selected	MediaConverter-FileInfo		Tak ada berkas yang dipilih
-Select this folder	MediaConverter		Pilih folder ini
-Error creating track.	MediaConverter		Ada galat saat membuat lintasan
-Continue	MediaConverter		Lanjutkan
-Encoder parameters	MediaConverter-EncoderWindow		Parameter enkoder
-Video:	MediaConverter-FileInfo		Video:
-%d bit 	MediaFileInfo		%d bit 
-Error creating '%filename'	MediaConverter		Ada galat saat membuat '%filename'
-Video quality not supported	MediaConverter		Kualitas video tidak didukung
-Cancelling…	MediaConverter		Membatalkan…
-File details	MediaConverter		Detail berkas
-Select	MediaConverter		Pilih
-Quit	Menu		Keluar
-Preview	MediaConverter		Pratinjau
-File format:	MediaConverter		Format berkas:
-None available	Audio codecs		Tak ada yang tersedia
 MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
-Error launching: %strError%	MediaConverter		Kesalahan peluncuran: %strError%
+Error creating video.	MediaConverter		Terjadi kesalahan saat membuat video.
+Cancelling	MediaConverter		Membatalkan
+None available	Audio codecs		Tak ada yang tersedia
+No file selected	MediaConverter-FileInfo		Tak ada berkas yang dipilih
 High	MediaConverter		Tinggi
-Drop media files onto this window	MediaConverter		Jatuhkan berkas media ke jendela ini
-Audio encoding:	MediaConverter		Penyandi audio:
-Audio quality not supported	MediaConverter		Kualitas audio tidak didukung
-File	Menu		Berkas
-Input file not recognized as Audio or Video	MediaConverter		Berkas masukan tidak dikenali sebagai Audio atau Video
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}
+File Error	MediaConverter-FileInfo		Galat Berkas
+None available	Video codecs		Tak ada yang tersedia
+Output format	MediaConverter		Format keluaran
+%.1f kHz mono	MediaFileInfo		%.1f kHz mono
 %.1f kHz stereo	MediaFileInfo		%.1f kHz stereo
-Convert	MediaConverter		Mengkonversi
-Video quality: %3d%%	MediaConverter		Kualitas video: %3d%%
-%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld Kanal
-Output folder	MediaConverter		Folder keluaran
+OK	MediaConverter		OKE
+Error creating '%filename'	MediaConverter		Ada galat saat membuat '%filename'
+Error loading a file	MediaConverter		Galat memuat berkas
+Encoder parameters	MediaConverter-EncoderWindow		Parameter enkoder
+Open…	Menu		Buka…
+Audio encoding:	MediaConverter		Penyandi audio:
 Audio quality: %3d%%	MediaConverter		Kualitas audio: %3d%%
+Cancelling…	MediaConverter		Membatalkan…
+Output file '%filename' created	MediaConverter		Berkas keluaran '%filename' dibuat
+Output folder	MediaConverter		Folder keluaran
+Error creating track.	MediaConverter		Ada galat saat membuat lintasan
+ seconds	MediaFileInfo		 detik
+Video using parameters form settings	MediaConverter		Video menggunakan parameter dari form pengaturan
+Video:	MediaConverter-FileInfo		Video:
+Select	MediaConverter		Pilih
+Conversion cancelled	MediaConverter		Konversi dibatalkan
+Low	MediaConverter		Rendah
+Error loading files	MediaConverter		Ada galat saat memuat berkas
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bits}}
+End   [ms]: 	MediaConverter		Akhir [ms]: 
+Cancel	MediaConverter		Batalkan
+OK	MediaConverter-FileInfo		OKE
+Error read audio frame %ld	MediaConverter		Ada kesalahan baca frame audio %ld
+Video encoding:	MediaConverter		Enkode video:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Ada galat saat membaca info file.\n\nGalat : 
+Error	MediaConverter		Kesalahan
+File details	MediaConverter		Detail berkas
+No audio	Audio codecs list		Tidak ada suara
+Drop media files onto this window	MediaConverter		Jatuhkan berkas media ke jendela ini
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# frame} other{# frames}}
+Quit	Menu		Keluar
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# bytes}}
+Duration:	MediaConverter-FileInfo		Durasi:
+MediaConverter	System name		MediaConverter
+Error launching: %strError%	MediaConverter		Kesalahan peluncuran: %strError%
+File format:	MediaConverter		Format berkas:
+Error writing audio frame %ld	MediaConverter		Kesalahan menulis frame audio %ld
+File	Menu		Berkas
+Video quality not supported	MediaConverter		Kualitas video tidak didukung
+Select this folder	MediaConverter		Pilih folder ini
+Error read video frame %ld	MediaConverter		Ada kesalahan baca frame video %ld
+%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanal
+%d bit 	MediaFileInfo		%d bit 
+No video	Video codecs list		Tak ada video
+Continue	MediaConverter		Lanjutkan
+Convert	MediaConverter		Mengkonversi
+Audio quality not supported	MediaConverter		Kualitas audio tidak didukung
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Ada galat menulis ke lokasi: %strPath%. Membuat standar ke lokasi: /boot/home
+Writing video track: %d%% complete	MediaConverter		Menulis trek video: %d%% lengkap
+Preview	MediaConverter		Pratinjau
+Start [ms]: 	MediaConverter		Mulai [ms]: 

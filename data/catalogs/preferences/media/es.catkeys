@@ -1,24 +1,24 @@
 1	spanish; castilian	x-vnd.Haiku-Media	4205337498
-Couldn't add volume control in Deskbar: %s\n	Media views		No se ha podido agregar el control de volumen en el Deskbar: %s\n
-Video input:	Media views		Entrada de video:
-Warning!	Media Window		¡Advertencia!
-Quit anyway	Media Window		Salir de todos modos
-Defaults	Media views		Predeterminados
-MIDI Settings	Media Window		Configuración de MIDI
+Audio mixer	Media Window		Mezclador de audio
+Show volume control on Deskbar	Media views		Mostrar control de volumen en la barra de escritorio
 Quit	Media Window		Salir
-Video settings	Media Window		Configuración de video
-Video output:	Media views		Salida de video:
-Could not connect to the media server.\nWould you like to start it ?	Media Window		No se puede conectar con el servidor multimedia.\n¿Deseas iniciarlo?
 Restart media services	Media views		Reiniciar los servicios de multimedia
+Couldn't add volume control in Deskbar: %s\n	Media views		No se ha podido agregar el control de volumen en el Deskbar: %s\n
+Start media server	Media Window		Iniciar servidor multimedia
+Audio settings	Media Window		Configuración de audio
+Quit anyway	Media Window		Salir de todos modos
 Couldn't remove volume control in Deskbar: %s\n	Media views		No se ha podido remover el control de volumen en el Deskbar: %s\n
 Media	System name		Multimedia
-Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Finalizar Media ahora parará el reinicio de los servicios de multimedia. Los resultados más probables serán fallos o la indisponibilidad de funcionalidad multimedia.
-Audio mixer	Media Window		Mezclador de audio
-This hardware has no controls.	Media Window		Este dispositivo no tiene controles.
+Warning!	Media Window		¡Advertencia!
+MIDI Settings	Media Window		Configuración de MIDI
+Video output:	Media views		Salida de video:
 Audio output:	Media views		Salida de audio:
-Audio settings	Media Window		Configuración de audio
-Start media server	Media Window		Iniciar servidor multimedia
-<none>	Media views		<ninguno>
-Channel:	Media views		Canal:
-Show volume control on Deskbar	Media views		Mostrar control de volumen en la barra de escritorio
+Video input:	Media views		Entrada de video:
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Finalizar Media ahora parará el reinicio de los servicios de multimedia. Los resultados más probables serán fallos o la indisponibilidad de funcionalidad multimedia.
 Audio input:	Media views		Entrada de audio:
+<none>	Media views		<ninguno>
+This hardware has no controls.	Media Window		Este dispositivo no tiene controles.
+Channel:	Media views		Canal:
+Defaults	Media views		Predeterminados
+Could not connect to the media server.\nWould you like to start it ?	Media Window		No se puede conectar con el servidor multimedia.\n¿Deseas iniciarlo?
+Video settings	Media Window		Configuración de video

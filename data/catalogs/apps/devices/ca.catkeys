@@ -1,95 +1,90 @@
-1	catalan; valencian	x-vnd.Haiku-Devices	865240481
-Manufacturer	DeviceSCSI		Fabricant
-Order by:	DevicesView		Ordena per:
-ACPI controller	Device		Controlador ACPI
-Memory controller	Device		Controlador de la memòria
-Driver used	DevicePCI		Controlador utilitzat
-CD-ROM	DeviceSCSI		CD-ROM
-ISA bus	Device		Bus ISA
-ACPI bus	Device		Bus ACPI
-ISA bus	DevicesView		Bus ISA
-Docking station	Device		Base d'acoblament
-Computer	Device		Ordinador
-Unknown device	Device		El dispositiu és desconegut
-Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Informació de la classe:\t\t\t\t: %classInfo%
-Processor	DeviceSCSI		Processador
-RBC	DeviceSCSI		RBC
-Detailed	DevicesView		Detallat
-Category	DevicesView		Categoria
-Quit	DevicesView		Surt
-Device paths	Device		Camins als dispositius
-Scanner	DeviceSCSI		Escànner
-Printer	DeviceSCSI		Impressora
-Processor	Device		Processador
-Optical Drive	DeviceSCSI		Unitat òptica
-ACPI Processor Namespace '%2'	DeviceACPI		Espai de noms ACPI del Processador '%2'
-Bridge	DeviceSCSI		Pont
-unknown	Device		desconegut
-ACPI Information	DeviceACPI		Informació ACPI
-Generic system peripheral	Device		Perifèric genèric del sistema
-Not implemented	DevicePCI		No s'ha implementat
-Disk Drive	DeviceSCSI		Unitat de disc
-Not implemented	DeviceACPI		No s'ha implementat
-Device name	DevicePCI		Nom del dispositiu
-Display controller	Device		Controlador de la pantalla
-Mass storage controller	Device		Controlador d'emmagatzematge massiu
-Input device controller	Device		Controlador de dispositiu d'entrada
-Network controller	Device		Controlador de xarxa
-Device class	DeviceSCSI		Classe de dispositiu
-Device name	DeviceACPI		Nom del dispositiu
-Driver used	Device		Controlador utilitzat
-Other	DeviceSCSI		Altre
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Nom del dispositiu\t\t\t\t: %Name%\nFabricant\t\t\t: %Manufacturer%\nControlador utilitzat\t\t\t\t: %DriverUsed%\nRutes del dispositiu\t: %DevicePaths%
-ACPI Thermal Zone	DeviceACPI		Zona tèrmica ACPI
-Communications	DeviceSCSI		Comunicacions
-Bus	DevicesView		Bus
-Communication controller	Device		Controlador de comunicacions
-Manufacturer	DeviceACPI		Fabricant
-PCI bus	Device		Bus PCI
-ACPI System Indicator	DeviceACPI		Indicador de Sistema ACPI
-None	Device		Cap
-PCI bus	DevicesView		Bus PCI
-Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Informació de classe:\t\t\t\t: %classInfo%
-Basic information	DevicesView		Informació bàsica
-PCI Information	DevicePCI		Informació PCI
-Manufacturer:	Device		Fabricant:
+1	catalan; valencian	x-vnd.Haiku-Devices	490380176
 ACPI bus	DevicesView		Bus ACPI
-Changer	DeviceSCSI		Canviador
-ACPI System Bus	DeviceACPI		Bus del sistema ACPI
-Devices	System name		Dispositius
-Worm	DeviceSCSI		Cuc
-Multimedia controller	Device		Controlador multimèdia
-Unknown	DevicePCI		Desconegut
-Device name:	Device		Nom del dispositiu:
-Computer	DevicesView		Ordinador
-Value	PropertyList		Valor
-Report compatibility	DevicesView		Informe de compatibilitat
-Device	Device		Dispositiu
-Signal processing controller	Device		Controlador de processament de senyals
-Serial bus controller	Device		Controlador del bus sèrie
-Wireless controller	Device		Controlador de xarxa sense fils
-ACPI node '%1'	DeviceACPI		Node '%1' ACPI
-Device name	Device		Nom del dispositiu
-Manufacturer	Device		Fabricant
-Name	PropertyList		Nom
-Manufacturer	DevicePCI		Fabricant
-Intelligent controller	Device		Controlador intel·ligent
-Satellite communications controller	Device		Controlador de les comunicacions per satèl·lit
-SCSI Information	DeviceSCSI		Informació de SCSI
-Enclosure	DeviceSCSI		Adjunció
-Array	DeviceSCSI		Matriu
-Bridge	Device		Pont
-Refresh devices	DevicesView		Refresca la llista dels dispositius
-Unknown device	DevicesView		El dispositiu és desconegut
-Graphics Peripheral	DeviceSCSI		Perifèric gràfic
-Tape Drive	DeviceSCSI		Unitat de cinta
-Bus Information	Device		Informació del bus
-Connection	DevicesView		Connexió
-Generate system information	DevicesView		Mostra la informació del sistema
 Encryption controller	Device		Controlador del xifratge
-Unclassified device	Device		Dispositiu sense classificar
-Device name	DeviceSCSI		Nom del dispositiu
-Card Reader	DeviceSCSI		Lector de targetes
+Bus Information	Device		Informació del bus
+Devices	System name		Dispositius
+Graphics Peripheral	DeviceSCSI		Perifèric gràfic
+Processor	Device		Processador
+Generate system information	DevicesView		Mostra la informació del sistema
 Class info	DevicePCI		Informació de la classe
-Device paths	DevicePCI		Camins als dispositius
+ACPI Information	DeviceACPI		Informació ACPI
+Detailed	DevicesView		Detallat
+Computer	DevicesView		Ordinador
+Communications	DeviceSCSI		Comunicacions
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Informació de classe:\t\t\t\t: %classInfo%
+Mass storage controller	Device		Controlador d'emmagatzematge massiu
+Connection	DevicesView		Connexió
+Printer	DeviceSCSI		Impressora
+ACPI Processor Namespace '%2'	DeviceACPI		Espai de noms ACPI del Processador '%2'
+SCSI Information	DeviceSCSI		Informació de SCSI
+Manufacturer	Device		Fabricant
+Device name:	Device		Nom del dispositiu:
+Scanner	DeviceSCSI		Escànner
+Memory controller	Device		Controlador de la memòria
+Unknown device	DevicesView		El dispositiu és desconegut
+Unknown	DevicePCI		Desconegut
+ACPI node '%1'	DeviceACPI		Node '%1' ACPI
+Optical Drive	DeviceSCSI		Unitat òptica
+Name	PropertyList		Nom
+Manufacturer	DeviceSCSI		Fabricant
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Nom del dispositiu\t\t\t\t: %Name%\nFabricant\t\t\t: %Manufacturer%\nControlador utilitzat\t\t\t\t: %DriverUsed%\nRutes del dispositiu\t: %DevicePaths%
+Device name	Device		Nom del dispositiu
+Satellite communications controller	Device		Controlador de les comunicacions per satèl·lit
+Device class	DeviceSCSI		Classe de dispositiu
+Device	Device		Dispositiu
+Input device controller	Device		Controlador de dispositiu d'entrada
+PCI bus	DevicesView		Bus PCI
+ACPI System Indicator	DeviceACPI		Indicador de Sistema ACPI
+ACPI System Bus	DeviceACPI		Bus del sistema ACPI
+PCI Information	DevicePCI		Informació PCI
+Tape Drive	DeviceSCSI		Unitat de cinta
+Changer	DeviceSCSI		Canviador
+Serial bus controller	Device		Controlador del bus sèrie
+Refresh devices	DevicesView		Refresca la llista dels dispositius
+Category	DevicesView		Categoria
+RBC	DeviceSCSI		RBC
+None	Device		Cap
+Device paths	Device		Camins als dispositius
+Unknown device	Device		El dispositiu és desconegut
+Wireless controller	Device		Controlador de xarxa sense fils
+Generic system peripheral	Device		Perifèric genèric del sistema
+Value	PropertyList		Valor
 Devices	DevicesView		Dispositius
+Device name	DeviceACPI		Nom del dispositiu
+Card Reader	DeviceSCSI		Lector de targetes
+Display controller	Device		Controlador de la pantalla
+Basic information	DevicesView		Informació bàsica
+Bus	DevicesView		Bus
+Device name	DevicePCI		Nom del dispositiu
+Disk Drive	DeviceSCSI		Unitat de disc
+Other	DeviceSCSI		Altre
+Report compatibility	DevicesView		Informe de compatibilitat
+Computer	Device		Ordinador
+PCI bus	Device		Bus PCI
+Enclosure	DeviceSCSI		Adjunció
+Order by:	DevicesView		Ordena per:
+ACPI Thermal Zone	DeviceACPI		Zona tèrmica ACPI
+Intelligent controller	Device		Controlador intel·ligent
+Multimedia controller	Device		Controlador multimèdia
+Quit	DevicesView		Surt
+ISA bus	Device		Bus ISA
+ISA bus	DevicesView		Bus ISA
+Processor	DeviceSCSI		Processador
+Manufacturer:	Device		Fabricant:
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Informació de la classe:\t\t\t\t: %classInfo%
+Bridge	Device		Pont
+Worm	DeviceSCSI		Cuc
+CD-ROM	DeviceSCSI		CD-ROM
+Manufacturer	DevicePCI		Fabricant
+Bridge	DeviceSCSI		Pont
+Signal processing controller	Device		Controlador de processament de senyals
+Device name	DeviceSCSI		Nom del dispositiu
+Docking station	Device		Base d'acoblament
+Array	DeviceSCSI		Matriu
+Unclassified device	Device		Dispositiu sense classificar
+ACPI controller	Device		Controlador ACPI
+Network controller	Device		Controlador de xarxa
+Driver used	Device		Controlador utilitzat
+Communication controller	Device		Controlador de comunicacions
+ACPI bus	Device		Bus ACPI
+unknown	Device		desconegut

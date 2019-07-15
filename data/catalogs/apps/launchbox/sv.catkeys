@@ -1,35 +1,35 @@
 1	swedish	x-vnd.Haiku-LaunchBox	3692177981
-New	LaunchBox		Ny
 Set description…	LaunchBox		Ange beskrivning...
-Vertical layout	LaunchBox		Vertikal utformning
-OK	LaunchBox		OK
-Pad 1	LaunchBox		Block 1
-last chance	LaunchBox		sista chansen
-Quit	LaunchBox		Avsluta
-Open containing folder	LaunchBox		Öppna innehållande mapp
-Clear button	LaunchBox		Rensa knapp
-LaunchBox	System name		StartBlock
-Ignore double-click	LaunchBox		Ignorera dubbelklick
-Auto-raise	LaunchBox		Upphöj automatiskt
-Show on all workspaces	LaunchBox		Visa på alla arbetsytor
-Show window border	LaunchBox		Visa fönsterkant
-Pad	LaunchBox		Block
-Icon size	LaunchBox		Ikonstorlek
-Bummer	LaunchBox		Hoppsan
-Cancel	LaunchBox		Avbryt
-Remove button	LaunchBox		Ta bort knapp
-Horizontal layout	LaunchBox		Horisontal utformning
-\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nKunde inte starta programmet med signaturen '%2'.\n\nFel:
-Failed to launch '%1'.\n\nError:	LaunchBox		Misslyckades att starta '%1'.\n\nFel:
-Name Panel	LaunchBox		Namnge Block
-Add button here	LaunchBox		Lägg till knapp
-Description for '%3'	LaunchBox		Beskrivning för '%3'
-Settings	LaunchBox		Inställningar
-Failed to launch 'something', error in Pad data.	LaunchBox		Kunde inte köra 'something', error i Pad data.
-Pad %1	LaunchBox		Block %1
-Close	LaunchBox		Stäng
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Misslyckades att skicka 'öppna mapp' kommando till Tracker.\n\nFel:
-You can drag an icon here.	LaunchBox		Du kan dra en ikon hit.
-Clone	LaunchBox		Klona
-launch popup	LaunchBox		starta popup
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Vill du verkligen stänga blocket?\n(Blocket kommer inte att kommas ihåg.)
+OK	LaunchBox		OK
+Ignore double-click	LaunchBox		Ignorera dubbelklick
+Show on all workspaces	LaunchBox		Visa på alla arbetsytor
+Name Panel	LaunchBox		Namnge Block
+Clone	LaunchBox		Klona
+Description for '%3'	LaunchBox		Beskrivning för '%3'
+Show window border	LaunchBox		Visa fönsterkant
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nKunde inte starta programmet med signaturen '%2'.\n\nFel:
+Failed to launch 'something', error in Pad data.	LaunchBox		Kunde inte köra 'something', error i Pad data.
+LaunchBox	System name		StartBlock
+Auto-raise	LaunchBox		Upphöj automatiskt
+Icon size	LaunchBox		Ikonstorlek
+Open containing folder	LaunchBox		Öppna innehållande mapp
+Add button here	LaunchBox		Lägg till knapp
+Cancel	LaunchBox		Avbryt
+launch popup	LaunchBox		starta popup
+Clear button	LaunchBox		Rensa knapp
+Bummer	LaunchBox		Hoppsan
+last chance	LaunchBox		sista chansen
+You can drag an icon here.	LaunchBox		Du kan dra en ikon hit.
+Pad 1	LaunchBox		Block 1
+Failed to launch '%1'.\n\nError:	LaunchBox		Misslyckades att starta '%1'.\n\nFel:
+Settings	LaunchBox		Inställningar
+Vertical layout	LaunchBox		Vertikal utformning
+Pad	LaunchBox		Block
+Close	LaunchBox		Stäng
+Remove button	LaunchBox		Ta bort knapp
+Quit	LaunchBox		Avsluta
+Horizontal layout	LaunchBox		Horisontal utformning
+New	LaunchBox		Ny
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Misslyckades att skicka 'öppna mapp' kommando till Tracker.\n\nFel:
+Pad %1	LaunchBox		Block %1

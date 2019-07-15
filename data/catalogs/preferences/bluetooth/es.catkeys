@@ -1,55 +1,49 @@
-1	spanish; castilian	x-vnd.Haiku-BluetoothPrefs	145165464
-About Bluetooth…	Window		Acerca de Bluetooth...
-Handheld	Settings view		PC de bolsillo
-Default inquiry time:	Settings view		Tiempo de búsqueda predeterminado:
+1	spanish; castilian	x-vnd.Haiku-BluetoothPrefs	67867884
+Laptop	Settings view		PC Portátil
+Only from trusted devices	Settings view		Sólo desde dispositivos de confianza
+15 secs	Settings view		15 segundos
+Quit	main		Salir
 Manufacturer: 	Device View		Fabricante: 
-Add device to list	Inquiry panel		Añadir dispositivo a la lista
-Starting scan...	Inquiry panel		Comenzando búsqueda...
-Smart phone	Settings view		Teléfono inteligente
-With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Con el apoyo de:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nGracias a todos los que ayudaron...\n\nEnviando o donando hardware:\n - Henry Jair Abril Florez (el colombiano)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconómicamente:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nCon parches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nRealizando pruebas:\n - Petter H. Juliussen\nA quienes me dieron todo el conocimiento:\n - the yellowTAB team
-Server	Settings view		Servidor
-Stop bluetooth services…	Window		Detener servicios Bluetooth…
-The Bluetooth services are not currently running on this system.	main		En este momento los servicios de Bluetooth no están ejecutándose en el sistema.
+Desktop	Settings view		Escritorio
+Server	Window		Servidor
 Identify host as:	Settings view		Identificarse como:
 Refresh…	Remote devices		Actualizar…
-Pair…	Remote devices		Emparejar…
-Incoming connections policy:	Settings view		Politica para conexiones entrantes:
-From all devices	Settings view		Desde todos los dispositivos
-Show name	Extended local device view		Mostrar nombre
 Local devices found on system:	Settings view		Dispositivos locales encontrados en el sistema:
-Remaining %1 seconds	Inquiry panel		Restan %1 segundos
-Server	Window		Servidor
-Scanning completed.	Inquiry panel		Búsqueda finalizada.
+Service classes: 	Device View		Clases de servicio:
+Remote devices	Window		Dispositivos remotos
+Settings	Window		Configuración
+Stop bluetooth services…	Window		Detener servicios Bluetooth…
+61 secs	Settings view		61 segundos
+Add…	Remote devices		Añadir…
+As blocked	Remote devices		Como bloqueado
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		No hay ningún dispositivo local Bluetooth registrado en el sistema.
+Revert	Window		Revertir
+Refresh local devices…	Window		Actualizando dispositivos locales…
+Disconnect	Remote devices		Desconectar
+From all devices	Settings view		Desde todos los dispositivos
+Defaults	Window		Valores predeterminados
+Start bluetooth services…	Window		Iniciar servicios Bluetooth...
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Compruebe que el Bluetooth de su dispositivo remoto esté activado. Presione 'Buscar' para iniciar la búsqueda. El tiempo necesario para la obtención de nombres se desconoce, aunque no debería superar los 3 segundos por dispositivo. Una vez encontrados, se podrán añadir a la lista principal, desde la que se podrá sincronizar con ellos.
+Scanning progress	Inquiry panel		Progreso de la búsqueda
+Bluetooth	System name		Bluetooth
 Launch now	main		Ejecutar ahora
 Remove	Remote devices		Eliminar
-Quit	main		Salir
-15 secs	Settings view		15 segundos
-Start bluetooth services…	Window		Iniciar servicios Bluetooth...
-Policy...	Settings view		Política...
-61 secs	Settings view		61 segundos
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		No hay ningún dispositivo local Bluetooth registrado en el sistema.
-Identify us as...	Settings view		Autoidentificarse como...
- packets: 	Device View		 paquetes: 
-As blocked	Remote devices		Como bloqueado
-Bluetooth	System name		Bluetooth
-Disconnect	Remote devices		Desconectar
-Defaults	Window		Valores predeterminados
-Inquiry	Inquiry panel		Consulta
-Desktop	Settings view		Escritorio
-Revert	Window		Revertir
-Remote devices	Window		Dispositivos remotos
-Laptop	Settings view		PC Portátil
-Discoverable	Extended local device view		Visible
-Service classes: 	Device View		Clases de servicio:
-Settings	Window		Configuración
-Only from trusted devices	Settings view		Sólo desde dispositivos de confianza
-Scanning progress	Inquiry panel		Progreso de la búsqueda
 Always ask	Settings view		Preguntar siempre
-Retrieving name of %1	Inquiry panel		Recuperando nombre de %1
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Compruebe que el Bluetooth de su dispositivo remoto esté activado. Presione 'Buscar' para iniciar la búsqueda. El tiempo necesario para la obtención de nombres se desconoce, aunque no debería superar los 3 segundos por dispositivo. Una vez encontrados, se podrán añadir a la lista principal, desde la que se podrá sincronizar con ellos.
-Authenticate	Extended local device view		Autenticar
-Refresh local devices…	Window		Actualizando dispositivos locales…
-Pick device...	Settings view		Elegir dispositivo…
-Retrieving names...	Inquiry panel		Obteniendo nombres...
 Help	Window		Ayuda
-Add…	Remote devices		Añadir…
+Pair…	Remote devices		Emparejar…
+Retrieving name of %1	Inquiry panel		Recuperando nombre de %1
+Inquiry	Inquiry panel		Consulta
+Incoming connections policy:	Settings view		Politica para conexiones entrantes:
+Show name	Extended local device view		Mostrar nombre
+Add device to list	Inquiry panel		Añadir dispositivo a la lista
+Remaining %1 seconds	Inquiry panel		Restan %1 segundos
+The Bluetooth services are not currently running on this system.	main		En este momento los servicios de Bluetooth no están ejecutándose en el sistema.
+Discoverable	Extended local device view		Visible
+Authenticate	Extended local device view		Autenticar
+Smart phone	Settings view		Teléfono inteligente
+Scanning completed.	Inquiry panel		Búsqueda finalizada.
+Default inquiry time:	Settings view		Tiempo de búsqueda predeterminado:
+Server	Settings view		Servidor
+Handheld	Settings view		PC de bolsillo
+ packets: 	Device View		 paquetes: 
+About Bluetooth…	Window		Acerca de Bluetooth...

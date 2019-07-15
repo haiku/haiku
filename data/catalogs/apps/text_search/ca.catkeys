@@ -1,30 +1,30 @@
 1	catalan; valencian	x-vnd.Haiku.TextSearch	293043021
-%s: Not enough room to escape the filename.	Grepper		%s: No hi ha prou espai per codificar el nom del fitxer.
-Trim to selection	GrepWindow		Escapça per la selecció
-Follow symbolic links	GrepWindow		Segueix els enllaços simbòlics
-Close	GrepWindow		Tanca
-Cancel	GrepWindow		Anul·la
-The unselected files will be removed from the list.	GrepWindow		Els fitxers que no estan seleccionats es suprimiran de la llista.
-Set target…	GrepWindow		Seleccioneu la destinació...
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Si us plau trieu els fitxers que voleu triar al Rastrejador.
-Copy text to clipboard	GrepWindow		Copia el text al porta-retalls
-Settings	GrepWindow		Paràmetres
-Select all	GrepWindow		Selecciona-ho tot
-OK	GrepWindow		D'acord
-Skip folders starting with a dot	GrepWindow		Ignora les carpetes que comencen a un punt
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME no ha pogut obrir alguna carpeta.
-Search	GrepWindow		Cerca
 Open selection	GrepWindow		Obre la selecció
-Look in sub-folders	GrepWindow		Cerca a les carpetes inferiors
 Actions	GrepWindow		Accions
-File	GrepWindow		Fitxer
-Encoding	GrepWindow		S'està codificant
-History	GrepWindow		Historial
 New window	GrepWindow		Finestra nova
-Please select the files you wish to keep searching.	GrepWindow		Si us plau trieu els fitxers que voleu seguir cercant.
-TextSearch	GrepWindow		Cerca un text
+Encoding	GrepWindow		S'està codificant
+OK	GrepWindow		D'acord
+Close	GrepWindow		Tanca
+Look in sub-folders	GrepWindow		Cerca a les carpetes inferiors
+%s: Not enough room to escape the filename.	Grepper		%s: No hi ha prou espai per codificar el nom del fitxer.
+Follow symbolic links	GrepWindow		Segueix els enllaços simbòlics
+Text files only	GrepWindow		Només els fitxers de text
 Quit	GrepWindow		Surt
 Show files in Tracker	GrepWindow		Mostra els fitxers al Rastrejador
-Case-sensitive	GrepWindow		Distingeix entre majúscules i minúscules
-Text files only	GrepWindow		Només els fitxers de text
+Please select the files you wish to keep searching.	GrepWindow		Si us plau trieu els fitxers que voleu seguir cercant.
+Trim to selection	GrepWindow		Escapça per la selecció
+Set target…	GrepWindow		Seleccioneu la destinació...
+TextSearch	GrepWindow		Cerca un text
+Search	GrepWindow		Cerca
+Copy text to clipboard	GrepWindow		Copia el text al porta-retalls
 Show lines	GrepWindow		Mostra les línies
+The unselected files will be removed from the list.	GrepWindow		Els fitxers que no estan seleccionats es suprimiran de la llista.
+Skip folders starting with a dot	GrepWindow		Ignora les carpetes que comencen a un punt
+Cancel	GrepWindow		Anul·la
+History	GrepWindow		Historial
+File	GrepWindow		Fitxer
+Case-sensitive	GrepWindow		Distingeix entre majúscules i minúscules
+Select all	GrepWindow		Selecciona-ho tot
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME no ha pogut obrir alguna carpeta.
+Settings	GrepWindow		Paràmetres

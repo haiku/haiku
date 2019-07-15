@@ -1,53 +1,53 @@
 1	spanish; castilian	x-vnd.Haiku-Network	1314732966
-Static	IntefaceAddressView		Estático
+Ethernet device	InterfaceListItem		Dispositivo Ethernet
+Link speed:	IntefaceView		Velocidad de conexión:
+disconnected	IntefaceView		desconectado
+IP Address:	IntefaceAddressView		Dirección IP:
+WPA	WPA protected network		WPA
+Network:	IntefaceView		Red:
+Received:	IntefaceView		Recibido:
+New…	NetworkWindow		Nuevo…
+no link	InterfaceListItem		sin enlace
+Other	NetworkWindow		Otro
+Sent:	IntefaceView		Enviado:
+Gateway:	IntefaceAddressView		Puerta de enlace:
+The netmask defines your local network	IntefaceAddressView		La máscara de red define su red local
+Your IP address	IntefaceAddressView		Su dirección IP:
+DHCP	IntefaceAddressView		DHCP
+Dial Up	NetworkWindow		Acceso telefónico
+Netmask:	IntefaceAddressView		Máscara de red:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Servicios
-no link	InterfaceListItem		sin enlace
-WPA2	WPA2 protected network		WPA2
-Choose automatically	IntefaceView		Escoger automáticamente
-connected	IntefaceView		conectado
-Ethernet device	InterfaceListItem		Dispositivo Ethernet
-The netmask defines your local network	IntefaceAddressView		La máscara de red define su red local
-Dial-up connection	InterfaceListItem		Conexión de acceso telefónico
-%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
-Network	NetworkWindow		Red
-VPN connection	InterfaceListItem		Conexión VPN
-Show network status in Deskbar	NetworkWindow		Mostrar estado de la red en Deskbar
-The method for obtaining an IP address	IntefaceAddressView		El método para obtener una dirección IP
-connected	InterfaceListItem		conectado
-disabled	InterfaceListItem		deshabilitado
-Dial Up	NetworkWindow		Acceso telefónico
-Apply	IntefaceAddressView		Aplicar
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Ha ocurrido un error al instalar NetworkStatus en la barra de escritorio: %s
+Revert	NetworkWindow		Revertir
+WEP	WEP protected network		WEP
+<no wireless networks found>	IntefaceView		<no se han encontrado redes inalámbricas>
+connected	IntefaceView		conectado
+VPN	NetworkWindow		VPN
+Apply	IntefaceAddressView		Aplicar
+Disable	ServiceView		Deshabilitar
+WPA2	WPA2 protected network		WPA2
+Show network status in Deskbar	NetworkWindow		Mostrar estado de la red en Deskbar
+Mode:	IntefaceAddressView		Modo:
+connected	InterfaceListItem		conectado
+Static	IntefaceAddressView		Estático
+launch error	NetworkWindow		error de inicio
+Renegotiate	IntefaceView		Renegociar
 MAC address:	IntefaceView		Dirección MAC:
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+disabled	InterfaceListItem		deshabilitado
+Dial-up connection	InterfaceListItem		Conexión de acceso telefónico
+The method for obtaining an IP address	IntefaceAddressView		El método para obtener una dirección IP
+Automatic	IntefaceAddressView		Automático
+Choose automatically	IntefaceView		Escoger automáticamente
+Status:	IntefaceView		Estado:
+Disable	IntefaceView		Deshabilitar
+Manage…	NetworkWindow		Administrar…
+open	Open network		abierto
+Network	NetworkWindow		Red
+Your gateway to the internet	IntefaceAddressView		Su puerta de enlace a internet
+Enable	ServiceView		Habilitar
+Ok	NetworkWindow		Aceptar
 Wireless device	InterfaceListItem		Dispositivo inalámbrico
 Disabled	IntefaceAddressView		Deshabilitado
-Renegotiate	IntefaceView		Renegociar
-Ok	NetworkWindow		Aceptar
-Network:	IntefaceView		Red:
-launch error	NetworkWindow		error de inicio
-Other	NetworkWindow		Otro
-Automatic	IntefaceAddressView		Automático
-Gateway:	IntefaceAddressView		Puerta de enlace:
-Revert	NetworkWindow		Revertir
-Enable	ServiceView		Habilitar
-disconnected	IntefaceView		desconectado
-Status:	IntefaceView		Estado:
-Link speed:	IntefaceView		Velocidad de conexión:
-Your gateway to the internet	IntefaceAddressView		Su puerta de enlace a internet
-New…	NetworkWindow		Nuevo…
-DHCP	IntefaceAddressView		DHCP
-Mode:	IntefaceAddressView		Modo:
-WPA	WPA protected network		WPA
-Sent:	IntefaceView		Enviado:
-open	Open network		abierto
-IP Address:	IntefaceAddressView		Dirección IP:
-VPN	NetworkWindow		VPN
-Received:	IntefaceView		Recibido:
-Disable	IntefaceView		Deshabilitar
-<no wireless networks found>	IntefaceView		<no se han encontrado redes inalámbricas>
-Netmask:	IntefaceAddressView		Máscara de red:
-Disable	ServiceView		Deshabilitar
-Your IP address	IntefaceAddressView		Su dirección IP:
-Manage…	NetworkWindow		Administrar…
-WEP	WEP protected network		WEP
+VPN connection	InterfaceListItem		Conexión VPN

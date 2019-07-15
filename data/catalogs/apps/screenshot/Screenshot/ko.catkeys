@@ -1,24 +1,24 @@
 1	korean	x-vnd.haiku-screenshot	4065094687
-seconds	ScreenshotWindow		초
-Desktop	ScreenshotWindow		데스크탑
 Include window border	ScreenshotWindow		창 틀 포함
-Screenshot	System name		화면갈무리
-Select	ScreenshotWindow		선택
-Capture active window	ScreenshotWindow		활성화된 창 갈무리
-Cancel	ScreenshotWindow		취소
-Name:	ScreenshotWindow		이름:
-Choose folder	ScreenshotWindow		폴더 선택
-Save	ScreenshotWindow		저장
-Please select	ScreenshotWindow		선택해주십시오
-Save as:	ScreenshotWindow		다른 이름으로 저장:
-Copy to clipboard	ScreenshotWindow		클립보드로 복사
 Save in:	ScreenshotWindow		저장할 곳:
-screenshot	Screenshot	Base filename of screenshot files	screenshot
+Select	ScreenshotWindow		선택
+Save as:	ScreenshotWindow		다른 이름으로 저장:
+seconds	ScreenshotWindow		초
 New screenshot	ScreenshotWindow		새 갈무리
+Screenshot	System name		화면갈무리
+Desktop	ScreenshotWindow		데스크탑
 Artwork folder	ScreenshotWindow		아트워크 폴더
-Home folder	ScreenshotWindow		홈 폴더
-Settings…	ScreenshotWindow		설정...
-overwrite	ScreenshotWindow		덮어 쓰기
-Delay:	ScreenshotWindow		대기시간:
-Include mouse pointer	ScreenshotWindow		마우스 포인터 포함
 Translator Settings	ScreenshotWindow		변환기 설정
+Include mouse pointer	ScreenshotWindow		마우스 포인터 포함
+overwrite	ScreenshotWindow		덮어 쓰기
+Settings…	ScreenshotWindow		설정...
+Choose folder	ScreenshotWindow		폴더 선택
+Name:	ScreenshotWindow		이름:
+Please select	ScreenshotWindow		선택해주십시오
+Cancel	ScreenshotWindow		취소
+Delay:	ScreenshotWindow		대기시간:
+Copy to clipboard	ScreenshotWindow		클립보드로 복사
+screenshot	Screenshot	Base filename of screenshot files	screenshot
+Home folder	ScreenshotWindow		홈 폴더
+Save	ScreenshotWindow		저장
+Capture active window	ScreenshotWindow		활성화된 창 갈무리

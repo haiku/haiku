@@ -1,12 +1,12 @@
 1	lithuanian	x-vnd.Be-WORK	3614422175
-Invalid argument: %s\n	Workspaces		Netinkamas argumentas: %s\n
 Quit	Workspaces		Baigti darbą
-Workspaces	System name		Darbalaukiai
+Invalid argument: %s\n	Workspaces		Netinkamas argumentas: %s\n
 Change workspace count…	Workspaces		Keisti darbalaukių skaičių…
-Remove replicant	Workspaces		Pašalinti replikantą
-Show window border	Workspaces		Rodyti lango rėmelį
-Auto-raise	Workspaces		Automatiškai iškelti
 Always on top	Workspaces		Visuomet viršuje
-Live in the Deskbar	Workspaces		Patalpinti pranešimų srityje
+Show window border	Workspaces		Rodyti lango rėmelį
 Show window tab	Workspaces		Rodyti lango antraštę
+Auto-raise	Workspaces		Automatiškai iškelti
+Remove replicant	Workspaces		Pašalinti replikantą
+Live in the Deskbar	Workspaces		Patalpinti pranešimų srityje
 Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Naudojimas: %s [argumentai] [darbalaukis]\nkur „argumentai“ gali būti šie:\n--notitle\t\tpašalinti lango antraštę, paliekant rėmelį ir dydžio keitimo valdiklį\n--noborder\t\tpašalinti lango antraštę, rėmelį, ir dydžio keitimo valdiklį\n--avoidfocus\t\tneleisti langui tapti veikiamuoju\n--alwaysontop\t\tiškelti langą virš kitų\n--notmovable\t\tneleisti lango perkelti\n--autoraise\t\tautomatiškai iškelti langą virš kitų, jeigu jis yra ekrano krašte\n--help\t\tparodyti šį pranešimą ir baigti darbą\n, o „darbalaukis“ – tai darbalaukio, į kurį norite pereiti, eilės numeris (0–31)\n
+Workspaces	System name		Darbalaukiai

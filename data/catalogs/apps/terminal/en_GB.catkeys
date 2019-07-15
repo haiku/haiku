@@ -1,7 +1,7 @@
 1	english (united kingdom)	x-vnd.Haiku-Terminal	1688084772
-OK	Terminal TermWindow		Alright
-Color scheme:	Terminal AppearancePrefView		Colour scheme:
-Unrecognized option \"%s\"\n	Terminal arguments parsing		Unrecognised option \"%s\"\n
 OK	Terminal SetTitleWindow		Alright
-Color:	Terminal AppearancePrefView		Colour:
 OK	Terminal TermApp		Alright
+Unrecognized option \"%s\"\n	Terminal arguments parsing		Unrecognised option \"%s\"\n
+Color scheme:	Terminal AppearancePrefView		Colour scheme:
+Color:	Terminal AppearancePrefView		Colour:
+OK	Terminal TermWindow		Alright

@@ -1,34 +1,34 @@
 1	belarusian	x-vnd.Haiku-Sudoku	2463385585
 Restore snapshot	SudokuWindow		Аднавіць здымак
-Could not set Sudoku:\n%s\n	SudokuWindow		Не ўдалося усталяваць Sudoku:\n%s\n
-Export as…	SudokuWindow		Экспратаваць як…
-OK	SudokuWindow		Так
-New	SudokuWindow		Новы
-Abort	ProgressWindow		Перарваць
-Sudoku	System name		Sudoku
-Could not open \"%s\":\n%s\n	SudokuWindow		Немагчыма адкрыць \"%s\":\n%s\n
-Easy	SudokuWindow		Лёгкі
-Open file…	SudokuWindow		Адкрыць файл…
-Solve single field	SudokuWindow		Вырашыць адно поле
-Solve	SudokuWindow		Вырашыць
-Redo	SudokuWindow		Перарабіць
 File	SudokuWindow		Файл
-Advanced	SudokuWindow		Прасунуты
-Start again	SudokuWindow		Запусціць наноў
-HTML	SudokuWindow		HTML
-Sudoku request	SudokuWindow		Запыт Sudoku
-Copy	SudokuWindow		Капіяваць
-Mark valid hints	SudokuWindow		Пазначыць несапраўдныя падказкі
-Sudoku solved - congratulations!\n	SudokuWindow		Sudoku вырашана - віншуем!\n
+Mark invalid values	SudokuWindow		Пазначыць несапраўдныя значэнні
+Solve single field	SudokuWindow		Вырашыць адно поле
 Hard	SudokuWindow		Цяжкі
-Snapshot current	SudokuWindow		Здымак бягучага
+Start again	SudokuWindow		Запусціць наноў
+New	SudokuWindow		Новы
+Easy	SudokuWindow		Лёгкі
+Undo	SudokuWindow		Адвярнуць
+Export as…	SudokuWindow		Экспратаваць як…
+Quit	SudokuWindow		Выйсці
+Redo	SudokuWindow		Перарабіць
+Could not open \"%s\":\n%s\n	SudokuWindow		Немагчыма адкрыць \"%s\":\n%s\n
+Blank	SudokuWindow		Чысты
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku вырашана - віншуем!\n
 Text	SudokuWindow		Тэкст
+Copy	SudokuWindow		Капіяваць
+Solve	SudokuWindow		Вырашыць
+HTML	SudokuWindow		HTML
+Advanced	SudokuWindow		Прасунуты
+Searching for removable values	SudokuGenerator		Шукаць выдаляемыя значэнні
+Abort	ProgressWindow		Перарваць
+Could not set Sudoku:\n%s\n	SudokuWindow		Не ўдалося усталяваць Sudoku:\n%s\n
+Help	SudokuWindow		Дапамога
+OK	SudokuWindow		Так
+Sudoku	System name		Sudoku
+Progress monitor	ProgressWindow		Паказнік прагрэсу
 Creating solvable field	SudokuGenerator		Стварыць вырашальнае поле
 View	SudokuWindow		Від
-Progress monitor	ProgressWindow		Паказнік прагрэсу
-Mark invalid values	SudokuWindow		Пазначыць несапраўдныя значэнні
-Blank	SudokuWindow		Чысты
-Help	SudokuWindow		Дапамога
-Searching for removable values	SudokuGenerator		Шукаць выдаляемыя значэнні
-Undo	SudokuWindow		Адвярнуць
-Quit	SudokuWindow		Выйсці
+Snapshot current	SudokuWindow		Здымак бягучага
+Mark valid hints	SudokuWindow		Пазначыць несапраўдныя падказкі
+Sudoku request	SudokuWindow		Запыт Sudoku
+Open file…	SudokuWindow		Адкрыць файл…

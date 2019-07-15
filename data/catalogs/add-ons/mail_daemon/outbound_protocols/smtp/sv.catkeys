@@ -1,14 +1,14 @@
 1	swedish	x-vnd.Haiku-SMTP	815985329
-SMTP server:	ConfigView		SMTP server:
-Error while logging in to %serv	smtp		Fel vid inloggning till %serv
-Unencrypted	ConfigView		Okrypterad
-. The server says:\n	smtp		. Servern säger:\n
-ESMTP	ConfigView		ESMTP
-Connecting to server…	smtp		Ansluter till server...
-Error while opening connection to %serv	smtp		Fel vid anslutning till %serv
 POP3 authentication failed. The server said:\n	smtp		POP3 verifiering misslyckades. Servern sa:\n
 Destination:	ConfigView		Mål:
+Error while logging in to %serv	smtp		Fel vid inloggning till %serv
+Connecting to server…	smtp		Ansluter till server...
+Unencrypted	ConfigView		Okrypterad
+. The server says:\n	smtp		. Servern säger:\n
+Error while opening connection to %serv	smtp		Fel vid anslutning till %serv
+. The server said:\n	smtp		. Servern sa:\n
 None	ConfigView		Ingen
+SMTP server:	ConfigView		SMTP server:
+ESMTP	ConfigView		ESMTP
 POP3 before SMTP	ConfigView		POP3 före SMTP
 SSL	ConfigView		SSL
-. The server said:\n	smtp		. Servern sa:\n

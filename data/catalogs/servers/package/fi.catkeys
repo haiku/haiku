@@ -1,16 +1,16 @@
 1	finnish	x-vnd.haiku-package_daemon	1440586681
-Package problems	PackageProblem	Window title	Pakkauspulmat
 Package changes	PackageResult	Window title	Pakkausmuutokset
 uninstall package %s\n	PackageResult	Don't change '%s' variable	poista pakkauksen %s asennus\n
-install package %s from repository %s\n	PackageResult	Don't change '%s' variables	asenna pakkaus %s tietovarastosta %s\n
-Apply changes	PackageResult		Toteuta muutokset
-solution %d:	PackageProblem	Don't change the %d variable	ratkaisu %d:
-Warning	PackageManager		Varoitus
-Retry	PackageProblem		Toista
-The following additional package changes have to be made:	PackageResult		Tehdään seuraavat lisäpakkausmuutokset:
 ignore problem for now	PackageProblem		ohita pulma toistaiseksi
+solution %d:	PackageProblem	Don't change the %d variable	ratkaisu %d:
+The following problems have been encountered. Please select a solution for each:	PackageProblem		Kohdattiin seuraavat pulmat. Valitse jokaiselle ratkaisu:
+Apply changes	PackageResult		Toteuta muutokset
+Package daemon	PackageManager		Pakkaustaustaohjelma
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	asenna pakkaus %s tietovarastosta %s\n
+The following additional package changes have to be made:	PackageResult		Tehdään seuraavat lisäpakkausmuutokset:
+Warning	PackageManager		Varoitus
 Cancel	PackageProblem		Peru
 don't activate package %source%	PackageProblem	don't change '%source%	älä aktivoi pakkausta %source%
-The following problems have been encountered. Please select a solution for each:	PackageProblem		Kohdattiin seuraavat pulmat. Valitse jokaiselle ratkaisu:
-Package daemon	PackageManager		Pakkaustaustaohjelma
 Cancel	PackageResult		Peru
+Retry	PackageProblem		Toista
+Package problems	PackageProblem	Window title	Pakkauspulmat

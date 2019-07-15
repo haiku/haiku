@@ -1,53 +1,53 @@
 1	japanese	x-vnd.Haiku-Network	1314732966
-Static	IntefaceAddressView		固定 IP
+Ethernet device	InterfaceListItem		イーサネットデバイス
+Link speed:	IntefaceView		リンクスピード:
+disconnected	IntefaceView		切断済み
+IP Address:	IntefaceAddressView		IP アドレス:
+WPA	WPA protected network		WPA
+Network:	IntefaceView		ネットワーク:
+Received:	IntefaceView		受信:
+New…	NetworkWindow		新規…
+no link	InterfaceListItem		リンク切れ
+Other	NetworkWindow		その他
+Sent:	IntefaceView		送信:
+Gateway:	IntefaceAddressView		ゲートウェイ:
+The netmask defines your local network	IntefaceAddressView		ネットマスクはローカルネットワークを定義します
+Your IP address	IntefaceAddressView		このコンピューターの IP アドレス
+DHCP	IntefaceAddressView		DHCP
+Dial Up	NetworkWindow		ダイアルアップ
+Netmask:	IntefaceAddressView		ネットマスク:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		サービス
-no link	InterfaceListItem		リンク切れ
-WPA2	WPA2 protected network		ネットマスクはローカルネットワークを定義します
-Choose automatically	IntefaceView		自動選択
-connected	IntefaceView		接続済み
-Ethernet device	InterfaceListItem		イーサネットデバイス
-The netmask defines your local network	IntefaceAddressView		ネットマスクはローカルネットワークを定義します
-Dial-up connection	InterfaceListItem		ダイアルアップ接続
-%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
-Network	NetworkWindow		ネットワーク
-VPN connection	InterfaceListItem		VPN 接続
-Show network status in Deskbar	NetworkWindow		Deskbar にネットワークの状況を表示する
-The method for obtaining an IP address	IntefaceAddressView		IP アドレスの取得方法
-connected	InterfaceListItem		接続済み
-disabled	InterfaceListItem		無効
-Dial Up	NetworkWindow		ダイアルアップ
-Apply	IntefaceAddressView		適用
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		ネットワーク状況の Deskbar へのインストールに失敗しました: %s
+Revert	NetworkWindow		元に戻す
+WEP	WEP protected network		WEP
+<no wireless networks found>	IntefaceView		<無線ネットワークが見つかりません>
+connected	IntefaceView		接続済み
+VPN	NetworkWindow		VPN
+Apply	IntefaceAddressView		適用
+Disable	ServiceView		無効
+WPA2	WPA2 protected network		ネットマスクはローカルネットワークを定義します
+Show network status in Deskbar	NetworkWindow		Deskbar にネットワークの状況を表示する
+Mode:	IntefaceAddressView		モード:
+connected	InterfaceListItem		接続済み
+Static	IntefaceAddressView		固定 IP
+launch error	NetworkWindow		その他
+Renegotiate	IntefaceView		再ネゴシエート
 MAC address:	IntefaceView		MAC アドレス:
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+disabled	InterfaceListItem		無効
+Dial-up connection	InterfaceListItem		ダイアルアップ接続
+The method for obtaining an IP address	IntefaceAddressView		IP アドレスの取得方法
+Automatic	IntefaceAddressView		自動
+Choose automatically	IntefaceView		自動選択
+Status:	IntefaceView		状態:
+Disable	IntefaceView		無効
+Manage…	NetworkWindow		管理…
+open	Open network		開く
+Network	NetworkWindow		ネットワーク
+Your gateway to the internet	IntefaceAddressView		インターネットへのゲートウェイ
+Enable	ServiceView		有効
+Ok	NetworkWindow		Ok
 Wireless device	InterfaceListItem		無線デバイス
 Disabled	IntefaceAddressView		無効
-Renegotiate	IntefaceView		再ネゴシエート
-Ok	NetworkWindow		Ok
-Network:	IntefaceView		ネットワーク:
-launch error	NetworkWindow		その他
-Other	NetworkWindow		その他
-Automatic	IntefaceAddressView		自動
-Gateway:	IntefaceAddressView		ゲートウェイ:
-Revert	NetworkWindow		元に戻す
-Enable	ServiceView		有効
-disconnected	IntefaceView		切断済み
-Status:	IntefaceView		状態:
-Link speed:	IntefaceView		リンクスピード:
-Your gateway to the internet	IntefaceAddressView		インターネットへのゲートウェイ
-New…	NetworkWindow		新規…
-DHCP	IntefaceAddressView		DHCP
-Mode:	IntefaceAddressView		モード:
-WPA	WPA protected network		WPA
-Sent:	IntefaceView		送信:
-open	Open network		開く
-IP Address:	IntefaceAddressView		IP アドレス:
-VPN	NetworkWindow		VPN
-Received:	IntefaceView		受信:
-Disable	IntefaceView		無効
-<no wireless networks found>	IntefaceView		<無線ネットワークが見つかりません>
-Netmask:	IntefaceAddressView		ネットマスク:
-Disable	ServiceView		無効
-Your IP address	IntefaceAddressView		このコンピューターの IP アドレス
-Manage…	NetworkWindow		管理…
-WEP	WEP protected network		WEP
+VPN connection	InterfaceListItem		VPN 接続

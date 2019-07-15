@@ -1,83 +1,86 @@
-1	indonesian	x-vnd.Haiku-Devices	525009626
-Manufacturer	DeviceSCSI		Pabrikan
-Order by:	DevicesView		Urutkan berdasarkan:
-ACPI controller	Device		Pengontrol ACPI
-Memory controller	Device		Pengendali memori
-Driver used	DevicePCI		Driver yang digunakan
-CD-ROM	DeviceSCSI		CD-ROM
-ISA bus	Device		Bus ISA
-ACPI bus	Device		Bus ACPI
-ISA bus	DevicesView		Bus ISA
-Docking station	Device		Stasiun perkaitan
-Computer	Device		Komputer
-Unknown device	Device		Perangkat tak dikenal
-Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Info Kelas:\t\t\t\t: %classInfo%
-Processor	DeviceSCSI		Prosesor
-RBC	DeviceSCSI		RBC
-Detailed	DevicesView		Terperinci
-Category	DevicesView		Kategori
-Quit	DevicesView		Berhenti
-Device paths	Device		Jalur perangkat
-Scanner	DeviceSCSI		Pemindai
-Printer	DeviceSCSI		Pencetak
-Processor	Device		Prosesor
-Optical Drive	DeviceSCSI		Drive Optik
-ACPI Processor Namespace '%2'	DeviceACPI		Namespace Prosesor ACPI '%2'
-Bridge	DeviceSCSI		Jembatan
-unknown	Device		tidak diketahui
-ACPI Information	DeviceACPI		Informasi ACPI
-Generic system peripheral	Device		Periferal sistem generik
-Not implemented	DevicePCI		Tidak diimplementasikan
-Disk Drive	DeviceSCSI		Disk Drive
-Not implemented	DeviceACPI		Tidak diimplementasikan
-Device name	DevicePCI		Nama perangkat
-Display controller	Device		Pengontrol display
-Mass storage controller	Device		Pengontrol penyimpanan massal
-Input device controller	Device		Pengontrol perangkat input
-Network controller	Device		Pengontrol jaringan
-Device class	DeviceSCSI		Kelas perangkat
-Device name	DeviceACPI		Nama perangkat
-Driver used	Device		Driver yang digunakan
-Other	DeviceSCSI		Lain
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Nama Perangkat\t\t\t\t: %Name%\nPabrikan\t\t\t: %Manufacturer%\nDriver digunakan\t\t\t\t: %DriverUsed%\nJalur perangkat\t: %DevicePaths%
-ACPI Thermal Zone	DeviceACPI		Zona Suhu ACPI
-Communications	DeviceSCSI		Komunikasi
-Bus	DevicesView		Bus
-Communication controller	Device		Pengontrol komunikasi
-Manufacturer	DeviceACPI		Pabrikan
-PCI bus	Device		Bus PCI
-ACPI System Indicator	DeviceACPI		Indikator Sistem ACPI
-None	Device		Tak satupun
-PCI bus	DevicesView		Bus PCI
-Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Info Kelas:\t\t\t\t: %classInfo%
-Basic information	DevicesView		Informasi dasar
-PCI Information	DevicePCI		Infomasi PCI
-Manufacturer:	Device		Pabrikan:
+1	indonesian	x-vnd.Haiku-Devices	691869921
 ACPI bus	DevicesView		Bus ACPI
-Devices	System name		Perangkat
-Multimedia controller	Device		Pengontrol multimedia
-Unknown	DevicePCI		Tidak diketahui
-Device name:	Device		Nama perangkat:
-Computer	DevicesView		Komputer
-Value	PropertyList		Nilai
-Report compatibility	DevicesView		Laporkan kompatibilitas
-Device	Device		Perangkat
-Wireless controller	Device		Pengontrol nirkabel
-Device name	Device		Nama perangkat
-Manufacturer	Device		Pabrikan
-Name	PropertyList		Nama
-Manufacturer	DevicePCI		Pabrikan
-Intelligent controller	Device		Pengontrol cerdas
-Satellite communications controller	Device		Pengontrol komunikasi satelit
-SCSI Information	DeviceSCSI		Informasi SCSI
-Enclosure	DeviceSCSI		Enklosur
-Bridge	Device		Jembatan
-Refresh devices	DevicesView		Segarkan perangkat
-Unknown device	DevicesView		Perangkat tak dikenal
-Graphics Peripheral	DeviceSCSI		Perangkat Grafis
 Bus Information	Device		Informasi Bus
-Connection	DevicesView		Koneksi
-Device name	DeviceSCSI		Nama perangkat
-Card Reader	DeviceSCSI		Pembaca kartu
+Devices	System name		Perangkat
+Graphics Peripheral	DeviceSCSI		Perangkat Grafis
+Processor	Device		Prosesor
 Class info	DevicePCI		Info kelas
+ACPI Information	DeviceACPI		Informasi ACPI
+Detailed	DevicesView		Terperinci
+Computer	DevicesView		Komputer
+Communications	DeviceSCSI		Komunikasi
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Info Kelas:\t\t\t\t: %classInfo%
+Mass storage controller	Device		Pengontrol penyimpanan massal
+Connection	DevicesView		Koneksi
+Printer	DeviceSCSI		Pencetak
+ACPI Processor Namespace '%2'	DeviceACPI		Namespace Prosesor ACPI '%2'
+SCSI Information	DeviceSCSI		Informasi SCSI
+Manufacturer	Device		Pabrikan
+Device name:	Device		Nama perangkat:
+Scanner	DeviceSCSI		Pemindai
+Memory controller	Device		Pengendali memori
+Unknown device	DevicesView		Perangkat tak dikenal
+Unknown	DevicePCI		Tidak diketahui
+ACPI node '%1'	DeviceACPI		Titik ACPI '%1'
+Optical Drive	DeviceSCSI		Drive Optik
+Name	PropertyList		Nama
+Manufacturer	DeviceSCSI		Pabrikan
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Nama Perangkat\t\t\t\t: %Name%\nPabrikan\t\t\t: %Manufacturer%\nDriver digunakan\t\t\t\t: %DriverUsed%\nJalur perangkat\t: %DevicePaths%
+Device name	Device		Nama perangkat
+Satellite communications controller	Device		Pengontrol komunikasi satelit
+Device class	DeviceSCSI		Kelas perangkat
+Device	Device		Perangkat
+Input device controller	Device		Pengontrol perangkat input
+PCI bus	DevicesView		Bus PCI
+ACPI System Indicator	DeviceACPI		Indikator Sistem ACPI
+ACPI System Bus	DeviceACPI		Sistem Bus ACPI
+PCI Information	DevicePCI		Infomasi PCI
+Changer	DeviceSCSI		Pengalih
+Serial bus controller	Device		Pengontrol serial bus
+Refresh devices	DevicesView		Segarkan perangkat
+Category	DevicesView		Kategori
+RBC	DeviceSCSI		RBC
+None	Device		Tak satupun
+Device paths	Device		Jalur perangkat
+Unknown device	Device		Perangkat tak dikenal
+Wireless controller	Device		Pengontrol nirkabel
+Generic system peripheral	Device		Periferal sistem generik
+Value	PropertyList		Nilai
 Devices	DevicesView		Perangkat
+Device name	DeviceACPI		Nama perangkat
+Card Reader	DeviceSCSI		Pembaca kartu
+Display controller	Device		Pengontrol display
+Basic information	DevicesView		Informasi dasar
+Bus	DevicesView		Bus
+Device name	DevicePCI		Nama perangkat
+Disk Drive	DeviceSCSI		Disk Drive
+Other	DeviceSCSI		Lain
+Report compatibility	DevicesView		Laporkan kompatibilitas
+Computer	Device		Komputer
+PCI bus	Device		Bus PCI
+Enclosure	DeviceSCSI		Enklosur
+Order by:	DevicesView		Urutkan berdasarkan:
+ACPI Thermal Zone	DeviceACPI		Zona Suhu ACPI
+Intelligent controller	Device		Pengontrol cerdas
+Multimedia controller	Device		Pengontrol multimedia
+Quit	DevicesView		Berhenti
+ISA bus	Device		Bus ISA
+ISA bus	DevicesView		Bus ISA
+Processor	DeviceSCSI		Prosesor
+Manufacturer:	Device		Pabrikan:
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Info Kelas:\t\t\t\t: %classInfo%
+Bridge	Device		Jembatan
+Worm	DeviceSCSI		Cacing
+CD-ROM	DeviceSCSI		CD-ROM
+Manufacturer	DevicePCI		Pabrikan
+Bridge	DeviceSCSI		Jembatan
+Signal processing controller	Device		Pengontrol pemroses sinyal
+Device name	DeviceSCSI		Nama perangkat
+Docking station	Device		Stasiun perkaitan
+Array	DeviceSCSI		Susunan
+ACPI controller	Device		Pengontrol ACPI
+Network controller	Device		Pengontrol jaringan
+Driver used	Device		Driver yang digunakan
+Communication controller	Device		Pengontrol komunikasi
+ACPI bus	Device		Bus ACPI
+unknown	Device		tidak diketahui

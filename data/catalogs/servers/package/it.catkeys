@@ -1,16 +1,16 @@
 1	italian	x-vnd.haiku-package_daemon	1440586681
-Package problems	PackageProblem	Window title	Problemi al pacchetto
 Package changes	PackageResult	Window title	Cambiamenti al pacchetto
 uninstall package %s\n	PackageResult	Don't change '%s' variable	disinstalla pacchetto %s\n
-install package %s from repository %s\n	PackageResult	Don't change '%s' variables	installa pacchetto %s dal repository %s\n
-Apply changes	PackageResult		Applica cambiamenti
-solution %d:	PackageProblem	Don't change the %d variable	soluzione %d:
-Warning	PackageManager		Attenzione
-Retry	PackageProblem		Riprova
-The following additional package changes have to be made:	PackageResult		I seguenti cambiamenti supplementari al pacchetto sono stati compiuti:
 ignore problem for now	PackageProblem		ignora il problema per adesso
+solution %d:	PackageProblem	Don't change the %d variable	soluzione %d:
+The following problems have been encountered. Please select a solution for each:	PackageProblem		I seguenti problemi sono stati riscontrati. Per favore, scegli una soluzione per ognuno di essi:
+Apply changes	PackageResult		Applica cambiamenti
+Package daemon	PackageManager		Server dei pacchetti
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	installa pacchetto %s dal repository %s\n
+The following additional package changes have to be made:	PackageResult		I seguenti cambiamenti supplementari al pacchetto sono stati compiuti:
+Warning	PackageManager		Attenzione
 Cancel	PackageProblem		Annulla
 don't activate package %source%	PackageProblem	don't change '%source%	non attivare il pacchetto %source%
-The following problems have been encountered. Please select a solution for each:	PackageProblem		I seguenti problemi sono stati riscontrati. Per favore, scegli una soluzione per ognuno di essi:
-Package daemon	PackageManager		Server dei pacchetti
 Cancel	PackageResult		Cancella
+Retry	PackageProblem		Riprova
+Package problems	PackageProblem	Window title	Problemi al pacchetto

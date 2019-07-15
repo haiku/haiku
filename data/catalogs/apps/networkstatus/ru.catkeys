@@ -1,22 +1,21 @@
-1	russian	x-vnd.Haiku-NetworkStatus	1729819859
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		NetworkStatus опции:\n\t--deskbar\tавтоматически добавить репликант в Deskbar\n\t--help\t\tвывести этот текст и выйти\n
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Вы можете запустить состояние сети в окне или установить его в Deskbar.
-<no wireless networks found>	NetworkStatusView		<беспроводные сети не обнаружены>
-Run in window	NetworkStatus		Запустить в окне
-No link	NetworkStatusView		Нет соединения
-Install in Deskbar	NetworkStatus		Установить в Deskbar
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		Не удалось запустить утилиту настройки сети.\n\nОшибка: 
+1	russian	x-vnd.Haiku-NetworkStatus	3823341665
 Netmask	NetworkStatusView		Маска подсети
-Broadcast	NetworkStatusView		Широковещательный
-Unknown	NetworkStatusView		Неизвестно
-Network Status	NetworkStatusView		Статус сети
-Ready	NetworkStatusView		Подключен
-No stateful configuration	NetworkStatusView		Нет полноценной конфигурации
-%ifaceName information:\n	NetworkStatusView		Информация о %ifaceName:\n
-Configuring	NetworkStatusView		Настраивается
-Address	NetworkStatusView		IP адрес
-OK	NetworkStatusView		ОК
-NetworkStatus	System name		Статус сети
-Open network preferences…	NetworkStatusView		Открыть настройки сети…
-Could not join wireless network:\n	NetworkStatusView		Не удалось подключиться к беспроводной сети:\n
 Quit	NetworkStatusView		Выход
+Unknown	NetworkStatusView		Неизвестно
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Не удалось запустить утилиту настройки сети.\n\nОшибка: 
+Install in Deskbar	NetworkStatus		Установить в Deskbar
+Open network preferences…	NetworkStatusView		Открыть настройки сети…
+NetworkStatus	System name		Статус сети
+OK	NetworkStatusView		ОК
+No link	NetworkStatusView		Нет соединения
+Could not join wireless network:\n	NetworkStatusView		Не удалось подключиться к беспроводной сети:\n
+Ready	NetworkStatusView		Подключен
+Network Status	NetworkStatusView		Статус сети
+Address	NetworkStatusView		IP адрес
+No stateful configuration	NetworkStatusView		Нет полноценной конфигурации
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Вы можете запустить состояние сети в окне или установить его в Deskbar.
+Broadcast	NetworkStatusView		Широковещательный
+%ifaceName information:\n	NetworkStatusView		Информация о %ifaceName:\n
+Run in window	NetworkStatus		Запустить в окне
+<no wireless networks found>	NetworkStatusView		<беспроводные сети не обнаружены>
+Configuring	NetworkStatusView		Настраивается

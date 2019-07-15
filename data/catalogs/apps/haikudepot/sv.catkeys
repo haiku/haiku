@@ -1,150 +1,130 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	3764618272
-Name	PackageListView		Namn
-Available packages	MainWindow		Tillgängliga paket
-Open %DeskbarLink%	PackageManager		Öppna %DeskbarLink%
-OK	MainWindow		OK
-Close	RatePackageWindow		Stäng
-The captcha puzzle needs to be solved.	UserLoginWindow		Captcha pusslet behöver lösas.
-Changelog	PackageInfoView		Ändringslogg
-Your rating:	RatePackageWindow		Dina betyg:
-The passwords do not match.	UserLoginWindow		Lösenorden stämmer inte överens.
-Log in…	MainWindow		Logga in...
-Rate %Package%	RatePackageWindow		Betyg %Package%
-Stability:	RatePackageWindow		Stabilitet:
-Click a package to view information	PackageInfoView		Klicka på ett paket för att se information
-Other users can see this rating	RatePackageWindow		Andra användare kan se denna bedömning
-Stability	RatePackageWindow		Stabilitet
-No changelog available.	PackageInfoView		Ingen ändringslogg finns.
-Description	PackageListView		Beskrivning
-Install	PackageManager		Installera
-All repositories	MainWindow		Alla repositorier
-Source packages	MainWindow		Källkodspaket
-Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Autentisering misslyckades. Användaren finns inte eller så är fel lösenord angivet.
-Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Kontot lyckades skapas. Du kan nu betygsätta paket och göra andra vettiga saker.
-Tools	MainWindow		Verktyg
-HaikuDepot	System name		HaikuDepot
-Close	UserLoginWindow		Stäng
-Rate package…	PackageInfoView		Betygsätt paket...
-Category	FilterView		Kategori
-Uninstall	PackageManager		Avinstallera
-An error occurred while obtaining the package list: %message%	MainWindow		Ett fel inträffade när packet manager hämtade paketlistan: %message%
-<no info>	PackageInfoView		<Ingen information>
-Starting the package daemon failed:\n\n%Error%	App		Starta package daemon misslyckades:\n\n%Error%
-An error occurred while initializing the package manager: %message%	MainWindow		Ett fel inträffade när packet manager startade: %message%
-Email address:	UserLoginWindow		E-postadress:
-Very unstable	RatePackageWindow		Mycket ostabil
-<Package contents not available for remote packages>	PackageContentsView		<Paketinehållet är inte tillgängligt för externa paket>
-The username is already taken. Please choose another.	UserLoginWindow		Användarnamnet används redan. Välj ett annat.
-Close	PackageManager		Stäng
-Not logged in	MainWindow		Inte inloggad
-The authentication was successful.	UserLoginWindow		Behörighetskontrollen lyckades.
-Installed packages	MainWindow		Installerade paket
-Status	PackageListView		Status
-Switch account…	MainWindow		Byt konto...
-Ignore	UserLoginWindow		Ignorera
-Your rating was updated.	RatePackageWindow		Ditt betyg ändrades.
-Language	UserLoginWindow		Språk
-The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Lösenordet är för svagt eller inte rätt. Varvänlig och använd minst 8 tecken med minst 2 nummer och 2 stora bokstäver.
-Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Ditt betyg har laddats upp. Du kan uppdatera eller ta bort det på webbplatsen för HaikuDepot-servern.
-Show only featured packages	FilterView		Visa bara framhävda paket
-Rate package	RatePackageWindow		Betygsatt paket
-Development	Model		Utveckling
-Fatal error	PackageManager		Allvarligt fel
-The user name needs to be at least 3 letters long.	UserLoginWindow		användarnamnet måste vara minst 3 bokstäver långt.
-Log in	UserLoginWindow		Logga in
-Repeat pass phrase:	UserLoginWindow		Upprepa lösenord:
-Ratings	PackageInfoView		Betyg
-But none could be listed here, sorry.	UserLoginWindow		Ursäkta, Men ingen kunde listas här.
-System & Utilities	Model		System & Verktyg
-Inactive	PackageListView		Inaktiv
-The package action could not be scheduled: %Error%	PackageInfoView		Paket körningen kunde inte planeras: %Error%
-Science & Mathematics	Model		Vetenskap & Matematik
-(%Votes%)	PackageInfoView		(%Votes%)
-You have not solved the captcha puzzle correctly.	UserLoginWindow		Du har inte löst captcha pusslet rätt.
-Success	UserLoginWindow		Klar
-HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Servicen behövs för HaikuDepot och den verkar inte köra.\nSkulle du vilja starta den nu?
-Downloading:	PackageInfoView		Mestadels stabil
-Mostly stable	RatePackageWindow		Mestadels stabil
-Log out	MainWindow		Logga ut
-Repository	PackageListView		Repositorie
-Education	Model		Utbildning
-This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Det här paketet verkar inte finnas på HaikuDepot-servern, så det är inte möjligt att skapa ett nytt betyg eller redigera ett befintligt betyg.
-Search terms:	FilterView		Sökvillkor
-%Version%	PackageInfoView		%Version%
-No user ratings available.	PackageInfoView		Ingen betygsättnings tillgänglig.
-Does not start	RatePackageWindow		Starta inte
-An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Ett fel inträffade när repositoriet uppdaterades: %error% (%details%)
-There are problems in the form:\n\n	UserLoginWindow		Det finns problem i formuläret:\n\n
-Create account	UserLoginWindow		Skapa konto
-Productivity	Model		Produktivitet
-No, quit HaikuDepot	App		Nej, avsluta HaikuDepot
-Authentication failed	UserLoginWindow		Autentisering misslyckades
-Logged in as %User%	MainWindow		Inloggad som %User%
-9999.99 KiB	PackageListView		9999.99 KiB
-Language	RatePackageWindow		Språk
-User rating	RatePackageWindow		Användarbetyg
-Size	PackageListView		Storlek
-You need to be logged into an account before you can rate packages.	MainWindow		Du måste logga in för att kunna betygsätta paket.
-User name:	UserLoginWindow		Användarnamn:
-Unstable but usable	RatePackageWindow		Ostabil men kan användas
-The email address appears to be malformed.	UserLoginWindow		E-post adressen är fel formulerat.
-Games	Model		Spel
-Rating	PackageListView		Betyg
-(%Votes%)	FeaturedPackagesView		(%Votes%)
-There was a puzzling response from the web service.	UserLoginWindow		Det komm ett konstigt meddelande från webb servicen.
-Graphics	Model		Grafik
-Local	MainWindow		Lokal
-Close	MainWindow		Stäng
-Preferred language:	UserLoginWindow		Föredraget språk:
-Internet & Network	Model		Internet & Nätverk
-Refresh repositories	MainWindow		Ladda om repositorier
-Cancel	MainWindow		Avbryt
-Quit HaikuDepot	App		Avsluta HaikuDepot
-Input validation	UserLoginWindow		Ogiltigt indata
-Update	RatePackageWindow		Uppdatera
-Video	Model		Video
-All categories	FilterView		Alla kategorier
-Contents	PackageInfoView		Innehåll
-An error occurred while refreshing the repository: %error%	MainWindow		Ett fel inträffade när repositoriet uppdaterades: %error%
-Try again	App		Försök igen
-Login or Create account	MainWindow		Logga in eller skapa konto
-Pending…	PackageListView		Väntar...
-{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# enhet} other{# enheter}}
-OK	PackageInfoView		OK
-Package daemon problem	App		Problem med paketdemonen
-Uninstalled	PackageListView		Avinstallera
-Show	MainWindow		Visa
-Stable	RatePackageWindow		Stabil
-Unknown	PackageListView		Okänd
-Comment language:	RatePackageWindow		Kommentarspråk:
-Pass phrase:	UserLoginWindow		Lösen fras:
-Screenshot	ScreenshotWindow		Skärmdump
-Not specified	RatePackageWindow		Inte angivet
-Available	PackageListView		Tillgänglig
-Develop packages	MainWindow		Utvecklingspaket
-%hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (version %hd.version%)
-n/a	PackageInfoView		oviktigt
-If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Om du inte anger en e-mail adress, kommer du inte kunna återställa ditt lösenord om du glömmer det.
- It responded with: 	UserLoginWindow		 Den svarade med: 
-Authentication failed. Connection to the service failed.	UserLoginWindow		Autentiseringen misslyckades. Koppling till servicen misslyckades.
-Cancel	RatePackageWindow		Avbryt
-Package action failed	PackageInfoView		Paketåtgärden misslyckades
-OK	UserLoginWindow		OK
-Send	RatePackageWindow		Skicka
-Repositories	MainWindow		Repositorier
--	no package size		-
-Category:	FilterView		Kategori:
-Failed to create account	UserLoginWindow		Misslyckades skapa konto
+1	swedish	x-vnd.Haiku-HaikuDepot	2728680786
 Check for updates…	MainWindow		Leta efter uppdateringar…
+Uninstall	PackageManager		Avinstallera
+(%Votes%)	FeaturedPackagesView		(%Votes%)
+Uninstalled	PackageListView		Avinstallera
+Available packages	MainWindow		Tillgängliga paket
+Create account	UserLoginWindow		Skapa konto
+Mostly stable	RatePackageWindow		Mestadels stabil
+Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Kontot lyckades skapas. Du kan nu betygsätta paket och göra andra vettiga saker.
+Rate package…	PackageInfoView		Betygsätt paket...
+Develop packages	MainWindow		Utvecklingspaket
+Starting the package daemon failed:\n\n%Error%	App		Starta package daemon misslyckades:\n\n%Error%
+<no info>	PackageInfoView		<Ingen information>
+No user ratings available.	PackageInfoView		Ingen betygsättnings tillgänglig.
+The user name needs to be at least 3 letters long.	UserLoginWindow		användarnamnet måste vara minst 3 bokstäver långt.
+Failed to create account	UserLoginWindow		Misslyckades skapa konto
+Ignore	UserLoginWindow		Ignorera
+Rating	PackageListView		Betyg
+Show	MainWindow		Visa
+Does not start	RatePackageWindow		Starta inte
+But none could be listed here, sorry.	UserLoginWindow		Ursäkta, Men ingen kunde listas här.
 There are problems with the data you entered:\n\n	UserLoginWindow		Det är något problem med data du skrev:\n\n
-Start package daemon	App		Starta paket-servicen
-Manage repositories…	MainWindow		Hantera repositorier...
-Business	Model		Företag
-Audio	Model		Ljud
+The authentication was successful.	UserLoginWindow		Behörighetskontrollen lyckades.
+Not specified	RatePackageWindow		Inte angivet
+Unstable but usable	RatePackageWindow		Ostabil men kan användas
+Active	PackageListView		Aktiv
+Login or Create account	MainWindow		Logga in eller skapa konto
+<Package contents not available for remote packages>	PackageContentsView		<Paketinehållet är inte tillgängligt för externa paket>
+Ratings	PackageInfoView		Betyg
+Switch account…	MainWindow		Byt konto...
+Preferred language:	UserLoginWindow		Föredraget språk:
+It was not possible to contact the web service.	UserLoginWindow		Det gick inte att kontakta webb servicen.
+Name	PackageListView		Namn
+Rate %Package%	RatePackageWindow		Betyg %Package%
+Quit HaikuDepot	App		Avsluta HaikuDepot
+Category	FilterView		Kategori
+Installed packages	MainWindow		Installerade paket
+User rating	RatePackageWindow		Användarbetyg
+Other users can see this rating	RatePackageWindow		Andra användare kan se denna bedömning
+Stable	RatePackageWindow		Stabil
+Fatal error	PackageManager		Allvarligt fel
+Package action failed	PackageInfoView		Paketåtgärden misslyckades
+No changelog available.	PackageInfoView		Ingen ändringslogg finns.
+There are problems in the form:\n\n	UserLoginWindow		Det finns problem i formuläret:\n\n
+There was a puzzling response from the web service.	UserLoginWindow		Det komm ett konstigt meddelande från webb servicen.
+Not logged in	MainWindow		Inte inloggad
+No, quit HaikuDepot	App		Nej, avsluta HaikuDepot
+Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Ditt betyg har laddats upp. Du kan uppdatera eller ta bort det på webbplatsen för HaikuDepot-servern.
+Available	PackageListView		Tillgänglig
+Cancel	UserLoginWindow		Avbryt
+HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Servicen behövs för HaikuDepot och den verkar inte köra.\nSkulle du vilja starta den nu?
+Click a package to view information	PackageInfoView		Klicka på ett paket för att se information
+Contents	PackageInfoView		Innehåll
+Close	PackageManager		Stäng
+Changelog	PackageInfoView		Ändringslogg
 Rating not possible	MainWindow		Betyg ej möjligt
 About	PackageInfoView		Om
-Active	PackageListView		Aktiv
-It was not possible to contact the web service.	UserLoginWindow		Det gick inte att kontakta webb servicen.
-Refreshing...	MainWindow		Uppdaterar...
+Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Autentisering misslyckades. Användaren finns inte eller så är fel lösenord angivet.
+Very unstable	RatePackageWindow		Mycket ostabil
+Stability	RatePackageWindow		Stabilitet
+Send	RatePackageWindow		Skicka
+Start package daemon	App		Starta paket-servicen
+The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Lösenordet är för svagt eller inte rätt. Varvänlig och använd minst 8 tecken med minst 2 nummer och 2 stora bokstäver.
+The package action could not be scheduled: %Error%	PackageInfoView		Paket körningen kunde inte planeras: %Error%
+Inactive	PackageListView		Inaktiv
+Cancel	RatePackageWindow		Avbryt
+OK	MainWindow		OK
+{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# enhet} other{# enheter}}
+OK	PackageInfoView		OK
+Downloading:	PackageInfoView		Mestadels stabil
+Success	UserLoginWindow		Klar
+Package daemon problem	App		Problem med paketdemonen
+(%Votes%)	PackageInfoView		(%Votes%)
+Repository	PackageListView		Repositorie
+%hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (version %hd.version%)
+Close	UserLoginWindow		Stäng
+Close	RatePackageWindow		Stäng
 Failed to create account: %s\n	UserLoginWindow		Misslyckades skapa konto: %s\n
-Cancel	UserLoginWindow		Avbryt
+Size	PackageListView		Storlek
+Your rating:	RatePackageWindow		Dina betyg:
+All categories	FilterView		Alla kategorier
+Your rating was updated.	RatePackageWindow		Ditt betyg ändrades.
+n/a	PackageInfoView		oviktigt
+Repositories	MainWindow		Repositorier
+Cancel	MainWindow		Avbryt
+Refresh repositories	MainWindow		Ladda om repositorier
+If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Om du inte anger en e-mail adress, kommer du inte kunna återställa ditt lösenord om du glömmer det.
+Tools	MainWindow		Verktyg
+The passwords do not match.	UserLoginWindow		Lösenorden stämmer inte överens.
+This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Det här paketet verkar inte finnas på HaikuDepot-servern, så det är inte möjligt att skapa ett nytt betyg eller redigera ett befintligt betyg.
+Language	RatePackageWindow		Språk
+Authentication failed. Connection to the service failed.	UserLoginWindow		Autentiseringen misslyckades. Koppling till servicen misslyckades.
+Log out	MainWindow		Logga ut
+Comment language:	RatePackageWindow		Kommentarspråk:
+Status	PackageListView		Status
+The username is already taken. Please choose another.	UserLoginWindow		Användarnamnet används redan. Välj ett annat.
+Update	RatePackageWindow		Uppdatera
+Language	UserLoginWindow		Språk
+OK	UserLoginWindow		OK
+Stability:	RatePackageWindow		Stabilitet:
+The captcha puzzle needs to be solved.	UserLoginWindow		Captcha pusslet behöver lösas.
+Source packages	MainWindow		Källkodspaket
+-	no package size		-
+User name:	UserLoginWindow		Användarnamn:
+Try again	App		Försök igen
+Rate package	RatePackageWindow		Betygsatt paket
+The email address appears to be malformed.	UserLoginWindow		E-post adressen är fel formulerat.
+You have not solved the captcha puzzle correctly.	UserLoginWindow		Du har inte löst captcha pusslet rätt.
+Unknown	PackageListView		Okänd
+Log in	UserLoginWindow		Logga in
+Logged in as %User%	MainWindow		Inloggad som %User%
+Email address:	UserLoginWindow		E-postadress:
+Screenshot	ScreenshotWindow		Skärmdump
+HaikuDepot	System name		HaikuDepot
+Search terms:	FilterView		Sökvillkor
+Pending…	PackageListView		Väntar...
+Repeat pass phrase:	UserLoginWindow		Upprepa lösenord:
+Category:	FilterView		Kategori:
+Authentication failed	UserLoginWindow		Autentisering misslyckades
+Manage repositories…	MainWindow		Hantera repositorier...
+Description	PackageListView		Beskrivning
+Pass phrase:	UserLoginWindow		Lösen fras:
+Open %DeskbarLink%	PackageManager		Öppna %DeskbarLink%
+Install	PackageManager		Installera
+Input validation	UserLoginWindow		Ogiltigt indata
+Log in…	MainWindow		Logga in...
+You need to be logged into an account before you can rate packages.	MainWindow		Du måste logga in för att kunna betygsätta paket.
+9999.99 KiB	PackageListView		9999.99 KiB
+All repositories	MainWindow		Alla repositorier
+%Version%	PackageInfoView		%Version%

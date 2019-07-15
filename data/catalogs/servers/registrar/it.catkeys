@@ -1,23 +1,23 @@
 1	italian	x-vnd.haiku-registrar	2599857937
-Restart system	ShutdownProcess		Riavvia il sistema
-The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		L'applicazione \"%appName%\" potrebbe essere bloccata da una finestra di dialogo.
-OK	ShutdownProcess		OK
-System is shut down	ShutdownProcess		Sistema in fase di spegnimento
-It's now safe to turn off the computer.	ShutdownProcess		Puoi spegnere il computer, adesso.
 Cancel	ShutdownProcess		Annulla
+OK	ShutdownProcess		OK
 Do you really want to shut down the system?	ShutdownProcess		Vuoi davvero spegnere il computer?
-Asking other processes to quit.	ShutdownProcess		In attesa della chiusura degli altri processi
-Asking \"%appName%\" to quit.	ShutdownProcess		In attesa che \"%appName%\" termini.
-%action%?	ShutdownProcess		%action%?
-Shutdown aborted	ShutdownProcess		Spegnimento interrotto
-Restarting…	ShutdownProcess		Riavvio in corso...
-Asking background applications to quit.	ShutdownProcess		Chiedi alle applicazioni in background di chiudersi.
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		L'applicazione \"%appName%\" ha arrestato il processo di spegnimento.
-Tidying things up a bit.	ShutdownProcess		Il lavoro di pulitura è in corso.
-Do you really want to restart the system?	ShutdownProcess		Davvero vuoi riavviare il sistema?
 Shutdown status	ShutdownProcess		Spegnimento in corso
-Cancel shutdown	ShutdownProcess		Cancella l'arresto
-Kill application	ShutdownProcess		Interrompi l'applicazione
 Shut down	ShutdownProcess		Spegni
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		L'applicazione \"%appName%\" potrebbe essere bloccata da una finestra di dialogo.
+System is shut down	ShutdownProcess		Sistema in fase di spegnimento
+Restart system	ShutdownProcess		Riavvia il sistema
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		L'applicazione \"%appName%\" ha arrestato il processo di spegnimento.
+Asking background applications to quit.	ShutdownProcess		Chiedi alle applicazioni in background di chiudersi.
+Do you really want to restart the system?	ShutdownProcess		Davvero vuoi riavviare il sistema?
 Restart	ShutdownProcess		Riavvia
+It's now safe to turn off the computer.	ShutdownProcess		Puoi spegnere il computer, adesso.
+Asking other processes to quit.	ShutdownProcess		In attesa della chiusura degli altri processi
+Cancel shutdown	ShutdownProcess		Cancella l'arresto
+Restarting…	ShutdownProcess		Riavvio in corso...
+%action%?	ShutdownProcess		%action%?
+Tidying things up a bit.	ShutdownProcess		Il lavoro di pulitura è in corso.
+Kill application	ShutdownProcess		Interrompi l'applicazione
+Shutdown aborted	ShutdownProcess		Spegnimento interrotto
 Shutting down…	ShutdownProcess		Arresto in corso…
+Asking \"%appName%\" to quit.	ShutdownProcess		In attesa che \"%appName%\" termini.

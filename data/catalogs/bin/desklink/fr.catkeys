@@ -1,16 +1,16 @@
-1	french	x-vnd.Haiku-desklink	3940727097
-Control physical output	MediaReplicant		Contrôler la sortie physique
-Couldn't launch 	MediaReplicant		Lancement impossible 
-Muted	MediaReplicant		Muet
-OK	MediaReplicant		OK
+1	french	x-vnd.Haiku-desklink	3568085956
+desklink	MediaReplicant	Title of an alert box	desklink
 Sound preferences…	MediaReplicant		Réglages sons…
+Muted	MediaReplicant		Muet
 %g dB	MediaReplicant		%g dB
-Open %name	DeskButton	Don't translate variable %name	Ouvrir %name
-No media server running	VolumeControl		Aucun serveur de médias en cours d’exécution
-Media preferences…	MediaReplicant		Réglages média…
-%d dB	VolumeControl		%d dB
+OK	MediaReplicant		OK
+Couldn't launch 	MediaReplicant		Lancement impossible 
+Volume	VolumeControl		Volume
 Open MediaPlayer	MediaReplicant		Ouvrir le Lecteur Média
-desklink	MediaReplicant		desklink
+%d dB	VolumeControl		%d dB
+Media preferences…	MediaReplicant		Réglages média…
 Options	MediaReplicant		Options
 Beep	MediaReplicant		Bip
-Volume	VolumeControl		Volume
+Open %name	DeskButton	Don't translate variable %name	Ouvrir %name
+Control physical output	MediaReplicant		Contrôler la sortie physique
+No media server running	VolumeControl		Aucun serveur de médias en cours d’exécution

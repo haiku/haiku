@@ -1,20 +1,20 @@
 1	indonesian	x-vnd.Haiku-VirtualMemory	2090796060
-Quit	SettingsWindow		Keluar
-Automatic swap management	SettingsWindow		Pengaturan swap otomatis
-Turn off	SettingsWindow		Matikan
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Menonaktifkan memori virtual akan memiliki efek yang tidak diinginkan pada stabilitas sistem setelah memori habis.\nVirtual memory tidak mempengaruhi kinerja sistem sampai titik ini tercapai.\n\nApakah Anda benar-benar yakin akan mematikannya?
 Requested swap file size:	SettingsWindow		Ukuran file swap yang diminta:
-The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Setelan yang ditentukan dalam pengaturan file tidak valid. Anda dapat memuat nilai bawaan atau keluar.
-Defaults	SettingsWindow		Bawaan
-Current Swap:	SettingsWindow		Swap saat ini:
-Use volume:	SettingsWindow		Pakai volume:
-Keep enabled	SettingsWindow		Tetap diaktifkan
-Revert	SettingsWindow		Pulihkan
 VirtualMemory	System name		VirtualMemory
-Use boot volume	SettingsWindow		Gunakan volume boot
-Load defaults	SettingsWindow		Muat nilai bawaan
 OK	VirtualMemoryApp		Oke
+Use volume:	SettingsWindow		Pakai volume:
+Turn off	SettingsWindow		Matikan
 Changes will take effect upon reboot.	SettingsWindow		Perubahan akan berlaku setelah reboot.
+Revert	SettingsWindow		Pulihkan
+Keep enabled	SettingsWindow		Tetap diaktifkan
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Setelan yang ditentukan dalam pengaturan file tidak valid. Anda dapat memuat nilai bawaan atau keluar.
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tditulis oleh Axel Dörfler\n\tHak cipta 2005, Haiku.\n
 The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		Volume yang ditentukan dalam pengaturan file tidak dapat ditemukan. Anda dapat menggunakan boot volume atau keluar.
+Current Swap:	SettingsWindow		Swap saat ini:
+Load defaults	SettingsWindow		Muat nilai bawaan
+Use boot volume	SettingsWindow		Gunakan volume boot
+Automatic swap management	SettingsWindow		Pengaturan swap otomatis
+Defaults	SettingsWindow		Bawaan
+Quit	SettingsWindow		Keluar
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Menonaktifkan memori virtual akan memiliki efek yang tidak diinginkan pada stabilitas sistem setelah memori habis.\nVirtual memory tidak mempengaruhi kinerja sistem sampai titik ini tercapai.\n\nApakah Anda benar-benar yakin akan mematikannya?
 Enable virtual memory	SettingsWindow		Aktifkan virtual memory

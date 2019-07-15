@@ -1,5 +1,5 @@
 1	english (united kingdom)	x-vnd.Haiku-DiskProbe	4162606420
-Case sensitive	FindWindow		Case-sensitive
 OK	DiskProbe		Alright
-OK	ProbeView		Alright
+Case sensitive	FindWindow		Case-sensitive
 Grayscale	TypeEditors		Grey-scale
+OK	ProbeView		Alright

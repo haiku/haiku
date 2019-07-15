@@ -1,49 +1,49 @@
 1	dutch; flemish	x-vnd.Be-PEPL	3676386979
-Edit	People		Aanpassen
-Error	People		Fout
-City	People		Stad
-The file '%name%' could not be written.	People		Het bestand '%name%' kon niet weggeschreven worden.
-none	Groups list		geen
-Configure attributes	People		Attributen configureren
-Company	People		Bedrijf
-%name% picture	People		afbeelding %name%
-Work phone	People		Telefoon werk
-People	System name		People
-New person	People		Nieuw persoon
-Select all	People		Alles selecteren
-File	People		Bestand
-Unnamed person	People		Naamloze persoon
-Could not create %s.	People		%s kon niet aangemaakt worden.
-Country	People		Land
-Close	People		Afsluiten
-Group	People		Groep
-Nickname	People		Bijnaam
-Quit	People		Afsluiten
-Name	People		Naam
-Revert	People		Omkeren
-Undo	People		Ongedaan maken
-E-mail	People		E-mail
-Load image…	People		Afbeelding laden...
-OK	People		Oké
-Remove image	People		Afbeelding verwijderen
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Het starten van het Bestandstypespreflet om de attributen van de persoon in te stellen is mislukt.\n\nFout:
-Home phone	People		Telefoon thuis
-Save as…	People		Opslaan als...
-Redo	People		Opnieuw uitvoeren
-Save changes before closing?	People		Wilt u wijzigingen opslaan alvorens te sluiten?
-Paste	People		Plakken
-Drop an image here,\nor use the contextual menu.	People		Sleep hier een afbeelding naar toe,\nof gebruik het contextmenu.
-Save	People		Opslaan
-Person	Short mimetype description		Persoon
+Unnamed person	People		Naamloze persoon
 New person…	People		Nieuw persoon...
 Address	People		Adres
-URL	People		URL
-Sorry	People		Sorry
 Zip	People		Postcode
-Contact information for a person.	Long mimetype description		Contactinfo voor een persoon.
-Fax	People		Fax
+Select all	People		Alles selecteren
+Could not create %s.	People		%s kon niet aangemaakt worden.
+Quit	People		Afsluiten
+Company	People		Bedrijf
+Name	People		Naam
+The file '%name%' could not be written.	People		Het bestand '%name%' kon niet weggeschreven worden.
 Contact name	People		Naam van de contactpersoon
-Cut	People		Knippen
 Cancel	People		Annuleren
+Edit	People		Aanpassen
+Save changes before closing?	People		Wilt u wijzigingen opslaan alvorens te sluiten?
+People	System name		People
+Error	People		Fout
+Revert	People		Omkeren
+Country	People		Land
+Person	Short mimetype description		Persoon
+New person	People		Nieuw persoon
+Save	People		Opslaan
+Fax	People		Fax
+URL	People		URL
+%name% picture	People		afbeelding %name%
+Home phone	People		Telefoon thuis
+none	Groups list		geen
+Save as…	People		Opslaan als...
+Cut	People		Knippen
+Contact information for a person.	Long mimetype description		Contactinfo voor een persoon.
+Remove image	People		Afbeelding verwijderen
+City	People		Stad
+Undo	People		Ongedaan maken
+Configure attributes	People		Attributen configureren
+Work phone	People		Telefoon werk
 State	People		Provincie
+Nickname	People		Bijnaam
+OK	People		Oké
+File	People		Bestand
+Redo	People		Opnieuw uitvoeren
+Close	People		Afsluiten
 Copy	People		Kopiëren
+Paste	People		Plakken
+E-mail	People		E-mail
+Group	People		Groep
+Drop an image here,\nor use the contextual menu.	People		Sleep hier een afbeelding naar toe,\nof gebruik het contextmenu.
+Load image…	People		Afbeelding laden...
+Sorry	People		Sorry

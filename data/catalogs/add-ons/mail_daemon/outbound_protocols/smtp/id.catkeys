@@ -1,14 +1,14 @@
 1	indonesian	x-vnd.Haiku-SMTP	815985329
-SMTP server:	ConfigView		Server SMTP:
-Error while logging in to %serv	smtp		Terjadi kesalahan ketika login ke %serv
-Unencrypted	ConfigView		Tak terenkripsi
-. The server says:\n	smtp		. Server mengatakan:\n
-ESMTP	ConfigView		ESMTP
-Connecting to server…	smtp		Menghubungkan ke server...
-Error while opening connection to %serv	smtp		Terjadi kesalahan ketika membuka koneksi ke %serv
 POP3 authentication failed. The server said:\n	smtp		Otentifikasi POP3 gagal. Server mengatakan:\n
 Destination:	ConfigView		Tujuan:
+Error while logging in to %serv	smtp		Terjadi kesalahan ketika login ke %serv
+Connecting to server…	smtp		Menghubungkan ke server...
+Unencrypted	ConfigView		Tak terenkripsi
+. The server says:\n	smtp		. Server mengatakan:\n
+Error while opening connection to %serv	smtp		Terjadi kesalahan ketika membuka koneksi ke %serv
+. The server said:\n	smtp		. Server mengatakan:\n
 None	ConfigView		Tak satupun
+SMTP server:	ConfigView		Server SMTP:
+ESMTP	ConfigView		ESMTP
 POP3 before SMTP	ConfigView		POP3 sebelum SMTP
 SSL	ConfigView		SSL
-. The server said:\n	smtp		. Server mengatakan:\n

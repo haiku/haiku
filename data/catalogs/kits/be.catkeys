@@ -1,39 +1,39 @@
 1	belarusian	x-vnd.Haiku-libbe	297520911
-gamma	AboutWindow		гамма
-beta	AboutWindow		бэта
-%3.2f GiB	StringForSize		%3.2f ГіБ
-Written by:	AboutWindow		Аўтар(ы):
-About %app%	AboutMenuItem		Пра %app%
-Cut	TextView		Выразаць
-Version	AboutWindow		Версія
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Немагчыма стварыць рэплікант \"%description\".\n%error
-Copy	TextView		Капіяваць
-%3.2f KiB	StringForSize		%3.2f КіБ
-alpha	AboutWindow		альфа
-Error	PrintJob		Памылка
 All Rights Reserved.	AboutWindow		Усе правы захаваныя.
-About %app%	AboutWindow		Пра %app%
+gold master	AboutWindow		залатая
+Undo	TextView		Адвярнуць
+gamma	AboutWindow		гамма
+development	AboutWindow		распрацоўны
 OK	Dragger		ОК
 OK	PrintJob		ОК
-Green:	ColorControl		Зялёны:
-Version history:	AboutWindow		Гісторыя версій:
-Remove replicant	Dragger		Выдаліць рэпліканта
-OK	AboutWindow		ОК
-OK	ZombieReplicantView		ОК
 Print Server is not responding.	PrintJob		Сервер друку не адказвае.
+About %app%	AboutMenuItem		Пра %app%
+Warning	Dragger		Папярэджанне
+Green:	ColorControl		Зялёны:
+Redo	TextView		Зрабіць наноў
+beta	AboutWindow		бэта
+OK	ZombieReplicantView		ОК
+Cut	TextView		Выразаць
+%3.2f GiB	StringForSize		%3.2f ГіБ
+Can't delete this replicant from its original application. Life goes on.	Dragger		Не ўдалося выдаліць рэплікант з яго праграмы. Але жыццё працягваецца.
+Error	ZombieReplicantView		Памылка
 Paste	TextView		Уставіць
+OK	AboutWindow		ОК
 Special Thanks:	AboutWindow		Адмысловыя падзякі:
 %.2f TiB	StringForSize		%.2f ТіБ
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Праграма рэпліканата не знойдзена. Подпис праграмы не зададзены.\n%error
-Redo	TextView		Зрабіць наноў
-<empty>	Menu		<няма>
-Warning	Dragger		Папярэджанне
-Undo	TextView		Адвярнуць
+Remove replicant	Dragger		Выдаліць рэпліканта
+Version	AboutWindow		Версія
 Red:	ColorControl		Чырвоны:
+<empty>	Menu		<няма>
+Copy	TextView		Капіяваць
+alpha	AboutWindow		альфа
 %3.2f MiB	StringForSize		%3.2f МіБ
+Error	PrintJob		Памылка
+About %app%	AboutWindow		Пра %app%
 About %app…	Dragger		Пра праграму %app…
-development	AboutWindow		распрацоўны
-Error	ZombieReplicantView		Памылка
+Version history:	AboutWindow		Гісторыя версій:
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Праграма рэпліканата не знойдзена. Подпис праграмы не зададзены.\n%error
+%3.2f KiB	StringForSize		%3.2f КіБ
 Blue:	ColorControl		Сіні:
-gold master	AboutWindow		залатая
-Can't delete this replicant from its original application. Life goes on.	Dragger		Не ўдалося выдаліць рэплікант з яго праграмы. Але жыццё працягваецца.
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Немагчыма стварыць рэплікант \"%description\".\n%error
+Written by:	AboutWindow		Аўтар(ы):

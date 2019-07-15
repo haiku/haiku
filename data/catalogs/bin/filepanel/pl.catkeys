@@ -1,20 +1,20 @@
 1	polish	x-vnd.mmu_man.filepanel	1802971238
 display a load/save file panel\n	FilePanelApp		wyświetl panel wczytywania/zapisywania plików\n
-options:\n	FilePanelApp		opcje:\n
-usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		użycie: %s [--help] [--directory katalog] [--load|--save] [--title ttl] [--single] [--modal] [--allow wyrażenie] [--forbid wyrażenie]\n
--k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\trodzaje wpisów, które mogą być otwarte (flavour): dowolna kombinacja znaków f, d, s (odpowiednio: plik – domyślny, katalog, dowiązanie symboliczne)\n
-usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		użycie: %s [-h] [-d folder] [-l|-s] [-t ttl] [-1] [-m] [-a wzorzec] [-f wzorzec]\n
--d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\totwórz w <folder>\n
-%s not a valid option\n	FilePanelApp		%s nie jest prawidłową opcją\n
 short\tlong\tdescription\n	FilePanelApp		krótki\tdługi\topis\n
-%s: this option requires a parameter\n	FilePanelApp		%s: ta opcja wymaga podania parametru\n
--l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tskorzystaj FilePanelu otwierania (domyślne)\n
--f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tniezaimplementowane\n
+%s not a valid option\n	FilePanelApp		%s nie jest prawidłową opcją\n
 -s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tskorzystaj z FilePanelu zapisywania\n
--n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tustaw domyślną nazwę dla zapisywania\n
--m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tsprawia, że FilePanel staje się modalny\n
+%s: this option requires a parameter\n	FilePanelApp		%s: ta opcja wymaga podania parametru\n
 -h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\twyświetl użycie\n
--a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tniezaimplementowane\n
--1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tzezwól na zaznaczenie maks. jednego pliku\n
--t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tustaw nazwę okna tytułowego programu FilePanel\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tskorzystaj FilePanelu otwierania (domyślne)\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tustaw domyślną nazwę dla zapisywania\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\trodzaje wpisów, które mogą być otwarte (flavour): dowolna kombinacja znaków f, d, s (odpowiednio: plik – domyślny, katalog, dowiązanie symboliczne)\n
 %s: UNIMPLEMENTED\n	FilePanelApp		%s: NIEZAIMPLEMENTOWANE\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tustaw nazwę okna tytułowego programu FilePanel\n
+-f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tniezaimplementowane\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		użycie: %s [-h] [-d folder] [-l|-s] [-t ttl] [-1] [-m] [-a wzorzec] [-f wzorzec]\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tzezwól na zaznaczenie maks. jednego pliku\n
+-a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tniezaimplementowane\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tsprawia, że FilePanel staje się modalny\n
+options:\n	FilePanelApp		opcje:\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\totwórz w <folder>\n
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		użycie: %s [--help] [--directory katalog] [--load|--save] [--title ttl] [--single] [--modal] [--allow wyrażenie] [--forbid wyrażenie]\n

@@ -1,27 +1,27 @@
 1	english	x-vnd.Haiku.TV	1995288111
-TV	MainWin		电视
-Channel	MainWin		频道
-Settings…	MainWin		设置…
-Interface	MainWin		接口
-Keep aspect ratio	MainWin		保持高宽比
-Previous channel	MainWin		上一个频道
-Settings	MainWin		设置
-TV	System name		电视
+No menu	MainWin		隐藏菜单栏
 No border	MainWin		无边框
-Always on top	MainWin		置顶
-OK	MainWin		确定
-Quit	MainWin		退出
+force 704 x 576, display aspect 4:3	MainWin		强制分辨率 704 x 576，高宽比 4:3
+Error, connecting to interface failed:\n\n	MainWin		错误，无法连接到接口：\n\n
+force 544 x 576, display aspect 4:3	MainWin		强制分辨率 544 x 576，高宽比 4:3
 Full screen	MainWin		全屏
-Debug	MainWin		调试
 Scale to native size	MainWin		恢复原始大小
 unknown	MainWin		未知
 Next channel	MainWin		下一个频道
-Error, interface is busy:\n\n	MainWin		错误，接口正在使用中：\n\n
-None	MainWin		无
-force 704 x 576, display aspect 4:3	MainWin		强制分辨率 704 x 576，高宽比 4:3
+Keep aspect ratio	MainWin		保持高宽比
 DVB - Digital Video Broadcasting TV	MainWin		DVB -数字视频广播电视  
-force 544 x 576, display aspect 4:3	MainWin		强制分辨率 544 x 576，高宽比 4:3
-pixel aspect ratio	MainWin		像素长宽比
-No menu	MainWin		隐藏菜单栏
-Error, connecting to interface failed:\n\n	MainWin		错误，无法连接到接口：\n\n
+Always on top	MainWin		置顶
+Debug	MainWin		调试
+Interface	MainWin		接口
 force 720 x 576, display aspect 4:3	MainWin		强制分辨率 720 x 576,高宽比 4:3
+Quit	MainWin		退出
+Channel	MainWin		频道
+Previous channel	MainWin		上一个频道
+OK	MainWin		确定
+TV	MainWin		电视
+Settings	MainWin		设置
+TV	System name		电视
+Settings…	MainWin		设置…
+None	MainWin		无
+Error, interface is busy:\n\n	MainWin		错误，接口正在使用中：\n\n
+pixel aspect ratio	MainWin		像素长宽比

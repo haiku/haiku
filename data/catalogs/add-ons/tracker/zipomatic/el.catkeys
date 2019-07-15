@@ -1,15 +1,15 @@
 1	greek, modern (1453-)	x-vnd.haiku.zip-o-matic	1573273374
-Stop	file:ZipOMaticWindow.cpp		Διακοπή
-Creating archive: %s	file:ZipOMaticWindow.cpp		Δημιουργία συμπιεσμένου αρχείου: %s
-Continue	file:ZipOMaticWindow.cpp		Συνέχεια
-Preparing to archive	file:ZipperThread.cpp		Προετοιμάζεται το συμπιεσμένο αρχείο
 Drop files here.	file:ZipOMaticWindow.cpp		Αφήστε τα αρχεία εδώ.
 Filename: %s	file:ZipOMaticWindow.cpp		Όνομα αρχείου: %s
-Let them continue	file:ZipOMatic.cpp		Αφήστε τα να συνεχίσουν
 Do you want to stop them?	file:ZipOMatic.cpp		Θέλετε να τα σταματήσετε;
+Error creating archive	file:ZipOMaticWindow.cpp		Σφάλμα κατά τη δημιουργία συμπιεσμένου αρχείου
+Stop them	file:ZipOMatic.cpp		Σταματησέ τα 
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Είστε σίγουρος ότι θέλετε να σταματήσει η δημιουργία αυτού του αρχείου;
+Preparing to archive	file:ZipperThread.cpp		Προετοιμάζεται το συμπιεσμένο αρχείο
+Let them continue	file:ZipOMatic.cpp		Αφήστε τα να συνεχίσουν
+Continue	file:ZipOMaticWindow.cpp		Συνέχεια
+Archive created OK	file:ZipOMaticWindow.cpp		Το αρχείο δημιουργήθηκε επιτυχώς.
+Stop	file:ZipOMaticWindow.cpp		Διακοπή
 Stopped	file:ZipOMaticWindow.cpp		Σταματημένο
 Archive	file:ZipperThread.cpp		Συμπιεσμένο αρχείο
-Error creating archive	file:ZipOMaticWindow.cpp		Σφάλμα κατά τη δημιουργία συμπιεσμένου αρχείου
-Archive created OK	file:ZipOMaticWindow.cpp		Το αρχείο δημιουργήθηκε επιτυχώς.
-Stop them	file:ZipOMatic.cpp		Σταματησέ τα 
+Creating archive: %s	file:ZipOMaticWindow.cpp		Δημιουργία συμπιεσμένου αρχείου: %s

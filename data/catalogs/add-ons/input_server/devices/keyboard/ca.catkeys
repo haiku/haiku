@@ -1,10 +1,10 @@
 1	catalan; valencian	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
-Kill application	Team monitor		Mata l'aplicació
-Quit application	Team monitor		Surt de l'aplicació
-Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Trieu una aplicació de la llista anterior i premeu el botó 'Mata l'aplicació' o bé 'Surt de l'aplicació' per tal de tancar-la.\n\nPremeu CONTROL+ALT+DELETE durant %ld segons per tal de reiniciar el sistema.
 If the application will not quit you may have to kill it.	Team monitor		Si la aplicació no surt potser l'haureu de matar.
-Force reboot	Team monitor		Força el reinici
-Team monitor	Team monitor		Monitor de l'equip
-(This team is a system component)	Team monitor		(Aquest equip és un component del sistema)
+Quit application	Team monitor		Surt de l'aplicació
 Restart the desktop	Team monitor		Reinicia l'escriptori
+Force reboot	Team monitor		Força el reinici
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Trieu una aplicació de la llista anterior i premeu el botó 'Mata l'aplicació' o bé 'Surt de l'aplicació' per tal de tancar-la.\n\nPremeu CONTROL+ALT+DELETE durant %ld segons per tal de reiniciar el sistema.
+Team monitor	Team monitor		Monitor de l'equip
+Kill application	Team monitor		Mata l'aplicació
 Cancel	Team monitor		Anul·la
+(This team is a system component)	Team monitor		(Aquest equip és un component del sistema)

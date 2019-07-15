@@ -1,20 +1,20 @@
 1	polish	x-vnd.Haiku-Touchpad	607725922
 Scrolling	TouchpadPrefView		Przewijanie
-Touchpad	System name		Touchpad
-Revert	TouchpadPrefView		Cofnij
 Tapping	TouchpadPrefView		Stukanie
-Please confirm	TouchpadPrefView		Proszę potwierdź
-Two finger scrolling	TouchpadPrefView		Przewijanie dwoma palcami
-Defaults	TouchpadPrefView		Przywróć domyślne
-Slow	TouchpadPrefView		Wolno
-Vertical	TouchpadPrefView		Pionowe
-High	TouchpadPrefView		Wysoka
-Horizontal scrolling	TouchpadPrefView		Poziome przewijanie
-Fast	TouchpadPrefView		Szybko
-OK	TouchpadPrefView		OK
-Acceleration	TouchpadPrefView		Przyspieszenie
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Nowy obszar przewijania jest bardzo duży i może utrudniać normalne operacje myszką. Czy na pewno chcesz  to zmienić?
-Horizontal	TouchpadPrefView		Poziome
-Off	TouchpadPrefView		Wyłącz
-Sensitivity	TouchpadPrefView		Czułość
+Touchpad	System name		Touchpad
 Cancel	TouchpadPrefView		Anuluj
+OK	TouchpadPrefView		OK
+Horizontal scrolling	TouchpadPrefView		Poziome przewijanie
+Slow	TouchpadPrefView		Wolno
+Two finger scrolling	TouchpadPrefView		Przewijanie dwoma palcami
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Nowy obszar przewijania jest bardzo duży i może utrudniać normalne operacje myszką. Czy na pewno chcesz  to zmienić?
+Defaults	TouchpadPrefView		Przywróć domyślne
+High	TouchpadPrefView		Wysoka
+Off	TouchpadPrefView		Wyłącz
+Fast	TouchpadPrefView		Szybko
+Vertical	TouchpadPrefView		Pionowe
+Please confirm	TouchpadPrefView		Proszę potwierdź
+Acceleration	TouchpadPrefView		Przyspieszenie
+Horizontal	TouchpadPrefView		Poziome
+Sensitivity	TouchpadPrefView		Czułość
+Revert	TouchpadPrefView		Cofnij

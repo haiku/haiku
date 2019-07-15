@@ -1,35 +1,35 @@
 1	english	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		恢复快照
-Could not set Sudoku:\n%s\n	SudokuWindow		无法设置数独：\n%s\n
-Export as…	SudokuWindow		导出为...
-OK	SudokuWindow		确定
-New	SudokuWindow		新建
-Abort	ProgressWindow		关于
-Sudoku	System name		数独
-Could not open \"%s\":\n%s\n	SudokuWindow		无法打开 \"%s\"：\n%s\n
-Easy	SudokuWindow		容易
-Open file…	SudokuWindow		打开文件...
-Solve single field	SudokuWindow		保存单个区域
-Solve	SudokuWindow		解决
-Redo	SudokuWindow		重复
 File	SudokuWindow		文件
-Advanced	SudokuWindow		高级
-Start again	SudokuWindow		重启
-HTML	SudokuWindow		HTML
-Sudoku request	SudokuWindow		数独要求
-Copy	SudokuWindow		复制
-Mark valid hints	SudokuWindow		标记有效线索
-Sudoku solved - congratulations!\n	SudokuWindow		数独已完成 - 祝贺您取得成功！\n
+Mark invalid values	SudokuWindow		标记无效线索
+Solve single field	SudokuWindow		保存单个区域
 Hard	SudokuWindow		困难
-Snapshot current	SudokuWindow		当前快照
+Start again	SudokuWindow		重启
+New	SudokuWindow		新建
+Easy	SudokuWindow		容易
+Undo	SudokuWindow		撤销
+Export as…	SudokuWindow		导出为...
+Quit	SudokuWindow		退出
+Redo	SudokuWindow		重复
+Could not open \"%s\":\n%s\n	SudokuWindow		无法打开 \"%s\"：\n%s\n
+Blank	SudokuWindow		空白
+Sudoku solved - congratulations!\n	SudokuWindow		数独已完成 - 祝贺您取得成功！\n
 Text	SudokuWindow		文本
+Copy	SudokuWindow		复制
+Solve	SudokuWindow		解决
+HTML	SudokuWindow		HTML
+Advanced	SudokuWindow		高级
+Set all hints	SudokuWindow		设置所有提示
+Searching for removable values	SudokuGenerator		搜索可删值
+Abort	ProgressWindow		关于
+Could not set Sudoku:\n%s\n	SudokuWindow		无法设置数独：\n%s\n
+Help	SudokuWindow		帮助
+OK	SudokuWindow		确定
+Sudoku	System name		数独
+Progress monitor	ProgressWindow		设置所有提示
 Creating solvable field	SudokuGenerator		创建已完成区域
 View	SudokuWindow		视图
-Progress monitor	ProgressWindow		设置所有提示
-Set all hints	SudokuWindow		设置所有提示
-Mark invalid values	SudokuWindow		标记无效线索
-Blank	SudokuWindow		空白
-Help	SudokuWindow		帮助
-Searching for removable values	SudokuGenerator		搜索可删值
-Undo	SudokuWindow		撤销
-Quit	SudokuWindow		退出
+Snapshot current	SudokuWindow		当前快照
+Mark valid hints	SudokuWindow		标记有效线索
+Sudoku request	SudokuWindow		数独要求
+Open file…	SudokuWindow		打开文件...

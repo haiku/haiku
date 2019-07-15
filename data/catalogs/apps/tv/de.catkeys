@@ -1,27 +1,27 @@
 1	german	x-vnd.Haiku.TV	1995288111
-TV	MainWin		TV
-Channel	MainWin		Kanal
-Settings…	MainWin		Einstellungen...
-Interface	MainWin		Hardware
-Keep aspect ratio	MainWin		Festes Seitenverhältnis
-Previous channel	MainWin		Vorheriger Kanal
-Settings	MainWin		Einstellungen
-TV	System name		TV
+No menu	MainWin		Kein Menü
 No border	MainWin		Kein Fensterrahmen
-Always on top	MainWin		Immer im Vordergrund
-OK	MainWin		OK
-Quit	MainWin		Beenden
+force 704 x 576, display aspect 4:3	MainWin		Erzwinge 704 x 576, Seitenverhältnis 4:3
+Error, connecting to interface failed:\n\n	MainWin		Fehler, Verbindung zur Hardware fehlgeschlagen:\n\n
+force 544 x 576, display aspect 4:3	MainWin		Erzwinge 544 x 576, Seitenverhältnis 4:3
 Full screen	MainWin		Vollbild
-Debug	MainWin		Debug
 Scale to native size	MainWin		Originalgröße
 unknown	MainWin		unbekannt
 Next channel	MainWin		Nächster Kanal
-Error, interface is busy:\n\n	MainWin		Fehler, Hardware ist beschäftigt:\n\n
-None	MainWin		Kein
-force 704 x 576, display aspect 4:3	MainWin		Erzwinge 704 x 576, Seitenverhältnis 4:3
+Keep aspect ratio	MainWin		Festes Seitenverhältnis
 DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
-force 544 x 576, display aspect 4:3	MainWin		Erzwinge 544 x 576, Seitenverhältnis 4:3
-pixel aspect ratio	MainWin		Pixel-Seitenverhältnis
-No menu	MainWin		Kein Menü
-Error, connecting to interface failed:\n\n	MainWin		Fehler, Verbindung zur Hardware fehlgeschlagen:\n\n
+Always on top	MainWin		Immer im Vordergrund
+Debug	MainWin		Debug
+Interface	MainWin		Hardware
 force 720 x 576, display aspect 4:3	MainWin		Erzwinge 720 x 576, Seitenverhältnis 4:3
+Quit	MainWin		Beenden
+Channel	MainWin		Kanal
+Previous channel	MainWin		Vorheriger Kanal
+OK	MainWin		OK
+TV	MainWin		TV
+Settings	MainWin		Einstellungen
+TV	System name		TV
+Settings…	MainWin		Einstellungen...
+None	MainWin		Kein
+Error, interface is busy:\n\n	MainWin		Fehler, Hardware ist beschäftigt:\n\n
+pixel aspect ratio	MainWin		Pixel-Seitenverhältnis

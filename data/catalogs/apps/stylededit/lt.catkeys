@@ -1,88 +1,88 @@
 1	lithuanian	x-vnd.Haiku-StyledEdit	727465241
-StyledEdit	System name		Rašyklė
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Šis failas pažymėtas kaip skirtas tik skaitymui. Ar įrašyti dokumento „%s“ pakeitimus? 
-Paste	Menus		Įdėti
-OK	LoadAlert		Gerai
-File	Menus		Failas
-???	LoadAlert		???
-Modified	StatusView		Modifikavimo data
-Lines:	Statistics		Eilučių:
-Italic	Menus		Kursyvas
-Left	Menus		Kairinė
-Search backwards	FindandReplaceWindow		Ieškoti viršun
-Unlock file	StatusView		Atrakinti failą
-Size	Menus		Dydis
-Save	QuitAlert		Įrašyti
-Page setup…	Menus		Puslapio nuostatos…
-Print…	Menus		Spausdinti…
-Can't undo	Menus		Atšaukti negalima
-Save	Menus		Įrašyti
-Default	Menus		Numatytai
-Replace with:	FindandReplaceWindow		Keisti į:
-Cancel	SaveAlert		Atsisakyti
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Negrįžtama, failas nerastas: „%s“.
-Case-sensitive	FindandReplaceWindow		Paisyti raidžių registro
-Reload	NodeMonitorAlerts		Įkelti iš naujo
-Replace in all windows	FindandReplaceWindow		Keisti visuose languose
-Wrap lines	Menus		Laužyti eilutes
-Quit	Menus		Baigti darbą
-File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Failą „%file%“ pašalino kita programa. Ar atkurti?
 Document statistics	Statistics		Dokumento statistika
-Cancel	RevertToSavedAlert		Atsisakyti
-Autodetect	Menus		Nustatyti automatiškai
-Document	Menus		Dokumentas
-Save changes to the document \"%s\"? 	QuitAlert		Įrašyti dokumento „%s“ pakeitimus? 
-Edit	Menus		Taisa
-Revert	RevertToSavedAlert		Atšaukti pakeitimus
-Font	Menus		Šriftas
-Replace all	FindandReplaceWindow		Pakeisti visus
-Statistics…	Menus		Statistika…
-Default	Open_and_SaveAsPanel		Numatytai
-Replace next	Menus		Pakeisti kitą
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		Yra neįrašytų „%s“ pakeitimų.\nAr grąžinti paskiausiai įrašytą versiją? 
-Cancel	FindandReplaceWindow		Atsisakyti
-Text encoding	Menus		Teksto koduotė
-Close	Menus		Užverti
-Save	SaveAlert		Įrašyti
-Words:	Statistics		Žodžių:
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Nepavyko įkelti „%s“:\n\tNepalaikomas failo formatas
-OK	RevertToSavedAlert		Gerai
-Don't save	QuitAlert		Neįrašyti
-Align	Menus		Lygiuotė
-Color	Menus		Spalva
-OK	QuitAlert		Gerai
-Open…	Menus		Atverti…
-Center	Menus		Centrinė
-Unable to unlock file\n\t%s	QuitAlert		Failo atrakinti nepavyko\n\t %s
-line %d, column %d	StatusView		%d eilutė, %d stulpelis
-OK	Statistics		Gerai
-New	Menus		Naujas
-Wrap-around search	FindandReplaceWindow		Tęsti paiešką nuo dokumento pradžios
-Bold	Menus		Pastorintas
-Find selection	Menus		Ieškoti pažymėto teksto
-Find:	FindandReplaceWindow		Ieškoti:
-Error saving \"%s\":\n%s	SaveAlert		Klaida įrašant „%s“:\n%s
-Copy	Menus		Kopijuoti
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Negrįžtama, failas nerastas: „%s“.
 Cut	Menus		Iškirpti
-File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Failą „%file%“ modifikavo kita programa. Ar įkelti jį iš naujo?
-Replace	FindandReplaceWindow		Pakeisti
-Find again	Menus		Ieškoti kito
-Cancel	QuitAlert		Atsisakyti
-Find…	Menus		Ieškoti…
-Select all	Menus		Pažymėti viską
-Don't save	SaveAlert		Neįrašyti
-Recover	NodeMonitorAlerts		Atkurti
-Error loading \"%s\":\n\t%s	LoadAlert		Klaida įkeliant „%s“:\n\t%s
-Ignore	NodeMonitorAlerts		Nepaisyti
-Read-only	StatusView		Tik skaitymui
-Undo typing	QuitAlert		Atšaukti
+Center	Menus		Centrinė
+Wrap-around search	FindandReplaceWindow		Tęsti paiešką nuo dokumento pradžios
+Page setup…	Menus		Puslapio nuostatos…
 Untitled 	StyledEditWindow		Bevardis 
-OK	SaveAlert		Gerai
+OK	Statistics		Gerai
 Find	FindandReplaceWindow		Ieškoti
-Encoding	Open_and_SaveAsPanel		Koduotė
-Characters:	Statistics		Simbolių:
-Save as…	Menus		Įrašyti kaip…
-Redo typing	QuitAlert		Grąžinti
-Reload…	Menus		Įkelti iš naujo…
+New	Menus		Naujas
+Document	Menus		Dokumentas
+Search backwards	FindandReplaceWindow		Ieškoti viršun
+Find again	Menus		Ieškoti kito
+Read-only	StatusView		Tik skaitymui
+Save	Menus		Įrašyti
+Cancel	QuitAlert		Atsisakyti
+Copy	Menus		Kopijuoti
+Reload	NodeMonitorAlerts		Įkelti iš naujo
+line %d, column %d	StatusView		%d eilutė, %d stulpelis
+Words:	Statistics		Žodžių:
+???	LoadAlert		???
+Recover	NodeMonitorAlerts		Atkurti
+Error saving \"%s\":\n%s	SaveAlert		Klaida įrašant „%s“:\n%s
+OK	RevertToSavedAlert		Gerai
+Unlock file	StatusView		Atrakinti failą
+Italic	Menus		Kursyvas
+Can't undo	Menus		Atšaukti negalima
 Replace…	Menus		Pakeisti…
+File	Menus		Failas
+Bold	Menus		Pastorintas
+Paste	Menus		Įdėti
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Failą „%file%“ modifikavo kita programa. Ar įkelti jį iš naujo?
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Failą „%file%“ pašalino kita programa. Ar atkurti?
+Lines:	Statistics		Eilučių:
+Replace in all windows	FindandReplaceWindow		Keisti visuose languose
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		Yra neįrašytų „%s“ pakeitimų.\nAr grąžinti paskiausiai įrašytą versiją? 
+Save	SaveAlert		Įrašyti
+Default	Open_and_SaveAsPanel		Numatytai
+Cancel	RevertToSavedAlert		Atsisakyti
+Cancel	FindandReplaceWindow		Atsisakyti
+Statistics…	Menus		Statistika…
+Encoding	Open_and_SaveAsPanel		Koduotė
+Replace all	FindandReplaceWindow		Pakeisti visus
+Close	Menus		Užverti
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Nepavyko įkelti „%s“:\n\tNepalaikomas failo formatas
+Left	Menus		Kairinė
+Default	Menus		Numatytai
+OK	SaveAlert		Gerai
+Color	Menus		Spalva
+Save changes to the document \"%s\"? 	QuitAlert		Įrašyti dokumento „%s“ pakeitimus? 
+StyledEdit	System name		Rašyklė
+Find:	FindandReplaceWindow		Ieškoti:
+Undo typing	QuitAlert		Atšaukti
+Error loading \"%s\":\n\t%s	LoadAlert		Klaida įkeliant „%s“:\n\t%s
+Don't save	SaveAlert		Neįrašyti
+Reload…	Menus		Įkelti iš naujo…
+Print…	Menus		Spausdinti…
+Quit	Menus		Baigti darbą
+Redo typing	QuitAlert		Grąžinti
+Ignore	NodeMonitorAlerts		Nepaisyti
+Wrap lines	Menus		Laužyti eilutes
+Text encoding	Menus		Teksto koduotė
+Unable to unlock file\n\t%s	QuitAlert		Failo atrakinti nepavyko\n\t %s
+Modified	StatusView		Modifikavimo data
+OK	LoadAlert		Gerai
+Save	QuitAlert		Įrašyti
+Case-sensitive	FindandReplaceWindow		Paisyti raidžių registro
+Find selection	Menus		Ieškoti pažymėto teksto
+Cancel	SaveAlert		Atsisakyti
+Find…	Menus		Ieškoti…
+Revert	RevertToSavedAlert		Atšaukti pakeitimus
+Size	Menus		Dydis
+Autodetect	Menus		Nustatyti automatiškai
+Replace next	Menus		Pakeisti kitą
+OK	QuitAlert		Gerai
+Replace with:	FindandReplaceWindow		Keisti į:
+Edit	Menus		Taisa
+Open…	Menus		Atverti…
+Save as…	Menus		Įrašyti kaip…
+Replace	FindandReplaceWindow		Pakeisti
+Characters:	Statistics		Simbolių:
+Don't save	QuitAlert		Neįrašyti
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Šis failas pažymėtas kaip skirtas tik skaitymui. Ar įrašyti dokumento „%s“ pakeitimus? 
+Align	Menus		Lygiuotė
+Font	Menus		Šriftas
+Select all	Menus		Pažymėti viską
 Right	Menus		Dešininė

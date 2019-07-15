@@ -1,18 +1,18 @@
 1	belarusian	x-vnd.Haiku-MidiPlayer	471142057
-None	Main Window		Няма
-Live input:	Main Window		Live Уваход:
-Stop	Main Window		Спыніць
-Cavern	Main Window		Пячора
-Volume:	Main Window		Гучнасць:
-Reverb:	Main Window		Рэвербацыя:
-OK	Main Window		ОК
-Off	Main Window		Выкл.
 Dungeon	Main Window		Падзямелле
-Play	Main Window		Іграць
-Garage	Main Window		Гараж
-Closet	Main Window		Шкаф
-MidiPlayer	System name		Праігравальнік MIDI
-Drop MIDI file here	Scope View		Кідайце MIDI файл сюды
-Igor's lab	Main Window		Лабараторыя
-Scope	Main Window		Абшар
 Could not load song	Main Window		Немагчыма загрузіць песню
+Igor's lab	Main Window		Лабараторыя
+Off	Main Window		Выкл.
+Volume:	Main Window		Гучнасць:
+Closet	Main Window		Шкаф
+Scope	Main Window		Абшар
+Drop MIDI file here	Scope View		Кідайце MIDI файл сюды
+None	Main Window		Няма
+Reverb:	Main Window		Рэвербацыя:
+MidiPlayer	System name		Праігравальнік MIDI
+OK	Main Window		ОК
+Stop	Main Window		Спыніць
+Live input:	Main Window		Live Уваход:
+Garage	Main Window		Гараж
+Play	Main Window		Іграць
+Cavern	Main Window		Пячора

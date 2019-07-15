@@ -1,15 +1,15 @@
 1	belarusian	x-vnd.haiku.zip-o-matic	1573273374
-Stop	file:ZipOMaticWindow.cpp		Спыніць
-Creating archive: %s	file:ZipOMaticWindow.cpp		Стварыць архіў: %s
-Continue	file:ZipOMaticWindow.cpp		Працягваць
-Preparing to archive	file:ZipperThread.cpp		Падрыхтоўка да архівацыі
 Drop files here.	file:ZipOMaticWindow.cpp		Кіньце файлы сюды.
 Filename: %s	file:ZipOMaticWindow.cpp		Імя файла: %s
-Let them continue	file:ZipOMatic.cpp		Дазволіць ім працягваць
 Do you want to stop them?	file:ZipOMatic.cpp		Жадаеце іх спыніць?
+Error creating archive	file:ZipOMaticWindow.cpp		Памылка падчас стварэння архіву
+Stop them	file:ZipOMatic.cpp		Спыніць іх
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Насамрэч жадаеце спыніць стварэнне гэтага архіву?
+Preparing to archive	file:ZipperThread.cpp		Падрыхтоўка да архівацыі
+Let them continue	file:ZipOMatic.cpp		Дазволіць ім працягваць
+Continue	file:ZipOMaticWindow.cpp		Працягваць
+Archive created OK	file:ZipOMaticWindow.cpp		Архіў быў створаны паспяхова
+Stop	file:ZipOMaticWindow.cpp		Спыніць
 Stopped	file:ZipOMaticWindow.cpp		Спынена
 Archive	file:ZipperThread.cpp		Архіў
-Error creating archive	file:ZipOMaticWindow.cpp		Памылка падчас стварэння архіву
-Archive created OK	file:ZipOMaticWindow.cpp		Архіў быў створаны паспяхова
-Stop them	file:ZipOMatic.cpp		Спыніць іх
+Creating archive: %s	file:ZipOMaticWindow.cpp		Стварыць архіў: %s

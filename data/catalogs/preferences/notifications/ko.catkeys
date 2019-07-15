@@ -1,13 +1,13 @@
 1	korean	x-vnd.Haiku-Notifications	213548865
-Revert	PrefletWin		되돌리기
-Enable notifications	GeneralView		알림 가능
 Window width:	GeneralView		창 너비:
 OK	PrefletWin		확인
-OK	NotificationView		확인
 Notifications	PrefletWin		알림
-General	PrefletView		일반
-Allowed	NotificationView		허가됨
-Notifications	System name		통지서비스
+Revert	PrefletWin		되돌리기
 Applications	PrefletView		응용프로그램
-Application	NotificationView		응용프로그램
 Applications	NotificationView		응용프로그램
+General	PrefletView		일반
+OK	NotificationView		확인
+Notifications	System name		통지서비스
+Allowed	NotificationView		허가됨
+Application	NotificationView		응용프로그램
+Enable notifications	GeneralView		알림 가능

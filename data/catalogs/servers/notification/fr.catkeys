@@ -1,5 +1,5 @@
 1	french	x-vnd.Haiku-notification_server	2022780929
 Warning	NotificationWindow		Avertissement
+Notification	NotificationWindow		Notification
 OK	NotificationWindow		OK
 Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Impossible de démarrer la surveillance des paramètres généraux.\nLes changements de filtres dynamique sont désactivés.
-Notification	NotificationWindow		Notification

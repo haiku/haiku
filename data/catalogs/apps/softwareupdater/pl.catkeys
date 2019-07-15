@@ -1,26 +1,36 @@
-1	polish	x-vnd.haiku-softwareupdater	3197458809
+1	polish	x-vnd.haiku-softwareupdater	1519085449
 No active network connection was found	UpdateManager	Error message	Nie znaleziono aktywnego połączenia sieciowego
-Cancel	SoftwareUpdaterWindow		Anuluj
-Packages are being updated	UpdateManager		Pakiety są aktualizowane
-Update now	SoftwareUpdaterWindow		Aktualizuj teraz
-Updates did not complete	UpdateAction		Aktualizacje nie zostały ukończone
-Checking for updates	CheckManager		Wyszukiwanie aktualizacji
-SoftwareUpdater	System name		SoftwareUpdater
-Fatal error while checking for updates: %s\n	CheckAction		Podczas szukania aktualizacji wystąpił błąd krytyczny: %s\n
-from repository	SoftwareUpdaterWindow	List item text	z repozytorium
-Cancel	SoftwareUpdaterWindow	Alert button label	Anuluj
 Quit	SoftwareUpdaterWindow	Alert button label	Zakończ
-Quit	SoftwareUpdaterWindow		Zakończ
-%i of %i	UpdateManager	Do not translate %i	%i z %i
-Quit	SoftwareUpdaterWindow	Button label	Zakończ
-Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Proszę wybrać jedną z opcji aktualizacji:\n\nZaktualizuj:\n\tAktualizuje wszystkie zainstalowane pakiety.\nPełna synchronizacja:\n\tSynchronizuje zainstalowane pakiety z repozytoriami.
-Exception occurred while checking for updates: %s\n	CheckAction		Podczas sprawdzania aktualizacji wystąpił wyjątek: %s\n
-Exception occurred while updating packages : %s\n	UpdateAction		Podczas aktualizowania pakietów wystąpił wyjątek: %s\n
-Update	SoftwareUpdaterWindow	Alert button label	Zaktualizuj
-OK	UpdateManager		OK
-A reboot may be necessary to complete some updates.	UpdateManager		Restart może być konieczny, aby ukończyć niektóre aktualizacje.
-Show more details	SoftwareUpdaterWindow		Wyświetl więcej szczegółów
-Full sync	SoftwareUpdaterWindow	Alert button label	Pełna synchronizacja
-No active network connection was found.\n	CheckManager		Nie znaleziono aktywnego połączenia z siecią.\n
-OK	SoftwareUpdaterWindow		OK
 There were no updates found.	CheckManager		Nie znaleziono żadnych aktualizacji.
+Updates found	SoftwareUpdaterWindow		Znaleziono aktualizacje
+Update now	SoftwareUpdaterWindow		Aktualizuj teraz
+OK	UpdateManager		OK
+Unrecognized argument	SoftwareUpdaterApp	Error message	Nierozpoznany argument
+There were no updates found.	CheckAction		Nie znaleziono aktualizacji.
+New packages to be installed	SoftwareUpdaterWindow	List super item label	Nowe pakiety do zainstalowania
+to	SoftwareUpdaterWindow	List item text	do
+Contacting software repositories to check for package updates.	CheckManager		Odpytywanie repozytoriów o dostępne aktualizacje.
+Available updates found	CheckManager		Znaleziono dostępne aktualizacje
+from repository	SoftwareUpdaterWindow	List item text	z repozytorium
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Odpytywanie repozytoriów o dostępne aktualizacje.
+Cancel	SoftwareUpdaterWindow	Alert button label	Anuluj
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Proszę wybrać jedną z opcji aktualizacji:\n\nZaktualizuj:\n\tAktualizuje wszystkie zainstalowane pakiety.\nPełna synchronizacja:\n\tSynchronizuje zainstalowane pakiety z repozytoriami.
+OK	SoftwareUpdaterWindow		OK
+Fatal error while checking for updates: %s\n	CheckAction		Podczas szukania aktualizacji wystąpił błąd krytyczny: %s\n
+SoftwareUpdater	System name		SoftwareUpdater
+No active network connection was found.\n	CheckManager		Nie znaleziono aktywnego połączenia z siecią.\n
+Full sync	SoftwareUpdaterWindow	Alert button label	Pełna synchronizacja
+Quit	SoftwareUpdaterWindow	Button label	Zakończ
+Exception occurred while updating packages : %s\n	UpdateAction		Podczas aktualizowania pakietów wystąpił wyjątek: %s\n
+Exception occurred while checking for updates: %s\n	CheckAction		Podczas sprawdzania aktualizacji wystąpił wyjątek: %s\n
+Packages are being updated	UpdateManager		Pakiety są aktualizowane
+Cancel	SoftwareUpdaterWindow		Anuluj
+Don't quit	SoftwareUpdaterWindow		Nie zamykaj
+Show more details	SoftwareUpdaterWindow		Wyświetl więcej szczegółów
+Checking for updates	CheckManager		Wyszukiwanie aktualizacji
+Update	SoftwareUpdaterWindow	Alert button label	Zaktualizuj
+Updates did not complete	UpdateAction		Aktualizacje nie zostały ukończone
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Otwórz Repozytoria
+%i of %i	UpdateManager	Do not translate %i	%i z %i
+Quit	SoftwareUpdaterWindow		Zakończ
+No updates available	CheckManager		Brak dostępnych aktualizacji

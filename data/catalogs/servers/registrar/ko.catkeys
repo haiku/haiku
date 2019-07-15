@@ -1,23 +1,23 @@
 1	korean	x-vnd.haiku-registrar	2599857937
-Restart system	ShutdownProcess		시스템 다시 시작
-The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		응용프로그램 \"%appName%\"은 모달 패널에 차단될 수도 있습니다.
-OK	ShutdownProcess		확인
-System is shut down	ShutdownProcess		시스템은 껴졌습니다.
-It's now safe to turn off the computer.	ShutdownProcess		지금은 컴퓨터를 끄기에 안전합니다.
 Cancel	ShutdownProcess		취소
+OK	ShutdownProcess		확인
 Do you really want to shut down the system?	ShutdownProcess		당신은 정말로 컴퓨터를 끄겟습니까?
-Asking other processes to quit.	ShutdownProcess		다른 프로세스를 끝내려고 요청하는 중
-Asking \"%appName%\" to quit.	ShutdownProcess		\"%appName%\"을 끝내려고 요청하는 중
-%action%?	ShutdownProcess		%action%?
-Shutdown aborted	ShutdownProcess		종료가 취소됨
-Restarting…	ShutdownProcess		다시 시작중...
-Asking background applications to quit.	ShutdownProcess		백그라운드 응용프로그램이 끝나기를 요청하는 중입니다.
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		응용프로그램 \"%appName%\" 은 종료작업에서 취소되었습니다.
-Tidying things up a bit.	ShutdownProcess		조금 정리하는 중
-Do you really want to restart the system?	ShutdownProcess		당신은 정말로 시스템이 다시 시작하기를 원합니까?
 Shutdown status	ShutdownProcess		종료 상태
-Cancel shutdown	ShutdownProcess		종료 취소
-Kill application	ShutdownProcess		응용프로그램 죽이기
 Shut down	ShutdownProcess		끝내기
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		응용프로그램 \"%appName%\"은 모달 패널에 차단될 수도 있습니다.
+System is shut down	ShutdownProcess		시스템은 껴졌습니다.
+Restart system	ShutdownProcess		시스템 다시 시작
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		응용프로그램 \"%appName%\" 은 종료작업에서 취소되었습니다.
+Asking background applications to quit.	ShutdownProcess		백그라운드 응용프로그램이 끝나기를 요청하는 중입니다.
+Do you really want to restart the system?	ShutdownProcess		당신은 정말로 시스템이 다시 시작하기를 원합니까?
 Restart	ShutdownProcess		다시 시작
+It's now safe to turn off the computer.	ShutdownProcess		지금은 컴퓨터를 끄기에 안전합니다.
+Asking other processes to quit.	ShutdownProcess		다른 프로세스를 끝내려고 요청하는 중
+Cancel shutdown	ShutdownProcess		종료 취소
+Restarting…	ShutdownProcess		다시 시작중...
+%action%?	ShutdownProcess		%action%?
+Tidying things up a bit.	ShutdownProcess		조금 정리하는 중
+Kill application	ShutdownProcess		응용프로그램 죽이기
+Shutdown aborted	ShutdownProcess		종료가 취소됨
 Shutting down…	ShutdownProcess		끝내는 중
+Asking \"%appName%\" to quit.	ShutdownProcess		\"%appName%\"을 끝내려고 요청하는 중

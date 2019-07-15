@@ -1,50 +1,50 @@
 1	romanian	x-vnd.Be-PEPL	2332202134
-Edit	People		Editează
-Error	People		Eroare
-City	People		Oraș
-The file '%name%' could not be written.	People		Nu a putut fi scris fișierul '%name%'.
-none	Groups list		nimic
-Configure attributes	People		Configurează atribute
-Company	People		Companie
-%name% picture	People		%name% imagine
-Work phone	People		Telefon de serviciu
-People	System name		Oameni
-New person	People		Persoană nouă
-Select all	People		Selectează tot
-File	People		Fișier
-Unnamed person	People		Persoană fără nume
-Could not create %s.	People		Nu s-a putut crea %s.
-Country	People		Țară
-Close	People		Închide
-Group	People		Grup
-Nickname	People		Pseudonim
-Quit	People		Închidere
-Name	People		Nume
-Revert	People		Revenire
-Don't save	People		Nu salva
-Undo	People		Refă
-E-mail	People		Email
-Load image…	People		Încarcă imagine…
-OK	People		OK
-Remove image	People		Elimină imaginea
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Lansarea preferinței FileTypes pentru a configura atributele aplicației Person a eșuat.\n\nEroare: 
-Home phone	People		Telefon de acasă
-Save as…	People		Salvează ca…
-Redo	People		Repetă
-Save changes before closing?	People		Doriți să salvați modificările înainte de a închide?
-Paste	People		Lipește
-Drop an image here,\nor use the contextual menu.	People		Plasează o imagine aici,\nsau utilizează meniul contextual.
-Save	People		Salvează
-Person	Short mimetype description		Persoană
+Unnamed person	People		Persoană fără nume
 New person…	People		Persoană nouă…
 Address	People		Adresă
-URL	People		URL
-Sorry	People		Îmi pare rău
 Zip	People		Cod poștal
-Contact information for a person.	Long mimetype description		Informațiile de contact pentru o persoană.
-Fax	People		Fax
+Select all	People		Selectează tot
+Could not create %s.	People		Nu s-a putut crea %s.
+Quit	People		Închidere
+Company	People		Companie
+Name	People		Nume
+The file '%name%' could not be written.	People		Nu a putut fi scris fișierul '%name%'.
 Contact name	People		Nume de contact
-Cut	People		Taie
 Cancel	People		Anulează
+Edit	People		Editează
+Save changes before closing?	People		Doriți să salvați modificările înainte de a închide?
+People	System name		Oameni
+Error	People		Eroare
+Revert	People		Revenire
+Country	People		Țară
+Person	Short mimetype description		Persoană
+New person	People		Persoană nouă
+Save	People		Salvează
+Fax	People		Fax
+URL	People		URL
+%name% picture	People		%name% imagine
+Home phone	People		Telefon de acasă
+none	Groups list		nimic
+Save as…	People		Salvează ca…
+Cut	People		Taie
+Contact information for a person.	Long mimetype description		Informațiile de contact pentru o persoană.
+Remove image	People		Elimină imaginea
+City	People		Oraș
+Undo	People		Refă
+Don't save	People		Nu salva
+Configure attributes	People		Configurează atribute
+Work phone	People		Telefon de serviciu
 State	People		Stare
+Nickname	People		Pseudonim
+OK	People		OK
+File	People		Fișier
+Redo	People		Repetă
+Close	People		Închide
 Copy	People		Copiază
+Paste	People		Lipește
+E-mail	People		Email
+Group	People		Grup
+Drop an image here,\nor use the contextual menu.	People		Plasează o imagine aici,\nsau utilizează meniul contextual.
+Load image…	People		Încarcă imagine…
+Sorry	People		Îmi pare rău

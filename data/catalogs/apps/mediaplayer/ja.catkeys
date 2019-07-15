@@ -1,155 +1,155 @@
 1	japanese	x-vnd.Haiku-MediaPlayer	1313616492
-raw audio	MediaPlayer-InfoWin		raw オーディオ
-Location	MediaPlayer-InfoWin		場所
-1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (アメリカ)
-%d kHz	MediaPlayer-InfoWin		%d kHz
-Stream settings	MediaPlayer-Main		ストリーム設定
-<unknown>	PlaylistItem-album		<不明>
-Scale controls in full screen mode	MediaPlayer-SettingsWindow		フルスクリーン表示時にコントロールを拡大する
-Video	MediaPlayer-InfoWin		ビデオ
-Subtitle size:	MediaPlayer-SettingsWindow		字幕のサイズ:
-Save Playlist	MediaPlayer-PlaylistWindow		プレイリストを保存
-<no media>	MediaPlayer-InfoWin		<メディアはありません>
-(not supported)	MediaPlayer-InfoWin		(サポートされていません)
-None of the files you wanted to play appear to be media files.	MediaPlayer-Main		再生しようとしているファイルはメディアファイルではないようです。
-Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		プレイリストの保存に失敗しました。\n\nエラー:
-ask every time	MediaPlayer-SettingsWindow		常に尋ねる
-%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
-New player…	MediaPlayer-Main		新規プレーヤー…
-100% scale	MediaPlayer-Main		100% 表示
-Subtitle placement:	MediaPlayer-SettingsWindow		字幕の位置:
-Close	MediaPlayer-Main		閉じる
-Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		いくつかのファイルはごみ箱に移動できませんでした。
-<unknown>	MediaPlayer-InfoWin		<不明>
-Open	MediaPlayer-Main		開く
-OK	MediaPlayer-SettingsWindow		OK
-Track %d	MediaPlayer-Main		トラック %d
-2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (シネマスコープ)
-Display mode	MediaPlayer-InfoWin		表示モード
-Medium	MediaPlayer-SettingsWindow		中
-Open network stream	MediaPlayer-NetworkStream		ネットワークストリームを開く
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		項目をごみ箱へ移動
 Close	MediaPlayer-PlaylistWindow		閉じる
-Open…	MediaPlayer-PlaylistWindow		開く…
-Undo	MediaPlayer-PlaylistWindow		元に戻す
-Stream URL:	MediaPlayer-NetworkStream		ストリームのURL:
+Volume of background clips	MediaPlayer-SettingsWindow		バックグラウンド再生時のボリューム
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		利用できるなら、ハードウェアビデオオーバーレイを使う
-File info…	MediaPlayer-Main		ファイル情報…
-Overlay	MediaPlayer-InfoWin		オーバーレイ
-Remove Entry	MediaPlayer-RemovePLItemsCmd		項目を削除
-Close window after playing audio	MediaPlayer-SettingsWindow		オーディオ再生終了後、ウィンドウを閉じる
-Full volume	MediaPlayer-SettingsWindow		最大音量
-Drop files to play	MediaPlayer-Main		ファイルをドロップして再生してください。
-Copyright	MediaPlayer-InfoWin		著作権
-Cancel	MediaPlayer-SettingsWindow		取り消し
-Loop audio	MediaPlayer-SettingsWindow		オーディオを繰り返し再生
-Container	MediaPlayer-InfoWin		コンテナー
-Nothing to Play	MediaPlayer-Main		再生するものがありません
+Audio	MediaPlayer-InfoWin		オーディオ
+Subtitle placement:	MediaPlayer-SettingsWindow		字幕の位置:
+MediaPlayer	System name		メディアプレーヤー
+Audio track	MediaPlayer-Main		音声トラック
 Muted	MediaPlayer-SettingsWindow		ミュート
-Quit	MediaPlayer-Main		終了
+OK	MediaPlayer-RemovePLItemsCmd		OK
+Open Playlist	MediaPlayer-PlaylistWindow		プレイリストを開く
+Subtitles	MediaPlayer-Main		字幕
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% の内部エラーです。ファイルは開けませんでした。
+DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
+File info	MediaPlayer-InfoWin		ファイル情報
+raw audio	MediaPlayer-InfoWin		raw オーディオ
+Select all	MediaPlayer-PlaylistWindow		すべて選択
+New player…	MediaPlayer-Main		新規プレーヤー…
+Move Entries	MediaPlayer-MovePLItemsCmd		項目を移動
+OK	MediaPlayer-Main		OK
+Remove	MediaPlayer-PlaylistWindow		削除
+<unknown>	MediaPlayer-InfoWin		<不明>
 Resume:	MediaPlayer-SettingsWindow		レジューム:
+Duration	MediaPlayer-InfoWin		再生時間
+Import Entries	MediaPlayer-ImportPLItemsCmd		項目のインポート
+Open network stream	MediaPlayer-Main		ネットワークストリームを開く 
+Move file to Trash	MediaPlayer-PlaylistWindow		ファイルをごみ箱に移動
+Open file…	MediaPlayer-Main		ファイルを開く…
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		フルスクリーン表示時にコントロールを拡大する
+View options	MediaPlayer-SettingsWindow		表示オプション
+%d kHz	MediaPlayer-InfoWin		%d kHz
+Full volume	MediaPlayer-SettingsWindow		最大音量
+<untitled>	PlaylistItem-title		<無題>
+Start media server	MediaPlayer-Main		メディアサーバーを起動する
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		メディアサーバーが動いていないようです。\n起動してもよろしいですか ?
+Location	MediaPlayer-InfoWin		場所
+Medium	MediaPlayer-SettingsWindow		中
+Play mode	MediaPlayer-SettingsWindow		再生モード
+Playlist	MediaPlayer-PlaylistWindow		プレイリスト
+%d Bit	MediaPlayer-InfoWin		%d ビット
+Track	Audio Track Menu		トラック
+Close	MediaPlayer-Main		閉じる
+Save error	MediaPlayer-PlaylistWindow		保存エラー
+Attributes	MediaPlayer-Main		属性
+Bottom of screen	MediaPlayer-SettingsWindow		画面の下側
+MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer 設定
+Copyright	MediaPlayer-InfoWin		著作権
+Invalid URL inserted!	MediaPlayer-NetworkStream		無効な URL が書き込まれました!
+Aspect ratio	MediaPlayer-Main		アスペクト比
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		プレイリストの保存に失敗しました。\n\nエラー:
+<no media>	MediaPlayer-InfoWin		<メディアはありません>
+Hide interface	MediaPlayer-Main		インターフェイスを隠す
+Error: 	MediaPlayer-Main		エラー:
+Video track	MediaPlayer-Main		映像トラック
+Playlist…	MediaPlayer-Main		プレイリスト…
+<unnamed media>	MediaPlayer-InfoWin		<名前の無いメディア>
+Save	MediaPlayer-PlaylistWindow		保存
+Randomize Entries	MediaPlayer-RandomizePLItemsCmd		項目のランダムな並び替え
+Cancel	MediaPlayer-NetworkStream		取り消し
+Nothing to Play	MediaPlayer-Main		再生するものがありません
+OK	MediaPlayer-SettingsWindow		OK
+Remove Entries	MediaPlayer-RemovePLItemsCmd		項目の削除
+never	MediaPlayer-SettingsWindow		実行しない
+Loop audio	MediaPlayer-SettingsWindow		オーディオを繰り返し再生
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部エラー (不正なメッセージ)。プレイリストの保存に失敗しました。
+Open…	MediaPlayer-PlaylistWindow		開く…
+Revert	MediaPlayer-SettingsWindow		元に戻す
+Low volume	MediaPlayer-SettingsWindow		低音量
+Audio	MediaPlayer-Main		オーディオ
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{モノラル} =2{ステレオ} other{# チャンネル}}
+Quit	MediaPlayer-Main		終了
+Redo	MediaPlayer-PlaylistWindow		やり直し
+Move Entry	MediaPlayer-MovePLItemsCmd		項目を移動
+<unknown>	PlaylistItem-author		<不明>
+Cancel	MediaPlayer-SettingsWindow		取り消し
+Large	MediaPlayer-SettingsWindow		大
+Import Entry	MediaPlayer-ImportPLItemsCmd		項目をインポート
+unknown format	MediaPlayer-InfoWin		不明なフォーマット
+Track %d	MediaPlayer-Main		トラック %d
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		すべてのファイルをごみ箱に移動できませんでした。
+Total duration: %s	MediaPlayer-PlaylistWindow		総再生時間: %s
+%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
+Move into trash error	MediaPlayer-RemovePLItemsCmd		ごみ箱への移動エラー
+50% scale	MediaPlayer-Main		50% 表示
+Drop files to play	MediaPlayer-Main		ファイルをドロップして再生してください。
+Copy Entry	MediaPlayer-CopyPLItemsCmd		項目をコピー
+Close window after playing audio	MediaPlayer-SettingsWindow		オーディオ再生終了後、ウィンドウを閉じる
+Edit	MediaPlayer-PlaylistWindow		編集
+Copy Entries	MediaPlayer-CopyPLItemsCmd		項目をコピー
+Always on top	MediaPlayer-Main		常に最前面
+Open	MediaPlayer-PlaylistWindow		開く
+always	MediaPlayer-SettingsWindow		常に実行
+Loop video	MediaPlayer-SettingsWindow		ビデオを繰り返し再生
+Stream URL:	MediaPlayer-NetworkStream		ストリームのURL:
+<unknown>	PlaylistItem-album		<不明>
+Stream settings	MediaPlayer-Main		ストリーム設定
+none	Subtitles menu		無し
+Save Playlist	MediaPlayer-PlaylistWindow		プレイリストを保存
+Overlay	MediaPlayer-InfoWin		オーバーレイ
+2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (シネマスコープ)
+Rating	MediaPlayer-Main		評価
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部エラー (メモリー不足)。プレイリストの保存に失敗しました。
 Video	MediaPlayer-Main		ビデオ
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		ファイルフォーマットを扱うデコーダーがインストールされていません。または、デコーダーと特定のバージョンのフォーマットに問題があります。
-Import Entry	MediaPlayer-ImportPLItemsCmd		項目をインポート
-400% scale	MediaPlayer-Main		400% 表示
-Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		プレイリストの保存に失敗しました:\n\nエラー:
-Move Entries	MediaPlayer-MovePLItemsCmd		項目を移動
-Audio	MediaPlayer-Main		オーディオ
-Open Playlist	MediaPlayer-PlaylistWindow		プレイリストを開く
-MediaPlayer	System name		メディアプレーヤー
-OK	MediaPlayer-Main		OK
+Lock Peaks	MediaPlayer-PeakView		ピークを固定
+none	Audio track menu		無し
+Open network stream	MediaPlayer-NetworkStream		ネットワークストリームを開く
+Automatically start playing	MediaPlayer-SettingsWindow		自動的に再生を開始する
+Undo	MediaPlayer-PlaylistWindow		元に戻す
+Display mode	MediaPlayer-InfoWin		表示モード
+Bottom of video	MediaPlayer-SettingsWindow		ビデオの下側
+Small	MediaPlayer-SettingsWindow		小
 Settings…	MediaPlayer-Main		設定…
-MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer 設定
-never	MediaPlayer-SettingsWindow		実行しない
-h	MediaPlayer-InfoWin	Hours	時間
-Select all	MediaPlayer-PlaylistWindow		すべて選択
-Move Entry	MediaPlayer-MovePLItemsCmd		項目を移動
-Open	MediaPlayer-PlaylistWindow		開く
-The file '%filename' could not be opened.\n\n	MediaPlayer-Main		ファイル'%filename'を開けませんでした。\n\n
-Error: 	MediaPlayer-RemovePLItemsCmd		エラー:
-Audio	MediaPlayer-InfoWin		オーディオ
-Move into trash error	MediaPlayer-RemovePLItemsCmd		ごみ箱への移動エラー
-Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部エラー (不正なメッセージ)。プレイリストの保存に失敗しました。
-%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% の内部エラーです。ファイルは開けませんでした。
+min	MediaPlayer-InfoWin	Minutes	分
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		プレイリストの保存に失敗しました:\n\nエラー:
+Video	MediaPlayer-InfoWin		ビデオ
+File info…	MediaPlayer-Main		ファイル情報…
+1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (アメリカ)
+<unnamed>	PlaylistItem-name		<名前が無い>
+Track	Video Track Menu		トラック
+Full screen	MediaPlayer-Main		全画面表示
+OK	MediaPlayer-NetworkStream		OK
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部エラー (ロックに失敗)。プレイリストの保存に失敗しました。
+100% scale	MediaPlayer-Main		100% 表示
+<nothing to redo>	MediaPlayer-PlaylistWindow		<やり直すものがありません>
+Bad URL	MediaPlayer-NetworkStream		Bad URL
+Save	MediaPlayer-Main		保存
 Close window after playing video	MediaPlayer-SettingsWindow		ビデオ再生終了後、ウィンドウを閉じる
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		ムービーのスムーズな拡大縮小 (オーバーレイモード以外)
-OK	MediaPlayer-RemovePLItemsCmd		OK
-Open network stream	MediaPlayer-Main		ネットワークストリームを開く 
-50% scale	MediaPlayer-Main		50% 表示
-Subtitles	MediaPlayer-Main		字幕
-Audio track	MediaPlayer-Main		音声トラック
-Import Entries	MediaPlayer-ImportPLItemsCmd		項目のインポート
-No aspect correction	MediaPlayer-Main		アスペクト比を修正しない
-Automatically start playing	MediaPlayer-SettingsWindow		自動的に再生を開始する
-Track	Video Track Menu		トラック
-Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部エラー (ロックに失敗)。プレイリストの保存に失敗しました。
-View options	MediaPlayer-SettingsWindow		表示オプション
-none	MediaPlayer-Main		無し
-Play mode	MediaPlayer-SettingsWindow		再生モード
-Remove Entries	MediaPlayer-RemovePLItemsCmd		項目の削除
-Video track	MediaPlayer-Main		映像トラック
-Loop video	MediaPlayer-SettingsWindow		ビデオを繰り返し再生
-Attributes	MediaPlayer-Main		属性
-All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		すべてのファイルをごみ箱に移動できませんでした。
-<untitled>	PlaylistItem-title		<無題>
-Track	Audio Track Menu		トラック
-unknown format	MediaPlayer-InfoWin		不明なフォーマット
-<nothing to redo>	MediaPlayer-PlaylistWindow		<やり直すものがありません>
-Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		項目をごみ箱に移動
 200% scale	MediaPlayer-Main		200% 表示
-It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		メディアサーバーが動いていないようです。\n起動してもよろしいですか ?
-Duration	MediaPlayer-InfoWin		再生時間
-Aspect ratio	MediaPlayer-Main		アスペクト比
-Error: 	MediaPlayer-Main		エラー:
-Large	MediaPlayer-SettingsWindow		大
-Bottom of video	MediaPlayer-SettingsWindow		ビデオの下側
-DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
-always	MediaPlayer-SettingsWindow		常に実行
-Total duration: %s	MediaPlayer-PlaylistWindow		総再生時間: %s
-<unnamed media>	MediaPlayer-InfoWin		<名前の無いメディア>
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		ファイル'%filename'を開けませんでした。\n\n
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		再生しようとしているファイルはメディアファイルではないようです。
+Remove Entry	MediaPlayer-RemovePLItemsCmd		項目を削除
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		項目をごみ箱に移動
+Subtitle size:	MediaPlayer-SettingsWindow		字幕のサイズ:
+No aspect correction	MediaPlayer-Main		アスペクト比を修正しない
 raw video	MediaPlayer-InfoWin		raw ビデオ
-Volume of background clips	MediaPlayer-SettingsWindow		バックグラウンド再生時のボリューム
-Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部エラー (メモリー不足)。プレイリストの保存に失敗しました。
-Hide interface	MediaPlayer-Main		インターフェイスを隠す
+Container	MediaPlayer-InfoWin		コンテナー
+none	MediaPlayer-Main		無し
 Open clips	MediaPlayer-Main		クリップを開く
-Copy Entry	MediaPlayer-CopyPLItemsCmd		項目をコピー
-none	Subtitles menu		無し
-Move file to Trash	MediaPlayer-PlaylistWindow		ファイルをごみ箱に移動
-Invalid URL inserted!	MediaPlayer-NetworkStream		無効な URL が書き込まれました!
-OK	MediaPlayer-NetworkStream		OK
-min	MediaPlayer-InfoWin	Minutes	分
-Small	MediaPlayer-SettingsWindow		小
-Randomize	MediaPlayer-PlaylistWindow		ランダムに並べ替え
-Off	Subtitles menu		オフ
-Randomize Entries	MediaPlayer-RandomizePLItemsCmd		項目のランダムな並び替え
-Revert	MediaPlayer-SettingsWindow		元に戻す
-Edit	MediaPlayer-PlaylistWindow		編集
-Start media server	MediaPlayer-Main		メディアサーバーを起動する
-%.3f fps	MediaPlayer-InfoWin		%.3f fps
-Bad URL	MediaPlayer-NetworkStream		Bad URL
-{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{モノラル} =2{ステレオ} other{# チャンネル}}
-<unnamed>	PlaylistItem-name		<名前が無い>
-OK	MediaPlayer-PlaylistWindow		OK
-none	Audio track menu		無し
-Cancel	MediaPlayer-NetworkStream		取り消し
-Playlist…	MediaPlayer-Main		プレイリスト…
-<unknown>	PlaylistItem-author		<不明>
-Save as…	MediaPlayer-PlaylistWindow		名前を付けて保存…
-Copy Entries	MediaPlayer-CopyPLItemsCmd		項目をコピー
-Redo	MediaPlayer-PlaylistWindow		やり直し
-Always on top	MediaPlayer-Main		常に最前面
-Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		項目をごみ箱へ移動
-Save	MediaPlayer-Main		保存
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		いくつかのファイルはごみ箱に移動できませんでした。
 <nothing to undo>	MediaPlayer-PlaylistWindow		<元に戻すものがありません>
-File info	MediaPlayer-InfoWin		ファイル情報
-Save	MediaPlayer-PlaylistWindow		保存
-%d Bit	MediaPlayer-InfoWin		%d ビット
-Remove	MediaPlayer-PlaylistWindow		削除
-Full screen	MediaPlayer-Main		全画面表示
-Open file…	MediaPlayer-Main		ファイルを開く…
+Save as…	MediaPlayer-PlaylistWindow		名前を付けて保存…
+Error: 	MediaPlayer-RemovePLItemsCmd		エラー:
 300% scale	MediaPlayer-Main		300% 表示
-Bottom of screen	MediaPlayer-SettingsWindow		画面の下側
-Save error	MediaPlayer-PlaylistWindow		保存エラー
-Rating	MediaPlayer-Main		評価
-Playlist	MediaPlayer-PlaylistWindow		プレイリスト
-Lock Peaks	MediaPlayer-PeakView		ピークを固定
-Low volume	MediaPlayer-SettingsWindow		低音量
+Open	MediaPlayer-Main		開く
+ask every time	MediaPlayer-SettingsWindow		常に尋ねる
+(not supported)	MediaPlayer-InfoWin		(サポートされていません)
+Randomize	MediaPlayer-PlaylistWindow		ランダムに並べ替え
+%.3f fps	MediaPlayer-InfoWin		%.3f fps
+Off	Subtitles menu		オフ
+400% scale	MediaPlayer-Main		400% 表示
+h	MediaPlayer-InfoWin	Hours	時間
+OK	MediaPlayer-PlaylistWindow		OK

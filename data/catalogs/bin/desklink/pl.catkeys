@@ -1,16 +1,16 @@
-1	polish	x-vnd.Haiku-desklink	3940727097
-Control physical output	MediaReplicant		Zarządzaj wyjściem fizycznym
-Couldn't launch 	MediaReplicant		Nie można uruchomić 
-Muted	MediaReplicant		Wyciszone
-OK	MediaReplicant		OK
+1	polish	x-vnd.Haiku-desklink	3568085956
+desklink	MediaReplicant	Title of an alert box	Skrót pulpitu
 Sound preferences…	MediaReplicant		Ustawienia dźwięku…
+Muted	MediaReplicant		Wyciszone
 %g dB	MediaReplicant		%g dB
-Open %name	DeskButton	Don't translate variable %name	Otwórz %name
-No media server running	VolumeControl		Brak uruchomionego serwera mediów
-Media preferences…	MediaReplicant		Ustawienia mediów…
-%d dB	VolumeControl		%d dB
+OK	MediaReplicant		OK
+Couldn't launch 	MediaReplicant		Nie można uruchomić 
+Volume	VolumeControl		Głośność
 Open MediaPlayer	MediaReplicant		Otwórz MediaPlayer
-desklink	MediaReplicant		Skrót pulpitu
+%d dB	VolumeControl		%d dB
+Media preferences…	MediaReplicant		Ustawienia mediów…
 Options	MediaReplicant		Opcje
 Beep	MediaReplicant		Brzęczyk
-Volume	VolumeControl		Głośność
+Open %name	DeskButton	Don't translate variable %name	Otwórz %name
+Control physical output	MediaReplicant		Zarządzaj wyjściem fizycznym
+No media server running	VolumeControl		Brak uruchomionego serwera mediów

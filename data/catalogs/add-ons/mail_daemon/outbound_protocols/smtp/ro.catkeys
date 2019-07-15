@@ -1,14 +1,14 @@
 1	romanian	x-vnd.Haiku-SMTP	815985329
-SMTP server:	ConfigView		Server SMTP:
-Error while logging in to %serv	smtp		Eroare la autentificare la %serv
-Unencrypted	ConfigView		Necriptat
-. The server says:\n	smtp		. Serverul spune:\n
-ESMTP	ConfigView		ESMTP
-Connecting to server…	smtp		Conectare la server…
-Error while opening connection to %serv	smtp		Eroare în timpul deschiderii conexiunii la %serv
 POP3 authentication failed. The server said:\n	smtp		Autentificarea POP3 a eșuat. Serverul a spus:\n
 Destination:	ConfigView		Destinație:
+Error while logging in to %serv	smtp		Eroare la autentificare la %serv
+Connecting to server…	smtp		Conectare la server…
+Unencrypted	ConfigView		Necriptat
+. The server says:\n	smtp		. Serverul spune:\n
+Error while opening connection to %serv	smtp		Eroare în timpul deschiderii conexiunii la %serv
+. The server said:\n	smtp		. Serverul a spus:\n
 None	ConfigView		Nimic
+SMTP server:	ConfigView		Server SMTP:
+ESMTP	ConfigView		ESMTP
 POP3 before SMTP	ConfigView		POP3 înainte de SMTP
 SSL	ConfigView		SSL
-. The server said:\n	smtp		. Serverul a spus:\n

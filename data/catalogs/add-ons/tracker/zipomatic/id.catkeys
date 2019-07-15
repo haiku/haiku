@@ -1,17 +1,17 @@
 1	indonesian	x-vnd.haiku.zip-o-matic	2032806096
-Stop	file:ZipOMaticWindow.cpp		Berhenti
-Creating archive: %s	file:ZipOMaticWindow.cpp		Membuat arsip: %s
-Continue	file:ZipOMaticWindow.cpp		Lanjutkan
-Preparing to archive	file:ZipperThread.cpp		Bersiap mengarsip
 Drop files here.	file:ZipOMaticWindow.cpp		Jatuhkan berkas disini.
 Filename: %s	file:ZipOMaticWindow.cpp		Namaberkas: %s
-You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Anda mempunyai {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} berjalan.\n\n
-Let them continue	file:ZipOMatic.cpp		Biarkan mereka melanjutkan
 Do you want to stop them?	file:ZipOMatic.cpp		Apakah anda ingin menghentikannya?
+Error creating archive	file:ZipOMaticWindow.cpp		Terjadi kesalahan membuat arsip
+Stop them	file:ZipOMatic.cpp		Hentikan
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Apakah anda yakin ingin berhenti membuat arsip ini?
+Preparing to archive	file:ZipperThread.cpp		Bersiap mengarsip
+Let them continue	file:ZipOMatic.cpp		Biarkan mereka melanjutkan
+Continue	file:ZipOMaticWindow.cpp		Lanjutkan
+Archive created OK	file:ZipOMaticWindow.cpp		Arsip telah dibuat OK
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# file added.} other{# files added.}}
+Stop	file:ZipOMaticWindow.cpp		Berhenti
 Stopped	file:ZipOMaticWindow.cpp		Dihentikan
 Archive	file:ZipperThread.cpp		Arsip
-Error creating archive	file:ZipOMaticWindow.cpp		Terjadi kesalahan membuat arsip
-{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# file added.} other{# files added.}}
-Archive created OK	file:ZipOMaticWindow.cpp		Arsip telah dibuat OK
-Stop them	file:ZipOMatic.cpp		Hentikan
+Creating archive: %s	file:ZipOMaticWindow.cpp		Membuat arsip: %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Anda mempunyai {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} berjalan.\n\n

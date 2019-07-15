@@ -1,27 +1,27 @@
 1	romanian	x-vnd.Haiku.TV	1995288111
-TV	MainWin		TV
-Channel	MainWin		Canal
-Settings…	MainWin		Configurări…
-Interface	MainWin		Interfață
-Keep aspect ratio	MainWin		Păstrează proporție aspect
-Previous channel	MainWin		Canalul precedent
-Settings	MainWin		Configurări
-TV	System name		TV
+No menu	MainWin		Fără meniu
 No border	MainWin		Fără margine
-Always on top	MainWin		Întotdeauna deasupra
-OK	MainWin		OK
-Quit	MainWin		Închidere
+force 704 x 576, display aspect 4:3	MainWin		forțează 704 x 576, aspect afișare 4:3
+Error, connecting to interface failed:\n\n	MainWin		Eroare, conectarea la interfață a eșuat:\n\n
+force 544 x 576, display aspect 4:3	MainWin		forțează 544 x 576, aspect afișare 4:3
 Full screen	MainWin		Ecran complet
-Debug	MainWin		Depanare
 Scale to native size	MainWin		Scalează la dimensiunea nativă
 unknown	MainWin		necunoscut
 Next channel	MainWin		Canalul următor
-Error, interface is busy:\n\n	MainWin		Eroare, interfața este ocupată:\n\n
-None	MainWin		Nimic
-force 704 x 576, display aspect 4:3	MainWin		forțează 704 x 576, aspect afișare 4:3
+Keep aspect ratio	MainWin		Păstrează proporție aspect
 DVB - Digital Video Broadcasting TV	MainWin		DVB - Difuzare Video Digital TV
-force 544 x 576, display aspect 4:3	MainWin		forțează 544 x 576, aspect afișare 4:3
-pixel aspect ratio	MainWin		proporție aspect pixel
-No menu	MainWin		Fără meniu
-Error, connecting to interface failed:\n\n	MainWin		Eroare, conectarea la interfață a eșuat:\n\n
+Always on top	MainWin		Întotdeauna deasupra
+Debug	MainWin		Depanare
+Interface	MainWin		Interfață
 force 720 x 576, display aspect 4:3	MainWin		forțează 720 x 576, aspect afișare 4:3
+Quit	MainWin		Închidere
+Channel	MainWin		Canal
+Previous channel	MainWin		Canalul precedent
+OK	MainWin		OK
+TV	MainWin		TV
+Settings	MainWin		Configurări
+TV	System name		TV
+Settings…	MainWin		Configurări…
+None	MainWin		Nimic
+Error, interface is busy:\n\n	MainWin		Eroare, interfața este ocupată:\n\n
+pixel aspect ratio	MainWin		proporție aspect pixel

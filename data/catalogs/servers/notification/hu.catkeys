@@ -1,5 +1,5 @@
 1	hungarian	x-vnd.Haiku-notification_server	2022780929
 Warning	NotificationWindow		Figyelmeztetés
+Notification	NotificationWindow		Értesítés
 OK	NotificationWindow		Rendben
 Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Nem sikerült elindítani az általános beállítás-monitort.\nAz élő szűrőváltoztatások le lettek tiltva.
-Notification	NotificationWindow		Értesítés

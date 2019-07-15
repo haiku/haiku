@@ -1,21 +1,20 @@
-1	korean	x-vnd.Haiku-NetworkStatus	3946594365
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		네트워크상태 옵션:\n\t--deskbar\t자동으로 데스크바에 복제품 더하기\n\t--help\t\이 정보를 보여주고 나가기\n
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		당신은 네트워크상태를 창에서 실행시키거나 데스크바에 설치 할 수 있습니다.
-<no wireless networks found>	NetworkStatusView		<무선 네트워크를 찾을 수 없음>
-Run in window	NetworkStatus		창으로 실행
-No link	NetworkStatusView		연결 안됨
-Install in Deskbar	NetworkStatus		데스크바에 설치
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		네트워크 설정애플릿 불러오기 실패.\n\n\에러:
+1	korean	x-vnd.Haiku-NetworkStatus	1745148875
 Netmask	NetworkStatusView		넷마스크
-Broadcast	NetworkStatusView		브로드캐스트
-Unknown	NetworkStatusView		알 수 없음
-Ready	NetworkStatusView		준비
-No stateful configuration	NetworkStatusView		상태형 설정이 없음
-%ifaceName information:\n	NetworkStatusView		%ifaceName 정보:\n
-Configuring	NetworkStatusView		설정중
-Address	NetworkStatusView		주소
-OK	NetworkStatusView		확인
-NetworkStatus	System name		네트워크상태
-Open network preferences…	NetworkStatusView		네트워크 환경설정 열기
-Could not join wireless network:\n	NetworkStatusView		무선 네트워크에 연결할 수 없음:\n
 Quit	NetworkStatusView		나가기
+Unknown	NetworkStatusView		알 수 없음
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		네트워크 설정애플릿 불러오기 실패.\n\n\에러:
+Install in Deskbar	NetworkStatus		데스크바에 설치
+Open network preferences…	NetworkStatusView		네트워크 환경설정 열기
+NetworkStatus	System name		네트워크상태
+OK	NetworkStatusView		확인
+No link	NetworkStatusView		연결 안됨
+Could not join wireless network:\n	NetworkStatusView		무선 네트워크에 연결할 수 없음:\n
+Ready	NetworkStatusView		준비
+Address	NetworkStatusView		주소
+No stateful configuration	NetworkStatusView		상태형 설정이 없음
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		당신은 네트워크상태를 창에서 실행시키거나 데스크바에 설치 할 수 있습니다.
+Broadcast	NetworkStatusView		브로드캐스트
+%ifaceName information:\n	NetworkStatusView		%ifaceName 정보:\n
+Run in window	NetworkStatus		창으로 실행
+<no wireless networks found>	NetworkStatusView		<무선 네트워크를 찾을 수 없음>
+Configuring	NetworkStatusView		설정중

@@ -1,50 +1,49 @@
-1	japanese	x-vnd.Haiku-ProcessController	1761882987
-Memory usage	ProcessController		メモリー使用量
-Kill this team!	ProcessController		スレッドを強制終了
-Idle priority	ProcessController		アイドル優先度
-Restart Deskbar	ProcessController		Deskbar を再起動
-Custom priority	ProcessController		カスタム優先度
-This team is already gone…	ProcessController		Team はすでに終了しています…
+1	japanese	x-vnd.Haiku-ProcessController	4131818684
 Error saving file	ProcessController		ファイル保存中にエラーが発生しました
-Real-time priority	ProcessController		リアルタイム優先度
-Power saving	ProcessController		省電力モード
-Your setting file could not be saved!\n(%s)	ProcessController		設定ファイルは保存できませんでした。\n(%s)
-What do you want to do with the team \"%s\"?	ProcessController		スレッド \"%s\" に対してなにをしますか?
-This thread is already gone…	ProcessController		スレッドはすでに終了しています…
-Cancel	ProcessController		取り消し
 Display priority	ProcessController		表示優先度
-Run in window	ProcessController		ウィンドウモードで起動
+That's no Fun!	ProcessController		そんなのおもしろくない!
+What do you want to do with the team \"%s\"?	ProcessController		スレッド \"%s\" に対してなにをしますか?
+Your setting file could not be saved!\n(%s)	ProcessController		設定ファイルは保存できませんでした。\n(%s)
 Processor %d	ProcessController		プロセッサ %d
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
-ProcessController is already installed in Deskbar.	ProcessController		プロセスコントローラーは、すでに Deskbar にインストールされています
-This is the last active processor...\nYou can't turn it off!	ProcessController		このプロセッサは最後の一個です。\n止められません！
-Info	ProcessController		情報
-Quit application	ProcessController		アプリケーションを終了
+Live in the Deskbar	ProcessController		Deskbar 中で実行
+Kill this team!	ProcessController		スレッドを強制終了
+OK	ProcessController		OK
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		プロセスコントローラーをウィンドウモードで起動するか、または Deskbar にインストールできます。
+Real-time priority	ProcessController		リアルタイム優先度
+Custom priority	ProcessController		カスタム優先度
+Debug this thread!	ProcessController		このスレッドをデバッグ
 Low priority	ProcessController		低優先度
+Urgent display priority	ProcessController		緊急表示優先度
+Memory usage	ProcessController		メモリー使用量
+Ok!	ProcessController		Ok!
+Normal priority	ProcessController		通常優先度
+Restart Deskbar	ProcessController		Deskbar を再起動
+About ProcessController…	ProcessController		プロセスコントローラーについて…
+Usage: %s [-deskbar]\n	ProcessController		Usage: %s [-deskbar]\n
+Please confirm	ProcessController		確認してください。
+Urgent priority	ProcessController		緊急優先度
 What do you want to do with the thread \"%s\"?	ProcessController		スレッド \"%s\" に対してなにをしますか?
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+Idle priority	ProcessController		アイドル優先度
+Real-time display priority	ProcessController		リアルタイム表示優先度
+Threads and CPU usage	ProcessController		スレッドと CPU の使用量
+Quit application	ProcessController		アプリケーションを終了
+Info	ProcessController		情報
+Kill this thread!	ProcessController		スレッドを強制終了
+This team is already gone…	ProcessController		Team はすでに終了しています…
 Gone teams…	ProcessController		終了した team…
+Quit an application	ProcessController		アプリケーションを終了
+Cancel	ProcessController		取り消し
+Install in Deskbar	ProcessController		Deskbar にインストール
+Debug this team!	ProcessController		スレッドをデバッグ
+Low latency	ProcessController		低遅延モード
+ProcessController	System name		プロセスコントローラー
 Lowest active priority	ProcessController		最低アクティブ優先度
 Restart Tracker	ProcessController		Tracker を再起動
-Live in the Deskbar	ProcessController		Deskbar 中で実行
-Kill this thread!	ProcessController		スレッドを強制終了
-Debug this thread!	ProcessController		このスレッドをデバッグ
-Normal priority	ProcessController		通常優先度
-New Terminal	ProcessController		ターミナルを起動
-Urgent priority	ProcessController		緊急優先度
-About ProcessController…	ProcessController		プロセスコントローラーについて…
-Ok!	ProcessController		Ok!
-Quit an application	ProcessController		アプリケーションを終了
-Install in Deskbar	ProcessController		Deskbar にインストール
-Threads and CPU usage	ProcessController		スレッドと CPU の使用量
-Urgent display priority	ProcessController		緊急表示優先度
-Low latency	ProcessController		低遅延モード
-OK	ProcessController		OK
-Damned!	ProcessController		とんでもない!
-Debug this team!	ProcessController		スレッドをデバッグ
-Usage: %s [-deskbar]\n	ProcessController		Usage: %s [-deskbar]\n
-ProcessController	System name		プロセスコントローラー
-Real-time display priority	ProcessController		リアルタイム表示優先度
-Please confirm	ProcessController		確認してください。
 System resources & caches…	ProcessController		システムリソースとキャッシュ…
-That's no Fun!	ProcessController		そんなのおもしろくない!
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		プロセスコントローラーをウィンドウモードで起動するか、または Deskbar にインストールできます。
+Damned!	ProcessController		とんでもない!
+New Terminal	ProcessController		ターミナルを起動
+Power saving	ProcessController		省電力モード
+ProcessController is already installed in Deskbar.	ProcessController		プロセスコントローラーは、すでに Deskbar にインストールされています
+This thread is already gone…	ProcessController		スレッドはすでに終了しています…
+Run in window	ProcessController		ウィンドウモードで起動

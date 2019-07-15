@@ -1,20 +1,20 @@
 1	spanish; castilian	x-vnd.Haiku-MidiPlayer	1046133011
-None	Main Window		Ninguno
-Live input:	Main Window		Entrada en vivo:
-Stop	Main Window		Detener
 This tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Este programa\nSabe leer miles de\ncanciones cursis
-Cavern	Main Window		Caverna
-Volume:	Main Window		Volumen:
-Reverb:	Main Window		Reverberación:
-OK	Main Window		Aceptar
-Loading instruments…	Scope View		Cargando instrumentos…
-Off	Main Window		Desactivado
 Dungeon	Main Window		Mazmorra
-Play	Main Window		Reproducir
-Garage	Main Window		Garaje
-Closet	Main Window		Armario
-MidiPlayer	System name		MidiPlayer
-Drop MIDI file here	Scope View		Suelte aquí el archivo MIDI
-Igor's lab	Main Window		Laboratorio de Igor
-Scope	Main Window		Ámbito
 Could not load song	Main Window		No se pudo cargar la canción
+Igor's lab	Main Window		Laboratorio de Igor
+Off	Main Window		Desactivado
+Loading instruments…	Scope View		Cargando instrumentos…
+Volume:	Main Window		Volumen:
+Closet	Main Window		Armario
+Scope	Main Window		Ámbito
+Drop MIDI file here	Scope View		Suelte aquí el archivo MIDI
+None	Main Window		Ninguno
+Reverb:	Main Window		Reverberación:
+MidiPlayer	System name		MidiPlayer
+OK	Main Window		Aceptar
+Stop	Main Window		Detener
+Live input:	Main Window		Entrada en vivo:
+Garage	Main Window		Garaje
+Play	Main Window		Reproducir
+Cavern	Main Window		Caverna

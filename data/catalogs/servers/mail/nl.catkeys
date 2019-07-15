@@ -1,19 +1,19 @@
 1	dutch; flemish	x-vnd.Be-POST	2949558073
+No new messages	MailDaemon		Geen nieuwe berichten
+No new messages	DeskbarView		Geen nieuwe berichten
+Shutdown mail services	DeskbarView		Mailservices afsluiten
+Mail status	MailDaemon		Mailstatus
 Fetching mail for %name	Notifier		Mail ophalen voor %name
-Check for mails only	DeskbarView		Alleen mails controleren
-Send pending mails	DeskbarView		Mails in wachtrij verzenden
-{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Eén nieuw bericht} other{# nieuwe berichten}}
 {0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# nieuw bericht} other{# nieuwe berichten}}
 {0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# nieuw bericht} other{# nieuwe berichten}} voor %name\n
+Create new message…	DeskbarView		Een nieuw bericht opstellen...
+Send pending mails	DeskbarView		Mails in wachtrij verzenden
+Settings…	DeskbarView		Instellingen…
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Eén nieuw bericht} other{# nieuwe berichten}}
 New Messages	MailDaemon		Nieuwe berichten
 <no accounts>	DeskbarView		<geen accounts>
-Mail status	MailDaemon		Mailstatus
-Shutdown mail services	DeskbarView		Mailservices afsluiten
-Sending mail for %name	Notifier		Mail voor %name versturen
-Create new message…	DeskbarView		Een nieuw bericht opstellen...
-No new messages	MailDaemon		Geen nieuwe berichten
-Check for mail now	DeskbarView		Nu mail controleren
-No new messages	DeskbarView		Geen nieuwe berichten
-Mail daemon status log	MailDaemon		Statuslog van maildaemon
-Settings…	DeskbarView		Instellingen…
 Mail status	Notifier		Mailstatus
+Check for mails only	DeskbarView		Alleen mails controleren
+Check for mail now	DeskbarView		Nu mail controleren
+Sending mail for %name	Notifier		Mail voor %name versturen
+Mail daemon status log	MailDaemon		Statuslog van maildaemon

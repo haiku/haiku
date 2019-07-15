@@ -1,5 +1,5 @@
 1	french	x-vnd.Haiku-cmd-dstconfig	684321431
-Ask me later	dstcheck		Me demander plus tard
-Manually adjust time…	dstcheck		Ajuster l’heure manuellement…
 Keep this time	dstcheck		Conserver cette heure
+Manually adjust time…	dstcheck		Ajuster l’heure manuellement…
 Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		Attention!\n\nL’horloge de votre ordinateur est peut-être décalée d’une heure à cause du changement d’heure.\nVotre ordinateur pense qu’il est %current time%.\n\nEst-ce la bonne heure ?
+Ask me later	dstcheck		Me demander plus tard

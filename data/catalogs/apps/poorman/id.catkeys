@@ -1,66 +1,66 @@
 1	indonesian	x-vnd.Haiku-PoorMan	1829050509
-Website location	PoorMan		Lokasi situs web
-Error Server	PoorMan		Server Galat
-Settings…	PoorMan		Pengaturan…
-Create PoorMan log	PoorMan		Buatkan log PoorMan
-Shutting down.\n	PoorMan		Mematikan.\n
-Hits: %lu	PoorMan		Hits: %lu
-Web folder:	PoorMan		Folder web:
-Save log console selection	PoorMan		Simpan catatan konsol terpilih
-Run server	PoorMan		Jalankan server
-PoorMan settings	PoorMan		Pengaturan PoorMan
-Clear hit counter	PoorMan		Hapus penghitung hit
-Copy	PoorMan		Salin
-Max. simultaneous connections:	PoorMan		Maks. koneksi bersamaan:
-Create public_html	PoorMan		Buat public_html
-Start page:	PoorMan		Laman mulai:
-done.\n	PoorMan		selesai.\n
-Create	PoorMan		Buat
-Shutting down.	PoorMan		Mematikan.
-Website options	PoorMan		Opsi situs web
-File Name	PoorMan		Nama Berkas
-Clear console log	PoorMan		Bersihkan konsol log
-Advanced	PoorMan		Lanjutan
-OK	PoorMan		OK
-Status: Stopped	PoorMan		Status: Dihentikan
-Dir Created	PoorMan		Dir Dibuat
-Log to file	PoorMan		Log ke berkas
-Quit	PoorMan		Keluar
-Hits: 0	PoorMan		Hits: 0
-Save log console	PoorMan		Simpan log konsol
-Edit	PoorMan		Sunting
+Select web folder	PoorMan		Pilih folder web
+Console logging	PoorMan		Pencatatan pada konsol
 Create Log File	PoorMan		Buat Berkas Log
-Log to console	PoorMan		Log ke konsol
-Directory: (none)	PoorMan		Direktori: (none)
+File logging	PoorMan		Pencatatan pada berkas
+Website options	PoorMan		Opsi situs web
+Log to file	PoorMan		Log ke berkas
+Shutting down.	PoorMan		Mematikan.
+Error Dir	PoorMan		Dir Galat
+Web folder:	PoorMan		Folder web:
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Silahkan memilih folder untuk menerbitkan di web.\n\nAnda dapat memiliki PoorMan membuatkan suatu \"public_html\" asali di folder rumah.\nAtau anda memilih salah satu folder milik anda sendiri.
 Log To Console	PoorMan		Catat Ke Konsol
-{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# connection} other{# connections}}
-Connections	PoorMan		Koneksi
-Status: Running	PoorMan		Status: Berjalan
-Controls	PoorMan		Kontrol
-Send file listing if there's no start page	PoorMan		Kirim daftar berkas jika tidak ada laman awal
-Error Dir	PoorMan		Dir Galat
-Select all	PoorMan		Pilih semua
-File	PoorMan		Berkas
-File Logging	PoorMan		Berkas Logging
-Save console selections as…	PoorMan		Simpan pilihan konsol sebagai…
-File logging	PoorMan		Pencatatan pada berkas
-Select web folder	PoorMan		Pilih folder web
-Logging view	PoorMan		Tampilan pencatatan
-Logging	PoorMan		Pencatatan
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Folder web asali telah dibuatkan di \"/boot/home/public_html.\"\nPastikan ada berkas HTML bernama \"index.html\" di folder tersebut.
-Clear log file	PoorMan		Bersihkan file pencatatan
-Log file name:	PoorMan		Nama berkas pencatatan:
-Directory: 	PoorMan		Direktori: 
-Log To File	PoorMan		Catat Ke Berkas
-Done	PoorMan		Selesai
-Create log file	PoorMan		Buat berkas pencatatan
+File Name	PoorMan		Nama Berkas
 Starting up... 	PoorMan		Memulai… 
-Site	PoorMan		Situs
-Cancel	PoorMan		Batal
-Console logging	PoorMan		Pencatatan pada konsol
-Cannot start the server	PoorMan		Tidak dapat memulai peladen
 Select	PoorMan		Pilih
+Logging view	PoorMan		Tampilan pencatatan
 Save console as…	PoorMan		Simpan konsol sebagai…
+Edit	PoorMan		Sunting
+Cancel	PoorMan		Batal
+Directory: 	PoorMan		Direktori: 
+Hits: %lu	PoorMan		Hits: %lu
+Hits: 0	PoorMan		Hits: 0
+Shutting down.\n	PoorMan		Mematikan.\n
+Select all	PoorMan		Pilih semua
+Error Server	PoorMan		Server Galat
+Send file listing if there's no start page	PoorMan		Kirim daftar berkas jika tidak ada laman awal
+Create PoorMan log	PoorMan		Buatkan log PoorMan
+Max. simultaneous connections:	PoorMan		Maks. koneksi bersamaan:
+Done	PoorMan		Selesai
+Site	PoorMan		Situs
+Cannot start the server	PoorMan		Tidak dapat memulai peladen
+Create log file	PoorMan		Buat berkas pencatatan
+Create public_html	PoorMan		Buat public_html
+Clear hit counter	PoorMan		Hapus penghitung hit
+Status: Stopped	PoorMan		Status: Dihentikan
+File	PoorMan		Berkas
+Settings…	PoorMan		Pengaturan…
+Log To File	PoorMan		Catat Ke Berkas
+Connections	PoorMan		Koneksi
+Controls	PoorMan		Kontrol
+Log to console	PoorMan		Log ke konsol
+Advanced	PoorMan		Lanjutan
+Copy	PoorMan		Salin
+Logging	PoorMan		Pencatatan
 PoorMan	System name		PoorMan
+Clear console log	PoorMan		Bersihkan konsol log
+Run server	PoorMan		Jalankan server
+Create	PoorMan		Buat
+{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# connection} other{# connections}}
+done.\n	PoorMan		selesai.\n
+PoorMan settings	PoorMan		Pengaturan PoorMan
 Console Logging	PoorMan		Pencatatan pada konsol
+Clear log file	PoorMan		Bersihkan file pencatatan
+Save log console selection	PoorMan		Simpan catatan konsol terpilih
+File Logging	PoorMan		Berkas Logging
+Log file name:	PoorMan		Nama berkas pencatatan:
+Status: Running	PoorMan		Status: Berjalan
+Directory: (none)	PoorMan		Direktori: (none)
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Folder web asali telah dibuatkan di \"/boot/home/public_html.\"\nPastikan ada berkas HTML bernama \"index.html\" di folder tersebut.
+Dir Created	PoorMan		Dir Dibuat
+Save console selections as…	PoorMan		Simpan pilihan konsol sebagai…
+Quit	PoorMan		Keluar
+Save log console	PoorMan		Simpan log konsol
+Start page:	PoorMan		Laman mulai:
+OK	PoorMan		OK
+Website location	PoorMan		Lokasi situs web

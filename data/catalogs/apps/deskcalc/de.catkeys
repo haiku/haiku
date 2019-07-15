@@ -1,10 +1,10 @@
 1	german	x-vnd.Haiku-DeskCalc	1694821448
 Compact	CalcView		Kompakt
-Scientific	CalcView		Wissenschaftlich
-DeskCalc	System name		Rechner
-Basic	CalcView		Einfach
-Radians	CalcView		Radiant
-Enable Num Lock on startup	CalcView		Num-Lock beim Start aktivieren
 Calculating	CalcView		Berechnung läuft
-Degrees	CalcView		Grad
+Enable Num Lock on startup	CalcView		Num-Lock beim Start aktivieren
+Scientific	CalcView		Wissenschaftlich
+Radians	CalcView		Radiant
 Audio Feedback	CalcView		Audiorückmeldung
+DeskCalc	System name		Rechner
+Degrees	CalcView		Grad
+Basic	CalcView		Einfach

@@ -1,13 +1,13 @@
 1	romanian	x-vnd.Haiku-SGITranslator	129108011
-Use compression:	SGIView		Utilizează comprimare:
-SGITranslator Settings	SGITranslator		Configurări SGITranslator
-None	SGIView		Nimic
 SGI images	SGITranslator		Imagini SGI
-SGI image translator	SGITranslator		Traducător imagine SGI
-\nbased on GIMP SGI plugin v1.5:\n	SGIView		\nbazat pe plugin-ul GIMP SGI v1.5:\n
-Version %d.%d.%d, %s	SGIView		Versiune %d.%d.%d, %s
-SGI image	SGITranslator		Imagine SGI
-RLE	SGIView		RLE
-SGI Settings	SGIMain		Configurări SGI
-written by:\n	SGIView		scris de:\n
+Use compression:	SGIView		Utilizează comprimare:
 SGI image translator	SGIView		Traducător imagine SGI
+SGI image	SGITranslator		Imagine SGI
+SGITranslator Settings	SGITranslator		Configurări SGITranslator
+SGI Settings	SGIMain		Configurări SGI
+SGI image translator	SGITranslator		Traducător imagine SGI
+None	SGIView		Nimic
+Version %d.%d.%d, %s	SGIView		Versiune %d.%d.%d, %s
+\nbased on GIMP SGI plugin v1.5:\n	SGIView		\nbazat pe plugin-ul GIMP SGI v1.5:\n
+RLE	SGIView		RLE
+written by:\n	SGIView		scris de:\n

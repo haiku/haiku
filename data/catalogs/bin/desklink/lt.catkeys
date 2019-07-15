@@ -1,15 +1,16 @@
-1	lithuanian	x-vnd.Haiku-desklink	4132238754
-Control physical output	MediaReplicant		Valdyti fizinę išvestį
-Couldn't launch 	MediaReplicant		Nepavyko paleisti 
-Muted	MediaReplicant		Nutildyta
-OK	MediaReplicant		Gerai
+1	lithuanian	x-vnd.Haiku-desklink	3568085956
+desklink	MediaReplicant	Title of an alert box	desklink
 Sound preferences…	MediaReplicant		Garsų nuostatos…
+Muted	MediaReplicant		Nutildyta
 %g dB	MediaReplicant		%g dB
-Open %name	DeskButton	Don't translate variable %name	Atverti %name
-No media server running	VolumeControl		Nepaleista įvairialypės terpės tarnyba
-Media preferences…	MediaReplicant		Įvairialypės terpės nuostatos…
+OK	MediaReplicant		Gerai
+Couldn't launch 	MediaReplicant		Nepavyko paleisti 
+Volume	VolumeControl		Garsis
 Open MediaPlayer	MediaReplicant		Atverti Medijos leistuvę
-desklink	MediaReplicant		desklink
+%d dB	VolumeControl		%d dB
+Media preferences…	MediaReplicant		Įvairialypės terpės nuostatos…
 Options	MediaReplicant		Parinktys
 Beep	MediaReplicant		Pyptelėti
-Volume	VolumeControl		Garsis
+Open %name	DeskButton	Don't translate variable %name	Atverti %name
+Control physical output	MediaReplicant		Valdyti fizinę išvestį
+No media server running	VolumeControl		Nepaleista įvairialypės terpės tarnyba

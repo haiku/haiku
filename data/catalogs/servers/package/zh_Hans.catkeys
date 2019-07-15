@@ -1,16 +1,16 @@
 1	english	x-vnd.haiku-package_daemon	1440586681
-Package problems	PackageProblem	Window title	包问题
 Package changes	PackageResult	Window title	包修改
 uninstall package %s\n	PackageResult	Don't change '%s' variable	卸载包 %s\n
-install package %s from repository %s\n	PackageResult	Don't change '%s' variables	安装包 %s 来源库 %s\n
-Apply changes	PackageResult		应用修改
-solution %d:	PackageProblem	Don't change the %d variable	解决 %d：
-Warning	PackageManager		警告
-Retry	PackageProblem		重试
-The following additional package changes have to be made:	PackageResult		如下附加包改动将会应用：
 ignore problem for now	PackageProblem		本次忽略问题
+solution %d:	PackageProblem	Don't change the %d variable	解决 %d：
+The following problems have been encountered. Please select a solution for each:	PackageProblem		遇到如下问题。请选择对应解决方案：
+Apply changes	PackageResult		应用修改
+Package daemon	PackageManager		包管理后台
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	安装包 %s 来源库 %s\n
+The following additional package changes have to be made:	PackageResult		如下附加包改动将会应用：
+Warning	PackageManager		警告
 Cancel	PackageProblem		取消
 don't activate package %source%	PackageProblem	don't change '%source%	不激活包 %source%
-The following problems have been encountered. Please select a solution for each:	PackageProblem		遇到如下问题。请选择对应解决方案：
-Package daemon	PackageManager		包管理后台
 Cancel	PackageResult		取消
+Retry	PackageProblem		重试
+Package problems	PackageProblem	Window title	包问题

@@ -1,41 +1,41 @@
 1	english	x-vnd.Haiku-Shortcuts	1611284793
-OK	ShortcutsWindow		确定
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		无法保存您的按键设置。
-Cancel	ShortcutsWindow		取消
-Append KeySet…	ShortcutsWindow		添加按键设置...  
-Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
-Key	ShortcutsWindow		按键
-Open KeySet…	ShortcutsWindow		打开按键设置...  
-Error, NULL state description?	ShortcutsSpec		错误，无效状态描述？
-Revert to saved	ShortcutsWindow		取消保存  
-*InsertString \"Your Text Here\"	ShortcutsWindow		*插入字符串 \"在此处写入文本\"
 *MouseUp	ShortcutsWindow		*MouseUp
-(Choose application with file requester)	ShortcutsWindow		（使用文件查询选取应用程序）
-*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		无法打开您的按键设置文件！
-*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \'*MoveMouseTo 100% 0\" \"*MouseButton 1\"
-Option	ShortcutsSpec	Name for modifier on keyboard	选项
-Save	ShortcutsWindow		保存
-*MouseButton 1	ShortcutsWindow		*MouseButton 1
-*MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
-Save changes before closing?	ShortcutsWindow		关闭前是否保存修改？
-Remove selected shortcut	ShortcutsWindow		删除选定快捷键  
-Add new shortcut	ShortcutsWindow		添加快捷键
-Save & apply	ShortcutsWindow		保存并应用
-*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage 应用程序/x-vnd.Be-TARK 'Tfnd'
-Append	ShortcutsWindow		添加
-File	ShortcutsWindow		文件
-Quit	ShortcutsWindow		退出
-*MouseDown	ShortcutsWindow		*MouseDown
-Don't save	ShortcutsWindow		不保存
 Application	ShortcutsWindow		应用程序
-Shift	ShortcutsSpec	Name for modifier on keyboard	Shift 
+Option	ShortcutsSpec	Name for modifier on keyboard	选项
+Save changes before closing?	ShortcutsWindow		关闭前是否保存修改？
+Revert to saved	ShortcutsWindow		取消保存  
+Don't save	ShortcutsWindow		不保存
+*MouseDown	ShortcutsWindow		*MouseDown
 *Beep	ShortcutsWindow		*提示音
-*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 5o%
-Save KeySet as…	ShortcutsWindow		保存按键设置…
-Open	ShortcutsWindow		打开
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		无法解析您的按键设置文件！
-Select	ShortcutsWindow		选择
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		无法保存您的按键设置文件！
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		无法保存您的按键设置。
+Save	ShortcutsWindow		保存
 Oh no	ShortcutsWindow		Oh no
+Key	ShortcutsWindow		按键
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage 应用程序/x-vnd.Be-TARK 'Tfnd'
+Select	ShortcutsWindow		选择
 Shortcuts	System name		快捷键
+Quit	ShortcutsWindow		退出
+(Choose application with file requester)	ShortcutsWindow		（使用文件查询选取应用程序）
+Cancel	ShortcutsWindow		取消
+*MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
+Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		无法解析您的按键设置文件！
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		无法保存您的按键设置文件！
+*InsertString \"Your Text Here\"	ShortcutsWindow		*插入字符串 \"在此处写入文本\"
+Remove selected shortcut	ShortcutsWindow		删除选定快捷键  
+Error, NULL state description?	ShortcutsSpec		错误，无效状态描述？
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		无法打开您的按键设置文件！
+Save & apply	ShortcutsWindow		保存并应用
+Open	ShortcutsWindow		打开
+Append	ShortcutsWindow		添加
+Save KeySet as…	ShortcutsWindow		保存按键设置…
+Append KeySet…	ShortcutsWindow		添加按键设置...  
+*MouseButton 1	ShortcutsWindow		*MouseButton 1
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \'*MoveMouseTo 100% 0\" \"*MouseButton 1\"
+OK	ShortcutsWindow		确定
+Add new shortcut	ShortcutsWindow		添加快捷键
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift 
+Open KeySet…	ShortcutsWindow		打开按键设置...  
+File	ShortcutsWindow		文件
+*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
+*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 5o%

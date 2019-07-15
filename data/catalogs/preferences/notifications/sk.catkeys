@@ -1,29 +1,29 @@
 1	slovak	x-vnd.Haiku-Notifications	1544806248
-An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Vyskytla sa chyba pri ukladaní nastavení.\nJe možné, že vám došlo miesto na disku.
-Add…	NotificationView		Pridať…
-Status	NotificationView		Stav
-Revert	PrefletWin		Vrátiť
-Enable notifications	GeneralView		Zapnúť upozornenia
-Window width:	GeneralView		Šírka okna:
-This is a test notification message	PrefletWin		Toto je testovacia správa oznámenia
-OK	PrefletWin		OK
-Duration:	GeneralView		Trvanie:
-OK	NotificationView		OK
 Application does not have a valid signature	NotificationView	Alert message	Aplikácia nemá platný podpis
-Notifications	PrefletWin		Oznamy
-Timeout:	GeneralView		Časový limit:
+Status	NotificationView		Stav
+Add…	NotificationView		Pridať…
 Muted	NotificationView		Umlčané
-General	PrefletView		Všeobecné
-Allowed	NotificationView		Povolené
-Remove	NotificationView		Odstrániť
-Notifications preflet sample	PrefletWin		Vzorka nastavení upozornení
-Notifications	System name		Oznamy
-Applications	PrefletView		Aplikácie
-Defaults	PrefletWin		Predvoľby
-pixels	GeneralView		pixelov
-Application	NotificationView		Aplikácia
-Width:	GeneralView		Šírka:
-seconds	GeneralView		sekúnd
-Mute notifications from this application	NotificationView		Umlčať oznámenia od tejto aplikácie
+Window width:	GeneralView		Šírka okna:
  is already listed	NotificationView	Alert message	 je už uvedená
+OK	PrefletWin		OK
+Notifications	PrefletWin		Oznamy
+Notifications preflet sample	PrefletWin		Vzorka nastavení upozornení
+Mute notifications from this application	NotificationView		Umlčať oznámenia od tejto aplikácie
+pixels	GeneralView		pixelov
+seconds	GeneralView		sekúnd
+Revert	PrefletWin		Vrátiť
+Applications	PrefletView		Aplikácie
+Timeout:	GeneralView		Časový limit:
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Vyskytla sa chyba pri ukladaní nastavení.\nJe možné, že vám došlo miesto na disku.
+Defaults	PrefletWin		Predvoľby
 Applications	NotificationView		Aplikácie
+Width:	GeneralView		Šírka:
+General	PrefletView		Všeobecné
+OK	NotificationView		OK
+Notifications	System name		Oznamy
+Allowed	NotificationView		Povolené
+Duration:	GeneralView		Trvanie:
+Application	NotificationView		Aplikácia
+Enable notifications	GeneralView		Zapnúť upozornenia
+This is a test notification message	PrefletWin		Toto je testovacia správa oznámenia
+Remove	NotificationView		Odstrániť

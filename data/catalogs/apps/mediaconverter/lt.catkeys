@@ -1,55 +1,55 @@
 1	lithuanian	x-vnd.Haiku-MediaConverter	3017975112
-Video using parameters form settings	MediaConverter		Vaizdo įrašui naudojami nurodyti parametrai
-Video encoding:	MediaConverter		Vaizdo kodavimas:
-No audio	Audio codecs list		Be garso takelio
-Error	MediaConverter		Klaida
-Error loading a file	MediaConverter		Klaida įkeliant failą
-File Error	MediaConverter-FileInfo		Failo klaida
-Open…	Menu		Atverti…
-Start [ms]: 	MediaConverter		Pradžia [ms]:
-Output file '%filename' created	MediaConverter		Sukurtas išvesties failas „%filename“
-Output format	MediaConverter		Išvesties formatas
-End   [ms]: 	MediaConverter		Pabaiga [ms]:
-MediaConverter	System name		Medijos keitiklis
-No video	Video codecs list		Be vaizdo takelio
-Duration:	MediaConverter-FileInfo		Trukmė:
-OK	MediaConverter		Gerai
+Video quality: %3d%%	MediaConverter		Vaizdo takelio kokybė: %3d%%
+Source files	MediaConverter		Pirminiai failai
 Error converting '%filename'	MediaConverter		Klaida konvertuojant „%filename“
-Low	MediaConverter		Žema
 Conversion completed	MediaConverter		Konvertavimas baigtas
 Audio:	MediaConverter-FileInfo		Garso takelis:
-OK	MediaConverter-FileInfo		Gerai
- seconds	MediaFileInfo		 sek.
-Source files	MediaConverter		Pirminiai failai
-Cancelling	MediaConverter		Nutraukiama
-Error loading files	MediaConverter		Klaida įkeliant failus
-Cancel	MediaConverter		Atsisakyti
-None available	Video codecs		Nepasiekiama
-Conversion cancelled	MediaConverter		Konvertavimas nutrauktas
-No file selected	MediaConverter-FileInfo		Nepažymėtas joks failas
-Select this folder	MediaConverter		Rinktis šį aplanką
-Continue	MediaConverter		Tęsti
-Encoder parameters	MediaConverter-EncoderWindow		Kodavimo parametrai
-Video:	MediaConverter-FileInfo		Vaizdo takelis:
-%d bit 	MediaFileInfo		%d bitų
-Error creating '%filename'	MediaConverter		Klaida kuriant „%filename“
-Video quality not supported	MediaConverter		Nepalaikomas vaizdo takelio kokybės lygmuo
-Cancelling…	MediaConverter		Nutraukiama…
-File details	MediaConverter		Failo savybės
-Select	MediaConverter		Rinktis
-Quit	Menu		Baigti darbą
-Preview	MediaConverter		Peržiūrėti
-File format:	MediaConverter		Failo formatas:
-None available	Audio codecs		Nepasiekiama
 MediaConverter+:SaveDirectory	MediaConverter		Medijos keitiklis: parinkite paskirties aplanką
-Error launching: %strError%	MediaConverter		Klaida paleidžiant: %strError%
+Cancelling	MediaConverter		Nutraukiama
+None available	Audio codecs		Nepasiekiama
+No file selected	MediaConverter-FileInfo		Nepažymėtas joks failas
 High	MediaConverter		Aukšta
-Drop media files onto this window	MediaConverter		Numeskite vaizdo ir/ar garso failus ant šio lango
+File Error	MediaConverter-FileInfo		Failo klaida
+None available	Video codecs		Nepasiekiama
+Output format	MediaConverter		Išvesties formatas
+OK	MediaConverter		Gerai
+Error creating '%filename'	MediaConverter		Klaida kuriant „%filename“
+Error loading a file	MediaConverter		Klaida įkeliant failą
+Encoder parameters	MediaConverter-EncoderWindow		Kodavimo parametrai
+Open…	Menu		Atverti…
 Audio encoding:	MediaConverter		Garso takelio kodavimas:
-Audio quality not supported	MediaConverter		Nepalaikomas garso takelio kokybės lygmuo
-File	Menu		Failas
-Convert	MediaConverter		Konvertuoti
-Video quality: %3d%%	MediaConverter		Vaizdo takelio kokybė: %3d%%
-Output folder	MediaConverter		Paskirties aplankas
 Audio quality: %3d%%	MediaConverter		Garso takelio kokybė: %3d%%
+Cancelling…	MediaConverter		Nutraukiama…
+Output file '%filename' created	MediaConverter		Sukurtas išvesties failas „%filename“
+Output folder	MediaConverter		Paskirties aplankas
+ seconds	MediaFileInfo		 sek.
+Video using parameters form settings	MediaConverter		Vaizdo įrašui naudojami nurodyti parametrai
+Video:	MediaConverter-FileInfo		Vaizdo takelis:
+Select	MediaConverter		Rinktis
+Conversion cancelled	MediaConverter		Konvertavimas nutrauktas
+Low	MediaConverter		Žema
+Error loading files	MediaConverter		Klaida įkeliant failus
+End   [ms]: 	MediaConverter		Pabaiga [ms]:
+Cancel	MediaConverter		Atsisakyti
+OK	MediaConverter-FileInfo		Gerai
+Video encoding:	MediaConverter		Vaizdo kodavimas:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Skaitant failo informaciją įvyko klaida.\n\nKlaida:
+Error	MediaConverter		Klaida
+File details	MediaConverter		Failo savybės
+No audio	Audio codecs list		Be garso takelio
+Drop media files onto this window	MediaConverter		Numeskite vaizdo ir/ar garso failus ant šio lango
+Quit	Menu		Baigti darbą
+Duration:	MediaConverter-FileInfo		Trukmė:
+MediaConverter	System name		Medijos keitiklis
+Error launching: %strError%	MediaConverter		Klaida paleidžiant: %strError%
+File format:	MediaConverter		Failo formatas:
+File	Menu		Failas
+Video quality not supported	MediaConverter		Nepalaikomas vaizdo takelio kokybės lygmuo
+Select this folder	MediaConverter		Rinktis šį aplanką
+%d bit 	MediaFileInfo		%d bitų
+No video	Video codecs list		Be vaizdo takelio
+Continue	MediaConverter		Tęsti
+Convert	MediaConverter		Konvertuoti
+Audio quality not supported	MediaConverter		Nepalaikomas garso takelio kokybės lygmuo
+Preview	MediaConverter		Peržiūrėti
+Start [ms]: 	MediaConverter		Pradžia [ms]:

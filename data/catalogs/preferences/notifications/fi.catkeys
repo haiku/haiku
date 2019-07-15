@@ -1,35 +1,35 @@
 1	finnish	x-vnd.Haiku-Notifications	332239666
-An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Asetuksia tallennettaessa tapahtui virhe.\nLevytila on mahdollisesti lopussa.
-Add…	NotificationView		Lisää...
-Status	NotificationView		Tila
-Revert	PrefletWin		Palauta
-Enable notifications	GeneralView		Ota käyttöön ilmoitukset
-Window width:	GeneralView		Ikkunaleveys:
-This is a test notification message	PrefletWin		Tämä on testi-ilmoitusviesti
-OK	PrefletWin		Valmis
-Duration:	GeneralView		Kesto:
-OK	NotificationView		Valmis
-Application does not have a valid signature	NotificationView	Alert message	Sovelluksella ei ole kelvollista allekirjoitusta
-Follow Deskbar	GeneralView		Seuraa työkalupalkkia
-Notifications	PrefletWin		Ilmoitukset
-Timeout:	GeneralView		Aikavalvonta:
-Muted	NotificationView		Mykistetty
-General	PrefletView		Yleistä
-Allowed	NotificationView		Sallittu
-Remove	NotificationView		Poista
-Lower right	GeneralView		Alhaalla oikealla
-Notifications preflet sample	PrefletWin		Ilmoitusasetusmalli
-Notifications	System name		Ilmoitusasetukset
-Position:	GeneralView		Sijainti:
-Applications	PrefletView		Sovellukset
-Defaults	PrefletWin		Oletukset
-pixels	GeneralView		pikseliä
-Application	NotificationView		Sovellus
-Width:	GeneralView		Leveys:
-seconds	GeneralView		sekuntia
-Mute notifications from this application	NotificationView		Mykistä ilmoitukset tästä sovelluksesta
-Upper right	GeneralView		Ylhäällä oikealla
- is already listed	NotificationView	Alert message	 on jo lueteltu
 Lower left	GeneralView		Alhaalla vasemmalla
+Application does not have a valid signature	NotificationView	Alert message	Sovelluksella ei ole kelvollista allekirjoitusta
+Status	NotificationView		Tila
+Add…	NotificationView		Lisää...
+Lower right	GeneralView		Alhaalla oikealla
+Muted	NotificationView		Mykistetty
+Window width:	GeneralView		Ikkunaleveys:
+ is already listed	NotificationView	Alert message	 on jo lueteltu
+OK	PrefletWin		Valmis
+Notifications	PrefletWin		Ilmoitukset
+Notifications preflet sample	PrefletWin		Ilmoitusasetusmalli
+Mute notifications from this application	NotificationView		Mykistä ilmoitukset tästä sovelluksesta
+pixels	GeneralView		pikseliä
+seconds	GeneralView		sekuntia
+Revert	PrefletWin		Palauta
+Applications	PrefletView		Sovellukset
+Timeout:	GeneralView		Aikavalvonta:
+Upper right	GeneralView		Ylhäällä oikealla
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Asetuksia tallennettaessa tapahtui virhe.\nLevytila on mahdollisesti lopussa.
+Defaults	PrefletWin		Oletukset
 Upper left	GeneralView		Ylhäällä vasemmalla
 Applications	NotificationView		Sovellukset
+Width:	GeneralView		Leveys:
+General	PrefletView		Yleistä
+OK	NotificationView		Valmis
+Follow Deskbar	GeneralView		Seuraa työkalupalkkia
+Notifications	System name		Ilmoitusasetukset
+Allowed	NotificationView		Sallittu
+Duration:	GeneralView		Kesto:
+Application	NotificationView		Sovellus
+Enable notifications	GeneralView		Ota käyttöön ilmoitukset
+This is a test notification message	PrefletWin		Tämä on testi-ilmoitusviesti
+Remove	NotificationView		Poista
+Position:	GeneralView		Sijainti:

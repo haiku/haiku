@@ -1,31 +1,31 @@
 1	slovak	x-vnd.haiku-screenshot	3958461128
-seconds	ScreenshotWindow		sekúnd
-Desktop	ScreenshotWindow		Plocha
 Include window border	ScreenshotWindow		Vrátane okraja okna
-Screenshot	System name		Snímka obrazovky
-Select	ScreenshotWindow		Vybrať
+Overwrite	ScreenshotWindow		Prepísať
+Save in:	ScreenshotWindow		Uložiť do:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Chyba pri ukladaní „%s“:\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Tento súbor už existuje.\n Ste si istý, že ho chcete prepísať?
+OK	ScreenshotWindow		OK
 The destination path exists but is not a folder.	ScreenshotWindow		Cieľová cesta existuje, ale nie je to priečinok.
-Capture active window	ScreenshotWindow		Zachytiť aktívne okno
-Cancel	ScreenshotWindow		Zrušiť
+Select	ScreenshotWindow		Vybrať
+Save as:	ScreenshotWindow		Uložiť ako:
+seconds	ScreenshotWindow		sekúnd
+New screenshot	ScreenshotWindow		Nová snímka obrazovky
+Screenshot	System name		Snímka obrazovky
+Desktop	ScreenshotWindow		Plocha
+Artwork folder	ScreenshotWindow		Priečinok s výtvarnými dielami
+Translator Settings	ScreenshotWindow		Nastavenia prekladača
+Include mouse pointer	ScreenshotWindow		Vrátane kurzora myši
+overwrite	ScreenshotWindow		prepísať
+Settings…	ScreenshotWindow		Nastavenia…
+Choose folder	ScreenshotWindow		Vyberte priečinok
 Name:	ScreenshotWindow		Názov:
 Choose folder…	ScreenshotWindow		Vyberte priečinok…
-This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Tento súbor už existuje.\n Ste si istý, že ho chcete prepísať?
-Choose folder	ScreenshotWindow		Vyberte priečinok
-Save	ScreenshotWindow		Uložiť
-Overwrite	ScreenshotWindow		Prepísať
 Please select	ScreenshotWindow		Prosím, vyberte
-Save as:	ScreenshotWindow		Uložiť ako:
-Copy to clipboard	ScreenshotWindow		Skopírovať do schránky
-Save in:	ScreenshotWindow		Uložiť do:
-screenshot	Screenshot	Base filename of screenshot files	snímka obrazovky
-New screenshot	ScreenshotWindow		Nová snímka obrazovky
-Artwork folder	ScreenshotWindow		Priečinok s výtvarnými dielami
-Home folder	ScreenshotWindow		Domovský priečinok
 Failed to save screenshot	ScreenshotWindow		Nepodarilo sa uložiť snímku obrazovky
-OK	ScreenshotWindow		OK
-Settings…	ScreenshotWindow		Nastavenia…
-overwrite	ScreenshotWindow		prepísať
+Cancel	ScreenshotWindow		Zrušiť
 Delay:	ScreenshotWindow		Oneskorenie:
-Error saving \"%s\":\n\t%s	ScreenshotWindow		Chyba pri ukladaní „%s“:\n\t%s
-Include mouse pointer	ScreenshotWindow		Vrátane kurzora myši
-Translator Settings	ScreenshotWindow		Nastavenia prekladača
+Copy to clipboard	ScreenshotWindow		Skopírovať do schránky
+screenshot	Screenshot	Base filename of screenshot files	snímka obrazovky
+Home folder	ScreenshotWindow		Domovský priečinok
+Save	ScreenshotWindow		Uložiť
+Capture active window	ScreenshotWindow		Zachytiť aktívne okno

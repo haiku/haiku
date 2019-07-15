@@ -1,22 +1,19 @@
-1	hungarian	x-vnd.haiku-softwareupdater	2357897323
+1	hungarian	x-vnd.haiku-softwareupdater	3158701976
 No active network connection was found	UpdateManager	Error message	Nincs aktív hálózati kapcsolat.
-Packages are being updated	UpdateManager		Frissítendő csomagok
-Update now	SoftwareUpdaterWindow		Frissítés
-Updates did not complete	UpdateAction		Frissítés nem fejeződött be
-Checking for updates	CheckManager		Frissítések ellenörzése
-%count% packages have available updates	CheckManager		%count% csomaghoz érhető el frissítés
-No remote repositories are available	UpdateManager	Error message	Egyetlen távoli tároló sem érhető el
-No updates available	UpdateAction		Nincs elérhető frissítés
-Downloading packages	UpdateManager		Csomagok letöltése
-Attempting to cancel the updates...	SoftwareUpdaterWindow		Frissítés megszakítása…
-from repository	SoftwareUpdaterWindow	List item text	tárolóból
-Cancel	SoftwareUpdaterWindow	Alert button label	Megszakít
-Click here to install updates.	CheckManager		Kattintson ide a frissítések telepítéséhez.
-The following changes will be made:	SoftwareUpdaterWindow		Elvégzendő változtatások:
-Available updates found	CheckManager		Frissítések érhetők el
-Checking for updates	SoftwareUpdaterWindow		Frissítések keresése
 Quit	SoftwareUpdaterWindow	Alert button label	Kilépés
+Update now	SoftwareUpdaterWindow		Frissítés
+No updates available	UpdateAction		Nincs elérhető frissítés
+Available updates found	CheckManager		Frissítések érhetők el
+from repository	SoftwareUpdaterWindow	List item text	tárolóból
 Cancelling updates	SoftwareUpdaterWindow		Frissítések megszakítása
+Cancel	SoftwareUpdaterWindow	Alert button label	Megszakít
+The following changes will be made:	SoftwareUpdaterWindow		Elvégzendő változtatások:
 Applying changes	UpdateManager		Változtatások alkalmazása
-Quit	SoftwareUpdaterWindow		Kilépés
 Quit	SoftwareUpdaterWindow	Button label	Kilépés
+Packages are being updated	UpdateManager		Frissítendő csomagok
+Checking for updates	SoftwareUpdaterWindow		Frissítések keresése
+Checking for updates	CheckManager		Frissítések ellenörzése
+No remote repositories are available	UpdateManager	Error message	Egyetlen távoli tároló sem érhető el
+Updates did not complete	UpdateAction		Frissítés nem fejeződött be
+Quit	SoftwareUpdaterWindow		Kilépés
+Downloading packages	UpdateManager		Csomagok letöltése

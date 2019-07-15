@@ -1,16 +1,16 @@
-1	indonesian	x-vnd.Haiku-desklink	3940727097
-Control physical output	MediaReplicant		Kontrol keluaran fisik
-Couldn't launch 	MediaReplicant		Tak bisa meluncurkan 
-Muted	MediaReplicant		Diredam
-OK	MediaReplicant		OKE
+1	indonesian	x-vnd.Haiku-desklink	3568085956
+desklink	MediaReplicant	Title of an alert box	desklink
 Sound preferences…	MediaReplicant		Preferensi suara...
+Muted	MediaReplicant		Diredam
 %g dB	MediaReplicant		%g dB
-Open %name	DeskButton	Don't translate variable %name	Buka %name
-No media server running	VolumeControl		Tak ada media server yang berjalan
-Media preferences…	MediaReplicant		Preferensi media...
-%d dB	VolumeControl		%d dB
+OK	MediaReplicant		OKE
+Couldn't launch 	MediaReplicant		Tak bisa meluncurkan 
+Volume	VolumeControl		Volume
 Open MediaPlayer	MediaReplicant		Buka PemutarMedia
-desklink	MediaReplicant		desklink
+%d dB	VolumeControl		%d dB
+Media preferences…	MediaReplicant		Preferensi media...
 Options	MediaReplicant		Pilihan
 Beep	MediaReplicant		Berbunyi
-Volume	VolumeControl		Volume
+Open %name	DeskButton	Don't translate variable %name	Buka %name
+Control physical output	MediaReplicant		Kontrol keluaran fisik
+No media server running	VolumeControl		Tak ada media server yang berjalan

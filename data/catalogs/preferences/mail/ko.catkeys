@@ -1,49 +1,49 @@
 1	korean	x-vnd.Haiku-Mail	2053766098
+Account settings	AutoConfigWindow		계정 설정
+\t\t· Outgoing	Config Window		\t\t· 보낸 편지함
+E-mail address:	E-Mail		이-메알 주소:
+Create new account	AutoConfigWindow		새 계정 만들기
+While sending and receiving	Config Window		보내고 받는 동안
+Apply	Config Window		적용
+Incoming mail filters	Config Views		메일 필터 불러오는 중
+Outgoing mail filters	Config Views		메일 필터 내보내는 중
+Add	Config Window		더하기
+Back	AutoConfigWindow		뒤로
+Real name:	E-Mail		진짜 이름:
+Real name:	Config Views		진짜 이름:
+\t\t· E-mail filters	Config Window		\t\t·이-메일 필터
+Outgoing	E-Mail		보낸 편지함
+Accounts	Config Window		계정
+Outgoing	Config Window		보낸 편지함
+Remove	Config Views		제거
 Settings	Config Window		설정
 Never	Config Window	show status window	안 함
-While sending and receiving	Config Window		보내고 받는 동안
-Incoming	Config Window		수신함
-OK	Config Window		확인
-E-mail address:	E-Mail		이-메알 주소:
-Account name:	E-Mail		계정 이름:
 Account name:	Config Views		계정 이름:
-Create new account	AutoConfigWindow		새 계정 만들기
-OK	Config Views		확인
-The filter could not be moved. Deleting filter.	Config Views		이 필터를 이동할 수 없습니다. 핕터를 지우는 중입니다.
-Revert	Config Window		되돌리기
-Login name:	E-Mail		로그인 이름:
-Incoming	E-Mail		수신함
-Password:	E-Mail		암호:
-Accounts	Config Window		계정
-Finish	AutoConfigWindow		완료
-Remove	Config Window		지우기
-Server Name:	E-Mail		서버 이름:
-While sending	Config Window		보내는 동안
+\t\t· Incoming	Config Window		\t\t· 받은 편지함
 Enter a valid e-mail address.	AutoConfigWindow		올바른 이-메일 주소를 입력하십시오.
-Add	Config Window		더하기
-Account settings	AutoConfigWindow		계정 설정
-E-mail	System name		메일
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\n일반 설정은 되돌맇 수 없습니다.\n\n일반 설정 검색중 발생한 오류:\n%s\n
-Real name:	Config Views		진짜 이름:
-\t\t· Outgoing	Config Window		\t\t· 보낸 편지함
+Incoming	E-Mail		수신함
 Choose Protocol	E-Mail		프로토콜 선택
 Return address:	Config Views		반송 주소:
-Edit mailbox menu…	Config Window		메일박스 메뉴 편집...
-Outgoing	E-Mail		보낸 편지함
-\t\t· E-mail filters	Config Window		\t\t·이-메일 필터
-Remove	Config Views		제거
-\t\t· Incoming	Config Window		\t\t· 받은 편지함
-Next	AutoConfigWindow		다음
-Check every	Config Window		모두 확인
-Back	AutoConfigWindow		뒤로
-Incoming mail filters	Config Views		메일 필터 불러오는 중
+Password:	E-Mail		암호:
+Error retrieving general settings: %s\n	Config Window		일반 설정을 검색하는 중 발생한 오류:%s\n
+The filter could not be moved. Deleting filter.	Config Views		이 필터를 이동할 수 없습니다. 핕터를 지우는 중입니다.
+OK	Config Views		확인
+Revert	Config Window		되돌리기
+Incoming	Config Window		수신함
+Finish	AutoConfigWindow		완료
+Add filter	Config Views		필터 추가
 Account settings	Config Views		계정 설정
 minutes	Config Window		분
-Error retrieving general settings: %s\n	Config Window		일반 설정을 검색하는 중 발생한 오류:%s\n
-Real name:	E-Mail		진짜 이름:
-Apply	Config Window		적용
+E-mail	System name		메일
+Check every	Config Window		모두 확인
+Account name:	E-Mail		계정 이름:
+Edit mailbox menu…	Config Window		메일박스 메뉴 편집...
+Server Name:	E-Mail		서버 이름:
+Remove	Config Window		지우기
+Login name:	E-Mail		로그인 이름:
+While sending	Config Window		보내는 동안
+OK	Config Window		확인
 OK	AutoConfigWindow		좋아요
-Add filter	Config Views		필터 추가
-Outgoing	Config Window		보낸 편지함
-Outgoing mail filters	Config Views		메일 필터 내보내는 중
+Next	AutoConfigWindow		다음
 Error	Config Window		에러

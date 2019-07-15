@@ -1,35 +1,35 @@
 1	slovak	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		Obnoviť snímku
-Could not set Sudoku:\n%s\n	SudokuWindow		Nepodarilo sa nastaviť Sudoku:\n%s\n
-Export as…	SudokuWindow		Exportovať ako…
-OK	SudokuWindow		OK
-New	SudokuWindow		Nový
-Abort	ProgressWindow		Zrušiť
-Sudoku	System name		Sudoku
-Could not open \"%s\":\n%s\n	SudokuWindow		Nebolo možné otvoriť „%s“:\n%s\n
-Easy	SudokuWindow		Jednoduché
-Open file…	SudokuWindow		Otvoriť súbor…
-Solve single field	SudokuWindow		Vyriešiť jediné pole
-Solve	SudokuWindow		Vyriešiť
-Redo	SudokuWindow		Opakovať
 File	SudokuWindow		Súbor
-Advanced	SudokuWindow		Pokročilé
-Start again	SudokuWindow		Začať znova
-HTML	SudokuWindow		HTML
-Sudoku request	SudokuWindow		Požiadavka Sudoku
-Copy	SudokuWindow		Kopírovať
-Mark valid hints	SudokuWindow		Označiť platné rady
-Sudoku solved - congratulations!\n	SudokuWindow		Sudoku vyriešené - gratulujeme!\n
+Mark invalid values	SudokuWindow		Označiť neplatné hodnoty
+Solve single field	SudokuWindow		Vyriešiť jediné pole
 Hard	SudokuWindow		Ťažké
-Snapshot current	SudokuWindow		Snímok aktuálneho
+Start again	SudokuWindow		Začať znova
+New	SudokuWindow		Nový
+Easy	SudokuWindow		Jednoduché
+Undo	SudokuWindow		Vrátiť
+Export as…	SudokuWindow		Exportovať ako…
+Quit	SudokuWindow		Ukončiť
+Redo	SudokuWindow		Opakovať
+Could not open \"%s\":\n%s\n	SudokuWindow		Nebolo možné otvoriť „%s“:\n%s\n
+Blank	SudokuWindow		Prázdne
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku vyriešené - gratulujeme!\n
 Text	SudokuWindow		Text
+Copy	SudokuWindow		Kopírovať
+Solve	SudokuWindow		Vyriešiť
+HTML	SudokuWindow		HTML
+Advanced	SudokuWindow		Pokročilé
+Set all hints	SudokuWindow		Nastaviť všetky rady
+Searching for removable values	SudokuGenerator		Hľadajú sa odstrániteľné hodnoty
+Abort	ProgressWindow		Zrušiť
+Could not set Sudoku:\n%s\n	SudokuWindow		Nepodarilo sa nastaviť Sudoku:\n%s\n
+Help	SudokuWindow		Pomoc
+OK	SudokuWindow		OK
+Sudoku	System name		Sudoku
+Progress monitor	ProgressWindow		Monitor priebehu
 Creating solvable field	SudokuGenerator		Vytvára sa vyriešiteľné pole
 View	SudokuWindow		Zobraziť
-Progress monitor	ProgressWindow		Monitor priebehu
-Set all hints	SudokuWindow		Nastaviť všetky rady
-Mark invalid values	SudokuWindow		Označiť neplatné hodnoty
-Blank	SudokuWindow		Prázdne
-Help	SudokuWindow		Pomoc
-Searching for removable values	SudokuGenerator		Hľadajú sa odstrániteľné hodnoty
-Undo	SudokuWindow		Vrátiť
-Quit	SudokuWindow		Ukončiť
+Snapshot current	SudokuWindow		Snímok aktuálneho
+Mark valid hints	SudokuWindow		Označiť platné rady
+Sudoku request	SudokuWindow		Požiadavka Sudoku
+Open file…	SudokuWindow		Otvoriť súbor…

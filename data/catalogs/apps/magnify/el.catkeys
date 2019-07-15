@@ -1,16 +1,13 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Magnify	698518753
-no clip msg\n	In console, when clipboard is empty after clicking Copy image		κανένα μήνυμα κλιπ\n
-Make square	Magnify-Main		Δημιουργία τετραγώνου
-Copy image	Magnify-Main		Αντιγραφή εικόνας
-usage: magnify [size] (magnify size * size pixels)\n	Console		χρήση: μεγέθυνση [μέγεθος] (μέγεθος μεγέθυνσης * μέγεθος εικονοστοιχείων)\n
-Stick coordinates	Magnify-Main		Συντεταγμένες Στίκ
-magnify: size must be a multiple of 4\n	Console		Μεγέθυνση: το μέγεθος πρέπει να είναι πολλαπλάσιο του 4\n
+1	greek, modern (1453-)	x-vnd.Haiku-Magnify	1150104797
 Decrease pixel size	Magnify-Main		Μείωση μεγέθους εικονοστοιχείου
+Increase pixel size	Magnify-Main		Αύξηση μεγέθους Pixel
+Stick coordinates	Magnify-Main		Συντεταγμένες Στίκ
+Copy image	Magnify-Main		Αντιγραφή εικόνας
+Decrease window size	Magnify-Main		Μείωση μεγέθους του παραθύρου
+Remove a crosshair	Magnify-Main		Αφαίρεση ενός σταυρονήματος
+Add a crosshair	Magnify-Main		Προσθήκη ενός σταυρονήματος
+Increase window size	Magnify-Main		Αύξηση μεγέθους του παραθύρου
+Save image	Magnify-Main		Αποθήκευση εικόνας
 Magnify	System name		Magnify
 Info	Magnify-Main		Πληροφορίες
-Remove a crosshair	Magnify-Main		Αφαίρεση ενός σταυρονήματος
-Save image	Magnify-Main		Αποθήκευση εικόνας
-Increase window size	Magnify-Main		Αύξηση μεγέθους του παραθύρου
-Decrease window size	Magnify-Main		Μείωση μεγέθους του παραθύρου
-Increase pixel size	Magnify-Main		Αύξηση μεγέθους Pixel
-Add a crosshair	Magnify-Main		Προσθήκη ενός σταυρονήματος
+Make square	Magnify-Main		Δημιουργία τετραγώνου

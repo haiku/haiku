@@ -1,19 +1,19 @@
 1	spanish; castilian	x-vnd.Be-POST	2949558073
+No new messages	MailDaemon		No hay mensajes nuevos
+No new messages	DeskbarView		No hay mensajes nuevos
+Shutdown mail services	DeskbarView		Apagar servicios de correo
+Mail status	MailDaemon		Estado del correro
 Fetching mail for %name	Notifier		Búsqueda de correo para %name
-Check for mails only	DeskbarView		Sólo mirar si hay correo
-Send pending mails	DeskbarView		Enviar correos pendientes
-{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{One new message} other{# new messages}}
 {0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# new message} other{# new messages}}
 {0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# new message} other{# new messages}} para %name\n
+Create new message…	DeskbarView		Crear nuevo mensaje...
+Send pending mails	DeskbarView		Enviar correos pendientes
+Settings…	DeskbarView		Configuración…
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{One new message} other{# new messages}}
 New Messages	MailDaemon		Nuevos Mensajes
 <no accounts>	DeskbarView		<no hay ninguna cuenta>
-Mail status	MailDaemon		Estado del correro
-Shutdown mail services	DeskbarView		Apagar servicios de correo
-Sending mail for %name	Notifier		Envio de correo para %name
-Create new message…	DeskbarView		Crear nuevo mensaje...
-No new messages	MailDaemon		No hay mensajes nuevos
-Check for mail now	DeskbarView		Mirar si hay correo ahora
-No new messages	DeskbarView		No hay mensajes nuevos
-Mail daemon status log	MailDaemon		Registro del estado del demonio de correo
-Settings…	DeskbarView		Configuración…
 Mail status	Notifier		Estado del correo
+Check for mails only	DeskbarView		Sólo mirar si hay correo
+Check for mail now	DeskbarView		Mirar si hay correo ahora
+Sending mail for %name	Notifier		Envio de correo para %name
+Mail daemon status log	MailDaemon		Registro del estado del demonio de correo

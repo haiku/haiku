@@ -1,22 +1,21 @@
-1	polish	x-vnd.Haiku-NetworkStatus	1729819859
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Opcje NetworkStatus:\n\t--deskbar\tautomatycznie dodaj replikant do Deskbara\n\t--help\t\twypisz tą informację i wyjdź\n
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Możesz uruchomić NetworkStatus w osobnym oknie lub w Deskbarze.
-<no wireless networks found>	NetworkStatusView		<nie odnaleziono sieci bezprzewodowych>
-Run in window	NetworkStatus		Uruchom w oknie
-No link	NetworkStatusView		Brak połączenia
-Install in Deskbar	NetworkStatus		Zainstaluj w Deskbarze
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		Uruchamianie panelu sieci nie powiodło się.\n\nBłąd: 
+1	polish	x-vnd.Haiku-NetworkStatus	3823341665
 Netmask	NetworkStatusView		Maska sieciowa
-Broadcast	NetworkStatusView		Nadawanie
-Unknown	NetworkStatusView		Nieznany
-Network Status	NetworkStatusView		Status sieci
-Ready	NetworkStatusView		Gotowy
-No stateful configuration	NetworkStatusView		Brak pełnej konfiguracji
-%ifaceName information:\n	NetworkStatusView		informacje o %ifaceName:\n
-Configuring	NetworkStatusView		Konfigurowanie
-Address	NetworkStatusView		Adres
-OK	NetworkStatusView		OK
-NetworkStatus	System name		NetworkStatus
-Open network preferences…	NetworkStatusView		Otwórz opcje sieci…
-Could not join wireless network:\n	NetworkStatusView		Nie można połączyć się z siecią bezprzewodową:\n
 Quit	NetworkStatusView		Zakończ
+Unknown	NetworkStatusView		Nieznany
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Uruchamianie panelu sieci nie powiodło się.\n\nBłąd: 
+Install in Deskbar	NetworkStatus		Zainstaluj w Deskbarze
+Open network preferences…	NetworkStatusView		Otwórz opcje sieci…
+NetworkStatus	System name		NetworkStatus
+OK	NetworkStatusView		OK
+No link	NetworkStatusView		Brak połączenia
+Could not join wireless network:\n	NetworkStatusView		Nie można połączyć się z siecią bezprzewodową:\n
+Ready	NetworkStatusView		Gotowy
+Network Status	NetworkStatusView		Status sieci
+Address	NetworkStatusView		Adres
+No stateful configuration	NetworkStatusView		Brak pełnej konfiguracji
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Możesz uruchomić NetworkStatus w osobnym oknie lub w Deskbarze.
+Broadcast	NetworkStatusView		Nadawanie
+%ifaceName information:\n	NetworkStatusView		informacje o %ifaceName:\n
+Run in window	NetworkStatus		Uruchom w oknie
+<no wireless networks found>	NetworkStatusView		<nie odnaleziono sieci bezprzewodowych>
+Configuring	NetworkStatusView		Konfigurowanie

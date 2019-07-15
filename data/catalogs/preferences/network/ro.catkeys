@@ -1,53 +1,53 @@
 1	romanian	x-vnd.Haiku-Network	1314732966
-Static	IntefaceAddressView		Static
+Ethernet device	InterfaceListItem		Dispozitiv Ethernet
+Link speed:	IntefaceView		Viteză legătură:
+disconnected	IntefaceView		deconectat
+IP Address:	IntefaceAddressView		Adresă IP:
+WPA	WPA protected network		WPA
+Network:	IntefaceView		Rețea:
+Received:	IntefaceView		Primit:
+New…	NetworkWindow		Nou…
+no link	InterfaceListItem		nicio legătură
+Other	NetworkWindow		Altele
+Sent:	IntefaceView		Trimis:
+Gateway:	IntefaceAddressView		Gateway:
+The netmask defines your local network	IntefaceAddressView		Masca de rețea definește rețeaua locală
+Your IP address	IntefaceAddressView		Adresă IP
+DHCP	IntefaceAddressView		DHCP
+Dial Up	NetworkWindow		Dial Up
+Netmask:	IntefaceAddressView		Mască rețea:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Servicii
-no link	InterfaceListItem		nicio legătură
-WPA2	WPA2 protected network		WPA2
-Choose automatically	IntefaceView		Alege automat
-connected	IntefaceView		conectat
-Ethernet device	InterfaceListItem		Dispozitiv Ethernet
-The netmask defines your local network	IntefaceAddressView		Masca de rețea definește rețeaua locală
-Dial-up connection	InterfaceListItem		Conexiune Dial-up
-%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
-Network	NetworkWindow		Rețea
-VPN connection	InterfaceListItem		Conexiune VPN
-Show network status in Deskbar	NetworkWindow		Afișează starea rețelei în Deskbar
-The method for obtaining an IP address	IntefaceAddressView		Metoda de obținere a unei adrese IP
-connected	InterfaceListItem		conectat
-disabled	InterfaceListItem		dezactivat
-Dial Up	NetworkWindow		Dial Up
-Apply	IntefaceAddressView		Aplică
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Instalarea NetworkStatus pe Deskbar a eșuat: %s
+Revert	NetworkWindow		Revenire
+WEP	WEP protected network		WEP
+<no wireless networks found>	IntefaceView		<nu s-au găsit rețele wireless>
+connected	IntefaceView		conectat
+VPN	NetworkWindow		VPN
+Apply	IntefaceAddressView		Aplică
+Disable	ServiceView		Dezactivare
+WPA2	WPA2 protected network		WPA2
+Show network status in Deskbar	NetworkWindow		Afișează starea rețelei în Deskbar
+Mode:	IntefaceAddressView		Mod:
+connected	InterfaceListItem		conectat
+Static	IntefaceAddressView		Static
+launch error	NetworkWindow		eroare la lansare
+Renegotiate	IntefaceView		Renegociază
 MAC address:	IntefaceView		Adresă MAC:
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+disabled	InterfaceListItem		dezactivat
+Dial-up connection	InterfaceListItem		Conexiune Dial-up
+The method for obtaining an IP address	IntefaceAddressView		Metoda de obținere a unei adrese IP
+Automatic	IntefaceAddressView		Automat
+Choose automatically	IntefaceView		Alege automat
+Status:	IntefaceView		Stare:
+Disable	IntefaceView		Dezactivare
+Manage…	NetworkWindow		Administrează…
+open	Open network		deschide
+Network	NetworkWindow		Rețea
+Your gateway to the internet	IntefaceAddressView		Gateaway către internet
+Enable	ServiceView		Activare
+Ok	NetworkWindow		Ok
 Wireless device	InterfaceListItem		Dispozitiv wireless
 Disabled	IntefaceAddressView		Dezactivat
-Renegotiate	IntefaceView		Renegociază
-Ok	NetworkWindow		Ok
-Network:	IntefaceView		Rețea:
-launch error	NetworkWindow		eroare la lansare
-Other	NetworkWindow		Altele
-Automatic	IntefaceAddressView		Automat
-Gateway:	IntefaceAddressView		Gateway:
-Revert	NetworkWindow		Revenire
-Enable	ServiceView		Activare
-disconnected	IntefaceView		deconectat
-Status:	IntefaceView		Stare:
-Link speed:	IntefaceView		Viteză legătură:
-Your gateway to the internet	IntefaceAddressView		Gateaway către internet
-New…	NetworkWindow		Nou…
-DHCP	IntefaceAddressView		DHCP
-Mode:	IntefaceAddressView		Mod:
-WPA	WPA protected network		WPA
-Sent:	IntefaceView		Trimis:
-open	Open network		deschide
-IP Address:	IntefaceAddressView		Adresă IP:
-VPN	NetworkWindow		VPN
-Received:	IntefaceView		Primit:
-Disable	IntefaceView		Dezactivare
-<no wireless networks found>	IntefaceView		<nu s-au găsit rețele wireless>
-Netmask:	IntefaceAddressView		Mască rețea:
-Disable	ServiceView		Dezactivare
-Your IP address	IntefaceAddressView		Adresă IP
-Manage…	NetworkWindow		Administrează…
-WEP	WEP protected network		WEP
+VPN connection	InterfaceListItem		Conexiune VPN

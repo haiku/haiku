@@ -1,5 +1,5 @@
 1	russian	x-vnd.Haiku-notification_server	2022780929
 Warning	NotificationWindow		Предупреждение
+Notification	NotificationWindow		Уведомление
 OK	NotificationWindow		ОК
 Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Невозможно запустить общие настройки монитора.\nФильтр изменений в реальном времени отключен.
-Notification	NotificationWindow		Уведомление

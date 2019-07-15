@@ -1,14 +1,14 @@
 1	hungarian	x-vnd.Haiku-JPEG2000Translator	3265915643
-Write	JPEG2000Translator		Írás
-JPEG2000 images	JPEG2000Translator		JPEG2000 kép
-Version %d.%d.%d	JPEG2000Translator		Verzió: %d.%d.%d, %s
-Output only codestream (.jpc)	JPEG2000Translator		Csak a kódfolyam (.jpc) küldése a kimenetre
-Write black-and-white images as RGB24	JPEG2000Translator		Fekete-fehér képek írása RGB24-ként
-Output quality	JPEG2000Translator		Kimeneti minőség
-Read	JPEG2000Translator		Olvasás
-©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nJasPer funkciótár alapján:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n
-Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Be Bittérkép Formátum (JPEG2000Értelmező)
-Low	JPEG2000Translator		Alacsony
-About	JPEG2000Translator		Névjegy
 High	JPEG2000Translator		Magas
+Low	JPEG2000Translator		Alacsony
+Output quality	JPEG2000Translator		Kimeneti minőség
+JPEG2000 images	JPEG2000Translator		JPEG2000 kép
+About	JPEG2000Translator		Névjegy
+Write black-and-white images as RGB24	JPEG2000Translator		Fekete-fehér képek írása RGB24-ként
+Version %d.%d.%d	JPEG2000Translator		Verzió: %d.%d.%d
+Read	JPEG2000Translator		Olvasás
 Read greyscale images as RGB32	JPEG2000Translator		Szürkeárnyalatos képek olvasása RGB32-ként
+©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nJasPer funkciótár alapján:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n
+Write	JPEG2000Translator		Írás
+Output only codestream (.jpc)	JPEG2000Translator		Csak a kódfolyam (.jpc) küldése a kimenetre
+Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Be Bittérkép Formátum (JPEG2000Értelmező)

@@ -1,10 +1,10 @@
 1	italian	x-vnd.Haiku-DeskCalc	1694821448
 Compact	CalcView		Compatta
-Scientific	CalcView		Scientifica
-DeskCalc	System name		DeskCalc
-Basic	CalcView		Normale
-Radians	CalcView		Radianti
-Enable Num Lock on startup	CalcView		Attiva BlocNum all'avvio
 Calculating	CalcView		Calcolo in corso
-Degrees	CalcView		Gradi
+Enable Num Lock on startup	CalcView		Attiva BlocNum all'avvio
+Scientific	CalcView		Scientifica
+Radians	CalcView		Radianti
 Audio Feedback	CalcView		Restituire feedback sonoro
+DeskCalc	System name		DeskCalc
+Degrees	CalcView		Gradi
+Basic	CalcView		Normale

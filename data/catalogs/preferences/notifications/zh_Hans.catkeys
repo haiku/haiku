@@ -1,22 +1,22 @@
 1	english	x-vnd.Haiku-Notifications	1507213255
-An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		首选项保存时发生错误。\n可能硬盘空间不足。
-Add…	NotificationView		添加…
-Status	NotificationView		状态
-Revert	PrefletWin		还原
-Enable notifications	GeneralView		启用通知
-Window width:	GeneralView		窗口宽度：
-This is a test notification message	PrefletWin		这是测试通知消息
-OK	PrefletWin		确定
-Duration:	GeneralView		时长：
-OK	NotificationView		确定
 Application does not have a valid signature	NotificationView	Alert message	应用程序没有有效标签签名
-Notifications	PrefletWin		通知
-Timeout:	GeneralView		超时：
+Status	NotificationView		状态
+Add…	NotificationView		添加…
 Muted	NotificationView		静音
-General	PrefletView		常规
-Allowed	NotificationView		允许
-Remove	NotificationView		移除
-Notifications	System name		通知
+Window width:	GeneralView		窗口宽度：
+OK	PrefletWin		确定
+Notifications	PrefletWin		通知
+Revert	PrefletWin		还原
 Applications	PrefletView		应用程序
-Application	NotificationView		应用程序
+Timeout:	GeneralView		超时：
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		首选项保存时发生错误。\n可能硬盘空间不足。
 Applications	NotificationView		应用程序
+General	PrefletView		常规
+OK	NotificationView		确定
+Notifications	System name		通知
+Allowed	NotificationView		允许
+Duration:	GeneralView		时长：
+Application	NotificationView		应用程序
+Enable notifications	GeneralView		启用通知
+This is a test notification message	PrefletWin		这是测试通知消息
+Remove	NotificationView		移除

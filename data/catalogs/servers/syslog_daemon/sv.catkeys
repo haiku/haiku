@@ -1,4 +1,4 @@
 1	swedish	x-vnd.Haiku-SystemLogger	57960782
-%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nDenna tjänst ansvarar för att samla alla systemmeddelanden och skriva dem till en systemlogg i \"%s\".\n\n
-OK	SyslogDaemon		OK
 Syslog Daemon	SyslogDaemon		Systemloggstjänst
+OK	SyslogDaemon		OK
+%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nDenna tjänst ansvarar för att samla alla systemmeddelanden och skriva dem till en systemlogg i \"%s\".\n\n

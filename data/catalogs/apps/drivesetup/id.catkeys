@@ -1,94 +1,93 @@
-1	indonesian	x-vnd.Haiku-DriveSetup	2321187933
-DriveSetup	System name		DriveSetup
-Could not acquire partitioning information.	MainWindow		Tidak dapat memperoleh informasi partisi.
+1	indonesian	x-vnd.Haiku-DriveSetup	2076471502
 Cancel	AbstractParametersPanel		Batalkan
-Delete	MainWindow		Hapus
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Anda yakin ingin menulis perubahan kembali ke diska sekarang?\n\nSemua data pada partisi yang dipilih tidak akan hilang jika Anda melakukannya!
-Rescan	MainWindow		Pindai ulang
-OK	MainWindow		OKE
-There's no space on the partition where a child partition could be created.	MainWindow		Tidak ada ruang di partisi dimana partisi anakan dapat dibuat.
-Could not unmount partition	MainWindow		Tidak bisa melepas partisi
-Initialize	InitializeParametersPanel		Inisialisasi
-OK	AbstractParametersPanel		OKE
-<empty>	PartitionList		<empty>
-Unable to find the selected partition by ID.	MainWindow		Tidak dapat menemukan partisi yang dipilih berdasarkan ID.
-Select a partition from the list below.	DiskView		Pilih partisi dari daftar di bawah ini.
-No disk devices have been recognized.	DiskView		Tidak ada perangkat diska yang dikenali.
-Failed to initialize the disk %s!\n	MainWindow		Gagal menginisialisasi disk %s!\n
-The selected disk is read-only.	MainWindow		Disk yang dipilih hanya-baca.
-Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Anda yakin ingin memformat partisi \"%s\"? Anda akan ditanya lagi sebelum perubahan ditulis ke diska.
-Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Haruskah dilepas dipaksa?\n\nCatatan: Jika aplikasi sedang menulis ke volume, dilepas sekarang dapat menyebabkan hilangnya data.\n
-Could not mount partition %s.	MainWindow		Tidak bisa memasang partisi %s.
-The partition %s has been successfully formatted.\n	MainWindow		Partisi %s telah berhasil diformat.\n
-Change parameters	MainWindow		Ubah parameter
-The partition %s is already unmounted.	MainWindow		Partisi %s sudah dilepas.
-Failed to delete the partition. No changes have been written to disk.	MainWindow		Gagal menghapus partisi. Tidak ada perubahan yang ditulis ke diska.
-Could not delete the selected partition.	MainWindow		Tidak dapat menghapus partisi yang dipilih.
-Initialize	MainWindow		Inisialisasi
-Error: 	MainWindow	in any error alert	Error: 
-Partition %ld	DiskView		Partisi %ld
-<empty>	DiskView		<empty>
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Inisialisasi partisi %s gagal. (Tidak ada yang ditulis ke disk.)
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Anda yakin ingin menulis perubahan kembali ke diska sekarang?\n\nSemua data pada partisi akan hilang jika Anda melakukannya!
-Mounted at	PartitionList		Dipasang pada
-There was an error acquiring the partition row.	MainWindow		Terjadi kesalahan saat mengambil baris partisi.
-You need to select a partition entry from the list.	MainWindow		Anda perlu memilih entri partisi dari daftar.
-The currently selected partition does not have a parent partition.	MainWindow		Partisi yang saat ini dipilih tidak memiliki partisi induk.
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Anda yakin ingin menulis perubahan kembali ke disk sekarang?\n\nSemua data pada disk yang dipilih akan hilang jika Anda melakukannya!
-Write changes	MainWindow		Tulis perubahan
-There was an error preparing the disk for modifications.	MainWindow		Terjadi kesalahan saat mempersiapkan disk untuk modifikasi.
-The partition %s is already mounted.	MainWindow		Partisi %s sudah terpasang.
-Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Anda yakin ingin memformat partisi? Anda akan ditanya lagi sebelum perubahan ditulis ke diska.
-Partition name:	ChangeParametersPanel		Nama partisi:
-Change	ChangeParametersPanel		Ubah
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Anda yakin ingin menulis perubahan kembali ke disk sekarang?\n\nSemua data pada disk %s akan hilang jika Anda melakukannya!
-Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Anda yakin ingin menghapus partisi yang dipilih? \n\nSemua data pada partisi akan hilang jika Anda melakukannya!
-Create…	MainWindow		Buat…
-Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Anda yakin ingin memformat diska mentah? (Kebanyakan orang menginisialisasi disk dengan sistem partisi terlebih dahulu) Anda akan ditanya lagi sebelum perubahan ditulis ke diska.
-The disk has been successfully initialized.\n	MainWindow		Disk telah berhasil diinisialisasi.\n
 Could not unmount partition %s.	MainWindow		Tidak dapat melepas partisi %s.
-Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Gagal mengubah parameter partisi. Tidak ada perubahan yang ditulis ke diska.
-Failed to format the partition %s!\n	MainWindow		Gagal memformat partisi %s!\n
-Mount	MainWindow		Pasang
-Partition type	PartitionList		Tipe partisi
-The panel experienced a problem!	MainWindow		Panel mengalami masalah!
-Change parameters…	MainWindow		Ubah parameter…
-Device	PartitionList		Perangkat
-Disk	MainWindow		Diska
-Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Anda yakin ingin menginisialisasi diska yang dipilih? Semua data akan hilang. Anda akan ditanya lagi sebelum perubahan ditulis ke diska.\n
-Partition size	CreateParametersPanel		Ukuran partisi
-Device	DiskView		Perangkat
-Active	PartitionList		Aktif
-Volume name	PartitionList		Nama volume
-Continue	MainWindow		Lanjutkan
-Cannot delete the selected partition.	MainWindow		Tidak dapat menghapus partisi yang dipilih.
 Mount all	MainWindow		Pasang semua
-End: %s	Support		Akhir: %s
-The panel could not return successfully.	MainWindow		Panel tidak berhasil kembali.
-Cancel	MainWindow		Batalkan
+Format	MainWindow		Format
+Disk	MainWindow		Diska
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Anda yakin ingin menulis perubahan kembali ke diska sekarang?\n\nSemua data pada partisi yang dipilih tidak akan hilang jika Anda melakukannya!
+Device	PartitionList		Perangkat
+Could not change the parameters of the selected partition.	MainWindow		Tidak dapat mengubah parameter partisi yang dipilih.
+Initialize	MainWindow		Inisialisasi
+OK	MainWindow		OKE
 Delete partition	MainWindow		Hapus partisi
-Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Anda yakin ingin mengubah parameter dari partisi yang dipilih?\n\nPartisi mungkin tidak lagi dikenali oleh sistem operasi lain!
-Disk system \"%s\" not found!	MainWindow		Sistem diska \"%s\" tidak ditemukan!
-Eject	MainWindow		Keluarkan
-Partition	MainWindow		Partisi
+Error: 	MainWindow	in any error alert	Error: 
+Could not delete the selected partition.	MainWindow		Tidak dapat menghapus partisi yang dipilih.
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Anda yakin ingin menginisialisasi diska yang dipilih? Semua data akan hilang. Anda akan ditanya lagi sebelum perubahan ditulis ke diska.\n
+The panel experienced a problem!	MainWindow		Panel mengalami masalah!
+Device	DiskView		Perangkat
+There was an error preparing the disk for modifications.	MainWindow		Terjadi kesalahan saat mempersiapkan disk untuk modifikasi.
+The disk has been successfully initialized.\n	MainWindow		Disk telah berhasil diinisialisasi.\n
+Unmount	MainWindow		Lepaskan kaitan
+Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Haruskah dilepas dipaksa?\n\nCatatan: Jika aplikasi sedang menulis ke volume, dilepas sekarang dapat menyebabkan hilangnya data.\n
+Failed to format the partition %s!\n	MainWindow		Gagal memformat partisi %s!\n
+Partition size	CreateParametersPanel		Ukuran partisi
 Validation of the given parameters failed.	MainWindow		Validasi parameter yang diberikan gagal.
+The partition %s is currently mounted.	MainWindow		Partisi %s saat ini terpasang.
+Cancel	MainWindow		Batalkan
+<empty>	PartitionList		<empty>
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Anda yakin ingin memformat partisi \"%s\"? Anda akan ditanya lagi sebelum perubahan ditulis ke diska.
+DriveSetup	System name		DriveSetup
+Mounted at	PartitionList		Dipasang pada
+Create…	MainWindow		Buat…
 Force unmount	MainWindow		Paksa lepaskan
+Write changes	MainWindow		Tulis perubahan
+Change parameters	MainWindow		Ubah parameter
+Validation of the given creation parameters failed.	MainWindow		Validasi parameter penciptaan yang diberikan gagal.
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Inisialisasi partisi %s gagal. (Tidak ada yang ditulis ke disk.)
+Partition	MainWindow		Partisi
+Eject	MainWindow		Keluarkan
+There was an error acquiring the partition row.	MainWindow		Terjadi kesalahan saat mengambil baris partisi.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Anda yakin ingin menulis perubahan kembali ke disk sekarang?\n\nSemua data pada disk %s akan hilang jika Anda melakukannya!
+Rescan	MainWindow		Pindai ulang
+Failed to initialize the disk %s!\n	MainWindow		Gagal menginisialisasi disk %s!\n
+Disk system \"%s\" not found!	MainWindow		Sistem diska \"%s\" tidak ditemukan!
+Delete	MainWindow		Hapus
+Surface test (not implemented)	MainWindow		Tes permukaan (tidak diimplementasikan)
+Partition type:	ChangeParametersPanel		Tipe Partisi:
+The panel could not return successfully.	MainWindow		Panel tidak berhasil kembali.
+Parameters	PartitionList		Parameter
+Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Gagal mengubah parameter partisi. Tidak ada perubahan yang ditulis ke diska.
+Could not acquire partitioning information.	MainWindow		Tidak dapat memperoleh informasi partisi.
+Cannot delete the selected partition.	MainWindow		Tidak dapat menghapus partisi yang dipilih.
+Partition %ld	DiskView		Partisi %ld
+There's no space on the partition where a child partition could be created.	MainWindow		Tidak ada ruang di partisi dimana partisi anakan dapat dibuat.
+Continue	MainWindow		Lanjutkan
+<empty>	DiskView		<empty>
+No disk devices have been recognized.	DiskView		Tidak ada perangkat diska yang dikenali.
+Could not mount partition %s.	MainWindow		Tidak bisa memasang partisi %s.
+Failed to delete the partition. No changes have been written to disk.	MainWindow		Gagal menghapus partisi. Tidak ada perubahan yang ditulis ke diska.
+Change parameters…	MainWindow		Ubah parameter…
+Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Anda yakin ingin memformat partisi? Anda akan ditanya lagi sebelum perubahan ditulis ke diska.
+Could not unmount partition	MainWindow		Tidak bisa melepas partisi
+The selected disk is read-only.	MainWindow		Disk yang dipilih hanya-baca.
 Create	CreateParametersPanel		Buat
 File system	PartitionList		Sistem berkas
-Validation of the given creation parameters failed.	MainWindow		Validasi parameter penciptaan yang diberikan gagal.
-Partition type:	ChangeParametersPanel		Tipe Partisi:
-Size	PartitionList		Ukuran
-Wipe (not implemented)	MainWindow		Sapu(tidak diimplementasikan)
-Validation of the given initialization parameters failed.	MainWindow		Validasi parameter inisialisasi yang diberikan gagal.
+The partition %s is already unmounted.	MainWindow		Partisi %s sudah dilepas.
 The selected partition does not contain a partitioning system.	MainWindow		Partisi yang dipilih tidak mengandung sistem partisi.
-Offset: %s	Support		Ofset: %s
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Anda yakin ingin menulis perubahan kembali ke disk sekarang?\n\nSemua data pada partisi %s akan hilang jika Anda melakukannya!
-The partition %s is currently mounted.	MainWindow		Partisi %s saat ini terpasang.
-Surface test (not implemented)	MainWindow		Tes permukaan (tidak diimplementasikan)
-Format	MainWindow		Format
-Could not change the parameters of the selected partition.	MainWindow		Tidak dapat mengubah parameter partisi yang dipilih.
-Parameters	PartitionList		Parameter
-Creation of the partition has failed.	MainWindow		Penciptaan partisi telah gagal.
+End: %s	Support		Akhir: %s
+Partition type	PartitionList		Tipe partisi
+Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Anda yakin ingin mengubah parameter dari partisi yang dipilih?\n\nPartisi mungkin tidak lagi dikenali oleh sistem operasi lain!
+Unable to find the selected partition by ID.	MainWindow		Tidak dapat menemukan partisi yang dipilih berdasarkan ID.
 The currently selected partition is not empty.	MainWindow		Partisi yang saat ini dipilih tidak kosong.
+The currently selected partition does not have a parent partition.	MainWindow		Partisi yang saat ini dipilih tidak memiliki partisi induk.
+Wipe (not implemented)	MainWindow		Sapu(tidak diimplementasikan)
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Anda yakin ingin memformat diska mentah? (Kebanyakan orang menginisialisasi disk dengan sistem partisi terlebih dahulu) Anda akan ditanya lagi sebelum perubahan ditulis ke diska.
+Validation of the given initialization parameters failed.	MainWindow		Validasi parameter inisialisasi yang diberikan gagal.
+OK	AbstractParametersPanel		OKE
+You need to select a partition entry from the list.	MainWindow		Anda perlu memilih entri partisi dari daftar.
+Offset: %s	Support		Ofset: %s
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Anda yakin ingin menulis perubahan kembali ke disk sekarang?\n\nSemua data pada disk yang dipilih akan hilang jika Anda melakukannya!
+Select a partition from the list below.	DiskView		Pilih partisi dari daftar di bawah ini.
+Active	PartitionList		Aktif
+Volume name	PartitionList		Nama volume
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Anda yakin ingin menghapus partisi yang dipilih? \n\nSemua data pada partisi akan hilang jika Anda melakukannya!
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Anda yakin ingin menulis perubahan kembali ke diska sekarang?\n\nSemua data pada partisi akan hilang jika Anda melakukannya!
 Failed to format the partition. No changes have been written to disk.	MainWindow		Gagal memformat partisi. Tidak ada perubahan yang ditulis ke diska.
-Unmount	MainWindow		Lepaskan kaitan
+Change	ChangeParametersPanel		Ubah
+The partition %s has been successfully formatted.\n	MainWindow		Partisi %s telah berhasil diformat.\n
+Partition name:	ChangeParametersPanel		Nama partisi:
+The partition %s is already mounted.	MainWindow		Partisi %s sudah terpasang.
+Size	PartitionList		Ukuran
+Creation of the partition has failed.	MainWindow		Penciptaan partisi telah gagal.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Anda yakin ingin menulis perubahan kembali ke disk sekarang?\n\nSemua data pada partisi %s akan hilang jika Anda melakukannya!
+Mount	MainWindow		Pasang

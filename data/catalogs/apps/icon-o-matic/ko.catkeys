@@ -1,193 +1,193 @@
 1	korean	x-vnd.haiku-icon_o_matic	2885914752
-Select All	Icon-O-Matic-PathManipulator		모두 선택
-Add Style	Icon-O-Matic-AddStylesCmd		스타일 추가
-Color (#%02x%02x%02x)	Style name after dropping a color		색상 (#%02x%02x%02x)
-Add	Icon-O-Matic-StylesList		더하기
-Move Shape	Icon-O-Matic-MoveShapesCommand		모양 이동
-Opening the document failed!	Icon-O-Matic-Main		문서 열기 실패함!
-Reset transformation	Icon-O-Matic-ShapesList		변환 재설정
-Move Paths	Icon-O-Matic-MovePathsCmd		경로 이동
 None	Icon-O-Matic-Properties		없음
-New	Icon-O-Matic-Menu-File		새 파일
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		그것이 로드될 때 Icon-O-Matic는 SVG에서 모든 데이터를 해석하지 않을 수 있습니다. 원래 파일을 덮어 씀으로써, 그 정보는 지금 없어질 것입니다.
-Paste Properties	Icon-O-Matic-Properties		속성 붙여넣기
-Stroke	Transformation		획
-Closed	Icon-O-Matic-PropertyNames		닫힘
-Remove Path	Icon-O-Matic-RemovePathsCmd		경로 제거
-Add shape with path	Icon-O-Matic-Menu-Shape		경로에 모양 더하기
-Select	Icon-O-Matic-Properties		선택
-Height	Icon-O-Matic-PropertyNames		높이
-Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		트랜스포머 제거
-Width	Icon-O-Matic-PropertyNames		너비
-Transformation	Icon-O-Matic-TransformationBoxStates		변환
-Duplicate	Icon-O-Matic-ShapesList		복제
-<unkown property>	Icon-O-Matic-PropertyNames		<알 수 없는 속성>
-Linear	Icon-O-Matic-StyleTypes		직선
-Assign Path	Icon-O-Matic-AddPathsCmd		경로 할당하기
-Move	Icon-O-Matic-TransformationBoxStates		이동
-Flip Control Points	Icon-O-Matic-FlipPointsCmd		제어 포인트 뒤집기
-warning	Icon-O-Matic-SVGExport		경고
-Copy	Icon-O-Matic-Properties		복사
-Miter Limit	Icon-O-Matic-PropertyNames		연결 한도
-OK	Icon-O-Matic-ColorPicker		확인
-Remove Control Point	Icon-O-Matic-RemovePointsCmd		제어 포인트 제거
-Bleep!	Exporter - Continue in error dialog		삐!
-Add circle	Icon-O-Matic-PathsList		원 더하기
-Shorten	Icon-O-Matic-PropertyNames		짧게 하기
-bad news	Title of error alert		나쁜 소식
-Remove Paths	Icon-O-Matic-RemovePathsCmd		경로 제거
-Scale Y	Icon-O-Matic-PropertyNames		Y 축
-Add Control Point	Icon-O-Matic-AddPointCmd		제어 포인트 더하기
-Untitled	Icon-O-Matic-Main		제목없음
-Multi Set 	Multi Set (property name)		다중 설정
-any of the other lists to	Empty property list - 2nd line		다른 목록에의
-Save as…	Icon-O-Matic-Menu-File		다른 이름으로 저장...
-Change Color	Icon-O-Matic-SetColorCmd		색상 바꾸기
-Style	Icon-O-Matic-Menus		스타일
-<modify path>	Icon-O-Matic-PathCmd		<수정된 경로>
-Opening the icon failed!	Icon-O-Matic-Main		아이콘 열기 실패!
-Error: 	Icon-O-Matic-Main		오류:
-Rotate indices backwards	Icon-O-Matic-PathsList		거꾸로 회전 지수
-Name	Icon-O-Matic-PropertyNames		이름
-bad news	Icon-O-Matic-Exporter		나쁜 소식
-<nothing to undo>	Icon-O-Matic-Menu-Edit		<실행 취소할 것이 없음>
-Off	Icon-O-Matic-Menu-Settings		끄기
-Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		모양 고정
-PNG Set	Icon-O-Matic-SavePanel		PNG 설정
-Joins	Icon-O-Matic-PropertyNames		연결
-Remove Style	Icon-O-Matic-RemoveStylesCmd		스타일 제거
-Scale X	Icon-O-Matic-PropertyNames		x 축
-Set 	Set (property name)		설정
-Cancel	Icon-O-Matic-SVGExport		취소
-Add shape with style	Icon-O-Matic-Menu-Shape		스타일에 모양 더하기
-Remove Shape	Icon-O-Matic-RemoveShapesCmd		모양 제거
-Reverse	Icon-O-Matic-PathsList		뒤집기
-HVIF Source Code	Icon-O-Matic-SavePanel		HVIF 소스 코드
-Reset Transformations	Icon-O-Matic-ResetTransformationCmd		변환 재설정
-All	Icon-O-Matic-Properties		모두
-Multi Paste Properties	Icon-O-Matic-Properties		다중 불여넣기 속성
-Undo	Icon-O-Matic-Main		되돌리기
-Click on a shape above	Empty transformers list - 1st line		위의 모양을 클릭하세요
-Add Shape	Icon-O-Matic-AddShapesCmd		모양 더하기
-Contour	Transformation		윤곽
-<nothing to redo>	Icon-O-Matic-Menu-Edit		<다시 실행 할 것이 없음>
-Perspective	Transformation		원근법
-Move Transformer	Icon-O-Matic-MoveTransformersCmd		트랜스포머 이동
-Opacity	Icon-O-Matic-PropertyNames		붕투명
-Add with path	Icon-O-Matic-ShapesList		경로와 함께 더하기
-Gradient type	Icon-O-Matic-StyleTypes		경사 종류
-Icon-O-Matic	System name		아이콘-오-매틱
-Cancel	Icon-O-Matic-Menu-Settings		취소
-Modify Control Point	Icon-O-Matic-ChangePointCmd		제어 포인트 고치기
-Saving your document failed!	Icon-O-Matic-Exporter		당신의 문서를 저장하기 실패함!
-edit it's properties here.	Empty property list - 3rd line		여기의 속성을 편집할 수 있습니다.
-Split	Icon-O-Matic-PathManipulator		나누기
-Nudge Control Points	Icon-O-Matic-NudgePointsCommand		제어 포인트 밀기
-Remove	Icon-O-Matic-StylesList		제거
-Add with path & style	Icon-O-Matic-ShapesList		경로& 스타일 함께 더하기
-META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON 속성
-Translation Y	Icon-O-Matic-PropertyNames		Y 변환
-Rotate	Icon-O-Matic-TransformationBoxStates		회전
-Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		트랜스포머 지우기
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		회전 경로 지수
-Add Transformer	Icon-O-Matic-AddTransformersCmd		트랜스포머 더하기
-Remove	Icon-O-Matic-PathsList		지우기
-Nudge Control Point	Icon-O-Matic-NudgePointsCommand		제어 포인트 밀기
-Pick a color	Icon-O-Matic-ColorPicker		색상 선택
-Quit	Icon-O-Matic-Menu-File		끝내기
-Export	Icon-O-Matic-Menu-File		내보내기
-No	Icon-O-Matic-StyledTextImport		아니오
-Rotate indices forwards	Icon-O-Matic-PathsList		회전 전달 지수
-Unassign Path	Icon-O-Matic-UnassignPathCmd		경로 할당해제
-load error	Icon-O-Matic-SVGImport		불러오기 에러
-Move Shapes	Icon-O-Matic-MoveShapesCommand		모양 이동
-Remove Styles	Icon-O-Matic-RemoveStylesCmd		스타일 제거
-Add	Icon-O-Matic-TransformersList		더하기
-Color	Icon-O-Matic-StyleTypes		색상
-Settings…	Icon-O-Matic-SavePanel		설정...
-Remove	Icon-O-Matic-PathManipulator		제거
-Radial	Icon-O-Matic-StyleTypes		방사형
-Perspective	Icon-O-Matic-TransformersList		원근법
-Add shape with path & style	Icon-O-Matic-Menu-Shape		경로&스타일을 함께 모양에 더하기
-Gradient	Icon-O-Matic-StyleTypes		기울기
-Min LOD	Icon-O-Matic-PropertyNames		최소 LOD 
-BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON 속성
-Invert selection	Icon-O-Matic-Properties		선택 반전
-Export as…	Icon-O-Matic-Menu-File		다른 형식으로 내보내기...
-Transformation	Transformation		변환
-Click on an object in	Empty property list - 1st line		개체를 클릭하십시오
-Move Transformers	Icon-O-Matic-MoveTransformersCmd		트랜스포머 이동
-Move Styles	Icon-O-Matic-MoveStylesCmd		스타일 이동
-Reset transformation	Icon-O-Matic-StylesList		변환 재설정
-Max LOD	Icon-O-Matic-PropertyNames		최대 LOD
-Transformer	Icon-O-Matic-Menus		트랜스포머
-Flip	Icon-O-Matic-PathManipulator		뒤집기
-Conic	Icon-O-Matic-StyleTypes		원뿔
-Split Control Points	Icon-O-Matic-SplitPointsCmd		제어 포인트 나누기
-Save	Icon-O-Matic-Menu-Settings		저장
 Add empty	Icon-O-Matic-ShapesList		빈 공간 더하기
-Close	Icon-O-Matic-Menu-File		닫기
-Cancel	Icon-O-Matic-ColorPicker		취소
-Paste	Icon-O-Matic-Properties		붙여넣기
-Shape	Icon-O-Matic-Menus		모양
-Translation X	Icon-O-Matic-PropertyNames		X 변환
-Properties	Icon-O-Matic-Menus		특성
-Move Pivot	Icon-O-Matic-TransformationBoxStates		중심점 이동
-Path	Icon-O-Matic-Menus		경로
-Freeze transformation	Icon-O-Matic-ShapesList		변환 고정
-File	Icon-O-Matic-Menus		파일
-Error: 	Icon-O-Matic-Exporter		오류:
-Add Transformers	Icon-O-Matic-AddTransformersCmd		트랜스포머 더하기
-Diamond	Icon-O-Matic-StyleTypes		마름모꼴
-Path	Icon-O-Matic-PropertyNames		경로
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		SVG 문서 파일 '%s'열기를  실패했습니다.\n\n에러: %s
-Swatches	Icon-O-Matic-Menus		견본
-<unavailable>	Icon-O-Matic-StyleTypes		<가능하지 않음>
-Rotation	Icon-O-Matic-PropertyNames		회전
-Add with style	Icon-O-Matic-ShapesList		스타일과 함께 더하기
-Add	Icon-O-Matic-PathsList		더하기
-Add Shapes	Icon-O-Matic-AddShapesCmd		모양 더하기
-Move Style	Icon-O-Matic-MoveStylesCmd		스타일 이동
-Bummer	Cancel button - error alert		실망
-Snap to grid	Icon-O-Matic-Menu-Settings		격자에 맞추기
-Remove	Icon-O-Matic-ShapesList		제거
-Yes	Icon-O-Matic-StyledTextImport		예
-Transformation	Icon-O-Matic-TransformersList		변환
-Add Styles	Icon-O-Matic-AddStylesCmd		스타일 더하기
-Remove Control Points	Icon-O-Matic-RemovePointsCmd		제어 포인트 지우기
-Format	Icon-O-Matic-SavePanel		서식
-Add rect	Icon-O-Matic-PathsList		직각 더하기
-Edit	Icon-O-Matic-Menus		편집
-Duplicate	Icon-O-Matic-StylesList		복제
-Caps	Icon-O-Matic-PropertyNames		캡스
-Transform	Icon-O-Matic-PathManipulator		변환
-Add Paths	Icon-O-Matic-AddPathsCmd		경로 더하기
-Style type	Icon-O-Matic-StyleTypes		스타일 형식
-Assign Style	Icon-O-Matic-AssignStyleCmd		경로 할당
-Add Path	Icon-O-Matic-AddPathsCmd		경로 더하기
+Opening the icon failed!	Icon-O-Matic-Main		아이콘 열기 실패!
+Add with path	Icon-O-Matic-ShapesList		경로와 함께 더하기
+Copy	Icon-O-Matic-Properties		복사
 Color	Icon-O-Matic-PropertyNames		색상
-Insert Control Point	Icon-O-Matic-InsertPointCmd		제어 포인트 집어넣기
-Flip Control Point	Icon-O-Matic-FlipPointsCmd		제어 포인트 뒤집기
-Redo	Icon-O-Matic-Main		다시실행
-Assign Paths	Icon-O-Matic-AddPathsCmd		경로 할당
-OK	Icon-O-Matic-SVGImport		확인
-Multi paste	Icon-O-Matic-Properties		여러개 붙여넣기
-to attach transformers.	Empty transformers list - 2nd line		트랜스포머 첨부
+Format	Icon-O-Matic-SavePanel		서식
+Move Shapes	Icon-O-Matic-MoveShapesCommand		모양 이동
+Color	Icon-O-Matic-StyleTypes		색상
+Select	Icon-O-Matic-Properties		선택
+Reset transformation	Icon-O-Matic-ShapesList		변환 재설정
+Duplicate	Icon-O-Matic-StylesList		복제
+Rotate	Icon-O-Matic-TransformationBoxStates		회전
+Remove Control Points	Icon-O-Matic-RemovePointsCmd		제어 포인트 지우기
+Shorten	Icon-O-Matic-PropertyNames		짧게 하기
+Unassign Path	Icon-O-Matic-UnassignPathCmd		경로 할당해제
+Paste	Icon-O-Matic-Properties		붙여넣기
+Detect Orient.	Icon-O-Matic-PropertyNames		위치 감지
+Click on a shape above	Empty transformers list - 1st line		위의 모양을 클릭하세요
+Close	Icon-O-Matic-Menu-File		닫기
+Add rect	Icon-O-Matic-PathsList		직각 더하기
+Rotation	Icon-O-Matic-PropertyNames		회전
+Multi Paste Properties	Icon-O-Matic-Properties		다중 불여넣기 속성
+Bleep!	Exporter - Continue in error dialog		삐!
+Transform	Icon-O-Matic-PathManipulator		변환
+Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		트랜스포머 지우기
+META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON 속성
+Add shape with style	Icon-O-Matic-Menu-Shape		스타일에 모양 더하기
+Assign Path	Icon-O-Matic-AddPathsCmd		경로 할당하기
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		변환 재설정
-Reverse Path	Icon-O-Matic-ReversePathCmd		반대 경로
-Scale	Icon-O-Matic-TransformationBoxStates		비율
-Duplicate	Icon-O-Matic-PathsList		복제
-Save	Icon-O-Matic-Menu-File		저장
-Append…	Icon-O-Matic-Menu-File		추가...
-Move Path	Icon-O-Matic-MovePathsCmd		경로 이동
-Overwrite	Icon-O-Matic-SVGExport		덮어 쓰기
-Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		모양 고정
+Transformation	Transformation		변환
+Remove	Icon-O-Matic-StylesList		제거
+Cancel	Icon-O-Matic-Menu-Settings		취소
+Assign Style	Icon-O-Matic-AssignStyleCmd		경로 할당
+Transformation	Icon-O-Matic-TransformationBoxStates		변환
+Closed	Icon-O-Matic-PropertyNames		닫힘
 Split Control Point	Icon-O-Matic-SplitPointsCmd		제어 포인트 나누기
+<nothing to redo>	Icon-O-Matic-Menu-Edit		<다시 실행 할 것이 없음>
+Height	Icon-O-Matic-PropertyNames		높이
+Add Shape	Icon-O-Matic-AddShapesCmd		모양 더하기
+warning	Icon-O-Matic-SVGExport		경고
+File	Icon-O-Matic-Menus		파일
+Clean Up Path	Icon-O-Matic-CleanUpPathCmd		경로 깨끗하게 하기
+Move Style	Icon-O-Matic-MoveStylesCmd		스타일 이동
+Properties	Icon-O-Matic-Menus		특성
+Path	Icon-O-Matic-PropertyNames		경로
+Add Control Point	Icon-O-Matic-AddPointCmd		제어 포인트 더하기
+Path	Icon-O-Matic-Menus		경로
+Stroke	Transformation		획
+Flip	Icon-O-Matic-PathManipulator		뒤집기
+Select All	Icon-O-Matic-PathManipulator		모두 선택
+Opacity	Icon-O-Matic-PropertyNames		붕투명
+OK	Icon-O-Matic-ColorPicker		확인
+Error: 	Icon-O-Matic-Main		오류:
+bad news	Icon-O-Matic-Exporter		나쁜 소식
+Saving your document failed!	Icon-O-Matic-Exporter		당신의 문서를 저장하기 실패함!
+Snap to grid	Icon-O-Matic-Menu-Settings		격자에 맞추기
+Opening the document failed!	Icon-O-Matic-Main		문서 열기 실패함!
+Shape	Icon-O-Matic-Menus		모양
+Add with path & style	Icon-O-Matic-ShapesList		경로& 스타일 함께 더하기
+<unavailable>	Icon-O-Matic-StyleTypes		<가능하지 않음>
+Min LOD	Icon-O-Matic-PropertyNames		최소 LOD 
+Reverse Path	Icon-O-Matic-ReversePathCmd		반대 경로
+Move Transformers	Icon-O-Matic-MoveTransformersCmd		트랜스포머 이동
+Add	Icon-O-Matic-TransformersList		더하기
+Paste Properties	Icon-O-Matic-Properties		속성 붙여넣기
+Undo	Icon-O-Matic-Main		되돌리기
+Scale X	Icon-O-Matic-PropertyNames		x 축
+Add	Icon-O-Matic-PathsList		더하기
+Add Styles	Icon-O-Matic-AddStylesCmd		스타일 더하기
+Remove	Icon-O-Matic-PathManipulator		제거
+Duplicate	Icon-O-Matic-ShapesList		복제
+Contour	Transformation		윤곽
+Perspective	Icon-O-Matic-TransformersList		원근법
+Move Paths	Icon-O-Matic-MovePathsCmd		경로 이동
+Rounding	Icon-O-Matic-PropertyNames		원모양
+Joins	Icon-O-Matic-PropertyNames		연결
+Cancel	Icon-O-Matic-ColorPicker		취소
+Duplicate	Icon-O-Matic-PathsList		복제
+Remove Shapes	Icon-O-Matic-RemoveShapesCmd		모양 지우기
+Save	Icon-O-Matic-Menu-Settings		저장
+Export as…	Icon-O-Matic-Menu-File		다른 형식으로 내보내기...
+Error: 	Icon-O-Matic-Exporter		오류:
+Move Path	Icon-O-Matic-MovePathsCmd		경로 이동
+Remove Paths	Icon-O-Matic-RemovePathsCmd		경로 제거
+Assign Paths	Icon-O-Matic-AddPathsCmd		경로 할당
+Diamond	Icon-O-Matic-StyleTypes		마름모꼴
+Add Style	Icon-O-Matic-AddStylesCmd		스타일 추가
+Nudge Control Points	Icon-O-Matic-NudgePointsCommand		제어 포인트 밀기
+Move Styles	Icon-O-Matic-MoveStylesCmd		스타일 이동
+Add shape with path	Icon-O-Matic-Menu-Shape		경로에 모양 더하기
+Translation X	Icon-O-Matic-PropertyNames		X 변환
+Flip Control Points	Icon-O-Matic-FlipPointsCmd		제어 포인트 뒤집기
+Add Transformers	Icon-O-Matic-AddTransformersCmd		트랜스포머 더하기
+BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON 속성
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		그것이 로드될 때 Icon-O-Matic는 SVG에서 모든 데이터를 해석하지 않을 수 있습니다. 원래 파일을 덮어 씀으로써, 그 정보는 지금 없어질 것입니다.
+Rotate indices backwards	Icon-O-Matic-PathsList		거꾸로 회전 지수
+Overwrite	Icon-O-Matic-SVGExport		덮어 쓰기
+Modify Control Point	Icon-O-Matic-ChangePointCmd		제어 포인트 고치기
+Cancel	Icon-O-Matic-SVGExport		취소
 Open…	Icon-O-Matic-Menu-File		열기...
+Redo	Icon-O-Matic-Main		다시실행
+Change Color	Icon-O-Matic-SetColorCmd		색상 바꾸기
+Remove	Icon-O-Matic-ShapesList		제거
+PNG Set	Icon-O-Matic-SavePanel		PNG 설정
+to attach transformers.	Empty transformers list - 2nd line		트랜스포머 첨부
+Linear	Icon-O-Matic-StyleTypes		직선
+any of the other lists to	Empty property list - 2nd line		다른 목록에의
+Nudge Control Point	Icon-O-Matic-NudgePointsCommand		제어 포인트 밀기
+Flip Control Point	Icon-O-Matic-FlipPointsCmd		제어 포인트 뒤집기
+Add Paths	Icon-O-Matic-AddPathsCmd		경로 더하기
+Color (#%02x%02x%02x)	Style name after dropping a color		색상 (#%02x%02x%02x)
+Clean up	Icon-O-Matic-PathsList		깨끗하게 하기
+Remove Style	Icon-O-Matic-RemoveStylesCmd		스타일 제거
+Split	Icon-O-Matic-PathManipulator		나누기
+Move	Icon-O-Matic-TransformationBoxStates		이동
+Reset Transformations	Icon-O-Matic-ResetTransformationCmd		변환 재설정
+Split Control Points	Icon-O-Matic-SplitPointsCmd		제어 포인트 나누기
+Remove Control Point	Icon-O-Matic-RemovePointsCmd		제어 포인트 제거
+Conic	Icon-O-Matic-StyleTypes		원뿔
+Name	Icon-O-Matic-PropertyNames		이름
+Multi paste	Icon-O-Matic-Properties		여러개 붙여넣기
+Add Shapes	Icon-O-Matic-AddShapesCmd		모양 더하기
+Reset transformation	Icon-O-Matic-StylesList		변환 재설정
+Add Transformer	Icon-O-Matic-AddTransformersCmd		트랜스포머 더하기
+Reverse	Icon-O-Matic-PathsList		뒤집기
+Move Pivot	Icon-O-Matic-TransformationBoxStates		중심점 이동
+Remove	Icon-O-Matic-PathsList		지우기
+Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		트랜스포머 제거
+Style type	Icon-O-Matic-StyleTypes		스타일 형식
+Quit	Icon-O-Matic-Menu-File		끝내기
+Remove Styles	Icon-O-Matic-RemoveStylesCmd		스타일 제거
+Gradient	Icon-O-Matic-StyleTypes		기울기
+bad news	Title of error alert		나쁜 소식
+Insert Control Point	Icon-O-Matic-InsertPointCmd		제어 포인트 집어넣기
+Add shape with path & style	Icon-O-Matic-Menu-Shape		경로&스타일을 함께 모양에 더하기
+Move Shape	Icon-O-Matic-MoveShapesCommand		모양 이동
+Radial	Icon-O-Matic-StyleTypes		방사형
+Caps	Icon-O-Matic-PropertyNames		캡스
+OK	Icon-O-Matic-SVGImport		확인
+Append…	Icon-O-Matic-Menu-File		추가...
+Scale Y	Icon-O-Matic-PropertyNames		Y 축
+Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		SVG 문서 파일 '%s'열기를  실패했습니다.\n\n에러: %s
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		색상 (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		기울기 고치기
-Clean Up Path	Icon-O-Matic-CleanUpPathCmd		경로 깨끗하게 하기
-Rounding	Icon-O-Matic-PropertyNames		원모양
-Remove Shapes	Icon-O-Matic-RemoveShapesCmd		모양 지우기
-Clean up	Icon-O-Matic-PathsList		깨끗하게 하기
-Detect Orient.	Icon-O-Matic-PropertyNames		위치 감지
+Set 	Set (property name)		설정
+Rotate indices forwards	Icon-O-Matic-PathsList		회전 전달 지수
+Click on an object in	Empty property list - 1st line		개체를 클릭하십시오
+Save	Icon-O-Matic-Menu-File		저장
+No	Icon-O-Matic-StyledTextImport		아니오
+Add circle	Icon-O-Matic-PathsList		원 더하기
+Freeze transformation	Icon-O-Matic-ShapesList		변환 고정
+Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		모양 고정
+Miter Limit	Icon-O-Matic-PropertyNames		연결 한도
+Untitled	Icon-O-Matic-Main		제목없음
+Max LOD	Icon-O-Matic-PropertyNames		최대 LOD
+Add Path	Icon-O-Matic-AddPathsCmd		경로 더하기
+load error	Icon-O-Matic-SVGImport		불러오기 에러
+Transformation	Icon-O-Matic-TransformersList		변환
+Save as…	Icon-O-Matic-Menu-File		다른 이름으로 저장...
+Swatches	Icon-O-Matic-Menus		견본
+<modify path>	Icon-O-Matic-PathCmd		<수정된 경로>
+HVIF Source Code	Icon-O-Matic-SavePanel		HVIF 소스 코드
+Icon-O-Matic	System name		아이콘-오-매틱
+<nothing to undo>	Icon-O-Matic-Menu-Edit		<실행 취소할 것이 없음>
+Add	Icon-O-Matic-StylesList		더하기
+Translation Y	Icon-O-Matic-PropertyNames		Y 변환
+Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		모양 고정
+Scale	Icon-O-Matic-TransformationBoxStates		비율
+Remove Shape	Icon-O-Matic-RemoveShapesCmd		모양 제거
+All	Icon-O-Matic-Properties		모두
+Transformer	Icon-O-Matic-Menus		트랜스포머
+Invert selection	Icon-O-Matic-Properties		선택 반전
+<unkown property>	Icon-O-Matic-PropertyNames		<알 수 없는 속성>
+Pick a color	Icon-O-Matic-ColorPicker		색상 선택
+Multi Set 	Multi Set (property name)		다중 설정
+Settings…	Icon-O-Matic-SavePanel		설정...
+Add with style	Icon-O-Matic-ShapesList		스타일과 함께 더하기
+New	Icon-O-Matic-Menu-File		새 파일
+Yes	Icon-O-Matic-StyledTextImport		예
+Remove Path	Icon-O-Matic-RemovePathsCmd		경로 제거
+Gradient type	Icon-O-Matic-StyleTypes		경사 종류
+Move Transformer	Icon-O-Matic-MoveTransformersCmd		트랜스포머 이동
+Perspective	Transformation		원근법
+Export	Icon-O-Matic-Menu-File		내보내기
+Width	Icon-O-Matic-PropertyNames		너비
+Bummer	Cancel button - error alert		실망
+Style	Icon-O-Matic-Menus		스타일
+edit it's properties here.	Empty property list - 3rd line		여기의 속성을 편집할 수 있습니다.
+Off	Icon-O-Matic-Menu-Settings		끄기
+Edit	Icon-O-Matic-Menus		편집

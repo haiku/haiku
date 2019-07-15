@@ -1,7 +1,7 @@
 1	finnish	x-vnd.Haiku-libpackage	2012114212
-Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Pakkauksella %s-%s ei ole täsmääviä vaatimuksia peruspakkaukselleen ”%s”
-Failed to get repository names	PackageManagerKit		Tietovaraston nimien hakeminen epäonnistui
-Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Tietovaraston ”%s” välimuistin hakeminen epäonnistui. Ohitetaan.
 Refreshing repository \"%s\" failed	PackageManagerKit		Tietovaraston ”%s” päivittäminen epäonnistui
 Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Asetusten hakeminen tietovarastosta ”%s” epäonnistui. Ohitetaan.
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Tietovaraston ”%s” välimuistin hakeminen epäonnistui. Ohitetaan.
+Failed to get repository names	PackageManagerKit		Tietovaraston nimien hakeminen epäonnistui
 Failed to remove transaction directory	PackageManagerKit		Tapahtumahakemiston poistaminen epäonnistui
+Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Pakkauksella %s-%s ei ole täsmääviä vaatimuksia peruspakkaukselleen ”%s”

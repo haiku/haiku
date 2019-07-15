@@ -1,3 +1,3 @@
 1	english	x-vnd.Haiku-TelnetService	1209067113
-Telnet server	TelnetServiceAddOn		Telnet 服务器
 The Telnet server allows you to remotely access your machine with a terminal session using the telnet protocol.\n\nPlease note that it is an insecure and unencrypted connection.	TelnetServiceAddOn		Telnet 服务器允许您使用终端会话通过 Telnet 协议远程访问您的机器。\n\n请注意这是一种不安全、未加密的连接。
+Telnet server	TelnetServiceAddOn		Telnet 服务器

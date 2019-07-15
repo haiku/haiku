@@ -1,15 +1,15 @@
 1	hungarian	x-vnd.Haiku-Sounds	1784495232
-Sound file:	HWindow		Hangfájl:
 Sounds	System name		Hangok
+Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Hangok\n Készítette:\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n Atsushi Takamatsu munkája alapján.\nMinden jog fenntartva ©2003-2006 Haiku
 No such file or directory	HEventList		Nem található ilyen fájl vagy mappa
-OK	SoundsHApp		Rendben
-OK	HEventList		Rendben
 OK	HWindow		Rendben
+Other…	HWindow		Egyéb…
+OK	SoundsHApp		Rendben
+Sound file:	HWindow		Hangfájl:
 This is not an audio file.	HWindow		Ez nem egy hangfájl.
+<none>	HEventList		<nincs>
+OK	HEventList		Rendben
 About Sounds	SoundsHApp		Hangok névjegye
 Sound	HEventList		Hang
 Event	HEventList		Esemény
-<none>	HEventList		<nincs>
-Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Hangok\n Készítette:\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n Atsushi Takamatsu munkája alapján.\nMinden jog fenntartva ©2003-2006 Haiku
 <none>	HWindow		<nincs>
-Other…	HWindow		Egyéb…

@@ -1,55 +1,49 @@
-1	japanese	x-vnd.Haiku-BluetoothPrefs	145165464
-About Bluetooth…	Window		Bluetoothについて…
-Handheld	Settings view		ハンドヘルド機器
-Default inquiry time:	Settings view		デフォルトの問い合わせ時間:
+1	japanese	x-vnd.Haiku-BluetoothPrefs	67867884
+Laptop	Settings view		ラップトップ
+Only from trusted devices	Settings view		信用されているデバイスのみ
+15 secs	Settings view		15 秒
+Quit	main		終了
 Manufacturer: 	Device View		製造元:
-Add device to list	Inquiry panel		デバイスを一覧に追加
-Starting scan...	Inquiry panel		スキャン開始…
-Smart phone	Settings view		スマートフォン
-With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		サポートしてくれた方々:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\n支援いただいた各個人...\n\nハードウェアの発送/寄付:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\n経済的支援:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nパッチの提供:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nテスト:\n - Petter H. Juliussen\nすべての知識を提供してくれた:\n - the yellowTAB team
-Server	Settings view		サーバー
-Stop bluetooth services…	Window		Bluetooth サービスを停止…
-The Bluetooth services are not currently running on this system.	main		Bluetooth サービスは現在システム上で動作していません。
+Desktop	Settings view		デスクトップ
+Server	Window		サーバー
 Identify host as:	Settings view		ホスト名:
 Refresh…	Remote devices		更新…
-Pair…	Remote devices		ペアリング…
-Incoming connections policy:	Settings view		着信接続ポリシー:
-From all devices	Settings view		すべてのデバイスから
-Show name	Extended local device view		名前を表示
 Local devices found on system:	Settings view		認識されたローカルデバイス :
-Remaining %1 seconds	Inquiry panel		残り %1 秒
-Server	Window		サーバー
-Scanning completed.	Inquiry panel		スキャンが完了しました。
+Service classes: 	Device View		サービスクラス:
+Remote devices	Window		リモートデバイス
+Settings	Window		設定
+Stop bluetooth services…	Window		Bluetooth サービスを停止…
+61 secs	Settings view		61 秒
+Add…	Remote devices		追加…
+As blocked	Remote devices		ブロック状態
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		このシステムには Bluetooth ローカルデバイスが登録されていません。
+Revert	Window		元に戻す
+Refresh local devices…	Window		ローカルデバイスを更新…
+Disconnect	Remote devices		切断
+From all devices	Settings view		すべてのデバイスから
+Defaults	Window		デフォルト
+Start bluetooth services…	Window		Bluetooth サービスを開始…
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		リモートデバイスの Bluetooth 機能がアクティブになっていることを確認してください。スキャンを開始するには「問い合わせ」ボタンを押してください。デバイスの名前を取得するに必要な時間は不明ですが、デバイス毎に 3 秒以内に完了すると思われます。その後一覧に追加ができて、ペアリングが可能になります。
+Scanning progress	Inquiry panel		スキャンの進行状況
+Bluetooth	System name		Bluetooth
 Launch now	main		ただちに起動
 Remove	Remote devices		削除
-Quit	main		終了
-15 secs	Settings view		15 秒
-Start bluetooth services…	Window		Bluetooth サービスを開始…
-Policy...	Settings view		ポリシー…
-61 secs	Settings view		61 秒
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		このシステムには Bluetooth ローカルデバイスが登録されていません。
-Identify us as...	Settings view		自機名…
- packets: 	Device View		パケット:
-As blocked	Remote devices		ブロック状態
-Bluetooth	System name		Bluetooth
-Disconnect	Remote devices		切断
-Defaults	Window		デフォルト
-Inquiry	Inquiry panel		問い合わせ
-Desktop	Settings view		デスクトップ
-Revert	Window		元に戻す
-Remote devices	Window		リモートデバイス
-Laptop	Settings view		ラップトップ
-Discoverable	Extended local device view		発見可能
-Service classes: 	Device View		サービスクラス:
-Settings	Window		設定
-Only from trusted devices	Settings view		信用されているデバイスのみ
-Scanning progress	Inquiry panel		スキャンの進行状況
 Always ask	Settings view		常に確認する
-Retrieving name of %1	Inquiry panel		%1の名前を取得しています
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		リモートデバイスの Bluetooth 機能がアクティブになっていることを確認してください。スキャンを開始するには「問い合わせ」ボタンを押してください。デバイスの名前を取得するに必要な時間は不明ですが、デバイス毎に 3 秒以内に完了すると思われます。その後一覧に追加ができて、ペアリングが可能になります。
-Authenticate	Extended local device view		認証
-Refresh local devices…	Window		ローカルデバイスを更新…
-Pick device...	Settings view		デバイスの選択...
-Retrieving names...	Inquiry panel		名前を取得しています…
 Help	Window		ヘルプ
-Add…	Remote devices		追加…
+Pair…	Remote devices		ペアリング…
+Retrieving name of %1	Inquiry panel		%1の名前を取得しています
+Inquiry	Inquiry panel		問い合わせ
+Incoming connections policy:	Settings view		着信接続ポリシー:
+Show name	Extended local device view		名前を表示
+Add device to list	Inquiry panel		デバイスを一覧に追加
+Remaining %1 seconds	Inquiry panel		残り %1 秒
+The Bluetooth services are not currently running on this system.	main		Bluetooth サービスは現在システム上で動作していません。
+Discoverable	Extended local device view		発見可能
+Authenticate	Extended local device view		認証
+Smart phone	Settings view		スマートフォン
+Scanning completed.	Inquiry panel		スキャンが完了しました。
+Default inquiry time:	Settings view		デフォルトの問い合わせ時間:
+Server	Settings view		サーバー
+Handheld	Settings view		ハンドヘルド機器
+ packets: 	Device View		パケット:
+About Bluetooth…	Window		Bluetoothについて…

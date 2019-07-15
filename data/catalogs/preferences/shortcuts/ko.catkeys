@@ -1,38 +1,38 @@
 1	korean	x-vnd.Haiku-Shortcuts	3264530129
-OK	ShortcutsWindow		확인
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		단축키는 당신의 키셋을 저장할 수 없습니다.
-Cancel	ShortcutsWindow		취소
-Append KeySet…	ShortcutsWindow		키셋 추가…
-Control	ShortcutsSpec	Name for modifier on keyboard	Control
-Key	ShortcutsWindow		키
-Open KeySet…	ShortcutsWindow		키셋 열기…
-Revert to saved	ShortcutsWindow		저장된 걸로 되돌림
-*InsertString \"Your Text Here\"	ShortcutsWindow		*문자열 삽입 \"당신의 텍스트를 여기에\"
 *MouseUp	ShortcutsWindow		*마우스 위로
-(Choose application with file requester)	ShortcutsWindow		(요청된 파일의 어플리케이션 선택)
-*LaunchHandler text/html	ShortcutsWindow		*런치핸들러 text/html
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		단축키는 당신의 키셋 파일을 열 수 없습니다!
-*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*다중 \"*마우스 이동 100% 0\" \"*마우스버튼 1\"
-Save	ShortcutsWindow		저장
-*MouseButton 1	ShortcutsWindow		*마우스버튼 1
-*MoveMouse +20 +0	ShortcutsWindow		*마우스이동+20 +0
-Remove selected shortcut	ShortcutsWindow		선택된 단축키 제거
-Add new shortcut	ShortcutsWindow		새 단축키 추가
-Save & apply	ShortcutsWindow		저장 & 추가
-*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*메세지 보내기 application/x-vnd.Be-TRAK 'Tfnd'
-Append	ShortcutsWindow		추가
-File	ShortcutsWindow		파일
-Quit	ShortcutsWindow		나가기
-*MouseDown	ShortcutsWindow		*메세지 보내기 application/x-vnd.Be-TRAK 'Tfnd'
-Don't save	ShortcutsWindow		저장 안함
 Application	ShortcutsWindow		어플리케이션
-Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Revert to saved	ShortcutsWindow		저장된 걸로 되돌림
+Don't save	ShortcutsWindow		저장 안함
+*MouseDown	ShortcutsWindow		*메세지 보내기 application/x-vnd.Be-TRAK 'Tfnd'
 *Beep	ShortcutsWindow		*비프음
-*MoveMouseTo 50% 50%	ShortcutsWindow		*마우스 이동 50% 50%
-Save KeySet as…	ShortcutsWindow		다른 이름으로 키셋 저장…
-Open	ShortcutsWindow		열기
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		단축키는 당신의 키셋 파일을 붙여 넣을수 없습니다!
-Select	ShortcutsWindow		선택
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		단축키는 당신의 키셋 파일을 저장할 수 없습니다!
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		단축키는 당신의 키셋을 저장할 수 없습니다.
+Save	ShortcutsWindow		저장
 Oh no	ShortcutsWindow		오 안돼
+Key	ShortcutsWindow		키
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*메세지 보내기 application/x-vnd.Be-TRAK 'Tfnd'
+Select	ShortcutsWindow		선택
 Shortcuts	System name		단축키
+Quit	ShortcutsWindow		나가기
+(Choose application with file requester)	ShortcutsWindow		(요청된 파일의 어플리케이션 선택)
+Cancel	ShortcutsWindow		취소
+*MoveMouse +20 +0	ShortcutsWindow		*마우스이동+20 +0
+Control	ShortcutsSpec	Name for modifier on keyboard	Control
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		단축키는 당신의 키셋 파일을 붙여 넣을수 없습니다!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		단축키는 당신의 키셋 파일을 저장할 수 없습니다!
+*InsertString \"Your Text Here\"	ShortcutsWindow		*문자열 삽입 \"당신의 텍스트를 여기에\"
+Remove selected shortcut	ShortcutsWindow		선택된 단축키 제거
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		단축키는 당신의 키셋 파일을 열 수 없습니다!
+Save & apply	ShortcutsWindow		저장 & 추가
+Open	ShortcutsWindow		열기
+Append	ShortcutsWindow		추가
+Save KeySet as…	ShortcutsWindow		다른 이름으로 키셋 저장…
+Append KeySet…	ShortcutsWindow		키셋 추가…
+*MouseButton 1	ShortcutsWindow		*마우스버튼 1
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*다중 \"*마우스 이동 100% 0\" \"*마우스버튼 1\"
+OK	ShortcutsWindow		확인
+Add new shortcut	ShortcutsWindow		새 단축키 추가
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Open KeySet…	ShortcutsWindow		키셋 열기…
+File	ShortcutsWindow		파일
+*LaunchHandler text/html	ShortcutsWindow		*런치핸들러 text/html
+*MoveMouseTo 50% 50%	ShortcutsWindow		*마우스 이동 50% 50%

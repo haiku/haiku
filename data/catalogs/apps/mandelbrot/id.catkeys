@@ -1,23 +1,23 @@
 1	indonesian	x-vnd.Haiku-Mandelbrot	1781779654
-About	MandelbrotWindow		Tentang
-Julia	MandelbrotWindow		Julia
-Grassland	MandelbrotWindow		Padang rumput
-Spring	MandelbrotWindow		Musim semi
-High contrast	MandelbrotWindow		Kontras tinggi
-Fire	MandelbrotWindow		Api
-Royal	MandelbrotWindow		Kerajaan
-File	MandelbrotWindow		Berkas
-Lightning	MandelbrotWindow		Petir
-Midnight	MandelbrotWindow		Tengah malam
-Palette	MandelbrotWindow		Palet
-Mandelbrot	MandelbrotWindow		Mandelbrot
 Burning Ship	MandelbrotWindow		Kapal Terbakar
-Quit	MandelbrotWindow		Berhenti
-Frost	MandelbrotWindow		Embun beku
+Grassland	MandelbrotWindow		Padang rumput
+Lightning	MandelbrotWindow		Petir
+About	MandelbrotWindow		Tentang
+Palette	MandelbrotWindow		Palet
 Set	MandelbrotWindow		Atur
-Iterations	MandelbrotWindow		Iterasi
-Mandelbrot	System name		Mandelbrot
-Deepfrost	MandelbrotWindow		Deepfrost
 Tricorn	MandelbrotWindow		Tricorn
-Multibrot	MandelbrotWindow		Multibrot
+Royal	MandelbrotWindow		Kerajaan
 Orbit Trap	MandelbrotWindow		Jebakan Orbit
+Deepfrost	MandelbrotWindow		Deepfrost
+Quit	MandelbrotWindow		Berhenti
+File	MandelbrotWindow		Berkas
+Julia	MandelbrotWindow		Julia
+Frost	MandelbrotWindow		Embun beku
+Fire	MandelbrotWindow		Api
+Mandelbrot	System name		Mandelbrot
+Iterations	MandelbrotWindow		Iterasi
+High contrast	MandelbrotWindow		Kontras tinggi
+Multibrot	MandelbrotWindow		Multibrot
+Spring	MandelbrotWindow		Musim semi
+Midnight	MandelbrotWindow		Tengah malam
+Mandelbrot	MandelbrotWindow		Mandelbrot

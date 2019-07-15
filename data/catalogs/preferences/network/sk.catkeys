@@ -1,53 +1,53 @@
 1	slovak	x-vnd.Haiku-Network	1314732966
-Static	IntefaceAddressView		Statická
+Ethernet device	InterfaceListItem		Ethernetové zariadenie
+Link speed:	IntefaceView		Rýchlosť linky:
+disconnected	IntefaceView		odpojené
+IP Address:	IntefaceAddressView		Adresa IP:
+WPA	WPA protected network		WPA
+Network:	IntefaceView		Sieť:
+Received:	IntefaceView		Prijatých:
+New…	NetworkWindow		Nová…
+no link	InterfaceListItem		bez spojenia
+Other	NetworkWindow		Iné
+Sent:	IntefaceView		Odoslaných:
+Gateway:	IntefaceAddressView		Brána:
+The netmask defines your local network	IntefaceAddressView		Sieťová maska definuje vašu lokálnu sieť
+Your IP address	IntefaceAddressView		Vaša adresa IP
+DHCP	IntefaceAddressView		DHCP
+Dial Up	NetworkWindow		Vytáčané pripojenie Dial-Up
+Netmask:	IntefaceAddressView		Sieťová maska:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Služby
-no link	InterfaceListItem		bez spojenia
-WPA2	WPA2 protected network		WPA2
-Choose automatically	IntefaceView		Vybrať automaticky
-connected	IntefaceView		pripojené
-Ethernet device	InterfaceListItem		Ethernetové zariadenie
-The netmask defines your local network	IntefaceAddressView		Sieťová maska definuje vašu lokálnu sieť
-Dial-up connection	InterfaceListItem		Vytáčané pripojenie
-%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
-Network	NetworkWindow		Sieť
-VPN connection	InterfaceListItem		Pripojenie VPN
-Show network status in Deskbar	NetworkWindow		Zobraziť stav siete v Paneli
-The method for obtaining an IP address	IntefaceAddressView		Spôsob získania adresy IP
-connected	InterfaceListItem		pripojené
-disabled	InterfaceListItem		zakázané
-Dial Up	NetworkWindow		Vytáčané pripojenie Dial-Up
-Apply	IntefaceAddressView		Použiť
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Inštalácia Stavu siete do Panelu zlyhala: %s
+Revert	NetworkWindow		Vrátiť
+WEP	WEP protected network		WEP
+<no wireless networks found>	IntefaceView		<neboli nájdené žiadne bezdrôtové siete>
+connected	IntefaceView		pripojené
+VPN	NetworkWindow		VPN
+Apply	IntefaceAddressView		Použiť
+Disable	ServiceView		Zakázať
+WPA2	WPA2 protected network		WPA2
+Show network status in Deskbar	NetworkWindow		Zobraziť stav siete v Paneli
+Mode:	IntefaceAddressView		Režim:
+connected	InterfaceListItem		pripojené
+Static	IntefaceAddressView		Statická
+launch error	NetworkWindow		chyba pri spustení
+Renegotiate	IntefaceView		Znovu vyjednať
 MAC address:	IntefaceView		Adresa MAC:
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+disabled	InterfaceListItem		zakázané
+Dial-up connection	InterfaceListItem		Vytáčané pripojenie
+The method for obtaining an IP address	IntefaceAddressView		Spôsob získania adresy IP
+Automatic	IntefaceAddressView		Automaticky
+Choose automatically	IntefaceView		Vybrať automaticky
+Status:	IntefaceView		Stav:
+Disable	IntefaceView		Zakázať
+Manage…	NetworkWindow		Spravovať…
+open	Open network		otvorená
+Network	NetworkWindow		Sieť
+Your gateway to the internet	IntefaceAddressView		Vaša brána do internetu
+Enable	ServiceView		Povoliť
+Ok	NetworkWindow		OK
 Wireless device	InterfaceListItem		Bezdrôtové zariadenie
 Disabled	IntefaceAddressView		Zakázané
-Renegotiate	IntefaceView		Znovu vyjednať
-Ok	NetworkWindow		OK
-Network:	IntefaceView		Sieť:
-launch error	NetworkWindow		chyba pri spustení
-Other	NetworkWindow		Iné
-Automatic	IntefaceAddressView		Automaticky
-Gateway:	IntefaceAddressView		Brána:
-Revert	NetworkWindow		Vrátiť
-Enable	ServiceView		Povoliť
-disconnected	IntefaceView		odpojené
-Status:	IntefaceView		Stav:
-Link speed:	IntefaceView		Rýchlosť linky:
-Your gateway to the internet	IntefaceAddressView		Vaša brána do internetu
-New…	NetworkWindow		Nová…
-DHCP	IntefaceAddressView		DHCP
-Mode:	IntefaceAddressView		Režim:
-WPA	WPA protected network		WPA
-Sent:	IntefaceView		Odoslaných:
-open	Open network		otvorená
-IP Address:	IntefaceAddressView		Adresa IP:
-VPN	NetworkWindow		VPN
-Received:	IntefaceView		Prijatých:
-Disable	IntefaceView		Zakázať
-<no wireless networks found>	IntefaceView		<neboli nájdené žiadne bezdrôtové siete>
-Netmask:	IntefaceAddressView		Sieťová maska:
-Disable	ServiceView		Zakázať
-Your IP address	IntefaceAddressView		Vaša adresa IP
-Manage…	NetworkWindow		Spravovať…
-WEP	WEP protected network		WEP
+VPN connection	InterfaceListItem		Pripojenie VPN

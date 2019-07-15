@@ -1,12 +1,12 @@
 1	greek, modern (1453-)	x-vnd.Haiku-VirtualMemory	1828586495
-Turn off	SettingsWindow		Απενεργοποίηση
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Απενεργοποιώντας την εικονική μνήμη θα έχετε ανεπιθύμητα αποτελέσματα για τη σταθερότητα του συστήματος όταν εξαντληθεί η μνήμη.\nΗ εικονική μνήμη δεν επηρεάζει την απόδοση του συστήματος μέχρι να φτάσει σε αυτό το σημείο.\n\nΕίστε πραγματικά βέβαιοι ότι θέλετε να την απενεργοποιήσετε;
 Requested swap file size:	SettingsWindow		Επιθυμητό μέγεθος αρχείου σελιδοποίησης:
-Defaults	SettingsWindow		Προεπιλογές
-Use volume:	SettingsWindow		Χρήση τόμου:
-Keep enabled	SettingsWindow		Κράτησέ τη ενεργοποιημένη
-Revert	SettingsWindow		Επαναφορά
 VirtualMemory	System name		VirtualMemory
 OK	VirtualMemoryApp		Εντάξει
+Use volume:	SettingsWindow		Χρήση τόμου:
+Turn off	SettingsWindow		Απενεργοποίηση
+Revert	SettingsWindow		Επαναφορά
+Keep enabled	SettingsWindow		Κράτησέ τη ενεργοποιημένη
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Εικονική Μνήμη\n\tγράφτηκε από τον Axel Dörfler\n\tΠνευματικά δικαιώματα 2005, Haiku.\n
+Defaults	SettingsWindow		Προεπιλογές
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Απενεργοποιώντας την εικονική μνήμη θα έχετε ανεπιθύμητα αποτελέσματα για τη σταθερότητα του συστήματος όταν εξαντληθεί η μνήμη.\nΗ εικονική μνήμη δεν επηρεάζει την απόδοση του συστήματος μέχρι να φτάσει σε αυτό το σημείο.\n\nΕίστε πραγματικά βέβαιοι ότι θέλετε να την απενεργοποιήσετε;
 Enable virtual memory	SettingsWindow		Ενεργοποίηση εικονικής μνήμης

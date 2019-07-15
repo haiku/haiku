@@ -1,12 +1,12 @@
 1	korean	x-vnd.Be-WORK	3614422175
-Invalid argument: %s\n	Workspaces		올바르지 않은 매개변수:%s\n
 Quit	Workspaces		나가기
-Workspaces	System name		작업공간
+Invalid argument: %s\n	Workspaces		올바르지 않은 매개변수:%s\n
 Change workspace count…	Workspaces		작업공간 갯수 바꾸기
-Remove replicant	Workspaces		복제품 제거하기
-Show window border	Workspaces		창 틀 보이기
-Auto-raise	Workspaces		자동 확장
 Always on top	Workspaces		항상 위에
-Live in the Deskbar	Workspaces		데스크바에 남기기
+Show window border	Workspaces		창 틀 보이기
 Show window tab	Workspaces		창 탭 보이기
+Auto-raise	Workspaces		자동 확장
+Remove replicant	Workspaces		복제품 제거하기
+Live in the Deskbar	Workspaces		데스크바에 남기기
 Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		사용법: %s [옵션] [작업공간]\n\"옵션\"은 어디에:\n --notitle\t\t제목 표시줄을 제거하고,테두리와 크기 조정은 유지함\n --noborder\t\t제목 표시줄,테두리 그리고 크기 조정을 제거함\n --avoidfocus\t\키보드 이벤트의 대상이 되지 않도록 창을 보호\n --alwaysontop\t\tk창를 항상 위에 고정\n --notmovable\t\t창을 주변으로 이동 시킬 수 없음\n --autoraise\t\t화면 가장자리에 있을 때 작업공간 창이 자동-조정\n --help\t\t도움말을 보여주고 끝내고\n더불어 \"작업공간\"은 전환하는(0-31)중의 작업공간의 수입니다\n
+Workspaces	System name		작업공간

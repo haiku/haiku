@@ -1,17 +1,17 @@
 1	slovak	x-vnd.Haiku-DataTranslations	4156631142
-DataTranslations	System name		Preklad dát
-Cancel	DataTranslations		Zrušiť
+Path:	DataTranslations		Cesta:
 Name:	DataTranslations		Názov:
+DataTranslations - Note	DataTranslations		Preklad dát - poznámka
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Zdá sa, že položka „%name“ nie je prekladač a nebude nainštalovaná.
 Could not install %s:\n%s	DataTranslations		Nebolo možné nainštalovať %s:\n%s
-Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Tento ovládací panel použite na nastavenie predvolených hodnôt prekladačov, ktoré sa použijú, keď aplikácia neuvedie žiadne iné nastavenia.
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Položka „%name“ už existuje v priečinku Translators! Má sa existujúci prekladač prepísať?
-DataTranslations - Note	DataTranslations		Preklad dát - poznámka
-Overwrite	DataTranslations		Prepísať
-Info:	DataTranslations		Info:
-Info	DataTranslations		Info
-Path:	DataTranslations		Cesta:
-The new translator has been installed successfully.	DataTranslations		Nový prekladač bol úspešne nainštalovaný.
-DataTranslations - Error	DataTranslations		Preklad dát - chyba
 OK	DataTranslations		OK
+Cancel	DataTranslations		Zrušiť
+Info:	DataTranslations		Info:
+DataTranslations - Error	DataTranslations		Preklad dát - chyba
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Tento ovládací panel použite na nastavenie predvolených hodnôt prekladačov, ktoré sa použijú, keď aplikácia neuvedie žiadne iné nastavenia.
+The new translator has been installed successfully.	DataTranslations		Nový prekladač bol úspešne nainštalovaný.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Položka „%name“ už existuje v priečinku Translators! Má sa existujúci prekladač prepísať?
+DataTranslations	System name		Preklad dát
+Info	DataTranslations		Info
+Overwrite	DataTranslations		Prepísať
 Version:	DataTranslations		Verzia:

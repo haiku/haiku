@@ -1,54 +1,54 @@
 1	swedish	x-vnd.Haiku-Mail	2750130554
+Account settings	AutoConfigWindow		Kontoinställningar
+\t\t· Outgoing	Config Window		\t\t· Utgående
+An error occurred while creating the config view: %error.	Config Views		Ett fel inträffade vid skapandet av konfigurerings vy. %error.
+E-mail address:	E-Mail		E-postadress:
+Create new account	AutoConfigWindow		Skapa konto
+While sending and receiving	Config Window		När sändning och mottagning sker
+Error!	Config Views		Fel!
+Apply	Config Window		Verkställ
+Incoming mail filters	Config Views		Inkommande e-postfilter
+Outgoing mail filters	Config Views		Utgående e-postfilter
+Server name:	E-Mail		Servernamn:
+Add	Config Window		Lägg till
+Back	AutoConfigWindow		Tillbaka
+Real name:	E-Mail		Verkligt namn:
+Real name:	Config Views		Verkligt namn:
+\t\t· E-mail filters	Config Window		\t\t· E-postfilter
+Outgoing	E-Mail		Utgående
+Accounts	Config Window		Konton
+Outgoing	Config Window		Utgående
+Remove	Config Views		Ta bort
+Show notifications:	Config Window		Visa notifieringar:
 Settings	Config Window		Inställningar
 Never	Config Window	show status window	Aldrig
-While sending and receiving	Config Window		När sändning och mottagning sker
-Incoming	Config Window		Inkommande
-Server name:	E-Mail		Servernamn:
-An error occurred while creating the config view: %error.	Config Views		Ett fel inträffade vid skapandet av konfigurerings vy. %error.
-OK	Config Window		OK
-E-mail address:	E-Mail		E-postadress:
-Account name:	E-Mail		Kontonamn:
 Account name:	Config Views		Kontonamn:
-Create new account	AutoConfigWindow		Skapa konto
-OK	Config Views		OK
-The filter could not be moved. Deleting filter.	Config Views		Filtret kunde inte flyttas. Tar bort filtret.
-Revert	Config Window		Återgå
-Login name:	E-Mail		Inloggningsnamn:
-Incoming	E-Mail		Inkommande
-Password:	E-Mail		Lösenord:
-Accounts	Config Window		Konton
-Finish	AutoConfigWindow		Slutför
-Remove	Config Window		Ta bort
-Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Skapa ett nytt konto med Lägg till knappen.\n\nTa bort ett konto med Ta bort knappen på ett valt konto.\n\nVälj ett konto i listan för att ändra dess settings.
-Error!	Config Views		Fel!
-Server Name:	E-Mail		Servernamn:
-While sending	Config Window		När sändning sker
-Show notifications:	Config Window		Visa notifieringar:
+\t\t· Incoming	Config Window		\t\t· Inkommande
 Enter a valid e-mail address.	AutoConfigWindow		Ange en giltig e-postadress.
-Add	Config Window		Lägg till
-Account settings	AutoConfigWindow		Kontoinställningar
-E-mail	System name		E-post
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nGrundinställningarna kunde inte återställas.\n\nEtt fel uppstod när grundinställningarna skulle återställas:\n%s\n
-Real name:	Config Views		Verkligt namn:
-\t\t· Outgoing	Config Window		\t\t· Utgående
+Incoming	E-Mail		Inkommande
 Choose Protocol	E-Mail		Välj protokoll
 Return address:	Config Views		Svarsadress:
-Edit mailbox menu…	Config Window		Redigera e-postmeny...
-Outgoing	E-Mail		Utgående
-\t\t· E-mail filters	Config Window		\t\t· E-postfilter
-Remove	Config Views		Ta bort
-\t\t· Incoming	Config Window		\t\t· Inkommande
-Next	AutoConfigWindow		Nästa
-Check every	Config Window		Kontrollera varje
-Back	AutoConfigWindow		Tillbaka
-Incoming mail filters	Config Views		Inkommande e-postfilter
+Password:	E-Mail		Lösenord:
+Error retrieving general settings: %s\n	Config Window		Misslyckades att hämta grundinställningarna: %s\n
+The filter could not be moved. Deleting filter.	Config Views		Filtret kunde inte flyttas. Tar bort filtret.
+OK	Config Views		OK
+Revert	Config Window		Återgå
+Incoming	Config Window		Inkommande
+Finish	AutoConfigWindow		Slutför
+Add filter	Config Views		Lägg till filter
 Account settings	Config Views		Kontoinställningar
 minutes	Config Window		minuter
-Error retrieving general settings: %s\n	Config Window		Misslyckades att hämta grundinställningarna: %s\n
-Real name:	E-Mail		Verkligt namn:
-Apply	Config Window		Verkställ
+E-mail	System name		E-post
+Check every	Config Window		Kontrollera varje
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Skapa ett nytt konto med Lägg till knappen.\n\nTa bort ett konto med Ta bort knappen på ett valt konto.\n\nVälj ett konto i listan för att ändra dess settings.
+Account name:	E-Mail		Kontonamn:
+Edit mailbox menu…	Config Window		Redigera e-postmeny...
+Server Name:	E-Mail		Servernamn:
+Remove	Config Window		Ta bort
+Login name:	E-Mail		Inloggningsnamn:
+While sending	Config Window		När sändning sker
+OK	Config Window		OK
 OK	AutoConfigWindow		OK
-Add filter	Config Views		Lägg till filter
-Outgoing	Config Window		Utgående
-Outgoing mail filters	Config Views		Utgående e-postfilter
+Next	AutoConfigWindow		Nästa
 Error	Config Window		Fel

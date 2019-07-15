@@ -1,35 +1,35 @@
 1	french	x-vnd.Haiku-LaunchBox	3692177981
-New	LaunchBox		Nouveau
 Set description…	LaunchBox		Ajouter une description…
-Vertical layout	LaunchBox		Disposition verticale
-OK	LaunchBox		OK
-Pad 1	LaunchBox		Pavé 1
-last chance	LaunchBox		dernière chance
-Quit	LaunchBox		Quitter
-Open containing folder	LaunchBox		Ouvrir le dossier hôte
-Clear button	LaunchBox		Vider le bouton
-LaunchBox	System name		Lanceur rapide
-Ignore double-click	LaunchBox		Ignorer le double click
-Auto-raise	LaunchBox		Faire apparaître automatiquement
-Show on all workspaces	LaunchBox		Afficher dans tous les espaces de travail
-Show window border	LaunchBox		Afficher la bordure de la fenêtre
-Pad	LaunchBox		Pavé
-Icon size	LaunchBox		Taille d’icône
-Bummer	LaunchBox		Zut
-Cancel	LaunchBox		Annuler
-Remove button	LaunchBox		Ôter le boutton
-Horizontal layout	LaunchBox		Disposition horizontale
-\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nÉchec au lancement de l’application à la signature « %2 ».\n\nErreur :
-Failed to launch '%1'.\n\nError:	LaunchBox		Impossible de lancer « %1 ».\n\nErreur :
-Name Panel	LaunchBox		Nom du panneau
-Add button here	LaunchBox		Ajouter un bouton ici
-Description for '%3'	LaunchBox		Description for « %3 »
-Settings	LaunchBox		Réglages
-Failed to launch 'something', error in Pad data.	LaunchBox		Impossible de lancer « quelque chose » : erreur dans les données du Pad.
-Pad %1	LaunchBox		Pavé %1
-Close	LaunchBox		Fermer
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Impossible d’envoyer « ouvrir le dossier » au Tracker.\n\nErreur : 
-You can drag an icon here.	LaunchBox		Vous pouvez glisser une icône ici.
-Clone	LaunchBox		Cloner
-launch popup	LaunchBox		launch popup
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Voulez-vous vraiment fermer ce pavé ?\n(Le pavé ne sera pas enregistré.)
+OK	LaunchBox		OK
+Ignore double-click	LaunchBox		Ignorer le double click
+Show on all workspaces	LaunchBox		Afficher dans tous les espaces de travail
+Name Panel	LaunchBox		Nom du panneau
+Clone	LaunchBox		Cloner
+Description for '%3'	LaunchBox		Description for « %3 »
+Show window border	LaunchBox		Afficher la bordure de la fenêtre
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nÉchec au lancement de l’application à la signature « %2 ».\n\nErreur :
+Failed to launch 'something', error in Pad data.	LaunchBox		Impossible de lancer « quelque chose » : erreur dans les données du Pad.
+LaunchBox	System name		Lanceur rapide
+Auto-raise	LaunchBox		Faire apparaître automatiquement
+Icon size	LaunchBox		Taille d’icône
+Open containing folder	LaunchBox		Ouvrir le dossier hôte
+Add button here	LaunchBox		Ajouter un bouton ici
+Cancel	LaunchBox		Annuler
+launch popup	LaunchBox		launch popup
+Clear button	LaunchBox		Vider le bouton
+Bummer	LaunchBox		Zut
+last chance	LaunchBox		dernière chance
+You can drag an icon here.	LaunchBox		Vous pouvez glisser une icône ici.
+Pad 1	LaunchBox		Pavé 1
+Failed to launch '%1'.\n\nError:	LaunchBox		Impossible de lancer « %1 ».\n\nErreur :
+Settings	LaunchBox		Réglages
+Vertical layout	LaunchBox		Disposition verticale
+Pad	LaunchBox		Pavé
+Close	LaunchBox		Fermer
+Remove button	LaunchBox		Ôter le boutton
+Quit	LaunchBox		Quitter
+Horizontal layout	LaunchBox		Disposition horizontale
+New	LaunchBox		Nouveau
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Impossible d’envoyer « ouvrir le dossier » au Tracker.\n\nErreur : 
+Pad %1	LaunchBox		Pavé %1

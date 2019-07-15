@@ -1,19 +1,19 @@
 1	english	x-vnd.Be-POST	2949558073
+No new messages	MailDaemon		无新消息
+No new messages	DeskbarView		无新消息
+Shutdown mail services	DeskbarView		停止邮件服务
+Mail status	MailDaemon		邮箱状态
 Fetching mail for %name	Notifier		获取 %name 的邮件
-Check for mails only	DeskbarView		只检查邮件
-Send pending mails	DeskbarView		发送挂起邮件
-{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{一个新消息} other{# 更多新消息}}
 {0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# 新消息} other{# 更多新消息}}
 {0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		%name 有 {0, plural, one{# 新消息} other{# 更多消息}} \n
+Create new message…	DeskbarView		新建邮件…
+Send pending mails	DeskbarView		发送挂起邮件
+Settings…	DeskbarView		设置…
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{一个新消息} other{# 更多新消息}}
 New Messages	MailDaemon		新邮件
 <no accounts>	DeskbarView		<无账户>
-Mail status	MailDaemon		邮箱状态
-Shutdown mail services	DeskbarView		停止邮件服务
-Sending mail for %name	Notifier		发送 %name 的邮件
-Create new message…	DeskbarView		新建邮件…
-No new messages	MailDaemon		无新消息
-Check for mail now	DeskbarView		开始检查邮件
-No new messages	DeskbarView		无新消息
-Mail daemon status log	MailDaemon		邮箱服务状态记录
-Settings…	DeskbarView		设置…
 Mail status	Notifier		邮箱状态
+Check for mails only	DeskbarView		只检查邮件
+Check for mail now	DeskbarView		开始检查邮件
+Sending mail for %name	Notifier		发送 %name 的邮件
+Mail daemon status log	MailDaemon		邮箱服务状态记录

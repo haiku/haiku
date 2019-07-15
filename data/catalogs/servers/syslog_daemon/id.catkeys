@@ -1,4 +1,4 @@
 1	indonesian	x-vnd.Haiku-SystemLogger	57960782
-%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nDaemon ini bertanggung jawab untuk mengumpulkan semua pesan sistem dan menuliskannya ke catatan seluruh sistem di \"%s\".\n\n
-OK	SyslogDaemon		OKE
 Syslog Daemon	SyslogDaemon		Syslog Daemon
+OK	SyslogDaemon		OKE
+%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nDaemon ini bertanggung jawab untuk mengumpulkan semua pesan sistem dan menuliskannya ke catatan seluruh sistem di \"%s\".\n\n

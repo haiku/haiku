@@ -1,48 +1,48 @@
 1	greek, modern (1453-)	x-vnd.Be-PEPL	3273435274
-Edit	People		Επεξεργασία
-Error	People		Σφάλμα
-City	People		Πόλη
-The file '%name%' could not be written.	People		Το αρχείο '%name%' δε μπορούσε να εγγραφεί.
-none	Groups list		Ουδείς
-Configure attributes	People		Ρύθμιση ιδιοτήτων
-Company	People		Εταιρεία
-%name% picture	People		%name% φωτογραφία
-Work phone	People		Τηλέφωνο εργασίας
-People	System name		People
-New person	People		Νέα επαφή
-Select all	People		Επιλογή όλων
-File	People		Αρχείο
-Unnamed person	People		Ανώνυμο άτομο
-Could not create %s.	People		Δεν ήταν δυνατή η δημιουργεία %S
-Country	People		Χώρα
-Close	People		Κλείσιμο
-Group	People		Γκρούπ
-Nickname	People		Ψευδόνυμο
-Quit	People		Έξοδος
-Name	People		Όνομα
-Revert	People		Επαναφόρα
-Undo	People		Αναίρεση
-E-mail	People		E-Mail
-Load image…	People		Φόρτωση εικόνας...
-OK	People		Εντάξει
-Remove image	People		Αφαίρεση εικόνας
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Η εκκίνηση του FileTypes preflet για τη ρύθμιση των ιδιοητων του ατόμου απέτυχε.\n\nΣφάλμα: 
-Home phone	People		Τηλέφωνο σπιτιού
-Save as…	People		Αποθήκευση σαν...
-Redo	People		Επανάληψη
-Paste	People		Επικόλλιση
-Drop an image here,\nor use the contextual menu.	People		Αφήστε μια εικόνα εδώ,\nή χρησιμοποιήστε το σχετικό μενού.
-Save	People		Αποθήκευση
-Person	Short mimetype description		Άτομο
+Unnamed person	People		Ανώνυμο άτομο
 New person…	People		Νέο έπαφη...
 Address	People		Όδος
-URL	People		URL
-Sorry	People		Συγγνώμη
 Zip	People		Τ.Κ.
-Contact information for a person.	Long mimetype description		Πληροφορίες επικοινωνίας επαφής.
-Fax	People		Φαξ
+Select all	People		Επιλογή όλων
+Could not create %s.	People		Δεν ήταν δυνατή η δημιουργεία %S
+Quit	People		Έξοδος
+Company	People		Εταιρεία
+Name	People		Όνομα
+The file '%name%' could not be written.	People		Το αρχείο '%name%' δε μπορούσε να εγγραφεί.
 Contact name	People		Όνομα της επαφής
-Cut	People		Αποκοπή
 Cancel	People		Άκυρο
+Edit	People		Επεξεργασία
+People	System name		People
+Error	People		Σφάλμα
+Revert	People		Επαναφόρα
+Country	People		Χώρα
+Person	Short mimetype description		Άτομο
+New person	People		Νέα επαφή
+Save	People		Αποθήκευση
+Fax	People		Φαξ
+URL	People		URL
+%name% picture	People		%name% φωτογραφία
+Home phone	People		Τηλέφωνο σπιτιού
+none	Groups list		Ουδείς
+Save as…	People		Αποθήκευση σαν...
+Cut	People		Αποκοπή
+Contact information for a person.	Long mimetype description		Πληροφορίες επικοινωνίας επαφής.
+Remove image	People		Αφαίρεση εικόνας
+City	People		Πόλη
+Undo	People		Αναίρεση
+Configure attributes	People		Ρύθμιση ιδιοτήτων
+Work phone	People		Τηλέφωνο εργασίας
 State	People		Πολιτεία
+Nickname	People		Ψευδόνυμο
+OK	People		Εντάξει
+File	People		Αρχείο
+Redo	People		Επανάληψη
+Close	People		Κλείσιμο
 Copy	People		Αντιγραφή
+Paste	People		Επικόλλιση
+E-mail	People		E-Mail
+Group	People		Γκρούπ
+Drop an image here,\nor use the contextual menu.	People		Αφήστε μια εικόνα εδώ,\nή χρησιμοποιήστε το σχετικό μενού.
+Load image…	People		Φόρτωση εικόνας...
+Sorry	People		Συγγνώμη

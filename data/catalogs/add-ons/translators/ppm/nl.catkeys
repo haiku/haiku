@@ -1,29 +1,28 @@
-1	dutch; flemish	x-vnd.Haiku-PPMTranslator	797856484
+1	dutch; flemish	x-vnd.Haiku-PPMTranslator	3151796093
+None	PPMTranslator		Geen
 PPM Settings	PPMMain		PPM Instellingen
-Based on PPMTranslator sample code	PPMTranslator		Gebaseerd op PPM-Vertaler voorbeeld code
-OK	PPMMain		OK
+System palette 8 bits	PPMTranslator		Systeemkleurenpalet 8 bits
+Sample code copyright 1999, Be Incorporated	PPMTranslator		Sample Code copyright 1999, Be Incorprated
+Something is wrong with the PPMTranslator!	PPMMain		Er is iets verkeerd met de PPMTranslator!
 Grayscale 8 bits	PPMTranslator		Grijswaarden 8 bits
+Based on PPMTranslator sample code	PPMTranslator		Gebaseerd op PPM-Vertaler voorbeeld code
+RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 bits big-endian
+PPM image translator	PPMTranslator		PPM-afbeelding translator
+Bitmap 1 bit	PPMTranslator		Bitmap 1 bit
+RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 bits big-endian
+PPMTranslator Settings	PPMTranslator		PMMVertaler Instellingen
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 bits
+OK	PPMMain		OK
+CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bits
 PPM image	PPMTranslator		PPM afbeelding
+RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 bits big-endian
+RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bits big-endian
+Write ASCII	PPMTranslator		ASCII schrijven
+RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 bits
+RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 bits big-endian
+RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 bits
+CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 bits
+RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 bits
+RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 bits
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 bits
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Be Bitmap Formaat (PPM Vertaler)
-CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bits
-CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 bits
-PPM image translator	PPMTranslator		PPM-afbeelding translator
-bits/space	PPMTranslator		bits/ruimte
-RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 bits big-endian
-RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 bits big-endian
-RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 bits big-endian
-RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 bits
-Write ASCII	PPMTranslator		ASCII schrijven
-RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 bits
-None	PPMTranslator		Geen
-RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bits big-endian
-RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 bits
-Bitmap 1 bit	PPMTranslator		Bitmap 1 bit
-RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 bits big-endian
-RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 bits
-Sample code copyright 1999, Be Incorporated	PPMTranslator		Sample Code copyright 1999, Be Incorprated
-PPMTranslator Settings	PPMTranslator		PMMVertaler Instellingen
-Something is wrong with the PPMTranslator!	PPMMain		Er is iets verkeerd met de PPMTranslator!
-System palette 8 bits	PPMTranslator		Systeemkleurenpalet 8 bits

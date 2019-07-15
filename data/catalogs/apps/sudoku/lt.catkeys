@@ -1,34 +1,34 @@
 1	lithuanian	x-vnd.Haiku-Sudoku	2463385585
 Restore snapshot	SudokuWindow		Atkurti įsimintą būseną
-Could not set Sudoku:\n%s\n	SudokuWindow		Nepavyko nustatyti sudoku:\n%s\n
-Export as…	SudokuWindow		Eksportuoti kaip…
-OK	SudokuWindow		Gerai
-New	SudokuWindow		Naujas
-Abort	ProgressWindow		Nutraukti
-Sudoku	System name		Sudoku
-Could not open \"%s\":\n%s\n	SudokuWindow		Nepavyko atverti „%s“:\n%s\n
-Easy	SudokuWindow		Lengvas
-Open file…	SudokuWindow		Atverti failą…
-Solve single field	SudokuWindow		Išspręsti vieną langelį
-Solve	SudokuWindow		Išspręsti
-Redo	SudokuWindow		Grąžinti
 File	SudokuWindow		Žaidimas
-Advanced	SudokuWindow		Vidutinis
-Start again	SudokuWindow		Pradėti iš naujo
-HTML	SudokuWindow		HTML failą
-Sudoku request	SudokuWindow		Sudoku užklausa
-Copy	SudokuWindow		Kopijuoti
-Mark valid hints	SudokuWindow		Paryškinti galimus variantus
-Sudoku solved - congratulations!\n	SudokuWindow		Sveikiname – sudoku išspręstas!\n
+Mark invalid values	SudokuWindow		Išskirti negalimas reikšmes
+Solve single field	SudokuWindow		Išspręsti vieną langelį
 Hard	SudokuWindow		Sudėtingas
-Snapshot current	SudokuWindow		Įsiminti būseną
+Start again	SudokuWindow		Pradėti iš naujo
+New	SudokuWindow		Naujas
+Easy	SudokuWindow		Lengvas
+Undo	SudokuWindow		Atšaukti
+Export as…	SudokuWindow		Eksportuoti kaip…
+Quit	SudokuWindow		Baigti
+Redo	SudokuWindow		Grąžinti
+Could not open \"%s\":\n%s\n	SudokuWindow		Nepavyko atverti „%s“:\n%s\n
+Blank	SudokuWindow		Tuščias
+Sudoku solved - congratulations!\n	SudokuWindow		Sveikiname – sudoku išspręstas!\n
 Text	SudokuWindow		Tekstą
+Copy	SudokuWindow		Kopijuoti
+Solve	SudokuWindow		Išspręsti
+HTML	SudokuWindow		HTML failą
+Advanced	SudokuWindow		Vidutinis
+Searching for removable values	SudokuGenerator		Ieškoma galimų pašalinti reikšmų
+Abort	ProgressWindow		Nutraukti
+Could not set Sudoku:\n%s\n	SudokuWindow		Nepavyko nustatyti sudoku:\n%s\n
+Help	SudokuWindow		Pagalba
+OK	SudokuWindow		Gerai
+Sudoku	System name		Sudoku
+Progress monitor	ProgressWindow		Eigos indikatorius
 Creating solvable field	SudokuGenerator		Kuriamas spręstinas langelis
 View	SudokuWindow		Rodymas
-Progress monitor	ProgressWindow		Eigos indikatorius
-Mark invalid values	SudokuWindow		Išskirti negalimas reikšmes
-Blank	SudokuWindow		Tuščias
-Help	SudokuWindow		Pagalba
-Searching for removable values	SudokuGenerator		Ieškoma galimų pašalinti reikšmų
-Undo	SudokuWindow		Atšaukti
-Quit	SudokuWindow		Baigti
+Snapshot current	SudokuWindow		Įsiminti būseną
+Mark valid hints	SudokuWindow		Paryškinti galimus variantus
+Sudoku request	SudokuWindow		Sudoku užklausa
+Open file…	SudokuWindow		Atverti failą…

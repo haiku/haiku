@@ -1,20 +1,20 @@
 1	hungarian	x-vnd.mmu_man.filepanel	1802971238
 display a load/save file panel\n	FilePanelApp		fájl betöltés/mentés ablak megjelenítése\n
-options:\n	FilePanelApp		opciók:\n
-usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		használat: %s [--help] [--directory mappa] [--load|--save] [--title ttl] [--single] [--modal] [--allow minta] [--forbid minta]\n
--k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tmegnyitható fajtájú bejegyzések: ezeknek bármilyen kombinációja: f, d, s (file (default), directory, symlink)\n
-usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		használat: %s [-h] [-d mappa] [-l|-s] [-t ttl] [-1] [-m] [-a minta] [-f minta]\n
--d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tmegnyitás a <mappánál>\n
-%s not a valid option\n	FilePanelApp		a %s nem egy érvényes opció\n
 short\tlong\tdescription\n	FilePanelApp		rövid\thosszú\tleírás\n
-%s: this option requires a parameter\n	FilePanelApp		%s: ehhez az opcióhoz meg kell adni egy paramétert\n
--l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tfájl betöltési ablak megjelenítése (alapértelmezett)\n
--f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tmég nincs megvalósítva\n
+%s not a valid option\n	FilePanelApp		a %s nem egy érvényes opció\n
 -s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tfájl mentési ablak megjelenítése\n
--n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\taz alapértelmezett mentési fájlnév\n
--m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tmodálissá teszi a fájl mentési/betöltési ablakot\n
+%s: this option requires a parameter\n	FilePanelApp		%s: ehhez az opcióhoz meg kell adni egy paramétert\n
 -h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tkiírja a használati segédletet\n
--a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tmég nincs implementálva\n
--1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tcsak 1 fájl kijelölését engedélyezi\n
--t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tbeállítja a mentési/betöltési ablak címét\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tfájl betöltési ablak megjelenítése (alapértelmezett)\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\taz alapértelmezett mentési fájlnév\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tmegnyitható fajtájú bejegyzések: ezeknek bármilyen kombinációja: f, d, s (file (default), directory, symlink)\n
 %s: UNIMPLEMENTED\n	FilePanelApp		%s: NINCS MEGVALÓSÍTVA\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tbeállítja a mentési/betöltési ablak címét\n
+-f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tmég nincs megvalósítva\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		használat: %s [-h] [-d mappa] [-l|-s] [-t ttl] [-1] [-m] [-a minta] [-f minta]\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tcsak 1 fájl kijelölését engedélyezi\n
+-a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tmég nincs implementálva\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tmodálissá teszi a fájl mentési/betöltési ablakot\n
+options:\n	FilePanelApp		opciók:\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tmegnyitás a <mappánál>\n
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		használat: %s [--help] [--directory mappa] [--load|--save] [--title ttl] [--single] [--modal] [--allow minta] [--forbid minta]\n

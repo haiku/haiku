@@ -1,88 +1,88 @@
 1	polish	x-vnd.Haiku-StyledEdit	727465241
-StyledEdit	System name		StyledEdit
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ten plik jest oznaczony jako tylko do odczytu. Czy zapisać zmiany w dokumencie „%s”? 
-Paste	Menus		Wklej
-OK	LoadAlert		OK
-File	Menus		Plik
-???	LoadAlert		???
-Modified	StatusView		Zmieniony
-Lines:	Statistics		Linie:
-Italic	Menus		Kursywa
-Left	Menus		Lewo
-Search backwards	FindandReplaceWindow		Szukaj wstecz
-Unlock file	StatusView		Odblokuj plik
-Size	Menus		Rozmiar
-Save	QuitAlert		Zapisz
-Page setup…	Menus		Ustawienia strony…
-Print…	Menus		Drukuj…
-Can't undo	Menus		Nie można cofnąć
-Save	Menus		Zapisz
-Default	Menus		Domyślne
-Replace with:	FindandReplaceWindow		Zamień na:
-Cancel	SaveAlert		Anuluj
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nie można przywrócić, nie znaleziono pliku: „%s”.
-Case-sensitive	FindandReplaceWindow		Uwzględnij wielkość liter
-Reload	NodeMonitorAlerts		Wczytaj ponownie
-Replace in all windows	FindandReplaceWindow		Zamień we wszystkich oknach
-Wrap lines	Menus		Zawijaj wiersze
-Quit	Menus		Zakończ
-File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Plik „%file%” został usunięty przez inny program. Czy chcesz go przywrócić?
 Document statistics	Statistics		Statystyki dokumentu
-Cancel	RevertToSavedAlert		Anuluj
-Autodetect	Menus		Autodetekcja
-Document	Menus		Dokument
-Save changes to the document \"%s\"? 	QuitAlert		Zapisać zmiany w dokumencie „%s”? 
-Edit	Menus		Edycja
-Revert	RevertToSavedAlert		Przywróć
-Font	Menus		Font
-Replace all	FindandReplaceWindow		Zamień wszystkie
-Statistics…	Menus		Statystyki…
-Default	Open_and_SaveAsPanel		Domyślne
-Replace next	Menus		Zamień następne
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		„%s” zawiera niezapisane zmiany.\nCzy przywrócić ostatnią zapisaną wersję? 
-Cancel	FindandReplaceWindow		Anuluj
-Text encoding	Menus		Kodowanie tekstu
-Close	Menus		Zamknij
-Save	SaveAlert		Zapisz
-Words:	Statistics		Słów:
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Błąd podczas otwierania „%s”:\n\tFormat nieobsługiwany
-OK	RevertToSavedAlert		OK
-Don't save	QuitAlert		Nie zapisuj
-Align	Menus		Wyrównaj
-Color	Menus		Kolor
-OK	QuitAlert		OK
-Open…	Menus		Otwórz…
-Center	Menus		Wyśrodkuj
-Unable to unlock file\n\t%s	QuitAlert		Nie można odblokować pliku\n\t %s
-line %d, column %d	StatusView		wiersz %d, kolumna %d
-OK	Statistics		OK
-New	Menus		Nowy
-Wrap-around search	FindandReplaceWindow		Szukanie owijające
-Bold	Menus		Pogrubienie
-Find selection	Menus		Znajdź zaznaczenie
-Find:	FindandReplaceWindow		Znajdź:
-Error saving \"%s\":\n%s	SaveAlert		Błąd podczas zapisywania „%s”:\n%s
-Copy	Menus		Kopiuj
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nie można przywrócić, nie znaleziono pliku: „%s”.
 Cut	Menus		Wytnij
-File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Plik „%file%” został zmieniony przez inny program. Czy wczytać go ponownie?
-Replace	FindandReplaceWindow		Zamień
-Find again	Menus		Znajdź następne
-Cancel	QuitAlert		Anuluj
-Find…	Menus		Znajdź…
-Select all	Menus		Zaznacz wszystko
-Don't save	SaveAlert		Nie zapisuj
-Recover	NodeMonitorAlerts		Odzyskaj
-Error loading \"%s\":\n\t%s	LoadAlert		Błąd podczas ładowania „%s”:\n\t%s
-Ignore	NodeMonitorAlerts		Ignoruj
-Read-only	StatusView		Tylko do odczytu
-Undo typing	QuitAlert		Cofnij pisanie
+Center	Menus		Wyśrodkuj
+Wrap-around search	FindandReplaceWindow		Szukanie owijające
+Page setup…	Menus		Ustawienia strony…
 Untitled 	StyledEditWindow		Bez tytułu 
-OK	SaveAlert		OK
+OK	Statistics		OK
 Find	FindandReplaceWindow		Znajdź
-Encoding	Open_and_SaveAsPanel		Kodowanie
-Characters:	Statistics		Znaków:
-Save as…	Menus		Zapisz jako…
-Redo typing	QuitAlert		Powtórz pisanie
-Reload…	Menus		Wczytaj ponownie…
+New	Menus		Nowy
+Document	Menus		Dokument
+Search backwards	FindandReplaceWindow		Szukaj wstecz
+Find again	Menus		Znajdź następne
+Read-only	StatusView		Tylko do odczytu
+Save	Menus		Zapisz
+Cancel	QuitAlert		Anuluj
+Copy	Menus		Kopiuj
+Reload	NodeMonitorAlerts		Wczytaj ponownie
+line %d, column %d	StatusView		wiersz %d, kolumna %d
+Words:	Statistics		Słów:
+???	LoadAlert		???
+Recover	NodeMonitorAlerts		Odzyskaj
+Error saving \"%s\":\n%s	SaveAlert		Błąd podczas zapisywania „%s”:\n%s
+OK	RevertToSavedAlert		OK
+Unlock file	StatusView		Odblokuj plik
+Italic	Menus		Kursywa
+Can't undo	Menus		Nie można cofnąć
 Replace…	Menus		Zastąp…
+File	Menus		Plik
+Bold	Menus		Pogrubienie
+Paste	Menus		Wklej
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Plik „%file%” został zmieniony przez inny program. Czy wczytać go ponownie?
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Plik „%file%” został usunięty przez inny program. Czy chcesz go przywrócić?
+Lines:	Statistics		Linie:
+Replace in all windows	FindandReplaceWindow		Zamień we wszystkich oknach
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		„%s” zawiera niezapisane zmiany.\nCzy przywrócić ostatnią zapisaną wersję? 
+Save	SaveAlert		Zapisz
+Default	Open_and_SaveAsPanel		Domyślne
+Cancel	RevertToSavedAlert		Anuluj
+Cancel	FindandReplaceWindow		Anuluj
+Statistics…	Menus		Statystyki…
+Encoding	Open_and_SaveAsPanel		Kodowanie
+Replace all	FindandReplaceWindow		Zamień wszystkie
+Close	Menus		Zamknij
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Błąd podczas otwierania „%s”:\n\tFormat nieobsługiwany
+Left	Menus		Lewo
+Default	Menus		Domyślne
+OK	SaveAlert		OK
+Color	Menus		Kolor
+Save changes to the document \"%s\"? 	QuitAlert		Zapisać zmiany w dokumencie „%s”? 
+StyledEdit	System name		StyledEdit
+Find:	FindandReplaceWindow		Znajdź:
+Undo typing	QuitAlert		Cofnij pisanie
+Error loading \"%s\":\n\t%s	LoadAlert		Błąd podczas ładowania „%s”:\n\t%s
+Don't save	SaveAlert		Nie zapisuj
+Reload…	Menus		Wczytaj ponownie…
+Print…	Menus		Drukuj…
+Quit	Menus		Zakończ
+Redo typing	QuitAlert		Powtórz pisanie
+Ignore	NodeMonitorAlerts		Ignoruj
+Wrap lines	Menus		Zawijaj wiersze
+Text encoding	Menus		Kodowanie tekstu
+Unable to unlock file\n\t%s	QuitAlert		Nie można odblokować pliku\n\t %s
+Modified	StatusView		Zmieniony
+OK	LoadAlert		OK
+Save	QuitAlert		Zapisz
+Case-sensitive	FindandReplaceWindow		Uwzględnij wielkość liter
+Find selection	Menus		Znajdź zaznaczenie
+Cancel	SaveAlert		Anuluj
+Find…	Menus		Znajdź…
+Revert	RevertToSavedAlert		Przywróć
+Size	Menus		Rozmiar
+Autodetect	Menus		Autodetekcja
+Replace next	Menus		Zamień następne
+OK	QuitAlert		OK
+Replace with:	FindandReplaceWindow		Zamień na:
+Edit	Menus		Edycja
+Open…	Menus		Otwórz…
+Save as…	Menus		Zapisz jako…
+Replace	FindandReplaceWindow		Zamień
+Characters:	Statistics		Znaków:
+Don't save	QuitAlert		Nie zapisuj
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ten plik jest oznaczony jako tylko do odczytu. Czy zapisać zmiany w dokumencie „%s”? 
+Align	Menus		Wyrównaj
+Font	Menus		Font
+Select all	Menus		Zaznacz wszystko
 Right	Menus		Prawo

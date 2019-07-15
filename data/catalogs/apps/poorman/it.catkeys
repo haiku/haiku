@@ -1,66 +1,66 @@
 1	italian	x-vnd.Haiku-PoorMan	1829050509
-Website location	PoorMan		Posizione del sito web
-Error Server	PoorMan		Errore del Server
-Settings…	PoorMan		Impostazioni...
-Create PoorMan log	PoorMan		Crea un log di PoorMan
-Shutting down.\n	PoorMan		Il server è stato arrestato.\n
-Hits: %lu	PoorMan		Hit: %lu
-Web folder:	PoorMan		Cartella Web:
-Save log console selection	PoorMan		Salva la selezione del log della console
-Run server	PoorMan		Esegui server
-PoorMan settings	PoorMan		Impostazioni di PoorMan
-Clear hit counter	PoorMan		Azzera il contatore delle richieste
-Copy	PoorMan		Copia
-Max. simultaneous connections:	PoorMan		Massimo numero di connessioni simultanee:
-Create public_html	PoorMan		Crea public_html
-Start page:	PoorMan		Pagina iniziale:
-done.\n	PoorMan		fatto.\n
-Create	PoorMan		Crea
-Shutting down.	PoorMan		Il server è stato arrestato.
-Website options	PoorMan		Opzioni del sito
-File Name	PoorMan		Nome del file
-Clear console log	PoorMan		Pulisci la console
-Advanced	PoorMan		Avanzato
-OK	PoorMan		OK
-Status: Stopped	PoorMan		Stato: Arrestato
-Dir Created	PoorMan		Cartella creata
-Log to file	PoorMan		Log su file
-Quit	PoorMan		Esci
-Hits: 0	PoorMan		Richieste: 0
-Save log console	PoorMan		Salva il log della console
-Edit	PoorMan		Modifica
+Select web folder	PoorMan		Seleziona cartella web
+Console logging	PoorMan		Logging su console
 Create Log File	PoorMan		Crea file di registro
-Log to console	PoorMan		Log su console
-Directory: (none)	PoorMan		Cartella: (nessuno)
+File logging	PoorMan		Log su file
+Website options	PoorMan		Opzioni del sito
+Log to file	PoorMan		Log su file
+Shutting down.	PoorMan		Il server è stato arrestato.
+Error Dir	PoorMan		Errore nella cartella
+Web folder:	PoorMan		Cartella Web:
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Scegliere una cartella da pubblicare sul web.\n\nPoorMan può creare una sottocartella \"public_html\" nella tua cartella personale.\nPuoi anche selezionare un'altra cartella, se preferisci.
 Log To Console	PoorMan		Invia il log alla Console
-{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# connessione} other{# connessioni}}
-Connections	PoorMan		Connessioni
-Status: Running	PoorMan		Stato: In esecuzione
-Controls	PoorMan		Controlli
-Send file listing if there's no start page	PoorMan		Mostra la lista dei file se non c'è nessuna pagina iniziale
-Error Dir	PoorMan		Errore nella cartella
-Select all	PoorMan		Seleziona tutto
-File	PoorMan		File
-File Logging	PoorMan		Logging su File
-Save console selections as…	PoorMan		Salva selezione della console come...
-File logging	PoorMan		Log su file
-Select web folder	PoorMan		Seleziona cartella web
-Logging view	PoorMan		Vista log
-Logging	PoorMan		Log
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Una cartella predefinita è stata creata in \"/boot/home/public_html.\"\nAssicurarati che ci sia un file HTML chiamato \"index.html\" nella cartella.
-Clear log file	PoorMan		Cancella file di log
-Log file name:	PoorMan		Nome del file di log:
-Directory: 	PoorMan		Cartella: 
-Log To File	PoorMan		Log su file
-Done	PoorMan		Applica
-Create log file	PoorMan		Crea un file di log
+File Name	PoorMan		Nome del file
 Starting up... 	PoorMan		Avviamento del server in corso… 
-Site	PoorMan		Sito
-Cancel	PoorMan		Cancella
-Console logging	PoorMan		Logging su console
-Cannot start the server	PoorMan		Non è stato possibile avviare il server
 Select	PoorMan		Seleziona
+Logging view	PoorMan		Vista log
 Save console as…	PoorMan		Salva console come...
+Edit	PoorMan		Modifica
+Cancel	PoorMan		Cancella
+Directory: 	PoorMan		Cartella: 
+Hits: %lu	PoorMan		Hit: %lu
+Hits: 0	PoorMan		Richieste: 0
+Shutting down.\n	PoorMan		Il server è stato arrestato.\n
+Select all	PoorMan		Seleziona tutto
+Error Server	PoorMan		Errore del Server
+Send file listing if there's no start page	PoorMan		Mostra la lista dei file se non c'è nessuna pagina iniziale
+Create PoorMan log	PoorMan		Crea un log di PoorMan
+Max. simultaneous connections:	PoorMan		Massimo numero di connessioni simultanee:
+Done	PoorMan		Applica
+Site	PoorMan		Sito
+Cannot start the server	PoorMan		Non è stato possibile avviare il server
+Create log file	PoorMan		Crea un file di log
+Create public_html	PoorMan		Crea public_html
+Clear hit counter	PoorMan		Azzera il contatore delle richieste
+Status: Stopped	PoorMan		Stato: Arrestato
+File	PoorMan		File
+Settings…	PoorMan		Impostazioni...
+Log To File	PoorMan		Log su file
+Connections	PoorMan		Connessioni
+Controls	PoorMan		Controlli
+Log to console	PoorMan		Log su console
+Advanced	PoorMan		Avanzato
+Copy	PoorMan		Copia
+Logging	PoorMan		Log
 PoorMan	System name		PoorMan
+Clear console log	PoorMan		Pulisci la console
+Run server	PoorMan		Esegui server
+Create	PoorMan		Crea
+{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# connessione} other{# connessioni}}
+done.\n	PoorMan		fatto.\n
+PoorMan settings	PoorMan		Impostazioni di PoorMan
 Console Logging	PoorMan		Log della console
+Clear log file	PoorMan		Cancella file di log
+Save log console selection	PoorMan		Salva la selezione del log della console
+File Logging	PoorMan		Logging su File
+Log file name:	PoorMan		Nome del file di log:
+Status: Running	PoorMan		Stato: In esecuzione
+Directory: (none)	PoorMan		Cartella: (nessuno)
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Una cartella predefinita è stata creata in \"/boot/home/public_html.\"\nAssicurarati che ci sia un file HTML chiamato \"index.html\" nella cartella.
+Dir Created	PoorMan		Cartella creata
+Save console selections as…	PoorMan		Salva selezione della console come...
+Quit	PoorMan		Esci
+Save log console	PoorMan		Salva il log della console
+Start page:	PoorMan		Pagina iniziale:
+OK	PoorMan		OK
+Website location	PoorMan		Posizione del sito web

@@ -1,95 +1,90 @@
-1	english	x-vnd.Haiku-Devices	865240481
-Manufacturer	DeviceSCSI		制造商
-Order by:	DevicesView		排序方式：
-ACPI controller	Device		ACPI控制器
-Memory controller	Device		内存控制器
-Driver used	DevicePCI		使用驱动
-CD-ROM	DeviceSCSI		CD光盘
-ISA bus	Device		ISA 总线
-ACPI bus	Device		ACPI 总线
-ISA bus	DevicesView		ISA  总线
-Docking station	Device		扩展接口
-Computer	Device		计算机
-Unknown device	Device		未知设备
-Class Info:\t\t\t\t: %classInfo%	DeviceACPI		类别信息：\t\t\t\t：%classInfo%
-Processor	DeviceSCSI		处理器
-RBC	DeviceSCSI		RBC
-Detailed	DevicesView		详细
-Category	DevicesView		分类
-Quit	DevicesView		退出
-Device paths	Device		设备路径
-Scanner	DeviceSCSI		扫描器
-Printer	DeviceSCSI		打印机
-Processor	Device		处理器
-Optical Drive	DeviceSCSI		光学设备
-ACPI Processor Namespace '%2'	DeviceACPI		ACPI 处理器命名空间 '%2'
-Bridge	DeviceSCSI		网桥
-unknown	Device		未知
-ACPI Information	DeviceACPI		ACPI信息
-Generic system peripheral	Device		外围通用系统
-Not implemented	DevicePCI		未实现
-Disk Drive	DeviceSCSI		磁盘驱动
-Not implemented	DeviceACPI		未实现
-Device name	DevicePCI		设备名称
-Display controller	Device		显示控制器
-Mass storage controller	Device		大储量存储控制器
-Input device controller	Device		输入设备控制器
-Network controller	Device		网络控制器
-Device class	DeviceSCSI		设备类型
-Device name	DeviceACPI		设备名称
-Driver used	Device		已用驱动
-Other	DeviceSCSI		其他
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		设备名称\t\t\t\t：%Name%\n制造商\t\t\t：%Manufacturer%\n使用驱动\t\t\t\t：%DriverUsed%\n设备路径\t：%DevicePaths%
-ACPI Thermal Zone	DeviceACPI		ACPI 温测区
-Communications	DeviceSCSI		通讯设备
-Bus	DevicesView		总线
-Communication controller	Device		通讯控制器
-Manufacturer	DeviceACPI		制造商
-PCI bus	Device		PCI 总线
-ACPI System Indicator	DeviceACPI		ACPI 系统指示器
-None	Device		无
-PCI bus	DevicesView		PCI 总线
-Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		类别信息：\t\t\t\t：%classinfo%
-Basic information	DevicesView		基本信息
-PCI Information	DevicePCI		PCI 信息
-Manufacturer:	Device		制造商：
+1	english	x-vnd.Haiku-Devices	490380176
 ACPI bus	DevicesView		ACPI 总线
-Changer	DeviceSCSI		交换设备
-ACPI System Bus	DeviceACPI		ACPI 系统总线
-Devices	System name		硬件设备
-Worm	DeviceSCSI		散热风扇
-Multimedia controller	Device		多媒体控制器
-Unknown	DevicePCI		未知
-Device name:	Device		设备名称：
-Computer	DevicesView		计算机
-Value	PropertyList		数值
-Report compatibility	DevicesView		兼容性报告
-Device	Device		设备
-Signal processing controller	Device		信号处理控制
-Serial bus controller	Device		串行总线控制器
-Wireless controller	Device		无线控制器
-ACPI node '%1'	DeviceACPI		ACPI 节点 '%1'
-Device name	Device		设备名称
-Manufacturer	Device		制造商
-Name	PropertyList		名称
-Manufacturer	DevicePCI		制造商
-Intelligent controller	Device		智能控制器
-Satellite communications controller	Device		卫星通讯控制器
-SCSI Information	DeviceSCSI		SCSI 信息
-Enclosure	DeviceSCSI		外围设备
-Array	DeviceSCSI		磁盘阵列
-Bridge	Device		网桥
-Refresh devices	DevicesView		刷新设备列表
-Unknown device	DevicesView		未知设备
-Graphics Peripheral	DeviceSCSI		外接绘图设备
-Tape Drive	DeviceSCSI		磁带驱动
-Bus Information	Device		总线信息
-Connection	DevicesView		连接
-Generate system information	DevicesView		常规系统信息
 Encryption controller	Device		加密控制器
-Unclassified device	Device		未分类设备
-Device name	DeviceSCSI		设备名称
-Card Reader	DeviceSCSI		读卡器
+Bus Information	Device		总线信息
+Devices	System name		硬件设备
+Graphics Peripheral	DeviceSCSI		外接绘图设备
+Processor	Device		处理器
+Generate system information	DevicesView		常规系统信息
 Class info	DevicePCI		类别信息
-Device paths	DevicePCI		设备路径
+ACPI Information	DeviceACPI		ACPI信息
+Detailed	DevicesView		详细
+Computer	DevicesView		计算机
+Communications	DeviceSCSI		通讯设备
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		类别信息：\t\t\t\t：%classinfo%
+Mass storage controller	Device		大储量存储控制器
+Connection	DevicesView		连接
+Printer	DeviceSCSI		打印机
+ACPI Processor Namespace '%2'	DeviceACPI		ACPI 处理器命名空间 '%2'
+SCSI Information	DeviceSCSI		SCSI 信息
+Manufacturer	Device		制造商
+Device name:	Device		设备名称：
+Scanner	DeviceSCSI		扫描器
+Memory controller	Device		内存控制器
+Unknown device	DevicesView		未知设备
+Unknown	DevicePCI		未知
+ACPI node '%1'	DeviceACPI		ACPI 节点 '%1'
+Optical Drive	DeviceSCSI		光学设备
+Name	PropertyList		名称
+Manufacturer	DeviceSCSI		制造商
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		设备名称\t\t\t\t：%Name%\n制造商\t\t\t：%Manufacturer%\n使用驱动\t\t\t\t：%DriverUsed%\n设备路径\t：%DevicePaths%
+Device name	Device		设备名称
+Satellite communications controller	Device		卫星通讯控制器
+Device class	DeviceSCSI		设备类型
+Device	Device		设备
+Input device controller	Device		输入设备控制器
+PCI bus	DevicesView		PCI 总线
+ACPI System Indicator	DeviceACPI		ACPI 系统指示器
+ACPI System Bus	DeviceACPI		ACPI 系统总线
+PCI Information	DevicePCI		PCI 信息
+Tape Drive	DeviceSCSI		磁带驱动
+Changer	DeviceSCSI		交换设备
+Serial bus controller	Device		串行总线控制器
+Refresh devices	DevicesView		刷新设备列表
+Category	DevicesView		分类
+RBC	DeviceSCSI		RBC
+None	Device		无
+Device paths	Device		设备路径
+Unknown device	Device		未知设备
+Wireless controller	Device		无线控制器
+Generic system peripheral	Device		外围通用系统
+Value	PropertyList		数值
 Devices	DevicesView		设备管理器
+Device name	DeviceACPI		设备名称
+Card Reader	DeviceSCSI		读卡器
+Display controller	Device		显示控制器
+Basic information	DevicesView		基本信息
+Bus	DevicesView		总线
+Device name	DevicePCI		设备名称
+Disk Drive	DeviceSCSI		磁盘驱动
+Other	DeviceSCSI		其他
+Report compatibility	DevicesView		兼容性报告
+Computer	Device		计算机
+PCI bus	Device		PCI 总线
+Enclosure	DeviceSCSI		外围设备
+Order by:	DevicesView		排序方式：
+ACPI Thermal Zone	DeviceACPI		ACPI 温测区
+Intelligent controller	Device		智能控制器
+Multimedia controller	Device		多媒体控制器
+Quit	DevicesView		退出
+ISA bus	Device		ISA 总线
+ISA bus	DevicesView		ISA  总线
+Processor	DeviceSCSI		处理器
+Manufacturer:	Device		制造商：
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		类别信息：\t\t\t\t：%classInfo%
+Bridge	Device		网桥
+Worm	DeviceSCSI		散热风扇
+CD-ROM	DeviceSCSI		CD光盘
+Manufacturer	DevicePCI		制造商
+Bridge	DeviceSCSI		网桥
+Signal processing controller	Device		信号处理控制
+Device name	DeviceSCSI		设备名称
+Docking station	Device		扩展接口
+Array	DeviceSCSI		磁盘阵列
+Unclassified device	Device		未分类设备
+ACPI controller	Device		ACPI控制器
+Network controller	Device		网络控制器
+Driver used	Device		已用驱动
+Communication controller	Device		通讯控制器
+ACPI bus	Device		ACPI 总线
+unknown	Device		未知

@@ -1,16 +1,16 @@
 1	japanese	x-vnd.haiku-package_daemon	1440586681
-Package problems	PackageProblem	Window title	パッケージの問題
 Package changes	PackageResult	Window title	パッケージの変更
 uninstall package %s\n	PackageResult	Don't change '%s' variable	パッケージ %s をアンインストール\n
-install package %s from repository %s\n	PackageResult	Don't change '%s' variables	パッケージ %s をリポジトリ %s からインストール\n
-Apply changes	PackageResult		変更を適用
-solution %d:	PackageProblem	Don't change the %d variable	解決策 %d:
-Warning	PackageManager		警告
-Retry	PackageProblem		再試行
-The following additional package changes have to be made:	PackageResult		以下の追加パッケージの変更が必要です:
 ignore problem for now	PackageProblem		現在のところ問題を無視する
+solution %d:	PackageProblem	Don't change the %d variable	解決策 %d:
+The following problems have been encountered. Please select a solution for each:	PackageProblem		以下の問題があります。それぞれについて解決策を選択してください:
+Apply changes	PackageResult		変更を適用
+Package daemon	PackageManager		パッケージデーモン
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	パッケージ %s をリポジトリ %s からインストール\n
+The following additional package changes have to be made:	PackageResult		以下の追加パッケージの変更が必要です:
+Warning	PackageManager		警告
 Cancel	PackageProblem		キャンセル
 don't activate package %source%	PackageProblem	don't change '%source%	パッケージ %source% を有効にしないでください
-The following problems have been encountered. Please select a solution for each:	PackageProblem		以下の問題があります。それぞれについて解決策を選択してください:
-Package daemon	PackageManager		パッケージデーモン
 Cancel	PackageResult		キャンセル
+Retry	PackageProblem		再試行
+Package problems	PackageProblem	Window title	パッケージの問題

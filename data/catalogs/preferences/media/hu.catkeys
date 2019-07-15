@@ -1,24 +1,24 @@
 1	hungarian	x-vnd.Haiku-Media	4205337498
-Couldn't add volume control in Deskbar: %s\n	Media views		Nem lehetett hangerőszabályzót helyezni az Asztalsávra: %s\n
-Video input:	Media views		Képbemenet:
-Warning!	Media Window		Figyelem!
-Quit anyway	Media Window		Kilépés mindenképp
-Defaults	Media views		Alapértelmezések
-MIDI Settings	Media Window		MIDI beállítások
+Audio mixer	Media Window		Hangerőszabályzó
+Show volume control on Deskbar	Media views		Hangerőszabályzó az Asztalsávon
 Quit	Media Window		Kilépés
-Video settings	Media Window		Videóbeállítások
-Video output:	Media views		Képkimenet:
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Nem lehet csatlakozni a Médiakiszolgálóhoz.\nEl szeretné indítani most?
 Restart media services	Media views		Médiaszolgáltatások újraindítása
+Couldn't add volume control in Deskbar: %s\n	Media views		Nem lehetett hangerőszabályzót helyezni az Asztalsávra: %s\n
+Start media server	Media Window		Média kiszolgáló elindítása
+Audio settings	Media Window		Hangbeállítások
+Quit anyway	Media Window		Kilépés mindenképp
 Couldn't remove volume control in Deskbar: %s\n	Media views		Nem lehetett a hangerőszabályzót eltávolítani az Asztalsávról: %s\n
 Media	System name		Média
-Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Az ablak bezárása esetén megszakad a média-szolgáltatás újraindítása. Részleges vagy hibás működést eredményezhet.
-Audio mixer	Media Window		Hangerőszabályzó
-This hardware has no controls.	Media Window		Ennek az eszköznek nincsenek vezérlői.
+Warning!	Media Window		Figyelem!
+MIDI Settings	Media Window		MIDI beállítások
+Video output:	Media views		Képkimenet:
 Audio output:	Media views		Hangkimenet:
-Audio settings	Media Window		Hangbeállítások
-Start media server	Media Window		Média kiszolgáló elindítása
-<none>	Media views		<nincs>
-Channel:	Media views		Csatorna:
-Show volume control on Deskbar	Media views		Hangerőszabályzó az Asztalsávon
+Video input:	Media views		Képbemenet:
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Az ablak bezárása esetén megszakad a média-szolgáltatás újraindítása. Részleges vagy hibás működést eredményezhet.
 Audio input:	Media views		Hangbemenet:
+<none>	Media views		<nincs>
+This hardware has no controls.	Media Window		Ennek az eszköznek nincsenek vezérlői.
+Channel:	Media views		Csatorna:
+Defaults	Media views		Alapértelmezések
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Nem lehet csatlakozni a Médiakiszolgálóhoz.\nEl szeretné indítani most?
+Video settings	Media Window		Videóbeállítások

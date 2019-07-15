@@ -1,60 +1,59 @@
-1	slovak	x-vnd.Haiku-PackageInstaller	3900768
-Install to:	PackageView		Inštalovať do:
-OK	PackageView		OK
-Accept	PackageTextViewer		Prijať
-No package selected.	UninstallView		Nebol vybraný žiadny balík.
+1	slovak	x-vnd.Haiku-PackageInstaller	4116690169
+Package description	UninstallView		Popis balíka
+none	PackageView		žiadny
 Continue	PackageInstall		Pokračovať
+Running post-installation scripts	PackageInstall		Spúšťajú sa poinštalačné skripty
+Package installer	PackageView		Inštalátor balíkov
+All existing files will be skipped?	PackageView		Všetky existujúce súbory sa preskočia?
+Replace	PackageView		Nahradiť
+All existing files will be replaced?	PackageView		Všetky existujúce súbory budú nahradené?
+Other…	PackageView		Iné…
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Symbolický odkaz s názvom „%s“ už v uvedenom adresári existuje.\nChcete nahradiť odkaz odkazom z tohto balíka alebo ho ponechať nezmenený?
+Stop	PackageStatus		Zastaviť
+Install to:	PackageView		Inštalovať do:
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Zdá sa, že uvedený balík je už v systéme nainštalovaný. Chcete existujúci balík odinštalovať a pokračovať v inštalácii?
+Skip all	PackageView		Preskočiť všetky
+The installation of the package has been aborted.	PackageView		Inštalácia balíka bola zrušená.
+No installation type selected	PackageView		Nebol vybraný typ inštalácie
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Chcete si zapamätať rozhodnutie po zvyšok tejto inštalácie?\n
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Vybraný balík nebol odstránený z vášho systému. Je možné, že zadný súbor s informáciami o inštalácii balíka bol poškodený.
+Install…	UninstallView		Nainštalovať…
+Installing files and folders	PackageInstall		Inštalujú sa súbory a priečinky
+Installed packages	UninstallWindow		Nainštalované balíky
 Remove	UninstallView		Odstrániť
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Požadovaný balík sa nepodarilo nainštalovať na váš systém. Môže to znamenať problém s cieľovým súborom balíka. Prosím, poraďte sa o probléme s distribútorom balíka.
-Image not loaded correctly	PackageImageViewer		Obraz nebol správne načítaný
-No package selected.	PackageInfo		Nebol vybraný žiadny balík.
-The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Zdá sa, že uvedený balík je už v systéme nainštalovaný. Chcete existujúci balík odinštalovať a pokračovať v inštalácii?
-Do you want to remember this decision for the rest of this installation?\n	PackageView		Chcete si zapamätať rozhodnutie po zvyšok tejto inštalácie?\n
-Installed packages	UninstallWindow		Nainštalované balíky
-There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Zdá sa, že sa vyskytla nezhoda vo veľkosti súboru balíka. Balík môže byť poškodený alebo bol po vytvorení zmenený. Želáte si napriek tomu pokračovať?
-Error while installing the package\n	PackageView		Chyba počas inštalácie balíka\n
-Disclaimer	PackageTextViewer		Zrieknutie sa zodpovednosti
-%name% (%size% free)	PackageView		%name% (%size% voľných)
-The installation of the package has been aborted.	PackageView		Inštalácia balíka bola zrušená.
-Done	PackageInstall		Hotovo
-All existing files will be replaced?	PackageView		Všetky existujúce súbory budú nahradené?
-Preparing package	PackageInstall		Pripravuje sa balík
-No package available.	PackageInfo		Žiaden balík nie je dostupný.
-none	PackageView		žiadny
-Install %name%	PackageView		Nainštalovať %name%
-Stop	PackageStatus		Zastaviť
-Other…	PackageView		Iné…
-No installation type selected	PackageView		Nebol vybraný typ inštalácie
-Installing files and folders	PackageInstall		Inštalujú sa súbory a priečinky
-Package installer	PackageView		Inštalátor balíkov
-Install…	UninstallView		Nainštalovať…
-Skip all	PackageView		Preskočiť všetky
-Running post-installation scripts	PackageInstall		Spúšťajú sa poinštalačné skripty
-Skip	PackageView		Preskočiť
-The package you requested has been successfully installed on your system.	PackageView		Balík, ktorý ste požadovali bol úspešne nainštalovaný na váš systém.
-Error! \"%s\" is not a valid path.\n	Packageinstaller main		Chyba! „%s“ nie je platná cesta.\n
-Installation type:	PackageView		Typ inštalácie:
-Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Chyba! (%s)! Nebolo možné otvoriť „%s“.\n
-Finishing installation	PackageInstall		Dokončuje sa inštalácia
-Installing package	PackageStatus		Inštaluje sa balík
-Ask again	PackageView		Spýtať sa znova
-Abort	PackageView		Zrušiť
-Replace all	PackageView		Nahradiť všetky
-Package description	UninstallView		Popis balíka
-Decline	PackageTextViewer		Zamietnuť
-All existing files will be skipped?	PackageView		Všetky existujúce súbory sa preskočia?
-Continue	PackageInfo		Pokračovať
-%index% of %total%	PackageInstall		%index% z %total%
-The package you selected has been successfully removed from your system.	UninstallView		Vybraný balík bol úspešne odstránený z vášho systému.
-Abort	PackageInfo		Zrušiť
-PackageInstaller	System name		Inštalátor balíkov
-Abort	PackageInstall		Zrušiť
-%name% (%size%)	PackageView		%name% (%size%)
-Continue	PackageTextViewer		Pokračovať
-Begin	PackageView		Začiatok
 OK	UninstallView		OK
-The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Symbolický odkaz s názvom „%s“ už v uvedenom adresári existuje.\nChcete nahradiť odkaz odkazom z tohto balíka alebo ho ponechať nezmenený?
-The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Vybraný balík nebol odstránený z vášho systému. Je možné, že zadný súbor s informáciami o inštalácii balíka bol poškodený.
-Replace	PackageView		Nahradiť
+Accept	PackageTextViewer		Prijať
+Abort	PackageView		Zrušiť
+Disclaimer	PackageTextViewer		Zrieknutie sa zodpovednosti
+Preparing package	PackageInstall		Pripravuje sa balík
+The package you requested has been successfully installed on your system.	PackageView		Balík, ktorý ste požadovali bol úspešne nainštalovaný na váš systém.
 Installation progress	PackageView		Priebeh inštalácie
+Decline	PackageTextViewer		Zamietnuť
+Continue	PackageTextViewer		Pokračovať
+Installing package	PackageStatus		Inštaluje sa balík
+Install %name%	PackageView		Nainštalovať %name%
+%index% of %total%	PackageInstall		%index% z %total%
+No package selected.	UninstallView		Nebol vybraný žiadny balík.
+%name% (%size% free)	PackageView		%name% (%size% voľných)
+Error while installing the package\n	PackageView		Chyba počas inštalácie balíka\n
+Finishing installation	PackageInstall		Dokončuje sa inštalácia
+No package available.	PackageInfo		Žiaden balík nie je dostupný.
+Installation type:	PackageView		Typ inštalácie:
+The package you selected has been successfully removed from your system.	UninstallView		Vybraný balík bol úspešne odstránený z vášho systému.
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Zdá sa, že sa vyskytla nezhoda vo veľkosti súboru balíka. Balík môže byť poškodený alebo bol po vytvorení zmenený. Želáte si napriek tomu pokračovať?
+%name% (%size%)	PackageView		%name% (%size%)
+Abort	PackageInstall		Zrušiť
+Replace all	PackageView		Nahradiť všetky
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Súbor balíka nie je čitateľný.\nJeden z možných dôvodov je, že požadovaný súbor nie je platný balík .pkg BeOs.
+Continue	PackageInfo		Pokračovať
+No package selected.	PackageInfo		Nebol vybraný žiadny balík.
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Chyba! „%s“ nie je platná cesta.\n
+Ask again	PackageView		Spýtať sa znova
+Begin	PackageView		Začiatok
+OK	PackageView		OK
+Abort	PackageInfo		Zrušiť
+Done	PackageInstall		Hotovo
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Chyba! (%s)! Nebolo možné otvoriť „%s“.\n
+Skip	PackageView		Preskočiť
+Image not loaded correctly	PackageImageViewer		Obraz nebol správne načítaný

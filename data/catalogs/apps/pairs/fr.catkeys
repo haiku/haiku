@@ -1,18 +1,18 @@
 1	french	x-vnd.Haiku-Pairs	818003250
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Paires n’a pas trouvé suffisamment d’icônes vectorielles pour démarrer; il en faut au moins %zu, seules %zu ont été trouvées.\n
-%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tÉcrit par Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n
+Pairs	System name		Paires
+Quit	PairsWindow		Quitter
+Medium	PairsWindow		Moyenne
+Game	PairsWindow		Jeu
 Expert (8x8)	PairsWindow		Expert (8x8)
-Beginner (4x4)	PairsWindow		Débutant (4x4)
+New	PairsWindow		Nouveau
+OK	Pairs		OK
+Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Paires n’a pas trouvé suffisamment d’icônes vectorielles pour démarrer; il en faut au moins %zu, seules %zu ont été trouvées.\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Vous avez terminé la partie en {0, plural, one{# clic} other{# clics}}.\n
+Small	PairsWindow		Petite
+Size	PairsWindow		Taille
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tÉcrit par Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n
 Quit game	PairsWindow		Quitter le jeu
 Large	PairsWindow		Grande
-Small	PairsWindow		Petite
-Game	PairsWindow		Jeu
-OK	Pairs		OK
-Size	PairsWindow		Taille
-New	PairsWindow		Nouveau
+Beginner (4x4)	PairsWindow		Débutant (4x4)
 Intermediate (6x6)	PairsWindow		Intermédiaire (6x6)
-Quit	PairsWindow		Quitter
-Pairs	System name		Paires
 New game	PairsWindow		Nouvelle partie
-Medium	PairsWindow		Moyenne

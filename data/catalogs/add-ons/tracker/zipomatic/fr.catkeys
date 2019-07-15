@@ -1,17 +1,17 @@
 1	french	x-vnd.haiku.zip-o-matic	2032806096
-Stop	file:ZipOMaticWindow.cpp		Arrêt
-Creating archive: %s	file:ZipOMaticWindow.cpp		Création de l’archive : %s
-Continue	file:ZipOMaticWindow.cpp		Continuer
-Preparing to archive	file:ZipperThread.cpp		Préparation de l’archivage
 Drop files here.	file:ZipOMaticWindow.cpp		Déposez les fichiers ici.
 Filename: %s	file:ZipOMaticWindow.cpp		Nom de fichier : %s
-You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Il y a {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matic}} en cours d’exécution.\n\n
-Let them continue	file:ZipOMatic.cpp		Les laisser continuer
 Do you want to stop them?	file:ZipOMatic.cpp		Voulez-vous les arrêter ?
+Error creating archive	file:ZipOMaticWindow.cpp		Impossible de créer l’archive
+Stop them	file:ZipOMatic.cpp		Les arrêter
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Êtes-vous sur de vouloir interrompre la création de cette archive ?
+Preparing to archive	file:ZipperThread.cpp		Préparation de l’archivage
+Let them continue	file:ZipOMatic.cpp		Les laisser continuer
+Continue	file:ZipOMaticWindow.cpp		Continuer
+Archive created OK	file:ZipOMaticWindow.cpp		Création de l’archive réussie
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# fichier ajouté.} other{# fichiers ajoutés.}}
+Stop	file:ZipOMaticWindow.cpp		Arrêt
 Stopped	file:ZipOMaticWindow.cpp		Arrêté
 Archive	file:ZipperThread.cpp		Archive
-Error creating archive	file:ZipOMaticWindow.cpp		Impossible de créer l’archive
-{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# fichier ajouté.} other{# fichiers ajoutés.}}
-Archive created OK	file:ZipOMaticWindow.cpp		Création de l’archive réussie
-Stop them	file:ZipOMatic.cpp		Les arrêter
+Creating archive: %s	file:ZipOMaticWindow.cpp		Création de l’archive : %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Il y a {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matic}} en cours d’exécution.\n\n

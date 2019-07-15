@@ -1,3 +1,3 @@
 1	finnish	x-vnd.Haiku-TelnetService	1209067113
-Telnet server	TelnetServiceAddOn		Telnet-palvelin
 The Telnet server allows you to remotely access your machine with a terminal session using the telnet protocol.\n\nPlease note that it is an insecure and unencrypted connection.	TelnetServiceAddOn		Telnet-palvelin sallii sinun kytkeytyä muualta koneellesi pääteistunnolla käyttäen telnet-yhteyskäytäntöä.\n\nHuomaa, että se on turvaton ja salaamaton yhteys.
+Telnet server	TelnetServiceAddOn		Telnet-palvelin

@@ -1,21 +1,17 @@
-1	russian	x-vnd.Haiku-Magnify	931164741
-no clip msg\n	In console, when clipboard is empty after clicking Copy image		буфер обмена пуст\n
-Make square	Magnify-Main		Сделать квадрат
-Copy image	Magnify-Main		Копировать изображение
-usage: magnify [size] (magnify size * size pixels)\n	Console		использование: magnify [размер] (размер увеличителя * размер пикселей)\n
-Freeze image	Magnify-Main		Стоп-кадр
+1	russian	x-vnd.Haiku-Magnify	94607167
+Decrease pixel size	Magnify-Main		Уменьшить размер пикселя
+Increase pixel size	Magnify-Main		Увеличить размер пикселя
 Stick coordinates	Magnify-Main		Зафиксировать координаты
 %width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height  @ {0, plural, one{# пиксель на пиксель} few{# пикселя на пиксель} other{# пикселей на пиксель}}
-Show info	Magnify-Main		Показать информацию
-magnify: size must be a multiple of 4\n	Console		увеличитель: размер должен кратным 4\n
-Decrease pixel size	Magnify-Main		Уменьшить размер пикселя
+Copy image	Magnify-Main		Копировать изображение
+Decrease window size	Magnify-Main		Уменьшить размер окна
+Remove a crosshair	Magnify-Main		Удалить перекрестье
+Add a crosshair	Magnify-Main		Добавить перекрестье
+Freeze image	Magnify-Main		Стоп-кадр
+Increase window size	Magnify-Main		Увеличить размер окна
+Save image	Magnify-Main		Сохранить изображение
+Show grid	Magnify-Main		Показать сетку
 Magnify	System name		Увеличитель
 Info	Magnify-Main		Информация
-Remove a crosshair	Magnify-Main		Удалить перекрестье
-Show grid	Magnify-Main		Показать сетку
-Save image	Magnify-Main		Сохранить изображение
-Increase window size	Magnify-Main		Увеличить размер окна
-Decrease window size	Magnify-Main		Уменьшить размер окна
-Increase pixel size	Magnify-Main		Увеличить размер пикселя
-  size must be > 4 and a multiple of 4\n	Console		  размер должен быть больше 4 и кратен 4\n
-Add a crosshair	Magnify-Main		Добавить перекрестье
+Show info	Magnify-Main		Показать информацию
+Make square	Magnify-Main		Сделать квадрат

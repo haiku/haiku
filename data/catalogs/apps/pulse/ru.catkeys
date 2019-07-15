@@ -1,48 +1,47 @@
-1	russian	x-vnd.Haiku-Pulse	2324471783
-OK	PrefsWindow		ОК
-Quit	DeskbarPulseView		Выход
-Mini mode	DeskbarPulseView		Мини режим
-Remove replicant	CPUButton		Удалить репликант
-Active color	ConfigView		Активный цвет
-Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Использование: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
-Fade colors	ConfigView		Затенять цвета
-%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nразработали David Ramsey и Arve Hjønnevåg\nИсправлен Daniel Switkin\n
-OK	DeskbarPulseView		ОК
-Deskbar mode	PrefsWindow		Режим Deskbar
-%.2f GHz	NormalPulseView		%.2f ГГц
-Normal mode	PrefsWindow		Обычный режим
-Defaults	PrefsWindow		По умолчанию
-Normal mode	MiniPulseView		Обычный режим
-Error	PulseApp		Ошибка
-Info	PulseView		Информация
-Deskbar	CPUButton		Deskbar
-Frame color	ConfigView		Цвет рамки
-Mini mode	PrefsWindow		Мини режим
-OK	PulseApp		ОК
-Bar colors	ConfigView		Цвета полоски
-Settings…	PulseView		Настройки…
-You can't disable the last active CPU.	PulseView		Нельзя отключить последний активный процессор.
-Info	PulseApp		Информация
-Info	CPUButton		Информация
-OK	PulseView		ОК
-Deskbar menu	CPUButton		Меню Deskbar
-About Pulse…	PulseView		О программе…
-Deskbar mode	MiniPulseView		Режим Deskbar
-Quit	MiniPulseView		Выход
-Pulse	System name		Пульс
-Pulse	NormalPulseView		Пульс
-%ld MHz	NormalPulseView		%ld МГц
-Deskbar mode	NormalPulseView		Режим Deskbar
-Pulse	PulseApp		Пульс
-Width of icon:	ConfigView		Размер значка:
-You can't disable the last active CPU.	CPUButton		Нельзя отключить последний активный процессор.
+1	russian	x-vnd.Haiku-Pulse	3788463253
 Normal mode	DeskbarPulseView		Обычный режим
-OK	CPUButton		ОК
-About Pulse…	CPUButton		О программе…
-Removing from Deskbar failed.\n%s	DeskbarPulseView		Не удалось удалить из Deskbar.\n%s
-Mini mode	NormalPulseView		Мини режим
+Info	CPUButton		Информация
+Quit	DeskbarPulseView		Выход
 Info	DeskbarPulseView		Информация
-Pulse settings	PulseWindow		Настройки пульсации
-Idle color	ConfigView		Цвет бездействия
-Installing in Deskbar failed\n%s	PulseApp		Не удалось установить в Deskbar.\n%s
+Normal mode	MiniPulseView		Обычный режим
+Frame color	ConfigView		Цвет рамки
+Error	PulseApp		Ошибка
+Bar colors	ConfigView		Цвета полоски
+%.2f GHz	NormalPulseView		%.2f ГГц
+Defaults	PrefsWindow		По умолчанию
+%ld MHz	NormalPulseView		%ld МГц
+Mini mode	PrefsWindow		Мини режим
 CPU progress bar	NormalPulseView		CPU progress bar
+Fade colors	ConfigView		Затенять цвета
+About Pulse…	PulseView		О программе…
+Pulse	NormalPulseView		Пульс
+Deskbar mode	NormalPulseView		Режим Deskbar
+Remove replicant	CPUButton		Удалить репликант
+You can't disable the last active CPU.	PulseView		Нельзя отключить последний активный процессор.
+Width of icon:	ConfigView		Размер значка:
+Deskbar mode	MiniPulseView		Режим Deskbar
+OK	PulseView		ОК
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nразработали David Ramsey и Arve Hjønnevåg\nИсправлен Daniel Switkin\n
+OK	PrefsWindow		ОК
+Pulse	PulseApp		Пульс
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Не удалось удалить из Deskbar.\n%s
+OK	PulseApp		ОК
+About Pulse…	CPUButton		О программе…
+Deskbar mode	PrefsWindow		Режим Deskbar
+Mini mode	DeskbarPulseView		Мини режим
+You can't disable the last active CPU.	CPUButton		Нельзя отключить последний активный процессор.
+OK	CPUButton		ОК
+Deskbar	CPUButton		Deskbar
+Settings…	PulseView		Настройки…
+Deskbar menu	CPUButton		Меню Deskbar
+Mini mode	NormalPulseView		Мини режим
+Quit	MiniPulseView		Выход
+Info	PulseView		Информация
+OK	DeskbarPulseView		ОК
+Info	PulseApp		Информация
+Pulse	System name		Пульс
+Active color	ConfigView		Активный цвет
+Installing in Deskbar failed\n%s	PulseApp		Не удалось установить в Deskbar.\n%s
+Idle color	ConfigView		Цвет бездействия
+Normal mode	PrefsWindow		Обычный режим
+Pulse settings	PulseWindow		Настройки пульсации

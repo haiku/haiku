@@ -1,53 +1,53 @@
 1	indonesian	x-vnd.Haiku-Screen	4090394050
-yes	Screen		ya
-Use laptop panel:	Screen		Memakai panel laptop:
-15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 warna
-/other…	Screen		/other…
-16 bits/pixel, 65536 colors	Screen		16 bits/pixel, 65536 warna
-Revert	Screen		Pulihkan
-Swap displays:	Screen		Tukar penampil digital:
-Combine displays:	Screen		Gabung penampil digital:
-Done	Screen		Sudah
-Set background…	Screen		Set latar belakang...
-Undo	Screen		Batal
-if needed	Screen		jika dibutuhkan
-Screen preferences by the Haiku team	Screen		Layar preferensi oleh tim Haiku
-Settings will revert in %seconds.	Screen		Pengaturan akan dipulihkan dalam %seconds.
-Screen	System name		Layar
-OK	Screen		OKE
-Workspaces	Screen		Workspaces
-The screen mode could not be set:\n\t%s\n	Screen		Mode Layar tidak bisa diatur:\n\t%s\n
 no	Screen		tidak
-Could not write VESA mode settings file:\n\t	Screen		Tidak bisa menulis berkas pengaturan mode VESA:\n\t
-Type or use the left and right arrow keys.	Screen		Ketik atau gunakan tombol panah kiri dan kanan.
-Warning	Screen		Peringatan
-Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Frekuensi horizonal:\t%lu - %lu kHz\nFrekuensi vertikal:\t%lu - %lu Hz\n\nDetak pixel maksimum:\t%g MHz
-Keep	Screen		Jaga
-Unknown mode	Screen		Mode tidak diketahui
-disable	Screen		dilumpuhkan
-Columns:	Screen		Kolom:
-All workspaces	Screen		Semua workspace
-always	Screen		selalu
-32 bits/pixel, 16 Million colors	Screen		32 bits/pixel, 16 Juta warna
-Current workspace	Screen		Workspace saat ini
-About	Screen		Tentang
-24 bits/pixel, 16 Million colors	Screen		24 bits/pixel, 16 Juta warna
-horizontally	Screen		secara horizontal
-Other…	Screen		Lainnya...
-Cancel	Screen		Batal
 bits/pixel	Screen		bits/piksel
-Refresh rate:	Screen		Laju refresh:
-Hz	Screen		Hz
-Do you wish to keep these settings?	Screen		Apakah Anda ingin menjaga pengaturan ini?
-Confirm changes	Screen		Konfirmasi perubahan
+15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 warna
 Rows:	Screen		Baris
-vertically	Screen		secara vertikal
-Resolution:	Screen		Resolusi:
-Screen	Screen		Layar
 %.1f Hz	Screen		%.1f Hz
-8 bits/pixel, 256 colors	Screen		8 bits/pixel, 256 warna
-Apply	Screen		Terapkan
-Refresh rate	Screen		Rasio refresh
-%sSerial no.: %s	Screen		%sNo Seri.: %s
-Colors:	Screen		Warna:
+The screen mode could not be set:\n\t%s\n	Screen		Mode Layar tidak bisa diatur:\n\t%s\n
+Keep	Screen		Jaga
+/other…	Screen		/other…
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Frekuensi horizonal:\t%lu - %lu kHz\nFrekuensi vertikal:\t%lu - %lu Hz\n\nDetak pixel maksimum:\t%g MHz
+Refresh rate:	Screen		Laju refresh:
 Video format:	Screen		Format Video:
+Undo	Screen		Batal
+OK	Screen		OKE
+Current workspace	Screen		Workspace saat ini
+vertically	Screen		secara vertikal
+All workspaces	Screen		Semua workspace
+Use laptop panel:	Screen		Memakai panel laptop:
+Could not write VESA mode settings file:\n\t	Screen		Tidak bisa menulis berkas pengaturan mode VESA:\n\t
+Settings will revert in %seconds.	Screen		Pengaturan akan dipulihkan dalam %seconds.
+Cancel	Screen		Batal
+Other…	Screen		Lainnya...
+Screen	Screen		Layar
+Colors:	Screen		Warna:
+yes	Screen		ya
+Swap displays:	Screen		Tukar penampil digital:
+%sSerial no.: %s	Screen		%sNo Seri.: %s
+8 bits/pixel, 256 colors	Screen		8 bits/pixel, 256 warna
+Revert	Screen		Pulihkan
+always	Screen		selalu
+Confirm changes	Screen		Konfirmasi perubahan
+Warning	Screen		Peringatan
+24 bits/pixel, 16 Million colors	Screen		24 bits/pixel, 16 Juta warna
+Hz	Screen		Hz
+Workspaces	Screen		Workspaces
+32 bits/pixel, 16 Million colors	Screen		32 bits/pixel, 16 Juta warna
+Done	Screen		Sudah
+16 bits/pixel, 65536 colors	Screen		16 bits/pixel, 65536 warna
+Screen preferences by the Haiku team	Screen		Layar preferensi oleh tim Haiku
+Refresh rate	Screen		Rasio refresh
+if needed	Screen		jika dibutuhkan
+Combine displays:	Screen		Gabung penampil digital:
+Unknown mode	Screen		Mode tidak diketahui
+About	Screen		Tentang
+Columns:	Screen		Kolom:
+Resolution:	Screen		Resolusi:
+Apply	Screen		Terapkan
+horizontally	Screen		secara horizontal
+disable	Screen		dilumpuhkan
+Set background…	Screen		Set latar belakang...
+Type or use the left and right arrow keys.	Screen		Ketik atau gunakan tombol panah kiri dan kanan.
+Screen	System name		Layar
+Do you wish to keep these settings?	Screen		Apakah Anda ingin menjaga pengaturan ini?

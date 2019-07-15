@@ -1,22 +1,22 @@
 1	indonesian	x-vnd.Haiku-JPEGTranslator	3788699631
-Output quality	JPEGTranslator		Kualitas output
-JPEG images	JPEGTranslator		Gambar JPEG
-Prevent colors 'washing out'	JPEGTranslator		Mencegah warna 'luntur'
-JPEG Library Error: %s\n	be_jerror		Galat Pustaka JPEG: %s\n
-Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Gunakan kode CMYK dengan 0 untuk pencakupan tinta 100%
-About	JPEGTranslator		Tentang
-©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBerdasarkan pustaka IJG ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\ndengan tambalan dukungan penyandian \"lossless\" oleh Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nDengan beberapa rutin konversi colorspace oleh Magnus Hellman\n\thttp://www.bebits.com/app/802\n
-Low	JPEGTranslator		Rendah
-Make file smaller (sligthtly worse quality)	JPEGTranslator		Buat file menjadi lebih kecil (kualitas sedikit lebih buruk)
-None	JPEGTranslator		Tak satupun
+Read	JPEGTranslator		Baca
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Format Bitmap Be (JPEGTranslator)
 Show warning messages	JPEGTranslator		Tampilkan pesan peringatan
-Output smoothing strength	JPEGTranslator		Keluaran kekuatan meratakan
-High	JPEGTranslator		Tinggi
-Write	JPEGTranslator		Menulis
-Write black-and-white images as RGB24	JPEGTranslator		Tulis gambar hitam-putih sebagai RGB24
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Gunakan kode CMYK dengan 0 untuk pencakupan tinta 100%
+JPEG Library Error: %s\n	be_jerror		Galat Pustaka JPEG: %s\n
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBerdasarkan pustaka IJG ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\ndengan tambalan dukungan penyandian \"lossless\" oleh Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nDengan beberapa rutin konversi colorspace oleh Magnus Hellman\n\thttp://www.bebits.com/app/802\n
+None	JPEGTranslator		Tak satupun
+About	JPEGTranslator		Tentang
 Version %d.%d.%d	JPEGTranslator		Versi %d.%d.%d
-Read greyscale images as RGB32	JPEGTranslator		Baca gambar abu-abu sebagai RGB32
-Read	JPEGTranslator		Baca
-JPEG Library Warning: %s\n	be_jerror		Peringatan pustaka JPEG: %s\n
+Write black-and-white images as RGB24	JPEGTranslator		Tulis gambar hitam-putih sebagai RGB24
+Output smoothing strength	JPEGTranslator		Keluaran kekuatan meratakan
 Use progressive compression	JPEGTranslator		Gunakan kompresi progresif
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Buat file menjadi lebih kecil (kualitas sedikit lebih buruk)
+High	JPEGTranslator		Tinggi
+Read greyscale images as RGB32	JPEGTranslator		Baca gambar abu-abu sebagai RGB32
+Output quality	JPEGTranslator		Kualitas output
+Low	JPEGTranslator		Rendah
+Write	JPEGTranslator		Menulis
+Prevent colors 'washing out'	JPEGTranslator		Mencegah warna 'luntur'
+JPEG Library Warning: %s\n	be_jerror		Peringatan pustaka JPEG: %s\n
+JPEG images	JPEGTranslator		Gambar JPEG

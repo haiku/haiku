@@ -1,42 +1,31 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	803595207
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	4101014534
+Uninstall	PackageManager		Desinstal·la
+(%Votes%)	FeaturedPackagesView		(%Votes%)
+Uninstalled	PackageListView		Desinstal·lat
+<no info>	PackageInfoView		<cap informació>
+No user ratings available.	PackageInfoView		No hi ha valoracions dels usuaris disponibles.
+Rating	PackageListView		Valoració
+Active	PackageListView		Actiu
+Ratings	PackageInfoView		Valoracions
 Name	PackageListView		Nom
-Close	RatePackageWindow		Tanca
-Changelog	PackageInfoView		Registre de canvis
-Click a package to view information	PackageInfoView		Cliqueu sobre un paquet per veure'n la informació
+Fatal error	PackageManager		Error greu
 No changelog available.	PackageInfoView		No hi ha cap registre de canvis disponible.
+Available	PackageListView		Disponible
+Click a package to view information	PackageInfoView		Cliqueu sobre un paquet per veure'n la informació
+Close	PackageManager		Tanca
+Changelog	PackageInfoView		Registre de canvis
+About	PackageInfoView		Quant a
+Inactive	PackageListView		Inactiu
+Downloading:	PackageInfoView		S'està baixant:
+(%Votes%)	PackageInfoView		(%Votes%)
+Close	UserLoginWindow		Tanca
+Close	RatePackageWindow		Tanca
+n/a	PackageInfoView		n/d
+Tools	MainWindow		Eines
+Status	PackageListView		Estat
+Unknown	PackageListView		Desconegut
+HaikuDepot	System name		Repertori Haiku
+Search terms:	FilterView		Paraules que voleu cercar:
 Description	PackageListView		Descripció
 Install	PackageManager		Instal·la
-Tools	MainWindow		Eines
-HaikuDepot	System name		Repertori Haiku
-Close	UserLoginWindow		Tanca
-Uninstall	PackageManager		Desinstal·la
-<no info>	PackageInfoView		<cap informació>
-An error occurred while initializing the package manager: %message%	MainWindow		Hi ha hagut un error en iniciar el gestor de paquets: %message%
-Close	PackageManager		Tanca
-Status	PackageListView		Estat
-Development	Model		Desenvolupament
-Fatal error	PackageManager		Error greu
-Ratings	PackageInfoView		Valoracions
-Inactive	PackageListView		Inactiu
-(%Votes%)	PackageInfoView		(%Votes%)
-Downloading:	PackageInfoView		S'està baixant:
-Search terms:	FilterView		Paraules que voleu cercar:
 %Version%	PackageInfoView		%Version%
-No user ratings available.	PackageInfoView		No hi ha valoracions dels usuaris disponibles.
-An error occurred while refreshing the repository: %error% (%details%)	MainWindow		S'ha produït un error en actualitzar el repertori: %error% (%details%)
-Productivity	Model		Productivitat
-Games	Model		Jocs
-Rating	PackageListView		Valoració
-(%Votes%)	FeaturedPackagesView		(%Votes%)
-Graphics	Model		Gràfics
-Local	MainWindow		Local
-Close	MainWindow		Tanca
-Video	Model		Vídeo
-An error occurred while refreshing the repository: %error%	MainWindow		S'ha produït un error en actualitzar el repertori: %error%
-Uninstalled	PackageListView		Desinstal·lat
-Unknown	PackageListView		Desconegut
-Available	PackageListView		Disponible
-n/a	PackageInfoView		n/d
-Audio	Model		Àudio
-About	PackageInfoView		Quant a
-Active	PackageListView		Actiu

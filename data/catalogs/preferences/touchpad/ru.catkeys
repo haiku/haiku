@@ -1,20 +1,20 @@
 1	russian	x-vnd.Haiku-Touchpad	607725922
 Scrolling	TouchpadPrefView		Прокрутка
-Touchpad	System name		Сенсорная панель
-Revert	TouchpadPrefView		Вернуть
 Tapping	TouchpadPrefView		Касание легким нажатием
-Please confirm	TouchpadPrefView		Пожалуйста, подтвердите
-Two finger scrolling	TouchpadPrefView		Прокрутка двумя пальцами
-Defaults	TouchpadPrefView		По умолчанию
-Slow	TouchpadPrefView		Медленно
-Vertical	TouchpadPrefView		Вертикальная
-High	TouchpadPrefView		Высокая
-Horizontal scrolling	TouchpadPrefView		Горизонтальная прокрутка
-Fast	TouchpadPrefView		Быстро
-OK	TouchpadPrefView		ОК
-Acceleration	TouchpadPrefView		Ускорение
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Выбранная область прокрутки слишком большая и может затруднить обычные операции с мышью. Вы действительно хотите изменить ее?
-Horizontal	TouchpadPrefView		Горизонтальная
-Off	TouchpadPrefView		Выключить
-Sensitivity	TouchpadPrefView		Чувствительность
+Touchpad	System name		Сенсорная панель
 Cancel	TouchpadPrefView		Отмена
+OK	TouchpadPrefView		ОК
+Horizontal scrolling	TouchpadPrefView		Горизонтальная прокрутка
+Slow	TouchpadPrefView		Медленно
+Two finger scrolling	TouchpadPrefView		Прокрутка двумя пальцами
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Выбранная область прокрутки слишком большая и может затруднить обычные операции с мышью. Вы действительно хотите изменить ее?
+Defaults	TouchpadPrefView		По умолчанию
+High	TouchpadPrefView		Высокая
+Off	TouchpadPrefView		Выключить
+Fast	TouchpadPrefView		Быстро
+Vertical	TouchpadPrefView		Вертикальная
+Please confirm	TouchpadPrefView		Пожалуйста, подтвердите
+Acceleration	TouchpadPrefView		Ускорение
+Horizontal	TouchpadPrefView		Горизонтальная
+Sensitivity	TouchpadPrefView		Чувствительность
+Revert	TouchpadPrefView		Вернуть

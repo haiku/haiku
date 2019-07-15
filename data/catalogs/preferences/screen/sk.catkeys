@@ -1,53 +1,53 @@
 1	slovak	x-vnd.Haiku-Screen	4090394050
-yes	Screen		áno
-Use laptop panel:	Screen		Použiť panel noteboku:
-15 bits/pixel, 32768 colors	Screen		15 bitov/pixel, 32768 farieb
-/other…	Screen		/iné…
-16 bits/pixel, 65536 colors	Screen		16 bitov/pixel, 65536 farieb
-Revert	Screen		Vrátiť
-Swap displays:	Screen		Vymeniť displeje:
-Combine displays:	Screen		Skombinovať displeje:
-Done	Screen		Hotovo
-Set background…	Screen		Nastaviť pozadie…
-Undo	Screen		Vrátiť späť
-if needed	Screen		ak treba
-Screen preferences by the Haiku team	Screen		Nastavenie obrazovky, vytvoril tím Haiku
-Settings will revert in %seconds.	Screen		Nastavenia sa vrátia späť o %seconds sekúnd.
-Screen	System name		Obrazovka
-OK	Screen		OK
-Workspaces	Screen		Pracovné plochy
-The screen mode could not be set:\n\t%s\n	Screen		Režim obrazovky nebolo možné nastaviť:\n\t%s\n
 no	Screen		nie
-Could not write VESA mode settings file:\n\t	Screen		Nepodarilo sa zapísať súbor režimu VESA:\n\t
-Type or use the left and right arrow keys.	Screen		Napíšte alebo použite šípky doprava a doľava.
-Warning	Screen		Upozornenie
-Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Vodorovná frekvencia:\t%lu - %lu kHz\nZvislá frekvencia:\t%lu - %lu Hz\n\nMaximálne časovanie pixlov:\t%g MHz
-Keep	Screen		Ponechať
-Unknown mode	Screen		Neznámy režim
-disable	Screen		vypnúť
-Columns:	Screen		Stĺpce:
-All workspaces	Screen		Všetky pracovné plochy
-always	Screen		vždy
-32 bits/pixel, 16 Million colors	Screen		32 bitov/pixel, 16 miliónov farieb
-Current workspace	Screen		Aktuálna pracovná plocha
-About	Screen		O aplikácii
-24 bits/pixel, 16 Million colors	Screen		24 bitov/pixel, 16 miliónov farieb
-horizontally	Screen		vodorovne
-Other…	Screen		Iné…
-Cancel	Screen		Zrušiť
 bits/pixel	Screen		bitov/pixel
-Refresh rate:	Screen		Obnovovacia frekvencia:
-Hz	Screen		Hz
-Do you wish to keep these settings?	Screen		Chcete tieto nastavenia zachovať?
-Confirm changes	Screen		Potvrdiť zmeny
+15 bits/pixel, 32768 colors	Screen		15 bitov/pixel, 32768 farieb
 Rows:	Screen		Riadkov:
-vertically	Screen		zvisle
-Resolution:	Screen		Rozlíšenie:
-Screen	Screen		Obrazovka
 %.1f Hz	Screen		%.1f Hz
-8 bits/pixel, 256 colors	Screen		8 bitov/pixel, 256 farieb
-Apply	Screen		Použiť
-Refresh rate	Screen		Obnovovacia frekvencia
-%sSerial no.: %s	Screen		%sSériové č.: %s
-Colors:	Screen		Farieb:
+The screen mode could not be set:\n\t%s\n	Screen		Režim obrazovky nebolo možné nastaviť:\n\t%s\n
+Keep	Screen		Ponechať
+/other…	Screen		/iné…
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Vodorovná frekvencia:\t%lu - %lu kHz\nZvislá frekvencia:\t%lu - %lu Hz\n\nMaximálne časovanie pixlov:\t%g MHz
+Refresh rate:	Screen		Obnovovacia frekvencia:
 Video format:	Screen		Formát videa:
+Undo	Screen		Vrátiť späť
+OK	Screen		OK
+Current workspace	Screen		Aktuálna pracovná plocha
+vertically	Screen		zvisle
+All workspaces	Screen		Všetky pracovné plochy
+Use laptop panel:	Screen		Použiť panel noteboku:
+Could not write VESA mode settings file:\n\t	Screen		Nepodarilo sa zapísať súbor režimu VESA:\n\t
+Settings will revert in %seconds.	Screen		Nastavenia sa vrátia späť o %seconds sekúnd.
+Cancel	Screen		Zrušiť
+Other…	Screen		Iné…
+Screen	Screen		Obrazovka
+Colors:	Screen		Farieb:
+yes	Screen		áno
+Swap displays:	Screen		Vymeniť displeje:
+%sSerial no.: %s	Screen		%sSériové č.: %s
+8 bits/pixel, 256 colors	Screen		8 bitov/pixel, 256 farieb
+Revert	Screen		Vrátiť
+always	Screen		vždy
+Confirm changes	Screen		Potvrdiť zmeny
+Warning	Screen		Upozornenie
+24 bits/pixel, 16 Million colors	Screen		24 bitov/pixel, 16 miliónov farieb
+Hz	Screen		Hz
+Workspaces	Screen		Pracovné plochy
+32 bits/pixel, 16 Million colors	Screen		32 bitov/pixel, 16 miliónov farieb
+Done	Screen		Hotovo
+16 bits/pixel, 65536 colors	Screen		16 bitov/pixel, 65536 farieb
+Screen preferences by the Haiku team	Screen		Nastavenie obrazovky, vytvoril tím Haiku
+Refresh rate	Screen		Obnovovacia frekvencia
+if needed	Screen		ak treba
+Combine displays:	Screen		Skombinovať displeje:
+Unknown mode	Screen		Neznámy režim
+About	Screen		O aplikácii
+Columns:	Screen		Stĺpce:
+Resolution:	Screen		Rozlíšenie:
+Apply	Screen		Použiť
+horizontally	Screen		vodorovne
+disable	Screen		vypnúť
+Set background…	Screen		Nastaviť pozadie…
+Type or use the left and right arrow keys.	Screen		Napíšte alebo použite šípky doprava a doľava.
+Screen	System name		Obrazovka
+Do you wish to keep these settings?	Screen		Chcete tieto nastavenia zachovať?

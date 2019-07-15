@@ -1,31 +1,30 @@
-1	spanish; castilian	x-vnd.Haiku-PPMTranslator	2233502290
-Version %d.%d.%d, %s	PPMTranslator		Versión %d.%d.%d, %s
+1	spanish; castilian	x-vnd.Haiku-PPMTranslator	292474603
+None	PPMTranslator		Ninguno
 PPM Settings	PPMMain		Configuración PPM
-Based on PPMTranslator sample code	PPMTranslator		Basado en el código de ejemplo de PPMTranslator
-OK	PPMMain		Aceptar
+System palette 8 bits	PPMTranslator		Paleta de sistema en 8 bits
+Sample code copyright 1999, Be Incorporated	PPMTranslator		Código de ejemplo copyright 1999, Be Incorporated
+Something is wrong with the PPMTranslator!	PPMMain		Algo va mal en el PPMTranslator.
 Grayscale 8 bits	PPMTranslator		Escala de grises en 8 bits
+Based on PPMTranslator sample code	PPMTranslator		Basado en el código de ejemplo de PPMTranslator
+RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 bits big-endian
+PPM image translator	PPMTranslator		Traductor de imágenes PPM
+Bitmap 1 bit	PPMTranslator		Mapa de bits de 1 bit
+RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 bits big-endian
+PPMTranslator Settings	PPMTranslator		Configuración PPMTranslator 
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 bits
+OK	PPMMain		Aceptar
+CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bits
 PPM image	PPMTranslator		Imagen PPM
+Input color space:	PPMTranslator		Espacio de Color de Entrada:
+RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 bits big-endian
+RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bits big-endian
+Write ASCII	PPMTranslator		Escribe en formato ASCII
+RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 bits
+RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 bits big-endian
+RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 bits
+Version %d.%d.%d, %s	PPMTranslator		Versión %d.%d.%d, %s
+CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 bits
+RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 bits
+RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 bits
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 bits
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Formato Be Bitmap (PPMTranslator)
-CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bits
-Input color space:	PPMTranslator		Espacio de Color de Entrada:
-CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 bits
-PPM image translator	PPMTranslator		Traductor de imágenes PPM
-bits/space	PPMTranslator		bits/espacio
-RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 bits big-endian
-RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 bits big-endian
-RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 bits big-endian
-RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 bits
-Write ASCII	PPMTranslator		Escribe en formato ASCII
-RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 bits
-None	PPMTranslator		Ninguno
-RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bits big-endian
-RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 bits
-Bitmap 1 bit	PPMTranslator		Mapa de bits de 1 bit
-RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 bits big-endian
-RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 bits
-Sample code copyright 1999, Be Incorporated	PPMTranslator		Código de ejemplo copyright 1999, Be Incorporated
-PPMTranslator Settings	PPMTranslator		Configuración PPMTranslator 
-Something is wrong with the PPMTranslator!	PPMMain		Algo va mal en el PPMTranslator.
-System palette 8 bits	PPMTranslator		Paleta de sistema en 8 bits

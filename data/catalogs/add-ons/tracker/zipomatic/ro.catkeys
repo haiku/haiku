@@ -1,17 +1,17 @@
 1	romanian	x-vnd.haiku.zip-o-matic	2032806096
-Stop	file:ZipOMaticWindow.cpp		Oprește
-Creating archive: %s	file:ZipOMaticWindow.cpp		Se creează arhiva: %s
-Continue	file:ZipOMaticWindow.cpp		Continuă
-Preparing to archive	file:ZipperThread.cpp		Se pregătește de arhivare
 Drop files here.	file:ZipOMaticWindow.cpp		Plasează fișiere aici.
 Filename: %s	file:ZipOMaticWindow.cpp		Nume fișier: %s
-You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Aveți {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matic}} funcționale.\n\n
-Let them continue	file:ZipOMatic.cpp		Lasă-le să continue
 Do you want to stop them?	file:ZipOMatic.cpp		Dorești să le oprești?
+Error creating archive	file:ZipOMaticWindow.cpp		Eroare la crearea arhivei
+Stop them	file:ZipOMatic.cpp		Oprește-le
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Dorești să oprești crearea acestei arhive?
+Preparing to archive	file:ZipperThread.cpp		Se pregătește de arhivare
+Let them continue	file:ZipOMatic.cpp		Lasă-le să continue
+Continue	file:ZipOMaticWindow.cpp		Continuă
+Archive created OK	file:ZipOMaticWindow.cpp		Arhivă creată OK
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# fișier adăugat.} other{# fișiere adăugate.}}
+Stop	file:ZipOMaticWindow.cpp		Oprește
 Stopped	file:ZipOMaticWindow.cpp		Oprit
 Archive	file:ZipperThread.cpp		Arhivă
-Error creating archive	file:ZipOMaticWindow.cpp		Eroare la crearea arhivei
-{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# fișier adăugat.} other{# fișiere adăugate.}}
-Archive created OK	file:ZipOMaticWindow.cpp		Arhivă creată OK
-Stop them	file:ZipOMatic.cpp		Oprește-le
+Creating archive: %s	file:ZipOMaticWindow.cpp		Se creează arhiva: %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Aveți {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matic}} funcționale.\n\n

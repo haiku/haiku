@@ -1,66 +1,66 @@
 1	slovak	x-vnd.Haiku-PoorMan	1829050509
-Website location	PoorMan		Umiestnenie webstránky
-Error Server	PoorMan		Chybový server
-Settings…	PoorMan		Nastavenia…
-Create PoorMan log	PoorMan		Vytvoriť záznam PoorMan
-Shutting down.\n	PoorMan		Vypína sa.\n
-Hits: %lu	PoorMan		Zásahov: %lu
-Web folder:	PoorMan		Webový priečinok:
-Save log console selection	PoorMan		Uložiť záznam výberu konzoly
-Run server	PoorMan		Spustiť server
-PoorMan settings	PoorMan		Nastavenia PoorMan
-Clear hit counter	PoorMan		Vyčistiť počítadlo zásahov
-Copy	PoorMan		Kopírovať
-Max. simultaneous connections:	PoorMan		Max. súčasných spojení:
-Create public_html	PoorMan		Vytvoriť public_html
-Start page:	PoorMan		Úvodná stránka:
-done.\n	PoorMan		hotovo.\n
-Create	PoorMan		Vytvoriť
-Shutting down.	PoorMan		Vypína sa.
-Website options	PoorMan		Nastavenia webstránky
-File Name	PoorMan		Názov súboru
-Clear console log	PoorMan		Vyčistiť záznam konzoly
-Advanced	PoorMan		Pokročilé
-OK	PoorMan		OK
-Status: Stopped	PoorMan		Stav: Zastavený
-Dir Created	PoorMan		Adr. vytvorený
-Log to file	PoorMan		Uložiť záznam do súboru
-Quit	PoorMan		Ukončiť
-Hits: 0	PoorMan		Zásahov: 0
-Save log console	PoorMan		Uložiť záznam konzoly
-Edit	PoorMan		Upraviť
+Select web folder	PoorMan		Vybrať webový priečinok
+Console logging	PoorMan		Záznam na konzolu
 Create Log File	PoorMan		Vytvoriť súbor so záznamom
-Log to console	PoorMan		Posielať záznam na konzolu
-Directory: (none)	PoorMan		Adresár: (žiaden)
+File logging	PoorMan		Záznam do súboru
+Website options	PoorMan		Nastavenia webstránky
+Log to file	PoorMan		Uložiť záznam do súboru
+Shutting down.	PoorMan		Vypína sa.
+Error Dir	PoorMan		Chybový adresár
+Web folder:	PoorMan		Webový priečinok:
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Prosím, vyberte priečinok, ktorý chcete zverejniť na webe.\n\nPoorMan môže pre vás vytvoriť predvolený priečinok „public_html“ vo vašom domovskom priečinku.\nAlebo namiesto toho vyberte jeden z vašich vlastných priečinkov.
 Log To Console	PoorMan		Záznam na konzolu
-{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# spojenie} few{# spojenia} other{# spojení}}
-Connections	PoorMan		Spojenia
-Status: Running	PoorMan		Stav: Beží
-Controls	PoorMan		Ovládacie prvky
-Send file listing if there's no start page	PoorMan		Poslať výpis súborov ak úvodná stránka neexistuje
-Error Dir	PoorMan		Chybový adresár
-Select all	PoorMan		Vybrať všetky
-File	PoorMan		Súbor
-File Logging	PoorMan		Záznam do súboru
-Save console selections as…	PoorMan		Uložiť výbery konzoly ako…
-File logging	PoorMan		Záznam do súboru
-Select web folder	PoorMan		Vybrať webový priečinok
-Logging view	PoorMan		Zobrazenie záznamu
-Logging	PoorMan		Záznam
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		V „/boot/home/public_html“ bol vytvorený predvolený webový priečinok.\nUistite sa, že obsahuje HTML súbor s názvom „index.html“.
-Clear log file	PoorMan		Vyčistiť súbor so záznamom
-Log file name:	PoorMan		Názov súboru so záznamom:
-Directory: 	PoorMan		Adresár: 
-Log To File	PoorMan		Záznam do súboru
-Done	PoorMan		Hotovo
-Create log file	PoorMan		Vytvoriť súbor so záznamom
+File Name	PoorMan		Názov súboru
 Starting up... 	PoorMan		Spúšťa sa... 
-Site	PoorMan		Lokalita
-Cancel	PoorMan		Zrušiť
-Console logging	PoorMan		Záznam na konzolu
-Cannot start the server	PoorMan		Nie je možné spustiť server
 Select	PoorMan		Vybrať
+Logging view	PoorMan		Zobrazenie záznamu
 Save console as…	PoorMan		Uložiť konzolu ako…
+Edit	PoorMan		Upraviť
+Cancel	PoorMan		Zrušiť
+Directory: 	PoorMan		Adresár: 
+Hits: %lu	PoorMan		Zásahov: %lu
+Hits: 0	PoorMan		Zásahov: 0
+Shutting down.\n	PoorMan		Vypína sa.\n
+Select all	PoorMan		Vybrať všetky
+Error Server	PoorMan		Chybový server
+Send file listing if there's no start page	PoorMan		Poslať výpis súborov ak úvodná stránka neexistuje
+Create PoorMan log	PoorMan		Vytvoriť záznam PoorMan
+Max. simultaneous connections:	PoorMan		Max. súčasných spojení:
+Done	PoorMan		Hotovo
+Site	PoorMan		Lokalita
+Cannot start the server	PoorMan		Nie je možné spustiť server
+Create log file	PoorMan		Vytvoriť súbor so záznamom
+Create public_html	PoorMan		Vytvoriť public_html
+Clear hit counter	PoorMan		Vyčistiť počítadlo zásahov
+Status: Stopped	PoorMan		Stav: Zastavený
+File	PoorMan		Súbor
+Settings…	PoorMan		Nastavenia…
+Log To File	PoorMan		Záznam do súboru
+Connections	PoorMan		Spojenia
+Controls	PoorMan		Ovládacie prvky
+Log to console	PoorMan		Posielať záznam na konzolu
+Advanced	PoorMan		Pokročilé
+Copy	PoorMan		Kopírovať
+Logging	PoorMan		Záznam
 PoorMan	System name		PoorMan
+Clear console log	PoorMan		Vyčistiť záznam konzoly
+Run server	PoorMan		Spustiť server
+Create	PoorMan		Vytvoriť
+{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# spojenie} few{# spojenia} other{# spojení}}
+done.\n	PoorMan		hotovo.\n
+PoorMan settings	PoorMan		Nastavenia PoorMan
 Console Logging	PoorMan		Záznam na konzolu
+Clear log file	PoorMan		Vyčistiť súbor so záznamom
+Save log console selection	PoorMan		Uložiť záznam výberu konzoly
+File Logging	PoorMan		Záznam do súboru
+Log file name:	PoorMan		Názov súboru so záznamom:
+Status: Running	PoorMan		Stav: Beží
+Directory: (none)	PoorMan		Adresár: (žiaden)
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		V „/boot/home/public_html“ bol vytvorený predvolený webový priečinok.\nUistite sa, že obsahuje HTML súbor s názvom „index.html“.
+Dir Created	PoorMan		Adr. vytvorený
+Save console selections as…	PoorMan		Uložiť výbery konzoly ako…
+Quit	PoorMan		Ukončiť
+Save log console	PoorMan		Uložiť záznam konzoly
+Start page:	PoorMan		Úvodná stránka:
+OK	PoorMan		OK
+Website location	PoorMan		Umiestnenie webstránky

@@ -1,17 +1,17 @@
 1	english	x-vnd.haiku.zip-o-matic	2032806096
-Stop	file:ZipOMaticWindow.cpp		停止
-Creating archive: %s	file:ZipOMaticWindow.cpp		创建档案：%s
-Continue	file:ZipOMaticWindow.cpp		继续
-Preparing to archive	file:ZipperThread.cpp		准备归档
 Drop files here.	file:ZipOMaticWindow.cpp		拖拽文件到此。
 Filename: %s	file:ZipOMaticWindow.cpp		文件名：%s
-You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		您具有 {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} 运行中。\n\n
-Let them continue	file:ZipOMatic.cpp		让它们继续
 Do you want to stop them?	file:ZipOMatic.cpp		您想停止运行它们吗？
+Error creating archive	file:ZipOMaticWindow.cpp		创建档案出错
+Stop them	file:ZipOMatic.cpp		停止它们
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		你确定停止创建档案吗？
+Preparing to archive	file:ZipperThread.cpp		准备归档
+Let them continue	file:ZipOMatic.cpp		让它们继续
+Continue	file:ZipOMaticWindow.cpp		继续
+Archive created OK	file:ZipOMaticWindow.cpp		档案创建成功
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# file added.} other{# files added.}}
+Stop	file:ZipOMaticWindow.cpp		停止
 Stopped	file:ZipOMaticWindow.cpp		已停止。
 Archive	file:ZipperThread.cpp		档案
-Error creating archive	file:ZipOMaticWindow.cpp		创建档案出错
-{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# file added.} other{# files added.}}
-Archive created OK	file:ZipOMaticWindow.cpp		档案创建成功
-Stop them	file:ZipOMatic.cpp		停止它们
+Creating archive: %s	file:ZipOMaticWindow.cpp		创建档案：%s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		您具有 {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} 运行中。\n\n

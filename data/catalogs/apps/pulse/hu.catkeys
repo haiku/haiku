@@ -1,48 +1,47 @@
-1	hungarian	x-vnd.Haiku-Pulse	2324471783
-OK	PrefsWindow		Rendben
-Quit	DeskbarPulseView		Kilépés
-Mini mode	DeskbarPulseView		Mini mód
-Remove replicant	CPUButton		Replikáns eltávolítása
-Active color	ConfigView		Aktív szín
-Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Használat: Pulse [--mini] [-w szélesség] [--width=szélesség]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
-Fade colors	ConfigView		Színek elhalványítása
-%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nÍrta: David Ramsey és Arve Hjønnevåg\nÁtírta: Daniel Switkin\n
-OK	DeskbarPulseView		Rendben
-Deskbar mode	PrefsWindow		Asztalsáv mód
-%.2f GHz	NormalPulseView		%.2f GHz
-Normal mode	PrefsWindow		Normál mód
-Defaults	PrefsWindow		Alapértelmezett
-Normal mode	MiniPulseView		Normál mód
-Error	PulseApp		Hiba
-Info	PulseView		Infó
-Deskbar	CPUButton		Asztalsáv
-Frame color	ConfigView		Keret színe
-Mini mode	PrefsWindow		Mini mód
-OK	PulseApp		Rendben
-Bar colors	ConfigView		Sávok színe
-Settings…	PulseView		Beállítások…
-You can't disable the last active CPU.	PulseView		Nem lehet letiltani a legutolsó aktív processzort.
-Info	PulseApp		Infó
-Info	CPUButton		Infó
-OK	PulseView		Rendben
-Deskbar menu	CPUButton		Asztalsáv menü
-About Pulse…	PulseView		Pulzus névjegye…
-Deskbar mode	MiniPulseView		Asztalsáv mód
-Quit	MiniPulseView		Kilépés
-Pulse	System name		Pulzus
-Pulse	NormalPulseView		Pulzus
-%ld MHz	NormalPulseView		%ld MHz
-Deskbar mode	NormalPulseView		Asztalsáv mód
-Pulse	PulseApp		Pulzus
-Width of icon:	ConfigView		Ikon szélessége
-You can't disable the last active CPU.	CPUButton		Nem lehet letiltani a legutolsó aktív processzort.
+1	hungarian	x-vnd.Haiku-Pulse	3788463253
 Normal mode	DeskbarPulseView		Normál mód
-OK	CPUButton		Rendben
-About Pulse…	CPUButton		Pulzus névjegye…
-Removing from Deskbar failed.\n%s	DeskbarPulseView		Nem sikerült eltávolítani az Asztalsávról.\n%s
-Mini mode	NormalPulseView		Mini mód
+Info	CPUButton		Infó
+Quit	DeskbarPulseView		Kilépés
 Info	DeskbarPulseView		Infó
-Pulse settings	PulseWindow		Pulzus beállításai
-Idle color	ConfigView		Üresjárat színe
-Installing in Deskbar failed\n%s	PulseApp		Nem sikerült telepíteni az Asztalsávra\n%s
+Normal mode	MiniPulseView		Normál mód
+Frame color	ConfigView		Keret színe
+Error	PulseApp		Hiba
+Bar colors	ConfigView		Sávok színe
+%.2f GHz	NormalPulseView		%.2f GHz
+Defaults	PrefsWindow		Alapértelmezett
+%ld MHz	NormalPulseView		%ld MHz
+Mini mode	PrefsWindow		Mini mód
 CPU progress bar	NormalPulseView		CPU folyamatsáv
+Fade colors	ConfigView		Színek elhalványítása
+About Pulse…	PulseView		Pulzus névjegye…
+Pulse	NormalPulseView		Pulzus
+Deskbar mode	NormalPulseView		Asztalsáv mód
+Remove replicant	CPUButton		Replikáns eltávolítása
+You can't disable the last active CPU.	PulseView		Nem lehet letiltani a legutolsó aktív processzort.
+Width of icon:	ConfigView		Ikon szélessége
+Deskbar mode	MiniPulseView		Asztalsáv mód
+OK	PulseView		Rendben
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nÍrta: David Ramsey és Arve Hjønnevåg\nÁtírta: Daniel Switkin\n
+OK	PrefsWindow		Rendben
+Pulse	PulseApp		Pulzus
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Nem sikerült eltávolítani az Asztalsávról.\n%s
+OK	PulseApp		Rendben
+About Pulse…	CPUButton		Pulzus névjegye…
+Deskbar mode	PrefsWindow		Asztalsáv mód
+Mini mode	DeskbarPulseView		Mini mód
+You can't disable the last active CPU.	CPUButton		Nem lehet letiltani a legutolsó aktív processzort.
+OK	CPUButton		Rendben
+Deskbar	CPUButton		Asztalsáv
+Settings…	PulseView		Beállítások…
+Deskbar menu	CPUButton		Asztalsáv menü
+Mini mode	NormalPulseView		Mini mód
+Quit	MiniPulseView		Kilépés
+Info	PulseView		Infó
+OK	DeskbarPulseView		Rendben
+Info	PulseApp		Infó
+Pulse	System name		Pulzus
+Active color	ConfigView		Aktív szín
+Installing in Deskbar failed\n%s	PulseApp		Nem sikerült telepíteni az Asztalsávra\n%s
+Idle color	ConfigView		Üresjárat színe
+Normal mode	PrefsWindow		Normál mód
+Pulse settings	PulseWindow		Pulzus beállításai

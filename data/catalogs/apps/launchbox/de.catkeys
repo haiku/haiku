@@ -1,35 +1,35 @@
 1	german	x-vnd.Haiku-LaunchBox	3692177981
-New	LaunchBox		Neu
 Set description…	LaunchBox		Beschreibung ändern…
-Vertical layout	LaunchBox		Vertikale Anordnung
-OK	LaunchBox		OK
-Pad 1	LaunchBox		Block 1
-last chance	LaunchBox		letzte Chance
-Quit	LaunchBox		Beenden
-Open containing folder	LaunchBox		Speicherort öffnen
-Clear button	LaunchBox		Feld leeren
-LaunchBox	System name		LaunchBox
-Ignore double-click	LaunchBox		Doppelklick ignorieren
-Auto-raise	LaunchBox		Automatisch nach vorn holen
-Show on all workspaces	LaunchBox		Auf allen Arbeitsflächen anzeigen
-Show window border	LaunchBox		Fensterrahmen anzeigen
-Pad	LaunchBox		Block
-Icon size	LaunchBox		Icongröße
-Bummer	LaunchBox		Mist
-Cancel	LaunchBox		Abbrechen
-Remove button	LaunchBox		Feld entfernen
-Horizontal layout	LaunchBox		Horizontale Anordnung
-\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nDie Anwendung mit der Signatur "%2" konnte nicht gestartet werden.\n\nFehler:
-Failed to launch '%1'.\n\nError:	LaunchBox		'%1' konnte nicht gestartet werden.\n\nFehler:
-Name Panel	LaunchBox		Namenspanel
-Add button here	LaunchBox		Feld hier einfügen
-Description for '%3'	LaunchBox		Beschreibung für '%3'
-Settings	LaunchBox		Einstellungen
-Failed to launch 'something', error in Pad data.	LaunchBox		Start von 'irgendwas' fehlgeschlagen, Fehler in den Daten des Blocks.
-Pad %1	LaunchBox		Block %1
-Close	LaunchBox		Schließen
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Senden des 'open folder' Kommandos zu Tracker fehlgeschlagen.\n\nFehler:
-You can drag an icon here.	LaunchBox		Hier kann ein Icon hingezogen werden.
-Clone	LaunchBox		Duplizieren
-launch popup	LaunchBox		starte popup
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Wirklich diesen Block schließen?\n(Der Block wird nicht gespeichert.)
+OK	LaunchBox		OK
+Ignore double-click	LaunchBox		Doppelklick ignorieren
+Show on all workspaces	LaunchBox		Auf allen Arbeitsflächen anzeigen
+Name Panel	LaunchBox		Namenspanel
+Clone	LaunchBox		Duplizieren
+Description for '%3'	LaunchBox		Beschreibung für '%3'
+Show window border	LaunchBox		Fensterrahmen anzeigen
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nDie Anwendung mit der Signatur "%2" konnte nicht gestartet werden.\n\nFehler:
+Failed to launch 'something', error in Pad data.	LaunchBox		Start von 'irgendwas' fehlgeschlagen, Fehler in den Daten des Blocks.
+LaunchBox	System name		LaunchBox
+Auto-raise	LaunchBox		Automatisch nach vorn holen
+Icon size	LaunchBox		Icongröße
+Open containing folder	LaunchBox		Speicherort öffnen
+Add button here	LaunchBox		Feld hier einfügen
+Cancel	LaunchBox		Abbrechen
+launch popup	LaunchBox		starte popup
+Clear button	LaunchBox		Feld leeren
+Bummer	LaunchBox		Mist
+last chance	LaunchBox		letzte Chance
+You can drag an icon here.	LaunchBox		Hier kann ein Icon hingezogen werden.
+Pad 1	LaunchBox		Block 1
+Failed to launch '%1'.\n\nError:	LaunchBox		'%1' konnte nicht gestartet werden.\n\nFehler:
+Settings	LaunchBox		Einstellungen
+Vertical layout	LaunchBox		Vertikale Anordnung
+Pad	LaunchBox		Block
+Close	LaunchBox		Schließen
+Remove button	LaunchBox		Feld entfernen
+Quit	LaunchBox		Beenden
+Horizontal layout	LaunchBox		Horizontale Anordnung
+New	LaunchBox		Neu
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Senden des 'open folder' Kommandos zu Tracker fehlgeschlagen.\n\nFehler:
+Pad %1	LaunchBox		Block %1

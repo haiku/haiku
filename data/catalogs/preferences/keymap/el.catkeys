@@ -1,23 +1,23 @@
 1	greek, modern (1453-)	x-vnd.Haiku-Keymap	140876782
+Sample and clipboard:	Keymap window		Δείγμα και πρόχειρο:
+Switch shortcut keys to Windows/Linux mode	Keymap window		Αλλαγή πλήκτρων συντόμευσης σε λειτουργία Windows/Linux
 Revert	Modifier keys window		Επαναφορά
+Acute trigger	Keymap window		Οξεία
+Save as…	Keymap window		Αποθήκευση ως...
 Tilde trigger	Keymap window		Περισπωμένη
-Grave trigger	Keymap window		Βαρεία
-Select dead keys	Keymap window		Επιλογή νεκρών πλήκτρων
-Quit	Keymap window		Έξοδος
-Switch shortcut keys to Haiku mode	Keymap window		Αλλαγή πλήκτρων συντόμευσης σε λειτουργία Haiku
+(Current)	Keymap window		(Τρέχων)
 Circumflex trigger	Keymap window		Περισπωμένη
-Diaeresis trigger	Keymap window		Διαλυτικά
-Open…	Keymap window		Άνοιγμα...
+Select dead keys	Keymap window		Επιλογή νεκρών πλήκτρων
+Layout	Keymap window		Τύπος πληκτρολογίου
+Revert	Keymap window		Επαναφορά
+Grave trigger	Keymap window		Βαρεία
+Quit	Keymap window		Έξοδος
+User:	Keymap window		Χρήστης:
+Keymap	System name		Διάταξη πληκτρολογίου
+Switch shortcut keys to Haiku mode	Keymap window		Αλλαγή πλήκτρων συντόμευσης σε λειτουργία Haiku
 System:	Keymap window		Σύστημα:
 Switch shortcut keys	Keymap window		Αλλαγή πλήκτρων συντόμευσης
-User:	Keymap window		Χρήστης:
-Sample and clipboard:	Keymap window		Δείγμα και πρόχειρο:
-Layout	Keymap window		Τύπος πληκτρολογίου
-Switch shortcut keys to Windows/Linux mode	Keymap window		Αλλαγή πλήκτρων συντόμευσης σε λειτουργία Windows/Linux
-Revert	Keymap window		Επαναφορά
-Save as…	Keymap window		Αποθήκευση ως...
-File	Keymap window		Αρχείο
-(Current)	Keymap window		(Τρέχων)
 Font	Keymap window		Γραμματοσειρά
-Keymap	System name		Διάταξη πληκτρολογίου
-Acute trigger	Keymap window		Οξεία
+File	Keymap window		Αρχείο
+Diaeresis trigger	Keymap window		Διαλυτικά
+Open…	Keymap window		Άνοιγμα...

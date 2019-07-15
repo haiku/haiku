@@ -1,88 +1,88 @@
 1	swedish	x-vnd.Haiku-Bluetooth	3550394259
-Display	DeviceClass		Skärm
-Capturing	DeviceClass		Fångar
-Printer	DeviceClass		Skrivare
-Uncategorized	DeviceClass		Okategoriserad
-1-17% utilized	DeviceClass		1-17% utnyttjat
 Positioning	DeviceClass		Position
-Rendering	DeviceClass		Rendering
-Phone	DeviceClass		Telefon
-17-33% utilized	DeviceClass		17-33% utnyttjat
-#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Ogiltigt namn
-Combo keyboard/pointing device	DeviceClass		Kombinerad tangentbord/pekenhet
 Controller	DeviceClass		Kontroller
-No service available	DeviceClass		Tjänst ej tillgänglig
-Wearable	DeviceClass	A wearable computer	Bärbar
-Handheld	DeviceClass		Handhållen
-Invalid device class!\n	DeviceClass		Ogiltig enhetsklass!\n
-Sensing device	DeviceClass		Avläsningsenhet
-Computer	DeviceClass		Dator
-Cellular	DeviceClass		Mobil
-Microphone	DeviceClass		Mikrofon
-Unknown (reserved) minor device class	DeviceClass		Okänd (reserverad) mindre enhetsklass
-Cordless	DeviceClass		Trådlös
 Common ISDN access	DeviceClass		Allmän ISDN åtkomst
-83-99% utilized	DeviceClass		83-99% utnyttjat
-Scanner	DeviceClass		Skanner
-Game	DeviceClass		Spel
-Gamepad	DeviceClass		Handkontroll
-(reserved)	DeviceClass		(reserverad)
-Desktop workstation	DeviceClass		Stationär dator
-Audio/Video	DeviceClass		Ljud/Bild
-Glasses	DeviceClass		Glasögon
+Unknown (reserved) minor device class	DeviceClass		Okänd (reserverad) mindre enhetsklass
+Uncategorized	DeviceClass		Okategoriserad
 Keyboard	DeviceClass		Tangentbord
-Camera	DeviceClass		Kamera
-Major class: 	DeviceClass		Större klass:
-50-67% utilized	DeviceClass		50-67% utnyttjat
-Card reader	DeviceClass		Kortläsare
-Set-top box	DeviceClass		Digitalbox
-Helmet	DeviceClass		Hjälm
-Laptop	DeviceClass		Bärbar dator
-Car audio	DeviceClass		Billjud
-SIM card reader	DeviceClass		SIM-kortsläsare
-Headphones	DeviceClass		Hörlurar
-Information	DeviceClass		Information
-Remote control	DeviceClass		Fjärrkontroll
-Service classes: 	DeviceClass		Serviceklasser:
-Pager	DeviceClass	A small radio device to receive short text messages	Personsökare
-Object transfer	DeviceClass		Objektöverföring
-Gaming/Toy	DeviceClass		Spel/Leksak
-Audio	DeviceClass		Ljud
-Robot	DeviceClass		Robot
-Camcorder	DeviceClass		Videokamera
-Digitizer tablet	DeviceClass		Digitaliseringsbord
-Loudspeaker	DeviceClass		Högtalare
-Joystick	DeviceClass		Spelspak
-LAN access	DeviceClass		LAN-åtkomst
-Wrist watch	DeviceClass		Handledsklocka
-Minor class: 	DeviceClass		Mindre klass:
-Networking	DeviceClass		Nätverk
-Portable audio	DeviceClass		Portabelt ljud
-Device conforms to the headset profile	DeviceClass		Enheten passar till headsetprofilen
-Hands-free	DeviceClass		Hands-free
-#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Ogiltigt namn
-Vehicle	DeviceClass		Fordon
-Palm	DeviceClass	A palm-held device	Handflata
-Video display and loudspeaker	DeviceClass		Videoskärm och högtalare
-Peripheral	DeviceClass		Tillbehör
-#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Ogiltigt namn
-Wired modem or voice gateway	DeviceClass		Trådmodem eller telefonigateway
-Jacket	DeviceClass		Uttag
-Unspecified	DeviceClass		Ospecifierad
-Fully available	DeviceClass		Fullt tillgänglig
-67-83% utilized	DeviceClass		67-83% utnyttjat
-Not implemented	RemoteDevice		Ej implementerat
-#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Ogiltigt namn
-Server	DeviceClass		Server
-Video conferencing	DeviceClass		Videokonferens
-Video camera	DeviceClass		Videokamera
-HiFi audio device	DeviceClass		HiFi-ljudenhet
 Smart phone	DeviceClass		Smart phone
-Telephony	DeviceClass		Telefoni
-Doll/Action figure	DeviceClass		Docka/Leksaksgubbe
 VCR	DeviceClass		Videoapparat
-Video monitor	DeviceClass		Videomonitor
-Pointing device	DeviceClass		Pekenhet
-Miscellaneous	DeviceClass		Diverse
-33-50% utilized	DeviceClass		33-50% utnyttjat
+Cellular	DeviceClass		Mobil
+Audio	DeviceClass		Ljud
+Audio/Video	DeviceClass		Ljud/Bild
+Car audio	DeviceClass		Billjud
+Major class: 	DeviceClass		Större klass:
+HiFi audio device	DeviceClass		HiFi-ljudenhet
+Microphone	DeviceClass		Mikrofon
+Capturing	DeviceClass		Fångar
+Jacket	DeviceClass		Uttag
+50-67% utilized	DeviceClass		50-67% utnyttjat
+Headphones	DeviceClass		Hörlurar
 Imaging	DeviceClass		Avbildning
+Device conforms to the headset profile	DeviceClass		Enheten passar till headsetprofilen
+Remote control	DeviceClass		Fjärrkontroll
+Fully available	DeviceClass		Fullt tillgänglig
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Ogiltigt namn
+Server	DeviceClass		Server
+No service available	DeviceClass		Tjänst ej tillgänglig
+Printer	DeviceClass		Skrivare
+Card reader	DeviceClass		Kortläsare
+Wired modem or voice gateway	DeviceClass		Trådmodem eller telefonigateway
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Ogiltigt namn
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Ogiltigt namn
+Camcorder	DeviceClass		Videokamera
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Ogiltigt namn
+17-33% utilized	DeviceClass		17-33% utnyttjat
+Desktop workstation	DeviceClass		Stationär dator
+Unspecified	DeviceClass		Ospecifierad
+Miscellaneous	DeviceClass		Diverse
+Robot	DeviceClass		Robot
+Vehicle	DeviceClass		Fordon
+LAN access	DeviceClass		LAN-åtkomst
+Glasses	DeviceClass		Glasögon
+Phone	DeviceClass		Telefon
+Laptop	DeviceClass		Bärbar dator
+67-83% utilized	DeviceClass		67-83% utnyttjat
+Cordless	DeviceClass		Trådlös
+Invalid device class!\n	DeviceClass		Ogiltig enhetsklass!\n
+Minor class: 	DeviceClass		Mindre klass:
+Doll/Action figure	DeviceClass		Docka/Leksaksgubbe
+Not implemented	RemoteDevice		Ej implementerat
+33-50% utilized	DeviceClass		33-50% utnyttjat
+Gaming/Toy	DeviceClass		Spel/Leksak
+Video camera	DeviceClass		Videokamera
+Handheld	DeviceClass		Handhållen
+Service classes: 	DeviceClass		Serviceklasser:
+Loudspeaker	DeviceClass		Högtalare
+83-99% utilized	DeviceClass		83-99% utnyttjat
+SIM card reader	DeviceClass		SIM-kortsläsare
+Computer	DeviceClass		Dator
+Scanner	DeviceClass		Skanner
+Wearable	DeviceClass	A wearable computer	Bärbar
+Display	DeviceClass		Skärm
+Gamepad	DeviceClass		Handkontroll
+Video monitor	DeviceClass		Videomonitor
+Palm	DeviceClass	A palm-held device	Handflata
+Joystick	DeviceClass		Spelspak
+Networking	DeviceClass		Nätverk
+Telephony	DeviceClass		Telefoni
+Game	DeviceClass		Spel
+Video display and loudspeaker	DeviceClass		Videoskärm och högtalare
+Wrist watch	DeviceClass		Handledsklocka
+Sensing device	DeviceClass		Avläsningsenhet
+Pointing device	DeviceClass		Pekenhet
+(reserved)	DeviceClass		(reserverad)
+Rendering	DeviceClass		Rendering
+Information	DeviceClass		Information
+Helmet	DeviceClass		Hjälm
+Pager	DeviceClass	A small radio device to receive short text messages	Personsökare
+Hands-free	DeviceClass		Hands-free
+Digitizer tablet	DeviceClass		Digitaliseringsbord
+Portable audio	DeviceClass		Portabelt ljud
+Camera	DeviceClass		Kamera
+1-17% utilized	DeviceClass		1-17% utnyttjat
+Combo keyboard/pointing device	DeviceClass		Kombinerad tangentbord/pekenhet
+Video conferencing	DeviceClass		Videokonferens
+Peripheral	DeviceClass		Tillbehör
+Object transfer	DeviceClass		Objektöverföring
+Set-top box	DeviceClass		Digitalbox

@@ -1,5 +1,5 @@
 1	indonesian	x-vnd.Haiku-notification_server	2022780929
 Warning	NotificationWindow		Peringatan
+Notification	NotificationWindow		Notifikasi
 OK	NotificationWindow		Oke
 Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Tidak dapat memulai pengaturan umum monitor.\nPerubahan filter live dinonaktifkan.
-Notification	NotificationWindow		Notifikasi

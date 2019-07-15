@@ -1,74 +1,73 @@
-1	ukrainian	x-vnd.Haiku-Appearance	2499598353
-Plain font:	Font view		Простий шрифт:
-Control highlight	Colors tab		Керування виділенням
+1	ukrainian	x-vnd.Haiku-Appearance	583615507
 Control border	Colors tab		Керування межею
-Antialiasing type:	AntialiasingSettingsView		Тип зглажування:
-Shadow	Colors tab		Тінь
-On	AntialiasingSettingsView		Увімкнути
-Defaults	APRWindow		Типове
-Link hover	Colors tab		Зависле посилання
-Grayscale	AntialiasingSettingsView		Відтінки сірого
-Shine	Colors tab		Сяйво
-About	DecorSettingsView		Про
-About decorator	DecorSettingsView		Про Декоратор
+Control mark	Colors tab		Відмітка
 Off	AntialiasingSettingsView		Вимкнути
-Link text	Colors tab		Текст посилання
-Link active	Colors tab		Активне посилання
-Choose Decorator	DecorSettingsView		Вибір Декоратора
+Window border	Colors tab		Межа вікна
+Inactive window tab	Colors tab		Заголовок неактивного вікна
+Defaults	APRWindow		Типове
+Shadow	Colors tab		Тінь
+Document background	Colors tab		Тло документа
+List background	Colors tab		Тло списку
+Fixed font:	Font view		Моноширинний шрифт:
+Appearance	System name		Вигляд
+Reduce colored edges filter strength:	AntialiasingSettingsView		Зменшити кольорову міцність кромки фільтра:
+Glyph hinting:	AntialiasingSettingsView		Уточнення:
+Menu item text	Colors tab		Текст елемента меню
+About decorator	DecorSettingsView		Про Декоратор
+Antialiasing menu	AntialiasingSettingsView		Меню зглажування
 Success	Colors tab		Успішно
-Inactive window tab text	Colors tab		Текст заголовку неактивного вікна
+About	DecorSettingsView		Про
+Shine	Colors tab		Сяйво
+Arrow style	DecorSettingsView		Стиль стрілок
+On	AntialiasingSettingsView		Увімкнути
+Decorator:	DecorSettingsView		Декоратор:
+Menu background	Colors tab		Тло меню
+Revert	APRWindow		Повернути
+List item text	Colors tab		Текст елементів списку
+OK	DecorSettingsView		Гаразд
+Control text	Colors tab		Текст керування
+Look and feel	APRWindow		Вигляд і поведінка
+Selected menu item background	Colors tab		Тло вибраного пункта меню
+Link active	Colors tab		Активне посилання
+Antialiasing	APRWindow		Згладжування
+Menu font:	Font view		Шрифт меню:
+Bold font:	Font view		Товстий шрифт:
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nАвторы:\n\t%decorAuthors\n\nURL: %decorURL\nЛіцензія: %decorLic\n\n%decorDesc\n
+Choose Decorator	DecorSettingsView		Вибір Декоратора
+Strong	AntialiasingSettingsView		Сильно
 Failure	Colors tab		Призупинено
+Double:	DecorSettingsView		Подвійний:
+Selected menu item text	Colors tab		Текст виділеного елемента меню
+Size:	Font Selection view		Розмір:
+Panel background	Colors tab		Тло панелі
+Plain font:	Font view		Простий шрифт:
+Window tab text	Colors tab		Текст заголовку вікна
+Navigation pulse	Colors tab		Навігація pulse
+LCD subpixel	AntialiasingSettingsView		Субпіксельне зглажування
+Window tab	Colors tab		Заголовок вікна
+Link text	Colors tab		Текст посилання
+Tooltip background	Colors tab		Тло підказки
+Scroll bar thumb	Colors tab		Повзунок прокрутки
+Link visited	Colors tab		Відвідане посилання
+Selected menu item border	Colors tab		Межа виділеного елемента меню
+Tooltip text	Colors tab		Текст підказки
+Control background	Colors tab		Керування тлом
+Selected list item text	Colors tab		Текст виділеного елемента списку
+Selected list item background	Colors tab		Тло вибраного пункта меню
+Inactive window tab text	Colors tab		Текст заголовку неактивного вікна
+Navigation base	Colors tab		Основа навігації
+Fonts	APRWindow		Шрифти
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Жебракують філософи при ґанку церкви в Гадячі, ще й шатро їхнє п’яне знаємо.
+Grayscale	AntialiasingSettingsView		Відтінки сірого
+Antialiasing type:	AntialiasingSettingsView		Тип зглажування:
+Panel text	Colors tab		Текст панелі
 Hinting menu	AntialiasingSettingsView		Меню-підказки
 Scroll bar:	DecorSettingsView		Смуга прокрутки:
-Document background	Colors tab		Тло документа
-Status bar	Colors tab		Смуга стану
-Revert	APRWindow		Повернути
-Window tab	Colors tab		Заголовок вікна
-Tooltip background	Colors tab		Тло підказки
-Selected menu item background	Colors tab		Тло вибраного пункта меню
-Antialiasing	APRWindow		Згладжування
-Navigation base	Colors tab		Основа навігації
-Selected list item text	Colors tab		Текст виділеного елемента списку
-Window border	Colors tab		Межа вікна
-Double:	DecorSettingsView		Подвійний:
-Window tab text	Colors tab		Текст заголовку вікна
-Document text	Colors tab		Текст документа
-Navigation pulse	Colors tab		Навігація pulse
-Selected menu item text	Colors tab		Текст виділеного елемента меню
-Menu background	Colors tab		Тло меню
-List background	Colors tab		Тло списку
-OK	DecorSettingsView		Гаразд
-Control mark	Colors tab		Відмітка
-Size:	Font Selection view		Розмір:
-Link visited	Colors tab		Відвідане посилання
-Decorator:	DecorSettingsView		Декоратор:
-Selected list item background	Colors tab		Тло вибраного пункта меню
-Panel background	Colors tab		Тло панелі
-Menu font:	Font view		Шрифт меню:
-Colors	APRWindow		Кольори
-Control background	Colors tab		Керування тлом
-Inactive window tab	Colors tab		Заголовок неактивного вікна
-List item text	Colors tab		Текст елементів списку
-Appearance	System name		Вигляд
-Fixed font:	Font view		Моноширинний шрифт:
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Жебракують філософи при ґанку церкви в Гадячі, ще й шатро їхнє п’яне знаємо.
-%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nАвторы:\n\t%decorAuthors\n\nURL: %decorURL\nЛіцензія: %decorLic\n\n%decorDesc\n
-Reduce colored edges filter strength:	AntialiasingSettingsView		Зменшити кольорову міцність кромки фільтра:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Субпіксельне зглажування в комбінації з уточненням недоступне у цій збірці Haiku через можливі патентні проблеми. Для включення цієї можливості Вам необхідно зібрати Haiku самостійно з включенням особливих опцій у заголовку конфігурації FreeType.
-Scroll bar thumb	Colors tab		Повзунок прокрутки
-Control text	Colors tab		Текст керування
-Single:	DecorSettingsView		Одинарний:
-Tooltip text	Colors tab		Текст підказки
-Bold font:	Font view		Товстий шрифт:
-Inactive window border	Colors tab		Межа неактивного вікна
-Menu item text	Colors tab		Текст елемента меню
-LCD subpixel	AntialiasingSettingsView		Субпіксельне зглажування
-Selected menu item border	Colors tab		Межа виділеного елемента меню
-Strong	AntialiasingSettingsView		Сильно
-Panel text	Colors tab		Текст панелі
-Arrow style	DecorSettingsView		Стиль стрілок
 Monospaced fonts only	AntialiasingSettingsView		Тільки моноширинні шрифти
-Look and feel	APRWindow		Вигляд і поведінка
-Antialiasing menu	AntialiasingSettingsView		Меню зглажування
-Fonts	APRWindow		Шрифти
-Glyph hinting:	AntialiasingSettingsView		Уточнення:
+Document text	Colors tab		Текст документа
+Inactive window border	Colors tab		Межа неактивного вікна
+Colors	APRWindow		Кольори
+Control highlight	Colors tab		Керування виділенням
+Status bar	Colors tab		Смуга стану
+Link hover	Colors tab		Зависле посилання
+Single:	DecorSettingsView		Одинарний:

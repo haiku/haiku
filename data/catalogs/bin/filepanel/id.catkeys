@@ -1,20 +1,20 @@
 1	indonesian	x-vnd.mmu_man.filepanel	1802971238
 display a load/save file panel\n	FilePanelApp		tampilkan panel berkas muat/simpan\n
-options:\n	FilePanelApp		pilihan:\n
-usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		penggunaan: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n
--k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tjenis masukan yang bisa dibuka (rasa): kombinasi apa saja dari f, d, s (file (default), directory, symlink)\n
-usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		penggunaan: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n
--d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tbuka di <folder>\n
-%s not a valid option\n	FilePanelApp		%s adalah pilihan yang tidak sah\n
 short\tlong\tdescription\n	FilePanelApp		pendek\tpanjang\tdeskripsi\n
-%s: this option requires a parameter\n	FilePanelApp		%s: opsi ini membutuhkan satu parameter\n
--l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tgunakan memuat FilePanel (standar)\n
--f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\ttidak-diterapkan\n
+%s not a valid option\n	FilePanelApp		%s adalah pilihan yang tidak sah\n
 -s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tgunakan simpan FilePanel\n
--n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tatur nama default untuk penyimpanan\n
--m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tmembuat FilePanel tipe modal\n
+%s: this option requires a parameter\n	FilePanelApp		%s: opsi ini membutuhkan satu parameter\n
 -h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\ttampilkan penggunaan\n
--a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\ttak-diimplementasikan\n
--1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\thanya ijinkan 1 berkas untuk dipilih\n
--t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tatur judul FilePanel window\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tgunakan memuat FilePanel (standar)\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tatur nama default untuk penyimpanan\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tjenis masukan yang bisa dibuka (rasa): kombinasi apa saja dari f, d, s (file (default), directory, symlink)\n
 %s: UNIMPLEMENTED\n	FilePanelApp		%s: TAK-DIIMPLEMENTASIKAN\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tatur judul FilePanel window\n
+-f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\ttidak-diterapkan\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		penggunaan: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\thanya ijinkan 1 berkas untuk dipilih\n
+-a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\ttak-diimplementasikan\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tmembuat FilePanel tipe modal\n
+options:\n	FilePanelApp		pilihan:\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tbuka di <folder>\n
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		penggunaan: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n

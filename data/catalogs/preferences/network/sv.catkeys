@@ -1,53 +1,53 @@
 1	swedish	x-vnd.Haiku-Network	1314732966
-Static	IntefaceAddressView		Statisk
+Ethernet device	InterfaceListItem		Ethernetenhet
+Link speed:	IntefaceView		Länkhastighet:
+disconnected	IntefaceView		frånkopplad
+IP Address:	IntefaceAddressView		IP-adress:
+WPA	WPA protected network		WPA
+Network:	IntefaceView		Nätverk:
+Received:	IntefaceView		Mottaget:
+New…	NetworkWindow		Ny…
+no link	InterfaceListItem		Ingen länk
+Other	NetworkWindow		Andra
+Sent:	IntefaceView		Skickat:
+Gateway:	IntefaceAddressView		Förmedlingsnod:
+The netmask defines your local network	IntefaceAddressView		Nätmasken definierar ditt lokala nätverk
+Your IP address	IntefaceAddressView		Din IP-adress
+DHCP	IntefaceAddressView		DHCP
+Dial Up	NetworkWindow		Uppringd
+Netmask:	IntefaceAddressView		Nätmask:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Tjänster
-no link	InterfaceListItem		Ingen länk
-WPA2	WPA2 protected network		WPA2
-Choose automatically	IntefaceView		Välj automatiskt
-connected	IntefaceView		ansluten
-Ethernet device	InterfaceListItem		Ethernetenhet
-The netmask defines your local network	IntefaceAddressView		Nätmasken definierar ditt lokala nätverk
-Dial-up connection	InterfaceListItem		Uppringd anslutning
-%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
-Network	NetworkWindow		Nätverk
-VPN connection	InterfaceListItem		VPN-uppkoppling
-Show network status in Deskbar	NetworkWindow		Visa nätverksstatus i Deskbar
-The method for obtaining an IP address	IntefaceAddressView		Metoden för att få en IP adress
-connected	InterfaceListItem		ansluten
-disabled	InterfaceListItem		inaktiverad
-Dial Up	NetworkWindow		Uppringd
-Apply	IntefaceAddressView		Använd
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Installatera NätverksStatus i Deskbar misslyckades: %s
+Revert	NetworkWindow		Återställ
+WEP	WEP protected network		WEP
+<no wireless networks found>	IntefaceView		<Inget nätverk hittades>
+connected	IntefaceView		ansluten
+VPN	NetworkWindow		VPN
+Apply	IntefaceAddressView		Använd
+Disable	ServiceView		Inaktivera
+WPA2	WPA2 protected network		WPA2
+Show network status in Deskbar	NetworkWindow		Visa nätverksstatus i Deskbar
+Mode:	IntefaceAddressView		Läge:
+connected	InterfaceListItem		ansluten
+Static	IntefaceAddressView		Statisk
+launch error	NetworkWindow		Startfel
+Renegotiate	IntefaceView		Omförhandla
 MAC address:	IntefaceView		MAC-adress:
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+disabled	InterfaceListItem		inaktiverad
+Dial-up connection	InterfaceListItem		Uppringd anslutning
+The method for obtaining an IP address	IntefaceAddressView		Metoden för att få en IP adress
+Automatic	IntefaceAddressView		Automatisk
+Choose automatically	IntefaceView		Välj automatiskt
+Status:	IntefaceView		Status:
+Disable	IntefaceView		Inaktivera
+Manage…	NetworkWindow		Hantera...
+open	Open network		öppna
+Network	NetworkWindow		Nätverk
+Your gateway to the internet	IntefaceAddressView		Din förmedlingsnod till internet
+Enable	ServiceView		Aktivera
+Ok	NetworkWindow		OK
 Wireless device	InterfaceListItem		Trådlös enhet
 Disabled	IntefaceAddressView		Inaktiverad
-Renegotiate	IntefaceView		Omförhandla
-Ok	NetworkWindow		OK
-Network:	IntefaceView		Nätverk:
-launch error	NetworkWindow		Startfel
-Other	NetworkWindow		Andra
-Automatic	IntefaceAddressView		Automatisk
-Gateway:	IntefaceAddressView		Förmedlingsnod:
-Revert	NetworkWindow		Återställ
-Enable	ServiceView		Aktivera
-disconnected	IntefaceView		frånkopplad
-Status:	IntefaceView		Status:
-Link speed:	IntefaceView		Länkhastighet:
-Your gateway to the internet	IntefaceAddressView		Din förmedlingsnod till internet
-New…	NetworkWindow		Ny…
-DHCP	IntefaceAddressView		DHCP
-Mode:	IntefaceAddressView		Läge:
-WPA	WPA protected network		WPA
-Sent:	IntefaceView		Skickat:
-open	Open network		öppna
-IP Address:	IntefaceAddressView		IP-adress:
-VPN	NetworkWindow		VPN
-Received:	IntefaceView		Mottaget:
-Disable	IntefaceView		Inaktivera
-<no wireless networks found>	IntefaceView		<Inget nätverk hittades>
-Netmask:	IntefaceAddressView		Nätmask:
-Disable	ServiceView		Inaktivera
-Your IP address	IntefaceAddressView		Din IP-adress
-Manage…	NetworkWindow		Hantera...
-WEP	WEP protected network		WEP
+VPN connection	InterfaceListItem		VPN-uppkoppling

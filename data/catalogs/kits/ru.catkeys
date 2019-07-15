@@ -1,42 +1,42 @@
 1	russian	x-vnd.Haiku-libbe	3337473349
-gamma	AboutWindow		гамма
-beta	AboutWindow		бета
-%3.2f GiB	StringForSize		%3.2f ГБ
-Written by:	AboutWindow		Разработан:
-About %app%	AboutMenuItem		О программе…
-Cut	TextView		Вырезать
-Version	AboutWindow		Версия
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Невозможно удалить репликант \"%description\".\n%error
-Copy	TextView		Копировать
-%3.2f KiB	StringForSize		%3.2f КБ
-alpha	AboutWindow		альфа
-Error	PrintJob		Ошибка
-All Rights Reserved.	AboutWindow		Все права защищены.
 {0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# байт} few{# байта} other{# байтов}}
-About %app%	AboutWindow		О программе…
-No pages to print!	PrintJob		Нет страниц для печати!
+All Rights Reserved.	AboutWindow		Все права защищены.
+gold master	AboutWindow		золотая
+Undo	TextView		Отменить
+gamma	AboutWindow		гамма
+development	AboutWindow		в разработке
 OK	Dragger		ОК
 OK	PrintJob		ОК
-Green:	ColorControl		Зеленый:
-Version history:	AboutWindow		История версий:
-Remove replicant	Dragger		Удалить репликант
-Select all	TextView		Выделить все
-OK	AboutWindow		ОК
-OK	ZombieReplicantView		ОК
 Print Server is not responding.	PrintJob		Сервер печати не отвечает.
+About %app%	AboutMenuItem		О программе…
+Warning	Dragger		Внимание
+Green:	ColorControl		Зеленый:
+Redo	TextView		Повторить
+No pages to print!	PrintJob		Нет страниц для печати!
+beta	AboutWindow		бета
+OK	ZombieReplicantView		ОК
+Cut	TextView		Вырезать
+%3.2f GiB	StringForSize		%3.2f ГБ
+Can't delete this replicant from its original application. Life goes on.	Dragger		Не удалось удалить этот репликант из его изначальное приложения. Жизнь продолжается.
+Error	ZombieReplicantView		Ошибка
 Paste	TextView		Вставить
+OK	AboutWindow		ОК
 Special Thanks:	AboutWindow		Особые благодарности:
 %.2f TiB	StringForSize		%.2f ТБ
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Не удалось найти приложение этого репликанта. Не указана сигнатура приложения.\n%error
-Redo	TextView		Повторить
-<empty>	Menu		<пусто>
-Warning	Dragger		Внимание
-Undo	TextView		Отменить
+Remove replicant	Dragger		Удалить репликант
+Version	AboutWindow		Версия
 Red:	ColorControl		Красный:
+<empty>	Menu		<пусто>
+Copy	TextView		Копировать
+Select all	TextView		Выделить все
+alpha	AboutWindow		альфа
 %3.2f MiB	StringForSize		%3.2f МБ
+Error	PrintJob		Ошибка
+About %app%	AboutWindow		О программе…
 About %app…	Dragger		О программе…
-development	AboutWindow		в разработке
-Error	ZombieReplicantView		Ошибка
+Version history:	AboutWindow		История версий:
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Не удалось найти приложение этого репликанта. Не указана сигнатура приложения.\n%error
+%3.2f KiB	StringForSize		%3.2f КБ
 Blue:	ColorControl		Синий:
-gold master	AboutWindow		золотая
-Can't delete this replicant from its original application. Life goes on.	Dragger		Не удалось удалить этот репликант из его изначальное приложения. Жизнь продолжается.
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Невозможно удалить репликант \"%description\".\n%error
+Written by:	AboutWindow		Разработан:

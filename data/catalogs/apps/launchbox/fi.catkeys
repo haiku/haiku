@@ -1,35 +1,35 @@
 1	finnish	x-vnd.Haiku-LaunchBox	3692177981
-New	LaunchBox		Uusi
 Set description…	LaunchBox		Aseta kuvaus...
-Vertical layout	LaunchBox		Pystysuora sijoittelu
-OK	LaunchBox		Valmis
-Pad 1	LaunchBox		Alusta 1
-last chance	LaunchBox		viimeinen mahdollisuus
-Quit	LaunchBox		Poistu
-Open containing folder	LaunchBox		Avaa sisältyvä kansio
-Clear button	LaunchBox		Nollaa painike
-LaunchBox	System name		Käynnistysikkuna
-Ignore double-click	LaunchBox		Ohita kaksoisnapsautukset
-Auto-raise	LaunchBox		Automaattisesti päällimmäinen
-Show on all workspaces	LaunchBox		Näytä kaikki työtilat
-Show window border	LaunchBox		Näytä ikkunaraja
-Pad	LaunchBox		Alusta
-Icon size	LaunchBox		Kuvakekoko
-Bummer	LaunchBox		Valmis
-Cancel	LaunchBox		Peru
-Remove button	LaunchBox		Poista painike
-Horizontal layout	LaunchBox		Vaakasuora sijoittelu
-\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nAllekirjoituksella ’%2’ varustetun sovelluksen käynnistys epäonnistui.\n\nVirhe:
-Failed to launch '%1'.\n\nError:	LaunchBox		Sovelluksen ’%1’ käynnistys epäonnistui:\n\nVirhe:
-Name Panel	LaunchBox		Nimipaneeli
-Add button here	LaunchBox		Lisää painike tänne
-Description for '%3'	LaunchBox		Kohteen ’%3’ kuvaus
-Settings	LaunchBox		Asetukset
-Failed to launch 'something', error in Pad data.	LaunchBox		’Jonkin’ käynnistäminen epäonnistui, virhe alustatiedoissa.
-Pad %1	LaunchBox		Alusta %1
-Close	LaunchBox		Sulje
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Komennon ’avaa kansio’ lähettäminen Seuraajalle epäonnistui.\n\nVirhe: 
-You can drag an icon here.	LaunchBox		Voit raahata kuvakkeen tänne.
-Clone	LaunchBox		Klooni
-launch popup	LaunchBox		käynnistysponnahdusikkuna
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Haluatko todella sulkea alustan?\n(Alustaa ei muisteta.)
+OK	LaunchBox		Valmis
+Ignore double-click	LaunchBox		Ohita kaksoisnapsautukset
+Show on all workspaces	LaunchBox		Näytä kaikki työtilat
+Name Panel	LaunchBox		Nimipaneeli
+Clone	LaunchBox		Klooni
+Description for '%3'	LaunchBox		Kohteen ’%3’ kuvaus
+Show window border	LaunchBox		Näytä ikkunaraja
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nAllekirjoituksella ’%2’ varustetun sovelluksen käynnistys epäonnistui.\n\nVirhe:
+Failed to launch 'something', error in Pad data.	LaunchBox		’Jonkin’ käynnistäminen epäonnistui, virhe alustatiedoissa.
+LaunchBox	System name		Käynnistysikkuna
+Auto-raise	LaunchBox		Automaattisesti päällimmäinen
+Icon size	LaunchBox		Kuvakekoko
+Open containing folder	LaunchBox		Avaa sisältyvä kansio
+Add button here	LaunchBox		Lisää painike tänne
+Cancel	LaunchBox		Peru
+launch popup	LaunchBox		käynnistysponnahdusikkuna
+Clear button	LaunchBox		Nollaa painike
+Bummer	LaunchBox		Valmis
+last chance	LaunchBox		viimeinen mahdollisuus
+You can drag an icon here.	LaunchBox		Voit raahata kuvakkeen tänne.
+Pad 1	LaunchBox		Alusta 1
+Failed to launch '%1'.\n\nError:	LaunchBox		Sovelluksen ’%1’ käynnistys epäonnistui:\n\nVirhe:
+Settings	LaunchBox		Asetukset
+Vertical layout	LaunchBox		Pystysuora sijoittelu
+Pad	LaunchBox		Alusta
+Close	LaunchBox		Sulje
+Remove button	LaunchBox		Poista painike
+Quit	LaunchBox		Poistu
+Horizontal layout	LaunchBox		Vaakasuora sijoittelu
+New	LaunchBox		Uusi
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Komennon ’avaa kansio’ lähettäminen Seuraajalle epäonnistui.\n\nVirhe: 
+Pad %1	LaunchBox		Alusta %1

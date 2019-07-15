@@ -1,22 +1,21 @@
-1	japanese	x-vnd.Haiku-NetworkStatus	1729819859
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		ネットワーク状況のオプション:\n\t--deskbar\tDeskbarにレプリカントを自動的に追加します。\n\t--help\t\tこの情報を表示して終了します。\n
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		ネットワーク状況をウィンドウで動かすことや、Deskbarにインストールすることができます。
-<no wireless networks found>	NetworkStatusView		<無線ネットワークが見つかりません>
-Run in window	NetworkStatus		ウィンドウで実行
-No link	NetworkStatusView		リンク無し
-Install in Deskbar	NetworkStatus		Deskbarにインストール
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		ネットワーク設定の起動に失敗しました。\n\nエラー:
+1	japanese	x-vnd.Haiku-NetworkStatus	3823341665
 Netmask	NetworkStatusView		ネットマスク
-Broadcast	NetworkStatusView		ブロードキャスト
-Unknown	NetworkStatusView		不明
-Network Status	NetworkStatusView		ネットワーク状況
-Ready	NetworkStatusView		完了
-No stateful configuration	NetworkStatusView		ステートフル設定がありません
-%ifaceName information:\n	NetworkStatusView		%ifaceName 情報:\n
-Configuring	NetworkStatusView		設定中
-Address	NetworkStatusView		アドレス
-OK	NetworkStatusView		OK
-NetworkStatus	System name		ネットワーク状況
-Open network preferences…	NetworkStatusView		ネットワーク設定を開く...
-Could not join wireless network:\n	NetworkStatusView		無線ネットワークに参加できませんでした:\n
 Quit	NetworkStatusView		終了
+Unknown	NetworkStatusView		不明
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		ネットワーク設定の起動に失敗しました。\n\nエラー:
+Install in Deskbar	NetworkStatus		Deskbarにインストール
+Open network preferences…	NetworkStatusView		ネットワーク設定を開く...
+NetworkStatus	System name		ネットワーク状況
+OK	NetworkStatusView		OK
+No link	NetworkStatusView		リンク無し
+Could not join wireless network:\n	NetworkStatusView		無線ネットワークに参加できませんでした:\n
+Ready	NetworkStatusView		完了
+Network Status	NetworkStatusView		ネットワーク状況
+Address	NetworkStatusView		アドレス
+No stateful configuration	NetworkStatusView		ステートフル設定がありません
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		ネットワーク状況をウィンドウで動かすことや、Deskbarにインストールすることができます。
+Broadcast	NetworkStatusView		ブロードキャスト
+%ifaceName information:\n	NetworkStatusView		%ifaceName 情報:\n
+Run in window	NetworkStatus		ウィンドウで実行
+<no wireless networks found>	NetworkStatusView		<無線ネットワークが見つかりません>
+Configuring	NetworkStatusView		設定中

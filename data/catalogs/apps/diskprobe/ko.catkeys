@@ -1,75 +1,75 @@
 1	korean	x-vnd.Haiku-DiskProbe	1200296126
-File offset: 	ProbeView		파일 오프셋: 
-%ld (native)	ProbeView		%ld (네이티브)
-64 bit unsigned value:	TypeEditors		64 비트 부호없는 값:
-Find again	ProbeView		다시 찾기
-Text	FindWindow		텍스트
-Find…	ProbeView		찾기…
-Case sensitive	FindWindow		대소문자 구분
-Cancel	OpenWindow		취소
-Close	AttributeWindow		닫기
-File	ProbeView		파일
-Attribute	ProbeView		속성
-Floating-point value:	TypeEditors		부동 소수점 포인트:
-16 bit	TypeEditors		16 비트
-Attributes	ProbeView		속성
-Device offset: 	ProbeView		장치 오프셋: 
-Selection	ProbeView		선택
-DiskProbe	System name		디스크조사
-what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	무엇: '%.4s'\n\n
-File	FileWindow		파일
-OK	DiskProbe		확인
-Boolean	TypeEditors	This is the type of editor	불린
-Paste	ProbeView		붙여넣기
-PNG format	TypeEditors		PNG 형식
-Font size	ProbeView		글자 크기
-Attribute type: 	ProbeView		속성 타입: 
-Attribute	AttributeWindow		속성
-8 bit signed value:	TypeEditors		8 비트 부호있는 값:
-Number:	TypeEditors		숫자:
-Save	ProbeView		저장
-Stop	ProbeView		정지
-Number editor	TypeEditors		숫자 편집기
-Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	16진수
-No type editor available	AttributeWindow		가능한 어떤 타입 편집기도 없음
-Double precision floating-point value:	TypeEditors		선택
-Device: 	ProbeView		장치: 
-Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		당신은 정말로 파일 \"%s\"로부터 이 속성 \"%s\" 을 제거하겠습니까?\n\n당신은 이 작업을 되돌릴 수 없습니다.
-Text	TypeEditors	This is the type of editor	텍스트
-8 bit unsigned value:	TypeEditors		8 비트 부호없는 값:
-Block	ProbeView		블록
-Back	ProbeView		뒤로
-Device	ProbeView		장치
-Unknown type	TypeEditors		알수 없는 형식
-Block 0x%Lx	ProbeView		불록 0x%Lx
-Quit	FileWindow		나가기
-Undo	ProbeView		되돌리기
 Close	ProbeView		닫기
-Number	TypeEditors	This is the type of editor	숫자
-Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	10진수
-16 bit signed value:	TypeEditors		16 비트 부호있는 값:
-String editor	TypeEditors		문자열 편집기
-of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	/0x0
-64 bit signed offset:	TypeEditors		64 비트 부호있는 오프셋:
-Boolean editor	TypeEditors		불린 편집기
-Copy	ProbeView		복사
-none	ProbeView	No attributes	없음
 Boolean value:	TypeEditors		불린 값:
-32 bit size or status:	TypeEditors		32 비트 크기나 상태:
-8 bit palette	TypeEditors		8 비트 팔레트
-Fit	ProbeView	Size of fonts, fits to available room	맞추기
-Probe device	OpenWindow		블록
-Unknown format	TypeEditors		알수 없는 포맷
+File	ProbeView		파일
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	16진수
-MIME type:	TypeEditors		MIME 형식:
-Page setup…	ProbeView		페이지 설정
+8 bit signed value:	TypeEditors		8 비트 부호있는 값:
+Text	TypeEditors	This is the type of editor	텍스트
+File offset: 	ProbeView		파일 오프셋: 
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		당신은 정말로 파일 \"%s\"로부터 이 속성 \"%s\" 을 제거하겠습니까?\n\n당신은 이 작업을 되돌릴 수 없습니다.
+No type editor available	AttributeWindow		가능한 어떤 타입 편집기도 없음
 New…	FileWindow		새 작업…
-DiskProbe request	AttributeWindow		DiskProbe가 요구됨
-Could not read image	TypeEditors	Image means here a picture file, not a disk image.	그림파일을 잀을 수 없음
-Save changes before closing?	ProbeView		닫기 전에 바뀐 것을 저장하겠습니까?
-DiskProbe request	ProbeView		DiskProbe가 요구됨
-Close	FileWindow		닫기
-OK	ProbeView		확인
-Cancel	AttributeWindow		취소
-Cancel	ProbeView		취소
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	무엇: '%.4s'\n\n
+OK	DiskProbe		확인
+DiskProbe	System name		디스크조사
+Back	ProbeView		뒤로
+Device: 	ProbeView		장치: 
 DiskProbe request	DiskProbe		DiskProbe가 요구됨
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	16진수
+Number editor	TypeEditors		숫자 편집기
+Attribute	ProbeView		속성
+Undo	ProbeView		되돌리기
+Cancel	OpenWindow		취소
+Unknown format	TypeEditors		알수 없는 포맷
+Stop	ProbeView		정지
+Cancel	ProbeView		취소
+Font size	ProbeView		글자 크기
+Copy	ProbeView		복사
+Floating-point value:	TypeEditors		부동 소수점 포인트:
+Cancel	AttributeWindow		취소
+16 bit signed value:	TypeEditors		16 비트 부호있는 값:
+DiskProbe request	AttributeWindow		DiskProbe가 요구됨
+64 bit signed offset:	TypeEditors		64 비트 부호있는 오프셋:
+Close	FileWindow		닫기
+Unknown type	TypeEditors		알수 없는 형식
+Number:	TypeEditors		숫자:
+Quit	FileWindow		나가기
+Text	FindWindow		텍스트
+Block 0x%Lx	ProbeView		불록 0x%Lx
+Attribute	AttributeWindow		속성
+16 bit	TypeEditors		16 비트
+32 bit size or status:	TypeEditors		32 비트 크기나 상태:
+Probe device	OpenWindow		블록
+none	ProbeView	No attributes	없음
+Case sensitive	FindWindow		대소문자 구분
+Attributes	ProbeView		속성
+MIME type:	TypeEditors		MIME 형식:
+Fit	ProbeView	Size of fonts, fits to available room	맞추기
+File	FileWindow		파일
+Device	ProbeView		장치
+Close	AttributeWindow		닫기
+Save	ProbeView		저장
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	/0x0
+Attribute type: 	ProbeView		속성 타입: 
+Page setup…	ProbeView		페이지 설정
+Boolean	TypeEditors	This is the type of editor	불린
+64 bit unsigned value:	TypeEditors		64 비트 부호없는 값:
+OK	ProbeView		확인
+Selection	ProbeView		선택
+8 bit unsigned value:	TypeEditors		8 비트 부호없는 값:
+%ld (native)	ProbeView		%ld (네이티브)
+Block	ProbeView		블록
+Find again	ProbeView		다시 찾기
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	그림파일을 잀을 수 없음
+DiskProbe request	ProbeView		DiskProbe가 요구됨
+Double precision floating-point value:	TypeEditors		선택
+Save changes before closing?	ProbeView		닫기 전에 바뀐 것을 저장하겠습니까?
+PNG format	TypeEditors		PNG 형식
+Number	TypeEditors	This is the type of editor	숫자
+String editor	TypeEditors		문자열 편집기
+Boolean editor	TypeEditors		불린 편집기
+Device offset: 	ProbeView		장치 오프셋: 
+Find…	ProbeView		찾기…
+8 bit palette	TypeEditors		8 비트 팔레트
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	10진수
+Paste	ProbeView		붙여넣기

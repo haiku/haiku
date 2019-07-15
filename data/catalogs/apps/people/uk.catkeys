@@ -1,50 +1,50 @@
 1	ukrainian	x-vnd.Be-PEPL	2332202134
-Edit	People		Редагувати
-Error	People		Помилка
-City	People		Місто
-The file '%name%' could not be written.	People		Файл '%name%' не може бути записаний.
-none	Groups list		жодного
-Configure attributes	People		Встановити атрибути
-Company	People		Компанія
-%name% picture	People		%name% малюнок
-Work phone	People		Робочий телефон
-People	System name		Персони
-New person	People		Нова персона
-Select all	People		Вибрати всіх
-File	People		Файл
-Unnamed person	People		Безіменна персона
-Could not create %s.	People		Не вдалося створити %s.
-Country	People		Країна
-Close	People		Закрити
-Group	People		Група
-Nickname	People		Кличка
-Quit	People		Вийти
-Name	People		Ім'я
-Revert	People		Повернути
-Don't save	People		Не зберігати
-Undo	People		Cкасувати
-E-mail	People		Пошта
-Load image…	People		Завантажити зображення…
-OK	People		Гаразд
-Remove image	People		Видалити зображення
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Підключення префлету FileTypes для вибору атрибутів Person призупинене.\n\nПомилка: 
-Home phone	People		Домашній телефон
-Save as…	People		Зберегти як…
-Redo	People		Переробити
-Save changes before closing?	People		Зберегти зміни перед закриттям?
-Paste	People		Вставити
-Drop an image here,\nor use the contextual menu.	People		Перемістіть зображення сюди,\nабо використайте контекстне меню.
-Save	People		Зберегти
-Person	Short mimetype description		Person
+Unnamed person	People		Безіменна персона
 New person…	People		Нова персона
 Address	People		Адреса
-URL	People		URL
-Sorry	People		Вибачте
 Zip	People		Індекс
-Contact information for a person.	Long mimetype description		Контактна інформація персони
-Fax	People		Факс
+Select all	People		Вибрати всіх
+Could not create %s.	People		Не вдалося створити %s.
+Quit	People		Вийти
+Company	People		Компанія
+Name	People		Ім'я
+The file '%name%' could not be written.	People		Файл '%name%' не може бути записаний.
 Contact name	People		Контактне ім'я
-Cut	People		Вирізати
 Cancel	People		Відмінити
+Edit	People		Редагувати
+Save changes before closing?	People		Зберегти зміни перед закриттям?
+People	System name		Персони
+Error	People		Помилка
+Revert	People		Повернути
+Country	People		Країна
+Person	Short mimetype description		Person
+New person	People		Нова персона
+Save	People		Зберегти
+Fax	People		Факс
+URL	People		URL
+%name% picture	People		%name% малюнок
+Home phone	People		Домашній телефон
+none	Groups list		жодного
+Save as…	People		Зберегти як…
+Cut	People		Вирізати
+Contact information for a person.	Long mimetype description		Контактна інформація персони
+Remove image	People		Видалити зображення
+City	People		Місто
+Undo	People		Cкасувати
+Don't save	People		Не зберігати
+Configure attributes	People		Встановити атрибути
+Work phone	People		Робочий телефон
 State	People		Держава
+Nickname	People		Кличка
+OK	People		Гаразд
+File	People		Файл
+Redo	People		Переробити
+Close	People		Закрити
 Copy	People		Копіювати
+Paste	People		Вставити
+E-mail	People		Пошта
+Group	People		Група
+Drop an image here,\nor use the contextual menu.	People		Перемістіть зображення сюди,\nабо використайте контекстне меню.
+Load image…	People		Завантажити зображення…
+Sorry	People		Вибачте

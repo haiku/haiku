@@ -1,21 +1,17 @@
-1	swedish	x-vnd.Haiku-Magnify	931164741
-no clip msg\n	In console, when clipboard is empty after clicking Copy image		inga urklipp\n
-Make square	Magnify-Main		Skapa rektangel
-Copy image	Magnify-Main		Kopiera bild
-usage: magnify [size] (magnify size * size pixels)\n	Console		användning: magnify [storlek] (förstorningsstorlek * storlek i pixlar)\n
-Freeze image	Magnify-Main		Frys bild
+1	swedish	x-vnd.Haiku-Magnify	94607167
+Decrease pixel size	Magnify-Main		Minska pixelstorlek
+Increase pixel size	Magnify-Main		Öka pixelstorlek
 Stick coordinates	Magnify-Main		Lås koordinater
 %width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixlar/pixel}}
-Show info	Magnify-Main		Visa information
-magnify: size must be a multiple of 4\n	Console		förstoraren: storleken måste vara en multipel av 4\n
-Decrease pixel size	Magnify-Main		Minska pixelstorlek
+Copy image	Magnify-Main		Kopiera bild
+Decrease window size	Magnify-Main		Minska fönsterstorlek
+Remove a crosshair	Magnify-Main		Ta bort korshår
+Add a crosshair	Magnify-Main		Lägg till ett korshår
+Freeze image	Magnify-Main		Frys bild
+Increase window size	Magnify-Main		Öka fönsterstorlek
+Save image	Magnify-Main		Spara bild
+Show grid	Magnify-Main		Visa rutnät
 Magnify	System name		FörstoringsGlas
 Info	Magnify-Main		Information
-Remove a crosshair	Magnify-Main		Ta bort korshår
-Show grid	Magnify-Main		Visa rutnät
-Save image	Magnify-Main		Spara bild
-Increase window size	Magnify-Main		Öka fönsterstorlek
-Decrease window size	Magnify-Main		Minska fönsterstorlek
-Increase pixel size	Magnify-Main		Öka pixelstorlek
-  size must be > 4 and a multiple of 4\n	Console		  storleken måste vara > 4 och multipel av 4\n
-Add a crosshair	Magnify-Main		Lägg till ett korshår
+Show info	Magnify-Main		Visa information
+Make square	Magnify-Main		Skapa rektangel

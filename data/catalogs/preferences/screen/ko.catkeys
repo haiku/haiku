@@ -1,51 +1,51 @@
 1	korean	x-vnd.Haiku-Screen	1388881963
-yes	Screen		예
-Use laptop panel:	Screen		랩탑 패널 사용:
-15 bits/pixel, 32768 colors	Screen		15 비트/픽셀, 32768 색상
-/other…	Screen		/다른...
-16 bits/pixel, 65536 colors	Screen		16 비트/픽셀, 65536 색상
-Revert	Screen		되돌리기
-Swap displays:	Screen		디스플레이 바꾸기:
-Combine displays:	Screen		디스플레이 결합:
-Done	Screen		완료
-Set background…	Screen		배경 설정...
-Undo	Screen		되돌리기
-if needed	Screen		필요한 경우
-Screen preferences by the Haiku team	Screen		Haiku 팀에 위한 화면 환경설정
-Screen	System name		화면
-OK	Screen		확인
-Workspaces	Screen		작업공간
-The screen mode could not be set:\n\t%s\n	Screen		스크린 모드가 설정되지 않았습니다:\n\t%s\n
 no	Screen		아니오
-Could not write VESA mode settings file:\n\t	Screen		VESA 모드 설정을 파일에 쓸 수 없습니다:\n\t
-Type or use the left and right arrow keys.	Screen		입력하거나 왼쪽 및 오른쪽 화살표 키를 사용하십시오.
-Warning	Screen		알림
-Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		수평 주파수:\t%lu - %lu kHz\n수직 주파구:\t%lu - %lu Hz\n\n최대 픽셀 클록:\t%g MHz
-Keep	Screen		유지
-Unknown mode	Screen		알 수 없는 모드
-disable	Screen		불가능
-Columns:	Screen		세로:
-All workspaces	Screen		모든 작업공간
-always	Screen		항상
-32 bits/pixel, 16 Million colors	Screen		32 비트/픽셀, 1600 만 색상
-Current workspace	Screen		현재 작업공간
-About	Screen		..에 관하여
-24 bits/pixel, 16 Million colors	Screen		24 비트/픽셀, 1600 만 색상
-horizontally	Screen		수평
-Other…	Screen		다른...
-Cancel	Screen		취소
 bits/pixel	Screen		비트/픽셀
-Refresh rate:	Screen		화면 재생 빈도:
-Hz	Screen		Hz
-Do you wish to keep these settings?	Screen		당신은 이 설정을 계속 유지하겠습니까?
+15 bits/pixel, 32768 colors	Screen		15 비트/픽셀, 32768 색상
 Rows:	Screen		가로:
-vertically	Screen		수직
-Resolution:	Screen		해상도:
-Screen	Screen		화면
 %.1f Hz	Screen		%.1f Hz
-8 bits/pixel, 256 colors	Screen		8 비트/픽셀l, 256 색상
-Apply	Screen		적용
-Refresh rate	Screen		화면 재생 빈도
-%sSerial no.: %s	Screen		%sSerial 번호.: %s
-Colors:	Screen		색상:
+The screen mode could not be set:\n\t%s\n	Screen		스크린 모드가 설정되지 않았습니다:\n\t%s\n
+Keep	Screen		유지
+/other…	Screen		/다른...
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		수평 주파수:\t%lu - %lu kHz\n수직 주파구:\t%lu - %lu Hz\n\n최대 픽셀 클록:\t%g MHz
+Refresh rate:	Screen		화면 재생 빈도:
 Video format:	Screen		비디오 형식:
+Undo	Screen		되돌리기
+OK	Screen		확인
+Current workspace	Screen		현재 작업공간
+vertically	Screen		수직
+All workspaces	Screen		모든 작업공간
+Use laptop panel:	Screen		랩탑 패널 사용:
+Could not write VESA mode settings file:\n\t	Screen		VESA 모드 설정을 파일에 쓸 수 없습니다:\n\t
+Cancel	Screen		취소
+Other…	Screen		다른...
+Screen	Screen		화면
+Colors:	Screen		색상:
+yes	Screen		예
+Swap displays:	Screen		디스플레이 바꾸기:
+%sSerial no.: %s	Screen		%sSerial 번호.: %s
+8 bits/pixel, 256 colors	Screen		8 비트/픽셀l, 256 색상
+Revert	Screen		되돌리기
+always	Screen		항상
+Warning	Screen		알림
+24 bits/pixel, 16 Million colors	Screen		24 비트/픽셀, 1600 만 색상
+Hz	Screen		Hz
+Workspaces	Screen		작업공간
+32 bits/pixel, 16 Million colors	Screen		32 비트/픽셀, 1600 만 색상
+Done	Screen		완료
+16 bits/pixel, 65536 colors	Screen		16 비트/픽셀, 65536 색상
+Screen preferences by the Haiku team	Screen		Haiku 팀에 위한 화면 환경설정
+Refresh rate	Screen		화면 재생 빈도
+if needed	Screen		필요한 경우
+Combine displays:	Screen		디스플레이 결합:
+Unknown mode	Screen		알 수 없는 모드
+About	Screen		..에 관하여
+Columns:	Screen		세로:
+Resolution:	Screen		해상도:
+Apply	Screen		적용
+horizontally	Screen		수평
+disable	Screen		불가능
+Set background…	Screen		배경 설정...
+Type or use the left and right arrow keys.	Screen		입력하거나 왼쪽 및 오른쪽 화살표 키를 사용하십시오.
+Screen	System name		화면
+Do you wish to keep these settings?	Screen		당신은 이 설정을 계속 유지하겠습니까?

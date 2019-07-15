@@ -1,17 +1,17 @@
 1	portuguese (brazil)	x-vnd.Haiku-DataTranslations	4156631142
-DataTranslations	System name		Traduções de Dados
-Cancel	DataTranslations		Cancelar
+Path:	DataTranslations		Caminho:
 Name:	DataTranslations		Nome:
+DataTranslations - Note	DataTranslations		Traduções de Dados - Nota
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		O item '%name' não aparenta ser um Tradutor e não será instalado.
 Could not install %s:\n%s	DataTranslations		Não foi possível instalar o %s:\n%s
-Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Use este painel de controle para definir valores padrão para tradutores, a serem utilizados quando não houver outras configurações especificadas por um aplicativo.
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Um item denominado '%name' já existe na pasta de Tradutores! Deve o tradutor existente ser sobrescrito?
-DataTranslations - Note	DataTranslations		Traduções de Dados - Nota
-Overwrite	DataTranslations		Sobrescrever
-Info:	DataTranslations		Informação:
-Info	DataTranslations		Informação
-Path:	DataTranslations		Caminho:
-The new translator has been installed successfully.	DataTranslations		O novo tradutor foi instalado com sucesso.
-DataTranslations - Error	DataTranslations		Traduções de Dados - Erro
 OK	DataTranslations		OK
+Cancel	DataTranslations		Cancelar
+Info:	DataTranslations		Informação:
+DataTranslations - Error	DataTranslations		Traduções de Dados - Erro
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Use este painel de controle para definir valores padrão para tradutores, a serem utilizados quando não houver outras configurações especificadas por um aplicativo.
+The new translator has been installed successfully.	DataTranslations		O novo tradutor foi instalado com sucesso.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Um item denominado '%name' já existe na pasta de Tradutores! Deve o tradutor existente ser sobrescrito?
+DataTranslations	System name		Traduções de Dados
+Info	DataTranslations		Informação
+Overwrite	DataTranslations		Sobrescrever
 Version:	DataTranslations		Versão:

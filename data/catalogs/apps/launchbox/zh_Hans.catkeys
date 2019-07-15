@@ -1,35 +1,35 @@
 1	english	x-vnd.Haiku-LaunchBox	3692177981
-New	LaunchBox		新建
 Set description…	LaunchBox		设置描述...
-Vertical layout	LaunchBox		竖直层
-OK	LaunchBox		确定
-Pad 1	LaunchBox		面板 1
-last chance	LaunchBox		最后机会
-Quit	LaunchBox		退出
-Open containing folder	LaunchBox		打开所在文件夹
-Clear button	LaunchBox		清除按钮
-LaunchBox	System name		启动栏
-Ignore double-click	LaunchBox		忽略双击
-Auto-raise	LaunchBox		自动提升
-Show on all workspaces	LaunchBox		在所有工作区显示
-Show window border	LaunchBox		显示窗口边界
-Pad	LaunchBox		面板
-Icon size	LaunchBox		图标尺寸
-Bummer	LaunchBox		无效
-Cancel	LaunchBox		取消
-Remove button	LaunchBox		删除按钮
-Horizontal layout	LaunchBox		水平层
-\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\n使用署名 '%2' 启动应用程序失败。\n\n错误：
-Failed to launch '%1'.\n\nError:	LaunchBox		启动 '%1' 失败。\n\n错误：
-Name Panel	LaunchBox		命名面板
-Add button here	LaunchBox		在此处添加按钮
-Description for '%3'	LaunchBox		描述 '%3'
-Settings	LaunchBox		设置
-Failed to launch 'something', error in Pad data.	LaunchBox		启动“某个应用”失败，Pad 数据出错。
-Pad %1	LaunchBox		面板 %1
-Close	LaunchBox		关闭
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		发送 '打开文件夹' 命令到文件浏览器失败。\n\n错误： 
-You can drag an icon here.	LaunchBox		您可以将图标拖动至此处。
-Clone	LaunchBox		复制
-launch popup	LaunchBox		载入弹出菜单
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		确定关闭该面板？\n（该面板将不被保存。）
+OK	LaunchBox		确定
+Ignore double-click	LaunchBox		忽略双击
+Show on all workspaces	LaunchBox		在所有工作区显示
+Name Panel	LaunchBox		命名面板
+Clone	LaunchBox		复制
+Description for '%3'	LaunchBox		描述 '%3'
+Show window border	LaunchBox		显示窗口边界
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\n使用署名 '%2' 启动应用程序失败。\n\n错误：
+Failed to launch 'something', error in Pad data.	LaunchBox		启动“某个应用”失败，Pad 数据出错。
+LaunchBox	System name		启动栏
+Auto-raise	LaunchBox		自动提升
+Icon size	LaunchBox		图标尺寸
+Open containing folder	LaunchBox		打开所在文件夹
+Add button here	LaunchBox		在此处添加按钮
+Cancel	LaunchBox		取消
+launch popup	LaunchBox		载入弹出菜单
+Clear button	LaunchBox		清除按钮
+Bummer	LaunchBox		无效
+last chance	LaunchBox		最后机会
+You can drag an icon here.	LaunchBox		您可以将图标拖动至此处。
+Pad 1	LaunchBox		面板 1
+Failed to launch '%1'.\n\nError:	LaunchBox		启动 '%1' 失败。\n\n错误：
+Settings	LaunchBox		设置
+Vertical layout	LaunchBox		竖直层
+Pad	LaunchBox		面板
+Close	LaunchBox		关闭
+Remove button	LaunchBox		删除按钮
+Quit	LaunchBox		退出
+Horizontal layout	LaunchBox		水平层
+New	LaunchBox		新建
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		发送 '打开文件夹' 命令到文件浏览器失败。\n\n错误： 
+Pad %1	LaunchBox		面板 %1

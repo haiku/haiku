@@ -1,41 +1,41 @@
 1	hungarian	x-vnd.Haiku-Repositories	2658607939
-Completed	TaskLooper	Completed task status message	Kész
-Repositories	System name		Raktárak
-There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Nem sikerült engedélyezni a raktárat (%url%)
-Remove this repository?	RepositoriesView	Removal alert confirmation message	Raktár eltávolítása?
-Description	TaskLooper	Failed task error description	Leírás
-Add	AddRepoWindow	Button label	Új
-URL	RepositoriesView	Column title	Cím
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Nem sikerült beolvasni a jelenelg engedélyezett raktárak nevét.
-Keep trying	TaskTimer	Button label	Kulcstartó
 This is not a valid URL.	AddRepoWindow	Add URL error message	Érvénytelen cím.
 Repository URL:	AddRepoWindow	Text box label	Raktár címe:
-Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Nem sikerült a raktár (%name%) beállításait betölteni.
-Details	TaskLooper	Job log details header	Részletek
-Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Gratulálok! A raktár (%name%) feladatai elkészültek.
-Status	RepositoriesView	Column title	Állapot
-Aborted	TaskLooper	Aborted task status message	Megszakítva
-Remove all	RepositoriesView	Button label	Összes eltávolítása
-Remove	RepositoriesView	Button label	Eltávolítás
-Changes completed	RepositoriesView	Status view text	Elkészültek a változtatások
-Name	RepositoriesView	Column title	Elnevezés
-Enable	RepositoriesView	Button label	Engedélyezés
-Enable repositories to use with package management:	RepositoriesView	Label text	Raktár engedélyezése a csomagkezelő használatához:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Nem sikerült frissíteni a raktár (%name%) információit
-Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Minden raktárhoz csak egy cím engedélyezett. Kérlek módosítsd a választásod.
-Failed	TaskLooper	Failed task status message	Sikertelen
-OK	Constants	Button label	Rendben
-Cancel task	TaskTimer	Button label	Feladat megszakítása
-Remove these repositories?	RepositoriesView	Removal alert confirmation message	Raktárak eltávolítása?
-Cancel	Constants	Button label	Mégse
-Changes pending:	RepositoriesView	Status view text	Függőben lévő módosítások:
 There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Nem sikerült letiltani a raktárat (%name%)
+Unknown	Constants	Unknown repository name	Ismeretlen
+Remove all	RepositoriesView	Button label	Összes eltávolítása
+Enable repositories to use with package management:	RepositoriesView	Label text	Raktár engedélyezése a csomagkezelő használatához:
+Disable	RepositoriesView	Button label	Letiltás
+Cancel task	TaskTimer	Button label	Feladat megszakítása
+Changes completed	RepositoriesView	Status view text	Elkészültek a változtatások
+Details	TaskLooper	Job log details header	Részletek
 Remove	Constants	Button label	Eltávolítás
-Enable all	RepositoriesView	Button label	Összes engedélyezése
-Stop and quit	RepositoriesWindow	Button label	Leállítás és kilépés
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Nem sikerült engedélyezni a raktárat (%url%)
+Remove this repository?	RepositoriesView	Removal alert confirmation message	Raktár eltávolítása?
 The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	A raktárhoz (%name%) tartozó feladat végrehajtása hosszabb időt vesz igénybe.
-Disable all	RepositoriesView	Button label	Összes letiltása
+Completed	TaskLooper	Completed task status message	Kész
+OK	Constants	Button label	Rendben
+Status	RepositoriesView	Column title	Állapot
+Name	RepositoriesView	Column title	Elnevezés
+Add	AddRepoWindow	Button label	Új
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Nem sikerült beolvasni a jelenelg engedélyezett raktárak nevét.
+Enable all	RepositoriesView	Button label	Összes engedélyezése
+Aborted	TaskLooper	Aborted task status message	Megszakítva
+URL	RepositoriesView	Column title	Cím
+Enable	RepositoriesView	Button label	Engedélyezés
+Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Nem sikerült a raktár (%name%) beállításait betölteni.
+Description	TaskLooper	Failed task error description	Leírás
+Failed	TaskLooper	Failed task status message	Sikertelen
+Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Gratulálok! A raktár (%name%) feladatai elkészültek.
 Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Néhány feladat még folyamatban van. Leállítsam őket és kilépjek?
 This repository URL already exists.	RepositoriesView	Error message	A raktár címe már létezik.
-Disable	RepositoriesView	Button label	Letiltás
-Unknown	Constants	Unknown repository name	Ismeretlen
+Repositories	System name		Raktárak
+Changes pending:	RepositoriesView	Status view text	Függőben lévő módosítások:
+Remove	RepositoriesView	Button label	Eltávolítás
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	Raktárak eltávolítása?
+Keep trying	TaskTimer	Button label	Kulcstartó
+Cancel	Constants	Button label	Mégse
+Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Minden raktárhoz csak egy cím engedélyezett. Kérlek módosítsd a választásod.
+Stop and quit	RepositoriesWindow	Button label	Leállítás és kilépés
+Disable all	RepositoriesView	Button label	Összes letiltása

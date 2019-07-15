@@ -1,17 +1,17 @@
 1	spanish; castilian	x-vnd.haiku.zip-o-matic	2032806096
-Stop	file:ZipOMaticWindow.cpp		Detener
-Creating archive: %s	file:ZipOMaticWindow.cpp		Creando archivo: %s
-Continue	file:ZipOMaticWindow.cpp		Continuar
-Preparing to archive	file:ZipperThread.cpp		Preparando para comprimir
 Drop files here.	file:ZipOMaticWindow.cpp		Suelte los archivos aquí.
 Filename: %s	file:ZipOMaticWindow.cpp		Nombre de archivo: %s
-You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Tiene {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} funcionando.\n\n
-Let them continue	file:ZipOMatic.cpp		Permitirles continuar
 Do you want to stop them?	file:ZipOMatic.cpp		¿Desea detenerlos?
+Error creating archive	file:ZipOMaticWindow.cpp		Error al crear el archivo
+Stop them	file:ZipOMatic.cpp		Detenerlos
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		¿Está seguro que desea detener la creación de este archivo?
+Preparing to archive	file:ZipperThread.cpp		Preparando para comprimir
+Let them continue	file:ZipOMatic.cpp		Permitirles continuar
+Continue	file:ZipOMaticWindow.cpp		Continuar
+Archive created OK	file:ZipOMaticWindow.cpp		Archivo correctamente creado
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# file added.} other{# files added.}}
+Stop	file:ZipOMaticWindow.cpp		Detener
 Stopped	file:ZipOMaticWindow.cpp		Detenido
 Archive	file:ZipperThread.cpp		Archivo
-Error creating archive	file:ZipOMaticWindow.cpp		Error al crear el archivo
-{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# file added.} other{# files added.}}
-Archive created OK	file:ZipOMaticWindow.cpp		Archivo correctamente creado
-Stop them	file:ZipOMatic.cpp		Detenerlos
+Creating archive: %s	file:ZipOMaticWindow.cpp		Creando archivo: %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Tiene {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} funcionando.\n\n

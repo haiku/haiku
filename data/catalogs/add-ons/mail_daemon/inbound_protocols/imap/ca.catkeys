@@ -1,7 +1,6 @@
-1	catalan; valencian	x-vnd.Haiku-IMAP	3950045582
-Destination:	imap_config		Destí:
-status	IMAPFolderConfig		estat
-Apply	IMAPFolderConfig		Aplica
-Fetching IMAP folders, have patience...	IMAPFolderConfig		S'està recuperant les carpetes IMAP, un moment si us plau...
-IMAP Folders	IMAPFolderConfig		Carpetes IMAP
+1	catalan; valencian	x-vnd.Haiku-IMAP	3213145085
 Failed to fetch available storage.	IMAPFolderConfig		No ha estat possible recuperar l'espai disponible.
+Apply	IMAPFolderConfig		Aplica
+status	IMAPFolderConfig		estat
+IMAP Folders	IMAPFolderConfig		Carpetes IMAP
+Destination:	imap_config		Destí:

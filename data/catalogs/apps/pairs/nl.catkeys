@@ -1,11 +1,11 @@
 1	dutch; flemish	x-vnd.Haiku-Pairs	2647083837
-Expert (8x8)	PairsWindow		Expert (8x8)
-Beginner (4x4)	PairsWindow		Beginner (4x4)
-Quit game	PairsWindow		Spel afsluiten
-Game	PairsWindow		Spel
-Size	PairsWindow		Grootte
-New	PairsWindow		Nieuw
-Intermediate (6x6)	PairsWindow		Gevorderde (6x6)
-Quit	PairsWindow		Afsluiten
 Pairs	System name		Pairs
+Quit	PairsWindow		Afsluiten
+Game	PairsWindow		Spel
+Expert (8x8)	PairsWindow		Expert (8x8)
+New	PairsWindow		Nieuw
+Size	PairsWindow		Grootte
+Quit game	PairsWindow		Spel afsluiten
+Beginner (4x4)	PairsWindow		Beginner (4x4)
+Intermediate (6x6)	PairsWindow		Gevorderde (6x6)
 New game	PairsWindow		Nieuw spel

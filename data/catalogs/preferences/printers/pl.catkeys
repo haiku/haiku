@@ -1,44 +1,38 @@
-1	polish	x-vnd.Be-PRNT	686411231
-Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Drukarka: %printer_name%\nSterownik:  %driver%\n
-Waiting	JobListView		Oczekuję
-Print test page	PrintersWindow		Wydrukuj stronę testową
- pending jobs	PrinterListView		 oczekujących zadań
-page	JobListView		strona
-Cancel	AddPrinterDialog		Anuluj
-Test page	PrintersWindow		Strona testowa
-Add printer	AddPrinterDialog		Dodaj drukarkę
-Green	TestPageView		Zielony
-Printers	PrintersWindow		Drukarki
-Add…	PrintersWindow		Dodaj…
-No pending jobs	PrinterListView		Brak oczekujących zadań
-Default Printer	PrinterListView		Domyślna drukarka
-Transport: %transport% %transport_address%	PrinterListView		Podsystem transportu: %transport%, adres: %transport_address%
-pages	JobListView		strony
-Printers	System name		Drukarki
-Processing	JobListView		W toku
-Red	TestPageView		Czerwony
-Printer name:	AddPrinterDialog		Nazwa drukarki:
-Driver: %driver%	PrinterListView		Sterownik: %driver%
-Black	TestPageView		Czarny
-Restart job	PrintersWindow		Zrestartuj zadanie
-Add	AddPrinterDialog		Dodaj
-Make default	PrintersWindow		Ustaw jako domyślną drukarkę
-Transport: %transport% %transport_address%	TestPageView		Podsystem transportu: %transport%, adres: %transport_address%
-Cancel job	PrintersWindow		Anuluj zadanie
-Yellow	TestPageView		Żółty
-Blue	TestPageView		Niebieski
-Remove	PrintersWindow		Usuń
-<pick one>	AddPrinterDialog		<wybierz>
-Print jobs for 	PrintersWindow		Drukowanie dla 
-Failed	JobListView		Nie wykonano
-%.2f KB	JobListView		%.2f KB
-Magenta	TestPageView		Purpurowy
-Completed	JobListView		Ukończono
-No printer found!	TransportMenu		Nie znaleziono drukarek!
-Print jobs: No printer selected	PrintersWindow		Drukowanie: Nie wybrano drukarki
-Cyan	TestPageView		Niebieskozielony
-Unknown status	JobListView		Nieznany status
-1 pending job	PrinterListView		1 oczekujące zadanie
-Connected to:	AddPrinterDialog		Podłączono do:
-Printer type:	AddPrinterDialog		Typ drukarki:
+1	polish	x-vnd.Be-PRNT	2042381362
 Test page	TestPageView		Strona testowa
+Remove	PrintersWindow		Usuń
+Red	TestPageView		Czerwony
+Default Printer	PrinterListView		Domyślna drukarka
+<pick one>	AddPrinterDialog		<wybierz>
+Connected to:	AddPrinterDialog		Podłączono do:
+Make default	PrintersWindow		Ustaw jako domyślną drukarkę
+Cyan	TestPageView		Niebieskozielony
+Completed	JobListView		Ukończono
+Test page	PrintersWindow		Strona testowa
+Transport: %transport% %transport_address%	PrinterListView		Podsystem transportu: %transport%, adres: %transport_address%
+Failed	JobListView		Nie wykonano
+Blue	TestPageView		Niebieski
+Waiting	JobListView		Oczekuję
+Processing	JobListView		W toku
+Cancel	AddPrinterDialog		Anuluj
+Unknown status	JobListView		Nieznany status
+Add printer	AddPrinterDialog		Dodaj drukarkę
+Printers	PrintersWindow		Drukarki
+No printer found!	TransportMenu		Nie znaleziono drukarek!
+Add…	PrintersWindow		Dodaj…
+Magenta	TestPageView		Purpurowy
+Transport: %transport% %transport_address%	TestPageView		Podsystem transportu: %transport%, adres: %transport_address%
+Add	AddPrinterDialog		Dodaj
+Print jobs: No printer selected	PrintersWindow		Drukowanie: Nie wybrano drukarki
+Printer name:	AddPrinterDialog		Nazwa drukarki:
+Yellow	TestPageView		Żółty
+Black	TestPageView		Czarny
+Printer type:	AddPrinterDialog		Typ drukarki:
+Printers	System name		Drukarki
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Drukarka: %printer_name%\nSterownik:  %driver%\n
+Green	TestPageView		Zielony
+Print test page	PrintersWindow		Wydrukuj stronę testową
+Restart job	PrintersWindow		Zrestartuj zadanie
+Driver: %driver%	PrinterListView		Sterownik: %driver%
+Cancel job	PrintersWindow		Anuluj zadanie
+%.2f KB	JobListView		%.2f KB

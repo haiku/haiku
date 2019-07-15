@@ -1,5 +1,5 @@
 1	belarusian	x-vnd.Haiku-notification_server	2022780929
 Warning	NotificationWindow		Увага
+Notification	NotificationWindow		Паведамленне
 OK	NotificationWindow		ОК
 Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Немагчыма запусціць манітор агульных наладак.\nІмгненыя змены фільтра будуць адключаны.
-Notification	NotificationWindow		Паведамленне

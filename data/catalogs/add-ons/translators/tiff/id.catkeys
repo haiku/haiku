@@ -1,16 +1,16 @@
 1	indonesian	x-vnd.Haiku-TIFFTranslator	2234713102
-LZW	TIFFView		LZW
-Version %d.%d.%d, %s	TIFFView		Versi %d.%d.%d, %s
-identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: tidak bisa mengatur direktori\n
-TIFF image	TIFFTranslator		Gambar TIFF
 TIFF Library:	TIFFView		Pustaka TIFF:
-TIFF image translator	TIFFView		Penerjemah gambar TIFF
-None	TIFFView		Tidak satupun
-TIFF images	TIFFTranslator		Citra TIFF
-TIFFTranslator Settings	TIFFTranslator		Pengaturan TIFFTranslator
-TIFF image translator	TIFFTranslator		Penerjemah gambar TIFF
 RLE (Packbits)	TIFFView		RLE (Packbits)
-TIFF Settings	TIFFMain		Pengaturan TIFF
-Use compression:	TIFFView		Gunakan kompresi:
-identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: dokumen indeks cacat\n
 ZIP (Deflate)	TIFFView		ZIP (Kempiskan)
+identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: dokumen indeks cacat\n
+Use compression:	TIFFView		Gunakan kompresi:
+TIFF image translator	TIFFView		Penerjemah gambar TIFF
+TIFF image	TIFFTranslator		Gambar TIFF
+TIFF Settings	TIFFMain		Pengaturan TIFF
+TIFF image translator	TIFFTranslator		Penerjemah gambar TIFF
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: tidak bisa mengatur direktori\n
+Version %d.%d.%d, %s	TIFFView		Versi %d.%d.%d, %s
+TIFFTranslator Settings	TIFFTranslator		Pengaturan TIFFTranslator
+LZW	TIFFView		LZW
+TIFF images	TIFFTranslator		Citra TIFF
+None	TIFFView		Tidak satupun

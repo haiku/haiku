@@ -1,17 +1,16 @@
-1	indonesian	x-vnd.Haiku-MatchHeader	548057976
+1	indonesian	x-vnd.Haiku-MatchHeader	3544711400
+Delete message	ConfigView		Hapus pesan
+Match \"%attribute\" against \"%regex\"	RuleFilter		Cocokkan \"%attribute\" terhadap \"%regex\"
+Match header	RuleFilter		Cocokan judul
+Set flags to	ConfigView		Set bendera ke
+<Choose account>	ConfigView		<Pilih akun>
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Nilai wildcard seperti \"*spam*\".\nDiawali dengan \"REGEX:\" untuk menggunakan expresi-ekspresi reguler.
+Then	ConfigView		Kemudian
+If	ConfigView		Jika
+Set as read	ConfigView		Tetapkan sebagai terbaca
+Reply with	ConfigView		Balas dengan
 <Choose action>	ConfigView		<Pilih tindakan>
-Header field (e.g. Subject, From, ...)	ConfigView		Kolom header (misal. Subyek, Dari, ...)
+Move to	ConfigView		Pindahkan ke
+this field is based on the action	ConfigView		bidang ini didasarkan pada tindakan
 Account	ConfigView		Akun
 has	ConfigView		memiliki
-Move to	ConfigView		Pindahkan ke
-Then	ConfigView		Kemudian
-this field is based on the action	ConfigView		bidang ini didasarkan pada tindakan
-Delete message	ConfigView		Hapus pesan
-<Choose account>	ConfigView		<Pilih akun>
-Set flags to	ConfigView		Set bendera ke
-Set as read	ConfigView		Tetapkan sebagai terbaca
-Match header	RuleFilter		Cocokan judul
-Reply with	ConfigView		Balas dengan
-If	ConfigView		Jika
-Match \"%attribute\" against \"%regex\"	RuleFilter		Cocokkan \"%attribute\" terhadap \"%regex\"
-Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Nilai wildcard seperti \"*spam*\".\nDiawali dengan \"REGEX:\" untuk menggunakan expresi-ekspresi reguler.

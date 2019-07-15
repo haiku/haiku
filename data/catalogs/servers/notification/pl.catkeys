@@ -1,5 +1,5 @@
 1	polish	x-vnd.Haiku-notification_server	2022780929
 Warning	NotificationWindow		Ostrzeżenie
+Notification	NotificationWindow		Powiadomienie
 OK	NotificationWindow		OK
 Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Nie można uruchomić monitora ustawień ogólnych.\nRezydujący filtr zmian wyłączony.
-Notification	NotificationWindow		Powiadomienie
