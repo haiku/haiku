@@ -146,7 +146,7 @@ WorkStatusView::_SetTextPendingDownloads()
 {
 	BString text;
 	static BStringFormat format(B_TRANSLATE("{0, plural,"
-		"one{1 package to download}"
+ 		"one{1 package to download}"
 		"other{# packages to download}}"));
 		format.Format(text, fPendingPackages.size());
 
@@ -161,11 +161,12 @@ WorkStatusView::_SetTextDownloading(const BString& title)
 	text.ReplaceFirst("%name%", title);
 
 	if (!fPendingPackages.empty()) {
-		BString count;
-		count << fPendingPackages.size();
-		BString more(" ");
-		more += B_TRANSLATE("(%count% more to download)");
-		more.ReplaceFirst("%count%", count);
+		BString more;
+		static BStringFormat format(B_TRANSLATE("{0, plural,"
+			"one{(1 more to download)}"
+			"other{(# more to download)}}"));
+		format.Format(more, fPendingPackages.size());
+		text += " ";
 		text += more;
 	}
 	SetText(text);
