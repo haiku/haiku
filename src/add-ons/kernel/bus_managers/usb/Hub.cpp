@@ -257,24 +257,34 @@ Hub::Explore(change_item **changeList)
 						fChildren[i] = NULL;
 					}
 
-					usb_speed speed = USB_SPEED_FULLSPEED;
-					// Hack - We currently do not support USB3.0 Hubs
-					// This is for XHCI, which anyway rechecks the port speed
-					// This will in no way work for non-root USB3.0 Hubs
-					if (fDeviceDescriptor.usb_version == 0x300)
-						speed = USB_SPEED_SUPERSPEED;
-					else if (fPortStatus[i].status & PORT_STATUS_LOW_SPEED)
-						speed = USB_SPEED_LOWSPEED;
-					else if (fPortStatus[i].status & PORT_STATUS_HIGH_SPEED)
-						speed = USB_SPEED_HIGHSPEED;
+					// Determine the device speed.
+					usb_speed speed;
+
+					// PORT_STATUS_LOW_SPEED and PORT_STATUS_SS_POWER are the
+					// same, but PORT_STATUS_POWER will not be set for SS
+					// devices, hence this somewhat convoluted logic.
+					if ((fPortStatus[i].status & PORT_STATUS_POWER) != 0) {
+						if ((fPortStatus[i].status & PORT_STATUS_HIGH_SPEED) != 0)
+							speed = USB_SPEED_HIGHSPEED;
+						else if ((fPortStatus[i].status & PORT_STATUS_LOW_SPEED) != 0)
+							speed = USB_SPEED_LOWSPEED;
+						else
+							speed = USB_SPEED_FULLSPEED;
+					} else {
+						// This must be a SuperSpeed device, which will
+						// simply inherit our speed.
+						speed = Speed();
+					}
+					if (speed > Speed())
+						speed = Speed();
 
 					// either let the device inherit our addresses (if we are
 					// already potentially using a transaction translator) or
-					// set ourselfs as the hub when we might become the
+					// set ourselves as the hub when we might become the
 					// transaction translator for the device.
 					int8 hubAddress = HubAddress();
 					uint8 hubPort = HubPort();
-					if (Speed() == USB_SPEED_HIGHSPEED || fDeviceDescriptor.usb_version == 0x300) {
+					if (Speed() == USB_SPEED_HIGHSPEED || Speed() == USB_SPEED_SUPERSPEED) {
 						hubAddress = DeviceAddress();
 						hubPort = i + 1;
 					}
