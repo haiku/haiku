@@ -36,6 +36,8 @@
    dbg@be.com
 */
 
+#define _BSD_SOURCE
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
@@ -1075,7 +1077,7 @@ delete_cache_list(cache_ent_list *cel)
                    "%p != %p\n", ce->block_num, junk, ce);
         }
 
-        memset(ce, 0xfd, sizeof(*ce));
+        explicit_bzero(ce, sizeof(*ce));
         free(ce);
 
         bc.cur_blocks--;

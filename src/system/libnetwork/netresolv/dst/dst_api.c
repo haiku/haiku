@@ -909,11 +909,11 @@ dst_s_read_private_key_file(char *name, DST_KEY *pk_key, u_int16_t in_id,
 	}
 	pk_key->dk_id = (u_int16_t) id;
 	pk_key->dk_alg = alg;
-	memset(in_buff, 0, cnt);
+	explicit_bzero(in_buff, cnt);
 	return (1);
 
  fail:
-	memset(in_buff, 0, cnt);
+	explicit_bzero(in_buff, cnt);
 	return (0);
 }
 
