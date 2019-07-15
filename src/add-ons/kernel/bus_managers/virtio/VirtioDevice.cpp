@@ -280,9 +280,9 @@ VirtioDevice::_DumpFeatures(const char* title, uint32 features,
 		if (name == NULL)
 			name = get_feature_name(feature);
 		if (name != NULL) {
-			strncat(features_string, "[", sizeof(features_string));
-			strncat(features_string, name, sizeof(features_string));
-			strncat(features_string, "] ", sizeof(features_string));
+			strlcat(features_string, "[", sizeof(features_string));
+			strlcat(features_string, name, sizeof(features_string));
+			strlcat(features_string, "] ", sizeof(features_string));
 		}
 	}
 	TRACE("%s: %s\n", title, features_string);
