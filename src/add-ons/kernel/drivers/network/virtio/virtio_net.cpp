@@ -293,8 +293,8 @@ virtio_net_init_device(void* _info, void** _cookie)
 		status = B_NO_MEMORY;
 		goto err2;
 	}
-	memset(info->rxBufInfos, 0, sizeof(info->rxBufInfos));
-	memset(info->txBufInfos, 0, sizeof(info->txBufInfos));
+	memset(info->rxBufInfos, 0, sizeof(BufInfo*) * info->rxSizes[0]);
+	memset(info->txBufInfos, 0, sizeof(BufInfo*) * info->txSizes[0]);
 
 	// create receive buffer area
 	info->rxArea = create_area("virtionet rx buffer", (void**)&rxBuffer,
