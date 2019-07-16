@@ -66,7 +66,7 @@ static uint32 kCrcTable[256] = {
 	\param data Pointer to the byte stream.
 	\param length Length of the byte stream in bytes.
 
-	\return The crc checksum, or 0 if an error occurred.
+	\return The crc checksum.
 */
 uint32
 calculate_crc(uint32 crc, uint8* data, uint16 length)

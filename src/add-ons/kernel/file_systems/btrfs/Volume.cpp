@@ -15,6 +15,7 @@
 #include "BTree.h"
 #include "CachedBlock.h"
 #include "Chunk.h"
+#include "CRCTable.h"
 #include "DebugSupport.h"
 #include "ExtentAllocator.h"
 #include "Inode.h"
@@ -656,7 +657,14 @@ Volume::FindBlock(off_t logical, off_t& physical)
 status_t
 Volume::WriteSuperBlock()
 {
-	// TODO(lesderid): Calculate checksum
+	uint32 checksum = calculate_crc((uint32)~1,
+			(uint8 *)(&fSuperBlock + sizeof(fSuperBlock.checksum)),
+			sizeof(fSuperBlock) - sizeof(fSuperBlock.checksum));
+
+	fSuperBlock.checksum[0] = (checksum >>  0) & 0xFF;
+	fSuperBlock.checksum[1] = (checksum >>  8) & 0xFF;
+	fSuperBlock.checksum[2] = (checksum >> 16) & 0xFF;
+	fSuperBlock.checksum[3] = (checksum >> 24) & 0xFF;
 
 	if (write_pos(fDevice, BTRFS_SUPER_BLOCK_OFFSET, &fSuperBlock,
 			sizeof(btrfs_super_block))
