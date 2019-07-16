@@ -183,7 +183,7 @@ get_elantech_movement(elantech_cookie *cookie, mouse_movement *movement)
 			dprintf("ELANTECH: Fingers %d, raw %x (MOTION)\n", (packet[3] & 0xe0) >>5, packet[3]);			//Most likely palm
 			if (cookie->fingers == 0) return B_OK;
 			//handle overflow and delta values
-			if ((packet[0] & 0x10) == 1) {
+			if ((packet[0] & 0x10) != 0) {
 				event.xPosition = cookie->x += 5 * (int8)packet[1];
 				event.yPosition = cookie->y += 5 * (int8)packet[2];
 			} else {

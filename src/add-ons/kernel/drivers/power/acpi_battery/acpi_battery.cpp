@@ -325,7 +325,7 @@ acpi_battery_read(void* _cookie, off_t position, void *buffer, size_t* numBytes)
 	if (position == 0) {
 		char string[512];
 		char *str = string;
-		size_t max_len = sizeof(string);
+		ssize_t max_len = sizeof(string);
 		snprintf(str, max_len, "Battery Status:\n");
 		max_len -= strlen(str);
 		str += strlen(str);

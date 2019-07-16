@@ -577,14 +577,14 @@ DavicomDevice::_SetupEndpoints()
 			continue;
 		}
 
-		if ((epd->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN)
+		if ((epd->endpoint_address & USB_ENDPOINT_ADDR_DIR_MASK)
 				== USB_ENDPOINT_ADDR_DIR_IN)
 		{
 			readEndpoint = ep;
 			continue;
 		}
 
-		if ((epd->endpoint_address & USB_ENDPOINT_ADDR_DIR_OUT)
+		if ((epd->endpoint_address & USB_ENDPOINT_ADDR_DIR_MASK)
 				== USB_ENDPOINT_ADDR_DIR_OUT)
 		{
 			writeEndpoint = ep;

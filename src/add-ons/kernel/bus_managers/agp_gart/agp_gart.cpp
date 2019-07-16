@@ -1154,7 +1154,7 @@ bind_aperture(aperture_id id, area_id area, addr_t base, size_t size,
 
 	status_t status = aperture->BindMemory(memory, base, size);
 	if (status < B_OK) {
-		if (reservedBase < 0)
+		if (reservedBase != 0)
 			aperture->DeleteMemory(memory);
 
 		return status;

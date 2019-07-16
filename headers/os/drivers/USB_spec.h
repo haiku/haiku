@@ -75,8 +75,10 @@
 #define USB_ENDPOINT_ATTR_IMPLICIT_USAGE	0x20
 #define USB_ENDPOINT_ATTR_USAGE_MASK		0x30
 
+/* Direction */
 #define USB_ENDPOINT_ADDR_DIR_IN			0x80
 #define USB_ENDPOINT_ADDR_DIR_OUT			0x00
+#define USB_ENDPOINT_ADDR_DIR_MASK			0x80
 
 
 typedef struct usb_device_descriptor {

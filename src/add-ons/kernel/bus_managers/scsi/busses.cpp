@@ -133,6 +133,7 @@ scsi_create_bus(device_node *node, uint8 path_id)
 	}
 
 	res = INIT_BEN(&bus->mutex, "scsi_bus_mutex");
+
 	if (res < B_OK)
 		goto err3;
 
