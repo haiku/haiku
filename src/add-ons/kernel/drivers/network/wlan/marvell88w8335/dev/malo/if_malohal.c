@@ -347,7 +347,8 @@ malo_hal_send_helper(struct malo_hal *mh, int bsize,
 {
 	mh->mh_cmdbuf[0] = htole16(MALO_HOSTCMD_CODE_DNLD);
 	mh->mh_cmdbuf[1] = htole16(bsize);
-	memcpy(&mh->mh_cmdbuf[4], data , dsize);
+	if (data != NULL)
+		memcpy(&mh->mh_cmdbuf[4], data , dsize);
 
 	malo_hal_trigger_pcicmd(mh);
 
@@ -410,7 +411,8 @@ malo_hal_send_main(struct malo_hal *mh, const void *data, size_t dsize,
 	mh->mh_cmdbuf[1] = htole16(dsize);
 	mh->mh_cmdbuf[2] = htole16(seqnum);
 	mh->mh_cmdbuf[3] = 0;
-	memcpy(&mh->mh_cmdbuf[4], data, dsize);
+	if (data != NULL)
+		memcpy(&mh->mh_cmdbuf[4], data, dsize);
 
 	malo_hal_trigger_pcicmd(mh);
 

@@ -26,7 +26,7 @@ status_t
 Reader::Read(int32 size, void** buffer, bool* mustFree)
 {
 	// check params
-	if (size < 0 || !buffer || mustFree)
+	if (size < 0 || !buffer || !mustFree)
 		return B_BAD_VALUE;
 
 	// deal with size == 0

@@ -39,7 +39,7 @@ Scrollable::SetScrollSource(Scroller* source)
 		fScrollSource = NULL;
 		// Notify the old source, if it doesn't know about the change.
 		if (oldSource && oldSource->ScrollTarget() == this)
-			fScrollSource->SetScrollTarget(NULL);
+			oldSource->SetScrollTarget(NULL);
 		fScrollSource = source;
 		// Notify the new source, if it doesn't know about the change.
 		if (source && source->ScrollTarget() != this)

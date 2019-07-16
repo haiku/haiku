@@ -333,14 +333,14 @@ BMediaRecorder::MediaSource() const
 }
 
 
-const media_input&
+const media_input
 BMediaRecorder::MediaInput() const
 {
 	CALLED();
 
-	media_input* input = NULL;
-	fNode->GetInput(input);
-	return *input;
+	media_input input;
+	fNode->GetInput(&input);
+	return input;
 }
 
 

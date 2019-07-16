@@ -72,7 +72,7 @@ protected:
 			// Get the producer node source
 			const media_source&	MediaSource() const;
 			// This is the our own input
-			const media_input&	MediaInput() const;
+			const media_input	MediaInput() const;
 
 	virtual	void				BufferReceived(void* buffer, size_t size,
 									const media_header& header);

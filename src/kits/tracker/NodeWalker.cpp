@@ -391,6 +391,9 @@ static int32
 build_dirent(const BEntry* source, struct dirent* ent,
 	size_t size, int32 count)
 {
+	if (source == NULL)
+		return 0;
+
 	entry_ref ref;
 	source->GetRef(&ref);
 

@@ -255,17 +255,22 @@ Device::Device(Object* parent, int8 hubAddress, uint8 hubPort,
 				}
 
 				case USB_DESCRIPTOR_ENDPOINT_COMPANION: {
-					usb_endpoint_descriptor* desc = currentInterface
-						->endpoint[currentInterface->endpoint_count - 1].descr;
-					if ((uint8*)desc != (&configData[descriptorStart
-							- desc->length])) {
-						TRACE_ERROR("found endpoint companion descriptor not immediately "
-							"following endpoint descriptor, ignoring!\n");
-						break;
+					if (currentInterface != NULL) {
+						usb_endpoint_descriptor* desc
+							= currentInterface->endpoint[
+								currentInterface->endpoint_count - 1].descr;
+						if ((uint8*)desc != (&configData[descriptorStart
+								- desc->length])) {
+							TRACE_ERROR("found endpoint companion descriptor "
+								"not immediately following endpoint "
+								"descriptor, ignoring!\n");
+							break;
+						}
+						// TODO: It'd be nicer if we could store the endpoint
+						// companion descriptor along with the endpoint
+						// descriptor, but as the interface struct is public
+						// API, that would be an ABI break.
 					}
-					// TODO: It'd be nicer if we could store the endpoint companion
-					// descriptor along with the endpoint descriptor, but as the
-					// interface struct is public API, that would be an ABI break.
 
 					// fall through
 				}
