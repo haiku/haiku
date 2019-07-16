@@ -457,8 +457,6 @@ load_driver_settings_from_file(int file, const char *driverName)
 				// everything went fine!
 				return handle;
 			}
-
-			free(handle);
 		}
 		// "text" might be NULL here, but that's allowed
 		free(text);

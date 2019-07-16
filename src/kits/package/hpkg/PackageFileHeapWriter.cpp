@@ -162,7 +162,7 @@ private:
 			return fUnusedBuffers.RemoveItem(fUnusedBuffers.CountItems() - 1);
 
 		void* buffer = malloc(fBufferSize);
-		if (buffer == NULL && !fBuffers.AddItem(buffer)) {
+		if (buffer == NULL || !fBuffers.AddItem(buffer)) {
 			free(buffer);
 			throw std::bad_alloc();
 		}

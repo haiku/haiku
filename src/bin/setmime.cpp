@@ -723,8 +723,8 @@ MimeType::_PurgeProperties()
 	delete fBigIcon;
 	fBigIcon = NULL;
 
-	fVectorIcon = NULL;
 	free(fVectorIcon);
+	fVectorIcon = NULL;
 
 	fExtensions.clear();
 	fAttributes.clear();
