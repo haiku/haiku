@@ -24,7 +24,6 @@ BUnicodeChar::BUnicodeChar()
 int8
 BUnicodeChar::Type(uint32 c)
 {
-	BUnicodeChar();
 	return u_charType(c);
 }
 
@@ -34,7 +33,6 @@ BUnicodeChar::Type(uint32 c)
 bool
 BUnicodeChar::IsAlpha(uint32 c)
 {
-	BUnicodeChar();
 	return u_isalpha(c);
 }
 
@@ -46,7 +44,6 @@ BUnicodeChar::IsAlpha(uint32 c)
 bool
 BUnicodeChar::IsAlNum(uint32 c)
 {
-	BUnicodeChar();
 	return u_isalnum(c);
 }
 
@@ -55,7 +52,6 @@ BUnicodeChar::IsAlNum(uint32 c)
 bool
 BUnicodeChar::IsLower(uint32 c)
 {
-	BUnicodeChar();
 	return u_isULowercase(c);
 }
 
@@ -64,7 +60,6 @@ BUnicodeChar::IsLower(uint32 c)
 bool
 BUnicodeChar::IsUpper(uint32 c)
 {
-	BUnicodeChar();
 	return u_isUUppercase(c);
 }
 
@@ -74,7 +69,6 @@ BUnicodeChar::IsUpper(uint32 c)
 bool
 BUnicodeChar::IsTitle(uint32 c)
 {
-	BUnicodeChar();
 	return u_istitle(c);
 }
 
@@ -86,7 +80,6 @@ BUnicodeChar::IsTitle(uint32 c)
 bool
 BUnicodeChar::IsDigit(uint32 c)
 {
-	BUnicodeChar();
 	return u_isdigit(c);
 }
 
@@ -100,7 +93,6 @@ BUnicodeChar::IsDigit(uint32 c)
 bool
 BUnicodeChar::IsHexDigit(uint32 c)
 {
-	BUnicodeChar();
 	return u_isxdigit(c);
 }
 
@@ -112,7 +104,6 @@ BUnicodeChar::IsHexDigit(uint32 c)
 bool
 BUnicodeChar::IsDefined(uint32 c)
 {
-	BUnicodeChar();
 	return u_isdefined(c);
 }
 
@@ -123,7 +114,6 @@ BUnicodeChar::IsDefined(uint32 c)
 bool
 BUnicodeChar::IsBase(uint32 c)
 {
-	BUnicodeChar();
 	return u_isbase(c);
 }
 
@@ -139,7 +129,6 @@ BUnicodeChar::IsBase(uint32 c)
 bool
 BUnicodeChar::IsControl(uint32 c)
 {
-	BUnicodeChar();
 	return u_iscntrl(c);
 }
 
@@ -149,7 +138,6 @@ BUnicodeChar::IsControl(uint32 c)
 bool
 BUnicodeChar::IsPunctuation(uint32 c)
 {
-	BUnicodeChar();
 	return u_ispunct(c);
 }
 
@@ -160,7 +148,6 @@ BUnicodeChar::IsPunctuation(uint32 c)
 bool
 BUnicodeChar::IsSpace(uint32 c)
 {
-	BUnicodeChar();
 	return u_isJavaSpaceChar(c);
 }
 
@@ -183,7 +170,6 @@ BUnicodeChar::IsSpace(uint32 c)
 bool
 BUnicodeChar::IsWhitespace(uint32 c)
 {
-	BUnicodeChar();
 	return u_isWhitespace(c);
 }
 
@@ -193,7 +179,6 @@ BUnicodeChar::IsWhitespace(uint32 c)
 bool
 BUnicodeChar::IsPrintable(uint32 c)
 {
-	BUnicodeChar();
 	return u_isprint(c);
 }
 
@@ -203,7 +188,6 @@ BUnicodeChar::IsPrintable(uint32 c)
 uint32
 BUnicodeChar::ToLower(uint32 c)
 {
-	BUnicodeChar();
 	return u_tolower(c);
 }
 
@@ -211,7 +195,6 @@ BUnicodeChar::ToLower(uint32 c)
 uint32
 BUnicodeChar::ToUpper(uint32 c)
 {
-	BUnicodeChar();
 	return u_toupper(c);
 }
 
@@ -219,7 +202,6 @@ BUnicodeChar::ToUpper(uint32 c)
 uint32
 BUnicodeChar::ToTitle(uint32 c)
 {
-	BUnicodeChar();
 	return u_totitle(c);
 }
 
@@ -227,7 +209,6 @@ BUnicodeChar::ToTitle(uint32 c)
 int32
 BUnicodeChar::DigitValue(uint32 c)
 {
-	BUnicodeChar();
 	return u_digit(c, 10);
 }
 
