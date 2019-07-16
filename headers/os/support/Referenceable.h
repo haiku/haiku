@@ -225,17 +225,20 @@ public:
 	BReference& operator=(const BReference<const Type>& other)
 	{
 		fReference = other.fReference;
+		return *this;
 	}
 
 	BReference& operator=(Type* other)
 	{
 		fReference = other;
+		return *this;
 	}
 
 	template<typename OtherType>
 	BReference& operator=(const BReference<OtherType>& other)
 	{
 		fReference = other.Get();
+		return *this;
 	}
 
 	bool operator==(const BReference<const Type>& other) const
