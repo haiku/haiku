@@ -124,7 +124,7 @@ ColorPreview::MessageReceived(BMessage* message)
 				(const void**)&color, &size) == B_OK) {
 			BMessage setColorMessage(SET_CURRENT_COLOR);
 			setColorMessage.AddData(kRGBColor, B_RGB_COLOR_TYPE, color,
-				sizeof(color));
+				sizeof(rgb_color));
 			Invoke(&setColorMessage);
 		}
 	} else if ((int32)message->what == kMsgMessageRunner) {

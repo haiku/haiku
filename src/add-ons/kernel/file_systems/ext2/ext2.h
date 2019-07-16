@@ -779,7 +779,7 @@ struct ext2_xattr_entry {
 	}
 
 	void Dump(bool full=false) const {
-		for (unsigned int i = 0; i < (full ? sizeof(this) : MinimumSize()); i++)
+		for (unsigned int i = 0; i < (full ? sizeof(*this) : MinimumSize()); i++)
 			dprintf("%02x ", ((uint8 *)this)[i]);
 		dprintf("\n");
 	}

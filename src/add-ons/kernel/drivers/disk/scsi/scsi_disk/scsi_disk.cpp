@@ -541,7 +541,7 @@ das_register_device(device_node *node)
 	// get inquiry data
 	if (sDeviceManager->get_attr_raw(node, SCSI_DEVICE_INQUIRY_ITEM,
 			(const void **)&deviceInquiry, &inquiryLength, true) != B_OK
-		|| inquiryLength < sizeof(deviceInquiry))
+		|| inquiryLength < sizeof(scsi_res_inquiry))
 		return B_ERROR;
 
 	// get block limit of underlying hardware to lower it (if necessary)

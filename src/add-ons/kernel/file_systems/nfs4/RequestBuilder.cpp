@@ -710,10 +710,10 @@ RequestBuilder::_GenerateClientId(XDR::WriteStream& stream,
 	PeerAddress local = server->LocalID();
 
 	memcpy(id + pos, server->ID().InAddr(), server->ID().InAddrSize());
-	pos += sizeof(server->ID().InAddrSize());
+	pos += server->ID().InAddrSize();
 
 	memcpy(id + pos, local.InAddr(), local.InAddrSize());
-	pos += sizeof(local.InAddrSize());
+	pos += local.InAddrSize();
 
 	*(uint16*)(id + pos) = server->ID().Port();
 	pos += sizeof(uint16);
