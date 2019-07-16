@@ -612,7 +612,7 @@ NetworkWindow::_ShowReplicant(bool show)
 				B_TRANSLATE("Installing NetworkStatus in Deskbar failed: %s"),
 				strerror(status));
 			BAlert* alert = new BAlert(B_TRANSLATE("launch error"),
-				errorMessage, B_TRANSLATE("Ok"));
+				errorMessage, B_TRANSLATE("OK"));
 			alert->Go(NULL);
 		}
 	} else {

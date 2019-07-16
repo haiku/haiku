@@ -136,13 +136,13 @@ MainView::MessageReceived(BMessage* message)
 			BWindowStack windowStack(Window());
 			if (windowStack.HasWindow(window)) {
 				BAlert* alert = new BAlert("API Error",
-					"Window on stack but should not be there!", "Ok");
+					"Window on stack but should not be there!", "OK");
 				alert->Go();
 			}
 			windowStack.AddWindow(window);
 			if (!windowStack.HasWindow(window)) {
 				BAlert* alert = new BAlert("API Error",
-					"Window not on stack but should be there!", "Ok");
+					"Window not on stack but should be there!", "OK");
 				alert->Go();
 			}
 			break;

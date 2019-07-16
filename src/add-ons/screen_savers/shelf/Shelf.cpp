@@ -185,7 +185,7 @@ Shelf::StartSaver(BView *view, bool preview)
 	s << "BApp:Name: " << be_app->Name();
 
 	PRINT(("%p:%s:%s\n", this, __FUNCTION__, s.String()));
-	//BAlert *a = new BAlert("debug", s.String(), "Ok");
+	//BAlert *a = new BAlert("debug", s.String(), "OK");
 	//a->Go();
 	return B_ERROR;
 #if 0

@@ -38,7 +38,7 @@ CustomRateWindow::CustomRateWindow(int baudrate)
 		.End()
 		.AddGroup(B_HORIZONTAL)
 			.AddGlue()
-			.Add(new BButton("ok", B_TRANSLATE("Ok"), new BMessage(kOkButtonMsg)))
+			.Add(new BButton("ok", B_TRANSLATE("OK"), new BMessage(kOkButtonMsg)))
 			.Add(new BButton("cancel", B_TRANSLATE("Cancel"),
 				new BMessage(B_QUIT_REQUESTED)))
 		.End()

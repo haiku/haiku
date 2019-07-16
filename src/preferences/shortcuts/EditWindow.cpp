@@ -26,7 +26,7 @@ EditWindow::EditWindow(const char* placeholder, uint32 flags)
 {
 	fTextControl = new BTextControl("", placeholder, NULL);
 
-	BButton* okButton = new BButton("Ok", new BMessage(B_CONTROL_MODIFIED));
+	BButton* okButton = new BButton("OK", new BMessage(B_CONTROL_MODIFIED));
 	okButton->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT, B_ALIGN_TOP));
 	SetDefaultButton(okButton);
 

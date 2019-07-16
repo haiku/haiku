@@ -333,7 +333,7 @@ SoftwareUpdaterWindow::MessageReceived(BMessage* message)
 			if (error != B_OK) {
 				BAlert* alert = new BAlert("reboot request", B_TRANSLATE(
 					"For some reason, we could not reboot your computer."),
-					B_TRANSLATE("Ok"), NULL, NULL,
+					B_TRANSLATE("OK"), NULL, NULL,
 					B_WIDTH_AS_USUAL, B_STOP_ALERT);
 				alert->Go();
 			}

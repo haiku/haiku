@@ -324,7 +324,7 @@ FolderConfigWindow::_LoadFolders()
 		message.ReplaceFirst("%server%", fSettings.Server());
 		message.ReplaceFirst("%error%", strerror(status));
 		BAlert* alert = new BAlert("IMAP error", message.String(),
-			B_TRANSLATE("Ok"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		alert->Go();
 
 		PostMessage(B_QUIT_REQUESTED);
