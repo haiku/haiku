@@ -273,7 +273,7 @@ send_slave_address(const i2c_bus *bus, int slaveAddress, bool isWrite)
 	status_t status;
 
 	TRACE("%s: 0x%X\n", __func__, slaveAddress);
-	status = send_byte(bus, (slaveAddress & 0xfe) | !isWrite, true);
+	status = send_byte(bus, (slaveAddress & 0xfe) | (isWrite ? 0 : 1), true);
 	if (status != B_OK)
 		return status;
 

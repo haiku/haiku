@@ -290,11 +290,11 @@ TabletProtocolHandler::_ReadReport(void *buffer, uint32 *cookie)
 
 	bool inRange = true;
 	if (fRange != NULL && fRange->Extract() == B_OK && fRange->Valid())
-		inRange = fRange->Data() & 1 != 0;
+		inRange = ((fRange->Data() & 1) != 0);
 
 	bool eraser = false;
 	if (fEraser != NULL && fEraser->Extract() == B_OK && fEraser->Valid())
-		eraser = (fEraser->Data() & 1) != 0;
+		eraser = ((fEraser->Data() & 1) != 0);
 
 	fReport.DoneProcessing();
 	TRACE("got tablet report\n");
