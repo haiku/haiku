@@ -145,8 +145,8 @@ struct ext2_super_block {
 	}
 	void SetLastOrphan(ino_t id)
 		{ last_orphan = B_HOST_TO_LENDIAN_INT32((uint32)id); }
-	void SetReadOnlyFeatures(uint32 readOnlyFeatures) const
-		{ readOnlyFeatures = B_HOST_TO_LENDIAN_INT32(readOnlyFeatures); }
+	void SetReadOnlyFeatures(uint32 readOnlyFeatures)
+		{ read_only_features = B_HOST_TO_LENDIAN_INT32(readOnlyFeatures); }
 
 	bool IsValid();
 		// implemented in Volume.cpp
