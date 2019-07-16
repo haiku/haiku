@@ -770,8 +770,8 @@ VideoProducer::_FrameGeneratorThread()
 					} else if (err == B_LAST_BUFFER_ERROR)
 						running = false;
 					// Send the buffer on down to the consumer
-					if (wasCached || (err = SendBuffer(buffer, fOutput.source,
-							fOutput.destination) != B_OK)) {
+					if (wasCached || ((err = SendBuffer(buffer, fOutput.source,
+							fOutput.destination)) != B_OK)) {
 						// If there is a problem sending the buffer,
 						// or if we don't send the buffer because its
 						// contents are the same as the last one,
