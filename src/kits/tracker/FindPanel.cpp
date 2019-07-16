@@ -1408,8 +1408,8 @@ FindPanel::BuildAttrQuery(BQuery* query, bool &dynamicDate) const
 							"true") == 0) {
 						value = 1;
 					} else if (strcasecmp(textControl->Text(),
-							"true") == 0) {
-						value = 1;
+							"false") == 0) {
+						value = 0;
 					} else
 						value = (uint32)atoi(textControl->Text());
 
