@@ -48,7 +48,7 @@ BitmapManager *gBitmapManager = NULL;
 int
 compare_app_pointer(const ServerApp* a, const ServerApp* b)
 {
-	return (addr_t)b - (addr_t)b;
+	return (addr_t)a - (addr_t)b;
 }
 
 
