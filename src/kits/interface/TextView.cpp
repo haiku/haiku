@@ -5676,9 +5676,12 @@ void
 BTextView::_ApplyStyleRange(int32 fromOffset, int32 toOffset, uint32 mode,
 	const BFont* font, const rgb_color* color, bool syncNullStyle)
 {
+	BFont normalized;
+		// Declared before the if so it stays allocated until the call to
+		// SetStyleRange
 	if (font != NULL) {
 		// if a font has been given, normalize it
-		BFont normalized = *font;
+		normalized = *font;
 		_NormalizeFont(&normalized);
 		font = &normalized;
 	}
