@@ -264,7 +264,7 @@ Stream::Start()
 	status_t result = B_BUSY;
 	if (!fIsRunning) {
 		for (size_t i = 0; i < kSamplesBufferCount; i++)
-			result = _QueueNextTransfer(i, true);
+			result = _QueueNextTransfer(i, i == 0);
 		fIsRunning = result == B_OK;
 	}
 	return result;
@@ -278,9 +278,9 @@ Stream::Stop()
 		// wait until possible notification handling finished...
 		while (atomic_add(&fInsideNotify, 0) != 0)
 			snooze(100);
-		gUSBModule->cancel_queued_transfers(fStreamEndpoint);
 		fIsRunning = false;
 	}
+	gUSBModule->cancel_queued_transfers(fStreamEndpoint);
 
 	return B_OK;
 }
@@ -320,7 +320,7 @@ Stream::_TransferCallback(void* cookie, status_t status, void* data,
 {
 	Stream* stream = (Stream*)cookie;
 	atomic_add(&stream->fInsideNotify, 1);
-	if (status == B_CANCELED || stream->fDevice->fRemoved) {
+	if (status == B_CANCELED || stream->fDevice->fRemoved || !stream->fIsRunning) {
 		atomic_add(&stream->fInsideNotify, -1);
 		TRACE(ERR, "Cancelled: c:%p st:%#010x, data:%#010x, len:%d\n",
 			cookie, status, data, actualLength);
