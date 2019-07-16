@@ -89,7 +89,7 @@ UserlandFS::KernelEmu::new_path(const char *path, char **copy)
 	strcpy(copiedPath, path);
 	// append a dot, if desired
 	if (appendDot) {
-		copiedPath[len] = '.';
+		copiedPath[len - 1] = '.';
 		copiedPath[len] = '\0';
 	}
 	*copy = copiedPath;

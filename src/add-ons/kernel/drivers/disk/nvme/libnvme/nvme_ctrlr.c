@@ -197,7 +197,6 @@ static void nvme_ctrlr_set_intel_supported_features(struct nvme_ctrlr *ctrlr)
 	bool *supported_feature = ctrlr->feature_supported;
 
 	supported_feature[NVME_INTEL_FEAT_MAX_LBA] = true;
-	supported_feature[NVME_INTEL_FEAT_MAX_LBA] = true;
 	supported_feature[NVME_INTEL_FEAT_NATIVE_MAX_LBA] = true;
 	supported_feature[NVME_INTEL_FEAT_POWER_GOVERNOR_SETTING] = true;
 	supported_feature[NVME_INTEL_FEAT_SMBUS_ADDRESS] = true;
