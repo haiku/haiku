@@ -685,23 +685,25 @@ TeamDescriptionView::SetItem(TeamListItem* item)
 	fItem = item;
 
 	if (item == NULL) {
-		int32 styleStart = 0;
-		int32 styleEnd = 0;
-		BString text;
+		if (fInfoTextView != NULL) {
+			int32 styleStart = 0;
+			int32 styleEnd = 0;
+			BString text;
 
-		text.SetToFormat(fInfoString, fSeconds);
-		fInfoTextView->SetText(text);
-		if (fRebootRunner != NULL && fSeconds < 4) {
-			styleStart = text.FindLast('\n');
-			styleEnd = text.Length();
-		}
+			text.SetToFormat(fInfoString, fSeconds);
+			fInfoTextView->SetText(text);
+			if (fRebootRunner != NULL && fSeconds < 4) {
+				styleStart = text.FindLast('\n');
+				styleEnd = text.Length();
+			}
 
-		if (styleStart != styleEnd && fInfoTextView != NULL) {
-			BFont font;
-			fInfoTextView->GetFont(&font);
-			font.SetFace(B_BOLD_FACE);
-			fInfoTextView->SetStylable(true);
-			fInfoTextView->SetFontAndColor(styleStart, styleEnd, &font);
+			if (styleStart != styleEnd) {
+				BFont font;
+				fInfoTextView->GetFont(&font);
+				font.SetFace(B_BOLD_FACE);
+				fInfoTextView->SetStylable(true);
+				fInfoTextView->SetFontAndColor(styleStart, styleEnd, &font);
+			}
 		}
 	} else {
 		fTeamName->SetText(item->Path()->Path());

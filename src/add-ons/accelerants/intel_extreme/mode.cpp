@@ -423,11 +423,11 @@ intel_propose_display_mode(display_mode* target, const display_mode* low,
 status_t
 intel_set_display_mode(display_mode* mode)
 {
-	TRACE("%s(%" B_PRIu16 "x%" B_PRIu16 ")\n", __func__,
-		mode->virtual_width, mode->virtual_height);
-
 	if (mode == NULL)
 		return B_BAD_VALUE;
+
+	TRACE("%s(%" B_PRIu16 "x%" B_PRIu16 ")\n", __func__,
+		mode->virtual_width, mode->virtual_height);
 
 	display_mode target = *mode;
 

@@ -135,15 +135,15 @@ dosfs_release_vnode(fs_volume *_vol, fs_vnode *_node, bool reenter)
 
 	TOUCH(reenter);
 
-	DPRINTF(0, ("dosfs_release_vnode (ino_t %" B_PRIdINO ")\n", node->vnid));
-
-	if ((vol->fs_flags & FS_FLAGS_OP_SYNC) && node->dirty) {
-		LOCK_VOL(vol);
-		_dosfs_sync(vol);
-		UNLOCK_VOL(vol);
-	}
-
 	if (node != NULL) {
+		DPRINTF(0, ("dosfs_release_vnode (ino_t %" B_PRIdINO ")\n", node->vnid));
+
+		if ((vol->fs_flags & FS_FLAGS_OP_SYNC) && node->dirty) {
+			LOCK_VOL(vol);
+			_dosfs_sync(vol);
+			UNLOCK_VOL(vol);
+		}
+
 #if TRACK_FILENAME
 		if (node->filename) free(node->filename);
 #endif

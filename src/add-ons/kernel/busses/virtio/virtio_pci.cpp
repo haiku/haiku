@@ -506,10 +506,13 @@ uninit_bus(void* bus_cookie)
 			remove_io_interrupt_handler(bus->irq, virtio_pci_config_interrupt,
 					bus);
 		}
-		sPCIx86Module->disable_msi(bus->info.bus,
-			bus->info.device, bus->info.function);
-		sPCIx86Module->unconfigure_msi(bus->info.bus,
-			bus->info.device, bus->info.function);
+
+		if (sPCIx86Module != NULL) {
+			sPCIx86Module->disable_msi(bus->info.bus,
+				bus->info.device, bus->info.function);
+			sPCIx86Module->unconfigure_msi(bus->info.bus,
+				bus->info.device, bus->info.function);
+		}
 	} else
 		remove_io_interrupt_handler(bus->irq, virtio_pci_interrupt, bus);
 	if (sPCIx86Module != NULL) {
