@@ -8,7 +8,6 @@
 #define OBJECT_CACHE_H
 
 
-#include <BytePointer.h>
 #include <condition_variable.h>
 #include <lock.h>
 #include <slab/ObjectDepot.h>
@@ -141,9 +140,8 @@ link_to_object(object_link* link, size_t objectSize)
 static inline object_link*
 object_to_link(void* object, size_t objectSize)
 {
-	BytePointer<object_link> pointer((uint8*)object
+	return (object_link*)(((uint8*)object)
 		+ (objectSize - sizeof(object_link)));
-	return &pointer;
 }
 
 
