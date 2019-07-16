@@ -1302,6 +1302,11 @@ pinger()
 
 	i = sendmsg(s, &smsghdr, 0);
 
+	// as smsghdr is a global variable, don't let stray pointer to the stack
+	// in it after this function returns.
+	smsghdr.msg_iov = NULL;
+	smsghdr.msg_iovlen = 0;
+
 	if (i < 0 || i != cc)  {
 		if (i < 0)
 			warn("sendmsg");
