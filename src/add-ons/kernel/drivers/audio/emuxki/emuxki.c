@@ -2171,7 +2171,7 @@ emuxki_setup(emuxki_dev * card)
 
 #if MIDI
 	//SBLIVE : EMU_MUDATA, workaround 0, AUDIGY, AUDIGY2: 0, workaround 0x11020004
-	if ((err = (*mpu401->create_device)((card->config.nabmbar + !IS_AUDIGY(&card->config) ? EMU_MUDATA : 0),
+	if ((err = (*mpu401->create_device)((card->config.nabmbar + (!IS_AUDIGY(&card->config) ? EMU_MUDATA : 0)),
 		&card->midi.driver, !IS_AUDIGY(&card->config) ? 0 : 0x11020004, midi_interrupt_op, &card->midi)) < B_OK)
 		return (err);
 
