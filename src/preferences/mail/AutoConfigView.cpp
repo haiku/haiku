@@ -469,9 +469,9 @@ void
 ServerSettingsView::_DetectMenuChanges()
 {
 	bool changed = _HasMarkedChanged(fInboundAuthMenu, fInboundAuthItemStart)
-		| _HasMarkedChanged(fInboundEncryptionMenu, fInboundEncrItemStart)
-		| _HasMarkedChanged(fOutboundAuthMenu, fOutboundAuthItemStart)
-		| _HasMarkedChanged(fOutboundEncryptionMenu, fOutboundEncrItemStart);
+		|| _HasMarkedChanged(fInboundEncryptionMenu, fInboundEncrItemStart)
+		|| _HasMarkedChanged(fOutboundAuthMenu, fOutboundAuthItemStart)
+		|| _HasMarkedChanged(fOutboundEncryptionMenu, fOutboundEncrItemStart);
 
 	if (changed) {
 		BMessage msg(kServerChangedMsg);
