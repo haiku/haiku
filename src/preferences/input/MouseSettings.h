@@ -11,6 +11,7 @@
 #define MOUSE_SETTINGS_H
 
 
+#include <Input.h>
 #include <InterfaceDefs.h>
 #include <Point.h>
 #include <SupportDefs.h>

@@ -43,7 +43,7 @@ static const int32 kDefaultAccelerationFactor = 65536;
 static const bool kDefaultAcceptFirstClick = false;
 
 
-InputMouse::InputMouse()
+InputMouse::InputMouse(BInputDevice* dev)
 	: BView("InputMouse", B_WILL_DRAW)
 {
 	fSettingsView = new SettingsView(fSettings);

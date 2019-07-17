@@ -17,6 +17,7 @@
 #include <Input.h>
 #include <Path.h>
 
+
 #if DEBUG
 #	define LOG(text...) PRINT((text))
 #else
@@ -27,7 +28,7 @@
 class TouchpadPref {
 public:
 								TouchpadPref();
-								~TouchpadPref();
+			virtual				~TouchpadPref();
 
 			void				Revert();
 			void				Defaults();
@@ -39,8 +40,6 @@ public:
 
 			touchpad_settings&	Settings()
 									{ return fSettings; }
-			bool 				IsTouchpadConnected()
-									{ return fConnected; }
 			status_t			UpdateSettings();
 
 private:
@@ -48,9 +47,6 @@ private:
 			status_t			LoadSettings();
 			status_t			SaveSettings();
 
-			status_t			ConnectToTouchPad();
-
-			bool 				fConnected;
 			BInputDevice* 		fTouchPad;
 
 			touchpad_settings	fSettings;

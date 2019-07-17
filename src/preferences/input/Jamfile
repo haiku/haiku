@@ -5,10 +5,13 @@ UsePrivateHeaders input ;
 Preference Input :
 	Input.cpp
 	InputDeviceView.cpp
+	InputKeyboard.cpp
 	InputMouse.cpp
 	InputTouchpadPref.cpp
 	InputTouchpadPrefView.cpp
 	InputWindow.cpp
+	KeyboardSettings.cpp
+	KeyboardView.cpp
 	MouseView.cpp
 	MouseSettings.cpp
 	SettingsView.cpp
@@ -23,6 +26,8 @@ DoCatalogs Input :
 	InputTouchpadPref.cpp
 	InputTouchpadPrefView.cpp
 	InputWindow.cpp
+	KeyboardSettings.cpp
+	KeyboardView.cpp
 	MouseView.cpp
 	MouseSettings.cpp
 	SettingsView.cpp

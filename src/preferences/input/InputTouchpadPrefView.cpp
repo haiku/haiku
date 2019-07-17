@@ -264,20 +264,13 @@ TouchpadView::DrawSliders()
 //	#pragma mark - TouchpadPrefView
 
 
-TouchpadPrefView::TouchpadPrefView(const char* name)
+TouchpadPrefView::TouchpadPrefView(BInputDevice* dev)
 	:
-	BGroupView(name)
+	BGroupView()
 {
 	SetupView();
 	// set view values
 	SetValues(&fTouchpadPref.Settings());
-	if (fTouchpadPref.IsTouchpadConnected() == false) {
-		DisablePref();
-		fShowWarning->SetText(B_TRANSLATE("No touchpad found, the settings "
-			"will have no effect."));
-	}
-	else
-		fShowWarning->Hide();
 }
 
 
@@ -372,6 +365,7 @@ TouchpadPrefView::SetupView()
 	BBox* scrollBox = new BBox("Touchpad");
 	scrollBox->SetLabel(B_TRANSLATE("Scrolling"));
 
+
 	fTouchpadView = new TouchpadView(BRect(0, 0, 130, 120));
 	fTouchpadView->SetExplicitMaxSize(BSize(130, 120));
 
@@ -461,11 +455,9 @@ TouchpadPrefView::SetupView()
 		new BMessage(REVERT_SETTINGS));
 	fRevertButton->SetEnabled(false);
 
-	fShowWarning = new BStringView("warning", "");
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.SetInsets(B_USE_WINDOW_SPACING)
-		.Add(fShowWarning)
 		.Add(scrollBox)
 		.Add(tapBox)
 			.Add(new BSeparatorView(B_HORIZONTAL))
@@ -492,16 +484,4 @@ TouchpadPrefView::SetValues(touchpad_settings* settings)
 	fScrollStepYSlider->SetValue(20 - settings->scroll_ystepsize / 2);
 	fScrollAccelSlider->SetValue(settings->scroll_acceleration);
 	fTapSlider->SetValue(settings->tapgesture_sensibility);
-}
-
-
-void
-TouchpadPrefView::DisablePref()
-{
-	fTwoFingerBox->SetEnabled(false);
-	fTwoFingerHorizontalBox->SetEnabled(false);
-	fTapSlider->SetEnabled(false);
-	fScrollAccelSlider->SetEnabled(false);
-	fScrollStepXSlider->SetEnabled(false);
-	fScrollStepYSlider->SetEnabled(false);
 }

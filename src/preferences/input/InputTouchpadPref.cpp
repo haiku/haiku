@@ -19,12 +19,9 @@
 
 TouchpadPref::TouchpadPref()
 {
-	fConnected = false;
 	// default center position
 	fWindowPosition.x = -1;
 	fWindowPosition.y = -1;
-
-	ConnectToTouchPad();
 
 	if (LoadSettings() != B_OK)
 		Defaults();
@@ -35,8 +32,7 @@ TouchpadPref::TouchpadPref()
 
 TouchpadPref::~TouchpadPref()
 {
-	if (fConnected)
-		delete fTouchPad;
+	delete fTouchPad;
 
 	SaveSettings();
 }
@@ -52,11 +48,6 @@ TouchpadPref::Revert()
 status_t
 TouchpadPref::UpdateSettings()
 {
-	if (!fConnected)
-		return B_ERROR;
-
-	LOG("UpdateSettings of device %s\n", fTouchPad->Name());
-
 	BMessage msg;
 	msg.AddBool("scroll_twofinger", fSettings.scroll_twofinger);
 	msg.AddBool("scroll_twofinger_horizontal",
@@ -145,42 +136,4 @@ TouchpadPref::SaveSettings()
 	}
 
 	return B_OK;
-}
-
-
-status_t
-TouchpadPref::ConnectToTouchPad()
-{
-	BList devList;
-	status_t status = get_input_devices(&devList);
-	if (status != B_OK)
-		return status;
-
-	int32 i = 0;
-	while (true) {
-		BInputDevice* dev = (BInputDevice*)devList.ItemAt(i);
-		if (dev == NULL)
-			break;
-		i++;
-
-		LOG("input device %s\n", dev->Name());
-
-		BString name = dev->Name();
-
-		if (name.FindFirst("Touchpad") >= 0
-			&& dev->Type() == B_POINTING_DEVICE
-			&& !fConnected) {
-			fConnected = true;
-			fTouchPad = dev;
-			// Don't bail out here, since we need to delete the other devices
-			// yet.
-		} else {
-			delete dev;
-		}
-	}
-	if (fConnected)
-		return B_OK;
-
-	LOG("touchpad input device NOT found\n");
-	return B_ENTRY_NOT_FOUND;
 }

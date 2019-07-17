@@ -7,14 +7,16 @@
 */
 
 
+#include "MouseSettings.h"
+
 #include <FindDirectory.h>
 #include <File.h>
 #include <Path.h>
+#include <String.h>
 #include <View.h>
 
 #include <stdio.h>
 
-#include "MouseSettings.h"
 
 // The R5 settings file differs from that of OpenBeOS;
 // the latter maps 16 different mouse buttons

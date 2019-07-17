@@ -15,8 +15,8 @@
 #include <Bitmap.h>
 #include <Button.h>
 #include <CheckBox.h>
-#include <Slider.h>
 #include <PopUpMenu.h>
+#include <Slider.h>
 
 
 class MouseSettings;

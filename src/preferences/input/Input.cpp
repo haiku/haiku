@@ -61,6 +61,12 @@ InputApplication::MessageReceived(BMessage* message)
 			fWindow->PostMessage(message);
 			break;
 		}
+		case kMsgSliderrepeatrate:
+		case kMsgSliderdelayrate:
+		{
+			fWindow->PostMessage(message);
+			break;
+		}
 	default:
 		BApplication::MessageReceived(message);
 	}

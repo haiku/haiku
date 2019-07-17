@@ -12,12 +12,12 @@
 
 #include <ListView.h>
 #include <ListItem.h>
+#include <Message.h>
 #include <StringItem.h>
 #include <ScrollBar.h>
 #include <String.h>
 #include <ScrollView.h>
 #include <View.h>
-#include <Message.h>
 
 #include "InputTouchpadPref.h"
 #include "MouseSettings.h"
@@ -28,25 +28,15 @@ class TouchpadPref;
 class MouseSettings;
 
 
-class DeviceName : public BStringItem {
-public:
-				DeviceName(const char* item, int d);
-	virtual 	~DeviceName();
-	int			WhichDevice() { return fDevice; };
-private:
-	int fDevice;
-};
-
 class DeviceListView: public BView {
 public:
 			DeviceListView(const char *name);
 	virtual		~DeviceListView();
 	virtual	void	AttachedToWindow();
+	BListView*	fDeviceList;
+
 private:
 	BScrollView*	fScrollView;
-	BListView*	fDeviceList;
-	TouchpadPref	fTouchpadPref;
-	MouseSettings	fMouseSettings;
 };
 
 #endif	// _INPUT_DEVICE_VIEW_H */

@@ -22,19 +22,19 @@
 #include <TabView.h>
 #include <View.h>
 
-#include "InputWindow.h"
+#include "InputDeviceView.h"
 #include "MouseSettings.h"
 #include "MouseView.h"
 #include "SettingsView.h"
 
 #define MOUSE_SETTINGS 'Mss'
 
+class DeviceListView;
 
-class BTabView;
 
 class InputMouse : public BView {
 public:
-					InputMouse();
+					InputMouse(BInputDevice* dev);
 	virtual			~InputMouse();
 	void			SetMouseType(int32 type);
 	void			MessageReceived(BMessage* message);

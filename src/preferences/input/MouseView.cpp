@@ -29,7 +29,6 @@
 
 #include "InputConstants.h"
 #include "MouseSettings.h"
-#include "InputWindow.h"
 
 
 static const int32 kButtonTop = 3;

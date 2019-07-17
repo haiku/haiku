@@ -25,9 +25,11 @@ const uint32 kMsgMouseType		= 'PUmt';
 const uint32 kMsgMouseMap		= 'PUmm';
 const uint32 kMsgMouseSpeed		= 'SLms';
 const uint32 kMsgAccelerationFactor	= 'SLma';
-const uint32 kMsgSelected		= 'SMms';
-const uint32 kMsgAddToDeviceList	= 'SAdl';
-const uint32 kMsgPointingDevices	= 'MTss';
+const uint32 kMsgKeyboardButton		= 'BKdr';
+const uint32 kMsgSliderrepeatrate	= 'SLrr';
+const uint32 kMsgSliderdelayrate	= 'SLdr';
+
+const uint32 kMsgErrordetect		= 'ERor';
 
 const uint32 kBorderSpace = 10;
 const uint32 kItemSpace = 7;
