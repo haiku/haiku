@@ -1256,7 +1256,6 @@ RemoteView::_DrawThread()
 
 				offscreen->DrawString(string, offsets, count);
 
-				free(string);
 				reply.Start(RP_DRAW_STRING_RESULT);
 				reply.Add(token);
 				reply.Add(offscreen->PenLocation());
@@ -1268,6 +1267,7 @@ RemoteView::_DrawThread()
 				BRect boxes[count];
 				font.GetBoundingBoxesAsGlyphs(string, count, B_SCREEN_METRIC,
 					boxes);
+				free(string);
 
 				font_height height;
 				offscreen->GetFontHeight(&height);

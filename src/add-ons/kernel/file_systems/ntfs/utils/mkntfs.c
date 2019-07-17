@@ -4287,10 +4287,10 @@ static BOOL mkntfs_create_root_structures(void)
 				1);
 		if ((u32)(1 << -bs->clusters_per_mft_record) !=
 				g_vol->mft_record_size) {
-			free(bs);
 			ntfs_log_error("BUG: calculated clusters_per_mft_record"
 					" is wrong (= 0x%x)\n",
 					bs->clusters_per_mft_record);
+			free(bs);
 			return FALSE;
 		}
 	}
@@ -4304,11 +4304,11 @@ static BOOL mkntfs_create_root_structures(void)
 		bs->clusters_per_index_record = -g_vol->indx_record_size_bits;
 		if ((1 << -bs->clusters_per_index_record) !=
 				(s32)g_vol->indx_record_size) {
-			free(bs);
 			ntfs_log_error("BUG: calculated "
 					"clusters_per_index_record is wrong "
 					"(= 0x%x)\n",
 					bs->clusters_per_index_record);
+			free(bs);
 			return FALSE;
 		}
 	}
