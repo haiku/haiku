@@ -153,7 +153,7 @@ ArgvParser::NextArgvIfNotEmpty()
 }
 
 
-char
+int
 ArgvParser::GetCh()
 {
 	if (fPos < 0 || fBuffer[fPos] == 0) {
@@ -185,7 +185,7 @@ ArgvParser::EachArgvPrivate(const char* name, ArgvHandler argvHandlerFunc,
 	status_t result;
 
 	for (;;) {
-		char ch = GetCh();
+		int ch = GetCh();
 		if (ch == EOF) {
 			// done with fFile
 			if (fInDoubleQuote || fInSingleQuote) {
