@@ -634,10 +634,10 @@ SonixCamDevice::MinRawFrameSize()
 {
 	// if (fCompressionEnabled) { ... return ; }
 	BRect vf(VideoFrame());
-	int w = vf.IntegerWidth()+1;
-	int h = vf.IntegerHeight()+1;
+	size_t w = vf.IntegerWidth()+1;
+	size_t h = vf.IntegerHeight()+1;
 	// 1 byte/pixel
-	return (size_t)(w*h);
+	return w * h;
 }
 
 

@@ -96,9 +96,9 @@ exfat_identify_partition(int fd, partition_data* partition, void** _cookie)
 	uint32 rootDirCluster = superBlock.RootDirCluster();
 	uint32 blockSize = 1 << superBlock.BlockShift();
 	uint32 clusterSize = blockSize << superBlock.BlocksPerClusterShift();
-	uint64 rootDirectoryOffset = (uint64)(EXFAT_SUPER_BLOCK_OFFSET
-		+ superBlock.FirstDataBlock() * blockSize
-		+ (rootDirCluster - 2) * clusterSize);
+	uint64 rootDirectoryOffset = EXFAT_SUPER_BLOCK_OFFSET
+		+ (uint64)superBlock.FirstDataBlock() * blockSize
+		+ (rootDirCluster - 2) * clusterSize;
 	struct exfat_entry entry;
 	size_t entrySize = sizeof(struct exfat_entry);
 	for (uint32 i = 0; read_pos(fd, rootDirectoryOffset + i * entrySize,

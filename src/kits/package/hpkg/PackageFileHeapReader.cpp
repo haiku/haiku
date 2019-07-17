@@ -157,7 +157,7 @@ PackageFileHeapReader::ReadAndDecompressChunk(size_t chunkIndex,
 {
 	uint64 offset = fOffsets[chunkIndex];
 	bool isLastChunk
-		= uint64(chunkIndex + 1) * kChunkSize >= fUncompressedHeapSize;
+		= ((uint64)chunkIndex + 1) * kChunkSize >= fUncompressedHeapSize;
 	size_t compressedSize = isLastChunk
 		? fCompressedHeapSize - offset
 		: fOffsets[chunkIndex + 1] - offset;

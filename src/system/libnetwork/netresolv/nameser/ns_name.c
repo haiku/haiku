@@ -597,7 +597,7 @@ ns_name_pack(const u_char *src, u_char *dst, int dstsiz,
 		if (dstp + 1 + n >= eob) {
 			goto cleanup;
 		}
-		memcpy(dstp, srcp, (size_t)(n + 1));
+		memcpy(dstp, srcp, (size_t)n + 1);
 		srcp += n + 1;
 		dstp += n + 1;
 	} while (n != 0);

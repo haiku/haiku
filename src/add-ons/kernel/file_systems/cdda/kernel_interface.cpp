@@ -1454,7 +1454,7 @@ cdda_scan_partition(int fd, partition_data* partition, void* _cookie)
 	uint32 lastTrack = toc->last_track + 1 - toc->first_track;
 	scsi_cd_msf& end = toc->tracks[lastTrack].start.time;
 
-	partition->content_size = off_t(end.minute * kFramesPerMinute
+	partition->content_size = ((off_t)end.minute * kFramesPerMinute
 		+ end.second * kFramesPerSecond + end.frame) * kFrameSize;
 	partition->block_size = kFrameSize;
 

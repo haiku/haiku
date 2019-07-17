@@ -154,7 +154,7 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
 	addlen((size_t)x, &buf, &buflen);
 	len = SPRINTF((tmp, " %s %s", p_class(class), p_type(type)));
 	T(addstr(tmp, (size_t)len, &buf, &buflen));
-	T(spaced = addtab((size_t)(x + len), (size_t)16, spaced, &buf, &buflen));
+	T(spaced = addtab((size_t)x + len, (size_t)16, spaced, &buf, &buflen));
 
 	/*
 	 * RData.

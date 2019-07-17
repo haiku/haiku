@@ -1731,7 +1731,7 @@ GenericAttributeText::CommitEditedTextFlavor(BTextView* textView)
 	switch (type) {
 		case B_STRING_TYPE:
 			size = fModel->WriteAttr(columnName, type, 0, textView->Text(),
-				(size_t)(textView->TextLength() + 1));
+				(size_t)textView->TextLength() + 1);
 			break;
 
 		case B_BOOL_TYPE:

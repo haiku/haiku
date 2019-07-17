@@ -1713,7 +1713,7 @@ time_t dos_to_unix_time(dosdatetime)
         ++days;                 /* OK through 2199 */
 
     /* convert date & time to seconds relative to 00:00:00, 01/01/YRBASE */
-    m_time = (time_t)((unsigned long)(days + dy) * 86400L +
+    m_time = (time_t)(((unsigned long)days + dy) * 86400L +
                       (unsigned long)hh * 3600L +
                       (unsigned long)(mm * 60 + ss));
       /* - 1;   MS-DOS times always rounded up to nearest even second */
