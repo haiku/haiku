@@ -23,7 +23,7 @@ public:
 	
 						~PCL6Rasterizer()
 						{
-							delete fOutBuffer;
+							delete[] fOutBuffer;
 							fOutBuffer = NULL;
 						}
 	

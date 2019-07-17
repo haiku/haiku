@@ -3077,8 +3077,8 @@ vm_page_write_modified_page_range(struct VMCache* cache, uint32 firstPage,
 		= new(malloc_flags(allocationFlags)) PageWriteWrapper*[maxPages];
 	if (wrapperPool == NULL || wrappers == NULL) {
 		// don't fail, just limit our capabilities
-		free(wrapperPool);
-		free(wrappers);
+		delete[] wrapperPool;
+		delete[] wrappers;
 		wrapperPool = stackWrappersPool;
 		wrappers = stackWrappers;
 		maxPages = 1;
