@@ -79,7 +79,7 @@ extern long		a64l(const char *string);
 extern char		**environ;
 extern int		clearenv(void);
 extern char		*getenv(const char *name);
-extern int		putenv(const char *string);
+extern int		putenv(char *string);
 extern int		setenv(char const *name, char const *value, int rewrite);
 extern int		unsetenv(const char *name);
 

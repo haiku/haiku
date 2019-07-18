@@ -304,7 +304,7 @@ unsetenv(const char *name)
 
 
 int
-putenv(const char *string)
+putenv(char *string)
 {
 	char *value = strchr(string, '=');
 	status_t status;
