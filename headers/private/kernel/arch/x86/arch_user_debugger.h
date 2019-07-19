@@ -101,7 +101,7 @@ struct arch_breakpoint {
 struct arch_team_debug_info {
 	struct arch_breakpoint	breakpoints[X86_BREAKPOINT_COUNT];
 
-	uint32_t				dr7;	// debug control register DR7
+	size_t				dr7;	// debug control register DR7
 };
 
 struct arch_thread_debug_info {
