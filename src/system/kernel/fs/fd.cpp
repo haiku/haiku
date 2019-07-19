@@ -20,6 +20,7 @@
 
 #include <syscalls.h>
 #include <syscall_restart.h>
+#include <slab/Slab.h>
 #include <util/AutoLock.h>
 #include <vfs.h>
 #include <wait_for_objects.h>
@@ -36,6 +37,8 @@
 
 
 static const size_t kMaxReadDirBufferSize = 64 * 1024;
+
+extern object_cache* sFileDescriptorCache;
 
 
 static struct file_descriptor* get_fd_locked(struct io_context* context,
@@ -117,7 +120,7 @@ struct file_descriptor*
 alloc_fd(void)
 {
 	file_descriptor* descriptor
-		= (file_descriptor*)malloc(sizeof(struct file_descriptor));
+		= (file_descriptor*)object_cache_alloc(sFileDescriptorCache, 0);
 	if (descriptor == NULL)
 		return NULL;
 
@@ -214,7 +217,7 @@ put_fd(struct file_descriptor* descriptor)
 		if (descriptor->ops != NULL && descriptor->ops->fd_free != NULL)
 			descriptor->ops->fd_free(descriptor);
 
-		free(descriptor);
+		object_cache_free(sFileDescriptorCache, descriptor, 0);
 	} else if ((descriptor->open_mode & O_DISCONNECTED) != 0
 		&& previous - 1 == descriptor->open_count
 		&& descriptor->ops != NULL) {

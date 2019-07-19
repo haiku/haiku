@@ -109,7 +109,6 @@
 #endif
 
 
-object_cache* sPathNameCache;
 const static size_t kMaxPathLength = 65536;
 	// The absolute maximum path length (for getcwd() - this is not depending
 	// on PATH_MAX
@@ -325,6 +324,9 @@ typedef BOpenHashTable<MountHash> MountTable;
 
 } // namespace
 
+
+object_cache* sPathNameCache;
+object_cache* sFileDescriptorCache;
 
 #define VNODE_HASH_TABLE_SIZE 1024
 static VnodeTable* sVnodeTable;
@@ -5344,10 +5346,15 @@ vfs_init(kernel_args* args)
 			|| sMountsTable->Init(MOUNTS_HASH_TABLE_SIZE) != B_OK)
 		panic("vfs_init: error creating mounts hash table\n");
 
-	sPathNameCache = create_object_cache("path names",
+	sPathNameCache = create_object_cache("vfs path names",
 		B_PATH_NAME_LENGTH + 1, 8, NULL, NULL, NULL);
 	if (sPathNameCache == NULL)
 		panic("vfs_init: error creating path name object_cache\n");
+
+	sFileDescriptorCache = create_object_cache("vfs fds",
+		sizeof(file_descriptor), 8, NULL, NULL, NULL);
+	if (sPathNameCache == NULL)
+		panic("vfs_init: error creating file descriptor object_cache\n");
 
 	node_monitor_init();
 
