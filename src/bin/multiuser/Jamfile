@@ -7,7 +7,6 @@ UsePrivateHeaders kernel ;
 UsePrivateHeaders libroot ;
 UsePrivateHeaders shared ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
-SubDirC++Flags [ FDefines _BSD_SOURCE=1 ] ;
 
 StaticLibrary libmultiuser_utils.a : multiuser_utils.cpp ;
 

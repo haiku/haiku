@@ -7,9 +7,10 @@
 
 
 #include_next <errno.h>
+#include <features.h>
 
 
-#ifdef _BSD_SOURCE
+#ifdef _DEFAULT_SOURCE
 
 
 #define EDOOFUS	EINVAL

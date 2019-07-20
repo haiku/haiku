@@ -7,9 +7,10 @@
 
 
 #include_next <endian.h>
+#include <features.h>
 
 
-#ifdef _BSD_SOURCE
+#ifdef _DEFAULT_SOURCE
 
 #include <config/HaikuConfig.h>
 #include <support/ByteOrder.h>

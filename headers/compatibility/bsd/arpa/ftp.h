@@ -37,7 +37,10 @@
 #define	_ARPA_FTP_H_
 
 
-#ifdef _BSD_SOURCE
+#include <features.h>
+
+
+#ifdef _DEFAULT_SOURCE
 
 
 /* Definitions for FTP; see RFC-765. */

@@ -7,9 +7,10 @@
 
 
 #include_next <sys/cdefs.h>
+#include <features.h>
 
 
-#ifdef _BSD_SOURCE
+#ifdef _DEFAULT_SOURCE
 
 
 #define __FBSDID(x)

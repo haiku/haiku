@@ -2,7 +2,6 @@ SubDir HAIKU_TOP src bin network ftpd ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 UseHeaders $(SUBDIR) : true ;
-SubDirCcFlags [ FDefines _BSD_SOURCE=1 ] ;
 
 BinCommand ftpd :
 	ftpd.c

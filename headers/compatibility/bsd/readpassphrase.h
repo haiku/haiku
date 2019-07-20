@@ -23,7 +23,9 @@
 #ifndef _READPASSPHRASE_H_
 #define _READPASSPHRASE_H_
 
-#ifdef _BSD_SOURCE
+#include <features.h>
+
+#ifdef _DEFAULT_SOURCE
 
 #define RPP_ECHO_OFF    0x00		/* Turn off echo (default). */
 #define RPP_ECHO_ON     0x01		/* Leave echo on. */

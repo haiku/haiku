@@ -7,9 +7,10 @@
 
 
 #include_next <sys/wait.h>
+#include <features.h>
 
 
-#ifdef _BSD_SOURCE
+#ifdef _DEFAULT_SOURCE
 
 
 #include <sys/resource.h>

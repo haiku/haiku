@@ -4,7 +4,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 UsePrivateHeaders firewire ;
 UsePrivateKernelHeaders ;
 
-local defines = [ FDefines _KERNEL=1 _BSD_SOURCE=1 ] ;
+local defines = [ FDefines _KERNEL=1 ] ;
 SubDirCcFlags $(defines) ;
 SubDirC++Flags $(defines) ;
 

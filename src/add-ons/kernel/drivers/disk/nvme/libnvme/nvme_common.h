@@ -52,11 +52,8 @@
 #include <time.h>
 #include <sys/types.h>
 #include <sys/cdefs.h>
-#ifdef __HAIKU__
-#define _BSD_SOURCE
-#include <compatibility/bsd/sys/queue.h>
-#else
 #include <sys/queue.h>
+#ifndef __HAIKU__
 #include <linux/types.h>
 #endif
 

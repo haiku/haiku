@@ -6,7 +6,10 @@
 #define _NETINET_IN_SYSTM_H_
 
 
-#ifdef _BSD_SOURCE
+#include <features.h>
+
+
+#ifdef _DEFAULT_SOURCE
 
 
 #include <stdint.h>

@@ -33,8 +33,9 @@
 #ifndef _SYS_QUEUE_H_
 #define	_SYS_QUEUE_H_
 
+#include <features.h>
 
-#ifdef _BSD_SOURCE
+#ifdef _DEFAULT_SOURCE
 
 
 #include <sys/cdefs.h>
@@ -619,6 +620,6 @@ void	remque(void *a);
 
 #endif /* _KERNEL */
 
-#endif /* _BSD_SOURCE */
+#endif /* _DEFAULT_SOURCE */
 
 #endif /* !_SYS_QUEUE_H_ */

@@ -37,8 +37,9 @@
 #ifndef _PATHS_H_
 #define	_PATHS_H_
 
+#include <features.h>
 
-#if defined(_BSD_SOURCE) || defined(_GNU_SOURCE)
+#if defined(_DEFAULT_SOURCE) || defined(_GNU_SOURCE)
 
 
 #include <sys/cdefs.h>
@@ -141,7 +142,7 @@ __END_DECLS
 #endif /* RESCUE */
 
 
-#endif /* _BSD_SOURCE || _GNU_SOURCE */
+#endif /* _DEFAULT_SOURCE || _GNU_SOURCE */
 
 
 #endif /* !_PATHS_H_ */

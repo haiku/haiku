@@ -6,8 +6,6 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 local services = [ FGristFiles services ] ;
 SEARCH on $(services) = [ FDirName $(SUBDIR) netresolv defaults ] ;
 
-SubDirC++Flags [ FDefines _BSD_SOURCE=1 ] ;
-
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {

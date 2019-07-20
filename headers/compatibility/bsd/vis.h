@@ -35,8 +35,9 @@
 #ifndef _VIS_H_
 #define	_VIS_H_
 
+#include <features.h>
 
-#ifdef _BSD_SOURCE
+#ifdef _DEFAULT_SOURCE
 
 
 #include <sys/types.h>

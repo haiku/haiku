@@ -32,8 +32,6 @@ UseBuildFeatureHeaders libedit ;
 
 LINKFLAGS += -Wl,--exclude-libs,ALL ;
 
-SubDirC++Flags [ FDefines _BSD_SOURCE=1 ] ;
-
 SEARCH_SOURCE += [ FDirName $(SUBDIR) settings ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface cli ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface cli commands ] ;

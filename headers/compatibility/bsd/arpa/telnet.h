@@ -38,7 +38,10 @@
 #define	_ARPA_TELNET_H_
 
 
-#ifdef _BSD_SOURCE
+#include <features.h>
+
+
+#ifdef _DEFAULT_SOURCE
 
 
 /*

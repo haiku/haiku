@@ -1,7 +1,6 @@
 SubDir HAIKU_TOP src libs libtelnet ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
-SubDirCcFlags [ FDefines _BSD_SOURCE=1 ] ;
 
 StaticLibrary libtelnet.a :
 	auth.c

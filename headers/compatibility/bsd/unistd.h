@@ -7,9 +7,10 @@
 
 
 #include_next <unistd.h>
+#include <features.h>
 
 
-#ifdef _BSD_SOURCE
+#ifdef _DEFAULT_SOURCE
 
 
 #define L_SET	SEEK_SET

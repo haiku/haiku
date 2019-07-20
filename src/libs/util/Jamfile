@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src libs util ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 
-local defines = [ FDefines SCCSID=0 _BSD_SOURCE=1 ] ;
+local defines = [ FDefines SCCSID=0 ] ;
 SubDirCcFlags $(defines) ;
 
 local architectureObject ;

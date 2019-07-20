@@ -6,7 +6,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src libs libtelnet ] : false ;
 
 UseBuildFeatureHeaders ncurses ;
 
-local defines = [ FDefines USE_TERMIO=1 OLD_ENVIRON=1 ENV_HACK=1 _BSD_SOURCE=1 ] ;
+local defines = [ FDefines USE_TERMIO=1 OLD_ENVIRON=1 ENV_HACK=1 ] ;
 
 SubDirCcFlags $(defines) ;
 SubDirC++Flags $(defines) ;

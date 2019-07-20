@@ -5,7 +5,6 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 UsePrivateHeaders firewire ;
 UsePrivateHeaders media ;
 UsePrivateHeaders shared ;
-SubDirC++Flags [ FDefines _BSD_SOURCE=1 ] ;
 
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {

@@ -7,9 +7,10 @@
 
 
 #include_next <sys/time.h>
+#include <features.h>
 
 
-#ifdef _BSD_SOURCE
+#ifdef _DEFAULT_SOURCE
 
 
 #ifdef __cplusplus

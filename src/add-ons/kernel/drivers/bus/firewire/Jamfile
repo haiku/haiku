@@ -4,7 +4,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 UsePrivateHeaders firewire ;
 UsePrivateKernelHeaders ;
 
-SubDirCcFlags [ FDefines _KERNEL=1 _BSD_SOURCE=1 ] ;
+SubDirCcFlags [ FDefines _KERNEL=1 ] ;
 
 KernelAddon fw_raw :
 	fw_raw.c

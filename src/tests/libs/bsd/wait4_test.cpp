@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/resource.h> 
-#define _BSD_SOURCE
 #include <sys/wait.h>
 #include <unistd.h>
 

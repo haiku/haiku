@@ -5,7 +5,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs libtelnet ] : false ;
 
-local defines = [ FDefines USE_TERMIO=1 _BSD_SOURCE=1 ] ;
+local defines = [ FDefines USE_TERMIO=1 ] ;
 
 SubDirCcFlags $(defines) ;
 SubDirC++Flags $(defines) ;

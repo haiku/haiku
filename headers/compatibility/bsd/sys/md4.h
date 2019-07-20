@@ -27,8 +27,9 @@
 #ifndef _MD4_H_
 #define _MD4_H_
 
+#include <features.h>
 
-#ifdef _BSD_SOURCE
+#ifdef _DEFAULT_SOURCE
 
 
 /* MD4 context. */

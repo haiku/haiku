@@ -39,8 +39,9 @@
 #ifndef _LIBUTIL_H_
 #define	_LIBUTIL_H_
 
+#include <features.h>
 
-#ifdef _BSD_SOURCE
+#ifdef _DEFAULT_SOURCE
 
 
 #include <stdint.h>

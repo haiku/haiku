@@ -34,8 +34,6 @@ UsePrivateSystemHeaders ;
 
 LINKFLAGS += -Wl,--exclude-libs,ALL ;
 
-SubDirC++Flags [ FDefines _BSD_SOURCE=1 ] ;
-
 SEARCH_SOURCE += [ FDirName $(SUBDIR) arch ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) arch x86 ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) arch x86_64 ] ;
