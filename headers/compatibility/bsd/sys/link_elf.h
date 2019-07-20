@@ -47,7 +47,7 @@
 #ifdef _BSD_SOURCE
 
 
-#include <sys/elf.h>
+#include <os/kernel/elf.h>
 
 /*
  * Flags that describe the origin of the entries in Dl_serinfo.

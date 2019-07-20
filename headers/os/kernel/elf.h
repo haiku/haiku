@@ -1,13 +1,14 @@
 /*
- * Copyright 2002-2016 Haiku, Inc. All rights reserved.
+ * Copyright 2002-2019 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _ELF_H
 #define _ELF_H
 
 
-#include <SupportDefs.h>
+#include <BeBuild.h>
 #include <ByteOrder.h>
+#include <SupportDefs.h>
 
 
 typedef uint32 Elf32_Addr;
@@ -27,6 +28,16 @@ typedef uint64 Elf64_Xword;
 typedef int64 Elf64_Sxword;
 
 typedef Elf64_Half Elf64_Versym;
+
+#if B_HAIKU_32_BIT
+	#define Elf_Addr Elf32_Addr
+	#define Elf_Phdr Elf32_Phdr
+	#define Elf_Half Elf32_Half
+#elif B_HAIKU_64_BIT
+	#define Elf_Addr Elf64_Addr
+	#define Elf_Phdr Elf64_Phdr
+	#define Elf_Half Elf64_Half
+#endif
 
 
 /*** ELF header ***/
