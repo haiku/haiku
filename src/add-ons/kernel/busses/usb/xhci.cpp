@@ -848,7 +848,11 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 
 	if (!directionIn) {
 		TRACE("copying out iov count %ld\n", transfer->VectorCount());
-		transfer->PrepareKernelAccess();
+		status_t status = transfer->PrepareKernelAccess();
+		if (status != B_OK) {
+			FreeDescriptor(td);
+			return status;
+		}
 		WriteDescriptor(td, transfer->Vector(), transfer->VectorCount());
 	}
 
@@ -2801,9 +2805,13 @@ XHCI::FinishTransfers()
 			if (callbackStatus == B_OK) {
 				if (directionIn && actualLength > 0) {
 					TRACE("copying in iov count %ld\n", transfer->VectorCount());
-					transfer->PrepareKernelAccess();
-					ReadDescriptor(td, transfer->Vector(),
-						transfer->VectorCount());
+					status_t status = transfer->PrepareKernelAccess();
+					if (status == B_OK) {
+						ReadDescriptor(td, transfer->Vector(),
+							transfer->VectorCount());
+					} else {
+						callbackStatus = status;
+					}
 				}
 			}
 			transfer->Finished(callbackStatus, actualLength);
