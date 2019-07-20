@@ -2802,16 +2802,14 @@ XHCI::FinishTransfers()
 				TRACE("transfer not successful, actualLength=%" B_PRIuSIZE "\n",
 					actualLength);
 			}
-			if (callbackStatus == B_OK) {
-				if (directionIn && actualLength > 0) {
-					TRACE("copying in iov count %ld\n", transfer->VectorCount());
-					status_t status = transfer->PrepareKernelAccess();
-					if (status == B_OK) {
-						ReadDescriptor(td, transfer->Vector(),
-							transfer->VectorCount());
-					} else {
-						callbackStatus = status;
-					}
+			if (callbackStatus == B_OK && directionIn && actualLength > 0) {
+				TRACE("copying in iov count %ld\n", transfer->VectorCount());
+				status_t status = transfer->PrepareKernelAccess();
+				if (status == B_OK) {
+					ReadDescriptor(td, transfer->Vector(),
+						transfer->VectorCount());
+				} else {
+					callbackStatus = status;
 				}
 			}
 			transfer->Finished(callbackStatus, actualLength);
