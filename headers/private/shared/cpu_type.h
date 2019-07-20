@@ -324,8 +324,7 @@ get_cpu_model_string(enum cpu_platform platform, enum cpu_vendor cpuVendor,
 				return "FX-Series";
 			if (model == 0x10 || model == 0x13)
 				return "A-Series";
-		} else if (family == 0x8f)
-			return "Ryzen 7";
+		}
 
 		// Fallback to manual parsing of the model string
 		get_cpuid_model_string(cpuidName);
