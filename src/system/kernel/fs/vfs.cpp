@@ -5353,7 +5353,7 @@ vfs_init(kernel_args* args)
 
 	sFileDescriptorCache = create_object_cache("vfs fds",
 		sizeof(file_descriptor), 8, NULL, NULL, NULL);
-	if (sPathNameCache == NULL)
+	if (sFileDescriptorCache == NULL)
 		panic("vfs_init: error creating file descriptor object_cache\n");
 
 	node_monitor_init();
