@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Touchpad	607725922
+1	german	x-vnd.Haiku-Touchpad	526581388
 Scrolling	TouchpadPrefView		Scrollen
 Tapping	TouchpadPrefView		Klicken
 Touchpad	System name		Touchpad
@@ -7,6 +7,7 @@ OK	TouchpadPrefView		OK
 Horizontal scrolling	TouchpadPrefView		Horizontales Scrollen
 Slow	TouchpadPrefView		Langsam
 Two finger scrolling	TouchpadPrefView		Zwei-Finger-Scrollen
+No touchpad found, the settings will have no effect.	TouchpadPrefView		Touchpad nicht gefunden, Einstellungen sind wirkungslos.
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Der neue Scroll-Bereich ist sehr groß und könnte eine normale Mausfunktion beeinträchtigen. Soll die Einstellung wirklich geändert werden?
 Defaults	TouchpadPrefView		Standardwerte
 High	TouchpadPrefView		Hoch

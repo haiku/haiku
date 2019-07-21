@@ -1,12 +1,13 @@
-1	japanese	x-vnd.Haiku-IMAP	3072419505
+1	japanese	x-vnd.Haiku-IMAP	4170458531
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		サーバー \"%server%\" に接続できませんでした:\n%error%
 Failed to fetch available storage.	IMAPFolderConfig		使用可能な容量を取得できませんでした
 Cancel	IMAPFolderConfig		キャンセル
-Ok	IMAPFolderConfig		Ok
 No encryption	imap_config		暗号化なし
 Configure IMAP Folders	imap_config		IMAP フォルダーの設定
 SSL	imap_config		SSL
 Apply	IMAPFolderConfig		適用
 status	IMAPFolderConfig		状態
+Update subcription of IMAP folders, have patience…	IMAPFolderConfig		IMAP フォルダーのサブスクリプションの更新のため、お待ちください…
 IMAP Folders	IMAPFolderConfig		IMAPフォルダー
 Destination:	imap_config		メッセージの保存先:
+Fetching IMAP folders, have patience…	IMAPFolderConfig		IMAP フォルターの取得中です、お待ちください…

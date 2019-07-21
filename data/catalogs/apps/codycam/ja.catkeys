@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-CodyCam	3200733765
+1	japanese	x-vnd.Haiku-CodyCam	4023809311
 destination directory expected	CodyCam		出力先ディレクトリを入力してください
 reply: '%s'\n	SftpClient		返信: '%s'\n
 JPEG image	CodyCam		JPEG 画像
@@ -27,6 +27,7 @@ Every 2 hours	CodyCam		2 時間ごと
 Cannot get a time source	CodyCam		タイムソースを取得できません
 Every 4 hours	CodyCam		4 時間ごと
 cmd: '%s'\n	FtpClient		コマンド: '%s'\n
+Closing the window	VideoConsumer.cpp		ウィンドウを閉じる
 Never	CodyCam		中止
 Every 8 hours	CodyCam		8 時間ごと
 Cannot start the video source	CodyCam		ビデオソースを開始できません
@@ -38,6 +39,7 @@ still image filename expected	CodyCam		イメージのファイル名を入力�
 File name:	CodyCam		ファイル名:
 Directory:	CodyCam		ディレクトリ:
 Error setting type of output file	VideoConsumer.cpp		出力ファイルの形式の設定に失敗
+Locking the window	VideoConsumer.cpp		ウィンドウをロックする
 Cannot find an available video stream	CodyCam		有効なビデオストリームが見つかりません
 Upload…	VideoConsumer.cpp		アップロード…
 password expected	CodyCam		パスワードを入力してください

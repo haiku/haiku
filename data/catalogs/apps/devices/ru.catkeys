@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Devices	490380176
+1	russian	x-vnd.Haiku-Devices	3345509916
 ACPI bus	DevicesView		Шина ACPI
 Encryption controller	Device		Контроллер шифрования
 Bus Information	Device		Информация о шине
@@ -54,7 +54,9 @@ Device name	DeviceACPI		Название устройства
 Card Reader	DeviceSCSI		Кардридер
 Display controller	Device		Контроллер дисплея
 Basic information	DevicesView		Основная информация
+ACPI Button '%1'	DeviceACPI		ACPI кнопка '%1'
 Bus	DevicesView		Шина
+ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Название устройства
 Disk Drive	DeviceSCSI		Дисковод
 Other	DeviceSCSI		Другие

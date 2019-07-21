@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-BootManager	3886671855
+1	german	x-vnd.Haiku-BootManager	867546001
 Old Master Boot Record backup failure	BootManagerController	Title	Fehler beim Sichern des alten Master-Boot-Record
 At least one partition must be selected!	BootManagerController		Es muss mindestens eine Partition ausgewählt werden!
 No space available!	DrivesPage	Cannot install	Kein Speicher verfügbar!
@@ -16,6 +16,7 @@ Never	DefaultPartitionPage		Nie
 Summary	BootManagerController	Title	Zusammenfassung
 An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Beim Schreiben des Bootmenüs ist ein Fehler aufgetreten. Der Master-Boot-Record ist eventuell beschädigt. Der MBR sollte daher sofort wiederhergestellt werden!
 After three seconds	DefaultPartitionPage		Nach drei Sekunden
+Read only!	DrivesPage	Cannot install	Schreibgeschützt!
 Write boot menu	BootManagerController	Button	Bootmenü schreiben
 OK	BootManagerController	Button	OK
 Uninstall boot manager	BootManagerController	Title	Bootmenü entfernen

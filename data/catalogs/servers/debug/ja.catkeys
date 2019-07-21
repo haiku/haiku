@@ -1,6 +1,7 @@
-1	japanese	x-vnd.Haiku-debug_server	2134779566
+1	japanese	x-vnd.Haiku-debug_server	166857212
 Debug	DebugServer		デバッグ
 Terminate	DebugServer		終了
 The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		アプリケーション:\n\n %app\n\nは、エラーのため続行できません。Haiku はアプリケーションを終了し、後始末をします。
 Save report	DebugServer		レポートを保存
 Write core file	DebugServer		コアファイルを書き込む
+Oh no!	DebugServer		Oh no!

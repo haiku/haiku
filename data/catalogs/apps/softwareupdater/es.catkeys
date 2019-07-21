@@ -21,8 +21,8 @@ Contacting software repositories to check for package updates.	SoftwareUpdaterWi
 Cancelling updates	SoftwareUpdaterWindow		Cancelando actualizaciones
 Cancel	SoftwareUpdaterWindow	Alert button label	Cancelar
 There were no updates found.	UpdateAction		No se encontraron actualizaciones.
-Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Por favor escoja entre las siguientes opciones de actualización:\n\nActualizar:\n\tActualiza los paquetes instalados.\nSincronización completa:\n\tSincroniza los paquetes instalados con los repositorios.
 OK	SoftwareUpdaterWindow		Aceptar
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Por favor escoja entre las siguientes opciones de actualización:\n\nActualizar:\n\tActualiza los paquetes instalados.\nSincronización completa:\n\tSincroniza los paquetes instalados con los repositorios.
 The following changes will be made:	SoftwareUpdaterWindow		Se realizarán los siguientes cambios:
 Argument variables are no longer accepted\n	SoftwareUpdaterApp		Las variables de argumentos ya no se aceptan\n
 Fatal error while checking for updates: %s\n	CheckAction		Se ha producido un error al buscar las actualizaciones: %s\n
@@ -44,8 +44,8 @@ Installing version	SoftwareUpdaterWindow	List item text	Instalando versión
 Checking for updates	CheckManager		Buscando actualizaciones
 No remote repositories are available	UpdateManager	Error message	No hay repositorios remotos disponibles
 Update	SoftwareUpdaterWindow	Alert button label	Actualizar
-Updates did not complete	UpdateAction		La actualización no se completó
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Abrir repositorios
+Updates did not complete	UpdateAction		La actualización no se completó
 Invalid update type, cannot continue with updates	UpdateAction		Tipo de actualización inválido, no se puede continuar con la actualización
 Uninstalling version	SoftwareUpdaterWindow	List item text	Desinstalando versión
 %i of %i	UpdateManager	Do not translate %i	%i de %i

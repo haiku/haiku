@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Network	1314732966
+1	russian	x-vnd.Haiku-Network	3145282573
 Ethernet device	InterfaceListItem		Ethernet устройство
 Link speed:	IntefaceView		Скорость соединения:
 disconnected	IntefaceView		отключено
@@ -20,8 +20,10 @@ EAP	EAP protected network		EAP
 Services	NetworkWindow		Службы
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Не удалось установить NetworkStatus в Deskbar: %s
 Revert	NetworkWindow		Вернуть
+off	ServiceListItem		выключен
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<беспроводные сети не найдены>
+Enable	IntefaceView		Включить
 connected	IntefaceView		подключено
 VPN	NetworkWindow		VPN
 Apply	IntefaceAddressView		Применить
@@ -37,6 +39,7 @@ MAC address:	IntefaceView		MAC-адрес:
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 disabled	InterfaceListItem		отключен
 Dial-up connection	InterfaceListItem		Коммутируемый доступ
+on	ServiceListItem		включен
 The method for obtaining an IP address	IntefaceAddressView		Метод получения IP-адреса
 Automatic	IntefaceAddressView		Автоматический
 Choose automatically	IntefaceView		Выбрать автоматически
@@ -47,7 +50,6 @@ open	Open network		открытая
 Network	NetworkWindow		Сеть
 Your gateway to the internet	IntefaceAddressView		Ваш шлюз в интернет
 Enable	ServiceView		Включить
-Ok	NetworkWindow		OK
 Wireless device	InterfaceListItem		Беспроводное устройство
 Disabled	IntefaceAddressView		Отключен
 VPN connection	InterfaceListItem		VPN соединение

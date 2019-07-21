@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-MAIL	1865394837
+1	japanese	x-vnd.Be-MAIL	3155788869
 Set to Saved	Mail		「保存済み」に設定
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		メッセージ本文には %ld 個エンコードできない文字があります。他の文字セットを使うと修正される可能性があります。そのまま送信する場合、「送信」ボタンを押してください (代用文字が Unicode 化可能な文字に代わって使われます)。文字セットを変更する場合、「中止」ボタンを押してください。
 Text wrapping:	Mail		文字列の折り返し:
@@ -8,6 +8,7 @@ Reply	Mail		返信
 Next message	Mail		次のメッセージ
 Mailing	Mail		メールの設定
 Unread	Mail		未読
+Same sender	Mail		同じ送信先
 Copy to new	Mail		新規メッセージにコピー
 Save as draft	Mail		下書きとして保存
 Encoding:	Mail		文字コード:
@@ -31,6 +32,7 @@ Only files can be added as attachments.	Mail		添付できるのは、ファイ�
 Close	Mail		閉じる
 Untitled	Mail		無題
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		転送メールから添付ファイルを削除する機能はまだ実装されていません。\nまだ正しく動作しないでしょう。
+Same recipient	Mail		同じ受信者
 Previous message	Mail		前のメッセージ
 (Address unavailable)	Mail		(アドレスは利用できません)
 Mail	System name		メール
@@ -83,6 +85,7 @@ Colored quotes:	Mail		引用部分の着色:
 Automatic	Mail		自動
 Open this link	Mail		このリンクを開く
 Auto signature:	Mail		署名の自動追加:
+Same subject	Mail		同じ表題
 Send	Mail		送信
 Open draft	Mail		下書きを開く
 Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	'New' のままにする

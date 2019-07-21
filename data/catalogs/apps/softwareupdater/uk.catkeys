@@ -21,8 +21,8 @@ Contacting software repositories to check for package updates.	SoftwareUpdaterWi
 Cancelling updates	SoftwareUpdaterWindow		Відміна оновлень
 Cancel	SoftwareUpdaterWindow	Alert button label	Відмінити
 There were no updates found.	UpdateAction		Не знайдено жодних оновлень.
-Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Будь-ласка, оберіть з цих параметрів оновлення:\n\nОновлення:\n\tОновити всі встановлені пакунки.\nПовна синхронізація:\n\tСинхронізувати встановлені пакунки зі сховищами.
 OK	SoftwareUpdaterWindow		Гаразд
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Будь-ласка, оберіть з цих параметрів оновлення:\n\nОновлення:\n\tОновити всі встановлені пакунки.\nПовна синхронізація:\n\tСинхронізувати встановлені пакунки зі сховищами.
 The following changes will be made:	SoftwareUpdaterWindow		Будуть зроблені наступні зміни:
 Argument variables are no longer accepted\n	SoftwareUpdaterApp		Змінні аргументу більше не приймаються\n
 Fatal error while checking for updates: %s\n	CheckAction		Критична помилка при перевірці оновлень: %s\n
@@ -44,8 +44,8 @@ Installing version	SoftwareUpdaterWindow	List item text	Встановлення
 Checking for updates	CheckManager		Перевірка оновлень
 No remote repositories are available	UpdateManager	Error message	Віддалені сховища відсутні
 Update	SoftwareUpdaterWindow	Alert button label	Оновлення
-Updates did not complete	UpdateAction		Оновлення не завершені
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Відкрити Сховища
+Updates did not complete	UpdateAction		Оновлення не завершені
 Invalid update type, cannot continue with updates	UpdateAction		Недійсний тип оновлення, неможливо продовжити оновлення
 Uninstalling version	SoftwareUpdaterWindow	List item text	Видалення версії
 %i of %i	UpdateManager	Do not translate %i	%i з %i

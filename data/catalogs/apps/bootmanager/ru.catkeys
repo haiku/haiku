@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-BootManager	3886671855
+1	russian	x-vnd.Haiku-BootManager	867546001
 Old Master Boot Record backup failure	BootManagerController	Title	Предыдущая загрузочная запись (MBR) не сохранена
 At least one partition must be selected!	BootManagerController		Как минимум один раздел должен быть выбран!
 No space available!	DrivesPage	Cannot install	Нет места для MBR!
@@ -16,6 +16,7 @@ Never	DefaultPartitionPage		Бесконечно
 Summary	BootManagerController	Title	Итог
 An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Произошла ошибка при записи загрузочного меню. Загрузочная запись (MBR) может быть повреждена. Вы должны восстановить её (MBR) прямо сейчас!
 After three seconds	DefaultPartitionPage		3 секунды
+Read only!	DrivesPage	Cannot install	Только для чтения!
 Write boot menu	BootManagerController	Button	Записать загрузочное меню
 OK	BootManagerController	Button	ОК
 Uninstall boot manager	BootManagerController	Title	Удалить менеджер загрузки

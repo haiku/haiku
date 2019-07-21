@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-PRNT	2042381362
+1	japanese	x-vnd.Be-PRNT	1465107170
 Test page	TestPageView		テストページ
 Remove	PrintersWindow		削除
 Red	TestPageView		赤
@@ -16,6 +16,8 @@ Waiting	JobListView		待機中
 Processing	JobListView		処理中
 Cancel	AddPrinterDialog		中止
 Unknown status	JobListView		状態が不明
+Print jobs for %printer_name%	PrintersWindow		%printer_name% の印刷ジョブ
+{0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? ページ}=1{# ページ}other{# ページ}}
 Add printer	AddPrinterDialog		プリンターを追加
 Printers	PrintersWindow		プリンター
 No printer found!	TransportMenu		プリンターが見つかりません。
@@ -29,6 +31,7 @@ Yellow	TestPageView		黄
 Black	TestPageView		黒
 Printer type:	AddPrinterDialog		プリンターの種類:
 Printers	System name		プリンター
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{印刷待ちジョブ無し}=1{1 つの印刷待ちジョブ}other{# つの印刷待ちジョブ}}
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		プリンター: %printer_name%\nドライバー: %driver%\n
 Green	TestPageView		緑
 Print test page	PrintersWindow		テストページを印刷

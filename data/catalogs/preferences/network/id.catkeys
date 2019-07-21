@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Network	1314732966
+1	indonesian	x-vnd.Haiku-Network	3284324275
 Ethernet device	InterfaceListItem		Perangkat ethernet
 Link speed:	IntefaceView		Kecepatan jalur:
 disconnected	IntefaceView		terputus
@@ -47,7 +47,6 @@ open	Open network		buka
 Network	NetworkWindow		Jaringan
 Your gateway to the internet	IntefaceAddressView		Gateway anda ke internet
 Enable	ServiceView		Dimungkinkan
-Ok	NetworkWindow		Oke
 Wireless device	InterfaceListItem		Perangkat nirkabel
 Disabled	IntefaceAddressView		Dilumpuhkan
 VPN connection	InterfaceListItem		Koneksi VPN

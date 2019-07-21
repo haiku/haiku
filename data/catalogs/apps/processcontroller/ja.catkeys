@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ProcessController	4131818684
+1	japanese	x-vnd.Haiku-ProcessController	168752057
 Error saving file	ProcessController		ファイル保存中にエラーが発生しました
 Display priority	ProcessController		表示優先度
 That's no Fun!	ProcessController		そんなのおもしろくない!
@@ -45,5 +45,6 @@ Damned!	ProcessController		とんでもない!
 New Terminal	ProcessController		ターミナルを起動
 Power saving	ProcessController		省電力モード
 ProcessController is already installed in Deskbar.	ProcessController		プロセスコントローラーは、すでに Deskbar にインストールされています
+This is the last active processor…\nYou can't turn it off!	ProcessController		これは最後のアクティブなプロセッサです…\n止められません!
 This thread is already gone…	ProcessController		スレッドはすでに終了しています…
 Run in window	ProcessController		ウィンドウモードで起動

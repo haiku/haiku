@@ -1,8 +1,7 @@
-1	greek, modern (1453-)	x-vnd.Haiku-IMAP	2947821065
+1	greek, modern (1453-)	x-vnd.Haiku-IMAP	1814079871
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Αδυναμία σύνδεσης με το διακομιστή \"%server%\":\n%error%
 Failed to fetch available storage.	IMAPFolderConfig		Αδύνατο το κατέβασμα επιπλέον χωρητικότητας.
 Cancel	IMAPFolderConfig		Άκυρο
-Ok	IMAPFolderConfig		Εντάξει
 Configure IMAP Folders	imap_config		Ρύθμιση φακέλων IMAP
 Apply	IMAPFolderConfig		Εφαρμογή
 status	IMAPFolderConfig		κατάσταση

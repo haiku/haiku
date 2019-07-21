@@ -1,10 +1,11 @@
-1	german	x-vnd.Haiku-LaunchBox	3692177981
+1	german	x-vnd.Haiku-LaunchBox	1530497419
 Set description…	LaunchBox		Beschreibung ändern…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Wirklich diesen Block schließen?\n(Der Block wird nicht gespeichert.)
 OK	LaunchBox		OK
 Ignore double-click	LaunchBox		Doppelklick ignorieren
 Show on all workspaces	LaunchBox		Auf allen Arbeitsflächen anzeigen
 Name Panel	LaunchBox		Namenspanel
+Autostart	LaunchBox		Autostart
 Clone	LaunchBox		Duplizieren
 Description for '%3'	LaunchBox		Beschreibung für '%3'
 Show window border	LaunchBox		Fensterrahmen anzeigen

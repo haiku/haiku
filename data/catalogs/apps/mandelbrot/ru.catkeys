@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Mandelbrot	1781779654
+1	russian	x-vnd.Haiku-Mandelbrot	2260046134
 Burning Ship	MandelbrotWindow		Горящий корабль
 Grassland	MandelbrotWindow		Луг
 Lightning	MandelbrotWindow		Молния
@@ -9,6 +9,7 @@ Tricorn	MandelbrotWindow		Треуголка
 Royal	MandelbrotWindow		Королевский
 Orbit Trap	MandelbrotWindow		Орбитальная ловушка
 Deepfrost	MandelbrotWindow		Заморозка
+Subsampling	MandelbrotWindow		Подвыборка
 Quit	MandelbrotWindow		Выход
 File	MandelbrotWindow		Файл
 Julia	MandelbrotWindow		Джулия

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Shortcuts	1611284793
+1	german	x-vnd.Haiku-Shortcuts	3834857117
 *MouseUp	ShortcutsWindow		*Maustaste losgelassen
 Application	ShortcutsWindow		Anwendung
 Option	ShortcutsSpec	Name for modifier on keyboard	Option
@@ -9,6 +9,7 @@ Don't save	ShortcutsWindow		Verwerfen
 *Beep	ShortcutsWindow		*Piepton
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Die Tastenbelegung konnte nicht gespeichert werden.
 Save	ShortcutsWindow		Speichern
+Either	ShortcutsSpec		Alle
 Oh no	ShortcutsWindow		Herrje!
 Key	ShortcutsWindow		Taste
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*Öffne Suche-Dialog
@@ -19,21 +20,26 @@ Quit	ShortcutsWindow		Beenden
 Cancel	ShortcutsWindow		Abbrechen
 *MoveMouse +20 +0	ShortcutsWindow		*Maus 20 Pixel nach rechts bewegen
 Control	ShortcutsSpec	Name for modifier on keyboard	Strg
+Left	ShortcutsSpec		Links
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht gelesen werden.
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht gespeichert werden.
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Zeichen einfügen \"Hier der Text\"
 Remove selected shortcut	ShortcutsWindow		Markierten Eintrag entfernen
 Error, NULL state description?	ShortcutsSpec		Fehler, NULL Status Beschreibung?
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht geladen werden.
 Save & apply	ShortcutsWindow		Speichern & anwenden
 Open	ShortcutsWindow		Öffnen
 Append	ShortcutsWindow		Anhängen
+Both	ShortcutsSpec		Beide
 Save KeySet as…	ShortcutsWindow		Tastenbelegung speichern unter…
 Append KeySet…	ShortcutsWindow		Tastenbelegung anfügen…
 *MouseButton 1	ShortcutsWindow		*Maustaste 1 drücken
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		Maus nach oben ins linke Eck und Maustaste 1 drücken
+Right	ShortcutsSpec		Rechts
 OK	ShortcutsWindow		OK
 Add new shortcut	ShortcutsWindow		Neue Tasten-Kombi
+(None)	ShortcutsSpec		(Keine)
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 Open KeySet…	ShortcutsWindow		Tastenbelegung öffnen…
 File	ShortcutsWindow		Datei

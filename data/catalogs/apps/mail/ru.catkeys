@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-MAIL	1865394837
+1	russian	x-vnd.Be-MAIL	3155788869
 Set to Saved	Mail		Послать в сохраненные
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основной текст содержит %ld некодируемых символов. Возможно, другая кодировка подойдет лучше? Нажмите Отправить чтобы все равно отправить письмо (некодиуемые символы будут заменены на кодируемые), или нажмите Отмена и попробуйте исправить их вручную.
 Text wrapping:	Mail		Перенос строк:
@@ -8,6 +8,7 @@ Reply	Mail		Ответить
 Next message	Mail		Следующее сообщение
 Mailing	Mail		Отправка
 Unread	Mail		Непрочитанные
+Same sender	Mail		Тот же отправитель
 Copy to new	Mail		Копировать в новое
 Save as draft	Mail		Сохранить как черновик
 Encoding:	Mail		Кодировка:
@@ -31,6 +32,7 @@ Only files can be added as attachments.	Mail		Только файлы могут
 Close	Mail		Закрыть
 Untitled	Mail		Безымянный
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Удаление вложений из пересланного письма еще не реализовано!\nЭта функция еще не работает.
+Same recipient	Mail		Тот же получатель
 Previous message	Mail		Предыдущее письмо
 (Address unavailable)	Mail		(Адрес недоступен)
 Mail	System name		Почта
@@ -83,6 +85,7 @@ Colored quotes:	Mail		Цветные кавычки:
 Automatic	Mail		Автоматическая
 Open this link	Mail		Открыть эту ссылку
 Auto signature:	Mail		Автоподпись:
+Same subject	Mail		Та же тема письма
 Send	Mail		Отправить
 Open draft	Mail		Открыть черновики
 Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Оставить как 'New'

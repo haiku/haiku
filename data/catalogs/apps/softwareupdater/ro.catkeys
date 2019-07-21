@@ -21,8 +21,8 @@ Contacting software repositories to check for package updates.	SoftwareUpdaterWi
 Cancelling updates	SoftwareUpdaterWindow		Se anulează actualizările
 Cancel	SoftwareUpdaterWindow	Alert button label	Anulează
 There were no updates found.	UpdateAction		Nu s-au găsit actualizări
-Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Alegeți din aceste opțiuni de actualizare:\n\nActualizare:\n\tActualizează toate pachetele instalate.\nSincronizare completă:\n\tSincronizează pachetele instalate cu depozitele.
 OK	SoftwareUpdaterWindow		OK
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Alegeți din aceste opțiuni de actualizare:\n\nActualizare:\n\tActualizează toate pachetele instalate.\nSincronizare completă:\n\tSincronizează pachetele instalate cu depozitele.
 The following changes will be made:	SoftwareUpdaterWindow		Următoarele modificări vor fi efectuate:
 Argument variables are no longer accepted\n	SoftwareUpdaterApp		Variabilele de argumente nu mai sunt acceptate\n
 Fatal error while checking for updates: %s\n	CheckAction		Eroare fatală la verificarea pentru actualizări: %s\n
@@ -44,8 +44,8 @@ Installing version	SoftwareUpdaterWindow	List item text	Se instalează versiunea
 Checking for updates	CheckManager		Se verifică pentru actualizări
 No remote repositories are available	UpdateManager	Error message	Nu există depozite disponibile la distanță
 Update	SoftwareUpdaterWindow	Alert button label	Actualizează
-Updates did not complete	UpdateAction		Actualizările nu au fost completate
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Deschide depozitele
+Updates did not complete	UpdateAction		Actualizările nu au fost completate
 Invalid update type, cannot continue with updates	UpdateAction		Tip de actualizare nevalid, nu se poate continua cu actualizările
 Uninstalling version	SoftwareUpdaterWindow	List item text	Se dezinstalează versiunea
 %i of %i	UpdateManager	Do not translate %i	%i din %i

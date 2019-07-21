@@ -1,10 +1,11 @@
-1	german	x-vnd.Haiku-Media	4205337498
+1	german	x-vnd.Haiku-Media	1682972002
 Audio mixer	Media Window		Audiomixer
 Show volume control on Deskbar	Media views		Lautstärkeregelung in Deskbar
 Quit	Media Window		Beenden
 Restart media services	Media views		Mediadienste neustarten
 Couldn't add volume control in Deskbar: %s\n	Media views		Die Lautstärkeregelung konnte nicht in der Deskbar installiert werden: %s\n
 Start media server	Media Window		Mediaserver starten
+<none>	VideoInputMenu	Used when no video input is available	<kein>
 Audio settings	Media Window		Audio-Einstellungen
 Quit anyway	Media Window		Trotzdem beenden
 Couldn't remove volume control in Deskbar: %s\n	Media views		Die Lautstärkeregelung konnte nicht aus der Deskbar entfernt werden: %s\n
@@ -22,3 +23,4 @@ Channel:	Media views		Kanal:
 Defaults	Media views		Standardwerte
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Verbindung mit dem Mediaserver fehlgeschlagen.\nSoll er gestartet werden?
 Video settings	Media Window		Video-Einstellungen
+<none>	VideoOutputMenu	Used when no video output is available	<kein>

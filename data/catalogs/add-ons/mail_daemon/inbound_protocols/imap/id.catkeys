@@ -1,8 +1,7 @@
-1	indonesian	x-vnd.Haiku-IMAP	3072419505
+1	indonesian	x-vnd.Haiku-IMAP	1938678311
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Tidak dapat terhubung ke server \"%server%\":\n%error%
 Failed to fetch available storage.	IMAPFolderConfig		Gagal untuk mengambil penyimpanan yang tersedia.
 Cancel	IMAPFolderConfig		Batal
-Ok	IMAPFolderConfig		Oke
 No encryption	imap_config		Tak ada enkripsi
 Configure IMAP Folders	imap_config		Mengkonfigurasi folder IMAP
 SSL	imap_config		SSL

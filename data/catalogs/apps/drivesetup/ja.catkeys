@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DriveSetup	2076471502
+1	japanese	x-vnd.Haiku-DriveSetup	3247363019
 Cancel	AbstractParametersPanel		中止
 Could not unmount partition %s.	MainWindow		パーティション %s をマウント解除できませんでした。
 Mount all	MainWindow		すべてマウント
@@ -12,10 +12,12 @@ OK	MainWindow		OK
 Delete partition	MainWindow		パーティションを削除
 Error: 	MainWindow	in any error alert	エラー : 
 Could not delete the selected partition.	MainWindow		選択されたパーティションを削除できませんでした。
+Open with DiskProbe	MainWindow		DiskProbe で開く
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		選択したディスクを初期化しますか? データはすべて失われます。変更をディスクに書き込む直前に再度確認します。\n
 The panel experienced a problem!	MainWindow		パネルに問題が発生しました。
 Device	DiskView		デバイス
 There was an error preparing the disk for modifications.	MainWindow		ディスクの変更のための準備をする際、エラーが発生しました。
+Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		本当にIntel Extended Partitionをフォーマットしますか? 続行するとそのサブパーティションがすべて上書きされます。変更がディスクに書き込まれる前にもう一度確認されるでしょう。
 The disk has been successfully initialized.\n	MainWindow		ディスクは正常に初期化されました。\n
 Unmount	MainWindow		マウント解除
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		強制的にマウント解除しても良いですか?\n\n注: アプリケーションが現在ボリュームに書き込み中の場合、マウント解除するとデータが失われるかもしれません。\n
@@ -57,6 +59,7 @@ No disk devices have been recognized.	DiskView		ディスクデバイスが検�
 Could not mount partition %s.	MainWindow		パーティション %s をマウントできませんでした。
 Failed to delete the partition. No changes have been written to disk.	MainWindow		パーティションの削除に失敗しました。変更は保存されていません。
 Change parameters…	MainWindow		パラメーターを変更…
+Format	InitializeParametersPanel		フォーマット
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		パーティションをフォーマットしますか? 変更をディスクに書き込む直前に再度確認します。
 Could not unmount partition	MainWindow		パーティションをマウント解除できませんでした。
 The selected disk is read-only.	MainWindow		選択されたディスクは読み取り専用です。

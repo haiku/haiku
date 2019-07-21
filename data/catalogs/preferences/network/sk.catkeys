@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Network	1314732966
+1	slovak	x-vnd.Haiku-Network	3284324275
 Ethernet device	InterfaceListItem		Ethernetové zariadenie
 Link speed:	IntefaceView		Rýchlosť linky:
 disconnected	IntefaceView		odpojené
@@ -47,7 +47,6 @@ open	Open network		otvorená
 Network	NetworkWindow		Sieť
 Your gateway to the internet	IntefaceAddressView		Vaša brána do internetu
 Enable	ServiceView		Povoliť
-Ok	NetworkWindow		OK
 Wireless device	InterfaceListItem		Bezdrôtové zariadenie
 Disabled	IntefaceAddressView		Zakázané
 VPN connection	InterfaceListItem		Pripojenie VPN

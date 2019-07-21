@@ -1,10 +1,11 @@
-1	russian	x-vnd.Haiku-LaunchBox	3692177981
+1	russian	x-vnd.Haiku-LaunchBox	1530497419
 Set description…	LaunchBox		Изменить описание…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Вы действительно хотите закрыть эту панель?\n(Эта панель не сохранится)
 OK	LaunchBox		ОК
 Ignore double-click	LaunchBox		Игнорировать двойной щелчок
 Show on all workspaces	LaunchBox		Отображать на всех рабочих столах
 Name Panel	LaunchBox		Название панели
+Autostart	LaunchBox		Автозапуск
 Clone	LaunchBox		Дублировать
 Description for '%3'	LaunchBox		Описание для '%3'
 Show window border	LaunchBox		Отображать рамку окна

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-BootManager	3886671855
+1	japanese	x-vnd.Haiku-BootManager	867546001
 Old Master Boot Record backup failure	BootManagerController	Title	旧マスターブートレコードの保存に失敗しました
 At least one partition must be selected!	BootManagerController		少なくとも１つのパーティションが選択されていなければなりません。
 No space available!	DrivesPage	Cannot install	空き領域がありません。
@@ -16,6 +16,7 @@ Never	DefaultPartitionPage		永久
 Summary	BootManagerController	Title	概要
 An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		ブートメニューを書き込む際エラーが発生しました。マスターブートレコードが破壊されている恐れがあるので、すぐに MBR を修復してください。
 After three seconds	DefaultPartitionPage		あと 3 秒
+Read only!	DrivesPage	Cannot install	読み取り専用!
 Write boot menu	BootManagerController	Button	ブートメニューを書き込む
 OK	BootManagerController	Button	OK
 Uninstall boot manager	BootManagerController	Title	ブートマネージャーを削除

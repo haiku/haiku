@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Network	1314732966
+1	romanian	x-vnd.Haiku-Network	3284324275
 Ethernet device	InterfaceListItem		Dispozitiv Ethernet
 Link speed:	IntefaceView		Viteză legătură:
 disconnected	IntefaceView		deconectat
@@ -47,7 +47,6 @@ open	Open network		deschide
 Network	NetworkWindow		Rețea
 Your gateway to the internet	IntefaceAddressView		Gateaway către internet
 Enable	ServiceView		Activare
-Ok	NetworkWindow		Ok
 Wireless device	InterfaceListItem		Dispozitiv wireless
 Disabled	IntefaceAddressView		Dezactivat
 VPN connection	InterfaceListItem		Conexiune VPN

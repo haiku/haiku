@@ -20,8 +20,8 @@ Contacting software repositories to check for package updates.	SoftwareUpdaterWi
 Cancelling updates	SoftwareUpdaterWindow		Perutaan päivityksiä
 Cancel	SoftwareUpdaterWindow	Alert button label	Peru
 There were no updates found.	UpdateAction		Yhtään päivitystä ei löytynyt.
-Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Valitse näistä päivitysvalitsimista:\n\nUpdate:\n\tPäivittää kaikki asennetut pakkaukset.\nFull sync:\n\tSynkronoi asennetut pakkaukset tietovaraston kanssa.
 OK	SoftwareUpdaterWindow		Valmis
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Valitse näistä päivitysvalitsimista:\n\nUpdate:\n\tPäivittää kaikki asennetut pakkaukset.\nFull sync:\n\tSynkronoi asennetut pakkaukset tietovaraston kanssa.
 The following changes will be made:	SoftwareUpdaterWindow		Tehdään seuraavat muutokset:
 Argument variables are no longer accepted\n	SoftwareUpdaterApp		Argumenttimuuttujia ei enää hyväksytä\n
 Fatal error while checking for updates: %s\n	CheckAction		Vakava virhe päivitysten tarkistuksessa: %s\n
@@ -43,8 +43,8 @@ Installing version	SoftwareUpdaterWindow	List item text	Asennetaan versiota
 Checking for updates	CheckManager		Tarkistetaan päivityksiä
 No remote repositories are available	UpdateManager	Error message	Yhtään etätietovarastoa ei ole käytettävissä
 Update	SoftwareUpdaterWindow	Alert button label	Päivitä
-Updates did not complete	UpdateAction		Päivitykset eivät valmistuneet
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Avaa tietovarastot
+Updates did not complete	UpdateAction		Päivitykset eivät valmistuneet
 Invalid update type, cannot continue with updates	UpdateAction		Virheellinen päivitystyyppi, päivitysten jatkaminen epäonnistui
 Uninstalling version	SoftwareUpdaterWindow	List item text	Poistetaan asennettu versio
 %i of %i	UpdateManager	Do not translate %i	%i / %i

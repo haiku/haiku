@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-PRNT	2042381362
+1	german	x-vnd.Be-PRNT	1465107170
 Test page	TestPageView		Testseite
 Remove	PrintersWindow		Entfernen
 Red	TestPageView		Rot
@@ -16,6 +16,8 @@ Waiting	JobListView		Warten
 Processing	JobListView		In Bearbeitung
 Cancel	AddPrinterDialog		Abbrechen
 Unknown status	JobListView		Status unbekannt
+Print jobs for %printer_name%	PrintersWindow		Druckjobs für %printer_name%
+{0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? Seiten}=1{# Seite}other{# Seiten}}
 Add printer	AddPrinterDialog		Drucker hinzufügen
 Printers	PrintersWindow		Printers - Drucker
 No printer found!	TransportMenu		Es wurde kein Drucker gefunden!
@@ -29,6 +31,7 @@ Yellow	TestPageView		Gelb
 Black	TestPageView		Schwarz
 Printer type:	AddPrinterDialog		Druckertyp:
 Printers	System name		Drucker
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{Keine Druckjobs}=1{1Druckjob in Warteschlange}other{# Druckjobs  in Warteschlange}}
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Drucker: %printer_name%\nTreiber: %driver%\n
 Green	TestPageView		Grün
 Print test page	PrintersWindow		Testseite drucken

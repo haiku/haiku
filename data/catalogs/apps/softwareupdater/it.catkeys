@@ -21,8 +21,8 @@ Contacting software repositories to check for package updates.	SoftwareUpdaterWi
 Cancelling updates	SoftwareUpdaterWindow		Annullamento degli aggiornamenti
 Cancel	SoftwareUpdaterWindow	Alert button label	Annulla
 There were no updates found.	UpdateAction		Nessun aggiornamento trovato.
-Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Per favore, scegli da una di queste opzioni di aggiornamento:\n\nAggiorna:\n\tAggiorna tutti i pacchetti installati.\nSincronizzazione completa:\n\tSincronizza i pacchetti installati con i repository.
 OK	SoftwareUpdaterWindow		OK
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Per favore, scegli da una di queste opzioni di aggiornamento:\n\nAggiorna:\n\tAggiorna tutti i pacchetti installati.\nSincronizzazione completa:\n\tSincronizza i pacchetti installati con i repository.
 The following changes will be made:	SoftwareUpdaterWindow		Saranno apportate le seguenti modifiche:
 Argument variables are no longer accepted\n	SoftwareUpdaterApp		Variabili argomento non sono più accettate\n
 Fatal error while checking for updates: %s\n	CheckAction		Errore critico durante il controllo per gli aggiornamenti: %s\n
@@ -44,8 +44,8 @@ Installing version	SoftwareUpdaterWindow	List item text	Installazione della vers
 Checking for updates	CheckManager		Controllo aggiornamenti in corso...
 No remote repositories are available	UpdateManager	Error message	Nessun repository remoto disponibile
 Update	SoftwareUpdaterWindow	Alert button label	Aggiorna
-Updates did not complete	UpdateAction		Gli aggiornamenti non sono stati completati
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Apri Repository
+Updates did not complete	UpdateAction		Gli aggiornamenti non sono stati completati
 Invalid update type, cannot continue with updates	UpdateAction		Tipo di aggiornamento non valido, impossibile continuare con gli aggiornamenti
 Uninstalling version	SoftwareUpdaterWindow	List item text	Rimozione della versione
 %i of %i	UpdateManager	Do not translate %i	%i di %i

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Pulse	3788463253
+1	japanese	x-vnd.Haiku-Pulse	139895817
 Normal mode	DeskbarPulseView		ウィンドウモード
 Info	CPUButton		情報
 Quit	DeskbarPulseView		終了
@@ -37,6 +37,7 @@ Deskbar menu	CPUButton		Deskbar メニュー
 Mini mode	NormalPulseView		ミニモード
 Quit	MiniPulseView		終了
 Info	PulseView		情報
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]
 OK	DeskbarPulseView		Ok
 Info	PulseApp		情報
 Pulse	System name		Pulse

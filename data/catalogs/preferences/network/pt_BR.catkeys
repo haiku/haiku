@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Network	2057164259
+1	portuguese (brazil)	x-vnd.Haiku-Network	4026755568
 New…	NetworkWindow		Novo…
 Other	NetworkWindow		Outro
 Gateway:	IntefaceAddressView		Rota padrão:
@@ -11,5 +11,4 @@ launch error	NetworkWindow		Erro de carregamento
 Automatic	IntefaceAddressView		Automático
 Your gateway to the internet	IntefaceAddressView		Sua rota padrão para a internet
 Enable	ServiceView		Habilitar
-Ok	NetworkWindow		Ok
 Disabled	IntefaceAddressView		Desabilitado

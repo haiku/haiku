@@ -21,8 +21,8 @@ Contacting software repositories to check for package updates.	SoftwareUpdaterWi
 Cancelling updates	SoftwareUpdaterWindow		Membatalkan pembaruan
 Cancel	SoftwareUpdaterWindow	Alert button label	Batal
 There were no updates found.	UpdateAction		Tak ada pembaruan yang ditemukan.
-Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Silakan pilih dari opsi pembaruan ini:\n\nMemperbarui:\n\tPerbarui semua paket yang diinstal.\nSinkronisasi penuh:\n\tSinkronisasi paket yang diinstal dengan repositori.
 OK	SoftwareUpdaterWindow		OKE
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Silakan pilih dari opsi pembaruan ini:\n\nMemperbarui:\n\tPerbarui semua paket yang diinstal.\nSinkronisasi penuh:\n\tSinkronisasi paket yang diinstal dengan repositori.
 The following changes will be made:	SoftwareUpdaterWindow		Perubahan berikut akan dilakukan:
 Argument variables are no longer accepted\n	SoftwareUpdaterApp		Variabel argumen tidak lagi diterima\n
 Fatal error while checking for updates: %s\n	CheckAction		Kesalahan fatal saat memeriksa pembaruan: %s\n
@@ -44,8 +44,8 @@ Installing version	SoftwareUpdaterWindow	List item text	Memasang versi
 Checking for updates	CheckManager		Memeriksa pembaruan
 No remote repositories are available	UpdateManager	Error message	Tidak ada repositori remote yang tersedia
 Update	SoftwareUpdaterWindow	Alert button label	Memperbarui
-Updates did not complete	UpdateAction		Pembaruan tidak selesai
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Buka Repositori
+Updates did not complete	UpdateAction		Pembaruan tidak selesai
 Invalid update type, cannot continue with updates	UpdateAction		Jenis pembaruan tidak sah, tidak dapat melanjutkan pembaruan
 Uninstalling version	SoftwareUpdaterWindow	List item text	Menghapus versi
 %i of %i	UpdateManager	Do not translate %i	%i dari %i

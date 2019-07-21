@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Mandelbrot	1781779654
+1	japanese	x-vnd.Haiku-Mandelbrot	3875916167
 Burning Ship	MandelbrotWindow		バーニングシップ
 Grassland	MandelbrotWindow		草原
 Lightning	MandelbrotWindow		稲妻
@@ -9,6 +9,8 @@ Tricorn	MandelbrotWindow		トリコーン
 Royal	MandelbrotWindow		ロイヤル
 Orbit Trap	MandelbrotWindow		Orbit Trap
 Deepfrost	MandelbrotWindow		ディープフロスト
+Subsampling	MandelbrotWindow		サブサンプリング
+1 (none)	MandelbrotWindow		1 (無し)
 Quit	MandelbrotWindow		終了
 File	MandelbrotWindow		ファイル
 Julia	MandelbrotWindow		ジュリア

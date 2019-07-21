@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Network	1314732966
+1	german	x-vnd.Haiku-Network	3145282573
 Ethernet device	InterfaceListItem		Ethernet-Gerät
 Link speed:	IntefaceView		Geschwindigkeit:
 disconnected	IntefaceView		getrennt
@@ -20,8 +20,10 @@ EAP	EAP protected network		EAP
 Services	NetworkWindow		Dienste
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Installation von Netzwerkstatus in Deskbar fehlgeschlagen: %s
 Revert	NetworkWindow		Anfangswerte
+off	ServiceListItem		aus
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<keine Funknetzwerke gefunden>
+Enable	IntefaceView		Aktivieren
 connected	IntefaceView		verbunden
 VPN	NetworkWindow		VPN
 Apply	IntefaceAddressView		Anwenden
@@ -37,6 +39,7 @@ MAC address:	IntefaceView		MAC-Adresse:
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 disabled	InterfaceListItem		deaktiviert
 Dial-up connection	InterfaceListItem		Einwählverbindung
+on	ServiceListItem		an
 The method for obtaining an IP address	IntefaceAddressView		Die Art wie IP Adressen bezogen werden
 Automatic	IntefaceAddressView		Automatisch
 Choose automatically	IntefaceView		Automatisch wählen
@@ -47,7 +50,6 @@ open	Open network		frei
 Network	NetworkWindow		Netzwerk
 Your gateway to the internet	IntefaceAddressView		Zugangsadresse zum Internet
 Enable	ServiceView		Aktivieren
-Ok	NetworkWindow		OK
 Wireless device	InterfaceListItem		Funknetzwerkgerät
 Disabled	IntefaceAddressView		Deaktiviert
 VPN connection	InterfaceListItem		VPN Verbindung

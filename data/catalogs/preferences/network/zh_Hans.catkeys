@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Network	3083801279
+1	english	x-vnd.Haiku-Network	758425292
 Ethernet device	InterfaceListItem		以太网设备
 Link speed:	IntefaceView		连接速度：
 disconnected	IntefaceView		断开连接
@@ -46,7 +46,6 @@ open	Open network		打开
 Network	NetworkWindow		网络
 Your gateway to the internet	IntefaceAddressView		您的互联网网关
 Enable	ServiceView		启用
-Ok	NetworkWindow		确定
 Wireless device	InterfaceListItem		无线设备
 Disabled	IntefaceAddressView		禁用
 VPN connection	InterfaceListItem		VPN 连接

@@ -1,6 +1,7 @@
-1	russian	x-vnd.Haiku-debug_server	2134779566
+1	russian	x-vnd.Haiku-debug_server	166857212
 Debug	DebugServer		Отладить
 Terminate	DebugServer		Завершить
 The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		В программе:\n\n      %app\n\nобнаружена ошибка, которая мешает продолжению её работы. Haiku завершит эту программу и немного приберётся за ней.
 Save report	DebugServer		Сохранить отчёт
 Write core file	DebugServer		Сохранить дамп памяти
+Oh no!	DebugServer		О, нет!

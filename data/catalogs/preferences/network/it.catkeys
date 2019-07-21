@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Network	1314732966
+1	italian	x-vnd.Haiku-Network	3284324275
 Ethernet device	InterfaceListItem		Dispositivo Ethernet
 Link speed:	IntefaceView		Velocità collegamento:
 disconnected	IntefaceView		disconnesso
@@ -47,7 +47,6 @@ open	Open network		apri
 Network	NetworkWindow		Rete
 Your gateway to the internet	IntefaceAddressView		Il tuo gateway su internet
 Enable	ServiceView		Abilita
-Ok	NetworkWindow		OK
 Wireless device	InterfaceListItem		Dispositivo Wireless
 Disabled	IntefaceAddressView		Disabilitata
 VPN connection	InterfaceListItem		Connessione VPN

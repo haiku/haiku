@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Devices	490380176
+1	german	x-vnd.Haiku-Devices	3345509916
 ACPI bus	DevicesView		ACPI-Bus
 Encryption controller	Device		Verschlüsselungscontroller
 Bus Information	Device		Bus-Information
@@ -54,7 +54,9 @@ Device name	DeviceACPI		Gerätename
 Card Reader	DeviceSCSI		Kartenleser
 Display controller	Device		Anzeige-Controller
 Basic information	DevicesView		Basisinformation
+ACPI Button '%1'	DeviceACPI		ACPI Button '%1'
 Bus	DevicesView		Bus
+ACPI <unknown>	DeviceACPI		ACPI <unbekannt>
 Device name	DevicePCI		Gerätename
 Disk Drive	DeviceSCSI		Laufwerk
 Other	DeviceSCSI		Andere

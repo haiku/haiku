@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-DriveSetup	2076471502
+1	russian	x-vnd.Haiku-DriveSetup	3247363019
 Cancel	AbstractParametersPanel		Отмена
 Could not unmount partition %s.	MainWindow		Невозможно отключить раздел %s.
 Mount all	MainWindow		Подключить все
@@ -12,10 +12,12 @@ OK	MainWindow		ОК
 Delete partition	MainWindow		Удалить раздел
 Error: 	MainWindow	in any error alert	Ошибка: 
 Could not delete the selected partition.	MainWindow		Невозможно удалить выбранный раздел.
+Open with DiskProbe	MainWindow		Открыть в Редакторе диска
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Вы уверены, что хотите инициализировать выбранный диск? Все данные на этом диске будут потеряны.\nПовторный запрос будет выдан непосредственно перед записью изменений на диск.\n
 The panel experienced a problem!	MainWindow		С панелью произошла проблема!
 Device	DiskView		Устройство
 There was an error preparing the disk for modifications.	MainWindow		Произошла ошибка при сохранении изменений на диск.
+Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Вы уверены, что хотите отформатировать Расширенный раздел? Все разделы, которые содержатся в нем будут перезаписаны если вы продолжите. Повторный запрос будет выдан непосредственно перед записью изменений на диск.
 The disk has been successfully initialized.\n	MainWindow		Диск был успешно инициализирован.\n
 Unmount	MainWindow		Отключить
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Отключить этот раздел принудительно?\n\nВнимание: если какое-нибудь приложение в данный момент записывает данные на этот раздел, то его отключение может привести к потере данных.\n
@@ -57,6 +59,7 @@ No disk devices have been recognized.	DiskView		Ни одно из дисков�
 Could not mount partition %s.	MainWindow		Невозможно подключить раздел %s.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Не удалось удалить раздел. Изменения не были записаны на диск.
 Change parameters…	MainWindow		Изменить параметры…
+Format	InitializeParametersPanel		Форматировать
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Вы уверены, что хотите инициализировать раздел?\nПовторный запрос будет выдан непосредственно перед записью изменений на диск.
 Could not unmount partition	MainWindow		Невозможно отключить раздел
 The selected disk is read-only.	MainWindow		Выбранный диск доступен только для чтения.

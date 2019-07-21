@@ -1,8 +1,7 @@
-1	polish	x-vnd.Haiku-IMAP	3072419505
+1	polish	x-vnd.Haiku-IMAP	1938678311
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Nie można połączyć z serwerem „%server%”:\n%error%
 Failed to fetch available storage.	IMAPFolderConfig		Nie udało się pobrać dostępnego miejsca.
 Cancel	IMAPFolderConfig		Anuluj
-Ok	IMAPFolderConfig		OK
 No encryption	imap_config		Brak szyfrowania
 Configure IMAP Folders	imap_config		Skonfiguruj katalogi IMAP
 SSL	imap_config		SSL

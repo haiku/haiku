@@ -1,10 +1,11 @@
-1	japanese	x-vnd.Haiku-Media	4205337498
+1	japanese	x-vnd.Haiku-Media	1682972002
 Audio mixer	Media Window		オーディオミキサー
 Show volume control on Deskbar	Media views		音量コントロールを Deskbar に表示
 Quit	Media Window		終了
 Restart media services	Media views		メディアサービスを再起動
 Couldn't add volume control in Deskbar: %s\n	Media views		音量コントロールを Deskbar に追加できませんでした: %s\n
 Start media server	Media Window		メディアサーバーの起動
+<none>	VideoInputMenu	Used when no video input is available	<無し>
 Audio settings	Media Window		オーディオ設定
 Quit anyway	Media Window		強制終了
 Couldn't remove volume control in Deskbar: %s\n	Media views		音量コントロールを Deskbar から削除できませんでした: %s\n
@@ -22,3 +23,4 @@ Channel:	Media views		チャンネル:
 Defaults	Media views		デフォルト
 Could not connect to the media server.\nWould you like to start it ?	Media Window		メディアサーバーに接続できませんでした。\nメディアサーバーを起動しますか？
 Video settings	Media Window		ビデオ設定
+<none>	VideoOutputMenu	Used when no video output is available	<無し>

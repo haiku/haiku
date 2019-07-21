@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Repositories	2658607939
+1	russian	x-vnd.Haiku-Repositories	1220143449
 This is not a valid URL.	AddRepoWindow	Add URL error message	Это неправильный URL-адрес.
 Repository URL:	AddRepoWindow	Text box label	URL репозитория:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Произошла ошибка обновления кеша репозитория для %name%
@@ -10,6 +10,7 @@ Disable	RepositoriesView	Button label	Отключить
 Cancel task	TaskTimer	Button label	Отменить задачу
 Changes completed	RepositoriesView	Status view text	Изменения завершены
 Details	TaskLooper	Job log details header	Детали
+Enabled	RepoRow	Tag in the Status column	Включен
 Remove	Constants	Button label	Удалить
 There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Ошибка при подключении репозитория %url%
 Remove this repository?	RepositoriesView	Removal alert confirmation message	Удалить этот репозиторий

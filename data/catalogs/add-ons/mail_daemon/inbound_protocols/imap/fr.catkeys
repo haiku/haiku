@@ -1,8 +1,7 @@
-1	french	x-vnd.Haiku-IMAP	3072419505
+1	french	x-vnd.Haiku-IMAP	1938678311
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Impossible de se connecter au serveur « %server% » :\n%error%
 Failed to fetch available storage.	IMAPFolderConfig		Impossible de récupérer le courrier reçu.
 Cancel	IMAPFolderConfig		Annuler
-Ok	IMAPFolderConfig		Valider
 No encryption	imap_config		Aucun chiffrage
 Configure IMAP Folders	imap_config		Configurer les dossiers IMAP
 SSL	imap_config		SSL

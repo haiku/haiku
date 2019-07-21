@@ -1,8 +1,9 @@
-1	german	x-vnd.Haiku-MatchHeader	3544711400
+1	german	x-vnd.Haiku-MatchHeader	1946584206
 Delete message	ConfigView		Nachricht löschen
 Match \"%attribute\" against \"%regex\"	RuleFilter		\"%attribute\" mit \"%regex\" vergleichen
 Match header	RuleFilter		Kopfdaten filtern
 Set flags to	ConfigView		Status setzen auf
+Header field (e.g. Subject, From, …)	ConfigView		Kopfdaten Feld (z.B. Betreff, Von, …)
 <Choose account>	ConfigView		<Konto wählen>
 Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Platzhalter wie \"*spam*\".\nFür reguläre Audrücke \"REGEX:\" voranstellen.
 Then	ConfigView		Dann

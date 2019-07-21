@@ -1,8 +1,9 @@
-1	japanese	x-vnd.Haiku-MatchHeader	3544711400
+1	japanese	x-vnd.Haiku-MatchHeader	1946584206
 Delete message	ConfigView		メッセージを削除する
 Match \"%attribute\" against \"%regex\"	RuleFilter		\"%regex\"  と一致する \"%attribute\" 
 Match header	RuleFilter		ヘッダー一致条件
 Set flags to	ConfigView		フラグを指定する
+Header field (e.g. Subject, From, …)	ConfigView		ヘッダーフィールド (例. 題名, 送信元, …)
 <Choose account>	ConfigView		<アカウントを選択>
 Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		ワイルドカード値は \"*spam*\" のようなものです。\n正規表現を使用するには、先頭に \"REGEX:\" をつけてください。
 Then	ConfigView		ならば

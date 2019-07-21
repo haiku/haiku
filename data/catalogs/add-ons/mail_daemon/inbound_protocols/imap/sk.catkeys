@@ -1,8 +1,7 @@
-1	slovak	x-vnd.Haiku-IMAP	3072419505
+1	slovak	x-vnd.Haiku-IMAP	1938678311
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Nepodarilo sa pripojiť k serveru „%server%“:\n%error%
 Failed to fetch available storage.	IMAPFolderConfig		Nepodarilo sa zistiť dostupné úložné miesto.
 Cancel	IMAPFolderConfig		Zrušiť
-Ok	IMAPFolderConfig		OK
 No encryption	imap_config		Bez šifrovania
 Configure IMAP Folders	imap_config		Nastavenie priečinkov IMAP
 SSL	imap_config		SSL

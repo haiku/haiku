@@ -1,10 +1,11 @@
-1	german	x-vnd.Haiku-HaikuDepot	2728680786
+1	german	x-vnd.Haiku-HaikuDepot	2335250517
 Check for updates…	MainWindow		Aktualisierungen suchen…
 Uninstall	PackageManager		Deinstallieren
 (%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Deinstalliert
 Available packages	MainWindow		Verfügbare Pakete
 Create account	UserLoginWindow		Benutzerkonto erstellen
+OK	App		OK
 Mostly stable	RatePackageWindow		Ziemlich stabil
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Benutzerkonto erfolgreich angelegt. Jetzt können Pakete bewertet werden, etc.
 Rate package…	PackageInfoView		Paket bewerten…
@@ -13,6 +14,7 @@ Starting the package daemon failed:\n\n%Error%	App		Der Paket-Daemon konnte nich
 <no info>	PackageInfoView		<keine Info>
 No user ratings available.	PackageInfoView		Keine Bewertungen vorhanden.
 The user name needs to be at least 3 letters long.	UserLoginWindow		Der Benutzername muss mindestens 3 Zeichen lang sein.
+Downloading package '%name%'	WorkStatusView		Paket '%name%' wird heruntergeladen
 Failed to create account	UserLoginWindow		Benutzerkonto konnte nicht angelegt werden
 Ignore	UserLoginWindow		Ignorieren
 Rating	PackageListView		Bewertung
@@ -26,9 +28,11 @@ Unstable but usable	RatePackageWindow		Instabil aber brauchbar
 Active	PackageListView		Aktiviert
 Login or Create account	MainWindow		Anmelden oder Benutzerkonto anlegen
 <Package contents not available for remote packages>	PackageContentsView		<Der Inhalt kann nur für bereits heruntergeladene Pakete angezeigt werden>
+{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1 Paket zum Herunterladen}other{# Pakete zum Herunterladen}}
 Ratings	PackageInfoView		Bewertungen
 Switch account…	MainWindow		Konto wechseln…
 Preferred language:	UserLoginWindow		Bevorzugte Sprache:
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display.  Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Bei der Aktualisierung von Paketdaten ist ein Problem aufgetreten. Daten könnten fehlen oder veraltet sein.  Details zu diesem Problem sind ggf. im Log von HaikuDepot zu finden.
 It was not possible to contact the web service.	UserLoginWindow		Der Web-Dienst konnte nicht erreicht werden.
 Name	PackageListView		Name
 Rate %Package%	RatePackageWindow		%Package% bewerten
@@ -42,9 +46,11 @@ Fatal error	PackageManager		Schwerwiegender Fehler
 Package action failed	PackageInfoView		Paket-Aktion fehlgeschlagen
 No changelog available.	PackageInfoView		Änderungsprotokoll nicht vorhanden.
 There are problems in the form:\n\n	UserLoginWindow		Es gibt Probleme mit dem Format:\n\n
+Error	App		Fehler
 There was a puzzling response from the web service.	UserLoginWindow		Der Web-Dienst hat mit einer wirren Meldung geantwortet.
 Not logged in	MainWindow		Nicht angemeldet
 No, quit HaikuDepot	App		Nein, HaikuDepot beenden
+Featured packages	FeaturedPackagesView		Empfohlene Pakete
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Die Bewertung wurde erfolgreich hochgeladen. Auf der HaikuDepot Server Webseite lässt sie sich aktualisieren oder auch wieder löschen.
 Available	PackageListView		Verfügbar
 Cancel	UserLoginWindow		Abbrechen
@@ -56,7 +62,9 @@ Changelog	PackageInfoView		Änderungsprotokoll
 Rating not possible	MainWindow		Bewertung nicht möglich
 About	PackageInfoView		Über
 Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Anmeldung fehlgeschlagen. Entweder dieses Benutzerkonto existiert nicht oder es wurde ein falsches Kennwort eingegeben.
+Reboot required	PackageManager		Neustart erforderlich
 Very unstable	RatePackageWindow		Sehr instabil
+All packages	PackageListView		Alle Pakete
 Stability	RatePackageWindow		Stabilität
 Send	RatePackageWindow		Senden
 Start package daemon	App		Paket-Daemon starten
@@ -69,6 +77,7 @@ OK	MainWindow		OK
 OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Aktueller Download:
 Success	UserLoginWindow		Erfolg
+It responded with: %message%	UserLoginWindow		Antwort: %message%
 Package daemon problem	App		Paket Daemon Problem
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Paketquelle
@@ -83,8 +92,10 @@ Your rating was updated.	RatePackageWindow		Die Bewertung wurde aktualisiert.
 n/a	PackageInfoView		n.v.
 Repositories	MainWindow		Paketquellen
 Cancel	MainWindow		Abbrechen
+{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 weiterer Download)}other{(# weitere Downloads)}}
 Refresh repositories	MainWindow		Paketquellen aktualisieren
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Wird keine E-Mail-Adresse hinterlegt, kann das Kennwort nicht zurückgesetzt werden, wenn es mal vergessen wird.
+Package Update Error	MainWindow		Fehler bei Paketaktualisierung
 Tools	MainWindow		Werkzeuge
 The passwords do not match.	UserLoginWindow		Die Kennwörter stimmen nicht überein.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Dieses Paket scheint nicht auf dem HaikuDepot Server zu sein. Es ist daher nicht möglich eine neue Bewertung abzugeben, bzw. eine bestehende zu ändern.
@@ -112,6 +123,7 @@ Logged in as %User%	MainWindow		Angemeldet als %User%
 Email address:	UserLoginWindow		E-Mail-Adresse:
 Screenshot	ScreenshotWindow		Bildschirmfoto
 HaikuDepot	System name		HaikuDepot
+A reboot is necessary to complete the installation process.	PackageManager		Um die Installation abzuschließen, muss Haiku neu gestartet werden.
 Search terms:	FilterView		Suchbegriffe:
 Pending…	PackageListView		Ausstehend…
 Repeat pass phrase:	UserLoginWindow		Kennwort wiederholen:

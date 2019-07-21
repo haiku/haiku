@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-PackageInstaller	3110601390
+1	german	x-vnd.Haiku-PackageInstaller	2472572058
 Package description	UninstallView		Paketbeschreibung
 none	PackageView		entfällt
 Continue	PackageInstall		Weiter
@@ -53,6 +53,7 @@ Continue	PackageInfo		Weiter
 No package selected.	PackageInfo		Kein Paket ausgewählt.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Fehler! \"%s\" ist kein gültiger Pfad.\n
 The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Ein Ordner '%s' existiert bereits im angebenen Pfad.\nSoll es mit dem Ordner aus diesem Paket ersetzt oder übersprungen werden?
+LegacyPackageInstaller	System name		BeOS-PaketInstaller
 Ask again	PackageView		Weiter nachfragen
 Begin	PackageView		Start
 OK	PackageView		OK

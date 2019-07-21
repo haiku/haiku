@@ -1,8 +1,7 @@
-1	english	x-vnd.Haiku-IMAP	3072419505
+1	english	x-vnd.Haiku-IMAP	1938678311
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		无法连接服务器 \"%server%\":\n%error%
 Failed to fetch available storage.	IMAPFolderConfig		获取可用存储失败
 Cancel	IMAPFolderConfig		取消
-Ok	IMAPFolderConfig		确定
 No encryption	imap_config		无加密
 Configure IMAP Folders	imap_config		配置 IMAP 目录
 SSL	imap_config		SSL

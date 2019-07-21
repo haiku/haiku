@@ -21,8 +21,8 @@ Contacting software repositories to check for package updates.	SoftwareUpdaterWi
 Cancelling updates	SoftwareUpdaterWindow		Annulation des mises à jour
 Cancel	SoftwareUpdaterWindow	Alert button label	Annuler
 There were no updates found.	UpdateAction		Aucune mise à jour n’a été trouvée.
-Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Veuillez choisir parmi ces options de mise à jour :\n\nMise à jour :\n\tMet à jour tous les paquets installés.\nTout synchroniser :\n\tSynchronise les paquets installés avec les dépôts.
 OK	SoftwareUpdaterWindow		Valider
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Veuillez choisir parmi ces options de mise à jour :\n\nMise à jour :\n\tMet à jour tous les paquets installés.\nTout synchroniser :\n\tSynchronise les paquets installés avec les dépôts.
 The following changes will be made:	SoftwareUpdaterWindow		Les modifications suivantes vont être apportées :
 Argument variables are no longer accepted\n	SoftwareUpdaterApp		Les variables d'argument ne sont plus acceptées\n
 Fatal error while checking for updates: %s\n	CheckAction		Erreur fatale lors de la vérification des mises à jour : %s\n
@@ -44,8 +44,8 @@ Installing version	SoftwareUpdaterWindow	List item text	Installation de la versi
 Checking for updates	CheckManager		Recherche de mises à jour
 No remote repositories are available	UpdateManager	Error message	Aucun dépôt distant n'est disponible
 Update	SoftwareUpdaterWindow	Alert button label	Mise à jour
-Updates did not complete	UpdateAction		Les mises à jour n’ont pas abouti
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Ouvrir les Dépôts
+Updates did not complete	UpdateAction		Les mises à jour n’ont pas abouti
 Invalid update type, cannot continue with updates	UpdateAction		Type de mise à jour invalide, la mise à jour est interrompue
 Uninstalling version	SoftwareUpdaterWindow	List item text	Désinstallation de la version
 %i of %i	UpdateManager	Do not translate %i	%i sur %i

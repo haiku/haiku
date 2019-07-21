@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Network	1314732966
+1	japanese	x-vnd.Haiku-Network	3145282573
 Ethernet device	InterfaceListItem		イーサネットデバイス
 Link speed:	IntefaceView		リンクスピード:
 disconnected	IntefaceView		切断済み
@@ -20,8 +20,10 @@ EAP	EAP protected network		EAP
 Services	NetworkWindow		サービス
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		ネットワーク状況の Deskbar へのインストールに失敗しました: %s
 Revert	NetworkWindow		元に戻す
+off	ServiceListItem		オフ
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<無線ネットワークが見つかりません>
+Enable	IntefaceView		有効
 connected	IntefaceView		接続済み
 VPN	NetworkWindow		VPN
 Apply	IntefaceAddressView		適用
@@ -37,6 +39,7 @@ MAC address:	IntefaceView		MAC アドレス:
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 disabled	InterfaceListItem		無効
 Dial-up connection	InterfaceListItem		ダイアルアップ接続
+on	ServiceListItem		オン
 The method for obtaining an IP address	IntefaceAddressView		IP アドレスの取得方法
 Automatic	IntefaceAddressView		自動
 Choose automatically	IntefaceView		自動選択
@@ -47,7 +50,6 @@ open	Open network		開く
 Network	NetworkWindow		ネットワーク
 Your gateway to the internet	IntefaceAddressView		インターネットへのゲートウェイ
 Enable	ServiceView		有効
-Ok	NetworkWindow		Ok
 Wireless device	InterfaceListItem		無線デバイス
 Disabled	IntefaceAddressView		無効
 VPN connection	InterfaceListItem		VPN 接続

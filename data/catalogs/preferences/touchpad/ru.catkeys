@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Touchpad	607725922
+1	russian	x-vnd.Haiku-Touchpad	526581388
 Scrolling	TouchpadPrefView		Прокрутка
 Tapping	TouchpadPrefView		Касание легким нажатием
 Touchpad	System name		Сенсорная панель
@@ -7,6 +7,7 @@ OK	TouchpadPrefView		ОК
 Horizontal scrolling	TouchpadPrefView		Горизонтальная прокрутка
 Slow	TouchpadPrefView		Медленно
 Two finger scrolling	TouchpadPrefView		Прокрутка двумя пальцами
+No touchpad found, the settings will have no effect.	TouchpadPrefView		Тачпад не найден, эти настройки не будут действовать.
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Выбранная область прокрутки слишком большая и может затруднить обычные операции с мышью. Вы действительно хотите изменить ее?
 Defaults	TouchpadPrefView		По умолчанию
 High	TouchpadPrefView		Высокая

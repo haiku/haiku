@@ -1,5 +1,6 @@
-1	german	x-vnd.haiku-softwareupdater	4294742959
+1	german	x-vnd.haiku-softwareupdater	369324613
 Updating version	SoftwareUpdaterWindow	List item text	Aktualisieren der Version
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Hier klicken, um {0, plural, one{# aktualisiertes Paket} other{# aktualisierte Pakete}} zu installieren.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Zu deinstallierende Pakete
 No active network connection was found	UpdateManager	Error message	Keine aktive Netzwerkverbindung gefunden
 Quit	SoftwareUpdaterWindow	Alert button label	Beenden
@@ -7,6 +8,7 @@ There were no updates found.	CheckManager		Keine Aktualisierungen gefunden.
 Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Aktualisierungen noch nicht abgeschlossen, trotzdem beenden?
 Updates found	SoftwareUpdaterWindow		Aktualisierungen gefunden
 Update now	SoftwareUpdaterWindow		Jetzt aktualisieren
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Aus unerfindlichen Gründen konnte der Rechner nicht neu gestartet werden.
 OK	UpdateManager		OK
 Unrecognized argument	SoftwareUpdaterApp	Error message	Unbekannter Parameter
 There were no updates found.	CheckAction		Es wurden keine Aktualisierungen gefunden.
@@ -14,6 +16,7 @@ No updates available	UpdateAction		Keine Aktualisierungen verfügbar
 New packages to be installed	SoftwareUpdaterWindow	List super item label	Zu installierende neue Pakete
 Packages to be updated	SoftwareUpdaterWindow	List super item label	Pakete werden aktualisiert
 to	SoftwareUpdaterWindow	List item text	auf
+Attempting to cancel the updates…	SoftwareUpdaterWindow		Versuche die Aktualisierungen abzubrechen…
 Contacting software repositories to check for package updates.	CheckManager		Um nach Aktualisierungen zu suchen, wird eine Verbindung mit den Paketquellen hergestellt.
 Available updates found	CheckManager		Aktualisierungen gefunden
 from repository	SoftwareUpdaterWindow	List item text	von Paketquelle
@@ -21,8 +24,8 @@ Contacting software repositories to check for package updates.	SoftwareUpdaterWi
 Cancelling updates	SoftwareUpdaterWindow		Aktualisierungen werden abgebrochen
 Cancel	SoftwareUpdaterWindow	Alert button label	Abbrechen
 There were no updates found.	UpdateAction		Es wurden keine Aktualisierungen gefunden.
-Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Bitte aus diesen Aktualisierungsoptionen wählen:\n\nUpdate:\n\tAktualisiert alle installierten Pakete.\nFull sync:\n\tSynchronisiert alle installierten Pakete mit den Paktequellen.
 OK	SoftwareUpdaterWindow		OK
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Bitte aus diesen Aktualisierungsoptionen wählen:\n\nUpdate:\n\tAktualisiert alle installierten Pakete.\nFull sync:\n\tSynchronisiert alle installierten Pakete mit den Paktequellen.
 The following changes will be made:	SoftwareUpdaterWindow		Folgenden Änderungen werden durchgeführt:
 Argument variables are no longer accepted\n	SoftwareUpdaterApp		Parametervariablen werden nicht mehr akzeptiert\n
 Fatal error while checking for updates: %s\n	CheckAction		Fehler bei Suche nach Aktualisierungen: %s\n
@@ -31,7 +34,9 @@ No active network connection was found.\n	CheckManager		Keine aktive Netzwerkver
 Applying changes	UpdateManager		Änderungen werden angewendet
 Full sync	SoftwareUpdaterWindow	Alert button label	Full sync
 Quit	SoftwareUpdaterWindow	Button label	Beenden
+Updates have been successfully installed.	UpdateManager		Aktualisierungen wurden erfolgreich installiert.
 Exception occurred while updating packages : %s\n	UpdateAction		Eine Ausnahme trat bei der Aktualisierung von Paketen auf: %s\n
+A reboot is necessary to complete the update process.	UpdateManager		Um die Aktualisierung abzuschließen, muss der Rechner neu gestartet werden.
 Exception occurred while checking for updates: %s\n	CheckAction		Eine Ausnahme trat bei der Suche nach Aktualisierungen auf: %s\n
 Packages are being updated	UpdateManager		Pakete werden aktualisiert
 Cancel	SoftwareUpdaterWindow		Abbrechen
@@ -39,13 +44,16 @@ Don't quit	SoftwareUpdaterWindow		Nicht beenden
 Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Hier klicken, um SoftwareUpater zu starten. Für einige Aktualisierungen muss eine Problemlösung ausgewählt werden.
 Checking for updates	SoftwareUpdaterWindow		Aktualisierungen werden gesucht
 Updates completed	UpdateManager		Aktualisierungen abgeschlossen
+Reboot	SoftwareUpdaterWindow		Neustart
 Show more details	SoftwareUpdaterWindow		Weitere Details anzeigen
 Installing version	SoftwareUpdaterWindow	List item text	Installieren der Version
 Checking for updates	CheckManager		Aktualisierungen werden gesucht
 No remote repositories are available	UpdateManager	Error message	Es sind keine Paketquellen erreichbar
+Software {0, plural, one{update} other{updates}} available	CheckManager		Software{0, plural, one{aktualisierung} other{aktualisierungen}} verfügbar
+Reboot	SoftwareUpdaterWindow	Button label	Neustart
 Update	SoftwareUpdaterWindow	Alert button label	Aktualisieren
-Updates did not complete	UpdateAction		Aktualisierungen wurden nicht abgeschlossen
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Paketquellen öffnen
+Updates did not complete	UpdateAction		Aktualisierungen wurden nicht abgeschlossen
 Invalid update type, cannot continue with updates	UpdateAction		Ungültiger Aktualisierungstyp, Aktualisierung wird abgebrochen
 Uninstalling version	SoftwareUpdaterWindow	List item text	Deinstallieren der Version
 %i of %i	UpdateManager	Do not translate %i	%i von %i

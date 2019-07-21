@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.haiku-softwareupdater	3158701976
+1	hungarian	x-vnd.haiku-softwareupdater	420642285
 No active network connection was found	UpdateManager	Error message	Nincs aktív hálózati kapcsolat.
 Quit	SoftwareUpdaterWindow	Alert button label	Kilépés
 Update now	SoftwareUpdaterWindow		Frissítés
@@ -11,6 +11,7 @@ The following changes will be made:	SoftwareUpdaterWindow		Elvégzendő változt
 Applying changes	UpdateManager		Változtatások alkalmazása
 Quit	SoftwareUpdaterWindow	Button label	Kilépés
 Packages are being updated	UpdateManager		Frissítendő csomagok
+Cancel	SoftwareUpdaterWindow		Megszakít
 Checking for updates	SoftwareUpdaterWindow		Frissítések keresése
 Checking for updates	CheckManager		Frissítések ellenörzése
 No remote repositories are available	UpdateManager	Error message	Egyetlen távoli tároló sem érhető el

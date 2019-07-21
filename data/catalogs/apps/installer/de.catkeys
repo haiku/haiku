@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Installer	1997609102
+1	german	x-vnd.Haiku-Installer	116830250
 Performing installation.	InstallProgress		Installation läuft.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Bitte Quelllaufwerk aus dem Menü wählen. Danach auf \"Start\" klicken.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Das DriveSetup-Fenster muss geschlossen werden, bevor der Installer verlassen werden kann.
@@ -27,6 +27,7 @@ Running Boot Manager…\n\nClose Boot Manager to continue with the installation.
 Quit DriveSetup	InstallerWindow		DriveSetup beenden
 Write boot sector	InstallerWindow		Bootsektor schreiben
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld von %2ld
+Finishing installation.	InstallProgress		Installation wird abgeschlossen.
 Install from:	InstallerWindow		Installieren von:
 Additional disk space required: 0.0 KiB	InstallerWindow		Zusätzlich benötigter Speicherplatz: 0.0 KiB
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Dies ist eine Beta-Version! Es besteht ein gewisses Risiko, dass wichtige Daten verloren gehen können. Man sollte seine Daten unbedingt regelmäßig sichern!\n\n\n
@@ -39,6 +40,8 @@ Hide optional packages	InstallerWindow		Optionale Pakete ausblenden
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Viel Spaß und Danke für das Interesse an Haiku!
 Quit	InstallerApp		Beenden
+Starting installation.	InstallProgress		Installation beginnt.
+Error writing boot sector.	InstallProgress		Fehler beim Schreiben des Bootsektors.
 OK	InstallerWindow		OK
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Bitte BootManger und DriveSetup vor dem Installer-Fenster schließen.
 Failed to launch Boot Manager	InstallerWindow		Boot Manager konnte nicht gestartet werden

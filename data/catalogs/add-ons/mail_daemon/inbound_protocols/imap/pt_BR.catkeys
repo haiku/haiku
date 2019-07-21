@@ -1,8 +1,7 @@
-1	portuguese (brazil)	x-vnd.Haiku-IMAP	2947821065
+1	portuguese (brazil)	x-vnd.Haiku-IMAP	1814079871
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Não é possível conectar ao servidor \"%server%\":\n%error%
 Failed to fetch available storage.	IMAPFolderConfig		Falhou ao buscar armazenamento disponível.
 Cancel	IMAPFolderConfig		Cancelar
-Ok	IMAPFolderConfig		Ok
 Configure IMAP Folders	imap_config		Configurar Pastas IMAP
 Apply	IMAPFolderConfig		Aplicar
 status	IMAPFolderConfig		status

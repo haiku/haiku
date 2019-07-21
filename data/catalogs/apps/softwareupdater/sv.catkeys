@@ -21,8 +21,8 @@ Contacting software repositories to check for package updates.	SoftwareUpdaterWi
 Cancelling updates	SoftwareUpdaterWindow		Avbryter uppdateringar
 Cancel	SoftwareUpdaterWindow	Alert button label	Avbryt
 There were no updates found.	UpdateAction		Inga uppdateringar hittades.
-Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Vänligen välj från dessa uppdateringsalternativ:\n\nUppdatera:\n\tUppdaterar alla installerade paket.\nFullständig synkronisering:\n\tSynkroniserar alla installerade paket med repositoriernas paket.
 OK	SoftwareUpdaterWindow		OK
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Vänligen välj från dessa uppdateringsalternativ:\n\nUppdatera:\n\tUppdaterar alla installerade paket.\nFullständig synkronisering:\n\tSynkroniserar alla installerade paket med repositoriernas paket.
 The following changes will be made:	SoftwareUpdaterWindow		Följande ändringar kommer att utföras:
 Argument variables are no longer accepted\n	SoftwareUpdaterApp		Argumentvariabler accepteras inte längre\n
 Fatal error while checking for updates: %s\n	CheckAction		Ett allvarligt fel inträffade under sökning efter uppdateringar: %s\n
@@ -44,8 +44,8 @@ Installing version	SoftwareUpdaterWindow	List item text	Installerar version
 Checking for updates	CheckManager		Letar efter uppdateringar
 No remote repositories are available	UpdateManager	Error message	Inga externa repositorier är tillgängliga
 Update	SoftwareUpdaterWindow	Alert button label	Uppdatera
-Updates did not complete	UpdateAction		Uppdateringen slutfördes inte
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Öppna Repositorier
+Updates did not complete	UpdateAction		Uppdateringen slutfördes inte
 Invalid update type, cannot continue with updates	UpdateAction		Ogiltig uppdateringstyp, kan inte fortsätta att uppdatera
 Uninstalling version	SoftwareUpdaterWindow	List item text	Avinstallerar version
 %i of %i	UpdateManager	Do not translate %i	%i av %i

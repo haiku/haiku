@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Appearance	583615507
+1	russian	x-vnd.Haiku-Appearance	663472720
 Control border	Colors tab		Граница элемента
 Control mark	Colors tab		Отметка
 Off	AntialiasingSettingsView		Выключить
@@ -8,10 +8,12 @@ Defaults	APRWindow		По умолчанию
 Shadow	Colors tab		Тень
 Document background	Colors tab		Фон документа
 List background	Colors tab		Фон списка
+No effect on running applications	DecorSettingsView		Не влияет на уже запущенные приложения
 Fixed font:	Font view		Моноширинный шрифт:
 Appearance	System name		Внешний вид
 Reduce colored edges filter strength:	AntialiasingSettingsView		Фильтрация цветных краев:
 Glyph hinting:	AntialiasingSettingsView		Уточнение:
+Default Haiku ControlLook	DecorSettingsView		Вид виджетов по умолчанию
 Menu item text	Colors tab		Текст пункта меню
 About decorator	DecorSettingsView		Об этом декораторе
 Antialiasing menu	AntialiasingSettingsView		Сглаживание меню
@@ -47,7 +49,9 @@ LCD subpixel	AntialiasingSettingsView		Субпиксельное сглажив
 Window tab	Colors tab		Заголовок окна
 Link text	Colors tab		Текст ссылки
 Tooltip background	Colors tab		Фон подсказки
+ControlLook:	DecorSettingsView		Вид виджетов:
 Scroll bar thumb	Colors tab		Ползунок прокрутки
+Default	DecorSettingsView		По умолчанию
 Link visited	Colors tab		Посещенная ссылка
 Selected menu item border	Colors tab		Рамка выделенного пункта меню
 Tooltip text	Colors tab		Текст подсказки
@@ -63,10 +67,12 @@ Antialiasing type:	AntialiasingSettingsView		Тип сглаживания:
 Panel text	Colors tab		Текст панели
 Hinting menu	AntialiasingSettingsView		Корректировка (хинтинг)
 Scroll bar:	DecorSettingsView		Полоса прокрутки:
+Choose ControlLook	DecorSettingsView		Выберите вид виджетов
 Monospaced fonts only	AntialiasingSettingsView		Только моноширинные шрифты
 Document text	Colors tab		Текст документа
 Inactive window border	Colors tab		Рамка неактивного окна
 Colors	APRWindow		Цвета
+About control look	DecorSettingsView		Об этом виде виджетов
 Control highlight	Colors tab		Подсветка элемента
 Status bar	Colors tab		Строка статуса
 Link hover	Colors tab		Цвет наведенной ссылки
