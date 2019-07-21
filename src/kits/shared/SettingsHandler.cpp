@@ -35,8 +35,8 @@ All rights reserved.
 #include <Debug.h>
 #include <Directory.h>
 #include <Entry.h>
-#include <FindDirectory.h>
 #include <File.h>
+#include <FindDirectory.h>
 #include <Path.h>
 #include <StopWatch.h>
 
@@ -53,6 +53,10 @@ All rights reserved.
 //	#pragma mark - ArgvParser
 
 
+/*! \class ArgvParser
+	ArgvParser class opens a text file and passes the context in argv
+	format to a specified handler
+*/
 ArgvParser::ArgvParser(const char* name)
 	:
 	fFile(0),
@@ -95,7 +99,7 @@ ArgvParser::MakeArgvEmpty()
 {
 	// done with current argv, free it up
 	for (int32 index = 0; index < fArgc; index++)
-		delete[] fCurrentArgv[index];
+		delete fCurrentArgv[index];
 
 	fArgc = 0;
 }
@@ -129,7 +133,7 @@ ArgvParser::NextArgv()
 		fSawBackslash = false;
 	}
 	fCurrentArgs[++fCurrentArgsPos] = '\0';
-	// terminate current arg pos
+		// terminate current arg pos
 
 	// copy it as a string to the current argv slot
 	fCurrentArgv[fArgc] = new char [strlen(fCurrentArgs) + 1];
@@ -268,7 +272,7 @@ ArgvParser::EachArgvPrivate(const char* name, ArgvHandler argvHandlerFunc,
 
 SettingsArgvDispatcher::SettingsArgvDispatcher(const char* name)
 	:
-	name(name)
+	fName(name)
 {
 }
 
@@ -329,6 +333,10 @@ SettingsArgvDispatcher::WriteRectValue(Settings* setting, BRect rect)
 }
 
 
+/*!	\class Settings
+	this class represents a list of all the settings handlers, reads and
+	saves the settings file
+*/
 Settings::Settings(const char* filename, const char* settingsDirName)
 	:
 	fFileName(filename),
@@ -366,6 +374,10 @@ Settings::ParseUserSettings(int, const char* const* argv, void* castToThis)
 }
 
 
+/*!
+	Returns false if argv dispatcher with the same name already
+	registered
+*/
 bool
 Settings::Add(SettingsArgvDispatcher* setting)
 {
@@ -481,8 +493,8 @@ Settings::Write(const char* format, ...)
 void
 Settings::VSWrite(const char* format, va_list arg)
 {
-	char fBuffer[2048];
-	vsprintf(fBuffer, format, arg);
+	char buffer[2048];
+	vsprintf(buffer, format, arg);
 	ASSERT(fCurrentSettings && fCurrentSettings->InitCheck() == B_OK);
-	fCurrentSettings->Write(fBuffer, strlen(fBuffer));
+	fCurrentSettings->Write(buffer, strlen(buffer));
 }

@@ -9,9 +9,8 @@ Application CodyCam :
 	FtpClient.cpp
 	SftpClient.cpp
 	Settings.cpp
-	SettingsHandler.cpp
 	VideoConsumer.cpp
-	: be localestub media translation $(TARGET_NETAPI_LIB)
+	: be localestub media shared translation $(TARGET_NETAPI_LIB)
 		[ TargetLibstdc++ ]
 	: CodyCam.rdef
 ;
@@ -22,7 +21,6 @@ DoCatalogs CodyCam :
 	CodyCam.cpp
 	FtpClient.cpp
 	Settings.cpp
-	SettingsHandler.cpp
 	SftpClient.cpp
 	VideoConsumer.cpp
 ;

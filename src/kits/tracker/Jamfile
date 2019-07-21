@@ -68,7 +68,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			RegExp.cpp
 			SelectionWindow.cpp
 			Settings.cpp
-			SettingsHandler.cpp
 			SettingsViews.cpp
 			SlowContextPopup.cpp
 			SlowMenu.cpp

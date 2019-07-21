@@ -35,11 +35,12 @@ All rights reserved.
 #define _SETTINGS_FILE_H
 
 
-#include <SupportDefs.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include <SupportDefs.h>
 
 
 class BFile;
@@ -111,7 +112,7 @@ public:
 
 	void SaveSettings(Settings* settings, bool onlyIfNonDefault);
 
-	const char* Name() const { return name; }
+	const char* Name() const { return fName; }
 		// name as it appears in the settings file
 
 	virtual const char* Handle(const char* const *argv) = 0;
@@ -134,7 +135,7 @@ protected:
 		// and does not need saving
 
 private:
-	const char* name;
+	const char* fName;
 };
 
 
