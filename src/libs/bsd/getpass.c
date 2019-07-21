@@ -38,7 +38,7 @@ getpass(const char *prompt)
 	if (fgets(password, sizeof(password), stdin) != NULL) {
 		size_t length = strlen(password);
 
-		if (password[length - 1] == '\n')
+		if (length > 0 && (password[length - 1] == '\n'))
 			password[length - 1] = '\0';
 
 		if (changed) {

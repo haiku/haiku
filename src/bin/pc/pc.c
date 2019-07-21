@@ -284,7 +284,7 @@ do_input(void)
   
   while(fgets(buff, 256, stdin) != NULL)
    {
-     if (buff[strlen(buff)-1] == '\n')
+     if (buff[0] != '\0' && buff[strlen(buff)-1] == '\n')
        buff[strlen(buff)-1] = '\0';     /* kill the newline character */
 
      for(ptr=buff; isspace(*ptr) && *ptr; ptr++)
