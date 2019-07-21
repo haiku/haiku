@@ -313,7 +313,7 @@ private:
 		// open the input file
 		ifstream file(filename, ifstream::in);
 		if (!file.is_open())
-			throw new IOException(string("Failed to open `") + filename + "'.");
+			throw IOException(string("Failed to open `") + filename + "'.");
 		// parse the syscalls
 		Tokenizer tokenizer(file);
 		// find "#pragma syscalls begin"
@@ -344,7 +344,7 @@ private:
 		// open the syscall info file
 		ofstream file(filename, ofstream::out | ofstream::trunc);
 		if (!file.is_open())
-			throw new IOException(string("Failed to open `") + filename + "'.");
+			throw IOException(string("Failed to open `") + filename + "'.");
 
 		// write preamble
 		file << "#include \"gensyscalls.h\"" << endl;
@@ -410,7 +410,7 @@ private:
 		// open the syscall info file
 		ofstream file(filename, ofstream::out | ofstream::trunc);
 		if (!file.is_open())
-			throw new IOException(string("Failed to open `") + filename + "'.");
+			throw IOException(string("Failed to open `") + filename + "'.");
 
 		// write preamble
 		file << "#include <computed_asm_macros.h>" << endl;
@@ -569,7 +569,7 @@ main(int argc, char** argv)
 {
 	try {
 		return Main().Run(argc, argv);
-	} catch (Exception& exception) {
+	} catch (const Exception& exception) {
 		fprintf(stderr, "%s\n", exception.what());
 		return 1;
 	}
