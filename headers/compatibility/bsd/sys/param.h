@@ -34,6 +34,8 @@
 #	define MAXLOGNAME 32
 #endif
 
+#define NBBY 8
+
 
 #endif
 
