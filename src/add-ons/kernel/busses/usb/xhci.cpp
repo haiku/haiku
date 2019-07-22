@@ -871,7 +871,7 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 status_t
 XHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 {
-	xhci_endpoint *endpoint = (xhci_endpoint *)pipe->ControllerCookie();
+	xhci_endpoint* endpoint = (xhci_endpoint*)pipe->ControllerCookie();
 	if (endpoint == NULL || endpoint->trbs == NULL) {
 		// Someone's de-allocated this pipe or endpoint in the meantime.
 		// (Possibly AllocateDevice failed, and we were the temporary pipe.)
@@ -888,11 +888,27 @@ XHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 		return B_OK;
 	}
 
-	// Get the head TD from the endpoint. We don't want to free the TDs while
-	// holding the endpoint lock, as the callbacks could potentially cause
-	// deadlocks.
+	// Get the head TD from the endpoint.
 	xhci_td* td_head = endpoint->td_head;
 	endpoint->td_head = NULL;
+
+	// We don't want to call the callbacks while holding the endpoint lock,
+	// as they could potentially cause deadlocks, so we instead store
+	// them in a pointer array. We need to do this separately from freeing
+	// the TDs, for in the case we fail to stop the endpoint, we cancel
+	// the transfers but do not free the TDs.
+	Transfer* transfers[XHCI_MAX_TRANSFERS];
+	int32 transfersCount = 0;
+
+	// We can't cancel or delete transfers under "force", as they probably
+	// are not safe to use anymore.
+	for (xhci_td* td = td_head; td != NULL; td = td->next) {
+		if (!force) {
+			transfers[transfersCount] = td->transfer;
+			transfersCount++;
+		}
+		td->transfer = NULL;
+	}
 
 	status_t status = StopEndpoint(false, endpoint->id + 1,
 		endpoint->device->slot);
@@ -910,24 +926,31 @@ XHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 		// operation as normal upon the next doorbell. (XHCI 1.1 § 4.6.9 p132.)
 	} else {
 		// We couldn't stop the endpoint. Most likely the device has been
-		// removed and the endpoint was stopped by the hardware.
+		// removed and the endpoint was stopped by the hardware, or is
+		// for some reason busy and cannot be stopped.
 		TRACE_ERROR("cancel queued transfers: could not stop endpoint: %s!\n",
 			strerror(status));
+
+		// Instead of freeing the TDs, we want to leave them in the endpoint
+		// so that when/if the hardware returns, they can be properly unlinked,
+		// as otherwise the endpoint could get "stuck" by having the "used"
+		// slowly accumulate due to "dead" transfers.
+		endpoint->td_head = td_head;
+		td_head = NULL;
 	}
 
 	endpointLocker.Unlock();
 
+	for (int32 i = 0; i < transfersCount; i++) {
+		transfers[i]->Finished(B_CANCELED, 0);
+		delete transfers[i];
+	}
+
+	// This loop looks a bit strange because we need to store the "next"
+	// pointer before freeing the descriptor.
 	xhci_td* td;
 	while ((td = td_head) != NULL) {
 		td_head = td_head->next;
-
-		// We can't cancel or delete transfers under "force", as they probably
-		// are not safe to use anymore.
-		if (!force && td->transfer != NULL) {
-			td->transfer->Finished(B_CANCELED, 0);
-			delete td->transfer;
-			td->transfer = NULL;
-		}
 		FreeDescriptor(td);
 	}
 
@@ -1709,6 +1732,13 @@ XHCI::_RemoveEndpointForPipe(Pipe *pipe)
 
 		uint8 epNumber = endpoint->id + 1;
 		StopEndpoint(true, epNumber, device->slot);
+
+		// See comment in CancelQueuedTransfers.
+		xhci_td* td;
+		while ((td = endpoint->td_head) != NULL) {
+			endpoint->td_head = endpoint->td_head->next;
+			FreeDescriptor(td);
+		}
 
 		mutex_destroy(&endpoint->lock);
 		memset(endpoint, 0, sizeof(xhci_endpoint));
@@ -2767,6 +2797,13 @@ XHCI::FinishTransfers()
 			TRACE("finishing transfer td %p\n", td);
 
 			Transfer* transfer = td->transfer;
+			if (transfer == NULL) {
+				// No transfer? Quick way out.
+				FreeDescriptor(td);
+				mutex_lock(&fFinishedLock);
+				continue;
+			}
+
 			bool directionIn = (transfer->TransferPipe()->Direction() != Pipe::Out);
 
 			status_t callbackStatus = B_OK;
