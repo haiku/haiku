@@ -102,6 +102,7 @@
 
 
 // Host Controller Runtime Registers
+#define XHCI_MFINDEX		0x0000
 // Section 5.5.2.1
 #define XHCI_IMAN(n)		(0x0020 + (0x20 * (n)))
 // IMAN

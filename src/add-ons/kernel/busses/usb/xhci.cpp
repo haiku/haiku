@@ -693,8 +693,6 @@ XHCI::SubmitTransfer(Transfer *transfer)
 
 	TRACE("SubmitTransfer()\n");
 	Pipe *pipe = transfer->TransferPipe();
-	if ((pipe->Type() & USB_OBJECT_ISO_PIPE) != 0)
-		return B_UNSUPPORTED;
 	if ((pipe->Type() & USB_OBJECT_CONTROL_PIPE) != 0)
 		return SubmitControlRequest(transfer);
 	return SubmitNormalRequest(transfer);
@@ -708,6 +706,8 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 	usb_request_data *requestData = transfer->RequestData();
 	bool directionIn = (requestData->RequestType & USB_REQTYPE_DEVICE_IN) != 0;
 
+	TRACE("SubmitControlRequest() length %d\n", requestData->Length);
+
 	xhci_endpoint *endpoint = (xhci_endpoint *)pipe->ControllerCookie();
 	if (endpoint == NULL) {
 		TRACE_ERROR("invalid endpoint!\n");
@@ -716,8 +716,6 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 	status_t status = transfer->InitKernelAccess();
 	if (status != B_OK)
 		return status;
-
-	TRACE("SubmitControlRequest() length %d\n", requestData->Length);
 
 	xhci_td *descriptor = CreateDescriptor(3, 1, requestData->Length);
 	if (descriptor == NULL)
@@ -787,10 +785,12 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 	TRACE("SubmitNormalRequest() length %ld\n", transfer->DataLength());
 
 	Pipe *pipe = transfer->TransferPipe();
+	usb_isochronous_data *isochronousData = transfer->IsochronousData();
+	bool directionIn = (pipe->Direction() == Pipe::In);
+
 	xhci_endpoint *endpoint = (xhci_endpoint *)pipe->ControllerCookie();
 	if (endpoint == NULL)
 		return B_BAD_VALUE;
-	bool directionIn = (pipe->Direction() == Pipe::In);
 
 	status_t status = transfer->InitKernelAccess();
 	if (status != B_OK)
@@ -798,11 +798,25 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 
 	// Compute the size to use for the TRBs, and then how many TRBs
 	// of this size we will need. We always need at least 1, of course.
-	const size_t dataLength = transfer->DataLength(),
-		maxPacketSize = pipe->MaxPacketSize(),
+	size_t dataLength = transfer->DataLength(),
+		packetSize = pipe->MaxPacketSize(),
 		packetsPerTrb = 4;
-	const size_t trbSize = packetsPerTrb * maxPacketSize;
-	int32 trbCount = (dataLength + trbSize - 1) / trbSize;
+
+	if (isochronousData != NULL) {
+		if (isochronousData->packet_count == 0)
+			return B_BAD_VALUE;
+
+		// Isochronous transfers use more specifically sized packets.
+		packetSize = transfer->DataLength() / isochronousData->packet_count;
+		if (packetSize > pipe->MaxPacketSize() || packetSize
+				!= (size_t)isochronousData->packet_descriptors[0].request_length)
+			return B_BAD_VALUE;
+		packetsPerTrb = 1;
+	}
+
+	// Now that we know packetSize & packetsPerTrb, compute TRB size and count.
+	const size_t trbSize = packetsPerTrb * packetSize;
+	const int32 trbCount = (dataLength + trbSize - 1) / trbSize;
 
 	xhci_td *td = CreateDescriptor(trbCount, trbCount, trbSize);
 	if (td == NULL)
@@ -810,7 +824,7 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 
 	// Normal Stage
 	size_t remaining = dataLength;
-	int32 remainingPackets = (remaining - trbSize) / maxPacketSize;
+	int32 remainingPackets = (remaining - trbSize) / packetSize;
 	for (int32 i = 0; i < trbCount; i++) {
 		// The "TD Size" field of a transfer TRB indicates the number of
 		// remaining maximum-size *packets* in this TD, *not* including the
@@ -832,6 +846,50 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 		td->trb_used++;
 		remaining -= trbLength;
 		remainingPackets -= packetsPerTrb;
+	}
+
+	// Isochronous-specific
+	if (isochronousData != NULL) {
+		// This is an isochronous transfer; we need to make the first TRB
+		// an isochronous TRB.
+		td->trbs[0].flags &= ~(TRB_3_TYPE(TRB_TYPE_NORMAL));
+		td->trbs[0].flags |= TRB_3_TYPE(TRB_TYPE_ISOCH);
+
+		// Isochronous pipes are scheduled by microframes, one of which
+		// is 125us for USB 2 and above. But for USB 1 it was 1ms, so
+		// we need to use a different frame delta for that case.
+		uint8 frameDelta = 1;
+		if (transfer->TransferPipe()->Speed() == USB_SPEED_FULLSPEED)
+			frameDelta = 8;
+
+		// TODO: We do not currently take Mult into account at all!
+		// How are we supposed to do that here?
+
+		// Determine the (starting) frame number: if ISO_ASAP is set,
+		// we are queueing this "right away", and so want to reset
+		// the starting_frame_number. Otherwise we use the passed one.
+		uint32 frame;
+		if ((isochronousData->flags & USB_ISO_ASAP) != 0
+				|| isochronousData->starting_frame_number == NULL) {
+			frame = ReadRunReg32(XHCI_MFINDEX) + 1;
+				// TODO: The +1 comes from the XHCI spec; document that.
+			td->trbs[0].flags |= TRB_3_ISO_SIA_BIT;
+		} else {
+			frame = *isochronousData->starting_frame_number;
+			td->trbs[0].flags |= TRB_3_FRID(frame);
+		}
+		frame = (frame + frameDelta) % 2048;
+		if (isochronousData->starting_frame_number != NULL)
+			*isochronousData->starting_frame_number = frame;
+
+		// TODO: The OHCI bus driver seems to also do this for inbound
+		// isochronous transfers. Perhaps it should be moved into the stack?
+		if (directionIn) {
+			for (uint32 i = 0; i < isochronousData->packet_count; i++) {
+				isochronousData->packet_descriptors[i].actual_length = 0;
+				isochronousData->packet_descriptors[i].status = B_NO_INIT;
+			}
+		}
 	}
 
 	// Set the ENT (Evaluate Next TRB) bit, so that the HC will not switch
@@ -903,6 +961,8 @@ XHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 	// We can't cancel or delete transfers under "force", as they probably
 	// are not safe to use anymore.
 	for (xhci_td* td = td_head; td != NULL; td = td->next) {
+		if (td->transfer == NULL)
+			continue;
 		if (!force) {
 			transfers[transfersCount] = td->transfer;
 			transfersCount++;
@@ -2003,7 +2063,13 @@ XHCI::ConfigureEndpoint(uint8 slot, uint8 number, uint8 type, bool directionIn,
 		// Control pipes are a special case, as they rarely have
 		// outbound transfers of any substantial size.
 		dwendpoint4 |= ENDPOINT_4_AVGTRBLENGTH(8);
+	} else if ((type & USB_OBJECT_ISO_PIPE) != 0) {
+		// Isochronous pipes are another special case: the TRB size will be
+		// one packet (which is normally smaller than the max packet size,
+		// but we don't know what it is here.)
+		dwendpoint4 |= ENDPOINT_4_AVGTRBLENGTH(maxPacketSize);
 	} else {
+		// Under all other circumstances, we put 4 packets in a TRB.
 		dwendpoint4 |= ENDPOINT_4_AVGTRBLENGTH(maxPacketSize * 4);
 	}
 
@@ -2042,6 +2108,9 @@ XHCI::ConfigureEndpoint(uint8 slot, uint8 number, uint8 type, bool directionIn,
 status_t
 XHCI::GetPortSpeed(uint8 index, usb_speed* speed)
 {
+	if (index >= fPortCount)
+		return B_BAD_INDEX;
+
 	uint32 portStatus = ReadOpReg(XHCI_PORTSC(index));
 
 	switch (PS_SPEED_GET(portStatus)) {
@@ -2839,6 +2908,20 @@ XHCI::FinishTransfers()
 				TRACE("transfer not successful, actualLength=%" B_PRIuSIZE "\n",
 					actualLength);
 			}
+
+			usb_isochronous_data* isochronousData = transfer->IsochronousData();
+			if (isochronousData != NULL) {
+				size_t packetSize = transfer->DataLength() / isochronousData->packet_count,
+					left = actualLength;
+				for (uint32 i = 0; i < isochronousData->packet_count; i++) {
+					size_t size = min_c(packetSize, left);
+					isochronousData->packet_descriptors[i].actual_length = size;
+					isochronousData->packet_descriptors[i].status = (size > 0)
+						? B_OK : B_DEV_FIFO_UNDERRUN;
+					left -= size;
+ 				}
+ 			}
+
 			if (callbackStatus == B_OK && directionIn && actualLength > 0) {
 				TRACE("copying in iov count %ld\n", transfer->VectorCount());
 				status_t status = transfer->PrepareKernelAccess();
