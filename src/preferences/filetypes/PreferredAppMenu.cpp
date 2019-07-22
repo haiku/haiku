@@ -201,7 +201,7 @@ update_preferred_app_menu(BMenu* menu, BMimeType* type, uint32 what,
 
 		menu->AddSeparatorItem();
 		menu->AddItem(item);
-		item->SetMarked(item);
+		item->SetMarked(true);
 	}
 }
 
