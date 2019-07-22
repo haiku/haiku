@@ -23,7 +23,6 @@ provides {
 	cmd:clear
 	cmd:compress
 	cmd:df
-	cmd:ftp
 	cmd:ftpd
 	cmd:hd
 	cmd:hey

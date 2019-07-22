@@ -8,7 +8,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	driveinfo dstcheck dumpcatalog
 	eject error
 	fdinfo ffm filepanel finddir findpaths fortune fstrim
-	ftp@libedit ftpd
+	ftpd
 	getarch groupadd groupdel groupmod
 	hd hey
 	ifconfig iroster isvolume
