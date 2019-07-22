@@ -106,7 +106,7 @@ HostnameView::_LoadHostname()
 		fHostname->SetText(fHostnameString);
 
 		return B_OK;
-	} else
+	}
 
 	return B_ERROR;
 }
