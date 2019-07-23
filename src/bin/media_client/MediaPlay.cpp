@@ -31,10 +31,10 @@ void
 play_buffer(void *cookie, void * buffer, size_t size, const media_raw_audio_format & format)
 {
 	int64 frames = 0;
-	
-	// Use your feeling, Obi-Wan, and find him you will. 
+
+	// Use your feeling, Obi-Wan, and find him you will.
 	playTrack->ReadFrames(buffer, &frames);
-	
+
 	if (frames <=0) {
 		player->SetHasData(false);
 		release_sem(finished);
@@ -70,38 +70,39 @@ int media_play(const char* uri)
 		delete playFile;
 		return 2;
 	}
-	
+
 	for (int i = 0; i < playFile->CountTracks(); i++) {
 		BMediaTrack* track = playFile->TrackAt(i);
-		playFormat.type = B_MEDIA_RAW_AUDIO;
-		if ((track->DecodedFormat(&playFormat) == B_OK) 
+		if (track != NULL) {
+			playFormat.type = B_MEDIA_RAW_AUDIO;
+			if ((track->DecodedFormat(&playFormat) == B_OK)
 				&& (playFormat.type == B_MEDIA_RAW_AUDIO)) {
-			playTrack = track;
-			break;
-		}
-		if (track)
+				playTrack = track;
+				break;
+			}
 			playFile->ReleaseTrack(track);
+		}
 	}
 
-	// Good relations with the Wookiees, I have. 
+	// Good relations with the Wookiees, I have.
 	signal(SIGINT, keyb_int);
 
 	finished = create_sem(0, "finish wait");
-	
+
 	printf("Playing file...\n");
-	
+
 	// Execute Plan 66!
 	player = new BSoundPlayer(&playFormat.u.raw_audio, "playfile", play_buffer);
 	player->SetVolume(1.0f);
 
-	// Join me, Padmé and together we can rule this galaxy. 
+	// Join me, Padmé and together we can rule this galaxy.
 	player->SetHasData(true);
 	player->Start();
 
 	acquire_sem(finished);
 
 	if (interrupt == true) {
-		// Once more, the Sith will rule the galaxy. 
+		// Once more, the Sith will rule the galaxy.
 		printf("Interrupted\n");
 		player->Stop();
 		kill_thread(reader);

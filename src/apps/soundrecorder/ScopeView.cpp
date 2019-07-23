@@ -2,7 +2,7 @@
  * Copyright 2005, Jérôme Duval. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Inspired by SoundCapture from Be newsletter (Media Kit Basics: 
+ * Inspired by SoundCapture from Be newsletter (Media Kit Basics:
  * 	Consumers and Producers)
  */
 
@@ -67,19 +67,19 @@ ScopeView::Draw(BRect updateRect)
 {
 	BRect bounds = Bounds();
 	SetHighColor(0,0,0);
-	
+
 	if (!fIsRendering)
 		DrawBitmapAsync(fBitmap, BPoint(0, 0));
-	else 
+	else
 		FillRect(bounds);
-	
+
 	float x = 0;
 	if (fTotalTime != 0)
 		x += (fMainTime - fLeftTime) * bounds.right
 			/ (fRightTime - fLeftTime);
 	SetHighColor(60,255,40);
 	StrokeLine(BPoint(x, bounds.top), BPoint(x, bounds.bottom));
-	
+
 	Sync();
 }
 
@@ -88,7 +88,7 @@ void
 ScopeView::Run()
 {
 	fRenderSem = create_sem(0, "scope rendering");
-	fThreadId = spawn_thread(&RenderLaunch, "Scope view", B_NORMAL_PRIORITY, 
+	fThreadId = spawn_thread(&RenderLaunch, "Scope view", B_NORMAL_PRIORITY,
 		this);
 	if (fThreadId < 0)
 		return;
@@ -121,8 +121,8 @@ ScopeView::ComputeRendering()
 	int64 framesCount = fMediaTrack->CountFrames() / SAMPLES_COUNT;
 	if (framesCount <= 0)
 		return;
-	T samples[fPlayFormat.u.raw_audio.buffer_size 
-		/ (fPlayFormat.u.raw_audio.format 
+	T samples[fPlayFormat.u.raw_audio.buffer_size
+		/ (fPlayFormat.u.raw_audio.format
 		& media_raw_audio_format::B_AUDIO_SIZE_MASK)];
 	int64 frames = 0;
 	U sum = 0;
@@ -140,19 +140,19 @@ ScopeView::ComputeRendering()
 		int64 framesIndex = 0;
 
 		while (framesIndex < frames) {
-			for (; framesIndex < frames && sumCount < framesCount; 
+			for (; framesIndex < frames && sumCount < framesCount;
 				framesIndex++, sumCount++) {
 				sum += samples[2 * framesIndex];
 				sum += samples[2 * framesIndex + 1];
 			}
-			
+
 			if (previewIndex >= SAMPLES_COUNT)
 				break;
-			
+
 			if (sumCount >= framesCount) {
-				// TRACE("computing block %ld, sumCount %ld\n", previewIndex, 
+				// TRACE("computing block %ld, sumCount %ld\n", previewIndex,
 				// sumCount);
-				fPreview[previewIndex] = (int32)(sum 
+				fPreview[previewIndex] = (int32)(sum
 					/ fPlayFormat.u.raw_audio.channel_count / framesCount);
 				if (previewMax < fPreview[previewIndex])
 					previewMax = fPreview[previewIndex];
@@ -162,11 +162,11 @@ ScopeView::ComputeRendering()
 			}
 		}
 	}
-	
+
 	if (previewMax <= 0)
 		return;
 	for (int i = 0; i < SAMPLES_COUNT; i++)
-		fPreview[i] = (int32)(fPreview[i] * 1.0 / previewMax 
+		fPreview[i] = (int32)(fPreview[i] * 1.0 / previewMax
 			* middle + middle);
 }
 
@@ -176,7 +176,7 @@ ScopeView::RenderLoop()
 {
 	while (acquire_sem(fRenderSem) == B_OK) {
 		fIsRendering = true;
-		
+
 		switch (fPlayFormat.u.raw_audio.format) {
 			case media_raw_audio_format::B_AUDIO_FLOAT:
 				ComputeRendering<float, float>();
@@ -194,28 +194,28 @@ ScopeView::RenderLoop()
 				ComputeRendering<char, int32>();
 				break;
 		}
-				
+
 		TRACE("finished computing, rendering\n");
-		
+
 		/* rendering */
 		RenderBitmap();
-		
+
 		TRACE("rendering done\n");
 
 		/* ask drawing */
-		
+
 		fIsRendering = false;
-	
+
 		if (Window()->LockWithTimeout(5000) == B_OK) {
 			Invalidate();
 			TRACE("invalidate done\n");
 			Window()->Unlock();
 		}
-	}	
+	}
 }
 
 
-void 
+void
 ScopeView::SetMainTime(bigtime_t timestamp)
 {
 	fMainTime = timestamp;
@@ -224,7 +224,7 @@ ScopeView::SetMainTime(bigtime_t timestamp)
 }
 
 
-void 
+void
 ScopeView::SetTotalTime(bigtime_t timestamp, bool reset)
 {
 	fTotalTime = timestamp;
@@ -238,7 +238,7 @@ ScopeView::SetTotalTime(bigtime_t timestamp, bool reset)
 }
 
 
-void 
+void
 ScopeView::SetLeftTime(bigtime_t timestamp)
 {
 	fLeftTime = timestamp;
@@ -247,7 +247,7 @@ ScopeView::SetLeftTime(bigtime_t timestamp)
 	TRACE("invalidate done\n");
 }
 
-void 
+void
 ScopeView::SetRightTime(bigtime_t timestamp)
 {
 	fRightTime = timestamp;
@@ -299,10 +299,10 @@ ScopeView::MouseDown(BPoint position)
 		drag.AddInt32("be:actions", B_COPY_TARGET);
 		drag.AddString("be:clip_name", "Audio Clip");
 		drag.AddString("be:types", B_FILE_MIME_TYPE);
-		
+
 		uint8* data;
 		size_t size;
-		
+
 		BMimeType wavType("audio/x-wav");
 		if (wavType.InitCheck() < B_OK
 			|| wavType.GetIcon(&data, &size) < B_OK) {
@@ -329,20 +329,20 @@ ScopeView::MouseDown(BPoint position)
 void
 ScopeView::InitBitmap()
 {
-	if (fBitmapView) {
+	if (fBitmap != NULL && fBitmapView != NULL) {
 		fBitmap->RemoveChild(fBitmapView);
 		delete fBitmapView;
 	}
 	if (fBitmap)
 		delete fBitmap;
-		
+
 	BRect rect = Bounds();
-	
+
 	fBitmap = new BBitmap(rect, BScreen().ColorSpace(), true);
 	memset(fBitmap->Bits(), 0, fBitmap->BitsLength());
-	
+
 	rect.OffsetToSelf(B_ORIGIN);
-	fBitmapView = new BView(rect.OffsetToSelf(B_ORIGIN), "bitmapView", 
+	fBitmapView = new BView(rect.OffsetToSelf(B_ORIGIN), "bitmapView",
 		B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW);
 	fBitmap->AddChild(fBitmapView);
 }
@@ -353,26 +353,26 @@ ScopeView::RenderBitmap()
 {
 	if (!fMediaTrack)
 		return;
-	
+
 	/* rendering */
 	fBitmap->Lock();
 	memset(fBitmap->Bits(), 0, fBitmap->BitsLength());
 	float width = fBitmapView->Bounds().Width() + 1;
-	
+
 	fBitmapView->SetDrawingMode(B_OP_ADD);
 	fBitmapView->SetHighColor(15,60,15);
-	int32 leftIndex = 
+	int32 leftIndex =
 		(fTotalTime != 0) ? fLeftTime * 20000 / fTotalTime : 0;
-	int32 rightIndex = 
+	int32 rightIndex =
 		(fTotalTime != 0) ? fRightTime * 20000 / fTotalTime : 20000;
-	
+
 	for (int32 i = leftIndex; i<rightIndex; i++) {
-		BPoint point((i - leftIndex) * width / (rightIndex - leftIndex), 
+		BPoint point((i - leftIndex) * width / (rightIndex - leftIndex),
 			fPreview[i]);
 		//TRACE("point x %f y %f\n", point.x, point.y);
 		fBitmapView->StrokeLine(point, point);
 	}
-	
+
 	fBitmap->Unlock();
 }
 

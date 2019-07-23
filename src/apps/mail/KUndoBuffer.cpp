@@ -14,10 +14,11 @@ KUndoItem::KUndoItem(const char* redo_text, int32 length, int32 offset,
 
 	if (redo_text != NULL) {
 		RedoText = (char*)malloc(length);
-		memcpy(RedoText, redo_text, length);
-		if (RedoText != NULL)
+
+		if (RedoText != NULL) {
+			memcpy(RedoText, redo_text, length);
 			fStatus = B_OK;
-		else
+		} else
 			fStatus = B_ERROR;
 	}
 }

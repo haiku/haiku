@@ -73,16 +73,20 @@ SavePanel::SavePanel(const char* name,
 
 	// add this instance as BHandler to the window's looper
 	window->AddHandler(this);
-	
+
 	// find a couple of important views and mess with their layout
 	BView* background = Window()->ChildAt(0);
+	if (background == NULL) {
+		printf("SavePanel::SavePanel() - couldn't find necessary controls.\n");
+		return;
+	}
 	BButton* cancel = dynamic_cast<BButton*>(
 		background->FindView("cancel button"));
 	BView* textview = background->FindView("text view");
 	BScrollBar* hscrollbar = dynamic_cast<BScrollBar*>(
 		background->FindView("HScrollBar"));
 
-	if (!background || !cancel || !textview || !hscrollbar) {
+	if (!cancel || !textview || !hscrollbar) {
 		printf("SavePanel::SavePanel() - couldn't find necessary controls.\n");
 		return;
 	}
@@ -96,7 +100,7 @@ SavePanel::SavePanel(const char* name,
 	rect.bottom = rect.top + fh.ascent + fh.descent + 5.0;
 
 	fFormatMF = new BMenuField(rect, "format popup", B_TRANSLATE("Format"),
-								fFormatM, true,	
+								fFormatM, true,
 								B_FOLLOW_LEFT | B_FOLLOW_BOTTOM,
 								B_WILL_DRAW | B_NAVIGABLE);
 	fFormatMF->SetDivider(be_plain_font->StringWidth(
@@ -129,7 +133,7 @@ SavePanel::SavePanel(const char* name,
 	// Build the "Settings" button relative to the format menu
 	rect = cancel->Frame();
 	rect.OffsetTo(fFormatMF->Frame().right + 5.0, rect.top);
-	fSettingsB = new BButton(rect, "settings", 
+	fSettingsB = new BButton(rect, "settings",
 							 B_TRANSLATE("Settings" B_UTF8_ELLIPSIS),
 							 new BMessage(MSG_SETTINGS),
 							 B_FOLLOW_LEFT | B_FOLLOW_BOTTOM,
@@ -324,7 +328,7 @@ SavePanel::AdjustExtension()
 //
 //		if (exporter) {
 //			BString name(textview->Text());
-//	
+//
 //			// adjust the name extension
 //			const char* extension = exporter->Extension();
 //			if (strlen(extension) > 0) {
@@ -335,7 +339,7 @@ SavePanel::AdjustExtension()
 //				}
 //				name << "." << extension;
 //			}
-//	
+//
 //			SetSaveText(name.String());
 //		}
 //
@@ -365,7 +369,7 @@ SavePanel::_ExportSettings()
 //	BTranslatorRoster *roster = BTranslatorRoster::Default();
 //	BView *view;
 //	BRect rect(0, 0, 239, 239);
-//	
+//
 //	// Build a window around this translator's configuration view
 //	status_t err = roster->MakeConfigurationView(item->id, NULL, &view, &rect);
 //	if (err < B_OK || view == NULL) {
@@ -397,30 +401,30 @@ SavePanel::_BuildMenu()
 {
 	fFormatM = new BPopUpMenu(B_TRANSLATE("Format"));
 
-	fNativeMI = new SaveItem("Icon-O-Matic", 
+	fNativeMI = new SaveItem("Icon-O-Matic",
 		new BMessage(MSG_FORMAT), EXPORT_MODE_MESSAGE);
 	fFormatM->AddItem(fNativeMI);
 	fNativeMI->SetEnabled(false);
 
 	fFormatM->AddSeparatorItem();
 
-	fHVIFMI = new SaveItem("HVIF", 
+	fHVIFMI = new SaveItem("HVIF",
 		new BMessage(MSG_FORMAT), EXPORT_MODE_FLAT_ICON);
 	fFormatM->AddItem(fHVIFMI);
 
-	fRDefMI = new SaveItem("HVIF RDef", 
+	fRDefMI = new SaveItem("HVIF RDef",
 		new BMessage(MSG_FORMAT), EXPORT_MODE_ICON_RDEF);
 	fFormatM->AddItem(fRDefMI);
 
-	fSourceMI = new SaveItem(B_TRANSLATE("HVIF Source Code"), 
+	fSourceMI = new SaveItem(B_TRANSLATE("HVIF Source Code"),
 		new BMessage(MSG_FORMAT), EXPORT_MODE_ICON_SOURCE);
 	fFormatM->AddItem(fSourceMI);
 
 	fFormatM->AddSeparatorItem();
 
-	fSVGMI = new SaveItem("SVG", 
+	fSVGMI = new SaveItem("SVG",
 		new BMessage(MSG_FORMAT), EXPORT_MODE_SVG);
-					
+
 	fFormatM->AddItem(fSVGMI);
 
 	fFormatM->AddSeparatorItem();
@@ -437,19 +441,19 @@ SavePanel::_BuildMenu()
 		new BMessage(MSG_FORMAT), EXPORT_MODE_BITMAP_64);
 	fFormatM->AddItem(fBitmap64MI);
 
-	fBitmapSetMI = new SaveItem(B_TRANSLATE("PNG Set"), 
+	fBitmapSetMI = new SaveItem(B_TRANSLATE("PNG Set"),
 		new BMessage(MSG_FORMAT), EXPORT_MODE_BITMAP_SET);
 	fFormatM->AddItem(fBitmapSetMI);
 
 	fFormatM->AddSeparatorItem();
 
-	fIconAttrMI = new SaveItem(B_TRANSLATE("BEOS:ICON Attribute"), 
+	fIconAttrMI = new SaveItem(B_TRANSLATE("BEOS:ICON Attribute"),
 		new BMessage(MSG_FORMAT), EXPORT_MODE_ICON_ATTR);
 	fFormatM->AddItem(fIconAttrMI);
 
 	fIconMimeAttrMI = new SaveItem(B_TRANSLATE("META:ICON Attribute"),
 		new BMessage(MSG_FORMAT), EXPORT_MODE_ICON_MIME_ATTR);
-					
+
 	fFormatM->AddItem(fIconMimeAttrMI);
 
 

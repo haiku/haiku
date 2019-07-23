@@ -738,7 +738,8 @@ ScreenWindow::_UpdateRefreshControl()
 		if (item->Message()->FindFloat("refresh") == fSelected.refresh) {
 			item->SetMarked(true);
 			// "Other" items only contains a refresh rate when active
-			fOtherRefresh->SetLabel(B_TRANSLATE("Other" B_UTF8_ELLIPSIS));
+			if (fOtherRefresh != NULL)
+				fOtherRefresh->SetLabel(B_TRANSLATE("Other" B_UTF8_ELLIPSIS));
 			return;
 		}
 	}

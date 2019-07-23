@@ -196,25 +196,29 @@ void DormantNodeView::MouseMoved(
 
 	int32 index;
 	if (!message && ((index = IndexOf(point)) >= 0)) {
-		DormantNodeListItem *item = dynamic_cast<DormantNodeListItem *>(ItemAt(index));
-		DormantNodeListItem *last = dynamic_cast<DormantNodeListItem *>(m_lastItemUnder);
-		BRect r = item->getRealFrame(be_plain_font);
-		if (item && r.Contains(point)) {
-			if (item != last) {
-				if (last)
-					last->MouseOver(this, point, B_EXITED_VIEW);
-				item->MouseOver(this, point, B_ENTERED_VIEW);
-				m_lastItemUnder = item;
-			}
-			else {
-				item->MouseOver(this, point, B_INSIDE_VIEW);
+		DormantNodeListItem *item =
+			dynamic_cast<DormantNodeListItem *>(ItemAt(index));
+		DormantNodeListItem *last =
+			dynamic_cast<DormantNodeListItem *>(m_lastItemUnder);
+		if (item != NULL) {
+			BRect r = item->getRealFrame(be_plain_font);
+			if (r.Contains(point)) {
+				if (item != last) {
+					if (last != NULL)
+						last->MouseOver(this, point, B_EXITED_VIEW);
+					item->MouseOver(this, point, B_ENTERED_VIEW);
+					m_lastItemUnder = item;
+				}
+				else {
+					item->MouseOver(this, point, B_INSIDE_VIEW);
+				}
 			}
 		}
-		else if (last) {
+		else if (last != NULL) {
 			last->MouseOver(this, point, B_EXITED_VIEW);
 		}
 	}
-	
+
 	_inherited::MouseMoved(point, transit, message);
 }
 
@@ -250,7 +254,7 @@ void DormantNodeView::_populateList() {
 	int32 bufferSize = bufferInc;
 	dormant_node_info *infoBuffer = new dormant_node_info[bufferSize];
 	int32 numNodes;
-	
+
 	// fill the buffer
 	while (true) {
 		numNodes = bufferSize;
@@ -261,13 +265,13 @@ void DormantNodeView::_populateList() {
 		if (numNodes < bufferSize) {
 			break;
 		}
-			
+
 		// reallocate buffer & try again
 		delete [] infoBuffer;
 		bufferSize += bufferInc;
 		infoBuffer = new dormant_node_info[bufferSize];
 	}
-	
+
 	// populate the list
 	for (int32 i = 0; i < numNodes; i++) {
 		DormantNodeListItem *item = new DormantNodeListItem(infoBuffer[i]);
@@ -298,7 +302,7 @@ void DormantNodeView::_updateList(
 	int32 bufferSize = bufferInc;
 	dormant_node_info *infoBuffer = new dormant_node_info[bufferSize];
 	int32 numNodes;
-	
+
 	// fill the buffer
 	while (true) {
 		numNodes = bufferSize;
@@ -309,7 +313,7 @@ void DormantNodeView::_updateList(
 		if (numNodes < bufferSize) {
 			break;
 		}
-			
+
 		// reallocate buffer & try again
 		delete [] infoBuffer;
 		bufferSize += bufferInc;
