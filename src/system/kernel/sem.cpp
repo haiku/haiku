@@ -355,7 +355,7 @@ delete_sem_internal(sem_id id, bool checkPermission)
 
 	int32 slot = id % sMaxSems;
 
-	InterruptsLocker _;
+	InterruptsLocker interruptsLocker;
 	SpinLocker listLocker(sSemsSpinlock);
 	SpinLocker semLocker(sSems[slot].lock);
 
@@ -385,6 +385,8 @@ delete_sem_internal(sem_id id, bool checkPermission)
 	SpinLocker schedulerLocker(thread_get_current_thread()->scheduler_lock);
 	scheduler_reschedule_if_necessary_locked();
 	schedulerLocker.Unlock();
+
+	interruptsLocker.Unlock();
 
 	free(name);
 	return B_OK;
