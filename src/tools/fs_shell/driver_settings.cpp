@@ -433,7 +433,7 @@ load_driver_settings_from_file(int file, const char *driverName)
 
 
 static bool
-put_string(char **_buffer, fssh_size_t *_bufferSize, char *string)
+put_string(char **_buffer, fssh_ssize_t *_bufferSize, char *string)
 {
 	fssh_size_t length, reserved, quotes;
 	char *buffer = *_buffer, c;
@@ -481,7 +481,7 @@ put_string(char **_buffer, fssh_size_t *_bufferSize, char *string)
 
 
 static bool
-put_chars(char **_buffer, fssh_size_t *_bufferSize, const char *chars)
+put_chars(char **_buffer, fssh_ssize_t *_bufferSize, const char *chars)
 {
 	char *buffer = *_buffer;
 	fssh_size_t length;
@@ -507,7 +507,7 @@ put_chars(char **_buffer, fssh_size_t *_bufferSize, const char *chars)
 
 
 static bool
-put_char(char **_buffer, fssh_size_t *_bufferSize, char c)
+put_char(char **_buffer, fssh_ssize_t *_bufferSize, char c)
 {
 	char *buffer = *_buffer;
 
@@ -527,15 +527,15 @@ put_char(char **_buffer, fssh_size_t *_bufferSize, char c)
 
 
 static void
-put_level_space(char **_buffer, fssh_size_t *_bufferSize, int32_t level)
+put_level_space(char **_buffer, fssh_ssize_t *_bufferSize, int32_t level)
 {
 	while (level-- > 0)
 		put_char(_buffer, _bufferSize, '\t');
 }
 
 
-static bool
-put_parameter(char **_buffer, fssh_size_t *_bufferSize,
+static void
+put_parameter(char **_buffer, fssh_ssize_t *_bufferSize,
 	struct fssh_driver_parameter *parameter, int32_t level, bool flat)
 {
 	int32_t i;
@@ -569,8 +569,6 @@ put_parameter(char **_buffer, fssh_size_t *_bufferSize,
 			put_level_space(_buffer, _bufferSize, level);
 		put_chars(_buffer, _bufferSize, flat ? "}" : "}\n");
 	}
-
-	return *_bufferSize >= 0;
 }
 
 
@@ -768,10 +766,10 @@ fssh_parse_driver_settings_string(const char *settingsString)
 */
 fssh_status_t
 fssh_get_driver_settings_string(void *_handle, char *buffer,
-	fssh_size_t *_bufferSize, bool flat)
+	fssh_ssize_t *_bufferSize, bool flat)
 {
 	settings_handle *handle = (settings_handle *)_handle;
-	fssh_size_t bufferSize = *_bufferSize;
+	fssh_ssize_t bufferSize = *_bufferSize;
 	int32_t i;
 
 	if (!check_handle(handle) || !buffer || *_bufferSize == 0)

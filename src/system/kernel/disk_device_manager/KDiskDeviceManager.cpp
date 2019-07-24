@@ -705,19 +705,17 @@ KDiskDeviceManager::CreateDevice(const char* path, bool* newlyCreated)
 			return error;
 		}
 
-		if (error == B_OK) {
-			// scan for partitions
-			_ScanPartition(device, false);
-			device->UnmarkBusy(true);
+		// scan for partitions
+		_ScanPartition(device, false);
+		device->UnmarkBusy(true);
 
-			_NotifyDeviceEvent(device, B_DEVICE_ADDED,
-				B_DEVICE_REQUEST_DEVICE_LIST);
+		_NotifyDeviceEvent(device, B_DEVICE_ADDED,
+			B_DEVICE_REQUEST_DEVICE_LIST);
 
-			if (newlyCreated)
-				*newlyCreated = true;
+		if (newlyCreated)
+			*newlyCreated = true;
 
-			return device->ID();
-		}
+		return device->ID();
 	}
 
 	return error;

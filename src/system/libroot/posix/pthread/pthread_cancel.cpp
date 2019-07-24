@@ -79,7 +79,7 @@ pthread_setcancelstate(int state, int *_oldState)
 
 	// return the old state
 	if (_oldState != NULL) {
-		*_oldState = (oldFlags & PTHREAD_CANCEL_ENABLE) != 0
+		*_oldState = (oldFlags & THREAD_CANCEL_ENABLED) != 0
 			? PTHREAD_CANCEL_ENABLE : PTHREAD_CANCEL_DISABLE;
 	}
 

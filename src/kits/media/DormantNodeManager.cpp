@@ -213,12 +213,6 @@ DormantNodeManager::RegisterAddOn(const char* path)
 		&reply, sizeof(reply));
 	if (status != B_OK) {
 		ERROR("DormantNodeManager::RegisterAddon failed, couldn't talk to "
-			"media server\n");
-		return 0;
-	}
-
-	if (status < B_OK) {
-		ERROR("DormantNodeManager::RegisterAddon failed, couldn't talk to "
 			"media server: %s\n", strerror(status));
 		return 0;
 	}

@@ -277,14 +277,15 @@ BScrollBar::BScrollBar(BMessage* data)
 	int32 orientation;
 	if (data->FindInt32("_orient", &orientation) < B_OK) {
 		fOrientation = B_VERTICAL;
-		if ((Flags() & B_SUPPORTS_LAYOUT) == 0) {
-			// just to make sure
-			SetResizingMode(fOrientation == B_VERTICAL
-				? B_FOLLOW_TOP_BOTTOM | B_FOLLOW_RIGHT
-				: B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
-		}
 	} else
 		fOrientation = (enum orientation)orientation;
+
+	if ((Flags() & B_SUPPORTS_LAYOUT) == 0) {
+		// just to make sure
+		SetResizingMode(fOrientation == B_VERTICAL
+			? B_FOLLOW_TOP_BOTTOM | B_FOLLOW_RIGHT
+			: B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
+	}
 
 	if (data->FindFloat("_prop", &fProportion) < B_OK)
 		fProportion = 0.0;

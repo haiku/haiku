@@ -357,8 +357,8 @@ log_vwrite(log_context lc, int category, int level, const char *format,
 			continue;
 
 		if (!did_vsprintf) {
-			(void)vsprintf(lc->buffer, format, args);
-			if (strlen(lc->buffer) > (size_t)LOG_BUFFER_SIZE) {
+			int len = vsnprintf(lc->buffer, LOG_BUFFER_SIZE, format, args);
+			if (len > (size_t)LOG_BUFFER_SIZE) {
 				syslog(LOG_CRIT,
 				       "memory overrun in log_vwrite()");
 				exit(1);
