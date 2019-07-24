@@ -4,11 +4,11 @@ UsePrivateHeaders input ;
 
 Preference Input :
 	Input.cpp
-	InputWindow.cpp
 	InputDeviceView.cpp
+	InputMouse.cpp
 	InputTouchpadPref.cpp
 	InputTouchpadPrefView.cpp
-	InputMouse.cpp
+	InputWindow.cpp
 	MouseView.cpp
 	MouseSettings.cpp
 	SettingsView.cpp
@@ -18,11 +18,11 @@ DoCatalogs Input :
 	x-vnd.Haiku-Input
 	:
 	Input.cpp
-	InputWindow.cpp
 	InputDeviceView.cpp
+	InputMouse.cpp
 	InputTouchpadPref.cpp
 	InputTouchpadPrefView.cpp
-	InputMouse.cpp
+	InputWindow.cpp
 	MouseView.cpp
 	MouseSettings.cpp
 	SettingsView.cpp

@@ -24,7 +24,6 @@
 
 
 #include "InputWindow.h"
-#include "InputDeviceView.h"
 #include "MouseSettings.h"
 #include "InputMouse.h"
 #include "InputConstants.h"

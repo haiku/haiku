@@ -21,9 +21,10 @@
 #include <CardView.h>
 #include <Message.h>
 
-#include "MouseSettings.h"
+#include "InputDeviceView.h"
 #include "InputMouse.h"
 #include "InputTouchpadPrefView.h"
+#include "MouseSettings.h"
 #include "touchpad_settings.h"
 
 
@@ -31,7 +32,6 @@ class BSplitView;
 class BCardView;
 class BCardLayout;
 
-class DeviceListView;
 class SettingsView;
 class DeviceName;
 class TouchpadPrefView;
