@@ -925,7 +925,9 @@ KeymapWindow::_FillSystemMaps()
 	if (directory.SetTo(path.Path()) == B_OK) {
 		while (directory.GetNextRef(&ref) == B_OK) {
 			fSystemListView->AddItem(
-				new KeymapListItem(ref, B_TRANSLATE_NOCOLLECT(ref.name)));
+				new KeymapListItem(ref,
+					B_TRANSLATE_NOCOLLECT_ALL((ref.name),
+					"KeymapNames", NULL)));
 		}
 	}
 
@@ -1017,8 +1019,9 @@ KeymapWindow::_SelectCurrentMap(BListView* view)
 		return false;
 
 	for (int32 i = 0; i < view->CountItems(); i++) {
-		BStringItem* current = dynamic_cast<BStringItem *>(view->ItemAt(i));
-		if (current != NULL && fCurrentMapName == current->Text()) {
+		KeymapListItem* current =
+			static_cast<KeymapListItem *>(view->ItemAt(i));
+		if (current != NULL && fCurrentMapName == current->EntryRef().name) {
 			view->Select(i);
 			view->ScrollToSelection();
 			return true;
