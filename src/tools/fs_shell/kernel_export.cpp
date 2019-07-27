@@ -22,6 +22,13 @@ fssh_spawn_kernel_thread(fssh_thread_func function, const char *threadName,
 
 
 fssh_status_t
+fssh_wait_for_thread(fssh_thread_id thread, fssh_status_t *_returnCode)
+{
+	return FSSH_B_ERROR;
+}
+
+
+fssh_status_t
 fssh_user_memcpy(void *dest, const void *source, fssh_size_t length)
 {
 	memcpy(dest, source, length);
