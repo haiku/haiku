@@ -49,8 +49,8 @@ pthread_mutex_destroy(pthread_mutex_t* mutex)
 }
 
 
-static status_t
-mutex_lock(pthread_mutex_t* mutex, bigtime_t timeout)
+status_t
+__pthread_mutex_lock(pthread_mutex_t* mutex, bigtime_t timeout)
 {
 	thread_id thisThread = find_thread(NULL);
 
@@ -104,14 +104,14 @@ mutex_lock(pthread_mutex_t* mutex, bigtime_t timeout)
 int
 pthread_mutex_lock(pthread_mutex_t* mutex)
 {
-	return mutex_lock(mutex, B_INFINITE_TIMEOUT);
+	return __pthread_mutex_lock(mutex, B_INFINITE_TIMEOUT);
 }
 
 
 int
 pthread_mutex_trylock(pthread_mutex_t* mutex)
 {
-	return mutex_lock(mutex, -1);
+	return __pthread_mutex_lock(mutex, -1);
 }
 
 
@@ -126,7 +126,7 @@ pthread_mutex_timedlock(pthread_mutex_t* mutex, const struct timespec* tv)
 	else
 		invalidTime = true;
 
-	status_t status = mutex_lock(mutex, timeout);
+	status_t status = __pthread_mutex_lock(mutex, timeout);
 	if (status != B_OK && invalidTime) {
 		// The timespec was not valid and the mutex could not be locked
 		// immediately.

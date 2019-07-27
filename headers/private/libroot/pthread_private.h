@@ -92,6 +92,7 @@ status_t __pthread_init_creation_attributes(
 	void* argument2, const char* name,
 	struct thread_creation_attributes* attributes);
 void __pthread_set_default_priority(int32 priority);
+status_t __pthread_mutex_lock(pthread_mutex_t* mutex, bigtime_t timeout);
 
 #ifdef __cplusplus
 }
