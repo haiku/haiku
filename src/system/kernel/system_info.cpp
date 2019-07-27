@@ -493,12 +493,12 @@ get_system_info(system_info* info)
 status_t
 get_cpu_info(uint32 firstCPU, uint32 cpuCount, cpu_info* info)
 {
+	if (cpuCount == 0)
+		return B_OK;
 	if (firstCPU >= (uint32)smp_get_num_cpus())
 		return B_BAD_VALUE;
 
 	uint32 count = std::min(cpuCount, smp_get_num_cpus() - firstCPU);
-	if (count <= 0)
-		return B_OK;
 
 	// This function is called very often from userland by applications
 	// that display CPU usage information, so we want to keep this as
