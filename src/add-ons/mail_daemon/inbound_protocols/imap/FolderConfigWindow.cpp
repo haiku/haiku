@@ -310,7 +310,7 @@ void
 FolderConfigWindow::_LoadFolders()
 {
 	StatusWindow* statusWindow = new StatusWindow(this,
-		B_TRANSLATE("Fetching IMAP folders, have patience" B_UTF8_ELLIPSIS));
+		B_TRANSLATE("Fetching IMAP folders, please be patient" B_UTF8_ELLIPSIS));
 	statusWindow->Show();
 
 	status_t status = fProtocol.Connect(fSettings.ServerAddress(),
@@ -345,12 +345,11 @@ FolderConfigWindow::_LoadFolders()
 
 	uint64 used, total;
 	if (fProtocol.GetQuota(used, total) == B_OK) {
-		char buffer[256];
-		BString quotaString = "Server storage: ";
-		quotaString += string_for_size(used, buffer, 256);
-		quotaString += " / ";
-		quotaString += string_for_size(total, buffer, 256);
-		quotaString += " used.";
+		BString quotaString;
+		char usedBuffer[128], totalBuffer[128];
+		quotaString.SetToFormat(B_TRANSLATE("Server storage: %s / %s used."),
+			string_for_size(used, usedBuffer, 128),
+			string_for_size(total, totalBuffer, 128));
 		fQuotaView->SetText(quotaString);
 	}
 
@@ -374,7 +373,7 @@ FolderConfigWindow::_ApplyChanges()
 		return;
 
 	StatusWindow* status = new StatusWindow(this,
-		B_TRANSLATE("Update subcription of IMAP folders, have patience"
+		B_TRANSLATE("Updating subscriptions to IMAP folders, please be patient"
 		B_UTF8_ELLIPSIS));
 	status->Show();
 
