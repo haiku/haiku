@@ -60,7 +60,7 @@ private:
 								int32 event, void* _logEntry);
 	static	void			_TransactionIdle(int32 transactionID, int32 event,
 								void* _journal);
-	static	status_t		_FlushLog(void* _journal);
+	static	status_t		_LogFlusher(void* _journal);
 
 private:
 			Volume*			fVolume;
@@ -76,6 +76,9 @@ private:
 			int32			fTransactionID;
 			bool			fHasSubtransaction;
 			bool			fSeparateSubTransactions;
+
+			thread_id		fLogFlusher;
+			sem_id			fLogFlusherSem;
 };
 
 

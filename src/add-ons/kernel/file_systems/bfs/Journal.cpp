@@ -409,6 +409,12 @@ Journal::Journal(Volume* volume)
 {
 	recursive_lock_init(&fLock, "bfs journal");
 	mutex_init(&fEntriesLock, "bfs journal entries");
+
+	fLogFlusherSem = create_sem(0, "bfs log flusher");
+	fLogFlusher = spawn_kernel_thread(&Journal::_LogFlusher, "bfs log flusher",
+		B_NORMAL_PRIORITY, this);
+	if (fLogFlusher > 0)
+		resume_thread(fLogFlusher);
 }
 
 
@@ -418,6 +424,11 @@ Journal::~Journal()
 
 	recursive_lock_destroy(&fLock);
 	mutex_destroy(&fEntriesLock);
+
+	sem_id logFlusher = fLogFlusherSem;
+	fLogFlusherSem = -1;
+	delete_sem(logFlusher);
+	wait_for_thread(fLogFlusher, NULL);
 }
 
 
@@ -685,20 +696,24 @@ Journal::_TransactionWritten(int32 transactionID, int32 event, void* _logEntry)
 /*static*/ void
 Journal::_TransactionIdle(int32 transactionID, int32 event, void* _journal)
 {
-	// The current transaction seems to be idle - flush it. We can't do this
-	// in this thread, as flushing the log can produce new transaction events.
-	thread_id id = spawn_kernel_thread(&Journal::_FlushLog, "bfs log flusher",
-		B_NORMAL_PRIORITY, _journal);
-	if (id > 0)
-		resume_thread(id);
+	// The current transaction seems to be idle - flush it. (We can't do this
+	// in this thread, as flushing the log can produce new transaction events.)
+	Journal* journal = (Journal*)_journal;
+	release_sem(journal->fLogFlusherSem);
 }
 
 
 /*static*/ status_t
-Journal::_FlushLog(void* _journal)
+Journal::_LogFlusher(void* _journal)
 {
 	Journal* journal = (Journal*)_journal;
-	return journal->_FlushLog(false, false);
+	while (journal->fLogFlusherSem >= 0) {
+		if (acquire_sem(journal->fLogFlusherSem) != B_OK)
+			continue;
+
+		journal->_FlushLog(false, false);
+	}
+	return B_OK;
 }
 
 
