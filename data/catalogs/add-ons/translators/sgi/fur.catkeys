@@ -1,0 +1,13 @@
+1	friulian	x-vnd.Haiku-SGITranslator	129108011
+SGI images	SGITranslator		Imagjins SGI
+Use compression:	SGIView		Dopre compression:
+SGI image translator	SGIView		Tradutôr imagjin SGI
+SGI image	SGITranslator		Imagjin SGI
+SGITranslator Settings	SGITranslator		Impostazions SGITranslator
+SGI Settings	SGIMain		Impostazions SGI
+SGI image translator	SGITranslator		Tradutôr imagjin SGI
+None	SGIView		Nissun
+Version %d.%d.%d, %s	SGIView		Version %d.%d.%d, %s
+\nbased on GIMP SGI plugin v1.5:\n	SGIView		\nbasât sul plugin SGI v1.5 par GIMP:\n
+RLE	SGIView		RLE
+written by:\n	SGIView		scrit di:\n

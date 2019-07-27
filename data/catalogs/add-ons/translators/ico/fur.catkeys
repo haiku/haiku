@@ -1,0 +1,14 @@
+1	friulian	x-vnd.Haiku-ICOTranslator	3916328565
+Cursor	ICOTranslator		Cursôr
+Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
+Windows %s %ld bit image	ICOTranslator		Imagjin Windows %s %ld bit
+Valid icon sizes are 16, 32, or 48	ConfigView		Lis dimensions validis a son 16, 32 o 48
+Windows icons	ICOTranslator		Iconis Windows
+Enforce valid icon sizes	ConfigView		Apliche dimensions validis di icone
+ICO Settings	main		Impostazions ICO
+Windows icon translator	ICOTranslator		Tradutôr di icone Windows
+pixels in either direction.	ConfigView		pixel in dutis dôs lis direzions.
+Write 32 bit images on true color input	ConfigView		Scrivi imagjins a 32 bit su input a colôrs reâi
+Icon	ICOTranslator		Icone
+ICOTranslator Settings	ConfigView		Impostazions ICOTranslator
+Windows icon translator	ConfigView		Tradutôr di iconis Windows

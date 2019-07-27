@@ -1,0 +1,42 @@
+1	friulian	x-vnd.Haiku-libbe	3337473349
+{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte} other{# byte}}
+All Rights Reserved.	AboutWindow		Ducj i dirits riservâts.
+gold master	AboutWindow		gold master
+Undo	TextView		Disfe
+gamma	AboutWindow		schirie
+development	AboutWindow		disvilup
+OK	Dragger		Va ben
+OK	PrintJob		Va ben
+Print Server is not responding.	PrintJob		Il servidôr di stampe nol rispuint.
+About %app%	AboutMenuItem		Informazions su %app%
+Warning	Dragger		Atenzion
+Green:	ColorControl		Vert:
+Redo	TextView		Torne fâs
+No pages to print!	PrintJob		Nissune pagjine di stampâ!
+beta	AboutWindow		beta
+OK	ZombieReplicantView		Va ben
+Cut	TextView		Taie
+%3.2f GiB	StringForSize		%3.2f GiB
+Can't delete this replicant from its original application. Life goes on.	Dragger		Impussibil gjavâ chest replicant de sô aplicazion origjinâl. Poben.
+Error	ZombieReplicantView		Erôr
+Paste	TextView		Tache
+OK	AboutWindow		Va ben
+Special Thanks:	AboutWindow		Ringraciaments speciâi:
+%.2f TiB	StringForSize		%.2f TiB
+Remove replicant	Dragger		Gjave replicant
+Version	AboutWindow		Version
+Red:	ColorControl		Ros:
+<empty>	Menu		<vueit>
+Copy	TextView		Copie
+Select all	TextView		Selezione dut
+alpha	AboutWindow		alfa
+%3.2f MiB	StringForSize		%3.2f MiB
+Error	PrintJob		Erôr
+About %app%	AboutWindow		Informazions su %app%
+About %app…	Dragger		Informazions su %app…
+Version history:	AboutWindow		Cronologjie des versions:
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Impussibil individuâ la aplicazion pal replicant. Nissune firme di aplicazion furnide.\n%error
+%3.2f KiB	StringForSize		%3.2f KiB
+Blue:	ColorControl		Blu:
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Impussibil creâ il replicant par \"%description\".\n%error
+Written by:	AboutWindow		Scrit di:

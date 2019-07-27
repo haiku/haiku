@@ -1,0 +1,17 @@
+1	friulian	x-vnd.Haiku-FontDemo	3449067186
+Stop cycling	ControlView		Ferme rotazion
+Haiku, Inc.	FontDemoView		Haiku, Inc.
+Rotation: %d	ControlView		Rotazion: %d
+Shear: %d	ControlView		Inclinazion: %d
+Spacing: %d	ControlView		Spaziadure: %d
+Cycle fonts	ControlView		Cambie caratars a rotazion
+Font:	ControlView		Caratar:
+Drawing mode:	ControlView		Modalitât di dissen:
+Haiku, Inc.	ControlView		Haiku, Inc.
+Controls	FontDemo		Controi
+FontDemo	System name		FontDemo
+Outline: %d	ControlView		Contor: %d
+Text:	ControlView		Test:
+Antialiased text	ControlView		Test cun anti-aliasing
+Bounding boxes	ControlView		Ricuadri di contigniment
+Size: %d	ControlView		Dimension: %d

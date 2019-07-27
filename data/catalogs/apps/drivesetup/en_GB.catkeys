@@ -1,18 +1,18 @@
 1	english (united kingdom)	x-vnd.Haiku-DriveSetup	1882543531
-Could not change the parameters of the selected partition.	MainWindow		Could not change the parametres of the selected partition.
 Initialize	MainWindow		Initialise
-OK	MainWindow		Alright
-Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Are you sure you want to initialise the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n
-The disk has been successfully initialized.\n	MainWindow		The disk has been successfully initialised.\n
+Could not change the parameters of the selected partition.	MainWindow		Could not change the parametres of the selected partition.
 Validation of the given parameters failed.	MainWindow		Validation of the given parametres failed.
-Change parameters	MainWindow		Change parametres
-Validation of the given creation parameters failed.	MainWindow		Validation of the given creation parametres failed.
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisation of the partition %s failed. (Nothing has been written to disk.)
-Failed to initialize the disk %s!\n	MainWindow		Failed to initialise the disc %s!\n
-Parameters	PartitionList		Parametres
+Validation of the given creation parameters failed.	MainWindow		Validation of the given creation parametres failed.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Failed to change the parametres of the partition. No changes have been written to disk.
 No disk devices have been recognized.	DiskView		No disc devices have been recognised.
 Change parameters…	MainWindow		Change parametres…
-Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Are you sure you want to change parametres of the selected partition?\n\nThe partition may no longer be recognised by other operating systems any more!
 Validation of the given initialization parameters failed.	MainWindow		Validation of the given initialisation parametres failed.
+OK	MainWindow		Alright
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Are you sure you want to initialise the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n
+The disk has been successfully initialized.\n	MainWindow		The disk has been successfully initialised.\n
+Change parameters	MainWindow		Change parametres
+Failed to initialize the disk %s!\n	MainWindow		Failed to initialise the disc %s!\n
+Parameters	PartitionList		Parametres
+Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Are you sure you want to change parametres of the selected partition?\n\nThe partition may no longer be recognised by other operating systems any more!
 OK	AbstractParametersPanel		Alright

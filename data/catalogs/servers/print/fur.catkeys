@@ -1,0 +1,55 @@
+1	friulian	x-vnd.Be-PSRV	1222926379
+Undefined	ConfigWindow		No definît
+Return the number of available transports	PrintServerApp Scripting		Torne indaûr il numar di colegaments(traspuarts) disponibii
+Return the number of available printers	PrintServerApp Scripting		Torne indaûr il numar di stampadoris disponibilis
+Get currently available ports/devices	Transport Scripting		Oten puartis e dispositîfs atualmentri disponibii
+Retrieve or select the active printer	PrintServerApp Scripting		Rileve o selezione la stampadore ative
+Cancel	PrintServerApp		Anule
+Retrieve a specific printer	PrintServerApp Scripting		Rileve une precise stampadore
+Page %1 to %2	ConfigWindow		Pagjine %1 to %2
+Get name of the printer add-on used for this printer	Printer Scripting		Oten il non dal component adizionâl doprât par cheste stampadore 
+B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
+OK	ConfigWindow		Va ben
+Cancel	ConfigWindow		Anule
+Printer server	ConfigWindow		Servidôr di stampe
+Page %1 to %2, %3 copies	ConfigWindow		Pagjine %1 di %2, %3 copiis
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		E esist za une stampadore cun chest non, ma il driver nol è stât cjatât. Sostituî?
+Yes	PrintServerApp		Sì
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Libri mestri (ANSI B)
+Would you like to set one up now?	PrintServerApp		Configurâ une stampadore cumò?
+Print job setup:	ConfigWindow		Configurazion lavôr di stampe:
+A6	ConfigWindow	ISO 216 paper size	A6
+Portrait	ConfigWindow		Verticâl
+All pages	ConfigWindow		Dutis lis pagjinis
+There is no default printer set up.	PrintServerApp		No je stade configurade nissune stampadore predefinide.
+B5	ConfigWindow	ISO 216 paper size	B5
+A0	ConfigWindow	ISO 216 paper size	A0
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	Letare (US)
+Printer:	ConfigWindow		Stampadore:
+A2	ConfigWindow	ISO 216 paper size	A2
+Select a printer	ConfigWindow		Selezione une stampadore
+Show configuration window	PrintServerApp Scripting		Mostre il barcon di configurazion
+A4	ConfigWindow	ISO 216 paper size	A4
+Get comments about this printer	Printer Scripting		Coments su cheste stampadore
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		E esist za une stampadore cun chest non, ma no si pues doprâ. Sostituî?
+No	PrintServerApp		No
+Get the transport configuration for this printer	Printer Scripting		Oten la configurazion dal colegament (traspuart) par cheste stampadore
+Landscape	ConfigWindow		Orizontâl
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legâl (US)
+There are no printers set up.	PrintServerApp		Nissune stampadore configurade.
+Get name of the transport add-on used for this printer	Printer Scripting		Oten il non dal component adizionâl dal colegament (traspuart) doprât par cheste stampadore
+All pages, %1 copies	ConfigWindow		Dutis lis pagjinis, %1 copiis
+Delete a specific printer	PrintServerApp Scripting		Elimine une precise stampadore
+Create a new printer	PrintServerApp Scripting		Cree une gnove stampadore
+OK	PrintServerApp		Va ben
+Print setup	ConfigWindow		Impostazions di stampe
+A1	ConfigWindow	ISO 216 paper size	A1
+Retrieve a specific transport	PrintServerApp Scripting		Recupere un specific colegament(traspuart)
+Get name of printer	Printer Scripting		Oten il non de stampadore
+A3	ConfigWindow	ISO 216 paper size	A3
+Get name of transport	Transport Scripting		Oten il non dal colegament (traspuart)
+A5	ConfigWindow	ISO 216 paper size	A5
+Would you like to make @ the default printer?	PrintServerApp		Rindi @ la stampadore predefinide?
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Formât ridot
+Page setup	ConfigWindow		Impostazions pagjine
+Paper setup:	ConfigWindow		Configurazion cjarte:

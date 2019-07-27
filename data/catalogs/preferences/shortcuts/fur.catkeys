@@ -1,0 +1,47 @@
+1	friulian	x-vnd.Haiku-Shortcuts	3834857117
+*MouseUp	ShortcutsWindow		*MouseMolât
+Application	ShortcutsWindow		Aplicazion
+Option	ShortcutsSpec	Name for modifier on keyboard	Opzion
+Save changes before closing?	ShortcutsWindow		Salvâ lis modifichis prime di sierâ?
+Revert to saved	ShortcutsWindow		Torne indaûr al salvât
+Don't save	ShortcutsWindow		No sta salvâ
+*MouseDown	ShortcutsWindow		*MouseFracât
+*Beep	ShortcutsWindow		*Bip
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Scurtis nol è stât bon di salvâ lis tôs impostazions di tascj.
+Save	ShortcutsWindow		Salve
+Either	ShortcutsSpec		Un dai doi
+Oh no	ShortcutsWindow		Orpo no
+Key	ShortcutsWindow		Tast
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*InvieMessaç application/x-vnd.Be-TRAK 'Tfnd'
+Select	ShortcutsWindow		Selezione
+Shortcuts	System name		Scurtis
+Quit	ShortcutsWindow		Jes
+(Choose application with file requester)	ShortcutsWindow		(Sielç aplicazion cul barcon domande file)
+Cancel	ShortcutsWindow		Anule
+*MoveMouse +20 +0	ShortcutsWindow		*MôfMouse +20 +0
+Control	ShortcutsSpec	Name for modifier on keyboard	Control
+Left	ShortcutsSpec		Çampe
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Scurtis nol è stât bon di analizâ il to file di impostazion tascj!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Scurtis nol è stât bon di salvâ il to file di impostazion tascj!
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InserìsStringhe \"Chi il to test\"
+Remove selected shortcut	ShortcutsWindow		Gjave scurte selezionade
+Error, NULL state description?	ShortcutsSpec		Erôr, descrizion di stât NULL?
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Scurtis nol è stât bon di vierzi il to file di impostazion tascj!
+Save & apply	ShortcutsWindow		Salve e apliche
+Open	ShortcutsWindow		Vierç
+Append	ShortcutsWindow		Met in code
+Both	ShortcutsSpec		Ducj i doi
+Save KeySet as…	ShortcutsWindow		Salve impostazion tascj come…
+Append KeySet…	ShortcutsWindow		Met in code impostazion tascj…
+*MouseButton 1	ShortcutsWindow		*BotonMouse 1
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multipli \"*MôfMouseViers 100% 0\" \"*BotonMouse 1\"
+Right	ShortcutsSpec		Diestre
+OK	ShortcutsWindow		Va ben
+Add new shortcut	ShortcutsWindow		Zonte gnove scurte
+(None)	ShortcutsSpec		(Nissun)
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Open KeySet…	ShortcutsWindow		Vierç impostazion tascj…
+File	ShortcutsWindow		File
+*LaunchHandler text/html	ShortcutsWindow		*InvieGjestôr text/html
+*MoveMouseTo 50% 50%	ShortcutsWindow		*MôfMouseA 50% 50%

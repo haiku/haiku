@@ -1,0 +1,14 @@
+1	friulian	x-vnd.Haiku-NewMailNotification	73789504
+You have {0, plural, one{One new message} other{# new messages}} for %account.	NotifierFilter		Tu âs {0, plural, one{Un gnûf messaç} other{# gnûfs messaçs}} su %account.
+none	NotifierConfigView		nissun
+Method:	NotifierConfigView		Metodi:
+Beep	NotifierConfigView		Bip
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{Un gnûf messaç} other{# gnûfs messaçs}}
+New mails notification	NotifierFilter		Notifiche gnove pueste
+Central alert	NotifierConfigView		Alarme centrâl
+OK	NotifierFilter		Va ben
+New messages	NotifierFilter		Gnûfs messaçs
+Log window	NotifierConfigView		Barcon dal regjistri
+Keyboard LEDs	NotifierConfigView		LED de tastiere
+Central beep	NotifierConfigView		Bip centrâl
+Alert	NotifierConfigView		Alarme

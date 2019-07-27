@@ -59,8 +59,8 @@ Send	RatePackageWindow		Küldés
 Start package daemon	App		Csomag démon indítása
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		A jelszó érvénytelen vagy könnyen megfejthető. A jelszónak legalább 8 karakterből kell álnia, illetve legalább 2 számot és 2 nagybetűt tartalmaz.
 The package action could not be scheduled: %Error%	PackageInfoView		A csomaggal történő művelet nem ütemezhető be: %Error%
-Inactive	PackageListView		Inaktív
 Cancel	RatePackageWindow		Mégse
+Inactive	PackageListView		Inaktív
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# elem} other{# elem}}
 OK	PackageInfoView		Rendben
@@ -73,8 +73,8 @@ Close	RatePackageWindow		Bezárás
 Failed to create account: %s\n	UserLoginWindow		%s létrehozása sikertelen\n
 Size	PackageListView		Méret
 Your rating:	RatePackageWindow		Saját értékelés:
-All categories	FilterView		Minden kategória
 Your rating was updated.	RatePackageWindow		Az értékelés módosítása sikerült.
+All categories	FilterView		Minden kategória
 n/a	PackageInfoView		nincs értékelve
 Cancel	MainWindow		Mégse
 Refresh repositories	MainWindow		Tárolók frissítése

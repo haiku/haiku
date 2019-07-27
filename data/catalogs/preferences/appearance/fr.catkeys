@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Appearance	583615507
+1	french	x-vnd.Haiku-Appearance	663472720
 Control border	Colors tab		Bordure des contrôles
 Control mark	Colors tab		Point de contrôle
 Off	AntialiasingSettingsView		Désactivé
@@ -8,10 +8,12 @@ Defaults	APRWindow		Défaut
 Shadow	Colors tab		Ombre
 Document background	Colors tab		Arrière plan du document
 List background	Colors tab		Arrière-plan de la liste
+No effect on running applications	DecorSettingsView		Aucun effet sur les applications en cours d’exécution
 Fixed font:	Font view		Police à chasse fixe :
 Appearance	System name		Apparence
 Reduce colored edges filter strength:	AntialiasingSettingsView		Intensité du filtre de réduction des bords de couleurs :
 Glyph hinting:	AntialiasingSettingsView		Consigne de glyphes :
+Default Haiku ControlLook	DecorSettingsView		Contrôleur d’aspect Haiku natif
 Menu item text	Colors tab		Texte des éléments de menu
 About decorator	DecorSettingsView		À propos du décorateur
 Antialiasing menu	AntialiasingSettingsView		Menu lissage
@@ -27,7 +29,7 @@ List item text	Colors tab		Texte de l’élément de la liste
 OK	DecorSettingsView		OK
 Control text	Colors tab		Texte des contrôles
 Look and feel	APRWindow		Aspect et comportement
-Selected menu item background	Colors tab		Arrière plan de l’élément sélectionnée dans le menu
+Selected menu item background	Colors tab		Arrière plan de l’élément sélectionné dans le menu
 Link active	Colors tab		Lien actif
 Antialiasing	APRWindow		Lissage
 Menu font:	Font view		Police des menus :
@@ -47,13 +49,15 @@ LCD subpixel	AntialiasingSettingsView		Sous-pixel LCD
 Window tab	Colors tab		Titre des fenêtres
 Link text	Colors tab		Texte du lien
 Tooltip background	Colors tab		Arrière plan des bulles d’aide
+ControlLook:	DecorSettingsView		Contrôleur d’aspect :
 Scroll bar thumb	Colors tab		Curseur de défilement
+Default	DecorSettingsView		Par défaut
 Link visited	Colors tab		Lien visité
 Selected menu item border	Colors tab		Bordure de l’élément sélectionné dans le menu
 Tooltip text	Colors tab		Texte des bulles d’aide
 Control background	Colors tab		Arrière plan des contrôles
 Selected list item text	Colors tab		Texte de l’élément sélectionné dans la liste
-Selected list item background	Colors tab		Arrière plan de l’élément sélectionnée dans la liste
+Selected list item background	Colors tab		Arrière plan de l’élément sélectionné dans la liste
 Inactive window tab text	Colors tab		Texte des titres de fenêtres inactives
 Navigation base	Colors tab		Base de navigation
 Fonts	APRWindow		Polices
@@ -63,11 +67,13 @@ Antialiasing type:	AntialiasingSettingsView		Type de lissage :
 Panel text	Colors tab		Texte des panneaux
 Hinting menu	AntialiasingSettingsView		Menu ajustement
 Scroll bar:	DecorSettingsView		Barre de défilement :
+Choose ControlLook	DecorSettingsView		Choisir un contrôleur d’aspect
 Monospaced fonts only	AntialiasingSettingsView		Seulement les polices à chasse fixe
 Document text	Colors tab		Texte du document
 Inactive window border	Colors tab		Bordure de fenêtre inactive
 Colors	APRWindow		Couleurs
+About control look	DecorSettingsView		À propos du Contrôleur d’aspect
 Control highlight	Colors tab		Mise en valeur de contrôle
-Status bar	Colors tab		Barre d'état
+Status bar	Colors tab		Barre d’état
 Link hover	Colors tab		Lien survolé
 Single:	DecorSettingsView		Simple :

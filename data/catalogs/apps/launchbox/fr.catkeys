@@ -1,10 +1,11 @@
-1	french	x-vnd.Haiku-LaunchBox	3692177981
+1	french	x-vnd.Haiku-LaunchBox	1530497419
 Set description…	LaunchBox		Ajouter une description…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Voulez-vous vraiment fermer ce pavé ?\n(Le pavé ne sera pas enregistré.)
 OK	LaunchBox		OK
 Ignore double-click	LaunchBox		Ignorer le double click
 Show on all workspaces	LaunchBox		Afficher dans tous les espaces de travail
 Name Panel	LaunchBox		Nom du panneau
+Autostart	LaunchBox		Démarrage automatique
 Clone	LaunchBox		Cloner
 Description for '%3'	LaunchBox		Description for « %3 »
 Show window border	LaunchBox		Afficher la bordure de la fenêtre

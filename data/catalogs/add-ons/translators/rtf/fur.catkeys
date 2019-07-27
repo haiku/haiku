@@ -1,0 +1,11 @@
+1	friulian	x-vnd.Haiku-RTFTranslator	334451110
+Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
+RTF text files	RTFTranslator		File di test RTF
+RTF-Translator Settings	ConfigView		impostazions RTF-Translator
+Rich Text Format (RTF) translator	ConfigView		Tradutôr di Formât di Test Ric (RTF)
+RTF Settings	main		Impostazions RTF
+RichTextFormat file	RTFTranslator		File RichTextFormat
+Be style text file	RTFTranslator		File di test stîl Be
+Plain text file	RTFTranslator		File di test sempliç
+Rich Text Format translator	RTFTranslator		Tradurôr Formât di Test Ric
+Rich Text Format translator v%d.%d.%d %s	RTFTranslator		Tradutôr Formât di Test Ric v%d.%d.%d %s

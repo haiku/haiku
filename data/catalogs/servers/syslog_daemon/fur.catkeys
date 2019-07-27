@@ -1,0 +1,4 @@
+1	friulian	x-vnd.Haiku-SystemLogger	57960782
+Syslog Daemon	SyslogDaemon		Demoni Syslog
+OK	SyslogDaemon		Va ben
+%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nChest demoni al è incargât di tirâ dongje ducj i messaçs di sisteme e di scriviju intal grant regjistri di sisteme su \"%s\".\n\n

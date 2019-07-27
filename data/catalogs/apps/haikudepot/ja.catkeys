@@ -28,7 +28,7 @@ Unstable but usable	RatePackageWindow		不安定であるが使用できる
 Active	PackageListView		有効
 Login or Create account	MainWindow		ログインまたはアカウントの作成
 <Package contents not available for remote packages>	PackageContentsView		<リモートパッケージには利用できません>
-{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1個のダウンロードするパッケージ}other{#個のダウンロードするパッケージ}}
+{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1個のダウンロードパッケージ}other{#個のダウンロードパッケージ}}
 Ratings	PackageInfoView		評価
 Switch account…	MainWindow		アカウントの切り替え…
 Preferred language:	UserLoginWindow		優先言語:
@@ -38,8 +38,8 @@ Name	PackageListView		名前
 Rate %Package%	RatePackageWindow		%Package% を評価
 Quit HaikuDepot	App		HaikuDepot を終了
 Category	FilterView		分類
-Installed packages	MainWindow		インストール済みパッケージ
 User rating	RatePackageWindow		ユーザーによる評価
+Installed packages	MainWindow		インストール済みパッケージ
 Other users can see this rating	RatePackageWindow		ほかのユーザーがこの評価を見ることができます
 Stable	RatePackageWindow		安定
 Fatal error	PackageManager		致命的なエラー
@@ -70,8 +70,8 @@ Send	RatePackageWindow		送信する
 Start package daemon	App		パッケージデーモンを起動
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		パスワードが弱すぎるか不正です。8 文字以上で、数字が 2 文字以上、大文字が 2 文字以上のパスワードを使用してください。
 The package action could not be scheduled: %Error%	PackageInfoView		パッケージアクションを予約できませんでした: %Error%
-Inactive	PackageListView		無効
 Cancel	RatePackageWindow		キャンセル
+Inactive	PackageListView		無効
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# アイテム} other{# アイテム}}
 OK	PackageInfoView		OK
@@ -87,10 +87,10 @@ Close	RatePackageWindow		閉じる
 Failed to create account: %s\n	UserLoginWindow		次のアカウントの作成に失敗しました: %s\n
 Size	PackageListView		サイズ
 Your rating:	RatePackageWindow		評価:
-All categories	FilterView		すべての分類
 Your rating was updated.	RatePackageWindow		評価が更新されました。
-n/a	PackageInfoView		利用不可
+All categories	FilterView		すべての分類
 Repositories	MainWindow		リポジトリ
+n/a	PackageInfoView		利用不可
 Cancel	MainWindow		キャンセル
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 個以上のダウンロード)}other{(# 個以上のダウンロード)}}
 Refresh repositories	MainWindow		リポジトリの更新

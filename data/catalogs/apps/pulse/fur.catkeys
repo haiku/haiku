@@ -1,0 +1,48 @@
+1	friulian	x-vnd.Haiku-Pulse	139895817
+Normal mode	DeskbarPulseView		Modalitât normâl
+Info	CPUButton		Informazions
+Quit	DeskbarPulseView		Jes
+Info	DeskbarPulseView		Informazions
+Normal mode	MiniPulseView		Modalitât normâl
+Frame color	ConfigView		Colôr curnîs
+Error	PulseApp		Erôr
+Bar colors	ConfigView		Colôrs de sbare
+%.2f GHz	NormalPulseView		%.2f GHz
+Defaults	PrefsWindow		Predefinîts
+%ld MHz	NormalPulseView		%ld MHz
+Mini mode	PrefsWindow		Modalitât mini
+CPU progress bar	NormalPulseView		Sbare di avanzament CPU
+Fade colors	ConfigView		Colôrs sfantâts
+About Pulse…	PulseView		Informazions su Pulse…
+Pulse	NormalPulseView		Pulse
+Deskbar mode	NormalPulseView		Modalitât Deskbar
+Remove replicant	CPUButton		Gjave replicant
+You can't disable the last active CPU.	PulseView		No si pues disabilitâ l'ultime CPU ative.
+Width of icon:	ConfigView		Largjece de icone:
+Deskbar mode	MiniPulseView		Modalitât Deskbar
+OK	PulseView		Va ben
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nDi David Ramsey e Arve Hjønnevåg\nRiviodût di Daniel Switkin\n
+OK	PrefsWindow		Va ben
+Pulse	PulseApp		Pulse
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Rimozion dal Deskbar falide.\n%s
+OK	PulseApp		Va ben
+About Pulse…	CPUButton		Informazions su Pulse…
+Deskbar mode	PrefsWindow		Modalitât Deskbar
+Mini mode	DeskbarPulseView		Modalitât mini
+You can't disable the last active CPU.	CPUButton		No si pues disabilitâ l'ultime CPU ative.
+OK	CPUButton		Va ben
+Deskbar	CPUButton		Deskbar
+Settings…	PulseView		Impostazions…
+Deskbar menu	CPUButton		Menù Deskbar
+Mini mode	NormalPulseView		Modalitât mini
+Quit	MiniPulseView		Jes
+Info	PulseView		Informazions
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		Ûs: Pulse [--mini] [-w largjece] [--width=largjece]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]
+OK	DeskbarPulseView		Va ben
+Info	PulseApp		Informazions
+Pulse	System name		Pulse
+Active color	ConfigView		Colôr atîf
+Installing in Deskbar failed\n%s	PulseApp		Instalazion tal Deskbar falide.\n%s
+Idle color	ConfigView		Colôr inativitât
+Normal mode	PrefsWindow		Modalitât normâl
+Pulse settings	PulseWindow		Impostazions di Pulse

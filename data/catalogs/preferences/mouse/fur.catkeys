@@ -1,0 +1,22 @@
+1	friulian	x-vnd.Haiku-Mouse	3990055017
+Mouse type:	SettingsView		Gjenar di mouse:
+Warp	SettingsView		Warp
+2-Button	SettingsView		2-Botons
+Double-click test area	SettingsView		Aree di prove dopli clic
+Revert	MouseWindow		Torne indaûr
+...by Andrew Edward McCall	MouseApplication		...di Andrew Edward McCall
+Mouse acceleration	SettingsView		Acelerazion mouse
+Click to focus	SettingsView		Clic par meti a fûc
+Click to focus and raise	SettingsView		Clic par meti a fûc e parâ denant
+3-Button	SettingsView		3-Botons
+Mouse speed	SettingsView		Velocitât mouse
+Focus mode:	SettingsView		Mût de metude a fûc:
+Instant warp	SettingsView		Warp istantani
+Dig Deal	MouseApplication		Grant Afâr
+1-Button	SettingsView		1-Boton
+Double-click speed	SettingsView		Velocitât dopli clic
+Defaults	MouseWindow		Predefinîts
+Focus follows mouse	SettingsView		La metude a fûc e va daûr dal mouse
+Accept first click	SettingsView		Acete prin clic
+Normal	SettingsView		Normâl
+Mouse	System name		Mouse

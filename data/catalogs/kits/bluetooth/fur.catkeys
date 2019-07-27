@@ -1,0 +1,88 @@
+1	friulian	x-vnd.Haiku-Bluetooth	3550394259
+Positioning	DeviceClass		Posizionament
+Controller	DeviceClass		Controlôr
+Common ISDN access	DeviceClass		Acès ISDN normâl
+Unknown (reserved) minor device class	DeviceClass		Classe minôr dal dispositîf (classe riservade) no cognossude
+Uncategorized	DeviceClass		Cence categorie
+Keyboard	DeviceClass		Tastiere
+Smart phone	DeviceClass		Smartphone
+VCR	DeviceClass		Videoregjistradôr
+Cellular	DeviceClass		Celulâr
+Audio	DeviceClass		Audio
+Audio/Video	DeviceClass		Audio/Video
+Car audio	DeviceClass		Autoradio
+Major class: 	DeviceClass		Classe maiôr: 
+HiFi audio device	DeviceClass		Dispositîf audio HiFi
+Microphone	DeviceClass		Microfon
+Capturing	DeviceClass		Cature/regjistrazion
+Jacket	DeviceClass		Jacket
+50-67% utilized	DeviceClass		50-67% utilizât
+Headphones	DeviceClass		Scufis
+Imaging	DeviceClass		Imagjine
+Device conforms to the headset profile	DeviceClass		Il dispositîf al è coerent cul profîl des scufis
+Remote control	DeviceClass		Telecomant
+Fully available	DeviceClass		Disponibil dal dut
+#CommandFailed#Not Valid name	RemoteDevice		#ComantFalît#Non no valit
+Server	DeviceClass		Servidôr
+No service available	DeviceClass		Nissun servizi disponibil
+Printer	DeviceClass		Stampadore
+Card reader	DeviceClass		Letôr di schedis
+Wired modem or voice gateway	DeviceClass		Modem cablât o gateway voce
+#ServerNotReady#Not Valid name	RemoteDevice		#ServidôrNoPront#Non no valit
+#NoOwnerError#Not Valid name	RemoteDevice		#ErôrNissunProprietari#Non no valit
+Camcorder	DeviceClass		Videocjamare
+#NotCompletedRequest#Not Valid name	RemoteDevice		#RichiesteNoCompletade#Non no valit
+17-33% utilized	DeviceClass		17-33% utilizât
+Desktop workstation	DeviceClass		Postazion di lavôr
+Unspecified	DeviceClass		No specificât
+Miscellaneous	DeviceClass		Variis
+Robot	DeviceClass		Robot
+Vehicle	DeviceClass		Veicul
+LAN access	DeviceClass		Acès LAN
+Glasses	DeviceClass		Ocjâi
+Phone	DeviceClass		Telefon
+Laptop	DeviceClass		Portatil
+67-83% utilized	DeviceClass		67-83% utilizât
+Cordless	DeviceClass		Cence fîl
+Invalid device class!\n	DeviceClass		Classe dispositîf no valide.\n
+Minor class: 	DeviceClass		Classe minôr: 
+Doll/Action figure	DeviceClass		Pipine/Riproduzion in scjale
+Not implemented	RemoteDevice		No implementât
+33-50% utilized	DeviceClass		33-50% utilizât
+Gaming/Toy	DeviceClass		Zûc/zughet
+Video camera	DeviceClass		Videocjamare
+Handheld	DeviceClass		Palmâr
+Service classes: 	DeviceClass		Classis di servizi: 
+Loudspeaker	DeviceClass		Casse
+83-99% utilized	DeviceClass		83-99% utilizât
+SIM card reader	DeviceClass		Letôr schedis SIM
+Computer	DeviceClass		Computer
+Scanner	DeviceClass		Scansionadôr
+Wearable	DeviceClass	A wearable computer	Si pues meti intôr
+Display	DeviceClass		Visôr
+Gamepad	DeviceClass		Gamepad
+Video monitor	DeviceClass		Visôr
+Palm	DeviceClass	A palm-held device	Palme
+Joystick	DeviceClass		Joystick
+Networking	DeviceClass		Rêt
+Telephony	DeviceClass		Telefonie
+Game	DeviceClass		Zûc
+Video display and loudspeaker	DeviceClass		Visôr e cassis
+Wrist watch	DeviceClass		Orloi di pols
+Sensing device	DeviceClass		Dispositîf di rilevament
+Pointing device	DeviceClass		Dispositîf di pontament
+(reserved)	DeviceClass		(riservât)
+Rendering	DeviceClass		Rafigurazion
+Information	DeviceClass		Informazion
+Helmet	DeviceClass		Casc
+Pager	DeviceClass	A small radio device to receive short text messages	Ciridôr
+Hands-free	DeviceClass		Mans libaris
+Digitizer tablet	DeviceClass		Taulete grafiche
+Portable audio	DeviceClass		Audio portatil
+Camera	DeviceClass		Fotocjamare
+1-17% utilized	DeviceClass		1-17% utilizât
+Combo keyboard/pointing device	DeviceClass		Cumbinazion tastiere/dispositîf di pontament
+Video conferencing	DeviceClass		Video conference
+Peripheral	DeviceClass		Periferiche
+Object transfer	DeviceClass		Trasferiment ogjet
+Set-top box	DeviceClass		Scjatule conversion segnâl

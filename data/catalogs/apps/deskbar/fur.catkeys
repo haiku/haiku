@@ -1,0 +1,50 @@
+1	friulian	x-vnd.Be-TSKB	2656653225
+Power off	DeskbarMenu		Distude
+Sort applications by name	PreferencesWindow		Ordene aplicazions par non
+Suspend	DeskbarMenu		Sospint
+Hide clock	TimeView		Plate orloi
+Applications	PreferencesWindow		Aplicazions
+Time preferences…	TimeView		Preferencis date e ore…
+About Haiku	DeskbarMenu		Informazions su Haiku
+Edit in Tracker…	PreferencesWindow		Modifiche in Tracker…
+Recent documents:	PreferencesWindow		Documents resints:
+Recent applications	DeskbarMenu		Aplicazions resintis
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplicazions
+Find…	DeskbarMenu		Cjate…
+Show clock	Tray		Mostre orloi
+Window	PreferencesWindow		Barcon
+Defaults	PreferencesWindow		Predefinidis
+Menu	PreferencesWindow		Menù
+Recent documents	DeskbarMenu		Documents resints
+Auto-hide	PreferencesWindow		Plate in automatic
+Always on top	PreferencesWindow		Simpri denant
+<Deskbar folder is empty>	DeskbarMenu		<La cartele Deskbar e je vueide>
+Show all	WindowMenu		Mostre dut
+No windows	WindowMenu		Nissun barcon
+Deskbar	System name		Deskbar
+Restart system	DeskbarMenu		Torne invie
+Large	PreferencesWindow		Grant
+Auto-raise	PreferencesWindow		Tire sù in automatic
+Recent folders:	PreferencesWindow		Cartelis resintis:
+Show application expander	PreferencesWindow		Mostre estensôr aplicazion
+Close all	WindowMenu		Siere dut
+Deskbar preferences	PreferencesWindow		Preferencis Deskbar
+Mount	DeskbarMenu		Monte
+Revert	PreferencesWindow		Torne indaûr
+Small	PreferencesWindow		Piçul
+Recent applications:	PreferencesWindow		Aplicazions resintis:
+Shutdown…	DeskbarMenu		Si distude…
+Tracker always first	PreferencesWindow		Tracker simpri par prin
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Preferencis
+Recent folders	DeskbarMenu		Cartelis resintis
+About this system	DeskbarMenu		Informazions sul sisteme
+Show calendar…	TimeView		Mostre il calendari…
+Deskbar preferences…	DeskbarMenu		Preferencis di Deskbar…
+Expand new applications	PreferencesWindow		Espandi lis gnovis aplicazions
+Show replicants	DeskbarMenu		Mostre replicants
+Hide application names	PreferencesWindow		Plate i nons des aplicazions
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Dimostrazions
+Icon size	PreferencesWindow		Dimension icone
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Applet dal scritori
+Hide all	WindowMenu		Plate dut
+Quit application	WindowMenu		Siere la aplicazion

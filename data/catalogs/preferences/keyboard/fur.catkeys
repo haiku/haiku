@@ -1,0 +1,14 @@
+1	friulian	x-vnd.Haiku-Keyboard	1711838804
+Written by Andrew Edward McCall	KeyboardApplication		Scrit di Andrew Edward McCall
+Typing test area	KeyboardView		Aree di prove di scriture
+Defaults	KeyboardWindow		Predefinîts
+Key repeat rate	KeyboardView		Tas di ripetizion dai tascj
+Revert	KeyboardWindow		Torne indaûr
+Delay until key repeat	KeyboardView		Timp di spiete par ripeti il tast
+Keyboard	System name		Tastiere
+OK	KeyboardApplication		Va ben
+Fast	KeyboardView		Svelt
+Slow	KeyboardView		Lent
+Something has gone wrong!	KeyboardApplication		Alc al è lât stuart!
+Long	KeyboardView		Lunc
+Short	KeyboardView		Curt

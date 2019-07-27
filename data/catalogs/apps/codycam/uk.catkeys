@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-CodyCam	3200733765
+1	ukrainian	x-vnd.Haiku-CodyCam	2593355250
 destination directory expected	CodyCam		вкажіть папку призначення
 reply: '%s'\n	SftpClient		відповісти: '%s'\n
 JPEG image	CodyCam		Зображення JPEG
@@ -27,6 +27,7 @@ Every 2 hours	CodyCam		Кожні 2 години
 Cannot get a time source	CodyCam		Неможливо отримати тривалість джерела
 Every 4 hours	CodyCam		Кожні 4 години
 cmd: '%s'\n	FtpClient		команда: '%s'\n
+Closing the window	VideoConsumer.cpp		Закривання вікна
 Never	CodyCam		Ніколи
 Every 8 hours	CodyCam		Кожні 8 годин
 Cannot start the video source	CodyCam		Неможливо запустити джерело відео
@@ -38,10 +39,11 @@ still image filename expected	CodyCam		надалі очікується наз�
 File name:	CodyCam		Ім’я файлу:
 Directory:	CodyCam		Тека:
 Error setting type of output file	VideoConsumer.cpp		Помилка при заданні типу вихідного файлу
+Locking the window	VideoConsumer.cpp		Блокування вікна
 Cannot find an available video stream	CodyCam		Неможливо знайти доступний поток відео
 Upload…	VideoConsumer.cpp		Вивантаження…
 password expected	CodyCam		очікується пароль
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <suppressed> (дійсне гасло відправлено)\n
+PASS <suppressed>  (real password sent)\n	FtpClient		PASS <suppressed>  (дійсне гасло відправлено)\n
 SFTP	CodyCam		SFTP
 Output	CodyCam		Вивід
 server address expected	CodyCam		вкажіть адресу сервера
@@ -64,8 +66,6 @@ Local	CodyCam		Локальний
 Stop video	CodyCam		Зупинити відео
 Last Capture: 	VideoConsumer.cpp		Останнє захоплення: 
 Rate:	CodyCam		Періодичність:
-File %s ; Line %ld # unterminated quote\n	SettingsHandler		Файл %s ; Рядок %ld # невизначений запит\n
-File %s # unterminated quote at end of file\n	SettingsHandler		Файл %s # невизначений запит в кінці файлу\n
 Couldn't find requested directory on server	VideoConsumer.cpp		Неможливо знайти запитувану теку на сервері
 Cannot find the media roster	CodyCam		Неможливо знайти медіа ростер
 Type:	CodyCam		Тип:
@@ -77,7 +77,6 @@ File	CodyCam		Файл
 read: %ld\n	SftpClient		читання: %ld\n
 Every hour	CodyCam		Кожну годину
 login ID expected	CodyCam		вкажіть логін
-File %s; Line %ld # %s	SettingsHandler		Файл %s; Рядок %ld # %s
 Video settings	CodyCam		Налаштування відео
 Can't find an available connection to the video window	CodyCam		Неможливо знайти доступне вікно відео
 FTP	CodyCam		FTP
@@ -86,5 +85,4 @@ Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Не з�
 Logging in…	VideoConsumer.cpp		Авторизація…
 CodyCam	System name		Камера
 Error writing output file	VideoConsumer.cpp		Помилка запису вихідного файлу
-unknown command	SettingsHandler		невідома команда
 Capture controls	CodyCam		Керування захопленням

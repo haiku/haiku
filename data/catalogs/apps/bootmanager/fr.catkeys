@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-BootManager	3886671855
+1	french	x-vnd.Haiku-BootManager	867546001
 Old Master Boot Record backup failure	BootManagerController	Title	Échec lors de la sauvegarde du Master Boot Record d’origine
 At least one partition must be selected!	BootManagerController		Au moins une partition doit être sélectionnée !
 No space available!	DrivesPage	Cannot install	Espace insuffisant !
@@ -16,6 +16,7 @@ Never	DefaultPartitionPage		Jamais
 Summary	BootManagerController	Title	Récapitulatif
 An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Une erreur est survenue lors de l’écriture du menu de démarrage. L’enregistrement d’amorçage maître (MBR) est probablement endommagé, vous devriez le restaurer maintenant !
 After three seconds	DefaultPartitionPage		Après 3 secondes
+Read only!	DrivesPage	Cannot install	Lecture seule !
 Write boot menu	BootManagerController	Button	Écrire le menu de démarrage
 OK	BootManagerController	Button	OK
 Uninstall boot manager	BootManagerController	Title	Désinstallation du gestionnaire d’amorçage

@@ -1,0 +1,17 @@
+1	friulian	x-vnd.haiku.zip-o-matic	2032806096
+Drop files here.	file:ZipOMaticWindow.cpp		Strissine achì i file.
+Filename: %s	file:ZipOMaticWindow.cpp		Non dal file: %s
+Do you want to stop them?	file:ZipOMatic.cpp		Vûstu interompiju?
+Error creating archive	file:ZipOMaticWindow.cpp		Erôr te creazion dal archivi
+Stop them	file:ZipOMatic.cpp		Fermiju
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Sino sigûrs di interompi la creazion di chest archivi?
+Preparing to archive	file:ZipperThread.cpp		Daûr a prontâ l'archiviazion
+Let them continue	file:ZipOMatic.cpp		Lassiju continuâ
+Continue	file:ZipOMaticWindow.cpp		Continue
+Archive created OK	file:ZipOMaticWindow.cpp		Archivi creât cun sucès
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# file zontât.} other{# file zontâts.}}
+Stop	file:ZipOMaticWindow.cpp		Ferme
+Stopped	file:ZipOMaticWindow.cpp		Interot
+Archive	file:ZipperThread.cpp		Archivi
+Creating archive: %s	file:ZipOMaticWindow.cpp		Creazion archivi: %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Tu âs {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matic}} in esecuzion.\n\n

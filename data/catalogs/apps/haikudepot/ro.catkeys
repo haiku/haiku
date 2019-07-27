@@ -34,8 +34,8 @@ Name	PackageListView		Nume
 Rate %Package%	RatePackageWindow		Evaluează %Package%
 Quit HaikuDepot	App		Închide HaikuDepot
 Category	FilterView		Categorie
-Installed packages	MainWindow		Pachete instalate
 User rating	RatePackageWindow		Evaluarea utilizatorului
+Installed packages	MainWindow		Pachete instalate
 Other users can see this rating	RatePackageWindow		Alți utilizatori pot vedea această evaluare
 Stable	RatePackageWindow		Stabil
 Fatal error	PackageManager		Eroare fatală
@@ -62,8 +62,8 @@ Send	RatePackageWindow		Trimitere
 Start package daemon	App		Pornire demon de pachet
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Parola e prea slabă sau nevalidă. Utilizați cel puțin 8 caractere cu minimum 2 numere și 2 litere majuscule.
 The package action could not be scheduled: %Error%	PackageInfoView		Actiunea pachetului n-a putut fi programată: %Error%
-Inactive	PackageListView		Inactiv
 Cancel	RatePackageWindow		Anulează
+Inactive	PackageListView		Inactiv
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# element} other{# elemente}}
 OK	PackageInfoView		OK
@@ -78,10 +78,10 @@ Close	RatePackageWindow		Închidere
 Failed to create account: %s\n	UserLoginWindow		Nu s-a putut crea contul: %s\n
 Size	PackageListView		Mărime
 Your rating:	RatePackageWindow		Evaluare:
-All categories	FilterView		Toate categoriile
 Your rating was updated.	RatePackageWindow		Evaluarea a fost actualizată.
-n/a	PackageInfoView		n/a
+All categories	FilterView		Toate categoriile
 Repositories	MainWindow		Depozite
+n/a	PackageInfoView		n/a
 Cancel	MainWindow		Anulează
 Refresh repositories	MainWindow		Actualizare depozite
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Dacă nu furnizați o adresă de email, nu veți putea reseta parola dacă o uitați.

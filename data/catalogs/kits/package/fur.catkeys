@@ -1,0 +1,7 @@
+1	friulian	x-vnd.Haiku-libpackage	2012114212
+Refreshing repository \"%s\" failed	PackageManagerKit		No si è rivâts a inzornâ il dipuesit \"%s\"
+Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		No si è rivâts a otignî la configurazion pal dipuesit \"%s\". Si salte.
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		No si è rivâts a otignî la cache pal dipuesit \"%s\". Si salte.
+Failed to get repository names	PackageManagerKit		Impussibil otignî i nons dai dipuesits
+Failed to remove transaction directory	PackageManagerKit		No si è rivâts a gjavâ la cartele des transazions
+Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Il pachet %s-%s nol à un recuisît corispondent pal so pachet base \"%s\"

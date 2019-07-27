@@ -1,0 +1,27 @@
+1	friulian	x-vnd.Haiku-mixer.media_addon	3450667169
+Input gain controls represent	AudioMixer		I controi di vuadagn in jentrade a rapresentin
+Linear interpolation	AudioMixer		Interpolazion lineâr
+Virtual output channels	AudioMixer		Canâi di jessude virtuâi
+Refuse output format changes	AudioMixer		Refude modifichis al formât di jessude
+Output mapping	AudioMixer		Mapadure des jessudis
+Allow input channel remapping	AudioMixer		Permet modifiche di mapadure dal canâl di jentrade
+Resampling algorithm	AudioMixer		Algoritmi par tornâ a campionâ
+Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Sbasse la jessude dal mixer di 3dB (come BeOS R5)
+Display balance control for stereo connections	AudioMixer		Mostre controi di belançament pes conessions stereo
+To output	AudioMixer		In jessude
+not connected	AudioMixer		no conetût
+Refuse input format changes	AudioMixer		Refude modifichis al formât di jentrade
+Drop/repeat samples	AudioMixer		Fâs colâ/ripet campions
+Output channel sources	AudioMixer		Sorzints canâi di jessude
+dB	AudioMixer		dB
+Gain controls	AudioMixer		Controi di vuadagn
+Input mapping	AudioMixer		Mapadure des jentradis
+Mute	AudioMixer		Cidin
+Input channel destinations	AudioMixer		Destinazions canâi di jentrade
+To master	AudioMixer		Al principâl
+Master output	AudioMixer		Jessude principâl
+Setup	AudioMixer		Configurazion
+Use non linear gain sliders (like BeOS R5)	AudioMixer		Dopre cursôrs regoladôrs di vuadagn no lineâr (come BeOS R5)
+Gain	AudioMixer		Vuadagn
+Allow output channel remapping	AudioMixer		Permet di tornâ a mapâ i canâi di jessude
+Physical input channels	AudioMixer		Canâi di jentrade fisics

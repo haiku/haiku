@@ -1,0 +1,17 @@
+1	friulian	x-vnd.Haiku-keystore_server	2429996361
+to perform the following action:\n%accessString%\n\n	AppAccessRequestWindow		par eseguî cheste azion:\n %accessString%\n\n
+This application doesn't yet have the required privileges.	AppAccessRequestWindow		Cheste aplicazion no à ancjemò i privileçs necessaris.
+Keyring:	KeyRequestWindow		Puarteclâfs:
+requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		al domande l'acès al puarteclâfs:\n%keyringName%\n\n
+Application keyring access	AppAccessRequestWindow		Acès dal puarteclâfs de aplicazion
+Disallow	AppAccessRequestWindow		Gjave il permès
+Allow once	AppAccessRequestWindow		Permet dome une volte
+Unlock keyring	KeyRequestWindow		Sbloche puarteclâfs
+An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		Une aplicazion e à domandât l'acès al puarteclâfs chi sot, ma al è blocât cuntune passphrase. Inserî la passphrase par sblocâlu.\nSe si sbloche il puarteclâfs, al restarà sblocât fintremai che il sisteme nol sarà distudât o fintremai che no si torni a blocâ il puarteclâfs a man.\nSe si anule chest dialic, il puarteclâfs al restarà blocât.
+Password:	KeyRequestWindow		Password:
+Cancel	KeyRequestWindow		Anule
+This application has been updated since it was last granted access.	AppAccessRequestWindow		Cheste aplicazion e je stade inzornade de ultime volte che e à vût l'acès.
+Allow always	AppAccessRequestWindow		Permet simpri
+Unlock	KeyRequestWindow		Sbloche
+The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		La aplicazion:\n %signature% (%path%)\n\n
+This application hasn't been granted access before.	AppAccessRequestWindow		Cheste aplicazion no à mai vût l'acès prime.

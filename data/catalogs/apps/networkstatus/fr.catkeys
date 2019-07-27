@@ -13,7 +13,7 @@ Ready	NetworkStatusView		Prêt
 Network Status	NetworkStatusView		État du réseau
 Address	NetworkStatusView		Adresse
 No stateful configuration	NetworkStatusView		Pas de configuration dynamique
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Vous pouvez exécuter l'État du réseau dans une fenêtre ou l’installer dans la Deskbar.
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Vous pouvez exécuter l’État du réseau dans une fenêtre ou l’installer dans la Deskbar.
 Broadcast	NetworkStatusView		Diffusion
 %ifaceName information:\n	NetworkStatusView		Informations de %ifaceName :\n
 Run in window	NetworkStatus		Exécuter dans une fenêtre

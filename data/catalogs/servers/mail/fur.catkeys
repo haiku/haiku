@@ -1,0 +1,19 @@
+1	friulian	x-vnd.Be-POST	2949558073
+No new messages	MailDaemon		Nissun gnûf messaç
+No new messages	DeskbarView		Nissun gnûf messaç
+Shutdown mail services	DeskbarView		Arest dai servizis di pueste
+Mail status	MailDaemon		Stât de pueste
+Fetching mail for %name	Notifier		Daûr a recuperâ la pueste di %name
+{0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# gnûf messaç} other{# gnûfs messaçs}}
+{0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# gnûf messaç} other{# gnûfs messaçs}} par %name\n
+Create new message…	DeskbarView		Cree un gnûf messaç…
+Send pending mails	DeskbarView		Invie la pueste in spiete
+Settings…	DeskbarView		Impostazions…
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Un gnûf messaç} other{# gnûfs messaçs}}
+New Messages	MailDaemon		Gnûfs messaçs
+<no accounts>	DeskbarView		<nissun account>
+Mail status	Notifier		Stât de pueste
+Check for mails only	DeskbarView		Controle dome la pueste
+Check for mail now	DeskbarView		Controle cumò la pueste
+Sending mail for %name	Notifier		Daûr a inviâ la pueste di %name
+Mail daemon status log	MailDaemon		Regjistri di stât dal demoni de pueste

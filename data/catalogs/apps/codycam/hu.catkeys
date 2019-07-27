@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-CodyCam	3200733765
+1	hungarian	x-vnd.Haiku-CodyCam	1770279704
 destination directory expected	CodyCam		nincs megadva célmappa
 reply: '%s'\n	SftpClient		válasz: '%s'\n
 JPEG image	CodyCam		JPEG kép
@@ -64,8 +64,6 @@ Local	CodyCam		Helyi
 Stop video	CodyCam		Videó leállítása
 Last Capture: 	VideoConsumer.cpp		Legutóbbi kép:
 Rate:	CodyCam		Frissítés:
-File %s ; Line %ld # unterminated quote\n	SettingsHandler		%s fájl ; Sor %ld # bezáratlan idézőjel\n
-File %s # unterminated quote at end of file\n	SettingsHandler		%s fájl # bezáratlan idézőjel a fájl végén\n
 Couldn't find requested directory on server	VideoConsumer.cpp		A megadott mappa nem található a kiszolgálón
 Cannot find the media roster	CodyCam		Nem található a médiajegyzék
 Type:	CodyCam		Típus:
@@ -77,7 +75,6 @@ File	CodyCam		Fálj
 read: %ld\n	SftpClient		olvasás: %ld\n
 Every hour	CodyCam		Óránként
 login ID expected	CodyCam		felhasználónév szükséges
-File %s; Line %ld # %s	SettingsHandler		%s fájl; Sor %ld # %s
 Video settings	CodyCam		Videóbeállítások
 Can't find an available connection to the video window	CodyCam		Nem található használható kapcsolat a videó ablakához
 FTP	CodyCam		FTP
@@ -86,5 +83,4 @@ Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Nem tal�
 Logging in…	VideoConsumer.cpp		Bejelentkezés…
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Hiba történt a kimeneti fájl írása során
-unknown command	SettingsHandler		ismeretlen parancs
 Capture controls	CodyCam		Képkészítés vezérlői

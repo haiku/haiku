@@ -1,0 +1,13 @@
+1	friulian	x-vnd.Be-WORK	3927737357
+Quit	Workspaces		Jes
+Invalid argument: %s\n	Workspaces		Argoment no valit: %s\n
+Change workspace count…	Workspaces		Cambie il numar dai spazis di lavôr…
+Always on top	Workspaces		Simpri denant
+Show window border	Workspaces		Mostre i ôrs dal barcon
+Show window tab	Workspaces		Mostre lenghete dal barcon
+Auto-raise	Workspaces		Tire sù in automatic
+Remove replicant	Workspaces		Gjave replicant
+Live in the Deskbar	Workspaces		Vîf tal Deskbar
+Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Ûs: %s [opzions] [spazi di lavôr]\ndulà che lis \"opzions\" a puedin jessi:\n  --notitle\t\tgjave la sbare dal titul e ten i ôrs e il ridimensionament\n  --noborder\t\tgjave la sbare dal titul, i ôrs e il ridimensionament\n  --avoidfocus\t\timpedìs che il barcon al sedi la destinazion dai events de tastiere\n  --alwaysontop\t\tten simpri denant il barcon\n  --notmovable\t\til barcon nol pues jessi spostât\n  --autoraise\t\ttire sù in automatic il barcon dal spazi di lavôr cuant che si cjate tai ôrs dal schermi\n  --help\t\tmostre chest jutori e jes\ne \"workspace\" al è il numar dai spazis di lavôr di creâ (di 0 a 31)\n
+Switch on mouse wheel	Workspaces		Cambie cu la rudielute dal mouse
+Workspaces	System name		Spazis di lavôr

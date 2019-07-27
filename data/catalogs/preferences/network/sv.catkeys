@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Network	3284324275
+1	swedish	x-vnd.Haiku-Network	1741006816
 Ethernet device	InterfaceListItem		Ethernetenhet
 Link speed:	IntefaceView		Länkhastighet:
 disconnected	IntefaceView		frånkopplad
@@ -20,8 +20,10 @@ EAP	EAP protected network		EAP
 Services	NetworkWindow		Tjänster
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Installatera NätverksStatus i Deskbar misslyckades: %s
 Revert	NetworkWindow		Återställ
+off	ServiceListItem		av
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<Inget nätverk hittades>
+Enable	IntefaceView		Aktivera
 connected	IntefaceView		ansluten
 VPN	NetworkWindow		VPN
 Apply	IntefaceAddressView		Använd
@@ -30,6 +32,7 @@ WPA2	WPA2 protected network		WPA2
 Show network status in Deskbar	NetworkWindow		Visa nätverksstatus i Deskbar
 Mode:	IntefaceAddressView		Läge:
 connected	InterfaceListItem		ansluten
+OK	NetworkWindow		OK
 Static	IntefaceAddressView		Statisk
 launch error	NetworkWindow		Startfel
 Renegotiate	IntefaceView		Omförhandla
@@ -37,6 +40,7 @@ MAC address:	IntefaceView		MAC-adress:
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 disabled	InterfaceListItem		inaktiverad
 Dial-up connection	InterfaceListItem		Uppringd anslutning
+on	ServiceListItem		på
 The method for obtaining an IP address	IntefaceAddressView		Metoden för att få en IP adress
 Automatic	IntefaceAddressView		Automatisk
 Choose automatically	IntefaceView		Välj automatiskt

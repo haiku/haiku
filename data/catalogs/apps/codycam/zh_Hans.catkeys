@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-CodyCam	1680414930
+1	english	x-vnd.Haiku-CodyCam	249960869
 destination directory expected	CodyCam		预期目标目录
 reply: '%s'\n	SftpClient		回复：‘%s’\n
 JPEG image	CodyCam		JPEG 图像
@@ -64,8 +64,6 @@ Local	CodyCam		本地
 Stop video	CodyCam		停止视频
 Last Capture: 	VideoConsumer.cpp		最后捕获：
 Rate:	CodyCam		比率：
-File %s ; Line %ld # unterminated quote\n	SettingsHandler		文件 %s 中 %ld 行 #存在无端接引用\n
-File %s # unterminated quote at end of file\n	SettingsHandler		文件 %s #文件结尾存在无端接引用\n
 Couldn't find requested directory on server	VideoConsumer.cpp		在服务器上未发现需求的目录
 Cannot find the media roster	CodyCam		未发现媒体名单
 Type:	CodyCam		类型：
@@ -77,7 +75,6 @@ File	CodyCam		文件
 read: %ld\n	SftpClient		读取：%ld\n
 Every hour	CodyCam		间隔 1 小时
 login ID expected	CodyCam		预期登录 ID
-File %s; Line %ld # %s	SettingsHandler		文件 %s; 行 %ld # %s
 Video settings	CodyCam		视频设置
 Can't find an available connection to the video window	CodyCam		未发现用于视频窗口的可用连接。
 FTP	CodyCam		FTP
@@ -85,5 +82,4 @@ Error creating output file	VideoConsumer.cpp		创建输出文件出错
 Logging in…	VideoConsumer.cpp		登陆中...
 CodyCam	System name		摄像头
 Error writing output file	VideoConsumer.cpp		输出文件写入出错
-unknown command	SettingsHandler		未知命令
 Capture controls	CodyCam		捕获控制

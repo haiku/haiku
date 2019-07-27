@@ -1,0 +1,14 @@
+1	friulian	x-vnd.Haiku-SMTP	815985329
+POP3 authentication failed. The server said:\n	smtp		La autenticazion POP3 e je falide. Rispueste dal servidôr:\n
+Destination:	ConfigView		Destinazion:
+Error while logging in to %serv	smtp		Erôr intal jentrâ su %serv
+Connecting to server…	smtp		Conession al servidôr…
+Unencrypted	ConfigView		No cifrât
+. The server says:\n	smtp		. Rispueste dal servidôr:\n
+Error while opening connection to %serv	smtp		Erôr tal vierzi la conession a %serv
+. The server said:\n	smtp		. Rispueste dal servidôr:\n
+None	ConfigView		Nissun
+SMTP server:	ConfigView		Servidôr SMTP:
+ESMTP	ConfigView		ESMTP
+POP3 before SMTP	ConfigView		POP3 prime di SMTP
+SSL	ConfigView		SSL

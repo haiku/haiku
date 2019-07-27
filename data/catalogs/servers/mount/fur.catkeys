@@ -1,0 +1,16 @@
+1	friulian	x-vnd.Haiku-mount_server	1677274447
+Mount read-only	AutoMounter		Montâ in dome-leture
+Error mounting volume:\n\n%s	AutoMounter		Erôr tal montâ il volum:\n\n%s
+Cancel	AutoMounter		Anule
+OK	AutoMounter		Va ben
+Unmount error	AutoMounter		Erôr tal dismontâ
+The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Il file system su chest volum nol è il file system di Haiku. Al è une vore conseât montâlu in modalitât dome-leture. Chest al evitarà pierditis malvoludis di dâts par colpe di erôrs di Haiku.
+Mount read/write	AutoMounter		Montâ in leture e scriture
+Could not unmount disk \"%s\":\n\t%s	AutoMounter		Impussibil dismontâ il disc \"%s\":\n\t%s
+It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Si consee di montâ ducj i volums adizionâi di Haiku in modalitât dome-leture. Chest al impedirà pierditis malvoludis di dâts par vie di erôrs in Haiku.
+Mounting volume '%s'\n\n	AutoMounter		Montaç dal volum '%s'\n\n
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Impussibil dismontâ il disc \"%s\":\n\t%s\n\nSfuarçâ il dismontâ?\n\nNote: Se une aplicazion e sta scrivint sul volum, dismontâlu cumò al compuarte pierditis di dâts.\n
+Force unmount	AutoMounter		Sfuarce il dismontâ
+Mount error	AutoMounter		Erôr di montaç
+Mounting volume <unnamed volume>\n\n	AutoMounter		Montaç dal volum <unnamed volume>\n\n
+Mount warning	AutoMounter		Avertiment di montaç

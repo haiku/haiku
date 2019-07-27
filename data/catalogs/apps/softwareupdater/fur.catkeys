@@ -1,0 +1,64 @@
+1	friulian	x-vnd.haiku-softwareupdater	369324613
+Updating version	SoftwareUpdaterWindow	List item text	Inzornament de version
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Fâs clic achì par instalâ {0, plural, one{# pachet inzornât} other{# pachets inzornâts}}.
+Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pachets di disinstalâ
+No active network connection was found	UpdateManager	Error message	Nissune conession di rêt ative cjatade
+Quit	SoftwareUpdaterWindow	Alert button label	Jes
+There were no updates found.	CheckManager		Nissun inzornament cjatât.
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		I inzornaments no son stâts completâts, sigûrs di jessî?
+Updates found	SoftwareUpdaterWindow		Inzornaments cjatâts
+Update now	SoftwareUpdaterWindow		Inzorne cumò
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Par cualchi reson, no ven podût tornâ a inviâ il computer.
+OK	UpdateManager		Va ben
+Unrecognized argument	SoftwareUpdaterApp	Error message	Argoment no ricognossût
+There were no updates found.	CheckAction		No son stâts cjatâts inzornaments.
+No updates available	UpdateAction		Nissun inzornament disponibil
+New packages to be installed	SoftwareUpdaterWindow	List super item label	Gnûfs pachets di instalâ
+Packages to be updated	SoftwareUpdaterWindow	List super item label	Pachets di inzornâ
+to	SoftwareUpdaterWindow	List item text	a
+Attempting to cancel the updates…	SoftwareUpdaterWindow		Daûr a cirî di anulâ i inzornaments…
+Contacting software repositories to check for package updates.	CheckManager		Si contate i dipuesits dal software par verificâ la presince di inzornaments di pachets.
+Available updates found	CheckManager		Inzornaments disponibii cjatâts
+from repository	SoftwareUpdaterWindow	List item text	dal dipuesit
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Si contate i dipuesits software par verificâ la presince di inzornaments di pachets.
+Cancelling updates	SoftwareUpdaterWindow		Anulament dai inzornaments
+Cancel	SoftwareUpdaterWindow	Alert button label	Anule
+There were no updates found.	UpdateAction		Nissun inzornament cjatât.
+OK	SoftwareUpdaterWindow		Va ben
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Par plasê, sielç une di chestis opzions di inzornament:\n\nInzorne:\n\tInzorne ducj i pachets instalâts.\nSincronizazion complete:\n\tSincronize i pachets instalâts cui dipuesits.
+The following changes will be made:	SoftwareUpdaterWindow		A vignaran fatis chestis modifichis:
+Argument variables are no longer accepted\n	SoftwareUpdaterApp		Lis variabilis di argoment no son plui acetadis\n
+Fatal error while checking for updates: %s\n	CheckAction		Erôr fatâl intal controlâ la presince di inzornaments: %s\n
+SoftwareUpdater	System name		SoftwareUpdater
+No active network connection was found.\n	CheckManager		No je stade cjatade nissune conession di rêt ative.\n
+Applying changes	UpdateManager		Aplicazion des modifichis
+Full sync	SoftwareUpdaterWindow	Alert button label	Sincronizazion complete
+Quit	SoftwareUpdaterWindow	Button label	Jes
+Updates have been successfully installed.	UpdateManager		I inzornaments a son stâts instalâts cun sucès.
+Exception occurred while updating packages : %s\n	UpdateAction		Ecezion capitade intant che si inzornave i pachets: %s\n
+A reboot is necessary to complete the update process.	UpdateManager		Al è necessari tornâ a inviâ il sisteme par completâ il procès di inzornament.
+Exception occurred while checking for updates: %s\n	CheckAction		Ecezion capitade intant che si verificave la presince di inzornaments: %s\n
+Packages are being updated	UpdateManager		I pachets a son daûr a jessi inzornâ
+Cancel	SoftwareUpdaterWindow		Anule
+Don't quit	SoftwareUpdaterWindow		No sta sierâ
+Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Fâs clic chi par eseguî SoftwareUpdater. Cualchi inzornament al domandarà di risolvi un probleme e si varà di selezionâ la soluzion.
+Checking for updates	SoftwareUpdaterWindow		Verifiche presince inzornaments
+Updates completed	UpdateManager		Inzornaments completâts
+Reboot	SoftwareUpdaterWindow		Torne invie
+Show more details	SoftwareUpdaterWindow		Mostre plui detais
+Installing version	SoftwareUpdaterWindow	List item text	Instalazion de version
+Checking for updates	CheckManager		Control presince inzornaments
+No remote repositories are available	UpdateManager	Error message	Nissun dipuesit rimot disponibil
+Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, one{Inzornament software disponibil} other{Inzornaments software disponibii}}
+Reboot	SoftwareUpdaterWindow	Button label	Torne invie
+Update	SoftwareUpdaterWindow	Alert button label	Inzorne
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Vierç dipuesits
+Updates did not complete	UpdateAction		I inzornaments no son stâts completâts
+Invalid update type, cannot continue with updates	UpdateAction		Gjenar di inzornament no valit, impussibil continuâ cui inzornaments
+Uninstalling version	SoftwareUpdaterWindow	List item text	Disinstalazion de version
+%i of %i	UpdateManager	Do not translate %i	%i di %i
+Quit	SoftwareUpdaterWindow		Jes
+No updates available	CheckManager		Nissun inzornament disponibil
+Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Ûs:  SoftwareUpdater <comant> [ <opzions> ]\nAl inzorne i pachets instalâts.\n\nComants:\n  update     - Cîr tai dipuesits inzornaments par ducj i pachets.\n  check      - Cîr inzornaments disponibii, ma mostre dome une notifiche cui risultâts.\n  full-sync  - Sincronize i pachets instalâts cui dipuesits.\n\nOpzions:\n  -h o --help       Mostre chest messaç di jutori\n  -v o --verbose    Mostre informazions plui prolissis\n
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Nissun dipuesit rimot disponibil. Par plasê, controle che cualchi dipuesit al sedi abilitât, doprant la preflet Dipuesits o il comant 'pkgman'.
+Downloading packages	UpdateManager		Daûr a discjariâ i pachets

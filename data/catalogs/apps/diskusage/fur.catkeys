@@ -1,0 +1,23 @@
+1	friulian	x-vnd.Haiku-DiskUsage	2951688400
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% in {0, plural, one{# file} other{# file}}
+Scanning %refName%	Scanner		Scansion %refName%
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d file
+Size	Info Window		Dimension
+Rescan	Pie View		Torne scansione
+Kind	Info Window		Gjenar
+file unavailable	Pie View		file no disponibil
+no supporting apps	Pie View		Nissun aplicazion di supuart
+Path	Info Window		Percors
+Scan	Status View		Scansion
+Rescan	Status View		Torne scansione
+file unavailable	Status View		file no disponibil
+Get info	Pie View		Oten informazions
+DiskUsage	System name		DiskUsage
+Created	Info Window		Creât
+Modified	Info Window		Modificât
+Abort	Status View		Interomp
+Open with	Pie View		Vierç cun
+Open	Pie View		Vierç
+{0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# file} other{# file}}
+%a, %d %b %Y, %r	Info Window		%a, %d di %b dal %Y, %r
+Free on %refName%	Scanner		Libars su %refName%

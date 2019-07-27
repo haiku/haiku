@@ -1,0 +1,19 @@
+1	friulian	x-vnd.Haiku-PackageInstaller	1757123825
+Package description	UninstallView		Descrizion dal pachet
+none	PackageView		nissun
+Continue	PackageInstall		Continue
+Running post-installation scripts	PackageInstall		Esecuzion script post-instalazion
+Package installer	PackageView		Instaladôr pachets
+All existing files will be skipped?	PackageView		Saltâ/Ignorâ ducj i file za esistents?
+Replace	PackageView		Sostituìs
+All existing files will be replaced?	PackageView		Sostituî ducj i file za esistents?
+Other…	PackageView		Altri…
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Il colegament simbolic clamât '%s' al esist za tal percors indicât.\nSostituî il colegament cun chel di chest pachet o saltâ?
+Stop	PackageStatus		Ferme
+Install to:	PackageView		Instale su:
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Il pachet indicât al semee jessi za instalât sul sisteme. Disinstalâ chel esistent e continuâ la instalazion?
+Skip all	PackageView		Salte ducj
+The installation of the package has been aborted.	PackageView		La instalazion dal pachet e je stade anulade.
+No installation type selected	PackageView		Nol è stât selezionât nissun gjenar di instalazion
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Visâsi di cheste decision e aplicâle pal rest di cheste instalazion?\n
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Il pachet selezionât nol è stât gjavât dal sisteme. Il file des informazions dal pachet instalât indicât al podarès jessi ruvinât.

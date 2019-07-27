@@ -1,0 +1,21 @@
+1	friulian	x-vnd.Haiku-Touchpad	526581388
+Scrolling	TouchpadPrefView		Scoriment
+Tapping	TouchpadPrefView		Batude
+Touchpad	System name		Touchpad
+Cancel	TouchpadPrefView		Cancele
+OK	TouchpadPrefView		Va ben
+Horizontal scrolling	TouchpadPrefView		Scoriment orizontâl
+Slow	TouchpadPrefView		Lent
+Two finger scrolling	TouchpadPrefView		Scoriment cun doi dêts
+No touchpad found, the settings will have no effect.	TouchpadPrefView		Nissun touchpad cjatât, lis impostazions no varan efiets.
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La gnove aree di scoriment e je une vore largje e a pues impedî lis normâls operazions dal mouse. Cambiâle pardabon?
+Defaults	TouchpadPrefView		Predefinîts
+High	TouchpadPrefView		Alt
+Off	TouchpadPrefView		Disativât
+Fast	TouchpadPrefView		Svelt
+Vertical	TouchpadPrefView		Verticâl
+Please confirm	TouchpadPrefView		Par plasê conferme
+Acceleration	TouchpadPrefView		Acelerazion
+Horizontal	TouchpadPrefView		Orizontâl
+Sensitivity	TouchpadPrefView		Sensibilitât
+Revert	TouchpadPrefView		Torne indaûr

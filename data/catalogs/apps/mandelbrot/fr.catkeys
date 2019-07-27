@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Mandelbrot	1781779654
+1	french	x-vnd.Haiku-Mandelbrot	3875916167
 Burning Ship	MandelbrotWindow		Bateau Enflammé
 Grassland	MandelbrotWindow		Prairie
 Lightning	MandelbrotWindow		Éclairs
@@ -9,6 +9,8 @@ Tricorn	MandelbrotWindow		Tricorne
 Royal	MandelbrotWindow		Royal
 Orbit Trap	MandelbrotWindow		Piège Orbital
 Deepfrost	MandelbrotWindow		Gel
+Subsampling	MandelbrotWindow		Sous-échantillonnage
+1 (none)	MandelbrotWindow		1 (aucun)
 Quit	MandelbrotWindow		Quitter
 File	MandelbrotWindow		Fichier
 Julia	MandelbrotWindow		Julia

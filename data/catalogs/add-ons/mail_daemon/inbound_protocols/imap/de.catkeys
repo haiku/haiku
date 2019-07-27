@@ -1,7 +1,8 @@
-1	german	x-vnd.Haiku-IMAP	4170458531
+1	german	x-vnd.Haiku-IMAP	2954199693
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Keine Verbindung zum Server \"%server%\":\n%error%
 Failed to fetch available storage.	IMAPFolderConfig		Keine der vorhandenen Ablagen konnte übertragen werden.
 Cancel	IMAPFolderConfig		Abbrechen
+OK	IMAPFolderConfig		OK
 No encryption	imap_config		Keine Verschlüsselung
 Configure IMAP Folders	imap_config		IMAP-Ordner konfigurieren
 SSL	imap_config		SSL

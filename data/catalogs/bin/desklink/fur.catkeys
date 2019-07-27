@@ -1,0 +1,16 @@
+1	friulian	x-vnd.Haiku-desklink	3568085956
+desklink	MediaReplicant	Title of an alert box	desklink
+Sound preferences…	MediaReplicant		Preferencis di sun…
+Muted	MediaReplicant		Cidinât
+%g dB	MediaReplicant		%g dB
+OK	MediaReplicant		Va ben
+Couldn't launch 	MediaReplicant		Impussibil inviâ 
+Volume	VolumeControl		Volum
+Open MediaPlayer	MediaReplicant		Vierç MediaPlayer
+%d dB	VolumeControl		%d dB
+Media preferences…	MediaReplicant		Preferencis multimediâls…
+Options	MediaReplicant		Opzions
+Beep	MediaReplicant		Bip
+Open %name	DeskButton	Don't translate variable %name	Vierç %name
+Control physical output	MediaReplicant		Controle jessude fisiche
+No media server running	VolumeControl		Nissun servidôr multimediâl in esecuzion

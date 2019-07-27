@@ -1,0 +1,47 @@
+1	friulian	x-vnd.Haiku-ActivityMonitor	1155619009
+P-faults	DataSource		Erôrs-pagjine
+Media nodes	DataSource		Grops multimediâi
+Threads	DataSource		Thread
+Always on top	ActivityWindow		Simpri denant
+Add graph	ActivityWindow		Zonte grafic
+Teams	DataSource		Complès
+MiB	DataSource		MiB
+Network send	DataSource		Rêt (inviament)
+CPU usage (combined)	DataSource		CPU doprade (cumbinât)
+CPU	DataSource		CPU
+Used memory	DataSource		Memorie doprade
+Cached memory	DataSource		Memorie cache
+Apps	DataSource		Aplicazions
+Show legend	ActivityView		Mostre liende
+Text clipboard	DataSource		Notis di test
+Settings	ActivityWindow		Impostazions
+Receiving	DataSource		Ricezion
+Settings…	ActivityWindow		Impostazions…
+Ports	DataSource		Puartis
+Page faults	DataSource		Erôrs di pagjine
+Sending	DataSource		Inviament
+Cache	DataSource		Cache
+%.1f faults/s	DataSource		%.1f erôrs/s
+Update time interval:	SettingsWindow		Interval di inzornament:
+TX	DataSource	Shorter version for Sending	TX
+Quit	ActivityWindow		Jes
+Block cache memory	DataSource		Bloche memorie cache
+Remove graph	ActivityView		Gjave grafic
+%lld sec.	SettingsWindow		%lld sec.
+%lld ms	SettingsWindow		%lld ms
+CPU usage	DataSource		CPU doprade
+Raw clipboard	DataSource		Notis gresis
+Sems	DataSource		Sems
+%.1f MiB	DataSource		%.1f MiB
+ActivityMonitor	System name		VisôrAtivitâts
+Running applications	DataSource		Aplicazions in esecuzion
+Semaphores	DataSource		Semafars
+Block cache	DataSource		Bloche cache
+Swap space	DataSource		Spazi memorie di scambi
+Swap	DataSource		Mem. di scambi
+File	ActivityWindow		File
+usage	DataSource		doprât
+Additional items	ActivityView		Elements adizionâi
+Network receive	DataSource		Rêt (ricezion)
+Memory	DataSource		Memorie
+RX	DataSource	Shorter version for Receiving.	RX

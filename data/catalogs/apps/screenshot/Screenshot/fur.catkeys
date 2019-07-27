@@ -1,0 +1,31 @@
+1	friulian	x-vnd.haiku-screenshot	3958461128
+Include window border	ScreenshotWindow		Inclût ôrs dal barcon
+Overwrite	ScreenshotWindow		Sorescrîf
+Save in:	ScreenshotWindow		Salve in:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Erôr tal salvâ \"%s\":\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Chest file al esist za.\n Sorescrivilu pardabon?
+OK	ScreenshotWindow		Va ben
+The destination path exists but is not a folder.	ScreenshotWindow		Il percors di destinazion al esist ma no je une cartele.
+Select	ScreenshotWindow		Selezione
+Save as:	ScreenshotWindow		Salve come:
+seconds	ScreenshotWindow		seconts
+New screenshot	ScreenshotWindow		Gnove cature di schermi
+Screenshot	System name		Cature di schermi
+Desktop	ScreenshotWindow		Scritori
+Artwork folder	ScreenshotWindow		Cartele Artwork
+Translator Settings	ScreenshotWindow		Impostazions tradutôr
+Include mouse pointer	ScreenshotWindow		Inclût il pontadôr dal mouse
+overwrite	ScreenshotWindow		sorescrîf
+Settings…	ScreenshotWindow		Impostazions…
+Choose folder	ScreenshotWindow		Sielç cartele
+Name:	ScreenshotWindow		Non:
+Choose folder…	ScreenshotWindow		Sielç une cartele…
+Please select	ScreenshotWindow		Par plasê selezione
+Failed to save screenshot	ScreenshotWindow		No si è rivâts a salvâ la cature di schermi
+Cancel	ScreenshotWindow		Cancele
+Delay:	ScreenshotWindow		Ritart:
+Copy to clipboard	ScreenshotWindow		Copie intes notis
+screenshot	Screenshot	Base filename of screenshot files	cature di schermi
+Home folder	ScreenshotWindow		Cartele home
+Save	ScreenshotWindow		Salve
+Capture active window	ScreenshotWindow		Cature il barcon atîf

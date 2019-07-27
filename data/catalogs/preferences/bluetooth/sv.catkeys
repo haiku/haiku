@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-BluetoothPrefs	67867884
+1	swedish	x-vnd.Haiku-BluetoothPrefs	4276705900
 Laptop	Settings view		Bärbar dator
 Only from trusted devices	Settings view		Endast från betrodda källor
 15 secs	Settings view		15 s
@@ -17,9 +17,11 @@ Stop bluetooth services…	Window		Stoppa Bluetooth-tjänster…
 Add…	Remote devices		Lägg till…
 As blocked	Remote devices		Som blockerad
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Inga lokala enheter funna på systemet
+Policy…	Settings view		Policy…
 Revert	Window		Återgå
 Refresh local devices…	Window		Uppdatera lokala enheter…
 Disconnect	Remote devices		Koppla från
+Identify us as…	Settings view		Identifiera oss som…
 From all devices	Settings view		För alla enheter
 Defaults	Window		Förval
 Start bluetooth services…	Window		Starta Bluetooth-tjänster…
@@ -28,12 +30,15 @@ Scanning progress	Inquiry panel		Genomsökningsstatus
 Bluetooth	System name		Bluetooth
 Launch now	main		Starta nu
 Remove	Remote devices		Ta bort
+Pick device…	Settings view		Välj enhet…
 Always ask	Settings view		Fråga alltid
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Med stöd av:\n- Mika Lindqvist\n- Adrien Destugues\n- Maksym Yevmenkin\n\nTack till alla som hjälpte till…\n\nAtt donera hårdvara:\n- Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n- Edwin Erik Amsler\n- Dennis d'Entremont\n- Luroh\n- Pieter Panman\n\nEkonomiskt:\n- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n- Matt M, Doug F, Hubert H,\n- Sebastian B, Andrew M, Jared E,\n- Frederik H, Tom S, Ferry B,\n- Greg G, David F, Richard S, Martin W:\n\nMed patchar:\n- Michael Weirauch\n- Fredrik Ekdahl\n- Raynald Lesieur\n- Andreas Färber\n- Joerg Meyer\nTesting:\n- Petter H. Juliussen\nSom gav mig all deras kunskap:\n- the yellowTAB team
 Help	Window		Hjälp
 Pair…	Remote devices		Par…
 Retrieving name of %1	Inquiry panel		Hämtar namn från %1
 Inquiry	Inquiry panel		Förfrågan
 Incoming connections policy:	Settings view		Policy för inkommande förbindelser:
+Retrieving names…	Inquiry panel		Hämtar namn…
 Show name	Extended local device view		Visa namn
 Add device to list	Inquiry panel		Lägg till enhet till istan
 Remaining %1 seconds	Inquiry panel		Återstår %1 sekunder
@@ -47,3 +52,4 @@ Server	Settings view		Server
 Handheld	Settings view		Handhållen
  packets: 	Device View		Paketer:
 About Bluetooth…	Window		Om Bluetooth…
+Starting scan…	Inquiry panel		Börjar skanna…

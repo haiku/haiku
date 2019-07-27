@@ -34,8 +34,8 @@ Name	PackageListView		名称
 Rate %Package%	RatePackageWindow		评级 %Package%
 Quit HaikuDepot	App		退出 HaikuDepot
 Category	FilterView		分类
-Installed packages	MainWindow		已安装软件包
 User rating	RatePackageWindow		用户评分
+Installed packages	MainWindow		已安装软件包
 Other users can see this rating	RatePackageWindow		其他用户可以看到该评级
 Stable	RatePackageWindow		稳定
 Fatal error	PackageManager		严重错误
@@ -62,8 +62,8 @@ Send	RatePackageWindow		发送
 Start package daemon	App		启动软件包管理后台
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		密码太简单或者无效。请输入至少包含 2 个数字和 2 个大写字符的 8 个字符作为密码。
 The package action could not be scheduled: %Error%	PackageInfoView		软件包操作无法预订执行：%Error%
-Inactive	PackageListView		未激活
 Cancel	RatePackageWindow		取消
+Inactive	PackageListView		未激活
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
 OK	PackageInfoView		确定
 Downloading:	PackageInfoView		下载中：
@@ -77,10 +77,10 @@ Close	RatePackageWindow		关闭
 Failed to create account: %s\n	UserLoginWindow		创建账户失败：%s\n
 Size	PackageListView		大小
 Your rating:	RatePackageWindow		您的评分:
-All categories	FilterView		所有分类
 Your rating was updated.	RatePackageWindow		您的评价已被更新。
-n/a	PackageInfoView		n/a
+All categories	FilterView		所有分类
 Repositories	MainWindow		仓库
+n/a	PackageInfoView		n/a
 Cancel	MainWindow		取消
 Refresh repositories	MainWindow		刷新仓库
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		如果未填写邮箱地址，在密码忘记后将无法进行重置。

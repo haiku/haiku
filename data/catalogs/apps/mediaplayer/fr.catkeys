@@ -46,7 +46,7 @@ Attributes	MediaPlayer-Main		Attributs
 Bottom of screen	MediaPlayer-SettingsWindow		Au bas de l’écran
 MediaPlayer settings	MediaPlayer-SettingsWindow		Réglages de MédiaPlayer
 Copyright	MediaPlayer-InfoWin		Droits d’auteurs
-Invalid URL inserted!	MediaPlayer-NetworkStream		L'URL saisie est invalide !
+Invalid URL inserted!	MediaPlayer-NetworkStream		L’URL saisie est invalide !
 Aspect ratio	MediaPlayer-Main		Aspect proportionnel
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		La sauvegarde de la liste de lecture a échoué.\n\nErreur : 
 <no media>	MediaPlayer-InfoWin		<aucun média>

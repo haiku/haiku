@@ -1,7 +1,8 @@
-1	swedish	x-vnd.Haiku-Keymap	1039047705
+1	swedish	x-vnd.Haiku-Keymap	459206087
 Key	Modifier keys window	As in a computer keyboard key	Tangent
 Japanese	KeymapNames		Japanska
 US	KeymapNames		US
+PG ↑	Keyboard Layout View	Very short for 'page up'	SU
 Brazilian	KeymapNames		Brasilianska
 Right control	Keyboard Layout View		Höger kontroll
 Dvorak	KeymapNames		Dvorak
@@ -11,6 +12,8 @@ Sample and clipboard:	Keymap window		Exempel:
 Polish	KeymapNames		Polska
 Latin-American	KeymapNames		Latinamerikansk
 Ukrainian	KeymapNames		Ukrainska
+PAGE ↓	Keyboard Layout View		SIDA
+DEL	Keyboard Layout View		DEL
 United-Kingdom	KeymapNames		Storbritannien
 Turkish (Type-F)	KeymapNames		Turkiska (typ-F)
 Serbian (Cyrillic)	KeymapNames		Serbiska (Kyrilliska)
@@ -26,15 +29,21 @@ Right option	Keyboard Layout View		Höger alternativ
 Turkish (Type-Q)	KeymapNames		Turkiska (Typ-Q)
 Revert	Modifier keys window		Återställ
 Slovak	KeymapNames		Slovakiska
+CAPS LOCK	Keyboard Layout View		SKIFTLÅS
 Colemak	KeymapNames		Colemak
 Dvorak (programmer's)	KeymapNames		Dvorak (programmerares)
+PRINT	Keyboard Layout View		SKRIV UT
 German (Mac)	KeymapNames		Tyska (Mac)
 Arabic (102)	KeymapNames		Arabiska (102)
 Belarusian (Mac)	KeymapNames		Vitryska (Mac)
 Croatian	KeymapNames		Kroatiska
+PAGE ↑	Keyboard Layout View		SIDA
 Set modifier keys	Modifier keys window		Set modifierings tangent
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd tangent
+PG ↓	Keyboard Layout View	Very short for 'page down'	SN
 Spanish	KeymapNames		Spanska
+HOME	Keyboard Layout View		HEM
+COMMAND	Keyboard Layout View		KOMMANDO
 Ukrainian (Mac)	KeymapNames		Ukrainska (Mac)
 Command:	Modifier keys window	Command key role name	Kommando:
 French (Bépo)	KeymapNames		Franska (Bépo)
@@ -46,6 +55,7 @@ Kazakh	KeymapNames		Kazakiska
 Save as…	Keymap window		Spara som…
 Lithuanian (Standard)	KeymapNames		Litauiska (Standard)
 Error: duplicate keys	Modifier keys window		Fel: Upprepad tangenter
+NUM	Keyboard Layout View	Very short for 'num lock'	NUM
 Bulgarian (Phonetic)	KeymapNames		Bulgariska (Fonetisk)
 Canadian-French	KeymapNames		Kanadensisk franska
 Hungarian	KeymapNames		Ungerska
@@ -54,12 +64,16 @@ Irish	KeymapNames		Irländska
 Remove	Keyboard Layout View		Ta bort
 Tilde trigger	Keymap window		Tilde trigger
 Shift	Keyboard Layout View	Shift key	Skift
+CONTROL	Keyboard Layout View		KONTROLL
 Czech (Mac)	KeymapNames		Tjeckiska (Mac)
 Macedonian	KeymapNames		Makedonska
 Left command	Keyboard Layout View		Vänster kommando
 Albanian	KeymapNames		Albanska
 (Current)	Keymap window		(Nuvarande)
+Friulian	KeymapNames		Friuliska
+OPT	Keyboard Layout View	Very short for 'option'	VAL
 Left option	Keyboard Layout View		Vänster alternativ
+END	Keyboard Layout View		END
 Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Vitryska
 Warning: left and right key roles do not match	Modifier keys window		Warning: Höger och vänster roller matchar inte varandra
@@ -70,6 +84,7 @@ Russian (Yawert)	KeymapNames		Ryska (yawert)
 Bulgarian (Cyrillic)	KeymapNames		Bulgariska (Kyrillisk)
 Left control	Keyboard Layout View		vänster control
 Swedish	KeymapNames		Svenska
+CAPS	Keyboard Layout View	Very short for 'caps lock'	CAPS
 Role	Modifier keys window	As in the role of a modifier key	Roll
 German	KeymapNames		Tyska
 Svorak	KeymapNames		Dvorak
@@ -77,16 +92,19 @@ Swiss-German	KeymapNames		Schweizisk tyska
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl-tangent
 Czech	KeymapNames		Tjeckiska
 Russian (Udmurt, Komi, Mari)	KeymapNames		Ryska (udmurt, komi, mari)
+Thai (TIS-820.2538)	KeymapNames		Thai (TIS-820.2538)
 Control:	Modifier keys window	Control key role name	Kontroll:
 Disabled	Modifier keys window	Do nothing	Inaktiverad
 Select dead keys	Keymap window		Markera döda tangenter
 Right shift	Keyboard Layout View		Höger skift
 Russian (Mac)	KeymapNames		Ryska (Mac)
+ESC	Keyboard Layout View		ESC
 Belarusian (Latin)	KeymapNames		Vitryska (Latin)
 Hebrew	KeymapNames		Hebreiska
 Layout	Keymap window		Utseende
 Greek	KeymapNames		Grekiska
 Revert	Keymap window		Återställ
+CTRL	Keyboard Layout View	Very short for 'control'	CTRL
 Grave trigger	Keymap window		Grave trigger
 Menu	Keyboard Layout View	Menu key	Meny
 Faeroese	KeymapNames		Färöisk
@@ -95,6 +113,7 @@ Polish (Typewriter)	KeymapNames		Polska (Skrivmaskin)
 French (Mac)	KeymapNames		Franska (Mac)
 User:	Keymap window		Användare:
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt tangent
+SHIFT	Keyboard Layout View		SHIFT
 Estonian	KeymapNames		Estländska
 Serbian (Latin)	KeymapNames		Serbiska (Latin)
 French	KeymapNames		Franska
@@ -112,15 +131,22 @@ System:	Keymap window		System:
 Switch shortcut keys	Keymap window		Switch shortcut keys
 Belgian (comma)	KeymapNames		Belgiska (komma)
 Right command	Keyboard Layout View		Höger kommando
+NUM LOCK	Keyboard Layout View		NUM LOCK
+MENU	Keyboard Layout View		MENU
 Norwegian	KeymapNames		Norska
 Font	Keymap window		Typsnitt
 Danish	KeymapNames		Danska
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Skifttangent
+PAUSE	Keyboard Layout View		PAUSE
 Russian	KeymapNames		Ryska
+CMD	Keyboard Layout View	Very short for 'command'	CMD
 Romanian	KeymapNames		Rumänska
 Command	Keyboard Layout View	Command key	Kommando
+SCROLL	Keyboard Layout View		SCROLL
 File	Keymap window		Arkiv
 Brazilian (ABNT2)	KeymapNames		Brasilianska (ABNT2)
+INS	Keyboard Layout View		INS
+OPTION	Keyboard Layout View		OPTION
 Dutch	KeymapNames		Holländska
 Diaeresis trigger	Keymap window		Diaeresis trigger
 Icelandic	KeymapNames		Isländska

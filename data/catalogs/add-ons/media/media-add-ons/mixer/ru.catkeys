@@ -18,7 +18,7 @@ Gain controls	AudioMixer		Регулировка усиления
 Input mapping	AudioMixer		Переназначение входа
 Mute	AudioMixer		Приглушить
 Input channel destinations	AudioMixer		Направления входных каналов
-To master	AudioMixer		До основного
+To master	AudioMixer		К главному
 Master output	AudioMixer		Главный выход
 Setup	AudioMixer		Настройка
 Use non linear gain sliders (like BeOS R5)	AudioMixer		Использовать нелинейные ползунки управления звуком

@@ -58,8 +58,8 @@ Send	RatePackageWindow		Enviar
 Start package daemon	App		Iniciar daemon de pacote
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		A senha é muito fraca ou inválida. Por favor, utilize ao menos 8 caracteres com pelo menos 2 números e 2 letras maiúsculas.
 The package action could not be scheduled: %Error%	PackageInfoView		A ação do pacote não pode ser agendada: %Error%
-Inactive	PackageListView		Inativo
 Cancel	RatePackageWindow		Cancelar
+Inactive	PackageListView		Inativo
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, um{# item} outro{# itens}}
 OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Baixando:

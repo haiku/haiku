@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-CodyCam	2233452043
+1	catalan; valencian	x-vnd.Haiku-CodyCam	2189635648
 destination directory expected	CodyCam		cal una carpeta destí
 reply: '%s'\n	SftpClient		respón: '%s'\n
 JPEG image	CodyCam		Imatge JPEG
@@ -42,7 +42,6 @@ Local	CodyCam		Local
 Stop video	CodyCam		Atura el vídeo
 Last Capture: 	VideoConsumer.cpp		Darrera Captura: 
 Rate:	CodyCam		Rati:
-File %s ; Line %ld # unterminated quote\n	SettingsHandler		Fitxer %s ; Línia %ld # cometes inacabades\n
 Type:	CodyCam		Tipus:
 Rename failed	VideoConsumer.cpp		No ha estat possible reanomenar el fitxer
 unrecognized upload client specified	CodyCam		no es pot reconèixer el client al que es vol enviar
@@ -52,7 +51,6 @@ File	CodyCam		Fitxer
 read: %ld\n	SftpClient		llegeix: %ld\n
 Every hour	CodyCam		Cada hora
 login ID expected	CodyCam		Cal un identificador d'usuari
-File %s; Line %ld # %s	SettingsHandler		Fitxer %s; Línia %ld # %s
 Video settings	CodyCam		Paràmetres de vídeo
 Can't find an available connection to the video window	CodyCam		No es pot trobar una connexió a la finestra de vídeo disponible
 FTP	CodyCam		FTP
@@ -60,5 +58,4 @@ Error creating output file	VideoConsumer.cpp		S'ha produït un error en escriure
 Logging in…	VideoConsumer.cpp		S'està entrant...
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		S'ha produït un error en escriure el fitxer de sortida
-unknown command	SettingsHandler		ordre desconeguda
 Capture controls	CodyCam		Controls de captura

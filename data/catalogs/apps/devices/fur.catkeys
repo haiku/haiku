@@ -1,0 +1,92 @@
+1	friulian	x-vnd.Haiku-Devices	3345509916
+ACPI bus	DevicesView		Bus ACPI
+Encryption controller	Device		Controlôr di cifradure
+Bus Information	Device		Informazion dal Bus
+Devices	System name		Dispositîfs
+Graphics Peripheral	DeviceSCSI		Periferiche grafiche
+Processor	Device		Processôr
+Generate system information	DevicesView		Gjenere informazions di sisteme
+Class info	DevicePCI		Informazions classe
+ACPI Information	DeviceACPI		Informazions ACPI
+Detailed	DevicesView		Informazions detaiadis
+Computer	DevicesView		Computer
+Communications	DeviceSCSI		Comunicazions
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Informazions classe:\t\t\t\t: %classInfo%
+Mass storage controller	Device		Controlôr memorie di masse
+Connection	DevicesView		Conession
+Printer	DeviceSCSI		Stampadore
+ACPI Processor Namespace '%2'	DeviceACPI		Spazi dai nons '%2' dal processôr ACPI
+SCSI Information	DeviceSCSI		Informazions SCSI
+Manufacturer	Device		Fabricant
+Device name:	Device		Non dal dispositîf:
+Scanner	DeviceSCSI		Scansionadôr
+Memory controller	Device		Controlôr de memorie
+Unknown device	DevicesView		Dispositîf no cognossût
+Unknown	DevicePCI		No cognossût
+ACPI node '%1'	DeviceACPI		Grop ACPI '%1'
+Optical Drive	DeviceSCSI		Unitât otiche
+Name	PropertyList		Non
+Manufacturer	DeviceSCSI		Fabricant
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Non dispositîf\t\t\t\t: %Name%\nFabricant\t\t\t: %Manufacturer%\nDriver doprât\t\t\t\t: %DriverUsed%\nPercors dal dispositîf\t: %DevicePaths%
+Device name	Device		Non dal dispositîf
+Satellite communications controller	Device		Controlôr di comunicazions satelitârs
+Device class	DeviceSCSI		Classe dispositîf
+Device	Device		Dispositîf
+Input device controller	Device		Controlôr dispositîfs di input
+PCI bus	DevicesView		Bus PCI
+ACPI System Indicator	DeviceACPI		Indicadôr di sisteme ACPI
+ACPI System Bus	DeviceACPI		Bus di Sisteme ACPI
+PCI Information	DevicePCI		Informazions PCI
+Tape Drive	DeviceSCSI		Unitât a curdele magnetiche
+Changer	DeviceSCSI		Modificadôr
+Serial bus controller	Device		Controlôr bus seriâl
+Refresh devices	DevicesView		Inzorne dispositîfs
+Category	DevicesView		Categorie
+RBC	DeviceSCSI		RBC
+None	Device		Nissun
+Device paths	Device		Percors dal dispositîf
+Unknown device	Device		Dispositîf no cognossût
+Wireless controller	Device		Controlôr dispositîfs cence fîi
+Generic system peripheral	Device		Periferiche gjeneriche di sisteme
+Value	PropertyList		Valôr
+Devices	DevicesView		Dispositîfs
+Device name	DeviceACPI		Non dal dispositîf
+Card Reader	DeviceSCSI		Letôr di schedis
+Display controller	Device		Controlôr dal visôr
+Basic information	DevicesView		Informazions di base
+ACPI Button '%1'	DeviceACPI		Boton ACPI '%1'
+Bus	DevicesView		Bus
+ACPI <unknown>	DeviceACPI		ACPI <no cognossût>
+Device name	DevicePCI		Non dal dispositîf
+Disk Drive	DeviceSCSI		Unitât disc
+Other	DeviceSCSI		Altri
+Report compatibility	DevicesView		Segnale compatibilitât
+Computer	Device		Computer
+PCI bus	Device		Bus PCI
+Enclosure	DeviceSCSI		Cente
+Order by:	DevicesView		Ordene par:
+ACPI Thermal Zone	DeviceACPI		Zone termiche ACPI
+Intelligent controller	Device		Controlôr inteligjent
+Multimedia controller	Device		Controlôr multimediâl
+Quit	DevicesView		Jes
+ISA bus	Device		Bus ISA
+ISA bus	DevicesView		Bus ISA
+Processor	DeviceSCSI		Processôr
+Manufacturer:	Device		Fabricant:
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Informazions classe:\t\t\t\t: %classInfo%
+Bridge	Device		Puint
+Worm	DeviceSCSI		Worm
+CD-ROM	DeviceSCSI		CD-ROM
+Manufacturer	DevicePCI		Fabricant
+Bridge	DeviceSCSI		Puint
+Signal processing controller	Device		Controlôr di elaborazion segnâi
+Device name	DeviceSCSI		Non dal dispositîf
+Docking station	Device		Stazion di bordament
+Array	DeviceSCSI		Serie
+Unclassified device	Device		Dispositîf no classificât
+ACPI controller	Device		Controlôr ACPI
+Network controller	Device		Controlôr di rêt
+Driver used	Device		Driver doprât
+Communication controller	Device		Controlôr di comunicazion
+ACPI bus	Device		Bus ACPI
+unknown	Device		no cognossût

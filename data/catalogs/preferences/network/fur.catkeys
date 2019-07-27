@@ -1,0 +1,55 @@
+1	friulian	x-vnd.Haiku-Network	3145282573
+Ethernet device	InterfaceListItem		Dispositîf ethernet
+Link speed:	IntefaceView		Velocitât colegament:
+disconnected	IntefaceView		disconetût
+IP Address:	IntefaceAddressView		Direzion IP:
+WPA	WPA protected network		WPA
+Network:	IntefaceView		Rêt:
+Received:	IntefaceView		Ricevûts:
+New…	NetworkWindow		Gnûf…
+no link	InterfaceListItem		nissun colegament
+Other	NetworkWindow		Altri
+Sent:	IntefaceView		Inviâts:
+Gateway:	IntefaceAddressView		Gateway:
+The netmask defines your local network	IntefaceAddressView		La mascare di rêt e definìs la tô rêt locâl
+Your IP address	IntefaceAddressView		La tô direzion IP
+DHCP	IntefaceAddressView		DHCP
+Dial Up	NetworkWindow		Acès telefonic
+Netmask:	IntefaceAddressView		Mascare di rêt:
+EAP	EAP protected network		EAP
+Services	NetworkWindow		Servizis
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Instalazion dal Stât de Rêt tal Deskbar falît: %s
+Revert	NetworkWindow		Torne indaûr
+off	ServiceListItem		off
+WEP	WEP protected network		WEP
+<no wireless networks found>	IntefaceView		<nissune rêt cence fîi cjatade>
+Enable	IntefaceView		Abilite
+connected	IntefaceView		conetût
+VPN	NetworkWindow		VPN
+Apply	IntefaceAddressView		Apliche
+Disable	ServiceView		Disabilite
+WPA2	WPA2 protected network		WPA2
+Show network status in Deskbar	NetworkWindow		Mostre il stât de rêt tal Deskbar
+Mode:	IntefaceAddressView		Modalitât:
+connected	InterfaceListItem		conetût
+Static	IntefaceAddressView		Static
+launch error	NetworkWindow		erôr di inviament
+Renegotiate	IntefaceView		Tornâ a negoziâ
+MAC address:	IntefaceView		Direzion MAC:
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+disabled	InterfaceListItem		disabilitât
+Dial-up connection	InterfaceListItem		Conession vie telefon
+on	ServiceListItem		on
+The method for obtaining an IP address	IntefaceAddressView		Il metodi par otignî une direzion IP
+Automatic	IntefaceAddressView		Automatic
+Choose automatically	IntefaceView		Sielç in automatic
+Status:	IntefaceView		Stât:
+Disable	IntefaceView		Disabilite
+Manage…	NetworkWindow		Gjestìs…
+open	Open network		vierç
+Network	NetworkWindow		Rêt
+Your gateway to the internet	IntefaceAddressView		Il to gateway par internet
+Enable	ServiceView		Abilite
+Wireless device	InterfaceListItem		Dispositîf cence fîi
+Disabled	IntefaceAddressView		Disabilitade
+VPN connection	InterfaceListItem		Conession VPN

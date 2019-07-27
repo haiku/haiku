@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Shortcuts	1611284793
+1	swedish	x-vnd.Haiku-Shortcuts	3834857117
 *MouseUp	ShortcutsWindow		*MusnappUpp
 Application	ShortcutsWindow		Applikation
 Option	ShortcutsSpec	Name for modifier on keyboard	Alternativ
@@ -9,6 +9,7 @@ Don't save	ShortcutsWindow		Spara inte
 *Beep	ShortcutsWindow		*Pip
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Genvägar kunde inte spara din genvägsuppsättning.
 Save	ShortcutsWindow		Spara
+Either	ShortcutsSpec		Antingen eller
 Oh no	ShortcutsWindow		Åh nej!
 Key	ShortcutsWindow		Tangent
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SkickaMeddelande application/x-vnd.Be-TRAK 'Tfnd'
@@ -19,21 +20,26 @@ Quit	ShortcutsWindow		Avsluta
 Cancel	ShortcutsWindow		Avbryt
 *MoveMouse +20 +0	ShortcutsWindow		*FlyttaMusenTill +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
+Left	ShortcutsSpec		Vänster
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Genvägar kunde inte läsa dina inställningar!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Genvägar kunde inte spara dina inställningar!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InfogaSträng \"Din text\"
 Remove selected shortcut	ShortcutsWindow		Ta bort
 Error, NULL state description?	ShortcutsSpec		Fel: NULL i tillståndsbeskrivning?
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Genvägar kunde inte öppna din tagentuppsättning!
 Save & apply	ShortcutsWindow		Spara
 Open	ShortcutsWindow		Öppna
 Append	ShortcutsWindow		Lägg till
+Both	ShortcutsSpec		Båda
 Save KeySet as…	ShortcutsWindow		Spara som...
 Append KeySet…	ShortcutsWindow		Lägg till…
 *MouseButton 1	ShortcutsWindow		*Musknapp 1
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Flera \"*FlyttaMusTill 100% 0\" \"*Musknapp 1\"
+Right	ShortcutsSpec		Höger
 OK	ShortcutsWindow		OK
 Add new shortcut	ShortcutsWindow		Lägg till
+(None)	ShortcutsSpec		(Ingen)
 Shift	ShortcutsSpec	Name for modifier on keyboard	Skift
 Open KeySet…	ShortcutsWindow		Öppna…
 File	ShortcutsWindow		Arkiv

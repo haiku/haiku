@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-CodyCam	176376418
+1	lithuanian	x-vnd.Haiku-CodyCam	3040889653
 destination directory expected	CodyCam		reikalingas paskirties aplankas
 reply: '%s'\n	SftpClient		atsakas: „%s“\n
 JPEG image	CodyCam		JPEG paveikslas
@@ -62,8 +62,6 @@ Local	CodyCam		vietinis
 Stop video	CodyCam		Stabdyti vaizdą
 Last Capture: 	VideoConsumer.cpp		Paskiausiai fotografuota: 
 Rate:	CodyCam		Intervalas:
-File %s ; Line %ld # unterminated quote\n	SettingsHandler		Failas %s; eilutė %ld # neterminuota kabutė\n
-File %s # unterminated quote at end of file\n	SettingsHandler		Failas %s # failo gale neterminuota kabutė\n
 Couldn't find requested directory on server	VideoConsumer.cpp		Nurodytas aplankas serveryje nerastas
 Type:	CodyCam		Tipas:
 Rename failed	VideoConsumer.cpp		Nepavyko pervardinti
@@ -74,7 +72,6 @@ File	CodyCam		Failas
 read: %ld\n	SftpClient		skaitoma: %ld\n
 Every hour	CodyCam		1 valanda
 login ID expected	CodyCam		reikalingas abonento vardas
-File %s; Line %ld # %s	SettingsHandler		Failas %s; eilutė %ld # %s
 Video settings	CodyCam		Vaizdo parametrai
 Can't find an available connection to the video window	CodyCam		Nepavyko rasti laisvos jungties prie vaizdo lango
 FTP	CodyCam		FTP
@@ -82,5 +79,4 @@ Error creating output file	VideoConsumer.cpp		Klaida kuriant išvesties failą
 Logging in…	VideoConsumer.cpp		Registruojamasi į seansą…
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Klaida rašant išvesties failą
-unknown command	SettingsHandler		nežinoma komanda
 Capture controls	CodyCam		Fotografavimo parinktys

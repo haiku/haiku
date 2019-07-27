@@ -17,7 +17,7 @@ A printer with that name already exists, but its driver could not be found! Repl
 Yes	PrintServerApp		Oui
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Tabloïd
 Would you like to set one up now?	PrintServerApp		Voulez-vous en installer un maintenant ?
-Print job setup:	ConfigWindow		Réglages des travaux d'impressions :
+Print job setup:	ConfigWindow		Réglages des travaux d’impressions :
 A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		Portrait
 All pages	ConfigWindow		Toutes les pages

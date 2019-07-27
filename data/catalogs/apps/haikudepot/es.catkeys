@@ -34,8 +34,8 @@ Name	PackageListView		Nombre
 Rate %Package%	RatePackageWindow		Puntuar %Package%
 Quit HaikuDepot	App		Salir de HaikuDepot
 Category	FilterView		Categoría
-Installed packages	MainWindow		Paquetes instalados
 User rating	RatePackageWindow		Puntuación del usuario
+Installed packages	MainWindow		Paquetes instalados
 Other users can see this rating	RatePackageWindow		Otros usuarios pueden ver esta puntuación
 Stable	RatePackageWindow		Estable
 Fatal error	PackageManager		Error fatal
@@ -62,8 +62,8 @@ Send	RatePackageWindow		Enviar
 Start package daemon	App		Arrancar demonio de paquetes
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		La contraseña es demasiado débil o inválida. Por favor use al menos 8 caracteres con al menos 2 números y 2 letras mayúsculas.
 The package action could not be scheduled: %Error%	PackageInfoView		La acción de paquete no se pudo programar: %Error%
-Inactive	PackageListView		Inactivo
 Cancel	RatePackageWindow		Cancelar
+Inactive	PackageListView		Inactivo
 OK	MainWindow		Aceptar
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
 OK	PackageInfoView		Aceptar
@@ -78,10 +78,10 @@ Close	RatePackageWindow		Cerrar
 Failed to create account: %s\n	UserLoginWindow		Fallo al crear la cuenta: %s\n
 Size	PackageListView		Tamaño
 Your rating:	RatePackageWindow		Su puntuación:
-All categories	FilterView		Todas las categorías
 Your rating was updated.	RatePackageWindow		Su evaluación ha sido actualizada.
-n/a	PackageInfoView		n/d
+All categories	FilterView		Todas las categorías
 Repositories	MainWindow		Repositorios
+n/a	PackageInfoView		n/d
 Cancel	MainWindow		Cancelar
 Refresh repositories	MainWindow		Actualizar repositorios
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Si no proporciona una dirección de correo, no será capaz de restablecer su conraseña si la olvida.

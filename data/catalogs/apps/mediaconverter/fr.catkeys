@@ -1,6 +1,6 @@
 1	french	x-vnd.Haiku-MediaConverter	2251404027
 Writing audio track: %d%% complete	MediaConverter		Écriture de la piste audio : %d %%
-Input file not recognized as Audio or Video	MediaConverter		Le fichier d'entrée n'est pas reconnu comme un fichier audio ou vidéo
+Input file not recognized as Audio or Video	MediaConverter		Le fichier d’entrée n’est pas reconnu comme un fichier audio ou vidéo
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2f fps
 Video quality: %3d%%	MediaConverter		Qualité vidéo : %3d%%
 Source files	MediaConverter		Fichiers sources
@@ -68,7 +68,7 @@ No video	Video codecs list		Pas de vidéo
 Continue	MediaConverter		Continuer
 Convert	MediaConverter		Convertir
 Audio quality not supported	MediaConverter		Qualité audio non prise en charge
-Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Erreur d'écriture à l'emplacement: %strPath%. Emplacement de repli : /boot/home
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Erreur d’écriture à l’emplacement: %strPath%. Emplacement de repli : /boot/home
 Writing video track: %d%% complete	MediaConverter		Écriture de la piste vidéo : %d %%
 Preview	MediaConverter		Aperçu
 Start [ms]: 	MediaConverter		Début [ms] : 

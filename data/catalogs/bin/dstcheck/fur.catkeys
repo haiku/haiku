@@ -1,0 +1,5 @@
+1	friulian	x-vnd.Haiku-cmd-dstconfig	684321431
+Keep this time	dstcheck		Ten cheste ore
+Manually adjust time…	dstcheck		Juste a man la ore…
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		Atenzion\n\nPar vie dal passaç ae ore solâr, l'orloi dal to computer e podarès jessi indaûr di une ore.\nLa ore atuâl e je: %current time%\n\nIse juste?
+Ask me later	dstcheck		Visimi plui tart

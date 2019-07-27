@@ -1,0 +1,16 @@
+1	friulian	x-vnd.haiku-package_daemon	1440586681
+Package changes	PackageResult	Window title	Modifichis dal pachet
+uninstall package %s\n	PackageResult	Don't change '%s' variable	disinstale pachet %s\n
+ignore problem for now	PackageProblem		ignore il probleme pal moment
+solution %d:	PackageProblem	Don't change the %d variable	soluzion %d:
+The following problems have been encountered. Please select a solution for each:	PackageProblem		A son vignûts fûr chescj problemis. Par plasê, selezione une soluzion par ognun di chei:
+Apply changes	PackageResult		Apliche modifichis
+Package daemon	PackageManager		Demoni dai pachets
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	instale pachet %s dal dipuesit %s\n
+The following additional package changes have to be made:	PackageResult		Si àn di fâ chestis modifichis adizionâls dal pachet:
+Warning	PackageManager		Atenzion
+Cancel	PackageProblem		Anule
+don't activate package %source%	PackageProblem	don't change '%source%	no sta ativâ il pachet %source%
+Cancel	PackageResult		Cancele
+Retry	PackageProblem		Torne prove
+Package problems	PackageProblem	Window title	Problemis dal pachet

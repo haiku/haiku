@@ -1,0 +1,9 @@
+1	friulian	x-vnd.Haiku-RAWTranslator	2975919330
+RAWTranslator Settings	ConfigView		Impostazions RAWTranslator
+Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
+RAW image translator	RAWTranslator		Tradutôr imagjin RAW
+RAW Settings	RAWTranslator main		Impostazions RAW
+RAW images	RAWTranslator		Imagjins RAW
+RAW image translator	ConfigView		Tradutôr di imagjin RAW
+%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	Imagjin RAW %s
+Based on Dave Coffin's dcraw 8.63	ConfigView		Basât su dcraw 8.63 di Dave Coffin

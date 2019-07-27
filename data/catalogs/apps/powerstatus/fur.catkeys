@@ -1,0 +1,46 @@
+1	friulian	x-vnd.Haiku-PowerStatus	3173765686
+Design capacity low warning: 	PowerStatus		Avîs batarie scjariade (capacitât di fabriche basse): 
+Show percent	PowerStatus		Mostre percentuâl
+Design capacity: 	PowerStatus		Capacitât (dal costrutôr): 
+ mW	PowerStatus		 mW
+The battery level is getting low, please plug in the device.	PowerStatus		Il nivel de batarie al sta lant jù, par plasê tache il dispositîf ae prese.
+Battery low	PowerStatus		Batarie basse
+Type: 	PowerStatus		Gjenar: 
+non-rechargeable	PowerStatus		no ricjariabile
+Empty battery slot	PowerStatus		Puest pe batarie vueit
+ mV	PowerStatus		 mV
+Run in window	PowerStatus		Eseguìs tal barcon
+PowerStatus	System name		PowerStatus
+ mWh	PowerStatus		 mWh
+Battery info…	PowerStatus		Informazions batarie…
+Damaged battery	PowerStatus		Batarie ruvinade
+Show time	PowerStatus		Mostre timp
+Last full charge: 	PowerStatus		Ultime cjarie plene: 
+Battery unused	PowerStatus		Batarie no doprade
+Extended battery info	PowerStatus		Infomazions batarie estesis
+ mA	PowerStatus		 mA
+Current rate: 	PowerStatus		Tas atuâl: 
+discharging	PowerStatus		discjariant
+Show text label	PowerStatus		Mostre etichete di test
+About…	PowerStatus		Informazions…
+Model number: 	PowerStatus		Numar model: 
+Install in Deskbar	PowerStatus		Instale tal Deskbar
+ mAh	PowerStatus		 mAh
+Capacity: 	PowerStatus		Capacitât: 
+Battery discharging	PowerStatus		Batarie in scjarie
+Serial number: 	PowerStatus		Numar seriâl: 
+Battery critical	PowerStatus		Nivel critic de batarie
+Capacity granularity 1: 	PowerStatus		Granularitât de capacitât 1: 
+OEM info: 	PowerStatus		Informazions OEM: 
+Design voltage: 	PowerStatus		Voltaç di progjetazion: 
+Battery charging	PowerStatus		Batarie in cjarie
+The battery level is critical, please plug in the device immediately.	PowerStatus		Il nivel de batarie al è critic, par plasê tache il dispositîf ae prese daurman.
+Design capacity warning: 	PowerStatus		Avîs capacitât di fabriche: 
+Quit	PowerStatus		Jes
+rechargeable	PowerStatus		ricjariabile
+charging	PowerStatus		cjariant
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Si pues eseguî PowerStatus intun barcon o instalâlu tal Deskbar.
+Show status icon	PowerStatus		Mostre icone di stât
+Capacity granularity 2: 	PowerStatus		Granularitât de capacitât 2: 
+Technology: 	PowerStatus		Tecnologjie: 
+no battery	PowerStatus		nissune batarie

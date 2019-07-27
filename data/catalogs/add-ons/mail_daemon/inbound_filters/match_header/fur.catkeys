@@ -1,0 +1,17 @@
+1	friulian	x-vnd.Haiku-MatchHeader	1946584206
+Delete message	ConfigView		Cancele messaç
+Match \"%attribute\" against \"%regex\"	RuleFilter		Corispondence \"%attribute\" rispiet a \"%regex\"
+Match header	RuleFilter		Intestazion corispondente
+Set flags to	ConfigView		Stabilìs bandieris a
+Header field (e.g. Subject, From, …)	ConfigView		Cjamp di intestazion (p.e. Ogjet, Di, …)
+<Choose account>	ConfigView		<Sielç un account>
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Caratar mate come \"*spam*\".\nPrefìs cun \"REGEX:\" par podê doprâ lis espressions regolârs.
+Then	ConfigView		Daspò
+If	ConfigView		Se
+Set as read	ConfigView		Segne come za let
+Reply with	ConfigView		Rispuint cun
+<Choose action>	ConfigView		<Sielç une azion>
+Move to	ConfigView		Sposte in
+this field is based on the action	ConfigView		chest cjamp al è basât su la azion
+Account	ConfigView		Account
+has	ConfigView		al à

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-BluetoothPrefs	67867884
+1	french	x-vnd.Haiku-BluetoothPrefs	2684471838
 Laptop	Settings view		Portable
 Only from trusted devices	Settings view		Seulement les appareils de confiance
 15 secs	Settings view		15 s
@@ -28,12 +28,14 @@ Scanning progress	Inquiry panel		Avancée de la recherche
 Bluetooth	System name		Bluetooth
 Launch now	main		Démarrer
 Remove	Remote devices		Enlever
+Pick device…	Settings view		Sélectionnez un appareil…
 Always ask	Settings view		Toujours demander
 Help	Window		Aide
 Pair…	Remote devices		Associer…
 Retrieving name of %1	Inquiry panel		Récupérer le nom de %1
 Inquiry	Inquiry panel		Examiner
 Incoming connections policy:	Settings view		Attitude envers les connexions entrantes :
+Retrieving names…	Inquiry panel		Récupération des noms…
 Show name	Extended local device view		Montrer le nom
 Add device to list	Inquiry panel		Ajouter l’appareil à la liste
 Remaining %1 seconds	Inquiry panel		Fin dans %1 secondes
@@ -47,3 +49,4 @@ Server	Settings view		Serveur
 Handheld	Settings view		Appareil de poche
  packets: 	Device View		paquets : 
 About Bluetooth…	Window		À propos de Bluetooth…
+Starting scan…	Inquiry panel		Démarrage de la recherche…

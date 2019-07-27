@@ -1,8 +1,8 @@
-1	french	x-vnd.Haiku-Repositories	2658607939
-This is not a valid URL.	AddRepoWindow	Add URL error message	Cette URL n'est pas valide.
+1	french	x-vnd.Haiku-Repositories	1220143449
+This is not a valid URL.	AddRepoWindow	Add URL error message	Cette URL n’est pas valide.
 Repository URL:	AddRepoWindow	Text box label	URL du dépôt :
-There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Une erreur est survenue lors de l'actualisation du cache du dépôt %name%
-There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Une erreur s'est produite lors de la désactivation du dépôt %name%
+There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Une erreur est survenue lors de l’actualisation du cache du dépôt %name%
+There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Une erreur s’est produite lors de la désactivation du dépôt %name%
 Unknown	Constants	Unknown repository name	Inconnu
 Remove all	RepositoriesView	Button label	Tout retirer
 Enable repositories to use with package management:	RepositoriesView	Label text	Activez les dépôts à utiliser pour obtenir les paquets :
@@ -10,8 +10,9 @@ Disable	RepositoriesView	Button label	Désactiver
 Cancel task	TaskTimer	Button label	Annuler la tâche
 Changes completed	RepositoriesView	Status view text	Modifications appliquées
 Details	TaskLooper	Job log details header	Détails
+Enabled	RepoRow	Tag in the Status column	Activé
 Remove	Constants	Button label	Retirer
-There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Une erreur s'est produite à l'activation du dépôt %url%
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Une erreur s’est produite à l’activation du dépôt %url%
 Remove this repository?	RepositoriesView	Removal alert confirmation message	Souhaitez-vous retirer ce dépôt ?
 The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	La tâche avec le dépôt %name% prend beaucoup de temps pour se terminer.
 Completed	TaskLooper	Completed task status message	Terminé
@@ -19,12 +20,12 @@ OK	Constants	Button label	OK
 Status	RepositoriesView	Column title	État
 Name	RepositoriesView	Column title	Nom
 Add	AddRepoWindow	Button label	Ajouter
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Dépôts n'a pas pu récupérer les noms des dépôts actuellement activés.
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Dépôts n’a pas pu récupérer les noms des dépôts actuellement activés.
 Enable all	RepositoriesView	Button label	Tout activer
 Aborted	TaskLooper	Aborted task status message	Abandon
 URL	RepositoriesView	Column title	URL
 Enable	RepositoriesView	Button label	Actif
-Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Erreur à l'obtention de la configuration du dépôt %name%.
+Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Erreur à l’obtention de la configuration du dépôt %name%.
 Description	TaskLooper	Failed task error description	Description
 Failed	TaskLooper	Failed task status message	Échec
 Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	La tâche avec le dépôt %name% a abouti.

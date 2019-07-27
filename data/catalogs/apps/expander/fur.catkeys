@@ -1,0 +1,51 @@
+1	friulian	x-vnd.Haiku-Expander	3300517306
+Expand	ExpanderMenu		Espant
+Expanding '%s'…	ExpanderWindow		Espansion di '%s'…
+Close window when done expanding	ExpanderPreferences		Siere il barcon une volte finide la espansion
+Set destination…	ExpanderMenu		Stabilìs destinazion…
+Use:	ExpanderPreferences		Dopre:
+File expanded	ExpanderWindow		File espandût
+The destination is read only.	ExpanderWindow		La destinazion e je in dome-leture.
+Expander: Open	ExpanderWindow		Espansôr: Vierç
+ is not supported	ExpanderWindow		 nol è supuartât
+Expander settings	ExpanderPreferences		Impostazions Espansôr
+Select current	DirectoryFilePanel		Selezione atuâl
+Source	ExpanderWindow		Sorzint
+Error when expanding archive	ExpanderWindow		Erôr te espansion dal archivi
+Hide contents	ExpanderWindow		Plate il contignût
+Cancel	ExpanderWindow		Anule
+Automatically expand files	ExpanderPreferences		Espant in automatic i file
+Continue	ExpanderWindow		Continue
+Destination folder	ExpanderPreferences		Cartele di destinazion
+Other	ExpanderPreferences		Altri
+Cancel	ExpanderPreferences		Cancele
+Expansion	ExpanderPreferences		Espansion
+Select	DirectoryFilePanel		Selezione
+The folder was either moved, renamed or not supported.	ExpanderWindow		O la cartele e je stade spostade, o e à cambiât non opûr no je supuartade.
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		La cartele di destinazion no esist. Creâle?
+Same directory as source (archive) file	ExpanderPreferences		Stesse cartele dal file (archivi) sorzint
+Settings	ExpanderMenu		Impostazions
+Settings…	ExpanderMenu		Impostazions…
+Expander: Choose destination	DirectoryFilePanel		Espansôr: Sielç la destinazion
+Select	ExpanderPreferences		Selezione
+Show contents	ExpanderWindow		Mostre contignût
+Automatically show contents listing	ExpanderPreferences		Mostre in automatic il listât dai contignûts
+OK	ExpanderPreferences		Va ben
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Fermâ pardabon la espansion di chest archivi? I elements espandûts a podaressin jessi incomplets.
+Leave destination folder path empty	ExpanderPreferences		Lasse vueit il percors de cartele di destinazion
+Failed to create the destination folder.	ExpanderWindow		No si è rivâts a creâ la cartele di destinazion.
+Select '%s'…	DirectoryFilePanel		Selezione '%s'…
+Create	ExpanderWindow		Cree
+The file doesn't exist	ExpanderWindow		Il file nol esist
+Stop	ExpanderMenu		Ferme
+File	ExpanderMenu		File
+Expander	System name		Espansôr
+Expand	ExpanderWindow		Espant
+Close	ExpanderMenu		Siere
+The destination is not a folder.	ExpanderWindow		La destinazion no je une cartele.
+Open destination folder after extraction	ExpanderPreferences		Vierç la cartele di destinazion daspò la estrazion
+Creating listing for '%s'…	ExpanderWindow		Creazion de liste par '%s'…
+Set source…	ExpanderMenu		Stabilìs la sorzint…
+Show contents	ExpanderMenu		Mostre contignût
+Stop	ExpanderWindow		Ferme
+Destination	ExpanderWindow		Destinazion

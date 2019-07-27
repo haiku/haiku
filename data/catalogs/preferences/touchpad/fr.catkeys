@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Touchpad	607725922
+1	french	x-vnd.Haiku-Touchpad	526581388
 Scrolling	TouchpadPrefView		Défilement
 Tapping	TouchpadPrefView		Tapotement
 Touchpad	System name		Pavé tactile
@@ -7,6 +7,7 @@ OK	TouchpadPrefView		OK
 Horizontal scrolling	TouchpadPrefView		Défilement horizontal
 Slow	TouchpadPrefView		Lente
 Two finger scrolling	TouchpadPrefView		Défilement à deux doigts
+No touchpad found, the settings will have no effect.	TouchpadPrefView		Aucun pavé tactile trouvé, les paramètres n’auront aucun effet.
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La nouvelle zone de défilement est très grande, ce qui peut nuire au fonctionnement normal de la souris. Voulez-vous vraiment la changer ?
 Defaults	TouchpadPrefView		Par défaut
 High	TouchpadPrefView		Haut

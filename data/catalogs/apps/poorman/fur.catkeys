@@ -1,0 +1,66 @@
+1	friulian	x-vnd.Haiku-PoorMan	1829050509
+Select web folder	PoorMan		Selezione cartele web
+Console logging	PoorMan		Regjistri su console
+Create Log File	PoorMan		Cree file di regjistri
+File logging	PoorMan		Regjistre su file
+Website options	PoorMan		Opzions dal sît web
+Log to file	PoorMan		Regjistri su file
+Shutting down.	PoorMan		Daûr a distudâ.
+Error Dir	PoorMan		Erôr te cartele
+Web folder:	PoorMan		Cartele Web:
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Par plasê, sielç la cartele di publicâ sul web.\n\nSi pues fâ creâ a Puar Om chê predefinide, \"public_html\", te tô cartele home.\nOpûr selezionâ une des tôs cartelis.
+Log To Console	PoorMan		Invie regjistri ae console
+File Name	PoorMan		Non dal file
+Starting up... 	PoorMan		Daûr a inviâ il servidôr… 
+Select	PoorMan		Selezione
+Logging view	PoorMan		Viodude regjistri
+Save console as…	PoorMan		Salve console come…
+Edit	PoorMan		Modifiche
+Cancel	PoorMan		Cancele
+Directory: 	PoorMan		Cartele: 
+Hits: %lu	PoorMan		Richiestis: %lu
+Hits: 0	PoorMan		Richiestis: 0
+Shutting down.\n	PoorMan		Daûr a distudâ il servidôr.\n
+Select all	PoorMan		Selezione dut
+Error Server	PoorMan		Erôr dal servidôr
+Send file listing if there's no start page	PoorMan		Invie la liste dai file se no je la pagjine iniziâl
+Create PoorMan log	PoorMan		Cree regjistri di Puar Om
+Max. simultaneous connections:	PoorMan		Massim numar di conessions simultaniis:
+Done	PoorMan		Fat
+Site	PoorMan		Sît
+Cannot start the server	PoorMan		Impussibil inviâ il servidôr
+Create log file	PoorMan		Cree file di regjistri
+Create public_html	PoorMan		Cree public_html
+Clear hit counter	PoorMan		Azere contadôr des richiestis
+Status: Stopped	PoorMan		Stât: Fermât
+File	PoorMan		File
+Settings…	PoorMan		Impostazions…
+Log To File	PoorMan		Regjistre su file
+Connections	PoorMan		Conessions
+Controls	PoorMan		Controi
+Log to console	PoorMan		Regjistre su console
+Advanced	PoorMan		Avanzât
+Copy	PoorMan		Copie
+Logging	PoorMan		Regjistri
+PoorMan	System name		Puar Om
+Clear console log	PoorMan		Nete regjistri di console
+Run server	PoorMan		Eseguìs servidôr
+Create	PoorMan		Cree
+{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# conession} other{# conessions}}
+done.\n	PoorMan		fat.\n
+PoorMan settings	PoorMan		Impostazions di Puar Om
+Console Logging	PoorMan		Regjistri de console
+Clear log file	PoorMan		Nete file di regjistri
+Save log console selection	PoorMan		Salve la selezion dal regjistri de console
+File Logging	PoorMan		Regjistrazion su file
+Log file name:	PoorMan		Non dal file di regjistri:
+Status: Running	PoorMan		Stât: in esecuzion
+Directory: (none)	PoorMan		Cartele: (nissune)
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Une cartele web predefinide e je stade creade in \"/boot/home/public_html.\"\nSigurâsi che al sedi un file HTML clamât \"index.html\" te cartele.
+Dir Created	PoorMan		Cartele creade
+Save console selections as…	PoorMan		Salve selezion de console come…
+Quit	PoorMan		Jes
+Save log console	PoorMan		Salve il regjistri de console
+Start page:	PoorMan		Pagjine iniziâl:
+OK	PoorMan		Va ben
+Website location	PoorMan		Posizion dal sît web

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-BootManager	3886671855
+1	swedish	x-vnd.Haiku-BootManager	867546001
 Old Master Boot Record backup failure	BootManagerController	Title	Kunde inte spara gamla MBR
 At least one partition must be selected!	BootManagerController		Minst en partition måste markeras!
 No space available!	DrivesPage	Cannot install	Inget utrymme tillgängligt!
@@ -16,6 +16,7 @@ Never	DefaultPartitionPage		Aldrig
 Summary	BootManagerController	Title	Sammanfattning
 An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Ett fel uppstod när startmenyn skulle sparas. Huvudstartsektorn kan vara förstörd. Du bör återställa huvudstartsektorn nu!
 After three seconds	DefaultPartitionPage		Efter tre sekunder
+Read only!	DrivesPage	Cannot install	Endast läsning!
 Write boot menu	BootManagerController	Button	Skriv startmeny
 OK	BootManagerController	Button	OK
 Uninstall boot manager	BootManagerController	Title	Avinstallera starthanteraren

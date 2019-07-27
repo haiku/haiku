@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-CodyCam	3200733765
+1	slovak	x-vnd.Haiku-CodyCam	1770279704
 destination directory expected	CodyCam		očakával sa cieľový adresár
 reply: '%s'\n	SftpClient		odpoveď: „%s“\n
 JPEG image	CodyCam		Obrázok JPEG
@@ -64,8 +64,6 @@ Local	CodyCam		Lokálne
 Stop video	CodyCam		Zastaviť video
 Last Capture: 	VideoConsumer.cpp		Posledné zachytenie: 
 Rate:	CodyCam		Interval:
-File %s ; Line %ld # unterminated quote\n	SettingsHandler		Súbor %s; riadok %ld # neukončená úvodzovka\n
-File %s # unterminated quote at end of file\n	SettingsHandler		Súbor %s # neukončená úvodzovka na konci súboru\n
 Couldn't find requested directory on server	VideoConsumer.cpp		Nebol nájdený požadovaný adresár na serveri
 Cannot find the media roster	CodyCam		Nie je možné nájsť zoznam médií
 Type:	CodyCam		Typ:
@@ -77,7 +75,6 @@ File	CodyCam		Súbor
 read: %ld\n	SftpClient		prečítané: %ld\n
 Every hour	CodyCam		Každú hodinu
 login ID expected	CodyCam		očakávalo sa prihlasovacie meno
-File %s; Line %ld # %s	SettingsHandler		Súbor %s; riadok %ld # %s
 Video settings	CodyCam		Nastavenia videa
 Can't find an available connection to the video window	CodyCam		Nebolo nájdené dostupné spojenie s oknom s videom
 FTP	CodyCam		FTP
@@ -86,5 +83,4 @@ Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Nepodari
 Logging in…	VideoConsumer.cpp		Prihlasuje sa…
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Chyba pri zápise výstupného súboru
-unknown command	SettingsHandler		neznámy príkaz
 Capture controls	CodyCam		Ovládacie prvky zachytávania

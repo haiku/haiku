@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-CodyCam	3200733765
+1	romanian	x-vnd.Haiku-CodyCam	1770279704
 destination directory expected	CodyCam		dosar de destinație așteptat
 reply: '%s'\n	SftpClient		răspuns: '%s'\n
 JPEG image	CodyCam		Imagine JPEG
@@ -64,8 +64,6 @@ Local	CodyCam		Local
 Stop video	CodyCam		Oprește video
 Last Capture: 	VideoConsumer.cpp		Ultima captură: 
 Rate:	CodyCam		Cotă:
-File %s ; Line %ld # unterminated quote\n	SettingsHandler		Fișierul %s; Linia %ld # citat nedeterminat\n
-File %s # unterminated quote at end of file\n	SettingsHandler		Fișierul %s # citat nedeterminat la sfârșitul fișierului\n
 Couldn't find requested directory on server	VideoConsumer.cpp		Nu s-a putut găsi dosarul cerut pe server
 Cannot find the media roster	CodyCam		Nu se poate găsi lista media
 Type:	CodyCam		Tip:
@@ -77,7 +75,6 @@ File	CodyCam		Fișier
 read: %ld\n	SftpClient		citește: %ld\n
 Every hour	CodyCam		La fiecare oră
 login ID expected	CodyCam		așteptat ID de autentificare
-File %s; Line %ld # %s	SettingsHandler		Fișier %s; Linie %ld # %s
 Video settings	CodyCam		Configurări video
 Can't find an available connection to the video window	CodyCam		Nu se poate găsi o conexiune disponibilă la fereastra video
 FTP	CodyCam		FTP
@@ -86,5 +83,4 @@ Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Nu s-a p
 Logging in…	VideoConsumer.cpp		Se deschide sesiunea…
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Eroare la scrierea fișierului de ieșire
-unknown command	SettingsHandler		comandă necunoscută
 Capture controls	CodyCam		Controale de captură

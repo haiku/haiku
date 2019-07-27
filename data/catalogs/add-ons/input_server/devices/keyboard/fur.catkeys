@@ -1,0 +1,10 @@
+1	friulian	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
+If the application will not quit you may have to kill it.	Team monitor		Se la aplicazion no si siere tu podaressis vê bisugne di copâle.
+Quit application	Team monitor		Jes de aplicazion
+Restart the desktop	Team monitor		Torne invie il scritori
+Force reboot	Team monitor		Sfuarce il tornâ a inviâ
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Par jessî di une aplicazion, selezionile de liste parsore e fâs clic suntun dai tascj 'Cope aplicazion' o 'Jes de aplicazion'.\n\nPar tornâ a inviâ il computer, ten fracât i tascj CONTROL+ALT+CANC par %ld seconts.
+Team monitor	Team monitor		Monitor dal complès
+Kill application	Team monitor		Cope aplicazion
+Cancel	Team monitor		Anule
+(This team is a system component)	Team monitor		(Chest complès al è un component di sisteme)

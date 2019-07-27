@@ -1,0 +1,14 @@
+1	friulian	x-vnd.Haiku-IMAP	2954199693
+Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Impussibil conetisi al servidôr \"%server%\":\n%error%
+Failed to fetch available storage.	IMAPFolderConfig		No si è rivâts a tirâ dongje memorie disponibile.
+Cancel	IMAPFolderConfig		Scancele
+OK	IMAPFolderConfig		Va ben
+No encryption	imap_config		Nissune cifradure
+Configure IMAP Folders	imap_config		Configure Cartelis IMAP
+SSL	imap_config		SSL
+Apply	IMAPFolderConfig		Apliche
+status	IMAPFolderConfig		stât
+Update subcription of IMAP folders, have patience…	IMAPFolderConfig		Inzornament sotscrizion des cartelis IMAP, puarte pazience…
+IMAP Folders	IMAPFolderConfig		Cartelis IMAP
+Destination:	imap_config		Destinazion:
+Fetching IMAP folders, have patience…	IMAPFolderConfig		Daûr a recuperâ lis cartelis IMAP, puarte pazience…

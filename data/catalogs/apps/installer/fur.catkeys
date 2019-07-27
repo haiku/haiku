@@ -1,0 +1,89 @@
+1	friulian	x-vnd.Haiku-Installer	116830250
+Performing installation.	InstallProgress		Esecuzion de instalazion.
+Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Sielç il disc sorzint dal menù a tende. Daspò fâs clic su \"Scomence\".
+Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Par plasê siere il barcon di Gjestion disc prime di sierâ chel dal Instaladôr.
+No optional packages available.	PackagesView		Nissun pachet opzionâl disponibil.
+Restart system	InstallerWindow		Torne invie il sisteme
+The mount point could not be retrieved.	InstallProgress		Impussibil recuperâ il pont di montaç.
+<none>	InstallerWindow	No partition available	<nissune>
+Please choose target	InstallerWindow		Sielç la destinazion
+Cancel	InstallProgress		Anule
+Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Instalazion completade. Il setôr di inviament al è stât scrit su '%s'. Frache Torne invie o sielç une gnove partizion par fâ une altre instalazion.
+Are you sure you want to to stop the installation?	InstallerWindow		Interompi pardabon la instalazion?
+Installer	System name		Instaladôr
+Unknown Type	InstallProgress	Partition content type	Gjenar no cognossût
+Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Frache il boton Scomence par instalâ di '%1s' su '%2s'.
+Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Sielç dal menù a tende il disc dulà lâ a instalâ. Daspò fâs clic su \"Scomence\".
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Instalazion completade. Il setôr di inviament al è stât scrit su '%s'. Frache Jes par bandonâ l'Instaladôr opûr sielç un gnûf volum di destinazion par fâ une altre instalazion.
+README	InstallerApp		LEIMI
+Quit	InstallerWindow		Jes
+Write boot sector to '%s'	InstallerWindow		Scriture setôr di inviament su '%s'
+Boot sector not written because of an internal error.	InstallProgress		Setôr di inviament no scrit par vie di un erôr interni.
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Impussibil inviâ Gjestion disc, la aplicazion par configurâ lis partizions dai discs.
+Welcome to the Haiku Installer!\n\n	InstallerApp		Benvignût tal program di instalazion di Haiku!\n\n
+?? of ??	InstallerWindow	Unknown progress	?? di ??
+Quit Boot Manager	InstallerWindow		Jes dal Gjestôr di inviament
+Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Esecuzion dal Gjestôr di inviament…\n\nSiere il Gjestôr di inviament par continuâ cu la instalazion.
+Quit DriveSetup	InstallerWindow		Jes di Gjestion disc
+Write boot sector	InstallerWindow		Scrîf setôr di inviament
+%1ld of %2ld	InstallerWindow	number of files copied	%1ld di %2ld
+Finishing installation.	InstallProgress		Daûr a finî la instalazion.
+Install from:	InstallerWindow		Instale di:
+Additional disk space required: 0.0 KiB	InstallerWindow		Spazi adizionâl domandât sul disc: 0.0 KiB
+This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Chest software al è ancjemò in version beta! Che al significhe che al esist il pericul di pierdi dâts impuartants. Fâs dispès copiis di backup! O sês stâts visâts.\n\n\n
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Cuant che si varà inviât Haiku pe prime volte, sigurâsi di lei la documentazion aes vôs \"Benvignût\" e \"Vuide pal utent\". Si cjatarà i lôr colegaments sul Scritori e tai preferîts di WebPositive.\n\n
+???	InstallerWindow	Unknown currently copied item	???
+Install anyway	InstallProgress		Instale distès
+1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Se si sta instalant Haiku su hardware reâl (no dentri di un emuladôr), si podarès volê preparâ une partizion sul disc fis di dentri un altri sisteme operatîf (par esempli doprant un CD inviabil cun jenfri GParted, che al rive ancje a ridimensionâ lis partizions esistentis, par liberâ spazi).\nSi pues ancje configurâ lis partizions doprant Gjestion disc, dal program di instalazion, ma no si rivarà a ridimensionâ lis partizions cun chel. Par cetant che Gjestion disc al sedi stât provât in ducj chescj agns, si consee di fâ un backup des altris partizions dal sisteme. No si sa mai…
+Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Sielç il disc sorzint e di destinazion dai menù a tende. Daspò fâs clic su \"Scomence\".
+Hide optional packages	InstallerWindow		Plate pachets opzionâi
+???	InstallerWindow	Unknown partition name	???
+Have fun and thanks for trying out Haiku!	InstallerApp		Bon divertiment e graciis pal vuestri interessament par Haiku!
+Quit	InstallerApp		Jes
+Starting installation.	InstallProgress		Daûr a tacâ la instalazion.
+Error writing boot sector.	InstallProgress		Erôr tal scrivi il setôr di inviament.
+OK	InstallerWindow		Va ben
+Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Par plasê siere i barcons di Gjestôr di inviament e Gjestion disc prime di sierâ chel dal Instaladôr.
+Failed to launch Boot Manager	InstallerWindow		No si è rivâts a inviâ il Gjestôr di inviament
+Try installing anyway	InstallProgress		Prove a instalâ distès
+IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMAZIONS IMPUARTANTIS PRIME DI INSTALÂ HAIKU\n\n
+Additional disk space required: %s	InstallerWindow		Al covente spazi adizionâl sul disc: %s
+Stop	InstallerWindow	In alert after pressing Stop	Ferme
+Boot sector successfully written.	InstallProgress		Setôr di inviament scrit cun sucès.
+An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Al è vignût fûr un erôr e la instalazion no je stade completade:\n\nErôr:   %s
+Restart	InstallerWindow		Torne invie
+The disk can't be mounted. Please choose a different disk.	InstallProgress		Il disc nol pues jessi montât. Sielç un disc diferent.
+Begin	InstallerWindow		Scomence
+Collecting copy information.	InstallProgress		Daûr a dâ dongje lis informazions de copie.
+Show optional packages	InstallerWindow		Mostre pachets opzionâi
+The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Il disc di destinazion al podarès no vê vonde spazi. Prove a sielzi un disc diferent o sielç di no instalâ elements opzionâi.
+Installation canceled.	InstallProgress		Instalazion anulade.
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Il volum di destinazion nol è vueit. Instalâ distès?\n\nNote: La cartele 'system' e deventarà une copie nete di chê dal volum sorzint, ma e tignarà lis sôs configurazions, dutis chês altris a vignaran unidis. Dulà che file e colegaments a esistin su ducj i doi i volums, si sorescrivarà dut cu la version dal volum sorzint.
+OK	InstallerApp		Va ben
+Are you sure you want to abort the installation?	InstallerWindow		Interompi pardabon la instalazion?
+Stop	InstallerWindow		Ferme
+Cancel	InstallerWindow		Anule
+Continue	InstallerWindow	In alert after pressing Stop	Continue
+No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		No je stade cjatade nissune partizion adate pe instalazion. Configure lis partizions e inizialize almancul une cul Be File System.
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Invie la utilitât Gjestion disc par partizionâ\ni discs fis e altris supuarts disponibii.\nLis partizions a puedin jessi inizializadis cul\nBe File System, necessari pes partizions di\ninviament di Haiku.
+Scanning for disks…	InstallerWindow		Scansion dai discs…
+Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Esecuzion di Gjestion disc…\n\nSiere Gjestion disc par continuâ cu la instalazion.
+Abort	InstallerWindow		Interomp
+The partition can't be mounted. Please choose a different partition.	InstallProgress		La partizion no pues jessi montade. Sielç une partizion diferente.
+Set up partitions…	InstallerWindow		Configure partizions…
+Install progress:  	InstallerWindow		Avanzament de instalazion:  
+You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		No si pues instalâ i contignûts di un disc su se stes. Sielç un disc diferent.
+Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Gjestôr di inviament, la aplicazion par configurâ il menù di inviament di Haiku, no pues jessi eseguide.
+Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Siere il barcon dal Gjestôr di inviament prime di sierâ il barcon dal Instaladôr.
+OK	InstallProgress		Va ben
+Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Esecuzion di Gjestôr di inviament e Gjestion disc…\n\nSiere dutis dôs lis aplicazions par continuâ cu la instalazion.
+Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Instalâ pardabon sul disc di inviament atuâl? Se si continue, l'instaladôr al varà di tornâ a inviâ la machine.
+Onto:	InstallerWindow		Su:
+Quit Boot Manager and DriveSetup	InstallerWindow		Jes dal Gjestôr di inviament e di Gjestion disc
+Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Instaladôr\n\tscrit di Jérôme Duval e Stephan Aßmus\n\tCopyright©2005-2010, Haiku.\n\n
+Tools	InstallerWindow		Struments
+scanning…	InstallerWindow		scansion…
+2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   L'Instaladôr al viodarà di rindi inviabile la partizion di Haiku, ma nol integrarà Haiku suntun menù di inviament esistent. Se si à GRUB instalât, si pues zontâ Haiku di lì\nPar vê plui detais, par plasê consultait la vuide sul inviament di Haiku su https://www.haiku-os.org/guides/booting.\nOpûr si pues creâ un menù di inviament dal menù \"Struments\" dal program di instalazion, consultait la Vuide pal Utent al argoment che al rivuarde la aplicazion \"BootManager\"(Gjestôr di inviament).\n\n\n
+Set up boot menu	InstallerWindow		Configure il menù di inviament
+Continue	InstallerApp		Continue
+Are you sure you want to abort the installation and restart the system?	InstallerWindow		Interompi pardabon la instalazion e tornâ a inviâ il sisteme?

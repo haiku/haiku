@@ -1,0 +1,30 @@
+1	friulian	x-vnd.Haiku-DeskCalc	2904979661
+cos	CalcView		cos
+acos	CalcView		arccos
+7   8   9   (   )  \n4   5   6   *   /  \n1   2   3   +   -  \n0   .   BS  =   C  \n	CalcView		7   8   9   (   )  \n4   5   6   *   /  \n1   2   3   +   -  \n0   .    ←  =   C  \n
+C	CalcView	Key label, 'C' means clear	C
+ceil	CalcView		taronde
+cbrt	CalcView		∛
+BS	CalcView	Key label, 'BS' means backspace	←
+floor	CalcView		staronzâ
+sin	CalcView		sin
+sinh	CalcView		sinh
+tanh	CalcView		tanh
+cosh	CalcView		cosh
+ln	CalcView		ln
+Compact	CalcView		Compate
+Calculating	CalcView		Daûr a calcolâ
+Enable Num Lock on startup	CalcView		Ative BlocNum al inviament
+Scientific	CalcView		Sientifiche
+log	CalcView		log
+sqrt	CalcView		√
+asin	CalcView		asin
+Radians	CalcView		Radiants
+tan	CalcView		tan
+exp	CalcView		^
+Audio Feedback	CalcView		Tornade di informazion sonore
+atan	CalcView		atan
+ln    sin   cos   tan   π    \nlog   asin  acos  atan  sqrt \nexp   sinh  cosh  tanh  cbrt \n!     ceil  floor E     ^    \n7     8     9     (     )    \n4     5     6     *     /    \n1     2     3     +     -    \n0     .     BS    =     C    \n	CalcView		ln    sin   cos   tan   π    \nlog   asin  acos  atan  √ \n^     sinh  cosh  tanh  ∛ \n!      tar.  star. E     ^    \n7     8     9     (     )    \n4     5     6     *     /    \n1     2     3     +     -    \n0     .     ←     =     C    \n
+DeskCalc	System name		DeskCalc
+Degrees	CalcView		Grâts
+Basic	CalcView		Normâl

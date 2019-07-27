@@ -1,0 +1,38 @@
+1	friulian	x-vnd.Haiku.TextSearch	1867528375
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Sielç i file che tu desideris che a vignedin selezionâts par te tal Tracker.
+%appname% : %path%	GrepWindow		%appname% : %path%
+Failed to start xargs program!	Grepper		No si è rivâts a inviâ il program xargs!
+Open selection	GrepWindow		Vierç selezion
+Actions	GrepWindow		Azions
+New window	GrepWindow		Gnûf barcon
+Encoding	GrepWindow		Codifiche
+OK	GrepWindow		Va ben
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Close	GrepWindow		Siere
+Look in sub-folders	GrepWindow		Cîr tes sot-cartelis
+%s: Not enough room to escape the filename.	Grepper		%s: No'nd è vonde spazi par evitâ il non dal file.
+Follow symbolic links	GrepWindow		Seguìs i colegaments simbolics
+Regular expression	GrepWindow		Espression regolâr
+Text files only	GrepWindow		Dome file di test
+Quit	GrepWindow		Jes
+Show files in Tracker	GrepWindow		Mostre i file tal Tracker
+Please select the files you wish to keep searching.	GrepWindow		Selezione i file che su chei tu desideris continuâ la ricercje. 
+Trim to selection	GrepWindow		Ridûs ae selezion
+Set target…	GrepWindow		Stabilìs destinazion…
+TextSearch	GrepWindow		TextSearch
+Failed to open input pipe!	Grepper		No si è rivâts a vierzi il condot/pipe di input!
+Search	GrepWindow		Cîr
+Copy text to clipboard	GrepWindow		Copie il test tes notis
+Show lines	GrepWindow		Mostre riis
+Failed to open errors pipe!	Grepper		No si è rivâts a vierzi il condot/pipe dai erôrs!
+The unselected files will be removed from the list.	GrepWindow		I file no selezionâts a vignaran gjavâts de liste.
+Skip folders starting with a dot	GrepWindow		Salte lis cartelis che a tachin cuntun pont
+Open files in code editor	GrepWindow		Vierç i file tal editôr di codiç
+Failed to open output pipe!	Grepper		No si è rivâts a vierzi il condot/pipe di jessude!
+Cancel	GrepWindow		Anule
+History	GrepWindow		Cronologjie
+File	GrepWindow		File
+Case-sensitive	GrepWindow		Sensibil aes maiusculis/minusculis
+Select all	GrepWindow		Selezione dut
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME nol pues vierzi une o plui cartelis.
+Settings	GrepWindow		Impostazions

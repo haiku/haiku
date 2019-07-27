@@ -5,7 +5,7 @@ Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhil
 Australia	Time		Australie
 America	Time		Amérique
 Reset to default server list	Time		Restaurer la liste de serveurs par défaut
-Could not resolve server address	Time		Impossible de résoudre l'adresse du serveur
+Could not resolve server address	Time		Impossible de résoudre l’adresse du serveur
 Set time zone	Time		Régler le fuseau horaire
 The following error occured while synchronizing:r\n%s: %s	Time		L’erreur suivante est survenue lors de la synchronisation :\n%s : %s
 Waiting for answer failed	Time		L’attente d’une réponse a échoué

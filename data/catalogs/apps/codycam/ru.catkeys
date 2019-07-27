@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-CodyCam	3200733765
+1	russian	x-vnd.Haiku-CodyCam	1770279704
 destination directory expected	CodyCam		укажите папку назначения
 reply: '%s'\n	SftpClient		ответ: '%s'\n
 JPEG image	CodyCam		JPEG изображение
@@ -64,8 +64,6 @@ Local	CodyCam		Локальный
 Stop video	CodyCam		Остановить видео
 Last Capture: 	VideoConsumer.cpp		Последний захват изображения: 
 Rate:	CodyCam		Период:
-File %s ; Line %ld # unterminated quote\n	SettingsHandler		Файл %s ; Строка %ld # unterminated quote\n
-File %s # unterminated quote at end of file\n	SettingsHandler		Файл %s # unterminated quote at end of file\n
 Couldn't find requested directory on server	VideoConsumer.cpp		Невозможно найти запрашиваемый каталог на сервере
 Cannot find the media roster	CodyCam		Невозможно найти медиа ростер
 Type:	CodyCam		Тип:
@@ -77,7 +75,6 @@ File	CodyCam		Файл
 read: %ld\n	SftpClient		чтение: %ld\n
 Every hour	CodyCam		Каждый час
 login ID expected	CodyCam		укажите логин
-File %s; Line %ld # %s	SettingsHandler		Файл %s; Строка %ld # %s
 Video settings	CodyCam		Настройка видео
 Can't find an available connection to the video window	CodyCam		Не удалось обнаружить доступного соединения с видео окном
 FTP	CodyCam		FTP
@@ -86,5 +83,4 @@ Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Не н�
 Logging in…	VideoConsumer.cpp		Авторизация…
 CodyCam	System name		Вебкамера
 Error writing output file	VideoConsumer.cpp		Ошибка при записи файла
-unknown command	SettingsHandler		неизвестная команда
 Capture controls	CodyCam		Настройки захвата

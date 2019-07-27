@@ -1,10 +1,11 @@
-1	ukrainian	x-vnd.Haiku-LaunchBox	3692177981
+1	ukrainian	x-vnd.Haiku-LaunchBox	1530497419
 Set description…	LaunchBox		Встановити опис…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Дійсно закрити цю панель?\n(Вона не збережеться.)
 OK	LaunchBox		Гаразд
 Ignore double-click	LaunchBox		Ігнорувати подвійне натискання
 Show on all workspaces	LaunchBox		Показати на всіх робочих просторах
 Name Panel	LaunchBox		Панель назви
+Autostart	LaunchBox		Автозапуск
 Clone	LaunchBox		Клонувати
 Description for '%3'	LaunchBox		Опис для '%3'
 Show window border	LaunchBox		Показувати межі вікна

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Be-PRNT	2042381362
+1	swedish	x-vnd.Be-PRNT	1465107170
 Test page	TestPageView		Testsida
 Remove	PrintersWindow		Ta bort
 Red	TestPageView		Röd
@@ -16,6 +16,8 @@ Waiting	JobListView		Väntar
 Processing	JobListView		Bearbetar
 Cancel	AddPrinterDialog		Avbryt
 Unknown status	JobListView		Okänd status
+Print jobs for %printer_name%	PrintersWindow		Utskriftsjobb för %printer_name%
+{0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? sidor}=1{# sida}other{# sidor}}
 Add printer	AddPrinterDialog		Lägg till skrivare
 Printers	PrintersWindow		Skrivare
 No printer found!	TransportMenu		Ingen skrivare funnen!
@@ -29,6 +31,7 @@ Yellow	TestPageView		Gul
 Black	TestPageView		Svart
 Printer type:	AddPrinterDialog		Skrivartyp:
 Printers	System name		Skrivare
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{Inga väntande jobb}=1{1 väntande jobb}other{# väntande jobb}}
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Skrivare: %printer_name%\nDrivrutin: %driver%\n
 Green	TestPageView		Grön
 Print test page	PrintersWindow		Skriv ut testsida

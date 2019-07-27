@@ -1,0 +1,38 @@
+1	friulian	x-vnd.Haiku-HaikuDepot	1120143338
+Check for updates…	MainWindow		Control inzornaments…
+Uninstall	PackageManager		Disinstale
+(%Votes%)	FeaturedPackagesView		(%Votes%)
+Uninstalled	PackageListView		Disinstalât
+Available packages	MainWindow		Pachets disponibii
+Create account	UserLoginWindow		Cree account
+OK	App		Va ben
+Mostly stable	RatePackageWindow		Pal plui stabil
+Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Account creât cun sucès. Si pues cumò votâ i pachets e fâ altris robis utilis.
+Rate package…	PackageInfoView		Vote pachet…
+Develop packages	MainWindow		Pachets di svilup
+Starting the package daemon failed:\n\n%Error%	App		Inviament dal demoni dai pachets falît:\n\n %Error%
+<no info>	PackageInfoView		<nessune informazion>
+No user ratings available.	PackageInfoView		Nissune valutazion dai utents disponibile.
+The user name needs to be at least 3 letters long.	UserLoginWindow		Il non utent al scugne jessi lunc almancul di 3 letaris.
+Downloading package '%name%'	WorkStatusView		Daûr a discjariâ il pachet '%name%'
+Failed to create account	UserLoginWindow		No si è rivâts a creâ l'account
+Ignore	UserLoginWindow		Ignore
+Rating	PackageListView		Valutazion
+Show	MainWindow		Mostre
+Does not start	RatePackageWindow		No si invie
+But none could be listed here, sorry.	UserLoginWindow		Nus displâs, ma nuie al pues jessi listât achì.
+There are problems with the data you entered:\n\n	UserLoginWindow		Problemis cui dâts inserîts:\n\n
+The authentication was successful.	UserLoginWindow		Autenticât cun sucès.
+Not specified	RatePackageWindow		No specificât
+Unstable but usable	RatePackageWindow		Instabil, ma che si pues doprâ
+Active	PackageListView		Atîf
+Login or Create account	MainWindow		Jentre o Regjistriti
+<Package contents not available for remote packages>	PackageContentsView		<Contignûts dal pachet no disponibii pai pachets rimots>
+{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1 pachet di discjariâ}other{# pachets di discjariâ}}
+Ratings	PackageInfoView		Valutazions
+Switch account…	MainWindow		Cambie account…
+Preferred language:	UserLoginWindow		Lenghe preferide:
+Repositories	MainWindow		Dipuesits
+Refresh repositories	MainWindow		Inzorne dipuesits
+Manage repositories…	MainWindow		Gjestìs dipuesits…
+All repositories	MainWindow		Ducj i dipuesits

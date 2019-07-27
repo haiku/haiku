@@ -1,5 +1,6 @@
-1	ukrainian	x-vnd.haiku-softwareupdater	4294742959
+1	ukrainian	x-vnd.haiku-softwareupdater	369324613
 Updating version	SoftwareUpdaterWindow	List item text	Оновлення версії
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Клікніть для встановлення {0, plural, one{# оновленого пакунку} other{# оновлених пакунків}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Пакуноу буде видалено
 No active network connection was found	UpdateManager	Error message	Не знайдено жодного активного підключення
 Quit	SoftwareUpdaterWindow	Alert button label	Вийти
@@ -7,6 +8,7 @@ There were no updates found.	CheckManager		Не знайдено жодних о
 Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Оновлення може бути неповним, Ви впевнені що бажаєте вийти?
 Updates found	SoftwareUpdaterWindow		Знайдено оновлення
 Update now	SoftwareUpdaterWindow		Оновити зараз
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Чомусь не вдається перезавантажити ваш комп’ютер.
 OK	UpdateManager		Гаразд
 Unrecognized argument	SoftwareUpdaterApp	Error message	Нерозпізнаний аргумент
 There were no updates found.	CheckAction		Оновлень не знайдено.
@@ -14,6 +16,7 @@ No updates available	UpdateAction		Немає доступних оновлен�
 New packages to be installed	SoftwareUpdaterWindow	List super item label	Нові пакунки встановлено
 Packages to be updated	SoftwareUpdaterWindow	List super item label	Пакунки будуть оновлені
 to	SoftwareUpdaterWindow	List item text	до
+Attempting to cancel the updates…	SoftwareUpdaterWindow		Спроба відміни оновлень…
 Contacting software repositories to check for package updates.	CheckManager		Під'єднати сховища для перевірки оновлень.
 Available updates found	CheckManager		Знайдено доступні оновлення
 from repository	SoftwareUpdaterWindow	List item text	зі сховища
@@ -31,7 +34,9 @@ No active network connection was found.\n	CheckManager		Не знайдено ж
 Applying changes	UpdateManager		Застосування змін
 Full sync	SoftwareUpdaterWindow	Alert button label	Повна синхронізація
 Quit	SoftwareUpdaterWindow	Button label	Вийти
+Updates have been successfully installed.	UpdateManager		Оновлення успішно встановлено.
 Exception occurred while updating packages : %s\n	UpdateAction		Стався виняток під час оновлення пакунків: %s\n
+A reboot is necessary to complete the update process.	UpdateManager		Для завершення процесу оновлення необхідне перезавантаження.
 Exception occurred while checking for updates: %s\n	CheckAction		Стався виняток під час перевірки оновлень: %s\n
 Packages are being updated	UpdateManager		Пакунки оновлено
 Cancel	SoftwareUpdaterWindow		Відмінити
@@ -39,10 +44,13 @@ Don't quit	SoftwareUpdaterWindow		Не виходити
 Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Клайніть для запуску SoftwareUpdater. Для деяких оновлень буде потрібно вибрати вирішення.
 Checking for updates	SoftwareUpdaterWindow		Перевірка оновлень
 Updates completed	UpdateManager		Оновлення завершені
+Reboot	SoftwareUpdaterWindow		Перезавантаження
 Show more details	SoftwareUpdaterWindow		Показати деталі
 Installing version	SoftwareUpdaterWindow	List item text	Встановлення версії
 Checking for updates	CheckManager		Перевірка оновлень
 No remote repositories are available	UpdateManager	Error message	Віддалені сховища відсутні
+Software {0, plural, one{update} other{updates}} available	CheckManager		Доступно {0, plural, one{оновлення} other{оновлення}} програмного забезпечення
+Reboot	SoftwareUpdaterWindow	Button label	Перезавантаження
 Update	SoftwareUpdaterWindow	Alert button label	Оновлення
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Відкрити Сховища
 Updates did not complete	UpdateAction		Оновлення не завершені

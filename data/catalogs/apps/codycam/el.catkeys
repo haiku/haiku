@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-CodyCam	3965116357
+1	greek, modern (1453-)	x-vnd.Haiku-CodyCam	2534662296
 destination directory expected	CodyCam		προβλεπόμενος κατάλογος προορισμού
 reply: '%s'\n	SftpClient		επανάληψη: '%s'\n
 JPEG image	CodyCam		Εικόνα JPEG
@@ -62,8 +62,6 @@ Local	CodyCam		Τοπικά
 Stop video	CodyCam		Σταμάτα το βίντεο
 Last Capture: 	VideoConsumer.cpp		Τελευταία Σύλληψη:
 Rate:	CodyCam		Ρυθμός:
-File %s ; Line %ld # unterminated quote\n	SettingsHandler		Αρχείο %s ; Σειρά %ld # ατερμάτιστο εισαγωγικό\n
-File %s # unterminated quote at end of file\n	SettingsHandler		Αρχείο %s # ατερμάτιστο εισαγωγικό στο τέλος του αρχείου\n
 Couldn't find requested directory on server	VideoConsumer.cpp		Αδυναμία εύρεσης του ζητούμενου καταλόγου στο διακομιστή
 Cannot find the media roster	CodyCam		Αδυναμία εύρεσης του ρόστερ των πολυμέσων
 Type:	CodyCam		Τύπος:
@@ -75,7 +73,6 @@ File	CodyCam		Αρχείο
 read: %ld\n	SftpClient		ανάγνωση: %ld\n
 Every hour	CodyCam		Κάθε ώρα
 login ID expected	CodyCam		αναμενόμενο ID σύνδεσης
-File %s; Line %ld # %s	SettingsHandler		Αρχείο %s; Γραμμή %ld # %s
 Video settings	CodyCam		Ρυθμίσεις βίντεο
 Can't find an available connection to the video window	CodyCam		Αδυναμία εύρεση μιας διαθέσιμης σύνδεσης στο παράθυρο του βίντεο
 FTP	CodyCam		FTP
@@ -83,5 +80,4 @@ Error creating output file	VideoConsumer.cpp		Σφάλμα κατά τη δημ�
 Logging in…	VideoConsumer.cpp		Γίνετε σύνδεση...
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Σφάλμα κατά την εγγραφή στο αρχείο εξόδου
-unknown command	SettingsHandler		άγνωστη εντολή
 Capture controls	CodyCam		Έλεγχος σύλληψης

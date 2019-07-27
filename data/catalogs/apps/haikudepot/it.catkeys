@@ -34,8 +34,8 @@ Name	PackageListView		Nome
 Rate %Package%	RatePackageWindow		Vota %Package%
 Quit HaikuDepot	App		Chiudi HaikuDepot
 Category	FilterView		Categoria
-Installed packages	MainWindow		Pacchetti installati
 User rating	RatePackageWindow		Valutazione utenti
+Installed packages	MainWindow		Pacchetti installati
 Other users can see this rating	RatePackageWindow		Gli altri utenti possono vedere questa valutazione
 Stable	RatePackageWindow		Stabile
 Fatal error	PackageManager		Errore fatale
@@ -62,8 +62,8 @@ Send	RatePackageWindow		Invia
 Start package daemon	App		Avvia server dei pacchetti
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		La password non è valida o è poco sicura. Usa almeno 8 caratteri di cui 2 devono essere dei numeri e altri 2 devono essere lettere maiuscole.
 The package action could not be scheduled: %Error%	PackageInfoView		Non è stato possibile pianificare l'azione sul pacchetto: %Error%
-Inactive	PackageListView		Inattivo
 Cancel	RatePackageWindow		Annulla
+Inactive	PackageListView		Inattivo
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
 OK	PackageInfoView		OK
@@ -78,10 +78,10 @@ Close	RatePackageWindow		Chiudi
 Failed to create account: %s\n	UserLoginWindow		Non è stato possibile creare l'account: %s\n
 Size	PackageListView		Dimensione
 Your rating:	RatePackageWindow		La tua valutazione:
-All categories	FilterView		Tutte le categorie
 Your rating was updated.	RatePackageWindow		La tua valutazione è stata aggiornata.
-n/a	PackageInfoView		nd
+All categories	FilterView		Tutte le categorie
 Repositories	MainWindow		Repository
+n/a	PackageInfoView		nd
 Cancel	MainWindow		Annulla
 Refresh repositories	MainWindow		Aggiorna repository
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Senza un indirizzo email, non sarai in grado di resettare la password se la dimentichi.

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Installer	1997609102
+1	ukrainian	x-vnd.Haiku-Installer	116830250
 Performing installation.	InstallProgress		Виконується встановлення.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Виберіть диск джерела з випадаючого меню. Тоді клікніть \"Почати\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Закрийте вікно Розмітки диску до закриття вікна Встановлювача.
@@ -27,6 +27,7 @@ Running Boot Manager…\n\nClose Boot Manager to continue with the installation.
 Quit DriveSetup	InstallerWindow		Вийти з Розмітки диску
 Write boot sector	InstallerWindow		Записати завантажувальний сектор
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld з %2ld
+Finishing installation.	InstallProgress		Завершення встановлення.
 Install from:	InstallerWindow		Встановити з:
 Additional disk space required: 0.0 KiB	InstallerWindow		Необхідно додатковий дисковий простір: 0.0 KiB
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Це програмне забезпечення для бета-тестування! Це означає, що існує ризик втрати важливих даних. Частіше робіть резервні копії, попереджаємо Вас! .\n\n\n
@@ -39,6 +40,8 @@ Hide optional packages	InstallerWindow		Сховати необов’язков
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Удачі та дякую, що випробували Haiku!
 Quit	InstallerApp		Завершити
+Starting installation.	InstallProgress		Початок встановлення.
+Error writing boot sector.	InstallProgress		Помилка запису завантажувального сектору.
 OK	InstallerWindow		Гаразд
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Закрийте Завантажувач та Розмітку диска до закриття вікна Встановлювача.
 Failed to launch Boot Manager	InstallerWindow		Призупинено запуск Завантажувача

@@ -1,3 +1,3 @@
 1	french	x-vnd.Haiku-FTPService	4086152171
 FTP server	FTPServiceAddOn		Serveur FTP
-The FTP server allows you to remotely access the files on your machine using the FTP protocol.\n\nPlease note that it is an insecure and unencrypted connection.	FTPServiceAddOn		Le serveur FTP vous permet d'accéder à distance aux fichiers de votre machine à travers le protocole FTP.\n\nVeuillez noter que la connexion n'est ni sécurisée ni chiffrée.
+The FTP server allows you to remotely access the files on your machine using the FTP protocol.\n\nPlease note that it is an insecure and unencrypted connection.	FTPServiceAddOn		Le serveur FTP vous permet d’accéder à distance aux fichiers de votre machine à travers le protocole FTP.\n\nVeuillez noter que la connexion n’est ni sécurisée ni chiffrée.

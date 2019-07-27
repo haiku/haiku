@@ -1,0 +1,42 @@
+1	friulian	x-vnd.Haiku-Repositories	1220143449
+This is not a valid URL.	AddRepoWindow	Add URL error message	Chest nol è un URL valit.
+Repository URL:	AddRepoWindow	Text box label	URL dal dipuesit:
+There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Al è vignût fûr un erôr tal inzornâ la cache dal dipuesit %name%
+There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Al è vignût fûr un erôr tal disabilitâ il dipuesit %name%
+Unknown	Constants	Unknown repository name	No cognossût
+Remove all	RepositoriesView	Button label	Gjave ducj
+Enable repositories to use with package management:	RepositoriesView	Label text	Abilite i dipuesits di doprâ cul gjestôr dai pachets:
+Disable	RepositoriesView	Button label	Disabilite
+Cancel task	TaskTimer	Button label	Cancele ativitât
+Changes completed	RepositoriesView	Status view text	Cambiaments completâts
+Details	TaskLooper	Job log details header	Detais
+Enabled	RepoRow	Tag in the Status column	Abilitât
+Remove	Constants	Button label	Gjave
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Al è vignût fûr un erôr tal abilitâ il dipuesit %url%
+Remove this repository?	RepositoriesView	Removal alert confirmation message	Gjavâ chest dipuesit?
+The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	La ativitât pal dipuesit %name% le sta tirant masse a dilunc par finî.
+Completed	TaskLooper	Completed task status message	Completât
+OK	Constants	Button label	Va ben
+Status	RepositoriesView	Column title	Stât
+Name	RepositoriesView	Column title	Non
+Add	AddRepoWindow	Button label	Zonte
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Dipuesits nol rive a recuperâ i nons dai dipuesits atualmentri abilitâts.
+Enable all	RepositoriesView	Button label	Abilite dut
+Aborted	TaskLooper	Aborted task status message	Anulât
+URL	RepositoriesView	Column title	URL
+Enable	RepositoriesView	Button label	Abilite
+Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Erôr tal otignî la configurazion dal dipuesit par %name%.
+Description	TaskLooper	Failed task error description	Descrizion
+Failed	TaskLooper	Failed task status message	Falît
+Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Buinis gnovis! La ativitât pal dipuesit %name% e je stade completade.
+Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Cualchi ativitât e je ancjemò in esecuzion. Fermâ chestis ativitâts e jessî?
+This repository URL already exists.	RepositoriesView	Error message	Chest URL di dipuesit al esist za.
+Repositories	System name		Dipuesits
+Changes pending:	RepositoriesView	Status view text	Cambiaments in spiete:
+Remove	RepositoriesView	Button label	Gjave
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	Gjavâ chescj dipuesits?
+Keep trying	TaskTimer	Button label	Continue a provâ
+Cancel	Constants	Button label	Anule
+Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Dome un URL par ogni dipuesit al pues jessi abilitât. Par plasê modifiche lis tôs selezions.
+Stop and quit	RepositoriesWindow	Button label	Ferme e jes
+Disable all	RepositoriesView	Button label	Disabilite dut

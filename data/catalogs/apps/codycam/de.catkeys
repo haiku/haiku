@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-CodyCam	4023809311
+1	german	x-vnd.Haiku-CodyCam	2593355250
 destination directory expected	CodyCam		Zielverzeichnis erwartet
 reply: '%s'\n	SftpClient		Antwort; '%s'\n
 JPEG image	CodyCam		JPEG-Bild
@@ -66,8 +66,6 @@ Local	CodyCam		Lokal
 Stop video	CodyCam		Video anhalten
 Last Capture: 	VideoConsumer.cpp		Letzte Aufnahme:
 Rate:	CodyCam		Intervall:
-File %s ; Line %ld # unterminated quote\n	SettingsHandler		In Datei %s ; Zeile %ld # befinden sich nicht geschlossene Anführungszeichen\n
-File %s # unterminated quote at end of file\n	SettingsHandler		In %s # befinden sich nicht geschlossene Anführungszeichen am Ende der Datei\n
 Couldn't find requested directory on server	VideoConsumer.cpp		Das angefragte Verzeichnis konnte auf dem Server nicht gefunden werden.
 Cannot find the media roster	CodyCam		Der Media-Roster konnte nicht gefunden werden
 Type:	CodyCam		Typ:
@@ -79,7 +77,6 @@ File	CodyCam		Datei
 read: %ld\n	SftpClient		gelesen: %ld\n
 Every hour	CodyCam		Jede Stunde
 login ID expected	CodyCam		Login-ID erwartet
-File %s; Line %ld # %s	SettingsHandler		Datei %s; Zeile %ld # %s
 Video settings	CodyCam		Video-Einstellungen
 Can't find an available connection to the video window	CodyCam		Es wurde keine verfügbare Verbindung zum Videofenster gefunden.
 FTP	CodyCam		FTP
@@ -88,5 +85,4 @@ Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Es wurde
 Logging in…	VideoConsumer.cpp		Einloggen…
 CodyCam	System name		Webcam
 Error writing output file	VideoConsumer.cpp		Fehler beim Schreiben der Ausgabedatei
-unknown command	SettingsHandler		unbekannter Befehl
 Capture controls	CodyCam		Aufnahme-Einstellungen

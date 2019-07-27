@@ -121,7 +121,7 @@ Supported types	Application Type Window		Types supportés
 Beta	Application Type Window		Bêta
 Could not retrieve preferred application of this file	Preferred App Menu		L’application préférée de ce fichier n’a pas pu être récupérée
 Application flags	Application Type Window		Fanions de l’application
-OK	FileTypes		Ok
+OK	FileTypes		OK
 Group name:	New File Type Window		Nom de groupe :
 Move up	FileTypes Window		Déplacer vers le haut
 Add	Attribute Window		Ajouter

@@ -1,0 +1,22 @@
+1	friulian	x-vnd.Haiku-PSDTranslator	3654055550
+Lab	PSDLoader		Laboratori
+Uncompressed	PSDConfig		No striçât
+Indexed	PSDLoader		Metût in tabele
+Grayscale	PSDLoader		Scjale di grîs
+Photoshop image translator	PSDConfig		Tradutôr di imagjin Photoshop
+Photoshop image translator	PSDTranslator		Tradutôr di imgjins Photoshop
+Version %d.%d.%d, %s	PSDConfig		Version %d.%d.%d, %s
+Photoshop Document (PSD file)	PSDConfig		Document Photoshop (file PSD)
+Photoshop image	PSDTranslator		Imagjin Photoshop
+RLE	PSDConfig		RLE
+Photoshop Big Document (PSB file)	PSDConfig		Document grant di Photoshop (file PSB)
+RGBA	PSDLoader		RGBA
+Photoshop image (%s)	PSDTranslator		Imagjin Photoshop (%s)
+PSDTranslator Settings	PSDConfig		Impostazions PSDTranslator
+RGB	PSDLoader		RGB
+Bitmap	PSDLoader		Bitmap
+CMYK	PSDLoader		CMYK
+Compression: 	PSDConfig		Compression: 
+Format: 	PSDConfig		Formât: 
+Multichannel	PSDLoader		Multi-canâl
+Duotone	PSDLoader		Dicromie

@@ -1,0 +1,133 @@
+1	friulian	x-vnd.Haiku-DiskProbe	2944605311
+Raw editor	AttributeWindow		Editôr dâts grês
+Remove	AttributeWindow		Gjave
+Close	ProbeView		Siere
+Boolean value:	TypeEditors		Valôr boolean:
+File	ProbeView		File
+Block size	ProbeView	Menu item. This is in the same menu window than 'Base' and 'Font size'	Dimension bloc
+MIME type editor	TypeEditors		Editôr gjenars MIME
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Esadecimâl
+16 bit unsigned value:	TypeEditors		Valôr cence segn a 16 bit:
+8 bit signed value:	TypeEditors		Valôr cun segn a 8 bit:
+ (native)	ProbeView		 (natîf)
+Attribute offset: 	ProbeView		Spostament atribût: 
+Text	TypeEditors	This is the type of editor	Test
+File offset: 	ProbeView		Spostament file: 
+Add	ProbeView		Zonte
+64 bit signed value:	TypeEditors		Valôr cun segn a 64 bit:
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Gjavâ par dabon l'atribût \"%s\" dal file \"%s\"?\n\nNo si pues tornâ indaûr di cheste azion.
+No type editor available	AttributeWindow		Nissun editôr di gjenars disponibii
+Print…	ProbeView		Stampe…
+New…	FileWindow		Gnûf…
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	ce: '%.4s'\n\n
+OK	DiskProbe		Va ben
+DiskProbe	System name		Scandai dal disc
+Back	ProbeView		Indaûr
+Device: 	ProbeView		Dispositîf 
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Base
+Open file…	FileWindow		Vierç file…
+32 bit unsigned pointer:	TypeEditors		Pontadôr cence segn a 32 bit:
+DiskProbe request	DiskProbe		Richieste Scandai dal disc
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Esadecimâl
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		No si è rivâts a scrivi sul file:\n%s\n\nDutis lis modifichis a laran pierdudis cuant che si jessarà.
+Examine device:	OpenWindow		Esamine il dispositîf:
+Number editor	TypeEditors		Editôr numeric
+Icon	TypeEditors		Icone
+Attribute	ProbeView		Atribût
+Don't save	ProbeView		No sta salvâ
+Undo	ProbeView		Disfe
+Flattened bitmap	TypeEditors		Bitmap plan
+Block %Ld (0x%Lx)	ProbeView		Bloc %Ld (0x%Lx)
+Cancel	OpenWindow		Anule
+Unknown format	TypeEditors		Formât no cognossût
+File: 	ProbeView		File: 
+Swapped: %Ld (0x%0*Lx)	ProbeView		Scambiât: %Ld (0x%0*Lx)
+Stop	ProbeView		Ferme
+Cancel	ProbeView		Anule
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Impussibil vierzi \"%s\":\n%s
+Font size	ProbeView		Dimension caratar
+Type editor not supported	ProbeView		Editôr di gjenars no supuartât
+Native: 0x%0*Lx	ProbeView		Natîf: 0x%0*Lx
+Copy	ProbeView		Copie
+Redo	ProbeView		Torne fâs
+Floating-point value:	TypeEditors		Valôr in virgule mobile:
+Cancel	AttributeWindow		Anule
+16 bit signed value:	TypeEditors		Valôr cun segn a 16 bit:
+DiskProbe request	AttributeWindow		Richieste Scandai dal disc
+Next	ProbeView		Sucessîf
+64 bit signed offset:	TypeEditors		Spostament cun segn a 64 bit:
+32 bit signed value:	TypeEditors		Valôr cun segn a 32 bit:
+Could not find search string.	ProbeView		Impussibil cjatâ la stringhe cirude.
+Close	FileWindow		Siere
+Unknown type	TypeEditors		Gjenar no cognossût
+Open device	FileWindow		Vierç dispositîf
+Number:	TypeEditors		Numar:
+Quit	FileWindow		Jes
+Text	FindWindow		Test
+Block 0x%Lx	ProbeView		Bloc 0x%Lx
+Attribute	AttributeWindow		Atribût
+Mode:	FindWindow		Modalitât:
+16 bit	TypeEditors		16 bit
+32 bit size or status:	TypeEditors		Dimension o stât a 32 bit:
+of 	ProbeView		di 
+Contents:	TypeEditors		Contignûts:
+Could not open file \"%s\": %s\n	DiskProbe		Impussibil vierzi il file \"%s\": %s\n
+Probe file…	OpenWindow		Sonde file…
+Block: 	ProbeView		Bloc: 
+Bookmarks	ProbeView		Segnelibris
+Probe device	OpenWindow		Scandaie dispositîf
+none	ProbeView	No attributes	nissun
+Case sensitive	FindWindow		Distinzion maiusculis/minusculis 
+32 bit unsigned value:	TypeEditors		Valôr cence segn a 32 bit:
+Remove from file	AttributeWindow		Gjave dal file
+Attributes	ProbeView		Atribûts
+Message	TypeEditors	This is the type of view	Messaç
+Message View	TypeEditors		Viodude messaç
+Offset: 	ProbeView		Spostament: 
+Swapped: 0x%0*Lx	ProbeView		Scambiât: 0x%0*Lx
+MIME type:	TypeEditors		Gjenar MIME:
+Fit	ProbeView	Size of fonts, fits to available room	Adate
+Type editor	ProbeView		Editôr di gjenars
+File	FileWindow		File
+Grayscale	TypeEditors		Scjale di grîs
+32 bit	TypeEditors		32 bit
+Native: %Ld (0x%0*Lx)	ProbeView		Natîf: %Ld (0x%0*Lx)
+Device	ProbeView		Dispositîf
+Close	AttributeWindow		Siere
+Type editor	AttributeWindow		Editôr di gjenars
+Save	ProbeView		Salve
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	di 0x0
+Attribute type: 	ProbeView		Gjenar atribût: 
+15 bit	TypeEditors		15 bit
+Page setup…	ProbeView		Configure pagjine…
+Boolean	TypeEditors	This is the type of editor	Boolean
+Icon view	TypeEditors		Viodude a iconis
+Select all	ProbeView		Selezione dut
+64 bit unsigned value:	TypeEditors		Valôr cence segn a 64 bit:
+OK	ProbeView		Va ben
+Previous	ProbeView		Precedent
+Selection	ProbeView		Selezion
+Find	FindWindow		Cjate
+8 bit unsigned value:	TypeEditors		Valôr cence segn a 8 bit:
+%ld (native)	ProbeView		%ld (natîf)
+Attribute: 	ProbeView		Atribût: 
+Block	ProbeView		Bloc
+Find again	ProbeView		Cjate ancjemò
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Viodude
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Impussibil lei la imagjin
+DiskProbe request	ProbeView		Richieste Scandai dal disc
+Double precision floating-point value:	TypeEditors		Valôr in virgule mobile a dople precision:
+Image	TypeEditors	This is the type of view	Imagjin
+Save changes before closing?	ProbeView		Salvâ lis modifichis prime di sierâ?
+PNG format	TypeEditors		Formât PNG
+Number	TypeEditors	This is the type of editor	Numar
+Edit	ProbeView		Modifiche
+String editor	TypeEditors		Editôr di test
+Boolean editor	TypeEditors		Editôr boolean
+Device offset: 	ProbeView		Spostament dispositîf: 
+Find…	ProbeView		Cjate…
+8 bit palette	TypeEditors		Palete a 8 bit
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Decimâl
+Image view	TypeEditors	Image means here a picture file, not a disk image.	Viodude imagjin
+Paste	ProbeView		Tache
+32 bit unsigned size:	TypeEditors		Dimension cence segn a 32 bit:

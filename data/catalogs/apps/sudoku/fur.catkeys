@@ -1,0 +1,35 @@
+1	friulian	x-vnd.Haiku-Sudoku	3382377306
+Restore snapshot	SudokuWindow		Ripristine istantanie
+File	SudokuWindow		File
+Mark invalid values	SudokuWindow		Segne valôrs sbaliâts
+Solve single field	SudokuWindow		Risolf cjamp singul
+Hard	SudokuWindow		Dificil
+Start again	SudokuWindow		Torne tache
+New	SudokuWindow		Gnûf
+Easy	SudokuWindow		Facil
+Undo	SudokuWindow		Disfe
+Export as…	SudokuWindow		Espuarte come…
+Quit	SudokuWindow		Jes
+Redo	SudokuWindow		Torne fâs
+Could not open \"%s\":\n%s\n	SudokuWindow		Impussibil vierzi \"%s\":\n%s\n
+Blank	SudokuWindow		Vueit
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku risolt - congratulazions!\n
+Text	SudokuWindow		Test
+Copy	SudokuWindow		Copie
+Solve	SudokuWindow		Risolf
+HTML	SudokuWindow		HTML
+Advanced	SudokuWindow		Avanzât
+Set all hints	SudokuWindow		Stabilìs ducj i sugjeriments
+Searching for removable values	SudokuGenerator		Daûr a cirî i valôrs che si puedin gjavâ
+Abort	ProgressWindow		Interomp 
+Could not set Sudoku:\n%s\n	SudokuWindow		Impussibil configurâ Sudoku:\n%s\n
+Help	SudokuWindow		Jutori
+OK	SudokuWindow		Va ben
+Sudoku	System name		Sudoku
+Progress monitor	ProgressWindow		Control di avanzament
+Creating solvable field	SudokuGenerator		Daûr a creâ il cjamp che si pues risolvi
+View	SudokuWindow		Visualize
+Snapshot current	SudokuWindow		Istantanie atuâl
+Mark valid hints	SudokuWindow		Segne sugjeriments valits
+Sudoku request	SudokuWindow		Richieste di Sudoku
+Open file…	SudokuWindow		Vierç file…

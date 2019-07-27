@@ -1,10 +1,11 @@
-1	french	x-vnd.Haiku-Media	4205337498
+1	french	x-vnd.Haiku-Media	1682972002
 Audio mixer	Media Window		Mélangeur audio
 Show volume control on Deskbar	Media views		Afficher le contrôle de volume dans la Deskbar
 Quit	Media Window		Quitter
 Restart media services	Media views		Redémarrer les services médias
 Couldn't add volume control in Deskbar: %s\n	Media views		Impossible d’insérer le contrôle du volume dans la Deskbar : %s\n
 Start media server	Media Window		Démarrer le serveur media
+<none>	VideoInputMenu	Used when no video input is available	<aucune>
 Audio settings	Media Window		Réglages audio
 Quit anyway	Media Window		Quitter quand même
 Couldn't remove volume control in Deskbar: %s\n	Media views		Impossible de retirer le contrôle du volume de la Deskbar : %s\n
@@ -22,3 +23,4 @@ Channel:	Media views		Canal :
 Defaults	Media views		Par défaut
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Impossible de se connecter au serveur de médias.\nVoulez-vous le démarrer ?
 Video settings	Media Window		Réglages vidéo
+<none>	VideoOutputMenu	Used when no video output is available	<aucune>

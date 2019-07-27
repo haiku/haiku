@@ -34,8 +34,8 @@ Name	PackageListView		Nama
 Rate %Package%	RatePackageWindow		Nilai %Package%
 Quit HaikuDepot	App		Keluar dari HaikuDepot
 Category	FilterView		Kategori
-Installed packages	MainWindow		Paket-paket yang terpasang
 User rating	RatePackageWindow		Peringkat pengguna
+Installed packages	MainWindow		Paket-paket yang terpasang
 Other users can see this rating	RatePackageWindow		Pengguna lain dapat melihat rating ini
 Stable	RatePackageWindow		Stabil
 Fatal error	PackageManager		Kesalahan fatal
@@ -62,8 +62,8 @@ Send	RatePackageWindow		Kirim
 Start package daemon	App		Mulai daemon paket
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Sandi terlalu lemah atau tidak valid. Silakan gunakan minimal 8 karakter dengan minimal 2 angka dan 2 huruf kapital.
 The package action could not be scheduled: %Error%	PackageInfoView		Tindakan paket tidak dapat dijadwalkan: %Error%
-Inactive	PackageListView		Tak aktif
 Cancel	RatePackageWindow		Batal
+Inactive	PackageListView		Tak aktif
 OK	MainWindow		OKE
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
 OK	PackageInfoView		OKE
@@ -78,10 +78,10 @@ Close	RatePackageWindow		Tutup
 Failed to create account: %s\n	UserLoginWindow		Gagal membuat akun: %s\n
 Size	PackageListView		Ukuran
 Your rating:	RatePackageWindow		Penilaianmu:
-All categories	FilterView		Semua Kategori
 Your rating was updated.	RatePackageWindow		Peringkat Anda telah diperbarui.
-n/a	PackageInfoView		n/a
+All categories	FilterView		Semua Kategori
 Repositories	MainWindow		Repositori
+n/a	PackageInfoView		n/a
 Cancel	MainWindow		Batal
 Refresh repositories	MainWindow		Muat-ulang repositori
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Jika Anda tidak memberikan alamat email, Anda tidak akan dapat mereset kata sandi Anda jika Anda melupakannya.

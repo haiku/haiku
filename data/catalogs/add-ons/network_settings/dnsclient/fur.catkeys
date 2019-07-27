@@ -1,0 +1,10 @@
+1	friulian	x-vnd.Haiku-DNSClientService	2825577357
+DNS settings	DNSClientServiceAddOn		Impostazions DNS
+Move down	DNSSettingsView		Sposte jù
+DNS settings	DNSSettingsView		Impostazions DNS
+Remove	DNSSettingsView		Gjave
+Domain:	DNSSettingsView		Domini:
+Add	DNSSettingsView		Zonte
+Server:	DNSSettingsView		Servidôr:
+Move up	DNSSettingsView		Sposte sù
+Apply	DNSSettingsView		Apliche

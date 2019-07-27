@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Keymap	1039047705
+1	french	x-vnd.Haiku-Keymap	2693024251
 Key	Modifier keys window	As in a computer keyboard key	Touche
 Japanese	KeymapNames		Japonais
 US	KeymapNames		US
@@ -11,6 +11,7 @@ Sample and clipboard:	Keymap window		Exemple et presse-papier :
 Polish	KeymapNames		Polonais
 Latin-American	KeymapNames		Latin-Americain
 Ukrainian	KeymapNames		Ukrainien
+DEL	Keyboard Layout View		Suppr
 United-Kingdom	KeymapNames		Royaume-Uni
 Turkish (Type-F)	KeymapNames		Turc (Type-F)
 Serbian (Cyrillic)	KeymapNames		Serbe (cyrillique)
@@ -26,6 +27,7 @@ Right option	Keyboard Layout View		Option droite
 Turkish (Type-Q)	KeymapNames		Turc (Type-Q)
 Revert	Modifier keys window		Défaire
 Slovak	KeymapNames		Slovaque
+CAPS LOCK	Keyboard Layout View		Verr. Maj.
 Colemak	KeymapNames		Colemak
 Dvorak (programmer's)	KeymapNames		Dvorak (programmation)
 German (Mac)	KeymapNames		Allemand (Mac)
@@ -70,6 +72,7 @@ Russian (Yawert)	KeymapNames		Russe (Yawert)
 Bulgarian (Cyrillic)	KeymapNames		Bulgare (cyrillique)
 Left control	Keyboard Layout View		Contrôle gauche
 Swedish	KeymapNames		Suédois
+CAPS	Keyboard Layout View	Very short for 'caps lock'	Maj.
 Role	Modifier keys window	As in the role of a modifier key	Rôle
 German	KeymapNames		Allemand
 Svorak	KeymapNames		Svorak

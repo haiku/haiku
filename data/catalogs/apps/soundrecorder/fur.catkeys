@@ -1,0 +1,46 @@
+1	friulian	x-vnd.Haiku-SoundRecorder	24440888
+Loop	RecorderWindow		Cicli continui
+Cannot find default audio hardware	RecorderWindow		Impussibil cjatâ l'hardware audio predefinît
+Cannot find the temporary file created to hold the new recording	RecorderWindow		Impussibil cjatâ il file temporani creât par conservâ la gnove regjistrazion
+Sample size:	RecorderWindow		Dimension di campionament:
+Nothing to play	RecorderWindow		Nie di riprodusi
+None of the files appear to be audio files.	RecorderWindow		Nissun dai file al semee jessi un file audio.
+Duration: 	RecorderWindow		Durade: 
+File info	RecorderWindow		Informazions sui file
+Drop files here	SoundListView		Strissine chi i file
+Input	RecorderWindow		Jentrade
+Some of the files don't appear to be audio files.	RecorderWindow		Cualchi file nol semee jessi un file audio.
+Stop	RecorderWindow		Ferme
+Format:	RecorderWindow		Formât:
+Sound List	RecorderWindow		Liste sonore
+Compression: 	RecorderWindow		Compression: 
+Rewind	RecorderWindow		Torne fâs sù
+Sample rate:	RecorderWindow		Frecuence di campionament:
+Invalid audio files	RecorderWindow		File audio no valits
+ seconds	RecorderWindow		 seconts
+OK	RecorderWindow		Va ben
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Impussibil vierzi il file temporani creât par conservâ la gnove regjistrazion
+Input:	RecorderWindow		Jentrade:
+Forward	RecorderWindow		Indenant
+Play	RecorderWindow		Riprodûs
+SoundRecorder	System name		Regjistradôr di suns
+Channels:	RecorderWindow		Canâi:
+ bits	RecorderWindow		 bit
+None	RecorderWindow		Nissun
+Record	RecorderWindow		Regjistre
+Sample size: 	RecorderWindow		Dimension dal campion: 
+Cannot recognize this file as a media file	RecorderWindow		Impussibil ricognossi chest file come file multimediâl
+Format: 	RecorderWindow		Formât: 
+File name: 	RecorderWindow		Non file: 
+Cannot connect to the selected sound input	RecorderWindow		Impussibil conetisi ae jentrade sonore selezionade
+Cannot get the file to play	RecorderWindow		Impussibil otignî il file di riprodusi
+Cannot record a sound that long	RecorderWindow		Impussibil regjistrâ un sun cetant lunc
+Duration:	RecorderWindow		Durade:
+Compression:	RecorderWindow		Compression:
+Cannot find an unused name to use for the new recording	RecorderWindow		Impussibil cjatâ un non di doprâ, che nol è za stât doprât, pe gnove regjistrazion
+Channels: 	RecorderWindow		Canâi: 
+Save	RecorderWindow		Salve
+Sample rate: 	RecorderWindow		Frecuence di campionament:
+Cannot connect to media server	RecorderWindow		Impussibil conetisi al servidôr multimediâl
+The file doesn't appear to be an audio file.	RecorderWindow		Il file nol semee jessi un file audio.
+File name:	RecorderWindow		Non file:

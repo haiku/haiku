@@ -1,10 +1,11 @@
-1	french	x-vnd.Haiku-HaikuDepot	2728680786
+1	french	x-vnd.Haiku-HaikuDepot	2330489938
 Check for updates…	MainWindow		Vérifier les mises à jour…
 Uninstall	PackageManager		Désinstaller
 (%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Désinstallé
 Available packages	MainWindow		Paquets disponibles
 Create account	UserLoginWindow		Créer un compte
+OK	App		OK
 Mostly stable	RatePackageWindow		Plutôt stable
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Compte créé avec succès. Vous pouvez maintenant évaluer les paquets, et faire d’autres choses utiles.
 Rate package…	PackageInfoView		Évaluer le paquet…
@@ -13,6 +14,7 @@ Starting the package daemon failed:\n\n%Error%	App		Le démarrage du serveur de 
 <no info>	PackageInfoView		<pas d’info>
 No user ratings available.	PackageInfoView		Aucun avis d’utilisateurs.
 The user name needs to be at least 3 letters long.	UserLoginWindow		Le nom d’utilisateur doit comporter au moins 3 caractères.
+Downloading package '%name%'	WorkStatusView		Téléchargement du paquet « %name% »
 Failed to create account	UserLoginWindow		La création du compte a échoué
 Ignore	UserLoginWindow		Ignorer
 Rating	PackageListView		Évaluation
@@ -34,14 +36,15 @@ Name	PackageListView		Nom
 Rate %Package%	RatePackageWindow		Évaluer %Package%
 Quit HaikuDepot	App		Quitter le Dépôt Haiku
 Category	FilterView		Catégorie
+User rating	RatePackageWindow		Avis de l’utilisateur
 Installed packages	MainWindow		Paquets installés
-User rating	RatePackageWindow		Avis de l'utilisateur
 Other users can see this rating	RatePackageWindow		Les autres utilisateurs peuvent voir cette évaluation
 Stable	RatePackageWindow		Stable
 Fatal error	PackageManager		Erreur fatale
 Package action failed	PackageInfoView		L’action du paquet a échoué
 No changelog available.	PackageInfoView		La liste des modifications n’est pas disponible.
 There are problems in the form:\n\n	UserLoginWindow		Il y a des problèmes dans le formulaire :\n\n
+Error	App		Erreur
 There was a puzzling response from the web service.	UserLoginWindow		La réponse du service web est incompréhensible.
 Not logged in	MainWindow		Non connecté
 No, quit HaikuDepot	App		Non, quitter le Dépôt Haiku
@@ -56,14 +59,16 @@ Changelog	PackageInfoView		Journal des modifications
 Rating not possible	MainWindow		Évaluation impossible
 About	PackageInfoView		À propos
 Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		L’authentification a échoué. L’utilisateur n’existe pas, ou le mot de passe est incorrect.
+Reboot required	PackageManager		Redémarrage nécessaire
 Very unstable	RatePackageWindow		Très instable
+All packages	PackageListView		Tous les paquets
 Stability	RatePackageWindow		Stabilité
 Send	RatePackageWindow		Envoyer
 Start package daemon	App		Démarrer le serveur de paquets
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Le mot de passe est trop faible ou invalide. Utilisez au moins 8 caractères dont au moins 2 chiffres et 2 lettres majuscules.
 The package action could not be scheduled: %Error%	PackageInfoView		L’action du paquet n’a pas eu lieu : %Error%
-Inactive	PackageListView		Inactif
 Cancel	RatePackageWindow		Annuler
+Inactive	PackageListView		Inactif
 OK	MainWindow		Valider
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# objet} other{# objets}}
 OK	PackageInfoView		OK
@@ -78,13 +83,14 @@ Close	RatePackageWindow		Fermer
 Failed to create account: %s\n	UserLoginWindow		Impossible de créer le compte : %s\n
 Size	PackageListView		Taille
 Your rating:	RatePackageWindow		Votre évaluation :
-All categories	FilterView		Toutes les catégories
 Your rating was updated.	RatePackageWindow		Votre évaluation a été mise à jour.
-n/a	PackageInfoView		n/a
+All categories	FilterView		Toutes les catégories
 Repositories	MainWindow		Dépôts
+n/a	PackageInfoView		n/a
 Cancel	MainWindow		Annuler
 Refresh repositories	MainWindow		Rafraîchir les dépôts
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Si vous ne fournissez pas d’adresse email, vous ne pourrez pas réinitialiser votre mot de passe en cas d’oubli.
+Package Update Error	MainWindow		Erreur lors de la mise à jour d’un paquet
 Tools	MainWindow		Outils
 The passwords do not match.	UserLoginWindow		Les mots de passe ne concordent pas.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Ce paquet ne semble pas se trouver sur le serveur du Dépôt Haiku, il n’est donc pas possible de créer une nouvelle évaluation ou de modifier une évaluation existante.
@@ -112,6 +118,7 @@ Logged in as %User%	MainWindow		Connecté en tant que %User%
 Email address:	UserLoginWindow		Adresse e-mail :
 Screenshot	ScreenshotWindow		Capture d’écran
 HaikuDepot	System name		Dépôt Haiku
+A reboot is necessary to complete the installation process.	PackageManager		Un redémarrage est nécessaire pour terminer le processus d’installation.
 Search terms:	FilterView		Termes à rechercher :
 Pending…	PackageListView		En attente…
 Repeat pass phrase:	UserLoginWindow		Répéter le mot de passe :

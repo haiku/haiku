@@ -9,7 +9,7 @@ Login application for Haiku\nUsage:\n	Login App		Application d’authentificatio
 Desktop	Desktop Window		Bureau
 Hide password	Login View		Camoufler le mot de passe
 Reboot	Login View		Redémarrer
-You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Vous pouvez personnaliser le bureau affiché derrière l'application Login en déposant des réplicants dessus.\n\nLorsque vous avez terminé, quittez l'application (Cmd-Q).
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Vous pouvez personnaliser le bureau affiché derrière l’application Login en déposant des réplicants dessus.\n\nLorsque vous avez terminé, quittez l’application (Cmd-Q).
 OK	Login View		OK
 Info	Login App		Informations
 Login:	Login View		Identifiant :

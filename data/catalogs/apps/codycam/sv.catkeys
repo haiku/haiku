@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-CodyCam	3200733765
+1	swedish	x-vnd.Haiku-CodyCam	2593355250
 destination directory expected	CodyCam		Målkatalog förväntas
 reply: '%s'\n	SftpClient		svar: '%s'\n
 JPEG image	CodyCam		JPEG-bild
@@ -27,6 +27,7 @@ Every 2 hours	CodyCam		Varannan timme
 Cannot get a time source	CodyCam		Kan inte hitta en tidskälla
 Every 4 hours	CodyCam		Var 4:e timme
 cmd: '%s'\n	FtpClient		cmd: '%s'\n
+Closing the window	VideoConsumer.cpp		Stänger fönstret
 Never	CodyCam		Aldrig
 Every 8 hours	CodyCam		Var 8:e timme
 Cannot start the video source	CodyCam		Kan inte starta videokällan
@@ -38,6 +39,7 @@ still image filename expected	CodyCam		stillbildsfilnamn förväntas
 File name:	CodyCam		Filnamn:
 Directory:	CodyCam		Katalog:
 Error setting type of output file	VideoConsumer.cpp		Fel vid skapande av filtyp för utdatafil
+Locking the window	VideoConsumer.cpp		Låser fönstret
 Cannot find an available video stream	CodyCam		Kan inte hitta någon tillgänglig videoström
 Upload…	VideoConsumer.cpp		Ladda upp...
 password expected	CodyCam		lösenord förväntas
@@ -64,8 +66,6 @@ Local	CodyCam		Lokal
 Stop video	CodyCam		Stoppa video
 Last Capture: 	VideoConsumer.cpp		Senaste bild:
 Rate:	CodyCam		Flöde:
-File %s ; Line %ld # unterminated quote\n	SettingsHandler		Fil %s ; Linje %ld # oterminerat citat\n
-File %s # unterminated quote at end of file\n	SettingsHandler		Fil %s  # oterminerat citat vid slutet av filen\n
 Couldn't find requested directory on server	VideoConsumer.cpp		Kunde inte hitta den begärda katalogen på servern
 Cannot find the media roster	CodyCam		Kan inte hitta mediaförteckningen
 Type:	CodyCam		Typ:
@@ -77,7 +77,6 @@ File	CodyCam		Arkiv
 read: %ld\n	SftpClient		läst: %ld\n
 Every hour	CodyCam		Varje timme
 login ID expected	CodyCam		Inloggningsid förväntas
-File %s; Line %ld # %s	SettingsHandler		Fil %s; Linje %ld # %s
 Video settings	CodyCam		Videoinställningar
 Can't find an available connection to the video window	CodyCam		Kan inte hitta en tillgänglig anslutning till videofönstret
 FTP	CodyCam		FTP
@@ -86,5 +85,4 @@ Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Kan inte
 Logging in…	VideoConsumer.cpp		Loggar in…
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Fel vid skrivning av utdatafil
-unknown command	SettingsHandler		okänt kommando
 Capture controls	CodyCam		Inhämtningsinställningar

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-CodyCam	3200733765
+1	french	x-vnd.Haiku-CodyCam	2593355250
 destination directory expected	CodyCam		dossier de destination attendu
 reply: '%s'\n	SftpClient		réponse : '%s'\n
 JPEG image	CodyCam		Image JPEG
@@ -27,6 +27,7 @@ Every 2 hours	CodyCam		Toutes les 2 heures
 Cannot get a time source	CodyCam		Impossible de trouver une référence de temps
 Every 4 hours	CodyCam		Toutes les 4 heures
 cmd: '%s'\n	FtpClient		cmd : '%s'\n
+Closing the window	VideoConsumer.cpp		Fermeture de la fenêtre
 Never	CodyCam		Jamais
 Every 8 hours	CodyCam		Toutes les 8 heures
 Cannot start the video source	CodyCam		Impossible d’initier la source vidéo
@@ -38,6 +39,7 @@ still image filename expected	CodyCam		nom de fichier d’image attendu
 File name:	CodyCam		Nom du fichier :
 Directory:	CodyCam		Dossier :
 Error setting type of output file	VideoConsumer.cpp		Impossible d’ajuster le type du fichier de sortie
+Locking the window	VideoConsumer.cpp		Verrouillage de la fenêtre
 Cannot find an available video stream	CodyCam		Impossible de trouver un flux vidéo disponible
 Upload…	VideoConsumer.cpp		Envoyer…
 password expected	CodyCam		mot de passe attendu
@@ -64,8 +66,6 @@ Local	CodyCam		Local
 Stop video	CodyCam		Arrêter la vidéo
 Last Capture: 	VideoConsumer.cpp		Dernière capture : 
 Rate:	CodyCam		Vitesse :
-File %s ; Line %ld # unterminated quote\n	SettingsHandler		Fichier %s ; ligne %ld # Guillemet non fermé\n
-File %s # unterminated quote at end of file\n	SettingsHandler		Fichier %s # guillemet non fermé à la fin du fichier\n
 Couldn't find requested directory on server	VideoConsumer.cpp		Impossible de trouver le dossier demandé sur le serveur
 Cannot find the media roster	CodyCam		Impossible de trouver le diagramme des médias
 Type:	CodyCam		Type :
@@ -77,7 +77,6 @@ File	CodyCam		Fichier
 read: %ld\n	SftpClient		lire : %ld\n
 Every hour	CodyCam		Toutes les heures
 login ID expected	CodyCam		identifiant attendu
-File %s; Line %ld # %s	SettingsHandler		Fichier %s; Ligne %ld # %s
 Video settings	CodyCam		Réglages vidéo
 Can't find an available connection to the video window	CodyCam		Impossible de trouver une connexion avec la fenêtre vidéo
 FTP	CodyCam		FTP
@@ -86,5 +85,4 @@ Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Impossib
 Logging in…	VideoConsumer.cpp		Connexion…
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Erreur d’écriture du fichier de sortie
-unknown command	SettingsHandler		command inconnue
 Capture controls	CodyCam		Contrôles de capture

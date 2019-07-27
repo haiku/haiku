@@ -1,0 +1,7 @@
+1	friulian	x-vnd.Haiku-debug_server	166857212
+Debug	DebugServer		Debug
+Terminate	DebugServer		Termine
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		Par vie di un errore, la aplicazion:\n\n      %app\n\nno pues continuâ la esecuzion e e vignarà terminade e netade di Haiku.
+Save report	DebugServer		Salve rapuart
+Write core file	DebugServer		Scrîf file cul stât de memorie
+Oh no!	DebugServer		Orpo!

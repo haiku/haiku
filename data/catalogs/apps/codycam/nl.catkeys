@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-CodyCam	3200733765
+1	dutch; flemish	x-vnd.Haiku-CodyCam	1770279704
 destination directory expected	CodyCam		doelmap verwacht
 reply: '%s'\n	SftpClient		antwoord: '%s'\n
 JPEG image	CodyCam		JPEG-afbeelding
@@ -64,8 +64,6 @@ Local	CodyCam		Lokaal
 Stop video	CodyCam		Stop video
 Last Capture: 	VideoConsumer.cpp		Laatst vastgelegd:
 Rate:	CodyCam		Snelheid:
-File %s ; Line %ld # unterminated quote\n	SettingsHandler		Bestand %s ; Regel %ld # niet-afgesloten aanhalingsteken\n
-File %s # unterminated quote at end of file\n	SettingsHandler		Bestand %s # niet-afgesloten aanhalingsteken aan het eind van bestand\n
 Couldn't find requested directory on server	VideoConsumer.cpp		Kan opgegeven map op server niet vinden
 Cannot find the media roster	CodyCam		Kan medianaamlijst niet vinden
 Type:	CodyCam		Type:
@@ -77,7 +75,6 @@ File	CodyCam		Bestand
 read: %ld\n	SftpClient		lees: %ld\n
 Every hour	CodyCam		Elk uur
 login ID expected	CodyCam		login ID verwacht
-File %s; Line %ld # %s	SettingsHandler		Bestand %s; Regel %ld # %s
 Video settings	CodyCam		Video-instellingen
 Can't find an available connection to the video window	CodyCam		Kan geen beschikbare verbinding naar het videovenster vinden
 FTP	CodyCam		FTP
@@ -86,5 +83,4 @@ Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Geen vid
 Logging in…	VideoConsumer.cpp		Inloggen...
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Fout bij het maken van het uitvoerbestand
-unknown command	SettingsHandler		onbekende opdracht
 Capture controls	CodyCam		Besturing voor het vastleggen

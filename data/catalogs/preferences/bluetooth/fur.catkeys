@@ -1,0 +1,55 @@
+1	friulian	x-vnd.Haiku-BluetoothPrefs	4276705900
+Laptop	Settings view		Portatil
+Only from trusted devices	Settings view		Dome di dispositîfs fidâts
+15 secs	Settings view		15 seconts
+Quit	main		Jes
+Manufacturer: 	Device View		Fabricant: 
+Desktop	Settings view		Scritori
+Server	Window		Servidôr
+Identify host as:	Settings view		Identifiche host come:
+Refresh…	Remote devices		Inzorne…
+Local devices found on system:	Settings view		Dispositîfs locâi cjatâts sul sisteme:
+Service classes: 	Device View		Classis di servizi: 
+Remote devices	Window		Dispositîfs rimots
+Settings	Window		Impostazions
+Stop bluetooth services…	Window		Ferme i servizis bluetooth…
+61 secs	Settings view		61 seconts
+Add…	Remote devices		Zonte…
+As blocked	Remote devices		Come blocât
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Nol è presint nissun dispositîf locâl Bluetooth regjistrât sul sisteme.
+Policy…	Settings view		Politiche…
+Revert	Window		Torne indaûr
+Refresh local devices…	Window		Inzornament dispositîfs locâi…
+Disconnect	Remote devices		Disconeti
+Identify us as…	Settings view		Identifichinus come…
+From all devices	Settings view		Di ducj i dispositîfs
+Defaults	Window		Predefinîts
+Start bluetooth services…	Window		Invie servizis bluetooth…
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Controle che lis funzionalitâts Bluetooth dal dispositîf rimot a sedin ativadis. Frache 'Interoghe' par inviâ la ricercje. Il timp che al covente par recuperâ i nons nol è cognossût, dut câs nol varès di cjapâ plui di 3 seconts par dispositîf. Daspò si podarà zontâju ae liste principâl, dulà che si podarà associâsi cun lôr.
+Scanning progress	Inquiry panel		Progrès de ricercje
+Bluetooth	System name		Bluetooth
+Launch now	main		Inviâ cumò
+Remove	Remote devices		Gjave
+Pick device…	Settings view		Sielç dispositîf…
+Always ask	Settings view		Domande simpri
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Cul supuart di:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nGraciis aes personis che a àn judât…\n\nSpedint/donant hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nIn maniere economiche:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nCun corezions:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nProvant:\n - Petter H. Juliussen\nA ducj chei che mi àn insegnât:\n - il grup di yellowTAB
+Help	Window		Jutori
+Pair…	Remote devices		Associe…
+Retrieving name of %1	Inquiry panel		Recupar dal non di %1
+Inquiry	Inquiry panel		Interoghe
+Incoming connections policy:	Settings view		Politiche pes conessions in jentrade:
+Retrieving names…	Inquiry panel		Daûr a recuperâ i nons…
+Show name	Extended local device view		Mostre non
+Add device to list	Inquiry panel		Zonte dispositîf ae liste
+Remaining %1 seconds	Inquiry panel		A restin ancjemò %1 seconts
+The Bluetooth services are not currently running on this system.	main		I servizis Bluetooth pal moment no son in esecuzion su chest sisteme.
+Discoverable	Extended local device view		Visibil
+Authenticate	Extended local device view		Autenticazion
+Smart phone	Settings view		Smartphone
+Scanning completed.	Inquiry panel		Ricercje completade.
+Default inquiry time:	Settings view		Timp di interogazion predefinît:
+Server	Settings view		Servidôr
+Handheld	Settings view		Palmâr
+ packets: 	Device View		 pachets: 
+About Bluetooth…	Window		Informazions su Bluetooth…
+Starting scan…	Inquiry panel		Inizi scansion…

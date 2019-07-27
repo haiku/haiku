@@ -1,0 +1,50 @@
+1	friulian	x-vnd.Haiku-ProcessController	168752057
+Error saving file	ProcessController		Erôr tal salvâ il file
+Display priority	ProcessController		Prioritât di visualizazion
+That's no Fun!	ProcessController		Nol fâs ridi!
+What do you want to do with the team \"%s\"?	ProcessController		Ce vûstu fâ cul complès \"%s\"?
+Your setting file could not be saved!\n(%s)	ProcessController		Il to file des impostazions nol pues jessi salvât!\n(%s)
+Processor %d	ProcessController		Processôr %d
+Live in the Deskbar	ProcessController		Vîf tal Deskbar
+Kill this team!	ProcessController		Cope chest complès!
+OK	ProcessController		Va ben
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Si pues eseguî "Controlôr dai procès" intun barcon o instalâlu tal Deskbar.
+Real-time priority	ProcessController		Prioritât in timp reâl
+Custom priority	ProcessController		Prioritât personalizade
+Debug this thread!	ProcessController		Eseguìs il debug di chest thread!
+Low priority	ProcessController		Prioritât basse
+Urgent display priority	ProcessController		Prioritât visualizazion urgjente
+Memory usage	ProcessController		Ûs de memorie
+Ok!	ProcessController		Va ben!
+Normal priority	ProcessController		Prioritât normâl
+Restart Deskbar	ProcessController		Torne invie Deskbar
+About ProcessController…	ProcessController		Informazions su Controlôr dai procès…
+Usage: %s [-deskbar]\n	ProcessController		Ûs: %s [-deskbar]\n
+Please confirm	ProcessController		Conferme
+Urgent priority	ProcessController		Prioritât Urgjente
+What do you want to do with the thread \"%s\"?	ProcessController		Ce vûstu fâ cul thread \"%s\"?
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+Idle priority	ProcessController		Prioritât inatîf
+Real-time display priority	ProcessController		Prioritât visualizazion in timp reâl
+Threads and CPU usage	ProcessController		Thread e ûs de CPU
+Quit application	ProcessController		Jes de aplicazion
+Info	ProcessController		Informazions
+Kill this thread!	ProcessController		Cope chest thread!
+This team is already gone…	ProcessController		Chest complès al è za lât…
+Gone teams…	ProcessController		Complès lâts…
+Quit an application	ProcessController		Siere une aplicazion
+Cancel	ProcessController		Cancele
+Install in Deskbar	ProcessController		Instale tal Deskbar
+Debug this team!	ProcessController		Fâs il debug di chest complès!
+Low latency	ProcessController		Timp di rispueste bas
+ProcessController	System name		Controlôr dai procès
+Lowest active priority	ProcessController		Prioritât ative plui basse
+Restart Tracker	ProcessController		Torne invie Tracker
+System resources & caches…	ProcessController		Risorsis di sisteme e cache…
+Damned!	ProcessController		Maledizion!
+New Terminal	ProcessController		Gnûf terminâl
+Power saving	ProcessController		Sparagn energjetic
+ProcessController is already installed in Deskbar.	ProcessController		Controlôr dai procès al è za instalât tal Deskbar.
+This is the last active processor…\nYou can't turn it off!	ProcessController		Chest al è l'ultin processôr atîf…\nNo si pues distudâlu!
+This thread is already gone…	ProcessController		Chest thread al è za lât…
+Run in window	ProcessController		Eseguìs tal barcon

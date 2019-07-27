@@ -1,0 +1,20 @@
+1	friulian	x-vnd.Haiku-MidiPlayer	1046133011
+This tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Cheste piçule aplicazion\nE sa cemût sunâ miârs di\nCjançonutis  smorfeosis
+Dungeon	Main Window		Pereson
+Could not load song	Main Window		Impussibil cjariâ la cjançon
+Igor's lab	Main Window		Laboratori di Igor
+Off	Main Window		Disativât
+Loading instruments…	Scope View		Daûr a cjariâ i struments…
+Volume:	Main Window		Volum:
+Closet	Main Window		Armâr
+Scope	Main Window		Ossiloscopi
+Drop MIDI file here	Scope View		Mole un file MIDI achì
+None	Main Window		Nissun
+Reverb:	Main Window		Rivoc:
+MidiPlayer	System name		MidiPlayer
+OK	Main Window		Va ben
+Stop	Main Window		Ferme
+Live input:	Main Window		Jentrade direte:
+Garage	Main Window		Garage
+Play	Main Window		Riprodûs
+Cavern	Main Window		Landri

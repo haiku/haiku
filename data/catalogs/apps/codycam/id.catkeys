@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-CodyCam	3200733765
+1	indonesian	x-vnd.Haiku-CodyCam	1770279704
 destination directory expected	CodyCam		direktori tujuan diharapkan
 reply: '%s'\n	SftpClient		balas: '%s'\n
 JPEG image	CodyCam		Gambar JPEG
@@ -64,8 +64,6 @@ Local	CodyCam		Lokal
 Stop video	CodyCam		Hentikan video
 Last Capture: 	VideoConsumer.cpp		Pengambilan Terakhir: 
 Rate:	CodyCam		Laju:
-File %s ; Line %ld # unterminated quote\n	SettingsHandler		Berkas %s ; Baris %ld # kutipan tidak selesai\n
-File %s # unterminated quote at end of file\n	SettingsHandler		Berkas %s # kutipan belum selesai pada akhir file\n
 Couldn't find requested directory on server	VideoConsumer.cpp		Tidak dapat menemukan direktori yang diminta pada peladen
 Cannot find the media roster	CodyCam		Tidak dapat menemukan daftar media
 Type:	CodyCam		Tipe:
@@ -77,7 +75,6 @@ File	CodyCam		Berkas
 read: %ld\n	SftpClient		baca: %ld\n
 Every hour	CodyCam		Setiap jam
 login ID expected	CodyCam		ID login diharapkan
-File %s; Line %ld # %s	SettingsHandler		Berkas %s; Baris %ld # %s
 Video settings	CodyCam		Pengaturan video
 Can't find an available connection to the video window	CodyCam		Tidak dapat menemukan ketersediaan koneksi ke jendela video
 FTP	CodyCam		FTP
@@ -86,5 +83,4 @@ Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Tidak da
 Logging in…	VideoConsumer.cpp		Masuk…
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Galat menulis berkas keluaran
-unknown command	SettingsHandler		perintah tidak dikenal
 Capture controls	CodyCam		Kontrol penangkapan

@@ -58,8 +58,8 @@ Send	RatePackageWindow		Poslať
 Start package daemon	App		Spustiť démona balíkov
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Heslo je príliš slabé alebo je neplatné. Použite najmenej 8 znakov s aspoň 2 číslami a 2 veľkými písmenami.
 The package action could not be scheduled: %Error%	PackageInfoView		Operáciu s balíkom nebolo možné naplánovať: %Error%
-Inactive	PackageListView		Neaktívne
 Cancel	RatePackageWindow		Zrušiť
+Inactive	PackageListView		Neaktívne
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# položka} few{# položky} other{# položiek}}
 OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Sťahuje sa:

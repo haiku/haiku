@@ -1,0 +1,157 @@
+1	friulian	x-vnd.Haiku-FileTypes	734679611
+Left	Attribute Window	Attribute column alignment in Tracker	Çampe
+Final	Application Types Window		Finâl
+FileTypes request	FileTypes Window		Richieste di FileTypes
+This file type already exists	New File Type Window		Chest gjenar di file al esist za
+Preferred application	FileTypes Window		Aplicazion preferide
+Launch	Application Types Window		Invie
+Removing uninstalled application types	Application Types Window		Rimozion dai gjenars di aplicazions disinstaladis
+Width:	Attribute Window	Default column width in Tracker for this attribute.	Largjece:
+Same as…	FileType Window	The same TYPE as ...	Il stes di…
+(from super type)	FileTypes Window		(dal super-gjenar)
+Select same preferred application as	FileTypes Window		Selezione la stesse aplicazion preferide di
+Could not change attributes	Attribute Window		Impussibil modificâ i atribûts
+Icon	FileTypes Window		Icone
+Add…	Application Type Window		Zonte…
+Attribute name:	Attribute Window		Non atribût:
+Long description:	Application Type Window		Descrizion lungje:
+Cancel	Preferred App Menu		Anule
+Remove	FileTypes Window		Gjave
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		La aplicazion \"%s\" no supuarte chest gjenar di file.\nStabilîlu distès?
+Remove	Application Type Window		Gjave
+Gamma	Application Type Window		Schirie
+Cancel	Application Type Window		Anule
+Attribute	Attribute Window		Atribût
+Multiple launch	Application Type Window		Inviament multipli
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# Gjenar di aplicazion al pues jessi gjavât} other{# Gjenars di aplicazion a puedin jessi gjavâts}}
+Edit…	Application Types Window		Modifiche…
+Could not set preferred application	FileTypes Window		Impussibil stabilî la aplicazion preferide
+Description	FileTypes Window		Descrizion
+Signature:	Application Types Window		Firme:
+None	FileTypes Window		Nissun
+Exclusive launch	Application Type Window		Inviament esclusîf
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Gjavâ un gjenar di file e je une azion che no si pues anulâ.\nGjavâle pardabon?
+Cancel	New File Type Window		Anule
+Select same preferred application as	FileType Window		Selezione la stesse aplicazion preferide di
+Cancel	Type List Window		Anule
+Don't save	Application Type Window		No sta salvâ
+Center	Attribute Window	Attribute column alignment in Tracker	Centre
+Done	Extension Window		Fat
+Development	Application Types Window		Disvilup
+Abort	Application Types Window		Cancele
+Save	Application Type Window		Salve
+Same as…	FileType Window	The same APPLICATION as ...	La stesse di…
+%1 application type	Application Type Window		Gjenar di aplicazion %1
+Icon	Application Type Window		Icone
+Version:	Application Type Window		Version:
+Default application	FileType Window		Aplicazion predefinide
+Internal name:	New File Type Window		Non interni:
+Extension:	Extension Window		Estension:
+Extensions:	FileTypes Window		Estensions:
+Select preferred application	FileType Window		Selezione aplicazion preferide
+Description:	FileTypes Window		Descrizion:
+Multiple files from \"%s\" file type	FileType Window		Multiplis file dal gjenar di file \"%s\"
+Add new group	New File Type Window		Zonte gnûf grup
+Remove uninstalled	Application Types Window		Gjave disinstalâts
+File	Application Type Window		File
+Progress	Application Types Window		Progrès
+Select…	FileType Window		Selezione…
+Information	Application Types Window		Informazions
+Settings	FileTypes Window		Impostazions
+Done	Attribute Window		Fat
+FileTypes request	FileTypes		Richieste di FileTypes
+Select same type as	FileType Window		Selezione il stes gjenar di
+Version:	Application Types Window		Version:
+Application types	Application Types Window		Gjenars di aplicazion
+(from application)	FileTypes Window		(de aplicazion)
+Description:	Application Types Window		Descrizion:
+Name:	Application Types Window		Non:
+File could not be opened	Preferred App Menu		Impussibil vierzi il file
+Args only	Application Type Window		Dome argoments
+Could not open \"%s\":\n%s	FileTypes		Impussibil vierzi \"%s\":\n%s
+Right	Attribute Window	Attribute column alignment in Tracker	Diestre
+Save changes before closing?	Application Type Window		Salvâ modifichis prime di sierâ?
+Background app	Application Type Window		Aplicazion eseguide in fonts
+Recognition rule is not valid:\n\n	FileTypes Window		Regule pal ricognossiment no valide:\n\n
+Show icons in list	FileTypes Window		Mostre lis iconis te liste
+Editable	Attribute Window	If Tracker allows to edit this attribute.	Modificabil
+New resource file…	FileTypes Window		Gnûf file risorse…
+[Multiple files] file types	FileType Window		[File multiplis] gjenars di file
+Application type	Application Type Window		Gjenar di aplicazion
+Show in Tracker…	Application Types Window		Mostre tal Tracker…
+Type name:	FileTypes Window		Non dal gjenar:
+Visible	Attribute Window		Visibil
+Select preferred application	FileTypes Window		Selezione aplicazion preferide
+Path:	Application Types Window		Percors:
+Could not install file type	New File Type Window		Impussibil instalâ il gjenar di file
+Same as…	FileTypes Window		Il stes di…
+Golden master	Application Type Window		Golden master
+FileTypes request	Preferred App Menu		Richieste di FileTypes
+Single launch	Application Type Window		Inviament singul
+no icon	FileTypes Window		nissune icone
+%s file type	FileType Window		Gjenar di file %s
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		La rimozion di un super-gjenar no pues jessi anulade.\nDucj i gjenars di file che a fasin part di chest super-gjenar a laran pierdûts!\n\nContinuâ pardabon? Par gjavâ il grup intîr, ten fracât il tast Maiusc e frache \"Gjave\".
+Add type	New File Type Window		Zonte gjenar
+Remove icon	Icon View		Gjave icone
+Cancel	Extension Window		Anule
+Alignment:	Attribute Window		Inliniament:
+Icon	FileType Window		Icone
+Signature:	Application Type Window		Firme:
+Development	Application Type Window		Disvilup
+Golden master	Application Types Window		Golden master
+Add	Extension Window		Zonte
+Open…	FileTypes Window		Vierç…
+Could not change file extensions	Extension Window		Impussibil modificâ lis estensions dal file
+Could not open file	FileType Window		Impussibil vierzi il file
+Choose type	Type List Window		Sielç gjenar
+Select…	FileTypes Window		Selezione…
+File recognition	FileTypes Window		Ricognossiment dal file
+Application types…	FileTypes Window		Gjenars di aplicazions…
+Add icon…	Icon View		Zonte icone…
+Cancel	FileTypes Window		Anule
+Save into resource file…	Application Type Window		Salve intun file risorse…
+Special:	Attribute Window		Speciâl:
+Type:	Attribute Window		Gjenar:
+Could not retrieve application signature	Preferred App Menu		Impussibil cjatâ la firme de aplicazion
+Beta	Application Types Window		Beta
+Add group	New File Type Window		Zonte grup
+Cancel	Attribute Window		Anule
+Gamma	Application Types Window		Schirie
+Supported types	Application Type Window		Gjenars supuartâts
+Beta	Application Type Window		Beta
+Could not retrieve preferred application of this file	Preferred App Menu		Impussibil recuperâ la aplicazion preferide par chest file
+Application flags	Application Type Window		Opzions aplicazion
+OK	FileTypes		Va ben
+Group name:	New File Type Window		Non dal grup:
+Move up	FileTypes Window		Sposte jù
+Add	Attribute Window		Zonte
+File	FileTypes Window		File
+Open file	FileTypes		Vierç file
+Version info	Application Type Window		Informazions version
+Final	Application Type Window		Finâl
+Preferred application	FileType Window		Aplicazion preferide
+FileTypes	FileTypes		FileTypes
+Set preferred application	Preferred App Menu		Stabilìs aplicazion preferide
+New file type	New File Type Window		Gnûf gjenar di file
+Short description:	Application Type Window		Descrizion curte:
+Save request	Application Type Window		Salve richieste
+Could not remove file type: %s\n	FileTypes Window		Impussibil gjavâ il gjenar di file: %s\n
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	Mostre come:
+Done	Type List Window		Fat
+Extra attributes	FileTypes Window		Atribûts adizionâi
+Group:	New File Type Window		Grup:
+Alpha	Application Types Window		Alfa
+Close	Application Type Window		Siere
+Extension	Extension Window		Estension
+Rule:	FileTypes Window		Regule:
+FileTypes	System name		Gjenars di file
+Version	Application Types Window		Version
+Quit	FileTypes Window		Jes
+File type	FileType Window		Gjenar di file
+Internal name:	FileTypes Window		Non interni:
+Add…	FileTypes Window		Zonte…
+Edit icon…	Icon View		Modifiche icone…
+Internal name:	Attribute Window		Non interni:
+Show recognition rule	FileTypes Window		Mostre regule di ricognossiment
+Move down	FileTypes Window		Sposte jù
+Alpha	Application Type Window		Alfa

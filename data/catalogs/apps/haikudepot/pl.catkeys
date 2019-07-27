@@ -58,8 +58,8 @@ Send	RatePackageWindow		Wyślij
 Start package daemon	App		Uruchom demona pakietów
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Hasło jest zbyt słabe lub niepoprawne. Użyj minimum 8 znaków, w tym co najmniej 2 cyfr i 2 wielkich liter.
 The package action could not be scheduled: %Error%	PackageInfoView		Akcja dla pakietu nie mogła zostać dodana do kolejki: %Error%
-Inactive	PackageListView		Nieaktywny
 Cancel	RatePackageWindow		Anuluj
+Inactive	PackageListView		Nieaktywny
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# element} few{# elementy} many{# elementów} other{# elementu}}
 OK	PackageInfoView		OK
@@ -73,8 +73,8 @@ Failed to create account: %s\n	UserLoginWindow		Nie udało się utworzyć konta:
 Size	PackageListView		Rozmiar
 Your rating:	RatePackageWindow		Twoja ocena:
 All categories	FilterView		Wszystkie kategorie
-n/a	PackageInfoView		Nie dotyczy
 Repositories	MainWindow		Repozytoria
+n/a	PackageInfoView		Nie dotyczy
 Cancel	MainWindow		Anuluj
 Refresh repositories	MainWindow		Odśwież repozytoria
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Jeśli nie podasz adresu e-mail, nie będziesz mógł zresetować hasła, jeśli go zapomnisz.

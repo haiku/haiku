@@ -1,0 +1,7 @@
+1	friulian	x-vnd.Haiku-SpamFilter	468104950
+or empty e-mail	SpamFilterConfig		o une e-mail vueide
+Genuine below and uncertain above:	SpamFilterConfig		Bogns sot e suspietâts parsore:
+Spam above:	SpamFilterConfig		Pueste malvolude parsore:
+Add spam rating to start of subject	SpamFilterConfig		Zonte valutazion pai malvolûts al inizi dal ogjet
+Bayesian Spam Filter	SpamFilter		Filtri malvolûts Bayesian
+Learn from all incoming e-mail	SpamFilterConfig		Impare di dutis lis e-mail in jentrade

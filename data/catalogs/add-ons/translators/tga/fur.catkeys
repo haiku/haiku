@@ -1,0 +1,16 @@
+1	friulian	x-vnd.Haiku-TGATranslator	3075011211
+Save with RLE compression	TGAView		Salve cun compression RLE
+Targa image (%d bits truecolor)	TGATranslator		Imagjin Targa (%d bit colôrs reâi)
+Ignore TGA alpha channel	TGAView		Ignore il canâl alfa TGA
+Targa image (%d bits colormap)	TGATranslator		Imagjin Targa (%d bit mape di colôr)
+TGA image translator	TGAView		Tradutôr di imagjin TGA
+Targa image (%d bits RLE colormap)	TGATranslator		Imagjin Targa (%d bit mape di colôr RLE)
+Targa image (%d bits gray)	TGATranslator		Imagjin Targa (%d bit di grîs)
+Written by the Haiku Translation Kit Team	TGAView		Scrit dal Grup dal Translation Kit di Haiku
+Targa image (%d bits RLE truecolor)	TGATranslator		Imagjin Targa (%d bit colôrs reâi RLE)
+TGA images	TGATranslator		Imagjins TGA
+Version %d.%d.%d, %s	TGAView		Version %d.%d.%d, %s
+TGATranslator Settings	TGATranslator		Impostazions TGATranslator
+TGA image translator	TGATranslator		Tradutôr imagjin TGA
+Targa image (%d bits RLE gray)	TGATranslator		Imagjin Targa (%d bit RLE di grîs)
+TGA Settings	TGAMain		Impostazions TGA

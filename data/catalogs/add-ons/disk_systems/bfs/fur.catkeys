@@ -1,0 +1,8 @@
+1	friulian	x-vnd.Haiku-BFSAddOn	1570987954
+Enable query support	BFS_Initialize_Parameter		Ative supuart pes interogazions
+Disabling query support may speed up certain file system operations, but should\nonly be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		Disabilitant il supuart pes interogazions si podarès sveltî cualchi operazion dal file system,\nma si varès di fâlu dome se un al è sigûr dal dut che no i coventaran lis interogazions.\nCualsisei volum che al è destinât al inviament di Haiku al scugne vê abilitât il supuart pes interogazions.
+Name:	BFS_Initialize_Parameter		Non:
+8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (Pai file grancj)
+2048 (Recommended)	BFS_Initialize_Parameter		2048 (Conseât)
+1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (Pai file piçui)
+Blocksize:	BFS_Initialize_Parameter		Dimension bloc:

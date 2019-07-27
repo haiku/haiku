@@ -1,0 +1,27 @@
+1	friulian	x-vnd.Haiku.TV	1995288111
+No menu	MainWin		Nissun menù
+No border	MainWin		Nissun ôr
+force 704 x 576, display aspect 4:3	MainWin		sfuarce 704 x 576, aspiet dal visôr 4:3
+Error, connecting to interface failed:\n\n	MainWin		Erôr, la conession ae interface e je falide:\n\n
+force 544 x 576, display aspect 4:3	MainWin		sfuarce 544 x 576, aspiet dal visôr 4:3
+Full screen	MainWin		A plen visôr
+Scale to native size	MainWin		Dimensions origjinâls
+unknown	MainWin		no cognossût
+Next channel	MainWin		Prossim canâl
+Keep aspect ratio	MainWin		Conserve proporzions
+DVB - Digital Video Broadcasting TV	MainWin		DVB - Trasmission TV Video Digjitâl
+Always on top	MainWin		Simpri denant
+Debug	MainWin		Debug
+Interface	MainWin		Interface
+force 720 x 576, display aspect 4:3	MainWin		sfuarce 720 x 576, aspiet dal visôr 4:3
+Quit	MainWin		Jes
+Channel	MainWin		Canâl
+Previous channel	MainWin		Canâl precedent
+OK	MainWin		Va ben
+TV	MainWin		TV
+Settings	MainWin		Impostazions
+TV	System name		TV
+Settings…	MainWin		Impostazions…
+None	MainWin		Nissun
+Error, interface is busy:\n\n	MainWin		Erôr, la interface e je ocupade:\n\n
+pixel aspect ratio	MainWin		proporzion dal pixel

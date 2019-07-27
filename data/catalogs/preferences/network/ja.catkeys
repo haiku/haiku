@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Network	3145282573
+1	japanese	x-vnd.Haiku-Network	1741006816
 Ethernet device	InterfaceListItem		イーサネットデバイス
 Link speed:	IntefaceView		リンクスピード:
 disconnected	IntefaceView		切断済み
@@ -32,6 +32,7 @@ WPA2	WPA2 protected network		ネットマスクはローカルネットワーク
 Show network status in Deskbar	NetworkWindow		Deskbar にネットワークの状況を表示する
 Mode:	IntefaceAddressView		モード:
 connected	InterfaceListItem		接続済み
+OK	NetworkWindow		OK
 Static	IntefaceAddressView		固定 IP
 launch error	NetworkWindow		その他
 Renegotiate	IntefaceView		再ネゴシエート

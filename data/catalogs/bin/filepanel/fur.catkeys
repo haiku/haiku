@@ -1,0 +1,20 @@
+1	friulian	x-vnd.mmu_man.filepanel	1802971238
+display a load/save file panel\n	FilePanelApp		visualize un panel par cjariâ/salvâ i file\n
+short\tlong\tdescription\n	FilePanelApp		curt\tlunc\tdescrizion\n
+%s not a valid option\n	FilePanelApp		%s no je une opzion valide\n
+-s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tdopre un FilePanel par salvâ\n
+%s: this option requires a parameter\n	FilePanelApp		%s: cheste opzion e domande un parametri\n
+-h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tvisualize utilizazion\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tdopre un FilePanel par cjariâ (predefinît)\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tstabilìs il non predefinît pai salvaments\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tGjenar di vôs che a puedin jessi viertis: cualsisei cumbinazion di f, d, s (file (predefinît), cartele, colegament simbolic)\n
+%s: UNIMPLEMENTED\n	FilePanelApp		%s: NO IMPLEMENTÂT\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tstabilìs il titul dal barcon dal FilePanel\n
+-f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tno implementât\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		ûs: %s [-h]     [-d cartele]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a scheme]      [-f scheme]\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tal è permetût selezionâ dome un file\n
+-a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tno implementât\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tal rint modâl il FilePanel\n
+options:\n	FilePanelApp		opzions:\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tvierç in <cartele>\n
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		ûs: %s [--help (jutori)] [--directory folder (cartele)] [--load|--save (cjarie o salve)] [--title ttl (titul)] [--single (singul)] [--modal (modâl)] [--allow pattern (permet model)] [--forbid pattern (proibìs model)]\n

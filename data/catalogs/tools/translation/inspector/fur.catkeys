@@ -1,0 +1,32 @@
+1	friulian	x.vnd.OBOS-Inspector	577867100
+\nInput Formats:	ImageView		\nFormâts di jentrade:
+Next Page	ImageWindow		Pagjine sucessive
+Previous Page	ImageWindow		Pagjine precedente
+Active Translators	InspectorApp		Tradutôrs atîfs
+System Translators	ActiveTranslatorsWindow		Tradutôrs di sisteme
+\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nGjenar: '%1' (%2)\nGrup: '%3' (%4)\nCualitât: %5\nCapacitât: %6\nGjenar MIME: %7\nNon: %8\n
+OK	ImageWindow		Va ben
+View	ImageWindow		Visualize
+Open…	ImageWindow		Vierç…
+Save feature not implemented yet.	ImageWindow		Il salvament nol è stât ancjemò implementât.
+Active Translators	ImageWindow		Tradutôrs atîfs
+Info	ImageWindow		Informazions
+Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Imagjin: %1\nSpazi colôr: %2 (%3)\nDimensions: %4 x %5\nByte par Rie: %6\nByte totâi: %7\n\nInformazion di identitât:\nStringhe ID: %8\nGjenar MIME: %9\nGjenar: '%10' (%11)\nID Tradutôr: %12\nGrup: '%13' (%14)\nCualitât: %15\nCapacitât: %16\n\nInformazion estension:\n
+No image available to save.	ImageWindow		Nissune imagjin disponibile pal salvament.
+OK	ImageView		Va ben
+Bummer	ImageWindow		Pecjât
+\nOutput Formats:	ImageView		\nFormâts di jessude:
+Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Numar di documents:%1\n\nTradutôr Doprât:\nNon: %2\nInfo: %3\nVersion: %4\n
+User Translators	ActiveTranslatorsWindow		Tradutôrs dal Utent
+Last Page	ImageWindow		Ultime Pagjine
+\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nTradutôr doprât:\nNon: %1\nInfo: %2\nVersion: %3\n
+Unknown	ImageView		No cognossût
+Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Barcon di informazion
+Sorry, unable to load the image.	ImageView		Impussibil cjariâ la imagjin.
+File	ImageWindow		File
+Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Document selezionât: %1\n\nTradutôr doprât:\nNon: %2\nInformazion: %3\nVersion: %4\n
+Quit	ImageWindow		Jes
+Sorry, unable to write the image file.	ImageView		Impussibil scrivi il file imagjin.
+Save…	ImageWindow		Salve…
+Window	ImageWindow		Barcon
+First Page	ImageWindow		Prime pagjine

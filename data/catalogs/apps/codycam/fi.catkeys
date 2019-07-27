@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-CodyCam	3200733765
+1	finnish	x-vnd.Haiku-CodyCam	1770279704
 destination directory expected	CodyCam		odotettiin kohdehakemistoa
 reply: '%s'\n	SftpClient		vastaus: ’%s’\n
 JPEG image	CodyCam		JPEG-kuva
@@ -64,8 +64,6 @@ Local	CodyCam		Paikallinen
 Stop video	CodyCam		Pysäytä video
 Last Capture: 	VideoConsumer.cpp		Viimeisin kaappaus: 
 Rate:	CodyCam		Taajuus:
-File %s ; Line %ld # unterminated quote\n	SettingsHandler		Tiedosto %s ; Rivi %ld # päättämätön lainaus\n
-File %s # unterminated quote at end of file\n	SettingsHandler		Tiedosto %s # päättämätön lainaus tiedoston lopussa\n
 Couldn't find requested directory on server	VideoConsumer.cpp		Pyydetyn hakemiston löytäminen palvelimelta epäonnistui
 Cannot find the media roster	CodyCam		Medialuettelon löytäminen epäonnistui
 Type:	CodyCam		Tyyppi:
@@ -77,7 +75,6 @@ File	CodyCam		Tiedosto
 read: %ld\n	SftpClient		luettu: %ld\n
 Every hour	CodyCam		Joka tunti
 login ID expected	CodyCam		odotettiin kirjautumistunnusta
-File %s; Line %ld # %s	SettingsHandler		Tiedosto %s; Rivi %ld # %s
 Video settings	CodyCam		Video-asetukset
 Can't find an available connection to the video window	CodyCam		Käytettävissä olevan yhteyden löytäminen videoikkunaan epäonnistui
 FTP	CodyCam		FTP
@@ -86,5 +83,4 @@ Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Videolä
 Logging in…	VideoConsumer.cpp		Kirjaudutaan…
 CodyCam	System name		Cody-kameraohjelma
 Error writing output file	VideoConsumer.cpp		Virhe kirjoitettaessa tulostetiedostoa
-unknown command	SettingsHandler		tuntematon komento
 Capture controls	CodyCam		Kaappausohjaimet

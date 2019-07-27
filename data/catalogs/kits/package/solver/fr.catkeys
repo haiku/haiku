@@ -1,5 +1,5 @@
 1	french	x-vnd.Haiku-libsolvsolver	3404387783
-allow architecture change of %source% to %target%	SolverProblemSolution		permettre le changement d'architecture de %source% pour %target%
+allow architecture change of %source% to %target%	SolverProblemSolution		permettre le changement d’architecture de %source% pour %target%
 install %source% from excluded repository	SolverProblemSolution		installer %source% depuis un dépôt exclu
 unspecified problem	SolverProblem		problème indéterminé
 package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		le paquet %source% nécessite %dependency%, mais aucun de ceux fournis ne peut être installé
@@ -12,23 +12,23 @@ conflicting requests	SolverProblem		requêtes conflictuelles
 do not install the most recent version of \"%selection%\"	SolverProblemSolution		ne pas installer la version la plus récente de « %selection% »
 allow replacement of %source% with %target%	SolverProblemSolution		autoriser le remplacement de %source% par %target%
 package %source% obsoletes %dependency% provided by %target%	SolverProblem		le paquet %source% rend obsolète %dependency% fourni par %target%
-do not forbid installation of %source%	SolverProblemSolution		ne pas interdire l'installation de %source%
+do not forbid installation of %source%	SolverProblemSolution		ne pas interdire l’installation de %source%
 allow downgrade of %source% to %target%	SolverProblemSolution		permettre de rétrograder %source% en %target%
 dependency problem	SolverProblem		problème de dépendance
 %dependency% is provided by the system	SolverProblem		%dependency% est fourni par le système
 keep %source% despite its inferior architecture	SolverProblemSolution		conserver %source% malgré son architecture moins bien adaptée
-%source% does not belong to a distupgrade repository	SolverProblem		%source% n'appartient pas à un dépôt de mise à jour
+%source% does not belong to a distupgrade repository	SolverProblem		%source% n’appartient pas à un dépôt de mise à jour
 installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		le paquet %source% installé rend obsolète %dependency% fourni par %target%
 allow name change of %source% to %target%	SolverProblemSolution		autoriser le renommage de %source% en %target%
 package %source% conflicts with %dependency% provided by %target%	SolverProblem		le paquet %source% est en conflit avec %dependency% fourni par %target%
 do something	SolverProblemSolution		faire quelque chose
-install %selection% despite its old version	SolverProblemSolution		installer %selection% malgré l'ancienneté de sa version
-cannot install both %source% and %target%	SolverProblem		impossible d'installer à la fois %source% et %target%
-package %source% is not installable	SolverProblem		le paquet %source% n'est pas installable
+install %selection% despite its old version	SolverProblemSolution		installer %selection% malgré l’ancienneté de sa version
+cannot install both %source% and %target%	SolverProblem		impossible d’installer à la fois %source% et %target%
+package %source% is not installable	SolverProblem		le paquet %source% n’est pas installable
 problem with installed package %source%	SolverProblem		problème avec le paquet installé %source%
 allow deinstallation of %source%	SolverProblemSolution		autoriser la désinstallation de %source%
-keep %source% from excluded repository	SolverProblemSolution		conserver %source% provenant d'un dépôt exclu
-keep old %source%	SolverProblemSolution		conserver l'ancien %source%
+keep %source% from excluded repository	SolverProblemSolution		conserver %source% provenant d’un dépôt exclu
+keep old %source%	SolverProblemSolution		conserver l’ancien %source%
 package %source% conflicts with %dependency% provided by itself	SolverProblem		le paquet %source% est en conflit avec %dependency% fourni par lui même
 allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		permettre le changement de fournisseur de « %sourceVendor% » (%source%) pour « %targetVendor% » (%target%)
 do not lock \"%selection%\"	SolverProblemSolution		ne pas verrouiller « %selection% »

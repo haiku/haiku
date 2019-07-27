@@ -16,7 +16,7 @@ Skip all	PackageView		Passer tout
 The installation of the package has been aborted.	PackageView		L’installation du paquet a été abandonnée.
 No installation type selected	PackageView		Aucun type d’installation sélectionné
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Voulez-vous vous souvenir de cette décision pour la suite de cette installation ?\n
-The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Le paquet sélectionné n'a pas été retiré de votre système. Le fichier d'informations du paquet installé peut avoir été corrompu.
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Le paquet sélectionné n’a pas été retiré de votre système. Le fichier d’informations du paquet installé peut avoir été corrompu.
 Install…	UninstallView		Installer…
 The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		L’élément nommé « %s » existe déjà dans le chemin donné.\nFaut-il remplacer l’élément par celui de ce paquet ou bien l’ignorer ?
 Installing files and folders	PackageInstall		Installation des fichiers et des dossiers

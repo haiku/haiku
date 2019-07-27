@@ -1,0 +1,74 @@
+1	friulian	x-vnd.Haiku-MediaConverter	2251404027
+Writing audio track: %d%% complete	MediaConverter		Scriture de linie audio: %d%% completade
+Input file not recognized as Audio or Video	MediaConverter		File di input no ricognossût come Audio o Video
+%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
+Video quality: %3d%%	MediaConverter		Cualitât video: %3d%%
+Source files	MediaConverter		File sorzints
+Error writing video frame %ld	MediaConverter		Erôr tal scrivi il fotogram dal video %ld
+Error converting '%filename'	MediaConverter		Erôr tal convertî '%filename'
+Selected directory not found. Defaulting to /boot/home	MediaConverter		La cartele selezionade no je stade cjatade. Si stabilìs chê predefinide: /boot/home
+Conversion completed	MediaConverter		Conversion completade
+Audio:	MediaConverter-FileInfo		Audio:
+MediaConverter+:SaveDirectory	MediaConverter		ConvertidôrMultimediâl+:CarteleSalvament
+Error creating video.	MediaConverter		Erôr tal creâ il video.
+Cancelling	MediaConverter		Daûr a cancelâ
+None available	Audio codecs		Nissun disponibil
+No file selected	MediaConverter-FileInfo		Nissun file selezionât
+High	MediaConverter		Alt
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Il file nol è stât ricognossût tra chei multimediâi supuartâts:} other{# file no son stâts ricognossûts tra chei multimediâi supuartâts:}}
+File Error	MediaConverter-FileInfo		Erôr di file
+None available	Video codecs		Nissun disponibil
+Output format	MediaConverter		Formât di jessude
+%.1f kHz mono	MediaFileInfo		%.1f kHz mono
+%.1f kHz stereo	MediaFileInfo		%.1f kHz stereo
+OK	MediaConverter		Va ben
+Error creating '%filename'	MediaConverter		Erôr tal creâ '%filename'
+Error loading a file	MediaConverter		Erôr tal cjariâ un file
+Encoder parameters	MediaConverter-EncoderWindow		Parametris dal codificadôr
+Open…	Menu		Vierç…
+Audio encoding:	MediaConverter		Codifiche Audio:
+Audio quality: %3d%%	MediaConverter		Cualitât audio: %3d%%
+Cancelling…	MediaConverter		Anulament di…
+Output file '%filename' created	MediaConverter		File di jessude '%filename' creât
+Output folder	MediaConverter		Cartele di jessude
+Error creating track.	MediaConverter		Erôr tal creâ la linie.
+ seconds	MediaFileInfo		 seconts
+Video using parameters form settings	MediaConverter		Il video al dopre lis impostazions dal modul dai parametris
+Video:	MediaConverter-FileInfo		Video:
+Select	MediaConverter		Selezione
+Conversion cancelled	MediaConverter		Conversion anulade
+Low	MediaConverter		Bas
+Error loading files	MediaConverter		Erôr tal cjariâ i file
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bit}}
+End   [ms]: 	MediaConverter		Fin    [ms]: 
+Cancel	MediaConverter		Cancele
+OK	MediaConverter-FileInfo		Va ben
+Error read audio frame %ld	MediaConverter		Erôr tal lei il campion audio %ld
+Video encoding:	MediaConverter		Codifiche video:
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Si è verificât un erôr tal lei lis informazions dal file.\n\nErôr: 
+Error	MediaConverter		Erôr
+File details	MediaConverter		Detais dai file
+No audio	Audio codecs list		Nissun audio
+Drop media files onto this window	MediaConverter		Strissine i file multimediâi su chest barcon
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# fotogram/campion} other{# fotograms/campions}}
+Quit	Menu		Jes
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# byte}}
+Duration:	MediaConverter-FileInfo		Durade:
+MediaConverter	System name		ConvertidôrMultimediâl
+Error launching: %strError%	MediaConverter		Erôr tal inviâ: %strError%
+File format:	MediaConverter		Formât file:
+Error writing audio frame %ld	MediaConverter		Erôr tal scrivi il campion audio %ld
+File	Menu		File
+Video quality not supported	MediaConverter		Cualitât video no supuartade
+Select this folder	MediaConverter		Selezione cheste cartele
+Error read video frame %ld	MediaConverter		Erôr tal lei il fotogram video %ld
+%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld canâl
+%d bit 	MediaFileInfo		%d bit 
+No video	Video codecs list		Nissun video
+Continue	MediaConverter		Continue
+Convert	MediaConverter		Convertìs
+Audio quality not supported	MediaConverter		Cualitât audio no supuartade
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Erôr tal scrivi sul percors: %strPath%. Si stabilìs ae posizion predefinide: /boot/home
+Writing video track: %d%% complete	MediaConverter		Scriture de linie video: %d%% completade
+Preview	MediaConverter		Anteprime
+Start [ms]: 	MediaConverter		Inizi [ms]: 

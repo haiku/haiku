@@ -1,12 +1,13 @@
-1	french	x-vnd.haiku-softwareupdater	4294742959
+1	french	x-vnd.haiku-softwareupdater	347109711
 Updating version	SoftwareUpdaterWindow	List item text	Mise à jour de la version
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Paquets à désinstaller
-No active network connection was found	UpdateManager	Error message	Aucune connexion réseau active n'a été trouvée
+No active network connection was found	UpdateManager	Error message	Aucune connexion réseau active n’a été trouvée
 Quit	SoftwareUpdaterWindow	Alert button label	Quitter
 There were no updates found.	CheckManager		Aucune mise à jour disponible.
 Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Des mises à jour sont en cours, êtes-vous sûr de vouloir quitter ?
 Updates found	SoftwareUpdaterWindow		Des mises à jour sont disponibles
 Update now	SoftwareUpdaterWindow		Mettre à jour maintenant
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Pour une raison quelconque, il est impossible de redémarrer l’ordinateur.
 OK	UpdateManager		Valider
 Unrecognized argument	SoftwareUpdaterApp	Error message	Argument non reconnu
 There were no updates found.	CheckAction		Aucune mise à jour n’a été trouvée.
@@ -14,6 +15,7 @@ No updates available	UpdateAction		Aucune mise à jour disponible
 New packages to be installed	SoftwareUpdaterWindow	List super item label	Nouveaux paquets à installer
 Packages to be updated	SoftwareUpdaterWindow	List super item label	Paquets à mettre à jour
 to	SoftwareUpdaterWindow	List item text	vers
+Attempting to cancel the updates…	SoftwareUpdaterWindow		Tentative d’annulation des mises à jour
 Contacting software repositories to check for package updates.	CheckManager		Contact des dépôts de logiciels à la recherche des mises à jour disponibles pour les paquets.
 Available updates found	CheckManager		Mises à jour disponibles
 from repository	SoftwareUpdaterWindow	List item text	depuis le dépôt
@@ -24,25 +26,29 @@ There were no updates found.	UpdateAction		Aucune mise à jour n’a été trouv
 OK	SoftwareUpdaterWindow		Valider
 Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Veuillez choisir parmi ces options de mise à jour :\n\nMise à jour :\n\tMet à jour tous les paquets installés.\nTout synchroniser :\n\tSynchronise les paquets installés avec les dépôts.
 The following changes will be made:	SoftwareUpdaterWindow		Les modifications suivantes vont être apportées :
-Argument variables are no longer accepted\n	SoftwareUpdaterApp		Les variables d'argument ne sont plus acceptées\n
+Argument variables are no longer accepted\n	SoftwareUpdaterApp		Les variables d’argument ne sont plus acceptées\n
 Fatal error while checking for updates: %s\n	CheckAction		Erreur fatale lors de la vérification des mises à jour : %s\n
 SoftwareUpdater	System name		SoftwareUpdater
 No active network connection was found.\n	CheckManager		Aucune connexion réseau active.\n
 Applying changes	UpdateManager		Application des modifications
 Full sync	SoftwareUpdaterWindow	Alert button label	Tout synchroniser
 Quit	SoftwareUpdaterWindow	Button label	Quitter
+Updates have been successfully installed.	UpdateManager		Les mises à jour ont été installées avec succès.
 Exception occurred while updating packages : %s\n	UpdateAction		Une exception est survenue lors de la mise à jour des paquets : %s\n
+A reboot is necessary to complete the update process.	UpdateManager		Un redémarrage est nécessaire pour terminer le processus de mise à jour.
 Exception occurred while checking for updates: %s\n	CheckAction		Une exception est survenue lors de la vérification des mises à jour : %s\n
 Packages are being updated	UpdateManager		Mise à jour des paquets en cours
 Cancel	SoftwareUpdaterWindow		Annuler
 Don't quit	SoftwareUpdaterWindow		Ne pas quitter
-Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Cliquez ici pour lancer SoftwareUpdater. Certains problèmes de mises à jour peuvent nécessiter le choix d'une solution.
+Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Cliquez ici pour lancer SoftwareUpdater. Certains problèmes de mises à jour peuvent nécessiter le choix d’une solution.
 Checking for updates	SoftwareUpdaterWindow		Recherche de mises à jour
 Updates completed	UpdateManager		Les mises à jour ont abouti
+Reboot	SoftwareUpdaterWindow		Redémarrer
 Show more details	SoftwareUpdaterWindow		Afficher plus de détails
 Installing version	SoftwareUpdaterWindow	List item text	Installation de la version
 Checking for updates	CheckManager		Recherche de mises à jour
-No remote repositories are available	UpdateManager	Error message	Aucun dépôt distant n'est disponible
+No remote repositories are available	UpdateManager	Error message	Aucun dépôt distant n’est disponible
+Reboot	SoftwareUpdaterWindow	Button label	Redémarrer
 Update	SoftwareUpdaterWindow	Alert button label	Mise à jour
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Ouvrir les Dépôts
 Updates did not complete	UpdateAction		Les mises à jour n’ont pas abouti
@@ -51,6 +57,6 @@ Uninstalling version	SoftwareUpdaterWindow	List item text	Désinstallation de la
 %i of %i	UpdateManager	Do not translate %i	%i sur %i
 Quit	SoftwareUpdaterWindow		Quitter
 No updates available	CheckManager		Aucune mise à jour disponible
-Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Utilisation:  SoftwareUpdater <commande> [ <option> ]\nMet à jour les paquets installés.\n\nCommandes :\n  update     - Recherche et met à jour tous les paquets depuis les dépôts.\n  check      - Recherche dans les dépôts les mises à jour disponibles, mais affiche uniquement une notification avec les résultats.\n  full-sync  - Synchronise les paquets installés avec les dépôts.\n\nOptions :\n  -h ou --help       Affiche cette aide utilisateur.\n  -v ou --verbose    Sortie d'informations verbeuse.\n
-No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Aucun dépôt distant n'est disponible. Veuillez vérifier qu'un dépôt est actif dans les préférences, ou à l’aide de la commande « pkgman ».
+Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Utilisation:  SoftwareUpdater <commande> [ <option> ]\nMet à jour les paquets installés.\n\nCommandes :\n  update     - Recherche et met à jour tous les paquets depuis les dépôts.\n  check      - Recherche dans les dépôts les mises à jour disponibles, mais affiche uniquement une notification avec les résultats.\n  full-sync  - Synchronise les paquets installés avec les dépôts.\n\nOptions :\n  -h ou --help       Affiche cette aide utilisateur.\n  -v ou --verbose    Sortie d’informations verbeuse.\n
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Aucun dépôt distant n’est disponible. Veuillez vérifier qu’un dépôt est actif dans les préférences, ou à l’aide de la commande « pkgman ».
 Downloading packages	UpdateManager		Téléchargement des paquets

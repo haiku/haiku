@@ -1,0 +1,22 @@
+1	friulian	x-vnd.Haiku-JPEGTranslator	3788699631
+Read	JPEGTranslator		Leture
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Formât Bitmap Be (JPEGTranslator)
+Show warning messages	JPEGTranslator		Mostre messaçs di avertiment
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Dopre codiç CMYK cun 0 pal 100% di cuvierture di ingjustri
+JPEG Library Error: %s\n	be_jerror		Erôr librarie JPEG: %s\n
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBasât su IJG library © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\ncun corezions al supuart de codifiche \"lossless\" di Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nCun cualchi routine di conversion dal spazi-colôr de bande di Magnus Hellman\n\thttp://www.bebits.com/app/802\n
+None	JPEGTranslator		Nissun
+About	JPEGTranslator		Informazions
+Version %d.%d.%d	JPEGTranslator		Version %d.%d.%d
+Write black-and-white images as RGB24	JPEGTranslator		Scrîf imagjins in blanc e neri come RGB24
+Output smoothing strength	JPEGTranslator		Intensitât slissadure in jessude
+Use progressive compression	JPEGTranslator		Dopre compression progressive
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Rint il file plui piçul (cualitât un tic inferiôr)
+High	JPEGTranslator		Alt
+Read greyscale images as RGB32	JPEGTranslator		Lei imagjins in scjale di grîs come RGB32
+Output quality	JPEGTranslator		Cualitât de jessude
+Low	JPEGTranslator		Bas
+Write	JPEGTranslator		Scriture
+Prevent colors 'washing out'	JPEGTranslator		Impedìs il 'slavâ' dai colôrs
+JPEG Library Warning: %s\n	be_jerror		Avertiment Librarie JPEG: %s\n
+JPEG images	JPEGTranslator		Imagjins JPEG

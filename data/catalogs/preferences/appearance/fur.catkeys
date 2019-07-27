@@ -1,0 +1,79 @@
+1	friulian	x-vnd.Haiku-Appearance	663472720
+Control border	Colors tab		Ôrs dal control
+Control mark	Colors tab		Marcadôr dal control
+Off	AntialiasingSettingsView		Disativât
+Window border	Colors tab		Ôr dal barcon
+Inactive window tab	Colors tab		Lenghete dal barcon inatîf
+Defaults	APRWindow		Predefinîts
+Shadow	Colors tab		Ombrene
+Document background	Colors tab		Fonts dal document
+List background	Colors tab		Fonts de liste
+No effect on running applications	DecorSettingsView		Nissun efiet su lis aplicazions in esecuzion
+Fixed font:	Font view		Caratar a spaziadure fisse:
+Appearance	System name		Aspiet
+Reduce colored edges filter strength:	AntialiasingSettingsView		Intensitât dal filtri di riduzion dai ôrs colorâts:
+Glyph hinting:	AntialiasingSettingsView		Miorament dai glifs:
+Default Haiku ControlLook	DecorSettingsView		ControlLook di Haiku predefinît
+Menu item text	Colors tab		Test dal element dal menù
+About decorator	DecorSettingsView		Informazions sul decoradôr
+Antialiasing menu	AntialiasingSettingsView		Menù dal antialiasing
+Success	Colors tab		Sucès
+About	DecorSettingsView		Informazions su
+Shine	Colors tab		Sflandôr
+Arrow style	DecorSettingsView		Stîl frece
+On	AntialiasingSettingsView		Ativât
+Decorator:	DecorSettingsView		Decoradôr:
+Menu background	Colors tab		Fonts dal menù
+Revert	APRWindow		Torne indaûr
+List item text	Colors tab		Test dal element de liste
+OK	DecorSettingsView		Va ben
+Control text	Colors tab		Test dal control
+Look and feel	APRWindow		Aspiet
+Selected menu item background	Colors tab		Fonts dal element selezionât tal menù
+Link active	Colors tab		Colegament atîf
+Antialiasing	APRWindow		Antialiasing
+Menu font:	Font view		Caratar dal menù:
+Bold font:	Font view		Caratar in neret:
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutôrs:\n\t%decorAuthors\n\nURL: %decorURL\nLicence: %decorLic\n\n%decorDesc\n
+Choose Decorator	DecorSettingsView		Sielç decoradôr
+Strong	AntialiasingSettingsView		Fuart
+Failure	Colors tab		Faliment
+Double:	DecorSettingsView		Dopli:
+Selected menu item text	Colors tab		Test dal element selezionât tal menù
+Size:	Font Selection view		Dimension:
+Panel background	Colors tab		Fonts dal panel
+Plain font:	Font view		Caratar sempliç:
+Window tab text	Colors tab		Test de lenghete dal barcon
+Navigation pulse	Colors tab		Impuls di navigazion
+LCD subpixel	AntialiasingSettingsView		Sub-pixel LCD
+Window tab	Colors tab		Lenghete dal barcon
+Link text	Colors tab		Test dal colegament
+Tooltip background	Colors tab		Fonts dai sugjeriments
+ControlLook:	DecorSettingsView		ControlLook:
+Scroll bar thumb	Colors tab		Miniature de sbare di scoriment
+Default	DecorSettingsView		Predefinît
+Link visited	Colors tab		Colegament visitât
+Selected menu item border	Colors tab		Ôr dal element selezionât tal menù
+Tooltip text	Colors tab		Test dal sugjeriment
+Control background	Colors tab		Fonts dal control
+Selected list item text	Colors tab		Test dal element selezionât te liste
+Selected list item background	Colors tab		Fonts dal element selezionât te liste
+Inactive window tab text	Colors tab		Test de lenghete dal barcon inatîf
+Navigation base	Colors tab		Base di navigazion
+Fonts	APRWindow		Caratars
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Al cjante il gjal, al criche il dì, mandi ninine mi tocje partî...
+Grayscale	AntialiasingSettingsView		Scjale di grîs
+Antialiasing type:	AntialiasingSettingsView		Gjenar di antialiasing:
+Panel text	Colors tab		Test dal panel
+Hinting menu	AntialiasingSettingsView		Menù dai sugjeriments
+Scroll bar:	DecorSettingsView		Sbare di scoriment:
+Choose ControlLook	DecorSettingsView		Sielç il ControlLook
+Monospaced fonts only	AntialiasingSettingsView		Dome caratars cun spziadure fisse
+Document text	Colors tab		Test dal document
+Inactive window border	Colors tab		Ôr dal barcon inatîf
+Colors	APRWindow		Colôrs
+About control look	DecorSettingsView		Informazions sul control dal aspiet
+Control highlight	Colors tab		Evidenziazion dal control
+Status bar	Colors tab		Sbare di stât
+Link hover	Colors tab		Parsore dal colegament
+Single:	DecorSettingsView		Singul:

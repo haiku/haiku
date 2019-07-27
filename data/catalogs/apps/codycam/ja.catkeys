@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-CodyCam	4023809311
+1	japanese	x-vnd.Haiku-CodyCam	2593355250
 destination directory expected	CodyCam		出力先ディレクトリを入力してください
 reply: '%s'\n	SftpClient		返信: '%s'\n
 JPEG image	CodyCam		JPEG 画像
@@ -11,7 +11,7 @@ Waiting…	CodyCam		待機中…
 Passive FTP	CodyCam		パッシブ FTP
 Every 10 minutes	CodyCam		10 分ごと
 Every minute	CodyCam		1 分ごと
-Capture Rate Menu	CodyCam		キャプチャレートメニュー
+Capture Rate Menu	CodyCam		キャプチャ頻度メニュー
 Cannot seek time source!	CodyCam		タイムソースをシークできません!
 Server login failed	VideoConsumer.cpp		サーバーへのログインに失敗しました
 on or off expected	Settings	Do not translate 'on' and 'off'	on か off かを入力してください
@@ -19,7 +19,7 @@ invalid upload client %ld\n	VideoConsumer.cpp		アップロードクライアン
 Every 30 seconds	CodyCam		30 秒ごと
 Cannot create a video window	CodyCam		ビデオウィンドウを作成できません
 Cannot register the video window	CodyCam		ビデオウィンドウを登録できません
-capture rate expected	CodyCam		キャプチャレートを入力してください
+capture rate expected	CodyCam		キャプチャ頻度を入力してください
 Quit	CodyCam		終了
 Cannot connect the video source to the video window	CodyCam		ビデオソースをビデオウィンドウに接続できません
 read: %d\n	SftpClient		読み込み: %d \n
@@ -55,7 +55,7 @@ Every 24 hours	CodyCam		24 時間ごと
 Image Format Menu	CodyCam		画像形式メニュー
 Every 5 minutes	CodyCam		5 分ごと
 File upload failed	VideoConsumer.cpp		ファイルのアップロードに失敗しました
-Format:	CodyCam		形式:
+Format:	CodyCam		ファイル形式:
 Start video	CodyCam		ビデオを開始
 Connected…	VideoConsumer.cpp		接続しました…
 upload client name expected	CodyCam		アップロードクライアントの名前を入力してください
@@ -65,9 +65,7 @@ password	CodyCam		パスワード
 Local	CodyCam		ローカル
 Stop video	CodyCam		ビデオを停止
 Last Capture: 	VideoConsumer.cpp		最後のキャプチャ:
-Rate:	CodyCam		レート:
-File %s ; Line %ld # unterminated quote\n	SettingsHandler		ファイル %s ; 行 %ld # unterminated quote\n
-File %s # unterminated quote at end of file\n	SettingsHandler		ファイル %s # unterminated quote at end of file\n
+Rate:	CodyCam		頻度:
 Couldn't find requested directory on server	VideoConsumer.cpp		要求されたディレクトリがサーバー上にみつかりませんでした
 Cannot find the media roster	CodyCam		media roster が見つかりません。
 Type:	CodyCam		形式:
@@ -79,7 +77,6 @@ File	CodyCam		ファイル
 read: %ld\n	SftpClient		読み込み: %ld\n
 Every hour	CodyCam		1 時間ごと
 login ID expected	CodyCam		ログイン ID を入力してください
-File %s; Line %ld # %s	SettingsHandler		ファイル %s; 行 %ld # %s
 Video settings	CodyCam		ビデオ設定
 Can't find an available connection to the video window	CodyCam		有効な接続がビデオウィンドウ上に見つかりません
 FTP	CodyCam		FTP
@@ -88,5 +85,4 @@ Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		ビデ�
 Logging in…	VideoConsumer.cpp		ログイン中…
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		ファイルの書き込みに失敗した
-unknown command	SettingsHandler		不明なコマンドです
 Capture controls	CodyCam		キャプチャ制御

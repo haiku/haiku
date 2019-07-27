@@ -1,0 +1,53 @@
+1	friulian	x-vnd.Haiku-Screen	4090394050
+no	Screen		no
+bits/pixel	Screen		bit/pixel
+15 bits/pixel, 32768 colors	Screen		15 bit/pixel, 32768 colôrs
+Rows:	Screen		Riis:
+%.1f Hz	Screen		%.1f Hz
+The screen mode could not be set:\n\t%s\n	Screen		Nol è stât pussibil configurâ la modalitât dal schermi:\n\t%s\n
+Keep	Screen		Ten
+/other…	Screen		/altri…
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Frecuence orizontâl:\t%lu - %lu kHz\nFrecuence Verticâl:\t%lu - %lu Hz\n\nMassim clock dai pixel:\t%g MHz
+Refresh rate:	Screen		Frecuence di inzornament:
+Video format:	Screen		Formât video:
+Undo	Screen		Disfe
+OK	Screen		Va ben
+Current workspace	Screen		Spazi di lavôr atuâl
+vertically	Screen		in verticâl
+All workspaces	Screen		Ducj i spazis di lavôr
+Use laptop panel:	Screen		Dopre panel dal portatil:
+Could not write VESA mode settings file:\n\t	Screen		Impussibil scrivi il file des impostazions de modalitât VESA:\n\t
+Settings will revert in %seconds.	Screen		Si tornarà aes impostazions vielis in %seconds seconts.
+Cancel	Screen		Cancele
+Other…	Screen		Altri…
+Screen	Screen		Schermi
+Colors:	Screen		Colôrs:
+yes	Screen		sì
+Swap displays:	Screen		Scambie visôrs:
+%sSerial no.: %s	Screen		%sNumar seriâl: %s
+8 bits/pixel, 256 colors	Screen		8 bit/pixel, 256 colôrs
+Revert	Screen		Torne indaûr
+always	Screen		simpri
+Confirm changes	Screen		Conferme modifichis
+Warning	Screen		Avertiment
+24 bits/pixel, 16 Million colors	Screen		24 bit/pixel, 16 Milions di colôrs
+Hz	Screen		Hz
+Workspaces	Screen		Spazis di lavôr
+32 bits/pixel, 16 Million colors	Screen		32 bit/pixel, 16 Milions di colôrs
+Done	Screen		Apliche
+16 bits/pixel, 65536 colors	Screen		16 bit/pixel, 65536 colôrs
+Screen preferences by the Haiku team	Screen		Impostazions schermi dal grup di Haiku
+Refresh rate	Screen		Frecuence di inzornament
+if needed	Screen		se necessari
+Combine displays:	Screen		Cumbine visôrs:
+Unknown mode	Screen		Modalitât no cognossude
+About	Screen		Informazions
+Columns:	Screen		Colonis:
+Resolution:	Screen		Risoluzion:
+Apply	Screen		Apliche
+horizontally	Screen		in orizontâl
+disable	Screen		disabilite
+Set background…	Screen		Stabilìs fonts…
+Type or use the left and right arrow keys.	Screen		Scrîf o dopre lis frecis di drete e çampe su pe tastiere.
+Screen	System name		Schermi
+Do you wish to keep these settings?	Screen		Tignî chestis impostazions?

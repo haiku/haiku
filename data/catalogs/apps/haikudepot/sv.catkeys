@@ -1,10 +1,11 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	2728680786
+1	swedish	x-vnd.Haiku-HaikuDepot	3041025920
 Check for updates…	MainWindow		Leta efter uppdateringar…
 Uninstall	PackageManager		Avinstallera
 (%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Avinstallera
 Available packages	MainWindow		Tillgängliga paket
 Create account	UserLoginWindow		Skapa konto
+OK	App		OK
 Mostly stable	RatePackageWindow		Mestadels stabil
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Kontot lyckades skapas. Du kan nu betygsätta paket och göra andra vettiga saker.
 Rate package…	PackageInfoView		Betygsätt paket...
@@ -13,6 +14,7 @@ Starting the package daemon failed:\n\n%Error%	App		Starta package daemon missly
 <no info>	PackageInfoView		<Ingen information>
 No user ratings available.	PackageInfoView		Ingen betygsättnings tillgänglig.
 The user name needs to be at least 3 letters long.	UserLoginWindow		användarnamnet måste vara minst 3 bokstäver långt.
+Downloading package '%name%'	WorkStatusView		Laddar hem paket '%name%'
 Failed to create account	UserLoginWindow		Misslyckades skapa konto
 Ignore	UserLoginWindow		Ignorera
 Rating	PackageListView		Betyg
@@ -34,8 +36,8 @@ Name	PackageListView		Namn
 Rate %Package%	RatePackageWindow		Betyg %Package%
 Quit HaikuDepot	App		Avsluta HaikuDepot
 Category	FilterView		Kategori
-Installed packages	MainWindow		Installerade paket
 User rating	RatePackageWindow		Användarbetyg
+Installed packages	MainWindow		Installerade paket
 Other users can see this rating	RatePackageWindow		Andra användare kan se denna bedömning
 Stable	RatePackageWindow		Stabil
 Fatal error	PackageManager		Allvarligt fel
@@ -62,8 +64,8 @@ Send	RatePackageWindow		Skicka
 Start package daemon	App		Starta paket-servicen
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Lösenordet är för svagt eller inte rätt. Varvänlig och använd minst 8 tecken med minst 2 nummer och 2 stora bokstäver.
 The package action could not be scheduled: %Error%	PackageInfoView		Paket körningen kunde inte planeras: %Error%
-Inactive	PackageListView		Inaktiv
 Cancel	RatePackageWindow		Avbryt
+Inactive	PackageListView		Inaktiv
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# enhet} other{# enheter}}
 OK	PackageInfoView		OK
@@ -78,10 +80,10 @@ Close	RatePackageWindow		Stäng
 Failed to create account: %s\n	UserLoginWindow		Misslyckades skapa konto: %s\n
 Size	PackageListView		Storlek
 Your rating:	RatePackageWindow		Dina betyg:
-All categories	FilterView		Alla kategorier
 Your rating was updated.	RatePackageWindow		Ditt betyg ändrades.
-n/a	PackageInfoView		oviktigt
+All categories	FilterView		Alla kategorier
 Repositories	MainWindow		Repositorier
+n/a	PackageInfoView		oviktigt
 Cancel	MainWindow		Avbryt
 Refresh repositories	MainWindow		Ladda om repositorier
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Om du inte anger en e-mail adress, kommer du inte kunna återställa ditt lösenord om du glömmer det.

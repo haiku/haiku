@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Be-MAIL	1865394837
+1	ukrainian	x-vnd.Be-MAIL	3155788869
 Set to Saved	Mail		Перемкнути до збереження
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основний текст містить %ld нерозкодованих символів. Можливо інше кодування спрацює краще? Виберіть Відправити якщо хочете зробити це не зважаючи(нерозкодований символ буде замінено таким що ситуативно підходить), або натисніть Відмінити щоб повернутися назад і виправити ситуацію.
 Text wrapping:	Mail		Обтікання тексту:
@@ -8,6 +8,7 @@ Reply	Mail		Відповісти
 Next message	Mail		Наступний лист
 Mailing	Mail		Відправлення
 Unread	Mail		Нечитане
+Same sender	Mail		Той самий відправник
 Copy to new	Mail		Копіювати до нового
 Save as draft	Mail		Зберегти як чорновик
 Encoding:	Mail		Кодування:
@@ -31,6 +32,7 @@ Only files can be added as attachments.	Mail		Тільки файли можут
 Close	Mail		Закрити
 Untitled	Mail		Без назви
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Видалення вкладень з листа що пересилається не підтримується!\nЦе не працюватиме правильно.
+Same recipient	Mail		Той самий отримувач
 Previous message	Mail		Попередній лист
 (Address unavailable)	Mail		(Адреса недоступна)
 Mail	System name		Пошта
@@ -83,6 +85,7 @@ Colored quotes:	Mail		Забарвлення цитат:
 Automatic	Mail		Автоматично
 Open this link	Mail		Відкрити це посилання
 Auto signature:	Mail		Автопідпис:
+Same subject	Mail		Та сама тема
 Send	Mail		Відіслати
 Open draft	Mail		Відкрити чорновик
 Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Зберегти як 'Нове'

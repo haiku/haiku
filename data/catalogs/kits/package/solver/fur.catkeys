@@ -1,0 +1,38 @@
+1	friulian	x-vnd.Haiku-libsolvsolver	3404387783
+allow architecture change of %source% to %target%	SolverProblemSolution		permet il cambi di architeture di %source% a %target%
+install %source% from excluded repository	SolverProblemSolution		instale %source% dal dipuesit escludût
+unspecified problem	SolverProblem		probleme no specificât
+package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		Il pachet %source% al domande la dipendence %dependency%, ma nissun dai pachets che la furnissin al pues jessi instalât 
+package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		il pachet %source% al rint sorpassât %dependency% che al è furnît di %target%
+nothing provides requested %dependency%	SolverProblem		nissun al furnìs la dipendence domandade %dependency%
+do not keep %source% installed	SolverProblemSolution		no sta tignî instalât %source%
+do not deinstall \"%selection%\"	SolverProblemSolution		no sta gjavâ \"%selection%\"
+install %source% despite its inferior architecture	SolverProblemSolution		instale %source% ancje se al è di une architeture inferiôr
+conflicting requests	SolverProblem		richiestis in conflit
+do not install the most recent version of \"%selection%\"	SolverProblemSolution		no sta instalâ la version plui resinte di \"%selection%\"
+allow replacement of %source% with %target%	SolverProblemSolution		permet la sostituzion di %source% cun %target%
+package %source% obsoletes %dependency% provided by %target%	SolverProblem		il pachet %source% al rint sorpassât %dependency% che al è furnît di %target%
+do not forbid installation of %source%	SolverProblemSolution		no sta dineâ la instalazion di %source%
+allow downgrade of %source% to %target%	SolverProblemSolution		permet di degradâ di %source% a %target%
+dependency problem	SolverProblem		probleme di dipendence
+%dependency% is provided by the system	SolverProblem		%dependency% al è za furnît dal sisteme
+keep %source% despite its inferior architecture	SolverProblemSolution		ten %source% ancje se la architeture e je di nivel inferiôr
+%source% does not belong to a distupgrade repository	SolverProblem		%source% nol fâs part di un dipuesit 'distupgrade'
+installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		il pachet instalât %source% al rint sorpassât %dependency% che al è furnît di %target%
+allow name change of %source% to %target%	SolverProblemSolution		permet di cambiâ non di %source% in %target%
+package %source% conflicts with %dependency% provided by %target%	SolverProblem		il pachet %source% al gjenere un conflit cun %dependency% furnît di %target%
+do something	SolverProblemSolution		fâs alc
+install %selection% despite its old version	SolverProblemSolution		instale %selection% ancje se e je une version vecje
+cannot install both %source% and %target%	SolverProblem		impussibil instalâ sedi %source% che %target%
+package %source% is not installable	SolverProblem		il pachet %source% no si pues instalâ
+problem with installed package %source%	SolverProblem		probleme cul pachet instalât %source%
+allow deinstallation of %source%	SolverProblemSolution		permet la disinstalazion di %source%
+keep %source% from excluded repository	SolverProblemSolution		ten %source% dal dipuesit escludût
+keep old %source%	SolverProblemSolution		ten il vecjo %source%
+package %source% conflicts with %dependency% provided by itself	SolverProblem		Il pachet %source% al va in conflit cun %dependency% furnît di se stes
+allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		permet modifiche, de bande dal furnidôr, di \"%sourceVendor%\" (%source%) a \"%targetVendor%\" (%target%)
+do not lock \"%selection%\"	SolverProblemSolution		no sta blocâ \"%selection%\"
+do not install \"%selection%\"	SolverProblemSolution		no sta instalâ \"%selection%\"
+nothing provides %dependency% needed by %source%	SolverProblem		nissun al furnìs %dependency%, che al covente a %source%
+%source% has inferior architecture	SolverProblem		%source% al à une architeture di nivel inferiôr
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		no sta disinstalâ ducj chei che a puedin jessi risolts \"%selection%\"

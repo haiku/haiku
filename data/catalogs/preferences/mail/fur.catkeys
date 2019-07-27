@@ -1,0 +1,54 @@
+1	friulian	x-vnd.Haiku-Mail	2750130554
+Account settings	AutoConfigWindow		Impostazions account
+\t\t· Outgoing	Config Window		\t\t· In jessude
+An error occurred while creating the config view: %error.	Config Views		Si è verificât un erôr intant che si creave la viodude de configurazion: %error.
+E-mail address:	E-Mail		Direzion e-mail:
+Create new account	AutoConfigWindow		Cree un gnûf account
+While sending and receiving	Config Window		Dilunc l'inviament e la ricezion
+Error!	Config Views		Erôr!
+Apply	Config Window		Apliche
+Incoming mail filters	Config Views		Filtris de pueste in jentrade
+Outgoing mail filters	Config Views		Filtris de pueste in jessude
+Server name:	E-Mail		Non servidôr:
+Add	Config Window		Zonte
+Back	AutoConfigWindow		Indaûr
+Real name:	E-Mail		Non reâl:
+Real name:	Config Views		Non reâl:
+\t\t· E-mail filters	Config Window		\t\t· Filtris e-mail
+Outgoing	E-Mail		In jessude
+Accounts	Config Window		Account
+Outgoing	Config Window		In jessude
+Remove	Config Views		Gjave
+Show notifications:	Config Window		Mostre notifichis:
+Settings	Config Window		Impostazions
+Never	Config Window	show status window	Mai
+Account name:	Config Views		Non account:
+\t\t· Incoming	Config Window		\t\t· In jentrade
+Enter a valid e-mail address.	AutoConfigWindow		Inserî une direzion e-mail valide.
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nImpussibil tornâ aes impostazions gjenerâls precedentis.\n\nErôr tal recuperâ lis impostazions gjenerâls:\n%s\n
+Incoming	E-Mail		In jentrade
+Choose Protocol	E-Mail		Sielç il protocol
+Return address:	Config Views		Direzion dal mitent:
+Password:	E-Mail		Password:
+Error retrieving general settings: %s\n	Config Window		Erôr tal recuperâ lis impostazions gjenerâls: %s\n
+The filter could not be moved. Deleting filter.	Config Views		Impussibil spostâ il filtri. Si elimine il filtri.
+OK	Config Views		Va ben
+Revert	Config Window		Torne indaûr
+Incoming	Config Window		In jentrade
+Finish	AutoConfigWindow		Fin
+Add filter	Config Views		Zonte filtri
+Account settings	Config Views		Impostazions account
+minutes	Config Window		minûts
+E-mail	System name		E-mail
+Check every	Config Window		Controle ogni
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Cree un gnûf account cul boton Zonte.\n\nGjave un account cul boton Gjave sul element selezionât.\n\nSelezione un element te liste par modificâ lis sôs impostazions.
+Account name:	E-Mail		Non account:
+Edit mailbox menu…	Config Window		Modifiche menù de casele de pueste…
+Server Name:	E-Mail		Non servidôr:
+Remove	Config Window		Gjave
+Login name:	E-Mail		Non di acès:
+While sending	Config Window		Dilunc l'inviament
+OK	Config Window		Va ben
+OK	AutoConfigWindow		Va ben
+Next	AutoConfigWindow		Sucessîf
+Error	Config Window		Erôr

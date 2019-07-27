@@ -1,0 +1,20 @@
+1	friulian	x-vnd.Haiku-VirtualMemory	2090796060
+Requested swap file size:	SettingsWindow		Dimension dal file di scambi domandât:
+VirtualMemory	System name		Memorie virtuâl
+OK	VirtualMemoryApp		Va ben
+Use volume:	SettingsWindow		Dopre il volum:
+Turn off	SettingsWindow		Disative
+Changes will take effect upon reboot.	SettingsWindow		Lis modifichis a varan efiet cuant che si tornarà a inviâ il sisteme.
+Revert	SettingsWindow		Torne indaûr
+Keep enabled	SettingsWindow		Ten abilitât
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Lis impostazions specificadis tal file des impostazions no son validis. Si pues cjariâ i predefinîts o jessî.
+VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tscrit di Axel Dörfler\n\tCopyright 2005, Haiku.\n
+The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		Nol è stât pussibil cjatâ il volum specificât tal file des impostazions. Si pues doprâ il volum di inviament opûr jessî.
+Current Swap:	SettingsWindow		Mem. di scambi autâl:
+Load defaults	SettingsWindow		Cjarie valôrs predefinîts
+Use boot volume	SettingsWindow		Dopre volum di inviament
+Automatic swap management	SettingsWindow		Gjestion automatiche de memorie di scambi
+Defaults	SettingsWindow		Predefinîts
+Quit	SettingsWindow		Jes
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Disativant la memorie virtuâl, cuant che la memorie e finìs, si varà efiets malvolûts te stabilitât di sisteme.\nLa memorie virtuâl no à efiets su pes prestazions dal sisteme fintremai che no si rive in chê situazion.\n\nDisativâle pardabon?
+Enable virtual memory	SettingsWindow		Abilite memorie virtuâl

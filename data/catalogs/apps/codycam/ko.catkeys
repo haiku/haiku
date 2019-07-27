@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-CodyCam	606289356
+1	korean	x-vnd.Haiku-CodyCam	3470802591
 destination directory expected	CodyCam		대상 디렉토리가 요구됨
 reply: '%s'\n	SftpClient		응답: '%s'\n
 JPEG image	CodyCam		JPEG 이미지
@@ -62,8 +62,6 @@ Local	CodyCam		지역
 Stop video	CodyCam		비디오 정지
 Last Capture: 	VideoConsumer.cpp		마지막 갈무리: 
 Rate:	CodyCam		빈도:
-File %s ; Line %ld # unterminated quote\n	SettingsHandler		파일 %s ; 줄 %ld # 끝나지 않은 따옴표\n
-File %s # unterminated quote at end of file\n	SettingsHandler		파일 %s # 파일의 끝에 끝나지 않은 따옴표가 있습니다\n
 Couldn't find requested directory on server	VideoConsumer.cpp		요청되는 디렉토리나 서버를 찾을 수 없음
 Cannot find the media roster	CodyCam		미디어 등록을 찾을 수 없음
 Type:	CodyCam		형식:
@@ -75,12 +73,10 @@ File	CodyCam		파일
 read: %ld\n	SftpClient		읽기: %ld\n
 Every hour	CodyCam		매 시간마다
 login ID expected	CodyCam		로그인 ID 가 요구됨
-File %s; Line %ld # %s	SettingsHandler		파일 %s; 줄 %ld # %s
 Video settings	CodyCam		비디오 설정
 Can't find an available connection to the video window	CodyCam		비디오 창에 가능한 연결을 찾을 수 없음
 FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		출력 파일 만들기 에러
 Logging in…	VideoConsumer.cpp		로그인 중…
 Error writing output file	VideoConsumer.cpp		츨력 파일 쓰기 에러
-unknown command	SettingsHandler		알수 없는 명령
 Capture controls	CodyCam		갈무리 제어

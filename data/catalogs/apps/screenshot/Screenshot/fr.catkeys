@@ -2,10 +2,10 @@
 Include window border	ScreenshotWindow		Inclure les bords des fenêtres
 Overwrite	ScreenshotWindow		Écraser
 Save in:	ScreenshotWindow		Enregistrer dans :
-Error saving \"%s\":\n\t%s	ScreenshotWindow		Erreur lors de l'enregistrement de « %s » :\n\t%s
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Erreur lors de l’enregistrement de « %s » :\n\t%s
 This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Ce fichier existe déjà.\n Êtes-vous sûr de vouloir l’écraser ?
-OK	ScreenshotWindow		Ok
-The destination path exists but is not a folder.	ScreenshotWindow		Le chemin de destination existe mais n'est pas un dossier.
+OK	ScreenshotWindow		OK
+The destination path exists but is not a folder.	ScreenshotWindow		Le chemin de destination existe mais n’est pas un dossier.
 Select	ScreenshotWindow		Sélectionner
 Save as:	ScreenshotWindow		Enregistrer sous :
 seconds	ScreenshotWindow		secondes
@@ -21,7 +21,7 @@ Choose folder	ScreenshotWindow		Choisir un dossier
 Name:	ScreenshotWindow		Nom :
 Choose folder…	ScreenshotWindow		Choisir un dossier…
 Please select	ScreenshotWindow		Veuillez sélectionner
-Failed to save screenshot	ScreenshotWindow		Impossible d'enregistrer la capture d'écran
+Failed to save screenshot	ScreenshotWindow		Impossible d’enregistrer la capture d’écran
 Cancel	ScreenshotWindow		Annuler
 Delay:	ScreenshotWindow		Retard :
 Copy to clipboard	ScreenshotWindow		Copier dans le presse-papiers

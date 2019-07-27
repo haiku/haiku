@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Touchpad	607725922
+1	swedish	x-vnd.Haiku-Touchpad	526581388
 Scrolling	TouchpadPrefView		Svepning
 Tapping	TouchpadPrefView		Knackning
 Touchpad	System name		Pekplatta
@@ -7,6 +7,7 @@ OK	TouchpadPrefView		OK
 Horizontal scrolling	TouchpadPrefView		Horisontell svepning
 Slow	TouchpadPrefView		Långsam
 Two finger scrolling	TouchpadPrefView		Tvåfingersvepning
+No touchpad found, the settings will have no effect.	TouchpadPrefView		Ingen styrplatta hittad, inställningarna kommer inte att ha någon effekt.
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Den nya svepningsytan är så stor att den kan hindra normal användning. Vill du verkligen ändra inställningen?
 Defaults	TouchpadPrefView		Förval
 High	TouchpadPrefView		Hög

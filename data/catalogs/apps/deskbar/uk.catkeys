@@ -26,7 +26,7 @@ Restart system	DeskbarMenu		Перезавантажити систему
 Large	PreferencesWindow		Великі
 Auto-raise	PreferencesWindow		Автоспливання
 Recent folders:	PreferencesWindow		Недавні теки:
-Show application expander	PreferencesWindow		Показувати програму expander
+Show application expander	PreferencesWindow		Показувати розпаковувач програми
 Close all	WindowMenu		Закрити все
 Deskbar preferences	PreferencesWindow		Налаштування Deskbar
 Mount	DeskbarMenu		Підмонтувати

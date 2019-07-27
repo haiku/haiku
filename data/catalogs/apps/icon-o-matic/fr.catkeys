@@ -149,7 +149,7 @@ Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGIm
 Export icon	Dialog title		Exporter l’icône
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Couleur (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Éditer le dégadé
-Rotate indices forwards	Icon-O-Matic-PathsList		Permuter les indices vers l'avant
+Rotate indices forwards	Icon-O-Matic-PathsList		Permuter les indices vers l’avant
 Click on an object in	Empty property list - 1st line		Cliquez sur un objet
 Save	Icon-O-Matic-Menu-File		Enregistrer
 No	Icon-O-Matic-StyledTextImport		Non

@@ -34,8 +34,8 @@ Name	PackageListView		Nimi
 Rate %Package%	RatePackageWindow		Anna pakkaukselle %Package% arvosana
 Quit HaikuDepot	App		Poistu HaikuVarastosta
 Category	FilterView		Luokka
-Installed packages	MainWindow		Asennetut paketit
 User rating	RatePackageWindow		Käyttäjäarvosanat
+Installed packages	MainWindow		Asennetut paketit
 Other users can see this rating	RatePackageWindow		Muut käyttäjät voivat nähdä tämän arvosanan
 Stable	RatePackageWindow		Vakaa
 Fatal error	PackageManager		Kriittinen virhe
@@ -62,8 +62,8 @@ Send	RatePackageWindow		Lähetä
 Start package daemon	App		Käynnistä pakkaustaustaprosessi
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Salasana on liian heikko tai virheellinen. Käytä vähintään 8 merkkiä, joista vähintään 2 on numeroita ja 2 suuria kirjaimia.
 The package action could not be scheduled: %Error%	PackageInfoView		Pakkaustoiminnon aikatauluttaminen epäonnistui: %Error%
-Inactive	PackageListView		Ei käytössä
 Cancel	RatePackageWindow		Peru
+Inactive	PackageListView		Ei käytössä
 OK	MainWindow		Valmis
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# kohde} other{# kohdetta}}
 OK	PackageInfoView		Valmis
@@ -78,10 +78,10 @@ Close	RatePackageWindow		Sulje
 Failed to create account: %s\n	UserLoginWindow		Tilin luominen epäonnistui: %s\n
 Size	PackageListView		Koko
 Your rating:	RatePackageWindow		Arvosanasi:
-All categories	FilterView		Kaikki luokat
 Your rating was updated.	RatePackageWindow		Arvosanasi päivitettiin.
-n/a	PackageInfoView		–
+All categories	FilterView		Kaikki luokat
 Repositories	MainWindow		Tietovarastot
+n/a	PackageInfoView		–
 Cancel	MainWindow		Peru
 Refresh repositories	MainWindow		Virkistä tietovarastoja
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Jos et tarjoa sähköpostiosoitetta, et kykene nollaamaan salasanaasi silloin kun unohdat sen.

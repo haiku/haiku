@@ -1,0 +1,24 @@
+1	friulian	x-vnd.Haiku-GLTeapot	1569683445
+Upper center	TeapotWindow		In alt tal mieç
+Lighting	TeapotWindow		Iluminazion
+Off	TeapotWindow		Distudât
+Lower left	TeapotWindow		In bas a çampe
+White	TeapotWindow		Blanc
+Yellow	TeapotWindow		Zâl
+Blue	TeapotWindow		Blu
+Gouraud shading	TeapotWindow		Ombrenadure Gouraud
+Quit	TeapotWindow		Jes
+Filled polygons	TeapotWindow		Poligons jemplâts
+Settings	TeapotWindow		Impostazions
+Fog	TeapotWindow		Fumate
+Backface culling	TeapotWindow		Scuint muse posteriôr
+Z-buffered	TeapotWindow		Cun buffer Z
+File	TeapotWindow		File
+Perspective	TeapotWindow		Prospetive
+GLTeapot	System name		GLTeapot
+Green	TeapotWindow		Vert
+Right	TeapotWindow		Diestre
+FPS display	TeapotWindow		Indicadôr FPS
+Add a teapot	TeapotWindow		Zonte une teiere
+Red	TeapotWindow		Ros
+Lights	TeapotWindow		Lûs

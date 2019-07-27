@@ -1,0 +1,41 @@
+1	friulian	x-vnd.Be-PRNT	1465107170
+Test page	TestPageView		Pagjine di prove
+Remove	PrintersWindow		Gjave
+Red	TestPageView		Ros
+Default Printer	PrinterListView		Stampadore predefinide
+<pick one>	AddPrinterDialog		<sielç un>
+Connected to:	AddPrinterDialog		Tacât a:
+Make default	PrintersWindow		Rint predefinide
+Cyan	TestPageView		Turchin
+Completed	JobListView		Completade
+Test page	PrintersWindow		Pagjine di prove
+Transport: %transport% %transport_address%	PrinterListView		Colegament/traspuart: %transport% %transport_address%
+Failed	JobListView		Falide
+Blue	TestPageView		Blu
+Waiting	JobListView		In spiete
+Processing	JobListView		In lavorazion
+Cancel	AddPrinterDialog		Anule
+Unknown status	JobListView		Stât no cognossût
+Print jobs for %printer_name%	PrintersWindow		Lavôrs di stampe par %printer_name%
+{0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? pagjinis}=1{# pagjine}other{# pagjinis}}
+Add printer	AddPrinterDialog		Zonte une stampadore
+Printers	PrintersWindow		Stampadoris
+No printer found!	TransportMenu		Nissune stampadore cjatade
+Add…	PrintersWindow		Zonte…
+Magenta	TestPageView		Magenta
+Transport: %transport% %transport_address%	TestPageView		Colegament/traspuart: %transport% %transport_address%
+Add	AddPrinterDialog		Zonte
+Print jobs: No printer selected	PrintersWindow		Voris di stampe: nissune stampadore selezionade
+Printer name:	AddPrinterDialog		Non de stampadore:
+Yellow	TestPageView		Zâl
+Black	TestPageView		Neri
+Printer type:	AddPrinterDialog		Gjenar di stampadore:
+Printers	System name		Stampadoris
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{Nissun lavôr in spiete}=1{1 lavôr in spiete}other{# lavôrs in spiete}}
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Stampadore: %printer_name%\nDriver:  %driver%\n
+Green	TestPageView		Vert
+Print test page	PrintersWindow		Stampe pagjine di prove
+Restart job	PrintersWindow		Torne invie il lavôr
+Driver: %driver%	PrinterListView		Driver: %driver%
+Cancel job	PrintersWindow		Anule lavôr
+%.2f KB	JobListView		%.2f KB
