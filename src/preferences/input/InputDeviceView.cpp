@@ -51,7 +51,6 @@ DeviceListView::DeviceListView(const char* name)
 	fDeviceList->AddItem(new DeviceName("Touchpad", 102));
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(fScrollView)
 		.End();
 	fDeviceList->SetSelectionMessage(new BMessage(ITEM_SELECTED));

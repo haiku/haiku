@@ -34,9 +34,9 @@
 #define B_TRANSLATION_CONTEXT "InputWindow"
 
 
-InputWindow::InputWindow(BRect _rect)
+InputWindow::InputWindow(BRect rect)
 	:
-	BWindow(_rect, B_TRANSLATE_SYSTEM_NAME("Input"), B_TITLED_WINDOW,
+	BWindow(rect, B_TRANSLATE_SYSTEM_NAME("Input"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS
 		| B_AUTO_UPDATE_SIZE_LIMITS | B_QUIT_ON_WINDOW_CLOSE)
 {
@@ -49,8 +49,9 @@ InputWindow::InputWindow(BRect _rect)
 	fCardView->AddChild(fTouchpadPrefView);
 
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL, 10)
+		.SetInsets(B_USE_WINDOW_SPACING)
 		.Add(fDeviceListView)
-		.AddGroup(B_VERTICAL,0)
+		.AddGroup(B_VERTICAL, 0)
 			.Add(fCardView)
 		.End();
 }
