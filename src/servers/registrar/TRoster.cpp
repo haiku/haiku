@@ -681,7 +681,7 @@ TRoster::HandleGetAppInfo(BMessage* request)
 
 	// get the info
 	RosterAppInfo* info = NULL;
-	status_t error;
+	status_t error = B_OK;
 	if (hasTeam) {
 		info = fRegisteredApps.InfoFor(team);
 		if (info == NULL)
@@ -732,7 +732,7 @@ TRoster::HandleGetAppList(BMessage* request)
 	// get the parameters
 	const char* signature;
 	error = request->FindString("signature", &signature);
-	
+
 	// reply to the request
 	if (error == B_OK) {
 		BMessage reply(B_REG_SUCCESS);
