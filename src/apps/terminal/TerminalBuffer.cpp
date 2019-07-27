@@ -47,8 +47,8 @@ TerminalBuffer::~TerminalBuffer()
 status_t
 TerminalBuffer::Init(int32 width, int32 height, int32 historySize)
 {
-	if (Sem() < 0)
-		return Sem();
+	if (BLocker::InitCheck() < 0)
+		return BLocker::InitCheck();
 
 	fAlternateScreen = _AllocateLines(width, height);
 	if (fAlternateScreen == NULL)

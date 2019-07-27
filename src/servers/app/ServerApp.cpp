@@ -223,8 +223,8 @@ ServerApp::InitCheck()
 	if (fClientReplyPort < B_OK)
 		return fClientReplyPort;
 
-	if (fWindowListLock.Sem() < B_OK)
-		return fWindowListLock.Sem();
+	if (fWindowListLock.InitCheck() < B_OK)
+		return fWindowListLock.InitCheck();
 
 	if (fMemoryAllocator == NULL)
 		return B_NO_MEMORY;

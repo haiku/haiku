@@ -100,7 +100,7 @@ get_next_encoder(int32* cookie, const media_file_format* fileFormat,
 		status_t ret = AddOnManager::GetInstance()->GetCodecInfo(
 			&candidateCodecInfo, &candidateFormatFamily, &candidateInputFormat,
 			&candidateOutputFormat, *cookie);
-				
+
 		if (ret != B_OK)
 			return ret;
 
@@ -186,7 +186,7 @@ _media_format_description::_media_format_description(
 }
 
 
-_media_format_description& 
+_media_format_description&
 _media_format_description::operator=(const _media_format_description& other)
 {
 	memcpy(this, &other, sizeof(*this));
@@ -318,7 +318,7 @@ meta_format::meta_format(const meta_format& other)
 }
 
 
-bool 
+bool
 meta_format::Matches(const media_format& otherFormat,
 	media_format_family family)
 {
@@ -329,7 +329,7 @@ meta_format::Matches(const media_format& otherFormat,
 }
 
 
-int 
+int
 meta_format::CompareDescriptions(const meta_format* a, const meta_format* b)
 {
 	if (a->description == b->description)
@@ -342,7 +342,7 @@ meta_format::CompareDescriptions(const meta_format* a, const meta_format* b)
 }
 
 
-int 
+int
 meta_format::Compare(const meta_format* a, const meta_format* b)
 {
 	int compare = CompareDescriptions(a, b);
@@ -422,7 +422,7 @@ update_media_formats()
 
 BMediaFormats::BMediaFormats()
 	:
-	fIteratorIndex(0)	
+	fIteratorIndex(0)
 {
 }
 
@@ -432,14 +432,14 @@ BMediaFormats::~BMediaFormats()
 }
 
 
-status_t 
+status_t
 BMediaFormats::InitCheck()
 {
-	return sLock.Sem() >= B_OK ? B_OK : sLock.Sem();
+	return sLock.InitCheck();
 }
 
 
-status_t 
+status_t
 BMediaFormats::GetCodeFor(const media_format& format,
 	media_format_family family,
 	media_format_description* _description)
@@ -465,7 +465,7 @@ BMediaFormats::GetCodeFor(const media_format& format,
 }
 
 
-status_t 
+status_t
 BMediaFormats::GetFormatFor(const media_format_description& description,
 	media_format* _format)
 {
@@ -499,8 +499,8 @@ BMediaFormats::GetFormatFor(const media_format_description& description,
 }
 
 
-status_t 
-BMediaFormats::GetBeOSFormatFor(uint32 format, 
+status_t
+BMediaFormats::GetBeOSFormatFor(uint32 format,
 	media_format* _format, media_type type)
 {
 	BMediaFormats formats;
@@ -520,7 +520,7 @@ BMediaFormats::GetBeOSFormatFor(uint32 format,
 }
 
 
-status_t 
+status_t
 BMediaFormats::GetAVIFormatFor(uint32 codec,
 	media_format* _format, media_type type)
 {
@@ -542,8 +542,8 @@ BMediaFormats::GetAVIFormatFor(uint32 codec,
 }
 
 
-status_t 
-BMediaFormats::GetQuicktimeFormatFor(uint32 vendor, uint32 codec, 
+status_t
+BMediaFormats::GetQuicktimeFormatFor(uint32 vendor, uint32 codec,
 	media_format* _format, media_type type)
 {
 	BMediaFormats formats;
@@ -564,7 +564,7 @@ BMediaFormats::GetQuicktimeFormatFor(uint32 vendor, uint32 codec,
 }
 
 
-status_t 
+status_t
 BMediaFormats::RewindFormats()
 {
 	if (!sLock.IsLocked() || sLock.LockingThread() != find_thread(NULL)) {
@@ -577,7 +577,7 @@ BMediaFormats::RewindFormats()
 }
 
 
-status_t 
+status_t
 BMediaFormats::GetNextFormat(media_format* _format,
 	media_format_description* _description)
 {
@@ -609,14 +609,14 @@ BMediaFormats::Lock()
 }
 
 
-void 
+void
 BMediaFormats::Unlock()
 {
 	sLock.Unlock();
 }
 
 
-status_t 
+status_t
 BMediaFormats::MakeFormatFor(const media_format_description* descriptions,
 	int32 descriptionCount, media_format* format, uint32 flags,
 	void* _reserved)
@@ -631,7 +631,7 @@ BMediaFormats::MakeFormatFor(const media_format_description* descriptions,
 // #pragma mark - deprecated API
 
 
-status_t 
+status_t
 BMediaFormats::MakeFormatFor(const media_format_description& description,
 	const media_format& inFormat, media_format* _outFormat)
 {

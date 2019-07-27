@@ -198,7 +198,7 @@ public:
 
 	status_t InitCheck() const
 	{
-		return (fLock.Sem() >= 0 ? B_OK : B_NO_INIT);
+		return fLock.InitCheck();
 	}
 
 	status_t GetHostAddress(const char* hostName, NetAddress* address)

@@ -1232,8 +1232,8 @@ status_t
 TRoster::Init()
 {
 	// check lock initialization
-	if (fLock.Sem() < 0)
-		return fLock.Sem();
+	if (fLock.InitCheck() < 0)
+		return fLock.InitCheck();
 
 	// create the info
 	RosterAppInfo* info = new(nothrow) RosterAppInfo;

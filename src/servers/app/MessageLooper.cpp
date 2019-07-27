@@ -18,6 +18,7 @@
 MessageLooper::MessageLooper(const char* name)
 	:
 	BLocker(name),
+	fName(name),
 	fThread(-1),
 	fQuitting(false),
 	fDeathSemaphore(-1)
@@ -120,10 +121,8 @@ MessageLooper::_PrepareQuit()
 void
 MessageLooper::_GetLooperName(char* name, size_t length)
 {
-	sem_id semaphore = Sem();
-	sem_info info;
-	if (get_sem_info(semaphore, &info) == B_OK)
-		strlcpy(name, info.name, length);
+	if (fName != NULL)
+		strlcpy(name, fName, length);
 	else
 		strlcpy(name, "unnamed looper", length);
 }

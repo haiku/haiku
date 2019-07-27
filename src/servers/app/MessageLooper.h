@@ -46,6 +46,7 @@ protected:
 	static	int32				_message_thread(void*_looper);
 
 protected:
+			const char*			fName;
 			thread_id			fThread;
 			BPrivate::PortLink	fLink;
 			bool				fQuitting;
