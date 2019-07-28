@@ -253,7 +253,7 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 	appendParameter(parameters, fReadOnly, B_TRANSLATE("Read only"));
 	appendParameter(parameters, volume.IsRemovable(), B_TRANSLATE("Removable"));
 	appendParameter(parameters, fShared, B_TRANSLATE("Shared"));
-	appendParameter(parameters, volume.KnowsMime(), B_TRANSLATE("Mimes"));
+	appendParameter(parameters, volume.KnowsMime(), B_TRANSLATE("MIMEs"));
 	appendParameter(parameters, volume.KnowsAttr(), B_TRANSLATE("Attributes"));
 	appendParameter(parameters, volume.KnowsQuery(), B_TRANSLATE("Queries"));
 

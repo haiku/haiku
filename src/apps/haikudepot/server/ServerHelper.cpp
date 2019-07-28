@@ -175,7 +175,7 @@ ServerHelper::AlertClientTooOld(BMessage* message)
 			" HaikuDepot required is \"%s\"."), minimumVersion.String());
 
 	BAlert* alert = new BAlert(
-		B_TRANSLATE("client_version_too_old"),
+		B_TRANSLATE("Client version too old"),
 		alertText,
 		B_TRANSLATE("OK"));
 
