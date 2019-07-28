@@ -90,7 +90,7 @@ SerialDevice::Init()
 		+ fInterruptBufferSize;
 	fBufferArea = create_area("usb_serial:buffers_area", (void **)&fReadBuffer,
 		B_ANY_KERNEL_ADDRESS, ROUNDUP(totalBuffers, B_PAGE_SIZE), B_CONTIGUOUS,
-		B_READ_AREA | B_WRITE_AREA);
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (fBufferArea < 0)
 		return fBufferArea;
 
