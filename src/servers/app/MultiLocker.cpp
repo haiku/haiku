@@ -35,8 +35,7 @@ MultiLocker::MultiLocker(const char* baseName)
 #endif
 	fInit(B_NO_INIT),
 	fWriterNest(0),
-	fWriterThread(-1),
-	fWriterStackBase(0)
+	fWriterThread(-1)
 {
 	// build the semaphores
 #if !DEBUG
@@ -126,30 +125,8 @@ MultiLocker::InitCheck()
 }
 
 
-/*!
-	This function demonstrates a nice method of determining if the current thread
-	is the writer or not.  The method involves caching the index of the page in memory
-	where the thread's stack is located.  Each time a new writer acquires the lock,
-	its thread_id and stack_page are recorded.  IsWriteLocked gets the stack_page of the
-	current thread and sees if it is a match.  If the stack_page matches you are guaranteed
-	to have the matching thread.  If the stack page doesn't match the more traditional
-	find_thread(NULL) method of matching the thread_ids is used.
-
-	This technique is very useful when dealing with a lock that is acquired in a nested fashion.
-	It could be expanded to cache the information of the last thread in the lock, and then if
-	the same thread returns while there is no one in the lock, it could save some time, if the
-	same thread is likely to acquire the lock again and again.
-	I should note another shortcut that could be implemented here
-	If fWriterThread is set to -1 then there is no writer in the lock, and we could
-	return from this function much faster.  However the function is currently set up
-	so all of the stack_base and thread_id info is determined here.  WriteLock passes
-	in some variables so that if the lock is not held it does not have to get the thread_id
-	and stack base again.  Instead this function returns that information.  So this shortcut
-	would only move this information gathering outside of this function, and I like it all
-	contained.
-*/
 bool
-MultiLocker::IsWriteLocked(addr_t* _stackBase, thread_id* _thread) const
+MultiLocker::IsWriteLocked() const
 {
 #if TIMING
 	bigtime_t start = system_time();
@@ -158,30 +135,8 @@ MultiLocker::IsWriteLocked(addr_t* _stackBase, thread_id* _thread) const
 	// get a variable on the stack
 	bool writeLockHolder = false;
 
-	if (fInit == B_OK) {
-		// determine which page in memory this stack represents
-		// this is managed by taking the address of the item on the
-		// stack and dividing it by the size of the memory pages
-		// if it is the same as the cached stack_page, there is a match
-		addr_t stackBase = (addr_t)&writeLockHolder / B_PAGE_SIZE;
-		thread_id thread = 0;
-
-		if (fWriterStackBase == stackBase) {
-			writeLockHolder = true;
-		} else {
-			// as there was no stack page match we resort to the
-			// tried and true methods
-			thread = find_thread(NULL);
-			if (fWriterThread == thread)
-				writeLockHolder = true;
-		}
-
-		// if someone wants this information, give it to them
-		if (_stackBase != NULL)
-			*_stackBase = stackBase;
-		if (_thread != NULL)
-			*_thread = thread;
-	}
+	if (fInit == B_OK)
+		writeLockHolder = (find_thread(NULL) == fWriterThread);
 
 #if TIMING
 	bigtime_t end = system_time();
@@ -248,10 +203,7 @@ MultiLocker::WriteLock()
 	bool locked = false;
 
 	if (fInit == B_OK) {
-		addr_t stackBase = 0;
-		thread_id thread = -1;
-
-		if (IsWriteLocked(&stackBase, &thread)) {
+		if (IsWriteLocked()) {
 			// already the writer - increment the nesting count
 			fWriterNest++;
 			locked = true;
@@ -286,8 +238,7 @@ MultiLocker::WriteLock()
 				if (locked) {
 					ASSERT(fWriterThread == -1);
 					// record thread information
-					fWriterThread = thread;
-					fWriterStackBase = stackBase;
+					fWriterThread = find_thread(NULL);
 				}
 			}
 		}
@@ -369,7 +320,6 @@ MultiLocker::WriteUnlock()
 			if (unlocked) {
 				// clear the information
 				fWriterThread = -1;
-				fWriterStackBase = 0;
 
 				// decrement and retrieve the lock count
 				if (atomic_add(&fLockCount, -1) > 1) {
@@ -434,10 +384,7 @@ MultiLocker::WriteLock()
 	if (fInit != B_OK)
 		debugger("lock not initialized");
 
-	addr_t stackBase = 0;
-	thread_id thread = -1;
-
-	if (IsWriteLocked(&stackBase, &thread)) {
+	if (IsWriteLocked()) {
 		if (fWriterNest < 0)
 			debugger("WriteLock() - negative writer nest count");
 
@@ -456,8 +403,7 @@ MultiLocker::WriteLock()
 		locked = status == B_OK;
 		if (locked) {
 			// record thread information
-			fWriterThread = thread;
-			fWriterStackBase = stackBase;
+			fWriterThread = find_thread(NULL);
 		}
 	}
 
@@ -501,7 +447,6 @@ MultiLocker::WriteUnlock()
 		} else {
 			// clear the information while still holding the lock
 			fWriterThread = -1;
-			fWriterStackBase = 0;
 			unlocked = release_sem_etc(fLock, LARGE_NUMBER,
 				B_DO_NOT_RESCHEDULE) == B_OK;
 		}
