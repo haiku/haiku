@@ -728,30 +728,23 @@ TRoster::HandleGetAppList(BMessage* request)
 
 	BAutolock _(fLock);
 
-	status_t error = B_OK;
 	// get the parameters
 	const char* signature;
 	if (request->FindString("signature", &signature) != B_OK)
 		signature = NULL;
 
 	// reply to the request
-	if (error == B_OK) {
-		BMessage reply(B_REG_SUCCESS);
-		// get the list
-		for (AppInfoList::Iterator it(fRegisteredApps.It());
-			 RosterAppInfo* info = *it;
-			 ++it) {
-			if (info->state != APP_STATE_REGISTERED)
-				continue;
-			if (!signature || !strcasecmp(signature, info->signature))
-				reply.AddInt32("teams", info->team);
-		}
-		request->SendReply(&reply);
-	} else {
-		BMessage reply(B_REG_ERROR);
-		reply.AddInt32("error", error);
-		request->SendReply(&reply);
+	BMessage reply(B_REG_SUCCESS);
+	// get the list
+	for (AppInfoList::Iterator it(fRegisteredApps.It());
+		 RosterAppInfo* info = *it;
+		 ++it) {
+		if (info->state != APP_STATE_REGISTERED)
+			continue;
+		if (signature == NULL || strcasecmp(signature, info->signature) == 0)
+			reply.AddInt32("teams", info->team);
 	}
+	request->SendReply(&reply);
 
 	FUNCTION_END();
 }
