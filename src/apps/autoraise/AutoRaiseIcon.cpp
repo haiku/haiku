@@ -380,7 +380,7 @@ int32 fronter(void *arg)
 		goto end; // don't touch windows if we changed workspace
 	if (tv->last_raiser_thread != find_thread(NULL))
 		goto end; // seems a newer one has been spawn, exit
-PRINT(("tok = %ld cw = %ld\n", tok, tv->current_window));
+PRINT(("tok = %" B_PRId32 " cw = %" B_PRId32 "\n", tok, tv->current_window));
 	if (tok == tv->current_window) {
 		bool doZoom = false;
 		BRect zoomRect(0.0f, 0.0f, 10.0f, 10.0f);
@@ -422,7 +422,8 @@ int32 poller(void *arg)
 			free(wi);
 			wi = get_window_info(tl[i]);
 			if (wi) {
-PRINT(("wi [%ld] = %p, %ld %s\n", i, wi, wi->layer, ((struct client_window_info *)wi)->name));
+PRINT(("wi [%" B_PRId32 "] = %p, %" B_PRId32 " %s\n", i, wi, wi->layer,
+	((struct client_window_info *)wi)->name));
 				if (wi->layer < 3) // we hit the desktop or a window not on this WS
 					continue;
 				if ((wi->window_left > wi->window_right) || (wi->window_top > wi->window_bottom))
@@ -430,9 +431,11 @@ PRINT(("wi [%ld] = %p, %ld %s\n", i, wi, wi->layer, ((struct client_window_info 
 				if (wi->is_mini)
 					continue;
 
-PRINT(("if (!%s && (%li, %li)isin(%li)(%li, %li, %li, %li) && (%li != %li) \n", wi->is_mini?"true":"false",
-	(long)mouse.x, (long)mouse.y, i, wi->window_left, wi->window_right,
-	wi->window_top, wi->window_bottom, wi->server_token, tok));
+PRINT(("if (!%s && (%li, %li)isin(%" B_PRId32 ")(%" B_PRId32 ", %" B_PRId32
+	", %" B_PRId32 ", %" B_PRId32 ") && (%" B_PRId32 " != %" B_PRId32 ") \n",
+	wi->is_mini?"true":"false", (long)mouse.x, (long)mouse.y, i,
+	wi->window_left, wi->window_right, wi->window_top, wi->window_bottom,
+	wi->server_token, tok));
 
 
 
