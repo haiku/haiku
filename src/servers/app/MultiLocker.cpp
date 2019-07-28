@@ -34,7 +34,8 @@ MultiLocker::MultiLocker(const char* baseName)
 	fInit(B_NO_INIT)
 {
 #if !DEBUG
-	rw_lock_init(&fLock, baseName != NULL ? baseName : "some MultiLocker");
+	rw_lock_init_etc(&fLock, baseName != NULL ? baseName : "some MultiLocker",
+		baseName != NULL ? RW_LOCK_FLAG_CLONE_NAME : 0);
 	fInit = B_OK;
 #else
 	// we are in debug mode!
