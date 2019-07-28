@@ -18,7 +18,7 @@
 MessageLooper::MessageLooper(const char* name)
 	:
 	BLocker(name),
-	fName(name),
+	fName(strdup(name)),
 	fThread(-1),
 	fQuitting(false),
 	fDeathSemaphore(-1)
@@ -28,6 +28,7 @@ MessageLooper::MessageLooper(const char* name)
 
 MessageLooper::~MessageLooper()
 {
+	free((void*)fName);
 }
 
 
