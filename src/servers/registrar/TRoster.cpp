@@ -731,7 +731,8 @@ TRoster::HandleGetAppList(BMessage* request)
 	status_t error = B_OK;
 	// get the parameters
 	const char* signature;
-	error = request->FindString("signature", &signature);
+	if (request->FindString("signature", &signature) != B_OK)
+		signature = NULL;
 
 	// reply to the request
 	if (error == B_OK) {
