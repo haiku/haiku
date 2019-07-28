@@ -278,7 +278,7 @@ ctl_endserver(struct ctl_sctx *ctx) {
 	struct ctl_sess *this, *next;
 
 	(*ctx->logger)(ctl_debug, "%s: ctx %p, sock %d, acID %p, sess %p",
-		       me, ctx, ctx->sock, ctx->acID.opaque, ctx->sess);
+		       me, ctx, ctx->sock, ctx->acID.opaque, ctx->sess.head);
 	if (ctx->acID.opaque != NULL) {
 		(void)evCancelConn(ctx->ev, ctx->acID);
 		ctx->acID.opaque = NULL;
