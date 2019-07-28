@@ -28,39 +28,20 @@ MultiLocker::MultiLocker(const char* baseName)
 #if DEBUG
 	fDebugArray(NULL),
 	fMaxThreads(0),
-#else
-	fReadCount(0),
-	fWriteCount(0),
-	fLockCount(0),
-#endif
-	fInit(B_NO_INIT),
 	fWriterNest(0),
-	fWriterThread(-1)
+	fWriterThread(-1),
+#endif
+	fInit(B_NO_INIT)
 {
-	// build the semaphores
 #if !DEBUG
-	if (baseName) {
-		char name[128];
-		snprintf(name, sizeof(name), "%s-%s", baseName, "ReadSem");
-		fReadSem = create_sem(0, name);
-		snprintf(name, sizeof(name), "%s-%s", baseName, "WriteSem");
-		fWriteSem = create_sem(0, name);
-		snprintf(name, sizeof(name), "%s-%s", baseName, "WriterLock");
-		fWriterLock = create_sem(0, name);
-	} else {
-		fReadSem = create_sem(0, "MultiLocker_ReadSem");
-		fWriteSem = create_sem(0, "MultiLocker_WriteSem");
-		fWriterLock = create_sem(0, "MultiLocker_WriterLock");
-	}
-
-	if (fReadSem >= 0 && fWriteSem >=0 && fWriterLock >= 0)
-		fInit = B_OK;
+	rw_lock_init(&fLock, baseName != NULL ? baseName : "some MultiLocker");
+	fInit = B_OK;
 #else
+	// we are in debug mode!
 	fLock = create_sem(LARGE_NUMBER, baseName != NULL ? baseName : "MultiLocker");
 	if (fLock >= 0)
 		fInit = B_OK;
 
-	// we are in debug mode!
 	// create the reader tracking list
 	// the array needs to be large enough to hold all possible threads
 	system_info sys;
@@ -93,10 +74,7 @@ MultiLocker::~MultiLocker()
 	fInit = B_NO_INIT;
 
 #if !DEBUG
-	// delete the semaphores
-	delete_sem(fReadSem);
-	delete_sem(fWriteSem);
-	delete_sem(fWriterLock);
+	rw_lock_destroy(&fLock);
 #else
 	delete_sem(fLock);
 	free(fDebugArray);
@@ -125,6 +103,10 @@ MultiLocker::InitCheck()
 }
 
 
+#if !DEBUG
+//	#pragma mark - Standard versions
+
+
 bool
 MultiLocker::IsWriteLocked() const
 {
@@ -132,11 +114,10 @@ MultiLocker::IsWriteLocked() const
 	bigtime_t start = system_time();
 #endif
 
-	// get a variable on the stack
 	bool writeLockHolder = false;
 
 	if (fInit == B_OK)
-		writeLockHolder = (find_thread(NULL) == fWriterThread);
+		writeLockHolder = (find_thread(NULL) == fLock.holder);
 
 #if TIMING
 	bigtime_t end = system_time();
@@ -148,10 +129,6 @@ MultiLocker::IsWriteLocked() const
 }
 
 
-#if !DEBUG
-//	#pragma mark - Standard versions
-
-
 bool
 MultiLocker::ReadLock()
 {
@@ -159,29 +136,7 @@ MultiLocker::ReadLock()
 	bigtime_t start = system_time();
 #endif
 
-	bool locked = false;
-
-	// the lock must be initialized
-	if (fInit == B_OK) {
-		if (IsWriteLocked()) {
-			// the writer simply increments the nesting
-			fWriterNest++;
-			locked = true;
-		} else {
-			// increment and retrieve the current count of readers
-			int32 currentCount = atomic_add(&fReadCount, 1);
-			if (currentCount < 0) {
-				// a writer holds the lock so wait for fReadSem to be released
-				status_t status;
-				do {
-					status = acquire_sem(fReadSem);
-				} while (status == B_INTERRUPTED);
-
-				locked = status == B_OK;
-			} else
-				locked = true;
-		}
-	}
+	bool locked = (rw_lock_read_lock(&fLock) == B_OK);
 
 #if TIMING
 	bigtime_t end = system_time();
@@ -200,49 +155,7 @@ MultiLocker::WriteLock()
 	bigtime_t start = system_time();
 #endif
 
-	bool locked = false;
-
-	if (fInit == B_OK) {
-		if (IsWriteLocked()) {
-			// already the writer - increment the nesting count
-			fWriterNest++;
-			locked = true;
-		} else {
-			// new writer acquiring the lock
-			if (atomic_add(&fLockCount, 1) >= 1) {
-				// another writer in the lock - acquire the semaphore
-				status_t status;
-				do {
-					status = acquire_sem(fWriterLock);
-				} while (status == B_INTERRUPTED);
-
-				locked = status == B_OK;
-			} else
-				locked = true;
-
-			if (locked) {
-				// new holder of the lock
-
-				// decrement fReadCount by a very large number
-				// this will cause new readers to block on fReadSem
-				int32 readers = atomic_add(&fReadCount, -LARGE_NUMBER);
-				if (readers > 0) {
-					// readers hold the lock - acquire fWriteSem
-					status_t status;
-					do {
-						status = acquire_sem_etc(fWriteSem, readers, 0, 0);
-					} while (status == B_INTERRUPTED);
-
-					locked = status == B_OK;
-				}
-				if (locked) {
-					ASSERT(fWriterThread == -1);
-					// record thread information
-					fWriterThread = find_thread(NULL);
-				}
-			}
-		}
-	}
+	bool locked = (rw_lock_write_lock(&fLock) == B_OK);
 
 #if TIMING
 	bigtime_t end = system_time();
@@ -261,21 +174,7 @@ MultiLocker::ReadUnlock()
 	bigtime_t start = system_time();
 #endif
 
-	bool unlocked = false;
-
-	if (IsWriteLocked()) {
-		// writers simply decrement the nesting count
-		fWriterNest--;
-		unlocked = true;
-	} else {
-		// decrement and retrieve the read counter
-		int32 current_count = atomic_add(&fReadCount, -1);
-		if (current_count < 0) {
-			// a writer is waiting for the lock so release fWriteSem
-			unlocked = release_sem_etc(fWriteSem, 1, B_DO_NOT_RESCHEDULE) == B_OK;
-		} else
-			unlocked = true;
-	}
+	bool unlocked = (rw_lock_read_unlock(&fLock) == B_OK);
 
 #if TIMING
 	bigtime_t end = system_time();
@@ -294,43 +193,7 @@ MultiLocker::WriteUnlock()
 	bigtime_t start = system_time();
 #endif
 
-	bool unlocked = false;
-
-	if (IsWriteLocked()) {
-		// if this is a nested lock simply decrement the nest count
-		if (fWriterNest > 0) {
-			fWriterNest--;
-			unlocked = true;
-		} else {
-			// writer finally unlocking
-
-			// increment fReadCount by a large number
-			// this will let new readers acquire the read lock
-			// retrieve the number of current waiters
-			int32 readersWaiting = atomic_add(&fReadCount, LARGE_NUMBER)
-				+ LARGE_NUMBER;
-
-			if (readersWaiting > 0) {
-				// readers are waiting to acquire the lock
-				unlocked = release_sem_etc(fReadSem, readersWaiting,
-					B_DO_NOT_RESCHEDULE) == B_OK;
-			} else
-				unlocked = true;
-
-			if (unlocked) {
-				// clear the information
-				fWriterThread = -1;
-
-				// decrement and retrieve the lock count
-				if (atomic_add(&fLockCount, -1) > 1) {
-					// other writers are waiting so release fWriterLock
-					unlocked = release_sem_etc(fWriterLock, 1,
-						B_DO_NOT_RESCHEDULE) == B_OK;
-				}
-			}
-		}
-	} else
-		debugger("Non-writer attempting to WriteUnlock()");
+	bool unlocked = (rw_lock_write_unlock(&fLock) == B_OK);
 
 #if TIMING
 	bigtime_t end = system_time();
@@ -344,6 +207,28 @@ MultiLocker::WriteUnlock()
 
 #else	// DEBUG
 //	#pragma mark - Debug versions
+
+
+bool
+MultiLocker::IsWriteLocked() const
+{
+#if TIMING
+	bigtime_t start = system_time();
+#endif
+
+	bool writeLockHolder = false;
+
+	if (fInit == B_OK)
+		writeLockHolder = (find_thread(NULL) == fWriterThread);
+
+#if TIMING
+	bigtime_t end = system_time();
+	islock_time += (end - start);
+	islock_count++;
+#endif
+
+	return writeLockHolder;
+}
 
 
 bool
