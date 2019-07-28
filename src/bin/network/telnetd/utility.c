@@ -228,7 +228,7 @@ netclear(void)
 	    next = thisitem;
 	    do {
 		next = nextitem(next);
-	    } while (wewant(next) && (nfrontp > next));
+	    } while (wewant(next));
 	    length = next-thisitem;
 	    memmove(good, thisitem, length);
 	    good += length;
