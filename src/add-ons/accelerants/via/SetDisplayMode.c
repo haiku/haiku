@@ -462,33 +462,34 @@ status_t SET_DPMS_MODE(uint32 dpms_flags) {
 
 	LOG(4,("SET_DPMS_MODE: 0x%08x\n", dpms_flags));
 	
+#if 0
 	if (si->dm.flags & DUALHEAD_BITS) /*dualhead*/
 	{
 		switch(dpms_flags) 
 		{
 		case B_DPMS_ON:	/* H: on, V: on, display on */
 			head1_dpms(true, true, true);
-//			if (si->ps.secondary_head) head2_dpms(true, true, true);
+			if (si->ps.secondary_head) head2_dpms(true, true, true);
 			break;
 		case B_DPMS_STAND_BY:
 			head1_dpms(false, false, true);
-//			if (si->ps.secondary_head) head2_dpms(false, false, true);
+			if (si->ps.secondary_head) head2_dpms(false, false, true);
 			break;
 		case B_DPMS_SUSPEND:
 			head1_dpms(false, true, false);
-//			if (si->ps.secondary_head) head2_dpms(false, true, false);
+			if (si->ps.secondary_head) head2_dpms(false, true, false);
 			break;
 		case B_DPMS_OFF: /* H: off, V: off, display off */
 			head1_dpms(false, false, false);
-//			if (si->ps.secondary_head) head2_dpms(false, false, false);
+			if (si->ps.secondary_head) head2_dpms(false, false, false);
 			break;
 		default:
 			LOG(8,("SET: Invalid DPMS settings (DH) 0x%08x\n", dpms_flags));
 			interrupt_enable(true);
 			return B_ERROR;
 		}
-	}
-	else /* singlehead */
+	} else /* singlehead */
+#endif
 	{
 		switch(dpms_flags) 
 		{
