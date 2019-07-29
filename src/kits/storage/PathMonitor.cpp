@@ -1462,7 +1462,7 @@ PathHandler::_EntryCreated(const NotOwningEntryRef& entryRef,
 	if (directory == NULL) {
 		// We're out of sync with reality.
 		if (!dryRun) {
-			if (Entry* nodeEntry = directory->FirstNodeEntry()) {
+			if (Entry* nodeEntry = directoryNode->FirstNodeEntry()) {
 				// remove the entry that is in the way and re-add the proper
 				// entry
 				NotOwningEntryRef directoryEntryRef = nodeEntry->EntryRef();
