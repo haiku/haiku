@@ -3,10 +3,15 @@
 
 #include "AutoRaiseIcon.h"
 #include <stdlib.h>
+#include <Catalog.h>
 #include <DataIO.h>
 #include <Screen.h>
 #include <View.h>
 #include <Debug.h>
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "AutoRaiseIcon"
 
 
 extern "C" _EXPORT BView *instantiate_deskbar_item(void)
@@ -40,28 +45,29 @@ ConfigMenu::ConfigMenu(TrayView *tv, bool useMag)
 	SetFont(be_plain_font);
 
 
-	BMenuItem *active = new BMenuItem("Active", new BMessage(MSG_TOGGLE_ACTIVE));
+	BMenuItem *active = new BMenuItem(B_TRANSLATE("Active"),
+		new BMessage(MSG_TOGGLE_ACTIVE));
 	active->SetMarked(s->Active());
 	AddItem(active);
 
-	tmpm = new BMenu("Mode");
+	tmpm = new BMenu(B_TRANSLATE("Mode"));
 	tmpm->SetFont(be_plain_font);
 
 	msg = new BMessage(MSG_SET_MODE);
 	msg->AddInt32(AR_MODE, Mode_All);
-	tmpi = new BMenuItem("Default (all windows)", msg);
+	tmpi = new BMenuItem(B_TRANSLATE("Default (all windows)"), msg);
 	tmpi->SetMarked(s->Mode() == Mode_All);
 	tmpm->AddItem(tmpi);
 
 	msg = new BMessage(MSG_SET_MODE);
 	msg->AddInt32(AR_MODE, Mode_DeskbarOver);
-	tmpi = new BMenuItem("Deskbar only (over its area)", msg);
+	tmpi = new BMenuItem(B_TRANSLATE("Deskbar only (over its area)"), msg);
 	tmpi->SetMarked(s->Mode() == Mode_DeskbarOver);
 	tmpm->AddItem(tmpi);
 
 	msg = new BMessage(MSG_SET_MODE);
 	msg->AddInt32(AR_MODE, Mode_DeskbarTouch);
-	tmpi = new BMenuItem("Deskbar only (touch)", msg);
+	tmpi = new BMenuItem(B_TRANSLATE("Deskbar only (touch)"), msg);
 	tmpi->SetMarked(s->Mode() == Mode_DeskbarTouch);
 	tmpm->AddItem(tmpi);
 
@@ -71,30 +77,30 @@ ConfigMenu::ConfigMenu(TrayView *tv, bool useMag)
 	modem->SetEnabled(s->Active());
 	AddItem(modem);
 
-	tmpm = new BMenu("Inactive behaviour");
+	tmpm = new BMenu(B_TRANSLATE("Inactive behaviour"));
 	tmpm->SetFont(be_plain_font);
 
 	msg = new BMessage(MSG_SET_BEHAVIOUR);
 	msg->AddInt32(AR_BEHAVIOUR, B_NORMAL_MOUSE);
-	tmpi = new BMenuItem("Normal", msg);
+	tmpi = new BMenuItem(B_TRANSLATE("Normal"), msg);
 	tmpi->SetMarked(tv->fNormalMM == B_NORMAL_MOUSE);
 	tmpm->AddItem(tmpi);
 
 	msg = new BMessage(MSG_SET_BEHAVIOUR);
 	msg->AddInt32(AR_BEHAVIOUR, B_FOCUS_FOLLOWS_MOUSE);
-	tmpi = new BMenuItem("Focus follows mouse", msg);
+	tmpi = new BMenuItem(B_TRANSLATE("Focus follows mouse"), msg);
 	tmpi->SetMarked(tv->fNormalMM == B_FOCUS_FOLLOWS_MOUSE);
 	tmpm->AddItem(tmpi);
 
 	msg = new BMessage(MSG_SET_BEHAVIOUR);
 	msg->AddInt32(AR_BEHAVIOUR, B_WARP_FOCUS_FOLLOWS_MOUSE);
-	tmpi = new BMenuItem("Warping (ffm)", msg);
+	tmpi = new BMenuItem(B_TRANSLATE("Warping (ffm)"), msg);
 	tmpi->SetMarked(tv->fNormalMM == (mode_mouse)B_WARP_FOCUS_FOLLOWS_MOUSE);
 	tmpm->AddItem(tmpi);
 
 	msg = new BMessage(MSG_SET_BEHAVIOUR);
 	msg->AddInt32(AR_BEHAVIOUR, B_INSTANT_WARP_FOCUS_FOLLOWS_MOUSE);
-	tmpi = new BMenuItem("Instant warping (ffm)", msg);
+	tmpi = new BMenuItem(B_TRANSLATE("Instant warping (ffm)"), msg);
 	tmpi->SetMarked(tv->fNormalMM == (mode_mouse)B_INSTANT_WARP_FOCUS_FOLLOWS_MOUSE);
 	tmpm->AddItem(tmpi);
 
@@ -103,54 +109,54 @@ ConfigMenu::ConfigMenu(TrayView *tv, bool useMag)
 	AddItem(behavm);
 
 
-	tmpm = new BMenu("Delay");
+	tmpm = new BMenu(B_TRANSLATE("Delay"));
 	tmpm->SetFont(be_plain_font);
 
 	msg = new BMessage(MSG_SET_DELAY);
 	msg->AddInt64(AR_DELAY, 100000LL);
-	tmpi = new BMenuItem("0.1 s", msg);
+	tmpi = new BMenuItem(B_TRANSLATE("0.1 s"), msg);
 	tmpi->SetMarked(tv->raise_delay == 100000LL);
 	tmpm->AddItem(tmpi);
 
 	msg = new BMessage(MSG_SET_DELAY);
 	msg->AddInt64(AR_DELAY, 200000LL);
-	tmpi = new BMenuItem("0.2 s", msg);
+	tmpi = new BMenuItem(B_TRANSLATE("0.2 s"), msg);
 	tmpi->SetMarked(tv->raise_delay == 200000LL);
 	tmpm->AddItem(tmpi);
 
 	msg = new BMessage(MSG_SET_DELAY);
 	msg->AddInt64(AR_DELAY, 500000LL);
-	tmpi = new BMenuItem("0.5 s", msg);
+	tmpi = new BMenuItem(B_TRANSLATE("0.5 s"), msg);
 	tmpi->SetMarked(tv->raise_delay == 500000LL);
 	tmpm->AddItem(tmpi);
 
 	msg = new BMessage(MSG_SET_DELAY);
 	msg->AddInt64(AR_DELAY, 1000000LL);
-	tmpi = new BMenuItem("1 s", msg);
+	tmpi = new BMenuItem(B_TRANSLATE("1 s"), msg);
 	tmpi->SetMarked(tv->raise_delay == 1000000LL);
 	tmpm->AddItem(tmpi);
 
 	msg = new BMessage(MSG_SET_DELAY);
 	msg->AddInt64(AR_DELAY, 2000000LL);
-	tmpi = new BMenuItem("2 s", msg);
+	tmpi = new BMenuItem(B_TRANSLATE("2 s"), msg);
 	tmpi->SetMarked(tv->raise_delay == 2000000LL);
 	tmpm->AddItem(tmpi);
 
 	msg = new BMessage(MSG_SET_DELAY);
 	msg->AddInt64(AR_DELAY, 3000000LL);
-	tmpi = new BMenuItem("3 s", msg);
+	tmpi = new BMenuItem(B_TRANSLATE("3 s"), msg);
 	tmpi->SetMarked(tv->raise_delay == 3000000LL);
 	tmpm->AddItem(tmpi);
 
 	msg = new BMessage(MSG_SET_DELAY);
 	msg->AddInt64(AR_DELAY, 4000000LL);
-	tmpi = new BMenuItem("4 s", msg);
+	tmpi = new BMenuItem(B_TRANSLATE("4 s"), msg);
 	tmpi->SetMarked(tv->raise_delay == 4000000LL);
 	tmpm->AddItem(tmpi);
 
 	msg = new BMessage(MSG_SET_DELAY);
 	msg->AddInt64(AR_DELAY, 5000000LL);
-	tmpi = new BMenuItem("5 s", msg);
+	tmpi = new BMenuItem(B_TRANSLATE("5 s"), msg);
 	tmpi->SetMarked(tv->raise_delay == 5000000LL);
 	tmpm->AddItem(tmpi);
 
@@ -163,9 +169,10 @@ ConfigMenu::ConfigMenu(TrayView *tv, bool useMag)
 	AddSeparatorItem();
 //	AddItem(new BMenuItem("Settings...", new BMessage(OPEN_SETTINGS)));
 
-	AddItem(new BMenuItem("About " APP_NAME B_UTF8_ELLIPSIS,
+	AddItem(new BMenuItem(B_TRANSLATE("About " APP_NAME B_UTF8_ELLIPSIS),
 		new BMessage(B_ABOUT_REQUESTED)));
-	AddItem(new BMenuItem("Remove from tray", new BMessage(REMOVE_FROM_TRAY)));
+	AddItem(new BMenuItem(B_TRANSLATE("Remove from tray"),
+		new BMessage(REMOVE_FROM_TRAY)));
 
 	SetTargetForItems(tv);
 	SetAsyncAutoDestruct(true);
@@ -522,7 +529,9 @@ void TrayView::MessageReceived(BMessage* message)
 			break;
 		}
 		case B_ABOUT_REQUESTED:
-			alert = new BAlert("about box", "AutoRaise, (c) 2002, mmu_man\nEnjoy :-)", "OK", NULL, NULL,
+			alert = new BAlert("about box",
+				B_TRANSLATE("AutoRaise, (c) 2002, mmu_man\nEnjoy :-)"),
+				B_TRANSLATE("OK"), NULL, NULL,
 				B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_INFO_ALERT);
 			alert->SetShortcut(0, B_ENTER);
 			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);

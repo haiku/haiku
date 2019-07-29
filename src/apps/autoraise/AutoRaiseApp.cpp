@@ -1,9 +1,17 @@
 #include "AutoRaiseApp.h"
 #include "AutoRaiseIcon.h"
+#include <Catalog.h>
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "AutoRaiseApp"
+
 
 AutoRaiseApp::AutoRaiseApp()
 	: BApplication( APP_SIG )
 {
+	B_TRANSLATE_MARK_SYSTEM_NAME_VOID("AutoRaise");
+
 	removeFromDeskbar(NULL);
 	fPersist = true;
 	fDone = false;
