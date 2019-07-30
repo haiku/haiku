@@ -119,10 +119,10 @@ private:
 
 #undef B_TRANSLATE_SYSTEM_NAME
 #define B_TRANSLATE_SYSTEM_NAME(string) \
-	BLocaleRoster::Default()->IsFilesystemTranslationPreferred() \
+	(BLocaleRoster::Default()->IsFilesystemTranslationPreferred() \
 		? BLocaleRoster::Default()->GetCatalog()->GetString((string), \
 			B_TRANSLATION_SYSTEM_NAME_CONTEXT) \
-		: (string)
+		: (string))
 
 // Translation markers which can be used to mark static strings/IDs which
 // are used as key for translation requests (at other places in the code).
