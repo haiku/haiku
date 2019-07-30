@@ -192,7 +192,7 @@ AddBootModuleSymlinksToPackage
 	generic_ide_pci
 	ide_isa@x86 isa@x86,x86_64 intel it8211
 	legacy_sata locked_pool
-	nvme_disk
+	nvme_disk@x86,x86_64
 	openpic@ppc
 	packagefs pci
 	scsi scsi_cd scsi_disk scsi_periph silicon_image_3112 highpoint_ide_pci
