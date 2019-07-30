@@ -103,7 +103,7 @@ ya_rand_init(unsigned int seed)
 	}
 
 	i1 = a[0] % VECTOR_SIZE;
-	i2 = (i1 + 024) % VECTOR_SIZE;
+	i2 = (i1 + 24) % VECTOR_SIZE;
 }
 
 
