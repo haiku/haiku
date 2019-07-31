@@ -377,6 +377,9 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 		| (info.vendor[2] << 8) | (info.vendor[3]);
 
 	switch (id) {
+		case 'ACI\0':
+			strcpy(info.vendor, "Ancor Communications");
+			break;
 		case 'ADI\0':
 			strcpy(info.vendor, "ADI MicroScan");
 			break;
@@ -397,6 +400,8 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 		case 'BNQ\0':
 			strcpy(info.vendor, "BenQ");
 			break;
+		case 'CMN\0':
+			strcpy(info.vendor, "Chimei Innolux");
 		case 'CPL\0':
 			strcpy(info.vendor, "ALFA");
 			break;
@@ -514,6 +519,9 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 		case 'SDI\0':
 			strcpy(info.vendor, "Samtron");
 			break;
+		case 'SEC\0':
+			strcpy(info.vendor, "Seiko Epson");
+			break;
 		case 'SHP\0':
 			strcpy(info.vendor, "Sharp");
 			break;
@@ -539,8 +547,14 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 		case 'TSB\0':
 			strcpy(info.vendor, "Toshiba");
 			break;
+		case 'UNK\0':
+			strcpy(info.vendor, "(unknown)");
+			break;
 		case 'UNM\0':
 			strcpy(info.vendor, "Unisys");
+			break;
+		case 'VES\0':
+			strcpy(info.vendor, "Vestel");
 			break;
 		case 'VIZ\0':
 			strcpy(info.vendor, "Vizio");
