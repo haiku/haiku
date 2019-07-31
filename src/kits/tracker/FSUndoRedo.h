@@ -99,7 +99,7 @@ inline uint32 FSUndoMoveMode(uint32 moveMode)
 static
 inline uint32 FSMoveMode(uint32 moveMode)
 {
-	return (moveMode & 0x00FFFFFF | kDoOperation;
+	return (moveMode & 0x00FFFFFF) | kDoOperation;
 }
 
 
