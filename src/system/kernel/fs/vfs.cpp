@@ -2864,7 +2864,8 @@ get_new_fd(int type, struct fs_mount* mount, struct vnode* vnode,
 	io_context* context = get_current_io_context(kernel);
 	fd = new_fd(context, descriptor);
 	if (fd < 0) {
-		free(descriptor);
+		descriptor->ops = NULL;
+		put_fd(descriptor);
 		return B_NO_MORE_FDS;
 	}
 
