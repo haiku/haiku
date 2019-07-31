@@ -41,6 +41,9 @@ All rights reserved.
 
 namespace BPrivate {
 
+static const uint32_t kUndoOperation = 'U' << 24;
+static const uint32_t kDoOperation = 'T' << 24;
+
 class UndoItem;
 
 class Undo {
@@ -82,21 +85,21 @@ class RenameVolumeUndo : public Undo {
 static
 inline bool FSIsUndoMoveMode(uint32 moveMode)
 {
-	return (moveMode & '\xff\0\0\0') == 'U\0\0\0';
+	return (moveMode & 0xFF000000) == kUndoOperation;
 }
 
 
 static
 inline uint32 FSUndoMoveMode(uint32 moveMode)
 {
-	return (moveMode & ~'\xff\0\0\0') | 'U\0\0\0';
+	return (moveMode & 0x00FFFFFF) | kUndoOperation;
 }
 
 
 static
 inline uint32 FSMoveMode(uint32 moveMode)
 {
-	return (moveMode & ~'\xff\0\0\0') | 'T\0\0\0';
+	return (moveMode & 0x00FFFFFF | kDoOperation;
 }
 
 
