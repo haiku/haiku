@@ -10334,7 +10334,8 @@ BPoseView::FilterPose(BPose* pose)
 	if (fRefFilter != NULL) {
 		PoseInfo poseInfo;
 		ReadPoseInfo(pose->TargetModel(), &poseInfo);
-		pose->TargetModel()->OpenNode();
+		if (pose->TargetModel()->OpenNode() != B_OK)
+			return false;
 		if (!ShouldShowPose(pose->TargetModel(), &poseInfo))
 			return false;
 	}
