@@ -300,13 +300,11 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 
 		do {
 			ssize_t bytesRead = min_c(sizeof(in), inline_size - offset);
-			memcpy(in, extent_data->inline_data + offset, bytesRead);
-			if (bytesRead != (ssize_t)sizeof(in)) {
-				if (bytesRead <= 0) {
-					status = Z_STREAM_ERROR;
-					break;
-				}
+			if (bytesRead <= 0) {
+				status = Z_STREAM_ERROR;
+				break;
 			}
+			memcpy(in, extent_data->inline_data + offset, bytesRead);
 
 			zStream.avail_in = bytesRead;
 			zStream.next_in = (Bytef*)in;
