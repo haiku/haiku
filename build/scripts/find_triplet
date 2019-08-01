@@ -1,0 +1,32 @@
+#!/bin/sh
+#
+# Produce a gcc triplet for the given architecture
+# Released under the MIT License.
+#
+# We have a lot of arbitrary toolchain triplets, this is
+# a simple script to decode them.
+#
+
+if [[ $# -ne 1 ]]; then
+	echo "usage: $0 <architecture>"
+	exit 1
+fi
+
+case "$1" in
+	"arm64")
+		echo "aarch64-unknown-haiku"
+		;;
+	"ppc")
+		echo "powerpc-apple-haiku"
+		;;
+	"sparc")
+		echo "sparc64-unknown-haiku"
+		;;
+	"x86_gcc2" | "x86")
+		echo "i586-pc-haiku"
+		;;
+	*)
+		echo "$1-unknown-haiku"
+		;;
+esac
+exit 0
