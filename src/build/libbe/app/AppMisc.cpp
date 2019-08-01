@@ -1,28 +1,11 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		AppMisc.cpp
-//	Author:			Ingo Weinhold (bonefish@users.sf.net)
-//	Description:	Miscellaneous private functionality.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold, bonefish@users.sf.net
+ *		Jacob Secunda
+ */
 
 #include <string.h>
 #include <sys/utsname.h>
@@ -69,20 +52,6 @@ is_running_on_haiku()
 {
 	struct utsname info;
 	return (uname(&info) == 0 && strcmp(info.sysname, "Haiku") == 0);
-}
-
-// is_app_showing_modal_window
-/*!	\brief Returns whether the application identified by the supplied
-		   \c team_id is currently showing a modal window.
-	\param team the ID of the application in question.
-	\return \c true, if the application is showing a modal window, \c false
-			otherwise.
-*/
-bool
-is_app_showing_modal_window(team_id team)
-{
-	// TODO: Implement!
-	return true;
 }
 
 } // namespace BPrivate

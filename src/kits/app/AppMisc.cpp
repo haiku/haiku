@@ -1,10 +1,11 @@
 /*
- * Copyright 2001-2015, Haiku, Inc.
+ * Copyright 2001-2019, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  *		Ingo Weinhold, bonefish@@users.sf.net
+ *		Jacob Secunda
  */
 
 
@@ -19,9 +20,12 @@
 #include <image.h>
 #include <Messenger.h>
 #include <OS.h>
+#include <Window.h>
 
+#include <AutoDeleter.h>
 #include <ServerLink.h>
 #include <ServerProtocol.h>
+#include <WindowInfo.h>
 
 
 namespace BPrivate {
@@ -171,8 +175,30 @@ main_thread_for(team_id team)
 bool
 is_app_showing_modal_window(team_id team)
 {
-	// TODO: Implement!
-	return true;
+	int32 tokenCount;
+	int32* tokens = get_token_list(team, &tokenCount);
+
+	if (tokens != NULL) {
+		MemoryDeleter tokenDeleter(tokens);
+
+		for (int32 index = 0; index < tokenCount; index++) {
+			client_window_info* matchWindowInfo = get_window_info(tokens[index]);
+			if (matchWindowInfo == NULL) {
+				// That window probably closed. Just go to the next one.
+				continue;
+			}
+
+			window_feel theFeel = (window_feel)matchWindowInfo->feel;
+			free(matchWindowInfo);
+
+			if (theFeel == B_MODAL_SUBSET_WINDOW_FEEL
+				|| theFeel == B_MODAL_APP_WINDOW_FEEL
+				|| theFeel == B_MODAL_ALL_WINDOW_FEEL)
+				return true;
+		}
+	}
+
+	return false;
 }
 
 
