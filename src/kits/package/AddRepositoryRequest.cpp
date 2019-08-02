@@ -77,7 +77,9 @@ AddRepositoryRequest::CreateInitialJobs()
 			tempEntry, fRepositoryBaseURL, targetDirectory);
 	if (activateJob == NULL)
 		return B_NO_MEMORY;
-	activateJob->AddDependency(fetchJob);
+	result = activateJob->AddDependency(fetchJob);
+	if (result != B_OK)
+		return result;
 	if ((result = QueueJob(activateJob)) != B_OK) {
 		delete activateJob;
 		return result;

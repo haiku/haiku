@@ -74,7 +74,11 @@ BRefreshRepositoryRequest::CreateInitialJobs()
 
 	BRepositoryCache repoCache;
 	BPackageRoster roster;
-	roster.GetRepositoryCache(fRepoConfig.Name(), &repoCache);
+	result = roster.GetRepositoryCache(fRepoConfig.Name(), &repoCache);
+	if (result != B_OK) {
+		delete fetchChecksumJob;
+		return result;
+	}
 
 	ValidateChecksumJob* validateChecksumJob
 		= new (std::nothrow) ValidateChecksumJob(fContext,

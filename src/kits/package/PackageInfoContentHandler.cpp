@@ -92,44 +92,34 @@ BPackageInfoContentHandler::HandlePackageAttribute(
 			break;
 
 		case B_PACKAGE_INFO_COPYRIGHTS:
-			fPackageInfo.AddCopyright(value.string);
-			break;
+			return fPackageInfo.AddCopyright(value.string);
 
 		case B_PACKAGE_INFO_LICENSES:
-			fPackageInfo.AddLicense(value.string);
-			break;
+			return fPackageInfo.AddLicense(value.string);
 
 		case B_PACKAGE_INFO_PROVIDES:
-			fPackageInfo.AddProvides(value.resolvable);
-			break;
+			return fPackageInfo.AddProvides(value.resolvable);
 
 		case B_PACKAGE_INFO_REQUIRES:
-			fPackageInfo.AddRequires(value.resolvableExpression);
-			break;
+			return fPackageInfo.AddRequires(value.resolvableExpression);
 
 		case B_PACKAGE_INFO_SUPPLEMENTS:
-			fPackageInfo.AddSupplements(value.resolvableExpression);
-			break;
+			return fPackageInfo.AddSupplements(value.resolvableExpression);
 
 		case B_PACKAGE_INFO_CONFLICTS:
-			fPackageInfo.AddConflicts(value.resolvableExpression);
-			break;
+			return fPackageInfo.AddConflicts(value.resolvableExpression);
 
 		case B_PACKAGE_INFO_FRESHENS:
-			fPackageInfo.AddFreshens(value.resolvableExpression);
-			break;
+			return fPackageInfo.AddFreshens(value.resolvableExpression);
 
 		case B_PACKAGE_INFO_REPLACES:
-			fPackageInfo.AddReplaces(value.string);
-			break;
+			return fPackageInfo.AddReplaces(value.string);
 
 		case B_PACKAGE_INFO_URLS:
-			fPackageInfo.AddURL(value.string);
-			break;
+			return fPackageInfo.AddURL(value.string);
 
 		case B_PACKAGE_INFO_SOURCE_URLS:
-			fPackageInfo.AddSourceURL(value.string);
-			break;
+			return fPackageInfo.AddSourceURL(value.string);
 
 		case B_PACKAGE_INFO_CHECKSUM:
 			fPackageInfo.SetChecksum(value.string);
@@ -144,25 +134,20 @@ BPackageInfoContentHandler::HandlePackageAttribute(
 			break;
 
 		case B_PACKAGE_INFO_GLOBAL_WRITABLE_FILES:
-			fPackageInfo.AddGlobalWritableFileInfo(
+			return fPackageInfo.AddGlobalWritableFileInfo(
 				value.globalWritableFileInfo);
-			break;
 
 		case B_PACKAGE_INFO_USER_SETTINGS_FILES:
-			fPackageInfo.AddUserSettingsFileInfo(value.userSettingsFileInfo);
-			break;
+			return fPackageInfo.AddUserSettingsFileInfo(value.userSettingsFileInfo);
 
 		case B_PACKAGE_INFO_USERS:
-			fPackageInfo.AddUser(value.user);
-			break;
+			return fPackageInfo.AddUser(value.user);
 
 		case B_PACKAGE_INFO_GROUPS:
-			fPackageInfo.AddGroup(value.string);
-			break;
+			return fPackageInfo.AddGroup(value.string);
 
 		case B_PACKAGE_INFO_POST_INSTALL_SCRIPTS:
-			fPackageInfo.AddPostInstallScript(value.string);
-			break;
+			return fPackageInfo.AddPostInstallScript(value.string);
 
 		default:
 			if (fErrorOutput != NULL) {

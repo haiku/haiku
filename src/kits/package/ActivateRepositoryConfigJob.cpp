@@ -46,7 +46,10 @@ ActivateRepositoryConfigJob::Execute()
 	if (result != B_OK)
 		return result;
 
-	fTargetEntry.SetTo(&fTargetDirectory, repoInfo.Name().String());
+	result = fTargetEntry.SetTo(&fTargetDirectory, repoInfo.Name().String());
+	if (result != B_OK)
+		return result;
+
 	if (fTargetEntry.Exists()) {
 		BString description = BString("A repository configuration for ")
 			<< repoInfo.Name() << " already exists.";
