@@ -188,15 +188,13 @@ static status_t
 EcLock(struct acpi_ec_cookie *sc)
 {
 	/* If _GLK is non-zero, acquire the global lock. */
-	status_t status = B_OK;
 	if (sc->ec_glk) {
-		status = sc->ec_acpi_module->acquire_global_lock(EC_LOCK_TIMEOUT,
+		status_t status = sc->ec_acpi_module->acquire_global_lock(EC_LOCK_TIMEOUT,
 			&sc->ec_glkhandle);
 		if (status != B_OK)
 			return status;
 	}
-	mutex_lock(&sc->ec_lock);
-	return status;
+	return mutex_lock(&sc->ec_lock);
 }
 
 

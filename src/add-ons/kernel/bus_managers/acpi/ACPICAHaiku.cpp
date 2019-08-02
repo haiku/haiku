@@ -772,10 +772,9 @@ AcpiOsRemoveInterruptHandler(UINT32 interruptNumber,
 	DEBUG_FUNCTION_F("vector: %lu; handler: %p", (uint32)interruptNumber,
 		serviceRoutine);
 #ifdef _KERNEL_MODE
-	remove_io_interrupt_handler(interruptNumber,
-		(interrupt_handler) serviceRoutine,
-		sInterruptHandlerData[interruptNumber]);
-	return AE_OK;
+	return remove_io_interrupt_handler(interruptNumber,
+		(interrupt_handler)serviceRoutine,
+		sInterruptHandlerData[interruptNumber]) == B_OK ? AE_OK : AE_ERROR;
 #else
 	return AE_ERROR;
 #endif
