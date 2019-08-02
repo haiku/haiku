@@ -375,6 +375,7 @@ FSClipboardPaste(Model* model, uint32 linksMode)
 	// these will be passed to the asynchronous copy/move process
 	BObjectList<entry_ref>* moveList = new BObjectList<entry_ref>(0, true);
 	BObjectList<entry_ref>* copyList = new BObjectList<entry_ref>(0, true);
+	BObjectList<entry_ref>* duplicateList = new BObjectList<entry_ref>(0, true);
 
 	if ((be_clipboard->Lock())) {
 		BMessage* clip = be_clipboard->Data();
@@ -444,14 +445,19 @@ FSClipboardPaste(Model* model, uint32 linksMode)
 							moveList->AddItem(new entry_ref(ref));
 						} else if (moveMode == kCopySelectionTo)
 							copyList->AddItem(new entry_ref(ref));
+					} else {
+						// if the entry should have been removed from its
+						// directory, we want to copy that entry next time, no
+						// matter if the items don't have to be moved at all
+						// (source == target)
+						if (moveMode == kMoveSelectionTo)
+							newMoveMode = kCopySelectionTo;
+						else {
+							// we are copying a file into its same directory, do
+							// a duplicate
+							duplicateList->AddItem(new entry_ref(ref));
+						}
 					}
-
-					// if the entry should have been removed from its
-					// directory, we want to copy that entry next time, no
-					// matter if the items don't have to be moved at all
-					// (source == target)
-					if (moveMode == kMoveSelectionTo)
-						newMoveMode = kCopySelectionTo;
 				}
 
 				// add the change to the update message (if necessary)
@@ -521,6 +527,11 @@ FSClipboardPaste(Model* model, uint32 linksMode)
 		FSMoveToFolder(copyList, new BEntry(entry), kCopySelectionTo);
 	else
 		delete copyList;
+
+	if (duplicateList->CountItems() > 0)
+		FSMoveToFolder(duplicateList, new BEntry(entry), kDuplicateSelection);
+	else
+		delete duplicateList;
 
 	return true;
 }
