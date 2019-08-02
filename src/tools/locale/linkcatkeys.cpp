@@ -127,8 +127,9 @@ main(int argc, char **argv)
 		case TARGET_ATTRIBUTE: {
 			BEntry entry(outputFile.String());
 			entry_ref eref;
-			entry.GetRef(&eref);
-			res = targetCatImpl.WriteToAttribute(eref);
+			res = entry.GetRef(&eref);
+			if (res == B_OK)
+				res = targetCatImpl.WriteToAttribute(eref);
 			if (res != B_OK) {
 				fprintf(stderr,
 					"couldn't write target-attribute to %s - error: %s\n",
@@ -140,8 +141,9 @@ main(int argc, char **argv)
 		case TARGET_RESOURCE: {
 			BEntry entry(outputFile.String());
 			entry_ref eref;
-			entry.GetRef(&eref);
-			res = targetCatImpl.WriteToResource(eref);
+			res = entry.GetRef(&eref);
+			if (res == B_OK)
+				res = targetCatImpl.WriteToResource(eref);
 			if (res != B_OK) {
 				fprintf(stderr,
 					"couldn't write target-resource to %s - error: %s\n",
