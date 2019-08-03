@@ -44,7 +44,8 @@ public:
 
 private:
 			void				_Spin();
-
+			void				_DrawSpin(BRect updateRect);
+			void				_DrawNonSpin(BRect updateRect);
 private:
 			bool				fIsSpinning;
 			float				fSpinSpeed;
