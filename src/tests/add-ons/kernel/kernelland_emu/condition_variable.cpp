@@ -118,12 +118,9 @@ ConditionVariableEntry::Wait(const void* object, uint32 flags,
 
 
 inline void
-ConditionVariableEntry::AddToVariable(ConditionVariable* variable)
+ConditionVariableEntry::AddToLockedVariable(ConditionVariable* variable)
 {
 	fThread = get_current_thread();
-
-	MutexLocker _(sConditionVariablesLock);
-
 	fVariable = variable;
 	fWaitStatus = STATUS_ADDED;
 	fVariable->fEntries.Add(this);
@@ -180,7 +177,8 @@ ConditionVariable::Unpublish()
 void
 ConditionVariable::Add(ConditionVariableEntry* entry)
 {
-	entry->AddToVariable(this);
+	MutexLocker _(sConditionVariablesLock);
+	entry->AddToLockedVariable(this);
 }
 
 
