@@ -846,8 +846,13 @@ ShowImageWindow::MessageReceived(BMessage* message)
 
 		case MSG_FILE_NEXT:
 		case kMsgNextSlide:
-			if (_ClosePrompt() && fNavigator.NextFile())
+			if (_ClosePrompt()) {
+				if (!fNavigator.NextFile()) {
+					// Wrap back around
+					fNavigator.FirstFile();
+				}
 				_LoadImage();
+			}
 			break;
 
 		case kMsgDeleteCurrentFile:
