@@ -244,16 +244,13 @@ low_resource_manager(void*)
 {
 	bigtime_t timeout = kLowResourceInterval;
 	while (true) {
-		int32 state = low_resource_state_no_update(B_ALL_KERNEL_RESOURCES);
-		if (state != B_LOW_RESOURCE_CRITICAL) {
-			acquire_sem_etc(sLowResourceWaitSem, 1, B_RELATIVE_TIMEOUT,
-				timeout);
-		}
+		acquire_sem_etc(sLowResourceWaitSem, 1, B_RELATIVE_TIMEOUT,
+			timeout);
 
 		RecursiveLocker _(&sLowResourceLock);
 
 		compute_state();
-		state = low_resource_state_no_update(B_ALL_KERNEL_RESOURCES);
+		int32 state = low_resource_state_no_update(B_ALL_KERNEL_RESOURCES);
 
 		TRACE(("low_resource_manager: state = %ld, %ld free pages, %lld free "
 			"memory, %lu free semaphores\n", state, vm_page_num_free_pages(),
@@ -265,7 +262,7 @@ low_resource_manager(void*)
 
 		call_handlers(sLowResources);
 
-		if (state == B_LOW_RESOURCE_WARNING)
+		if (state >= B_LOW_RESOURCE_WARNING)
 			timeout = kWarnResourceInterval;
 		else
 			timeout = kLowResourceInterval;
