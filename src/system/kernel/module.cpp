@@ -897,7 +897,7 @@ iterator_get_next_module(module_iterator* iterator, char* buffer,
 	}
 
 	if (iterator->loaded_modules) {
-		recursive_lock_lock(&sModulesLock);
+		RecursiveLocker _(sModulesLock);
 		ModuleTable::Iterator hashIterator(sModulesHash);
 
 		for (int32 i = 0; hashIterator.HasNext(); i++) {
@@ -910,13 +910,10 @@ iterator_get_next_module(module_iterator* iterator, char* buffer,
 					*_bufferSize = strlcpy(buffer, module->name, *_bufferSize);
 					iterator->module_offset = i + 1;
 
-					recursive_lock_unlock(&sModulesLock);
 					return B_OK;
 				}
 			}
 		}
-
-		recursive_lock_unlock(&sModulesLock);
 
 		// prevent from falling into modules hash iteration again
 		iterator->loaded_modules = false;
