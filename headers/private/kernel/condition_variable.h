@@ -1,5 +1,6 @@
 /*
  * Copyright 2007-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2019, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_CONDITION_VARIABLE_H
@@ -37,9 +38,10 @@ public:
 	inline	ConditionVariable*	Variable() const { return fVariable; }
 
 private:
-	inline	void				AddToVariable(ConditionVariable* variable);
+	inline	void				AddToLockedVariable(ConditionVariable* variable);
 
 private:
+			spinlock			fLock;
 			ConditionVariable*	fVariable;
 			Thread*				fThread;
 			status_t			fWaitStatus;
@@ -88,6 +90,8 @@ protected:
 
 			const void*			fObject;
 			const char*			fObjectType;
+
+			spinlock			fLock;
 			EntryList			fEntries;
 			ConditionVariable*	fNext;
 
