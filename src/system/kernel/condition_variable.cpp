@@ -282,37 +282,6 @@ ConditionVariable::NotifyAll(const void* object, status_t result)
 }
 
 
-/*static*/ void
-ConditionVariable::ListAll()
-{
-	kprintf("  variable      object (type)                waiting threads\n");
-	kprintf("------------------------------------------------------------\n");
-	ConditionVariableHash::Iterator it(&sConditionVariableHash);
-	while (ConditionVariable* variable = it.Next()) {
-		// count waiting threads
-		int count = variable->fEntries.Count();
-
-		kprintf("%p  %p  %-20s %15d\n", variable, variable->fObject,
-			variable->fObjectType, count);
-	}
-}
-
-
-void
-ConditionVariable::Dump() const
-{
-	kprintf("condition variable %p\n", this);
-	kprintf("  object:  %p (%s)\n", fObject, fObjectType);
-	kprintf("  threads:");
-
-	for (EntryList::ConstIterator it = fEntries.GetIterator();
-		 ConditionVariableEntry* entry = it.Next();) {
-		kprintf(" %" B_PRId32, entry->fThread->id);
-	}
-	kprintf("\n");
-}
-
-
 void
 ConditionVariable::_Notify(bool all, status_t result)
 {
@@ -352,6 +321,37 @@ ConditionVariable::_NotifyLocked(bool all, status_t result)
 		if (!all)
 			break;
 	}
+}
+
+
+/*static*/ void
+ConditionVariable::ListAll()
+{
+	kprintf("  variable      object (type)                waiting threads\n");
+	kprintf("------------------------------------------------------------\n");
+	ConditionVariableHash::Iterator it(&sConditionVariableHash);
+	while (ConditionVariable* variable = it.Next()) {
+		// count waiting threads
+		int count = variable->fEntries.Count();
+
+		kprintf("%p  %p  %-20s %15d\n", variable, variable->fObject,
+			variable->fObjectType, count);
+	}
+}
+
+
+void
+ConditionVariable::Dump() const
+{
+	kprintf("condition variable %p\n", this);
+	kprintf("  object:  %p (%s)\n", fObject, fObjectType);
+	kprintf("  threads:");
+
+	for (EntryList::ConstIterator it = fEntries.GetIterator();
+		 ConditionVariableEntry* entry = it.Next();) {
+		kprintf(" %" B_PRId32, entry->fThread->id);
+	}
+	kprintf("\n");
 }
 
 
