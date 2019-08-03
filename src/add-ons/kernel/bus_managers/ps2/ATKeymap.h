@@ -154,7 +154,7 @@ const static uint32 kATKeycodeMap[] = {
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
+	0x85,   // media: Previous track
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
@@ -163,18 +163,18 @@ const static uint32 kATKeycodeMap[] = {
 	0x00,   // UNMAPPED		150
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
+	0x8a,   // media: Next track
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x5b,   // KP Enter
 	0x60,   // Right Control
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED		160
+	0x93,   // media: Volume mute	160
+	0x87,   // media: Calculator
+	0x81,   // media: Play
 	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
+	0x86,   // media: Stop
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
@@ -184,11 +184,11 @@ const static uint32 kATKeycodeMap[] = {
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
+	0x92,   // media: Volume down
 	0x00,   // UNMAPPED
+	0x91,   // media: Volume up
 	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
+	0x8a,   // media: www home
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED		180
 	0x23,   // KP /
@@ -220,7 +220,7 @@ const static uint32 kATKeycodeMap[] = {
 	0x35,   // End
 	0x62,   // Down Arrow
 	0x36,   // Page Down
-	0x1f,   // Insert		200
+	0x1f,   // Insert		210
 	0x34,   // Delete
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
@@ -230,24 +230,24 @@ const static uint32 kATKeycodeMap[] = {
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x66,   // Left Gui
-	0x67,   // Right Gui	210
+	0x67,   // Right Gui	220
 	0x68,   // Menu
+	0x94,   // power: Shutdown
+	0x95,   // power: Sleep
+	0x00,   // UNMAPPED 0x60
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
+	0x96,   // power: Wake
 	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED		220
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
+	0x8d,   // media: www Search
+	0x8e,   // medie: www Favorites 		230
+	0x8f,   // media: www Refresh
+	0x90,   // media: www Stop
+	0x8b,   // media: www Forward
+	0x8c,   // media: www back
+	0x88,   // media: My computer
+	0x89,   // media: email
+	0x83,   // media: select //last scancode for pressed
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
