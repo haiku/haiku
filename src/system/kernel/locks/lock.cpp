@@ -781,8 +781,9 @@ _mutex_lock(mutex* lock, void* _locker)
 
 	status_t error = thread_block();
 #if KDEBUG
-	if (error == B_OK)
-		atomic_set(&lock->holder, waiter.thread->id);
+	if (error == B_OK) {
+		ASSERT(lock->holder == waiter.thread->id);
+	}
 #endif
 	return error;
 }
@@ -813,23 +814,19 @@ _mutex_unlock(mutex* lock)
 		lock->waiters = waiter->next;
 		if (lock->waiters != NULL)
 			lock->waiters->last = waiter->last;
-#if KDEBUG
-		thread_id unblockedThread = waiter->thread->id;
-#endif
-
-		// unblock thread
-		thread_unblock(waiter->thread, B_OK);
 
 #if KDEBUG
 		// Already set the holder to the unblocked thread. Besides that this
 		// actually reflects the current situation, setting it to -1 would
 		// cause a race condition, since another locker could think the lock
 		// is not held by anyone.
-		lock->holder = unblockedThread;
+		lock->holder = waiter->thread->id;
 #endif
+
+		// unblock thread
+		thread_unblock(waiter->thread, B_OK);
 	} else {
-		// We've acquired the spinlock before the locker that is going to wait.
-		// Just mark the lock as released.
+		// Nobody is waiting to acquire this lock. Just mark it as released.
 #if KDEBUG
 		lock->holder = -1;
 #else
@@ -907,7 +904,7 @@ _mutex_lock_with_timeout(mutex* lock, uint32 timeoutFlags, bigtime_t timeout)
 
 	if (error == B_OK) {
 #if KDEBUG
-		lock->holder = waiter.thread->id;
+		ASSERT(lock->holder == waiter.thread->id);
 #endif
 	} else {
 		locker.Lock();
