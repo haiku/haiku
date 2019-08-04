@@ -792,6 +792,7 @@ thread_hit_debug_event(debug_debugger_message event, const void *message,
 	// TODO: Maybe better use ref-counting and a flag in the breakpoint manager.
 	Team* team = thread_get_current_thread()->team;
 	ConditionVariable debugChangeCondition;
+	debugChangeCondition.Init(team, "debug change condition");
 	prepare_debugger_change(team, debugChangeCondition);
 
 	if (team->debug_info.breakpoint_manager != NULL) {
@@ -1561,6 +1562,7 @@ nub_thread_cleanup(Thread *nubThread)
 		nubThread->id, nubThread->team->debug_info.debugger_port));
 
 	ConditionVariable debugChangeCondition;
+	debugChangeCondition.Init(nubThread->team, "debug change condition");
 	prepare_debugger_change(nubThread->team, debugChangeCondition);
 
 	team_debug_info teamDebugInfo;
@@ -2545,6 +2547,7 @@ install_team_debugger(team_id teamID, port_id debuggerPort,
 	// get the team
 	Team* team;
 	ConditionVariable debugChangeCondition;
+	debugChangeCondition.Init((void*)teamID, "debug change condition");
 	error = prepare_debugger_change(teamID, debugChangeCondition, team);
 	if (error != B_OK)
 		return error;
@@ -2871,6 +2874,7 @@ _user_remove_team_debugger(team_id teamID)
 {
 	Team* team;
 	ConditionVariable debugChangeCondition;
+	debugChangeCondition.Init((void*)teamID, "debug change condition");
 	status_t error = prepare_debugger_change(teamID, debugChangeCondition,
 		team);
 	if (error != B_OK)
