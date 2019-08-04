@@ -325,11 +325,12 @@ ConditionVariable::_NotifyLocked(bool all, status_t result)
 	// entering Wait() and acquiring its own lock, and then acquiring ours.
 	while (ConditionVariableEntry* entry = fEntries.RemoveHead()) {
 		release_spinlock(&fLock);
+		acquire_spinlock(&entry->fLock);
 
-		SpinLocker _(entry->fLock);
 		entry->fVariable = NULL;
 
 		if (entry->fWaitStatus <= 0) {
+			release_spinlock(&entry->fLock);
 			acquire_spinlock(&fLock);
 			continue;
 		}
@@ -341,6 +342,7 @@ ConditionVariable::_NotifyLocked(bool all, status_t result)
 
 		entry->fWaitStatus = result;
 
+		release_spinlock(&entry->fLock);
 		acquire_spinlock(&fLock);
 
 		if (!all)
