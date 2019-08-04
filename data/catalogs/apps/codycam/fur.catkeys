@@ -34,7 +34,7 @@ Cannot start the video source	CodyCam		Impussibil ativâ la sorzint video
 Cannot set the time source for the video source	CodyCam		Impussibil stabilî la sorzint dal timp pe sorzint video
 Renaming…	VideoConsumer.cpp		Daûr a cambiâ non…
 Send to…	CodyCam		Invie a…
-Password:	CodyCam		Password:
+Password:	CodyCam		Peraule di ordin:
 still image filename expected	CodyCam		si spietave il non di file pe imagjin statiche
 File name:	CodyCam		Non dal file:
 Directory:	CodyCam		Cartele:
@@ -42,8 +42,8 @@ Error setting type of output file	VideoConsumer.cpp		Erôr tal stabilî il gjena
 Locking the window	VideoConsumer.cpp		Daûr a blocâ il barcon
 Cannot find an available video stream	CodyCam		Impussibil cjatâ un flus video disponibil
 Upload…	VideoConsumer.cpp		Cjarie…
-password expected	CodyCam		si spietave la password
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <scartade>  (password reâl inviade)\n
+password expected	CodyCam		si spietave la peraule di ordin
+PASS <suppressed>  (real password sent)\n	FtpClient		PASS <scartade>  (peraule di ordin reâl inviade)\n
 SFTP	CodyCam		SFTP
 Output	CodyCam		Jessude
 server address expected	CodyCam		si spietave la direzion dal servidôr
@@ -61,7 +61,7 @@ Connected…	VideoConsumer.cpp		Conetût…
 upload client name expected	CodyCam		si spietave il non dal client di trasmission
 Every 15 seconds	CodyCam		Ogni 15 seconts
 Error getting initial latency for the capture node	CodyCam		Erôr tal otignî il timp di rispueste iniziâl pal grop di cature
-password	CodyCam		password
+password	CodyCam		peraule di ordin
 Local	CodyCam		Locâl
 Stop video	CodyCam		Ferme il video
 Last Capture: 	VideoConsumer.cpp		Ultime cature: 

@@ -30,7 +30,7 @@ Show application expander	PreferencesWindow		エキスパンダーを表示
 Close all	WindowMenu		すべて閉じる
 Deskbar preferences	PreferencesWindow		Deskbar の設定
 Mount	DeskbarMenu		マウント
-Revert	PreferencesWindow		取り消し
+Revert	PreferencesWindow		元に戻す
 Small	PreferencesWindow		小
 Recent applications:	PreferencesWindow		最近使ったアプリケーション:
 Shutdown…	DeskbarMenu		シャットダウン…

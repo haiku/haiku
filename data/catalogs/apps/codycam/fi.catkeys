@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-CodyCam	1770279704
+1	finnish	x-vnd.Haiku-CodyCam	2593355250
 destination directory expected	CodyCam		odotettiin kohdehakemistoa
 reply: '%s'\n	SftpClient		vastaus: ’%s’\n
 JPEG image	CodyCam		JPEG-kuva
@@ -27,6 +27,7 @@ Every 2 hours	CodyCam		Joka toinen tunti
 Cannot get a time source	CodyCam		Aikalähteen hakeminen epäonnistui
 Every 4 hours	CodyCam		Joka 4. tunti
 cmd: '%s'\n	FtpClient		komento: ’%s’\n
+Closing the window	VideoConsumer.cpp		Suljetaan ikkuna
 Never	CodyCam		Ei koskaan
 Every 8 hours	CodyCam		Joka 8. tunti
 Cannot start the video source	CodyCam		Videolähteen käynnistäminen epäonnistui
@@ -38,6 +39,7 @@ still image filename expected	CodyCam		odotettiin pysäytyskuvatiedostonimeä
 File name:	CodyCam		Tiedostonimi:
 Directory:	CodyCam		Hakemisto:
 Error setting type of output file	VideoConsumer.cpp		Virhe asetettaessa tulostetiedoston tyyppiä
+Locking the window	VideoConsumer.cpp		Lukitaan ikkuna
 Cannot find an available video stream	CodyCam		Käytettävissä olevan videovirran löytäminen epäonnistui
 Upload…	VideoConsumer.cpp		Kopioi palvelimelle...
 password expected	CodyCam		odotettiin salasanaa

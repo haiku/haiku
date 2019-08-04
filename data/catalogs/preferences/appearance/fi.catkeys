@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Appearance	583615507
+1	finnish	x-vnd.Haiku-Appearance	663472720
 Control border	Colors tab		Säätimen reuna
 Control mark	Colors tab		Ohjausmerkki
 Off	AntialiasingSettingsView		Pois päältä
@@ -8,15 +8,17 @@ Defaults	APRWindow		Oletusasetukset
 Shadow	Colors tab		Varjo
 Document background	Colors tab		Dokumentin tausta
 List background	Colors tab		Luettelotausta
+No effect on running applications	DecorSettingsView		Ei vaikutusta käynnissä olevissa sovelluksissa
 Fixed font:	Font view		Tasalevyinen kirjasin:
 Appearance	System name		Ulkoasuasetukset
 Reduce colored edges filter strength:	AntialiasingSettingsView		Vähennä värillisten reunojen suodatuksen vahvuutta:
 Glyph hinting:	AntialiasingSettingsView		Kirjoitusmerkin viimeistely:
+Default Haiku ControlLook	DecorSettingsView		Oletus Haiku ControlLook
 Menu item text	Colors tab		Valikkovalinnan teksti
 About decorator	DecorSettingsView		Koristeluohjelmasta
 Antialiasing menu	AntialiasingSettingsView		Reunanpehmennysvalikko
 Success	Colors tab		Onnistuminen
-About	DecorSettingsView		Ohjelmasta
+About	DecorSettingsView		Tietoa
 Shine	Colors tab		Hohto
 Arrow style	DecorSettingsView		Nuolityyli
 On	AntialiasingSettingsView		Käytössä
@@ -47,7 +49,9 @@ LCD subpixel	AntialiasingSettingsView		LCD-alipikseli
 Window tab	Colors tab		Ikkunan välilehti
 Link text	Colors tab		Linkkiteksti
 Tooltip background	Colors tab		Työkaluvinkin tausta
+ControlLook:	DecorSettingsView		ControlLook:
 Scroll bar thumb	Colors tab		Vierintäpalkkipeukalo
+Default	DecorSettingsView		Oletus
 Link visited	Colors tab		Vierailtu linkki
 Selected menu item border	Colors tab		Valitun valikkovalinnan reuna
 Tooltip text	Colors tab		Työkaluvinkin teksti
@@ -63,10 +67,12 @@ Antialiasing type:	AntialiasingSettingsView		Reunanpehmennystapa:
 Panel text	Colors tab		Paneelin teksti
 Hinting menu	AntialiasingSettingsView		Vinkkausvalikko
 Scroll bar:	DecorSettingsView		Vierityspalkki:
+Choose ControlLook	DecorSettingsView		Valitse ControlLook
 Monospaced fonts only	AntialiasingSettingsView		Vain monospace-kirjasimet
 Document text	Colors tab		Dokumentin teksti
 Inactive window border	Colors tab		Ei-aktiivinen ikkunaraja
 Colors	APRWindow		Värit
+About control look	DecorSettingsView		Ohjelmasta control look
 Control highlight	Colors tab		Säätimen korostus
 Status bar	Colors tab		Tilapalkki
 Link hover	Colors tab		Linkkileijunta

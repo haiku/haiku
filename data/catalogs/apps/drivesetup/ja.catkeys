@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DriveSetup	4152338259
+1	japanese	x-vnd.Haiku-DriveSetup	791750172
 Could not unmount partition %s.	MainWindow		パーティション %s をマウント解除できませんでした。
 Mount all	MainWindow		すべてマウント
 Disk	MainWindow		ディスク
@@ -6,8 +6,11 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Device	PartitionList		デバイス
 Initialize	MainWindow		初期化
 Could not change the parameters of the selected partition.	MainWindow		選択されたパーティションのパラメーター変更ができませんでした。
+PGP encrypted	Encryption utils		PGP で暗号化された
 Delete partition	MainWindow		パーティションを削除
 Error: 	MainWindow	in any error alert	エラー : 
+Removable	PartitionList		リムーバブル
+Block size	PartitionList		ブロックサイズ
 The panel experienced a problem!	MainWindow		パネルに問題が発生しました。
 Device	DiskView		デバイス
 Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		本当にIntel Extended Partitionをフォーマットしますか? 続行するとそのサブパーティションがすべて上書きされます。変更がディスクに書き込まれる前にもう一度確認されるでしょう。
@@ -26,11 +29,13 @@ Validation of the given creation parameters failed.	MainWindow		作成パラメ�
 Eject	MainWindow		取り出す
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか?\n\nその場合、ディスク %s のデータがすべて失われます。
 Surface test (not implemented)	MainWindow		表面チェック (実装されていません)
+Read only	PartitionList		読み取り専用
 The panel could not return successfully.	MainWindow		パネルは正しく返しませんでした。
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		パーティションのパラメーターの変更に失敗しました。ディスクは変更されていません。
 Partition %ld	DiskView		パーティション %ld
 There's no space on the partition where a child partition could be created.	MainWindow		子パーティションを作成するスペースがありません。
 No disk devices have been recognized.	DiskView		ディスクデバイスが検出されていません。
+Attributes	PartitionList		属性
 Failed to delete the partition. No changes have been written to disk.	MainWindow		パーティションの削除に失敗しました。変更は保存されていません。
 Change parameters…	MainWindow		パラメーターを変更…
 Format	InitializeParametersPanel		フォーマット
@@ -46,15 +51,20 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		ワイプ (実装されていません)
 The currently selected partition does not have a parent partition.	MainWindow		選択されたパーティションには親パーティションがありません。
 Validation of the given initialization parameters failed.	MainWindow		初期化パラメーターの検証に失敗しました
+Shared	PartitionList		共有
+BitLocker encrypted	Encryption utils		BitLocker で暗号化された
 You need to select a partition entry from the list.	MainWindow		一覧からパーティションを一つ選択してください。
 Offset: %s	Support		オフセット: %s
+SafeBoot encrypted	Encryption utils		SafeBoot で暗号化された
 Volume name	PartitionList		ボリューム名
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか?\n\nその場合、ディスクのすべてのデータが失われますので、ご注意ください。
 Change	ChangeParametersPanel		変更
 Partition name:	ChangeParametersPanel		パーティション名 :
+LUKS encrypted	Encryption utils		LUKS で暗号化された
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか?\n\nその場合、ディスク %s のデータがすべて失われます。
 Cancel	AbstractParametersPanel		中止
 Format	MainWindow		フォーマット
+<empty or unknown>	DiskView		<空または不明>
 OK	MainWindow		OK
 Open with DiskProbe	MainWindow		DiskProbe で開く
 Could not delete the selected partition.	MainWindow		選択されたパーティションを削除できませんでした。
@@ -63,6 +73,8 @@ There was an error preparing the disk for modifications.	MainWindow		ディス�
 The disk has been successfully initialized.\n	MainWindow		ディスクは正常に初期化されました。\n
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		強制的にマウント解除しても良いですか?\n\n注: アプリケーションが現在ボリュームに書き込み中の場合、マウント解除するとデータが失われるかもしれません。\n
 Cancel	MainWindow		中止
+Free space	PartitionList		空き容量
+Queries	PartitionList		クエリ
 Force unmount	MainWindow		強制的にマウント解除
 Partition	MainWindow		パーティション
 Change parameters	MainWindow		パラメーターを変更
@@ -78,10 +90,14 @@ Cannot delete the selected partition.	MainWindow		選択されたパーティシ
 Continue	MainWindow		続ける
 Could not mount partition %s.	MainWindow		パーティション %s をマウントできませんでした。
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		パーティションをフォーマットしますか? 変更をディスクに書き込む直前に再度確認します。
+<empty or unknown>	PartitionList		<空または不明>
 The selected disk is read-only.	MainWindow		選択されたディスクは読み取り専用です。
 The partition %s is already unmounted.	MainWindow		パーティション %s はすでにマウント解除されています。
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		選択したパーティションのパラメーターを変更しますか?\n\nパーティションはほかのオペレーティングシステムからはもう認識されないかもしれません。
+Boot	PartitionList		ブート
 OK	AbstractParametersPanel		OK
+Virtual	PartitionList		仮想
+Virtual	DiskView		仮想
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか?\n\nその場合、選択されたディスクのデータがすべて失われますので、ご注意ください。
 Select a partition from the list below.	DiskView		下記の一覧からパーティションを一つ選択してください。
 Active	PartitionList		アクティブ

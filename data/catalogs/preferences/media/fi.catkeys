@@ -1,10 +1,11 @@
-1	finnish	x-vnd.Haiku-Media	4205337498
+1	finnish	x-vnd.Haiku-Media	1682972002
 Audio mixer	Media Window		Äänisekoitin
 Show volume control on Deskbar	Media views		Näytä voimakkuusohjain Työpöytäpalkissa
 Quit	Media Window		Lopeta
 Restart media services	Media views		Käynnistä mediapalvelut uudelleen
 Couldn't add volume control in Deskbar: %s\n	Media views		Voimakkuussäätimen lisääminen Työpöytäpalkkiin epäonnistui: %s\n
 Start media server	Media Window		Käynnistä mediapalvelin
+<none>	VideoInputMenu	Used when no video input is available	<ei mitään>
 Audio settings	Media Window		Ääniasetukset
 Quit anyway	Media Window		Lopeta silti
 Couldn't remove volume control in Deskbar: %s\n	Media views		Voimakkuussäätimen poistaminen Työpöytäpalkista epäonnistui: %s\n
@@ -22,3 +23,4 @@ Channel:	Media views		Kanava:
 Defaults	Media views		Oletukset
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Yhdistäminen mediapalvelimeen epäonnistui.\nHaluaisitko käynnistää sen nyt ?
 Video settings	Media Window		Videoasetukset
+<none>	VideoOutputMenu	Used when no video output is available	<ei mitään>

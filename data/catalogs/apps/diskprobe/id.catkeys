@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-DiskProbe	715949111
+1	indonesian	x-vnd.Haiku-DiskProbe	2944605311
 Raw editor	AttributeWindow		Penyunting mentah
 Remove	AttributeWindow		Hapus
 Close	ProbeView		Tutup
@@ -7,46 +7,57 @@ File	ProbeView		Berkas
 Block size	ProbeView	Menu item. This is in the same menu window than 'Base' and 'Font size'	Ukuran blok
 MIME type editor	TypeEditors		Editor tipe MIME
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Heksadesimal
+16 bit unsigned value:	TypeEditors		nilai 16-bit unsigned:
 8 bit signed value:	TypeEditors		8 bita signed value:
  (native)	ProbeView		 (asli)
+Attribute offset: 	ProbeView		Atribut offset: 
 Text	TypeEditors	This is the type of editor	Teks
 File offset: 	ProbeView		Ofset berkas: 
 Add	ProbeView		Tambah
+64 bit signed value:	TypeEditors		nilai 64-bit signed:
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Anda benar-benar ingin menghapus atribut \"%s\" dari file \"%s\"?\n\nAnda tidak dapat membatalkan tindakan ini.
 No type editor available	AttributeWindow		Tidak ada editor tipe yang tersedia
 Print…	ProbeView		Cetak…
 New…	FileWindow		Baru...
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	apa: '%.4s'\n\n
-OK	DiskProbe		Oke
+OK	DiskProbe		OKE
 DiskProbe	System name		DiskProbe
 Back	ProbeView		Mundur
 Device: 	ProbeView		Perangkat: 
 Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Basis
 Open file…	FileWindow		Buka berkas…
+32 bit unsigned pointer:	TypeEditors		pointer 32 bit unsigned:
+DiskProbe request	DiskProbe		Permintaan DiskProbe
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Penulisan ke berkas gagal:\n%s\n\nSemua perubahan akan hilang saat Anda keluar.
 Examine device:	OpenWindow		Memeriksa perangkat:
 Number editor	TypeEditors		Editor angka
 Icon	TypeEditors		Ikon
 Attribute	ProbeView		Atribut
 Don't save	ProbeView		Jangan simpan
 Undo	ProbeView		Batalkan
+Flattened bitmap	TypeEditors		Bitmap dipipihkan
 Block %Ld (0x%Lx)	ProbeView		Blok %Ld (0x%Lx)
 Cancel	OpenWindow		Batalkan
 Unknown format	TypeEditors		Format tak dikenal
 File: 	ProbeView		Berkas: 
-Stop	ProbeView		Stop
+Swapped: %Ld (0x%0*Lx)	ProbeView		Ditukar: %Ld (0x%0*Lx)
+Stop	ProbeView		Berhenti
 Cancel	ProbeView		Batal
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Tak bisa membuka \"%s\":\n%s
 Font size	ProbeView		Ukuran fon
 Type editor not supported	ProbeView		Tipe editor tidak didukung
 Native: 0x%0*Lx	ProbeView		Asli: 0x%0*Lx
 Copy	ProbeView		Salin
+Redo	ProbeView		Ulangi
 Floating-point value:	TypeEditors		Nilai Floating-point:
 Cancel	AttributeWindow		Batalkan
 16 bit signed value:	TypeEditors		Nilai 16 bita signed:
-DiskProbe request	AttributeWindow		Permintaan DiskProbe 
+DiskProbe request	AttributeWindow		Permintaan DiskProbe
 Next	ProbeView		Selanjutnya
 64 bit signed offset:	TypeEditors		ofset 64 bita signed:
+32 bit signed value:	TypeEditors		Nilai 32 bit signed:
+Could not find search string.	ProbeView		Tidak menemukan kata yang dicari.
 Close	FileWindow		Tutup
 Unknown type	TypeEditors		Tipe tidak dikenal
 Open device	FileWindow		Buka perangkat
@@ -61,20 +72,26 @@ Mode:	FindWindow		Moda:
 of 	ProbeView		dari 
 Contents:	TypeEditors		Kandungan:
 Could not open file \"%s\": %s\n	DiskProbe		Tidak dapat membuka berkas \"%s\": %s\n
+Probe file…	OpenWindow		Periksa berkas…
 Block: 	ProbeView		Blok: 
+Bookmarks	ProbeView		Tanda buku
 Probe device	OpenWindow		Perangkat penyelidik
 none	ProbeView	No attributes	tidak ada
 Case sensitive	FindWindow		Peka huruf besar kecil
+32 bit unsigned value:	TypeEditors		Nilai 32 bit unsigned:
 Remove from file	AttributeWindow		Hapus dari berkas
 Attributes	ProbeView		Atribut
 Message	TypeEditors	This is the type of view	Pesan
 Message View	TypeEditors		Tampilan Pesan
-Offset: 	ProbeView		Ofset:
+Offset: 	ProbeView		Ofset: 
+Swapped: 0x%0*Lx	ProbeView		Ditukar: 0x%0*Lx
 MIME type:	TypeEditors		Tipe MIME:
 Fit	ProbeView	Size of fonts, fits to available room	Sesuaikan
 Type editor	ProbeView		Tipe editor
 File	FileWindow		Berkas
+Grayscale	TypeEditors		Skala abu-abu
 32 bit	TypeEditors		32 bit
+Native: %Ld (0x%0*Lx)	ProbeView		Asli: %Ld (0x%0*Lx)
 Device	ProbeView		Perangkat
 Close	AttributeWindow		Tutup
 Type editor	AttributeWindow		Editor tipe
@@ -96,12 +113,13 @@ Find	FindWindow		Cari
 Attribute: 	ProbeView		Atribut: 
 Block	ProbeView		Blok
 Find again	ProbeView		Telusur lagi
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Tampilan
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Tidak bisa membaca gambar
-DiskProbe request	ProbeView		Permintaan DiskProbe 
+DiskProbe request	ProbeView		Permintaan DiskProbe
 Double precision floating-point value:	TypeEditors		Nilai double precision floating-point :
 Image	TypeEditors	This is the type of view	Gambar
 Save changes before closing?	ProbeView		Simpan perubahan sebelum ditutup?
-PNG format	TypeEditors		format PNG
+PNG format	TypeEditors		Format PNG
 Number	TypeEditors	This is the type of editor	Nomor
 Edit	ProbeView		Sunting
 String editor	TypeEditors		Editor string
@@ -112,3 +130,4 @@ Find…	ProbeView		Telusur…
 Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Desimal
 Image view	TypeEditors	Image means here a picture file, not a disk image.	Lihat gambar
 Paste	ProbeView		Tempel
+32 bit unsigned size:	TypeEditors		Ukuran 32 bit unsigned:

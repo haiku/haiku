@@ -1,4 +1,5 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	3041025920
+1	swedish	x-vnd.Haiku-HaikuDepot	3957908772
+An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ett fel inträffade vid uppdatering av repositoriet: %error%
 Check for updates…	MainWindow		Leta efter uppdateringar…
 Uninstall	PackageManager		Avinstallera
 (%Votes%)	FeaturedPackagesView		(%Votes%)
@@ -8,19 +9,23 @@ Create account	UserLoginWindow		Skapa konto
 OK	App		OK
 Mostly stable	RatePackageWindow		Mestadels stabil
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Kontot lyckades skapas. Du kan nu betygsätta paket och göra andra vettiga saker.
+The response to the captcha was incorrect.	ServerHelper		Svaret på captchan var inkorrekt.
 Rate package…	PackageInfoView		Betygsätt paket...
 Develop packages	MainWindow		Utvecklingspaket
 Starting the package daemon failed:\n\n%Error%	App		Starta package daemon misslyckades:\n\n%Error%
 <no info>	PackageInfoView		<Ingen information>
 No user ratings available.	PackageInfoView		Ingen betygsättnings tillgänglig.
+Local Repository Load Error	LocalPkgDataLoadProcess		Laddningfel av lokalt repositorie
 The user name needs to be at least 3 letters long.	UserLoginWindow		användarnamnet måste vara minst 3 bokstäver långt.
 Downloading package '%name%'	WorkStatusView		Laddar hem paket '%name%'
 Failed to create account	UserLoginWindow		Misslyckades skapa konto
 Ignore	UserLoginWindow		Ignorera
 Rating	PackageListView		Betyg
+Synchronizing icons	ServerIconExportUpdateProcess		Synkroniserar ikoner
 Show	MainWindow		Visa
 Does not start	RatePackageWindow		Starta inte
 But none could be listed here, sorry.	UserLoginWindow		Ursäkta, Men ingen kunde listas här.
+An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Ett fel inträffade vid hämtning av paketlistan: %message%
 There are problems with the data you entered:\n\n	UserLoginWindow		Det är något problem med data du skrev:\n\n
 The authentication was successful.	UserLoginWindow		Behörighetskontrollen lyckades.
 Not specified	RatePackageWindow		Inte angivet
@@ -28,6 +33,7 @@ Unstable but usable	RatePackageWindow		Ostabil men kan användas
 Active	PackageListView		Aktiv
 Login or Create account	MainWindow		Logga in eller skapa konto
 <Package contents not available for remote packages>	PackageContentsView		<Paketinehållet är inte tillgängligt för externa paket>
+{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1 paket att hämta}other{# paket att hämta}}
 Ratings	PackageInfoView		Betyg
 Switch account…	MainWindow		Byt konto...
 Preferred language:	UserLoginWindow		Föredraget språk:

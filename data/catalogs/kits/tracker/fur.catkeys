@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	3176790743
+1	friulian	x-vnd.Haiku-libtracker	1502919247
 Created	ContainerWindow		Creât
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
 Open with…	ContainerWindow		Vierç cun…
@@ -408,6 +408,7 @@ ends with	FindPanel		al finìs cun
 Show Disks icon	SettingsView		Mostre icone discs
 Outline selection rectangle only	SettingsView		Dome il retangul di selezion dal contor
 by formula	FindPanel		par formule
+is	FindPanel		al è
 Move to Trash	FilePanelPriv		Sposte te Scovacere
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Se si cambie non ae cartele di sisteme o al so contignût, no si rivarà plui a inviâ %osName!\n\nContinuâ pardabon?\n\nPar cambiâ non distès ae cartele di sisteme o al so contignût, ten fracât il tast Maiusc e fâs clic su \"Cambie non\".
 40 x 40	ContainerWindow		40 x 40

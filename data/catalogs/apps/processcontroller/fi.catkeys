@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ProcessController	4131818684
+1	finnish	x-vnd.Haiku-ProcessController	168752057
 Error saving file	ProcessController		Virhe tallennettaessa tiedostoa
 Display priority	ProcessController		Näyttöprioriteetti
 That's no Fun!	ProcessController		Se ei ole hauskaa!
@@ -45,5 +45,6 @@ Damned!	ProcessController		Kirottua!
 New Terminal	ProcessController		Uusi Pääteikkuna
 Power saving	ProcessController		Virransäästö
 ProcessController is already installed in Deskbar.	ProcessController		Prosessiohjain on jo asennettu Työpöytäpalkkiin.
+This is the last active processor…\nYou can't turn it off!	ProcessController		Tämä on viimeinen aktiivi prosessori…\nEt voi kääntää sitä pois päältä!
 This thread is already gone…	ProcessController		Tämä säie on jo poistunut...
 Run in window	ProcessController		Suorita ikkunassa

@@ -1,10 +1,11 @@
-1	finnish	x-vnd.Haiku-LaunchBox	3692177981
+1	finnish	x-vnd.Haiku-LaunchBox	1530497419
 Set description…	LaunchBox		Aseta kuvaus...
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Haluatko todella sulkea alustan?\n(Alustaa ei muisteta.)
 OK	LaunchBox		Valmis
 Ignore double-click	LaunchBox		Ohita kaksoisnapsautukset
 Show on all workspaces	LaunchBox		Näytä kaikki työtilat
 Name Panel	LaunchBox		Nimipaneeli
+Autostart	LaunchBox		Automaattikäynnistys
 Clone	LaunchBox		Klooni
 Description for '%3'	LaunchBox		Kohteen ’%3’ kuvaus
 Show window border	LaunchBox		Näytä ikkunaraja

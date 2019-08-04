@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Touchpad	607725922
+1	finnish	x-vnd.Haiku-Touchpad	526581388
 Scrolling	TouchpadPrefView		Vieritys
 Tapping	TouchpadPrefView		Naputus
 Touchpad	System name		Levyhiiri
@@ -7,6 +7,7 @@ OK	TouchpadPrefView		Valmis
 Horizontal scrolling	TouchpadPrefView		Vaakasuora vieritys
 Slow	TouchpadPrefView		Hidas
 Two finger scrolling	TouchpadPrefView		Kaksisormivieritys
+No touchpad found, the settings will have no effect.	TouchpadPrefView		Tasohiirtä ei löytynyt, asetuksilla ei ole mitään vaikutusta.
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Uusi vieritysalue on hyvin laaja ja saattaa haitata normaalia hiiritoimintaa. Haluatko todella vaihtaa sen?
 Defaults	TouchpadPrefView		Oletukset
 High	TouchpadPrefView		Korkea

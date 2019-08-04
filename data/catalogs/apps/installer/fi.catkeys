@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Installer	1997609102
+1	finnish	x-vnd.Haiku-Installer	116830250
 Performing installation.	InstallProgress		Suoritetaan asennus.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Valitse lähdelevy ponnahdusvalikosta. Napsauta sitten ”Aloita”.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Sulje ”Levyasema-asetukset”-ikkuna ennen Asennusohjelman ikkunan sulkemista.
@@ -27,6 +27,7 @@ Running Boot Manager…\n\nClose Boot Manager to continue with the installation.
 Quit DriveSetup	InstallerWindow		Poistu Levyasema-asetuksista
 Write boot sector	InstallerWindow		Kirjoita käynnistyssektori
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld / %2ld
+Finishing installation.	InstallProgress		Päätetään asennus.
 Install from:	InstallerWindow		Asenna levyltä:
 Additional disk space required: 0.0 KiB	InstallerWindow		Vaadittu lisälevytilaa: 0.0 kibitavua
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Tämä on beeta-laatuinen ohjelmisto! Se tarkoittaa, että on olemassa riski menettää tärkeää dataa. Tee usein varmuuskopioita! Sinua on varoitettu.\n\n\n
@@ -39,6 +40,8 @@ Hide optional packages	InstallerWindow		Piilota valinnaiset pakkaukset
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Pidä hauskaa ja kiitos, että kokeilet Haikua!
 Quit	InstallerApp		Lopeta
+Starting installation.	InstallProgress		Aloitetaan asennus.
+Error writing boot sector.	InstallProgress		Käynnistyssektorin kirjoitusvirhe.
 OK	InstallerWindow		Valmis
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Sulje ensin Käynnistyshallinta- ja Levyasema-asetusikkunat ennen asennusohjelman ikkunan sulkemista.
 Failed to launch Boot Manager	InstallerWindow		Käynnistyshallinnan käynnistäminen epäonnistui

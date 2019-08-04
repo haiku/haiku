@@ -1,8 +1,9 @@
-1	finnish	x-vnd.Haiku-MatchHeader	3544711400
+1	finnish	x-vnd.Haiku-MatchHeader	1946584206
 Delete message	ConfigView		Poista viesti
 Match \"%attribute\" against \"%regex\"	RuleFilter		Täsmää ”%attribute” säännöllisen lausekkeen ”%regex” varalta
 Match header	RuleFilter		Täsmää otsikko
 Set flags to	ConfigView		Aseta lippujen arvoksi
+Header field (e.g. Subject, From, …)	ConfigView		Otsakekenttä (esim.: Aihe, Lähettäjä, ...)
 <Choose account>	ConfigView		<Valitse tili>
 Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Jokerimerkkiarvot, kuten ”*spam*”.\nKäytä säännöllisissä lausekkeissa etuliitettä ”REGEX:”.
 Then	ConfigView		Sitten

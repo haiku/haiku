@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Devices	490380176
+1	finnish	x-vnd.Haiku-Devices	3345509916
 ACPI bus	DevicesView		ACPI-väylä
 Encryption controller	Device		Salausohjain
 Bus Information	Device		Väylätiedot
@@ -54,7 +54,9 @@ Device name	DeviceACPI		Laitenimi
 Card Reader	DeviceSCSI		Korttilukija
 Display controller	Device		Näyttöohjain
 Basic information	DevicesView		Perustiedot
+ACPI Button '%1'	DeviceACPI		ACPI-painike '%1'
 Bus	DevicesView		Väylä
+ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Laitenimi
 Disk Drive	DeviceSCSI		Levyasema
 Other	DeviceSCSI		Muu

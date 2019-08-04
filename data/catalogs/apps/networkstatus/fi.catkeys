@@ -1,9 +1,10 @@
-1	finnish	x-vnd.Haiku-NetworkStatus	3823341665
+1	finnish	x-vnd.Haiku-NetworkStatus	186344131
 Netmask	NetworkStatusView		Verkkopeite
 Quit	NetworkStatusView		Lopeta
 Unknown	NetworkStatusView		Tuntematon
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Verkkoasetusohjelman käynnistyminen epäonnistui.\n\nVirhe: 
 Install in Deskbar	NetworkStatus		Asenna Työpöytäpalkkiin
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		NetworkStatus-valitsimet:\n\t--deskbar\tlisää kopio automaattisesti Työpöytäpalkkiin\n\t--help\t\ttulosta nämä tiedot ja poistu
 Open network preferences…	NetworkStatusView		Avaa verkkoasetukset...
 NetworkStatus	System name		Verkkotila
 OK	NetworkStatusView		Valmis
@@ -12,6 +13,7 @@ Could not join wireless network:\n	NetworkStatusView		Liittyminen langattomaan v
 Ready	NetworkStatusView		Valmis
 Network Status	NetworkStatusView		Verkkotila
 Address	NetworkStatusView		Osoite
+Deskbar is not running, giving up.	NetworkStatus		Työpöytäpalkki ei ole käynnissä, luovutaan toiminnosta.
 No stateful configuration	NetworkStatusView		Ei tilallista asetusta
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Voit suorittaa Verkontilan ikkunassa tai asentaa sen Työpöytäpalkkiin.
 Broadcast	NetworkStatusView		Yleislähetys

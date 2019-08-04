@@ -1,24 +1,31 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	2728680786
+1	finnish	x-vnd.Haiku-HaikuDepot	3697446690
+An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Tietovaraston päivityksen yhteydessä tapahtui virhe: %error%
 Check for updates…	MainWindow		Tarkista päivitykset…
 Uninstall	PackageManager		Poista asennus
 (%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Poistetut asennukset
 Available packages	MainWindow		Saatavilla olevat pakkaukset
 Create account	UserLoginWindow		Luo tili
+OK	App		Valmis
 Mostly stable	RatePackageWindow		Äärimmäisen stabiili
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Tilin luominen onnistui. Voit nyt antaa pakkauksille arvosanoja ja tehdä muita hyödyllisiä asioita.
+The response to the captcha was incorrect.	ServerHelper		Captcha-vastaus oli virheellinen.
 Rate package…	PackageInfoView		Anna pakkaukselle arvosana...
 Develop packages	MainWindow		Kehityspaketit
 Starting the package daemon failed:\n\n%Error%	App		Pakkaustaustaprosessin käynnistyminen epäonnistui:\n\n%Error%
 <no info>	PackageInfoView		<ei tietoja>
 No user ratings available.	PackageInfoView		Käyttäjäarvosanoja ei ole saatavilla.
+Local Repository Load Error	LocalPkgDataLoadProcess		Paikallisen tietovaraston latausvirhe
 The user name needs to be at least 3 letters long.	UserLoginWindow		Käyttäjänimen on oltava vähintään 3 merkkiä pitkä.
+Downloading package '%name%'	WorkStatusView		Ladataan pakkaus '%name%'
 Failed to create account	UserLoginWindow		Tilin luominen epäonnistui
 Ignore	UserLoginWindow		Ohita
 Rating	PackageListView		Arvosana
+Synchronizing icons	ServerIconExportUpdateProcess		Synkronoidaan kuvakkeet
 Show	MainWindow		Näytä
 Does not start	RatePackageWindow		Ei käynnisty
 But none could be listed here, sorry.	UserLoginWindow		Tässä ei kyetty luetteloimaan mitään.
+An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Pakkausluettelon hankkimisessa tapahtui virhe: %message%
 There are problems with the data you entered:\n\n	UserLoginWindow		Syöttämissäsi tiedoissa oli pulmia:\n\n
 The authentication was successful.	UserLoginWindow		Tunnistautuminen onnistui.
 Not specified	RatePackageWindow		Ei määritelty
@@ -26,37 +33,53 @@ Unstable but usable	RatePackageWindow		Epävakaa, mutta käyttökelpoinen
 Active	PackageListView		Käytössä
 Login or Create account	MainWindow		Kirjaudu tai luo tili
 <Package contents not available for remote packages>	PackageContentsView		<Etäpakkausten sisältö ei ole saatavilla>
+{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1 pakkaus ladattu}other{# pakkausta ladattu}}
 Ratings	PackageInfoView		Arvosanat
 Switch account…	MainWindow		Vaihda tiliä...
 Preferred language:	UserLoginWindow		Ensisijainen kieli:
+Server Error	ServerHelper		Palvelinvirhe
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display.  Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Pakkaustietojen päivityksessä ilmeni pulma, joka saattaa aiheuttaa sen, että sovellusnäytöllä näkyvät tiedot ovat vanhentuneita tai ne puuttuvat.  Yksityiskohtaisia lisätietoja tästä pulmasta saattaa löytyä sovelluksen lokitiedostosta.
 It was not possible to contact the web service.	UserLoginWindow		Webbipalveluun ei saatu yhteyttä.
 Name	PackageListView		Nimi
+Local	LocalPkgDataLoadProcess		Paikallinen
 Rate %Package%	RatePackageWindow		Anna pakkaukselle %Package% arvosana
+An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Pakkaushallinnan alustuksessa tapahtui virhe: %message%
 Quit HaikuDepot	App		Poistu HaikuVarastosta
+Repository Update Error	LocalRepositoryUpdateProcess		Tietovarastopäivityksen virhe
 Category	FilterView		Luokka
 User rating	RatePackageWindow		Käyttäjäarvosanat
 Installed packages	MainWindow		Asennetut paketit
+A requested object or an object involved in the request was not found on the server.	ServerHelper		Pyydettyä objektia tai pyyntöön liittyvää objektia ei löytynyt palvelimelta.
 Other users can see this rating	RatePackageWindow		Muut käyttäjät voivat nähdä tämän arvosanan
 Stable	RatePackageWindow		Vakaa
+This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		Tämä sovellus on liian vanha viestimään HaikuDepot-palvelinjärjestelmän kanssa.  Hanki uudempi HaikuDepot-versio päivittämällä Haiku-järjestelmä.  Vaadittu HaikuDepot-minimiversio on \"%s\".
 Fatal error	PackageManager		Kriittinen virhe
 Package action failed	PackageInfoView		Pakettitoiminta epäonnistui
 No changelog available.	PackageInfoView		Mitään muutoslokia ei ole saatavilla.
 There are problems in the form:\n\n	UserLoginWindow		Muodossa on pulmia:\n\n
+Error	App		Virhe
 There was a puzzling response from the web service.	UserLoginWindow		Webbipalvelun vastaus oli pulmallinen.
 Not logged in	MainWindow		Et ole kirjautunut sisään
 No, quit HaikuDepot	App		Ei, poistu HaikuVarastosta
+Featured packages	FeaturedPackagesView		Jakeluversiopakkaukset
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Arvosanasi kopiointi palvelimelle onnistui. Voit päivittää tai poistaa sen HaikuDepot-palvelimen webbisivulla.
+Network Error	ServerHelper		Verkkovirhe
 Available	PackageListView		Saatavilla
 Cancel	UserLoginWindow		Peru
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuVarasto tarvitsee toimiakseen pakkaustaustaprosessin, ja se ei näytä olevan käynnissä.\nHaluaisitko käynnistää sen nyt?
 Click a package to view information	PackageInfoView		Napsauta pakkausta tietojen katsomiseksi
 Contents	PackageInfoView		Sisällöt
 Close	PackageManager		Sulje
+A network transport error has arisen communicating with the HaikuDepot server system: %s	ServerHelper		Verkon siirtovirhe syntyi viestinnässä HaikuDepot-palvelinjärjestelmän kanssa: %s
 Changelog	PackageInfoView		Muutosloki
 Rating not possible	MainWindow		Arvosanojen antaminen ei ole mahdollista
 About	PackageInfoView		Ohjelmasta
 Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Todentaminen epäonnistui. Käyttäjä ei ole olemassa tai tarjottiin väärää salasanaa.
+%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# prosessi} other{# prosessia}}
+Reboot required	PackageManager		Tarvitaan uudelleenkäynnistys
 Very unstable	RatePackageWindow		Hyvin epävakaa
+All packages	PackageListView		Kaikki pakkaukset
+Network Transport Error	ServerHelper		Verkkosiirron virhe
 Stability	RatePackageWindow		Stabiilisuus
 Send	RatePackageWindow		Lähetä
 Start package daemon	App		Käynnistä pakkaustaustaprosessi
@@ -64,17 +87,20 @@ The password is too weak or invalid. Please use at least 8 characters with at le
 The package action could not be scheduled: %Error%	PackageInfoView		Pakkaustoiminnon aikatauluttaminen epäonnistui: %Error%
 Cancel	RatePackageWindow		Peru
 Inactive	PackageListView		Ei käytössä
+Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synkronoidaan metatietoja tietovaratoista
 OK	MainWindow		Valmis
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# kohde} other{# kohdetta}}
 OK	PackageInfoView		Valmis
 Downloading:	PackageInfoView		Ladataan:
 Success	UserLoginWindow		Valmis
+It responded with: %message%	UserLoginWindow		Se vastasi viestillä: %message%
 Package daemon problem	App		Pakkaustaustaprosessipulma
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Tietovarasto
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (versio %hd.version%)
 Close	UserLoginWindow		Sulje
 Close	RatePackageWindow		Sulje
+Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synkronoidaan pakkaustietoja tietovarastolle '%REPO_NAME%'
 Failed to create account: %s\n	UserLoginWindow		Tilin luominen epäonnistui: %s\n
 Size	PackageListView		Koko
 Your rating:	RatePackageWindow		Arvosanasi:
@@ -83,8 +109,10 @@ All categories	FilterView		Kaikki luokat
 Repositories	MainWindow		Tietovarastot
 n/a	PackageInfoView		–
 Cancel	MainWindow		Peru
+{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 lisää ladattavaksi)}other{(# lisää ladattavaksi)}}
 Refresh repositories	MainWindow		Virkistä tietovarastoja
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Jos et tarjoa sähköpostiosoitetta, et kykene nollaamaan salasanaasi silloin kun unohdat sen.
+Package Update Error	MainWindow		Pakkauksen päivitysvirhe
 Tools	MainWindow		Työkalut
 The passwords do not match.	UserLoginWindow		Salasanat eivät täsmää.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Tämä pakkaus ei näytä olevan HaikuDepot-palvelimella, joten ei ole mahdollista luoda sille uutta arvosanaa tai muokata olemassaolevaa arvosanaa.
@@ -95,9 +123,13 @@ Comment language:	RatePackageWindow		Kommenttikieli:
 Status	PackageListView		Tila
 The username is already taken. Please choose another.	UserLoginWindow		Käyttäjätunnus on jo varattu. Valitse toinen käyttäjätunnus.
 Update	RatePackageWindow		Päivitä
+OK	ServerHelper		Valmis
 Language	UserLoginWindow		Kieli
 OK	UserLoginWindow		Valmis
+Reading repository data	LocalPkgDataLoadProcess		Luetaan tietovarastotietoja
+Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Synkronoidaan viitetietoja palvelimelta
 Stability:	RatePackageWindow		Stabiilisuus:
+A validation error has occurred	ServerHelper		Tapahtui kelpuutusvirhe
 The captcha puzzle needs to be solved.	UserLoginWindow		Captcha-pulma on ratkaistava.
 Source packages	MainWindow		Lähdekoodipakkaukset
 -	no package size		-
@@ -112,19 +144,23 @@ Logged in as %User%	MainWindow		Kirjautuneena tunnuksella %User%
 Email address:	UserLoginWindow		Sähköpostiosoite:
 Screenshot	ScreenshotWindow		Kuvakaappaus
 HaikuDepot	System name		HaikuVarasto
+A reboot is necessary to complete the installation process.	PackageManager		Asennusprosessin päättäminen vaatii uudelleenkäynnistämisen.
 Search terms:	FilterView		Hakusanat:
 Pending…	PackageListView		Odottaa...
 Repeat pass phrase:	UserLoginWindow		Toista salasana:
 Category:	FilterView		Luokka:
 Authentication failed	UserLoginWindow		Todennus epäonnistui
 Manage repositories…	MainWindow		Hallinnoi tietovarastoja...
+Fetching remote repository data	LocalRepositoryUpdateProcess		Noudetaan etätietovaraston tietoja
 Description	PackageListView		Kuvaus
 Pass phrase:	UserLoginWindow		Salasana:
 Open %DeskbarLink%	PackageManager		Avaa %DeskbarLink%
 Install	PackageManager		Asenna
 Input validation	UserLoginWindow		Syötevalidointi
+An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		HaikuDepot-palvein [%i] lähetti odottamattoman virheen
 Log in…	MainWindow		Kirjaudu...
 You need to be logged into an account before you can rate packages.	MainWindow		Sinun on kirjauduttava tilille ennen kuin voit antaa arvosanoja pakkauksille.
+Authorization or security issue	ServerHelper		Valtuutus- tai turvallisuuspulma
 9999.99 KiB	PackageListView		9999.99 kibitavua
 All repositories	MainWindow		Kaikki tietovarastot
 %Version%	PackageInfoView		%Version%

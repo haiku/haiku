@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-BootManager	3886671855
+1	finnish	x-vnd.Haiku-BootManager	867546001
 Old Master Boot Record backup failure	BootManagerController	Title	Vanhan Master Boot Record-tietueen varmuuskopiohäiriö
 At least one partition must be selected!	BootManagerController		Vähintään yksi osio on valittava!
 No space available!	DrivesPage	Cannot install	Tilaa ei ole käytettävissä!
@@ -16,6 +16,7 @@ Never	DefaultPartitionPage		Ei koskaan
 Summary	BootManagerController	Title	Yhteenveto
 An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Tapahtui virhe kirjoitettaessa käynnistysvalikkoa. Master Boot Record saattaa olla vaurioitunut, sinun on palautettava MBR nyt!
 After three seconds	DefaultPartitionPage		Kolmen sekunnin jälkeen
+Read only!	DrivesPage	Cannot install	Kirjoitussuojattu!
 Write boot menu	BootManagerController	Button	Kirjoita käynnistysvalikko
 OK	BootManagerController	Button	Valmis
 Uninstall boot manager	BootManagerController	Title	Poista Käynnistyshallinta

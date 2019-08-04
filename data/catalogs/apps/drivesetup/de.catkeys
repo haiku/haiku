@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DriveSetup	4152338259
+1	german	x-vnd.Haiku-DriveSetup	791750172
 Could not unmount partition %s.	MainWindow		Partition \"%s\" konnte nicht ausgehangen werden.
 Mount all	MainWindow		Alle einhängen
 Disk	MainWindow		Datenträger
@@ -6,8 +6,11 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Device	PartitionList		Gerät
 Initialize	MainWindow		Initialisieren
 Could not change the parameters of the selected partition.	MainWindow		Die Parameter der ausgewählten Partition konnten nicht geändert werden.
+PGP encrypted	Encryption utils		PGP verschlüsselt
 Delete partition	MainWindow		Partition löschen
 Error: 	MainWindow	in any error alert	Fehler: 
+Removable	PartitionList		Wechselmedium
+Block size	PartitionList		Blockgröße
 The panel experienced a problem!	MainWindow		Es gab ein Problem mit dem Panel!
 Device	DiskView		Gerät
 Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Soll die Intel Extended Partition tatsächlich formatiert werden? Eventuell enthaltene Unterpartitionen würden überschrieben. Bevor diese Änderungen vorgenommen werden, wird nochmal nachgefragt.
@@ -26,11 +29,13 @@ Validation of the given creation parameters failed.	MainWindow		Die Überprüfun
 Eject	MainWindow		Auswerfen
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf dem Medium \"%s\" gehen dabei unwiderruflich verloren!
 Surface test (not implemented)	MainWindow		Oberflächentest (nicht implementiert)
+Read only	PartitionList		Schreibgeschützt
 The panel could not return successfully.	MainWindow		Das Fenster meldete sich nicht mehr zurück.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Die Parameter der Partition konnten nicht geändert werden. Es wurde nichts auf die Disk geschrieben.
 Partition %ld	DiskView		Partition %ld
 There's no space on the partition where a child partition could be created.	MainWindow		Es gibt keinen Platz auf der Partition, in der eine Tochterpartition angelegt werden könnte.
 No disk devices have been recognized.	DiskView		Es wurden keine Datenträger erkannt.
+Attributes	PartitionList		Attribute
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Das Löschen der Partition ist fehlgeschlagen. Der Datenträger blieb unverändert.
 Change parameters…	MainWindow		Parameter ändern…
 Format	InitializeParametersPanel		Formatieren
@@ -46,15 +51,20 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Löschen (nicht implementiert)
 The currently selected partition does not have a parent partition.	MainWindow		Die ausgewählte Partition hat keine übergeordnete Partition.
 Validation of the given initialization parameters failed.	MainWindow		Die Überprüfung der zum Initialisieren angegebenen Parameter ist fehlgeschlagen.
+Shared	PartitionList		Netzwerk
+BitLocker encrypted	Encryption utils		BitLocker verschlüsselt
 You need to select a partition entry from the list.	MainWindow		Bitte einen Partitionseintrag aus der Liste wählen.
 Offset: %s	Support		Versatz: %s
+SafeBoot encrypted	Encryption utils		SafeBoot verschlüsselt
 Volume name	PartitionList		Datenträgername
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf der Partition gehen dabei unwiderruflich verloren!
 Change	ChangeParametersPanel		Ändern
 Partition name:	ChangeParametersPanel		Partitionsname:
+LUKS encrypted	Encryption utils		LUKS verschlüsselt
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf der Partition \"%s\" gehen dabei unwiderruflich verloren!
 Cancel	AbstractParametersPanel		Abbrechen
 Format	MainWindow		Formatieren
+<empty or unknown>	DiskView		<leer oder unbekannt>
 OK	MainWindow		OK
 Open with DiskProbe	MainWindow		Öffnen mit DiskProbe
 Could not delete the selected partition.	MainWindow		Die gewählte Partition konnte nicht gelöscht werden.
@@ -63,6 +73,8 @@ There was an error preparing the disk for modifications.	MainWindow		Beim Vorber
 The disk has been successfully initialized.\n	MainWindow		Der Datenträger wurde erfolgreich initialisiert.\n
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Soll das Aushängen erzwungen werden?\n\nAchtung: Sollte der Datenträger gerade durch eine Anwendung beschrieben werden, können beim erzwungenen Aushängen Daten verloren gehen.\n
 Cancel	MainWindow		Abbrechen
+Free space	PartitionList		Freier Speicherplatz
+Queries	PartitionList		Queries
 Force unmount	MainWindow		Aushängen erzwingen
 Partition	MainWindow		Partition
 Change parameters	MainWindow		Parameter ändern
@@ -78,10 +90,14 @@ Cannot delete the selected partition.	MainWindow		Gewählte Partition konnte nic
 Continue	MainWindow		Weiter
 Could not mount partition %s.	MainWindow		Die Partition \"%s\" konnte nicht eingehangen werden.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition wirklich formatiert werden? Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.
+<empty or unknown>	PartitionList		<leer oder unbekannt>
 The selected disk is read-only.	MainWindow		Vom ausgewählten Datenträger ist schreibgeschützt.
 The partition %s is already unmounted.	MainWindow		Die Partition \"%s\" ist bereits ausgehangen.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Sollen die Parameter der ausgewählten Partition wirklich geändert werden?\n\nAndere Betriebssysteme können die Partition unter Umständen nicht mehr erkennen!
+Boot	PartitionList		Boot
 OK	AbstractParametersPanel		OK
+Virtual	PartitionList		Virtuell
+Virtual	DiskView		Virtuell
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf dem gewählten Datenträger gehen dabei unwiderruflich verloren!
 Select a partition from the list below.	DiskView		Bitte eine Partition aus der unten stehenden Liste wählen.
 Active	PartitionList		Aktiv

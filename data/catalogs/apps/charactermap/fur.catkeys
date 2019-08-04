@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-CharacterMap	3968279509
+1	friulian	x-vnd.Haiku-CharacterMap	124574598
 Enclosed alphanumerics	UnicodeBlocks		Alfanumerics includûts
 Basic Latin	UnicodeBlocks		Latin basic
 Cyrillic extended C	UnicodeBlocks		Cirilic estês C
@@ -147,3 +147,55 @@ Runic	UnicodeBlocks		Runic
 Miscellaneous mathematical symbols B	UnicodeBlocks		Simbui matematics varis - B
 Cuneiform numbers and punctuation	UnicodeBlocks		Interpunzion e numars cuneiformis
 Private use area	UnicodeBlocks		Aree di ûs privât
+CJK unified ideographs extension B	UnicodeBlocks		Estension B dai ideograms CJK unificâts
+Phags-pa	UnicodeBlocks		Phags-pa
+Kangxi radicals	UnicodeBlocks		Radicâi Kangxi
+Dingbats	UnicodeBlocks		Caratars decoratîfs Dingbats
+Tai Xuan Jing symbols	UnicodeBlocks		Simbui Tai Xuan Jing
+Yi syllables	UnicodeBlocks		Silabis Yi
+Buhid	UnicodeBlocks		Buhid
+Telugu	UnicodeBlocks		Telugu
+Superscripts and subscripts	UnicodeBlocks		Esponents e indiçs
+Thai	UnicodeBlocks		Thai
+Osage	UnicodeBlocks		Osage
+Deseret	UnicodeBlocks		Deseret
+Tifinagh	UnicodeBlocks		Tifinagh
+Gurmukhi	UnicodeBlocks		Gurmukhi
+CharacterMap	System name		Mape caratars
+Lao	UnicodeBlocks		Lao
+Gothic	UnicodeBlocks		Gotic
+Limbu	UnicodeBlocks		Limbu
+Rejang	UnicodeBlocks		Rejang
+Show private blocks	CharacterWindow		Mostre blocs privâts
+Phoenician	UnicodeBlocks		Fenici
+Mongolian	UnicodeBlocks		Mongul
+Supplemental arrows A	UnicodeBlocks		Frecis suplementârs A
+Miscellaneous symbols and arrows	UnicodeBlocks		Simbui e frecis varis
+Yijing hexagram symbols	UnicodeBlocks		Simbui a esagrams Yijing
+Supplemental mathematical operators	UnicodeBlocks		Operadôrs matematics suplementârs
+Enclosed CJK letters and months	UnicodeBlocks		Letaris CJK cjapadis dentri e mês
+Kayah Li	UnicodeBlocks		Kayah Li
+Alphabetic presentation forms	UnicodeBlocks		Formis di presentazion alfabetichis
+Halfwidth and fullwidth forms	UnicodeBlocks		Formis a largjece plene e mieze
+Lydian	UnicodeBlocks		Lidi
+Ethiopic supplement	UnicodeBlocks		Etiop suplementâr
+Glagolitic supplement	UnicodeBlocks		Suplement glagolitic
+CJK unified ideographs extension E	UnicodeBlocks		Ideograms unificâts CJK estension E
+Latin extended B	UnicodeBlocks		Latin estês B
+Box drawing	UnicodeBlocks		Dissen ricuadris
+Mathematical alphanumeric symbols	UnicodeBlocks		Simbui matematics alfanumerics
+Copy character	CharacterView		Copie caratar
+Greek and Coptic	UnicodeBlocks		Grêc e Copti
+Carian	UnicodeBlocks		Carian
+Georgian	UnicodeBlocks		Gjeorgjian
+Phaistos disc	UnicodeBlocks		Disc di Festo
+Shavian	UnicodeBlocks		Shavian
+CJK compatibility	UnicodeBlocks		Compatibilitât CJK
+Malayalam	UnicodeBlocks		Malayalam
+N'Ko	UnicodeBlocks		N'Ko
+Kannada	UnicodeBlocks		Kannada
+Copy as escaped byte string	CharacterView		Copie come stringhe di byte 'escaped'
+Phonetic extensions supplement	UnicodeBlocks		Suplement estensions fonetichis
+Domino tiles	UnicodeBlocks		Tessaris dal domino
+Bhaiksuki	UnicodeBlocks		Bhaiksuki
+Katakana phonetic extensions	UnicodeBlocks		Estensions fonetichis Katakana

@@ -4,7 +4,7 @@ Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Paket-pak
 No active network connection was found	UpdateManager	Error message	Tidak ditemukan koneksi jaringan aktif
 Quit	SoftwareUpdaterWindow	Alert button label	Berhenti
 There were no updates found.	CheckManager		Tidak ada pembaruan yang ditemukan.
-Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Pembaruan belum selesai, apakah Anda yakin ingin berhenti?
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Pembaruan belum selesai, apakah anda yakin ingin berhenti?
 Updates found	SoftwareUpdaterWindow		Pembaruan ditemukan
 Update now	SoftwareUpdaterWindow		Membarui sekarang
 OK	UpdateManager		OKE

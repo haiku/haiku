@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Network	3284324275
+1	finnish	x-vnd.Haiku-Network	1741006816
 Ethernet device	InterfaceListItem		Ethernet-laite
 Link speed:	IntefaceView		Yhteysnopeus:
 disconnected	IntefaceView		katkaistu
@@ -20,8 +20,10 @@ EAP	EAP protected network		EAP
 Services	NetworkWindow		Palvelut
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Verkkotilan asentaminen Työkalupalkkiin epäonnistui: %s
 Revert	NetworkWindow		Palauta
+off	ServiceListItem		pois käytöstä
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<langatonta verkkoa ei löytynyt>
+Enable	IntefaceView		Ota käyttöön
 connected	IntefaceView		yhdistetty
 VPN	NetworkWindow		VPN
 Apply	IntefaceAddressView		Käytä
@@ -30,6 +32,7 @@ WPA2	WPA2 protected network		WPA2
 Show network status in Deskbar	NetworkWindow		Näytä verkkotila Työkalupalkissa
 Mode:	IntefaceAddressView		Tila:
 connected	InterfaceListItem		yhdistetty
+OK	NetworkWindow		Valmis
 Static	IntefaceAddressView		Staattinen
 launch error	NetworkWindow		käynnistysvirhe
 Renegotiate	IntefaceView		Neuvottele uudelleen
@@ -37,6 +40,7 @@ MAC address:	IntefaceView		MAC-osoite:
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%nimi% (%authenticationMode%)
 disabled	InterfaceListItem		poissa käytöstä
 Dial-up connection	InterfaceListItem		Valintayhteys
+on	ServiceListItem		päällä
 The method for obtaining an IP address	IntefaceAddressView		IP-osoitteen hakemismenettely
 Automatic	IntefaceAddressView		Automaattinen
 Choose automatically	IntefaceView		Valitse automaattisesti

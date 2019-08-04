@@ -8,7 +8,7 @@ Disallow	AppAccessRequestWindow		Gjave il permès
 Allow once	AppAccessRequestWindow		Permet dome une volte
 Unlock keyring	KeyRequestWindow		Sbloche puarteclâfs
 An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		Une aplicazion e à domandât l'acès al puarteclâfs chi sot, ma al è blocât cuntune passphrase. Inserî la passphrase par sblocâlu.\nSe si sbloche il puarteclâfs, al restarà sblocât fintremai che il sisteme nol sarà distudât o fintremai che no si torni a blocâ il puarteclâfs a man.\nSe si anule chest dialic, il puarteclâfs al restarà blocât.
-Password:	KeyRequestWindow		Password:
+Password:	KeyRequestWindow		Peraule di ordin:
 Cancel	KeyRequestWindow		Anule
 This application has been updated since it was last granted access.	AppAccessRequestWindow		Cheste aplicazion e je stade inzornade de ultime volte che e à vût l'acès.
 Allow always	AppAccessRequestWindow		Permet simpri

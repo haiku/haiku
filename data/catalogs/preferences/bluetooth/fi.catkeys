@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-BluetoothPrefs	67867884
+1	finnish	x-vnd.Haiku-BluetoothPrefs	4276705900
 Laptop	Settings view		Kannettava
 Only from trusted devices	Settings view		Vain luotetuista laitteista
 15 secs	Settings view		15 sekuntia
@@ -17,9 +17,11 @@ Stop bluetooth services…	Window		Pysäytä bluetooth-palvelut…
 Add…	Remote devices		Lisää…
 As blocked	Remote devices		Estettynä
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Järjestelmästä ei löytynyt paikallisia Bluetooth-laitteita.
+Policy…	Settings view		Toimintatapa...
 Revert	Window		Palauta
 Refresh local devices…	Window		Verestä paikallisia laitteita...
 Disconnect	Remote devices		Katkaise yhteys
+Identify us as…	Settings view		Tunnista meidät nimellä...
 From all devices	Settings view		Kaikista laitteista
 Defaults	Window		Oletusasetukset
 Start bluetooth services…	Window		Käynnistä bluetooth-palvelut…
@@ -28,12 +30,15 @@ Scanning progress	Inquiry panel		Etsinnän edistyminen
 Bluetooth	System name		Bluetooth-asetukset
 Launch now	main		Käynnistä nyt
 Remove	Remote devices		Poista
+Pick device…	Settings view		Poimi laite...
 Always ask	Settings view		Kysy joka kerta
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Tukihenkilöt:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nKiitokset henkilöille, jotka auttoivat…\n\nLähettäen/lahjoittaen laitteistoa:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nTaloudellisesti:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nKorjausversioilla:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTestauksella:\n - Petter H. Juliussen\nJotka kertoivat minulla kaiken tietämänsä:\n - yellowTAB-ryhmä
 Help	Window		Opaste
 Pair…	Remote devices		Parita…
 Retrieving name of %1	Inquiry panel		Noudetaan %1-nimi
 Inquiry	Inquiry panel		Kysely
 Incoming connections policy:	Settings view		Saapuvien yhteyksien sääntö:
+Retrieving names…	Inquiry panel		Haetaan nimiä...
 Show name	Extended local device view		Näytä nimi
 Add device to list	Inquiry panel		Lisää laite luetteloon
 Remaining %1 seconds	Inquiry panel		Jäljellä %1 sekuntia
@@ -47,3 +52,4 @@ Server	Settings view		Palvelin
 Handheld	Settings view		Kädessäpidettävät
  packets: 	Device View		 pakettia: 
 About Bluetooth…	Window		Bluetooth-ohjelmasta…
+Starting scan…	Inquiry panel		Aloitetaan haku...

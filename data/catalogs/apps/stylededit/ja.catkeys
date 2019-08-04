@@ -69,7 +69,7 @@ Case-sensitive	FindandReplaceWindow		大文字と小文字を区別する
 Find selection	Menus		選択範囲を検索
 Cancel	SaveAlert		中止
 Find…	Menus		検索…
-Revert	RevertToSavedAlert		取り消し
+Revert	RevertToSavedAlert		元に戻す
 Size	Menus		サイズ
 Autodetect	Menus		自動判別
 Replace next	Menus		次を置換

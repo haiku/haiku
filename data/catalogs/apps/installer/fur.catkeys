@@ -14,7 +14,7 @@ Installer	System name		Instaladôr
 Unknown Type	InstallProgress	Partition content type	Gjenar no cognossût
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Frache il boton Scomence par instalâ di '%1s' su '%2s'.
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Sielç dal menù a tende il disc dulà lâ a instalâ. Daspò fâs clic su \"Scomence\".
-Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Instalazion completade. Il setôr di inviament al è stât scrit su '%s'. Frache Jes par bandonâ l'Instaladôr opûr sielç un gnûf volum di destinazion par fâ une altre instalazion.
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Instalazion completade. Il setôr di inviament al è stât scrit su '%s'. Frache Jes par bandonâ l'Instaladôr o sielç un gnûf volum dulà fâ une altre instalazion.
 README	InstallerApp		LEIMI
 Quit	InstallerWindow		Jes
 Write boot sector to '%s'	InstallerWindow		Scriture setôr di inviament su '%s'

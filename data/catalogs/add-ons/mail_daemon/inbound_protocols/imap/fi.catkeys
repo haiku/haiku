@@ -1,7 +1,8 @@
-1	finnish	x-vnd.Haiku-IMAP	1938678311
+1	finnish	x-vnd.Haiku-IMAP	722419473
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Yhdistäminen palvelimelle ”%server%” epäonnistui:\n%error%
 Failed to fetch available storage.	IMAPFolderConfig		Saatavilla olevan tallennuspaikan noutaminen epäonnistui.
 Cancel	IMAPFolderConfig		Peru
+OK	IMAPFolderConfig		Valmis
 No encryption	imap_config		Ei salausta
 Configure IMAP Folders	imap_config		Aseta IMAP-kansiot
 SSL	imap_config		SSL

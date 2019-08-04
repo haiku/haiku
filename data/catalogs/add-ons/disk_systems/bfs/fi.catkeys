@@ -1,5 +1,6 @@
-1	finnish	x-vnd.Haiku-BFSAddOn	3514982252
+1	finnish	x-vnd.Haiku-BFSAddOn	1570987954
 Enable query support	BFS_Initialize_Parameter		Ota käyttöön kyselytuki
+Disabling query support may speed up certain file system operations, but should\nonly be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		Kyselytuen ottaminen pois käytöstä voi nopeuttaa tiettyjä tiedostojärjestelmä-\ntoimia, mutta silloin on oltava aivan varma, että missään ei tarvita kyselyjä.\nKyselytuen on oltava kaikissa taltioissa, jotka on tarkoitettu Haikun käynnistämiseen.
 Name:	BFS_Initialize_Parameter		Nimi:
 8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (Enimmäkseen isoja tiedostoja)
 2048 (Recommended)	BFS_Initialize_Parameter		2048 (Suositeltu)

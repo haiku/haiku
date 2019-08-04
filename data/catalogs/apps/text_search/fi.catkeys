@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku.TextSearch	2123129416
+1	finnish	x-vnd.Haiku.TextSearch	1867528375
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Valitse tiedostot, jotka haluat valittaviksi Seuraajassa.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Xargs-ohjelman käynnistäminen epäonnistui!
@@ -27,6 +27,7 @@ Show lines	GrepWindow		Näytä rivit
 Failed to open errors pipe!	Grepper		Virheputken avaaminen epäonnistui!
 The unselected files will be removed from the list.	GrepWindow		Valitsemattomat tiedostot poistetaan luettelosta.
 Skip folders starting with a dot	GrepWindow		Ohita kansiot, joiden nimet alkavat pisteellä
+Open files in code editor	GrepWindow		Avaa tiedostot koodieditorissa
 Failed to open output pipe!	Grepper		Tulostusputken avaaminen epäonnistui!
 Cancel	GrepWindow		Peru
 History	GrepWindow		Historia

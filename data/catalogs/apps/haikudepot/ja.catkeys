@@ -1,4 +1,5 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	2335250517
+1	japanese	x-vnd.Haiku-HaikuDepot	3697446690
+An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
 Check for updates…	MainWindow		更新をチェック…
 Uninstall	PackageManager		アンインストール
 (%Votes%)	FeaturedPackagesView		(%Votes%)
@@ -8,19 +9,23 @@ Create account	UserLoginWindow		アカウントの作成
 OK	App		OK
 Mostly stable	RatePackageWindow		ほとんど安定
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		アカウントが正常に作成されました。これからパッケージの評価やほかの便利なことができます。
+The response to the captcha was incorrect.	ServerHelper		キャプチャの回答が間違っていました
 Rate package…	PackageInfoView		パッケージを評価…
 Develop packages	MainWindow		開発用パッケージ
 Starting the package daemon failed:\n\n%Error%	App		パッケージデーモンの起動に失敗しました:\n\n%Error%
 <no info>	PackageInfoView		<情報無し>
 No user ratings available.	PackageInfoView		ユーザー評価はありません。
+Local Repository Load Error	LocalPkgDataLoadProcess		ローカルリポジトリ読み込みエラー
 The user name needs to be at least 3 letters long.	UserLoginWindow		ユーザー名は少なくとも 3 文字は必要です。
 Downloading package '%name%'	WorkStatusView		パッケージ '%name%' をダウンロード中
 Failed to create account	UserLoginWindow		アカウントの作成に失敗しました
 Ignore	UserLoginWindow		無視
 Rating	PackageListView		評価
+Synchronizing icons	ServerIconExportUpdateProcess		アイコンを同期しています。
 Show	MainWindow		表示
 Does not start	RatePackageWindow		起動しない
 But none could be listed here, sorry.	UserLoginWindow		すみません。しかし、ここにはなにもリストされていません。
+An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		パッケージリストの取得中にエラーが発生しました: %message%
 There are problems with the data you entered:\n\n	UserLoginWindow		入力したデーターに問題があります:\n\n
 The authentication was successful.	UserLoginWindow		認証に成功しました。
 Not specified	RatePackageWindow		指定なし
@@ -32,16 +37,22 @@ Login or Create account	MainWindow		ログインまたはアカウントの作�
 Ratings	PackageInfoView		評価
 Switch account…	MainWindow		アカウントの切り替え…
 Preferred language:	UserLoginWindow		優先言語:
+Server Error	ServerHelper		サーバーエラー
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display.  Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		パッケージデータの更新中に、データーが期限切れになったり、アプリケーションの表示から無くなるかもしれない問題が発生しました。この問題に関する追加の詳細は、アプリケーションのログから得られるかもしれません。
 It was not possible to contact the web service.	UserLoginWindow		ウェブサービスにコンタクトできませんでした。
 Name	PackageListView		名前
+Local	LocalPkgDataLoadProcess		ローカル
 Rate %Package%	RatePackageWindow		%Package% を評価
+An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		パッケージマネージャーの初期化中にエラーが発生しました: %message%
 Quit HaikuDepot	App		HaikuDepot を終了
+Repository Update Error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
 Category	FilterView		分類
 User rating	RatePackageWindow		ユーザーによる評価
 Installed packages	MainWindow		インストール済みパッケージ
+A requested object or an object involved in the request was not found on the server.	ServerHelper		要求されたオブジェクトまたはリクエストに関連するオブジェクトがサーバー上に見つかりませんでした。　　
 Other users can see this rating	RatePackageWindow		ほかのユーザーがこの評価を見ることができます
 Stable	RatePackageWindow		安定
+This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		アプリケーションが古いので、HaikuDepot サーバーシステムと通信できません。Haiku システムを更新して、HaikuDepot の新しいバージョンを入手してください。必要とされる HaikuDepot の最小簿バージョンは、\"%s\" です。
 Fatal error	PackageManager		致命的なエラー
 Package action failed	PackageInfoView		パッケージアクションに失敗しました
 No changelog available.	PackageInfoView		変更記録はありません。
@@ -52,19 +63,23 @@ Not logged in	MainWindow		ログインしていません
 No, quit HaikuDepot	App		いいえ、HaikuDepot を終了します
 Featured packages	FeaturedPackagesView		おすすめパッケージ
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		評価が正常に更新されました。HaikuDepot Server のウェブサイトで評価を更新または削除できます。
+Network Error	ServerHelper		ネットワークエラー
 Available	PackageListView		利用可能
 Cancel	UserLoginWindow		キャンセル
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot はパッケージデーモンが動作することを必要とします。 そしてそれは動作していないようです。\n今起動しますか?
 Click a package to view information	PackageInfoView		パッケージをクリックして情報を見る
 Contents	PackageInfoView		内容
 Close	PackageManager		閉じる
+A network transport error has arisen communicating with the HaikuDepot server system: %s	ServerHelper		HaikuDepot サーバーシステムとの通信中に、次のネットワークトランスポートエラーが発生しました: %s
 Changelog	PackageInfoView		変更履歴
 Rating not possible	MainWindow		評価不能
 About	PackageInfoView		パッケージについて
 Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		認証に失敗しました。ユーザーが存在しないか、不正なパスワードが入力されました。
+%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# プロセス} other{# プロセス}}
 Reboot required	PackageManager		再起動が必要です
 Very unstable	RatePackageWindow		非常に不安定
 All packages	PackageListView		すべてのパッケージ
+Network Transport Error	ServerHelper		ネットワークトランスポートエラー
 Stability	RatePackageWindow		安定度
 Send	RatePackageWindow		送信する
 Start package daemon	App		パッケージデーモンを起動
@@ -72,6 +87,7 @@ The password is too weak or invalid. Please use at least 8 characters with at le
 The package action could not be scheduled: %Error%	PackageInfoView		パッケージアクションを予約できませんでした: %Error%
 Cancel	RatePackageWindow		キャンセル
 Inactive	PackageListView		無効
+Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		リポジトリに関するメタデータを同期中
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# アイテム} other{# アイテム}}
 OK	PackageInfoView		OK
@@ -84,6 +100,7 @@ Repository	PackageListView		リポジトリ
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (バージョン %hd.version%)
 Close	UserLoginWindow		閉じる
 Close	RatePackageWindow		閉じる
+Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		リポジトリ '%REPO_NAME%' のパッケージデーターを同期中
 Failed to create account: %s\n	UserLoginWindow		次のアカウントの作成に失敗しました: %s\n
 Size	PackageListView		サイズ
 Your rating:	RatePackageWindow		評価:
@@ -106,9 +123,13 @@ Comment language:	RatePackageWindow		コメント言語:
 Status	PackageListView		状態
 The username is already taken. Please choose another.	UserLoginWindow		ユーザー名はすでに使われています。他の名前を選んでください。
 Update	RatePackageWindow		更新
+OK	ServerHelper		OK
 Language	UserLoginWindow		言語
 OK	UserLoginWindow		OK
+Reading repository data	LocalPkgDataLoadProcess		リポジトリのデーターを読み込んでいます
+Synchronizing reference data from server	ServerReferenceDataUpdateProcess		サーバーから参照データーを同期中
 Stability:	RatePackageWindow		安定度:
+A validation error has occurred	ServerHelper		検証エラーが発生しました
 The captcha puzzle needs to be solved.	UserLoginWindow		Captcha パズルを解く必要があります。
 Source packages	MainWindow		ソースパッケージ
 -	no package size		-
@@ -130,13 +151,16 @@ Repeat pass phrase:	UserLoginWindow		パスフレーズの再入力:
 Category:	FilterView		分類:
 Authentication failed	UserLoginWindow		認証に失敗しました
 Manage repositories…	MainWindow		リポジトリの管理…
+Fetching remote repository data	LocalRepositoryUpdateProcess		リモートリポジトリデータを取得中
 Description	PackageListView		説明
 Pass phrase:	UserLoginWindow		パスフレーズ:
 Open %DeskbarLink%	PackageManager		%DeskbarLink% を開く
 Install	PackageManager		インストール
 Input validation	UserLoginWindow		入力検証
+An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		予期しないエラーが次の HaikuDepot サーバーから送信されました [%i]
 Log in…	MainWindow		ログイン…
 You need to be logged into an account before you can rate packages.	MainWindow		パッケージを評価する前にアカウントにログインする必要があります。
+Authorization or security issue	ServerHelper		認証またはセキュリティの問題
 9999.99 KiB	PackageListView		9999.99 KiB
 All repositories	MainWindow		すべてのリポジトリ
 %Version%	PackageInfoView		%Version%

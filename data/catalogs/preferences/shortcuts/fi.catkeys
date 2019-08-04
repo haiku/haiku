@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Shortcuts	1611284793
+1	finnish	x-vnd.Haiku-Shortcuts	3834857117
 *MouseUp	ShortcutsWindow		*HiiriYlös
 Application	ShortcutsWindow		Sovellus
 Option	ShortcutsSpec	Name for modifier on keyboard	Valitsin
@@ -9,6 +9,7 @@ Don't save	ShortcutsWindow		Älä tallenna
 *Beep	ShortcutsWindow		*Piip
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Pikanäppäinasetukset-sovellus ei kyennyt tallentamaan keyset-tiedostoa.
 Save	ShortcutsWindow		Tallenna
+Either	ShortcutsSpec		eikä
 Oh no	ShortcutsWindow		Oh ei
 Key	ShortcutsWindow		Näppäin
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*LähetäViesti application/x-vnd.Be-TRAK ’Tfnd’
@@ -19,21 +20,26 @@ Quit	ShortcutsWindow		Poistu
 Cancel	ShortcutsWindow		Peru
 *MoveMouse +20 +0	ShortcutsWindow		*SiirräHiiri +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Control-painike
+Left	ShortcutsSpec		Vasen
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Pikanäppäinasetukset ei kyennyt jäsentämään KeySet-tiedostoa!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Pikanäppäinsetukset eivät kyennyt tallentamaan KeySet-tiedostoa!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Lisää merkkijono ”Tekstisi tänne”
 Remove selected shortcut	ShortcutsWindow		Poista valittu pikanäppäin
 Error, NULL state description?	ShortcutsSpec		Virhe, NULL-tilakuvaus?
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Pikanäppäinasetukset ei kyennyt avaamaan KeySet-tiedostoa!
 Save & apply	ShortcutsWindow		Tallenna ja käytä
 Open	ShortcutsWindow		Avaa
 Append	ShortcutsWindow		Liitä
+Both	ShortcutsSpec		Sekä
 Save KeySet as…	ShortcutsWindow		Tallenna KeySet-tiedosto nimellä…
 Append KeySet…	ShortcutsWindow		Liitä KeySet-tiedosto…
 *MouseButton 1	ShortcutsWindow		*Hiiripainike 1
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Moni ”*SiirräHiiriKohteeseen 100% 0” ”*Hiiripainike 1”
+Right	ShortcutsSpec		Oikea
 OK	ShortcutsWindow		Valmis
 Add new shortcut	ShortcutsWindow		Lisää uusi pikanäppäin
+(None)	ShortcutsSpec		(Ei mitään)
 Shift	ShortcutsSpec	Name for modifier on keyboard	Vaihtonäppäin
 Open KeySet…	ShortcutsWindow		Avaa KeySet-tiedosto…
 File	ShortcutsWindow		Tiedosto

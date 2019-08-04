@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-DriveSetup	3425668869
+1	friulian	x-vnd.Haiku-DriveSetup	791750172
 Could not unmount partition %s.	MainWindow		Impussibil dismontâ la partizion %s.
 Mount all	MainWindow		Monte dut
 Disk	MainWindow		Disc
@@ -6,8 +6,11 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Device	PartitionList		Dispositîf
 Initialize	MainWindow		Inizialize
 Could not change the parameters of the selected partition.	MainWindow		Impussibil cambiâ i parametris de partizion selezionade.
+PGP encrypted	Encryption utils		Cifrât cun PGP
 Delete partition	MainWindow		Elimine partizion
 Error: 	MainWindow	in any error alert	Erôr: 
+Removable	PartitionList		Estraibil
+Block size	PartitionList		Dimension bloc
 The panel experienced a problem!	MainWindow		Il panel al à vût un probleme!
 Device	DiskView		Dispositîf
 Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Formatâ pardabon la partizion estese Intel? Se si continue, cualsisei sot-partizion contignude e vignarà sorescrite. Prime di scrivi lis modifichis sul disc, e vignarà domandade di gnûf une conferme.
@@ -26,13 +29,16 @@ Validation of the given creation parameters failed.	MainWindow		La convalide dai
 Eject	MainWindow		Pare fûr
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Scrivi pardabon lis modifichis sul disc cumò?\n\nSe si lu fâs, ducj i dâts sul disc %s a laran pierdûts in mût irimediabil!
 Surface test (not implemented)	MainWindow		Verifiche de superficie (no implementât)
+Read only	PartitionList		Dome leture
 The panel could not return successfully.	MainWindow		Il panel nol è rivât a completâ la ativitât cun sucès.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		No si è rivâts a cambiâ i parametris de partizion. Nissune modifiche e je stade scrite sul disc.
 Partition %ld	DiskView		Partizion %ld
 There's no space on the partition where a child partition could be created.	MainWindow		Su cheste partizion no'nd è spazi par creâ une sot-partizion.
 No disk devices have been recognized.	DiskView		Nissun dispositîf di disc al è stât ricognossût.
+Attributes	PartitionList		Atribûts
 Failed to delete the partition. No changes have been written to disk.	MainWindow		No si è rivâts a eliminâ la partizion. Nissune modifiche e je stade scrite sul disc.
 Change parameters…	MainWindow		Modifiche i parametris…
+Format	InitializeParametersPanel		Formât
 Could not unmount partition	MainWindow		Impussibil dismontâ la partizion
 Create	CreateParametersPanel		Cree
 File system	PartitionList		File system
@@ -45,15 +51,20 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Nete vie (no implementât)
 The currently selected partition does not have a parent partition.	MainWindow		La partizion atualmentri selezionade no à une sore-partizion.
 Validation of the given initialization parameters failed.	MainWindow		La convalide dai parametris di inizializazion definîts e je falide.
+Shared	PartitionList		Condividût
+BitLocker encrypted	Encryption utils		Cifrât cun BitLocker
 You need to select a partition entry from the list.	MainWindow		Si scugne selezionâ une partizion de liste.
 Offset: %s	Support		Spostament: %s
+SafeBoot encrypted	Encryption utils		Cifrât cun SafeBoot
 Volume name	PartitionList		Non dal volum
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Scrivi pardabon lis modifichis sul disc cumò?\n\nSe si lu fâs, ducj i dâts su la partizion a laran pierdûts in mût irimediabil!
 Change	ChangeParametersPanel		Modifiche
 Partition name:	ChangeParametersPanel		Non de partizion:
+LUKS encrypted	Encryption utils		Cifrât cun LUKS
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Scrivi pardabon lis modifichis sul disc cumò?\n\nSe si lu fâs, ducj i dâts su la partizion %s a laran pierdûts in mût irimediabil!
 Cancel	AbstractParametersPanel		Anule
 Format	MainWindow		Formate
+<empty or unknown>	DiskView		<vueit o no cognossût>
 OK	MainWindow		Va ben
 Open with DiskProbe	MainWindow		Vierç cun Scandai dal disc
 Could not delete the selected partition.	MainWindow		Impussibil eliminâ la partizion selezionade.
@@ -62,6 +73,8 @@ There was an error preparing the disk for modifications.	MainWindow		Si è verif
 The disk has been successfully initialized.\n	MainWindow		Il disc al è stât inizializât cun sucès.\n
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Si aial di sfuarçâ il dismontaç?\n\nNote: Se une aplicazion e sta scrivint in chel moment sul volum, il dismontâlu al podarès puartâ a pierditis di dâts.\n
 Cancel	MainWindow		Anule
+Free space	PartitionList		Spazi libar
+Queries	PartitionList		Interogazions
 Force unmount	MainWindow		Sfuarce il dismontaç
 Partition	MainWindow		Partizion
 Change parameters	MainWindow		Modifiche i parametris
@@ -77,10 +90,14 @@ Cannot delete the selected partition.	MainWindow		Impussibil eliminâ la partizi
 Continue	MainWindow		Continue
 Could not mount partition %s.	MainWindow		Impussibil montâ la partizion %s.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Formatâ pardabon la partizion? Prime di scrivi lis modifichis sul disc, e vignarà domandade di gnûf une conferme.
+<empty or unknown>	PartitionList		<vueit o no cognossût>
 The selected disk is read-only.	MainWindow		Il disc selezionât al è di dome-leture.
 The partition %s is already unmounted.	MainWindow		La partizion %s e je stade za dismontade.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Cambiâ pardabon i parametris de partizion selezionade?\n\nAltris sistemis operatîfs a podaressin no ricognossi plui la partizion!
+Boot	PartitionList		Inviament
 OK	AbstractParametersPanel		Va ben
+Virtual	PartitionList		Virtuâl
+Virtual	DiskView		Virtuâl
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Scrivi pardabon cumò lis modifichis sul disc?\n\nSe si lu fâs ducj i dâts dal disc selezionât a laran pierdûts in mût irimediabil!
 Select a partition from the list below.	DiskView		Selezione une partizion de liste chi sot.
 Active	PartitionList		Atîf

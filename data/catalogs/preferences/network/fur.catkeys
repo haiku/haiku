@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Network	3145282573
+1	friulian	x-vnd.Haiku-Network	1741006816
 Ethernet device	InterfaceListItem		Dispositîf ethernet
 Link speed:	IntefaceView		Velocitât colegament:
 disconnected	IntefaceView		disconetût
@@ -32,6 +32,7 @@ WPA2	WPA2 protected network		WPA2
 Show network status in Deskbar	NetworkWindow		Mostre il stât de rêt tal Deskbar
 Mode:	IntefaceAddressView		Modalitât:
 connected	InterfaceListItem		conetût
+OK	NetworkWindow		Va ben
 Static	IntefaceAddressView		Static
 launch error	NetworkWindow		erôr di inviament
 Renegotiate	IntefaceView		Tornâ a negoziâ

@@ -1,5 +1,6 @@
-1	finnish	x-vnd.haiku-softwareupdater	4078911117
+1	finnish	x-vnd.haiku-softwareupdater	153492771
 Updating version	SoftwareUpdaterWindow	List item text	Päivitetään versio
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Asentamista varten napsauta tänne {0, plural, one{# päivitetty pakkaus} other{# päivitettyä pakkausta}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Poistettavat asennetut pakkaukset
 No active network connection was found	UpdateManager	Error message	Yhtään aktiivista verkkoyhteyttä ei löytynyt
 Quit	SoftwareUpdaterWindow	Alert button label	Poistu
@@ -7,12 +8,14 @@ There were no updates found.	CheckManager		Päivityksiä ei löytynyt.
 Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Päivitykset eivät ole valmiina, oletko varma, että haluat poistua?
 Updates found	SoftwareUpdaterWindow		Päivityksiä löytyi
 Update now	SoftwareUpdaterWindow		Päivitä nyt
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Jostain syystä tietokoneesi uudelleenkäynnistys ei onnistunut.
 OK	UpdateManager		Valmis
 Unrecognized argument	SoftwareUpdaterApp	Error message	Tunnistamaton argumentti
 There were no updates found.	CheckAction		Päivityksiä ei löytynyt.
 No updates available	UpdateAction		Ei ole yhtään päivitystä
 New packages to be installed	SoftwareUpdaterWindow	List super item label	Uudet asennettavat pakkaukset
 Packages to be updated	SoftwareUpdaterWindow	List super item label	Päivitettävät pakkaukset
+Attempting to cancel the updates…	SoftwareUpdaterWindow		Yritetään perua päivitykset...
 Contacting software repositories to check for package updates.	CheckManager		Otetaan yhteyttä ohjelmistotietovarastoihin pakkauspäivitysten tarkistamiseksi.
 Available updates found	CheckManager		Löydettiin saatavilla olevia päivityksiä
 from repository	SoftwareUpdaterWindow	List item text	tietovarastosta
@@ -30,7 +33,9 @@ No active network connection was found.\n	CheckManager		Yhtään aktiivista verk
 Applying changes	UpdateManager		Toteutetaan muutokset
 Full sync	SoftwareUpdaterWindow	Alert button label	Täysi synkronointi
 Quit	SoftwareUpdaterWindow	Button label	Poistu
+Updates have been successfully installed.	UpdateManager		Päivitysten asennus onnistui.
 Exception occurred while updating packages : %s\n	UpdateAction		Pakkausten päivityksessä tapahtui poikkeusvirhe : %s\n
+A reboot is necessary to complete the update process.	UpdateManager		Tämän prosessin valmistumiseksi tarvitaan uudelleenkäynnistys.
 Exception occurred while checking for updates: %s\n	CheckAction		Päivitysten tarkistuksessa tapahtui poikkeusvirhe: %s\n
 Packages are being updated	UpdateManager		Pakkauksia päivitetään
 Cancel	SoftwareUpdaterWindow		Peru
@@ -38,10 +43,13 @@ Don't quit	SoftwareUpdaterWindow		Älä poistu
 Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Suorita Ohjelmistopäivittäjä napsauttamalla tästä. Jotkut päivitykset vaativat pulmaratkaisun valittavaksi.
 Checking for updates	SoftwareUpdaterWindow		Tarkistetaan päivityksiä
 Updates completed	UpdateManager		Päivitykset valmiina
+Reboot	SoftwareUpdaterWindow		Käynnistä uudelleen
 Show more details	SoftwareUpdaterWindow		Näytä lisätietoja
 Installing version	SoftwareUpdaterWindow	List item text	Asennetaan versiota
 Checking for updates	CheckManager		Tarkistetaan päivityksiä
 No remote repositories are available	UpdateManager	Error message	Yhtään etätietovarastoa ei ole käytettävissä
+Software {0, plural, one{update} other{updates}} available	CheckManager		Ohjelmiston {0, plural, one{päivitys} other{päivitystä}} saatavilla
+Reboot	SoftwareUpdaterWindow	Button label	Käynnistä uudelleen
 Update	SoftwareUpdaterWindow	Alert button label	Päivitä
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Avaa tietovarastot
 Updates did not complete	UpdateAction		Päivitykset eivät valmistuneet

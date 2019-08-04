@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Repositories	2658607939
+1	finnish	x-vnd.Haiku-Repositories	1220143449
 This is not a valid URL.	AddRepoWindow	Add URL error message	Tämä ei ole kelvollinen verkko-osoite
 Repository URL:	AddRepoWindow	Text box label	Tietovarastoverkko-osoite:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Tietovarastokohteen %name% välimuistin verestämisessä tapahtui virhe
@@ -10,6 +10,7 @@ Disable	RepositoriesView	Button label	Ota pois käytöstä
 Cancel task	TaskTimer	Button label	Peru tehtävä
 Changes completed	RepositoriesView	Status view text	Muutokset valmiina
 Details	TaskLooper	Job log details header	Lisätiedot
+Enabled	RepoRow	Tag in the Status column	Otettu käyttöön
 Remove	Constants	Button label	Poista
 There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Tietovaraston verkko-osoitteen %url% käyttöönotossa tapahtui virhe
 Remove this repository?	RepositoriesView	Removal alert confirmation message	Poistetaanko tämä tietovarasto?

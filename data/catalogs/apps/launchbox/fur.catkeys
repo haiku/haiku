@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-LaunchBox	4256703397
+1	friulian	x-vnd.Haiku-LaunchBox	1530497419
 Set description…	LaunchBox		Stabilìs descrizion…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Sierâ pardabon chest pad?\n(Il pad nol vignarà ricuardât.)
 OK	LaunchBox		Va ben
@@ -14,9 +14,10 @@ Failed to launch 'something', error in Pad data.	LaunchBox		Esecuzion di 'alc' f
 LaunchBox	System name		LaunchBox
 Auto-raise	LaunchBox		Tire sù in automatic
 Icon size	LaunchBox		Dimension icone
-Open containing folder	LaunchBox		Vierç cartele
+Open containing folder	LaunchBox		Mostre te cartele
 Add button here	LaunchBox		Zonte boton achì
 Cancel	LaunchBox		Anule
+launch popup	LaunchBox		eseguìs popup
 Clear button	LaunchBox		Nete boton
 Bummer	LaunchBox		Maledizion
 last chance	LaunchBox		ultime pussibilitât

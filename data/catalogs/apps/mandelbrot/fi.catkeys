@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Mandelbrot	1781779654
+1	finnish	x-vnd.Haiku-Mandelbrot	3875916167
 Burning Ship	MandelbrotWindow		Palava laiva
 Grassland	MandelbrotWindow		Grassland
 Lightning	MandelbrotWindow		Salamointi
@@ -9,6 +9,8 @@ Tricorn	MandelbrotWindow		Kolmijyväinen
 Royal	MandelbrotWindow		Kuninkaallinen
 Orbit Trap	MandelbrotWindow		Kehäansa
 Deepfrost	MandelbrotWindow		Syväjäätynyt
+Subsampling	MandelbrotWindow		Alinäyte
+1 (none)	MandelbrotWindow		1 (ei mitään)
 Quit	MandelbrotWindow		Poistu
 File	MandelbrotWindow		Tiedosto
 Julia	MandelbrotWindow		Julia

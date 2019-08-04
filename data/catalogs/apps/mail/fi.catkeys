@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-MAIL	1865394837
+1	finnish	x-vnd.Be-MAIL	3155788869
 Set to Saved	Mail		Aseta tallennetuksi
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Päätekstisi sisältää %ld koodaamatonta merkkiä. Ehkä eri merkistö toimisi paremmin? Napauta Lähetä-painiketta sen lähettämiseksi silti (korvausmerkkejä käytetään koodaamattomien merkkien paikalla), tai valitse Peru palataksesi ja yritä korjata se.
 Text wrapping:	Mail		Tekstin rivitys:
@@ -8,6 +8,7 @@ Reply	Mail		Vastaa
 Next message	Mail		Seuraava viesti
 Mailing	Mail		Lähetetään sähköpostia
 Unread	Mail		Lukematta
+Same sender	Mail		Sama lähettäjä
 Copy to new	Mail		Kopioi uuteen
 Save as draft	Mail		Tallenna luonnoksena
 Encoding:	Mail		Koodaus:
@@ -31,6 +32,7 @@ Only files can be added as attachments.	Mail		Vain tiedostoja voi lisätä liitt
 Close	Mail		Sulje
 Untitled	Mail		Nimetön
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Liitteiden poistamista edelleenlähetetyistä sähköpostiviesteistä ei ole vielä toteutettu!\nSe ei vielä toimi oikein.
+Same recipient	Mail		Sama vastaanottaja
 Previous message	Mail		Edellinen viesti
 (Address unavailable)	Mail		(Osoite ei ole saatavilla)
 Mail	System name		Sähköposti
@@ -83,6 +85,7 @@ Colored quotes:	Mail		Väritetyt lainaukset:
 Automatic	Mail		Automaattinen
 Open this link	Mail		Avaa tämä linkki
 Auto signature:	Mail		Automaattiallekirjoitus:
+Same subject	Mail		Sama aihe
 Send	Mail		Lähetä
 Open draft	Mail		Avaa luonnos
 Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Jätä arvoksi ’New’
