@@ -18,6 +18,7 @@
 #include <scheduling_analysis.h>
 #include <thread.h>
 #include <util/AutoLock.h>
+#include <util/atomic.h>
 
 
 #define STATUS_ADDED	1
@@ -143,14 +144,11 @@ ConditionVariableEntry::Wait(uint32 flags, bigtime_t timeout)
 	if (fVariable == NULL)
 		return fWaitStatus;
 
-	SpinLocker conditionLocker(fVariable->fLock);
-
 	thread_prepare_to_block(fThread, flags,
 		THREAD_BLOCK_TYPE_CONDITION_VARIABLE, fVariable);
 
 	fWaitStatus = STATUS_WAITING;
 
-	conditionLocker.Unlock();
 	entryLocker.Unlock();
 
 	status_t error;
@@ -161,13 +159,27 @@ ConditionVariableEntry::Wait(uint32 flags, bigtime_t timeout)
 
 	entryLocker.Lock();
 
-	// remove entry from variable, if not done yet
+	// Remove entry from variable, if not done yet. Since we are going to
+	// lock ourselves and recheck fVariable if it is not NULL, we don't need
+	// to acquire our own lock before doing this first NULL check.
 	if (fVariable != NULL) {
-		conditionLocker.Lock();
-		// we need to check we are still in the variable's entries; there may
-		// have been a race for our removal.
-		if (fVariable->fEntries.Contains(this))
+		if (fVariable == NULL)
+			return error;
+		SpinLocker conditionLocker(fVariable->fLock);
+		entryLocker.Unlock();
+
+		if (fVariable->fEntries.Contains(this)) {
 			fVariable->fEntries.Remove(this);
+		} else {
+			// The variable's fEntries did not contain us, but we currently
+			// have the variable's lock acquired. This must mean we are in
+			// a race with the variable's Notify. It is possible we will be
+			// destroyed immediately upon returning here, so we need to
+			// spin until our fVariable member is unset by the Notify thread
+			// and then re-acquire our own lock to avoid a use-after-free.
+			while (atomic_pointer_get(&fVariable) != NULL) {}
+		}
+		entryLocker.Lock();
 		fVariable = NULL;
 	}
 
