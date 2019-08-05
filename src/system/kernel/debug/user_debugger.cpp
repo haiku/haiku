@@ -2547,7 +2547,7 @@ install_team_debugger(team_id teamID, port_id debuggerPort,
 	// get the team
 	Team* team;
 	ConditionVariable debugChangeCondition;
-	debugChangeCondition.Init((void*)teamID, "debug change condition");
+	debugChangeCondition.Init(NULL, "debug change condition");
 	error = prepare_debugger_change(teamID, debugChangeCondition, team);
 	if (error != B_OK)
 		return error;
@@ -2874,7 +2874,7 @@ _user_remove_team_debugger(team_id teamID)
 {
 	Team* team;
 	ConditionVariable debugChangeCondition;
-	debugChangeCondition.Init((void*)teamID, "debug change condition");
+	debugChangeCondition.Init(NULL, "debug change condition");
 	status_t error = prepare_debugger_change(teamID, debugChangeCondition,
 		team);
 	if (error != B_OK)
