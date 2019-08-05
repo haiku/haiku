@@ -231,20 +231,23 @@ dump_sem_info(int argc, char **argv)
 		return 0;
 	}
 
-	num = strtoul(argv[1], NULL, 0);
+	char* endptr;
+	num = strtoul(argv[1], &endptr, 0);
 
-	if (IS_KERNEL_ADDRESS(num)) {
-		dump_sem((struct sem_entry *)num);
-		return 0;
-	} else if (num >= 0) {
-		uint32 slot = num % sMaxSems;
-		if (sSems[slot].id != (int)num) {
-			kprintf("sem %ld (%#lx) doesn't exist!\n", num, num);
+	if (endptr != argv[1]) {
+		if (IS_KERNEL_ADDRESS(num)) {
+			dump_sem((struct sem_entry *)num);
+			return 0;
+		} else {
+			uint32 slot = num % sMaxSems;
+			if (sSems[slot].id != (int)num) {
+				kprintf("sem %ld (%#lx) doesn't exist!\n", num, num);
+				return 0;
+			}
+
+			dump_sem(&sSems[slot]);
 			return 0;
 		}
-
-		dump_sem(&sSems[slot]);
-		return 0;
 	}
 
 	// walk through the sem list, trying to match name
