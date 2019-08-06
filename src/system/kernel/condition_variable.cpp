@@ -159,18 +159,13 @@ ConditionVariableEntry::Wait(uint32 flags, bigtime_t timeout)
 
 	entryLocker.Lock();
 
-	// Remove entry from variable, if not done yet. Since we are going to
-	// lock ourselves and recheck fVariable if it is not NULL, we don't need
-	// to acquire our own lock before doing this first NULL check.
+	// Remove entry from variable, if not done yet.
 	if (fVariable != NULL) {
-		if (fVariable == NULL)
-			return error;
 		SpinLocker conditionLocker(fVariable->fLock);
-		entryLocker.Unlock();
-
 		if (fVariable->fEntries.Contains(this)) {
 			fVariable->fEntries.Remove(this);
 		} else {
+			entryLocker.Unlock();
 			// The variable's fEntries did not contain us, but we currently
 			// have the variable's lock acquired. This must mean we are in
 			// a race with the variable's Notify. It is possible we will be
@@ -178,8 +173,8 @@ ConditionVariableEntry::Wait(uint32 flags, bigtime_t timeout)
 			// spin until our fVariable member is unset by the Notify thread
 			// and then re-acquire our own lock to avoid a use-after-free.
 			while (atomic_pointer_get(&fVariable) != NULL) {}
+			entryLocker.Lock();
 		}
-		entryLocker.Lock();
 		fVariable = NULL;
 	}
 
