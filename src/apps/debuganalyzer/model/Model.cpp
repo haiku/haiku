@@ -46,6 +46,8 @@ wait_object_type_name(uint32 type)
 			return "mutex";
 		case THREAD_BLOCK_TYPE_RW_LOCK:
 			return "rw lock";
+		case THREAD_BLOCK_TYPE_USER:
+			return "user";
 		case THREAD_BLOCK_TYPE_OTHER:
 			return "other";
 		case THREAD_BLOCK_TYPE_SNOOZE:

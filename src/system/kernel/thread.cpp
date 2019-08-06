@@ -1699,6 +1699,10 @@ _dump_thread_info(Thread *thread, bool shortInfo)
 					kprintf("rwlock    %p   ", thread->wait.object);
 					break;
 
+				case THREAD_BLOCK_TYPE_USER:
+					kprintf("user%*s", B_PRINTF_POINTER_WIDTH + 11, "");
+					break;
+
 				case THREAD_BLOCK_TYPE_OTHER:
 					kprintf("other%*s", B_PRINTF_POINTER_WIDTH + 10, "");
 					break;
@@ -1780,6 +1784,10 @@ _dump_thread_info(Thread *thread, bool shortInfo)
 
 			case THREAD_BLOCK_TYPE_RW_LOCK:
 				kprintf("rwlock %p\n", thread->wait.object);
+				break;
+
+			case THREAD_BLOCK_TYPE_USER:
+				kprintf("user\n");
 				break;
 
 			case THREAD_BLOCK_TYPE_OTHER:
@@ -2976,7 +2984,13 @@ user_unblock_thread(thread_id threadID, status_t status)
 	if (thread->user_thread->wait_status > 0) {
 		thread->user_thread->wait_status = status;
 		clear_ac();
-		thread_unblock_locked(thread, status);
+
+		// Even if the user_thread->wait_status was > 0, it may be the
+		// case that this thread is actually blocked on something else.
+		if (thread->state == B_THREAD_WAITING
+				&& thread->wait.type == THREAD_BLOCK_TYPE_USER) {
+			thread_unblock_locked(thread, status);
+		}
 	} else
 		clear_ac();
 
@@ -3715,7 +3729,7 @@ _user_block_thread(uint32 flags, bigtime_t timeout)
 	clear_ac();
 
 	// nope, so wait
-	thread_prepare_to_block(thread, flags, THREAD_BLOCK_TYPE_OTHER, "user");
+	thread_prepare_to_block(thread, flags, THREAD_BLOCK_TYPE_USER, NULL);
 
 	threadLocker.Unlock();
 
