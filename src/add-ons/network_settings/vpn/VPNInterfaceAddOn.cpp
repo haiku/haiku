@@ -32,34 +32,34 @@ using namespace BNetworkKit;
 
 
 #undef B_TRANSLATION_CONTEXT
-#define B_TRANSLATION_CONTEXT "OpenVPNInterfaceAddOn"
+#define B_TRANSLATION_CONTEXT "VPNInterfaceAddOn"
 
 
 static const uint32 kMsgToggleService = 'tgls';
 
 
-class OpenVPNInterfaceAddOn : public BNetworkSettingsAddOn {
+class VPNInterfaceAddOn : public BNetworkSettingsAddOn {
 public:
-								OpenVPNInterfaceAddOn(image_id image,
+								VPNInterfaceAddOn(image_id image,
 									BNetworkSettings& settings);
-	virtual						~OpenVPNInterfaceAddOn();
+	virtual						~VPNInterfaceAddOn();
 
 	virtual	BNetworkSettingsItem*
 								CreateNextItem(uint32& cookie);
 };
 
 
-class OpenVPNInterfaceView : public InterfaceView {
+class VPNInterfaceView : public InterfaceView {
 public:
-								OpenVPNInterfaceView(BNetworkSettings& settings);
-	virtual						~OpenVPNInterfaceView();
+								VPNInterfaceView(BNetworkSettings& settings);
+	virtual						~VPNInterfaceView();
 };
 
 
-class OpenVPNInterfaceItem : public BNetworkSettingsItem {
+class VPNInterfaceItem : public BNetworkSettingsItem {
 public:
-								OpenVPNInterfaceItem(BNetworkSettings& settings);
-	virtual						~OpenVPNInterfaceItem();
+								VPNInterfaceItem(BNetworkSettings& settings);
+	virtual						~VPNInterfaceItem();
 
 	virtual	BNetworkSettingsType
 								Type() const;
@@ -80,14 +80,14 @@ private:
 // #pragma mark -
 
 
-OpenVPNInterfaceView::OpenVPNInterfaceView(BNetworkSettings& settings)
+VPNInterfaceView::VPNInterfaceView(BNetworkSettings& settings)
 	:
 	InterfaceView()
 {
 }
 
 
-OpenVPNInterfaceView::~OpenVPNInterfaceView()
+VPNInterfaceView::~VPNInterfaceView()
 {
 }
 
@@ -95,7 +95,7 @@ OpenVPNInterfaceView::~OpenVPNInterfaceView()
 // #pragma mark -
 
 
-OpenVPNInterfaceItem::OpenVPNInterfaceItem(BNetworkSettings& settings)
+VPNInterfaceItem::VPNInterfaceItem(BNetworkSettings& settings)
 	:
 	fSettings(settings),
 	fItem(new InterfaceListItem("My Awesome VPN",
@@ -105,7 +105,7 @@ OpenVPNInterfaceItem::OpenVPNInterfaceItem(BNetworkSettings& settings)
 }
 
 
-OpenVPNInterfaceItem::~OpenVPNInterfaceItem()
+VPNInterfaceItem::~VPNInterfaceItem()
 {
 	if (fView->Parent() == NULL)
 		delete fView;
@@ -115,37 +115,37 @@ OpenVPNInterfaceItem::~OpenVPNInterfaceItem()
 
 
 BNetworkSettingsType
-OpenVPNInterfaceItem::Type() const
+VPNInterfaceItem::Type() const
 {
 	return B_NETWORK_SETTINGS_TYPE_VPN;
 }
 
 
 BListItem*
-OpenVPNInterfaceItem::ListItem()
+VPNInterfaceItem::ListItem()
 {
 	return fItem;
 }
 
 
 BView*
-OpenVPNInterfaceItem::View()
+VPNInterfaceItem::View()
 {
 	if (fView == NULL)
-		fView = new OpenVPNInterfaceView(fSettings);
+		fView = new VPNInterfaceView(fSettings);
 
 	return fView;
 }
 
 
 status_t
-OpenVPNInterfaceItem::Revert()
+VPNInterfaceItem::Revert()
 {
 	return B_OK;
 }
 
 bool
-OpenVPNInterfaceItem::IsRevertable()
+VPNInterfaceItem::IsRevertable()
 {
 	// TODO
 	return false;
@@ -155,7 +155,7 @@ OpenVPNInterfaceItem::IsRevertable()
 // #pragma mark -
 
 
-OpenVPNInterfaceAddOn::OpenVPNInterfaceAddOn(image_id image,
+VPNInterfaceAddOn::VPNInterfaceAddOn(image_id image,
 	BNetworkSettings& settings)
 	:
 	BNetworkSettingsAddOn(image, settings)
@@ -163,16 +163,16 @@ OpenVPNInterfaceAddOn::OpenVPNInterfaceAddOn(image_id image,
 }
 
 
-OpenVPNInterfaceAddOn::~OpenVPNInterfaceAddOn()
+VPNInterfaceAddOn::~VPNInterfaceAddOn()
 {
 }
 
 
 BNetworkSettingsItem*
-OpenVPNInterfaceAddOn::CreateNextItem(uint32& cookie)
+VPNInterfaceAddOn::CreateNextItem(uint32& cookie)
 {
 	if (cookie++ == 0)
-		return new OpenVPNInterfaceItem(Settings());
+		return new VPNInterfaceItem(Settings());
 
 	return NULL;
 }
@@ -185,5 +185,5 @@ extern "C"
 BNetworkSettingsAddOn*
 instantiate_network_settings_add_on(image_id image, BNetworkSettings& settings)
 {
-	return new OpenVPNInterfaceAddOn(image, settings);
+	return new VPNInterfaceAddOn(image, settings);
 }

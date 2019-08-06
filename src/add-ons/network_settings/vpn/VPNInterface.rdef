@@ -1,4 +1,4 @@
-resource app_signature "application/x-vnd.Haiku-OpenVPNInterface";
+resource app_signature "application/x-vnd.Haiku-VPNInterface";
 
 resource app_version {
 	major  = 1,
@@ -7,6 +7,6 @@ resource app_version {
 	variety = 0,
 	internal = 0,
 	short_info = "1.0.0",
-	long_info = "Haiku OpenVPN connection settings"
+	long_info = "Haiku VPNInterface connection settings"
 };
 
