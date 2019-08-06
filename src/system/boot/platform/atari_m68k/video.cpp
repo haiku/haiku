@@ -1023,10 +1023,10 @@ video_mode_hook(Menu *menu, MenuItem *item)
 	// find selected mode
 	video_mode *mode = NULL;
 
-	menu = item->Submenu();
-	item = menu->FindMarked();
-	if (item != NULL) {
-		switch (menu->IndexOf(item)) {
+	Menu* submenu = item->Submenu();
+	MenuItem* subitem = submenu->FindMarked();
+	if (subitem != NULL) {
+		switch (submenu->IndexOf(subitem)) {
 			case 0:
 				// "Default" mode special
 				sMode = sDefaultMode;
@@ -1037,7 +1037,7 @@ video_mode_hook(Menu *menu, MenuItem *item)
 				// sets sMode to NULL which triggers VGA mode
 				//break;
 			default:
-				mode = (video_mode *)item->Data();
+				mode = (video_mode *)subitem->Data();
 				break;
 		}
 	}
