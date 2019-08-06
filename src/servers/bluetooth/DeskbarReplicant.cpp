@@ -184,6 +184,8 @@ DeskbarReplicant::MouseDown(BPoint where)
 	menu->SetTargetForItems(this);
 	ConvertToScreen(&point);
 	menu->Go(point, true, true, true);
+
+	delete menu;
 }
 
 
