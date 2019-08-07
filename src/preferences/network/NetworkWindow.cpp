@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2015 Haiku Inc. All rights reserved.
+ * Copyright 2004-2019 Haiku Inc., All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  *	Authors:
@@ -449,8 +449,6 @@ NetworkWindow::_ScanAddOns()
 		}
 
 		_SortItemsUnder(fServicesItem);
-		_SortItemsUnder(fDialUpItem);
-		_SortItemsUnder(fVPNItem);
 		_SortItemsUnder(fOtherItem);
 	}
 
@@ -486,16 +484,6 @@ NetworkWindow::_ListItemFor(BNetworkSettingsType type)
 			if (fServicesItem == NULL)
 				fServicesItem = _CreateItem(B_TRANSLATE("Services"));
 			return fServicesItem;
-
-		case B_NETWORK_SETTINGS_TYPE_DIAL_UP:
-			if (fDialUpItem == NULL)
-				fDialUpItem = _CreateItem(B_TRANSLATE("Dial Up"));
-			return fDialUpItem;
-
-		case B_NETWORK_SETTINGS_TYPE_VPN:
-			if (fVPNItem == NULL)
-				fVPNItem = _CreateItem(B_TRANSLATE("VPN"));
-			return fVPNItem;
 
 		case B_NETWORK_SETTINGS_TYPE_OTHER:
 			if (fOtherItem == NULL)
