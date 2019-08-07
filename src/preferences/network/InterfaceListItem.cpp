@@ -304,8 +304,16 @@ InterfaceListItem::_StateText() const
 {
 	if (fDisabled)
 		return B_TRANSLATE("disabled");
-	if (!fInterface.HasLink())
-		return B_TRANSLATE("no link");
+
+	if (!fInterface.HasLink()) {
+		switch (fType) {
+			case B_NETWORK_INTERFACE_TYPE_VPN:
+			case B_NETWORK_INTERFACE_TYPE_DIAL_UP:
+				return B_TRANSLATE("disconnected");
+			default:
+				return B_TRANSLATE("no link");
+		}
+	}
 
 	// TODO!
 //	} else if ((fSettings->IPAddr(AF_INET).IsEmpty()
