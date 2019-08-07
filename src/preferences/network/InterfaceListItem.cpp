@@ -175,6 +175,9 @@ InterfaceListItem::_Init()
 		case B_NETWORK_INTERFACE_TYPE_ETHERNET:
 			_PopulateBitmaps("ether");
 			break;
+		case B_NETWORK_INTERFACE_TYPE_VPN:
+			_PopulateBitmaps("vpn");
+			break;
 	}
 }
 
@@ -269,6 +272,7 @@ InterfaceListItem::_UpdateState()
 			break;
 		case B_NETWORK_INTERFACE_TYPE_VPN:
 			fSubtitle = B_TRANSLATE("VPN connection");
+			fDisabled = false;
 			break;
 		default:
 			fSubtitle = "";
