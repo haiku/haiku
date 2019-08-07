@@ -56,6 +56,9 @@ requires {
 	cmd:unzip
 #endif
 	lib:libcurl
+#ifdef HAIKU_BUILD_FEATURE_X86_LIBEDIT_ENABLED
+	lib:libedit
+#endif
 #ifdef HAIKU_BUILD_FEATURE_X86_FONTCONFIG_ENABLED
 	lib:libfontconfig
 #endif

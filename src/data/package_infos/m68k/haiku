@@ -55,6 +55,9 @@ requires {
 	cmd:tar
 	cmd:unzip
 #endif
+#ifdef HAIKU_BUILD_FEATURE_M68K_LIBEDIT_ENABLED
+	lib:libedit
+#endif
 	lib:libfreetype
 	lib:libfontconfig
 	lib:libgcc_s
