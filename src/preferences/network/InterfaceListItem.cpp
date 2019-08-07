@@ -178,6 +178,9 @@ InterfaceListItem::_Init()
 		case B_NETWORK_INTERFACE_TYPE_VPN:
 			_PopulateBitmaps("vpn");
 			break;
+		case B_NETWORK_INTERFACE_TYPE_DIAL_UP:
+			_PopulateBitmaps("dialup");
+			break;
 	}
 }
 
@@ -269,6 +272,7 @@ InterfaceListItem::_UpdateState()
 			break;
 		case B_NETWORK_INTERFACE_TYPE_DIAL_UP:
 			fSubtitle = B_TRANSLATE("Dial-up connection");
+			fDisabled = false;
 			break;
 		case B_NETWORK_INTERFACE_TYPE_VPN:
 			fSubtitle = B_TRANSLATE("VPN connection");
