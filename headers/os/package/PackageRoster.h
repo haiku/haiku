@@ -32,6 +32,7 @@ class BInstallationLocationInfo;
 class BPackageInfoSet;
 class BRepositoryCache;
 class BRepositoryConfig;
+class BPackageInfo;
 
 
 // watchable events
@@ -86,6 +87,10 @@ public:
 			status_t			GetActivePackages(
 									BPackageInstallationLocation location,
 									BPackageInfoSet& packageInfos);
+
+			status_t			IsPackageActive(
+									BPackageInstallationLocation location,
+									const BPackageInfo info, bool* active);
 
 			status_t			StartWatching(const BMessenger& target,
 									uint32 eventMask);

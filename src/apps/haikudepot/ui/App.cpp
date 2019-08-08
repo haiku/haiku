@@ -13,7 +13,9 @@
 #include <Catalog.h>
 #include <Entry.h>
 #include <Message.h>
+#include <package/PackageDefs.h>
 #include <package/PackageInfo.h>
+#include <package/PackageRoster.h>
 #include <Path.h>
 #include <Roster.h>
 #include <Screen.h>
@@ -364,6 +366,35 @@ App::_Open(const BEntry& entry)
 	}
 
 	package->SetLocalFilePath(path.Path());
+
+	// Set if the package is active
+	//
+	// TODO(leavengood): It is very awkward having to check these two locations
+	// here, and in many other places in HaikuDepot. Why do clients of the
+	// package kit have to know about these locations?
+	bool active = false;
+	BPackageKit::BPackageRoster roster;
+	status = roster.IsPackageActive(
+		BPackageKit::B_PACKAGE_INSTALLATION_LOCATION_SYSTEM, info, &active);
+	if (status != B_OK) {
+		fprintf(stderr, "Could not check if package was active in system: %s\n",
+			strerror(status));
+		return;
+	}
+	if (!active) {
+		status = roster.IsPackageActive(
+			BPackageKit::B_PACKAGE_INSTALLATION_LOCATION_HOME, info, &active);
+		if (status != B_OK) {
+			fprintf(stderr,
+				"Could not check if package was active in home: %s\n",
+				strerror(status));
+			return;
+		}
+	}
+
+	if (active) {
+		package->SetState(ACTIVATED);
+	}
 
 	BMessage settings;
 	_LoadSettings(settings);
