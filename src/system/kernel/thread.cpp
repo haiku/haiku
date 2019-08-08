@@ -2987,7 +2987,7 @@ user_unblock_thread(thread_id threadID, status_t status)
 
 		// Even if the user_thread->wait_status was > 0, it may be the
 		// case that this thread is actually blocked on something else.
-		if (thread->state == B_THREAD_WAITING
+		if (thread->wait.status > 0
 				&& thread->wait.type == THREAD_BLOCK_TYPE_USER) {
 			thread_unblock_locked(thread, status);
 		}
