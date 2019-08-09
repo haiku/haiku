@@ -1,3 +1,8 @@
+/*
+ * Copyright 1998-1999 Be, Inc. All Rights Reserved.
+ * Copyright 2003-2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef SFTP_CLIENT_H
 #define SFTP_CLIENT_H
 

@@ -1,3 +1,10 @@
+/*
+ * Copyright 1998-1999 Be, Inc. All Rights Reserved.
+ * Copyright 2003-2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+
 #include "Settings.h"
 
 #include <stdio.h>
@@ -71,9 +78,9 @@ StringValueSetting::NeedsSaving() const
 
 
 const char*
-StringValueSetting::Handle(const char *const *argv)
+StringValueSetting::Handle(const char* const *argv)
 {
-	if (!*++argv)
+	if (*++argv == NULL)
 		return fValueExpectedErrorString;
 
 	ValueChanged(*argv);
@@ -108,9 +115,9 @@ EnumeratedStringValueSetting::ValueChanged(const char* newValue)
 
 
 const char*
-EnumeratedStringValueSetting::Handle(const char *const *argv)
+EnumeratedStringValueSetting::Handle(const char* const *argv)
 {
-	if (!*++argv)
+	if (*++argv == NULL)
 		return fValueExpectedErrorString;
 
 	printf("---EnumeratedStringValueSetting::Handle %s %s\n", *(argv-1), *argv);
@@ -127,7 +134,7 @@ EnumeratedStringValueSetting::_ValidateString(const char* string)
 {
 	for (int32 i = 0;; i++) {
 		const char* enumString = fEnumerator(i);
-		if (!enumString)
+		if (enumString == NULL)
 			return false;
 		if (strcmp(enumString, string) == 0)
 			return true;
@@ -142,7 +149,8 @@ EnumeratedStringValueSetting::_ValidateString(const char* string)
 ScalarValueSetting::ScalarValueSetting(const char* name, int32 defaultValue,
 	const char* valueExpectedErrorString, const char* wrongValueErrorString,
 	int32 min, int32 max)
-	: SettingsArgvDispatcher(name),
+	:
+	SettingsArgvDispatcher(name),
 	fDefaultValue(defaultValue),
 	fValue(defaultValue),
 	fMax(max),
@@ -182,9 +190,9 @@ ScalarValueSetting::GetValueAsString(char* buffer) const
 
 
 const char*
-ScalarValueSetting::Handle(const char *const *argv)
+ScalarValueSetting::Handle(const char* const *argv)
 {
-	if (!*++argv)
+	if (*++argv == NULL)
 		return fValueExpectedErrorString;
 
 	int32 newValue = atoi(*argv);
@@ -199,7 +207,7 @@ ScalarValueSetting::Handle(const char *const *argv)
 void
 ScalarValueSetting::SaveSettingValue(Settings* settings)
 {
-	settings->Write("%d", fValue);
+	settings->Write("%" B_PRId32, fValue);
 }
 
 
@@ -214,7 +222,8 @@ ScalarValueSetting::NeedsSaving() const
 
 
 BooleanValueSetting::BooleanValueSetting(const char* name, bool defaultValue)
-	: ScalarValueSetting(name, defaultValue, 0, 0)
+	:
+	ScalarValueSetting(name, defaultValue, 0, 0)
 {
 }
 
@@ -232,9 +241,9 @@ BooleanValueSetting::Value() const
 
 
 const char*
-BooleanValueSetting::Handle(const char *const *argv)
+BooleanValueSetting::Handle(const char* const *argv)
 {
-	if (!*++argv) {
+	if (*++argv == NULL) {
 		return B_TRANSLATE_COMMENT("on or off expected","Do not translate "
 			"'on' and 'off'");
 	}

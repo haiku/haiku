@@ -1,9 +1,11 @@
+/*
+ * Copyright 1998-1999 Be, Inc. All Rights Reserved.
+ * Copyright 2003-2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef CODYCAM_H
 #define CODYCAM_H
 
-
-#include "Settings.h"
-#include "VideoConsumer.h"
 
 #include <string.h>
 
@@ -17,6 +19,9 @@
 #include <StringView.h>
 #include <TextControl.h>
 #include <Window.h>
+
+#include "Settings.h"
+#include "VideoConsumer.h"
 
 
 class BMediaRoster;
@@ -143,7 +148,7 @@ private:
 			port_id*		fPortPtr;
 
 			BView*			fVideoView;
-			BTextView*	fErrorView;
+			BTextView*		fErrorView;
 
 			BTextControl*	fFileName;
 			BBox*			fCaptureSetupBox;
@@ -194,4 +199,3 @@ private:
 };
 
 #endif	// CODYCAM_H
-

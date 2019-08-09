@@ -1,19 +1,19 @@
-//	Copyright (c) 1998-99, Be Incorporated, All Rights Reserved.
-//	SMS
-//	VideoConsumer.cpp
+/*
+ * Copyright 1998-1999 Be, Inc. All Rights Reserved.
+ * Copyright 2003-2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
-#include "FileUploadClient.h"
-#include "FtpClient.h"
-#include "SftpClient.h"
 #include "VideoConsumer.h"
 
 #include <fcntl.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <Application.h>
+#include <BitmapStream.h>
 #include <Buffer.h>
 #include <BufferGroup.h>
 #include <Catalog.h>
@@ -25,9 +25,14 @@
 #include <TimeSource.h>
 #include <View.h>
 
+#include "FileUploadClient.h"
+#include "FtpClient.h"
+#include "SftpClient.h"
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "VideoConsumer.cpp"
+
 
 #define M1 ((double)1000000.0)
 #define JITTER		20000
@@ -38,7 +43,7 @@
 #define LOOP		printf
 
 
-static status_t SetFileType(BFile* file,  int32 translator, uint32 type);
+static status_t SetFileType(BFile* file, int32 translator, uint32 type);
 
 const media_raw_video_format vid_format = {29.97, 1, 0, 239,
 	B_VIDEO_TOP_LEFT_RIGHT, 1, 1, {B_RGB16, 320, 240, 320 * 4, 0, 0}};
@@ -47,7 +52,8 @@ const media_raw_video_format vid_format = {29.97, 1, 0, 239,
 VideoConsumer::VideoConsumer(const char* name, BView* view,
 	BStringView* statusLine,
 	BMediaAddOn* addon, const uint32 internalId)
-	: BMediaNode(name),
+	:
+	BMediaNode(name),
 	BMediaEventLooper(),
 	BBufferConsumer(B_MEDIA_RAW_VIDEO),
 	fStatusLine(statusLine),
@@ -75,7 +81,7 @@ VideoConsumer::VideoConsumer(const char* name, BView* view,
 
 	for (uint32 j = 0; j < 3; j++) {
 		fBitmap[j] = NULL;
-		fBufferMap[j] = 0;
+		fBufferMap[j] = NULL;
 	}
 
 	strcpy(fFileNameText, "");
@@ -99,7 +105,7 @@ VideoConsumer::~VideoConsumer()
 		if (fWindow->Lock()) {
 			puts(B_TRANSLATE("Closing the window"));
 			fWindow->Close();
-			fWindow = 0;
+			fWindow = NULL;
 		}
 	}
 
@@ -115,7 +121,6 @@ VideoConsumer::~VideoConsumer()
 		kill_thread(fFtpThread);
 
 	DeleteBuffers();
-
 }
 
 /********************************
@@ -192,13 +197,15 @@ VideoConsumer::RequestCompleted(const media_request_info& info)
 	switch (info.what) {
 		case media_request_info::B_SET_OUTPUT_BUFFERS_FOR:
 			if (info.status != B_OK)
-					ERROR("VideoConsumer::RequestCompleted: Not using our buffers!\n");
+					ERROR("VideoConsumer::RequestCompleted: "
+						  "Not using our buffers!\n");
 			break;
 
 		default:
 			ERROR("VideoConsumer::RequestCompleted: Invalid argument\n");
 			break;
 	}
+
 	return B_OK;
 }
 
@@ -208,7 +215,6 @@ VideoConsumer::HandleMessage(int32 message, const void* data, size_t size)
 {
 	//FUNCTION("VideoConsumer::HandleMessage\n");
 	ftp_msg_info* info = (ftp_msg_info*)data;
-	status_t status = B_OK;
 
 	switch (message) {
 		case FTP_INFO:
@@ -224,8 +230,9 @@ VideoConsumer::HandleMessage(int32 message, const void* data, size_t size)
 			strcpy(fPasswordText, info->passwordText);
 			strcpy(fDirectoryText, info->directoryText);
 			// remove old user events
-			EventQueue()->FlushEvents(TimeSource()->Now(), BTimedEventQueue::B_ALWAYS,
-				true, BTimedEventQueue::B_USER_EVENT);
+			EventQueue()->FlushEvents(TimeSource()->Now(),
+				BTimedEventQueue::B_ALWAYS, true,
+				BTimedEventQueue::B_USER_EVENT);
 			if (fRate != B_INFINITE_TIMEOUT) {
 				// if rate is not "Never," push an event
 				// to restart captures 5 seconds from now
@@ -236,30 +243,31 @@ VideoConsumer::HandleMessage(int32 message, const void* data, size_t size)
 			break;
 	}
 
-	return status;
+	return B_OK;
 }
 
 
 void
 VideoConsumer::BufferReceived(BBuffer* buffer)
 {
-	LOOP("VideoConsumer::Buffer #%" B_PRId32 " received, start_time %" B_PRIdBIGTIME
-		"\n", buffer->ID(), buffer->Header()->start_time);
+	LOOP("VideoConsumer::Buffer #%" B_PRId32 " received, start_time %"
+		B_PRIdBIGTIME "\n", buffer->ID(), buffer->Header()->start_time);
 
 	if (RunState() == B_STOPPED) {
 		buffer->Recycle();
 		return;
 	}
 
-	media_timed_event event(buffer->Header()->start_time, BTimedEventQueue::B_HANDLE_BUFFER,
-		buffer, BTimedEventQueue::B_RECYCLE_BUFFER);
+	media_timed_event event(buffer->Header()->start_time,
+		BTimedEventQueue::B_HANDLE_BUFFER, buffer,
+		BTimedEventQueue::B_RECYCLE_BUFFER);
 	EventQueue()->AddEvent(event);
 }
 
 
 void
-VideoConsumer::ProducerDataStatus(const media_destination& forWhom, int32 status,
-	bigtime_t atMediaTime)
+VideoConsumer::ProducerDataStatus(const media_destination& forWhom,
+	int32 status, bigtime_t atMediaTime)
 {
 	FUNCTION("VideoConsumer::ProducerDataStatus\n");
 
@@ -292,8 +300,8 @@ VideoConsumer::CreateBuffers(const media_format& withFormat)
 	}
 	// and attach the  bitmaps to the buffer group
 	for (uint32 j = 0; j < 3; j++) {
-		fBitmap[j] = new BBitmap(BRect(0, 0, (xSize - 1), (ySize - 1)), colorspace,
-			false, true);
+		fBitmap[j] = new BBitmap(BRect(0, 0, (xSize - 1), (ySize - 1)),
+			colorspace, false, true);
 		if (fBitmap[j]->IsValid()) {
 			buffer_clone_info info;
 			if ((info.area = area_for(fBitmap[j]->Bits())) == B_ERROR)
@@ -304,11 +312,13 @@ VideoConsumer::CreateBuffers(const media_format& withFormat)
 			info.buffer = 0;
 
 			if ((status = fBuffers->AddBuffer(info)) != B_OK) {
-				ERROR("VideoConsumer::CreateBuffers - ERROR ADDING BUFFER TO GROUP\n");
+				ERROR("VideoConsumer::CreateBuffers - "
+					  "ERROR ADDING BUFFER TO GROUP\n");
 				return status;
 			}
 			else
-				PROGRESS("VideoConsumer::CreateBuffers - SUCCESSFUL ADD BUFFER TO GROUP\n");
+				PROGRESS("VideoConsumer::CreateBuffers - "
+						 "SUCCESSFUL ADD BUFFER TO GROUP\n");
 		} else {
 			ERROR("VideoConsumer::CreateBuffers - ERROR CREATING VIDEO RING "
 				"BUFFER: %08" B_PRIx32 "\n", status);
@@ -320,19 +330,22 @@ VideoConsumer::CreateBuffers(const media_format& withFormat)
 	for (int j = 0; j < 3; j++)
 		buffList[j] = NULL;
 
-	if ((status = fBuffers->GetBufferList(3, buffList)) == B_OK)
+	status = fBuffers->GetBufferList(3, buffList);
+	if (status == B_OK)
 		for (int j = 0; j < 3; j++)
 			if (buffList[j] != NULL) {
 				fBufferMap[j] = buffList[j];
 				PROGRESS(" j = %d buffer = %p\n", j, fBufferMap[j]);
 			} else {
-				ERROR("VideoConsumer::CreateBuffers ERROR MAPPING RING BUFFER\n");
+				ERROR("VideoConsumer::CreateBuffers "
+					  "ERROR MAPPING RING BUFFER\n");
 				return B_ERROR;
 			}
 	else
 		ERROR("VideoConsumer::CreateBuffers ERROR IN GET BUFFER LIST\n");
 
-	fFtpBitmap = new BBitmap(BRect(0, 0, xSize - 1, ySize - 1), B_RGB32, false, false);
+	fFtpBitmap = new BBitmap(BRect(0, 0, xSize - 1, ySize - 1), B_RGB32, false,
+		false);
 
 	FUNCTION("VideoConsumer::CreateBuffers - EXIT\n");
 	return status;
@@ -354,13 +367,15 @@ VideoConsumer::DeleteBuffers()
 				fBitmap[j] = NULL;
 			}
 	}
+
 	FUNCTION("VideoConsumer::DeleteBuffers - EXIT\n");
 }
 
 
 status_t
-VideoConsumer::Connected(const media_source& producer, const media_destination& where,
-	const media_format& withFormat, media_input* outInput)
+VideoConsumer::Connected(const media_source& producer,
+	const media_destination& where, const media_format& withFormat,
+	media_input* outInput)
 {
 	FUNCTION("VideoConsumer::Connected\n");
 
@@ -374,7 +389,7 @@ VideoConsumer::Connected(const media_source& producer, const media_destination& 
 	int32 changeTag = 1;
 	if (CreateBuffers(withFormat) == B_OK)
 		BBufferConsumer::SetOutputBuffersFor(producer, fDestination,
-			fBuffers, (void *)&userData, &changeTag, true);
+			fBuffers, (void*)&userData, &changeTag, true);
 	else {
 		ERROR("VideoConsumer::Connected - COULDN'T CREATE BUFFERS\n");
 		return B_ERROR;
@@ -388,7 +403,8 @@ VideoConsumer::Connected(const media_source& producer, const media_destination& 
 
 
 void
-VideoConsumer::Disconnected(const media_source& producer, const media_destination& where)
+VideoConsumer::Disconnected(const media_source& producer,
+	const media_destination& where)
 {
 	FUNCTION("VideoConsumer::Disconnected\n");
 
@@ -425,12 +441,14 @@ VideoConsumer::AcceptFormat(const media_destination& dest, media_format* format)
 		&& format->u.raw_video.display.format != B_RGB15
 		&& format->u.raw_video.display.format != B_GRAY8
 		&&
-		format->u.raw_video.display.format != media_raw_video_format::wildcard.display.format) {
+		format->u.raw_video.display.format
+			!= media_raw_video_format::wildcard.display.format) {
 		ERROR("AcceptFormat - not a format we know about!\n");
 		return B_MEDIA_BAD_FORMAT;
 	}
 
-	if (format->u.raw_video.display.format == media_raw_video_format::wildcard.display.format) {
+	if (format->u.raw_video.display.format
+		== media_raw_video_format::wildcard.display.format) {
 		format->u.raw_video.display.format = B_RGB16;
 	}
 
@@ -456,11 +474,12 @@ VideoConsumer::GetNextInput(int32* cookie, media_input* outInput)
 		sprintf(fIn.name, "Video Consumer");
 		*outInput = fIn;
 		(*cookie)++;
+
 		return B_OK;
-	} else {
-		ERROR("VideoConsumer::GetNextInput - - BAD INDEX\n");
-		return B_MEDIA_BAD_DESTINATION;
 	}
+
+	ERROR("VideoConsumer::GetNextInput - - BAD INDEX\n");
+	return B_MEDIA_BAD_DESTINATION;
 }
 
 
@@ -471,8 +490,8 @@ VideoConsumer::DisposeInputCookie(int32 /*cookie*/)
 
 
 status_t
-VideoConsumer::GetLatencyFor(const media_destination& forWhom, bigtime_t* outLatency,
-	media_node_id* out_timesource)
+VideoConsumer::GetLatencyFor(const media_destination& forWhom,
+	bigtime_t* outLatency, media_node_id* out_timesource)
 {
 	FUNCTION("VideoConsumer::GetLatencyFor\n");
 
@@ -486,8 +505,9 @@ VideoConsumer::GetLatencyFor(const media_destination& forWhom, bigtime_t* outLat
 
 
 status_t
-VideoConsumer::FormatChanged(const media_source& producer, const media_destination& consumer,
-	int32 fromChangeCount, const media_format& format)
+VideoConsumer::FormatChanged(const media_source& producer,
+	const media_destination& consumer, int32 fromChangeCount,
+	const media_format& format)
 {
 	FUNCTION("VideoConsumer::FormatChanged\n");
 
@@ -518,8 +538,9 @@ VideoConsumer::HandleEvent(const media_timed_event* event, bigtime_t lateness,
 
 		case BTimedEventQueue::B_STOP:
 			PROGRESS("VideoConsumer::HandleEvent - STOP\n");
-			EventQueue()->FlushEvents(event->event_time, BTimedEventQueue::B_ALWAYS,
-				true, BTimedEventQueue::B_HANDLE_BUFFER);
+			EventQueue()->FlushEvents(event->event_time,
+				BTimedEventQueue::B_ALWAYS, true,
+				BTimedEventQueue::B_HANDLE_BUFFER);
 			break;
 
 		case BTimedEventQueue::B_USER_EVENT:
@@ -537,7 +558,7 @@ VideoConsumer::HandleEvent(const media_timed_event* event, bigtime_t lateness,
 		case BTimedEventQueue::B_HANDLE_BUFFER:
 		{
 			LOOP("VideoConsumer::HandleEvent - HANDLE BUFFER\n");
-			buffer = (BBuffer *)event->pointer;
+			buffer = (BBuffer*)event->pointer;
 			if (RunState() == B_STARTED && fConnectionActive) {
 				// see if this is one of our buffers
 				uint32 index = 0;
@@ -555,26 +576,34 @@ VideoConsumer::HandleEvent(const media_timed_event* event, bigtime_t lateness,
 				}
 
 				if (fFtpComplete && fTimeToFtp) {
-					PROGRESS("VidConsumer::HandleEvent - SPAWNING FTP THREAD\n");
+					PROGRESS("VidConsumer::HandleEvent - "
+							 "SPAWNING FTP THREAD\n");
 					fTimeToFtp = false;
 					fFtpComplete = false;
-					memcpy(fFtpBitmap->Bits(), buffer->Data(), fFtpBitmap->BitsLength());
-					fFtpThread = spawn_thread(FtpRun, "Video Window Ftp", B_NORMAL_PRIORITY, this);
+					memcpy(fFtpBitmap->Bits(), buffer->Data(),
+						fFtpBitmap->BitsLength());
+					fFtpThread = spawn_thread(FtpRun, "Video Window Ftp",
+						B_NORMAL_PRIORITY, this);
 					resume_thread(fFtpThread);
 				}
 
 				if ((RunMode() == B_OFFLINE)
-					|| ((TimeSource()->Now() > (buffer->Header()->start_time - JITTER))
-						&& (TimeSource()->Now() < (buffer->Header()->start_time + JITTER)))) {
+					|| ((TimeSource()->Now() >
+						(buffer->Header()->start_time - JITTER))
+					&& (TimeSource()->Now() <
+					   (buffer->Header()->start_time + JITTER)))) {
 					if (!fOurBuffers)
 						// not our buffers, so we need to copy
-						memcpy(fBitmap[index]->Bits(), buffer->Data(), fBitmap[index]->BitsLength());
+						memcpy(fBitmap[index]->Bits(), buffer->Data(),
+							fBitmap[index]->BitsLength());
 
 					if (fWindow->Lock()) {
 						uint32 flags;
 						if ((fBitmap[index]->ColorSpace() == B_GRAY8) &&
-							!bitmaps_support_space(fBitmap[index]->ColorSpace(), &flags)) {
-							// handle mapping of GRAY8 until app server knows how
+							!bitmaps_support_space(fBitmap[index]->ColorSpace(),
+								&flags)) {
+							// handle mapping of GRAY8 until app server
+							// knows how
 							uint32* start = (uint32*)fBitmap[index]->Bits();
 							int32 size = fBitmap[index]->BitsLength();
 							uint32* end = start + size / 4;
@@ -607,7 +636,7 @@ VideoConsumer::FtpRun(void* data)
 {
 	FUNCTION("VideoConsumer::FtpRun\n");
 
-	((VideoConsumer *)data)->FtpThread();
+	((VideoConsumer*)data)->FtpThread();
 
 	return 0;
 }
@@ -620,7 +649,8 @@ VideoConsumer::FtpThread()
 	FUNCTION("VideoConsumer::FtpThread\n");
 	if (fUploadClient == 2) {
 		// 64 + 64 = 128 max
-		snprintf(fullPath, B_PATH_NAME_LENGTH, "%s/%s", fDirectoryText, fFileNameText);
+		snprintf(fullPath, B_PATH_NAME_LENGTH, "%s/%s", fDirectoryText,
+			fFileNameText);
 		LocalSave(fullPath, fFtpBitmap);
 	} else if (LocalSave(fFileNameText, fFtpBitmap) == B_OK)
 		FtpSave(fFileNameText);
@@ -666,14 +696,16 @@ VideoConsumer::LocalSave(char* filename, BBitmap* bitmap)
 
 	/* save a local copy of the image in the requested format */
 	output = new BFile();
-	if (output->SetTo(filename, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE) == B_NO_ERROR) {
+	if (output->SetTo(filename, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE)
+		== B_NO_ERROR) {
 		BBitmapStream input(bitmap);
-		status_t err = BTranslatorRoster::Default()->Translate(&input, NULL, NULL,
-			output, fImageFormat);
+		status_t err = BTranslatorRoster::Default()->Translate(&input, NULL,
+			NULL, output, fImageFormat);
 		if (err == B_OK) {
 			err = SetFileType(output, fTranslator, fImageFormat);
 			if (err != B_OK)
-				UpdateFtpStatus(B_TRANSLATE("Error setting type of output file"));
+				UpdateFtpStatus(
+					B_TRANSLATE("Error setting type of output file"));
 		}
 		else
 			UpdateFtpStatus(B_TRANSLATE("Error writing output file"));
@@ -681,18 +713,19 @@ VideoConsumer::LocalSave(char* filename, BBitmap* bitmap)
 		input.DetachBitmap(&bitmap);
 		output->Unset();
 		delete output;
+
 		return B_OK;
-	} else {
-		UpdateFtpStatus(B_TRANSLATE("Error creating output file"));
-		return B_ERROR;
 	}
+
+	UpdateFtpStatus(B_TRANSLATE("Error creating output file"));
+	return B_ERROR;
 }
 
 
 status_t
 VideoConsumer::FtpSave(char* filename)
 {
-	FileUploadClient *ftp;
+	FileUploadClient* ftp;
 
 	//XXX: make that cleaner
 	switch (fUploadClient) {
@@ -764,7 +797,7 @@ SetFileType(BFile* file, int32 translator, uint32 type)
 	int32 count;
 
 	status_t err = BTranslatorRoster::Default()->GetOutputFormats(translator,
-		(const translation_format **)&formats, &count);
+		(const translation_format**)&formats, &count);
 	if (err < B_OK)
 		return err;
 

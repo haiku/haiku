@@ -1,3 +1,8 @@
+/*
+ * Copyright 1998-1999 Be, Inc. All Rights Reserved.
+ * Copyright 2003-2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
@@ -18,7 +23,7 @@ public:
 
 			void				ValueChanged(const char* newValue);
 			const char*			Value() const;
-	virtual const char*			Handle(const char *const *argv);
+	virtual const char*			Handle(const char* const *argv);
 
 protected:
 	virtual	void				SaveSettingValue(Settings*);
@@ -46,7 +51,7 @@ public:
 									const char* wrongValueErrorString);
 
 			void				ValueChanged(const char* newValue);
-	virtual const char*			Handle(const char *const *argv);
+	virtual const char*			Handle(const char* const *argv);
 
 private:
 			bool				_ValidateString(const char* string);
@@ -61,13 +66,14 @@ public:
 									int32 defaultValue,
 									const char* valueExpectedErrorString,
 									const char* wrongValueErrorString,
-									int32 min = INT32_MIN, int32 max = INT32_MAX);
+									int32 min = INT32_MIN,
+									int32 max = INT32_MAX);
 	virtual						~ScalarValueSetting();
 
 			void				ValueChanged(int32 newValue);
 			int32				Value() const;
 			void				GetValueAsString(char*) const;
-	virtual const char*			Handle(const char *const *argv);
+	virtual const char*			Handle(const char* const *argv);
 
 protected:
 	virtual void				SaveSettingValue(Settings*);
@@ -89,10 +95,10 @@ public:
 	virtual						~BooleanValueSetting();
 
 			bool				Value() const;
-	virtual	const char*			Handle(const char *const *argv);
+	virtual	const char*			Handle(const char* const *argv);
 
 protected:
-	virtual	void				SaveSettingValue(Settings *);
+	virtual	void				SaveSettingValue(Settings*);
 };
 
 #endif	// SETTINGS_H

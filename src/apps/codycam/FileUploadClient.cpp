@@ -1,4 +1,12 @@
+/*
+ * Copyright 1998-1999 Be, Inc. All Rights Reserved.
+ * Copyright 2003-2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+
 #include "FileUploadClient.h"
+
 
 FileUploadClient::FileUploadClient()
 {
@@ -13,48 +21,45 @@ FileUploadClient::~FileUploadClient()
 bool
 FileUploadClient::ChangeDir(const string& dir)
 {
-	bool rc = false;
-	return rc;
+	return false;
 }
 
 
 bool
 FileUploadClient::ListDirContents(string& listing)
 {
-	bool rc = false;
-	return rc;
+	return false;
 }
 
 
 bool
 FileUploadClient::PrintWorkingDir(string& dir)
 {
-	bool rc = false;
-	return rc;
+	return false;
 }
 
 
 bool
-FileUploadClient::Connect(const string& server, const string& login, const string& passwd)
+FileUploadClient::Connect(const string& server, const string& login,
+	const string& passwd)
 {
-	bool rc = false;
-	return rc;
+	return false;
 }
 
 
 bool
-FileUploadClient::PutFile(const string& local, const string& remote, ftp_mode mode)
+FileUploadClient::PutFile(const string& local, const string& remote,
+	ftp_mode mode)
 {
-	bool rc = false;
-	return rc;
+	return false;
 }
 
 
 bool
-FileUploadClient::GetFile(const string& remote, const string& local, ftp_mode mode)
+FileUploadClient::GetFile(const string& remote, const string& local,
+	ftp_mode mode)
 {
-	bool rc = false;
-	return rc;
+	return false;
 }
 
 
@@ -63,16 +68,14 @@ FileUploadClient::GetFile(const string& remote, const string& local, ftp_mode mo
 bool
 FileUploadClient::MoveFile(const string& oldPath, const string& newPath)
 {
-	bool rc = false;
-	return rc;
+	return false;
 }
 
 
 bool
 FileUploadClient::Chmod(const string& path, const string& mod)
 {
-	bool rc = false;
-	return rc;
+	return false;
 }
 
 
@@ -80,5 +83,3 @@ void
 FileUploadClient::SetPassive(bool on)
 {
 }
-
-
