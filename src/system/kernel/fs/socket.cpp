@@ -361,8 +361,10 @@ create_socket_fd(net_socket* socket, bool kernel)
 
 	// publish it
 	int fd = new_fd(get_current_io_context(kernel), descriptor);
-	if (fd < 0)
-		free(descriptor);
+	if (fd < 0) {
+		descriptor->ops = NULL;
+		put_fd(descriptor);
+	}
 
 	return fd;
 }
