@@ -58,7 +58,7 @@ InputServerStream::InputServerStream(BMessenger& messenger)
 	message.AddInt32("remote team", BPrivate::current_team());
 
 	fCursorArea = create_area("shared cursor", (void **)&fCursorBuffer, B_ANY_ADDRESS,
-		B_PAGE_SIZE, B_LAZY_LOCK, B_READ_AREA | B_WRITE_AREA);
+		B_PAGE_SIZE, B_LAZY_LOCK, B_READ_AREA | B_WRITE_AREA | B_CLONEABLE_AREA);
 	if (fCursorArea >= B_OK)
 		message.AddInt32("cursor area", fCursorArea);
 

@@ -31,7 +31,7 @@ DirectWindowInfo::DirectWindowInfo()
 {
 	fBufferArea = create_area("direct area", (void**)&fBufferInfo,
 		B_ANY_ADDRESS, DIRECT_BUFFER_INFO_AREA_SIZE,
-		B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+		B_NO_LOCK, B_READ_AREA | B_WRITE_AREA | B_CLONEABLE_AREA);
 
 	memset(fBufferInfo, 0, DIRECT_BUFFER_INFO_AREA_SIZE);
 	fBufferInfo->buffer_state = B_DIRECT_STOP;
