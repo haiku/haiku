@@ -69,7 +69,7 @@ BBufferGroup::BBufferGroup(size_t size, int32 count, uint32 placement,
 
 	void* startAddress;
 	area_id bufferArea = create_area("some buffers area", &startAddress,
-		placement, areaSize, lock, B_READ_AREA | B_WRITE_AREA);
+		placement, areaSize, lock, B_READ_AREA | B_WRITE_AREA | B_CLONEABLE_AREA);
 	if (bufferArea < 0) {
 		ERROR("BBufferGroup: failed to allocate %ld bytes area\n", areaSize);
 		fInitError = (status_t)bufferArea;

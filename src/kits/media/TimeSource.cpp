@@ -495,7 +495,7 @@ BTimeSource::FinishCreate()
 		(const_cast<BPrivate::media::TimeSourceTransmit**>(&fBuf));
 
 	fArea = create_area(name, buf, B_ANY_ADDRESS, TS_AREA_SIZE,
-		B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
+		B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA | B_CLONEABLE_AREA);
 
 	if (fArea <= 0) {
 		ERROR("BTimeSource::BTimeSource couldn't create area, node %" B_PRId32

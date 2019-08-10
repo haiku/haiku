@@ -208,7 +208,7 @@ BufferManager::_CloneArea(area_id area)
 
 	void* address;
 	area_id clonedArea = clone_area("media_server cloned buffer", &address,
-		B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, area);
+		B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA | B_CLONEABLE_AREA, area);
 
 	TRACE("BufferManager::_CloneArea() cloned area %" B_PRId32 ", clone id %"
 		B_PRId32 "\n", area, clonedArea);

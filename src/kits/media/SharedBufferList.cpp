@@ -44,7 +44,8 @@ SharedBufferList::Create(SharedBufferList** _list)
 	SharedBufferList* list;
 
 	area_id area = create_area("shared buffer list", (void**)&list,
-		B_ANY_ADDRESS, size, B_LAZY_LOCK, B_READ_AREA | B_WRITE_AREA);
+		B_ANY_ADDRESS, size, B_LAZY_LOCK,
+		B_READ_AREA | B_WRITE_AREA | B_CLONEABLE_AREA);
 	if (area < 0)
 		return area;
 

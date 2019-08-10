@@ -2420,7 +2420,7 @@ BMediaRoster::GetParameterWebFor(const media_node& node, BParameterWeb** _web)
 		area_id area;
 		void *data;
 		area = create_area("parameter web data", &data, B_ANY_ADDRESS, size,
-			B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+			B_NO_LOCK, B_READ_AREA | B_WRITE_AREA | B_CLONEABLE_AREA);
 		if (area < B_OK) {
 			ERROR("BMediaRoster::GetParameterWebFor couldn't create area of "
 				"size %" B_PRId32 "\n", size);
