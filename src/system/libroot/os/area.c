@@ -26,7 +26,7 @@ clone_area(const char *name, void **address, uint32 addressSpec,
 	uint32 protection, area_id sourceArea)
 {
 	if (__gABIVersion < B_HAIKU_ABI_GCC_2_HAIKU)
-		protection |= B_EXECUTE_AREA;
+		protection |= B_EXECUTE_AREA | B_CLONEABLE_AREA;
 	return _kern_clone_area(name, address, addressSpec, protection, sourceArea);
 }
 
