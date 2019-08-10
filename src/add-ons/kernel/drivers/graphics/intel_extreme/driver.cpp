@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2019, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Ken Mays, kmays2000@gmail.com
  */
 
 
@@ -47,24 +48,23 @@ const struct supported_device {
 
 	{0x2572, INTEL_GROUP_85x, "i865G"},
 	{0x3582, INTEL_GROUP_85x, "i855G"},
-	{0x358e, INTEL_GROUP_85x, "i855G"},
+	{0x358e, INTEL_GROUP_85x, "i854G"},
 
 	{0x2582, INTEL_MODEL_915, "i915G"},
 	{0x258a, INTEL_MODEL_915, "i915"},
 	{0x2592, INTEL_MODEL_915M, "i915GM"},
-	{0x2792, INTEL_MODEL_915, "i910"},
 	{0x2772, INTEL_MODEL_945, "i945G"},
 	{0x27a2, INTEL_MODEL_945M, "i945GM"},
 	{0x27ae, INTEL_MODEL_945M, "i945GME"},
-	{0x2972, INTEL_MODEL_965, "i946G"},
+	{0x2972, INTEL_MODEL_965, "946GZ"},
 	{0x2982, INTEL_MODEL_965, "G35"},
-	{0x2992, INTEL_MODEL_965, "i965Q"},
-	{0x29a2, INTEL_MODEL_965, "i965G"},
+	{0x2992, INTEL_MODEL_965, "Q965"},
+	{0x29a2, INTEL_MODEL_965, "G965"},
 	{0x2a02, INTEL_MODEL_965M, "i965GM"},
 	{0x2a12, INTEL_MODEL_965M, "i965GME"},
-	{0x29b2, INTEL_MODEL_G33, "G33G"},
-	{0x29c2, INTEL_MODEL_G33, "Q35G"},
-	{0x29d2, INTEL_MODEL_G33, "Q33G"},
+	{0x29b2, INTEL_MODEL_G33, "Q35"},
+	{0x29c2, INTEL_MODEL_G33, "G33"},
+	{0x29d2, INTEL_MODEL_G33, "Q33"},
 
 	{0x2a42, INTEL_MODEL_GM45, "GM45"},
 	{0x2e02, INTEL_MODEL_G45, "IGD"},
@@ -81,16 +81,14 @@ const struct supported_device {
 
 	{0x0042, INTEL_MODEL_ILKG, "IronLake Desktop"},
 	{0x0046, INTEL_MODEL_ILKGM, "IronLake Mobile"},
-	{0x0046, INTEL_MODEL_ILKGM, "IronLake Mobile"},
-	{0x0046, INTEL_MODEL_ILKGM, "IronLake Mobile"},
 
+	{0x010a, INTEL_MODEL_SNBGS, "SandyBridge Server GT1"},
 	{0x0102, INTEL_MODEL_SNBG, "SandyBridge Desktop GT1"},
 	{0x0112, INTEL_MODEL_SNBG, "SandyBridge Desktop GT2"},
 	{0x0122, INTEL_MODEL_SNBG, "SandyBridge Desktop GT2+"},
-	{0x0106, INTEL_MODEL_SNBGM, "SandyBridge Mobile GT1"},
 	{0x0116, INTEL_MODEL_SNBGM, "SandyBridge Mobile GT2"},
 	{0x0126, INTEL_MODEL_SNBGM, "SandyBridge Mobile GT2+"},
-	{0x010a, INTEL_MODEL_SNBGS, "SandyBridge Server"},
+
 
 	{0x0152, INTEL_MODEL_IVBG, "IvyBridge Desktop GT1"},
 	{0x0162, INTEL_MODEL_IVBG, "IvyBridge Desktop GT2"},
@@ -112,23 +110,97 @@ const struct supported_device {
 	{0x0f33, INTEL_MODEL_VLVM, "ValleyView Mobile"},
 	{0x0157, INTEL_MODEL_VLVM, "ValleyView Mobile"},
 
-//	{0x1616, INTEL_MODEL_BDWM, "HD Graphics 5500 (Broadwell GT2)"},
+	{0x1602, INTEL_MODEL_BDWM, "Broadwell GT1"},
+	{0x1606, INTEL_MODEL_BDWM, "Broadwell GT1"},
+	{0x160a, INTEL_MODEL_BDWM, "Broadwell GT1"},
+	{0x160b, INTEL_MODEL_BDWM, "Broadwell GT1"},
+	{0x160d, INTEL_MODEL_BDWM, "Broadwell GT1"},
+	{0x160e, INTEL_MODEL_BDWM, "Broadwell GT1"},
+	{0x1622, INTEL_MODEL_BDW,  "Broadwell GT2"},
+	{0x1626, INTEL_MODEL_BDWM, "Broadwell GT2"},
+	{0x1612, INTEL_MODEL_BDWM, "Broadwell GT2"},
+	{0x1616, INTEL_MODEL_BDWM, "Broadwell GT2"},
+	{0x161B, INTEL_MODEL_BDWM, "Broadwell GT2"},
+	{0x161a, INTEL_MODEL_BDWM, "Broadwell GT2"},
+	{0x161d, INTEL_MODEL_BDWM, "Broadwell GT2"},
+	{0x161e, INTEL_MODEL_BDWM, "Broadwell GT2"},
+	{0x1622, INTEL_MODEL_BDWM, "Broadwell GT3"},
+	{0x1626, INTEL_MODEL_BDWM, "Broadwell GT3"},
+	{0x162a, INTEL_MODEL_BDWM, "Broadwell GT3"},
+	{0x162b, INTEL_MODEL_BDWM, "Broadwell GT3"},
+	{0x162d, INTEL_MODEL_BDWM, "Broadwell GT3"},
+	{0x162e, INTEL_MODEL_BDWM, "Broadwell GT3"},
+	{0x1632, INTEL_MODEL_BDWM, "Broadwell GT3"},
+	{0x1636, INTEL_MODEL_BDWM, "Broadwell GT3"},
+	{0x163a, INTEL_MODEL_BDWM, "Broadwell GT3"},
+	{0x163b, INTEL_MODEL_BDWM, "Broadwell GT3"},
+	{0x163d, INTEL_MODEL_BDWM, "Broadwell GT3"},
+	{0x163e, INTEL_MODEL_BDWM, "Broadwell GT3"},
 
 	{0x1902, INTEL_MODEL_SKY,  "Skylake GT1"},
 	{0x1906, INTEL_MODEL_SKYM, "Skylake GT1"},
-	{0x190a, INTEL_MODEL_SKYS, "Skylake GT1"},
+	{0x1908, INTEL_MODEL_SKYM, "Skylake GT1"},
 	{0x190b, INTEL_MODEL_SKY,  "Skylake GT1"},
-	{0x190e, INTEL_MODEL_SKYM, "Skylake GT1"},
 	{0x1912, INTEL_MODEL_SKY,  "Skylake GT2"},
 	{0x1916, INTEL_MODEL_SKYM, "Skylake GT2"},
-	{0x191a, INTEL_MODEL_SKYS, "Skylake GT2"},
-	{0x191b, INTEL_MODEL_SKY,  "Skylake GT2"},
+	{0x191b, INTEL_MODEL_SKYM, "Skylake GT2"},
 	{0x191d, INTEL_MODEL_SKY,  "Skylake GT2"},
 	{0x191e, INTEL_MODEL_SKYM, "Skylake GT2"},
 	{0x1921, INTEL_MODEL_SKYM, "Skylake GT2F"},
 	{0x1926, INTEL_MODEL_SKYM, "Skylake GT3"},
-	{0x192a, INTEL_MODEL_SKYS, "Skylake GT3"},
-	{0x192b, INTEL_MODEL_SKY,  "Skylake GT3"},
+	{0x1927, INTEL_MODEL_SKYM, "Skylake GT3"},
+	{0x192b, INTEL_MODEL_SKYM, "Skylake GT3"},
+	{0x192d, INTEL_MODEL_SKYS, "Skylake GT3"},
+	{0x1932, INTEL_MODEL_SKY,  "Skylake GT3"},
+	{0x193a, INTEL_MODEL_SKY,  "Skylake GT4"},
+	{0x193b, INTEL_MODEL_SKY,  "Skylake GT4"},
+	{0x193d, INTEL_MODEL_SKY,  "Skylake GT4"},
+
+	{0x22b0, INTEL_MODEL_CHVM, "Cherryview"},
+	{0x22b1, INTEL_MODEL_CHVM, "Cherryview"},
+	{0x22b2, INTEL_MODEL_CHVM, "Cherryview"},
+	{0x22b3, INTEL_MODEL_CHVM, "Cherryview"},
+
+	{0x3184, INTEL_MODEL_GMLM, "Geminilake"},
+	{0x3185, INTEL_MODEL_GMLM, "Geminilake"},
+
+	{0x3e90, INTEL_MODEL_CFL, "Coffeelake GT1"},
+	{0x3e91, INTEL_MODEL_CFL, "Coffeelake GT2"},
+	{0x3e92, INTEL_MODEL_CFL, "Coffeelake GT2"},
+	{0x3e93, INTEL_MODEL_CFL, "Coffeelake GT1"},
+	{0x3e94, INTEL_MODEL_CFL, "Coffeelake GT2"},
+	{0x3e96, INTEL_MODEL_CFL, "Coffeelake GT2"},
+	{0x3e9b, INTEL_MODEL_CFL, "Coffeelake GT2"},
+	{0x3ea5, INTEL_MODEL_CFLM, "Coffeelake GT3"},
+	{0x3ea6, INTEL_MODEL_CFLM, "Coffeelake GT3"},
+	{0x3ea7, INTEL_MODEL_CFLM, "Coffeelake GT3"},
+	{0x3ea8, INTEL_MODEL_CFLM, "Coffeelake GT3"},
+
+	{0x5A84, INTEL_MODEL_APLM, "Apollolake"},
+	{0x5A85, INTEL_MODEL_APLM, "Apollolake"},
+
+	{0x5902, INTEL_MODEL_KBY,  "Kabylake GT1"},
+	{0x5906, INTEL_MODEL_KBYM, "Kabylake GT1"},
+	{0x591B, INTEL_MODEL_KBYM, "Kabylake GT2"},
+	{0x591D, INTEL_MODEL_KBY,  "Kabylake GT2"},
+	{0x591E, INTEL_MODEL_KBYM, "Kabylake GT2"},
+	{0x5912, INTEL_MODEL_KBY,  "Kabylake GT2"},
+	{0x5916, INTEL_MODEL_KBYM, "Kabylake GT2"},
+	{0x5917, INTEL_MODEL_KBYM, "Kabylake GT2"},
+	{0x5926, INTEL_MODEL_KBYM, "Kabylake GT3"},
+	{0x5927, INTEL_MODEL_KBYM, "Kabylake GT3"},
+	
+	{0x8A56, INTEL_MODEL_ICL, "Icelake GT1"},
+	{0x8A58, INTEL_MODEL_ICL, "Icelake GT1"},
+	{0x8A5b, INTEL_MODEL_ICL, "Icelake GT1"},
+	{0x8A5d, INTEL_MODEL_ICL, "Icelake GT1"},
+	{0x8A57, INTEL_MODEL_ICL, "Icelake GT1.5"},
+	{0x8A59, INTEL_MODEL_ICL, "Icelake GT1.5"},
+	{0x8A5a, INTEL_MODEL_ICL, "Icelake GT1.5"},
+	{0x8A5c, INTEL_MODEL_ICL, "Icelake GT1.5"},
+	{0x8A50, INTEL_MODEL_ICL, "Icelake GT2"},
+	{0x8A51, INTEL_MODEL_ICL, "Icelake GT2"},
+	{0x8A52, INTEL_MODEL_ICL, "Icelake GT2"},
 };
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
