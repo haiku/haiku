@@ -14,6 +14,7 @@ licenses {
 	MIT
 	"GNU LGPL v2.1"
 }
+flags			system_package
 
 provides {
 	haiku=%HAIKU_VERSION% compat>=R1~alpha4_pm_hrev51198
