@@ -29,13 +29,13 @@
 //	field is the only flag field, we currently use it for this.
 //	A cleaner approach would be appreciated - maybe just an official generic
 //	flags region in the protection field.
-#define B_OVERCOMMITTING_AREA	0x1000
-#define B_SHARED_AREA			0x2000
-/* 0x4000 was B_KERNEL_AREA until hrev52545 */
+#define B_OVERCOMMITTING_AREA	(1 << 12)
+#define B_SHARED_AREA			(1 << 13)
 
-#define B_USER_AREA_FLAGS		(B_USER_PROTECTION | B_OVERCOMMITTING_AREA)
+#define B_USER_AREA_FLAGS		\
+	(B_USER_PROTECTION | B_OVERCOMMITTING_AREA | B_CLONEABLE_AREA)
 #define B_KERNEL_AREA_FLAGS \
-	(B_KERNEL_PROTECTION | B_USER_CLONEABLE_AREA | B_SHARED_AREA)
+	(B_KERNEL_PROTECTION | B_SHARED_AREA)
 
 // mapping argument for several internal VM functions
 enum {

@@ -651,7 +651,7 @@ MapDevice(DeviceInfo& di)
 		regsBase,
 		regAreaSize,
 		B_ANY_KERNEL_ADDRESS,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_CLONEABLE_AREA,
 		(void**)&di.regs);
 
 	// If there was an error, delete other areas.
@@ -782,7 +782,7 @@ InitDevice(DeviceInfo& di)
 		B_ANY_KERNEL_ADDRESS,
 		ROUND_TO_PAGE_SIZE(sharedSize + vesaModeTableSize),
 		B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA);
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_CLONEABLE_AREA);
 	if (di.sharedArea < 0)
 		return di.sharedArea;	// return error code
 

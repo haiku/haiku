@@ -435,7 +435,7 @@ frame_buffer_console_init(kernel_args* args)
 	sConsole.area = map_physical_memory("vesa frame buffer",
 		args->frame_buffer.physical_buffer.start,
 		args->frame_buffer.physical_buffer.size, B_ANY_KERNEL_ADDRESS,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_CLONEABLE_AREA,
 		&frameBuffer);
 	if (sConsole.area < 0)
 		return sConsole.area;

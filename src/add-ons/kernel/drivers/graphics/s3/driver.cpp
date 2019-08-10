@@ -245,7 +245,7 @@ MapDevice(DeviceInfo& di)
 
 	si.regsArea = map_physical_memory(areaName, regsBase, regAreaSize,
 		B_ANY_KERNEL_ADDRESS,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_CLONEABLE_AREA,
 		(void**)(&(di.regs)));
 
 	if (si.regsArea < 0)
@@ -412,7 +412,7 @@ InitDevice(DeviceInfo& di)
 		B_ANY_KERNEL_ADDRESS,
 		((sizeof(SharedInfo) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1)),
 		B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA);
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_CLONEABLE_AREA);
 	if (di.sharedArea < 0)
 		return di.sharedArea;	// return error code
 

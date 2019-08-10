@@ -29,11 +29,6 @@
 
 #define MAX_DEVICES	  8
 
-#ifndef __HAIKU__
-#	undef B_USER_CLONEABLE_AREA
-#	define B_USER_CLONEABLE_AREA 0
-#endif
-
 /* Tell the kernel what revision of the driver API we support */
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
@@ -567,7 +562,7 @@ map_device(device_info *di)
 		di->pcii.u.h0.base_registers_pci[registers],
 		di->pcii.u.h0.base_register_sizes[registers],
 		B_ANY_KERNEL_ADDRESS,
-		B_USER_CLONEABLE_AREA | (si->use_clone_bugfix ? B_READ_AREA|B_WRITE_AREA : 0),
+		B_CLONEABLE_AREA | (si->use_clone_bugfix ? B_READ_AREA|B_WRITE_AREA : 0),
 		(void **)&(di->regs));
 	si->clone_bugfix_regs = (uint32 *) di->regs;
 
@@ -890,7 +885,7 @@ open_hook(const char* name, uint32 flags, void** cookie)
 	/* create this area with NO user-space read or write permissions, to prevent accidental damage */
 	di->shared_area = create_area(shared_name, (void **)&(di->si), B_ANY_KERNEL_ADDRESS,
 		((sizeof(shared_info) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1)), B_FULL_LOCK,
-		B_USER_CLONEABLE_AREA);
+		B_CLONEABLE_AREA);
 	if (di->shared_area < 0) {
 		/* return the error */
 		result = di->shared_area;
@@ -911,7 +906,7 @@ open_hook(const char* name, uint32 flags, void** cookie)
 			B_ANY_KERNEL_ADDRESS,
 			2 * net_buf_size, /* take twice the net size so we can have MTRR-WC even on old systems */
 			B_32_BIT_CONTIGUOUS, /* GPU always needs access */
-			B_USER_CLONEABLE_AREA | B_READ_AREA | B_WRITE_AREA);
+			B_CLONEABLE_AREA | B_READ_AREA | B_WRITE_AREA);
 			// TODO: Physical aligning can be done without waste using the
 			// private create_area_etc().
 	/* on error, abort */

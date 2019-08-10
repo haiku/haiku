@@ -44,7 +44,7 @@ int32 api_version = B_CUR_DRIVER_API_VERSION;	// revision of driver API used
 struct ChipInfo {
 	uint16		chipID;			// PCI device id of the chip
 	ChipType	chipType;		// assigned chip type identifier
-	const char*	chipName;		// user recognizable name for chip 
+	const char*	chipName;		// user recognizable name for chip
 								//   (must be < 32 chars)
 };
 
@@ -83,7 +83,7 @@ static status_t device_open(const char* name, uint32 flags, void** cookie);
 static status_t device_close(void* dev);
 static status_t device_free(void* dev);
 static status_t device_read(void* dev, off_t pos, void* buf, size_t* len);
-static status_t device_write(void* dev, off_t pos, const void* buf, 
+static status_t device_write(void* dev, off_t pos, const void* buf,
 					size_t* len);
 static status_t device_ioctl(void* dev, uint32 msg, void* buf, size_t len);
 
@@ -106,7 +106,7 @@ static device_hooks gDeviceHooks =
 static inline uint32
 GetPCI(pci_info& info, uint8 offset, uint8 size)
 {
-	return gPCI->read_pci_config(info.bus, info.device, info.function, offset, 
+	return gPCI->read_pci_config(info.bus, info.device, info.function, offset,
 		size);
 }
 
@@ -114,7 +114,7 @@ GetPCI(pci_info& info, uint8 offset, uint8 size)
 static inline void
 SetPCI(pci_info& info, uint8 offset, uint8 size, uint32 value)
 {
-	gPCI->write_pci_config(info.bus, info.device, info.function, offset, size, 
+	gPCI->write_pci_config(info.bus, info.device, info.function, offset, size,
 		value);
 }
 
@@ -147,7 +147,7 @@ MapDevice(DeviceInfo& di)
 		B_READ_AREA + B_WRITE_AREA,
 		(void**)&si.videoMemAddr);
 
-	TRACE("Video memory, area: %ld,  addr: 0x%lX, size: %ld\n", 
+	TRACE("Video memory, area: %ld,  addr: 0x%lX, size: %ld\n",
 		si.videoMemArea, (uint32)(si.videoMemAddr), videoRamSize);
 
 	if (si.videoMemArea < 0) {
@@ -173,7 +173,7 @@ MapDevice(DeviceInfo& di)
 		regsBase,
 		regAreaSize,
 		B_ANY_KERNEL_ADDRESS,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_CLONEABLE_AREA,
 		(void**)&di.regs);
 
 	// If there was an error, delete other areas.
@@ -221,7 +221,7 @@ InitDevice(DeviceInfo& di)
 		B_ANY_KERNEL_ADDRESS,
 		ROUND_TO_PAGE_SIZE(sharedSize),
 		B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA);
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_CLONEABLE_AREA);
 	if (di.sharedArea < 0)
 		return di.sharedArea;	// return error code
 
@@ -304,7 +304,7 @@ init_hardware(void)
 	pci_info pciInfo;
 	const ChipInfo* pDevice = GetNextSupportedDevice(pciIndex, pciInfo);
 
-	TRACE("init_hardware() - %s\n", 
+	TRACE("init_hardware() - %s\n",
 		pDevice == NULL ? "no supported devices" : "device supported");
 
 	put_module(B_PCI_MODULE_NAME);		// put away the module manager
@@ -313,7 +313,7 @@ init_hardware(void)
 }
 
 
-status_t  
+status_t
 init_driver(void)
 {
 	// Get handle for the pci bus.
@@ -425,7 +425,7 @@ device_open(const char* name, uint32 /*flags*/, void** cookie)
 		*cookie = &di;		// send cookie to opener
 	}
 
-	TRACE("device_open() returning 0x%lx,  open count: %ld\n", status, 
+	TRACE("device_open() returning 0x%lx,  open count: %ld\n", status,
 		di.openCount);
 	return status;
 }

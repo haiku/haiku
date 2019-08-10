@@ -83,13 +83,14 @@ typedef struct area_info {
 #define B_RANDOMIZED_BASE_ADDRESS	7
 
 /* area protection */
-#define B_READ_AREA				1
-#define B_WRITE_AREA			2
-#define B_EXECUTE_AREA			4
-#define B_STACK_AREA			8
+#define B_READ_AREA				(1 << 0)
+#define B_WRITE_AREA			(1 << 1)
+#define B_EXECUTE_AREA			(1 << 2)
+#define B_STACK_AREA			(1 << 3)
 	/* "stack" protection is not available on most platforms - it's used
 	   to only commit memory as needed, and have guard pages at the
 	   bottom of the stack. */
+#define B_CLONEABLE_AREA		(1 << 8)
 
 extern area_id		create_area(const char *name, void **startAddress,
 						uint32 addressSpec, size_t size, uint32 lock,

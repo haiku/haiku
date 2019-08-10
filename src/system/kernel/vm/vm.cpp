@@ -2110,7 +2110,7 @@ vm_clone_area(team_id team, const char* name, void** address,
 
 	if (!kernel && sourceAddressSpace == VMAddressSpace::Kernel()
 		&& targetAddressSpace != VMAddressSpace::Kernel()
-		&& !(sourceArea->protection & B_USER_CLONEABLE_AREA)) {
+		&& !(sourceArea->protection & B_CLONEABLE_AREA)) {
 		// kernel areas must not be cloned in userland, unless explicitly
 		// declared user-cloneable upon construction
 #if KDEBUG

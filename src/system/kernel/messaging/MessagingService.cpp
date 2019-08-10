@@ -59,7 +59,7 @@ MessagingArea::Create(sem_id lockSem, sem_id counterSem)
 	// create the area
 	area->fID = create_area("messaging", (void**)&area->fHeader,
 		B_ANY_KERNEL_ADDRESS, kMessagingAreaSize, B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA);
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_CLONEABLE_AREA);
 	if (area->fID < 0) {
 		delete area;
 		return NULL;
