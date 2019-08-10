@@ -21,7 +21,6 @@ provides {
 	cmd:arp
 	cmd:chop
 	cmd:clear
-	cmd:compress
 	cmd:df
 	cmd:ftpd
 	cmd:hd
@@ -39,7 +38,6 @@ provides {
 	cmd:telnet
 	cmd:telnetd
 	cmd:top
-	cmd:tput
 	cmd:traceroute
 	cmd:trash
 	cmd:unchop
