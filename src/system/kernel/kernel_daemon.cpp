@@ -17,17 +17,11 @@
 #include <util/DoublyLinkedList.h>
 
 
-// The use of snooze() in the kernel_daemon() function is very inaccurate, of
-// course - the time the daemons need to execute add up in each iteration.
-// But since the kernel daemon is documented to be very inaccurate, this
-// actually might be okay (and that's why it's implemented this way now :-).
-// BeOS R5 seems to do it in the same way, anyway.
-
 struct daemon : DoublyLinkedListLinkImpl<struct daemon> {
 	daemon_hook	function;
 	void*		arg;
 	int32		frequency;
-	int32		offset;
+	bigtime_t	last;
 	bool		executing;
 };
 
@@ -54,6 +48,7 @@ private:
 private:
 			recursive_lock		fLock;
 			DaemonList			fDaemons;
+			sem_id				fDaemonAddedSem;
 			thread_id			fThread;
 			ConditionVariable	fUnregisterCondition;
 			int32				fUnregisterWaiters;
@@ -68,6 +63,10 @@ status_t
 KernelDaemon::Init(const char* name)
 {
 	recursive_lock_init(&fLock, name);
+
+	fDaemonAddedSem = create_sem(0, "kernel daemon added");
+	if (fDaemonAddedSem < 0)
+		return fDaemonAddedSem;
 
 	fThread = spawn_kernel_thread(&_DaemonThreadEntry, name, B_LOW_PRIORITY,
 		this);
@@ -94,27 +93,14 @@ KernelDaemon::Register(daemon_hook function, void* arg, int frequency)
 	daemon->function = function;
 	daemon->arg = arg;
 	daemon->frequency = frequency;
+	daemon->last = 0;
 	daemon->executing = false;
 
-	RecursiveLocker _(fLock);
-
-	if (frequency > 1) {
-		// we try to balance the work-load for each daemon run
-		// (beware, it's a very simple algorithm, yet effective)
-
-		DaemonList::Iterator iterator = fDaemons.GetIterator();
-		int32 num = 0;
-
-		while (iterator.HasNext()) {
-			if (iterator.Next()->frequency == frequency)
-				num++;
-		}
-
-		daemon->offset = num % frequency;
-	} else
-		daemon->offset = 0;
-
+	RecursiveLocker locker(fLock);
 	fDaemons.Add(daemon);
+	locker.Unlock();
+
+	release_sem(fDaemonAddedSem);
 	return B_OK;
 }
 
@@ -218,20 +204,29 @@ status_t
 KernelDaemon::_DaemonThread()
 {
 	struct daemon marker;
-	int32 iteration = 0;
+	const bigtime_t start = system_time(), iterationToUsecs = 100 * 1000;
 
 	marker.arg = NULL;
 
 	while (true) {
 		RecursiveLocker locker(fLock);
 
+		bigtime_t timeout = INT64_MAX;
+
 		// iterate through the list and execute each daemon if needed
 		while (struct daemon* daemon = _NextDaemon(marker)) {
 			daemon->executing = true;
 			locker.Unlock();
 
-			if (((iteration + daemon->offset) % daemon->frequency) == 0)
-				daemon->function(daemon->arg, iteration);
+			const bigtime_t time = system_time();
+			bigtime_t next = (daemon->last +
+				(daemon->frequency * iterationToUsecs)) - time;
+			if (next <= 0) {
+				daemon->last = time;
+				next = daemon->frequency * iterationToUsecs;
+				daemon->function(daemon->arg, (time - start) / iterationToUsecs);
+			}
+			timeout = min_c(timeout, next);
 
 			locker.Lock();
 			daemon->executing = false;
@@ -244,8 +239,7 @@ KernelDaemon::_DaemonThread()
 
 		locker.Unlock();
 
-		iteration++;
-		snooze(100000);	// 0.1 seconds
+		acquire_sem_etc(fDaemonAddedSem, 1, B_RELATIVE_TIMEOUT, timeout);
 	}
 
 	return B_OK;
