@@ -1,11 +1,12 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2019, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  *		James Woodcock
  */
+
 
 #include <arpa/inet.h>
 #include <errno.h>
@@ -34,6 +35,24 @@ struct address_family {
 	const char*	name;
 	const char*	identifiers[4];
 	void		(*print_address)(sockaddr* address);
+};
+
+enum filter_flags {
+	FILTER_FAMILY_MASK		= 0x0000ff,
+	FILTER_PROTOCOL_MASK	= 0x00ff00,
+	FILTER_STATE_MASK		= 0xff0000,
+
+	// Families
+	FILTER_AF_INET			= 0x000001,
+	FILTER_AF_INET6			= 0x000002,
+	FILTER_AF_UNIX			= 0x000004,
+
+	// Protocols
+	FILTER_IPPROTO_TCP		= 0x000100,
+	FILTER_IPPROTO_UDP		= 0x000200,
+
+	// States
+	FILTER_STATE_LISTEN		= 0x010000,
 };
 
 // AF_INET family
@@ -99,10 +118,17 @@ inet_print_address(sockaddr* _address)
 void
 usage(int status)
 {
-	printf("usage: %s [-nh]\n", kProgramName);
-	printf("options:\n");
+	printf("Usage: %s [-nh]\n", kProgramName);
+	printf("Options:\n");
 	printf("	-n	don't resolve names\n");
 	printf("	-h	this help\n");
+	printf("Filter options:\n");
+	printf("	-4	IPv4\n");
+	printf("	-6	IPv6\n");
+	printf("	-x	Unix\n");
+	printf("	-t	TCP\n");
+	printf("	-u	UDP\n");
+	printf("	-l	listen state\n");
 
 	exit(status);
 }
@@ -135,14 +161,27 @@ main(int argc, char** argv)
 {
 	int optionIndex = 0;
 	int opt;
-	static struct option longOptions[] = {
+	int filter = 0;
+
+	const static struct option kLongOptions[] = {
 		{"help", no_argument, 0, 'h'},
 		{"numeric", no_argument, 0, 'n'},
+
+		{"inet", no_argument, 0, '4'},
+		{"inet6", no_argument, 0, '6'},
+		{"unix", no_argument, 0, 'x'},
+
+		{"tcp", no_argument, 0, 't'},
+		{"udp", no_argument, 0, 'u'},
+
+		{"listen", no_argument, 0, 'l'},
+
 		{0, 0, 0, 0}
 	};
 
 	do {
-		opt = getopt_long(argc, argv, "hn", longOptions, &optionIndex);
+		opt = getopt_long(argc, argv, "hn46xtul", kLongOptions,
+			&optionIndex);
 		switch (opt) {
 			case -1:
 				// end of arguments, do nothing
@@ -150,6 +189,28 @@ main(int argc, char** argv)
 
 			case 'n':
 				sResolveNames = 0;
+				break;
+
+			// Family filter
+			case '4':
+				filter |= FILTER_AF_INET;
+				break;
+			case '6':
+				filter |= FILTER_AF_INET6;
+				break;
+			case 'x':
+				filter |= FILTER_AF_UNIX;
+				break;
+			// Protocol filter
+			case 't':
+				filter |= FILTER_IPPROTO_TCP;
+				break;
+			case 'u':
+				filter |= FILTER_IPPROTO_UDP;
+				break;
+			// State filter
+			case 'l':
+				filter |= FILTER_STATE_LISTEN;
 				break;
 
 			case 'h':
@@ -169,6 +230,27 @@ main(int argc, char** argv)
 	int family = -1;
 	net_stat stat;
 	while (_kern_get_next_socket_stat(family, &cookie, &stat) == B_OK) {
+		// Filter families
+		if ((filter & FILTER_FAMILY_MASK) != 0) {
+			if (((filter & FILTER_AF_INET) == 0 || family != AF_INET)
+				&& ((filter & FILTER_AF_INET6) == 0 || family != AF_INET6)
+				&& ((filter & FILTER_AF_UNIX) == 0 || family != AF_UNIX))
+				continue;
+		}
+		// Filter protocols
+		if ((filter & FILTER_PROTOCOL_MASK) != 0) {
+			if (((filter & FILTER_IPPROTO_TCP) == 0
+					|| stat.protocol != IPPROTO_TCP)
+				&& ((filter & FILTER_IPPROTO_UDP) == 0
+					|| stat.protocol != IPPROTO_UDP))
+				continue;
+		}
+		if ((filter & FILTER_STATE_MASK) != 0) {
+			if ((filter & FILTER_STATE_LISTEN) == 0
+				|| strcmp(stat.state, "listen") != 0)
+				continue;
+		}
+
 		protoent* proto = getprotobynumber(stat.protocol);
 		if (proto != NULL)
 			printf("%-6s ", proto->p_name);
