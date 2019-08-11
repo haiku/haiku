@@ -90,7 +90,8 @@ ServerMemoryAllocator::AddArea(area_id serverArea, area_id& _area,
 
 	mapping->local_area = clone_area(readOnly
 			? "server read-only memory" : "server_memory", &base, addressSpec,
-		B_READ_AREA | (readOnly ? 0 : B_WRITE_AREA), serverArea);
+		B_CLONEABLE_AREA | B_READ_AREA | (readOnly ? 0 : B_WRITE_AREA),
+		serverArea);
 	if (mapping->local_area < B_OK) {
 		status = mapping->local_area;
 
