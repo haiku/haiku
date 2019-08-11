@@ -2567,12 +2567,22 @@ XHCI::DoCommand(xhci_trb* trb)
 	QueueCommand(trb);
 	Ring(0, 0);
 
-	if (acquire_sem_etc(fCmdCompSem, 1, B_RELATIVE_TIMEOUT, 1 * 1000 * 1000) < B_OK) {
-		TRACE("Unable to obtain fCmdCompSem!\n");
-		fCmdAddr = 0;
-		Unlock();
-		return B_TIMED_OUT;
+	// Begin with a 50ms timeout.
+	if (acquire_sem_etc(fCmdCompSem, 1, B_RELATIVE_TIMEOUT, 50 * 1000) != B_OK) {
+		// We've hit the timeout. In some error cases, interrupts are not
+		// generated; so here we force the event ring to be polled once.
+		release_sem(fEventSem);
+
+		// Now try again, this time with a 750ms timeout.
+		if (acquire_sem_etc(fCmdCompSem, 1, B_RELATIVE_TIMEOUT,
+				750 * 1000) != B_OK) {
+			TRACE("Unable to obtain fCmdCompSem!\n");
+			fCmdAddr = 0;
+			Unlock();
+			return B_TIMED_OUT;
+		}
 	}
+
 	// eat up sems that have been released by multiple interrupts
 	int32 semCount = 0;
 	get_sem_count(fCmdCompSem, &semCount);
