@@ -120,7 +120,7 @@
 #define XHCI_ERDP_LO(n)		(0x0038 + (0x20 * (n)))
 #define XHCI_ERDP_HI(n)		(0x003C + (0x20 * (n)))
 // Event Handler Busy (EHB)
-#define ERST_EHB			(1 << 3)
+#define ERDP_BUSY			(1 << 3)
 
 
 // Host Controller Doorbell Registers

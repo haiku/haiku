@@ -2378,8 +2378,8 @@ XHCI::Ring(uint8 slot, uint8 endpoint)
 
 	WriteDoorReg32(XHCI_DOORBELL(slot), XHCI_DOORBELL_TARGET(endpoint)
 		| XHCI_DOORBELL_STREAMID(0));
-	/* Flush PCI posted writes */
 	ReadDoorReg32(XHCI_DOORBELL(slot));
+		// Flush PCI writes
 }
 
 
@@ -2829,8 +2829,7 @@ XHCI::ProcessEvents()
 	fEventCcs = j;
 
 	uint64 addr = fErst->rs_addr + i * sizeof(xhci_trb);
-	addr |= ERST_EHB;
-	WriteRunReg32(XHCI_ERDP_LO(0), (uint32)addr);
+	WriteRunReg32(XHCI_ERDP_LO(0), (uint32)addr | ERDP_BUSY);
 	WriteRunReg32(XHCI_ERDP_HI(0), (uint32)(addr >> 32));
 }
 
