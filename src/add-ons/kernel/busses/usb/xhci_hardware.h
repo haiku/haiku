@@ -319,19 +319,6 @@ struct xhci_trb {
 } __attribute__((__aligned__(4)));
 
 
-struct xhci_segment {
-	xhci_trb *		trbs;
-	xhci_segment *	next;
-};
-
-
-struct xhci_ring {
-	xhci_segment *	first_seg;
-	xhci_trb *		enqueue;
-	xhci_trb *		dequeue;
-};
-
-
 // Section 6.5
 struct xhci_erst_element {
 	uint64	rs_addr;
