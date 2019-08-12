@@ -152,7 +152,8 @@ PackageVolumeState::IsNewer(const PackageVolumeState* a,
 PackageVolumeInfo::PackageVolumeInfo()
 	:
 	BReferenceable(),
-	fStates()
+	fStates(),
+	fPackagesDir(NULL)
 {
 }
 
@@ -161,6 +162,9 @@ PackageVolumeInfo::~PackageVolumeInfo()
 {
 	while (PackageVolumeState* state = fStates.RemoveHead())
 		delete state;
+
+	if (fPackagesDir != NULL)
+		closedir(fPackagesDir);
 }
 
 
@@ -169,31 +173,45 @@ PackageVolumeInfo::SetTo(Directory* baseDirectory, const char* packagesPath)
 {
 	TRACE("PackageVolumeInfo::SetTo()\n");
 
+	if (fPackagesDir != NULL)
+		closedir(fPackagesDir);
+
 	// get the packages directory
-	DIR* dir = open_directory(baseDirectory, packagesPath);
-	if (dir == NULL) {
+	fPackagesDir = open_directory(baseDirectory, packagesPath);
+	if (fPackagesDir == NULL) {
 		TRACE("PackageVolumeInfo::SetTo(): failed to open packages directory: "
 			"%s\n", strerror(errno));
 		return errno;
 	}
-	CObjectDeleter<DIR, int> dirCloser(dir, &closedir);
 
-	Directory* packagesDirectory = directory_from(dir);
+	Directory* packagesDirectory = directory_from(fPackagesDir);
 	packagesDirectory->Acquire();
 
 	// add the current state
 	PackageVolumeState* state = _AddState(NULL);
 	if (state == NULL)
 		return B_NO_MEMORY;
-	status_t error = _InitState(packagesDirectory, dir, state);
+	status_t error = _InitState(packagesDirectory, fPackagesDir, state);
 	if (error != B_OK) {
 		TRACE("PackageVolumeInfo::SetTo(): failed to init current state: "
 			"%s\n", strerror(error));
 		return error;
 	}
 
-	// Iterate through the packages/administrative directory to find old state
-	// directories.
+	return B_OK;
+}
+
+
+status_t
+PackageVolumeInfo::LoadOldStates() {
+	if (fPackagesDir == NULL) {
+		TRACE("PackageVolumeInfo::LoadOldStates(): package directory is NULL");
+		return B_ERROR;
+	}
+
+	Directory* packagesDirectory = directory_from(fPackagesDir);
+	packagesDirectory->Acquire();
+
 	if (DIR* administrativeDir = open_directory(packagesDirectory,
 			kAdministrativeDirectory)) {
 		while (dirent* entry = readdir(administrativeDir)) {
@@ -208,13 +226,16 @@ PackageVolumeInfo::SetTo(Directory* baseDirectory, const char* packagesPath)
 		fStates.Sort(&PackageVolumeState::IsNewer);
 
 		// initialize the old states
+		PackageVolumeState* state;
+		status_t error;
 		for (state = fStates.GetNext(state); state != NULL;) {
 			PackageVolumeState* nextState = fStates.GetNext(state);
 			if (state->Name()) {
-				error = _InitState(packagesDirectory, dir, state);
+				error = _InitState(packagesDirectory, fPackagesDir, state);
 				if (error != B_OK) {
-					TRACE("PackageVolumeInfo::SetTo(): failed to init state "
-						"\"%s\": %s\n", state->Name(), strerror(error));
+					TRACE("PackageVolumeInfo::LoadOldStates(): failed to "
+						"init state \"%s\": %s\n", state->Name(),
+						strerror(error));
 					fStates.Remove(state);
 					delete state;
 				}
@@ -222,8 +243,8 @@ PackageVolumeInfo::SetTo(Directory* baseDirectory, const char* packagesPath)
 			state = nextState;
 		}
 	} else {
-		TRACE("PackageVolumeInfo::SetTo(): failed to open administrative "
-			"directory: %s\n", strerror(errno));
+		TRACE("PackageVolumeInfo::LoadOldStates(): failed to open "
+			"administrative directory: %s\n", strerror(errno));
 	}
 
 	return B_OK;

@@ -57,6 +57,8 @@ public:
 			status_t			SetTo(Directory* baseDirectory,
 									const char* packagesPath);
 
+			status_t			LoadOldStates();
+
 			const StateList&	States() const
 									{ return fStates; }
 
@@ -71,6 +73,7 @@ private:
 
 private:
 			StateList			fStates;
+			DIR*				fPackagesDir;
 };
 
 
