@@ -226,7 +226,7 @@ PackageVolumeInfo::LoadOldStates() {
 		fStates.Sort(&PackageVolumeState::IsNewer);
 
 		// initialize the old states
-		PackageVolumeState* state;
+		PackageVolumeState* state = NULL;
 		status_t error;
 		for (state = fStates.GetNext(state); state != NULL;) {
 			PackageVolumeState* nextState = fStates.GetNext(state);
