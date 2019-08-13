@@ -139,6 +139,8 @@ ReaderImplBase::PackageInfoAttributeHandlerBase::NotifyDone(
 {
 	status_t error = context->packageContentHandler->HandlePackageAttribute(
 		fPackageInfoValue);
+	if (context->ignoreUnknownAttributes && error == B_NOT_SUPPORTED)
+		error = B_OK; // Safe to skip a future/unknown attribute.
 	fPackageInfoValue.Clear();
 	return error;
 }
@@ -681,6 +683,8 @@ ReaderImplBase::PackageAttributeHandler::HandleAttribute(
 	if (_handler == NULL) {
 		status_t error = context->packageContentHandler
 			->HandlePackageAttribute(fPackageInfoValue);
+		if (context->ignoreUnknownAttributes && error == B_NOT_SUPPORTED)
+			error = B_OK; // Safe to skip a future/unknown attribute.
 		fPackageInfoValue.Clear();
 		if (error != B_OK)
 			return error;
