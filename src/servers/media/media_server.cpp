@@ -435,7 +435,7 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 			request.SendReply(status, &reply, sizeof(reply));
 			break;
 		}
-		
+
 		case SERVER_RELEASE_NODE_ALL:
 		{
 			const server_release_node_request& request
@@ -952,7 +952,7 @@ ServerApp::MessageReceived(BMessage* msg)
 				gNodeManager->CleanupDormantFlavorInfos();
 
 			team_id id;
-			if (msg->FindInt32("team", &id) == B_OK
+			if (msg->FindInt32("be:team", &id) == B_OK
 					&& gAppManager->HasTeam(id)) {
 				gAppManager->UnregisterTeam(id);
 			}
