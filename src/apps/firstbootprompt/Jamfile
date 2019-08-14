@@ -1,6 +1,9 @@
 SubDir HAIKU_TOP src apps firstbootprompt ;
 
+UseHeaders [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) data keymaps ] ;
 UsePrivateHeaders app interface locale shared ;
+
+Includes [ FGristFiles BootPromptWindow.cpp ] : <keymap-locale>KeymapNames.h ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src preferences keymap ] ;
 

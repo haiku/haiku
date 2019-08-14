@@ -27,6 +27,7 @@ public:
 private:
 			void				_InitCatalog(bool saveSettings);
 			void				_UpdateStrings();
+			void				_UpdateKeymapsMenu();
 			void				_PopulateLanguages();
 			void				_PopulateKeymaps();
 			void				_ActivateKeymap(const BMessage* message) const;

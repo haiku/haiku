@@ -38,6 +38,7 @@
 
 #include "BootPrompt.h"
 #include "Keymap.h"
+#include "KeymapNames.h"
 
 
 using BPrivate::MutableLocaleRoster;
@@ -255,6 +256,7 @@ BootPromptWindow::MessageReceived(BMessage* message)
 				MutableLocaleRoster::Default()->SetPreferredLanguages(
 					&preferredLanguages);
 				_InitCatalog(true);
+				_UpdateKeymapsMenu();
 
 				// Select default keymap by language
 				BLanguage language(item->Language());
@@ -404,6 +406,28 @@ BootPromptWindow::_PopulateLanguages()
 
 
 void
+BootPromptWindow::_UpdateKeymapsMenu()
+{
+	BMenu *menu = fKeymapsMenuField->Menu();
+	BMenuItem* item;
+	BList itemsList;
+
+	// Recreate keymapmenu items list, since BMenu could not sort its items.
+	while ((item = menu->ItemAt(0)) != NULL) {
+		BMessage* message = item->Message();
+		entry_ref ref;
+		message->FindRef("ref", &ref);
+		item-> SetLabel(B_TRANSLATE_NOCOLLECT_ALL((ref.name),
+		"KeymapNames", NULL));
+		itemsList.AddItem(item);
+		menu->RemoveItem(0);
+	}
+	itemsList.SortItems(compare_void_menu_items);
+	fKeymapsMenuField->Menu()->AddList(&itemsList, 0);
+}
+
+
+void
 BootPromptWindow::_PopulateKeymaps()
 {
 	// Get the name of the current keymap, so we can mark the correct entry
@@ -434,7 +458,9 @@ BootPromptWindow::_PopulateKeymaps()
 		while (directory.GetNextRef(&ref) == B_OK) {
 			BMessage* message = new BMessage(MSG_KEYMAP_SELECTED);
 			message->AddRef("ref", &ref);
-			BMenuItem* item = new BMenuItem(ref.name, message);
+			BMenuItem* item =
+				new BMenuItem(B_TRANSLATE_NOCOLLECT_ALL((ref.name),
+				"KeymapNames", NULL), message);
 			itemsList.AddItem(item);
 			if (currentName == ref.name)
 				item->SetMarked(true);
