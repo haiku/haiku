@@ -390,6 +390,7 @@ static const Translation kTranslations[] = {
 	"Fredrik Holmqvist\n" \
 	"Philippe Houdoin\n" \
 	"Kacper Kasper\n" \
+	"Ryan Leavengood\n" \
 	"Andrew Lindesay\n" \
 	"Michael Lotz\n" \
 	"Scott McCreary\n" \
@@ -428,7 +429,6 @@ static const Translation kTranslations[] = {
 	"Marcin Konicki\n" \
 	"Waldemar Kornewald\n" \
 	"Thomas Kurschel\n" \
-	"Ryan Leavengood\n" \
 	"Brecht Machiels\n" \
 	"Matt Madia\n" \
 	"David McPaul\n" \
