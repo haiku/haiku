@@ -1,4 +1,5 @@
 /*
+ * Copyright 2019, Ryan Leavengood.
  * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Marcus Overhagen. All Rights Reserved.
  * Distributed under the terms of the MIT License.
@@ -7,8 +8,7 @@
 #define _BUFFER_CACHE_H_
 
 
-#include <map>
-
+#include <HashMap.h>
 #include <MediaDefs.h>
 
 
@@ -18,15 +18,23 @@ class BBuffer;
 namespace BPrivate {
 
 
+struct buffer_cache_entry {
+	BBuffer*	buffer;
+	port_id		port;
+};
+
+
 class BufferCache {
 public:
 								BufferCache();
 								~BufferCache();
 
-			BBuffer*			GetBuffer(media_buffer_id id);
+			BBuffer*			GetBuffer(media_buffer_id id, port_id port);
+
+			void				FlushCacheForPort(port_id port);
 
 private:
-	typedef std::map<media_buffer_id, BBuffer*> BufferMap;
+	typedef HashMap<HashKey32<media_buffer_id>, buffer_cache_entry> BufferMap;
 
 			BufferMap			fMap;
 };

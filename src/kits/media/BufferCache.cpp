@@ -1,4 +1,5 @@
 /*
+ * Copyright 2019, Ryan Leavengood.
  * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Marcus Overhagen. All Rights Reserved.
  * Distributed under the terms of the MIT License.
@@ -25,22 +26,23 @@ BufferCache::BufferCache()
 
 BufferCache::~BufferCache()
 {
-	for (BufferMap::iterator iterator = fMap.begin(); iterator != fMap.end();
-			iterator++) {
-		delete iterator->second;
+	BufferMap::Iterator iterator = fMap.GetIterator();
+	while (iterator.HasNext()) {
+		BufferMap::Entry entry = iterator.Next();
+		delete entry.value.buffer;
 	}
 }
 
 
 BBuffer*
-BufferCache::GetBuffer(media_buffer_id id)
+BufferCache::GetBuffer(media_buffer_id id, port_id port)
 {
 	if (id <= 0)
 		return NULL;
 
-	BufferMap::iterator found = fMap.find(id);
-	if (found != fMap.end())
-		return found->second;
+	buffer_cache_entry* existing;
+	if (fMap.Get(id, existing))
+		return existing->buffer;
 
 	buffer_clone_info info;
 	info.buffer = id;
@@ -54,14 +56,32 @@ BufferCache::GetBuffer(media_buffer_id id)
 	if (buffer->ID() != id)
 		debugger("BufferCache::GetBuffer: IDs mismatch");
 
-	try {
-		fMap.insert(std::make_pair(id, buffer));
-	} catch (std::bad_alloc& exception) {
+	buffer_cache_entry entry;
+	entry.buffer = buffer;
+	entry.port = port;
+	status_t error = fMap.Put(id, entry);
+	if (error != B_OK) {
 		delete buffer;
 		return NULL;
 	}
 
 	return buffer;
+}
+
+
+void
+BufferCache::FlushCacheForPort(port_id port)
+{
+	BufferMap::Iterator iterator = fMap.GetIterator();
+	while (iterator.HasNext()) {
+		BufferMap::Entry entry = iterator.Next();
+		if (entry.value.port == port) {
+			// Delete the buffer
+			delete entry.value.buffer;
+			// Then remove it from the map
+			fMap.Remove(iterator);
+		}
+	}
 }
 
 

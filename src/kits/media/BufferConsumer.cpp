@@ -379,7 +379,8 @@ BBufferConsumer::HandleMessage(int32 message, const void* data, size_t size)
 			const consumer_buffer_received_command* command
 				= static_cast<const consumer_buffer_received_command*>(data);
 
-			BBuffer* buffer = fBufferCache->GetBuffer(command->buffer);
+			BBuffer* buffer = fBufferCache->GetBuffer(command->buffer,
+				command->header.source_port);
 			if (buffer == NULL) {
 				ERROR("BBufferConsumer::CONSUMER_BUFFER_RECEIVED can't"
 					"find the buffer\n");
@@ -425,6 +426,10 @@ BBufferConsumer::HandleMessage(int32 message, const void* data, size_t size)
 		case CONSUMER_DISCONNECTED:
 		{
 			const consumer_disconnected_request *request = static_cast<const consumer_disconnected_request *>(data);
+			// We no longer need to cache the buffers requested by the other end
+			// of this port.
+			fBufferCache->FlushCacheForPort(request->source.port);
+
 			consumer_disconnected_reply reply;
 			Disconnected(request->source, request->destination);
 			request->SendReply(B_OK, &reply, sizeof(reply));
