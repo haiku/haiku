@@ -35,6 +35,7 @@
 #include <StringView.h>
 #include <TextControl.h>
 
+#include "KeyboardLayoutNames.h"
 #include "KeyboardLayoutView.h"
 #include "KeymapApplication.h"
 #include "KeymapListItem.h"
@@ -666,7 +667,8 @@ KeymapWindow::_AddKeyboardLayoutMenu(BMenu* menu, BDirectory directory)
 		BDirectory subdirectory;
 		subdirectory.SetTo(&ref);
 		if (subdirectory.InitCheck() == B_OK) {
-			BMenu* submenu = new BMenu(B_TRANSLATE_NOCOLLECT(ref.name));
+			BMenu* submenu = new BMenu(B_TRANSLATE_NOCOLLECT_ALL((ref.name),
+				"KeyboardLayoutNames", NULL));
 
 			_AddKeyboardLayoutMenu(submenu, subdirectory);
 			menu->AddItem(submenu, (int32)0);
@@ -674,8 +676,8 @@ KeymapWindow::_AddKeyboardLayoutMenu(BMenu* menu, BDirectory directory)
 			BMessage* message = new BMessage(kChangeKeyboardLayout);
 
 			message->AddRef("ref", &ref);
-			menu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(ref.name),
-				message), (int32)0);
+			menu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT_ALL((ref.name),
+				"KeyboardLayoutNames", NULL), message), (int32)0);
 		}
 	}
 }

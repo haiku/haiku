@@ -40,7 +40,7 @@ HAIKU_KEYBOARD_LAYOUT_FILES =
 	"Kinesis Advantage"
 	"Kinesis Ergo Elan International"
 	"TypeMatrix 2030" ;
-HAIKU_KEYBOARD_LAYOUT_FILES = $(HAIKU_KEYBOARD_LAYOUT_FILES:G=keyboard-layout) ;
+HAIKU_KEYBOARD_LAYOUT_FILES = $(HAIKU_KEYBOARD_LAYOUT_FILES) ;
 SEARCH on $(HAIKU_KEYBOARD_LAYOUT_FILES) = $(keyboardLayoutsDir) ;
 
 # Add Apple Aluminum keyboard layout files to the image in an Apple Aluminum
@@ -55,7 +55,7 @@ HAIKU_APPLE_ALUMINUM_KEYBOARD_LAYOUT_FILES =
 	"Apple Aluminum (US)"
 	"Apple Aluminum Extended (US)" ;
 HAIKU_APPLE_ALUMINUM_KEYBOARD_LAYOUT_FILES
-	= $(HAIKU_APPLE_ALUMINUM_KEYBOARD_LAYOUT_FILES:G=keyboard-layout) ;
+	= $(HAIKU_APPLE_ALUMINUM_KEYBOARD_LAYOUT_FILES) ;
 SEARCH on $(HAIKU_APPLE_ALUMINUM_KEYBOARD_LAYOUT_FILES) = $(appleAluminumDir) ;
 
 # Add ThinkPad keyboard layout files to the image in a ThinkPad
@@ -73,7 +73,7 @@ HAIKU_THINKPAD_KEYBOARD_LAYOUT_FILES =
 	"ThinkPad X100e (US)"
 	"ThinkPad X100e International" ;
 HAIKU_THINKPAD_KEYBOARD_LAYOUT_FILES
-	= $(HAIKU_THINKPAD_KEYBOARD_LAYOUT_FILES:G=keyboard-layout) ;
+	= $(HAIKU_THINKPAD_KEYBOARD_LAYOUT_FILES) ;
 SEARCH on $(HAIKU_THINKPAD_KEYBOARD_LAYOUT_FILES) = $(thinkpadDir) ;
 
 
