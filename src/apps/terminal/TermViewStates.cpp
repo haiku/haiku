@@ -8,6 +8,7 @@
  *		Stefano Ceccherini, stefano.ceccherini@gmail.com
  *		Kian Duffy, myob@users.sourceforge.net
  *		Y.Hayakawa, hida@sawada.riec.tohoku.ac.jp
+ *		Simon South, simon@simonsouth.net
  *		Ingo Weinhold, ingo_weinhold@gmx.de
  *		Clemens Zeidler, haiku@Clemens-Zeidler.de
  *		Siarzhuk Zharski, zharik@gmx.li
@@ -207,6 +208,55 @@ TermView::DefaultState::KeyDown(const char* bytes, int32 numBytes)
 	currentMessage->FindInt32("raw_char", &rawChar);
 
 	fView->_ActivateCursor(true);
+
+	// Handle the Option key when used as Meta
+	if ((mod & B_LEFT_OPTION_KEY) != 0 && fView->fUseOptionAsMetaKey
+		&& (fView->fInterpretMetaKey || fView->fMetaKeySendsEscape)) {
+		const char* bytes;
+		int8 numBytes;
+
+		// Determine the character produced by the same keypress without the
+		// Option key
+		mod &= B_SHIFT_KEY | B_CAPS_LOCK | B_CONTROL_KEY;
+		if (mod == 0) {
+			bytes = (const char*)&rawChar;
+			numBytes = 1;
+		} else {
+			const int (*keymapTable)[128] =
+				fView->fKeymapTableForModifiers.Get(mod);
+			bytes = &fView->fKeymapChars[(*keymapTable)[key]];
+			numBytes = *(bytes++);
+		}
+
+		if (numBytes <= 0)
+			return;
+
+		fView->_ScrollTo(0, true);
+
+		char outputBuffer[2];
+		const char* toWrite = bytes;
+
+		if (fView->fMetaKeySendsEscape) {
+			fView->fShell->Write("\e", 1);
+		} else if (numBytes == 1) {
+			char byte = *bytes | 0x80;
+
+			// The eighth bit has special meaning in UTF-8, so if that encoding
+			// is in use recode the output (as xterm does)
+			if (fView->fEncoding == M_UTF8) {
+				outputBuffer[0] = 0xc0 | ((byte >> 6) & 0x03);
+				outputBuffer[1] = 0x80 | (byte & 0x3f);
+				numBytes = 2;
+			} else {
+				outputBuffer[0] = byte;
+				numBytes = 1;
+			}
+			toWrite = outputBuffer;
+		}
+
+		fView->fShell->Write(toWrite, numBytes);
+		return;
+	}
 
 	// handle multi-byte chars
 	if (numBytes > 1) {

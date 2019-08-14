@@ -6,6 +6,7 @@
  *
  * Authors:
  *		Kian Duffy, myob@users.sourceforge.net
+ *		Simon South, simon@simonsouth.net
  *		Siarzhuk Zharski, zharik@gmx.li
  */
 
@@ -1395,12 +1396,12 @@ TermParse::_DecPrivateModeSet(int value)
 			fBuffer->ReportAnyMouseEvent(true);
 			break;
 		case 1034:
-			// TODO: Interprete "meta" key, sets eighth bit.
-			// Not supported yet.
+			// Interpret "meta" key, sets eighth bit.
+			fBuffer->EnableInterpretMetaKey(true);
 			break;
 		case 1036:
-			// TODO: Send ESC when Meta modifies a key
-			// Not supported yet.
+			// Send ESC when Meta modifies a key
+			fBuffer->EnableMetaKeySendsEscape(true);
 			break;
 		case 1039:
 			// TODO: Send ESC when Alt modifies a key
@@ -1470,12 +1471,12 @@ TermParse::_DecPrivateModeReset(int value)
 			fBuffer->ReportAnyMouseEvent(false);
 			break;
 		case 1034:
-			// Don't interprete "meta" key.
-			// Not supported yet.
+			// Don't interpret "meta" key.
+			fBuffer->EnableInterpretMetaKey(false);
 			break;
 		case 1036:
-			// TODO: Don't send ESC when Meta modifies a key
-			// Not supported yet.
+			// Don't send ESC when Meta modifies a key
+			fBuffer->EnableMetaKeySendsEscape(false);
 			break;
 		case 1039:
 			// TODO: Don't send ESC when Alt modifies a key

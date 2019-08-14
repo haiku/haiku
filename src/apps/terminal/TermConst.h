@@ -7,6 +7,7 @@
  *
  * Authors:
  *		Kian Duffy, myob@users.sourceforge.net
+ *		Simon South, simon@simonsouth.net
  *		Siarzhuk Zharski, zharik@gmx.li
  */
 #ifndef TERMCONST_H_INCLUDED
@@ -79,6 +80,7 @@ static const uint32 MSG_SET_TERMINAL_TITLE				= 'sett';
 static const uint32 MSG_SET_TERMINAL_COLORS				= 'setc';
 static const uint32 MSG_RESET_TERMINAL_COLORS			= 'rstc';
 static const uint32 MSG_QUIT_TERMNAL					= 'qutt';
+static const uint32 MSG_ENABLE_META_KEY					= 'emtk';
 static const uint32 MSG_REPORT_MOUSE_EVENT				= 'mous';
 static const uint32 MSG_SAVE_WINDOW_POSITION			= 'swps';
 static const uint32 MSG_MOVE_TAB_LEFT					= 'mvtl';
@@ -133,6 +135,8 @@ static const char* const PREF_TEXT_ENCODING = "Text encoding";
 
 static const char* const PREF_BLINK_CURSOR = "Blinking cursor";
 static const char* const PREF_ALLOW_BOLD = "Allow bold text";
+static const char* const PREF_USE_OPTION_AS_META =
+	"Use left Option as Meta key";
 static const char* const PREF_WARN_ON_EXIT = "Warn on exit";
 static const char* const PREF_CURSOR_STYLE = "Cursor style";
 static const char* const PREF_EMULATE_BOLD = "Emulate bold";

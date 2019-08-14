@@ -25,6 +25,7 @@ static const uint32 MSG_TAB_TITLE_SETTING_CHANGED		= 'mtts';
 static const uint32 MSG_WINDOW_TITLE_SETTING_CHANGED	= 'mwts';
 static const uint32 MSG_BLINK_CURSOR_CHANGED			= 'mbcc';
 static const uint32 MSG_ALLOW_BOLD_CHANGED				= 'mabc';
+static const uint32 MSG_USE_OPTION_AS_META_CHANGED		= 'momc';
 static const uint32 MSG_WARN_ON_EXIT_CHANGED			= 'mwec';
 static const uint32 MSG_COLS_CHANGED					= 'mccl';
 static const uint32 MSG_HISTORY_CHANGED					= 'mhst';
@@ -78,6 +79,7 @@ private:
 
 			BCheckBox*			fBlinkCursor;
 			BCheckBox*			fAllowBold;
+			BCheckBox*			fUseOptionAsMetaKey;
 			BCheckBox*			fWarnOnExit;
 			BMenuField*			fFontField;
 

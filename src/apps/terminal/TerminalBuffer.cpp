@@ -5,6 +5,7 @@
  *
  * Authors:
  *		Ingo Weinhold, ingo_weinhold@gmx.de
+ *		Simon South, simon@simonsouth.net
  *		Siarzhuk Zharski, zharik@gmx.li
  */
 
@@ -87,6 +88,28 @@ int
 TerminalBuffer::Encoding() const
 {
 	return fEncoding;
+}
+
+
+void
+TerminalBuffer::EnableInterpretMetaKey(bool enable)
+{
+	if (fListenerValid) {
+		BMessage message(MSG_ENABLE_META_KEY);
+		message.AddBool("enableInterpretMetaKey", enable);
+		fListener.SendMessage(&message);
+	}
+}
+
+
+void
+TerminalBuffer::EnableMetaKeySendsEscape(bool enable)
+{
+	if (fListenerValid) {
+		BMessage message(MSG_ENABLE_META_KEY);
+		message.AddBool("enableMetaKeySendsEscape", enable);
+		fListener.SendMessage(&message);
+	}
 }
 
 

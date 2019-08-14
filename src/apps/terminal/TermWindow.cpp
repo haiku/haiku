@@ -10,6 +10,7 @@
  *		Kian Duffy, myob@users.sourceforge.net
  *		Daniel Furrer, assimil8or@users.sourceforge.net
  *		John Scipione, jscipione@gmail.com
+ *		Simon South, simon@simonsouth.net
  *		Siarzhuk Zharski, zharik@gmx.li
  */
 
@@ -202,6 +203,9 @@ TermWindow::TermWindow(const BString& title, Arguments* args)
 	fTerminalRoster.SetListener(this);
 	int32 id = fTerminalRoster.ID();
 
+	// fetch the current keymap
+	get_key_map(&fKeymap, &fKeymapChars);
+
 	// apply the title settings
 	fTitle.pattern = title;
 	if (fTitle.pattern.Length() == 0) {
@@ -272,6 +276,9 @@ TermWindow::~TermWindow()
 
 	for (int32 i = 0; Session* session = _SessionAt(i); i++)
 		delete session;
+
+	delete fKeymap;
+	delete[] fKeymapChars;
 }
 
 
@@ -673,6 +680,10 @@ TermWindow::MessageReceived(BMessage *message)
 	bool findresult;
 
 	switch (message->what) {
+		case B_KEY_MAP_LOADED:
+			_UpdateKeymap();
+			break;
+
 		case B_COPY:
 			_ActiveTermView()->Copy(be_clipboard);
 			break;
@@ -891,6 +902,18 @@ TermWindow::MessageReceived(BMessage *message)
 				TermView* view = _TermViewAt(i);
 				_TermViewAt(i)->SetTermFont(&font);
 				_ResizeView(view);
+			}
+			break;
+		}
+
+		case MSG_USE_OPTION_AS_META_CHANGED:
+		{
+			bool useOptionAsMetaKey
+				= PrefHandler::Default()->getBool(PREF_USE_OPTION_AS_META);
+
+			for (int32 i = 0; i < fTabView->CountTabs(); i++) {
+				TermView* view = _TermViewAt(i);
+				view->SetUseOptionAsMetaKey(useOptionAsMetaKey);
 			}
 			break;
 		}
@@ -1305,6 +1328,10 @@ TermWindow::_AddTab(Arguments* args, const BString& currentDirectory)
 				PrefHandler::Default()->getString(PREF_TEXT_ENCODING));
 		if (charset != NULL)
 			view->SetEncoding(charset->GetConversionID());
+
+		view->SetKeymap(fKeymap, fKeymapChars);
+		view->SetUseOptionAsMetaKey(
+			PrefHandler::Default()->getBool(PREF_USE_OPTION_AS_META));
 
 		_SetTermColors(containerView);
 
@@ -1993,4 +2020,19 @@ TermWindow::_MoveWindowInScreen(BWindow* window)
 	BRect frame = window->Frame();
 	BSize screenSize(BScreen(window).Frame().Size());
 	window->MoveTo(BLayoutUtils::MoveIntoFrame(frame, screenSize).LeftTop());
+}
+
+
+void
+TermWindow::_UpdateKeymap()
+{
+	delete fKeymap;
+	delete[] fKeymapChars;
+
+	get_key_map(&fKeymap, &fKeymapChars);
+
+	for (int32 i = 0; i < fTabView->CountTabs(); i++) {
+		TermView* view = _TermViewAt(i);
+		view->SetKeymap(fKeymap, fKeymapChars);
+	}
 }

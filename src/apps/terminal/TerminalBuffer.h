@@ -5,6 +5,7 @@
  *
  * Authors:
  *		Ingo Weinhold, ingo_weinhold@gmx.de
+ *		Simon South, simon@simonsouth.net
  *		Siarzhuk Zharski, zharik@gmx.li
  */
 #ifndef TERMINAL_BUFFER_H
@@ -51,6 +52,9 @@ public:
 
 			void				UseAlternateScreenBuffer(bool clear);
 			void				UseNormalScreenBuffer();
+
+			void				EnableInterpretMetaKey(bool enable);
+			void				EnableMetaKeySendsEscape(bool enable);
 
 			void				ReportX10MouseEvent(bool report);
 			void				ReportNormalMouseEvent(bool report);

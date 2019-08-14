@@ -32,6 +32,7 @@
 #define TERM_WINDOW_H
 
 
+#include <InterfaceDefs.h>
 #include <MessageRunner.h>
 #include <String.h>
 #include <Window.h>
@@ -188,6 +189,8 @@ private:
 
 			void				_MoveWindowInScreen(BWindow* window);
 
+			void				_UpdateKeymap();
+
 private:
 			TerminalRoster		fTerminalRoster;
 
@@ -228,6 +231,9 @@ private:
 			bool				fMatchWord;
 
 			bool				fFullScreen;
+
+			key_map*			fKeymap;
+			char*				fKeymapChars;
 };
 
 

@@ -8,6 +8,7 @@
  * Authors:
  *		Jeremiah Bailey, <jjbailey@gmail.com>
  *		Kian Duffy, <myob@users.sourceforge.net>
+ *		Simon South, simon@simonsouth.net
  *		Siarzhuk Zharski, <zharik@gmx.li>
  */
 
@@ -179,6 +180,10 @@ void
 TermApp::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case B_KEY_MAP_LOADED:
+			fTermWindow->PostMessage(message);
+			break;
+
 		case MSG_ACTIVATE_TERM:
 			fTermWindow->Activate();
 			break;
