@@ -601,7 +601,8 @@ BMediaRosterEx::PublishOutputs(const media_node& node, List<media_output>* list)
 		size_t size;
 		size = ROUND_UP_TO_PAGE(count * sizeof(media_output));
 		request.area = create_area("publish outputs", &start_addr,
-			B_ANY_ADDRESS, size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+			B_ANY_ADDRESS, size, B_NO_LOCK,
+			B_READ_AREA | B_WRITE_AREA | B_CLONEABLE_AREA);
 		if (request.area < B_OK) {
 			ERROR("PublishOutputs: failed to create area, %#" B_PRIx32 "\n",
 				request.area);
@@ -650,7 +651,8 @@ BMediaRosterEx::PublishInputs(const media_node& node, List<media_input>* list)
 		size_t size;
 		size = ROUND_UP_TO_PAGE(count * sizeof(media_input));
 		request.area = create_area("publish inputs", &start_addr,
-			B_ANY_ADDRESS, size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+			B_ANY_ADDRESS, size, B_NO_LOCK,
+			B_READ_AREA | B_WRITE_AREA | B_CLONEABLE_AREA);
 		if (request.area < B_OK) {
 			ERROR("PublishInputs: failed to create area, %#" B_PRIx32 "\n",
 				request.area);
