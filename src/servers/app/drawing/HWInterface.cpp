@@ -586,8 +586,10 @@ HWInterface::_DrawCursor(IntRect area) const
 		// that has the cursor blended on top of it
 
 		// blending buffer
-		uint8* buffer = new uint8[width * height * 4];
+		uint8* buffer = new(std::nothrow) uint8[width * height * 4];
 			// TODO: cache this buffer
+		if (buffer == NULL)
+			return;
 
 		// offset into back buffer
 		uint8* src = (uint8*)backBuffer->Bits();
@@ -1085,6 +1087,10 @@ HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 		BRect cursorBounds = fCursorAndDragBitmap->Bounds();
 		fCursorAreaBackup = new buffer_clip(cursorBounds.IntegerWidth() + 1,
 			cursorBounds.IntegerHeight() + 1);
+		if (fCursorAreaBackup->buffer == NULL) {
+			delete fCursorAreaBackup;
+			fCursorAreaBackup = NULL;
+		}
 	}
  	_DrawCursor(_CursorFrame());
 }

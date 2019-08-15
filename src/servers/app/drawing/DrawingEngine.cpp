@@ -428,7 +428,7 @@ struct node {
 	void init(const BRect& r, int32 maxPointers)
 	{
 		rect = r;
-		pointers = new node*[maxPointers];
+		pointers = new(std::nothrow) node*[maxPointers];
 		in_degree = 0;
 		next_pointer = 0;
 	}
@@ -490,6 +490,8 @@ DrawingEngine::CopyRegion(/*const*/ BRegion* region, int32 xOffset,
 	BStackOrHeapArray<node, 64> nodes(count);
 	for (int32 i= 0; i < count; i++) {
 		nodes[i].init(region->RectAt(i), count);
+		if (nodes[i].pointers == NULL)
+			return;
 	}
 
 	for (int32 i = 0; i < count; i++) {
@@ -551,8 +553,11 @@ DrawingEngine::CopyRegion(/*const*/ BRegion* region, int32 xOffset,
 	clipping_rect* sortedRectList = NULL;
 	int32 nextSortedIndex = 0;
 
-	if (fAvailableHWAccleration & HW_ACC_COPY_REGION)
-		sortedRectList = new clipping_rect[count];
+	if (fAvailableHWAccleration & HW_ACC_COPY_REGION) {
+		sortedRectList = new(std::nothrow) clipping_rect[count];
+		if (sortedRectList == NULL)
+			return;
+	}
 
 	while (!inDegreeZeroNodes.empty()) {
 		node* n = inDegreeZeroNodes.top();
