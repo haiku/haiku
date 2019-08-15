@@ -2110,11 +2110,10 @@ vm_clone_area(team_id team, const char* name, void** address,
 
 	if (!kernel && sourceAddressSpace != targetAddressSpace
 		&& (sourceArea->protection & B_CLONEABLE_AREA) == 0) {
-		// kernel areas must not be cloned in userland, unless explicitly
-		// declared user-cloneable upon construction
 #if KDEBUG
-		panic("attempting to clone area \"%s\" (%" B_PRId32 ")!",
-			sourceArea->name, sourceID);
+		Team* team = thread_get_current_thread()->team;
+		dprintf("team \"%s\" (%" B_PRId32 ") attempted to clone area \"%s\" (%"
+			B_PRId32 ")!\n", team->Name(), team->id, sourceArea->name, sourceID);
 #endif
 		status = B_NOT_ALLOWED;
 	} else if (sourceArea->cache_type == CACHE_TYPE_NULL) {
