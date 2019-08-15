@@ -6,6 +6,8 @@
 
 #include <ControlLook.h>
 
+#include <binary_compatibility/Interface.h>
+
 
 namespace BPrivate {
 
@@ -77,7 +79,18 @@ BControlLook::SetBackgroundInfo(const BMessage& backgroundInfo)
 }
 
 
-void BControlLook::_ReservedControlLook1() {}
+extern "C" void
+B_IF_GCC_2(_ReservedControlLook1__Q28BPrivate12BControlLook,
+		_ZN8BPrivate12BControlLook21_ReservedControlLook1Ev)(
+	BControlLook* controlLook, BView* view, BRect& rect,
+	const BRect& updateRect, const rgb_color& base, uint32 flags,
+	uint32 borders, border_style borderStyle, uint32 side)
+{
+	controlLook->DrawTabFrame(view, rect, updateRect, base, flags, borders,
+		borderStyle, side);
+}
+
+
 void BControlLook::_ReservedControlLook2() {}
 void BControlLook::_ReservedControlLook3() {}
 void BControlLook::_ReservedControlLook4() {}

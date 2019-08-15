@@ -20,6 +20,7 @@
 #include <Region.h>
 #include <Shape.h>
 #include <String.h>
+#include <TabView.h>
 #include <View.h>
 #include <Window.h>
 #include <WindowPrivate.h>
@@ -1329,6 +1330,50 @@ HaikuControlLook::DrawSliderHashMarks(BView* view, BRect& rect,
 
 		view->EndLineArray();
 	}
+}
+
+
+void
+HaikuControlLook::DrawTabFrame(BView* view, BRect& rect,
+	const BRect& updateRect, const rgb_color& base, uint32 flags,
+	uint32 borders, border_style borderStyle, uint32 side)
+{
+	if (!rect.IsValid() || !rect.Intersects(updateRect))
+		return;
+
+	if (side == BTabView::kTopSide || side == BTabView::kBottomSide) {
+		// draw an inactive tab frame behind all tabs
+		borders = B_TOP_BORDER | B_BOTTOM_BORDER;
+		if (borderStyle == B_NO_BORDER) {
+			// removes left border that is an artifact of DrawInactiveTab()
+			rect.left -= 1;
+		} else
+			borders |= B_LEFT_BORDER | B_RIGHT_BORDER;
+
+		// DrawInactiveTab draws 2px border
+		// draw a little wider tab frame to align B_PLAIN_BORDER with it
+		if (borderStyle == B_PLAIN_BORDER) {
+			rect.left -= 1;
+			rect.right += 1;
+		}
+	} else if (side == BTabView::kLeftSide || side == BTabView::kRightSide) {
+		// draw an inactive tab frame behind all tabs
+		borders = B_LEFT_BORDER | B_RIGHT_BORDER;
+		if (borderStyle == B_NO_BORDER) {
+			// removes top border that is an artifact of DrawInactiveTab()
+			rect.top -= 1;
+		} else
+			borders |= B_TOP_BORDER | B_BOTTOM_BORDER;
+
+		// DrawInactiveTab draws 2px border
+		// draw a little wider tab frame to align B_PLAIN_BORDER with it
+		if (borderStyle == B_PLAIN_BORDER) {
+			rect.top -= 1;
+			rect.bottom += 1;
+		}
+	}
+
+	DrawInactiveTab(view, rect, rect, base, 0, borders, side);
 }
 
 

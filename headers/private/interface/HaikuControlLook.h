@@ -217,12 +217,17 @@ public:
 									hash_mark_location location,
 									uint32 flags, orientation orientation);
 
+	virtual	void				DrawTabFrame(BView* view, BRect& rect,
+									const BRect& updateRect,
+									const rgb_color& base, uint32 flags = 0,
+									uint32 borders = B_ALL_BORDERS,
+									border_style borderStyle = B_FANCY_BORDER,
+									uint32 side = B_TOP_BORDER);
 	virtual	void				DrawActiveTab(BView* view, BRect& rect,
 									const BRect& updateRect,
 									const rgb_color& base, uint32 flags = 0,
 									uint32 borders = B_ALL_BORDERS,
 									uint32 side = B_TOP_BORDER);
-
 	virtual	void				DrawInactiveTab(BView* view, BRect& rect,
 									const BRect& updateRect,
 									const rgb_color& base, uint32 flags = 0,
