@@ -4905,6 +4905,40 @@ BView::MessageReceived(BMessage* message)
 {
 	if (!message->HasSpecifiers()) {
 		switch (message->what) {
+			case B_INVALIDATE:
+			{
+				BRect rect;
+				if (message->FindRect("be:area", &rect) == B_OK)
+					Invalidate(rect);
+				else
+					Invalidate();
+				break;
+			}
+
+			case B_KEY_DOWN:
+			{
+				// TODO: cannot use "string" here if we support having different
+				// font encoding per view (it's supposed to be converted by
+				// BWindow::_HandleKeyDown() one day)
+				const char* string;
+				ssize_t bytes;
+				if (message->FindData("bytes", B_STRING_TYPE,
+						(const void**)&string, &bytes) == B_OK)
+					KeyDown(string, bytes - 1);
+				break;
+			}
+
+			case B_KEY_UP:
+			{
+				// TODO: same as above
+				const char* string;
+				ssize_t bytes;
+				if (message->FindData("bytes", B_STRING_TYPE,
+						(const void**)&string, &bytes) == B_OK)
+					KeyUp(string, bytes - 1);
+				break;
+			}
+
 			case B_VIEW_RESIZED:
 				FrameResized(message->GetInt32("width", 0),
 					message->GetInt32("height", 0));
@@ -4913,6 +4947,14 @@ BView::MessageReceived(BMessage* message)
 			case B_VIEW_MOVED:
 				FrameMoved(fParentOffset);
 				break;
+
+			case B_MOUSE_DOWN:
+			{
+				BPoint where;
+				message->FindPoint("be:view_where", &where);
+				MouseDown(where);
+				break;
+			}
 
 			case B_MOUSE_IDLE:
 			{
@@ -4925,6 +4967,85 @@ BView::MessageReceived(BMessage* message)
 					ShowToolTip(tip);
 				else
 					BHandler::MessageReceived(message);
+				break;
+			}
+
+			case B_MOUSE_MOVED:
+			{
+				uint32 eventOptions = fEventOptions | fMouseEventOptions;
+				bool noHistory = eventOptions & B_NO_POINTER_HISTORY;
+				bool dropIfLate = !(eventOptions & B_FULL_POINTER_HISTORY);
+
+				bigtime_t eventTime;
+				if (message->FindInt64("when", (int64*)&eventTime) < B_OK)
+					eventTime = system_time();
+
+				uint32 transit;
+				message->FindInt32("be:transit", (int32*)&transit);
+				// don't drop late messages with these important transit values
+				if (transit == B_ENTERED_VIEW || transit == B_EXITED_VIEW)
+					dropIfLate = false;
+
+				// TODO: The dropping code may have the following problem: On
+				// slower computers, 20ms may just be to abitious a delay.
+				// There, we might constantly check the message queue for a
+				// newer message, not find any, and still use the only but later
+				// than 20ms message, which of course makes the whole thing
+				// later than need be. An adaptive delay would be kind of neat,
+				// but would probably use additional BWindow members to count
+				// the successful versus fruitless queue searches and the delay
+				// value itself or something similar.
+				if (noHistory
+					|| (dropIfLate && (system_time() - eventTime > 20000))) {
+					// filter out older mouse moved messages in the queue
+					BWindow* window = Window();
+					window->_DequeueAll();
+					BMessageQueue* queue = window->MessageQueue();
+					queue->Lock();
+
+					BMessage* moved;
+					for (int32 i = 0; (moved = queue->FindMessage(i)) != NULL;
+						 i++) {
+						if (moved != message && moved->what == B_MOUSE_MOVED) {
+							// there is a newer mouse moved message in the
+							// queue, just ignore the current one, the newer one
+							// will be handled here eventually
+							queue->Unlock();
+							return;
+						}
+					}
+					queue->Unlock();
+				}
+
+				BPoint where;
+				uint32 buttons;
+				message->FindPoint("be:view_where", &where);
+				message->FindInt32("buttons", (int32*)&buttons);
+
+				if (transit == B_EXITED_VIEW || transit == B_OUTSIDE_VIEW)
+					HideToolTip();
+
+				BMessage* dragMessage = NULL;
+				if (message->HasMessage("be:drag_message")) {
+					dragMessage = new BMessage();
+					if (message->FindMessage("be:drag_message", dragMessage)
+						!= B_OK) {
+						delete dragMessage;
+						dragMessage = NULL;
+					}
+				}
+
+				MouseMoved(where, transit, dragMessage);
+				delete dragMessage;
+				break;
+			}
+
+			case B_MOUSE_UP:
+			{
+				BPoint where;
+				message->FindPoint("be:view_where", &where);
+				fMouseEventOptions = 0;
+				MouseUp(where);
 				break;
 			}
 
