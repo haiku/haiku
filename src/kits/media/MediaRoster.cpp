@@ -70,6 +70,7 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002-2006 Marcus "
 #include <SharedBufferList.h>
 #include <TList.h>
 
+#include "PortPool.h"
 #include "TimeSourceObjectManager.h"
 
 
@@ -144,6 +145,9 @@ public:
 			wait_for_thread(roster, &err);
 			if (err != B_OK)
 				ERROR("BMediaRoster: wait_for_thread returned error");
+
+			// Only now delete the port pool
+			delete gPortPool;
 		}
 	}
 };
@@ -165,6 +169,9 @@ BMediaRosterEx::BMediaRosterEx(status_t* _error)
 {
 	gDormantNodeManager = new DormantNodeManager();
 	gTimeSourceObjectManager = new TimeSourceObjectManager();
+	gPortPool = new PortPool();
+		// This is created here but deleted in the MediaRosterUndertaker because
+		// otherwise there are segfaults trying to send final quit messages.
 
 	*_error = BuildConnections();
 

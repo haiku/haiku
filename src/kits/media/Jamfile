@@ -63,6 +63,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			FormatManager.cpp
 			MediaRecorderNode.cpp
 			Notifications.cpp
+			PortPool.cpp
 			request_data.cpp
 			SharedBufferList.cpp
 			TrackReader.cpp
