@@ -16,6 +16,7 @@
 #include "JsonErrorHandlingTest.h"
 #include "JsonTextWriterTest.h"
 #include "JsonToMessageTest.h"
+#include "KeymapTest.h"
 
 
 BTestSuite*
@@ -31,6 +32,7 @@ getTestSuite()
 	JsonErrorHandlingTest::AddTests(*suite);
 	JsonTextWriterTest::AddTests(*suite);
 	JsonToMessageTest::AddTests(*suite);
+	KeymapTest::AddTests(*suite);
 
 	return suite;
 }

@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src build libshared ;
 
 USES_BE_API on libshared_build.a = true ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) headers private shared ] : true ;
+UsePrivateHeaders interface shared ;
 
 UsePrivateBuildHeaders shared ;
 

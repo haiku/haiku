@@ -25,6 +25,9 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		UsePrivateSystemHeaders ;
 		UsePrivateHeaders kernel libroot ;
 
+		# for BKeymap
+		UsePrivateHeaders interface ;
+
 		StaticLibrary <$(architecture)>libshared.a :
 			AboutMenuItem.cpp
 			ArgumentVector.cpp
