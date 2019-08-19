@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Produce a gcc triplet for the given architecture
 # Released under the MIT License.
