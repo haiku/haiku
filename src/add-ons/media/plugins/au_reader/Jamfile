@@ -2,7 +2,12 @@ SubDir HAIKU_TOP src add-ons media plugins au_reader ;
 
 UsePrivateHeaders media ;
 
-Addon au_reader :
-	au_reader.cpp
-	: be libmedia.so [ TargetLibsupc++ ]
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Addon [ MultiArchDefaultGristFiles au_reader ] :
+			au_reader.cpp
+			: be media [ TargetLibsupc++ ]
+		;
+	}
+}
