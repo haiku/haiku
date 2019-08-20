@@ -1783,8 +1783,8 @@ BPoseView::AddPoseToList(PoseList* list, bool visibleList, bool insertionSort,
 	bool addedItem = false;
 	bool needToDraw = true;
 
-	if (insertionSort && list->CountItems() > 0) {
-		int32 orientation = BSearchList(list, pose, &poseIndex, 0);
+	if (insertionSort && poseIndex > 0) {
+		int32 orientation = BSearchList(list, pose, &poseIndex, poseIndex);
 
 		if (orientation == kInsertAfter)
 			poseIndex++;
@@ -1794,50 +1794,72 @@ BPoseView::AddPoseToList(PoseList* list, bool visibleList, bool insertionSort,
 			poseBounds = CalcPoseRectList(pose, poseIndex);
 			havePoseBounds = true;
 
-			BRect srcRect(Extent());
-			srcRect.top = poseBounds.top;
-			srcRect = srcRect & viewBounds;
-			BRect destRect(srcRect);
-			destRect.OffsetBy(0, fListElemHeight);
+			// Simple optimization: if the new pose bounds is completely below
+			// the current view bounds, we do not need to draw.
+			if (poseBounds.top > viewBounds.bottom) {
+				needToDraw = false;
+			} else {
+				// The new pose may need to be placed where another pose already
+				// is. This code creates some rects where we either need to
+				// slide some already drawn poses down, or at least update the
+				// rect where the new pose is.
+				BRect srcRect(Extent());
+				srcRect.top = poseBounds.top;
+				srcRect = srcRect & viewBounds;
+				BRect destRect(srcRect);
+				destRect.OffsetBy(0, fListElemHeight);
 
-			// special case the addition of a pose that scrolls
-			// the extent into the view for the first time:
-			if (destRect.bottom > viewBounds.top
-				&& destRect.top > destRect.bottom) {
-				// make destRect valid
-				destRect.top = viewBounds.top;
-			}
+				// special case the addition of a pose that scrolls
+				// the extent into the view for the first time:
+				if (destRect.bottom > viewBounds.top
+					&& destRect.top > destRect.bottom) {
+					// make destRect valid
+					destRect.top = viewBounds.top;
+				}
 
-			if (srcRect.Intersects(viewBounds)
-				|| destRect.Intersects(viewBounds)) {
-				// The visual area is affected by the insertion.
-				// If items have been added above the visual area,
-				// delay the scrolling. srcRect.bottom holds the
-				// current Extent(). So if the bottom is still above
-				// the viewBounds top, it means the view is scrolled
-				// to show the area below the items that have already
-				// been added.
-				if (srcRect.top == viewBounds.top
-					&& srcRect.bottom >= viewBounds.top
-					&& poseIndex != 0) {
-					// if new pose above current view bounds, cache up
-					// the draw and do it later
-					listViewScrollBy += fListElemHeight;
-					needToDraw = false;
-				} else {
-					FinishPendingScroll(listViewScrollBy, viewBounds);
-					list->AddItem(pose, poseIndex);
-
-					fMimeTypeListIsDirty = true;
-					addedItem = true;
-					if (srcRect.IsValid()) {
-						CopyBits(srcRect, destRect);
-						srcRect.bottom = destRect.top;
-						SynchronousUpdate(srcRect);
+				// TODO: As long as either srcRect or destRect are valid, this
+				// will always be true because srcRect is built from viewBounds.
+				// Many times they are not valid, but most of the time they are,
+				// and in a folder with a lot of contents this causes a lot of
+				// unnecessary drawing. Hence the optimization above. This all
+				// just needs to be rethought completely. Similar code is in
+				// BPoseView::InsertPoseAfter.
+				if (srcRect.Intersects(viewBounds)
+					|| destRect.Intersects(viewBounds)) {
+					// The visual area is affected by the insertion.
+					// If items have been added above the visual area,
+					// delay the scrolling. srcRect.bottom holds the
+					// current Extent(). So if the bottom is still above
+					// the viewBounds top, it means the view is scrolled
+					// to show the area below the items that have already
+					// been added.
+					if (srcRect.top == viewBounds.top
+						&& srcRect.bottom >= viewBounds.top
+						&& poseIndex != 0) {
+						// if new pose above current view bounds, cache up
+						// the draw and do it later
+						listViewScrollBy += fListElemHeight;
+						needToDraw = false;
 					} else {
-						SynchronousUpdate(destRect);
+						FinishPendingScroll(listViewScrollBy, viewBounds);
+						list->AddItem(pose, poseIndex);
+
+						fMimeTypeListIsDirty = true;
+						addedItem = true;
+						if (srcRect.IsValid()) {
+							// Slide the already drawn bits down.
+							CopyBits(srcRect, destRect);
+							// Shrink the srcRect down to the just the part that
+							// needs to be redrawn.
+							srcRect.bottom = destRect.top;
+							SynchronousUpdate(srcRect);
+						} else {
+							// This is probably the bottom of the view or just
+							// got scrolled into view.
+							SynchronousUpdate(destRect);
+						}
+						needToDraw = false;
 					}
-					needToDraw = false;
 				}
 			}
 		}
@@ -9289,6 +9311,7 @@ PoseCompareAddWidget(const BPose* p1, const BPose* p2, BPoseView* view)
 	}
 
 	int32 result = 0;
+	// We perform a loop in case there is a secondary sort
 	for (int32 count = 0; ; count++) {
 		BTextWidget* widget1 = primary->WidgetFor(sort);
 		if (widget1 == NULL)
@@ -9303,19 +9326,19 @@ PoseCompareAddWidget(const BPose* p1, const BPose* p2, BPoseView* view)
 
 		result = widget1->Compare(*widget2, view);
 
-		if (count != 0)
+		// We either have a non-equal result, or are on the second iteration
+		// for secondary sort. Either way, return.
+		if (result != 0 || count != 0)
 			return result;
 
-		// do we need to sort by secondary attribute?
-		if (result == 0) {
-			sort = view->SecondarySort();
-			if (!sort)
-				return result;
+		// Non-equal result, sort by secondary attribute
+		sort = view->SecondarySort();
+		if (!sort)
+			return result;
 
-			column = view->ColumnFor(sort);
-			if (column == NULL)
-				return result;
-		}
+		column = view->ColumnFor(sort);
+		if (column == NULL)
+			return result;
 	}
 
 	return result;
