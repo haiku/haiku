@@ -2196,9 +2196,9 @@ BMenu::_ComputeLayout(int32 index, bool bestFit, bool moveItems,
 		if (dynamic_cast<_BMCMenuBar_*>(this) != NULL)
 			size.width = Bounds().Width() - fPad.right;
 		else if (Parent() != NULL)
-			size.width = Parent()->Frame().Width() + 1;
+			size.width = Parent()->Frame().Width();
 		else if (Window() != NULL)
-			size.width = Window()->Frame().Width() + 1;
+			size.width = Window()->Frame().Width();
 		else
 			size.width = Bounds().Width();
 	} else
