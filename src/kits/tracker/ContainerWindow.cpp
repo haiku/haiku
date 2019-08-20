@@ -1055,7 +1055,6 @@ BContainerWindow::InitLayout()
 	item->SetExplicitMaxSize(BSize(kCountViewWidth, B_SIZE_UNSET));
 
 	// Eliminate the extra borders
-	fMenuContainer->GroupLayout()->SetInsets(0, 0, -1, 0);
 	fPoseContainer->GridLayout()->SetInsets(-1, 0, -1, -1);
 	fCountContainer->GroupLayout()->SetInsets(0, -1, 0, 0);
 
