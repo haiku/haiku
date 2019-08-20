@@ -23,7 +23,7 @@ main(int argc, char** argv)
 	if (argc != 3) {
 		fprintf(stderr, "Usage: %s <device> <size>\n",
 			"Resize volume on <device> to new size <size> (in bytes, suffixes "
-			"'k', 'm', 'g', 't' are interpreted as KiB, Mib, GiB, TiB).\n"
+			"'k', 'm', 'g', 't' are interpreted as KiB, Mib, GiB, TiB).\n",
 			kProgramName);
 		return 1;
 	}
