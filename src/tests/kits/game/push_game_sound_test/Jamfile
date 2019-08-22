@@ -9,3 +9,8 @@ SimpleTest push_game_sound_sine
 	: push_game_sound_sine.cpp
 	: game be [ TargetLibsupc++ ]
 ;
+
+SimpleTest push_game_sound_triangle
+	: push_game_sound_triangle.cpp
+	: game be [ TargetLibsupc++ ]
+;
