@@ -146,6 +146,9 @@ BGameSoundDevice::CreateBuffer(gs_id* sound, const gs_audio_format* format,
 	if (frames <= 0 || !sound)
 		return B_BAD_VALUE;
 
+	// Make sure BMediaRoster is created before we AllocateSound()
+	BMediaRoster* roster = BMediaRoster::Roster();
+
 	status_t err = B_MEDIA_TOO_MANY_BUFFERS;
 	int32 position = AllocateSound();
 
@@ -153,7 +156,7 @@ BGameSoundDevice::CreateBuffer(gs_id* sound, const gs_audio_format* format,
 		fSounds[position] = new SimpleSoundBuffer(format, data, frames);
 
 		media_node systemMixer;
-		BMediaRoster::Roster()->GetAudioMixer(&systemMixer);
+		roster->GetAudioMixer(&systemMixer);
 		err = fSounds[position]->Connect(&systemMixer);
 	}
 
@@ -171,6 +174,9 @@ BGameSoundDevice::CreateBuffer(gs_id* sound, const void* object,
 	if (!object || !sound)
 		return B_BAD_VALUE;
 
+	// Make sure BMediaRoster is created before we AllocateSound()
+	BMediaRoster* roster = BMediaRoster::Roster();
+
 	status_t err = B_MEDIA_TOO_MANY_BUFFERS;
 	int32 position = AllocateSound();
 
@@ -179,7 +185,7 @@ BGameSoundDevice::CreateBuffer(gs_id* sound, const void* object,
 			inBufferFrameCount, inBufferCount);
 
 		media_node systemMixer;
-		BMediaRoster::Roster()->GetAudioMixer(&systemMixer);
+		roster->GetAudioMixer(&systemMixer);
 		err = fSounds[position]->Connect(&systemMixer);
 	}
 
