@@ -532,10 +532,7 @@ BSecureSocket::InitCheck()
 bool
 BSecureSocket::CertificateVerificationFailed(BCertificate&, const char*)
 {
-	// Until apps actually make use of the certificate API, let's keep the old
-	// behavior and accept all connections, even if the certificate validation
-	// didn't work.
-	return true;
+	return false;
 }
 
 
