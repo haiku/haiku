@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-BluetoothPrefs	67867884
+1	indonesian	x-vnd.Haiku-BluetoothPrefs	4276705900
 Laptop	Settings view		Leptop
 Only from trusted devices	Settings view		Hanya dari perangkat terpercaya
 15 secs	Settings view		15 detik
@@ -17,9 +17,11 @@ Stop bluetooth services…	Window		Menghentikan layanan bluetooth...
 Add…	Remote devices		Tambah...
 As blocked	Remote devices		Sebagai diblokir
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Tidak ada perangkat lokal Bluetooth terdaftar pada sistem.
+Policy…	Settings view		Kebijakan…
 Revert	Window		Pulihkan
 Refresh local devices…	Window		Refresh perangkat lokal...
 Disconnect	Remote devices		Memutuskan
+Identify us as…	Settings view		Identifikasi kami sebagai…
 From all devices	Settings view		Dari semua perangkat
 Defaults	Window		Bawaan
 Start bluetooth services…	Window		Mulai layanan bluetooth ...
@@ -28,12 +30,15 @@ Scanning progress	Inquiry panel		Proses pemindaian
 Bluetooth	System name		Bluetooth
 Launch now	main		Luncurkan sekarang
 Remove	Remote devices		Melepaskan
+Pick device…	Settings view		Pilih perangkat…
 Always ask	Settings view		Selalu tanya
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Dengan dukungan dari:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nTerima kasih secara khusu pada individu berikut…\n\nDonasi/mengirim perangkat kasar:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nSecara ekonomi:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nDengan tambalan:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nYang memberikan kepada saya banyak pengetahuan:\n - the yellowTAB team
 Help	Window		Tolong
 Pair…	Remote devices		Pasangkan...
 Retrieving name of %1	Inquiry panel		Mengambil nama dari %1
 Inquiry	Inquiry panel		Selidiki
 Incoming connections policy:	Settings view		Kebijakan koneksi masuk:
+Retrieving names…	Inquiry panel		Mengambil nama…
 Show name	Extended local device view		Tampilkan nama
 Add device to list	Inquiry panel		Tambah alat ke daftar
 Remaining %1 seconds	Inquiry panel		Sisa %1 detik
@@ -47,3 +52,4 @@ Server	Settings view		Server
 Handheld	Settings view		Perangkat genggam
  packets: 	Device View		 paket: 
 About Bluetooth…	Window		Tentang Bluetooth…
+Starting scan…	Inquiry panel		Mulai memindai…

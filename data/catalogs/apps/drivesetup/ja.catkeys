@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DriveSetup	791750172
+1	japanese	x-vnd.Haiku-DriveSetup	1934767996
 Could not unmount partition %s.	MainWindow		パーティション %s をマウント解除できませんでした。
 Mount all	MainWindow		すべてマウント
 Disk	MainWindow		ディスク
@@ -52,6 +52,7 @@ Wipe (not implemented)	MainWindow		ワイプ (実装されていません)
 The currently selected partition does not have a parent partition.	MainWindow		選択されたパーティションには親パーティションがありません。
 Validation of the given initialization parameters failed.	MainWindow		初期化パラメーターの検証に失敗しました
 Shared	PartitionList		共有
+MIMEs	PartitionList		MIME
 BitLocker encrypted	Encryption utils		BitLocker で暗号化された
 You need to select a partition entry from the list.	MainWindow		一覧からパーティションを一つ選択してください。
 Offset: %s	Support		オフセット: %s

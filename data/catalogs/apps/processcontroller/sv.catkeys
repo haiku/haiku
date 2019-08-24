@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ProcessController	4131818684
+1	swedish	x-vnd.Haiku-ProcessController	168752057
 Error saving file	ProcessController		Fel vid sparning av fil
 Display priority	ProcessController		Visningsprioritet
 That's no Fun!	ProcessController		Det var inte roligt!
@@ -45,5 +45,6 @@ Damned!	ProcessController		Attans!
 New Terminal	ProcessController		Ny terminal
 Power saving	ProcessController		Strömbesparing
 ProcessController is already installed in Deskbar.	ProcessController		ProcessKontroll är redan installerad i Deskbar.
+This is the last active processor…\nYou can't turn it off!	ProcessController		Detta är den sista aktiva processorn…\nDu kan inte stänga av den!
 This thread is already gone…	ProcessController		Tråden är redan avslutad
 Run in window	ProcessController		Kör i fönster

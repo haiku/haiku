@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	3957908772
+1	swedish	x-vnd.Haiku-HaikuDepot	2444426778
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ett fel inträffade vid uppdatering av repositoriet: %error%
 Check for updates…	MainWindow		Leta efter uppdateringar…
 Uninstall	PackageManager		Avinstallera
@@ -37,34 +37,49 @@ Login or Create account	MainWindow		Logga in eller skapa konto
 Ratings	PackageInfoView		Betyg
 Switch account…	MainWindow		Byt konto...
 Preferred language:	UserLoginWindow		Föredraget språk:
+Server Error	ServerHelper		Serverfel
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display.  Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Vid uppdatering av paketdata uppstod ett problem som kan göra att data visat i programemets vy är föråldrat eller saknas.  Ytterligare information om det här problemet kan hämtas från applikationsloggarna.
 It was not possible to contact the web service.	UserLoginWindow		Det gick inte att kontakta webb servicen.
 Name	PackageListView		Namn
+Local	LocalPkgDataLoadProcess		Lokal
 Rate %Package%	RatePackageWindow		Betyg %Package%
+An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Ett fel inträffade vid initiering av pakethanteraren: %message%
 Quit HaikuDepot	App		Avsluta HaikuDepot
+Repository Update Error	LocalRepositoryUpdateProcess		Fel vid uppdatering av repositoriet
 Category	FilterView		Kategori
 User rating	RatePackageWindow		Användarbetyg
 Installed packages	MainWindow		Installerade paket
+A requested object or an object involved in the request was not found on the server.	ServerHelper		Ett begärt objekt eller ett objekt involverat i begäran hittades inte på servern.
 Other users can see this rating	RatePackageWindow		Andra användare kan se denna bedömning
 Stable	RatePackageWindow		Stabil
+This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		Denna applikation är för gammal för att kommunicera med  HaikuDepot-serversystemet.  Få en nyare version av HaikuDepot  genom att uppdatera Haiku.  Den minsta versionen av  HaikuDepot som krävs är \ "% s \".
 Fatal error	PackageManager		Allvarligt fel
 Package action failed	PackageInfoView		Paketåtgärden misslyckades
 No changelog available.	PackageInfoView		Ingen ändringslogg finns.
 There are problems in the form:\n\n	UserLoginWindow		Det finns problem i formuläret:\n\n
+Error	App		Fel
 There was a puzzling response from the web service.	UserLoginWindow		Det komm ett konstigt meddelande från webb servicen.
 Not logged in	MainWindow		Inte inloggad
 No, quit HaikuDepot	App		Nej, avsluta HaikuDepot
+Featured packages	FeaturedPackagesView		Utvalda paket
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Ditt betyg har laddats upp. Du kan uppdatera eller ta bort det på webbplatsen för HaikuDepot-servern.
+Network Error	ServerHelper		Nätverksfel
 Available	PackageListView		Tillgänglig
 Cancel	UserLoginWindow		Avbryt
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Servicen behövs för HaikuDepot och den verkar inte köra.\nSkulle du vilja starta den nu?
 Click a package to view information	PackageInfoView		Klicka på ett paket för att se information
 Contents	PackageInfoView		Innehåll
 Close	PackageManager		Stäng
+A network transport error has arisen communicating with the HaikuDepot server system: %s	ServerHelper		Ett nättransportfel har uppstått i kommunikationen med HaikuDepot-serversystemet: %s
 Changelog	PackageInfoView		Ändringslogg
 Rating not possible	MainWindow		Betyg ej möjligt
 About	PackageInfoView		Om
 Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Autentisering misslyckades. Användaren finns inte eller så är fel lösenord angivet.
+%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processer}}
+Reboot required	PackageManager		Omstart krävs
 Very unstable	RatePackageWindow		Mycket ostabil
+All packages	PackageListView		Alla paket
+Network Transport Error	ServerHelper		Nättransportfel
 Stability	RatePackageWindow		Stabilitet
 Send	RatePackageWindow		Skicka
 Start package daemon	App		Starta paket-servicen
@@ -72,17 +87,20 @@ The password is too weak or invalid. Please use at least 8 characters with at le
 The package action could not be scheduled: %Error%	PackageInfoView		Paket körningen kunde inte planeras: %Error%
 Cancel	RatePackageWindow		Avbryt
 Inactive	PackageListView		Inaktiv
+Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synkroniserar metadata från repositorier
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# enhet} other{# enheter}}
 OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Mestadels stabil
 Success	UserLoginWindow		Klar
+It responded with: %message%	UserLoginWindow		Den svarade med: %message%
 Package daemon problem	App		Problem med paketdemonen
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Repositorie
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (version %hd.version%)
 Close	UserLoginWindow		Stäng
 Close	RatePackageWindow		Stäng
+Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synkroniserar paketdata för repositoriet '%REPO_NAME%'
 Failed to create account: %s\n	UserLoginWindow		Misslyckades skapa konto: %s\n
 Size	PackageListView		Storlek
 Your rating:	RatePackageWindow		Dina betyg:
@@ -91,8 +109,10 @@ All categories	FilterView		Alla kategorier
 Repositories	MainWindow		Repositorier
 n/a	PackageInfoView		oviktigt
 Cancel	MainWindow		Avbryt
+{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 kvar att ladda hem)}other{(# kvar att ladda hem)}}
 Refresh repositories	MainWindow		Ladda om repositorier
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Om du inte anger en e-mail adress, kommer du inte kunna återställa ditt lösenord om du glömmer det.
+Package Update Error	MainWindow		Paketuppdateringsfel
 Tools	MainWindow		Verktyg
 The passwords do not match.	UserLoginWindow		Lösenorden stämmer inte överens.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Det här paketet verkar inte finnas på HaikuDepot-servern, så det är inte möjligt att skapa ett nytt betyg eller redigera ett befintligt betyg.
@@ -103,9 +123,13 @@ Comment language:	RatePackageWindow		Kommentarspråk:
 Status	PackageListView		Status
 The username is already taken. Please choose another.	UserLoginWindow		Användarnamnet används redan. Välj ett annat.
 Update	RatePackageWindow		Uppdatera
+OK	ServerHelper		OK
 Language	UserLoginWindow		Språk
 OK	UserLoginWindow		OK
+Reading repository data	LocalPkgDataLoadProcess		Läser repositoriedata
+Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Synkroniserar referensdata från server
 Stability:	RatePackageWindow		Stabilitet:
+A validation error has occurred	ServerHelper		Ett valideringsfel har inträffat
 The captcha puzzle needs to be solved.	UserLoginWindow		Captcha pusslet behöver lösas.
 Source packages	MainWindow		Källkodspaket
 -	no package size		-
@@ -120,19 +144,24 @@ Logged in as %User%	MainWindow		Inloggad som %User%
 Email address:	UserLoginWindow		E-postadress:
 Screenshot	ScreenshotWindow		Skärmdump
 HaikuDepot	System name		HaikuDepot
+A reboot is necessary to complete the installation process.	PackageManager		En omstart är nödvändig för att slutföra installationsprocessen.
 Search terms:	FilterView		Sökvillkor
 Pending…	PackageListView		Väntar...
 Repeat pass phrase:	UserLoginWindow		Upprepa lösenord:
 Category:	FilterView		Kategori:
 Authentication failed	UserLoginWindow		Autentisering misslyckades
 Manage repositories…	MainWindow		Hantera repositorier...
+Fetching remote repository data	LocalRepositoryUpdateProcess		Hämtar fjärrdata från repositorie
 Description	PackageListView		Beskrivning
 Pass phrase:	UserLoginWindow		Lösen fras:
 Open %DeskbarLink%	PackageManager		Öppna %DeskbarLink%
 Install	PackageManager		Installera
 Input validation	UserLoginWindow		Ogiltigt indata
+An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Ett oväntat fel har skickats från HaikuDepot-servern [%i]
 Log in…	MainWindow		Logga in...
 You need to be logged into an account before you can rate packages.	MainWindow		Du måste logga in för att kunna betygsätta paket.
+Client version too old	ServerHelper		Klientversionen är för gammal
+Authorization or security issue	ServerHelper		Autoriserings- eller säkerhetsproblem
 9999.99 KiB	PackageListView		9999.99 KiB
 All repositories	MainWindow		Alla repositorier
 %Version%	PackageInfoView		%Version%

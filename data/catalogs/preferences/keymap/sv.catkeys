@@ -21,8 +21,8 @@ Belgian (point)	KeymapNames		Belgiska (punkt)
 Finnish	KeymapNames		Finska
 Num lock	Keyboard Layout View		Num lock
 Switch shortcut keys to Windows/Linux mode	Keymap window		Byt snabbtangentsknapp till Windows/Linux-standard
-Option	Keyboard Layout View	Option key	Alternativ
 Spanish (Dvorak)	KeymapNames		Spanska (Dvorak)
+Option	Keyboard Layout View	Option key	Alternativ
 Scroll lock	Keyboard Layout View		Scroll lock
 US-International	KeymapNames		US-Internationell
 Right option	Keyboard Layout View		Höger alternativ
@@ -82,12 +82,12 @@ Caps lock	Keyboard Layout View		Caps Lock
 Left shift	Keyboard Layout View		Vänster skift
 Russian (Yawert)	KeymapNames		Ryska (yawert)
 Bulgarian (Cyrillic)	KeymapNames		Bulgariska (Kyrillisk)
-Left control	Keyboard Layout View		vänster control
 Swedish	KeymapNames		Svenska
+Left control	Keyboard Layout View		vänster control
 CAPS	Keyboard Layout View	Very short for 'caps lock'	CAPS
 Role	Modifier keys window	As in the role of a modifier key	Roll
-German	KeymapNames		Tyska
 Svorak	KeymapNames		Dvorak
+German	KeymapNames		Tyska
 Swiss-German	KeymapNames		Schweizisk tyska
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl-tangent
 Czech	KeymapNames		Tjeckiska
@@ -96,8 +96,8 @@ Thai (TIS-820.2538)	KeymapNames		Thai (TIS-820.2538)
 Control:	Modifier keys window	Control key role name	Kontroll:
 Disabled	Modifier keys window	Do nothing	Inaktiverad
 Select dead keys	Keymap window		Markera döda tangenter
-Right shift	Keyboard Layout View		Höger skift
 Russian (Mac)	KeymapNames		Ryska (Mac)
+Right shift	Keyboard Layout View		Höger skift
 ESC	Keyboard Layout View		ESC
 Belarusian (Latin)	KeymapNames		Vitryska (Latin)
 Hebrew	KeymapNames		Hebreiska
@@ -129,18 +129,18 @@ Defaults	Keymap window		Standardvärde
 ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		System:
 Switch shortcut keys	Keymap window		Switch shortcut keys
-Belgian (comma)	KeymapNames		Belgiska (komma)
 Right command	Keyboard Layout View		Höger kommando
 NUM LOCK	Keyboard Layout View		NUM LOCK
 MENU	Keyboard Layout View		MENU
+Belgian (comma)	KeymapNames		Belgiska (komma)
 Norwegian	KeymapNames		Norska
 Font	Keymap window		Typsnitt
 Danish	KeymapNames		Danska
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Skifttangent
-PAUSE	Keyboard Layout View		PAUSE
 Russian	KeymapNames		Ryska
-CMD	Keyboard Layout View	Very short for 'command'	CMD
+PAUSE	Keyboard Layout View		PAUSE
 Romanian	KeymapNames		Rumänska
+CMD	Keyboard Layout View	Very short for 'command'	CMD
 Command	Keyboard Layout View	Command key	Kommando
 SCROLL	Keyboard Layout View		SCROLL
 File	Keymap window		Arkiv

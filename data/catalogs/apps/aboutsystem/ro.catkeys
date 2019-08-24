@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-About	3963412481
+1	romanian	x-vnd.Haiku-About	3515404468
 Revision	AboutView		Revizie
 The Haikuware team and their bounty program\n	AboutView		Echipa Haikuware și programul lor de recompense\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Toate drepturile rezervate.
@@ -19,7 +19,6 @@ Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter H
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Codul unic Haiku, în special nucleul și tot codul la care aplicațiile pot face legături, este distribuit sub termenii <MIT license>. Unele librării de sistem pot conține cod de la părți terțe distribuit prin <LGPL license>. Puteți găsi drepturile de autor ale codului părților terțe mai jos.\n\n
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Copyright © 1996-1997 Jeff Prosise. Toate drepturile rezervate.
 Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Copyright © 1999-2006 Brian Paul. Proiectul Mesa3D. Toate drepturile rezervate.
-Copyright © 2000-2014 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2014 Fabrice Bellard, și alții.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Copyright © 2010-2011 Google Inc. Toate drepturile rezervate.
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nToate drepturile rezervate.
 Past maintainers:\n	AboutView		Responsabili anteriori:\n
@@ -35,7 +34,6 @@ Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyrigh
 GNU LGPL v2	AboutWindow		GNU LGPL v2
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. Acest program se bazează pe munca Grupului Independent JPEG.
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fondator proiect)\n\n
-Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Conține programe dezvoltate de Fundația NetBSD, Inc. și contribuitorii acesteia:\nftp, tput\nCopyright © 1996-2008 Fundația NetBSD, Inc. Toate drepturile rezervate.
 BSD (3-clause)	AboutWindow		BSD (clauza 3)
 About this system	AboutWindow		Despre acest sistem
 %d MiB used (%d%%)	AboutView		%d MiB utilizați (%d%%)

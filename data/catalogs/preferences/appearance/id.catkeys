@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Appearance	583615507
+1	indonesian	x-vnd.Haiku-Appearance	663472720
 Control border	Colors tab		Kontrol batas
 Control mark	Colors tab		Penanda kontrol
 Off	AntialiasingSettingsView		Mati
@@ -8,10 +8,12 @@ Defaults	APRWindow		Defaults
 Shadow	Colors tab		Bayangan
 Document background	Colors tab		Latarbelakang dokumen
 List background	Colors tab		Latar-belakang daftar
+No effect on running applications	DecorSettingsView		Tidak berpengaruh pada aplikasi berjalan
 Fixed font:	Font view		Fon tetap:
 Appearance	System name		Penampilan
 Reduce colored edges filter strength:	AntialiasingSettingsView		Mengurangi kekuatan filter batas berwarna :
 Glyph hinting:	AntialiasingSettingsView		Glyph hinting:
+Default Haiku ControlLook	DecorSettingsView		Bawaan Haiku ControlLook
 Menu item text	Colors tab		Teks daftar item
 About decorator	DecorSettingsView		Tentang dekorator
 Antialiasing menu	AntialiasingSettingsView		Menu antialias
@@ -47,7 +49,9 @@ LCD subpixel	AntialiasingSettingsView		Subpiksel LCD
 Window tab	Colors tab		Tab jendela
 Link text	Colors tab		Link teks
 Tooltip background	Colors tab		Latarbelakang tooltip
+ControlLook:	DecorSettingsView		ControlLook:
 Scroll bar thumb	Colors tab		Scroll bar thumb
+Default	DecorSettingsView		Standar
 Link visited	Colors tab		Tautan yang dikunjungi
 Selected menu item border	Colors tab		Batas daftar item terpilih
 Tooltip text	Colors tab		Teks tooltip
@@ -63,10 +67,12 @@ Antialiasing type:	AntialiasingSettingsView		Tipe antialiasing:
 Panel text	Colors tab		Teks panel
 Hinting menu	AntialiasingSettingsView		Menu isyarat
 Scroll bar:	DecorSettingsView		Scroll bar:
+Choose ControlLook	DecorSettingsView		Memilih ControlLook
 Monospaced fonts only	AntialiasingSettingsView		Hanya fon monospace
 Document text	Colors tab		Teks dokumen
 Inactive window border	Colors tab		Batas jendela non-aktif
 Colors	APRWindow		Warna
+About control look	DecorSettingsView		Tentang controlLook
 Control highlight	Colors tab		Kontrol sorot
 Status bar	Colors tab		Status bar
 Link hover	Colors tab		Link melayang

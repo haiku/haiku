@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-About	3963412481
+1	russian	x-vnd.Haiku-About	3515404468
 Revision	AboutView		Ревизия
 The Haikuware team and their bounty program\n	AboutView		Команде Haikuware и их программе пожертвований\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Все права защищены © 1999-2007 Michael C. Ring.
@@ -19,7 +19,6 @@ Copyright © 2003 Peter Hanappe and others.	AboutView		Все права защ�
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Код, написанный специально для Haiku, особенно ядро и весь код, с которым могут быть связаны приложения, распространяется на условиях <MIT license>. Некоторые системные библиотеки содержат сторонний код, распространяемый под <LGPL license>. Вы можете найти авторские права на этот код ниже.\n\n
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Все права защищены © 1996-1997 Jeff Prosise.
 Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Все права защищены © 1999-2006 Brian Paul. Проект Mesa3D.
-Copyright © 2000-2014 Fabrice Bellard, et al.	AboutView		Все права защищены © 2000-2014 Fabrice Bellard и другие.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Все права защищены © 2010-2011 Google Inc.
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Все права защищены © 1987-1988 Digital Equipment Corporation, Мейнард, Массачусетс.
 Past maintainers:\n	AboutView		Предыдущие разработчики:\n
@@ -35,7 +34,6 @@ Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Все �
 GNU LGPL v2	AboutWindow		GNU LGPL v2
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Все права защищены © 1994-2009, Thomas G. Lane, Guido Vollbeding. Это программное обеспечение частично основано на работе Independent JPEG Group.
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (основателю проекта)\n\n
-Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Содержит программное обеспечение, разработанное NetBSD Foundation, Inc и его сотрудниками:\nftp, tput\nВсе права защищены © 1996-2008 NetBSD Foundation, Inc.
 BSD (3-clause)	AboutWindow		BSD (3-х пунктная)
 About this system	AboutWindow		Об этой системе
 %d MiB used (%d%%)	AboutView		%d МБ использовано (%d%%)

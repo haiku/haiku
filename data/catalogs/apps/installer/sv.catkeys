@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Installer	1997609102
+1	swedish	x-vnd.Haiku-Installer	116830250
 Performing installation.	InstallProgress		Verkställer installationen.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Välj källdisk från menyn. Klicka sedan på \"Starta\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Var god stäng Diskhanteringsfönstret innan du stänger fönstret för Installeraren.
@@ -27,6 +27,7 @@ Running Boot Manager…\n\nClose Boot Manager to continue with the installation.
 Quit DriveSetup	InstallerWindow		Avsluta DiskHantering
 Write boot sector	InstallerWindow		Skriv bootsektor
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld av %2ld
+Finishing installation.	InstallProgress		Slutför installationen.
 Install from:	InstallerWindow		Installera från:
 Additional disk space required: 0.0 KiB	InstallerWindow		Ytterligare nödvändigt diskutrymme: 0.0 KiB
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Detta är programvara av betakvalitet! Det betyder att det finns risk för att du förlorar viktig data. Gör frekventa säkerhetskopior! Du har blivit varnad.\n\n\n
@@ -39,6 +40,8 @@ Hide optional packages	InstallerWindow		Göm valbara paket
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Ha det så kul och tack för att du provar Haiku!
 Quit	InstallerApp		Avsluta
+Starting installation.	InstallProgress		Påbörjar installationen.
+Error writing boot sector.	InstallProgress		Fel vid skrivning av bootsektorn.
 OK	InstallerWindow		OK
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Vänligen stäng Starthanterarens- och DiskHanterings fönster innan du stänger Installerarens fönster.
 Failed to launch Boot Manager	InstallerWindow		Kunde inte starta Boot Manager

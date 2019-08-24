@@ -21,8 +21,8 @@ Belgian (point)	KeymapNames		Belgisch (Point)
 Finnish	KeymapNames		Finnisch
 Num lock	Keyboard Layout View		Num-Feststelltaste
 Switch shortcut keys to Windows/Linux mode	Keymap window		Befehlstasten tauschen: Windows/Linux-Modus
-Option	Keyboard Layout View	Option key	Option
 Spanish (Dvorak)	KeymapNames		Spanisch (Dvorak)
+Option	Keyboard Layout View	Option key	Option
 Scroll lock	Keyboard Layout View		Rollen-Feststelltaste
 US-International	KeymapNames		US International
 Right option	Keyboard Layout View		Option rechts
@@ -82,12 +82,12 @@ Caps lock	Keyboard Layout View		Hochstelltaste
 Left shift	Keyboard Layout View		Shift left
 Russian (Yawert)	KeymapNames		Russisch (Yawert)
 Bulgarian (Cyrillic)	KeymapNames		Bulgarisch (Kyrillisch)
-Left control	Keyboard Layout View		Steuerung links
 Swedish	KeymapNames		Schwedisch
+Left control	Keyboard Layout View		Steuerung links
 CAPS	Keyboard Layout View	Very short for 'caps lock'	FEST
 Role	Modifier keys window	As in the role of a modifier key	Funktion
-German	KeymapNames		Deutsch
 Svorak	KeymapNames		Svorak
+German	KeymapNames		Deutsch
 Swiss-German	KeymapNames		Schweizerdeutsch
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Strg-Taste
 Czech	KeymapNames		Tschechisch
@@ -96,8 +96,8 @@ Thai (TIS-820.2538)	KeymapNames		Thai (TIS-820.2538)
 Control:	Modifier keys window	Control key role name	Steuerung:
 Disabled	Modifier keys window	Do nothing	Deaktiviert
 Select dead keys	Keymap window		Auslösetasten definieren
-Right shift	Keyboard Layout View		Shift rechts
 Russian (Mac)	KeymapNames		Russisch (Mac)
+Right shift	Keyboard Layout View		Shift rechts
 ESC	Keyboard Layout View		ESC
 Belarusian (Latin)	KeymapNames		Weißrussisch (lat. Alphabet)
 Hebrew	KeymapNames		Hebräisch
@@ -129,18 +129,18 @@ Defaults	Keymap window		Standardwerte
 ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		System:
 Switch shortcut keys	Keymap window		Befehlstasten tauschen
-Belgian (comma)	KeymapNames		Belgisch (Komma)
 Right command	Keyboard Layout View		Befehl rechts
 NUM LOCK	Keyboard Layout View		NUM LOCK
 MENU	Keyboard Layout View		MENÜ
+Belgian (comma)	KeymapNames		Belgisch (Komma)
 Norwegian	KeymapNames		Norwegisch
 Font	Keymap window		Schriftart
 Danish	KeymapNames		Dänisch
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift-Taste
-PAUSE	Keyboard Layout View		PAUSE
 Russian	KeymapNames		Russisch
-CMD	Keyboard Layout View	Very short for 'command'	BEF
+PAUSE	Keyboard Layout View		PAUSE
 Romanian	KeymapNames		Rumänisch
+CMD	Keyboard Layout View	Very short for 'command'	BEF
 Command	Keyboard Layout View	Command key	Befehl
 SCROLL	Keyboard Layout View		ROLLEN
 File	Keymap window		Datei

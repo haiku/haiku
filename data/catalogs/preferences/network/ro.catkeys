@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Network	3284324275
+1	romanian	x-vnd.Haiku-Network	943149646
 Ethernet device	InterfaceListItem		Dispozitiv Ethernet
 Link speed:	IntefaceView		Viteză legătură:
 disconnected	IntefaceView		deconectat
@@ -14,7 +14,6 @@ Gateway:	IntefaceAddressView		Gateway:
 The netmask defines your local network	IntefaceAddressView		Masca de rețea definește rețeaua locală
 Your IP address	IntefaceAddressView		Adresă IP
 DHCP	IntefaceAddressView		DHCP
-Dial Up	NetworkWindow		Dial Up
 Netmask:	IntefaceAddressView		Mască rețea:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Servicii
@@ -23,7 +22,6 @@ Revert	NetworkWindow		Revenire
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<nu s-au găsit rețele wireless>
 connected	IntefaceView		conectat
-VPN	NetworkWindow		VPN
 Apply	IntefaceAddressView		Aplică
 Disable	ServiceView		Dezactivare
 WPA2	WPA2 protected network		WPA2

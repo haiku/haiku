@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Be-MAIL	1865394837
+1	swedish	x-vnd.Be-MAIL	3155788869
 Set to Saved	Mail		Set till Sparad
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Din text innehåller %ld tecken som inte kan hanteras. En annan teckenuppsättning kanske skulle fungera bättre? Klicka Skicka för att skicka det ändå (Ersättnings tecken kommer att användas till de tecken som inte kunde översättas), eller välj avbryt och försök att fixa felet.
 Text wrapping:	Mail		Textradbrytning:
@@ -8,6 +8,7 @@ Reply	Mail		Svara
 Next message	Mail		Nästa meddelande
 Mailing	Mail		e-post
 Unread	Mail		Oläst
+Same sender	Mail		Samma avsändare
 Copy to new	Mail		Kopiera till ny
 Save as draft	Mail		Spara som utkast
 Encoding:	Mail		Kodning:
@@ -31,6 +32,7 @@ Only files can be added as attachments.	Mail		Endast filer kan läggas till som 
 Close	Mail		Stäng
 Untitled	Mail		Namnlös
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Att ta bort bilaga från ett mail som skickats vidare är inte implementerat än!\nDet kommer inte att fungera som det ska.
+Same recipient	Mail		Samma mottagare
 Previous message	Mail		Föregående meddelande
 (Address unavailable)	Mail		(Adresser kunde inte nås)
 Mail	System name		E-post
@@ -83,6 +85,7 @@ Colored quotes:	Mail		Färglagda citeringar:
 Automatic	Mail		Automatiskt
 Open this link	Mail		Öppna denna länk
 Auto signature:	Mail		Autosignatur:
+Same subject	Mail		Samma ämne
 Send	Mail		Skicka
 Open draft	Mail		Öppna utkast
 Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Lämna som 'Ny'

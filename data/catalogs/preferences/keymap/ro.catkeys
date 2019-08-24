@@ -18,8 +18,8 @@ Belgian (point)	KeymapNames		Belgiană (punct)
 Finnish	KeymapNames		Finlandeză
 Num lock	Keyboard Layout View		Num lock
 Switch shortcut keys to Windows/Linux mode	Keymap window		Schimbă scurtăturile la modul Windows/Linux
-Option	Keyboard Layout View	Option key	Opțiune
 Spanish (Dvorak)	KeymapNames		Spaniolă (Dvorak)
+Option	Keyboard Layout View	Option key	Opțiune
 Scroll lock	Keyboard Layout View		Scroll lock
 US-International	KeymapNames		US-internațional
 Right option	Keyboard Layout View		Opțiune dreapta
@@ -68,11 +68,11 @@ Caps lock	Keyboard Layout View		Caps lock
 Left shift	Keyboard Layout View		Shift stânga
 Russian (Yawert)	KeymapNames		Rusă (Yawert)
 Bulgarian (Cyrillic)	KeymapNames		Bulgară (Chirilică)
-Left control	Keyboard Layout View		Control stânga
 Swedish	KeymapNames		Suedeză
+Left control	Keyboard Layout View		Control stânga
 Role	Modifier keys window	As in the role of a modifier key	Rol
-German	KeymapNames		Germană
 Svorak	KeymapNames		Svorak
+German	KeymapNames		Germană
 Swiss-German	KeymapNames		Germană elvețiană
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Tasta Ctrl
 Czech	KeymapNames		Cehă
@@ -80,8 +80,8 @@ Russian (Udmurt, Komi, Mari)	KeymapNames		Rusă (Udmurt, Komi, Mari)
 Control:	Modifier keys window	Control key role name	Control:
 Disabled	Modifier keys window	Do nothing	Dezactivat
 Select dead keys	Keymap window		Selectează chei moarte
-Right shift	Keyboard Layout View		Shift dreapta
 Russian (Mac)	KeymapNames		Rusă (Mac)
+Right shift	Keyboard Layout View		Shift dreapta
 Belarusian (Latin)	KeymapNames		Belarusă (Latină)
 Hebrew	KeymapNames		Ebraică
 Layout	Keymap window		Aranjament
@@ -110,8 +110,8 @@ Defaults	Keymap window		Implicite
 ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		Sistem:
 Switch shortcut keys	Keymap window		Schimbă scurtături
-Belgian (comma)	KeymapNames		Belgiană (virgulă)
 Right command	Keyboard Layout View		Comanda dreaptă
+Belgian (comma)	KeymapNames		Belgiană (virgulă)
 Norwegian	KeymapNames		Norvegiană
 Font	Keymap window		Font
 Danish	KeymapNames		Daneză

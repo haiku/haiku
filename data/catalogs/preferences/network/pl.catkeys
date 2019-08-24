@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Network	3284324275
+1	polish	x-vnd.Haiku-Network	943149646
 Ethernet device	InterfaceListItem		Urządzenie ethernetowe
 Link speed:	IntefaceView		Prędkość połączenia:
 disconnected	IntefaceView		rozłączone
@@ -14,7 +14,6 @@ Gateway:	IntefaceAddressView		Brama:
 The netmask defines your local network	IntefaceAddressView		Maska sieci definiuje twoją sieć lokalną
 Your IP address	IntefaceAddressView		Twój adres IP
 DHCP	IntefaceAddressView		DHCP
-Dial Up	NetworkWindow		Wdzwaniane
 Netmask:	IntefaceAddressView		Maska sieci:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Usługi
@@ -23,7 +22,6 @@ Revert	NetworkWindow		Cofnij
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<nie znaleziono sieci bezprzewodowych>
 connected	IntefaceView		połączone
-VPN	NetworkWindow		VPN
 Apply	IntefaceAddressView		Zastosuj
 Disable	ServiceView		Wyłącz
 WPA2	WPA2 protected network		WPA2

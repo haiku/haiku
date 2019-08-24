@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-About	3963412481
+1	indonesian	x-vnd.Haiku-About	3515404468
 Revision	AboutView		Revisi
 The Haikuware team and their bounty program\n	AboutView		Tim Haikuware dan Program hadiah mereka\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Hak Cipta © 1999-2007 Michael C. Ring. Hak cipta dilindungi undang-undang.
@@ -19,7 +19,6 @@ Copyright © 2003 Peter Hanappe and others.	AboutView		Hak Cipta © 2003 Peter H
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Kode yang unik untuk Haiku, terutama kernel dan semua kode yang aplikasi dapat terhubung dengannya, didistribusikan di bawah ketentuan <MIT license>. Beberapa sistem pustaka berisi kode pihak ketiga didistribusikan di bawah <LGPL lisensi>. Anda dapat menemukan hak cipta untuk kode pihak ketiga di bawah.\n\n
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Hak Cipta © 1996-1997 Jeff Prosise. Hak cipta dilindungi undang-undang.
 Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Hak Cipta © 1999-2006 Brian Paul. Proyek Mesa3D. Hak cipta dilindungi undang-undang.
-Copyright © 2000-2014 Fabrice Bellard, et al.	AboutView		Hak Cipta © 2000-2014 Fabrice Bellard, et al.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Hak cipta © 2010-2011 Google Inc. Hak cipta dilindungi undang-undang.
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Hak cipta © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nHak cipta dilindungi undang-undang.
 Past maintainers:\n	AboutView		Pengelola yang lalu:\n
@@ -35,7 +34,6 @@ Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Hak cipt
 GNU LGPL v2	AboutWindow		GNU LGPL v2
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Hak Cipta © 1994-2009, Thomas G. Lane, Guido Vollbeding. Perangkat lunak ini sebagian didasarkan pada karya Independent JPEG Group.
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (pendiri proyek)\n\n
-Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Berisi perangkat lunak yang dikembangkan oleh NetBSD Foundation, Inc. dan kontributornya:\nftp, tput\nHak cipta © 1996-2008 The NetBSD Foundation, Inc. Hak cipta dilindungi undang-undang.
 BSD (3-clause)	AboutWindow		BSD (3-clause)
 About this system	AboutWindow		Tentang sistem ini
 %d MiB used (%d%%)	AboutView		%d MiB terpakai (%d%%)

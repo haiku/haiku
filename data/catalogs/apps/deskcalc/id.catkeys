@@ -1,4 +1,14 @@
-1	indonesian	x-vnd.Haiku-DeskCalc	1694821448
+1	indonesian	x-vnd.Haiku-DeskCalc	3577885628
+7   8   9   (   )  \n4   5   6   *   /  \n1   2   3   +   -  \n0   .   BS  =   C  \n	CalcView		7   8   9   (   )  \n4   5   6   *   /  \n1   2   3   +   -  \n0   .   BS  =   C  \n
+C	CalcView	Key label, 'C' means clear	C
+ceil	CalcView		ceil
+cbrt	CalcView		cbrt
+BS	CalcView	Key label, 'BS' means backspace	BS
+floor	CalcView		floor
+sin	CalcView		sin
+sinh	CalcView		sinh
+tanh	CalcView		tanh
+cosh	CalcView		cosh
 Compact	CalcView		Ringkas
 Calculating	CalcView		Menghitung
 Enable Num Lock on startup	CalcView		Aktifkan Num Lock pada saat mulai

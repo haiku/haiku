@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	3697446690
+1	german	x-vnd.Haiku-HaikuDepot	2444426778
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Fehler bei der Aktualisierung der Paketquelle: %error%
 Check for updates…	MainWindow		Aktualisierungen suchen…
 Uninstall	PackageManager		Deinstallieren
@@ -160,6 +160,7 @@ Input validation	UserLoginWindow		Eingabeprüfung
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Der HaikuDepot Server hat einen unerwarteten Fehler gesandt [%i]
 Log in…	MainWindow		Anmelden…
 You need to be logged into an account before you can rate packages.	MainWindow		Nur angemeldete Benutzer können Pakete bewerten.
+Client version too old	ServerHelper		Client Version zu alt
 Authorization or security issue	ServerHelper		Authentifizierungs- oder Sicherheitsproblem
 9999.99 KiB	PackageListView		9999.99 KiB
 All repositories	MainWindow		Alle Paketquellen

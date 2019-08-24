@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-About	104781418
+1	korean	x-vnd.Haiku-About	2319114422
 Revision	AboutView		리비젼
 The Haikuware team and their bounty program\n	AboutView		Haikuware 팀과 그들의 현상금 프로그램\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. All rights reserved.
@@ -27,7 +27,6 @@ Time running:	AboutView		실행 시간:
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. All rights reserved.
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. 이 소프트웨어는 부분적으로 독랍적  JPEG 그룹의 작업에 기반을 두고 잇습니다.
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (프로젝트 창시자)\n\n
-Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		포함된 소프트웨어 중에서 NetBSD 재단,Inc과 그들의 공현자들에게서 온 것:\nftp,tput\nCopyright © 1996-2008 FreeBSD 재단. All rights reserved.
 About this system	AboutWindow		시스템 정보
 %d MiB used (%d%%)	AboutView		%d 메비바이트 사용 (%d%%)
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.

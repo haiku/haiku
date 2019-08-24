@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	3697446690
+1	japanese	x-vnd.Haiku-HaikuDepot	2444426778
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
 Check for updates…	MainWindow		更新をチェック…
 Uninstall	PackageManager		アンインストール
@@ -160,6 +160,7 @@ Input validation	UserLoginWindow		入力検証
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		予期しないエラーが次の HaikuDepot サーバーから送信されました [%i]
 Log in…	MainWindow		ログイン…
 You need to be logged into an account before you can rate packages.	MainWindow		パッケージを評価する前にアカウントにログインする必要があります。
+Client version too old	ServerHelper		クライアントのバージョンが古すぎます
 Authorization or security issue	ServerHelper		認証またはセキュリティの問題
 9999.99 KiB	PackageListView		9999.99 KiB
 All repositories	MainWindow		すべてのリポジトリ

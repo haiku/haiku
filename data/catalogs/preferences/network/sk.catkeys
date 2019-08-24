@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Network	3284324275
+1	slovak	x-vnd.Haiku-Network	943149646
 Ethernet device	InterfaceListItem		Ethernetové zariadenie
 Link speed:	IntefaceView		Rýchlosť linky:
 disconnected	IntefaceView		odpojené
@@ -14,7 +14,6 @@ Gateway:	IntefaceAddressView		Brána:
 The netmask defines your local network	IntefaceAddressView		Sieťová maska definuje vašu lokálnu sieť
 Your IP address	IntefaceAddressView		Vaša adresa IP
 DHCP	IntefaceAddressView		DHCP
-Dial Up	NetworkWindow		Vytáčané pripojenie Dial-Up
 Netmask:	IntefaceAddressView		Sieťová maska:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Služby
@@ -23,7 +22,6 @@ Revert	NetworkWindow		Vrátiť
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<neboli nájdené žiadne bezdrôtové siete>
 connected	IntefaceView		pripojené
-VPN	NetworkWindow		VPN
 Apply	IntefaceAddressView		Použiť
 Disable	ServiceView		Zakázať
 WPA2	WPA2 protected network		WPA2

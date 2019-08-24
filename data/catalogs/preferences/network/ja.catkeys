@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Network	1741006816
+1	japanese	x-vnd.Haiku-Network	3694799483
 Ethernet device	InterfaceListItem		イーサネットデバイス
 Link speed:	IntefaceView		リンクスピード:
 disconnected	IntefaceView		切断済み
@@ -14,7 +14,6 @@ Gateway:	IntefaceAddressView		ゲートウェイ:
 The netmask defines your local network	IntefaceAddressView		ネットマスクはローカルネットワークを定義します
 Your IP address	IntefaceAddressView		このコンピューターの IP アドレス
 DHCP	IntefaceAddressView		DHCP
-Dial Up	NetworkWindow		ダイアルアップ
 Netmask:	IntefaceAddressView		ネットマスク:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		サービス
@@ -25,7 +24,6 @@ WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<無線ネットワークが見つかりません>
 Enable	IntefaceView		有効
 connected	IntefaceView		接続済み
-VPN	NetworkWindow		VPN
 Apply	IntefaceAddressView		適用
 Disable	ServiceView		無効
 WPA2	WPA2 protected network		ネットマスクはローカルネットワークを定義します

@@ -18,8 +18,8 @@ Belgian (point)	KeymapNames		Belga (punto)
 Finnish	KeymapNames		Finlandese
 Num lock	Keyboard Layout View		Bloc Num
 Switch shortcut keys to Windows/Linux mode	Keymap window		Modalità tasti di scelta rapida: Windows/Linux
-Option	Keyboard Layout View	Option key	Option
 Spanish (Dvorak)	KeymapNames		Spagnolo (Dvorak)
+Option	Keyboard Layout View	Option key	Option
 Scroll lock	Keyboard Layout View		Blocca scorrimento
 US-International	KeymapNames		US-Internazionale
 Right option	Keyboard Layout View		Option destro
@@ -68,11 +68,11 @@ Caps lock	Keyboard Layout View		Bloc Maiusc
 Left shift	Keyboard Layout View		Maiusc sinistro
 Russian (Yawert)	KeymapNames		Russo (Yawert)
 Bulgarian (Cyrillic)	KeymapNames		Bulgaro (Cirillico)
-Left control	Keyboard Layout View		Tasto control sinistro
 Swedish	KeymapNames		Svedese
+Left control	Keyboard Layout View		Tasto control sinistro
 Role	Modifier keys window	As in the role of a modifier key	Ruolo
-German	KeymapNames		Tedesco
 Svorak	KeymapNames		Svorak
+German	KeymapNames		Tedesco
 Swiss-German	KeymapNames		Tedesco (Svizzera)
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Tasto Ctrl
 Czech	KeymapNames		Ceco
@@ -80,8 +80,8 @@ Russian (Udmurt, Komi, Mari)	KeymapNames		Russo (Udmurti, Komi, Mari)
 Control:	Modifier keys window	Control key role name	Control:
 Disabled	Modifier keys window	Do nothing	Disabilitato
 Select dead keys	Keymap window		Tasti attivazione accenti
-Right shift	Keyboard Layout View		Maiusc destro
 Russian (Mac)	KeymapNames		Russo (Mac)
+Right shift	Keyboard Layout View		Maiusc destro
 Belarusian (Latin)	KeymapNames		Bielorusso (Latino)
 Hebrew	KeymapNames		Ebraico
 Layout	Keymap window		Layout
@@ -110,8 +110,8 @@ Defaults	Keymap window		Predefiniti
 ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		Sistema:
 Switch shortcut keys	Keymap window		Tasti di scelta rapida
-Belgian (comma)	KeymapNames		Belga (virgola)
 Right command	Keyboard Layout View		Command destro
+Belgian (comma)	KeymapNames		Belga (virgola)
 Norwegian	KeymapNames		Norvegese
 Font	Keymap window		Carattere
 Danish	KeymapNames		Danese

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Pulse	3788463253
+1	swedish	x-vnd.Haiku-Pulse	139895817
 Normal mode	DeskbarPulseView		Normalläge
 Info	CPUButton		Information
 Quit	DeskbarPulseView		Avsluta
@@ -37,6 +37,7 @@ Deskbar menu	CPUButton		Deskbar meny
 Mini mode	NormalPulseView		Komprimerat läge
 Quit	MiniPulseView		Avsluta
 Info	PulseView		Information
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		Användning: Pulse [--mini] [-w bredd] [--width=bredd]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]
 OK	DeskbarPulseView		OK
 Info	PulseApp		Information
 Pulse	System name		Puls

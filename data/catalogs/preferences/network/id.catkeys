@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Network	3284324275
+1	indonesian	x-vnd.Haiku-Network	943149646
 Ethernet device	InterfaceListItem		Perangkat ethernet
 Link speed:	IntefaceView		Kecepatan jalur:
 disconnected	IntefaceView		terputus
@@ -14,7 +14,6 @@ Gateway:	IntefaceAddressView		Gateway:
 The netmask defines your local network	IntefaceAddressView		Netmask mendefinisikan jaringan lokal anda
 Your IP address	IntefaceAddressView		Alamat IP Anda
 DHCP	IntefaceAddressView		DHCP
-Dial Up	NetworkWindow		Dial Up
 Netmask:	IntefaceAddressView		Netmask:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Layanan
@@ -23,7 +22,6 @@ Revert	NetworkWindow		Pulihkan
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<no wireless networks found>
 connected	IntefaceView		terhubung
-VPN	NetworkWindow		VPN
 Apply	IntefaceAddressView		Terapkan
 Disable	ServiceView		Dilumpuhkan
 WPA2	WPA2 protected network		WPA2

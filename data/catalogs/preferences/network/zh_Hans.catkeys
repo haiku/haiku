@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Network	758425292
+1	english	x-vnd.Haiku-Network	2712217959
 Ethernet device	InterfaceListItem		以太网设备
 Link speed:	IntefaceView		连接速度：
 disconnected	IntefaceView		断开连接
@@ -14,7 +14,6 @@ Gateway:	IntefaceAddressView		网关：
 The netmask defines your local network	IntefaceAddressView		子网掩码定义您的本地网络
 Your IP address	IntefaceAddressView		您的 IP 地址
 DHCP	IntefaceAddressView		DHCP
-Dial Up	NetworkWindow		拨号
 Netmask:	IntefaceAddressView		子网掩码：
 EAP	EAP protected network		EAP
 Services	NetworkWindow		服务
@@ -23,7 +22,6 @@ Revert	NetworkWindow		恢复
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<未发现无线网络>
 connected	IntefaceView		已连接
-VPN	NetworkWindow		VPN
 Apply	IntefaceAddressView		应用
 Disable	ServiceView		禁用
 WPA2	WPA2 protected network		WPA2

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Network	3284324275
+1	italian	x-vnd.Haiku-Network	943149646
 Ethernet device	InterfaceListItem		Dispositivo Ethernet
 Link speed:	IntefaceView		Velocità collegamento:
 disconnected	IntefaceView		disconnesso
@@ -14,7 +14,6 @@ Gateway:	IntefaceAddressView		Gateway:
 The netmask defines your local network	IntefaceAddressView		La maschera di rete definisce la tua rete locale
 Your IP address	IntefaceAddressView		Il tuo indirizzo IP
 DHCP	IntefaceAddressView		DHCP
-Dial Up	NetworkWindow		Dial Up
 Netmask:	IntefaceAddressView		Netmask:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Servizi
@@ -23,7 +22,6 @@ Revert	NetworkWindow		Ripristina
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<nessuna rete senza fili trovata>
 connected	IntefaceView		connesso
-VPN	NetworkWindow		VPN
 Apply	IntefaceAddressView		Applica
 Disable	ServiceView		Disabilita
 WPA2	WPA2 protected network		WPA2

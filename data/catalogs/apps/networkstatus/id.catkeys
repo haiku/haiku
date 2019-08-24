@@ -1,9 +1,10 @@
-1	indonesian	x-vnd.Haiku-NetworkStatus	3823341665
+1	indonesian	x-vnd.Haiku-NetworkStatus	186344131
 Netmask	NetworkStatusView		Netmask
 Quit	NetworkStatusView		Keluar
 Unknown	NetworkStatusView		Takdiketahui
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Gagal meluncurkan preflet jaringan.\n\nkesalahan: 
 Install in Deskbar	NetworkStatus		Pasang di Deskbar
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Pilihan NetworkStatus:\n\t--deskbar\totomatos menambah replicant ke Deskbar\n\t--help\t\tcetak info ini dan keluar
 Open network preferences…	NetworkStatusView		Buka preferensi jaringan...
 NetworkStatus	System name		StatusJaringan
 OK	NetworkStatusView		OKE
@@ -12,6 +13,7 @@ Could not join wireless network:\n	NetworkStatusView		Tidak bisa gabung ke jarin
 Ready	NetworkStatusView		Siap
 Network Status	NetworkStatusView		Status Jaringan
 Address	NetworkStatusView		Alamat
+Deskbar is not running, giving up.	NetworkStatus		Deskbar tidak berjalan, menyerah.
 No stateful configuration	NetworkStatusView		Takada konfigurasi tersimpan
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Anda dapat menjalankan StatusJaringan di sebuah Jendela atau memasangnya di Deksbar.
 Broadcast	NetworkStatusView		Broadcast

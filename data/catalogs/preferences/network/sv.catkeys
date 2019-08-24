@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Network	1741006816
+1	swedish	x-vnd.Haiku-Network	3694799483
 Ethernet device	InterfaceListItem		Ethernetenhet
 Link speed:	IntefaceView		Länkhastighet:
 disconnected	IntefaceView		frånkopplad
@@ -14,7 +14,6 @@ Gateway:	IntefaceAddressView		Förmedlingsnod:
 The netmask defines your local network	IntefaceAddressView		Nätmasken definierar ditt lokala nätverk
 Your IP address	IntefaceAddressView		Din IP-adress
 DHCP	IntefaceAddressView		DHCP
-Dial Up	NetworkWindow		Uppringd
 Netmask:	IntefaceAddressView		Nätmask:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Tjänster
@@ -25,7 +24,6 @@ WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<Inget nätverk hittades>
 Enable	IntefaceView		Aktivera
 connected	IntefaceView		ansluten
-VPN	NetworkWindow		VPN
 Apply	IntefaceAddressView		Använd
 Disable	ServiceView		Inaktivera
 WPA2	WPA2 protected network		WPA2

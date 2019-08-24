@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Mandelbrot	1781779654
+1	swedish	x-vnd.Haiku-Mandelbrot	3875916167
 Burning Ship	MandelbrotWindow		Brinnande skepp
 Grassland	MandelbrotWindow		Grässlätt
 Lightning	MandelbrotWindow		Blixten
@@ -9,6 +9,8 @@ Tricorn	MandelbrotWindow		Trekorn
 Royal	MandelbrotWindow		Kunglig
 Orbit Trap	MandelbrotWindow		Omloppsbana
 Deepfrost	MandelbrotWindow		Djup frost
+Subsampling	MandelbrotWindow		Subsampling
+1 (none)	MandelbrotWindow		1 (ingen)
 Quit	MandelbrotWindow		Avsluta
 File	MandelbrotWindow		Arkiv
 Julia	MandelbrotWindow		Julia

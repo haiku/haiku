@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Network	1741006816
+1	german	x-vnd.Haiku-Network	3694799483
 Ethernet device	InterfaceListItem		Ethernet-Gerät
 Link speed:	IntefaceView		Geschwindigkeit:
 disconnected	IntefaceView		getrennt
@@ -14,7 +14,6 @@ Gateway:	IntefaceAddressView		Gateway:
 The netmask defines your local network	IntefaceAddressView		Die Netzmaske definiert das lokale Netzwerk
 Your IP address	IntefaceAddressView		IP-Adresse
 DHCP	IntefaceAddressView		DHCP
-Dial Up	NetworkWindow		Einwahl
 Netmask:	IntefaceAddressView		Netzmaske:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Dienste
@@ -25,7 +24,6 @@ WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<keine Funknetzwerke gefunden>
 Enable	IntefaceView		Aktivieren
 connected	IntefaceView		verbunden
-VPN	NetworkWindow		VPN
 Apply	IntefaceAddressView		Anwenden
 Disable	ServiceView		Deaktivieren
 WPA2	WPA2 protected network		WPA2

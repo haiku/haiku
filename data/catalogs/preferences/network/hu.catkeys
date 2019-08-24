@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Network	3284324275
+1	hungarian	x-vnd.Haiku-Network	943149646
 Ethernet device	InterfaceListItem		Vezetékes eszköz
 Link speed:	IntefaceView		Kapcsolat sebessége:
 disconnected	IntefaceView		leválasztva
@@ -14,7 +14,6 @@ Gateway:	IntefaceAddressView		Átjáró:
 The netmask defines your local network	IntefaceAddressView		A hálózati masz határozza meg a helyi hálózatot
 Your IP address	IntefaceAddressView		Az Ön IP-címe
 DHCP	IntefaceAddressView		DHCP
-Dial Up	NetworkWindow		Betárcsázó
 Netmask:	IntefaceAddressView		Hálózati maszk:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Szolgáltatások
@@ -23,7 +22,6 @@ Revert	NetworkWindow		Visszaállít
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<nem található vezetéknélküli hálózat>
 connected	IntefaceView		kapcsolódva
-VPN	NetworkWindow		VPN
 Apply	IntefaceAddressView		Alkalmaz
 Disable	ServiceView		Letiltás
 WPA2	WPA2 protected network		WPA2

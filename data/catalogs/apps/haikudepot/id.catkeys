@@ -1,62 +1,85 @@
-1	indonesian	x-vnd.Haiku-HaikuDepot	2728680786
+1	indonesian	x-vnd.Haiku-HaikuDepot	2444426778
+An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Terjadi kesalahan saat menyegarkan repositori: %error%
 Check for updates…	MainWindow		Memeriksa pembaruan…
 Uninstall	PackageManager		Hapus
 (%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Telah dilepas
 Available packages	MainWindow		Paket yang tersedia
 Create account	UserLoginWindow		Membuat akun
+OK	App		OKE
 Mostly stable	RatePackageWindow		Sebagian besar stabil
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Akun berhasil dibuat. Sekarang Anda dapat menilai paket dan melakukan hal-hal berguna lainnya.
+The response to the captcha was incorrect.	ServerHelper		Respons terhadap captcha salah.
 Rate package…	PackageInfoView		Nilai paket...
 Develop packages	MainWindow		Paket pengembangan
 Starting the package daemon failed:\n\n%Error%	App		Mulai layanan paket gagal :\n\n%Error%
 <no info>	PackageInfoView		<no info>
 No user ratings available.	PackageInfoView		Tak tersedia penilaian pengguna.
+Local Repository Load Error	LocalPkgDataLoadProcess		Kesalahan Memuat Repositori Lokal
 The user name needs to be at least 3 letters long.	UserLoginWindow		Nama pengguna harus minimal 3 huruf.
+Downloading package '%name%'	WorkStatusView		Paket pengunduhan '%name%'
 Failed to create account	UserLoginWindow		Gagal membuat akun
 Ignore	UserLoginWindow		Abaikan
 Rating	PackageListView		Penilaian
+Synchronizing icons	ServerIconExportUpdateProcess		Ikon sinkronisasi
 Show	MainWindow		Menunjukkan
 Does not start	RatePackageWindow		Tidak memulai
 But none could be listed here, sorry.	UserLoginWindow		Tapi tak satu pun bisa didaftar di sini, maaf.
-There are problems with the data you entered:\n\n	UserLoginWindow		Ada masalah dengan data yang Anda masukkan:\n\n
+An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Terjadi kesalahan saat mendapatkan daftar paket:%message%
+There are problems with the data you entered:\n\n	UserLoginWindow		Ada masalah dengan data yang anda masukkan:\n\n
 The authentication was successful.	UserLoginWindow		Otentifikasi sukses.
 Not specified	RatePackageWindow		Tidak ditentukan
 Unstable but usable	RatePackageWindow		Tidak stabil tapi bisa digunakan
 Active	PackageListView		Aktif
 Login or Create account	MainWindow		Masuk atau Buat akun
 <Package contents not available for remote packages>	PackageContentsView		<Package contents not available for remote packages>
+{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1 package to download}other{# paket diunduh}}
 Ratings	PackageInfoView		Peringkat
 Switch account…	MainWindow		Beralih akun...
 Preferred language:	UserLoginWindow		Bahasa pilihan:
+Server Error	ServerHelper		server error
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display.  Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Saat memperbarui data paket, muncul masalah yang dapat menyebabkan data menjadi usang atau hilang dari tampilan aplikasi.  Rincian tambahan tentang masalah ini mungkin dapat diperoleh dari log aplikasi.
 It was not possible to contact the web service.	UserLoginWindow		Tidak bisa menghubungi layanan web.
 Name	PackageListView		Nama
+Local	LocalPkgDataLoadProcess		Lokal
 Rate %Package%	RatePackageWindow		Nilai %Package%
+An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Terjadi kesalahan saat menginisialisasi manajer paket:%message%
 Quit HaikuDepot	App		Keluar dari HaikuDepot
+Repository Update Error	LocalRepositoryUpdateProcess		Kesalahan Pembaruan Repositori
 Category	FilterView		Kategori
 User rating	RatePackageWindow		Peringkat pengguna
 Installed packages	MainWindow		Paket-paket yang terpasang
+A requested object or an object involved in the request was not found on the server.	ServerHelper		Objek yang diminta atau objek yang terlibat dalam permintaan tidak ditemukan di server.
 Other users can see this rating	RatePackageWindow		Pengguna lain dapat melihat rating ini
 Stable	RatePackageWindow		Stabil
+This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		Aplikasi ini terlalu lama untuk berkomunikasi dengan  Sistem server HaikuDepot.  Dapatkan versi HaikuDepot yang lebih baru  dengan memperbarui sistem Haiku Anda.  Versi minimum dari yang dibutuhkan  HaikuDepot adalah \"%s\".
 Fatal error	PackageManager		Kesalahan fatal
 Package action failed	PackageInfoView		Tindakan paket gagal
 No changelog available.	PackageInfoView		Tak ada log perubahan tersedia.
 There are problems in the form:\n\n	UserLoginWindow		Ada masalah dalam form:\n\n
+Error	App		Kesalahan
 There was a puzzling response from the web service.	UserLoginWindow		Ada respon membingungkan dari layanan web.
 Not logged in	MainWindow		Tidak masuk
 No, quit HaikuDepot	App		Tidak, keluar dari HaikuDepot
+Featured packages	FeaturedPackagesView		Paket unggulan
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Peringkat Anda berhasil diunggah. Anda dapat memperbarui atau menghapusnya di situs web server HaikuDepot.
+Network Error	ServerHelper		Ada kesalahan Jaringan
 Available	PackageListView		Tersedia
 Cancel	UserLoginWindow		Batal
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot membutuhkan service paket agar berfungsi, dan itu tampaknya tidak berjalan.\nApakah Anda ingin menjalankanya sekarang?
 Click a package to view information	PackageInfoView		Klik paket untuk melihat informasi
 Contents	PackageInfoView		Isi
 Close	PackageManager		Tutup
+A network transport error has arisen communicating with the HaikuDepot server system: %s	ServerHelper		Terjadi kesalahan transportasi jaringan saat berkomunikasi dengan sistem server HaikuDepot: %s
 Changelog	PackageInfoView		Log perubahan
 Rating not possible	MainWindow		Peringkat tidak memungkinkan
 About	PackageInfoView		Tentang
 Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Otentikasi gagal. Pengguna tidak ada atau password yang disediakan salah.
+%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# proses}}
+Reboot required	PackageManager		Diperlukan boot ulang
 Very unstable	RatePackageWindow		Amat tak-stabil
+All packages	PackageListView		Semua paket
+Network Transport Error	ServerHelper		Kesalahan Transport Jaringan
 Stability	RatePackageWindow		Kestabilan
 Send	RatePackageWindow		Kirim
 Start package daemon	App		Mulai daemon paket
@@ -64,27 +87,32 @@ The password is too weak or invalid. Please use at least 8 characters with at le
 The package action could not be scheduled: %Error%	PackageInfoView		Tindakan paket tidak dapat dijadwalkan: %Error%
 Cancel	RatePackageWindow		Batal
 Inactive	PackageListView		Tak aktif
+Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Menyinkronkan meta-data tentang repositori
 OK	MainWindow		OKE
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
 OK	PackageInfoView		OKE
 Downloading:	PackageInfoView		Mengunduh:
 Success	UserLoginWindow		Berhasil
+It responded with: %message%	UserLoginWindow		Merespons dengan: %message%
 Package daemon problem	App		Masalah daemon paket
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Repositori
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (versi %hd.version%)
 Close	UserLoginWindow		Tutup
 Close	RatePackageWindow		Tutup
+Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Menyinkronkan data paket untuk repositori '%REPO_NAME%'
 Failed to create account: %s\n	UserLoginWindow		Gagal membuat akun: %s\n
 Size	PackageListView		Ukuran
 Your rating:	RatePackageWindow		Penilaianmu:
-Your rating was updated.	RatePackageWindow		Peringkat Anda telah diperbarui.
-All categories	FilterView		Semua Kategori
+Your rating was updated.	RatePackageWindow		Peringkat anda telah diperbarui.
+All categories	FilterView		Semua kategori
 Repositories	MainWindow		Repositori
 n/a	PackageInfoView		n/a
 Cancel	MainWindow		Batal
+{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 more to download)}other{(# more to download)}}
 Refresh repositories	MainWindow		Muat-ulang repositori
-If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Jika Anda tidak memberikan alamat email, Anda tidak akan dapat mereset kata sandi Anda jika Anda melupakannya.
+If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Jika anda tidak memberikan alamat email, Anda tidak akan dapat mereset kata sandi anda jika anda melupakannya.
+Package Update Error	MainWindow		Pembaruan Paket Masalah
 Tools	MainWindow		Perkakas
 The passwords do not match.	UserLoginWindow		Sandi tak cocok.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Paket ini sepertinya tidak ada di Server HaikuDepot, jadi tidak mungkin membuat peringkat baru atau mengedit peringkat yang sudah ada.
@@ -95,9 +123,13 @@ Comment language:	RatePackageWindow		Bahasa komentar:
 Status	PackageListView		Status
 The username is already taken. Please choose another.	UserLoginWindow		Nama pengguna telah dipakai. Silakan pilih lainnya.
 Update	RatePackageWindow		Memperbarui
+OK	ServerHelper		OKE
 Language	UserLoginWindow		Bahasa
 OK	UserLoginWindow		OKE
+Reading repository data	LocalPkgDataLoadProcess		Membaca data repositori
+Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Menyinkronkan data referensi dari server
 Stability:	RatePackageWindow		Kestabilan:
+A validation error has occurred	ServerHelper		Kesalahan validasi telah terjadi
 The captcha puzzle needs to be solved.	UserLoginWindow		Teka-teki captcha perlu diselesaikan.
 Source packages	MainWindow		Paket sumber
 -	no package size		-
@@ -112,19 +144,24 @@ Logged in as %User%	MainWindow		Masuk sebagai %User%
 Email address:	UserLoginWindow		Alamat email:
 Screenshot	ScreenshotWindow		Screenshot
 HaikuDepot	System name		HaikuDepot
+A reboot is necessary to complete the installation process.	PackageManager		Boot ulang diperlukan untuk menyelesaikan proses pemasangan.
 Search terms:	FilterView		Kriteria pencarian:
 Pending…	PackageListView		Menunggu keputusan
 Repeat pass phrase:	UserLoginWindow		Ulangi frase sandi:
 Category:	FilterView		Kategori:
 Authentication failed	UserLoginWindow		Otentikasi gagal
 Manage repositories…	MainWindow		Kelola repositori…
+Fetching remote repository data	LocalRepositoryUpdateProcess		Mengambil data repositori jarak jauh
 Description	PackageListView		Deskripsi
 Pass phrase:	UserLoginWindow		Frasa lulus:
 Open %DeskbarLink%	PackageManager		Buka %DeskbarLink%
 Install	PackageManager		Instalasi
 Input validation	UserLoginWindow		Validasi masukan
+An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Kesalahan tak terduga telah dikirim dari server HaikuDepot [%i]
 Log in…	MainWindow		Log masuk…
 You need to be logged into an account before you can rate packages.	MainWindow		Anda harus masuk ke akun sebelum dapat memberi nilai paket.
+Client version too old	ServerHelper		Versi klien terlalu lama
+Authorization or security issue	ServerHelper		Otorisasi atau masalah keamanan
 9999.99 KiB	PackageListView		9999.99 KiB
 All repositories	MainWindow		Semua repositori
 %Version%	PackageInfoView		%Version%

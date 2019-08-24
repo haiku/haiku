@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Network	3284324275
+1	spanish; castilian	x-vnd.Haiku-Network	943149646
 Ethernet device	InterfaceListItem		Dispositivo Ethernet
 Link speed:	IntefaceView		Velocidad de conexión:
 disconnected	IntefaceView		desconectado
@@ -14,7 +14,6 @@ Gateway:	IntefaceAddressView		Puerta de enlace:
 The netmask defines your local network	IntefaceAddressView		La máscara de red define su red local
 Your IP address	IntefaceAddressView		Su dirección IP:
 DHCP	IntefaceAddressView		DHCP
-Dial Up	NetworkWindow		Acceso telefónico
 Netmask:	IntefaceAddressView		Máscara de red:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Servicios
@@ -23,7 +22,6 @@ Revert	NetworkWindow		Revertir
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<no se han encontrado redes inalámbricas>
 connected	IntefaceView		conectado
-VPN	NetworkWindow		VPN
 Apply	IntefaceAddressView		Aplicar
 Disable	ServiceView		Deshabilitar
 WPA2	WPA2 protected network		WPA2

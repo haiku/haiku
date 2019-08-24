@@ -18,8 +18,8 @@ Belgian (point)	KeymapNames		Belga (punto)
 Finnish	KeymapNames		Finés
 Num lock	Keyboard Layout View		Bloqueo numérico
 Switch shortcut keys to Windows/Linux mode	Keymap window		Cambiar atajos de teclado a modo Windows/Linux
-Option	Keyboard Layout View	Option key	Opción
 Spanish (Dvorak)	KeymapNames		Español (Dvorak)
+Option	Keyboard Layout View	Option key	Opción
 Scroll lock	Keyboard Layout View		Bloq Despl
 US-International	KeymapNames		Estados Unidos - Internacional
 Right option	Keyboard Layout View		Opción derecha
@@ -68,11 +68,11 @@ Caps lock	Keyboard Layout View		Bloqueo de mayúsculas
 Left shift	Keyboard Layout View		Mayús izquierda
 Russian (Yawert)	KeymapNames		Ruso (Yawert)
 Bulgarian (Cyrillic)	KeymapNames		Búlgaro (Cirílico)
-Left control	Keyboard Layout View		Control izquierdo
 Swedish	KeymapNames		Sueco
+Left control	Keyboard Layout View		Control izquierdo
 Role	Modifier keys window	As in the role of a modifier key	Rol
-German	KeymapNames		Alemán
 Svorak	KeymapNames		Svorak
+German	KeymapNames		Alemán
 Swiss-German	KeymapNames		Suizo Alemán
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Tecla control
 Czech	KeymapNames		Checo
@@ -80,8 +80,8 @@ Russian (Udmurt, Komi, Mari)	KeymapNames		Ruso (Udmurt, Komi, Mari)
 Control:	Modifier keys window	Control key role name	Control:
 Disabled	Modifier keys window	Do nothing	Deshabilitado
 Select dead keys	Keymap window		Seleccionar teclas muertas
-Right shift	Keyboard Layout View		Mayúsculas derecha
 Russian (Mac)	KeymapNames		Ruso (Mac)
+Right shift	Keyboard Layout View		Mayúsculas derecha
 Belarusian (Latin)	KeymapNames		Bielorruso (Latín)
 Hebrew	KeymapNames		Hebreo
 Layout	Keymap window		Distribución
@@ -110,8 +110,8 @@ Defaults	Keymap window		Valores predeterminados
 ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		Sistema:
 Switch shortcut keys	Keymap window		Cambiar atajos de teclado
-Belgian (comma)	KeymapNames		Belga (coma)
 Right command	Keyboard Layout View		Comando derecho
+Belgian (comma)	KeymapNames		Belga (coma)
 Norwegian	KeymapNames		Noruego
 Font	Keymap window		Tipo de letra
 Danish	KeymapNames		Danés

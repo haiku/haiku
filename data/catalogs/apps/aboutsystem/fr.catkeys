@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-About	1421374934
+1	french	x-vnd.Haiku-About	3515404468
 Revision	AboutView		Révision
 The Haikuware team and their bounty program\n	AboutView		L’équipe Haikuware et son programme de récompenses\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Tous droits réservés.
@@ -19,7 +19,6 @@ Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter H
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Le code source spécifique à Haiku, en particulier, celui du noyau et des applications liées, est distribué suivant les termes de la <licence MIT>. Quelques librairies systèmes contiennent du code tiers, distribué sous <licence LGPL>. Vous pouvez trouver les copyrights de ce code ci-dessous.\n\n
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Copyright © 1996-1997 Jeff Prosise. Tous droits réservés.
 Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Copyright © 1999-2006 Brian Paul. Le Projet Mesa3D. Tous droits réservés.
-Copyright © 2000-2014 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2014 Fabrice Bellard, et al.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Copyright © 2010-2011 Google Inc. Tous droits réservés.
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nTous droits réservés.
 Past maintainers:\n	AboutView		Précédents développeurs :\n
@@ -35,7 +34,6 @@ Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyrigh
 GNU LGPL v2	AboutWindow		GNU LGPL v2
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. Ce logiciel est basé en partie sur le travail de l’Independent JPEG Group.
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fondateur du projet)\n\n
-Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Contient des logiciels développés par la Foundation NetBSD, Inc. et ses contributeurs :\nftp, tput\nCopyright © 1996-2008 La Fondation NetBSD, Inc. Tous droits réservés.
 BSD (3-clause)	AboutWindow		BSD (3-clauses)
 About this system	AboutWindow		À propos de ce système
 %d MiB used (%d%%)	AboutView		%d Mio utilisés (%d%%)
@@ -56,7 +54,6 @@ Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Copyright �
 Current maintainers:\n	AboutView		Développeurs actuels :\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. Tous droits réservés.
 Version:	AboutView		Version :
-Berkeley	AboutWindow		Berkeley
 The BeGeistert team\n	AboutView		L’équipe BeGeistert\n
 GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
 License: 	AboutView		Licence : 

@@ -1,10 +1,11 @@
-1	swedish	x-vnd.Haiku-LaunchBox	3692177981
+1	swedish	x-vnd.Haiku-LaunchBox	1530497419
 Set description…	LaunchBox		Ange beskrivning...
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Vill du verkligen stänga blocket?\n(Blocket kommer inte att kommas ihåg.)
 OK	LaunchBox		OK
 Ignore double-click	LaunchBox		Ignorera dubbelklick
 Show on all workspaces	LaunchBox		Visa på alla arbetsytor
 Name Panel	LaunchBox		Namnge Block
+Autostart	LaunchBox		Autostart
 Clone	LaunchBox		Klona
 Description for '%3'	LaunchBox		Beskrivning för '%3'
 Show window border	LaunchBox		Visa fönsterkant

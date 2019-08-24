@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DriveSetup	791750172
+1	german	x-vnd.Haiku-DriveSetup	1934767996
 Could not unmount partition %s.	MainWindow		Partition \"%s\" konnte nicht ausgehangen werden.
 Mount all	MainWindow		Alle einhängen
 Disk	MainWindow		Datenträger
@@ -52,6 +52,7 @@ Wipe (not implemented)	MainWindow		Löschen (nicht implementiert)
 The currently selected partition does not have a parent partition.	MainWindow		Die ausgewählte Partition hat keine übergeordnete Partition.
 Validation of the given initialization parameters failed.	MainWindow		Die Überprüfung der zum Initialisieren angegebenen Parameter ist fehlgeschlagen.
 Shared	PartitionList		Netzwerk
+MIMEs	PartitionList		MIMEs
 BitLocker encrypted	Encryption utils		BitLocker verschlüsselt
 You need to select a partition entry from the list.	MainWindow		Bitte einen Partitionseintrag aus der Liste wählen.
 Offset: %s	Support		Versatz: %s

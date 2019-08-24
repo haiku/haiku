@@ -1,18 +1,49 @@
-1	indonesian	x-vnd.Haiku-ProcessController	2677715882
+1	indonesian	x-vnd.Haiku-ProcessController	3447757456
+Error saving file	ProcessController		Kesalahan menyimpan file
+Display priority	ProcessController		Prioritas tampilan
+That's no Fun!	ProcessController		Itu tidak seru!
+What do you want to do with the team \"%s\"?	ProcessController		Apa yang ingin Anda lakukan dengan tim \"%s\"?
+Your setting file could not be saved!\n(%s)	ProcessController		Berkas pengaturan anda tidak dapat disimpan\n(%s)
 Processor %d	ProcessController		Prosesor %d
+Live in the Deskbar	ProcessController		Tinggal di Deskbar
+Kill this team!	ProcessController		Matikan tim ini!
 OK	ProcessController		OK
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Anda dapat menjalankan ProcessController dalam sebuah window atau memasangnya di Deskbar.
+Real-time priority	ProcessController		Prioritas waktu nyata
+Custom priority	ProcessController		Prioritas khusus
+Debug this thread!	ProcessController		Debug utas ini!
 Low priority	ProcessController		Prioritas rendah
+Urgent display priority	ProcessController		Prioritas tampilan yang mendesak
 Memory usage	ProcessController		Pemakaian memori
 Ok!	ProcessController		Ok!
+Normal priority	ProcessController		Prioritas normal
+Restart Deskbar	ProcessController		Mulai ulang Deskbar
 About ProcessController…	ProcessController		Tentang ProcessController…
 Usage: %s [-deskbar]\n	ProcessController		Penggunaan: %s [-deskbar]\n
 Please confirm	ProcessController		Mohon konfirmasi
 Urgent priority	ProcessController		Priority penting
+What do you want to do with the thread \"%s\"?	ProcessController		Apa yang ingin Anda lakukan dengan utas \"%s\"?
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+Idle priority	ProcessController		Prioritas menganggur
+Real-time display priority	ProcessController		Prioritas tampilan Real-time
+Threads and CPU usage	ProcessController		Trit dan penggunaan CPU
 Quit application	ProcessController		Keluar aplikasi
 Info	ProcessController		Info
+Kill this thread!	ProcessController		Matikan trit ini!
+This team is already gone…	ProcessController		Tim ini sudah pergi…
 Quit an application	ProcessController		Hentikan suatu aplikasi
 Cancel	ProcessController		Batal
+Install in Deskbar	ProcessController		Pasang di Deskbar
+Debug this team!	ProcessController		Debug tim ini!
 Low latency	ProcessController		Latensi rendah
+ProcessController	System name		ProcessController
+Lowest active priority	ProcessController		Prioritas aktif terendah
+Restart Tracker	ProcessController		Mulai Ulang Tracker
+System resources & caches…	ProcessController		Sumber daya sistem & cache…
+Damned!	ProcessController		Terlalu!
 New Terminal	ProcessController		Terminal baru
+Power saving	ProcessController		Penghematan energi
+ProcessController is already installed in Deskbar.	ProcessController		ProcessController sudah terpasang di Deskbar.
+This is the last active processor…\nYou can't turn it off!	ProcessController		Ini adalah prosesor aktif terakhir…\nAnda tidak dapat mematikannya!
+This thread is already gone…	ProcessController		Utas ini sudah tidak ada…
+Run in window	ProcessController		Jalankan di jendela

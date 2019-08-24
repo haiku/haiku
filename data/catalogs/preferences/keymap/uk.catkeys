@@ -18,8 +18,8 @@ Belgian (point)	KeymapNames		Бельгійська (point)
 Finnish	KeymapNames		Фінська
 Num lock	Keyboard Layout View		Num lock
 Switch shortcut keys to Windows/Linux mode	Keymap window		Перемикати швидкі кнопки як у Linux/Windows
-Option	Keyboard Layout View	Option key	Опції
 Spanish (Dvorak)	KeymapNames		Іспанська (Dvorak)
+Option	Keyboard Layout View	Option key	Опції
 Scroll lock	Keyboard Layout View		Scroll lock
 US-International	KeymapNames		US-міжнародна
 Right option	Keyboard Layout View		Права Option
@@ -68,11 +68,11 @@ Caps lock	Keyboard Layout View		Caps lock
 Left shift	Keyboard Layout View		Лівий Shift
 Russian (Yawert)	KeymapNames		Російська (Yawert)
 Bulgarian (Cyrillic)	KeymapNames		Болгарська (Кирилиця)
-Left control	Keyboard Layout View		Ліва Control
 Swedish	KeymapNames		Шведська
+Left control	Keyboard Layout View		Ліва Control
 Role	Modifier keys window	As in the role of a modifier key	Роль
-German	KeymapNames		Німецька
 Svorak	KeymapNames		Svorak
+German	KeymapNames		Німецька
 Swiss-German	KeymapNames		Швейцарська-Німецька
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Клавіша Ctrl
 Czech	KeymapNames		Чешська
@@ -80,8 +80,8 @@ Russian (Udmurt, Komi, Mari)	KeymapNames		Російська  (Udmurt, Komi, Mar
 Control:	Modifier keys window	Control key role name	Керування:
 Disabled	Modifier keys window	Do nothing	Вимкнути
 Select dead keys	Keymap window		Вибрати мертві клавіші
-Right shift	Keyboard Layout View		Правий Shift
 Russian (Mac)	KeymapNames		Російська (Mac)
+Right shift	Keyboard Layout View		Правий Shift
 Belarusian (Latin)	KeymapNames		Білоруська (Латина)
 Hebrew	KeymapNames		Іврит
 Layout	Keymap window		Макет
@@ -110,8 +110,8 @@ Defaults	Keymap window		Типово
 ISO-9995	KeymapNames		SO-9995
 System:	Keymap window		Системні:
 Switch shortcut keys	Keymap window		Перемкнути швидкі кнопки
-Belgian (comma)	KeymapNames		Бельгійська (comma)
 Right command	Keyboard Layout View		Права Command
+Belgian (comma)	KeymapNames		Бельгійська (comma)
 Norwegian	KeymapNames		Норвежська
 Font	Keymap window		Шрифт
 Danish	KeymapNames		Данська

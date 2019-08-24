@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Network	3284324275
+1	ukrainian	x-vnd.Haiku-Network	943149646
 Ethernet device	InterfaceListItem		Мережева карта
 Link speed:	IntefaceView		Швидкість з'єднання:
 disconnected	IntefaceView		від'єднати
@@ -14,7 +14,6 @@ Gateway:	IntefaceAddressView		Шлюз:
 The netmask defines your local network	IntefaceAddressView		Нетмаска визначає вашу локальну мережу
 Your IP address	IntefaceAddressView		Ваша IP адреса
 DHCP	IntefaceAddressView		DHCP
-Dial Up	NetworkWindow		Dial Up
 Netmask:	IntefaceAddressView		Нетмаска:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Служби
@@ -23,7 +22,6 @@ Revert	NetworkWindow		Повернути
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<бездротових з'єднань не виявлено>
 connected	IntefaceView		під'єднано
-VPN	NetworkWindow		VPN
 Apply	IntefaceAddressView		Застосовувати
 Disable	ServiceView		Заборонити
 WPA2	WPA2 protected network		WPA2

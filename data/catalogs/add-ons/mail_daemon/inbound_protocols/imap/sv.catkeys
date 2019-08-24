@@ -1,9 +1,12 @@
-1	swedish	x-vnd.Haiku-IMAP	722419473
+1	swedish	x-vnd.Haiku-IMAP	1343128980
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Kunde inte koppla till server \"%server%\":\n%error%
+Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		Uppdaterar prenumerationer till IMAP-mappar, vänta en stund…
 Failed to fetch available storage.	IMAPFolderConfig		Misslyckades att hämta tillgängligt lagringsutrymme.
 Cancel	IMAPFolderConfig		Avsluta
 OK	IMAPFolderConfig		OK
+Server storage: %s / %s used.	IMAPFolderConfig		Serverlagring: %s / %s används.
 No encryption	imap_config		Ingen kryptering
+Fetching IMAP folders, please be patient…	IMAPFolderConfig		Hämtar IMAP-mappar, vänta en stund…
 Configure IMAP Folders	imap_config		Konfigurera IMAP Mappar
 SSL	imap_config		SSL
 Apply	IMAPFolderConfig		Använd

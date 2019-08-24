@@ -18,8 +18,8 @@ Belgian (point)	KeymapNames		Бельгийская с точкой
 Finnish	KeymapNames		Финская
 Num lock	Keyboard Layout View		Num lock
 Switch shortcut keys to Windows/Linux mode	Keymap window		Переключить раскладку в режим Windows/Linux
-Option	Keyboard Layout View	Option key	Option
 Spanish (Dvorak)	KeymapNames		Испанская (Дворак)
+Option	Keyboard Layout View	Option key	Option
 Scroll lock	Keyboard Layout View		Scroll lock
 US-International	KeymapNames		США-международная
 Right option	Keyboard Layout View		Правый option
@@ -67,8 +67,8 @@ Caps lock	Keyboard Layout View		Caps lock
 Left shift	Keyboard Layout View		Левый shift
 Russian (Yawert)	KeymapNames		Русская (фонетическая)
 Bulgarian (Cyrillic)	KeymapNames		Болгарская (кириллица)
-Left control	Keyboard Layout View		Левый control
 Swedish	KeymapNames		Шведская
+Left control	Keyboard Layout View		Левый control
 Role	Modifier keys window	As in the role of a modifier key	Роль
 German	KeymapNames		Немецкая
 Swiss-German	KeymapNames		Швейцарская немецкая
@@ -78,8 +78,8 @@ Russian (Udmurt, Komi, Mari)	KeymapNames		Русская (удмуртский, 
 Control:	Modifier keys window	Control key role name	Control:
 Disabled	Modifier keys window	Do nothing	Отключено
 Select dead keys	Keymap window		Выбор мертвых клавиш
-Right shift	Keyboard Layout View		Правый shift
 Russian (Mac)	KeymapNames		Русская (Mac)
+Right shift	Keyboard Layout View		Правый shift
 Belarusian (Latin)	KeymapNames		Беларуская (латиница)
 Hebrew	KeymapNames		Иврит
 Layout	Keymap window		Макет
@@ -108,8 +108,8 @@ Defaults	Keymap window		По умолчанию
 ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		Системные:
 Switch shortcut keys	Keymap window		Переключение горячих клавиш
-Belgian (comma)	KeymapNames		Бельгийская с запятой
 Right command	Keyboard Layout View		Правый command
+Belgian (comma)	KeymapNames		Бельгийская с запятой
 Norwegian	KeymapNames		Норвежская
 Font	Keymap window		Шрифт
 Danish	KeymapNames		Датская

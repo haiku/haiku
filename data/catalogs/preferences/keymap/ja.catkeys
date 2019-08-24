@@ -21,8 +21,8 @@ Belgian (point)	KeymapNames		ベルギー語 (point)
 Finnish	KeymapNames		フィンランド語
 Num lock	Keyboard Layout View		Num lock
 Switch shortcut keys to Windows/Linux mode	Keymap window		ショートカットキースイッチを Windows/Linux モードにする
-Option	Keyboard Layout View	Option key	オプションキー:
 Spanish (Dvorak)	KeymapNames		スペイン語 (Dvorak)
+Option	Keyboard Layout View	Option key	オプションキー:
 Scroll lock	Keyboard Layout View		Scroll lock
 US-International	KeymapNames		英語 (US-International)
 Right option	Keyboard Layout View		右 Option キー
@@ -82,12 +82,12 @@ Caps lock	Keyboard Layout View		Caps lock
 Left shift	Keyboard Layout View		左 Shift キー
 Russian (Yawert)	KeymapNames		ロシア語 (Yawert)
 Bulgarian (Cyrillic)	KeymapNames		ブルガリア語 (Cyrillic)
-Left control	Keyboard Layout View		左 Control キー
 Swedish	KeymapNames		スウェーデン語
+Left control	Keyboard Layout View		左 Control キー
 CAPS	Keyboard Layout View	Very short for 'caps lock'	CAPS
 Role	Modifier keys window	As in the role of a modifier key	役割
-German	KeymapNames		ドイツ語
 Svorak	KeymapNames		Svorak
+German	KeymapNames		ドイツ語
 Swiss-German	KeymapNames		ドイツ語 (スイス)
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl キー
 Czech	KeymapNames		チェコ語
@@ -96,8 +96,8 @@ Thai (TIS-820.2538)	KeymapNames		タイ語 (TIS-820.2538)
 Control:	Modifier keys window	Control key role name	Control:
 Disabled	Modifier keys window	Do nothing	無効
 Select dead keys	Keymap window		デッドキーの選択
-Right shift	Keyboard Layout View		右 Shift キー
 Russian (Mac)	KeymapNames		ロシア語 (Mac)
+Right shift	Keyboard Layout View		右 Shift キー
 ESC	Keyboard Layout View		ESC
 Belarusian (Latin)	KeymapNames		ベラルーシ語 (Latin)
 Hebrew	KeymapNames		ヘブライ語
@@ -129,18 +129,18 @@ Defaults	Keymap window		デフォルト
 ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		システム:
 Switch shortcut keys	Keymap window		ショートカットキーのスイッチ
-Belgian (comma)	KeymapNames		ベルギー語 (comma)
 Right command	Keyboard Layout View		右 Command キー
 NUM LOCK	Keyboard Layout View		NUM LOCK
 MENU	Keyboard Layout View		MENU
+Belgian (comma)	KeymapNames		ベルギー語 (comma)
 Norwegian	KeymapNames		ノルウェー語
 Font	Keymap window		フォント
 Danish	KeymapNames		デンマーク語
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift キー
-PAUSE	Keyboard Layout View		PAUSE
 Russian	KeymapNames		ロシア語
-CMD	Keyboard Layout View	Very short for 'command'	CMD
+PAUSE	Keyboard Layout View		PAUSE
 Romanian	KeymapNames		ルーマニア語
+CMD	Keyboard Layout View	Very short for 'command'	CMD
 Command	Keyboard Layout View	Command key	Command
 SCROLL	Keyboard Layout View		SCROLL
 File	Keymap window		ファイル
