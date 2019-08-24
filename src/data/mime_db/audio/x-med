@@ -1,0 +1,11 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "audio/x-med";
+
+resource(2, "META:S:DESC") #'MSDC' "Amiga MED/OctaMED Tracker Module";
+
+resource(3, "META:EXTENS") message(234) {
+	"extensions" = "med",
+	"type" = "audio/x-med"
+};
