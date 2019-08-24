@@ -557,6 +557,8 @@ void __x86_setup_system_time(uint32 conversionFactor,
 	uint32 conversionFactorNsecs, bool conversionFactorNsecsShift);
 #endif
 
+status_t __x86_patch_errata_percpu(int cpu);
+
 void x86_userspace_thread_exit(void);
 void x86_end_userspace_thread_exit(void);
 

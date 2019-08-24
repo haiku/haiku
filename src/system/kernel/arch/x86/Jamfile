@@ -24,6 +24,7 @@ if $(TARGET_ARCH) = x86_64 {
 		arch.S
 		cpuid.cpp
 		descriptors.cpp
+		errata.cpp
 		interrupts.S
 		signals.cpp
 		signals_asm.S
@@ -49,6 +50,7 @@ if $(TARGET_ARCH) = x86_64 {
 		bios.cpp
 		cpuid.S
 		descriptors.cpp
+		errata.cpp
 		interrupts.S
 		signals.cpp
 		signals_asm.S

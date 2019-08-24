@@ -1135,7 +1135,7 @@ arch_cpu_init_percpu(kernel_args* args, int cpu)
 			gCpuIdleFunc = halt_idle;
 	}
 
-	return B_OK;
+	return __x86_patch_errata_percpu(cpu);
 }
 
 
