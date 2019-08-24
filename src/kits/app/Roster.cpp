@@ -2194,6 +2194,8 @@ BRoster::_TranslateRef(entry_ref* ref, BMimeType* appMeta,
 	if (ref == NULL || appMeta == NULL || appRef == NULL || appFile == NULL)
 		return B_BAD_VALUE;
 
+	entry_ref originalRef = *ref;
+
 	// resolve ref, if necessary
 	BEntry entry;
 	status_t error = entry.SetTo(ref, false);
@@ -2254,7 +2256,9 @@ BRoster::_TranslateRef(entry_ref* ref, BMimeType* appMeta,
 		// we're done.
 		char preferredApp[B_MIME_TYPE_LENGTH];
 		if (!isDocument || appFileInfo.GetPreferredApp(preferredApp) != B_OK) {
-			*appRef = *ref;
+			// If we were given a symlink, point appRef to it in case its name
+			// or attributes are relevant.
+			*appRef = originalRef;
 			if (_wasDocument != NULL)
 				*_wasDocument = isDocument;
 
