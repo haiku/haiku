@@ -1872,6 +1872,7 @@ BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 	thread_id appThread = -1;
 	port_id appPort = -1;
 	uint32 appToken = 0;
+	entry_ref hintRef;
 
 	while (true) {
 		// find the app
@@ -1881,6 +1882,7 @@ BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 			&appFlags, &wasDocument);
 		DBG(OUT("  find app: %s (%" B_PRIx32 ") %s \n", strerror(error), error,
 			signature));
+
 		if (error != B_OK)
 			return error;
 
@@ -1956,15 +1958,18 @@ BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 						_RemovePreRegApp(appToken);
 
 					if (!wasDocument) {
+						// Did we already try this?
+						if (appRef == hintRef)
+							break;
+
 						// Remove app hint if it's this one
 						BMimeType appType(signature);
-						entry_ref hintRef;
 
 						if (appType.InitCheck() == B_OK
 							&& appType.GetAppHint(&hintRef) == B_OK
 							&& appRef == hintRef) {
 							appType.SetAppHint(NULL);
-							// try again
+							// try again with the app hint removed
 							continue;
 						}
 					}
