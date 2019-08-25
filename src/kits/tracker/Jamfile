@@ -25,6 +25,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		SharedLibrary $(libtracker) :
 			AttributeStream.cpp
+			AttributesView.cpp
 			AutoMounterSettings.cpp
 			BackgroundImage.cpp
 			Bitmaps.cpp
@@ -96,7 +97,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			WidgetAttributeText.cpp
 
 			:
-			be localestub shared translation
+			be columnlistview localestub shared translation
 			[ TargetLibstdc++ ] [ TargetLibsupc++ ]
 			[ MultiArchDefaultGristFiles libshortcuts_shared.a ]
 			;
@@ -109,6 +110,7 @@ DoCatalogs libtracker.so :
 	x-vnd.Haiku-libtracker
 	:
 	Tracker.cpp
+	AttributesView.cpp
 	AutoMounterSettings.cpp
 	ContainerWindow.cpp
 	CountView.cpp

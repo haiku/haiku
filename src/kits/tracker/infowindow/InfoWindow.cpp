@@ -64,6 +64,7 @@ All rights reserved.
 #include <VolumeRoster.h>
 
 #include "Attributes.h"
+#include "AttributesView.h"
 #include "AutoLock.h"
 #include "Commands.h"
 #include "DialogPane.h"
@@ -146,6 +147,9 @@ BInfoWindow::BInfoWindow(Model* model, int32 group_index,
 	fPermissionsView = new FilePermissionsView(
 		permissionsBounds, fModel);
 	tabView->AddTab(fPermissionsView);
+
+	tabView->AddTab(new AttributesView(TargetModel()));
+
 	// This window accepts messages before being shown, so let's start the
 	// looper immediately.
 	Run();
