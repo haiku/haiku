@@ -464,8 +464,8 @@ usb_midi_removed(void* cookie)
 			break;
 		midiDevice->ports[cable] = NULL;
 		DPRINTF_DEBUG((MY_ID "removing port %d\n", cable));
+		remove_port_info(port);
 		if (port->open_fd != NULL) {
-			remove_port_info(port);
 			port->open_fd->port = NULL;
 			port->open_fd->device = NULL;
 			delete_sem(port->open_fd->sem_cb);
