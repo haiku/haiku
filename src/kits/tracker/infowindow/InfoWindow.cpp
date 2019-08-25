@@ -129,7 +129,8 @@ BInfoWindow::BInfoWindow(Model* model, int32 group_index,
 	if (TargetModel()->InitCheck() != B_OK)
 		return;
 
-	AddChild(new HeaderView(TargetModel()));
+	fHeaderView = new HeaderView(TargetModel());
+	AddChild(fHeaderView);
 	BTabView* tabView = new BTabView("tabs");
 	tabView->SetBorder(B_NO_BORDER);
 	AddChild(tabView);

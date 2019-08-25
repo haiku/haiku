@@ -188,7 +188,10 @@ GeneralInfoView::GeneralInfoView(Model* model)
 
 	// Keep some free space for the stuff we print ourselves
 	float lineHeight = CurrentFontHeight();
-	GroupLayout()->SetInsets(kBorderMargin, lineHeight * 7,
+	int lineCount = 7;
+	if (model->IsSymLink())
+		lineCount += 1; // Add space for "Link to" line
+	GroupLayout()->SetInsets(kBorderMargin, lineHeight * lineCount,
 		B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING);
 
 	// Add a preferred handler pop-up menu if this item
@@ -553,9 +556,7 @@ GeneralInfoView::MouseMoved(BPoint where, uint32, const BMessage* dragMessage)
 
 					if (font.StringWidth(fPathStr.String()) > maxWidth) {
 						fTrackingState = no_track;
-						BRect rect(fPathRect);
-						rect.OffsetBy(Window()->Frame().left,
-							Window()->Frame().top);
+						BRect rect = ConvertToScreen(fPathRect);
 
 						if (fPathWindow == NULL
 							|| BMessenger(fPathWindow).IsValid() == false) {
@@ -572,9 +573,7 @@ GeneralInfoView::MouseMoved(BPoint where, uint32, const BMessage* dragMessage)
 
 					if (font.StringWidth(fLinkToStr.String()) > maxWidth) {
 						fTrackingState = no_track;
-						BRect rect(fLinkRect);
-						rect.OffsetBy(Window()->Frame().left,
-							Window()->Frame().top);
+						BRect rect = ConvertToScreen(fLinkRect);
 
 						if (!fLinkWindow
 							|| BMessenger(fLinkWindow).IsValid() == false) {
@@ -587,9 +586,7 @@ GeneralInfoView::MouseMoved(BPoint where, uint32, const BMessage* dragMessage)
 				} else if (fDescRect.Contains(point)
 					&& font.StringWidth(fDescStr.String()) > maxWidth) {
 					fTrackingState = no_track;
-					BRect rect(fDescRect);
-					rect.OffsetBy(Window()->Frame().left,
-						Window()->Frame().top);
+					BRect rect = ConvertToScreen(fDescRect);
 
 					if (!fDescWindow
 						|| BMessenger(fDescWindow).IsValid() == false) {

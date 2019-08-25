@@ -120,6 +120,7 @@ DoCatalogs libtracker.so :
 	FindPanel.cpp
 	FSClipboard.cpp
 	FSUtils.cpp
+	GeneralInfoView.cpp
 	InfoWindow.cpp
 	LocalizedFolders.h
 	Model.cpp
