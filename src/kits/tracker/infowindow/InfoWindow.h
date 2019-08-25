@@ -50,7 +50,7 @@ class BMenuField;
 namespace BPrivate {
 
 class Model;
-class AttributeView;
+class GeneralInfoView;
 
 
 class BInfoWindow : public BWindow {
@@ -84,7 +84,7 @@ private:
 	thread_id fCalcThreadID;
 	LockingList<BWindow>* fWindowList;
 	FilePermissionsView* fPermissionsView;
-	AttributeView* fAttributeView;
+	GeneralInfoView* fGeneralInfoView;
 	BFilePanel* fFilePanel;
 	bool fFilePanelOpen;
 

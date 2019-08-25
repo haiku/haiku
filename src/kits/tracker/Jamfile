@@ -44,6 +44,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			FilePanelPriv.cpp
 			FilePermissionsView.cpp
 			FindPanel.cpp
+			GeneralInfoView.cpp
 			GroupedMenu.cpp
 			IconCache.cpp
 			IconMenuItem.cpp
