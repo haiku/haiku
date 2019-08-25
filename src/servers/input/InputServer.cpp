@@ -932,21 +932,33 @@ InputServer::HandleGetSetKeyMap(BMessage* message, BMessage* reply)
 {
 	CALLED();
 
+	status_t status;
 	if (message->what == IS_GET_KEY_MAP) {
-		status_t status = reply->AddData("keymap", B_ANY_TYPE, &fKeys, sizeof(fKeys));
+		status = reply->AddData("keymap", B_ANY_TYPE, &fKeys, sizeof(fKeys));
 		if (status == B_OK)
 			status = reply->AddData("key_buffer", B_ANY_TYPE, fChars, fCharsSize);
 
 		return status;
 	}
 
-	if (_LoadKeymap() != B_OK)
-		_LoadSystemKeymap();
+	status = _LoadKeymap();
+	if (status != B_OK) {
+		status = _LoadSystemKeymap();
+		if (status != B_OK)
+			return status;
+	}
 
 	BMessage msg(IS_CONTROL_DEVICES);
 	msg.AddInt32("type", B_KEYBOARD_DEVICE);
 	msg.AddInt32("code", B_KEY_MAP_CHANGED);
-	return fAddOnManager->PostMessage(&msg);
+	status = fAddOnManager->PostMessage(&msg);
+
+	if (status == B_OK) {
+		BMessage appMsg(B_KEY_MAP_LOADED);
+		be_roster->Broadcast(&appMsg);
+	}
+
+	return status;
 }
 
 
