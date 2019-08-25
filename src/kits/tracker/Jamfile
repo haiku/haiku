@@ -101,6 +101,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 	}
 }
 
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits tracker infowindow ] ;
+
 DoCatalogs libtracker.so :
 	x-vnd.Haiku-libtracker
 	:
