@@ -21,6 +21,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons input_server
 			filters shortcut_catcher ] ;
+		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits tracker infowindow ] ;
 
 		SharedLibrary $(libtracker) :
 			AttributeStream.cpp
