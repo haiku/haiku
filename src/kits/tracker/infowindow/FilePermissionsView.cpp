@@ -74,7 +74,7 @@ public:
 
 FilePermissionsView::FilePermissionsView(BRect rect, Model* model)
 	:
-	BView(rect, "FilePermissionsView", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW),
+	BView(rect, B_TRANSLATE("Permissions"), B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW),
 	fModel(model)
 {
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);

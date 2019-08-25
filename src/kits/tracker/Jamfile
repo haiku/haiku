@@ -46,6 +46,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			FindPanel.cpp
 			GeneralInfoView.cpp
 			GroupedMenu.cpp
+			HeaderView.cpp
 			IconCache.cpp
 			IconMenuItem.cpp
 			InfoWindow.cpp

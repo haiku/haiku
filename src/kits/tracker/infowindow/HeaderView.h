@@ -31,85 +31,80 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef INFO_WINDOW_H
-#define INFO_WINDOW_H
 
 
-#include <String.h>
-#include <Window.h>
+#ifndef HEADERVIEW_H
+#define HEADERVIEW_H
+
+
+#include <Bitmap.h>
+#include <Handler.h>
+#include <Message.h>
 #include <MessageFilter.h>
+#include <Rect.h>
+#include <TextView.h>
+#include <View.h>
 
-#include "FilePermissionsView.h"
-#include "HeaderView.h"
-#include "LockingList.h"
-#include "Utilities.h"
-
-
-class BFilePanel;
-class BMenuField;
-
-namespace BPrivate {
-
-class Model;
-class GeneralInfoView;
+#include "Model.h"
 
 
-class BInfoWindow : public BWindow {
+class HeaderView: public BView {
 public:
-	BInfoWindow(Model*, int32 groupIndex,
-		LockingList<BWindow>* list = NULL);
-	~BInfoWindow();
+	HeaderView(Model*);
+	~HeaderView();
 
-	virtual bool IsShowing(const node_ref*) const;
-	Model* TargetModel() const;
-	void SetSizeString(const char*);
-	bool StopCalc();
-	void OpenFilePanel(const entry_ref*);
+	void ModelChanged(Model*, BMessage*);
+	void ReLinkTargetModel(Model*);
+	void BeginEditingTitle();
+	void FinishEditingTitle(bool);
+	virtual void Draw(BRect);
+	virtual void MakeFocus(bool focus);
+	virtual void WindowActivated(bool active);
 
-	static void GetSizeString(BString &result, off_t size,
-		int32 fileCount);
+	BTextView* TextView() const { return fTitleEditView; }
 
 protected:
-	virtual void Quit();
-	virtual void MessageReceived(BMessage*);
-	virtual void Show();
+	virtual void MouseDown(BPoint where);
+	virtual void MouseMoved(BPoint where, uint32, const BMessage* dragMessage);
+	virtual void MouseUp(BPoint where);
+	virtual void MessageReceived(BMessage* message);
+
+	status_t BuildContextMenu(BMenu* parent);
+	static filter_result TextViewFilter(BMessage*, BHandler**,
+		BMessageFilter*);
+
+	float CurrentFontHeight();
 
 private:
-	static BRect InfoWindowRect();
-	static int32 CalcSize(void*);
+	// States for tracking the mouse
+	enum track_state {
+		no_track = 0,
+		icon_track,
+		open_only_track
+			// This is for items that can be opened, but can't be
+			// drag and dropped or renamed (Trash, Desktop Folder...)
+	};
 
+	// Layouting
+	BRect fTitleRect;
+	BRect fIconRect;
+	BPoint fClickPoint;
+
+	// Model data
 	Model* fModel;
-	volatile bool fStopCalc;
-	int32 fIndex;
-		// tells where it lives with respect to other
-	thread_id fCalcThreadID;
-	LockingList<BWindow>* fWindowList;
-	FilePermissionsView* fPermissionsView;
-	GeneralInfoView* fGeneralInfoView;
-	HeaderView* fHeaderView;
-	BFilePanel* fFilePanel;
-	bool fFilePanelOpen;
+	Model* fIconModel;
+	BBitmap* fIcon;
+	BTextView* fTitleEditView;
 
-	typedef BWindow _inherited;
+	// Mouse tracking
+	track_state fTrackingState;
+	bool fMouseDown;
+	bool fIsDropTarget;
+	bool fDoubleClick;
+	bool fDragging;
+
+	typedef BView _inherited;
 };
 
 
-inline bool
-BInfoWindow::StopCalc()
-{
-	return fStopCalc;
-}
-
-
-inline Model*
-BInfoWindow::TargetModel() const
-{
-	return fModel;
-}
-
-} // namespace BPrivate
-
-using namespace BPrivate;
-
-
-#endif	// INFO_WINDOW_H
+#endif /* !HEADERVIEW_H */

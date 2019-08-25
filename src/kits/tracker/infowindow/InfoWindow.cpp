@@ -58,6 +58,7 @@ All rights reserved.
 #include <ScrollView.h>
 #include <StringFormat.h>
 #include <SymLink.h>
+#include <TabView.h>
 #include <TextView.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
@@ -96,7 +97,8 @@ BInfoWindow::BInfoWindow(Model* model, int32 group_index,
 	:
 	BWindow(BInfoWindow::InfoWindowRect(),
 		"InfoWindow", B_TITLED_WINDOW,
-		B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_CURRENT_WORKSPACE),
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS,
+		B_CURRENT_WORKSPACE),
 	fModel(model),
 	fStopCalc(false),
 	fIndex(group_index),
@@ -120,6 +122,31 @@ BInfoWindow::BInfoWindow(Model* model, int32 group_index,
 	AddShortcut('U', 0, new BMessage(kUnmountVolume));
 	AddShortcut('P', 0, new BMessage(kPermissionsSelected));
 
+	BGroupLayout* layout = new BGroupLayout(B_VERTICAL, 0);
+	SetLayout(layout);
+
+	BModelOpener modelOpener(TargetModel());
+	if (TargetModel()->InitCheck() != B_OK)
+		return;
+
+	AddChild(new HeaderView(TargetModel()));
+	BTabView* tabView = new BTabView("tabs");
+	tabView->SetBorder(B_NO_BORDER);
+	AddChild(tabView);
+
+	fGeneralInfoView = new GeneralInfoView(TargetModel());
+	tabView->AddTab(fGeneralInfoView);
+
+	BRect permissionsBounds(0,
+		fGeneralInfoView->Bounds().bottom,
+		fGeneralInfoView->Bounds().right,
+		fGeneralInfoView->Bounds().bottom + 103);
+
+	fPermissionsView = new FilePermissionsView(
+		permissionsBounds, fModel);
+	tabView->AddTab(fPermissionsView);
+	// This window accepts messages before being shown, so let's start the
+	// looper immediately.
 	Run();
 }
 
@@ -170,29 +197,12 @@ BInfoWindow::IsShowing(const node_ref* node) const
 void
 BInfoWindow::Show()
 {
-	BModelOpener modelOpener(TargetModel());
 	if (TargetModel()->InitCheck() != B_OK) {
 		Close();
 		return;
 	}
 
 	AutoLock<BWindow> lock(this);
-
-	const BFont* font = be_plain_font;
-	float width = font->StringWidth("This is a really long string which we"
-		"will use to find the window width");
-
-	// window height depends on file type
-	int lines = 9;
-	if (fModel->IsExecutable())
-		lines++;
-	float height = font->Size() * (lines * 2 + 1);
-
-	ResizeTo(width, height);
-
-	BRect attrRect(Bounds());
-	fGeneralInfoView = new GeneralInfoView(attrRect, TargetModel());
-	AddChild(fGeneralInfoView);
 
 	// position window appropriately based on index
 	BRect windRect(InfoWindowRect());
@@ -261,7 +271,7 @@ BInfoWindow::MessageReceived(BMessage* message)
 			BEntry entry(fModel->EntryRef());
 			if (!fModel->HasLocalizedName()
 				&& ConfirmChangeIfWellKnownDirectory(&entry, kRename)) {
-				fGeneralInfoView->BeginEditingTitle();
+				fHeaderView->BeginEditingTitle();
 			}
 			break;
 		}
@@ -372,6 +382,7 @@ BInfoWindow::MessageReceived(BMessage* message)
 
 				// Tell the attribute view about this new model
 				fGeneralInfoView->ReLinkTargetModel(TargetModel());
+				fHeaderView->ReLinkTargetModel(TargetModel());
 			}
 			break;
 		}
@@ -429,6 +440,7 @@ BInfoWindow::MessageReceived(BMessage* message)
 						// FilePermissionView::ModelChanged()
 						// call, because it changes the model...
 						// (bad style!)
+					fHeaderView->ModelChanged(TargetModel(), message);
 
 					if (fPermissionsView != NULL)
 						fPermissionsView->ModelChanged(TargetModel());
@@ -453,28 +465,8 @@ BInfoWindow::MessageReceived(BMessage* message)
 
 		case kPermissionsSelected:
 		{
-			BRect permissionsBounds(kBorderWidth + 1,
-						fGeneralInfoView->Bounds().bottom,
-						fGeneralInfoView->Bounds().right,
-						fGeneralInfoView->Bounds().bottom + 103);
-
-			if (fPermissionsView == NULL) {
-				// Only true on first call.
-				fPermissionsView = new FilePermissionsView(
-					permissionsBounds, fModel);
-				ResizeBy(0, permissionsBounds.Height());
-				fGeneralInfoView->AddChild(fPermissionsView);
-				fGeneralInfoView->SetPermissionsSwitchState(kPaneSwitchOpen);
-			} else if (fPermissionsView->IsHidden()) {
-				fPermissionsView->ModelChanged(fModel);
-				fPermissionsView->Show();
-				ResizeBy(0, permissionsBounds.Height());
-				fGeneralInfoView->SetPermissionsSwitchState(kPaneSwitchOpen);
-			} else {
-				fPermissionsView->Hide();
-				ResizeBy(0, -permissionsBounds.Height());
-				fGeneralInfoView->SetPermissionsSwitchState(kPaneSwitchClosed);
-			}
+			BTabView* tabView = (BTabView*)FindView("tabs");
+			tabView->Select(1);	
 			break;
 		}
 
@@ -594,10 +586,7 @@ BInfoWindow::CalcSize(void* castToWindow)
 void
 BInfoWindow::SetSizeString(const char* sizeString)
 {
-	GeneralInfoView* view
-		= dynamic_cast<GeneralInfoView*>(FindView("attr_view"));
-	if (view != NULL)
-		view->SetSizeString(sizeString);
+	fGeneralInfoView->SetSizeString(sizeString);
 }
 
 

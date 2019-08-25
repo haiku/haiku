@@ -35,7 +35,8 @@ All rights reserved.
 
 #include "GeneralInfoView.h"
 
-#include <Alert.h>
+#include <algorithm>
+
 #include <Application.h>
 #include <Catalog.h>
 #include <Locale.h>
@@ -44,7 +45,6 @@ All rights reserved.
 #include <Region.h>
 #include <Roster.h>
 #include <Screen.h>
-#include <ScrollView.h>
 #include <StringFormat.h>
 #include <SymLink.h>
 #include <Volume.h>
@@ -87,15 +87,8 @@ private:
 }	// namespace BPrivate
 
 
-// Offsets taken from TAlertView::Draw in BAlert.cpp
-const float kIconHorizOffset = 18.0f;
-const float kIconVertOffset = 6.0f;
-
 const float kBorderMargin = 15.0f;
 const float kDrawMargin = 3.0f;
-
-// Amount you have to move the mouse before a drag starts
-const float kDragSlop = 3.0f;
 
 
 const uint32 kSetPreferredApp = 'setp';
@@ -158,76 +151,46 @@ OpenToolTipWindow(BScreen& screen, BRect rect, const char* name,
 }
 
 
-GeneralInfoView::GeneralInfoView(BRect rect, Model* model)
+GeneralInfoView::GeneralInfoView(Model* model)
 	:
-	BView(rect, "attr_view", B_FOLLOW_ALL_SIDES,
-		B_WILL_DRAW | B_PULSE_NEEDED),
+	BGroupView(B_VERTICAL),
 	fDivider(0),
 	fPreferredAppMenu(NULL),
 	fModel(model),
-	fIconModel(model),
 	fMouseDown(false),
-	fDragging(false),
-	fDoubleClick(false),
 	fTrackingState(no_track),
-	fIsDropTarget(false),
-	fTitleEditView(NULL),
 	fPathWindow(NULL),
 	fLinkWindow(NULL),
 	fDescWindow(NULL),
 	fCurrentLinkColorWhich(B_LINK_TEXT_COLOR),
 	fCurrentPathColorWhich(fCurrentLinkColorWhich)
 {
+	SetFlags(Flags() | B_WILL_DRAW | B_PULSE_NEEDED | B_FRAME_EVENTS);
+	SetName(B_TRANSLATE("Information"));
 	// Set view color to standard background grey
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	SetFont(be_plain_font);
-	// If the model is a symlink, then we deference the model to
-	// get the targets icon
-	if (fModel->IsSymLink()) {
-		Model* resolvedModel = new Model(model->EntryRef(), true, true);
-		if (resolvedModel->InitCheck() == B_OK)
-			fIconModel = resolvedModel;
-		// broken link, just show the symlink
-		else
-			delete resolvedModel;
-	}
-
-	// Create the rect for displaying the icon
-	fIconRect.Set(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1);
-	// Offset taken from BAlert
-	fIconRect.OffsetBy(kIconHorizOffset, kIconVertOffset);
-
-	// The title rect
-	// The magic numbers are used to properly calculate the rect so that
-	// when the editing text view is displayed, the position of the text
-	// does not change.
-	BFont currentFont;
-	font_height fontMetrics;
-	GetFont(&currentFont);
-	currentFont.GetHeight(&fontMetrics);
-
-	fTitleRect.left = fIconRect.right + 5;
-	fTitleRect.top = 0;
-	fTitleRect.bottom = fontMetrics.ascent + 1;
-	fTitleRect.right = min_c(
-		fTitleRect.left + currentFont.StringWidth(fModel->Name()),
-		Bounds().Width() - 5);
-	// Offset so that it centers with the icon
-	fTitleRect.OffsetBy(0,
-		fIconRect.top + ((fIconRect.Height() - fTitleRect.Height()) / 2));
-	// Make some room for the border for when we are in edit mode
-	// (Negative numbers increase the size of the rect)
-	fTitleRect.InsetBy(-1, -2);
-
 	fFreeBytes = -1;
 	fSizeString = "";
 	fSizeRect.Set(0, 0, 0, 0);
 
 	// Find offset for attributes, might be overiden below if there
 	// is a prefered handle menu displayed
+	BFont currentFont;
+	GetFont(&currentFont);
 	currentFont.SetSize(currentFont.Size() - 2);
-	fDivider = currentFont.StringWidth(B_TRANSLATE("Description:"))
-		+ kBorderMargin + kBorderWidth + 1;
+
+	// The widest string depends on the locale. We should check them all, this
+	// is only an approximation that works for English and French.
+	float width = currentFont.StringWidth(B_TRANSLATE("Description:"));
+	width = std::max(width, currentFont.StringWidth(B_TRANSLATE("Location:")));
+	fDivider = width + kBorderMargin + 1;
+
+	// Keep some free space for the stuff we print ourselves
+	float lineHeight = CurrentFontHeight();
+	GroupLayout()->SetInsets(kBorderMargin, lineHeight * 7,
+		B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING);
+
 	// Add a preferred handler pop-up menu if this item
 	// is a file...This goes in place of the Link To:
 	// string...
@@ -237,18 +200,12 @@ GeneralInfoView::GeneralInfoView(BRect rect, Model* model)
 
 		// But don't add the menu if the file is executable
 		if (!fModel->IsExecutable()) {
-			float lineHeight = CurrentFontHeight();
-
-			BRect preferredAppRect(kBorderWidth + kBorderMargin,
-				fTitleRect.bottom + (lineHeight * 7),
-				Bounds().Width() - 5, fTitleRect.bottom + (lineHeight * 8));
-			fPreferredAppMenu = new BMenuField(preferredAppRect, "", "",
-				new BPopUpMenu(""));
+			fPreferredAppMenu = new BMenuField("", "", new BPopUpMenu(""));
 			currentFont.SetSize(currentFont.Size() + 2);
 			fDivider = currentFont.StringWidth(B_TRANSLATE("Opens with:"))
 				+ 5;
 			fPreferredAppMenu->SetDivider(fDivider);
-			fDivider += (preferredAppRect.left - 2);
+			fDivider += (kBorderMargin - 2);
 			fPreferredAppMenu->SetFont(&currentFont);
 			fPreferredAppMenu->SetHighUIColor(B_PANEL_TEXT_COLOR);
 			fPreferredAppMenu->SetLabel(B_TRANSLATE("Opens with:"));
@@ -301,16 +258,6 @@ GeneralInfoView::GeneralInfoView(BRect rect, Model* model)
 			AddChild(fPreferredAppMenu);
 		}
 	}
-
-	fPermissionsSwitch = new PaneSwitch(BRect(), "Permissions");
-	fPermissionsSwitch->SetMessage(new BMessage(kPermissionsSelected));
-	fPermissionsSwitch->SetLabels(NULL,	B_TRANSLATE("Permissions"));
-	AddChild(fPermissionsSwitch);
-	fPermissionsSwitch->ResizeToPreferred();
-	fPermissionsSwitch->MoveTo(kBorderWidth + 3,
-		Bounds().bottom - 3 - fPermissionsSwitch->Bounds().Height());
-
-	InitStrings(model);
 }
 
 
@@ -324,9 +271,6 @@ GeneralInfoView::~GeneralInfoView()
 
 	if (fDescWindow->Lock())
 		fDescWindow->Quit();
-
-	if (fIconModel != fModel)
-		delete fIconModel;
 }
 
 
@@ -507,25 +451,8 @@ GeneralInfoView::ModelChanged(Model* model, BMessage* message)
 			break;
 	}
 
-	// Update the icon stuff
-	if (fIconModel != fModel) {
-		delete fIconModel;
-		fIconModel = NULL;
-	}
-
 	fModel = model;
 	if (fModel->IsSymLink()) {
-		// if we are looking at a symlink, deference the model and look
-		// at the target
-		Model* resolvedModel = new Model(model->EntryRef(), true, true);
-		if (resolvedModel->InitCheck() == B_OK) {
-			if (fIconModel != fModel)
-				delete fIconModel;
-			fIconModel = resolvedModel;
-		} else {
-			fIconModel = model;
-			delete resolvedModel;
-		}
 		InitStrings(model);
 		Invalidate();
 	}
@@ -545,17 +472,6 @@ void
 GeneralInfoView::ReLinkTargetModel(Model* model)
 {
 	fModel = model;
-	if (fModel->IsSymLink()) {
-		Model* resolvedModel = new Model(model->EntryRef(), true, true);
-		if (resolvedModel->InitCheck() == B_OK) {
-			if (fIconModel != fModel)
-				delete fIconModel;
-			fIconModel = resolvedModel;
-		} else {
-			fIconModel = fModel;
-			delete resolvedModel;
-		}
-	}
 	InitStrings(model);
 	Invalidate(Bounds());
 }
@@ -564,12 +480,6 @@ GeneralInfoView::ReLinkTargetModel(Model* model)
 void
 GeneralInfoView::MouseDown(BPoint where)
 {
-	BEntry entry;
-	fModel->GetEntry(&entry);
-
-	// Assume this isn't part of a double click
-	fDoubleClick = false;
-
 	// Start tracking the mouse if we are in any of the hotspots
 	if (fLinkRect.Contains(where)) {
 		InvertRect(fLinkRect);
@@ -577,67 +487,14 @@ GeneralInfoView::MouseDown(BPoint where)
 	} else if (fPathRect.Contains(where)) {
 		InvertRect(fPathRect);
 		fTrackingState = path_track;
-	} else if (fTitleRect.Contains(where)) {
-		if (!fModel->HasLocalizedName()
-			&& ConfirmChangeIfWellKnownDirectory(&entry, kRename, true)) {
-			BeginEditingTitle();
-		}
-	} else if (fTitleEditView) {
-		FinishEditingTitle(true);
-	} else if (fSizeRect.Contains(where)) {
 		if (fModel->IsDirectory() && !fModel->IsVolume()
 			&& !fModel->IsRoot()) {
 			InvertRect(fSizeRect);
 			fTrackingState = size_track;
 		} else
 			fTrackingState = no_track;
-	} else if (fIconRect.Contains(where)) {
-		uint32 buttons;
-		Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
-		if (SecondaryMouseButtonDown(modifiers(), buttons)) {
-			// Show contextual menu
-			BPopUpMenu* contextMenu
-				= new BPopUpMenu("FileContext", false, false);
-			if (contextMenu) {
-				BuildContextMenu(contextMenu);
-				contextMenu->SetAsyncAutoDestruct(true);
-				contextMenu->Go(ConvertToScreen(where), true, true,
-					ConvertToScreen(fIconRect));
-			}
-		} else {
-			// Check to see if the point is actually on part of the icon,
-			// versus just in the container rect. The icons are always
-			// the large version
-			BPoint offsetPoint;
-			offsetPoint.x = where.x - fIconRect.left;
-			offsetPoint.y = where.y - fIconRect.top;
-			if (IconCache::sIconCache->IconHitTest(offsetPoint, fIconModel,
-					kNormalIcon, B_LARGE_ICON)) {
-				// Can't drag the trash anywhere..
-				fTrackingState = fModel->IsTrash()
-					? open_only_track : icon_track;
-
-				// Check for possible double click
-				if (abs((int32)(fClickPoint.x - where.x)) < kDragSlop
-					&& abs((int32)(fClickPoint.y - where.y)) < kDragSlop) {
-					int32 clickCount;
-					Window()->CurrentMessage()->FindInt32("clicks",
-						&clickCount);
-
-					// This checks the* previous* click point
-					if (clickCount == 2) {
-						offsetPoint.x = fClickPoint.x - fIconRect.left;
-						offsetPoint.y = fClickPoint.y - fIconRect.top;
-						fDoubleClick
-							= IconCache::sIconCache->IconHitTest(offsetPoint,
-							fIconModel, kNormalIcon, B_LARGE_ICON);
-					}
-				}
-			}
-		}
 	}
 
-	fClickPoint = where;
 	fMouseDown = true;
 	SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 }
@@ -646,20 +503,6 @@ GeneralInfoView::MouseDown(BPoint where)
 void
 GeneralInfoView::MouseMoved(BPoint where, uint32, const BMessage* dragMessage)
 {
-	if (dragMessage != NULL && dragMessage->ReturnAddress() != BMessenger(this)
-		&& dragMessage->what == B_SIMPLE_DATA
-		&& BPoseView::CanHandleDragSelection(fModel, dragMessage,
-			(modifiers() & B_CONTROL_KEY) != 0)) {
-		// highlight drag target
-		bool overTarget = fIconRect.Contains(where);
-		SetDrawingMode(B_OP_OVER);
-		if (overTarget != fIsDropTarget) {
-			IconCache::sIconCache->Draw(fIconModel, this, fIconRect.LeftTop(),
-				overTarget ? kSelectedIcon : kNormalIcon, B_LARGE_ICON, true);
-			fIsDropTarget = overTarget;
-		}
-	}
-
 	fCurrentLinkColorWhich = B_LINK_TEXT_COLOR;
 	fCurrentPathColorWhich = fCurrentLinkColorWhich;
 
@@ -683,88 +526,6 @@ GeneralInfoView::MouseMoved(BPoint where, uint32, const BMessage* dragMessage)
 				fMouseDown = !fMouseDown;
 				InvertRect(fSizeRect);
 			}
-			break;
-
-		case icon_track:
-			if (fMouseDown && !fDragging
-				&& (abs((int32)(where.x - fClickPoint.x)) > kDragSlop
-					|| abs((int32)(where.y - fClickPoint.y)) > kDragSlop)) {
-				// Find the required height
-				BFont font;
-				GetFont(&font);
-
-				float height = CurrentFontHeight()
-					+ fIconRect.Height() + 8;
-				BRect rect(0, 0, min_c(fIconRect.Width()
-						+ font.StringWidth(fModel->Name()) + 4,
-					fIconRect.Width() * 3), height);
-				BBitmap* dragBitmap = new BBitmap(rect, B_RGBA32, true);
-				dragBitmap->Lock();
-				BView* view = new BView(dragBitmap->Bounds(), "",
-					B_FOLLOW_NONE, 0);
-				dragBitmap->AddChild(view);
-				view->SetOrigin(0, 0);
-				BRect clipRect(view->Bounds());
-				BRegion newClip;
-				newClip.Set(clipRect);
-				view->ConstrainClippingRegion(&newClip);
-
-				// Transparent draw magic
-				view->SetHighColor(0, 0, 0, 0);
-				view->FillRect(view->Bounds());
-				view->SetDrawingMode(B_OP_ALPHA);
-				rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
-				textColor.alpha = 128;
-					// set transparency by value
-				view->SetHighColor(textColor);
-				view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
-
-				// Draw the icon
-				float hIconOffset = (rect.Width() - fIconRect.Width()) / 2;
-				IconCache::sIconCache->Draw(fIconModel, view,
-					BPoint(hIconOffset, 0), kNormalIcon, B_LARGE_ICON, true);
-
-				// See if we need to truncate the string
-				BString nameString(fModel->Name());
-				if (view->StringWidth(fModel->Name()) > rect.Width()) {
-					view->TruncateString(&nameString, B_TRUNCATE_END,
-						rect.Width() - 5);
-				}
-
-				// Draw the label
-				font_height fontHeight;
-				font.GetHeight(&fontHeight);
-				float leftText = (view->StringWidth(nameString.String())
-					- fIconRect.Width()) / 2;
-				view->MovePenTo(BPoint(hIconOffset - leftText + 2,
-					fIconRect.Height() + (fontHeight.ascent + 2)));
-				view->DrawString(nameString.String());
-
-				view->Sync();
-				dragBitmap->Unlock();
-
-				BMessage dragMessage(B_REFS_RECEIVED);
-				dragMessage.AddPoint("click_pt", fClickPoint);
-				BPoint tmpLoc;
-				uint32 button;
-				GetMouse(&tmpLoc, &button);
-				if (button)
-					dragMessage.AddInt32("buttons", (int32)button);
-
-				dragMessage.AddInt32("be:actions",
-					(modifiers() & B_OPTION_KEY) != 0
-						? B_COPY_TARGET : B_MOVE_TARGET);
-				dragMessage.AddRef("refs", fModel->EntryRef());
-				DragMessage(&dragMessage, dragBitmap, B_OP_ALPHA,
-					BPoint((fClickPoint.x - fIconRect.left)
-					+ hIconOffset, fClickPoint.y - fIconRect.top), this);
-				fDragging = true;
-			}
-			break;
-
-		case open_only_track :
-			// Special type of entry that can't be renamed or drag and dropped
-			// It can only be opened by double clicking on the icon
 			break;
 
 		default:
@@ -893,23 +654,6 @@ GeneralInfoView::MouseUp(BPoint where)
 	} else if (fTrackingState == path_track && fPathRect.Contains(where)) {
 		InvertRect(fPathRect);
 		OpenLinkSource();
-	} else if ((fTrackingState == icon_track
-			|| fTrackingState == open_only_track)
-		&& fIconRect.Contains(where)) {
-		// If it was a double click, then tell Tracker to open the item
-		// The CurrentMessage() here does* not* have a "clicks" field,
-		// which is why we are tracking the clicks with this temp var
-		if (fDoubleClick) {
-			// Double click, launch.
-			BMessage message(B_REFS_RECEIVED);
-			message.AddRef("refs", fModel->EntryRef());
-
-			// add a messenger to the launch message that will be used to
-			// dispatch scripting calls from apps to the PoseView
-			message.AddMessenger("TrackerViewToken", BMessenger(this));
-			be_app->PostMessage(&message);
-			fDoubleClick = false;
-		}
 	} else if (fTrackingState == size_track && fSizeRect.Contains(where)) {
 		// Recalculate size
 		Window()->PostMessage(kRecalculateSize);
@@ -917,9 +661,7 @@ GeneralInfoView::MouseUp(BPoint where)
 
 	// End mouse tracking
 	fMouseDown = false;
-	fDragging = false;
 	fTrackingState = no_track;
-
 }
 
 
@@ -981,8 +723,7 @@ GeneralInfoView::CheckAndSetSize()
 
 	BRect bounds(Bounds());
 	float lineHeight = CurrentFontHeight() + 2;
-	bounds.Set(fDivider, fIconRect.bottom, bounds.right,
-		fIconRect.bottom + lineHeight);
+	bounds.Set(fDivider, 0, bounds.right, lineHeight);
 	Invalidate(bounds);
 }
 
@@ -990,18 +731,6 @@ GeneralInfoView::CheckAndSetSize()
 void
 GeneralInfoView::MessageReceived(BMessage* message)
 {
-	if (message->WasDropped()
-		&& message->what == B_SIMPLE_DATA
-		&& message->ReturnAddress() != BMessenger(this)
-		&& fIconRect.Contains(ConvertFromScreen(message->DropPoint()))
-		&& BPoseView::CanHandleDragSelection(fModel, message,
-			(modifiers() & B_CONTROL_KEY) != 0)) {
-		BPoseView::HandleDropCommon(message, fModel, 0, this,
-			message->DropPoint());
-		Invalidate(fIconRect);
-		return;
-	}
-
 	switch (message->what) {
 		case kSetPreferredApp:
 		{
@@ -1033,6 +762,16 @@ GeneralInfoView::MessageReceived(BMessage* message)
 
 
 void
+GeneralInfoView::FrameResized(float, float)
+{
+	BModelOpener opener(fModel);
+
+	// Truncate the strings according to the new width
+	InitStrings(fModel);
+}
+
+
+void
 GeneralInfoView::Draw(BRect)
 {
 	// Set the low color for anti-aliasing
@@ -1045,54 +784,17 @@ GeneralInfoView::Draw(BRect)
 	rgb_color labelColor = ui_color(B_PANEL_TEXT_COLOR);
 	rgb_color attributeColor = mix_color(HighColor(), labelColor, 192);
 
-	// Draw the dark grey area on the left
-	BRect drawBounds(Bounds());
-	drawBounds.right = kBorderWidth;
-	SetHighUIColor(B_PANEL_BACKGROUND_COLOR, B_DARKEN_2_TINT);
-	FillRect(drawBounds);
-
-	// Draw the icon, straddling the border
-	SetDrawingMode(B_OP_OVER);
-	IconCache::sIconCache->Draw(fIconModel, this, fIconRect.LeftTop(),
-		kNormalIcon, B_LARGE_ICON, true);
-	SetDrawingMode(B_OP_COPY);
 	// Font information
 	font_height fontMetrics;
-	BFont currentFont;
 	float lineHeight = 0;
 	float lineBase = 0;
-	// Draw the main title if the user is not currently editing it
-	if (fTitleEditView == NULL) {
-		SetFont(be_bold_font);
-		SetFontSize(be_bold_font->Size());
-		GetFont(&currentFont);
-		currentFont.GetHeight(&fontMetrics);
-		lineHeight = CurrentFontHeight() + 5;
-		lineBase = fTitleRect.bottom - fontMetrics.descent;
-		SetHighColor(labelColor);
-		MovePenTo(BPoint(fIconRect.right + 6, lineBase));
-
-		// Recalculate the rect width
-		fTitleRect.right = min_c(
-				fTitleRect.left + currentFont.StringWidth(fModel->Name()),
-			Bounds().Width() - 5);
-		// Check for possible need of truncation
-		if (StringWidth(fModel->Name()) > fTitleRect.Width()) {
-			BString nameString(fModel->Name());
-			TruncateString(&nameString, B_TRUNCATE_END,
-				fTitleRect.Width() - 2);
-			DrawString(nameString.String());
-		} else
-			DrawString(fModel->Name());
-	}
-
 	// Draw the attribute font stuff
 	SetFont(be_plain_font);
 	GetFontHeight(&fontMetrics);
 	lineHeight = CurrentFontHeight() + 5;
 
 	// Starting base line for the first string
-	lineBase = fTitleRect.bottom + lineHeight;
+	lineBase = lineHeight;
 
 	// Capacity/size
 	SetHighColor(labelColor);
@@ -1259,126 +961,10 @@ GeneralInfoView::Draw(BRect)
 
 
 void
-GeneralInfoView::BeginEditingTitle()
-{
-	if (fTitleEditView != NULL)
-		return;
-
-	BFont font(be_plain_font);
-	font.SetSize(font.Size() + 2);
-	BRect textFrame(fTitleRect);
-	textFrame.right = Bounds().Width() - 5;
-	BRect textRect(textFrame);
-	textRect.OffsetTo(0, 0);
-	textRect.InsetBy(1, 1);
-
-	// Just make it some really large size, since we don't do any line
-	// wrapping. The text filter will make sure to scroll the cursor
-	// into position
-
-	textRect.right = 2000;
-	fTitleEditView = new BTextView(textFrame, "text_editor",
-		textRect, &font, 0, B_FOLLOW_ALL, B_WILL_DRAW);
-	fTitleEditView->SetText(fModel->Name());
-	DisallowFilenameKeys(fTitleEditView);
-
-	// Reset the width of the text rect
-	textRect = fTitleEditView->TextRect();
-	textRect.right = fTitleEditView->LineWidth() + 20;
-	fTitleEditView->SetTextRect(textRect);
-	fTitleEditView->SetWordWrap(false);
-	// Add filter for catching B_RETURN and B_ESCAPE key's
-	fTitleEditView->AddFilter(
-		new BMessageFilter(B_KEY_DOWN, GeneralInfoView::TextViewFilter));
-
-	BScrollView* scrollView = new BScrollView("BorderView", fTitleEditView,
-		0, 0, false, false, B_PLAIN_BORDER);
-	AddChild(scrollView);
-	fTitleEditView->SelectAll();
-	fTitleEditView->MakeFocus();
-
-	Window()->UpdateIfNeeded();
-}
-
-
-void
-GeneralInfoView::FinishEditingTitle(bool commit)
-{
-	if (fTitleEditView == NULL)
-		return;
-
-	bool reopen = false;
-
-	const char* text = fTitleEditView->Text();
-	uint32 length = strlen(text);
-	if (commit && strcmp(text, fModel->Name()) != 0
-		&& length < B_FILE_NAME_LENGTH) {
-		BEntry entry(fModel->EntryRef());
-		BDirectory parent;
-		if (entry.InitCheck() == B_OK
-			&& entry.GetParent(&parent) == B_OK) {
-			if (parent.Contains(text)) {
-				BAlert* alert = new BAlert("",
-					B_TRANSLATE("That name is already taken. "
-					"Please type another one."),
-					B_TRANSLATE("OK"),
-					0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-				alert->Go();
-				reopen = true;
-			} else {
-				if (fModel->IsVolume()) {
-					BVolume	volume(fModel->NodeRef()->device);
-					if (volume.InitCheck() == B_OK)
-						volume.SetName(text);
-				} else
-					entry.Rename(text);
-
-				// Adjust the size of the text rect
-				BFont currentFont(be_plain_font);
-				currentFont.SetSize(currentFont.Size() + 2);
-				fTitleRect.right = min_c(fTitleRect.left
-						+ currentFont.StringWidth(fTitleEditView->Text()),
-					Bounds().Width() - 5);
-			}
-		}
-	} else if (length >= B_FILE_NAME_LENGTH) {
-		BAlert* alert = new BAlert("",
-			B_TRANSLATE("That name is too long. Please type another one."),
-			B_TRANSLATE("OK"),
-			0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-		alert->Go();
-		reopen = true;
-	}
-
-	// Remove view
-	BView* scrollView = fTitleEditView->Parent();
-	RemoveChild(scrollView);
-	delete scrollView;
-	fTitleEditView = NULL;
-
-	if (reopen)
-		BeginEditingTitle();
-}
-
-
-void
-GeneralInfoView::MakeFocus(bool focus)
-{
-	if (!focus && fTitleEditView != NULL)
-		FinishEditingTitle(true);
-}
-
-
-void
 GeneralInfoView::WindowActivated(bool active)
 {
 	if (active)
 		return;
-
-	if (fTitleEditView != NULL)
-		FinishEditingTitle(true);
 
 	if (fPathWindow->Lock()) {
 		fPathWindow->Quit();
@@ -1409,148 +995,6 @@ GeneralInfoView::CurrentFontHeight()
 }
 
 
-status_t
-GeneralInfoView::BuildContextMenu(BMenu* parent)
-{
-	if (parent == NULL)
-		return B_BAD_VALUE;
-
-	// Add navigation menu if this is not a symlink
-	// Symlink's to directories are OK however!
-	BEntry entry(fModel->EntryRef());
-	entry_ref ref;
-	entry.GetRef(&ref);
-	Model model(&entry);
-	bool navigate = false;
-	if (model.InitCheck() == B_OK) {
-		if (model.IsSymLink()) {
-			// Check if it's to a directory
-			if (entry.SetTo(model.EntryRef(), true) == B_OK) {
-				navigate = entry.IsDirectory();
-				entry.GetRef(&ref);
-			}
-		} else if (model.IsDirectory() || model.IsVolume())
-			navigate = true;
-	}
-	ModelMenuItem* navigationItem = NULL;
-	if (navigate) {
-		navigationItem = new ModelMenuItem(new Model(model),
-			new BNavMenu(model.Name(), B_REFS_RECEIVED, be_app, Window()));
-
-		// setup a navigation menu item which will dynamically load items
-		// as menu items are traversed
-		BNavMenu* navMenu = dynamic_cast<BNavMenu*>(navigationItem->Submenu());
-		if (navMenu != NULL)
-			navMenu->SetNavDir(&ref);
-
-		navigationItem->SetLabel(model.Name());
-		navigationItem->SetEntry(&entry);
-
-		parent->AddItem(navigationItem, 0);
-		parent->AddItem(new BSeparatorItem(), 1);
-
-		BMessage* message = new BMessage(B_REFS_RECEIVED);
-		message->AddRef("refs", &ref);
-		navigationItem->SetMessage(message);
-		navigationItem->SetTarget(be_app);
-	}
-
-	parent->AddItem(new BMenuItem(B_TRANSLATE("Open"),
-		new BMessage(kOpenSelection), 'O'));
-
-	if (!model.IsDesktop() && !model.IsRoot() && !model.IsTrash()
-		&& !fModel->HasLocalizedName()) {
-		parent->AddItem(new BMenuItem(B_TRANSLATE("Edit name"),
-			new BMessage(kEditItem), 'E'));
-		parent->AddSeparatorItem();
-
-		if (fModel->IsVolume()) {
-			BMenuItem* item = new BMenuItem(B_TRANSLATE("Unmount"),
-				new BMessage(kUnmountVolume), 'U');
-			parent->AddItem(item);
-			// volume model, enable/disable the Unmount item
-			BVolume boot;
-			BVolumeRoster().GetBootVolume(&boot);
-			BVolume volume;
-			volume.SetTo(fModel->NodeRef()->device);
-			if (volume == boot)
-				item->SetEnabled(false);
-		}
-	}
-
-	if (!model.IsRoot() && !model.IsVolume() && !model.IsTrash())
-		parent->AddItem(new BMenuItem(B_TRANSLATE("Identify"),
-			new BMessage(kIdentifyEntry)));
-
-	if (model.IsTrash())
-		parent->AddItem(new BMenuItem(B_TRANSLATE("Empty Trash"),
-			new BMessage(kEmptyTrash)));
-
-	BMenuItem* sizeItem = NULL;
-	if (model.IsDirectory() && !model.IsVolume() && !model.IsRoot())  {
-		parent->AddItem(sizeItem
-				= new BMenuItem(B_TRANSLATE("Recalculate folder size"),
-			new BMessage(kRecalculateSize)));
-	}
-
-	if (model.IsSymLink()) {
-		parent->AddItem(sizeItem
-				= new BMenuItem(B_TRANSLATE("Set new link target"),
-			new BMessage(kSetLinkTarget)));
-	}
-
-	parent->AddItem(new BSeparatorItem());
-	parent->AddItem(new BMenuItem(B_TRANSLATE("Permissions"),
-		new BMessage(kPermissionsSelected), 'P'));
-
-	parent->SetFont(be_plain_font);
-	parent->SetTargetForItems(this);
-
-	// Reset the nav menu to be_app
-	if (navigate)
-		navigationItem->SetTarget(be_app);
-	if (sizeItem)
-		sizeItem->SetTarget(Window());
-
-	return B_OK;
-}
-
-
-void
-GeneralInfoView::SetPermissionsSwitchState(int32 state)
-{
-	fPermissionsSwitch->SetValue(state);
-	fPermissionsSwitch->Invalidate();
-}
-
-
-filter_result
-GeneralInfoView::TextViewFilter(BMessage* message, BHandler**,
-	BMessageFilter* filter)
-{
-	uchar key;
-	GeneralInfoView* attribView = static_cast<GeneralInfoView*>(
-		static_cast<BWindow*>(filter->Looper())->FindView("attr_view"));
-
-	// Adjust the size of the text rect
-	BRect nuRect(attribView->TextView()->TextRect());
-	nuRect.right = attribView->TextView()->LineWidth() + 20;
-	attribView->TextView()->SetTextRect(nuRect);
-
-	// Make sure the cursor is in view
-	attribView->TextView()->ScrollToSelection();
-	if (message->FindInt8("byte", (int8*)&key) != B_OK)
-		return B_DISPATCH_MESSAGE;
-
-	if (key == B_RETURN || key == B_ESCAPE) {
-		attribView->FinishEditingTitle(key == B_RETURN);
-		return B_SKIP_MESSAGE;
-	}
-
-	return B_DISPATCH_MESSAGE;
-}
-
-
 off_t
 GeneralInfoView::LastSize() const
 {
@@ -1572,8 +1016,7 @@ GeneralInfoView::SetSizeString(const char* sizeString)
 
 	BRect bounds(Bounds());
 	float lineHeight = CurrentFontHeight() + 6;
-	bounds.Set(fDivider, fIconRect.bottom, bounds.right,
-		fIconRect.bottom + lineHeight);
+	bounds.Set(fDivider, 0, bounds.right, lineHeight);
 	Invalidate(bounds);
 }
 
