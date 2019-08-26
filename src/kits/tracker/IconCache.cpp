@@ -1007,7 +1007,6 @@ IconCache::Preload(AutoLock<SimpleIconCache>* nodeCacheLocker,
 
 					entry = GetIconFromFileTypes(&modelOpener, source, mode,
 						size, &lazyBitmap, 0);
-					ASSERT(entry != NULL || entry->HaveIconBitmap(mode, size));
 
 					if (entry == NULL || !entry->HaveIconBitmap(mode, size)) {
 						// we don't have an icon, go with the generic
