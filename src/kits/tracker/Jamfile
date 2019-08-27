@@ -97,7 +97,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			WidgetAttributeText.cpp
 
 			:
-			be columnlistview localestub shared translation
+			be libcolumnlistview.a localestub shared translation
 			[ TargetLibstdc++ ] [ TargetLibsupc++ ]
 			[ MultiArchDefaultGristFiles libshortcuts_shared.a ]
 			;
