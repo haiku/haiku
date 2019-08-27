@@ -1725,6 +1725,10 @@ HaikuControlLook::DrawBorder(BView* view, BRect& rect, const BRect& updateRect,
 		return;
 
 	rgb_color scrollbarFrameColor = tint_color(base, B_DARKEN_2_TINT);
+	if (base.red + base.green + base.blue <= 128 * 3) {
+		scrollbarFrameColor = tint_color(base, B_LIGHTEN_1_TINT);
+	}
+
 	if ((flags & B_FOCUSED) != 0)
 		scrollbarFrameColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 

@@ -159,10 +159,14 @@ BSeparatorView::Archive(BMessage* into, bool deep) const
 void
 BSeparatorView::Draw(BRect updateRect)
 {
-	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color bgColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color highColor = ui_color(B_PANEL_TEXT_COLOR);
+
 	if (BView* parent = Parent()) {
-		if (parent->ViewColor() != B_TRANSPARENT_COLOR)
-			base = parent->ViewColor();
+		if (parent->ViewColor() != B_TRANSPARENT_COLOR) {
+			bgColor = parent->ViewColor();
+			highColor = parent->HighColor();
+		}
 	}
 
 	BRect labelBounds;
@@ -222,14 +226,14 @@ BSeparatorView::Draw(BRect updateRect)
 				/ 2);
 			bounds.bottom = bounds.top + borderSize - 1;
 			region.Exclude(bounds);
-			be_control_look->DrawBorder(this, bounds, updateRect, base,
+			be_control_look->DrawBorder(this, bounds, updateRect, bgColor,
 				fBorder, 0, BControlLook::B_TOP_BORDER);
 		} else {
 			bounds.left = floorf((bounds.left + bounds.right + 1 - borderSize)
 				/ 2);
 			bounds.right = bounds.left + borderSize - 1;
 			region.Exclude(bounds);
-			be_control_look->DrawBorder(this, bounds, updateRect, base,
+			be_control_look->DrawBorder(this, bounds, updateRect, bgColor,
 				fBorder, 0, BControlLook::B_LEFT_BORDER);
 		}
 		if (labelBounds.IsValid())
@@ -238,14 +242,14 @@ BSeparatorView::Draw(BRect updateRect)
 		ConstrainClippingRegion(&region);
 	}
 
-	SetLowColor(base);
+	SetLowColor(bgColor);
 	FillRect(updateRect, B_SOLID_LOW);
 
 	if (fLabel.CountChars() > 0) {
 		font_height fontHeight;
 		GetFontHeight(&fontHeight);
 
-		SetHighColor(0, 0, 0, 255);
+		SetHighColor(highColor);
 
 		if (fOrientation == B_HORIZONTAL) {
 			DrawString(fLabel.String(), BPoint(labelBounds.left,
