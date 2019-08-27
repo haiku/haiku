@@ -122,7 +122,6 @@ struct _pthread_spinlock {
 };
 
 
-#include <endian.h>
 #include <null.h>
 #include <size_t.h>
 #include <time.h>
