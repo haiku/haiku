@@ -61,8 +61,12 @@
 #define DISABLE_UNMAP             0
 #endif
 #ifndef DEFAULT_SPAN_MAP_COUNT
+#ifdef __HAIKU__
+#define DEFAULT_SPAN_MAP_COUNT    32
+#else
 //! Default number of spans to map in call to map more virtual memory (default values yield 4MiB here)
 #define DEFAULT_SPAN_MAP_COUNT    64
+#endif
 #endif
 
 #if ENABLE_THREAD_CACHE
