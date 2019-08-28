@@ -75,8 +75,8 @@ typedef struct {
 	pci_info				info;
 
 	struct nvme_ctrlr*		ctrlr;
-	struct nvme_ns*			ns;
 
+	struct nvme_ns*			ns;
 	uint64					capacity;
 	uint32					block_size;
 	size_t					max_transfer_size;
@@ -418,13 +418,13 @@ nvme_disk_read(void* cookie, off_t pos, void* buffer, size_t* length)
 			return B_NO_MEMORY;
 		}
 
-		status_t status = nvme_disk_read(cookie, rounded_pos, bounceBuffer,
-			&rounded_len);
+		status_t status = do_nvme_segmented_io(handle->info, rounded_pos,
+			bounceBuffer, &rounded_len);
 		if (status != B_OK) {
 			// The "rounded_len" will be the actual transferred length, but
 			// of course it will contain the padding.
-			*length = std::min(*length, std::max((size_t)0,
-				rounded_len - (size_t)(pos - rounded_pos)));
+			*length = std::min(*length, (size_t)std::max((off_t)0,
+				rounded_len - (off_t)(pos - rounded_pos)));
 			if (*length == 0)
 				return status;
 		}
@@ -437,8 +437,8 @@ nvme_disk_read(void* cookie, off_t pos, void* buffer, size_t* length)
 		return status;
 	}
 
-	// If we got here, that means the arguments are already rounded to LBAs,
-	// so just do the I/O directly.
+	// If we got here, that means the arguments are already rounded to LBAs
+	// and the buffer is a kernel one, so just do the I/O directly.
 	return do_nvme_segmented_io(handle->info, pos, buffer, length);
 }
 
@@ -465,11 +465,14 @@ nvme_disk_write(void* cookie, off_t pos, const void* buffer, size_t* length)
 		// blocks before we copy our information to the bounce buffer.
 		// TODO: This would be faster if we queued both reads at once!
 		size_t readlen = block_size;
-		status_t status = do_nvme_io(handle->info, rounded_pos, bounceBuffer,
-			&readlen);
-		if (status != B_OK) {
-			*length = 0;
-			return status;
+		status_t status;
+		if (rounded_pos != pos) {
+			status = do_nvme_io(handle->info, rounded_pos, bounceBuffer,
+				&readlen);
+			if (status != B_OK) {
+				*length = 0;
+				return status;
+			}
 		}
 		if (rounded_len > block_size) {
 			off_t offset = rounded_len - block_size;
@@ -481,6 +484,7 @@ nvme_disk_write(void* cookie, off_t pos, const void* buffer, size_t* length)
 			}
 		}
 
+		// Now we can copy in the actual data to be written.
 		void* offsetBuffer = ((int8*)bounceBuffer) + (pos - rounded_pos);
 		if (IS_USER_ADDRESS(buffer))
 			status = user_memcpy(offsetBuffer, buffer, *length);
@@ -491,11 +495,11 @@ nvme_disk_write(void* cookie, off_t pos, const void* buffer, size_t* length)
 			return status;
 		}
 
-		status = nvme_disk_write(cookie, rounded_pos, bounceBuffer,
-			&rounded_len);
+		status = do_nvme_segmented_io(handle->info, rounded_pos, bounceBuffer,
+			&rounded_len, true);
 		if (status != B_OK) {
-			*length = std::min(*length, std::max((size_t)0,
-				rounded_len - (size_t)(pos - rounded_pos)));
+			*length = std::min(*length, (size_t)std::max((off_t)0,
+				rounded_len - (off_t)(pos - rounded_pos)));
 		}
 		return status;
 	}
