@@ -22,6 +22,7 @@
 #include <KPPPUtils.h>
 
 #include <net/if.h>
+#include <arpa/inet.h>
 
 #include <ByteOrder.h>
 #include <net_buffer.h>

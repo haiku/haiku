@@ -16,6 +16,8 @@
 #include <KPPPConfigurePacket.h>
 #include <KPPPInterface.h>
 
+#include <arpa/inet.h>
+
 
 /*!	\brief Constructor.
 

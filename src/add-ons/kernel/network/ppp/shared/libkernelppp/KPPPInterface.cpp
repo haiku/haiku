@@ -23,6 +23,7 @@
 // void (KernelExport.h) and once with int (stdio.h).
 #include <cstdio>
 #include <cstring>
+#include <arpa/inet.h>
 
 #include <ByteOrder.h>
 #include <net_buffer.h>
