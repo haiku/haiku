@@ -128,8 +128,10 @@ main(int argc, char* argv[])
 	if (InitializeMp3DecodingCookie(&decodingCookie) != B_OK)
 		exit(1);
 
+	media_format rawAudioFormat = CreateRawMediaFormat();
+
 	media_raw_audio_format* audioOutputFormat
-		= &CreateRawMediaFormat().u.raw_audio;
+		= &rawAudioFormat.u.raw_audio;
 
 	BSoundPlayer player(audioOutputFormat, "wave_player", Mp3Decoding,
 		NULL, &decodingCookie);
