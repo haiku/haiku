@@ -22,7 +22,7 @@
 static status_t
 GetI2CSignals_Alt(void* cookie, int* _clock, int* data)
 {
-	uint32 index = (uint32)cookie;
+	uint32 index = (uint32)(addr_t)cookie;
 	uint8 value = ReadCrtcReg(index);
 
 	*_clock = (value & 0x4) != 0;
@@ -34,7 +34,7 @@ GetI2CSignals_Alt(void* cookie, int* _clock, int* data)
 static status_t
 SetI2CSignals_Alt(void* cookie, int _clock, int data)
 {
-	uint32 index = (uint32)cookie;
+	uint32 index = (uint32)(addr_t)cookie;
 	uint8 value = 0x10;
 
 	if (_clock)
