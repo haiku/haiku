@@ -261,7 +261,7 @@ KPPPInterface::~KPPPInterface()
 	while (true) {
 		Down();
 		{
-			MutexLocker (fLock);
+			MutexLocker locker(fLock);
 			if (State() == PPP_INITIAL_STATE && Phase() == PPP_DOWN_PHASE)
 				break;
 		}
