@@ -8,6 +8,7 @@
 
 #include <KernelExport.h>
 #include <PCI.h>
+#include <string.h>
 
 
 #define DRIVER_MODULE_NAME "drivers/graphics/specific_driver/driver_v1"
