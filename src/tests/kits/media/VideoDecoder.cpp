@@ -20,7 +20,7 @@
 class VideoView: public BView
 {
 	public:
-		VideoView::VideoView(BMediaTrack* track, int32 width, int32 height);
+		VideoView(BMediaTrack* track, int32 width, int32 height);
 		void Draw(BRect);
 		void KeyDown(const char*, int32);
 
@@ -62,8 +62,8 @@ VideoView::KeyDown(const char*, int32)
 class VideoWindow: public BWindow
 {
 public:
-	VideoWindow::VideoWindow(const char* videoFile);
-	VideoWindow::~VideoWindow();
+	VideoWindow(const char* videoFile);
+	~VideoWindow();
 
 private:
 	BFile*			fFile;
