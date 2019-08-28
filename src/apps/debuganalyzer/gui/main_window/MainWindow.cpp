@@ -177,7 +177,7 @@ MainWindow::OpenThreadWindow(Model::Thread* thread)
 	// window doesn't exist yet -- create it
 	try {
 		window = new ThreadWindow(fSubWindowManager, fModel, thread);
-	} catch (std::bad_alloc) {
+	} catch (std::bad_alloc&) {
 		// TODO: Report error!
 	}
 

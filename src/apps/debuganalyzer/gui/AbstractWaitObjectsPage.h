@@ -528,7 +528,7 @@ ABSTRACT_WAIT_OBJECTS_PAGE_CLASS::_UpdateTreeModel()
 		try {
 			fWaitObjectsTreeModel = new WaitObjectsTreeModel(fModel,
 				fGroupByName);
-		} catch (std::bad_alloc) {
+		} catch (std::bad_alloc&) {
 			// TODO: Report error!
 		}
 		fWaitObjectsTree->SetTreeTableModel(fWaitObjectsTreeModel);
