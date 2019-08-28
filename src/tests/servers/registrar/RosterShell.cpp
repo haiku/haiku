@@ -5,6 +5,7 @@
 #include <string.h>
 #include <strstream>
 #include <vector>
+#include <iostream>
 
 #include <List.h>
 #include <Path.h>
@@ -80,7 +81,7 @@ public:
 			return;
 		}
 		// activate the team
-		team_id team = (team_id)teamList.ItemAt(0);
+		team_id team = (team_id)(uintptr_t)teamList.ItemAt(0);
 		status_t error = roster.ActivateApp(team);
 		if (error != B_OK) {
 			printf("activate: failed to activate application %ld: %s\n",
@@ -148,7 +149,7 @@ public:
 		printf("%-8s%-40s\n", "team", "signature");
 		printf("---------------------------------------------------------\n");
 		for (int32 i = 0; i < count; i++) {
-			team_id team = (team_id)teamList.ItemAt(i);
+			team_id team = (team_id)(uintptr_t)teamList.ItemAt(i);
 			app_info info;
 			status_t error = roster.GetRunningAppInfo(team, &info);
 			if (error == B_OK)
@@ -173,7 +174,7 @@ public:
 		// print an info for each team
 		int32 count = teamList.CountItems();
 		for (int32 i = 0; i < count; i++) {
-			team_id team = (team_id)teamList.ItemAt(i);
+			team_id team = (team_id)(uintptr_t)teamList.ItemAt(i);
 			printf("team %8ld\n", team);
 			printf("-------------\n");
 			app_info info;
@@ -207,7 +208,7 @@ public:
 		}
 		// send a B_QUIT_REQUESTED message to each team
 		for (int32 i = 0; i < count; i++) {
-			team_id team = (team_id)teamList.ItemAt(i);
+			team_id team = (team_id)(uintptr_t)teamList.ItemAt(i);
 			status_t error = B_OK;
 			BMessenger messenger(NULL, team, &error);
 			if (messenger.IsValid()) {
