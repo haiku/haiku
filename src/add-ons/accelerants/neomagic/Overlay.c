@@ -75,8 +75,8 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 	/* acquire the shared benaphore */
 	AQUIRE_BEN(si->overlay.lock)
 
-	LOG(4,("Overlay: cardRAM_start = $%08x\n",(uint32)((uint8*)si->framebuffer)));
-	LOG(4,("Overlay: cardRAM_start_DMA = $%08x\n",(uint32)((uint8*)si->framebuffer_pci)));
+	LOG(4,("Overlay: cardRAM_start = $%p\n",((uint8*)si->framebuffer)));
+	LOG(4,("Overlay: cardRAM_start_DMA = $%p\n",((uint8*)si->framebuffer_pci)));
 	LOG(4,("Overlay: cardRAM_size = %dKb\n",si->ps.memory_size));
 
 	/* find first empty slot (room for another buffer?) */
