@@ -680,7 +680,7 @@ RuleMatcher::GotArguments(int32 argCount, char * const *args)
 
 
 static void
-node_opened(void *vnode, int32 fdType, mount_id device, vnode_id parent,
+node_opened(struct vnode *vnode, int32 fdType, dev_t device, vnode_id parent,
 	vnode_id node, const char *name, off_t size)
 {
 	if (device < gBootDevice) {
