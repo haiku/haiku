@@ -17,6 +17,8 @@
 #include "settings.h"
 #include "strings.h"
 
+#include <string.h>
+
 #define UFI_COMMAND_LEN		12
 #define ATAPI_COMMAND_LEN	12
 
