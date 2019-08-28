@@ -88,7 +88,7 @@ void
 clipboard_dump(BClipboard &clipboard)
 {
 	const char *data;
-	int32 size;
+	ssize_t size;
 	if (clipboard.Data()->FindData("text/plain", B_MIME_TYPE,
 		(const void**)&data, &size) == B_OK) {
 		printf("%.*s\n", (int)size, data);
