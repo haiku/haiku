@@ -3,7 +3,7 @@
 
 #include <keyboard_mouse_driver.h>
 
-typedef enum mouse_id {
+enum mouse_id {
 	kNoDevice		= -2,
 	kUnknown		= -1,	// Something there, but can't recognize it yet.
 	kNotSet			=  0,
