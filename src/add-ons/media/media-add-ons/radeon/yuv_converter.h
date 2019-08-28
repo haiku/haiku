@@ -20,7 +20,7 @@
 	- colour components should be interpolated for odd pixels
 */
 
-	static const int8 c_offs[8] =
+	static const uint8 c_offs[8] =
 		{ 128, 128, 128, 128, 128, 128, 128, 128 };
 		
 	static const int16 y_offs[4] =
