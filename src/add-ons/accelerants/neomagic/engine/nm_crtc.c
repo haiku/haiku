@@ -955,7 +955,7 @@ status_t nm_crtc_cursor_init()
 	nm_crtc_depth(BPP8);
 
 	/* clear cursor: so we need full RAM access! */
-	fb = ((vuint32 *)(((uint32)si->framebuffer) + curadd));
+	fb = ((vuint32 *)(((uintptr_t)si->framebuffer) + curadd));
 	for (i = 0; i < (1024/4); i++)
 	{
 		fb[i] = 0;

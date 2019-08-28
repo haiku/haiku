@@ -242,8 +242,8 @@ static void nm_bes_calc_move_overlay(move_overlay_info *moi)
 	 *******************************/
 
 	/* calculate inputbitmap origin adress */
-	moi->a1orgv = (uint32)((vuint32 *)si->overlay.ob.buffer);
-	moi->a1orgv -= (uint32)((vuint32 *)si->framebuffer);
+	moi->a1orgv = (uintptr_t)((vuint32 *)si->overlay.ob.buffer);
+	moi->a1orgv -= (uintptr_t)((vuint32 *)si->framebuffer);
 	LOG(4,("Overlay: topleft corner of input bitmap (cardRAM offset) $%08x\n", moi->a1orgv));
 
 	/* Setup vertical source start: first (sub)pixel contributing to output picture. */
