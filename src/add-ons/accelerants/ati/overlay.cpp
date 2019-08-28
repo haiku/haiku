@@ -91,18 +91,18 @@ AllocateOverlayBuffer(color_space colorSpace, uint16 width, uint16 height)
 	// thus, if the overlay buffer overflows it will be less apt to affect the
 	// cursor.
 
-	uint32 prevBuffAddr = (si.videoMemAddr + si.cursorOffset - 0xfff) & ~0xfff;
+	addr_t prevBuffAddr = (si.videoMemAddr + si.cursorOffset - 0xfff) & ~0xfff;
 
 	while (ovBuff != NULL) {
 		// Test if there is sufficient space between the end of the current
 		// buffer and the start of the previous buffer to allocate the new
 		// buffer.
 
-		uint32 currentBuffEndAddr = (addr_t)ovBuff->buffer + ovBuff->size;
+		addr_t currentBuffEndAddr = (addr_t)ovBuff->buffer + ovBuff->size;
 		if ((prevBuffAddr - currentBuffEndAddr) >= buffSize)
 			break;		// sufficient space for the new buffer
 
-		prevBuffAddr = (uint32)ovBuff->buffer;
+		prevBuffAddr = (addr_t)ovBuff->buffer;
 		prevOvBuff = ovBuff;
 		ovBuff = ovBuff->nextBuffer;
 	}
@@ -116,7 +116,7 @@ AllocateOverlayBuffer(color_space colorSpace, uint16 width, uint16 height)
 		// ends so that it can be determined if there is sufficient space for
 		// the new buffer to be created.
 
-		uint32 fbEndAddr = si.videoMemAddr + si.frameBufferOffset
+		addr_t fbEndAddr = si.videoMemAddr + si.frameBufferOffset
 			+ (si.displayMode.virtual_width
 			* ((si.displayMode.bitsPerPixel + 7) / 8)	// bytes per pixel
 			* si.displayMode.virtual_height);
@@ -255,7 +255,7 @@ AllocateOverlay(void)
 		return NULL;
 	}
 
-	return (overlay_token)++si.overlayToken;
+	return (overlay_token)(addr_t)++si.overlayToken;
 }
 
 
