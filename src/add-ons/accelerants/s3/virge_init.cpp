@@ -89,9 +89,9 @@ Virge_Init(void)
 	// some DX chipsets don't seem to do it automatically.
 
 	WritePIO_8(CRTC_INDEX, 0x59);
-	WritePIO_8(CRTC_DATA, (uint32)(si.videoMemPCI) >> 24);
+	WritePIO_8(CRTC_DATA, (uint8)((uint32)(si.videoMemPCI) >> 24));
 	WritePIO_8(CRTC_INDEX, 0x5A);
-	WritePIO_8(CRTC_DATA, (uint32)(si.videoMemPCI) >> 16);
+	WritePIO_8(CRTC_DATA, (uint8)((uint32)(si.videoMemPCI) >> 16));
 
 	// Enable MMIO.
 

@@ -92,7 +92,7 @@ Virge_GetEdidInfo(edid1_info& edidInfo)
 		uint32 DDCPort = 0xAA;
 
 		i2c_bus bus;
-		bus.cookie = (void*)DDCPort;
+		bus.cookie = (void*)(addr_t)DDCPort;
 		bus.set_signals = &SetI2CSignals_Alt;
 		bus.get_signals = &GetI2CSignals_Alt;
 		ddc2_init_timing(&bus);
