@@ -95,7 +95,7 @@ AllocateOverlayBuffer(color_space colorSpace, uint16 width, uint16 height)
 	// If no buffers have been allocated, prevBuffAddr calculated here will be
 	// the address where the buffer area will start.
 
-	uint32 prevBuffAddr = si.videoMemAddr + si.frameBufferOffset
+	addr_t prevBuffAddr = si.videoMemAddr + si.frameBufferOffset
 						+ si.maxFrameBufferSize;
 
 	while (ovBuff != NULL) {
@@ -103,11 +103,11 @@ AllocateOverlayBuffer(color_space colorSpace, uint16 width, uint16 height)
 		// buffer and the start of the previous buffer to allocate the new
 		// buffer.
 
-		uint32 currentBuffEndAddr = (addr_t)ovBuff->buffer + ovBuff->size;
+		addr_t currentBuffEndAddr = (addr_t)ovBuff->buffer + ovBuff->size;
 		if ((prevBuffAddr - currentBuffEndAddr) >= buffSize)
 			break;		// sufficient space for the new buffer
 
-		prevBuffAddr = (uint32)ovBuff->buffer;
+		prevBuffAddr = (addr_t)ovBuff->buffer;
 		prevOvBuff = ovBuff;
 		ovBuff = ovBuff->nextBuffer;
 	}
@@ -121,7 +121,7 @@ AllocateOverlayBuffer(color_space colorSpace, uint16 width, uint16 height)
 		// ends so that it can be determined if there is sufficient space for
 		// the new buffer to be created.
 
-		uint32 fbEndAddr = si.videoMemAddr + si.frameBufferOffset
+		addr_t fbEndAddr = si.videoMemAddr + si.frameBufferOffset
 			+ (si.displayMode.virtual_width * si.displayMode.bytesPerPixel
 			* si.displayMode.virtual_height);
 
