@@ -125,7 +125,7 @@ EasyPenInputDevice::InitCheck()
 		}
 		snooze(250000);
 		serial->Write("z9", 2); // 8 data bits,odd  parity <command>                     z 9
-		serial->Write((char)NULL, 1); //	Reset                <command>                NUL
+		serial->Write("", 1); //	Reset                <command>                NUL
 		serial->Write("DP", 2);		// mode command    D   trigger command    P
 		snooze(250000);
 		serial->ClearInput();
