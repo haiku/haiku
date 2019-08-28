@@ -100,7 +100,7 @@ TDFX_DisplayOverlay(const overlay_window* window,
 	// Add width of overlay buffer to stride.
 	uint32 stride = INREG32(VIDEO_DESKTOP_OVERLAY_STRIDE) & 0x0000ffff;
 	stride |= (buffer->width << 1) << 16;
-	uint32 offset = (uint32)buffer->buffer_dma;
+	uint32 offset = (uint32)(addr_t)buffer->buffer_dma;
 
 	TDFX_WaitForFifo(2);
 
