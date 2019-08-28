@@ -705,7 +705,7 @@ fwohci_init(struct fwohci_softc *sc)
 	if (sc->fc.crom_sid_Area < B_OK)
 		return B_NO_MEMORY;
 	sc->sid_buf = (uint32_t*)(sc->sid_dma.v_addr = buf_virt);
-	sc->sid_dma.bus_addr = (bus_addr_t)buf_phy;
+	sc->sid_dma.bus_addr = (bus_addr_t)(addr_t)buf_phy;
 	sc->fc.config_rom
 		= (uint32_t*)(sc->crom_dma.v_addr = (char*)buf_virt + OHCI_SIDSIZE);
 	sc->crom_dma.bus_addr = (bus_addr_t)buf_phy + OHCI_SIDSIZE;
