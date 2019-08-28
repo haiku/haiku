@@ -1174,7 +1174,7 @@ fw_xfer_alloc_buf(int send_len, int recv_len)
 			return(NULL);
 		}
 		xfer->send.payload = (uint32_t *)send_virt;
-		xfer->send.bus_addr = (bus_addr_t)send_phy;
+		xfer->send.bus_addr = (bus_addr_t)(addr_t)send_phy;
 	}
 	if (recv_len > 0) {
 /*		xfer->recv.payload = malloc(recv_len);
@@ -1196,7 +1196,7 @@ fw_xfer_alloc_buf(int send_len, int recv_len)
 			return(NULL);
 		}
 		xfer->recv.payload = (uint32_t *)recv_virt;
-		xfer->recv.bus_addr = (bus_addr_t)recv_phy;
+		xfer->recv.bus_addr = (bus_addr_t)(addr_t)recv_phy;
 	}
 	return(xfer);
 }
