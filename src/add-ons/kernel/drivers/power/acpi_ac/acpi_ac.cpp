@@ -24,11 +24,11 @@
 
 #define TRACE_AC
 #ifdef TRACE_AC
-#	define TRACE(x...) dprintf("acpi_ac: "x)
+#	define TRACE(x...) dprintf("acpi_ac: " x)
 #else
 #	define TRACE(x...)
 #endif
-#define ERROR(x...)	dprintf("acpi_ac: "x)
+#define ERROR(x...)	dprintf("acpi_ac: " x)
 
 static device_manager_info *sDeviceManager;
 
