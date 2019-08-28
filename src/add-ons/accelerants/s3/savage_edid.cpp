@@ -23,7 +23,7 @@
 static status_t
 GetI2CSignals(void* cookie, int* _clock, int* data)
 {
-	uint32 index = (uint32)cookie;
+	uint32 index = (uint32)(addr_t)cookie;
 	uint8 value = ReadCrtcReg(index);
 
 	*_clock = (value & 0x4) != 0;
@@ -35,7 +35,7 @@ GetI2CSignals(void* cookie, int* _clock, int* data)
 static status_t
 SetI2CSignals(void* cookie, int _clock, int data)
 {
-	uint32 index = (uint32)cookie;
+	uint32 index = (uint32)(addr_t)cookie;
 	uint8 value = 0x10;
 
 	if (_clock)
@@ -75,7 +75,7 @@ Savage_GetEdidInfo(edid1_info& edidInfo)
     }
 
 	i2c_bus bus;
-	bus.cookie = (void*)DDCPort;
+	bus.cookie = (void*)(addr_t)DDCPort;
 	bus.set_signals = &SetI2CSignals;
 	bus.get_signals = &GetI2CSignals;
 	ddc2_init_timing(&bus);
