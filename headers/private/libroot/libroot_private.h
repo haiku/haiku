@@ -33,6 +33,8 @@ status_t __test_executable(const char *path, char *invoker);
 status_t __flatten_process_args(const char* const* args, int32 argCount,
 			const char* const* env, int32* envCount, const char* executablePath,
 			char*** _flatArgs, size_t* _flatSize);
+thread_id __load_image_at_path(const char* path, int32 argCount,
+			const char **args, const char **environ);
 void _call_atexit_hooks_for_range(addr_t start, addr_t size);
 void __init_env(const struct user_space_program_args *args);
 void __init_env_post_heap(void);

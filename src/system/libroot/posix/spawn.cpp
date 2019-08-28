@@ -1,6 +1,6 @@
 /*
- * Copyright 2017-2019, Jérôme Duval, jerome.Duval@gmail.com
- * Distributed under the terms of the MIT license.
+ * Copyright 2017-2019, Jérôme Duval, jerome.duval@gmail.com
+ * Distributed under the terms of the MIT License.
  */
 
 
@@ -13,6 +13,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <libroot_private.h>
 #include <signal_defs.h>
 #include <syscalls.h>
 
@@ -495,7 +496,7 @@ process_file_actions(const posix_spawn_file_actions_t *_actions, int *errfd)
 
 
 static int
-do_posix_spawn(pid_t *_pid, const char *path,
+spawn_using_fork(pid_t *_pid, const char *path,
 	const posix_spawn_file_actions_t *actions,
 	const posix_spawnattr_t *attrp, char *const argv[], char *const envp[],
 	bool envpath)
@@ -552,6 +553,52 @@ fail:
 	close(fds[0]);
 	close(fds[1]);
 	return err;
+}
+
+
+static int
+spawn_using_load_image(pid_t *_pid, const char *_path,
+	char *const argv[], char *const envp[], bool envpath)
+{
+	const char* path;
+	// if envpath is specified but the path contains '/', don't search PATH
+	if (!envpath || strchr(_path, '/') != NULL) {
+		path = _path;
+	} else {
+		char* buffer = (char*)alloca(B_PATH_NAME_LENGTH);
+		status_t status = __look_up_in_path(_path, buffer);
+		if (status != B_OK)
+			return status;
+		path = buffer;
+	}
+
+	// count arguments
+	int32 argCount = 0;
+	while (argv[argCount] != NULL)
+		argCount++;
+
+	thread_id thread = __load_image_at_path(path, argCount, (const char**)argv,
+		(const char**)(envp != NULL ? envp : environ));
+	if (thread < 0)
+		return thread;
+
+	*_pid = thread;
+	return resume_thread(thread);
+}
+
+
+static int
+do_posix_spawn(pid_t *_pid, const char *path,
+	const posix_spawn_file_actions_t *actions,
+	const posix_spawnattr_t *attrp, char *const argv[], char *const envp[],
+	bool envpath)
+{
+	if (actions == NULL && attrp == NULL) {
+		return spawn_using_load_image(_pid, path, argv, envp, envpath);
+	} else {
+		return spawn_using_fork(_pid, path, actions, attrp, argv, envp,
+			envpath);
+	}
 }
 
 
