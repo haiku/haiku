@@ -8,6 +8,7 @@
 #include <ByteOrder.h>
 #include <net/if_dl.h>
 #include <net_stack.h>
+#include <arpa/inet.h>
 
 #include <ethernet.h>
 #include <ether_driver.h>
