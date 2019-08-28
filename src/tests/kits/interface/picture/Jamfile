@@ -23,9 +23,9 @@ UseLibraryHeaders agg expat ;
 SimpleTest PictureTest :
 	PictureTest.cpp
 	SVGViewView.cpp
-	: be translation 
+	: be translation
 	[ BuildFeatureAttribute expat : library ]
-	[ TargetLibsupc++ ]
+	[ TargetLibstdc++ ] [ TargetLibsupc++ ]
 	;
 
 if $(TARGET_PLATFORM) = libbe_test {

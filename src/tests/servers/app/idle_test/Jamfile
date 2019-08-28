@@ -2,5 +2,5 @@ SubDir HAIKU_TOP src tests servers app idle_test ;
 
 SimpleTest idle_test :
 	test.cpp
-	: be ;
+	: be [ TargetLibstdc++ ] ;
 

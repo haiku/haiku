@@ -14,7 +14,7 @@ Application Benchmark :
 	Test.cpp
 	TestWindow.cpp
 	VerticalLineTest.cpp
-	: be [ TargetLibsupc++ ]
+	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 ;
 
 if ( $(TARGET_PLATFORM) = libbe_test ) {

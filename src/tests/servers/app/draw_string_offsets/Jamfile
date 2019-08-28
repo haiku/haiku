@@ -7,7 +7,7 @@ UseHeaders [ FDirName os interface ] ;
 
 SimpleTest DrawStringOffsets :
 	main.cpp
-	: be [ TargetLibsupc++ ]
+	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 	;
 
 if ( $(TARGET_PLATFORM) = libbe_test ) {

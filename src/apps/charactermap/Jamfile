@@ -11,7 +11,7 @@ Application CharacterMap :
 	UnicodeBlocks.cpp
 	UnicodeBlockView.cpp
 
-	: be [ TargetLibsupc++ ] localestub
+	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ] localestub
 	: CharacterMap.rdef
 	;
 

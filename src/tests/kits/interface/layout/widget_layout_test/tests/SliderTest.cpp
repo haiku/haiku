@@ -206,7 +206,7 @@ SliderTest::ActivateTest(View* controls)
 	fOrientationRadioGroup->AddButton(button->GetRadioButton());
 
 	// default to horizontal
-	fOrientationRadioGroup->SelectButton(0L);
+	fOrientationRadioGroup->SelectButton((int32)0);
 
 	// the radio button group for selecting the thumb style
 
@@ -228,7 +228,7 @@ SliderTest::ActivateTest(View* controls)
 	fThumbStyleRadioGroup->AddButton(button->GetRadioButton());
 
 	// default to block thumb
-	fThumbStyleRadioGroup->SelectButton(0L);
+	fThumbStyleRadioGroup->SelectButton((int32)0);
 
 	// spacing
 	group->AddChild(new VStrut(10));
@@ -263,7 +263,7 @@ SliderTest::ActivateTest(View* controls)
 	fHashMarkLocationRadioGroup->AddButton(button->GetRadioButton());
 
 	// default to no hash marks
-	fHashMarkLocationRadioGroup->SelectButton(0L);
+	fHashMarkLocationRadioGroup->SelectButton((int32)0);
 
 	// spacing
 	group->AddChild(new VStrut(10));
@@ -289,7 +289,7 @@ SliderTest::ActivateTest(View* controls)
 	fBarThicknessRadioGroup->AddButton(button->GetRadioButton());
 
 	// default to default thickness
-	fBarThicknessRadioGroup->SelectButton(1L);
+	fBarThicknessRadioGroup->SelectButton((int32)1);
 
 	// spacing
 	group->AddChild(new VStrut(10));
@@ -316,7 +316,7 @@ SliderTest::ActivateTest(View* controls)
 	fLabelRadioGroup->AddButton(button->GetRadioButton());
 
 	// default to normal label
-	fLabelRadioGroup->SelectButton(1L);
+	fLabelRadioGroup->SelectButton((int32)1);
 
 	// spacing
 	group->AddChild(new VStrut(10));
@@ -343,7 +343,7 @@ SliderTest::ActivateTest(View* controls)
 	fLimitLabelsRadioGroup->AddButton(button->GetRadioButton());
 
 	// default to no limit labels
-	fLimitLabelsRadioGroup->SelectButton(0L);
+	fLimitLabelsRadioGroup->SelectButton((int32)0);
 
 	// spacing
 	group->AddChild(new VStrut(10));

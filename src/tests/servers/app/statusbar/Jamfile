@@ -7,7 +7,7 @@ UseHeaders [ FDirName os interface ] ;
 
 SimpleTest StatusBar :
 	main.cpp
-	: be [ TargetLibsupc++ ] ;
+	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ] ;
 
 if ( $(TARGET_PLATFORM) = libbe_test ) {
 	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : StatusBar

@@ -122,7 +122,7 @@ BoxTest::ActivateTest(View* controls)
 	fBorderStyleRadioGroup->AddButton(button->GetRadioButton());
 
 	// default to no border
-	fBorderStyleRadioGroup->SelectButton(0L);
+	fBorderStyleRadioGroup->SelectButton((int32)0);
 
 	// spacing
 	group->AddChild(new VStrut(10));
@@ -148,7 +148,7 @@ BoxTest::ActivateTest(View* controls)
 	fLabelRadioGroup->AddButton(button->GetRadioButton());
 
 	// default to no border
-	fLabelRadioGroup->SelectButton(0L);
+	fLabelRadioGroup->SelectButton((int32)0);
 
 	// spacing
 	group->AddChild(new VStrut(10));

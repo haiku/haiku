@@ -63,11 +63,11 @@ UsePrivateHeaders storage mime ;
 
 SharedLibrary libbe_test.so :
 	:
-	<libbe!$(HAIKU_PACKAGING_ARCH)>app_kit.o
-	<libbe!$(HAIKU_PACKAGING_ARCH)>interface_kit.o
-	<libbe!$(HAIKU_PACKAGING_ARCH)>locale_kit.o
-	<libbe!$(HAIKU_PACKAGING_ARCH)>storage_kit.o
-	<libbe!$(HAIKU_PACKAGING_ARCH)>support_kit.o
+	<libbe!$(TARGET_PACKAGING_ARCH)>app_kit.o
+	<libbe!$(TARGET_PACKAGING_ARCH)>interface_kit.o
+	<libbe!$(TARGET_PACKAGING_ARCH)>locale_kit.o
+	<libbe!$(TARGET_PACKAGING_ARCH)>storage_kit.o
+	<libbe!$(TARGET_PACKAGING_ARCH)>support_kit.o
 
 	[ MultiArchDefaultGristFiles libstorage_kit_mime.a ]
 
@@ -77,7 +77,8 @@ SharedLibrary libbe_test.so :
 	[ TargetLibstdc++ ]
 	[ BuildFeatureAttribute icu : libraries ]
 	[ BuildFeatureAttribute zlib : library ]
-;
+	[ BuildFeatureAttribute zstd : library ]
+	;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) interface textview_support ] ;

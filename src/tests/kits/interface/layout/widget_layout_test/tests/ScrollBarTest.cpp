@@ -78,7 +78,7 @@ ScrollBarTest::ActivateTest(View* controls)
 	fOrientationRadioGroup->AddButton(button->GetRadioButton());
 
 	// default to horizontal
-	fOrientationRadioGroup->SelectButton(0L);
+	fOrientationRadioGroup->SelectButton((int32)0);
 
 	// glue
 	vGroup->AddChild(new Glue());

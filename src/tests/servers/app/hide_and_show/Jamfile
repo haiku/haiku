@@ -7,7 +7,7 @@ UseHeaders [ FDirName os interface ] ;
 
 Application HideAndShow :
 	HideAndShow.cpp
-	: be [ TargetLibsupc++ ]
+	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 ;
 
 if $(TARGET_PLATFORM) = libbe_test {

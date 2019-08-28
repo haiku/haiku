@@ -2,6 +2,6 @@ SubDir HAIKU_TOP src tests servers app code_to_name ;
 
 SimpleTest code_to_name
 	: code_to_name.cpp
-	: be
+	: be [ TargetLibstdc++ ]
 ;
 

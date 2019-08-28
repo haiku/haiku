@@ -6,8 +6,9 @@
 
 class TestApp : public BApplication {
 public:
-	TestApp(const char *signature)
-		: BApplication(signature)
+	TestApp(const char* signature)
+		:
+		BApplication(signature)
 	{
 	}
 
@@ -15,18 +16,18 @@ public:
 	{
 	}
 
-	virtual void ArgvReceived(int32 argc, char **argv)
+	virtual void ArgvReceived(int32 argc, char** argv)
 	{
-		printf("TestApp::ArgvReceived(%ld)\n", argc);
+		printf("TestApp::ArgvReceived(%" B_PRId32 ")\n", argc);
 		BMessage *message = CurrentMessage();
 		message->PrintToStream();
 		BMessenger returnAddress(message->ReturnAddress());
-		printf("team: %ld\n", returnAddress.Team());
+		printf("team: %" B_PRId32 "\n", returnAddress.Team());
 		for (int32 i = 0; i < argc; i++)
-			printf("arg %ld: `%s'\n", i, argv[i]);
+			printf("arg %" B_PRId32 ": `%s'\n", i, argv[i]);
 	}
 
-	virtual void RefsReceived(BMessage *message)
+	virtual void RefsReceived(BMessage* message)
 	{
 		printf("TestApp::RefsReceived()\n");
 		message->PrintToStream();
@@ -44,9 +45,10 @@ public:
 int
 main()
 {
-	TestApp *app = new TestApp("application/x-vnd.OBOS-TestApp1");
+	TestApp* app = new TestApp("application/x-vnd.Haiku-TestApp1");
 	app->Run();
 	delete app;
+
 	return 0;
 }
 

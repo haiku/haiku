@@ -5,9 +5,9 @@ AddSubDirSupportedPlatforms libbe_test ;
 UsePrivateHeaders app interface shared ;
 
 Application Workspaces :
-	Workspaces.cpp 
-	: be shared localestub [ TargetLibsupc++ ]
-	: Workspaces.rdef 
+	Workspaces.cpp
+	: be shared localestub [ TargetLibstdc++ ] [ TargetLibsupc++ ]
+	: Workspaces.rdef
 	;
 
 if $(TARGET_PLATFORM) = libbe_test {

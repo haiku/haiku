@@ -37,7 +37,7 @@ if $(TARGET_PLATFORM) = haiku {
 	SharedLibrary libgame.so :
 		DirectWindow.cpp
 		WindowScreen.cpp
-		: be
+		: be [ TargetLibstdc++ ]
 	;
 
 	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_LIB_DIR) : libgame.so

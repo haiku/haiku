@@ -7,6 +7,6 @@ UseHeaders [ FDirName os interface ] ;
 
 Application ViewTransit :
 	ViewTransit.cpp
-	: be [ TargetLibsupc++ ]
+	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 ;
 

@@ -18,7 +18,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			:
 			be
 			[ MultiArchDefaultGristFiles libiconv.a ]
-			[ TargetLibsupc++ ] localestub ;
+			[ TargetLibstdc++ ] [ TargetLibsupc++ ] localestub ;
 	}
 }
 

@@ -10,7 +10,7 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src tests servers app harness ] ;
 SimpleTest Gradients :
 	harness.cpp
 	main.cpp
-	: be [ TargetLibsupc++ ]
+	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 	: Gradients.rdef
 	;
 

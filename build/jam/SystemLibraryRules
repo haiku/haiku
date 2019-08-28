@@ -22,7 +22,7 @@ rule TargetLibstdc++ asPath
 	# Returns the c++-standard-library for the target.
 	# Invoking with <asPath> = true will return the full library path.
 
-	if $(TARGET_PLATFORM) = haiku {
+	if $(TARGET_PLATFORM) = haiku || $(TARGET_PLATFORM) = libbe_test {
 		if $(TARGET_PACKAGING_ARCH) = x86_gcc2 {
 			# the libstdc++.so for our legacy compiler (needs to be built)
 			return libstdc++.r4.so ;
@@ -35,13 +35,8 @@ rule TargetLibstdc++ asPath
 		return [
 			BuildFeatureAttribute gcc_syslibs : libstdc++.so : $(flags)
 		] ;
-	} else {
-		if $(TARGET_PLATFORM) = libbe_test {
-			# Use the existing host library
-			return stdc++.r4 ;
-		}
-		# TODO: return libstdc++.so for non-Haiku target platform if needed
 	}
+	# TODO: return libstdc++.so for non-Haiku target platform if needed
 }
 
 

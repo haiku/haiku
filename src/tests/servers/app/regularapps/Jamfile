@@ -15,7 +15,7 @@ SimpleTest TestApp_Clock :
 	cl_view.cpp
 	cl_wind.cpp
 	clock.cpp
-	: be localestub [ TargetLibsupc++ ]
+	: be localestub [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 	: Clock.rdef
 	;
 

@@ -123,7 +123,7 @@ StdBinCommands
 	settype.cpp
 	spybmessage.cpp
 	urlwrapper.cpp
-	: be [ TargetLibsupc++ ] : $(haiku-utils_rsrc) ;
+	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ] : $(haiku-utils_rsrc) ;
 
 # standard commands that need libbe.so, libsupc++.so, and libshared.a
 StdBinCommands

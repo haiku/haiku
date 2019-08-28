@@ -81,8 +81,10 @@ SharedLibrary libhwinterfaceimpl.so :
 	DWindowHWInterface.cpp
 	MultiLocker.cpp
 
-#	trace.c
-	: libhwinterface.so
+#	libraries
+	:
+	libhwinterface.so
+	[ TargetLibstdc++ ]
 ;
 
 local decorator_src =
@@ -187,6 +189,7 @@ SharedLibrary libtestappserver.so :
 	: be libpainter.a libagg.a libtextencoding.so shared libstackandtile.a
 	liblinprog.a libhwinterface.so libhwinterfaceimpl.so
 	[ BuildFeatureAttribute freetype : library ]
+	[ TargetLibstdc++ ]
 ;
 
 Includes [ FGristFiles AppServer.cpp BitmapManager.cpp Canvas.cpp
@@ -220,6 +223,9 @@ HaikuInstall install-test-apps : $(HAIKU_APP_TEST_LIB_DIR)
 	: tests!apps ;
 
 HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : test_app_server
+	: tests!apps ;
+
+HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : run.sh
 	: tests!apps ;
 
 } # if $(TARGET_PLATFORM) = libbe_test

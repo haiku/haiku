@@ -7,7 +7,7 @@ Application Chart :
 	ChartRender.cpp
 	ChartView.cpp
 	ChartWindow.cpp
-	: be game localestub [ TargetLibsupc++ ]
+	: be game localestub [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 	: Chart.rdef
 	;
 

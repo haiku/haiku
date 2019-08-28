@@ -4,12 +4,17 @@ There is a pseudo target "install-test-apps" which needs to be built like this:
 
 $ TARGET_PLATFORM=libbe_test jam install-test-apps
 
-This will build "test_registrar", "test_app_server", the needed libs and some test apps and install everything into "generated/tests/apps".
+This will build "test_registrar", "test_app_server",
+the needed libs and some test apps and install everything into "generated/tests/libbe_test/(your architecture)/apps".
 
-You can use the "run" script in this folder to run the servers, as well as open the test app folder in Tracker (via the -o option), or launch specific test app(s) by specifying their name in the command line, for example "run WindowInvalidation".
+You can use the "run.sh" script installed in the "generated/tests/libbe_test/(your architecture)/apps" folder to run the servers,
+as well as open the test app folder in Tracker (via the -o option),
+or launch specific test app(s) by specifying their name in the command line,
+for example "run WindowInvalidation".
 
 NOTE: it is currently necessary to prefix the starting of test_app_server with
 	LD_PRELOAD="lib/libbe_test.so"
-This is a bug that should be fixed (go for it :-), but supplying the library manually is a workaround for using test_app_server for now.
+This is a bug that should be fixed (go for it :-),
+but supplying the library manually is a workaround for using test_app_server for now.
 
 Have fun!

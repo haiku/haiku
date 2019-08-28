@@ -17,7 +17,7 @@ Preference Screen :
 	ScreenSettings.cpp
 	ScreenWindow.cpp
 	Utility.cpp
-	: be [ TargetLibsupc++ ] localestub libaccelerantscommon.a
+	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ] localestub libaccelerantscommon.a
 	: Screen.rdef
 	;
 

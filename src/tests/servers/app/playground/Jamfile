@@ -10,7 +10,7 @@ Application Playground :
 	ObjectView.cpp
 	ObjectWindow.cpp
 	States.cpp
-	: be [ TargetLibsupc++ ] localestub
+	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ] localestub
 	: Playground.rdef
 ;
 
