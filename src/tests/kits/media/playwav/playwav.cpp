@@ -22,8 +22,6 @@ sem_id finished = -1;
 int fd = -1;
 NAMESPACE BSoundPlayer *sp = 0;
 
-inline float abs(float f) { return f < 0 ? -f : f; }
-
 void PlayBuffer(void *cookie, void * buffer, size_t size, const media_raw_audio_format & format)
 {
 	size_t portsize = port_buffer_size(port);
