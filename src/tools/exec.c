@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <unistd.h>
 
 
 static void
@@ -66,7 +67,8 @@ main(int argc, const char* argv[])
 	char** args = NULL, *currentArg = NULL;
 	const char* str;
 	int argsLen = 0, argsBufferLen = 0, currentArgLen = 0,
-		currentArgBufferLen = 0, encounteredNewlineAt = -1, pos;
+		currentArgBufferLen = 0, encounteredNewlineAt = -1,
+		modifiedEnvironment = 0, pos;
 
 	if (argc != 2) {
 		printf("usage: %s \"program arg 'arg1' ...\"\n", argv[0]);
@@ -83,7 +85,7 @@ main(int argc, const char* argv[])
 			// We don't support that here, so we need to make sure
 			// that either we have not parsed any arguments yet,
 			// or there are no more arguments pushed after this.
-			if (argsLen == 0 && currentArgLen == 0)
+			if (argsLen == 0 && currentArgLen == 0 && !modifiedEnvironment)
 				break;
 			encounteredNewlineAt = argsLen + 1;
 			// fall through
@@ -97,9 +99,65 @@ main(int argc, const char* argv[])
 				return 1;
 			}
 
+			// the current argument hasn't been terminated, do that now
 			append_char('\0', &currentArg, &currentArgLen,
 				&currentArgBufferLen);
 
+			// handle environs
+			{
+			char* val;
+			if (argsLen == 0 && (val = strstr(currentArg, "=")) != NULL) {
+				const char* dollar;
+				char* newVal = NULL;
+				*val = '\0';
+				val++;
+
+				// handle trivial variable substitution, i.e. VAL=$VAL:...
+				dollar = strstr(val, "$");
+				if (dollar != NULL) {
+					const char* oldVal;
+					int oldValLen, valLen, nameLen;
+
+					if (dollar != val) {
+						puts("exec: environ expansion not at start of "
+							"line unsupported");
+						return 1;
+					}
+					val++; // skip the $
+					valLen = strlen(val);
+					nameLen = strlen(currentArg);
+
+					// if the new value does not start with the environ name
+					// (which is broken by a non-alphanumeric character), bail.
+					if (strncmp(val, currentArg, nameLen) != 0
+							|| isalnum(val[nameLen])) {
+						puts("exec: environ expansion of other variables "
+							"unsupported");
+						return 1;
+					}
+
+					// get the old value and actually do the expansion
+					oldVal = getenv(currentArg);
+					oldValLen = strlen(oldVal);
+					newVal = malloc(valLen + oldValLen + 1);
+					memcpy(newVal, oldVal, oldValLen);
+					memcpy(newVal + oldValLen, val + nameLen, valLen + 1);
+					val = newVal;
+				}
+
+				setenv(currentArg, val, 1);
+				free(newVal);
+				modifiedEnvironment = 1;
+
+				free(currentArg);
+				currentArg = NULL;
+				currentArgLen = 0;
+				currentArgBufferLen = 0;
+				break;
+			}
+			}
+
+			// actually add the argument to the array
 			if ((argsLen + 2) >= argsBufferLen) {
 				args = realloc(args, (argsBufferLen + 8) * sizeof(char*));
 				if (args == NULL) {
