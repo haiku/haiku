@@ -208,7 +208,7 @@ rule As
 
 actions As
 {
-	$(CC) -c "$(2)" -O2 $(ASFLAGS) -D_ASSEMBLER $(ASDEFS) $(ASHDRS) -o "$(1)" ;
+	$(CC) -c "$(2)" -O2 $(ASFLAGS) -D_ASSEMBLER $(ASDEFS) $(ASHDRS) -o "$(1)"
 }
 
 rule Lex
