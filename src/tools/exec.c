@@ -20,7 +20,7 @@ append_char(char c, char** arg, int* argLen, int* argBufferLen)
 	if ((*argLen + 1) >= *argBufferLen) {
 		*arg = realloc(*arg, *argBufferLen + 32);
 		if (*arg == NULL) {
-			puts("oom");
+			puts("exec: oom");
 			exit(1);
 		}
 		*argBufferLen += 32;
@@ -41,7 +41,7 @@ parse_quoted(const char* str, int* pos, char** currentArg, int* currentArgLen,
 		(*pos)++;
 		c = str[*pos];
 		if (c == '\0') {
-			puts("mismatched quotes");
+			puts("exec: mismatched quotes");
 			exit(1);
 		}
 		if (c == end)
@@ -66,7 +66,7 @@ main(int argc, const char* argv[])
 	char** args = NULL, *currentArg = NULL;
 	const char* str;
 	int argsLen = 0, argsBufferLen = 0, currentArgLen = 0,
-		currentArgBufferLen = 0, pos;
+		currentArgBufferLen = 0, encounteredNewlineAt = -1, pos;
 
 	if (argc != 2) {
 		printf("usage: %s \"program arg 'arg1' ...\"\n", argv[0]);
@@ -77,13 +77,25 @@ main(int argc, const char* argv[])
 	pos = 0;
 	while (1) {
 		switch (str[pos]) {
-		case ' ':
-		case '\t':
 		case '\r':
 		case '\n':
+			// In normal shells, this would imply a second command.
+			// We don't support that here, so we need to make sure
+			// that either we have not parsed any arguments yet,
+			// or there are no more arguments pushed after this.
+			if (argsLen == 0 && currentArgLen == 0)
+				break;
+			encounteredNewlineAt = argsLen + 1;
+			// fall through
+		case ' ':
+		case '\t':
 		case '\0':
 			if (currentArgLen == 0)
 				break; // do nothing
+			if (encounteredNewlineAt == argsLen) {
+				puts("exec: running multiple commands not supported!");
+				return 1;
+			}
 
 			append_char('\0', &currentArg, &currentArgLen,
 				&currentArgBufferLen);
@@ -91,7 +103,7 @@ main(int argc, const char* argv[])
 			if ((argsLen + 2) >= argsBufferLen) {
 				args = realloc(args, (argsBufferLen + 8) * sizeof(char*));
 				if (args == NULL) {
-					puts("oom");
+					puts("exec: oom");
 					return 1;
 				}
 				argsBufferLen += 8;
@@ -114,6 +126,9 @@ main(int argc, const char* argv[])
 
 		case '\\':
 			pos++;
+			// don't append newlines to the current argument
+			if (str[pos] == '\r' || str[pos] == '\n')
+				break;
 			// fall through
 		default:
 			append_char(str[pos], &currentArg, &currentArgLen,
