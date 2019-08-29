@@ -161,7 +161,7 @@ public:
 		FillRect(b, B_SOLID_LOW);
 
 		if (fEncrypted && CountChildren() == 0) {
-			SetHighColor(make_color(128, 128, 128));
+			SetHighColor(make_color(192, 192, 192));
 			StrokeRect(b, B_SOLID_HIGH);
 			b.InsetBy(1, 1);
 			SetLowColor(make_color(224, 224, 0));
@@ -176,12 +176,12 @@ public:
 
 		BRect used(b.LeftTop(), BSize(b.Width() / (100.0 / fUsed), b.Height()));
 
-		SetLowColor(make_color(240, 248, 255));
+		SetLowColor(make_color(172, 172, 255));
 
 		if (fReadOnly)
-			SetLowColor(make_color(255, 224, 224));
-		if (fBoot || fBFS)
-			SetLowColor(make_color(224, 255, 224));
+			SetLowColor(make_color(255, 172, 172));
+		else if (fBoot || fBFS)
+			SetLowColor(make_color(190, 255, 190));
 		if (CountChildren() == 0)
 			FillRect(used, B_SOLID_LOW);
 
