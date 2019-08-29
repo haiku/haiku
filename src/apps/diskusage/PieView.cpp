@@ -386,7 +386,7 @@ PieView::_DrawProgressBar(BRect updateRect)
 	float strWidth = StringWidth(task);
 	bx = (b.left + b.Width() - strWidth) / 2.0;
 	by -= fFontHeight + 2.0 * kSmallVMargin;
-	SetHighColor(0, 0, 0);
+	SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 	DrawString(task, BPoint(bx, by));
 }
 
