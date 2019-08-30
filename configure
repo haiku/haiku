@@ -267,7 +267,7 @@ standard_gcc_settings()
 	# determine architecture from machine triple
 	case $gccMachine in
 		arm-*)		targetCpu=arm;;
-		arm64-*)	targetCpu=arm64;;
+		aarch64-*)	targetCpu=arm64;;
 		i?86-*)		targetCpu=x86;;
 		m68k-*)		targetCpu=m68k;;
 		powerpc-*)	targetCpu=ppc;;
@@ -701,6 +701,7 @@ while [ $# -gt 0 ] ; do
 				ppc)		targetMachine=powerpc-apple-haiku;;
 				m68k)		targetMachine=m68k-unknown-haiku;;
 				arm)		targetMachine=arm-unknown-haiku;;
+				arm64)		targetMachine=aarch64-unknown-haiku;;
 				riscv64)	targetMachine=riscv64-unknown-haiku;;
 				sparc)		targetMachine=sparc64-unknown-haiku;;
 				*)
@@ -760,7 +761,7 @@ while [ $# -gt 0 ] ; do
 				x86_64)		targetMachine=x86_64-unknown-haiku;;
 				ppc)		targetMachine=powerpc-apple-haiku;;
 				arm)		targetMachine=arm-unknown-haiku;;
-				arm64)		targetMachine=arm64-unknown-haiku;;
+				arm64)		targetMachine=aarch64-unknown-haiku;;
 				riscv64)	targetMachine=riscv64-unknown-haiku;;
 				sparc)		targetMachine=sparc64-unknown-haiku;;
 				*)

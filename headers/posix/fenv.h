@@ -7,6 +7,8 @@
 #  include <arch/x86_64/fenv.h>
 #elif defined(__arm__)
 #  include <arch/arm/fenv.h>
+#elif defined(__aarch64__)
+#  include <arch/arm64/fenv.h>
 #elif defined(__POWERPC__)
 #  include <arch/ppc/fenv.h>
 #else
