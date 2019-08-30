@@ -1,5 +1,5 @@
 /* 
-** Distributed under the terms of the Haiku License.
+** Distributed under the terms of the MIT License.
 */
 #ifndef _FSSH_DIRENT_H
 #define _FSSH_DIRENT_H

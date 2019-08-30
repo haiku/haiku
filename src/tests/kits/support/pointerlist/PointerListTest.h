@@ -1,6 +1,6 @@
 /* 
 ** Copyright 2004, Michael Pfeiffer (laplace@users.sourceforge.net).
-** Distributed under the terms of the Haiku License.
+** Distributed under the terms of the MIT License.
 **
 */
 

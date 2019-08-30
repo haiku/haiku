@@ -3,7 +3,7 @@
  * Based on frame_buffer_console.
  *
  * Copyright 2005 Michael Lotz. All rights reserved.
- * Distributed under the Haiku License.
+ * Distributed under the MIT License.
  *
  * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.

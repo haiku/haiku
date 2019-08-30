@@ -1,6 +1,6 @@
 /*
 ** Copyright 2004, the Haiku project. All rights reserved.
-** Distributed under the terms of the Haiku License.
+** Distributed under the terms of the MIT License.
 **
 ** Author : Jérôme Duval
 ** Original authors: Marcus Overhagen, Axel Dörfler

@@ -1,7 +1,7 @@
 /* 
 ** Copyright 2003-2004, Stefano Ceccherini (burton666@libero.it). All rights reserved.
 **           2004, Michael Pfeiffer (laplace@users.sourceforge.net).
-** Distributed under the terms of the Haiku License.
+** Distributed under the terms of the MIT License.
 **
 ** History
 ** 2003-2004  Initial implementation by Stefano Ceccerini.

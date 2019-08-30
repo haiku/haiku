@@ -1,7 +1,7 @@
 /*
  * Copyright 2010, Michael Lotz, mmlr@mlotz.ch.
  * Copyright 2004, Axel Dörfler, axeld@pinc-software.de.
- * Distributed under the terms of the Haiku License.
+ * Distributed under the terms of the MIT License.
  */
 
 #include <new>

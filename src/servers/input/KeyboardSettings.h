@@ -1,6 +1,6 @@
 /*
 ** Copyright 2004-2006, the Haiku project. All rights reserved.
-** Distributed under the terms of the Haiku License.
+** Distributed under the terms of the MIT License.
 **
 ** Authors in chronological order:
 **  mccall@digitalparadise.co.uk

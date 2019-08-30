@@ -1,6 +1,6 @@
 /*
 ** Copyright 2005, Jérôme Duval. All rights reserved.
-** Distributed under the terms of the Haiku License.
+** Distributed under the terms of the MIT License.
 */
 
 #include <stdio.h>

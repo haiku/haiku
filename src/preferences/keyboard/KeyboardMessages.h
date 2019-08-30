@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2007, Haiku. All rights reserved.
- * Distributed under the terms of the Haiku License.
+ * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Andrew McCall, mccall@digitalparadise.co.uk

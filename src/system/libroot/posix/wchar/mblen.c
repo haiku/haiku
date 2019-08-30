@@ -1,6 +1,6 @@
 /*
 ** Copyright 2011, Oliver Tappe, zooey@hirschkaefer.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
+** Distributed under the terms of the MIT License.
 */
  
 #include <wchar_private.h>

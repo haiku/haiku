@@ -1,6 +1,6 @@
 /*
 ** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the Haiku License.
+** Distributed under the terms of the MIT License.
 */
 
 /*

@@ -1,6 +1,6 @@
 /*
  * Copyright 2001-2011 Haiku, Inc. All Rights Reserved.
- * Distributed under the terms of the Haiku License.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef _PTHREAD_H_
 #define _PTHREAD_H_

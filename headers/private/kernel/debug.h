@@ -1,6 +1,6 @@
 /*
  * Copyright 2002-2015, Axel Dörfler, axeld@pinc-software.de
- * Distributed under the terms of the Haiku License.
+ * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.

@@ -1,6 +1,6 @@
 /*
 ** Copyright 2010, Oliver Tappe, zooey@hirschkaefer.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
+** Distributed under the terms of the MIT License.
 */
 
 #include <ctype.h>

@@ -1,6 +1,6 @@
 /*
  * Copyright 2017 Haiku, Inc. All Rights Reserved.
- * Distributed under the terms of the Haiku License.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef _SPAWN_H_
 #define _SPAWN_H_

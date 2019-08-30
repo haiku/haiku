@@ -2,7 +2,7 @@
  * Part of the MiniTerminal.
  *
  * Copyright 2005 Michael Lotz. All rights reserved.
- * Distributed under the Haiku License.
+ * Distributed under the MIT License.
  */
 
 #include "Arguments.h"

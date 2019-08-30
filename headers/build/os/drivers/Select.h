@@ -1,6 +1,6 @@
 /* File System and Drivers select support
 **
-** Distributed under the terms of the Haiku License.
+** Distributed under the terms of the MIT License.
 */
 #ifndef _DRIVERS_SELECT_H
 #define _DRIVERS_SELECT_H

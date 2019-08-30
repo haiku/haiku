@@ -1,6 +1,6 @@
 /*
  * Copyright 2019 Haiku, Inc. All Rights Reserved.
- * Distributed under the terms of the Haiku License.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef _GNU_SPAWN_H_
 #define _GNU_SPAWN_H_

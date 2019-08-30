@@ -3,7 +3,7 @@
  * Copyright 2013-2014, Fredrik Holmqvist, fredrik.holmqvist@gmail.com.
  * Copyright 2014, Henry Harrington, henry.harrington@gmail.com.
  * All rights reserved.
- * Distributed under the terms of the Haiku License.
+ * Distributed under the terms of the MIT License.
  */
 
 

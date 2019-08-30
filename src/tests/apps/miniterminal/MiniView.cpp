@@ -4,7 +4,7 @@
  * Based on consoled and MuTerminal.
  *
  * Copyright 2005 Michael Lotz. All rights reserved.
- * Distributed under the Haiku License.
+ * Distributed under the MIT License.
  *
  * Copyright 2004-2005, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.

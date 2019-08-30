@@ -1,6 +1,6 @@
 /* 
  * Copyright 2005, Ingo Weinhold <bonefish@cs.tu-berlin.de>. All rights
- * reserved. Distributed under the terms of the Haiku License.
+ * reserved. Distributed under the terms of the MIT License.
  */
 #ifndef SETJMP_INTERNAL_H
 #define SETJMP_INTERNAL_H
