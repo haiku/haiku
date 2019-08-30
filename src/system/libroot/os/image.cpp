@@ -314,6 +314,55 @@ clear_caches(void *address, size_t length, uint32 flags)
 //	#pragma mark -
 
 
+status_t
+__look_up_in_path(const char *file, char *buffer)
+{
+	// get the PATH
+	const char* paths = getenv("PATH");
+	if (paths == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	int fileNameLen = strlen(file);
+
+	// iterate through the paths
+	const char* pathEnd = paths - 1;
+	while (pathEnd != NULL) {
+		paths = pathEnd + 1;
+		pathEnd = strchr(paths, ':');
+		int pathLen = (pathEnd ? pathEnd - paths : strlen(paths));
+
+		// We skip empty paths and those that would become too long.
+		// The latter is not really correct, but practically irrelevant.
+		if (pathLen == 0
+			|| pathLen + 1 + fileNameLen >= B_PATH_NAME_LENGTH) {
+			continue;
+		}
+
+		// concatinate the program path
+		char path[B_PATH_NAME_LENGTH];
+		memcpy(path, paths, pathLen);
+		path[pathLen] = '\0';
+
+		if (path[pathLen - 1] != '/')
+			strcat(path, "/");
+		strcat(path, file);
+
+		// check whether it is a file
+		struct stat st;
+		if (stat(path, &st) != 0 || !S_ISREG(st.st_mode))
+			continue;
+
+		// if executable, we've found what we are looking for
+		if (access(path, X_OK) == 0) {
+			strlcpy(buffer, path, B_PATH_NAME_LENGTH);
+			return B_OK;
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
 static char *
 next_argument(char **_start, bool separate)
 {

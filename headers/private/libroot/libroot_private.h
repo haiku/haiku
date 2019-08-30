@@ -23,6 +23,7 @@ extern int __gABIVersion;
 extern char _single_threaded;
 	/* This determines if a process runs single threaded or not */
 
+status_t __look_up_in_path(const char *name, char *buffer);
 status_t __parse_invoke_line(char *invoker, char ***_newArgs,
 			char * const **_oldArgs, int32 *_argCount, const char *arg0);
 status_t __get_next_image_dependency(image_id id, uint32 *cookie,

@@ -157,50 +157,14 @@ execvpe(const char* file, char* const argv[], char* const environment[])
 
 	// file is just a leaf name, so we have to look it up in the path
 
-	// get the PATH
-	const char* paths = getenv("PATH");
-	if (paths == NULL) {
-		__set_errno(B_ENTRY_NOT_FOUND);
+	char path[B_PATH_NAME_LENGTH];
+	status_t status = __look_up_in_path(file, path);
+	if (status != B_OK) {
+		__set_errno(status);
 		return -1;
 	}
 
-	int fileNameLen = strlen(file);
-
-	// iterate through the paths
-	const char* pathEnd = paths - 1;
-	while (pathEnd != NULL) {
-		paths = pathEnd + 1;
-		pathEnd = strchr(paths, ':');
-		int pathLen = (pathEnd ? pathEnd - paths : strlen(paths));
-
-		// We skip empty paths and those that would become too long.
-		// The latter is not really correct, but practically irrelevant.
-		if (pathLen == 0
-			|| pathLen + 1 + fileNameLen >= B_PATH_NAME_LENGTH) {
-			continue;
-		}
-
-		// concatinate the program path
-		char path[B_PATH_NAME_LENGTH];
-		memcpy(path, paths, pathLen);
-		path[pathLen] = '\0';
-
-		if (path[pathLen - 1] != '/')
-			strcat(path, "/");
-		strcat(path, file);
-
-		// check whether it is a file
-		struct stat st;
-		if (stat(path, &st) != 0 || !S_ISREG(st.st_mode))
-			continue;
-
-		// if executable, execute it
-		if (access(path, X_OK) == 0)
-			return do_exec(path, argv, environment, true);
-	}
-
-	__set_errno(B_ENTRY_NOT_FOUND);
-	return -1;
+	return do_exec(path, argv, environment, true);
 }
 
 
