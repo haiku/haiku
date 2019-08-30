@@ -134,7 +134,7 @@ bfs_identify_partition(int fd, partition_data* partition, void** _cookie)
 	memcpy(&cookie->super_block, &superBlock, sizeof(disk_super_block));
 
 	*_cookie = cookie;
-	return 0.8f;
+	return 0.85f;
 }
 
 
