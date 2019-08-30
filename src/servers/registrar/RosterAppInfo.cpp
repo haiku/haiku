@@ -10,6 +10,9 @@
 #include <new>
 #include <string.h>
 
+#include <Entry.h>
+#include <SupportDefs.h>
+
 
 using std::nothrow;
 
@@ -33,7 +36,9 @@ RosterAppInfo::Init(thread_id thread, team_id team, port_id port, uint32 flags,
 	this->team = team;
 	this->port = port;
 	this->flags = flags;
-	this->ref = *ref;
+	BEntry entry(ref, true);
+	if (entry.GetRef(&this->ref) != B_OK)
+		this->ref = *ref;
 	if (signature)
 		strlcpy(this->signature, signature, B_MIME_TYPE_LENGTH);
 	else
