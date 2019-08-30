@@ -828,7 +828,11 @@ Volume::_EraseUnusedBootBlock()
 {
 	const int32 blockSize = 512;
 	const char emptySector[blockSize] = { 0 };
+	// Erase boot block if any
 	if (write_pos(fDevice, 0, emptySector, blockSize) != blockSize)
+		return B_IO_ERROR;
+	// Erase ext2 superblock if any
+	if (write_pos(fDevice, 1024, emptySector, blockSize) != blockSize)
 		return B_IO_ERROR;
 
 	return B_OK;
