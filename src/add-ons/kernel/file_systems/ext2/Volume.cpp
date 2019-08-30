@@ -207,7 +207,10 @@ ext2_super_block::IsValid()
 			|| BlocksPerGroup() != (1UL << BlockShift()) * 8
 			|| InodeSize() > (1UL << BlockShift())
 			|| RevisionLevel() > EXT2_MAX_REVISION
-			|| ReservedGDTBlocks() > (1UL << BlockShift()) / 4) {
+			|| ReservedGDTBlocks() > (1UL << BlockShift()) / 4
+			|| NumInodes() == 0
+			|| InodeSize() == 0
+			|| FreeInodes() > NumInodes()) {
 		return false;
 	}
 
@@ -536,6 +539,8 @@ Volume::GetInodeBlock(ino_t id, off_t& block)
 
 	block = group->InodeTable(Has64bitFeature())
 		+ ((id - 1) % fSuperBlock.InodesPerGroup()) / fInodesPerBlock;
+	if (block < 0)
+		return B_BAD_DATA;
 	return B_OK;
 }
 
