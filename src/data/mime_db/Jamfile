@@ -46,7 +46,7 @@ rule BuildMimeDB superTypes
 
 actions BuildMimeDBSuperTypes
 {
-	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	export $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 
 	# remove and re-create the directory
 	baseDirectory="$(1)"
@@ -66,7 +66,7 @@ actions BuildMimeDBSuperTypes
 
 actions BuildMimeDBSubTypes
 {
-	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	export $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 
 	resattr="$(2[1])"
 	superType=`basename "$(2[2])" .super`

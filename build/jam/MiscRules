@@ -266,7 +266,7 @@ actions RunCommandLine1 {
 		target=${target}X
 		eval "${target}=${t}"
 	done
-	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) \
 	"$(COMMAND_LINE)"
 }
 

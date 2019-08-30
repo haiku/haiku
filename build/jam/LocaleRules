@@ -77,7 +77,7 @@ rule ExtractCatalogEntries target : sources : signature : regexp
 
 actions ExtractCatalogEntries1
 {
-	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	export $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 	$(CC) -E $(CCDEFS) -DB_COLLECTING_CATKEYS $(HDRS) "$(2[2-])" > "$(1)".pre
 	$(2[1]) $(HAIKU_CATALOG_REGEXP) -s $(HAIKU_CATALOG_SIGNATURE) \
 		-w -o "$(1)" "$(1)".pre
@@ -86,7 +86,7 @@ actions ExtractCatalogEntries1
 
 actions ExtractCatalogEntries2
 {
-	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	export $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 	$(CC) -E $(CCDEFS) -DB_COLLECTING_CATKEYS $(HDRS) "$(2[2-])" > "$(1)".pre \
 		|| true
 	$(2[1]) $(HAIKU_CATALOG_REGEXP) -s $(HAIKU_CATALOG_SIGNATURE) \
@@ -113,7 +113,7 @@ rule LinkApplicationCatalog target : sources : signature : language
 
 actions LinkApplicationCatalog1
 {
-	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) \
 	$(2[1]) "$(2[2-])" -l $(HAIKU_CATALOG_LANGUAGE) \
 		-s $(HAIKU_CATALOG_SIGNATURE) -o "$(1)"
 }
@@ -198,6 +198,6 @@ rule AddCatalogEntryAttribute target
 
 actions AddCatalogEntryAttribute1
 {
-	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) \
 	"$(2)" -t string "SYS:NAME" "$(CATALOG_ENTRY)" "$(1)"
 }

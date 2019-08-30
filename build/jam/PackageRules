@@ -75,7 +75,7 @@ rule PreprocessPackageInfo source : directory : architecture
 
 actions UpdatePackageInfoRequires
 {
-	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) \
 	"$(2[1])" "$(1)" "$(2[2])"
 }
 
@@ -183,7 +183,7 @@ rule BuildHaikuPackage package : packageInfo
 	AddVariableToScript $(script) : outputDir : $(HAIKU_OUTPUT_DIR) ;
 	AddVariableToScript $(script) : tmpDir : $(tempDir) ;
 	AddVariableToScript $(script) : addBuildCompatibilityLibDir
-		: $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ;
+		: "export $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)" ;
 	AddVariableToScript $(script) : compressionLevel
 		: [ on $(package) return $(HAIKU_PACKAGE_COMPRESSION_LEVEL) ] ;
 	AddVariableToScript $(script) : updateOnly

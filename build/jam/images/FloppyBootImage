@@ -136,7 +136,7 @@ Always $(script) ;
 
 AddVariableToScript $(script) : tmpDir : $(HAIKU_TMP_DIR) ;
 AddVariableToScript $(script) : addBuildCompatibilityLibDir
-	: $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ;
+	: "export $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)" ;
 AddTargetVariableToScript $(script) : <build>copyattr ;
 
 # create the other scripts

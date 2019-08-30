@@ -34,7 +34,7 @@ rule BuildAoutLoader {
 
 actions BuildAoutLoader bind ELF2AOUT {
 	rm -f $(1)
-	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) \
 	$(ELF2AOUT) -o $(1) $(2)
 }
 

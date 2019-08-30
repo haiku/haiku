@@ -97,7 +97,7 @@ rule KernelSo target : source
 
 actions KernelSo1
 {
-	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	export $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 
 	$(2[1]) --data $(2[2]) $(1) &&
 	$(HAIKU_ELFEDIT_$(TARGET_PACKAGING_ARCH)) --output-type dyn $(1)

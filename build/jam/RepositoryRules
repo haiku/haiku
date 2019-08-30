@@ -256,7 +256,7 @@ actions RepositoryConfig1
 	if [ -n "$(2[3]:E)" ]; then
 		version=`cat "$(2[3]:E)"`
 	fi
-	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) \
 	$(2[1]) $(2[2]) $(1)
 }
 
@@ -272,7 +272,7 @@ rule RepositoryCache repoCache : repoInfo : packageFiles
 
 actions RepositoryCache1
 {
-	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) \
 	$(2[1]) create -q $(2[2-])
 	mv $(1:B=repo) $(1)
 }
@@ -362,7 +362,7 @@ actions BootstrapRepositoryFetchPackage1
 
 	cd $(HAIKU_REPOSITORY_BUILD_DIRECTORY)
 
-	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	export $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 	if [ -n "$secondaryCrossDevelPackages" ]; then
 		$(HOST_HAIKU_PORTER) -j$(HAIKU_PORTER_CONCURRENT_JOBS) \
 			--all-dependencies $(HAIKU_PORTER_EXTRA_OPTIONS) \
@@ -665,7 +665,7 @@ actions BuildHaikuPortsSourcePackageDirectory1
 
 	cd $(HAIKU_REPOSITORY_BUILD_DIRECTORY)
 
-	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	export $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 	if [ -n "$secondaryCrossDevelPackages" ]; then
 		$(HOST_HAIKU_PORTER) --cross-devel-package "$haikuCrossDevelPackage" \
 			"$secondaryCrossDevelPackages" \
@@ -763,7 +763,7 @@ rule HaikuRepository repository : repoInfoTemplate : packages
 
 	local script = $(initVariablesScript) ;
 	AddVariableToScript $(script) : addBuildCompatibilityLibDir
-		: $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ;
+		: "export $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)" ;
 	AddVariableToScript $(script) : sha256 : $(HOST_SHA256) ;
 	AddVariableToScript $(script) : sedExtendedRegex
 		: $(HOST_EXTENDED_REGEX_SED) ;

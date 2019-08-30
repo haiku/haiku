@@ -10,7 +10,7 @@ rule Copy
 
 actions Copy1
 {
-	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) \
 	"$(2[1])" -d "$(2[2-])" "$(1)"
 }
 
@@ -295,7 +295,7 @@ actions ExtractTarArchive1
 actions ExtractHPKGArchive1
 {
 	mkdir -p "$(1)"
-	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) \
 	$(2[1]) extract -C "$(1)" "$(2[2])"
 }
 
@@ -355,7 +355,7 @@ rule CopySetHaikuRevision target : source
 
 actions CopySetHaikuRevision1
 {
-	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	export $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 
 	$(2[1]) --data $(2[3]) $(1) || exit 1
 
@@ -422,7 +422,7 @@ rule DataFileToSourceFile sourceFile : dataFile : dataVariable : sizeVariable
 
 actions DataFileToSourceFile1
 {
-	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) \
 	$(2[1]) $(DATA_VARIABLE) $(SIZE_VARIABLE) $(2[2]) $(1)
 }
 
@@ -594,7 +594,7 @@ rule StripFile target : source
 
 actions StripFile1
 {
-	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	export $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 	"$(STRIP)" -o "$(1)" "$(2[1])"
 	"$(2[2])" -o "$(1)" "$(2[1])"
 	"$(2[3])" "$(2[1])" "$(1)"

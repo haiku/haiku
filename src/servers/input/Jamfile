@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src servers input ;
 
-rule MkKeymapHeader {
+rule MkKeymapHeader
+{
 	local binary = $(1) ;
 	local source = $(2) ;
 
@@ -12,9 +13,10 @@ rule MkKeymapHeader {
 	LocalClean clean : $(binary) ;
 }
 
-actions MkKeymapHeader1 {
-	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-	$(2[1]) -o "$(1)" -h "$(2[2-])" ;
+actions MkKeymapHeader1
+{
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) \
+	$(2[1]) -o "$(1)" -h "$(2[2-])"
 }
 
 MkKeymapHeader [ FGristFiles SystemKeymap.h ] : US-International.keymap ;

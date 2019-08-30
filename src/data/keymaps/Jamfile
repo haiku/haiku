@@ -19,8 +19,8 @@ rule MkKeymapComp
 
 actions MkKeymapComp1
 {
-	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-	$(2[1]) -o "$(1)" -c "$(2[2-])" ;
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) \
+	$(2[1]) -o "$(1)" -c "$(2[2-])"
 }
 
 
