@@ -12,7 +12,7 @@
 #define set_ac()
 #define clear_ac()
 
-#include <kernel/arch/arm64/armreg.h>
+#include <kernel/arch/arm64/arm_registers.h>
 
 #ifndef _ASSEMBLER
 
@@ -104,7 +104,7 @@ arm64_address_translate_ ##stage (uint64 addr)		\
 	uint64 ret;											\
 														\
 	__asm __volatile(									\
-	    "at " __STRING(stage) ", %1 \n"					\
+	    "at " __ARMREG_STRING(stage) ", %1 \n"					\
 	    "mrs %0, par_el1" : "=r"(ret) : "r"(addr));		\
 														\
 	return (ret);										\
@@ -125,6 +125,7 @@ struct iframe {
 	uint64			x[30];
 };
 
+#ifdef __cplusplus
 namespace BKernel {
 	struct Thread;
 }  // namespace BKernel
@@ -133,6 +134,7 @@ typedef struct arch_cpu_info {
 	uint32						mpidr;
 	BKernel::Thread*			last_vfp_user;
 } arch_cpu_info;
+#endif
 
 #ifdef __cplusplus
 extern "C" {

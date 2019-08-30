@@ -18,6 +18,7 @@
 #include <arch/m68k/arch_debugger.h>
 #include <arch/mipsel/arch_debugger.h>
 #include <arch/arm/arch_debugger.h>
+#include <arch/arm64/arch_debugger.h>
 #include <arch/riscv64/arch_debugger.h>
 #include <arch/sparc/arch_debugger.h>
 
@@ -38,6 +39,8 @@
 	typedef struct riscv64_debug_cpu_state debug_cpu_state;
 #elif defined(__sparc64__)
 	typedef struct sparc_debug_cpu_state debug_cpu_state;
+#elif defined(__aarch64__) || defined(__arm64__)
+	typedef struct arm64_debug_cpu_state debug_cpu_state;
 #else
 	#error unsupported architecture
 #endif

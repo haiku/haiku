@@ -19,6 +19,8 @@
 #	include "arch/ppc/syscalls.inc"
 #elif defined(ARCH_arm)
 #	include "arch/arm/syscalls.inc"
+#elif defined(ARCH_arm64)
+#	include "arch/arm64/syscalls.inc"
 #elif defined(ARCH_m68k)
 #	include "arch/m68k/syscalls.inc"
 #elif defined(ARCH_riscv64)
