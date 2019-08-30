@@ -8,6 +8,7 @@
 
 #include <SupportDefs.h>
 
+extern struct fs_vnode_ops gRamFSVnodeOps;
 const size_t kMaxIndexKeyLength = 256;
 
 #endif	// RAM_FS_H

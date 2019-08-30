@@ -133,7 +133,6 @@ class EntryListenerTree : public _EntryListenerTree {};
 Volume::Volume(fs_volume* volume)
 	:
 	fVolume(volume),
-	fID(0),
 	fNextNodeID(kRootParentID + 1),
 	fNodeTable(NULL),
 	fDirectoryEntryTable(NULL),
@@ -170,16 +169,15 @@ Volume::Mount(uint32 flags)
 {
 	Unmount();
 
-	// check the locker's semaphores
-	if (fLocker.Sem() < 0)
-		return fLocker.Sem();
-	if (fIteratorLocker.Sem() < 0)
-		return fIteratorLocker.Sem();
-	if (fQueryLocker.Sem() < 0)
-		return fQueryLocker.Sem();
+	// check the lockers
+	if (fLocker.InitCheck() < 0)
+		return fLocker.InitCheck();
+	if (fIteratorLocker.InitCheck() < 0)
+		return fIteratorLocker.InitCheck();
+	if (fQueryLocker.InitCheck() < 0)
+		return fQueryLocker.InitCheck();
 
 	status_t error = B_OK;
-	fID = id;
 	// create a block allocator
 	if (error == B_OK) {
 		fBlockAllocator = new(nothrow) BlockAllocator(kDefaultAreaSize);
@@ -291,7 +289,6 @@ Volume::Unmount()
 		delete fBlockAllocator;
 		fBlockAllocator = NULL;
 	}
-	fID = 0;
 	return B_OK;
 }
 
@@ -349,7 +346,7 @@ Volume::NewVNode(Node *node)
 {
 	status_t error = NodeAdded(node);
 	if (error == B_OK) {
-		error = new_vnode(GetID(), node->GetID(), node);
+		error = new_vnode(FSVolume(), node->GetID(), node, &gRamFSVnodeOps);
 		if (error != B_OK)
 			NodeRemoved(node);
 	}
@@ -362,7 +359,8 @@ Volume::PublishVNode(Node *node)
 {
 	status_t error = NodeAdded(node);
 	if (error == B_OK) {
-		error = publish_vnode(GetID(), node->GetID(), node);
+		error = publish_vnode(FSVolume(), node->GetID(), node, &gRamFSVnodeOps,
+			node->GetMode(), 0);
 		if (error != B_OK)
 			NodeRemoved(node);
 	}
@@ -373,7 +371,7 @@ Volume::PublishVNode(Node *node)
 status_t
 Volume::GetVNode(ino_t id, Node **node)
 {
-	return (fMounted ? get_vnode(GetID(), id, (void**)node) : B_BAD_VALUE);
+	return (fMounted ? get_vnode(FSVolume(), id, (void**)node) : B_BAD_VALUE);
 }
 
 // GetVNode
@@ -384,7 +382,7 @@ Volume::GetVNode(Node *node)
 	status_t error = (fMounted ? GetVNode(node->GetID(), &dummy)
 							   : B_BAD_VALUE );
 	if (error == B_OK && dummy != node) {
-		FATAL(("Two Nodes have the same ID: %Ld!\n", node->GetID()));
+		FATAL("Two Nodes have the same ID: %Ld!\n", node->GetID());
 		PutVNode(dummy);
 		error = B_ERROR;
 	}
@@ -395,14 +393,14 @@ Volume::GetVNode(Node *node)
 status_t
 Volume::PutVNode(ino_t id)
 {
-	return (fMounted ? put_vnode(GetID(), id) : B_BAD_VALUE);
+	return (fMounted ? put_vnode(FSVolume(), id) : B_BAD_VALUE);
 }
 
 // PutVNode
 status_t
 Volume::PutVNode(Node *node)
 {
-	return (fMounted ? put_vnode(GetID(), node->GetID()) : B_BAD_VALUE);
+	return (fMounted ? put_vnode(FSVolume(), node->GetID()) : B_BAD_VALUE);
 }
 
 // RemoveVNode
@@ -410,7 +408,7 @@ status_t
 Volume::RemoveVNode(Node *node)
 {
 	if (fMounted)
-		return remove_vnode(GetID(), node->GetID());
+		return remove_vnode(FSVolume(), node->GetID());
 	status_t error = NodeRemoved(node);
 	if (error == B_OK)
 		delete node;
@@ -421,7 +419,7 @@ Volume::RemoveVNode(Node *node)
 status_t
 Volume::UnremoveVNode(Node *node)
 {
-	return (fMounted ? unremove_vnode(GetID(), node->GetID()) : B_BAD_VALUE);
+	return (fMounted ? unremove_vnode(FSVolume(), node->GetID()) : B_BAD_VALUE);
 }
 
 // NodeAdded

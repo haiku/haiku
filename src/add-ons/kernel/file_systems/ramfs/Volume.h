@@ -99,7 +99,7 @@ public:
 	status_t Mount(uint32 flags);
 	status_t Unmount();
 
-	dev_t GetID() const { return fID; }
+	dev_t GetID() const { return fVolume != NULL ? fVolume->id : -1; }
 	fs_volume* FSVolume() const { return fVolume; }
 
 	off_t GetBlockSize() const;
@@ -183,7 +183,6 @@ protected:
 private:
 	typedef DoublyLinkedList<Query>	QueryList;
 
-	dev_t					fID;
 	ino_t					fNextNodeID;
 	NodeTable				*fNodeTable;
 	DirectoryEntryTable		*fDirectoryEntryTable;

@@ -18,6 +18,7 @@ KernelAddon ramfs
 	BlockAllocatorAreaBucket.cpp
 	BlockReferenceManager.cpp
 	DataContainer.cpp
+	DebugSupport.cpp
 	Directory.cpp
 	Entry.cpp
 	EntryIterator.cpp
@@ -36,3 +37,6 @@ KernelAddon ramfs
 	SymLink.cpp
 	Volume.cpp
 ;
+
+SEARCH on [ FGristFiles DebugSupport.cpp ]
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
