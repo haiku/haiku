@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Jaroslaw Pelczar <jarek@jpelczar.com>
+ * Copyright 2019 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 
