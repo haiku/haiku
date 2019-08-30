@@ -1,4 +1,7 @@
-// NodeListener.h
+/*
+ * Copyright 2007, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * All rights reserved. Distributed under the terms of the MIT license.
+ */
 
 #ifndef NODE_LISTENER_H
 #define NODE_LISTENER_H

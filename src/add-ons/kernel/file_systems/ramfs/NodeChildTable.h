@@ -1,5 +1,7 @@
-// NodeChildTable.h
-
+/*
+ * Copyright 2007, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * All rights reserved. Distributed under the terms of the MIT license.
+ */
 #ifndef NODE_CHILD_TABLE_H
 #define NODE_CHILD_TABLE_H
 

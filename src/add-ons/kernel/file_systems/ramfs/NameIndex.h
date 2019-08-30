@@ -1,5 +1,7 @@
-// NameIndex.h
-
+/*
+ * Copyright 2007, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * All rights reserved. Distributed under the terms of the MIT license.
+ */
 #ifndef NAME_INDEX_H
 #define NAME_INDEX_H
 

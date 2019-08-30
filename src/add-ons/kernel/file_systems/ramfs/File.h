@@ -1,5 +1,7 @@
-// File.h
-
+/*
+ * Copyright 2007, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * All rights reserved. Distributed under the terms of the MIT license.
+ */
 #ifndef FILE_H
 #define FILE_H
 

@@ -1,4 +1,7 @@
-// IndexDirectory.cpp
+/*
+ * Copyright 2007, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * All rights reserved. Distributed under the terms of the MIT license.
+ */
 
 #include <TypeConstants.h>
 
@@ -61,7 +64,7 @@ IndexDirectory::~IndexDirectory()
 status_t
 IndexDirectory::InitCheck() const
 {
-	return (fNameIndex && fLastModifiedIndex && fSizeIndex ? B_OK 
+	return (fNameIndex && fLastModifiedIndex && fSizeIndex ? B_OK
 														   : B_NO_MEMORY);
 }
 

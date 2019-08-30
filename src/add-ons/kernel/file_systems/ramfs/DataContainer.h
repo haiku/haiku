@@ -1,5 +1,7 @@
-// DataContainer.h
-
+/*
+ * Copyright 2007, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * All rights reserved. Distributed under the terms of the MIT license.
+ */
 #ifndef DATA_CONTAINER_H
 #define DATA_CONTAINER_H
 
@@ -14,7 +16,7 @@ class Volume;
 // 16 bytes are for free, since they are shared with the block list.
 // (actually even more, since the list has an initial size).
 // I ran a test analyzing what sizes the attributes in my system have:
-//     size   percentage   bytes used in average 
+//     size   percentage   bytes used in average
 //   <=   0         0.00                   93.45
 //   <=   4        25.46                   75.48
 //   <=   8        30.54                   73.02

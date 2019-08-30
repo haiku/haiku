@@ -1,5 +1,7 @@
-// AllocationInfo.h
-
+/*
+ * Copyright 2007, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * All rights reserved. Distributed under the terms of the MIT license.
+ */
 #ifndef ALLOCATION_INFO_H
 #define ALLOCATION_INFO_H
 
