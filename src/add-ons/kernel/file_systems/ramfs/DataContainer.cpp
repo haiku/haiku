@@ -1,420 +1,359 @@
 /*
  * Copyright 2007, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2019, Haiku, Inc.
  * All rights reserved. Distributed under the terms of the MIT license.
  */
+#include "DataContainer.h"
+
+#include <AutoDeleter.h>
+#include <util/AutoLock.h>
+
+#include <vm/VMCache.h>
+#include <vm/vm_page.h>
 
 #include "AllocationInfo.h"
-#include "Attribute.h"	// for debugging only
-#include "Block.h"
-#include "DataContainer.h"
 #include "DebugSupport.h"
 #include "Misc.h"
-#include "Node.h"		// for debugging only
 #include "Volume.h"
 
 // constructor
 DataContainer::DataContainer(Volume *volume)
 	: fVolume(volume),
-	  fSize(0)
+	  fSize(0),
+	  fCache(NULL)
 {
 }
 
 // destructor
 DataContainer::~DataContainer()
 {
-	Resize(0);
+	if (fCache != NULL) {
+		fCache->Lock();
+		fCache->ReleaseRefAndUnlock();
+		fCache = NULL;
+	}
 }
 
 // InitCheck
 status_t
 DataContainer::InitCheck() const
 {
-	return (fVolume ? B_OK : B_ERROR);
+	return (fVolume != NULL ? B_OK : B_ERROR);
 }
 
 // Resize
 status_t
 DataContainer::Resize(off_t newSize)
 {
+//	PRINT("DataContainer::Resize(%Ld), fSize: %Ld\n", newSize, fSize);
+
 	status_t error = B_OK;
-	if (newSize < 0)
-		newSize = 0;
-	if (newSize != fSize) {
-		// Shrinking should never fail. Growing can fail, if we run out of
-		// memory. Then we try to shrink back to the original size.
-		off_t oldSize = fSize;
-		error = _Resize(newSize);
-		if (error == B_NO_MEMORY && newSize > fSize)
-			_Resize(oldSize);
+	if (newSize < fSize) {
+		// shrink
+		if (_IsCacheMode()) {
+			// resize the VMCache, which will automatically free pages
+			AutoLocker<VMCache> _(fCache);
+			error = fCache->Resize(newSize, VM_PRIORITY_SYSTEM);
+			if (error != B_OK)
+				return error;
+		} else {
+			// small buffer mode: just set the new size (done below)
+		}
+	} else if (newSize > fSize) {
+		// grow
+		if (_RequiresCacheMode(newSize)) {
+			if (!_IsCacheMode())
+				error = _SwitchToCacheMode(fSize);
+			if (error != B_OK)
+				return error;
+
+			AutoLocker<VMCache> _(fCache);
+			fCache->Resize(newSize, VM_PRIORITY_SYSTEM);
+
+			// pages will be added as they are written to; so nothing else
+			// needs to be done here.
+		} else {
+			// no need to switch to cache mode: just set the new size
+			// (done below)
+		}
 	}
+
+	fSize = newSize;
+
+//	PRINT("DataContainer::Resize() done: %lx, fSize: %Ld\n", error, fSize);
 	return error;
 }
 
 // ReadAt
 status_t
 DataContainer::ReadAt(off_t offset, void *_buffer, size_t size,
-					  size_t *bytesRead)
+	size_t *bytesRead)
 {
 	uint8 *buffer = (uint8*)_buffer;
-	status_t error = (buffer && offset >= 0 && bytesRead ? B_OK : B_BAD_VALUE);
-	if (error == B_OK) {
-		// read not more than we have to offer
-		offset = min(offset, fSize);
-		size = min(size, size_t(fSize - offset));
-		// iterate through the blocks, reading as long as there's something
-		// left to read
-		size_t blockSize = fVolume->GetBlockSize();
-		*bytesRead = 0;
-		while (size > 0) {
-			size_t inBlockOffset = offset % blockSize;
-			size_t toRead = min(size, size_t(blockSize - inBlockOffset));
-			void *blockData = _GetBlockDataAt(offset / blockSize,
-											  inBlockOffset, toRead);
-D(
-if (!blockData) {
-	Node *node = NULL;
-	if (Attribute *attribute = dynamic_cast<Attribute*>(this)) {
-		FATAL("attribute `%s' of\n", attribute->GetName());
-		node = attribute->GetNode();
-	} else {
-		node = dynamic_cast<Node*>(this);
+	status_t error = (buffer && offset >= 0 &&
+		bytesRead ? B_OK : B_BAD_VALUE);
+	if (error != B_OK)
+		return error;
+
+	// read not more than we have to offer
+	offset = min(offset, fSize);
+	size = min(size, size_t(fSize - offset));
+
+	if (!_IsCacheMode()) {
+		// in non-cache mode, we just copy the data directly
+		memcpy(buffer, fSmallBuffer + offset, size);
+		if (bytesRead != NULL)
+			*bytesRead = size;
+		return B_OK;
 	}
-	if (node)
-//		FATAL(("node `%s'\n", node->GetName()));
-		FATAL("container size: %Ld, offset: %Ld, buffer size: %lu\n",
-		   fSize, offset, size);
-		return B_ERROR;
-}
-);
-			memcpy(buffer, blockData, toRead);
-			buffer += toRead;
-			size -= toRead;
-			offset += toRead;
-			*bytesRead += toRead;
-		}
-	}
+
+	// cache mode
+	error = _DoCacheIO(offset, buffer, size, bytesRead, false);
+
 	return error;
 }
 
 // WriteAt
 status_t
 DataContainer::WriteAt(off_t offset, const void *_buffer, size_t size,
-					   size_t *bytesWritten)
+	size_t *bytesWritten)
 {
-//PRINT(("DataContainer::WriteAt(%Ld, %p, %lu, %p), fSize: %Ld\n", offset, _buffer, size, bytesWritten, fSize));
+	PRINT("DataContainer::WriteAt(%Ld, %p, %lu, %p), fSize: %Ld\n", offset, _buffer, size, bytesWritten, fSize);
+
 	const uint8 *buffer = (const uint8*)_buffer;
 	status_t error = (buffer && offset >= 0 && bytesWritten
-					  ? B_OK : B_BAD_VALUE);
-	// resize the container, if necessary
-	if (error == B_OK) {
-		off_t newSize = offset + size;
-		off_t oldSize = fSize;
-		if (newSize > fSize) {
-			error = Resize(newSize);
-			// pad with zero, if necessary
-			if (error == B_OK && offset > oldSize)
-				_ClearArea(offset, oldSize - offset);
-		}
-	}
-	if (error == B_OK) {
-		// iterate through the blocks, writing as long as there's something
-		// left to write
-		size_t blockSize = fVolume->GetBlockSize();
-		*bytesWritten = 0;
-		while (size > 0) {
-			size_t inBlockOffset = offset % blockSize;
-			size_t toWrite = min(size, size_t(blockSize - inBlockOffset));
-			void *blockData = _GetBlockDataAt(offset / blockSize,
-											  inBlockOffset, toWrite);
-D(if (!blockData) return B_ERROR;);
-			memcpy(blockData, buffer, toWrite);
-			buffer += toWrite;
-			size -= toWrite;
-			offset += toWrite;
-			*bytesWritten += toWrite;
-		}
-	}
-//PRINT(("DataContainer::WriteAt() done: %lx, fSize: %Ld\n", error, fSize));
-	return error;
-}
+		? B_OK : B_BAD_VALUE);
+	if (error != B_OK)
+		return error;
 
-// GetFirstDataBlock
-void
-DataContainer::GetFirstDataBlock(const uint8 **data, size_t *length)
-{
-	if (data && length) {
-		if (_IsBlockMode()) {
-			BlockReference *block = _GetBlockList()->ItemAt(0);
-			*data = (const uint8*)block->GetData();
-			*length = min(fSize, fVolume->GetBlockSize());
-		} else {
-			*data = fSmallBuffer;
-			*length = fSize;
-		}
+	// resize the container, if necessary
+	if ((offset + size) > fSize)
+		error = Resize(offset + size);
+	if (error != B_OK)
+		return error;
+
+	if (!_IsCacheMode()) {
+		// in non-cache mode, we just copy the data directly
+		memcpy(fSmallBuffer + offset, buffer, size);
+		if (bytesWritten != NULL)
+			*bytesWritten = size;
+		return B_OK;
 	}
+
+	// cache mode
+	error = _DoCacheIO(offset, (uint8*)buffer, size, bytesWritten, true);
+
+	PRINT("DataContainer::WriteAt() done: %lx, fSize: %Ld\n", error, fSize);
+	return error;
 }
 
 // GetAllocationInfo
 void
 DataContainer::GetAllocationInfo(AllocationInfo &info)
 {
-	if (_IsBlockMode()) {
-		BlockList *blocks = _GetBlockList();
-		info.AddListAllocation(blocks->GetCapacity(), sizeof(BlockReference*));
-		int32 blockCount = blocks->CountItems();
-		for (int32 i = 0; i < blockCount; i++)
-			info.AddBlockAllocation(blocks->ItemAt(i)->GetBlock()->GetSize());
+	if (_IsCacheMode()) {
+		info.AddAreaAllocation(fCache->committed_size);
 	} else {
 		// ...
 	}
 }
 
-// _RequiresBlockMode
-inline
-bool
-DataContainer::_RequiresBlockMode(size_t size)
+// _RequiresCacheMode
+inline bool
+DataContainer::_RequiresCacheMode(size_t size)
 {
-	return (size > kSmallDataContainerSize);
+	// we cannot back out of cache mode after entering it,
+	// as there may be other consumers of our VMCache
+	return _IsCacheMode() || (size > kSmallDataContainerSize);
 }
 
-// _IsBlockMode
-inline
-bool
-DataContainer::_IsBlockMode() const
+// _IsCacheMode
+inline bool
+DataContainer::_IsCacheMode() const
 {
-	return (fSize > kSmallDataContainerSize);
-}
-
-// _Resize
-status_t
-DataContainer::_Resize(off_t newSize)
-{
-//PRINT(("DataContainer::_Resize(%Ld), fSize: %Ld\n", newSize, fSize));
-	status_t error = B_OK;
-	if (newSize != fSize) {
-		size_t blockSize = fVolume->GetBlockSize();
-		int32 blockCount = _CountBlocks();
-		int32 newBlockCount = (newSize + blockSize - 1) / blockSize;
-		if (newBlockCount == blockCount) {
-			// only the last block needs to be resized
-			if (_IsBlockMode() && _RequiresBlockMode(newSize)) {
-				// keep block mode
-				error = _ResizeLastBlock((newSize - 1) % blockSize + 1);
-			} else if (!_IsBlockMode() && !_RequiresBlockMode(newSize)) {
-				// keep small buffer mode
-				fSize = newSize;
-			} else if (fSize < newSize) {
-				// switch to block mode
-				_SwitchToBlockMode(newSize);
-			} else {
-				// switch to small buffer mode
-				_SwitchToSmallBufferMode(newSize);
-			}
-		} else if (newBlockCount < blockCount) {
-			// shrink
-			if (_IsBlockMode()) {
-				// remove the last blocks
-				BlockList *blocks = _GetBlockList();
-				for (int32 i = blockCount - 1; i >= newBlockCount; i--) {
-					BlockReference *block = blocks->ItemAt(i);
-					blocks->RemoveItem(i);
-					fVolume->FreeBlock(block);
-					fSize = (fSize - 1) / blockSize * blockSize;
-				}
-				// resize the last block to the correct size, respectively
-				// switch to small buffer mode
-				if (_RequiresBlockMode(newSize))
-					error = _ResizeLastBlock((newSize - 1) % blockSize + 1);
-				else
-					_SwitchToSmallBufferMode(newSize);
-			} else {
-				// small buffer mode: just set the new size
-				fSize = newSize;
-			}
-		} else {
-			// grow
-			if (_RequiresBlockMode(newSize)) {
-				// resize the first block to the correct size, respectively
-				// switch to block mode
-				if (_IsBlockMode())
-					error = _ResizeLastBlock(blockSize);
-				else {
-					error = _SwitchToBlockMode(min((size_t)newSize,
-												   blockSize));
-				}
-				// add new blocks
-				BlockList *blocks = _GetBlockList();
-				while (error == B_OK && fSize < newSize) {
-					size_t newBlockSize = min(size_t(newSize - fSize),
-											  blockSize);
-					BlockReference *block = NULL;
-					error = fVolume->AllocateBlock(newBlockSize, &block);
-					if (error == B_OK) {
-						if (blocks->AddItem(block))
-							fSize += newBlockSize;
-						else {
-							SET_ERROR(error, B_NO_MEMORY);
-							fVolume->FreeBlock(block);
-						}
-					}
-				}
-			} else {
-				// no need to switch to block mode: just set the new size
-				fSize = newSize;
-			}
-		}
-	}
-//PRINT(("DataContainer::_Resize() done: %lx, fSize: %Ld\n", error, fSize));
-	return error;
-}
-
-// _GetBlockList
-inline
-DataContainer::BlockList *
-DataContainer::_GetBlockList()
-{
-	return (BlockList*)fBlocks;
-}
-
-// _GetBlockList
-inline
-const DataContainer::BlockList *
-DataContainer::_GetBlockList() const
-{
-	return (BlockList*)fBlocks;
+	return fCache != NULL;
 }
 
 // _CountBlocks
-inline
-int32
+inline int32
 DataContainer::_CountBlocks() const
 {
-	if (_IsBlockMode())
-		return _GetBlockList()->CountItems();
+	if (_IsCacheMode())
+		return fCache->page_count;
 	else if (fSize == 0)	// small buffer mode, empty buffer
 		return 0;
 	return 1;	// small buffer mode, non-empty buffer
 }
 
-// _GetBlockDataAt
-inline
-void *
-DataContainer::_GetBlockDataAt(int32 index, size_t offset, size_t DARG(size))
-{
-	if (_IsBlockMode()) {
-		BlockReference *block = _GetBlockList()->ItemAt(index);
-D(if (!fVolume->CheckBlock(block, offset + size)) return NULL;);
-		return block->GetDataAt(offset);
-	} else {
-D(
-if (offset + size > kSmallDataContainerSize) {
-	FATAL("DataContainer: Data access exceeds small buffer.\n");
-	PANIC("DataContainer: Data access exceeds small buffer.");
-	return NULL;
-}
-);
-		return fSmallBuffer + offset;
-	}
-}
-
-// _ClearArea
-void
-DataContainer::_ClearArea(off_t offset, off_t size)
-{
-	// constrain the area to the data area
-	offset = min(offset, fSize);
-	size = min(size, fSize - offset);
-	// iterate through the blocks, clearing as long as there's something
-	// left to clear
-	size_t blockSize = fVolume->GetBlockSize();
-	while (size > 0) {
-		size_t inBlockOffset = offset % blockSize;
-		size_t toClear = min(size_t(size), blockSize - inBlockOffset);
-		void *blockData = _GetBlockDataAt(offset / blockSize, inBlockOffset,
-										  toClear);
-D(if (!blockData) return;);
-		memset(blockData, 0, toClear);
-		size -= toClear;
-		offset += toClear;
-	}
-}
-
-// _ResizeLastBlock
+// _SwitchToCacheMode
 status_t
-DataContainer::_ResizeLastBlock(size_t newSize)
+DataContainer::_SwitchToCacheMode(size_t newBlockSize)
 {
-//PRINT(("DataContainer::_ResizeLastBlock(%lu), fSize: %Ld\n", newSize, fSize));
-	int32 blockCount = _CountBlocks();
-	status_t error = (fSize > 0 && blockCount > 0 && newSize > 0
-					  ? B_OK : B_BAD_VALUE);
-D(
-if (!_IsBlockMode()) {
-	FATAL("Call of _ResizeLastBlock() in small buffer mode.\n");
-	PANIC("Call of _ResizeLastBlock() in small buffer mode.");
-	return B_ERROR;
-}
-);
-	if (error == B_OK) {
-		size_t blockSize = fVolume->GetBlockSize();
-		size_t oldSize = (fSize - 1) % blockSize + 1;
-		if (newSize != oldSize) {
-			BlockList *blocks = _GetBlockList();
-			BlockReference *block = blocks->ItemAt(blockCount - 1);
-			BlockReference *newBlock = fVolume->ResizeBlock(block, newSize);
-			if (newBlock) {
-				if (newBlock != block)
-					blocks->ReplaceItem(blockCount - 1, newBlock);
-				fSize += off_t(newSize) - oldSize;
-			} else
-				SET_ERROR(error, B_NO_MEMORY);
-		}
-	}
-//PRINT(("DataContainer::_ResizeLastBlock() done: %lx, fSize: %Ld\n", error, fSize));
+	status_t error = VMCacheFactory::CreateAnonymousCache(fCache, false, 0,
+		0, false, VM_PRIORITY_SYSTEM);
+	if (error != B_OK)
+		return error;
+
+	fCache->temporary = 1;
+	fCache->virtual_end = newBlockSize;
+
+	error = fCache->Commit(newBlockSize, VM_PRIORITY_SYSTEM);
+	if (error != B_OK)
+		return error;
+
+	if (fSize != 0)
+		error = _DoCacheIO(0, fSmallBuffer, fSize, NULL, true);
+
 	return error;
 }
 
-// _SwitchToBlockMode
+// _DoCacheIO
 status_t
-DataContainer::_SwitchToBlockMode(size_t newBlockSize)
+DataContainer::_DoCacheIO(const off_t offset, uint8* buffer, ssize_t length,
+	size_t* bytesProcessed, bool isWrite)
 {
-	// allocate a new block
-	BlockReference *block = NULL;
-	status_t error = fVolume->AllocateBlock(newBlockSize, &block);
-	if (error == B_OK) {
-		// copy the data from the small buffer into the block
-		if (fSize > 0)
-			memcpy(block->GetData(), fSmallBuffer, fSize);
-		// construct the block list and add the block
-		new (fBlocks) BlockList(10);
-		BlockList *blocks = _GetBlockList();
-		if (blocks->AddItem(block)) {
-			fSize = newBlockSize;
+	const size_t originalLength = length;
+	const bool user = IS_USER_ADDRESS(buffer);
+
+	const off_t rounded_offset = ROUNDDOWN(offset, B_PAGE_SIZE);
+	const size_t rounded_len = ROUNDUP((length) + (offset - rounded_offset),
+		B_PAGE_SIZE);
+	vm_page** pages = new(std::nothrow) vm_page*[rounded_len / B_PAGE_SIZE];
+	if (pages == NULL)
+		return B_NO_MEMORY;
+	ArrayDeleter<vm_page*> pagesDeleter(pages);
+
+	_GetPages(rounded_offset, rounded_len, isWrite, pages);
+
+	status_t error = B_OK;
+	size_t index = 0;
+
+	while (length > 0) {
+		vm_page* page = pages[index];
+		phys_addr_t at = (page->physical_page_number * B_PAGE_SIZE);
+		ssize_t bytes = B_PAGE_SIZE;
+		if (index == 0) {
+			const uint32 pageoffset = (offset % B_PAGE_SIZE);
+			at += pageoffset;
+			bytes -= pageoffset;
+		}
+		bytes = min(length, bytes);
+
+		if (isWrite) {
+			page->modified = true;
+			error = vm_memcpy_to_physical(at, buffer, bytes, user);
 		} else {
-			// error: destroy the block list and free the block
-			SET_ERROR(error, B_NO_MEMORY);
-			blocks->~BlockList();
-			if (fSize > 0)
-				memcpy(fSmallBuffer, block->GetData(), fSize);
-			fVolume->FreeBlock(block);
+			if (page != NULL) {
+				error = vm_memcpy_from_physical(buffer, at, bytes, user);
+			} else {
+				if (user) {
+					error = user_memset(buffer, 0, bytes);
+				} else {
+					memset(buffer, 0, bytes);
+				}
+			}
 		}
+		if (error != B_OK)
+			break;
+
+		buffer += bytes;
+		length -= bytes;
+		index++;
 	}
+
+	_PutPages(rounded_offset, rounded_len, pages, error == B_OK);
+
+	if (bytesProcessed != NULL)
+		*bytesProcessed = length > 0 ? originalLength - length : originalLength;
+
 	return error;
 }
 
-// _SwitchToSmallBufferMode
+// _GetPages
 void
-DataContainer::_SwitchToSmallBufferMode(size_t newSize)
+DataContainer::_GetPages(off_t offset, off_t length, bool isWrite,
+	vm_page** pages)
 {
-	// remove the first (and only) block
-	BlockList *blocks = _GetBlockList();
-	BlockReference *block = blocks->ItemAt(0);
-	blocks->RemoveItem((int32)0L);
-	// destroy the block list and copy the data into the small buffer
-	blocks->~BlockList();
-	if (newSize > 0)
-		memcpy(fSmallBuffer, block->GetData(), newSize);
-	// free the block and set the new size
-	fVolume->FreeBlock(block);
-	fSize = newSize;
+	// TODO: This method is duplicated in the ram_disk. Perhaps it
+	// should be put into a common location?
+
+	// get the pages, we already have
+	AutoLocker<VMCache> locker(fCache);
+
+	size_t pageCount = length / B_PAGE_SIZE;
+	size_t index = 0;
+	size_t missingPages = 0;
+
+	while (length > 0) {
+		vm_page* page = fCache->LookupPage(offset);
+		if (page != NULL) {
+			if (page->busy) {
+				fCache->WaitForPageEvents(page, PAGE_EVENT_NOT_BUSY, true);
+				continue;
+			}
+
+			DEBUG_PAGE_ACCESS_START(page);
+			page->busy = true;
+		} else
+			missingPages++;
+
+		pages[index++] = page;
+		offset += B_PAGE_SIZE;
+		length -= B_PAGE_SIZE;
+	}
+
+	locker.Unlock();
+
+	// For a write we need to reserve the missing pages.
+	if (isWrite && missingPages > 0) {
+		vm_page_reservation reservation;
+		vm_page_reserve_pages(&reservation, missingPages,
+			VM_PRIORITY_SYSTEM);
+
+		for (size_t i = 0; i < pageCount; i++) {
+			if (pages[i] != NULL)
+				continue;
+
+			pages[i] = vm_page_allocate_page(&reservation,
+				PAGE_STATE_WIRED | VM_PAGE_ALLOC_BUSY);
+
+			if (--missingPages == 0)
+				break;
+		}
+
+		vm_page_unreserve_pages(&reservation);
+	}
 }
 
+void
+DataContainer::_PutPages(off_t offset, off_t length, vm_page** pages,
+	bool success)
+{
+	// TODO: This method is duplicated in the ram_disk. Perhaps it
+	// should be put into a common location?
+
+	AutoLocker<VMCache> locker(fCache);
+
+	// Mark all pages unbusy. On error free the newly allocated pages.
+	size_t index = 0;
+
+	while (length > 0) {
+		vm_page* page = pages[index++];
+		if (page != NULL) {
+			if (page->CacheRef() == NULL) {
+				if (success) {
+					fCache->InsertPage(page, offset);
+					fCache->MarkPageUnbusy(page);
+					DEBUG_PAGE_ACCESS_END(page);
+				} else
+					vm_page_free(NULL, page);
+			} else {
+				fCache->MarkPageUnbusy(page);
+				DEBUG_PAGE_ACCESS_END(page);
+			}
+		}
+
+		offset += B_PAGE_SIZE;
+		length -= B_PAGE_SIZE;
+	}
+}

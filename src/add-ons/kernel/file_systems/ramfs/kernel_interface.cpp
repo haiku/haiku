@@ -137,7 +137,7 @@ ramfs_read_fs_info(fs_volume* _volume, struct fs_info *info)
 	if (VolumeReadLocker locker = volume) {
 		info->flags = B_FS_IS_PERSISTENT | B_FS_HAS_ATTR | B_FS_HAS_MIME
 			| B_FS_HAS_QUERY;
-		info->block_size = volume->GetBlockSize();
+		info->block_size = B_PAGE_SIZE;
 		info->io_size = kOptimalIOSize;
 		info->total_blocks = volume->CountBlocks();
 		info->free_blocks = volume->CountFreeBlocks();

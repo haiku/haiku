@@ -26,8 +26,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "Block.h"
-#include "BlockAllocator.h"
+#include <vm/vm_page.h>
+
 #include "DebugSupport.h"
 #include "Directory.h"
 #include "DirectoryEntryTable.h"
@@ -42,11 +42,6 @@
 #include "NodeTable.h"
 #include "TwoKeyAVLTree.h"
 #include "Volume.h"
-
-// default block size
-static const off_t kDefaultBlockSize = 4096;
-
-static const size_t kDefaultAreaSize = kDefaultBlockSize * 128;
 
 // default volume name
 static const char *kDefaultVolumeName = "RAM FS";
@@ -143,9 +138,6 @@ Volume::Volume(fs_volume* volume)
 	fAnyNodeListeners(),
 	fEntryListeners(NULL),
 	fAnyEntryListeners(),
-	fBlockAllocator(NULL),
-	fBlockSize(kDefaultBlockSize),
-	fAllocatedBlocks(0),
 	fAccessTime(0),
 	fMounted(false)
 {
@@ -173,14 +165,6 @@ Volume::Mount(uint32 flags)
 	Unmount();
 
 	status_t error = B_OK;
-	// create a block allocator
-	if (error == B_OK) {
-		fBlockAllocator = new(nothrow) BlockAllocator(kDefaultAreaSize);
-		if (fBlockAllocator)
-			error = fBlockAllocator->InitCheck();
-		else
-			SET_ERROR(error, B_NO_MEMORY);
-	}
 	// create the listener trees
 	if (error == B_OK) {
 		fNodeListeners = new(nothrow) NodeListenerTree;
@@ -267,41 +251,22 @@ Volume::Unmount()
 		delete fNodeTable;
 		fNodeTable = NULL;
 	}
-	// delete the block allocator
-	if (fBlockAllocator) {
-		delete fBlockAllocator;
-		fBlockAllocator = NULL;
-	}
 	return B_OK;
-}
-
-// GetBlockSize
-off_t
-Volume::GetBlockSize() const
-{
-	return fBlockSize;
 }
 
 // CountBlocks
 off_t
 Volume::CountBlocks() const
 {
-	size_t bytes = 0;
-	system_info sysInfo;
-	if (get_system_info(&sysInfo) == B_OK) {
-		int32 freePages = sysInfo.max_pages - sysInfo.used_pages;
-		bytes = (uint32)freePages * B_PAGE_SIZE
-				+ fBlockAllocator->GetAvailableBytes();
-	}
-	return bytes / kDefaultBlockSize;
+	// TODO: Compute how many pages we are using across all DataContainers.
+	return 0;
 }
 
 // CountFreeBlocks
 off_t
 Volume::CountFreeBlocks() const
 {
-	// TODO:...
-	return CountBlocks() - fBlockAllocator->GetUsedBytes() / kDefaultBlockSize;
+	return vm_page_num_available_pages();
 }
 
 // SetName
@@ -752,54 +717,6 @@ Volume::UpdateLiveQueries(Entry *entry, Node* node, const char *attribute,
 	}
 }
 
-// AllocateBlock
-status_t
-Volume::AllocateBlock(size_t size, BlockReference **block)
-{
-	status_t error = (size > 0 && size <= fBlockSize && block
-					  ? B_OK : B_BAD_VALUE);
-	if (error == B_OK) {
-		*block = fBlockAllocator->AllocateBlock(size);
-		if (*block)
-			fAllocatedBlocks++;
-		else
-			SET_ERROR(error, B_NO_MEMORY);
-	}
-	return error;
-}
-
-// FreeBlock
-void
-Volume::FreeBlock(BlockReference *block)
-{
-	if (block) {
-		fBlockAllocator->FreeBlock(block);
-		fAllocatedBlocks--;
-	}
-}
-
-// ResizeBlock
-BlockReference *
-Volume::ResizeBlock(BlockReference *block, size_t size)
-{
-	BlockReference *newBlock = NULL;
-	if (size <= fBlockSize && block) {
-		if (size == 0) {
-			fBlockAllocator->FreeBlock(block);
-			fAllocatedBlocks--;
-		} else
-			newBlock = fBlockAllocator->ResizeBlock(block, size);
-	}
-	return newBlock;
-}
-
-// CheckBlock
-bool
-Volume::CheckBlock(BlockReference *block, size_t size)
-{
-	return fBlockAllocator->CheckBlock(block, size);
-}
-
 // GetAllocationInfo
 void
 Volume::GetAllocationInfo(AllocationInfo &info)
@@ -813,9 +730,6 @@ Volume::GetAllocationInfo(AllocationInfo &info)
 	fRootDirectory->GetAllocationInfo(info);
 	// name
 	info.AddStringAllocation(fName.GetLength());
-	// block allocator
-	info.AddOtherAllocation(sizeof(BlockAllocator));
-	fBlockAllocator->GetAllocationInfo(info);
 }
 
 // ReadLock

@@ -12,10 +12,6 @@ KernelAddon ramfs
 	AttributeIndex.cpp
 	AttributeIndexImpl.cpp
 	AttributeIterator.cpp
-	BlockAllocator.cpp
-	BlockAllocatorArea.cpp
-	BlockAllocatorAreaBucket.cpp
-	BlockReferenceManager.cpp
 	DataContainer.cpp
 	DebugSupport.cpp
 	Directory.cpp

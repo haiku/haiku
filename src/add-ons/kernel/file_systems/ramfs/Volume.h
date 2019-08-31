@@ -34,9 +34,8 @@
 #include "String.h"
 
 class AllocationInfo;
-class Block;
-class BlockAllocator;
-class BlockReference;
+class Attribute;
+class AttributeIndex;
 class Directory;
 class DirectoryEntryTable;
 class Entry;
@@ -101,7 +100,6 @@ public:
 	dev_t GetID() const { return fVolume != NULL ? fVolume->id : -1; }
 	fs_volume* FSVolume() const { return fVolume; }
 
-	off_t GetBlockSize() const;
 	off_t CountBlocks() const;
 	off_t CountFreeBlocks() const;
 
@@ -156,11 +154,6 @@ public:
 
 	ino_t NextNodeID() { return fNextNodeID++; }
 
-	status_t AllocateBlock(size_t size, BlockReference **block);
-	void FreeBlock(BlockReference *block);
-	BlockReference *ResizeBlock(BlockReference *block, size_t size);
-	// debugging only
-	bool CheckBlock(BlockReference *block, size_t size = 0);
 	void GetAllocationInfo(AllocationInfo &info);
 
 	bigtime_t GetAccessTime() const	{ return fAccessTime; }
@@ -194,9 +187,6 @@ private:
 	EntryListenerTree		*fEntryListeners;
 	EntryListenerList		fAnyEntryListeners;
 	QueryList				fQueries;
-	BlockAllocator			*fBlockAllocator;
-	off_t					fBlockSize;
-	off_t					fAllocatedBlocks;
 	bigtime_t				fAccessTime;
 	bool					fMounted;
 };
