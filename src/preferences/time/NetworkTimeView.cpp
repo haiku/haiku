@@ -409,12 +409,12 @@ NetworkTimeView::MessageReceived(BMessage* message)
 				if (message->FindInt32("error code", &errorCode) == B_OK) {
 					snprintf(buffer, sizeof(buffer),
 						B_TRANSLATE("The following error occured "
-							"while synchronizing:\r\n%s: %s"),
+							"while synchronizing:\n%s: %s"),
 						errorString, strerror(errorCode));
 				} else {
 					snprintf(buffer, sizeof(buffer),
 						B_TRANSLATE("The following error occured "
-							"while synchronizing:\r\n%s"),
+							"while synchronizing:\n%s"),
 						errorString);
 				}
 
