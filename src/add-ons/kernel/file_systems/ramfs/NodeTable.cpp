@@ -30,7 +30,7 @@ NodeTable::AddNode(Node *node)
 {
 	status_t error = (node ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
-		if (fNodes.Lookup(node->GetID()) != nullptr)
+		if (fNodes.Lookup(node->GetID()) != NULL)
 			fNodes.Remove(node);
 		SET_ERROR(error, fNodes.Insert(node));
 	}

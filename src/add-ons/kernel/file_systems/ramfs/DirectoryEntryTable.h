@@ -135,7 +135,7 @@ DirectoryEntryTable::RemoveEntry(ino_t id, Entry *child)
 status_t
 DirectoryEntryTable::RemoveEntry(ino_t id, const char *name)
 {
-	Entry* child = fTable.Lookup(typename DirectoryEntryHash::Key(id, name));
+	Entry* child = fTable.Lookup(DirectoryEntryHash::Key(id, name));
 	if (!child)
 		return B_NAME_NOT_FOUND;
 	return fTable.Remove(child) ? B_OK : B_ERROR;
@@ -145,7 +145,7 @@ DirectoryEntryTable::RemoveEntry(ino_t id, const char *name)
 Entry *
 DirectoryEntryTable::GetEntry(ino_t id, const char *name)
 {
-	Entry *child = fTable.Lookup(typename DirectoryEntryHash::Key(id, name));
+	Entry *child = fTable.Lookup(DirectoryEntryHash::Key(id, name));
 	return child;
 }
 
