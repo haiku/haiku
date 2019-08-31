@@ -165,6 +165,21 @@ GeneralInfoView::GeneralInfoView(Model* model)
 	fCurrentLinkColorWhich(B_LINK_TEXT_COLOR),
 	fCurrentPathColorWhich(fCurrentLinkColorWhich)
 {
+	const char* fieldNames[] = {
+		B_TRANSLATE("Description:"),
+		B_TRANSLATE("Location:"),
+		B_TRANSLATE("Opens with:"),
+		B_TRANSLATE("Capacity:"),
+		B_TRANSLATE("Size:"),
+		B_TRANSLATE("Created:"),
+		B_TRANSLATE("Modified:"),
+		B_TRANSLATE("Kind:"),
+		B_TRANSLATE("Link to:"),
+		B_TRANSLATE("Version:"),
+		NULL
+	};
+
+
 	SetFlags(Flags() | B_WILL_DRAW | B_PULSE_NEEDED | B_FRAME_EVENTS);
 	SetName(B_TRANSLATE("Information"));
 	// Set view color to standard background grey
@@ -182,8 +197,9 @@ GeneralInfoView::GeneralInfoView(Model* model)
 
 	// The widest string depends on the locale. We should check them all, this
 	// is only an approximation that works for English and French.
-	float width = currentFont.StringWidth(B_TRANSLATE("Description:"));
-	width = std::max(width, currentFont.StringWidth(B_TRANSLATE("Location:")));
+	float width = 0;
+	for (int i = 0; fieldNames[i] != 0; i++)
+		width = std::max(width, StringWidth(fieldNames[i]));
 	fDivider = width + kBorderMargin + 1;
 
 	// Keep some free space for the stuff we print ourselves
@@ -191,6 +207,8 @@ GeneralInfoView::GeneralInfoView(Model* model)
 	int lineCount = 7;
 	if (model->IsSymLink())
 		lineCount += 1; // Add space for "Link to" line
+	if (model->IsExecutable())
+		lineCount += 2; // Add space for "Version" and "Description" lines
 	GroupLayout()->SetInsets(kBorderMargin, lineHeight * lineCount,
 		B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING);
 
