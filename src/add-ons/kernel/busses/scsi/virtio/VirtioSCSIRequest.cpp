@@ -126,12 +126,13 @@ VirtioSCSIRequest::Finish(bool resubmit)
 		}
 	}
 
+	scsi_ccb *ccb = fCCB;
 	mutex_unlock(&fLock);
 
 	if (resubmit)
-		gSCSI->resubmit(fCCB);
+		gSCSI->resubmit(ccb);
 	else
-		gSCSI->finished(fCCB, 1);
+		gSCSI->finished(ccb, 1);
 
 	TRACE("VirtioSCSIRequest::Finish() done\n");
 
