@@ -8,7 +8,6 @@ DEFINES += DEBUG_APP="\\\"ramfs\\\"" ;
 KernelAddon ramfs
 	:
 	AllocationInfo.cpp
-	AreaUtils.cpp
 	Attribute.cpp
 	AttributeIndex.cpp
 	AttributeIndexImpl.cpp
