@@ -5,44 +5,35 @@
 #ifndef NODE_TABLE_H
 #define NODE_TABLE_H
 
+#include <util/OpenHashTable.h>
+
 #include "AllocationInfo.h"
 #include "Node.h"
-#include "OpenHashTable.h"
 
-// NodeHashElement
-class NodeHashElement : public OpenHashElement {
-public:
-	NodeHashElement() : OpenHashElement(), fNode(NULL)
+// NodeHash
+struct NodeHash {
+	typedef ino_t		KeyType;
+	typedef	Node		ValueType;
+
+	size_t HashKey(KeyType key) const
 	{
-		fNext = -1;
+		return uint32(key & 0xffffffff);
 	}
 
-	static inline uint32 HashForID(ino_t id)
+	size_t Hash(ValueType* value) const
 	{
-		return uint32(id & 0xffffffff);
+		return HashKey(value->GetID());
 	}
 
-	static inline uint32 HashForID(Node *node)
+	bool Compare(KeyType key, ValueType* value) const
 	{
-		return HashForID(node->GetID());
+		return value->GetID() == key;
 	}
 
-	inline uint32 Hash() const
+	ValueType*& GetLink(ValueType* value) const
 	{
-		return HashForID(fNode);
+		return value->HashLink();
 	}
-
-	inline bool operator==(const OpenHashElement &element) const
-	{
-		return (static_cast<const NodeHashElement&>(element).fNode == fNode);
-	}
-
-	inline void Adopt(NodeHashElement &element)
-	{
-		fNode = element.fNode;
-	}
-
-	Node	*fNode;
 };
 
 // NodeTable
@@ -62,15 +53,8 @@ public:
 	void GetAllocationInfo(AllocationInfo &info);
 
 private:
-	NodeHashElement *_FindElement(ino_t id) const;
-
-private:
-	OpenHashElementArray<NodeHashElement>	fElementArray;
-	OpenHashTable<NodeHashElement, OpenHashElementArray<NodeHashElement> >
-		fNodes;
+	BOpenHashTable<NodeHash> fNodes;
+	status_t fInitStatus;
 };
-
-// undefine the PRINT from <Debug.h>
-//#undef PRINT
 
 #endif	// NODE_TABLE_H

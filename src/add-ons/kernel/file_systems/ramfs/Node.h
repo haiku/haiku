@@ -38,6 +38,8 @@ public:
 
 	virtual status_t InitCheck() const;
 
+	Node*& HashLink()	{ return fHashLink; }
+
 	inline void SetVolume(Volume *volume)	{ fVolume = volume; }
 	inline Volume *GetVolume() const		{ return fVolume; }
 
@@ -109,6 +111,7 @@ public:
 	virtual void GetAllocationInfo(AllocationInfo &info);
 
 private:
+	Node					*fHashLink;
 	Volume					*fVolume;
 	ino_t					fID;
 	int32					fRefCount;
