@@ -70,7 +70,7 @@ Node::~Node()
 	while (Attribute *attribute = fAttributes.First()) {
 		status_t error = DeleteAttribute(attribute);
 		if (error != B_OK) {
-			FATAL(("Node::~Node(): Failed to delete attribute!\n"));
+			FATAL("Node::~Node(): Failed to delete attribute!\n");
 			break;
 		}
 	}
@@ -114,7 +114,7 @@ Node::RemoveReference()
 status_t
 Node::Link(Entry *entry)
 {
-PRINT(("Node[%Ld]::Link(): %ld ->...\n", fID, fRefCount));
+PRINT("Node[%Ld]::Link(): %" B_PRId32 " ->...\n", fID, fRefCount);
 	fReferrers.Insert(entry);
 
 	status_t error = AddReference();
@@ -128,7 +128,7 @@ PRINT(("Node[%Ld]::Link(): %ld ->...\n", fID, fRefCount));
 status_t
 Node::Unlink(Entry *entry)
 {
-PRINT(("Node[%Ld]::Unlink(): %ld ->...\n", fID, fRefCount));
+PRINT("Node[%Ld]::Unlink(): %" B_PRId32 " ->...\n", fID, fRefCount);
 	RemoveReference();
 	fReferrers.Remove(entry);
 

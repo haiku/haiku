@@ -43,8 +43,8 @@ BlockAllocator::Area::Create(size_t size)
 	if (id >= 0) {
 		area = new(base) Area(id, size);
 	} else {
-		ERROR(("BlockAllocator::Area::Create(%lu): Failed to create area: %s\n",
-			size, strerror(id)));
+		ERROR("BlockAllocator::Area::Create(%lu): Failed to create area: %s\n",
+			size, strerror(id));
 	}
 	return area;
 }
@@ -250,7 +250,7 @@ BlockAllocator::Area::SanityCheck() const
 {
 	// area ID
 	if (fID < 0) {
-		FATAL("Area ID < 0: %lx\n", fID);
+		FATAL("Area ID < 0: %" B_PRIx32 "\n", fID);
 		BA_PANIC("Bad area ID.");
 		return false;
 	}
@@ -271,7 +271,7 @@ BlockAllocator::Area::SanityCheck() const
 	}
 	// block count
 	if (fFreeBlockCount + fUsedBlockCount == 0) {
-		FATAL(("Area contains no blocks at all.\n"));
+		FATAL("Area contains no blocks at all.\n");
 		BA_PANIC("Bad area block count.");
 		return false;
 	}
@@ -295,8 +295,8 @@ BlockAllocator::Area::SanityCheck() const
 		for (int32 i = 0; i < blockCount; i++) {
 			blockListOK = false;
 			if (!block) {
-				FATAL("Encountered NULL in block list at index %ld, although "
-					   "list should have %ld blocks\n", i, blockCount);
+				FATAL("Encountered NULL in block list at index %" B_PRId32 ", although "
+					   "list should have %" B_PRId32 " blocks\n", i, blockCount);
 				BA_PANIC("Bad area block list.");
 				return false;
 			}
@@ -321,14 +321,14 @@ BlockAllocator::Area::SanityCheck() const
 			// alignment
 			if (block_align_floor(address) != address
 				|| block_align_floor(blockSize) != blockSize) {
-				FATAL("Block %ld not properly aligned: %p, size: %lu\n",
+				FATAL("Block %" B_PRId32 " not properly aligned: %p, size: %lu\n",
 					   i, block, blockSize);
 				BA_PANIC("Bad area block.");
 				return false;
 			}
 			// previous block
 			if (block->GetPreviousBlock() != prevBlock) {
-				FATAL("Previous block of block %ld was not the previous "
+				FATAL("Previous block of block %" B_PRId32 " was not the previous "
 					   "block in list: %p vs %p\n", i,
 					   block->GetPreviousBlock(), prevBlock);
 				BA_PANIC("Bad area block list.");
@@ -344,14 +344,14 @@ BlockAllocator::Area::SanityCheck() const
 					freeBytes += freeBlock->GetUsableSize();
 				// block == next free block of previous free block
 				if (freeBlock != nextFree) {
-					FATAL("Free block %ld is not the next block in free "
+					FATAL("Free block %" B_PRId32 " is not the next block in free "
 						   "list: %p vs %p\n", i, freeBlock, nextFree);
 					BA_PANIC("Bad area free list.");
 					return false;
 				}
 				// previous free block
 				if (freeBlock->GetPreviousFreeBlock() != prevFree) {
-					FATAL("Previous free block of block %ld was not the "
+					FATAL("Previous free block of block %" B_PRId32 " was not the "
 						   " previous block in free list: %p vs %p\n", i,
 						   freeBlock->GetPreviousFreeBlock(), prevFree);
 					BA_PANIC("Bad area free list.");
@@ -384,13 +384,13 @@ BlockAllocator::Area::SanityCheck() const
 			}
 			// block counts (a bit reduntant)
 			if (freeBlockCount != fFreeBlockCount) {
-				FATAL("Free block count is %ld, but should be %ld\n",
+				FATAL("Free block count is %" B_PRIuSIZE ", but should be %" B_PRIu32 "\n",
 					   fFreeBlockCount, freeBlockCount);
 				BA_PANIC("Bad area free block count.");
 				return false;
 			}
 			if (usedBlockCount != fUsedBlockCount) {
-				FATAL("Used block count is %ld, but should be %ld\n",
+				FATAL("Used block count is %" B_PRIuSIZE ", but should be %" B_PRIu32 "\n",
 					   fUsedBlockCount, usedBlockCount);
 				BA_PANIC("Bad area used block count.");
 				return false;

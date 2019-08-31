@@ -74,15 +74,15 @@ D(
 if (!blockData) {
 	Node *node = NULL;
 	if (Attribute *attribute = dynamic_cast<Attribute*>(this)) {
-		FATAL(("attribute `%s' of\n", attribute->GetName()));
+		FATAL("attribute `%s' of\n", attribute->GetName());
 		node = attribute->GetNode();
 	} else {
 		node = dynamic_cast<Node*>(this);
 	}
 	if (node)
 //		FATAL(("node `%s'\n", node->GetName()));
-		FATAL(("container size: %Ld, offset: %Ld, buffer size: %lu\n",
-		   fSize, offset, size));
+		FATAL("container size: %Ld, offset: %Ld, buffer size: %lu\n",
+		   fSize, offset, size);
 		return B_ERROR;
 }
 );
@@ -308,7 +308,7 @@ D(if (!fVolume->CheckBlock(block, offset + size)) return NULL;);
 	} else {
 D(
 if (offset + size > kSmallDataContainerSize) {
-	FATAL(("DataContainer: Data access exceeds small buffer.\n"));
+	FATAL("DataContainer: Data access exceeds small buffer.\n");
 	PANIC("DataContainer: Data access exceeds small buffer.");
 	return NULL;
 }
@@ -349,7 +349,7 @@ DataContainer::_ResizeLastBlock(size_t newSize)
 					  ? B_OK : B_BAD_VALUE);
 D(
 if (!_IsBlockMode()) {
-	FATAL(("Call of _ResizeLastBlock() in small buffer mode.\n"));
+	FATAL("Call of _ResizeLastBlock() in small buffer mode.\n");
 	PANIC("Call of _ResizeLastBlock() in small buffer mode.");
 	return B_ERROR;
 }

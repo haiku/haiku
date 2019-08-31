@@ -236,7 +236,7 @@ enum ops {
 enum match {
 	NO_MATCH = 0,
 	MATCH_OK = 1,
-	
+
 	MATCH_BAD_PATTERN = -2,
 	MATCH_INVALID_CHARACTER
 };
@@ -391,7 +391,7 @@ class Operator : public Term {
 //---------------------------------
 
 
-void 
+void
 skipWhitespace(char **expr, int32 skip = 0)
 {
 	char *string = (*expr) + skip;
@@ -400,7 +400,7 @@ skipWhitespace(char **expr, int32 skip = 0)
 }
 
 
-void 
+void
 skipWhitespaceReverse(char **expr,char *stop)
 {
 	char *string = *expr;
@@ -638,7 +638,7 @@ matchString(char *pattern, char *string)
 
 	if (string[0])
 		return NO_MATCH;
-	
+
 	return MATCH_OK;
 }
 
@@ -689,7 +689,7 @@ Equation::Equation(char **expr)
 	// attribute string is empty (which is not allowed)
 	if (start > end)
 		return;
-		
+
 	// at this point, "start" points to the beginning of the string, "end" points
 	// to the last character of the string, and "string" points to the first
 	// character of the equation symbol
@@ -710,7 +710,7 @@ Equation::Equation(char **expr)
 				return;
 			fOp = OP_UNEQUAL;
 			break;
-		
+
 		// any invalid characters will be rejected
 		default:
 			*expr = string;
@@ -733,7 +733,7 @@ Equation::Equation(char **expr)
 		// string is quoted (start has to be on the beginning of a string)
 		if (ParseQuotedString(&start, &end) < B_OK)
 			return;
-		
+
 		string = end + 2;
 		skipWhitespace(&string);
 	} else {
@@ -743,7 +743,7 @@ Equation::Equation(char **expr)
 		end = string - 1;
 		skipWhitespaceReverse(&end, start);
 	}
-	
+
 	// at this point, "start" will point to the first character of the value,
 	// "end" will point to its last character, and "start" to the first non-
 	// whitespace character after the value string
@@ -776,7 +776,7 @@ Equation::~Equation()
 }
 
 
-status_t 
+status_t
 Equation::InitCheck()
 {
 	if (fAttribute == NULL
@@ -788,13 +788,13 @@ Equation::InitCheck()
 }
 
 
-status_t 
+status_t
 Equation::ParseQuotedString(char **_start, char **_end)
 {
 	char *start = *_start;
 	char quote = *start++;
 	char *end = start;
-	
+
 	for (;*end && *end != quote;end++) {
 		if (*end == '\\')
 			end++;
@@ -831,7 +831,7 @@ Equation::CopyString(char *start, char *end)
 }
 
 
-status_t 
+status_t
 Equation::ConvertValue(type_code type)
 {
 	// Has the type already been converted?
@@ -874,7 +874,7 @@ Equation::ConvertValue(type_code type)
 			fSize = sizeof(double);
 			break;
 		default:
-			FATAL("query value conversion to 0x%lx requested!\n", type);
+			FATAL("query value conversion to 0x%" B_PRIx32 " requested!\n", type);
 			// should we fail here or just do a safety int32 conversion?
 			return B_ERROR;
 	}
@@ -926,11 +926,11 @@ Equation::CompareTo(const uint8 *value, uint16 size)
 }
 
 
-void 
+void
 Equation::Complement()
 {
 	D(if (fOp <= OP_EQUATION || fOp > OP_LESS_THAN_OR_EQUAL) {
-		FATAL(("op out of range!"));
+		FATAL("op out of range!");
 		return;
 	});
 
@@ -1025,7 +1025,7 @@ Equation::Match(Entry *entry, Node* node, const char *attributeName, int32 type,
 }
 
 
-void 
+void
 Equation::CalculateScore(IndexWrapper &index)
 {
 	// As always, these values could be tuned and refined.
@@ -1063,7 +1063,7 @@ status_t
 Equation::PrepareQuery(Volume */*volume*/, IndexWrapper &index, IndexIterator **iterator, bool queryNonIndexed)
 {
 	status_t status = index.SetTo(fAttribute);
-	
+
 	// if we should query attributes without an index, we can just proceed here
 	if (status < B_OK && !queryNonIndexed)
 		return B_ENTRY_NOT_FOUND;
@@ -1144,7 +1144,7 @@ Equation::PrepareQuery(Volume */*volume*/, IndexWrapper &index, IndexIterator **
 }
 
 
-status_t 
+status_t
 Equation::GetNextMatching(Volume *volume, IndexIterator *iterator,
 	struct dirent *dirent, size_t bufferSize)
 {
@@ -1292,20 +1292,20 @@ Operator::Match(Entry *entry, Node* node, const char *attribute,
 }
 
 
-void 
+void
 Operator::Complement()
 {
 	if (fOp == OP_AND)
 		fOp = OP_OR;
 	else
 		fOp = OP_AND;
-	
+
 	fLeft->Complement();
 	fRight->Complement();
 }
 
 
-void 
+void
 Operator::CalculateScore(IndexWrapper &index)
 {
 	fLeft->CalculateScore(index);
@@ -1313,26 +1313,26 @@ Operator::CalculateScore(IndexWrapper &index)
 }
 
 
-int32 
+int32
 Operator::Score() const
 {
 	if (fOp == OP_AND) {
 		// return the one with the better score
 		if (fRight->Score() > fLeft->Score())
 			return fRight->Score();
-		
+
 		return fLeft->Score();
 	}
-	
+
 	// for OP_OR, be honest, and return the one with the worse score
 	if (fRight->Score() < fLeft->Score())
 		return fRight->Score();
-	
+
 	return fLeft->Score();
 }
 
 
-status_t 
+status_t
 Operator::InitCheck()
 {
 	if ((fOp != OP_AND && fOp != OP_OR)
@@ -1363,7 +1363,7 @@ Operator::Copy() const
 		Term *term = new Term(equation);
 		if (term == NULL)
 			delete equation;
-		
+
 		return term;
 	}
 
@@ -1438,10 +1438,10 @@ Expression::Expression(char *expr)
 {
 	if (expr == NULL)
 		return;
-	
+
 	fTerm = ParseOr(&expr);
 	if (fTerm != NULL && fTerm->InitCheck() < B_OK) {
-		FATAL(("Corrupt tree in expression!\n"));
+		FATAL("Corrupt tree in expression!\n");
 		delete fTerm;
 		fTerm = NULL;
 	}
@@ -1449,7 +1449,7 @@ Expression::Expression(char *expr)
 		fTerm->PrintToStream();
 		D(__out("\n"));
 		if (*expr != '\0')
-			PRINT(("Unexpected end of string: \"%s\"!\n", expr));
+			PRINT("Unexpected end of string: \"%s\"!\n", expr);
 	});
 	fPosition = expr;
 }
@@ -1471,7 +1471,7 @@ Expression::ParseEquation(char **expr)
 		skipWhitespace(expr, 1);
 		if (**expr != '(')
 			return NULL;
-		
+
 		nott = true;
 	}
 
@@ -1480,16 +1480,16 @@ Expression::ParseEquation(char **expr)
 		return NULL;
 	} else if (**expr == '(') {
 		skipWhitespace(expr, 1);
-		
+
 		Term *term = ParseOr(expr);
-		
+
 		skipWhitespace(expr);
-		
+
 		if (**expr != ')') {
 			delete term;
 			return NULL;
 		}
-		
+
 		// If the term is negated, we just complement the tree, to get
 		// rid of the not, a.k.a. DeMorgan's Law.
 		if (nott)
@@ -1557,11 +1557,11 @@ Expression::ParseOr(char **expr)
 }
 
 
-bool 
+bool
 Expression::IsOperator(char **expr, char op)
 {
 	char *string = *expr;
-	
+
 	if (*string == op && *(string + 1) == op) {
 		*expr += 2;
 		return true;
@@ -1570,7 +1570,7 @@ Expression::IsOperator(char **expr, char op)
 }
 
 
-status_t 
+status_t
 Expression::InitCheck()
 {
 	if (fTerm == NULL)
@@ -1652,14 +1652,14 @@ Query::Rewind()
 					stack.Push(op->Left());
 			}
 		} else if (term->Op() == OP_EQUATION || fStack.Push((Equation *)term) < B_OK)
-			FATAL(("Unknown term on stack or stack error"));
+			FATAL("Unknown term on stack or stack error");
 	}
 
 	return B_OK;
 }
 
 
-status_t 
+status_t
 Query::GetNextEntry(struct dirent *dirent, size_t size)
 {
 	// If we don't have an equation to use yet/anymore, get a new one
@@ -1688,7 +1688,7 @@ Query::GetNextEntry(struct dirent *dirent, size_t size)
 }
 
 
-void 
+void
 Query::SetLiveMode(port_id port, int32 token)
 {
 	fPort = port;
@@ -1719,13 +1719,13 @@ send_entry_notification(port_id port, int32 token, Volume* volume, Entry* entry,
 }
 
 
-void 
+void
 Query::LiveUpdate(Entry *entry, Node* node, const char *attribute, int32 type,
 	const uint8 *oldKey, size_t oldLength, const uint8 *newKey,
 	size_t newLength)
 {
-PRINT(("%p->Query::LiveUpdate(%p, %p, \"%s\", 0x%lx, %p, %lu, %p, %lu)\n",
-this, entry, node, attribute, type, oldKey, oldLength, newKey, newLength));
+PRINT("%p->Query::LiveUpdate(%p, %p, \"%s\", 0x%lx, %p, %lu, %p, %lu)\n",
+this, entry, node, attribute, type, oldKey, oldLength, newKey, newLength);
 	if (fPort < 0 || fExpression == NULL || node == NULL || attribute == NULL)
 		return;
 
@@ -1748,18 +1748,18 @@ this, entry, node, attribute, type, oldKey, oldLength, newKey, newLength));
 		type, oldKey, oldLength);
 	status_t newStatus = fExpression->Root()->Match(entry, node, attribute,
 		type, newKey, newLength);
-PRINT(("  oldStatus: 0x%lx, newStatus: 0x%lx\n", oldStatus, newStatus));
+PRINT("  oldStatus: 0x%lx, newStatus: 0x%lx\n", oldStatus, newStatus);
 
 	bool created;
 	if (oldStatus == MATCH_OK && newStatus == MATCH_OK) {
-		// only send out a notification if the name was changed 
+		// only send out a notification if the name was changed
 		if (oldKey == NULL || strcmp(attribute,"name"))
 			return;
 
 		if (entry) {
 			// entry should actually always be given, when the changed
 			// attribute is the entry name
-PRINT(("notification: old: removed\n"));
+PRINT("notification: old: removed\n");
 			notify_query_entry_removed(fPort, fToken, fVolume->GetID(),
 				entry->GetParent()->GetID(), (const char *)oldKey,
 				entry->GetNode()->GetID());
@@ -1776,7 +1776,7 @@ PRINT(("notification: old: removed\n"));
 	// We send a notification for the given entry, if any, or otherwise for
 	// all entries referring to the node;
 	if (entry) {
-PRINT(("notification: new: %s\n", (created ? "created" : "removed")));
+PRINT("notification: new: %s\n", (created ? "created" : "removed"));
 		send_entry_notification(fPort, fToken, fVolume, entry, created);
 	} else {
 		entry = node->GetFirstReferrer();

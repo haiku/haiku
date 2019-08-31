@@ -25,7 +25,7 @@ Directory::~Directory()
 	// delete all entries
 	while (Entry *entry = fEntries.First()) {
 		if (DeleteEntry(entry) != B_OK) {
-			FATAL(("Could not delete all entries in directory.\n"));
+			FATAL("Could not delete all entries in directory.\n");
 			break;
 		}
 	}
@@ -234,7 +234,7 @@ Directory::DeleteEntry(Entry *entry)
 		if (error == B_OK)
 			delete entry;
 		else {
-			FATAL("Failed to Unlink() entry %p from node %Ld!\n", entry,
+			FATAL("Failed to Unlink() entry %p from node %" B_PRIdINO "!\n", entry,
 				   entry->GetNode()->GetID());
 			AddEntry(entry);
 		}

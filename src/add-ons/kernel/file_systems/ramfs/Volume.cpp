@@ -382,7 +382,7 @@ Volume::GetVNode(Node *node)
 	status_t error = (fMounted ? GetVNode(node->GetID(), &dummy)
 							   : B_BAD_VALUE );
 	if (error == B_OK && dummy != node) {
-		FATAL("Two Nodes have the same ID: %Ld!\n", node->GetID());
+		FATAL("Two Nodes have the same ID: %" B_PRIdINO "!\n", node->GetID());
 		PutVNode(dummy);
 		error = B_ERROR;
 	}

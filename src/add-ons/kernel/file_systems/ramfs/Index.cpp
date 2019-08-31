@@ -75,11 +75,11 @@ void
 Index::Dump()
 {
 	D(
-		PRINT(("Index: `%s', type: %lx\n", GetName(), GetType()));
+		PRINT("Index: `%s', type: %lx\n", GetName(), GetType());
 		for (IndexEntryIterator it(this); it.GetCurrent(); it.GetNext()) {
 			Entry *entry = it.GetCurrent();
-			PRINT(("  entry: `%s', dir: %Ld\n", entry->GetName(),
-												entry->GetParent()->GetID()));
+			PRINT("  entry: `%s', dir: %Ld\n", entry->GetName(),
+												entry->GetParent()->GetID());
 		}
 	)
 }

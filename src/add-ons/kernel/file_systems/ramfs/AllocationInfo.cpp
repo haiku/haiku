@@ -172,68 +172,68 @@ AllocationInfo::Dump() const
 	size_t areaCount = 0;
 	size_t areaSize = 0;
 
-	PRINT(("  node table:\n"));
-	PRINT(("    array size:  %9lu\n", fNodeTableArraySize));
-	PRINT(("    vector size: %9lu\n", fNodeTableVectorSize));
-	PRINT(("    elements:    %9lu\n", fNodeTableElementCount));
+	PRINT("  node table:\n");
+	PRINT("    array size:  %9lu\n", fNodeTableArraySize);
+	PRINT("    vector size: %9lu\n", fNodeTableVectorSize);
+	PRINT("    elements:    %9lu\n", fNodeTableElementCount);
 	areaCount += 2;
 	areaSize += fNodeTableArraySize * sizeof(int32) + fNodeTableVectorSize;
 
-	PRINT(("  entry table:\n"));
-	PRINT(("    array size:  %9lu\n", fDirectoryEntryTableArraySize));
-	PRINT(("    vector size: %9lu\n", fDirectoryEntryTableVectorSize));
-	PRINT(("    elements:    %9lu\n", fDirectoryEntryTableElementCount));
+	PRINT("  entry table:\n");
+	PRINT("    array size:  %9lu\n", fDirectoryEntryTableArraySize);
+	PRINT("    vector size: %9lu\n", fDirectoryEntryTableVectorSize);
+	PRINT("    elements:    %9lu\n", fDirectoryEntryTableElementCount);
 	areaCount += 2;
 	areaSize += fDirectoryEntryTableArraySize * sizeof(int32)
 				+ fDirectoryEntryTableVectorSize;
 
-	PRINT(("  attribute table:\n"));
-	PRINT(("    array size:  %9lu\n", fNodeAttributeTableArraySize));
-	PRINT(("    vector size: %9lu\n", fNodeAttributeTableVectorSize));
-	PRINT(("    elements:    %9lu\n", fNodeAttributeTableElementCount));
+	PRINT("  attribute table:\n");
+	PRINT("    array size:  %9lu\n", fNodeAttributeTableArraySize);
+	PRINT("    vector size: %9lu\n", fNodeAttributeTableVectorSize);
+	PRINT("    elements:    %9lu\n", fNodeAttributeTableElementCount);
 	areaCount += 2;
 	areaSize += fNodeAttributeTableArraySize * sizeof(int32)
 				+ fNodeAttributeTableVectorSize;
 
-	PRINT(("  attributes:  %9lu, size: %9lu\n", fAttributeCount, fAttributeSize));
+	PRINT("  attributes:  %9lu, size: %9lu\n", fAttributeCount, fAttributeSize);
 	heapCount += fAttributeCount;
 	heapSize += fAttributeCount * sizeof(Attribute);
 
-	PRINT(("  directories: %9lu\n", fDirectoryCount));
+	PRINT("  directories: %9lu\n", fDirectoryCount);
 	heapCount += fDirectoryCount;
 	heapSize += fDirectoryCount * sizeof(Directory);
 
-	PRINT(("  entries:     %9lu\n", fEntryCount));
+	PRINT("  entries:     %9lu\n", fEntryCount);
 	heapCount += fEntryCount;
 	heapSize += fEntryCount * sizeof(Entry);
 
-	PRINT(("  files:       %9lu, size: %9lu\n", fFileCount, fFileSize));
+	PRINT("  files:       %9lu, size: %9lu\n", fFileCount, fFileSize);
 	heapCount += fFileCount;
 	heapSize += fFileCount * sizeof(File);
 
-	PRINT(("  symlinks:    %9lu, size: %9lu\n", fSymLinkCount, fSymLinkSize));
+	PRINT("  symlinks:    %9lu, size: %9lu\n", fSymLinkCount, fSymLinkSize);
 	heapCount += fSymLinkCount;
 	heapSize += fSymLinkCount * sizeof(SymLink);
 
-	PRINT(("  areas:       %9lu, size: %9lu\n", fAreaCount, fAreaSize));
+	PRINT("  areas:       %9lu, size: %9lu\n", fAreaCount, fAreaSize);
 	areaCount += fAreaCount;
 	areaSize += fAreaSize;
 
-	PRINT(("  blocks:      %9lu, size: %9lu\n", fBlockCount, fBlockSize));
+	PRINT("  blocks:      %9lu, size: %9lu\n", fBlockCount, fBlockSize);
 
-	PRINT(("  lists:       %9lu, size: %9lu\n", fListCount, fListSize));
+	PRINT("  lists:       %9lu, size: %9lu\n", fListCount, fListSize);
 	heapCount += fListCount;
 	heapSize += fListSize;
 
-	PRINT(("  other:       %9lu, size: %9lu\n", fOtherCount, fOtherSize));
+	PRINT("  other:       %9lu, size: %9lu\n", fOtherCount, fOtherSize);
 	heapCount += fOtherCount;
 	heapSize += fOtherSize;
 
-	PRINT(("  strings:     %9lu, size: %9lu\n", fStringCount, fStringSize));
+	PRINT("  strings:     %9lu, size: %9lu\n", fStringCount, fStringSize);
 	heapCount += fStringCount;
 	heapSize += fStringSize;
 
-	PRINT(("heap:  %9lu allocations, size: %9lu\n", heapCount, heapSize));
-	PRINT(("areas: %9lu allocations, size: %9lu\n", areaCount, areaSize));
+	PRINT("heap:  %9lu allocations, size: %9lu\n", heapCount, heapSize);
+	PRINT("areas: %9lu allocations, size: %9lu\n", areaCount, areaSize);
 }
 

@@ -178,7 +178,7 @@ BlockAllocator::SanityCheck(bool deep) const
 	}
 	// area count
 	if (areaCount != fAreaCount) {
-		FATAL("fAreaCount is %ld, but should be %ld\n", fAreaCount,
+		FATAL("fAreaCount is %" B_PRId32 ", but should be %" B_PRId32 "\n", fAreaCount,
 			   areaCount);
 		BA_PANIC("BlockAllocator: Bad free bytes.");
 		return false;
@@ -279,8 +279,8 @@ BlockAllocator::_AllocateBlock(size_t usableSize, bool dontCreateArea)
 			fFreeBytes += area->GetFreeBytes();
 			bucket = fBuckets + area->GetBucketIndex();
 			bucket->AddArea(area);
-PRINT(("New area allocated. area count now: %ld, free bytes: %lu\n",
-fAreaCount, fFreeBytes));
+PRINT("New area allocated. area count now: %" B_PRId32 ", free bytes: %lu\n",
+fAreaCount, fFreeBytes);
 		}
 	}
 	// allocate a block
@@ -295,8 +295,8 @@ fAreaCount, fFreeBytes));
 		}
 #if ENABLE_BA_PANIC
 else if (!fPanic) {
-FATAL(("Block allocation failed unexpectedly.\n"));
-PRINT(("  usableSize: %lu, areaFreeBytes: %lu\n", usableSize, areaFreeBytes));
+FATAL("Block allocation failed unexpectedly.\n");
+PRINT("  usableSize: %lu, areaFreeBytes: %lu\n", usableSize, areaFreeBytes);
 BA_PANIC("Block allocation failed unexpectedly.");
 //block = area->AllocateBlock(usableSize);
 }
@@ -395,8 +395,8 @@ BlockAllocator::_Defragment()
 					area->FreeBlock(block, true);
 #if ENABLE_BA_PANIC
 					if (fPanic) {
-						PRINT(("Panicked while trying to free block %p\n",
-							   block));
+						PRINT("Panicked while trying to free block %p\n",
+							   block);
 						success = false;
 						break;
 					}
@@ -410,9 +410,9 @@ BlockAllocator::_Defragment()
 			if (success && area->IsEmpty()) {
 				area->Delete();
 				fAreaCount--;
-PRINT(("defragmenting: area deleted\n"));
+PRINT("defragmenting: area deleted\n");
 			} else {
-PRINT(("defragmenting: failed to empty area\n"));
+PRINT("defragmenting: failed to empty area\n");
 				// failed: re-add the area
 				fFreeBytes += area->GetFreeBytes();
 				AreaBucket *newBucket = fBuckets + area->GetBucketIndex();

@@ -274,7 +274,7 @@ AttributeIndexImpl::Changed(Attribute *attribute, const uint8 *oldKey,
 status_t
 AttributeIndexImpl::Added(Attribute *attribute)
 {
-PRINT(("AttributeIndex::Add(%p)\n", attribute));
+PRINT("AttributeIndex::Add(%p)\n", attribute);
 	status_t error = (attribute ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
 		size_t size = attribute->GetSize();
@@ -293,7 +293,7 @@ PRINT(("AttributeIndex::Add(%p)\n", attribute));
 bool
 AttributeIndexImpl::Removed(Attribute *attribute)
 {
-PRINT(("AttributeIndex::Removed(%p)\n", attribute));
+PRINT("AttributeIndex::Removed(%p)\n", attribute);
 	bool result = (attribute && attribute->GetIndex() == this);
 	if (result) {
 		if (attribute->IsInIndex())
@@ -381,13 +381,13 @@ AttributeIndexImpl::Iterator::GetCurrent(uint8 *buffer, size_t *keyLength)
 				(*attribute)->GetKey(buffer, keyLength);
 			} else {
 				FATAL("Node of current attribute and node of current entry "
-					   "differ: %Ld vs. %Ld\n",
+					   "differ: %" B_PRIdINO " vs. %" B_PRIdINO "\n",
 					   (*attribute)->GetNode()->GetID(),
 					   entry->GetNode()->GetID());
 				entry = NULL;
 			}
 		} else {
-			FATAL("We have a current entry (`%s', node: %Ld), but no current "
+			FATAL("We have a current entry (`%s', node: %" B_PRIdINO "), but no current "
 				   "attribute.\n", entry->GetName(),
 				   entry->GetNode()->GetID());
 			entry = NULL;
