@@ -147,7 +147,7 @@ ramfs_read_fs_info(fs_volume* _volume, struct fs_info *info)
 		strcpy(info->fsh_name, "ramfs");
 	} else
 		SET_ERROR(error, B_ERROR);
-	return B_OK;
+	return error;
 }
 
 
@@ -916,7 +916,7 @@ ramfs_close(fs_volume* _volume, fs_vnode* _node, void* /*cookie*/)
 		notify_if_stat_changed(volume, node);
 	} else
 		SET_ERROR(error, B_ERROR);
-	return B_OK;
+	return error;
 
 }
 
@@ -1632,8 +1632,7 @@ ramfs_close_attr(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 		notify_if_stat_changed(volume, node);
 	} else
 		SET_ERROR(error, B_ERROR);
-	return B_OK;
-
+	return error;
 }
 
 

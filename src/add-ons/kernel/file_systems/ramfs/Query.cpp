@@ -286,7 +286,7 @@ class Term {
 
 		virtual bool NeedsEntry() = 0;
 
-#ifdef DEBUG
+#if DEBUG
 		virtual void	PrintToStream() = 0;
 #endif
 
@@ -329,7 +329,7 @@ class Equation : public Term {
 
 		virtual bool NeedsEntry();
 
-#ifdef DEBUG
+#if DEBUG
 		virtual void PrintToStream();
 #endif
 
@@ -375,7 +375,7 @@ class Operator : public Term {
 		virtual bool NeedsEntry();
 
 		//Term		*Copy() const;
-#ifdef DEBUG
+#if DEBUG
 		virtual void PrintToStream();
 #endif
 
@@ -1389,7 +1389,7 @@ Operator::Copy() const
 
 //	#pragma mark -
 
-#ifdef DEBUG
+#if DEBUG
 void
 Operator::PrintToStream()
 {
