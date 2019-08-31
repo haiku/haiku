@@ -21,24 +21,29 @@ int kTypeColumn = 2;
 AttributesView::AttributesView(Model* model)
 	:
 	BGroupView(B_VERTICAL, 0),
-	fListView(new BColumnListView("attrs", 0, B_PLAIN_BORDER))
+	fListView(new BColumnListView("attrs", 0, B_PLAIN_BORDER, false))
 {
 	SetName("Attributes");
 	AddChild(fListView);
 
 	float nameWidth = StringWidth("SYS:PACKAGE_FILE") + 16;
-	float typeWidth = StringWidth("Double-precision floating point number") + 16;
-	float valueWidth = StringWidth("W") * 64 + 16;
+	float typeMaxWidth = StringWidth("Double-precision floating point number") + 16;
+	float typeWidth = StringWidth("64-bit unsigned integer") + 16;
+	float valueMaxWidth = StringWidth("W") * 64 + 16;
+	float valueWidth = StringWidth("(94.00, 95.00) (1920, 1080)") + 16;
 	BStringColumn* nameColumn = new BStringColumn("Name", nameWidth, nameWidth,
-		nameWidth, nameWidth);
+		nameWidth, 0);
 	BStringColumn* typeColumn = new BStringColumn("Type", typeWidth, typeWidth,
-		typeWidth, typeWidth);
+		typeMaxWidth, 0);
 	BStringColumn* valueColumn = new BStringColumn("Value", valueWidth,
-		valueWidth, valueWidth, valueWidth);
+		valueWidth, valueMaxWidth, 0);
 
 	fListView->AddColumn(nameColumn, 0);
 	fListView->AddColumn(valueColumn, 1);
 	fListView->AddColumn(typeColumn, 2);
+
+	SetExplicitMinSize(BSize(typeWidth + valueWidth + nameWidth + 40,
+		B_SIZE_UNSET));
 
 	BNode* node = model->Node();
 
@@ -134,7 +139,7 @@ AttributesView::AttributesView(Model* model)
 				if (info.size == sizeof(BRect)) {
 					BRect value;
 					node->ReadAttr(name, info.type, 0, &value, sizeof(value));
-					representation.SetToFormat("(%f,%f) (%f,%f)", value.left,
+					representation.SetToFormat("(%g,%g) (%g,%g)", value.left,
 						value.top, value.right, value.bottom);
 				} else {
 					representation.SetToFormat("<%" B_PRIdOFF " rectangles>",
