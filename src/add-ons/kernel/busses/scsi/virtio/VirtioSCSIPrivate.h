@@ -91,10 +91,8 @@ private:
 
 			VirtioSCSIRequest*	fRequest;
 
-			spinlock			fInterruptLock;
 			ConditionVariable	fInterruptCondition;
 			ConditionVariableEntry fInterruptConditionEntry;
-			bool				fExpectsInterrupt;
 
 			scsi_dpc_cookie		fEventDPC;
 			struct virtio_scsi_event fEventBuffers[VIRTIO_SCSI_NUM_EVENTS];

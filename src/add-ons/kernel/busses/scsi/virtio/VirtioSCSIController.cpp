@@ -41,7 +41,6 @@ VirtioSCSIController::VirtioSCSIController(device_node *node)
 {
 	CALLED();
 
-	B_INITIALIZE_SPINLOCK(&fInterruptLock);
 	fInterruptCondition.Init(this, "virtio scsi transfer");
 
 	if (gSCSI->alloc_dpc(&fEventDPC) != B_OK)
@@ -231,22 +230,13 @@ VirtioSCSIController::ExecuteRequest(scsi_ccb *ccb)
 	}
 	fRequest->FillRequest(inCount, outCount, entries);
 
-	{
-		InterruptsSpinLocker locker(fInterruptLock);
-		fExpectsInterrupt = true;
-		fInterruptCondition.Add(&fInterruptConditionEntry);
-	}
+	fInterruptCondition.Add(&fInterruptConditionEntry);
 
 	fVirtio->queue_request_v(fRequestVirtioQueue, entries,
 		outCount, inCount, NULL);
 
 	result = fInterruptConditionEntry.Wait(B_RELATIVE_TIMEOUT,
 		fRequest->Timeout());
-
-	{
-		InterruptsSpinLocker locker(fInterruptLock);
-		fExpectsInterrupt = false;
-	}
 
 	if (result != B_OK)
 		return result;
@@ -295,7 +285,6 @@ VirtioSCSIController::_RequestCallback(void* driverCookie, void* cookie)
 void
 VirtioSCSIController::_RequestInterrupt()
 {
-	SpinLocker locker(fInterruptLock);
 	fInterruptCondition.NotifyAll();
 }
 
