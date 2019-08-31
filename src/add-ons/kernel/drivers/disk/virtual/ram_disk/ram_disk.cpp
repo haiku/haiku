@@ -553,14 +553,14 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 
 			ASSERT(offset % B_PAGE_SIZE == 0);
 			ASSERT(length % B_PAGE_SIZE == 0);
-	
+
 			vm_page** pages = new(std::nothrow) vm_page*[length / B_PAGE_SIZE];
 			if (pages == NULL)
 				return B_NO_MEMORY;
 			ArrayDeleter<vm_page*> pagesDeleter(pages);
 
 			_GetPages(offset, length, false, pages);
-			
+
 			AutoLocker<VMCache> locker(fCache);
 			uint32 j;
 			for (j = 0; j < length / B_PAGE_SIZE; j++) {
@@ -651,6 +651,9 @@ private:
 
 	void _GetPages(off_t offset, off_t length, bool isWrite, vm_page** pages)
 	{
+		// TODO: This method is duplicated in ramfs' DataContainer. Perhaps it
+		// should be put into a common location?
+
 		// get the pages, we already have
 		AutoLocker<VMCache> locker(fCache);
 
@@ -701,6 +704,9 @@ private:
 
 	void _PutPages(off_t offset, off_t length, vm_page** pages, bool success)
 	{
+		// TODO: This method is duplicated in ramfs' DataContainer. Perhaps it
+		// should be put into a common location?
+
 		AutoLocker<VMCache> locker(fCache);
 
 		// Mark all pages unbusy. On error free the newly allocated pages.
