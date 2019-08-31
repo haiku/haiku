@@ -138,8 +138,7 @@ DirectoryEntryTable::RemoveEntry(ino_t id, const char *name)
 	Entry* child = fTable.Lookup(typename DirectoryEntryHash::Key(id, name));
 	if (!child)
 		return B_NAME_NOT_FOUND;
-	status_t error = fTable.Remove(child);
-	return error;
+	return fTable.Remove(child) ? B_OK : B_ERROR;
 }
 
 // GetEntry
