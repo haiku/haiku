@@ -274,7 +274,6 @@ Node::FindAttribute(const char *name, Attribute **_attribute) const
 {
 	status_t error = (name && _attribute ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
-/*
 		Attribute *attribute = NULL;
 		while (GetNextAttribute(&attribute) == B_OK) {
 			if (!strcmp(attribute->GetName(), name)) {
@@ -283,8 +282,6 @@ Node::FindAttribute(const char *name, Attribute **_attribute) const
 			}
 		}
 		error = B_ENTRY_NOT_FOUND;
-*/
-		error = GetVolume()->FindNodeAttribute(GetID(), name, _attribute);
 	}
 	return error;
 }

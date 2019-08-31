@@ -47,7 +47,6 @@ class IndexDirectory;
 class LastModifiedIndex;
 class NameIndex;
 class Node;
-class NodeAttributeTable;
 class NodeListener;
 class NodeListenerTree;
 class NodeTable;
@@ -136,11 +135,9 @@ public:
 							  uint32 flags);
 	status_t RemoveEntryListener(EntryListener *listener, Entry *entry);
 
-	// node attribute table
+	// node attributes
 	status_t NodeAttributeAdded(ino_t id, Attribute *attribute);
 	status_t NodeAttributeRemoved(ino_t id, Attribute *attribute);
-	status_t FindNodeAttribute(ino_t id, const char *name,
-							   Attribute **attribute);
 
 	// indices
 	IndexDirectory *GetIndexDirectory() const	{ return fIndexDirectory; }
@@ -186,7 +183,6 @@ private:
 	ino_t					fNextNodeID;
 	NodeTable				*fNodeTable;
 	DirectoryEntryTable		*fDirectoryEntryTable;
-	NodeAttributeTable		*fNodeAttributeTable;
 	IndexDirectory			*fIndexDirectory;
 	Directory				*fRootDirectory;
 	String					fName;

@@ -20,9 +20,6 @@ AllocationInfo::AllocationInfo()
 	  fDirectoryEntryTableArraySize(0),
 	  fDirectoryEntryTableVectorSize(0),
 	  fDirectoryEntryTableElementCount(0),
-	  fNodeAttributeTableArraySize(0),
-	  fNodeAttributeTableVectorSize(0),
-	  fNodeAttributeTableElementCount(0),
 
 	  fAttributeCount(0),
 	  fAttributeSize(0),
@@ -71,18 +68,6 @@ AllocationInfo::AddDirectoryEntryTableAllocation(size_t arraySize,
 	fDirectoryEntryTableArraySize += arraySize;
 	fDirectoryEntryTableVectorSize += vectorSize * elementSize;
 	fDirectoryEntryTableElementCount += elementCount;
-}
-
-// AddNodeAttributeTableAllocation
-void
-AllocationInfo::AddNodeAttributeTableAllocation(size_t arraySize,
-												size_t vectorSize,
-												size_t elementSize,
-												size_t elementCount)
-{
-	fNodeAttributeTableArraySize += arraySize;
-	fNodeAttributeTableVectorSize += vectorSize * elementSize;
-	fNodeAttributeTableElementCount += elementCount;
 }
 
 // AddAttributeAllocation
@@ -186,14 +171,6 @@ AllocationInfo::Dump() const
 	areaCount += 2;
 	areaSize += fDirectoryEntryTableArraySize * sizeof(int32)
 				+ fDirectoryEntryTableVectorSize;
-
-	PRINT("  attribute table:\n");
-	PRINT("    array size:  %9lu\n", fNodeAttributeTableArraySize);
-	PRINT("    vector size: %9lu\n", fNodeAttributeTableVectorSize);
-	PRINT("    elements:    %9lu\n", fNodeAttributeTableElementCount);
-	areaCount += 2;
-	areaSize += fNodeAttributeTableArraySize * sizeof(int32)
-				+ fNodeAttributeTableVectorSize;
 
 	PRINT("  attributes:  %9lu, size: %9lu\n", fAttributeCount, fAttributeSize);
 	heapCount += fAttributeCount;

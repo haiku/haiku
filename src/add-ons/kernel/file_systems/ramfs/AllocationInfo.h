@@ -17,9 +17,6 @@ public:
 	void AddDirectoryEntryTableAllocation(size_t arraySize, size_t vectorSize,
 										  size_t elementSize,
 										  size_t elementCount);
-	void AddNodeAttributeTableAllocation(size_t arraySize, size_t vectorSize,
-										 size_t elementSize,
-										 size_t elementCount);
 
 	void AddAttributeAllocation(size_t size);
 	void AddDirectoryAllocation();
@@ -42,9 +39,6 @@ private:
 	size_t	fDirectoryEntryTableArraySize;
 	size_t	fDirectoryEntryTableVectorSize;
 	size_t	fDirectoryEntryTableElementCount;
-	size_t	fNodeAttributeTableArraySize;
-	size_t	fNodeAttributeTableVectorSize;
-	size_t	fNodeAttributeTableElementCount;
 
 	size_t	fAttributeCount;
 	size_t	fAttributeSize;

@@ -136,7 +136,6 @@ Volume::Volume(fs_volume* volume)
 	fNextNodeID(kRootParentID + 1),
 	fNodeTable(NULL),
 	fDirectoryEntryTable(NULL),
-	fNodeAttributeTable(NULL),
 	fIndexDirectory(NULL),
 	fRootDirectory(NULL),
 	fName(kDefaultVolumeName),
@@ -213,14 +212,6 @@ Volume::Mount(uint32 flags)
 		else
 			SET_ERROR(error, B_NO_MEMORY);
 	}
-	// create the node attribute table
-	if (error == B_OK) {
-		fNodeAttributeTable = new(nothrow) NodeAttributeTable;
-		if (fNodeAttributeTable)
-			error = fNodeAttributeTable->InitCheck();
-		else
-			SET_ERROR(error, B_NO_MEMORY);
-	}
 	// create the index directory
 	if (error == B_OK) {
 		fIndexDirectory = new(nothrow) IndexDirectory(this);
@@ -272,10 +263,6 @@ Volume::Unmount()
 		fNodeListeners = NULL;
 	}
 	// delete the tables
-	if (fNodeAttributeTable) {
-		delete fNodeAttributeTable;
-		fNodeAttributeTable = NULL;
-	}
 	if (fDirectoryEntryTable) {
 		delete fDirectoryEntryTable;
 		fDirectoryEntryTable = NULL;
@@ -660,7 +647,6 @@ Volume::NodeAttributeAdded(ino_t id, Attribute *attribute)
 {
 	status_t error = (attribute ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
-		error = fNodeAttributeTable->AddNodeChild(id, attribute);
 		// notify the respective attribute index
 		if (error == B_OK) {
 			if (AttributeIndex *index = FindAttributeIndex(
@@ -678,7 +664,6 @@ Volume::NodeAttributeRemoved(ino_t id, Attribute *attribute)
 {
 	status_t error = (attribute ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
-		error = fNodeAttributeTable->RemoveNodeChild(id, attribute);
 		// notify the respective attribute index
 		if (error == B_OK) {
 			if (AttributeIndex *index = FindAttributeIndex(
@@ -695,19 +680,6 @@ Volume::NodeAttributeRemoved(ino_t id, Attribute *attribute)
 			UpdateLiveQueries(NULL, attribute->GetNode(), attribute->GetName(),
 				attribute->GetType(), oldKey, oldLength, NULL, 0);
 		}
-	}
-	return error;
-}
-
-// FindNodeAttribute
-status_t
-Volume::FindNodeAttribute(ino_t id, const char *name, Attribute **attribute)
-{
-	status_t error = (attribute ? B_OK : B_BAD_VALUE);
-	if (error == B_OK) {
-		*attribute = fNodeAttributeTable->GetNodeChild(id, name);
-		if (!*attribute)
-			error = B_ENTRY_NOT_FOUND;
 	}
 	return error;
 }
@@ -841,8 +813,6 @@ Volume::GetAllocationInfo(AllocationInfo &info)
 	fNodeTable->GetAllocationInfo(info);
 	info.AddOtherAllocation(sizeof(DirectoryEntryTable));
 	fDirectoryEntryTable->GetAllocationInfo(info);
-	info.AddOtherAllocation(sizeof(NodeAttributeTable));
-	fNodeAttributeTable->GetAllocationInfo(info);
 	// node hierarchy
 	fRootDirectory->GetAllocationInfo(info);
 	// name
