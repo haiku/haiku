@@ -139,9 +139,6 @@ Volume::Volume(fs_volume* volume)
 	fIndexDirectory(NULL),
 	fRootDirectory(NULL),
 	fName(kDefaultVolumeName),
-	fLocker("volume"),
-	fIteratorLocker("iterators"),
-	fQueryLocker("queries"),
 	fNodeListeners(NULL),
 	fAnyNodeListeners(),
 	fEntryListeners(NULL),
@@ -152,6 +149,9 @@ Volume::Volume(fs_volume* volume)
 	fAccessTime(0),
 	fMounted(false)
 {
+	rw_lock_init(&fLocker, "ramfs volume");
+	recursive_lock_init(&fIteratorLocker, "ramfs iterators");
+	recursive_lock_init(&fQueryLocker, "ramfs queries");
 }
 
 
@@ -159,6 +159,10 @@ Volume::Volume(fs_volume* volume)
 Volume::~Volume()
 {
 	Unmount();
+
+	recursive_lock_destroy(&fIteratorLocker);
+	recursive_lock_destroy(&fQueryLocker);
+	rw_lock_destroy(&fLocker);
 }
 
 
@@ -167,14 +171,6 @@ status_t
 Volume::Mount(uint32 flags)
 {
 	Unmount();
-
-	// check the lockers
-	if (fLocker.InitCheck() < 0)
-		return fLocker.InitCheck();
-	if (fIteratorLocker.InitCheck() < 0)
-		return fIteratorLocker.InitCheck();
-	if (fQueryLocker.InitCheck() < 0)
-		return fQueryLocker.InitCheck();
 
 	status_t error = B_OK;
 	// create a block allocator
@@ -724,7 +720,7 @@ Volume::FindAttributeIndex(const char *name, uint32 type)
 void
 Volume::AddQuery(Query *query)
 {
-	AutoLocker<RecursiveLock> _(fQueryLocker);
+	RecursiveLocker _(fQueryLocker);
 
 	if (query)
 		fQueries.Insert(query);
@@ -734,7 +730,7 @@ Volume::AddQuery(Query *query)
 void
 Volume::RemoveQuery(Query *query)
 {
-	AutoLocker<RecursiveLock> _(fQueryLocker);
+	RecursiveLocker _(fQueryLocker);
 
 	if (query)
 		fQueries.Remove(query);
@@ -746,7 +742,7 @@ Volume::UpdateLiveQueries(Entry *entry, Node* node, const char *attribute,
 	int32 type, const uint8 *oldKey, size_t oldLength, const uint8 *newKey,
 	size_t newLength)
 {
-	AutoLocker<RecursiveLock> _(fQueryLocker);
+	RecursiveLocker _(fQueryLocker);
 
 	for (Query* query = fQueries.First();
 		 query;
@@ -826,53 +822,47 @@ Volume::GetAllocationInfo(AllocationInfo &info)
 bool
 Volume::ReadLock()
 {
-	bool alreadyLocked = fLocker.IsLocked();
-	if (fLocker.Lock()) {
-		if (!alreadyLocked)
-			fAccessTime = system_time();
-		return true;
-	}
-	return false;
+	bool ok = rw_lock_read_lock(&fLocker) == B_OK;
+	if (ok && fLocker.owner_count > 1)
+		fAccessTime = system_time();
+	return ok;
 }
 
 // ReadUnlock
 void
 Volume::ReadUnlock()
 {
-	fLocker.Unlock();
+	rw_lock_read_unlock(&fLocker);
 }
 
 // WriteLock
 bool
 Volume::WriteLock()
 {
-	bool alreadyLocked = fLocker.IsLocked();
-	if (fLocker.Lock()) {
-		if (!alreadyLocked)
-			fAccessTime = system_time();
-		return true;
-	}
-	return false;
+	bool ok = rw_lock_write_lock(&fLocker) == B_OK;
+	if (ok && fLocker.owner_count > 1)
+		fAccessTime = system_time();
+	return ok;
 }
 
 // WriteUnlock
 void
 Volume::WriteUnlock()
 {
-	fLocker.Unlock();
+	rw_lock_write_unlock(&fLocker);
 }
 
 // IteratorLock
 bool
 Volume::IteratorLock()
 {
-	return fIteratorLocker.Lock();
+	return recursive_lock_lock(&fIteratorLocker) == B_OK;
 }
 
 // IteratorUnlock
 void
 Volume::IteratorUnlock()
 {
-	fIteratorLocker.Unlock();
+	recursive_lock_unlock(&fIteratorLocker);
 }
 

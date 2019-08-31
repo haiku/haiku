@@ -24,8 +24,8 @@
 
 #include <fs_interface.h>
 #include <SupportDefs.h>
+#include <lock.h>
 
-#include <userlandfs/shared/RecursiveLock.h>
 #include <util/DoublyLinkedList.h>
 
 #include "Entry.h"
@@ -186,9 +186,9 @@ private:
 	IndexDirectory			*fIndexDirectory;
 	Directory				*fRootDirectory;
 	String					fName;
-	RecursiveLock			fLocker;
-	RecursiveLock			fIteratorLocker;
-	RecursiveLock			fQueryLocker;
+	rw_lock					fLocker;
+	recursive_lock			fIteratorLocker;
+	recursive_lock			fQueryLocker;
 	NodeListenerTree		*fNodeListeners;
 	NodeListenerList		fAnyNodeListeners;
 	EntryListenerTree		*fEntryListeners;
