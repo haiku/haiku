@@ -66,16 +66,18 @@ compare_keys(const uint8 *key1, size_t length1, const uint8 *key2,
 // PrimaryKey
 class AttributeIndexImpl::PrimaryKey {
 public:
-	PrimaryKey(Attribute *attribute, const uint8 *key,
+	PrimaryKey(Attribute *attribute, const uint8 *theKey,
 			   size_t length)
-		: attribute(attribute), key(key), length(length) {}
+		: attribute(attribute), length(length)
+			{ memcpy(key, theKey, length); }
 	PrimaryKey(Attribute *attribute)
-		: attribute(attribute) { attribute->GetKey(&key, &length); }
-	PrimaryKey(const uint8 *key, size_t length)
-		: attribute(NULL), key(key), length(length) {}
+		: attribute(attribute) { attribute->GetKey(key, &length); }
+	PrimaryKey(const uint8 *theKey, size_t length)
+		: attribute(NULL), length(length)
+			{ memcpy(key, theKey, length); }
 
 	Attribute	*attribute;
-	const uint8	*key;
+	uint8		key[kMaxIndexKeyLength];
 	size_t		length;
 };
 
@@ -466,9 +468,9 @@ AttributeIndexImpl::Iterator::SetTo(AttributeIndexImpl *index,
 				if (!fEntry)
 					BaseClass::GetNext();
 				if (Attribute **attribute = fIterator.fIterator.GetCurrent()) {
-					const uint8 *attrKey;
+					uint8 attrKey[kMaxIndexKeyLength];
 					size_t attrKeyLength;
-					(*attribute)->GetKey(&attrKey, &attrKeyLength);
+					(*attribute)->GetKey(attrKey, &attrKeyLength);
 					if (!ignoreValue
 						&& compare_keys(attrKey, attrKeyLength, key, length,
 										fIndex->GetType()) != 0) {

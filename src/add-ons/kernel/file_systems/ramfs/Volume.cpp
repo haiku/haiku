@@ -670,9 +670,9 @@ Volume::NodeAttributeRemoved(ino_t id, Attribute *attribute)
 
 		// update live queries
 		if (error == B_OK && attribute->GetNode()) {
-			const uint8* oldKey;
+			uint8 oldKey[kMaxIndexKeyLength];
 			size_t oldLength;
-			attribute->GetKey(&oldKey, &oldLength);
+			attribute->GetKey(oldKey, &oldLength);
 			UpdateLiveQueries(NULL, attribute->GetNode(), attribute->GetName(),
 				attribute->GetType(), oldKey, oldLength, NULL, 0);
 		}

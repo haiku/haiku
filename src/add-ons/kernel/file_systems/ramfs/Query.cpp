@@ -1009,9 +1009,10 @@ Equation::Match(Entry *entry, Node* node, const char *attributeName, int32 type,
 	} else {
 		// then for attributes
 		Attribute *attribute = NULL;
+		buffer = (const uint8*)alloca(kMaxIndexKeyLength);
 
 		if (node->FindAttribute(fAttribute, &attribute) == B_OK) {
-			attribute->GetKey(&buffer, &size);
+			attribute->GetKey((uint8*)buffer, &size);
 			type = attribute->GetType();
 		} else
 			return MatchEmptyString();

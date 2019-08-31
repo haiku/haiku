@@ -84,9 +84,9 @@ Attribute::WriteAt(off_t offset, const void *buffer, size_t size,
 		fIndex->Changed(this, oldKey, oldLength);
 
 	// update live queries
-	const uint8* newKey;
+	uint8 newKey[kMaxIndexKeyLength];
 	size_t newLength;
-	GetKey(&newKey, &newLength);
+	GetKey(newKey, &newLength);
 	GetVolume()->UpdateLiveQueries(NULL, fNode, GetName(), fType, oldKey,
 		oldLength, newKey, newLength);
 
@@ -107,24 +107,10 @@ Attribute::SetIndex(AttributeIndex *index, bool inIndex)
 
 // GetKey
 void
-Attribute::GetKey(const uint8 **key, size_t *length)
-{
-	if (key && length) {
-		GetFirstDataBlock(key, length);
-		*length = min(*length, kMaxIndexKeyLength);
-	}
-}
-
-// GetKey
-void
 Attribute::GetKey(uint8 *key, size_t *length)
 {
-	if (key && length) {
-		const uint8 *originalKey = NULL;
-		GetKey(&originalKey, length);
-		if (length > 0)
-			memcpy(key, originalKey, *length);
-	}
+	*length = min(*length, kMaxIndexKeyLength);
+	ReadAt(0, key, *length, length);
 }
 
 // AttachAttributeIterator

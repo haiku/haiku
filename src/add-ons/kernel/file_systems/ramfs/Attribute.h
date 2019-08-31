@@ -42,7 +42,6 @@ public:
 	void SetIndex(AttributeIndex *index, bool inIndex);
 	AttributeIndex *GetIndex() const	{ return fIndex; }
 	bool IsInIndex() const				{ return fInIndex; }
-	void GetKey(const uint8 **key, size_t *length);
 	void GetKey(uint8 *key, size_t *length);
 
 	// iterator management
