@@ -30,6 +30,7 @@
 #include "BlockAllocator.h"
 #include "DebugSupport.h"
 #include "Directory.h"
+#include "DirectoryEntryTable.h"
 #include "Entry.h"
 #include "EntryListener.h"
 #include "IndexDirectory.h"
@@ -37,7 +38,6 @@
 #include "Misc.h"
 #include "NameIndex.h"
 #include "Node.h"
-#include "NodeChildTable.h"
 #include "NodeListener.h"
 #include "NodeTable.h"
 #include "TwoKeyAVLTree.h"
@@ -535,7 +535,7 @@ Volume::EntryAdded(ino_t id, Entry *entry)
 {
 	status_t error = (entry ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
-		error = fDirectoryEntryTable->AddNodeChild(id, entry);
+		error = fDirectoryEntryTable->AddEntry(id, entry);
 		if (error == B_OK) {
 			// notify listeners
 			// listeners interested in that entry
@@ -566,7 +566,7 @@ Volume::EntryRemoved(ino_t id, Entry *entry)
 {
 	status_t error = (entry ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
-		error = fDirectoryEntryTable->RemoveNodeChild(id, entry);
+		error = fDirectoryEntryTable->RemoveEntry(id, entry);
 		if (error == B_OK) {
 			// notify listeners
 			// listeners interested in that entry
@@ -597,7 +597,7 @@ Volume::FindEntry(ino_t id, const char *name, Entry **entry)
 {
 	status_t error = (entry ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
-		*entry = fDirectoryEntryTable->GetNodeChild(id, name);
+		*entry = fDirectoryEntryTable->GetEntry(id, name);
 		if (!*entry)
 			error = B_ENTRY_NOT_FOUND;
 	}

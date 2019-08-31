@@ -24,6 +24,8 @@ public:
 
 	status_t InitCheck() const;
 
+	Entry*& HashLink()	{ return fHashLink; }
+
 	inline void SetParent(Directory *parent)	{ fParent = parent; }
 	Directory *GetParent() const				{ return fParent; }
 
@@ -50,6 +52,7 @@ public:
 	void GetAllocationInfo(AllocationInfo &info);
 
 private:
+	Entry					*fHashLink;
 	Directory				*fParent;
 	Node					*fNode;
 	String					fName;
