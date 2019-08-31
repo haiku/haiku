@@ -91,6 +91,7 @@ private:
 
 			VirtioSCSIRequest*	fRequest;
 
+			int32				fCurrentRequest;
 			ConditionVariable	fInterruptCondition;
 			ConditionVariableEntry fInterruptConditionEntry;
 
@@ -123,6 +124,7 @@ public:
 									{ return fCCB->data_length > 0; }
 
 			status_t			Finish(bool resubmit);
+			void				Abort();
 
 			// SCSI stuff
 			status_t			Start(scsi_ccb *ccb);

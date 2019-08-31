@@ -141,6 +141,17 @@ VirtioSCSIRequest::Finish(bool resubmit)
 
 
 void
+VirtioSCSIRequest::Abort()
+{
+	scsi_ccb *ccb = fCCB;
+	mutex_unlock(&fLock);
+
+	ccb->subsys_status = SCSI_REQ_ABORTED;
+	gSCSI->finished(ccb, 1);
+}
+
+
+void
 VirtioSCSIRequest::RequestSense()
 {
 	CALLED();
