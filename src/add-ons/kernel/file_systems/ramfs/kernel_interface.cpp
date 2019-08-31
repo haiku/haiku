@@ -105,6 +105,7 @@ ramfs_mount(fs_volume* _volume, const char* /*device*/, uint32 flags,
 
 	*_rootID = volume->GetRootDirectory()->GetID();
 	_volume->private_volume = volume;
+	_volume->ops = &gRamFSVolumeOps;
 
 	RETURN_ERROR(B_OK);
 }
@@ -186,7 +187,7 @@ ramfs_lookup(fs_volume* _volume, fs_vnode* _dir, const char* entryName,
 {
 //	FUNCTION_START();
 	Volume* volume = (Volume*)_volume->private_volume;
-	Directory* dir = dynamic_cast<Directory*>((Node*)_dir);
+	Directory* dir = dynamic_cast<Directory*>((Node*)_dir->private_node);
 
 	FUNCTION(("dir: (%llu), entry: `%s'\n", (dir ? dir->GetID() : -1),
 		entryName));

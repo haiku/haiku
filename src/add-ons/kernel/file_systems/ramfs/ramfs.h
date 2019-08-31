@@ -9,6 +9,7 @@
 #include <SupportDefs.h>
 
 extern struct fs_vnode_ops gRamFSVnodeOps;
+extern struct fs_volume_ops gRamFSVolumeOps;
 const size_t kMaxIndexKeyLength = 256;
 
 #endif	// RAM_FS_H
