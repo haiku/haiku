@@ -55,7 +55,7 @@ BStripeView::Draw(BRect updateRect)
 
 	SetDrawingMode(B_OP_ALPHA);
 	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-	DrawBitmapAsync(&fIcon, BPoint(stripeRect.right - (fIconSize / 2.0),
+	DrawBitmapAsync(&fIcon, BPoint(18 * iconLayoutScale,
 		6 * iconLayoutScale));
 }
 
