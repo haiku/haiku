@@ -36,6 +36,7 @@
 #include <fs_interface.h>
 #include <fs_query.h>
 #include <fs_volume.h>
+#include <vfs.h>
 #include <KernelExport.h>
 #include <NodeMonitor.h>
 #include <TypeConstants.h>
@@ -227,9 +228,9 @@ SET_ERROR(error, error);
 }
 
 
-// ramfs_read_vnode
+// ramfs_get_vnode
 static status_t
-ramfs_read_vnode(fs_volume* _volume, ino_t vnid, fs_vnode* node, int* _type,
+ramfs_get_vnode(fs_volume* _volume, ino_t vnid, fs_vnode* node, int* _type,
 	uint32* _flags, bool reenter)
 {
 //	FUNCTION_START();
@@ -889,6 +890,13 @@ ramfs_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 		// truncate if requested
 		if (error == B_OK && (openMode & O_TRUNC))
 			error = node->SetSize(0);
+		// set cache in vnode
+		if (File *file = dynamic_cast<File*>(node)) {
+			struct vnode* vnode;
+			if (vfs_lookup_vnode(_volume->id, node->GetID(), &vnode) == B_OK) {
+				vfs_set_vnode_cache(vnode, file->GetCache());
+			}
+		}
 		NodeMTimeUpdater mTimeUpdater(node);
 		// set result / cleanup on failure
 		if (error == B_OK)
@@ -2146,7 +2154,7 @@ fs_volume_ops gRamFSVolumeOps = {
 	&ramfs_read_fs_info,
 	&ramfs_write_fs_info,
 	&ramfs_sync,
-	&ramfs_read_vnode,
+	&ramfs_get_vnode,
 
 	/* index directory & index operations */
 	&ramfs_open_index_dir,

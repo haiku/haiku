@@ -46,6 +46,8 @@ public:
 	status_t Resize(off_t newSize);
 	off_t GetSize() const { return fSize; }
 
+	VMCache* GetCache();
+
 	virtual status_t ReadAt(off_t offset, void *buffer, size_t size,
 							size_t *bytesRead);
 	virtual status_t WriteAt(off_t offset, const void *buffer, size_t size,
@@ -57,7 +59,7 @@ public:
 private:
 	inline bool _RequiresCacheMode(size_t size);
 	inline bool _IsCacheMode() const;
-	status_t _SwitchToCacheMode(size_t newBlockSize);
+	status_t _SwitchToCacheMode();
 	void _GetPages(off_t offset, off_t length, bool isWrite, vm_page** pages);
 	void _PutPages(off_t offset, off_t length, vm_page** pages, bool success);
 	status_t _DoCacheIO(const off_t offset, uint8* buffer, ssize_t length,

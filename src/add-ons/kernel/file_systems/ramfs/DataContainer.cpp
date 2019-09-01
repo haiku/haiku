@@ -41,6 +41,15 @@ DataContainer::InitCheck() const
 	return (fVolume != NULL ? B_OK : B_ERROR);
 }
 
+// GetCache
+VMCache*
+DataContainer::GetCache()
+{
+	if (!_IsCacheMode())
+		_SwitchToCacheMode();
+	return fCache;
+}
+
 // Resize
 status_t
 DataContainer::Resize(off_t newSize)
@@ -63,7 +72,7 @@ DataContainer::Resize(off_t newSize)
 		// grow
 		if (_RequiresCacheMode(newSize)) {
 			if (!_IsCacheMode())
-				error = _SwitchToCacheMode(fSize);
+				error = _SwitchToCacheMode();
 			if (error != B_OK)
 				return error;
 
@@ -187,7 +196,7 @@ DataContainer::_CountBlocks() const
 
 // _SwitchToCacheMode
 status_t
-DataContainer::_SwitchToCacheMode(size_t newBlockSize)
+DataContainer::_SwitchToCacheMode()
 {
 	status_t error = VMCacheFactory::CreateAnonymousCache(fCache, false, 0,
 		0, false, VM_PRIORITY_SYSTEM);
@@ -195,9 +204,9 @@ DataContainer::_SwitchToCacheMode(size_t newBlockSize)
 		return error;
 
 	fCache->temporary = 1;
-	fCache->virtual_end = newBlockSize;
+	fCache->virtual_end = fSize;
 
-	error = fCache->Commit(newBlockSize, VM_PRIORITY_SYSTEM);
+	error = fCache->Commit(fSize, VM_PRIORITY_SYSTEM);
 	if (error != B_OK)
 		return error;
 
