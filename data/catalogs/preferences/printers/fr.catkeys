@@ -1,4 +1,4 @@
-1	french	x-vnd.Be-PRNT	2042381362
+1	french	x-vnd.Be-PRNT	1465107170
 Test page	TestPageView		Page de test
 Remove	PrintersWindow		Retirer
 Red	TestPageView		Rouge
@@ -16,6 +16,8 @@ Waiting	JobListView		Attente
 Processing	JobListView		Traitement
 Cancel	AddPrinterDialog		Annuler
 Unknown status	JobListView		État inconnu
+Print jobs for %printer_name%	PrintersWindow		Impressions en cours pour %printer_name%
+{0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? pages}=1{# page}other{# pages}}
 Add printer	AddPrinterDialog		Ajouter une imprimante
 Printers	PrintersWindow		Imprimantes
 No printer found!	TransportMenu		Aucune imprimante trouvée !
@@ -29,6 +31,7 @@ Yellow	TestPageView		Jaune
 Black	TestPageView		Noir
 Printer type:	AddPrinterDialog		Type d’imprimante :
 Printers	System name		Imprimantes
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{Aucun travail en attente}=1{1 travail en attente}other{# travaux en attente}}
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Imprimante : %printer_name%\n    Pilote : %driver%\n
 Green	TestPageView		Vert
 Print test page	PrintersWindow		Imprimer une page de test

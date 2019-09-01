@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Be-PRNT	2042381362
+1	hungarian	x-vnd.Be-PRNT	1465107170
 Test page	TestPageView		Tesztoldal
 Remove	PrintersWindow		Eltávolítás
 Red	TestPageView		Vörös
@@ -16,6 +16,8 @@ Waiting	JobListView		Várakozás
 Processing	JobListView		Feldolgozás
 Cancel	AddPrinterDialog		Mégse
 Unknown status	JobListView		Ismeretlen állapot
+Print jobs for %printer_name%	PrintersWindow		%printer_name% nyomtatási feladatai
+{0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? oldal}=1{# oldal}other{# oldal}}
 Add printer	AddPrinterDialog		Nyomtató hozzáadása
 Printers	PrintersWindow		Nyomtatók
 No printer found!	TransportMenu		Nem található nyomtató!
@@ -29,6 +31,7 @@ Yellow	TestPageView		Sárga
 Black	TestPageView		Fekete
 Printer type:	AddPrinterDialog		Nyomtató típusa:
 Printers	System name		Nyomtatók
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{Nincsen nyomtatni való}=1{1 várakozó feladat}other{# várakozó feladat}}
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Nyomtató: %printer_name%\nVezérlő: %driver%\n
 Green	TestPageView		Zöld
 Print test page	PrintersWindow		Tesztoldal nyomtatása

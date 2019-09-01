@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	2335250517
+1	ukrainian	x-vnd.Haiku-HaikuDepot	4184700448
 Check for updates…	MainWindow		Оцінити пакунок…
 Uninstall	PackageManager		Видалити
 (%Votes%)	FeaturedPackagesView		(%Votes%)
@@ -8,8 +8,8 @@ Create account	UserLoginWindow		Створити обліковий запис
 OK	App		Гаразд
 Mostly stable	RatePackageWindow		Найстабільніший
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Акаунт успішно створено. Тепер Ви зможете оцінювати пакети і робити інші корисні речі.
-Rate package…	PackageInfoView		Оцінити пакет…
 Develop packages	MainWindow		Пакети розробника
+Rate package…	PackageInfoView		Оцінити пакет…
 Starting the package daemon failed:\n\n%Error%	App		Запуск демона пакету призупинено:\n\n%Error%
 <no info>	PackageInfoView		<немає інформації>
 No user ratings available.	PackageInfoView		Оцінка для користувача недоступна.
@@ -18,8 +18,8 @@ Downloading package '%name%'	WorkStatusView		Завантажити пакуно
 Failed to create account	UserLoginWindow		Створення облікового запису призупинено
 Ignore	UserLoginWindow		Ігнорувати
 Rating	PackageListView		Оцінка
-Show	MainWindow		Показати
 Does not start	RatePackageWindow		Не починається
+Show	MainWindow		Показати
 But none could be listed here, sorry.	UserLoginWindow		Жодних перечислень тут, вибачте
 There are problems with the data you entered:\n\n	UserLoginWindow		Сталися проблеми з введеними даними:\n\n
 The authentication was successful.	UserLoginWindow		Активізація успішна.
@@ -32,7 +32,6 @@ Login or Create account	MainWindow		Авторизуватись або заре
 Ratings	PackageInfoView		Оцінки
 Switch account…	MainWindow		Перемкнути обліковий запис…
 Preferred language:	UserLoginWindow		Бажана мова:
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display.  Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Під час оновлення даних пакета виникла проблема, яка може спричинити застарілість або відсутність даних на екрані програми.  Додаткові відомості щодо цієї проблеми можуть бути отримані з журналів програми.
 It was not possible to contact the web service.	UserLoginWindow		Неможливо під'єднатись до мережевого сервісу.
 Name	PackageListView		Ім'я
 Rate %Package%	RatePackageWindow		Оцінити %Package%

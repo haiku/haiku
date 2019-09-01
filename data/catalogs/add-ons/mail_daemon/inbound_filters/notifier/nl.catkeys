@@ -1,14 +1,13 @@
-1	dutch; flemish	x-vnd.Haiku-NewMailNotification	73789504
-You have {0, plural, one{One new message} other{# new messages}} for %account.	NotifierFilter		U heeft {0, plural, one{Eén nieuw bericht} other{# nieuwe berichten}} voor %account.
-none	NotifierConfigView		geen
-Method:	NotifierConfigView		Methode:
-Beep	NotifierConfigView		Geluidssignaal
-{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{Eén nieuw bericht} other {# nieuwe berichten}}
-New mails notification	NotifierFilter		Nieuwe e-mails notificatie
-Central alert	NotifierConfigView		Centraal signaal
-OK	NotifierFilter		OK
-New messages	NotifierFilter		Nieuwe bericht
+1	dutch; flemish	x-vnd.Haiku-NewMailNotification	2111731137
 Log window	NotifierConfigView		Logvenster
-Keyboard LEDs	NotifierConfigView		Toetsenbords LED's
-Central beep	NotifierConfigView		Centraal geluidssignaal
+none	NotifierConfigView		geen
+New mails notification	NotifierFilter		Nieuwe e-mails notificatie
 Alert	NotifierConfigView		Signaal
+OK	NotifierFilter		OK
+Central alert	NotifierConfigView		Centraal signaal
+Beep	NotifierConfigView		Geluidssignaal
+Central beep	NotifierConfigView		Centraal geluidssignaal
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{Eén nieuw bericht} other {# nieuwe berichten}}
+New messages	NotifierFilter		Nieuwe bericht
+Method:	NotifierConfigView		Methode:
+Keyboard LEDs	NotifierConfigView		Toetsenbords LED's

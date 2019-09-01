@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku.TextSearch	2123129416
+1	hungarian	x-vnd.Haiku.TextSearch	1867528375
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Válassza ki azokat a fájlokat a Nyomkövetőben, melyek kijelölésre kerüljenek.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Az xargs indítása sikertelen!
@@ -27,6 +27,7 @@ Show lines	GrepWindow		Sorok megjelenítése
 Failed to open errors pipe!	Grepper		Nem tudtam megnyitni az átmeneti fájlt.
 The unselected files will be removed from the list.	GrepWindow		A ki nem választott fájlok el lesznek távolítva a listáról.
 Skip folders starting with a dot	GrepWindow		Ponttal kezdődő mappák átugrása
+Open files in code editor	GrepWindow		Fájlok megnyitása a kódszerkesztőben
 Failed to open output pipe!	Grepper		Nem sikerült megnyitni a kimeneti eszközt
 Cancel	GrepWindow		Mégse
 History	GrepWindow		Előzmények

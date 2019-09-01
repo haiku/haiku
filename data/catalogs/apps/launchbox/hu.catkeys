@@ -1,10 +1,11 @@
-1	hungarian	x-vnd.Haiku-LaunchBox	3692177981
+1	hungarian	x-vnd.Haiku-LaunchBox	1530497419
 Set description…	LaunchBox		Leírás…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Biztos bezárja ezt a tálcát?\n(A tálca nem lesz rögzítve sehol.)
 OK	LaunchBox		Rendben
 Ignore double-click	LaunchBox		Dupla kattintás figyelmen kívül hagyása
 Show on all workspaces	LaunchBox		Megjelenítés az összes munkaasztalon
 Name Panel	LaunchBox		Név panel
+Autostart	LaunchBox		Automatikus indítás
 Clone	LaunchBox		Klónozás
 Description for '%3'	LaunchBox		%3 leírása
 Show window border	LaunchBox		Ablak keretének mutatása

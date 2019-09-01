@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Appearance	583615507
+1	hungarian	x-vnd.Haiku-Appearance	663472720
 Control border	Colors tab		Vezérlőelem kerete
 Control mark	Colors tab		Vezérlőelem jelölése
 Off	AntialiasingSettingsView		Ki
@@ -8,10 +8,12 @@ Defaults	APRWindow		Eredeti
 Shadow	Colors tab		Árnyék
 Document background	Colors tab		Dokumentum háttere
 List background	Colors tab		Lista háttere
+No effect on running applications	DecorSettingsView		Futó alkalmazásokra nincs hatása
 Fixed font:	Font view		Rögzített szélességű betűtípus:
 Appearance	System name		Megjelenés
 Reduce colored edges filter strength:	AntialiasingSettingsView		A színezett betűszélek szűrőjének erősségi szintje:
 Glyph hinting:	AntialiasingSettingsView		Betűképek körvonala:
+Default Haiku ControlLook	DecorSettingsView		Alapértelmezett Haiku megjelenés
 Menu item text	Colors tab		Menüelem-szöveg
 About decorator	DecorSettingsView		Dekoráció névjegye
 Antialiasing menu	AntialiasingSettingsView		Élsimítási menü
@@ -47,7 +49,9 @@ LCD subpixel	AntialiasingSettingsView		LCD-szubpixel
 Window tab	Colors tab		Ablakfül
 Link text	Colors tab		Hivatkozás szövege
 Tooltip background	Colors tab		Eszköztár háttere
+ControlLook:	DecorSettingsView		Megjelenés:
 Scroll bar thumb	Colors tab		Görgetősáv megjelenése
+Default	DecorSettingsView		Alapértelmezett
 Link visited	Colors tab		Meglátogatott hivatkozás
 Selected menu item border	Colors tab		Kiválasztott menüelem szegélye
 Tooltip text	Colors tab		Buboréksúgó szövege
@@ -63,10 +67,12 @@ Antialiasing type:	AntialiasingSettingsView		Élsimítás módja:
 Panel text	Colors tab		Panel szövege
 Hinting menu	AntialiasingSettingsView		Körvonalmenü
 Scroll bar:	DecorSettingsView		Görgetősáv:
+Choose ControlLook	DecorSettingsView		Megjelenés kiválasztása
 Monospaced fonts only	AntialiasingSettingsView		Csak rögzített szélességű betűtípusok
 Document text	Colors tab		Dokumentumszöveg
 Inactive window border	Colors tab		Inaktív ablakkeret
 Colors	APRWindow		Színek
+About control look	DecorSettingsView		Névjegy
 Control highlight	Colors tab		Kiválasztott vezérlőelem
 Status bar	Colors tab		Állapotsor
 Link hover	Colors tab		Kijelölt hivatkozás

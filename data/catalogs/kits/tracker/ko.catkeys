@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-libtracker	3656461673
+1	korean	x-vnd.Haiku-libtracker	2738005582
 Created	ContainerWindow		만든 때
 Open and make preferred	OpenWithWindow		열고 연결프로그램으로 지정
 Open with…	ContainerWindow		연결 프로그램...
@@ -36,7 +36,6 @@ Size	ContainerWindow		크기
 Select…	ContainerWindow		선택..
 Show shared volumes on Desktop	SettingsView		데스크탑에 공유 볼륨 보여주기
 Size	PoseView		크기
-OK	InfoWindow		확인
 matches wildcard expression	SelectionWindow		일치하는 와일드 카드 표현
 Identify	ContainerWindow		식별
 You can't move or copy items to read-only volumes.	FSUtils		당신은 읽기-전용 볼륨에 아이템들을 복사나 이동할 수 없습니다.
@@ -58,7 +57,6 @@ Select	SelectionWindow		선택
 Select	InfoWindow		선택
 OK	OpenWithWindow		확인
 Include trash	FindPanel		휴지통 포함
-That name is too long. Please type another one.	InfoWindow		이 이름은 너무 깁니다. 다른 이름을 입력해주십시오.
 GiB	WidgetAttributeText		기가이진바이트
 Clean up	ContainerWindow		정리하기
 Modified	FindPanel		고친 때
@@ -70,7 +68,6 @@ Preparing to restore items…	StatusWindow		아이템 복구하려고 준비중.
 Mount	ContainerWindow		마운트
 Desktop	B_DESKTOP_DIRECTORY		데스크탑
 Link to:	InfoWindow		링크할 곳:
-Set new link target	InfoWindow		새 링크할 곳 설정
 Copy here	ContainerWindow		여기에 복사
 All disks	FindPanel		모든 디스크
 Window	ContainerWindow		창
@@ -81,14 +78,14 @@ Save as Query template:	FindPanel		질의 원형으로 저장
 Edit templates…	TemplatesMenu		원형 편집...
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used 사용 -- %free 안 사용)
 Trash	Model		휴지통
-Enable type-ahead filtering	SettingsView		표시전 버퍼 필터링 가능
 copy	FSUtils	filename copy	복사
 New folder%ld	FSUtils		새 폴더%ld
+Enable type-ahead filtering	SettingsView		표시전 버퍼 필터링 가능
 Location	OpenWithWindow		위치
 %Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		화면에 맞게 크기 조정
-List folders first	SettingsView		목록에서 폴더를 처음으로
 Find	FSUtils		찾기
+List folders first	SettingsView		목록에서 폴더를 처음으로
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		\"%name\"란 이름의 아이템은 이 폴더에 이미 존재합니다. 당신은 이것을 당신이 만드는 심볼릭 링크로 바꾸겠습니까?
 Temporary	FindPanel		임시
 Create relative link	ContainerWindow		상대 링크 만들기
@@ -145,14 +142,13 @@ contains	SelectionWindow		포함
 is not	FindPanel		는 아님
 Icon view	DeskWindow		아이콘으로 보기
 Mount settings…	ContainerWindow		마운트 설정...
-Permissions	InfoWindow		권한
 by name	FindPanel		이름으로
 Copy more	ContainerWindow		더 복사하기
 Sorry, you can't save things at the root of your system.	FilePanelPriv		미안합니다, 당신은 시스템의 루트에 저장할 수 없습니다.
 Restore	ContainerWindow		복원
 Location	ContainerWindow		위치
-Warning space color	SettingsView		경고 공간 색상
 Skip	FSUtils		지나치기
+Warning space color	SettingsView		경고 공간 색상
 Used space color	SettingsView		사용된 공간 색상
 Cancel	FSUtils		취소
 Original name	ContainerWindow		원래 이름
@@ -200,7 +196,6 @@ You must have at least one attribute showing.	PoseView		당신은 적어도 하�
 Cut	FilePanelPriv		잘라내기
 Favorites	FilePanelPriv		즐겨찾기
 home	B_USER_DIRECTORY		홈
-Open	InfoWindow		열기
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		트랙커 새 원형
 Disk mounting during boot	AutoMounterSettings		부팅하는 동안 디스크 마운트하기
 Don't automount	AutoMounterSettings		자동 마운트 안함
@@ -224,7 +219,6 @@ copying	FSUtils		복사중
 Get info	FilePanelPriv		정보 얻기
 Execute	FilePermissionsView		실행
 Delete	ContainerWindow		지우기
-Edit name	InfoWindow		이름 편잡
 Show volumes on Desktop	SettingsView		데스크탑에 볼륨 보여주기
 Recent folders	ContainerWindow		최근 폴더
 Desktop	Model		데스크탑
@@ -235,7 +229,6 @@ MiB	WidgetAttributeText		메가이진바이트
 Delete	FSUtils		지우기
 Edit name	ContainerWindow		이름 편집
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		 \"%document\" 를 열 수 없습니다(없는 심벌: %library). \n
-Identify	InfoWindow		식별
 config	B_USER_CONFIG_DIRECTORY		설정
 Error moving \"%name\".	FSUtils		 \"%name\" 이동중 에러 발생.
 Select…	QueryContainerWindow		선택...
@@ -282,7 +275,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 You cannot create a link to the root directory.	FSUtils		당신은 루트 디렉토리에 대한 링크를 만들 수 없습니다.
 Select all	FilePanelPriv		모두 선택
 Other	FilePermissionsView		기타
-Empty Trash	InfoWindow		휴지통 비우기
 Automatic disk mounting	AutoMounterSettings		자동으로 디스크 마운트
 parent folder	NavMenu		상위 폴더
 Create link here	ContainerWindow		여기에 링크 만들기
@@ -299,7 +291,6 @@ greater than	FindPanel		보다 큰
 Created:	InfoWindow		만든 때:
 Single window navigation	SettingsView		하나의 창으로 탐색
 Edit Query template	FindPanel		질의 원형 편집
-Unmount	InfoWindow		마운트 해제
 All disks	AutoMounterSettings		모든 디스크
 link	FSUtils	filename link	링크
 Proceed	FSUtils		진행
@@ -331,7 +322,6 @@ Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		 \"%docu
 Create relative link here	ContainerWindow		여기에 상대 링크 만들기
 Copy	FilePanelPriv		복사
 Close all	ContainerWindow		모두 닫기
-Recalculate folder size	InfoWindow		폴더 크기 다시 계산
 Paused: click to resume or stop	StatusWindow		일시 정지됨: 다시 시작이나 정지 클릭
 Name	QueryPoseView		이름
 Does not handle file	OpenWithWindow		파일을 다룰 수 없음
@@ -369,7 +359,6 @@ Save	FindPanel		저장
 Go to parent	FilePanelPriv		상위로 가기
 Name	FindPanel		이름
 Cancel	WidgetAttributeText		취소
-That name is already taken. Please type another one.	InfoWindow		이 이름은 이미 존재합니다. 다른 이름을 입력해 주십시오.
 Copy layout	ContainerWindow		배치 복사
 Duplicate	ContainerWindow		사본 만들기
 Untitled clipping	PoseView		이름없는 클립보드

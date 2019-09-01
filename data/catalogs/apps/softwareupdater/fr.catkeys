@@ -1,5 +1,6 @@
-1	french	x-vnd.haiku-softwareupdater	347109711
+1	french	x-vnd.haiku-softwareupdater	1722463448
 Updating version	SoftwareUpdaterWindow	List item text	Mise à jour de la version
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Cliquez ici pour installer {0, plural, one{le paquet révisé} other{les # paquets révisés}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Paquets à désinstaller
 No active network connection was found	UpdateManager	Error message	Aucune connexion réseau active n’a été trouvée
 Quit	SoftwareUpdaterWindow	Alert button label	Quitter

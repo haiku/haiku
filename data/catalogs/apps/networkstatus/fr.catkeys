@@ -1,9 +1,10 @@
-1	french	x-vnd.Haiku-NetworkStatus	3823341665
+1	french	x-vnd.Haiku-NetworkStatus	186344131
 Netmask	NetworkStatusView		Masque réseau
 Quit	NetworkStatusView		Quitter
 Unknown	NetworkStatusView		Inconnu
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Le lancement de la preflet réseau a échoué.\n\nErreur : 
 Install in Deskbar	NetworkStatus		Installer dans la Deskbar
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Options de NetworkStatus :\n\t--deskbar\tajoute automatiquement le réplicant à la Deskbar\n\t--help\t\taffiche cet information puis sort
 Open network preferences…	NetworkStatusView		Ouvrir les préférences du réseau…
 NetworkStatus	System name		État du réseau
 OK	NetworkStatusView		OK
@@ -12,6 +13,7 @@ Could not join wireless network:\n	NetworkStatusView		Impossible de joinde le r�
 Ready	NetworkStatusView		Prêt
 Network Status	NetworkStatusView		État du réseau
 Address	NetworkStatusView		Adresse
+Deskbar is not running, giving up.	NetworkStatus		Deskbar n'est pas lancé, abandon.
 No stateful configuration	NetworkStatusView		Pas de configuration dynamique
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Vous pouvez exécuter l’État du réseau dans une fenêtre ou l’installer dans la Deskbar.
 Broadcast	NetworkStatusView		Diffusion

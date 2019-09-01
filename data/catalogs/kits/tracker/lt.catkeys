@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	3310629453
+1	lithuanian	x-vnd.Haiku-libtracker	2392173362
 Created	ContainerWindow		Sukūrimo data
 Open and make preferred	OpenWithWindow		Atverti ir laikyti numatytąja
 Open with…	ContainerWindow		Atverti naudojant…
@@ -39,7 +39,6 @@ Size	ContainerWindow		Dydis
 Select…	ContainerWindow		Pažymėti…
 Show shared volumes on Desktop	SettingsView		Darbalaukyje rodyti bendrintus tomus
 Size	PoseView		Dydis
-OK	InfoWindow		Gerai
 matches wildcard expression	SelectionWindow		atitinka šabloną
 96 x 96	ContainerWindow		96×96
 Identify	ContainerWindow		Atpažinti
@@ -63,7 +62,6 @@ Select	SelectionWindow		Pažymėti
 Select	InfoWindow		Pažymėti
 OK	OpenWithWindow		Gerai
 Include trash	FindPanel		Ieškoti ir Šiukšlinėje
-That name is too long. Please type another one.	InfoWindow		Toks vardas per ilgas. Įveskite kitą.
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Sutvarkyti
 Modified	FindPanel		Modifikavimo data
@@ -76,7 +74,6 @@ Preparing to restore items…	StatusWindow		Ruošiamasi atkurti objektus…
 Mount	ContainerWindow		Prijungti
 Desktop	B_DESKTOP_DIRECTORY		Darbalaukis
 Link to:	InfoWindow		Nuoroda į:
-Set new link target	InfoWindow		Keisti nuorodos paskirtį
 Copy here	ContainerWindow		Kopijuoti čia
 All disks	FindPanel		Visuose tomuose
 Window	ContainerWindow		Langas
@@ -87,14 +84,14 @@ Save as Query template:	FindPanel		Įrašyti kaip užklausos šabloną:
 Edit templates…	TemplatesMenu		Tvarkyti šablonus…
 %capacity (%used used -- %free free)	InfoWindow		%capacity (užpildyta %used, laisva %free)
 Trash	Model		Šiukšlinė
-Enable type-ahead filtering	SettingsView		Leisti filtravimą renkant tekstą
 copy	FSUtils	filename copy	kopija
 New folder%ld	FSUtils		Naujas aplankas %ld
+Enable type-ahead filtering	SettingsView		Leisti filtravimą renkant tekstą
 Location	OpenWithWindow		Vieta
 %Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		Pritaikyti dydį prie turinio
-List folders first	SettingsView		Aplankus rikiuoti pirmiau
 Find	FSUtils		Ieškoti
+List folders first	SettingsView		Aplankus rikiuoti pirmiau
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Objektas vardu „%name“ jau egzistuoja šiame aplanke. Ar norite jį pakeisti kuriama simboline nuoroda?
 Temporary	FindPanel		Užklausa laikina
 Create relative link	ContainerWindow		Kurti santykinę nuorodą
@@ -152,14 +149,13 @@ contains	SelectionWindow		savyje turi
 is not	FindPanel		nėra
 Icon view	DeskWindow		Rodyti piktogramas
 Mount settings…	ContainerWindow		Tomų prijungimo nuostatos…
-Permissions	InfoWindow		Leidimai
 by name	FindPanel		pagal vardą
 Copy more	ContainerWindow		Kopijuoti dar
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Apgailestaujame, tačiau į šakninį failų sistemos aplanką nieko rašyti neleidžiama.
 Restore	ContainerWindow		Atkurti
 Location	ContainerWindow		Vieta
-Warning space color	SettingsView		Užpildytos vietos spalva (įspėjant)
 Skip	FSUtils		Praleisti
+Warning space color	SettingsView		Užpildytos vietos spalva (įspėjant)
 Used space color	SettingsView		Užpildytos vietos spalva
 Cancel	FSUtils		Atsisakyti
 Original name	ContainerWindow		Tikras vardas
@@ -210,7 +206,6 @@ You must have at least one attribute showing.	PoseView		Bent vienas požymis tur
 Cut	FilePanelPriv		Iškirpti
 Favorites	FilePanelPriv		Parankiniai
 home	B_USER_DIRECTORY		Namai
-Open	InfoWindow		Atverti
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Naujų failų šablonai
 Disk mounting during boot	AutoMounterSettings		Įkeliant sistemą, prijungti tomus:
 Don't automount	AutoMounterSettings		Automatiškai neprijungti
@@ -234,7 +229,6 @@ copying	FSUtils		kopijuojate
 Get info	FilePanelPriv		Savybės
 Execute	FilePermissionsView		Vykdyti
 Delete	ContainerWindow		Šalinti
-Edit name	InfoWindow		Pervardinti
 Show volumes on Desktop	SettingsView		Rodyti atskirus tomus
 Recent folders	ContainerWindow		Paskiausi aplankai
 Desktop	Model		Darbalaukis
@@ -246,7 +240,6 @@ Delete	FSUtils		Šalinti
 Edit name	ContainerWindow		Pervardinti
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Failo „%document“ nepavyko atverti (trūksta simbolio: %symbol).\n
 More options	FindPanel		Daugiau parinkčių
-Identify	InfoWindow		Atpažinti
 config	B_USER_CONFIG_DIRECTORY		Konfigūracija
 Error moving \"%name\".	FSUtils		Klaida perkeliant „%name“.
 Select…	QueryContainerWindow		Pažymėti…
@@ -295,7 +288,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 You cannot create a link to the root directory.	FSUtils		Šakniniame aplanke nuorodų kurti neleidžiama.
 Select all	FilePanelPriv		Pažymėti viską
 Other	FilePermissionsView		Kiti
-Empty Trash	InfoWindow		Ištuštinti šiukšlinę
 Automatic disk mounting	AutoMounterSettings		Automatiškai prijungti tomus:
 parent folder	NavMenu		Viršaplankis
 Create link here	ContainerWindow		Sukurti nuorodą čia
@@ -313,7 +305,6 @@ Created:	InfoWindow		Sukūrimo data:
 Single window navigation	SettingsView		Naršyti viename lange
 Edit Query template	FindPanel		Taisyti užklausos šabloną
 Save query as template…	FindPanel		Įrašyti užklausą kaip šabloną…
-Unmount	InfoWindow		Atjungti
 All disks	AutoMounterSettings		Visus tomus
 link	FSUtils	filename link	nuoroda
 Proceed	FSUtils		Vykdyti
@@ -347,7 +338,6 @@ Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Failo �
 Create relative link here	ContainerWindow		Sukurti santykinę nuorodą čia
 Copy	FilePanelPriv		Kopijuoti
 Close all	ContainerWindow		Užverti visus
-Recalculate folder size	InfoWindow		Perskaičiuoti aplanko dydį
 Paused: click to resume or stop	StatusWindow		Pristabdyta. Galite pratęsti arba nutraukti
 Name	QueryPoseView		Vardas
 Error %error loading add-On %name.	ContainerWindow		Klaida %error įkeliant priedą „%name“.
@@ -387,7 +377,6 @@ Save	FindPanel		Įrašyti
 Go to parent	FilePanelPriv		Eiti į viršaplankį
 Name	FindPanel		Vardas
 Cancel	WidgetAttributeText		Atsisakyti
-That name is already taken. Please type another one.	InfoWindow		Toks vardas jau naudojamas. Įveskite kitą.
 Copy layout	ContainerWindow		Kopijuoti išdėstymą
 Duplicate	ContainerWindow		Dubliuoti
 Untitled clipping	PoseView		Bevardė iškarpa

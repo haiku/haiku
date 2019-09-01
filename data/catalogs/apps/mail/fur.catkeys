@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Be-MAIL	3595992122
+1	friulian	x-vnd.Be-MAIL	3155788869
 Set to Saved	Mail		Met come Salvât
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Il to test principâl al conten %ld caratars che no si puedin codificâ. Podaressial lâ ben forsit un complès di caratars diferents? Frache Invie par inviâlu distès (un caratar sostitutîf al vignarà doprât al puest di chei no codificabii), o sielç Anule par tornâ indaûr e justâ il test.
 Text wrapping:	Mail		Rie gnove automatiche:
@@ -6,6 +6,7 @@ Show icons & labels	Mail		Mostre iconis e etichetis
 (Date unavailable)	Mail		(Date no disponibile)
 Reply	Mail		Rispuint
 Next message	Mail		Messaç sucessîf
+Mailing	Mail		Spedizion pueste
 Unread	Mail		No let
 Same sender	Mail		Stes mitent
 Copy to new	Mail		Copie su gnûf

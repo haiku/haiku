@@ -1,14 +1,13 @@
-1	german	x-vnd.Haiku-NewMailNotification	73789504
-You have {0, plural, one{One new message} other{# new messages}} for %account.	NotifierFilter		%account enthält {0, plural, one{eine neue Nachricht} other{# neue Nachrichten}}.
-none	NotifierConfigView		keine
-Method:	NotifierConfigView		Methode:
-Beep	NotifierConfigView		Tonsignal
-{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{eine neue Nachricht} other{# neue Nachrichten}}
-New mails notification	NotifierFilter		Ankündigung neuer E-Mails
-Central alert	NotifierConfigView		Hinweisfenster (alle Konten)
-OK	NotifierFilter		OK
-New messages	NotifierFilter		Neue Nachrichten
+1	german	x-vnd.Haiku-NewMailNotification	2111731137
 Log window	NotifierConfigView		Statusfenster
-Keyboard LEDs	NotifierConfigView		Tastatur-LEDs
-Central beep	NotifierConfigView		Tonsignal (alle Konten)
+none	NotifierConfigView		keine
+New mails notification	NotifierFilter		Ankündigung neuer E-Mails
 Alert	NotifierConfigView		Hinweisfenster
+OK	NotifierFilter		OK
+Central alert	NotifierConfigView		Hinweisfenster (alle Konten)
+Beep	NotifierConfigView		Tonsignal
+Central beep	NotifierConfigView		Tonsignal (alle Konten)
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{eine neue Nachricht} other{# neue Nachrichten}}
+New messages	NotifierFilter		Neue Nachrichten
+Method:	NotifierConfigView		Methode:
+Keyboard LEDs	NotifierConfigView		Tastatur-LEDs

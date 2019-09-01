@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	2942097057
+1	japanese	x-vnd.Haiku-libtracker	2023640966
 Created	ContainerWindow		作成日時
 Open and make preferred	OpenWithWindow		関連付けて開く
 Open with…	ContainerWindow		指定アプリケーションで開く…
@@ -42,7 +42,6 @@ Size	ContainerWindow		サイズ
 Select…	ContainerWindow		選択…
 Show shared volumes on Desktop	SettingsView		共有ディスクをデスクトップに表示する
 Size	PoseView		サイズ
-OK	InfoWindow		OK
 matches wildcard expression	SelectionWindow		ワイルドカード表現と一致
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		タイトル
@@ -70,7 +69,6 @@ Select	SelectionWindow		選択
 Select	InfoWindow		選択
 OK	OpenWithWindow		OK
 Include trash	FindPanel		ごみ箱を含む
-That name is too long. Please type another one.	InfoWindow		名前が長すぎます。もっと短い名前にしてください。
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		アイコンの整列
 Modified	FindPanel		更新日時
@@ -86,7 +84,6 @@ Mount	ContainerWindow		マウント
 Desktop	B_DESKTOP_DIRECTORY		デスクトップ
 Corrupted pointers.	libtracker		ポインターが破損しています。
 Link to:	InfoWindow		リンク先:
-Set new link target	InfoWindow		リンク先を変更
 Copy here	ContainerWindow		ここにコピー
 All disks	FindPanel		全パーティション
 Window	ContainerWindow		ウィンドウ
@@ -100,14 +97,14 @@ Edit templates…	TemplatesMenu		テンプレートを編集…
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used 使用中 -- %free 使用可能)
 Hide dotfiles	SettingsView		ドットファイルを隠す
 Trash	Model		ごみ箱
-Enable type-ahead filtering	SettingsView		先行入力フィルターを有効にする
 copy	FSUtils	filename copy	コピー
 New folder%ld	FSUtils		新規フォルダー %ld 
+Enable type-ahead filtering	SettingsView		先行入力フィルターを有効にする
 Location	OpenWithWindow		場所
 %Ld B	WidgetAttributeText		%Ld バイト
 Resize to fit	QueryContainerWindow		最適な表示サイズに変更
-List folders first	SettingsView		フォルダーを先頭に表示
 Find	FSUtils		検索
+List folders first	SettingsView		フォルダーを先頭に表示
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		このフォルダーにすでに\"%name\"という項目があります。作成しようとしているシンボリックリンクと置き換えますか?
 List view	ContainerWindow		一覧表示
 Temporary	FindPanel		一時的なクエリ
@@ -176,15 +173,14 @@ contains	SelectionWindow		含む
 is not	FindPanel		除く
 Icon view	DeskWindow		アイコン表示
 Mount settings…	ContainerWindow		マウント設定…
-Permissions	InfoWindow		アクセス権
 Keywords	Bookmark Query Columns		キーワード
 by name	FindPanel		名前で検索
 Copy more	ContainerWindow		さらにコピー
 Sorry, you can't save things at the root of your system.	FilePanelPriv		システムのルートフォルダーへの保存は許可されていません。
 Restore	ContainerWindow		元に戻す
 Location	ContainerWindow		場所
-Warning space color	SettingsView		空き容量警告の色
 Skip	FSUtils		スキップ
+Warning space color	SettingsView		空き容量警告の色
 Used space color	SettingsView		使用済容量の色
 Cancel	FSUtils		中止
 Original name	ContainerWindow		元の名前
@@ -237,7 +233,6 @@ You must have at least one attribute showing.	PoseView		最低一つの属性を
 Cut	FilePanelPriv		切り取り
 Favorites	FilePanelPriv		お気に入り
 home	B_USER_DIRECTORY		ホーム
-Open	InfoWindow		開く
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		新規 Tracker テンプレート
 Disk mounting during boot	AutoMounterSettings		起動時の設定
 Don't automount	AutoMounterSettings		自動マウントを使わない
@@ -264,7 +259,6 @@ copying	FSUtils		コピー中
 Get info	FilePanelPriv		詳細情報…
 Execute	FilePermissionsView		実行
 Delete	ContainerWindow		削除
-Edit name	InfoWindow		名前の変更
 Show volumes on Desktop	SettingsView		ディスクをデスクトップに表示する
 Recent folders	ContainerWindow		最近開いたフォルダー
 Desktop	Model		デスクトップ
@@ -276,7 +270,6 @@ Delete	FSUtils		削除
 Edit name	ContainerWindow		名前の変更
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" を開けませんでした (シンボル %symbol が見つかりません)。\n
 More options	FindPanel		検索オプションを表示
-Identify	InfoWindow		ファイル形式を判別
 config	B_USER_CONFIG_DIRECTORY		config
 Error moving \"%name\".	FSUtils		\"%name\"を移動中にエラーが発生しました。
 Select…	QueryContainerWindow		選択…
@@ -329,7 +322,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 You cannot create a link to the root directory.	FSUtils		ルートフォルダーにはリンクを作成できません。
 Select all	FilePanelPriv		すべて選択
 Other	FilePermissionsView		その他
-Empty Trash	InfoWindow		ごみ箱を空にする
 Automatic disk mounting	AutoMounterSettings		ディスクの自動マウント
 parent folder	NavMenu		親フォルダー
 Create link here	ContainerWindow		ここにリンクを作成
@@ -347,7 +339,6 @@ Created:	InfoWindow		作成日時:
 Single window navigation	SettingsView		シングルウィンドウナビゲーション
 Edit Query template	FindPanel		クエリテンプレートを編集
 Save query as template…	FindPanel		クエリテンプレートとして保存…
-Unmount	InfoWindow		マウント解除
 All disks	AutoMounterSettings		全パーティション
 link	FSUtils	filename link	リンク
 Proceed	FSUtils		続行
@@ -387,7 +378,6 @@ Create relative link here	ContainerWindow		ここに相対リンクを作成
 Copy	FilePanelPriv		コピー
 All Haiku disks	AutoMounterSettings		すべての Haiku ディスク
 Close all	ContainerWindow		すべて閉じる
-Recalculate folder size	InfoWindow		フォルダーサイズを再計算
 Paused: click to resume or stop	StatusWindow		一時停止中: クリックで動作の再開また中断をしてください 
 Name	QueryPoseView		名前
 Error %error loading add-On %name.	ContainerWindow		%nameアドオンの読み込み中に%errorエラーが発生
@@ -432,7 +422,6 @@ Name	FindPanel		名前
 Cancel	WidgetAttributeText		中止
 Expression too long.	libtracker		式が長過ぎます。
 Memory corruption.	libtracker		メモリーが破損しています。
-That name is already taken. Please type another one.	InfoWindow		指定された名前はすでに使用されています。別の名前を指定してください。
 Copy layout	ContainerWindow		レイアウトをコピー
 Duplicate	ContainerWindow		複製
 Untitled clipping	PoseView		無名クリッピング

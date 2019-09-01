@@ -1,14 +1,13 @@
-1	swedish	x-vnd.Haiku-NewMailNotification	73789504
-You have {0, plural, one{One new message} other{# new messages}} for %account.	NotifierFilter		Du har {0, plural, one{Ett nytt meddelande} other{# nya meddelanden}} för %account.
-none	NotifierConfigView		inga
-Method:	NotifierConfigView		Metod:
-Beep	NotifierConfigView		Pip
-{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{Ett nytt meddelande} other{# nya meddelanden}}
-New mails notification	NotifierFilter		Notifikationer för e-post
-Central alert	NotifierConfigView		Central avisering
-OK	NotifierFilter		OK
-New messages	NotifierFilter		Nya meddelanden
+1	swedish	x-vnd.Haiku-NewMailNotification	2111731137
 Log window	NotifierConfigView		Loggfönster
-Keyboard LEDs	NotifierConfigView		Tangentbords LEDs
-Central beep	NotifierConfigView		Centralt pip
+none	NotifierConfigView		inga
+New mails notification	NotifierFilter		Notifikationer för e-post
 Alert	NotifierConfigView		Avisering
+OK	NotifierFilter		OK
+Central alert	NotifierConfigView		Central avisering
+Beep	NotifierConfigView		Pip
+Central beep	NotifierConfigView		Centralt pip
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{Ett nytt meddelande} other{# nya meddelanden}}
+New messages	NotifierFilter		Nya meddelanden
+Method:	NotifierConfigView		Metod:
+Keyboard LEDs	NotifierConfigView		Tangentbords LEDs

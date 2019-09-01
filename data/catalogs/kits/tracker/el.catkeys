@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	2558476238
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	1640020147
 Created	ContainerWindow		Δημιουργήθηκε
 Open and make preferred	OpenWithWindow		'Ανοιγμα και ορισμός προεπιλεγμένου
 Open with…	ContainerWindow		Άνοιγμα με...
@@ -35,7 +35,6 @@ Size	ContainerWindow		Μέγεθος
 Select…	ContainerWindow		Επιλογή...
 Show shared volumes on Desktop	SettingsView		Εμφάνιση κοινών τόμων στην επιφάνεια εργασίας
 Size	PoseView		Μέγεθος
-OK	InfoWindow		Εντάξει
 Identify	ContainerWindow		Αναγνώριση
 You can't move or copy items to read-only volumes.	FSUtils		Δεν μπορείτε να μετακινήσετε ή να αντιγράψετε στοιχεία σε τόμους μόνο ανάγνωσης.
 Create link	ContainerWindow		Δημιουργία σύνδεσμου
@@ -56,7 +55,6 @@ Select	SelectionWindow		Επιλογή
 Select	InfoWindow		Επιλογή
 OK	OpenWithWindow		Εντάξει
 Include trash	FindPanel		Συμπερίληψη κάδου
-That name is too long. Please type another one.	InfoWindow		Το όνομα είναι πολύ μεγάλο. Παρακαλώ πληκτρολογήστε κάποιο άλλο.
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Καθαρισμός
 Modified	FindPanel		Τροποποιήθηκε
@@ -68,7 +66,6 @@ Preparing to restore items…	StatusWindow		Προετοιμασία για τη
 Mount	ContainerWindow		Προσάρτηση
 Desktop	B_DESKTOP_DIRECTORY		Επιφάνεια Εργασίας
 Link to:	InfoWindow		Σύνδεση με:
-Set new link target	InfoWindow		Ορισμός νέου συνδέσμου
 Copy here	ContainerWindow		Αντιγραφή εδώ
 All disks	FindPanel		Όλοι οι δίσκοι
 Window	ContainerWindow		Παράθυρο
@@ -84,8 +81,8 @@ New folder%ld	FSUtils		Νέος φάκελος%ld
 Location	OpenWithWindow		Τοποθεσία
 %Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		Αλλαγή μεγέθους για να χωράει
-List folders first	SettingsView		Λίστα φακέλων πρώτα
 Find	FSUtils		Εύρεση
+List folders first	SettingsView		Λίστα φακέλων πρώτα
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Ένα στοιχείο που ονομάζεται \"%name\" υπάρχει ήδη σε αυτό το φάκελο. Θα θέλατε να τον αντικαταστήσετε με το συμβολικό σύνδεσμο που δημιουργείτε;
 Temporary	FindPanel		Προσωρινό
 Create relative link	ContainerWindow		Δημιουργία συγγενικού συνδέσμου
@@ -142,14 +139,13 @@ contains	SelectionWindow		περιέχει
 is not	FindPanel		δεν είναι
 Icon view	DeskWindow		Προβολή εικονιδίου
 Mount settings…	ContainerWindow		Ρυθμίσεις προσάρτησης...
-Permissions	InfoWindow		Δικαιώματα
 by name	FindPanel		κατα όνομα
 Copy more	ContainerWindow		Αντιγραφή κι άλλων
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Λυπούμαστε, αλλά δεν μπορείτε να αποθηκεύσετε αντικείμενα στη ρίζα του συστήματός σας.
 Restore	ContainerWindow		Επαναφορά
 Location	ContainerWindow		Τοποθεσία
-Warning space color	SettingsView		Χρώμα διαστήματος προειδοποίησης
 Skip	FSUtils		Παράλειψη
+Warning space color	SettingsView		Χρώμα διαστήματος προειδοποίησης
 Used space color	SettingsView		Χρώμα χρησιμοποιημένου χώρου
 Cancel	FSUtils		Άκυρο
 Original name	ContainerWindow		Πρωτότυπο όνομα
@@ -196,7 +192,6 @@ You must have at least one attribute showing.	PoseView		Πρέπει να έχε
 Cut	FilePanelPriv		Αποκοπή
 Favorites	FilePanelPriv		Αγαπημένα
 home	B_USER_DIRECTORY		αρχικός
-Open	InfoWindow		Άνοιγμα
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Νέα πρότυπα ανιχνευτή
 Disk mounting during boot	AutoMounterSettings		Προσάρτηση δίσκου κατά την εκκίνηση
 Don't automount	AutoMounterSettings		Να μη γίνει αυτόματη προσάρτηση
@@ -220,7 +215,6 @@ copying	FSUtils		αντιγραφή
 Get info	FilePanelPriv		Λήψη πληροφοριών
 Execute	FilePermissionsView		Εκτέλεση
 Delete	ContainerWindow		Διαγραφή
-Edit name	InfoWindow		Επεξεργασία ονόματος
 Show volumes on Desktop	SettingsView		Προβολή τομέων στην επιφάνεια
 Recent folders	ContainerWindow		Πρόσφατοι φάκελοι
 Desktop	Model		Επιφάνεια εργασίας
@@ -231,7 +225,6 @@ MiB	WidgetAttributeText		MB
 Delete	FSUtils		Διαγραφή
 Edit name	ContainerWindow		Επεξεργασία ονόματος
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Αδυναμία ανοίγματος του \"%document\" (Λείπει το σύμβολο: %symbol). \n
-Identify	InfoWindow		Αναγνώρηση
 config	B_USER_CONFIG_DIRECTORY		ρύθμιση
 Error moving \"%name\".	FSUtils		Σφάλμα κατα τη μετακίνηση του \"%name\".
 Select…	QueryContainerWindow		Επιλογή...
@@ -277,7 +270,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 You cannot create a link to the root directory.	FSUtils		Δε μπορείτε να δημιουργήσετε σύνδεσμο με το ριζικό κατάλογο.
 Select all	FilePanelPriv		Επιλογή όλων
 Other	FilePermissionsView		Άλλο
-Empty Trash	InfoWindow		Άδειασμα κάδου
 Automatic disk mounting	AutoMounterSettings		Αυτόματη προσάρτηση δίσκων
 parent folder	NavMenu		φάκελος γονέα
 Create link here	ContainerWindow		Δημιουργία συνδέσμου εδώ
@@ -294,7 +286,6 @@ greater than	FindPanel		μεγαλύτερο από
 Created:	InfoWindow		Δημιουργήθηκε:
 Single window navigation	SettingsView		Πλοήγηση απλού παράθυρου
 Edit Query template	FindPanel		Επεξεργασία προτύπου ερωτήματος
-Unmount	InfoWindow		Αποπροσάρτηση
 All disks	AutoMounterSettings		Όλοι οι δίσκοι
 link	FSUtils	filename link	σύνδεσμος
 Proceed	FSUtils		Συνέχεια
@@ -326,7 +317,6 @@ Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Αδυν
 Create relative link here	ContainerWindow		Δημιουργία συγγενικού συνδέσμου εδώ
 Copy	FilePanelPriv		Αντιγραφή
 Close all	ContainerWindow		Κλείσιμο όλων
-Recalculate folder size	InfoWindow		Επανυπολογισμός μεγέθους φακέλου
 Paused: click to resume or stop	StatusWindow		Σταματημένο: κάντε κλικ για συνέχεια ή διακοπή
 Name	QueryPoseView		Όνομα
 Does not handle file	OpenWithWindow		Δε χειρίζεται το αρχείο
@@ -363,7 +353,6 @@ Save	FindPanel		Αποθήκευση
 Go to parent	FilePanelPriv		Μετάβαση στο γονέα
 Name	FindPanel		Όνομα
 Cancel	WidgetAttributeText		Άκυρο
-That name is already taken. Please type another one.	InfoWindow		Αυτό το όνομα χρησιμοποιείται ήδη. Παρακαλώ πληκτρολογήστε κάποιο άλλο.
 Copy layout	ContainerWindow		Αντιγραφή διάταξης
 Duplicate	ContainerWindow		Διπλότυπο
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		το αρχείο \"%name\" υπάρχει ήδη στον προσδιορισμένο φάκελο. Θέλετε σίγουρα να το αντικαταστήσετε;

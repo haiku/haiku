@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	2455264118
+1	friulian	x-vnd.Haiku-HaikuDepot	4293876709
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificât un erôr intal inzornâ il dipuesit: %error%
 Check for updates…	MainWindow		Control inzornaments…
 Uninstall	PackageManager		Disinstale
@@ -10,8 +10,8 @@ OK	App		Va ben
 Mostly stable	RatePackageWindow		Pal plui stabil
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Account creât cun sucès. Si pues cumò votâ i pachets e fâ altris robis utilis.
 The response to the captcha was incorrect.	ServerHelper		La rispueste al captcha e jere sbaliade.
-Rate package…	PackageInfoView		Vote pachet…
 Develop packages	MainWindow		Pachets di svilup
+Rate package…	PackageInfoView		Vote pachet…
 Starting the package daemon failed:\n\n%Error%	App		Inviament dal demoni dai pachets falît:\n\n %Error%
 <no info>	PackageInfoView		<nessune informazion>
 No user ratings available.	PackageInfoView		Nissune valutazion dai utents disponibile.
@@ -22,8 +22,8 @@ Failed to create account	UserLoginWindow		No si è rivâts a creâ l'account
 Ignore	UserLoginWindow		Ignore
 Rating	PackageListView		Valutazion
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronizazion iconis
-Show	MainWindow		Mostre
 Does not start	RatePackageWindow		No si invie
+Show	MainWindow		Mostre
 But none could be listed here, sorry.	UserLoginWindow		Nus displâs, ma nuie al pues jessi listât achì.
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Si è verificât un erôr intal otignî la liste dai pachets: %message%
 There are problems with the data you entered:\n\n	UserLoginWindow		Problemis cui dâts inserîts:\n\n
@@ -118,10 +118,12 @@ This package doesn't seem to be on the HaikuDepot Server, so it's not possible t
 Language	RatePackageWindow		Lenghe
 Authentication failed. Connection to the service failed.	UserLoginWindow		Autenticazion falide. Conession al servizi falide.
 Log out	MainWindow		Termine session
+Comment language:	RatePackageWindow		Lenghe dal coment:
 Status	PackageListView		Stât
 The username is already taken. Please choose another.	UserLoginWindow		Chest non utent al è za doprât. Sielç un altri.
 Update	RatePackageWindow		Inzorne
 OK	ServerHelper		Va ben
+Language	UserLoginWindow		Lenghe
 OK	UserLoginWindow		Va ben
 Reading repository data	LocalPkgDataLoadProcess		Leture dâts dal dipuesit
 Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Sincronizazion dâts di riferiment dal servidôr
@@ -157,6 +159,8 @@ Input validation	UserLoginWindow		Convalide input
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Un erôr inspietât al è stât inviât dal servidôr di HaikuDepot [%i]
 Log in…	MainWindow		Acès…
 You need to be logged into an account before you can rate packages.	MainWindow		Si scugne jessi jentrâts intun account prime di podê valutâ i pachets.
+Client version too old	ServerHelper		Version dal client masse vecje
 Authorization or security issue	ServerHelper		Probleme di autorizazion o sigurece
+9999.99 KiB	PackageListView		9999.99 KiB
 All repositories	MainWindow		Ducj i dipuesits
 %Version%	PackageInfoView		%Version%

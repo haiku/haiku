@@ -7,8 +7,8 @@ Available packages	MainWindow		可用软件包
 Create account	UserLoginWindow		创建账号
 Mostly stable	RatePackageWindow		基本稳定
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		账号创建成功。你现在可以进行软件包评分或其他操作。
-Rate package…	PackageInfoView		软件包评分…
 Develop packages	MainWindow		开发软件包
+Rate package…	PackageInfoView		软件包评分…
 Starting the package daemon failed:\n\n%Error%	App		包管理服务启动失败:\n\n%Error%
 <no info>	PackageInfoView		<无信息>
 No user ratings available.	PackageInfoView		未发现用户评分。
@@ -16,8 +16,8 @@ The user name needs to be at least 3 letters long.	UserLoginWindow		用户名需
 Failed to create account	UserLoginWindow		账户创建失败
 Ignore	UserLoginWindow		忽略
 Rating	PackageListView		评级
-Show	MainWindow		显示
 Does not start	RatePackageWindow		未开始
+Show	MainWindow		显示
 But none could be listed here, sorry.	UserLoginWindow		对不起，没有可以列出的内容。
 There are problems with the data you entered:\n\n	UserLoginWindow		您所输入的数据存在问题：\n\n
 The authentication was successful.	UserLoginWindow		授权成功。

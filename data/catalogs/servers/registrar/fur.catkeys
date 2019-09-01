@@ -8,7 +8,7 @@ The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess
 System is shut down	ShutdownProcess		Il sisteme si sta distudant
 Restart system	ShutdownProcess		Torne invie il sisteme
 Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		La aplicazion \"%appName%\" e à interot il procès di distudament.
-Asking background applications to quit.	ShutdownProcess		Si domande aes aplicazions in background di sierâsi.
+Asking background applications to quit.	ShutdownProcess		Si domande aes aplicazions in sotfont di sierâsi.
 Do you really want to restart the system?	ShutdownProcess		Tornâ a inviâ pardabon il sisteme?
 Restart	ShutdownProcess		Torne invie
 It's now safe to turn off the computer.	ShutdownProcess		Cumò si pues distudâ il computer.

@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Mandelbrot	2260046134
+1	friulian	x-vnd.Haiku-Mandelbrot	3875916167
 Burning Ship	MandelbrotWindow		Nâf in fûc
 Grassland	MandelbrotWindow		Pradarie
 Lightning	MandelbrotWindow		Folc
@@ -10,6 +10,7 @@ Royal	MandelbrotWindow		Regâl
 Orbit Trap	MandelbrotWindow		Trapule orbitâl
 Deepfrost	MandelbrotWindow		Profonditâts glaçadis
 Subsampling	MandelbrotWindow		Sot-campionament
+1 (none)	MandelbrotWindow		1 (nissun)
 Quit	MandelbrotWindow		Jes
 File	MandelbrotWindow		File
 Julia	MandelbrotWindow		Julie

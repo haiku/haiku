@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Pulse	3788463253
+1	hungarian	x-vnd.Haiku-Pulse	139895817
 Normal mode	DeskbarPulseView		Normál mód
 Info	CPUButton		Infó
 Quit	DeskbarPulseView		Kilépés
@@ -37,6 +37,7 @@ Deskbar menu	CPUButton		Asztalsáv menü
 Mini mode	NormalPulseView		Mini mód
 Quit	MiniPulseView		Kilépés
 Info	PulseView		Infó
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		Használat: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]
 OK	DeskbarPulseView		Rendben
 Info	PulseApp		Infó
 Pulse	System name		Pulzus

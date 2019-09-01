@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-HaikuDepot	2444426778
+1	indonesian	x-vnd.Haiku-HaikuDepot	4293876709
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Terjadi kesalahan saat menyegarkan repositori: %error%
 Check for updates…	MainWindow		Memeriksa pembaruan…
 Uninstall	PackageManager		Hapus
@@ -10,8 +10,8 @@ OK	App		OKE
 Mostly stable	RatePackageWindow		Sebagian besar stabil
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Akun berhasil dibuat. Sekarang Anda dapat menilai paket dan melakukan hal-hal berguna lainnya.
 The response to the captcha was incorrect.	ServerHelper		Respons terhadap captcha salah.
-Rate package…	PackageInfoView		Nilai paket...
 Develop packages	MainWindow		Paket pengembangan
+Rate package…	PackageInfoView		Nilai paket...
 Starting the package daemon failed:\n\n%Error%	App		Mulai layanan paket gagal :\n\n%Error%
 <no info>	PackageInfoView		<no info>
 No user ratings available.	PackageInfoView		Tak tersedia penilaian pengguna.
@@ -22,8 +22,8 @@ Failed to create account	UserLoginWindow		Gagal membuat akun
 Ignore	UserLoginWindow		Abaikan
 Rating	PackageListView		Penilaian
 Synchronizing icons	ServerIconExportUpdateProcess		Ikon sinkronisasi
-Show	MainWindow		Menunjukkan
 Does not start	RatePackageWindow		Tidak memulai
+Show	MainWindow		Menunjukkan
 But none could be listed here, sorry.	UserLoginWindow		Tapi tak satu pun bisa didaftar di sini, maaf.
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Terjadi kesalahan saat mendapatkan daftar paket:%message%
 There are problems with the data you entered:\n\n	UserLoginWindow		Ada masalah dengan data yang anda masukkan:\n\n
@@ -38,7 +38,6 @@ Ratings	PackageInfoView		Peringkat
 Switch account…	MainWindow		Beralih akun...
 Preferred language:	UserLoginWindow		Bahasa pilihan:
 Server Error	ServerHelper		server error
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display.  Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Saat memperbarui data paket, muncul masalah yang dapat menyebabkan data menjadi usang atau hilang dari tampilan aplikasi.  Rincian tambahan tentang masalah ini mungkin dapat diperoleh dari log aplikasi.
 It was not possible to contact the web service.	UserLoginWindow		Tidak bisa menghubungi layanan web.
 Name	PackageListView		Nama
 Local	LocalPkgDataLoadProcess		Lokal

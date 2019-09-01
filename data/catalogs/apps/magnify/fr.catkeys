@@ -1,6 +1,7 @@
-1	french	x-vnd.Haiku-Magnify	94607167
+1	french	x-vnd.Haiku-Magnify	883952675
 Decrease pixel size	Magnify-Main		Réduire le grossissement
 Increase pixel size	Magnify-Main		Augmenter le grossissement
+magnify: size must be a multiple of 4	Console		Agrandissement : la taille doit être un multiple de 4
 Stick coordinates	Magnify-Main		Mémoriser les coordonnées
 %width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}
 Copy image	Magnify-Main		Copier l’image

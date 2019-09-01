@@ -1,3 +1,3 @@
 1	russian	x-vnd.Haiku-TelnetService	1209067113
-The Telnet server allows you to remotely access your machine with a terminal session using the telnet protocol.\n\nPlease note that it is an insecure and unencrypted connection.	TelnetServiceAddOn		Telnet cервер позволяет вам удаленно получить доступ к вашему компьютеру используя telnet протокол.\n\nПожалуйста, имейте ввиду, что это небезопасное и нешифрованное соединение.
+The Telnet server allows you to remotely access your machine with a terminal session using the telnet protocol.\n\nPlease note that it is an insecure and unencrypted connection.	TelnetServiceAddOn		Telnet сервер позволяет получить доступ к вашему компьютеру дистанционно, используя протокол telnet.\n\nПожалуйста, имейте ввиду, что это небезопасное и незашифрованное соединение.
 Telnet server	TelnetServiceAddOn		Telnet cервер

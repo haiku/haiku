@@ -18,7 +18,7 @@ Settings	Terminal TermWindow		Impostazions
 %app% settings	Terminal PrefWindow	window title	Impostazions %app%
 Use default	Terminal SetTitleWindow		Dopre predefinît
 Close tab	Terminal TermWindow		Siere schede
-Selected background	Terminal AppearancePrefView		Selezione fonts
+Selected background	Terminal AppearancePrefView		Fonts selezionât
 Error!	Terminal getString		Erôr!
 Set tab title	Terminal TermWindow		Stabilìs titul schede
 Appearance	Terminal PrefWindow		Aspiet

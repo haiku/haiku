@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Time	3755504714
+1	romanian	x-vnd.Haiku-Time	752043118
 OK	Time		OK
 Message receiving failed	Time		Primirea mesajului a eșuat
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Oră și Dată, scris de:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
@@ -7,7 +7,6 @@ America	Time		America
 Reset to default server list	Time		Restabilește la lista de server implicită
 Could not resolve server address	Time		Nu s-a putut rezolva adresa serverului
 Set time zone	Time		Configurează fusul orar
-The following error occured while synchronizing:r\n%s: %s	Time		Următoarea eroare a apărut în timpul sincronizării:r\n%s: %s
 Waiting for answer failed	Time		Așteptarea pentru răspuns a eșuat
 <Other>	Time		<Altele>
 Received invalid time	Time		S-a primit o oră invalidă
@@ -17,7 +16,6 @@ Asia	Time		Asia
 Try all servers	Time		Încearcă toate serverele
 Time	Time		Oră
 Current time:	Time		Oră curentă:
-The following error occured while synchronizing:r\n%s	Time		Următoarea eroare a apărut în timpul sincronizării:r\n%s
 Europe	Time		Europa
 Show day of week	Time		Afișează ziua săptămânii
 Local time (Windows compatible)	Time		Ora locală (compatibil cu Windows)

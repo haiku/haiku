@@ -1,12 +1,12 @@
 1	korean	x-vnd.Haiku-NewMailNotification	2338542986
-none	NotifierConfigView		없음
-Method:	NotifierConfigView		방법:
-Beep	NotifierConfigView		비프
-New mails notification	NotifierFilter		새 메일 알림
-Central alert	NotifierConfigView		중앙  경고
-OK	NotifierFilter		좋아요
-New messages	NotifierFilter		새 메세지
 Log window	NotifierConfigView		로그 창
-Keyboard LEDs	NotifierConfigView		키보드 LED
-Central beep	NotifierConfigView		중앙 비프
+none	NotifierConfigView		없음
+New mails notification	NotifierFilter		새 메일 알림
 Alert	NotifierConfigView		경고
+OK	NotifierFilter		좋아요
+Central alert	NotifierConfigView		중앙  경고
+Beep	NotifierConfigView		비프
+Central beep	NotifierConfigView		중앙 비프
+New messages	NotifierFilter		새 메세지
+Method:	NotifierConfigView		방법:
+Keyboard LEDs	NotifierConfigView		키보드 LED

@@ -11,7 +11,7 @@ DataTranslations - Error	DataTranslations		DataTranslations - Erôr
 Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Dopre chest panel di control par stabilî i valôrs predefinîts pai tradutôrs, di doprâ cuant che nissune altre impostazion e je stade specificade di une aplicazion.
 The new translator has been installed successfully.	DataTranslations		Il gnûf tradutôr al è stât instalât cun sucès.
 An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Un element clamât '%name' al esist za inte cartele dai Tradutôrs! Il tradutôr esistent aial di jessi sorescrit?
-DataTranslations	System name		Traduzions dâts
+DataTranslations	System name		Traduzion dâts
 Info	DataTranslations		Informazions
 Overwrite	DataTranslations		Sorescrîf
 Version:	DataTranslations		Version:

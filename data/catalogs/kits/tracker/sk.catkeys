@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	3215214560
+1	slovak	x-vnd.Haiku-libtracker	2296758469
 Created	ContainerWindow		Vytvorené
 Open and make preferred	OpenWithWindow		Otvoriť a nastaviť ako preferovanú
 Open with…	ContainerWindow		Otvoriť pomocou…
@@ -42,7 +42,6 @@ Size	ContainerWindow		Veľkosť
 Select…	ContainerWindow		Vybrať…
 Show shared volumes on Desktop	SettingsView		Zobraziť zdieľané zväzky na Ploche
 Size	PoseView		Veľkosť
-OK	InfoWindow		OK
 matches wildcard expression	SelectionWindow		zodpovedá výrazu so zástupnými znakmi
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Názov
@@ -70,7 +69,6 @@ Select	SelectionWindow		Vybrať
 Select	InfoWindow		Vybrať
 OK	OpenWithWindow		OK
 Include trash	FindPanel		Vrátane Koša
-That name is too long. Please type another one.	InfoWindow		Uvedený názov je príliš dlhý. Prosím, napíšte iný.
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Vyčistiť
 Modified	FindPanel		Zmenené
@@ -86,7 +84,6 @@ Mount	ContainerWindow		Pripojiť
 Desktop	B_DESKTOP_DIRECTORY		Plocha
 Corrupted pointers.	libtracker		Poškodené ukazovatele.
 Link to:	InfoWindow		Odkazovať na:
-Set new link target	InfoWindow		Nastaviť nový cieľ odkazu
 Copy here	ContainerWindow		Kopírovať sem
 All disks	FindPanel		Všetky disky
 Window	ContainerWindow		Okno
@@ -100,14 +97,14 @@ Edit templates…	TemplatesMenu		Upraviť šablóny…
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used využité -- %free voľné)
 Hide dotfiles	SettingsView		Skryť súbory s bodkou na začiatku
 Trash	Model		Kôš
-Enable type-ahead filtering	SettingsView		Zapnúť filtrovanie počas písania
 copy	FSUtils	filename copy	kopírovať
 New folder%ld	FSUtils		Nový priečinok%ld
+Enable type-ahead filtering	SettingsView		Zapnúť filtrovanie počas písania
 Location	OpenWithWindow		Umiestnenie
 %Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		Prispôsobiť veľkosť
-List folders first	SettingsView		Uviesť priečinky na začiatku
 Find	FSUtils		Nájsť
+List folders first	SettingsView		Uviesť priečinky na začiatku
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Položka s názvom „%name“ už v tomto priečinku existuje. Chcete ju nahradiť symbolickým odkazom, ktorý vytvárate?
 List view	ContainerWindow		Zobrazenie zoznamu
 Temporary	FindPanel		Dočasné
@@ -176,15 +173,14 @@ contains	SelectionWindow		obsahuje
 is not	FindPanel		nie je
 Icon view	DeskWindow		Zobrazenie ikon
 Mount settings…	ContainerWindow		Nastavenia pripojenia…
-Permissions	InfoWindow		Oprávnenia
 Keywords	Bookmark Query Columns		Kľúčové slová
 by name	FindPanel		podľa názvu
 Copy more	ContainerWindow		Kopírovať viac
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Ľutujeme, nemôžete ukladať veci do koreňového adresára systému.
 Restore	ContainerWindow		Obnoviť
 Location	ContainerWindow		Umiestnenie
-Warning space color	SettingsView		Farba priestoru upozornenia
 Skip	FSUtils		Preskočiť
+Warning space color	SettingsView		Farba priestoru upozornenia
 Used space color	SettingsView		Farba využitého miesta
 Cancel	FSUtils		Zrušiť
 Original name	ContainerWindow		Pôvodný názov
@@ -237,7 +233,6 @@ You must have at least one attribute showing.	PoseView		Musí sa zobrazovať asp
 Cut	FilePanelPriv		Vystrihnúť
 Favorites	FilePanelPriv		Obľúbené
 home	B_USER_DIRECTORY		domov
-Open	InfoWindow		Otvoriť
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Nové šablóny Trackera
 Disk mounting during boot	AutoMounterSettings		Pripájanie diskov počas štartu
 Don't automount	AutoMounterSettings		Nepoužívať automount
@@ -264,7 +259,6 @@ copying	FSUtils		kopírovanie
 Get info	FilePanelPriv		Získať info
 Execute	FilePermissionsView		Vykonať
 Delete	ContainerWindow		Zmazať
-Edit name	InfoWindow		Upraviť názov
 Show volumes on Desktop	SettingsView		Zobraziť zväzky na ploche
 Recent folders	ContainerWindow		Nedávne priečinky
 Desktop	Model		Plocha
@@ -276,7 +270,6 @@ Delete	FSUtils		Zmazať
 Edit name	ContainerWindow		Upraviť názov
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Nebolo možné otvoriť „%document“ (Chýbajúci symbol: %symbol). \n
 More options	FindPanel		Ďalšie možnosti
-Identify	InfoWindow		Identifikovať
 config	B_USER_CONFIG_DIRECTORY		konfigurácia
 Error moving \"%name\".	FSUtils		Chyba pri presúvaní „%name“.
 Select…	QueryContainerWindow		Vybrať…
@@ -328,7 +321,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 You cannot create a link to the root directory.	FSUtils		Nemôžete vytvoriť odkaz na koreňový adresár.
 Select all	FilePanelPriv		Vybrať všetky
 Other	FilePermissionsView		Iné
-Empty Trash	InfoWindow		Vyprázdniť Kôš
 Automatic disk mounting	AutoMounterSettings		Automatické pripájanie diskov
 parent folder	NavMenu		nadradený priečinok
 Create link here	ContainerWindow		Vytvoriť odkaz tu
@@ -346,7 +338,6 @@ Created:	InfoWindow		Vytvorené:
 Single window navigation	SettingsView		Navigácia v jednom okne
 Edit Query template	FindPanel		Upraviť šablónu Požiadavky
 Save query as template…	FindPanel		Uložiť požiadavku ako šablónu…
-Unmount	InfoWindow		Odpojiť
 All disks	AutoMounterSettings		Všetky disky
 link	FSUtils	filename link	odkaz
 Proceed	FSUtils		Pokračovať
@@ -386,7 +377,6 @@ Create relative link here	ContainerWindow		Vytvoriť relatívny odkaz tu
 Copy	FilePanelPriv		Kopírovať
 All Haiku disks	AutoMounterSettings		Všetky disky Haiku
 Close all	ContainerWindow		Zatvoriť všetky
-Recalculate folder size	InfoWindow		Znovu vypočítať veľkosť priečinka
 Paused: click to resume or stop	StatusWindow		Pozastavené: kliknutím môžete pokračovať alebo zastaviť
 Name	QueryPoseView		Názov
 Error %error loading add-On %name.	ContainerWindow		Chyba %error pri načítaní doplnku %name.
@@ -431,7 +421,6 @@ Name	FindPanel		Názov
 Cancel	WidgetAttributeText		Zrušiť
 Expression too long.	libtracker		Výraz je príliš dlhý.
 Memory corruption.	libtracker		Poškodenie pamäte.
-That name is already taken. Please type another one.	InfoWindow		Tento názov už je zabraný. Prosím, skúste iný.
 Copy layout	ContainerWindow		Kopírovať rozloženie
 Duplicate	ContainerWindow		Duplikovať
 Untitled clipping	PoseView		Orezávanie nepomenovaných

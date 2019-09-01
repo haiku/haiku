@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	2444426778
+1	japanese	x-vnd.Haiku-HaikuDepot	4293876709
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
 Check for updates…	MainWindow		更新をチェック…
 Uninstall	PackageManager		アンインストール
@@ -10,8 +10,8 @@ OK	App		OK
 Mostly stable	RatePackageWindow		ほとんど安定
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		アカウントが正常に作成されました。これからパッケージの評価やほかの便利なことができます。
 The response to the captcha was incorrect.	ServerHelper		キャプチャの回答が間違っていました
-Rate package…	PackageInfoView		パッケージを評価…
 Develop packages	MainWindow		開発用パッケージ
+Rate package…	PackageInfoView		パッケージを評価…
 Starting the package daemon failed:\n\n%Error%	App		パッケージデーモンの起動に失敗しました:\n\n%Error%
 <no info>	PackageInfoView		<情報無し>
 No user ratings available.	PackageInfoView		ユーザー評価はありません。
@@ -22,8 +22,8 @@ Failed to create account	UserLoginWindow		アカウントの作成に失敗し�
 Ignore	UserLoginWindow		無視
 Rating	PackageListView		評価
 Synchronizing icons	ServerIconExportUpdateProcess		アイコンを同期しています。
-Show	MainWindow		表示
 Does not start	RatePackageWindow		起動しない
+Show	MainWindow		表示
 But none could be listed here, sorry.	UserLoginWindow		すみません。しかし、ここにはなにもリストされていません。
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		パッケージリストの取得中にエラーが発生しました: %message%
 There are problems with the data you entered:\n\n	UserLoginWindow		入力したデーターに問題があります:\n\n
@@ -38,7 +38,6 @@ Ratings	PackageInfoView		評価
 Switch account…	MainWindow		アカウントの切り替え…
 Preferred language:	UserLoginWindow		優先言語:
 Server Error	ServerHelper		サーバーエラー
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display.  Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		パッケージデータの更新中に、データーが期限切れになったり、アプリケーションの表示から無くなるかもしれない問題が発生しました。この問題に関する追加の詳細は、アプリケーションのログから得られるかもしれません。
 It was not possible to contact the web service.	UserLoginWindow		ウェブサービスにコンタクトできませんでした。
 Name	PackageListView		名前
 Local	LocalPkgDataLoadProcess		ローカル

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Network	33101153
+1	french	x-vnd.Haiku-Network	3694799483
 Ethernet device	InterfaceListItem		Périphérique Ethernet
 Link speed:	IntefaceView		Vitesse du lien :
 disconnected	IntefaceView		déconnecté
@@ -19,6 +19,7 @@ EAP	EAP protected network		EAP
 Services	NetworkWindow		Services
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Échec de l’installation de l’État du réseau dans la Deskbar : %s
 Revert	NetworkWindow		Rétablir
+off	ServiceListItem		éteint
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<aucun réseau sans fil trouvé>
 Enable	IntefaceView		Activer
@@ -37,6 +38,7 @@ MAC address:	IntefaceView		Adresse MAC :
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 disabled	InterfaceListItem		désactivé
 Dial-up connection	InterfaceListItem		Connexion téléphonique
+on	ServiceListItem		allumé
 The method for obtaining an IP address	IntefaceAddressView		Méthode d’obtention de l’adresse IP
 Automatic	IntefaceAddressView		Automatique
 Choose automatically	IntefaceView		Choisir automatiquement

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Time	3755504714
+1	hungarian	x-vnd.Haiku-Time	752043118
 OK	Time		Rendben
 Message receiving failed	Time		Sikertelen üzenetfogadás
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Dátum és idő, készítette:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\n Copyright 2004-2012, Haiku.
@@ -7,7 +7,6 @@ America	Time		Amerika
 Reset to default server list	Time		Eredeti kiszolgálólista visszaállìtása
 Could not resolve server address	Time		Nem sikerült feloldani a kiszolgáló címét
 Set time zone	Time		Időzóna beállítása
-The following error occured while synchronizing:r\n%s: %s	Time		A következő hiba történt szinkronizálás közben:r\n%s: %s
 Waiting for answer failed	Time		Nem érkezett válasz
 <Other>	Time		<Egyéb>
 Received invalid time	Time		Érvénytelen idő érkezett
@@ -17,7 +16,6 @@ Asia	Time		Ázsia
 Try all servers	Time		Összes kiszolgáló kipróbálása
 Time	Time		Idő
 Current time:	Time		Jelenlegi idő:
-The following error occured while synchronizing:r\n%s	Time		A következő hiba történt szinkronizálás közben:r\n%s
 Europe	Time		Európa
 Show day of week	Time		A hét napjának megjelenítése
 Local time (Windows compatible)	Time		Helyi idő (Windows kompatibilis)

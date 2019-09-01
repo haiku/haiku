@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Shortcuts	1048837818
+1	french	x-vnd.Haiku-Shortcuts	3834857117
 *MouseUp	ShortcutsWindow		*SourisEnHaut
 Application	ShortcutsWindow		Application
 Option	ShortcutsSpec	Name for modifier on keyboard	Option
@@ -26,6 +26,7 @@ Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Raccourcis n’a
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsérerTexte « votre texte ici »
 Remove selected shortcut	ShortcutsWindow		Supprimer le raccourci sélectionné
 Error, NULL state description?	ShortcutsSpec		Erreur : description d’état NULL ?
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Raccourcis n’a pas pu ouvrir le fichier de jeu de touches !
 Save & apply	ShortcutsWindow		Sauver et appliquer
 Open	ShortcutsWindow		Ouvrir

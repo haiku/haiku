@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	2444426778
+1	swedish	x-vnd.Haiku-HaikuDepot	4293876709
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ett fel inträffade vid uppdatering av repositoriet: %error%
 Check for updates…	MainWindow		Leta efter uppdateringar…
 Uninstall	PackageManager		Avinstallera
@@ -10,8 +10,8 @@ OK	App		OK
 Mostly stable	RatePackageWindow		Mestadels stabil
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Kontot lyckades skapas. Du kan nu betygsätta paket och göra andra vettiga saker.
 The response to the captcha was incorrect.	ServerHelper		Svaret på captchan var inkorrekt.
-Rate package…	PackageInfoView		Betygsätt paket...
 Develop packages	MainWindow		Utvecklingspaket
+Rate package…	PackageInfoView		Betygsätt paket...
 Starting the package daemon failed:\n\n%Error%	App		Starta package daemon misslyckades:\n\n%Error%
 <no info>	PackageInfoView		<Ingen information>
 No user ratings available.	PackageInfoView		Ingen betygsättnings tillgänglig.
@@ -22,8 +22,8 @@ Failed to create account	UserLoginWindow		Misslyckades skapa konto
 Ignore	UserLoginWindow		Ignorera
 Rating	PackageListView		Betyg
 Synchronizing icons	ServerIconExportUpdateProcess		Synkroniserar ikoner
-Show	MainWindow		Visa
 Does not start	RatePackageWindow		Starta inte
+Show	MainWindow		Visa
 But none could be listed here, sorry.	UserLoginWindow		Ursäkta, Men ingen kunde listas här.
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Ett fel inträffade vid hämtning av paketlistan: %message%
 There are problems with the data you entered:\n\n	UserLoginWindow		Det är något problem med data du skrev:\n\n
@@ -38,7 +38,6 @@ Ratings	PackageInfoView		Betyg
 Switch account…	MainWindow		Byt konto...
 Preferred language:	UserLoginWindow		Föredraget språk:
 Server Error	ServerHelper		Serverfel
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display.  Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Vid uppdatering av paketdata uppstod ett problem som kan göra att data visat i programemets vy är föråldrat eller saknas.  Ytterligare information om det här problemet kan hämtas från applikationsloggarna.
 It was not possible to contact the web service.	UserLoginWindow		Det gick inte att kontakta webb servicen.
 Name	PackageListView		Namn
 Local	LocalPkgDataLoadProcess		Lokal

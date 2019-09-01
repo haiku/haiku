@@ -1,14 +1,13 @@
-1	hungarian	x-vnd.Haiku-NewMailNotification	73789504
-You have {0, plural, one{One new message} other{# new messages}} for %account.	NotifierFilter		{0, plural, one{Új levél} other{# új levél}} érkezett a(z) %account fiókba.
-none	NotifierConfigView		nincs
-Method:	NotifierConfigView		Művelet:
-Beep	NotifierConfigView		hangjelzés
-{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{Új levél} other{# új levél}}
-New mails notification	NotifierFilter		Új üzenet értesítés
-Central alert	NotifierConfigView		központi jelzés
-OK	NotifierFilter		Rendben
-New messages	NotifierFilter		Új üzenetek
+1	hungarian	x-vnd.Haiku-NewMailNotification	2111731137
 Log window	NotifierConfigView		naplóablak
-Keyboard LEDs	NotifierConfigView		billentyűzet-villogás
-Central beep	NotifierConfigView		központi hangjelzés
+none	NotifierConfigView		nincs
+New mails notification	NotifierFilter		Új üzenet értesítés
 Alert	NotifierConfigView		jelzés
+OK	NotifierFilter		Rendben
+Central alert	NotifierConfigView		központi jelzés
+Beep	NotifierConfigView		hangjelzés
+Central beep	NotifierConfigView		központi hangjelzés
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{Új levél} other{# új levél}}
+New messages	NotifierFilter		Új üzenetek
+Method:	NotifierConfigView		Művelet:
+Keyboard LEDs	NotifierConfigView		billentyűzet-villogás

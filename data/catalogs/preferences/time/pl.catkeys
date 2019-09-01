@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Time	3566599171
+1	polish	x-vnd.Haiku-Time	563137575
 OK	Time		OK
 Message receiving failed	Time		Odbiór wiadomości nie powiódł się
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date, napisany przez:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nPrawa zastrzeżone 2004-2012, Haiku.
@@ -6,7 +6,6 @@ Australia	Time		Australia
 America	Time		Ameryka
 Reset to default server list	Time		Przywróć domyślną listę serwerów
 Set time zone	Time		Ustaw strefę czasową
-The following error occured while synchronizing:r\n%s: %s	Time		Wystąpił błąd podczas synchronizacji:r\n%s: %s
 Waiting for answer failed	Time		Oczekiwanie na odpowiedź nie powiodło się
 <Other>	Time		<Inne>
 Received invalid time	Time		Odebrano niepoprawny czas
@@ -16,7 +15,6 @@ Asia	Time		Azja
 Try all servers	Time		Wypróbuj wszystkie serwery
 Time	Time		Czas
 Current time:	Time		Aktualny czas:
-The following error occured while synchronizing:r\n%s	Time		Wystąpił błąd podczas synchronizacji:r\n%s
 Europe	Time		Europa
 Show day of week	Time		Pokaż dzień tygodnia
 Local time (Windows compatible)	Time		Czas lokalny (kompatybilne z Windowsem)

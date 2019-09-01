@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libtracker	2942097057
+1	italian	x-vnd.Haiku-libtracker	2023640966
 Created	ContainerWindow		Creato
 Open and make preferred	OpenWithWindow		Apri e rendi preferito
 Open with…	ContainerWindow		Apri con…
@@ -42,7 +42,6 @@ Size	ContainerWindow		Dimensione
 Select…	ContainerWindow		Seleziona…
 Show shared volumes on Desktop	SettingsView		Mostra volumi condivisi sulla Scrivania
 Size	PoseView		Dimensione
-OK	InfoWindow		OK
 matches wildcard expression	SelectionWindow		espressione wildcard
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Titolo
@@ -70,7 +69,6 @@ Select	SelectionWindow		Seleziona
 Select	InfoWindow		Seleziona
 OK	OpenWithWindow		OK
 Include trash	FindPanel		Includi cestino
-That name is too long. Please type another one.	InfoWindow		Il nome inserito è troppo lungo. Scriverne un altro.
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Ordina icone
 Modified	FindPanel		Modificato
@@ -86,7 +84,6 @@ Mount	ContainerWindow		Monta
 Desktop	B_DESKTOP_DIRECTORY		Scrivania
 Corrupted pointers.	libtracker		Puntatori corrotti.
 Link to:	InfoWindow		Collegamento a:
-Set new link target	InfoWindow		Imposta un nuovo target al collegamento
 Copy here	ContainerWindow		Copia qui
 All disks	FindPanel		Tutti i dischi
 Window	ContainerWindow		Finestra
@@ -100,14 +97,14 @@ Edit templates…	TemplatesMenu		Modifica modelli…
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used usato -- %free libero)
 Hide dotfiles	SettingsView		Nascondi i file .*
 Trash	Model		Cestino
-Enable type-ahead filtering	SettingsView		Abilita filtro istantaneo
 copy	FSUtils	filename copy	copia
 New folder%ld	FSUtils		Nuova cartella%ld
+Enable type-ahead filtering	SettingsView		Abilita filtro istantaneo
 Location	OpenWithWindow		Posizione
 %Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		Adatta
-List folders first	SettingsView		Elenca prima le cartelle
 Find	FSUtils		Trova
+List folders first	SettingsView		Elenca prima le cartelle
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Esiste già in questa cartella un elemento chiamato \"%name\". Vuoi sostituirlo con il collegamento simbolico che stai creando?
 List view	ContainerWindow		Vista a liste
 Temporary	FindPanel		Temporaneo
@@ -176,15 +173,14 @@ contains	SelectionWindow		contiene
 is not	FindPanel		non è
 Icon view	DeskWindow		Visualizza icone
 Mount settings…	ContainerWindow		Impostazioni di mount
-Permissions	InfoWindow		Permessi
 Keywords	Bookmark Query Columns		Parole chiave
 by name	FindPanel		per nome
 Copy more	ContainerWindow		Copia ancora
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Non è possibile salvare nulla sulla directory principale (root) del sistema.
 Restore	ContainerWindow		Ripristina
 Location	ContainerWindow		Posizione
-Warning space color	SettingsView		Colore area di avvertimento
 Skip	FSUtils		Salta
+Warning space color	SettingsView		Colore area di avvertimento
 Used space color	SettingsView		Colore della spazio utilizzato
 Cancel	FSUtils		Annulla
 Original name	ContainerWindow		Nome originale
@@ -237,7 +233,6 @@ You must have at least one attribute showing.	PoseView		Non si può avere meno d
 Cut	FilePanelPriv		Taglia
 Favorites	FilePanelPriv		Preferiti
 home	B_USER_DIRECTORY		home
-Open	InfoWindow		Apri
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Nuovi Modelli Tracker
 Disk mounting during boot	AutoMounterSettings		Montaggio dischi durante l'avvio
 Don't automount	AutoMounterSettings		Non montare automaticamente
@@ -264,7 +259,6 @@ copying	FSUtils		in copia
 Get info	FilePanelPriv		Ottieni informazioni
 Execute	FilePermissionsView		Esecuzione
 Delete	ContainerWindow		Elimina
-Edit name	InfoWindow		Modifica nome
 Show volumes on Desktop	SettingsView		Mostra i volumi sulla Scrivania
 Recent folders	ContainerWindow		Cartelle recenti
 Desktop	Model		Scrivania
@@ -276,7 +270,6 @@ Delete	FSUtils		Elimina
 Edit name	ContainerWindow		Modifica nome
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Non è stato possibile aprire \"%document\" (Simbolo mancante: %symbol). \n
 More options	FindPanel		Altre opzioni
-Identify	InfoWindow		Identifica
 config	B_USER_CONFIG_DIRECTORY		configurazione
 Error moving \"%name\".	FSUtils		Errore durante lo spostamento di \"%name\".
 Select…	QueryContainerWindow		Seleziona…
@@ -329,7 +322,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 You cannot create a link to the root directory.	FSUtils		Non è possibile creare un collegamento alla cartella di root.
 Select all	FilePanelPriv		Seleziona tutto
 Other	FilePermissionsView		Altro
-Empty Trash	InfoWindow		Svuota Cestino
 Automatic disk mounting	AutoMounterSettings		Montaggio automatico dei dischi
 parent folder	NavMenu		cartella superiore
 Create link here	ContainerWindow		Crea collegamento qui
@@ -347,7 +339,6 @@ Created:	InfoWindow		Creato il:
 Single window navigation	SettingsView		Navigazione a finestra singola
 Edit Query template	FindPanel		Modifica modello di interrogazione
 Save query as template…	FindPanel		Salva interrogazione come modello…
-Unmount	InfoWindow		Smonta
 All disks	AutoMounterSettings		Tutti i dischi
 link	FSUtils	filename link	collegamento
 Proceed	FSUtils		Procedi
@@ -387,7 +378,6 @@ Create relative link here	ContainerWindow		Crea collegamento relativo qui
 Copy	FilePanelPriv		Copia
 All Haiku disks	AutoMounterSettings		Tutti i dischi Haiku
 Close all	ContainerWindow		Chiudi tutto
-Recalculate folder size	InfoWindow		Ricalcola dimensione cartella
 Paused: click to resume or stop	StatusWindow		In pausa: fare click per riprendere o fermare
 Name	QueryPoseView		Nome
 Error %error loading add-On %name.	ContainerWindow		Il caricamento del componente aggiuntivo %name ha generato il seguente errore: %error.
@@ -432,7 +422,6 @@ Name	FindPanel		Nome
 Cancel	WidgetAttributeText		Annulla
 Expression too long.	libtracker		Espressione troppo lunga.
 Memory corruption.	libtracker		Corruzione della memoria.
-That name is already taken. Please type another one.	InfoWindow		Il nome è già preso. Per piacere scriverne un altro.
 Copy layout	ContainerWindow		Copia layout
 Duplicate	ContainerWindow		Duplica
 Untitled clipping	PoseView		Appunto senza nome

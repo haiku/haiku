@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Time	3755504714
+1	italian	x-vnd.Haiku-Time	752043118
 OK	Time		OK
 Message receiving failed	Time		Ricezione del messaggio fallita
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Ora & Data, realizzato da:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
@@ -7,7 +7,6 @@ America	Time		America
 Reset to default server list	Time		Reimposta alla configurazione predefinita
 Could not resolve server address	Time		Impossibile risolvere l'indirizzo del server
 Set time zone	Time		Imposta fuso orario
-The following error occured while synchronizing:r\n%s: %s	Time		Si è verificato il seguente errore durante la sincronizzazione:r\n%s: %s
 Waiting for answer failed	Time		Nessuna risposta pervenuta
 <Other>	Time		<Altro>
 Received invalid time	Time		È stato ricevuto un orario non valido
@@ -17,7 +16,6 @@ Asia	Time		Asia
 Try all servers	Time		Prova con tutti i server
 Time	Time		Ora
 Current time:	Time		Ora attuale:
-The following error occured while synchronizing:r\n%s	Time		Si è verificato il seguente errore durante la sincronizzazione:r\n%s
 Europe	Time		Europa
 Show day of week	Time		Mostra giorno della settimana
 Local time (Windows compatible)	Time		Ora locale (compatibile Windows)

@@ -6,8 +6,8 @@ Available packages	MainWindow		Dostupné balíky
 Create account	UserLoginWindow		Vytvoriť účet
 Mostly stable	RatePackageWindow		Prevažne stabilný
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Účet bol úspešne vytvorený. Teraz môžete hodnotiť balíky a robiť ďalšie užitočné veci.
-Rate package…	PackageInfoView		Ohodnotiť balík…
 Develop packages	MainWindow		Vývoj balíkov
+Rate package…	PackageInfoView		Ohodnotiť balík…
 Starting the package daemon failed:\n\n%Error%	App		Spustenie démona balíkov zlyhalo:\n\n%Error%
 <no info>	PackageInfoView		<žiadne info>
 No user ratings available.	PackageInfoView		Používateľské hodnotenie nie je dostupné.
@@ -15,8 +15,8 @@ The user name needs to be at least 3 letters long.	UserLoginWindow		Meno použí
 Failed to create account	UserLoginWindow		Nepodarilo sa vytvoriť účet
 Ignore	UserLoginWindow		Ignorovať
 Rating	PackageListView		Hodnotenie
-Show	MainWindow		Zobraziť
 Does not start	RatePackageWindow		Nespúšťa sa
+Show	MainWindow		Zobraziť
 But none could be listed here, sorry.	UserLoginWindow		Ale žiadne tu nebolo možné uviesť, ľutujeme.
 There are problems with the data you entered:\n\n	UserLoginWindow		Vyskytli sa problémy v údajoch, ktoré ste zadali:\n\n
 The authentication was successful.	UserLoginWindow		Overenie prebehlo úspešne.

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Keymap	2693024251
+1	french	x-vnd.Haiku-Keymap	221508000
 Key	Modifier keys window	As in a computer keyboard key	Touche
 Japanese	KeymapNames		Japonais
 US	KeymapNames		US
@@ -66,7 +66,7 @@ Esperanto	KeymapNames		Espéranto
 Belarusian	KeymapNames		Biélorusse
 Warning: left and right key roles do not match	Modifier keys window		Attention : les rôles des touches gauche et droite ne correspondent pas
 Circumflex trigger	Keymap window		Accent circonflexe
-Caps lock	Keyboard Layout View		Verr. maj.
+Caps lock	Keyboard Layout View		Verr. Maj.
 Left shift	Keyboard Layout View		Majuscule gauche
 Russian (Yawert)	KeymapNames		Russe (Yawert)
 Bulgarian (Cyrillic)	KeymapNames		Bulgare (cyrillique)
@@ -98,6 +98,7 @@ Polish (Typewriter)	KeymapNames		Polonais (Machine à écrire)
 French (Mac)	KeymapNames		Français (Mac)
 User:	Keymap window		Utilisateur :
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Touche Alt/Option
+SHIFT	Keyboard Layout View		Maj
 Estonian	KeymapNames		Estonien
 Serbian (Latin)	KeymapNames		Serbe (Latin)
 French	KeymapNames		Français
@@ -114,6 +115,7 @@ ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		Système :
 Switch shortcut keys	Keymap window		Basculer les touches de raccourcis
 Right command	Keyboard Layout View		Commande droite
+NUM LOCK	Keyboard Layout View		Verr. Num.
 Belgian (comma)	KeymapNames		Belge (virgule)
 Norwegian	KeymapNames		Norvégien
 Font	Keymap window		Police

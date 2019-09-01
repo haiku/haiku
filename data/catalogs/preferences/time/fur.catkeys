@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Time	3755504714
+1	friulian	x-vnd.Haiku-Time	752043118
 OK	Time		Va ben
 Message receiving failed	Time		Ricezion dal messaç falide
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Ore e Date, scrit di:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
@@ -7,7 +7,6 @@ America	Time		Americhe
 Reset to default server list	Time		Ristabilìs ae liste di servidôrs predefinide
 Could not resolve server address	Time		Impussibil risolvi la direzion dal servidôr
 Set time zone	Time		Stabilìs fûs orari
-The following error occured while synchronizing:r\n%s: %s	Time		Si è verificât chest erôr intant che si sincronizave:r\n%s: %s
 Waiting for answer failed	Time		No si è rivâts a spietâ la rispueste
 <Other>	Time		<Altri>
 Received invalid time	Time		Ricevût orari no valit
@@ -17,7 +16,6 @@ Asia	Time		Asie
 Try all servers	Time		Prove ducj i servidôrs
 Time	Time		Ore
 Current time:	Time		Ore atuâl:
-The following error occured while synchronizing:r\n%s	Time		Si è verificât chest erôr intant che si sincronizave:r\n%s
 Europe	Time		Europe
 Show day of week	Time		Mostre dì de setemane
 Local time (Windows compatible)	Time		Ore locâl (compatibil Windows)

@@ -1,14 +1,13 @@
-1	indonesian	x-vnd.Haiku-NewMailNotification	73789504
-You have {0, plural, one{One new message} other{# new messages}} for %account.	NotifierFilter		Anda mempunyai {0, plural, one{One new message} other{# new messages}} untuk %account.
-none	NotifierConfigView		tak satupun
-Method:	NotifierConfigView		Metode:
-Beep	NotifierConfigView		Bunyi bip
-{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{One new message} lainnya {# new messages}}
-New mails notification	NotifierFilter		Permberitahuan surel baru
-Central alert	NotifierConfigView		Central alert
-OK	NotifierFilter		OKE
-New messages	NotifierFilter		Pesan baru
+1	indonesian	x-vnd.Haiku-NewMailNotification	2111731137
 Log window	NotifierConfigView		Jendela log
-Keyboard LEDs	NotifierConfigView		Led papan ketik
-Central beep	NotifierConfigView		Bunyi utama
+none	NotifierConfigView		tak satupun
+New mails notification	NotifierFilter		Permberitahuan surel baru
 Alert	NotifierConfigView		Peringatan
+OK	NotifierFilter		OKE
+Central alert	NotifierConfigView		Central alert
+Beep	NotifierConfigView		Bunyi bip
+Central beep	NotifierConfigView		Bunyi utama
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{One new message} lainnya {# new messages}}
+New messages	NotifierFilter		Pesan baru
+Method:	NotifierConfigView		Metode:
+Keyboard LEDs	NotifierConfigView		Led papan ketik

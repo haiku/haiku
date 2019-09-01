@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-WebPositive	1161363300
+1	friulian	x-vnd.Haiku-WebPositive	3301958994
 Show home button	Settings Window		Mostre boton di inizi
 Username:	Authentication Panel		Non utent:
 Copy URL to clipboard	Download Window		Copie URL tes notis
@@ -37,6 +37,7 @@ Download folder:	Settings Window		Cartele dai file discjariâts:
 Edit	WebPositive Window		Modifiche
 Cancel	Authentication Panel		Anule
 Match case	WebPositive Window		Corispondence maiusc./minusc.
+Search page:	Settings Window		Pagjine di ricercje:
 Zoom text only	WebPositive Window		Ingrandìs dome il test
 Default fixed font size:	Settings Window		Dimension predefinide dal caratar a spaziadure fisse:
 Close tab	WebPositive Window		Siere schede
@@ -105,6 +106,7 @@ Paste	URL Bar		Tache
 Cookie manager	WebPositive Window		Gjestôr dai Cookie
 /s)	Download Window	...as in 'per second'	/s)
 Hide password text	Authentication Panel		Plate test peraule di ordin
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Ogni mês si fâs la lune, ogni dì si impare une.
 Open start page	Settings Window		Vierç pagjine iniziâl
 Continue downloads	WebPositive		Ripie i discjariaments
 Cancel	Download Window		Anule
@@ -137,6 +139,7 @@ Copy	WebPositive Window		Copie
 Open bookmarks confirmation	WebPositive Window		Conferme vierzidure dai segnelibris
 Remove missing	Download Window		Gjave mancjants
 Clone current page	Settings Window		Clone la pagjine atuâl
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Vierzi %addedCount segnelibris adun?
 Session cookie	Cookie Manager		Cookie di session
 OK	Authentication Panel		Va ben
 Copy	URL Bar		Copie

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	3470530992
+1	english	x-vnd.Haiku-libtracker	2552074901
 Created	ContainerWindow		创建
 Open and make preferred	OpenWithWindow		打开并创建首选
 Open with…	ContainerWindow		打开方式...
@@ -41,7 +41,6 @@ Size	ContainerWindow		尺寸
 Select…	ContainerWindow		选择...
 Show shared volumes on Desktop	SettingsView		在桌面显示共享卷。
 Size	PoseView		尺寸
-OK	InfoWindow		确定
 matches wildcard expression	SelectionWindow		匹配通配符表达式
 96 x 96	ContainerWindow		96 x 96
 Identify	ContainerWindow		标识
@@ -65,7 +64,6 @@ Select	SelectionWindow		选择
 Select	InfoWindow		选择
 OK	OpenWithWindow		确定
 Include trash	FindPanel		包括垃圾箱
-That name is too long. Please type another one.	InfoWindow		名称太长，请重新命名。
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		刷新
 Modified	FindPanel		修改
@@ -79,7 +77,6 @@ Preparing to restore items…	StatusWindow		准备恢复项目...
 Mount	ContainerWindow		挂载
 Desktop	B_DESKTOP_DIRECTORY		桌面
 Link to:	InfoWindow		链接到： 
-Set new link target	InfoWindow		设置链接目标
 Copy here	ContainerWindow		复制到此
 All disks	FindPanel		所有磁盘
 Window	ContainerWindow		窗口
@@ -92,14 +89,14 @@ Edit templates…	TemplatesMenu		编辑模版...
 %capacity (%used used -- %free free)	InfoWindow		%capacity（已用 %used -- 空闲 %free）
 Hide dotfiles	SettingsView		隐藏 dotfiles
 Trash	Model		垃圾箱
-Enable type-ahead filtering	SettingsView		启用输入提示过滤
 copy	FSUtils	filename copy	复制
 New folder%ld	FSUtils		新建目录 %ld
+Enable type-ahead filtering	SettingsView		启用输入提示过滤
 Location	OpenWithWindow		位置
 %Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		适合大小
-List folders first	SettingsView		首先列出目录
 Find	FSUtils		搜索
+List folders first	SettingsView		首先列出目录
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		该文件夹中已经存在命名为 \"%name\" 的项目，您希望将其替换为正在创建的符号链接吗？
 Temporary	FindPanel		临时文件
 Create relative link	ContainerWindow		创建相对链接
@@ -158,14 +155,13 @@ contains	SelectionWindow		包含
 is not	FindPanel		不是
 Icon view	DeskWindow		图标视图
 Mount settings…	ContainerWindow		挂载设置...
-Permissions	InfoWindow		权限
 by name	FindPanel		名称
 Copy more	ContainerWindow		更多复制
 Sorry, you can't save things at the root of your system.	FilePanelPriv		对不起，您不能够在系统根目录保存内容。
 Restore	ContainerWindow		恢复
 Location	ContainerWindow		位置
-Warning space color	SettingsView		空白颜色警告
 Skip	FSUtils		跳过
+Warning space color	SettingsView		空白颜色警告
 Used space color	SettingsView		已用空间颜色
 Cancel	FSUtils		取消
 Original name	ContainerWindow		原始名称
@@ -216,7 +212,6 @@ You must have at least one attribute showing.	PoseView		您必须至少显示一
 Cut	FilePanelPriv		剪切
 Favorites	FilePanelPriv		选择
 home	B_USER_DIRECTORY		主目录
-Open	InfoWindow		打开
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		文件浏览器新模板
 Disk mounting during boot	AutoMounterSettings		启动时挂载磁盘
 Don't automount	AutoMounterSettings		手动挂载
@@ -240,7 +235,6 @@ copying	FSUtils		复制中
 Get info	FilePanelPriv		获取信息
 Execute	FilePermissionsView		执行
 Delete	ContainerWindow		删除
-Edit name	InfoWindow		编辑名称
 Show volumes on Desktop	SettingsView		在桌面显示卷
 Recent folders	ContainerWindow		最近目录
 Desktop	Model		桌面
@@ -252,7 +246,6 @@ Delete	FSUtils		删除
 Edit name	ContainerWindow		编辑名称
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		无法打开 \"%document\"（缺失符号：%symbol）。\n
 More options	FindPanel		更多选项
-Identify	InfoWindow		标识
 config	B_USER_CONFIG_DIRECTORY		设置
 Error moving \"%name\".	FSUtils		移动 \"%name\" 出错。
 Select…	QueryContainerWindow		选择...
@@ -301,7 +294,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 You cannot create a link to the root directory.	FSUtils		您无法创建至根目录的链接。
 Select all	FilePanelPriv		全选
 Other	FilePermissionsView		其它
-Empty Trash	InfoWindow		清空垃圾箱
 Automatic disk mounting	AutoMounterSettings		磁盘自动挂载
 parent folder	NavMenu		上级目录
 Create link here	ContainerWindow		创建链接
@@ -319,7 +311,6 @@ Created:	InfoWindow		创建：
 Single window navigation	SettingsView		单个窗口导航
 Edit Query template	FindPanel		编辑查询模板
 Save query as template…	FindPanel		保存查询为模板…
-Unmount	InfoWindow		卸载
 All disks	AutoMounterSettings		所有磁盘
 link	FSUtils	filename link	链接
 Proceed	FSUtils		执行
@@ -354,7 +345,6 @@ Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		无法�
 Create relative link here	ContainerWindow		创建相对链接
 Copy	FilePanelPriv		复制
 Close all	ContainerWindow		关闭所有
-Recalculate folder size	InfoWindow		重新计算目录大小
 Paused: click to resume or stop	StatusWindow		暂停：点击继续或停止
 Name	QueryPoseView		名称
 Error %error loading add-On %name.	ContainerWindow		错误 %error，载入附加组件 %name 出错。
@@ -394,7 +384,6 @@ Save	FindPanel		保存
 Go to parent	FilePanelPriv		上级目录
 Name	FindPanel		名称
 Cancel	WidgetAttributeText		取消
-That name is already taken. Please type another one.	InfoWindow		该名称已使用，请输入其他名称。
 Copy layout	ContainerWindow		复制布局
 Duplicate	ContainerWindow		副本
 Untitled clipping	PoseView		未命名片段

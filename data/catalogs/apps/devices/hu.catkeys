@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Devices	490380176
+1	hungarian	x-vnd.Haiku-Devices	3345509916
 ACPI bus	DevicesView		ACPI port
 Encryption controller	Device		Titkosító vezérlő
 Bus Information	Device		Busz-információ
@@ -54,7 +54,9 @@ Device name	DeviceACPI		Eszköznév
 Card Reader	DeviceSCSI		Kártyaolvasó
 Display controller	Device		Kijelző vezérlő
 Basic information	DevicesView		Alapvető információk
+ACPI Button '%1'	DeviceACPI		ACPI gomb '%1'
 Bus	DevicesView		Busz
+ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Eszköznév
 Disk Drive	DeviceSCSI		Lemezmeghajtó
 Other	DeviceSCSI		Egyéb

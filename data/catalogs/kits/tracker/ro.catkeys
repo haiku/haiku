@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	2942097057
+1	romanian	x-vnd.Haiku-libtracker	2023640966
 Created	ContainerWindow		Creat
 Open and make preferred	OpenWithWindow		Deschide sau fixează ca preferat
 Open with…	ContainerWindow		Deschide cu…
@@ -42,7 +42,6 @@ Size	ContainerWindow		Dimensiune
 Select…	ContainerWindow		Selectează…
 Show shared volumes on Desktop	SettingsView		Afișează volumele comune pe desktop
 Size	PoseView		Dimensiune
-OK	InfoWindow		OK
 matches wildcard expression	SelectionWindow		se potrivește expresiei metacaracter
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Titlu
@@ -70,7 +69,6 @@ Select	SelectionWindow		Selectează
 Select	InfoWindow		Selectează
 OK	OpenWithWindow		OK
 Include trash	FindPanel		Include gunoi
-That name is too long. Please type another one.	InfoWindow		Numele este prea lung. Încercați altul.
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Curăță
 Modified	FindPanel		Modificat
@@ -86,7 +84,6 @@ Mount	ContainerWindow		Montează
 Desktop	B_DESKTOP_DIRECTORY		Desktop
 Corrupted pointers.	libtracker		Pointeri corupți.
 Link to:	InfoWindow		Leagă la:
-Set new link target	InfoWindow		Configurează destinație legăturii noi
 Copy here	ContainerWindow		Copiază aici
 All disks	FindPanel		Toate discurile
 Window	ContainerWindow		Fereastră
@@ -100,14 +97,14 @@ Edit templates…	TemplatesMenu		Editează șabloane…
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used utilizat -- %free liber)
 Hide dotfiles	SettingsView		Ascunde fișierele punct
 Trash	Model		Gunoi
-Enable type-ahead filtering	SettingsView		Activează filtrarea type-ahead
 copy	FSUtils	filename copy	copiază
 New folder%ld	FSUtils		Dosar nou%ld
+Enable type-ahead filtering	SettingsView		Activează filtrarea type-ahead
 Location	OpenWithWindow		Locație
 %Ld B	WidgetAttributeText		%Ld Octeți
 Resize to fit	QueryContainerWindow		Redimensionează pentru a potrivi
-List folders first	SettingsView		Enumeră dosarele întâi
 Find	FSUtils		Găsește
+List folders first	SettingsView		Enumeră dosarele întâi
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Un element numit \"%name\" există deja în acest dosar. Doriți să-l înlocuiți cu legătura simbolică pe care o creați?
 List view	ContainerWindow		Vizualizare listă
 Temporary	FindPanel		Temporar
@@ -176,15 +173,14 @@ contains	SelectionWindow		conține
 is not	FindPanel		nu este
 Icon view	DeskWindow		Vizualizare pictogramă
 Mount settings…	ContainerWindow		Configurări montare…
-Permissions	InfoWindow		Permisiuni
 Keywords	Bookmark Query Columns		Cuvinte cheie
 by name	FindPanel		după nume
 Copy more	ContainerWindow		Copiază mai mult
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Îmi pare rău, nu puteți salva lucruri la administratorul sistemului.
 Restore	ContainerWindow		Restaurează
 Location	ContainerWindow		Locație
-Warning space color	SettingsView		Culoare spațiu avertisment
 Skip	FSUtils		Omite
+Warning space color	SettingsView		Culoare spațiu avertisment
 Used space color	SettingsView		Culoare spațiu utilizat
 Cancel	FSUtils		Anulează
 Original name	ContainerWindow		Nume original
@@ -237,7 +233,6 @@ You must have at least one attribute showing.	PoseView		Trebuie să aveți cel p
 Cut	FilePanelPriv		Taie
 Favorites	FilePanelPriv		Favorite
 home	B_USER_DIRECTORY		acasă
-Open	InfoWindow		Deschide
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Modele noi Tracker
 Disk mounting during boot	AutoMounterSettings		Montare disc în timpul pornirii
 Don't automount	AutoMounterSettings		Nu automonta
@@ -264,7 +259,6 @@ copying	FSUtils		se copiază
 Get info	FilePanelPriv		Obține info
 Execute	FilePermissionsView		Execută
 Delete	ContainerWindow		Șterge
-Edit name	InfoWindow		Editează nume
 Show volumes on Desktop	SettingsView		Afișează volumele pe desktop
 Recent folders	ContainerWindow		Dosare recente
 Desktop	Model		Desktop
@@ -276,7 +270,6 @@ Delete	FSUtils		Șterge
 Edit name	ContainerWindow		Editează nume
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Nu s-a putut deschide \"%document\" (Simbol lipsă: %symbol). \n
 More options	FindPanel		Mai multe opțiuni
-Identify	InfoWindow		Identifică
 config	B_USER_CONFIG_DIRECTORY		config
 Error moving \"%name\".	FSUtils		Eroare la mutarea \"%name\".
 Select…	QueryContainerWindow		Selectează…
@@ -329,7 +322,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 You cannot create a link to the root directory.	FSUtils		Nu puteți crea o legătură către dosarul administrator.
 Select all	FilePanelPriv		Selectează tot
 Other	FilePermissionsView		Altele
-Empty Trash	InfoWindow		Gunoi vid
 Automatic disk mounting	AutoMounterSettings		Montare disc automată
 parent folder	NavMenu		dosar superior
 Create link here	ContainerWindow		Crează legătură aici
@@ -347,7 +339,6 @@ Created:	InfoWindow		Creat:
 Single window navigation	SettingsView		Navigare cu o singură fereastră
 Edit Query template	FindPanel		Editează șablon interogare
 Save query as template…	FindPanel		Salvează interogarea ca șablon…
-Unmount	InfoWindow		Demontează
 All disks	AutoMounterSettings		Toate discurile
 link	FSUtils	filename link	legătură
 Proceed	FSUtils		Continuă
@@ -387,7 +378,6 @@ Create relative link here	ContainerWindow		Creează legătură relativă aici
 Copy	FilePanelPriv		Copiază
 All Haiku disks	AutoMounterSettings		Toate discurile Haiku
 Close all	ContainerWindow		Închide tot
-Recalculate folder size	InfoWindow		Recalculează dimensiunea dosarului
 Paused: click to resume or stop	StatusWindow		Pauză: dați clic pentru a relua sau a opri
 Name	QueryPoseView		Nume
 Error %error loading add-On %name.	ContainerWindow		Eroare %error la încărcarea add-on %name.
@@ -432,7 +422,6 @@ Name	FindPanel		Nume
 Cancel	WidgetAttributeText		Anulează
 Expression too long.	libtracker		Expresie prea lungă.
 Memory corruption.	libtracker		Corupere de memorie.
-That name is already taken. Please type another one.	InfoWindow		Numele este luat deja. Tastați altul.
 Copy layout	ContainerWindow		Copiază aranjament
 Duplicate	ContainerWindow		Duplicat
 Untitled clipping	PoseView		Tăietură fără nume

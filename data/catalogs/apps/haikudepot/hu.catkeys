@@ -7,8 +7,8 @@ Available packages	MainWindow		Elérhető csomagok
 Create account	UserLoginWindow		Felhasználói fiók létrehozása
 Mostly stable	RatePackageWindow		Nagyrészt stabil
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		A fiók sikeresen létrehozva. Mostmár lehetőség van a csomagok értékelésére és további funkciókra.
-Rate package…	PackageInfoView		Csomag értékelése…
 Develop packages	MainWindow		Fejlesztői csomagok
+Rate package…	PackageInfoView		Csomag értékelése…
 Starting the package daemon failed:\n\n%Error%	App		A csomag démon indítása sikertelen:\n\n%Error%
 <no info>	PackageInfoView		<nincs információ>
 No user ratings available.	PackageInfoView		Felhasználói értékelés nem áll rendelkezésre.
@@ -16,8 +16,8 @@ The user name needs to be at least 3 letters long.	UserLoginWindow		A felhaszná
 Failed to create account	UserLoginWindow		Nem sikerült a fiók létrehozása
 Ignore	UserLoginWindow		Mellőzés
 Rating	PackageListView		Értékelés
-Show	MainWindow		Megjelenítés
 Does not start	RatePackageWindow		Nem indul el
+Show	MainWindow		Megjelenítés
 But none could be listed here, sorry.	UserLoginWindow		A felsoroltak közül egyik sem használható.
 There are problems with the data you entered:\n\n	UserLoginWindow		Tévesen megadott adatok:\n\n
 The authentication was successful.	UserLoginWindow		A felhasználóazonosítás sikeres volt

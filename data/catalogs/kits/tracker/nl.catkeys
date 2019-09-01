@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	4090572320
+1	dutch; flemish	x-vnd.Haiku-libtracker	3172116229
 Created	ContainerWindow		Gemaakt
 Open and make preferred	OpenWithWindow		Openen en bevoorkeuren
 Open with…	ContainerWindow		Openen met...
@@ -42,7 +42,6 @@ Size	ContainerWindow		Grootte
 Select…	ContainerWindow		Selecteren...
 Show shared volumes on Desktop	SettingsView		Toon gedeelde gegevensdragers op het bureaublad
 Size	PoseView		Grootte
-OK	InfoWindow		Oké
 matches wildcard expression	SelectionWindow		komt overeen met wildcardtekens
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Titel
@@ -69,7 +68,6 @@ Select	SelectionWindow		Selecteren
 Select	InfoWindow		Selecteren
 OK	OpenWithWindow		Oké
 Include trash	FindPanel		Prullenbak erbij opnemen
-That name is too long. Please type another one.	InfoWindow		Deze naam is te lang. Typ alstublieft een andere in.
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Opruimen
 Modified	FindPanel		Gewijzigd
@@ -85,7 +83,6 @@ Mount	ContainerWindow		Betrekken
 Desktop	B_DESKTOP_DIRECTORY		Bureaublad
 Corrupted pointers.	libtracker		Corrupte pointers.
 Link to:	InfoWindow		Link naar:
-Set new link target	InfoWindow		Nieuw linkdoel instellen
 Copy here	ContainerWindow		Hierheen kopiëren
 All disks	FindPanel		Alle schijven
 Window	ContainerWindow		Venster
@@ -99,14 +96,14 @@ Edit templates…	TemplatesMenu		Wijzig sjablonen...
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used gebruikt -- %free vrij)
 Hide dotfiles	SettingsView		Verberg dot-bestanden
 Trash	Model		Prullenbak
-Enable type-ahead filtering	SettingsView		Zoeken-tijdens-typen toepassen
 copy	FSUtils	filename copy	kopie
 New folder%ld	FSUtils		Nieuwe map%ld
+Enable type-ahead filtering	SettingsView		Zoeken-tijdens-typen toepassen
 Location	OpenWithWindow		Locatie
 %Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		Grootte passend maken
-List folders first	SettingsView		Toon mappen eerst
 Find	FSUtils		Zoeken
+List folders first	SettingsView		Toon mappen eerst
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Er bestaat al een item \"%name\" in deze map. Wilt u het vervangen door het gelinkte bestand dat u aan het maken bent?
 List view	ContainerWindow		Lijstweergave
 Temporary	FindPanel		Tijdelijk
@@ -175,15 +172,14 @@ contains	SelectionWindow		bevat
 is not	FindPanel		is niet
 Icon view	DeskWindow		Icoonweergave
 Mount settings…	ContainerWindow		Instellingen voor betrekken...
-Permissions	InfoWindow		Machtigingen
 Keywords	Bookmark Query Columns		Trefwoorden
 by name	FindPanel		op naam
 Copy more	ContainerWindow		Meer kopiëren
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Sorry, u kunt geen zaken opslaan in de root van uw systeem.
 Restore	ContainerWindow		Herstellen
 Location	ContainerWindow		Locatie
-Warning space color	SettingsView		Waarschuwende ruimte-kleur
 Skip	FSUtils		Overslaan
+Warning space color	SettingsView		Waarschuwende ruimte-kleur
 Used space color	SettingsView		Kleur voor gebruikte ruimte
 Cancel	FSUtils		Annuleren
 Original name	ContainerWindow		Oorspronkelijke naam
@@ -236,7 +232,6 @@ You must have at least one attribute showing.	PoseView		Er moet minstens één e
 Cut	FilePanelPriv		Knippen
 Favorites	FilePanelPriv		Favorieten
 home	B_USER_DIRECTORY		home
-Open	InfoWindow		Openen
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Tracker Nieuwe Sjablonen
 Disk mounting during boot	AutoMounterSettings		Schijf wordt betrokken tijdens opstarten
 Don't automount	AutoMounterSettings		Niet automatisch betrekken
@@ -263,7 +258,6 @@ copying	FSUtils		bezig met kopiëren
 Get info	FilePanelPriv		Informatie ophalen
 Execute	FilePermissionsView		Uitvoeren
 Delete	ContainerWindow		Verwijderen
-Edit name	InfoWindow		Naam aanpassen
 Show volumes on Desktop	SettingsView		Toon gegevensdragers op het bureaublad
 Recent folders	ContainerWindow		Recente mappen
 Desktop	Model		Bureaublad
@@ -275,7 +269,6 @@ Delete	FSUtils		Verwijderen
 Edit name	ContainerWindow		Naam wijzigen
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" kon niet geopend worden (Ontbrekend symbool %symbol).\n
 More options	FindPanel		Meer opties
-Identify	InfoWindow		Identificeer
 config	B_USER_CONFIG_DIRECTORY		config
 Error moving \"%name\".	FSUtils		Fout bij verplaatsing van \"%name\".
 Select…	QueryContainerWindow		Selecteren...
@@ -328,7 +321,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 You cannot create a link to the root directory.	FSUtils		U kunt geen link naar de rootmap maken.
 Select all	FilePanelPriv		Selecteer alles
 Other	FilePermissionsView		Andere
-Empty Trash	InfoWindow		Prullenbak leegmaken:
 Automatic disk mounting	AutoMounterSettings		Automatische schijfbetrekking
 parent folder	NavMenu		bovenliggende map
 Create link here	ContainerWindow		Maak hier een koppeling
@@ -346,7 +338,6 @@ Created:	InfoWindow		Gemaakt:
 Single window navigation	SettingsView		Enkel-venster-navigatie
 Edit Query template	FindPanel		Zoekopdracht-sjabloon aanpassen
 Save query as template…	FindPanel		Zoekvraag als sjabloon opslaan...
-Unmount	InfoWindow		Onttrekken
 All disks	AutoMounterSettings		Alle schijven
 link	FSUtils	filename link	koppeling
 Proceed	FSUtils		Verdergaan
@@ -386,7 +377,6 @@ Create relative link here	ContainerWindow		Maak een hier relatieve koppeling
 Copy	FilePanelPriv		Kopiëren
 All Haiku disks	AutoMounterSettings		Alle Haiku-schijven
 Close all	ContainerWindow		Alles sluiten
-Recalculate folder size	InfoWindow		Mapgrootte herberekenen
 Paused: click to resume or stop	StatusWindow		Gepauzeerd: klik om te hervatten of te stoppen
 Name	QueryPoseView		Naam
 Error %error loading add-On %name.	ContainerWindow		Fout %error bij het laden van invoegtoepassing %name.
@@ -431,7 +421,6 @@ Name	FindPanel		Naam
 Cancel	WidgetAttributeText		Annuleren
 Expression too long.	libtracker		Expressie te lang.
 Memory corruption.	libtracker		Geheugencorruptie.
-That name is already taken. Please type another one.	InfoWindow		Deze naam is al in gebruik. Typ altublieft een andere in.
 Copy layout	ContainerWindow		Indeling kopiëren
 Duplicate	ContainerWindow		Dupliceer
 Untitled clipping	PoseView		Naamloze clipping

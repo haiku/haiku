@@ -1,6 +1,8 @@
-1	friulian	x-vnd.Haiku-MediaPlayer	3146194547
+1	friulian	x-vnd.Haiku-MediaPlayer	2493516169
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Sposte element te Scovacere
 Close	MediaPlayer-PlaylistWindow		Siere
+Volume of background clips	MediaPlayer-SettingsWindow		Volum des riproduzions di sotfont
+Use hardware video overlays if available	MediaPlayer-SettingsWindow		Dopre soreposizions video in hardware, se disponibilis
 Audio	MediaPlayer-InfoWin		Audio
 Subtitle placement:	MediaPlayer-SettingsWindow		Plaçament dai sottitui:
 MediaPlayer	System name		MediaPlayer
@@ -10,6 +12,7 @@ OK	MediaPlayer-RemovePLItemsCmd		Va ben
 Open Playlist	MediaPlayer-PlaylistWindow		Vierç liste di riproduzion
 Subtitles	MediaPlayer-Main		Sottitui
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% al è lât incuintri a un erôr interni. Nol è stât pussibil vierzi il file.
+DrawBitmap	MediaPlayer-InfoWin		Dissegnâ Bitmap
 File info	MediaPlayer-InfoWin		Informazions file
 raw audio	MediaPlayer-InfoWin		audio grês
 Select all	MediaPlayer-PlaylistWindow		Selezione dut
@@ -46,10 +49,12 @@ Copyright	MediaPlayer-InfoWin		Copyright
 Invalid URL inserted!	MediaPlayer-NetworkStream		Inserît URL no valit!
 Aspect ratio	MediaPlayer-Main		Proporzions
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Salvament de liste di riproduzion falît.\n\nErôr: 
+<no media>	MediaPlayer-InfoWin		<cence media>
 Hide interface	MediaPlayer-Main		Plate interface
 Error: 	MediaPlayer-Main		Erôr: 
 Video track	MediaPlayer-Main		Linie video
 Playlist…	MediaPlayer-Main		Liste di riproduzion…
+<unnamed media>	MediaPlayer-InfoWin		<media cence non>
 Save	MediaPlayer-PlaylistWindow		Salve
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Rint casuâls lis vôs
 Cancel	MediaPlayer-NetworkStream		Anule
@@ -92,6 +97,7 @@ Stream URL:	MediaPlayer-NetworkStream		URL dal flus:
 Stream settings	MediaPlayer-Main		Impostazions dal flus
 none	Subtitles menu		nissun
 Save Playlist	MediaPlayer-PlaylistWindow		Salve liste di riproduzion
+Overlay	MediaPlayer-InfoWin		Soreposizion
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
 Rating	MediaPlayer-Main		Valutazion
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erôr interni (memorie plene). Salvament de liste di riproduzion falît.
@@ -104,6 +110,7 @@ Automatically start playing	MediaPlayer-SettingsWindow		Comence la riproduzion i
 Undo	MediaPlayer-PlaylistWindow		Disfe
 Display mode	MediaPlayer-InfoWin		Modalitât visualizazion
 Bottom of video	MediaPlayer-SettingsWindow		Part inferiôr dal visôr
+Small	MediaPlayer-SettingsWindow		Piçui
 Settings…	MediaPlayer-Main		Impostazions…
 min	MediaPlayer-InfoWin	Minutes	min
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Salvament de liste di riproduzion falît:\n\nErôr: 
@@ -120,6 +127,7 @@ Internal error (locking failed). Saving the playlist failed.	MediaPlayer-Playlis
 Bad URL	MediaPlayer-NetworkStream		URL sbaliât
 Save	MediaPlayer-Main		Salve
 Close window after playing video	MediaPlayer-SettingsWindow		Siere barcon ae fin de riproduzion video
+Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Scjale i filmâts in mût fluit (modalitât no soreposizion)
 200% scale	MediaPlayer-Main		Scjale 200%
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Il file '%filename' nol pues jessi viert.\n\n
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Nissun dai file che si voleve riprodusi al semee jessi un file multimediâl.
@@ -140,6 +148,7 @@ ask every time	MediaPlayer-SettingsWindow		domande ogni volte
 (not supported)	MediaPlayer-InfoWin		(no supuartât)
 Randomize	MediaPlayer-PlaylistWindow		Casuâl
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
+Off	Subtitles menu		Disativâts
 400% scale	MediaPlayer-Main		Scjale 400%
 h	MediaPlayer-InfoWin	Hours	h
 OK	MediaPlayer-PlaylistWindow		Va ben

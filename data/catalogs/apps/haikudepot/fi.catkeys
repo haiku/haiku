@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	3697446690
+1	finnish	x-vnd.Haiku-HaikuDepot	1251929325
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Tietovaraston päivityksen yhteydessä tapahtui virhe: %error%
 Check for updates…	MainWindow		Tarkista päivitykset…
 Uninstall	PackageManager		Poista asennus
@@ -10,8 +10,8 @@ OK	App		Valmis
 Mostly stable	RatePackageWindow		Äärimmäisen stabiili
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Tilin luominen onnistui. Voit nyt antaa pakkauksille arvosanoja ja tehdä muita hyödyllisiä asioita.
 The response to the captcha was incorrect.	ServerHelper		Captcha-vastaus oli virheellinen.
-Rate package…	PackageInfoView		Anna pakkaukselle arvosana...
 Develop packages	MainWindow		Kehityspaketit
+Rate package…	PackageInfoView		Anna pakkaukselle arvosana...
 Starting the package daemon failed:\n\n%Error%	App		Pakkaustaustaprosessin käynnistyminen epäonnistui:\n\n%Error%
 <no info>	PackageInfoView		<ei tietoja>
 No user ratings available.	PackageInfoView		Käyttäjäarvosanoja ei ole saatavilla.
@@ -22,8 +22,8 @@ Failed to create account	UserLoginWindow		Tilin luominen epäonnistui
 Ignore	UserLoginWindow		Ohita
 Rating	PackageListView		Arvosana
 Synchronizing icons	ServerIconExportUpdateProcess		Synkronoidaan kuvakkeet
-Show	MainWindow		Näytä
 Does not start	RatePackageWindow		Ei käynnisty
+Show	MainWindow		Näytä
 But none could be listed here, sorry.	UserLoginWindow		Tässä ei kyetty luetteloimaan mitään.
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Pakkausluettelon hankkimisessa tapahtui virhe: %message%
 There are problems with the data you entered:\n\n	UserLoginWindow		Syöttämissäsi tiedoissa oli pulmia:\n\n
@@ -38,7 +38,6 @@ Ratings	PackageInfoView		Arvosanat
 Switch account…	MainWindow		Vaihda tiliä...
 Preferred language:	UserLoginWindow		Ensisijainen kieli:
 Server Error	ServerHelper		Palvelinvirhe
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display.  Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Pakkaustietojen päivityksessä ilmeni pulma, joka saattaa aiheuttaa sen, että sovellusnäytöllä näkyvät tiedot ovat vanhentuneita tai ne puuttuvat.  Yksityiskohtaisia lisätietoja tästä pulmasta saattaa löytyä sovelluksen lokitiedostosta.
 It was not possible to contact the web service.	UserLoginWindow		Webbipalveluun ei saatu yhteyttä.
 Name	PackageListView		Nimi
 Local	LocalPkgDataLoadProcess		Paikallinen

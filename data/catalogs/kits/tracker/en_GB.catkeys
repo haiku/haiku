@@ -1,7 +1,6 @@
-1	english (united kingdom)	x-vnd.Haiku-libtracker	3683169520
+1	english (united kingdom)	x-vnd.Haiku-libtracker	2781426079
 Error moving \"%name\" to Trash. (%error)	FSUtils		Error moving \"%name\" to the Rubbish Bin. (%error)
 Error emptying Trash	FSUtils		Error emptying the Rubbish Bin
-OK	InfoWindow		Alright
 OK	OpenWithWindow		Alright
 Include trash	FindPanel		Include rubbish
 Trash	Model		Rubbish
@@ -17,7 +16,6 @@ You can't move or copy the trash.	FSUtils		You can't move or copy Rubbish.
 OK	AutoMounterSettings		Alright
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Some of the selected items cannot be moved to the Rubbish Bin. Would you like to delete them instead? (This operation cannot be reverted.)
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		The selected item cannot be moved to the Rubbish Bin. Would you like to delete it instead? (This operation cannot be reverted.)
-Empty Trash	InfoWindow		Empty Rubbish
 Sorry, you can't copy items to the Trash.	FSClipBoard		Sorry, you can't copy items to the Rubbish Bin.
 Emptying Trash… 	StatusWindow		Emptying Rubbish… 
 trash	B_TRASH_DIRECTORY		rubbish bin

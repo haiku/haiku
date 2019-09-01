@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	2942097057
+1	swedish	x-vnd.Haiku-libtracker	2023640966
 Created	ContainerWindow		Skapad
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
 Open with…	ContainerWindow		Öppna med...
@@ -42,7 +42,6 @@ Size	ContainerWindow		Storlek
 Select…	ContainerWindow		Markera...
 Show shared volumes on Desktop	SettingsView		Visa delade volymer på Skrivbordet
 Size	PoseView		Storlek
-OK	InfoWindow		OK
 matches wildcard expression	SelectionWindow		matchar jokeruttryck
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Titel
@@ -70,7 +69,6 @@ Select	SelectionWindow		Markera
 Select	InfoWindow		Markera
 OK	OpenWithWindow		OK
 Include trash	FindPanel		Inkludera papperskorg
-That name is too long. Please type another one.	InfoWindow		Namnet är för långt. Var god välj ett annat.
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Rada upp
 Modified	FindPanel		Modifierad
@@ -86,7 +84,6 @@ Mount	ContainerWindow		Montera
 Desktop	B_DESKTOP_DIRECTORY		Skrivbord
 Corrupted pointers.	libtracker		Korrupta pekare.
 Link to:	InfoWindow		Länka till:
-Set new link target	InfoWindow		Ange nytt länkmål
 Copy here	ContainerWindow		Kopiera hit
 All disks	FindPanel		Alla diskar
 Window	ContainerWindow		Fönster
@@ -100,14 +97,14 @@ Edit templates…	TemplatesMenu		Redigera mallar...
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used använt -- %free ledigt)
 Hide dotfiles	SettingsView		Dölj . filer
 Trash	Model		Papperskorg
-Enable type-ahead filtering	SettingsView		Markera filer som matchar tangentsekvens
 copy	FSUtils	filename copy	kopia
 New folder%ld	FSUtils		Ny mapp%ld
+Enable type-ahead filtering	SettingsView		Markera filer som matchar tangentsekvens
 Location	OpenWithWindow		Plats
 %Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		Anpassa
-List folders first	SettingsView		Visa mappar först
 Find	FSUtils		Sök
+List folders first	SettingsView		Visa mappar först
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Ett objekt med namnet \"%name\" finns redan i denna katalog. Vill du ersätta det med den symboliska länken du skapar?
 List view	ContainerWindow		Listvy
 Temporary	FindPanel		Tillfällig
@@ -176,15 +173,14 @@ contains	SelectionWindow		innehåller
 is not	FindPanel		är inte
 Icon view	DeskWindow		Ikonvy
 Mount settings…	ContainerWindow		Monteringsinställningar...
-Permissions	InfoWindow		Behörigheter
 Keywords	Bookmark Query Columns		Nyckelord
 by name	FindPanel		genom namn
 Copy more	ContainerWindow		Kopiera fler
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Du kan inte spara i roten på filsystemet.
 Restore	ContainerWindow		Återställ
 Location	ContainerWindow		Plats
-Warning space color	SettingsView		Färg för utrymmesvarning
 Skip	FSUtils		Hoppa över
+Warning space color	SettingsView		Färg för utrymmesvarning
 Used space color	SettingsView		Färg för diskanvändning
 Cancel	FSUtils		Avbryt
 Original name	ContainerWindow		Originalnamn
@@ -237,7 +233,6 @@ You must have at least one attribute showing.	PoseView		Du måste ha minst ett a
 Cut	FilePanelPriv		Klipp ut
 Favorites	FilePanelPriv		Favoriter
 home	B_USER_DIRECTORY		hem
-Open	InfoWindow		Öppna
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Tracker Nya Mallar
 Disk mounting during boot	AutoMounterSettings		Diskmontering under uppstart
 Don't automount	AutoMounterSettings		Automontera inte
@@ -264,7 +259,6 @@ copying	FSUtils		kopierar
 Get info	FilePanelPriv		Få info
 Execute	FilePermissionsView		Kör
 Delete	ContainerWindow		Ta bort
-Edit name	InfoWindow		Redigera namn
 Show volumes on Desktop	SettingsView		Visa volymer på Skrivbordet
 Recent folders	ContainerWindow		Senaste mapparna
 Desktop	Model		Skrivbord
@@ -276,7 +270,6 @@ Delete	FSUtils		Ta bort
 Edit name	ContainerWindow		Ändra namn
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Kunde inte öppna \"%document\" (Saknar symbol: %symbol). \n
 More options	FindPanel		Fler alternativ
-Identify	InfoWindow		Identifiera
 config	B_USER_CONFIG_DIRECTORY		inställningar
 Error moving \"%name\".	FSUtils		Fel vid flytt av \"%name\".
 Select…	QueryContainerWindow		Markera...
@@ -329,7 +322,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 You cannot create a link to the root directory.	FSUtils		Du kan inte skapa en länk till rotkatalogen.
 Select all	FilePanelPriv		Välj allt
 Other	FilePermissionsView		Annan
-Empty Trash	InfoWindow		Töm papperskorg
 Automatic disk mounting	AutoMounterSettings		Montera volymer automatiskt
 parent folder	NavMenu		föräldrakatalog
 Create link here	ContainerWindow		Skapa länk här
@@ -347,7 +339,6 @@ Created:	InfoWindow		Skapad:
 Single window navigation	SettingsView		Enfönsternavigation
 Edit Query template	FindPanel		Redigera sökmall
 Save query as template…	FindPanel		Spara sökning som mall…
-Unmount	InfoWindow		Avmontera
 All disks	AutoMounterSettings		Alla diskar
 link	FSUtils	filename link	länk
 Proceed	FSUtils		Fortsätt
@@ -387,7 +378,6 @@ Create relative link here	ContainerWindow		Skapa relativ länk här
 Copy	FilePanelPriv		Kopiera
 All Haiku disks	AutoMounterSettings		Alla Haikuskivor
 Close all	ContainerWindow		Stäng alla
-Recalculate folder size	InfoWindow		Beräkna katalogstorlek
 Paused: click to resume or stop	StatusWindow		Pausad: Klicka för att fortsätta eller stanna
 Name	QueryPoseView		Namn
 Error %error loading add-On %name.	ContainerWindow		Fel %error vid laddning av Tillägg %name.
@@ -432,7 +422,6 @@ Name	FindPanel		Namn
 Cancel	WidgetAttributeText		Avbryt
 Expression too long.	libtracker		Uttryck för långt.
 Memory corruption.	libtracker		Minneskorruption.
-That name is already taken. Please type another one.	InfoWindow		Namnet är redan upptaget. Var god välj ett annat.
 Copy layout	ContainerWindow		Kopiera layout
 Duplicate	ContainerWindow		Duplicera
 Untitled clipping	PoseView		Namnlöst urklipp

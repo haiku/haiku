@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	2942097057
+1	finnish	x-vnd.Haiku-libtracker	2023640966
 Created	ContainerWindow		Luotu
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
 Open with…	ContainerWindow		Avaa sovelluksella...
@@ -42,7 +42,6 @@ Size	ContainerWindow		Koko
 Select…	ContainerWindow		Valitse...
 Show shared volumes on Desktop	SettingsView		Näytä jaetut taltiot työpöydällä
 Size	PoseView		Koko
-OK	InfoWindow		Valmis
 matches wildcard expression	SelectionWindow		täsmää jokerimerkkilausekkeeseen
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Otsikko
@@ -70,7 +69,6 @@ Select	SelectionWindow		Valitse
 Select	InfoWindow		Valitse
 OK	OpenWithWindow		Valmis
 Include trash	FindPanel		Sisällytä roskakori
-That name is too long. Please type another one.	InfoWindow		Tuo nimi on liian pitkä. Kirjoita joku toinen nimi.
 GiB	WidgetAttributeText		gibitavua
 Clean up	ContainerWindow		Tyhjennä
 Modified	FindPanel		Muokattu
@@ -86,7 +84,6 @@ Mount	ContainerWindow		Liitä
 Desktop	B_DESKTOP_DIRECTORY		Työpöytä
 Corrupted pointers.	libtracker		Osoittimet vaurioituneet.
 Link to:	InfoWindow		Linkitä kohteeseen:
-Set new link target	InfoWindow		Aseta uusi linkityskohde
 Copy here	ContainerWindow		Kopioi tänne
 All disks	FindPanel		Kaikki levyt
 Window	ContainerWindow		Ikkuna
@@ -100,14 +97,14 @@ Edit templates…	TemplatesMenu		Muokkaa mallinteita...
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used käytetty -- %free vapaana)
 Hide dotfiles	SettingsView		Piilota pistetiedostot
 Trash	Model		Roskakori
-Enable type-ahead filtering	SettingsView		Ota pois käytöstä kirjoituspuskurisuodatus
 copy	FSUtils	filename copy	kopioi
 New folder%ld	FSUtils		Uusi kansio%ld
+Enable type-ahead filtering	SettingsView		Ota pois käytöstä kirjoituspuskurisuodatus
 Location	OpenWithWindow		Sijainti
 %Ld B	WidgetAttributeText		%Ld tavua
 Resize to fit	QueryContainerWindow		Sovita koko
-List folders first	SettingsView		Luettele kansiot ensin
 Find	FSUtils		Etsi
+List folders first	SettingsView		Luettele kansiot ensin
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Kohde nimeltä ”%name” on jo olemassa tässä kansiossa. Haluaisitko korvata sen symbolisella linkillä, jota olet luomassa?
 List view	ContainerWindow		Luettelonäkymä
 Temporary	FindPanel		Tilapäinen
@@ -176,15 +173,14 @@ contains	SelectionWindow		sisältää
 is not	FindPanel		ei ole
 Icon view	DeskWindow		Kuvakenäkymä
 Mount settings…	ContainerWindow		Liittämisasetukset...
-Permissions	InfoWindow		Käyttöoikeudet
 Keywords	Bookmark Query Columns		Avainsanat
 by name	FindPanel		nimittäin
 Copy more	ContainerWindow		Kopioi lisää
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Et voi tallentaa asioita järjestelmäsi root-kansioon.
 Restore	ContainerWindow		Palauta
 Location	ContainerWindow		Sijainti
-Warning space color	SettingsView		Varoitustilaväri
 Skip	FSUtils		Ohita
+Warning space color	SettingsView		Varoitustilaväri
 Used space color	SettingsView		Käytetyn tilan väri
 Cancel	FSUtils		Peru
 Original name	ContainerWindow		Alkuperäinen nimi
@@ -237,7 +233,6 @@ You must have at least one attribute showing.	PoseView		Sinulla on oltava vähin
 Cut	FilePanelPriv		Leikkaa
 Favorites	FilePanelPriv		Suosikit
 home	B_USER_DIRECTORY		koti
-Open	InfoWindow		Avaa
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Seuraajan uudet mallinteet
 Disk mounting during boot	AutoMounterSettings		Levyn liittäminen käynnistyksen aikana
 Don't automount	AutoMounterSettings		Älä liitä automaattisesti
@@ -264,7 +259,6 @@ copying	FSUtils		kopioidaan
 Get info	FilePanelPriv		Hae tiedot
 Execute	FilePermissionsView		Suorita
 Delete	ContainerWindow		Poista
-Edit name	InfoWindow		Muokkaa nimeä
 Show volumes on Desktop	SettingsView		Näytä taltiot työpöydällä
 Recent folders	ContainerWindow		Äskettäiset kansiot
 Desktop	Model		Työpöytä
@@ -276,7 +270,6 @@ Delete	FSUtils		Poista
 Edit name	ContainerWindow		Muokkaa nimeä
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Asiakirjan ”%document” avaus epäonnistui (Symboli puuttuu: %symbol).\n
 More options	FindPanel		Lisää valitsimia
-Identify	InfoWindow		Tunnista
 config	B_USER_CONFIG_DIRECTORY		asetukset
 Error moving \"%name\".	FSUtils		Virhe siirrettäessä kohdetta ”%name”.
 Select…	QueryContainerWindow		Valitse...
@@ -329,7 +322,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 You cannot create a link to the root directory.	FSUtils		Et voi luoda linkkiä juurihakemistoon.
 Select all	FilePanelPriv		Valitse kaikki
 Other	FilePermissionsView		Muu
-Empty Trash	InfoWindow		Tyhjennä roskakori
 Automatic disk mounting	AutoMounterSettings		Automaattinen levyliittäminen
 parent folder	NavMenu		ylemmän tason kansio
 Create link here	ContainerWindow		Luo linkki tähän
@@ -347,7 +339,6 @@ Created:	InfoWindow		Luotu:
 Single window navigation	SettingsView		Yksittäisikkunanavigointi
 Edit Query template	FindPanel		Muokkaa kyselymallinnetta
 Save query as template…	FindPanel		Tallenna kysely mallinteena...
-Unmount	InfoWindow		Irrota
 All disks	AutoMounterSettings		Kaikki levyt
 link	FSUtils	filename link	linkki
 Proceed	FSUtils		Jatketaan
@@ -387,7 +378,6 @@ Create relative link here	ContainerWindow		Luo suhteellinen linkki tähän
 Copy	FilePanelPriv		Kopioi
 All Haiku disks	AutoMounterSettings		Kaikki Haiku-levyasemat
 Close all	ContainerWindow		Sulje kaikki
-Recalculate folder size	InfoWindow		Laske kansion koko uudelleen
 Paused: click to resume or stop	StatusWindow		Keskeytetty: napsauta painiketta resume tai stop
 Name	QueryPoseView		Nimi
 Error %error loading add-On %name.	ContainerWindow		Virhe %error ladattaessa lisäosaa %name.
@@ -432,7 +422,6 @@ Name	FindPanel		Nimi
 Cancel	WidgetAttributeText		Peru
 Expression too long.	libtracker		Lauseke on liian pitkä.
 Memory corruption.	libtracker		Muisti vaurioitunut.
-That name is already taken. Please type another one.	InfoWindow		Tuo nimi on jo varattu. Kirjoita toinen nimi.
 Copy layout	ContainerWindow		Kopioi sijoittelu
 Duplicate	ContainerWindow		Kaksoiskappale
 Untitled clipping	PoseView		Otsikoton leikkaus

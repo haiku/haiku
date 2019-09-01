@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	4112773339
+1	russian	x-vnd.Haiku-libtracker	3194317248
 Created	ContainerWindow		Создан
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
 Open with…	ContainerWindow		Открыть в…
@@ -41,7 +41,6 @@ Size	ContainerWindow		Размер
 Select…	ContainerWindow		Выделить…
 Show shared volumes on Desktop	SettingsView		Показывать значки общих дисков
 Size	PoseView		Размер
-OK	InfoWindow		ОК
 matches wildcard expression	SelectionWindow		совпадает с шаблонным выражением
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Заголовок
@@ -68,7 +67,6 @@ Select	SelectionWindow		Выделить
 Select	InfoWindow		Выделить
 OK	OpenWithWindow		ОК
 Include trash	FindPanel		Включая корзину
-That name is too long. Please type another one.	InfoWindow		Это имя слишком длинное. Пожалуйста, введите другое имя.
 GiB	WidgetAttributeText		ГБ
 Clean up	ContainerWindow		Выстроить
 Modified	FindPanel		Изменён
@@ -84,7 +82,6 @@ Mount	ContainerWindow		Подключить
 Desktop	B_DESKTOP_DIRECTORY		Рабочий стол
 Corrupted pointers.	libtracker		Поврежденные указатели.
 Link to:	InfoWindow		Ссылка на:
-Set new link target	InfoWindow		Изменить цель ссылки
 Copy here	ContainerWindow		Копировать сюда
 All disks	FindPanel		всех дисках
 Window	ContainerWindow		Окно
@@ -98,14 +95,14 @@ Edit templates…	TemplatesMenu		Изменить шаблоны…
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used занято -- %free свободно)
 Hide dotfiles	SettingsView		Скрывать файлы, начинающиеся с точки
 Trash	Model		Корзина
-Enable type-ahead filtering	SettingsView		Включить фильтрацию файлов при наборе
 copy	FSUtils	filename copy	копия
 New folder%ld	FSUtils		Новая папка%ld
+Enable type-ahead filtering	SettingsView		Включить фильтрацию файлов при наборе
 Location	OpenWithWindow		Путь
 %Ld B	WidgetAttributeText		%Ld байт
 Resize to fit	QueryContainerWindow		Подогнать размер окна
-List folders first	SettingsView		Отображать папки в начале списка
 Find	FSUtils		Найти
+List folders first	SettingsView		Отображать папки в начале списка
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Объект с именем \"%name\" уже существует в этой папке. Заменить его ссылкой, которую вы создаёте?
 List view	ContainerWindow		Список
 Temporary	FindPanel		Временный запрос
@@ -173,15 +170,14 @@ contains	SelectionWindow		содержит
 is not	FindPanel		не равен
 Icon view	DeskWindow		Большие значки
 Mount settings…	ContainerWindow		Настройка подключения дисков…
-Permissions	InfoWindow		Права
 Keywords	Bookmark Query Columns		Ключевые слова
 by name	FindPanel		по имени
 Copy more	ContainerWindow		Копировать ещё
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Извините, сохранение объектов в корневой папке системы невозможно.
 Restore	ContainerWindow		Восстановить
 Location	ContainerWindow		Путь
-Warning space color	SettingsView		Цвет предупреждения о нехватке места
 Skip	FSUtils		Пропустить
+Warning space color	SettingsView		Цвет предупреждения о нехватке места
 Used space color	SettingsView		Цвет использованного места
 Cancel	FSUtils		Отмена
 Original name	ContainerWindow		Оригинальное имя
@@ -234,7 +230,6 @@ You must have at least one attribute showing.	PoseView		Вы должны ост
 Cut	FilePanelPriv		Вырезать
 Favorites	FilePanelPriv		Закладки
 home	B_USER_DIRECTORY		Домашняя
-Open	InfoWindow		Открыть
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Шаблоны
 Disk mounting during boot	AutoMounterSettings		Подключение дисков при загрузке
 Don't automount	AutoMounterSettings		Не подключать автоматически
@@ -261,7 +256,6 @@ copying	FSUtils		копируемый
 Get info	FilePanelPriv		Информация
 Execute	FilePermissionsView		Исполнение
 Delete	ContainerWindow		Удалить
-Edit name	InfoWindow		Переименовать
 Show volumes on Desktop	SettingsView		Показывать значки разделов
 Recent folders	ContainerWindow		Недавнюю папку
 Desktop	Model		Рабочий стол
@@ -273,7 +267,6 @@ Delete	FSUtils		Удалить
 Edit name	ContainerWindow		Переименовать
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Невозможно открыть \"%document\" (Отсутствует символ: %symbol). \n
 More options	FindPanel		Больше опций
-Identify	InfoWindow		Опознать
 config	B_USER_CONFIG_DIRECTORY		Конфигурация
 Error moving \"%name\".	FSUtils		Ошибка при перемещении \"%name\".
 Select…	QueryContainerWindow		Выделить…
@@ -324,7 +317,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 You cannot create a link to the root directory.	FSUtils		Невозможно создать ссылку на корневую папку.
 Select all	FilePanelPriv		Выделить все
 Other	FilePermissionsView		Другие
-Empty Trash	InfoWindow		Очистить корзину
 Automatic disk mounting	AutoMounterSettings		Автоматическое подключение
 parent folder	NavMenu		родительский каталог
 Create link here	ContainerWindow		Создать ссылку здесь
@@ -342,7 +334,6 @@ Created:	InfoWindow		Создан:
 Single window navigation	SettingsView		Открывать папки в одном окне
 Edit Query template	FindPanel		Изменить шаблон запроса
 Save query as template…	FindPanel		Сохранить запрос как шаблон…
-Unmount	InfoWindow		Отключить
 All disks	AutoMounterSettings		Все диски
 link	FSUtils	filename link	ссылка
 Proceed	FSUtils		Исправить
@@ -381,7 +372,6 @@ Create relative link here	ContainerWindow		Создать относительн
 Copy	FilePanelPriv		Копировать
 All Haiku disks	AutoMounterSettings		Все диски Haiku
 Close all	ContainerWindow		Закрыть все
-Recalculate folder size	InfoWindow		Пересчитать размер папки
 Paused: click to resume or stop	StatusWindow		Пауза: нажмите повторно для продолжения
 Name	QueryPoseView		Имя
 Error %error loading add-On %name.	ContainerWindow		Ошибка %error при запуске дополнения %name.
@@ -425,7 +415,6 @@ Name	FindPanel		Имя
 Cancel	WidgetAttributeText		Отмена
 Expression too long.	libtracker		Выражение слишком длинное.
 Memory corruption.	libtracker		Повреждение памяти.
-That name is already taken. Please type another one.	InfoWindow		Это имя уже занято. Пожалуйста, введите другое.
 Copy layout	ContainerWindow		Копировать вид папки
 Duplicate	ContainerWindow		Дублировать
 Untitled clipping	PoseView		Безымянная выборка

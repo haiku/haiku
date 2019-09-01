@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Time	3755504714
+1	german	x-vnd.Haiku-Time	752043118
 OK	Time		OK
 Message receiving failed	Time		Nachricht wurde nicht erhalten
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Datum & Zeit\n\nvon\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
@@ -7,7 +7,6 @@ America	Time		Amerika
 Reset to default server list	Time		Serverliste zurücksetzen
 Could not resolve server address	Time		Serveraddresse konnte nicht aufgelöst werden
 Set time zone	Time		Zeitzone setzen
-The following error occured while synchronizing:r\n%s: %s	Time		Beim Synchronisieren trat folgender Fehler auf:r\n%s: %s
 Waiting for answer failed	Time		Warten auf Antwort fehlgeschlagen
 <Other>	Time		<Andere>
 Received invalid time	Time		Ungültige Zeit erhalten
@@ -17,7 +16,6 @@ Asia	Time		Asien
 Try all servers	Time		Alle Server abfragen
 Time	Time		Time - Datum & Zeit
 Current time:	Time		Aktuelle Zeit:
-The following error occured while synchronizing:r\n%s	Time		Beim Synchronisieren trat folgender Fehler auf:r\n%s
 Europe	Time		Europa
 Show day of week	Time		Wochentag anzeigen
 Local time (Windows compatible)	Time		Lokalzeit (Windows-kompatibel)

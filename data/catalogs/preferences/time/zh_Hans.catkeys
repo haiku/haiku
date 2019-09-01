@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Time	3566599171
+1	english	x-vnd.Haiku-Time	563137575
 OK	Time		确定
 Message receiving failed	Time		消息接收失败
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		时间日期，编写者：\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\n版权所有 2004-2012, Haiku.
@@ -6,7 +6,6 @@ Australia	Time		澳大利亚
 America	Time		美洲
 Reset to default server list	Time		重置为默认服务器列表
 Set time zone	Time		设置时区
-The following error occured while synchronizing:r\n%s: %s	Time		同步时间时发生如下错误：r\n%s：%s
 Waiting for answer failed	Time		等待回复失败
 <Other>	Time		<其他>
 Received invalid time	Time		接收时间无效
@@ -16,7 +15,6 @@ Asia	Time		亚洲
 Try all servers	Time		尝试所有服务器
 Time	Time		时间
 Current time:	Time		当前时间：
-The following error occured while synchronizing:r\n%s	Time		时间同步时发生如下错误：r\n%s
 Europe	Time		欧洲
 Show day of week	Time		显示星期
 Local time (Windows compatible)	Time		本地时间（Windows 兼容）

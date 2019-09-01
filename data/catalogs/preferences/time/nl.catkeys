@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Time	3755504714
+1	dutch; flemish	x-vnd.Haiku-Time	752043118
 OK	Time		Oké
 Message receiving failed	Time		Ontvangen van het bericht mislukt
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date, geschreven door:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nAlle rechten voorbehouden, 2004-2012, Haiku.
@@ -7,7 +7,6 @@ America	Time		Amerika
 Reset to default server list	Time		Herstel standaard-serverlijst
 Could not resolve server address	Time		Het serveradres opzoeken is mislukt
 Set time zone	Time		Tijdzone instellen
-The following error occured while synchronizing:r\n%s: %s	Time		De volgende fout deed zich voor tijdens het synchroniseren:r\n%s: %s
 Waiting for answer failed	Time		Wachten op antwoord mislukt
 <Other>	Time		<Anders>
 Received invalid time	Time		Ongeldige tijd ontvangen
@@ -17,7 +16,6 @@ Asia	Time		Azië
 Try all servers	Time		Alle servers proberen
 Time	Time		Tijd
 Current time:	Time		Huidige tijd:
-The following error occured while synchronizing:r\n%s	Time		De volgende fout deed zich voor tijdens het synchroniseren:r\n%s
 Europe	Time		Europa
 Show day of week	Time		Dag van de week tonen
 Local time (Windows compatible)	Time		Lokale tijd (Windowscompatibel)

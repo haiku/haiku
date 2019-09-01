@@ -1,10 +1,9 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Time	1277298809
+1	greek, modern (1453-)	x-vnd.Haiku-Time	2568804509
 OK	Time		Εντάξει
 Message receiving failed	Time		Η λήψη μηνυμάτων απέτυχε
 Australia	Time		Αυστραλία
 America	Time		Αμερική
 Set time zone	Time		Ορισμός ζώνης ώρας
-The following error occured while synchronizing:r\n%s: %s	Time		Το παρακάτω σφάλμα προέκυψε κατά τον συγχρονισμό::r\n%s: %s
 Waiting for answer failed	Time		Η αναμονή για απάντηση απέτυχε
 <Other>	Time		<Άλλο>
 Received invalid time	Time		Ελήφθη λανθασμένη ώρα
@@ -14,7 +13,6 @@ Asia	Time		Ασία
 Try all servers	Time		Δοκιμή όλων των εξυπηρετητών
 Time	Time		Ώρα
 Current time:	Time		Τρέχουσα ώρα:
-The following error occured while synchronizing:r\n%s	Time		Το παρακάτω σφάλμα προέκυψε κατά τον συγχρονισμό:r\n%s
 Europe	Time		Ευρώπη
 Local time (Windows compatible)	Time		Τοπική ώρα (συμβατή με τα Windows)
 Hardware clock set to:	Time		Το ρολόι υλικού μέρους ορίστηκε στο:

@@ -1,14 +1,13 @@
-1	japanese	x-vnd.Haiku-NewMailNotification	73789504
-You have {0, plural, one{One new message} other{# new messages}} for %account.	NotifierFilter		%account に {0, plural, one{1 件の新着メッセージ} other{# 件の新着メッセージ}} があります。
-none	NotifierConfigView		無し
-Method:	NotifierConfigView		方法:
-Beep	NotifierConfigView		ビープ音
-{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{1 件の新着メッセージ} other{# 件の新着メッセージ}}
-New mails notification	NotifierFilter		新着メール通知
-Central alert	NotifierConfigView		警告ウィンドウ (すべてのアカウント)
-OK	NotifierFilter		OK
-New messages	NotifierFilter		新着メッセージ
+1	japanese	x-vnd.Haiku-NewMailNotification	2111731137
 Log window	NotifierConfigView		ログウィンドウ
-Keyboard LEDs	NotifierConfigView		キーボードLED
-Central beep	NotifierConfigView		ビープ音 (すべてのアカウント)
+none	NotifierConfigView		無し
+New mails notification	NotifierFilter		新着メール通知
 Alert	NotifierConfigView		警告ウィンドウ
+OK	NotifierFilter		OK
+Central alert	NotifierConfigView		警告ウィンドウ (すべてのアカウント)
+Beep	NotifierConfigView		ビープ音
+Central beep	NotifierConfigView		ビープ音 (すべてのアカウント)
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{1 件の新着メッセージ} other{# 件の新着メッセージ}}
+New messages	NotifierFilter		新着メッセージ
+Method:	NotifierConfigView		方法:
+Keyboard LEDs	NotifierConfigView		キーボードLED

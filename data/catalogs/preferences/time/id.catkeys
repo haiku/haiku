@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Time	3755504714
+1	indonesian	x-vnd.Haiku-Time	752043118
 OK	Time		OKE
 Message receiving failed	Time		Penerimaan pesan gagal
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Jam dan tanggal, ditulis oleh:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nHak cipta 2004-2012, Haiku.
@@ -7,7 +7,6 @@ America	Time		Amerika
 Reset to default server list	Time		Reset ke daftar server bawaan
 Could not resolve server address	Time		Tidak dapat menemukan alamat server
 Set time zone	Time		Set zona waktu
-The following error occured while synchronizing:r\n%s: %s	Time		Pesan kesalahan berikut muncul ketika singkronisasi:r\n%s: %s
 Waiting for answer failed	Time		Gagal menunggu jawaban
 <Other>	Time		<Other>
 Received invalid time	Time		Menerima jam yang salah
@@ -17,7 +16,6 @@ Asia	Time		Asia
 Try all servers	Time		Coba semua server
 Time	Time		Jam
 Current time:	Time		Waktu saat ini:
-The following error occured while synchronizing:r\n%s	Time		Kesalahan berikut muncul ketika proses singkronisasi:r\n%s
 Europe	Time		Eropa
 Show day of week	Time		Tampilkan nama hari dalam sepekan
 Local time (Windows compatible)	Time		Waktu lokal (kompatibel windows)

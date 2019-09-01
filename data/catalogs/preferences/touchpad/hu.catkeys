@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Touchpad	607725922
+1	hungarian	x-vnd.Haiku-Touchpad	526581388
 Scrolling	TouchpadPrefView		Görgetés
 Tapping	TouchpadPrefView		Érintőtábla használata
 Touchpad	System name		Érintőtábla
@@ -7,6 +7,7 @@ OK	TouchpadPrefView		Rendben
 Horizontal scrolling	TouchpadPrefView		Vízszintes görgetés
 Slow	TouchpadPrefView		Lassú
 Two finger scrolling	TouchpadPrefView		Kétujjas görgetés
+No touchpad found, the settings will have no effect.	TouchpadPrefView		Nem találtam tapipadot, a beállításoknak nincs hatása.
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Az új görgetési terület túl nagy és hátráltathatja az egér használatában. Biztos meg szeretné változtatni?
 Defaults	TouchpadPrefView		Eredeti
 High	TouchpadPrefView		Magas

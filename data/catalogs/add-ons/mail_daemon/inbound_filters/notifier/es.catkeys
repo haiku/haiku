@@ -1,14 +1,13 @@
-1	spanish; castilian	x-vnd.Haiku-NewMailNotification	73789504
-You have {0, plural, one{One new message} other{# new messages}} for %account.	NotifierFilter		Usted tiene {0, plural, one{un mensaje nuevo} other{# mensajes nuevos}} para %account.
-none	NotifierConfigView		ninguno
-Method:	NotifierConfigView		Método:
-Beep	NotifierConfigView		Pitido
-{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{One new message} other{# new messages}}
-New mails notification	NotifierFilter		Nuevas notificaciones de correo
-Central alert	NotifierConfigView		Alerta central 
-OK	NotifierFilter		Aceptar
-New messages	NotifierFilter		Mensajes nuevos
+1	spanish; castilian	x-vnd.Haiku-NewMailNotification	2111731137
 Log window	NotifierConfigView		Ventana de registro
-Keyboard LEDs	NotifierConfigView		Luces LED de teclado
-Central beep	NotifierConfigView		Beep central
+none	NotifierConfigView		ninguno
+New mails notification	NotifierFilter		Nuevas notificaciones de correo
 Alert	NotifierConfigView		Alerta
+OK	NotifierFilter		Aceptar
+Central alert	NotifierConfigView		Alerta central 
+Beep	NotifierConfigView		Pitido
+Central beep	NotifierConfigView		Beep central
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{One new message} other{# new messages}}
+New messages	NotifierFilter		Mensajes nuevos
+Method:	NotifierConfigView		Método:
+Keyboard LEDs	NotifierConfigView		Luces LED de teclado

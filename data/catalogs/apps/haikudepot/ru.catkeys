@@ -1,4 +1,5 @@
-1	russian	x-vnd.Haiku-HaikuDepot	2096938922
+1	russian	x-vnd.Haiku-HaikuDepot	120160942
+An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Произошла ошибка при обновлении репозитория: %error%
 Check for updates…	MainWindow		Проверить обновления…
 Uninstall	PackageManager		Удалить
 (%Votes%)	FeaturedPackagesView		(%Votes%)
@@ -8,8 +9,8 @@ Create account	UserLoginWindow		Создать учётную запись
 OK	App		OK
 Mostly stable	RatePackageWindow		В основном стабилен
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Аккаунт был успешно создан. Теперь вы можете оценивать пакеты и делать другие полезные вещи.
-Rate package…	PackageInfoView		Оценить пакет…
 Develop packages	MainWindow		Пакеты для разработчиков
+Rate package…	PackageInfoView		Оценить пакет…
 Starting the package daemon failed:\n\n%Error%	App		Не удалось запустить пакетный демон:\n\n%Error%
 <no info>	PackageInfoView		<нет информации>
 No user ratings available.	PackageInfoView		Рейтинг пользователей недоступен.
@@ -18,8 +19,8 @@ Downloading package '%name%'	WorkStatusView		Загрузка пакета '%nam
 Failed to create account	UserLoginWindow		Не удалось создать учётную запись
 Ignore	UserLoginWindow		Игнорировать
 Rating	PackageListView		Оценка
-Show	MainWindow		Показывать
 Does not start	RatePackageWindow		Не запускается
+Show	MainWindow		Показывать
 But none could be listed here, sorry.	UserLoginWindow		Но не удалось определить с какими именно, извините.
 There are problems with the data you entered:\n\n	UserLoginWindow		Проблемы с данными, которые вы ввели:\n\n
 The authentication was successful.	UserLoginWindow		Авторизация прошла успешно.
@@ -32,9 +33,9 @@ Login or Create account	MainWindow		Войти или создать учетн�
 Ratings	PackageInfoView		Оценки
 Switch account…	MainWindow		Сменить аккаунт…
 Preferred language:	UserLoginWindow		Предпочитаемый язык:
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display.  Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Возникла ошибка при обновлении сведений о пакете. Из-за этого некоторые сведения могут отсутствовать или быть устаревшими. Дополнительная информация об этой проблеме может быть получена из логов приложения.
 It was not possible to contact the web service.	UserLoginWindow		Не удалось связаться с веб сервером.
 Name	PackageListView		Имя
+Local	LocalPkgDataLoadProcess		Локальный
 Rate %Package%	RatePackageWindow		Оценить %Package%
 Quit HaikuDepot	App		Закрыть HaikuDepot
 Category	FilterView		Все категории
@@ -136,6 +137,7 @@ Install	PackageManager		Установить
 Input validation	UserLoginWindow		Проверка ввода
 Log in…	MainWindow		Войти…
 You need to be logged into an account before you can rate packages.	MainWindow		Вы должны войти в свою учётную запись перед тем как оценить пакет.
+Client version too old	ServerHelper		Слишком старая версия клиента
 9999.99 KiB	PackageListView		9999.99 KiB
 All repositories	MainWindow		Все репозитории
 %Version%	PackageInfoView		%Version%

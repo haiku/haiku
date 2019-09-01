@@ -17,8 +17,8 @@ Input	MultiAudio		Вход
 Output treble	MultiAudio		Выход высоких
 Mono mix	MultiAudio		Моно микширование
 General	MultiAudio		Общие
-Input & Output	MultiAudio		Вход и Выход
-Enhanced Setup	MultiAudio		Расщиренные настройки
+Input & Output	MultiAudio		Вход и выход
+Enhanced Setup	MultiAudio		Расширенные настройки
 Stereo mix	MultiAudio		Стерео микширование
 Output 3D depth	MultiAudio		Выход 3D глубины
 Volume	MultiAudio		Громкость

@@ -26,7 +26,7 @@ Sorry, unable to load the image.	ImageView		К сожалению, не удал
 File	ImageWindow		Файл
 Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Выбранный документ: %1\n\nИспользованный транслятор:\nИмя: %2\nСведения: %3\nВерсия: %4\n
 Quit	ImageWindow		Выйти
-Sorry, unable to write the image file.	ImageView		К сожалению, не удалось записать изображения файл.
+Sorry, unable to write the image file.	ImageView		К сожалению, не удалось записать файл изображения.
 Save…	ImageWindow		Сохранить…
 Window	ImageWindow		Окно
 First Page	ImageWindow		Первая страница

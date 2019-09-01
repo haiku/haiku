@@ -1,11 +1,10 @@
-1	catalan; valencian	x-vnd.Haiku-Time	2676925183
+1	catalan; valencian	x-vnd.Haiku-Time	3968430883
 OK	Time		D'acord
 Message receiving failed	Time		No ha estat possible rebre el missatge
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Di i Hora, escrit per:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Australia	Time		Austràlia
 America	Time		Amèrica
 Set time zone	Time		Tria el fus horari
-The following error occured while synchronizing:r\n%s: %s	Time		S'ha produït aquest error en sincronitzar:r\n%s: %s
 Waiting for answer failed	Time		No ha estat possible esperar la resposta
 <Other>	Time		<Altre>
 Received invalid time	Time		S'ha rebut una hora no vàlida
@@ -15,7 +14,6 @@ Asia	Time		Àsia
 Try all servers	Time		Prova tots els servidors
 Time	Time		Hora
 Current time:	Time		Hora actual:
-The following error occured while synchronizing:r\n%s	Time		S'ha produït aquest error en sincronitzar:r\n%s
 Europe	Time		Europa
 Show day of week	Time		Mostra el dia de la setmana
 Local time (Windows compatible)	Time		Hora local (compatible amb el Windows)

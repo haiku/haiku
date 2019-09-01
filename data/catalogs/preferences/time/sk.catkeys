@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Time	3755504714
+1	slovak	x-vnd.Haiku-Time	752043118
 OK	Time		OK
 Message receiving failed	Time		Prijatie správy zlyhalo
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Čas a dátum, napísali:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
@@ -7,7 +7,6 @@ America	Time		Amerika
 Reset to default server list	Time		Obnoviť predvolený zoznam serverov
 Could not resolve server address	Time		Nepodarilo sa preložiť adresu servera
 Set time zone	Time		Nastaviť časové pásmo
-The following error occured while synchronizing:r\n%s: %s	Time		Počas synchronizácie sa vyskytla nasledovná chyba:r\n%s: %s
 Waiting for answer failed	Time		Čakanie na odpoveď zlyhalo
 <Other>	Time		<Iné>
 Received invalid time	Time		Prijatý neplatný čas
@@ -17,7 +16,6 @@ Asia	Time		Ázia
 Try all servers	Time		Skúsiť všetky servery
 Time	Time		Čas
 Current time:	Time		Aktuálny čas:
-The following error occured while synchronizing:r\n%s	Time		Počas synchronizácie sa vyskytla nasledovná chyba:r\n%s
 Europe	Time		Európa
 Show day of week	Time		Zobraziť deň v týždni
 Local time (Windows compatible)	Time		Miestny čas (kompatibilné s Windows)

@@ -71,7 +71,7 @@ Args only	Application Type Window		Dome argoments
 Could not open \"%s\":\n%s	FileTypes		Impussibil vierzi \"%s\":\n%s
 Right	Attribute Window	Attribute column alignment in Tracker	Diestre
 Save changes before closing?	Application Type Window		Salvâ modifichis prime di sierâ?
-Background app	Application Type Window		Aplicazion eseguide in fonts
+Background app	Application Type Window		Aplicazion in sotfont
 Recognition rule is not valid:\n\n	FileTypes Window		Regule pal ricognossiment no valide:\n\n
 Show icons in list	FileTypes Window		Mostre lis iconis te liste
 Editable	Attribute Window	If Tracker allows to edit this attribute.	Modificabil

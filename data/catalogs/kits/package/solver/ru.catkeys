@@ -1,8 +1,9 @@
-1	russian	x-vnd.Haiku-libsolvsolver	3644444718
+1	russian	x-vnd.Haiku-libsolvsolver	1617515826
 allow architecture change of %source% to %target%	SolverProblemSolution		разрешить изменение архитектуры пакета с %source% на %target%
 install %source% from excluded repository	SolverProblemSolution		установить пакет %source% из исключённого репозитория
 unspecified problem	SolverProblem		неопределенная проблема
 package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		пакету %source%, требуется %dependency%, но ни один из его поставщиков не может быть установлен
+package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		пакет %source% имеет устаревшую зависимость %dependency% предоставленную пакетом %target%
 nothing provides requested %dependency%	SolverProblem		Ничего не предоставляет требуемый %dependency%
 do not keep %source% installed	SolverProblemSolution		не оставлять %source% установленным
 do not deinstall \"%selection%\"	SolverProblemSolution		не удалять \"%selection%\"

@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libtracker	2942097057
+1	indonesian	x-vnd.Haiku-libtracker	2023640966
 Created	ContainerWindow		Dibuat
 Open and make preferred	OpenWithWindow		Buka dan buat sebagai yang disukai
 Open with…	ContainerWindow		Buka dengan…
@@ -42,7 +42,6 @@ Size	ContainerWindow		Ukuran
 Select…	ContainerWindow		Pilih...
 Show shared volumes on Desktop	SettingsView		Tampilkan volume berbagi pada Desktop
 Size	PoseView		Ukuran
-OK	InfoWindow		OKE
 matches wildcard expression	SelectionWindow		sesuai dengan ungkapan wildcard
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Judul
@@ -70,7 +69,6 @@ Select	SelectionWindow		Memilih
 Select	InfoWindow		Memilih
 OK	OpenWithWindow		OKE
 Include trash	FindPanel		Termasuk sampah
-That name is too long. Please type another one.	InfoWindow		Nama itu terlalu panjang. Silakan ketik yang lain.
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Pembersihan
 Modified	FindPanel		Diubah
@@ -86,7 +84,6 @@ Mount	ContainerWindow		Memasang
 Desktop	B_DESKTOP_DIRECTORY		Desktop
 Corrupted pointers.	libtracker		Pointer rusak.
 Link to:	InfoWindow		Hubungkan ke:
-Set new link target	InfoWindow		Tetapkan target tautan baru
 Copy here	ContainerWindow		Salin ke sini
 All disks	FindPanel		Semua disk
 Window	ContainerWindow		Jendela
@@ -100,14 +97,14 @@ Edit templates…	TemplatesMenu		Sunting template…
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used terpakai -- %free bebas)
 Hide dotfiles	SettingsView		Sembunyikan berkas awalan titik
 Trash	Model		Sampah
-Enable type-ahead filtering	SettingsView		Aktifkan penyaringan ketik-didepan
 copy	FSUtils	filename copy	salin
 New folder%ld	FSUtils		Folder baru%ld
+Enable type-ahead filtering	SettingsView		Aktifkan penyaringan ketik-didepan
 Location	OpenWithWindow		Lokasi
 %Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		Ubah ukuran agar sesuai
-List folders first	SettingsView		Daftar folder dahulukan
 Find	FSUtils		Cari
+List folders first	SettingsView		Daftar folder dahulukan
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Item bernama \"%name\" sudah ada di folder ini. Apakah Anda ingin menggantinya dengan membuat link simbolik?
 List view	ContainerWindow		Tampilan daftar
 Temporary	FindPanel		Sementara
@@ -176,15 +173,14 @@ contains	SelectionWindow		berisi
 is not	FindPanel		tidak
 Icon view	DeskWindow		Tampilan ikon
 Mount settings…	ContainerWindow		Pengaturan mount…
-Permissions	InfoWindow		Hak akses
 Keywords	Bookmark Query Columns		Katakunci
 by name	FindPanel		berdasarkan nama
 Copy more	ContainerWindow		Salin lebih banyak
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Maaf, anda tidak dapat menyimpan sesuatu pada root sistem anda.
 Restore	ContainerWindow		Memulihkan
 Location	ContainerWindow		Lokasi
-Warning space color	SettingsView		Warna ruang peringatan
 Skip	FSUtils		Lewati
+Warning space color	SettingsView		Warna ruang peringatan
 Used space color	SettingsView		Warna ruang yang digunakan
 Cancel	FSUtils		Batal
 Original name	ContainerWindow		Nama asli
@@ -237,7 +233,6 @@ You must have at least one attribute showing.	PoseView		Anda harus memiliki seti
 Cut	FilePanelPriv		Potong
 Favorites	FilePanelPriv		Favorit
 home	B_USER_DIRECTORY		rumah
-Open	InfoWindow		Buka
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Tracker Buat Templat Baru
 Disk mounting during boot	AutoMounterSettings		Me-mount disk saat boot
 Don't automount	AutoMounterSettings		Jangan dikaitkan otomatis
@@ -264,7 +259,6 @@ copying	FSUtils		menyalin
 Get info	FilePanelPriv		Dapatkan info
 Execute	FilePermissionsView		Laksanakan
 Delete	ContainerWindow		Hapus
-Edit name	InfoWindow		Sunting nama
 Show volumes on Desktop	SettingsView		Tampilkan volume di Desktop
 Recent folders	ContainerWindow		Folder barusan
 Desktop	Model		Desktop
@@ -276,7 +270,6 @@ Delete	FSUtils		Hapus
 Edit name	ContainerWindow		Sunting nama
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Tidak bisa buka \"%document\" (Ada simbol hilang: %symbol). \n
 More options	FindPanel		Opsi lebih lanjut:
-Identify	InfoWindow		Identitas
 config	B_USER_CONFIG_DIRECTORY		konfigurasi
 Error moving \"%name\".	FSUtils		Terjadi kesalahan memindah \"%name\".
 Select…	QueryContainerWindow		Pilih...
@@ -329,7 +322,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 You cannot create a link to the root directory.	FSUtils		Anda tidak dapat membuat link ke direktori root.
 Select all	FilePanelPriv		Pilih semua
 Other	FilePermissionsView		Lainnya
-Empty Trash	InfoWindow		Kosongkan Tempat Sampah
 Automatic disk mounting	AutoMounterSettings		Pemasangan diska otomatis
 parent folder	NavMenu		folder induk
 Create link here	ContainerWindow		Buat link di sini
@@ -347,7 +339,6 @@ Created:	InfoWindow		Dibuat:
 Single window navigation	SettingsView		Navigasi satu jendela
 Edit Query template	FindPanel		Edit template kueri
 Save query as template…	FindPanel		Simpan query sebagai kerangka…
-Unmount	InfoWindow		Unmount
 All disks	AutoMounterSettings		Semua disk
 link	FSUtils	filename link	tautan
 Proceed	FSUtils		Lanjutkan
@@ -387,7 +378,6 @@ Create relative link here	ContainerWindow		Buat tautan relatif di sini
 Copy	FilePanelPriv		Salin
 All Haiku disks	AutoMounterSettings		Semua disk Haiku
 Close all	ContainerWindow		Tutup semua
-Recalculate folder size	InfoWindow		Hitung ulang ukuran folder
 Paused: click to resume or stop	StatusWindow		Berhenti: klik untuk melanjutkan atau menghentikan
 Name	QueryPoseView		Nama
 Error %error loading add-On %name.	ContainerWindow		Kesalahan %error memuat pengaya %name.
@@ -432,7 +422,6 @@ Name	FindPanel		Nama
 Cancel	WidgetAttributeText		Batal
 Expression too long.	libtracker		Ekspresi terlalu panjang.
 Memory corruption.	libtracker		Korupsi memory.
-That name is already taken. Please type another one.	InfoWindow		Nama tersebut telah dipakai. Silakan ketik lainnya.
 Copy layout	ContainerWindow		Salin tata letak
 Duplicate	ContainerWindow		Menduplikasi
 Untitled clipping	PoseView		Potongan tak-berjudul

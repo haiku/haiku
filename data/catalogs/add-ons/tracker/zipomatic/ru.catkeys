@@ -1,7 +1,7 @@
 1	russian	x-vnd.haiku.zip-o-matic	2032806096
 Drop files here.	file:ZipOMaticWindow.cpp		Переместите файлы сюда.
-Filename: %s	file:ZipOMaticWindow.cpp		Имя архива: %s
-Do you want to stop them?	file:ZipOMatic.cpp		Вы хотите остановить их?
+Filename: %s	file:ZipOMaticWindow.cpp		Имя файла: %s
+Do you want to stop them?	file:ZipOMatic.cpp		Вы действительно хотите остановить их?
 Error creating archive	file:ZipOMaticWindow.cpp		Ошибка при создании архива
 Stop them	file:ZipOMatic.cpp		Остановить их
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Вы уверены, что хотите остановить создание этого архива?

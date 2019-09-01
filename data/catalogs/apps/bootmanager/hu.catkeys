@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-BootManager	3886671855
+1	hungarian	x-vnd.Haiku-BootManager	867546001
 Old Master Boot Record backup failure	BootManagerController	Title	Régi Master Boot Record mentési hiba
 At least one partition must be selected!	BootManagerController		Legalább egy partíciót ki kell választania.
 No space available!	DrivesPage	Cannot install	Nincs szabad hely!
@@ -16,6 +16,7 @@ Never	DefaultPartitionPage		Soha
 Summary	BootManagerController	Title	Összegzés
 An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		A rendszerválasztó telepítése közben hiba lépett fel. A rendszerbetöltő valószínűleg megsérült, kérjük, állítsa vissza!
 After three seconds	DefaultPartitionPage		Három másodperc után
+Read only!	DrivesPage	Cannot install	Csak olvasható!
 Write boot menu	BootManagerController	Button	Rendszerválasztó menü rögzítése
 OK	BootManagerController	Button	Rendben
 Uninstall boot manager	BootManagerController	Title	A rendszerválasztó eltávolítása

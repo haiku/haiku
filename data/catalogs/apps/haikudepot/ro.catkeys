@@ -7,8 +7,8 @@ Available packages	MainWindow		Pachete disponibile
 Create account	UserLoginWindow		Creează cont
 Mostly stable	RatePackageWindow		Majoritatea stabile
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Cont creat cu succes. Acum puteți evalua pachete și face alte lucruri folositoare.
-Rate package…	PackageInfoView		Evaluați pachet…
 Develop packages	MainWindow		Dezvoltă pachete
+Rate package…	PackageInfoView		Evaluați pachet…
 Starting the package daemon failed:\n\n%Error%	App		Pornirea demonului de pachete a eșuat:\n\n%Error%
 <no info>	PackageInfoView		<no info>
 No user ratings available.	PackageInfoView		Nu sunt disponibile evaluările utilizatorilor.
@@ -16,8 +16,8 @@ The user name needs to be at least 3 letters long.	UserLoginWindow		Numele de ut
 Failed to create account	UserLoginWindow		Eșec la crearea contului
 Ignore	UserLoginWindow		Ignoră
 Rating	PackageListView		Evaluare
-Show	MainWindow		Arată
 Does not start	RatePackageWindow		Nu pornește
+Show	MainWindow		Arată
 But none could be listed here, sorry.	UserLoginWindow		Dar nu s-a putut lista niciuna, scuze.
 There are problems with the data you entered:\n\n	UserLoginWindow		Există probleme cu datele pe care le-ați introdus:\n\n
 The authentication was successful.	UserLoginWindow		Autentificarea a fost reușită.

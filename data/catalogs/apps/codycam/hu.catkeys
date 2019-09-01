@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-CodyCam	1770279704
+1	hungarian	x-vnd.Haiku-CodyCam	2593355250
 destination directory expected	CodyCam		nincs megadva célmappa
 reply: '%s'\n	SftpClient		válasz: '%s'\n
 JPEG image	CodyCam		JPEG kép
@@ -27,6 +27,7 @@ Every 2 hours	CodyCam		2 óránként
 Cannot get a time source	CodyCam		Nem található időforrás
 Every 4 hours	CodyCam		4 óránként
 cmd: '%s'\n	FtpClient		cmd: '%s'\n
+Closing the window	VideoConsumer.cpp		Ablak bezárása
 Never	CodyCam		Soha
 Every 8 hours	CodyCam		8 óránként
 Cannot start the video source	CodyCam		Nem sikerült elindítani a videóforrást
@@ -38,6 +39,7 @@ still image filename expected	CodyCam		nincs megadva fájlnév a képekhez
 File name:	CodyCam		Fájlnév:
 Directory:	CodyCam		Mappa:
 Error setting type of output file	VideoConsumer.cpp		Hiba történt a kimeneti fájl típusának megadása során
+Locking the window	VideoConsumer.cpp		Ablak zárolása
 Cannot find an available video stream	CodyCam		Nem található elérhető videóadás
 Upload…	VideoConsumer.cpp		Feltöltés…
 password expected	CodyCam		nincs megadva jelszó

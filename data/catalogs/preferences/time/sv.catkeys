@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Time	3755504714
+1	swedish	x-vnd.Haiku-Time	752043118
 OK	Time		OK
 Message receiving failed	Time		Kunde inte ta emot meddelandet
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date, Skriven av:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
@@ -7,7 +7,6 @@ America	Time		Amerika
 Reset to default server list	Time		Återställ till förinställt värde
 Could not resolve server address	Time		Det gick inte att namnupplösa serveradressen
 Set time zone	Time		Ange tidzon
-The following error occured while synchronizing:r\n%s: %s	Time		Följande fel uppstod vid synkronisering:r\n%s: %s
 Waiting for answer failed	Time		Fick inget svar
 <Other>	Time		<Annan>
 Received invalid time	Time		Tog emot en ogiltig tid
@@ -17,7 +16,6 @@ Asia	Time		Asien
 Try all servers	Time		Prova alla servrarna
 Time	Time		Tid
 Current time:	Time		Aktuell tid:
-The following error occured while synchronizing:r\n%s	Time		Följande fel uppstod vid synkronisering:r\n%s
 Europe	Time		Europa
 Show day of week	Time		Visa veckodag
 Local time (Windows compatible)	Time		Lokal tid (Windows kompatibel)

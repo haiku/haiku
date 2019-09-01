@@ -21,8 +21,8 @@ Belgian (point)	KeymapNames		Belgjic (pont)
 Finnish	KeymapNames		Finlandês
 Num lock	Keyboard Layout View		Bloc Num
 Switch shortcut keys to Windows/Linux mode	Keymap window		Passe ai tascj des scurtis de modalitât Windows/Linux
-Option	Keyboard Layout View	Option key	Opzion
 Spanish (Dvorak)	KeymapNames		Spagnûl (Dvorak)
+Option	Keyboard Layout View	Option key	Opzion
 Scroll lock	Keyboard Layout View		Bloche scoriment
 US-International	KeymapNames		US-Internazionâl
 Right option	Keyboard Layout View		Opzion a diestre
@@ -82,12 +82,12 @@ Caps lock	Keyboard Layout View		Bloc Maiusc
 Left shift	Keyboard Layout View		Maiusc a çampe
 Russian (Yawert)	KeymapNames		Rus (Yawert)
 Bulgarian (Cyrillic)	KeymapNames		Bulgar (Cirilic)
-Left control	Keyboard Layout View		Control a çampe
 Swedish	KeymapNames		Svedês
+Left control	Keyboard Layout View		Control a çampe
 CAPS	Keyboard Layout View	Very short for 'caps lock'	⇪
 Role	Modifier keys window	As in the role of a modifier key	Rûl
-German	KeymapNames		Todesc
 Svorak	KeymapNames		Svorak
+German	KeymapNames		Todesc
 Swiss-German	KeymapNames		Todesc (Svuizare)
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Tast Ctrl
 Czech	KeymapNames		Cec
@@ -96,8 +96,8 @@ Thai (TIS-820.2538)	KeymapNames		Tailandês (TIS-820.2538)
 Control:	Modifier keys window	Control key role name	Control:
 Disabled	Modifier keys window	Do nothing	Disabilitât
 Select dead keys	Keymap window		Selezione tascj muarts
-Right shift	Keyboard Layout View		Maiusc a diestre
 Russian (Mac)	KeymapNames		Rus (Mac)
+Right shift	Keyboard Layout View		Maiusc a diestre
 ESC	Keyboard Layout View		ESC
 Belarusian (Latin)	KeymapNames		Bielorus (Latin)
 Hebrew	KeymapNames		Ebreu
@@ -129,18 +129,18 @@ Defaults	Keymap window		Predefinîts
 ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		Sisteme:
 Switch shortcut keys	Keymap window		Scambie tascj di scurte
-Belgian (comma)	KeymapNames		Belgjic (virgule)
 Right command	Keyboard Layout View		Comant di diestre
 NUM LOCK	Keyboard Layout View		BLOC NUM
 MENU	Keyboard Layout View		MENÙ
+Belgian (comma)	KeymapNames		Belgjic (virgule)
 Norwegian	KeymapNames		Norvegjês
 Font	Keymap window		Caratar
 Danish	KeymapNames		Danês
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tast Maiusc
-PAUSE	Keyboard Layout View		PAUSE
 Russian	KeymapNames		Rus
-CMD	Keyboard Layout View	Very short for 'command'	CMT
+PAUSE	Keyboard Layout View		PAUSE
 Romanian	KeymapNames		Rumen
+CMD	Keyboard Layout View	Very short for 'command'	CMT
 Command	Keyboard Layout View	Command key	Comant
 SCROLL	Keyboard Layout View		SCOR
 File	Keymap window		File

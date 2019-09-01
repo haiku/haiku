@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	320002301
+1	catalan; valencian	x-vnd.Haiku-libtracker	3696513506
 Created	ContainerWindow		Generat
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
 Open with…	ContainerWindow		Obre amb...
@@ -38,7 +38,6 @@ Size	ContainerWindow		Mida
 Select…	ContainerWindow		Seleccioneu...
 Show shared volumes on Desktop	SettingsView		Mostra els volums a l'Escriptori
 Size	PoseView		Mida
-OK	InfoWindow		D'acord
 matches wildcard expression	SelectionWindow		es correspon amb l'expressió regular
 96 x 96	ContainerWindow		96 x 96
 Identify	ContainerWindow		Identifica com a
@@ -61,7 +60,6 @@ Select	SelectionWindow		Seleccioneu
 Select	InfoWindow		Seleccioneu
 OK	OpenWithWindow		D'acord
 Include trash	FindPanel		Inclou la paperera
-That name is too long. Please type another one.	InfoWindow		Aquest nom és massa llarg. Si us plau entreu-ne un altre.
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Neteja
 Modified	FindPanel		Modificat
@@ -74,7 +72,6 @@ Preparing to restore items…	StatusWindow		S'està preparant la restauració de
 Mount	ContainerWindow		Munta
 Desktop	B_DESKTOP_DIRECTORY		Escriptori
 Link to:	InfoWindow		Enllaç a:
-Set new link target	InfoWindow		Defineix un nou objectiu de l'enllaç
 Copy here	ContainerWindow		Copia aquí
 All disks	FindPanel		Tots els discs
 Window	ContainerWindow		Finestra
@@ -85,14 +82,14 @@ Save as Query template:	FindPanel		Desa-ho com una plantilla de Consulta:
 Edit templates…	TemplatesMenu		Edita les plantilles...
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used usat -- %free lliure)
 Trash	Model		Paperera
-Enable type-ahead filtering	SettingsView		Habilita el filtrat a mida que s'escriu
 copy	FSUtils	filename copy	còpia
 New folder%ld	FSUtils		Carpeta nova%ld
+Enable type-ahead filtering	SettingsView		Habilita el filtrat a mida que s'escriu
 Location	OpenWithWindow		Ubicació
 %Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		Redimensiona-ho per ajustar-ho
-List folders first	SettingsView		Mostra primer les carpetes
 Find	FSUtils		Cerca
+List folders first	SettingsView		Mostra primer les carpetes
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Ja existeix un element amb el nom \"%name\" a la carpeta indicada. El voleu substituir amb l'enllaç simbòlic que demaneu?
 Temporary	FindPanel		Temporal
 Create relative link	ContainerWindow		Fés un enllaç relatiu
@@ -149,14 +146,13 @@ Replace	FilePanelPriv		Substitueix
 contains	SelectionWindow		conté
 is not	FindPanel		no és
 Icon view	DeskWindow		Mostra les icones
-Permissions	InfoWindow		Permisos
 by name	FindPanel		per nom
 Copy more	ContainerWindow		Copia'n més
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Ho lamentem, no podeu desar fitxers a la carpeta arrel del sistema.
 Restore	ContainerWindow		Restaura
 Location	ContainerWindow		Ubicació
-Warning space color	SettingsView		L'espai de color és feble
 Skip	FSUtils		Omet
+Warning space color	SettingsView		L'espai de color és feble
 Used space color	SettingsView		Espai de color utilitzat
 Cancel	FSUtils		Anul·la
 Original name	ContainerWindow		Nom original
@@ -207,7 +203,6 @@ You must have at least one attribute showing.	PoseView		Heu de triar al menys un
 Cut	FilePanelPriv		Retalla
 Favorites	FilePanelPriv		Preferits
 home	B_USER_DIRECTORY		inici
-Open	InfoWindow		Obre
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Noves plantilles del Seguidor
 Disk mounting during boot	AutoMounterSettings		Muntatge del disc a l'arrencada
 Don't automount	AutoMounterSettings		No ho muntis automàticament
@@ -231,7 +226,6 @@ copying	FSUtils		s'està copiant
 Get info	FilePanelPriv		Informació
 Execute	FilePermissionsView		Executa
 Delete	ContainerWindow		Suprimeix
-Edit name	InfoWindow		Edita el nom
 Show volumes on Desktop	SettingsView		Mostra els volums a l'Escriptori
 Recent folders	ContainerWindow		Carpetes recents
 Desktop	Model		Escriptori
@@ -243,7 +237,6 @@ Delete	FSUtils		Suprimeix
 Edit name	ContainerWindow		Edita el nom
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		No ha estat possible obrir \"%document\" (Falta el símbol: %symbol). \n
 More options	FindPanel		Més opcions
-Identify	InfoWindow		Identifica com a
 config	B_USER_CONFIG_DIRECTORY		configuració
 Error moving \"%name\".	FSUtils		Hi hagut un error en moure \"%name\".
 Select…	QueryContainerWindow		Seleccioneu...
@@ -292,7 +285,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 You cannot create a link to the root directory.	FSUtils		No podeu fer un enllaç cap a la carpeta arrel.
 Select all	FilePanelPriv		Selecciona-ho tot
 Other	FilePermissionsView		Altre
-Empty Trash	InfoWindow		Buida la Paperera
 Automatic disk mounting	AutoMounterSettings		Muntatge automàtic dels discs
 parent folder	NavMenu		carpeta pare
 Create link here	ContainerWindow		Fes un enllaç aquí
@@ -310,7 +302,6 @@ Created:	InfoWindow		Generat
 Single window navigation	SettingsView		Navega en una sola finestra
 Edit Query template	FindPanel		Edita el model de consulta
 Save query as template…	FindPanel		Desa el model de la consulta...
-Unmount	InfoWindow		Desmunta
 All disks	AutoMounterSettings		Tots els discs
 link	FSUtils	filename link	enllaç
 Proceed	FSUtils		Continua
@@ -344,7 +335,6 @@ Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		No ha es
 Create relative link here	ContainerWindow		Fes un enllaç relatiu aquí
 Copy	FilePanelPriv		Copia
 Close all	ContainerWindow		Tanca-ho tot
-Recalculate folder size	InfoWindow		Torna a calcular la mida de la carpeta
 Paused: click to resume or stop	StatusWindow		En pausa: cliqueu per continuar o aturar
 Name	QueryPoseView		Nom
 Error %error loading add-On %name.	ContainerWindow		S'ha produït un error %error en carregar el Complement %name.
@@ -382,7 +372,6 @@ Save	FindPanel		Desa
 Go to parent	FilePanelPriv		Vés al pare
 Name	FindPanel		Nom
 Cancel	WidgetAttributeText		Anul·la
-That name is already taken. Please type another one.	InfoWindow		Ja existeix aquest nom d'usuari. Escolliu-ne un altre.
 Copy layout	ContainerWindow		Copia la disposició
 Duplicate	ContainerWindow		Duplica
 Untitled clipping	PoseView		Retall sense nom

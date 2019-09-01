@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-ProcessController	4131818684
+1	hungarian	x-vnd.Haiku-ProcessController	168752057
 Error saving file	ProcessController		Hiba történt a fájl mentése során
 Display priority	ProcessController		Kijelzési prioritás
 That's no Fun!	ProcessController		Ez nem vicces!
@@ -45,5 +45,6 @@ Damned!	ProcessController		Fenébe!
 New Terminal	ProcessController		Új terminál
 Power saving	ProcessController		Energiatakarékosság
 ProcessController is already installed in Deskbar.	ProcessController		A Folyamatkezelő már telepítve van az Asztalsávra.
+This is the last active processor…\nYou can't turn it off!	ProcessController		Ez az utolsó aktív processzor…\nNem kapcsolható ki.
 This thread is already gone…	ProcessController		Ez a szál már eltűnt…
 Run in window	ProcessController		Futtatás ablakban

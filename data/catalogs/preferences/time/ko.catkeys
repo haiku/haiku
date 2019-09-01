@@ -1,10 +1,9 @@
-1	korean	x-vnd.Haiku-Time	1277298809
+1	korean	x-vnd.Haiku-Time	2568804509
 OK	Time		확인
 Message receiving failed	Time		메세지 응답 실패함
 Australia	Time		오스트레일리아
 America	Time		미국
 Set time zone	Time		시간대 설정
-The following error occured while synchronizing:r\n%s: %s	Time		동기화 중에 다음 에러가 발생했음:r\n%s: %s
 Waiting for answer failed	Time		답변 대기중에 실패함
 <Other>	Time		<다른...>
 Received invalid time	Time		올바르지 않은 시간이 응답됨
@@ -14,7 +13,6 @@ Asia	Time		아시아
 Try all servers	Time		모든 서버 시도
 Time	Time		시간
 Current time:	Time		현재 시간:
-The following error occured while synchronizing:r\n%s	Time		동기화 중에 다음 에러가 발생했음:r\n%s
 Europe	Time		유럽
 Local time (Windows compatible)	Time		지역 시간 (윈도우즈 호환)
 Hardware clock set to:	Time		하드웨어 시간  설정:

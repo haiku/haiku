@@ -1,11 +1,10 @@
-1	lithuanian	x-vnd.Haiku-Time	2676925183
+1	lithuanian	x-vnd.Haiku-Time	3968430883
 OK	Time		Gerai
 Message receiving failed	Time		Nepavyko gauti pranešimo
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Laikas ir data. Programos autoriai:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\n© 2004-2012, „Haiku“,
 Australia	Time		Australija
 America	Time		Amerika
 Set time zone	Time		Pakeisti laiko juostą
-The following error occured while synchronizing:r\n%s: %s	Time		Bandant sinchronizuoti, susidurta su šia klaida:\n%s: %s
 Waiting for answer failed	Time		Atsakymas negautas
 <Other>	Time		<Kita>
 Received invalid time	Time		Gautas negalimas laikas
@@ -15,7 +14,6 @@ Asia	Time		Azija
 Try all servers	Time		Bandyti visus serverius
 Time	Time		Laikas
 Current time:	Time		Dabartinis laikas:
-The following error occured while synchronizing:r\n%s	Time		Bandant sinchronizuoti, susidurta su šia klaida:\n%s
 Europe	Time		Europa
 Show day of week	Time		Rodyti savaitės dieną
 Local time (Windows compatible)	Time		Vietinis laikas (suderinama su „Windows“)

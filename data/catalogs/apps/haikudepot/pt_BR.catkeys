@@ -6,8 +6,8 @@ Available packages	MainWindow		Pacotes disponíveis
 Create account	UserLoginWindow		Criar conta
 Mostly stable	RatePackageWindow		Na maior parte estável
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Conta criada com sucesso. Você pode agora classificar pacotes e fazer outras coisas úteis.
-Rate package…	PackageInfoView		Avaliar pacote...
 Develop packages	MainWindow		Desenvolver pacotes
+Rate package…	PackageInfoView		Avaliar pacote...
 Starting the package daemon failed:\n\n%Error%	App		A inicialização do daemon de pacote falhou:\n\n%Error%
 <no info>	PackageInfoView		<sem informação>
 No user ratings available.	PackageInfoView		Nenhuma avaliação de usuário disponível.
@@ -15,8 +15,8 @@ The user name needs to be at least 3 letters long.	UserLoginWindow		O nome de us
 Failed to create account	UserLoginWindow		Falhou ao criar conta
 Ignore	UserLoginWindow		Ignorar
 Rating	PackageListView		Avaliação
-Show	MainWindow		Exibir
 Does not start	RatePackageWindow		Não iniciar
+Show	MainWindow		Exibir
 But none could be listed here, sorry.	UserLoginWindow		Mas nenhum pode ser listado aqui, desculpe.
 There are problems with the data you entered:\n\n	UserLoginWindow		Existem problemas com os dados que você inseriu:\n\n
 The authentication was successful.	UserLoginWindow		A autenticação foi bem sucedida.

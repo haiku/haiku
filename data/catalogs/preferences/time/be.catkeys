@@ -1,11 +1,10 @@
-1	belarusian	x-vnd.Haiku-Time	2676925183
+1	belarusian	x-vnd.Haiku-Time	3968430883
 OK	Time		ОК
 Message receiving failed	Time		Памылка атрымання паведамлення
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date, распрацавана:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Australia	Time		Аўстралія
 America	Time		Амерыка
 Set time zone	Time		Пазначыць часавы пояс
-The following error occured while synchronizing:r\n%s: %s	Time		Памылка падчас сінхранізацыі:r\n%s: %s
 Waiting for answer failed	Time		Памылка падчас чакання адказу
 <Other>	Time		<Іншае>
 Received invalid time	Time		Атрыманы несапраўдны час
@@ -15,7 +14,6 @@ Asia	Time		Азія
 Try all servers	Time		Паспрабаваць усе серверы
 Time	Time		Час
 Current time:	Time		Сапраўдны час:
-The following error occured while synchronizing:r\n%s	Time		Памылка падчас сінхранізацыі:r\n%s
 Europe	Time		Эўропа
 Show day of week	Time		Паказваць дзень тыдню
 Local time (Windows compatible)	Time		Лакальны час (як у Windows)

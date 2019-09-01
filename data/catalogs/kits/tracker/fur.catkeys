@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	1502919247
+1	friulian	x-vnd.Haiku-libtracker	2023640966
 Created	ContainerWindow		Creât
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
 Open with…	ContainerWindow		Vierç cun…
@@ -33,6 +33,7 @@ Error in regular expression:\n\n'%errstring'	PoseView		Erôr te espression regol
 Would you like to find a suitable application to open the file?	FSUtils		Cjatâ une aplicazion adate par vierzi il file?
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		No si pues sostituî une cartele o un colegament simbolic cuntun file.
+Trailing \\.	libtracker		\\ ae fin.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Su %func\nal è falît find_directory().\nMotîf: %error
 Handles any file	OpenWithWindow		Al gjestìs cualsisei file
 save text	FilePanelPriv		salve test
@@ -41,7 +42,6 @@ Size	ContainerWindow		Dimension
 Select…	ContainerWindow		Selezione…
 Show shared volumes on Desktop	SettingsView		Mostre i volums condividûts sul Scritori
 Size	PoseView		Dimension
-OK	InfoWindow		Va ben
 matches wildcard expression	SelectionWindow		al coincît cu la espression cun matis (*)
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Titul
@@ -69,7 +69,6 @@ Select	SelectionWindow		Selezione
 Select	InfoWindow		Selezione
 OK	OpenWithWindow		Va ben
 Include trash	FindPanel		Inclût scovacere
-That name is too long. Please type another one.	InfoWindow		Il non inserît al è masse lunc. Scrîf un altri.
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Met a puest
 Modified	FindPanel		Modificât
@@ -85,7 +84,6 @@ Mount	ContainerWindow		Monte
 Desktop	B_DESKTOP_DIRECTORY		Scritori
 Corrupted pointers.	libtracker		Pontadôrs corots.
 Link to:	InfoWindow		Colegament a:
-Set new link target	InfoWindow		Stabilìs la gnove destinazion dal colegament
 Copy here	ContainerWindow		Copie chi
 All disks	FindPanel		Ducj i discs
 Window	ContainerWindow		Barcon
@@ -99,14 +97,14 @@ Edit templates…	TemplatesMenu		Modifiche modei…
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used doprât -- %free libar)
 Hide dotfiles	SettingsView		Plate i file .*
 Trash	Model		Scovacere
-Enable type-ahead filtering	SettingsView		Abilite filtri scriture anticipade
 copy	FSUtils	filename copy	copie
 New folder%ld	FSUtils		Gnove cartele%ld
+Enable type-ahead filtering	SettingsView		Abilite filtri scriture anticipade
 Location	OpenWithWindow		Posizion
 %Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		Jemple
-List folders first	SettingsView		Liste prime lis cartelis
 Find	FSUtils		Cjate
+List folders first	SettingsView		Liste prime lis cartelis
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Un element clamât \"%name\" al esist za in cheste cartele. Sostituîlu cul colegament simbolic che si sta creant?
 List view	ContainerWindow		Viodude a liste
 Temporary	FindPanel		Temporani
@@ -175,15 +173,14 @@ contains	SelectionWindow		al conten
 is not	FindPanel		nol è
 Icon view	DeskWindow		Viodude a iconis
 Mount settings…	ContainerWindow		Impostazions di montaç…
-Permissions	InfoWindow		Permès
 Keywords	Bookmark Query Columns		Peraulis clâf
 by name	FindPanel		par non
 Copy more	ContainerWindow		Copie ancjemò
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Mi displâs, ma no si pues salvâ robis te lidrîs dal sisteme.
 Restore	ContainerWindow		Ripristine
 Location	ContainerWindow		Posizion
-Warning space color	SettingsView		Colôr aree di avertiment
 Skip	FSUtils		Salte
+Warning space color	SettingsView		Colôr aree di avertiment
 Used space color	SettingsView		Colôr dal spazi doprât
 Cancel	FSUtils		Anule
 Original name	ContainerWindow		Non origjinâl
@@ -236,7 +233,6 @@ You must have at least one attribute showing.	PoseView		Si scugne vê almancul u
 Cut	FilePanelPriv		Taie
 Favorites	FilePanelPriv		Preferîts
 home	B_USER_DIRECTORY		home
-Open	InfoWindow		Vierç
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Gnûfs Modei Tracker
 Disk mounting during boot	AutoMounterSettings		Montaç discs dilunc l'inviament
 Don't automount	AutoMounterSettings		No sta montâ in automatic
@@ -263,7 +259,6 @@ copying	FSUtils		copiant
 Get info	FilePanelPriv		Oten informazions
 Execute	FilePermissionsView		Esecuzion
 Delete	ContainerWindow		Elimine
-Edit name	InfoWindow		Modifiche non
 Show volumes on Desktop	SettingsView		Mostre volums sul Scritori
 Recent folders	ContainerWindow		Cartelis resintis
 Desktop	Model		Scritori
@@ -275,7 +270,6 @@ Delete	FSUtils		Elimine
 Edit name	ContainerWindow		Modifiche non
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Nol è stât pussibil vierzi \"%document\" (Al mancje il simbul: %symbol). \n
 More options	FindPanel		Altris opzions
-Identify	InfoWindow		Identifiche
 config	B_USER_CONFIG_DIRECTORY		configurazion
 Error moving \"%name\".	FSUtils		Erôr tal spostâ \"%name\".
 Select…	QueryContainerWindow		Selezione…
@@ -328,7 +322,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 You cannot create a link to the root directory.	FSUtils		No si pues creâ un colegament ae cartele lidrîs.
 Select all	FilePanelPriv		Selezione dut
 Other	FilePermissionsView		Altri
-Empty Trash	InfoWindow		Disvuede Scovacere
 Automatic disk mounting	AutoMounterSettings		Montaç automatic dai discs
 parent folder	NavMenu		cartele superiôr
 Create link here	ContainerWindow		Cree colegament achì
@@ -346,7 +339,6 @@ Created:	InfoWindow		Creât ai:
 Single window navigation	SettingsView		Navigazion a barcon ugnul
 Edit Query template	FindPanel		Modifiche model di interogazion
 Save query as template…	FindPanel		Salve interogazion come model…
-Unmount	InfoWindow		Dismonte
 All disks	AutoMounterSettings		Ducj i discs
 link	FSUtils	filename link	colegament
 Proceed	FSUtils		Procêt
@@ -386,7 +378,6 @@ Create relative link here	ContainerWindow		Cree colegament relatîf achì
 Copy	FilePanelPriv		Copie
 All Haiku disks	AutoMounterSettings		Ducj i discs Haiku
 Close all	ContainerWindow		Siere dut
-Recalculate folder size	InfoWindow		Torne calcole la dimension de cartele
 Paused: click to resume or stop	StatusWindow		In pause: fâ clic par ripiâ il lavôr o fermâ
 Name	QueryPoseView		Non
 Error %error loading add-On %name.	ContainerWindow		Erôr %error cjariant il component adizionâl %name.
@@ -431,7 +422,6 @@ Name	FindPanel		Non
 Cancel	WidgetAttributeText		Anule
 Expression too long.	libtracker		Espression masse lungje.
 Memory corruption.	libtracker		Coruzion de memorie.
-That name is already taken. Please type another one.	InfoWindow		Chel non al è za stât cjolt. Par plasê scrîf un altri.
 Copy layout	ContainerWindow		Copie disposizion
 Duplicate	ContainerWindow		Doplee
 Untitled clipping	PoseView		Ritai cence non

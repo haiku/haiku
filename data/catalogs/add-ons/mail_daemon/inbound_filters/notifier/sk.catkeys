@@ -1,14 +1,13 @@
-1	slovak	x-vnd.Haiku-NewMailNotification	73789504
-You have {0, plural, one{One new message} other{# new messages}} for %account.	NotifierFilter		Máte {0, plural, one{Jednu novú správu} few{# nové správy} other{# nových správ}} pre %account.
-none	NotifierConfigView		žiadne
-Method:	NotifierConfigView		Metóda:
-Beep	NotifierConfigView		Pípnutie
-{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{Jedna nová správa} few{# nové správy} other{# nových správ}}
-New mails notification	NotifierFilter		Upozornenie na nové správy
-Central alert	NotifierConfigView		Centrálne upozornenie
-OK	NotifierFilter		OK
-New messages	NotifierFilter		Nové správy
+1	slovak	x-vnd.Haiku-NewMailNotification	2111731137
 Log window	NotifierConfigView		Okno záznamu
-Keyboard LEDs	NotifierConfigView		LED klávesnice
-Central beep	NotifierConfigView		Centrálne pípnutie
+none	NotifierConfigView		žiadne
+New mails notification	NotifierFilter		Upozornenie na nové správy
 Alert	NotifierConfigView		Upozornenie
+OK	NotifierFilter		OK
+Central alert	NotifierConfigView		Centrálne upozornenie
+Beep	NotifierConfigView		Pípnutie
+Central beep	NotifierConfigView		Centrálne pípnutie
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{Jedna nová správa} few{# nové správy} other{# nových správ}}
+New messages	NotifierFilter		Nové správy
+Method:	NotifierConfigView		Metóda:
+Keyboard LEDs	NotifierConfigView		LED klávesnice
