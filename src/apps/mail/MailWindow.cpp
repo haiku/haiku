@@ -2952,14 +2952,14 @@ TMailWindow::OpenMessage(const entry_ref* ref, uint32 characterSetForDecoding)
 			BMessage msg(REFS_RECEIVED);
 			entry_ref enc_ref;
 
-			char* s = strtok((char*)string.String(), ":");
-			while (s != NULL) {
-				BEntry entry(s, true);
+			BStringList list;
+			string.Split(":", false, list);
+			for (int32 i = 0; i < list.CountStrings(); i++) {
+				BEntry entry(list.StringAt(i), true);
 				if (entry.Exists()) {
 					entry.GetRef(&enc_ref);
 					msg.AddRef("refs", &enc_ref);
 				}
-				s = strtok(NULL, ":");
 			}
 			AddEnclosure(&msg);
 		}
