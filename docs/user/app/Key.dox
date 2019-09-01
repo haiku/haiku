@@ -1,0 +1,422 @@
+/*
+ * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/app/Key.h	hrev45343
+ *		src/kits/app/Key.cpp	hrev45343
+ */
+
+
+ /*!
+	\file Key.h
+	\ingroup app
+	\ingroup libbe
+	\brief Provides BKey and BPasswordKey classes, as well as BKeyPurpose and
+        BKeyType enums.
+*/
+
+
+ ///// BKeyPurpose enum /////
+
+
+/*!
+    \enum BKeyPurpose
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+    \var BKeyPurpose::B_KEY_PURPOSE_ANY
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+    \var BKeyPurpose::B_KEY_PURPOSE_GENERIC
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+    \var BKeyPurpose::B_KEY_PURPOSE_KEYRING
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+    \var BKeyPurpose::B_KEY_PURPOSE_WEB
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+    \var BKeyPurpose::B_KEY_PURPOSE_NETWORK
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+    \var BKeyPurpose::B_KEY_PURPOSE_VOLUME
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+ ///// BKeyType enum /////
+
+
+/*!
+    \enum BKeyType
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+    \var BKeyType::B_KEY_TYPE_ANY
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+    \var BKeyType::B_KEY_TYPE_GENERIC
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+    \var BKeyType::B_KEY_TYPE_PASSWORD
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+    \var BKeyType::B_KEY_TYPE_CERTIFICATE
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+///// BKey class /////
+
+
+/*!
+    \class BKey
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn BKey::BKey();
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn BKey::BKey(BKeyPurpose purpose, const char* identifier, 
+        const char* secondaryIdentifier = NULL, const uint8* data = NULL,
+		size_t length = 0)
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn BKey::BKey(BKey& other)
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn virtual BKey::~BKey()
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn virtual	BKeyType BKey::Type() const
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn void BKey::Unset()
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BKey::SetTo(BKeyPurpose purpose, const char* identifier,
+		const char* secondaryIdentifier = NULL, const uint8* data = NULL,
+		size_t length = 0)
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn void BKey::SetPurpose(BKeyPurpose purpose)
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn BKeyPurpose BKey::Purpose() const
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn void BKey::SetIdentifier(const char* identifier)
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BKey::Identifier() const
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn void BKey::SetSecondaryIdentifier(const char* identifier)
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BKey::SecondaryIdentifier() const
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BKey::SetData(const uint8* data, size_t length)
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn size_t BKey::DataLength() const
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn const uint8* BKey::Data() const
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BKey::GetData(uint8* buffer, size_t bufferSize) const
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BKey::Owner() const
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn bigtime_t BKey::CreationTime() const
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BKey::Flatten(BMessage& message) const
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BKey::Unflatten(const BMessage& message)
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn BKey& BKey::operator=(const BKey& other)
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn bool BKey::operator==(const BKey& other) const
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn bool BKey::operator!=(const BKey& other) const
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn virtual void BKey::PrintToStream();
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+///// BPasswordKey class /////
+
+
+
+/*!
+    \class BPasswordKey
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+/*!
+	\fn BPasswordKey::BPasswordKey()
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn BPasswordKey::BPasswordKey(const char* password, BKeyPurpose purpose,
+        const char* identifier, const char* secondaryIdentifier = NULL)
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn BPasswordKey::BPasswordKey(BPasswordKey& other)
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn virtual BPasswordKey::~BPasswordKey()
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn virtual BKeyType BPasswordKey::Type() const
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BPasswordKey::SetTo(const char* password, BKeyPurpose purpose,
+		const char* identifier, const char* secondaryIdentifier = NULL)
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BPasswordKey::SetPassword(const char* password)
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BPasswordKey::Password() const
+    \brief Undocumented
+
+    \since Haiku R1
+*/
+
+
+/*!
+	\fn virtual void BPasswordKey::PrintToStream()
+    \brief Undocumented
+
+    \since Haiku R1
+*/
