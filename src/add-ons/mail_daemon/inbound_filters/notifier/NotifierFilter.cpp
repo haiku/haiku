@@ -78,7 +78,7 @@ NotifyFilter::MailboxSynchronized(status_t status)
 
 	if ((fStrategy & NOTIFY_ALERT) != 0) {
 		BStringFormat format(B_TRANSLATE(
-			"You have {0, plural, one{One new message} other{# new messages}} "
+			"You have {0, plural, one{one new message} other{# new messages}} "
 			"for %account."));
 
 		BString text;

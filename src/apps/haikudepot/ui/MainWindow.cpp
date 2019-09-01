@@ -957,7 +957,7 @@ MainWindow::_BulkLoadProcessCoordinatorFinished(
 			B_TRANSLATE("Package Update Error"),
 			B_TRANSLATE("While updating package data, a problem has arisen "
 				"that may cause data to be outdated or missing from the "
-				"application's display.  Additional details regarding this "
+				"application's display. Additional details regarding this "
 				"problem may be able to be obtained from the application "
 				"logs."));
 	}
