@@ -109,8 +109,8 @@ VirtioSCSIRequest::Finish(bool resubmit)
 	} else if (fStatus == SCSI_REQ_CMP && fResponse->status != 0
 		&& HasSense()) {
 		// when the request completed and has set sense
-    	// data, report this to the scsi stack by setting
-    	// CHECK CONDITION status
+		// data, report this to the scsi stack by setting
+		// CHECK CONDITION status
 		TRACE("setting check condition\n");
 
 		fCCB->subsys_status = SCSI_REQ_CMP_ERR;
