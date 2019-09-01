@@ -1035,7 +1035,7 @@ free_vnode(struct vnode* vnode, bool reenter)
 	// long as the vnode is busy and in the hash, that won't happen, but as
 	// soon as we've removed it from the hash, it could reload the vnode -- with
 	// a new cache attached!
-	if (vnode->cache != NULL)
+	if (vnode->cache != NULL && vnode->cache->type == CACHE_TYPE_VNODE)
 		((VMVnodeCache*)vnode->cache)->VnodeDeleted();
 
 	// The file system has removed the resources of the vnode now, so we can
@@ -4021,7 +4021,7 @@ change_vnode_id(fs_volume* volume, ino_t vnodeID, ino_t newID)
 	vnode->id = newID;
 	sVnodeTable->Insert(vnode);
 
-	if (vnode->cache != NULL)
+	if (vnode->cache != NULL && vnode->cache->type == CACHE_TYPE_VNODE)
 		((VMVnodeCache*)vnode->cache)->SetVnodeID(newID);
 
 	return B_OK;
@@ -4824,6 +4824,31 @@ vfs_get_vnode_cache(struct vnode* vnode, VMCache** _cache, bool allocate)
 		*_cache = vnode->cache;
 	}
 
+	return status;
+}
+
+
+/*!	Sets the vnode's VMCache object, for subsystems that want to manage
+	their own.
+	In case it's successful, it will also grab a reference to the cache
+	it returns.
+*/
+extern "C" status_t
+vfs_set_vnode_cache(struct vnode* vnode, VMCache* _cache)
+{
+	rw_lock_read_lock(&sVnodeLock);
+	vnode->Lock();
+
+	status_t status = B_OK;
+	if (vnode->cache != NULL) {
+		status = B_NOT_ALLOWED;
+	} else {
+		vnode->cache = _cache;
+		_cache->AcquireRef();
+	}
+
+	vnode->Unlock();
+	rw_lock_read_unlock(&sVnodeLock);
 	return status;
 }
 

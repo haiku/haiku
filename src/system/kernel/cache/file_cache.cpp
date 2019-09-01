@@ -932,6 +932,8 @@ cache_prefetch_vnode(struct vnode* vnode, off_t offset, size_t size)
 	VMCache* cache;
 	if (vfs_get_vnode_cache(vnode, &cache, false) != B_OK)
 		return;
+	if (cache->type != CACHE_TYPE_VNODE)
+		return;
 
 	file_cache_ref* ref = ((VMVnodeCache*)cache)->FileCacheRef();
 	off_t fileSize = cache->virtual_end;
@@ -1029,7 +1031,7 @@ cache_node_opened(struct vnode* vnode, int32 fdType, VMCache* cache,
 		return;
 
 	off_t size = -1;
-	if (cache != NULL) {
+	if (cache != NULL && cache->type == CACHE_TYPE_VNODE) {
 		file_cache_ref* ref = ((VMVnodeCache*)cache)->FileCacheRef();
 		if (ref != NULL)
 			size = cache->virtual_end;
@@ -1048,7 +1050,7 @@ cache_node_closed(struct vnode* vnode, int32 fdType, VMCache* cache,
 		return;
 
 	int32 accessType = 0;
-	if (cache != NULL) {
+	if (cache != NULL && cache->type == CACHE_TYPE_VNODE) {
 		// ToDo: set accessType
 	}
 
