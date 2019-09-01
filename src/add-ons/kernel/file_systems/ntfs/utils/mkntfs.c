@@ -6,7 +6,7 @@
  * Copyright (c) 2002-2006 Szabolcs Szakacsits
  * Copyright (c) 2005      Erik Sornes
  * Copyright (c) 2007      Yura Pakhuchiy
- * Copyright (c) 2010      Jean-Pierre Andre
+ * Copyright (c) 2010-2014 Jean-Pierre Andre
  *
  * This utility will create an NTFS 1.2 or 3.1 volume on a user
  * specified (block) device.
@@ -161,6 +161,18 @@ struct BITMAP_ALLOCATION {
 	s64	length;		/* count of consecutive clusters */
 } ;
 
+		/* Upcase $Info, used since Windows 8 */
+struct UPCASEINFO {
+	le32	len;
+	le32	filler;
+	le64	crc;
+	le32	osmajor;
+	le32	osminor;
+	le32	build;
+	le16	packmajor;
+	le16	packminor;
+} ;
+
 /**
  * global variables
  */
@@ -170,6 +182,7 @@ static u8		  *g_mft_bitmap		  = NULL;
 static int		   g_lcn_bitmap_byte_size = 0;
 static int		   g_dynamic_buf_size	  = 0;
 static u8		  *g_dynamic_buf	  = NULL;
+static struct UPCASEINFO  *g_upcaseinfo		  = NULL;
 static runlist		  *g_rl_mft		  = NULL;
 static runlist		  *g_rl_mft_bmp		  = NULL;
 static runlist		  *g_rl_mftmirr		  = NULL;
@@ -210,6 +223,53 @@ static struct mkntfs_options {
 	BOOL with_uuid;			/* -U, request setting an uuid */
 	char *label;			/* -L, volume label */
 } opts;
+
+/*
+ *  crc64, adapted from http://rpm5.org/docs/api/digest_8c-source.html
+ * ECMA-182 polynomial, see
+ *     http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-182.pdf
+ */
+		/* make sure the needed types are defined */
+#undef byte
+#undef uint32_t
+#undef uint64_t
+#define byte u8
+#define uint32_t u32
+#define uint64_t u64
+static uint64_t crc64(uint64_t crc, const byte * data, size_t size)
+	/*@*/
+{
+	static uint64_t polynomial = 0x9a6c9329ac4bc9b5ULL;
+	static uint64_t xorout = 0xffffffffffffffffULL;
+	static uint64_t table[256];
+
+	crc ^= xorout;
+
+	if (data == NULL) {
+	/* generate the table of CRC remainders for all possible bytes */
+		uint64_t c;
+		uint32_t i, j;
+		for (i = 0;  i < 256;  i++) {
+			c = i;
+			for (j = 0;  j < 8;  j++) {
+				if (c & 1)
+					c = polynomial ^ (c >> 1);
+				else
+					c = (c >> 1);
+			}
+			table[i] = c;
+		}
+	} else
+		while (size) {
+			crc = table[(crc ^ *data) & 0xff] ^ (crc >> 8);
+			size--;
+			data++;
+		}
+
+	crc ^= xorout;
+
+	return crc;
+}
 
 /*
  *		Mark a run of clusters as allocated
@@ -1490,7 +1550,7 @@ static int insert_resident_attr_in_mft_record(MFT_RECORD *m,
 	}
 	a = ctx->attr;
 	/* sizeof(resident attribute record header) == 24 */
-	asize = ((24 + ((name_len + 7) & ~7) + val_len) + 7) & ~7;
+	asize = ((24 + ((name_len*2 + 7) & ~7) + val_len) + 7) & ~7;
 	err = make_room_for_attribute(m, (char*)a, asize);
 	if (err == -ENOSPC) {
 		/*
@@ -4212,6 +4272,14 @@ static BOOL mkntfs_create_root_structures(void)
 	m = (MFT_RECORD*)(g_buf + 4 * g_vol->mft_record_size);
 	err = add_attr_data(m, NULL, 0, CASE_SENSITIVE, const_cpu_to_le16(0),
 			(u8*)g_vol->attrdef, g_vol->attrdef_len);
+	/*
+	 * The $Info only exists since Windows 8, but it apparently
+	 * does not disturb chkdsk from earlier versions.
+	 */
+	if (!err)
+		err = add_attr_data(m, "$Info", 5, CASE_SENSITIVE,
+			const_cpu_to_le16(0),
+			(u8*)g_upcaseinfo, sizeof(struct UPCASEINFO));
 	if (!err)
 		err = create_hardlink(g_index_block, root_ref, m,
 				MK_LE_MREF(FILE_AttrDef, FILE_AttrDef),
@@ -4572,6 +4640,7 @@ static BOOL mkntfs_create_root_structures(void)
  */
 static int mkntfs_redirect(struct mkntfs_options *opts2)
 {
+	u64 upcase_crc;
 	int result = 1;
 	ntfs_attr_search_ctx *ctx = NULL;
 	long long lw, pos;
@@ -4605,12 +4674,20 @@ static int mkntfs_redirect(struct mkntfs_options *opts2)
 	if (opts.cluster_size >= 0)
 		g_vol->cluster_size = opts.cluster_size;
 	/* Length is in unicode characters. */
-	g_vol->upcase_len = 65536;
-	g_vol->upcase = ntfs_malloc(g_vol->upcase_len * sizeof(ntfschar));
-	if (!g_vol->upcase)
+	g_vol->upcase_len = ntfs_upcase_build_default(&g_vol->upcase);
+	/* Since Windows 8, there is a $Info stream in $UpCase */
+	g_upcaseinfo =
+		(struct UPCASEINFO*)ntfs_malloc(sizeof(struct UPCASEINFO));
+	if (!g_vol->upcase_len || !g_upcaseinfo)
 		goto done;
-	ntfs_upcase_table_build(g_vol->upcase,
+	/* If the CRC is correct, chkdsk does not warn about obsolete table */
+	crc64(0,(byte*)NULL,0); /* initialize the crc computation */
+	upcase_crc = crc64(0,(byte*)g_vol->upcase,
 			g_vol->upcase_len * sizeof(ntfschar));
+	/* keep the version fields as zero */
+	memset(g_upcaseinfo, 0, sizeof(struct UPCASEINFO));
+	g_upcaseinfo->len = const_cpu_to_le32(sizeof(struct UPCASEINFO));
+	g_upcaseinfo->crc = cpu_to_le64(upcase_crc);
 	g_vol->attrdef = ntfs_malloc(sizeof(attrdef_ntfs3x_array));
 	if (!g_vol->attrdef) {
 		ntfs_log_perror("Could not create attrdef structure");
@@ -4768,7 +4845,7 @@ done:
  * mkntfs_main
  */
 int	mkntfs_main(const char *devpath, const char *label)
-{	
+{
 	//reset global variables
 	g_buf = NULL;
 	g_mft_bitmap_byte_size = 0;
@@ -4789,13 +4866,13 @@ int	mkntfs_main(const char *devpath, const char *label)
 	g_mftmirr_lcn = 0;
 	g_logfile_lcn = 0;
 	g_logfile_size = 0;
-	g_mft_zone_end = 0;	
+	g_mft_zone_end = 0;
 	g_num_bad_blocks = 0;
 	g_bad_blocks = NULL;
 	g_allocation = NULL;
-	
+
 	//init default options
-	mkntfs_init_options(&opts);	
+	mkntfs_init_options(&opts);
 
 	opts.dev_name = devpath;
 	opts.label = label;
@@ -4805,4 +4882,3 @@ int	mkntfs_main(const char *devpath, const char *label)
 
 	return mkntfs_redirect(&opts);
 }
-
