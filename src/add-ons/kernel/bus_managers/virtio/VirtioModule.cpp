@@ -184,11 +184,11 @@ virtio_queue_size(virtio_queue _queue)
 }
 
 
-void*
-virtio_queue_dequeue(virtio_queue _queue, uint32* _usedLength)
+bool
+virtio_queue_dequeue(virtio_queue _queue, void** _cookie, uint32* _usedLength)
 {
 	VirtioQueue *queue = (VirtioQueue *)_queue;
-	return queue->Dequeue(_usedLength);
+	return queue->Dequeue(_cookie, _usedLength);
 }
 
 

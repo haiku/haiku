@@ -275,7 +275,7 @@ VirtioSCSIController::_RequestCallback(void* driverCookie, void* cookie)
 	VirtioSCSIController* controller = (VirtioSCSIController*)driverCookie;
 
 	while (controller->fVirtio->queue_dequeue(
-			controller->fRequestVirtioQueue, NULL) != NULL) {
+			controller->fRequestVirtioQueue, NULL, NULL)) {
 	}
 
 	controller->_RequestInterrupt();
@@ -296,12 +296,9 @@ VirtioSCSIController::_EventCallback(void* driverCookie, void* cookie)
 	CALLED();
 	VirtioSCSIController* controller = (VirtioSCSIController*)driverCookie;
 
-	while (true) {
-		virtio_scsi_event* event = (virtio_scsi_event*)
-			controller->fVirtio->queue_dequeue(controller->fEventVirtioQueue,
-				NULL);
-		if (event == NULL)
-			break;
+	virtio_scsi_event* event = NULL;
+	while (controller->fVirtio->queue_dequeue(controller->fEventVirtioQueue,
+			(void**)&event, NULL)) {
 		controller->_EventInterrupt(event);
 	}
 }

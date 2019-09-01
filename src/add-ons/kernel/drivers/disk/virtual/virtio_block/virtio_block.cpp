@@ -189,7 +189,7 @@ virtio_block_callback(void* driverCookie, void* cookie)
 	virtio_block_driver_info* info = (virtio_block_driver_info*)cookie;
 
 	// consume all queued elements
-	while (info->virtio->queue_dequeue(info->virtio_queue, NULL) != NULL)
+	while (info->virtio->queue_dequeue(info->virtio_queue, NULL, NULL))
 		;
 
 	release_sem_etc(info->sem_cb, 1, B_DO_NOT_RESCHEDULE);

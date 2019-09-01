@@ -131,7 +131,8 @@ public:
 			void				EnableInterrupt();
 			void				DisableInterrupt();
 
-			void*				Dequeue(uint32* _usedLength = NULL);
+			bool				Dequeue(void** _cookie = NULL,
+									uint32* _usedLength = NULL);
 
 private:
 			void				UpdateAvailable(uint16 index);

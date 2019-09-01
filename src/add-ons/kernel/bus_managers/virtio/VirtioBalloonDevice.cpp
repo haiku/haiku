@@ -188,14 +188,13 @@ VirtioBalloonDevice::_Thread()
 
 		// alloc or release
 		TRACE("queue request\n");
-		status_t result = fVirtio->queue_request(queue, &fEntry, NULL, 
-			queue);
+		status_t result = fVirtio->queue_request(queue, &fEntry, NULL, NULL);
 		if (result != B_OK) {
 			ERROR("queueing failed (%s)\n", strerror(result));
 			return result;
 		}
 
-		while (fVirtio->queue_dequeue(queue, NULL) == NULL) {
+		while (!fVirtio->queue_dequeue(queue, NULL, NULL)) {
 			TRACE("wait for response\n");
 			queueConditionEntry.Wait(B_CAN_INTERRUPT);
 		}

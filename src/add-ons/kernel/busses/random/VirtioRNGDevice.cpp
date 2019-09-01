@@ -95,7 +95,7 @@ VirtioRNGDevice::Read(void* _buffer, size_t* _numBytes)
 			fInterruptCondition.Add(&fInterruptConditionEntry);
 		}
 		status_t result = fVirtio->queue_request(fVirtioQueue, NULL, &fEntry,
-			this);
+			NULL);
 		if (result != B_OK) {
 			ERROR("queueing failed (%s)\n", strerror(result));
 			return result;
@@ -131,7 +131,7 @@ VirtioRNGDevice::_RequestCallback(void* driverCookie, void* cookie)
 {
 	VirtioRNGDevice* device = (VirtioRNGDevice*)driverCookie;
 
-	while (device->fVirtio->queue_dequeue(device->fVirtioQueue, NULL) != NULL)
+	while (device->fVirtio->queue_dequeue(device->fVirtioQueue, NULL, NULL))
 		;
 
 	device->_RequestInterrupt();

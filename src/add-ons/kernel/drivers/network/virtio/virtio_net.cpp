@@ -171,26 +171,15 @@ get_feature_name(uint32 feature)
 static status_t
 virtio_net_drain_queues(virtio_net_driver_info* info)
 {
-	while (true) {
-		BufInfo* buf = (BufInfo*)info->virtio->queue_dequeue(
-			info->txQueues[0], NULL);
-		if (buf == NULL)
-			break;
+	BufInfo* buf = NULL;
+	while (info->virtio->queue_dequeue(info->txQueues[0], (void**)&buf, NULL))
 		info->txFreeList.Add(buf);
-	}
 
-	while (true) {
-		BufInfo* buf = (BufInfo*)info->virtio->queue_dequeue(
-			info->rxQueues[0], NULL);
-		if (buf == NULL)
-			break;
-	}
+	while (info->virtio->queue_dequeue(info->rxQueues[0], NULL, NULL))
+		;
 
-	while (true) {
-		BufInfo* buf = info->rxFullList.RemoveHead();
-		if (buf == NULL)
-			break;
-	}
+	while (info->rxFullList.RemoveHead() != NULL)
+		;
 
 	return B_OK;
 }
@@ -565,10 +554,11 @@ virtio_net_read(void* cookie, off_t pos, void* buffer, size_t* _length)
 		mutex_lock(&info->rxLock);
 		while (info->rxDone != -1) {
 			uint32 usedLength = 0;
-			BufInfo* buf = (BufInfo*)info->virtio->queue_dequeue(
-				info->rxQueues[0], &usedLength);
-			if (buf == NULL)
+			BufInfo* buf = NULL;
+			if (!info->virtio->queue_dequeue(info->rxQueues[0], (void**)&buf,
+					&usedLength) || buf == NULL) {
 				break;
+			}
 
 			buf->rxUsedLength = usedLength;
 			info->rxFullList.Add(buf);
@@ -622,10 +612,12 @@ virtio_net_write(void* cookie, off_t pos, const void* buffer,
 
 		mutex_lock(&info->txLock);
 		while (info->txDone != -1) {
-			BufInfo* buf = (BufInfo*)info->virtio->queue_dequeue(
-				info->txQueues[0], NULL);
-			if (buf == NULL)
+			BufInfo* buf = NULL;
+			if (!info->virtio->queue_dequeue(info->txQueues[0], (void**)&buf,
+					NULL) || buf == NULL) {
 				break;
+			}
+
 			info->txFreeList.Add(buf);
 		}
 	}
