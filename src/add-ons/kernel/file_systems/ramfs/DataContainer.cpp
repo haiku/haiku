@@ -239,7 +239,8 @@ DataContainer::_DoCacheIO(const off_t offset, uint8* buffer, ssize_t length,
 
 	while (length > 0) {
 		vm_page* page = pages[index];
-		phys_addr_t at = (page->physical_page_number * B_PAGE_SIZE);
+		phys_addr_t at = (page != NULL)
+			? (page->physical_page_number * B_PAGE_SIZE) : 0;
 		ssize_t bytes = B_PAGE_SIZE;
 		if (index == 0) {
 			const uint32 pageoffset = (offset % B_PAGE_SIZE);
