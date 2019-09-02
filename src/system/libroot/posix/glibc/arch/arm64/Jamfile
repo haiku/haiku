@@ -1,0 +1,154 @@
+SubDir HAIKU_TOP src system libroot posix glibc arch arm64 ;
+
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch $(TARGET_ARCH) ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch generic ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc stdlib ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc math ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc libio ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
+
+SubDirHdrs $(HAIKU_TOP) src system libroot posix glibc arch generic ;
+
+UsePrivateHeaders libroot ;
+
+if $(OPTIM) = -O0 {
+	OPTIM = -O ;
+}
+
+# don't compile with debugging
+DEBUG = 0 ;
+
+SubDirCcFlags -D_GNU_SOURCE -D_IEEE_LIBM ;
+
+# Note: There is no *l() support yet. Our compiler says sizeof(long double) = 8,
+# while there are only 96 and 128 bit implementation in glibc.
+local genericSources =
+	lshift.c rshift.c submul_1.c
+	add_n.c sub_n.c
+	addmul_1.c mul_1.c
+
+	branred.c
+	cmp.c dbl2mpn.c divrem.c
+	doasin.c dosincos.c
+	halfulp.c
+	memrchr.c
+	mpa.c mpatan.c mpatan2.c mpexp.c mplog.c mpn2dbl.c
+	mpn2flt.c mpn2ldbl.c mpsqrt.c mptan.c
+	mul.c mul_n.c
+	sincos32.c
+	slowexp.c
+	slowpow.c
+
+	e_acos.c e_acosf.c # e_acosl.c
+	e_acosh.c e_acoshf.c # e_acoshl.c
+	e_asin.c e_asinf.c # e_asinl.c
+	e_atan2.c e_atan2f.c # e_atan2l.c
+	e_atanh.c e_atanhf.c # e_atanhl.c
+	e_cosh.c e_coshf.c # e_coshl.c
+	e_exp.c e_expf.c
+	e_fmod.c e_fmodf.c # e_fmodl.c
+	e_gamma_r.c e_gammaf_r.c
+	e_hypot.c e_hypotf.c # e_hypotl.c
+	e_j0.c e_j0f.c
+	e_j1.c e_j1f.c
+	e_jn.c e_jnf.c
+	e_lgamma_r.c e_lgammaf_r.c
+	e_log.c e_logf.c
+	e_log10.c e_log10f.c
+	e_pow.c e_powf.c # e_powl.c
+	e_rem_pio2f.c
+	e_remainder.c e_remainderf.c # e_remainderl.c
+	e_scalb.c e_scalbf.c # e_scalbl.c
+	e_sinh.c e_sinhf.c # e_sinhl.c
+	k_cos.c k_cosf.c
+	k_sin.c k_sinf.c
+	k_rem_pio2.c k_rem_pio2f.c # k_rem_pio2l.c
+	k_tan.c k_tanf.c
+	s_asinh.c s_asinhf.c # s_asinhl.c
+	s_atan.c s_atanf.c # s_atanl.c
+	s_cbrt.c s_cbrtf.c # s_cbrtl.c
+	s_ceil.c s_ceilf.c # s_ceill.c
+	s_cos.c s_cosf.c
+	s_copysign.c s_copysignf.c
+	s_erf.c s_erff.c # s_erfl.c
+	s_expm1f.c s_expm1.c
+	s_finite.c s_finitef.c # s_finitel.c
+	s_clog.c s_clogf.c # s_clogl.c
+	s_csqrt.c s_csqrtf.c # s_csqrtl.c
+	s_floor.c s_floorf.c # s_floorl.c
+	s_fabs.c s_fabsf.c
+	s_fdim.c s_fdimf.c
+	s_fma.c s_fmaf.c # s_fmal.c
+	s_fmax.c s_fmaxf.c
+	s_fmin.c s_fminf.c
+	s_fpclassify.c s_fpclassifyf.c # s_fpclassifyl.c
+	s_frexp.c s_frexpf.c # s_frexpl.c
+	s_ilogb.c s_ilogbf.c
+	s_isinf.c s_isinff.c # s_isinfl.c
+	s_isnan.c s_isnanf.c
+	s_ldexp.c s_ldexpf.c # s_ldexpl.c
+	s_llrint.c s_llrintf.c # s_llrintl.c
+	s_log1p.c s_log1pf.c
+	s_logb.c s_logbf.c # s_logbl.c
+	s_lrint.c s_lrintf.c # s_lrintl.c
+	s_lround.c s_lroundf.c
+	s_modf.c s_modff.c # s_modfl.c
+	s_nan.c s_nanf.c # s_nanl.c
+	# s_nexttoward.c s_nexttowardf.c s_nexttowardl.c
+	s_round.c s_roundf.c # s_roundl.c
+	s_rint.c s_rintf.c
+	s_scalbn.c s_scalbnf.c # s_scalbnl.c
+	s_signbit.c s_signbitf.c # s_signbitl.c
+	s_significand.c s_significandf.c
+	s_signgam.c
+	s_sin.c s_sinf.c # s_sinl.c
+	s_sincos.c s_sincosf.c
+	s_tan.c s_tanf.c
+	s_tanh.c s_tanhf.c
+	s_trunc.c s_truncf.c
+	t_exp.c
+	w_acos.c w_acosf.c # w_acosl.c
+	w_acosh.c w_acoshf.c # w_acoshl.c
+	w_atan2.c w_atan2f.c # w_atan2l.c
+	w_asin.c w_asinf.c # w_asinl.c
+	w_atanh.c w_atanhf.c # w_atanhl.c
+	w_cosh.c w_coshf.c # w_coshl.c
+	w_drem.c w_dremf.c # w_dreml.c
+	w_exp.c w_expf.c # w_expl.c
+	w_fmod.c w_fmodf.c # w_fmodl.c
+	w_hypot.c w_hypotf.c # w_hypotl.c
+	w_j0.c w_j0f.c
+	w_j1.c w_j1f.c
+	w_jn.c w_jnf.c
+	w_lgamma.c w_lgammaf.c
+	w_lgamma_r.c w_lgammaf_r.c
+	w_log.c w_logf.c # w_logl.c
+	w_log10.c w_log10f.c # w_log10l.c
+	w_pow.c w_powf.c # w_powl.c
+	w_remainder.c w_remainderf.c # w_remainderl.c
+	w_scalb.c w_scalbf.c # w_scalbl.c
+	w_sinh.c w_sinhf.c # w_sinhl.c
+	w_sqrt.c w_sqrtf.c
+	w_tgamma.c w_tgammaf.c # w_tgammal.c
+	;
+
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup arm64 ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		MergeObject <$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_generic.o :
+			$(genericSources)
+			;
+
+		MergeObjectFromObjects <$(architecture)>posix_gnu_arch_$(TARGET_ARCH).o
+			: :
+			<$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_generic.o
+			;
+
+		SEARCH on [ FGristFiles $(genericSources) ]
+			= [ FDirName $(HAIKU_TOP) src system libroot posix glibc arch
+				generic ] ;
+	}
+}

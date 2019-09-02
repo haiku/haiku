@@ -422,6 +422,13 @@ rule KernelArchitectureSetup architecture
 				-Wl,-z -Wl,max-page-size=0x1000
 				-Wl,-z -Wl,common-page-size=0x1000 ;
 
+		case arm64 :
+			# Workaround for ld using 32k for alignment despite forcing it in the config...
+			# should definitely not be needed!
+			HAIKU_KERNEL_LINKFLAGS +=
+				-Wl,-z -Wl,max-page-size=0x1000
+				-Wl,-z -Wl,common-page-size=0x1000 ;
+
 		case ppc :
 			# Build a position independent PPC kernel. We need to be able to
 			# relocate the kernel, since the virtual address space layout at

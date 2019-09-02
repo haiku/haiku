@@ -2,3 +2,11 @@ SubDir HAIKU_TOP src system kernel arch arm64 ;
 
 SubDirHdrs $(SUBDIR) $(DOTDOT) generic ;
 UsePrivateKernelHeaders ;
+
+KernelMergeObject kernel_arch_arm64.o :
+	arch_elf.cpp
+	
+	:
+	$(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
+	:
+;

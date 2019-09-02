@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src system libroot os arch arm ;
+SubDir HAIKU_TOP src system libroot os arch arm64 ;
 
 SubDirC++Flags -std=gnu++11 ;
 
@@ -13,7 +13,8 @@ for architectureObject in [ MultiArchSubDirSetup arm64 ] {
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
 		MergeObject <$(architecture)>os_arch_$(TARGET_ARCH).o :
-
+			tls.c
+			thread.c
 
 			generic_atomic.cpp
 			generic_stack_trace.cpp
