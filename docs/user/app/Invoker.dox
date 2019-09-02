@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Haiku, Inc. All rights reserved.
+ * Copyright 2015, 2019 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -169,6 +169,16 @@
 
 	\return \c true if the invoker and its target are in the same team,
 	        \c false if they reside in separate address spaces.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BHandler* BInvoker::Target(BLooper** _looper = NULL) const
+	\brief Invoke BMessenger::Target() on the internal messenger
+
+	\see BMessenger::Target()
 
 	\since BeOS R3
 */

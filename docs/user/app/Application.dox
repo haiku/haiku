@@ -1,13 +1,13 @@
 /*
- * Copyright 2011-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2011-2014, 2019 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		John Scipione, jscipione@gmail.com
  * 
  * Corresponds to:
- *		headers/os/app/Application.h	hrev47355
- *		src/kits/app/Application.cpp	hrev47355
+ *		headers/os/app/Application.h	hrev49893
+ *		src/kits/app/Application.cpp	hrev52620
  */
 
 
@@ -518,6 +518,14 @@ main()
 
 
 /*!
+	\fn const char* BApplication::Signature() const
+	\brief Returns the signature of the Application
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\fn status_t BApplication::GetAppInfo(app_info *info) const
 	\brief Fills out the \a info parameter with information about the
 	       application.
@@ -631,3 +639,53 @@ main()
 
 
 //! @}
+
+
+/*!
+	\name Lifecycle Management
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BApplication::RegisterLooper(BLooper* looper)
+	\brief Register a looper to quit when the application quits
+
+	There are situations where you create BLooper objects, that you may want to
+	have BApplication quit properly, when the application is quitting. This
+	method allows you to add Loopers under management of BApplication.
+
+	Note that Windows are automatically handled by BApplication, so there is no
+	need to manually register BWindow-based loopers using this method.
+
+	\returns \c B_OK when the looper was registered without an issue,
+		\c B_BAD_VALUE when you try to register a BWindow, or \c B_ERROR
+		when the looper was already registered.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BApplication::UnregisterLooper(BLooper* looper)
+	\brief Remove a previously registered Looper from the quit-list
+
+	If a looper has been added to the quit list using
+	BApplication::RegisterLooper, they can be unregistered using this method.
+	You should do this in the case the looper quits before the application
+	does.
+
+	Note that Windows are automatically handled by BApplication, so you don't
+	have to use this function to unregister windows.
+
+	\returns \c B_OK when the looper has been removed, \c B_BAD_VALUE when you
+	try to unregister a BWindow, or \c B_ERROR when the looper was not
+	previously registered.
+
+	\since Haiku R1
+*/
+
+
+//! @{

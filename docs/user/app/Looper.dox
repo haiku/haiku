@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2018 Haiku, Inc. All rights reserved.
+ * Copyright 2008-2019 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -435,6 +435,15 @@
 	           you an invalid or a \c NULL pointer.
 
 	\since BeOS R5
+*/
+
+
+/*!
+	\fn void BLooper::DispatchExternalMessage(BMessage* message,
+		BHandler* handler, bool& _detached)
+	\brief Internal method to support single-threaded GUI toolkits
+
+	\since Haiku R1
 */
 
 
