@@ -266,7 +266,7 @@ Volume::CountBlocks() const
 off_t
 Volume::CountFreeBlocks() const
 {
-	return vm_page_num_available_pages();
+	return vm_page_num_free_pages();
 }
 
 // SetName
