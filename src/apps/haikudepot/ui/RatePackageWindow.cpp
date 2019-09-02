@@ -570,9 +570,10 @@ RatePackageWindow::_QueryRatingThread()
 			package->DepotName().String());
 		BMessenger(this).SendMessage(B_QUIT_REQUESTED);
 	} else {
-		status_t status = interface.RetrieveUserRating(
-			package->Name(), package->Version(), package->Architecture(),
-			repositoryCode, username, info);
+		status_t status = interface
+			.RetreiveUserRatingForPackageAndVersionByUser(package->Name(),
+			package->Version(), package->Architecture(), repositoryCode,
+			username, info);
 
 		if (status == B_OK) {
 				// could be an error or could be a valid response envelope

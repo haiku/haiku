@@ -24,6 +24,7 @@
 #include <Message.h>
 #include <Path.h>
 
+#include "HaikuDepotConstants.h"
 #include "Logger.h"
 #include "LocaleUtils.h"
 #include "StorageUtils.h"
@@ -624,15 +625,20 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 		BMessage info;
 
 		BString packageName;
-		BString architecture;
+		BString webAppRepositoryCode;
 		{
 			BAutolock locker(&fLock);
 			packageName = package->Name();
-			architecture = package->Architecture();
+			const DepotInfo* depot = DepotForName(package->DepotName());
+
+			if (depot != NULL)
+				webAppRepositoryCode = depot->WebAppRepositoryCode();
 		}
 
-		status_t status = fWebAppInterface.RetrieveUserRatings(packageName,
-			architecture, 0, 50, info);
+		status_t status = fWebAppInterface
+			.RetreiveUserRatingsForPackageForDisplay(packageName,
+				webAppRepositoryCode, 0, PACKAGE_INFO_MAX_USER_RATINGS,
+				info);
 		if (status == B_OK) {
 			// Parse message
 			BMessage result;
@@ -687,23 +693,31 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 					BString minor = "?";
 					BString micro = "";
 					double revision = -1;
+					BString architectureCode = "";
 					BMessage version;
 					if (item.FindMessage("pkgVersion", &version) == B_OK) {
 						version.FindString("major", &major);
 						version.FindString("minor", &minor);
 						version.FindString("micro", &micro);
 						version.FindDouble("revision", &revision);
+						version.FindString("architectureCode",
+							&architectureCode);
 					}
 					BString versionString = major;
 					versionString << ".";
 					versionString << minor;
-					if (micro.Length() > 0) {
+					if (!micro.IsEmpty()) {
 						versionString << ".";
 						versionString << micro;
 					}
 					if (revision > 0) {
 						versionString << "-";
 						versionString << (int) revision;
+					}
+
+					if (!architectureCode.IsEmpty()) {
+						versionString << " " << STR_MDASH << " ";
+						versionString << architectureCode;
 					}
 
 					BDateTime createTimestamp;

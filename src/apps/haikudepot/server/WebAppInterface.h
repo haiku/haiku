@@ -56,13 +56,13 @@ public:
 									const BString& packageName,
 									BMessage& message);
 
-			status_t			RetrieveUserRatings(
+			status_t			RetreiveUserRatingsForPackageForDisplay(
 									const BString& packageName,
-									const BString& architecture,
+									const BString& webAppRepositoryCode,
 									int resultOffset, int maxResults,
 									BMessage& message);
 
-			status_t			RetrieveUserRating(
+			status_t			RetreiveUserRatingForPackageAndVersionByUser(
 									const BString& packageName,
 									const BPackageVersion& version,
 									const BString& architecture,

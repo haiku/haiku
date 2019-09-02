@@ -63,4 +63,8 @@ enum {
 #define LANGUAGE_DEFAULT Language(LANGUAGE_DEFAULT_CODE, "English", true)
 
 
+#define PACKAGE_INFO_MAX_USER_RATINGS 250
+
+#define STR_MDASH "\xE2\x80\x94"
+
 #endif // HAIKU_DEPOT_CONSTANTS_H
