@@ -37,11 +37,9 @@ static const Translation kTranslations[] = {
 		"cssvb94\n"
 		"naydef\n"
 	},
-#if 0
 	{ "ca",
 		"Paco Rivière\n"
 	},
-#endif
 	{ "zh",
 		"Dong Guangyu\n"
 		"Pengfei Han (kurain)\n"
@@ -125,6 +123,9 @@ static const Translation kTranslations[] = {
 		"roptat\n"
 		"Starchaser\n"
 		"Wabouz\n"
+	},
+	{ "fur",
+		"Fabio Tomat\n"
 	},
 	{ "de",
 		"Atalanttore\n"
