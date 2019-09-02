@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2019 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -17,12 +17,16 @@
  *				exit
  */
 
-#define FUNCTION(x) .global x; .type x,%function; x
+#define FUNCTION(x) .globl x; .type _init, %function; x
 
-.section .init
+.section .init, "ax", @progbits
+.p2align 16
 FUNCTION(_init):
-	// crtbegin.o stuff comes here
+	sub		sp, sp, #16
+	str		lr, [sp]
 
-.section .fini
+.section .fini, "ax", @progbits
+.p2align 16
 FUNCTION(_fini):
-	// crtbegin.o stuff comes here
+	sub		sp, sp, #16
+	str		lr, [sp]
