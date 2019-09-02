@@ -959,9 +959,7 @@ AutoMounter::_SuggestMountFlags(const BPartition* partition, uint32* _flags)
 
 	if (partition->ContentType() != NULL
 		&& strcmp(partition->ContentType(), kPartitionTypeBFS) == 0) {
-#if 0
 		askReadOnly = false;
-#endif
 		isBFS = true;
 	}
 
@@ -986,16 +984,10 @@ AutoMounter::_SuggestMountFlags(const BPartition* partition, uint32* _flags)
 			string << B_TRANSLATE("Mounting volume <unnamed volume>\n\n");
 
 		// TODO: Use distro name instead of "Haiku"...
-		if (!isBFS) {
-			string << B_TRANSLATE("The file system on this volume is not the "
-				"Haiku file system. It is strongly suggested to mount it in "
-				"read-only mode. This will prevent unintentional data loss "
-				"because of errors in Haiku.");
-		} else {
-			string << B_TRANSLATE("It is suggested to mount all additional "
-				"Haiku volumes in read-only mode. This will prevent "
-				"unintentional data loss because of errors in Haiku.");
-		}
+		string << B_TRANSLATE("The file system on this volume is not the "
+			"Be file system. It is recommended to mount it in read-only "
+			"mode, to prevent unintentional data loss because of bugs "
+			"in Haiku.");
 
 		BAlert* alert = new BAlert(B_TRANSLATE("Mount warning"),
 			string.String(), B_TRANSLATE("Mount read/write"),
