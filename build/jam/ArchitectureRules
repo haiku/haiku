@@ -429,6 +429,9 @@ rule KernelArchitectureSetup architecture
 				-Wl,-z -Wl,max-page-size=0x1000
 				-Wl,-z -Wl,common-page-size=0x1000 ;
 
+			HAIKU_KERNEL_PIC_CCFLAGS = -fPIC ;
+			HAIKU_KERNEL_PIC_LINKFLAGS = -shared -fPIC ;
+
 		case ppc :
 			# Build a position independent PPC kernel. We need to be able to
 			# relocate the kernel, since the virtual address space layout at
