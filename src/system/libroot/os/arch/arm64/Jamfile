@@ -16,6 +16,8 @@ for architectureObject in [ MultiArchSubDirSetup arm64 ] {
 			tls.c
 			thread.c
 			system_time.c
+			time.c
+			get_stack_frame.S
 
 			generic_atomic.cpp
 			generic_stack_trace.cpp
