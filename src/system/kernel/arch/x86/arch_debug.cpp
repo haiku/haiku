@@ -72,10 +72,12 @@ get_next_frame_no_debugger(addr_t bp, addr_t* _next, addr_t* _ip,
 	// TODO: Do this more efficiently in assembly.
 	stack_frame frame;
 	if (onKernelStack
-		&& is_kernel_stack_address(thread, bp + sizeof(frame) - 1))
+			&& is_kernel_stack_address(thread, bp + sizeof(frame) - 1)) {
 		memcpy(&frame, (void*)bp, sizeof(frame));
-	else if (user_memcpy(&frame, (void*)bp, sizeof(frame)) != B_OK)
+	} else if (!IS_USER_ADDRESS(bp)
+			|| user_memcpy(&frame, (void*)bp, sizeof(frame)) != B_OK) {
 		return B_BAD_ADDRESS;
+	}
 
 	*_ip = frame.return_address;
 	*_next = (addr_t)frame.previous;
