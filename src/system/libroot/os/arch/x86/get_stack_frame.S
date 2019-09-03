@@ -12,10 +12,3 @@ FUNCTION(get_stack_frame):
 	ret
 FUNCTION_END(get_stack_frame)
 
-
-/* void* __arch_get_caller(void); */
-FUNCTION(__arch_get_caller):
-	mov		4(%ebp), %eax
-	ret
-FUNCTION_END(__arch_get_caller)
-

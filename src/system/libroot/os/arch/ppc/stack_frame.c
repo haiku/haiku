@@ -15,10 +15,3 @@ get_stack_frame(void)
 	return NULL;
 }
 
-
-void*
-__arch_get_caller(void)
-{
-	// TODO: Implement!
-	return NULL;
-}

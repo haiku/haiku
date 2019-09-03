@@ -40,8 +40,9 @@ dlsym(void *handle, char const *name)
 	status_t status;
 	void* caller = NULL;
 
-	if (handle == RTLD_NEXT)
-		caller = __arch_get_caller();
+	if (handle == RTLD_NEXT) {
+		caller = __builtin_return_address(0);
+	}
 
 	status = __gRuntimeLoader->get_library_symbol(handle, caller, name,
 		&location);

@@ -418,7 +418,6 @@ void __acoshl() {}
 void __acosl() {}
 void __adjust_heap__H3ZPQ217EnvironmentFilter5EntryZlZQ217EnvironmentFilter5Entry_X01X11X11X21_v() {}
 void __allocate_pthread() {}
-void __arch_get_caller() {}
 void __arch_get_stack_trace() {}
 void __arch_get_system_time_offset() {}
 void __arch_init_time() {}

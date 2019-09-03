@@ -608,7 +608,6 @@ void __acosl() {}
 void __acr() {}
 void __add() {}
 void __allocate_pthread() {}
-void __arch_get_caller() {}
 void __arch_get_stack_trace() {}
 void __arch_get_system_time_offset() {}
 void __arch_init_time() {}
