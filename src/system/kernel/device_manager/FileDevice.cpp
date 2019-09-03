@@ -253,7 +253,7 @@ set_ioctl_result(const ResultType& result, void* buffer, size_t length)
 	if (buffer == NULL)
 		return B_BAD_ADDRESS;
 
-	if (!IS_USER_ADDRESS(buffer))
+	if (IS_USER_ADDRESS(buffer))
 		return user_memcpy(buffer, &result, sizeof(ResultType));
 
 	memcpy(buffer, &result, sizeof(ResultType));
