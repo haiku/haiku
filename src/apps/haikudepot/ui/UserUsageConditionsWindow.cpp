@@ -43,47 +43,116 @@
 
 #define LINES_INTRODUCTION_TEXT 2
 
-
-enum {
-	MSG_USER_USAGE_CONDITIONS_DATA	= 'uucd',
-	MSG_USER_USAGE_CONDITIONS_ERROR	= 'uuce'
-};
+#define WINDOW_FRAME BRect(0, 0, 500, 400)
 
 
-UserUsageConditionsWindow::UserUsageConditionsWindow(BWindow* parent,
-	BRect frame, Model& model, UserUsageConditionsSelectionMode mode)
+UserUsageConditionsWindow::UserUsageConditionsWindow(Model& model,
+	UserUsageConditions& userUsageConditions)
 	:
-	BWindow(frame, B_TRANSLATE("User Usage Conditions"),
-			B_FLOATING_WINDOW_LOOK, B_FLOATING_SUBSET_WINDOW_FEEL,
+	BWindow(WINDOW_FRAME, B_TRANSLATE("User Usage Conditions"),
+			B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+			B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS
+				| B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
+	fMode(FIXED),
+	fModel(model),
+	fWorkerThread(-1)
+{
+	_InitUiControls();
+
+	BScrollView* scrollView = new BScrollView("copy scroll view", fCopyView,
+		0, false, true, B_PLAIN_BORDER);
+	BButton* okButton = new BButton("ok", B_TRANSLATE("OK"),
+		new BMessage(B_QUIT_REQUESTED));
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_WINDOW_INSETS)
+		.Add(fVersionStringView, 1)
+		.Add(scrollView, 97)
+		.Add(fAgeNoteStringView, 1)
+		.AddGroup(B_HORIZONTAL, 1)
+			.AddGlue()
+			.Add(okButton)
+			.End()
+		.End();
+
+	CenterOnScreen();
+	_DisplayData(userUsageConditions);
+}
+
+UserUsageConditionsWindow::UserUsageConditionsWindow(
+	Model& model, UserUsageConditionsSelectionMode mode)
+	:
+	BWindow(WINDOW_FRAME, B_TRANSLATE("User Usage Conditions"),
+			B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 			B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS
 				| B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
 	fMode(mode),
 	fModel(model),
 	fWorkerThread(-1)
 {
-	AddToSubset(parent);
-
 	if (mode != LATEST)
 		debugger("only the LATEST user usage conditions are handled for now");
+
+	_InitUiControls();
 
 	fWorkerIndicator = new BarberPole("fetch data worker indicator");
 	BSize workerIndicatorSize;
 	workerIndicatorSize.SetHeight(20);
 	fWorkerIndicator->SetExplicitMinSize(workerIndicatorSize);
 
-	fCopyView = new MarkupTextView("copy view");
-	fCopyView->SetViewUIColor(B_NO_COLOR);
-	fCopyView->SetLowColor(RGB_COLOR_WHITE);
-	fCopyView->SetInsets(8.0f);
-
-	BScrollView* scrollView = new BScrollView("copy scroll view", fCopyView,
-		0, false, true, B_PLAIN_BORDER);
-
 	BTextView* introductionTextView = new BTextView("introduction text view");
 	introductionTextView->AdoptSystemColors();
 	introductionTextView->MakeEditable(false);
 	introductionTextView->MakeSelectable(false);
 	introductionTextView->SetText(B_TRANSLATE(_IntroductionTextForMode(mode)));
+
+	BSize introductionSize;
+	introductionSize.SetHeight(
+		_ExpectedIntroductionTextHeight(introductionTextView));
+	introductionTextView->SetExplicitPreferredSize(introductionSize);
+
+	BScrollView* scrollView = new BScrollView("copy scroll view", fCopyView,
+		0, false, true, B_PLAIN_BORDER);
+	BButton* okButton = new BButton("ok", B_TRANSLATE("OK"),
+		new BMessage(B_QUIT_REQUESTED));
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_WINDOW_INSETS)
+		.Add(introductionTextView, 1)
+		.AddGlue()
+		.Add(fVersionStringView, 1)
+		.Add(scrollView, 95)
+		.Add(fAgeNoteStringView, 1)
+		.AddGroup(B_HORIZONTAL, 1)
+			.AddGlue()
+			.Add(okButton)
+			.End()
+		.Add(fWorkerIndicator, 1)
+		.End();
+
+	CenterOnScreen();
+
+	_FetchData();
+		// start a new thread to pull down the user usage conditions data.
+}
+
+
+UserUsageConditionsWindow::~UserUsageConditionsWindow()
+{
+}
+
+
+/*! This sets up the UI controls / interface elements that are not specific to
+    a given mode of viewing.
+*/
+
+void
+UserUsageConditionsWindow::_InitUiControls()
+{
+	fCopyView = new MarkupTextView("copy view");
+	fCopyView->SetViewUIColor(B_NO_COLOR);
+	fCopyView->SetLowColor(RGB_COLOR_WHITE);
+	fCopyView->SetInsets(8.0f);
 
 	fAgeNoteStringView = new BStringView("age note string view",
 		PLACEHOLDER_TEXT);
@@ -102,38 +171,6 @@ UserUsageConditionsWindow::UserUsageConditionsWindow(BWindow* parent,
 	fVersionStringView->SetHighUIColor(B_PANEL_TEXT_COLOR, B_DARKEN_3_TINT);
 	fVersionStringView->SetExplicitMaxSize(
 		BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
-
-	BSize introductionSize;
-	introductionSize.SetHeight(
-		_ExpectedIntroductionTextHeight(introductionTextView));
-	introductionTextView->SetExplicitPreferredSize(introductionSize);
-
-	BButton* okButton = new BButton("ok", B_TRANSLATE("OK"),
-		new BMessage(B_QUIT_REQUESTED));
-
-	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.SetInsets(B_USE_WINDOW_INSETS)
-		.Add(introductionTextView, 1)
-		.AddGlue()
-		.Add(fVersionStringView, 1)
-		.Add(scrollView, 96)
-		.Add(fAgeNoteStringView, 1)
-		.AddGroup(B_HORIZONTAL, 1)
-			.AddGlue()
-			.Add(okButton)
-			.End()
-		.Add(fWorkerIndicator, 1)
-		.End();
-
-	CenterIn(parent->Frame());
-
-	_FetchData();
-		// start a new thread to pull down the user usage conditions data.
-}
-
-
-UserUsageConditionsWindow::~UserUsageConditionsWindow()
-{
 }
 
 

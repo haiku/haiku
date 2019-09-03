@@ -68,7 +68,6 @@ enum {
 	MSG_PACKAGE_CHANGED						= 'pchd',
 	MSG_WORK_STATUS_CHANGE					= 'wsch',
 	MSG_WORK_STATUS_CLEAR					= 'wscl',
-	MSG_VIEW_LATEST_USER_USAGE_CONDITIONS	= 'vluc',
 
 	MSG_SHOW_FEATURED_PACKAGES				= 'sofp',
 	MSG_SHOW_AVAILABLE_PACKAGES				= 'savl',
@@ -740,10 +739,11 @@ MainWindow::_BuildUserMenu(BMenuBar* menuBar)
 		new BMessage(MSG_LOG_OUT));
 	fUserMenu->AddItem(fLogOutItem);
 
-	fLogOutItem = new BMenuItem(B_TRANSLATE("View latest user usage conditions"
-		B_UTF8_ELLIPSIS),
-		new BMessage(MSG_VIEW_LATEST_USER_USAGE_CONDITIONS));
-	fUserMenu->AddItem(fLogOutItem);
+	BMenuItem *latestUserUsageConditionsMenuItem =
+		new BMenuItem(B_TRANSLATE("View latest user usage conditions"
+			B_UTF8_ELLIPSIS),
+			new BMessage(MSG_VIEW_LATEST_USER_USAGE_CONDITIONS));
+	fUserMenu->AddItem(latestUserUsageConditionsMenuItem);
 
 	menuBar->AddItem(fUserMenu);
 }
@@ -1349,6 +1349,6 @@ void
 MainWindow::_ViewLatestUserUsageConditions()
 {
 	UserUsageConditionsWindow* window = new UserUsageConditionsWindow(
-		this, BRect(0, 0, 500, 400), fModel, LATEST);
+		fModel, LATEST);
 	window->Show();
 }

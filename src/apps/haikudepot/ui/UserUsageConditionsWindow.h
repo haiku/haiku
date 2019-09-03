@@ -22,14 +22,17 @@ class Model;
 
 enum UserUsageConditionsSelectionMode {
 	LATEST		= 1,
-	USER		= 2
+	USER		= 2,
+	FIXED		= 3
+		// means that the user usage conditions are supplied to the window.
 };
 
 
 class UserUsageConditionsWindow : public BWindow {
 public:
-								UserUsageConditionsWindow(BWindow* parent,
-									BRect frame, Model& model,
+								UserUsageConditionsWindow(Model& model,
+									UserUsageConditions& userUsageConditions);
+								UserUsageConditionsWindow(Model& model,
 									UserUsageConditionsSelectionMode mode);
 	virtual						~UserUsageConditionsWindow();
 
@@ -37,6 +40,8 @@ public:
 	virtual bool				QuitRequested();
 
 private:
+	void						_InitUiControls();
+
 	static const BString		_VersionText(const BString& code);
 	static const BString		_MinimumAgeText(uint8 minimumAge);
 	static const BString		_IntroductionTextForMode(

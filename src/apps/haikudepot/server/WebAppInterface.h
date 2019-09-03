@@ -106,6 +106,7 @@ public:
 									const BString& captchaToken,
 									const BString& captchaResponse,
 									const BString& languageCode,
+									const BString& userUsageConditionsCode,
 									BMessage& message);
 
 			status_t			AuthenticateUser(const BString& nickName,

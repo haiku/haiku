@@ -693,31 +693,44 @@ status_t
 WebAppInterface::CreateUser(const BString& nickName,
 	const BString& passwordClear, const BString& email,
 	const BString& captchaToken, const BString& captchaResponse,
-	const BString& languageCode, BMessage& message)
+	const BString& languageCode, const BString& userUsageConditionsCode,
+	BMessage& message)
 {
-	JsonBuilder builder;
-	builder
-		.AddValue("jsonrpc", "2.0")
-		.AddValue("id", ++fRequestIndex)
-		.AddValue("method", "createUser")
-		.AddArray("params")
-			.AddObject()
-				.AddValue("nickname", nickName)
-				.AddValue("passwordClear", passwordClear);
+		// BHttpRequest later takes ownership of this.
+	BMallocIO* requestEnvelopeData = new BMallocIO();
+	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
 
-				if (!email.IsEmpty())
-					builder.AddValue("email", email);
+	requestEnvelopeWriter.WriteObjectStart();
+	_WriteStandardJsonRpcEnvelopeValues(requestEnvelopeWriter, "createUser");
+	requestEnvelopeWriter.WriteObjectName("params");
+	requestEnvelopeWriter.WriteArrayStart();
 
-				builder.AddValue("captchaToken", captchaToken)
-				.AddValue("captchaResponse", captchaResponse)
-				.AddValue("naturalLanguageCode", languageCode)
-			.EndObject()
-		.EndArray()
-	;
+	requestEnvelopeWriter.WriteObjectStart();
 
-	BString jsonString = builder.End();
+	requestEnvelopeWriter.WriteObjectName("nickname");
+	requestEnvelopeWriter.WriteString(nickName.String());
+	requestEnvelopeWriter.WriteObjectName("passwordClear");
+	requestEnvelopeWriter.WriteString(passwordClear.String());
+	requestEnvelopeWriter.WriteObjectName("captchaToken");
+	requestEnvelopeWriter.WriteString(captchaToken.String());
+	requestEnvelopeWriter.WriteObjectName("captchaResponse");
+	requestEnvelopeWriter.WriteString(captchaResponse.String());
+	requestEnvelopeWriter.WriteObjectName("naturalLanguageCode");
+	requestEnvelopeWriter.WriteString(languageCode.String());
+	requestEnvelopeWriter.WriteObjectName("userUsageConditionsCode");
+	requestEnvelopeWriter.WriteString(userUsageConditionsCode.String());
 
-	return _SendJsonRequest("user", jsonString, 0, message);
+	if (!email.IsEmpty()) {
+		requestEnvelopeWriter.WriteObjectName("email");
+		requestEnvelopeWriter.WriteString(email.String());
+	}
+
+	requestEnvelopeWriter.WriteObjectEnd();
+	requestEnvelopeWriter.WriteArrayEnd();
+	requestEnvelopeWriter.WriteObjectEnd();
+
+	return _SendJsonRequest("user", requestEnvelopeData,
+		_LengthAndSeekToZero(requestEnvelopeData), 0, message);
 }
 
 
