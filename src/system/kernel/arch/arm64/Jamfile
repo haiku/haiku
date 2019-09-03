@@ -5,6 +5,21 @@ UsePrivateKernelHeaders ;
 
 KernelMergeObject kernel_arch_arm64.o :
 	arch_elf.cpp
+	arch_int.cpp
+	arch_commpage.cpp
+	arch_thread.cpp
+	arch_cpu.cpp
+	arch_debug_console.cpp
+	arch_debug.cpp
+	arch_user_debugger.cpp
+	arch_vm_translation_map.cpp
+	arch_vm.cpp
+	arch_timer.cpp
+	arch_system_info.cpp
+	arch_smp.cpp
+	arch_real_time_clock.cpp
+	arch_platform.cpp
+	arch_asm.S
 	
 	:
 	$(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused

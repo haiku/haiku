@@ -15,6 +15,7 @@ for architectureObject in [ MultiArchSubDirSetup arm64 ] {
 		MergeObject <$(architecture)>os_arch_$(TARGET_ARCH).o :
 			tls.c
 			thread.c
+			system_time.c
 
 			generic_atomic.cpp
 			generic_stack_trace.cpp
