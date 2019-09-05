@@ -1522,10 +1522,16 @@ TMailWindow::MessageReceived(BMessage* msg)
 
 			BPoint where;
 			if (msg->FindPoint("where", &where) != B_OK) {
-				BRect bounds = fToolBar->Bounds();
-				where = fToolBar->ConvertToScreen(BPoint(
-					(bounds.right - bounds.left) / 2,
-					(bounds.bottom - bounds.top) / 2));
+				BRect rect;
+				BButton* button = fToolBar->FindButton(M_SIG_MENU);
+				if (button != NULL)
+					rect = button->Frame();
+				else
+					rect = fToolBar->Bounds();
+
+				where = button->ConvertToScreen(BPoint(
+					((rect.right - rect.left) / 2) - 16,
+					(rect.bottom - rect.top) / 2));
 			}
 
 			if ((item = menu->Go(where, false, true)) != NULL) {
