@@ -70,6 +70,7 @@ ControllerView::MessageReceived(BMessage* message)
 
 		default:
 			TransportControlGroup::MessageReceived(message);
+			break;
 	}
 }
 
