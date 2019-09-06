@@ -150,9 +150,9 @@ static const uint32 kByForumlaItem = 'Fbyq';
 	// taken from src/kits/tracker/FindPanel.h
 static const int kCopyBufferSize = 64 * 1024;	// 64 KB
 
-static const char* kSameRecipientItem = B_TRANSLATE_MARK("Same recipient");
-static const char* kSameSenderItem = B_TRANSLATE_MARK("Same sender");
-static const char* kSameSubjectItem = B_TRANSLATE_MARK("Same subject");
+static const char* kSameRecipientItem = B_TRANSLATE("Same recipient");
+static const char* kSameSenderItem = B_TRANSLATE("Same sender");
+static const char* kSameSubjectItem = B_TRANSLATE("Same subject");
 
 
 // static bitmap cache
