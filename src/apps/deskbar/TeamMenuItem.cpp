@@ -308,9 +308,17 @@ TTeamMenuItem::DrawExpanderArrow()
 
 	rect.OffsetTo(BPoint(frame.right - rect.Width(),
 		ContentLocation().y + ((frame.Height() - rect.Height()) / 2)));
+
+	float colorTint = B_DARKEN_3_TINT;
+
+	rgb_color bgColor = ui_color(B_MENU_BACKGROUND_COLOR);
+	if (bgColor.red + bgColor.green + bgColor.blue <= 128 * 3) {
+		colorTint = B_LIGHTEN_2_TINT;
+	}
+
 	be_control_look->DrawArrowShape(menu, rect, rect,
-		ui_color(B_MENU_BACKGROUND_COLOR), fArrowDirection, 0,
-		B_DARKEN_3_TINT);
+		bgColor, fArrowDirection, 0,
+		colorTint);
 }
 
 
