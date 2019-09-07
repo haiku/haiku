@@ -345,7 +345,7 @@ private:
 			// keyboard
 			const key_map*		fKeymap;
 			const char*			fKeymapChars;
-			HashMap<HashKey32<int32>, const int(*)[128]>
+			HashMap<HashKey32<int32>, const int32(*)[128]>
 								fKeymapTableForModifiers;
 			bool				fUseOptionAsMetaKey;
 			bool				fInterpretMetaKey;

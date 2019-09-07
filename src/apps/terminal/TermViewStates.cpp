@@ -222,7 +222,7 @@ TermView::DefaultState::KeyDown(const char* bytes, int32 numBytes)
 			bytes = (const char*)&rawChar;
 			numBytes = 1;
 		} else {
-			const int (*keymapTable)[128] =
+			const int32 (*keymapTable)[128] =
 				fView->fKeymapTableForModifiers.Get(mod);
 			bytes = &fView->fKeymapChars[(*keymapTable)[key]];
 			numBytes = *(bytes++);
