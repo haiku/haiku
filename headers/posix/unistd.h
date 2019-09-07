@@ -131,6 +131,10 @@
 #define	_SC_TIMERS						58
 #define	_SC_CPUTIME						59
 #define	_SC_THREAD_CPUTIME				60
+#define _SC_HOST_NAME_MAX				61
+#define _SC_REGEXP						62
+#define _SC_SYMLOOP_MAX					63
+#define _SC_SHELL						64
 
 
 /* confstr() constants */

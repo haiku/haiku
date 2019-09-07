@@ -71,14 +71,22 @@ __sysconf(int name)
 			return CLK_TCK;
 		case _SC_JOB_CONTROL:
 			return 1;
+		case _SC_HOST_NAME_MAX:
+			return _POSIX_HOST_NAME_MAX;
 		case _SC_NGROUPS_MAX:
 			return NGROUPS_MAX;
 		case _SC_OPEN_MAX:
 			return getdtablesize();
+		case _SC_REGEXP:
+			return 1;
 		case _SC_SAVED_IDS:
+			return 1;
+		case _SC_SHELL:
 			return 1;
 		case _SC_STREAM_MAX:
 			return STREAM_MAX;
+		case _SC_SYMLOOP_MAX:
+			return SYMLOOP_MAX;
 		case _SC_TZNAME_MAX:
 			return TZNAME_MAX;
 		case _SC_VERSION:
