@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-BluetoothPrefs	3156587572
+1	dutch; flemish	x-vnd.Haiku-BluetoothPrefs	67867884
 Laptop	Settings view		Laptop
 Only from trusted devices	Settings view		Alleen van vertrouwde apparaten
 15 secs	Settings view		15 sec.
@@ -26,6 +26,7 @@ Start bluetooth services…	Window		Start bluetooth-diensten…
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Controleer of de Bluetoothmogelijkheden van uw externe apparaat zijn ingeschakeld. Klik op 'Onderzoek' om het afzoeken te starten. De benodigde tijd voor het ophalen van de namen is onbekend, al zou dat korter dan 3 seconden per apparaat moeten zijn. Daarna kunt u ze toevoegen aan uw hoofdlijst, waarvandaan u eraan kunt koppelen.
 Scanning progress	Inquiry panel		Afzoek-voortgang
 Bluetooth	System name		Bluetooth
+Launch now	main		Nu uitvoeren
 Remove	Remote devices		Verwijderen
 Always ask	Settings view		Altijd vragen
 Help	Window		Help
@@ -36,6 +37,7 @@ Incoming connections policy:	Settings view		Beleid inkomende verbindingen:
 Show name	Extended local device view		Toon naam
 Add device to list	Inquiry panel		Apparaat aan lijst toevoegen
 Remaining %1 seconds	Inquiry panel		%1 seconden resterend
+The Bluetooth services are not currently running on this system.	main		De Bluetooth services zijn momenteel niet actief op dit systeem.
 Discoverable	Extended local device view		Zichtbaar
 Authenticate	Extended local device view		Verifieer
 Smart phone	Settings view		Smartphone

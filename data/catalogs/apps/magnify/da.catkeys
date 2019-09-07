@@ -1,0 +1,21 @@
+1	danish	x-vnd.Haiku-Magnify	1248284405
+  size must be > 4 and a multiple of 4	Console		  størrelse skal være > 4 og et multiplum af 4
+Decrease pixel size	Magnify-Main		Mindre pixelstørrelse
+no clip msg	In console, when clipboard is empty after clicking Copy image		ingen klipmeddelelse
+Increase pixel size	Magnify-Main		Større pixelstørrelse
+magnify: size must be a multiple of 4	Console		magnify: størrelse skal være multiplum af 4
+Stick coordinates	Magnify-Main		Fasthold koordinater
+%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}
+Copy image	Magnify-Main		Kopiér billede
+Decrease window size	Magnify-Main		Mindre vinduesstørrelse
+Remove a crosshair	Magnify-Main		Fjern et sigtekorn
+Add a crosshair	Magnify-Main		Tilføj et sigtekorn
+Freeze image	Magnify-Main		Frys billede
+usage: magnify [size] (magnify size * size pixels)	Console		anvendelse: magnify [størrelse] (forstørrelsesstørrelse * størrelse for pixels)
+Increase window size	Magnify-Main		Større vinduesstørrelse
+Save image	Magnify-Main		Gem billede
+Show grid	Magnify-Main		Vis gitter
+Magnify	System name		Forstør
+Info	Magnify-Main		Info
+Show info	Magnify-Main		Vis info
+Make square	Magnify-Main		Gør firkantet

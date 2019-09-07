@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Appearance	583615507
+1	ukrainian	x-vnd.Haiku-Appearance	663472720
 Control border	Colors tab		Керування межею
 Control mark	Colors tab		Відмітка
 Off	AntialiasingSettingsView		Вимкнути
@@ -8,10 +8,12 @@ Defaults	APRWindow		Типове
 Shadow	Colors tab		Тінь
 Document background	Colors tab		Тло документа
 List background	Colors tab		Тло списку
+No effect on running applications	DecorSettingsView		Не впливає на запущені застосунки
 Fixed font:	Font view		Моноширинний шрифт:
 Appearance	System name		Вигляд
 Reduce colored edges filter strength:	AntialiasingSettingsView		Зменшити кольорову міцність кромки фільтра:
 Glyph hinting:	AntialiasingSettingsView		Уточнення:
+Default Haiku ControlLook	DecorSettingsView		Стандартний вигляд віджетів
 Menu item text	Colors tab		Текст елемента меню
 About decorator	DecorSettingsView		Про Декоратор
 Antialiasing menu	AntialiasingSettingsView		Меню зглажування
@@ -47,7 +49,9 @@ LCD subpixel	AntialiasingSettingsView		Субпіксельне зглажува
 Window tab	Colors tab		Заголовок вікна
 Link text	Colors tab		Текст посилання
 Tooltip background	Colors tab		Тло підказки
+ControlLook:	DecorSettingsView		Вигляд віджетів:
 Scroll bar thumb	Colors tab		Повзунок прокрутки
+Default	DecorSettingsView		Стандартний
 Link visited	Colors tab		Відвідане посилання
 Selected menu item border	Colors tab		Межа виділеного елемента меню
 Tooltip text	Colors tab		Текст підказки
@@ -63,10 +67,12 @@ Antialiasing type:	AntialiasingSettingsView		Тип зглажування:
 Panel text	Colors tab		Текст панелі
 Hinting menu	AntialiasingSettingsView		Меню-підказки
 Scroll bar:	DecorSettingsView		Смуга прокрутки:
+Choose ControlLook	DecorSettingsView		Оберіть вигляд віджетів
 Monospaced fonts only	AntialiasingSettingsView		Тільки моноширинні шрифти
 Document text	Colors tab		Текст документа
 Inactive window border	Colors tab		Межа неактивного вікна
 Colors	APRWindow		Кольори
+About control look	DecorSettingsView		При вигляд віджетів
 Control highlight	Colors tab		Керування виділенням
 Status bar	Colors tab		Смуга стану
 Link hover	Colors tab		Зависле посилання

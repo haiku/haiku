@@ -1,0 +1,92 @@
+1	portuguese	x-vnd.Haiku-Devices	3345509916
+ACPI bus	DevicesView		Barramento ACPI
+Encryption controller	Device		Controlador de encriptação
+Bus Information	Device		Informação de Bus
+Devices	System name		Dispositivos
+Graphics Peripheral	DeviceSCSI		Periférico de Gráficos
+Processor	Device		Processador
+Generate system information	DevicesView		Gerar informação do sistema
+Class info	DevicePCI		Informação de classe
+ACPI Information	DeviceACPI		Informação ACPI
+Detailed	DevicesView		Detalhada
+Computer	DevicesView		Computador
+Communications	DeviceSCSI		Comunicações
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Informação de Classe:\t\t\t\t: %classInfo%
+Mass storage controller	Device		Controlador de armazenamento em massa
+Connection	DevicesView		Conexão
+Printer	DeviceSCSI		Impressora
+ACPI Processor Namespace '%2'	DeviceACPI		Espaço de Nome de Processador ACPI '%2'
+SCSI Information	DeviceSCSI		Informação de SCSI
+Manufacturer	Device		Fabricante
+Device name:	Device		Nome do dispositivo:
+Scanner	DeviceSCSI		Scanner
+Memory controller	Device		Controlador de memória
+Unknown device	DevicesView		Dispositivo desconhecido
+Unknown	DevicePCI		Desconhecido
+ACPI node '%1'	DeviceACPI		Nó de ACPI '%1'
+Optical Drive	DeviceSCSI		Unidade Ótica
+Name	PropertyList		Nome
+Manufacturer	DeviceSCSI		Fabricante
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Nome de Dispositivo\t\t\t\t: %Name%\nFabricante\t\t\t: %Manufacturer%\nControlador utilizado\t\t\t\t: %DriverUsed%\nCaminhos de dispositivo\t: %DevicePaths%
+Device name	Device		Nome de dispositivo
+Satellite communications controller	Device		Controlador de comunicações por satélite
+Device class	DeviceSCSI		Classe de dispositivo
+Device	Device		Dispositivo
+Input device controller	Device		Controlador de dispositivo de introdução
+PCI bus	DevicesView		Barramento PCI
+ACPI System Indicator	DeviceACPI		Indicador de Sistema de ACPI
+ACPI System Bus	DeviceACPI		Barramento de Sistema ACPI
+PCI Information	DevicePCI		Informação PCI
+Tape Drive	DeviceSCSI		Dispositivo de Fita Magnética
+Changer	DeviceSCSI		Trocador
+Serial bus controller	Device		Controlador de barramento em série
+Refresh devices	DevicesView		Atualizar lista de dispositivos
+Category	DevicesView		Categoria
+RBC	DeviceSCSI		RBC
+None	Device		Nenhum
+Device paths	Device		Localização dos dispositivos
+Unknown device	Device		Dispositivo desconhecido
+Wireless controller	Device		Controlador sem fios
+Generic system peripheral	Device		Periférico genérico de sistema
+Value	PropertyList		Valor
+Devices	DevicesView		Dispositivos
+Device name	DeviceACPI		Nome de dispositivo
+Card Reader	DeviceSCSI		Leitor de Cartões
+Display controller	Device		Controlador de ecrã
+Basic information	DevicesView		Informação básica
+ACPI Button '%1'	DeviceACPI		Botão ACPI '%1'
+Bus	DevicesView		Barramento
+ACPI <unknown>	DeviceACPI		ACPI <desconhecido>
+Device name	DevicePCI		Nome de dispositivo
+Disk Drive	DeviceSCSI		Unidade de Disco
+Other	DeviceSCSI		Outro
+Report compatibility	DevicesView		Reportar compatibilidade
+Computer	Device		Computador
+PCI bus	Device		Barramento PCI
+Enclosure	DeviceSCSI		Enclosure
+Order by:	DevicesView		Ordenar por:
+ACPI Thermal Zone	DeviceACPI		Zona Térmica de ACPI
+Intelligent controller	Device		Controlador inteligente
+Multimedia controller	Device		Controlador multimédia
+Quit	DevicesView		Sair
+ISA bus	Device		Barramento ISA
+ISA bus	DevicesView		Barramento ISA
+Processor	DeviceSCSI		Processador
+Manufacturer:	Device		Fabricante:
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Informação de Classe:\t\t\t\t: %classInfo%
+Bridge	Device		Ponte
+Worm	DeviceSCSI		Worm
+CD-ROM	DeviceSCSI		CD-ROM
+Manufacturer	DevicePCI		Fabricante
+Bridge	DeviceSCSI		Bridge
+Signal processing controller	Device		Controlador do processador de sinal
+Device name	DeviceSCSI		Nome de dispositivo
+Docking station	Device		Estação de ancoragem
+Array	DeviceSCSI		Matriz
+Unclassified device	Device		Dispositivo não classificado
+ACPI controller	Device		Controlador ACPI
+Network controller	Device		Controlador de rede
+Driver used	Device		Controlador utilizado
+Communication controller	Device		Controlador de comunicações
+ACPI bus	Device		Barramento ACPI
+unknown	Device		desconhecido

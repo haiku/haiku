@@ -21,8 +21,8 @@ Belgian (point)	KeymapNames		Belga (pont)
 Finnish	KeymapNames		Finn
 Num lock	Keyboard Layout View		Num lock
 Switch shortcut keys to Windows/Linux mode	Keymap window		Billentyűkombináció váltása Windows/Linux módra
-Spanish (Dvorak)	KeymapNames		Spanyol (Dvorak)
 Option	Keyboard Layout View	Option key	Opció billentyű
+Spanish (Dvorak)	KeymapNames		Spanyol (Dvorak)
 Scroll lock	Keyboard Layout View		Scroll lock
 US-International	KeymapNames		Egyesült Államok - nemzetközi
 Right option	Keyboard Layout View		Jobb opció billentyű
@@ -65,13 +65,13 @@ Remove	Keyboard Layout View		Eltávolítás
 Tilde trigger	Keymap window		Hullámvonal kapcsoló
 Shift	Keyboard Layout View	Shift key	Váltógomb
 CONTROL	Keyboard Layout View		CONTROL
-Czech (Mac)	KeymapNames		Cseh (Mac)
 Macedonian	KeymapNames		Macedón
+Czech (Mac)	KeymapNames		Cseh (Mac)
 Left command	Keyboard Layout View		Bal parancs billentyű
 Albanian	KeymapNames		Albán
 (Current)	Keymap window		(jelenlegi)
-Friulian	KeymapNames		Friuli
 OPT	Keyboard Layout View	Very short for 'option'	OPT
+Friulian	KeymapNames		Friuli
 Left option	Keyboard Layout View		Bal opció billentyű
 END	Keyboard Layout View		END
 Esperanto	KeymapNames		Eszperantó
@@ -137,8 +137,8 @@ Norwegian	KeymapNames		Norvég
 Font	Keymap window		Betűtípus
 Danish	KeymapNames		Dán
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift billentyű
-Russian	KeymapNames		Orosz
 PAUSE	Keyboard Layout View		PAUSE
+Russian	KeymapNames		Orosz
 Romanian	KeymapNames		Román
 CMD	Keyboard Layout View	Very short for 'command'	CMD
 Command	Keyboard Layout View	Command key	Parancsbillentyű

@@ -1,0 +1,46 @@
+1	portuguese	x-vnd.Haiku-PowerStatus	3173765686
+Design capacity low warning: 	PowerStatus		Aviso de baixa capacidade de origem: 
+Show percent	PowerStatus		Ver porcentagem
+Design capacity: 	PowerStatus		Capacidade de origem: 
+ mW	PowerStatus		 mW
+The battery level is getting low, please plug in the device.	PowerStatus		O nível de bateria está a ficar baixo, por favor ligue o dispositivo à corrente.
+Battery low	PowerStatus		Bateria fraca
+Type: 	PowerStatus		Tipo: 
+non-rechargeable	PowerStatus		não recarregável
+Empty battery slot	PowerStatus		Compartimento da bateria vazio
+ mV	PowerStatus		 mV
+Run in window	PowerStatus		Executar numa janela
+PowerStatus	System name		Estado de Energia
+ mWh	PowerStatus		 mWh
+Battery info…	PowerStatus		Informações da bateria…
+Damaged battery	PowerStatus		Bateria danificada
+Show time	PowerStatus		Mostrar tempo
+Last full charge: 	PowerStatus		Última carga completa: 
+Battery unused	PowerStatus		Bateria sem uso
+Extended battery info	PowerStatus		Informação detalhada da bateria
+ mA	PowerStatus		 mA
+Current rate: 	PowerStatus		Consumo atual: 
+discharging	PowerStatus		a descarregar
+Show text label	PowerStatus		Mostrar etiqueta de texto
+About…	PowerStatus		Acerca…
+Model number: 	PowerStatus		Número do modelo: 
+Install in Deskbar	PowerStatus		Instalar na Deskbar
+ mAh	PowerStatus		 mAh
+Capacity: 	PowerStatus		Capacidade: 
+Battery discharging	PowerStatus		Bateria a descarregar
+Serial number: 	PowerStatus		Número de série: 
+Battery critical	PowerStatus		Bateria em nível crítico
+Capacity granularity 1: 	PowerStatus		Granularidade de capacidade 1: 
+OEM info: 	PowerStatus		Informação OEM: 
+Design voltage: 	PowerStatus		Voltagem de origem: 
+Battery charging	PowerStatus		Bateria a carregar
+The battery level is critical, please plug in the device immediately.	PowerStatus		O nível da bateria é crítico, por favor ligue imediatamente o dispositivo à corrente.
+Design capacity warning: 	PowerStatus		Aviso de capacidade de origem: 
+Quit	PowerStatus		Sair
+rechargeable	PowerStatus		recarregável
+charging	PowerStatus		carregando
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Você pode executar a aplicação Estado de Energia numa janela ou instalá-la na Deskbar.
+Show status icon	PowerStatus		Ver ícone de estado
+Capacity granularity 2: 	PowerStatus		Granularidade de capacidade 2: 
+Technology: 	PowerStatus		Tecnologia: 
+no battery	PowerStatus		sem bateria

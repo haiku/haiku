@@ -1,5 +1,5 @@
 1	italian	x-vnd.Haiku-TIFFTranslator	2234713102
-TIFF Library:	TIFFView		Libreria TIFF
+TIFF Library:	TIFFView		Libreria TIFF:
 RLE (Packbits)	TIFFView		RLE (Packbits)
 ZIP (Deflate)	TIFFView		ZIP (Deflate)
 identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: indice documento non valido\n

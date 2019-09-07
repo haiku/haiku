@@ -1,0 +1,92 @@
+1	danish	x-vnd.Haiku-Devices	3345509916
+ACPI bus	DevicesView		ACPI-bus
+Encryption controller	Device		Krypterings-kontroller
+Bus Information	Device		Bus-information
+Devices	System name		Enheder
+Graphics Peripheral	DeviceSCSI		Grafisk perifer
+Processor	Device		Processor
+Generate system information	DevicesView		Generer systeminformation
+Class info	DevicePCI		Klasseinfo
+ACPI Information	DeviceACPI		ACPI-information
+Detailed	DevicesView		Detaljer
+Computer	DevicesView		Computer
+Communications	DeviceSCSI		Kommunikation
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Klasseinfo:\t\t\t\t: %classInfo%
+Mass storage controller	Device		Masselagerings-kontroller
+Connection	DevicesView		Forbindelse
+Printer	DeviceSCSI		Printer
+ACPI Processor Namespace '%2'	DeviceACPI		ACPI-processor-navnerum '%2'
+SCSI Information	DeviceSCSI		SCSI-information
+Manufacturer	Device		Producent
+Device name:	Device		Enhedsnavn:
+Scanner	DeviceSCSI		Skanner
+Memory controller	Device		Hukommelse-kontroller
+Unknown device	DevicesView		Ukendt enhed
+Unknown	DevicePCI		Ukendt
+ACPI node '%1'	DeviceACPI		ACPI-knudepunkt '%1'
+Optical Drive	DeviceSCSI		Optisk drev
+Name	PropertyList		Navn
+Manufacturer	DeviceSCSI		Producent
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Enhedsnavn\t\t\t\t: %Name%\nProducent\t\t\t: %Manufacturer%\nAnvendt driver\t\t\t\t: %DriverUsed%\nEnhedsstier\t: %DevicePaths%
+Device name	Device		Enhedsnavn
+Satellite communications controller	Device		Satellit kommunikation-kontroller
+Device class	DeviceSCSI		Enhedsklasse
+Device	Device		Enhed
+Input device controller	Device		Inputenheds-kontroller
+PCI bus	DevicesView		PCI-bus
+ACPI System Indicator	DeviceACPI		ACPI systemindikator
+ACPI System Bus	DeviceACPI		ACPI systembus
+PCI Information	DevicePCI		PCI-information
+Tape Drive	DeviceSCSI		Bånddrev
+Changer	DeviceSCSI		Skifter
+Serial bus controller	Device		Seriel bus-kontroller
+Refresh devices	DevicesView		Genopfrisk enheder
+Category	DevicesView		Kategori
+RBC	DeviceSCSI		RBC
+None	Device		Ingen
+Device paths	Device		Enhedsstier
+Unknown device	Device		Ukendt enhed
+Wireless controller	Device		Trådlås-kontroller
+Generic system peripheral	Device		Generisk systemperifer
+Value	PropertyList		Værdi
+Devices	DevicesView		Enheder
+Device name	DeviceACPI		Enhedsnavn
+Card Reader	DeviceSCSI		Kortlæser
+Display controller	Device		Skærm-kontroller
+Basic information	DevicesView		Grundlæggende information
+ACPI Button '%1'	DeviceACPI		ACPI-knap '%1'
+Bus	DevicesView		Bus
+ACPI <unknown>	DeviceACPI		ACPI <ukendt>
+Device name	DevicePCI		Enhedsnavn
+Disk Drive	DeviceSCSI		Diskdrev
+Other	DeviceSCSI		Andet
+Report compatibility	DevicesView		Rapportér kompatibilitet
+Computer	Device		Computer
+PCI bus	Device		PCI-bus
+Enclosure	DeviceSCSI		Enclosure
+Order by:	DevicesView		Sortér efter:
+ACPI Thermal Zone	DeviceACPI		ACPI termiskzone
+Intelligent controller	Device		Intelligent kontroller
+Multimedia controller	Device		Multimedie-kontroller
+Quit	DevicesView		Afslut
+ISA bus	Device		ISA-bus
+ISA bus	DevicesView		ISA-bus
+Processor	DeviceSCSI		Processor
+Manufacturer:	Device		Producent:
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Klasseinfo:\t\t\t\t: %classInfo%
+Bridge	Device		Bro
+Worm	DeviceSCSI		Orm
+CD-ROM	DeviceSCSI		CD-ROM
+Manufacturer	DevicePCI		Producent
+Bridge	DeviceSCSI		Bro
+Signal processing controller	Device		Signalbehandling-kontroller
+Device name	DeviceSCSI		Enhedsnavn
+Docking station	Device		Dokingstation
+Array	DeviceSCSI		Array
+Unclassified device	Device		Uklassificeret enhed
+ACPI controller	Device		ACPI-kontroller
+Network controller	Device		Netværks-kontroller
+Driver used	Device		Anvendt driver
+Communication controller	Device		Kommunikations-kontroller
+ACPI bus	Device		ACPI-bus
+unknown	Device		ukendt

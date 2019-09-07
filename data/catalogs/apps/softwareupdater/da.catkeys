@@ -1,0 +1,64 @@
+1	danish	x-vnd.haiku-softwareupdater	369324613
+Updating version	SoftwareUpdaterWindow	List item text	Opdaterer version
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Klik her for at installere {0, plural, one{# opdateret pakke} other{# opdateret pakker}}.
+Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pakker som skal afinstalleres
+No active network connection was found	UpdateManager	Error message	Der blev ikke fundet nogen aktiv netværksforbindelse
+Quit	SoftwareUpdaterWindow	Alert button label	Afslut
+There were no updates found.	CheckManager		Der blev ikke fundet nogen opdateringer.
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Opdateringer er blevet fuldført, er du sikker på, at du vil afslutte?
+Updates found	SoftwareUpdaterWindow		Fandt opdateringer
+Update now	SoftwareUpdaterWindow		Opdater nu
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Vi kunne, af en eller anden grund, ikke genstarte din computer.
+OK	UpdateManager		OK
+Unrecognized argument	SoftwareUpdaterApp	Error message	Ikke-genkendt argument
+There were no updates found.	CheckAction		Der blev ikke fundet nogen opdateringer.
+No updates available	UpdateAction		Ingen tilgængelige opdateringer
+New packages to be installed	SoftwareUpdaterWindow	List super item label	Nye pakker som skal installeres
+Packages to be updated	SoftwareUpdaterWindow	List super item label	Pakker som skal opdateres
+to	SoftwareUpdaterWindow	List item text	til
+Attempting to cancel the updates…	SoftwareUpdaterWindow		Forsøger at annullere opdateringerne …
+Contacting software repositories to check for package updates.	CheckManager		Kontakter software-softwarekilder for at søge efter pakkeopdateringer.
+Available updates found	CheckManager		Fandt tilgængelige opdateringer
+from repository	SoftwareUpdaterWindow	List item text	fra softwarekilde
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Kontakter software-softwarekilder for at søge efter pakkeopdateringer.
+Cancelling updates	SoftwareUpdaterWindow		Annullerer opdateringer
+Cancel	SoftwareUpdaterWindow	Alert button label	Annuller
+There were no updates found.	UpdateAction		Der blev ikke fundet nogen opdateringer.
+OK	SoftwareUpdaterWindow		OK
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Vælg venligst fra følgende opdateringsvalgmuligheder:\n\nOpdater:\n\tOpdaterer alle installerede pakker.\nFuld synkronisering:\n\tSynkroniserer de installerede pakker med softwarekilderne.
+The following changes will be made:	SoftwareUpdaterWindow		Følgende ændringer vil blive foretaget:
+Argument variables are no longer accepted\n	SoftwareUpdaterApp		Argumentvariabler accepteres ikke mere\n
+Fatal error while checking for updates: %s\n	CheckAction		Fatal fejl ved søgning efter opdateringer: %s\n
+SoftwareUpdater	System name		Softwareopdatering
+No active network connection was found.\n	CheckManager		Der blev ikke fundet nogen aktive netværksforbindelse.\n
+Applying changes	UpdateManager		Anvender ændringer
+Full sync	SoftwareUpdaterWindow	Alert button label	Fuld synkronisering
+Quit	SoftwareUpdaterWindow	Button label	Afslut
+Updates have been successfully installed.	UpdateManager		Opdateringer er blevet installeret.
+Exception occurred while updating packages : %s\n	UpdateAction		Der opstod en undtagelse under opdatering af pakker: %s\n
+A reboot is necessary to complete the update process.	UpdateManager		Det er nødvendigt at genstarte for at fuldføre opdateringsprocessen.
+Exception occurred while checking for updates: %s\n	CheckAction		Der opstod en undtagelse under søgning efter opdateringer: %s\n
+Packages are being updated	UpdateManager		Pakker opdateres
+Cancel	SoftwareUpdaterWindow		Annuller
+Don't quit	SoftwareUpdaterWindow		Afslut ikke
+Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Klik her for at køre Softwareopdatering. Nogle opdateringer kræver at en problemløsning er valgt.
+Checking for updates	SoftwareUpdaterWindow		Søger efter opdateringer
+Updates completed	UpdateManager		Opdateringer fuldført
+Reboot	SoftwareUpdaterWindow		Genstart
+Show more details	SoftwareUpdaterWindow		Vis flere detaljer
+Installing version	SoftwareUpdaterWindow	List item text	Installerer version
+Checking for updates	CheckManager		Søger efter opdateringer
+No remote repositories are available	UpdateManager	Error message	Der er ikke nogen tilgængelige fjernsoftwarekilder
+Software {0, plural, one{update} other{updates}} available	CheckManager		Software {0, plural, one{opdatering} other{opdateringer}} tilgængelig
+Reboot	SoftwareUpdaterWindow	Button label	Genstart
+Update	SoftwareUpdaterWindow	Alert button label	Opdater
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Åbn softwarekilder
+Updates did not complete	UpdateAction		Opdateringer blev ikke fuldført
+Invalid update type, cannot continue with updates	UpdateAction		Ugyldig opdateringstype, kan ikke fortsætte med opdateringer
+Uninstalling version	SoftwareUpdaterWindow	List item text	Afinstallerer version
+%i of %i	UpdateManager	Do not translate %i	%i af %i
+Quit	SoftwareUpdaterWindow		Afslut
+No updates available	CheckManager		Der er ikke nogen opdateringer tilgængelige
+Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Anvendelse:  SoftwareUpdater <kommando> [ <tilvalg> ]\nOpdater installerede pakker.\n\nKommandoer:\n  update     - Søg i softwarekilder efter opdateringer til alle pakker.\n  check      - Søg efter tilgængelige opdateringer men vis kun en underretning med resultater.\n  full-sync  - Synkroniser de installerede pakker med softwarekilderne.\n\nTilvalg:\n  -h eller --help       Udskriv denne anvendelseshjælp\n  -v eller --verbose    Output uddybende information\n
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Der er ikke nogen tilgængelige fjernsoftwarekilder. Bekræft venligst at nogen softwarekilder er aktiveret med Softwarekilder-preflet'en eller 'pkgman'-kommandoen.
+Downloading packages	UpdateManager		Downloader pakker

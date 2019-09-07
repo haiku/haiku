@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-NewMailNotification	2111731137
+1	french	x-vnd.Haiku-NewMailNotification	1375000288
 Log window	NotifierConfigView		Fenêtre de connexion
 none	NotifierConfigView		aucune
 New mails notification	NotifierFilter		Notification de nouveaux courriers
@@ -11,3 +11,4 @@ Central beep	NotifierConfigView		Sonnerie générale
 New messages	NotifierFilter		Nouveaux messages
 Method:	NotifierConfigView		Méthode :
 Keyboard LEDs	NotifierConfigView		LEDs du clavier
+You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		Vous avez {0, plural, one{un nouveau message} other{# nouveaux messages}} pour %account.

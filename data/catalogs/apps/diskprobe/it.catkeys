@@ -68,7 +68,7 @@ Block 0x%Lx	ProbeView		Blocco 0x%Lx
 Attribute	AttributeWindow		Attributo
 Mode:	FindWindow		Modalità:
 16 bit	TypeEditors		16 bit
-32 bit size or status:	TypeEditors		Dimensione o stato a 32 bit
+32 bit size or status:	TypeEditors		Dimensione o stato a 32 bit:
 of 	ProbeView		di 
 Contents:	TypeEditors		Contenuti:
 Could not open file \"%s\": %s\n	DiskProbe		Impossibile aprire il file \"%s\": %s\n
@@ -130,4 +130,4 @@ Find…	ProbeView		Trova…
 Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Decimale
 Image view	TypeEditors	Image means here a picture file, not a disk image.	Visuale immagine
 Paste	ProbeView		Incolla
-32 bit unsigned size:	TypeEditors		Valore 32 bit senza segno:
+32 bit unsigned size:	TypeEditors		Dimensione 32 bit senza segno:

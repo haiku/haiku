@@ -1,9 +1,42 @@
-1	danish	x-vnd.Haiku-libbe	2677153267
-%.2f TiB	StringForSize		%.2f TiB
-%3.2f GiB	StringForSize		%3.2f GiB
-%3.2f KiB	StringForSize		%3.2f KiB
-%3.2f MiB	StringForSize		%3.2f MiB
-%d bytes	StringForSize		%d bytes
-Blue:	ColorControl		Blå:
+1	danish	x-vnd.Haiku-libbe	3337473349
+{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte} other{# bytes}}
+All Rights Reserved.	AboutWindow		Alle rettigheder forbeholdes.
+gold master	AboutWindow		guldmaster
+Undo	TextView		Fortryd
+gamma	AboutWindow		gamma
+development	AboutWindow		udvikling
+OK	Dragger		OK
+OK	PrintJob		OK
+Print Server is not responding.	PrintJob		Udskriftsserveren svarer ikke.
+About %app%	AboutMenuItem		Om %app%
+Warning	Dragger		Advarsel
 Green:	ColorControl		Grøn:
+Redo	TextView		Omgør
+No pages to print!	PrintJob		Ingen sider at udskrive!
+beta	AboutWindow		beta
+OK	ZombieReplicantView		OK
+Cut	TextView		Klip
+%3.2f GiB	StringForSize		%3.2f GiB
+Can't delete this replicant from its original application. Life goes on.	Dragger		Kan ikke slette replikanten fra dets oprindelige program. Livet fortsætter som vanligt.
+Error	ZombieReplicantView		Fejl
+Paste	TextView		Indsæt
+OK	AboutWindow		OK
+Special Thanks:	AboutWindow		Særlig tak til:
+%.2f TiB	StringForSize		%.2f TiB
+Remove replicant	Dragger		Fjern replikant
+Version	AboutWindow		Version
 Red:	ColorControl		Rød:
+<empty>	Menu		<tom>
+Copy	TextView		Kopiér
+Select all	TextView		Vælg alle
+alpha	AboutWindow		alfa
+%3.2f MiB	StringForSize		%3.2f MiB
+Error	PrintJob		Fejl
+About %app%	AboutWindow		Om %app%
+About %app…	Dragger		Om %app…
+Version history:	AboutWindow		Versionshistorik:
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Kan ikke finde programmet for replikanten. Ingen programsignatur er angivet.\n%error
+%3.2f KiB	StringForSize		%3.2f KiB
+Blue:	ColorControl		Blå:
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Kan ikke oprette replikanten for \"%description\".\n%error
+Written by:	AboutWindow		Skrevet af:

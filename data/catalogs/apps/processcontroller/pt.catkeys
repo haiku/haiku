@@ -1,0 +1,22 @@
+1	portuguese	x-vnd.Haiku-ProcessController	315281146
+Error saving file	ProcessController		Erro ao guardar o ficheiro
+Processor %d	ProcessController		Processador %d
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Pode executar o Gestor de Processos numa janela ou instalá-lo na Deskbar.
+Real-time priority	ProcessController		Prioridade em tempo real
+Memory usage	ProcessController		Utilização de memória
+Normal priority	ProcessController		Prioridade normal
+Restart Deskbar	ProcessController		Reiniciar a Deskbar
+About ProcessController…	ProcessController		Acerca do Gestor de Processos…
+Usage: %s [-deskbar]\n	ProcessController		Utilização: %s [-deskbar]\n
+Please confirm	ProcessController		Por favor confirme
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+Quit application	ProcessController		Sair da aplicação
+Info	ProcessController		Informações
+Cancel	ProcessController		Cancelar
+Install in Deskbar	ProcessController		Instalar na Deskbar
+ProcessController	System name		Gestor de Processos
+Restart Tracker	ProcessController		Reiniciar o Tracker
+New Terminal	ProcessController		Novo Terminal
+Power saving	ProcessController		Poupança de energia
+ProcessController is already installed in Deskbar.	ProcessController		O Gestor de Processos já está instalado na Deskbar.
+Run in window	ProcessController		Executar numa janela

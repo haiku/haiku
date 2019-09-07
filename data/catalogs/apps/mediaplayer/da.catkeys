@@ -1,0 +1,155 @@
+1	danish	x-vnd.Haiku-MediaPlayer	1313616492
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Fjern element til papirkurv
+Close	MediaPlayer-PlaylistWindow		Luk
+Volume of background clips	MediaPlayer-SettingsWindow		Lydstyrke for baggrundsklips
+Use hardware video overlays if available	MediaPlayer-SettingsWindow		Brug hardware-videooverlægninger hvis tilgængelige
+Audio	MediaPlayer-InfoWin		Lyd
+Subtitle placement:	MediaPlayer-SettingsWindow		Erstat for undertekst:
+MediaPlayer	System name		Medieafspiller
+Audio track	MediaPlayer-Main		Lydspor
+Muted	MediaPlayer-SettingsWindow		Lydløst
+OK	MediaPlayer-RemovePLItemsCmd		OK
+Open Playlist	MediaPlayer-PlaylistWindow		Åbn afspilningsliste
+Subtitles	MediaPlayer-Main		Undertekster
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% stødte på en intern fejl. Filen kunne ikke åbnes.
+DrawBitmap	MediaPlayer-InfoWin		Tegn bitmap
+File info	MediaPlayer-InfoWin		Filinfo
+raw audio	MediaPlayer-InfoWin		rå video
+Select all	MediaPlayer-PlaylistWindow		Vælg alt
+New player…	MediaPlayer-Main		Ny afspiller…
+Move Entries	MediaPlayer-MovePLItemsCmd		Flyt elementer
+OK	MediaPlayer-Main		OK
+Remove	MediaPlayer-PlaylistWindow		Fjern
+<unknown>	MediaPlayer-InfoWin		<ukendt>
+Resume:	MediaPlayer-SettingsWindow		Genoptag:
+Duration	MediaPlayer-InfoWin		Varighed
+Import Entries	MediaPlayer-ImportPLItemsCmd		Importér elementer
+Open network stream	MediaPlayer-Main		Åbn netværksstream
+Move file to Trash	MediaPlayer-PlaylistWindow		Flyt fil til papirkurv
+Open file…	MediaPlayer-Main		Åbn fil…
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Skaler styringer i fuldskærmstilstand
+View options	MediaPlayer-SettingsWindow		Visningsvalgmuligheder
+%d kHz	MediaPlayer-InfoWin		%d kHz
+Full volume	MediaPlayer-SettingsWindow		Fuld lydstyrke
+<untitled>	PlaylistItem-title		<unavngivet>
+Start media server	MediaPlayer-Main		Start medieserver
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Det ser ikke ud til at medieserveren kører.\nVil du starte den ?
+Location	MediaPlayer-InfoWin		Placering
+Medium	MediaPlayer-SettingsWindow		Medium
+Play mode	MediaPlayer-SettingsWindow		Afspilningstilstand
+Playlist	MediaPlayer-PlaylistWindow		Afspilningsliste
+%d Bit	MediaPlayer-InfoWin		%d bit
+Track	Audio Track Menu		Spor
+Close	MediaPlayer-Main		Luk
+Save error	MediaPlayer-PlaylistWindow		Fejl ved gemning
+Attributes	MediaPlayer-Main		Attributter
+Bottom of screen	MediaPlayer-SettingsWindow		Nederst på skærmen
+MediaPlayer settings	MediaPlayer-SettingsWindow		Medieafspiller-indstillinger
+Copyright	MediaPlayer-InfoWin		Ophavsret
+Invalid URL inserted!	MediaPlayer-NetworkStream		Ugyldig URL indsat!
+Aspect ratio	MediaPlayer-Main		Højde-bredde-forhold
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Gemning af afspilningslisten mislykkedes.\n\nFejl: 
+<no media>	MediaPlayer-InfoWin		<intet medie>
+Hide interface	MediaPlayer-Main		Skjul brugerflade
+Error: 	MediaPlayer-Main		Fejl: 
+Video track	MediaPlayer-Main		Videospor
+Playlist…	MediaPlayer-Main		Afspilningsliste…
+<unnamed media>	MediaPlayer-InfoWin		<unavngivet medie>
+Save	MediaPlayer-PlaylistWindow		Gem
+Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Tilfældiggør elementer
+Cancel	MediaPlayer-NetworkStream		Annuller
+Nothing to Play	MediaPlayer-Main		Intet af afspille
+OK	MediaPlayer-SettingsWindow		OK
+Remove Entries	MediaPlayer-RemovePLItemsCmd		Fjern elementer
+never	MediaPlayer-SettingsWindow		aldrig
+Loop audio	MediaPlayer-SettingsWindow		Lyd i løkke
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Intern fejl (forkert udformet meddelelse). Gemning af afspilningslisten mislykkedes.
+Open…	MediaPlayer-PlaylistWindow		Åbn…
+Revert	MediaPlayer-SettingsWindow		Tilbagefør
+Low volume	MediaPlayer-SettingsWindow		Lav lydstyrke
+Audio	MediaPlayer-Main		Lyd
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# kanaler}}
+Quit	MediaPlayer-Main		Afslut
+Redo	MediaPlayer-PlaylistWindow		Omgør
+Move Entry	MediaPlayer-MovePLItemsCmd		Flyt element
+<unknown>	PlaylistItem-author		<ukendt>
+Cancel	MediaPlayer-SettingsWindow		Annuller
+Large	MediaPlayer-SettingsWindow		Stor
+Import Entry	MediaPlayer-ImportPLItemsCmd		Importér element
+unknown format	MediaPlayer-InfoWin		ukendt format
+Track %d	MediaPlayer-Main		Spor %d
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Alle filer kunne ikke flyttes til papirkurv.
+Total duration: %s	MediaPlayer-PlaylistWindow		Samlet varighed: %s
+%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
+Move into trash error	MediaPlayer-RemovePLItemsCmd		Fejl ved flytning til papirkurv
+50% scale	MediaPlayer-Main		50% skala
+Drop files to play	MediaPlayer-Main		Slip filer for at afspille
+Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopiér element
+Close window after playing audio	MediaPlayer-SettingsWindow		Luk vindue efter afspilning af lyd
+Edit	MediaPlayer-PlaylistWindow		Rediger
+Copy Entries	MediaPlayer-CopyPLItemsCmd		Kopiér elementer
+Always on top	MediaPlayer-Main		Altid øverst
+Open	MediaPlayer-PlaylistWindow		Åbn
+always	MediaPlayer-SettingsWindow		altid
+Loop video	MediaPlayer-SettingsWindow		Video i løkke
+Stream URL:	MediaPlayer-NetworkStream		Stream-URL:
+<unknown>	PlaylistItem-album		<ukendt>
+Stream settings	MediaPlayer-Main		Streamindstillinger
+none	Subtitles menu		ingen
+Save Playlist	MediaPlayer-PlaylistWindow		Gem afspilningsliste
+Overlay	MediaPlayer-InfoWin		Overlægning
+2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (cinemascope)
+Rating	MediaPlayer-Main		Bedømmelse
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Intern fejl (ikke mere ledig hukommelse). Gemning af afspilningslisten mislykkedes.
+Video	MediaPlayer-Main		Video
+There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Der er ikke installeret nogen dekoder til at håndtere filformatet, eller dekoderen har problemer med den speficikke version af formatet.
+Lock Peaks	MediaPlayer-PeakView		Lås spidspunkter
+none	Audio track menu		ingen
+Open network stream	MediaPlayer-NetworkStream		Åbn netværksstream
+Automatically start playing	MediaPlayer-SettingsWindow		Automatisk start af afspilning
+Undo	MediaPlayer-PlaylistWindow		Fortryd
+Display mode	MediaPlayer-InfoWin		Visningstilstand
+Bottom of video	MediaPlayer-SettingsWindow		Nederst i video
+Small	MediaPlayer-SettingsWindow		Lille
+Settings…	MediaPlayer-Main		Indstillinger…
+min	MediaPlayer-InfoWin	Minutes	min
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Gemning af afspilningslisten mislykkedes:\n\nFejl: 
+Video	MediaPlayer-InfoWin		Video
+File info…	MediaPlayer-Main		Filinfo…
+1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikansk)
+<unnamed>	PlaylistItem-name		<unavngivet>
+Track	Video Track Menu		Spor
+Full screen	MediaPlayer-Main		Fuldskærm
+OK	MediaPlayer-NetworkStream		OK
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Intern fejl (låsning mislykkedes). Gemning af afspilningslisten mislykkedes.
+100% scale	MediaPlayer-Main		100% skala
+<nothing to redo>	MediaPlayer-PlaylistWindow		<intet at omgøre>
+Bad URL	MediaPlayer-NetworkStream		Dårlig URL
+Save	MediaPlayer-Main		Gem
+Close window after playing video	MediaPlayer-SettingsWindow		Luk vindue efter afspilning af video
+Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Skaler film jævnt (ikke-overlægning-tilstand)
+200% scale	MediaPlayer-Main		200% skala
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Filen '%filename' kunne ikke åbnes.\n\n
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Ingen af de filer du vil afspiller ser ud til at være mediefiler.
+Remove Entry	MediaPlayer-RemovePLItemsCmd		Fjern element
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Fjern elementer til papirkurv
+Subtitle size:	MediaPlayer-SettingsWindow		Størrelse for undertekst:
+No aspect correction	MediaPlayer-Main		Ingen korrigering af højde-bredde-forhold
+raw video	MediaPlayer-InfoWin		rå video
+Container	MediaPlayer-InfoWin		Beholder
+none	MediaPlayer-Main		ingen
+Open clips	MediaPlayer-Main		Åbn klips
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Nogle filer kunne ikke flyttes til papirkurven.
+<nothing to undo>	MediaPlayer-PlaylistWindow		<intet at fortryde>
+Save as…	MediaPlayer-PlaylistWindow		Gem som…
+Error: 	MediaPlayer-RemovePLItemsCmd		Fejl: 
+300% scale	MediaPlayer-Main		300% skala
+Open	MediaPlayer-Main		Åbn
+ask every time	MediaPlayer-SettingsWindow		spørg hver gang
+(not supported)	MediaPlayer-InfoWin		(understøttes ikke)
+Randomize	MediaPlayer-PlaylistWindow		Tilfældiggør
+%.3f fps	MediaPlayer-InfoWin		%.3f fps
+Off	Subtitles menu		Fra
+400% scale	MediaPlayer-Main		400% skala
+h	MediaPlayer-InfoWin	Hours	t
+OK	MediaPlayer-PlaylistWindow		OK

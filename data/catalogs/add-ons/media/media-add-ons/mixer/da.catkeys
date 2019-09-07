@@ -1,0 +1,27 @@
+1	danish	x-vnd.Haiku-mixer.media_addon	3450667169
+Input gain controls represent	AudioMixer		Repræsentant for input gain-styringer
+Linear interpolation	AudioMixer		Lineær interpolering
+Virtual output channels	AudioMixer		Virtuelle outputkaneler
+Refuse output format changes	AudioMixer		Nægt ændringer af outputformat
+Output mapping	AudioMixer		Outportkortlægning
+Allow input channel remapping	AudioMixer		Tillad genkortlæsning af inputkanaler
+Resampling algorithm	AudioMixer		Gemsamplingsalgoritme
+Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Svæk mixeroutput med 3dB (ligesom BeOS R5)
+Display balance control for stereo connections	AudioMixer		Vis balancestyring til stereoforbindelser
+To output	AudioMixer		Til output
+not connected	AudioMixer		ikke tilsluttet
+Refuse input format changes	AudioMixer		Nægt ændringer af inputformat
+Drop/repeat samples	AudioMixer		Drop/gentag datapunkter
+Output channel sources	AudioMixer		Kilder for outputkanal
+dB	AudioMixer		dB
+Gain controls	AudioMixer		Gain-styringer
+Input mapping	AudioMixer		Inputkortlægning
+Mute	AudioMixer		Mute
+Input channel destinations	AudioMixer		Destinationer for inputkanal
+To master	AudioMixer		Til master
+Master output	AudioMixer		Master-output
+Setup	AudioMixer		Opsætning
+Use non linear gain sliders (like BeOS R5)	AudioMixer		Brug ikke-lineær gain-skydere (ligesom BeOS R5)
+Gain	AudioMixer		Gain
+Allow output channel remapping	AudioMixer		Tillad kortlægning af outputkanal
+Physical input channels	AudioMixer		Fysiske inputkanaler

@@ -1,13 +1,51 @@
-1	portuguese	x-vnd.Haiku-Expander	3298829330
-Cancel	ExpanderWindow		Cancelar
-Close	ExpanderMenu		Fechar
-Continue	ExpanderWindow		Continuar
-Destination	ExpanderWindow		Destino
+1	portuguese	x-vnd.Haiku-Expander	3300517306
 Expand	ExpanderMenu		Expandir
+Expanding '%s'…	ExpanderWindow		A descomprimir '%s'…
+Close window when done expanding	ExpanderPreferences		Fechar a janela quando terminar a expansão
+Set destination…	ExpanderMenu		Definir destino…
+Use:	ExpanderPreferences		Usar:
+File expanded	ExpanderWindow		Ficheiro expandido
+The destination is read only.	ExpanderWindow		O destino é só de leitura.
 Expander: Open	ExpanderWindow		Expander: Abrir
-Settings	ExpanderMenu		Definições
+ is not supported	ExpanderWindow		 não é suportado
+Expander settings	ExpanderPreferences		Definições do Expander
+Select current	DirectoryFilePanel		Seleccionar actual
 Source	ExpanderWindow		Fonte
+Error when expanding archive	ExpanderWindow		Erro ao expandir o ficheiro
+Hide contents	ExpanderWindow		Ocultar conteúdo
+Cancel	ExpanderWindow		Cancelar
+Automatically expand files	ExpanderPreferences		Expandir automaticamente os ficheiros
+Continue	ExpanderWindow		Continuar
+Destination folder	ExpanderPreferences		Pasta de destino
+Other	ExpanderPreferences		Outro
+Cancel	ExpanderPreferences		Cancelar
+Expansion	ExpanderPreferences		Expansão
+Select	DirectoryFilePanel		Seleccionar
+The folder was either moved, renamed or not supported.	ExpanderWindow		A pasta foi movida ou renomeada, ou não é suportada.
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		A pasta de destino não existe. Deseja criá-la?
+Same directory as source (archive) file	ExpanderPreferences		Mesma pasta que o ficheiro (arquivo) de origem
+Settings	ExpanderMenu		Definições
+Settings…	ExpanderMenu		Definições…
+Expander: Choose destination	DirectoryFilePanel		Expander: Escolher destino
+Select	ExpanderPreferences		Seleccionar
+Show contents	ExpanderWindow		Mostrar conteúdo
+Automatically show contents listing	ExpanderPreferences		Mostrar automaticamente listagem do conteúdo
+OK	ExpanderPreferences		OK
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Tem a certeza de que pretende interromper a descompressão deste arquivo? Os itens descomprimidos poderão não estar completos.
+Leave destination folder path empty	ExpanderPreferences		Deixar vazio o caminho para pasta de destino
+Failed to create the destination folder.	ExpanderWindow		Falhou a criação da pasta de destino.
+Select '%s'…	DirectoryFilePanel		Selecionar '%s'…
+Create	ExpanderWindow		Criar
+The file doesn't exist	ExpanderWindow		O ficheiro não existe
 Stop	ExpanderMenu		Parar
-Stop	ExpanderWindow		Parar
+File	ExpanderMenu		Ficheiro
+Expander	System name		Expander
+Expand	ExpanderWindow		Expandir
+Close	ExpanderMenu		Fechar
 The destination is not a folder.	ExpanderWindow		O destino não é uma pasta.
-is not supported	ExpanderWindow		não é suportado
+Open destination folder after extraction	ExpanderPreferences		Abrir a pasta de destino após a extracção
+Creating listing for '%s'…	ExpanderWindow		A criar listagem para '%s'…
+Set source…	ExpanderMenu		Definir a fonte…
+Show contents	ExpanderMenu		Mostrar conteúdo
+Stop	ExpanderWindow		Parar
+Destination	ExpanderWindow		Destino

@@ -1,0 +1,7 @@
+1	danish	x-vnd.Haiku-SpamFilter	468104950
+or empty e-mail	SpamFilterConfig		eller tom e-mail
+Genuine below and uncertain above:	SpamFilterConfig		Ægte nedenfor og usikre ovenfor:
+Spam above:	SpamFilterConfig		Spam ovenfor:
+Add spam rating to start of subject	SpamFilterConfig		Tilføj spambedømmelse til begyndelsen af emnet
+Bayesian Spam Filter	SpamFilter		Bayesian-spamfilter
+Learn from all incoming e-mail	SpamFilterConfig		Lær fra alle indkommende e-mail

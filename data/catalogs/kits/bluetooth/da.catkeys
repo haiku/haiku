@@ -1,0 +1,88 @@
+1	danish	x-vnd.Haiku-Bluetooth	3550394259
+Positioning	DeviceClass		Placering
+Controller	DeviceClass		Controller
+Common ISDN access	DeviceClass		Almindelig ISDN-adgang
+Unknown (reserved) minor device class	DeviceClass		Ukendt (reserveret) mindre enhedsklasse
+Uncategorized	DeviceClass		Ukategoriseret
+Keyboard	DeviceClass		Tastatur
+Smart phone	DeviceClass		Smartphone
+VCR	DeviceClass		Videoafspiller
+Cellular	DeviceClass		Mobil
+Audio	DeviceClass		Lyd
+Audio/Video	DeviceClass		Lyd/video
+Car audio	DeviceClass		Bilstereo
+Major class: 	DeviceClass		Større klasse: 
+HiFi audio device	DeviceClass		HiFi-lydenhed
+Microphone	DeviceClass		Mikrofon
+Capturing	DeviceClass		Optager
+Jacket	DeviceClass		Udtag
+50-67% utilized	DeviceClass		50-67% brugt
+Headphones	DeviceClass		Høretelefoner
+Imaging	DeviceClass		Billedebehandling
+Device conforms to the headset profile	DeviceClass		Enhed stemmer overens med høretelefonsprofilen
+Remote control	DeviceClass		Fjernbetjening
+Fully available	DeviceClass		Fuldt ud tilgængeligt
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Ikke gyldigt navn
+Server	DeviceClass		Server
+No service available	DeviceClass		Ingen tjeneste er tilgængelig
+Printer	DeviceClass		Printer
+Card reader	DeviceClass		Kortlæser
+Wired modem or voice gateway	DeviceClass		Kabelmodem eller stemmeadgangspunkt
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Ikke gyldigt navn
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Ikke gyldigt navn
+Camcorder	DeviceClass		Videokamera
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Ikke gyldigt navn
+17-33% utilized	DeviceClass		17-33% brugt
+Desktop workstation	DeviceClass		Skrivebordsarbejdsstation
+Unspecified	DeviceClass		Uspecificeret
+Miscellaneous	DeviceClass		Diverse
+Robot	DeviceClass		Robot
+Vehicle	DeviceClass		Køretøj
+LAN access	DeviceClass		LAN-adgang
+Glasses	DeviceClass		Briller
+Phone	DeviceClass		Telefon
+Laptop	DeviceClass		Bærbar
+67-83% utilized	DeviceClass		67-83% brugt
+Cordless	DeviceClass		Trådløs
+Invalid device class!\n	DeviceClass		Ugyldig enhedsklasse!\n
+Minor class: 	DeviceClass		Mindre klasse: 
+Doll/Action figure	DeviceClass		Dukke/actionfigur
+Not implemented	RemoteDevice		Ikke implementeret
+33-50% utilized	DeviceClass		33-50% brugt
+Gaming/Toy	DeviceClass		Spil/legetøj
+Video camera	DeviceClass		Videokamera
+Handheld	DeviceClass		Håndholdt
+Service classes: 	DeviceClass		Tjenesteklasser: 
+Loudspeaker	DeviceClass		Højttaler
+83-99% utilized	DeviceClass		83-99% brugt
+SIM card reader	DeviceClass		SIM-kortlæser
+Computer	DeviceClass		Computer
+Scanner	DeviceClass		Skanner
+Wearable	DeviceClass	A wearable computer	Bærbar
+Display	DeviceClass		Skærm
+Gamepad	DeviceClass		Spilcontroller
+Video monitor	DeviceClass		Videomonitor
+Palm	DeviceClass	A palm-held device	Palm
+Joystick	DeviceClass		Joystick
+Networking	DeviceClass		Netværk
+Telephony	DeviceClass		Telefoni
+Game	DeviceClass		Spil
+Video display and loudspeaker	DeviceClass		Videoskærm og højttalere
+Wrist watch	DeviceClass		Armbåndsur
+Sensing device	DeviceClass		Sensorenhed
+Pointing device	DeviceClass		Pegeenhed
+(reserved)	DeviceClass		(reserveret)
+Rendering	DeviceClass		Gengivning
+Information	DeviceClass		Information
+Helmet	DeviceClass		Hjelm
+Pager	DeviceClass	A small radio device to receive short text messages	Personsøger
+Hands-free	DeviceClass		Håndfri
+Digitizer tablet	DeviceClass		Digitizertablet
+Portable audio	DeviceClass		Bærbar lyd
+Camera	DeviceClass		Kamera
+1-17% utilized	DeviceClass		1-17% brugt
+Combo keyboard/pointing device	DeviceClass		Kombineret tastatur/pegeredskab
+Video conferencing	DeviceClass		Videokonference
+Peripheral	DeviceClass		Tilkoblet enhed
+Object transfer	DeviceClass		Objektoverførsel
+Set-top box	DeviceClass		Tv-modtagerboks

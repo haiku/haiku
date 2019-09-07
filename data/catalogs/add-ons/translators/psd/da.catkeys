@@ -1,0 +1,22 @@
+1	danish	x-vnd.Haiku-PSDTranslator	3654055550
+Lab	PSDLoader		Lab
+Uncompressed	PSDConfig		Ukomprimeret
+Indexed	PSDLoader		Indekseret
+Grayscale	PSDLoader		Gråtone
+Photoshop image translator	PSDConfig		Photoshop-billedoversætter
+Photoshop image translator	PSDTranslator		Photoshop-billedoversætter
+Version %d.%d.%d, %s	PSDConfig		Version %d.%d.%d, %s
+Photoshop Document (PSD file)	PSDConfig		Photoshop-dokument (PSD-fil)
+Photoshop image	PSDTranslator		Photoshop-billede
+RLE	PSDConfig		RLE
+Photoshop Big Document (PSB file)	PSDConfig		Photoshop Big-dokument (PSB-fil)
+RGBA	PSDLoader		RGBA
+Photoshop image (%s)	PSDTranslator		Photoshop-billede (%s)
+PSDTranslator Settings	PSDConfig		PSDTranslator-indstillinger
+RGB	PSDLoader		RGB
+Bitmap	PSDLoader		Bitmap
+CMYK	PSDLoader		CMYK
+Compression: 	PSDConfig		Komprimering: 
+Format: 	PSDConfig		Format: 
+Multichannel	PSDLoader		Multikanal
+Duotone	PSDLoader		Tofarvet

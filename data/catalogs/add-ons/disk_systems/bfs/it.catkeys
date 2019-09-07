@@ -1,5 +1,6 @@
-1	italian	x-vnd.Haiku-BFSAddOn	3514982252
+1	italian	x-vnd.Haiku-BFSAddOn	1570987954
 Enable query support	BFS_Initialize_Parameter		Attiva supporto per le interrogazioni
+Disabling query support may speed up certain file system operations, but should\nonly be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		Disabilitare il supporto alle interrogazioni può velocizzare alcune operazioni sul file system, ma dovrebbe\nessere utilizzato solo se si è completamente sicuri di non averne bisogno.\nOgni disco che potrebbe essere utilizzato per avviare Haiku deve avere il supporto alle interrogazioni abilitato.
 Name:	BFS_Initialize_Parameter		Nome:
 8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (Per file di grandi dimensioni)
 2048 (Recommended)	BFS_Initialize_Parameter		2048 (Raccomandato)

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	4293876709
+1	swedish	x-vnd.Haiku-HaikuDepot	2601073644
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ett fel inträffade vid uppdatering av repositoriet: %error%
 Check for updates…	MainWindow		Leta efter uppdateringar…
 Uninstall	PackageManager		Avinstallera
@@ -10,6 +10,7 @@ OK	App		OK
 Mostly stable	RatePackageWindow		Mestadels stabil
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Kontot lyckades skapas. Du kan nu betygsätta paket och göra andra vettiga saker.
 The response to the captcha was incorrect.	ServerHelper		Svaret på captchan var inkorrekt.
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Vid uppdatering av paketdata har ett problem uppstått som kan göra att data är föråldrade eller saknas från programmets display. Ytterligare information om det här problemet kan hämtas från applikationsloggarna.
 Develop packages	MainWindow		Utvecklingspaket
 Rate package…	PackageInfoView		Betygsätt paket...
 Starting the package daemon failed:\n\n%Error%	App		Starta package daemon misslyckades:\n\n%Error%
@@ -156,6 +157,7 @@ Pass phrase:	UserLoginWindow		Lösen fras:
 Open %DeskbarLink%	PackageManager		Öppna %DeskbarLink%
 Install	PackageManager		Installera
 Input validation	UserLoginWindow		Ogiltigt indata
+View latest user usage conditions…	MainWindow		Se de senaste användarvillkoren…
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Ett oväntat fel har skickats från HaikuDepot-servern [%i]
 Log in…	MainWindow		Logga in...
 You need to be logged into an account before you can rate packages.	MainWindow		Du måste logga in för att kunna betygsätta paket.

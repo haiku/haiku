@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	2023640966
+1	japanese	x-vnd.Haiku-libtracker	838081337
 Created	ContainerWindow		作成日時
 Open and make preferred	OpenWithWindow		関連付けて開く
 Open with…	ContainerWindow		指定アプリケーションで開く…
@@ -23,6 +23,7 @@ Name	Default Query Columns		名前
 Unmount	ContainerWindow		マウント解除
 Eject when unmounting	AutoMounterSettings		マウント解除時メディアを取り出す
 Searching for disks to mount…	StatusWindow		マウントできるディスクを探しています…
+Information	InfoWindow		情報
 Error emptying Trash	FSUtils		ごみ箱を空にしている途中でエラーが発生しました。
 Opens with:	InfoWindow		アプリケーション:
 Size	QueryPoseView		サイズ
@@ -402,6 +403,7 @@ by formula	FindPanel		式で検索
 is	FindPanel		と等しい
 Move to Trash	FilePanelPriv		ごみ箱に移動
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		システムフォルダーやその内容の名前を変更すると、%osNameが起動しなくなります!\n\n変更しますか?\n\nそれでもシステムフォルダーやその内容の名前を変更するなら、シフトキーを押しながら\"名前の変更\"をクリックしてください。
+Permissions	FilePermissionsView		アクセス権
 40 x 40	ContainerWindow		40 x 40
 40 x 40	DeskWindow		40 x 40
 New folder %ld	FSUtils		新規フォルダー %ld 

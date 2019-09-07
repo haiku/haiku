@@ -1,0 +1,147 @@
+1	portuguese	x-vnd.Haiku-FileTypes	267718819
+Left	Attribute Window	Attribute column alignment in Tracker	À esquerda
+Final	Application Types Window		Final
+FileTypes request	FileTypes Window		Pedido de Tipos de Ficheiro
+This file type already exists	New File Type Window		O tipo de ficheiro ja existe
+Preferred application	FileTypes Window		Aplicação prédefinida
+Launch	Application Types Window		Iniciar
+Removing uninstalled application types	Application Types Window		A remover tipos de aplicação desinstalados
+Width:	Attribute Window	Default column width in Tracker for this attribute.	Largura:
+Same as…	FileType Window	The same TYPE as ...	Igual a…
+(from super type)	FileTypes Window		(a partir do tipo super)
+Select same preferred application as	FileTypes Window		Selecionar o mesmo programa preferido de
+Could not change attributes	Attribute Window		Não foi possível mudar os atributos
+Icon	FileTypes Window		Ícone
+Add…	Application Type Window		Adicionar…
+Attribute name:	Attribute Window		Nome do atributo:
+Long description:	Application Type Window		Descrição detalhada:
+Cancel	Preferred App Menu		Cancelar
+Remove	FileTypes Window		Remover
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		A aplicação \"%s\" não suporta este tipo de ficheiro.\nTem a certeza que deseja defini-lo na mesma?
+Remove	Application Type Window		Remover
+Gamma	Application Type Window		Gamma
+Cancel	Application Type Window		Cancelar
+Attribute	Attribute Window		Atributo
+Multiple launch	Application Type Window		Múltiplas instâncias
+Edit…	Application Types Window		Editar…
+Could not set preferred application	FileTypes Window		Incapaz de definir a aplicação preferida
+Description	FileTypes Window		Descrição
+Signature:	Application Types Window		Assinatura:
+None	FileTypes Window		Nenhum
+Exclusive launch	Application Type Window		Correr exclusivamente
+Cancel	New File Type Window		Cancelar
+Select same preferred application as	FileType Window		Selecionar o mesmo programa preferido de
+Cancel	Type List Window		Remover
+Don't save	Application Type Window		Não guardar
+Center	Attribute Window	Attribute column alignment in Tracker	Ao centro
+Done	Extension Window		Terminar
+Development	Application Types Window		Desenvolvimento
+Abort	Application Types Window		Cancelar
+Save	Application Type Window		Guardar
+Same as…	FileType Window	The same APPLICATION as ...	Igual a…
+Icon	Application Type Window		Ícone
+Version:	Application Type Window		Versão:
+Default application	FileType Window		Aplicação predefinida
+Internal name:	New File Type Window		Nome interno:
+Extension:	Extension Window		Extensão:
+Extensions:	FileTypes Window		Extensões:
+Select preferred application	FileType Window		Seleccionar aplicação preferida
+Description:	FileTypes Window		Descrição:
+Multiple files from \"%s\" file type	FileType Window		Vários ficheiros do tipo \"%s\"
+Add new group	New File Type Window		Adicionar um novo grupo
+Remove uninstalled	Application Types Window		Remover não instalados
+File	Application Type Window		Ficheiro
+Progress	Application Types Window		Progresso
+Select…	FileType Window		Seleccionar…
+Information	Application Types Window		Informação
+Settings	FileTypes Window		Definições
+Done	Attribute Window		Terminar
+FileTypes request	FileTypes		Pedido de Tipos de Ficheiro
+Select same type as	FileType Window		Selecionar o mesmo tipo de
+Version:	Application Types Window		Versão:
+(from application)	FileTypes Window		(a partir da aplicação)
+Description:	Application Types Window		Descrição:
+Name:	Application Types Window		Nome:
+File could not be opened	Preferred App Menu		Não foi possível abrir o ficheiro
+Args only	Application Type Window		Apenas argumentos
+Could not open \"%s\":\n%s	FileTypes		Não foi possível abrir \"%s\":\n%s
+Save changes before closing?	Application Type Window		Guardar alterações antes de fechar?
+Background app	Application Type Window		Aplicação de segundo plano
+Recognition rule is not valid:\n\n	FileTypes Window		Regra de reconhecimento não é válida:\n\n
+Show icons in list	FileTypes Window		Mostrar ícones na lista
+Editable	Attribute Window	If Tracker allows to edit this attribute.	Editável
+New resource file…	FileTypes Window		Novo ficheiro de recursos…
+Application type	Application Type Window		Tipo de aplicação
+Show in Tracker…	Application Types Window		Mostrar no Tracker…
+Visible	Attribute Window		Visível
+Select preferred application	FileTypes Window		Escolher aplicação prédefinida
+Path:	Application Types Window		Caminho:
+Could not install file type	New File Type Window		Não foi possível instalar o tipo de ficheiro
+Same as…	FileTypes Window		Igual a…
+Golden master	Application Type Window		Mestre dourado
+FileTypes request	Preferred App Menu		Pedido de Tipos de Ficheiro
+Single launch	Application Type Window		Instância única
+no icon	FileTypes Window		sem ícone
+Add type	New File Type Window		Adicionar tipo
+Remove icon	Icon View		Remover ícone
+Cancel	Extension Window		Cancelar
+Alignment:	Attribute Window		Alinhamento:
+Icon	FileType Window		Ícone
+Signature:	Application Type Window		Assinatura:
+Development	Application Type Window		Desenvolvimento
+Golden master	Application Types Window		Mestre dourado
+Add	Extension Window		Adicionar
+Open…	FileTypes Window		Abrir…
+Could not change file extensions	Extension Window		Não foi possível mudar as extensões dos ficheiros
+Could not open file	FileType Window		Não foi possível abrir o ficheiro
+Choose type	Type List Window		Escolher tipo
+Select…	FileTypes Window		Seleccionar…
+Application types…	FileTypes Window		Tipos de aplicação…
+Add icon…	Icon View		Adicionar ícone…
+Cancel	FileTypes Window		Cancelar
+Save into resource file…	Application Type Window		Guardar num ficheiro de recurso…
+Special:	Attribute Window		Especial:
+Type:	Attribute Window		Tipo:
+Could not retrieve application signature	Preferred App Menu		Não foi possível encontrar a assinatura da aplicação
+Beta	Application Types Window		Beta
+Add group	New File Type Window		Adicionar grupo
+Cancel	Attribute Window		Cancelar
+Gamma	Application Types Window		Gamma
+Supported types	Application Type Window		Tipos suportados
+Beta	Application Type Window		Beta
+Could not retrieve preferred application of this file	Preferred App Menu		Não foi possível encontrar a aplicação preferida deste ficheiro
+Application flags	Application Type Window		Sinalizadores da aplicação
+OK	FileTypes		OK
+Group name:	New File Type Window		Nome do grupo:
+Move up	FileTypes Window		Mover para cima
+Add	Attribute Window		Adicionar
+File	FileTypes Window		Ficheiro
+Open file	FileTypes		Abrir ficheiro
+Version info	Application Type Window		Informações da versão
+Final	Application Type Window		Final
+Preferred application	FileType Window		Programa preferido
+FileTypes	FileTypes		Tipos de Ficheiro
+Set preferred application	Preferred App Menu		Definir aplicação preferida
+New file type	New File Type Window		Novo tipo de ficheiro
+Short description:	Application Type Window		Descrição resumida:
+Save request	Application Type Window		Salvar pedido
+Could not remove file type: %s\n	FileTypes Window		Não foi possível remover o tipo de ficheiro: %s\n
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	Mostrar como:
+Done	Type List Window		Concluido
+Extra attributes	FileTypes Window		Atributos extra
+Group:	New File Type Window		Grupo:
+Alpha	Application Types Window		Alfa
+Close	Application Type Window		Fechar
+Extension	Extension Window		Extensão
+Rule:	FileTypes Window		Regra:
+FileTypes	System name		Tipos de Ficheiro
+Version	Application Types Window		Versão
+Quit	FileTypes Window		Sair
+File type	FileType Window		Tipo de Ficheiro
+Internal name:	FileTypes Window		Nome interno:
+Add…	FileTypes Window		Adicionar…
+Edit icon…	Icon View		Editar ícone…
+Internal name:	Attribute Window		Nome interno:
+Show recognition rule	FileTypes Window		Mostrar regra de reconhecimento
+Move down	FileTypes Window		Mover para baixo
+Alpha	Application Type Window		Alfa

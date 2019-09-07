@@ -1,24 +1,24 @@
-1	portuguese	x-vnd.Haiku-Media	2390037910
-Audio input:	Media views		Entrada de áudio:
-Audio output:	Media views		Saída de áudio:
-Audio settings	Media Window		Defenições de áudio
-Channel:	Media views		Canal:
-Cleaning up.	Media Window		A limpar.
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Não foi possível estabelecer uma ligação ao servidor multimédia.\nDeseja iniciá-lo?
-Defaults	Media views		Predefenições
-Done shutting down.	Media Window		Encerramento concluído.
-OK	Media Window		OK
-Quit	Media Window		Sair
-Ready for use…	Media Window		Pronto a funcionar...
-Restart media services	Media views		Reiniciar serviços multimédia
-Restarting media services\nShutting down media server\n	Media Window		A reiniciar os serviços multimédia\nA encerrar o servidor multimédia...\n
-Restarting media services\nStarting media server…\n	Media Window		A reiniciar os serviços multimédia\nA iniciar o servidor multimédia...\n
+1	portuguese	x-vnd.Haiku-Media	4205337498
+Audio mixer	Media Window		Misturador de áudio
 Show volume control on Deskbar	Media views		Mostrar controlo de volume na Deskbar
+Quit	Media Window		Sair
+Restart media services	Media views		Reiniciar serviços multimédia
+Couldn't add volume control in Deskbar: %s\n	Media views		Não foi possível adicionar controlo de volume à Deskbar: %s\n
 Start media server	Media Window		Iniciar o servidor multimédia
-Starting media server…	Media Window		A iniciar o servidor multimédia...
-Stopping media server…	Media Window		A encerrar o servidor multimédia...
-Telling media_addon_server to quit.	Media Window		A indicar ao servidor adicional multimédia para encerrar.
-This hardware has no controls.	Media Window		Este hardware não tem controlos.
-Video input:	Media views		Entrada de vídeo:
+Audio settings	Media Window		Definições de áudio
+Quit anyway	Media Window		Sair de qualquer modo
+Couldn't remove volume control in Deskbar: %s\n	Media views		Não foi possível remover o controlo de volume na Deskbar: %s\n
+Media	System name		Média
+Warning!	Media Window		Aviso!
+MIDI Settings	Media Window		Configurações MIDI
 Video output:	Media views		Saída de vídeo:
-Waiting for media_server to quit.	Media Window		À espera que o media_server termine.
+Audio output:	Media views		Saída de áudio:
+Video input:	Media views		Entrada de vídeo:
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Sair de Média agora irá interromper a reinicialização dos serviços multimédia. Isso resultará em funcionalidades multimédia instáveis ou indisponíveis.
+Audio input:	Media views		Entrada de áudio:
+<none>	Media views		<nenhum>
+This hardware has no controls.	Media Window		Este hardware não tem controlos.
+Channel:	Media views		Canal:
+Defaults	Media views		Predefinições
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Não foi possível estabelecer uma ligação ao servidor de média.\nDeseja iniciá-lo?
+Video settings	Media Window		Definições de vídeo

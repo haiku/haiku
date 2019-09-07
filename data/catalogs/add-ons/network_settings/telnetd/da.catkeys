@@ -1,0 +1,3 @@
+1	danish	x-vnd.Haiku-TelnetService	1209067113
+The Telnet server allows you to remotely access your machine with a terminal session using the telnet protocol.\n\nPlease note that it is an insecure and unencrypted connection.	TelnetServiceAddOn		Telnet-serveren giver dig mulighed for fjernadgang til din maskine med en terminalsession, med telnet-protokollen.\n\nBemærk venligst at det er en usikker og ukrypteret forbindelse.
+Telnet server	TelnetServiceAddOn		Telnet-server

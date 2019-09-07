@@ -1,138 +1,98 @@
-1	portuguese	x-vnd.Be-MAIL	1010473126
-%d - Date	Mail		%d - Data
-%e - E-mail address	Mail		%e - Endereço de e-mail
-%n - Full name	Mail		%n - Nome completo
-Account from mail	Mail		Conta relativa ao e-mail
-Account:	Mail		Conta:
-Accounts…	Mail		Contas…
-Add	Mail		Adicionar
-Add enclosure…	Mail		Adicionar anexo…
-Add signature	Mail		Adicionar assinatura
-An error occurred trying to open this signature.	Mail		Ocorreu um erro ao tentar abrir esta assinatura.
-An error occurred trying to save the attachment.	Mail		Ocorreu um erro ao tentar guardar o anexo.
-An error occurred trying to save this signature.	Mail		Ocorreu um erro ao tentar guardar esta assinatura.
-Attach attributes:	Mail		Incluir atributos dos anexos:
-Attachments:	Mail		Anexos:
-Auto signature:	Mail		Assinatura automática:
-Automatically mark mail as read:	Mail		Marcar e-mail como lido automaticamente:
-Bcc:	Mail		Bcc:
-Beginner	Mail		Principiante
-Button bar:	Mail		Barra de botões:
-Cancel	Mail		Cancelar
-Cc:	Mail		Cc:
-Check spelling	Mail		Verificar a ortografia
-Close	Mail		Fechar
-Close and 	Mail		Fechar e
-Colored quotes:	Mail		Citações coloridas:
-Copy	Mail		Copiar
-Copy link location	Mail		Copiar endereço do link
-Copy to new	Mail		Copiar para novo
-Couldn't open this signature. Sorry.	Mail		Desculpe, não foi possível abrir esta assinatura.
-Cut	Mail		Cortar
-Decoding:	Mail		Descodificar:
-Default account:	Mail		Conta Predefenida:
-Delete	Mail		Apagar
-Discard	Mail		Rejeitar
-Do you wish to save this message as a draft before closing?	Mail		Deseja guardar esta mensagem como rascunho antes de fechar?
-Do you wish to send this message before closing?	Mail		Quer enviar esta mensagem antes de fechar?
-Don't save	Mail		Não guardar
-E-mail draft could not be saved!	Mail		Não foi possível guardar o rascunho!
-Edit	Mail		Editar
-Edit queries…	Mail		Editar consultas…
-Edit signatures…	Mail		Editar assinaturas…
-Encoding:	Mail		Codificação:
-Expert	Mail		Experiente
-Find	Mail		Pesquisar
-Find again	Mail		Localizar seguinte
-Find…	Mail		Pesquisar…
-Font:	Mail		Tipo de letra:
-Forward	Mail		Reencaminhar
-Forward without attachments	Mail		Reencaminhar sem anexos
-From:	Mail		De:
-Hide	Mail		Ocultar
-Include file attributes in attachments	Mail		Incluir atributos do BeOS nos anexos?
-Inconsistency occurred in the undo/redo buffer.	Mail		Ocorreu um erro de inconsistência na memória intermédia do Anular/Refazer.
-Initial spell check mode:	Mail		Modo de correcção ortográfica inicial:
-Leave as '%s'	Mail		Deixar como '%s'
-Leave as New	Mail		Marcar como nova
-Leave same	Mail		Deixar na mesma
-Mail couldn't find its dictionary.	Mail		Mail não encontrou o seu dicionário.
-Mail preferences	Mail		Preferências de E-Mail
-Mailing	Mail		Correio electrónico
-Message	Mail		Mensagem
-Move to trash	Mail		Mover para lixo
-Need Tracker to move items to trash	Mail		Precisa do tracker para mover os items para o lixo
-New	Mail		Novo
-New mail message	Mail		Nova mensagem de e-mail
-Next	Mail		Seguinte
-Next message	Mail		Mensagem seguinte
-No file attributes, just plain data	Mail		Sem atributos de ficheiro, apenas dados simples
-None	Mail		Nenhum
-OK	Mail		OK
-Only files can be added as attachments.	Mail		Apenas ficheiros podem ser adicionados como anexos.
-Open	Mail		Abrir
-Open attachment	Mail		Abrir anexo
-Open draft	Mail		Abrir rascunho
-Open this link	Mail		Abrir esta hiperligação
-Page setup…	Mail		Configurar página…
-Paste	Mail		Colar
-Preferences…	Mail		Preferências…
-Previous	Mail		Anterior
-Previous message	Mail		Mensagem anterior
-Print	Mail		Imprimir
-Print…	Mail		Imprimir…
-Queries	Mail		Consultas
-Quit	Mail		Sair
-Quote	Mail		Citar
-Random	Mail		Aleatório
-Read 	Mail		Ler
-Really delete this signature? This cannot be undone.	Mail		Quer mesmo apagar esta assinatura? Isto não pode ser desfeito.
-Redo	Mail		Refazer
-Remove attachment	Mail		Remover anexo
-Remove enclosure	Mail		Remover anexo
-Remove quote	Mail		Remover citação
-Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		A funcionalidade de remover anexos de um E-Mail reencaminhado ainda não foi implementada!\nNão irá funcionar correctamente.
-Reply	Mail		Responder
-Reply account:	Mail		Conta de resposta:
-Reply preamble:	Mail		Sumário da resposta:
-Reply to all	Mail		Responder a todos
-Reply to sender	Mail		Responder ao remetente
-Resend	Mail		Reenviar
-Revert	Mail		Reverter
-Save	Mail		Guardar
-Save address	Mail		Guardar endereço
-Save as draft	Mail		Salvar como rascunho
-Save attachment…	Mail		Guardar anexo…
-Save changes to this signature?	Mail		Guardar alterações feitas a esta assinatura?
-Select all	Mail		Seleccionar tudo
-Send	Mail		Enviar
-Send message	Mail		Enviar mensagem
-Set to %s	Mail		Defenir como %s
-Set to Saved	Mail		Defenir como guardado
-Set to…	Mail		Defenir como…
-Show header	Mail		Mostrar cabeçalho
+1	portuguese	x-vnd.Be-MAIL	1301706747
 Show icons & labels	Mail		Mostrar ícones e legendas
+Next message	Mail		Próxima mensagem
+Unread	Mail		Por ler
+Copy to new	Mail		Copiar para novo
+Save as draft	Mail		Guardar como rascunho
+Print	Mail		Imprimir
+Default account:	Mail		Conta predefinida:
+Message	Mail		Mensagem
+Bcc:	Mail		Bcc:
+New	Mail		Novo
+Save	Mail		Guardar
+Undo	Mail		Desfazer
+Button bar:	Mail		Barra de botões:
+Save changes to this signature?	Mail		Guardar as alterações a esta assinatura?
+Save attachment…	Mail		Guardar anexo…
+Paste	Mail		Colar
+E-mail draft could not be saved!	Mail		Não foi possível guardar o rascunho de e-mail!
+Don't send	Mail		Não enviar
+Close	Mail		Fechar
+Untitled	Mail		Sem título
+Previous message	Mail		Mensagem anterior
+(Address unavailable)	Mail		(Endereço indisponível)
+Next	Mail		Próximo
+Attachments:	Mail		Anexos:
 Show icons only	Mail		Mostrar apenas ícones
-Show raw message	Mail		Mostrar mensagem não processada
-Signature	Mail		Assinatura
-Signature:	Mail		Assinatura:
-Signatures	Mail		Assinaturas
-Size:	Mail		Tamanho:
-Sorry	Mail		Desculpe
-Sorry, could not find an application that supports the 'Person' data type.	Mail		Desculpe, não foi possível encontrar uma aplicação que suporte o tipo de dados 'Person'.
-Start now	Mail		Começar agora
 Subject:	Mail		Assunto:
-The mail_daemon could not be started:\n\t	Mail		Não foi possível iniciar o mail_daemon:\n\t
-The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		O mail_daemon não está a ser executado. Esta mensagem será posta em lista de espera e será enviada quando o mail_daemon iniciar.
-There is no installed handler for URL links.	Mail		Não existe nenhum programa instalado para abrir hiperligações URL.
-Title:	Mail		Título:
-To:	Mail		Para:
-Trash	Mail		Lixo
-Undo	Mail		Anular
-Unread	Mail		Não lida
-Use default account	Mail		Usar conta predefenida
-User interface	Mail		Interface do utilizador
+OK	Mail		OK
+Cc:	Mail		Cc:
+No matches	Mail		Nenhuma correspondência
+Queries	Mail		Consultas
+Reply to sender	Mail		Responder ao remetente
+Copy	Mail		Copiar
+Signature	Mail		Assinatura
+Use default account	Mail		Usar conta predefinida
+draft	B_USER_DIRECTORY/mail/draft		rascunho
+spam	B_USER_DIRECTORY/mail/spam		spam
+Reply to all	Mail		Responder a todos
+Cancel	Mail		Cancelar
+Signature:	Mail		Assinatura:
+queries	B_USER_DIRECTORY/mail/queries		consultas
 View	Mail		Ver
-Warn unencodable:	Mail		Aviso incodificável:
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		O seu texto principal contém %ld caracteres incodificáveis. Se calhar um conjunto de caracteres novos funcionará melhor? Carregue em Enviar para enviar na mesma (um conjunto de caracteres alternativo será usado em vez dos incodificáveis), ou escolha Cancelar para voltar atrás e tentar corrigir o problema.
-\\n - Newline	Mail		\\n - Nova linha
+Signatures	Mail		Assinaturas
+Find	Mail		Procurar
+Date:	Mail		Data:
+Expert	Mail		Experiente
+Automatically mark mail as read:	Mail		Marcar e-mail como lido automaticamente:
+Colored quotes:	Mail		Citações coloridas:
+Send	Mail		Enviar
+Open draft	Mail		Abrir rascunho
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Deixar como 'New'
+Random	Mail		Aleatório
+Attach attributes:	Mail		Incluir atributos dos anexos:
+Find again	Mail		Procurar seguinte
+To:	Mail		Para:
+helpful message	Mail		mensagem útil
+Font:	Mail		Tipo de letra:
+Accounts…	Mail		Contas…
+Previous	Mail		Anterior
+Include file attributes in attachments	Mail		Incluir atributos de ficheiro nos anexos
+Start now	Mail		Iniciar agora
+Move to trash	Mail		Mover para o lixo
+<none>	Mail		<nenhum>
+%d - Date	Mail		%d - Data
+Check spelling	Mail		Verificar ortografia
+Leave as '%s'	Mail		Deixar como '%s'
+Settings…	Mail		Definições…
+Trash	Mail		Lixo
+Find…	Mail		Procurar…
+Select all	Mail		Selecionar tudo
+Show header	Mail		Mostrar cabeçalho
+Reply account:	Mail		Conta de resposta:
+Open attachment	Mail		Abrir anexo
+Save this message as a draft before closing?	Mail		Guardar esta mensagem como rascunho antes de fechar?
+None	Mail		Nenhum
+Resend	Mail		Reenviar
+Hide	Mail		Ocultar
+From:	Mail		De:
+No file attributes, just plain data	Mail		Não há atributos de ficheiro, apenas dados simples
+out	B_USER_DIRECTORY/mail/out		saída
+Send this message before closing?	Mail		Enviar esta mensagem antes de fechar?
+Don't save	Mail		Não guardar
+An error occurred trying to save the attachment.	Mail		Ocorreu um erro ao tentar guardar o anexo.
+Save address	Mail		Guardar endereço
+Edit queries…	Mail		Editar consultas…
+There is no installed handler for URL links.	Mail		Não existe nenhum programa instalado para abrir hiperligações URL.
+File	Mail		Ficheiro
+New mail message	Mail		Nova mensagem de e-mail
+An error occurred trying to open this signature.	Mail		Ocorreu um erro ao tentar abrir esta assinatura.
+User interface	Mail		Interface de utilizador
+Inconsistency occurred in the undo/redo buffer.	Mail		Ocorreu um erro de inconsistência na memória intermédia do Anular/Refazer.
+Remove attachment	Mail		Remover anexo
+Edit	Mail		Editar
+An error occurred trying to save this signature.	Mail		Ocorreu um erro ao tentar guardar esta assinatura.
+Beginner	Mail		Principiante
+Send message	Mail		Enviar mensagem
+Revert	Mail		Reverter
+Unknown	Mail		Desconhecido

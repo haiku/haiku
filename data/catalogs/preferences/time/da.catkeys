@@ -1,0 +1,49 @@
+1	danish	x-vnd.Haiku-Time	834234238
+OK	Time		OK
+Message receiving failed	Time		Modtagning af meddelelse mislykkedes
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Klokkeslæt og dato, skrevet af:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nOphavsret 2004-2012, Haiku.
+Australia	Time		Australien
+America	Time		Amerika
+Reset to default server list	Time		Nulstil til standard serverliste
+Could not resolve server address	Time		Kunne ikke løse serveradresse
+Set time zone	Time		Sæt tidszone
+Waiting for answer failed	Time		Ventning af meddelelse mislykkedes
+<Other>	Time		<Andet>
+Received invalid time	Time		Ugyldig tid modtaget
+Remove	Time		Fjern
+Synchronize again	Time		Synkronisér igen
+Asia	Time		Asien
+Try all servers	Time		Prøv alle servere
+Time	Time		Tid
+Current time:	Time		Nuværende tid:
+The following error occured while synchronizing:\n%s: %s	Time		Følgende fejl opstod ved synkronisering:\n%s: %s
+Europe	Time		Europa
+Show day of week	Time		Vis ugedag
+Local time (Windows compatible)	Time		Lokal tid (Windows-kompatibel)
+Hardware clock set to:	Time		Sæt hardware-ur til:
+Arctic	Time		Arktisk
+Antarctica	Time		Antarktis
+GMT (UNIX compatible)	Time		GMT (UNIX-kompatibel)
+Africa	Time		Afrika
+Stop	Time		Stop
+Time zone	Time		Tidszone
+Clock	Time		Ur
+Network time	Time		Netværkstid
+Sending request failed	Time		Afsendelse af forespørgsel mislykkedes
+Preview time:	Time		Forhåndsvisningstid:
+\nNow: 	Time		\nNu: 
+Could not create socket	Time		Kunne ikke oprette sokkel
+Pacific	Time		Stillehavsområdet
+Atlantic	Time		Atlantisk
+Show clock in Deskbar	Time		Vis ur i skrivebordslinje
+Display time with seconds	Time		Vis klokkeslæt med sekunder
+Time	System name		Tid
+about	Time		om
+Show time zone	Time		Vis tidszone
+Synchronize at boot	Time		Synkronisér ved opstart
+Indian	Time		Indien
+Revert	Time		Tilbagefør
+Date and time	Time		Dato og klokkeslæt
+The following error occured while synchronizing:\n%s	Time		Følgende fejl opstod ved synkronisering:\n%s
+Synchronize	Time		Synkronisér
+Add	Time		Tilføj

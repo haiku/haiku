@@ -1,0 +1,8 @@
+1	danish	x-vnd.Haiku-BFSAddOn	1570987954
+Enable query support	BFS_Initialize_Parameter		Aktivér understøttelse af forespørgsel
+Disabling query support may speed up certain file system operations, but should\nonly be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		Deaktivering af understøttelse af forespørgsel kan øge hastigheden af bestemte filsystemhandlinger, \nmen bør kun bruges hvis du er helt sikker på at der ikke bliver brug for forespørgsler.\nDiskenheder som skal bruges til at boote Haiku skal have understøttelse af forespørgsel aktiveret.
+Name:	BFS_Initialize_Parameter		Navn:
+8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (hovedsaglig store filer)
+2048 (Recommended)	BFS_Initialize_Parameter		2048 (anbefalet)
+1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (hovedsagelig små filer)
+Blocksize:	BFS_Initialize_Parameter		Blokstørrelse:

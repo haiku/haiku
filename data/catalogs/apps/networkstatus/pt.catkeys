@@ -1,15 +1,21 @@
-1	portuguese	x-vnd.Haiku-NetworkStatus	4273377053
-Address	NetworkStatusView		Endereço
-Broadcast	NetworkStatusView		Difusão
-Configuring	NetworkStatusView		A configurar
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		Falha ao iniciar o preflet de rede.\n\nErro:
+1	portuguese	x-vnd.Haiku-NetworkStatus	3823341665
 Netmask	NetworkStatusView		Máscara de rede
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		NetworkStatus opções:\n\t--deskbartadicionar replicante automaticamente à Deskbar\n\t--help\t\tmostrar esta informação e saír\n
-NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		NetworkStatus\n\tescrito por %1 e Hugo Santos\n\t%2, Haiku, Inc.\n
-No link	NetworkStatusView		Sem ligação
-No stateful configuration	NetworkStatusView		Sem configuração de monitorização de estado
-OK	NetworkStatusView		OK
-Open network preferences…	NetworkStatusView		Abrir preferências de rede…
 Quit	NetworkStatusView		Sair
-Ready	NetworkStatusView		Pronto
 Unknown	NetworkStatusView		Desconhecido
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Falha ao iniciar o preflet de rede.\n\nErro: 
+Install in Deskbar	NetworkStatus		Instalar na Deskbar
+Open network preferences…	NetworkStatusView		Abrir preferências de rede…
+NetworkStatus	System name		NetworkStatus
+OK	NetworkStatusView		OK
+No link	NetworkStatusView		Sem ligação
+Could not join wireless network:\n	NetworkStatusView		Não foi possível aceder à rede sem fios:\n
+Ready	NetworkStatusView		Pronto
+Network Status	NetworkStatusView		Estado da Rede
+Address	NetworkStatusView		Endereço
+No stateful configuration	NetworkStatusView		Sem configuração de monitorização de estado
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Pode executar a aplicação NetworkStatus numa janela ou instalá-la na Deskbar.
+Broadcast	NetworkStatusView		Difusão
+%ifaceName information:\n	NetworkStatusView		Informação sobre %ifaceName:\n
+Run in window	NetworkStatus		Executar em janela
+<no wireless networks found>	NetworkStatusView		<não foram encontradas redes sem fios>
+Configuring	NetworkStatusView		A configurar

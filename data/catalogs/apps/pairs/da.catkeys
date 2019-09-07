@@ -1,10 +1,18 @@
-1	danish	x-vnd.Haiku-Pairs	794776701
-Beginner (4x4)	PairsWindow		Begynder (4x4)
-Expert (8x8)	PairsWindow		Ekspert (8x8)
-Game	PairsWindow		Spil
-Intermediate (6x6)	PairsWindow		Øvet (6x6)
-New	PairsWindow		Ny
-New game	PairsWindow		Nyt spil
+1	danish	x-vnd.Haiku-Pairs	818003250
+Pairs	System name		Par
 Quit	PairsWindow		Afslut
-Quit game	PairsWindow		Afslut spil
+Medium	PairsWindow		Mellem
+Game	PairsWindow		Spil
+Expert (8x8)	PairsWindow		Ekspert (8x8)
+New	PairsWindow		Ny
+OK	Pairs		OK
+Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Par fandt ikke nok vektorikoner til at starte; det behøver mindst %zu, fandt %zu.\n
+You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Du fuldførte partiet i {0, plural, one{# klik} other{# klik}}.\n
+Small	PairsWindow		Lille
 Size	PairsWindow		Størrelse
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tskrevet af Ralf Schülke\n\tOphavsret 2008-2010, Haiku Inc.\n\n
+Quit game	PairsWindow		Afslut spil
+Large	PairsWindow		Stor
+Beginner (4x4)	PairsWindow		Begynder (4x4)
+Intermediate (6x6)	PairsWindow		Øvet (6x6)
+New game	PairsWindow		Nyt spil

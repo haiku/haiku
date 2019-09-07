@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	4293876709
+1	friulian	x-vnd.Haiku-HaikuDepot	3237543383
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificât un erôr intal inzornâ il dipuesit: %error%
 Check for updates…	MainWindow		Control inzornaments…
 Uninstall	PackageManager		Disinstale
@@ -156,6 +156,7 @@ Pass phrase:	UserLoginWindow		Sproc di ordin:
 Open %DeskbarLink%	PackageManager		Vierç %DeskbarLink%
 Install	PackageManager		Instale
 Input validation	UserLoginWindow		Convalide input
+View latest user usage conditions…	MainWindow		Viôt lis ultimis condizions di ûs dal utent…
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Un erôr inspietât al è stât inviât dal servidôr di HaikuDepot [%i]
 Log in…	MainWindow		Acès…
 You need to be logged into an account before you can rate packages.	MainWindow		Si scugne jessi jentrâts intun account prime di podê valutâ i pachets.

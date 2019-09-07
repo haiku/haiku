@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Network	3694799483
+1	friulian	x-vnd.Haiku-Network	3039697761
 Ethernet device	InterfaceListItem		Dispositîf ethernet
 Link speed:	IntefaceView		Velocitât colegament:
 disconnected	IntefaceView		disconetût
@@ -40,6 +40,7 @@ disabled	InterfaceListItem		disabilitât
 Dial-up connection	InterfaceListItem		Conession vie telefon
 on	ServiceListItem		on
 The method for obtaining an IP address	IntefaceAddressView		Il metodi par otignî une direzion IP
+disconnected	InterfaceListItem		disconetût
 Automatic	IntefaceAddressView		Automatic
 Choose automatically	IntefaceView		Sielç in automatic
 Status:	IntefaceView		Stât:

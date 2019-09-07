@@ -1,38 +1,99 @@
-1	dutch; flemish	x-vnd.Haiku-Keymap	4022885915
+1	dutch; flemish	x-vnd.Haiku-Keymap	1927482454
 Key	Modifier keys window	As in a computer keyboard key	Toets
+Japanese	KeymapNames		Japans
+Brazilian	KeymapNames		Braziliaans
+Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Optie:
 Cancel	Modifier keys window		Annuleren
 Sample and clipboard:	Keymap window		Voorbeeld en klembord:
+Polish	KeymapNames		Pools
+Latin-American	KeymapNames		Latijns-Amerikaans
+Ukrainian	KeymapNames		Oekraïens
+United-Kingdom	KeymapNames		Verenigd Koninkrijk
+Turkish (Type-F)	KeymapNames		Turks (F-indeling)
+Serbian (Cyrillic)	KeymapNames		Servisch (Cyrillisch)
+Belgian (point)	KeymapNames		Belgisch (punt)
+Finnish	KeymapNames		Fins
 Switch shortcut keys to Windows/Linux mode	Keymap window		Snelkoppelingstoetsen omschakelen naar Windows/Linux-modus
+Spanish (Dvorak)	KeymapNames		Spaans (Dvorak)
+Turkish (Type-Q)	KeymapNames		Turks (Q-indeling)
 Revert	Modifier keys window		Herstellen
+Slovak	KeymapNames		Slowaaks
+German (Mac)	KeymapNames		Duits (Mac)
+Arabic (102)	KeymapNames		Arabisch (102)
+Belarusian (Mac)	KeymapNames		Wit-Russisch (Mac)
+Croatian	KeymapNames		Kroatisch
 Set modifier keys	Modifier keys window		Modificatietoetsen instellen
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd-toets
+Spanish	KeymapNames		Spaans
+Ukrainian (Mac)	KeymapNames		Oekraïens (Mac)
 Command:	Modifier keys window	Command key role name	Command:
+French (Bépo)	KeymapNames		Frans (Bépo)
 Acute trigger	Keymap window		Accent aigu-activeerder
+Italian	KeymapNames		Italiaans
 Modifier keys	Modifier keys window		Modificatietoetsen
+Kazakh	KeymapNames		Kazachs
 Save as…	Keymap window		Opslaan als...
+Lithuanian (Standard)	KeymapNames		Litouws (Standaard)
+Bulgarian (Phonetic)	KeymapNames		Bulgaars (fonetisch)
+Canadian-French	KeymapNames		Canadees-Frans
+Hungarian	KeymapNames		Hongaars
+Irish	KeymapNames		Iers
+Remove	Keyboard Layout View		Verwijderen
 Tilde trigger	Keymap window		Tilde-activeerder
+Macedonian	KeymapNames		Macedonisch
+Czech (Mac)	KeymapNames		Tsjechisch (Mac)
+Albanian	KeymapNames		Albanees
 (Current)	Keymap window		(Huidig)
+Belarusian	KeymapNames		Wit-Russisch
+Warning: left and right key roles do not match	Modifier keys window		Waarschuwing: rol van de linker- en rechtertoetsen komen niet overeen
 Circumflex trigger	Keymap window		Circumflex-activeerder
+Bulgarian (Cyrillic)	KeymapNames		Bulgaars (Cyrillisch)
+Swedish	KeymapNames		Zweeds
 Role	Modifier keys window	As in the role of a modifier key	Rol
+German	KeymapNames		Duits
+Swiss-German	KeymapNames		Zwitsers-Duits
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl-toets
+Czech	KeymapNames		Tsjechisch
+Russian (Udmurt, Komi, Mari)	KeymapNames		Russisch (Oedmoerts, Komi, Mari)
 Control:	Modifier keys window	Control key role name	Besturingselement:
 Disabled	Modifier keys window	Do nothing	Uitgeschakeld
 Select dead keys	Keymap window		Selecteer dode toetsen
+Russian (Mac)	KeymapNames		Russisch (Mac)
+Belarusian (Latin)	KeymapNames		Wit-Russisch (Latijns)
+Hebrew	KeymapNames		Hebreeuws
 Layout	Keymap window		Lay-out
+Greek	KeymapNames		Grieks
 Revert	Keymap window		Herstellen
 Grave trigger	Keymap window		Accent grave-activeerder
+Faeroese	KeymapNames		Faeröers
 Quit	Keymap window		Afsluiten
+French (Mac)	KeymapNames		Frans (Mac)
 User:	Keymap window		Gebruiker:
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt-toets
+Estonian	KeymapNames		Ests
+Serbian (Latin)	KeymapNames		Servisch (Latijns)
+French	KeymapNames		Frans
+Portuguese	KeymapNames		Portugees
+Swiss-French	KeymapNames		Zwitsers-Frans
 Shift:	Modifier keys window	Shift key role name	Shift:
 Keymap	System name		Toetsenbordindeling
+Slovene	KeymapNames		Sloveens
+Lithuanian	KeymapNames		Litouws
 Set modifier keys…	Keymap window		Optietoetsen instellen…
 Switch shortcut keys to Haiku mode	Keymap window		Snelkoppelingstoetsen omschakelen naar Haiku-modus
+Defaults	Keymap window		Standaardwaarden
 System:	Keymap window		Systeem:
 Switch shortcut keys	Keymap window		Snelkoppelingstoetsen omschakelen
+Belgian (comma)	KeymapNames		Belgisch (komma)
+Norwegian	KeymapNames		Noors
 Font	Keymap window		Lettertype
+Danish	KeymapNames		Deens
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shifttoets
+Russian	KeymapNames		Russisch
+Romanian	KeymapNames		Roemeens
 File	Keymap window		Bestand
+Brazilian (ABNT2)	KeymapNames		Braziliaans (ABNT2)
+Dutch	KeymapNames		Nederlands
 Diaeresis trigger	Keymap window		Trema-activeerder
 Open…	Keymap window		Openen...

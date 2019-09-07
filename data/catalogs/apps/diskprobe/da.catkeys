@@ -1,0 +1,133 @@
+1	danish	x-vnd.Haiku-DiskProbe	2944605311
+Raw editor	AttributeWindow		Rå editor
+Remove	AttributeWindow		Fjern
+Close	ProbeView		Luk
+Boolean value:	TypeEditors		Boolesk værdi:
+File	ProbeView		Fil
+Block size	ProbeView	Menu item. This is in the same menu window than 'Base' and 'Font size'	Blokstørrelse
+MIME type editor	TypeEditors		MIME-type-editor
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadecimal
+16 bit unsigned value:	TypeEditors		16 bit værdi uden fortegn:
+8 bit signed value:	TypeEditors		8 bit værdi med fortegn:
+ (native)	ProbeView		 (oprindelig)
+Attribute offset: 	ProbeView		Attributforskydning: 
+Text	TypeEditors	This is the type of editor	Tekst
+File offset: 	ProbeView		Filforskydning: 
+Add	ProbeView		Tilføj
+64 bit signed value:	TypeEditors		64 bit værdi med fortegn:
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Vil du virkelig fjerne attributten \"%s\" fra filen \"%s\"?\n\nDu kan ikke fortryde handlingen.
+No type editor available	AttributeWindow		Ingen type-editor tilgængelig
+Print…	ProbeView		Udskriv…
+New…	FileWindow		Ny…
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	hvad: '%.4s'\n\n
+OK	DiskProbe		OK
+DiskProbe	System name		Disksondering
+Back	ProbeView		Tilbage
+Device: 	ProbeView		Enhed: 
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Base
+Open file…	FileWindow		Åbn fil…
+32 bit unsigned pointer:	TypeEditors		32 bit pointer uden fortegn:
+DiskProbe request	DiskProbe		Disksonderingsanmodning
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Skrivning til filen mislykkedes:\n%s\n\nAlle ændringer går tabt når du afslutter.
+Examine device:	OpenWindow		Undersøg enhed:
+Number editor	TypeEditors		Nummer-editor
+Icon	TypeEditors		Ikon
+Attribute	ProbeView		Attribut
+Don't save	ProbeView		Gem ikke
+Undo	ProbeView		Fortryd
+Flattened bitmap	TypeEditors		Fladgjort bitmap
+Block %Ld (0x%Lx)	ProbeView		Blok %Ld (0x%Lx)
+Cancel	OpenWindow		Annuller
+Unknown format	TypeEditors		Ukendt format
+File: 	ProbeView		Fil: 
+Swapped: %Ld (0x%0*Lx)	ProbeView		Ombyggede: %Ld (0x%0*Lx)
+Stop	ProbeView		Stop
+Cancel	ProbeView		Annuller
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Kunne ikke åbne \"%s\":\n%s
+Font size	ProbeView		Skriftstørrelse
+Type editor not supported	ProbeView		Type-editor understøttes ikke
+Native: 0x%0*Lx	ProbeView		Oprindelig: 0x%0*Lx
+Copy	ProbeView		Kopiér
+Redo	ProbeView		Omgør
+Floating-point value:	TypeEditors		Flydende kommatal-værdi:
+Cancel	AttributeWindow		Annuller
+16 bit signed value:	TypeEditors		16 bit værdi med fortegn:
+DiskProbe request	AttributeWindow		Disksonderingsanmodning
+Next	ProbeView		Næste
+64 bit signed offset:	TypeEditors		64 bit forskydning med fortegn:
+32 bit signed value:	TypeEditors		32 bit værdi med fortegn:
+Could not find search string.	ProbeView		Kunne ikke finde søgestreng.
+Close	FileWindow		Luk
+Unknown type	TypeEditors		Ukendt type
+Open device	FileWindow		Åbn enhed
+Number:	TypeEditors		Nummer:
+Quit	FileWindow		Afslut
+Text	FindWindow		Tekst
+Block 0x%Lx	ProbeView		Blok 0x%Lx
+Attribute	AttributeWindow		Attribut
+Mode:	FindWindow		Tilstand:
+16 bit	TypeEditors		16 bit
+32 bit size or status:	TypeEditors		32 bit størrelse eller status:
+of 	ProbeView		af 
+Contents:	TypeEditors		Indhold:
+Could not open file \"%s\": %s\n	DiskProbe		Kunne ikke åbne filen \"%s\": %s\n
+Probe file…	OpenWindow		Sondér fil…
+Block: 	ProbeView		Blok: 
+Bookmarks	ProbeView		Bogmærker
+Probe device	OpenWindow		Sondér enhed
+none	ProbeView	No attributes	ingen
+Case sensitive	FindWindow		Der skelnes mellem store og små bogstaver
+32 bit unsigned value:	TypeEditors		32 bit værdi uden fortegn:
+Remove from file	AttributeWindow		Fjern fra fil
+Attributes	ProbeView		Attributter
+Message	TypeEditors	This is the type of view	Meddelelse
+Message View	TypeEditors		Meddelelsesvisning
+Offset: 	ProbeView		Forskydning: 
+Swapped: 0x%0*Lx	ProbeView		Ombyttede: 0x%0*Lx
+MIME type:	TypeEditors		MIME-type:
+Fit	ProbeView	Size of fonts, fits to available room	Tilpas
+Type editor	ProbeView		Type-editor
+File	FileWindow		Fil
+Grayscale	TypeEditors		Gråtone
+32 bit	TypeEditors		32 bit
+Native: %Ld (0x%0*Lx)	ProbeView		Oprindelig: %Ld (0x%0*Lx)
+Device	ProbeView		Enhed
+Close	AttributeWindow		Luk
+Type editor	AttributeWindow		Type-editor
+Save	ProbeView		Gem
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	af 0x0
+Attribute type: 	ProbeView		Attributtype: 
+15 bit	TypeEditors		15 bit
+Page setup…	ProbeView		Sideopsætning…
+Boolean	TypeEditors	This is the type of editor	Boolesk
+Icon view	TypeEditors		Ikonvisning
+Select all	ProbeView		Vælg alt
+64 bit unsigned value:	TypeEditors		64 bit værdi uden fortegn:
+OK	ProbeView		OK
+Previous	ProbeView		Forrige
+Selection	ProbeView		Valg
+Find	FindWindow		Find
+8 bit unsigned value:	TypeEditors		8 bit værdi uden fortegn:
+%ld (native)	ProbeView		%ld (oprindelig)
+Attribute: 	ProbeView		Attribut: 
+Block	ProbeView		Blok
+Find again	ProbeView		Find igen
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Vis
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Kunne ikke læse billede
+DiskProbe request	ProbeView		Disksonderingsanmodning
+Double precision floating-point value:	TypeEditors		Flydende kommatal-værdi med dobbelt præcision:
+Image	TypeEditors	This is the type of view	Billede
+Save changes before closing?	ProbeView		Gem ændringer inden lukning?
+PNG format	TypeEditors		PNG-format
+Number	TypeEditors	This is the type of editor	Nummer
+Edit	ProbeView		Rediger
+String editor	TypeEditors		Streng-editor
+Boolean editor	TypeEditors		Boolesk-editor
+Device offset: 	ProbeView		Enhedsforskydning: 
+Find…	ProbeView		Find…
+8 bit palette	TypeEditors		8 bit palet
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Decimal
+Image view	TypeEditors	Image means here a picture file, not a disk image.	Billedvisning
+Paste	ProbeView		Indsæt
+32 bit unsigned size:	TypeEditors		32 bit størrelse uden fortegn:

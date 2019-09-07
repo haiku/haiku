@@ -1,0 +1,10 @@
+1	danish	x-vnd.Haiku-DNSClientService	2825577357
+DNS settings	DNSClientServiceAddOn		DNS-indstillinger
+Move down	DNSSettingsView		Flyt ned
+DNS settings	DNSSettingsView		DNS-indstillinger
+Remove	DNSSettingsView		Fjern
+Domain:	DNSSettingsView		Domæne:
+Add	DNSSettingsView		Tilføj
+Server:	DNSSettingsView		Server:
+Move up	DNSSettingsView		Flyt op
+Apply	DNSSettingsView		Anvend

@@ -1,0 +1,36 @@
+1	danish	x-vnd.Haiku-LaunchBox	1530497419
+Set description…	LaunchBox		Indstil beskrivelse…
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Vil du virkelig lukke pad'en?\n(pad'en vil ikke blive husket).
+OK	LaunchBox		OK
+Ignore double-click	LaunchBox		Ignorer dobbeltklik
+Show on all workspaces	LaunchBox		Vis på alle arbejdsområder
+Name Panel	LaunchBox		Navngiv panel
+Autostart	LaunchBox		Automatisk start
+Clone	LaunchBox		Klon
+Description for '%3'	LaunchBox		Beskrivelse for '%3'
+Show window border	LaunchBox		Vis vindueskant
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nKunne ikke starte program med signaturen '%2'.\n\nFejl:
+Failed to launch 'something', error in Pad data.	LaunchBox		Kunne ikke starte 'noget', fejl i paddata.
+LaunchBox	System name		Startboks
+Auto-raise	LaunchBox		Løft automatisk
+Icon size	LaunchBox		Ikonstørrelse
+Open containing folder	LaunchBox		Åbn indeholdende mappe
+Add button here	LaunchBox		Tilføj knap her
+Cancel	LaunchBox		Annuller
+launch popup	LaunchBox		start pop op
+Clear button	LaunchBox		Ryd-knap
+Bummer	LaunchBox		Øv
+last chance	LaunchBox		sidste chance
+You can drag an icon here.	LaunchBox		Du kan trække et ikon hertil.
+Pad 1	LaunchBox		Pad 1
+Failed to launch '%1'.\n\nError:	LaunchBox		Kunne ikke starte '%1'.\n\nFejl:
+Settings	LaunchBox		Indstillinger
+Vertical layout	LaunchBox		Lodret layout
+Pad	LaunchBox		Pad
+Close	LaunchBox		Luk
+Remove button	LaunchBox		Fjern knap
+Quit	LaunchBox		Afslut
+Horizontal layout	LaunchBox		Vandret layout
+New	LaunchBox		Ny
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Kunne ikke sende 'åbn mappe'-kommando til tracker.\n\nFejl: 
+Pad %1	LaunchBox		Pad %1

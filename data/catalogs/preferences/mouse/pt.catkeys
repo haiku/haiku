@@ -1,22 +1,22 @@
-1	portuguese	x-vnd.Haiku-Mouse	1036956709
-...by Andrew Edward McCall	MouseApplication		...por Andrew Edward McCall
-1-Button	SettingsView		1 botão
-2-Button	SettingsView		2 botões
-3-Button	SettingsView		3 botões
-Accept first click	SettingsView		Aceitar o primeiro clique
-Click to focus	SettingsView		Clique para focar
-Defaults	MouseWindow		Predefenições
-Dig Deal	MouseApplication		Grande coisa...
-Double-click speed	SettingsView		Velocidade do duplo clique
+1	portuguese	x-vnd.Haiku-Mouse	3990055017
+Mouse type:	SettingsView		Tipo de rato:
+Warp	SettingsView		Teleportar
+2-Button	SettingsView		2 Botões
 Double-click test area	SettingsView		Área de teste de duplo clique
-Fast	SettingsView		Rápido
-Focus follows mouse	SettingsView		Foco segue o rato
+Revert	MouseWindow		Reverter
+...by Andrew Edward McCall	MouseApplication		...por Andrew Edward McCall
+Mouse acceleration	SettingsView		Aceleração do ponteiro
+Click to focus	SettingsView		Clique para ativar
+Click to focus and raise	SettingsView		Clicar para ativar e trazer para primeiro plano
+3-Button	SettingsView		3 Botões
+Mouse speed	SettingsView		Velocidade do ponteiro
 Focus mode:	SettingsView		Modo de foco:
 Instant warp	SettingsView		Teleporte instantâneo
-Mouse acceleration	SettingsView		Aceleração do rato
-Mouse speed	SettingsView		Velocidade do rato
-Mouse type:	SettingsView		Tipo de rato:
+Dig Deal	MouseApplication		Grande coisa...
+1-Button	SettingsView		1 Botão
+Double-click speed	SettingsView		Velocidade do duplo clique
+Defaults	MouseWindow		Predefinições
+Focus follows mouse	SettingsView		Foco segue o rato
+Accept first click	SettingsView		Aceitar o primeiro clique
 Normal	SettingsView		Normal
-Revert	MouseWindow		Reverter
-Slow	SettingsView		Lento
-Warp	SettingsView		Teleportar
+Mouse	System name		Rato

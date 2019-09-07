@@ -1,8 +1,12 @@
-1	italian	x-vnd.Haiku-IMAP	1938678311
+1	italian	x-vnd.Haiku-IMAP	1343128980
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Impossibile connettersi al server \"%server%\":\n%error%
+Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		Aggiornamento delle iscrizioni alle cartelle IMAP, attendere…
 Failed to fetch available storage.	IMAPFolderConfig		Impossibile ottenere memoria disponibile
 Cancel	IMAPFolderConfig		Cancella
+OK	IMAPFolderConfig		OK
+Server storage: %s / %s used.	IMAPFolderConfig		Spazio di archiviazione sul server: %s / %s utilizzato.
 No encryption	imap_config		Nessuna crittografia
+Fetching IMAP folders, please be patient…	IMAPFolderConfig		Recupero delle cartelle IMAP, attendere…
 Configure IMAP Folders	imap_config		Configura Cartelle IMAP
 SSL	imap_config		SSL
 Apply	IMAPFolderConfig		Applica

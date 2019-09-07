@@ -1,0 +1,29 @@
+1	portuguese	x-vnd.Be-PRNT	3430755356
+Test page	TestPageView		Página de teste
+Remove	PrintersWindow		Remover
+Red	TestPageView		Vermelho
+Default Printer	PrinterListView		Impressora Predefinida
+<pick one>	AddPrinterDialog		<escolha uma>
+Connected to:	AddPrinterDialog		Ligado a:
+Make default	PrintersWindow		Tornar predefinida
+Cyan	TestPageView		Ciano
+Completed	JobListView		Concluído
+Test page	PrintersWindow		Página de teste
+Failed	JobListView		Falhou
+Blue	TestPageView		Azul
+Cancel	AddPrinterDialog		Cancelar
+Add printer	AddPrinterDialog		Adicionar impressora
+Printers	PrintersWindow		Impressoras
+No printer found!	TransportMenu		Nenhuma impressora encontrada!
+Add…	PrintersWindow		Adicionar…
+Add	AddPrinterDialog		Adicionar
+Print jobs: No printer selected	PrintersWindow		Tarefas de impressão: Nenhuma impressora selecionada
+Printer name:	AddPrinterDialog		Nome da impressora:
+Yellow	TestPageView		Amarelo
+Black	TestPageView		Preto
+Printer type:	AddPrinterDialog		Tipo de impressora:
+Printers	System name		Impressoras
+Green	TestPageView		Verde
+Print test page	PrintersWindow		Imprimir página de teste
+Restart job	PrintersWindow		Reiniciar tarefa
+Cancel job	PrintersWindow		Cancelar tarefa

@@ -1,0 +1,64 @@
+1	danish	x-vnd.Haiku-PackageInstaller	2472572058
+Package description	UninstallView		Pakkebeskrivelse
+none	PackageView		ingen
+Continue	PackageInstall		Fortsæt
+Running post-installation scripts	PackageInstall		Kører efterinstallationsscripts
+Package installer	PackageView		Pakkeinstallationsprogram
+All existing files will be skipped?	PackageView		Spring alle eksisterende filer over?
+Replace	PackageView		Erstat
+All existing files will be replaced?	PackageView		Erstat alle eksisterende filer?
+Other…	PackageView		Andet…
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Det symbolske link ved navn '%s' findes allerede i den givne sti.\nErstat det symbolske link med et fra pakken eller spring det over?
+Stop	PackageStatus		Stop
+Install to:	PackageView		Installer til:
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Den givne pakke ser allerede ud til at være installeret på dit system. Vil du afinstallere den eksisterende og fortsætte installationen?
+Skip all	PackageView		Spring alle over
+The installation of the package has been aborted.	PackageView		Installationen af pakken er blevet afbrudt.
+No installation type selected	PackageView		Ingen installationstype valgt
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Vil du huske beslutningen i resten af installationen?\n
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Den valgte pakke blev ikke fjernet fra dit system. Den givne installerede pakkeinformationsfil kan måske være beskadiget.
+Install…	UninstallView		Installer…
+The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Elementet ved navn '%s' findes allerede i den givne sti.\nErstat elementet med et fra pakken eller spring det over?
+Installing files and folders	PackageInstall		Installerer filer og mapper
+Installed packages	UninstallWindow		Installerede pakker
+Remove	UninstallView		Fjern
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Det lykkedes ikke at installere den anmodede pakke på dit system. Det kan måske været et problem med målets pakkefil. Tag venligst kontakt til pakkedistributøren med problemet.
+OK	UninstallView		OK
+Accept	PackageTextViewer		Accepter
+Abort	PackageView		Afbryd
+Disclaimer	PackageTextViewer		Ansvarsfraskrivelse
+Preparing package	PackageInstall		Forbereder pakke
+The package you requested has been successfully installed on your system.	PackageView		Pakken du anmodede om er blevet installeret på dit system.
+Installation progress	PackageView		Installationsforløb
+Decline	PackageTextViewer		Afvis
+Continue	PackageTextViewer		Fortsæt
+Installing package	PackageStatus		Installerer pakke
+Install %name%	PackageView		Installer %name%
+%index% of %total%	PackageInstall		%index% af %total%
+No package selected.	UninstallView		Ingen pakke valgt.
+%name% (%size% free)	PackageView		%name% (%size% ledig)
+Error while installing the package\n	PackageView		Fejl ved installation af pakken\n
+Finishing installation	PackageInstall		Færdig med installationen
+No package available.	PackageInfo		Ingen pakke tilgængelig.
+The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Scriptet ved navn '%s' findes allerede i den givne sti.\nErstat scriptet med et fra pakken eller spring det over?
+Installation type:	PackageView		Installationstype:
+The package you selected has been successfully removed from your system.	UninstallView		Pakken du valgte er blevet fjernet fra dit system.
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Der ser ud til at være en uoverensstemmelse i pakkens filstørrelse. Pakken kan være beskadiget eller være blev ændret efter den blev oprettet. Vil du stadig fortsætte?
+%name% (%size%)	PackageView		%name% (%size%)
+Abort	PackageInstall		Afbryd
+The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Filen ved navn '%s' findes allerede i den givne sti.\nErstat filen med en fra pakken eller spring den over?
+Replace all	PackageView		Erstat alle
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Pakkefilen er ikke læsbar.\nEn af årsagerne til det kan være at den anmodede fil ikke er en gyldig BeOS .pkg-pakke.
+Continue	PackageInfo		Fortsæt
+No package selected.	PackageInfo		Ingen pakke valgt.
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Fejl! \"%s\" er ikke en gyldig sti.\n
+The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Mappen ved navn '%s' findes allerede i den givne sti.\nErstat mappen med en fra pakken eller spring den over?
+LegacyPackageInstaller	System name		ForældetPakkeinstallationsprogram
+Ask again	PackageView		Spørg igen
+Begin	PackageView		Begynd
+OK	PackageView		OK
+Abort	PackageInfo		Afbryd
+Done	PackageInstall		Færdig
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Fejl (%s)! Kunne ikke åbne \"%s\".\n
+Skip	PackageView		Spring over
+Image not loaded correctly	PackageImageViewer		Billedet blev ikke indlæst korrekt

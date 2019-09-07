@@ -1,17 +1,17 @@
-1	danish	x-vnd.haiku.zip-o-matic	829498916
-%ld files added.	file:ZipOMaticWindow.cpp		%ld filer tilføjet.
-1 file added.	file:ZipOMaticWindow.cpp		1 fil tilføjet.
-Archive	file:ZipperThread.cpp		Arkiv
-Archive created OK	file:ZipOMaticWindow.cpp		Arkiv oprettet uden fejl
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Er du sikker på, at du ønsker at afbryde arkiveringen?
-Continue	file:ZipOMaticWindow.cpp		Fortsæt
-Creating archive: %s	file:ZipOMaticWindow.cpp		Opretter arkiv: %s
-Do you want to stop them?	file:ZipOMatic.cpp		Ønsker du at stoppe dem?
-Error creating archive	file:ZipOMaticWindow.cpp		Fejl i forbindelse med oprettelsen af arkiv
+1	danish	x-vnd.haiku.zip-o-matic	2032806096
+Drop files here.	file:ZipOMaticWindow.cpp		Slip filer her.
 Filename: %s	file:ZipOMaticWindow.cpp		Filnavn: %s
-Let them continue	file:ZipOMatic.cpp		Lad dem fortsætte
-Preparing to archive	file:ZipperThread.cpp		Forbereder arkivering
-Stop	file:ZipOMaticWindow.cpp		Stop
+Do you want to stop them?	file:ZipOMatic.cpp		Vil du stoppe dem?
+Error creating archive	file:ZipOMaticWindow.cpp		Fejl ved oprettelse af arkiv
 Stop them	file:ZipOMatic.cpp		Stop dem
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Er du sikker på, at du vil afbryde arkiveringen?
+Preparing to archive	file:ZipperThread.cpp		Forbereder arkivering
+Let them continue	file:ZipOMatic.cpp		Lad dem fortsætte
+Continue	file:ZipOMaticWindow.cpp		Fortsæt
+Archive created OK	file:ZipOMaticWindow.cpp		Arkiv oprettet uden fejl
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# fil tilføjet.} other{# filer tilføjet.}}
+Stop	file:ZipOMaticWindow.cpp		Stop
 Stopped	file:ZipOMaticWindow.cpp		Stoppet
-You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Du har %ld Zip-O-Matic kørende.\n\n
+Archive	file:ZipperThread.cpp		Arkiv
+Creating archive: %s	file:ZipOMaticWindow.cpp		Opretter arkiv: %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Du har {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} kørende.\n\n

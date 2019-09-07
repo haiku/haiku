@@ -1,0 +1,54 @@
+1	danish	x-vnd.Haiku-Mail	2750130554
+Account settings	AutoConfigWindow		Kontoindstillinger
+\t\t· Outgoing	Config Window		\t\t· Udgående
+An error occurred while creating the config view: %error.	Config Views		Der opstod en fejl ved oprettelse af konfigurationsvisningen: %error.
+E-mail address:	E-Mail		E-mailadresse:
+Create new account	AutoConfigWindow		Opret ny konto
+While sending and receiving	Config Window		Når der sendes og modtages
+Error!	Config Views		Fejl!
+Apply	Config Window		Anvend
+Incoming mail filters	Config Views		Filtre for indgående mail
+Outgoing mail filters	Config Views		Filtre for udgående mail
+Server name:	E-Mail		Servernavn:
+Add	Config Window		Tilføj
+Back	AutoConfigWindow		Tilbage
+Real name:	E-Mail		Rigtige navn:
+Real name:	Config Views		Rigtige navn:
+\t\t· E-mail filters	Config Window		\t\t· Filtre for e-mail
+Outgoing	E-Mail		Udgående
+Accounts	Config Window		Konti
+Outgoing	Config Window		Udgående
+Remove	Config Views		Fjern
+Show notifications:	Config Window		Vis underretninger:
+Settings	Config Window		Indstillinger
+Never	Config Window	show status window	Aldrig
+Account name:	Config Views		Kontonavn:
+\t\t· Incoming	Config Window		\t\t· Indkommende
+Enter a valid e-mail address.	AutoConfigWindow		Indtast en gyldig e-mailadresse.
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nDe generelle indstillinger kunne ikke indhentes.\n\nFejl ved indhentelse af generelle indstillinger:\n%s\n
+Incoming	E-Mail		Indkommende
+Choose Protocol	E-Mail		Vælg protokol
+Return address:	Config Views		Returadresse:
+Password:	E-Mail		Adgangskode:
+Error retrieving general settings: %s\n	Config Window		Fejl ved indhentning af generelle indstillinger: %s\n
+The filter could not be moved. Deleting filter.	Config Views		Filteret kunne ikke flyttes. Sletter filter.
+OK	Config Views		OK
+Revert	Config Window		Tilbagefør
+Incoming	Config Window		Indkommende
+Finish	AutoConfigWindow		Færdig
+Add filter	Config Views		Tilføj filter
+Account settings	Config Views		Kontoindstillinger
+minutes	Config Window		minutter
+E-mail	System name		E-mail
+Check every	Config Window		Tjek hver
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Opret en ny konto med Tilføj-knappen.\n\nFjern en konto med Fjern-knappen på det valgte punkt.\n\nVælg et punkt i listen for at ændre dens indstillinger.
+Account name:	E-Mail		Kontonavn:
+Edit mailbox menu…	Config Window		Rediger postkassemenu…
+Server Name:	E-Mail		Servernavn:
+Remove	Config Window		Fjern
+Login name:	E-Mail		Loginnavn:
+While sending	Config Window		Når der sendes
+OK	Config Window		OK
+OK	AutoConfigWindow		OK
+Next	AutoConfigWindow		Næste
+Error	Config Window		Fejl

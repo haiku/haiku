@@ -1,0 +1,35 @@
+1	danish	x-vnd.Haiku-Notifications	332239666
+Lower left	GeneralView		Nederst til venstre
+Application does not have a valid signature	NotificationView	Alert message	Programmet har ikke en gyldig signatur
+Status	NotificationView		Status
+Add…	NotificationView		Tilføj…
+Lower right	GeneralView		Nederst til højre
+Muted	NotificationView		Lydløst
+Window width:	GeneralView		Vinduesbredde:
+ is already listed	NotificationView	Alert message	 er allerede oplistet
+OK	PrefletWin		OK
+Notifications	PrefletWin		Underretninger
+Notifications preflet sample	PrefletWin		Prøve for underretningspreflet
+Mute notifications from this application	NotificationView		Sæt underretninger fra programmet på lydløst
+pixels	GeneralView		pixels
+seconds	GeneralView		sekunder
+Revert	PrefletWin		Tilbagefør
+Applications	PrefletView		Programmer
+Timeout:	GeneralView		Timeout:
+Upper right	GeneralView		Øverst til højre
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Der opstod en fejl ved gemning af præferencerne.\nDu er muligvis løbet tør for diskplads.
+Defaults	PrefletWin		Standarder
+Upper left	GeneralView		Øverst til venstre
+Applications	NotificationView		Programmer
+Width:	GeneralView		Bredde:
+General	PrefletView		Generelt
+OK	NotificationView		OK
+Follow Deskbar	GeneralView		Følg skrivebordslinje
+Notifications	System name		Underretninger
+Allowed	NotificationView		Tilladt
+Duration:	GeneralView		Varighed:
+Application	NotificationView		Program
+Enable notifications	GeneralView		Aktivér underretninger
+This is a test notification message	PrefletWin		Dette er en test-underretningsmeddelelese
+Remove	NotificationView		Fjern
+Position:	GeneralView		Placering:

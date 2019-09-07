@@ -1,18 +1,16 @@
-1	portuguese	x-vnd.Haiku-VirtualMemory	2137942259
-%Ld B	SettingsWindow		%Ld B
-Changes will take effect on restart!	SettingsWindow		As alterações irão ser efectuadas após reiniciar!
-Current swap file size: 	SettingsWindow		Tamanho do ficheiro swap actual:
-Defaults	SettingsWindow		Predefenições
+1	portuguese	x-vnd.Haiku-VirtualMemory	2798290122
+Requested swap file size:	SettingsWindow		Tamanho do ficheiro swap requerido:
+VirtualMemory	System name		Memória Virtual
+OK	VirtualMemoryApp		OK
+Use volume:	SettingsWindow		Usar volume:
+Turn off	SettingsWindow		Desligar
+Changes will take effect upon reboot.	SettingsWindow		As alterações entrarão em efeito ao reiniciar.
+Revert	SettingsWindow		Reverter
+Keep enabled	SettingsWindow		Mantar ligados
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		As definições especificadas no ficheiro de definições são inválidas. Pode carregar as predefinições ou sair.
+VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tescrito por Axel Dörfler\n\tCopyright 2005, Haiku.\n
+Load defaults	SettingsWindow		Carregar predefinições
+Defaults	SettingsWindow		Predefinições
+Quit	SettingsWindow		Sair
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Desligar a memória virtual irá ter efeitos indesejados na estabilidade do sistema assim que a memória estiver cheia.\nA memória virtual não irá afectar a performance do sistema até que esse ponto aconteça.\n\nTem a certeza que deseja desligá-la?
 Enable virtual memory	SettingsWindow		Usar memória virtual
-GB	SettingsWindow		GB
-KB	SettingsWindow		KB
-Keep enabled	SettingsWindow		Mantar ligados
-MB	SettingsWindow		MB
-OK	VirtualMemoryApp		OK
-Physical memory: 	SettingsWindow		Memória física:
-Requested swap file size:	SettingsWindow		Tamanho do ficheiro swap requerido:
-Revert	SettingsWindow		Reverter
-Turn off	SettingsWindow		Desligar
-Use volume:	SettingsWindow		Usar volume:
-VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tescrito por Axel Dörfler\n\tCopyright 2005, Haiku.\n

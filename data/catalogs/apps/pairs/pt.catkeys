@@ -1,12 +1,18 @@
-1	portuguese	x-vnd.Haiku-Pairs	1126884905
-Beginner (4x4)	PairsWindow		Principiante (4x4)
-Expert (8x8)	PairsWindow		Especialista (8x8)
-Game	PairsWindow		Jogo
-Intermediate (6x6)	PairsWindow		Médio (6x6)
-New	PairsWindow		Novo
-New game	PairsWindow		Novo jogo
-OK	PairsView		OK
-Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		A aplicação Pairs não encontrou ícones vectoriais suficientes no sistema; são necessários pelo menos %d.
+1	portuguese	x-vnd.Haiku-Pairs	818003250
+Pairs	System name		Pares
 Quit	PairsWindow		Sair
-Quit game	PairsWindow		Terminar jogo
+Medium	PairsWindow		Médio
+Game	PairsWindow		Jogo
+Expert (8x8)	PairsWindow		Especialista (8x8)
+New	PairsWindow		Novo
+OK	Pairs		OK
+Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	O Pares não encontrou ícones vetoriais suficientes para iniciar. Precisa no mínimo de %zu, mas encontrou apenas %zu.\n
+You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Você completou o jogo em {0, plural, one{# clique} other{# cliques}}.\n
+Small	PairsWindow		Pequeno
 Size	PairsWindow		Tamanho
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tescrito por Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n
+Quit game	PairsWindow		Terminar jogo
+Large	PairsWindow		Grande
+Beginner (4x4)	PairsWindow		Principiante (4x4)
+Intermediate (6x6)	PairsWindow		Médio (6x6)
+New game	PairsWindow		Novo jogo

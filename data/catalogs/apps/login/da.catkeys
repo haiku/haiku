@@ -1,0 +1,20 @@
+1	danish	x-vnd.Haiku-Login	336867745
+Invalid login!	Login View		Ugyldigt login!
+Error	Login App		Fejl
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tStart i hylderedigeringstilstand for tilpasning af skrivebordet.\n
+Welcome to Haiku	Login Window		Velkommen til Haiku
+Halt	Login View		Stop
+Login application for Haiku\nUsage:\n	Login App		Login-program til Haiku\nAnvendelse:\n
+--nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tGør ikke vinduet modalt\n
+Desktop	Desktop Window		Skrivebord
+Hide password	Login View		Skjul adgangskode
+Reboot	Login View		Genstart
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Du kan tilpasse skrivebordet som vises bag login-programmet ved at slippe replikanter på det.\n\nNår du er færdig, så afslut blot programmet (Cmd-Q).
+OK	Login View		OK
+Info	Login App		Info
+Login:	Login View		Login:
+Password:	Login View		Adgangskode:
+Unimplemented	Login App		Uimplementeret
+OK	Login App		OK
+Error: %1	Login App		Fejl: %1
+error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	fejl %s\n

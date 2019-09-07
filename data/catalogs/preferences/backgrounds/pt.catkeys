@@ -1,23 +1,28 @@
-1	portuguese	x-vnd.Haiku-Backgrounds	389381034
-All workspaces	Main View		Todas as áreas de trabalho
-Apply	Main View		Aplicar
-Center	Main View		Centrado
-Current workspace	Main View		Área de trabalho actual
-Default	Main View		Predefinido
-Default folder	Main View		Pasta predefinida
-Folder: 	Main View		Pasta:
-Icon label outline	Main View		Contorno da legenda do ícone
-Image:	Main View		Imagem:
-Manual	Main View		Manual
-None	Main View		Nenhum
-Other folder…	Main View		Outra pasta...
-Other…	Main View		Outros...
-Placement:	Main View		Posicionamento:
-Preview	Main View		Previsualização
-Resolution: 	Image Filepanel		Resolução:
-Revert	Main View		Reverter
-Scale to fit	Main View		Ajustar tamanho
-Tile	Main View		Mosaico
+1	portuguese	x-vnd.Haiku-Backgrounds	681978856
+Backgrounds	System name		Imagens de fundo
 X:	Main View		X:
-Y:	Main View		Y:
+Setting the background image failed:	Main View		A configuração da imagem de fundo falhou:
+Resolution: 	Image Filepanel		Resolução: 
 pick one	Main View		escolha um
+Default	Main View		Predefinido
+Center	Main View		Centrado
+Folder: %path	Main View		Pasta: %path
+Manual	Main View		Manual
+Set background image error	Main View		Erro ao aplicar a imagem de fundo
+Default folder	Main View		Pasta predefinida
+Revert	Main View		Reverter
+None	Main View		Nenhum
+All workspaces	Main View		Todas as áreas de trabalho
+Icon label outline	Main View		Contornos das legendas de ícones
+Other…	Main View		Outros…
+Current workspace	Main View		Área de trabalho atual
+Apply	Main View		Aplicar
+Other folder…	Main View		Outra pasta…
+Y:	Main View		Y:
+Tile	Main View		Mosaico
+Select	Main View		Selecionar
+Scale to fit	Main View		Ajustar tamanho
+OK	Main View		OK
+Placement:	Main View		Posicionamento:
+Preview	Main View		Pré-visualização
+Image:	Main View		Imagem:

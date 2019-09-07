@@ -1,0 +1,55 @@
+1	danish	x-vnd.Haiku-Network	3039697761
+Ethernet device	InterfaceListItem		Ethernet-enhed
+Link speed:	IntefaceView		Linkhastighed:
+disconnected	IntefaceView		ikke forbundet
+IP Address:	IntefaceAddressView		IP-adresse:
+WPA	WPA protected network		WPA
+Network:	IntefaceView		Netværk:
+Received:	IntefaceView		Modtaget:
+New…	NetworkWindow		Ny…
+no link	InterfaceListItem		intet link
+Other	NetworkWindow		Andre
+Sent:	IntefaceView		Sendt:
+Gateway:	IntefaceAddressView		Gateway:
+The netmask defines your local network	IntefaceAddressView		Netmasken angiver dit lokale netværk
+Your IP address	IntefaceAddressView		Din IP-adresse
+DHCP	IntefaceAddressView		DHCP
+Netmask:	IntefaceAddressView		Netmaske:
+EAP	EAP protected network		EAP
+Services	NetworkWindow		Tjenester
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Installering af netværksstatus i skrivebordslinje mislykkede: %s
+Revert	NetworkWindow		Tilbagefør
+off	ServiceListItem		fra
+WEP	WEP protected network		WEP
+<no wireless networks found>	IntefaceView		<fandt ingen trådløse netværk>
+Enable	IntefaceView		Aktivér
+connected	IntefaceView		tilsluttet
+Apply	IntefaceAddressView		Anvend
+Disable	ServiceView		Deaktivér
+WPA2	WPA2 protected network		WPA2
+Show network status in Deskbar	NetworkWindow		Vis netværksstatus i skrivebordslinje
+Mode:	IntefaceAddressView		Tilstand:
+connected	InterfaceListItem		tilsluttet
+OK	NetworkWindow		OK
+Static	IntefaceAddressView		Statisk
+launch error	NetworkWindow		fejl ved start
+Renegotiate	IntefaceView		Genforhandl
+MAC address:	IntefaceView		MAC-adresse:
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+disabled	InterfaceListItem		deaktiveret
+Dial-up connection	InterfaceListItem		Opkaldsforbindelse
+on	ServiceListItem		til
+The method for obtaining an IP address	IntefaceAddressView		Metoden til at indhente en IP-adresse
+disconnected	InterfaceListItem		ikke forbundet
+Automatic	IntefaceAddressView		Automatisk
+Choose automatically	IntefaceView		Vælg automatisk
+Status:	IntefaceView		Status:
+Disable	IntefaceView		Deaktivér
+Manage…	NetworkWindow		Håndter…
+open	Open network		åben
+Network	NetworkWindow		Netværk
+Your gateway to the internet	IntefaceAddressView		Din indgang til internettet
+Enable	ServiceView		Aktivér
+Wireless device	InterfaceListItem		Trådløs enhed
+Disabled	IntefaceAddressView		Deaktiveret
+VPN connection	InterfaceListItem		VPN-forbindelse

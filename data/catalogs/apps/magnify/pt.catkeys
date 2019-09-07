@@ -1,0 +1,17 @@
+1	portuguese	x-vnd.Haiku-Magnify	94607167
+Decrease pixel size	Magnify-Main		Diminuir tamanho do pixel
+Increase pixel size	Magnify-Main		Aumentar tamanho do pixel
+Stick coordinates	Magnify-Main		Coordenadas fixas
+%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}
+Copy image	Magnify-Main		Copiar imagem
+Decrease window size	Magnify-Main		Diminuir tamanho da janela
+Remove a crosshair	Magnify-Main		Remover uma mira
+Add a crosshair	Magnify-Main		Adicionar uma mira
+Freeze image	Magnify-Main		Congelar imagem
+Increase window size	Magnify-Main		Aumentar tamanho da janela
+Save image	Magnify-Main		Guardar imagem
+Show grid	Magnify-Main		Mostrar grelha
+Magnify	System name		Ampliar
+Info	Magnify-Main		Informação
+Show info	Magnify-Main		Mostrar informações
+Make square	Magnify-Main		Criar quadrado

@@ -1,12 +1,15 @@
-1	italian	x-vnd.Haiku-HaikuDepot	2728680786
+1	italian	x-vnd.Haiku-HaikuDepot	3919231293
+An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificato un errore nell'aggiornamento del repository: %error%
 Check for updates…	MainWindow		Controllo aggiornamenti…
 Uninstall	PackageManager		Disinstalla
 (%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Disinstallato
 Available packages	MainWindow		Pacchetti disponibili
 Create account	UserLoginWindow		Crea account
+OK	App		OK
 Mostly stable	RatePackageWindow		Tendenzialmente stabile
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Account creato con successo. Ora puoi votare i pacchetti e utilizzare tutte le funzionalità dell'applicazione.
+The response to the captcha was incorrect.	ServerHelper		Il captcha inserito non è corretto.
 Develop packages	MainWindow		Sviluppo
 Rate package…	PackageInfoView		Vota pacchetto…
 Starting the package daemon failed:\n\n%Error%	App		Avvio del demone dei pacchetti fallito:\n\n%Error%
@@ -95,6 +98,7 @@ Comment language:	RatePackageWindow		Linguaggio commento:
 Status	PackageListView		Stato
 The username is already taken. Please choose another.	UserLoginWindow		Questo nome utente è già usato. Scegline un altro.
 Update	RatePackageWindow		Aggiorna
+OK	ServerHelper		OK
 Language	UserLoginWindow		Linguaggi di programmazione
 OK	UserLoginWindow		OK
 Stability:	RatePackageWindow		Stabilità:

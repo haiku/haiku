@@ -1,0 +1,20 @@
+1	danish	x-vnd.Haiku-MidiPlayer	1046133011
+This tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Miniprogrammet\nkan afspille tusindvis af\nsjove sange
+Dungeon	Main Window		Fangehul
+Could not load song	Main Window		Kunne ikke indlæse sang
+Igor's lab	Main Window		Igors laboratorium
+Off	Main Window		Sluk
+Loading instruments…	Scope View		Indlæser instrumenter…
+Volume:	Main Window		Lydstyrke:
+Closet	Main Window		Skab
+Scope	Main Window		Omfang
+Drop MIDI file here	Scope View		Slip MIDI-filen her
+None	Main Window		Ingen
+Reverb:	Main Window		Rumklang:
+MidiPlayer	System name		Midi-afspiller
+OK	Main Window		OK
+Stop	Main Window		Stop
+Live input:	Main Window		Liveinput:
+Garage	Main Window		Garage
+Play	Main Window		Spil
+Cavern	Main Window		Hule

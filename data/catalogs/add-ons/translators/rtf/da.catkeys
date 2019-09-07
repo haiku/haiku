@@ -1,0 +1,11 @@
+1	danish	x-vnd.Haiku-RTFTranslator	334451110
+Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
+RTF text files	RTFTranslator		RTF-tekstfiler
+RTF-Translator Settings	ConfigView		RTF-Translator-indstillinger
+Rich Text Format (RTF) translator	ConfigView		Rich Text Format-oversætter (RTF)
+RTF Settings	main		RTF-indstillinger
+RichTextFormat file	RTFTranslator		RichTextFormat-fil
+Be style text file	RTFTranslator		Be style-tekstfil
+Plain text file	RTFTranslator		Ren tekst-fil
+Rich Text Format translator	RTFTranslator		Rich Text Format-oversætter
+Rich Text Format translator v%d.%d.%d %s	RTFTranslator		Rich Text Format-oversætter v%d.%d.%d %s

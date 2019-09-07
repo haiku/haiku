@@ -1,0 +1,41 @@
+1	portuguese	x-vnd.Haiku-Mail	1939496501
+Account settings	AutoConfigWindow		Definições de conta
+An error occurred while creating the config view: %error.	Config Views		Ocorreu um erro ao criar a vista de configuração: %error.
+E-mail address:	E-Mail		Endereço de correio eletrónico:
+Create new account	AutoConfigWindow		Criar nova conta
+While sending and receiving	Config Window		Enquanto envia e recebe
+Error!	Config Views		Erro!
+Apply	Config Window		Aplicar
+Incoming mail filters	Config Views		Filtros de correio recebido
+Outgoing mail filters	Config Views		Filtros de correio enviado
+Server name:	E-Mail		Nome do servidor:
+Add	Config Window		Adicionar
+Back	AutoConfigWindow		Retroceder
+Real name:	E-Mail		Nome verdadeiro:
+Real name:	Config Views		Nome verdadeiro:
+\t\t· E-mail filters	Config Window		\t\t· Filtros de correio
+Accounts	Config Window		Contas
+Remove	Config Views		Remover
+Show notifications:	Config Window		Mostrar notificações:
+Settings	Config Window		Definições
+Never	Config Window	show status window	Nunca
+Account name:	Config Views		Nome da conta:
+Enter a valid e-mail address.	AutoConfigWindow		Introduza um endereço de e-mail válido.
+Choose Protocol	E-Mail		Selecionar Protocolo
+Return address:	Config Views		Endereço de retorno:
+Password:	E-Mail		Palavra-passe:
+Error retrieving general settings: %s\n	Config Window		Erro ao obter as configurações gerais: %s\n
+Incoming	Config Window		Recebido
+Finish	AutoConfigWindow		Concluir
+Add filter	Config Views		Adicionar filtro
+Account settings	Config Views		Definições de conta
+minutes	Config Window		minutos
+E-mail	System name		Correio eletrónico
+Account name:	E-Mail		Nome da conta:
+Edit mailbox menu…	Config Window		Editar menu da caixa de correio…
+Server Name:	E-Mail		Nome do Servidor:
+Remove	Config Window		Remover
+Login name:	E-Mail		Nome de utilizador:
+While sending	Config Window		Enquanto envia
+Next	AutoConfigWindow		Seguinte
+Error	Config Window		Erro

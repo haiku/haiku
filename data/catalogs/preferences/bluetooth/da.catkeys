@@ -1,0 +1,55 @@
+1	danish	x-vnd.Haiku-BluetoothPrefs	4276705900
+Laptop	Settings view		Laptop
+Only from trusted devices	Settings view		Kun fra betroede enheder
+15 secs	Settings view		15 sekunder
+Quit	main		Afslut
+Manufacturer: 	Device View		Producent: 
+Desktop	Settings view		Skrivebord
+Server	Window		Server
+Identify host as:	Settings view		Identificer host som:
+Refresh…	Remote devices		Opdater…
+Local devices found on system:	Settings view		Lokale enheder fundet på systemet:
+Service classes: 	Device View		Tjeneste klasser: 
+Remote devices	Window		Fjerne enheder
+Settings	Window		Indstillinger
+Stop bluetooth services…	Window		Stop bluetooth-tjenester…
+61 secs	Settings view		61 sekunder
+Add…	Remote devices		Tilføj…
+As blocked	Remote devices		Som blokeret
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Der er ikke nogen Bluetooth-LocalDevice registreret på systemet.
+Policy…	Settings view		Regler …
+Revert	Window		Tilbagefør
+Refresh local devices…	Window		Genopfrisk lokale enheder…
+Disconnect	Remote devices		Afbryd forbindelsen
+Identify us as…	Settings view		Identificer os som …
+From all devices	Settings view		Fra alle enheder
+Defaults	Window		Standarder
+Start bluetooth services…	Window		Start bluetooth-tjenester…
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Tjek at Bluetooth er aktiveret på din fjern enhed. Tryk på 'Forespørgsel' for at starte søgningen. Tiden der skal bruges for at finde navnene er ukendt, men det burde ikke tage mere end 3 sekunder per enhed. Du kan efterfølgende tilføje dem til din hovedliste, hvor du kan parre med enhederne.
+Scanning progress	Inquiry panel		Søgnings status
+Bluetooth	System name		Bluetooth
+Launch now	main		Start nu
+Remove	Remote devices		Fjern
+Pick device…	Settings view		Vælg enhed …
+Always ask	Settings view		Spørg altid
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Med støtte fra:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nTak til dem som hjalp til …\n\nAfsendelse/donering af hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nØkonomisk:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nMed rettelser:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTestning:\n - Petter H. Juliussen\nDer gav mig al kendskaben:\n - yellowTAB-teamet
+Help	Window		Hjælp
+Pair…	Remote devices		Parre…
+Retrieving name of %1	Inquiry panel		Hentning af navn af %1
+Inquiry	Inquiry panel		Forespørgsel
+Incoming connections policy:	Settings view		Regler for indgående forbindelser:
+Retrieving names…	Inquiry panel		Henter navne …
+Show name	Extended local device view		Vis navn
+Add device to list	Inquiry panel		Tilføj enhed til listen
+Remaining %1 seconds	Inquiry panel		Resterende %1 sekunder
+The Bluetooth services are not currently running on this system.	main		Bluetooth-tjenesterne kører i øjeblikket ikke på systemet.
+Discoverable	Extended local device view		Synlig
+Authenticate	Extended local device view		Godkend
+Smart phone	Settings view		Smartphone
+Scanning completed.	Inquiry panel		Søgning afsluttet.
+Default inquiry time:	Settings view		Standard forespørgselstid:
+Server	Settings view		Server
+Handheld	Settings view		Håndholdt
+ packets: 	Device View		 pakker: 
+About Bluetooth…	Window		Om Bluetooth…
+Starting scan…	Inquiry panel		Starter skanning …

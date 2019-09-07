@@ -1,0 +1,31 @@
+1	portuguese	x-vnd.haiku-screenshot	3958461128
+Include window border	ScreenshotWindow		Incluir limite da janela
+Overwrite	ScreenshotWindow		Escrever por cima
+Save in:	ScreenshotWindow		Guardar em:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Erro ao guardar \"%s\":\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		O ficheiro já existe.\n Tem a certeza de que pretende substituí-lo?
+OK	ScreenshotWindow		OK
+The destination path exists but is not a folder.	ScreenshotWindow		O caminho de destino existe mas não é uma pasta.
+Select	ScreenshotWindow		Selecionar
+Save as:	ScreenshotWindow		Guardar como:
+seconds	ScreenshotWindow		segundos
+New screenshot	ScreenshotWindow		Nova captura de ecrã
+Screenshot	System name		Captura de Ecrã
+Desktop	ScreenshotWindow		Área de Trabalho
+Artwork folder	ScreenshotWindow		Pasta artwork
+Translator Settings	ScreenshotWindow		Configurações do Tradutor
+Include mouse pointer	ScreenshotWindow		Incluir ponteiro do rato
+overwrite	ScreenshotWindow		substituir
+Settings…	ScreenshotWindow		Configurações…
+Choose folder	ScreenshotWindow		Selecionar pasta
+Name:	ScreenshotWindow		Nome:
+Choose folder…	ScreenshotWindow		Selecionar pasta…
+Please select	ScreenshotWindow		Por favor selecione
+Failed to save screenshot	ScreenshotWindow		Ocorreu uma falha ao guardar a captura de ecrã
+Cancel	ScreenshotWindow		Cancelar
+Delay:	ScreenshotWindow		Atraso:
+Copy to clipboard	ScreenshotWindow		Copiar para a Área de Transferência
+screenshot	Screenshot	Base filename of screenshot files	captura_de_ecrã
+Home folder	ScreenshotWindow		Pasta home
+Save	ScreenshotWindow		Guardar
+Capture active window	ScreenshotWindow		Capturar janela ativa

@@ -1,47 +1,45 @@
-1	portuguese	x-vnd.Haiku-BluetoothPrefs	3727111885
-15 secs	Settings view		15 seg.
-61 secs	Settings view		61 seg.
-About Bluetooth…	Window		Sobre o Bluetooth...
-Add device to list	Inquiry panel		Adicionar dispositivo à lista
-Add…	Remote devices		Adicionar...
-Always ask	Settings view		Perguntar sempre
-As blocked	Remote devices		Como bloqueados
-Connections & channels…	Window		Ligações e canais...
-Default inquiry time:	Settings view		Tempo de consulta predefenido:
-Defaults	Window		Predefinições
-Desktop	Settings view		Ambiente de Trabalho
-Discoverable	Extended local device view		Detectável
-From all devices	Settings view		Todos os dispositivos
-Handheld	Settings view		Computador de Bolso
-Help	Window		Ajuda
-Identify host as:	Settings view		Identificar anfitrião como:
-Identify us as...	Settings view		Identificar-nos como...
-Incoming connections policy:	Settings view		Política de ligações de entrada:
-Inquiry	Inquiry panel		Consulta
+1	portuguese	x-vnd.Haiku-BluetoothPrefs	671611674
 Laptop	Settings view		Portátil
-Local devices found on system:	Settings view		Dispositivos locais encontrados no sistema:
 Only from trusted devices	Settings view		Apenas de dispositivos de confiança
-Pair…	Remote devices		Emparelhar...
-Pick LocalDevice...	Settings view		Escolher LocalDevice...
-Policy...	Settings view		Política
-Refresh LocalDevices…	Window		Actualizar os LocalDevices...
-Refresh…	Remote devices		Actualizar...
-Remote devices	Window		Dispositivos remotos
-Remote devices list…	Window		Lista de dispositivos remotos...
-Remove	Remote devices		Remover
-Retrieving names...	Inquiry panel		A obter nomes...
-Revert	Window		Reverter
-Scanning completed.	Inquiry panel		Pesquisa completa.
-Scanning progress	Inquiry panel		Progresso da pesquisa
-Server	Settings view		Servidor
+15 secs	Settings view		15 seg.
+Quit	main		Sair
+Manufacturer: 	Device View		Fabricante: 
+Desktop	Settings view		Área de Trabalho
 Server	Window		Servidor
-Service classes: 	Device View		Classes de serviços:
+Identify host as:	Settings view		Identificar anfitrião como:
+Refresh…	Remote devices		Atualizar…
+Local devices found on system:	Settings view		Dispositivos locais encontrados no sistema:
+Service classes: 	Device View		Classes de serviço: 
+Remote devices	Window		Dispositivos remotos
 Settings	Window		Definições
-Show bluetooth console…	Window		Mostrar consola bluetooth...
-Show name	Extended local device view		Mostrar nome
-Smart phone	Settings view		Smart phone
-Start bluetooth services…	Window		Iniciar serviços bluetooth...
-Starting scan...	Inquiry panel		A iniciar pesquisa...
-Stop bluetooth services…	Window		Parar serviços bluetooth...
+Stop bluetooth services…	Window		Parar serviços bluetooth…
+61 secs	Settings view		61 seg.
+Add…	Remote devices		Adicionar…
+As blocked	Remote devices		Como bloqueados
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Não existe nenhum Bluetooth LocalDevice registado no sistema.
-View	Window		Ver
+Revert	Window		Reverter
+Disconnect	Remote devices		Desligar
+From all devices	Settings view		Todos os dispositivos
+Defaults	Window		Predefinições
+Start bluetooth services…	Window		Iniciar serviços bluetooth…
+Scanning progress	Inquiry panel		Progresso da pesquisa
+Bluetooth	System name		Bluetooth
+Launch now	main		Iniciar agora
+Remove	Remote devices		Remover
+Always ask	Settings view		Perguntar sempre
+Help	Window		Ajuda
+Pair…	Remote devices		Emparelhar…
+Inquiry	Inquiry panel		Consulta
+Incoming connections policy:	Settings view		Política de ligações de entrada:
+Show name	Extended local device view		Mostrar nome
+Add device to list	Inquiry panel		Adicionar dispositivo à lista
+Remaining %1 seconds	Inquiry panel		Faltam %1 segundos
+The Bluetooth services are not currently running on this system.	main		Os serviços Bluetooth não estão em execução neste sistema.
+Discoverable	Extended local device view		Detectável
+Authenticate	Extended local device view		Autenticar
+Smart phone	Settings view		Smart phone
+Scanning completed.	Inquiry panel		Pesquisa completa.
+Default inquiry time:	Settings view		Tempo de consulta predefinido:
+Server	Settings view		Servidor
+Handheld	Settings view		Computador de Bolso
+About Bluetooth…	Window		Sobre o Bluetooth…

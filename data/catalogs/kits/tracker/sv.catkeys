@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	2023640966
+1	swedish	x-vnd.Haiku-libtracker	838081337
 Created	ContainerWindow		Skapad
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
 Open with…	ContainerWindow		Öppna med...
@@ -23,6 +23,7 @@ Name	Default Query Columns		Namn
 Unmount	ContainerWindow		Avmontera
 Eject when unmounting	AutoMounterSettings		Mata ut vid avmontering
 Searching for disks to mount…	StatusWindow		Letar efter diskar för montering...
+Information	InfoWindow		Information
 Error emptying Trash	FSUtils		Ett fel uppstod när Papperskorgen skulle tömmas
 Opens with:	InfoWindow		Öppnas med:
 Size	QueryPoseView		Storlek
@@ -402,6 +403,7 @@ by formula	FindPanel		med formel
 is	FindPanel		är
 Move to Trash	FilePanelPriv		Flytta till papperskorg
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Om du byter namn på systemmappen eller dess innehåll kommer du kanske inte kunna starta %osName!\n\nÄr du säker på att du vill göra detta?\n\nFör att byta namn ändå, håll nere Shift-tangenten samtidigt som du trycker på \"Byt namn\".
+Permissions	FilePermissionsView		Behörigheter
 40 x 40	ContainerWindow		40 x 40
 40 x 40	DeskWindow		40 x 40
 New folder %ld	FSUtils		Ny mapp %ld

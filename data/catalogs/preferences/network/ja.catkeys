@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Network	3694799483
+1	japanese	x-vnd.Haiku-Network	3039697761
 Ethernet device	InterfaceListItem		イーサネットデバイス
 Link speed:	IntefaceView		リンクスピード:
 disconnected	IntefaceView		切断済み
@@ -40,6 +40,7 @@ disabled	InterfaceListItem		無効
 Dial-up connection	InterfaceListItem		ダイアルアップ接続
 on	ServiceListItem		オン
 The method for obtaining an IP address	IntefaceAddressView		IP アドレスの取得方法
+disconnected	InterfaceListItem		切断
 Automatic	IntefaceAddressView		自動
 Choose automatically	IntefaceView		自動選択
 Status:	IntefaceView		状態:

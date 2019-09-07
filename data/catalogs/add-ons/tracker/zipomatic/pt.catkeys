@@ -1,17 +1,17 @@
-1	portuguese	x-vnd.haiku.zip-o-matic	829498916
-%ld files added.	file:ZipOMaticWindow.cpp		%ld ficheiros adicionados.
-1 file added.	file:ZipOMaticWindow.cpp		1 ficheiro adicionado.
-Archive	file:ZipperThread.cpp		Arquivo
-Archive created OK	file:ZipOMaticWindow.cpp		Criação de arquivo bem sucedida
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Tem a certeza de que quer interromper a criação deste arquivo?
-Continue	file:ZipOMaticWindow.cpp		Continuar
-Creating archive: %s	file:ZipOMaticWindow.cpp		A criar arquivo: %s
+1	portuguese	x-vnd.haiku.zip-o-matic	2032806096
+Drop files here.	file:ZipOMaticWindow.cpp		Largue ficheiros aqui.
+Filename: %s	file:ZipOMaticWindow.cpp		Nome do ficheiro: %s
 Do you want to stop them?	file:ZipOMatic.cpp		Quer pará-los?
 Error creating archive	file:ZipOMaticWindow.cpp		Erro ao criar arquivo
-Filename: %s	file:ZipOMaticWindow.cpp		Nome do ficheiro: %s
-Let them continue	file:ZipOMatic.cpp		Deixá-los continuar
-Preparing to archive	file:ZipperThread.cpp		A preparar para arquivar
-Stop	file:ZipOMaticWindow.cpp		Parar
 Stop them	file:ZipOMatic.cpp		Pará-los
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Tem a certeza de que quer interromper a criação deste arquivo?
+Preparing to archive	file:ZipperThread.cpp		A preparar para arquivar
+Let them continue	file:ZipOMatic.cpp		Deixá-los continuar
+Continue	file:ZipOMaticWindow.cpp		Continuar
+Archive created OK	file:ZipOMaticWindow.cpp		Criação de arquivo bem sucedida
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# ficheiro adicionado.} other{# ficheiros adicionados.}}
+Stop	file:ZipOMaticWindow.cpp		Parar
 Stopped	file:ZipOMaticWindow.cpp		Parado
-You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Você tem %ld Zip-O-Matic a correr.\n\n
+Archive	file:ZipperThread.cpp		Arquivo
+Creating archive: %s	file:ZipOMaticWindow.cpp		A criar arquivo: %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Tem {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} em execução.\n\n

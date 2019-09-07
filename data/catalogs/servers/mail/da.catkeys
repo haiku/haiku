@@ -1,0 +1,19 @@
+1	danish	x-vnd.Be-POST	2949558073
+No new messages	MailDaemon		Ingen nye meddelelser
+No new messages	DeskbarView		Ingen nye meddelelser
+Shutdown mail services	DeskbarView		Luk ned for posttjenester
+Mail status	MailDaemon		Status for post
+Fetching mail for %name	Notifier		Henter post for %name
+{0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# ny meddelelse} other{# nye meddelelser}}
+{0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# ny meddelelse} other{# nye meddelelser}} for %name\n
+Create new message…	DeskbarView		Opret ny meddelelse…
+Send pending mails	DeskbarView		Send afventende post
+Settings…	DeskbarView		Indstillinger…
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{En ny meddelelse} other{# nye meddelelser}}
+New Messages	MailDaemon		Nye meddelelser
+<no accounts>	DeskbarView		<ingen konti>
+Mail status	Notifier		Status for post
+Check for mails only	DeskbarView		Søg kun efter post
+Check for mail now	DeskbarView		Søg efter post nu
+Sending mail for %name	Notifier		Sender post for %name
+Mail daemon status log	MailDaemon		Statuslog for postdæmon

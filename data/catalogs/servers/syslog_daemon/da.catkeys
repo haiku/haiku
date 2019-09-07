@@ -1,0 +1,4 @@
+1	danish	x-vnd.Haiku-SystemLogger	57960782
+Syslog Daemon	SyslogDaemon		Syslog-dæmon
+OK	SyslogDaemon		OK
+%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nDæmonen er ansvarlig for at samle alle systemmeddelelser og skrive dem til den systembredde log hos \"%s\".\n\n

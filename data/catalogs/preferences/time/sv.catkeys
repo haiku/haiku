@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Time	752043118
+1	swedish	x-vnd.Haiku-Time	834234238
 OK	Time		OK
 Message receiving failed	Time		Kunde inte ta emot meddelandet
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date, Skriven av:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
@@ -16,6 +16,7 @@ Asia	Time		Asien
 Try all servers	Time		Prova alla servrarna
 Time	Time		Tid
 Current time:	Time		Aktuell tid:
+The following error occured while synchronizing:\n%s: %s	Time		Följande fel inträffade vid synkronisering:\n%s: %s
 Europe	Time		Europa
 Show day of week	Time		Visa veckodag
 Local time (Windows compatible)	Time		Lokal tid (Windows kompatibel)
@@ -43,5 +44,6 @@ Synchronize at boot	Time		Synkronisera vid uppstart
 Indian	Time		Indien
 Revert	Time		Återställ
 Date and time	Time		Datum och tid
+The following error occured while synchronizing:\n%s	Time		Följande fel inträffade vid synkronisering:\n%s
 Synchronize	Time		Synkronisera
 Add	Time		Lägg till

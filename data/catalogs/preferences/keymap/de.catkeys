@@ -21,8 +21,8 @@ Belgian (point)	KeymapNames		Belgisch (Point)
 Finnish	KeymapNames		Finnisch
 Num lock	Keyboard Layout View		Num-Feststelltaste
 Switch shortcut keys to Windows/Linux mode	Keymap window		Befehlstasten tauschen: Windows/Linux-Modus
-Spanish (Dvorak)	KeymapNames		Spanisch (Dvorak)
 Option	Keyboard Layout View	Option key	Option
+Spanish (Dvorak)	KeymapNames		Spanisch (Dvorak)
 Scroll lock	Keyboard Layout View		Rollen-Feststelltaste
 US-International	KeymapNames		US International
 Right option	Keyboard Layout View		Option rechts
@@ -65,13 +65,13 @@ Remove	Keyboard Layout View		Entfernen
 Tilde trigger	Keymap window		~ Tilde
 Shift	Keyboard Layout View	Shift key	Shift
 CONTROL	Keyboard Layout View		STEUERUNG
-Czech (Mac)	KeymapNames		Tschechisch (Mac)
 Macedonian	KeymapNames		Mazedonisch
+Czech (Mac)	KeymapNames		Tschechisch (Mac)
 Left command	Keyboard Layout View		Befehl links
 Albanian	KeymapNames		Albanisch
 (Current)	Keymap window		(Aktiv)
-Friulian	KeymapNames		Friaulisch
 OPT	Keyboard Layout View	Very short for 'option'	OPT
+Friulian	KeymapNames		Friaulisch
 Left option	Keyboard Layout View		Option links
 END	Keyboard Layout View		ENDE
 Esperanto	KeymapNames		Esperanto
@@ -137,8 +137,8 @@ Norwegian	KeymapNames		Norwegisch
 Font	Keymap window		Schriftart
 Danish	KeymapNames		Dänisch
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift-Taste
-Russian	KeymapNames		Russisch
 PAUSE	Keyboard Layout View		PAUSE
+Russian	KeymapNames		Russisch
 Romanian	KeymapNames		Rumänisch
 CMD	Keyboard Layout View	Very short for 'command'	BEF
 Command	Keyboard Layout View	Command key	Befehl

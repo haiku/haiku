@@ -1,33 +1,77 @@
-1	portuguese	x-vnd.Haiku-About	2847391904
-%.2f GHz	AboutView		%.2f GHz
-%d MiB total	AboutView		%d MiB no total
-%d MiB used (%d%%)	AboutView		%d MiB usados (%d%%)
-%ld MHz	AboutView		%ld MHz
-%ld Processors:	AboutView		%ld Processadores:
-%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB total, %inacessíveis MiB inacessíveis
-... and the many people making donations!\n\n	AboutView		... e as muitas pessoas que fizeram donativos!\n\n
-About this system	AboutWindow		Sobre este sistema
-Contributors:\n	AboutView		Colaboradores:\n
-Current maintainers:\n	AboutView		Programadores actuais:\n
-GCC %d Hybrid	AboutView		GCC %d Híbrido
-Kernel:	AboutView		Kernel:
-License: 	AboutView		Licença: 
-Licenses: 	AboutView		Licenças: 
-Memory:	AboutView		Memória:
-Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fundador do projecto)\n\n
-Past maintainers:\n	AboutView		Ex-programadores:\n
-Processor:	AboutView		Processador:
+1	portuguese	x-vnd.Haiku-About	943754242
 Revision	AboutView		Revisão
-Source Code: 	AboutView		Código Fonte:
-The BeGeistert team\n	AboutView		A equipa BeGeistert\n
-The Haiku-Ports team\n	AboutView		A equipa Haiku-Ports\n
-The Haikuware team and their bounty program\n	AboutView		A equipa do Haikuware e o seu programa de recompensas\n
-Time running:	AboutView		Tempo de actividade:
-Translations:\n	AboutView		Traduções:\n
-Unknown	AboutView		Desconhecido
-Version:	AboutView		Versão:
-Website, marketing & documentation:\n	AboutView		Website, marketing & documentação:\n
-[Click a license name to read the respective license.]\n\n	AboutView		[Clique no nome da licença para a ler.]\n\n
-\nCopyrights\n\n	AboutView		\nCopyrights\n\n
+The Haikuware team and their bounty program\n	AboutView		À equipa do Haikuware e ao seu programa de recompensas\n
+Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Todos os direitos reservados.
+%.2f GHz	AboutView		%.2f GHz
 \n\nSpecial thanks to:\n	AboutView		\n\nAgradecimentos especiais a:\n
-\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… e provavelmente mais alguém que nos esquecemos de mencionar (desculpe!)\n\n
+Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (e o seu núcleo NewOS)\n
+Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y.Takagi. Todos os direitos reservados.
+Google and their Google Summer of Code and Google Code In programs\n	AboutView		Google e os seus programas Google Summer of Code e Google Code In\n
+Contributors:\n	AboutView		Colaboradores:\n
+Kernel:	AboutView		Kernel:
+Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Copyright © 2006-2012 Kentaro Fukuchi
+Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Copyright © 1991-2000 Silicon Graphics, Inc. Todos os direitos reservados.
+Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Todos os direitos reservados.
+Past website & marketing:\n	AboutView		Website & marketing, no passado:\n
+Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe e outros.
+{0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Processador:} other{# Processadores:}}
+%d MiB total	AboutView		%d MiB no total
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	O código que é único ao Haiku, especialmente o núcleo e todo o código a que as aplicações podem ligar, é distribuído sob os termos da <licença MIT>. Algumas bibliotecas do sistema contêm código de terceiros distribídos sob a <licença LGPL>. Você pode encontrar os direitos de cópia para código de terceiros em baixo.\n\n
+Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Copyright © 1996-1997 Jeff Prosise. Todos os direitos reservados.
+Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Copyright © 1999-2006 Brian Paul. Mesa3D Project. Todos os direitos reservados.
+Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Copyright © 2010-2011 Google Inc. Todos os direitos reservados.
+Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nTodos os direitos reservados.
+Past maintainers:\n	AboutView		Ex-programadores:\n
+Unknown	AboutView		Desconhecido
+Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. e à sua equipa de desenvolvimento, por terem criado o BeOS!\n\n
+Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Copyright © 2002-2014 Industrial Light & Magic, uma divisão da Lucas Digital Ltd. LLC.
+Licenses: 	AboutView		Licenças: 
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		O copyright do código do Haiku é propriedade da Haiku, Inc. ou dos respetivos autores onde expressamente notado no código-fonte. Haiku® e o logótipo® HAIKU são marcas comerciais registadas da Haiku, Inc.\n\n
+Copyright © 2009 Colin Percival	AboutView		Copyright © 2009 Colin Percival
+Time running:	AboutView		Tempo de actividade:
+%ld MHz	AboutView		%ld MHz
+Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Todos os direitos reservados.
+GNU LGPL v2	AboutWindow		GNU LGPL v2
+Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. Este software é baseado em parte no trabalho do Independent JPEG Group.
+Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fundador do projecto)\n\n
+BSD (3-clause)	AboutWindow		BSD (3-clause)
+About this system	AboutWindow		Sobre este sistema
+%d MiB used (%d%%)	AboutView		%d MiB usados (%d%%)
+Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 pelos autores de Gutenprint. Todos os direitos reservados.
+Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. Todos os direitos reservados.
+AboutSystem	System name		Acerca do Sistema
+Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Copyright © 1995-2001 Lars Düning. Todos os direitos reservados.
+Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Copyright © 1998-2000 Thai Open Source Software Center Ltd e Clark Cooper.
+Source Code: 	AboutView		Código Fonte: 
+\nCopyrights\n\n	AboutView		\nCopyrights\n\n
+GNU GPL v3	AboutWindow		GNU GPL v3
+The HaikuPorts team\n	AboutView		À equipa do HaikuPorts\n
+Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Contém software do Projecto GNU, disponibilizado sob as licenças GPL e LGPL:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.
+Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm e Werner Lemberg.
+Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Contém software do Projeto FreeBSD, disponibilizado sob a licença BSD:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. Todos os direitos reservados.
+[Click a license name to read the respective license.]\n\n	AboutView		[Clique no nome da licença para a ler.]\n\n
+Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Copyright © 2002-2003 Steve Lhomme. Todos os direitos reservados.
+Copyright © 2000-2019 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2019 Fabrice Bellard, et al.
+Current maintainers:\n	AboutView		Programadores atuais:\n
+Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. Todos os direitos reservados.
+Version:	AboutView		Versão:
+The BeGeistert team\n	AboutView		À equipa da BeGeistert\n
+GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
+License: 	AboutView		Licença: 
+GNU GPL v2	AboutWindow		GNU GPL v2
+The University of Auckland and Christof Lutteroth\n\n	AboutView		A Universidade de Auckland e Christof Lutteroth\n\n
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB total, %inaccessible MiB inacessíveis
+Copyright © 2012-2016 Google Internationalization team.	AboutView		Copyright © 2012-2016 Google Internationalization team.
+Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Copyright © 1994-2008 Xiph.Org. Todos os direitos reservados.
+Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Copyright © 1995-2004 Jean-Loup Gailly e Mark Adler.
+Copyright © 2001-2003 Expat maintainers.	AboutView		Copyright © 2001-2003 Os mantenedores de Expat.
+Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Copyright © 2002-2006 Maxim Shemaranev (McSeem).
+Translations:\n	AboutView		Traduções:\n
+Memory:	AboutView		Memória:
+\n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…e provavelmente alguns mais que nos esquecemos de mencionar (pedimos desculpa!)\n\n
+BSD (2-clause)	AboutWindow		BSD (2-clause)
+Website & marketing:\n	AboutView		Website & marketing:\n
+2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 por Andy Ritger baseado na Generalized Timing Formula
+…and the many people making donations!\n\n	AboutView		…e às muitas pessoas que têm feito donativos!\n\n
+BSD (4-clause)	AboutWindow		BSD (4-clause)
+BITSTREAM CHARTER is a registered trademark of Bitstream Inc.	AboutView		BITSTREAM CHARTER é uma marca registada de Bitstream Inc.

@@ -1,0 +1,15 @@
+1	portuguese	x-vnd.Haiku-JPEGTranslator	1266191322
+Read	JPEGTranslator		Leitura
+Show warning messages	JPEGTranslator		Mostrar mensagens de aviso
+JPEG Library Error: %s\n	be_jerror		Erro da Biblioteca JPEG: %s\n
+None	JPEGTranslator		Nenhum
+About	JPEGTranslator		Acerca
+Version %d.%d.%d	JPEGTranslator		Versão %d.%d.%d
+Write black-and-white images as RGB24	JPEGTranslator		Escrever imagens a preto-e-branco como RGB24
+Use progressive compression	JPEGTranslator		Usar compressão progressiva
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Tornar o ficheiro mais pequeno (qualidade ligeiramente inferior)
+Read greyscale images as RGB32	JPEGTranslator		Ler imagens em escala de cinzentos como RGB32
+Output quality	JPEGTranslator		Qualidade de saída
+Write	JPEGTranslator		Escrever
+JPEG Library Warning: %s\n	be_jerror		Aviso da Biblioteca JPEG: %s\n
+JPEG images	JPEGTranslator		Imagens JPEG

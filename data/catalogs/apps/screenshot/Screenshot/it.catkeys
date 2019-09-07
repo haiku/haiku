@@ -2,7 +2,7 @@
 Include window border	ScreenshotWindow		Includi bordi finestra
 Overwrite	ScreenshotWindow		Sovrascrivi
 Save in:	ScreenshotWindow		Salva in:
-Error saving \"%s\":\n\t%s	ScreenshotWindow		Errore nel salvataggion di \"%s\":\n\t%s
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Errore nel salvataggio di \"%s\":\n\t%s
 This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Questo file esiste già.\nSei sicuro di volerlo sovrascrivere?
 OK	ScreenshotWindow		OK
 The destination path exists but is not a folder.	ScreenshotWindow		Il percorso di destinazione esiste ma non è una cartella.

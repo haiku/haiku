@@ -1,0 +1,41 @@
+1	danish	x-vnd.Be-PRNT	1465107170
+Test page	TestPageView		Testside
+Remove	PrintersWindow		Fjern
+Red	TestPageView		Rød
+Default Printer	PrinterListView		Standardprinter
+<pick one>	AddPrinterDialog		<vælg en>
+Connected to:	AddPrinterDialog		Forbundet til:
+Make default	PrintersWindow		Gør standard
+Cyan	TestPageView		Cyan
+Completed	JobListView		Fuldført
+Test page	PrintersWindow		Testside
+Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
+Failed	JobListView		Mislykkedes
+Blue	TestPageView		Blå
+Waiting	JobListView		Venter
+Processing	JobListView		Behandler
+Cancel	AddPrinterDialog		Annuller
+Unknown status	JobListView		Ukendt status
+Print jobs for %printer_name%	PrintersWindow		Udskrivningsjobs for %printer_name%
+{0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? sider}=1{# side}other{# sider}}
+Add printer	AddPrinterDialog		Tilføj printer
+Printers	PrintersWindow		Printere
+No printer found!	TransportMenu		Fandt ingen printer!
+Add…	PrintersWindow		Tilføj…
+Magenta	TestPageView		Magenta
+Transport: %transport% %transport_address%	TestPageView		Transport: %transport% %transport_address%
+Add	AddPrinterDialog		Tilføj
+Print jobs: No printer selected	PrintersWindow		Udskrivningsjobs: Der er ikke valgt nogen printer
+Printer name:	AddPrinterDialog		Printernavn:
+Yellow	TestPageView		Gul
+Black	TestPageView		Sort
+Printer type:	AddPrinterDialog		Printertype:
+Printers	System name		Printere
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{Ingen afventende jobs}=1{1 afventende job}other{# afventende jobs}}
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Printer: %printer_name%\nDriver:  %driver%\n
+Green	TestPageView		Grøn
+Print test page	PrintersWindow		Udskriv testside
+Restart job	PrintersWindow		Genstart job
+Driver: %driver%	PrinterListView		Driver: %driver%
+Cancel job	PrintersWindow		Annuller job
+%.2f KB	JobListView		%.2f KB

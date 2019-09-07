@@ -1,0 +1,8 @@
+1	portuguese	x-vnd.mmu_man.filepanel	989870026
+display a load/save file panel\n	FilePanelApp		mostrar um painel de carregar/guardar ficheiro\n
+%s not a valid option\n	FilePanelApp		%s não é uma opção válida\n
+%s: this option requires a parameter\n	FilePanelApp		%s: esta opção requer um parâmetro\n
+%s: UNIMPLEMENTED\n	FilePanelApp		%s: NÃO IMPLEMENTADO\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		usage: %s [-h]     [-d pasta]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a padrão]      [-f padrão]\n
+options:\n	FilePanelApp		opções:\n
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		utilização: %s [--help] [--directory pasta] [--load|--save] [--title ttl] [--single] [--modal] [--allow padrão] [--forbid padrão]\n

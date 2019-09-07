@@ -1,0 +1,31 @@
+1	danish	x-vnd.haiku-screenshot	3958461128
+Include window border	ScreenshotWindow		Inkluder vindueskant
+Overwrite	ScreenshotWindow		Overskriv
+Save in:	ScreenshotWindow		Gem i:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Fejl ved gemning af \"%s\":\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Filen findes allerede.\n Er du sikker på, at du vil overskrive den?
+OK	ScreenshotWindow		OK
+The destination path exists but is not a folder.	ScreenshotWindow		Destinationsstien findes men er ikke en mappe.
+Select	ScreenshotWindow		Vælg
+Save as:	ScreenshotWindow		Gem som:
+seconds	ScreenshotWindow		sekunder
+New screenshot	ScreenshotWindow		Nyt skærmbillede
+Screenshot	System name		Skærmbillede
+Desktop	ScreenshotWindow		Skrivebord
+Artwork folder	ScreenshotWindow		Kunstmappe
+Translator Settings	ScreenshotWindow		Oversættelsesindstillinger
+Include mouse pointer	ScreenshotWindow		Inkluder musemarkør
+overwrite	ScreenshotWindow		overskriv
+Settings…	ScreenshotWindow		Indstillinger…
+Choose folder	ScreenshotWindow		Vælg mappe
+Name:	ScreenshotWindow		Navn:
+Choose folder…	ScreenshotWindow		Vælg mappe…
+Please select	ScreenshotWindow		Vælg venligst
+Failed to save screenshot	ScreenshotWindow		Kunne ikke gemme skærmbillede
+Cancel	ScreenshotWindow		Annuller
+Delay:	ScreenshotWindow		Forsinkelse:
+Copy to clipboard	ScreenshotWindow		Kopiér til udklipsholderen
+screenshot	Screenshot	Base filename of screenshot files	skærmbillede
+Home folder	ScreenshotWindow		Hjemmemappe
+Save	ScreenshotWindow		Gem
+Capture active window	ScreenshotWindow		Optag aktivt vindue

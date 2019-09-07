@@ -1,0 +1,35 @@
+1	danish	x-vnd.Haiku-Sudoku	3382377306
+Restore snapshot	SudokuWindow		Gendan snapshot
+File	SudokuWindow		Fil
+Mark invalid values	SudokuWindow		Markér invalide værdier
+Solve single field	SudokuWindow		Løs enkelt felt
+Hard	SudokuWindow		Svær
+Start again	SudokuWindow		Start igen
+New	SudokuWindow		Ny
+Easy	SudokuWindow		Nem
+Undo	SudokuWindow		Fortryd
+Export as…	SudokuWindow		Eksportér som…
+Quit	SudokuWindow		Afslut
+Redo	SudokuWindow		Omgør
+Could not open \"%s\":\n%s\n	SudokuWindow		Kunne ikke åbne \"%s\":\n%s\n
+Blank	SudokuWindow		Blank
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku løst - tillykke!\n
+Text	SudokuWindow		Tekst
+Copy	SudokuWindow		Kopiér
+Solve	SudokuWindow		Løs
+HTML	SudokuWindow		HTML
+Advanced	SudokuWindow		Avanceret
+Set all hints	SudokuWindow		Sæt alle fif
+Searching for removable values	SudokuGenerator		Søg efter fjernbare værdier
+Abort	ProgressWindow		Afslut
+Could not set Sudoku:\n%s\n	SudokuWindow		Kunne ikke sætte Sudoku:\n%s\n
+Help	SudokuWindow		Hjælp
+OK	SudokuWindow		OK
+Sudoku	System name		Sudoku
+Progress monitor	ProgressWindow		Fremskridtsmonitor
+Creating solvable field	SudokuGenerator		Skab løsbart felt
+View	SudokuWindow		Vis
+Snapshot current	SudokuWindow		Snapshot nuværende
+Mark valid hints	SudokuWindow		Markér valide hints
+Sudoku request	SudokuWindow		Sudoku-forespørgsel
+Open file…	SudokuWindow		Åbn fil…

@@ -1,0 +1,13 @@
+1	danish	x-vnd.Be-WORK	3927737357
+Quit	Workspaces		Afslut
+Invalid argument: %s\n	Workspaces		Ugyldigt argument: %s\n
+Change workspace count…	Workspaces		Vælg arbejdsplads antal…
+Always on top	Workspaces		Altid på top
+Show window border	Workspaces		Vis vindueskant
+Show window tab	Workspaces		Vis vinduesfaneblad
+Auto-raise	Workspaces		Auto-hæv
+Remove replicant	Workspaces		Fjern replikant
+Live in the Deskbar	Workspaces		Live i skrivebordslinje
+Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Anvendelse: %s [tilvalg] [arbejdsområde]\nhvor \"tilvalg\" er:\n  --notitle\t\ttitellinjen fjernes, kanten og tilpas størrelse bevares\n  --noborder\t\ttitellinjen, kanten og tilpas størrelse fjernes\n  --avoidfocus\t\tforhindre vinduet i at blive mål for tastaturhændelserne\n  --alwaysontop\t\tbevarer vinduet øverst\n  --notmovable\t\tvinduet kan ikke flyttes rundt\n  --autoraise\t\tløft automatisk arbejdsområdevinduet når det er ved skærmens kant\n  --help\t\tvis denne hjælp og afslut\nog \"arbejdsområde\" er nummeret på arbejdsområdet der skal skiftes til (0-31)\n
+Switch on mouse wheel	Workspaces		Skift med musehjul
+Workspaces	System name		Arbejdsområder

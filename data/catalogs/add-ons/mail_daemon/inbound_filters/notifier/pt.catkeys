@@ -1,0 +1,10 @@
+1	portuguese	x-vnd.Haiku-NewMailNotification	1733996425
+Log window	NotifierConfigView		Janela de registo
+none	NotifierConfigView		nenhum
+New mails notification	NotifierFilter		Notificação de novo correio
+Alert	NotifierConfigView		Alerta
+OK	NotifierFilter		OK
+Central alert	NotifierConfigView		Alerta central
+New messages	NotifierFilter		Novas mensagens
+Method:	NotifierConfigView		Método:
+Keyboard LEDs	NotifierConfigView		LEDs do teclado

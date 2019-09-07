@@ -1,0 +1,38 @@
+1	danish	x-vnd.Haiku.TextSearch	1867528375
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Vælg venligst de filer du vil have valgt til dig i Trackeren.
+%appname% : %path%	GrepWindow		%appname% : %path%
+Failed to start xargs program!	Grepper		Kunne ikke starte xargs-program!
+Open selection	GrepWindow		Åbn valgte
+Actions	GrepWindow		Handlinger
+New window	GrepWindow		Nyt vindue
+Encoding	GrepWindow		Kodning
+OK	GrepWindow		OK
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Close	GrepWindow		Luk
+Look in sub-folders	GrepWindow		Kig i undermapper
+%s: Not enough room to escape the filename.	Grepper		%s: Ikke nok plads til at undgå filnavnet.
+Follow symbolic links	GrepWindow		Følg symbolske links
+Regular expression	GrepWindow		Regulært udtryk
+Text files only	GrepWindow		Kun tekstfiler
+Quit	GrepWindow		Afslut
+Show files in Tracker	GrepWindow		Vis filer i Tracker
+Please select the files you wish to keep searching.	GrepWindow		Vælg venligst de filer du vil fortsat søge efter.
+Trim to selection	GrepWindow		Trim alt andet en markeringen
+Set target…	GrepWindow		Sæt mål…
+TextSearch	GrepWindow		TextSearch
+Failed to open input pipe!	Grepper		Kunne ikke åbne inputledning!
+Search	GrepWindow		Søg
+Copy text to clipboard	GrepWindow		Kopiér tekst til udklipsholderen
+Show lines	GrepWindow		Vis linjer
+Failed to open errors pipe!	Grepper		Kunne ikke åbne fejlledning!
+The unselected files will be removed from the list.	GrepWindow		De ikke-valgte filer vil blive slettet fra listen.
+Skip folders starting with a dot	GrepWindow		Spring de mapper over der starter med et punktum
+Open files in code editor	GrepWindow		Åbn filer i kodeeditor
+Failed to open output pipe!	Grepper		Kunne ikke åbne outputledning!
+Cancel	GrepWindow		Annuller
+History	GrepWindow		Historie
+File	GrepWindow		Fil
+Case-sensitive	GrepWindow		Versalfølsom
+Select all	GrepWindow		Vælg alt
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME kunne ikke åbne en eller flere mapper.
+Settings	GrepWindow		Indstillinger

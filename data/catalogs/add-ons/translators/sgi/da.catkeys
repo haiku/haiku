@@ -1,0 +1,13 @@
+1	danish	x-vnd.Haiku-SGITranslator	129108011
+SGI images	SGITranslator		SGI-billeder
+Use compression:	SGIView		Brug komprimering:
+SGI image translator	SGIView		SGI-billedoversætter
+SGI image	SGITranslator		SGI-billede
+SGITranslator Settings	SGITranslator		SGITranslator-indstillinger
+SGI Settings	SGIMain		SGI-indstillinger
+SGI image translator	SGITranslator		SGI-billedoversætter
+None	SGIView		Ingen
+Version %d.%d.%d, %s	SGIView		Version %d.%d.%d, %s
+\nbased on GIMP SGI plugin v1.5:\n	SGIView		\nbaseret på GIMP SGI-plugin v1.5:\n
+RLE	SGIView		RLE
+written by:\n	SGIView		skrevet af:\n

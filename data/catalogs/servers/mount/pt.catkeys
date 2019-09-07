@@ -1,17 +1,14 @@
-1	portuguese	x-vnd.Haiku-mount_server	1422362183
-Cancel	AutoMounter		Cancelar
-Could not unmount disk \"%s\":\n\t%s	AutoMounter		Não foi possível desmontar o disco \"%s\":\n\t%s
-Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Não foi possível desmontar o disco \"%s\":\n\t%s\n\nForçar a desmontagem?\n\nNota: Se uma aplicação estiver a escrever no volume neste momento, desmontá-lo agora pode resultar em perca de dados.\n
-Error mounting volume:\n\n%s	AutoMounter		Erro ao montar volume:\n\n%s
-Force unmount	AutoMounter		Forçar desmontagem
-It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		É recomendado montar volumes do Haiku adicionais em modo só de leitura. Isto evitará percas de dados acidentais devido a erros no Haiku.
-Mount error	AutoMounter		Erro ao montar
+1	portuguese	x-vnd.Haiku-mount_server	819316177
 Mount read-only	AutoMounter		Montar em modo só de leitura
-Mount read/write	AutoMounter		Montar em modo de leitura/escrita
-Mount warning	AutoMounter		Aviso ao montar
-Mounting volume '%s'\n\n	AutoMounter		A montar o volume '%s'\n\n
-Mounting volume <unnamed volume>\n\n	AutoMounter		A montar volume <volume sem nome>\n\n
+Error mounting volume:\n\n%s	AutoMounter		Erro ao montar volume:\n\n%s
+Cancel	AutoMounter		Cancelar
 OK	AutoMounter		OK
-Previous volumes mounted.	AutoMounter		Volumes montados anteriormente.
-The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		O sistema de ficheiros neste volume não é o sistema de ficheiros do Haiku. É altamente recomendado montá-lo em modo só de leitura. Isto evitará percas de dados acidentais devido a erros no Haiku.
 Unmount error	AutoMounter		Erro ao desmontar
+Mount read/write	AutoMounter		Montar em modo de leitura/escrita
+Could not unmount disk \"%s\":\n\t%s	AutoMounter		Não foi possível desmontar o disco \"%s\":\n\t%s
+Mounting volume '%s'\n\n	AutoMounter		A montar o volume '%s'\n\n
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Não foi possível desmontar o disco \"%s\":\n\t%s\n\nForçar a desmontagem?\n\nNota: Se uma aplicação estiver a escrever no volume neste momento, desmontá-lo agora pode resultar em perca de dados.\n
+Force unmount	AutoMounter		Forçar desmontagem
+Mount error	AutoMounter		Erro ao montar
+Mounting volume <unnamed volume>\n\n	AutoMounter		A montar volume <volume sem nome>\n\n
+Mount warning	AutoMounter		Aviso ao montar

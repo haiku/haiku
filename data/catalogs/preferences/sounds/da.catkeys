@@ -1,0 +1,15 @@
+1	danish	x-vnd.Haiku-Sounds	1784495232
+Sounds	System name		Lyde
+Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Lyde\n  Bragt til dig af :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Originalt arbejde fra Atsushi Takamatsu.\nOphavsret ©2003-2006 Haiku
+No such file or directory	HEventList		Ingen sådan fil eller sted
+OK	HWindow		OK
+Other…	HWindow		Anden…
+OK	SoundsHApp		OK
+Sound file:	HWindow		Lydfil:
+This is not an audio file.	HWindow		Dette er ikke en lydfil.
+<none>	HEventList		<ingen>
+OK	HEventList		OK
+About Sounds	SoundsHApp		Om Lyde
+Sound	HEventList		Lyd
+Event	HEventList		Begivenhed
+<none>	HWindow		<ingen>

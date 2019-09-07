@@ -1,0 +1,8 @@
+1	portuguese	x-vnd.Haiku-Sudoku	1078565486
+Start again	SudokuWindow		Iniciar novamente
+New	SudokuWindow		Novo
+Easy	SudokuWindow		Fácil
+Quit	SudokuWindow		Sair
+Copy	SudokuWindow		Copiar
+Advanced	SudokuWindow		Avançado
+Open file…	SudokuWindow		Abrir ficheiro…

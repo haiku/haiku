@@ -1,0 +1,50 @@
+1	danish	x-vnd.Haiku-ProcessController	168752057
+Error saving file	ProcessController		Fejl ved gemning af fil
+Display priority	ProcessController		Visningsprioritet
+That's no Fun!	ProcessController		Det var kedeligt!
+What do you want to do with the team \"%s\"?	ProcessController		Hvad vil du gøre med temaet \"%s\"?
+Your setting file could not be saved!\n(%s)	ProcessController		Din indstillingsfil kunne ikke gemmes!\n(%s)
+Processor %d	ProcessController		Processor %d
+Live in the Deskbar	ProcessController		Live i skrivebordslinjen
+Kill this team!	ProcessController		Dræb teamet!
+OK	ProcessController		OK
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Du kan køre Processtyring i et vindue eller installere det i skrivebordslinjen.
+Real-time priority	ProcessController		Realtidsprioritet
+Custom priority	ProcessController		Tilpasset prioritet
+Debug this thread!	ProcessController		Fejlret tråden!
+Low priority	ProcessController		Lav prioritet
+Urgent display priority	ProcessController		Vigtig visning prioritet
+Memory usage	ProcessController		Hukommelsesforbrug
+Ok!	ProcessController		Ok!
+Normal priority	ProcessController		Normal prioritet
+Restart Deskbar	ProcessController		Genstart skrivebordslinje
+About ProcessController…	ProcessController		Om Processtyring…
+Usage: %s [-deskbar]\n	ProcessController		Anvendelse: %s [-deskbar]\n
+Please confirm	ProcessController		Bekræft venligst
+Urgent priority	ProcessController		Vigtig prioritet
+What do you want to do with the thread \"%s\"?	ProcessController		Hvad vil du gøre med tråden \"%s\"?
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+Idle priority	ProcessController		Inaktivitetsprioritet
+Real-time display priority	ProcessController		Realtidsvisning prioritet
+Threads and CPU usage	ProcessController		Tråde- og CPU-forbrud
+Quit application	ProcessController		Afslut program
+Info	ProcessController		Info
+Kill this thread!	ProcessController		Dræb tråden!
+This team is already gone…	ProcessController		Teamet er allerede borte…
+Gone teams…	ProcessController		Teams som er borte…
+Quit an application	ProcessController		Afslut et program
+Cancel	ProcessController		Annuller
+Install in Deskbar	ProcessController		Installer i skrivebordslinje
+Debug this team!	ProcessController		Fejlret teamet!
+Low latency	ProcessController		Lav latens
+ProcessController	System name		Processtyring
+Lowest active priority	ProcessController		Laveste aktive prioritet
+Restart Tracker	ProcessController		Genstart tracker
+System resources & caches…	ProcessController		Systemressourcer og mellemlagre…
+Damned!	ProcessController		Forbandet!
+New Terminal	ProcessController		Ny terminal
+Power saving	ProcessController		Strømstyring
+ProcessController is already installed in Deskbar.	ProcessController		Processtyring er allerede installeret i skrivebordslinje.
+This is the last active processor…\nYou can't turn it off!	ProcessController		Dette er den sidste aktive processer …\nDu kan ikke slå den fra!
+This thread is already gone…	ProcessController		Tråden er allerede væk…
+Run in window	ProcessController		Kør i vindue

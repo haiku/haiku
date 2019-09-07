@@ -1,3 +1,50 @@
-1	danish	x-vnd.Be-TSKB	1884644663
+1	danish	x-vnd.Be-TSKB	2656653225
+Power off	DeskbarMenu		Sluk
+Sort applications by name	PreferencesWindow		Sortér programmer efter navn
+Suspend	DeskbarMenu		Suspendér
+Hide clock	TimeView		Skjul ur
 Applications	PreferencesWindow		Programmer
-Recent applications	BeMenu		Seneste programmer
+Time preferences…	TimeView		Tidspræferencer…
+About Haiku	DeskbarMenu		Om Haiku
+Edit in Tracker…	PreferencesWindow		Rediger i Tracker…
+Recent documents:	PreferencesWindow		Seneste dokumenter:
+Recent applications	DeskbarMenu		Seneste programmer
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programmer
+Find…	DeskbarMenu		Find…
+Show clock	Tray		Vis ur
+Window	PreferencesWindow		Vindue
+Defaults	PreferencesWindow		Standarder
+Menu	PreferencesWindow		Menu
+Recent documents	DeskbarMenu		Seneste dokumenter
+Auto-hide	PreferencesWindow		Skjul automatisk
+Always on top	PreferencesWindow		Altid oven på
+<Deskbar folder is empty>	DeskbarMenu		<Skrivebordslinje-mappe er tom>
+Show all	WindowMenu		Vis alle
+No windows	WindowMenu		Ingen vinduer
+Deskbar	System name		Skrivebordslinje
+Restart system	DeskbarMenu		Genstart systemet
+Large	PreferencesWindow		Stor
+Auto-raise	PreferencesWindow		Auto hæv
+Recent folders:	PreferencesWindow		Seneste foldere:
+Show application expander	PreferencesWindow		Vis program udvider
+Close all	WindowMenu		Luk alle
+Deskbar preferences	PreferencesWindow		Skrivebordslinje-præferencer
+Mount	DeskbarMenu		Monter
+Revert	PreferencesWindow		Tilbagefør
+Small	PreferencesWindow		Lille
+Recent applications:	PreferencesWindow		Seneste programmer:
+Shutdown…	DeskbarMenu		Luk ned…
+Tracker always first	PreferencesWindow		Tracker altid først
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Præferencer
+Recent folders	DeskbarMenu		Seneste mapper
+About this system	DeskbarMenu		Om systemet
+Show calendar…	TimeView		Vis kalender…
+Deskbar preferences…	DeskbarMenu		Skrivebordslinje-præferencer…
+Expand new applications	PreferencesWindow		Udvid nye programmer
+Show replicants	DeskbarMenu		Vis replikanter
+Hide application names	PreferencesWindow		Skjul programnavne
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demoer
+Icon size	PreferencesWindow		Ikonstørrelse
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Skrivebordsappletter
+Hide all	WindowMenu		Skjul alle
+Quit application	WindowMenu		Afslut program

@@ -1,0 +1,9 @@
+1	danish	x-vnd.Haiku-EXRTranslator	3596882613
+Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
+EXR image translator	EXRTranslator		EXR-billedoversætter
+EXR Settings	main		EXR-indstillinger
+EXR images	EXRTranslator		EXR-billeder
+a division of Lucasfilm Entertainment Company Ltd	ConfigView		et datterselskab af Lucasfilm Entertainment Company Ltd
+EXR image	EXRTranslator		EXR-billede
+EXR image translator	ConfigView		EXR-billedoversætter
+Based on OpenEXR %version%	ConfigView		Baseret på OpenEXR %version%

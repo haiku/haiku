@@ -1,0 +1,4 @@
+1	portuguese	x-vnd.Haiku-libpackage	2992828469
+Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Não foi possível obter a configuração para o repositório \"%s\". Ignorando.
+Failed to get repository names	PackageManagerKit		Não foi possível obter os nomes dos repositórios
+Failed to remove transaction directory	PackageManagerKit		Ocorreu uma falha ao remover a pasta da transação

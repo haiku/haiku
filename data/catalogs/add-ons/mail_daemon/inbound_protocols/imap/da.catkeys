@@ -1,0 +1,15 @@
+1	danish	x-vnd.Haiku-IMAP	1343128980
+Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Kunne ikke oprette forbindelse til serveren \"%server%\":\n%error%
+Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		Opdaterer abonneringer på IMAP-mapper, vent venligst …
+Failed to fetch available storage.	IMAPFolderConfig		Kunne ikke hente tilgængeligt lager.
+Cancel	IMAPFolderConfig		Annuller
+OK	IMAPFolderConfig		OK
+Server storage: %s / %s used.	IMAPFolderConfig		Serverlager: %s/%s brugt.
+No encryption	imap_config		Ingen kryptering
+Fetching IMAP folders, please be patient…	IMAPFolderConfig		Henter IMAP-mapper, vent venligst …
+Configure IMAP Folders	imap_config		Konfigurer IMAP-mapper
+SSL	imap_config		SSL
+Apply	IMAPFolderConfig		Anvend
+status	IMAPFolderConfig		status
+IMAP Folders	IMAPFolderConfig		IMAP-mapper
+Destination:	imap_config		Destination:

@@ -1,0 +1,10 @@
+1	danish	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
+If the application will not quit you may have to kill it.	Team monitor		Hvis programmet ikke vil afslutte, kan det hænde du må dræbe det.
+Quit application	Team monitor		Afslut program
+Restart the desktop	Team monitor		Genstart skrivebordet
+Force reboot	Team monitor		Gennemtving genstart
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Vælg et program fra listen ovenover, og klik på enten 'Dræb program' eller 'Afslut program' for at lukke det.\n\nHold CONTROL+ALT+DELETE nede i %ld sekunder for at genstarte maskinen.
+Team monitor	Team monitor		Gruppemonitor
+Kill application	Team monitor		Dræb program
+Cancel	Team monitor		Annuller
+(This team is a system component)	Team monitor		(Holdet er en systemkomponent)

@@ -1,0 +1,157 @@
+1	danish	x-vnd.Haiku-FileTypes	734679611
+Left	Attribute Window	Attribute column alignment in Tracker	Venstre
+Final	Application Types Window		Endelig
+FileTypes request	FileTypes Window		Filtyper-anmodning
+This file type already exists	New File Type Window		Filtypen findes allerede
+Preferred application	FileTypes Window		Foretrukne program
+Launch	Application Types Window		Start
+Removing uninstalled application types	Application Types Window		Fjerner afinstallerede programtyper
+Width:	Attribute Window	Default column width in Tracker for this attribute.	Bredde:
+Same as…	FileType Window	The same TYPE as ...	Samme som…
+(from super type)	FileTypes Window		(fra super-type)
+Select same preferred application as	FileTypes Window		Vælg samme foretrukne program som
+Could not change attributes	Attribute Window		Kunne ikke skifte attributter
+Icon	FileTypes Window		Ikon
+Add…	Application Type Window		Tilføj…
+Attribute name:	Attribute Window		Attributnavn:
+Long description:	Application Type Window		Lang beskrivelse:
+Cancel	Preferred App Menu		Annuller
+Remove	FileTypes Window		Fjern
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Programmet \"%s\" understøtter ikke denne filtype.\nEr du sikker på, at du vil indstille den alligevel?
+Remove	Application Type Window		Fjern
+Gamma	Application Type Window		Gamma
+Cancel	Application Type Window		Annuller
+Attribute	Attribute Window		Attribut
+Multiple launch	Application Type Window		Flere start
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# Programtype kunne ikke fjernes} other{# Programtyper kunne ikke fjernes}}
+Edit…	Application Types Window		Rediger…
+Could not set preferred application	FileTypes Window		Kunne ikke indstille foretrukne program
+Description	FileTypes Window		Beskrivelse
+Signature:	Application Types Window		Signatur:
+None	FileTypes Window		Intet
+Exclusive launch	Application Type Window		Eksklusiv start
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Fjernelse af en filtype kan ikke fortrydes.\nEr du sikker på, at du vil fjerne den?
+Cancel	New File Type Window		Annuller
+Select same preferred application as	FileType Window		Vælg samme foretrukne program som
+Cancel	Type List Window		Annuller
+Don't save	Application Type Window		Gem ikke
+Center	Attribute Window	Attribute column alignment in Tracker	I midten
+Done	Extension Window		Færdig
+Development	Application Types Window		Udvikling
+Abort	Application Types Window		Afbryd
+Save	Application Type Window		Gem
+Same as…	FileType Window	The same APPLICATION as ...	Samme som…
+%1 application type	Application Type Window		%1-programtype
+Icon	Application Type Window		Ikon
+Version:	Application Type Window		Version:
+Default application	FileType Window		Standardprogram
+Internal name:	New File Type Window		Internt navn:
+Extension:	Extension Window		Udvidelse:
+Extensions:	FileTypes Window		Udvidelser:
+Select preferred application	FileType Window		Vælg foretrukne program
+Description:	FileTypes Window		Beskrivelse:
+Multiple files from \"%s\" file type	FileType Window		Flere filer fra \"%s\"-filtype
+Add new group	New File Type Window		Tilføj ny gruppe
+Remove uninstalled	Application Types Window		Fjern afinstalleret
+File	Application Type Window		Fil
+Progress	Application Types Window		Forløb
+Select…	FileType Window		Vælg…
+Information	Application Types Window		Information
+Settings	FileTypes Window		Indstillinger
+Done	Attribute Window		Færdig
+FileTypes request	FileTypes		Filtyper-anmodning
+Select same type as	FileType Window		Vælg samme type som
+Version:	Application Types Window		Version:
+Application types	Application Types Window		Programtyper
+(from application)	FileTypes Window		(fra program)
+Description:	Application Types Window		Beskrivelse:
+Name:	Application Types Window		Navn:
+File could not be opened	Preferred App Menu		Filen kunne ikke åbnes
+Args only	Application Type Window		Kun argumenter
+Could not open \"%s\":\n%s	FileTypes		Kunne ikke åbne \"%s\":\n%s
+Right	Attribute Window	Attribute column alignment in Tracker	Højre
+Save changes before closing?	Application Type Window		Gem ændringer inden lukning?
+Background app	Application Type Window		Baggrundsprogram
+Recognition rule is not valid:\n\n	FileTypes Window		Genkendelsesregel er ikke gyldig:\n\n
+Show icons in list	FileTypes Window		Vis ikoner i liste
+Editable	Attribute Window	If Tracker allows to edit this attribute.	Redigerbar
+New resource file…	FileTypes Window		Nu ressource fil…
+[Multiple files] file types	FileType Window		[Flere filer]-filtyper
+Application type	Application Type Window		Færdig
+Show in Tracker…	Application Types Window		Vis i tracker…
+Type name:	FileTypes Window		Typenavn:
+Visible	Attribute Window		Synlig
+Select preferred application	FileTypes Window		Vælg foretrukne program
+Path:	Application Types Window		Sti:
+Could not install file type	New File Type Window		Kunne ikke installere filtype
+Same as…	FileTypes Window		Samme som…
+Golden master	Application Type Window		Golden master
+FileTypes request	Preferred App Menu		Filtyper-anmodning
+Single launch	Application Type Window		Enkel start
+no icon	FileTypes Window		intet ikon
+%s file type	FileType Window		%s-filtype
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Fjernelse af en super-type kan ikke fortrydes.\nAlle filtyper som tilhører denne filtype vil gå tabt!\n\nEr du sikker på, at du vil gøre det? Hold Skift-tasten nede og tryk på \"Fjern\", for at fjerne hele gruppen.
+Add type	New File Type Window		Tilføj type
+Remove icon	Icon View		Fjern ikon
+Cancel	Extension Window		Annuller
+Alignment:	Attribute Window		Justering:
+Icon	FileType Window		Ikon
+Signature:	Application Type Window		Signatur:
+Development	Application Type Window		Udvikling
+Golden master	Application Types Window		Golden master
+Add	Extension Window		Tilføj
+Open…	FileTypes Window		Åbn…
+Could not change file extensions	Extension Window		Kunne ikke skifte filendelser
+Could not open file	FileType Window		Kunne ikke åbne fil
+Choose type	Type List Window		Vælg type
+Select…	FileTypes Window		Vælg…
+File recognition	FileTypes Window		Filgenkendelse
+Application types…	FileTypes Window		Programtyper…
+Add icon…	Icon View		Tilføj ikon…
+Cancel	FileTypes Window		Annuller
+Save into resource file…	Application Type Window		Gem i ressourcefil…
+Special:	Attribute Window		Speciel:
+Type:	Attribute Window		Type:
+Could not retrieve application signature	Preferred App Menu		Kunne ikke indhente programsignatur
+Beta	Application Types Window		Beta
+Add group	New File Type Window		Tilføj gruppe
+Cancel	Attribute Window		Annuller
+Gamma	Application Types Window		Gamma
+Supported types	Application Type Window		Understøttede typer
+Beta	Application Type Window		Beta
+Could not retrieve preferred application of this file	Preferred App Menu		Kunne ikke indhente foretrukne program af filen
+Application flags	Application Type Window		Programflag
+OK	FileTypes		OK
+Group name:	New File Type Window		Gruppenavn:
+Move up	FileTypes Window		Flyt op
+Add	Attribute Window		Tilføj
+File	FileTypes Window		Fil
+Open file	FileTypes		Åbn fil
+Version info	Application Type Window		Versionsinfo
+Final	Application Type Window		Endelig
+Preferred application	FileType Window		Foretrukne program
+FileTypes	FileTypes		Filtyper
+Set preferred application	Preferred App Menu		Indstil foretrukne program
+New file type	New File Type Window		Ny filtype
+Short description:	Application Type Window		Kort beskrivelse:
+Save request	Application Type Window		Gem anmodning
+Could not remove file type: %s\n	FileTypes Window		Kunne ikke fjerne filtype: %s\n
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	Vis som:
+Done	Type List Window		Programtype
+Extra attributes	FileTypes Window		Ekstra attributter
+Group:	New File Type Window		Gruppe:
+Alpha	Application Types Window		Alfa
+Close	Application Type Window		Luk
+Extension	Extension Window		Udvidelse
+Rule:	FileTypes Window		Rolle:
+FileTypes	System name		Filtyper
+Version	Application Types Window		Version
+Quit	FileTypes Window		Afslut
+File type	FileType Window		Filtype
+Internal name:	FileTypes Window		Internt navn:
+Add…	FileTypes Window		Tilføj…
+Edit icon…	Icon View		Rediger ikon…
+Internal name:	Attribute Window		Internt navn:
+Show recognition rule	FileTypes Window		Vis genkendelsesregel
+Move down	FileTypes Window		Flyt ned
+Alpha	Application Type Window		Alfa

@@ -1,0 +1,23 @@
+1	danish	x-vnd.Haiku-DiskUsage	2951688400
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% i {0, plural, one{# fil} other{# filer}}
+Scanning %refName%	Scanner		Skanner %refName%
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d filer
+Size	Info Window		Størrelse
+Rescan	Pie View		Skan igen
+Kind	Info Window		Slags
+file unavailable	Pie View		filen er utilgængelig
+no supporting apps	Pie View		ingen understøttende programmer
+Path	Info Window		Sti
+Scan	Status View		Skan
+Rescan	Status View		Skan igen
+file unavailable	Status View		filen er ikke tilgængelig
+Get info	Pie View		Hent info
+DiskUsage	System name		Diskforbrug
+Created	Info Window		Oprettet
+Modified	Info Window		Ændret
+Abort	Status View		Afbryd
+Open with	Pie View		Åbn med
+Open	Pie View		Åbn
+{0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# fil} other{# filer}}
+%a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+Free on %refName%	Scanner		Ledig på %refName%

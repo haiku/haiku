@@ -1,0 +1,168 @@
+1	danish	x-vnd.Haiku-HaikuDepot	2601073644
+An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Der opstod en fejl under opdatering af softwarekilden: %error%
+Check for updates…	MainWindow		Søg efter opdateringer…
+Uninstall	PackageManager		Afinstaller
+(%Votes%)	FeaturedPackagesView		(%Votes%)
+Uninstalled	PackageListView		Afinstalleret
+Available packages	MainWindow		Tilgængelige pakker
+Create account	UserLoginWindow		Opret konto
+OK	App		OK
+Mostly stable	RatePackageWindow		Hovedsageligt stabil
+Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Kontooprettelse lykkedes. Du kan nu bedømme pakker og gøre andre nyttige ting.
+The response to the captcha was incorrect.	ServerHelper		Svaret på captchaen var forkert.
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Ved opdatering af pakkedata er der opstået et problem som kan forårsage forældet eller manglende data i programmets visning. Yderligere detaljer om problemet kan ses i programloggene.
+Develop packages	MainWindow		Udviklingspakker
+Rate package…	PackageInfoView		Bedøm pakke…
+Starting the package daemon failed:\n\n%Error%	App		Start af pakkedæmon mislykkedes:\n\n%Error%
+<no info>	PackageInfoView		<ingen info>
+No user ratings available.	PackageInfoView		Ingen tilgængelige brugerbedømmelser.
+Local Repository Load Error	LocalPkgDataLoadProcess		Fejl ved indlæsning af lokal softwarekilde
+The user name needs to be at least 3 letters long.	UserLoginWindow		Brugernavnet skal være mindst 3 bogstaver langt.
+Downloading package '%name%'	WorkStatusView		Downloader pakken '%name%'
+Failed to create account	UserLoginWindow		Kunne ikke oprette konto
+Ignore	UserLoginWindow		Ignorer
+Rating	PackageListView		Bedømmelse
+Synchronizing icons	ServerIconExportUpdateProcess		Synkroniserer ikoner
+Does not start	RatePackageWindow		Starter ikke
+Show	MainWindow		Vis
+But none could be listed here, sorry.	UserLoginWindow		Men ingen kunne oplistes her, beklager.
+An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Der opstod en fejl ved indhentning af pakkelisten: %message%
+There are problems with the data you entered:\n\n	UserLoginWindow		Der er problemer med den data du indtastede:\n\n
+The authentication was successful.	UserLoginWindow		Autentifikationen lykkedes.
+Not specified	RatePackageWindow		Ikke angivet
+Unstable but usable	RatePackageWindow		Ustabil men anvendelig
+Active	PackageListView		Aktiv
+Login or Create account	MainWindow		Log ind eller opret konto
+<Package contents not available for remote packages>	PackageContentsView		<pakkenindehold er ikke tilgængeligt for fjernpakker>
+{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1 pakke til download}other{# pakker til download}}
+Ratings	PackageInfoView		Bedømmelser
+Switch account…	MainWindow		Skift konto…
+Preferred language:	UserLoginWindow		Foretrukne sprog:
+Server Error	ServerHelper		Fejl ved server
+It was not possible to contact the web service.	UserLoginWindow		Det er ikke muligt at kontakte webtjenesten.
+Name	PackageListView		Navn
+Local	LocalPkgDataLoadProcess		Lokal
+Rate %Package%	RatePackageWindow		Bedøm %Package%
+An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Der opstod en fejl under initialisering af pakkehåndteringen: %message%
+Quit HaikuDepot	App		Afslut HaikuDepot
+Repository Update Error	LocalRepositoryUpdateProcess		Fej ved opdatering af softwarekilde
+Category	FilterView		Kategori
+User rating	RatePackageWindow		Brugerbedømmelse
+Installed packages	MainWindow		Installerede pakker
+A requested object or an object involved in the request was not found on the server.	ServerHelper		Et anmodet objekt eller et objekt som er involveret i anmodningen blev ikke fundet på serveren.
+Other users can see this rating	RatePackageWindow		Andre brugere kan se bedømmelsen
+Stable	RatePackageWindow		Stabil
+This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		Programmet er for gammelt til at kommunikere med HaikuDepot-serversystemet. Hent en nyere version af HaikuDepot ved at opdatere dit Haiku-system. Den laveste version af HaikuDepot som kræves er \"%s\".
+Fatal error	PackageManager		Fatal fejl
+Package action failed	PackageInfoView		Pakkehandling mislykkedes
+No changelog available.	PackageInfoView		Ingen ændringslog tilgængelig.
+There are problems in the form:\n\n	UserLoginWindow		Der er problemer i formularen:\n\n
+Error	App		Fejl
+There was a puzzling response from the web service.	UserLoginWindow		Der var et gådesvar fra webtjenesten.
+Not logged in	MainWindow		Ikke logget ind
+No, quit HaikuDepot	App		Nej, afslut HaikuDepot
+Featured packages	FeaturedPackagesView		Udvalgte pakker
+Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Din bedømmelse blev uploadet. Du kan opdatere eller fjerne den på HaikuDepot-server-webstedet.
+Network Error	ServerHelper		Fejl ved netværk
+Available	PackageListView		Tilgængelig
+Cancel	UserLoginWindow		Annuller
+HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot behøver pakkedæmonen for at fungere, og den ser ikke ud til at køre.\nVil du starte den nu?
+Click a package to view information	PackageInfoView		Klik på en pakke for at vise information
+Contents	PackageInfoView		Indhold
+Close	PackageManager		Luk
+A network transport error has arisen communicating with the HaikuDepot server system: %s	ServerHelper		Der er opstået en fejl ved netværkstransport med HaikuDepot-serversystemet: %s
+Changelog	PackageInfoView		Ændringslog
+Rating not possible	MainWindow		Bedømmelse ikke mulig
+About	PackageInfoView		Om
+Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Autentifikation mislykkedes. Brugeren findes ikke eller den forkerte adgangskode blev angivet.
+%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# proces} other{# processer}}
+Reboot required	PackageManager		Kræver genstart
+Very unstable	RatePackageWindow		Meget ustabil
+All packages	PackageListView		Alle pakker
+Network Transport Error	ServerHelper		Fejl ved netværkstransport
+Stability	RatePackageWindow		Stabilitet
+Send	RatePackageWindow		Send
+Start package daemon	App		Start pakkedæmon
+The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Adgangskoden er for svag eller ugyldig. Brug venligst mindst 8 tegn med mindst 2 tal og 2 store bogstaver.
+The package action could not be scheduled: %Error%	PackageInfoView		Pakkehandlingen kunne ikke planlægges: %Error%
+Cancel	RatePackageWindow		Annuller
+Inactive	PackageListView		Inaktiv
+Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synkroniserer metadata om softwarekilder
+OK	MainWindow		OK
+{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# element} other{# elementer}}
+OK	PackageInfoView		OK
+Downloading:	PackageInfoView		Downloader:
+Success	UserLoginWindow		Lykkedes
+It responded with: %message%	UserLoginWindow		Den svarede med: %message%
+Package daemon problem	App		Problem med pakkedæmon
+(%Votes%)	PackageInfoView		(%Votes%)
+Repository	PackageListView		Softwarekilde
+%hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (version %hd.version%)
+Close	UserLoginWindow		Luk
+Close	RatePackageWindow		Luk
+Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synkroniserer pakkedata for softwarekilden '%REPO_NAME%'
+Failed to create account: %s\n	UserLoginWindow		Kunne ikke oprette konto: %s\n
+Size	PackageListView		Størrelse
+Your rating:	RatePackageWindow		Din bedømmelse:
+Your rating was updated.	RatePackageWindow		Din bedømmelse blev opdateret.
+All categories	FilterView		Alle kategorier
+Repositories	MainWindow		Softwarekilder
+n/a	PackageInfoView		-
+Cancel	MainWindow		Annuller
+{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 mere at downloade)}other{(# mere at downloade)}}
+Refresh repositories	MainWindow		Genopfrisk softwarekilder
+If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Hvis du ikke angiver en e-mailadresse, så vil du ikke være i stand til at nulstille din adgangskode hvis du glemmer den.
+Package Update Error	MainWindow		Fejl ved pakkeopdatering
+Tools	MainWindow		Værktøjer
+The passwords do not match.	UserLoginWindow		Adgangskoderne er ikke ens.
+This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Pakken ser ikke ud til at være på HaikuDepot-serveren, så det er ikke muligt at oprette en ny bedømmelse eller redigere end eksisterende bedømmelse.
+Language	RatePackageWindow		Sprog
+Authentication failed. Connection to the service failed.	UserLoginWindow		Autentifikation mislykkedes. Forbindelsen til tjenesten mislykkedes.
+Log out	MainWindow		Log ud
+Comment language:	RatePackageWindow		Kommentarsprog:
+Status	PackageListView		Status
+The username is already taken. Please choose another.	UserLoginWindow		Brugernavnet er allerede taget. Vælg venligst et andet.
+Update	RatePackageWindow		Opdater
+OK	ServerHelper		OK
+Language	UserLoginWindow		Sprog
+OK	UserLoginWindow		OK
+Reading repository data	LocalPkgDataLoadProcess		Læser data for softwarekilde
+Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Synkroniserer referencedata fra server
+Stability:	RatePackageWindow		Stabilitet:
+A validation error has occurred	ServerHelper		Der opstod en fejl ved validering
+The captcha puzzle needs to be solved.	UserLoginWindow		Captcha-gåden skal løses.
+Source packages	MainWindow		Kildepakker
+-	no package size		-
+User name:	UserLoginWindow		Brugernavn:
+Try again	App		Prøv igen
+Rate package	RatePackageWindow		Bedøm pakke
+The email address appears to be malformed.	UserLoginWindow		E-mailadressen ser ud til at være forkert udformet.
+You have not solved the captcha puzzle correctly.	UserLoginWindow		Du løste ikke captcha-gåden korrekt.
+Unknown	PackageListView		Ukendt
+Log in	UserLoginWindow		Log ind
+Logged in as %User%	MainWindow		Logger ind som %User%
+Email address:	UserLoginWindow		E-mailadresse:
+Screenshot	ScreenshotWindow		Skærmbillede
+HaikuDepot	System name		HaikuDepot
+A reboot is necessary to complete the installation process.	PackageManager		Der kræves en genstart for at fuldføre installationsprocessen.
+Search terms:	FilterView		Søgetermer:
+Pending…	PackageListView		Afventer…
+Repeat pass phrase:	UserLoginWindow		Gentag adgangsfrase:
+Category:	FilterView		Kategori:
+Authentication failed	UserLoginWindow		Autentifikation mislykkedes
+Manage repositories…	MainWindow		Håndter softwarekilder…
+Fetching remote repository data	LocalRepositoryUpdateProcess		Henter data for fjernsoftwarekilde
+Description	PackageListView		Beskrivelse
+Pass phrase:	UserLoginWindow		Adgangsfrase:
+Open %DeskbarLink%	PackageManager		Åbn %DeskbarLink%
+Install	PackageManager		Installer
+Input validation	UserLoginWindow		Inputvalidering
+View latest user usage conditions…	MainWindow		Vis seneste betingelser for brugeranvendelse …
+An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Det blev sendt en uventet fejl fra HaikuDepot-serveren [%i]
+Log in…	MainWindow		Log ind…
+You need to be logged into an account before you can rate packages.	MainWindow		Du skal logge ind på en konto inden du kan bedømme pakker.
+Client version too old	ServerHelper		Klientens version for gammel
+Authorization or security issue	ServerHelper		Problem med autentifikation eller sikkerhed
+9999.99 KiB	PackageListView		9999.99 KiB
+All repositories	MainWindow		Alle softwarekilder
+%Version%	PackageInfoView		%Version%

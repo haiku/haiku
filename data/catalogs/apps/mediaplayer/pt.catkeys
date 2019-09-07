@@ -1,0 +1,93 @@
+1	portuguese	x-vnd.Haiku-MediaPlayer	973553693
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Eliminar elemento para o Lixo
+Close	MediaPlayer-PlaylistWindow		Fechar
+Audio	MediaPlayer-InfoWin		Áudio
+Subtitle placement:	MediaPlayer-SettingsWindow		Posição das legendas:
+Audio track	MediaPlayer-Main		Faixa de áudio
+Muted	MediaPlayer-SettingsWindow		Mudo
+OK	MediaPlayer-RemovePLItemsCmd		OK
+Open Playlist	MediaPlayer-PlaylistWindow		Abrir Lista de Reprodução
+Subtitles	MediaPlayer-Main		Legendas
+File info	MediaPlayer-InfoWin		Informações do ficheiro
+Select all	MediaPlayer-PlaylistWindow		Selecionar tudo
+New player…	MediaPlayer-Main		Novo leitor…
+OK	MediaPlayer-Main		OK
+Remove	MediaPlayer-PlaylistWindow		Remover
+<unknown>	MediaPlayer-InfoWin		<desconhecido>
+Resume:	MediaPlayer-SettingsWindow		Retomar:
+Duration	MediaPlayer-InfoWin		Duração
+Move file to Trash	MediaPlayer-PlaylistWindow		Mover ficheiro para o Lixo
+Open file…	MediaPlayer-Main		Abrir ficheiro…
+<untitled>	PlaylistItem-title		<sem título>
+Start media server	MediaPlayer-Main		Iniciar o servidor de média
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Parece que o servidor de média não está em execução.\nGostaria de o iniciar?
+Medium	MediaPlayer-SettingsWindow		Médio
+Play mode	MediaPlayer-SettingsWindow		Modo de reprodução
+Track	Audio Track Menu		Faixa
+Close	MediaPlayer-Main		Fechar
+Save error	MediaPlayer-PlaylistWindow		Erro ao guardar
+Attributes	MediaPlayer-Main		Atributos
+Invalid URL inserted!	MediaPlayer-NetworkStream		URL inválida!
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Ocorreu uma falha ao guardar a lista de reprodução.\n\nErro: 
+<no media>	MediaPlayer-InfoWin		<sem média>
+Hide interface	MediaPlayer-Main		Ocultar interface
+Error: 	MediaPlayer-Main		Erro: 
+Video track	MediaPlayer-Main		Faixa de vídeo
+Playlist…	MediaPlayer-Main		Lista de reprodução…
+<unnamed media>	MediaPlayer-InfoWin		<média sem nome>
+Save	MediaPlayer-PlaylistWindow		Guardar
+Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Entradas Aleatórias
+Cancel	MediaPlayer-NetworkStream		Cancelar
+Nothing to Play	MediaPlayer-Main		Nada para Reproduzir
+OK	MediaPlayer-SettingsWindow		OK
+never	MediaPlayer-SettingsWindow		nunca
+Open…	MediaPlayer-PlaylistWindow		Abrir…
+Revert	MediaPlayer-SettingsWindow		Reverter
+Audio	MediaPlayer-Main		Áudio
+Quit	MediaPlayer-Main		Sair
+Redo	MediaPlayer-PlaylistWindow		Refazer
+Move Entry	MediaPlayer-MovePLItemsCmd		Mover Entrada
+<unknown>	PlaylistItem-author		<desconhecido>
+Cancel	MediaPlayer-SettingsWindow		Cancelar
+Large	MediaPlayer-SettingsWindow		Grande
+unknown format	MediaPlayer-InfoWin		formato desconhecido
+Track %d	MediaPlayer-Main		Faixa %d
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Os ficheiros não puderam ser movidos para o Lixo.
+Total duration: %s	MediaPlayer-PlaylistWindow		Duração total: %s
+Move into trash error	MediaPlayer-RemovePLItemsCmd		Erro ao mover para o lixo
+Drop files to play	MediaPlayer-Main		Largar ficheiros para reproduzir
+Copy Entries	MediaPlayer-CopyPLItemsCmd		Copiar Entradas
+Always on top	MediaPlayer-Main		Sempre por cima
+Open	MediaPlayer-PlaylistWindow		Abrir
+always	MediaPlayer-SettingsWindow		sempre
+Loop video	MediaPlayer-SettingsWindow		Repetir vídeo
+none	Subtitles menu		nenhum
+Save Playlist	MediaPlayer-PlaylistWindow		Guardar Lista de Reprodução
+Video	MediaPlayer-Main		Vídeo
+none	Audio track menu		nenhuma
+Automatically start playing	MediaPlayer-SettingsWindow		Iniciar a reprodução automaticamente
+Undo	MediaPlayer-PlaylistWindow		Desfazer
+Small	MediaPlayer-SettingsWindow		Pequeno
+Settings…	MediaPlayer-Main		Definições…
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Ocorreu uma falha ao guardar a lista de reprodução:\n\nErro: 
+File info…	MediaPlayer-Main		Informações do ficheiro…
+<unnamed>	PlaylistItem-name		<sem nome>
+Track	Video Track Menu		Faixa
+OK	MediaPlayer-NetworkStream		OK
+<nothing to redo>	MediaPlayer-PlaylistWindow		<nada para refazer>
+Bad URL	MediaPlayer-NetworkStream		URL inválido
+Save	MediaPlayer-Main		Guardar
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Não foi possível abrir o ficheiro '%filename'.\n\n
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Nenhum dos ficheiros que pretendia reproduzir parece ser de média.
+Remove Entry	MediaPlayer-RemovePLItemsCmd		Remover Entrada
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Eliminar elementos para o Lixo
+Subtitle size:	MediaPlayer-SettingsWindow		Tamanho das legendas:
+No aspect correction	MediaPlayer-Main		Nenhuma correção de proporção
+none	MediaPlayer-Main		nenhum
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Alguns ficheiros não puderam ser movidos para o Lixo.
+<nothing to undo>	MediaPlayer-PlaylistWindow		<nada para desfazer>
+Save as…	MediaPlayer-PlaylistWindow		Guardar como…
+Error: 	MediaPlayer-RemovePLItemsCmd		Erro: 
+Open	MediaPlayer-Main		Abrir
+(not supported)	MediaPlayer-InfoWin		(não suportado)
+OK	MediaPlayer-PlaylistWindow		OK

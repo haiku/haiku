@@ -1,15 +1,18 @@
-1	dutch; flemish	x-vnd.Haiku-DriveSetup	2553026145
+1	dutch; flemish	x-vnd.Haiku-DriveSetup	233536944
 Could not unmount partition %s.	MainWindow		Kon partitie %s niet onttrekken.
 Mount all	MainWindow		Alles betrekken
 Disk	MainWindow		Schijf
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\nU zult alle gegevens op de geselecteerde partitie onherroepelijk kwijt zijn als u dit doet!
 Device	PartitionList		Apparaat
 Initialize	MainWindow		Initialiseren
+Could not change the parameters of the selected partition.	MainWindow		Kon de parameters van de geselecteerde partitie niet wijzigen.
 Delete partition	MainWindow		Partitie verwijderen
 Error: 	MainWindow	in any error alert	Fout:
 Device	DiskView		Apparaat
 Unmount	MainWindow		Onttrekken
 Failed to format the partition %s!\n	MainWindow		Formatteren van partitie %s is mislukt!\n
+Partition size	CreateParametersPanel		Partitiegrootte
+Validation of the given parameters failed.	MainWindow		Validatie van de opgegeven parameters mislukt.
 The partition %s is currently mounted.	MainWindow		De partitie %s is op dit moment gekoppeld.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Weet u zeker dat u de partitie \"%s\" wilt formatteren? U krijgt deze vraag nogmaals voordat de wijzigingen op de schijf weggeschreven worden.
 DriveSetup	System name		DriveSetup

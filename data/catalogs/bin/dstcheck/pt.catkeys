@@ -1,7 +1,5 @@
-1	portuguese	x-vnd.Haiku-cmd-dstconfig	1690254090
-Would you like to set the clock using the Time and\nDate preference utility?	dstcheck		Gostaria de acertar o relógio através das preferências de Tempo e\nData?
+1	portuguese	x-vnd.Haiku-cmd-dstconfig	684321431
+Keep this time	dstcheck		Manter esta hora
+Manually adjust time…	dstcheck		Ajustar manualmente a hora…
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		Atenção!\n\nPor causa da mudança da hora de verão, o relógio do computador pode estar atrasado ou adiantado uma hora.\nO computador acha que são %current time%.\n\nA hora indicada está certa?
 Ask me later	dstcheck		Perguntar mais tarde
-No	dstcheck		Não
-Yes	dstcheck		Sim
-Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off. Currently, your computer thinks it is 	dstcheck		Atenção!\n\nDevido à mudança de hora, o relógio pode estar uma hora atrasado. Actualmente, o computador pensa que são
-.\n\nIs this the correct time?	dstcheck		.\n\nA hora está certa?

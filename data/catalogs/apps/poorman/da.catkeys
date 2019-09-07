@@ -1,0 +1,66 @@
+1	danish	x-vnd.Haiku-PoorMan	1829050509
+Select web folder	PoorMan		Vælg webmappe
+Console logging	PoorMan		Konsollogning
+Create Log File	PoorMan		Opret logfil
+File logging	PoorMan		Fillogning
+Website options	PoorMan		Websted-valgmuligheder
+Log to file	PoorMan		Log til fil
+Shutting down.	PoorMan		Lukker ned.
+Error Dir	PoorMan		Fejlmappe
+Web folder:	PoorMan		Webmappe:
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Vælg venligst mappen som skal udgives på webbet.\n\nDu kan få PoorMan til at oprette en standard \"public_html\" i din hjemmemappe.\nEller du kan vælge en af dine egne mapper i stedet.
+Log To Console	PoorMan		Log til konsol
+File Name	PoorMan		Filnavn
+Starting up... 	PoorMan		Starter... 
+Select	PoorMan		Vælg
+Logging view	PoorMan		Logning-visning
+Save console as…	PoorMan		Gem konsol som…
+Edit	PoorMan		Rediger
+Cancel	PoorMan		Annuller
+Directory: 	PoorMan		Mappe: 
+Hits: %lu	PoorMan		Træf: %lu
+Hits: 0	PoorMan		Træf: 0
+Shutting down.\n	PoorMan		Lukker ned.\n
+Select all	PoorMan		Vælg alle
+Error Server	PoorMan		Fejl ved server
+Send file listing if there's no start page	PoorMan		Send filoplistning hvis der ikke er nogen startside
+Create PoorMan log	PoorMan		Opret PoorMan-log
+Max. simultaneous connections:	PoorMan		Maks. samtidige forbindelser:
+Done	PoorMan		Færdig
+Site	PoorMan		Sted
+Cannot start the server	PoorMan		Kan ikke starte serveren
+Create log file	PoorMan		Opret logfil
+Create public_html	PoorMan		Opret public_html
+Clear hit counter	PoorMan		Ryd træftæller
+Status: Stopped	PoorMan		Status: Stoppet
+File	PoorMan		Fil
+Settings…	PoorMan		Indstillinger…
+Log To File	PoorMan		Log til fil
+Connections	PoorMan		Forbindelser
+Controls	PoorMan		Styringer
+Log to console	PoorMan		Log til konsol
+Advanced	PoorMan		Avanceret
+Copy	PoorMan		Kopiér
+Logging	PoorMan		Logning
+PoorMan	System name		PoorMan
+Clear console log	PoorMan		Ryd konsollog
+Run server	PoorMan		Kør server
+Create	PoorMan		Opret
+{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# forbindelse} other{# forbindelser}}
+done.\n	PoorMan		færdig.\n
+PoorMan settings	PoorMan		PoorMan-indstillinger
+Console Logging	PoorMan		Konsollogning
+Clear log file	PoorMan		Ryd logfil
+Save log console selection	PoorMan		Gem valg af logkonsol
+File Logging	PoorMan		Fillogning
+Log file name:	PoorMan		Navn på logfil:
+Status: Running	PoorMan		Status: Kørende
+Directory: (none)	PoorMan		Mappe: (ingen)
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Der er blevet oprettet en standardwebmappe i \"/boot/home/public_html.\"\nSørg for at der er en HTML-fil ved navn \"index.html\" i mappen.
+Dir Created	PoorMan		Mappe oprettet
+Save console selections as…	PoorMan		Gem konsolvalg som…
+Quit	PoorMan		Afslut
+Save log console	PoorMan		Gem logkonsol
+Start page:	PoorMan		Startside:
+OK	PoorMan		OK
+Website location	PoorMan		Webstedsplacering

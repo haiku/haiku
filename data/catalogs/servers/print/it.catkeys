@@ -14,10 +14,10 @@ Cancel	ConfigWindow		Annulla
 Printer server	ConfigWindow		Server di stampa
 Page %1 to %2, %3 copies	ConfigWindow		Pagina %1 di %2, %3 copie
 A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Esiste già una stampante con questo nome, ma il driver non è stato trovato. Sostituire?
-Yes	PrintServerApp		Si
+Yes	PrintServerApp		Sì
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	US-Ledger
 Would you like to set one up now?	PrintServerApp		Vuoi impostare una stampante adesso?
-Print job setup:	ConfigWindow		Imposta lavoro di stampa
+Print job setup:	ConfigWindow		Impostazione lavoro di stampa:
 A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		Verticale
 All pages	ConfigWindow		Tutte le pagine

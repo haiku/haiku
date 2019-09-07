@@ -7,7 +7,7 @@ OK	Terminal SetTitleWindow		OK
 Edit	Terminal TermWindow		Modifica
 Select all	Terminal TermWindow		Seleziona tutto
 Confirm exit if active programs exist	Terminal AppearancePrefView		Chiedi conferma per l'uscita in caso ci siano processi attivi
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tLa directory di lavoro corrente del processo attivo nella\n\t\t\ttab corrente. Opzionalmente, il massimo numero di componenti di percorso\n\t\t\tpuò essere specificaato. Es. '%2d' per al più due componenti.\n\t%T\t-\tIl nome dell'applicazione Terminal nella localizzazione corrente.\n\t%e\t-\tLa codifica della tab corrente. Non mostrato se UTF-8.\n\t%i\t-\tL'indice della finestra.\n\t%p\t-\tIl nome del processo attivo nella tab corrente .\n\t%t\t-\tIl titolo della tab corrente.
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tLa directory di lavoro corrente del processo attivo nella\n\t\t\ttab corrente. Opzionalmente, il massimo numero di componenti di percorso\n\t\t\tpuò essere specificato. Es. '%2d' per al più due componenti.\n\t%T\t-\tIl nome dell'applicazione Terminal nella localizzazione corrente.\n\t%e\t-\tLa codifica della tab corrente. Non mostrato se UTF-8.\n\t%i\t-\tL'indice della finestra.\n\t%p\t-\tIl nome del processo attivo nella tab corrente .\n\t%t\t-\tIl titolo della tab corrente.
 Solarized Dark	Terminal colors scheme		Solarizzato (Scuro)
 Copy	Terminal TermWindow		Copia
 Retro	Terminal colors scheme		Retro
@@ -66,13 +66,13 @@ Copy path	Terminal TermView		Copia percorso
 Window size	Terminal TermWindow		Dimensioni della finestra
 Copy absolute path	Terminal TermView		Copia percorso assoluto
 Cancel	Terminal TermWindow		Annulla
-The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Il processo \"%1\" è ancora in esecuzione.\nSe si chiude il terminale il processo verrà fermato.
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Il processo \"%1\" è ancora in esecuzione.\nSe si chiude la scheda il processo verrà fermato.
 Cursor	Terminal AppearancePrefView		Cursore
 Full screen	Terminal TermWindow		Schermo intero
 Shell 	Terminal TermWindow		Shell 
 Midnight	Terminal colors scheme		Mezzanotte
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tIl carattere '%'.\n\t%<\t-\tInizia una sezione mostrata esclusivamente se un segnaposto\n\t\t\successivo non è vuoto.\n\t%>\t-\tInizia una sezione mostrata esclusivamente se un segnaposto\n\t\t\ttra una precedente sezione %< e la corrente è non vuota..\n\t%-\t-\tTermina una sezione %< o %>.\n\nOgni carattere non alfanumerico tra '%' e una lettera che esprime un formato provoca l'inserimento di uno spazio\nse il segnaposto non è vuoto. Viene aggiunto alla sezione %<.
-Tab title:	Terminal TermWindow		Titolo scheda
+Tab title:	Terminal TermWindow		Titolo scheda:
 Window title:	Terminal TermWindow		Titolo finestra:
 Default	Terminal colors scheme		Predefinito
 Window size:	Terminal AppearancePrefView		Dimensioni della finestra:

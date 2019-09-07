@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Network	3694799483
+1	swedish	x-vnd.Haiku-Network	3039697761
 Ethernet device	InterfaceListItem		Ethernetenhet
 Link speed:	IntefaceView		Länkhastighet:
 disconnected	IntefaceView		frånkopplad
@@ -40,6 +40,7 @@ disabled	InterfaceListItem		inaktiverad
 Dial-up connection	InterfaceListItem		Uppringd anslutning
 on	ServiceListItem		på
 The method for obtaining an IP address	IntefaceAddressView		Metoden för att få en IP adress
+disconnected	InterfaceListItem		frånkopplad
 Automatic	IntefaceAddressView		Automatisk
 Choose automatically	IntefaceView		Välj automatiskt
 Status:	IntefaceView		Status:

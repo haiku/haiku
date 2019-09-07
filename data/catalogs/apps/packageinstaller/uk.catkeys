@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-PackageInstaller	3110601390
+1	ukrainian	x-vnd.Haiku-PackageInstaller	2472572058
 Package description	UninstallView		Опис пакунку
 none	PackageView		жодного
 Continue	PackageInstall		Продовжити
@@ -53,6 +53,7 @@ Continue	PackageInfo		Продовжити
 No package selected.	PackageInfo		Не вибрано пакунок.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Помилка! \"%s\" не є правильним шляхом.\n
 The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Каталог з іменем '%s' повністю присутній за вказаним шляхом.\nЗамінити його подібним з цього пакунку чи пропустити?
+LegacyPackageInstaller	System name		Встановлювач попередніх версій
 Ask again	PackageView		Запитати знову
 Begin	PackageView		Почати
 OK	PackageView		Гаразд

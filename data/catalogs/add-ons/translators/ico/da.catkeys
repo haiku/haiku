@@ -1,0 +1,14 @@
+1	danish	x-vnd.Haiku-ICOTranslator	3916328565
+Cursor	ICOTranslator		Markør
+Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
+Windows %s %ld bit image	ICOTranslator		Windows %s %ld bit billede
+Valid icon sizes are 16, 32, or 48	ConfigView		Gyldige ikonstørrelser er 16, 32 eller 48
+Windows icons	ICOTranslator		Vinduesikoner
+Enforce valid icon sizes	ConfigView		Gennemtving gyldige ikonstørrelser
+ICO Settings	main		ICO-indstillinger
+Windows icon translator	ICOTranslator		Windows-ikonoversætter
+pixels in either direction.	ConfigView		pixels i begge retninger.
+Write 32 bit images on true color input	ConfigView		Skriv 32 bit billeder på input med ægte farver
+Icon	ICOTranslator		Ikon
+ICOTranslator Settings	ConfigView		ICOTranslator-indstillinger
+Windows icon translator	ConfigView		Windows-ikonoversætter

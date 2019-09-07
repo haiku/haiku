@@ -1,0 +1,7 @@
+1	danish	x-vnd.Haiku-libpackage	2012114212
+Refreshing repository \"%s\" failed	PackageManagerKit		Genopfriskning af softwarekilden \"%s\" mislykkedes
+Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Kunne ikke hente konfiguration til softwarekilden \"%s\". Springer over.
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Kunne ikke hente mellemlager til softwarekilden \"%s\". Springer over.
+Failed to get repository names	PackageManagerKit		Kunne ikke hente softwarekildenavne
+Failed to remove transaction directory	PackageManagerKit		Kunne ikke fjerne transaktionsmappe
+Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Pakke %s-%s har ikke en matchende kræves til sin grundpakke \"%s\"

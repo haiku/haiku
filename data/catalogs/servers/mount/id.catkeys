@@ -1,13 +1,11 @@
-1	indonesian	x-vnd.Haiku-mount_server	1677274447
+1	indonesian	x-vnd.Haiku-mount_server	819316177
 Mount read-only	AutoMounter		Pasang hanya-baca
 Error mounting volume:\n\n%s	AutoMounter		Ada kesalahan saat memasang Volume:\n\n%s
 Cancel	AutoMounter		Batal
 OK	AutoMounter		Oke
 Unmount error	AutoMounter		Terjadi kesalahan unmount
-The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Sistem file pada volume ini bukan berisi sistem-file Haiku. Sangat disarankan untuk memasang dalam mode baca-saja. Ini akan mencegah kehilangan data tak disengaja karena kesalahan dalam Haiku.
 Mount read/write	AutoMounter		Mount baca/tulis
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		Tak bisa melepas disk \"%s\":\n\t%s
-It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Disarankan untuk memasang semua volume tambahan di Haiku dalam mode read-only. Ini akan mencegah kehilangan data tak-disengaja karena kesalahan dalam Haiku.
 Mounting volume '%s'\n\n	AutoMounter		Mengkaitkan volume '%s'\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Tak bisa melepas disk \"%s\":\n\t%s\n\nHaruskah dilepas paksa?\n\nCatatan: Jika aplikasi sedang menulis di volume, melepas sekarang mungkin mengakibatkan hilangnya data.\n
 Force unmount	AutoMounter		Melepas paksa

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-CodyCam	1770279704
+1	italian	x-vnd.Haiku-CodyCam	2593355250
 destination directory expected	CodyCam		cartella di destinazione non indicata
 reply: '%s'\n	SftpClient		ripeti: '%s'\n
 JPEG image	CodyCam		Immagine JPEG
@@ -27,6 +27,7 @@ Every 2 hours	CodyCam		Ogni 2 ore
 Cannot get a time source	CodyCam		Impossibile ottenere il tempo di riferimento
 Every 4 hours	CodyCam		Ogni 4 ore
 cmd: '%s'\n	FtpClient		cmd: '%s'\n
+Closing the window	VideoConsumer.cpp		Chiusura della finestra
 Never	CodyCam		Mai
 Every 8 hours	CodyCam		Ogni 8 ore
 Cannot start the video source	CodyCam		Impossibile attivare la sorgente video
@@ -38,6 +39,7 @@ still image filename expected	CodyCam		nome file per l'immagine statica non indi
 File name:	CodyCam		Nome del file:
 Directory:	CodyCam		Cartella:
 Error setting type of output file	VideoConsumer.cpp		Errore durante l'impostazione del tipo di file in output
+Locking the window	VideoConsumer.cpp		Blocco della finestra
 Cannot find an available video stream	CodyCam		Impossibile trovare un flusso video disponibile
 Upload…	VideoConsumer.cpp		Carica…
 password expected	CodyCam		password non indicata

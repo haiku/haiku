@@ -18,8 +18,8 @@ Belgian (point)	KeymapNames		Belgia (point)
 Finnish	KeymapNames		Finlandia
 Num lock	Keyboard Layout View		Num lock
 Switch shortcut keys to Windows/Linux mode	Keymap window		Beralih tombol pintas untuk modus Windows/Linux
-Spanish (Dvorak)	KeymapNames		Spanyol (Dvorak)
 Option	Keyboard Layout View	Option key	Pilihan
+Spanish (Dvorak)	KeymapNames		Spanyol (Dvorak)
 Scroll lock	Keyboard Layout View		Scroll lock
 US-International	KeymapNames		AS-Internasional
 Right option	Keyboard Layout View		Pilihan kanan
@@ -54,8 +54,8 @@ Irish	KeymapNames		Irlandia
 Remove	Keyboard Layout View		Hapus
 Tilde trigger	Keymap window		Pemicu tilde
 Shift	Keyboard Layout View	Shift key	Shift
-Czech (Mac)	KeymapNames		Ceko (Mac)
 Macedonian	KeymapNames		Makedonia
+Czech (Mac)	KeymapNames		Ceko (Mac)
 Left command	Keyboard Layout View		Perintah kiri
 Albanian	KeymapNames		Albania
 (Current)	Keymap window		(Saat ini)

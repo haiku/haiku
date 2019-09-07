@@ -1,0 +1,9 @@
+1	danish	x-vnd.Haiku-RAWTranslator	2975919330
+RAWTranslator Settings	ConfigView		RAWTranslator-indstillinger
+Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
+RAW image translator	RAWTranslator		RAW-billedoversætter
+RAW Settings	RAWTranslator main		RAW-indstillinger
+RAW images	RAWTranslator		RAW-billeder
+RAW image translator	ConfigView		RAW-billedoversætter
+%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	%s RAW-billede
+Based on Dave Coffin's dcraw 8.63	ConfigView		Baseret på Dave Coffin's dcraw 8.63

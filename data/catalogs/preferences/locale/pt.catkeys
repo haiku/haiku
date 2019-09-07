@@ -1,18 +1,29 @@
-1	portuguese	x-vnd.Haiku-Locale	1431723094
-12 hour	TimeFormatSettings		12 horas
-24 hour	TimeFormatSettings		24 horas
+1	portuguese	x-vnd.Haiku-Locale	2152251058
 Available languages	Locale Preflet Window		Idiomas disponíveis
-Currency	TimeFormatSettings		Moeda
-Date	TimeFormatSettings		Data
-Defaults	Locale Preflet Window		Predefenições
-Language	Locale Preflet Window		Idioma
-Locale	Locale Preflet		Região
-Long format:	TimeFormatSettings		Formato longo:
-Numbers	TimeFormatSettings		Números
-OK	Locale Preflet Window		OK
-Preferred languages	Locale Preflet Window		Idiomas preferidos
-Revert	Locale Preflet Window		Reverter
-Short format:	TimeFormatSettings		Formato curto:
-Time	TimeFormatSettings		Hora
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Não foi possível encontrar a lista de idiomas! Não pode usar este preflet!
+Negative:	TimeFormatSettings		Negativo:
 already chosen	LanguageListView		escolhida
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Não foi possível encontrar a lista de idiomas! Não pode usar este preflet!
+Long format:	TimeFormatSettings		Formato longo:
+Currency	TimeFormatSettings		Moeda
+Locale	System name		Localidade
+Short format:	TimeFormatSettings		Formato curto:
+Language	Locale Preflet Window		Idioma
+Preferred languages	Locale Preflet Window		Idiomas preferidos
+Use month/day-names from preferred language	TimeFormatSettings		Use mês/dia, os nomes de idioma preferido
+Formatting	Locale Preflet Window		Formatação
+Locale	Locale Preflet Window		Localidade
+Numbers	TimeFormatSettings		Números
+24 hour	TimeFormatSettings		24 horas
+OK	Locale Preflet Window		OK
+Restart	Locale Preflet Window		Reiniciar
+Full format:	TimeFormatSettings		Formato completo:
+Defaults	Locale Preflet Window		Predefinições
+Cancel	Locale Preflet Window		Cancelar
+Revert	Locale Preflet Window		Reverter
+Medium format:	TimeFormatSettings		Formato médio:
+12 hour	TimeFormatSettings		12 horas
+Time	TimeFormatSettings		Hora
+Date	TimeFormatSettings		Data
+Positive:	TimeFormatSettings		Positivo:
+Locale	Locale Preflet		Região
+Options	Locale Preflet Window		Opções

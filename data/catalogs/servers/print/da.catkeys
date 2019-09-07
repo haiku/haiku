@@ -1,21 +1,55 @@
-1	danish	x-vnd.Be-PSRV	3878243268
-All pages	ConfigWindow		Alle sider
-Cancel	ConfigWindow		Afbryd
-Cancel	PrintServerApp		Afbryd
-Landscape	ConfigWindow		Landskab
-No	PrintServerApp		Nej
-OK	ConfigWindow		OK
-OK	PrintServerApp		OK
-Page setup	ConfigWindow		Side opsætning
-Page setup:	ConfigWindow		Side opsætning:
-Paper setup:	ConfigWindow		Papir indstillinger:
-Portrait	ConfigWindow		Portræt
-Print setup	ConfigWindow		Printer indstillinger
-Printer:	ConfigWindow		Printer:
-Select a printer	ConfigWindow		Vælg en printer
-There are no printers set up.	PrintServerApp		Ingen printer er konfigureret
-There is no default printer set up.	PrintServerApp		Der er ikke konfigureret nogen standard printer.
+1	danish	x-vnd.Be-PSRV	1222926379
 Undefined	ConfigWindow		Udefineret
-Would you like to make @ the default printer?	PrintServerApp		Ønsker du at markere @ som standard printer?
-Would you like to set one up now?	PrintServerApp		Ønsker du at indstille en nu?
+Return the number of available transports	PrintServerApp Scripting		Returner antallet af tilgængelige transporter
+Return the number of available printers	PrintServerApp Scripting		Returner antallet af tilgængelige printere
+Get currently available ports/devices	Transport Scripting		Hent nuværende tilgængelige porte/enheder
+Retrieve or select the active printer	PrintServerApp Scripting		Indhent eller vælg den aktive printer
+Cancel	PrintServerApp		Annuller
+Retrieve a specific printer	PrintServerApp Scripting		Indhent en bestemt printer
+Page %1 to %2	ConfigWindow		Side %1 til %2
+Get name of the printer add-on used for this printer	Printer Scripting		Hent navnet på printer-tilføjelsen som bruges til printeren
+B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
+OK	ConfigWindow		OK
+Cancel	ConfigWindow		Annuller
+Printer server	ConfigWindow		Printerserver
+Page %1 to %2, %3 copies	ConfigWindow		Side %1 til %2, %3 kopier
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Der findes allerede en printer med det navn, men dens driver kunne ikke findes! Erstat?
 Yes	PrintServerApp		Ja
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger
+Would you like to set one up now?	PrintServerApp		Vil du indstille en nu?
+Print job setup:	ConfigWindow		Opsætning af udskrivningsjob:
+A6	ConfigWindow	ISO 216 paper size	A6
+Portrait	ConfigWindow		Portræt
+All pages	ConfigWindow		Alle sider
+There is no default printer set up.	PrintServerApp		Der er ikke konfigureret nogen standard printer.
+B5	ConfigWindow	ISO 216 paper size	B5
+A0	ConfigWindow	ISO 216 paper size	A0
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	Brev
+Printer:	ConfigWindow		Printer:
+A2	ConfigWindow	ISO 216 paper size	A2
+Select a printer	ConfigWindow		Vælg en printer
+Show configuration window	PrintServerApp Scripting		Vis konfigurationsvindue
+A4	ConfigWindow	ISO 216 paper size	A4
+Get comments about this printer	Printer Scripting		Hent kommentarer om printeren
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Der findes allerede en printer med det navn, men den kan slet ikke bruges! Erstat?
+No	PrintServerApp		Nej
+Get the transport configuration for this printer	Printer Scripting		Hent transportkonfigurationen til printeren
+Landscape	ConfigWindow		Landskab
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
+There are no printers set up.	PrintServerApp		Ingen printer er konfigureret.
+Get name of the transport add-on used for this printer	Printer Scripting		Hent navnet på transport-tilføjelsen som bruges til printeren
+All pages, %1 copies	ConfigWindow		Alle sider, %1 kopier
+Delete a specific printer	PrintServerApp Scripting		Slet en bestemt printer
+Create a new printer	PrintServerApp Scripting		Opret en ny printer
+OK	PrintServerApp		OK
+Print setup	ConfigWindow		Printeropsætning
+A1	ConfigWindow	ISO 216 paper size	A1
+Retrieve a specific transport	PrintServerApp Scripting		Modtager en bestemt transport
+Get name of printer	Printer Scripting		Hent navnet på printeren
+A3	ConfigWindow	ISO 216 paper size	A3
+Get name of transport	Transport Scripting		Hent navn på transport
+A5	ConfigWindow	ISO 216 paper size	A5
+Would you like to make @ the default printer?	PrintServerApp		Vil du markere @ som standard printer?
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Avis
+Page setup	ConfigWindow		Sideopsætning
+Paper setup:	ConfigWindow		Papiropsætning:

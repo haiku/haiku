@@ -1,0 +1,50 @@
+1	portuguese	x-vnd.Be-PEPL	2332202134
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Falhou o início do painel de preferências de Tipos de Ficheiro para configurar os atributos de Pessoa.\n\nErro: 
+Unnamed person	People		Pessoa sem nome
+New person…	People		Nova pessoa…
+Address	People		Endereço
+Zip	People		Código postal
+Select all	People		Selecionar tudo
+Could not create %s.	People		Não foi possível criar %s.
+Quit	People		Sair
+Company	People		Empresa
+Name	People		Nome
+The file '%name%' could not be written.	People		Não foi possível escrever o ficheiro '%name%'.
+Contact name	People		Nome do contacto
+Cancel	People		Cancelar
+Edit	People		Editar
+Save changes before closing?	People		Guardar as alterações antes de fechar?
+People	System name		Pessoas
+Error	People		Erro
+Revert	People		Reverter
+Country	People		País
+Person	Short mimetype description		Pessoa
+New person	People		Nova pessoa
+Save	People		Guardar
+Fax	People		Fax
+URL	People		URL
+%name% picture	People		Foto de %name%
+Home phone	People		Telefone de casa
+none	Groups list		nenhum
+Save as…	People		Guardar como…
+Cut	People		Cortar
+Contact information for a person.	Long mimetype description		Informação de contacto de uma pessoa.
+Remove image	People		Remover imagem
+City	People		Cidade
+Undo	People		Desfazer
+Don't save	People		Não guardar
+Configure attributes	People		Configurar atributos
+Work phone	People		Telefone de trabalho
+State	People		Estado
+Nickname	People		Alcunha
+OK	People		OK
+File	People		Ficheiro
+Redo	People		Refazer
+Close	People		Fechar
+Copy	People		Copiar
+Paste	People		Colar
+E-mail	People		E-mail
+Group	People		Grupo
+Drop an image here,\nor use the contextual menu.	People		Largue uma imagem aqui,\nou use o menu de contexto.
+Load image…	People		Carregar imagem…
+Sorry	People		Desculpe

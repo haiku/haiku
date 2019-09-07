@@ -1,13 +1,11 @@
-1	slovak	x-vnd.Haiku-mount_server	1677274447
+1	slovak	x-vnd.Haiku-mount_server	819316177
 Mount read-only	AutoMounter		Pripojiť len na čítanie
 Error mounting volume:\n\n%s	AutoMounter		Chyba pri pripájaní zväzku:\n\n%s
 Cancel	AutoMounter		Zrušiť
 OK	AutoMounter		OK
 Unmount error	AutoMounter		Chyba pri odpájaní
-The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Súborový systém na tomto zväzku nie je súborový systém Haiku. Dôrazne sa odporúča pripojiť ho v režime len na čítanie. Tým zabránite neúmyselnej strate dát v prípade chýb v Haiku.
 Mount read/write	AutoMounter		Pripojiť na čítanie/zápis
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		Nebolo možné odpojiť disk „%s“:\n\t %s
-It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Navrhujeme, aby ste pripájali všetky ďalšie diskové oblasti Haiku v režime len na čítanie. Tým zabránite neúmyselnej strate dát v prípade chýb v Haiku.
 Mounting volume '%s'\n\n	AutoMounter		Pripája sa zväzok „%s“\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Nebolo možné odpojiť disk „%s“:\n\t%s\n\nVynútiť odpojenie?\n\nPozn.: Ak aplikácia práve na zväzok zapisuje, jeho odpojenie môže mať za následok stratu dát.\n
 Force unmount	AutoMounter		Vynútiť odpojenie

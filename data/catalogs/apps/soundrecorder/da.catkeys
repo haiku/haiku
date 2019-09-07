@@ -1,0 +1,46 @@
+1	danish	x-vnd.Haiku-SoundRecorder	24440888
+Loop	RecorderWindow		Løkke
+Cannot find default audio hardware	RecorderWindow		Kan ikke finde lyd hardware
+Cannot find the temporary file created to hold the new recording	RecorderWindow		Kan ikke finde den midlertidige fil lavet til at holde den nye optagelse
+Sample size:	RecorderWindow		Prøvestørrelse:
+Nothing to play	RecorderWindow		Intet at spille
+None of the files appear to be audio files.	RecorderWindow		Ingen af filerne ser ud til at være lydfiler.
+Duration: 	RecorderWindow		Varighed: 
+File info	RecorderWindow		Filinfo
+Drop files here	SoundListView		Slip filer her
+Input	RecorderWindow		Input
+Some of the files don't appear to be audio files.	RecorderWindow		Nogle af filerne ser ikke ud til at være lydfiler.
+Stop	RecorderWindow		Stop
+Format:	RecorderWindow		Format:
+Sound List	RecorderWindow		Lydliste
+Compression: 	RecorderWindow		Komprimering: 
+Rewind	RecorderWindow		Spol tilbage
+Sample rate:	RecorderWindow		Testhastighed:
+Invalid audio files	RecorderWindow		Invalide lydfiler
+ seconds	RecorderWindow		 sekunder
+OK	RecorderWindow		OK
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Kan ikke åbne den midlertidige fil lavet til at holde den nye optagelse
+Input:	RecorderWindow		Input:
+Forward	RecorderWindow		Spol fremad
+Play	RecorderWindow		Afspil
+SoundRecorder	System name		LydOptager
+Channels:	RecorderWindow		Kanaler:
+ bits	RecorderWindow		 bit
+None	RecorderWindow		Ingen
+Record	RecorderWindow		Optag
+Sample size: 	RecorderWindow		Prøvestørrelse: 
+Cannot recognize this file as a media file	RecorderWindow		Kan ikke genkende filen som en mediefil
+Format: 	RecorderWindow		Format: 
+File name: 	RecorderWindow		Filnavn: 
+Cannot connect to the selected sound input	RecorderWindow		Kan ikke forbinde til det valgte lydinput
+Cannot get the file to play	RecorderWindow		Kan ikke få filen til at afspille
+Cannot record a sound that long	RecorderWindow		Kan ikke optage en så lang lyd
+Duration:	RecorderWindow		Varighed:
+Compression:	RecorderWindow		Komprimering:
+Cannot find an unused name to use for the new recording	RecorderWindow		Kan ikke finde et ubrugt navn til at bruge til den nye optagelse
+Channels: 	RecorderWindow		Kanaler: 
+Save	RecorderWindow		Gem
+Sample rate: 	RecorderWindow		Testhastighed: 
+Cannot connect to media server	RecorderWindow		Kan ikke oprette forbindelse til medieserver
+The file doesn't appear to be an audio file.	RecorderWindow		Filen ser ikke ud til at være en lydfil.
+File name:	RecorderWindow		Filnavn:

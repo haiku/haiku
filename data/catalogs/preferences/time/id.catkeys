@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Time	752043118
+1	indonesian	x-vnd.Haiku-Time	834234238
 OK	Time		OKE
 Message receiving failed	Time		Penerimaan pesan gagal
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Jam dan tanggal, ditulis oleh:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nHak cipta 2004-2012, Haiku.
@@ -16,6 +16,7 @@ Asia	Time		Asia
 Try all servers	Time		Coba semua server
 Time	Time		Jam
 Current time:	Time		Waktu saat ini:
+The following error occured while synchronizing:\n%s: %s	Time		Kesalahan berikut terjadi saat menyinkronkan:\n%s: %s
 Europe	Time		Eropa
 Show day of week	Time		Tampilkan nama hari dalam sepekan
 Local time (Windows compatible)	Time		Waktu lokal (kompatibel windows)
@@ -43,5 +44,6 @@ Synchronize at boot	Time		Sinkronisasi saat but
 Indian	Time		India
 Revert	Time		Pulihkan
 Date and time	Time		Hari dan jam
+The following error occured while synchronizing:\n%s	Time		Kesalahan berikut terjadi saat menyinkronkan:\n%s
 Synchronize	Time		Singkronkan
 Add	Time		Tambah

@@ -1,0 +1,47 @@
+1	danish	x-vnd.Haiku-Shortcuts	3834857117
+*MouseUp	ShortcutsWindow		*MouseUp
+Application	ShortcutsWindow		Program
+Option	ShortcutsSpec	Name for modifier on keyboard	Valgmulighed
+Save changes before closing?	ShortcutsWindow		Gem ændringer inden lukning?
+Revert to saved	ShortcutsWindow		Tilbagefør til gemte
+Don't save	ShortcutsWindow		Gem ikke
+*MouseDown	ShortcutsWindow		*MouseDown
+*Beep	ShortcutsWindow		*Beep
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Genveje kunne ikke gemme dit keyset.
+Save	ShortcutsWindow		Gem
+Either	ShortcutsSpec		Vilkårlig
+Oh no	ShortcutsWindow		Åh nej
+Key	ShortcutsWindow		Tast
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
+Select	ShortcutsWindow		Vælg
+Shortcuts	System name		Genveje
+Quit	ShortcutsWindow		Afslut
+(Choose application with file requester)	ShortcutsWindow		(Vælg program med fil-forespørger)
+Cancel	ShortcutsWindow		Annuller
+*MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
+Control	ShortcutsSpec	Name for modifier on keyboard	Kontrol
+Left	ShortcutsSpec		Venstre
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Genveje kunne ikke sende din KeySet-fil!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Genveje kunne ikke gemme din KeySet-fil!
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Din tekst her\"
+Remove selected shortcut	ShortcutsWindow		Fjern valgte genvej
+Error, NULL state description?	ShortcutsSpec		Fejl, NULL-tilstand beskrivelse?
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Genveje kunne ikke åbne din KeySet-fil!
+Save & apply	ShortcutsWindow		Gem og anvend
+Open	ShortcutsWindow		Åbn
+Append	ShortcutsWindow		Tilføj
+Both	ShortcutsSpec		Begge
+Save KeySet as…	ShortcutsWindow		Gem KeySet som…
+Append KeySet…	ShortcutsWindow		Tilføj KeySet…
+*MouseButton 1	ShortcutsWindow		*Mousebutton 1
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
+Right	ShortcutsSpec		Højre
+OK	ShortcutsWindow		OK
+Add new shortcut	ShortcutsWindow		Tilføj ny genvej
+(None)	ShortcutsSpec		(ingen)
+Shift	ShortcutsSpec	Name for modifier on keyboard	Skift
+Open KeySet…	ShortcutsWindow		Åbn KeySet…
+File	ShortcutsWindow		Fil
+*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
+*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%

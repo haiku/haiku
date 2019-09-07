@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Shortcuts	863758906
+1	indonesian	x-vnd.Haiku-Shortcuts	2363891926
 *MouseUp	ShortcutsWindow		*MouseUp
 Application	ShortcutsWindow		Aplikasi
 Option	ShortcutsSpec	Name for modifier on keyboard	Opsi
@@ -18,6 +18,7 @@ Quit	ShortcutsWindow		Keluar
 Cancel	ShortcutsWindow		Batal
 *MoveMouse +20 +0	ShortcutsWindow		*TombolMouse +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Kontrol
+Left	ShortcutsSpec		Kiri
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Pintasan tidak dapat mengurai file KeySet Anda!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Pintasan tidak dapat menyimpan file KeySet Anda!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Teks Anda Disini\"

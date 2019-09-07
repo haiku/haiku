@@ -1,10 +1,20 @@
-1	portuguese	x-vnd.Haiku-Touchpad	4054922715
-Defaults	TouchpadPrefView		Predefenições
-Fast	TouchpadPrefView		Rápida
-High	TouchpadPrefView		Alto
-Horizontal scrolling	TouchpadPrefView		Deslocamento horizontal
-Off	TouchpadPrefView		Desligado
-Revert	TouchpadPrefView		Reverter
+1	portuguese	x-vnd.Haiku-Touchpad	607725922
 Scrolling	TouchpadPrefView		Deslocamento
+Tapping	TouchpadPrefView		Tocar para clicar
+Touchpad	System name		Touchpad
+Cancel	TouchpadPrefView		Cancelar
+OK	TouchpadPrefView		OK
+Horizontal scrolling	TouchpadPrefView		Deslocamento horizontal
 Slow	TouchpadPrefView		Lento
 Two finger scrolling	TouchpadPrefView		Deslocamento com dois dedos
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		A nova área de deslocamento é muito grande e pode impedir o funcionamento normal do rato. Pretende mesmo alterá-la?
+Defaults	TouchpadPrefView		Predefinições
+High	TouchpadPrefView		Alta
+Off	TouchpadPrefView		Desligada
+Fast	TouchpadPrefView		Rápido
+Vertical	TouchpadPrefView		Vertical
+Please confirm	TouchpadPrefView		Por favor confirme
+Acceleration	TouchpadPrefView		Aceleração
+Horizontal	TouchpadPrefView		Horizontal
+Sensitivity	TouchpadPrefView		Sensibilidade
+Revert	TouchpadPrefView		Reverter

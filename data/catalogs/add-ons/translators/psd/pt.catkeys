@@ -1,0 +1,9 @@
+1	portuguese	x-vnd.Haiku-PSDTranslator	4077272827
+Lab	PSDLoader		Lab
+Uncompressed	PSDConfig		Sem compressão
+Grayscale	PSDLoader		Escala de cinzentos
+RLE	PSDConfig		RLE
+RGBA	PSDLoader		RGBA
+RGB	PSDLoader		RGB
+Bitmap	PSDLoader		Mapa de bits
+CMYK	PSDLoader		CMYK

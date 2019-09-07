@@ -1,0 +1,13 @@
+1	portuguese	x-vnd.Haiku-MatchHeader	709288665
+Delete message	ConfigView		Eliminar mensagem
+Set flags to	ConfigView		Definir sinalizadores para
+<Choose account>	ConfigView		<Escolher conta>
+Then	ConfigView		Depois
+If	ConfigView		Se
+Set as read	ConfigView		Marcar como lida
+Reply with	ConfigView		Responder com
+<Choose action>	ConfigView		<Escolher ação>
+Move to	ConfigView		Mover para
+this field is based on the action	ConfigView		este campo é baseado na ação
+Account	ConfigView		Conta
+has	ConfigView		tem

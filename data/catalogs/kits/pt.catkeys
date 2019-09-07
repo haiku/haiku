@@ -1,8 +1,42 @@
-1	portuguese	x-vnd.Haiku-libbe	1448968507
-%.2f TiB	StringForSize		%.2f TiB
-%3.2f GiB	StringForSize		%3.2f GiB
-%3.2f KiB	StringForSize		%3.2f KiB
-%3.2f MiB	StringForSize		%3.2f MiB
-Blue:	ColorControl		Azul:
+1	portuguese	x-vnd.Haiku-libbe	3337473349
+{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte} other{# bytes}}
+All Rights Reserved.	AboutWindow		Todos os Direitos Reservados.
+gold master	AboutWindow		gold master
+Undo	TextView		Desfazer
+gamma	AboutWindow		gama
+development	AboutWindow		desenvolvimento
+OK	Dragger		OK
+OK	PrintJob		OK
+Print Server is not responding.	PrintJob		O Servidor de Impressão não está a responder.
+About %app%	AboutMenuItem		Acerca de %app%
+Warning	Dragger		Aviso
 Green:	ColorControl		Verde:
+Redo	TextView		Refazer
+No pages to print!	PrintJob		Nenhuma página para imprimir!
+beta	AboutWindow		beta
+OK	ZombieReplicantView		OK
+Cut	TextView		Cortar
+%3.2f GiB	StringForSize		%3.2f GiB
+Can't delete this replicant from its original application. Life goes on.	Dragger		Não é possível eliminar este replicante da sua aplicação original. A vida continua.
+Error	ZombieReplicantView		Erro
+Paste	TextView		Colar
+OK	AboutWindow		OK
+Special Thanks:	AboutWindow		Agradecimentos Especiais:
+%.2f TiB	StringForSize		%.2f TiB
+Remove replicant	Dragger		Remover replicante
+Version	AboutWindow		Versão
 Red:	ColorControl		Vermelho:
+<empty>	Menu		<vazio>
+Copy	TextView		Copiar
+Select all	TextView		Selecionar tudo
+alpha	AboutWindow		alfa
+%3.2f MiB	StringForSize		%3.2f MiB
+Error	PrintJob		Erro
+About %app%	AboutWindow		Acerca de %app%
+About %app…	Dragger		Acerca de %app…
+Version history:	AboutWindow		Histórico de versões:
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Não foi possível encontrar a aplicação para o replicante. Não foi fornecida nenhuma assinatura de aplicação.\n%error
+%3.2f KiB	StringForSize		%3.2f KiB
+Blue:	ColorControl		Azul:
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Não foi possível criar o replicante para \"%description\".\n%error
+Written by:	AboutWindow		Escrito por:

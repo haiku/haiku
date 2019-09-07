@@ -18,8 +18,8 @@ Belgian (point)	KeymapNames		Belga (punto)
 Finnish	KeymapNames		Finés
 Num lock	Keyboard Layout View		Bloqueo numérico
 Switch shortcut keys to Windows/Linux mode	Keymap window		Cambiar atajos de teclado a modo Windows/Linux
-Spanish (Dvorak)	KeymapNames		Español (Dvorak)
 Option	Keyboard Layout View	Option key	Opción
+Spanish (Dvorak)	KeymapNames		Español (Dvorak)
 Scroll lock	Keyboard Layout View		Bloq Despl
 US-International	KeymapNames		Estados Unidos - Internacional
 Right option	Keyboard Layout View		Opción derecha
@@ -54,8 +54,8 @@ Irish	KeymapNames		Irlandés
 Remove	Keyboard Layout View		Eliminar
 Tilde trigger	Keymap window		Disparador de tilde (~)
 Shift	Keyboard Layout View	Shift key	Mayúsculas
-Czech (Mac)	KeymapNames		Checo (Mac)
 Macedonian	KeymapNames		Macedonio
+Czech (Mac)	KeymapNames		Checo (Mac)
 Left command	Keyboard Layout View		Command izquierda
 Albanian	KeymapNames		Albano
 (Current)	Keymap window		(Actual)

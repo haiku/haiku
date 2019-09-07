@@ -1,24 +1,28 @@
-1	danish	x-vnd.Haiku-Backgrounds	4220509773
-All workspaces	Main View		Alle arbejdsområder
-Apply	Main View		Udfør
-Center	Main View		Centreret
-Current workspace	Main View		Nuværende arbejdsområde
+1	danish	x-vnd.Haiku-Backgrounds	681978856
+Backgrounds	System name		Baggrunde
+X:	Main View		X:
+Setting the background image failed:	Main View		Indstilling af baggrundsbilledet mislykkedes:
+Resolution: 	Image Filepanel		Opløsning: 
+pick one	Main View		vælg en
 Default	Main View		Standard
-Default folder	Main View		Standard mappe
-Folder: 	Main View		Mappe: 
-Icon label outline	Main View		Omrids af ikon etiket
-Image:	Main View		Billede:
+Center	Main View		Centreret
+Folder: %path	Main View		Mappe: %path
 Manual	Main View		Manuel
+Set background image error	Main View		Fejl ved indstilling af baggrundsbillede
+Default folder	Main View		Standard mappe
+Revert	Main View		Tilbagefør
 None	Main View		Ingen
-Other folder…	Main View		Anden mappe…
+All workspaces	Main View		Alle arbejdsområder
+Icon label outline	Main View		Omrids af ikon etiket
 Other…	Main View		Andre…
+Current workspace	Main View		Nuværende arbejdsområde
+Apply	Main View		Anvend
+Other folder…	Main View		Anden mappe…
+Y:	Main View		Y:
+Tile	Main View		Side om side
+Select	Main View		Vælg
+Scale to fit	Main View		Skaler så det passer
+OK	Main View		OK
 Placement:	Main View		Placering:
 Preview	Main View		Forhåndsvisning
-Resolution: 	Image Filepanel		Opløsning: 
-Revert	Main View		Tilbagestil
-Scale to fit	Main View		Skaler så det passer
-Select	Main View		Vælg
-Tile	Main View		Side om side
-X:	Main View		X:
-Y:	Main View		Y:
-pick one	Main View		vælg en
+Image:	Main View		Billede:

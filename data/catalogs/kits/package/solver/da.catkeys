@@ -1,0 +1,38 @@
+1	danish	x-vnd.Haiku-libsolvsolver	3404387783
+allow architecture change of %source% to %target%	SolverProblemSolution		tillad skift af arkitektur af %source% til %target%
+install %source% from excluded repository	SolverProblemSolution		installer %source% fra ekskluderet softwarekilde
+unspecified problem	SolverProblem		uspecificeret problem
+package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		pakken %source% kræver %dependency%, men ingen af leverandørerne kan installeres
+package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		pakken %source% forælder implicit %dependency% som leveres af %target%
+nothing provides requested %dependency%	SolverProblem		intet leverer anmodede %dependency%
+do not keep %source% installed	SolverProblemSolution		behold ikke %source% installeret
+do not deinstall \"%selection%\"	SolverProblemSolution		afinstaller ikke \"%selection%\"
+install %source% despite its inferior architecture	SolverProblemSolution		installer %source% på trods af dens ringere arkitektur
+conflicting requests	SolverProblem		anmodninger er i konflikt
+do not install the most recent version of \"%selection%\"	SolverProblemSolution		vil du installere den seneste version af \"%selection%\"
+allow replacement of %source% with %target%	SolverProblemSolution		tillad erstatning af %source% med %target%
+package %source% obsoletes %dependency% provided by %target%	SolverProblem		pakken %source% forælder %dependency% som leveres af %target%
+do not forbid installation of %source%	SolverProblemSolution		forbyd ikke installationen af %source%
+allow downgrade of %source% to %target%	SolverProblemSolution		tillad nedgradering af %source% til %target%
+dependency problem	SolverProblem		afhængighedsproblem
+%dependency% is provided by the system	SolverProblem		%dependency% leveres af systemet
+keep %source% despite its inferior architecture	SolverProblemSolution		behold %source% på trods af dens ringere arkitektur
+%source% does not belong to a distupgrade repository	SolverProblem		%source% tilhører ikke en distupgrade-softwarekilde
+installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		installeret pakke %source% forælder %dependency% som leveres af %target%
+allow name change of %source% to %target%	SolverProblemSolution		tillad skift af navn af %source% til %target%
+package %source% conflicts with %dependency% provided by %target%	SolverProblem		pakken %source% er i konflikt med %dependency% som leveres af %target%
+do something	SolverProblemSolution		gør noget
+install %selection% despite its old version	SolverProblemSolution		installer %selection% på trods a dens gamle version
+cannot install both %source% and %target%	SolverProblem		kan ikke installere både %source% og %target%
+package %source% is not installable	SolverProblem		pakken %source% er ikke installerbar
+problem with installed package %source%	SolverProblem		problem med at installere pakken %source%
+allow deinstallation of %source%	SolverProblemSolution		tillad afinstallation af %source%
+keep %source% from excluded repository	SolverProblemSolution		behold %source% fra ekskluderet softwarekilde
+keep old %source%	SolverProblemSolution		behold gamle %source%
+package %source% conflicts with %dependency% provided by itself	SolverProblem		pakken %source% er i konflikt med %dependency% som leveres af sig selv
+allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		tillad skift af leverandør fra \"%sourceVendor%\" (%source%) til \"%targetVendor%\" (%target%)
+do not lock \"%selection%\"	SolverProblemSolution		lås ikke \"%selection%\"
+do not install \"%selection%\"	SolverProblemSolution		installer ikke \"%selection%\"
+nothing provides %dependency% needed by %source%	SolverProblem		intet leverer %dependency% som behøves af %source%
+%source% has inferior architecture	SolverProblem		%source% har ringere arkitektur
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		afinstaller ikke alle løsbarer \"%selection%\"

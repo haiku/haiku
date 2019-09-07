@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Time	752043118
+1	japanese	x-vnd.Haiku-Time	834234238
 OK	Time		OK
 Message receiving failed	Time		メッセージの取得に失敗しました
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		日付と時刻 作者:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
@@ -16,6 +16,7 @@ Asia	Time		アジア
 Try all servers	Time		すべてのサーバーを試す
 Time	Time		日付と時刻
 Current time:	Time		現在時刻:
+The following error occured while synchronizing:\n%s: %s	Time		時刻の同期中に、次のエラーが発生しました:\n%s: %s
 Europe	Time		ヨーロッパ
 Show day of week	Time		曜日を表示
 Local time (Windows compatible)	Time		現地時刻 (Windows 互換)
@@ -43,5 +44,6 @@ Synchronize at boot	Time		起動時に同期
 Indian	Time		インド
 Revert	Time		元に戻す
 Date and time	Time		日付と時刻
+The following error occured while synchronizing:\n%s	Time		時刻の同期中に、次のエラーが発生しました:\n%s
 Synchronize	Time		同期
 Add	Time		追加

@@ -1,9 +1,12 @@
-1	ukrainian	x-vnd.Haiku-IMAP	722419473
+1	ukrainian	x-vnd.Haiku-IMAP	1343128980
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Неможливо під'єднатися до сервера \"%server%\":\n%error%
+Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		Оновлення налаштувань тек IMAP, треба трохи зачекати…
 Failed to fetch available storage.	IMAPFolderConfig		Призупинено отримання доступних масивів.
 Cancel	IMAPFolderConfig		Скасувати
 OK	IMAPFolderConfig		Гаразд
+Server storage: %s / %s used.	IMAPFolderConfig		Місткість серверу: використано %s / %s.
 No encryption	imap_config		Без шифрування
+Fetching IMAP folders, please be patient…	IMAPFolderConfig		Отримую дані з тек IMAP, треба трохи зачекати…
 Configure IMAP Folders	imap_config		Зконфігурувати теки IMAP
 SSL	imap_config		SSL
 Apply	IMAPFolderConfig		Застосувати

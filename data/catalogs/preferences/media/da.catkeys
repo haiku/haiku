@@ -1,0 +1,26 @@
+1	danish	x-vnd.Haiku-Media	1682972002
+Audio mixer	Media Window		Lydmixer
+Show volume control on Deskbar	Media views		Vis lydstyrkestyring på skrivebordslinje
+Quit	Media Window		Afslut
+Restart media services	Media views		Genstart medietjenester
+Couldn't add volume control in Deskbar: %s\n	Media views		Kunne ikke tilføje lydstyrkestyring i skrivebordslinje: %s\n
+Start media server	Media Window		Start medieserver
+<none>	VideoInputMenu	Used when no video input is available	<ingen>
+Audio settings	Media Window		Lydindstillinger
+Quit anyway	Media Window		Afslut alligevel
+Couldn't remove volume control in Deskbar: %s\n	Media views		Kunne ikke fjerne lydstyrkestyring i skrivebordslinje: %s\n
+Media	System name		Medier
+Warning!	Media Window		Advarsel!
+MIDI Settings	Media Window		MIDI-indstillinger
+Video output:	Media views		Videooutput:
+Audio output:	Media views		Lydoutput:
+Video input:	Media views		Videoinput:
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Hvis mediet afsluttes nu vil det stoppe genstarten af medietjenesten. Problematisk eller utilgængelig mediefunktionalitet er sandsynligvist resultatet.
+Audio input:	Media views		Lydinput:
+<none>	Media views		<ingen>
+This hardware has no controls.	Media Window		Hardwaren har ingen styringer.
+Channel:	Media views		Kanal:
+Defaults	Media views		Standarder
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Kunne ikke oprette forbindelse til medieserveren.\nVil du starte den ?
+Video settings	Media Window		Videoindstillinger
+<none>	VideoOutputMenu	Used when no video output is available	<ingen>

@@ -1,0 +1,23 @@
+1	danish	x-vnd.Haiku-NetworkStatus	186344131
+Netmask	NetworkStatusView		Netmaske
+Quit	NetworkStatusView		Afslut
+Unknown	NetworkStatusView		Ukendt
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Start af netværk-preflet mislykkedes.\n\nFejl: 
+Install in Deskbar	NetworkStatus		Installer i skrivebordslinje
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Valgmuligheder for Netværksstatus:\n\t--deskbar\ttilføj automatisk replikant til skrivebordslinje\n\t--help\t\tvis denne hjælp og afslut
+Open network preferences…	NetworkStatusView		Åbn netværkspræferencer…
+NetworkStatus	System name		Netværksstatus
+OK	NetworkStatusView		OK
+No link	NetworkStatusView		Intet link
+Could not join wireless network:\n	NetworkStatusView		Kunne ikke deltage i trådløst netværk:\n
+Ready	NetworkStatusView		Klar
+Network Status	NetworkStatusView		Netværksstatus
+Address	NetworkStatusView		Adresse
+Deskbar is not running, giving up.	NetworkStatus		Skrivebordslinje kører ikke, giver op.
+No stateful configuration	NetworkStatusView		Ingen tilstandsfuld konfiguration
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Du kan køre netværksstatus i et vindue eller installere det i skrivebordslinjen.
+Broadcast	NetworkStatusView		Udsend
+%ifaceName information:\n	NetworkStatusView		%ifaceName-information:\n
+Run in window	NetworkStatus		Kør i vindue
+<no wireless networks found>	NetworkStatusView		<fandt ingen trådløse netværk>
+Configuring	NetworkStatusView		Konfigurering

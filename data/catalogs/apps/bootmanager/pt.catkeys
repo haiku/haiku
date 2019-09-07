@@ -1,0 +1,69 @@
+1	portuguese	x-vnd.Haiku-BootManager	867546001
+Old Master Boot Record backup failure	BootManagerController	Title	Falha na cópia de segurança do Master Boot Record antigo
+At least one partition must be selected!	BootManagerController		Ao menos uma partição deve ser selecionada!
+No space available!	DrivesPage	Cannot install	Sem espaço disponível!
+Boot Manager is unable to read the partition table!	BootManagerController		O Gestor de Arranque não consegue ler a tabela de partições!
+Immediately	DefaultPartitionPage		Imediatamente
+Uninstall Boot Manager	UninstallPage	Title	Desinstalar o Gestor de Arranque
+Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Desconhecido
+Installation of boot menu failed	BootManagerController	Title	A instalação do menu de arranque falhou
+Backup Master Boot Record	BootManagerController	Title	Fazer cópia de segurança do Master Boot Record
+Cannot access!	DrivesPage	Cannot install	Não foi possível aceder!
+After one second	DefaultPartitionPage		Após um segundo
+The old Master Boot Record was successfully saved to %s.	BootManagerController		O Master Boot Record antigo foi guardado com sucesso para %s.
+Quit	WizardView	Button	Sair
+Never	DefaultPartitionPage		Nunca
+Summary	BootManagerController	Title	Resumo
+An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Ocorreu um erro ao escrever o menu de arranque. O Master Boot Record pode estar destruído, você deve restaurar o MBR agora!
+After three seconds	DefaultPartitionPage		Após três segundos
+Read only!	DrivesPage	Cannot install	Apenas de leitura!
+Write boot menu	BootManagerController	Button	Escrever menu de arranque
+OK	BootManagerController	Button	OK
+Uninstall boot manager	BootManagerController	Title	Desinstalar o gestor de arranque
+About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Está prestes a escrever o seguinte menu de arranque para o disco de arranque (%s). Por favor verifique as informações abaixo antes de prosseguir.
+The first partition on the disk starts too early and does not leave enough space free for a boot menu.\nBoot Manager needs 2 KiB available space before the first partition.	BootManagerController		A primeira partição do disco começa demasiado cedo e não deixa espaço suficiente para um menu de arranque.\nO Gestor de Arranque necessita de ter 2KiB de espaço livre antes da primeira partição.
+Uninstall	DrivesPage	Button	Desinstalar
+Update	DrivesPage	Button	Atualizar
+The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		O Master Boot Record (MBR) do dispositivo de arranque:\n\t%s\nserá agora salvo no disco. Por favor seleccione um ficheiro para guardar o MBR.\n\nSe algo correr mal com a instalação ou se desejar posteriormente remover o menu de arranque, simplesmente execute o programa bootman e escolha a opção 'Desinstalar'.
+Default Partition	DefaultPartitionPage	Title	Partição Predefinida
+Installation of boot menu completed	BootManagerController	Title	Instalação de menu de arranque completa
+After one minute	DefaultPartitionPage		Após um minuto
+Select	FileSelectionPage	Button	Selecionar
+USB Drive	DrivesPage	Default disk name	Dispositivo USB
+Restore MBR	BootManagerController	Button	Recuperar MBR
+Hard Drive	DrivesPage	Default disk name	HD
+Drives	DrivesPage	Title	Unidades
+The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		As seguintes partições foram detetadas. Por favor assinale a caixa junto às partições que pretende incluir no menu de arranque. Também pode definir os nomes das partições conforme pretender que elas apareçam no menu de arranque.
+After five seconds	DefaultPartitionPage		Após cinco segundos
+Timeout: %s	DefaultPartitionPage		Tempo limite: %s
+The Master Boot Record could not be restored!	BootManagerController		O Master Boot Record não pôde ser restaurado!
+The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		A tabela de partições do primeiro disco rígido não é compatível com o Gestor de Arranque.\nO Gestor de Arranque apenas funciona com partições MBR de IBM PC.
+Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Por favor, seleccione o dispositivo em que pretende que seja instalado ou desinstalado o gestor de arranque.
+After four seconds	DefaultPartitionPage		Depois de quatro segundos
+Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Sem nome %d
+First partition starts too early	BootManagerController	Title	A primeira partição começa demasiado cedo
+About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Está prestes a escrever o menu de arranque para o disco. Tem a certeza de que quer continuar?
+Partitions	DefaultPartitionPage	Pop up menu title	Partições
+Default Partition:	DefaultPartitionPage	Menu field label	Partição Predefinida:
+Next	WizardView	Button	Seguinte
+Previous	WizardView	Button	Anterior
+Uninstallation of boot menu failed	BootManagerController	Title	Falhou a desinstalação do menu de arranque
+Incompatible format!	DrivesPage	Cannot install	Formato incompatível!
+Old Master Boot Record saved	BootManagerController	Title	Master Boot Record antigo guardado
+Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Por favor especifique uma partição predefinida e um tempo limite.\nO menu de arranque irá carregar a partição predefinida após o tempo limite, a menos que você selecione outra partição. Também pode fazer com que o menu de arranque aguarde indefinidamente até que seja selecionada uma partição.\nMantenha pressionada a tecla 'ALT' para desativar o tempo limite no momento do arranque.
+Partitions	PartitionsPage	Title	Partições
+Uninstallation of boot menu completed	BootManagerController	Title	Desinstalação do menu de arranque completa
+After two seconds	DefaultPartitionPage		Depois de dois segundos
+Partition table not compatible	BootManagerController	Title	Tabela de partições não compatível
+The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		O Master Boot Record do dispositivo de arranque (%DISK) foi restaurado com sucesso a partir de %FILE.
+Done	BootManagerController	Button	Feito
+BootManager	System name		Gestor de Arranque
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Por favor localize o ficheiro guardado do Master Boot Record (MBR) para restaurar a partir dele. Esse é o ficheiro que foi criado quando o gestor de arranque foi instalado pela primeira vez.
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Por favor localize o ficheiro guardado do Master Boot Record (MBR) para restaurar a partir dele. Esse é o ficheiro que foi criado quando o gestor de arranque foi instalado pela primeira vez.
+About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Está prestes a restaurar o Master Boot Record (MBR) de %disk a partir de %file. Deseja continuar?
+Install	DrivesPage	Button	Instalar
+File:	FileSelectionPage	Text control label	Ficheiro:
+Error reading partition table	BootManagerController	Title	Erro ao ler a tabela de partições
+Back	BootManagerController	Button	Retroceder
+The boot manager has been successfully installed on your system.	BootManagerController		O gestor de arranque foi instalado com êxito.
+The old Master Boot Record could not be saved to %s. You can continue the installation but there will be no way to uninstall the boot menu.	BootManagerController		Não foi possível guardar para %s o Master Boot Record antigo. Pode prosseguir com a instalação, mas não haverá forma de desinstalar o menu de arranque.

@@ -1,21 +1,55 @@
-1	portuguese	x-vnd.Be-PSRV	3878243268
-All pages	ConfigWindow		Todas as páginas
-Cancel	ConfigWindow		Cancelar
+1	portuguese	x-vnd.Be-PSRV	1222926379
+Undefined	ConfigWindow		Indefinido
+Return the number of available transports	PrintServerApp Scripting		Devolve o número de cartuchos disponíveis
+Return the number of available printers	PrintServerApp Scripting		Devolve o número de impressoras disponíveis
+Get currently available ports/devices	Transport Scripting		Obtendo portas/dispositivos atualmente disponível
+Retrieve or select the active printer	PrintServerApp Scripting		Recuperar ou selecione a impressora ativa
 Cancel	PrintServerApp		Cancelar
-Landscape	ConfigWindow		Horizontal
-No	PrintServerApp		Não
+Retrieve a specific printer	PrintServerApp Scripting		Recuperar uma impressora específica
+Page %1 to %2	ConfigWindow		Página %1 a %2
+Get name of the printer add-on used for this printer	Printer Scripting		Obter o nome da extensão de impressora utilizada para esta impressora
+B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
 OK	ConfigWindow		OK
-OK	PrintServerApp		OK
-Page setup	ConfigWindow		Configuração de página
-Page setup:	ConfigWindow		Configuração da página:
-Paper setup:	ConfigWindow		Configuração do papel:
-Portrait	ConfigWindow		Vertical
-Print setup	ConfigWindow		Configuração de página
-Printer:	ConfigWindow		Impressora:
-Select a printer	ConfigWindow		Escolha uma impressora
-There are no printers set up.	PrintServerApp		Não existem impressoras configuradas.
-There is no default printer set up.	PrintServerApp		Não existe nenhuma impressora predefenida.
-Undefined	ConfigWindow		Indefenido
-Would you like to make @ the default printer?	PrintServerApp		Deseja tornar @ na impressora predefenida?
-Would you like to set one up now?	PrintServerApp		Deseja configurar uma agora?
+Cancel	ConfigWindow		Cancelar
+Printer server	ConfigWindow		Servidor de impressão
+Page %1 to %2, %3 copies	ConfigWindow		Página %1 a %2, %3 cópias
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Já existe uma impressora com esse nome, mas não foi encontrado o seu controlador! Substituir?
 Yes	PrintServerApp		Sim
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger
+Would you like to set one up now?	PrintServerApp		Deseja configurar uma agora?
+Print job setup:	ConfigWindow		Configuração de tarefa de impressão:
+A6	ConfigWindow	ISO 216 paper size	A6
+Portrait	ConfigWindow		Vertical
+All pages	ConfigWindow		Todas as páginas
+There is no default printer set up.	PrintServerApp		Não existe nenhuma impressora predefinida.
+B5	ConfigWindow	ISO 216 paper size	B5
+A0	ConfigWindow	ISO 216 paper size	A0
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	Letter
+Printer:	ConfigWindow		Impressora:
+A2	ConfigWindow	ISO 216 paper size	A2
+Select a printer	ConfigWindow		Escolha uma impressora
+Show configuration window	PrintServerApp Scripting		Mostrar janela de configuração
+A4	ConfigWindow	ISO 216 paper size	A4
+Get comments about this printer	Printer Scripting		Obtendo os comentários sobre esta impressora
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Já existe uma impressora com esse nome, mas não pode mesmo ser utilizada! Substituir?
+No	PrintServerApp		Não
+Get the transport configuration for this printer	Printer Scripting		Obtendo a configuração do cartucho para esta impressora
+Landscape	ConfigWindow		Horizontal
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
+There are no printers set up.	PrintServerApp		Não existem impressoras configuradas.
+Get name of the transport add-on used for this printer	Printer Scripting		Obter o nome da extensão de transporte utilizada para esta impressora
+All pages, %1 copies	ConfigWindow		Todas as páginas, %1 cópias
+Delete a specific printer	PrintServerApp Scripting		Apagar uma impressora específica
+Create a new printer	PrintServerApp Scripting		Criar uma nova impressora
+OK	PrintServerApp		OK
+Print setup	ConfigWindow		Configuração de página
+A1	ConfigWindow	ISO 216 paper size	A1
+Retrieve a specific transport	PrintServerApp Scripting		Recuperanod um cartucho específico
+Get name of printer	Printer Scripting		Obténdo o nome da impressora
+A3	ConfigWindow	ISO 216 paper size	A3
+Get name of transport	Transport Scripting		Obtendo o nome do cartucho
+A5	ConfigWindow	ISO 216 paper size	A5
+Would you like to make @ the default printer?	PrintServerApp		Deseja tornar @ a impressora predefinida?
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid
+Page setup	ConfigWindow		Configuração de página
+Paper setup:	ConfigWindow		Configuração do papel:

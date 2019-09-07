@@ -1,0 +1,17 @@
+1	danish	x-vnd.Haiku-DataTranslations	4156631142
+Path:	DataTranslations		Sti:
+Name:	DataTranslations		Navn:
+DataTranslations - Note	DataTranslations		Dataoversættelser - Bemærkning
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Emnet '%name' synes ikke at være en oversætter, og vil ikke blive installeret.
+Could not install %s:\n%s	DataTranslations		Kunne ikke installere %s:\n%s
+OK	DataTranslations		OK
+Cancel	DataTranslations		Annuller
+Info:	DataTranslations		Info:
+DataTranslations - Error	DataTranslations		Dataoversættelser - Fejl
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Brug dette kontrolpanel til at indstille standardvalgene for oversættelserne, som bruges ved manglende angivelser af et program.
+The new translator has been installed successfully.	DataTranslations		Den nye oversætter er blevet installeret med succes.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Et emne '%name' findes allerede i oversættelses-folderen! Skal oversættelsen, som findes i forvejen, overskrives?
+DataTranslations	System name		Dataoversættelser
+Info	DataTranslations		Info
+Overwrite	DataTranslations		Overskriv
+Version:	DataTranslations		Version:

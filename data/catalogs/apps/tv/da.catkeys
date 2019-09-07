@@ -1,0 +1,27 @@
+1	danish	x-vnd.Haiku.TV	1995288111
+No menu	MainWin		Ingen menu
+No border	MainWin		Ingen kant
+force 704 x 576, display aspect 4:3	MainWin		tving 704 x 576, skærm aspekt 4:3
+Error, connecting to interface failed:\n\n	MainWin		Fejl, forbindelse til grænseflade mislykkedes:\n\n
+force 544 x 576, display aspect 4:3	MainWin		tving 544 x 576, skærm aspekt 4:3
+Full screen	MainWin		Fuld skærm
+Scale to native size	MainWin		Skaler til oprindelig størrelse
+unknown	MainWin		ukendt
+Next channel	MainWin		Næste kanal
+Keep aspect ratio	MainWin		Behold skærmformat
+DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
+Always on top	MainWin		Altid på top
+Debug	MainWin		Fejlfind
+Interface	MainWin		Grænseflade
+force 720 x 576, display aspect 4:3	MainWin		tving 720 x 576, skærm aspekt 4:3
+Quit	MainWin		Afslut
+Channel	MainWin		Kanal
+Previous channel	MainWin		Forrige kanal
+OK	MainWin		OK
+TV	MainWin		TV
+Settings	MainWin		Indstillinger
+TV	System name		TV
+Settings…	MainWin		Indstillinger…
+None	MainWin		Ingen
+Error, interface is busy:\n\n	MainWin		Fejl, grænseflade er optaget:\n\n
+pixel aspect ratio	MainWin		pixel aspekt forhold

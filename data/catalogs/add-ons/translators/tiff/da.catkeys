@@ -1,0 +1,16 @@
+1	danish	x-vnd.Haiku-TIFFTranslator	2234713102
+TIFF Library:	TIFFView		TIFF Bibliotek:
+RLE (Packbits)	TIFFView		RLE (packbits)
+ZIP (Deflate)	TIFFView		ZIP (deflate)
+identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: invalid dokument indeks\n
+Use compression:	TIFFView		Brug komprimering:
+TIFF image translator	TIFFView		TIFF-billedoversætter
+TIFF image	TIFFTranslator		TIFF-billede
+TIFF Settings	TIFFMain		TIFF-indstillinger
+TIFF image translator	TIFFTranslator		TIFF-billedoversætter
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: kunne ikke indstille placering\n
+Version %d.%d.%d, %s	TIFFView		Version %d.%d.%d, %s
+TIFFTranslator Settings	TIFFTranslator		TIFFTranslator-indstillinger
+LZW	TIFFView		LZW
+TIFF images	TIFFTranslator		TIFF-billeder
+None	TIFFView		Ingen

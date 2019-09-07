@@ -1,0 +1,16 @@
+1	portuguese	x-vnd.Haiku-desklink	3568085956
+desklink	MediaReplicant	Title of an alert box	desklink
+Sound preferences…	MediaReplicant		Preferências de som…
+Muted	MediaReplicant		Silenciado
+%g dB	MediaReplicant		%g dB
+OK	MediaReplicant		OK
+Couldn't launch 	MediaReplicant		Não foi possível iniciar 
+Volume	VolumeControl		Volume
+Open MediaPlayer	MediaReplicant		Abrir MediaPlayer
+%d dB	VolumeControl		%d dB
+Media preferences…	MediaReplicant		Preferências de média…
+Options	MediaReplicant		Opções
+Beep	MediaReplicant		Bipe
+Open %name	DeskButton	Don't translate variable %name	Abrir %name
+Control physical output	MediaReplicant		Controlar saída física
+No media server running	VolumeControl		Nenhum servidor de média em execução

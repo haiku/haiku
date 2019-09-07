@@ -1,6 +1,8 @@
-1	portuguese	x-vnd.Haiku-FirstBootPrompt	1972532432
-Desktop (Live-CD)	BootPromptWindow		Desktop (Live-CD)
-Keymap	BootPromptWindow		Esquema de teclado
+1	portuguese	x-vnd.Haiku-FirstBootPrompt	2649051796
+Custom	BootPromptWindow		Personalizado
+Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Obrigado por experimentar o Haiku! Esperamos que lhe agrade!\n\nPode selecionar a sua língua e a disposição de teclado preferidas a partir da lista da esquerda, e elas serão aplicadas de imediato. Poderá alterar ambas as configurações mais tarde, muito facilmente, a partir da Área de Trabalho.\n\nDeseja executar o Instalador, ou continuar a inicializar para a Área de Trabalho?\n
+Boot to Desktop	BootPromptWindow		Inicializar para a Área de Trabalho
+Keymap	BootPromptWindow		Disposição do teclado
+Welcome to Haiku!	BootPromptWindow		Bem-vindo ao Haiku!
 Language	BootPromptWindow		Idioma
-Run Installer	BootPromptWindow		Iniciar a instalação
-Welcome to Haiku!	BootPromptWindow		Benvindo ao Haiku!
+Run Installer	BootPromptWindow		Iniciar o Instalador

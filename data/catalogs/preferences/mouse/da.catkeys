@@ -1,0 +1,22 @@
+1	danish	x-vnd.Haiku-Mouse	3990055017
+Mouse type:	SettingsView		Musetype:
+Warp	SettingsView		Hurtig
+2-Button	SettingsView		2-knap
+Double-click test area	SettingsView		Testområde for dobbeltklik
+Revert	MouseWindow		Omvendt
+...by Andrew Edward McCall	MouseApplication		...af Andrew Edward McCall
+Mouse acceleration	SettingsView		Museacceleration
+Click to focus	SettingsView		Klik for at fokusere
+Click to focus and raise	SettingsView		Klik for at fokusere og løfte
+3-Button	SettingsView		3-knap
+Mouse speed	SettingsView		Musehastighed
+Focus mode:	SettingsView		Fokustilstand:
+Instant warp	SettingsView		Øjeblikkelig hurtig
+Dig Deal	MouseApplication		Dig Deal
+1-Button	SettingsView		1-knap
+Double-click speed	SettingsView		Hastighed for dobbeltklik
+Defaults	MouseWindow		Standarder
+Focus follows mouse	SettingsView		Fokus følger mus
+Accept first click	SettingsView		Accepter første klik
+Normal	SettingsView		Normal
+Mouse	System name		Mus

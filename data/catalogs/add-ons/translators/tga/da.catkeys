@@ -1,0 +1,16 @@
+1	danish	x-vnd.Haiku-TGATranslator	3075011211
+Save with RLE compression	TGAView		Gem med RLE-komprimering
+Targa image (%d bits truecolor)	TGATranslator		Targa-billede (%d bit ægte farver)
+Ignore TGA alpha channel	TGAView		Ignorer TGA-alfakanal
+Targa image (%d bits colormap)	TGATranslator		Targa-billede (%d bit farveskema)
+TGA image translator	TGAView		TGA-billedoversætter
+Targa image (%d bits RLE colormap)	TGATranslator		Targa-billede (%d bit RLE-farveskema)
+Targa image (%d bits gray)	TGATranslator		Targa-billede (%d bit grå)
+Written by the Haiku Translation Kit Team	TGAView		Skrevet af Haiku Translation Kit Team
+Targa image (%d bits RLE truecolor)	TGATranslator		Targa-billede (%d bit RLE-ægte farver)
+TGA images	TGATranslator		TGA-billeder
+Version %d.%d.%d, %s	TGAView		Version %d.%d.%d, %s
+TGATranslator Settings	TGATranslator		TGATranslator-indstillinger
+TGA image translator	TGATranslator		TGA-billedoversætter
+Targa image (%d bits RLE gray)	TGATranslator		Targa-billede (%d bit RLE-grå)
+TGA Settings	TGAMain		TGA-indstillinger

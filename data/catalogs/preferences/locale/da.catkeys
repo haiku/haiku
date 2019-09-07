@@ -1,0 +1,31 @@
+1	danish	x-vnd.Haiku-Locale	1488345554
+Available languages	Locale Preflet Window		Tilgængelige sprog
+Negative:	TimeFormatSettings		Negativt:
+already chosen	LanguageListView		allerede valgt
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Det var ikke muligt at finde tilgængelige sprog! Du kan ikke bruger prefletten!
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Skrivebordslinje eller tracker skal genstartes før ændringerne kan træde i kraft. Vil du genstarte dem nu?
+Long format:	TimeFormatSettings		Langt format:
+Currency	TimeFormatSettings		Møntfod
+Locale	System name		Sprog
+Short format:	TimeFormatSettings		Kort format:
+Language	Locale Preflet Window		Sprog
+Preferred languages	Locale Preflet Window		Foretrukne sprog
+Use month/day-names from preferred language	TimeFormatSettings		Brug måneds-/dagnavne fra foretrukne sprog
+Formatting	Locale Preflet Window		Formatering
+Locale	Locale Preflet Window		Sprog
+Numbers	TimeFormatSettings		Tal
+24 hour	TimeFormatSettings		24 timer
+OK	Locale Preflet Window		OK
+Restart	Locale Preflet Window		Genstart
+Full format:	TimeFormatSettings		Fuldt format:
+Defaults	Locale Preflet Window		Standarder
+Cancel	Locale Preflet Window		Annuller
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Oversæt program- og mappenavne i skrivebordslinje og tracker.
+Revert	Locale Preflet Window		Tilbagefør
+Medium format:	TimeFormatSettings		Mediumformat:
+12 hour	TimeFormatSettings		12 timer
+Time	TimeFormatSettings		Tid
+Date	TimeFormatSettings		Dato
+Positive:	TimeFormatSettings		Positivt:
+Locale	Locale Preflet		Sprog
+Options	Locale Preflet Window		Valgmuligheder

@@ -1,17 +1,50 @@
-1	portuguese	x-vnd.Haiku-Network	2612124251
-Adapter:	EthernetSettingsView		Adaptador:
-Apply	EthernetSettingsView		Aplicar
-Auto-configuring failed: 	EthernetSettingsView		A configuração automática falhou:
-DHCP	EthernetSettingsView		DHCP
-DNS #1:	EthernetSettingsView		DNS #1:
-DNS #2:	EthernetSettingsView		DNS #2:
-Disabled	EthernetSettingsView		Desactivado
-Domain:	EthernetSettingsView		Domínio:
-Gateway:	EthernetSettingsView		Gateway:
-IP address:	EthernetSettingsView		Endereço IP:
-Mode:	EthernetSettingsView		Modo:
-Netmask:	EthernetSettingsView		Máscara de Rede:
-OK	EthernetSettingsView		OK
-Revert	EthernetSettingsView		Reverter
-Static	EthernetSettingsView		Estático
-The net_server needs to run for the auto configuration!	EthernetSettingsView		O net_server precisa de correr para a configuração automática!
+1	portuguese	x-vnd.Haiku-Network	943149646
+Ethernet device	InterfaceListItem		Dispositivo Ethernet
+Link speed:	IntefaceView		Velocidade de ligação:
+disconnected	IntefaceView		desligado
+IP Address:	IntefaceAddressView		Endereço de IP:
+WPA	WPA protected network		WPA
+Network:	IntefaceView		Rede:
+Received:	IntefaceView		Dados recebidos:
+New…	NetworkWindow		Novo…
+no link	InterfaceListItem		sem ligação
+Other	NetworkWindow		Outro
+Sent:	IntefaceView		Dados enviados:
+Gateway:	IntefaceAddressView		Gateway:
+The netmask defines your local network	IntefaceAddressView		A máscara de sub-rede define a sua rede local
+Your IP address	IntefaceAddressView		O seu endereço de IP
+DHCP	IntefaceAddressView		DHCP
+Netmask:	IntefaceAddressView		Máscara de sub-rede:
+EAP	EAP protected network		EAP
+Services	NetworkWindow		Serviços
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		A instalação do NetworkStatus na Deskbar falhou: %s
+Revert	NetworkWindow		Reverter
+WEP	WEP protected network		WEP
+<no wireless networks found>	IntefaceView		<não foram detetadas redes sem fios>
+connected	IntefaceView		ligado
+Apply	IntefaceAddressView		Aplicar
+Disable	ServiceView		Desativar
+WPA2	WPA2 protected network		WPA2
+Show network status in Deskbar	NetworkWindow		Mostrar o estado da rede na Deskbar
+Mode:	IntefaceAddressView		Modo:
+connected	InterfaceListItem		ligado
+Static	IntefaceAddressView		Estático
+launch error	NetworkWindow		erro de inicialização
+Renegotiate	IntefaceView		Renegociar
+MAC address:	IntefaceView		Endereço MAC:
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+disabled	InterfaceListItem		desativado
+Dial-up connection	InterfaceListItem		Ligação Dial-up
+The method for obtaining an IP address	IntefaceAddressView		O método a utilizar para a obtenção de um endereço de IP
+Automatic	IntefaceAddressView		Automático
+Choose automatically	IntefaceView		Selecionar automaticamente
+Status:	IntefaceView		Estado:
+Disable	IntefaceView		Desativar
+Manage…	NetworkWindow		Gerir…
+open	Open network		aberto
+Network	NetworkWindow		Rede
+Your gateway to the internet	IntefaceAddressView		A sua porta de ligação à Internet
+Enable	ServiceView		Ativar
+Wireless device	InterfaceListItem		Dispositivo sem fios
+Disabled	IntefaceAddressView		Desativado
+VPN connection	InterfaceListItem		Ligação VPN

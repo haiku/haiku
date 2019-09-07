@@ -1,0 +1,11 @@
+1	portuguese	x-vnd.haiku-registrar	1998626824
+Cancel	ShutdownProcess		Cancelar
+Do you really want to shut down the system?	ShutdownProcess		Tem a certeza de que pretende desligar o computador?
+Shutdown status	ShutdownProcess		Estado do encerramento
+Shut down	ShutdownProcess		Desligar
+Restart system	ShutdownProcess		Reiniciar sistema
+Do you really want to restart the system?	ShutdownProcess		Tem a certeza de que pretende reiniciar o computador?
+Restart	ShutdownProcess		Reiniciar
+Asking other processes to quit.	ShutdownProcess		A solicitar o encerramento dos outros processos.
+Shutdown aborted	ShutdownProcess		Encerramento interrompido
+Asking \"%appName%\" to quit.	ShutdownProcess		A solicitar o encerramento de \"%appName%\".

@@ -1,0 +1,8 @@
+1	portuguese	x-vnd.Haiku-JPEG2000Translator	2851707544
+High	JPEG2000Translator		Alta
+Low	JPEG2000Translator		Baixa
+Output quality	JPEG2000Translator		Qualidade de saída
+About	JPEG2000Translator		Acerca
+Write black-and-white images as RGB24	JPEG2000Translator		Guardar imagens a preto-e-branco como RGB24
+Read	JPEG2000Translator		Leitura
+Read greyscale images as RGB32	JPEG2000Translator		Ler imagens em tons de cinza como RGB32

@@ -2,20 +2,20 @@
 no	Screen		no
 bits/pixel	Screen		bit/pixel
 15 bits/pixel, 32768 colors	Screen		15 bit/pixel, 32768 colori
-Rows:	Screen		Righe
+Rows:	Screen		Righe:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		Non è stato possibile impostare lo schermo:\n\t%s\n
 Keep	Screen		Mantieni
 /other…	Screen		/altro…
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Frequenza orizzontale:\t%lu - %lu kHz\nFrequenza verticale:\t%lu - %lu Hz\n\nMassimo clock dei pixel:\t%g MHz
-Refresh rate:	Screen		Ritmo di aggiornamento
+Refresh rate:	Screen		Ritmo di aggiornamento:
 Video format:	Screen		Formato video:
 Undo	Screen		Annulla
 OK	Screen		OK
 Current workspace	Screen		Spazio di lavoro attuale
 vertically	Screen		verticalmente
 All workspaces	Screen		Tutti gli spazi di lavoro
-Use laptop panel:	Screen		Usa pannello del portatile
+Use laptop panel:	Screen		Usa pannello del portatile:
 Could not write VESA mode settings file:\n\t	Screen		Non è stato possibile scrivere le impostazioni della modalità VESA:\n\t
 Settings will revert in %seconds.	Screen		Le impostazioni saranno ripristinate in %seconds secondi.
 Cancel	Screen		Cancella
@@ -39,7 +39,7 @@ Done	Screen		Applica
 Screen preferences by the Haiku team	Screen		Impostazioni schermo dal team di Haiku
 Refresh rate	Screen		Frequenza di aggiornamento
 if needed	Screen		se necessario
-Combine displays:	Screen		Combina schemi
+Combine displays:	Screen		Combina schermi:
 Unknown mode	Screen		Modalità sconosciuta
 About	Screen		Informazioni
 Columns:	Screen		Colonne:

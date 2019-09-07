@@ -1,0 +1,42 @@
+1	danish	x-vnd.Haiku-Repositories	1220143449
+This is not a valid URL.	AddRepoWindow	Add URL error message	Dette er ikke en gyldig URL.
+Repository URL:	AddRepoWindow	Text box label	Softwarekilde-URL:
+There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Der opstod en fejl ved genopfriskning af softwarekilde-mellemlageret til %name%
+There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Der opstod en fejl ved deaktivering af softwarekilden %name%
+Unknown	Constants	Unknown repository name	Ukendt
+Remove all	RepositoriesView	Button label	Fjern alle
+Enable repositories to use with package management:	RepositoriesView	Label text	Aktivér softwarekilder til brug med pakkehåndtering:
+Disable	RepositoriesView	Button label	Deaktivér
+Cancel task	TaskTimer	Button label	Annuller opgave
+Changes completed	RepositoriesView	Status view text	Ændringer fuldført
+Details	TaskLooper	Job log details header	Detaljer
+Enabled	RepoRow	Tag in the Status column	Aktiveret
+Remove	Constants	Button label	Fjern
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Der opstod en fejl ved aktivering af softwarekilden %url%
+Remove this repository?	RepositoriesView	Removal alert confirmation message	Fjern softwarekilden?
+The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	Opgaven til softwarekilden %name% er længe om at blive fuldført.
+Completed	TaskLooper	Completed task status message	Fuldført
+OK	Constants	Button label	OK
+Status	RepositoriesView	Column title	Status
+Name	RepositoriesView	Column title	Navn
+Add	AddRepoWindow	Button label	Tilføj
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Softwarekilderne kunne ikke indhente navnene på de softwarekilder som på nuværende tidspunkt er aktiveret.
+Enable all	RepositoriesView	Button label	Aktivér alle
+Aborted	TaskLooper	Aborted task status message	Afbrudt
+URL	RepositoriesView	Column title	URL
+Enable	RepositoriesView	Button label	Aktivér
+Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Fejl ved hentning af softwarekilde-konfiguration til %name%.
+Description	TaskLooper	Failed task error description	Beskrivelse
+Failed	TaskLooper	Failed task status message	Mislykkede
+Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Godt nyt! Opgaven til softwarekilden %name% blev fuldført.
+Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Nogle opgaver kører stadig. Stop opgaverne og afslut?
+This repository URL already exists.	RepositoriesView	Error message	Softwarekilde-URL'en findes allerede.
+Repositories	System name		Softwarekilder
+Changes pending:	RepositoriesView	Status view text	Afventende ændringer:
+Remove	RepositoriesView	Button label	Fjern
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	Fjerne disse softwarekilder?
+Keep trying	TaskTimer	Button label	Bliv ved med at prøve
+Cancel	Constants	Button label	Annuller
+Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Der kan kun aktiveres én URL for hver softwarekilde. Ændr venligst dine valg.
+Stop and quit	RepositoriesWindow	Button label	Stop og afslut
+Disable all	RepositoriesView	Button label	Deaktivér alle

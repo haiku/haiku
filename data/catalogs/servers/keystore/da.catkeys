@@ -1,0 +1,17 @@
+1	danish	x-vnd.Haiku-keystore_server	2429996361
+to perform the following action:\n%accessString%\n\n	AppAccessRequestWindow		til udførsel af følgende handling:\n%accessString%\n\n
+This application doesn't yet have the required privileges.	AppAccessRequestWindow		Programmet har endnu ikke de krævede rettigheder.
+Keyring:	KeyRequestWindow		Nøglering:
+requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		anmoder om adgang til nøglering:\n%keyringName%\n\n
+Application keyring access	AppAccessRequestWindow		Adgang for programnøglering
+Disallow	AppAccessRequestWindow		Nægt
+Allow once	AppAccessRequestWindow		Tillad én gang
+Unlock keyring	KeyRequestWindow		Lås op for nøglering
+An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		Et program vil have adgang til nøgleringen nedenfor, men den er låst med en adgangsfrase. Indtast venligst adgangsfrasen for at låse op for nøgleringen.\nHvis du låser op for nøgleringen, så bliver den ved med at være låst op, indtil systemet lukkes ned eller nøgleringen låses igen manuelt.\nHVis du vil annullere dialogen, så bliver nøgleringen ved med at være låst.
+Password:	KeyRequestWindow		Adgangskode:
+Cancel	KeyRequestWindow		Annuller
+This application has been updated since it was last granted access.	AppAccessRequestWindow		Programmet er blevet opdateret siden det sidst blev givet adgang.
+Allow always	AppAccessRequestWindow		Tillad altid
+Unlock	KeyRequestWindow		Lås op
+The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		Programmet:\n%signature% (%path%)\n\n
+This application hasn't been granted access before.	AppAccessRequestWindow		Programmet er ikke blevet givet adgang før.

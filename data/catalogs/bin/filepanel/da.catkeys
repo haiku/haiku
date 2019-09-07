@@ -1,0 +1,20 @@
+1	danish	x-vnd.mmu_man.filepanel	1802971238
+display a load/save file panel\n	FilePanelApp		vis et åbn-/gem-filpanel\n
+short\tlong\tdescription\n	FilePanelApp		kort\tlang\tbeskrivelse\n
+%s not a valid option\n	FilePanelApp		%s er ikke et gyldigt tilvalg\n
+-s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tbrug et gem-filpanel\n
+%s: this option requires a parameter\n	FilePanelApp		%s: tilvalget kræver en parameter\n
+-h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tvis anvendelse\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tbrug et indlæs-filpanel (standard)\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tsæt standardnavnet til når der gemmes\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tslags punkter der kan åbnes (variant): enhver kombination af f, d, s (fil (standard), mappe, symlink)\n
+%s: UNIMPLEMENTED\n	FilePanelApp		%s: UIMPLEMENTERET\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tsæt filpanelets vinduestitel\n
+-f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tuimplementeret\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		anvendelse: %s [-h]     [-d mappe]               [-l|-s]     [-t ttl]      [-1]       [-m]      [-a mønster]      [-f mønster]\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\ttillad kun valg af én fil\n
+-a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tuimplementeret\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tgør filpanelet modalt\n
+options:\n	FilePanelApp		tilvalg:\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tåbn ved <mappe>\n
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		anvendelse: %s [--help] [--directory mappe] [--load|--save] [--title ttl] [--single] [--modal] [--allow mønster] [--forbid mønster]\n

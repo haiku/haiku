@@ -1,0 +1,5 @@
+1	portuguese	x-vnd.Haiku-notification_server	2022780929
+Warning	NotificationWindow		Atenção
+Notification	NotificationWindow		Notificação
+OK	NotificationWindow		OK
+Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Não foi possível iniciar o monitor de configurações gerais.\nAlterações de filtro "ao vivo" desativadas.

@@ -1,0 +1,16 @@
+1	danish	x-vnd.haiku-package_daemon	1440586681
+Package changes	PackageResult	Window title	Pakkeændringer
+uninstall package %s\n	PackageResult	Don't change '%s' variable	afinstaller pakken %s\n
+ignore problem for now	PackageProblem		ignorer problemet for nu
+solution %d:	PackageProblem	Don't change the %d variable	løsning %d:
+The following problems have been encountered. Please select a solution for each:	PackageProblem		Stødte på følgende problemer. Vælg venligst en løsning til hver:
+Apply changes	PackageResult		Anvend ændringer
+Package daemon	PackageManager		Pakkedæmon
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	installer pakken %s fra softwarearkivet %s\n
+The following additional package changes have to be made:	PackageResult		Følgende yderligere pakkeændringer er foretaget:
+Warning	PackageManager		Advarsel
+Cancel	PackageProblem		Annuller
+don't activate package %source%	PackageProblem	don't change '%source%	aktivér ikke pakken %source%
+Cancel	PackageResult		Annuller
+Retry	PackageProblem		Prøv igen
+Package problems	PackageProblem	Window title	Pakkeproblemer

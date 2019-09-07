@@ -1,13 +1,11 @@
-1	dutch; flemish	x-vnd.Haiku-mount_server	1677274447
+1	dutch; flemish	x-vnd.Haiku-mount_server	819316177
 Mount read-only	AutoMounter		Betrek alleen-lezen
 Error mounting volume:\n\n%s	AutoMounter		Fout bij betrekken van gegevensdrager:\n\n%s
 Cancel	AutoMounter		Annuleren
 OK	AutoMounter		Oké
 Unmount error	AutoMounter		Fout bij het onttrekken
-The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Het bestandssysteem op deze gegevensdrager is niet het Haiku-bestandssysteem. Het wordt sterk aangeraden om het in alleen-lezen modus te betrekken. Dit zal onbedoeld dataverlies door fouten in Haiku voorkomen.
 Mount read/write	AutoMounter		Betrek lezen/schrijven
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		De schijf \"%s\" kon niet worden onttrokken:\n\t%s
-It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Aangeraden wordt om alle additionele Haiku-gegevendragers te betrekken in alleen-lezen-modus. Dit zal onbedoeld dataverlies door fouten in Haiku voorkomen.
 Mounting volume '%s'\n\n	AutoMounter		Betrekken van de gegevensdrager: '%s'\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Kon de schijf \"%s\" niet betrekken:\n\t%s\n\nMoet het onttrekken geforceerd worden?\n\nNota: Als een toepassing op dit moment naar het gegevensdrager schrijft, kan onttrekken dataverlies tot gevolg hebben.\n
 Force unmount	AutoMounter		Forceer onttrekking

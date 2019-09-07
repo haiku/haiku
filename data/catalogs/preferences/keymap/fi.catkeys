@@ -21,8 +21,8 @@ Belgian (point)	KeymapNames		Belgialainen (piste)
 Finnish	KeymapNames		Suomalainen
 Num lock	Keyboard Layout View		Numerolukko
 Switch shortcut keys to Windows/Linux mode	Keymap window		Vaihda pikanäppäimet Windows/Linux -tilaan
-Spanish (Dvorak)	KeymapNames		Espanjalainen (Dvorak)
 Option	Keyboard Layout View	Option key	Valitsin
+Spanish (Dvorak)	KeymapNames		Espanjalainen (Dvorak)
 Scroll lock	Keyboard Layout View		Vierityslukko
 US-International	KeymapNames		US-kansainvälinen
 Right option	Keyboard Layout View		Alt Gr-näppäin
@@ -65,13 +65,13 @@ Remove	Keyboard Layout View		Poista
 Tilde trigger	Keymap window		Aaltoviivaliipaisin
 Shift	Keyboard Layout View	Shift key	Vaihtonäppäin
 CONTROL	Keyboard Layout View		CONTROL
-Czech (Mac)	KeymapNames		Tšekkiläinen (Mac)
 Macedonian	KeymapNames		Makedonialainen
+Czech (Mac)	KeymapNames		Tšekkiläinen (Mac)
 Left command	Keyboard Layout View		Alt-näppäin
 Albanian	KeymapNames		Albanialainen
 (Current)	Keymap window		(Nykyinen)
-Friulian	KeymapNames		Friulian
 OPT	Keyboard Layout View	Very short for 'option'	OPT
+Friulian	KeymapNames		Friulian
 Left option	Keyboard Layout View		Vasen valitsin
 END	Keyboard Layout View		END
 Esperanto	KeymapNames		Esperantolainen
@@ -137,8 +137,8 @@ Norwegian	KeymapNames		Norjalainen
 Font	Keymap window		Kirjasin
 Danish	KeymapNames		Tanskalainen
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Vaihtonäppäin
-Russian	KeymapNames		Venäläinen
 PAUSE	Keyboard Layout View		PAUSE
+Russian	KeymapNames		Venäläinen
 Romanian	KeymapNames		Romanialainen
 CMD	Keyboard Layout View	Very short for 'command'	CMD
 Command	Keyboard Layout View	Command key	Komento

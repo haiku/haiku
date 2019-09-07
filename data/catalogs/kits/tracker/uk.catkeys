@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	2023640966
+1	ukrainian	x-vnd.Haiku-libtracker	838081337
 Created	ContainerWindow		Cтворений
 Open and make preferred	OpenWithWindow		Відкрити і зробити бажаною
 Open with…	ContainerWindow		Відкрити у…
@@ -23,6 +23,7 @@ Name	Default Query Columns		Ім'я
 Unmount	ContainerWindow		Відмонтувати
 Eject when unmounting	AutoMounterSettings		Виштовхнути після відмонтування
 Searching for disks to mount…	StatusWindow		Пошук дисків для монтування…
+Information	InfoWindow		Повідомлення
 Error emptying Trash	FSUtils		Помилка спустошення Кошика!
 Opens with:	InfoWindow		Відкрити за допомогою:
 Size	QueryPoseView		Розмір
@@ -402,6 +403,7 @@ by formula	FindPanel		за формулою
 is	FindPanel		є
 Move to Trash	FilePanelPriv		Перемістити до Кошика
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		При зміні назви теки system або її вмісту може стати неможливим завантаження %osName!\n\nВи впевнені що бажаєте цього? \n\nДля зміни назви теки system або її вмісту будь-що затиснувши кнопку Shift клікніть \"Переіменувати\".
+Permissions	FilePermissionsView		Дозволи
 40 x 40	ContainerWindow		40 x 40
 40 x 40	DeskWindow		40 x 40
 New folder %ld	FSUtils		Нова тека %ld

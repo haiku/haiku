@@ -1,0 +1,21 @@
+1	danish	x-vnd.Haiku-Touchpad	526581388
+Scrolling	TouchpadPrefView		Rul
+Tapping	TouchpadPrefView		Trykning
+Touchpad	System name		Touchpad
+Cancel	TouchpadPrefView		Annuller
+OK	TouchpadPrefView		OK
+Horizontal scrolling	TouchpadPrefView		Vandret rul
+Slow	TouchpadPrefView		Langsom
+Two finger scrolling	TouchpadPrefView		To-fingers rul
+No touchpad found, the settings will have no effect.	TouchpadPrefView		Ingen touchpad fundet, indstillingen har ingen virkning.
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Dette nye område er meget stort, og hæmmer måske musehandlinger. Er du sikker på, at du vil ændre det?
+Defaults	TouchpadPrefView		Standard
+High	TouchpadPrefView		Høj
+Off	TouchpadPrefView		Deaktivér
+Fast	TouchpadPrefView		Hurtig
+Vertical	TouchpadPrefView		Lodret
+Please confirm	TouchpadPrefView		Bekræft venligst
+Acceleration	TouchpadPrefView		Acceleration
+Horizontal	TouchpadPrefView		Vandret
+Sensitivity	TouchpadPrefView		Sensitivitet
+Revert	TouchpadPrefView		Tilbagefør

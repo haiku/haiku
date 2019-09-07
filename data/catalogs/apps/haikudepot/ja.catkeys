@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	4293876709
+1	japanese	x-vnd.Haiku-HaikuDepot	2601073644
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
 Check for updates…	MainWindow		更新をチェック…
 Uninstall	PackageManager		アンインストール
@@ -10,6 +10,7 @@ OK	App		OK
 Mostly stable	RatePackageWindow		ほとんど安定
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		アカウントが正常に作成されました。これからパッケージの評価やほかの便利なことができます。
 The response to the captcha was incorrect.	ServerHelper		キャプチャの回答が間違っていました
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		パッケージデーターの更新中に問題が発生しました。その問題によりデータが期限切れに、つまり、アプリケーションの表示から消えてしまいます。この問題に関する追加のデータは、アプリケーションのログから得られるかもしれません。
 Develop packages	MainWindow		開発用パッケージ
 Rate package…	PackageInfoView		パッケージを評価…
 Starting the package daemon failed:\n\n%Error%	App		パッケージデーモンの起動に失敗しました:\n\n%Error%
@@ -156,6 +157,7 @@ Pass phrase:	UserLoginWindow		パスフレーズ:
 Open %DeskbarLink%	PackageManager		%DeskbarLink% を開く
 Install	PackageManager		インストール
 Input validation	UserLoginWindow		入力検証
+View latest user usage conditions…	MainWindow		ユーザーの最新の使用状況を表示…
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		予期しないエラーが次の HaikuDepot サーバーから送信されました [%i]
 Log in…	MainWindow		ログイン…
 You need to be logged into an account before you can rate packages.	MainWindow		パッケージを評価する前にアカウントにログインする必要があります。

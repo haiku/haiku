@@ -1,26 +1,27 @@
-1	portuguese	x-vnd.Haiku.TV	2971561976
-Always on top	MainWin		Sempre visível
-Channel	MainWin		Canal
-DVB - Digital Video Broadcasting TV	MainWin		DVB - TV Digital Video Broadcasting
-Debug	MainWin		Depurar
-Error, connecting to interface failed:\n\n	MainWin		Erro, falha na ligação à interface:\n\n
-Error, interface is busy:\n\n	MainWin		Erro, a interface está ocupada:\n\n
-Full screen	MainWin		Ecrã inteiro
-Interface	MainWin		Interface
-Keep aspect ratio	MainWin		Manter a proporção
-Next channel	MainWin		Próximo canal
-No border	MainWin		Sem limite
+1	portuguese	x-vnd.Haiku.TV	1995288111
 No menu	MainWin		Sem menu
-None	MainWin		Nenhum
-OK	MainWin		OK
-Previous channel	MainWin		Canal anterior
-Quit	MainWin		Sair
-Scale to native size	MainWin		Ajustar para tamanho nativo
-Settings	MainWin		Definições
-Settings…	MainWin		Definições...
-TV	MainWin		TV
-force 544 x 576, display aspect 4:3	MainWin		forçar 544 x 576, aspecto de visualização 4:3
+No border	MainWin		Sem limite
 force 704 x 576, display aspect 4:3	MainWin		forçar 704 x 576, aspecto de visualização 4:3
-force 720 x 576, display aspect 4:3	MainWin		forçar 720 x 576, aspecto de visualização 4:3
-pixel aspect ratio	MainWin		proporção do pixel
+Error, connecting to interface failed:\n\n	MainWin		Erro, falha na ligação à interface:\n\n
+force 544 x 576, display aspect 4:3	MainWin		forçar 544 x 576, aspecto de visualização 4:3
+Full screen	MainWin		Ecrã inteiro
+Scale to native size	MainWin		Ajustar para tamanho nativo
 unknown	MainWin		desconhecido
+Next channel	MainWin		Próximo canal
+Keep aspect ratio	MainWin		Manter a proporção
+DVB - Digital Video Broadcasting TV	MainWin		DVB - TV Digital Video Broadcasting
+Always on top	MainWin		Sempre visível
+Debug	MainWin		Depurar
+Interface	MainWin		Interface
+force 720 x 576, display aspect 4:3	MainWin		forçar 720 x 576, aspecto de visualização 4:3
+Quit	MainWin		Sair
+Channel	MainWin		Canal
+Previous channel	MainWin		Canal anterior
+OK	MainWin		OK
+TV	MainWin		TV
+Settings	MainWin		Definições
+TV	System name		TV
+Settings…	MainWin		Definições…
+None	MainWin		Nenhum
+Error, interface is busy:\n\n	MainWin		Erro, a interface está ocupada:\n\n
+pixel aspect ratio	MainWin		proporção do pixel

@@ -1,0 +1,9 @@
+1	portuguese	x-vnd.Haiku-keystore_server	3434924656
+Keyring:	KeyRequestWindow		Porta-chaves:
+Allow once	AppAccessRequestWindow		Permitir uma vez
+Unlock keyring	KeyRequestWindow		Desbloquear porta-chaves
+Password:	KeyRequestWindow		Palavra-passe:
+Cancel	KeyRequestWindow		Cancelar
+Allow always	AppAccessRequestWindow		Permitir sempre
+Unlock	KeyRequestWindow		Desbloquear
+This application hasn't been granted access before.	AppAccessRequestWindow		Não foi concedido previamente acesso a esta aplicação.

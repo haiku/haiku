@@ -1,0 +1,74 @@
+1	danish	x-vnd.Haiku-MediaConverter	2251404027
+Writing audio track: %d%% complete	MediaConverter		Skrivning af lydspor: %d%% fuldført
+Input file not recognized as Audio or Video	MediaConverter		Inputfil ikke genkendt som lyd eller video
+%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2f fps
+Video quality: %3d%%	MediaConverter		Videokvalitet: %3d%%
+Source files	MediaConverter		Kildefiler
+Error writing video frame %ld	MediaConverter		Fejl ved skrivning af videobillede %ld
+Error converting '%filename'	MediaConverter		Fejl ved konvertering af '%filename'
+Selected directory not found. Defaulting to /boot/home	MediaConverter		Fandt ikke den valgte mappe. Bruger standard /boot/home
+Conversion completed	MediaConverter		Konvertering fuldført
+Audio:	MediaConverter-FileInfo		Lyd:
+MediaConverter+:SaveDirectory	MediaConverter		Mediekonvertering+:Gemmemappe
+Error creating video.	MediaConverter		Fejl ved oprettelse af video.
+Cancelling	MediaConverter		Annullerer
+None available	Audio codecs		Ingen tilgængelig
+No file selected	MediaConverter-FileInfo		Ingen fil valgt
+High	MediaConverter		Høj
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Filen blev ikke genkendt som en understøttede mediefil:} other{# filer blev ikke genkendt som understøttede mediefiler:}}
+File Error	MediaConverter-FileInfo		Filfejl
+None available	Video codecs		Ingen tilgængelig
+Output format	MediaConverter		Outputformat
+%.1f kHz mono	MediaFileInfo		%.1f kHz mono
+%.1f kHz stereo	MediaFileInfo		%.1f kHz stereo
+OK	MediaConverter		OK
+Error creating '%filename'	MediaConverter		Fejl ved oprettelse af '%filename'
+Error loading a file	MediaConverter		Fejl ved indlæsning af fil
+Encoder parameters	MediaConverter-EncoderWindow		Koderparametre
+Open…	Menu		Åbn…
+Audio encoding:	MediaConverter		Lydkodning:
+Audio quality: %3d%%	MediaConverter		Lydkvalitet: %3d%%
+Cancelling…	MediaConverter		Annullerer…
+Output file '%filename' created	MediaConverter		Outputfilen '%filename' blev oprettet
+Output folder	MediaConverter		Outputmappe
+Error creating track.	MediaConverter		Fejl ved oprettelse af spor.
+ seconds	MediaFileInfo		 sekunder
+Video using parameters form settings	MediaConverter		Video med parameterens formularindstillinger
+Video:	MediaConverter-FileInfo		Video:
+Select	MediaConverter		Vælg
+Conversion cancelled	MediaConverter		Konvertering annulleret
+Low	MediaConverter		Lav
+Error loading files	MediaConverter		Fejl ved indlæsning af filer
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bit}}
+End   [ms]: 	MediaConverter		Slut   [ms]: 
+Cancel	MediaConverter		Annuller
+OK	MediaConverter-FileInfo		OK
+Error read audio frame %ld	MediaConverter		Fejl ved læsning af lydbillede %ld
+Video encoding:	MediaConverter		Videokodning:
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Der opstod en fejl ved læsning af filinfoen.\n\nFejl : 
+Error	MediaConverter		Fejl
+File details	MediaConverter		Fildetaljer
+No audio	Audio codecs list		Ingen lyd
+Drop media files onto this window	MediaConverter		Drop mediefiler i vinduet
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# billede} other{# billeder}}
+Quit	Menu		Afslut
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# bytes}}
+Duration:	MediaConverter-FileInfo		Varighed:
+MediaConverter	System name		Mediekonvertering
+Error launching: %strError%	MediaConverter		Fejl ved start: %strError%
+File format:	MediaConverter		Filformat:
+Error writing audio frame %ld	MediaConverter		Fejl ved skrivning af lydbillede %ld
+File	Menu		Fil
+Video quality not supported	MediaConverter		Videokvalitet understøttes ikke
+Select this folder	MediaConverter		Vælg mappen
+Error read video frame %ld	MediaConverter		Fejl ved læsning af videobillede %ld
+%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanal
+%d bit 	MediaFileInfo		%d bit 
+No video	Video codecs list		Ingen video
+Continue	MediaConverter		Fortsæt
+Convert	MediaConverter		Konverter
+Audio quality not supported	MediaConverter		Lydkvalitet understøttes ikke
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Fejl ved skrivning til placering: %strPath%. Bruger standardplacering: /boot/home
+Writing video track: %d%% complete	MediaConverter		Skriver videospor: %d%% fuldført
+Preview	MediaConverter		Forhåndsvis
+Start [ms]: 	MediaConverter		Start [ms]: 

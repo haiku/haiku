@@ -1,0 +1,25 @@
+1	portuguese	x-vnd.Haiku-Repositories	622637338
+This is not a valid URL.	AddRepoWindow	Add URL error message	Este não é um URL válido.
+Repository URL:	AddRepoWindow	Text box label	URL do repositório:
+Unknown	Constants	Unknown repository name	Desconhecido
+Remove all	RepositoriesView	Button label	Remover tudo
+Enable repositories to use with package management:	RepositoriesView	Label text	Ativar os repositórios a utilizar com a gestão de pacotes:
+Cancel task	TaskTimer	Button label	Cancelar tarefa
+Details	TaskLooper	Job log details header	Detalhes
+Remove	Constants	Button label	Remover
+Remove this repository?	RepositoriesView	Removal alert confirmation message	Remover este repositório?
+Completed	TaskLooper	Completed task status message	Concluído
+Status	RepositoriesView	Column title	Estado
+Name	RepositoriesView	Column title	Nome
+Add	AddRepoWindow	Button label	Adicionar
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Repositórios não conseguiu recuperar os nomes dos repositórios que se encontram ativos.
+Aborted	TaskLooper	Aborted task status message	Interrompido
+Description	TaskLooper	Failed task error description	Descrição
+Failed	TaskLooper	Failed task status message	Falhou
+Repositories	System name		Repositórios
+Changes pending:	RepositoriesView	Status view text	Alterações pendentes:
+Remove	RepositoriesView	Button label	Remover
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	Remover estes repositórios?
+Keep trying	TaskTimer	Button label	Continuar a tentar
+Cancel	Constants	Button label	Cancelar
+Stop and quit	RepositoriesWindow	Button label	Parar e sair

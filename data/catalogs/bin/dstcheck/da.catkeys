@@ -1,0 +1,5 @@
+1	danish	x-vnd.Haiku-cmd-dstconfig	684321431
+Keep this time	dstcheck		Behold tiden
+Manually adjust time…	dstcheck		Manuel justering af tid…
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		OBS!\n\nPga. skiftet fra sommertid, kan din computers ur går en time forkert.\nDin computer tror det er %current time%.\n\nEr det den korrekte tid?
+Ask me later	dstcheck		Spørg mig senere

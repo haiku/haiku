@@ -1,0 +1,46 @@
+1	danish	x-vnd.Haiku-PowerStatus	3173765686
+Design capacity low warning: 	PowerStatus		Advarsel om designkapacitet lav: 
+Show percent	PowerStatus		Vis procent
+Design capacity: 	PowerStatus		Designkapacitet: 
+ mW	PowerStatus		 mW
+The battery level is getting low, please plug in the device.	PowerStatus		Batteriniveauet er ved at være lavt, sæt venligst strømstikket i enheden.
+Battery low	PowerStatus		Batteriet er lavt
+Type: 	PowerStatus		Type: 
+non-rechargeable	PowerStatus		ikke-genopladelig
+Empty battery slot	PowerStatus		Tom batteri plads
+ mV	PowerStatus		 mV
+Run in window	PowerStatus		Kør i vindue
+PowerStatus	System name		Strømstatus
+ mWh	PowerStatus		 mWh
+Battery info…	PowerStatus		Batteriinfo…
+Damaged battery	PowerStatus		Beskadiget batteri
+Show time	PowerStatus		Vis tid
+Last full charge: 	PowerStatus		Sidste fulde opladning: 
+Battery unused	PowerStatus		Batteri ubrugt
+Extended battery info	PowerStatus		Udviddet batteriinfo
+ mA	PowerStatus		 mA
+Current rate: 	PowerStatus		Nuværende rate: 
+discharging	PowerStatus		aflader
+Show text label	PowerStatus		Vis tekstetiket
+About…	PowerStatus		Om…
+Model number: 	PowerStatus		Modelnummer: 
+Install in Deskbar	PowerStatus		Installer i skrivebordslinje
+ mAh	PowerStatus		 mAh
+Capacity: 	PowerStatus		Kapacitet: 
+Battery discharging	PowerStatus		Batteri aflader
+Serial number: 	PowerStatus		Serienummer: 
+Battery critical	PowerStatus		Batteri kritisk
+Capacity granularity 1: 	PowerStatus		Kapacitet kornethed 1: 
+OEM info: 	PowerStatus		OEM-info: 
+Design voltage: 	PowerStatus		Designspænding: 
+Battery charging	PowerStatus		Batteri oplader
+The battery level is critical, please plug in the device immediately.	PowerStatus		Batteriniveauet er kritisk, sæt venligst strømstikket i enheden med det samme.
+Design capacity warning: 	PowerStatus		Advarsel om designkapacitet: 
+Quit	PowerStatus		Afslut
+rechargeable	PowerStatus		genopladeligt
+charging	PowerStatus		oplader
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Du kan køre strømstatus i et vindue eller installer det i skrivebordslinjen.
+Show status icon	PowerStatus		Vis statusikon
+Capacity granularity 2: 	PowerStatus		Kapacitet kornethed 2: 
+Technology: 	PowerStatus		Teknologi: 
+no battery	PowerStatus		intet batteri

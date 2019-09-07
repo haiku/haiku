@@ -1,0 +1,4 @@
+1	portuguese	x-vnd.Haiku-debug_server	3769319086
+Debug	DebugServer		Depurar
+Terminate	DebugServer		Terminar
+Save report	DebugServer		Guardar relatório

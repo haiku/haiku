@@ -1,0 +1,14 @@
+1	danish	x-vnd.Haiku-Keyboard	1711838804
+Written by Andrew Edward McCall	KeyboardApplication		Skrevet af Andrew Edward McCall
+Typing test area	KeyboardView		Prøveområde for indtastning
+Defaults	KeyboardWindow		Standarder
+Key repeat rate	KeyboardView		Tast gentagelses frekvens
+Revert	KeyboardWindow		Tilbagefør
+Delay until key repeat	KeyboardView		Pause inden tast gentagelse
+Keyboard	System name		Tastatur
+OK	KeyboardApplication		OK
+Fast	KeyboardView		Hurtig
+Slow	KeyboardView		Langsom
+Something has gone wrong!	KeyboardApplication		Et eller andet gik galt!
+Long	KeyboardView		Lang
+Short	KeyboardView		Kort

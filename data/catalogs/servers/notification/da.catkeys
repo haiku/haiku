@@ -1,0 +1,5 @@
+1	danish	x-vnd.Haiku-notification_server	2022780929
+Warning	NotificationWindow		Advarsel
+Notification	NotificationWindow		Underretning
+OK	NotificationWindow		OK
+Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Kunne ikke starte generel indstillingsovervågning.\nLivefilter ændringer er deaktiveret.

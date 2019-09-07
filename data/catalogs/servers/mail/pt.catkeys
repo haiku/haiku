@@ -1,0 +1,16 @@
+1	portuguese	x-vnd.Be-POST	2370492867
+No new messages	MailDaemon		Sem mensagens novas
+No new messages	DeskbarView		Sem mensagens novas
+Shutdown mail services	DeskbarView		Desligar serviços de correio
+Fetching mail for %name	Notifier		A obter correio para %name
+{0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# mensagem nova} other{# novas messagens}}
+{0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# mensagem nova} other{# mensagens novas}} para %name\n
+Create new message…	DeskbarView		Criar nova mensagem…
+Send pending mails	DeskbarView		Enviar mensagens pendentes
+Settings…	DeskbarView		Definições…
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Uma mensagem nova} other{# mensagens novas}}
+New Messages	MailDaemon		Mensagens Novas
+<no accounts>	DeskbarView		<nenhuma conta>
+Check for mails only	DeskbarView		Verificar apenas o correio
+Check for mail now	DeskbarView		Verificar correio agora
+Sending mail for %name	Notifier		A enviar correio para %name

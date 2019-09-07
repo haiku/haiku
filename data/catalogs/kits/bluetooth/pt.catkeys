@@ -1,0 +1,88 @@
+1	portuguese	x-vnd.Haiku-Bluetooth	3550394259
+Positioning	DeviceClass		A posicionar
+Controller	DeviceClass		Controlador
+Common ISDN access	DeviceClass		Acesso ISDN comum
+Unknown (reserved) minor device class	DeviceClass		Classe de dispositivos menores desconhecida (reservada)
+Uncategorized	DeviceClass		Não categorizado
+Keyboard	DeviceClass		Teclados
+Smart phone	DeviceClass		Smart phone
+VCR	DeviceClass		VCR
+Cellular	DeviceClass		Telemóvel
+Audio	DeviceClass		Áudio
+Audio/Video	DeviceClass		Áudio/Vídeo
+Car audio	DeviceClass		Áudio automóvel
+Major class: 	DeviceClass		Classe principal: 
+HiFi audio device	DeviceClass		Dispositivo de áudio HiFi
+Microphone	DeviceClass		Microfone
+Capturing	DeviceClass		A capturar
+Jacket	DeviceClass		Jaqueta
+50-67% utilized	DeviceClass		50-67% utilizados
+Headphones	DeviceClass		Auscultadores
+Imaging	DeviceClass		Imagem
+Device conforms to the headset profile	DeviceClass		O dispositivo está em conformidade com o perfil de auscultador
+Remote control	DeviceClass		Controlo remoto
+Fully available	DeviceClass		Totalmente disponível
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Not Valid name
+Server	DeviceClass		Servidor
+No service available	DeviceClass		Nenhum serviço disponível
+Printer	DeviceClass		Impressora
+Card reader	DeviceClass		Leitor de cartão
+Wired modem or voice gateway	DeviceClass		Modem Wired ou voice gateway
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Not Valid name
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Not Valid name
+Camcorder	DeviceClass		Câmara de filmar
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Not Valid name
+17-33% utilized	DeviceClass		17-33% utilizados
+Desktop workstation	DeviceClass		Estação de trabalho
+Unspecified	DeviceClass		Não especificado
+Miscellaneous	DeviceClass		Diversos
+Robot	DeviceClass		Robô
+Vehicle	DeviceClass		Veículo
+LAN access	DeviceClass		Acesso à LAN
+Glasses	DeviceClass		Óculos
+Phone	DeviceClass		Telefone
+Laptop	DeviceClass		Portátil
+67-83% utilized	DeviceClass		67-83% utilizados
+Cordless	DeviceClass		Sem fios
+Invalid device class!\n	DeviceClass		Classe inválida de dispositivo!\n
+Minor class: 	DeviceClass		Classe menor: 
+Doll/Action figure	DeviceClass		Boneca/Boneco
+Not implemented	RemoteDevice		Não implementado
+33-50% utilized	DeviceClass		33-50% utilizados
+Gaming/Toy	DeviceClass		Jogos/Brinquedos
+Video camera	DeviceClass		Câmara de vídeo
+Handheld	DeviceClass		Computador de Bolso ou PDA
+Service classes: 	DeviceClass		Classes de serviço: 
+Loudspeaker	DeviceClass		Altifalante
+83-99% utilized	DeviceClass		83-99% utilizados
+SIM card reader	DeviceClass		Leitor de cartão SIM
+Computer	DeviceClass		Computador
+Scanner	DeviceClass		Scanner
+Wearable	DeviceClass	A wearable computer	Wearable
+Display	DeviceClass		Ecrã
+Gamepad	DeviceClass		Gamepad
+Video monitor	DeviceClass		Monitor de vídeo
+Palm	DeviceClass	A palm-held device	Palm
+Joystick	DeviceClass		Joystick
+Networking	DeviceClass		Rede
+Telephony	DeviceClass		Telefonia
+Game	DeviceClass		Jogo
+Video display and loudspeaker	DeviceClass		Ecrã de vídeo e altifalante
+Wrist watch	DeviceClass		Relógio de pulso
+Sensing device	DeviceClass		Dispositivo de detecção
+Pointing device	DeviceClass		Dispositivo apontador
+(reserved)	DeviceClass		(reservado)
+Rendering	DeviceClass		A compor
+Information	DeviceClass		Informação
+Helmet	DeviceClass		Capacete
+Pager	DeviceClass	A small radio device to receive short text messages	Pager
+Hands-free	DeviceClass		Mãos livres
+Digitizer tablet	DeviceClass		Mesa digitalizadora
+Portable audio	DeviceClass		Áudio portátil
+Camera	DeviceClass		Câmara
+1-17% utilized	DeviceClass		1-17% utilizados
+Combo keyboard/pointing device	DeviceClass		Combo teclado/apontador dispositivo
+Video conferencing	DeviceClass		Videoconferência
+Peripheral	DeviceClass		Periférico
+Object transfer	DeviceClass		Transferência de objecto
+Set-top box	DeviceClass		Set-top box

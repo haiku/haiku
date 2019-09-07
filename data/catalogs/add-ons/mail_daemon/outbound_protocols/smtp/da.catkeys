@@ -1,0 +1,14 @@
+1	danish	x-vnd.Haiku-SMTP	815985329
+POP3 authentication failed. The server said:\n	smtp		POP3 godkendelse mislykkedes. Serveren sagde:\n
+Destination:	ConfigView		Destination:
+Error while logging in to %serv	smtp		Fejl ved indlogning til %serv
+Connecting to server…	smtp		Forbinder til server…
+Unencrypted	ConfigView		Ukrypteret
+. The server says:\n	smtp		. Serveren siger:\n
+Error while opening connection to %serv	smtp		Fejl ved åbning af forbindelse til %serv
+. The server said:\n	smtp		. Serveren sagde:\n
+None	ConfigView		Ingen
+SMTP server:	ConfigView		SMTP-server:
+ESMTP	ConfigView		ESMTP
+POP3 before SMTP	ConfigView		POP3 før SMTP
+SSL	ConfigView		SSL

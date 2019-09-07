@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	2023640966
+1	french	x-vnd.Haiku-libtracker	2813094656
 Created	ContainerWindow		Créé
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
 Open with…	ContainerWindow		Ouvrir avec…
@@ -402,6 +402,7 @@ by formula	FindPanel		par formule
 is	FindPanel		est
 Move to Trash	FilePanelPriv		Envoyer à la corbeille
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Si vous renommez le dossier système ou son contenu, vous ne pourrez plus démarrer %osName !\n\nÊtes vous sûr de vouloir le faire ?\n\nPour renommer quand-même le dossier système ou son contenu , maintenez la touche Majuscule enfoncée et cliquez sur « renommer ».
+Permissions	FilePermissionsView		Permissions
 40 x 40	ContainerWindow		40 x 40
 40 x 40	DeskWindow		40 x 40
 New folder %ld	FSUtils		Nouveau dossier %ld

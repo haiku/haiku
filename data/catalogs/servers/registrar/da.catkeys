@@ -1,0 +1,23 @@
+1	danish	x-vnd.haiku-registrar	2599857937
+Cancel	ShutdownProcess		Annuller
+OK	ShutdownProcess		OK
+Do you really want to shut down the system?	ShutdownProcess		Vil du virkelig lukke ned for systemet?
+Shutdown status	ShutdownProcess		Status for nedlukning
+Shut down	ShutdownProcess		Luk ned
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Programmet \"%appName%\" blokeres måske på et modalt panel.
+System is shut down	ShutdownProcess		Systemet er lukket ned
+Restart system	ShutdownProcess		Genstart systemet
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Programmet \"%appName%\" har afbrudt nedlukningsprocessen.
+Asking background applications to quit.	ShutdownProcess		Spørger baggrundsprogrammer om at afslutte.
+Do you really want to restart the system?	ShutdownProcess		Vil du virkelig genstarte systemet?
+Restart	ShutdownProcess		Genstart
+It's now safe to turn off the computer.	ShutdownProcess		Det er nu sikkert at slukke computeren.
+Asking other processes to quit.	ShutdownProcess		Spørger andre processer om at afslutte.
+Cancel shutdown	ShutdownProcess		Annuller nedlukning
+Restarting…	ShutdownProcess		Genstarter…
+%action%?	ShutdownProcess		%action%?
+Tidying things up a bit.	ShutdownProcess		Rydder lidt op.
+Kill application	ShutdownProcess		Dræb program
+Shutdown aborted	ShutdownProcess		Nedlukning afbrudt
+Shutting down…	ShutdownProcess		Lukker ned…
+Asking \"%appName%\" to quit.	ShutdownProcess		Spørger \"%appName%\" om at afslutte.

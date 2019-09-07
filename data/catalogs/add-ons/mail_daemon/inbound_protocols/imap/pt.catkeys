@@ -1,0 +1,11 @@
+1	portuguese	x-vnd.Haiku-IMAP	1310086832
+Failed to fetch available storage.	IMAPFolderConfig		Falha ao obter armazenamento disponível.
+Cancel	IMAPFolderConfig		Cancelar
+OK	IMAPFolderConfig		OK
+No encryption	imap_config		Não encriptado
+Configure IMAP Folders	imap_config		Configurar Pastas IMAP
+SSL	imap_config		SSL
+Apply	IMAPFolderConfig		Aplicar
+status	IMAPFolderConfig		estado
+IMAP Folders	IMAPFolderConfig		Pastas IMAP
+Destination:	imap_config		Destino:

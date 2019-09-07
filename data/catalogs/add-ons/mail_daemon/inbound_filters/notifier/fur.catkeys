@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-NewMailNotification	2111731137
+1	friulian	x-vnd.Haiku-NewMailNotification	1375000288
 Log window	NotifierConfigView		Barcon dal regjistri
 none	NotifierConfigView		nissun
 New mails notification	NotifierFilter		Notifiche gnove pueste
@@ -11,3 +11,4 @@ Central beep	NotifierConfigView		Bip centrâl
 New messages	NotifierFilter		Gnûfs messaçs
 Method:	NotifierConfigView		Metodi:
 Keyboard LEDs	NotifierConfigView		LED de tastiere
+You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		Tu âs {0, plural, one{ung gnûf messaç} other{# gnûfs messaçs}} su %account.
