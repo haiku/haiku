@@ -28,6 +28,7 @@ HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_WLAN);
 HAIKU_FIRMWARE_VERSION(1);
 HAIKU_FIRMWARE_NAME_MAP(6) = {
 	{"iwm3160fw", "iwm-3160-17.ucode"},
+	{"iwm3168fw", "iwm-3168-22.ucode"},
 	{"iwm7260fw", "iwm-7260-17.ucode"},
 	{"iwm7265fw", "iwm-7265-17.ucode"},
 	{"iwm7265Dfw", "iwm-7265D-22.ucode"},

@@ -40,11 +40,11 @@ KernelAddon idualwifi7260 :
 	;
 
 HAIKU_WIFI_FIRMWARE_PACKAGES on idualwifi7260 =
-	iwm-3160-ucode-17
+	iwm-3160-ucode-17 iwm-3168-ucode-22
 	iwm-7260-ucode-17 iwm-7265-ucode-17 iwm-7265D-ucode-22
 	iwm-8000C-ucode-22 iwm-8265-ucode-22 ;
 HAIKU_WIFI_FIRMWARE_ARCHIVES on idualwifi7260 =
-	iwm-3160-ucode-17.tgz
+	iwm-3160-ucode-17.tgz iwm-3168-ucode-22.tgz
 	iwm-7260-ucode-17.tgz iwm-7265-ucode-17.tgz iwm-7265D-ucode-22.tgz
 	iwm-8000C-ucode-22.tgz iwm-8265-ucode-22.tgz ;
 HAIKU_WIFI_FIRMWARE_DO_EXTRACT on idualwifi7260 = true ;
