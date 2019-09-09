@@ -22,6 +22,7 @@
 /*!
 	\enum alert_type
 	\ingroup interface
+	\brief Type of alert.
 
 	Determines which icon (if any) is displayed in the alert dialog.
 	Choose one option. If the constructor doesn't include an
@@ -83,6 +84,7 @@
 /*!
 	\enum button_spacing
 	\ingroup interface
+	\brief Method of spacing of buttons in alerts.
 
 	Determines how the buttons on the alert dialog are spaced relative
 	to each other. Choose one option. If the constructor doesn't include a
@@ -164,6 +166,21 @@ int32 button_index = alert->Go();
 
 	The Go() method does the work of loading up and removing the alert
 	window and returns the index of the button that the user selected.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BAlert::BAlert()
+	\brief Create an unconfigured BAlert dialog.
+
+	This method creates an unconfigured BAlert. You can configure it with
+	methods like SetText(), SetType() and SetButtonSpacing.
+
+	It is advised to use one of the other constructors that help set up all
+	the configuration in one go, instead of doing it piece by piece with this
+	method. 
 
 	\since BeOS R3
 */
@@ -303,6 +320,67 @@ int32 button_index = alert->Go();
 
 
 /*!
+	\fn alert_type BAlert::Type() const
+	\brief Get the alert_type of this alert.
+
+	\return Returns one of the values from the alert_type enum.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BAlert::SetType(alert_type type)
+	\brief Set the type of the alert.
+
+	\param type Pass one of the alert_type enum values to set the type.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BAlert::SetIcon(BBitmap *bitmap)
+	\brief Set a custom icon for the alert.
+
+	\param bitmap A valid BBitmap. The bitmap is copied. 
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BAlert::SetText(const char *text)
+	\brief Set the text for the alert.
+
+	\param text The text you want the alert to display.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BAlert::SetButtonSpacing(button_spacing spacing)
+	\brief Set the button spacing for the alert.
+
+	\param spacing Pass one of the button_spacing values to configure the
+		spacing.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BAlert::SetButtonWidth(button_width width)
+	\brief Set the button width for the buttons of the alert.
+
+	\param width Pass one of the button_width values to configure the width.
+
+	\since BeOS R3
+*/
+
+
+/*!
 	\fn void BAlert::SetShortcut(int32 index, char key)
 	\brief Sets the shortcut character which is mapped to a button at the
 	       specified \a index.
@@ -387,6 +465,29 @@ int32 button_index = alert->Go();
 	\brief Resizes the alert dialog.
 
 	\copydetails BWindow::FrameResized()
+*/
+
+
+/*!
+	\fn void BAlert::AddButton(const char *label, char key=0)
+	\brief Adds a button to the alert.
+
+	\param label The label of the button.
+	\param key The key a user can press to quickly select this button.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn int32 BAlert::CountButtons() const
+	\brief Counts the number of buttons in the alert.
+
+	\return The number of buttons in this alert window.
+
+	\see AddButton() and ButtonAt()
+
+	\since BeOS R3
 */
 
 

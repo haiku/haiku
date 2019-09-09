@@ -1,0 +1,209 @@
+/*
+ * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Name, email@email.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/Alignment.h	 hrev32745
+ *		src/kits/interface/Alignment.cpp	 hrev18649
+ */
+
+
+/*!
+	\file Alignment.h
+	\ingroup interface
+	\brief Undocumented file.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BAlignment
+	\ingroup interface
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var alignment BAlignment::horizontal
+	\brief Undocumented public variable
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var vertical_alignment BAlignment::vertical
+	\brief Undocumented public variable
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAlignment::BAlignment()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAlignment::BAlignment(const BAlignment &other)
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAlignment::BAlignment(alignment horizontal, vertical_alignment vertical)
+	\brief Undocumented public method
+
+	\param horizontal Undocumented
+	\param vertical Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn alignment BAlignment::Horizontal() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn vertical_alignment BAlignment::Vertical() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn float BAlignment::RelativeHorizontal() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn float BAlignment::RelativeVertical() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BAlignment::SetHorizontal(alignment horizontal)
+	\brief Undocumented public method
+
+	\param horizontal Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BAlignment::SetVertical(vertical_alignment vertical)
+	\brief Undocumented public method
+
+	\param vertical Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BAlignment::IsHorizontalSet() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BAlignment::IsVerticalSet() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BAlignment::operator==(const BAlignment &other) const
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BAlignment::operator!=(const BAlignment &other) const
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAlignment & BAlignment::operator=(const BAlignment &other)
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
