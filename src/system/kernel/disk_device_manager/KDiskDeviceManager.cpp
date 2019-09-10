@@ -986,31 +986,33 @@ KDiskDeviceManager::LoadNextDiskSystem(int32* cookie)
 status_t
 KDiskDeviceManager::InitialDeviceScan()
 {
-	status_t error = B_ERROR;
-
 	// scan for devices
 	if (ManagerLocker locker = this) {
-		error = _Scan("/dev/disk");
+		status_t error = _Scan("/dev/disk");
 		if (error != B_OK)
 			return error;
 	}
 
 	// scan the devices for partitions
 	int32 cookie = 0;
+	status_t status = B_OK;
 	while (KDiskDevice* device = RegisterNextDevice(&cookie)) {
 		PartitionRegistrar _(device, true);
 		if (DeviceWriteLocker deviceLocker = device) {
 			if (ManagerLocker locker = this) {
-				error = _ScanPartition(device, false);
+				status_t error = _ScanPartition(device, false);
 				device->UnmarkBusy(true);
 				if (error != B_OK)
-					break;
+					status = error;
+				// Even if we could not scan this partition, we want to try
+				// and scan the rest. Just because one partition is invalid
+				// or unscannable does not mean the ones after it are.
 			} else
 				return B_ERROR;
 		} else
 			return B_ERROR;
 	}
-	return error;
+	return status;
 }
 
 
@@ -1091,21 +1093,23 @@ KDiskDeviceManager::RescanDiskSystems()
 
 	// rescan existing devices with the new disk systems
 	int32 cookie = 0;
+	status_t status = B_OK;
 	while (KDiskDevice* device = RegisterNextDevice(&cookie)) {
 		PartitionRegistrar _(device, true);
 		if (DeviceWriteLocker deviceLocker = device) {
 			if (ManagerLocker locker = this) {
-				status_t status = _ScanPartition(device, false, &addedSystems);
+				status_t error = _ScanPartition(device, false, &addedSystems);
 				device->UnmarkBusy(true);
-				if (status != B_OK)
-					break;
+				if (error != B_OK)
+					status = error;
+				// See comment in InitialDeviceScan().
 			} else
 				return B_ERROR;
 		} else
 			return B_ERROR;
 	}
 
-	return B_OK;
+	return status;
 }
 
 
