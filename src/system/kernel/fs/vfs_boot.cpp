@@ -360,9 +360,11 @@ get_boot_partitions(KMessage& bootVolume, PartitionStack& partitions)
 
 	status = manager->InitialDeviceScan();
 	if (status != B_OK) {
-		dprintf("KDiskDeviceManager::InitialDeviceScan() failed: %s\n",
+		dprintf("KDiskDeviceManager::InitialDeviceScan() returned error: %s\n",
 			strerror(status));
-		return status;
+		// InitialDeviceScan returns error if one (or more) partitions are
+		// determined to be invalid. The partition we are trying to boot from
+		// may be usuable anyway, so don't fail here.
 	}
 
 #if KDEBUG
