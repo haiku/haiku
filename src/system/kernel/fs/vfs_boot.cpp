@@ -365,13 +365,14 @@ get_boot_partitions(KMessage& bootVolume, PartitionStack& partitions)
 		return status;
 	}
 
-	if (1 /* dump devices and partitions */) {
-		KDiskDevice *device;
-		int32 cookie = 0;
-		while ((device = manager->NextDevice(&cookie)) != NULL) {
-			device->Dump(true, 0);
-		}
+#if KDEBUG
+	// dump devices and partitions
+	KDiskDevice *device;
+	int32 cookie = 0;
+	while ((device = manager->NextDevice(&cookie)) != NULL) {
+		device->Dump(true, 0);
 	}
+#endif
 
 	struct BootPartitionVisitor : KPartitionVisitor {
 		BootPartitionVisitor(BootMethod* bootMethod, PartitionStack &stack)
