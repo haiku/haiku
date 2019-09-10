@@ -11,8 +11,8 @@ SEARCH_SOURCE += $(bfsTop) ;
 		USER=1
 	;
 
-	if $(DEBUG) = 0 {
-		# the gcc on BeOS doesn't compile BFS correctly with -O2 or more
+	if $(TARGET_PACKAGING_ARCH) = x86_gcc2 {
+		# GCC2 doesn't compile BFS correctly with -O2 or more
 		OPTIM = -O1 ;
 	}
 
