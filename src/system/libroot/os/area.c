@@ -17,6 +17,8 @@ create_area(const char *name, void **address, uint32 addressSpec, size_t size,
 {
 	if (__gABIVersion < B_HAIKU_ABI_GCC_2_HAIKU)
 		protection |= B_EXECUTE_AREA;
+	if (__gAPIVersion < B_HAIKU_VERSION_1_PRE_BETA_2)
+		protection |= B_CLONEABLE_AREA;
 	return _kern_create_area(name, address, addressSpec, size, lock, protection);
 }
 
