@@ -93,13 +93,18 @@ rldexport_init(void)
 
 
 /*!	Is called for all images, and sets the minimum ABI version found to the
-	gRuntimeLoader.abi_version field.
+	gRuntimeLoader.abi_version field and the minimum API version found to the
+	gRuntimeLoader.api_version field.
 */
 void
-set_abi_version(int abi_version)
+set_abi_api_version(int abi_version, int api_version)
 {
 	if (gRuntimeLoader.abi_version == 0
 		|| gRuntimeLoader.abi_version > abi_version) {
 		gRuntimeLoader.abi_version = abi_version;
+	}
+	if (gRuntimeLoader.api_version == 0
+		|| gRuntimeLoader.api_version > api_version) {
+		gRuntimeLoader.api_version = api_version;
 	}
 }

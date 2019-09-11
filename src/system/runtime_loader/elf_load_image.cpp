@@ -641,7 +641,7 @@ load_image(char const* name, image_type type, const char* rpath,
 		#endif
 	}
 
-	set_abi_version(image->abi);
+	set_abi_api_version(image->abi, image->api_version);
 
 	// init gcc version dependent image flags
 	// symbol resolution strategy

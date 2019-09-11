@@ -57,6 +57,7 @@ struct rld_export {
 	const struct user_space_program_args *program_args;
 	const void* commpage_address;
 	int abi_version;
+	int api_version;
 };
 
 extern struct rld_export *__gRuntimeLoader;

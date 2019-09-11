@@ -19,6 +19,7 @@ extern "C" {
 #endif
 
 extern int __gABIVersion;
+extern int __gAPIVersion;
 
 extern char _single_threaded;
 	/* This determines if a process runs single threaded or not */
