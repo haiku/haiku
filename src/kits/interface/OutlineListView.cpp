@@ -890,7 +890,7 @@ BOutlineListView::ExpandOrCollapse(BListItem* item, bool expand)
 				// adjust the indexes to correspond to their new visible positions
 				fFirstSelected -= count;
 				fLastSelected -= count;
-		}			
+		}
 
 		int32 maxIndex = fList.CountItems() - 1;
 		if (fFirstSelected > maxIndex)
@@ -931,8 +931,13 @@ BOutlineListView::DrawLatch(BRect itemRect, int32 level, bool collapsed,
 	int32 arrowDirection = collapsed ? BControlLook::B_RIGHT_ARROW
 		: BControlLook::B_DOWN_ARROW;
 
+	float tintColor = B_DARKEN_4_TINT;
+	if (base.red + base.green + base.blue <= 128 * 3) {
+		tintColor = B_LIGHTEN_2_TINT;
+	}
+
 	be_control_look->DrawArrowShape(this, latchRect, itemRect, base,
-		arrowDirection, 0, B_DARKEN_4_TINT);
+		arrowDirection, 0, tintColor);
 }
 
 
