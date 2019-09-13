@@ -801,6 +801,7 @@ void GlutWindow::MessageReceived(BMessage *message)
 	 	break;
 	}
 	default:
+		BGLView::MessageReceived(message);
 	 	break;
 	}
 }
