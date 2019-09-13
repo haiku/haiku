@@ -506,7 +506,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 			.Add(fTVStandardField->CreateMenuBarLayoutItem(), 1, 6)
 		.End();
 
-	fBrightnessSlider = new BSlider("brightness", "Brightness",
+	fBrightnessSlider = new BSlider("brightness", B_TRANSLATE("Brightness:"),
 		NULL, 0, 255, B_HORIZONTAL);
 
 	status_t result = screen.GetBrightness(&fOriginalBrightness);
