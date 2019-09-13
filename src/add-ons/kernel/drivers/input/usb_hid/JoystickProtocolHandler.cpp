@@ -19,6 +19,8 @@
 #include <string.h>
 #include <usb/USB_hid.h>
 
+#include <kernel.h>
+
 
 JoystickProtocolHandler::JoystickProtocolHandler(HIDReport &report)
 	:
@@ -271,7 +273,11 @@ JoystickProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 			if (result != B_OK)
 				return result;
 
-			fJoystickModuleInfo = *(joystick_module_info *)buffer;
+			if (!IS_USER_ADDRESS(buffer)
+				|| user_memcpy(&fJoystickModuleInfo, buffer,
+					sizeof(joystick_module_info)) != B_OK) {
+				return B_BAD_ADDRESS;
+			}
 
 			bool supportsVariable = (fJoystickModuleInfo.flags
 				& js_flag_variable_size_reads) != 0;
@@ -298,15 +304,19 @@ JoystickProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 			fJoystickModuleInfo.num_sticks = 1;
 			fJoystickModuleInfo.config_size = 0;
 			mutex_unlock(&fUpdateLock);
-			break;
+			return B_OK;
 		}
 
 		case B_JOYSTICK_GET_DEVICE_MODULE:
 			if (length < sizeof(joystick_module_info))
 				return B_BAD_VALUE;
 
-			*(joystick_module_info *)buffer = fJoystickModuleInfo;
-			break;
+			if (!IS_USER_ADDRESS(buffer)
+				|| user_memcpy(buffer, &fJoystickModuleInfo,
+					sizeof(joystick_module_info)) != B_OK) {
+				return B_BAD_ADDRESS;
+			}
+			return B_OK;
 	}
 
 	return B_ERROR;
