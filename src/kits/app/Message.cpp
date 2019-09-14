@@ -165,8 +165,9 @@ BMessage::BMessage(BMessage* other)
 BMessage::BMessage(uint32 _what)
 {
 	DEBUG_FUNCTION_ENTER;
-	_InitCommon(true);
-	fHeader->what = what = _what;
+	if (_InitCommon(true))
+		fHeader->what = _what;
+	what = _what;
 }
 
 
