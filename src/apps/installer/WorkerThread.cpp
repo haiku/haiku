@@ -117,6 +117,12 @@ public:
 	virtual bool ShouldCopyEntry(const BEntry& entry, const char* path,
 		const struct stat& statInfo, int32 level) const
 	{
+		if (S_ISBLK(statInfo.st_mode) || S_ISCHR(statInfo.st_mode)
+				|| S_ISFIFO(statInfo.st_mode) || S_ISSOCK(statInfo.st_mode)) {
+			printf("skipping '%s', it is a special file.\n", path);
+			return false;
+		}
+
 		if (fIgnorePaths.find(path) != fIgnorePaths.end()) {
 			printf("ignoring '%s'.\n", path);
 			return false;
