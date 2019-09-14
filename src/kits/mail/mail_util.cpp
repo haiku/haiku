@@ -189,7 +189,7 @@ read_read_attr(BNode& node, read_flags& flag)
 
 	BString statusString;
 	if (node.ReadAttrString(B_MAIL_ATTR_STATUS, &statusString) == B_OK) {
-		if (statusString.ICompare("New"))
+		if (statusString.ICompare("New") == 0)
 			flag = B_UNREAD;
 		else
 			flag = B_READ;
