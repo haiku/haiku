@@ -325,8 +325,7 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 	legctlsts |= XHCI_LEGCTLSTS_EVENTS_SMI;
 	WriteCapReg32(eecp + XHCI_LEGCTLSTS, legctlsts);
 
-	// On Intel's Panther Point and Lynx Point Chipset taking ownership
-	// of EHCI owned ports, is what we do here.
+	// We need to explicitly take ownership of EHCI ports on earlier Intel chipsets.
 	if (fPCIInfo->vendor_id == PCI_VENDOR_INTEL) {
 		switch (fPCIInfo->device_id) {
 			case PCI_DEVICE_INTEL_PANTHER_POINT_XHCI:
