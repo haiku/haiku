@@ -126,8 +126,8 @@ TeamBarMenuItem::DrawBar(bool force)
 	rgb_color highColor = menu->HighColor();
 	frame.right -=  24;
 	frame.left = frame.right-kBarWidth;
-	frame.top += 5;
-	frame.bottom = frame.top+8;
+	frame.top += kBarPadding;
+	frame.bottom -= kBarPadding;
 
 	if (fKernel < 0)
 		return;

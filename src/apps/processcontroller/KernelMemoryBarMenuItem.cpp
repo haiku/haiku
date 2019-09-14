@@ -73,8 +73,8 @@ KernelMemoryBarMenuItem::DrawBar(bool force)
 	rgb_color highColor = menu->HighColor();
 
 	// draw the bar itself
-	BRect cadre (frame.right - kMargin - kBarWidth, frame.top + 5,
-		frame.right - kMargin, frame.top + 13);
+	BRect cadre (frame.right - kMargin - kBarWidth, frame.top + kBarPadding,
+		frame.right - kMargin, frame.bottom  - kBarPadding);
 
 	if (fLastSum < 0)
 		force = true;
@@ -104,7 +104,6 @@ KernelMemoryBarMenuItem::DrawBar(bool force)
 			menu->SetHighColor(gKernelColorSelected);
 		else
 			menu->SetHighColor(gKernelColor);
-//		menu->SetHighColor(gKernelColor);
 		menu->FillRect (r);
 	}
 	r.left = grenze1;
@@ -120,7 +119,6 @@ KernelMemoryBarMenuItem::DrawBar(bool force)
 			menu->SetHighColor(tint_color (kLavender, B_HIGHLIGHT_BACKGROUND_TINT));
 		else
 			menu->SetHighColor(kLavender);
-//		menu->SetHighColor(gUserColor);
 		menu->FillRect (r);
 	}
 	r.left = grenze2;

@@ -118,8 +118,8 @@ MemoryBarMenuItem::DrawBar(bool force)
 
 	// draw the bar itself
 
-	BRect rect(frame.right - kMargin - kBarWidth, frame.top + 5,
-		frame.right - kMargin, frame.top + 13);
+	BRect rect(frame.right - kMargin - kBarWidth, frame.top + kBarPadding,
+		frame.right - kMargin, frame.bottom - kBarPadding);
 	if (fWriteMemory < 0)
 		return;
 
