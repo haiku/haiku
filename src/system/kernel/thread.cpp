@@ -3008,12 +3008,12 @@ thread_check_permissions(const Thread* currentThread, const Thread* thread,
 	if (thread->team->id == team_get_kernel_team_id())
 		return false;
 
-	if (thread->team != currentThread->team
-			&& currentThread->team->effective_uid != 0
-			&& thread->team->real_uid != currentThread->team->real_uid)
-		return false;
+	if (thread->team == currentThread->team
+			|| currentThread->team->effective_uid == 0
+			|| thread->team->real_uid == currentThread->team->real_uid)
+		return true;
 
-	return true;
+	return false;
 }
 
 
