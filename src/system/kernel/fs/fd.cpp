@@ -822,6 +822,13 @@ common_user_vector_io(int fd, off_t pos, const iovec* userVecs, size_t count,
 
 	ssize_t bytesTransferred = 0;
 	for (uint32 i = 0; i < count; i++) {
+		if (!IS_USER_ADDRESS(vecs[i].iov_base)) {
+			status = B_BAD_ADDRESS;
+			if (bytesTransferred == 0)
+				return status;
+			break;
+		}
+
 		size_t length = vecs[i].iov_len;
 		if (write) {
 			status = descriptor->ops->fd_write(descriptor, pos,
