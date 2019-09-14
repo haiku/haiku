@@ -24,6 +24,7 @@ typedef struct mutex {
 	spinlock				lock;
 #if KDEBUG
 	thread_id				holder;
+	uint16					_unused;
 #else
 	int32					count;
 	uint16					ignore_unlock_count;
@@ -38,6 +39,8 @@ typedef struct recursive_lock {
 	mutex		lock;
 #if !KDEBUG
 	thread_id	holder;
+#else
+	int32		_unused;
 #endif
 	int			recursion;
 } recursive_lock;
