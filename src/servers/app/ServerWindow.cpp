@@ -2451,7 +2451,21 @@ fDesktop->LockSingleWindow();
 		}
 
 		default:
-			_DispatchViewDrawingMessage(code, link);
+			// The drawing code handles allocation failures using exceptions;
+			// so we need to account for that here.
+			try {
+				_DispatchViewDrawingMessage(code, link);
+			} catch (std::bad_alloc&) {
+				// Cancel any message we were in the middle of sending.
+				fLink.CancelMessage();
+
+				if (link.NeedsReply()) {
+					// As done in _DispatchViewDrawingMessage, send just a
+					// single status_t as the reply.
+					fLink.StartMessage(B_NO_MEMORY);
+					fLink.Flush();
+				}
+			}
 			break;
 	}
 }
