@@ -1,10 +1,11 @@
-1	indonesian	x-vnd.Haiku-LaunchBox	3692177981
+1	indonesian	x-vnd.Haiku-LaunchBox	1530497419
 Set description…	LaunchBox		Atur deskripsi…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Sungguhan menutup pad ini?\n(Padnya tidak akan diingat.)
 OK	LaunchBox		OKE
 Ignore double-click	LaunchBox		Abaikan klik dua kali
 Show on all workspaces	LaunchBox		Tampilkan di semua workspace
 Name Panel	LaunchBox		Panel Nama
+Autostart	LaunchBox		Autostart
 Clone	LaunchBox		Klon
 Description for '%3'	LaunchBox		Deskripsi untuk '%3'
 Show window border	LaunchBox		Tampilkan batas jendela

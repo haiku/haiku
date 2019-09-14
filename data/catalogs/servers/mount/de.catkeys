@@ -1,9 +1,10 @@
-1	german	x-vnd.Haiku-mount_server	819316177
+1	german	x-vnd.Haiku-mount_server	2818767263
 Mount read-only	AutoMounter		Schreibgeschützt einhängen
 Error mounting volume:\n\n%s	AutoMounter		Fehler beim Einhängen:\n\n%s
 Cancel	AutoMounter		Abbrechen
 OK	AutoMounter		OK
 Unmount error	AutoMounter		Fehler beim Aushängen
+The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		Das Dateisystem des Datenträgers ist nicht das Be File System. Um eventuellen Datenverlust durch Bugs in Haiku zu vermeiden, wird empfohlen den Datenträger schreibgeschützt einzuhängen.
 Mount read/write	AutoMounter		Beschreibbar einhängen
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		Datenträger \"%s\" konnte nicht ausgehängt werden:\n\t%s
 Mounting volume '%s'\n\n	AutoMounter		'%s' wird eingehangen\n\n

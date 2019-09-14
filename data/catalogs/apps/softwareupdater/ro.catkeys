@@ -1,5 +1,6 @@
-1	romanian	x-vnd.haiku-softwareupdater	4294742959
+1	romanian	x-vnd.haiku-softwareupdater	369324613
 Updating version	SoftwareUpdaterWindow	List item text	Se actualizează versiunea
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Apăsați clic aici pentru a instala {0, plural, one{# updated package} other{# updated packages}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pachetele de dezinstalat
 No active network connection was found	UpdateManager	Error message	Nu s-a găsit o conexiune la rețea activă
 Quit	SoftwareUpdaterWindow	Alert button label	Ieșire
@@ -7,6 +8,7 @@ There were no updates found.	CheckManager		Nu au fost găsite actualizări.
 Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Actualizările nu au fost completate, sigur doriți să ieșiți?
 Updates found	SoftwareUpdaterWindow		Actualizări găsite
 Update now	SoftwareUpdaterWindow		Actualizează acum
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Dintr-un anumit motiv, nu s-a putut reporni calculatorul.
 OK	UpdateManager		OK
 Unrecognized argument	SoftwareUpdaterApp	Error message	Argument nerecunoscut
 There were no updates found.	CheckAction		Nu s-au găsit actualizări.
@@ -14,6 +16,7 @@ No updates available	UpdateAction		Nu există actualizări disponibile
 New packages to be installed	SoftwareUpdaterWindow	List super item label	Pachete noi de instalat
 Packages to be updated	SoftwareUpdaterWindow	List super item label	Pachete de actualizat
 to	SoftwareUpdaterWindow	List item text	la
+Attempting to cancel the updates…	SoftwareUpdaterWindow		Se încearcă anularea actualizărilor…
 Contacting software repositories to check for package updates.	CheckManager		Se contactează depozitele de programe pentru a verifica dacă sunt actualizări de pachete.
 Available updates found	CheckManager		S-au găsit actualizări disponibile
 from repository	SoftwareUpdaterWindow	List item text	din depozitul
@@ -31,7 +34,9 @@ No active network connection was found.\n	CheckManager		Nu s-a găsit o conexiun
 Applying changes	UpdateManager		Se aplică modificările
 Full sync	SoftwareUpdaterWindow	Alert button label	Sincronizare completă
 Quit	SoftwareUpdaterWindow	Button label	Ieșire
+Updates have been successfully installed.	UpdateManager		Actualizările au fost instalate cu succes.
 Exception occurred while updating packages : %s\n	UpdateAction		A apărut o excepție în timpul încărcării pachetelor: %s\n
+A reboot is necessary to complete the update process.	UpdateManager		O repornire este necesară pentru a completa procesul de actualizare.
 Exception occurred while checking for updates: %s\n	CheckAction		A apărut o excepție în timpul verificării pentru actualizări: %s\n
 Packages are being updated	UpdateManager		Se actualizează pachetele
 Cancel	SoftwareUpdaterWindow		Anulează
@@ -39,10 +44,13 @@ Don't quit	SoftwareUpdaterWindow		Nu ieși
 Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Apăsați clic aici pentru a rula SoftwareUpdater. Unele actualizări vor necesita selectarea unei soluții pentru problemă.
 Checking for updates	SoftwareUpdaterWindow		Se verifică pentru actualizări
 Updates completed	UpdateManager		Actualizări completate
+Reboot	SoftwareUpdaterWindow		Repornire
 Show more details	SoftwareUpdaterWindow		Afișează mai multe detalii
 Installing version	SoftwareUpdaterWindow	List item text	Se instalează versiunea
 Checking for updates	CheckManager		Se verifică pentru actualizări
 No remote repositories are available	UpdateManager	Error message	Nu există depozite disponibile la distanță
+Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, one{update} other{updates}} software disponibile
+Reboot	SoftwareUpdaterWindow	Button label	Repornire
 Update	SoftwareUpdaterWindow	Alert button label	Actualizează
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Deschide depozitele
 Updates did not complete	UpdateAction		Actualizările nu au fost completate

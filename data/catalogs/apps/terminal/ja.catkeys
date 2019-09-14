@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Terminal	2815667231
+1	japanese	x-vnd.Haiku-Terminal	2664488407
 Close other tabs	Terminal TermWindow		他のタブを閉じる
 Insert path	Terminal TermView		パスを挿入
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		すみません、シェルを起動できませんでした。
@@ -87,6 +87,7 @@ Use text:	Terminal FindWindow		テキスト指定:
 Close active tab	Terminal TermWindow		タブを閉じる
 Save as default	Terminal TermWindow		デフォルトとして保存
 Nothing is selected.	Terminal TermWindow		なにも選択されていません。
+Use left Option as Meta key	Terminal AppearancePrefView		左オプションキーをメタキーとして使う
 Find	Terminal FindWindow		検索
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		パターンは現在のタブタイトルを指定します。次のプレースホルダーが\n使用できます:\n
 Professional	Terminal colors scheme		プロフェッショナル

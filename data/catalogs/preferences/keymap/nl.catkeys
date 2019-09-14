@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Keymap	1927482454
+1	dutch; flemish	x-vnd.Haiku-Keymap	1642205776
 Key	Modifier keys window	As in a computer keyboard key	Toets
 Japanese	KeymapNames		Japans
 Brazilian	KeymapNames		Braziliaans
@@ -96,4 +96,5 @@ File	Keymap window		Bestand
 Brazilian (ABNT2)	KeymapNames		Braziliaans (ABNT2)
 Dutch	KeymapNames		Nederlands
 Diaeresis trigger	Keymap window		Trema-activeerder
+Icelandic	KeymapNames		Ijslands
 Open…	Keymap window		Openen...

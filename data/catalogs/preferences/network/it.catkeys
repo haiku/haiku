@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Network	943149646
+1	italian	x-vnd.Haiku-Network	3833841185
 Ethernet device	InterfaceListItem		Dispositivo Ethernet
 Link speed:	IntefaceView		Velocità collegamento:
 disconnected	IntefaceView		disconnesso
@@ -28,6 +28,7 @@ WPA2	WPA2 protected network		WPA2
 Show network status in Deskbar	NetworkWindow		Mostra lo stato della rete sulla Deskbar
 Mode:	IntefaceAddressView		Modalità:
 connected	InterfaceListItem		connesso
+OK	NetworkWindow		OK
 Static	IntefaceAddressView		Statico
 launch error	NetworkWindow		Errore di avvio
 Renegotiate	IntefaceView		Rinegoziare

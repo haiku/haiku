@@ -1,9 +1,10 @@
-1	japanese	x-vnd.Haiku-mount_server	819316177
+1	japanese	x-vnd.Haiku-mount_server	2818767263
 Mount read-only	AutoMounter		読み取り専用
 Error mounting volume:\n\n%s	AutoMounter		パーティションをマウント中にエラー発生:\n\n%s
 Cancel	AutoMounter		中止
 OK	AutoMounter		OK
 Unmount error	AutoMounter		マウント解除エラー
+The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		このボリュームのファイルシステムは、Be file system ではありません。Haiku のバグによる意図的でないデータロスを防ぐために、読み取り専用でマウントすることをお勧めします。
 Mount read/write	AutoMounter		読み書き
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		\"%s\" をマウント解除できませんでした:\n\t%s
 Mounting volume '%s'\n\n	AutoMounter		'%s'パーティションをマウント中\n\n

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Installer	1997609102
+1	italian	x-vnd.Haiku-Installer	116830250
 Performing installation.	InstallProgress		Esecuzione dell'installazione.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Scegli il disco d'origine dal menu a pop-up. Quindi fai click su \"Inizia\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Chiudi la finestra del Gestore Disco prima di chiudere quella dell'Installer.
@@ -27,6 +27,7 @@ Running Boot Manager…\n\nClose Boot Manager to continue with the installation.
 Quit DriveSetup	InstallerWindow		Esci da DriveSetup
 Write boot sector	InstallerWindow		Scrivi settore d'avvio
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld di %2ld
+Finishing installation.	InstallProgress		Completamento dell'installazione.
 Install from:	InstallerWindow		Installa da:
 Additional disk space required: 0.0 KiB	InstallerWindow		Spazio aggiuntivo richiesto sul disco: 0.0 KiB
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Questo software è ancora in versione beta! Ciò significa il rischio di perdere dati importanti. Effettua backup con regolarità! Sei stato avvertito.\n\n\n
@@ -39,6 +40,8 @@ Hide optional packages	InstallerWindow		Nascondi pacchetti opzionali
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Buon divertimento e grazie per il tuo interesse per Haiku!
 Quit	InstallerApp		Esci
+Starting installation.	InstallProgress		Avvio dell'installazione.
+Error writing boot sector.	InstallProgress		Errore nella scrittura del settore di avvio.
 OK	InstallerWindow		OK
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Chiudi le finestre del Boot Manager e di DriveSetup prima di chiudere la finestra dell'Installer.
 Failed to launch Boot Manager	InstallerWindow		Impossibile eseguire Boot Manager

@@ -1,10 +1,11 @@
-1	romanian	x-vnd.Haiku-Terminal	722771482
+1	romanian	x-vnd.Haiku-Terminal	2664488407
 Close other tabs	Terminal TermWindow		Închide alte taburi
 Insert path	Terminal TermView		Inserează cale
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminalul nu a putut porni shell. Îmi pare rău.
 Text encoding	Terminal TermWindow		Codificare text
 OK	Terminal SetTitleWindow		OK
 Edit	Terminal TermWindow		Editează
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               tipărește acest ajutor\n  -t,     --title              stabilește titlul ferestrei\n  -f,     --fullscreen         începe în modul ecran complet\n  -w,     --working-directory  stabilește directorul de lucru inițial\n
 Select all	Terminal TermWindow		Selectează tot
 Confirm exit if active programs exist	Terminal AppearancePrefView		Confirmă ieșirea dacă există programe active
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tDosarul curent de lucru al procesului active din\n\t\t\ttabul curent. Opțional numărul maxim de componente ale căii\n\t\t\tpoate fi specificat. E.g. '%2d' pentru cel mult două componente.\n\t%T\t-\tNumele aplicației Terminal pentru localizarea curentă.\n\t%e\t-\tCodarea tabului curent. Nu se afișează pentru UTF-8.\n\t%i\t-\tIndicele ferestrei.\n\t%p\t-\tNumele procesului activ din tabul curent.\n\t%t\t-\tTitlul tabului curent.
@@ -86,6 +87,7 @@ Use text:	Terminal FindWindow		Utilizează text:
 Close active tab	Terminal TermWindow		Închide tabul activ
 Save as default	Terminal TermWindow		Salvează ca implicit
 Nothing is selected.	Terminal TermWindow		Nimic nu este selectat.
+Use left Option as Meta key	Terminal AppearancePrefView		Utilizează opțiunea stângă ca tastă meta
 Find	Terminal FindWindow		Găsește
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Tiparul care specifică titlul tabului curent. Următoarele marcaje\npot fi utilizate:\n
 Professional	Terminal colors scheme		Profesional
@@ -109,6 +111,7 @@ Set window title	Terminal TermWindow		Setează titlu fereastră
 Increase	Terminal TermWindow		Mărește
 OK	Terminal TermWindow		OK
 Close window	Terminal TermWindow		Închide fereastră
+Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminal Haiku\nDrepturi de autor 2001-2019 Haiku, Inc.\nDrepturi de autor(C) 1999 Kazuho Okui and Takashi Murai.\n\nUtilizare: %s [OPȚIUNE] [SHELL]\n
 Solarized Light	Terminal colors scheme		Lumină solarizată
 Clear all	Terminal TermWindow		Eliberează tot
 Search forward	Terminal FindWindow		Caută înainte

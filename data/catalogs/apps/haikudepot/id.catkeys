@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-HaikuDepot	4293876709
+1	indonesian	x-vnd.Haiku-HaikuDepot	2601073644
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Terjadi kesalahan saat menyegarkan repositori: %error%
 Check for updates…	MainWindow		Memeriksa pembaruan…
 Uninstall	PackageManager		Hapus
@@ -10,6 +10,7 @@ OK	App		OKE
 Mostly stable	RatePackageWindow		Sebagian besar stabil
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Akun berhasil dibuat. Sekarang Anda dapat menilai paket dan melakukan hal-hal berguna lainnya.
 The response to the captcha was incorrect.	ServerHelper		Respons terhadap captcha salah.
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Saat memperbarui data paket, muncul masalah yang dapat menyebabkan data menjadi usang atau hilang dari tampilan aplikasi. Rincian tambahan tentang masalah ini mungkin dapat diperoleh dari log aplikasi.
 Develop packages	MainWindow		Paket pengembangan
 Rate package…	PackageInfoView		Nilai paket...
 Starting the package daemon failed:\n\n%Error%	App		Mulai layanan paket gagal :\n\n%Error%
@@ -110,7 +111,7 @@ n/a	PackageInfoView		n/a
 Cancel	MainWindow		Batal
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 more to download)}other{(# more to download)}}
 Refresh repositories	MainWindow		Muat-ulang repositori
-If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Jika anda tidak memberikan alamat email, Anda tidak akan dapat mereset kata sandi anda jika anda melupakannya.
+If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Jika anda tidak memberikan alamat email, anda tidak akan dapat mereset kata sandi anda jika anda melupakannya.
 Package Update Error	MainWindow		Pembaruan Paket Masalah
 Tools	MainWindow		Perkakas
 The passwords do not match.	UserLoginWindow		Sandi tak cocok.
@@ -145,7 +146,7 @@ Screenshot	ScreenshotWindow		Screenshot
 HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		Boot ulang diperlukan untuk menyelesaikan proses pemasangan.
 Search terms:	FilterView		Kriteria pencarian:
-Pending…	PackageListView		Menunggu keputusan
+Pending…	PackageListView		Menunggu keputusan…
 Repeat pass phrase:	UserLoginWindow		Ulangi frase sandi:
 Category:	FilterView		Kategori:
 Authentication failed	UserLoginWindow		Otentikasi gagal
@@ -156,6 +157,7 @@ Pass phrase:	UserLoginWindow		Frasa lulus:
 Open %DeskbarLink%	PackageManager		Buka %DeskbarLink%
 Install	PackageManager		Instalasi
 Input validation	UserLoginWindow		Validasi masukan
+View latest user usage conditions…	MainWindow		Lihat kondisi penggunaan terbaru…
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Kesalahan tak terduga telah dikirim dari server HaikuDepot [%i]
 Log in…	MainWindow		Log masuk…
 You need to be logged into an account before you can rate packages.	MainWindow		Anda harus masuk ke akun sebelum dapat memberi nilai paket.

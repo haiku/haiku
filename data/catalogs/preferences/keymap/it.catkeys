@@ -1,7 +1,8 @@
-1	italian	x-vnd.Haiku-Keymap	1039047705
+1	italian	x-vnd.Haiku-Keymap	343418681
 Key	Modifier keys window	As in a computer keyboard key	Tasto
 Japanese	KeymapNames		Giapponese
 US	KeymapNames		US
+PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Brasiliano
 Right control	Keyboard Layout View		Control destro
 Dvorak	KeymapNames		Dvorak
@@ -34,6 +35,7 @@ Belarusian (Mac)	KeymapNames		Bielorusso (Mac)
 Croatian	KeymapNames		Croato
 Set modifier keys	Modifier keys window		Imposta i tasti modificatori
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Tasto Win/Cmd
+PG ↓	Keyboard Layout View	Very short for 'page down'	PG ↓
 Spanish	KeymapNames		Spagnolo
 Ukrainian (Mac)	KeymapNames		Ucraino (Mac)
 Command:	Modifier keys window	Command key role name	Comando:
@@ -59,6 +61,7 @@ Czech (Mac)	KeymapNames		Ceco (Mac)
 Left command	Keyboard Layout View		Command sinistro
 Albanian	KeymapNames		Albanese
 (Current)	Keymap window		(Attuale)
+Friulian	KeymapNames		Friulano
 Left option	Keyboard Layout View		Opzione sinistro
 Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Bielorusso
@@ -82,6 +85,7 @@ Disabled	Modifier keys window	Do nothing	Disabilitato
 Select dead keys	Keymap window		Tasti attivazione accenti
 Russian (Mac)	KeymapNames		Russo (Mac)
 Right shift	Keyboard Layout View		Maiusc destro
+ESC	Keyboard Layout View		ESC
 Belarusian (Latin)	KeymapNames		Bielorusso (Latino)
 Hebrew	KeymapNames		Ebraico
 Layout	Keymap window		Layout
@@ -111,16 +115,19 @@ ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		Sistema:
 Switch shortcut keys	Keymap window		Tasti di scelta rapida
 Right command	Keyboard Layout View		Command destro
+MENU	Keyboard Layout View		MENU
 Belgian (comma)	KeymapNames		Belga (virgola)
 Norwegian	KeymapNames		Norvegese
 Font	Keymap window		Carattere
 Danish	KeymapNames		Danese
+Generic 104-key	KeyboardLayoutNames		Tastiera generica a 104 tasti
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tasto Maiusc
 Russian	KeymapNames		Russo
 Romanian	KeymapNames		Rumeno
 Command	Keyboard Layout View	Command key	Comando
 File	Keymap window		File
 Brazilian (ABNT2)	KeymapNames		Brasiliano (ABNT2)
+INS	Keyboard Layout View		INS
 Dutch	KeymapNames		Danese
 Diaeresis trigger	Keymap window		Dieresi
 Icelandic	KeymapNames		Islandese

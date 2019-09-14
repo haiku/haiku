@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Time	752043118
+1	romanian	x-vnd.Haiku-Time	834234238
 OK	Time		OK
 Message receiving failed	Time		Primirea mesajului a eșuat
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Oră și Dată, scris de:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
@@ -16,6 +16,7 @@ Asia	Time		Asia
 Try all servers	Time		Încearcă toate serverele
 Time	Time		Oră
 Current time:	Time		Oră curentă:
+The following error occured while synchronizing:\n%s: %s	Time		Următoarea eroare a apărut în timpul sincronizării:\n%s: %s
 Europe	Time		Europa
 Show day of week	Time		Afișează ziua săptămânii
 Local time (Windows compatible)	Time		Ora locală (compatibil cu Windows)
@@ -43,5 +44,6 @@ Synchronize at boot	Time		Sincronizează la pornirea sistemului
 Indian	Time		Indian
 Revert	Time		Inversează
 Date and time	Time		Dată și oră
+The following error occured while synchronizing:\n%s	Time		Următoarea eroare a apărut în timpul sincronizării:\n%s
 Synchronize	Time		Sincronizează
 Add	Time		Adaugă

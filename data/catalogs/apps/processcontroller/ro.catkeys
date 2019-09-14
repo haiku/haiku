@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-ProcessController	4131818684
+1	romanian	x-vnd.Haiku-ProcessController	168752057
 Error saving file	ProcessController		Eroare la salvarea fișierului
 Display priority	ProcessController		Prioritate afișaj
 That's no Fun!	ProcessController		Nu e amuzant!
@@ -45,5 +45,6 @@ Damned!	ProcessController		Aiurea!
 New Terminal	ProcessController		Terminal nou
 Power saving	ProcessController		Economisire de energie
 ProcessController is already installed in Deskbar.	ProcessController		ControlerProces este instalat deja pe bara de desktop.
+This is the last active processor…\nYou can't turn it off!	ProcessController		Acesta este ultimul procesor activ…\nNu puteți să îl opriți!
 This thread is already gone…	ProcessController		Acest fir de execuție este plecat deja…
 Run in window	ProcessController		Pornește în fereastră

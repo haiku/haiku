@@ -1,10 +1,11 @@
-1	romanian	x-vnd.Haiku-LaunchBox	3692177981
+1	romanian	x-vnd.Haiku-LaunchBox	1530497419
 Set description…	LaunchBox		Configurează descriere…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Sigur închideți acest suport?\n(Suportul nu va fi reținut.)
 OK	LaunchBox		OK
 Ignore double-click	LaunchBox		Ignoră dublu-clic
 Show on all workspaces	LaunchBox		Afișează toate spațiile de lucru
 Name Panel	LaunchBox		Panou nume
+Autostart	LaunchBox		Start auto
 Clone	LaunchBox		Clonează
 Description for '%3'	LaunchBox		Descriere pentru '%3'
 Show window border	LaunchBox		Afișează margine fereastră

@@ -2,7 +2,7 @@
 Audio mixer	Media Window		Mixer audio
 Show volume control on Deskbar	Media views		Mostre il control dal volum tal Deskbar
 Quit	Media Window		Jes
-Restart media services	Media views		Torna a inviâ i servizis multimediâls
+Restart media services	Media views		Torne a inviâ i servizis multimediâls
 Couldn't add volume control in Deskbar: %s\n	Media views		Impussibil zontâ il control dal volum tal Deskbar: %s\n
 Start media server	Media Window		Invie servidôr multimediâl
 <none>	VideoInputMenu	Used when no video input is available	<nissun>

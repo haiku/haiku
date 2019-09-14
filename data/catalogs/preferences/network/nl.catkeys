@@ -1,3 +1,38 @@
-1	dutch; flemish	x-vnd.Haiku-Network	3363740538
+1	dutch; flemish	x-vnd.Haiku-Network	825145315
+Ethernet device	InterfaceListItem		Ethernet-apparaat
+Link speed:	IntefaceView		Verbindingssnelheid:
+disconnected	IntefaceView		niet verbonden
+IP Address:	IntefaceAddressView		IP-adres:
+Network:	IntefaceView		Netwerk:
+Received:	IntefaceView		Ontvangen:
+New…	NetworkWindow		Nieuw…
+no link	InterfaceListItem		geen verbinding
+Sent:	IntefaceView		Verzonden:
+The netmask defines your local network	IntefaceAddressView		Het netwerkmasker bepaalt uw lokale netwerk
+Your IP address	IntefaceAddressView		Uw IP-adres
+Netmask:	IntefaceAddressView		Netwerkmasker:
+Services	NetworkWindow		Diensten
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Installatie van NetwerkStatus in Deskbar mislukt: %s
 Revert	NetworkWindow		Herstellen
+<no wireless networks found>	IntefaceView		<geen draadloze netwerken gevonden>
+connected	IntefaceView		verbonden
 Apply	IntefaceAddressView		Toepassen
+Disable	ServiceView		Uitschakelen
+Show network status in Deskbar	NetworkWindow		Toon netwerkstatus in Deskbar
+Mode:	IntefaceAddressView		Modus:
+connected	InterfaceListItem		verbonden
+Static	IntefaceAddressView		Statisch
+Renegotiate	IntefaceView		Heronderhandelen
+MAC address:	IntefaceView		MAC-adres:
+disabled	InterfaceListItem		uitgeschakeld
+Dial-up connection	InterfaceListItem		Inbelverbinding
+The method for obtaining an IP address	IntefaceAddressView		De wijze voor het verkrijgen van een IP-adres
+Automatic	IntefaceAddressView		Automatisch
+Disable	IntefaceView		Uitschakelen
+Manage…	NetworkWindow		Beheren…
+Network	NetworkWindow		Netwerk
+Your gateway to the internet	IntefaceAddressView		Uw gateway naar het internet
+Enable	ServiceView		Inschakelen
+Wireless device	InterfaceListItem		Draadloos apparaat
+Disabled	IntefaceAddressView		Uitgeschakeld
+VPN connection	InterfaceListItem		VPN-verbinding

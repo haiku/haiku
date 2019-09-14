@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Devices	490380176
+1	romanian	x-vnd.Haiku-Devices	3345509916
 ACPI bus	DevicesView		Magistrală ACPI
 Encryption controller	Device		Controler de criptare
 Bus Information	Device		Infomații magistrală
@@ -54,7 +54,9 @@ Device name	DeviceACPI		Nume dispozitiv
 Card Reader	DeviceSCSI		Cititor de carduri
 Display controller	Device		Controler de afișare
 Basic information	DevicesView		Informații de bază
+ACPI Button '%1'	DeviceACPI		Buton ACPI „%1”
 Bus	DevicesView		Magistrală
+ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Nume dispozitiv
 Disk Drive	DeviceSCSI		Unitate disc
 Other	DeviceSCSI		Altele

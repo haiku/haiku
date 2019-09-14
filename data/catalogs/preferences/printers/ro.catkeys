@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Be-PRNT	2042381362
+1	romanian	x-vnd.Be-PRNT	1465107170
 Test page	TestPageView		Pagină de test
 Remove	PrintersWindow		Elimină
 Red	TestPageView		Roșu
@@ -16,6 +16,8 @@ Waiting	JobListView		Se așteaptă
 Processing	JobListView		Se procesează
 Cancel	AddPrinterDialog		Anulează
 Unknown status	JobListView		Stare necunoscută
+Print jobs for %printer_name%	PrintersWindow		Sarcini de tipărire pentru %printer_name%
+{0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? pages}=1{# page}other{# pages}}
 Add printer	AddPrinterDialog		Adaugă imprimantă
 Printers	PrintersWindow		Imprimante
 No printer found!	TransportMenu		Nicio imprimantă găsită!
@@ -29,6 +31,7 @@ Yellow	TestPageView		Galben
 Black	TestPageView		Negru
 Printer type:	AddPrinterDialog		Tip de imprimantă:
 Printers	System name		Imprimante
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Imprimantă: %printer_name%\nDriver:  %driver%\n
 Green	TestPageView		Verde
 Print test page	PrintersWindow		Tipărește o pagină de test

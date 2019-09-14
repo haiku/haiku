@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Pulse	3788463253
+1	romanian	x-vnd.Haiku-Pulse	139895817
 Normal mode	DeskbarPulseView		Mod normal
 Info	CPUButton		Info
 Quit	DeskbarPulseView		Închidere
@@ -37,6 +37,7 @@ Deskbar menu	CPUButton		Meniul barei de desktop
 Mini mode	NormalPulseView		Mod mini
 Quit	MiniPulseView		Închidere
 Info	PulseView		Detalii
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		Utilizare: Pulse [--mini] [-w lățime] [--width=lățime]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]
 OK	DeskbarPulseView		OK
 Info	PulseApp		Detalii
 Pulse	System name		Puls

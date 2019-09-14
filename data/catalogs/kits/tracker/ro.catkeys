@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	2023640966
+1	romanian	x-vnd.Haiku-libtracker	838081337
 Created	ContainerWindow		Creat
 Open and make preferred	OpenWithWindow		Deschide sau fixează ca preferat
 Open with…	ContainerWindow		Deschide cu…
@@ -23,6 +23,7 @@ Name	Default Query Columns		Nume
 Unmount	ContainerWindow		Demontează
 Eject when unmounting	AutoMounterSettings		Scoate la demontare
 Searching for disks to mount…	StatusWindow		Se caută discuri de montat…
+Information	InfoWindow		Informații
 Error emptying Trash	FSUtils		Eroare la golirea coșului de gunoi
 Opens with:	InfoWindow		Se deschide cu:
 Size	QueryPoseView		Dimensiune
@@ -402,6 +403,7 @@ by formula	FindPanel		după formulă
 is	FindPanel		este
 Move to Trash	FilePanelPriv		Mută la gunoi
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Dacă redenumiți dosarul de sistem sau conținutul acestuia, nu veți putea să porniți %osName!\n\nSigur doriți să faceți asta?\n\nPentru a redenumi dosarul de sistem sau conținutul acestuia oricum, țineți apăsată tasta Shift și dați clic pe \"Redenumire\".
+Permissions	FilePermissionsView		Permisiuni
 40 x 40	ContainerWindow		40 x 40
 40 x 40	DeskWindow		40 x 40
 New folder %ld	FSUtils		Dosar nou %ld

@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Mandelbrot	1781779654
+1	indonesian	x-vnd.Haiku-Mandelbrot	3875916167
 Burning Ship	MandelbrotWindow		Kapal Terbakar
 Grassland	MandelbrotWindow		Padang rumput
 Lightning	MandelbrotWindow		Petir
@@ -9,6 +9,8 @@ Tricorn	MandelbrotWindow		Tricorn
 Royal	MandelbrotWindow		Kerajaan
 Orbit Trap	MandelbrotWindow		Jebakan Orbit
 Deepfrost	MandelbrotWindow		Deepfrost
+Subsampling	MandelbrotWindow		Subsampling
+1 (none)	MandelbrotWindow		1 (tiada)
 Quit	MandelbrotWindow		Berhenti
 File	MandelbrotWindow		Berkas
 Julia	MandelbrotWindow		Julia

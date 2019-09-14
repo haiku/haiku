@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-ScreenSaver	904083067
+1	dutch; flemish	x-vnd.Haiku-ScreenSaver	557704281
 Could not load screen saver	ScreenSaver		Kon screensaver niet laden
 30 seconds	ScreenSaver		30 seconden
 Start screensaver	ScreenSaver		Start de schermbeveiliging
@@ -10,7 +10,9 @@ Display Power Management Signaling not available	ScreenSaver		Het Energiebeheers
 ScreenSaver	System name		Schermbeveiliging
 Test	ScreenSaver		Test
 General	ScreenSaver		Algemeen
+Fade now when mouse is here	ScreenSaver		Direct starten wanneer de muisaanwijzer zich hier bevindt
 Enable screensaver	ScreenSaver		Schermbeveiliging inschakelen
+Don't fade when mouse is here	ScreenSaver		Niet starten wanneer de muisaanwijzer zich hier bevindt
 Cancel	ScreenSaver		Annuleren
 Turn off screen	ScreenSaver		Scherm uit
 No options available	ScreenSaver		Geen opties aanwezig
@@ -22,4 +24,5 @@ Blackness	ScreenSaver		Blackness
 Use custom password	ScreenSaver		Gebruik gelegenheids-paswoord
 Done	ScreenSaver		Klaar
 Confirm password:	ScreenSaver		Bevestig paswoord:
+No preview available	PreviewView		Geen voorbeeld beschikbaar
 Use network password	ScreenSaver		Gebruik netwerkpaswoord

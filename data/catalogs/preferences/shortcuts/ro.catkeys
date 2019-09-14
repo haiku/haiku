@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Shortcuts	1611284793
+1	romanian	x-vnd.Haiku-Shortcuts	3834857117
 *MouseUp	ShortcutsWindow		*MauSus
 Application	ShortcutsWindow		Aplicație
 Option	ShortcutsSpec	Name for modifier on keyboard	Opțiune
@@ -9,6 +9,7 @@ Don't save	ShortcutsWindow		Nu salva
 *Beep	ShortcutsWindow		*Bip
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Shortcuts nu a putut să salveze setul de taste.
 Save	ShortcutsWindow		Salvează
+Either	ShortcutsSpec		Oricare
 Oh no	ShortcutsWindow		Oh nu
 Key	ShortcutsWindow		Tastă
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*TrimiteMesaj application/x-vnd.Be-TRAK 'Tfnd'
@@ -19,21 +20,26 @@ Quit	ShortcutsWindow		Închidere
 Cancel	ShortcutsWindow		Anulează
 *MoveMouse +20 +0	ShortcutsWindow		*MutăMaus +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
+Left	ShortcutsSpec		Stânga
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Scurtături nu a putut analiza fișierul dumneavoastră set de taste!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Scurtături nu a putut salva fișierul dumneavoastră set de taste!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Textul aici\"
 Remove selected shortcut	ShortcutsWindow		Elimină scurtătura selectată
 Error, NULL state description?	ShortcutsSpec		Eroare, descriere stare NULL?
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Scurtături nu a putut deschide fișierul dumneavoastră set de taste!
 Save & apply	ShortcutsWindow		Salvează & aplică
 Open	ShortcutsWindow		Deschide
 Append	ShortcutsWindow		Adaugă
+Both	ShortcutsSpec		Ambele
 Save KeySet as…	ShortcutsWindow		Salvează KeySet ca…
 Append KeySet…	ShortcutsWindow		Adăugare KeySet…
 *MouseButton 1	ShortcutsWindow		*ButonMaus 1
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
+Right	ShortcutsSpec		Dreapta
 OK	ShortcutsWindow		OK
 Add new shortcut	ShortcutsWindow		Adaugă scurtătură nouă
+(None)	ShortcutsSpec		(Nimic)
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 Open KeySet…	ShortcutsWindow		Deschide KeySet…
 File	ShortcutsWindow		Fișier

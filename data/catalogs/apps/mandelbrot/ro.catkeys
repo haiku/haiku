@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Mandelbrot	1781779654
+1	romanian	x-vnd.Haiku-Mandelbrot	3875916167
 Burning Ship	MandelbrotWindow		Navă aprinsă
 Grassland	MandelbrotWindow		Pășune
 Lightning	MandelbrotWindow		Fulger
@@ -9,6 +9,8 @@ Tricorn	MandelbrotWindow		Tricorn
 Royal	MandelbrotWindow		Regal
 Orbit Trap	MandelbrotWindow		Capcană pe orbită
 Deepfrost	MandelbrotWindow		Îngheț profund
+Subsampling	MandelbrotWindow		Subeșantionare
+1 (none)	MandelbrotWindow		1 (nimic)
 Quit	MandelbrotWindow		Închidere
 File	MandelbrotWindow		Fișier
 Julia	MandelbrotWindow		Iulia

@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-DriveSetup	791750172
+1	indonesian	x-vnd.Haiku-DriveSetup	1934767996
 Could not unmount partition %s.	MainWindow		Tidak dapat melepas partisi %s.
 Mount all	MainWindow		Pasang semua
 Disk	MainWindow		Diska
@@ -52,6 +52,7 @@ Wipe (not implemented)	MainWindow		Sapu(tidak diimplementasikan)
 The currently selected partition does not have a parent partition.	MainWindow		Partisi yang saat ini dipilih tidak memiliki partisi induk.
 Validation of the given initialization parameters failed.	MainWindow		Validasi parameter inisialisasi yang diberikan gagal.
 Shared	PartitionList		Bersama
+MIMEs	PartitionList		MIME
 BitLocker encrypted	Encryption utils		Terenkripsi bitLocker
 You need to select a partition entry from the list.	MainWindow		Anda perlu memilih entri partisi dari daftar.
 Offset: %s	Support		Ofset: %s

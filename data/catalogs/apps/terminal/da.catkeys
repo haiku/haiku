@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Terminal	2815667231
+1	danish	x-vnd.Haiku-Terminal	2664488407
 Close other tabs	Terminal TermWindow		Luk andre faneblade
 Insert path	Terminal TermView		Indsæt sti
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal kunne ikke køre skallen. Beklager.
@@ -87,6 +87,7 @@ Use text:	Terminal FindWindow		Brug tekst:
 Close active tab	Terminal TermWindow		Luk aktivt faneblad
 Save as default	Terminal TermWindow		Gem som standard
 Nothing is selected.	Terminal TermWindow		Intet er markeret.
+Use left Option as Meta key	Terminal AppearancePrefView		Brug venstre Option som Meta-tast
 Find	Terminal FindWindow		Find
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Mønsteret angiver den aktuelle fanebladstitel. Følgende pladsholdere\nkan bruges:\n
 Professional	Terminal colors scheme		Professionel

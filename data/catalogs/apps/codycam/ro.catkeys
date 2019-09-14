@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-CodyCam	1770279704
+1	romanian	x-vnd.Haiku-CodyCam	2593355250
 destination directory expected	CodyCam		dosar de destinație așteptat
 reply: '%s'\n	SftpClient		răspuns: '%s'\n
 JPEG image	CodyCam		Imagine JPEG
@@ -27,6 +27,7 @@ Every 2 hours	CodyCam		La fiecare 2 ore
 Cannot get a time source	CodyCam		Nu se poate obține o sursă de timp
 Every 4 hours	CodyCam		La fiecare 4 ore
 cmd: '%s'\n	FtpClient		cmd: '%s'\n
+Closing the window	VideoConsumer.cpp		Se închide fereastra
 Never	CodyCam		Niciodată
 Every 8 hours	CodyCam		La fiecare 8 ore
 Cannot start the video source	CodyCam		Nu se poate porni sursa video
@@ -38,6 +39,7 @@ still image filename expected	CodyCam		nume de fișier imagine fixă așteptat
 File name:	CodyCam		Nume fișier:
 Directory:	CodyCam		Dosar:
 Error setting type of output file	VideoConsumer.cpp		Eroare la setarea tipului pentru fișierul de ieșire
+Locking the window	VideoConsumer.cpp		Se blochează fereastra
 Cannot find an available video stream	CodyCam		Nu se poate găsi un flux video disponibil
 Upload…	VideoConsumer.cpp		Încărcare…
 password expected	CodyCam		parolă așteptată

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku.TextSearch	2123129416
+1	romanian	x-vnd.Haiku.TextSearch	1867528375
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Selectați fișierele pe care le doriți selectate pentru dumneavoastră în Tracker.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Nu s-a putut porni programul xargs!
@@ -27,6 +27,7 @@ Show lines	GrepWindow		Afișează linii
 Failed to open errors pipe!	Grepper		Nu s-a putut deschide canalul de erori!
 The unselected files will be removed from the list.	GrepWindow		Fișierele neselectate vor fi eliminate din listă.
 Skip folders starting with a dot	GrepWindow		Omite dosarele care încep cu un punct
+Open files in code editor	GrepWindow		Deschide fișierele în editorul de cod
 Failed to open output pipe!	Grepper		Nu s-a putut deschide canalul de ieșire!
 Cancel	GrepWindow		Anulează
 History	GrepWindow		Istoric

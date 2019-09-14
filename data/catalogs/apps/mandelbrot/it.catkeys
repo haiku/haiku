@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Mandelbrot	1781779654
+1	italian	x-vnd.Haiku-Mandelbrot	3397649687
 Burning Ship	MandelbrotWindow		Burning Ship
 Grassland	MandelbrotWindow		Prateria
 Lightning	MandelbrotWindow		Fulmine
@@ -9,6 +9,7 @@ Tricorn	MandelbrotWindow		Tricorn
 Royal	MandelbrotWindow		Regale
 Orbit Trap	MandelbrotWindow		Orbit Trap
 Deepfrost	MandelbrotWindow		Profondità gelate
+1 (none)	MandelbrotWindow		1 (nessuno)
 Quit	MandelbrotWindow		Esci
 File	MandelbrotWindow		File
 Julia	MandelbrotWindow		Julia

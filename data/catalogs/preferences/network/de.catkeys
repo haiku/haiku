@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Network	3694799483
+1	german	x-vnd.Haiku-Network	3039697761
 Ethernet device	InterfaceListItem		Ethernet-Gerät
 Link speed:	IntefaceView		Geschwindigkeit:
 disconnected	IntefaceView		getrennt
@@ -40,6 +40,7 @@ disabled	InterfaceListItem		deaktiviert
 Dial-up connection	InterfaceListItem		Einwählverbindung
 on	ServiceListItem		an
 The method for obtaining an IP address	IntefaceAddressView		Die Art wie IP Adressen bezogen werden
+disconnected	InterfaceListItem		getrennt
 Automatic	IntefaceAddressView		Automatisch
 Choose automatically	IntefaceView		Automatisch wählen
 Status:	IntefaceView		Status:

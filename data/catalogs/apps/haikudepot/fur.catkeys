@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	3237543383
+1	friulian	x-vnd.Haiku-HaikuDepot	2601073644
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificât un erôr intal inzornâ il dipuesit: %error%
 Check for updates…	MainWindow		Control inzornaments…
 Uninstall	PackageManager		Disinstale
@@ -10,6 +10,7 @@ OK	App		Va ben
 Mostly stable	RatePackageWindow		Pal plui stabil
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Account creât cun sucès. Si pues cumò votâ i pachets e fâ altris robis utilis.
 The response to the captcha was incorrect.	ServerHelper		La rispueste al captcha e jere sbaliade.
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Intant che si inzornave i dâts dal pachet, si è verificât un probleme che al podarès puartâ a vê dâts vielis o mancjants in merit a ce che la aplicazion e visualize. Detais in plui su chest probleme al è probabil otignîju dai regjistris de aplicazion.
 Develop packages	MainWindow		Pachets di svilup
 Rate package…	PackageInfoView		Vote pachet…
 Starting the package daemon failed:\n\n%Error%	App		Inviament dal demoni dai pachets falît:\n\n %Error%

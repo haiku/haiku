@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Terminal	2815667231
+1	friulian	x-vnd.Haiku-Terminal	2664488407
 Close other tabs	Terminal TermWindow		Siere altris schedis
 Insert path	Terminal TermView		Inserìs percors
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Scuse, ma Terminâl nol à podût inviâ la shell.
@@ -87,6 +87,7 @@ Use text:	Terminal FindWindow		Dopre test:
 Close active tab	Terminal TermWindow		Siere schede ative
 Save as default	Terminal TermWindow		Salve come predefinît
 Nothing is selected.	Terminal TermWindow		Nol è selezionât nie.
+Use left Option as Meta key	Terminal AppearancePrefView		Dopre Opzion a çampe come tast Meta
 Find	Terminal FindWindow		Cjate
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Il scheme che al specifiche il titul de schede atuâl. A puedin jessi doprâts\nchescj segnepuest:\n
 Professional	Terminal colors scheme		Professionâl

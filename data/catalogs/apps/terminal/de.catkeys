@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Terminal	2815667231
+1	german	x-vnd.Haiku-Terminal	2664488407
 Close other tabs	Terminal TermWindow		Andere Reiter schließen
 Insert path	Terminal TermView		Pfad einfügen
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Das Terminal konnte die Konsole leider nicht starten.
@@ -87,6 +87,7 @@ Use text:	Terminal FindWindow		Suchbegriff:
 Close active tab	Terminal TermWindow		Aktiven Reiter schließen
 Save as default	Terminal TermWindow		Als Standardwerte speichern
 Nothing is selected.	Terminal TermWindow		Es wurde nichts ausgewählt.
+Use left Option as Meta key	Terminal AppearancePrefView		Linke Option-Taste als Meta-Taste verwenden
 Find	Terminal FindWindow		Suchen
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Die Formel für diesen Reitertitel. Folgende Variablen\nstehen zur Verfügung:\n
 Professional	Terminal colors scheme		Professional

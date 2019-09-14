@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-NewMailNotification	2111731137
+1	romanian	x-vnd.Haiku-NewMailNotification	1375000288
 Log window	NotifierConfigView		Fereastră istoric
 none	NotifierConfigView		nimic
 New mails notification	NotifierFilter		Înștiințare mailuri noi
@@ -11,3 +11,4 @@ Central beep	NotifierConfigView		Bip central
 New messages	NotifierFilter		Mesaje noi
 Method:	NotifierConfigView		Metodă:
 Keyboard LEDs	NotifierConfigView		LEDuri tastatură
+You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		Aveți {0, plural, one{one new message} other{# new messages}} pentru %account.

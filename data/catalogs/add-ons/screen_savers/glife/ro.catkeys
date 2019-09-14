@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-GLifeScreensaver	2074508370
+1	romanian	x-vnd.Haiku-GLifeScreensaver	2182395945
 by Aaron Hill	GLife ScreenSaver		de Aaron Hill
 None	GLife ScreenSaver		Nimic
 none	GLife ScreenSaver		nimic
@@ -6,6 +6,7 @@ Grid Height: %li	GLife ScreenSaver		Înălțime grilă: %li
 Grid Width: 	GLife ScreenSaver		Lățime grilă: 
 Grid Border: %li	GLife ScreenSaver		Margine grilă: %li
 Grid Border: 	GLife ScreenSaver		Margine grilă: 
+Grid Life Delay: <number>x	This is a factor: the x represents 'times'		Amânare viață grilă: <number>x
 OpenGL \"Game of Life\"	GLife ScreenSaver		OpenGL \"Jocul Vieții\"
 Grid Height: 	GLife ScreenSaver		Înălțime grilă: 
 4x	GLife ScreenSaver	This is a factor: the x represents 'times'	4x

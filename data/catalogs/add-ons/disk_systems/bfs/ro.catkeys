@@ -1,5 +1,6 @@
-1	romanian	x-vnd.Haiku-BFSAddOn	3514982252
+1	romanian	x-vnd.Haiku-BFSAddOn	1570987954
 Enable query support	BFS_Initialize_Parameter		Activează suportul de interogare
+Disabling query support may speed up certain file system operations, but should\nonly be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		Dezactivarea suportului de interogare poate accelera anumite operații ale sistemului de fișiere, dar ar trebui\nsă fie utilizat doar dacă sunteți absolut sigur că nu veți avea nevoie de interogări.\nOrice volum care este destinat pentru pornirea Haiku trebuie să aibă suportul de interogare activat.
 Name:	BFS_Initialize_Parameter		Nume:
 8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (În general fișiere mari)
 2048 (Recommended)	BFS_Initialize_Parameter		2048 (Recomandat)

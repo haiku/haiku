@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-PackageInstaller	3110601390
+1	friulian	x-vnd.Haiku-PackageInstaller	2472572058
 Package description	UninstallView		Descrizion dal pachet
 none	PackageView		nissun
 Continue	PackageInstall		Continue
@@ -53,6 +53,7 @@ Continue	PackageInfo		Continue
 No package selected.	PackageInfo		Nissun pachet selezionât.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Erôr! \"%s\" nol è un percors valit.\n
 The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		La cartele clamade '%s' e esist za tal percors indicât.\nSostituî cun chê in chest pachet o saltâ?
+LegacyPackageInstaller	System name		InstaladôrPachetsVecjos
 Ask again	PackageView		Torne domande
 Begin	PackageView		Scomence
 OK	PackageView		Va ben

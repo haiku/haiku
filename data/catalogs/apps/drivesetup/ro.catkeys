@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-DriveSetup	2981446742
+1	romanian	x-vnd.Haiku-DriveSetup	1934767996
 Could not unmount partition %s.	MainWindow		Nu se poate demonta partiția %s.
 Mount all	MainWindow		Montează tot
 Disk	MainWindow		Disc
@@ -6,10 +6,14 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Device	PartitionList		Dispozitiv
 Initialize	MainWindow		Inițializează
 Could not change the parameters of the selected partition.	MainWindow		Nu s-au putut modifica parametrii partiției selectate.
+PGP encrypted	Encryption utils		Criptat PGP
 Delete partition	MainWindow		Șterge partiție
 Error: 	MainWindow	in any error alert	Eroare: 
+Removable	PartitionList		Detașabil
+Block size	PartitionList		Dimensiune bloc
 The panel experienced a problem!	MainWindow		Panoul a avut o problemă!
 Device	DiskView		Dispozitiv
+Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Sigur doriți să formatați Partiția Extinsă Intel? Orice subpartiții pe care le conține vor fi suprascrise dacă veți continua. Veți fi întrebat din nou înainte ca schimbările să fie scrise pe disc.
 Unmount	MainWindow		Demontează
 Failed to format the partition %s!\n	MainWindow		Nu s-a putut formata partiția %s!\n
 Partition size	CreateParametersPanel		Dimensiune partiție
@@ -25,13 +29,16 @@ Validation of the given creation parameters failed.	MainWindow		Validarea parame
 Eject	MainWindow		Scoate
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe discul %s vor fi pierdute fără posibilitatea de a le recupera dacă faceți acest lucru!
 Surface test (not implemented)	MainWindow		Test de suprafață (nu este implementat)
+Read only	PartitionList		Doar citire
 The panel could not return successfully.	MainWindow		Panoul nu a putut returna cu succes.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Nu s-au putut modifica parametrii partiției. Nicio modificare scrisă pe disc.
 Partition %ld	DiskView		Partiție %ld
 There's no space on the partition where a child partition could be created.	MainWindow		Nu mai există spațiu liber pe partiția unde se poate crea o partiție secundară.
 No disk devices have been recognized.	DiskView		Nu au fost recunoscute dispozitivele de disc.
+Attributes	PartitionList		Atribute
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Ștergerea partiției a eșuat. Nu s-au scris modificări pe disc.
 Change parameters…	MainWindow		Modifică parametrii…
+Format	InitializeParametersPanel		Format
 Could not unmount partition	MainWindow		Nu s-a putut demonta partiția
 Create	CreateParametersPanel		Creează
 File system	PartitionList		Sistem de fișiere
@@ -44,22 +51,31 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Ștergere (nu este implementat)
 The currently selected partition does not have a parent partition.	MainWindow		Partiția selectată curent nu are o partiție superioară.
 Validation of the given initialization parameters failed.	MainWindow		Validarea parametrilor de inițializare furnizați a eșuat.
+Shared	PartitionList		Partajat
+MIMEs	PartitionList		MIME-uri
+BitLocker encrypted	Encryption utils		Criptat BitLocker
 You need to select a partition entry from the list.	MainWindow		Trebuie să selectați o intrare de partiție din listă.
 Offset: %s	Support		Deplasare: %s
+SafeBoot encrypted	Encryption utils		Criptat SafeBoot
 Volume name	PartitionList		Nume volum
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe partiție vor fi pierdute fără posibilitatea de a le recupera dacă faceți acest lucru!
 Change	ChangeParametersPanel		Modificare
 Partition name:	ChangeParametersPanel		Nume partiție:
+LUKS encrypted	Encryption utils		Criptat LUKS
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe partiția %s vor fi pierdute fără posibilitatea de a le recupera dacă faceți acest lucru!
 Cancel	AbstractParametersPanel		Anulează
 Format	MainWindow		Formatare
+<empty or unknown>	DiskView		<empty or unknown>
 OK	MainWindow		OK
+Open with DiskProbe	MainWindow		Deschide cu DiskProbe
 Could not delete the selected partition.	MainWindow		Nu s-a putut șterge partiția selectată.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Sigur doriți să inițializați discul selectat? Toate datele vor fi pierdute. Veți fi întrebat din nou înainte ca modificările să fie scrise pe disc.\n
 There was an error preparing the disk for modifications.	MainWindow		A apărut o eroare la pregătirea discului pentru modificări.
 The disk has been successfully initialized.\n	MainWindow		Discul a fost inițializat cu succes.\n
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Ar trebui să fie forțată demontarea?\n\nNotă: Dacă o aplicație scrie acum pe volum, demontarea acestuia poate rezulta în pierderi de date.\n
 Cancel	MainWindow		Anulează
+Free space	PartitionList		Spațiu liber
+Queries	PartitionList		Interogări
 Force unmount	MainWindow		Forțează demontarea
 Partition	MainWindow		Partiție
 Change parameters	MainWindow		Modifică parametrii
@@ -75,10 +91,14 @@ Cannot delete the selected partition.	MainWindow		Nu se poate șterge partiția 
 Continue	MainWindow		Continuă
 Could not mount partition %s.	MainWindow		Nu s-a putut monta partiția %s.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Sigur doriți să formatați partiția? Veți fi întrebat din nou înainte ca schimbările să fie scrise pe disc.
+<empty or unknown>	PartitionList		<empty or unknown>
 The selected disk is read-only.	MainWindow		Discul selectat este protejat la scriere.
 The partition %s is already unmounted.	MainWindow		Partiția %s este deja demontată.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Sigur doriți să modificați parametrii partiției selectate?\n\nE posibil ca partiția să nu mai fie recunoscută de alte sisteme de operare!
+Boot	PartitionList		Pornire
 OK	AbstractParametersPanel		OK
+Virtual	PartitionList		Virtual
+Virtual	DiskView		Virtual
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe discul selectat vor fi pierdute fără posibilitatea de a le recupera dacă faceți acest lucru!
 Select a partition from the list below.	DiskView		Selectați o partiție din lista de mai jos.
 Active	PartitionList		Activ

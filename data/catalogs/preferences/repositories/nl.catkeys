@@ -1,0 +1,23 @@
+1	dutch; flemish	x-vnd.Haiku-Repositories	3143587292
+This is not a valid URL.	AddRepoWindow	Add URL error message	Dit is geen geldige URL.
+Unknown	Constants	Unknown repository name	Onbekend
+Remove all	RepositoriesView	Button label	Allen verwijderen
+Disable	RepositoriesView	Button label	Uitschakelen
+Cancel task	TaskTimer	Button label	Taak annuleren
+Changes completed	RepositoriesView	Status view text	Wijzigingen voltooid
+Remove	Constants	Button label	Verwijderen
+Completed	TaskLooper	Completed task status message	Voltooid
+Name	RepositoriesView	Column title	Naam
+Add	AddRepoWindow	Button label	Toevoegen
+Enable all	RepositoriesView	Button label	Allen inschakelen
+Aborted	TaskLooper	Aborted task status message	Afgebroken
+Enable	RepositoriesView	Button label	Inschakelen
+Description	TaskLooper	Failed task error description	Beschrijving
+Failed	TaskLooper	Failed task status message	Mislukt
+Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Sommige taken zijn nog actief. Deze taken stoppen en afsluiten?
+Changes pending:	RepositoriesView	Status view text	Toe te passen wijzigingen:
+Remove	RepositoriesView	Button label	Verwijderen
+Keep trying	TaskTimer	Button label	Blijven proberen
+Cancel	Constants	Button label	Annuleren
+Stop and quit	RepositoriesWindow	Button label	Stoppen en afsluiten
+Disable all	RepositoriesView	Button label	Allen uitschakelen

@@ -65,7 +65,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Grayscale	AntialiasingSettingsView		Scjale di grîs
 Antialiasing type:	AntialiasingSettingsView		Gjenar di antialiasing:
 Panel text	Colors tab		Test dal panel
-Hinting menu	AntialiasingSettingsView		Menù dai sugjeriments
+Hinting menu	AntialiasingSettingsView		Menù dai mioraments
 Scroll bar:	DecorSettingsView		Sbare di scoriment:
 Choose ControlLook	DecorSettingsView		Sielç il ControlLook
 Monospaced fonts only	AntialiasingSettingsView		Dome caratars cun spziadure fisse

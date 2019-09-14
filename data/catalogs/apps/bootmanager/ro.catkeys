@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-BootManager	3886671855
+1	romanian	x-vnd.Haiku-BootManager	867546001
 Old Master Boot Record backup failure	BootManagerController	Title	Eșec la salvarea vechii înregistrări de boot principală
 At least one partition must be selected!	BootManagerController		Cel puțin o partiție trebuie selectată!
 No space available!	DrivesPage	Cannot install	Nu este spațiu disponibil!
@@ -16,6 +16,7 @@ Never	DefaultPartitionPage		Niciodată
 Summary	BootManagerController	Title	Rezumat
 An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		A apărut o eroare la scrierea meniului de boot. Înregistrarea de boot principală s-ar putea să fie distrusă, ar trebui să restaurați MBR acum!
 After three seconds	DefaultPartitionPage		După trei secunde
+Read only!	DrivesPage	Cannot install	Doar citire!
 Write boot menu	BootManagerController	Button	Scrie meniul de boot
 OK	BootManagerController	Button	OK
 Uninstall boot manager	BootManagerController	Title	Dezinstalează administratorul de boot

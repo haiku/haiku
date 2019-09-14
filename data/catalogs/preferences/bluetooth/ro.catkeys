@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-BluetoothPrefs	67867884
+1	romanian	x-vnd.Haiku-BluetoothPrefs	4276705900
 Laptop	Settings view		Laptop
 Only from trusted devices	Settings view		Numai de la dispozitivele de încredere
 15 secs	Settings view		15 secunde
@@ -17,9 +17,11 @@ Stop bluetooth services…	Window		Oprește servicii bluetooth…
 Add…	Remote devices		Adaugă…
 As blocked	Remote devices		Ca blocat
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Nu există niciun dispozitiv local Bluetooth înregistrat pe sistem.
+Policy…	Settings view		Politică…
 Revert	Window		Revenire
 Refresh local devices…	Window		Reactualizare dispozitive locale…
 Disconnect	Remote devices		Deconectează
+Identify us as…	Settings view		Identifică-ne ca…
 From all devices	Settings view		De la toate dispozitivele
 Defaults	Window		Implicite
 Start bluetooth services…	Window		Pornește servicii bluetooth…
@@ -28,12 +30,15 @@ Scanning progress	Inquiry panel		Progresul scanării
 Bluetooth	System name		Bluetooth
 Launch now	main		Lansează acum
 Remove	Remote devices		Elimină
+Pick device…	Settings view		Alege dispozitivul…
 Always ask	Settings view		Întreabă întotdeauna
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Cu suportul al:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nMulțumim persoanelor care au ajutat…\n\nLivrare/donare de hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomic:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nCu patch-uri:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTestare:\n - Petter H. Juliussen\nCine mi-a dat toate cunoștințele:\n - echipa yellowTAB
 Help	Window		Ajutor
 Pair…	Remote devices		Asociază…
 Retrieving name of %1	Inquiry panel		Se obține numele lui %1
 Inquiry	Inquiry panel		Întrebare
 Incoming connections policy:	Settings view		Regula conexiunilor de primire:
+Retrieving names…	Inquiry panel		Se obțin numele…
 Show name	Extended local device view		Afișează nume
 Add device to list	Inquiry panel		Adaugă dispozitiv la listă
 Remaining %1 seconds	Inquiry panel		Au rămas %1 secunde
@@ -47,3 +52,4 @@ Server	Settings view		Server
 Handheld	Settings view		Calculator de buzunar
  packets: 	Device View		 pachete: 
 About Bluetooth…	Window		Despre Bluetooth…
+Starting scan…	Inquiry panel		Se începe scanarea…

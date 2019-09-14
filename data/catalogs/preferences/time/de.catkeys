@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Time	752043118
+1	german	x-vnd.Haiku-Time	834234238
 OK	Time		OK
 Message receiving failed	Time		Nachricht wurde nicht erhalten
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Datum & Zeit\n\nvon\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
@@ -16,6 +16,7 @@ Asia	Time		Asien
 Try all servers	Time		Alle Server abfragen
 Time	Time		Time - Datum & Zeit
 Current time:	Time		Aktuelle Zeit:
+The following error occured while synchronizing:\n%s: %s	Time		Folgender Fehler trat beim Synchronisieren auf:\n%s: %s
 Europe	Time		Europa
 Show day of week	Time		Wochentag anzeigen
 Local time (Windows compatible)	Time		Lokalzeit (Windows-kompatibel)
@@ -43,5 +44,6 @@ Synchronize at boot	Time		Synchronisieren beim Hochfahren
 Indian	Time		Indischer Ozean
 Revert	Time		Anfangswerte
 Date and time	Time		Datum und Zeit
+The following error occured while synchronizing:\n%s	Time		Folgender Fehler trat beim Synchronisieren auf:\n%s
 Synchronize	Time		Synchronisieren
 Add	Time		Hinzu

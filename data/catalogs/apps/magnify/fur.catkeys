@@ -1,6 +1,7 @@
-1	friulian	x-vnd.Haiku-Magnify	3228180819
+1	friulian	x-vnd.Haiku-Magnify	1248284405
   size must be > 4 and a multiple of 4	Console		  la dimension e scugne jessi > 4 e un multipli di 4
 Decrease pixel size	Magnify-Main		Diminuìs la dimension dai pixel
+no clip msg	In console, when clipboard is empty after clicking Copy image		nissun msg ritaiât
 Increase pixel size	Magnify-Main		Aumente la dimension dai pixel
 magnify: size must be a multiple of 4	Console		magnify: la dimension e scugne jessi un multipli di 4
 Stick coordinates	Magnify-Main		Ten chestis coordenadis

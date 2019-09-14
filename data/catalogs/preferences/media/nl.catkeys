@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Media	3383826947
+1	dutch; flemish	x-vnd.Haiku-Media	4205337498
 Audio mixer	Media Window		Audiomixer
 Show volume control on Deskbar	Media views		Toon volumebediening in Deskbar
 Quit	Media Window		Afsluiten
@@ -14,6 +14,7 @@ MIDI Settings	Media Window		MIDI-instellingen
 Video output:	Media views		Video-output:
 Audio output:	Media views		Audio-output:
 Video input:	Media views		Video-invoer:
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Nu afsluiten van Media zal de herstart van de media-services stopppen. Dit leidt waarschijnlijk tot het onbetrouwbaar of niet functioneren van media-functionaliteit.
 Audio input:	Media views		Audio-input:
 <none>	Media views		<geen>
 This hardware has no controls.	Media Window		Deze hardware heeft geen bedieningselementen.

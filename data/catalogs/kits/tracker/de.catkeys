@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	1729503744
+1	german	x-vnd.Haiku-libtracker	543944115
 Created	ContainerWindow		Erstellt
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
 Open with…	ContainerWindow		Öffnen mit...
@@ -23,6 +23,7 @@ Name	Default Query Columns		Name
 Unmount	ContainerWindow		Aushängen
 Eject when unmounting	AutoMounterSettings		Auswerfen beim Aushängen
 Searching for disks to mount…	StatusWindow		Es werden Datenträger zum Einhängen gesucht…
+Information	InfoWindow		Information
 Error emptying Trash	FSUtils		Fehler beim Leeren des Papierkorbs
 Opens with:	InfoWindow		Wird geöffnet mit:
 Size	QueryPoseView		Größe
@@ -396,6 +397,7 @@ by formula	FindPanel		nach Formel
 is	FindPanel		ist
 Move to Trash	FilePanelPriv		In Papierkorb verschieben
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Wird der System Ordner oder dessen Inhalt umbenannt, kann %osName nicht mehr gestartet werden!\n\nTrotzdem umbenennen?\n\nUm den System Ordner oder dessen Inhalt trotzdem umzubenennen, Shift-Taste gedrückt halten und \"Umbenennen\" klicken.
+Permissions	FilePermissionsView		Berechtigungen
 40 x 40	ContainerWindow		40 x 40
 40 x 40	DeskWindow		40 x 40
 New folder %ld	FSUtils		Neuer Ordner %ld

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libtracker	2023640966
+1	italian	x-vnd.Haiku-libtracker	838081337
 Created	ContainerWindow		Creato
 Open and make preferred	OpenWithWindow		Apri e rendi preferito
 Open with…	ContainerWindow		Apri con…
@@ -23,6 +23,7 @@ Name	Default Query Columns		Nome
 Unmount	ContainerWindow		Smonta
 Eject when unmounting	AutoMounterSettings		Espelli i volumi una volta smontati
 Searching for disks to mount…	StatusWindow		Ricerca di dischi da montare…
+Information	InfoWindow		Informazioni
 Error emptying Trash	FSUtils		Errore nello svuotamento del cestino
 Opens with:	InfoWindow		Apri con:
 Size	QueryPoseView		Dimensione
@@ -402,6 +403,7 @@ by formula	FindPanel		per formula
 is	FindPanel		è
 Move to Trash	FilePanelPriv		Sposta nel Cestino
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Se rinomini la cartella di sistema o il suo contenuto, non sarai più in grado di avviare %osName!\n\nSei sicuro di voler procedere?\n\nPer rinominare la cartella di sistema o il suo contenuto, tieni premuto il tasto Maiusc e clicca su \"Rinomina\".
+Permissions	FilePermissionsView		Permessi
 40 x 40	ContainerWindow		40 × 40
 40 x 40	DeskWindow		40 × 40
 New folder %ld	FSUtils		Nuova cartella %ld

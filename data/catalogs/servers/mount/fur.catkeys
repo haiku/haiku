@@ -1,9 +1,10 @@
-1	friulian	x-vnd.Haiku-mount_server	819316177
+1	friulian	x-vnd.Haiku-mount_server	2818767263
 Mount read-only	AutoMounter		Montâ in dome-leture
 Error mounting volume:\n\n%s	AutoMounter		Erôr tal montâ il volum:\n\n%s
 Cancel	AutoMounter		Anule
 OK	AutoMounter		Va ben
 Unmount error	AutoMounter		Erôr tal dismontâ
+The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		Il file system su chest volum nol è il file system Be. Si consee di montâlu in modalitât dome-leture, par evitâ pierditis di dâts par vie di erôrs in Haiku.
 Mount read/write	AutoMounter		Montâ in leture e scriture
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		Impussibil dismontâ il disc \"%s\":\n\t%s
 Mounting volume '%s'\n\n	AutoMounter		Montaç dal volum '%s'\n\n

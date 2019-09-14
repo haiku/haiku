@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Installer	1997609102
+1	romanian	x-vnd.Haiku-Installer	116830250
 Performing installation.	InstallProgress		Se execută instalarea.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Alege discul sursă din meniul contextual. Apoi apasă \"Începe\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Alegeți fereastra ConfigurareDrive înainte de a închide fereastra Programului de instalare.
@@ -27,6 +27,7 @@ Running Boot Manager…\n\nClose Boot Manager to continue with the installation.
 Quit DriveSetup	InstallerWindow		Închide DriveSetup
 Write boot sector	InstallerWindow		Scrie sectorul de boot
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld din %2ld
+Finishing installation.	InstallProgress		Se termină instalarea.
 Install from:	InstallerWindow		Instalează de la:
 Additional disk space required: 0.0 KiB	InstallerWindow		Spațiu de disc adițional necesar: 0.0 KiB
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Acesta este software de calitate beta! Aceasta înseamnă că există un risc de a pierde date importante. Efectuați copii de rezervă frecvent! Ați fost avertizat.\n\n\n
@@ -39,6 +40,8 @@ Hide optional packages	InstallerWindow		Ascunde pachetele opționale
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Distracție plăcută și mulțumim că ați încercat Haiku!
 Quit	InstallerApp		Închidere
+Starting installation.	InstallProgress		Se începe instalarea.
+Error writing boot sector.	InstallProgress		Eroare la scrierea sectorului de boot.
 OK	InstallerWindow		OK
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Închideți Administratorul de boot și ConfigurareDrive înainte de a închide fereastra Programului de instalare.
 Failed to launch Boot Manager	InstallerWindow		Nu s-a putut lansa Managerul de Boot

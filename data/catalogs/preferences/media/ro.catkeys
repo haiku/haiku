@@ -1,10 +1,11 @@
-1	romanian	x-vnd.Haiku-Media	4205337498
+1	romanian	x-vnd.Haiku-Media	1682972002
 Audio mixer	Media Window		Mixaj audio
 Show volume control on Deskbar	Media views		Afișează controlul volumului în Deskbar
 Quit	Media Window		Închidere
 Restart media services	Media views		Restartează servicii media
 Couldn't add volume control in Deskbar: %s\n	Media views		Nu s-a putut adăuga controlul de volum pe bara de desktop: %s\n
 Start media server	Media Window		Pornește server media
+<none>	VideoInputMenu	Used when no video input is available	<none>
 Audio settings	Media Window		Configurări audio
 Quit anyway	Media Window		Închide oricum
 Couldn't remove volume control in Deskbar: %s\n	Media views		Nu s-a putut elimina controlul de volum de pe bara de desktop: %s\n
@@ -22,3 +23,4 @@ Channel:	Media views		Canal:
 Defaults	Media views		Implicite
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Nu s-a putut conecta la serverul media.\nDoriți să îl porniți ?
 Video settings	Media Window		Configurări video
+<none>	VideoOutputMenu	Used when no video output is available	<none>

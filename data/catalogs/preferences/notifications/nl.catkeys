@@ -1,13 +1,31 @@
-1	dutch; flemish	x-vnd.Haiku-Notifications	213548865
+1	dutch; flemish	x-vnd.Haiku-Notifications	4198982834
+Lower left	GeneralView		Linksonder
+Application does not have a valid signature	NotificationView	Alert message	Toepassing heeft geen geldige handtekening
+Add…	NotificationView		Toevoegen…
+Lower right	GeneralView		Rechtsonder
+Muted	NotificationView		Gedempt
 Window width:	GeneralView		Vensterbreedte:
+ is already listed	NotificationView	Alert message	 is al toegevoegd
 OK	PrefletWin		Oké
 Notifications	PrefletWin		Aankondigingen
+Mute notifications from this application	NotificationView		Meldingen van deze toepassing dempen
+seconds	GeneralView		sconden
 Revert	PrefletWin		Herstellen
 Applications	PrefletView		Toepassingen
+Upper right	GeneralView		Rechtsboven
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Er is een fout opgetreden bij het opslaan van de voorkeuren.\nMogelijk is er onvoldoende schijfruimte vrij.
+Defaults	PrefletWin		Standaardwaarden
+Upper left	GeneralView		Linksboven
 Applications	NotificationView		Toepassingen
+Width:	GeneralView		Breedte:
 General	PrefletView		Algemeen
 OK	NotificationView		Oké
+Follow Deskbar	GeneralView		Deskbar volgen
 Notifications	System name		Aankondigingen
 Allowed	NotificationView		Toegestaan
+Duration:	GeneralView		Duur:
 Application	NotificationView		Toepassing
 Enable notifications	GeneralView		Aankondigingen aanzetten
+This is a test notification message	PrefletWin		Dit is een testmelding
+Remove	NotificationView		Verwijderen
+Position:	GeneralView		Positie:

@@ -1,8 +1,12 @@
-1	romanian	x-vnd.Haiku-IMAP	1938678311
+1	romanian	x-vnd.Haiku-IMAP	1343128980
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Nu s-a putut conecta la server \"%server%\":\n%error%
+Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		Se actualizează abonamentele la dosarele IMAP, aveți răbdare…
 Failed to fetch available storage.	IMAPFolderConfig		Nu s-a putut aduce depozitul disponibil.
 Cancel	IMAPFolderConfig		Anulează
+OK	IMAPFolderConfig		OK
+Server storage: %s / %s used.	IMAPFolderConfig		Stocare server: %s / %s utilizat.
 No encryption	imap_config		Fără criptare
+Fetching IMAP folders, please be patient…	IMAPFolderConfig		Se aduc dosarele IMAP, aveți răbdare…
 Configure IMAP Folders	imap_config		Configurează dosare IMAP
 SSL	imap_config		SSL
 Apply	IMAPFolderConfig		Aplică

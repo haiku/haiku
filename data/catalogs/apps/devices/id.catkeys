@@ -1,9 +1,11 @@
-1	indonesian	x-vnd.Haiku-Devices	691869921
+1	indonesian	x-vnd.Haiku-Devices	3345509916
 ACPI bus	DevicesView		Bus ACPI
+Encryption controller	Device		Pengontrol enkripsi
 Bus Information	Device		Informasi Bus
 Devices	System name		Perangkat
 Graphics Peripheral	DeviceSCSI		Perangkat Grafis
 Processor	Device		Prosesor
+Generate system information	DevicesView		Hasilkan informasi sistem
 Class info	DevicePCI		Info kelas
 ACPI Information	DeviceACPI		Informasi ACPI
 Detailed	DevicesView		Terperinci
@@ -35,6 +37,7 @@ PCI bus	DevicesView		Bus PCI
 ACPI System Indicator	DeviceACPI		Indikator Sistem ACPI
 ACPI System Bus	DeviceACPI		Sistem Bus ACPI
 PCI Information	DevicePCI		Infomasi PCI
+Tape Drive	DeviceSCSI		Drive Pita
 Changer	DeviceSCSI		Pengalih
 Serial bus controller	Device		Pengontrol serial bus
 Refresh devices	DevicesView		Segarkan perangkat
@@ -51,7 +54,9 @@ Device name	DeviceACPI		Nama perangkat
 Card Reader	DeviceSCSI		Pembaca kartu
 Display controller	Device		Pengontrol display
 Basic information	DevicesView		Informasi dasar
+ACPI Button '%1'	DeviceACPI		Tombol ACPI '%1'
 Bus	DevicesView		Bus
+ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Nama perangkat
 Disk Drive	DeviceSCSI		Disk Drive
 Other	DeviceSCSI		Lain
@@ -78,6 +83,7 @@ Signal processing controller	Device		Pengontrol pemroses sinyal
 Device name	DeviceSCSI		Nama perangkat
 Docking station	Device		Stasiun perkaitan
 Array	DeviceSCSI		Susunan
+Unclassified device	Device		Perangkat tidak terklasifikasi
 ACPI controller	Device		Pengontrol ACPI
 Network controller	Device		Pengontrol jaringan
 Driver used	Device		Driver yang digunakan

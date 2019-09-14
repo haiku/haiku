@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-BootManager	3886671855
+1	indonesian	x-vnd.Haiku-BootManager	867546001
 Old Master Boot Record backup failure	BootManagerController	Title	Master Boot Record lama gagal dicadangkan
 At least one partition must be selected!	BootManagerController		Setidaknya satu partisi harus dipilih!
 No space available!	DrivesPage	Cannot install	Tidak ada tempat yang tersedia!
@@ -16,6 +16,7 @@ Never	DefaultPartitionPage		Tak pernah
 Summary	BootManagerController	Title	Ringkasan
 An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Terjadi kesalahan saat menulis menu booting. Master Boot Record mungkin hancur, Anda harus mengembalikan MBR sekarang!
 After three seconds	DefaultPartitionPage		Setelah tiga detik
+Read only!	DrivesPage	Cannot install	Hanya baca!
 Write boot menu	BootManagerController	Button	Tuliskan menu booting
 OK	BootManagerController	Button	OKE
 Uninstall boot manager	BootManagerController	Title	Copot manager boot

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Appearance	583615507
+1	romanian	x-vnd.Haiku-Appearance	663472720
 Control border	Colors tab		Margine de control
 Control mark	Colors tab		Semn control
 Off	AntialiasingSettingsView		Oprit
@@ -8,10 +8,12 @@ Defaults	APRWindow		Implicite
 Shadow	Colors tab		Umbră
 Document background	Colors tab		Fundalul documentului
 List background	Colors tab		Fundal listă
+No effect on running applications	DecorSettingsView		Niciun efect asupra aplicațiilor care rulează
 Fixed font:	Font view		Font fix:
 Appearance	System name		Aspect
 Reduce colored edges filter strength:	AntialiasingSettingsView		Reduce intensitatea filtrului marginilor colorate:
 Glyph hinting:	AntialiasingSettingsView		Indiciu glyph:
+Default Haiku ControlLook	DecorSettingsView		Haiku ControlLock implicit
 Menu item text	Colors tab		Text de element meniu
 About decorator	DecorSettingsView		Despre decorator
 Antialiasing menu	AntialiasingSettingsView		Meniu anticrenelare
@@ -47,7 +49,9 @@ LCD subpixel	AntialiasingSettingsView		Subpixel LCD
 Window tab	Colors tab		Tab de fereastră
 Link text	Colors tab		Text legătură
 Tooltip background	Colors tab		Fundalul indiciului
+ControlLook:	DecorSettingsView		ControlLock:
 Scroll bar thumb	Colors tab		Miniatură bară de derulare
+Default	DecorSettingsView		Implicit
 Link visited	Colors tab		Legătură vizitată
 Selected menu item border	Colors tab		Marginea elementului de meniu selectat
 Tooltip text	Colors tab		Text de indiciu
@@ -63,10 +67,12 @@ Antialiasing type:	AntialiasingSettingsView		Tip de anti-alias:
 Panel text	Colors tab		Text de panou
 Hinting menu	AntialiasingSettingsView		Meniu de sugestii
 Scroll bar:	DecorSettingsView		Bară de derulare:
+Choose ControlLook	DecorSettingsView		Alege ControlLock
 Monospaced fonts only	AntialiasingSettingsView		Doar fonturi monospațiate
 Document text	Colors tab		Document text
 Inactive window border	Colors tab		Margine fereastră inactivă
 Colors	APRWindow		Culori
+About control look	DecorSettingsView		Despre control lock
 Control highlight	Colors tab		Punct principal de control
 Status bar	Colors tab		Bara de stare
 Link hover	Colors tab		Planare legătură

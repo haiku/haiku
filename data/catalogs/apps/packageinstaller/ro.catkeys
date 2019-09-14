@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-PackageInstaller	3110601390
+1	romanian	x-vnd.Haiku-PackageInstaller	2472572058
 Package description	UninstallView		Descriere pachet
 none	PackageView		nimic
 Continue	PackageInstall		Continuare
@@ -53,6 +53,7 @@ Continue	PackageInfo		Continuare
 No package selected.	PackageInfo		Niciun pachet selectat.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Eroare! \"%s\" nu este o cale validă.\n
 The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Directorul cu numele „%s” există deja la calea dată.\nSe înlocuiește directorul cu unul din acest pachet sau se sare?
+LegacyPackageInstaller	System name		LegacyPackageInstaller
 Ask again	PackageView		Întreabă din nou
 Begin	PackageView		Început
 OK	PackageView		OK
