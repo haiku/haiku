@@ -478,7 +478,7 @@ vfs_mount_boot_file_system(kernel_args* args)
 		panic("get_boot_partitions failed!");
 	}
 	if (partitions.IsEmpty()) {
-		panic("did not find any boot partitions!");
+		panic("did not find any boot partitions! @! syslog | tail 15");
 	}
 
 	dev_t bootDevice = -1;
