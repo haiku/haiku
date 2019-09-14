@@ -94,6 +94,8 @@ struct dl_phdr_info
 	void *dlpi_tls_data;
 };
 
+#include <sys/cdefs.h>
+
 __BEGIN_DECLS
 
 typedef int (*__dl_iterate_hdr_callback)(struct dl_phdr_info *, size_t, void *);
