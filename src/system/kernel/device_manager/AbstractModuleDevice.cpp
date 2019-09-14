@@ -68,6 +68,8 @@ AbstractModuleDevice::Open(const char* path, int openMode, void** _cookie)
 status_t
 AbstractModuleDevice::Read(void* cookie, off_t pos, void* buffer, size_t* _length)
 {
+	if (Module()->read == NULL)
+		return BaseDevice::Read(cookie, pos, buffer, _length);
 	return Module()->read(cookie, pos, buffer, _length);
 }
 
@@ -75,6 +77,8 @@ AbstractModuleDevice::Read(void* cookie, off_t pos, void* buffer, size_t* _lengt
 status_t
 AbstractModuleDevice::Write(void* cookie, off_t pos, const void* buffer, size_t* _length)
 {
+	if (Module()->write == NULL)
+		return BaseDevice::Write(cookie, pos, buffer, _length);
 	return Module()->write(cookie, pos, buffer, _length);
 }
 
@@ -82,6 +86,8 @@ AbstractModuleDevice::Write(void* cookie, off_t pos, const void* buffer, size_t*
 status_t
 AbstractModuleDevice::IO(void* cookie, io_request* request)
 {
+	if (Module()->io == NULL)
+		return BaseDevice::IO(cookie, request);
 	return Module()->io(cookie, request);
 }
 
@@ -89,6 +95,8 @@ AbstractModuleDevice::IO(void* cookie, io_request* request)
 status_t
 AbstractModuleDevice::Control(void* cookie, int32 op, void* buffer, size_t length)
 {
+	if (Module()->control == NULL)
+		return BaseDevice::Control(cookie, op, buffer, length);
 	return Module()->control(cookie, op, buffer, length);
 }
 
@@ -96,6 +104,8 @@ AbstractModuleDevice::Control(void* cookie, int32 op, void* buffer, size_t lengt
 status_t
 AbstractModuleDevice::Select(void* cookie, uint8 event, selectsync* sync)
 {
+	if (Module()->select == NULL)
+		return BaseDevice::Select(cookie, event, sync);
 	return Module()->select(cookie, event, sync);
 }
 
@@ -103,6 +113,8 @@ AbstractModuleDevice::Select(void* cookie, uint8 event, selectsync* sync)
 status_t
 AbstractModuleDevice::Deselect(void* cookie, uint8 event, selectsync* sync)
 {
+	if (Module()->deselect == NULL)
+		return BaseDevice::Deselect(cookie, event, sync);
 	return Module()->deselect(cookie, event, sync);
 }
 
