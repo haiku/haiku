@@ -14,6 +14,7 @@
 
 #include <Drivers.h>
 
+#include <kernel.h>
 #include <util/kernel_cpp.h>
 #include <util/ring_buffer.h>
 
@@ -389,7 +390,10 @@ RingBuffer::~RingBuffer()
 size_t
 RingBuffer::Read(void *buffer, ssize_t size)
 {
-	return ring_buffer_read(fBuffer, (uint8*)buffer, size);
+	if (IS_USER_ADDRESS(buffer))
+		return ring_buffer_user_read(fBuffer, (uint8*)buffer, size);
+	else
+		return ring_buffer_read(fBuffer, (uint8*)buffer, size);
 }
 
 
