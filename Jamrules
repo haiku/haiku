@@ -93,6 +93,25 @@ include [ FDirName $(HAIKU_BUILD_RULES_DIR) TestsRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) BuildSetup ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) DefaultBuildProfiles ] ;
 
+# Include the repositories for this architecture.
+local repositoriesDirectory
+	= [ FDirName $(HAIKU_BUILD_RULES_DIR) repositories ] ;
+local repositories = HaikuPorts ;
+if $(HAIKU_BUILD_TYPE) = bootstrap {
+	repositories = HaikuPortsCross ;
+}
+
+local repository ;
+for repository in $(repositories) {
+	local repositoryDirectory
+		= [ FDirName $(repositoriesDirectory) $(repository) ] ;
+	local file = [ Glob $(repositoryDirectory) : $(HAIKU_PACKAGING_ARCH) ] ;
+	if $(file) {
+		HAIKU_REPOSITORY_JAMFILE = $(file) ;
+		include $(file) ;
+	}
+}
+
 # Declare no-op user-overridable build rules.
 rule UserBuildConfigRulePostBuildTargets	{ }
 rule UserBuildConfigRulePreImage			{ }
@@ -111,25 +130,6 @@ if ! $(HAIKU_IGNORE_USER_BUILD_CONFIG) {
 		= [ GLOB $(HAIKU_OUTPUT_DIR) : UserBuildConfig ] ;
 	if $(userBuildConfig) {
 		include $(userBuildConfig) ;
-	}
-}
-
-# Include the repositories for this architecture.
-local repositoriesDirectory
-	= [ FDirName $(HAIKU_BUILD_RULES_DIR) repositories ] ;
-local repositories = HaikuPorts ;
-if $(HAIKU_BUILD_TYPE) = bootstrap {
-	repositories = HaikuPortsCross ;
-}
-
-local repository ;
-for repository in $(repositories) {
-	local repositoryDirectory
-		= [ FDirName $(repositoriesDirectory) $(repository) ] ;
-	local file = [ Glob $(repositoryDirectory) : $(HAIKU_PACKAGING_ARCH) ] ;
-	if $(file) {
-		HAIKU_REPOSITORY_JAMFILE = $(file) ;
-		include $(file) ;
 	}
 }
 
