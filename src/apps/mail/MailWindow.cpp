@@ -366,11 +366,11 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		new BMessage(M_FIND_AGAIN), 'G'));
 	if (!fIncoming) {
 		menu->AddSeparatorItem();
-		fQuote = new BMenuItem(B_TRANSLATE("Quote"),
-			new BMessage(M_QUOTE), '\'');
+		fQuote = new BMenuItem(B_TRANSLATE("Increase quote level"),
+			new BMessage(M_ADD_QUOTE_LEVEL), '+');
 		menu->AddItem(fQuote);
-		fRemoveQuote = new BMenuItem(B_TRANSLATE("Remove quote"),
-			new BMessage(M_REMOVE_QUOTE), '\'', B_SHIFT_KEY);
+		fRemoveQuote = new BMenuItem(B_TRANSLATE("Decrease quote level"),
+			new BMessage(M_SUB_QUOTE_LEVEL), '-');
 		menu->AddItem(fRemoveQuote);
 
 		menu->AddSeparatorItem();
@@ -383,12 +383,12 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	menu->AddSeparatorItem();
 	menu->AddItem(item = new BMenuItem(
 		B_TRANSLATE("Settings" B_UTF8_ELLIPSIS),
-		new BMessage(M_PREFS),','));
+		new BMessage(M_PREFS)));
 	item->SetTarget(be_app);
 	fMenuBar->AddItem(menu);
 	menu->AddItem(item = new BMenuItem(
 		B_TRANSLATE("Accounts" B_UTF8_ELLIPSIS),
-		new BMessage(M_ACCOUNTS),'-'));
+		new BMessage(M_ACCOUNTS)));
 	item->SetTarget(be_app);
 
 	// View Menu
@@ -1462,8 +1462,8 @@ TMailWindow::MessageReceived(BMessage* msg)
 			FindWindow::FindAgain(this);
 			break;
 
-		case M_QUOTE:
-		case M_REMOVE_QUOTE:
+		case M_ADD_QUOTE_LEVEL:
+		case M_SUB_QUOTE_LEVEL:
 			PostMessage(msg->what, fContentView);
 			break;
 

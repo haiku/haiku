@@ -693,14 +693,14 @@ TContentView::MessageReceived(BMessage *msg)
 			break;
 		}
 
-		case M_QUOTE:
+		case M_ADD_QUOTE_LEVEL:
 		{
 			int32 start, finish;
 			fTextView->GetSelection(&start, &finish);
 			fTextView->AddQuote(start, finish);
 			break;
 		}
-		case M_REMOVE_QUOTE:
+		case M_SUB_QUOTE_LEVEL:
 		{
 			int32 start, finish;
 			fTextView->GetSelection(&start, &finish);
