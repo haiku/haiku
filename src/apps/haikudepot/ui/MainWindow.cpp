@@ -740,7 +740,7 @@ MainWindow::_BuildUserMenu(BMenuBar* menuBar)
 	fUserMenu->AddItem(fLogOutItem);
 
 	BMenuItem *latestUserUsageConditionsMenuItem =
-		new BMenuItem(B_TRANSLATE("View latest user usage conditions"
+		new BMenuItem(B_TRANSLATE("View latest usage conditions"
 			B_UTF8_ELLIPSIS),
 			new BMessage(MSG_VIEW_LATEST_USER_USAGE_CONDITIONS));
 	fUserMenu->AddItem(latestUserUsageConditionsMenuItem);
@@ -954,7 +954,7 @@ MainWindow::_BulkLoadProcessCoordinatorFinished(
 {
 	if (coordinatorState.ErrorStatus() != B_OK) {
 		AppUtils::NotifySimpleError(
-			B_TRANSLATE("Package Update Error"),
+			B_TRANSLATE("Package update error"),
 			B_TRANSLATE("While updating package data, a problem has arisen "
 				"that may cause data to be outdated or missing from the "
 				"application's display. Additional details regarding this "

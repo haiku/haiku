@@ -29,11 +29,11 @@
 #define PLACEHOLDER_TEXT "..."
 
 #define INTRODUCTION_TEXT_LATEST "HaikuDepot communicates with a " \
-	"sever component called HaikuDepotServer.  These are the latest user " \
+	"sever component called HaikuDepotServer.  These are the latest " \
 	"usage conditions for use of the HaikuDepotServer service."
 
 #define INTRODUCTION_TEXT_USER "HaikuDepot communicates with a " \
-	"sever component called HaikuDepotServer.  These are the user usage " \
+	"sever component called HaikuDepotServer.  These are the usage " \
 	"conditions that the user has agreed to in relation to the use of the " \
 	"HaikuDepotServer service."
 
@@ -49,7 +49,7 @@
 UserUsageConditionsWindow::UserUsageConditionsWindow(Model& model,
 	UserUsageConditions& userUsageConditions)
 	:
-	BWindow(WINDOW_FRAME, B_TRANSLATE("User Usage Conditions"),
+	BWindow(WINDOW_FRAME, B_TRANSLATE("Usage conditions"),
 			B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 			B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS
 				| B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
@@ -82,7 +82,7 @@ UserUsageConditionsWindow::UserUsageConditionsWindow(Model& model,
 UserUsageConditionsWindow::UserUsageConditionsWindow(
 	Model& model, UserUsageConditionsSelectionMode mode)
 	:
-	BWindow(WINDOW_FRAME, B_TRANSLATE("User Usage Conditions"),
+	BWindow(WINDOW_FRAME, B_TRANSLATE("Usage conditions"),
 			B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 			B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS
 				| B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
@@ -91,7 +91,7 @@ UserUsageConditionsWindow::UserUsageConditionsWindow(
 	fWorkerThread(-1)
 {
 	if (mode != LATEST)
-		debugger("only the LATEST user usage conditions are handled for now");
+		debugger("only the LATEST usage conditions are handled for now");
 
 	_InitUiControls();
 
@@ -222,7 +222,7 @@ UserUsageConditionsWindow::_FetchData()
 	if (-1 != fWorkerThread)
 		debugger("illegal state - attempt to fetch, but fetch in progress");
 	thread_id thread = spawn_thread(&_FetchDataThreadEntry,
-		"Fetch user usage conditions data", B_NORMAL_PRIORITY, this);
+		"Fetch usage conditions data", B_NORMAL_PRIORITY, this);
 	if (thread >= 0) {
 		fWorkerIndicator->Start();
 		_SetWorkerThread(thread);
@@ -265,9 +265,9 @@ UserUsageConditionsWindow::_FetchDataPerform()
 		BMessenger(this).SendMessage(&dataMessage);
 	} else {
 		AppUtils::NotifySimpleError(
-			B_TRANSLATE("User Usage Conditions Download Problem"),
-			B_TRANSLATE("An error has arisen downloading the user usage "
-				"conditions.  Check the log for details and try again."));
+			B_TRANSLATE("Usage conditions download problem"),
+			B_TRANSLATE("An error has arisen downloading the usage "
+				"conditions. Check the log for details and try again."));
 		BMessenger(this).SendMessage(B_QUIT_REQUESTED);
 	}
 

@@ -151,6 +151,6 @@ LocalRepositoryUpdateProcess::_NotifyError(const BString& error,
 	}
 
 	AppUtils::NotifySimpleError(
-		B_TRANSLATE("Repository Update Error"),
+		B_TRANSLATE("Repository update error"),
 		alertText);
 }

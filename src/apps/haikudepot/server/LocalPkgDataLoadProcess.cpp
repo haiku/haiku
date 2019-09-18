@@ -388,6 +388,6 @@ LocalPkgDataLoadProcess::_NotifyError(const BString& messageText) const
 	printf("an error has arisen loading data of packages from local : %s\n",
 		messageText.String());
 	AppUtils::NotifySimpleError(
-		B_TRANSLATE("Local Repository Load Error"),
+		B_TRANSLATE("Local repository load error"),
 		messageText);
 }
