@@ -1,0 +1,153 @@
+/*
+ * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Name, email@email.com
+ *
+ * Corresponds to:
+ *		headers/os/support/BufferedDataIO.h	 hrev47422
+ *		src/kits/support/BufferedDataIO.cpp	 hrev48615
+ */
+
+
+
+
+/*!
+	\file BufferedDataIO.h
+	\ingroup support
+	\ingroup libbe
+	\brief Undocumented file.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BBufferedDataIO
+	\ingroup support
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BBufferedDataIO::BBufferedDataIO(BDataIO &stream, size_t bufferSize=65536L, bool ownsStream=true, bool partialReads=false)
+	\brief Undocumented public method
+
+	\param stream Undocumented
+	\param bufferSize Undocumented
+	\param ownsStream Undocumented
+	\param partialReads Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BBufferedDataIO::~BBufferedDataIO()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BBufferedDataIO::InitCheck() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BDataIO* BBufferedDataIO::Stream() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn size_t BBufferedDataIO::BufferSize() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BBufferedDataIO::OwnsStream() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BBufferedDataIO::SetOwnsStream(bool ownsStream)
+	\brief Undocumented public method
+
+	\param ownsStream Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BBufferedDataIO::Flush()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual ssize_t BBufferedDataIO::Read(void *buffer, size_t size)
+	\brief Undocumented public method
+
+	\param buffer Undocumented
+	\param size Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual ssize_t BBufferedDataIO::Write(const void *buffer, size_t size)
+	\brief Undocumented public method
+
+	\param buffer Undocumented
+	\param size Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/

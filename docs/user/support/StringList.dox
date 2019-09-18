@@ -1,0 +1,470 @@
+/*
+ * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Name, email@email.com
+ *
+ * Corresponds to:
+ *		headers/os/support/StringList.h	 hrev47422
+ *		src/kits/support/StringList.cpp	 hrev46113
+ */
+
+
+/*!
+	\file StringList.h
+	\ingroup support
+	\brief Undocumented file.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BStringList
+	\ingroup support
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BStringList::BStringList(int32 count=20)
+	\brief Undocumented public method
+
+	\param count Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BStringList::BStringList(const BStringList &other)
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BStringList::~BStringList()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BStringList::Add(const BString &string, int32 index)
+	\brief Undocumented public method
+
+	\param string Undocumented
+	\param index Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BStringList::Add(const BString &string)
+	\brief Undocumented public method
+
+	\param string Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BStringList::Add(const BStringList &list, int32 index)
+	\brief Undocumented public method
+
+	\param list Undocumented
+	\param index Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BStringList::Add(const BStringList &list)
+	\brief Undocumented public method
+
+	\param list Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BStringList::Remove(const BString &string, bool ignoreCase=false)
+	\brief Undocumented public method
+
+	\param string Undocumented
+	\param ignoreCase Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BStringList::Remove(const BStringList &list, bool ignoreCase=false)
+	\brief Undocumented public method
+
+	\param list Undocumented
+	\param ignoreCase Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BString BStringList::Remove(int32 index)
+	\brief Undocumented public method
+
+	\param index Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BStringList::Remove(int32 index, int32 count)
+	\brief Undocumented public method
+
+	\param index Undocumented
+	\param count Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BStringList::Replace(int32 index, const BString &string)
+	\brief Undocumented public method
+
+	\param index Undocumented
+	\param string Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BStringList::MakeEmpty()
+	\brief Undocumented public method
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BStringList::Sort(bool ignoreCase=false)
+	\brief Undocumented public method
+
+	\param ignoreCase Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BStringList::Swap(int32 indexA, int32 indexB)
+	\brief Undocumented public method
+
+	\param indexA Undocumented
+	\param indexB Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BStringList::Move(int32 fromIndex, int32 toIndex)
+	\brief Undocumented public method
+
+	\param fromIndex Undocumented
+	\param toIndex Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BString BStringList::StringAt(int32 index) const
+	\brief Undocumented public method
+
+	\param index Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BString BStringList::First() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BString BStringList::Last() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BStringList::HasString(const BString &string, bool ignoreCase=false) const
+	\brief Undocumented public method
+
+	\param string Undocumented
+	\param ignoreCase Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BStringList::IndexOf(const BString &string, bool ignoreCase=false) const
+	\brief Undocumented public method
+
+	\param string Undocumented
+	\param ignoreCase Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BStringList::CountStrings() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BStringList::IsEmpty() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BString BStringList::Join(const char *separator, int32 length=-1) const
+	\brief Undocumented public method
+
+	\param separator Undocumented
+	\param length Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BStringList::DoForEach(bool(*func)(const BString &string))
+	\brief Undocumented public method
+
+	\param func Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BStringList::DoForEach(bool(*func)(const BString &string, void *arg2), void *arg2)
+	\brief Undocumented public method
+
+	\param func Undocumented
+	\param arg2 Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BStringList& BStringList::operator=(const BStringList &other)
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BStringList::operator==(const BStringList &other) const
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BStringList::operator!=(const BStringList &other) const
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual bool BStringList::IsFixedSize() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual type_code BStringList::TypeCode() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual bool BStringList::AllowsTypeCode(type_code code) const
+	\brief Undocumented public method
+
+	\param code Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual ssize_t BStringList::FlattenedSize() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BStringList::Flatten(void *buffer, ssize_t size) const
+	\brief Undocumented public method
+
+	\param buffer Undocumented
+	\param size Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BStringList::Unflatten(type_code code, const void *buffer, ssize_t size)
+	\brief Undocumented public method
+
+	\param code Undocumented
+	\param buffer Undocumented
+	\param size Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
