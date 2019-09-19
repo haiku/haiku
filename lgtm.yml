@@ -1,0 +1,35 @@
+extraction:
+  cpp:
+    prepare:
+      packages:
+        - git
+        - nasm
+        - autoconf
+        - automake
+        - texinfo
+        - flex
+        - bison
+        - gawk
+        - build-essential
+        - unzip
+        - wget
+        - zip
+        - less
+        - zlib1g-dev
+        - xorriso
+        - libtool
+        - mtools
+        - gcc-multilib
+        - python3
+    after_prepare:
+      - curl https://codeload.github.com/haiku/buildtools/zip/master -o master.zip
+      - mkdir $LGTM_WORKSPACE/buildtools
+      - unzip -qq master.zip -d $LGTM_WORKSPACE/buildtools
+      - cd $LGTM_WORKSPACE/buildtools/buildtools-master/jam && make && BINDIR=$LGTM_WORKSPACE/bin ./jam0 install
+    configure:
+      command:
+        - ./configure --build-cross-tools x86_64 $LGTM_WORKSPACE/buildtools/buildtools-master --use-gcc-pipe -j2
+    index:
+      build_command:
+        - HAIKU_REVISION=hrev54000 $LGTM_WORKSPACE/bin/jam -j2 @nightly-raw
+ 
