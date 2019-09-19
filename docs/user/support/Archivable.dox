@@ -396,6 +396,31 @@
 
 
 /*!
+	\enum BUnarchiver::ownership_policy
+	\brief Options for the ownership policy of objects retrieved from
+		BUnarchiver
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var ownership_policy BUnarchiver::B_ASSUME_OWNERSHIP
+	\brief Ownership of unarchived objects will be transferred to the caller.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var ownership_policy BUnarchiver::B_DONT_ASSUME_OWNERSHIP
+	\brief The unarchived objects will be borrowed to the caller.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\fn BUnarchiver::BUnarchiver(const BMessage* archive)
 	\brief Constructs a BUnarchiver object to manage \c archive.
 
@@ -872,3 +897,4 @@ MyArchivableClas::MyArchivableClas(BMessage* archive)
 
 
 //! @}
+ 

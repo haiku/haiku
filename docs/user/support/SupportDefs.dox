@@ -7,7 +7,7 @@
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/support/SupportDefs.h	rev 35018
+ *		headers/os/support/SupportDefs.h	hrev51198
  */
 
 
@@ -242,11 +242,55 @@
 */
 
 
+/*!
+	\typedef typedef __haiku_phys_addr_t phys_addr_t
+	\brief Represents a physical address.
+
+	This has the length of 4 bytes on a 32 bit platform, and 8 bytes on a 64
+	bit platform.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\typedef typedef phys_addr_t phys_size_t
+	\brief Represents a size of physical memory.
+
+	This has the length of 4 bytes on a 32 bit platform, and 8 bytes on a 64
+	bit platform.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\typedef typedef __haiku_generic_addr_t generic_addr_t
+	\brief Represents a generic address.
+
+	A generic address is wide enough to store both physical and virtual
+	addresses.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\typedef typedef generic_addr_t generic_size_t
+	\brief Represents a size of generic memory.
+
+	A generic address is wide enough to store both physical and virtual
+	addresses.
+
+	\since Haiku R1
+*/
+
+
 //! @}
 
 
 /*!
-	\name Format strings for printf() and scanf()
+	\name Format strings for printf() and scanf() for integer types
 */
 
 
@@ -255,221 +299,265 @@
 
 /*!
 	\def B_PRId8
+	\brief printf() constant for i8 as decimal
 */
 
 
 /*!
 	\def B_PRIi8
+	\brief printf() constant for i8 as decimal
 */
 
 
 /*!
 	\def B_PRId16
+	\brief printf() constant for i16 as decimal
 */
 
 
 /*!
 	\def B_PRIi16
+	\brief printf() constant for i16 as decimal
 */
 
 
 /*!
 	\def B_PRId32
+	\brief printf() constant for i32 as decimal
 */
 
 
 /*!
 	\def B_PRIi32
+	\brief printf() constant for i32 as decimal
 */
 
 
 /*!
 	\def B_PRId64
+	\brief printf() constant for i64 as decimal
 */
 
 
 /*!
 	\def B_PRIi64
+	\brief printf() constant for i64 as decimal
 */
 
 
 /*!
 	\def B_PRIu8
+	\brief printf() constant for u8 as decimal
 */
 
 
 /*!
 	\def B_PRIo8
+	\brief printf() constant for u8 as octal
 */
 
 
 /*!
 	\def B_PRIx8
+	\brief printf() constant for u8 as lowercase hexadecimal
 */
 
 
 /*!
 	\def B_PRIX8
+	\brief printf() constant for u8 as uppercase hexadecimal
 */
 
 
 /*!
 	\def B_PRIu16
+	\brief printf() constant for u16 as decimal
 */
 
 
 /*!
 	\def B_PRIo16
+	\brief printf() constant for u16 as octal
 */
 
 
 /*!
 	\def B_PRIx16
+	\brief printf() constant for u16 as lowercase hexadecimal
 */
 
 
 /*!
 	\def B_PRIX16
+	\brief printf() constant for u16 as uppercase hexadecimal
 */
 
 
 /*!
 	\def B_PRIu32
+	\brief printf() constant for u32 as decimal
 */
 
 
 /*!
 	\def B_PRIo32
+	\brief printf() constant for u32 as octal
 */
 
 
 /*!
 	\def B_PRIx32
+	\brief printf() constant for u32 as lowercase hexadecimal
 */
 
 
 /*!
 	\def B_PRIX32
+	\brief printf() constant for u32 as uppercase hexadecimal
 */
 
 
 /*!
 	\def B_PRIu64
+	\brief printf() constant for u64 as decimal
 */
 
 
 /*!
 	\def B_PRIo64
+	\brief printf() constant for u64 as octal
 */
 
 
 /*!
 	\def B_PRIx64
+	\brief printf() constant for u64 as lowercase hexadecimal
 */
 
 
 /*!
 	\def B_PRIX64
+	\brief printf() constant for u64 as uppercase hexadecimal
 */
 
 
 /*!
 	\def B_SCNd8
+	\brief scanf() constant for i8 as decimal
 */
 
 
 /*!
 	\def B_SCNi8
+	\brief scanf() constant for i8 as decimal, octal or hexadecimal
 */
 
 
 /*!
 	\def B_SCNd16
+	\brief scanf() constant for i16 as decimal
 */
 
 
 /*!
 	\def B_SCNi16
+	\brief scanf() constant for i16 as decimal, octal or hexadecimal
 */
 
 
 /*!
 	\def B_SCNd32
+	\brief scanf() constant for i32 as decimal
 */
 
 
 /*!
 	\def B_SCNi32
+	\brief scanf() constant for i32 as decimal, octal or hexadecimal
 */
 
 
 /*!
 	\def B_SCNd64
+	\brief scanf() constant for i64 as decimal
 */
 
 
 /*!
 	\def B_SCNi64
+	\brief scanf() constant for i64 as decimal, octal or hexadecimal
 */
 
 
 /*!
 	\def B_SCNu8
+	\brief scanf() constant for u8 as decimal
 */
 
 
 /*!
 	\def B_SCNo8
+	\brief scanf() constant for u8 as decimal, octal or hexadecimal
 */
 
 
 /*!
 	\def B_SCNx8
+	\brief scanf() constant for u8 as hexadecimal
 */
 
 
 /*!
 	\def B_SCNu16
+	\brief scanf() constant for u16 as decimal
 */
 
 
 /*!
 	\def B_SCNo16
+	\brief scanf() constant for u16 as decimal, octal or hexadecimal
 */
 
 
 /*!
 	\def B_SCNx16
+	\brief scanf() constant for u16 as hexadecimal
 */
 
 
 /*!
 	\def B_SCNu32
+	\brief scanf() constant for u32 as decimal
 */
 
 
 /*!
 	\def B_SCNo32
+	\brief scanf() constant for u32 as decimal, octal or hexadecimal
 */
 
 
 /*!
 	\def B_SCNx32
+	\brief scanf() constant for u32 as hexadecimal
 */
 
 
 /*!
 	\def B_SCNu64
+	\brief scanf() constant for u64 as decimal
 */
 
 
 /*!
 	\def B_SCNo64
+	\brief scanf() constant for u64 as decimal, octal or hexadecimal
 */
 
 
 /*!
 	\def B_SCNx64
+	\brief scanf() constant for u64 as hexadecimal
 */
 
 
@@ -486,109 +574,285 @@
 
 /*!
 	\def B_PRIuSIZE
-	\brief size_t
+	\brief printf() constant for size_t as decimal
 */
 
 
 /*!
 	\def B_PRIoSIZE
-	\brief size_t
+	\brief printf() constant for size_t as octal
 */
 
 
 /*!
 	\def B_PRIxSIZE
-	\brief size_t
+	\brief printf() constant for size_t as lowercase hexadecimal
 */
 
 
 /*!
 	\def B_PRIXSIZE
-	\brief size_t
+	\brief printf() constant for size_t as uppercase hexadecimal
+*/
+
+
+/*!
+	\def B_SCNuSIZE
+	\brief scanf() constant for size_t as decimal
+*/
+
+
+/*!
+	\def B_SCNoSIZE
+	\brief scanf() constant for size_t as decimal, octal or hexadecimal
+
+*/
+
+
+/*!
+	\def B_SCNxSIZE
+	\brief scanf() constant for size_t as hexadecimal
 */
 
 
 /*!
 	\def B_PRIdSSIZE
-	\brief ssize_t
+	\brief printf() constant for ssize_t as decimal
 */
 
 
 /*!
 	\def B_PRIiSSIZE
-	\brief ssize_t
+	\brief printf() constant for ssize_t as decimal
+*/
+
+
+/*!
+	\def B_SCNdSSIZE
+	\brief scanf() constant for ssize_t as decimal
+*/
+
+
+/*!
+	\def B_SCNiSSIZE
+	\brief scanf() constant for ssize_t as decimal, octal or hexadecimal
 */
 
 
 /*!
 	\def B_PRIuADDR
-	\brief addr_t
+	\brief printf() constant for addr_t as decimal
 */
 
 
 /*!
 	\def B_PRIoADDR
-	\brief addr_t
+	\brief printf() constant for addr_t as octal
 */
 
 
 /*!
 	\def B_PRIxADDR
-	\brief addr_t
+	\brief printf() constant for addr_t as lowercase hexadecimal
 */
 
 
 /*!
 	\def B_PRIXADDR
-	\brief addr_t
+	\brief printf() constant for addr_t as uppercase hexadecimal
+*/
+
+
+/*!
+	\def B_SCNuADDR
+	\brief scanf() constant for addr_t as decimal
+*/
+
+
+/*!
+	\def B_SCNoADDR
+	\brief scanf() constant for addr_t as decimal, octal or hexadecimal
+*/
+
+
+/*!
+	\def B_SCNxADDR
+	\brief scanf() constant for addr_t as hexadecimal
+*/
+
+
+/*!
+	\def B_PRIuPHYSADDR
+	\brief printf() constant for phys_addr_t as decimal
+*/
+
+
+/*!
+	\def B_PRIoPHYSADDR
+	\brief printf() constant for phys_addr_t as octal
+*/
+
+
+/*!
+	\def B_PRIxPHYSADDR
+	\brief printf() constant for phys_addr_t as lowercase hexadecimal
+*/
+
+
+/*!
+	\def B_PRIXPHYSADDR
+	\brief printf() constant for phys_addr_t as uppercase hexadecimal
+*/
+
+
+/*!
+	\def B_SCNuPHYSADDR
+	\brief scanf() constant for phys_addr_t as decimal
+*/
+
+
+/*!
+	\def B_SCNoPHYSADDR
+	\brief scanf() constant for phys_addr_t as decimal, octal or hexadecimal
+*/
+
+
+/*!
+	\def B_SCNxPHYSADDR
+	\brief scanf() constant for phys_addr_t as hexadecimal
+*/
+
+
+/*!
+	\def B_PRIuGENADDR
+	\brief printf() constant for generic_addr_t as decimal
+*/
+
+
+/*!
+	\def B_PRIoGENADDR
+	\brief printf() constant for generic_addr_t as octal
+*/
+
+
+/*!
+	\def B_PRIxGENADDR
+	\brief printf() constant for generic_addr_t as lowercase hexadecimal
+*/
+
+
+/*!
+	\def B_PRIXGENADDR
+	\brief printf() constant for generic_addr_t as uppercase hexadecimal
+*/
+
+
+/*!
+	\def B_SCNuGENADDR
+	\brief scanf() constant for generic_addr_t as decimal
+*/
+
+
+/*!
+	\def B_SCNoGENADDR
+	\brief scanf() constant for generic_addr_t as decimal, octal or hexadecimal
+*/
+
+
+/*!
+	\def B_SCNxGENADDR
+	\brief scanf() constant for generic_addr_t as hexadecimal
 */
 
 
 /*!
 	\def B_PRIdOFF
-	\brief off_t
+	\brief printf() constant for off_t as decimal
 */
 
 
 /*!
 	\def B_PRIiOFF
-	\brief off_t
+	\brief printf() constant for off_t as decimal
+*/
+
+
+/*!
+	\def B_PRIxOFF
+	\brief printf() constant for off_t as lowercase hexadecimal
+*/
+
+
+/*!
+	\def B_SCNdOFF
+	\brief scanf() constant for off_t as decimal
+*/
+
+
+/*!
+	\def B_SCNiOFF
+	\brief scanf() constant for off_t as decimal, octal or hexadecimal
+*/
+
+
+/*!
+	\def B_SCNxOFF
+	\brief scanf() constant for off_t as octal
 */
 
 
 /*!
 	\def B_PRIdDEV
-	\brief dev_t
+	\brief printf() constant for dev_t as decimal
 */
 
 
 /*!
 	\def B_PRIiDEV
-	\brief dev_t
+	\brief printf() constant for dev_t as decimal
 */
 
 
 /*!
 	\def B_PRIdINO
-	\brief ino_t
+	\brief printf() constant for ino_t as decimal
 */
 
 
 /*!
 	\def B_PRIiINO
-	\brief ino_t
+	\brief printf() constant for ino_t as decimal
 */
 
 
 /*!
 	\def B_PRIdTIME
-	\brief time_t
+	\brief printf() constant for time_t as decimal
 */
 
 
 /*!
 	\def B_PRIiTIME
-	\brief time_t
+	\brief printf() constant for time_t as decimal
+*/
+
+
+/*!
+	\def B_PRIdBIGTIME
+	\brief printf() constant for bigtime_t as decimal
+*/
+
+
+/*!
+	\def B_PRIiBIGTIME
+	\brief printf() constant for bigtime_t as decimal
+*/
+
+
+/*!
+	\def B_PRINTF_POINTER_WIDTH
+	\brief printf() argument for printed width of a pointer with the %p format
+		(minus 0x prefix).
 */
 
 
@@ -633,6 +897,16 @@
 	\brief Defines the constant \c NULL if it hasn't already been defined.
 
 	\since BeOS R3
+*/
+
+
+/*!
+	\def B_COUNT_OF(a)
+	\brief Count items in an array.
+
+	Set to (sizeof(a) / sizeof(a[0])).
+
+	\since Haiku R1
 */
 
 

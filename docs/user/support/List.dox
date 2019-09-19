@@ -12,8 +12,8 @@
  *		John Drinkwater, jdrinkwater@gmail.com
  *
  * Corresponds to:
- *		headers/os/support/List.h	hrev47418
- *		src/kits/support/List.cpp	hrev47418
+ *		headers/os/support/List.h	hrev47422
+ *		src/kits/support/List.cpp	hrev47422
  */
 
 
@@ -481,12 +481,32 @@ A C D E F G B H I J
 
 
 /*!
+	\fn bool BList::HasItem(const void *item) const
+	\brief Return whether or not \a item is in the list.
+
+	\return \c true if the \a item was in the list, \c false otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\fn int32 BList::IndexOf(void* item) const
 	\brief Return the index of \a item.
 
 	\return The index of the item, or -1 when the item is not in the list.
 
 	\since BeOS R3
+*/
+
+
+/*!
+	\fn int32 BList::IndexOf(const void *item) const
+	\brief Return the index of \a item.
+
+	\return The index of the item, or -1 when the item is not in the list.
+
+	\since Haiku R1
 */
 
 
