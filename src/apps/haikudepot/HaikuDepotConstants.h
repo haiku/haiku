@@ -21,6 +21,7 @@ enum {
 	MSG_DID_UPDATE_USER_RATING				= 'upur',
 	MSG_LANGUAGE_SELECTED					= 'lngs',
 	MSG_VIEW_LATEST_USER_USAGE_CONDITIONS	= 'vluc',
+	MSG_VIEW_USERS_USER_USAGE_CONDITIONS	= 'vuuc',
 	MSG_USER_USAGE_CONDITIONS_DATA			= 'uucd',
 	MSG_USER_USAGE_CONDITIONS_ERROR			= 'uuce'
 };
@@ -61,6 +62,13 @@ enum {
 	RSRC_ARROW_RIGHT	= 550,
 };
 
+
+enum UserUsageConditionsSelectionMode {
+	LATEST		= 1,
+	USER		= 2,
+	FIXED		= 3
+		// means that the user usage conditions are supplied to the window.
+};
 
 #define LANGUAGE_DEFAULT_CODE "en"
 #define LANGUAGE_DEFAULT Language(LANGUAGE_DEFAULT_CODE, "English", true)

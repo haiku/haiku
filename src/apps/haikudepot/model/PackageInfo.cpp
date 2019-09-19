@@ -55,7 +55,6 @@ Language::GetName(BString& name,
 
 UserInfo::UserInfo()
 	:
-	fAvatar(),
 	fNickName()
 {
 }
@@ -63,15 +62,6 @@ UserInfo::UserInfo()
 
 UserInfo::UserInfo(const BString& nickName)
 	:
-	fAvatar(),
-	fNickName(nickName)
-{
-}
-
-
-UserInfo::UserInfo(const BitmapRef& avatar, const BString& nickName)
-	:
-	fAvatar(avatar),
 	fNickName(nickName)
 {
 }
@@ -79,7 +69,6 @@ UserInfo::UserInfo(const BitmapRef& avatar, const BString& nickName)
 
 UserInfo::UserInfo(const UserInfo& other)
 	:
-	fAvatar(other.fAvatar),
 	fNickName(other.fNickName)
 {
 }
@@ -88,7 +77,6 @@ UserInfo::UserInfo(const UserInfo& other)
 UserInfo&
 UserInfo::operator=(const UserInfo& other)
 {
-	fAvatar = other.fAvatar;
 	fNickName = other.fNickName;
 	return *this;
 }
@@ -97,8 +85,7 @@ UserInfo::operator=(const UserInfo& other)
 bool
 UserInfo::operator==(const UserInfo& other) const
 {
-	return fAvatar == other.fAvatar
-		&& fNickName == other.fNickName;
+	return fNickName == other.fNickName;
 }
 
 
@@ -119,28 +106,22 @@ UserRating::UserRating()
 	fComment(),
 	fLanguage(),
 	fPackageVersion(),
-	fUpVotes(0),
-	fDownVotes(0),
-	fCreateTimestamp()
+	fCreateTimestamp(0)
 {
 }
 
 
 UserRating::UserRating(const UserInfo& userInfo, float rating,
 		const BString& comment, const BString& language,
-		const BString& packageVersion, int32 upVotes, int32 downVotes,
-		const BDateTime& createTimestamp)
+		const BString& packageVersion, uint64 createTimestamp)
 	:
 	fUserInfo(userInfo),
 	fRating(rating),
 	fComment(comment),
 	fLanguage(language),
 	fPackageVersion(packageVersion),
-	fUpVotes(upVotes),
-	fDownVotes(downVotes),
-	fCreateTimestamp()
+	fCreateTimestamp(createTimestamp)
 {
-	fCreateTimestamp.SetTime_t(createTimestamp.Time_t());
 }
 
 
@@ -151,11 +132,8 @@ UserRating::UserRating(const UserRating& other)
 	fComment(other.fComment),
 	fLanguage(other.fLanguage),
 	fPackageVersion(other.fPackageVersion),
-	fUpVotes(other.fUpVotes),
-	fDownVotes(other.fDownVotes),
-	fCreateTimestamp()
+	fCreateTimestamp(other.fCreateTimestamp)
 {
-	fCreateTimestamp.SetTime_t(other.CreateTimestamp().Time_t());
 }
 
 
@@ -167,9 +145,7 @@ UserRating::operator=(const UserRating& other)
 	fComment = other.fComment;
 	fLanguage = other.fLanguage;
 	fPackageVersion = other.fPackageVersion;
-	fUpVotes = other.fUpVotes;
-	fDownVotes = other.fDownVotes;
-	fCreateTimestamp.SetTime_t(other.fCreateTimestamp.Time_t());
+	fCreateTimestamp = other.fCreateTimestamp;
 	return *this;
 }
 
@@ -182,8 +158,6 @@ UserRating::operator==(const UserRating& other) const
 		&& fComment == other.fComment
 		&& fLanguage == other.fLanguage
 		&& fPackageVersion == other.fPackageVersion
-		&& fUpVotes == other.fUpVotes
-		&& fDownVotes == other.fDownVotes
 		&& fCreateTimestamp == other.fCreateTimestamp;
 }
 

@@ -7,6 +7,7 @@
 #include "UserLoginWindow.h"
 
 #include <algorithm>
+#include <ctype.h>
 #include <stdio.h>
 
 #include <mail_encoding.h>
@@ -341,6 +342,24 @@ count_upper_case_letters(const BString& string)
 }
 
 
+static bool
+contains_any_whitespace(const BString& string)
+{
+	const char* c = string.String();
+	for (int32 i = 0; i < string.CountChars(); i++) {
+		if (isspace(c[i]))
+			return true;
+	}
+
+	return false;
+}
+
+
+/*! This method will check that the inputs in the user interface are, as far as
+    the desktop application can be sure, correct.
+    \return true if the data in the form was valid.
+*/
+
 bool
 UserLoginWindow::_ValidateCreateAccountFields(bool alertProblems)
 {
@@ -349,11 +368,17 @@ UserLoginWindow::_ValidateCreateAccountFields(bool alertProblems)
 	BString password2(fRepeatPasswordField->Text());
 	BString email(fEmailField->Text());
 	BString captcha(fCaptchaResultField->Text());
-	bool minimumAgeConfirmed = fConfirmMinimumAgeCheckBox->Value() != 0;
+	bool minimumAgeConfirmed = fConfirmMinimumAgeCheckBox->Value()
+		== B_CONTROL_ON;
 	bool userUsageConditionsConfirmed =
-		fConfirmUserUsageConditionsCheckBox->Value() != 0;
+		fConfirmUserUsageConditionsCheckBox->Value() == B_CONTROL_ON;
 
 	// TODO: Use the same validation as the web-serivce
+
+	bool validEmail = email.IsEmpty() ||
+		(B_ERROR != email.FindFirst("@") && !contains_any_whitespace(email));
+	fEmailField->MarkAsInvalid(!validEmail);
+
 	bool validUserName = nickName.Length() >= 3;
 	fNewUsernameField->MarkAsInvalid(!validUserName);
 
@@ -367,23 +392,11 @@ UserLoginWindow::_ValidateCreateAccountFields(bool alertProblems)
 	fCaptchaResultField->MarkAsInvalid(!validCaptcha);
 
 	bool valid = validUserName && validPassword && password1 == password2
-		&& validCaptcha;
-	if (valid && email.Length() > 0)
-		return true;
+		&& validCaptcha && minimumAgeConfirmed && userUsageConditionsConfirmed
+		&& validEmail;
 
-	if (alertProblems) {
-		BString message;
-		alert_type alertType;
-		const char* okLabel = B_TRANSLATE("OK");
-		const char* cancelLabel = NULL;
-		if (!valid) {
-			message = B_TRANSLATE("There are problems in the form:\n\n");
-			alertType = B_WARNING_ALERT;
-		} else {
-			alertType = B_IDEA_ALERT;
-			okLabel = B_TRANSLATE("Ignore");
-			cancelLabel = B_TRANSLATE("Cancel");
-		}
+	if (!valid && alertProblems) {
+		BString message = B_TRANSLATE("There are problems in the form:\n\n");
 
 		if (!validUserName) {
 			message << B_TRANSLATE(
@@ -425,14 +438,11 @@ UserLoginWindow::_ValidateCreateAccountFields(bool alertProblems)
 		BAlert* alert = new(std::nothrow) BAlert(
 			B_TRANSLATE("Input validation"),
 			message,
-			okLabel, cancelLabel, NULL,
-			B_WIDTH_AS_USUAL, alertType);
+			B_TRANSLATE("OK"), NULL, NULL,
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 
-		if (alert != NULL) {
-			int32 choice = alert->Go();
-			if (choice == 1)
-				return false;
-		}
+		if (alert != NULL)
+			alert->Go();
 	}
 
 	return valid;

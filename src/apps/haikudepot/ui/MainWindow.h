@@ -2,7 +2,7 @@
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent <rene@gollent.com>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
- * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2019, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MAIN_WINDOW_H
@@ -10,13 +10,13 @@
 
 #include <Window.h>
 
-#include "TabView.h"
+#include "HaikuDepotConstants.h"
 #include "Model.h"
 #include "PackageAction.h"
 #include "PackageActionHandler.h"
-#include "PackageInfoListener.h"
 #include "ProcessCoordinator.h"
-#include "HaikuDepotConstants.h"
+#include "PackageInfoListener.h"
+#include "TabView.h"
 
 
 class BCardLayout;
@@ -69,7 +69,7 @@ private:
 			void				_BuildMenu(BMenuBar* menuBar);
 			void				_BuildUserMenu(BMenuBar* menuBar);
 
-			void				_RestoreUserName(const BMessage& settings);
+			void				_RestoreNickname(const BMessage& settings);
 			const char*			_WindowFrameName() const;
 			void				_RestoreWindowFrame(const BMessage& settings);
 
@@ -101,7 +101,8 @@ private:
 			void				_RatePackage();
 			void				_ShowScreenshot();
 
-			void				_ViewLatestUserUsageConditions();
+			void				_ViewUserUsageConditions(
+									UserUsageConditionsSelectionMode mode);
 
 private:
 			FilterView*			fFilterView;
@@ -118,6 +119,7 @@ private:
 			BMenu*				fRepositoryMenu;
 			BMenuItem*			fLogInItem;
 			BMenuItem*			fLogOutItem;
+			BMenuItem*			fUsersUserUsageConditionsMenuItem;
 
 			BMenuItem*			fShowAvailablePackagesItem;
 			BMenuItem*			fShowInstalledPackagesItem;

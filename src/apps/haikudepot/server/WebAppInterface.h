@@ -13,6 +13,8 @@
 #include <package/PackageVersion.h>
 
 #include "List.h"
+#include "UserCredentials.h"
+#include "UserDetail.h"
 #include "UserUsageConditions.h"
 
 
@@ -47,10 +49,8 @@ public:
 
 			WebAppInterface&	operator=(const WebAppInterface& other);
 
-			void				SetAuthorization(const BString& username,
-									const BString& password);
-			const BString&		Username() const
-									{ return fUsername; }
+			void				SetAuthorization(const UserCredentials& value);
+			const BString&		Nickname() const;
 
 			status_t			GetChangelog(
 									const BString& packageName,
@@ -67,7 +67,7 @@ public:
 									const BPackageVersion& version,
 									const BString& architecture,
 									const BString& repositoryCode,
-									const BString& username,
+									const BString& userNickname,
 									BMessage& message);
 
 			status_t			CreateUserRating(
@@ -88,6 +88,13 @@ public:
 									const BString& stability,
 									int rating, bool active,
 									BMessage& message);
+
+			status_t			RetrieveUserDetailForCredentials(
+									const UserCredentials& credentials,
+									UserDetail& userDetail);
+
+			status_t			RetrieveCurrentUserDetail(
+									UserDetail& userDetail);
 
 			status_t			RetrieveUserUsageConditions(
 									const BString& code,
@@ -116,13 +123,15 @@ public:
 	static int32				ErrorCodeFromResponse(BMessage& response);
 
 private:
-			status_t			_SendRawGetRequest(
-									const BString urlPathComponents,
-									BDataIO* stream);
+	static	status_t			_UnpackUserDetails(
+									BMessage& responseEnvelopeMessage,
+									UserDetail& userDetail);
+
 			status_t			_RetrieveUserUsageConditionsMeta(
 									const BString& code, BMessage& message);
 			status_t			_RetrieveUserUsageConditionsCopy(
 									const BString& code, BDataIO* stream);
+
 			void				_WriteStandardJsonRpcEnvelopeValues(
 									BJsonWriter& writer,
 									const char* methodName);
@@ -130,16 +139,24 @@ private:
 									const BString& jsonString, uint32 flags,
 									BMessage& reply) const;
 			status_t			_SendJsonRequest(const char* domain,
+									UserCredentials credentials,
 									BPositionIO* requestData,
 									size_t requestDataSize, uint32 flags,
 									BMessage& reply) const;
+			status_t			_SendJsonRequest(const char* domain,
+									BPositionIO* requestData,
+									size_t requestDataSize, uint32 flags,
+									BMessage& reply) const;
+
+			status_t			_SendRawGetRequest(
+									const BString urlPathComponents,
+									BDataIO* stream);
 	static	void				_LogPayload(BPositionIO* requestData,
 									size_t size);
 	static	off_t				_LengthAndSeekToZero(BPositionIO* data);
 
 private:
-			BString				fUsername;
-			BString				fPassword;
+			UserCredentials		fCredentials;
 	static	int					fRequestIndex;
 };
 

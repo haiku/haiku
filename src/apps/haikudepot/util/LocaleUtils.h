@@ -6,6 +6,9 @@
 #define LOCALE_UTILS_H
 
 
+#include <String.h>
+
+
 class BCollator;
 
 
@@ -13,6 +16,7 @@ class LocaleUtils {
 
 public:
 	static	BCollator*		GetSharedCollator();
+	static	BString			TimestampToDateTimeString(uint64 millis);
 
 private:
 	static	void			GetCollator(BCollator* collator);

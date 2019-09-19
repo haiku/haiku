@@ -548,7 +548,7 @@ RatePackageWindow::_QueryRatingThread()
 	Unlock();
 
 	BAutolock locker(fModel.Lock());
-	BString username = fModel.Username();
+	BString nickname = fModel.Nickname();
 	locker.Unlock();
 
 	if (package.Get() == NULL) {
@@ -573,7 +573,7 @@ RatePackageWindow::_QueryRatingThread()
 		status_t status = interface
 			.RetreiveUserRatingForPackageAndVersionByUser(package->Name(),
 			package->Version(), package->Architecture(), repositoryCode,
-			username, info);
+			nickname, info);
 
 		if (status == B_OK) {
 				// could be an error or could be a valid response envelope

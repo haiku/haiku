@@ -277,8 +277,7 @@ WebAppInterface::WebAppInterface()
 
 WebAppInterface::WebAppInterface(const WebAppInterface& other)
 	:
-	fUsername(other.fUsername),
-	fPassword(other.fPassword)
+	fCredentials(other.fCredentials)
 {
 }
 
@@ -293,18 +292,22 @@ WebAppInterface::operator=(const WebAppInterface& other)
 {
 	if (this == &other)
 		return *this;
-	fUsername = other.fUsername;
-	fPassword = other.fPassword;
+	fCredentials = other.fCredentials;
 	return *this;
 }
 
 
 void
-WebAppInterface::SetAuthorization(const BString& username,
-	const BString& password)
+WebAppInterface::SetAuthorization(const UserCredentials& value)
 {
-	fUsername = username;
-	fPassword = password;
+	fCredentials = value;
+}
+
+
+const BString&
+WebAppInterface::Nickname() const
+{
+	return fCredentials.Nickname();
 }
 
 
@@ -368,7 +371,7 @@ status_t
 WebAppInterface::RetreiveUserRatingForPackageAndVersionByUser(
 	const BString& packageName, const BPackageVersion& version,
 	const BString& architecture, const BString &repositoryCode,
-	const BString& username, BMessage& message)
+	const BString& userNickname, BMessage& message)
 {
 		// BHttpRequest later takes ownership of this.
 	BMallocIO* requestEnvelopeData = new BMallocIO();
@@ -383,7 +386,7 @@ WebAppInterface::RetreiveUserRatingForPackageAndVersionByUser(
 	requestEnvelopeWriter.WriteObjectStart();
 
 	requestEnvelopeWriter.WriteObjectName("userNickname");
-	requestEnvelopeWriter.WriteString(username.String());
+	requestEnvelopeWriter.WriteString(userNickname.String());
 	requestEnvelopeWriter.WriteObjectName("pkgName");
 	requestEnvelopeWriter.WriteString(packageName.String());
 	requestEnvelopeWriter.WriteObjectName("pkgVersionArchitectureCode");
@@ -423,6 +426,114 @@ WebAppInterface::RetreiveUserRatingForPackageAndVersionByUser(
 	return _SendJsonRequest("userrating", requestEnvelopeData,
 		_LengthAndSeekToZero(requestEnvelopeData), NEEDS_AUTHORIZATION,
 		message);
+}
+
+
+/*! This method will fill out the supplied UserDetail object with information
+    about the user that is supplied in the credentials.  Importantly it will
+    also authenticate the request with the details of the credentials and will
+    not use the credentials that are configured in 'fCredentials'.
+*/
+
+status_t
+WebAppInterface::RetrieveUserDetailForCredentials(
+	const UserCredentials& credentials, UserDetail& userDetail)
+{
+	if (!credentials.IsValid()) {
+		debugger("the credentials supplied are invalid so it is not possible "
+			"to obtain the user detail");
+	}
+
+		// BHttpRequest later takes ownership of this.
+	BMallocIO* requestEnvelopeData = new BMallocIO();
+	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
+
+	requestEnvelopeWriter.WriteObjectStart();
+	_WriteStandardJsonRpcEnvelopeValues(requestEnvelopeWriter, "getUser");
+	requestEnvelopeWriter.WriteObjectName("params");
+	requestEnvelopeWriter.WriteArrayStart();
+	requestEnvelopeWriter.WriteObjectStart();
+	requestEnvelopeWriter.WriteObjectName("nickname");
+	requestEnvelopeWriter.WriteString(credentials.Nickname().String());
+	requestEnvelopeWriter.WriteObjectEnd();
+	requestEnvelopeWriter.WriteArrayEnd();
+	requestEnvelopeWriter.WriteObjectEnd();
+
+	BMessage responseEnvelopeMessage;
+	status_t result = _SendJsonRequest("user", credentials, requestEnvelopeData,
+		_LengthAndSeekToZero(requestEnvelopeData), NEEDS_AUTHORIZATION,
+		responseEnvelopeMessage);
+		// note that the credentials used here are passed in as args.
+
+	if (result == B_OK)
+		result = _UnpackUserDetails(responseEnvelopeMessage, userDetail);
+
+	return result;
+}
+
+
+/*! This method will return the credentials for the currently authenticated
+    user.
+*/
+
+status_t
+WebAppInterface::RetrieveCurrentUserDetail(UserDetail& userDetail)
+{
+	return RetrieveUserDetailForCredentials(fCredentials, userDetail);
+}
+
+
+/*! When the user requests user detail, the server sends back an envelope of
+    response data.  This method will unpack the data into a model object.
+    \return Not B_OK if something went wrong.
+*/
+
+/*static*/ status_t
+WebAppInterface::_UnpackUserDetails(BMessage& responseEnvelopeMessage,
+	UserDetail& userDetail)
+{
+	BMessage resultMessage;
+	status_t result = responseEnvelopeMessage.FindMessage(
+		"result", &resultMessage);
+
+	if (result != B_OK) {
+		fprintf(stderr, "bad response envelope missing 'result' entry\n");
+		return result;
+	}
+
+	BString nickname;
+	result = resultMessage.FindString("nickname", &nickname);
+	userDetail.SetNickname(nickname);
+
+	BMessage agreementMessage;
+	if (resultMessage.FindMessage("userUsageConditionsAgreement",
+		&agreementMessage) == B_OK) {
+		BString code;
+		BDateTime agreedToTimestamp;
+		BString userUsageConditionsCode;
+		UserUsageConditionsAgreement agreement = userDetail.Agreement();
+		bool isLatest;
+
+		if (agreementMessage.FindString("userUsageConditionsCode",
+			&userUsageConditionsCode) == B_OK) {
+			agreement.SetCode(userUsageConditionsCode);
+		}
+
+		double timestampAgreedMillis;
+		if (agreementMessage.FindDouble("timestampAgreed",
+			&timestampAgreedMillis) == B_OK) {
+			agreement.SetTimestampAgreed((uint64) timestampAgreedMillis);
+		}
+
+		if (agreementMessage.FindBool("isLatest", &isLatest)
+			== B_OK) {
+			agreement.SetIsLatest(isLatest);
+		}
+
+		userDetail.SetAgreement(agreement);
+	}
+
+	return result;
 }
 
 
@@ -551,7 +662,7 @@ WebAppInterface::CreateUserRating(const BString& packageName,
 	requestEnvelopeWriter.WriteObjectName("pkgVersionType");
 	requestEnvelopeWriter.WriteString("SPECIFIC");
 	requestEnvelopeWriter.WriteObjectName("userNickname");
-	requestEnvelopeWriter.WriteString(fUsername.String());
+	requestEnvelopeWriter.WriteString(fCredentials.Nickname());
 
 	if (!version.Major().IsEmpty()) {
 		requestEnvelopeWriter.WriteObjectName("pkgVersionMajor");
@@ -797,6 +908,16 @@ status_t
 WebAppInterface::_SendJsonRequest(const char* domain, BPositionIO* requestData,
 	size_t requestDataSize, uint32 flags, BMessage& reply) const
 {
+	return _SendJsonRequest(domain, fCredentials, requestData, requestDataSize,
+		flags, reply);
+}
+
+
+status_t
+WebAppInterface::_SendJsonRequest(const char* domain,
+	UserCredentials credentials, BPositionIO* requestData,
+	size_t requestDataSize, uint32 flags, BMessage& reply) const
+{
 	if (requestDataSize == 0) {
 		if (Logger::IsInfoEnabled())
 			printf("jrpc; empty request payload\n");
@@ -853,13 +974,12 @@ WebAppInterface::_SendJsonRequest(const char* domain, BPositionIO* requestData,
 	// Authentication via Basic Authentication
 	// The other way would be to obtain a token and then use the Token Bearer
 	// header.
-	if ((flags & NEEDS_AUTHORIZATION) != 0
-		&& !fUsername.IsEmpty() && !fPassword.IsEmpty()) {
-		BHttpAuthentication authentication(fUsername, fPassword);
+	if (((flags & NEEDS_AUTHORIZATION) != 0) && credentials.IsValid()) {
+		BHttpAuthentication authentication(credentials.Nickname(),
+			credentials.PasswordClear());
 		authentication.SetMethod(B_HTTP_AUTHENTICATION_BASIC);
 		context.AddAuthentication(url, authentication);
 	}
-
 
 	request.AdoptInputData(requestData, requestDataSize);
 

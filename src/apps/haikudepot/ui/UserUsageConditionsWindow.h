@@ -9,7 +9,9 @@
 #include <Messenger.h>
 #include <Window.h>
 
+#include "HaikuDepotConstants.h"
 #include "PackageInfo.h"
+#include "UserDetail.h"
 #include "UserUsageConditions.h"
 
 
@@ -18,14 +20,6 @@ class BTextView;
 class BStringView;
 class MarkupTextView;
 class Model;
-
-
-enum UserUsageConditionsSelectionMode {
-	LATEST		= 1,
-	USER		= 2,
-	FIXED		= 3
-		// means that the user usage conditions are supplied to the window.
-};
 
 
 class UserUsageConditionsWindow : public BWindow {
@@ -45,16 +39,22 @@ private:
 	static const BString		_VersionText(const BString& code);
 	static const BString		_MinimumAgeText(uint8 minimumAge);
 	static const BString		_IntroductionTextForMode(
-									UserUsageConditionsSelectionMode mode);
+									UserUsageConditionsSelectionMode mode,
+									const UserDetail& userDetail);
 	static float				_ExpectedIntroductionTextHeight(
 									BTextView* introductionTextView);
 
-	void						_DisplayData(const UserUsageConditions& data);
+	void						_DisplayData(const UserDetail& userDetail,
+									const UserUsageConditions&
+									userUsageConditions);
 
 	void						_FetchData();
 	void						_SetWorkerThread(thread_id thread);
 	static int32				_FetchDataThreadEntry(void* data);
 	void						_FetchDataPerform();
+	status_t					_FetchUserUsageConditionsCodePerform(
+									UserDetail& userDetail, BString& code);
+	void						_NotifyFetchProblem();
 
 private:
 			UserUsageConditionsSelectionMode
@@ -63,6 +63,7 @@ private:
 			Model&				fModel;
 			BStringView*		fAgeNoteStringView;
 			BStringView*		fVersionStringView;
+			BTextView*			fIntroductionTextView;
 			BarberPole*			fWorkerIndicator;
 			thread_id			fWorkerThread;
 };

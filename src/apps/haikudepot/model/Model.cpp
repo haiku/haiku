@@ -720,21 +720,13 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 						versionString << architectureCode;
 					}
 
-					BDateTime createTimestamp;
-					double createTimestampMillisF;
-					if (item.FindDouble("createTimestamp",
-						&createTimestampMillisF) == B_OK) {
-						double createTimestampSecsF =
-							createTimestampMillisF / 1000.0;
-						time_t createTimestampSecs =
-							(time_t) createTimestampSecsF;
-						createTimestamp.SetTime_t(createTimestampSecs);
-					}
+					double createTimestamp;
+					item.FindDouble("createTimestamp", &createTimestamp);
 
 					// Add the rating to the PackageInfo
 					UserRating userRating = UserRating(UserInfo(user), rating,
-						comment, languageCode, versionString, 0, 0,
-						createTimestamp);
+						comment, languageCode, versionString,
+						(uint64) createTimestamp);
 					package->AddUserRating(userRating);
 
 					if (Logger::IsDebugEnabled()) {
@@ -813,43 +805,43 @@ Model::_PopulatePackageChangelog(const PackageInfoRef& package)
 
 
 void
-Model::SetUsername(BString username)
+Model::SetNickname(BString nickname)
 {
 	BString password;
-	if (username.Length() > 0) {
+	if (nickname.Length() > 0) {
 		BPasswordKey key;
 		BKeyStore keyStore;
-		if (keyStore.GetKey(kHaikuDepotKeyring, B_KEY_TYPE_PASSWORD, username,
+		if (keyStore.GetKey(kHaikuDepotKeyring, B_KEY_TYPE_PASSWORD, nickname,
 				key) == B_OK) {
 			password = key.Password();
 		} else {
-			username = "";
+			nickname = "";
 		}
 	}
-	SetAuthorization(username, password, false);
+	SetAuthorization(nickname, password, false);
 }
 
 
 const BString&
-Model::Username() const
+Model::Nickname() const
 {
-	return fWebAppInterface.Username();
+	return fWebAppInterface.Nickname();
 }
 
 
 void
-Model::SetAuthorization(const BString& username, const BString& password,
+Model::SetAuthorization(const BString& nickname, const BString& passwordClear,
 	bool storePassword)
 {
-	if (storePassword && username.Length() > 0 && password.Length() > 0) {
-		BPasswordKey key(password, B_KEY_PURPOSE_WEB, username);
+	if (storePassword && nickname.Length() > 0 && passwordClear.Length() > 0) {
+		BPasswordKey key(passwordClear, B_KEY_PURPOSE_WEB, nickname);
 		BKeyStore keyStore;
 		keyStore.AddKeyring(kHaikuDepotKeyring);
 		keyStore.AddKey(kHaikuDepotKeyring, key);
 	}
 
 	BAutolock locker(&fLock);
-	fWebAppInterface.SetAuthorization(username, password);
+	fWebAppInterface.SetAuthorization(UserCredentials(nickname, passwordClear));
 
 	_NotifyAuthorizationChanged();
 }

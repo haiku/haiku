@@ -131,10 +131,10 @@ public:
 			void				PopulatePackage(const PackageInfoRef& package,
 									uint32 flags);
 
-			void				SetUsername(BString username);
-			const BString&		Username() const;
-			void				SetAuthorization(const BString& username,
-									const BString& password,
+			void				SetNickname(BString nickname);
+			const BString&		Nickname() const;
+			void				SetAuthorization(const BString& nickname,
+									const BString& passwordClear,
 									bool storePassword);
 
 			const WebAppInterface& GetWebAppInterface() const

@@ -13,7 +13,6 @@
 #include <Referenceable.h>
 #include <package/PackageInfo.h>
 
-#include "DateTime.h"
 #include "List.h"
 #include "PackageInfoListener.h"
 #include "SharedBitmap.h"
@@ -50,21 +49,16 @@ class UserInfo {
 public:
 								UserInfo();
 								UserInfo(const BString& nickName);
-								UserInfo(const BitmapRef& avatar,
-									const BString& nickName);
 								UserInfo(const UserInfo& other);
 
 			UserInfo&			operator=(const UserInfo& other);
 			bool				operator==(const UserInfo& other) const;
 			bool				operator!=(const UserInfo& other) const;
 
-			const BitmapRef&	Avatar() const
-									{ return fAvatar; }
 			const BString&		NickName() const
 									{ return fNickName; }
 
 private:
-			BitmapRef			fAvatar;
 			BString				fNickName;
 };
 
@@ -77,8 +71,7 @@ public:
 									const BString& comment,
 									const BString& language,
 									const BString& packageVersion,
-									int32 upVotes, int32 downVotes,
-									const BDateTime& createTimestamp);
+									uint64 createTimestamp);
 								UserRating(const UserRating& other);
 
 			UserRating&			operator=(const UserRating& other);
@@ -95,12 +88,7 @@ public:
 									{ return fRating; }
 			const BString&		PackageVersion() const
 									{ return fPackageVersion; }
-
-			int32				UpVotes() const
-									{ return fUpVotes; }
-			int32				DownVotes() const
-									{ return fDownVotes; }
-			const BDateTime&	CreateTimestamp() const
+			const uint64		CreateTimestamp() const
 									{ return fCreateTimestamp; }
 private:
 			UserInfo			fUserInfo;
@@ -108,9 +96,8 @@ private:
 			BString				fComment;
 			BString				fLanguage;
 			BString				fPackageVersion;
-			int32				fUpVotes;
-			int32				fDownVotes;
-			BDateTime			fCreateTimestamp;
+			uint64				fCreateTimestamp;
+				// milliseconds since epoc
 };
 
 
