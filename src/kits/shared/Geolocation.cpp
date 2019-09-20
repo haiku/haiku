@@ -1,5 +1,6 @@
 /*
  * Copyright 2014, Haiku, Inc. All Rights Reserved.
+ * Copyright 2019, Adrien Destugues, pulkomandy@pulkomandy.tk
  * Distributed under the terms of the MIT License.
  */
 
@@ -19,15 +20,57 @@
 namespace BPrivate {
 
 
+class GeolocationListener: public BUrlProtocolListener
+{
+	public:
+		GeolocationListener()
+		{
+			pthread_cond_init(&fCompletion, NULL);
+			pthread_mutex_init(&fLock, NULL);
+		}
+
+		virtual	~GeolocationListener() {
+			pthread_cond_destroy(&fCompletion);
+			pthread_mutex_destroy(&fLock);
+		}
+
+		void ConnectionOpened(BUrlRequest* caller)
+		{
+			pthread_mutex_lock(&fLock);
+		}
+
+		void DataReceived(BUrlRequest*, const char* data, off_t position,
+					ssize_t size) {
+			fResult.WriteAt(position, data, size);
+		}
+
+		void RequestCompleted(BUrlRequest* caller, bool success) {
+			pthread_cond_signal(&fCompletion);
+			pthread_mutex_unlock(&fLock);
+		}
+
+		BMallocIO fResult;
+		pthread_cond_t fCompletion;
+		pthread_mutex_t fLock;
+};
+
+
 BGeolocation::BGeolocation()
-	: fService(kDefaultService)
+	: fGeolocationService(kDefaultGeolocationService),
+	fGeocodingService(kDefaultGeocodingService)
 {
 }
 
 
-BGeolocation::BGeolocation(const BUrl& service)
-	: fService(service)
+BGeolocation::BGeolocation(const BUrl& geolocationService,
+	const BUrl& geocodingService)
+	: fGeolocationService(geolocationService),
+	fGeocodingService(geocodingService)
 {
+	if (!fGeolocationService.IsValid())
+		fGeolocationService.SetUrlString(kDefaultGeolocationService);
+	if (!fGeocodingService.IsValid())
+		fGeocodingService.SetUrlString(kDefaultGeocodingService);
 }
 
 
@@ -72,22 +115,11 @@ BGeolocation::LocateSelf(float& latitude, float& longitude)
 	if (count < 2)
 		return B_DEVICE_NOT_FOUND;
 
-	class GeolocationListener: public BUrlProtocolListener
-	{
-		public:
-			virtual	~GeolocationListener() {};
-
-			void	DataReceived(BUrlRequest*, const char* data, off_t position,
-						ssize_t size) {
-				result.WriteAt(position, data, size);
-			}
-			BMallocIO result;
-	};
-
 	GeolocationListener listener;
 
 	// Send Request (POST JSON message)
-	BUrlRequest* request = BUrlProtocolRoster::MakeRequest(fService, &listener);
+	BUrlRequest* request = BUrlProtocolRoster::MakeRequest(fGeolocationService,
+		&listener);
 	if (request == NULL)
 		return B_BAD_DATA;
 
@@ -107,8 +139,10 @@ BGeolocation::LocateSelf(float& latitude, float& longitude)
 		return result;
 	}
 
+	pthread_mutex_lock(&listener.fLock);
 	while (http->IsRunning())
-		snooze(10000);
+		pthread_cond_wait(&listener.fCompletion, &listener.fLock);
+	pthread_mutex_unlock(&listener.fLock);
 
 	// Parse reply
 	const BHttpResult& reply = (const BHttpResult&)http->Result();
@@ -118,7 +152,7 @@ BGeolocation::LocateSelf(float& latitude, float& longitude)
 	}
 
 	BMessage data;
-	result = BJson::Parse((char*)listener.result.Buffer(), data);
+	result = BJson::Parse((char*)listener.fResult.Buffer(), data);
 	delete http;
 	if (result != B_OK) {
 		return result;
@@ -144,6 +178,57 @@ BGeolocation::LocateSelf(float& latitude, float& longitude)
 }
 
 
+status_t
+BGeolocation::Country(const float latitude, const float longitude,
+	BCountry& country)
+{
+	// Prepare the request URL
+	BUrl url(fGeocodingService);
+	BString requestString;
+	requestString.SetToFormat("%s&lat=%f&lng=%f", url.Request().String(), latitude,
+		longitude);
+	url.SetPath("/countryCode");
+	url.SetRequest(requestString);
+
+	GeolocationListener listener;
+	BUrlRequest* request = BUrlProtocolRoster::MakeRequest(url,
+		&listener);
+	if (request == NULL)
+		return B_BAD_DATA;
+
+	BHttpRequest* http = dynamic_cast<BHttpRequest*>(request);
+	if (http == NULL) {
+		delete request;
+		return B_BAD_DATA;
+	}
+
+	status_t result = http->Run();
+	if (result < 0) {
+		delete http;
+		return result;
+	}
+
+	pthread_mutex_lock(&listener.fLock);
+	while (http->IsRunning()) {
+		pthread_cond_wait(&listener.fCompletion, &listener.fLock);
+	}
+	pthread_mutex_unlock(&listener.fLock);
+
+	// Parse reply
+	const BHttpResult& reply = (const BHttpResult&)http->Result();
+	if (reply.StatusCode() != 200) {
+		delete http;
+		return B_ERROR;
+	}
+
+	off_t length = 0;
+	listener.fResult.GetSize(&length);
+	length -= 2; // Remove \r\n from response
+	BString countryCode((char*)listener.fResult.Buffer(), (int32)length);
+	return country.SetTo(countryCode);
+}
+
+
 #ifdef HAVE_DEFAULT_GEOLOCATION_SERVICE_KEY
 
 #include "DefaultGeolocationServiceKey.h"
@@ -152,9 +237,14 @@ const char* BGeolocation::kDefaultService
 	= "https://location.services.mozilla.com/v1/geolocate?key="
 		DEFAULT_GEOLOCATION_SERVICE_KEY;
 
+const char* BGeolocation::kDefaultGeocodingService
+	= "https://secure.geonames.org/?username="
+		DEFAULT_GEOCODING_SERVICE_KEY;
+
 #else
 
-const char* BGeolocation::kDefaultService = "";
+const char* BGeolocation::kDefaultGeolocationService = "";
+const char* BGeolocation::kDefaultGeocodingService = "";
 
 #endif
 

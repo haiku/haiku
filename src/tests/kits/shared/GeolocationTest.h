@@ -15,6 +15,7 @@ public:
 					GeolocationTest();
 
 			void	TestLocateSelf();
+			void	TestCountry();
 
 	static	void	AddTests(BTestSuite& suite);
 };
