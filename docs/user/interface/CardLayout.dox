@@ -1,0 +1,315 @@
+/*
+ * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Name, email@email.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/CardLayout.h	hrev43514
+ *		src/kits/interface/CardLayout.cpp	hrev49019
+ */
+
+
+/*!
+	\file CardLayout.h
+	\ingroup layout
+	\brief Undocumented file.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BCardLayout
+	\ingroup layout
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BCardLayout::BCardLayout()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BCardLayout::BCardLayout(BMessage *from)
+	\brief Undocumented public method
+
+	\param from Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BCardLayout::~BCardLayout()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BLayoutItem* BCardLayout::VisibleItem() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BCardLayout::VisibleIndex() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BCardLayout::SetVisibleItem(int32 index)
+	\brief Undocumented public method
+
+	\param index Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BCardLayout::SetVisibleItem(BLayoutItem *item)
+	\brief Undocumented public method
+
+	\param item Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BSize BCardLayout::BaseMinSize()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BSize BCardLayout::BaseMaxSize()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BSize BCardLayout::BasePreferredSize()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BAlignment BCardLayout::BaseAlignment()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual bool BCardLayout::HasHeightForWidth()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BCardLayout::GetHeightForWidth(float width, float *min, float *max, float *preferred)
+	\brief Undocumented public method
+
+	\param width Undocumented
+	\param min Undocumented
+	\param max Undocumented
+	\param preferred Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BCardLayout::Archive(BMessage *into, bool deep=true) const
+	\brief Undocumented public method
+
+	\param into Undocumented
+	\param deep Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BCardLayout::Perform(perform_code d, void *arg)
+	\brief Undocumented public method
+
+	\param d Undocumented
+	\param arg Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static static BArchivable* BCardLayout::Instantiate(BMessage *from)
+	\brief Undocumented public method
+
+	\param from Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BCardLayout::AllArchived(BMessage *archive) const
+	\brief Undocumented protected method
+
+	\param archive Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BCardLayout::AllUnarchived(const BMessage *from)
+	\brief Undocumented protected method
+
+	\param from Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BCardLayout::ItemArchived(BMessage *into, BLayoutItem *item, int32 index) const
+	\brief Undocumented protected method
+
+	\param into Undocumented
+	\param item Undocumented
+	\param index Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BCardLayout::ItemUnarchived(const BMessage *from, BLayoutItem *item, int32 index)
+	\brief Undocumented protected method
+
+	\param from Undocumented
+	\param item Undocumented
+	\param index Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BCardLayout::LayoutInvalidated(bool children=false)
+	\brief Undocumented protected method
+
+	\param children Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BCardLayout::DoLayout()
+	\brief Undocumented protected method
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual bool BCardLayout::ItemAdded(BLayoutItem *item, int32 atIndex)
+	\brief Undocumented protected method
+
+	\param item Undocumented
+	\param atIndex Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BCardLayout::ItemRemoved(BLayoutItem *item, int32 fromIndex)
+	\brief Undocumented protected method
+
+	\param item Undocumented
+	\param fromIndex Undocumented
+
+	\since Haiku R1
+*/

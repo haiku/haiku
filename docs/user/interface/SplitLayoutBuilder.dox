@@ -1,0 +1,175 @@
+/*
+ * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Name, email@email.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/SplitLayoutBuilder.h	hrev45833
+ *		src/kits/interface/SplitLayoutBuilder.cpp	hrev45833
+ */
+
+
+/*!
+	\file SplitLayoutBuilder.h
+	\ingroup layout
+	\brief Undocumented file.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BSplitLayoutBuilder
+	\ingroup layout
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSplitLayoutBuilder::BSplitLayoutBuilder(orientation orientation=B_HORIZONTAL, float spacing=B_USE_DEFAULT_SPACING)
+	\brief Undocumented public method
+
+	\param orientation Undocumented
+	\param spacing Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSplitLayoutBuilder::BSplitLayoutBuilder(BSplitView *view)
+	\brief Undocumented public method
+
+	\param view Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSplitView* BSplitLayoutBuilder::SplitView() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSplitLayoutBuilder& BSplitLayoutBuilder::GetSplitView(BSplitView **view)
+	\brief Undocumented public method
+
+	\param view Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSplitLayoutBuilder& BSplitLayoutBuilder::Add(BView *view)
+	\brief Undocumented public method
+
+	\param view Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSplitLayoutBuilder& BSplitLayoutBuilder::Add(BView *view, float weight)
+	\brief Undocumented public method
+
+	\param view Undocumented
+	\param weight Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSplitLayoutBuilder& BSplitLayoutBuilder::Add(BLayoutItem *item)
+	\brief Undocumented public method
+
+	\param item Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSplitLayoutBuilder& BSplitLayoutBuilder::Add(BLayoutItem *item, float weight)
+	\brief Undocumented public method
+
+	\param item Undocumented
+	\param weight Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSplitLayoutBuilder& BSplitLayoutBuilder::SetCollapsible(bool collapsible)
+	\brief Undocumented public method
+
+	\param collapsible Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSplitLayoutBuilder& BSplitLayoutBuilder::SetInsets(float left, float top, float right, float bottom)
+	\brief Undocumented public method
+
+	\param left Undocumented
+	\param top Undocumented
+	\param right Undocumented
+	\param bottom Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSplitLayoutBuilder::operator BSplitView *()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/

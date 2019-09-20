@@ -1,0 +1,131 @@
+/*
+ * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Name, email@email.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/GroupView.h	hrev45833
+ *		src/kits/interface/GroupView.cpp	hrev49977
+ */
+
+
+/*!
+	\file GroupView.h
+	\ingroup interface
+	\brief Undocumented file.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BGroupView
+	\ingroup interface
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGroupView::BGroupView(orientation orientation=B_HORIZONTAL, float spacing=B_USE_DEFAULT_SPACING)
+	\brief Undocumented public method
+
+	\param orientation Undocumented
+	\param spacing Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGroupView::BGroupView(const char *name, orientation orientation=B_HORIZONTAL, float spacing=B_USE_DEFAULT_SPACING)
+	\brief Undocumented public method
+
+	\param name Undocumented
+	\param orientation Undocumented
+	\param spacing Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGroupView::BGroupView(BMessage *from)
+	\brief Undocumented public method
+
+	\param from Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BGroupView::~BGroupView()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BGroupView::SetLayout(BLayout *layout)
+	\brief Undocumented public method
+
+	\param layout Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGroupLayout* BGroupView::GroupLayout() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BGroupView::Perform(perform_code d, void *arg)
+	\brief Undocumented public method
+
+	\param d Undocumented
+	\param arg Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static static BArchivable* BGroupView::Instantiate(BMessage *from)
+	\brief Undocumented public method
+
+	\param from Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/

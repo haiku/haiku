@@ -1,0 +1,667 @@
+/*
+ * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Name, email@email.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/ChannelControl.h	hrev49977
+ *		src/kits/interface/ChannelControl.cpp	hrev49495
+ */
+
+
+
+
+/*!
+	\file ChannelControl.h
+	\ingroup interface
+	\brief Undocumented file.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BChannelControl
+	\ingroup interface
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BChannelControl::BChannelControl(BRect frame, const char *name, const char *label, BMessage *model, int32 channelCount=1, uint32 resizingMode=B_FOLLOW_LEFT_TOP, uint32 flags=B_WILL_DRAW)
+	\brief Undocumented public method
+
+	\param frame Undocumented
+	\param name Undocumented
+	\param label Undocumented
+	\param model Undocumented
+	\param channelCount Undocumented
+	\param resizingMode Undocumented
+	\param flags Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BChannelControl::BChannelControl(const char *name, const char *label, BMessage *model, int32 channelCount=1, uint32 flags=B_WILL_DRAW)
+	\brief Undocumented public method
+
+	\param name Undocumented
+	\param label Undocumented
+	\param model Undocumented
+	\param channelCount Undocumented
+	\param flags Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BChannelControl::BChannelControl(BMessage *archive)
+	\brief Undocumented public method
+
+	\param archive Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BChannelControl::~BChannelControl()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BChannelControl::Archive(BMessage *data, bool deep=true) const
+	\brief Undocumented public method
+
+	\param data Undocumented
+	\param deep Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual void BChannelControl::Draw(BRect updateRect)=0
+	\brief Undocumented public method
+
+	\param updateRect Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual void BChannelControl::MouseDown(BPoint where)=0
+	\brief Undocumented public method
+
+	\param where Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual void BChannelControl::KeyDown(const char *bytes, int32 numBytes)=0
+	\brief Undocumented public method
+
+	\param bytes Undocumented
+	\param numBytes Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelControl::FrameResized(float newWidth, float newHeight)
+	\brief Undocumented public method
+
+	\param newWidth Undocumented
+	\param newHeight Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelControl::SetFont(const BFont *font, uint32 mask=B_FONT_ALL)
+	\brief Undocumented public method
+
+	\param font Undocumented
+	\param mask Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelControl::AttachedToWindow()
+	\brief Undocumented public method
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelControl::DetachedFromWindow()
+	\brief Undocumented public method
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelControl::ResizeToPreferred()
+	\brief Undocumented public method
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual void BChannelControl::GetPreferredSize(float *width, float *height)=0
+	\brief Undocumented public method
+
+	\param width Undocumented
+	\param height Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelControl::MessageReceived(BMessage *message)
+	\brief Undocumented public method
+
+	\param message Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BHandler* BChannelControl::ResolveSpecifier(BMessage *message, int32 index, BMessage *specifier, int32 what, const char *property)
+	\brief Undocumented public method
+
+	\param message Undocumented
+	\param index Undocumented
+	\param specifier Undocumented
+	\param what Undocumented
+	\param property Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BChannelControl::GetSupportedSuites(BMessage *data)
+	\brief Undocumented public method
+
+	\param data Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelControl::SetModificationMessage(BMessage *message)
+	\brief Undocumented public method
+
+	\param message Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BMessage* BChannelControl::ModificationMessage() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BChannelControl::Invoke(BMessage *message=NULL)
+	\brief Undocumented public method
+
+	\param message Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BChannelControl::InvokeChannel(BMessage *message=NULL, int32 fromChannel=0, int32 channelCount=-1, const bool *_mask=NULL)
+	\brief Undocumented public method
+
+	\param message Undocumented
+	\param fromChannel Undocumented
+	\param channelCount Undocumented
+	\param _mask Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BChannelControl::InvokeNotifyChannel(BMessage *message=NULL, uint32 kind=B_CONTROL_INVOKED, int32 fromChannel=0, int32 channelCount=-1, const bool *_mask=NULL)
+	\brief Undocumented public method
+
+	\param message Undocumented
+	\param kind Undocumented
+	\param fromChannel Undocumented
+	\param channelCount Undocumented
+	\param _mask Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelControl::SetValue(int32 value)
+	\brief Undocumented public method
+
+	\param value Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BChannelControl::SetCurrentChannel(int32 index)
+	\brief Undocumented public method
+
+	\param index Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BChannelControl::CurrentChannel() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual int32 BChannelControl::CountChannels() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual int32 BChannelControl::MaxChannelCount() const =0
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BChannelControl::SetChannelCount(int32 count)
+	\brief Undocumented public method
+
+	\param count Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BChannelControl::ValueFor(int32 channel) const
+	\brief Undocumented public method
+
+	\param channel Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual int32 BChannelControl::GetValue(int32 *_values, int32 fromChannel, int32 channelCount) const
+	\brief Undocumented public method
+
+	\param _values Undocumented
+	\param fromChannel Undocumented
+	\param channelCount Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BChannelControl::SetValueFor(int32 channel, int32 value)
+	\brief Undocumented public method
+
+	\param channel Undocumented
+	\param value Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BChannelControl::SetValue(int32 fromChannel, int32 channelCount, const int32 *values)
+	\brief Undocumented public method
+
+	\param fromChannel Undocumented
+	\param channelCount Undocumented
+	\param values Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BChannelControl::SetAllValue(int32 values)
+	\brief Undocumented public method
+
+	\param values Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BChannelControl::SetLimitsFor(int32 channel, int32 minimum, int32 maximum)
+	\brief Undocumented public method
+
+	\param channel Undocumented
+	\param minimum Undocumented
+	\param maximum Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BChannelControl::GetLimitsFor(int32 channel, int32 *_minimum, int32 *_maximum) const
+	\brief Undocumented public method
+
+	\param channel Undocumented
+	\param _minimum Undocumented
+	\param _maximum Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BChannelControl::SetLimitsFor(int32 fromChannel, int32 channelCount, const int32 *minima, const int32 *maxima)
+	\brief Undocumented public method
+
+	\param fromChannel Undocumented
+	\param channelCount Undocumented
+	\param minima Undocumented
+	\param maxima Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BChannelControl::GetLimitsFor(int32 fromChannel, int32 channelCount, int32 *minima, int32 *maxima) const
+	\brief Undocumented public method
+
+	\param fromChannel Undocumented
+	\param channelCount Undocumented
+	\param minima Undocumented
+	\param maxima Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BChannelControl::SetLimits(int32 minimum, int32 maximum)
+	\brief Undocumented public method
+
+	\param minimum Undocumented
+	\param maximum Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BChannelControl::GetLimits(int32 *_minimum, int32 *_maximum) const
+	\brief Undocumented public method
+
+	\param _minimum Undocumented
+	\param _maximum Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual bool BChannelControl::SupportsIndividualLimits() const =0
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BChannelControl::SetLimitLabels(const char *minLabel, const char *maxLabel)
+	\brief Undocumented public method
+
+	\param minLabel Undocumented
+	\param maxLabel Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BChannelControl::MinLimitLabel() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BChannelControl::MaxLimitLabel() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BChannelControl::SetLimitLabelsFor(int32 channel, const char *minLabel, const char *maxLabel)
+	\brief Undocumented public method
+
+	\param channel Undocumented
+	\param minLabel Undocumented
+	\param maxLabel Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BChannelControl::SetLimitLabelsFor(int32 fromChannel, int32 channelCount, const char *minLabel, const char *maxLabel)
+	\brief Undocumented public method
+
+	\param fromChannel Undocumented
+	\param channelCount Undocumented
+	\param minLabel Undocumented
+	\param maxLabel Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BChannelControl::MinLimitLabelFor(int32 channel) const
+	\brief Undocumented public method
+
+	\param channel Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BChannelControl::MaxLimitLabelFor(int32 channel) const
+	\brief Undocumented public method
+
+	\param channel Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 *const  & BChannelControl::MinLimitList() const
+	\brief Undocumented protected method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 *const  & BChannelControl::MaxLimitList() const
+	\brief Undocumented protected method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 *const  & BChannelControl::ValueList() const
+	\brief Undocumented protected method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/

@@ -1,0 +1,1160 @@
+/*
+ * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Name, email@email.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/AffineTransform.h	hrev52913
+ *		src/kits/interface/AffineTransform.cpp	hrev51931
+ */
+
+
+/*!
+	\file AffineTransform.h
+	\ingroup interface
+	\brief Undocumented file.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BAffineTransform
+	\ingroup interface
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var const double BAffineTransform::kDefaultEpsilon
+	\brief Undocumented public variable
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var double BAffineTransform::sx
+	\brief Undocumented public variable
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var double BAffineTransform::shy
+	\brief Undocumented public variable
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var double BAffineTransform::shx
+	\brief Undocumented public variable
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var double BAffineTransform::sy
+	\brief Undocumented public variable
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var double BAffineTransform::tx
+	\brief Undocumented public variable
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var double BAffineTransform::ty
+	\brief Undocumented public variable
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAffineTransform::BAffineTransform()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAffineTransform::BAffineTransform(double sx, double shy, double shx, double sy, double tx, double ty)
+	\brief Undocumented public method
+
+	\param sx Undocumented
+	\param shy Undocumented
+	\param shx Undocumented
+	\param sy Undocumented
+	\param tx Undocumented
+	\param ty Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAffineTransform::BAffineTransform(const BAffineTransform &copyFrom)
+	\brief Undocumented public method
+
+	\param copyFrom Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BAffineTransform::~BAffineTransform()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual bool BAffineTransform::IsFixedSize() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual type_code BAffineTransform::TypeCode() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual ssize_t BAffineTransform::FlattenedSize() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BAffineTransform::Flatten(void *buffer, ssize_t size) const
+	\brief Undocumented public method
+
+	\param buffer Undocumented
+	\param size Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BAffineTransform::Unflatten(type_code code, const void *buffer, ssize_t size)
+	\brief Undocumented public method
+
+	\param code Undocumented
+	\param buffer Undocumented
+	\param size Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BAffineTransform::Apply(double *x, double *y) const
+	\brief Undocumented public method
+
+	\param x Undocumented
+	\param y Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BAffineTransform::ApplyInverse(double *x, double *y) const
+	\brief Undocumented public method
+
+	\param x Undocumented
+	\param y Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPoint BAffineTransform::Apply(const BPoint &point) const
+	\brief Undocumented public method
+
+	\param point Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPoint BAffineTransform::ApplyInverse(const BPoint &point) const
+	\brief Undocumented public method
+
+	\param point Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BAffineTransform::Apply(BPoint *point) const
+	\brief Undocumented public method
+
+	\param point Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BAffineTransform::ApplyInverse(BPoint *point) const
+	\brief Undocumented public method
+
+	\param point Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BAffineTransform::Apply(BPoint *points, uint32 count) const
+	\brief Undocumented public method
+
+	\param points Undocumented
+	\param count Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BAffineTransform::ApplyInverse(BPoint *points, uint32 count) const
+	\brief Undocumented public method
+
+	\param points Undocumented
+	\param count Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform & BAffineTransform::TranslateBy(double x, double y)
+	\brief Undocumented public method
+
+	\param x Undocumented
+	\param y Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform& BAffineTransform::TranslateBy(const BPoint &delta)
+	\brief Undocumented public method
+
+	\param delta Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform & BAffineTransform::PreTranslateBy(double x, double y)
+	\brief Undocumented public method
+
+	\param x Undocumented
+	\param y Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAffineTransform BAffineTransform::TranslateByCopy(double x, double y) const
+	\brief Undocumented public method
+
+	\param x Undocumented
+	\param y Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAffineTransform BAffineTransform::TranslateByCopy(const BPoint &delta) const
+	\brief Undocumented public method
+
+	\param delta Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform & BAffineTransform::RotateBy(double angle)
+	\brief Undocumented public method
+
+	\param angle Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform& BAffineTransform::RotateBy(const BPoint &center, double angle)
+	\brief Undocumented public method
+
+	\param center Undocumented
+	\param angle Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform & BAffineTransform::PreRotateBy(double angleRadians)
+	\brief Undocumented public method
+
+	\param angleRadians Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAffineTransform BAffineTransform::RotateByCopy(double angle) const
+	\brief Undocumented public method
+
+	\param angle Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAffineTransform BAffineTransform::RotateByCopy(const BPoint &center, double angle) const
+	\brief Undocumented public method
+
+	\param center Undocumented
+	\param angle Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform & BAffineTransform::ScaleBy(double scale)
+	\brief Undocumented public method
+
+	\param scale Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform& BAffineTransform::ScaleBy(const BPoint &center, double scale)
+	\brief Undocumented public method
+
+	\param center Undocumented
+	\param scale Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform & BAffineTransform::ScaleBy(double x, double y)
+	\brief Undocumented public method
+
+	\param x Undocumented
+	\param y Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform& BAffineTransform::ScaleBy(const BPoint &center, double x, double y)
+	\brief Undocumented public method
+
+	\param center Undocumented
+	\param x Undocumented
+	\param y Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform& BAffineTransform::ScaleBy(const BPoint &scale)
+	\brief Undocumented public method
+
+	\param scale Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform& BAffineTransform::ScaleBy(const BPoint &center, const BPoint &scale)
+	\brief Undocumented public method
+
+	\param center Undocumented
+	\param scale Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform & BAffineTransform::PreScaleBy(double x, double y)
+	\brief Undocumented public method
+
+	\param x Undocumented
+	\param y Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAffineTransform BAffineTransform::ScaleByCopy(double scale) const
+	\brief Undocumented public method
+
+	\param scale Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAffineTransform BAffineTransform::ScaleByCopy(const BPoint &center, double scale) const
+	\brief Undocumented public method
+
+	\param center Undocumented
+	\param scale Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAffineTransform BAffineTransform::ScaleByCopy(double x, double y) const
+	\brief Undocumented public method
+
+	\param x Undocumented
+	\param y Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAffineTransform BAffineTransform::ScaleByCopy(const BPoint &center, double x, double y) const
+	\brief Undocumented public method
+
+	\param center Undocumented
+	\param x Undocumented
+	\param y Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAffineTransform BAffineTransform::ScaleByCopy(const BPoint &scale) const
+	\brief Undocumented public method
+
+	\param scale Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAffineTransform BAffineTransform::ScaleByCopy(const BPoint &center, const BPoint &scale) const
+	\brief Undocumented public method
+
+	\param center Undocumented
+	\param scale Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform& BAffineTransform::SetScale(double scale)
+	\brief Undocumented public method
+
+	\param scale Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform& BAffineTransform::SetScale(double x, double y)
+	\brief Undocumented public method
+
+	\param x Undocumented
+	\param y Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform & BAffineTransform::ShearBy(double x, double y)
+	\brief Undocumented public method
+
+	\param x Undocumented
+	\param y Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform& BAffineTransform::ShearBy(const BPoint &center, double x, double y)
+	\brief Undocumented public method
+
+	\param center Undocumented
+	\param x Undocumented
+	\param y Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform& BAffineTransform::ShearBy(const BPoint &shear)
+	\brief Undocumented public method
+
+	\param shear Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform& BAffineTransform::ShearBy(const BPoint &center, const BPoint &shear)
+	\brief Undocumented public method
+
+	\param center Undocumented
+	\param shear Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAffineTransform BAffineTransform::ShearByCopy(double x, double y) const
+	\brief Undocumented public method
+
+	\param x Undocumented
+	\param y Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAffineTransform BAffineTransform::ShearByCopy(const BPoint &center, double x, double y) const
+	\brief Undocumented public method
+
+	\param center Undocumented
+	\param x Undocumented
+	\param y Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAffineTransform BAffineTransform::ShearByCopy(const BPoint &shear) const
+	\brief Undocumented public method
+
+	\param shear Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAffineTransform BAffineTransform::ShearByCopy(const BPoint &center, const BPoint &shear) const
+	\brief Undocumented public method
+
+	\param center Undocumented
+	\param shear Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform & BAffineTransform::Multiply(const BAffineTransform &other)
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform& BAffineTransform::PreMultiply(const BAffineTransform &other)
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform & BAffineTransform::MultiplyInverse(const BAffineTransform &other)
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform & BAffineTransform::PreMultiplyInverse(const BAffineTransform &other)
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAffineTransform & BAffineTransform::operator=(const BAffineTransform &copyFrom)
+	\brief Undocumented public method
+
+	\param copyFrom Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BAffineTransform::operator==(const BAffineTransform &other) const
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BAffineTransform::operator!=(const BAffineTransform &other) const
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform & BAffineTransform::operator*=(const BAffineTransform &other)
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform & BAffineTransform::operator/=(const BAffineTransform &other)
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAffineTransform BAffineTransform::operator*(const BAffineTransform &other) const
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAffineTransform BAffineTransform::operator/(const BAffineTransform &other) const
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAffineTransform BAffineTransform::operator~() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BAffineTransform::IsValid(double epsilon=kDefaultEpsilon) const
+	\brief Undocumented public method
+
+	\param epsilon Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BAffineTransform::IsIdentity(double epsilon=kDefaultEpsilon) const
+	\brief Undocumented public method
+
+	\param epsilon Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BAffineTransform::IsDilation(double epsilon=kDefaultEpsilon) const
+	\brief Undocumented public method
+
+	\param epsilon Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BAffineTransform::IsEqual(const BAffineTransform &other, double epsilon=kDefaultEpsilon) const
+	\brief Undocumented public method
+
+	\param other Undocumented
+	\param epsilon Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform& BAffineTransform::Invert()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform& BAffineTransform::FlipX()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform& BAffineTransform::FlipY()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BAffineTransform& BAffineTransform::Reset()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn double BAffineTransform::Determinant() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn double BAffineTransform::InverseDeterminant() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BAffineTransform::GetTranslation(double *tx, double *ty) const
+	\brief Undocumented public method
+
+	\param tx Undocumented
+	\param ty Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn double BAffineTransform::Rotation() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn double BAffineTransform::Scale() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BAffineTransform::GetScale(double *sx, double *sy) const
+	\brief Undocumented public method
+
+	\param sx Undocumented
+	\param sy Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BAffineTransform::GetScaleAbs(double *sx, double *sy) const
+	\brief Undocumented public method
+
+	\param sx Undocumented
+	\param sy Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BAffineTransform::GetAffineParameters(double *translationX, double *translationY, double *rotation, double *scaleX, double *scaleY, double *shearX, double *shearY) const
+	\brief Undocumented public method
+
+	\param translationX Undocumented
+	\param translationY Undocumented
+	\param rotation Undocumented
+	\param scaleX Undocumented
+	\param scaleY Undocumented
+	\param shearX Undocumented
+	\param shearY Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static static BAffineTransform BAffineTransform::AffineTranslation(double x, double y)
+	\brief Undocumented public method
+
+	\param x Undocumented
+	\param y Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static static BAffineTransform BAffineTransform::AffineRotation(double angle)
+	\brief Undocumented public method
+
+	\param angle Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static static BAffineTransform BAffineTransform::AffineScaling(double x, double y)
+	\brief Undocumented public method
+
+	\param x Undocumented
+	\param y Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static static BAffineTransform BAffineTransform::AffineScaling(double scale)
+	\brief Undocumented public method
+
+	\param scale Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static static BAffineTransform BAffineTransform::AffineShearing(double x, double y)
+	\brief Undocumented public method
+
+	\param x Undocumented
+	\param y Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/

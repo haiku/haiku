@@ -1,0 +1,550 @@
+/*
+ * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Name, email@email.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/SplitView.h	hrev49977
+ *		src/kits/interface/SplitView.cpp	hrev43279
+ */
+
+
+/*!
+	\file SplitView.h
+	\ingroup layout
+	\brief Undocumented file.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BSplitView
+	\ingroup layout
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSplitView::BSplitView(orientation orientation=B_HORIZONTAL, float spacing=B_USE_DEFAULT_SPACING)
+	\brief Undocumented public method
+
+	\param orientation Undocumented
+	\param spacing Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSplitView::BSplitView(BMessage *from)
+	\brief Undocumented public method
+
+	\param from Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BSplitView::~BSplitView()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BSplitView::SetInsets(float left, float top, float right, float bottom)
+	\brief Undocumented public method
+
+	\param left Undocumented
+	\param top Undocumented
+	\param right Undocumented
+	\param bottom Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BSplitView::SetInsets(float horizontal, float vertical)
+	\brief Undocumented public method
+
+	\param horizontal Undocumented
+	\param vertical Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BSplitView::SetInsets(float insets)
+	\brief Undocumented public method
+
+	\param insets Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BSplitView::GetInsets(float *left, float *top, float *right, float *bottom) const
+	\brief Undocumented public method
+
+	\param left Undocumented
+	\param top Undocumented
+	\param right Undocumented
+	\param bottom Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn float BSplitView::Spacing() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BSplitView::SetSpacing(float spacing)
+	\brief Undocumented public method
+
+	\param spacing Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn orientation BSplitView::Orientation() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BSplitView::SetOrientation(orientation orientation)
+	\brief Undocumented public method
+
+	\param orientation Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn float BSplitView::SplitterSize() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BSplitView::SetSplitterSize(float size)
+	\brief Undocumented public method
+
+	\param size Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BSplitView::CountItems() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn float BSplitView::ItemWeight(int32 index) const
+	\brief Undocumented public method
+
+	\param index Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn float BSplitView::ItemWeight(BLayoutItem *item) const
+	\brief Undocumented public method
+
+	\param item Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BSplitView::SetItemWeight(int32 index, float weight, bool invalidateLayout)
+	\brief Undocumented public method
+
+	\param index Undocumented
+	\param weight Undocumented
+	\param invalidateLayout Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BSplitView::SetItemWeight(BLayoutItem *item, float weight)
+	\brief Undocumented public method
+
+	\param item Undocumented
+	\param weight Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BSplitView::IsCollapsible(int32 index) const
+	\brief Undocumented public method
+
+	\param index Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BSplitView::SetCollapsible(bool collapsible)
+	\brief Undocumented public method
+
+	\param collapsible Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BSplitView::SetCollapsible(int32 index, bool collapsible)
+	\brief Undocumented public method
+
+	\param index Undocumented
+	\param collapsible Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BSplitView::SetCollapsible(int32 first, int32 last, bool collapsible)
+	\brief Undocumented public method
+
+	\param first Undocumented
+	\param last Undocumented
+	\param collapsible Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BSplitView::IsItemCollapsed(int32 index) const
+	\brief Undocumented public method
+
+	\param index Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BSplitView::SetItemCollapsed(int32 index, bool collapsed)
+	\brief Undocumented public method
+
+	\param index Undocumented
+	\param collapsed Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BSplitView::AddChild(BView *child, BView *sibling=NULL)
+	\brief Undocumented public method
+
+	\param child Undocumented
+	\param sibling Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BSplitView::AddChild(BView *child, float weight)
+	\brief Undocumented public method
+
+	\param child Undocumented
+	\param weight Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BSplitView::AddChild(int32 index, BView *child, float weight)
+	\brief Undocumented public method
+
+	\param index Undocumented
+	\param child Undocumented
+	\param weight Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BSplitView::AddChild(BLayoutItem *child)
+	\brief Undocumented public method
+
+	\param child Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BSplitView::AddChild(BLayoutItem *child, float weight)
+	\brief Undocumented public method
+
+	\param child Undocumented
+	\param weight Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BSplitView::AddChild(int32 index, BLayoutItem *child, float weight)
+	\brief Undocumented public method
+
+	\param index Undocumented
+	\param child Undocumented
+	\param weight Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BSplitView::AttachedToWindow()
+	\brief Undocumented public method
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BSplitView::Draw(BRect updateRect)
+	\brief Undocumented public method
+
+	\param updateRect Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BSplitView::DrawAfterChildren(BRect updateRect)
+	\brief Undocumented public method
+
+	\param updateRect Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BSplitView::MouseDown(BPoint where)
+	\brief Undocumented public method
+
+	\param where Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BSplitView::MouseUp(BPoint where)
+	\brief Undocumented public method
+
+	\param where Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BSplitView::MouseMoved(BPoint where, uint32 transit, const BMessage *message)
+	\brief Undocumented public method
+
+	\param where Undocumented
+	\param transit Undocumented
+	\param message Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BSplitView::MessageReceived(BMessage *message)
+	\brief Undocumented public method
+
+	\param message Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BSplitView::SetLayout(BLayout *layout)
+	\brief Undocumented public method
+
+	\param layout Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BSplitView::Archive(BMessage *into, bool deep=true) const
+	\brief Undocumented public method
+
+	\param into Undocumented
+	\param deep Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BSplitView::Perform(perform_code d, void *arg)
+	\brief Undocumented public method
+
+	\param d Undocumented
+	\param arg Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static static BArchivable* BSplitView::Instantiate(BMessage *from)
+	\brief Undocumented public method
+
+	\param from Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BSplitView::AllArchived(BMessage *into) const
+	\brief Undocumented protected method
+
+	\param into Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BSplitView::AllUnarchived(const BMessage *from)
+	\brief Undocumented protected method
+
+	\param from Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BSplitView::DrawSplitter(BRect frame, const BRect &updateRect, orientation orientation, bool pressed)
+	\brief Undocumented protected method
+
+	\param frame Undocumented
+	\param updateRect Undocumented
+	\param orientation Undocumented
+	\param pressed Undocumented
+
+	\since Haiku R1
+*/

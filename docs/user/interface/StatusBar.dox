@@ -1,0 +1,506 @@
+/*
+ * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Name, email@email.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/StatusBar.h	hrev49977
+ *		src/kits/interface/StatusBar.cpp	hrev51409
+ */
+
+
+/*!
+	\file StatusBar.h
+	\ingroup interface
+	\brief Undocumented file.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BStatusBar
+	\ingroup interface
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BStatusBar::BStatusBar(BRect frame, const char *name, const char *label=NULL, const char *trailingLabel=NULL)
+	\brief Undocumented public method
+
+	\param frame Undocumented
+	\param name Undocumented
+	\param label Undocumented
+	\param trailingLabel Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BStatusBar::BStatusBar(const char *name, const char *label=NULL, const char *trailingLabel=NULL)
+	\brief Undocumented public method
+
+	\param name Undocumented
+	\param label Undocumented
+	\param trailingLabel Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BStatusBar::BStatusBar(BMessage *archive)
+	\brief Undocumented public method
+
+	\param archive Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BStatusBar::~BStatusBar()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BStatusBar::Archive(BMessage *archive, bool deep=true) const
+	\brief Undocumented public method
+
+	\param archive Undocumented
+	\param deep Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BStatusBar::AttachedToWindow()
+	\brief Undocumented public method
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BStatusBar::DetachedFromWindow()
+	\brief Undocumented public method
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BStatusBar::AllAttached()
+	\brief Undocumented public method
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BStatusBar::AllDetached()
+	\brief Undocumented public method
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BStatusBar::WindowActivated(bool state)
+	\brief Undocumented public method
+
+	\param state Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BStatusBar::MakeFocus(bool focus=true)
+	\brief Undocumented public method
+
+	\param focus Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BStatusBar::GetPreferredSize(float *_width, float *_height)
+	\brief Undocumented public method
+
+	\param _width Undocumented
+	\param _height Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BSize BStatusBar::MinSize()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BSize BStatusBar::MaxSize()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BSize BStatusBar::PreferredSize()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BStatusBar::ResizeToPreferred()
+	\brief Undocumented public method
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BStatusBar::FrameMoved(BPoint newPosition)
+	\brief Undocumented public method
+
+	\param newPosition Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BStatusBar::FrameResized(float newWidth, float newHeight)
+	\brief Undocumented public method
+
+	\param newWidth Undocumented
+	\param newHeight Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BStatusBar::Draw(BRect updateRect)
+	\brief Undocumented public method
+
+	\param updateRect Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BStatusBar::MessageReceived(BMessage *message)
+	\brief Undocumented public method
+
+	\param message Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BStatusBar::MouseDown(BPoint where)
+	\brief Undocumented public method
+
+	\param where Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BStatusBar::MouseUp(BPoint where)
+	\brief Undocumented public method
+
+	\param where Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BStatusBar::MouseMoved(BPoint where, uint32 transit, const BMessage *dragMessage)
+	\brief Undocumented public method
+
+	\param where Undocumented
+	\param transit Undocumented
+	\param dragMessage Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BStatusBar::SetBarColor(rgb_color color)
+	\brief Undocumented public method
+
+	\param color Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BStatusBar::SetBarHeight(float height)
+	\brief Undocumented public method
+
+	\param height Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BStatusBar::SetText(const char *string)
+	\brief Undocumented public method
+
+	\param string Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BStatusBar::SetTrailingText(const char *string)
+	\brief Undocumented public method
+
+	\param string Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BStatusBar::SetMaxValue(float max)
+	\brief Undocumented public method
+
+	\param max Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BStatusBar::Update(float delta, const char *text=NULL, const char *trailingText=NULL)
+	\brief Undocumented public method
+
+	\param delta Undocumented
+	\param text Undocumented
+	\param trailingText Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BStatusBar::Reset(const char *label=NULL, const char *trailingLabel=NULL)
+	\brief Undocumented public method
+
+	\param label Undocumented
+	\param trailingLabel Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BStatusBar::SetTo(float value, const char *text=NULL, const char *trailingText=NULL)
+	\brief Undocumented public method
+
+	\param value Undocumented
+	\param text Undocumented
+	\param trailingText Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn float BStatusBar::CurrentValue() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn float BStatusBar::MaxValue() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn rgb_color BStatusBar::BarColor() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn float BStatusBar::BarHeight() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BStatusBar::Text() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BStatusBar::TrailingText() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BStatusBar::Label() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BStatusBar::TrailingLabel() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BHandler* BStatusBar::ResolveSpecifier(BMessage *message, int32 index, BMessage *specifier, int32 what, const char *property)
+	\brief Undocumented public method
+
+	\param message Undocumented
+	\param index Undocumented
+	\param specifier Undocumented
+	\param what Undocumented
+	\param property Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BStatusBar::GetSupportedSuites(BMessage *data)
+	\brief Undocumented public method
+
+	\param data Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BStatusBar::Perform(perform_code d, void *arg)
+	\brief Undocumented public method
+
+	\param d Undocumented
+	\param arg Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static static BArchivable* BStatusBar::Instantiate(BMessage *archive)
+	\brief Undocumented public method
+
+	\param archive Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/

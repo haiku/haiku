@@ -1,0 +1,311 @@
+/*
+ * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Name, email@email.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/Input.h	hrev32748
+ *		src/kits/interface/Input.cpp	hrev46376
+ */
+
+
+///// TO THEY WHO DOCUMENT /////
+// The BeBook puts this class and its functions under the category 'Input Server'
+// grouped together with BInputServerDevice, BInputServerFilter and BInputServerMethod
+// Not sure if we should follow that choice.
+
+/*!
+	\file Input.h
+	\ingroup interface
+	\brief Undocumented file.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BInputDevice
+	\ingroup interface
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BInputDevice::~BInputDevice()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BInputDevice::Name() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn input_device_type BInputDevice::Type() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BInputDevice::IsRunning() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BInputDevice::Start()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BInputDevice::Stop()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BInputDevice::Control(uint32 code, BMessage *message)
+	\brief Undocumented public method
+
+	\param code Undocumented
+	\param message Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static static status_t BInputDevice::Start(input_device_type type)
+	\brief Undocumented public method
+
+	\param type Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static static status_t BInputDevice::Stop(input_device_type type)
+	\brief Undocumented public method
+
+	\param type Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static static status_t BInputDevice::Control(input_device_type type, uint32 code, BMessage *message)
+	\brief Undocumented public method
+
+	\param type Undocumented
+	\param code Undocumented
+	\param message Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\enum input_method_op
+	\ingroup <kit name>
+	\brief Undocumented enum.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var input_method_op B_INPUT_METHOD_STARTED
+	\brief Undocumented enum value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var input_method_op B_INPUT_METHOD_STOPPED
+	\brief Undocumented enum value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var input_method_op B_INPUT_METHOD_CHANGED
+	\brief Undocumented enum value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var input_method_op B_INPUT_METHOD_LOCATION_REQUEST
+	\brief Undocumented enum value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\enum input_device_type
+	\ingroup <kit name>
+	\brief Undocumented enum.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var input_device_type B_POINTING_DEVICE
+	\brief Undocumented enum value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var input_device_type B_KEYBOARD_DEVICE
+	\brief Undocumented enum value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var input_device_type B_UNDEFINED_DEVICE
+	\brief Undocumented enum value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\enum input_device_notification
+	\ingroup <kit name>
+	\brief Undocumented enum.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var input_device_notification B_INPUT_DEVICE_ADDED
+	\brief Undocumented enum value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var input_device_notification B_INPUT_DEVICE_STARTED
+	\brief Undocumented enum value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var input_device_notification B_INPUT_DEVICE_STOPPED
+	\brief Undocumented enum value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var input_device_notification B_INPUT_DEVICE_REMOVED
+	\brief Undocumented enum value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BInputDevice* find_input_device(const char *name)
+	\brief Undocumented function
+
+	\param name Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t get_input_devices(BList *list)
+	\brief Undocumented function
+
+	\param list Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t watch_input_devices(BMessenger target, bool start)
+	\brief Undocumented function
+
+	\param target Undocumented
+	\param start Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/

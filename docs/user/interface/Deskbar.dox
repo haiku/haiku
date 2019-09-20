@@ -1,0 +1,395 @@
+/*
+ * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Name, email@email.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/Deskbar.h	hrev52499
+ *		src/kits/interface/Deskbar.cpp	hrev52499
+ */
+
+
+/*!
+	\file Deskbar.h
+	\ingroup interface
+	\brief Undocumented file.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BDeskbar
+	\ingroup interface
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BDeskbar::BDeskbar()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BDeskbar::~BDeskbar()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BDeskbar::IsRunning() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BRect BDeskbar::Frame() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn deskbar_location BDeskbar::Location(bool *_isExpanded=NULL) const
+	\brief Undocumented public method
+
+	\param _isExpanded Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BDeskbar::SetLocation(deskbar_location location, bool expanded=false)
+	\brief Undocumented public method
+
+	\param location Undocumented
+	\param expanded Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BDeskbar::IsExpanded() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BDeskbar::Expand(bool expand)
+	\brief Undocumented public method
+
+	\param expand Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BDeskbar::IsAlwaysOnTop() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BDeskbar::SetAlwaysOnTop(bool alwaysOnTop)
+	\brief Undocumented public method
+
+	\param alwaysOnTop Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BDeskbar::IsAutoRaise() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BDeskbar::SetAutoRaise(bool autoRaise)
+	\brief Undocumented public method
+
+	\param autoRaise Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BDeskbar::IsAutoHide() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BDeskbar::SetAutoHide(bool autoHide)
+	\brief Undocumented public method
+
+	\param autoHide Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BDeskbar::GetItemInfo(int32 id, const char **_name) const
+	\brief Undocumented public method
+
+	\param id Undocumented
+	\param _name Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BDeskbar::GetItemInfo(const char *name, int32 *_id) const
+	\brief Undocumented public method
+
+	\param name Undocumented
+	\param _id Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BDeskbar::HasItem(int32 id) const
+	\brief Undocumented public method
+
+	\param id Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BDeskbar::HasItem(const char *name) const
+	\brief Undocumented public method
+
+	\param name Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint32 BDeskbar::CountItems() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn float BDeskbar::MaxItemWidth() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn float BDeskbar::MaxItemHeight() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BDeskbar::AddItem(BView *archivableView, int32 *_id=NULL)
+	\brief Undocumented public method
+
+	\param archivableView Undocumented
+	\param _id Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BDeskbar::AddItem(entry_ref *addOn, int32 *_id=NULL)
+	\brief Undocumented public method
+
+	\param addOn Undocumented
+	\param _id Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BDeskbar::RemoveItem(int32 id)
+	\brief Undocumented public method
+
+	\param id Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BDeskbar::RemoveItem(const char *name)
+	\brief Undocumented public method
+
+	\param name Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\enum deskbar_location
+	\ingroup <kit name>
+	\brief Undocumented enum.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var deskbar_location B_DESKBAR_TOP
+	\brief Undocumented enum value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var deskbar_location B_DESKBAR_BOTTOM
+	\brief Undocumented enum value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var deskbar_location B_DESKBAR_LEFT_TOP
+	\brief Undocumented enum value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var deskbar_location B_DESKBAR_RIGHT_TOP
+	\brief Undocumented enum value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var deskbar_location B_DESKBAR_LEFT_BOTTOM
+	\brief Undocumented enum value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var deskbar_location B_DESKBAR_RIGHT_BOTTOM
+	\brief Undocumented enum value.
+
+	\since Haiku R1
+*/

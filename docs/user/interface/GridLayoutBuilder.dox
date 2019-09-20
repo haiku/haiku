@@ -1,0 +1,207 @@
+/*
+ * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Name, email@email.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/GridLayoutBuilder.h	hrev38512
+ *		src/kits/interface/GridLayoutBuilder.cpp	hrev45833
+ */
+
+
+/*!
+	\file GridLayoutBuilder.h
+	\ingroup layout
+	\brief Undocumented file.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BGridLayoutBuilder
+	\ingroup layout
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGridLayoutBuilder::BGridLayoutBuilder(float horizontal=B_USE_DEFAULT_SPACING, float vertical=B_USE_DEFAULT_SPACING)
+	\brief Undocumented public method
+
+	\param horizontal Undocumented
+	\param vertical Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGridLayoutBuilder::BGridLayoutBuilder(BGridLayout *layout)
+	\brief Undocumented public method
+
+	\param layout Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGridLayoutBuilder::BGridLayoutBuilder(BGridView *view)
+	\brief Undocumented public method
+
+	\param view Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGridLayout* BGridLayoutBuilder::GridLayout() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGridLayoutBuilder& BGridLayoutBuilder::GetGridLayout(BGridLayout **_layout)
+	\brief Undocumented public method
+
+	\param _layout Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BView* BGridLayoutBuilder::View() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGridLayoutBuilder& BGridLayoutBuilder::GetView(BView **_view)
+	\brief Undocumented public method
+
+	\param _view Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGridLayoutBuilder& BGridLayoutBuilder::Add(BView *view, int32 column, int32 row, int32 columnCount=1, int32 rowCount=1)
+	\brief Undocumented public method
+
+	\param view Undocumented
+	\param column Undocumented
+	\param row Undocumented
+	\param columnCount Undocumented
+	\param rowCount Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGridLayoutBuilder& BGridLayoutBuilder::Add(BLayoutItem *item, int32 column, int32 row, int32 columnCount=1, int32 rowCount=1)
+	\brief Undocumented public method
+
+	\param item Undocumented
+	\param column Undocumented
+	\param row Undocumented
+	\param columnCount Undocumented
+	\param rowCount Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGridLayoutBuilder& BGridLayoutBuilder::SetColumnWeight(int32 column, float weight)
+	\brief Undocumented public method
+
+	\param column Undocumented
+	\param weight Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGridLayoutBuilder& BGridLayoutBuilder::SetRowWeight(int32 row, float weight)
+	\brief Undocumented public method
+
+	\param row Undocumented
+	\param weight Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGridLayoutBuilder& BGridLayoutBuilder::SetInsets(float left, float top, float right, float bottom)
+	\brief Undocumented public method
+
+	\param left Undocumented
+	\param top Undocumented
+	\param right Undocumented
+	\param bottom Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGridLayoutBuilder::operator BGridLayout *()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/

@@ -1,0 +1,214 @@
+/*
+ * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Name, email@email.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/OptionControl.h	hrev49977
+ *		src/kits/interface/OptionControl.cpp	hrev33756
+ */
+
+
+///// TO THEY WHO DOCUMENT: it seems like the OptionControl.cpp file some docs already, so that's a good starting point /////
+
+
+/*!
+	\file OptionControl.h
+	\ingroup interface
+	\brief Undocumented file.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BOptionControl
+	\ingroup interface
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BOptionControl::BOptionControl(BRect frame, const char *name, const char *label, BMessage *message, uint32 resizeMask=B_FOLLOW_LEFT_TOP, uint32 flags=B_WILL_DRAW)
+	\brief Undocumented public method
+
+	\param frame Undocumented
+	\param name Undocumented
+	\param label Undocumented
+	\param message Undocumented
+	\param resizeMask Undocumented
+	\param flags Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BOptionControl::BOptionControl(const char *name, const char *label, BMessage *message, uint32 flags=B_WILL_DRAW)
+	\brief Undocumented public method
+
+	\param name Undocumented
+	\param label Undocumented
+	\param message Undocumented
+	\param flags Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BOptionControl::~BOptionControl()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BOptionControl::MessageReceived(BMessage *message)
+	\brief Undocumented public method
+
+	\param message Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BOptionControl::AddOption(const char *name, int32 value)
+	\brief Undocumented public method
+
+	\param name Undocumented
+	\param value Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual bool BOptionControl::GetOptionAt(int32 index, const char **_name, int32 *_value)=0
+	\brief Undocumented public method
+
+	\param index Undocumented
+	\param _name Undocumented
+	\param _value Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual void BOptionControl::RemoveOptionAt(int32 index)=0
+	\brief Undocumented public method
+
+	\param index Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual int32 BOptionControl::CountOptions() const =0
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BOptionControl::AddOptionAt(const char *name, int32 value, int32 index)=0
+	\brief Undocumented public method
+
+	\param name Undocumented
+	\param value Undocumented
+	\param index Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual int32 BOptionControl::SelectedOption(const char **name=NULL, int32 *outValue=NULL) const =0
+	\brief Undocumented public method
+
+	\param name Undocumented
+	\param outValue Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BOptionControl::SelectOptionFor(int32 value)
+	\brief Undocumented public method
+
+	\param value Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BOptionControl::SelectOptionFor(const char *name)
+	\brief Undocumented public method
+
+	\param name Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BMessage* BOptionControl::MakeValueMessage(int32 value)
+	\brief Undocumented protected method
+
+	\param value Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_OPTION_CONTROL_VALUE
+	\brief Undocumented enum value.
+
+	\since Haiku R1
+*/

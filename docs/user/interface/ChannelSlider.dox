@@ -1,0 +1,472 @@
+/*
+ * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Name, email@email.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/ChannelSlider.h	hrev49977
+ *		src/kits/interface/ChannelSlider.cpp	hrev51468
+ */
+
+
+/*!
+	\file ChannelSlider.h
+	\ingroup interface
+	\brief Undocumented file.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BChannelSlider
+	\ingroup interface
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BChannelSlider::BChannelSlider(BRect area, const char *name, const char *label, BMessage *message, int32 channels=1, uint32 resizeMode=B_FOLLOW_LEFT_TOP, uint32 flags=B_WILL_DRAW)
+	\brief Undocumented public method
+
+	\param area Undocumented
+	\param name Undocumented
+	\param label Undocumented
+	\param message Undocumented
+	\param channels Undocumented
+	\param resizeMode Undocumented
+	\param flags Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BChannelSlider::BChannelSlider(BRect area, const char *name, const char *label, BMessage *message, orientation orientation, int32 channels=1, uint32 resizeMode=B_FOLLOW_LEFT_TOP, uint32 flags=B_WILL_DRAW)
+	\brief Undocumented public method
+
+	\param area Undocumented
+	\param name Undocumented
+	\param label Undocumented
+	\param message Undocumented
+	\param orientation Undocumented
+	\param channels Undocumented
+	\param resizeMode Undocumented
+	\param flags Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BChannelSlider::BChannelSlider(const char *name, const char *label, BMessage *message, orientation orientation, int32 channels=1, uint32 flags=B_WILL_DRAW)
+	\brief Undocumented public method
+
+	\param name Undocumented
+	\param label Undocumented
+	\param message Undocumented
+	\param orientation Undocumented
+	\param channels Undocumented
+	\param flags Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BChannelSlider::BChannelSlider(BMessage *archive)
+	\brief Undocumented public method
+
+	\param archive Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BChannelSlider::~BChannelSlider()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BChannelSlider::Archive(BMessage *into, bool deep=true) const
+	\brief Undocumented public method
+
+	\param into Undocumented
+	\param deep Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelSlider::AttachedToWindow()
+	\brief Undocumented public method
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelSlider::AllAttached()
+	\brief Undocumented public method
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelSlider::DetachedFromWindow()
+	\brief Undocumented public method
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelSlider::AllDetached()
+	\brief Undocumented public method
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelSlider::MessageReceived(BMessage *message)
+	\brief Undocumented public method
+
+	\param message Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelSlider::Draw(BRect updateRect)
+	\brief Undocumented public method
+
+	\param updateRect Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelSlider::MouseDown(BPoint where)
+	\brief Undocumented public method
+
+	\param where Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelSlider::MouseUp(BPoint where)
+	\brief Undocumented public method
+
+	\param where Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelSlider::MouseMoved(BPoint where, uint32 transit, const BMessage *dragMessage)
+	\brief Undocumented public method
+
+	\param where Undocumented
+	\param transit Undocumented
+	\param dragMessage Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelSlider::WindowActivated(bool state)
+	\brief Undocumented public method
+
+	\param state Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelSlider::KeyDown(const char *bytes, int32 numBytes)
+	\brief Undocumented public method
+
+	\param bytes Undocumented
+	\param numBytes Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelSlider::KeyUp(const char *bytes, int32 numBytes)
+	\brief Undocumented public method
+
+	\param bytes Undocumented
+	\param numBytes Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelSlider::FrameResized(float width, float height)
+	\brief Undocumented public method
+
+	\param width Undocumented
+	\param height Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelSlider::SetFont(const BFont *font, uint32 mask=B_FONT_ALL)
+	\brief Undocumented public method
+
+	\param font Undocumented
+	\param mask Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelSlider::MakeFocus(bool focusState=true)
+	\brief Undocumented public method
+
+	\param focusState Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelSlider::GetPreferredSize(float *_width, float *_height)
+	\brief Undocumented public method
+
+	\param _width Undocumented
+	\param _height Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BHandler* BChannelSlider::ResolveSpecifier(BMessage *message, int32 index, BMessage *specifier, int32 form, const char *property)
+	\brief Undocumented public method
+
+	\param message Undocumented
+	\param index Undocumented
+	\param specifier Undocumented
+	\param form Undocumented
+	\param property Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BChannelSlider::GetSupportedSuites(BMessage *data)
+	\brief Undocumented public method
+
+	\param data Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelSlider::SetEnabled(bool on)
+	\brief Undocumented public method
+
+	\param on Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual orientation BChannelSlider::Orientation() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BChannelSlider::SetOrientation(orientation orientation)
+	\brief Undocumented public method
+
+	\param orientation Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual int32 BChannelSlider::MaxChannelCount() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual bool BChannelSlider::SupportsIndividualLimits() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelSlider::DrawChannel(BView *into, int32 channel, BRect area, bool pressed)
+	\brief Undocumented public method
+
+	\param into Undocumented
+	\param channel Undocumented
+	\param area Undocumented
+	\param pressed Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelSlider::DrawGroove(BView *into, int32 channel, BPoint leftTop, BPoint rightBottom)
+	\brief Undocumented public method
+
+	\param into Undocumented
+	\param channel Undocumented
+	\param leftTop Undocumented
+	\param rightBottom Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BChannelSlider::DrawThumb(BView *into, int32 channel, BPoint where, bool pressed)
+	\brief Undocumented public method
+
+	\param into Undocumented
+	\param channel Undocumented
+	\param where Undocumented
+	\param pressed Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual const BBitmap* BChannelSlider::ThumbFor(int32 channel, bool pressed)
+	\brief Undocumented public method
+
+	\param channel Undocumented
+	\param pressed Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BRect BChannelSlider::ThumbFrameFor(int32 channel)
+	\brief Undocumented public method
+
+	\param channel Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual float BChannelSlider::ThumbDeltaFor(int32 channel)
+	\brief Undocumented public method
+
+	\param channel Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual float BChannelSlider::ThumbRangeFor(int32 channel)
+	\brief Undocumented public method
+
+	\param channel Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static static BArchivable* BChannelSlider::Instantiate(BMessage *from)
+	\brief Undocumented public method
+
+	\param from Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/

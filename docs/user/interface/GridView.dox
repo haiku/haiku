@@ -1,0 +1,131 @@
+/*
+ * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Name, email@email.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/GridView.h	hrev43514
+ *		src/kits/interface/GridView.cpp	hrev49777
+ */
+
+
+/*!
+	\file GridView.h
+	\ingroup layout
+	\brief Undocumented file.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BGridView
+	\ingroup layout
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGridView::BGridView(float horizontal=B_USE_DEFAULT_SPACING, float vertical=B_USE_DEFAULT_SPACING)
+	\brief Undocumented public method
+
+	\param horizontal Undocumented
+	\param vertical Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGridView::BGridView(const char *name, float horizontal=B_USE_DEFAULT_SPACING, float vertical=B_USE_DEFAULT_SPACING)
+	\brief Undocumented public method
+
+	\param name Undocumented
+	\param horizontal Undocumented
+	\param vertical Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGridView::BGridView(BMessage *from)
+	\brief Undocumented public method
+
+	\param from Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BGridView::~BGridView()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BGridView::SetLayout(BLayout *layout)
+	\brief Undocumented public method
+
+	\param layout Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGridLayout* BGridView::GridLayout() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BGridView::Perform(perform_code d, void *arg)
+	\brief Undocumented public method
+
+	\param d Undocumented
+	\param arg Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static static BArchivable* BGridView::Instantiate(BMessage *from)
+	\brief Undocumented public method
+
+	\param from Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/

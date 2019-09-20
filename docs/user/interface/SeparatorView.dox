@@ -1,0 +1,288 @@
+/*
+ * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Name, email@email.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/SeparatorView.h	hrev45833
+ *		src/kits/interface/SeparatorView.cpp	hrev53246
+ */
+
+
+/*!
+	\file SeparatorView.h
+	\ingroup interface
+	\brief Undocumented file.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BSeparatorView
+	\ingroup interface
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSeparatorView::BSeparatorView(orientation orientation, border_style border=B_PLAIN_BORDER)
+	\brief Undocumented public method
+
+	\param orientation Undocumented
+	\param border Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSeparatorView::BSeparatorView(const char *name, const char *label, orientation orientation=B_HORIZONTAL, border_style border=B_FANCY_BORDER, const BAlignment &alignment=BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER))
+	\brief Undocumented public method
+
+	\param name Undocumented
+	\param label Undocumented
+	\param orientation Undocumented
+	\param border Undocumented
+	\param alignment Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSeparatorView::BSeparatorView(const char *name, BView *labelView, orientation orientation=B_HORIZONTAL, border_style border=B_FANCY_BORDER, const BAlignment &alignment=BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER))
+	\brief Undocumented public method
+
+	\param name Undocumented
+	\param labelView Undocumented
+	\param orientation Undocumented
+	\param border Undocumented
+	\param alignment Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSeparatorView::BSeparatorView(const char *label=NULL, orientation orientation=B_HORIZONTAL, border_style border=B_FANCY_BORDER, const BAlignment &alignment=BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER))
+	\brief Undocumented public method
+
+	\param label Undocumented
+	\param orientation Undocumented
+	\param border Undocumented
+	\param alignment Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSeparatorView::BSeparatorView(BView *labelView, orientation orientation=B_HORIZONTAL, border_style border=B_FANCY_BORDER, const BAlignment &alignment=BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER))
+	\brief Undocumented public method
+
+	\param labelView Undocumented
+	\param orientation Undocumented
+	\param border Undocumented
+	\param alignment Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSeparatorView::BSeparatorView(BMessage *archive)
+	\brief Undocumented public method
+
+	\param archive Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BSeparatorView::~BSeparatorView()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BSeparatorView::Archive(BMessage *into, bool deep=true) const
+	\brief Undocumented public method
+
+	\param into Undocumented
+	\param deep Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BSeparatorView::Draw(BRect updateRect)
+	\brief Undocumented public method
+
+	\param updateRect Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BSeparatorView::GetPreferredSize(float *width, float *height)
+	\brief Undocumented public method
+
+	\param width Undocumented
+	\param height Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BSize BSeparatorView::MinSize()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BSize BSeparatorView::MaxSize()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual BSize BSeparatorView::PreferredSize()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BSeparatorView::SetOrientation(orientation orientation)
+	\brief Undocumented public method
+
+	\param orientation Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BSeparatorView::SetAlignment(const BAlignment &aligment)
+	\brief Undocumented public method
+
+	\param aligment Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BSeparatorView::SetBorderStyle(border_style border)
+	\brief Undocumented public method
+
+	\param border Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BSeparatorView::SetLabel(const char *label)
+	\brief Undocumented public method
+
+	\param label Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BSeparatorView::SetLabel(BView *view, bool deletePrevious)
+	\brief Undocumented public method
+
+	\param view Undocumented
+	\param deletePrevious Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual status_t BSeparatorView::Perform(perform_code code, void *data)
+	\brief Undocumented public method
+
+	\param code Undocumented
+	\param data Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static static BArchivable* BSeparatorView::Instantiate(BMessage *archive)
+	\brief Undocumented public method
+
+	\param archive Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual virtual void BSeparatorView::DoLayout()
+	\brief Undocumented protected method
+
+	\since Haiku R1
+*/
