@@ -118,6 +118,19 @@
 
 
 /*!
+	\fn status_t BCountry::GetPreferredLanguage(BLanguage& language) const
+	\brief Get the most likely language to use in that country.
+
+	\param language A reference to a BLanguage to set to the preferred language.
+
+	\returns A status code, B_OK if everything went fine, or an error code
+	         otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\fn const char* BCountry::Code() const
 	\brief Gets the ISO country code for the country.
 

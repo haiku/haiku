@@ -139,6 +139,35 @@ BCountry::GetName(BString& name, const BLanguage* displayLanguage) const
 }
 
 
+status_t
+BCountry::GetPreferredLanguage(BLanguage& language) const
+{
+#if __GNUC__ == 2
+	return ENOSYS;
+#else
+	status_t status = InitCheck();
+	if (status != B_OK)
+		return status;
+
+	icu::Locale* languageLocale = fICULocale->clone();
+	if (languageLocale == NULL)
+		return B_NO_MEMORY;
+
+	UErrorCode icuError = U_ZERO_ERROR;
+	languageLocale->addLikelySubtags(icuError);
+
+	if (U_FAILURE(icuError))
+		return B_ERROR;
+
+	status = language.SetTo(languageLocale->getLanguage());
+
+	delete languageLocale;
+
+	return status;
+#endif
+}
+
+
 const char*
 BCountry::Code() const
 {
