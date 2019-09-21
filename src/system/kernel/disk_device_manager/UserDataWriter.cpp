@@ -6,12 +6,8 @@
 
 #include "UserDataWriter.h"
 
-using namespace std;
-
-typedef uint8	*addr;
-
 // RelocationEntryList
-struct UserDataWriter::RelocationEntryList : Vector<addr*> {};
+struct UserDataWriter::RelocationEntryList : Vector<addr_t*> {};
 
 // constructor
 UserDataWriter::UserDataWriter()
@@ -128,9 +124,9 @@ UserDataWriter::AllocatedSize() const
 status_t
 UserDataWriter::AddRelocationEntry(void *address)
 {
-	if (fRelocationEntries && (addr)address >= (addr)fBuffer
-		&& (addr)address < (addr)fBuffer + fBufferSize - sizeof(void*)) {
-		return fRelocationEntries->PushBack((addr*)address);
+	if (fRelocationEntries && (addr_t)address >= (addr_t)fBuffer
+		&& (addr_t)address < (addr_t)fBuffer + fBufferSize - sizeof(void*)) {
+		return fRelocationEntries->PushBack((addr_t*)address);
 	}
 	return B_ERROR;
 }
@@ -143,9 +139,9 @@ UserDataWriter::Relocate(void *address)
 		return B_BAD_VALUE;
 	int32 count = fRelocationEntries->Count();
 	for (int32 i = 0; i < count; i++) {
-		addr *entry = fRelocationEntries->ElementAt(i);
+		addr_t *entry = fRelocationEntries->ElementAt(i);
 		if (*entry)
-			*entry += (addr)address - (addr)fBuffer;
+			*entry += (addr_t)address - (addr_t)fBuffer;
 	}
 	return B_OK;
 }
