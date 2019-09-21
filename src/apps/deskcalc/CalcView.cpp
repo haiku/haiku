@@ -201,7 +201,7 @@ CalcView::CalcView(BMessage* archive)
 
 CalcView::~CalcView()
 {
-	delete fKeypad;
+	delete[] fKeypad;
 	delete fOptions;
 	free(fKeypadDescription);
 	delete fEvaluateMessageRunner;
