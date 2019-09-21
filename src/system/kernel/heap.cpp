@@ -601,7 +601,7 @@ dump_allocations(int argc, char **argv)
 							&& (address == 0 || base == address)) {
 							// interesting...
 							if (!statsOnly) {
-								kprintf("team: % 6ld; thread: % 6ld; "
+								kprintf("team: % 6" B_PRId32 "; thread: % 6" B_PRId32 "; "
 									"address: 0x%08lx; size: %lu bytes; "
 									"caller: %#lx\n", info->team, info->thread,
 									base, info->size, info->caller);
@@ -631,7 +631,7 @@ dump_allocations(int argc, char **argv)
 						&& (address == 0 || base == address)) {
 						// interesting...
 						if (!statsOnly) {
-							kprintf("team: % 6ld; thread: % 6ld;"
+							kprintf("team: % 6" B_PRId32 "; thread: % 6" B_PRId32 ";"
 								" address: 0x%08lx; size: %lu bytes;"
 								" caller: %#lx\n", info->team, info->thread,
 								base, info->size, info->caller);
@@ -650,8 +650,8 @@ dump_allocations(int argc, char **argv)
 		}
 	}
 
-	kprintf("total allocations: %lu; total bytes: %lu\n", totalCount,
-		totalSize);
+	kprintf("total allocations: %" B_PRIu32 "; total bytes: %" B_PRIuSIZE "\n",
+		totalCount, totalSize);
 	return 0;
 }
 
@@ -815,14 +815,14 @@ dump_allocations_per_caller(int argc, char **argv)
 	qsort(sCallerInfoTable, sCallerInfoCount, sizeof(caller_info),
 		sortBySize ? &caller_info_compare_size : &caller_info_compare_count);
 
-	kprintf("%ld different callers, sorted by %s...\n\n", sCallerInfoCount,
-		sortBySize ? "size" : "count");
+	kprintf("%" B_PRId32 " different callers, sorted by %s...\n\n",
+		sCallerInfoCount, sortBySize ? "size" : "count");
 
 	kprintf("     count        size      caller\n");
 	kprintf("----------------------------------\n");
 	for (int32 i = 0; i < sCallerInfoCount; i++) {
 		caller_info& info = sCallerInfoTable[i];
-		kprintf("%10ld  %10ld  %#08lx", info.count, info.size, info.caller);
+		kprintf("%10" B_PRId32 "  %10" B_PRId32 "  %#08lx", info.count, info.size, info.caller);
 
 		const char *symbol;
 		const char *imageName;
