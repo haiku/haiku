@@ -601,7 +601,7 @@ GIFLoad::MemblockDeleteAll()
 	while (fHeadMemblock != NULL) {
 		// delete the linked list
 		block = fHeadMemblock->next;
-		delete fHeadMemblock;
+		free(fHeadMemblock);
 		fHeadMemblock = block;
 	}
 }
