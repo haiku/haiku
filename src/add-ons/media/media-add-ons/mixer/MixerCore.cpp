@@ -112,7 +112,7 @@ MixerCore::~MixerCore()
 		delete[] fResampler;
 	}
 
-	delete fMixBufferChannelTypes;
+	delete[] fMixBufferChannelTypes;
 }
 
 
@@ -429,7 +429,7 @@ MixerCore::_ApplyOutputFormat()
 	if (fMixBuffer != NULL)
 		rtm_free(fMixBuffer);
 
-	delete fMixBufferChannelTypes;
+	delete[] fMixBufferChannelTypes;
 
 	fMixBufferFrameRate = (int32)(0.5 + format.frame_rate);
 	fMixBufferFrameCount = frames_per_buffer(format);
