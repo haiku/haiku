@@ -70,7 +70,7 @@ HEventList::HEventList(const char* name)
 HEventList::~HEventList()
 {
 	RemoveAll();
-	delete fType;
+	free(fType);
 }
 
 
@@ -80,7 +80,7 @@ HEventList::SetType(const char* type)
 	RemoveAll();
 	BMediaFiles mfiles;
 	mfiles.RewindRefs(type);
-	delete fType;
+	free(fType);
 	fType = strdup(type);
 
 	BString name;
