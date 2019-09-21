@@ -158,7 +158,7 @@ void PulseView::ChangeCPUState(BMessage *message) {
 
 PulseView::~PulseView() {
 	if (popupmenu != NULL) delete popupmenu;
-	if (cpu_menu_items != NULL) delete cpu_menu_items;
+	if (cpu_menu_items != NULL) delete[] cpu_menu_items;
 
 	delete[] prev_active;
 	delete[] cpu_times;
