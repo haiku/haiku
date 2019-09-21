@@ -40,7 +40,7 @@ public:
 
 		for (int i = 0; i < CRYPTO_num_locks(); i++)
 			pthread_mutex_destroy(&sMutexBuf[i]);
-		delete sMutexBuf;
+		delete[] sMutexBuf;
 	}
 
 private:
