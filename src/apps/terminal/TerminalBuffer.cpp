@@ -39,7 +39,7 @@ TerminalBuffer::TerminalBuffer()
 
 TerminalBuffer::~TerminalBuffer()
 {
-	delete fAlternateScreen;
+	free(fAlternateScreen);
 	delete fAlternateHistory;
 	delete[] fColorsPalette;
 }
