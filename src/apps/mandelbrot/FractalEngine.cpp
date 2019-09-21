@@ -111,7 +111,7 @@ void FractalEngine::MessageReceived(BMessage* msg)
 		fResizing = true;
 		StopRender();
 
-		delete fRenderBuffer;
+		delete[] fRenderBuffer;
 		fRenderBuffer = NULL;
 
 		fWidth = msg->GetUInt16("width", 320);
