@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	2601073644
+1	romanian	x-vnd.Haiku-HaikuDepot	4076252645
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		A apărut o eroare în timpul reîmprospătării depozitului: %error%
 Check for updates…	MainWindow		Verifică pentru actualizări…
 Uninstall	PackageManager		Dezinstalare
@@ -16,7 +16,6 @@ Rate package…	PackageInfoView		Evaluați pachet…
 Starting the package daemon failed:\n\n%Error%	App		Pornirea demonului de pachete a eșuat:\n\n%Error%
 <no info>	PackageInfoView		<no info>
 No user ratings available.	PackageInfoView		Nu sunt disponibile evaluările utilizatorilor.
-Local Repository Load Error	LocalPkgDataLoadProcess		Eroare la încărcarea depozitului local
 The user name needs to be at least 3 letters long.	UserLoginWindow		Numele de utilizator trebuie să fie de cel puțin 3 litere.
 Downloading package '%name%'	WorkStatusView		Se descarcă pachetul „%name%”
 Failed to create account	UserLoginWindow		Eșec la crearea contului
@@ -45,12 +44,12 @@ Local	LocalPkgDataLoadProcess		Local
 Rate %Package%	RatePackageWindow		Evaluează %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		A apărut o eroare în timpul inițializării administratorului de pachete: %message%
 Quit HaikuDepot	App		Închide HaikuDepot
-Repository Update Error	LocalRepositoryUpdateProcess		Eroare la actualizarea depozitului
 Category	FilterView		Categorie
 User rating	RatePackageWindow		Evaluarea utilizatorului
 Installed packages	MainWindow		Pachete instalate
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Un obiect cerut sau un obiect implicat în cerere nu a fost găsit pe server.
 Other users can see this rating	RatePackageWindow		Alți utilizatori pot vedea această evaluare
+The minimum age requirements must be met.	UserLoginWindow		Cerințele de vârstă minimă trebuie îndeplinite.
 Stable	RatePackageWindow		Stabil
 This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		Această aplicație este prea veche pentru a comunica cu  sistemul de servere HaikuDepot.  Obțineți o versiune nouă a HaikuDepot  prin actualizarea sistemului Haiku.  Versiunea minimă a  HaikuDepot necesară este \„%s\”.
 Fatal error	PackageManager		Eroare fatală
@@ -104,6 +103,7 @@ Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProce
 Failed to create account: %s\n	UserLoginWindow		Nu s-a putut crea contul: %s\n
 Size	PackageListView		Mărime
 Your rating:	RatePackageWindow		Evaluare:
+I am %MinimumAgeYears% years of age or older	UserLoginWindow		Sunt în vârstă de %MinimumAgeYears% de ani sau mai mult
 Your rating was updated.	RatePackageWindow		Evaluarea a fost actualizată.
 All categories	FilterView		Toate categoriile
 Repositories	MainWindow		Depozite
@@ -112,7 +112,6 @@ Cancel	MainWindow		Anulează
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 more to download)}other{(# more to download)}}
 Refresh repositories	MainWindow		Actualizare depozite
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Dacă nu furnizați o adresă de email, nu veți putea reseta parola dacă o uitați.
-Package Update Error	MainWindow		Eroare la actualizarea pachetului
 Tools	MainWindow		Unelte
 The passwords do not match.	UserLoginWindow		Parolele nu se potrivesc.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Acest pachet nu pare a fi pe Server HaikuDepot, prin urmare nu este posibil să creați o evaluare nouă sau să editați o evaluare existentă.
@@ -157,7 +156,6 @@ Pass phrase:	UserLoginWindow		Parolă:
 Open %DeskbarLink%	PackageManager		Deschide %DeskbarLink%
 Install	PackageManager		Instalare
 Input validation	UserLoginWindow		Validare intrare
-View latest user usage conditions…	MainWindow		Vizualizați cele mai recente condiții de utilizare ale utilizatorului…
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		O eroare neașteptată a fost trimisă de la serverul HaikuDepot [%i]
 Log in…	MainWindow		Autentificare…
 You need to be logged into an account before you can rate packages.	MainWindow		Trebuie să fiți autentificat într-un cont înainte de a evalua pachete.

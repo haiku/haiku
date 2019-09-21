@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Screen	4090394050
+1	hungarian	x-vnd.Haiku-Screen	2685901476
 no	Screen		nem
 bits/pixel	Screen		bit/pixel
 15 bits/pixel, 32768 colors	Screen		15 bit/pixel, 32768 szín
@@ -33,6 +33,7 @@ Warning	Screen		Figyelmeztetés
 24 bits/pixel, 16 Million colors	Screen		24 bit/pixel, 16 millió szín
 Hz	Screen		Hz
 Workspaces	Screen		Munkaasztalok
+Brightness:	Screen		Fényerősség:
 32 bits/pixel, 16 Million colors	Screen		32 bit/pixel, 16 millió szín
 Done	Screen		Kész
 16 bits/pixel, 65536 colors	Screen		16 bit/pixel, 65538 szín

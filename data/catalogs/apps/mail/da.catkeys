@@ -1,4 +1,4 @@
-1	danish	x-vnd.Be-MAIL	3155788869
+1	danish	x-vnd.Be-MAIL	2849540371
 Set to Saved	Mail		Indstil til gemt
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Din hovedtekst indeholder %ld ukodbare tegn. Måske et andet tegnsæt vil virke bedre? Tryk på Send for at sende den alligevel (der bruges et erstatningstegn i stedet for de ukodbare), eller vælg Annuller for at gå tilbage og prøve at rette det igen.
 Text wrapping:	Mail		Tekstombrydning:
@@ -59,7 +59,6 @@ Reply to sender	Mail		Besvar afsender
 Copy	Mail		Kopiér
 Add signature	Mail		Tilføj signatur
 %n - Full name	Mail		%n - Fuldt navn
-Remove quote	Mail		Fjern citat
 Signature	Mail		Signatur
 Use default account	Mail		Brug standardkonto
 draft	B_USER_DIRECTORY/mail/draft		kladde
@@ -151,7 +150,6 @@ New mail message	Mail		Ny e-mailmeddelelse
 An error occurred trying to open this signature.	Mail		Der opstod en fejl ved forsøg på at åbne signaturen.
 Edit signatures…	Mail		Rediger signaturer…
 User interface	Mail		Brugerflade
-Quote	Mail		Citat
 Inconsistency occurred in the undo/redo buffer.	Mail		Der skete en konsistens fejl i fortryd/gør historikken.
 Remove attachment	Mail		Fjern vedhæftning
 Set to…	Mail		Indstil til…

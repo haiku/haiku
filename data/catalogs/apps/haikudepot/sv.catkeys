@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	2601073644
+1	swedish	x-vnd.Haiku-HaikuDepot	2091519218
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ett fel inträffade vid uppdatering av repositoriet: %error%
 Check for updates…	MainWindow		Leta efter uppdateringar…
 Uninstall	PackageManager		Avinstallera
@@ -16,7 +16,6 @@ Rate package…	PackageInfoView		Betygsätt paket...
 Starting the package daemon failed:\n\n%Error%	App		Starta package daemon misslyckades:\n\n%Error%
 <no info>	PackageInfoView		<Ingen information>
 No user ratings available.	PackageInfoView		Ingen betygsättnings tillgänglig.
-Local Repository Load Error	LocalPkgDataLoadProcess		Laddningfel av lokalt repositorie
 The user name needs to be at least 3 letters long.	UserLoginWindow		användarnamnet måste vara minst 3 bokstäver långt.
 Downloading package '%name%'	WorkStatusView		Laddar hem paket '%name%'
 Failed to create account	UserLoginWindow		Misslyckades skapa konto
@@ -45,7 +44,6 @@ Local	LocalPkgDataLoadProcess		Lokal
 Rate %Package%	RatePackageWindow		Betyg %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Ett fel inträffade vid initiering av pakethanteraren: %message%
 Quit HaikuDepot	App		Avsluta HaikuDepot
-Repository Update Error	LocalRepositoryUpdateProcess		Fel vid uppdatering av repositoriet
 Category	FilterView		Kategori
 User rating	RatePackageWindow		Användarbetyg
 Installed packages	MainWindow		Installerade paket
@@ -112,7 +110,6 @@ Cancel	MainWindow		Avbryt
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 kvar att ladda hem)}other{(# kvar att ladda hem)}}
 Refresh repositories	MainWindow		Ladda om repositorier
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Om du inte anger en e-mail adress, kommer du inte kunna återställa ditt lösenord om du glömmer det.
-Package Update Error	MainWindow		Paketuppdateringsfel
 Tools	MainWindow		Verktyg
 The passwords do not match.	UserLoginWindow		Lösenorden stämmer inte överens.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Det här paketet verkar inte finnas på HaikuDepot-servern, så det är inte möjligt att skapa ett nytt betyg eller redigera ett befintligt betyg.
@@ -157,7 +154,6 @@ Pass phrase:	UserLoginWindow		Lösen fras:
 Open %DeskbarLink%	PackageManager		Öppna %DeskbarLink%
 Install	PackageManager		Installera
 Input validation	UserLoginWindow		Ogiltigt indata
-View latest user usage conditions…	MainWindow		Se de senaste användarvillkoren…
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Ett oväntat fel har skickats från HaikuDepot-servern [%i]
 Log in…	MainWindow		Logga in...
 You need to be logged into an account before you can rate packages.	MainWindow		Du måste logga in för att kunna betygsätta paket.

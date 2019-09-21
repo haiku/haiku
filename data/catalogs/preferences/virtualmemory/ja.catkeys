@@ -1,5 +1,5 @@
 1	japanese	x-vnd.Haiku-VirtualMemory	2090796060
-Requested swap file size:	SettingsWindow		指定されたスワップサイズ:
+Requested swap file size:	SettingsWindow		指定されたスワップファイルサイズ:
 VirtualMemory	System name		仮想メモリー
 OK	VirtualMemoryApp		OK
 Use volume:	SettingsWindow		パーティション:
@@ -13,7 +13,7 @@ The volume specified in the settings file could not be found. You can use the bo
 Current Swap:	SettingsWindow		現在のスワップ:
 Load defaults	SettingsWindow		デフォルト値を読み込む
 Use boot volume	SettingsWindow		起動ボリュームを使用
-Automatic swap management	SettingsWindow		自動仮想メモリー管理
+Automatic swap management	SettingsWindow		自動スワップファイル管理
 Defaults	SettingsWindow		デフォルト
 Quit	SettingsWindow		終了
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		仮想メモリーを無効にすると、使用可能な物理メモリーが少なくなったときにシステムが不安定になることがあります。\n物理メモリーが少なくなるまでは仮想メモリーがシステムパフォーマンスに影響を与えることはありません。\n\n仮想メモリーを無効にしてもよろしいですか?

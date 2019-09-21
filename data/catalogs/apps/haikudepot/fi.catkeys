@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	1251929325
+1	finnish	x-vnd.Haiku-HaikuDepot	3981008869
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Tietovaraston päivityksen yhteydessä tapahtui virhe: %error%
 Check for updates…	MainWindow		Tarkista päivitykset…
 Uninstall	PackageManager		Poista asennus
@@ -15,7 +15,6 @@ Rate package…	PackageInfoView		Anna pakkaukselle arvosana...
 Starting the package daemon failed:\n\n%Error%	App		Pakkaustaustaprosessin käynnistyminen epäonnistui:\n\n%Error%
 <no info>	PackageInfoView		<ei tietoja>
 No user ratings available.	PackageInfoView		Käyttäjäarvosanoja ei ole saatavilla.
-Local Repository Load Error	LocalPkgDataLoadProcess		Paikallisen tietovaraston latausvirhe
 The user name needs to be at least 3 letters long.	UserLoginWindow		Käyttäjänimen on oltava vähintään 3 merkkiä pitkä.
 Downloading package '%name%'	WorkStatusView		Ladataan pakkaus '%name%'
 Failed to create account	UserLoginWindow		Tilin luominen epäonnistui
@@ -44,7 +43,6 @@ Local	LocalPkgDataLoadProcess		Paikallinen
 Rate %Package%	RatePackageWindow		Anna pakkaukselle %Package% arvosana
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Pakkaushallinnan alustuksessa tapahtui virhe: %message%
 Quit HaikuDepot	App		Poistu HaikuVarastosta
-Repository Update Error	LocalRepositoryUpdateProcess		Tietovarastopäivityksen virhe
 Category	FilterView		Luokka
 User rating	RatePackageWindow		Käyttäjäarvosanat
 Installed packages	MainWindow		Asennetut paketit
@@ -111,7 +109,6 @@ Cancel	MainWindow		Peru
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 lisää ladattavaksi)}other{(# lisää ladattavaksi)}}
 Refresh repositories	MainWindow		Virkistä tietovarastoja
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Jos et tarjoa sähköpostiosoitetta, et kykene nollaamaan salasanaasi silloin kun unohdat sen.
-Package Update Error	MainWindow		Pakkauksen päivitysvirhe
 Tools	MainWindow		Työkalut
 The passwords do not match.	UserLoginWindow		Salasanat eivät täsmää.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Tämä pakkaus ei näytä olevan HaikuDepot-palvelimella, joten ei ole mahdollista luoda sille uutta arvosanaa tai muokata olemassaolevaa arvosanaa.

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Be-MAIL	3155788869
+1	hungarian	x-vnd.Be-MAIL	2849540371
 Set to Saved	Mail		Mentésre jelöl
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		A szöveg %ld nem kódolható karaktert tartalmaz. Lehetséges, hogy egy másik karakterkészlet jobb lenne? Kattintson a „Küldés”-re, ha mindenképp el akarja küldeni így (egy helyettesítő karakter fog megjelenni a nem kódolható karakter helyén), vagy térjen vissza, és javítsa ki azt.
 Text wrapping:	Mail		Szöveg tördelése:
@@ -59,7 +59,6 @@ Reply to sender	Mail		Válasz a feladónak
 Copy	Mail		Másolás
 Add signature	Mail		Aláírás hozzáfűzése
 %n - Full name	Mail		%n - Teljes neve
-Remove quote	Mail		Idézet eltávolítása
 Signature	Mail		Aláírás
 Use default account	Mail		Alapértelmezett fiók használata
 draft	B_USER_DIRECTORY/mail/draft		Piszkozat
@@ -151,7 +150,6 @@ New mail message	Mail		Új levél írása
 An error occurred trying to open this signature.	Mail		Hiba történt az aláírás megnyitásakor.
 Edit signatures…	Mail		Aláírás szerkesztése…
 User interface	Mail		Felhasználói felület
-Quote	Mail		Idézet
 Inconsistency occurred in the undo/redo buffer.	Mail		Kavarodás történt a visszavon/újra tárolóban.
 Remove attachment	Mail		Eltávolítás
 Set to…	Mail		Megjelöl…

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-MAIL	3209807243
+1	belarusian	x-vnd.Be-MAIL	2903558745
 Set to Saved	Mail		Пазначыць як захаванае
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваша паведамленне месціць %ld літар якія адсутнічаюць у выбранай кадоўцы. Нягледзячы на гэта вы маеце магчымасць Даслаць яго (у такім разе адсутныя літары будуць заменены на больш стасуючыя), ці Адмяніць перасылку ды вярнуцца і правіць гэтае паведамленне далей. Магчыма іншая кадоўка дапаможа даслаць паведамленне ў зыходным выглядзе.
 Text wrapping:	Mail		Афармоўка тэксту:
@@ -56,7 +56,6 @@ Reply to sender	Mail		Адказаць адпраўніку
 Copy	Mail		Капіяваць
 Add signature	Mail		Дадаць подпіс
 %n - Full name	Mail		%n - Поўнае імя
-Remove quote	Mail		Выдаліць цытату
 Signature	Mail		Подпіс
 Use default account	Mail		Ужываць прадвызначаны акаунт
 draft	B_USER_DIRECTORY/mail/draft		чарнавік
@@ -147,7 +146,6 @@ New mail message	Mail		Новае паведамленне
 An error occurred trying to open this signature.	Mail		Памылка. Немагчыма адкрыць гэты подпіс.
 Edit signatures…	Mail		Праўка подпісаў…
 User interface	Mail		Інтэрфейс карыстача
-Quote	Mail		Цытата
 Inconsistency occurred in the undo/redo buffer.	Mail		Неадпаведнасць ў чарзе аперацый паўтора/адмены.
 Remove attachment	Mail		Выдаліць укладанне
 Set to…	Mail		Прызначыць да…

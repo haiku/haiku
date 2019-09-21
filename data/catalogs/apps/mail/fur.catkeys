@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Be-MAIL	3155788869
+1	friulian	x-vnd.Be-MAIL	2849540371
 Set to Saved	Mail		Met come Salvât
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Il to test principâl al conten %ld caratars che no si puedin codificâ. Podaressial lâ ben forsit un complès di caratars diferents? Frache Invie par inviâlu distès (un caratar sostitutîf al vignarà doprât al puest di chei no codificabii), o sielç Anule par tornâ indaûr e justâ il test.
 Text wrapping:	Mail		Rie gnove automatiche:
@@ -59,7 +59,6 @@ Reply to sender	Mail		Rispuint al mitent
 Copy	Mail		Copie
 Add signature	Mail		Zonte firme
 %n - Full name	Mail		%n - Non complet
-Remove quote	Mail		Gjave citazion
 Signature	Mail		Firme
 Use default account	Mail		Dopre l'account predefinît
 draft	B_USER_DIRECTORY/mail/draft		stampon
@@ -151,7 +150,6 @@ New mail message	Mail		Gnûf messaç di pueste
 An error occurred trying to open this signature.	Mail		Si è verificât un erôr cirint di vierzi cheste firme.
 Edit signatures…	Mail		Modifiche firme…
 User interface	Mail		Interface utent
-Quote	Mail		Cite
 Inconsistency occurred in the undo/redo buffer.	Mail		Si è verificade une incoerence intal buffer 'disfe/torne fâs'.
 Remove attachment	Mail		Gjave zonte
 Set to…	Mail		Met a…

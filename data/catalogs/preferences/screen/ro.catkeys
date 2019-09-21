@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Screen	4090394050
+1	romanian	x-vnd.Haiku-Screen	2685901476
 no	Screen		nu
 bits/pixel	Screen		biți/pixel
 15 bits/pixel, 32768 colors	Screen		15 biți/pixel, 32768 culori
@@ -33,6 +33,7 @@ Warning	Screen		Avertisment
 24 bits/pixel, 16 Million colors	Screen		24 biți/pixel, 16 Milioane de culori
 Hz	Screen		Hz
 Workspaces	Screen		Spații de lucru
+Brightness:	Screen		Luminozitate:
 32 bits/pixel, 16 Million colors	Screen		32 biți/pixel, 16 Milioane de culori
 Done	Screen		Gata
 16 bits/pixel, 65536 colors	Screen		16 biți/pixel, 65536 culori

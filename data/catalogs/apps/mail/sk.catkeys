@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Be-MAIL	1865394837
+1	slovak	x-vnd.Be-MAIL	1559146339
 Set to Saved	Mail		Nastaviť na Uložené
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Váš hlavný text obsahuje %ld znakov, ktoré nebolo možné zakódovať. Možno by bola vhodná iná znaková sada? Ak chcete správu napriek tomu odoslať, stlačte „Odoslať“ (namiesto nezakódovateľných znakov sa použijú náhradné znaky) alebo sa vráťte späť stlačením „Zrušiť“ a pokúste sa to opraviť.
 Text wrapping:	Mail		Zalamovanie textu:
@@ -57,7 +57,6 @@ Reply to sender	Mail		Odpovedať odosielateľovi
 Copy	Mail		Kopírovať
 Add signature	Mail		Pridať podpis
 %n - Full name	Mail		%n - Plný názov
-Remove quote	Mail		Odstrániť citát
 Signature	Mail		Podpis
 Use default account	Mail		Použiť predvolený účet
 draft	B_USER_DIRECTORY/mail/draft		rozpísané
@@ -148,7 +147,6 @@ New mail message	Mail		Nová poštová správa
 An error occurred trying to open this signature.	Mail		Vyskytla sa chyba pri pokuse otvoriť podpis.
 Edit signatures…	Mail		Upraviť podpisy…
 User interface	Mail		Používateľské rozhranie
-Quote	Mail		Citovať
 Inconsistency occurred in the undo/redo buffer.	Mail		V zásobníku vrátení/opakovaní sa vyskytla nekonzistencia.
 Remove attachment	Mail		Odstrániť prílohu
 Set to…	Mail		Nastaviť na…

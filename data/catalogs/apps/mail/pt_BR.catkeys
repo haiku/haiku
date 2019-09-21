@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Be-MAIL	1865394837
+1	portuguese (brazil)	x-vnd.Be-MAIL	1559146339
 Set to Saved	Mail		Definir como Salvo
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		O texto principal contém %ld caracteres não codificáveis. Quem sabe um conjunto de caracteres diferente trabalhe melhor? Clique em Enviar para enviar a mensagem como está (um caractere substituto será usado no lugar dos não codificáveis) ou escolha Cancelar para voltar e tentar consertar isso.
 Text wrapping:	Mail		Quebra de texto:
@@ -57,7 +57,6 @@ Reply to sender	Mail		Responder ao remetente
 Copy	Mail		Copiar
 Add signature	Mail		Adicionar assinatura
 %n - Full name	Mail		%n - Nome completo
-Remove quote	Mail		Remover citação
 Signature	Mail		Assinatura
 Use default account	Mail		Usar conta padrão
 draft	B_USER_DIRECTORY/mail/draft		rascunho
@@ -148,7 +147,6 @@ New mail message	Mail		Nova mensagem de correio
 An error occurred trying to open this signature.	Mail		Ocorreu um erro ao tentar abrir esta assinatura.
 Edit signatures…	Mail		Editar assinaturas…
 User interface	Mail		Interface de usuário
-Quote	Mail		Citar
 Inconsistency occurred in the undo/redo buffer.	Mail		Ocorreu um erro de inconsistência na memória intermédia do Desfazer/Refazer.
 Remove attachment	Mail		Remover anexo
 Set to…	Mail		Definir como…

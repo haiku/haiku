@@ -1,9 +1,10 @@
-1	hungarian	x-vnd.Haiku-Keymap	459206087
+1	hungarian	x-vnd.Haiku-Keymap	3348782469
 Key	Modifier keys window	As in a computer keyboard key	Billentyű
 Japanese	KeymapNames		Japán
 US	KeymapNames		Egyesült Államok
 PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Brazil
+ThinkPad (US)	KeyboardLayoutNames		ThinkPad (Egyesült Államok)
 Right control	Keyboard Layout View		Jobb Ctrl
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Opció billentyű:
@@ -35,12 +36,16 @@ Dvorak (programmer's)	KeymapNames		Dvorak (programozói)
 PRINT	Keyboard Layout View		PRINT
 German (Mac)	KeymapNames		Német (Mac)
 Arabic (102)	KeymapNames		Arab (102)
+ThinkPad	KeyboardLayoutNames		ThinkPad
 Belarusian (Mac)	KeymapNames		Belorusz (Mac)
 Croatian	KeymapNames		Horvát
 PAGE ↑	Keyboard Layout View		PAGE ↑
 Set modifier keys	Modifier keys window		Módosító billentyű megadása
+Apple Aluminium International	KeyboardLayoutNames		Apple Aluminium (nemzetközi)
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd billentyű
 PG ↓	Keyboard Layout View	Very short for 'page down'	PG ↓
+ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (Egyesült Államok)
+Apple Aluminum	KeyboardLayoutNames		Apple Aluminum
 Spanish	KeymapNames		Spanyol
 HOME	Keyboard Layout View		HOME
 COMMAND	Keyboard Layout View		COMMAND
@@ -50,13 +55,18 @@ French (Bépo)	KeymapNames		Francia (Bépo)
 Russian (Typewriter)	KeymapNames		Orosz (írógép)
 Acute trigger	Keymap window		Ékezet kapcsoló
 Italian	KeymapNames		Olasz
+ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s (nemzetközi)
+Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminum (Egyesült Államok)
+Kinesis Ergo Elan International	KeyboardLayoutNames		Kinesis Ergo Elan (nemzetközi)
 Modifier keys	Modifier keys window		Módosító billentyű
+ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 (nemzetközi)
 Kazakh	KeymapNames		Kazah
 Save as…	Keymap window		Mentés másként…
 Lithuanian (Standard)	KeymapNames		Litván (alapértelmezett)
 Error: duplicate keys	Modifier keys window		Hiba: dupla billentyű
 NUM	Keyboard Layout View	Very short for 'num lock'	NUM
 Bulgarian (Phonetic)	KeymapNames		Belga (fonetikus)
+Kinesis Advantage	KeyboardLayoutNames		Kinesis Advantage
 Canadian-French	KeymapNames		Kanadai-francia
 Hungarian	KeymapNames		Magyar
 Control	Keyboard Layout View	Control key	Vezérlőbillentyű
@@ -81,12 +91,14 @@ Circumflex trigger	Keymap window		Kalap kapcsoló
 Caps lock	Keyboard Layout View		Caps lock
 Left shift	Keyboard Layout View		Bal Shift
 Russian (Yawert)	KeymapNames		Orosz (Yawert)
+ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e (nemzetközi)
 Bulgarian (Cyrillic)	KeymapNames		Bolgár (cirill)
 Swedish	KeymapNames		Svéd
 Left control	Keyboard Layout View		Bal Ctrl
 CAPS	Keyboard Layout View	Very short for 'caps lock'	CAPS
 Role	Modifier keys window	As in the role of a modifier key	Szerep
 Svorak	KeymapNames		Svorak
+ThinkPad X100e (US)	KeyboardLayoutNames		ThinkPad X100e (Egyesült Államok)
 German	KeymapNames		Német
 Swiss-German	KeymapNames		Svájci-német
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl billentyű
@@ -94,6 +106,7 @@ Czech	KeymapNames		Cseh
 Russian (Udmurt, Komi, Mari)	KeymapNames		Orosz (Udmurt, Komi, Mari)
 Thai (TIS-820.2538)	KeymapNames		Thai (TIS-820.2538)
 Control:	Modifier keys window	Control key role name	Vezérlőbillentyű:
+Generic 105-key International	KeyboardLayoutNames		Hagyományos 105 billentyűs (nemzetközi)
 Disabled	Modifier keys window	Do nothing	Letiltva
 Select dead keys	Keymap window		„Beragadó” gombok kiválasztása
 Russian (Mac)	KeymapNames		Orosz (Mac)
@@ -112,6 +125,7 @@ Quit	Keymap window		Kilépés
 Polish (Typewriter)	KeymapNames		Lengyel (írógép)
 French (Mac)	KeymapNames		Francia (Mac)
 User:	Keymap window		Felhasználó:
+Apple Aluminium Extended International	KeyboardLayoutNames		Apple Aluminium Extended (nemzetközi)
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opc billentyű
 SHIFT	Keyboard Layout View		SHIFT
 Estonian	KeymapNames		Észt
@@ -128,6 +142,8 @@ Switch shortcut keys to Haiku mode	Keymap window		Billentyűzetkombináció-vál
 Defaults	Keymap window		Eredeti
 ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		Nyelv:
+ThinkPad International	KeyboardLayoutNames		ThinkPad (nemzetközi)
+Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Aluminum Extended (Egyesült Államok)
 Switch shortcut keys	Keymap window		Billentyűzetkombináció-váltás
 Right command	Keyboard Layout View		Jobb parancs billentyű
 NUM LOCK	Keyboard Layout View		NUM LOCK
@@ -136,9 +152,11 @@ Belgian (comma)	KeymapNames		Belga (vessző)
 Norwegian	KeymapNames		Norvég
 Font	Keymap window		Betűtípus
 Danish	KeymapNames		Dán
+Generic 104-key	KeyboardLayoutNames		Hagyományos 104 billentyűs
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift billentyű
 PAUSE	Keyboard Layout View		PAUSE
 Russian	KeymapNames		Orosz
+TypeMatrix 2030	KeyboardLayoutNames		TypeMatrix 2030
 Romanian	KeymapNames		Román
 CMD	Keyboard Layout View	Very short for 'command'	CMD
 Command	Keyboard Layout View	Command key	Parancsbillentyű
@@ -151,3 +169,4 @@ Dutch	KeymapNames		Holland
 Diaeresis trigger	Keymap window		Tréma kapcsoló
 Icelandic	KeymapNames		Izlandi
 Open…	Keymap window		Megnyitás…
+ThinkPad T400s (US)	KeyboardLayoutNames		ThinkPad T400s (Egyesült Államok)

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-HaikuDepot	2601073644
+1	italian	x-vnd.Haiku-HaikuDepot	2091519218
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificato un errore nell'aggiornamento del repository: %error%
 Check for updates…	MainWindow		Controllo aggiornamenti…
 Uninstall	PackageManager		Disinstalla
@@ -16,7 +16,6 @@ Rate package…	PackageInfoView		Vota pacchetto…
 Starting the package daemon failed:\n\n%Error%	App		Avvio del demone dei pacchetti fallito:\n\n%Error%
 <no info>	PackageInfoView		<nessuna informazione>
 No user ratings available.	PackageInfoView		Nessuna valutazione utente è disponibile.
-Local Repository Load Error	LocalPkgDataLoadProcess		Errore nel caricamento del Repository locale
 The user name needs to be at least 3 letters long.	UserLoginWindow		Il nome utente deve essere composto da almeno tre caratteri alfanumerici.
 Downloading package '%name%'	WorkStatusView		Download del pacchetto '%name%' in corso
 Failed to create account	UserLoginWindow		Non è stato possibile creare l'account
@@ -45,7 +44,6 @@ Local	LocalPkgDataLoadProcess		Locale
 Rate %Package%	RatePackageWindow		Vota %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Si è verificato un errore durante l'inizializzazione del gestore dei pacchetti: %message%
 Quit HaikuDepot	App		Chiudi HaikuDepot
-Repository Update Error	LocalRepositoryUpdateProcess		Errore Aggiornamento Repository
 Category	FilterView		Categoria
 User rating	RatePackageWindow		Valutazione utenti
 Installed packages	MainWindow		Pacchetti installati
@@ -112,7 +110,6 @@ Cancel	MainWindow		Annulla
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 ancora da scaricare)}other{(# ancora da scaricare)}}
 Refresh repositories	MainWindow		Aggiorna repository
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Senza un indirizzo email, non sarai in grado di resettare la password se la dimentichi.
-Package Update Error	MainWindow		Errore Aggiornamento Pacchetto
 Tools	MainWindow		Strumenti
 The passwords do not match.	UserLoginWindow		Le password non corrispondono.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Questo pacchetto non sembra essere sul server di HaikuDepot, pertanto non è possibile creare una nuova valutazione o modificare una valutazione esistente.
@@ -157,7 +154,6 @@ Pass phrase:	UserLoginWindow		Password:
 Open %DeskbarLink%	PackageManager		Apri %DeskbarLink%
 Install	PackageManager		Installa
 Input validation	UserLoginWindow		Validazione input
-View latest user usage conditions…	MainWindow		Vedi le ultime condizioni d'uso dell'utente…
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Si è verificato un errore inatteso dal server HaikuDepot [%i]
 Log in…	MainWindow		Accesso…
 You need to be logged into an account before you can rate packages.	MainWindow		Per poter valutare i pacchetti è necessario accedere con un account.

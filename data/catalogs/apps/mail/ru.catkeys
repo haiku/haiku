@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-MAIL	3155788869
+1	russian	x-vnd.Be-MAIL	2849540371
 Set to Saved	Mail		Послать в сохраненные
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основной текст содержит %ld некодируемых символов. Возможно, другая кодировка подойдет лучше? Нажмите Отправить чтобы все равно отправить письмо (некодиуемые символы будут заменены на кодируемые), или нажмите Отмена и попробуйте исправить их вручную.
 Text wrapping:	Mail		Перенос строк:
@@ -59,7 +59,6 @@ Reply to sender	Mail		Ответить отправителю
 Copy	Mail		Копия
 Add signature	Mail		Добавить подпись
 %n - Full name	Mail		%n - Полное имя
-Remove quote	Mail		Удалить цитату
 Signature	Mail		Подпись
 Use default account	Mail		Использовать аккаунт по умолчанию
 draft	B_USER_DIRECTORY/mail/draft		Черновики
@@ -151,7 +150,6 @@ New mail message	Mail		Новое сообщение
 An error occurred trying to open this signature.	Mail		Возникла ошибка при попытке открытия этой подписи.
 Edit signatures…	Mail		Изменить подписи…
 User interface	Mail		Интерфейс пользователя
-Quote	Mail		Цитата
 Inconsistency occurred in the undo/redo buffer.	Mail		Произошло несоответствие в буфере отмены/повтора.
 Remove attachment	Mail		Удалить вложение
 Set to…	Mail		Пометить как…

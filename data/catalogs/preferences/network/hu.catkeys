@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Network	3694799483
+1	hungarian	x-vnd.Haiku-Network	3039697761
 Ethernet device	InterfaceListItem		Vezetékes eszköz
 Link speed:	IntefaceView		Kapcsolat sebessége:
 disconnected	IntefaceView		leválasztva
@@ -40,6 +40,7 @@ disabled	InterfaceListItem		letiltva
 Dial-up connection	InterfaceListItem		Telefonos kapcsolat
 on	ServiceListItem		be
 The method for obtaining an IP address	IntefaceAddressView		Az IP-cím megszerzésének módja
+disconnected	InterfaceListItem		szétkapcsolva
 Automatic	IntefaceAddressView		Automatikus
 Choose automatically	IntefaceView		Automatikus választás
 Status:	IntefaceView		Állapot:

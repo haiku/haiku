@@ -1,4 +1,4 @@
-1	english	x-vnd.Be-MAIL	1865394837
+1	english	x-vnd.Be-MAIL	1559146339
 Set to Saved	Mail		设置为保存
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		你的正文中包含的 %ld 属于无法识别的编码类型。 可能改变编码类型之后会更好的运行？ 点击“发送”继续(系统将会选择一种合适的类型来代替无法编码的类型)，或者点击“取消”，进行修复。
 Text wrapping:	Mail		文本加密：
@@ -57,7 +57,6 @@ Reply to sender	Mail		回复发件人
 Copy	Mail		复制
 Add signature	Mail		添加署名
 %n - Full name	Mail		%n - 全名
-Remove quote	Mail		删除引用
 Signature	Mail		样式
 Use default account	Mail		使用默认账户
 draft	B_USER_DIRECTORY/mail/draft		草稿箱
@@ -148,7 +147,6 @@ New mail message	Mail		新建邮件
 An error occurred trying to open this signature.	Mail		试图打开标识出错。
 Edit signatures…	Mail		编辑署名…
 User interface	Mail		用户界面
-Quote	Mail		转发
 Inconsistency occurred in the undo/redo buffer.	Mail		缓冲区发生错误，撤销/重复操作无法执行。
 Remove attachment	Mail		删除附件
 Set to…	Mail		设置为…

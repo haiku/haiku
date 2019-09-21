@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	2023640966
+1	hungarian	x-vnd.Haiku-libtracker	838081337
 Created	ContainerWindow		Létrehozva
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
 Open with…	ContainerWindow		Megnyitás…
@@ -23,6 +23,7 @@ Name	Default Query Columns		Név
 Unmount	ContainerWindow		Leválasztás
 Eject when unmounting	AutoMounterSettings		Kiadás leválasztáskor
 Searching for disks to mount…	StatusWindow		Csatolandó lemezek keresése…
+Information	InfoWindow		Információ
 Error emptying Trash	FSUtils		Hiba történt a Szemetes ürítése közben.
 Opens with:	InfoWindow		Megnyitás ezzel:
 Size	QueryPoseView		Méret
@@ -402,6 +403,7 @@ by formula	FindPanel		képlet alapján
 is	FindPanel		egyenlő
 Move to Trash	FilePanelPriv		Mozgatás a Szemetesbe
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Ha átnevezed a rendszermappát vagy annak tartalmát, akkor a %osName nem indítható!\n\nBiztosan ezt akarod tenni?\n\nA rendszermappa vagy annak tartalmának átnevezéséhez tartsd lenyomva a Shift billentyűt, és kattints az \"Átnevezés\" gombra.
+Permissions	FilePermissionsView		Jogosultságok
 40 x 40	ContainerWindow		40 x 40
 40 x 40	DeskWindow		40 x 40
 New folder %ld	FSUtils		Új mappa %ld

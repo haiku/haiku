@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	2249260889
+1	french	x-vnd.Haiku-HaikuDepot	683373137
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Une erreur est survenue lors du rafraîchissement : %error%
 Check for updates…	MainWindow		Vérifier les mises à jour…
 Uninstall	PackageManager		Désinstaller
@@ -15,7 +15,6 @@ Rate package…	PackageInfoView		Évaluer le paquet…
 Starting the package daemon failed:\n\n%Error%	App		Le démarrage du serveur de paquets a échoué :\n\n%Error%
 <no info>	PackageInfoView		<pas d’info>
 No user ratings available.	PackageInfoView		Aucun avis d’utilisateurs.
-Local Repository Load Error	LocalPkgDataLoadProcess		Impossible d'ouvrir le dépôt local
 The user name needs to be at least 3 letters long.	UserLoginWindow		Le nom d’utilisateur doit comporter au moins 3 caractères.
 Downloading package '%name%'	WorkStatusView		Téléchargement du paquet « %name% »
 Failed to create account	UserLoginWindow		La création du compte a échoué
@@ -44,7 +43,6 @@ Local	LocalPkgDataLoadProcess		Local
 Rate %Package%	RatePackageWindow		Évaluer %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Une erreur est survenue lors de l'initialisation du gestionnaire de paquets : %message%
 Quit HaikuDepot	App		Quitter le Dépôt Haiku
-Repository Update Error	LocalRepositoryUpdateProcess		Erreur lors de la mise à jour des dépôts
 Category	FilterView		Catégorie
 User rating	RatePackageWindow		Avis de l’utilisateur
 Installed packages	MainWindow		Paquets installés
@@ -103,7 +101,6 @@ n/a	PackageInfoView		n/a
 Cancel	MainWindow		Annuler
 Refresh repositories	MainWindow		Rafraîchir les dépôts
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Si vous ne fournissez pas d’adresse email, vous ne pourrez pas réinitialiser votre mot de passe en cas d’oubli.
-Package Update Error	MainWindow		Erreur lors de la mise à jour d’un paquet
 Tools	MainWindow		Outils
 The passwords do not match.	UserLoginWindow		Les mots de passe ne concordent pas.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Ce paquet ne semble pas se trouver sur le serveur du Dépôt Haiku, il n’est donc pas possible de créer une nouvelle évaluation ou de modifier une évaluation existante.

@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	2601073644
+1	friulian	x-vnd.Haiku-HaikuDepot	2091519218
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificât un erôr intal inzornâ il dipuesit: %error%
 Check for updates…	MainWindow		Control inzornaments…
 Uninstall	PackageManager		Disinstale
@@ -16,7 +16,6 @@ Rate package…	PackageInfoView		Vote pachet…
 Starting the package daemon failed:\n\n%Error%	App		Inviament dal demoni dai pachets falît:\n\n %Error%
 <no info>	PackageInfoView		<nessune informazion>
 No user ratings available.	PackageInfoView		Nissune valutazion dai utents disponibile.
-Local Repository Load Error	LocalPkgDataLoadProcess		Erôr cjariament dipuesit locâl
 The user name needs to be at least 3 letters long.	UserLoginWindow		Il non utent al scugne jessi lunc almancul di 3 letaris.
 Downloading package '%name%'	WorkStatusView		Daûr a discjariâ il pachet '%name%'
 Failed to create account	UserLoginWindow		No si è rivâts a creâ l'account
@@ -45,7 +44,6 @@ Local	LocalPkgDataLoadProcess		Locâl
 Rate %Package%	RatePackageWindow		Vote %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Si è verificât un erôr intal inizializâ il gjestôr dal pachet: %message%
 Quit HaikuDepot	App		Siere HaikuDepot
-Repository Update Error	LocalRepositoryUpdateProcess		Erôr inzornament dipuesit
 Category	FilterView		Categorie
 User rating	RatePackageWindow		Valutazion utents
 Installed packages	MainWindow		Pachets instalâts
@@ -112,7 +110,6 @@ Cancel	MainWindow		Anule
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(ancjemò 1 discjariament)}other{(ancjemò # discjariaments)}}
 Refresh repositories	MainWindow		Inzorne dipuesits
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Se no si indiche une direzion email, no si podarà ristabilî la peraule di ordin, tal câs che si le dismenteedi.
-Package Update Error	MainWindow		Erôr inzornament pachet
 Tools	MainWindow		Struments
 The passwords do not match.	UserLoginWindow		Lis peraulis di ordin no corispuindin.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Chest pachet nol semee esisti sul servidôr HaikuDepot, duncje nol è pussibil creâ une gnove valutazion o modificâ une esistente.
@@ -157,7 +154,6 @@ Pass phrase:	UserLoginWindow		Sproc di ordin:
 Open %DeskbarLink%	PackageManager		Vierç %DeskbarLink%
 Install	PackageManager		Instale
 Input validation	UserLoginWindow		Convalide input
-View latest user usage conditions…	MainWindow		Viôt lis ultimis condizions di ûs dal utent…
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Un erôr inspietât al è stât inviât dal servidôr di HaikuDepot [%i]
 Log in…	MainWindow		Acès…
 You need to be logged into an account before you can rate packages.	MainWindow		Si scugne jessi jentrâts intun account prime di podê valutâ i pachets.

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	120160942
+1	russian	x-vnd.Haiku-HaikuDepot	1489803009
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Произошла ошибка при обновлении репозитория: %error%
 Check for updates…	MainWindow		Проверить обновления…
 Uninstall	PackageManager		Удалить
@@ -95,7 +95,6 @@ n/a	PackageInfoView		н/д
 Cancel	MainWindow		Отменить
 Refresh repositories	MainWindow		Обновить репозитории
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Если вы не укажите адрес электронной почты, вы не сможете восстановить пароль в случае его утери.
-Package Update Error	MainWindow		Ошибка обновления пакетов
 Tools	MainWindow		Инструменты
 The passwords do not match.	UserLoginWindow		Пароли не совпадают.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Похоже, что этого пакета нет на сервере HaikuDepot из-за чего создать новый рейтинг или изменить существующий невозможно.

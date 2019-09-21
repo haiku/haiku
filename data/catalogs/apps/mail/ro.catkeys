@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Be-MAIL	3155788869
+1	romanian	x-vnd.Be-MAIL	2849540371
 Set to Saved	Mail		Stabilește la salvat
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Textul dumneavoastră principal conține caractere %ld care nu se pot coda. Este posibil ca un set diferit de caractere să funcționeze mai bine? Apăsați pe Trimite pentru a fi trimis oricum (un caracter de substituție va fi utilizat în locul celor care nu se pot coda), sau alegeți Anulează pentru a merge înapoi să îl reparați.
 Text wrapping:	Mail		Încadrare text:
@@ -59,7 +59,6 @@ Reply to sender	Mail		Răspunde la expeditor
 Copy	Mail		Copiază
 Add signature	Mail		Adaugă semnătură
 %n - Full name	Mail		%n - Nume complet
-Remove quote	Mail		Elimină citat
 Signature	Mail		Semnătură
 Use default account	Mail		Utilizează contul implicit
 draft	B_USER_DIRECTORY/mail/draft		ciornă
@@ -151,7 +150,6 @@ New mail message	Mail		Mesaj email nou
 An error occurred trying to open this signature.	Mail		A apărut o eroare când s-a încercat deschiderea acestei semnături.
 Edit signatures…	Mail		Editează semnături…
 User interface	Mail		Interfață cu utilizatorul
-Quote	Mail		Citat
 Inconsistency occurred in the undo/redo buffer.	Mail		A apărut o inconsecvență în preîncărcarea refă/repetă.
 Remove attachment	Mail		Elimină atașament
 Set to…	Mail		Stabilește la…

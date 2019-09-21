@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-MAIL	3155788869
+1	german	x-vnd.Be-MAIL	2849540371
 Set to Saved	Mail		Status setzen: Saved
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Der Text enthält %ld nicht kodierbare Zeichen. Eine andere Zeichenkodierung könnte helfen. 'Senden' klicken, um die Nachricht trotzdem zu senden (Ersatzzeichen werden für die nicht kodierbaren Zeichen verwendet), oder den Vorgang abbrechen, um das Problem zu lösen.
 Text wrapping:	Mail		Zeilenumbruch:
@@ -59,7 +59,6 @@ Reply to sender	Mail		Antwort an Absender
 Copy	Mail		Kopieren
 Add signature	Mail		Signatur anhängen
 %n - Full name	Mail		%n - Voller Name
-Remove quote	Mail		Zitatebene entfernen
 Signature	Mail		Signatur
 Use default account	Mail		Standardkonto
 draft	B_USER_DIRECTORY/mail/draft		Entwürfe
@@ -151,7 +150,6 @@ New mail message	Mail		Nachricht verfassen
 An error occurred trying to open this signature.	Mail		Beim Öffnen dieser Signatur ist ein Fehler aufgetreten.
 Edit signatures…	Mail		Signaturen bearbeiten…
 User interface	Mail		Programmoberfläche
-Quote	Mail		Zitieren
 Inconsistency occurred in the undo/redo buffer.	Mail		Es ist ein Fehler im Rückgängig/Wiederherstellen-Puffer aufgetreten.
 Remove attachment	Mail		Anhang entfernen
 Set to…	Mail		Status setzen…

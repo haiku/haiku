@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Be-MAIL	3209807243
+1	lithuanian	x-vnd.Be-MAIL	2903558745
 Set to Saved	Mail		Perkelti į Išsaugotus
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Laiško tekste yra %lt simboliai (-ų), kurių negalima užkoduoti naudojant pasirinktą koduotę. Galbūt norėtumėte parinkti kitą koduotę? Ar norite laišką išsiųsti nepaisant šios problemos (netinkami simboliai bus pakeisti tinkamais)? Jeigu norite pabandyti problemą išspręsti, rinkitės „Atsisakyti“.
 Text wrapping:	Mail		Teksto laužymas:
@@ -56,7 +56,6 @@ Reply to sender	Mail		Atsakyti siuntėjui
 Copy	Mail		Kopijuoti
 Add signature	Mail		Pridėti prierašą
 %n - Full name	Mail		%n – pilnas vardas
-Remove quote	Mail		Šalinti citatą
 Signature	Mail		Prierašas
 Use default account	Mail		Naudoti numatytąją paskyrą
 draft	B_USER_DIRECTORY/mail/draft		Juodraščiai
@@ -147,7 +146,6 @@ New mail message	Mail		Naujas laiškas
 An error occurred trying to open this signature.	Mail		Bandant atverti šį prierašą, įvyko klaida.
 Edit signatures…	Mail		Taisyti prierašus…
 User interface	Mail		Naudotojo sąsaja
-Quote	Mail		Citata
 Inconsistency occurred in the undo/redo buffer.	Mail		Nesutapimas atšaukti/grąžinti buferyje.
 Remove attachment	Mail		Šalinti priedą
 Set to…	Mail		Nustatyti būseną į…

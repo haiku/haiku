@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Screen	4090394050
+1	danish	x-vnd.Haiku-Screen	2685901476
 no	Screen		nej
 bits/pixel	Screen		bit/pixel
 15 bits/pixel, 32768 colors	Screen		15 bit/pixel, 32768 farver
@@ -33,6 +33,7 @@ Warning	Screen		Advarsel
 24 bits/pixel, 16 Million colors	Screen		24 bit/pixel, 16 millioner farver
 Hz	Screen		Hz
 Workspaces	Screen		Arbejdsrum
+Brightness:	Screen		Lysstyrke:
 32 bits/pixel, 16 Million colors	Screen		32 bit/pixel, 16 millioner farver
 Done	Screen		Færdig
 16 bits/pixel, 65536 colors	Screen		16 bit/pixel, 65536 farver

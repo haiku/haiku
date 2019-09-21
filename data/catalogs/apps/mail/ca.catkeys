@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Be-MAIL	3209807243
+1	catalan; valencian	x-vnd.Be-MAIL	2903558745
 Set to Saved	Mail		Marca com a desat
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		El vostre text principal conté caràcters no codificables.Pot ser amb un joc de caràcters diferent funcionaria millor. Premeu Envia per enviar-ho igualment (llavors es substituirà amb un altre els caràcters que no es poden codificar), o bé trieu 'Anul·la' per anar enredera i intentar corregir-ho.
 Text wrapping:	Mail		Ajustament de línia:
@@ -56,7 +56,6 @@ Reply to sender	Mail		Respon al remitent
 Copy	Mail		Copia
 Add signature	Mail		Afegeix una signatura
 %n - Full name	Mail		%n - Nom complet
-Remove quote	Mail		Esborra la cita
 Signature	Mail		Signatura
 Use default account	Mail		Utilitza el compte predeterminat
 draft	B_USER_DIRECTORY/mail/draft		esborrany
@@ -147,7 +146,6 @@ New mail message	Mail		Nou missatge de correu
 An error occurred trying to open this signature.	Mail		Ha ocorregut un error mentre s'intentava obrir aquesta signatura.
 Edit signatures…	Mail		Edita les signatures...
 User interface	Mail		Interfície d'usuari
-Quote	Mail		Cita
 Inconsistency occurred in the undo/redo buffer.	Mail		S'ha produït una inconsistència en desfer/ refer la memòria intermèdia.
 Remove attachment	Mail		Suprimeix l'adjunt
 Set to…	Mail		Estableix-ho com a...

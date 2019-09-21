@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	2601073644
+1	ukrainian	x-vnd.Haiku-HaikuDepot	2091519218
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Під час оновлення репозиторію сталася помилка: %error%
 Check for updates…	MainWindow		Оцінити пакунок…
 Uninstall	PackageManager		Видалити
@@ -16,7 +16,6 @@ Rate package…	PackageInfoView		Оцінити пакет…
 Starting the package daemon failed:\n\n%Error%	App		Запуск демона пакету призупинено:\n\n%Error%
 <no info>	PackageInfoView		<немає інформації>
 No user ratings available.	PackageInfoView		Оцінка для користувача недоступна.
-Local Repository Load Error	LocalPkgDataLoadProcess		Помилка при завантаженні репозиторію
 The user name needs to be at least 3 letters long.	UserLoginWindow		Ім'я користувача повинно бути хоча б у 3 літери завдовжки.
 Downloading package '%name%'	WorkStatusView		Завантажити пакунок '%name%'
 Failed to create account	UserLoginWindow		Створення облікового запису призупинено
@@ -45,7 +44,6 @@ Local	LocalPkgDataLoadProcess		На цьому пристрої
 Rate %Package%	RatePackageWindow		Оцінити %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Під час запуску диспетчера пакунків сталася помилка: %message%
 Quit HaikuDepot	App		Вийти зі Сховища Haiku
-Repository Update Error	LocalRepositoryUpdateProcess		Помилка зв'язку з репозиторієм
 Category	FilterView		Категорія
 User rating	RatePackageWindow		Оцінка користувача
 Installed packages	MainWindow		Встановлені пакети
@@ -112,7 +110,6 @@ Cancel	MainWindow		Відмінити
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 більше для завантаження)}other{(# більше для завантаження)}}
 Refresh repositories	MainWindow		Оновити репозиторії
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Якщо Ви не вкажете адресу пошти, то не зможете відновити гасло у випадку його забування.
-Package Update Error	MainWindow		Помилка оновлення пакунку
 Tools	MainWindow		Інструменти
 The passwords do not match.	UserLoginWindow		Гасла не співпадають
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Цей пакет, здається, не знаходиться на HaikuDepot Server, тому неможливо створити нову оцінку або відредагувати існуючу.
@@ -157,7 +154,6 @@ Pass phrase:	UserLoginWindow		Гасло:
 Open %DeskbarLink%	PackageManager		Відкрити %DeskbarLink%
 Install	PackageManager		Встановити
 Input validation	UserLoginWindow		Перевірка вхідних даних
-View latest user usage conditions…	MainWindow		Переглянути дії останнього користувача
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Сервер HaikuDepot надіслав непередбачену помилку [%i]
 Log in…	MainWindow		Авторизуватись…
 You need to be logged into an account before you can rate packages.	MainWindow		Для оцінки пакетів спочатку необхідно авторизуватись.

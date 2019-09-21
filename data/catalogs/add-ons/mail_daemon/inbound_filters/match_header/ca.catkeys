@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-MatchHeader	1349121828
+1	catalan; valencian	x-vnd.Haiku-MatchHeader	709288665
 Delete message	ConfigView		Suprimeix el missatge
 Set flags to	ConfigView		Posa les banderes a
 <Choose account>	ConfigView		<Trieu un compte>
@@ -9,4 +9,5 @@ Reply with	ConfigView		Respon amb
 <Choose action>	ConfigView		<Trieu una acció>
 Move to	ConfigView		Mou a
 this field is based on the action	ConfigView		aquest camp es basa en l'acció
+Account	ConfigView		Compte
 has	ConfigView		té

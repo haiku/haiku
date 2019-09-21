@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-MAIL	3155788869
+1	finnish	x-vnd.Be-MAIL	2849540371
 Set to Saved	Mail		Aseta tallennetuksi
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Päätekstisi sisältää %ld koodaamatonta merkkiä. Ehkä eri merkistö toimisi paremmin? Napauta Lähetä-painiketta sen lähettämiseksi silti (korvausmerkkejä käytetään koodaamattomien merkkien paikalla), tai valitse Peru palataksesi ja yritä korjata se.
 Text wrapping:	Mail		Tekstin rivitys:
@@ -59,7 +59,6 @@ Reply to sender	Mail		Vastaa lähettäjälle
 Copy	Mail		Kopioi
 Add signature	Mail		Lisää allekirjoitus
 %n - Full name	Mail		%n - Koko nimi
-Remove quote	Mail		Poista lainaus
 Signature	Mail		Allekirjoitus
 Use default account	Mail		Käytä oletustiliä
 draft	B_USER_DIRECTORY/mail/draft		luonnos
@@ -151,7 +150,6 @@ New mail message	Mail		Uusi sähköpostiviesti
 An error occurred trying to open this signature.	Mail		Tapahtui virhe yritettäessä avata tätä allekirjoitusta.
 Edit signatures…	Mail		Muokkaa allekirjoituksia…
 User interface	Mail		Käyttöliittymä
-Quote	Mail		Lainaus
 Inconsistency occurred in the undo/redo buffer.	Mail		Tapahtui epäjohdonmukaisuutta puskurin perumisen/uudelleentekemisen yhteydessä.
 Remove attachment	Mail		Poista liite
 Set to…	Mail		Aseta arvoon…

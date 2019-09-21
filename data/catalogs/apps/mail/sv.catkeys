@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Be-MAIL	3155788869
+1	swedish	x-vnd.Be-MAIL	2849540371
 Set to Saved	Mail		Set till Sparad
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Din text innehåller %ld tecken som inte kan hanteras. En annan teckenuppsättning kanske skulle fungera bättre? Klicka Skicka för att skicka det ändå (Ersättnings tecken kommer att användas till de tecken som inte kunde översättas), eller välj avbryt och försök att fixa felet.
 Text wrapping:	Mail		Textradbrytning:
@@ -59,7 +59,6 @@ Reply to sender	Mail		Svara avsändare
 Copy	Mail		Kopiera
 Add signature	Mail		Lägg till signatur
 %n - Full name	Mail		%n - Hela namnet
-Remove quote	Mail		Ta bort citationstecken
 Signature	Mail		Signatur
 Use default account	Mail		Använd standardkonto
 draft	B_USER_DIRECTORY/mail/draft		utkast
@@ -151,7 +150,6 @@ New mail message	Mail		Nytt e-post-meddelande
 An error occurred trying to open this signature.	Mail		Ett fel uppstod när signaturen skulle öppnas.
 Edit signatures…	Mail		Redigera signaturer…
 User interface	Mail		Användargränssnitt
-Quote	Mail		Citat
 Inconsistency occurred in the undo/redo buffer.	Mail		Inkonsekvens uppstod i ångra/gör om-bufferten.
 Remove attachment	Mail		Ta bort bifogad fil
 Set to…	Mail		Satt till...

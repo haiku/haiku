@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	2601073644
+1	japanese	x-vnd.Haiku-HaikuDepot	4076252645
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
 Check for updates…	MainWindow		更新をチェック…
 Uninstall	PackageManager		アンインストール
@@ -16,7 +16,6 @@ Rate package…	PackageInfoView		パッケージを評価…
 Starting the package daemon failed:\n\n%Error%	App		パッケージデーモンの起動に失敗しました:\n\n%Error%
 <no info>	PackageInfoView		<情報無し>
 No user ratings available.	PackageInfoView		ユーザー評価はありません。
-Local Repository Load Error	LocalPkgDataLoadProcess		ローカルリポジトリ読み込みエラー
 The user name needs to be at least 3 letters long.	UserLoginWindow		ユーザー名は少なくとも 3 文字は必要です。
 Downloading package '%name%'	WorkStatusView		パッケージ '%name%' をダウンロード中
 Failed to create account	UserLoginWindow		アカウントの作成に失敗しました
@@ -45,12 +44,12 @@ Local	LocalPkgDataLoadProcess		ローカル
 Rate %Package%	RatePackageWindow		%Package% を評価
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		パッケージマネージャーの初期化中にエラーが発生しました: %message%
 Quit HaikuDepot	App		HaikuDepot を終了
-Repository Update Error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
 Category	FilterView		分類
 User rating	RatePackageWindow		ユーザーによる評価
 Installed packages	MainWindow		インストール済みパッケージ
 A requested object or an object involved in the request was not found on the server.	ServerHelper		要求されたオブジェクトまたはリクエストに関連するオブジェクトがサーバー上に見つかりませんでした。　　
 Other users can see this rating	RatePackageWindow		ほかのユーザーがこの評価を見ることができます
+The minimum age requirements must be met.	UserLoginWindow		最低年齢制限を満たさなければいけない。
 Stable	RatePackageWindow		安定
 This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		アプリケーションが古いので、HaikuDepot サーバーシステムと通信できません。Haiku システムを更新して、HaikuDepot の新しいバージョンを入手してください。必要とされる HaikuDepot の最小簿バージョンは、\"%s\" です。
 Fatal error	PackageManager		致命的なエラー
@@ -104,6 +103,7 @@ Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProce
 Failed to create account: %s\n	UserLoginWindow		次のアカウントの作成に失敗しました: %s\n
 Size	PackageListView		サイズ
 Your rating:	RatePackageWindow		評価:
+I am %MinimumAgeYears% years of age or older	UserLoginWindow		私は %MinimumAgeYears% 歳以上です
 Your rating was updated.	RatePackageWindow		評価が更新されました。
 All categories	FilterView		すべての分類
 Repositories	MainWindow		リポジトリ
@@ -112,7 +112,6 @@ Cancel	MainWindow		キャンセル
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 個以上のダウンロード)}other{(# 個以上のダウンロード)}}
 Refresh repositories	MainWindow		リポジトリの更新
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		メールアドレスを入力しない場合、パスワードを忘れた時にリセットできないでしょう。
-Package Update Error	MainWindow		パッケージアップデートエラー
 Tools	MainWindow		ツール
 The passwords do not match.	UserLoginWindow		パスワードが一致しません。
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		このパッケージは HaikuDepot Server 上には無いようです。従って新規の評価の作成や既存の評価の更新はできません。
@@ -157,7 +156,6 @@ Pass phrase:	UserLoginWindow		パスフレーズ:
 Open %DeskbarLink%	PackageManager		%DeskbarLink% を開く
 Install	PackageManager		インストール
 Input validation	UserLoginWindow		入力検証
-View latest user usage conditions…	MainWindow		ユーザーの最新の使用状況を表示…
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		予期しないエラーが次の HaikuDepot サーバーから送信されました [%i]
 Log in…	MainWindow		ログイン…
 You need to be logged into an account before you can rate packages.	MainWindow		パッケージを評価する前にアカウントにログインする必要があります。

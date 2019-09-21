@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Be-MAIL	1865394837
+1	spanish; castilian	x-vnd.Be-MAIL	1559146339
 Set to Saved	Mail		Ajustar como Guardado
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		El texto que ha escrito contiene %ld caracteres indecodificables. ¿Quizás un carácter diferente podría funcionar mejor? Presione enviar de cualquier manera (un carácter sustituto se utilizará en lugar de los indecodificables), o presione Cancelar para regresar e intentar arreglarlo.
 Text wrapping:	Mail		Ajuste del texto:
@@ -57,7 +57,6 @@ Reply to sender	Mail		Responder al remitente
 Copy	Mail		Copiar
 Add signature	Mail		Agregar firma
 %n - Full name	Mail		%n - Nombre completo
-Remove quote	Mail		Eliminar cita
 Signature	Mail		Firma
 Use default account	Mail		Usar la cuenta por omisión
 draft	B_USER_DIRECTORY/mail/draft		borrador
@@ -148,7 +147,6 @@ New mail message	Mail		Crear mensaje de correo
 An error occurred trying to open this signature.	Mail		Se produjo un error mientras se trataba de abrir la firma.
 Edit signatures…	Mail		Editar firmas...
 User interface	Mail		Interfaz de usuario
-Quote	Mail		Cita
 Inconsistency occurred in the undo/redo buffer.	Mail		Se produjo una inconsistencia en el búfer de deshacer/rehacer.
 Remove attachment	Mail		Eliminar adjunto
 Set to…	Mail		Ajustar a…

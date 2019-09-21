@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-HaikuDepot	2601073644
+1	indonesian	x-vnd.Haiku-HaikuDepot	2091519218
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Terjadi kesalahan saat menyegarkan repositori: %error%
 Check for updates…	MainWindow		Memeriksa pembaruan…
 Uninstall	PackageManager		Hapus
@@ -16,7 +16,6 @@ Rate package…	PackageInfoView		Nilai paket...
 Starting the package daemon failed:\n\n%Error%	App		Mulai layanan paket gagal :\n\n%Error%
 <no info>	PackageInfoView		<no info>
 No user ratings available.	PackageInfoView		Tak tersedia penilaian pengguna.
-Local Repository Load Error	LocalPkgDataLoadProcess		Kesalahan Memuat Repositori Lokal
 The user name needs to be at least 3 letters long.	UserLoginWindow		Nama pengguna harus minimal 3 huruf.
 Downloading package '%name%'	WorkStatusView		Paket pengunduhan '%name%'
 Failed to create account	UserLoginWindow		Gagal membuat akun
@@ -45,7 +44,6 @@ Local	LocalPkgDataLoadProcess		Lokal
 Rate %Package%	RatePackageWindow		Nilai %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Terjadi kesalahan saat menginisialisasi manajer paket:%message%
 Quit HaikuDepot	App		Keluar dari HaikuDepot
-Repository Update Error	LocalRepositoryUpdateProcess		Kesalahan Pembaruan Repositori
 Category	FilterView		Kategori
 User rating	RatePackageWindow		Peringkat pengguna
 Installed packages	MainWindow		Paket-paket yang terpasang
@@ -112,7 +110,6 @@ Cancel	MainWindow		Batal
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 more to download)}other{(# more to download)}}
 Refresh repositories	MainWindow		Muat-ulang repositori
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Jika anda tidak memberikan alamat email, anda tidak akan dapat mereset kata sandi anda jika anda melupakannya.
-Package Update Error	MainWindow		Pembaruan Paket Masalah
 Tools	MainWindow		Perkakas
 The passwords do not match.	UserLoginWindow		Sandi tak cocok.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Paket ini sepertinya tidak ada di Server HaikuDepot, jadi tidak mungkin membuat peringkat baru atau mengedit peringkat yang sudah ada.
@@ -157,7 +154,6 @@ Pass phrase:	UserLoginWindow		Frasa lulus:
 Open %DeskbarLink%	PackageManager		Buka %DeskbarLink%
 Install	PackageManager		Instalasi
 Input validation	UserLoginWindow		Validasi masukan
-View latest user usage conditions…	MainWindow		Lihat kondisi penggunaan terbaru…
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Kesalahan tak terduga telah dikirim dari server HaikuDepot [%i]
 Log in…	MainWindow		Log masuk…
 You need to be logged into an account before you can rate packages.	MainWindow		Anda harus masuk ke akun sebelum dapat memberi nilai paket.

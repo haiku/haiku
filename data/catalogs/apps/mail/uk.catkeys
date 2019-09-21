@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Be-MAIL	3155788869
+1	ukrainian	x-vnd.Be-MAIL	2849540371
 Set to Saved	Mail		Перемкнути до збереження
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основний текст містить %ld нерозкодованих символів. Можливо інше кодування спрацює краще? Виберіть Відправити якщо хочете зробити це не зважаючи(нерозкодований символ буде замінено таким що ситуативно підходить), або натисніть Відмінити щоб повернутися назад і виправити ситуацію.
 Text wrapping:	Mail		Обтікання тексту:
@@ -59,7 +59,6 @@ Reply to sender	Mail		Відповісти відправникові
 Copy	Mail		Копіювати
 Add signature	Mail		Додати підпис
 %n - Full name	Mail		%n - повне ім'я
-Remove quote	Mail		Видалити цитату
 Signature	Mail		Підпис
 Use default account	Mail		Використати типовий обліковий запис
 draft	B_USER_DIRECTORY/mail/draft		чорновик
@@ -151,7 +150,6 @@ New mail message	Mail		Новий лист
 An error occurred trying to open this signature.	Mail		Помилка при спробі відкрити цей підпис.
 Edit signatures…	Mail		Редагувати підписи…
 User interface	Mail		Інтерфейс користувача
-Quote	Mail		Цитата
 Inconsistency occurred in the undo/redo buffer.	Mail		Невідповідність у буфері відміни/заміни.
 Remove attachment	Mail		Видалити вкладення
 Set to…	Mail		Встановити в…

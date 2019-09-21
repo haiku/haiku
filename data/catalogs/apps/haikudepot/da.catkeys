@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-HaikuDepot	2601073644
+1	danish	x-vnd.Haiku-HaikuDepot	2091519218
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Der opstod en fejl under opdatering af softwarekilden: %error%
 Check for updates…	MainWindow		Søg efter opdateringer…
 Uninstall	PackageManager		Afinstaller
@@ -16,7 +16,6 @@ Rate package…	PackageInfoView		Bedøm pakke…
 Starting the package daemon failed:\n\n%Error%	App		Start af pakkedæmon mislykkedes:\n\n%Error%
 <no info>	PackageInfoView		<ingen info>
 No user ratings available.	PackageInfoView		Ingen tilgængelige brugerbedømmelser.
-Local Repository Load Error	LocalPkgDataLoadProcess		Fejl ved indlæsning af lokal softwarekilde
 The user name needs to be at least 3 letters long.	UserLoginWindow		Brugernavnet skal være mindst 3 bogstaver langt.
 Downloading package '%name%'	WorkStatusView		Downloader pakken '%name%'
 Failed to create account	UserLoginWindow		Kunne ikke oprette konto
@@ -45,7 +44,6 @@ Local	LocalPkgDataLoadProcess		Lokal
 Rate %Package%	RatePackageWindow		Bedøm %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Der opstod en fejl under initialisering af pakkehåndteringen: %message%
 Quit HaikuDepot	App		Afslut HaikuDepot
-Repository Update Error	LocalRepositoryUpdateProcess		Fej ved opdatering af softwarekilde
 Category	FilterView		Kategori
 User rating	RatePackageWindow		Brugerbedømmelse
 Installed packages	MainWindow		Installerede pakker
@@ -112,7 +110,6 @@ Cancel	MainWindow		Annuller
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 mere at downloade)}other{(# mere at downloade)}}
 Refresh repositories	MainWindow		Genopfrisk softwarekilder
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Hvis du ikke angiver en e-mailadresse, så vil du ikke være i stand til at nulstille din adgangskode hvis du glemmer den.
-Package Update Error	MainWindow		Fejl ved pakkeopdatering
 Tools	MainWindow		Værktøjer
 The passwords do not match.	UserLoginWindow		Adgangskoderne er ikke ens.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Pakken ser ikke ud til at være på HaikuDepot-serveren, så det er ikke muligt at oprette en ny bedømmelse eller redigere end eksisterende bedømmelse.
@@ -157,7 +154,6 @@ Pass phrase:	UserLoginWindow		Adgangsfrase:
 Open %DeskbarLink%	PackageManager		Åbn %DeskbarLink%
 Install	PackageManager		Installer
 Input validation	UserLoginWindow		Inputvalidering
-View latest user usage conditions…	MainWindow		Vis seneste betingelser for brugeranvendelse …
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Det blev sendt en uventet fejl fra HaikuDepot-serveren [%i]
 Log in…	MainWindow		Log ind…
 You need to be logged into an account before you can rate packages.	MainWindow		Du skal logge ind på en konto inden du kan bedømme pakker.

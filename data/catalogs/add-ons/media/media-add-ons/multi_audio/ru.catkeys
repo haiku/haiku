@@ -13,7 +13,7 @@ Headphones	MultiAudio		Наушники
 Beep	MultiAudio		Сигнал
 Output mono mix	MultiAudio		Выход моно микс
 Output stereo mix	MultiAudio		Выход стерео микс
-Input	MultiAudio		Вход
+Input	MultiAudio		Входная
 Output treble	MultiAudio		Выход высоких
 Mono mix	MultiAudio		Моно микширование
 General	MultiAudio		Общие
@@ -22,7 +22,7 @@ Enhanced Setup	MultiAudio		Расширенные настройки
 Stereo mix	MultiAudio		Стерео микширование
 Output 3D depth	MultiAudio		Выход 3D глубины
 Volume	MultiAudio		Громкость
-Output	MultiAudio		Выход
+Output	MultiAudio		Выходная
 Video	MultiAudio		Видео
 Line	MultiAudio		Линия
 Mic	MultiAudio		Микрофон

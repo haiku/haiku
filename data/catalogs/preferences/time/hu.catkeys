@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Time	752043118
+1	hungarian	x-vnd.Haiku-Time	834234238
 OK	Time		Rendben
 Message receiving failed	Time		Sikertelen üzenetfogadás
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Dátum és idő, készítette:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\n Copyright 2004-2012, Haiku.
@@ -16,6 +16,7 @@ Asia	Time		Ázsia
 Try all servers	Time		Összes kiszolgáló kipróbálása
 Time	Time		Idő
 Current time:	Time		Jelenlegi idő:
+The following error occured while synchronizing:\n%s: %s	Time		Hiba történt szinkronizálás közben:\n%s: %s
 Europe	Time		Európa
 Show day of week	Time		A hét napjának megjelenítése
 Local time (Windows compatible)	Time		Helyi idő (Windows kompatibilis)
@@ -43,5 +44,6 @@ Synchronize at boot	Time		Szinkronizálás indításkor
 Indian	Time		India
 Revert	Time		Visszaállít
 Date and time	Time		Dátum és idő
+The following error occured while synchronizing:\n%s	Time		Hiba történt szinkronizálás közben:\n%s
 Synchronize	Time		Szinkronizálás
 Add	Time		Hozzáadás
