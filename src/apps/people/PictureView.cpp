@@ -275,10 +275,13 @@ PictureView::Draw(BRect updateRect)
 		BRect frame = rect.InsetByCopy(kPictureMargin, kPictureMargin);
 		BRect srcRect = picture->Bounds();
 		BSize size = frame.Size();
-		if (srcRect.Width() > srcRect.Height())
-			size.height = srcRect.Height() * size.width / srcRect.Width();
-		else
+		float pictureAspect = srcRect.Height() / srcRect.Width();
+		float frameAspect = size.height / size.width;
+
+		if (pictureAspect > frameAspect)
 			size.width = srcRect.Width() * size.height / srcRect.Height();
+		else if (pictureAspect < frameAspect)
+			size.height = srcRect.Height() * size.width / srcRect.Width();
 
 		fPictureRect = BLayoutUtils::AlignInFrame(frame, size,
 			BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER));
