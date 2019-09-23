@@ -737,10 +737,7 @@ GeneralInfoView::CheckAndSetSize()
 	} else
 		return;
 
-	BRect bounds(Bounds());
-	float lineHeight = CurrentFontHeight() + 2;
-	bounds.Set(fDivider, 0, bounds.right, lineHeight);
-	Invalidate(bounds);
+	SetSizeString(fSizeString);
 }
 
 
@@ -1030,9 +1027,8 @@ GeneralInfoView::SetSizeString(const char* sizeString)
 {
 	fSizeString = sizeString;
 
-	BRect bounds(Bounds());
 	float lineHeight = CurrentFontHeight() + 6;
-	bounds.Set(fDivider, 0, bounds.right, lineHeight);
+	BRect bounds(fDivider, 0, Bounds().right, lineHeight);
 	Invalidate(bounds);
 }
 
