@@ -508,6 +508,7 @@ GeneralInfoView::MouseDown(BPoint where)
 	} else if (fPathRect.Contains(where)) {
 		InvertRect(fPathRect);
 		fTrackingState = path_track;
+	} else if (fSizeRect.Contains(where)) {
 		if (fModel->IsDirectory() && !fModel->IsVolume()
 			&& !fModel->IsRoot()) {
 			InvertRect(fSizeRect);
