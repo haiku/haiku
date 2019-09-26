@@ -312,6 +312,11 @@ BTextView::BTextView(BMessage* archive)
 
 	_InitObject(rect, NULL, NULL);
 
+	bool toggle;
+
+	if (archive->FindBool("_password", &toggle) == B_OK)
+		HideTyping(toggle);
+
 	const char* text = NULL;
 	if (archive->FindString("_text", &text) == B_OK)
 		SetText(text);
@@ -334,8 +339,6 @@ BTextView::BTextView(BMessage* archive)
 	if (archive->FindInt32("_sel", &flag) == B_OK &&
 		archive->FindInt32("_sel", &flag2) == B_OK)
 		Select(flag, flag2);
-
-	bool toggle;
 
 	if (archive->FindBool("_stylable", &toggle) == B_OK)
 		SetStylable(toggle);
@@ -438,6 +441,8 @@ BTextView::Archive(BMessage* data, bool deep) const
 		err = data->AddBool("_nsel", !fSelectable);
 	if (err == B_OK)
 		err = data->AddBool("_nedit", !fEditable);
+	if (err == B_OK)
+		err = data->AddBool("_password", IsTypingHidden());
 
 	if (err == B_OK && fDisallowedChars != NULL && fDisallowedChars->CountItems() > 0) {
 		err = data->AddData("_dis_ch", B_RAW_TYPE, fDisallowedChars->Items(),
