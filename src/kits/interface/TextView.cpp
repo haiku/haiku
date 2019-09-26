@@ -263,6 +263,7 @@ BTextView::BTextView(BRect frame, const char* name, BRect textRect,
 		flags | B_FRAME_EVENTS | B_PULSE_NEEDED | B_INPUT_METHOD_AWARE)
 {
 	_InitObject(textRect, NULL, NULL);
+	SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
 }
 
 
@@ -274,6 +275,7 @@ BTextView::BTextView(BRect frame, const char* name, BRect textRect,
 		flags | B_FRAME_EVENTS | B_PULSE_NEEDED | B_INPUT_METHOD_AWARE)
 {
 	_InitObject(textRect, initialFont, initialColor);
+	SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
 }
 
 
@@ -283,6 +285,7 @@ BTextView::BTextView(const char* name, uint32 flags)
 		flags | B_FRAME_EVENTS | B_PULSE_NEEDED | B_INPUT_METHOD_AWARE)
 {
 	_InitObject(Bounds(), NULL, NULL);
+	SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
 }
 
 
@@ -293,6 +296,7 @@ BTextView::BTextView(const char* name, const BFont* initialFont,
 		flags | B_FRAME_EVENTS | B_PULSE_NEEDED | B_INPUT_METHOD_AWARE)
 {
 	_InitObject(Bounds(), initialFont, initialColor);
+	SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
 }
 
 
@@ -3124,7 +3128,6 @@ BTextView::_InitObject(BRect textRect, const BFont* initialFont,
 	fLastClickOffset = -1;
 
 	SetDoesUndo(true);
-	SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
 }
 
 
