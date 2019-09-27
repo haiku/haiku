@@ -46,6 +46,8 @@
 #	define	inet_ntop		__inet_ntop
 #	define	inet_nsap_addr	__inet_nsap_addr
 #	define	inet_nsap_ntoa	__inet_nsap_ntoa
+
+#define	__weak_alias(alias, sym) __asm(".weak " #alias "\n" #alias " = " #sym);
 #endif
 
 struct group;           /* silence warning */
