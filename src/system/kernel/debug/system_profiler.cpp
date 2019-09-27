@@ -370,7 +370,7 @@ SystemProfiler::Init()
 	// clone the user area
 	void* areaBase;
 	fKernelArea = clone_area("profiling samples", &areaBase,
-		B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA,
+		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 		fUserArea);
 	if (fKernelArea < 0)
 		return fKernelArea;
