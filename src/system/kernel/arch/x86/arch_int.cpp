@@ -296,6 +296,21 @@ x86_page_fault_exception(struct iframe* frame)
 		panic("page fault in debugger without fault handler! Touching "
 			"address %p from ip %p\n", (void*)cr2, (void*)frame->ip);
 		return;
+	} else if (!IFRAME_IS_USER(frame)
+		&& (frame->error_code & PGFAULT_I) != 0
+		&& (x86_read_cr4() & IA32_CR4_SMEP) != 0) {
+		// check that: 1. come not from userland,
+		// 2. is an instruction fetch, 3. smep is enabled
+		panic("SMEP violation user-mapped address %p touched from kernel %p\n",
+			(void*)cr2, (void*)frame->ip);
+	} else if ((frame->flags & X86_EFLAGS_ALIGNMENT_CHECK) == 0
+		&& !IFRAME_IS_USER(frame)
+		&& (frame->error_code & PGFAULT_P) != 0
+		&& (x86_read_cr4() & IA32_CR4_SMAP) != 0) {
+		// check that: 1. AC flag is not set, 2. come not from userland,
+		// 3. is a page-protection violation, 4. smap is enabled
+		panic("SMAP violation user-mapped address %p touched from kernel %p\n",
+			(void*)cr2, (void*)frame->ip);
 	} else if ((frame->flags & X86_EFLAGS_INTERRUPT) == 0) {
 		// interrupts disabled
 
@@ -327,21 +342,6 @@ x86_page_fault_exception(struct iframe* frame)
 		panic("page fault not allowed at this place. Touching address "
 			"%p from ip %p\n", (void*)cr2, (void*)frame->ip);
 		return;
-	} else if (!IFRAME_IS_USER(frame)
-		&& (frame->error_code & PGFAULT_I) != 0
-		&& (x86_read_cr4() & IA32_CR4_SMEP) != 0) {
-		// check that: 1. come not from userland,
-		// 2. is an instruction fetch, 3. smep is enabled
-		panic("SMEP violation user-mapped address %p touched from kernel %p\n",
-			(void*)cr2, (void*)frame->ip);
-	} else if ((frame->flags & X86_EFLAGS_ALIGNMENT_CHECK) == 0
-		&& !IFRAME_IS_USER(frame)
-		&& (frame->error_code & PGFAULT_P) != 0
-		&& (x86_read_cr4() & IA32_CR4_SMAP) != 0) {
-		// check that: 1. AC flag is not set, 2. come not from userland,
-		// 3. is a page-protection violation, 4. smap is enabled
-		panic("SMAP violation user-mapped address %p touched from kernel %p\n",
-			(void*)cr2, (void*)frame->ip);
 	}
 
 	enable_interrupts();
