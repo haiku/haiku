@@ -837,7 +837,9 @@ DwarfImageDebugInfo::GetStatement(FunctionDebugInfo* _function,
 		if (state.isStatement) {
 			statementAddress = state.address;
 			statementLine = state.line - 1;
-			statementColumn = std::max(state.column - 1, (int32)0);
+			// discard column info until proper support is implemented
+			// statementColumn = std::max(state.column - 1, (int32)0);
+			statementColumn = 0;
 		}
 	}
 
@@ -931,7 +933,9 @@ DwarfImageDebugInfo::GetStatementAtSourceLocation(FunctionDebugInfo* _function,
 		if (state.isStatement) {
 			statementAddress = state.address;
 			statementLine = state.line - 1;
-			statementColumn = std::max(state.column - 1, (int32)0);
+			// discard column info until proper support is implemented
+			// statementColumn = std::max(state.column - 1, (int32)0);
+			statementColumn = 0;
 		}
 	}
 
@@ -1053,7 +1057,9 @@ DwarfImageDebugInfo::_AddSourceCodeInfo(CompilationUnit* unit,
 		if (state.isStatement) {
 			statementAddress = state.address;
 			statementLine = state.line - 1;
-			statementColumn = std::max(state.column - 1, (int32)0);
+			// discard column info until proper support is implemented
+			// statementColumn = std::max(state.column - 1, (int32)0);
+			statementColumn = 0;
 		}
 	}
 
