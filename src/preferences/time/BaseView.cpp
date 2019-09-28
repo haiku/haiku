@@ -85,10 +85,8 @@ TTimeBaseView::ChangeTime(BMessage* message)
 		if (message->FindInt32("month", &month) != B_OK)
 			month = date.Month();
 
-		if (year >= 1970 && year <= 2037) {
-			date.SetDate(year, month, day);
-			dateTime.SetDate(date);
-		}
+		date.SetDate(year, month, day);
+		dateTime.SetDate(date);
 	}
 
 	set_real_time_clock(dateTime.Time_t());

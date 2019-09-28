@@ -669,12 +669,6 @@ TDateEdit::_CheckRange()
 			break;
 
 		case B_DATE_ELEMENT_YEAR:
-			// 2037 is the end of 32-bit UNIX time
-			if (value > 2037)
-				value = 2037;
-			else if (value < 1970)
-				value = 1970;
-
 			fDate.SetDate(value, fDate.Month(), fDate.Day());
 			break;
 
@@ -713,7 +707,7 @@ TDateEdit::_IsValidDoubleDigit(int32 value)
 		case B_DATE_ELEMENT_YEAR:
 		{
 			int32 year = int32(fHoldValue / 100) * 100 + value;
-			if (year <= 2037 && year >= 1970)
+			if (year >= 2000)
 				isInRange = true;
 			break;
 		}
