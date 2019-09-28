@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	4076252645
+1	romanian	x-vnd.Haiku-HaikuDepot	3044073414
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		A apărut o eroare în timpul reîmprospătării depozitului: %error%
 Check for updates…	MainWindow		Verifică pentru actualizări…
 Uninstall	PackageManager		Dezinstalare
@@ -19,7 +19,6 @@ No user ratings available.	PackageInfoView		Nu sunt disponibile evaluările util
 The user name needs to be at least 3 letters long.	UserLoginWindow		Numele de utilizator trebuie să fie de cel puțin 3 litere.
 Downloading package '%name%'	WorkStatusView		Se descarcă pachetul „%name%”
 Failed to create account	UserLoginWindow		Eșec la crearea contului
-Ignore	UserLoginWindow		Ignoră
 Rating	PackageListView		Evaluare
 Synchronizing icons	ServerIconExportUpdateProcess		Se sincronizează iconițele
 Does not start	RatePackageWindow		Nu pornește

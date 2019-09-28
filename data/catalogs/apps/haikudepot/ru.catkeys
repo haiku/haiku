@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	1489803009
+1	russian	x-vnd.Haiku-HaikuDepot	457623778
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Произошла ошибка при обновлении репозитория: %error%
 Check for updates…	MainWindow		Проверить обновления…
 Uninstall	PackageManager		Удалить
@@ -17,7 +17,6 @@ No user ratings available.	PackageInfoView		Рейтинг пользовате�
 The user name needs to be at least 3 letters long.	UserLoginWindow		Имя пользователя должно состоять минимум из 3-х символов.
 Downloading package '%name%'	WorkStatusView		Загрузка пакета '%name%'
 Failed to create account	UserLoginWindow		Не удалось создать учётную запись
-Ignore	UserLoginWindow		Игнорировать
 Rating	PackageListView		Оценка
 Does not start	RatePackageWindow		Не запускается
 Show	MainWindow		Показывать

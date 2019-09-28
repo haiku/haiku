@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-HaikuDepot	2091519218
+1	indonesian	x-vnd.Haiku-HaikuDepot	1059339987
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Terjadi kesalahan saat menyegarkan repositori: %error%
 Check for updates…	MainWindow		Memeriksa pembaruan…
 Uninstall	PackageManager		Hapus
@@ -19,7 +19,6 @@ No user ratings available.	PackageInfoView		Tak tersedia penilaian pengguna.
 The user name needs to be at least 3 letters long.	UserLoginWindow		Nama pengguna harus minimal 3 huruf.
 Downloading package '%name%'	WorkStatusView		Paket pengunduhan '%name%'
 Failed to create account	UserLoginWindow		Gagal membuat akun
-Ignore	UserLoginWindow		Abaikan
 Rating	PackageListView		Penilaian
 Synchronizing icons	ServerIconExportUpdateProcess		Ikon sinkronisasi
 Does not start	RatePackageWindow		Tidak memulai

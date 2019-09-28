@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-HaikuDepot	1735843491
+1	portuguese	x-vnd.Haiku-HaikuDepot	703664260
 Check for updates…	MainWindow		Verificar atualizações…
 Uninstall	PackageManager		Desinstalar
 (%Votes%)	FeaturedPackagesView		(%Votes%)
@@ -14,7 +14,6 @@ Starting the package daemon failed:\n\n%Error%	App		Falhou a inicialização do 
 No user ratings available.	PackageInfoView		Não há avaliações de utilizadores disponíveis.
 The user name needs to be at least 3 letters long.	UserLoginWindow		O nome de utilizador tem de ter, no mínimo, 3 letras.
 Failed to create account	UserLoginWindow		Falhou a criação de conta
-Ignore	UserLoginWindow		Ignorar
 Rating	PackageListView		Avaliação
 Does not start	RatePackageWindow		Não inicia
 Show	MainWindow		Mostrar

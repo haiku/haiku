@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-HaikuDepot	2091519218
+1	danish	x-vnd.Haiku-HaikuDepot	1059339987
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Der opstod en fejl under opdatering af softwarekilden: %error%
 Check for updates…	MainWindow		Søg efter opdateringer…
 Uninstall	PackageManager		Afinstaller
@@ -19,7 +19,6 @@ No user ratings available.	PackageInfoView		Ingen tilgængelige brugerbedømmels
 The user name needs to be at least 3 letters long.	UserLoginWindow		Brugernavnet skal være mindst 3 bogstaver langt.
 Downloading package '%name%'	WorkStatusView		Downloader pakken '%name%'
 Failed to create account	UserLoginWindow		Kunne ikke oprette konto
-Ignore	UserLoginWindow		Ignorer
 Rating	PackageListView		Bedømmelse
 Synchronizing icons	ServerIconExportUpdateProcess		Synkroniserer ikoner
 Does not start	RatePackageWindow		Starter ikke

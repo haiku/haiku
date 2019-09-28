@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-MAIL	2849540371
+1	german	x-vnd.Be-MAIL	1477453861
 Set to Saved	Mail		Status setzen: Saved
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Der Text enthält %ld nicht kodierbare Zeichen. Eine andere Zeichenkodierung könnte helfen. 'Senden' klicken, um die Nachricht trotzdem zu senden (Ersatzzeichen werden für die nicht kodierbaren Zeichen verwendet), oder den Vorgang abbrechen, um das Problem zu lösen.
 Text wrapping:	Mail		Zeilenumbruch:
@@ -13,6 +13,7 @@ Copy to new	Mail		In neue Nachricht kopieren
 Save as draft	Mail		Als Entwurf speichern
 Encoding:	Mail		Zeichenkodierung:
 Print	Mail		Drucken
+Decrease quote level	Mail		Eine Zitatebene höher
 Encoding	Mail		Zeichenkodierung:
 Default account:	Mail		Standardkonto:
 Message	Mail		Nachricht
@@ -164,4 +165,5 @@ Spam	Mail		Spam
 Couldn't open this signature. Sorry.	Mail		Diese Signatur konnte leider nicht geöffnet werden.
 Revert	Mail		Anfangswerte
 Unknown	Mail		Unbekannt
+Increase quote level	Mail		Eine Zitatebene tiefer
 Add enclosure…	Mail		Anhang anfügen…

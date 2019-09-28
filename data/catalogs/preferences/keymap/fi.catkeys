@@ -1,9 +1,10 @@
-1	finnish	x-vnd.Haiku-Keymap	459206087
+1	finnish	x-vnd.Haiku-Keymap	3348782469
 Key	Modifier keys window	As in a computer keyboard key	Näppäin
 Japanese	KeymapNames		Japanilainen
 US	KeymapNames		US
 PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Brasilialainen
+ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
 Right control	Keyboard Layout View		Oikea control-näppäin
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Valitsin:
@@ -35,12 +36,16 @@ Dvorak (programmer's)	KeymapNames		Dvorak (ohjelmoijan)
 PRINT	Keyboard Layout View		PRINT
 German (Mac)	KeymapNames		Saksalainen (Mac)
 Arabic (102)	KeymapNames		Arabialainen (102)
+ThinkPad	KeyboardLayoutNames		ThinkPad
 Belarusian (Mac)	KeymapNames		Valkovenäläinen (Mac)
 Croatian	KeymapNames		Kroatialainen
 PAGE ↑	Keyboard Layout View		PAGE ↑
 Set modifier keys	Modifier keys window		Aseta muuntonäppäimet
+Apple Aluminium International	KeyboardLayoutNames		Apple Aluminium International
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd-näppäin
 PG ↓	Keyboard Layout View	Very short for 'page down'	PG ↓
+ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (US)
+Apple Aluminum	KeyboardLayoutNames		Apple Aluminum
 Spanish	KeymapNames		Espanjalainen
 HOME	Keyboard Layout View		HOME
 COMMAND	Keyboard Layout View		COMMAND
@@ -50,13 +55,18 @@ French (Bépo)	KeymapNames		Ranskalainen (Bépo)
 Russian (Typewriter)	KeymapNames		Venäläinen (kirjoituskone)
 Acute trigger	Keymap window		Akuuttiaksenttiliipaisin
 Italian	KeymapNames		Italialainen
+ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s International
+Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminum (US)
+Kinesis Ergo Elan International	KeyboardLayoutNames		Kinesis Ergo Elan International
 Modifier keys	Modifier keys window		Muuntonäppäimet
+ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 International
 Kazakh	KeymapNames		Kazakstanilainen
 Save as…	Keymap window		Tallenna nimellä…
 Lithuanian (Standard)	KeymapNames		Liettualainen (vakio)
 Error: duplicate keys	Modifier keys window		Virhe: kaksinkertaiset avaimet
 NUM	Keyboard Layout View	Very short for 'num lock'	NUM
 Bulgarian (Phonetic)	KeymapNames		Bulgarialainen (foneettinen)
+Kinesis Advantage	KeyboardLayoutNames		Kinesis Advantage
 Canadian-French	KeymapNames		Kanadalaisranskalainen
 Hungarian	KeymapNames		Unkarilainen
 Control	Keyboard Layout View	Control key	Control-näppäin
@@ -81,12 +91,14 @@ Circumflex trigger	Keymap window		Sirkumfleksiliipaisin
 Caps lock	Keyboard Layout View		Vaihtolukko
 Left shift	Keyboard Layout View		Vasen vaihtonäppäin
 Russian (Yawert)	KeymapNames		Venäläinen (Yawert)
+ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e International
 Bulgarian (Cyrillic)	KeymapNames		Bulgarialainen (kyrillinen)
 Swedish	KeymapNames		Ruotsalainen
 Left control	Keyboard Layout View		Vasen control-näppäin
 CAPS	Keyboard Layout View	Very short for 'caps lock'	CAPS
 Role	Modifier keys window	As in the role of a modifier key	Rooli
 Svorak	KeymapNames		Svorak
+ThinkPad X100e (US)	KeyboardLayoutNames		ThinkPad X100e (US)
 German	KeymapNames		Saksalainen
 Swiss-German	KeymapNames		Sveitsiläissaksalainen
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl-näppäin
@@ -94,6 +106,7 @@ Czech	KeymapNames		Tšekkiläinen
 Russian (Udmurt, Komi, Mari)	KeymapNames		Venäläinen (udmurttilainen, komilainen, marilainen)
 Thai (TIS-820.2538)	KeymapNames		Thai (TIS-820.2538)
 Control:	Modifier keys window	Control key role name	Ohjain:
+Generic 105-key International	KeyboardLayoutNames		Generic 105-key International
 Disabled	Modifier keys window	Do nothing	Poissa käytöstä
 Select dead keys	Keymap window		Valitse kuolleet näppäimet
 Russian (Mac)	KeymapNames		Venäläinen (Mac)
@@ -112,6 +125,7 @@ Quit	Keymap window		Poistu
 Polish (Typewriter)	KeymapNames		Puolalainen (kirjoituskone)
 French (Mac)	KeymapNames		Ranskalainen (Mac)
 User:	Keymap window		Käyttäjä:
+Apple Aluminium Extended International	KeyboardLayoutNames		Apple Aluminium Extended International
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt-näppäin
 SHIFT	Keyboard Layout View		VAIHTO
 Estonian	KeymapNames		Eestiläinen
@@ -128,6 +142,8 @@ Switch shortcut keys to Haiku mode	Keymap window		Vaihda pikanäppäimet Haiku-t
 Defaults	Keymap window		Oletukset
 ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		Järjestelmä:
+ThinkPad International	KeyboardLayoutNames		ThinkPad International
+Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Aluminum Extended (US)
 Switch shortcut keys	Keymap window		Vaihda pikanäppäimiä
 Right command	Keyboard Layout View		Oikea komentonäppäin
 NUM LOCK	Keyboard Layout View		NUM LOCK
@@ -136,9 +152,11 @@ Belgian (comma)	KeymapNames		Belgialaienn (pilkku)
 Norwegian	KeymapNames		Norjalainen
 Font	Keymap window		Kirjasin
 Danish	KeymapNames		Tanskalainen
+Generic 104-key	KeyboardLayoutNames		Generic 104-key
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Vaihtonäppäin
 PAUSE	Keyboard Layout View		PAUSE
 Russian	KeymapNames		Venäläinen
+TypeMatrix 2030	KeyboardLayoutNames		TypeMatrix 2030
 Romanian	KeymapNames		Romanialainen
 CMD	Keyboard Layout View	Very short for 'command'	CMD
 Command	Keyboard Layout View	Command key	Komento
@@ -151,3 +169,4 @@ Dutch	KeymapNames		Hollantilainen
 Diaeresis trigger	Keymap window		Treemaliipaisin
 Icelandic	KeymapNames		Islantilainen
 Open…	Keymap window		Avaa…
+ThinkPad T400s (US)	KeyboardLayoutNames		ThinkPad T400s (US)

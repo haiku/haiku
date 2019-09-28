@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Screen	4090394050
+1	finnish	x-vnd.Haiku-Screen	2685901476
 no	Screen		ei
 bits/pixel	Screen		bittiä/pikseli
 15 bits/pixel, 32768 colors	Screen		15 bittiä/pikseli, 32768 väriä
@@ -33,6 +33,7 @@ Warning	Screen		Varoitus
 24 bits/pixel, 16 Million colors	Screen		24 bittiä/pikseli, 16 miljoonaa väriä
 Hz	Screen		Hz
 Workspaces	Screen		Työtilat
+Brightness:	Screen		Kirkkaus:
 32 bits/pixel, 16 Million colors	Screen		32 bittiä/pikseli, 16 miljoonaa väriä
 Done	Screen		Valmis
 16 bits/pixel, 65536 colors	Screen		16 bittiä/pikseli, 65536 väriä

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-MAIL	2849540371
+1	finnish	x-vnd.Be-MAIL	1477453861
 Set to Saved	Mail		Aseta tallennetuksi
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Päätekstisi sisältää %ld koodaamatonta merkkiä. Ehkä eri merkistö toimisi paremmin? Napauta Lähetä-painiketta sen lähettämiseksi silti (korvausmerkkejä käytetään koodaamattomien merkkien paikalla), tai valitse Peru palataksesi ja yritä korjata se.
 Text wrapping:	Mail		Tekstin rivitys:
@@ -13,6 +13,7 @@ Copy to new	Mail		Kopioi uuteen
 Save as draft	Mail		Tallenna luonnoksena
 Encoding:	Mail		Koodaus:
 Print	Mail		Tulosta
+Decrease quote level	Mail		Alenna lainaustasoa
 Encoding	Mail		Koodaus
 Default account:	Mail		Oletustili:
 Message	Mail		Viesti
@@ -164,4 +165,5 @@ Spam	Mail		Roskaposti
 Couldn't open this signature. Sorry.	Mail		Tämän allekirjoituksen avaus epäonnistui.
 Revert	Mail		Palauta
 Unknown	Mail		Tuntematon
+Increase quote level	Mail		Kasvata lainaustasoa
 Add enclosure…	Mail		Lisää liite…

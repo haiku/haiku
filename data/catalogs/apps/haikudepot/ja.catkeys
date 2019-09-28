@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	4076252645
+1	japanese	x-vnd.Haiku-HaikuDepot	3044073414
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
 Check for updates…	MainWindow		更新をチェック…
 Uninstall	PackageManager		アンインストール
@@ -19,7 +19,6 @@ No user ratings available.	PackageInfoView		ユーザー評価はありません
 The user name needs to be at least 3 letters long.	UserLoginWindow		ユーザー名は少なくとも 3 文字は必要です。
 Downloading package '%name%'	WorkStatusView		パッケージ '%name%' をダウンロード中
 Failed to create account	UserLoginWindow		アカウントの作成に失敗しました
-Ignore	UserLoginWindow		無視
 Rating	PackageListView		評価
 Synchronizing icons	ServerIconExportUpdateProcess		アイコンを同期しています。
 Does not start	RatePackageWindow		起動しない

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	2091519218
+1	ukrainian	x-vnd.Haiku-HaikuDepot	1059339987
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Під час оновлення репозиторію сталася помилка: %error%
 Check for updates…	MainWindow		Оцінити пакунок…
 Uninstall	PackageManager		Видалити
@@ -19,7 +19,6 @@ No user ratings available.	PackageInfoView		Оцінка для користув
 The user name needs to be at least 3 letters long.	UserLoginWindow		Ім'я користувача повинно бути хоча б у 3 літери завдовжки.
 Downloading package '%name%'	WorkStatusView		Завантажити пакунок '%name%'
 Failed to create account	UserLoginWindow		Створення облікового запису призупинено
-Ignore	UserLoginWindow		Ігнорувати
 Rating	PackageListView		Оцінка
 Synchronizing icons	ServerIconExportUpdateProcess		Синхронізую піктограми
 Does not start	RatePackageWindow		Не починається

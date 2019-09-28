@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-HaikuDepot	2751748087
+1	slovak	x-vnd.Haiku-HaikuDepot	1719568856
 Uninstall	PackageManager		Odinštalovať
 (%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Odinštalované
@@ -13,7 +13,6 @@ Starting the package daemon failed:\n\n%Error%	App		Spustenie démona balíkov z
 No user ratings available.	PackageInfoView		Používateľské hodnotenie nie je dostupné.
 The user name needs to be at least 3 letters long.	UserLoginWindow		Meno používateľa musí byť aspoň 3 písmená dlhé.
 Failed to create account	UserLoginWindow		Nepodarilo sa vytvoriť účet
-Ignore	UserLoginWindow		Ignorovať
 Rating	PackageListView		Hodnotenie
 Does not start	RatePackageWindow		Nespúšťa sa
 Show	MainWindow		Zobraziť

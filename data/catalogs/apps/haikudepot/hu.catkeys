@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	8619710
+1	hungarian	x-vnd.Haiku-HaikuDepot	3271407775
 Check for updates…	MainWindow		Frissítések keresése…
 Uninstall	PackageManager		Eltávolítás
 (%Votes%)	FeaturedPackagesView		(%Votes%)
@@ -14,7 +14,6 @@ Starting the package daemon failed:\n\n%Error%	App		A csomag démon indítása s
 No user ratings available.	PackageInfoView		Felhasználói értékelés nem áll rendelkezésre.
 The user name needs to be at least 3 letters long.	UserLoginWindow		A felhasználói névnek legalább 3 karakter hosszúnak kell lennie.
 Failed to create account	UserLoginWindow		Nem sikerült a fiók létrehozása
-Ignore	UserLoginWindow		Mellőzés
 Rating	PackageListView		Értékelés
 Does not start	RatePackageWindow		Nem indul el
 Show	MainWindow		Megjelenítés

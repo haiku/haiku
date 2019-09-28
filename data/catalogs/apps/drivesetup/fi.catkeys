@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-DriveSetup	791750172
+1	finnish	x-vnd.Haiku-DriveSetup	1934767996
 Could not unmount partition %s.	MainWindow		Osion %s irrottaminen epäonnistui.
 Mount all	MainWindow		Liitä kaikki
 Disk	MainWindow		Levy
@@ -52,6 +52,7 @@ Wipe (not implemented)	MainWindow		Alustus (ei ole toteutettu)
 The currently selected partition does not have a parent partition.	MainWindow		Nykyisellä valitulla osiolla ei ole yläosiota.
 Validation of the given initialization parameters failed.	MainWindow		Annettujen alustusparametrien todentaminen epäonnistui.
 Shared	PartitionList		Jaettu
+MIMEs	PartitionList		MIME-tyypit
 BitLocker encrypted	Encryption utils		BitLocker-salattu
 You need to select a partition entry from the list.	MainWindow		Sinun täytyy valita osiorivi luettelosta.
 Offset: %s	Support		Siirrososoite: %s

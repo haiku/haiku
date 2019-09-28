@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Terminal	2815667231
+1	finnish	x-vnd.Haiku-Terminal	2664488407
 Close other tabs	Terminal TermWindow		Sulje muut välilehdet
 Insert path	Terminal TermView		Lisää polku
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Komentotulkin käynnistäminen Pääteikkunassa epäonnistui.
@@ -87,6 +87,7 @@ Use text:	Terminal FindWindow		Käytä tekstiä:
 Close active tab	Terminal TermWindow		Sulje käytössä oleva välilehti
 Save as default	Terminal TermWindow		Tallenna oletuksena
 Nothing is selected.	Terminal TermWindow		Mitään ei ole valittu.
+Use left Option as Meta key	Terminal AppearancePrefView		Käytä vasenta valintapainiketta Meta-avaimena
 Find	Terminal FindWindow		Etsi
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Nykyisen välilehtiotsikon määrittävä malli. Seuraavia paikanpitäjiä\nvoidaan käyttää:\n
 Professional	Terminal colors scheme		Ammattilaistaso

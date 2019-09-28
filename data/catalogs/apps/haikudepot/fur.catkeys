@@ -1,4 +1,5 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	2091519218
+1	friulian	x-vnd.Haiku-HaikuDepot	3722851180
+Repository update error	LocalRepositoryUpdateProcess		Erôr di inzornament dal dipuesit
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificât un erôr intal inzornâ il dipuesit: %error%
 Check for updates…	MainWindow		Control inzornaments…
 Uninstall	PackageManager		Disinstale
@@ -19,7 +20,6 @@ No user ratings available.	PackageInfoView		Nissune valutazion dai utents dispon
 The user name needs to be at least 3 letters long.	UserLoginWindow		Il non utent al scugne jessi lunc almancul di 3 letaris.
 Downloading package '%name%'	WorkStatusView		Daûr a discjariâ il pachet '%name%'
 Failed to create account	UserLoginWindow		No si è rivâts a creâ l'account
-Ignore	UserLoginWindow		Ignore
 Rating	PackageListView		Valutazion
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronizazion iconis
 Does not start	RatePackageWindow		No si invie
@@ -71,6 +71,7 @@ Close	PackageManager		Siere
 A network transport error has arisen communicating with the HaikuDepot server system: %s	ServerHelper		Al è vignût fûr un erôr di traspuart di rêt tal comunicâ cul sisteme dal servidôr di HaikuDepot: %s
 Changelog	PackageInfoView		Regjistri modifichis
 Rating not possible	MainWindow		Valutazion dineade
+Package update error	MainWindow		Erôr di inzornament dal pachet
 About	PackageInfoView		Informazions su
 Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Autenticazion falide. L'utent nol esist o la peraule di ordin indicade e je sbaliade.
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# procès} other{# procès}}
@@ -88,6 +89,7 @@ Inactive	PackageListView		Inatîf
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Sincronizazion meta-dâts in merit ai dipuesits
 OK	MainWindow		Va ben
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
+Usage conditions download problem	UserLoginWindow		Probleme tal discjariament des condizions di ûs
 OK	PackageInfoView		Va ben
 Downloading:	PackageInfoView		Ricezion:
 Success	UserLoginWindow		Lât a bon fin
@@ -99,9 +101,11 @@ Repository	PackageListView		Dipuesit
 Close	UserLoginWindow		Siere
 Close	RatePackageWindow		Siere
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sincronizazion dâts pachet pal dipuesit '%REPO_NAME%'
+View the usage conditions	UserLoginWindow		Viôt lis condizions di ûs
 Failed to create account: %s\n	UserLoginWindow		No si è rivâts a creâ l'account: %s\n
 Size	PackageListView		Dimension
 Your rating:	RatePackageWindow		La tô valutazion:
+I am %MinimumAgeYears% years of age or older	UserLoginWindow		O ai %MinimumAgeYears% agns o plui
 Your rating was updated.	RatePackageWindow		La tô valutazion e je stade inzornade.
 All categories	FilterView		Dutis lis categoriis
 Repositories	MainWindow		Dipuesits
@@ -133,15 +137,19 @@ Source packages	MainWindow		Pachets sorzint
 User name:	UserLoginWindow		Non utent:
 Try again	App		Torne prove
 Rate package	RatePackageWindow		Valute pachet
+The usage conditions must be agreed to.	UserLoginWindow		Si scugne acetâ lis condizions di ûs.
 The email address appears to be malformed.	UserLoginWindow		La direzion email e semee jessi malformade.
 You have not solved the captcha puzzle correctly.	UserLoginWindow		No tu âs risolt ben il captcha.
 Unknown	PackageListView		No cognossût
+I agree to the usage conditions	UserLoginWindow		O aceti lis condizions di ûs
+An error has arisen downloading the usage conditions. Check the log for details and try again.	UserLoginWindow		Si è presentât un erôr discjariant lis condizions di ûs. Controle il regjistri pai detais e prove di gnûf.
 Log in	UserLoginWindow		Jentre
 Logged in as %User%	MainWindow		Jentrât come %User%
 Email address:	UserLoginWindow		Direzion email:
 Screenshot	ScreenshotWindow		Istantanie
 HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		Al covente tornâ a inviâ il sisteme par completâ la instalazion.
+View latest usage conditions…	MainWindow		Viôt lis ultimis condizions di ûs…
 Search terms:	FilterView		Tiermins di ricercje:
 Pending…	PackageListView		In spiete…
 Repeat pass phrase:	UserLoginWindow		Ripet il sproc di ordin:
@@ -159,6 +167,7 @@ Log in…	MainWindow		Acès…
 You need to be logged into an account before you can rate packages.	MainWindow		Si scugne jessi jentrâts intun account prime di podê valutâ i pachets.
 Client version too old	ServerHelper		Version dal client masse vecje
 Authorization or security issue	ServerHelper		Probleme di autorizazion o sigurece
+Local repository load error	LocalPkgDataLoadProcess		Erôr tal cjariament dal dipuesit locâl
 9999.99 KiB	PackageListView		9999.99 KiB
 All repositories	MainWindow		Ducj i dipuesits
 %Version%	PackageInfoView		%Version%

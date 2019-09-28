@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-HaikuDepot	2728680786
+1	spanish; castilian	x-vnd.Haiku-HaikuDepot	1696501555
 Check for updates…	MainWindow		Buscar actualizaciones…
 Uninstall	PackageManager		Desinstalar
 (%Votes%)	FeaturedPackagesView		(%Votes%)
@@ -14,7 +14,6 @@ Starting the package daemon failed:\n\n%Error%	App		Fallo al iniciar el demonio 
 No user ratings available.	PackageInfoView		No hay valoraciones de usuario disponibles.
 The user name needs to be at least 3 letters long.	UserLoginWindow		El nombre de usuario debe ser al menos de tres letras de longitud.
 Failed to create account	UserLoginWindow		Fallo al registrar la cuenta
-Ignore	UserLoginWindow		Ignorar
 Rating	PackageListView		Valoraciones
 Does not start	RatePackageWindow		No inicia
 Show	MainWindow		Mostrar

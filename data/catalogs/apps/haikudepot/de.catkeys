@@ -1,4 +1,5 @@
-1	german	x-vnd.Haiku-HaikuDepot	4076252645
+1	german	x-vnd.Haiku-HaikuDepot	533628093
+Repository update error	LocalRepositoryUpdateProcess		Fehler bei Paketquellenaktualisierung
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Fehler bei der Aktualisierung der Paketquelle: %error%
 Check for updates…	MainWindow		Aktualisierungen suchen…
 Uninstall	PackageManager		Deinstallieren
@@ -19,7 +20,6 @@ No user ratings available.	PackageInfoView		Keine Bewertungen vorhanden.
 The user name needs to be at least 3 letters long.	UserLoginWindow		Der Benutzername muss mindestens 3 Zeichen lang sein.
 Downloading package '%name%'	WorkStatusView		Paket '%name%' wird heruntergeladen
 Failed to create account	UserLoginWindow		Benutzerkonto konnte nicht angelegt werden
-Ignore	UserLoginWindow		Ignorieren
 Rating	PackageListView		Bewertung
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronisierungs-Icons
 Does not start	RatePackageWindow		Startet nicht
@@ -72,6 +72,7 @@ Close	PackageManager		Schließen
 A network transport error has arisen communicating with the HaikuDepot server system: %s	ServerHelper		Bei der Kommunikation mit dem HaikuDepot Server ist ein Netzwerk-Übertragungsfehler aufgetreten: %s
 Changelog	PackageInfoView		Änderungsprotokoll
 Rating not possible	MainWindow		Bewertung nicht möglich
+Package update error	MainWindow		Fehler bei Paketaktualisierung
 About	PackageInfoView		Über
 Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Anmeldung fehlgeschlagen. Entweder dieses Benutzerkonto existiert nicht oder es wurde ein falsches Kennwort eingegeben.
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# Prozess} other{# Prozesse}}
@@ -89,6 +90,7 @@ Inactive	PackageListView		Deaktiviert
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synchronisieren der Metadaten von Paketquellen
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# Objekt} other{# Objekte}}
+Usage conditions download problem	UserLoginWindow		Problem beim Herunterladen der Nutzungsbedingungen
 OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Aktueller Download:
 Success	UserLoginWindow		Erfolg
@@ -100,6 +102,7 @@ Repository	PackageListView		Paketquelle
 Close	UserLoginWindow		Schließen
 Close	RatePackageWindow		Schließen
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchronisieren von Paketdaten für Paketquelle '%REPO_NAME%'
+View the usage conditions	UserLoginWindow		Nutzungsbedingungen lesen
 Failed to create account: %s\n	UserLoginWindow		Benutzerkonto konnte nicht angelegt werden: %s\n
 Size	PackageListView		Größe
 Your rating:	RatePackageWindow		Eigene Bewertung:
@@ -135,15 +138,19 @@ Source packages	MainWindow		Quellcode-Pakete
 User name:	UserLoginWindow		Benutzername:
 Try again	App		Nochmal versuchen
 Rate package	RatePackageWindow		Paket bewerten
+The usage conditions must be agreed to.	UserLoginWindow		Den Nutzungsbedingungen muss zugestimmt werden.
 The email address appears to be malformed.	UserLoginWindow		Das Format der angegebenen E-Mail-Adresse ist fehlerhaft.
 You have not solved the captcha puzzle correctly.	UserLoginWindow		Die Captcha-Frage wurde nicht richtig beantwortet.
 Unknown	PackageListView		Unbekannt
+I agree to the usage conditions	UserLoginWindow		I stimme den Nutzungsbedingungen zu
+An error has arisen downloading the usage conditions. Check the log for details and try again.	UserLoginWindow		Beim Herunterladen der Nutzungsbedingungen ist ein Fehler aufgetreten. Bitte Logdatei überprüfen und nochmals versuchen.
 Log in	UserLoginWindow		Anmelden
 Logged in as %User%	MainWindow		Angemeldet als %User%
 Email address:	UserLoginWindow		E-Mail-Adresse:
 Screenshot	ScreenshotWindow		Bildschirmfoto
 HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		Um die Installation abzuschließen, muss Haiku neu gestartet werden.
+View latest usage conditions…	MainWindow		Aktuelle Nutzungsbedingungen lesen…
 Search terms:	FilterView		Suchbegriffe:
 Pending…	PackageListView		Ausstehend…
 Repeat pass phrase:	UserLoginWindow		Kennwort wiederholen:
@@ -161,6 +168,7 @@ Log in…	MainWindow		Anmelden…
 You need to be logged into an account before you can rate packages.	MainWindow		Nur angemeldete Benutzer können Pakete bewerten.
 Client version too old	ServerHelper		Client Version zu alt
 Authorization or security issue	ServerHelper		Authentifizierungs- oder Sicherheitsproblem
+Local repository load error	LocalPkgDataLoadProcess		Fehler bem Laden einer lokalen Paketquelle
 9999.99 KiB	PackageListView		9999.99 KiB
 All repositories	MainWindow		Alle Paketquellen
 %Version%	PackageInfoView		%Version%

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	683373137
+1	french	x-vnd.Haiku-HaikuDepot	3946161202
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Une erreur est survenue lors du rafraîchissement : %error%
 Check for updates…	MainWindow		Vérifier les mises à jour…
 Uninstall	PackageManager		Désinstaller
@@ -18,7 +18,6 @@ No user ratings available.	PackageInfoView		Aucun avis d’utilisateurs.
 The user name needs to be at least 3 letters long.	UserLoginWindow		Le nom d’utilisateur doit comporter au moins 3 caractères.
 Downloading package '%name%'	WorkStatusView		Téléchargement du paquet « %name% »
 Failed to create account	UserLoginWindow		La création du compte a échoué
-Ignore	UserLoginWindow		Ignorer
 Rating	PackageListView		Évaluation
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronisation des icônes
 Does not start	RatePackageWindow		Ne démarre pas

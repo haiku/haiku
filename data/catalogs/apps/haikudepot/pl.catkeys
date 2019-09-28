@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-HaikuDepot	823157944
+1	polish	x-vnd.Haiku-HaikuDepot	4085946009
 Uninstall	PackageManager		Usuń
 (%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Niezainstalowany
@@ -13,7 +13,6 @@ Starting the package daemon failed:\n\n%Error%	App		Uruchamianie demona pakietó
 No user ratings available.	PackageInfoView		Brak ocen użytkowników.
 The user name needs to be at least 3 letters long.	UserLoginWindow		Nazwa użytkownika powinna składać się z co najmniej 3 znaków.
 Failed to create account	UserLoginWindow		Nie udało się utworzyć konta
-Ignore	UserLoginWindow		Ignoruj
 Rating	PackageListView		Ocena
 Does not start	RatePackageWindow		Nie uruchamia się
 Show	MainWindow		Pokaż

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Network	3694799483
+1	finnish	x-vnd.Haiku-Network	3039697761
 Ethernet device	InterfaceListItem		Ethernet-laite
 Link speed:	IntefaceView		Yhteysnopeus:
 disconnected	IntefaceView		katkaistu
@@ -40,6 +40,7 @@ disabled	InterfaceListItem		poissa käytöstä
 Dial-up connection	InterfaceListItem		Valintayhteys
 on	ServiceListItem		päällä
 The method for obtaining an IP address	IntefaceAddressView		IP-osoitteen hakemismenettely
+disconnected	InterfaceListItem		yhteys katkaistu
 Automatic	IntefaceAddressView		Automaattinen
 Choose automatically	IntefaceView		Valitse automaattisesti
 Status:	IntefaceView		Tila:
