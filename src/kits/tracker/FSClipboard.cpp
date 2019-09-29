@@ -513,6 +513,7 @@ FSClipboardPaste(Model* model, uint32 linksMode)
 		// there was some problem with our target, so we bail out here
 		delete moveList;
 		delete copyList;
+		delete duplicateList;
 		return false;
 	}
 
