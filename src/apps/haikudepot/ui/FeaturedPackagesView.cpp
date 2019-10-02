@@ -159,6 +159,10 @@ public:
 					_UpdateColors();
 				break;
 			}
+
+			default:
+				BView::MessageReceived(message);
+				break;
 		}
 	}
 
