@@ -12,13 +12,13 @@
 #include <KernelExport.h>
 
 #include <arch/cpu.h>
-#include <arch/x86/descriptors.h>
 #include <boot/kernel_args.h>
 #include <boot/platform.h>
 #include <boot/stage2.h>
 #include <boot/stdio.h>
 #include <kernel.h>
 
+#include "arch_mmu.h"
 #include "acpi.h"
 #include "console.h"
 #include "efi_platform.h"
@@ -41,9 +41,6 @@ EFI_HANDLE kImage;
 
 static uint32 sBootOptions;
 static uint64 gLongKernelEntry;
-extern uint64 gLongGDT;
-extern uint64 gLongGDTR;
-segment_descriptor gBootGDT[BOOT_GDT_SEGMENT_COUNT];
 
 
 extern "C" int main(stage2_args *args);
@@ -65,27 +62,6 @@ extern "C" uint32
 platform_boot_options()
 {
 	return sBootOptions;
-}
-
-
-static void
-long_gdt_init()
-{
-	clear_segment_descriptor(&gBootGDT[0]);
-
-	// Set up code/data segments (TSS segments set up later in the kernel).
-	set_segment_descriptor(&gBootGDT[KERNEL_CODE_SEGMENT], DT_CODE_EXECUTE_ONLY,
-		DPL_KERNEL);
-	set_segment_descriptor(&gBootGDT[KERNEL_DATA_SEGMENT], DT_DATA_WRITEABLE,
-		DPL_KERNEL);
-	set_segment_descriptor(&gBootGDT[USER_CODE_SEGMENT], DT_CODE_EXECUTE_ONLY,
-		DPL_USER);
-	set_segment_descriptor(&gBootGDT[USER_DATA_SEGMENT], DT_DATA_WRITEABLE,
-		DPL_USER);
-
-	// Used by long_enter_kernel().
-	gLongGDT = (addr_t)gBootGDT + 0xFFFFFF0000000000;
-	dprintf("GDT at 0x%lx\n", gLongGDT);
 }
 
 
@@ -152,7 +128,7 @@ platform_start_kernel(void)
 	preloaded_elf64_image *image = static_cast<preloaded_elf64_image *>(
 		gKernelArgs.kernel_image.Pointer());
 
-	long_gdt_init();
+	arch_mmu_init();
 	convert_kernel_args();
 
 	// Save the kernel entry point address.
@@ -238,7 +214,7 @@ platform_start_kernel(void)
 	// Update EFI, generate final kernel physical memory map, etc.
 	mmu_post_efi_setup(memory_map_size, memory_map, descriptor_size, descriptor_version);
 
-	smp_boot_other_cpus(final_pml4, (uint32_t)(uint64_t)&gLongGDTR, gLongKernelEntry);
+	smp_boot_other_cpus(final_pml4, gLongKernelEntry);
 
 	// Enter the kernel!
 	efi_enter_kernel(final_pml4,
