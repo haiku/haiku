@@ -55,19 +55,19 @@ static pll_limits kLimits85x = {
 // and carried on to later cards with just one further change (to the P2 cutoff
 // frequency) in Sandy Bridge.
 //
-// So, it makes no sense to have separa limits and algorithm for 9xx and G45.
+// So, it makes no sense to have separate limits and algorithm for 9xx and G45.
 
 static pll_limits kLimits9xxSdvo = {
 	// p, p1, p2,  n,   m, m1, m2
-	{  5,  1, 10,  5,  70, 12,  7},	// min
-	{ 80,  8,  5, 10, 120, 22, 11},	// max
+	{  5,  1,  5,  5,  70, 12,  7},	// min
+	{ 80,  8, 10, 10, 120, 22, 11},	// max
 	200000, 1400000, 2800000
 };
 
 static pll_limits kLimits9xxLvds = {
 	// p, p1, p2,  n,   m, m1, m2
-	{  7,  1, 14,  1,  70,  8,  3},	// min
-	{ 98,  8,  7,  6, 120, 18,  7},	// max
+	{  7,  1,  7,  1,  70,  8,  3},	// min
+	{ 98,  8, 14,  6, 120, 18,  7},	// max
 	112000, 1400000, 2800000
 };
 
@@ -406,6 +406,7 @@ compute_dpll_9xx(display_mode* current, pll_divisors* divisors, bool isLVDS)
 
 	float best = requestedPixelClock;
 	pll_divisors bestDivisors;
+	memset(&bestDivisors, 0, sizeof(bestDivisors));
 
 	for (divisors->m1 = limits.min.m1; divisors->m1 <= limits.max.m1;
 			divisors->m1++) {
@@ -438,9 +439,13 @@ compute_dpll_9xx(display_mode* current, pll_divisors* divisors, bool isLVDS)
 
 	*divisors = bestDivisors;
 
-	TRACE("%s: best MHz: %g (error: %g)\n", __func__,
-		((referenceClock * divisors->m) / divisors->n) / divisors->p,
-		best);
+	if (best == requestedPixelClock)
+		debugger("No valid PLL configuration found");
+	else {
+		TRACE("%s: best MHz: %g (error: %g)\n", __func__,
+			((referenceClock * divisors->m) / divisors->n) / divisors->p,
+			best);
+	}
 }
 
 
