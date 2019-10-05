@@ -39,45 +39,115 @@
 #define CALLED(x...) TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
 
+// PLL limits, taken from programming manual when available, and from Linux KMS
+// drivers otherwise. However, note that we use the values of N+2, M1+2 and
+// M2+2 here, the - 2 being applied when we write the values to the registers.
 
-// Static pll limits taken from Linux kernel KMS
+static pll_limits kLimits85x = {
+	// p, p1, p2,  n,   m, m1, m2
+	{  4,  2,  4,  5,  96, 20,  8},
+	{128, 33,  2, 18, 140, 28, 18},
+	165000, 930000, 1400000
+};
+
+// TODO according to the docs, the limits for 9xx anf G45 should be the same.
+// For Iron Lake, a new set of timings is introduced along with the FDI system,
+// and carried on to later cards with just one further change (to the P2 cutoff
+// frequency) in Sandy Bridge.
+//
+// So, it makes no sense to have separa limits and algorithm for 9xx and G45.
+
+static pll_limits kLimits9xxSdvo = {
+	// p, p1, p2,  n,   m, m1, m2
+	{  5,  1, 10,  5,  70, 12,  7},	// min
+	{ 80,  8,  5, 10, 120, 22, 11},	// max
+	200000, 1400000, 2800000
+};
+
+static pll_limits kLimits9xxLvds = {
+	// p, p1, p2,  n,   m, m1, m2
+	{  7,  1, 14,  1,  70,  8,  3},	// min
+	{ 98,  8,  7,  6, 120, 18,  7},	// max
+	112000, 1400000, 2800000
+};
+
+// Limits for G45 cards taken from g45_vlo3_register_0_0_0.pdf, page 46
+// Note that n here is actually n+2, but m1 and m2 are as in the datasheet.
+
+static pll_limits kLimitsG4xSdvo = {
+	// p, p1, p2,  n,   m, m1, m2
+	{  5,  1,  5,  5,  70, 12,  7},	// min
+	{ 80,  8, 10, 10, 120, 22, 11},	// max
+	270000, 1400000, 2800000
+};
+
+#if 0
+static pll_limits kLimitsG4xHdmi = {
+	// p, p1, p2,  n,   m, m1, m2
+	{  5,  1, 10,  5,  70, 12,  7},	// min
+	{ 80,  8,  5, 10, 120, 22, 11},	// max
+	165000, 1400000, 2800000
+};
+#endif
+
+static pll_limits kLimitsG4xLvdsSingle = {
+	// p, p1, p2,  n,   m, m1, m2
+	{  7,  1, 14,  5,  70, 12,  7},	// min
+	{ 98,  8, 14, 10, 120, 22, 11},	// max
+	0, 1400000, 2800000
+};
+
+static pll_limits kLimitsG4xLvdsDual = {
+	// p, p1, p2,  n,   m, m1, m2
+	{ 14,  2,  7,  5,  70, 12,  7},	// min
+	{ 42,  6,  7, 10, 120, 22, 11},	// max
+	0, 1400000, 2800000
+};
 
 static pll_limits kLimitsIlkDac = {
 	// p, p1, p2, n,   m, m1, m2
-	{  5,  1,  5, 3,  79, 12,  5}, // min
-	{ 80,  8, 10, 8, 118, 22,  9}, // max
+	{  5,  1,  5, 3,  79, 14,  7}, // min
+	{ 80,  8, 10, 8, 118, 24, 11}, // max
 	225000, 1760000, 3510000
 };
 
 static pll_limits kLimitsIlkLvdsSingle = {
 	// p, p1, p2, n,   m, m1, m2
-	{ 28,  2, 14, 3,  79, 12,  5}, // min
-	{112,  8, 14, 8, 118, 22,  9}, // max
+	{ 28,  2, 14, 3,  79, 14,  7}, // min
+	{112,  8, 14, 8, 118, 24, 11}, // max
 	225000, 1760000, 3510000
 };
 
 static pll_limits kLimitsIlkLvdsDual = {
 	// p, p1, p2, n,   m, m1, m2
-	{ 14,  2,  7, 3,  79, 12,  5}, // min
-	{ 56,  8,  7, 8, 127, 22,  9}, // max
+	{ 14,  2,  7, 3,  79, 14,  7}, // min
+	{ 56,  8,  7, 8, 127, 24, 11}, // max
 	225000, 1760000, 3510000
 };
 
 // 100Mhz RefClock
 static pll_limits kLimitsIlkLvdsSingle100 = {
 	// p, p1, p2, n,   m, m1, m2
-	{ 28,  2, 14, 3,  79, 12,  5}, // min
-	{112,  8, 14, 8, 126, 22,  9}, // max
+	{ 28,  2, 14, 3,  79, 14,  7}, // min
+	{112,  8, 14, 8, 126, 24, 11}, // max
 	225000, 1760000, 3510000
 };
 
 static pll_limits kLimitsIlkLvdsDual100 = {
 	// p, p1, p2, n,   m, m1, m2
-	{ 14,  2,  7, 3,  79, 12,  5}, // min
-	{ 42,  6,  7, 8, 126, 22,  9}, // max
+	{ 14,  2,  7, 3,  79, 14,  7}, // min
+	{ 42,  6,  7, 8, 126, 24, 11}, // max
 	225000, 1760000, 3510000
 };
 
+// TODO From haswell onwards, a completely different PLL design is used
+// (intel_gfx-prm-osrc-hsw-display_0.pdf, page 268 for VGA). It uses a "virtual
+// root frequency" and one just has to set a single divider (integer and
+// fractional parts), so it makes no sense to reuse the same code and limit
+// structures there.
+//
+// For other display connections, the clock is handled differently, as there is
+// no need for a precise timing to send things in sync with the display.
 #if 0
 static pll_limits kLimitsChv = {
 	// p, p1, p2, n,   m, m1, m2
@@ -101,50 +171,6 @@ static pll_limits kLimitsBxt = {
 };
 #endif
 
-static pll_limits kLimits9xxSdvo = {
-	// p, p1, p2,  n,   m, m1, m2
-	{  5,  1, 10,  5,  70, 12,  7},	// min
-	{ 80,  8,  5, 10, 120, 22, 11},	// max
-	200000, 1400000, 2800000
-};
-
-static pll_limits kLimits9xxLvds = {
-	// p, p1, p2,  n,   m, m1, m2
-	{  7,  1, 14,  1,  70,  8,  3},	// min
-	{ 98,  8,  7,  6, 120, 18,  7},	// max
-	112000, 1400000, 2800000
-};
-
-static pll_limits kLimitsG4xSdvo = {
-	// p, p1, p2, n,   m, m1, m2
-	{ 10,  1, 10, 1, 104, 17,  5},	// min
-	{ 30,  3, 10, 4, 138, 23, 11},	// max
-	270000, 1750000, 3500000
-};
-
-#if 0
-static pll_limits kLimitsG4xHdmi = {
-	// p, p1, p2, n,   m, m1, m2
-	{  5,  1, 10, 1, 104, 16,  5},	// min
-	{ 80,  8,  5, 4, 138, 23, 11},	// max
-	165000, 1750000, 3500000
-};
-#endif
-
-static pll_limits kLimitsG4xLvdsSingle = {
-	// p,  p1, p2, n,   m, m1, m2
-	{ 28,   2, 14, 1, 104, 17,  5},	// min
-	{ 112,  8, 14, 3, 138, 23, 11},	// max
-	0, 1750000, 3500000
-};
-
-static pll_limits kLimitsG4xLvdsDual = {
-	// p, p1, p2, n,   m, m1, m2
-	{ 14,  2,  7, 1, 104, 17,  5},	// min
-	{ 42,  6,  7, 3, 138, 23, 11},	// max
-	0, 1750000, 3500000
-};
-
 static pll_limits kLimitsPinSdvo = {
 	// p, p1, p2, n,   m, m1,  m2
 	{  5,  1, 10, 3,   2,  0,   0},	// min
@@ -157,13 +183,6 @@ static pll_limits kLimitsPinLvds = {
 	{  7,  1, 14, 3,   2,  0,   0},	// min
 	{112,  8, 14, 6, 256,  0, 254},	// max
 	112000, 1700000, 3500000
-};
-
-static pll_limits kLimits85x = {
-	// p, p1, p2,  n,   m, m1, m2
-	{  4,  2,  4,  5,  96, 20,  8},
-	{128, 33,  2, 18, 140, 28, 18},
-	165000, 930000, 1400000
 };
 
 
@@ -222,6 +241,13 @@ compute_pll_p2(display_mode* current, pll_divisors* divisors,
 }
 
 
+// TODO we can simplify this computation, with the way the dividers are set, we
+// know that all values in the valid range for M are reachable. M1 allows to
+// generate any multiple of 5 in the range and M2 allows to reach the 4 next
+// values. Therefore, we don't need to loop over the range of values for M1 and
+// M2 separately, we could instead just loop over possible values for M.
+// For this to work, the logic of this function must be reversed: for a given M,
+// it should give the resulting M1 and M2 values for programming the registers.
 static uint32
 compute_pll_m(pll_divisors* divisors)
 {
@@ -232,13 +258,7 @@ compute_pll_m(pll_divisors* divisors)
 
 	// Pineview, m1 is reserved
 	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_PIN))
-		return divisors->m2 + 2;
-
-	if (gInfo->shared_info->device_type.Generation() >= 3)
-		return 5 * (divisors->m1 + 2) + (divisors->m2 + 2);
-
-	// TODO: This logic needs validated... PLL's were calculated differently
-	// on 8xx chipsets
+		return divisors->m2;
 
 	return 5 * divisors->m1 + divisors->m2;
 }
