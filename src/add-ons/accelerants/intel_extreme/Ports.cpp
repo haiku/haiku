@@ -312,10 +312,14 @@ AnalogPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		return B_ERROR;
 	}
 
+#if 0
+	// Disabled for now as our code doesn't work. Let's hope VESA/EFI has
+	// already set things up for us during boot.
 	// Train FDI if it exists
 	FDILink* link = fPipe->FDI();
 	if (link != NULL)
 		link->Train(target);
+#endif
 
 	pll_divisors divisors;
 	compute_pll_divisors(target, &divisors, false);
@@ -474,10 +478,14 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	if (!wait_for_clear(panelStatus, PANEL_STATUS_POWER_ON, 1000))
 		ERROR("%s: %s didn't power off within 1000ms!\n", __func__, PortName());
 
+#if 0
+	// Disabled for now as our code doesn't work. Let's hope VESA/EFI has
+	// already set things up for us during boot.
 	// Train FDI if it exists
 	FDILink* link = fPipe->FDI();
 	if (link != NULL)
 		link->Train(target);
+#endif
 
 #if 0
 	// Disable PanelFitter for now
@@ -749,10 +757,14 @@ DigitalPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		return B_ERROR;
 	}
 
+#if 0
+	// Disabled for now as our code doesn't work. Let's hope VESA/EFI has
+	// already set things up for us during boot.
 	// Train FDI if it exists
 	FDILink* link = fPipe->FDI();
 	if (link != NULL)
 		link->Train(target);
+#endif
 
 	pll_divisors divisors;
 	compute_pll_divisors(target, &divisors, false);
@@ -1113,10 +1125,14 @@ DigitalDisplayInterface::SetDisplayMode(display_mode* target, uint32 colorMode)
 		return B_ERROR;
 	}
 
+#if 0
+	// Disabled for now as our code doesn't work. Let's hope VESA/EFI has
+	// already set things up for us during boot.
 	// Train FDI if it exists
 	FDILink* link = fPipe->FDI();
 	if (link != NULL)
 		link->Train(target);
+#endif
 
 	pll_divisors divisors;
 	compute_pll_divisors(target, &divisors, false);
