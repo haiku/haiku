@@ -19,7 +19,7 @@ namespace media {
 
 
 PortPool* gPortPool;
-	// initialized by BMediaRosterEx, deleted by MediaRosterUndertaker.
+	// managed by MediaRosterUndertaker.
 
 
 PortPool::PortPool()

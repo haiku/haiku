@@ -115,8 +115,17 @@ static BLocker sInitLocker("BMediaRoster::Roster locker");
 static List<LocalNode> sRegisteredNodes;
 
 
+// This class takes care of all static initialization and destruction of
+// libmedia objects. It guarantees that things are created and destroyed in
+// the correct order, as well as performing some "garbage collecting" by being
+// destructed automatically on application exit.
 class MediaRosterUndertaker {
 public:
+	MediaRosterUndertaker()
+	{
+		gPortPool = new PortPool();
+	}
+
 	~MediaRosterUndertaker()
 	{
 		BAutolock _(sInitLocker);
@@ -169,9 +178,6 @@ BMediaRosterEx::BMediaRosterEx(status_t* _error)
 {
 	gDormantNodeManager = new DormantNodeManager();
 	gTimeSourceObjectManager = new TimeSourceObjectManager();
-	gPortPool = new PortPool();
-		// This is created here but deleted in the MediaRosterUndertaker because
-		// otherwise there are segfaults trying to send final quit messages.
 
 	*_error = BuildConnections();
 
