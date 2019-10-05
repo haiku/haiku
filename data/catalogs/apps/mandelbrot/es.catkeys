@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Mandelbrot	1781779654
+1	spanish; castilian	x-vnd.Haiku-Mandelbrot	3397649687
 Burning Ship	MandelbrotWindow		Nave Ardiendo
 Grassland	MandelbrotWindow		Pradera
 Lightning	MandelbrotWindow		Relámpago
@@ -9,6 +9,7 @@ Tricorn	MandelbrotWindow		Tricornio
 Royal	MandelbrotWindow		Real
 Orbit Trap	MandelbrotWindow		Trampa Orbital
 Deepfrost	MandelbrotWindow		Helada profunda
+1 (none)	MandelbrotWindow		1 (ninguno)
 Quit	MandelbrotWindow		Salir
 File	MandelbrotWindow		Archivo
 Julia	MandelbrotWindow		Julia

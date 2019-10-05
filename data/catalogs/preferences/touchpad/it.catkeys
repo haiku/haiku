@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Touchpad	607725922
+1	italian	x-vnd.Haiku-Touchpad	526581388
 Scrolling	TouchpadPrefView		Scorrimento
 Tapping	TouchpadPrefView		Tocco
 Touchpad	System name		Touchpad
@@ -7,6 +7,7 @@ OK	TouchpadPrefView		OK
 Horizontal scrolling	TouchpadPrefView		Scorrimento orizzontale
 Slow	TouchpadPrefView		Lento
 Two finger scrolling	TouchpadPrefView		Scorrimento con due dita
+No touchpad found, the settings will have no effect.	TouchpadPrefView		Nessun touchpad trovato, le impostazioni non avranno alcun effetto.
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La nuova area di scorrimento è molto larga e può impedire le normali operazioni del mouse. Davvero vuoi cambiarla?
 Defaults	TouchpadPrefView		Predefiniti
 High	TouchpadPrefView		Alto

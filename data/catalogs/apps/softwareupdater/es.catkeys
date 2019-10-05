@@ -1,5 +1,6 @@
-1	spanish; castilian	x-vnd.haiku-softwareupdater	4294742959
+1	spanish; castilian	x-vnd.haiku-softwareupdater	369324613
 Updating version	SoftwareUpdaterWindow	List item text	Actualizando versión
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Haga clic aquí para instalar {0, plural, one{# updated package} other{# updated packages}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Paquetes a desinstalar
 No active network connection was found	UpdateManager	Error message	No se detectó una conexión de red activa
 Quit	SoftwareUpdaterWindow	Alert button label	Salir
@@ -7,6 +8,7 @@ There were no updates found.	CheckManager		No se encontraron actualizaciones.
 Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Las actualizaciones no han terminado, ¿está seguro de que desea salir?
 Updates found	SoftwareUpdaterWindow		Actualizaciones encontradas
 Update now	SoftwareUpdaterWindow		Actualizar ahora
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Por algún motivo, no se pudo reiniciar su computadora.
 OK	UpdateManager		Aceptar
 Unrecognized argument	SoftwareUpdaterApp	Error message	Argumento no reconocido
 There were no updates found.	CheckAction		No se encontraron actualizaciones.
@@ -14,6 +16,7 @@ No updates available	UpdateAction		No hay actualizaciones disponibles
 New packages to be installed	SoftwareUpdaterWindow	List super item label	Hay nuevos paquetes a ser instalados
 Packages to be updated	SoftwareUpdaterWindow	List super item label	Paquetes a actualizar
 to	SoftwareUpdaterWindow	List item text	a
+Attempting to cancel the updates…	SoftwareUpdaterWindow		Intentando cancelar las actualizaciones…
 Contacting software repositories to check for package updates.	CheckManager		Conectando con los repositorios de software para comprobar actualización de paquetes
 Available updates found	CheckManager		Se encontraron actualizaciones disponibles
 from repository	SoftwareUpdaterWindow	List item text	desde repositorio
@@ -31,7 +34,9 @@ No active network connection was found.\n	CheckManager		No hay ninguna conexión
 Applying changes	UpdateManager		Aplicando cambios
 Full sync	SoftwareUpdaterWindow	Alert button label	Sincronización completa
 Quit	SoftwareUpdaterWindow	Button label	Salir
+Updates have been successfully installed.	UpdateManager		Las actualizaciones han sido instaladas correctamente.
 Exception occurred while updating packages : %s\n	UpdateAction		Ocurrió un error mientras se actualizaban los paquetes : %s\n
+A reboot is necessary to complete the update process.	UpdateManager		Es necesario un reinicio para completar el proceso de actualización.
 Exception occurred while checking for updates: %s\n	CheckAction		Ocurrió una excepción al buscar actualizaciones: %s\n
 Packages are being updated	UpdateManager		Los paquetes están siendo actualizados
 Cancel	SoftwareUpdaterWindow		Cancelar
@@ -39,10 +44,13 @@ Don't quit	SoftwareUpdaterWindow		No salir
 Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Haz clic aquí para ejecutar SoftwareUpdater. Algunas actualizaciones requerirán seleccionar una solución a un problema.
 Checking for updates	SoftwareUpdaterWindow		Buscando actualizaciones
 Updates completed	UpdateManager		Actualizaciones completadas
+Reboot	SoftwareUpdaterWindow		Reiniciar
 Show more details	SoftwareUpdaterWindow		Mostrar más detalles
 Installing version	SoftwareUpdaterWindow	List item text	Instalando versión
 Checking for updates	CheckManager		Buscando actualizaciones
 No remote repositories are available	UpdateManager	Error message	No hay repositorios remotos disponibles
+Software {0, plural, one{update} other{updates}} available	CheckManager		Software {0, plural, one{update} other{updates}} disponibles
+Reboot	SoftwareUpdaterWindow	Button label	Reiniciar
 Update	SoftwareUpdaterWindow	Alert button label	Actualizar
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Abrir repositorios
 Updates did not complete	UpdateAction		La actualización no se completó

@@ -1,5 +1,6 @@
-1	italian	x-vnd.haiku-softwareupdater	4294742959
+1	italian	x-vnd.haiku-softwareupdater	369324613
 Updating version	SoftwareUpdaterWindow	List item text	Aggiornamento della versione
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Clicca qui per installare {0, plural, one{# pacchetto aggiornato} other{# pacchetti aggiornati}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pacchetti da disinstallare
 No active network connection was found	UpdateManager	Error message	Nessuna connessione di rete attiva trovata
 Quit	SoftwareUpdaterWindow	Alert button label	Esci
@@ -7,6 +8,7 @@ There were no updates found.	CheckManager		Nessun aggiornamento trovato.
 Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Gli aggiornamenti non sono stati completati, sei sicuro di voler uscire?
 Updates found	SoftwareUpdaterWindow		Aggiornamenti trovati
 Update now	SoftwareUpdaterWindow		Aggiorna ora
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Per qualche motivo non è possibile riavviare il computer.
 OK	UpdateManager		OK
 Unrecognized argument	SoftwareUpdaterApp	Error message	Argomento non riconosciuto
 There were no updates found.	CheckAction		Non sono stati trovati aggiornamenti.
@@ -14,6 +16,7 @@ No updates available	UpdateAction		Nessun aggiornamento disponibile
 New packages to be installed	SoftwareUpdaterWindow	List super item label	Nuovi pacchetti che verranno installati
 Packages to be updated	SoftwareUpdaterWindow	List super item label	Pacchetti da aggiornare
 to	SoftwareUpdaterWindow	List item text	a
+Attempting to cancel the updates…	SoftwareUpdaterWindow		Tentativo di cancellazione degli aggiornamenti in corso…
 Contacting software repositories to check for package updates.	CheckManager		Contatta i repository del software per verificare la presenza di aggiornamenti ai pacchetti.
 Available updates found	CheckManager		Aggiornamenti disponibili trovati
 from repository	SoftwareUpdaterWindow	List item text	dal repository
@@ -31,7 +34,9 @@ No active network connection was found.\n	CheckManager		Non è stata trovata nes
 Applying changes	UpdateManager		Applicazione delle modifiche
 Full sync	SoftwareUpdaterWindow	Alert button label	Sincronizzazione completa
 Quit	SoftwareUpdaterWindow	Button label	Esci
+Updates have been successfully installed.	UpdateManager		Gli aggiornamenti sono stati installati con successo.
 Exception occurred while updating packages : %s\n	UpdateAction		Eccezione rilevata durante l'aggiornamento dei pacchetti: %s\n
+A reboot is necessary to complete the update process.	UpdateManager		Per completare il processo di aggiornamento è necessario riavviare.
 Exception occurred while checking for updates: %s\n	CheckAction		Eccezione rilevata durante il rilevamento degli aggiornamenti: %s\n
 Packages are being updated	UpdateManager		I pacchetti sono in fase di aggiornamento
 Cancel	SoftwareUpdaterWindow		Annulla
@@ -39,10 +44,13 @@ Don't quit	SoftwareUpdaterWindow		Non chiudere
 Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Clicca qui per eseguire SoftwareUpdater. Alcuni aggiornamenti causeranno un probleme la cui soluzione dovrà essere selezionata.
 Checking for updates	SoftwareUpdaterWindow		Controllo per aggiornamenti
 Updates completed	UpdateManager		Aggiornamenti completati
+Reboot	SoftwareUpdaterWindow		Riavvia
 Show more details	SoftwareUpdaterWindow		Mostra ulteriori dettagli
 Installing version	SoftwareUpdaterWindow	List item text	Installazione della versione
 Checking for updates	CheckManager		Controllo aggiornamenti in corso...
 No remote repositories are available	UpdateManager	Error message	Nessun repository remoto disponibile
+Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, one{aggiornamento disponibile} other{aggiornamenti disponibili}}
+Reboot	SoftwareUpdaterWindow	Button label	Riavvia
 Update	SoftwareUpdaterWindow	Alert button label	Aggiorna
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Apri Repository
 Updates did not complete	UpdateAction		Gli aggiornamenti non sono stati completati

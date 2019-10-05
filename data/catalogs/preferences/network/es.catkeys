@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Network	943149646
+1	spanish; castilian	x-vnd.Haiku-Network	3039697761
 Ethernet device	InterfaceListItem		Dispositivo Ethernet
 Link speed:	IntefaceView		Velocidad de conexión:
 disconnected	IntefaceView		desconectado
@@ -19,8 +19,10 @@ EAP	EAP protected network		EAP
 Services	NetworkWindow		Servicios
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Ha ocurrido un error al instalar NetworkStatus en la barra de escritorio: %s
 Revert	NetworkWindow		Revertir
+off	ServiceListItem		inactivo
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<no se han encontrado redes inalámbricas>
+Enable	IntefaceView		Activar
 connected	IntefaceView		conectado
 Apply	IntefaceAddressView		Aplicar
 Disable	ServiceView		Deshabilitar
@@ -28,6 +30,7 @@ WPA2	WPA2 protected network		WPA2
 Show network status in Deskbar	NetworkWindow		Mostrar estado de la red en Deskbar
 Mode:	IntefaceAddressView		Modo:
 connected	InterfaceListItem		conectado
+OK	NetworkWindow		Aceptar
 Static	IntefaceAddressView		Estático
 launch error	NetworkWindow		error de inicio
 Renegotiate	IntefaceView		Renegociar
@@ -35,7 +38,9 @@ MAC address:	IntefaceView		Dirección MAC:
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 disabled	InterfaceListItem		deshabilitado
 Dial-up connection	InterfaceListItem		Conexión de acceso telefónico
+on	ServiceListItem		activo
 The method for obtaining an IP address	IntefaceAddressView		El método para obtener una dirección IP
+disconnected	InterfaceListItem		desconectado
 Automatic	IntefaceAddressView		Automático
 Choose automatically	IntefaceView		Escoger automáticamente
 Status:	IntefaceView		Estado:

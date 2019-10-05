@@ -1,4 +1,5 @@
-1	indonesian	x-vnd.Haiku-HaikuDepot	1059339987
+1	indonesian	x-vnd.Haiku-HaikuDepot	913112167
+Repository update error	LocalRepositoryUpdateProcess		Kesalahan pembaruan repositori
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Terjadi kesalahan saat menyegarkan repositori: %error%
 Check for updates…	MainWindow		Memeriksa pembaruan…
 Uninstall	PackageManager		Hapus
@@ -48,6 +49,7 @@ User rating	RatePackageWindow		Peringkat pengguna
 Installed packages	MainWindow		Paket-paket yang terpasang
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Objek yang diminta atau objek yang terlibat dalam permintaan tidak ditemukan di server.
 Other users can see this rating	RatePackageWindow		Pengguna lain dapat melihat rating ini
+The minimum age requirements must be met.	UserLoginWindow		Persyaratan umur minimum harus dipenuhi.
 Stable	RatePackageWindow		Stabil
 This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		Aplikasi ini terlalu lama untuk berkomunikasi dengan  Sistem server HaikuDepot.  Dapatkan versi HaikuDepot yang lebih baru  dengan memperbarui sistem Haiku Anda.  Versi minimum dari yang dibutuhkan  HaikuDepot adalah \"%s\".
 Fatal error	PackageManager		Kesalahan fatal
@@ -70,6 +72,7 @@ Close	PackageManager		Tutup
 A network transport error has arisen communicating with the HaikuDepot server system: %s	ServerHelper		Terjadi kesalahan transportasi jaringan saat berkomunikasi dengan sistem server HaikuDepot: %s
 Changelog	PackageInfoView		Log perubahan
 Rating not possible	MainWindow		Peringkat tidak memungkinkan
+Package update error	MainWindow		Kesalahan pembaruan paket
 About	PackageInfoView		Tentang
 Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Otentikasi gagal. Pengguna tidak ada atau password yang disediakan salah.
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# proses}}
@@ -87,6 +90,7 @@ Inactive	PackageListView		Tak aktif
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Menyinkronkan meta-data tentang repositori
 OK	MainWindow		OKE
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
+Usage conditions download problem	UserLoginWindow		Masalah pengunduhan kondisi penggunaan
 OK	PackageInfoView		OKE
 Downloading:	PackageInfoView		Mengunduh:
 Success	UserLoginWindow		Berhasil
@@ -98,14 +102,17 @@ Repository	PackageListView		Repositori
 Close	UserLoginWindow		Tutup
 Close	RatePackageWindow		Tutup
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Menyinkronkan data paket untuk repositori '%REPO_NAME%'
+View the usage conditions	UserLoginWindow		Lihat kondisi penggunaan
 Failed to create account: %s\n	UserLoginWindow		Gagal membuat akun: %s\n
 Size	PackageListView		Ukuran
 Your rating:	RatePackageWindow		Penilaianmu:
+I am %MinimumAgeYears% years of age or older	UserLoginWindow		Saya%MinimumAgeYears% tahun atau lebih
 Your rating was updated.	RatePackageWindow		Peringkat anda telah diperbarui.
 All categories	FilterView		Semua kategori
 Repositories	MainWindow		Repositori
 n/a	PackageInfoView		n/a
 Cancel	MainWindow		Batal
+View agreed usage conditions…	MainWindow		Lihat ketentuan penggunaan yang disepakati…
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 more to download)}other{(# more to download)}}
 Refresh repositories	MainWindow		Muat-ulang repositori
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Jika anda tidak memberikan alamat email, anda tidak akan dapat mereset kata sandi anda jika anda melupakannya.
@@ -132,15 +139,19 @@ Source packages	MainWindow		Paket sumber
 User name:	UserLoginWindow		Nama pengguna:
 Try again	App		Coba lagi
 Rate package	RatePackageWindow		Nilai paket
+The usage conditions must be agreed to.	UserLoginWindow		Ketentuan penggunaan harus disetujui.
 The email address appears to be malformed.	UserLoginWindow		Alamat email tampaknya salah format.
 You have not solved the captcha puzzle correctly.	UserLoginWindow		Anda belum memecahkan teka-teki captcha dengan benar.
 Unknown	PackageListView		Tidak dikenal
+I agree to the usage conditions	UserLoginWindow		Saya menyetujui ketentuan penggunaan
+An error has arisen downloading the usage conditions. Check the log for details and try again.	UserLoginWindow		Terjadi kesalahan saat mengunduh kondisi penggunaan. Periksa log untuk detailnya dan coba lagi.
 Log in	UserLoginWindow		Masuk
 Logged in as %User%	MainWindow		Masuk sebagai %User%
 Email address:	UserLoginWindow		Alamat email:
 Screenshot	ScreenshotWindow		Screenshot
 HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		Boot ulang diperlukan untuk menyelesaikan proses pemasangan.
+View latest usage conditions…	MainWindow		Lihat ketentuan penggunaan terbaru…
 Search terms:	FilterView		Kriteria pencarian:
 Pending…	PackageListView		Menunggu keputusan…
 Repeat pass phrase:	UserLoginWindow		Ulangi frase sandi:
@@ -158,6 +169,7 @@ Log in…	MainWindow		Log masuk…
 You need to be logged into an account before you can rate packages.	MainWindow		Anda harus masuk ke akun sebelum dapat memberi nilai paket.
 Client version too old	ServerHelper		Versi klien terlalu lama
 Authorization or security issue	ServerHelper		Otorisasi atau masalah keamanan
+Local repository load error	LocalPkgDataLoadProcess		Kesalahan pemuatan repositori lokal
 9999.99 KiB	PackageListView		9999.99 KiB
 All repositories	MainWindow		Semua repositori
 %Version%	PackageInfoView		%Version%

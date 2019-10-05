@@ -1,10 +1,29 @@
-1	spanish; castilian	x-vnd.Haiku-DeskCalc	1694821448
+1	spanish; castilian	x-vnd.Haiku-DeskCalc	1508549721
+cos	CalcView		cos
+acos	CalcView		acos
+7   8   9   (   )  \n4   5   6   *   /  \n1   2   3   +   -  \n0   .   BS  =   C  \n	CalcView		7   8   9   (   )  \n4   5   6   *   /  \n1   2   3   +   -  \n0   .   BS  =   C  \n
+C	CalcView	Key label, 'C' means clear	C
+ceil	CalcView		ceil
+cbrt	CalcView		cbrt
+BS	CalcView	Key label, 'BS' means backspace	BS
+floor	CalcView		floor
+sin	CalcView		sin
+sinh	CalcView		sinh
+tanh	CalcView		tanh
+cosh	CalcView		cosh
+ln	CalcView		ln
 Compact	CalcView		Compacta
 Calculating	CalcView		Calculando
 Enable Num Lock on startup	CalcView		Activar bloqueo numérico al inicio
 Scientific	CalcView		Científica
+log	CalcView		log
+sqrt	CalcView		sqrt
+asin	CalcView		asin
 Radians	CalcView		Radianes
+tan	CalcView		tan
+exp	CalcView		exp
 Audio Feedback	CalcView		Acople (retroalimentación acústica)
+atan	CalcView		atan
 DeskCalc	System name		Calculadora
 Degrees	CalcView		Grados
 Basic	CalcView		Básica

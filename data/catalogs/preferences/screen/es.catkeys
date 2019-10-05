@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Screen	4090394050
+1	spanish; castilian	x-vnd.Haiku-Screen	2685901476
 no	Screen		no
 bits/pixel	Screen		bits/píxel
 15 bits/pixel, 32768 colors	Screen		15 bits/píxel, 32768 colores
@@ -33,6 +33,7 @@ Warning	Screen		Advertencia
 24 bits/pixel, 16 Million colors	Screen		24 bits/píxel, 16 millones de colores
 Hz	Screen		Hz
 Workspaces	Screen		Espacios de trabajo
+Brightness:	Screen		Brillo:
 32 bits/pixel, 16 Million colors	Screen		32 bits/píxel, 16 millones de colores
 Done	Screen		Terminado
 16 bits/pixel, 65536 colors	Screen		16 pits/píxel, 65536 colores

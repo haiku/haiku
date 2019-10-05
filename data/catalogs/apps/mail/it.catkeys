@@ -1,4 +1,4 @@
-1	italian	x-vnd.Be-MAIL	1559146339
+1	italian	x-vnd.Be-MAIL	1477453861
 Set to Saved	Mail		Imposta a 'Salvato'
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Il testo contiene %ld caratteri non codificabili. Se premi 'Invio' questi caratteri saranno sostituiti. Premi 'Annulla' per tornare indietro e verificare il set di caratteri utilizzato.
 Text wrapping:	Mail		A capo automatico
@@ -8,10 +8,12 @@ Reply	Mail		Rispondi
 Next message	Mail		Messaggio successivo
 Mailing	Mail		Invio
 Unread	Mail		Non letto
+Same sender	Mail		Stesso mittente
 Copy to new	Mail		Copia su nuovo
 Save as draft	Mail		Salva come bozza
 Encoding:	Mail		Codifica:
 Print	Mail		Stampa
+Decrease quote level	Mail		Diminuisci quota
 Encoding	Mail		Codifica
 Default account:	Mail		Account predefinito:
 Message	Mail		Messaggio
@@ -31,6 +33,7 @@ Only files can be added as attachments.	Mail		Al messaggio possono essere allega
 Close	Mail		Chiudi
 Untitled	Mail		Senza titolo
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		La rimozione degli allegati da un messaggio in corso di inoltro non è stata ancora implementata!\nNon funzionerà correttamente.
+Same recipient	Mail		Stesso destinatario
 Previous message	Mail		Messaggio precedente
 (Address unavailable)	Mail		(Indirizzo non disponibile)
 Mail	System name		Mail
@@ -82,6 +85,7 @@ Colored quotes:	Mail		Citazioni colorate:
 Automatic	Mail		Automatico
 Open this link	Mail		Apri questo collegamento
 Auto signature:	Mail		Firma automatica:
+Same subject	Mail		Stesso oggetto
 Send	Mail		Invia
 Open draft	Mail		Apri bozza
 Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Lascia come 'Nuovo'
@@ -161,4 +165,5 @@ Spam	Mail		Indesiderata
 Couldn't open this signature. Sorry.	Mail		Non è possibile aprire questa firma. Spiacente.
 Revert	Mail		Ripristina
 Unknown	Mail		Sconosciuto
+Increase quote level	Mail		Aumenta quota
 Add enclosure…	Mail		Inserisci allegato…

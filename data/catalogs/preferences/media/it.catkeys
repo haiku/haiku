@@ -1,10 +1,11 @@
-1	italian	x-vnd.Haiku-Media	4205337498
+1	italian	x-vnd.Haiku-Media	1682972002
 Audio mixer	Media Window		Mixer audio
 Show volume control on Deskbar	Media views		Mostra controlli volume nella Deskbar
 Quit	Media Window		Esci
 Restart media services	Media views		Riavvio servizi media
 Couldn't add volume control in Deskbar: %s\n	Media views		Non è stato possibile aggiungere il controllo del volume nella Deskbar: %s\n
 Start media server	Media Window		Avvia media server
+<none>	VideoInputMenu	Used when no video input is available	<nessuno>
 Audio settings	Media Window		Impostazioni Audio
 Quit anyway	Media Window		Esci comunque
 Couldn't remove volume control in Deskbar: %s\n	Media views		Non è stato possibile rimuovere il controllo del volume nella Deskbar: %s\n
@@ -22,3 +23,4 @@ Channel:	Media views		Canale:
 Defaults	Media views		Predefiniti
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Impossibile connettersi al media server.\nAvviarlo?
 Video settings	Media Window		Impostazioni video
+<none>	VideoOutputMenu	Used when no video output is available	<nessuno>

@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Devices	490380176
+1	spanish; castilian	x-vnd.Haiku-Devices	3345509916
 ACPI bus	DevicesView		Bus ACPI
 Encryption controller	Device		Controlador de cifrado
 Bus Information	Device		Información de Bus
@@ -54,7 +54,9 @@ Device name	DeviceACPI		Nombre de dispositivo
 Card Reader	DeviceSCSI		Lector de tarjetas
 Display controller	Device		Controlador de pantalla
 Basic information	DevicesView		Información básica
+ACPI Button '%1'	DeviceACPI		ACPI Botón '%1'
 Bus	DevicesView		Bus
+ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Nombre de dispositivo
 Disk Drive	DeviceSCSI		Dispositivo de disco
 Other	DeviceSCSI		Otro

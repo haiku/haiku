@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Appearance	583615507
+1	italian	x-vnd.Haiku-Appearance	663472720
 Control border	Colors tab		Bordi del controllo
 Control mark	Colors tab		Marcatore del controllo
 Off	AntialiasingSettingsView		Disattivato
@@ -8,10 +8,12 @@ Defaults	APRWindow		Predefiniti
 Shadow	Colors tab		Ombra
 Document background	Colors tab		Sfondo del documento
 List background	Colors tab		Sfondo della lista
+No effect on running applications	DecorSettingsView		Nessun effetto sulle applicazioni in esecuzione
 Fixed font:	Font view		Carattere a spaziatura fissa:
 Appearance	System name		Aspetto
 Reduce colored edges filter strength:	AntialiasingSettingsView		Intensità del filtro di riduzione del bordi colorati:
 Glyph hinting:	AntialiasingSettingsView		Hinting dei glifi:
+Default Haiku ControlLook	DecorSettingsView		ControlLook Haiku Predefinito
 Menu item text	Colors tab		Testo della voce nel menu
 About decorator	DecorSettingsView		Informazioni sul decoratore
 Antialiasing menu	AntialiasingSettingsView		Antialiasing sul menu
@@ -47,7 +49,9 @@ LCD subpixel	AntialiasingSettingsView		Sub-pixel LCD
 Window tab	Colors tab		Linguetta della finestra
 Link text	Colors tab		Testo del collegamento
 Tooltip background	Colors tab		Sfondo dei suggerimenti
+ControlLook:	DecorSettingsView		ControlLook:
 Scroll bar thumb	Colors tab		Maniglia della barra di scorrimento
+Default	DecorSettingsView		Predefinito
 Link visited	Colors tab		Testo del collegamento visitato
 Selected menu item border	Colors tab		Bordo della voce selezionata nel menu
 Tooltip text	Colors tab		Testo del suggerimento
@@ -63,10 +67,12 @@ Antialiasing type:	AntialiasingSettingsView		Tipo di antialias:
 Panel text	Colors tab		Testo del pannello
 Hinting menu	AntialiasingSettingsView		Menu dei suggerimenti
 Scroll bar:	DecorSettingsView		Barra di scorrimento:
+Choose ControlLook	DecorSettingsView		Scegli ControlLook
 Monospaced fonts only	AntialiasingSettingsView		Solo caratteri con spaziatura fissa
 Document text	Colors tab		Testo del documento
 Inactive window border	Colors tab		Bordo finestra inattiva
 Colors	APRWindow		Colori
+About control look	DecorSettingsView		Informazioni su ControlLook
 Control highlight	Colors tab		Evidenziazione del controllo
 Status bar	Colors tab		Barra di stato
 Link hover	Colors tab		Testo del collegamento al passaggio del mouse

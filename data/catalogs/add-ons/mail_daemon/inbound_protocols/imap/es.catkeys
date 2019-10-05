@@ -1,8 +1,12 @@
-1	spanish; castilian	x-vnd.Haiku-IMAP	1938678311
+1	spanish; castilian	x-vnd.Haiku-IMAP	1343128980
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		No se pudo conectar al servidor \"%server%\":\n%error%
+Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		Actualizando suscripciones a carpetas IMAP. Por favor, aguarde…
 Failed to fetch available storage.	IMAPFolderConfig		No se pudo recopilar el espacio disponible.
 Cancel	IMAPFolderConfig		Cancelar
+OK	IMAPFolderConfig		Aceptar
+Server storage: %s / %s used.	IMAPFolderConfig		Almacenamiento en el servidor: %s / %s en uso.
 No encryption	imap_config		Sin cifrado
+Fetching IMAP folders, please be patient…	IMAPFolderConfig		Obteniendo carpetas IMAP. Por favor aguarde…
 Configure IMAP Folders	imap_config		Configurar carpetas IMAP
 SSL	imap_config		SSL
 Apply	IMAPFolderConfig		Aplicar

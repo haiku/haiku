@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Repositories	2658607939
+1	spanish; castilian	x-vnd.Haiku-Repositories	1220143449
 This is not a valid URL.	AddRepoWindow	Add URL error message	No es una URL válida.
 Repository URL:	AddRepoWindow	Text box label	URL del repositorio:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Se produjo un error al actualizar el cache del repositorio %name%
@@ -10,6 +10,7 @@ Disable	RepositoriesView	Button label	Deshabilitar
 Cancel task	TaskTimer	Button label	Cancelar tarea
 Changes completed	RepositoriesView	Status view text	Cambios completados
 Details	TaskLooper	Job log details header	Detalles
+Enabled	RepoRow	Tag in the Status column	Activo
 Remove	Constants	Button label	Quitar
 There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Se produjo un error al habilitar el repositorio %url%
 Remove this repository?	RepositoriesView	Removal alert confirmation message	¿Quitar este repositorio?

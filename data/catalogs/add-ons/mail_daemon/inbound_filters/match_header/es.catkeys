@@ -1,8 +1,9 @@
-1	spanish; castilian	x-vnd.Haiku-MatchHeader	3544711400
+1	spanish; castilian	x-vnd.Haiku-MatchHeader	1946584206
 Delete message	ConfigView		Borrar mensaje
 Match \"%attribute\" against \"%regex\"	RuleFilter		Concordar \"%attribute\" contra \"%regex\"
 Match header	RuleFilter		Cabecera concordante
 Set flags to	ConfigView		Seleccionar banderas a 
+Header field (e.g. Subject, From, …)	ConfigView		Campos de la cabecera (por ej. Asunto, Desde, …)
 <Choose account>	ConfigView		<Elegir cuenta>
 Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Valor de comodín como \"*spam*\.\nPrefijos con \"REGEX:\" para utilizar expresiones regulares.
 Then	ConfigView		Luego

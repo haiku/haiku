@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Shortcuts	1611284793
+1	italian	x-vnd.Haiku-Shortcuts	3834857117
 *MouseUp	ShortcutsWindow		*MouseRilasciato
 Application	ShortcutsWindow		Applicazione
 Option	ShortcutsSpec	Name for modifier on keyboard	Opzione
@@ -9,6 +9,7 @@ Don't save	ShortcutsWindow		Non salvare
 *Beep	ShortcutsWindow		*Bip
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Shortcuts non è stato capace di salvare le tue impostazioni di tasti.
 Save	ShortcutsWindow		Salva
+Either	ShortcutsSpec		Entrambi
 Oh no	ShortcutsWindow		Oh no
 Key	ShortcutsWindow		Tasto
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*InviaMessaggio application/x-vnd.Be-TRAK 'Tfnd'
@@ -19,21 +20,26 @@ Quit	ShortcutsWindow		Esci
 Cancel	ShortcutsWindow		Annulla
 *MoveMouse +20 +0	ShortcutsWindow		*MuoviMouse +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
+Left	ShortcutsSpec		Sinistra
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di elaborare il tuo file di impostazione tasti!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di salvare il tuo file di impostazione tasti!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InserisciStringa \"Qui il tuo testo\"
 Remove selected shortcut	ShortcutsWindow		Rimuovi scorciatoia selezionata
 Error, NULL state description?	ShortcutsSpec		Errore: probabile descrizione di stato NULL
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di aprire il vostro file di impostazione tasti!
 Save & apply	ShortcutsWindow		Salva e applica
 Open	ShortcutsWindow		Apri
 Append	ShortcutsWindow		Accoda
+Both	ShortcutsSpec		Entrambi
 Save KeySet as…	ShortcutsWindow		Salva Impostazione tasti come…
 Append KeySet…	ShortcutsWindow		Accoda Impostazione Tasti…
 *MouseButton 1	ShortcutsWindow		*TastoMouse 1
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multiplo \"*MuoviMouseVerso 100% 0\" \"*TastoMouse 1\"
+Right	ShortcutsSpec		Destra
 OK	ShortcutsWindow		OK
 Add new shortcut	ShortcutsWindow		Aggiungi nuova scorciatoia
+(None)	ShortcutsSpec		(Nessuno)
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 Open KeySet…	ShortcutsWindow		Apri Impostazione Tasti…
 File	ShortcutsWindow		File

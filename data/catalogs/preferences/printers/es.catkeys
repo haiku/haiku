@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Be-PRNT	2042381362
+1	spanish; castilian	x-vnd.Be-PRNT	1465107170
 Test page	TestPageView		Página de prueba
 Remove	PrintersWindow		Eliminar
 Red	TestPageView		Rojo
@@ -16,6 +16,8 @@ Waiting	JobListView		En cola
 Processing	JobListView		Procesando
 Cancel	AddPrinterDialog		Cancelar
 Unknown status	JobListView		Estado desconocido
+Print jobs for %printer_name%	PrintersWindow		Trabajos de impresión para %printer_name%
+{0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? pages}=1{# page}other{# pages}}
 Add printer	AddPrinterDialog		Añadir impresora
 Printers	PrintersWindow		Impresoras
 No printer found!	TransportMenu		No se encontró la impresora.
@@ -29,6 +31,7 @@ Yellow	TestPageView		Amarillo
 Black	TestPageView		Negro
 Printer type:	AddPrinterDialog		Tipo de impresión:
 Printers	System name		Impresoras
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Impresora: %printer_name%\nControlador: %driver%\n
 Green	TestPageView		Verde
 Print test page	PrintersWindow		Imprimir página de prueba

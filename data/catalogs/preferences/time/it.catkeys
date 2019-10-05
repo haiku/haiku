@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Time	752043118
+1	italian	x-vnd.Haiku-Time	834234238
 OK	Time		OK
 Message receiving failed	Time		Ricezione del messaggio fallita
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Ora & Data, realizzato da:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
@@ -16,6 +16,7 @@ Asia	Time		Asia
 Try all servers	Time		Prova con tutti i server
 Time	Time		Ora
 Current time:	Time		Ora attuale:
+The following error occured while synchronizing:\n%s: %s	Time		Errore durante la sincronizzazione:\n%s: %s
 Europe	Time		Europa
 Show day of week	Time		Mostra giorno della settimana
 Local time (Windows compatible)	Time		Ora locale (compatibile Windows)
@@ -43,5 +44,6 @@ Synchronize at boot	Time		Sincronizza all'avvio
 Indian	Time		Indiano
 Revert	Time		Ripristina
 Date and time	Time		Data e ora
+The following error occured while synchronizing:\n%s	Time		Errore durante la sincronizzazione:\n%s
 Synchronize	Time		Sincronizza
 Add	Time		Aggiungi

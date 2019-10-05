@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	2023640966
+1	spanish; castilian	x-vnd.Haiku-libtracker	838081337
 Created	ContainerWindow		Creado
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
 Open with…	ContainerWindow		Abrir con…
@@ -23,6 +23,7 @@ Name	Default Query Columns		Nombre
 Unmount	ContainerWindow		Desmontar
 Eject when unmounting	AutoMounterSettings		Expulsar al momento de desmontar
 Searching for disks to mount…	StatusWindow		Buscando discos para montar
+Information	InfoWindow		Información
 Error emptying Trash	FSUtils		Error al vaciar la papelera
 Opens with:	InfoWindow		Abrir con:
 Size	QueryPoseView		Tamaño
@@ -402,6 +403,7 @@ by formula	FindPanel		por formula
 is	FindPanel		es
 Move to Trash	FilePanelPriv		Mover a la papelera
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Si renombras la carpeta de sistema o sus contenidos, es posible que no puedas iniciar %osName.\n\n¿Estás seguro de que deseas hacer esto?\n\nPara renombrar la carpeta de sistema o sus contenidos, mantén presionada la tecla Mayúsculas y haz clic en \"Renombrar\".
+Permissions	FilePermissionsView		Permisos
 40 x 40	ContainerWindow		40 x 40
 40 x 40	DeskWindow		40 x 40
 New folder %ld	FSUtils		Nueva carpeta %ld

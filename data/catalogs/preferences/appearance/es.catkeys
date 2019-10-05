@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Appearance	583615507
+1	spanish; castilian	x-vnd.Haiku-Appearance	4226716962
 Control border	Colors tab		Borde del control
 Control mark	Colors tab		Marca de control
 Off	AntialiasingSettingsView		Desactivado
@@ -8,6 +8,7 @@ Defaults	APRWindow		Valores predeterminados
 Shadow	Colors tab		Sombra
 Document background	Colors tab		Fondo de documento
 List background	Colors tab		Fondo de listas
+No effect on running applications	DecorSettingsView		Sin efecto en aplicaciones en ejecución
 Fixed font:	Font view		Tipo de letra monoespaciado:
 Appearance	System name		Apariencia
 Reduce colored edges filter strength:	AntialiasingSettingsView		Reducir fortaleza del filtro de bordes coloreados:

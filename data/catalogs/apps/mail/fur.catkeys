@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Be-MAIL	2849540371
+1	friulian	x-vnd.Be-MAIL	1477453861
 Set to Saved	Mail		Met come Salvât
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Il to test principâl al conten %ld caratars che no si puedin codificâ. Podaressial lâ ben forsit un complès di caratars diferents? Frache Invie par inviâlu distès (un caratar sostitutîf al vignarà doprât al puest di chei no codificabii), o sielç Anule par tornâ indaûr e justâ il test.
 Text wrapping:	Mail		Rie gnove automatiche:
@@ -13,6 +13,7 @@ Copy to new	Mail		Copie su gnûf
 Save as draft	Mail		Salve come stampon
 Encoding:	Mail		Codifiche:
 Print	Mail		Stampe
+Decrease quote level	Mail		Diminuìs nivel di citazion
 Encoding	Mail		Codifiche
 Default account:	Mail		Account predefinît:
 Message	Mail		Messaç
@@ -164,4 +165,5 @@ Spam	Mail		Malvolude
 Couldn't open this signature. Sorry.	Mail		Impussibil vierzi cheste firme. Scuse.
 Revert	Mail		Torne indaûr
 Unknown	Mail		No cognossût
+Increase quote level	Mail		Aumente nivel di citazion
 Add enclosure…	Mail		Inserìs alegât…

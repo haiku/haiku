@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Pulse	3788463253
+1	italian	x-vnd.Haiku-Pulse	139895817
 Normal mode	DeskbarPulseView		Modalità normale
 Info	CPUButton		Informazioni
 Quit	DeskbarPulseView		Esci
@@ -37,6 +37,7 @@ Deskbar menu	CPUButton		Menu Deskbar
 Mini mode	NormalPulseView		Modalità mini
 Quit	MiniPulseView		Esci
 Info	PulseView		Informazioni
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		Uso: Pulse [--mini] [-w larghezza] [--width=larghezza]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]
 OK	DeskbarPulseView		OK
 Info	PulseApp		Informazioni
 Pulse	System name		Pulse

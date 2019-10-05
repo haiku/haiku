@@ -25,7 +25,7 @@ Cache	DataSource		Cache
 Update time interval:	SettingsWindow		Intervallo di aggiornamento:
 TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		Esci
-Block cache memory	DataSource		Blocca memoria cache
+Block cache memory	DataSource		Memoria cache a blocchi
 Remove graph	ActivityView		Rimuovi grafico
 %lld sec.	SettingsWindow		%lld sec.
 %lld ms	SettingsWindow		%lld ms
@@ -36,7 +36,7 @@ Sems	DataSource		Sems
 ActivityMonitor	System name		MonitorAttività
 Running applications	DataSource		Applicazioni in esecuzione
 Semaphores	DataSource		Semafori
-Block cache	DataSource		Blocca cache
+Block cache	DataSource		Cache a blocchi
 Swap space	DataSource		Spazio swap
 Swap	DataSource		Swap
 File	ActivityWindow		File

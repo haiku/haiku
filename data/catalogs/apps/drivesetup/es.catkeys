@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-DriveSetup	2981446742
+1	spanish; castilian	x-vnd.Haiku-DriveSetup	1195596759
 Could not unmount partition %s.	MainWindow		No se pudo desmontar la partición %s.
 Mount all	MainWindow		Montar todo
 Disk	MainWindow		Disco
@@ -6,10 +6,14 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Device	PartitionList		Dispositivo
 Initialize	MainWindow		Inicializar
 Could not change the parameters of the selected partition.	MainWindow		No se pudieron cambiar los parámetros de la partición seleccionada.
+PGP encrypted	Encryption utils		Cifrado PGP
 Delete partition	MainWindow		Eliminar partición
 Error: 	MainWindow	in any error alert	Error:
+Removable	PartitionList		Removible
+Block size	PartitionList		Tamaño de bloque
 The panel experienced a problem!	MainWindow		¡El panel experimentó un problema!
 Device	DiskView		Dispositivo
+Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		¿Está seguro de que desea formatear la Partición Extendida Intel? Si continúa, cualquier sub partición que contenga será sobrescrita. Usted será consultado nuevamente antes de que los cambios sean grabados en el disco.
 Unmount	MainWindow		Desmontar
 Failed to format the partition %s!\n	MainWindow		¡Fallo al formatear la partición %s!\n
 Partition size	CreateParametersPanel		Tamaño de partición
@@ -25,11 +29,13 @@ Validation of the given creation parameters failed.	MainWindow		Falló la valida
 Eject	MainWindow		Expulsar
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		¿Está seguro que quiere escribir los cambios en el disco ahora?\n\nToda la información en el disco %s se perderá irremisiblemente si lo hace!
 Surface test (not implemented)	MainWindow		Comprobación de superficie (no implementado)
+Read only	PartitionList		Sólo lectura
 The panel could not return successfully.	MainWindow		El panel no pudo regresar exitosamente.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Fallo al cambiar parámetros de la partición. Ningún cambio se ha escrito al disco.
 Partition %ld	DiskView		Partición %ld
 There's no space on the partition where a child partition could be created.	MainWindow		No hay espacio en la partición para crear una partición hija.
 No disk devices have been recognized.	DiskView		No se reconoce ningún dispositivo de disco.
+Attributes	PartitionList		Atributos
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Falló el borrado de la partición. No se han escrito cambios en el disco.
 Change parameters…	MainWindow		Cambiar parámetros…
 Could not unmount partition	MainWindow		No se pudo desmontar la partición
@@ -44,22 +50,30 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Limpiar (no implementado)
 The currently selected partition does not have a parent partition.	MainWindow		La partición seleccionada no tiene una partición padre.
 Validation of the given initialization parameters failed.	MainWindow		La validación de los parámetros de inicialización proporcionados falló.
+Shared	PartitionList		Compartida
+MIMEs	PartitionList		MIMEs
+BitLocker encrypted	Encryption utils		Cifrado BitLocker
 You need to select a partition entry from the list.	MainWindow		Debe seleccionar una partición de la lista.
 Offset: %s	Support		Desplazamiento: %s
+SafeBoot encrypted	Encryption utils		Cifrado SafeBoot
 Volume name	PartitionList		Nombre del volumen
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		¿Está seguro que desea escribir los cambios al disco ahora?\n\n¡Toda la información en la partición se perderá irremediablemente si lo hace!
 Change	ChangeParametersPanel		Cambiar
 Partition name:	ChangeParametersPanel		Nombre de la partición:
+LUKS encrypted	Encryption utils		Cifrado LUKS
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		¿Está seguro que desea escribir los cambios de regreso al disco ahora?\n\nToda la información de la partición %s se perderá irremediablemente si lo hace!
 Cancel	AbstractParametersPanel		Cancelar
 Format	MainWindow		Formato
+<empty or unknown>	DiskView		<empty or unknown>
 OK	MainWindow		Aceptar
+Open with DiskProbe	MainWindow		Abrir con DiskProbe
 Could not delete the selected partition.	MainWindow		No se pudo borrar la partición seleccionada.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		¿Está seguro que desea inicializar el disco seleccionado? Toda la información se perderá. Se le preguntará de nuevo antes que los cambios se escriban al disco.\n
 There was an error preparing the disk for modifications.	MainWindow		Surgió un error preparando el disco para modificaciones.
 The disk has been successfully initialized.\n	MainWindow		El disco se ha inicializado exitosamente.\n
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		¿Debería forzarse el desmontaje?\n\nNota: Si una aplicación está escribiendo en el volumen, desmontarlo ahora podría resultar en pérdida de datos.\n
 Cancel	MainWindow		Cancelar
+Free space	PartitionList		Espacio disponible
 Force unmount	MainWindow		Forzar desmontaje
 Partition	MainWindow		Partición
 Change parameters	MainWindow		Cambiar parámetros
@@ -79,6 +93,8 @@ The selected disk is read-only.	MainWindow		El disco seleccionado es de sólo le
 The partition %s is already unmounted.	MainWindow		La partición %s ya está montada.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		¿Está seguro que desea cambiar los parámetros de la partición seleccionada?\n\n¡La partición ya no podrá reconocerse por otros sistemas operativos!
 OK	AbstractParametersPanel		Aceptar
+Virtual	PartitionList		Virtual
+Virtual	DiskView		Virtual
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		¿Está seguro que desea escribir los cambios al disco ahora?\n\n¡Toda la información en el disco seleccionado se perderá irremediablemente si lo hace!
 Select a partition from the list below.	DiskView		Elija una partición de la lista inferior.
 Active	PartitionList		Activa

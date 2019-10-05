@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Touchpad	607725922
+1	spanish; castilian	x-vnd.Haiku-Touchpad	526581388
 Scrolling	TouchpadPrefView		Desplazamiento
 Tapping	TouchpadPrefView		Golpeando
 Touchpad	System name		Touchpad
@@ -7,6 +7,7 @@ OK	TouchpadPrefView		Aceptar
 Horizontal scrolling	TouchpadPrefView		Desplazamiento Horizontal
 Slow	TouchpadPrefView		Lento
 Two finger scrolling	TouchpadPrefView		Desplazamiento con dos dedos
+No touchpad found, the settings will have no effect.	TouchpadPrefView		No se encontró touchpad. La configuración no tendrá efecto.
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		El nuevo área de scroll es demasiado larga y puede impedir la operación normal del mouse. ¿Realmente quiere cambiarlo?
 Defaults	TouchpadPrefView		Valores predeterminados
 High	TouchpadPrefView		Alta

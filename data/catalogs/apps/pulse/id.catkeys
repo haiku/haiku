@@ -1,9 +1,21 @@
-1	indonesian	x-vnd.Haiku-Pulse	1887527162
+1	indonesian	x-vnd.Haiku-Pulse	3038350035
+Normal mode	DeskbarPulseView		Mode normal
+Info	CPUButton		Info
 Quit	DeskbarPulseView		Keluar
+Info	DeskbarPulseView		Info
+Normal mode	MiniPulseView		Mode normal
+Frame color	ConfigView		Warna bingkai
 Error	PulseApp		Kesalahan
 Bar colors	ConfigView		Batang warna
+%.2f GHz	NormalPulseView		%.2f GHz
+Defaults	PrefsWindow		Bawaan
 %ld MHz	NormalPulseView		%ld MHz
+Mini mode	PrefsWindow		Mode mini
+CPU progress bar	NormalPulseView		Bilah perkembangan CPU
+Fade colors	ConfigView		Warna pudar
 About Pulse…	PulseView		Tentang Pulse…
+Pulse	NormalPulseView		Denyut (Pulse)
+Deskbar mode	NormalPulseView		Mode deskbar
 OK	PrefsWindow		OKE
 About Pulse…	CPUButton		Tentang Pulse…
 Mini mode	DeskbarPulseView		Mode mini

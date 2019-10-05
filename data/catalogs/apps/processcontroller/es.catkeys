@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-ProcessController	4131818684
+1	spanish; castilian	x-vnd.Haiku-ProcessController	168752057
 Error saving file	ProcessController		Error cuando tratamos de gaurdar el archivo
 Display priority	ProcessController		Prioridad de Muestra
 That's no Fun!	ProcessController		¡No es divertido!
@@ -45,5 +45,6 @@ Damned!	ProcessController		¡Ay caramba!
 New Terminal	ProcessController		Terminal nuevo
 Power saving	ProcessController		Ahorro de energía
 ProcessController is already installed in Deskbar.	ProcessController		El Controlador de Procesos ya está instalado en barra de escritorio.
+This is the last active processor…\nYou can't turn it off!	ProcessController		Este es el último procesador activo…\n¡No puede apagarlo!
 This thread is already gone…	ProcessController		Este hilo ya sale...
 Run in window	ProcessController		Ejecutar en ventana

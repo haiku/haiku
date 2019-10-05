@@ -1,4 +1,4 @@
-1	italian	x-vnd.Be-PRNT	2042381362
+1	italian	x-vnd.Be-PRNT	1465107170
 Test page	TestPageView		Stampa di prova
 Remove	PrintersWindow		Rimuovere
 Red	TestPageView		Rosso
@@ -16,6 +16,8 @@ Waiting	JobListView		In attesa
 Processing	JobListView		Esecuzione in corso
 Cancel	AddPrinterDialog		Annulla
 Unknown status	JobListView		Status sconosciuto
+Print jobs for %printer_name%	PrintersWindow		Lavori di stampa di %printer_name%
+{0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? pagine}=1{# pagina}other{# pagine}}
 Add printer	AddPrinterDialog		Aggiungi una stampante
 Printers	PrintersWindow		Stampanti
 No printer found!	TransportMenu		Nessuna stampante trovata
@@ -29,6 +31,7 @@ Yellow	TestPageView		Giallo
 Black	TestPageView		Nero
 Printer type:	AddPrinterDialog		Tipo stampante:
 Printers	System name		Stampanti
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{Nessun lavoro di stampa in attesa}=1{1 lavoro di stampa in attesa}other{# lavori di stampa in attesa}}
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Stampante: %printer_name%\nDriver:  %driver%\n
 Green	TestPageView		Verde
 Print test page	PrintersWindow		Stampa pagina di prova

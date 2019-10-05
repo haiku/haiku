@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-BootManager	3886671855
+1	spanish; castilian	x-vnd.Haiku-BootManager	867546001
 Old Master Boot Record backup failure	BootManagerController	Title	Error al respaldar el antiguo sector de arranque maestro (MBR)
 At least one partition must be selected!	BootManagerController		Es necesario seleccionar por lo menos una partición.
 No space available!	DrivesPage	Cannot install	¡No hay espacio disponible!
@@ -16,6 +16,7 @@ Never	DefaultPartitionPage		Nunca
 Summary	BootManagerController	Title	Resumen
 An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Ha ocurrido un error al guardar el menú de arranque. El sector de arranque puede haberse dañado. ¡Restaure el MBR ahora!
 After three seconds	DefaultPartitionPage		Después de tres segundos
+Read only!	DrivesPage	Cannot install	¡Solo lectura!
 Write boot menu	BootManagerController	Button	Grabar menú de arranque
 OK	BootManagerController	Button	Aceptar
 Uninstall boot manager	BootManagerController	Title	Desinstalar Gestor de arranque

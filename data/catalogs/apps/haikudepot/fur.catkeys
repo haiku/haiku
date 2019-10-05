@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	3722851180
+1	friulian	x-vnd.Haiku-HaikuDepot	913112167
 Repository update error	LocalRepositoryUpdateProcess		Erôr di inzornament dal dipuesit
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificât un erôr intal inzornâ il dipuesit: %error%
 Check for updates…	MainWindow		Control inzornaments…
@@ -49,6 +49,7 @@ User rating	RatePackageWindow		Valutazion utents
 Installed packages	MainWindow		Pachets instalâts
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Un ogjet domandât o un ogjet che al centrave cu la richieste nol è stât cjatât sul servidôr.
 Other users can see this rating	RatePackageWindow		I altris utents a puedin viodi cheste valutazion
+The minimum age requirements must be met.	UserLoginWindow		Il recuisît pe etât minime al à di jessi rispietât.
 Stable	RatePackageWindow		Stabile
 This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		Cheste aplicazion e je masse vecje par comunicâ cul  sisteme dal servidôr di HaikuDepot.  Oten une gnove version di HaikuDepot  inzornant il sisteme Haiku.  La version minime necessarie di  HaikuDepot e je \"%s\".
 Fatal error	PackageManager		Erôr fatâl
@@ -111,6 +112,7 @@ All categories	FilterView		Dutis lis categoriis
 Repositories	MainWindow		Dipuesits
 n/a	PackageInfoView		n/d
 Cancel	MainWindow		Anule
+View agreed usage conditions…	MainWindow		Viôt lis cundizions di ûs acetadis…
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(ancjemò 1 discjariament)}other{(ancjemò # discjariaments)}}
 Refresh repositories	MainWindow		Inzorne dipuesits
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Se no si indiche une direzion email, no si podarà ristabilî la peraule di ordin, tal câs che si le dismenteedi.

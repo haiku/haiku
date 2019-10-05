@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Installer	1997609102
+1	spanish; castilian	x-vnd.Haiku-Installer	116830250
 Performing installation.	InstallProgress		Realizando instalación.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Elija el disco de origen del menú desplegable. Después haga clic en \"Empezar\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Por favor, cierre la ventana de DriveSetup antes de cerrar la ventana del Instalador.
@@ -27,6 +27,7 @@ Running Boot Manager…\n\nClose Boot Manager to continue with the installation.
 Quit DriveSetup	InstallerWindow		Salir de la configuración de la unidad
 Write boot sector	InstallerWindow		Escribir sector de arranque
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld de %2ld
+Finishing installation.	InstallProgress		Finalizando instalación.
 Install from:	InstallerWindow		Instalar desde:
 Additional disk space required: 0.0 KiB	InstallerWindow		Espacio adicional requerido en disco: 0.0 KiB
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		¡Este software es beta! Esto significa que existe el riesgo de perder información valiosa. ¡Recuerde realizar copias de seguridad con frecuencia!\n\n\n
@@ -39,6 +40,8 @@ Hide optional packages	InstallerWindow		Ocultar paquetes opcionales
 ???	InstallerWindow	Unknown partition name	¿¿¿???
 Have fun and thanks for trying out Haiku!	InstallerApp		¡Diviértase y gracias por probar Haiku!
 Quit	InstallerApp		Salir
+Starting installation.	InstallProgress		Iniciando instalación.
+Error writing boot sector.	InstallProgress		Error al escribir en el sector de arranque.
 OK	InstallerWindow		Aceptar
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Por favor cierre las ventanas de administrador de arranque y configuración de unidad antes de cerrar la ventana de instalación.
 Failed to launch Boot Manager	InstallerWindow		Fallo al iniciar Boot Manager

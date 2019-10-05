@@ -62,7 +62,7 @@ File	Menu		Archivo
 Video quality not supported	MediaConverter		Calidad de video no soportada
 Select this folder	MediaConverter		Seleccionar esta carpeta
 Error read video frame %ld	MediaConverter		Error al leer frame de vídeo %ld
-%.1f kHz %ld channel	MediaFileInfo		canal %.1f kHz %ld
+%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld canales
 %d bit 	MediaFileInfo		%d bit
 No video	Video codecs list		Sin video
 Continue	MediaConverter		Continuar

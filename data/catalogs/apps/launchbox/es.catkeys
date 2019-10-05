@@ -1,10 +1,11 @@
-1	spanish; castilian	x-vnd.Haiku-LaunchBox	3692177981
+1	spanish; castilian	x-vnd.Haiku-LaunchBox	1530497419
 Set description…	LaunchBox		Definir descripción...
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		¿Realmente desea cerrar este pad?\n(El pad no se recordará)
 OK	LaunchBox		Aceptar
 Ignore double-click	LaunchBox		Hacer caso omiso de doble clic
 Show on all workspaces	LaunchBox		Mostrar en todos espacios trabajo
 Name Panel	LaunchBox		Panel de nombre
+Autostart	LaunchBox		Inicio automático
 Clone	LaunchBox		Clonar
 Description for '%3'	LaunchBox		Descripción para: '%3'
 Show window border	LaunchBox		Mostrar borde de ventana
