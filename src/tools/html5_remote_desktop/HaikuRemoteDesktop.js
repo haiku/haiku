@@ -178,6 +178,13 @@ const B_SQUARE_CAP = B_SQUARE_JOIN;
 const B_DEFAULT_MITER_LIMIT = 10;
 
 
+// Font spacing and face
+const B_FIXED_SPACING = 3;
+
+const B_ITALIC_FACE = 0x0001;
+const B_BOLD_FACE = 0x0020;
+
+
 // modifiers
 const B_SHIFT_KEY = 0x00000001;
 const B_COMMAND_KEY = 0x00000002;
@@ -1063,7 +1070,10 @@ RemoteState.prototype.applyContext = function()
 
 	context.fillStyle = context.strokeStyle = style;
 
-	context.font = this.font.size + 'px sans';
+	context.font = (this.font.face & B_ITALIC_FACE ? "italic " : "")
+		+ (this.font.face & B_BOLD_FACE ? "bold " : "")
+		+ this.font.size + 'px '
+		+ (this.font.spacing==B_FIXED_SPACING ? 'monospace' : 'Helvetica');
 	context.globalCompositeOperation = this.drawingMode;
 	context.lineWidth = this.penSize;
 	context.lineCap = this.lineCap;
