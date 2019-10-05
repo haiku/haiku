@@ -121,9 +121,17 @@ intel_get_interrupt_mask(intel_info& info, int pipes, bool enable)
 			mask |= INTERRUPT_VBLANK_PIPEB;
 	}
 
+#if 0 // FIXME enable when we support the 3rd pipe
+	if ((pipes & INTEL_PIPE_C) != 0) {
+		if (hasPCH && !info.device_type.InGroup(INTEL_GROUP_SNB))
+			mask |= PCH_INTERRUPT_VBLANK_PIPEC;
+	}
+#endif
+
 	// On SandyBridge, there is an extra "global enable" flag, which must also
 	// be set when enabling the interrupts (but not when testing for them).
-	if (enable && info.device_type.InGroup(INTEL_GROUP_SNB))
+	if (enable && (info.device_type.InGroup(INTEL_GROUP_SNB)
+			|| info.device_type.InGroup(INTEL_GROUP_HAS)))
 		mask |= PCH_INTERRUPT_GLOBAL_SNB;
 
 	return mask;
