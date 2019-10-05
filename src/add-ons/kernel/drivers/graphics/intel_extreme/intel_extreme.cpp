@@ -507,6 +507,10 @@ intel_extreme_init(intel_info &info)
 	if (status == B_OK) {
 		info.shared_info->overlay_offset = (addr_t)info.overlay_registers
 			- info.aperture_base;
+		TRACE("Overlay registers mapped at %" B_PRIxADDR " = %p - %"
+			B_PRIxADDR " (%" B_PRIxPHYSADDR ")\n",
+			info.shared_info->overlay_offset, info.overlay_registers,
+			info.aperture_base, info.shared_info->physical_overlay_registers);
 		init_overlay_registers(info.overlay_registers);
 	} else {
 		ERROR("error: could not allocate overlay memory! %s\n",
@@ -514,6 +518,7 @@ intel_extreme_init(intel_info &info)
 	}
 
 	// Allocate hardware status page and the cursor memory
+	TRACE("Allocating hardware status page");
 
 	if (intel_allocate_memory(info, B_PAGE_SIZE, 0, B_APERTURE_NEED_PHYSICAL,
 			(addr_t*)info.shared_info->status_page,
