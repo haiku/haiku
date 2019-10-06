@@ -329,6 +329,20 @@ create_mode_list(void)
 	display_mode* list;
 	uint32 count = 0;
 
+	const color_space kSupportedSpaces[] = {B_RGB32_LITTLE, B_RGB16_LITTLE,
+		B_CMAP8};
+	const color_space* supportedSpaces;
+	int colorSpaceCount;
+
+	if (gInfo->shared_info->device_type.Generation() >= 4) {
+		// No B_RGB15, use our custom colorspace list
+		supportedSpaces = kSupportedSpaces;
+		colorSpaceCount = B_COUNT_OF(kSupportedSpaces);
+	} else {
+		supportedSpaces = NULL;
+		colorSpaceCount = 0;
+	}
+
 	// If no EDID, but have vbt from driver, use that mode
 	if (!gInfo->has_edid && gInfo->shared_info->got_vbt) {
 		// We could not read any EDID info. Fallback to creating a list with
@@ -336,13 +350,13 @@ create_mode_list(void)
 
 		// TODO: support lower modes via scaling and windowing
 		gInfo->mode_list_area = create_display_modes("intel extreme modes",
-			NULL, &gInfo->shared_info->panel_mode, 1, NULL, 0, NULL,
-			&list, &count);
+			NULL, &gInfo->shared_info->panel_mode, 1,
+			supportedSpaces, colorSpaceCount, NULL, &list, &count);
 	} else {
 		// Otherwise return the 'real' list of modes
 		gInfo->mode_list_area = create_display_modes("intel extreme modes",
-			gInfo->has_edid ? &gInfo->edid_info : NULL, NULL, 0, NULL, 0, NULL,
-			&list, &count);
+			gInfo->has_edid ? &gInfo->edid_info : NULL, NULL, 0,
+			supportedSpaces, colorSpaceCount, NULL, &list, &count);
 	}
 
 	if (gInfo->mode_list_area < B_OK)
