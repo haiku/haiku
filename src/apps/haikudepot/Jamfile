@@ -116,6 +116,8 @@ local applicationSources =
 	App.cpp
 	BarberPole.cpp
 	BitmapView.cpp
+	Captcha.cpp
+	CreateUserDetail.cpp
 	DecisionProvider.cpp
 	FeaturedPackagesView.cpp
 	FilterView.cpp
@@ -149,6 +151,8 @@ local applicationSources =
 	UserLoginWindow.cpp
 	UserUsageConditions.cpp
 	UserUsageConditionsWindow.cpp
+	ValidationFailure.cpp
+	ValidationUtils.cpp
 	WorkStatusView.cpp
 
 	# network + server / local processes

@@ -10,7 +10,10 @@
 #include <Messenger.h>
 #include <Window.h>
 
+#include "CreateUserDetail.h"
 #include "PackageInfo.h"
+#include "UserCredentials.h"
+#include "ValidationFailure.h"
 
 
 class BButton;
@@ -19,6 +22,7 @@ class BMenuField;
 class BTabView;
 class BTextControl;
 class BitmapView;
+class Captcha;
 class LinkView;
 class Model;
 class UserUsageConditions;
@@ -30,6 +34,7 @@ public:
 									Model& model);
 	virtual						~UserLoginWindow();
 
+	virtual	bool				QuitRequested();
 	virtual	void				MessageReceived(BMessage* message);
 
 			void				SetOnSuccessMessage(
@@ -45,28 +50,59 @@ private:
 			};
 
 			void				_SetMode(Mode mode);
-			bool				_ValidateCreateAccountFields(
-									bool alertProblems = false);
-			void				_Login();
+			void				_SetWorkerThread(thread_id thread);
+			void				_SetWorkerThreadLocked(thread_id thread);
+
+			void				_Authenticate();
+			void				_Authenticate(
+									const UserCredentials& credentials);
+	static	int32				_AuthenticateThreadEntry(void* data);
+			void				_AuthenticateThread(
+									UserCredentials& credentials);
+			void				_UnpackAuthenticationToken(
+									BMessage& responsePayload, BString& token);
+			void				_HandleAuthenticationFailed();
+			void				_HandleAuthenticationSuccess(
+									const UserCredentials & credentials);
+			void				_HandleAuthenticationError();
+
 			void				_CreateAccount();
+			void				_AssembleCreateUserDetail(
+									CreateUserDetail& detail);
+			void				_ValidateCreateUserDetail(
+									CreateUserDetail& detail,
+									ValidationFailures& failures);
+			void				_AlertCreateUserValidationFailure(
+									const ValidationFailures& failures);
+	static	BString				_CreateAlertTextFromValidationFailure(
+									const BString& property,
+									const BString& message);
+			void				_MarkCreateUserInvalidFields();
+			void				_MarkCreateUserInvalidFields(
+									const ValidationFailures& failures);
+	static	int32				_CreateAccountThreadEntry(void* data);
+			void				_CreateAccountThread(CreateUserDetail* detail);
+			void				_HandleCreateAccountSuccess(
+									const UserCredentials& credentials);
+			void				_HandleCreateAccountFailure(
+									const ValidationFailures& failures);
+			void				_HandleCreateAccountError();
+
 			void				_CreateAccountSetup(uint32 mask);
 			void				_CreateAccountSetupIfNecessary();
-			void				_LoginSuccessful(const BString& message);
-
-			void				_SetWorkerThread(thread_id thread);
-
-	static	int32				_AuthenticateThreadEntry(void* data);
-			void				_AuthenticateThread();
-
 	static	int32				_CreateAccountSetupThreadEntry(void* data);
-			void				_CreateAccountCaptchaSetupThread();
-			void				_CreateAccountUserUsageConditionsSetupThread();
+			status_t			_CreateAccountCaptchaSetupThread(
+									Captcha& captcha);
+			status_t			_CreateAccountUserUsageConditionsSetupThread(
+									UserUsageConditions& userUsageConditions);
+			status_t			_UnpackCaptcha(BMessage& responsePayload,
+									Captcha& captcha);
+			void				_HandleCreateAccountSetupSuccess(
+									BMessage* message);
 
+			void				_SetCaptcha(Captcha* captcha);
 			void				_SetUserUsageConditions(
 									UserUsageConditions* userUsageConditions);
-
-	static	int32				_CreateAccountThreadEntry(void* data);
-			void				_CreateAccountThread();
 
 			void				_CollectValidationFailures(
 									const BMessage& result,
@@ -74,16 +110,25 @@ private:
 
 			void				_ViewUserUsageConditions();
 
+			void				_TakeUpCredentialsAndQuit(
+									const UserCredentials& credentials);
+
+			void				_EnableMutableControls(bool enabled);
+
+	static	void				_ValidationFailuresToString(
+									const ValidationFailures& failures,
+									BString& output);
+
 private:
 			BMessenger			fOnSuccessTarget;
 			BMessage			fOnSuccessMessage;
 
 			BTabView*			fTabView;
 
-			BTextControl*		fUsernameField;
+			BTextControl*		fNicknameField;
 			BTextControl*		fPasswordField;
 
-			BTextControl*		fNewUsernameField;
+			BTextControl*		fNewNicknameField;
 			BTextControl*		fNewPasswordField;
 			BTextControl*		fRepeatPasswordField;
 			BTextControl*		fEmailField;
@@ -97,19 +142,18 @@ private:
 			BButton*			fSendButton;
 			BButton*			fCancelButton;
 
-			BString				fCaptchaToken;
-			BitmapRef			fCaptchaImage;
+			UserUsageConditions*
+								fUserUsageConditions;
+			Captcha*			fCaptcha;
 			BString				fPreferredLanguageCode;
 
 			Model&				fModel;
 
 			Mode				fMode;
 
-			UserUsageConditions*
-								fUserUsageConditions;
-
 			BLocker				fLock;
 			thread_id			fWorkerThread;
+			bool				fQuitRequestedDuringWorkerThread;
 };
 
 

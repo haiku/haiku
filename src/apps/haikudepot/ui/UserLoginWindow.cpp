@@ -22,17 +22,20 @@
 #include <MenuField.h>
 #include <PopUpMenu.h>
 #include <TextControl.h>
-#include <UnicodeChar.h>
 
 #include "AppUtils.h"
 #include "BitmapView.h"
+#include "Captcha.h"
 #include "HaikuDepotConstants.h"
 #include "LanguageMenuUtils.h"
 #include "LinkView.h"
+#include "Logger.h"
 #include "Model.h"
+#include "ServerHelper.h"
 #include "TabView.h"
 #include "UserUsageConditions.h"
 #include "UserUsageConditionsWindow.h"
+#include "ValidationUtils.h"
 #include "WebAppInterface.h"
 
 
@@ -41,36 +44,74 @@
 
 #define PLACEHOLDER_TEXT B_UTF8_ELLIPSIS
 
+#define KEY_USER_CREDENTIALS			"userCredentials"
+#define KEY_CAPTCHA_IMAGE				"captchaImage"
+#define KEY_USER_USAGE_CONDITIONS		"userUsageConditions"
+#define KEY_VALIDATION_FAILURES			"validationFailures"
+
+
 enum ActionTabs {
-	TAB_LOGIN					= 0,
-	TAB_CREATE_ACCOUNT			= 1
+	TAB_LOGIN							= 0,
+	TAB_CREATE_ACCOUNT					= 1
 };
+
 
 enum {
-	MSG_SEND					= 'send',
-	MSG_TAB_SELECTED			= 'tbsl',
-	MSG_CAPTCHA_OBTAINED		= 'cpob',
-	MSG_VALIDATE_FIELDS			= 'vldt'
+	MSG_SEND							= 'send',
+	MSG_TAB_SELECTED					= 'tbsl',
+	MSG_CREATE_ACCOUNT_SETUP_SUCCESS	= 'cass',
+	MSG_CREATE_ACCOUNT_SETUP_ERROR		= 'case',
+	MSG_VALIDATE_FIELDS					= 'vldt',
+	MSG_LOGIN_SUCCESS					= 'lsuc',
+	MSG_LOGIN_FAILED					= 'lfai',
+	MSG_LOGIN_ERROR						= 'lter',
+	MSG_CREATE_ACCOUNT_SUCCESS			= 'csuc',
+	MSG_CREATE_ACCOUNT_FAILED			= 'cfai',
+	MSG_CREATE_ACCOUNT_ERROR			= 'cfae'
 };
 
-/*! The creation of an account requires that some prerequisite data is first
-    loaded in or may later need to be refreshed.  This enum controls what
-    elements of the setup should be performed.
+
+/*!	The creation of an account requires that some prerequisite data is first
+	loaded in or may later need to be refreshed.  This enum controls what
+	elements of the setup should be performed.
 */
 
 enum CreateAccountSetupMask {
-	CREATE_CAPTCHA					= 1 << 1,
-	FETCH_USER_USAGE_CONDITIONS		= 1 << 2
+	CREATE_CAPTCHA						= 1 << 1,
+	FETCH_USER_USAGE_CONDITIONS			= 1 << 2
 };
 
-/*! A background thread runs to gather data to use in the interface for creating
-    a new user.  This structure is passed to the background thread.
+
+/*!	To create a user, some details need to be provided.  Those details together
+	with a pointer to the window structure are provided to the background thread
+	using this struct.
+*/
+
+struct CreateAccountThreadData {
+	UserLoginWindow*		window;
+	CreateUserDetail*		detail;
+};
+
+
+/*!	A background thread runs to gather data to use in the interface for creating
+	a new user.  This structure is passed to the background thread.
 */
 
 struct CreateAccountSetupThreadData {
-	UserLoginWindow*	window;
-	uint32				mask;
+	UserLoginWindow*		window;
+	uint32					mask;
 		// defines what setup steps are required
+};
+
+
+/*!	A background thread runs to authenticate the user with the remote server
+	system.  This structure provides the thread with the necessary data to
+	perform this work.
+*/
+
+struct AuthenticateSetupThreadData {
+	UserLoginWindow*		window;
+	UserCredentials*		credentials;
 };
 
 
@@ -79,25 +120,27 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 	BWindow(frame, B_TRANSLATE("Log in"),
 		B_FLOATING_WINDOW_LOOK, B_FLOATING_SUBSET_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS
-			| B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
+			| B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_CLOSE_ON_ESCAPE),
+	fUserUsageConditions(NULL),
+	fCaptcha(NULL),
 	fPreferredLanguageCode(LANGUAGE_DEFAULT_CODE),
 	fModel(model),
 	fMode(NONE),
-	fUserUsageConditions(NULL),
-	fWorkerThread(-1)
+	fWorkerThread(-1),
+	fQuitRequestedDuringWorkerThread(false)
 {
 	AddToSubset(parent);
 
-	fUsernameField = new BTextControl(B_TRANSLATE("User name:"), "", NULL);
-	fPasswordField = new BTextControl(B_TRANSLATE("Pass phrase:"), "", NULL);
+	fNicknameField = new BTextControl(B_TRANSLATE("Nickname:"), "", NULL);
+	fPasswordField = new BTextControl(B_TRANSLATE("Password:"), "", NULL);
 	fPasswordField->TextView()->HideTyping(true);
 
-	fNewUsernameField = new BTextControl(B_TRANSLATE("User name:"), "",
+	fNewNicknameField = new BTextControl(B_TRANSLATE("Nickname:"), "",
 		NULL);
-	fNewPasswordField = new BTextControl(B_TRANSLATE("Pass phrase:"), "",
+	fNewPasswordField = new BTextControl(B_TRANSLATE("Password:"), "",
 		new BMessage(MSG_VALIDATE_FIELDS));
 	fNewPasswordField->TextView()->HideTyping(true);
-	fRepeatPasswordField = new BTextControl(B_TRANSLATE("Repeat pass phrase:"),
+	fRepeatPasswordField = new BTextControl(B_TRANSLATE("Repeat password:"),
 		"", new BMessage(MSG_VALIDATE_FIELDS));
 	fRepeatPasswordField->TextView()->HideTyping(true);
 
@@ -139,7 +182,7 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 
 	// Setup modification messages on all text fields to trigger validation
 	// of input
-	fNewUsernameField->SetModificationMessage(
+	fNewNicknameField->SetModificationMessage(
 		new BMessage(MSG_VALIDATE_FIELDS));
 	fNewPasswordField->SetModificationMessage(
 		new BMessage(MSG_VALIDATE_FIELDS));
@@ -154,7 +197,7 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 
 	BGridView* loginCard = new BGridView(B_TRANSLATE("Log in"));
 	BLayoutBuilder::Grid<>(loginCard)
-		.AddTextControl(fUsernameField, 0, 0)
+		.AddTextControl(fNicknameField, 0, 0)
 		.AddTextControl(fPasswordField, 0, 1)
 		.AddGlue(0, 2)
 
@@ -164,7 +207,7 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 
 	BGridView* createAccountCard = new BGridView(B_TRANSLATE("Create account"));
 	BLayoutBuilder::Grid<>(createAccountCard)
-		.AddTextControl(fNewUsernameField, 0, 0)
+		.AddTextControl(fNewNicknameField, 0, 0)
 		.AddTextControl(fNewPasswordField, 0, 1)
 		.AddTextControl(fRepeatPasswordField, 0, 2)
 		.AddTextControl(fEmailField, 0, 3)
@@ -216,7 +259,7 @@ UserLoginWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MSG_VALIDATE_FIELDS:
-			_ValidateCreateAccountFields();
+			_MarkCreateUserInvalidFields();
 			break;
 
 		case MSG_VIEW_LATEST_USER_USAGE_CONDITIONS:
@@ -226,7 +269,7 @@ UserLoginWindow::MessageReceived(BMessage* message)
 		case MSG_SEND:
 			switch (fMode) {
 				case LOGIN:
-					_Login();
+					_Authenticate();
 					break;
 				case CREATE_ACCOUNT:
 					_CreateAccount();
@@ -254,27 +297,86 @@ UserLoginWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case MSG_CAPTCHA_OBTAINED:
-			if (fCaptchaImage.Get() != NULL) {
-				fCaptchaView->SetBitmap(fCaptchaImage);
-			} else {
-				fCaptchaView->UnsetBitmap();
-			}
-			fCaptchaResultField->SetText("");
+		case MSG_CREATE_ACCOUNT_SETUP_ERROR:
+			printf("failed to setup for account setup - window must quit\n");
+			BMessenger(this).SendMessage(B_QUIT_REQUESTED);
 			break;
 
-		case MSG_USER_USAGE_CONDITIONS_DATA:
-			_SetUserUsageConditions(new UserUsageConditions(message));
+		case MSG_CREATE_ACCOUNT_SETUP_SUCCESS:
+			_HandleCreateAccountSetupSuccess(message);
 			break;
 
 		case MSG_LANGUAGE_SELECTED:
 			message->FindString("code", &fPreferredLanguageCode);
 			break;
 
+		case MSG_LOGIN_ERROR:
+			_HandleAuthenticationError();
+			break;
+
+		case MSG_LOGIN_FAILED:
+			_HandleAuthenticationFailed();
+			break;
+
+		case MSG_LOGIN_SUCCESS:
+		{
+			BMessage credentialsMessage;
+			if (message->FindMessage(KEY_USER_CREDENTIALS,
+					&credentialsMessage) != B_OK) {
+				debugger("expected key in internal message not found");
+			}
+
+			_HandleAuthenticationSuccess(
+				UserCredentials(&credentialsMessage));
+			break;
+		}
+		case MSG_CREATE_ACCOUNT_SUCCESS:
+		{
+			BMessage credentialsMessage;
+			if (message->FindMessage(KEY_USER_CREDENTIALS,
+					&credentialsMessage) != B_OK) {
+				debugger("expected key in internal message not found");
+			}
+
+			_HandleCreateAccountSuccess(
+				UserCredentials(&credentialsMessage));
+			break;
+		}
+		case MSG_CREATE_ACCOUNT_FAILED:
+		{
+			BMessage validationFailuresMessage;
+			if (message->FindMessage(KEY_VALIDATION_FAILURES,
+					&validationFailuresMessage) != B_OK) {
+				debugger("expected key in internal message not found");
+			}
+			ValidationFailures validationFailures(&validationFailuresMessage);
+			_HandleCreateAccountFailure(validationFailures);
+			break;
+		}
+		case MSG_CREATE_ACCOUNT_ERROR:
+			_HandleCreateAccountError();
+			break;
 		default:
 			BWindow::MessageReceived(message);
 			break;
 	}
+}
+
+
+bool
+UserLoginWindow::QuitRequested()
+{
+	BAutolock locker(&fLock);
+
+	if (fWorkerThread >= 0) {
+		if (Logger::IsDebugEnabled())
+			printf("quit requested while worker thread is operating -- will "
+				"try again once the worker thread has completed\n");
+		fQuitRequestedDuringWorkerThread = true;
+		return false;
+	}
+
+	return true;
 }
 
 
@@ -284,6 +386,24 @@ UserLoginWindow::SetOnSuccessMessage(
 {
 	fOnSuccessTarget = messenger;
 	fOnSuccessMessage = message;
+}
+
+
+void
+UserLoginWindow::_EnableMutableControls(bool enabled)
+{
+	fNicknameField->SetEnabled(enabled);
+	fPasswordField->SetEnabled(enabled);
+	fNewNicknameField->SetEnabled(enabled);
+	fNewPasswordField->SetEnabled(enabled);
+	fRepeatPasswordField->SetEnabled(enabled);
+	fEmailField->SetEnabled(enabled);
+	fLanguageCodeField->SetEnabled(enabled);
+	fCaptchaResultField->SetEnabled(enabled);
+	fConfirmMinimumAgeCheckBox->SetEnabled(enabled);
+	fConfirmUserUsageConditionsCheckBox->SetEnabled(enabled);
+	fUserUsageConditionsLink->SetEnabled(enabled);
+	fSendButton->SetEnabled(enabled);
 }
 
 
@@ -299,14 +419,14 @@ UserLoginWindow::_SetMode(Mode mode)
 		case LOGIN:
 			fTabView->Select(TAB_LOGIN);
 			fSendButton->SetLabel(B_TRANSLATE("Log in"));
-			fUsernameField->MakeFocus();
+			fNicknameField->MakeFocus();
 			break;
 		case CREATE_ACCOUNT:
 			fTabView->Select(TAB_CREATE_ACCOUNT);
 			fSendButton->SetLabel(B_TRANSLATE("Create account"));
 			_CreateAccountSetupIfNecessary();
-			fNewUsernameField->MakeFocus();
-			_ValidateCreateAccountFields();
+			fNewNicknameField->MakeFocus();
+			_MarkCreateUserInvalidFields();
 			break;
 		default:
 			break;
@@ -314,185 +434,246 @@ UserLoginWindow::_SetMode(Mode mode)
 }
 
 
-static int32
-count_digits(const BString& string)
+void
+UserLoginWindow::_SetWorkerThreadLocked(thread_id thread)
 {
-	int32 digits = 0;
-	const char* c = string.String();
-	for (int32 i = 0; i < string.CountChars(); i++) {
-		uint32 unicodeChar = BUnicodeChar::FromUTF8(&c);
-		if (BUnicodeChar::IsDigit(unicodeChar))
-			digits++;
-	}
-	return digits;
-}
-
-
-static int32
-count_upper_case_letters(const BString& string)
-{
-	int32 upperCaseLetters = 0;
-	const char* c = string.String();
-	for (int32 i = 0; i < string.CountChars(); i++) {
-		uint32 unicodeChar = BUnicodeChar::FromUTF8(&c);
-		if (BUnicodeChar::IsUpper(unicodeChar))
-			upperCaseLetters++;
-	}
-	return upperCaseLetters;
-}
-
-
-static bool
-contains_any_whitespace(const BString& string)
-{
-	const char* c = string.String();
-	for (int32 i = 0; i < string.CountChars(); i++) {
-		if (isspace(c[i]))
-			return true;
-	}
-
-	return false;
-}
-
-
-/*! This method will check that the inputs in the user interface are, as far as
-    the desktop application can be sure, correct.
-    \return true if the data in the form was valid.
-*/
-
-bool
-UserLoginWindow::_ValidateCreateAccountFields(bool alertProblems)
-{
-	BString nickName(fNewUsernameField->Text());
-	BString password1(fNewPasswordField->Text());
-	BString password2(fRepeatPasswordField->Text());
-	BString email(fEmailField->Text());
-	BString captcha(fCaptchaResultField->Text());
-	bool minimumAgeConfirmed = fConfirmMinimumAgeCheckBox->Value()
-		== B_CONTROL_ON;
-	bool userUsageConditionsConfirmed =
-		fConfirmUserUsageConditionsCheckBox->Value() == B_CONTROL_ON;
-
-	// TODO: Use the same validation as the web-serivce
-
-	bool validEmail = email.IsEmpty() ||
-		(B_ERROR != email.FindFirst("@") && !contains_any_whitespace(email));
-	fEmailField->MarkAsInvalid(!validEmail);
-
-	bool validUserName = nickName.Length() >= 3;
-	fNewUsernameField->MarkAsInvalid(!validUserName);
-
-	bool validPassword = password1.Length() >= 8
-		&& count_digits(password1) >= 2
-		&& count_upper_case_letters(password1) >= 2;
-	fNewPasswordField->MarkAsInvalid(!validPassword);
-	fRepeatPasswordField->MarkAsInvalid(password1 != password2);
-
-	bool validCaptcha = captcha.Length() > 0;
-	fCaptchaResultField->MarkAsInvalid(!validCaptcha);
-
-	bool valid = validUserName && validPassword && password1 == password2
-		&& validCaptcha && minimumAgeConfirmed && userUsageConditionsConfirmed
-		&& validEmail;
-
-	if (!valid && alertProblems) {
-		BString message = B_TRANSLATE("There are problems in the form:\n\n");
-
-		if (!validUserName) {
-			message << B_TRANSLATE(
-				"The user name needs to be at least "
-				"3 letters long.") << "\n\n";
-		}
-		if (!validPassword) {
-			message << B_TRANSLATE(
-				"The password is too weak or invalid. "
-				"Please use at least 8 characters with "
-				"at least 2 numbers and 2 upper-case "
-				"letters.") << "\n\n";
-		}
-		if (password1 != password2) {
-			message << B_TRANSLATE(
-				"The passwords do not match.") << "\n\n";
-		}
-		if (email.Length() == 0) {
-			message << B_TRANSLATE(
-				"If you do not provide an email address, "
-				"you will not be able to reset your password "
-				"if you forget it.") << "\n\n";
-		}
-		if (!validCaptcha) {
-			message << B_TRANSLATE(
-				"The captcha puzzle needs to be solved.") << "\n\n";
-		}
-
-		if (!minimumAgeConfirmed) {
-			message << B_TRANSLATE(
-				"The minimum age requirements must be met.") << "\n\n";
-		}
-
-		if (!userUsageConditionsConfirmed) {
-			message << B_TRANSLATE(
-				"The usage conditions must be agreed to.") << "\n\n";
-		}
-
-		BAlert* alert = new(std::nothrow) BAlert(
-			B_TRANSLATE("Input validation"),
-			message,
-			B_TRANSLATE("OK"), NULL, NULL,
-			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-
-		if (alert != NULL)
-			alert->Go();
-	}
-
-	return valid;
+	BAutolock locker(&fLock);
+	_SetWorkerThread(thread);
 }
 
 
 void
-UserLoginWindow::_Login()
+UserLoginWindow::_SetWorkerThread(thread_id thread)
+{
+	if (thread >= 0) {
+		fWorkerThread = thread;
+		resume_thread(fWorkerThread);
+	} else {
+		fWorkerThread = -1;
+		if (fQuitRequestedDuringWorkerThread)
+			BMessenger(this).SendMessage(B_QUIT_REQUESTED);
+		fQuitRequestedDuringWorkerThread = false;
+	}
+}
+
+
+// #pragma mark - Authentication
+
+
+void
+UserLoginWindow::_Authenticate()
+{
+	_Authenticate(UserCredentials(
+		fNicknameField->Text(), fPasswordField->Text()));
+}
+
+
+void
+UserLoginWindow::_Authenticate(const UserCredentials& credentials)
 {
 	BAutolock locker(&fLock);
 
 	if (fWorkerThread >= 0)
 		return;
+
+	_EnableMutableControls(false);
+	AuthenticateSetupThreadData* threadData = new AuthenticateSetupThreadData();
+		// this will be owned and deleted by the thread
+	threadData->window = this;
+	threadData->credentials = new UserCredentials(credentials);
 
 	thread_id thread = spawn_thread(&_AuthenticateThreadEntry,
-		"Authenticator", B_NORMAL_PRIORITY, this);
+		"Authentication", B_NORMAL_PRIORITY, threadData);
 	if (thread >= 0)
 		_SetWorkerThread(thread);
+}
+
+
+/*static*/ int32
+UserLoginWindow::_AuthenticateThreadEntry(void* data)
+{
+	AuthenticateSetupThreadData* threadData
+		= static_cast<AuthenticateSetupThreadData*>(data);
+	threadData->window->_AuthenticateThread(*(threadData->credentials));
+	threadData->window->_SetWorkerThreadLocked(-1);
+	delete threadData->credentials;
+	delete threadData;
+	return 0;
 }
 
 
 void
-UserLoginWindow::_CreateAccount()
+UserLoginWindow::_AuthenticateThread(UserCredentials& userCredentials)
 {
-	if (!_ValidateCreateAccountFields(true))
-		return;
+	BMessage responsePayload;
+	WebAppInterface interface = fModel.GetWebAppInterface();
+	status_t status = interface.AuthenticateUser(
+		userCredentials.Nickname(), userCredentials.PasswordClear(),
+		responsePayload);
+	BString token;
 
-	BAutolock locker(&fLock);
+	if (status == B_OK) {
+		int32 errorCode = interface.ErrorCodeFromResponse(responsePayload);
 
-	if (fWorkerThread >= 0)
-		return;
+		if (errorCode == ERROR_CODE_NONE)
+			_UnpackAuthenticationToken(responsePayload, token);
+		else {
+			ServerHelper::NotifyServerJsonRpcError(responsePayload);
+			BMessenger(this).SendMessage(MSG_LOGIN_ERROR);
+			return;
+				// early exit
+		}
+	}
 
-	thread_id thread = spawn_thread(&_CreateAccountThreadEntry,
-		"Account creator", B_NORMAL_PRIORITY, this);
-	if (thread >= 0)
-		_SetWorkerThread(thread);
+	if (status == B_OK) {
+		userCredentials.SetIsSuccessful(!token.IsEmpty());
+
+		if (Logger::IsDebugEnabled()) {
+			if (token.IsEmpty())
+				printf("authentication failed\n");
+			else
+				printf("authentication successful\n");
+		}
+
+		BMessenger messenger(this);
+
+		if (userCredentials.IsSuccessful()) {
+			BMessage message(MSG_LOGIN_SUCCESS);
+			BMessage credentialsMessage;
+			status = userCredentials.Archive(&credentialsMessage);
+			if (status == B_OK)
+				status = message.AddMessage(KEY_USER_CREDENTIALS, &credentialsMessage);
+			if (status == B_OK)
+				messenger.SendMessage(&message);
+		} else {
+			BMessage message(MSG_LOGIN_FAILED);
+			messenger.SendMessage(&message);
+		}
+	} else {
+		ServerHelper::NotifyTransportError(status);
+		BMessenger(this).SendMessage(MSG_LOGIN_ERROR);
+	}
 }
 
+
+void
+UserLoginWindow::_UnpackAuthenticationToken(BMessage& responsePayload,
+	BString& token)
+{
+	BMessage resultPayload;
+	if (responsePayload.FindMessage("result", &resultPayload) == B_OK) {
+		resultPayload.FindString("token", &token);
+			// We don't care for or store the token for now. The web-service
+			// supports two methods of authorizing requests. One is via
+			// Basic Authentication in the HTTP header, the other is via
+			// Token Bearer. Since the connection is encrypted, it is hopefully
+			// ok to send the password with each request instead of implementing
+			// the Token Bearer. See section 5.1.2 in the haiku-depot-web
+			// documentation.
+	}
+}
+
+
+/*!	This method gets hit when an error occurs while authenticating; something
+	like a network error.  Because of the large number of possible errors, the
+	reporting of the error is handled separately from this method.  This method
+	only needs to take responsibility for returning the GUI and state of the
+	window to a situation where the user can try again.
+*/
+
+void
+UserLoginWindow::_HandleAuthenticationError()
+{
+	_EnableMutableControls(true);
+}
+
+
+void
+UserLoginWindow::_HandleAuthenticationFailed()
+{
+	AppUtils::NotifySimpleError(
+		B_TRANSLATE("Authentication failed"),
+		B_TRANSLATE("The user does not exist or the wrong was"
+			" supplied. Check your credentials and try again.")
+	);
+	fPasswordField->SetText("");
+	_EnableMutableControls(true);
+}
+
+
+/*!	This is called when the user has successfully authenticated with the remote
+	HaikuDepotServer system; this handles the take-up of the data and closing
+	the window etc...
+*/
+
+void
+UserLoginWindow::_HandleAuthenticationSuccess(
+	const UserCredentials& credentials)
+{
+	BString message = B_TRANSLATE("You have successfully authenticated as user "
+		"%Nickname%.");
+	message.ReplaceAll("%Nickname%", credentials.Nickname());
+
+	BAlert* alert = new(std::nothrow) BAlert(
+		B_TRANSLATE("Success"), message, B_TRANSLATE("Close"));
+
+	if (alert != NULL)
+		alert->Go();
+
+	_TakeUpCredentialsAndQuit(credentials);
+}
+
+
+/*!	This method will fire any configured target + message, will set the
+	authentication details (credentials) into the system so that further API
+	calls etc... will be from this user and will quit the window.
+*/
+
+void
+UserLoginWindow::_TakeUpCredentialsAndQuit(const UserCredentials& credentials)
+{
+	{
+		AutoLocker<BLocker> locker(fModel.Lock());
+		fModel.SetAuthorization(credentials.Nickname(),
+			credentials.PasswordClear(), true);
+	}
+
+	// Clone these fields before the window goes away.
+	BMessenger onSuccessTarget(fOnSuccessTarget);
+	BMessage onSuccessMessage(fOnSuccessMessage);
+
+	BMessenger(this).SendMessage(B_QUIT_REQUESTED);
+
+	// Send the success message after the alert has been closed,
+	// otherwise more windows will popup alongside the alert.
+	if (onSuccessTarget.IsValid() && onSuccessMessage.what != 0)
+		onSuccessTarget.SendMessage(&onSuccessMessage);
+}
+
+
+// #pragma mark - Create Account Setup
+
+
+/*!	This method will trigger the process of gathering the data from the server
+	that is necessary for setting up an account.  It will only gather that data
+	that it does not already have to avoid extra work.
+*/
 
 void
 UserLoginWindow::_CreateAccountSetupIfNecessary()
 {
 	uint32 setupMask = 0;
-	if (fCaptchaToken.IsEmpty())
+	if (fCaptcha == NULL)
 		setupMask |= CREATE_CAPTCHA;
 	if (fUserUsageConditions == NULL)
 		setupMask |= FETCH_USER_USAGE_CONDITIONS;
 	_CreateAccountSetup(setupMask);
 }
 
+
+/*!	Fetches the data required for creating an account.
+	\param mask describes what data is required to be fetched.
+*/
 
 void
 UserLoginWindow::_CreateAccountSetup(uint32 mask)
@@ -508,17 +689,12 @@ UserLoginWindow::_CreateAccountSetup(uint32 mask)
 	if (!Lock())
 		debugger("unable to lock the user login window");
 
-	if ((mask & CREATE_CAPTCHA) != 0) {
-		fCaptchaToken = "";
-		fCaptchaView->UnsetBitmap();
-		fCaptchaImage.Unset();
-	}
+	_EnableMutableControls(false);
 
-	if ((mask & FETCH_USER_USAGE_CONDITIONS) != 0) {
-		fConfirmMinimumAgeCheckBox->SetLabel(PLACEHOLDER_TEXT);
-		fConfirmMinimumAgeCheckBox->SetValue(0);
-		fConfirmUserUsageConditionsCheckBox->SetValue(0);
-	}
+	if ((mask & CREATE_CAPTCHA) != 0)
+		_SetCaptcha(NULL);
+	if ((mask & FETCH_USER_USAGE_CONDITIONS) != 0)
+		_SetUserUsageConditions(NULL);
 
 	Unlock();
 
@@ -529,172 +705,10 @@ UserLoginWindow::_CreateAccountSetup(uint32 mask)
 	thread_id thread = spawn_thread(&_CreateAccountSetupThreadEntry,
 		"Create account setup", B_NORMAL_PRIORITY, threadData);
 	if (thread >= 0)
-		_SetWorkerThread(thread);
+		_SetWorkerThreadLocked(thread);
 	else {
 		debugger("unable to start a thread to gather data for creating an "
 			"account");
-	}
-}
-
-
-void
-UserLoginWindow::_LoginSuccessful(const BString& message)
-{
-	// Clone these fields before the window goes away.
-	// (This method is executd from another thread.)
-	BMessenger onSuccessTarget(fOnSuccessTarget);
-	BMessage onSuccessMessage(fOnSuccessMessage);
-
-	BMessenger(this).SendMessage(B_QUIT_REQUESTED);
-
-	BAlert* alert = new(std::nothrow) BAlert(
-		B_TRANSLATE("Success"),
-		message,
-		B_TRANSLATE("Close"));
-
-	if (alert != NULL)
-		alert->Go();
-
-	// Send the success message after the alert has been closed,
-	// otherwise more windows will popup alongside the alert.
-	if (onSuccessTarget.IsValid() && onSuccessMessage.what != 0)
-		onSuccessTarget.SendMessage(&onSuccessMessage);
-}
-
-
-void
-UserLoginWindow::_SetWorkerThread(thread_id thread)
-{
-	if (!Lock())
-		return;
-
-	bool enabled = thread < 0;
-
-	fUsernameField->SetEnabled(enabled);
-	fPasswordField->SetEnabled(enabled);
-	fNewUsernameField->SetEnabled(enabled);
-	fNewPasswordField->SetEnabled(enabled);
-	fRepeatPasswordField->SetEnabled(enabled);
-	fEmailField->SetEnabled(enabled);
-	fLanguageCodeField->SetEnabled(enabled);
-	fCaptchaResultField->SetEnabled(enabled);
-	fConfirmMinimumAgeCheckBox->SetEnabled(enabled);
-	fConfirmUserUsageConditionsCheckBox->SetEnabled(enabled);
-	fUserUsageConditionsLink->SetEnabled(enabled);
-	fSendButton->SetEnabled(enabled);
-
-	if (thread >= 0) {
-		fWorkerThread = thread;
-		resume_thread(fWorkerThread);
-	} else {
-		fWorkerThread = -1;
-	}
-
-	Unlock();
-}
-
-
-void
-UserLoginWindow::_CreateAccountUserUsageConditionsSetupThread()
-{
-	UserUsageConditions conditions;
-	WebAppInterface interface = fModel.GetWebAppInterface();
-
-	if (interface.RetrieveUserUsageConditions(NULL, conditions) == B_OK) {
-		BMessage dataMessage(MSG_USER_USAGE_CONDITIONS_DATA);
-		conditions.Archive(&dataMessage, true);
-		BMessenger(this).SendMessage(&dataMessage);
-	} else {
-		AppUtils::NotifySimpleError(
-			B_TRANSLATE("Usage conditions download problem"),
-			B_TRANSLATE("An error has arisen downloading the usage "
-				"conditions. Check the log for details and try again."));
-		BMessenger(this).SendMessage(B_QUIT_REQUESTED);
-	}
-}
-
-
-/*! This method is hit when the user usage conditions data arrives back from the
-    server.  At this point some of the UI elements may need to be updated.
-*/
-
-void
-UserLoginWindow::_SetUserUsageConditions(
-	UserUsageConditions* userUsageConditions)
-{
-	fUserUsageConditions = userUsageConditions;
-	BString minimumAgeString;
-	minimumAgeString.SetToFormat("%" B_PRId8,
-		fUserUsageConditions->MinimumAge());
-	BString label = B_TRANSLATE(
-		"I am %MinimumAgeYears% years of age or older");
-	label.ReplaceAll("%MinimumAgeYears%", minimumAgeString);
-	fConfirmMinimumAgeCheckBox->SetLabel(label);
-}
-
-
-int32
-UserLoginWindow::_AuthenticateThreadEntry(void* data)
-{
-	UserLoginWindow* window = reinterpret_cast<UserLoginWindow*>(data);
-	window->_AuthenticateThread();
-	return 0;
-}
-
-
-void
-UserLoginWindow::_AuthenticateThread()
-{
-	if (!Lock())
-		return;
-
-	BString nickName(fUsernameField->Text());
-	BString passwordClear(fPasswordField->Text());
-
-	Unlock();
-
-	WebAppInterface interface;
-	BMessage info;
-
-	status_t status = interface.AuthenticateUser(
-		nickName, passwordClear, info);
-
-	BString error = B_TRANSLATE("Authentication failed. "
-		"Connection to the service failed.");
-
-	BMessage result;
-	if (status == B_OK && info.FindMessage("result", &result) == B_OK) {
-		BString token;
-		if (result.FindString("token", &token) == B_OK && !token.IsEmpty()) {
-			// We don't care for or store the token for now. The web-service
-			// supports two methods of authorizing requests. One is via
-			// Basic Authentication in the HTTP header, the other is via
-			// Token Bearer. Since the connection is encrypted, it is hopefully
-			// ok to send the password with each request instead of implementing
-			// the Token Bearer. See section 5.1.2 in the haiku-depot-web
-			// documentation.
-			error = "";
-			fModel.SetAuthorization(nickName, passwordClear, true);
-		} else {
-			error = B_TRANSLATE("Authentication failed. The user does "
-				"not exist or the wrong password was supplied.");
-		}
-	}
-
-	if (!error.IsEmpty()) {
-		BAlert* alert = new(std::nothrow) BAlert(
-			B_TRANSLATE("Authentication failed"),
-			error,
-			B_TRANSLATE("Close"), NULL, NULL,
-			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-
-		if (alert != NULL)
-			alert->Go();
-
-		_SetWorkerThread(-1);
-	} else {
-		_SetWorkerThread(-1);
-		_LoginSuccessful(B_TRANSLATE("The authentication was successful."));
 	}
 }
 
@@ -703,210 +717,638 @@ int32
 UserLoginWindow::_CreateAccountSetupThreadEntry(void* data)
 {
 	CreateAccountSetupThreadData* threadData =
-		reinterpret_cast<CreateAccountSetupThreadData*>(data);
-	if ((threadData->mask & CREATE_CAPTCHA) != 0)
-		threadData->window->_CreateAccountCaptchaSetupThread();
-	if ((threadData->mask & FETCH_USER_USAGE_CONDITIONS) != 0)
-		threadData->window->_CreateAccountUserUsageConditionsSetupThread();
-	threadData->window->_SetWorkerThread(-1);
+		static_cast<CreateAccountSetupThreadData*>(data);
+	BMessenger messenger(threadData->window);
+	status_t result = B_OK;
+	Captcha captcha;
+	UserUsageConditions userUsageConditions;
+	bool shouldCreateCaptcha = (threadData->mask & CREATE_CAPTCHA) != 0;
+	bool shouldFetchUserUsageConditions
+		= (threadData->mask & FETCH_USER_USAGE_CONDITIONS) != 0;
+
+	if (result == B_OK && shouldCreateCaptcha)
+		result = threadData->window->_CreateAccountCaptchaSetupThread(captcha);
+	if (result == B_OK && shouldFetchUserUsageConditions) {
+		result = threadData->window
+			->_CreateAccountUserUsageConditionsSetupThread(userUsageConditions);
+	}
+
+	if (result == B_OK) {
+		BMessage message(MSG_CREATE_ACCOUNT_SETUP_SUCCESS);
+		if (result == B_OK && shouldCreateCaptcha) {
+			BMessage captchaMessage;
+			result = captcha.Archive(&captchaMessage);
+			if (result == B_OK)
+				result = message.AddMessage(KEY_CAPTCHA_IMAGE, &captchaMessage);
+		}
+		if (result == B_OK && shouldFetchUserUsageConditions) {
+			BMessage userUsageConditionsMessage;
+			result = userUsageConditions.Archive(&userUsageConditionsMessage);
+			if (result == B_OK) {
+				result = message.AddMessage(KEY_USER_USAGE_CONDITIONS,
+					&userUsageConditionsMessage);
+			}
+		}
+		if (result == B_OK) {
+			if (Logger::IsDebugEnabled())
+				printf("successfully completed collection of create account "
+					"data from the server in background thread\n");
+			messenger.SendMessage(&message);
+		} else {
+			debugger("unable to configure the "
+				"'MSG_CREATE_ACCOUNT_SETUP_SUCCESS' message.");
+		}
+	}
+
+	if (result != B_OK) {
+		// any error messages / alerts should have already been handled by this
+		// point.
+		messenger.SendMessage(MSG_CREATE_ACCOUNT_SETUP_ERROR);
+	}
+
+	threadData->window->_SetWorkerThreadLocked(-1);
 	delete threadData;
 	return 0;
 }
 
 
-void
-UserLoginWindow::_CreateAccountCaptchaSetupThread()
+status_t
+UserLoginWindow::_CreateAccountUserUsageConditionsSetupThread(
+	UserUsageConditions& userUsageConditions)
 {
-	WebAppInterface interface;
-	BMessage info;
+	WebAppInterface interface = fModel.GetWebAppInterface();
+	status_t result = interface.RetrieveUserUsageConditions(
+		NULL, userUsageConditions);
 
-	status_t status = interface.RequestCaptcha(info);
+	if (result != B_OK) {
+		AppUtils::NotifySimpleError(
+			B_TRANSLATE("Usage conditions download problem"),
+			B_TRANSLATE("An error has arisen downloading the usage "
+				"conditions required to create a new user. Check the log for "
+				"details and try again."));
+	}
 
-	BAutolock locker(&fLock);
+	return result;
+}
 
-	BMessage result;
-	if (status == B_OK && info.FindMessage("result", &result) == B_OK) {
-		result.FindString("token", &fCaptchaToken);
-		BString imageDataBase64;
-		if (result.FindString("pngImageDataBase64", &imageDataBase64) == B_OK) {
-			ssize_t encodedSize = imageDataBase64.Length();
-			ssize_t decodedSize = (encodedSize * 3 + 3) / 4;
-			if (decodedSize > 0) {
-				char* buffer = new char[decodedSize];
-				decodedSize = decode_base64(buffer, imageDataBase64.String(),
-					encodedSize);
-				if (decodedSize > 0) {
-					BMemoryIO memoryIO(buffer, (size_t)decodedSize);
-					fCaptchaImage.SetTo(new(std::nothrow) SharedBitmap(
-						memoryIO), true);
-					BMessenger(this).SendMessage(MSG_CAPTCHA_OBTAINED);
-				} else {
-					fprintf(stderr, "Failed to decode captcha: %s\n",
-						strerror(decodedSize));
-				}
-				delete[] buffer;
-			}
+
+status_t
+UserLoginWindow::_CreateAccountCaptchaSetupThread(Captcha& captcha)
+{
+	WebAppInterface interface = fModel.GetWebAppInterface();
+	BMessage responsePayload;
+
+	status_t status = interface.RequestCaptcha(responsePayload);
+
+// check for transport related errors.
+
+	if (status != B_OK) {
+		AppUtils::NotifySimpleError(
+			B_TRANSLATE("Captcha error"),
+			B_TRANSLATE("It was not possible to communicate with the server to "
+				"obtain a captcha image required to create a new user."));
+	}
+
+// check for server-generated errors.
+
+	if (status == B_OK) {
+		if (interface.ErrorCodeFromResponse(responsePayload)
+				!= ERROR_CODE_NONE) {
+			ServerHelper::AlertTransportError(&responsePayload);
+			status = B_ERROR;
 		}
+	}
+
+// now parse the response from the server and extract the captcha data.
+
+	if (status == B_OK) {
+		status = _UnpackCaptcha(responsePayload, captcha);
+		if (status != B_OK) {
+			AppUtils::NotifySimpleError(
+				B_TRANSLATE("Captcha error"),
+				B_TRANSLATE("It was not possible to extract necessary captcha "
+					"information from the data sent back from the server."));
+		}
+	}
+
+	return status;
+}
+
+
+/*!	Takes the data returned to the client after it was requested from the
+	server and extracts from it the captcha image.
+*/
+
+status_t
+UserLoginWindow::_UnpackCaptcha(BMessage& responsePayload, Captcha& captcha)
+{
+	status_t result = B_OK;
+
+	BMessage resultMessage;
+	if (result == B_OK)
+		result = responsePayload.FindMessage("result", &resultMessage);
+	BString token;
+	if (result == B_OK)
+		result = resultMessage.FindString("token", &token);
+	BString pngImageDataBase64;
+	if (result == B_OK)
+		result = resultMessage.FindString("pngImageDataBase64", &pngImageDataBase64);
+
+	ssize_t encodedSize;
+	ssize_t decodedSize;
+	if (result == B_OK) {
+		encodedSize = pngImageDataBase64.Length();
+		decodedSize = (encodedSize * 3 + 3) / 4;
+		if (decodedSize <= 0)
+			result = B_ERROR;
+	}
+
+	char* buffer = NULL;
+	if (result == B_OK) {
+		buffer = new char[decodedSize];
+		decodedSize = decode_base64(buffer, pngImageDataBase64.String(),
+			encodedSize);
+		if (decodedSize <= 0)
+			result = B_ERROR;
+
+		if (result == B_OK) {
+			captcha.SetToken(token);
+			captcha.SetPngImageData(buffer, decodedSize);
+		}
+		delete buffer;
+	}
+
+	return result;
+}
+
+
+void
+UserLoginWindow::_HandleCreateAccountSetupSuccess(BMessage* message)
+{
+	if (Logger::IsDebugEnabled())
+		printf("handling account setup success\n");
+
+	BMessage captchaMessage;
+	BMessage userUsageConditionsMessage;
+
+	if (message->FindMessage(KEY_CAPTCHA_IMAGE, &captchaMessage) == B_OK)
+		_SetCaptcha(new Captcha(&captchaMessage));
+
+	if (message->FindMessage(KEY_USER_USAGE_CONDITIONS,
+			&userUsageConditionsMessage) == B_OK) {
+		_SetUserUsageConditions(
+			new UserUsageConditions(&userUsageConditionsMessage));
+	}
+
+	_EnableMutableControls(true);
+}
+
+
+void
+UserLoginWindow::_SetCaptcha(Captcha* captcha)
+{
+	if (Logger::IsDebugEnabled())
+		printf("setting captcha\n");
+	if (fCaptcha != NULL)
+		delete fCaptcha;
+	fCaptcha = captcha;
+
+	if (fCaptcha == NULL)
+		fCaptchaView->UnsetBitmap();
+	else {
+		off_t size;
+		fCaptcha->PngImageData()->GetSize(&size);
+		SharedBitmap* captchaImage
+			= new SharedBitmap(*(fCaptcha->PngImageData()));
+		fCaptchaView->SetBitmap(captchaImage);
+	}
+	fCaptchaResultField->SetText("");
+}
+
+
+/*!	This method is hit when the user usage conditions data arrives back from the
+	server.  At this point some of the UI elements may need to be updated.
+*/
+
+void
+UserLoginWindow::_SetUserUsageConditions(
+	UserUsageConditions* userUsageConditions)
+{
+	if (Logger::IsDebugEnabled())
+		printf("setting user usage conditions\n");
+	if (fUserUsageConditions != NULL)
+		delete fUserUsageConditions;
+	fUserUsageConditions = userUsageConditions;
+
+	if (fUserUsageConditions != NULL) {
+		BString minimumAgeString;
+		minimumAgeString.SetToFormat("%" B_PRId8,
+			fUserUsageConditions->MinimumAge());
+		BString label = B_TRANSLATE(
+			"I am %MinimumAgeYears% years of age or older");
+		label.ReplaceAll("%MinimumAgeYears%", minimumAgeString);
+		fConfirmMinimumAgeCheckBox->SetLabel(label);
 	} else {
-		fprintf(stderr, "Failed to obtain captcha: %s\n", strerror(status));
+		fConfirmMinimumAgeCheckBox->SetLabel(PLACEHOLDER_TEXT);
+		fConfirmMinimumAgeCheckBox->SetValue(0);
+		fConfirmUserUsageConditionsCheckBox->SetValue(0);
 	}
 }
 
 
-int32
-UserLoginWindow::_CreateAccountThreadEntry(void* data)
-{
-	UserLoginWindow* window = reinterpret_cast<UserLoginWindow*>(data);
-	window->_CreateAccountThread();
-	return 0;
-}
+// #pragma mark - Create Account
 
 
 void
-UserLoginWindow::_CreateAccountThread()
+UserLoginWindow::_CreateAccount()
 {
-	if (!Lock())
+	BAutolock locker(&fLock);
+
+	if (fCaptcha == NULL)
+		debugger("missing captcha when assembling create user details");
+	if (fUserUsageConditions == NULL)
+		debugger("missing user usage conditions when assembling create user "
+			"details");
+
+	if (fWorkerThread >= 0)
 		return;
 
-	if (fUserUsageConditions == NULL)
-		debugger("missing usage conditions when creating an account");
+	CreateUserDetail* detail = new CreateUserDetail();
+	ValidationFailures validationFailures;
 
-	if (fConfirmMinimumAgeCheckBox->Value() == 0
-		|| fConfirmUserUsageConditionsCheckBox->Value() == 0) {
-		debugger("expected that the minimum age and usage conditions are "
-			"agreed to at this point");
+	_AssembleCreateUserDetail(*detail);
+	_ValidateCreateUserDetail(*detail, validationFailures);
+	_MarkCreateUserInvalidFields(validationFailures);
+	_AlertCreateUserValidationFailure(validationFailures);
+
+	if (validationFailures.IsEmpty()) {
+		CreateAccountThreadData* data = new CreateAccountThreadData();
+		data->window = this;
+		data->detail = detail;
+
+		thread_id thread = spawn_thread(&_CreateAccountThreadEntry,
+			"Account creator", B_NORMAL_PRIORITY, data);
+		if (thread >= 0)
+			_SetWorkerThread(thread);
+	}
+}
+
+
+/*!	Take the data from the user interface and put it into a model object to be
+	used as the input for the validation and communication with the backend
+	application server (HDS).
+*/
+
+void
+UserLoginWindow::_AssembleCreateUserDetail(CreateUserDetail& detail)
+{
+	detail.SetNickname(fNewNicknameField->Text());
+	detail.SetPasswordClear(fNewPasswordField->Text());
+	detail.SetIsPasswordRepeated(strlen(fRepeatPasswordField->Text()) > 0
+		&& strcmp(fNewPasswordField->Text(),
+			fRepeatPasswordField->Text()) == 0);
+	detail.SetEmail(fEmailField->Text());
+
+	if (fCaptcha != NULL)
+		detail.SetCaptchaToken(fCaptcha->Token());
+
+	detail.SetCaptchaResponse(fCaptchaResultField->Text());
+	detail.SetLanguageCode(fPreferredLanguageCode);
+
+	if ( fUserUsageConditions != NULL
+		&& fConfirmMinimumAgeCheckBox->Value() == 1
+		&& fConfirmUserUsageConditionsCheckBox->Value() == 1) {
+		detail.SetAgreedToUserUsageConditionsCode(fUserUsageConditions->Code());
+	}
+}
+
+
+/*!	This method will check the data supplied in the detail and will relay any
+	validation or data problems into the supplied ValidationFailures object.
+*/
+
+void
+UserLoginWindow::_ValidateCreateUserDetail(
+	CreateUserDetail& detail, ValidationFailures& failures)
+{
+	if (!ValidationUtils::IsValidEmail(detail.Email()))
+		failures.AddFailure("email", "malformed");
+
+	if (detail.Nickname().IsEmpty())
+		failures.AddFailure("nickname", "required");
+	else {
+		if (!ValidationUtils::IsValidNickname(detail.Nickname()))
+			failures.AddFailure("nickname", "malformed");
 	}
 
-	BString nickName(fNewUsernameField->Text());
-	BString passwordClear(fNewPasswordField->Text());
-	BString email(fEmailField->Text());
-	BString captchaToken(fCaptchaToken);
-	BString captchaResponse(fCaptchaResultField->Text());
-	BString languageCode(fPreferredLanguageCode);
-	BString userUsageConditionsCode(fUserUsageConditions->Code());
+	if (detail.PasswordClear().IsEmpty())
+		failures.AddFailure("passwordClear", "required");
+	else {
+		if (!ValidationUtils::IsValidPasswordClear(detail.PasswordClear()))
+			failures.AddFailure("passwordClear", "invalid");
+	}
 
-	Unlock();
+	if (!detail.IsPasswordRepeated())
+		failures.AddFailure("repeatPasswordClear", "repeat");
 
-	WebAppInterface interface;
-	BMessage info;
+	if (detail.AgreedToUserUsageConditionsCode().IsEmpty())
+		failures.AddFailure("agreedToUserUsageConditionsCode", "required");
 
-	status_t status = interface.CreateUser(
-		nickName, passwordClear, email, captchaToken, captchaResponse,
-		languageCode, userUsageConditionsCode, info);
+	if (detail.CaptchaResponse().IsEmpty())
+		failures.AddFailure("captchaResponse", "required");
+}
 
-	BAutolock locker(&fLock);
 
-	BString error = B_TRANSLATE(
-		"There was a puzzling response from the web service.");
+void
+UserLoginWindow::_MarkCreateUserInvalidFields()
+{
+	CreateUserDetail detail;
+	ValidationFailures failures;
+	_AssembleCreateUserDetail(detail);
+	_ValidateCreateUserDetail(detail, failures);
+	_MarkCreateUserInvalidFields(failures);
+}
 
-	BMessage result;
-	if (status == B_OK) {
-		if (info.FindMessage("result", &result) == B_OK) {
-			error = "";
-		} else if (info.FindMessage("error", &result) == B_OK) {
-			result.PrintToStream();
-			BString message;
-			if (result.FindString("message", &message) == B_OK) {
-				if (message == "captchabadresponse") {
-					error = B_TRANSLATE("You have not solved the captcha "
-						"puzzle correctly.");
-				} else if (message == "validationerror") {
-					_CollectValidationFailures(result, error);
-				} else {
-					BString response = B_TRANSLATE("It responded with: %message%");
-					response.ReplaceFirst("%message%", message);
-					error << " " << response;
-				}
+
+void
+UserLoginWindow::_MarkCreateUserInvalidFields(
+	const ValidationFailures& failures)
+{
+	fNewNicknameField->MarkAsInvalid(failures.Contains("nickname"));
+	fNewPasswordField->MarkAsInvalid(failures.Contains("passwordClear"));
+	fRepeatPasswordField->MarkAsInvalid(failures.Contains("repeatPasswordClear"));
+	fEmailField->MarkAsInvalid(failures.Contains("email"));
+	fCaptchaResultField->MarkAsInvalid(failures.Contains("captchaResponse"));
+}
+
+
+void
+UserLoginWindow::_AlertCreateUserValidationFailure(
+	const ValidationFailures& failures)
+{
+	if (!failures.IsEmpty()) {
+		BString alertMessage = B_TRANSLATE("There are problems in the supplied "
+			"data:");
+		alertMessage << "\n\n";
+
+		for (int32 i = 0; i < failures.CountFailures(); i++) {
+			ValidationFailure* failure = failures.FailureAtIndex(i);
+			BStringList messages = failure->Messages();
+
+			for (int32 j = 0; j < messages.CountStrings(); j++) {
+				alertMessage << _CreateAlertTextFromValidationFailure(
+					failure->Property(), messages.StringAt(j));
+				alertMessage << '\n';
 			}
 		}
-	} else {
-		error = B_TRANSLATE(
-			"It was not possible to contact the web service.");
-	}
 
-	locker.Unlock();
-
-	if (!error.IsEmpty()) {
 		BAlert* alert = new(std::nothrow) BAlert(
-			B_TRANSLATE("Failed to create account"),
-			error,
-			B_TRANSLATE("Close"), NULL, NULL,
+			B_TRANSLATE("Input validation"),
+			alertMessage,
+			B_TRANSLATE("OK"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 
 		if (alert != NULL)
 			alert->Go();
+	}
+}
 
-		fprintf(stderr,
-			B_TRANSLATE("Failed to create account: %s\n"), error.String());
 
-		_SetWorkerThread(-1);
+/*!	This method produces a debug string for a set of validation failures.
+ */
 
-		// We need a new captcha, it can be used only once
-		fCaptchaToken = "";
-		_CreateAccountSetup(CREATE_CAPTCHA);
+/*static*/ void
+UserLoginWindow::_ValidationFailuresToString(const ValidationFailures& failures,
+	BString& output)
+{
+	for (int32 i = 0; i < failures.CountFailures(); i++) {
+		ValidationFailure* failure = failures.FailureAtIndex(i);
+		BStringList messages = failure->Messages();
+		for (int32 j = 0; j < messages.CountStrings(); j++)
+		{
+			if (0 != j || 0 != i)
+				output << ", ";
+			output << failure->Property();
+			output << ":";
+			output << messages.StringAt(j);
+		}
+	}
+}
+
+
+/*static*/ BString
+UserLoginWindow::_CreateAlertTextFromValidationFailure(
+	const BString& property, const BString& message)
+{
+	if (property == "email" && message == "malformed")
+		return B_TRANSLATE("The email is malformed.");
+
+	if (property == "nickname" && message == "notunique") {
+		return B_TRANSLATE("The nickname must be unique, but the supplied "
+			"nickname is already taken.  Choose a different nickname.");
+	}
+
+	if (property == "nickname" && message == "required")
+		return B_TRANSLATE("The nickname is required.");
+
+	if (property == "nickname" && message == "malformed") {
+		return B_TRANSLATE("The nickname is malformed.  The nickname may only "
+			"contain digits and lower case latin characters.  The nickname "
+			"must be between four and sixteen characters in length.");
+	}
+
+	if (property == "passwordClear" && message == "required")
+		return B_TRANSLATE("A password is required.");
+
+	if (property == "passwordClear" && message == "invalid") {
+		return B_TRANSLATE("The password must be at least eight characters "
+			"long, consist of at least two digits and one upper case "
+			"character.");
+	}
+
+	if (property == "passwordClearRepeated" && message == "required") {
+		return B_TRANSLATE("The password must be repeated in order to reduce "
+			"the chance of entering the password incorrectly.");
+	}
+
+	if (property == "passwordClearRepeated" && message == "repeat")
+		return B_TRANSLATE("The password has been incorrectly repeated.");
+
+	if (property == "agreedToUserUsageConditionsCode"
+			&& message == "required") {
+		return B_TRANSLATE("The usage agreement must be agreed to and a "
+			"confirmation should be made that the person creating the user "
+			"meets the minimum age requirement.");
+	}
+
+	if (property == "captchaResponse" && message == "required") {
+		return B_TRANSLATE("A response to the captcha question must be "
+			"provided.");
+	}
+
+	if (property == "captchaResponse" && message == "captchabadresponse") {
+		return B_TRANSLATE("The supplied response to the captcha is "
+			"incorrect.  A new captcha will be generated; try again.");
+	}
+
+	BString result = B_TRANSLATE("An unexpected error '%Message%' has arisen "
+		"with property '%Property%'");
+	result.ReplaceAll("%Message%", message);
+	result.ReplaceAll("%Property%", property);
+	return result;
+}
+
+
+/*!	This is the entry-point for the thread that will process the data to create
+	the new account.
+*/
+
+int32
+UserLoginWindow::_CreateAccountThreadEntry(void* data)
+{
+	CreateAccountThreadData* threadData =
+		static_cast<CreateAccountThreadData*>(data);
+	threadData->window->_CreateAccountThread(threadData->detail);
+	threadData->window->_SetWorkerThreadLocked(-1);
+	if (NULL != threadData->detail)
+		delete threadData->detail;
+	return 0;
+}
+
+
+/*!	This method runs in a background thread run and makes the necessary calls
+	to the application server to actually create the user.
+*/
+
+void
+UserLoginWindow::_CreateAccountThread(CreateUserDetail* detail)
+{
+	WebAppInterface interface = fModel.GetWebAppInterface();
+	BMessage responsePayload;
+	BMessenger messenger(this);
+
+	status_t status = interface.CreateUser(
+		detail->Nickname(),
+		detail->PasswordClear(),
+		detail->Email(),
+		detail->CaptchaToken(),
+		detail->CaptchaResponse(),
+		detail->LanguageCode(),
+		detail->AgreedToUserUsageConditionsCode(),
+		responsePayload);
+
+	BString error = B_TRANSLATE(
+		"There was a puzzling response from the web service.");
+
+	if (status == B_OK) {
+		int32 errorCode = interface.ErrorCodeFromResponse(responsePayload);
+
+		switch (errorCode) {
+			case ERROR_CODE_NONE:
+			{
+				BMessage userCredentialsMessage;
+				UserCredentials userCredentials(detail->Nickname(),
+					detail->PasswordClear());
+				userCredentials.Archive(&userCredentialsMessage);
+				BMessage message(MSG_CREATE_ACCOUNT_SUCCESS);
+				message.AddMessage(KEY_USER_CREDENTIALS,
+					&userCredentialsMessage);
+				messenger.SendMessage(&message);
+				break;
+			}
+			case ERROR_CODE_CAPTCHABADRESPONSE:
+			{
+				ValidationFailures validationFailures;
+				validationFailures.AddFailure("captchaResponse", "captchabadresponse");
+				BMessage validationFailuresMessage;
+				validationFailures.Archive(&validationFailuresMessage);
+				BMessage message(MSG_CREATE_ACCOUNT_FAILED);
+				message.AddMessage(KEY_VALIDATION_FAILURES,
+					&validationFailuresMessage);
+				messenger.SendMessage(&message);
+				break;
+			}
+			case ERROR_CODE_VALIDATION:
+			{
+				ValidationFailures validationFailures;
+				ServerHelper::GetFailuresFromJsonRpcError(validationFailures,
+					responsePayload);
+				if (Logger::IsDebugEnabled()) {
+					BString debugString;
+					_ValidationFailuresToString(validationFailures,
+						debugString);
+					printf("create account validation issues; %s\n",
+						debugString.String());
+				}
+				BMessage validationFailuresMessage;
+				validationFailures.Archive(&validationFailuresMessage);
+				BMessage message(MSG_CREATE_ACCOUNT_FAILED);
+				message.AddMessage(KEY_VALIDATION_FAILURES,
+					&validationFailuresMessage);
+				messenger.SendMessage(&message);
+				break;
+			}
+			default:
+				ServerHelper::NotifyServerJsonRpcError(responsePayload);
+				messenger.SendMessage(MSG_CREATE_ACCOUNT_ERROR);
+				break;
+		}
 	} else {
-		fModel.SetAuthorization(nickName, passwordClear, true);
-
-		_SetWorkerThread(-1);
-		_LoginSuccessful(B_TRANSLATE("Account created successfully. "
-			"You can now rate packages and do other useful things."));
+		AppUtils::NotifySimpleError(
+			B_TRANSLATE("User creation error"),
+			B_TRANSLATE("It was not possible to create the new user."));
+		messenger.SendMessage(MSG_CREATE_ACCOUNT_ERROR);
 	}
 }
 
 
 void
-UserLoginWindow::_CollectValidationFailures(const BMessage& result,
-	BString& error) const
+UserLoginWindow::_HandleCreateAccountSuccess(
+	const UserCredentials& credentials)
 {
-	error = B_TRANSLATE("There are problems with the data you entered:\n\n");
+	BString message = B_TRANSLATE("The user %Nickname% has been successfully "
+		"created in the HaikuDepotServer system.  You can administer your user "
+		"details by using the web interface.  You are now logged-in as this "
+		"new user.");
+	message.ReplaceAll("%Nickname%", credentials.Nickname());
 
-	bool found = false;
+	BAlert* alert = new(std::nothrow) BAlert(
+		B_TRANSLATE("User Created"), message, B_TRANSLATE("Close"));
 
-	BMessage data;
-	BMessage failures;
-	if (result.FindMessage("data", &data) == B_OK
-		&& data.FindMessage("validationfailures", &failures) == B_OK) {
-		int32 index = 0;
-		while (true) {
-			BString name;
-			name << index++;
-			BMessage failure;
-			if (failures.FindMessage(name, &failure) != B_OK)
-				break;
+	if (alert != NULL)
+		alert->Go();
 
-			BString property;
-			BString message;
-			if (failure.FindString("property", &property) == B_OK
-				&& failure.FindString("message", &message) == B_OK) {
-				found = true;
-				if (property == "nickname" && message == "notunique") {
-					error << B_TRANSLATE(
-						"The username is already taken. "
-						"Please choose another.");
-				} else if (property == "passwordClear"
-					&& message == "invalid") {
-					error << B_TRANSLATE(
-						"The password is too weak or invalid. "
-						"Please use at least 8 characters with "
-						"at least 2 numbers and 2 upper-case "
-						"letters.");
-				} else if (property == "email" && message == "malformed") {
-					error << B_TRANSLATE(
-						"The email address appears to be malformed.");
-				} else {
-					error << property << ": " << message;
-				}
-			}
-		}
-	}
-
-	if (!found) {
-		error << B_TRANSLATE("But none could be listed here, sorry.");
-	}
+	_TakeUpCredentialsAndQuit(credentials);
 }
 
 
-/*! Opens a new window that shows the already downloaded user usage conditions.
+void
+UserLoginWindow::_HandleCreateAccountFailure(const ValidationFailures& failures)
+{
+	_MarkCreateUserInvalidFields(failures);
+	_AlertCreateUserValidationFailure(failures);
+	_EnableMutableControls(true);
+
+	// if an attempt was made to the server then the captcha would have been
+	// used up and a new captcha is required.
+	_CreateAccountSetup(CREATE_CAPTCHA);
+}
+
+
+/*!	Handles the main UI-thread processing for the situation where there was an
+	unexpected error when creating the account.  Note that any error messages
+	presented to the user are expected to be prepared and initiated from the
+	background thread creating the account.
+*/
+
+void
+UserLoginWindow::_HandleCreateAccountError()
+{
+	_EnableMutableControls(true);
+}
+
+
+/*!	Opens a new window that shows the already downloaded user usage conditions.
 */
 
 void

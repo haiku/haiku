@@ -3,14 +3,18 @@ SubDir HAIKU_TOP src tests apps haikudepot ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) src apps haikudepot ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src apps haikudepot model ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src apps haikudepot server ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src apps haikudepot server dumpexportrepository ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src apps haikudepot util ] ;
 
 UsePrivateHeaders shared ;
 
 local sourceDirs =
+	model
 	server
 	server/dumpexportrepository
+	util
 ;
 
 local sourceDir ;
@@ -36,6 +40,12 @@ UnitTestLib haikudepottest.so :
 	StandardMetaData.cpp
 	StandardMetaDataJsonEventListener.cpp
 	StandardMetaDataJsonEventListenerTest.cpp
+
+	ValidationFailure.cpp
+	ValidationFailureTest.cpp
+
+	ValidationUtils.cpp
+	ValidationUtilsTest.cpp
 
 	: be shared bnetapi package [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 ;

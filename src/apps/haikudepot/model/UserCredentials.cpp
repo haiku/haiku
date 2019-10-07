@@ -32,6 +32,15 @@ UserCredentials::UserCredentials(const BString& nickname,
 }
 
 
+UserCredentials::UserCredentials(const UserCredentials& other)
+	:
+	fNickname(other.Nickname()),
+	fPasswordClear(other.PasswordClear()),
+	fIsSuccessful(false)
+{
+}
+
+
 UserCredentials::UserCredentials()
 	:
 	fNickname(),

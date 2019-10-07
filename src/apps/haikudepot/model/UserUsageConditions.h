@@ -11,11 +11,11 @@
 #include <String.h>
 
 
-/*! A user in the HDS system should have agreed to user usage conditions when
-    they created their user on the server.  This object represents the user
-    usage conditions that either they have agreed to or that they could agree
-    to.  Each set of user usage conditions has a code that uniquely identifies
-    a given set of conditions.
+/*!	A user in the HDS system should have agreed to user usage conditions when
+	they created their user on the server.  This object represents the user
+	usage conditions that either they have agreed to or that they could agree
+	to.  Each set of user usage conditions has a code that uniquely identifies
+	a given set of conditions.
 */
 
 class UserUsageConditions : public BArchivable {

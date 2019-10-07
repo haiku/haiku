@@ -8,29 +8,22 @@
 
 #include <stdio.h>
 
-#include <AppFileInfo.h>
 #include <Application.h>
-#include <AutoDeleter.h>
-#include <Autolock.h>
-#include <File.h>
 #include <HttpHeaders.h>
 #include <HttpRequest.h>
 #include <Json.h>
 #include <JsonTextWriter.h>
 #include <JsonMessageWriter.h>
 #include <Message.h>
-#include <Roster.h>
 #include <Url.h>
 #include <UrlContext.h>
 #include <UrlProtocolListener.h>
 #include <UrlProtocolRoster.h>
 
-#include "AutoLocker.h"
 #include "DataIOUtils.h"
 #include "HaikuDepotConstants.h"
 #include "List.h"
 #include "Logger.h"
-#include "PackageInfo.h"
 #include "ServerSettings.h"
 #include "ServerHelper.h"
 
@@ -38,159 +31,6 @@
 #define BASEURL_DEFAULT "https://depot.haiku-os.org"
 #define USERAGENT_FALLBACK_VERSION "0.0.0"
 #define LOG_PAYLOAD_LIMIT 8192
-
-
-class JsonBuilder {
-public:
-	JsonBuilder()
-		:
-		fString("{"),
-		fInList(false)
-	{
-	}
-
-	JsonBuilder& AddObject()
-	{
-		fString << '{';
-		fInList = false;
-		return *this;
-	}
-
-	JsonBuilder& AddObject(const char* name)
-	{
-		_StartName(name);
-		fString << '{';
-		fInList = false;
-		return *this;
-	}
-
-	JsonBuilder& EndObject()
-	{
-		fString << '}';
-		fInList = true;
-		return *this;
-	}
-
-	JsonBuilder& AddArray(const char* name)
-	{
-		_StartName(name);
-		fString << '[';
-		fInList = false;
-		return *this;
-	}
-
-	JsonBuilder& EndArray()
-	{
-		fString << ']';
-		fInList = true;
-		return *this;
-	}
-
-	JsonBuilder& AddStrings(const StringList& strings)
-	{
-		for (int i = 0; i < strings.CountItems(); i++)
-			AddItem(strings.ItemAtFast(i));
-		return *this;
-	}
-
-	JsonBuilder& AddItem(const char* item)
-	{
-		return AddItem(item, false);
-	}
-
-	JsonBuilder& AddItem(const char* item, bool nullIfEmpty)
-	{
-		if (item == NULL || (nullIfEmpty && strlen(item) == 0)) {
-			if (fInList)
-				fString << ",null";
-			else
-				fString << "null";
-		} else {
-			if (fInList)
-				fString << ",\"";
-			else
-				fString << '"';
-			fString << _EscapeString(item);
-			fString << '"';
-		}
-		fInList = true;
-		return *this;
-	}
-
-	JsonBuilder& AddValue(const char* name, const char* value)
-	{
-		return AddValue(name, value, false);
-	}
-
-	JsonBuilder& AddValue(const char* name, const char* value,
-		bool nullIfEmpty)
-	{
-		_StartName(name);
-		if (value == NULL || (nullIfEmpty && strlen(value) == 0)) {
-			fString << "null";
-		} else {
-			fString << '"';
-			fString << _EscapeString(value);
-			fString << '"';
-		}
-		fInList = true;
-		return *this;
-	}
-
-	JsonBuilder& AddValue(const char* name, int value)
-	{
-		_StartName(name);
-		fString << value;
-		fInList = true;
-		return *this;
-	}
-
-	JsonBuilder& AddValue(const char* name, bool value)
-	{
-		_StartName(name);
-		if (value)
-			fString << "true";
-		else
-			fString << "false";
-		fInList = true;
-		return *this;
-	}
-
-	const BString& End()
-	{
-		fString << "}\n";
-		return fString;
-	}
-
-private:
-	void _StartName(const char* name)
-	{
-		if (fInList)
-			fString << ",\"";
-		else
-			fString << '"';
-		fString << _EscapeString(name);
-		fString << "\":";
-	}
-
-	BString _EscapeString(const char* original) const
-	{
-		BString string(original);
-		string.ReplaceAll("\\", "\\\\");
-		string.ReplaceAll("\"", "\\\"");
-		string.ReplaceAll("/", "\\/");
-		string.ReplaceAll("\b", "\\b");
-		string.ReplaceAll("\f", "\\f");
-		string.ReplaceAll("\n", "\\n");
-		string.ReplaceAll("\r", "\\r");
-		string.ReplaceAll("\t", "\\t");
-		return string;
-	}
-
-private:
-	BString		fString;
-	bool		fInList;
-};
 
 
 class ProtocolListener : public BUrlProtocolListener {
@@ -314,18 +154,27 @@ WebAppInterface::Nickname() const
 status_t
 WebAppInterface::GetChangelog(const BString& packageName, BMessage& message)
 {
-	BString jsonString = JsonBuilder()
-		.AddValue("jsonrpc", "2.0")
-		.AddValue("id", ++fRequestIndex)
-		.AddValue("method", "getPkgChangelog")
-		.AddArray("params")
-			.AddObject()
-				.AddValue("pkgName", packageName)
-			.EndObject()
-		.EndArray()
-	.End();
+	BMallocIO* requestEnvelopeData = new BMallocIO();
+		// BHttpRequest later takes ownership of this.
+	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
 
-	return _SendJsonRequest("pkg", jsonString, 0, message);
+	requestEnvelopeWriter.WriteObjectStart();
+	_WriteStandardJsonRpcEnvelopeValues(requestEnvelopeWriter,
+		"getPkgChangelog");
+	requestEnvelopeWriter.WriteObjectName("params");
+	requestEnvelopeWriter.WriteArrayStart();
+	requestEnvelopeWriter.WriteObjectStart();
+
+	requestEnvelopeWriter.WriteObjectName("pkgName");
+	requestEnvelopeWriter.WriteString(packageName.String());
+
+	requestEnvelopeWriter.WriteObjectEnd();
+	requestEnvelopeWriter.WriteArrayEnd();
+	requestEnvelopeWriter.WriteObjectEnd();
+
+	return _SendJsonRequest("pkg", requestEnvelopeData,
+		_LengthAndSeekToZero(requestEnvelopeData), 0,
+		message);
 }
 
 
@@ -429,10 +278,10 @@ WebAppInterface::RetreiveUserRatingForPackageAndVersionByUser(
 }
 
 
-/*! This method will fill out the supplied UserDetail object with information
-    about the user that is supplied in the credentials.  Importantly it will
-    also authenticate the request with the details of the credentials and will
-    not use the credentials that are configured in 'fCredentials'.
+/*!	This method will fill out the supplied UserDetail object with information
+	about the user that is supplied in the credentials.  Importantly it will
+	also authenticate the request with the details of the credentials and will
+	not use the credentials that are configured in 'fCredentials'.
 */
 
 status_t
@@ -468,8 +317,8 @@ WebAppInterface::RetrieveUserDetailForCredentials(
 }
 
 
-/*! This method will return the credentials for the currently authenticated
-    user.
+/*!	This method will return the credentials for the currently authenticated
+	user.
 */
 
 status_t
@@ -479,9 +328,9 @@ WebAppInterface::RetrieveCurrentUserDetail(BMessage& message)
 }
 
 
-/*! When the user requests user detail, the server sends back an envelope of
-    response data.  This method will unpack the data into a model object.
-    \return Not B_OK if something went wrong.
+/*!	When the user requests user detail, the server sends back an envelope of
+	response data.  This method will unpack the data into a model object.
+	\return Not B_OK if something went wrong.
 */
 
 /*static*/ status_t
@@ -533,14 +382,14 @@ WebAppInterface::UnpackUserDetail(BMessage& responseEnvelopeMessage,
 }
 
 
-/*! \brief Returns data relating to the user usage conditions
+/*!	\brief Returns data relating to the user usage conditions
 
 	\param code defines the version of the data to return or if empty then the
 		latest is returned.
 
-    This method will go to the server and get details relating to the user usage
-    conditions.  It does this in two API calls; first gets the details (the
-    minimum age) and in the second call, the text of the conditions is returned.
+	This method will go to the server and get details relating to the user usage
+	conditions.  It does this in two API calls; first gets the details (the
+	minimum age) and in the second call, the text of the conditions is returned.
 */
 
 status_t
@@ -782,17 +631,23 @@ WebAppInterface::RetrieveScreenshot(const BString& code,
 status_t
 WebAppInterface::RequestCaptcha(BMessage& message)
 {
-	BString jsonString = JsonBuilder()
-		.AddValue("jsonrpc", "2.0")
-		.AddValue("id", ++fRequestIndex)
-		.AddValue("method", "generateCaptcha")
-		.AddArray("params")
-			.AddObject()
-			.EndObject()
-		.EndArray()
-	.End();
+	BMallocIO* requestEnvelopeData = new BMallocIO();
+		// BHttpRequest later takes ownership of this.
+	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
 
-	return _SendJsonRequest("captcha", jsonString, 0, message);
+	requestEnvelopeWriter.WriteObjectStart();
+	_WriteStandardJsonRpcEnvelopeValues(requestEnvelopeWriter,
+		"generateCaptcha");
+	requestEnvelopeWriter.WriteObjectName("params");
+	requestEnvelopeWriter.WriteArrayStart();
+	requestEnvelopeWriter.WriteObjectStart();
+	requestEnvelopeWriter.WriteObjectEnd();
+	requestEnvelopeWriter.WriteArrayEnd();
+	requestEnvelopeWriter.WriteObjectEnd();
+
+	return _SendJsonRequest("captcha", requestEnvelopeData,
+		_LengthAndSeekToZero(requestEnvelopeData), 0,
+		message);
 }
 
 
@@ -845,28 +700,38 @@ status_t
 WebAppInterface::AuthenticateUser(const BString& nickName,
 	const BString& passwordClear, BMessage& message)
 {
-	BString jsonString = JsonBuilder()
-		.AddValue("jsonrpc", "2.0")
-		.AddValue("id", ++fRequestIndex)
-		.AddValue("method", "authenticateUser")
-		.AddArray("params")
-			.AddObject()
-				.AddValue("nickname", nickName)
-				.AddValue("passwordClear", passwordClear)
-			.EndObject()
-		.EndArray()
-	.End();
+	BMallocIO* requestEnvelopeData = new BMallocIO();
+		// BHttpRequest later takes ownership of this.
+	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
 
-	return _SendJsonRequest("user", jsonString, 0, message);
+	requestEnvelopeWriter.WriteObjectStart();
+	_WriteStandardJsonRpcEnvelopeValues(requestEnvelopeWriter,
+		"authenticateUser");
+	requestEnvelopeWriter.WriteObjectName("params");
+	requestEnvelopeWriter.WriteArrayStart();
+	requestEnvelopeWriter.WriteObjectStart();
+
+	requestEnvelopeWriter.WriteObjectName("nickname");
+	requestEnvelopeWriter.WriteString(nickName.String());
+	requestEnvelopeWriter.WriteObjectName("passwordClear");
+	requestEnvelopeWriter.WriteString(passwordClear.String());
+
+	requestEnvelopeWriter.WriteObjectEnd();
+	requestEnvelopeWriter.WriteArrayEnd();
+	requestEnvelopeWriter.WriteObjectEnd();
+
+	return _SendJsonRequest("user", requestEnvelopeData,
+		_LengthAndSeekToZero(requestEnvelopeData), 0,
+		message);
 }
 
 
-/*! JSON-RPC invocations return a response.  The response may be either
-    a result or it may be an error depending on the response structure.
-    If it is an error then there may be additional detail that is the
-    error code and message.  This method will extract the error code
-    from the response.  This method will return 0 if the payload does
-    not look like an error.
+/*!	JSON-RPC invocations return a response.  The response may be either
+	a result or it may be an error depending on the response structure.
+	If it is an error then there may be additional detail that is the
+	error code and message.  This method will extract the error code
+	from the response.  This method will return 0 if the payload does
+	not look like an error.
 */
 
 int32
@@ -1107,9 +972,9 @@ WebAppInterface::_LogPayload(BPositionIO* requestData, size_t size)
 }
 
 
-/*! This will get the position of the data to get the length an then sets the
-    offset to zero so that it can be re-read for reading the payload in to log
-    or send.
+/*!	This will get the position of the data to get the length an then sets the
+	offset to zero so that it can be re-read for reading the payload in to log
+	or send.
 */
 
 off_t

@@ -11,9 +11,9 @@
 #include <String.h>
 
 
-/*! This object represents the tuple of the user's nickname (username) and
-    password.  It also carries a boolean that indicates if an authentication
-    with these credentials was successful or failed.
+/*!	This object represents the tuple of the user's nickname (username) and
+	password.  It also carries a boolean that indicates if an authentication
+	with these credentials was successful or failed.
 */
 
 class UserCredentials : public BArchivable {
@@ -21,6 +21,7 @@ public:
 								UserCredentials(BMessage* from);
 								UserCredentials(const BString& nickname,
 									const BString& passwordClear);
+								UserCredentials(const UserCredentials& other);
 								UserCredentials();
 	virtual						~UserCredentials();
 
@@ -41,5 +42,6 @@ private:
 			BString				fPasswordClear;
 			bool				fIsSuccessful;
 };
+
 
 #endif // USER_CREDENTIALS_H

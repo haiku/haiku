@@ -1,11 +1,13 @@
 /*
- * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2019, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef SERVER_HELPER_H
 #define SERVER_HELPER_H
 
 #include <HttpHeaders.h>
+
+#include "ValidationFailure.h"
 
 
 class BMessage;
@@ -27,7 +29,15 @@ public:
 	static	void						NotifyServerJsonRpcError(
 											BMessage& error);
 	static	void						AlertServerJsonRpcError(
-											BMessage* message);
+											BMessage* responseEnvelopeMessage);
+	static	void						GetFailuresFromJsonRpcError(
+											ValidationFailures& failures,
+											BMessage& responseEnvelopeMessage);
+
+private:
+	static	void						_GetFailuresFromJsonRpcFailures(
+											ValidationFailures& failures,
+											BMessage& jsonRpcFailures);
 };
 
 #endif // SERVER_HELPER_H
