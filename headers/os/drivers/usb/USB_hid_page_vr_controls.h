@@ -2,8 +2,8 @@
  * Copyright 2004-2010, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _USB_HID_PAGE_GAME_CONTROLS_H
-#define _USB_HID_PAGE_GAME_CONTROLS_H
+#ifndef _USB_HID_PAGE_VR_CONTROLS_H
+#define _USB_HID_PAGE_VR_CONTROLS_H
 
 
 /* Reference:
@@ -46,4 +46,4 @@ enum {
 };
 
 
-#endif // _USB_HID_PAGE_GAME_CONTROLS_H
+#endif // _USB_HID_PAGE_VR_CONTROLS_H
