@@ -5,8 +5,8 @@
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-#ifndef MOVE_SHAPES_COMMAND_H
-#define MOVE_SHAPES_COMMAND_H
+#ifndef MOVE_PATHS_COMMAND_H
+#define MOVE_PATHS_COMMAND_H
 
 
 #include "Command.h"
@@ -47,4 +47,4 @@ class MovePathsCommand : public Command {
 			int32				fCount;
 };
 
-#endif // MOVE_SHAPES_COMMAND_H
+#endif // MOVE_PATHS_COMMAND_H
