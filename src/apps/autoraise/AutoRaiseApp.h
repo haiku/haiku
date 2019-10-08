@@ -1,5 +1,5 @@
-#ifndef ICON_H
-#define ICON_H
+#ifndef AUTORAISEAPP_H
+#define AUTORAISEAPP_H
 
 #include <Application.h>
 #include <Archivable.h>
