@@ -994,7 +994,8 @@ fs_volume_ops gBtrfsVolumeOps = {
 fs_vnode_ops gBtrfsVnodeOps = {
 	/* vnode operations */
 	&btrfs_lookup,
-	NULL,
+	NULL, // btrfs_get_vnode_name - optional, and we can't do better than the
+		// fallback implementation, so leave as NULL.
 	&btrfs_put_vnode,
 	NULL,	// btrfs_remove_vnode,
 
