@@ -28,7 +28,6 @@
 #else
 #	define TRACE(x...) ;
 #endif
-#	define ERROR(x...) dprintf("\33[34mbtrfs:\33[0m " x)
 
 
 class DeviceOpener {

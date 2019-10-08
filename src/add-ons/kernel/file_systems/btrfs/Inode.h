@@ -99,9 +99,9 @@ private:
 };
 
 /*!The Vnode class provides a convenience layer upon get_vnode(), so that
-/* you don't have to call put_vnode() anymore, which may make code more
-/* readable in some cases
-*/
+ * you don't have to call put_vnode() anymore, which may make code more
+ * readable in some cases
+ */
 class Vnode {
 public:
 	Vnode(Volume* volume, ino_t id)
