@@ -431,19 +431,24 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	TRACE("Volume::Mount() Find larget inode id % " B_PRIu64 "\n",
 		fLargestInodeID);
 
-	// Initialize Journal
-	fJournal = new(std::nothrow) Journal(this);
-	if (fJournal == NULL)
-		return B_NO_MEMORY;
+	if ((flags & B_MOUNT_READ_ONLY) != 0) {
+		fJournal = NULL;
+		fExtentAllocator = NULL;
+	} else {
+		// Initialize Journal
+		fJournal = new(std::nothrow) Journal(this);
+		if (fJournal == NULL)
+			return B_NO_MEMORY;
 
-	// Initialize ExtentAllocator;
-	fExtentAllocator = new(std::nothrow) ExtentAllocator(this);
-	if (fExtentAllocator == NULL)
-		return B_NO_MEMORY;
-	status = fExtentAllocator->Initialize();
-	if (status != B_OK) {
-		ERROR("could not initalize extent allocator!\n");
-		return status;
+		// Initialize ExtentAllocator;
+		fExtentAllocator = new(std::nothrow) ExtentAllocator(this);
+		if (fExtentAllocator == NULL)
+			return B_NO_MEMORY;
+		status = fExtentAllocator->Initialize();
+		if (status != B_OK) {
+			ERROR("could not initalize extent allocator!\n");
+			return status;
+		}
 	}
 
 	// ready

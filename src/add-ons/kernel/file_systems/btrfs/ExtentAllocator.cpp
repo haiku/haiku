@@ -581,19 +581,19 @@ ExtentAllocator::Initialize()
 
 	status_t status = _LoadExtentTree(BTRFS_BLOCKGROUP_FLAG_DATA);
 	if (status != B_OK) {
-		ERROR("ExtentAllocator:: could not load exent tree (data)\n");
+		ERROR("ExtentAllocator:: could not load extent tree (data)\n");
 		return status;
 	}
 
 	status = _LoadExtentTree(BTRFS_BLOCKGROUP_FLAG_SYSTEM);
 	if (status != B_OK) {
-		ERROR("ExtentAllocator:: could not load exent tree (system)\n");
+		ERROR("ExtentAllocator:: could not load extent tree (system)\n");
 		return status;
 	}
 
 	status = _LoadExtentTree(BTRFS_BLOCKGROUP_FLAG_METADATA);
 	if (status != B_OK) {
-		ERROR("ExtentAllocator:: could not load exent tree (metadata)\n");
+		ERROR("ExtentAllocator:: could not load extent tree (metadata)\n");
 		return status;
 	}
 
