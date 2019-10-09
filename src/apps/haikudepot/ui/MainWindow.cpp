@@ -131,6 +131,7 @@ MainWindow::MainWindow(const BMessage& settings)
 	fUserMenu(NULL),
 	fLogInItem(NULL),
 	fLogOutItem(NULL),
+	fUsersUserUsageConditionsMenuItem(NULL),
 	fModelListener(new MainWindowModelListener(BMessenger(this)), true),
 	fBulkLoadProcessCoordinator(NULL),
 	fSinglePackageMode(false)
@@ -230,6 +231,7 @@ MainWindow::MainWindow(const BMessage& settings, const PackageInfoRef& package)
 	fUserMenu(NULL),
 	fLogInItem(NULL),
 	fLogOutItem(NULL),
+	fUsersUserUsageConditionsMenuItem(NULL),
 	fModelListener(new MainWindowModelListener(BMessenger(this)), true),
 	fBulkLoadProcessCoordinator(NULL),
 	fSinglePackageMode(true)
