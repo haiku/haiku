@@ -6157,6 +6157,10 @@ iflib_softirq_alloc_generic(if_ctx_t ctx, if_irq_t irq, iflib_intr_type_t type, 
 void
 iflib_irq_free(if_ctx_t ctx, if_irq_t irq)
 {
+#ifdef __HAIKU__
+	if (!irq)
+		return;
+#endif
 
 	if (irq->ii_tag)
 		bus_teardown_intr(ctx->ifc_dev, irq->ii_res, irq->ii_tag);
