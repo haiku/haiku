@@ -6158,7 +6158,7 @@ void
 iflib_irq_free(if_ctx_t ctx, if_irq_t irq)
 {
 #ifdef __HAIKU__
-	if (!irq)
+	if (!ctx || !irq)
 		return;
 #endif
 
