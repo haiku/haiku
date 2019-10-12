@@ -10,5 +10,5 @@ Mounting volume '%s'\n\n	AutoMounter		S'està muntant el volum '%s'\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		No ha estat possible desmuntar el disc \"%s\":\n\t%s\n\nVoleu forçar el seu desmuntatge?\n\nNota: Si ara mateix hi ha alguna aplicació escrivint al volum, si es desmunta es podrien perdre dades.\n
 Force unmount	AutoMounter		Força el muntatge
 Mount error	AutoMounter		Error de muntatge
-Mounting volume <unnamed volume>\n\n	AutoMounter		S'està muntant el volum <volum desconegut>\n\n
+Mounting volume <unnamed volume>\n\n	AutoMounter		S'està muntant el volum <unnamed volume>\n\n
 Mount warning	AutoMounter		Avís del muntatge

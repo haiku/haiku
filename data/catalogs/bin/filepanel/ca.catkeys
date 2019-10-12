@@ -16,5 +16,5 @@ usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]      
 -a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tno està suportat\n
 -m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tfa que el quadre FilePanel sigui de tipus modal\n
 options:\n	FilePanelApp		opcions:\n
--d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tobre la <carpeta>\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tobre la <folder>\n
 usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		ús: %s [--help] [--directory carpeta] [--load|--save] [--title títol] [--single] [--modal] [--allow plantilla_acceptable] [--forbid plantilla_inacceptable]\n

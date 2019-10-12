@@ -23,7 +23,7 @@ Write changes	MainWindow		Desa els canvis
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		No ha estat possible iniciar la partició %s. (No s'han desat els canvis al disc.)
 Validation of the given creation parameters failed.	MainWindow		No ha estat possible validar els paràmetres de la validació.
 Eject	MainWindow		Expulsa
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Esteu segur que voleu tornar a desar els canvis al disc ara?\n\nSi ho feu totes les dades del disc $s es perdran i no es podran recuperar!
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Esteu segur que voleu tornar a desar els canvis al disc ara?\n\nSi ho feu, totes les dades del disc %s es perdran i no es podran recuperar!
 Surface test (not implemented)	MainWindow		Prova de la superfície (no està implementat)
 The panel could not return successfully.	MainWindow		La finestra a retornat una fallada.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		No ha estat possible canviar el paràmetres de la partició. No s'han desat els canvis al disc.
@@ -70,7 +70,7 @@ Partition type:	ChangeParametersPanel		Tipus de partició:
 Parameters	PartitionList		Paràmetres
 Cannot delete the selected partition.	MainWindow		No ha estat possible suprimir la partició seleccionada.
 Continue	MainWindow		Continua
-Could not mount partition %s.	MainWindow		No ha estat possible muntar la partició $s.
+Could not mount partition %s.	MainWindow		No s'ha pogut muntar la partició %s.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Esteu segur que voleu formatar la partició? Encara us preguntarem un cop més abans d'escriure els canvis al disc.
 The selected disk is read-only.	MainWindow		El disc triat és només de lectura.
 The partition %s is already unmounted.	MainWindow		La partició %s ja està muntada.

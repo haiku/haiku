@@ -13,7 +13,7 @@ OK	Login View		D'acord
 Info	Login App		Informació
 Login:	Login View		Nom d'usuari:
 Password:	Login View		Contrasenya:
-Unimplemented	Login App		Podeu personalitzar l'escriptori que es mostra darrera de l'aplicació Autenticació deixant-hi anar replicants.\n\nQuan haureu acabat només heu de sortir de l'aplicació (Alt-Q).
+Unimplemented	Login App		No implementat
 OK	Login App		D'acord
 Error: %1	Login App		Error: %1
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	error %s\n

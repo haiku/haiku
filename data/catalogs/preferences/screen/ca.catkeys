@@ -8,7 +8,7 @@ The screen mode could not be set:\n\t%s\n	Screen		No ha estat possible ajustar e
 Keep	Screen		Conserva
 /other…	Screen		/altre…
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Freqüència horitzontal:\t%lu - %lu kHz\nFreqüència vertical:\t%lu - %lu Hz\n\nAmple de banda màxim :\t%g MHz
-Refresh rate:	Screen		La configuració es restablirà en %seconds segons.
+Refresh rate:	Screen		Freqüència d'actualització:
 Video format:	Screen		Format del vídeo:
 Undo	Screen		Desfés
 OK	Screen		D'acord

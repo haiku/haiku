@@ -1,4 +1,4 @@
-1	danish	x-vnd.Be-MAIL	2849540371
+1	danish	x-vnd.Be-MAIL	1477453861
 Set to Saved	Mail		Indstil til gemt
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Din hovedtekst indeholder %ld ukodbare tegn. Måske et andet tegnsæt vil virke bedre? Tryk på Send for at sende den alligevel (der bruges et erstatningstegn i stedet for de ukodbare), eller vælg Annuller for at gå tilbage og prøve at rette det igen.
 Text wrapping:	Mail		Tekstombrydning:
@@ -13,6 +13,7 @@ Copy to new	Mail		Kopiér til ny
 Save as draft	Mail		Gem som kladde
 Encoding:	Mail		Kodning:
 Print	Mail		Print
+Decrease quote level	Mail		Lavere kvoteniveau
 Encoding	Mail		Kodning
 Default account:	Mail		Standardkonto:
 Message	Mail		Meddelelse
@@ -164,4 +165,5 @@ Spam	Mail		Spam
 Couldn't open this signature. Sorry.	Mail		Kunne ikke åbne signaturen. Beklager.
 Revert	Mail		Tilbagefør
 Unknown	Mail		Ukendt
+Increase quote level	Mail		Højere kvoteniveau
 Add enclosure…	Mail		Tilføj enclosure…

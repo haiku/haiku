@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	533628093
+1	finnish	x-vnd.Haiku-HaikuDepot	913112167
 Repository update error	LocalRepositoryUpdateProcess		Tietovaraston päivitysvirhe
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Tietovaraston päivityksen yhteydessä tapahtui virhe: %error%
 Check for updates…	MainWindow		Tarkista päivitykset…
@@ -112,6 +112,7 @@ All categories	FilterView		Kaikki luokat
 Repositories	MainWindow		Tietovarastot
 n/a	PackageInfoView		–
 Cancel	MainWindow		Peru
+View agreed usage conditions…	MainWindow		Katso hyväksyttyjä käyttöehtoja…
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 lisää ladattavaksi)}other{(# lisää ladattavaksi)}}
 Refresh repositories	MainWindow		Virkistä tietovarastoja
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Jos et tarjoa sähköpostiosoitetta, et kykene nollaamaan salasanaasi silloin kun unohdat sen.

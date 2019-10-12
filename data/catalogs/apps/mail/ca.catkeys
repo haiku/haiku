@@ -1,6 +1,6 @@
 1	catalan; valencian	x-vnd.Be-MAIL	2903558745
 Set to Saved	Mail		Marca com a desat
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		El vostre text principal conté caràcters no codificables.Pot ser amb un joc de caràcters diferent funcionaria millor. Premeu Envia per enviar-ho igualment (llavors es substituirà amb un altre els caràcters que no es poden codificar), o bé trieu 'Anul·la' per anar enredera i intentar corregir-ho.
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		El vostre text principal conté %ld caràcters no codificables. Potser amb un conjunt de caràcters diferent funcionaria millor? Premeu Envia per enviar-ho igualment (se substituiran per altres els caràcters que no es puguin codificar), o bé trieu Cancel·la per tornar i intentar corregir-ho.
 Text wrapping:	Mail		Ajustament de línia:
 Show icons & labels	Mail		Mostra les icones i les etiquetes
 (Date unavailable)	Mail		(La data no està disponible)
@@ -29,7 +29,7 @@ sent	B_USER_DIRECTORY/mail/sent		enviat
 Only files can be added as attachments.	Mail		Només es poden afegir fitxers amb els adjunts.
 Close	Mail		Tanca
 Untitled	Mail		Sense títol
-Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Encara no està desenvolupada la supressió de correus reenviats!\No funcionarà correctament.
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Encara no està desenvolupada la supressió d'adjunts reenviats!\nNo funcionarà correctament.
 Previous message	Mail		Missatge anterior
 (Address unavailable)	Mail		(L'adreça no està disponible)
 Mail	System name		Correu electrònic

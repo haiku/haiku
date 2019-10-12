@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	543944115
+1	german	x-vnd.Haiku-libtracker	4072090563
 Created	ContainerWindow		Erstellt
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
 Open with…	ContainerWindow		Öffnen mit...
@@ -230,6 +230,7 @@ ends with	SelectionWindow		endet mit
 You must have at least one attribute showing.	PoseView		Es muss mindestens ein Attribut angezeigt werden.
 Cut	FilePanelPriv		Ausschneiden
 Favorites	FilePanelPriv		Favoriten
+home	B_USER_DIRECTORY		Home
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Tracker Neue Vorlagen
 Disk mounting during boot	AutoMounterSettings		Einhängen beim Systemstart
 Don't automount	AutoMounterSettings		Nicht automatisch einhängen
