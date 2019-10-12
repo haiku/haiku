@@ -331,7 +331,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 	// Signature
 
 	fSignatureControl = new BTextControl("signature",
-		B_TRANSLATE("Signature:"), new BMessage(kMsgSignatureChanged));
+		B_TRANSLATE("Signature:"), NULL, new BMessage(kMsgSignatureChanged));
 	fSignatureControl->SetModificationMessage(
 		new BMessage(kMsgSignatureChanged));
 
