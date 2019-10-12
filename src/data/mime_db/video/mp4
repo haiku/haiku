@@ -12,4 +12,5 @@ resource(3, "META:EXTENS") message(234) {
 	"type" = "video/mp4"
 };
 
-resource(4, "META:SNIFF_RULE") "0.60 (\"\\000\\000\\000\\034ftypmp42\")";
+resource(4, "META:SNIFF_RULE") "0.60 [4](-i \"ftyp\")[8](-i \"isom\" | \"iso2\" | \"mmp4\" | \"mp41\" | \"mp42\") ";
+// note: isom and iso2 as major type is against what iso sais, but these exist in the wild, thus they are here.
