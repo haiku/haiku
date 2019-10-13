@@ -22,8 +22,11 @@ HAIKU_FBSD_WLAN_DRIVER_GLUE(iprowifi2200, iwi, pci)
 NO_HAIKU_FBSD_MII_DRIVER();
 HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_WLAN);
 HAIKU_FIRMWARE_VERSION(300);
-HAIKU_FIRMWARE_NAME_MAP(3) = {{"iwi_bss", "ipw2200-bss.fw"},
-	{"iwi_ibss", "ipw2200-ibss.fw"}, {"iwi_monitor", "ipw2200-sniffer.fw"}};
+HAIKU_FIRMWARE_NAME_MAP({
+	{"iwi_bss", "ipw2200-bss.fw"},
+	{"iwi_ibss", "ipw2200-ibss.fw"},
+	{"iwi_monitor", "ipw2200-sniffer.fw"}
+});
 
 
 int

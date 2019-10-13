@@ -234,9 +234,17 @@ extern const uint __haiku_firmware_version;
 extern const uint __haiku_firmware_parts_count;
 extern const char* __haiku_firmware_name_map[][2];
 
-#define HAIKU_FIRMWARE_NAME_MAP(firmwarePartsCount) \
-	const uint __haiku_firmware_parts_count = firmwarePartsCount; \
-	const char* __haiku_firmware_name_map[firmwarePartsCount][2]
+/*
+ * Provide a firmware name mapping as a multi-dimentional const char* array.
+ *
+ * HAIKU_FIRMWARE_NAME_MAP({
+ *   {"name-used-by-driver", "actual-name-of-firmware-file-on-disk"},
+ *   ...
+ * });
+ */
+#define HAIKU_FIRMWARE_NAME_MAP(...) \
+	const char* __haiku_firmware_name_map[][2] = __VA_ARGS__; \
+	const uint __haiku_firmware_parts_count = B_COUNT_OF(__haiku_firmware_name_map)
 
 #define NO_HAIKU_FIRMWARE_NAME_MAP() \
 	const uint __haiku_firmware_parts_count = 0; \
