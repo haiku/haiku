@@ -174,7 +174,8 @@ TermView::TermView(BRect frame, const ShellParameters& shellParameters,
 	fReportX10MouseEvent(false),
 	fReportNormalMouseEvent(false),
 	fReportButtonMouseEvent(false),
-	fReportAnyMouseEvent(false)
+	fReportAnyMouseEvent(false),
+	fEnableExtendedMouseCoordinates(false)
 {
 	status_t status = _InitObject(shellParameters);
 	if (status != B_OK)
@@ -197,7 +198,8 @@ TermView::TermView(int rows, int columns,
 	fReportX10MouseEvent(false),
 	fReportNormalMouseEvent(false),
 	fReportButtonMouseEvent(false),
-	fReportAnyMouseEvent(false)
+	fReportAnyMouseEvent(false),
+	fEnableExtendedMouseCoordinates(false)
 {
 	status_t status = _InitObject(shellParameters);
 	if (status != B_OK)
@@ -230,7 +232,8 @@ TermView::TermView(BMessage* archive)
 	fReportX10MouseEvent(false),
 	fReportNormalMouseEvent(false),
 	fReportButtonMouseEvent(false),
-	fReportAnyMouseEvent(false)
+	fReportAnyMouseEvent(false),
+	fEnableExtendedMouseCoordinates(false)
 {
 	BRect frame = Bounds();
 
@@ -317,6 +320,7 @@ TermView::_InitObject(const ShellParameters& shellParameters)
 	fReportNormalMouseEvent = false;
 	fReportButtonMouseEvent = false;
 	fReportAnyMouseEvent = false;
+	fEnableExtendedMouseCoordinates = false;
 	fMouseClipboard = be_clipboard;
 	fDefaultState = new(std::nothrow) DefaultState(this);
 	fSelectState = new(std::nothrow) SelectState(this);
@@ -1846,18 +1850,21 @@ TermView::MessageReceived(BMessage *msg)
 		}
 		case MSG_REPORT_MOUSE_EVENT:
 		{
-			bool report;
-			if (msg->FindBool("reportX10MouseEvent", &report) == B_OK)
-				fReportX10MouseEvent = report;
+			bool value;
+			if (msg->FindBool("reportX10MouseEvent", &value) == B_OK)
+				fReportX10MouseEvent = value;
 
-			if (msg->FindBool("reportNormalMouseEvent", &report) == B_OK)
-				fReportNormalMouseEvent = report;
+			if (msg->FindBool("reportNormalMouseEvent", &value) == B_OK)
+				fReportNormalMouseEvent = value;
 
-			if (msg->FindBool("reportButtonMouseEvent", &report) == B_OK)
-				fReportButtonMouseEvent = report;
+			if (msg->FindBool("reportButtonMouseEvent", &value) == B_OK)
+				fReportButtonMouseEvent = value;
 
-			if (msg->FindBool("reportAnyMouseEvent", &report) == B_OK)
-				fReportAnyMouseEvent = report;
+			if (msg->FindBool("reportAnyMouseEvent", &value) == B_OK)
+				fReportAnyMouseEvent = value;
+
+			if (msg->FindBool("enableExtendedMouseCoordinates", &value) == B_OK)
+				fEnableExtendedMouseCoordinates = value;
 			break;
 		}
 		case MSG_REMOVE_RESIZE_VIEW_IF_NEEDED:
@@ -2407,30 +2414,65 @@ void
 TermView::_SendMouseEvent(int32 buttons, int32 mode, int32 x, int32 y,
 	bool motion)
 {
-	char xtermButtons;
-	if (buttons == B_PRIMARY_MOUSE_BUTTON)
-		xtermButtons = 32 + 0;
-	else if (buttons == B_SECONDARY_MOUSE_BUTTON)
-		xtermButtons = 32 + 1;
-	else if (buttons == B_TERTIARY_MOUSE_BUTTON)
-		xtermButtons = 32 + 2;
-	else
-		xtermButtons = 32 + 3;
+	if (!fEnableExtendedMouseCoordinates) {
+		char xtermButtons;
+		if (buttons == B_PRIMARY_MOUSE_BUTTON)
+			xtermButtons = 32 + 0;
+		else if (buttons == B_SECONDARY_MOUSE_BUTTON)
+			xtermButtons = 32 + 1;
+		else if (buttons == B_TERTIARY_MOUSE_BUTTON)
+			xtermButtons = 32 + 2;
+		else
+			xtermButtons = 32 + 3;
 
-	if (motion)
-		xtermButtons += 32;
+		if (motion)
+			xtermButtons += 32;
 
-	char xtermX = x + 1 + 32;
-	char xtermY = y + 1 + 32;
+		char xtermX = x + 1 + 32;
+		char xtermY = y + 1 + 32;
 
-	char destBuffer[6];
-	destBuffer[0] = '\033';
-	destBuffer[1] = '[';
-	destBuffer[2] = 'M';
-	destBuffer[3] = xtermButtons;
-	destBuffer[4] = xtermX;
-	destBuffer[5] = xtermY;
-	fShell->Write(destBuffer, 6);
+		char destBuffer[6];
+		destBuffer[0] = '\033';
+		destBuffer[1] = '[';
+		destBuffer[2] = 'M';
+		destBuffer[3] = xtermButtons;
+		destBuffer[4] = xtermX;
+		destBuffer[5] = xtermY;
+		fShell->Write(destBuffer, 6);
+	} else {
+		char xtermButtons;
+		if (buttons == B_PRIMARY_MOUSE_BUTTON)
+			xtermButtons = 0;
+		else if (buttons == B_SECONDARY_MOUSE_BUTTON)
+			xtermButtons = 1;
+		else if (buttons == B_TERTIARY_MOUSE_BUTTON)
+			xtermButtons = 2;
+		else
+			xtermButtons = 3;
+
+		if (motion)
+			xtermButtons += 32;
+
+		int16 xtermX = x + 1;
+		int16 xtermY = y + 1;
+
+		char destBuffer[13];
+		destBuffer[0] = '\033';
+		destBuffer[1] = '[';
+		destBuffer[2] = '<';
+		destBuffer[3] = xtermButtons + '0';
+		destBuffer[4] = ';';
+		destBuffer[5] = xtermX / 100 % 10 + '0';
+		destBuffer[6] = xtermX / 10 % 10 + '0';
+		destBuffer[7] = xtermX % 10 + '0';
+		destBuffer[8] = ';';
+		destBuffer[9] = xtermY / 100 % 10 + '0';
+		destBuffer[10] = xtermY / 10 % 10 + '0';
+		destBuffer[11] = xtermY % 10 + '0';
+		// No support for button press/release
+		destBuffer[12] = 'M';
+		fShell->Write(destBuffer, 13);
+	}
 }
 
 

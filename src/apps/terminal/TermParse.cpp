@@ -1395,6 +1395,10 @@ TermParse::_DecPrivateModeSet(int value)
 			// Use All Motion Mouse Tracking
 			fBuffer->ReportAnyMouseEvent(true);
 			break;
+		case 1006:
+			// Enable extended mouse coordinates with SGR scheme
+			fBuffer->EnableExtendedMouseCoordinates(true);
+			break;
 		case 1034:
 			// Interpret "meta" key, sets eighth bit.
 			fBuffer->EnableInterpretMetaKey(true);
@@ -1469,6 +1473,10 @@ TermParse::_DecPrivateModeReset(int value)
 		case 1003:
 			// Disable All Motion Mouse Tracking.
 			fBuffer->ReportAnyMouseEvent(false);
+			break;
+		case 1006:
+			// Disable extended mouse coordinates with SGR scheme
+			fBuffer->EnableExtendedMouseCoordinates(false);
 			break;
 		case 1034:
 			// Don't interpret "meta" key.

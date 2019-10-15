@@ -177,9 +177,9 @@ enum {
 #define TAB_WIDTH 8
 
 #define MIN_COLS 10
-#define MAX_COLS 256
+#define MAX_COLS 999
 #define MIN_ROWS 10
-#define MAX_ROWS 256
+#define MAX_ROWS 999
 
 // Insert mode flag
 #define MODE_OVER 0

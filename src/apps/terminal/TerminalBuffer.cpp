@@ -158,6 +158,17 @@ TerminalBuffer::ReportAnyMouseEvent(bool reportAnyMouseEvent)
 
 
 void
+TerminalBuffer::EnableExtendedMouseCoordinates(bool enable)
+{
+	if (fListenerValid) {
+		BMessage message(MSG_REPORT_MOUSE_EVENT);
+		message.AddBool("enableExtendedMouseCoordinates", enable);
+		fListener.SendMessage(&message);
+	}
+}
+
+
+void
 TerminalBuffer::SetEncoding(int encoding)
 {
 	fEncoding = encoding;

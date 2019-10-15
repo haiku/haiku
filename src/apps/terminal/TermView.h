@@ -359,6 +359,7 @@ private:
 			bool				fReportNormalMouseEvent;
 			bool				fReportButtonMouseEvent;
 			bool				fReportAnyMouseEvent;
+			bool				fEnableExtendedMouseCoordinates;
 			BClipboard*			fMouseClipboard;
 
 			// states
