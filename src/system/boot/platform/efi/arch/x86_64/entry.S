@@ -9,8 +9,6 @@
 
 #include <arch/x86/descriptors.h>
 
-#include "mmu.h"
-
 
 #define GDT_LIMIT 0x800
 

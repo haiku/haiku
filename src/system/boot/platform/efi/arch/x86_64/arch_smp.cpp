@@ -72,14 +72,14 @@ struct trampoline_args {
 };
 
 
-static uint32
+uint32
 apic_read(uint32 offset)
 {
 	return *(volatile uint32 *)((addr_t)gKernelArgs.arch_args.apic_phys + offset);
 }
 
 
-static void
+void
 apic_write(uint32 offset, uint32 data)
 {
 	*(volatile uint32 *)((addr_t)gKernelArgs.arch_args.apic_phys + offset) = data;

@@ -37,14 +37,7 @@ local platform_src =
 	support.S
 	;
 
-local arch_src =
-	arch_mmu.cpp
-	arch_smp.cpp
-	relocation_func.cpp
-	entry.S
-	;
-
-Includes [ FGristFiles $(efi_glue_src) $(platform_src) $(arch_src) ]
+Includes [ FGristFiles $(efi_glue_src) $(platform_src) ]
 	:
 	[ BuildFeatureAttribute gnuefi : headers ]
 	[ BuildFeatureAttribute gnuefi : headersProtocol ]
@@ -55,21 +48,26 @@ local platform ;
 for platform in [ MultiBootSubDirSetup efi ] {
 	on $(platform) {
 
-		BootMergeObject boot_platform_efi.o :
+		BootMergeObject boot_platform_efi_common.o :
 			$(efi_glue_src)
 			$(platform_src)
-			$(arch_src)
 			:
 			: boot_platform_generic_efi.a
 		;
 
-		SEARCH on [ FGristFiles $(arch_src) ]
-			= [ FDirName $(SUBDIR) arch $(TARGET_ARCH) ] ;
+		BootMergeObject boot_platform_efi.o :
+			: :
+			boot_platform_efi_$(TARGET_ARCH).o
+			boot_platform_efi_common.o
+		;
+
 		LOCATE on [ FGristFiles $(efi_glue_src) ]
 			= [ BuildFeatureAttribute gnuefi : libdir : path ] ;
 		Depends [ FGristFiles $(efi_glue_src) ]
 			: [ BuildFeatureAttribute gnuefi : libdir ] ;
-		Depends [ FGristFiles $(platform_src) $(arch_src) ]
+		Depends [ FGristFiles $(platform_src) ]
 			: [ BuildFeatureAttribute gnuefi : headers ] ;
 	}
 }
+
+SubInclude HAIKU_TOP src system boot platform efi arch $(TARGET_ARCH) ;
