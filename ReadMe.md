@@ -40,10 +40,10 @@ If you're submitting a patch to us, please make sure you're following the
 [patch submitting guidelines](https://dev.haiku-os.org/wiki/CodingGuidelines/SubmittingPatches).
 
 If you're having trouble finding something in the source tree, you can use
-one of our OpenGrok servers:
+one of our web-based source code browsers:
 
- * http://xref.plausible.coop/ (provided by Landon Fuller)
- * http://code.metager.de/source/xref/haiku (provided by MetaGer)
+ * http://xref.plausible.coop/ (OpenGrok, provided by Landon Fuller)
+ * http://cgit.haiku-os.org/ (cgit, provided by Haiku, Inc.)
 
 ### Contributing documentation
 The main piece of documentation that still needs work are the API docs (found
