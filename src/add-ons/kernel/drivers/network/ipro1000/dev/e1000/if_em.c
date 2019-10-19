@@ -2214,11 +2214,11 @@ em_free_pci_resources(if_ctx_t ctx)
 	if (adapter->intr_type == IFLIB_INTR_MSIX)
 		iflib_irq_free(ctx, &adapter->irq);
 
-	{
-	int i;
-	for (i = 0; i < adapter->rx_num_queues; i++, que++) {
-		iflib_irq_free(ctx, &que->que_irq);
-	}
+	if (que) {
+		int i;
+		for (i = 0; i < adapter->rx_num_queues; i++, que++) {
+			iflib_irq_free(ctx, &que->que_irq);
+		}
 	}
 
 	if (adapter->memory != NULL) {
