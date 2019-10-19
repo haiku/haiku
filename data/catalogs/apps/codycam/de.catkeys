@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-CodyCam	2593355250
+1	german	x-vnd.Haiku-CodyCam	3529495545
 destination directory expected	CodyCam		Zielverzeichnis erwartet
 reply: '%s'\n	SftpClient		Antwort; '%s'\n
 JPEG image	CodyCam		JPEG-Bild
@@ -83,6 +83,5 @@ FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		Fehler bei Erstellung der Ausgabedatei
 Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Es wurde keine Videoquelle gefunden.\n Um CodyCam zu nutzen, wird eine Webcam benötigt.
 Logging in…	VideoConsumer.cpp		Einloggen…
-CodyCam	System name		Webcam
 Error writing output file	VideoConsumer.cpp		Fehler beim Schreiben der Ausgabedatei
 Capture controls	CodyCam		Aufnahme-Einstellungen

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-GLTeapot	1569683445
+1	german	x-vnd.Haiku-GLTeapot	4226587228
 Upper center	TeapotWindow		Mitte oben
 Lighting	TeapotWindow		Beleuchtung
 Off	TeapotWindow		Aus
@@ -15,7 +15,6 @@ Backface culling	TeapotWindow		Backface Culling
 Z-buffered	TeapotWindow		Z-Buffering
 File	TeapotWindow		Datei
 Perspective	TeapotWindow		Perspektive
-GLTeapot	System name		GL-Teekanne
 Green	TeapotWindow		Grün
 Right	TeapotWindow		Rechts
 FPS display	TeapotWindow		FPS-Anzeige

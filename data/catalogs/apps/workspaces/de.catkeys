@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-WORK	3927737357
+1	german	x-vnd.Be-WORK	1029717550
 Quit	Workspaces		Beenden
 Invalid argument: %s\n	Workspaces		Ungültiger Parameter: %s\n
 Change workspace count…	Workspaces		Anzahl der Arbeitsflächen ändern...
@@ -10,4 +10,3 @@ Remove replicant	Workspaces		Replikant entfernen
 Live in the Deskbar	Workspaces		In der Deskbar anzeigen
 Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Gebrauch: %s [Optionen] [Arbeitsfläche]\nmögliche \"Optionen\" sind:\n  --notitle\t\tFenster ohne Titelreiter, aber mit Rahmen.\n  --noborder\t\tFenster ohne Titelreiter und Rahmen.\n  --avoidfocus\t\tFenster kann nicht aktiv oder Ziel für Tastatureingaben werden.\n  --alwaysontop\t\tFenster ist immer im Vordergrund.\n  --notmovable\t\tFenster kann nicht verschoben werden.\n  --autoraise\t\tFenster kommt automatisch in den Vordergrund, wenn es am Bildschirmrand ist und sich die Maus darüber befindet.\n  --help\t\tZeigt diesen Hilfetext an.\nund \"Arbeitsfläche\" ist die Nummer (0-31) der Arbeitsfläche, zu der gewechselt werden soll.\n
 Switch on mouse wheel	Workspaces		Arbeitsfläche per Mausrad wechseln
-Workspaces	System name		Arbeitsflächen

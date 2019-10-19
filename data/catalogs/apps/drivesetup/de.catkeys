@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DriveSetup	1934767996
+1	german	x-vnd.Haiku-DriveSetup	1293367628
 Could not unmount partition %s.	MainWindow		Partition \"%s\" konnte nicht ausgehangen werden.
 Mount all	MainWindow		Alle einhängen
 Disk	MainWindow		Datenträger
@@ -20,7 +20,6 @@ Partition size	CreateParametersPanel		Partitionsgröße
 Validation of the given parameters failed.	MainWindow		Die Überprüfung der angegebenen Parameter ist fehlgeschlagen.
 The partition %s is currently mounted.	MainWindow		Die Partition \"%s\" ist momentan eingehangen.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition \"%s\" wirklich formatiert werden? Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.
-DriveSetup	System name		Datenträgerverwaltung
 Mounted at	PartitionList		Eingehangen als
 Create…	MainWindow		Anlegen…
 Write changes	MainWindow		Änderungen schreiben

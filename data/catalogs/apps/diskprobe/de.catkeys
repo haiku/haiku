@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DiskProbe	2944605311
+1	german	x-vnd.Haiku-DiskProbe	3693286223
 Raw editor	AttributeWindow		Raw-Editor
 Remove	AttributeWindow		Entfernen
 Close	ProbeView		Schließen
@@ -21,13 +21,12 @@ Print…	ProbeView		Drucken…
 New…	FileWindow		Neu…
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	what: '%.4s'\n\n
 OK	DiskProbe		OK
-DiskProbe	System name		Hex-Editor
 Back	ProbeView		Zurück
 Device: 	ProbeView		Gerät: 
 Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Basis
 Open file…	FileWindow		Datei öffnen…
 32 bit unsigned pointer:	TypeEditors		Vorzeichenloser 32-Bit-Zeiger:
-DiskProbe request	DiskProbe		Hex-Editor-Anfrage
+DiskProbe request	DiskProbe		DiskProbe-Anfrage
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadezimal
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Die Datei konnte nicht geschrieben werden:\n%s\n\nAlle Änderungen werden beim Beenden verloren gehen.
 Examine device:	OpenWindow		Gerät untersuchen:

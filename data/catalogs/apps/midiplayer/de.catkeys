@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-MidiPlayer	1046133011
+1	german	x-vnd.Haiku-MidiPlayer	751580930
 This tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Das kleine Programm \nKann tausend Lieder spielen\nKlingt etwas seltsam
 Dungeon	Main Window		Kerker
 Could not load song	Main Window		Lied konnte nicht geladen werden
@@ -11,7 +11,6 @@ Scope	Main Window		Wellenform
 Drop MIDI file here	Scope View		Midi-Dateien hier fallen lassen
 None	Main Window		Kein
 Reverb:	Main Window		Hall:
-MidiPlayer	System name		Midi-Player
 OK	Main Window		OK
 Stop	Main Window		Stopp
 Live input:	Main Window		Live-Eingang:

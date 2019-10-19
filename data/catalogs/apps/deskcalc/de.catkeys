@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DeskCalc	2904979661
+1	german	x-vnd.Haiku-DeskCalc	1790079062
 cos	CalcView		cos
 acos	CalcView		acos
 7   8   9   (   )  \n4   5   6   *   /  \n1   2   3   +   -  \n0   .   BS  =   C  \n	CalcView		7   8   9   (   )  \n4   5   6   *   /  \n1   2   3   +   -  \n0   .   BS  =   C  \n
@@ -25,6 +25,5 @@ exp	CalcView		exp
 Audio Feedback	CalcView		Audiorückmeldung
 atan	CalcView		atan
 ln    sin   cos   tan   π    \nlog   asin  acos  atan  sqrt \nexp   sinh  cosh  tanh  cbrt \n!     ceil  floor E     ^    \n7     8     9     (     )    \n4     5     6     *     /    \n1     2     3     +     -    \n0     .     BS    =     C    \n	CalcView		ln    sin   cos   tan   π    \nlog   asin  acos  atan  sqrt \nexp   sinh  cosh  tanh  cbrt \n!     ceil  floor E     ^    \n7     8     9     (     )    \n4     5     6     *     /    \n1     2     3     +     -    \n0     .     BS    =     C    \n
-DeskCalc	System name		Rechner
 Degrees	CalcView		Grad
 Basic	CalcView		Einfach

@@ -5,7 +5,7 @@ There was an error refreshing the repository cache for %name%	TaskLooper	Error m
 There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Произошла ошибка при отключении репозитория %name%
 Unknown	Constants	Unknown repository name	Неизвестно
 Remove all	RepositoriesView	Button label	Удалить все
-Enable repositories to use with package management:	RepositoriesView	Label text	Включить репозитории для работы с пакетным менеджером:
+Enable repositories to use with package management:	RepositoriesView	Label text	Список репозиториев для работы с пакетным менеджером:
 Disable	RepositoriesView	Button label	Отключить
 Cancel task	TaskTimer	Button label	Отменить задачу
 Changes completed	RepositoriesView	Status view text	Изменения завершены

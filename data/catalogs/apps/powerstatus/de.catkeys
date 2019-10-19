@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-PowerStatus	3173765686
+1	german	x-vnd.Haiku-PowerStatus	3250907196
 Design capacity low warning: 	PowerStatus		Kapazitätswarnung (Herstellerangabe):
 Show percent	PowerStatus		Prozent anzeigen
 Design capacity: 	PowerStatus		Kapazität (lt. Hersteller):
@@ -10,7 +10,6 @@ non-rechargeable	PowerStatus		nicht aufladbar
 Empty battery slot	PowerStatus		Akkufach ist leer
  mV	PowerStatus		mV
 Run in window	PowerStatus		Im Fenster ausführen
-PowerStatus	System name		Akku-Anzeige
  mWh	PowerStatus		mWh
 Battery info…	PowerStatus		Akku-Infos…
 Damaged battery	PowerStatus		Akku defekt

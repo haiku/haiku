@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ActivityMonitor	1155619009
+1	german	x-vnd.Haiku-ActivityMonitor	2639593771
 P-faults	DataSource		Seitenfehler
 Media nodes	DataSource		Media-Nodes
 Threads	DataSource		Threads
@@ -33,7 +33,6 @@ CPU usage	DataSource		CPU-Auslastung
 Raw clipboard	DataSource		Raw-Ablage
 Sems	DataSource		Sems
 %.1f MiB	DataSource		%.1f MiB
-ActivityMonitor	System name		Systemmonitor
 Running applications	DataSource		Laufende Anwendungen
 Semaphores	DataSource		Semaphoren
 Block cache	DataSource		Block-Cache

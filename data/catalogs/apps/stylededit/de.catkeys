@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-StyledEdit	727465241
+1	german	x-vnd.Haiku-StyledEdit	2839922509
 Document statistics	Statistics		Dokument-Statistik
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rückgängig machen unmöglich, die Datei wurde nicht gefunden: \"%s\".
 Cut	Menus		Ausschneiden
@@ -49,7 +49,6 @@ Default	Menus		Standard
 OK	SaveAlert		OK
 Color	Menus		Farbe
 Save changes to the document \"%s\"? 	QuitAlert		Geändertes Dokument \"%s\" speichern? 
-StyledEdit	System name		Texteditor
 Find:	FindandReplaceWindow		Suche:
 Undo typing	QuitAlert		Rückgängig: Eingabe
 Error loading \"%s\":\n\t%s	LoadAlert		Fehler beim Laden von \"%s\":\n\t%s

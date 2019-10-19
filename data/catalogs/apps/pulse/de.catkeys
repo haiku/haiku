@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Pulse	139895817
+1	german	x-vnd.Haiku-Pulse	4083035326
 Normal mode	DeskbarPulseView		Normal-Modus
 Info	CPUButton		Info
 Quit	DeskbarPulseView		Beenden
@@ -13,8 +13,7 @@ Defaults	PrefsWindow		Standardwerte
 Mini mode	PrefsWindow		Mini-Modus
 CPU progress bar	NormalPulseView		CPU-Auslastungsbalken
 Fade colors	ConfigView		Verblassende Balken
-About Pulse…	PulseView		Über CPU-Anzeige…
-Pulse	NormalPulseView		CPU-Anzeige
+About Pulse…	PulseView		Über Pulse…
 Deskbar mode	NormalPulseView		Deskbar-Modus
 Remove replicant	CPUButton		Replikant entfernen
 You can't disable the last active CPU.	PulseView		Die letzte aktive CPU kann nicht ausgeschaltet werden.
@@ -26,7 +25,7 @@ OK	PrefsWindow		OK
 Pulse	PulseApp		CPU-Anzeige
 Removing from Deskbar failed.\n%s	DeskbarPulseView		Entfernen aus Deskbar fehlgeschlagen.\n%s
 OK	PulseApp		OK
-About Pulse…	CPUButton		Über CPU-Anzeige…
+About Pulse…	CPUButton		Über Pulse…
 Deskbar mode	PrefsWindow		Deskbar-Modus
 Mini mode	DeskbarPulseView		Mini-Modus
 You can't disable the last active CPU.	CPUButton		Die letzte aktive CPU kann nicht ausgeschaltet werden.
@@ -40,9 +39,8 @@ Info	PulseView		Info
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		Gebrauch: Pulse [--mini] [-w Breite] [--width=Breite]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]
 OK	DeskbarPulseView		OK
 Info	PulseApp		Info
-Pulse	System name		CPU-Anzeige
 Active color	ConfigView		Aktive Farbe
 Installing in Deskbar failed\n%s	PulseApp		Installation in Deskbar fehlgeschlagen.\n%s
 Idle color	ConfigView		Leerlauffarbe
 Normal mode	PrefsWindow		Normal-Modus
-Pulse settings	PulseWindow		CPU-Anzeige Einstellungen
+Pulse settings	PulseWindow		Pulse-Einstellungen

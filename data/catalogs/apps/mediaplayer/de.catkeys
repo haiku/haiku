@@ -1,11 +1,10 @@
-1	german	x-vnd.Haiku-MediaPlayer	1313616492
+1	german	x-vnd.Haiku-MediaPlayer	1250854242
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Eintrag in den Papierkorb verschieben
 Close	MediaPlayer-PlaylistWindow		Schließen
 Volume of background clips	MediaPlayer-SettingsWindow		Wiedergabe im Hintergrund
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Hardware-Overlay verwenden, falls verfügbar
 Audio	MediaPlayer-InfoWin		Audio
 Subtitle placement:	MediaPlayer-SettingsWindow		Untertitelposition:
-MediaPlayer	System name		Media-Player
 Audio track	MediaPlayer-Main		Audiospur
 Muted	MediaPlayer-SettingsWindow		Stumm geschaltet
 OK	MediaPlayer-RemovePLItemsCmd		OK
@@ -44,7 +43,7 @@ Close	MediaPlayer-Main		Schließen
 Save error	MediaPlayer-PlaylistWindow		Speichern ist fehlgeschlagen
 Attributes	MediaPlayer-Main		Attribute
 Bottom of screen	MediaPlayer-SettingsWindow		Unten im Fenster
-MediaPlayer settings	MediaPlayer-SettingsWindow		Media-Player-Einstellungen
+MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer-Einstellungen
 Copyright	MediaPlayer-InfoWin		Copyright
 Invalid URL inserted!	MediaPlayer-NetworkStream		Eingegebene URL ungültig!
 Aspect ratio	MediaPlayer-Main		Seitenverhältnis

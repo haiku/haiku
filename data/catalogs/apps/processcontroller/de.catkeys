@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ProcessController	168752057
+1	german	x-vnd.Haiku-ProcessController	2102755977
 Error saving file	ProcessController		Fehler beim Speichern der Datei
 Display priority	ProcessController		Anzeigen-Priorität
 That's no Fun!	ProcessController		Nicht lustig!
@@ -37,14 +37,13 @@ Cancel	ProcessController		Abbrechen
 Install in Deskbar	ProcessController		In Deskbar installieren
 Debug this team!	ProcessController		Dieses Team debuggen!
 Low latency	ProcessController		Performance-Modus
-ProcessController	System name		Systemmanager
 Lowest active priority	ProcessController		Niedrigste aktive Priorität
 Restart Tracker	ProcessController		Tracker neu starten
 System resources & caches…	ProcessController		Systemressourcen & Cache…
 Damned!	ProcessController		Herrje!
 New Terminal	ProcessController		Neues Terminal
 Power saving	ProcessController		Energiespar-Modus
-ProcessController is already installed in Deskbar.	ProcessController		Der Systemmanager ist bereits in der Deskbar installiert.
+ProcessController is already installed in Deskbar.	ProcessController		ProcessController ist bereits in der Deskbar installiert.
 This is the last active processor…\nYou can't turn it off!	ProcessController		Dies ist der letzte aktive Prozessor…\nDen kann man nicht ausschalten!
 This thread is already gone…	ProcessController		Dieser Thread existiert nicht mehr…
 Run in window	ProcessController		Im Fenster ausführen

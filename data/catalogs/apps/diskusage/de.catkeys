@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DiskUsage	2951688400
+1	german	x-vnd.Haiku-DiskUsage	801248363
 %size% in {0, plural, one{# file} other{# files}}	Info Window		%size% in {0, plural, one{einer Datei} other{# Dateien}}
 Scanning %refName%	Scanner		Analysiere %refName%
 %d files	Status View	For UI layouting only, use the longest plural form for your language	%d Dateien
@@ -12,7 +12,6 @@ Scan	Status View		Analyse
 Rescan	Status View		Erneut analysieren
 file unavailable	Status View		Datei nicht verfügbar
 Get info	Pie View		Datei-Info
-DiskUsage	System name		Datenträgerbelegung
 Created	Info Window		Erstellt
 Modified	Info Window		Geändert
 Abort	Status View		Abbrechen

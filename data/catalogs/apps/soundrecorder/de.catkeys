@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-SoundRecorder	24440888
+1	german	x-vnd.Haiku-SoundRecorder	4145480344
 Loop	RecorderWindow		Schleife
 Cannot find default audio hardware	RecorderWindow		Standard-Audiohardware wurde nicht gefunden.
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Die temporäre Datei, in der die neue Aufnahme gespeichert wurde, kann nicht gefunden werden.
@@ -23,7 +23,6 @@ Cannot open the temporary file created to hold the new recording	RecorderWindow	
 Input:	RecorderWindow		Eingang:
 Forward	RecorderWindow		Vorwärts
 Play	RecorderWindow		Wiedergabe
-SoundRecorder	System name		Audiorekorder
 Channels:	RecorderWindow		Kanäle:
  bits	RecorderWindow		Bits
 None	RecorderWindow		Keine

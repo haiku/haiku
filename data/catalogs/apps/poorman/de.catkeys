@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-PoorMan	1829050509
+1	german	x-vnd.Haiku-PoorMan	1941909940
 Select web folder	PoorMan		Web-Ordner auswählen
 Console logging	PoorMan		In Konsole loggen
 Create Log File	PoorMan		Logdatei erstellen
@@ -42,13 +42,12 @@ Log to console	PoorMan		In Konsole loggen
 Advanced	PoorMan		Erweitert
 Copy	PoorMan		Kopieren
 Logging	PoorMan		Log
-PoorMan	System name		Webserver
 Clear console log	PoorMan		Konsolenlog löschen
 Run server	PoorMan		Server starten
 Create	PoorMan		Erstelle
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# Verbindung} other{# Verbindungen}}
 done.\n	PoorMan		fertig.\n
-PoorMan settings	PoorMan		Webserver-Einstellungen
+PoorMan settings	PoorMan		PoorMan-Einstellungen
 Console Logging	PoorMan		In Konsole loggen
 Clear log file	PoorMan		Logdatei leeren
 Save log console selection	PoorMan		Auswahl der Logkonsole speichern

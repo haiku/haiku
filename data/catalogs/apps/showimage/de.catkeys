@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ShowImage	3998703664
+1	german	x-vnd.Haiku-ShowImage	601442731
 Use as background…	Menus		Als Hintergrund verwenden…
 File	Menus		Datei
 Slide delay	Menus		Verzögerung
@@ -45,7 +45,6 @@ Progress monitor	ProgressWindow		Fortschrittsanzeige
 Last page	Menus		Letzte Seite
 Stretch to window	Menus		Auf Fenstergröße vergrößern
 Previous file	Menus		Vorherige Datei
-ShowImage	System name		Bildbetrachter
 Slide show	Menus		Diashow
 Fit image to page	PrintOptionsWindow		Bild in Seite einpassen
 Flip top to bottom	Menus		Vertikal spiegeln

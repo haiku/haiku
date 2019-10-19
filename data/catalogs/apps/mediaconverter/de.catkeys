@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-MediaConverter	2251404027
+1	german	x-vnd.Haiku-MediaConverter	2437569950
 Writing audio track: %d%% complete	MediaConverter		Schreibe Audiospur: %d%% fertig
 Input file not recognized as Audio or Video	MediaConverter		Eingabedatei nicht als Audio oder Video erkannt.
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2fBilder/s
@@ -9,7 +9,7 @@ Error converting '%filename'	MediaConverter		Fehler beim Konvertieren von '%file
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Der gewählte Ordner wurde nicht gefunden. Versuche /boot/home stattdessen.
 Conversion completed	MediaConverter		Konvertierung abgeschlossen
 Audio:	MediaConverter-FileInfo		Audio:
-MediaConverter+:SaveDirectory	MediaConverter		Media-Konverter+:SaveDirectory
+MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
 Error creating video.	MediaConverter		Fehler beim Erstellen des Videos.
 Cancelling	MediaConverter		Abbruch
 None available	Audio codecs		Keine verfügbar
@@ -54,7 +54,6 @@ Drop media files onto this window	MediaConverter		Mediadateien auf diesem Fenste
 Quit	Menu		Beenden
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# Byte} other{# Bytes}}
 Duration:	MediaConverter-FileInfo		Dauer:
-MediaConverter	System name		Media-Konverter
 Error launching: %strError%	MediaConverter		Fehler beim Start: %strError%
 File format:	MediaConverter		Dateiformat:
 Error writing audio frame %ld	MediaConverter		Fehler beim Schreiben von Audioframe %ld

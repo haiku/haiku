@@ -10,7 +10,7 @@ non-rechargeable	PowerStatus		no ricjariabile
 Empty battery slot	PowerStatus		Puest pe batarie vueit
  mV	PowerStatus		 mV
 Run in window	PowerStatus		Eseguìs tal barcon
-PowerStatus	System name		PowerStatus
+PowerStatus	System name		Stât de Batarie
  mWh	PowerStatus		 mWh
 Battery info…	PowerStatus		Informazions batarie…
 Damaged battery	PowerStatus		Batarie ruvinade
@@ -39,7 +39,7 @@ Design capacity warning: 	PowerStatus		Avîs capacitât di fabriche:
 Quit	PowerStatus		Jes
 rechargeable	PowerStatus		ricjariabile
 charging	PowerStatus		cjariant
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Si pues eseguî PowerStatus intun barcon o instalâlu tal Deskbar.
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Si pues eseguî Stât de Batarie intun barcon o instalâlu tal Deskbar.
 Show status icon	PowerStatus		Mostre icone di stât
 Capacity granularity 2: 	PowerStatus		Granularitât de capacitât 2: 
 Technology: 	PowerStatus		Tecnologjie: 

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-CharacterMap	124574598
+1	german	x-vnd.Haiku-CharacterMap	4049350982
 Enclosed alphanumerics	UnicodeBlocks		Eingeschlossene alphanumerische Zeichen
 Basic Latin	UnicodeBlocks		Lateinisch
 Cyrillic extended C	UnicodeBlocks		Kyrillisch (Erweiterung C)
@@ -161,7 +161,6 @@ Osage	UnicodeBlocks		Osage
 Deseret	UnicodeBlocks		Deseret
 Tifinagh	UnicodeBlocks		Tifinagh
 Gurmukhi	UnicodeBlocks		Gurmukhi
-CharacterMap	System name		Zeichentabelle
 Lao	UnicodeBlocks		Lao
 Gothic	UnicodeBlocks		Gotisch
 Limbu	UnicodeBlocks		Limbu

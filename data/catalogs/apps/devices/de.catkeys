@@ -1,8 +1,7 @@
-1	german	x-vnd.Haiku-Devices	3345509916
+1	german	x-vnd.Haiku-Devices	2577757080
 ACPI bus	DevicesView		ACPI-Bus
 Encryption controller	Device		Verschlüsselungscontroller
 Bus Information	Device		Bus-Information
-Devices	System name		Geräte
 Graphics Peripheral	DeviceSCSI		Grafik-Peripheriegerät
 Processor	Device		Prozessor
 Generate system information	DevicesView		Systeminformationen erstellen

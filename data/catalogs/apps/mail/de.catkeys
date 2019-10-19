@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-MAIL	1477453861
+1	german	x-vnd.Be-MAIL	58052085
 Set to Saved	Mail		Status setzen: Saved
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Der Text enthält %ld nicht kodierbare Zeichen. Eine andere Zeichenkodierung könnte helfen. 'Senden' klicken, um die Nachricht trotzdem zu senden (Ersatzzeichen werden für die nicht kodierbaren Zeichen verwendet), oder den Vorgang abbrechen, um das Problem zu lösen.
 Text wrapping:	Mail		Zeilenumbruch:
@@ -36,7 +36,6 @@ Removing attachments from a forwarded mail is not yet implemented!\nIt will not 
 Same recipient	Mail		Selber Empfänger
 Previous message	Mail		Vorherige Nachricht
 (Address unavailable)	Mail		(Adresse nicht verfügbar)
-Mail	System name		E-Mail
 Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Anhang: %name% (Typ: %type%)
 Copy link location	Mail		Linkadresse kopieren
 Attachments: 	Mail		Anhänge: 
@@ -98,7 +97,7 @@ Need Tracker to move items to trash	Mail		Um Nachrichten in den Papierkorb zu ve
 The mail_daemon could not be started:\n\t	Mail		Der Maildienst (mail_daemon) konnte nicht gestartet werden:\n\t
 <no account found>	Mail		<kein Konto gefunden>
 Mail couldn't find its dictionary.	Mail		Das Wörterbuch wurde nicht gefunden.
-Mail preferences	Mail		E-Mail-Einstellungen
+Mail preferences	Mail		Mail-Einstellungen
 helpful message	Mail		Tipp
  Read 	Mail		 Gelesen 
 Font:	Mail		Schriftart:
