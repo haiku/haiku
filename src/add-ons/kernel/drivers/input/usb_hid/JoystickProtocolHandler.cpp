@@ -20,6 +20,7 @@
 #include <usb/USB_hid.h>
 
 #include <kernel.h>
+#include <util/AutoLock.h>
 
 
 JoystickProtocolHandler::JoystickProtocolHandler(HIDReport &report)
@@ -236,14 +237,15 @@ JoystickProtocolHandler::Read(uint32 *cookie, off_t position, void *buffer,
 		return B_BUFFER_OVERFLOW;
 
 	// this is a polling interface, we just return the current value
-	status_t result = mutex_lock(&fUpdateLock);
-	if (result != B_OK) {
+	MutexLocker locker(fUpdateLock);
+	if (!locker.IsLocked()) {
 		*numBytes = 0;
-		return result;
+		return B_ERROR;
 	}
 
-	memcpy(buffer, fCurrentValues.data, fCurrentValues.data_size);
-	mutex_unlock(&fUpdateLock);
+	if (!IS_USER_ADDRESS(buffer) || user_memcpy(buffer, fCurrentValues.data,
+			fCurrentValues.data_size) != B_OK)
+		return B_BAD_ADDRESS;
 
 	*numBytes = fCurrentValues.data_size;
 	return B_OK;
