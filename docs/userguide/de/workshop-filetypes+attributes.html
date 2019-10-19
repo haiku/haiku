@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008, 2019 Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,10 +32,12 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/de.png" alt="" /> Deutsch</li>
+<li><a href="../id/workshop-filetypes+attributes.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/workshop-filetypes+attributes.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../en/workshop-filetypes+attributes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/workshop-filetypes+attributes.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/workshop-filetypes+attributes.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/workshop-filetypes+attributes.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/workshop-filetypes+attributes.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/workshop-filetypes+attributes.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/workshop-filetypes+attributes.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -59,6 +61,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Solange die Übersetzung dieser Seite noch nicht ganz fertig ist, erscheint für die noch fehlenden Teile die englische Version.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -142,11 +145,11 @@ Auf alle Fälle hängen wir an diese Dateien eine Reihe von Attributen. Hier mü
 <ul>
 <li><p><i>Attributname</i> - Erscheint als Spaltenkopf im Tracker-Fenster</p></li>
 <li><p><i>Interner Name</i> - Wird für die Indizierung und Suche verwendet.</p></li>
-<li><i>Typ</i> - Beschreibt die Art des Attributs und entsprechend wie es gesucht werden kann.
+<li><i>Type</i> - Defines the value the attribute can hold and therefore how it can be queried.
     <ul>
-    <li><span class="menu">String</span> - normaler Text</li>
-    <li><span class="menu">Boolean</span> - für die binären Werte 0 und 1</li>
-    <li><span class="menu">Integer</span>für ganzzahlige Werte diesen Umfangs:
+    <li><span class="menu">String</span> for normal text</li>
+    <li><span class="menu">Boolean</span> for binary data: 0 (false) or &gt;=1 (true)</li>
+    <li><span class="menu">Integer</span> for integer numbers with different ranges:
         <ul>
         <li><span class="menu">8 bit</span>: ± 255</li>
         <li><span class="menu">16 bit</span>: ± 65,535</li>
@@ -154,18 +157,24 @@ Auf alle Fälle hängen wir an diese Dateien eine Reihe von Attributen. Hier mü
         <li><span class="menu">64 bit</span>: ± 18,446,744,073,709,551,615</li>
         </ul>
     </li>
-    <li><span class="menu">Float</span> - Fließkommazahlen einfacher Genauigkeit</li>
-    <li><span class="menu">Double</span> - Fließkommazahlen doppelter Genauigkeit</li>
-    <li><span class="menu">Time</span> - Zeit und Datum-Werte</li>
+    <li><span class="menu">Float</span> for floating-point numbers, single precision</li>
+    <li><span class="menu">Double</span> for floating-point numbers, double precision</li>
+    <li><span class="menu">Time</span> for time and date format</li>
     </ul>
 </li>
 </ul>
 <ul>
-<li><i>Sichtbar</i> - Nur wenn diese Option markiert ist, kann das Attribut im Tracker gesehen / angezeigt werden; da unsere DVD-Datenbank angezeigt werden soll, setzten wir das Kreuz mit diesen Einstellungen:<ul>
-    <li><span class="menu">Anzeigen als</span> - auf "Default" (Standard) belassen. Zukünftig sind hier weitere Möglichkeiten wie Fortschrittsbalken oder Sterne geplant</li>
-    <li><span class="menu">Editierbar</span> - hiermit kann das Attribut direkt im Tracker ergänzt werden</li>
-    <li><span class="menu">Breite</span> - die Breite der Spalte des Attributs im Tracker-Fenster</li>
-    <li><span class="menu">Ausrichtung</span> - die Ausrichtung des Attribut-Wertes in der Spalte im Tracker: linksbündig, zentriert oder rechtsbündig</li>
+<li><i>Visible</i> - This checkbox determines if the attribute is visible in a Tracker window at all. Since the Tracker will be the interface to our DVD database, we check it and define its appearance with:<ul>
+    <li><span class="menu">Display as</span> - Left on "Default" if the values are to be displayed according to the attribute's "Type" (e.g. string/integer/float etc.). The other options are:
+	<ul>
+		<li><span class="menu">Checkbox</span> - Can be used to show either one of two symbols, see <span class="menu">Special</span> below.</li>
+		<li><span class="menu">Duration</span> - Shows an integer as 1/60, e.g. "90" becomes "1:30".</li>
+		<li><span class="menu">Rating</span> - Shows a rating between 0 and 10 as star symbols.</li>
+	</ul></li>
+    <li><span class="menu">Editable</span> - Determines if the attribute shall be editable in Tracker.</li>
+    <li><span class="menu">Special</span> - Defines the two symbols used for a checkbox display. For example, "xo" will show a "x" for all values &gt;0 and "o" for 0.</li>
+    <li><span class="menu">Width</span> - The default width of that attributes column in a Tracker window.</li>
+    <li><span class="menu">Alignment</span> - The attribute can be displayed left, center, or right aligned.</li>
 </ul></li></ul>
 <p>Jetzt müssen diese Werte für die Attribute eingegeben werden:</p>
 <table summary="DVDdb Attributes" cellpadding="10" border="1">

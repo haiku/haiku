@@ -32,11 +32,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/jp.png" alt="" /> 日本語</li>
+<li><a href="../../id/preferences/appearance.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/preferences/appearance.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/preferences/appearance.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/preferences/appearance.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/preferences/appearance.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/preferences/appearance.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/preferences/appearance.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/preferences/appearance.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/preferences/appearance.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pl/preferences/appearance.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
@@ -72,12 +74,12 @@
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="fonts" name="fonts">フォント</a></h2>
 <img src="../images/prefs-images/appearance-fonts.png" alt="appearance-fonts.png" />
-<p>Haiku は目的別に 3 種類の標準フォントを定めています。ここでシステム全体に用いられるフォントのスタイル (通常・太字・固定幅) とサイズを設定します。加えて、メニューで使われるフォントの設定が別にあります。</p>
+<p>Haiku は目的別に 3 種類の標準フォントを定めています。ここでシステム全体に用いられるフォントのスタイル (通常・太字・固定幅) とサイズを設定します。同様に、メニューで使われるフォントの設定が別にあります。</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="installing_fonts" name="installing_fonts">新しいフォントのインストール</a></h3>
-<p>正規の .hpkg パッケージの一部でない新しいフォントをインストールするには、<tt>non-packaged</tt> フォルダーの、フォントの種類 (<tt>psfonts</tt> または <tt>ttfonts</tt>) に応じたサブフォルダーへコピーします (<a href="../filesystem-layout.html">ファイルシステムレイアウト</a>のトピックを参照ください)。TrueType フォントでは、コピー先は以下のようになるでしょう。</p>
+<p>正規の .hpkg パッケージではない新しいフォントをインストールするには、<tt>non-packaged</tt> フォルダーの、フォントの種類 (<tt>psfonts</tt> または <tt>ttfonts</tt>) に応じたサブフォルダーへコピーします (<a href="../filesystem-layout.html">ファイルシステムレイアウト</a>のトピックを参照ください)。TrueType フォントでは、コピー先は以下のようになるでしょう。</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="path">/boot/system/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>すべてのユーザー用フォント</td></tr>
 <tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>あなたの専用フォント</td></tr>
@@ -87,13 +89,13 @@
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="colors" name="colors">色 (Colors)</a></h2>
 <img src="../images/prefs-images/appearance-colors.png" alt="appearance-colors.png" />
-<p><span class="menu">色 (Colors)</span> タブで、ユーザーインターフェースの各部位の色を変更できます。カラーウェルは、ほかのアプリケーションからのドラッグ＆ドロップを受け付けるので、たとえば、<span class="app">WonderBrush</span>、<span class="app">Icon-O-Matic</span>、または<span class="app">背景</span>パネルなどから色をドラッグできます。</p>
+<p><span class="menu">色 (Colors)</span> タブで、ユーザーインターフェースの各部の色を変更できます。カラーウェルは、ほかのアプリケーションからのドラッグ＆ドロップを受け付けるので、たとえば、<span class="app">WonderBrush</span>、<span class="app">Icon-O-Matic</span>、または<span class="app">背景</span>パネルなどから色をドラッグできます。</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="decorators" name="decorators">ウィンドウデコレーター (Window decorators)</a></h2>
 <img src="../images/prefs-images/appearance-decorators.png" alt="appearance-decorators.png" />
-<p>デコレーターは、ウィンドウや GUI 要素のルックアンドフィールを決定します。現在、Haiku はデフォルトデコレーターただ 1 つが付属しています。ほかのデコレーターを見つけてインストールすれば、ポップアップメニューからべつのデコレーターを選択できるでしょう。</p>
-<p>デフォルトデコレーターでは、スクロールバーの矢印のスタイルを設定できます。スクロールバーの終端に、スペースを節約するために単独の矢印にするか、上下左右にスクロールする際にマウスの移動を潜在的にいくつか減らせる— 伝統的な BeOS の方法 —上下矢印にするかを設定できます。</p>
+<p>デコレーターは、ウィンドウや GUI 要素のルックアンドフィールを決定します。現在、Haiku は1 つのデフォルトデコレーターだけが付属しています。ほかのデコレーターを探してインストールすれば、ポップアップメニューからべつのデコレーターを選択できるでしょう。</p>
+<p>デフォルトデコレーターでは、スクロールバーの矢印スタイルを設定できます。スクロールバーの終端を、スペースを節約できる単独の矢印にするか、上下左右にスクロールする際にマウスの移動を潜在的にいくらか減らせる— 伝統的な BeOS の方法 —上下矢印にするかを設定できます。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -104,26 +106,26 @@
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 グリフのヒンティング (Glyph hinting)</h3>
-<p><span class="menu">グリフのヒンティング (Glyph hinting)</span> を有効にすると、すべての文字の縦方向および横方向両端に、必ず 2 ピクセルの空白が入るようになります。特に、白い背景で黒い文字を扱う場合には、これを有効にしたときとしないときとで、結果は完全に対照的になります。有効にした場合、テキストがはっきりして見えます。ネットブックのような低解像度の機器で特に効果的な、<span class="menu">等幅フォントのみ有効 (Monospaced Fonts Only)</span> の設定もあります。ヒンティングをオンにすると、小さい文字がかなり汚く見えることがありますが、その場合でもテキストエディターやターミナルでヒンティングの恩恵を受けられます。</p>
-<p>次の拡大したスクリーンショットは、Hinting を有効にした場合と有効にしない場合とで、どれだけ見た目が変わるのかを示しています:</p>
+<p><span class="menu">グリフのヒンティング (Glyph hinting)</span> を有効にすると、すべての文字の縦横方向両端に、必ず 2 ピクセルの空白が入るようになります。特に、白い背景で黒い文字を扱う場合には、有効にしたときとしないときとで、結果は完全に対照的になります。有効にした場合、テキストがはっきり見えます。ネットブックのような低解像度の機器で特に効果的な、<span class="menu">等幅フォントのみ有効 (Monospaced Fonts Only)</span> の設定もあります。ヒンティングをオンにすると、小さい文字がかなり汚く見えることがありますが、その場合でもテキストエディターやターミナルでヒンティングの恩恵を受けられます。</p>
+<p>次の拡大したスクリーンショットは、ヒンティングを有効にした場合としない場合とで、どれだけ見た目が変わるかを示しています:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />ヒンティング無効</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />ヒンティング有効</td></tr>
 </table>
-<p>このページに掲載されているすべての<span class="app">拡大鏡 (Magnify)</span> ウィンドウは、当然のことながらそれぞれ異なるオプションで描画されている点に注意する必要があります。ですので、たとえば、黄色いタブの太文字タイトルや、"33 x 15 @ 8 pixels/pixel" というテキストの比較により、各設定が実際に作り出す印象を知ることができます。</p>
+<p>このページに掲載されているすべての<span class="app">拡大鏡 (Magnify)</span> ウィンドウは、当然のことながらそれぞれ異なるオプションで描画されている点に注意が必要です。たとえば、黄色いタブの太文字タイトルや、"33 x 15 @ 8 pixels/pixel" というテキストを比較すれば、各設定が実際に作り出す印象を得ます。</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 アンチエイリアスのタイプ (Antialiasing type)</h3>
-<p>もう 1 つの画面描画を改善する方法は <i>アンチエイリアス (Antialiasing)</i> で、テキストだけでなくすべてのベクターグラフィックをサポートします。アンチエイリアスはあるピクセルの色を変更することで、線をなめらかにします。線をなめらかにする手法には、次の 2 つがあります。</p>
+<p>画面描画を改善するもう 1 つの方法は <i>アンチエイリアス (Antialiasing)</i> で、テキストだけでなくすべてのベクターグラフィックをサポートします。アンチエイリアスはあるピクセルの色を変更することで、線をなめらかにします。その手法には、次の 2 つがあります。</p>
 <p><span class="menu">グレースケール (Grayscale)</span> は、輪郭のピクセルの明度を変更します。<br />
-<span class="menu">LCD サブピクセル (LCD subpixel)</span> は、特に (高解像度の) LCD ディスプレイを使用する場合に、グレースケールよりなめらかに描画します。LCD ディスプレイの各ピクセルは、赤、緑、青の要素で構成されているので、この手法では 1 ピクセルの明度を変更する代わりに、その何分の 1 以下だけ輪郭を移動させて輪郭の色を変更します。</p>
-<p>先ほどと同様に、次の拡大したスクリーンショットは、この 2 つの方法の違いを示しています。</p>
+<span class="menu">LCD サブピクセル (LCD subpixel)</span> は、特に (高解像度の) LCD ディスプレイの場合に、グレースケールよりなめらかに描画します。LCD ディスプレイの各ピクセルは、赤、緑、青の要素で構成されているので、この手法では 1 ピクセルの明度を変更する代わりに、その何分の 1 以下だけ輪郭を移動させて輪郭の色を変更します。</p>
+<p>先ほどと同様に、次の拡大したスクリーンショットは、この 2 種類の方法の違いを示しています。</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />グレースケール、ヒンティング無効</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-subpixel.png" alt="appearance-subpixel.png" /><br />LCD サブピクセル、ヒンティング無効</td></tr>
 </table>
-<p>サブピクセルベースのアンチエイリアスでは、図形オブジェクトにわずかな色味を帯びた輝きが加わります。この余分な輝きをだれもが許容するわけではありません。Haiku では、この 2 つのアンチエイリアス手法を混ぜて使えます。スライダーを使って、最適な混合比を設定できます。</p>
-<div class="box-info">サブピクセルベースのアンチエイリアスをグリフのヒンティングとあわせて使用することは、ソフトウェア特許の対象となるため、デフォルトでは両者を同時に使用できないようになっています。ユーザーの居住地域次第では、ロック解除バージョンの入手が合法である場合があります。その場合は申し訳ありませんが、その地域の配布担当者と交渉してください。</div>
-<p>ソースコードを変更して再コンパイルすることで、ヒンティングと LCD サブピクセルを組み合わせた描画方法を有効にした場合、ヒンティングとグレースケールを組み合わせたものと見た目を比較すると、次のようになります。</p>
+<p>サブピクセルベースのアンチエイリアスでは、オブジェクトにわずかな色味を帯びた輝きが加わります。この余分な輝きをだれもが許容するわけではありません。Haiku では、この 2 種類の手法を混ぜて使えます。スライダーを使って、最適な混合比を設定できます。</p>
+<div class="box-info">サブピクセルベースのアンチエイリアスをグリフのヒンティングとあわせて使うことは、ソフトウェア特許の対象となるため、デフォルトでは両者を同時に使えないようになっています。ユーザーの居住地域によっては、ロック解除バージョンの入手が合法な場合があります。その場合は申し訳ありませんが、その地域の配布担当者と交渉してください。</div>
+<p>ソースコードを変更して再コンパイルして、ヒンティングと LCD サブピクセルを組み合わせた描画方法を有効にした場合、ヒンティングとグレースケールの組み合わせと見た目を比較すると、次のようになります。</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />グレースケール、ヒンティング有効</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on-subpixel.png" alt="appearance-glyph-on-subpixel.png" /><br />LCD サブピクセル、ヒンティング有効</td></tr>
 </table>

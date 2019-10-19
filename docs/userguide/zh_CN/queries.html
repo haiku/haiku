@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,11 +31,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/zh_CN.png" alt="" />  中文 ［中文］</li>
+<li><a href="../id/queries.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/queries.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/queries.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/queries.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/queries.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/queries.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/queries.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/queries.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/queries.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/queries.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -58,6 +60,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 
 <table class="index" id="index" summary="index">
@@ -113,10 +116,9 @@
 <p>这样将添加一个弹出菜单到文本框的左侧，还可以在其下侧 <span class="button">添加</span> 和 <span class="button">删除</span> 按钮。 通过该菜单，您可以选择查询的属性。而使用 <span class="button">添加</span> 和 <span class="button">删除</span> 按钮，您可以添加或者删除其他查询属性。这些属性可以通过 AND/OR 进行逻辑链接。</p>
 <p>我们以一次邮件查询为例：</p>
 <img src="images/queries-images/query-window-filled.png" alt="query-window-filled.png" />
-<p>这是查询近两个月内 Clare Botters以 "vibraphone" 或 "skepticality" 为主题的邮件的查找窗口。<br />
-
-如您所见，基于时间属性的搜索可以支持一些有用的词汇：除了 "last 2 months"，您还可以使用 "today"，"yesterday"，"Monday" 或者 "last Monday" （相当于 Monday last week），或者 "last 2 minutes/hours/days/weeks"。<br />
-这是减小搜索结果数量的很好方式。</p>
+<p>This is your Find window when you're looking for all emails Clara Oswald has sent to you in the last two months that had in the subject "sufflé" or "impossible".<br />
+As you see, searching through time-based attributes supports some useful phrases: besides for the "last 2 months", you could also use "today", "yesterday", "Monday" or "last Monday" (which would be the Monday last week), or "last 2 minutes/hours/days/weeks".<br />
+A good way to cut down the number of search results.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -125,15 +127,15 @@
 <p>使用属性查询 Calara 的邮件中有关 vibraphones 等内容。如果您设置了所有的属性和它们的搜索项，可以尝试切换为<span class="menu">使用表达式</span>模式，然后淹没于这一行的查询字符串：</p>
 <img src="images/queries-images/formula-query.png" alt="formula-query.png" />
 <p>一行一段文本的编辑方便于阅读：</p>
-<pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [bB][oO][tT][tT][eE][rR][sS]*")
+<pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [oO][sS][wW][aA][lL][dD]*")
        &amp;&amp;(MAIL:when&gt;=%2 months%))
-       &amp;&amp;(MAIL:subject=="*[vV][iI][bB][rR][aA][pP][hH][oO][nN][eE]*"))
-       ||(MAIL:subject=="*[sS][kK][eE][pP][tT][iI][cC][aA][lL][iI][tT][yY]*"))
+       &amp;&amp;(MAIL:subject=="*[sS][uU][fF][fF][lL][éÉ]*"))
+       ||(MAIL:subject=="*[iI][mM][pP][oO][sS][sS][iI][bB][lL][eE]*"))
        &amp;&amp;(BEOS:TYPE=="text/x-email"))</pre>
 <p>如何使用？</p>
 <ul>
 <li><p>您可以复制粘贴字符串到邮件，论坛及IRC中供他人使用或调试。</p></li>
-<li><p>您可以使用这种方法在<span class="menu">属性</span>模式中创建查询，然后切换到<span class="menu">表达式</span>模式，从而顺利的创建用于终端查询或脚本中的搜索字符串。</p></li>
+<li><p>You can use this method to construct a query in <span class="menu">Attribute</span> mode and then switch to <span class="menu">Formula</span> mode, to comfortably generate a search string. Enclosed in single quotes, that string can then be used with the <span class="cli">query</span> command in the Terminal.</p></li>
 <li><p>您可以微调查询，在需要的地方插入括号，使某些部分大小写敏感，或者取消逻辑组合，如为 NOT AND 修改 "<tt></tt>" 为 "<tt>!=</tt>"。所有您需要的就是基本理解<a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression">正则表达式</a>，和脚本的基础知识。</p></li>
 </ul>
 

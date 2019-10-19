@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -28,10 +28,12 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/gb.png" alt="" /> English</li>
+<li><a href="../id/queries.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/queries.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/queries.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../es/queries.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/queries.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/queries.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/queries.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/queries.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/queries.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -61,11 +63,11 @@
 <tr class="heading"><td>Index</td></tr>
 <tr class="index"><td>
 	<a href="#find-window">The Find window</a><br />
-	<a href="#basic-query">Basic queries - "by Name"</a><br />
-	<a href="#adv-query">Advanced queries - "by Attribute"</a><br />
-	<a href="#more-adv-query">Even more advanced queries - "by Formula"</a><br />
+	<a href="#basic-query">Basic queries - "by name"</a><br />
+	<a href="#adv-query">Advanced queries - "by attribute"</a><br />
+	<a href="#more-adv-query">Even more advanced queries - "by formula"</a><br />
 	<a href="#result-window">The result window</a><br />
-	<a href="#query-template">Query Templates</a>
+	<a href="#query-template">Query templates</a>
 </td></tr>
 </table>
 
@@ -83,9 +85,9 @@ Even better, you don't have to double-click to re-do a query. You can <a href="t
 <li><p>Select recent or saved queries or save the current search parameters as <a href="#query-template">Query Template</a>.</p></li>
 <li><p>Narrow down your search from <span class="menu">All files and folders</span> to specific file types.</p></li>
 <li>Define the search method:<ul>
-    <li><span class="menu">by Name</span> - a basic search by file or folder name</li>
-    <li><span class="menu">by Attribute</span> - an advanced search, you specify search terms for one or more attributes</li>
-    <li><span class="menu">by Formula</span> - an even more advanced search, you can fine-tune a complex query term</li></ul></li>
+    <li><span class="menu">by name</span> - a basic search by file or folder name</li>
+    <li><span class="menu">by attribute</span> - an advanced search, you specify search terms for one or more attributes</li>
+    <li><span class="menu">by formula</span> - an even more advanced search, you can fine-tune a complex query term</li></ul></li>
 <li><p>Select which drives to search on.</p></li>
 <li><p>Enter the search term.</p></li>
 <li><p>The expander hides/unhides the additional options.</p></li>
@@ -97,38 +99,38 @@ Even better, you don't have to double-click to re-do a query. You can <a href="t
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="basic-query" name="basic-query">Basic queries - "by Name"</a></h2>
+<a id="basic-query" name="basic-query">Basic queries - "by name"</a></h2>
 <p>If you simply want to find all files and folders on your mounted disks that match a certain pattern, simply leave the search method at <span class="menu">by Name</span>, enter the search term into the text box and press <span class="key">ENTER</span>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="adv-query" name="adv-query">Advanced queries - "by Attribute"</a></h2>
+<a id="adv-query" name="adv-query">Advanced queries - "by attribute"</a></h2>
 <p>You can create more advanced queries by searching within the attributes of specific file types. For that to work, these attributes have to be <a href="index.html">indexed</a>.</p>
 <img src="images/queries-images/query-window.png" alt="query-window.png" />
-<p>You start by setting the filetype from <span class="menu">All files and folders</span> to, for example, <span class="menu">Text | E-mail</span> and change the search method to <span class="menu">by Attribute</span>.</p>
+<p>You start by setting the filetype from <span class="menu">All files and folders</span> to, for example, <span class="menu">Text | E-mail</span> and change the search method to <span class="menu">by attribute</span>.</p>
 <p>This adds a pop-up menu to the left of the textbox and the buttons <span class="button">Add</span> and <span class="button">Remove</span> under that. From the menu you choose which attribute to query. With <span class="button">Add</span> and <span class="button">Remove</span> you can query additional attributes or remove them again. These attributes can be logically linked with AND/OR.</p>
 <p>Let's do an email query as an example:</p>
 <img src="images/queries-images/query-window-filled.png" alt="query-window-filled.png" />
-<p>This is your Find window when you're looking for all emails Clara Botters has sent to you in the last two months that had in the subject "vibraphone" or "skepticality".<br />
+<p>This is your Find window when you're looking for all emails Clara Oswald has sent to you in the last two months that had in the subject "sufflé" or "impossible".<br />
 As you see, searching through time-based attributes supports some useful phrases: besides for the "last 2 months", you could also use "today", "yesterday", "Monday" or "last Monday" (which would be the Monday last week), or "last 2 minutes/hours/days/weeks".<br />
 A good way to cut down the number of search results.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="more-adv-query" name="more-adv-query">Even more advanced queries - "by Formula"</a></h2>
+<a id="more-adv-query" name="more-adv-query">Even more advanced queries - "by formula"</a></h2>
 <p>Typing in a formula query by hand is daunting and really quite unpractical. It still has its uses.</p>
-<p>Take the above query by attribute of Clara's mails concerning vibraphones etc. If you have all the attributes and their search terms set, try switching to <span class="menu">by Formula</span> mode and be overwhelmed by this one line query string:</p>
+<p>Take the above query by attribute of Clara's mails concerning vibraphones etc. If you have all the attributes and their search terms set, try switching to <span class="menu">by formula</span> mode and be overwhelmed by this one line query string:</p>
 <img src="images/queries-images/formula-query.png" alt="formula-query.png" />
 <p>Once more as text, edited for readability:</p>
-<pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [bB][oO][tT][tT][eE][rR][sS]*")
+<pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [oO][sS][wW][aA][lL][dD]*")
        &amp;&amp;(MAIL:when&gt;=%2 months%))
-       &amp;&amp;(MAIL:subject=="*[vV][iI][bB][rR][aA][pP][hH][oO][nN][eE]*"))
-       ||(MAIL:subject=="*[sS][kK][eE][pP][tT][iI][cC][aA][lL][iI][tT][yY]*"))
+       &amp;&amp;(MAIL:subject=="*[sS][uU][fF][fF][lL][éÉ]*"))
+       ||(MAIL:subject=="*[iI][mM][pP][oO][sS][sS][iI][bB][lL][eE]*"))
        &amp;&amp;(BEOS:TYPE=="text/x-email"))</pre>
 <p>What's the use?</p>
 <ul>
 <li><p>You could copy and paste the string into an email, forum or IRC for others to use or debug.</p></li>
-<li><p>You can use this method to construct a query in <span class="menu">Attribute</span> mode and then switch to <span class="menu">Formula</span> mode, to comfortably generate a search string to use for a query in Terminal or a script.</p></li>
+<li><p>You can use this method to construct a query in <span class="menu">Attribute</span> mode and then switch to <span class="menu">Formula</span> mode, to comfortably generate a search string. Enclosed in single quotes, that string can then be used with the <span class="cli">query</span> command in the Terminal.</p></li>
 <li><p>You can fine tune your query by inserting parenthesis where needed, make parts case-sensitive or negate logical combinations by changing. e.g. "<tt>==</tt>" to "<tt>!=</tt>" for a NOT AND. All you need is a basic understanding of <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression">regular expressions</a> and maybe some scripting basics.</p></li>
 </ul>
 
@@ -149,7 +151,7 @@ A good way to cut down the number of search results.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="query-template" name="query-template">Query Templates</a></h2>
+<a id="query-template" name="query-template">Query templates</a></h2>
 <p>If you double click a saved query, the file search is at once started and the result window opens immediately. However, you may not want to search with these <i>exact</i> search parameters, but use it as starting point to only slightly tweak the formula.<br />
 By using the <span class="menu">Save query as template</span> menu item (see <a href="#find-window">(1) in screenshot</a> at the top) or drag &amp; dropping the icon (10) anywhere with the right mouse button, you can create just such a template. Double clicking it won't open a result window, but the Find panel, giving you the opportunity to quickly change search strings or add/remove attributes.</p>
 <p>Wherever you choose to save query templates, they'll be listed in the Find panel's menu of recent queries.</p>

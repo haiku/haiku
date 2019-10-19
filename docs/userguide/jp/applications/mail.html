@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2011, Haiku, Inc. All rights reserved.
+ * Copyright 2011, 2019, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,11 +31,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/jp.png" alt="" /> 日本語</li>
+<li><a href="../../id/applications/mail.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/mail.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/applications/mail.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/applications/mail.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/applications/mail.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/applications/mail.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/mail.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/mail.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/mail.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pl/applications/mail.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
@@ -103,7 +105,7 @@
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>メッセージ</h3>
 <p>メッセージの返信方法は説明が必要かもしれません。</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">返信 (Reply)</span></td><td><span class="key">ALT</span> <span class="key">R</span></td><td style="width:10px;"></td><td>メールを送信してきたサーバーへの標準の返信です。注: メーリングリストの場合、通常は差出人<i>だけではなく</i>、メーリングリストに返信します。</td></tr>
+<tr><td><span class="menu">返信 (Reply)</span></td><td><span class="key">ALT</span> <span class="key">R</span></td><td style="width:10px;"></td><td>メールを送信したサーバーへの標準の返信です。注: メーリングリストの場合、通常は差出人<i>だけではなく</i>、メーリングリストに返信します。</td></tr>
 <tr><td class="onelinetop"><span class="menu">差出人に返信 (Reply to sender)</span></td><td><span class="key">OPT</span> <span class="key">ALT</span> <span class="key">R</span></td><td></td><td>一方、この方法は ”差出人 (From)” 属性に表示されている差出人のみに返信します。</td></tr>
 <tr><td><span class="menu">全員に返信 (Reply to all)</span></td><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">R</span></td><td></td><td>元の差出人とほかの受信者 (CC) に返信します。</td></tr>
 </table>
@@ -113,7 +115,8 @@
 <p><span class="menu">アドレスを保存 (Save address)</span> はヘッダーのメールアドレスすべてを回収し、メールの内容をサブメニューに保存します。メールアドレスを選択すると、<a href="people.html">People</a> アプリケーションが開いて連絡情報を保存できます。</p>
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>クエリ</h3>
-<p>この機能はまだ動作しませんが、現在開いているメッセージに関係するメッセージを表示するためのクエリ (同じ受信者や同じ件名) を表示するはずです。</p>
+<p>このメニューは、現在開いているメールに関係するすべてのメールを開くクエリを保持しています。<span class="menu">同じ受信者 (Same recipient)</span>、<span class="menu">同じ差出人 (Same sender)</span> または<span class="menu">同じ題名 (Same subject)</span> は、対応するすべてのメールを一覧表示するクエリを開きます:</p>
+<img src="../images/apps-images/mail-query.png" alt="mail-query.png" /> 
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -130,7 +133,8 @@
 <p><span class="menu">下書きとして保存 (Save as draft)</span> でメールを保存して後で再開できます。<span class="menu">下書きを開く (Open draft)</span> サブメニューに ”Draft (下書き)” のステータスのメールがすべて表示され、一覧からメールを選択すると再開できます。</p>
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>編集</h3>
-<p><span class="menu">引用符を付ける (Quote)</span>  と<span class="menu">引用を削除 (Remove quote)</span> または、ショートカット <span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span> を使い、&gt; シンボルの数を調整して引用レベルを変更できます。引用するテキストを選択してメニューを開いてください。</p>
+<p><span class="menu">引用レベルを上げる (Increase quote level)</span> と <span class="menu">下げる (Decrease quote level)</span>、またはショートカット <span class="key">ALT</span> <span class="key">+</span> / <span class="key">-</span>は、引用行の先頭の "&gt;" シンボルの数を調節して引用レベルを変更できます。引用 / 引用解除する行のテキストを選択してメニューを開くだけです。
+</p>
 
 <img src="../images/apps-images/mail-spellcheck.png" alt="email-spellcheck.png" /> 
 
@@ -151,7 +155,7 @@
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>クエリ</h3>
-<p>この機能はまだ動作しませんが、現在開いているメッセージに関連するメッセージを表示するためのクエリ (同じ受信者や同じ件名) の表示が目的です。</p>
+<p>この機能はまだ動作しませんが、現在開いているメッセージに関連するメッセージを表示するクエリ (同じ受信者や同じ件名) の表示が目的です。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -173,7 +177,7 @@
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>メールの設定</h3>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="menu">標準アカウント (Default account)</span></td><td style="width:10px;"></td><td>複数のメールアカウントがある場合、新規メッセージを作成するとき使用するアカウントを指定します。</td></tr>
-<tr><td><span class="menu">返信アカウント (Reply account)</span></td><td></td><td>メールに返信するとき、上のポップアップメニューの<span class="menu">標準アカウントを使う (Use default account)</span> または<span class="menu">メッセージを受信したアカウント (Account from mail)</span> で、メールを返信するアカウントを指定できます。</td></tr>
+<tr><td><span class="menu">返信アカウント (Reply account)</span></td><td></td><td>返信の際、上のポップアップメニューの<span class="menu">標準アカウントを使う (Use default account)</span> または<span class="menu">メッセージを受信したアカウント (Account from mail)</span> で、メールを返信するアカウントを指定できます。</td></tr>
 <tr><td><span class="menu">返信の前書き (Reply preamble)</span></td><td></td><td>これは引用されたテキストの前に挿入されます。テキストフィールドの横のポップアップメニューからさまざまな変数を使えます。<br />例: "<i>こんにちは %n!\\n\\n %d にあなたは書きました：\\n</i>" は次のようになります：<pre>こんにちは Dr. Hawking!
 
 Mon, 18 Jan 1998 02:55:16 +0800 あなたは書きました：
@@ -181,9 +185,9 @@ Mon, 18 Jan 1998 02:55:16 +0800 あなたは書きました：
 &gt; ...and the rest of the quoted text following...</pre></td></tr>
 <tr><td><span class="menu">署名の自動追加 (Auto signature)</span></td><td></td><td>メールの終わりに自動的に署名を追加します。</td></tr>
 <tr><td><span class="menu">文字コード (Encoding)</span></td><td></td><td>標準文字コードを設定します。</td></tr>
-<tr><td class="onelinetop"><span class="menu">文字コード不一致通知 (Warn unencodable)</span></td><td></td><td>メールに現在の設定ではエンコードできない文字が含まれていた場合、設定してこれに関する警告を受けとれます。それにより、文字コードを変更するチャンスが得られます。設定しないと、エンコードできない文字は四角形のシンボルに置き換えられます。</td></tr>
+<tr><td class="onelinetop"><span class="menu">文字コード不一致通知 (Warn unencodable)</span></td><td></td><td>メールに現在の設定ではエンコードできない文字が含まれていた場合、設定して警告を受けとれます。それにより、文字コードを変更する機会が得られます。設定しないと、エンコードできない文字は四角いシンボルに置き換えられます。</td></tr>
 <tr><td><span class="menu">文字列の折り返し (Text wrapping)</span></td><td></td><td>76 文字ごとに改行し、メールを見やすくします。</td></tr>
-<tr><td><span class="menu">属性の添付 (Attach attributes)</span></td><td></td><td>添付ファイルと一緒に BFS 属性を送るかどうか選択できます。これはほかの Haiku ユーザーにとっては、”完全な” ファイル (MP3 ファイルのアーティスト、アルバム、タイトル属性を考えてください) を受信できるので便利ですが、Haiku を使用していないユーザーには混乱 (または疑い) を起こす可能性があり、追加された ”BeOS 属性” が何なのか知りたがるかもしれません。<br />添付ファイルに BFS 属性を付けずに送信することを選択した場合、送信前にファイルを zip 圧縮することを思い出してください、さもなければ属性は取りさられてしまうでしょう。</td></tr>
+<tr><td><span class="menu">属性の添付 (Attach attributes)</span></td><td></td><td>添付ファイルと一緒に BFS 属性を送るかどうか選択できます。これはほかの Haiku ユーザーにとっては、”完全な” ファイル (MP3 ファイルのアーティスト、アルバム、タイトル属性を考えてください) を受信できるので便利ですが、Haiku を使用していないユーザーには混乱 (または疑い) を起こす可能性があり、追加された ”BeOS 属性” が何なのか知りたがるかもしれません。<br />添付ファイルに BFS 属性を付けずに送信することを選択した場合、送信前にファイルを zip 圧縮することを思い出してください、そうしなければ属性は取りさられてしまうでしょう。</td></tr>
 </table>
 
 </div>

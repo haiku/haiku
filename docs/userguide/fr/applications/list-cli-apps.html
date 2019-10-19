@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2017, Haiku. All rights reserved.
+ * Copyright 2010-2018, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,10 +32,12 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/fr.png" alt="" /> Français</li>
+<li><a href="../../id/applications/list-cli-apps.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/list-cli-apps.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/applications/list-cli-apps.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/applications/list-cli-apps.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/applications/list-cli-apps.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../fur/applications/list-cli-apps.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/list-cli-apps.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/list-cli-apps.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pl/applications/list-cli-apps.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
@@ -53,7 +55,7 @@
 
 <span>
 <a href="../applications.html#cli-apps" class="uplink">Applications</a>
-::  <a href="cli-apps.html">Haiku-specific commands</a>  »
+::  <a href="cli-apps.html">Haiku-specific commands</a>  »
 </span></div>
 </div>
 
@@ -89,8 +91,7 @@ Voici une liste de touts les programmes en ligne de commande qui sont livrés av
 <tr><td><tt>beep</tt></td><td> </td><td>Fait retentir la sonnerie.</td></tr>
 <tr><td><tt>bunzip2</tt></td><td> </td><td>Voir <tt>bzip2</tt>.</td></tr>
 <tr><td><tt>bzip2</tt></td><td> </td><td>Compresseur de fichier.</td></tr>
-<tr><td><tt>c++</tt></td><td> </td><td>Compilateur C++</td></tr>
-<tr><td><tt>cal</tt></td><td> </td><td>Affiche un calendrier. </td></tr>
+<tr><td><tt>c++</tt></td><td> </td><td>C++-Compiler.</td></tr>
 <tr><td><tt>cat</tt></td><td> </td><td>Concatènate les fichiers et les affiche sur la sortie standard.</td></tr>
 <tr><td><tt>catattr</tt></td><td> </td><td>Affiche le contenu des attributs d'un fichier. <a href="cli-apps.html">(spécifique à Haiku)</a></td></tr>
 <tr><td><tt>cc</tt></td><td> </td><td>Compiler C</td></tr>
@@ -103,11 +104,9 @@ Voici une liste de touts les programmes en ligne de commande qui sont livrés av
 <tr><td><tt>chroot</tt></td><td> </td><td>Exécute une commande depuis le répertoire racine spécifié.</td></tr>
 <tr><td><tt>cksum</tt></td><td> </td><td>affiche la somme de contrôle CRC (Contrôle de Redondance Cyclique) et nombre d'octets des fichiers.</td></tr>
 <tr><td><tt>clear</tt></td><td> </td><td>Nettoie la fenêtre du terminal.</td></tr>
-<tr><td><tt>clockconfig</tt></td><td> </td><td>Imprime la configuration de l'horloge.</td></tr>
 <tr><td><tt>cmp</tt></td><td> </td><td>Comparaison de fichiers octet par octet.</td></tr>
 <tr><td><tt>collectcatkeys </tt></td><td> </td><td>[Résidu des évolutions du locale-kit.]</td></tr>
 <tr><td><tt>comm</tt></td><td> </td><td>Comparaison de fichiers triés ligne par ligne.</td></tr>
-<tr><td><tt>compress</tt></td><td> </td><td>Programme de compression de données.</td></tr>
 <tr><td><tt>consoled</tt></td><td> </td><td>Démon de la console</td></tr>
 <tr><td><tt>copyattr</tt></td><td> </td><td>Copie tous ou une partie des attributs d'un ou plusieurs fichiers vers un autre fichier ou un nouveau. <a href="cli-apps.html">(spécifique à Haiku)</a></td></tr>
 <tr><td><tt>cp</tt></td><td> </td><td>Copie des fichiers et des répertoires.</td></tr>
@@ -148,7 +147,6 @@ Voici une liste de touts les programmes en ligne de commande qui sont livrés av
 <tr><td><tt>fmt</tt></td><td> </td><td>Re-formate les paragraphes d'un fichier.</td></tr>
 <tr><td><tt>fold</tt></td><td> </td><td>Découpe les lignes d'un fichier d'entrée.</td></tr>
 <tr><td><tt>fortune</tt></td><td> </td><td>Affiche au hasard un adage optimiste.</td></tr>
-<tr><td><tt>frcode</tt></td><td> </td><td>Appelé par updatedb pour compresser la liste des noms de fichiers.</td></tr>
 <tr><td><tt>freetype-config</tt></td><td> </td><td>Affiche les informations de compilation et d'édition de lien de FreeType.</td></tr>
 <tr><td><tt>fstrim</tt></td><td> </td><td>Envoi la commande « TRIM » à un disque SSD.</td></tr>
 <tr><td><tt>ftp</tt></td><td> </td><td>Programme de transfert de fichier.</td></tr>
@@ -156,9 +154,7 @@ Voici une liste de touts les programmes en ligne de commande qui sont livrés av
 <tr><td><tt>funzip</tt></td><td> </td><td>Extrait le premier élément d'une archive vers la sortie standard.</td></tr>
 <tr><td><tt>fwcontrol</tt></td><td> </td><td>Programme de contrôle du FireWire.</td></tr>
 <tr><td><tt>gawk</tt></td><td> </td><td>Langage d'analyse pour le traitement des données textuelles.</td></tr>
-<tr><td><tt>gdb</tt></td><td> </td><td>Débogueur GNU.</td></tr>
 <tr><td><tt>getarch</tt></td><td> </td><td>Shows the environment's compiler version. </td></tr>
-<tr><td><tt>getlimits</tt></td><td> </td><td>Imprime des limites en fonction de la plateforme dans un format utile pour les scripts shell.</td></tr>
 <tr><td><tt>grep</tt></td><td> </td><td>Recherche un motif.</td></tr>
 <tr><td><tt>groups</tt></td><td> </td><td>Affiche les groupes dont chaque utilisateur est membre. </td></tr>
 <tr><td><tt>gunzip</tt></td><td> </td><td>Voir <tt>gzip</tt>.</td></tr>
@@ -169,7 +165,6 @@ Voici une liste de touts les programmes en ligne de commande qui sont livrés av
 <tr><td><tt>hey</tt></td><td> </td><td>Un petit utilitaire pour faire interagir les scripts avec les applications ayant une interface graphique.</td></tr>
 <tr><td><tt>hostname</tt></td><td> </td><td>Affiche ou défini le nom d'hôte du système.</td></tr>
 <tr><td><tt>id</tt></td><td> </td><td>Affiche les informations de l'utilisateur et du groupe.</td></tr>
-<tr><td><tt>ident</tt></td><td> </td><td>Identifie les mots-clés RCS dans les fichiers.</td></tr>
 <tr><td><tt>ifconfig</tt></td><td> </td><td>Configure une interface réseau.</td></tr>
 <tr><td><tt>install</tt></td><td> </td><td>Copie des fichiers vers une destination sans perturber le fonctionnement du système.</td></tr>
 <tr><td><tt>install-wifi-firmwares.sh</tt></td><td> </td><td>Installe le micrologiciel (firmware) de divers adaptateurs réseaux sans-fils.</td></tr>
@@ -181,7 +176,7 @@ Voici une liste de touts les programmes en ligne de commande qui sont livrés av
 <tr><td><tt>kernel_debugger</tt></td><td> </td><td>Entre dans le débogueur du noyau.</td></tr>
 <tr><td><tt>keymap</tt></td><td> </td><td>Charge ou enregistre la disposition des touches du clavier.</td></tr>
 <tr><td><tt>kill</tt></td><td> </td><td>Envoi un signal pour mettre fin à un processus.</td></tr>
-<tr><td><tt>launch_roster</tt></td><td> </td><td>Controls the launch_daemon, e.g. stop and restart services. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
+<tr><td><tt>launch_roster</tt></td><td> </td><td>Controls the launch_daemon, e.g. stop and restart services. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
 <tr><td><tt>less</tt></td><td> </td><td>Visualise un fichier.</td></tr>
 <tr><td><tt>lessecho</tt></td><td> </td><td>Reproduire ses arguments en développant les méta-caractères ‘*’ et ‘?’ dans les noms de fichiers.</td></tr>
 <tr><td><tt>lesskey</tt></td><td> </td><td>Spécifie les clés de liaisons qui doivent être utilisées par "less".</td></tr>
@@ -209,7 +204,6 @@ Voici une liste de touts les programmes en ligne de commande qui sont livrés av
 <tr><td><tt>mbox2mail</tt></td><td> </td><td>Convertit les fichiers de boîtes aux lettres Unix en fichiers e-mail de BeOS.</td></tr>
 <tr><td><tt>md5sum</tt></td><td> </td><td>Affiche ou vérifie les sommes de contrôles MD5.</td></tr>
 <tr><td><tt>media_client</tt></td><td> </td><td>"media_client play" plays back audio files.</td></tr>
-<tr><td><tt>merge</tt></td><td> </td><td>Fusion de fichiers tripartite.</td></tr>
 <tr><td><tt>message</tt></td><td> </td><td>Affiche un fichier BMessage plat.</td></tr>
 <tr><td><tt>mimeset</tt></td><td> </td><td>Affecte un type MIME à un fichier.</td></tr>
 <tr><td><tt>mkdepend</tt></td><td> </td><td>Makefile dependency generator.</td></tr>
@@ -226,7 +220,6 @@ Voici une liste de touts les programmes en ligne de commande qui sont livrés av
 <tr><td><tt>mountvolume</tt></td><td> </td><td>Mounte un volume par son nom.</td></tr>
 <tr><td><tt>mv</tt></td><td> </td><td>Déplace ou renomme un fichier.</td></tr>
 <tr><td><tt>nano</tt></td><td> </td><td>The default text editor in the Terminal, a clone of 'Pico'. </td></tr>
-<tr><td><tt>netcat</tt></td><td> </td><td>Utilitaire TCP et UDP.</td></tr>
 <tr><td><tt>netstat</tt></td><td> </td><td>Affiche les connexions réseau, les tables de routage, les statistiques des interfaces, les correspondances pour chaque connexions et les abonnements aux diffusions.</td></tr>
 <tr><td><tt>nl</tt></td><td> </td><td>Affiche chaque fichier en ajoutant les numéros de lignes.</td></tr>
 <tr><td><tt>nohup</tt></td><td> </td><td>Exécute une commande insensible aux signaux de déconnexions.</td></tr>
@@ -261,7 +254,6 @@ Voici une liste de touts les programmes en ligne de commande qui sont livrés av
 <tr><td><tt>reindex</tt></td><td> </td><td>Met les attributs des fichiers existants dans l'index nouvellement créé. <a href="cli-apps.html">(spécifique à Haiku)</a></td></tr>
 <tr><td><tt>release</tt></td><td> </td><td>Libère un sémaphore.</td></tr>
 <tr><td><tt>renice</tt></td><td> </td><td>Modifie la priorité d'un processus en cours.</td></tr>
-<tr><td><tt>rlog</tt></td><td> </td><td>Affiche les messages de journalisation et autres informations sur les fichiers RCS.</td></tr>
 <tr><td><tt>rm</tt></td><td> </td><td>Supprime des fichiers et des répertoires.</td></tr>
 <tr><td><tt>rmattr</tt></td><td> </td><td>Retire un attribut à un fichier. <a href="cli-apps.html">(spécifique à Haiku)</a></td></tr>
 <tr><td><tt>rmdir</tt></td><td> </td><td>Supprime un répertoire.</td></tr>
@@ -278,7 +270,6 @@ Voici une liste de touts les programmes en ligne de commande qui sont livrés av
 <tr><td><tt>settype</tt></td><td> </td><td>Affecte un type MIME à un fichier, une signature, et une application préférée.</td></tr>
 <tr><td><tt>setversion</tt></td><td> </td><td>Affiche la version du fichier.</td></tr>
 <tr><td><tt>setvolume</tt></td><td> </td><td>Règle le volume des sons systèmes.</td></tr>
-<tr><td><tt>setwep</tt></td><td> </td><td>Provides WEP encryption for wireless networks. </td></tr>
 <tr><td><tt>sh</tt></td><td> </td><td>Voir <tt>bash</tt>.</td></tr>
 <tr><td><tt>sha1sum</tt></td><td> </td><td>Affiche ou vérifie les sommes de contrôles SHA1. </td></tr>
 <tr><td><tt>shar</tt></td><td> </td><td>Crée des archives shell.</td></tr>
@@ -366,7 +357,7 @@ Voici une liste de touts les programmes en ligne de commande qui sont livrés av
 <div class="nav">
 <div class="inner"><span>
 <a href="../applications.html#cli-apps" class="uplink">Applications</a>
-::  <a href="cli-apps.html">Haiku-specific commands</a>  »
+::  <a href="cli-apps.html">Haiku-specific commands</a>  »
 </span></div>
 </div>
 

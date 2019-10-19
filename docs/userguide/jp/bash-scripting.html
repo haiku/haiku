@@ -32,11 +32,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/jp.png" alt="" /> 日本語</li>
+<li><a href="../id/bash-scripting.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/bash-scripting.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/bash-scripting.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/bash-scripting.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/bash-scripting.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/bash-scripting.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/bash-scripting.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/bash-scripting.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/bash-scripting.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/bash-scripting.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -74,16 +76,16 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="scripting-bible" name="scripting-bible">スクリプト処理のための必読書</a></h2>
-<p>シェル内で作業するためのいくつかの基礎を学んだあとは、スクリプト処理の世界にゆっくりと歩み出しましょう。この場合も、本屋と同じくらい豊富なチュートリアルやリファレンスをオンライン上で見つけられるでしょう。Haiku にほぼピッタリの非常にすばらしい入門書に、オンラインで入手可能な Scot Hacker 氏による BeOS Bible の <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting1.html" class="printurl">Scripting Chapter</a> (<a href="http://www.birdhouse.org/beos/bible/bos/BeOS.scripting.PDF">PDF, 900kb</a>) があります。</p>
+<p>シェル内で作業するためのいくつかの基礎を学んだあとは、スクリプト処理の世界にゆっくりと歩み出す時です。この場合も、豊富なチュートリアルやリファレンスをオンラインでも本屋でも見つけられるでしょう。Haiku にほぼピッタリの非常にすばらしい入門書に、オンラインで入手可能な Scot Hacker 氏による BeOS Bible の <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting1.html" class="printurl">Scripting Chapter</a> (<a href="http://www.birdhouse.org/beos/bible/bos/BeOS.scripting.PDF">PDF, 900kb</a>) があります。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="user-scripts" name="user-scripts">Haiku でのスクリプト</a></h2>
-<p>以前、Haiku には起動とシャットダウンのためのスクリプトがありました。現在は代わりに <a href="https://dev.haiku-os.org/wiki/LaunchDaemon">launch_daemon</a> を使用しています。しかし、特定のユーザースクリプトについてこのプロセスを増やすことができます。それらがすでに存在しない場合は、ユーザー自身で必要なファイルを作成する必要があります。ほかに、コマンドを実行するプロセス内に単純に追加する方法もあります。</p>
+<p>以前、Haiku には起動とシャットダウンのためのスクリプトがありました。現在は代わりに <a href="https://dev.haiku-os.org/wiki/LaunchDaemon">launch_daemon</a> を使用しています。しかし、ユーザーはまだ特定のユーザースクリプトを使ってこのプロセスを増やせます。それらがすでに存在しない場合は、ユーザー自身で必要なファイルを作成する必要があります。ほかに、コマンドを実行するプロセス内に単純に追加する方法もあります。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="userbootscript" name="userbootscript">UserBootscript</a></h3>
-<p>システムの起動プロセスが完了すると、<span class="path">/boot/home/config/settings/boot/UserBootscript</span> が実行されます。たとえば次のように、システムが起動した直後にいくつかのプログラムを毎回自動起動させることができます:</p>
+<p>システムの起動プロセスが完了すると、<span class="path">/boot/home/config/settings/boot/UserBootscript</span> が実行されます。たとえば次のように、システムの起動ごとに自動起動するいくつかのプログラムを立ち上げられます:</p>
 <pre># ランチャーを起動する
 /boot/system/apps/LaunchBox &amp;
 

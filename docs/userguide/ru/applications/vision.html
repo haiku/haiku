@@ -12,6 +12,7 @@
  * Translators:
  *		Sergei Reznikov
  *		Rodastahm Islamov
+ *		Vsevolod
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -31,11 +32,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/ru.png" alt="" /> Русский</li>
+<li><a href="../../id/applications/vision.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/vision.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/applications/vision.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/applications/vision.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/applications/vision.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/applications/vision.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/vision.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/vision.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/vision.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pl/applications/vision.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
@@ -61,10 +64,10 @@
 <div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Index</td></tr>
+<tr class="heading"><td>Содержание</td></tr>
 <tr class="index"><td>
-	<a href="#shortcuts">Keyboard shortcuts</a><br />
-	<a href="#commands">Built-in commands</a></td></tr>
+	<a href="#shortcuts">Горячие клавиши</a><br />
+	<a href="#commands">Встроенные команды</a></td></tr>
 </table>
 
 <h2><img src="../../images/apps-images/vision-icon_64.png" alt="vision-icon_64.png" width="64" height="64" />Vision</h2>
@@ -74,9 +77,9 @@
 <tr><td>Настройки хранятся по адресу:</td><td></td><td><span class="path">~/config/settings/Vision/*</span></td></tr>
 </table>
 <p><br /></p>
-<p>Vision is an IRC client originally developed for the BeOS. More documentation and a bug tracker are available at the <a href="https://github.com/HaikuArchives/Vision/">Vision homepage</a>.</p>
-<div class="box-info">You can find help from other Haiku users and developers on <a href="https://www.haiku-os.org/community/irc">Haiku channels</a> in various languages.<br />
-The most frequented channel is the English speaking #haiku at irc.freenode.net.</div>
+<p>Vision - это IRC-клиент, изначально разработанный для BeOS. Документация и баг-трекер доступны на <a href="http://vision.sourceforge.net/">официальном сайте Vision</a>.</p>
+<div class="box-info">Вы можете получить помощь от пользователей и разработчиков Haiku, зайдя на один из <a href="http://www.haiku-os.org/community/irc">каналов Haiku</a>.<br />
+Наиболее популярным является англоязычный канал #haiku на сервере irc.freenode.org.</div>
 <p>Some advice, especially if you're new to IRC:</p>
 <ul>
 <li><p>Search the web for "IRC etiquette" to learn about the do's and don'ts of chatting. Without much searching, I found <a href="https://workaround.org/getting-help-on-irc/">Getting help on IRC</a> by Christoph Haas to be quite helpful.</p></li>
@@ -88,7 +91,7 @@ The most frequented channel is the English speaking #haiku at irc.freenode.net.<
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="shortcuts" name="shortcuts">Keyboard shortcuts</a></h2>
+<a id="shortcuts" name="shortcuts">Горячие клавиши</a></h2>
 <p>Vision provides a few handy keyboard shortcuts:</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="key">TAB</span></td><td style="width:15px;"></td><td>Tab-completion like in Terminal: After entering a few letters of a nickname, hitting <span class="key">TAB</span> completes to the first matching nickname.</td></tr>
@@ -108,15 +111,15 @@ Vision treats these with sequential priority. When you press <span class="key">S
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="commands" name="commands">Built-in commands</a></h2>
+<a id="commands" name="commands">Встроенные команды</a></h2>
 <p>Here's a list of built-in commands, taken with permission from Vision's website.</p>
-<p>The syntax:</p>
+<p>Синтаксис:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="0">
-<tr><td><tt>/COMMAND</tt></td><td width="10"></td><td>the command</td></tr>
-<tr><td><tt>&lt;required&gt;</tt></td><td></td><td>a required parameter</td></tr>
-<tr><td><tt>[optional]</tt></td><td></td><td>an optional parameter</td></tr>
-<tr><td><tt>|</tt></td><td></td><td>a logical OR</td></tr>
-<tr><td><tt>...</tt></td><td></td><td>more parameters possible</td></tr>
+<tr><td><tt>/КОМАНДА</tt></td><td width="10"></td><td>команда</td></tr>
+<tr><td><tt>&lt;обязательно&gt;</tt></td><td></td><td>обязательный параметр</td></tr>
+<tr><td><tt>[необязательно]</tt></td><td></td><td>необязательный параметр</td></tr>
+<tr><td><tt>|</tt></td><td></td><td>логическое ИЛИ</td></tr>
+<tr><td><tt>...</tt></td><td></td><td>можно добавить больше параметров</td></tr>
 </table>
 
 <ul>

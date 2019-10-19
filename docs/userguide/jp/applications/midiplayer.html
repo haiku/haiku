@@ -32,11 +32,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/jp.png" alt="" /> 日本語</li>
+<li><a href="../../id/applications/midiplayer.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/midiplayer.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/applications/midiplayer.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/applications/midiplayer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/applications/midiplayer.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/applications/midiplayer.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/midiplayer.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/midiplayer.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/midiplayer.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pl/applications/midiplayer.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
@@ -69,10 +71,8 @@
 <p><br /></p>
 <p>名前のとおり、MIDI プレーヤーは、MIDI 音楽ファイルを再生するときに使われます。MIDI ファイルは特別で、エンコードされたデジタル音楽は記録せず、音楽の説明を記録します (つまり、この音符をどのボリュームでどれだけ長く、楽器 X を使うなど)。<br />
 これはファイルサイズを小さくしますが、楽器ライブラリ (サウンドフォント) によって再生結果が大きく異なります。さらに、サウンドフォントは楽器のサンプル数と音質によってサイズが大きくなります。</p>
-<div class="box-info"><p>サウンドフォントのサイズはとても大きく、一部のユーザーしか必要としないので、Haiku は標準でそれをインストールしません。必要な人のほとんどは高音質またはカスタムサウンドフォントをすでに持っています。<i>何か</i>が聞けるようにするためには、オプショナルパッケージから無料でサウンドフォントをインストールできます。ターミナルで、<tt>installoptionalpackage TimGMSoundFont</tt> と入力します。</p>
-<p>
-ほかのサウンドフォントを再生するには、<tt>/boot/system/data/synth</tt> にリンクを作成し、big_synth.sy と名前を付けてください。
-</p></div>
+<div class="box-info"><p>Haiku のリリースは、サイズは小さいが、比較的に高品質なサウンドフォントを含んでいます。MIDI をさらに真剣に使用する人は、大抵すでに超高品質のサウンドフォントやカスタムサウンドフォントを持っているでしょう。</p>
+<p>ほかのサウンドフォント (HaikuDepot を通じて HPKG としてインストールできないもの) を使用するには、.sf ファイルをたとえば <tt>~/config/non-packaged/data/synth/</tt> にコピーします。アクティブなサウンドフォントは、 Media プレファレンスの <span class="menu">MIDI</span> で選択できます。</p></div>
 <img src="../images/apps-images/midiplayer.png" alt="midiplayer.png" />
 <p>MIDI プレーヤーのインターフェースはシンプルです。MIDI ファイルをダブルクリックまたはドラッグ＆ドロップすると再生を開始します。スライダーで音量を調節し、<span class="menu">リバーブ (Reverb)</span> ポップアップメニューでリバーブを追加します。スコープをオンにすると、オシロスコープの形をしたビジュアライザが上に表示されます。</p>
 

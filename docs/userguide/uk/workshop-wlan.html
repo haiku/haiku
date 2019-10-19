@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2012-2016, Haiku, Inc. All rights reserved.
+ * Copyright 2012-2019, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,11 +31,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/uk.png" alt="" /> Українська</li>
+<li><a href="../id/workshop-wlan.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/workshop-wlan.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/workshop-wlan.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/workshop-wlan.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/workshop-wlan.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/workshop-wlan.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/workshop-wlan.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/workshop-wlan.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/workshop-wlan.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/workshop-wlan.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -59,34 +61,25 @@
 
 <div id="content">
 <div>
+<div class="box-info">Переклад даної сторінки ще неповний. Допоки це так, незавершені частини користайте у англійському варіанті. </div>
 
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Зміст</td></tr>
 <tr class="index"><td>
-	<a href="#firmware">Як отримати робоче залізо</a><br />
-	<a href="#gui">Приєднання до бездротової мережі</a><br />
-	<a href="#commandline">Приєднання за допомогою командної стрічки</a><br />
-	<a href="#tips">Поради</a>
+	<a href="#gui">Joining a wireless network</a><br />
+	<a href="#commandline">Joining from the command line</a><br />
+	<a href="#firmware">Getting supported hardware to work</a><br />
+	<a href="#tips">Tips</a>
 </td></tr>
 </table>
 
 <h1>Семінар: Бездротові мережі</h1>
 
-<p>Отримання робочої мережі надзвичайно важливе у зв'язку з необхідністю мати постійне підключення до інтернету у сучасних умовах. Крокування у ногу з часом в умовах швидкої мінливості апаратних засобів та драйверів до них для такого невеликого проекту як Haiku стало можливе завдяки використанню шару сумісності з драйверами <a href="http://www.freebsd.org">FreeBSD</a>.<br />
-Це забезпечує підтримку величезної кількості обладнання, хоча і не на всі 100%. Дивись <a href="https://www.haiku-os.org/guides/daily-tasks/wireless#hardware-notes">онлайн список</a> підтримуваних моделей або прочитай розділ <a href="http://www.freebsd.org/releases/11.1R/hardware.html#wlan">Апаратна підтримка релізу FreeBSD 11.1.</a></p>
+<p>Getting the networking to run is essential in today's need for permanent internet connection. As keeping up to date with all the different and ever changing hardware and drivers is quite impossible for a small project, Haiku relies on a <a href="http://www.freebsd.org">FreeBSD</a> compatibility layer for its networking drivers.<br />
+This ensures a massive amount of supported hardware, though probably not 100% of what's out there. See <a href="http://www.freebsd.org/releases/12.0R/hardware.html#wlan">FreeBSD 12.0's release hardware notes</a> for a list of supported models.</p>
 <div class="box-info">Поточно вважається що тільки PCI, PCI-X, PCI-Express, Mini PCI та Mini PCI-Express пристрої можуть працювати.<br />
 PCMCIA, CardBus, ExpressCard, USB та ISA пристрої як і раніше потребують робіт з забезпечення їхньої функціонування.</div>
-
-<h2>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="firmware" name="firmware">Отримання сумісних пристоїв для роботи</a></h2>
-<p>Навіть якщо перша перешкода в цілому підтримуваного обладнання подолана деякі бездротові мережеві карти вимагають бінарних модулів прошивки для правильної роботи. Haiku не може включати в себе деякі з цих файлів мікропрограм через проблеми з ліцензуванням. Проте Haiku містить простий скрипт, для видобування та встановлення необхідних пропрієтарних бітів для вас. Як правило, якщо ви плануєте використовувати бездротову мережу, це гарна ідея, запуск такого сценарію гарантуватиме доступність системи при необхідності до усіх прошивок.</p>
-<p>Відкрийте Terminal (Термінал) та наберіть:</p>
-<pre class="terminal">install-wifi-firmwares.sh</pre>
-<p>Тепер перегляньте ліцензії та дозвольте інсталяцію усіх доступних файлів прошивок.</p>
-
-<p>При відсутності доступу до інтернету для завантаження так потрібних прошивок для Haiku, існує офлайн метод, дивись <a href="#tips">Поради</a> нижче.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -117,17 +110,20 @@ ArcorInternet123                 00:20:12:a4:29:e1        15  WPA</pre>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="tips" name="tips">Поради</a></h2>
-<h3>Закачування бінарних файлів прошивок без доступу до мережі</h3>
+<a id="firmware" name="firmware">Отримання сумісних пристоїв для роботи</a></h2>
+<p>All supported modern wireless hardware works out of the box.</p>
+
+<p>A few quite old chipsets (Intel 2100/2200/2225/2915, Broadcom 43xx, Marvell 88w8335) require binary firmware modules that Haiku cannot include due to licensing issues, though. To get these wireless cards to work, a simple script is included which will retrieve and install all of the needed proprietary bits for you.</p>
+<p>Відкрийте Terminal (Термінал) та наберіть:</p>
+<pre class="terminal">install-wifi-firmwares.sh</pre>
+<p>Тепер перегляньте ліцензії та дозвольте інсталяцію усіх доступних файлів прошивок.</p>
+
 <p>Якщо ви не можете отримати бінарні файли прошивок за допомогою сценарію <tt>install-wifi-firmwares.sh</tt> (наприклад, при відсутності підключення до Інтернету в Haiku), Ви можете скачати <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt">цей сценарій оболонки</a> та запустити його в іншій операційній системі яка має встановлені <tt>wget</tt> і <tt>zip</tt><br />
 Користувачі Windows повинні мати <a href="http://gnuwin32.sourceforge.net/packages/wget.htm">wget</a> та <a href="http://gnuwin32.sourceforge.net/packages/zip.htm">zip</a> для Windows встановлені у типових місцях і використати <a href="https://www.haiku-os.org/files/download-data-for-wlan-firmwares.bat">такий batch скрипт</a>.<br />
 Скрипт завантажить потрібні файли та створить zip файл, який потрібно розпакувати у Haiku <tt>/boot</tt>. Після розпаковки треба відкрити Термінал та набрати:</p>
 <pre class="terminal">install-wifi-firmwares.sh</pre>
 <p>Перегляньте ліцензії та дайте дозвіл на встановлення усіх доступних файлів прошивок.</p>
-<h3>Як уникнути втрати з'єднання</h3>
-<p>Драйвери Haiku для деяких  WLAN чіпсетів, а саме iprowifi4965 схильні до втрати з'єднання при використанні шифрування WPA. Якщо ви постраждали від цього, спробуйте відключити режим "HT" (з високою пропускною здатністю, 802.11n) перед підключенням до мережі:</p>
-<pre class="terminal">ifconfig /dev/net/iprowifi4965/0 -ht</pre>
-<p>Якщо це усуне проблему вставте цю стрічку у <span class="path">~/config/settings/boot/UserBootscript</span>, щоб вона спрацьовувала автоматично при кожному завантаженні.</p>
+
 </div>
 </div>
 

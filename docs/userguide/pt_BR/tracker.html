@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2018, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,11 +31,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../id/tracker.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/tracker.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/tracker.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/tracker.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/tracker.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/tracker.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/tracker.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/tracker.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/tracker.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/tracker.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -130,7 +132,7 @@ Este filtro de autocompletar é definido nas <a href="#tracker-preferences.html"
 <ul>
 <li><p><span class="menu">Visão de ícone</span> (<span class="key">ALT</span> <span class="key">1</span>) - Ícones grandes, pode-se alterar o tamanho a partir do submenu ou reduzir/aumentar seu tamanho com <span class="key">ALT</span> <span class="key">+</span>/<span class="key">-</span>.</p></li>
 <li><p><span class="menu">Visão de mini ícone</span> (<span class="key">ALT</span> <span class="key">2</span>) - Ícones pequenos.</p></li>
-<li><p><span class="menu">List view</span> (<span class="key">ALT</span> <span class="key">3</span>) - A detailed list of your files enabling you to show/hide file attributes. (See topic <a href="attributes.html">Attributes</a>.) From the submenu you can choose to use either mini or large icons.</p></li>
+<li><p><span class="menu">List view</span> (<span class="key">ALT</span> <span class="key">3</span>) - A detailed list of your files enabling you to show/hide file attributes (see topic <a href="attributes.html">Attributes</a>.)</p></li>
 </ul>
 <p>O menu <span class="menu">Janela</span> oferece uma quantidade de outras funções:</p>
 <ul>
@@ -185,10 +187,16 @@ Neste exemplo, existe um arquivo "Texto" com o tipo de arquivo <tt>text/plain</t
 <br /><br />
 <img src="images/tracker-images/open-with-preferred.png" alt="open-with-preferred" />
 <p>Aqui encontrar-se-ão novamente os programas que foram listados no submenu. Ao selecionar um e clicar o botão <span class="button">Abrir e tornar preferido</span>, mudou-se o aplicativo preferido para todo arquivo daquele tipo de arquivo, no caso <tt>text/plain</tt>.</p></li>
-<li><span class="menu">Obter informação</span>
-<br /><br />
+<li><span class="menu">Get info</span>
+<p>This opens a panel that shows the meta data of a file and lets you edit its permissions. You can rename it by clicking on the file name at the top.</p>
 <img src="images/tracker-images/get-info.png" alt="get-info" />
-<p>A caixa de diálogo apresenta informações do arquivo selecionado e permite definir o aplicativo padrão e, após ter expandido aquela parte da caixa de diálogo, permissões e proprietário. Clicando no caminho irá abrí-lo em uma janela do Rastreador.</p></li>
+<p>The panel consists of three tabs:</p>
+<ul>
+<li><span class="menu">Information</span>: Shows standard data like size, date of creation/modification, file type and location. Click on the location path to open the files parent folder. The <span class="menu">Open with</span> menu sets the preferred application to open this particular file.</li>
+<li><span class="menu">Permissions</span>: Lets you change owner, group and file permissions.</li>
+<li><span class="menu">Attibutes</span>: Lists all extra file attributes with their value and type.</li>
+</ul>
+</li>
 <li><p><span class="menu">Editar nome</span>, <span class="menu">Duplicar</span> e <span class="menu">Mover para a lixeira</span> - permite renomear ou duplicar uma arquivo ou colocar o arquivo selecionado na lixeira.</p></li>
 <li><p><span class="menu">Mover para</span>, <span class="menu">Copiar para</span> e <span class="menu">Criar vínculo</span> - permite mover, copiar ou vincular o(s) arquivo(s) selecionado(s) usando o método de navegação por submenu. Pressionar <span class="key">SHIFT</span> enquanto chama o menu oferece a opção para criar um vínculo relativo.</p></li>
 <li><p><span class="menu">Recortar</span>, <span class="menu">Copiar</span> e <span class="menu">Colar</span> - permite recortar, copiar e cloar arquivos usando a área de transferência. Ao pressionar <span class="key">SHIFT</span> enquanto chama o menu pode-se <span class="menu">Copiar/Recortar mais</span> arquivos, talvez de outra pasta que possa colar em outro lugar mais tarde. Também, enquanto pressiona <span class="key">SHIFT</span> pode-se colar os arquivos copiados na área de transferência como vínculos.</p></li>

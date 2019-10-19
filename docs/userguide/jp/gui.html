@@ -32,11 +32,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/jp.png" alt="" /> 日本語</li>
+<li><a href="../id/gui.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/gui.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/gui.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/gui.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/gui.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/gui.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/gui.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/gui.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/gui.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/gui.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -63,8 +65,8 @@
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>インデックス</td></tr>
 <tr class="index"><td>
-		<a href="#move-resize">簡単なウィンドウの移動とリサイズ</a><br />
-                <a href="#stack-tile">Stack &amp; Tile</a><br />
+		<a href="#move-resize">ウィンドウを素早く移動 / リサイズする方法</a><br />
+                <a href="#stack-tile">スタック &amp; タイル</a><br />
                 <a href="#open-save-panel">読み込み / 保存パネル</a><br />
                 <a href="#replicants">レプリカント</a></td></tr>
 </table>
@@ -89,7 +91,7 @@
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="move-resize" name="move-resize">簡単なウィンドウの移動とリサイズ</a></h2>
+<a id="move-resize" name="move-resize">ウィンドウを素早く移動 / リサイズする方法</a></h2>
 <p>ウィンドウの移動やリサイズは、同時に実行している複数のアプリケーションを取り扱う操作の大部分を占めます。黄色の小さいタイトルタブや、さらに細いウィンドウの枠をポイントする代わりに、より簡単にウィンドウを動かす方法があります。また、リサイズコーナーは小さい上に、右下の角からその方向にしかリサイズできないという制約があります。 <br />ウィンドウ枠の右クリックでリサイズできますが、慎重にポイントしなければなりません。</p>
 <p>こうした問題に対処するために、Haiku は <span class="key">CTRL</span> <span class="key">ALT</span>  (ウィンドウを管理するキーの組み合わせ) とマウスを使ったすばらしい解決策を提供しています。ウィンドウ管理に関連するさらに多くのショートカットについては、<a href="keyboard-shortcuts.html#general">ショートカットとキーの組み合わせ</a>の章も参照してください。</p>
 <img src="images/gui-images/resizing.png" alt="resizing.png" />
@@ -98,27 +100,27 @@
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="stack-tile" name="stack-tile">Stack &amp; Tile (スタック＆タイル)</a></h2>
-<p>Haiku のユーザーインターフェースは、ウィンドウがフルサイズのタイトルバーの代わりに黄色のタブを備えているという事実を、完璧に使いこなすユニークな特徴を提供します。それは、"Stack &amp; Tile (スタック＆タイル)" と呼ばれます。<br />
+<a id="stack-tile" name="stack-tile">スタック＆タイル</a></h2>
+<p>Haiku のユーザーインターフェースは、ウィンドウがフルサイズのタイトルバーの代わりに黄色のタブを備えているという事実を、完璧に使いこなすユニークな特徴を提供します。それは、"スタック＆タイル (Stack &amp; Tile)" と呼ばれます。<br />
 以下の例で、ブックマークを表示した Tracker ウィンドウが、WebPositive ウィンドウの左側にタイル (Tile) します。WebPositive ウィンドウ自体は、ソースフォルダー  <tt>haiku</tt> を表示する別の Tracker ウィンドウとスタック (Stack) しています。このアニメーションでは、ユーザーがスタックしたウィンドウのタブをクリックすると、交互にどちらか一方を前面に移動します。</p> 
 <img src="images/gui-images/gui-s+t.gif" alt="gui-s+t.gif" />
-<p>このようにつながっているので、ウィンドウのグループは同時に移動およびリサイズできます。それは、よりプロジェクト中心の環境で作業するよい配置です。右側のドキュメントと web ブラウザーウィンドウの代わりに、エディターと Tracker ウィンドウ、そしておそらく作業中のプロジェクトに関する関連するメールを、それらと一緒に stack&amp;tile できます。</p>
+<p>このようにつながっているので、ウィンドウのグループは同時に移動およびリサイズできます。それは、よりプロジェクト中心の環境で作業するよい配置です。右側のドキュメントと web ブラウザーウィンドウの代わりに、エディターと Tracker ウィンドウ、そしておそらく作業中のプロジェクトに関する関連するメールを、それらと一緒に スタック &amp; タイルできます。</p>
 <p>ウィンドウを実際に配置することは容易です。別のウィンドウのタブか枠の近くまでウィンドウをタブでドラッグしながら、ウィンドウが強調されるまで、<span class="key">OPT</span> を押してください。それからマウスボタンを離します。</p>
-<p>Stack &amp; Tile は、2 つの関連する部分から成ります。</p>
+<p>スタック &amp; タイル は、2 つの関連する部分から成ります。</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><img src="images/gui-images/gui-stacking.png" alt="gui-stacking.png" /></td><td width="10"></td>
-<td><p>"<i>Stacking (スタック)</i>" は、ウィンドウを互いに重なり合わせて置くことです。黄色のタブは自動的に所定の位置に移動します。<br />
+<td><p>"<i>スタック (Stacking)</i>" は、ウィンドウを互いに重なり合わせて置くことです。黄色のタブは自動的に所定の位置に移動します。<br />
 <span class="key">OPT</span> を押しながらタブを重ねると、色が変わります。次に、ウィンドウにドロップして、スタックします。</p></td></tr></table>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2" vspace="10">
 <tr><td><img src="images/gui-images/gui-tiling.png" alt="gui-tilinging.png" /></td><td></td>
-<td><p>"<i>Tiling (タイル)</i>" は、ウィンドウを水平方向、または垂直方向にくっつけることです。<br />
+<td><p>"<i>タイル (Tiling)</i>" は、ウィンドウを水平方向、または垂直方向にくっつけることです。<br />
 先と同様に、<span class="key">OPT</span> を押しながら、ウィンドウを互いに近づけたとき、色が変化したウィンドウをドロップすれば、ウィンドウ枠は互いにくっつくでしょう。</p></td></tr></table>
 <p>分離は同じように行えます。ウィンドウをタブでドラッグ中に <span class="key">OPT</span> を押せば、グループの外に出ます。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="open-save-panel" name="open-save-panel">読み込み / 保存パネル</a></h2>
-<p>どのようなアプリケーションでも、ファイルを開くか保存する際は以下のようなパネルが開きます。</p>
+<p>どのようなアプリケーションでも、ファイルを開く / 保存する際は以下のようなパネルが開きます。</p>
 <img src="images/gui-images/open-save.png" alt="open-save.png" />
 <p>パネルは一般的な要素をすべて備えています。現在のフォルダー下のファイル選択リスト、保存パネルではファイル名を入力するテキストフィールドと、異なるファイル形式のためのポップアップメニュー、そしてその設定です。<br />
 ファイル選択リストの上にあるポップアップメニューで親フォルダーに移動できます。</p>

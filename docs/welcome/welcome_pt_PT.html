@@ -4,17 +4,19 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2017, Haiku. All rights reserved.
+ * Copyright 2008-2018, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  *		Stephan Aßmus <superstippi@gmx.de> 
+ * Translators:
+ *		'
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta name="robots" content="all" />
-	<title>Welcome to Haiku!</title>
+	<title>Bem-vindo ao Haiku!</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="Haiku-doc.css" />
 </head>
@@ -28,11 +30,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="images/flags/pt_PT.png" alt="" /> Português</li>
+<li><a href="welcome_id.html"><img src="images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="welcome_ca.html"><img src="images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="welcome_de.html"><img src="images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="welcome_en.html"><img src="images/flags/gb.png" alt="" />English</a></li>
 <li><a href="welcome_es.html"><img src="images/flags/es.png" alt="" />Español</a></li>
 <li><a href="welcome_fr.html"><img src="images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="welcome_fur.html"><img src="images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="welcome_it.html"><img src="images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="welcome_hu.html"><img src="images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="welcome_pl.html"><img src="images/flags/pl.png" alt="" />Polski</a></li>
@@ -56,72 +60,74 @@
 <div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Index</td></tr>
+<tr class="heading"><td>Índice</td></tr>
 <tr class="index"><td>
-	<a href="#welcome">Welcome to Haiku!</a><br />
-	<a href="#bugreport">Beware of Bugs</a><br />
-	<a href="#system">Getting to know the system</a><br />
-	<a href="#software">Installing new software</a><br />
-	<a href="#wifi">Wifi in Haiku</a><br />
-	<a href="#api">Getting to know the API</a><br />
-	<a href="#contact">Getting in contact</a>
+	<a href="#welcome">Bem-vindo ao Haiku!</a><br />
+	<a href="#bugreport">Cuidado com os <i>Bugs</i></a><br />
+	<a href="#system">Conhecer o sistema</a><br />
+	<a href="#software">Instalar mais software</a><br />
+	<a href="#update">Atualizar o Haiku</a><br />
+	<a href="#wifi">Wifi no Haiku</a><br />
+	<a href="#api">Conhecer a API</a><br />
+	<a href="#contact">Entrar em contacto</a>
 </td></tr>
 </table>
 
-<h2>
-<a id="welcome" name="welcome">Welcome to Haiku!</a></h2>
-<p>Thanks for checking out Haiku! This is our fifth public release. We hope to attract new developers to our project and give users a chance to check out Haiku. While this first <i>beta release</i> includes all major features planned for the final Haiku release, it still has many bugs and a few rough edges that need further polishing. However, we think that this release is quite usable and hope it lets you discover Haiku's great potential and that you share our excitement.</p>
-<p>Visit our project's website <a href="https://www.haiku-os.org">Haiku-os.org</a> for the latest news and announcements.</p>
+<h1>
+<a id="welcome" name="welcome">Bem-vindo ao Haiku!</a></h1>
+<p>Obrigado pelo seu interesse no Haiku! Este é o nosso quinto lançamento público. Esperamos atrair novos desenvolvedores para o projeto e oferecer aos utilizadores uma oportunidade de experimentar o Haiku. Apesar de esta <i>versão beta</i> incluir todas as funcionalidades principais planeadas para a versão final do Haiku, ainda tem muitos bugs e alguns traços que precisam de ser retocados. Consideramos, contudo, que esta versão é bastante estável e esperamos que lhe permita descobrir o grande potencial do Haiku e compartilhar do nosso entusiasmo.</p>
+<p>Visite o <i>site</i> do nosso projeto em  <a href="https://www.haiku-os.org">Haiku-os.org</a> para saber das últimas notícias e comunicados.</p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="bugreport" name="bugreport">Beware of Bugs</a></h2>
-<p>We have been working hard to fix potentially critical bugs, however, being a beta release, there are bound to be some left undiscovered.</p>
-<div class="box-warning">We discourage using beta versions as a production system. Your data could be altered, mangled or downright destroyed. Keep up-to-date backups!</div>
+<a id="bugreport" name="bugreport">Cuidado com os <i>Bugs</i></a></h2>
+<p>Estivemos a trabalhar arduamente para corrigir <i>bugs</i> potencialmente críticos, entretanto, por ser uma versão beta, é natural que ainda existam alguns à espera de serem descobertos.</p>
+<div class="box-warning">Desencorajamos o uso de versões beta como sistemas de produção. Os seus dados poderão ser seriamente alterados, corrompidos ou completamente destruídos. Mantenha as cópias de segurança atualizadas!</div>
 
-<p>One of the main reasons for releasing a beta version is to attract more people to test the system and discover bugs or provide suggestions for future enhancements. Please file bugs and enhancements in our bug tracker after using its search function to avoid duplicates.</p>
+<p>Uma das principais razões para lançar uma versão beta é para cativar mais pessoas para testar o sistema e descobrir falhas ou oferecer sugestões para futuros melhoramentos. Por favor relate erros e sugestões de melhoramentos no nosso sistema de acompanhamento de <i>bugs</i>, depois de usar a nossa ferramenta de pesquisa, para evitar duplicados.</p>
 <ul>
-	<li><a href="https://dev.haiku-os.org/wiki" class="printurl">Haiku Bug Tracker</a></li>
-	<li><a href="pt_PT/bugreports.html">Tips for a helpful bug report</a></li>
+	<li><a href="https://dev.haiku-os.org/wiki" class="printurl">Sistema de Acompanhamento de Problemas do Haiku</a></li>
+	<li><a href="pt_PT/bugreports.html">Dicas para um relatório de erros útil</a></li>
 </ul>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="system" name="system">Getting to know the system</a></h2>
-<p>The first release(s) of Haiku will be very much like the BeOS R5, the operating system it is reimplementing. If you never experienced it, have a look at these links:</p>
+<a id="system" name="system">Conhecer o sistema</a></h2>
+<p>A primeira versão do Haiku será muito semelhante ao BeOS R5, o sistema operativo que está a ser reimplementado. Se nunca o experimentou, dê uma olhada nestas ligações:</p>
 <ul>
-	<li><a href="../userguide/pt_PT/contents.html">Haiku User Guide</a></li>
-	<li><a href="https://www.haiku-os.org/community/" class="printurl">Get help and support and become a part of  the community</a></li>
+	<li><a href="../userguide/pt_PT/contents.html">Guia do Utilizador do Haiku</a></li>
+	<li><a href="https://www.haiku-os.org/community/" class="printurl">Obter ajuda e suporte, e tornar-se parte da comunidade</a></li>
 </ul>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="software" name="software">Installing more software</a></h2>
-<p>Most of the available software can be downloaded and installed with the application <a href="../userguide/pt_PT/applications/haikudepot.html">HaikuDepot</a> that comes with Haiku.<br />
-Because of our binary and source compatibility, most BeOS applications run on Haiku. Many of those have been re-packaged for Haiku or still run unmodified. You'll find more information on installing new programs in the user guide's chapter on <a href="../userguide/pt_PT/applications.html">Applications</a>.</p>
-<p>There are several community-based software collections. See the <a href="https://www.haiku-os.org/community/software">Software Sites</a> page on our website.</p>
+<a id="software" name="software">Instalar mais software</a></h2>
+<p>A maior parte do software disponível pode ser descarregado e instalado com a aplicação <a href="../userguide/pt_PT/applications/haikudepot.html">HaikuDepot</a> que vem com o Haiku.<br />
+Por causa da sua compatibilidade de código e binária, muitas aplicações do BeOS podem ser também executadas no Haiku. Muitas delas foram reempacotadas para o Haiku ou ainda correm sem modificações. Encontrará mais informações sobre como instalar novos programas no capítulo <a href="../userguide/pt_PT/applications.html">Aplicações</a> do guia do utilizador.</p>
+<p>Há várias coleções de software baseadas na comunidade. Consulte a página <a href="https://www.haiku-os.org/community/software">Software Sites</a> no nosso <i>website</i>.</p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="update" name="update">Updating Haiku</a></h2>
-<p>Updating Haiku as well as third party packages is done with the application <a href="../userguide/pt_PT/applications/softwareupdater.html">SoftwareUpdater</a>. When it's finished, reboot.<br />
-For more details, see the guide <a href="https://www.haiku-os.org/guides/daily-tasks/updating-system">Updating and downgrading your system</a> on our website.</p>
+<a id="update" name="update">Atualizar o Haiku</a></h2>
+<p>A atualização do Haiku, bem como dos pacotes de terceiros, é feita com a aplicação <a href="../userguide/pt_PT/applications/softwareupdater.html">SoftwareUpdater</a>. Quando terminar, reinicie.<br />
+Para saber mais detalhes, consulte o guia <a href="https://www.haiku-os.org/guides/daily-tasks/updating-system">Updating and downgrading your system</a> (atualizar e reverter atualizações do seu sistema) no nosso <i>website</i>.</p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="software" name="wifi">Wifi in Haiku</a></h2>
-<p>Haiku supports wireless networks that are WPA/WPA2 or WEP encrypted and of course open, unencrypted connections. Due to several different licensing policies of different hardware vendors, a manual installation process for the firmware may be required. You'll find more information on supported hardware, firmware installation and how to join a wireless network in the Haiku User Guide's <a href="../userguide/pt_PT/workshop-wlan.html">Workshop: Wireless networking</a>.</p> 
+<a id="software" name="wifi">Wifi no Haiku</a></h2>
+<p>O Haiku suporta redes sem fio encriptadas com  WPA/WPA2 ou WEP e, claro, abertas ou não encriptadas. Por motivos relacionados com as diferentes políticas de licenciamento dos diversos fabricantes de hardware, pode ser necessário um processo de instalação manual de firmware. Encontrará mais informação sobre o hardware suportado, instalação de firmware e como aceder a uma rede sem fios na secção <a href="../userguide/pt_PT/workshop-wlan.html">Passo a passo: Redes sem fios</a> do 
+Guia do Utilizador do Haiku.</p> 
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="api" name="api">Getting to know the API</a></h2>
-<p>Since Haiku is a reimplementation, the API is still the same as for BeOS R5 (with some additions). Therefore the documentation in the Be Book is still a valid resource. Thanks to ACCESS, who owns the rights to former Be Inc. property, we are allowed to provide a copy of the Be Book.<br />
-Deviations from the BeOS API and Haiku specific additions are collected in the Haiku Book.</p>
+<a id="api" name="api">Conhecer a API</a></h2>
+<p>Uma vez que o Haiku é uma reimplementação, a API ainda é a mesma do BeOS R5 (com alguns acréscimos). Portanto, a documentação que consta do Be Book ainda é um recurso válido. Graças à ACCESS, que detém os direitos de antiga propriedade da Be Inc., temos permissão para fornecer uma cópia do be Book.<br />
+As divergências a partir da BeOS API e os acréscimos específicos do Haiku são reunidos no  Haiku Book.</p>
 
-<p>There are some resources that should help you getting started:</p>
+<p>Há alguns recursos que lhe poderão ser úteis para ajudar a começar:</p>
 <ul>
-	<li><a href="https://www.haiku-os.org/development/faq" class="printurl">Development FAQ</a></li>
-	<li><a href="http://cgit.haiku-os.org/" class="printurl">Source Browser</a></li>
+	<li><a href="https://www.haiku-os.org/development" class="printurl">Comece a programar para Haiku</a></li>
+	<li><a href="http://cgit.haiku-os.org/" class="printurl">Explorador do Código-fonte</a></li>
 	<li><a href="https://www.haiku-os.org/legacy-docs/bebook/" class="printurl">The Be Book</a></li>
 	<li><a href="https://www.haiku-os.org/docs/api/" class="printurl">The Haiku Book</a></li>
 	<li><a href="https://www.haiku-os.org/legacy-docs/benewsletter/" class="printurl">Be Newsletter Archive</a></li>
@@ -129,8 +135,8 @@ Deviations from the BeOS API and Haiku specific additions are collected in the H
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="contact" name="contact">Getting in contact</a></h2>
-<p>Get in contact with other developers and users and join the discussions on IRC (<a href="http://webchat.freenode.net/?channels=haiku">#haiku</a> on webchat), in our forums or the mailing lists. When many different people come together, rules have to be established to keep communication effective. Please respect our <a href="https://www.haiku-os.org/community/ml/etiquette">Mailing List Etiquette</a>.</p>
+<a id="contact" name="contact">Entrar em contacto</a></h2>
+<p>Entre em contacto com outros desenvolvedores e utilizadores, e junte-se às discussões no IRC (<a href="http://webchat.freenode.net/?channels=haiku">#haiku</a> no <i>web chat</i>), nos nossos fóruns ou nas listas de discussão (<i>mailing lists</i>). Quando se juntam muitas pessoas diferentes, devem ser estabelecidas regras para manter efetiva a comunicação. Por favor, respeite a nossa <a href="https://www.haiku-os.org/community/ml/etiquette">Etiqueta nas Listas de Discussão</a>.</p>
 <ul>
 	<li><a href="https://www.haiku-os.org/community/irc" class="printurl">IRC channels</a></li>
 	<li><a href="https://www.haiku-os.org/forum" class="printurl">Forums</a></li>

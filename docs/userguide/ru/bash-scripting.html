@@ -15,6 +15,7 @@
  *		Humdinger
  *		Michael Smirnov
  *		mrNoisy
+ *		Vsevolod
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -34,11 +35,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/ru.png" alt="" /> Русский</li>
+<li><a href="../id/bash-scripting.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/bash-scripting.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/bash-scripting.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/bash-scripting.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/bash-scripting.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/bash-scripting.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/bash-scripting.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/bash-scripting.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/bash-scripting.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/bash-scripting.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -61,7 +64,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <h1>Bash и скрипты</h1>
 
@@ -96,13 +98,14 @@
 
 <p>Более простая альтернатива для запускающихся приложений во время загрузки - разместить ссылки на необходимые программы в папке <span class="path">/boot/home/config/settings/boot/launch</span>. Это может быть сделано правым кликом по приложению, которое вы хотели бы поместить в автозапуск, выбрав меню <span class="menu">Создать ссылку (Create Link)</span> и затем выполнив перемещение по папкам используя <a href="tracker.html#navigating">навигацию</a>.</p>
 
-<h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="usershutdownscript" name="usershutdownscript">The UserShutdownScript - <i>not yet working</i></a></h3>
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="usershutdownscript" name="usershutdownscript">UserShutdownScript - <i>пока не работает</i></a></h3>
 <p><span class="path">/boot/home/config/settings/boot/UserShutdownScript</span> будет выполнен в качестве первого этапа в процессе завершения работы. Если скрипт возвращает ненулевой результат по окончании, завершение работы прекращается.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="usershutdownfinishscript" name="usershutdownfinishscript">The UserShutdownFinishScript - <i>not yet working</i></a></h3>
+<a id="usershutdownfinishscript" name="usershutdownfinishscript">UserShutdownFinishScript - <i>пока не работает</i></a></h3>
 <p><span class="path">/boot/home/config/settings/boot/UserShutdownFinishScript</span> выполняется в последнюю очередь в процессе завершения работы. Имейте ввиду, что большинство элементов системы уже не функционируют во время выполнения этого скрипта.</p>
 
 </div>

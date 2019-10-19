@@ -34,11 +34,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/jp.png" alt="" /> 日本語</li>
+<li><a href="../id/deskbar.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/deskbar.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/deskbar.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/deskbar.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/deskbar.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/deskbar.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/deskbar.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/deskbar.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/deskbar.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/deskbar.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -61,6 +63,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>インデックス</td></tr>
@@ -78,7 +81,7 @@
 <p>トレイの片側にある凸の部分をつかんで新しい位置にドラッグ＆ドロップすると、画面の四隅、または上下に Deskbar を移動できます。Deskbar メニューに凸の部分をドラッグ＆ドロップすれば、バーを小さく折りたたむこともできます。</p>
 <p>トレイのもう一方の凸の部分をつまんで、マウスを左右に動かすと、Deskbar の幅を変更できます。</p>
 <img src="images/deskbar-images/width.png" alt="width" />
-<p>横幅の広い Deskbar は、トレイ内の 1 行により多くのアイコンを置けます。それほど煩雑ではありませんが、特に大きなアイコンを使用している場合、それはまた、実行中プログラム一覧内の長いアプリケーション名を切り詰めます。</p>
+<p>幅のより広い Deskbar は、トレイ内の 1 行により多くのアイコンを置けます。それほど煩雑ではありませんが、特に大きなアイコンを使用している場合、それはまた、実行中プログラム一覧内の長いアプリケーション名を切り詰めます。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -115,10 +118,10 @@
 </table>
 
 <h4>メニュー (Menu)</h4>
-<p>Deskbar の最初の 2 つのメニューは固定されていますが、ユーザーは、<span class="menu">シャットダウン… (Shutdown...)</span> より下のメニューをカスタマイズできます。<br />
-ここでは、Deskbar メニューに表示する、最近利用したドキュメント、フォルダー、アプリケーションの数を指定できます。または、それらを表示させないかどうかを設定できます。<br />
-<span class="button">Tracker で編集… (Edit in Tracker...)</span>  ボタンは <span class="path">~/config/settings/deskbar/menu/</span> フォルダーを開きます。そこには、Deskbar で表示されるファイルとフォルダーが見つかるでしょう。初期設定では、<span class="menu">アプリケーション (Applications)</span>、<span class="menu">デモ (Demos)</span>、<span class="menu">デスクトップアプレット (Deskbar Applets)</span>、<span class="menu">環境設定 (Preferences)</span> となっています。<br />
-このフォルダーに対してコピー / 削除するだけで、アプリケーションへのリンクやドキュメント、またはクエリのような項目でさえも、追加または削除できます。</p>
+<p>While the first couple of menu items of the Deskbar are fixed, you can customized the ones below <span class="menu">Shutdown...</span>.<br />
+Here you can set the number of recent documents, folders and applications that are shown in their menu in the Deskbar, or if you want to see them at all.<br />
+The button <span class="button">Edit in Tracker...</span> opens the folder <span class="path">~/config/settings/deskbar/menu/</span>. In it you'll find the files and folders that appear in the Deskbar, by default these are <span class="menu">Applications</span>, <span class="menu">Demos</span>, <span class="menu">Deskbar applets</span>, and <span class="menu">Preferences</span>.<br />
+You can delete or add entries like links to applications, documents or even queries by simply copying/deleting them to/from this folder.</p>
 <!-- <p _translation_id="432">It's even easier to simply drag a file, folder or saved query and drop it where you want it into the Deskbar.</p> -->
 <div class="box-info"><p>パッケージからインストールされたプログラムは、自動的に Deskbar メニュー内に項目を作成します。パッケージをインストールするにつれて、それは少し込み入ってくるでしょう。もしユーザーが総合的に管理するのが好きで、自分自身でリンクした (たぶんサブフォルダーに分類された) アプリケーションを見たいだけなら、以下がそのやり方です。<br />
 <span class="path">menu</span> フォルダーのリンクを、<span class="path">~/config/settings/deskbar/</span> 内に作成し、それを <span class="path">menu_entries</span> にリネームします。以上は、ターミナルから以下のように実現できます。</p>

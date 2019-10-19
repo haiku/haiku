@@ -9,6 +9,8 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Kacper Kasper
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -28,11 +30,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/pl.png" alt="" /> Polski</li>
+<li><a href="../../id/applications/screenshot.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/screenshot.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/applications/screenshot.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/applications/screenshot.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/applications/screenshot.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/applications/screenshot.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/screenshot.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/screenshot.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/screenshot.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_PT/applications/screenshot.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
@@ -55,7 +59,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tłumaczenie tej strony jest niekompletne. Nieukończone części wyświetlane są w języku angielskim.</div>
 
 <h2><img src="../../images/apps-images/screenshot-icon_64.png" alt="screenshot-icon_64.png" width="64" height="64" />Screenshot</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -65,21 +68,21 @@
 <tr><td>Ustawienia:</td><td></td><td><span class="path">~/config/settings/screenshot</span></td></tr>
 </table>
 <p><br /></p>
-<p>Screenshots are taken by either starting the Screenshot application or by pressing the <span class="key">PRINT</span> key,</p>
+<p>Zrzuty ekranu można przechwytywać uruchamiając aplikację Screenshot lub wciskając klawisz <span class="key">PRINT</span>.</p>
 <p><img id="sreenshot" src="../images/apps-images/screenshot.png" alt="screenshot.png" /></p>
-<p>In the Screenshot panel you can toggle between taking the whole screen or just the active window and decide if the window border and mouse pointer should be included. You can also enter a delay before a screenshot is taken.</p>
-<p>Below that you set the name, format and location for the screenshot that will be used when you click <span class="button">Save</span>. Instead of saving the file to disk you can also decide to <span class="button">Copy to clipboard</span> to be able to paste the shot directly into another application, or take a <span class="button">New screenshot</span>.</p>
-<p>All settings are remembered the next time you take a screenshot, enabling these convenient keyboard shortcuts:</p>
+<p>W oknie aplikacji możesz przełączyć przechwytywanie pełnego ekranu lub tylko aktywnego okna, oraz zdecydować czy obramowanie i wskaźnik myszy mają być uwzględnione. Możliwe jest również ustawienie opóźnienia przed wykonaniem zrzutu.</p>
+<p>Poniżej ustawia się nazwę, format, i lokację, które będą użyte po kliknięciu przycisku <span class="button">Zapisz</span>. Zamiast zapisywania pliku możesz skopiować zrzut do schowka przyciskiem obok <span class="button">Skopiuj do schowka</span>, aby wkleić go później w innej aplikacji. Przycisk <span class="button">Nowy zrzut ekranu</span> umożliwia ponowne przechwycenie ekranu.</p>
+<p>Wszystkie ustawienia zostają zapamiętane na następny raz, dzięki czemu możliwe jest używanie wygodnych skrótów klawiszowych:</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="key">PRINT</span></td><td style="width:15px;"></td><td>Takes a screenshot with zero delay and launches the Screenshot panel.</td></tr>
-<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">PRINT</span></td><td></td><td>Takes a screenshot silently (without opening the panel), while still respecting the last used settings.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">PRINT</span></td><td></td><td>Also takes a screenshot silently with the saved settings, but instead of saving it as a file, it's just copied to the clipboard.</td></tr>
+<tr><td><span class="key">PRINT</span></td><td style="width:15px;"></td><td>Wykonuje zrzut ekranu bez opóźnienia i uruchamia aplikację Screenshot.</td></tr>
+<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">PRINT</span></td><td></td><td>Wykonuje zrzut bez otwierania okna aplikacji, korzystając z zapamiętanych ustawień.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">PRINT</span></td><td></td><td>Jak wyżej, z tą różnicą, że zrzut zostaje zapisany do schowka zamiast do pliku.</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Taking a screenshot from Terminal</h2>
-<p>There's a special <span class="cli">screenshot</span> application to be used from Terminal or a script.<br />
-<span class="cli">screenshot --help</span> shows the familiar options as parameters:</p>
+Wykonywanie zrzutów ekranu z Terminala</h2>
+<p>Dostępny jest specjalny program <span class="cli">screenshot</span> do wykorzystania w Terminalu lub skypcie.<br />
+<span class="cli">screenshot --help</span> wyświetla znajome opcje:</p>
 
 <pre class="terminal">~&gt; screenshot --help
 

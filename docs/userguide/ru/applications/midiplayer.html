@@ -32,11 +32,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/ru.png" alt="" /> Русский</li>
+<li><a href="../../id/applications/midiplayer.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/midiplayer.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/applications/midiplayer.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/applications/midiplayer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/applications/midiplayer.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/applications/midiplayer.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/midiplayer.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/midiplayer.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/midiplayer.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pl/applications/midiplayer.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
@@ -59,6 +61,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <h2><img src="../../images/apps-images/midiplayer-icon_64.png" alt="midiplayer-icon_64.png" width="64" height="64" />MIDI плеер (MidiPlayer)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -70,8 +73,8 @@
 <p>Как следует из названия приложения, MIDI плеер предназначен для воспроизведения Midi-файлов. Midi-файлы достаточно специфичны т.к. не являются оцифрованной и закодированной музыкой. Midi-файлы лишь содержат описание следующего плана: Проигрывать такую-то ноту с такой-то громкостью, используя такой-то инструмент.<br />
 Благодаря этому размер midi-файлов очень маленький, но в зависимости от используемой библиотеки (так называемой SoundFont) зависит конечный результат, и результаты могут разительно отличаться. А также эти SoundFont, как правило, достаточно большие, чем больше иcтрументов и чем выше качество сэмплов, тем больше места занимает SoundFont.
 </p>
-<div class="box-info"><p>Вместе с Haiku не поставляется SoundFont, т.к. они занимают слишком много места и лишь некоторым это действительно нужно. Те кто в этом нуждается уже имею высококачественные SoundFonts. Для того чтобы хоть <i>что-нибудь</i> услышать, вы можете установить бесплатную библиотеку из дополнительных пакетов. В Терминале наберите: <tt>installoptionalpackage TimGMSoundFont</tt></p>
-<p>Для того чтобы использовать другой SoundFont, создайте ссылку на для него по следующему адресу <tt>/boot/system/data/synth</tt> и переименуйте ссылку в <tt>big_synth.sy</tt>.</p></div>
+<div class="box-info"><p>Haiku releases include a small but relatively high quality SoundFont. People who use MIDI more seriously often already have very high quality or custom SoundFonts.</p>
+<p>To use other SoundFonts (that don't come installable via HaikuDepot as a HPKG), just copy the .sf file to e.g. <tt>~/config/non-packaged/data/synth/</tt>. You can select the active SoundFont in the Media preferences under <span class="menu">MIDI</span>.</p></div>
 <img src="../images/apps-images/midiplayer.png" alt="midiplayer.png" />
 <p>Графический интерфейс Midi плеера достаточно прост. Дважды щёлкните или перекиньте midi-файл, и он тут же воспроизведётся. Вы можете контролировать громкость, добавлять эффект эха в выпадающем меню <span class="menu">Реверберации</span>. Активация флажка Осциллограф - включает данную визуализацию, отображаемую в окне самого приложения.</p>
 

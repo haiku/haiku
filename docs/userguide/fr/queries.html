@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,10 +31,12 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/fr.png" alt="" /> Français</li>
+<li><a href="../id/queries.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/queries.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/queries.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/queries.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/queries.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../fur/queries.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/queries.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/queries.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/queries.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -58,6 +60,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Cette page n'est pas encore entièrement traduite. Les parties non encore traduites seront en anglais.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -112,7 +115,9 @@ Mieux encore, vous n'avez pas à double-cliquer à nouveau pour rafraichir une r
 <p>Cela ajoute une liste déroulante à gauche de la zone de texte ainsi que les boutons <span class="button">Add</span> et <span class="button">Remove</span> juste dessous. Dans la liste déroulante vous choisissez quel attribut rechercher. Avec<span class="button">Add</span> et <span class="button">Remove</span> vous pouvez interroger des attributs supplémentaires ou les retirer. Ces attributs peuvent être combinés logiquement avec ET/OU.</p>
 <p>Faisons par exemple une requête sur un e-mail :</p>
 <img src="images/queries-images/query-window-filled.png" alt="query-window-filled.png" />
-<p>Il s'agit de votre fenêtre de recherche lorsque vous êtes à la recherche de tous les e-mails que vous a envoyé Clara Botters dans les deux derniers mois et dont le sujet contenait "vibraphone" ou "skepticality".</p>
+<p>This is your Find window when you're looking for all emails Clara Oswald has sent to you in the last two months that had in the subject "sufflé" or "impossible".<br />
+As you see, searching through time-based attributes supports some useful phrases: besides for the "last 2 months", you could also use "today", "yesterday", "Monday" or "last Monday" (which would be the Monday last week), or "last 2 minutes/hours/days/weeks".<br />
+A good way to cut down the number of search results.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -121,15 +126,15 @@ Mieux encore, vous n'avez pas à double-cliquer à nouveau pour rafraichir une r
 <p>Prenez par exemple la requête par attributs ci-dessus, cherchant les emails de Clara concernant les vibraphones. Si vous passez ensuite en mode de recherche par formule (<span class="menu">by Formula</span>), vous serez confronté à cette longue phrase de recherche :</p>
 <img src="images/queries-images/formula-query.png" alt="formula-query.png" />
 <p>la même chose, sous forme de texte, édité pour plus de lisibilité :</p>
-<pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [bB][oO][tT][tT][eE][rR][sS]*")
+<pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [oO][sS][wW][aA][lL][dD]*")
        &amp;&amp;(MAIL:when&gt;=%2 months%))
-       &amp;&amp;(MAIL:subject=="*[vV][iI][bB][rR][aA][pP][hH][oO][nN][eE]*"))
-       ||(MAIL:subject=="*[sS][kK][eE][pP][tT][iI][cC][aA][lL][iI][tT][yY]*"))
+       &amp;&amp;(MAIL:subject=="*[sS][uU][fF][fF][lL][éÉ]*"))
+       ||(MAIL:subject=="*[iI][mM][pP][oO][sS][sS][iI][bB][lL][eE]*"))
        &amp;&amp;(BEOS:TYPE=="text/x-email"))</pre>
 <p>A quoi ça sert ?</p>
 <ul>
 <li><p>Vous pouvez copier et coller la chaîne dans un e-mail, un forum ou sur IRC pour que d'autres puissent l'utiliser ou la déboguer.</p></li>
-<li><p>En construisant une requête en mode <span class="menu">Attribute</span>, puis en passant en mode <span class="menu">Formula</span>, Vous pouvez générer facilement une chaîne de recherche à utiliser pour une requête dans le Terminal ou dans un script.</p></li>
+<li><p>You can use this method to construct a query in <span class="menu">Attribute</span> mode and then switch to <span class="menu">Formula</span> mode, to comfortably generate a search string. Enclosed in single quotes, that string can then be used with the <span class="cli">query</span> command in the Terminal.</p></li>
 <li><p>Vous pouvez affiner votre recherche en ajoutant des parenthèses si nécessaire, rendre une partie sensible à la casse ou modifier leur combinaison logique en changeant par exemple "<tt>==</tt>" en "<tt>!=</tt>" pour un NON ET. Il suffit d'avoir une compréhension de base des <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="http://en.wikipedia.org/wiki/Regular expression">expressions régulières</a>, et peut-être quelques notions de base de scripts.</p></li>
 </ul>
 

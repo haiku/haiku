@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2018, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -28,11 +28,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/pt_PT.png" alt="" /> Português</li>
+<li><a href="../id/tracker.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/tracker.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/tracker.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/tracker.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/tracker.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/tracker.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/tracker.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/tracker.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/tracker.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/tracker.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -59,7 +61,7 @@
 
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Index</td></tr>
+<tr class="heading"><td>Índice</td></tr>
 <tr class="index"><td>
 	<a href="#mounting-volumes">Mounting volumes</a><br />
 	<a href="#navigating">Navigating</a><br />
@@ -127,7 +129,7 @@ This type-ahead filtering is set in the <a href="#tracker-preferences.html">Trac
 <ul>
 <li><p><span class="menu">Icon view</span> (<span class="key">ALT</span> <span class="key">1</span>) - Big icons, you can change the size from the submenu or in/decrease their size with <span class="key">ALT</span> <span class="key">+</span>/<span class="key">-</span>.</p></li>
 <li><p><span class="menu">Mini icon view</span> (<span class="key">ALT</span> <span class="key">2</span>) - Small icons.</p></li>
-<li><p><span class="menu">List view</span> (<span class="key">ALT</span> <span class="key">3</span>) - A detailed list of your files enabling you to show/hide file attributes. (See topic <a href="attributes.html">Attributes</a>.) From the submenu you can choose to use either mini or large icons.</p></li>
+<li><p><span class="menu">List view</span> (<span class="key">ALT</span> <span class="key">3</span>) - A detailed list of your files enabling you to show/hide file attributes (see topic <a href="attributes.html">Attributes</a>.)</p></li>
 </ul>
 <p>The <span class="menu">Window</span> menu offers a number of other functions:</p>
 <ul>
@@ -153,7 +155,7 @@ This type-ahead filtering is set in the <a href="#tracker-preferences.html">Trac
 <ul>
 <li><p><span class="menu">Desktop</span> - Decide if all mounted disks appear directly on the Desktop or in a window after clicking a single Disk icon sitting on the Desktop.</p></li>
 <li><p><span class="menu">Windows</span> - You can set <span class="menu">Single window navigation</span>, i.e. a double-clicked folder doesn't open in its own window, but inside the already open window instead, replacing the view of its parent folder. This is not the same as clicking while holding the <span class="key">OPT</span> key, as described above, because you'll lose the per window saved position and size.
-<br /><br /></p>
+</p>
 <img src="images/tracker-images/tracker-preferences-navigator.png" alt="tracker-preferences-navigator.png" />
 <p>Before you switch Tracker to <span class="menu">Single window navigation mode</span>, because that may feel more familiar to you, we recommend giving the menu based browsing a try first, as that may actually work much faster for you after getting used to. On the other hand, single window browsing offers a <i>Navigator</i> where you can enter or copy &amp; paste a path name and use back, forward and up buttons.</p> 
 <p>Activating <span class="menu">Type-ahead filtering</span> will filter the contents of a Tracker window while you type to only display the files matching your string in their name or any currently displayed attribute. See <a href="#type-ahead-filter">above</a>.</p></li>
@@ -170,21 +172,27 @@ This type-ahead filtering is set in the <a href="#tracker-preferences.html">Trac
 <ul>
 <li><p><span class="menu">Find...</span> - Find a file or folder. See topic <a href="queries.html">Query</a> for more info.</p></li>
 <li><p><span class="menu">New</span> - Create a new folder or any other file based on a <i>template</i>.
-<br /><br /></p>
+</p>
 <img src="images/tracker-images/new-menu.png" alt="new-menu.png" />
 <p>Choosing <span class="menu">Edit templates...</span> opens the folder <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span>. Creating a file in that folder will offer its filetype with the file's name and other attributes as template in the <span class="menu">New</span> menu. Here, there's a file "Text" with the filetype <tt>text/plain</tt>. See topic <a href="filetypes.html">Filetypes</a> for more info.</p></li>
 <li><p><span class="menu">Open with...</span> - A submenu offers all applications that can handle this filetype.
-<br /><br /></p>
+</p>
 <img src="images/tracker-images/open-with.png" alt="open-with.png" />
 
 <p>The preferred application that would open the file when double-clicked, is checkmarked. This submenu lists first those applications that can handle the exact filetype, in this case it's a text file, the type <tt>text/plain</tt>. Next come all applications that can handle that supertype in general, here <tt>text/*</tt>. Last in the list are those that can deal with any file. If you don't click on an app in the submenu, but on the <span class="menu">Open with...</span> entry instead, a panel opens:</p>
-<br /><br />
+
 <img src="images/tracker-images/open-with-preferred.png" alt="open-with-preferred" />
 <p>Here you'll again find the programs that were listed in the submenu. By selecting one and clicking the <span class="button">Open and make preferred</span> button, you changed the preferred application for every file of that filetype, here <tt>text/plain</tt>.</p></li>
 <li><span class="menu">Get info</span>
-<br /><br />
+<p>This opens a panel that shows the meta data of a file and lets you edit its permissions. You can rename it by clicking on the file name at the top.</p>
 <img src="images/tracker-images/get-info.png" alt="get-info" />
-<p>The panel presents info on the selected file and lets you set the default application and, after you expanded that part of the panel, permissions and owner. Clicking on the path will open it in a Tracker window.</p></li>
+<p>The panel consists of three tabs:</p>
+<ul>
+<li><span class="menu">Information</span>: Shows standard data like size, date of creation/modification, file type and location. Click on the location path to open the files parent folder. The <span class="menu">Open with</span> menu sets the preferred application to open this particular file.</li>
+<li><span class="menu">Permissions</span>: Lets you change owner, group and file permissions.</li>
+<li><span class="menu">Attibutes</span>: Lists all extra file attributes with their value and type.</li>
+</ul>
+</li>
 <li><p><span class="menu">Edit name</span>, <span class="menu">Duplicate</span> and <span class="menu">Move to trash</span> - lets you rename or duplicate a file or put the selected file(s) to the trash.</p></li>
 <li><p><span class="menu">Move to</span>, <span class="menu">Copy to</span> and <span class="menu">Create link</span> - lets you move, copy or link the selected file(s) using the submenu navigating method. Holding <span class="key">SHIFT</span> while invoking the menu offers the option to create a relative link.</p></li>
 <li><p><span class="menu">Cut</span>, <span class="menu">Copy</span> and <span class="menu">Paste</span> - lets you cut, copy and paste files using the clipboard. By holding <span class="key">SHIFT</span> while invoking the menu you can <span class="menu">Copy/Cut more</span> files, maybe from another folder that you can paste somewhere else later. Also, while holding <span class="key">SHIFT</span> you can paste the copied files in the clipboard as links.</p></li>

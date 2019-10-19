@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,11 +32,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/ru.png" alt="" /> Русский</li>
+<li><a href="../id/queries.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/queries.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/queries.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/queries.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/queries.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/queries.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/queries.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/queries.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/queries.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/queries.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -59,6 +61,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -113,9 +116,9 @@
 <p>Это добавляет всплывающее меню слева от текстового полня и кнопок <span class="button">Добавить</span> и <span class="button">Удалить</span>. Из меню можно выбрать атрибут, по которому будет произведен запрос. При помощи кнопок <span class="button">Добавить</span> и <span class="button">Удалить</span> вы можете добавить дополнительный атрибут или удалить ненужный. Эти атрибуты могут быть логически связаны операторами и/или.</p>
 <p>Давайте произведем запрос по письмам для примера:</p>
 <img src="images/queries-images/query-window-filled.png" alt="query-window-filled.png" />
-<p>Так выглядит окно поиска для запроса по всем письмам, которые Clara Botters послала вам за последние два месяца с темой "vibraphone" или "skepticality".<br />
-Как видите, поиск на основе атрибутов времени поддерживает некоторые полезные фразы: кроме  "за последние два месяца (last 2 months)", вы можете выбрать "сегодня (today)", "вчера (yesterday)", "Понедельник (Monday)" или "последний Понедельник (last Monday)" (это будет понедельник на прошлой неделе), или "последние 2 минуты/часа/дня/недели (last 2 minutes/hours/days/weeks").<br />
-Хороший способ сузить круг поиска.</p>
+<p>This is your Find window when you're looking for all emails Clara Oswald has sent to you in the last two months that had in the subject "sufflé" or "impossible".<br />
+As you see, searching through time-based attributes supports some useful phrases: besides for the "last 2 months", you could also use "today", "yesterday", "Monday" or "last Monday" (which would be the Monday last week), or "last 2 minutes/hours/days/weeks".<br />
+A good way to cut down the number of search results.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -124,15 +127,15 @@
 <p>Используйте запросы по атрибутам, которые находятся выше. Если у вас есть все атрибуты и установлены условия поиска, попробуйте переключиться на тип поиска <span class="menu">по формуле</span> и вы увидите, как запрос превратится в строку:</p>
 <img src="images/queries-images/formula-query.png" alt="formula-query.png" />
 <p>В более понятном виде:</p>
-<pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [bB][oO][tT][tT][eE][rR][sS]*")
+<pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [oO][sS][wW][aA][lL][dD]*")
        &amp;&amp;(MAIL:when&gt;=%2 months%))
-       &amp;&amp;(MAIL:subject=="*[vV][iI][bB][rR][aA][pP][hH][oO][nN][eE]*"))
-       ||(MAIL:subject=="*[sS][kK][eE][pP][tT][iI][cC][aA][lL][iI][tT][yY]*"))
+       &amp;&amp;(MAIL:subject=="*[sS][uU][fF][fF][lL][éÉ]*"))
+       ||(MAIL:subject=="*[iI][mM][pP][oO][sS][sS][iI][bB][lL][eE]*"))
        &amp;&amp;(BEOS:TYPE=="text/x-email"))</pre>
 <p>Что это даёт?</p>
 <ul>
 <li><p>Вы можете скопировать и вставить строку в письмо, форум или IRC для того чтобы пользовались другие или для отладки.</p></li>
-<li><p>Вы можете использовать метод для построения запросов в режиме <span class="menu">Атрибутов</span>, затем переключаться в режим <span class="menu">Формулы</span>, чтобы сгенерировать строку поиска для использования запроса в терминале или сценарии.</p></li>
+<li><p>You can use this method to construct a query in <span class="menu">Attribute</span> mode and then switch to <span class="menu">Formula</span> mode, to comfortably generate a search string. Enclosed in single quotes, that string can then be used with the <span class="cli">query</span> command in the Terminal.</p></li>
 <li><p>Вы можете составить свой запрос наиболее точно, вставив круглые скобки там, где это необходимо, задав его частично зависящим от регистра или применяя логические комбинации отрицания, например: "<tt>==</tt>" (НЕ), "<tt>!=</tt>" (И). Для этого требуются лишь минимальные знания <a href="http://ru.wikipedia.org/wiki/%D0%A0%D0%B5%D0%B3%D1%83%D0%BB%D1%8F%D1%80%D0%BD%D1%8B%D0%B5_%D0%B2%D1%8B%D1%80%D0%B0%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F" class="external free" title="http://ru.wikipedia.org/wiki/Регулярные выражения">регулярных выражений</a> и некоторые познания структуры скриптов.</p></li>
 </ul>
 

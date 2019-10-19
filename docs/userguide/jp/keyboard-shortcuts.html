@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2016, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -33,11 +33,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/jp.png" alt="" /> 日本語</li>
+<li><a href="../id/keyboard-shortcuts.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/keyboard-shortcuts.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/keyboard-shortcuts.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/keyboard-shortcuts.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/keyboard-shortcuts.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/keyboard-shortcuts.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/keyboard-shortcuts.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/keyboard-shortcuts.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/keyboard-shortcuts.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/keyboard-shortcuts.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -63,8 +65,8 @@
 
 <h1>ショートカットとキーの組み合わせ</h1>
 
-<p>Haiku のショートカットキーは標準で、たとえばメニューからコマンドを起動するために、よく使われる <span class="key">CTRL</span> キーではなく <span class="key">ALT</span> キーを使用します。これには BeOS が少々 MacOS の影響を受けていたという歴史的な経緯があります。実際、このキーに慣れると利点があります。たとえば、<span class="key">ALT</span> <span class="key">C</span> と <span class="key">ALT</span> <span class="key">V</span> は <acronym title="Bourne Again Shell">Bash</acronym> ターミナルのシェルでもシームレスに統合されていて、ターミナル内では <span class="key">CTRL</span> <span class="key">C</span> を実行中のプロセスを終了するために利用できます。</p>
-<p>いずれにせよ、<a href="preferences/keymap.html">キーマップ</a>プレファレンスで、たぶんよりなじみ深いであろう <span class="key">CTRL</span> キーへ切り替えることもできます。ユーザーガイドでは常に標準の環境設定を想定して、コマンドキーを <span class="key">ALT</span> で表しています。</p>
+<p>Haiku のショートカットキーは標準で、たとえばメニューからコマンドを起動するために、よく使われる <span class="key">CTRL</span> キーではなく <span class="key">ALT</span> キーを使用します。これには BeOS が少々 MacOS の影響を受けていたという歴史的な経緯があります。実際、このキーに慣れてみると有利な点があります。たとえば、<span class="key">ALT</span> <span class="key">C</span> と <span class="key">ALT</span> <span class="key">V</span> は <acronym title="Bourne Again Shell">Bash</acronym> ターミナルのシェルでもシームレスに統合されていて、ターミナル内では <span class="key">CTRL</span> <span class="key">C</span> は実行中のプロセスを終了します。</p>
+<p>いずれにせよ、<a href="preferences/keymap.html">キーマップ</a>プレファレンスで、より馴染んでいると思われる <span class="key">CTRL</span> キーへ切り替えられます。ユーザーガイドでは常に標準の環境設定を想定して、コマンドキーを <span class="key">ALT</span> で表しています。</p>
 <p>キーマップ / キーボード配置で、どのキーが <span class="key">OPT</span> か <span class="key">MENU</span> なのか疑問に思ったら、<a href="preferences/keymap.html">キーマップ</a>プレファレンスを再度利用してください。キーボードでキーを押した際に送信されたキーストロークを確認できます。</p>
 
 <h2>
@@ -107,6 +109,8 @@
 <p>テキストを編集しているときは、それが Tracker 内でファイル名を編集しているときても、StyledEdit でファイルを編集しているときでも、Vision でチャットをしているときでも、いくつかの一般的なショートカットがあります。</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
 <tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span> または<br /><span class="key">OPT</span> <span class="key">←</span> / <span class="key">→</span></td><td style="width:15px;"></td><td>テキスト内を単語単位で移動します (注: <span class="key">OPT</span> との組合せに慣れたほうが良いかもしれません。その後、アプリケーションが <span class="key">ALT</span> との組合せをすでにほかのコマンドに使っていても準備万端です)。</td></tr>
+<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">BACKSPACE</span> または<br /><span class="key">OPT</span> <span class="key"> BACKSPACE</span></td><td style="width:15px;"></td><td>カーソル左側の単語単位のテキスト削除</td></tr>
+<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">DEL</span> または<br /><span class="key">OPT</span> <span class="key"> DEL </span></td><td style="width:15px;"></td><td>カーソル右側の単語単位のテキスト削除</td></tr>
 <tr><td><span class="key">HOME</span></td><td></td><td>行の先頭に移動します。</td></tr>
 <tr><td><span class="key">END</span></td><td></td><td>行の終わりに移動します。</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">HOME</span></td><td></td><td>文章の先頭に移動します。</td></tr>
@@ -157,8 +161,8 @@
 <tr><td><span class="key">SHIFT</span></td><td style="width:15px;"></td><td>初めに選択された項目とユーザーがクリックした項目の間の全項目を選択します。</td></tr>
 <tr><td><span class="key">ALT</span></td><td></td><td>選択領域でユーザーがクリックした項目を追加または削除します。</td></tr>
 </table>
-<p>Tracker ウィンドウで文字を入力すると、Tracker はスクロールしてインクリメンタルサーチにもっとも一致するファイルを選択します。もし入力された文字で始まるファイルが無ければ、ファイル名または属性のどこかに検索文字列を含むファイルが選択されます。大文字小文字は区別<i>されません</i>。<br />
-入力された文字列は左下 (通常リスト中のアイテム数が表示される場所) に表示されます。表示は 1 秒後に元に戻り、新しいインクリメンタルサーチが開始できるようになります。<br />
+<p>Tracker ウィンドウで文字入力を始めると、Tracker はスクロールしてインクリメンタルサーチにもっとも一致するファイルを選択します。もし入力された文字で始まるファイルが無ければ、ファイル名または属性のどこかに検索文字列を含むファイルが選択されます。大文字小文字は区別<i>されません</i>。<br />
+入力された文字列は左下 (通常リスト中のアイテム数が表示される場所) に表示されます。表示は 1 秒後に元に戻り、新しいインクリメンタルサーチが開始できます。<br />
 最初に検索文字列が現れる部分にジャンプする代わりに、一致しないファイルを除いて表示するように設定することもできます。<a href="tracker.html#tracker-preferences">先行入力フィルタリング</a>のトピックを参照してください。</p>
 
 </div>

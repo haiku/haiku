@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Kacper Kasper
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Workspaces Applet</title>
+	<title>Aplet Przestrzenie robocze</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
@@ -28,11 +30,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/pl.png" alt="" /> Polski</li>
+<li><a href="../../id/desktop-applets/workspaces.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/desktop-applets/workspaces.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/desktop-applets/workspaces.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/desktop-applets/workspaces.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/desktop-applets/workspaces.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/desktop-applets/workspaces.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/desktop-applets/workspaces.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/desktop-applets/workspaces.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/desktop-applets/workspaces.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_PT/desktop-applets/workspaces.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
@@ -54,36 +58,35 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tłumaczenie tej strony jest niekompletne. Nieukończone części wyświetlane są w języku angielskim.</div>
-<h1><img src="../../images/desktop-applets-images/workspaces-icon_64.png" alt="workspaces-icon_64.png" width="64" height="64" /><a name="applet" id="applet">Workspaces</a></h1>
+<h1><img src="../../images/desktop-applets-images/workspaces-icon_64.png" alt="workspaces-icon_64.png" width="64" height="64" /><a name="applet" id="applet">Przestrzenie robocze</a></h1>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Desktop Applets</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplet Pulpitu</span></td></tr>
 <tr><td>Ścieżka:</td><td></td><td><span class="path">/boot/system/apps/Workspaces</span></td></tr>
 <tr><td>Ustawienia:</td><td></td><td><span class="path">~/config/settings/system/app_server/workspaces</span><br />
-<span class="path">~/config/settings/Workspaces_settings</span> - Stores the panel's window position.</td></tr>
+<span class="path">~/config/settings/Workspaces_settings</span> – przechowuje pozycję okna panelu</td></tr>
 </table>
 <p><br /></p>
 <img src="../images/workspaces-images/workspaces.png" alt="workspaces.png" />
-<p>You find the Workspaces applet with the other <span class="menu">Desktop applets</span> in the Deskbar. It shows a miniature version of all workspaces. There are several options available from the context menu of the applet's window, which are all pretty self-explaining.<br />
-<span class="menu">Change workspace count...</span> will open the <a href="../preferences/screen.html">Screen</a> preferences where you set the number of workspaces and their arrangement (how many rows and columns).</p>
-<p>Since the applet is a <a href="../gui.html#replicants">Replicant</a>, you can resize the window as desired and then drag &amp; drop it by its handle onto the desktop (make sure <span class="menu">Show replicants</span> is activated in the Deskbar menu). Hold <span class="key">SHIFT</span> while resizing to keep your screen's aspect ratio.</p>
+<p>Aplet Przestrzenie robocze znajduje się wśród pozostałych <span class="menu">Apletów Pulpitu</span> w Deskbarze. Wyświetla on miniaturową wersję wszystkich przestrzeni roboczych. W menu kontekstowym okna apletu jest kilka opcji, których nazwy są wystarczająco klarowne.<br />
+<span class="menu">Zmień liczbę przestrzeni roboczych...</span> otworzy panel preferencji <a href="../preferences/screen.html">Ekran</a>, w którym można ustawić liczbę i ustawienie (w kolumnach i rzędach) przestrzeni roboczych.</p>
+<p>Ponieważ ten aplet jest <a href="../gui.html#replicants">Replikantem</a>, możesz zmienić rozmiar okna, a następnie przeciągnąć i upuścić go na pulpicie korzystając z uchwytu (upewnij się, że opcja <span class="menu">Pokaż replikanty</span> w menu Deskbara jest włączona). Przytrzymaj <span class="key">SHIFT</span> podczas zmiany rozmiaru, aby zachować współczynnik wymiarów ekranu.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="moving" name="moving">Moving windows between workspaces</a></h2>
-<p>To move a window, you grab it in the Workspaces applet and simply drag it to another workspace. This has the advantage, that you can move it without leaving your current desktop. Of course, that only works well when there aren't too many windows in a workspace and your target isn't obscured by other windows. Another possibility is to grab a window by its tab and just holding on to it while switching workspaces with <span class="key">ALT</span> <span class="key">Fx</span>.</p>
-<p>For more information on workspaces in general and more keyboard shortcuts, see topic <a href="../workspaces.html">Workspaces</a>.</p>
-<div class="box-info">Try this: Make the Workspaces window really big and hide the window tab and border. Now go to the <a href="../preferences/shortcuts.html">Shortcuts preferences</a> and assign <span class="key">CTRL</span> <span class="key">^</span> to the Workspaces applet (<span class="path">/system/preferences/Shortcuts</span>).<br />
-Now you can quickly summon the applet with a key combo and equally quickly dismiss it again with <span class="key">ESC</span>.</div>
+<a id="moving" name="moving">Przenoszenie okien między przestrzeniami roboczymi</a></h2>
+<p>Aby przenieść okno wystarczy złapać je w aplecie i po prostu przeciągnąć na inną przestrzeń. Ma to taką zaletę, że nie ma konieczności zmiany pulpitu przy przenoszeniu. Oczywiście, działa to tylko wtedy, gdy nie ma zbyt wielu okien na przestrzeni roboczej oraz pulpit docelowy nie jest przykryty innym oknem. Inna możliwość to chwycenie belki okna i trzymanie jej przy zmianie przestrzeni kombinacją <span class="key">ALT</span> <span class="key">Fx</span>.</p>
+<p>Więcej informacji o przestrzeniach roboczych w ogólności i dodatkowe skróty klawiszowe znajdziesz w artykule <a href="../workspaces.html">Przestrzenie robocze</a>.</p>
+<div class="box-info">Wypróbuj: zmień rozmiary okna apletu na bardzo duże i ukryj jego obramowanie oraz belkę tytułową. Następnie przejdź do panelu preferencji <a href="../preferences/shortcuts.html">Skróty</a> i przypisz <span class="key">CTRL</span> <span class="key">^</span> do apletu przestrzeni roboczych (<span class="path">/system/apps/Workspaces</span>).<br />
+Teraz możesz szybko przywoływać aplet kombinacją klawiszy i równie szybko się go pozbyć klawiszem <span class="key">ESC</span>.</div>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="special" name="special">Special functionality</a></h2>
-<p>The Workspaces applet provides some additional functionality when clicking on a window while holding certain modifier keys:</p>
+<a id="special" name="special">Specjalne funkcjonalności</a></h2>
+<p>Aplet przestrzeni roboczych potrafi więcej rzeczy, jeżeli okno zostanie kliknięte z wciśniętymi klawiszami:</p>
 <table summary="functionality-thru-modifiers" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="key">CTRL</span></td><td style="width:15px;"></td><td>Brings the window to the front.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">SHIFT</span></td><td></td><td>Minimizes the window.</td></tr>
-<tr><td><span class="key">OPT</span></td><td></td><td>Sends the window to the back.</td></tr>
+<tr><td><span class="key">CTRL</span></td><td style="width:15px;"></td><td>Przenosi okno na wierzch.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">SHIFT</span></td><td></td><td>Ukrywa (minimalizuje) okno.</td></tr>
+<tr><td><span class="key">OPT</span></td><td></td><td>Przenosi okno na spód.</td></tr>
 </table>
 
 </div>

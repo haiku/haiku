@@ -4,11 +4,12 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ *		Kacper Kasper <kacperkasper@gmail.com>
  * Translators:
  *		Pengphei Han
  *
@@ -30,11 +31,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/zh_CN.png" alt="" />  中文 ［中文］</li>
+<li><a href="../../id/applications/drivesetup.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/drivesetup.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/applications/drivesetup.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/applications/drivesetup.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/applications/drivesetup.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/applications/drivesetup.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/drivesetup.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/drivesetup.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/drivesetup.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pl/applications/drivesetup.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
@@ -49,15 +52,16 @@
 <li><a href="../../jp/applications/drivesetup.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 </ul>
 <span>
- «  <a href="diskusage.html">磁盘查看器</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">应用程序
-</a> 
-::  <a href="expander.html">档案管理器</a>  »
+ «  <a href="diskusage.html">磁盘查看器</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">应用程序
+</a> 
+::  <a href="expander.html">档案管理器</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
+<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <h2><img src="../../images/apps-images/drivesetup-icon_64.png" alt="drivesetup-icon_64.png" width="64" height="64" />磁盘管理器</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -66,40 +70,65 @@
 <tr><td>设置:</td><td></td><td><span class="path">~/config/settings/DriveSetup</span></td></tr>
 </table>
 <p><br /></p>
-<p>磁盘管理器是一个用于磁盘分区的创建，删除，和初始化的工具。同时，它不能够移动和编辑已经存在的分区，所以您需要一个未分区的磁卷（可能是一个USB磁盘或者硬盘）或者利用初始化工具，例如， <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> 来提供分区空间。</p>
+<p>DriveSetup is a tool to create, delete and format partitions. At this time it can't resize or move existing partitions, so that you'll either need an unpartitioned volume (perhaps an external USB drive or another harddisk) or do the initial setup with a tool like the <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> to provide the space for another partition.</p>
 <img src="../images/apps-images/drivesetup.png" alt="drivesetup.png" />
-<p>在顶部是下面列表中设备的所有分区的图形表示。除了四个主要分区构成的大的分区外，其中每个主要分区都可以包含多个扩展分区或者逻辑分区。您可以使用设备图标之前的 +/- 微控件来展开分区列表，查看每个逻辑分区的详细信息。</p>
-<p>您可以在该列表中选择分区，然后使用 <span class="menu">Partition</span> 菜单中的命令或者  <span class="key">ALT</span> <span class="key">M</span> 或者 <span class="key">ALT</span> <span class="key">U</span> 组合键来挂载或者卸载该分区。</p>
-<p>您也可以使用 <span class="menu">Partition | Delete</span> 来完全移除分区。
-<br />
-在执行以上操作时，我们时刻需要注意：</p>
-<div class="box-stop">分区的创建、删除、初始化都是非常危险的操作。您需要至少检查两次以确定处理的是正确的分区，而且要对数据做好备份以防发生意外。</div>
+<p>At the top is a graphical representation of all partitions inside the device chosen in the list below it. Each device, by default, can hold a maximum of 4 <i>primary</i> partitions. This limit can be removed by making one of those an <i>extended</i> partition, which in turn can hold theoretically an unlimited number of <i>logical</i> partitions (practical limitations depend on, for example, other OSes installed).<br />
+You may have to expand such a list with the +/- widget that appears in that case in front of that device to see the details of every logical partition.</p>
+<p>Colors and icons provide some more information about the available volumes and partitions.<br />
+Besides the familiar icons for harddisks, CD drives and USB sticks etc., there are a few that indicate a their mount mode:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="4">
+<tr><td><img src="../../images/apps-images/drivesetup-icon_boot.png" alt="drivesetup-icon_boot.png" width="16" height="16" /></td><td style="width:10px;"> </td>
+<td>The /boot partition</td></tr>
+<tr><td><img src="../../images/apps-images/drivesetup-icon_encrypted.png" alt="drivesetup-icon_encrypted.png" width="16" height="16" /></td><td> </td>
+<td>An encrypted partition</td></tr>
+<tr><td><img src="../../images/apps-images/drivesetup-icon_shared.png" alt="drivesetup-icon_shared.png" width="16" height="16" /></td><td> </td>
+<td>A partition shared through SMB/NFS etc.</td></tr>
+<tr><td><img src="../../images/apps-images/drivesetup-icon_read-only.png" alt="drivesetup-icon_read-only.png" width="16" height="16" /></td><td> </td>
+<td>A partition that was mounted read-only</td></tr>
+<tr><td><img src="../../images/apps-images/drivesetup-icon_virtual.png" alt="drivesetup-icon_virtual.png" width="16" height="16" /></td><td> </td>
+<td>A mounted image file (see also the <a href="./cli-apps.html">diskimage command</a>)</td></tr>
+</table>
+<p>When mounted, a colored bar shows the used space of a partition. The color depends on the kind of partition:</p>
+<table summary="layout" border="0" cellspacing="2" cellpadding="4">
+<tr><td style="background-color:#BEFFBE" width="20"></td><td width="3"></td><td>A BFS formatted partition</td></tr>
+<tr><td style="background-color:#ACACFF"></td><td></td><td>A non-BFS formatted partition</td></tr>
+<tr><td style="background-color:#FFACAC"></td><td></td><td>A read-only partition</td></tr>
+<tr><td style="background-image: repeating-linear-gradient(135deg, #E0E000 1%, #C0C0C0 15%)"></td><td></td><td>An encrypted partition</td></tr>
+</table>
+<p>You can select a partition and choose various commands from the context or <span class="menu">Partition</span> menu, like <span class="menu">Mount</span>/<span class="menu">Unmount</span>, or to <span class="menu">Open in DiskProbe</span>.</p>
+<p>You can also <span class="menu">Format</span> or completely <span class="menu">Delete</span> a partition.</p>
+<div class="box-stop">Dealing with creating/deleting/formatting partitions is very dangerous business. Always check twice to be sure you're working with the right one and always keep an up-to-date backup of your data in case something goes wrong!</div>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="initializing" name="initializing">Initializing a disk</a></h2>
+<p>If you don't plan to use just one of the partitions of a larger disk, but the entire drive as one partition, e.g. a USB stick or a Compact Flash card, you'll have to initialize the disk first.</p>
+<p>You do this by selecting the raw disk from list of devices and choose a partition map from the <span class="menu">Disk | Initialize</span> menu. The <span class="menu">Intel Partition Map</span> is the right choice for classical booting via a BIOS.</p>
+<div class="box-stop">Initializing will destroy all data on the drive!</div>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="creating" name="creating">创建分区</a></h2>
-<div class="box-info">如果您打算使用整个驱动作为一个分区，如 USB 磁盘 或者标准闪存卡，您可以跳过创建分区这一步骤，而直接进行分区的<a href="#initializing">初始化</a>。</div>
 <p>如果您在驱动中发现了未格式化的空间，例如上面的 <tt>&lt;empty&gt;</tt>，您可以通过 <span class="menu">Partition | Create...</span>（<span class="key">ALT</span> <span class="key">C</span>）在该空间内新建一个分区。</p>
 <img src="../images/apps-images/drivesetup-create.png" alt="drivesetup-create.png" />
 <p>该对话框提示您对分区大小和类型进行调整。如果您希望此分区用于Haiku的安装，或者您希望使用Haiku所有的特性如属性和查询，您需要选择 <span class="menu">Be File System</span> 。需要注意的是，其他的操作系统可能无法访问该分区。</p>
-<p>如果您已经创建了一个主分区而不是其中的扩展分区和逻辑分区，上面的对话框将会显示一个<span class="menu">Active Partition</span> 复选框。 如果您希望该分区用于启动Haiku的安装，您必须在该复选框上打勾。</p>
-<p>在您使用或者挂载新建的分区之前，该分区必须具有一个初始化的文件系统。</p>
+<p>The <span class="menu">Active partition</span> checkbox is only available if you have created a primary partition instead of just another logical partition within an extended one. You'll have to tick that checkbox if you plan to use that partition to boot a Haiku installation.</p>
+<p>Before you can use, or even mount the newly created partition, it has to be formatted with a filesystem.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="initializing" name="initializing">格式化分区</a></h2>
-<p>只有未挂载的分区才可以通过 <span class="menu">Partition | Initialize</span> 菜单进行初始化。</p>
+<a id="initializing" name="formatting">Formatting a partition</a></h2>
+<p>Only unmounted partitions can be formatted by choosing a filesystem from the sub-menu of <span class="menu">Partition | Format</span>. The <span class="menu">Be File System</span> (BFS) is mandatory for a Haiku boot partition and recommended for data partitions to be used with Haiku. Only BFS formatted partitions can be queried and fully support Haiku's file attributes.</p>
 <img src="../images/apps-images/drivesetup-initialize.png" alt="drivesetup-initialize.png" />
-<p>您可以在这里设置分区名和它的块大小。建议每块的大小设置为2084字节，但是您可以根据特别的需要对此进行调整。<br />
-格式化此分区将会擦除其上所有的数据！</p>
-
+<p>Here you set the name for the partition and it's blocksize. The blocksize is the space in bytes that a file will allocate at minimum. 2048 bytes per block are recommended, but you can choose larger or smaller sizes if you have these very specific needs.<br />
+If the future data on your partition won't need any querying, you can uncheck <span class="menu">Enable query support</span>  to save a bit of overhead for managing the index. </p>
+<div class="box-stop">Formatting will destroy all data on the partition!</div>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="diskusage.html">磁盘查看器</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">应用程序
-</a> 
-::  <a href="expander.html">档案管理器</a>  »
+ «  <a href="diskusage.html">磁盘查看器</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">应用程序
+</a> 
+::  <a href="expander.html">档案管理器</a>  »
 </span></div>
 </div>
 

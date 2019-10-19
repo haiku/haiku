@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,10 +32,12 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/es.png" alt="" /> Español</li>
+<li><a href="../id/bugreports.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/bugreports.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/bugreports.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/bugreports.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../fr/bugreports.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/bugreports.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/bugreports.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/bugreports.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/bugreports.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -57,6 +59,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">La traducción de esta página aún no está completa. Hasta que lo esté, las partes sin traducir se muestran en el inglés original.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Contenido</td></tr>
@@ -156,6 +159,7 @@ Una o más páginas de texto se mostrarán en la pantalla, solamente las última
 <tr><td>- <span class="cli">listusb -v</span></td><td> </td><td>asumiendo que el conflicto se relacione con USB, esto es similar a <span class="cli">lsusb</span>.</td></tr>
 <tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>vea <a href="#syslog">Registro de sistema</a> arriba, parecido al depurador en pantalla cuando se arranca. Con la orden <span class="cli">open</span> puede acortar a la parte relevante del registro de sistema en un editor de texto.</td></tr>
 <tr><td class="onelinetop">- <span class="cli">listimage | grep drivers/</span></td><td> </td><td>muestra una lista de todos los controladores utilizados.</td></tr>
+<tr><td>- <span class="cli">usb_hid_report</span></td><td> </td><td>In case of USB input devices, add the <span class="cli">/tmp/usb_hid_report_descriptor_*.bin</span> file.</td></tr>
 <tr><td>- <span class="cli">ints</span></td><td> </td><td>sólo disponible en la <i>Zona de depuración del núcleo (kernel)</i> (vea abajo). Muestra el uso de interruptores. No deberían haber muchos que esten compartidos por diferentes dispositivos.</td></tr>
 <tr><td colspan="3">Salida de depuración a pantalla (una opción de modo a prueba de fallas en el momento de arranque, vea <a href="#onscreen">arriba</a>)</td></tr>
 </table>

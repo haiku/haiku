@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2018, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,11 +32,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/zh_CN.png" alt="" />  中文 ［中文］</li>
+<li><a href="../id/tracker.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/tracker.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/tracker.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/tracker.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/tracker.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/tracker.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/tracker.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/tracker.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/tracker.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/tracker.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -132,7 +134,7 @@
 <ul>
 <li><p><span class="menu">图标视图</span> (<span class="key">ALT</span> <span class="key">1</span>) - 大图标，您可以通过子菜单，或者使用 <span class="key">ALT</span> <span class="key">+</span>/<span class="key">ALT</span> <span class="key">-</span> 来放大/缩小图标尺寸。</p></li>
 <li><p><span class="menu">迷你视图</span>  (<span class="key">ALT</span> <span class="key">2</span>) - 小图标。</p></li>
-<li><p><span class="menu">List view</span> (<span class="key">ALT</span> <span class="key">3</span>) - A detailed list of your files enabling you to show/hide file attributes. (See topic <a href="attributes.html">Attributes</a>.) From the submenu you can choose to use either mini or large icons.</p></li>
+<li><p><span class="menu">List view</span> (<span class="key">ALT</span> <span class="key">3</span>) - A detailed list of your files enabling you to show/hide file attributes (see topic <a href="attributes.html">Attributes</a>.)</p></li>
 </ul>
 <p> <span class="menu">窗口</span>  菜单还提供了很多其他的功能：</p>
 <ul>
@@ -193,10 +195,16 @@
 <br /><br />
 <img src="images/tracker-images/open-with-preferred.png" alt="open-with-preferred" />
 <p>在这里，您将会再次找出子菜单中的所用程序。通过选中其中之一，然后点击 <span class="button">打开并设为首选</span> 按钮，您将会修改该类型文件的首选程序，在这里为 <tt>text/plain</tt>。</p></li>
-<li><span class="menu">获取信息</span>
-<br /><br />
+<li><span class="menu">Get info</span>
+<p>This opens a panel that shows the meta data of a file and lets you edit its permissions. You can rename it by clicking on the file name at the top.</p>
 <img src="images/tracker-images/get-info.png" alt="get-info" />
-<p>该面板显示选中文件的信息，而可以让您设置其默认应用，在展开部分面板后，为权限和拥有者。点击路径将会在文件浏览器中将其打开。</p></li>
+<p>The panel consists of three tabs:</p>
+<ul>
+<li><span class="menu">Information</span>: Shows standard data like size, date of creation/modification, file type and location. Click on the location path to open the files parent folder. The <span class="menu">Open with</span> menu sets the preferred application to open this particular file.</li>
+<li><span class="menu">Permissions</span>: Lets you change owner, group and file permissions.</li>
+<li><span class="menu">Attibutes</span>: Lists all extra file attributes with their value and type.</li>
+</ul>
+</li>
 <li><p><span class="menu">重命名</span>，<span class="menu">复制</span>和<span class="menu">移动到垃圾箱</span> - 重命名，复制文件，或者将选中文件移动到垃圾箱。</p></li>
 <li><p><span class="menu">移动到</span>，<span class="menu">复制到</span>和<span class="menu">创建链接</span> - 让您使用子菜单导航方法移动，复制或者链接选中文件。调用菜单时，同时按下<span class="key">SHIFT</span> 键，将会提供一个选项已创建相对链接。</p></li>
 <li><p><span class="menu">剪切</span>，<span class="menu">复制</span>和<span class="menu">粘贴</span> - 让您使用剪贴板剪切，复制以及粘贴文件。在调用可以用于 <span class="menu">复制/剪切更多</span> 文件的菜单时，按下 <span class="key">SHIFT</span> 键，可能从其他目录中，您可以粘贴文件到其他地方。而且，按下 <span class="key">SHIFT</span> 键，您可以以链接的形式粘贴剪贴板中复制的文件。</p></li>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -33,11 +33,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/jp.png" alt="" /> 日本語</li>
+<li><a href="../id/bugreports.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/bugreports.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/bugreports.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/bugreports.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/bugreports.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/bugreports.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/bugreports.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/bugreports.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/bugreports.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/bugreports.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -157,6 +159,7 @@ syslog (system log の略称) はシステムに発生した有益な情報を�
 <tr><td>- <span class="cli">listusb -v</span></td><td> </td><td>USB 関連のバグを取り扱うときに使用します。Linux の <span class="cli">lsusb</span> に似ています。</td></tr>
 <tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>Haiku で使用するシステムのメインログ、上の <a href="#syslog">Syslog</a> を参照ください。ブート中の画面上デバッグと似ています。<span class="cli">open</span> コマンドを用いることで、syslog の関連する部分をテキストエディターに切り出せます。</td></tr>
 <tr><td class="onelinetop">- <span class="cli">listimage | grep drivers/</span></td><td> </td><td>使用されているドライバーのリストを出力する。</td></tr>
+<tr><td>- <span class="cli">usb_hid_report</span></td><td> </td><td>USB 入力デバイスの場合は、<span class="cli">/tmp/usb_hid_report_descriptor_*.bin</span> ファイルを追加してください。</td></tr>
 <tr><td>- <span class="cli">ints</span></td><td> </td><td><i>Kernel Debugging Land</i> (上記を参照) でのみ有効。割り込みの使用状況を表示します。同じ割り込みが複数のデバイスで共有されるのは好ましくありません。</td></tr>
 <tr><td colspan="3">- 画面上へのデバッグ出力 (ブート時のセーフモードオプション<a href="#onscreen">上</a>を参照)</td></tr>
 </table>

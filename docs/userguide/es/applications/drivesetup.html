@@ -4,11 +4,12 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ *		Kacper Kasper <kacperkasper@gmail.com>
  * Translators:
  *		CapitanPico
  *
@@ -30,10 +31,12 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/es.png" alt="" /> Español</li>
+<li><a href="../../id/applications/drivesetup.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/drivesetup.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/applications/drivesetup.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/applications/drivesetup.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../fr/applications/drivesetup.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/drivesetup.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/drivesetup.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/drivesetup.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pl/applications/drivesetup.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
@@ -49,14 +52,15 @@
 <li><a href="../../jp/applications/drivesetup.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 </ul>
 <span>
- «  <a href="diskusage.html">DiskUsage</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Aplicaciones</a> 
-::  <a href="expander.html">Expander</a>  »
+ «  <a href="diskusage.html">DiskUsage</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicaciones</a> 
+::  <a href="expander.html">Expander</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
+<div class="box-info">La traducción de esta página aún no está completa. Hasta que lo esté, las partes sin traducir se muestran en el inglés original.</div>
 
 <h2><img src="../../images/apps-images/drivesetup-icon_64.png" alt="drivesetup-icon_64.png" width="64" height="64" />DriveSetup</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -65,39 +69,65 @@
 <tr><td>Configuración:</td><td></td><td><span class="path">~/config/settings/DriveSetup</span></td></tr>
 </table>
 <p><br /></p>
-<p>DriveSetup es una herramienta para crear, borrar e inicializar particiones. Por ahora no puede redimensionar ni mover particiones existentes, así que es necesario o un volumen sin particionar (ta vez un disco externo USB u otro disco duro) o modificar la configuración inicial con una herramienta como <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> para proveer de espacio otra partición.</p>
+<p>DriveSetup is a tool to create, delete and format partitions. At this time it can't resize or move existing partitions, so that you'll either need an unpartitioned volume (perhaps an external USB drive or another harddisk) or do the initial setup with a tool like the <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> to provide the space for another partition.</p>
 <img src="../images/apps-images/drivesetup.png" alt="drivesetup.png" />
-<p>En la zona superior se muestra una repesentación gráfica de todas las particiones existentes en el interior del dispositivo elegido de la lista de abajo. Hay un máximo de 4 particiones primarias, cada una de las cuales puede contener un cierto número de particiones lógicas. Es posible manejar la lista con el control +/- que aparece, si es necesario, frente al dispoitivo en cuestión para visualizar los detalles de cada partición lógica.</p>
-<p>Se puede seleccionar una partición de la lista y montarla o desmontarla con las órdenes menú <span class="menu">Partición</span>  o presionando <span class="key">ALT</span> <span class="key">M</span> o <span class="key">ALT</span> <span class="key">U</span>.</p>
-<p>Es posible borrar completamente una partición con <span class="menu">Partición | Borrar</span>.<br />
-Lo que devuelve el siguiente aviso:</p>
-<div class="box-stop">Tratar asuntos de creación/borrado/iniciación de particiones es una tarea muy peligrosa. Compruebe siempre dos veces para asegurarse de que está trabajando con la partición adecuada, y guarde siempre una copia de seguridad actualizada de sus datos     ¡sólo por si algo sale mal!</div>
+<p>At the top is a graphical representation of all partitions inside the device chosen in the list below it. Each device, by default, can hold a maximum of 4 <i>primary</i> partitions. This limit can be removed by making one of those an <i>extended</i> partition, which in turn can hold theoretically an unlimited number of <i>logical</i> partitions (practical limitations depend on, for example, other OSes installed).<br />
+You may have to expand such a list with the +/- widget that appears in that case in front of that device to see the details of every logical partition.</p>
+<p>Colors and icons provide some more information about the available volumes and partitions.<br />
+Besides the familiar icons for harddisks, CD drives and USB sticks etc., there are a few that indicate a their mount mode:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="4">
+<tr><td><img src="../../images/apps-images/drivesetup-icon_boot.png" alt="drivesetup-icon_boot.png" width="16" height="16" /></td><td style="width:10px;"> </td>
+<td>The /boot partition</td></tr>
+<tr><td><img src="../../images/apps-images/drivesetup-icon_encrypted.png" alt="drivesetup-icon_encrypted.png" width="16" height="16" /></td><td> </td>
+<td>An encrypted partition</td></tr>
+<tr><td><img src="../../images/apps-images/drivesetup-icon_shared.png" alt="drivesetup-icon_shared.png" width="16" height="16" /></td><td> </td>
+<td>A partition shared through SMB/NFS etc.</td></tr>
+<tr><td><img src="../../images/apps-images/drivesetup-icon_read-only.png" alt="drivesetup-icon_read-only.png" width="16" height="16" /></td><td> </td>
+<td>A partition that was mounted read-only</td></tr>
+<tr><td><img src="../../images/apps-images/drivesetup-icon_virtual.png" alt="drivesetup-icon_virtual.png" width="16" height="16" /></td><td> </td>
+<td>A mounted image file (see also the <a href="./cli-apps.html">diskimage command</a>)</td></tr>
+</table>
+<p>When mounted, a colored bar shows the used space of a partition. The color depends on the kind of partition:</p>
+<table summary="layout" border="0" cellspacing="2" cellpadding="4">
+<tr><td style="background-color:#BEFFBE" width="20"></td><td width="3"></td><td>A BFS formatted partition</td></tr>
+<tr><td style="background-color:#ACACFF"></td><td></td><td>A non-BFS formatted partition</td></tr>
+<tr><td style="background-color:#FFACAC"></td><td></td><td>A read-only partition</td></tr>
+<tr><td style="background-image: repeating-linear-gradient(135deg, #E0E000 1%, #C0C0C0 15%)"></td><td></td><td>An encrypted partition</td></tr>
+</table>
+<p>You can select a partition and choose various commands from the context or <span class="menu">Partition</span> menu, like <span class="menu">Mount</span>/<span class="menu">Unmount</span>, or to <span class="menu">Open in DiskProbe</span>.</p>
+<p>You can also <span class="menu">Format</span> or completely <span class="menu">Delete</span> a partition.</p>
+<div class="box-stop">Dealing with creating/deleting/formatting partitions is very dangerous business. Always check twice to be sure you're working with the right one and always keep an up-to-date backup of your data in case something goes wrong!</div>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="initializing" name="initializing">Initializing a disk</a></h2>
+<p>If you don't plan to use just one of the partitions of a larger disk, but the entire drive as one partition, e.g. a USB stick or a Compact Flash card, you'll have to initialize the disk first.</p>
+<p>You do this by selecting the raw disk from list of devices and choose a partition map from the <span class="menu">Disk | Initialize</span> menu. The <span class="menu">Intel Partition Map</span> is the right choice for classical booting via a BIOS.</p>
+<div class="box-stop">Initializing will destroy all data on the drive!</div>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="creating" name="creating">Creación de una nueva partición</a></h2>
-<div class="box-info">Si pretende usar un disco completo como partición única, por ejemplo un pendrive o una tarjeta Flash, puede saltar se el proceso de creación de particiones y poceder directamente a <a href="#initializing">Inicialización</a>.</div>
 <p>Cuando se encuentra un espacio sin formatear en un dispositvo como el de la imagen superior <tt>&lt;vacío&gt;</tt>, es posible crear una nueva partición desde <span class="menu">Partición | Crear...</span>(<span class="key">ALT</span> <span class="key">C</span>).</p>
 <img src="../images/apps-images/drivesetup-create.png" alt="drivesetup-create.png" />
 <p>Este cuadro de diálogo permite ajustar el tamaño y el tipo de la partición. Seleccione <span class="menu">Be File System</span> 
 Si se desea usar la partición para una instalación de Haiku o si se quieren usar sobre ella todas las características interesantes de Haiku, como atributos y consultas. Tenga en cuenta que otros sistemas operativos a lo mejor no son capaces de acceder a tal partición.</p>
-<p>Si ha creado una partición primaria en vez de otra partición lógica, el cuadro de diálogo superior también muestra un cuadro seleccionable <span class="menu">Active Partition</span>. Se tendrá que seleccionar tal opción si se va a usar esa partición para lanzar una instalación de Haiku.</p>
-<p>Antes de que se pueda usar, o incluso montar la nueva partición, debe ser inicializada con un sistema de archivos.</p>
+<p>The <span class="menu">Active partition</span> checkbox is only available if you have created a primary partition instead of just another logical partition within an extended one. You'll have to tick that checkbox if you plan to use that partition to boot a Haiku installation.</p>
+<p>Before you can use, or even mount the newly created partition, it has to be formatted with a filesystem.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="initializing" name="initializing">Inicializando una partición</a></h2>
-<p>Sólamente se pueden inicializar particiones que no estén montadas a través del menú <span class="menu">Partctión | Inicializar</span>.</p>
+<a id="initializing" name="formatting">Formatting a partition</a></h2>
+<p>Only unmounted partitions can be formatted by choosing a filesystem from the sub-menu of <span class="menu">Partition | Format</span>. The <span class="menu">Be File System</span> (BFS) is mandatory for a Haiku boot partition and recommended for data partitions to be used with Haiku. Only BFS formatted partitions can be queried and fully support Haiku's file attributes.</p>
 <img src="../images/apps-images/drivesetup-initialize.png" alt="drivesetup-initialize.png" />
-<p>Aquí se selecciona el nombre para la partición y el tamaño de sus bloques de datos. Se recomiendan 2048 bytes por bloque, pero es posible escoger un tamaño inferior o superior si es necesario por alguna razón concreta.<br />
-¡La Inicialización eliminará todos los datos de la partición!</p>
-
+<p>Here you set the name for the partition and it's blocksize. The blocksize is the space in bytes that a file will allocate at minimum. 2048 bytes per block are recommended, but you can choose larger or smaller sizes if you have these very specific needs.<br />
+If the future data on your partition won't need any querying, you can uncheck <span class="menu">Enable query support</span>  to save a bit of overhead for managing the index. </p>
+<div class="box-stop">Formatting will destroy all data on the partition!</div>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="diskusage.html">DiskUsage</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Aplicaciones</a> 
-::  <a href="expander.html">Expander</a>  »
+ «  <a href="diskusage.html">DiskUsage</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicaciones</a> 
+::  <a href="expander.html">Expander</a>  »
 </span></div>
 </div>
 

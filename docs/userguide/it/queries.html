@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,11 +31,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/it.png" alt="" /> Italiano</li>
+<li><a href="../id/queries.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/queries.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/queries.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/queries.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/queries.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/queries.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/queries.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../hu/queries.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/queries.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
 <li><a href="../pt_PT/queries.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
@@ -58,6 +60,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">La traduzione di questa pagina non è stata completata. Per questo motivo le parti non tradotte sono visibili in inglese.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -112,9 +115,9 @@ Non è necessario fare doppio click per rieseguire una query. E' possibile <a hr
 <p>Questo aggiunge un menu pop-up a sinistra della casella di testo e, sotto di questo, i bottoni  <span class="button">Add</span> e <span class="button">Remove</span>. Dal menu è possibile scegliere con quali attributi fare una query. Con <span class="button">Add</span> e <span class="button">Remove</span> invece è possibile effettuare una query con attributi addizionali o rimuoverli. Questi attributi possono essere collegati con AND/OR.</p>
 <p>Facciamo per esempio una email query:</p>
 <img src="images/queries-images/query-window-filled.png" alt="query-window-filled.png" />
-<p>Questa è la finestra di ricerca, quando si cercano tutte le email ricevute da Clara Botters negli ultimi due mesi che hanno nel Soggetto "vibrafono" o "scettico".<br />
-E' facile notare che la ricerca attraverso gli attributi basati sul tempo supporta alcune frasi utili come: "gli ultimi due mesi", inoltre si può usare anche "oggi", "ieri", "lunedì" o "o l'ultimo lunedì" (che è il lunedì dell'ultima settimana), o "o gli utlimi 2 minuti/ore/giorni/settimane".<br />
-Questo è un buon modo per ridurre il numero di risultati di ricerca.</p>
+<p>This is your Find window when you're looking for all emails Clara Oswald has sent to you in the last two months that had in the subject "sufflé" or "impossible".<br />
+As you see, searching through time-based attributes supports some useful phrases: besides for the "last 2 months", you could also use "today", "yesterday", "Monday" or "last Monday" (which would be the Monday last week), or "last 2 minutes/hours/days/weeks".<br />
+A good way to cut down the number of search results.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -123,15 +126,15 @@ Questo è un buon modo per ridurre il numero di risultati di ricerca.</p>
 <p>Prende le query precedenti in base all'attributo delle mail di Clara relative a vibrafoni ecc. Se si dispone di tutti gli attributi ed i loro termini di ricerca impostati, si consiglia di provare ad usare la modalità <span class="menu">by Formula</span> :</p>
 <img src="images/queries-images/formula-query.png" alt="formula-query.png" />
 <p>Ancora una volta, modificato per renderlo leggibile</p>
-<pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [bB][oO][tT][tT][eE][rR][sS]*")
+<pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [oO][sS][wW][aA][lL][dD]*")
        &amp;&amp;(MAIL:when&gt;=%2 months%))
-       &amp;&amp;(MAIL:subject=="*[vV][iI][bB][rR][aA][pP][hH][oO][nN][eE]*"))
-       ||(MAIL:subject=="*[sS][kK][eE][pP][tT][iI][cC][aA][lL][iI][tT][yY]*"))
+       &amp;&amp;(MAIL:subject=="*[sS][uU][fF][fF][lL][éÉ]*"))
+       ||(MAIL:subject=="*[iI][mM][pP][oO][sS][sS][iI][bB][lL][eE]*"))
        &amp;&amp;(BEOS:TYPE=="text/x-email"))</pre>
 <p>Qual'è l'uso?</p>
 <ul>
 <li><p>E' possibile copiare la stringa e incollarla ad altre persone in un'email, su un forum o su IRC per essere usata da altri oppure per un debug.</p></li>
-<li><p>E' possibile usare questo metodo per costruire una query in modalità <span class="menu">Attribute</span> e quindi passare alla modalità <span class="menu">Formula</span>, per generare comodamente una stringa di ricerca da utilizzare per una query nel terminale o in uno script.</p></li>
+<li><p>You can use this method to construct a query in <span class="menu">Attribute</span> mode and then switch to <span class="menu">Formula</span> mode, to comfortably generate a search string. Enclosed in single quotes, that string can then be used with the <span class="cli">query</span> command in the Terminal.</p></li>
 <li><p>Le query possono essere raffinate inserendo delle parentesi dove necessario, per rendere ad esempio alcune parti case-sensitive o annulare combinazioni logiche cambiando "<tt>==</tt>" con "<tt>!=</tt>" per un NOT AND. Tutto quello che serve è una conoscenza basilare delle <a href="http://it.wikipedia.org/wiki/Espressione_regolare" class="external free" title="Wikipedia: Espressione regolare">espressioni regolari</a> e forse alcune nozioni di base sullo scripting.</p></li>
 </ul>
 

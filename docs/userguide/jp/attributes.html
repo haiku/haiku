@@ -32,11 +32,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/jp.png" alt="" /> 日本語</li>
+<li><a href="../id/attributes.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/attributes.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/attributes.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/attributes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/attributes.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/attributes.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/attributes.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/attributes.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/attributes.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/attributes.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -74,15 +76,15 @@
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="attributes-tracker" name="attributes-tracker">Tracker での属性</a></h2>
 <p>属性はデータベースやスプレッドシートと非常によく似た形で表示されます。Tracker を使って、どの属性 (列) を表示するのかの選択や、属性にしたがってファイルリストの順番 (行) の並べ替えができます。</p>
-<p>Tracker で属性を操作するには、Tracker ウィンドウを開いて<span class="menu">属性 (Attributes) </span>メニューをクリックし、表示する属性を選択します。あるいは単純に列見出しを右クリックし、コンテキストメニューで該当する項目をマークします。また、列見出しをドラッグ＆ドロップするだけで、列を再配置できます。列をウィンドウの外に移動させることで、不要な列をすばやく取り除けます。</p>
+<p>Tracker で属性を操作するには、Tracker ウィンドウを開いて<span class="menu">属性 (Attributes) </span>メニューをクリックし、表示する属性を選択します。あるいは単純に列見出しを右クリックし、コンテキストメニューで該当する項目をマークします。また、列見出しをドラッグ＆ドロップするだけで、列を再配置できます。列をウィンドウ外に移動させれば、不要な列をすばやく取り除けます。</p>
 <p>列見出し中の 属性間の線をダブルクリックすると、列幅が自動的に適切なサイズに調整されます。</p>
-<p>列見出しをクリックすると、並び替えの順序が昇順から降順へ切り替わります。<span class="key">SHIFT</span> を押しながら列見出しをクリックすれば、2 番目の並び替え順を決められます。たとえば、1 番目の並び替え順を会社名、2 番目の並び替え順をコンタクト名にして People ファイルを並べ替えられます。例として上のスクリーンショットを見てください。2 番目の並び替え順は、列見出しすぐそばの、1 番目の並び替え順よりも明るい色の目印でマークされています。</p>
-<p>これら属性の編集はファイルのリネームと同様に簡単です: 項目をクリックするか、<span class="key">ALT</span> <span class="key">E</span> を押します。属性間の移動は <span class="key">TAB</span> および <span class="key">SHIFT</span> <span class="key">TAB</span> で行います。変更を適用せずに編集モードを抜けるには <span class="key">ESC</span> を押します。</p>
+<p>列見出しをクリックすると、並び順が昇順から降順へ切り替わります。<span class="key">SHIFT</span> を押しながら列見出しをクリックすれば、2 番目の並び順を決められます。たとえば、1 番目の並び順を会社名、2 番目をコンタクト名にして People ファイルを並べ替えられます。例として上のスクリーンショットを見てください。2 番目の並び順は、列見出しすぐそばの、1 番目の並び順よりも明るい色の目印でマークされています。</p>
+<p>属性の編集はファイルのリネームと同じぐらい簡単です: 項目をクリックするか、<span class="key">ALT</span> <span class="key">E</span> を押します。属性間の移動は <span class="key">TAB</span> および <span class="key">SHIFT</span> <span class="key">TAB</span> で行います。変更を適用せずに編集モードを抜けるには <span class="key">ESC</span> を押します。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="attributes-terminal" name="attributes-terminal">ターミナルでの属性</a></h2>
-<p>コマンドラインが好みの場合やスクリプトを使って大量のファイルを処理しようという場合に備えて、ターミナルから属性を制御できるコマンドがいくつか用意されています。</p>
+<p>コマンドラインが好みか、スクリプトを使って大量のファイルを処理するつもりなら、ターミナルから属性を制御できるコマンドがいくつか用意されています。</p>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="listattr" name="listattr">listattr</a></h3>
@@ -133,7 +135,7 @@ Clara Botters : string : Whelton</pre>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="addattr" name="addattr">addattr</a></h3>
-<p><span class="cli">addattr</span> はファイルに属性を追加。または属性を値で満たす、そのどちらもできます。</p>
+<p><span class="cli">addattr</span> はファイルに属性を追加することも、または属性を値で満たすこともできます。</p>
 <pre>使い方: addattr [-t type] attr value file1 [file2...]
     または: addattr [-f value-from-file] [-t type] attr file1 [file2...]
  
@@ -152,19 +154,19 @@ Clara Botters : string : Whelton</pre>
 <pre>使い方: rmattr [-p] attr filename1 [filename2...]
          'attr' はそのファイル属性の名前です。
          '-p' が指定されると、'attr' はパターンとみなされます。</pre>
-<p>実用的な観点から見れば、単に "Fax" 属性の内容を入力しないことで十分対応できますが、次のようにタイプすると、Clara のファイルから "Fax" 属性を完全に削除できます。</p>
+<p>実用的には、単に "Fax" 属性の内容を入力しなければ十分ですが、次のようにタイプすると、Clara のファイルから "Fax" 属性を完全に削除できます。</p>
 <pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="copyattr" name="copyattr">copyattr</a></h3>
-<p><span class="cli">copyattr</span> は 1 つ以上のファイルの属性を、ほかのファイルにコピーします。デフォルトではファイルの実際の内容については<b>コピーされません</b>。</p>
+<p><span class="cli">copyattr</span> は 1 つ以上のファイルの属性を、ほかのファイルにコピーします。デフォルトではファイルの実際の内容は<b>コピーされません</b>。</p>
 <pre>使い方: copyattr &lt;options&gt; &lt;source&gt; [ ... ] &lt;destination&gt;</pre>
 
 <p>属性に加えてファイルの内容そのものもコピーする場合は、"<span class="cli">-d</span>" または "<span class="cli">--data</span>" オプションを追加します。</p>
 
 <p><br /></p>
-<p>以上のコマンドに関する情報や各コマンドのオプションに関する情報は、コマンド名の次に "<span class="cli">-h</span>" または "<span class="cli">--help</span>" を続けてタイプすると得られます。</p>
+<p>以上のコマンドとそのオプションに関する詳しい情報は、コマンド名の次に "<span class="cli">-h</span>" または "<span class="cli">--help</span>" を続けてタイプすると得られます。</p>
 
 </div>
 </div>

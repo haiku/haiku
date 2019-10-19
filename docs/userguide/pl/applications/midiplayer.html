@@ -10,6 +10,8 @@
  * Authors:
  *		Gerard Stanczak (Google Code-In student)
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Kacper Kasper
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -29,11 +31,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/pl.png" alt="" /> Polski</li>
+<li><a href="../../id/applications/midiplayer.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/midiplayer.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/applications/midiplayer.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/applications/midiplayer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/applications/midiplayer.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/applications/midiplayer.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/midiplayer.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/midiplayer.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/midiplayer.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_PT/applications/midiplayer.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
@@ -56,7 +60,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tłumaczenie tej strony jest niekompletne. Nieukończone części wyświetlane są w języku angielskim.</div>
 
 <h2><img src="../../images/apps-images/midiplayer-icon_64.png" alt="midiplayer-icon_64.png" width="64" height="64" />MidiPlayer</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -65,12 +68,12 @@
 <tr><td>Ustawienia:</td><td></td><td><span class="path">~/config/settings/MidiPlayerSettings</span></td></tr>
 </table>
 <p><br /></p>
-<p>As the name suggests, MidiPlayer is used to playback midi music files. Midi files are special, as they don't contain the actual digitized and in some way encoded music, but only a description of it: Hold this note for that long with this volume and use instrument X for it.<br />
-While this keeps file sizes pretty small, it also follows that depending on the instrument library (the so-called "SoundFont") the results can differ hugely. Also, these SoundFonts tend to be quite large, increasingly so with the number and quality of the instrument samples.</p>
-<div class="box-info"><p>Haiku doesn't come with a SoundFont installed, because they are so large and only few people generally need one. Most of those who do, already have high quality or custom SoundFonts. To be able to at least hear <i>something</i> you can install a free one from an optional package. In Terminal, enter: <tt>installoptionalpackage TimGMSoundFont</tt></p>
-<p>To use any other SoundFont, create a link to it in <tt>/boot/system/data/synth</tt> and name it <tt>big_synth.sy</tt>.</p></div>
+<p>Jak nazwa wskazuje, MidiPlayer służy do otwarzania plików muzycznych MIDI. Pliki MIDI są specyficzne, ponieważ nie zawierają muzyki przekonwertowanej do formy cyfrowej, a tylko jej opis: zagraj tę nutę przez taki czas, z taką głośnością na instrumencie X.<br />
+Chociaż pozwala to zachować niewielki rozmiar pliku, to naturalnie w zależności od biblioteki instrumentów (tzw. fontu dźwiękowego) wynik odtwarzania może się znacząco różnić. Ponadto, fonty dźwiękowe osiągają znaczne rozmiary, proporcjonalnie do liczby i jakości zawartych próbek instrumentów.</p>
+<div class="box-info"><p>Wydania Haiku zawierają mały, ale względnie dobry font. Osoby używające MIDI „na poważnie” zazwyczaj mają już pod ręką fonty wysokiej jakości.</p>
+<p>Aby używać innych fontów (spoza HaikuDepot lub dostępnych jako pakiet HPKG), wystarczy skopiować plik .sf do np. <tt>~/config/non-packaged/data/synth/</tt>. Aktywny font można ustawić w panelu preferencji Media w sekcji <span class="menu">MIDI</span>.</p></div>
 <img src="../images/apps-images/midiplayer.png" alt="midiplayer.png" />
-<p>MidiPlayer's interface is very simple. Just double-click or drag &amp; drop a midi file and playback starts. You control the volume with the slider and add reverb effects from the <span class="menu">Reverb</span> pop-up menu. Activating the scope will show a visualization in form of an oscilloscope running at the top.</p>
+<p>Interfejs MidiPlayera jest bardzo prosty. Dwukrotne kliknięcie lub przeciągnięcie i upuszczenie pliku w programie rozpoczyna odtwarzanie. Suwakiem można ustawić głośność, a menu <span class="menu">Pogłos</span> pozwala dodać efekt pogłosu. Zaznaczenie pola wyboru <span class="menu">Skala</span> wyświetli wizualizację w formie oscyloskopu w górnej części okna.</p>
 
 </div>
 </div>

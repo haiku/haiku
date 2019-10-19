@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2017, Haiku. All rights reserved.
+ * Copyright 2010-2018, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,11 +32,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../../id/applications/list-cli-apps.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/list-cli-apps.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/applications/list-cli-apps.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/applications/list-cli-apps.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/applications/list-cli-apps.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/applications/list-cli-apps.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/list-cli-apps.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/list-cli-apps.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/list-cli-apps.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pl/applications/list-cli-apps.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
@@ -53,7 +55,7 @@
 
 <span>
 <a href="../applications.html#cli-apps" class="uplink">Applications</a>
-::  <a href="cli-apps.html">Haiku-specific commands</a>  »
+::  <a href="cli-apps.html">Haiku-specific commands</a>  »
 </span></div>
 </div>
 
@@ -87,8 +89,7 @@ Aqui está uma lista de todos os aplicativos de linha de comando que são fornec
 <tr><td><tt>beep</tt></td><td> </td><td>Toca um sino. </td></tr>
 <tr><td><tt>bunzip2</tt></td><td> </td><td>Ver <tt>bzip2</tt>.</td></tr>
 <tr><td><tt>bzip2</tt></td><td> </td><td>Compressor de arquivos.</td></tr>
-<tr><td><tt>c++</tt></td><td> </td><td>Compilador C</td></tr>
-<tr><td><tt>cal</tt></td><td> </td><td>Exibe um calendário. </td></tr>
+<tr><td><tt>c++</tt></td><td> </td><td>C++-Compiler.</td></tr>
 <tr><td><tt>cat</tt></td><td> </td><td>Concatena arquivos e impressões para a saída padrão. </td></tr>
 <tr><td><tt>catattr</tt></td><td> </td><td>Imprime o conteúdo de um atributo de um arquivo. <a href="cli-apps.html">(específico do Haiku)</a></td></tr>
 <tr><td><tt>cc</tt></td><td> </td><td>Compilador C</td></tr>
@@ -101,11 +102,9 @@ Aqui está uma lista de todos os aplicativos de linha de comando que são fornec
 <tr><td><tt>chroot</tt></td><td> </td><td>Executa um comando dentro de um diretório raiz especificado. </td></tr>
 <tr><td><tt>cksum</tt></td><td> </td><td>Imprime o CRC checksum e a contagem de  bytes de arquivos. </td></tr>
 <tr><td><tt>clear</tt></td><td> </td><td>Limpa uma janela de terminal. </td></tr>
-<tr><td><tt>clockconfig</tt></td><td> </td><td>Imprime a configuração do relógio.</td></tr>
 <tr><td><tt>cmp</tt></td><td> </td><td>Compara arquivos byte a byte.</td></tr>
 <tr><td><tt>collectcatkeys </tt></td><td> </td><td>[Sobra da mudança do locale-kit.]</td></tr>
 <tr><td><tt>comm</tt></td><td> </td><td>Compara arquivos ordenados linha a linha. </td></tr>
-<tr><td><tt>compress</tt></td><td> </td><td>Programa de compressão de dados</td></tr>
 <tr><td><tt>consoled</tt></td><td> </td><td>Daemon de console</td></tr>
 <tr><td><tt>copyattr</tt></td><td> </td><td>Copia todos ou um subconjunto de atributos de um ou mais arquivos para outro ou novo arquivo. <a href="cli-apps.html">(específico do Haiku)</a></td></tr>
 <tr><td><tt>cp</tt></td><td> </td><td>Copia arquivos e diretórios. </td></tr>
@@ -146,7 +145,6 @@ Aqui está uma lista de todos os aplicativos de linha de comando que são fornec
 <tr><td><tt>fmt</tt></td><td> </td><td>Reformata os parágrafos de um arquivo.</td></tr>
 <tr><td><tt>fold</tt></td><td> </td><td>Quebra linhas de entrada de um arquivo.</td></tr>
 <tr><td><tt>fortune</tt></td><td> </td><td>Imprime um adágio aleatório, provavelmente interessante. </td></tr>
-<tr><td><tt>frcode</tt></td><td> </td><td>Chamado pelo updatedb para comprimir a lista de nomes de arquivos.</td></tr>
 <tr><td><tt>freetype-config</tt></td><td> </td><td>Exibe informação de compilação e vinculação do FreeType.</td></tr>
 <tr><td><tt>fstrim</tt></td><td> </td><td>Envia um comando TRIM para um dispositivo SSD.</td></tr>
 <tr><td><tt>ftp</tt></td><td> </td><td>Programa de transferência de arquivos</td></tr>
@@ -154,9 +152,7 @@ Aqui está uma lista de todos os aplicativos de linha de comando que são fornec
 <tr><td><tt>funzip</tt></td><td> </td><td>Extrai o primeiro ítem de um arquivo compactado para a saída padrão.</td></tr>
 <tr><td><tt>fwcontrol</tt></td><td> </td><td>Programa de controle do FireWire</td></tr>
 <tr><td><tt>gawk</tt></td><td> </td><td>Linguagem de processamente e verificação de padrões. </td></tr>
-<tr><td><tt>gdb</tt></td><td> </td><td>Depurador GNU</td></tr>
 <tr><td><tt>getarch</tt></td><td> </td><td>Shows the environment's compiler version. </td></tr>
-<tr><td><tt>getlimits</tt></td><td> </td><td>Imprime limites dependentes de plataforma em um formato útil para scripts shell. </td></tr>
 <tr><td><tt>grep</tt></td><td> </td><td>Pesquisa por um padrão.</td></tr>
 <tr><td><tt>groups</tt></td><td> </td><td>Imprime a composição de grupo para cada nome de usuário. </td></tr>
 <tr><td><tt>gunzip</tt></td><td> </td><td>Ver <tt>gzip</tt>.</td></tr>
@@ -167,7 +163,6 @@ Aqui está uma lista de todos os aplicativos de linha de comando que são fornec
 <tr><td><tt>hey</tt></td><td> </td><td>Uma pequena ferramenta para escrever aplicativos de interface gráfica.</td></tr>
 <tr><td><tt>hostname</tt></td><td> </td><td>Imprime ou define o hostname do sistema. </td></tr>
 <tr><td><tt>id</tt></td><td> </td><td>Imprime a informação de usuário e grupo. </td></tr>
-<tr><td><tt>ident</tt></td><td> </td><td>Identifica as palavras-chave RCS em arquivos. </td></tr>
 <tr><td><tt>ifconfig</tt></td><td> </td><td>Configura uma interface de rede. </td></tr>
 <tr><td><tt>install</tt></td><td> </td><td>Copia arquivos em um destino sem interromper o sistema em execução.</td></tr>
 <tr><td><tt>install-wifi-firmwares.sh</tt></td><td> </td><td>Installa o firmware para várias placas de rede sem fio. </td></tr>
@@ -179,7 +174,7 @@ Aqui está uma lista de todos os aplicativos de linha de comando que são fornec
 <tr><td><tt>kernel_debugger</tt></td><td> </td><td>Inicia o depurador do kernel.</td></tr>
 <tr><td><tt>keymap</tt></td><td> </td><td>Carrega ou salva um mapa de teclado.</td></tr>
 <tr><td><tt>kill</tt></td><td> </td><td>Envia um sinal para encerrar um processo. </td></tr>
-<tr><td><tt>launch_roster</tt></td><td> </td><td>Controls the launch_daemon, e.g. stop and restart services. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
+<tr><td><tt>launch_roster</tt></td><td> </td><td>Controls the launch_daemon, e.g. stop and restart services. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
 <tr><td><tt>less</tt></td><td> </td><td>Visualiza um arquivo.</td></tr>
 <tr><td><tt>lessecho</tt></td><td> </td><td>Ecoa seus argumentos e expande metacaracteres, tais como * e ?, em arquivos.</td></tr>
 <tr><td><tt>lesskey</tt></td><td> </td><td>Especifica vinculação de teclas para o less. </td></tr>
@@ -207,7 +202,6 @@ Aqui está uma lista de todos os aplicativos de linha de comando que são fornec
 <tr><td><tt>mbox2mail</tt></td><td> </td><td>Converte arquivos de caixa de correio do Unix para arquivos de correio eletrônico do BeOS.</td></tr>
 <tr><td><tt>md5sum</tt></td><td> </td><td>Imprime ou verifica checksums MD5.</td></tr>
 <tr><td><tt>media_client</tt></td><td> </td><td>"media_client play" plays back audio files.</td></tr>
-<tr><td><tt>merge</tt></td><td> </td><td>Fusão de arquivos em três vias. </td></tr>
 <tr><td><tt>message</tt></td><td> </td><td>Imprime um arquivo BMessage comprimido. </td></tr>
 <tr><td><tt>mimeset</tt></td><td> </td><td>Define o tipo MIME de um arquivo. </td></tr>
 <tr><td><tt>mkdepend</tt></td><td> </td><td>Gerador de dependências do Makefile.</td></tr>
@@ -224,7 +218,6 @@ Aqui está uma lista de todos os aplicativos de linha de comando que são fornec
 <tr><td><tt>mountvolume</tt></td><td> </td><td>Monta um volume pelo nome.</td></tr>
 <tr><td><tt>mv</tt></td><td> </td><td>Move/renomeia um arquivo. </td></tr>
 <tr><td><tt>nano</tt></td><td> </td><td>The default text editor in the Terminal, a clone of 'Pico'. </td></tr>
-<tr><td><tt>netcat</tt></td><td> </td><td>Utilitário de TCP e UDP.</td></tr>
 <tr><td><tt>netstat</tt></td><td> </td><td>Imprime conexões de rede, tabelas de roteamento, estatísticas de interface, conexões mascaradas e membros de multicast. </td></tr>
 <tr><td><tt>nl</tt></td><td> </td><td>Imprime cada arquivo com numeração de linhas adicionado. </td></tr>
 <tr><td><tt>nohup</tt></td><td> </td><td>Executa um comando ignorando sinais de  hangup. </td></tr>
@@ -259,7 +252,6 @@ Aqui está uma lista de todos os aplicativos de linha de comando que são fornec
 <tr><td><tt>reindex</tt></td><td> </td><td>Põe atributos de arquivos existentes dentro de índices recém criados. <a href="cli-apps.html">(específico do Haiku)</a></td></tr>
 <tr><td><tt>release</tt></td><td> </td><td>Lança um semáforo. </td></tr>
 <tr><td><tt>renice</tt></td><td> </td><td>Altera a prioridade de um processo em execução. </td></tr>
-<tr><td><tt>rlog</tt></td><td> </td><td>Imprime mensagens de log e outras informações sobre arquivos RCS.</td></tr>
 <tr><td><tt>rm</tt></td><td> </td><td>Remove arquivos e diretórios. </td></tr>
 <tr><td><tt>rmattr</tt></td><td> </td><td>Remove um atributo de um arquivo.  <a href="cli-apps.html">(específico do Haiku)</a></td></tr>
 <tr><td><tt>rmdir</tt></td><td> </td><td>Remove diretórios.</td></tr>
@@ -276,7 +268,6 @@ Aqui está uma lista de todos os aplicativos de linha de comando que são fornec
 <tr><td><tt>settype</tt></td><td> </td><td>Define o tipo MIME, a assinatura e o aplicativo preferido de um arquivo. </td></tr>
 <tr><td><tt>setversion</tt></td><td> </td><td>Exibe a versão de um arquivo.</td></tr>
 <tr><td><tt>setvolume</tt></td><td> </td><td>Define o volume de som do sistema. </td></tr>
-<tr><td><tt>setwep</tt></td><td> </td><td>Provides WEP encryption for wireless networks. </td></tr>
 <tr><td><tt>sh</tt></td><td> </td><td>Ver <tt>bash</tt>. </td></tr>
 <tr><td><tt>sha1sum</tt></td><td> </td><td>Imprime ou verifica checksums SHA1. </td></tr>
 <tr><td><tt>shar</tt></td><td> </td><td>Cria arquivos compactados em shell.</td></tr>
@@ -365,7 +356,7 @@ Aqui está uma lista de todos os aplicativos de linha de comando que são fornec
 <div class="inner"><span>
 <a href="../applications.html#cli-apps" class="uplink">Aplicativos
 </a>
-::  <a href="cli-apps.html">Haiku-specific commands</a>  »
+::  <a href="cli-apps.html">Haiku-specific commands</a>  »
 </span></div>
 </div>
 

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,11 +32,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/zh_CN.png" alt="" />  中文 ［中文］</li>
+<li><a href="../id/bugreports.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/bugreports.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/bugreports.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/bugreports.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/bugreports.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/bugreports.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/bugreports.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/bugreports.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/bugreports.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/bugreports.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -160,6 +162,7 @@ Note that in KDL your keyboard may not work. PS/2 keyboards always do, with USB 
 <tr><td>- <span class="cli">listusb -v</span></td><td> </td><td>假如是有关 USB 的问题，它类似于Linux下的 <span class="cli">lsusb</span>。</td></tr>
 <tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>Haiku的主要系统日志，查看上述  <a href="#syslog">Syslog</a>，类似于引导过程中的屏幕调试信息。您可以使用 <span class="cli">open</span> 命令在文本编辑器中获取到系统日志中相关的部分。</td></tr>
 <tr><td class="onelinetop">- <span class="cli">listimage | grep drivers/</span></td><td> </td><td> 列出所有使用的驱动。</td></tr>
+<tr><td>- <span class="cli">usb_hid_report</span></td><td> </td><td>In case of USB input devices, add the <span class="cli">/tmp/usb_hid_report_descriptor_*.bin</span> file.</td></tr>
 <tr><td>- <span class="cli">ints</span></td><td> </td><td>只在 <i>内核调试状态</i> 可用（参阅下文）。它用显示中断使用情况。不可能有许多由不同硬件共享的中断。</td></tr>
 <tr><td colspan="3">- 屏幕调试输出（一种安全模式引导时间选项，查看 <a href="#onscreen">上述</a>）。</td></tr>
 </table>

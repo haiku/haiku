@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2017, Haiku. All rights reserved.
+ * Copyright 2010-2018, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -34,11 +34,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/ru.png" alt="" /> Русский</li>
+<li><a href="../../id/applications/list-cli-apps.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/list-cli-apps.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/applications/list-cli-apps.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/applications/list-cli-apps.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/applications/list-cli-apps.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/applications/list-cli-apps.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/list-cli-apps.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/list-cli-apps.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/list-cli-apps.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pl/applications/list-cli-apps.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
@@ -55,7 +57,7 @@
 
 <span>
 <a href="../applications.html#cli-apps" class="uplink">Applications</a>
-::  <a href="cli-apps.html">Haiku-specific commands</a>  »
+::  <a href="cli-apps.html">Haiku-specific commands</a>  »
 </span></div>
 </div>
 
@@ -68,8 +70,8 @@
 <tr><td>Расположение в Tracker:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
 </table>
 <p><br /></p>
-<p>All commandline applications shipped with Haiku are in <span class="path">/boot/system/bin/</span>. Your own or additionally installed commandline apps will appear in <span class="path">~/config/bin/</span> when installed from a .hpkg package. Otherwise you can put them into <span class="path">~/config/non-packaged/bin/</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
-Here's a list of all commandline applications that are shipped with Haiku. Each with only a short description of what it does, for more detailed information on its usage execute the command with the parameter <tt>--help</tt>.</p>
+<p>Все приложения командной строки, поставляемые вместе с Haiku, располагаются в <span class="path">/boot/system/bin</span>. Приложения, которые вы написали или установили самостоятельно, будут располагаться в  <span class="path">~/config/bin</span> при установке из пакета .hpkg. Указанные пути располагаются в переменной PATH, таким образом приложения отыскиваются автоматически.<br />
+Ниже приведен список все приложений командной строки, поставляемых вместе с Haiku. Для каждого приложения дано краткое описание того, что оно делает. Для получения более подробной информации выполните команду с параметром <tt>--help</tt>.</p>
 <p><br /></p>
 <p>Указатель:   <a href="#A">A – E</a>   ::   <a href="#F"> F – J </a>   ::   <a href="#K"> K – O </a>   ::   <a href="#P"> P – S </a>   ::   <a href="#T"> T – Z </a></p>
 <p><br /></p>
@@ -88,9 +90,8 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>bc</tt></td><td> </td><td>Арифметический язык-калькулятор.</td></tr>
 <tr><td><tt>beep</tt></td><td> </td><td>Воспроизводит системный сигнал.</td></tr>
 <tr><td><tt>bunzip2</tt></td><td> </td><td>См. <tt>bzip2</tt>.</td></tr>
-<tr><td><tt>bzip2</tt></td><td> </td><td>File compressor.</td></tr>
-<tr><td><tt>c++</tt></td><td> </td><td>C  -Compiler.</td></tr>
-<tr><td><tt>cal</tt></td><td> </td><td>Отображает календарь.</td></tr>
+<tr><td><tt>bzip2</tt></td><td> </td><td>Программа для сжатия файлов.</td></tr>
+<tr><td><tt>c++</tt></td><td> </td><td>Компилятор C++</td></tr>
 <tr><td><tt>cat</tt></td><td> </td><td>Объединяет файлы и печатает в стандартный вывод. </td></tr>
 <tr><td><tt>catattr</tt></td><td> </td><td>Выводит содержимое аттрибутов файла. <a href="cli-apps.html">(специфичное для Haiku)</a></td></tr>
 <tr><td><tt>cc</tt></td><td> </td><td>Компиллятор Си</td></tr>
@@ -103,11 +104,9 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>chroot</tt></td><td> </td><td>Выполняет команду с указанным корневым каталогом.</td></tr>
 <tr><td><tt>cksum</tt></td><td> </td><td>Выводит контрольную сумму CRC и количество байтов для указанных файлов.</td></tr>
 <tr><td><tt>clear</tt></td><td> </td><td>Очищает окно терминала.</td></tr>
-<tr><td><tt>clockconfig</tt></td><td> </td><td>Выводит параметры часов.</td></tr>
 <tr><td><tt>cmp</tt></td><td> </td><td>Производит побайтовое сравнение файлов.</td></tr>
 <tr><td><tt>collectcatkeys </tt></td><td> </td><td>[Осталась после перемещения locale-kit.]</td></tr>
 <tr><td><tt>comm</tt></td><td> </td><td>Производит построчное сравнение файлов. </td></tr>
-<tr><td><tt>compress</tt></td><td> </td><td>Программа сжатия данных</td></tr>
 <tr><td><tt>consoled</tt></td><td> </td><td>Консольный демон</td></tr>
 <tr><td><tt>copyattr</tt></td><td> </td><td>Копирует все или некоторый набор атрибутов из одного или нескольких файлов в другой или новый файл. <a href="cli-apps.html">(специфично для Haiku)</a></td></tr>
 <tr><td><tt>cp</tt></td><td> </td><td>Копирует файлы и каталоги.</td></tr>
@@ -118,7 +117,7 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>dc</tt></td><td> </td><td>Пакет для арифметических вычислений.</td></tr>
 <tr><td><tt>dd</tt></td><td> </td><td>Копирует двоичные данные, производит конвертацию и ворматирование указанные в операндах.</td></tr>
 <tr><td><tt>desklink</tt></td><td> </td><td>Добавляет элемент в Deskbar. <a href="cli-apps.html">(специфичное для Haiku)</a></td></tr>
-<tr><td><tt>diskimage</tt></td><td> </td><td>Registers a file as disk device that can then be mounted. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
+<tr><td><tt>diskimage</tt></td><td> </td><td>Регистрирует файл как монтируемое дисковое устройство. <a href="cli-apps.html">(специфично для Haiku)</a></td></tr>
 <tr><td><tt>df</tt></td><td> </td><td>Выводит объем использованного и свободного пространства подключенных томов.</td></tr>
 <tr><td><tt>diff</tt></td><td> </td><td>Сравнивает файлы построчно.</td></tr>
 <tr><td><tt>diff3</tt></td><td> </td><td>Построчно сравнивает три файла.</td></tr>
@@ -148,17 +147,14 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>fmt</tt></td><td> </td><td>Переформатирует каждый абзац файла.</td></tr>
 <tr><td><tt>fold</tt></td><td> </td><td>Разбивает строки файла на строки требуемой длины.</td></tr>
 <tr><td><tt>fortune</tt></td><td> </td><td>Выводит случайную, и, надеюсь, интересную пословицу.</td></tr>
-<tr><td><tt>frcode</tt></td><td> </td><td>Вызывается командой updatedb для сжатия списка имен файлов</td></tr>
 <tr><td><tt>freetype-config</tt></td><td> </td><td>Выводит информацию о параметрах компилляции и линковки FreeType.</td></tr>
-<tr><td><tt>fstrim</tt></td><td> </td><td>Send a TRIM command to an SSD drive.</td></tr>
+<tr><td><tt>fstrim</tt></td><td> </td><td>Посылает команду TRIM на диск SSD.</td></tr>
 <tr><td><tt>ftp</tt></td><td> </td><td>FTP клиент</td></tr>
 <tr><td><tt>ftpd</tt></td><td> </td><td>FTP сервер</td></tr>
 <tr><td><tt>funzip</tt></td><td> </td><td>Распаковывает первый элемент архива в стандартный вывод.</td></tr>
 <tr><td><tt>fwcontrol</tt></td><td> </td><td>Программа управления FireWire</td></tr>
 <tr><td><tt>gawk</tt></td><td> </td><td>Язык построчного разбора и обработки по заданным шаблонам.</td></tr>
-<tr><td><tt>gdb</tt></td><td> </td><td>Отладчик GNU</td></tr>
 <tr><td><tt>getarch</tt></td><td> </td><td>Shows the environment's compiler version. </td></tr>
-<tr><td><tt>getlimits</tt></td><td> </td><td>Выводит платформозависимые ограничения в формате, удобном для использования в скриптинге.</td></tr>
 <tr><td><tt>grep</tt></td><td> </td><td>Поиск по шаблону.</td></tr>
 <tr><td><tt>groups</tt></td><td> </td><td>Выводит членство в группах для каждого имени пользователя.</td></tr>
 <tr><td><tt>gunzip</tt></td><td> </td><td>Тоже самое что и <tt>gzip</tt>.</td></tr>
@@ -169,7 +165,6 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>hey</tt></td><td> </td><td>Небольшой инструмент для скриптования GUI-приложений.</td></tr>
 <tr><td><tt>hostname</tt></td><td> </td><td>Выводит список  сетевых имен системы.</td></tr>
 <tr><td><tt>id</tt></td><td> </td><td>Выводит информацию о пользователе и группе.</td></tr>
-<tr><td><tt>ident</tt></td><td> </td><td>Определяет ключевые слова RCS в файлах. </td></tr>
 <tr><td><tt>ifconfig</tt></td><td> </td><td>Настраивает сетевой интерфейс.</td></tr>
 <tr><td><tt>install</tt></td><td> </td><td>Копирует файлы в место назначения без нарушения работы системы.</td></tr>
 <tr><td><tt>install-wifi-firmwares.sh</tt></td><td> </td><td>Устанавливает прошивки для различного набора беспроводных сетевых карт.</td></tr>
@@ -181,7 +176,7 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>kernel_debugger</tt></td><td> </td><td>Переход к отладчику ядра.</td></tr>
 <tr><td><tt>keymap</tt></td><td> </td><td>Загружает либо сохраняет раскладку клавиатуры.</td></tr>
 <tr><td><tt>kill</tt></td><td> </td><td>Посылает процессу сигнал выхода.</td></tr>
-<tr><td><tt>launch_roster</tt></td><td> </td><td>Controls the launch_daemon, e.g. stop and restart services. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
+<tr><td><tt>launch_roster</tt></td><td> </td><td>Контролирует launch_daemon, т.е. остановку и перезапуск служб. <a href="cli-apps.html">(специфично для Haiku)</a></td></tr>
 <tr><td><tt>less</tt></td><td> </td><td>Просматривает файл.</td></tr>
 <tr><td><tt>lessecho</tt></td><td> </td><td>Выводит свои аргументы и расширяет метасимволы, такие как * и? в именах файлов.</td></tr>
 <tr><td><tt>lesskey</tt></td><td> </td><td>Назначает клавишу для вызова less.</td></tr>
@@ -196,7 +191,7 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>listsem</tt></td><td> </td><td>Перечисляет семафоры, отведенные указанной команде.</td></tr>
 <tr><td><tt>listusb</tt></td><td> </td><td>Выводит список USB устройств. </td></tr>
 <tr><td><tt>ln</tt></td><td> </td><td>Создает ссылку на файл.</td></tr>
-<tr><td><tt>locale</tt></td><td> </td><td>Shows the set preferred language, its LC_CTYPE and the preferred formatting.</td></tr>
+<tr><td><tt>locale</tt></td><td> </td><td>Показывает выбранный предпочитаемый язык, его LC_CTYPE и предпочитаемое форматирование.</td></tr>
 <tr><td><tt>locate</tt></td><td> </td><td>Находит файл.</td></tr>
 <tr><td><tt>logger</tt></td><td> </td><td>Отправляет сообщение в системный лог.</td></tr>
 <tr><td><tt>login</tt></td><td> </td><td>Открывает сессию в системе.</td></tr>
@@ -208,8 +203,7 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>makebootable</tt></td><td> </td><td>Делает указанный BFS раздел/устройство доступным для загрузки, записывая загрузочный код в первые два сектора.</td></tr>
 <tr><td><tt>mbox2mail</tt></td><td> </td><td>Преобразует файы Unix mailbox в файлы e-mail BeOS.</td></tr>
 <tr><td><tt>md5sum</tt></td><td> </td><td>Выводит или проверяет контрольные суммы MD5.</td></tr>
-<tr><td><tt>media_client</tt></td><td> </td><td>"media_client play" plays back audio files.</td></tr>
-<tr><td><tt>merge</tt></td><td> </td><td>Трехстороннее слияние файлов.</td></tr>
+<tr><td><tt>media_client</tt></td><td> </td><td>"media_client play" проигрывает аудиофайлы.</td></tr>
 <tr><td><tt>message</tt></td><td> </td><td>Выводит содержимое BMessage, записанное в файл.</td></tr>
 <tr><td><tt>mimeset</tt></td><td> </td><td>Устанавливает MIME-тип файла.</td></tr>
 <tr><td><tt>mkdepend</tt></td><td> </td><td>Makefile dependency generator.</td></tr>
@@ -225,8 +219,7 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>mount_nfs</tt></td><td> </td><td>Подключает NFS раздел. </td></tr>
 <tr><td><tt>mountvolume</tt></td><td> </td><td>Подключает том по имени.</td></tr>
 <tr><td><tt>mv</tt></td><td> </td><td>Перемещает/переименовывает файл.</td></tr>
-<tr><td><tt>nano</tt></td><td> </td><td>The default text editor in the Terminal, a clone of 'Pico'. </td></tr>
-<tr><td><tt>netcat</tt></td><td> </td><td>Утилита TCP и UDP.</td></tr>
+<tr><td><tt>nano</tt></td><td> </td><td>Стандартный текстовый редактор в Терминале, клон Pico. </td></tr>
 <tr><td><tt>netstat</tt></td><td> </td><td>Выводит сетевые подключения, таблицы маршрутизации, статистику интерфейсов, маскированные соединения и участие в групповых передачах.</td></tr>
 <tr><td><tt>nl</tt></td><td> </td><td>Выводит файл с добавлением нумерации строк.</td></tr>
 <tr><td><tt>nohup</tt></td><td> </td><td>Выполняет команду с игнорированием сигналов потери связи.</td></tr>
@@ -242,8 +235,8 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>pathchk</tt></td><td> </td><td>Диагностирует неверные или непереносимые имена файлов.</td></tr>
 <tr><td><tt>pc</tt></td><td> </td><td>Калькулятор программиста</td></tr>
 <tr><td><tt>ping</tt></td><td> </td><td>Отправляет ICMP-эхо-запрос сетевому хосту.</td></tr>
-<tr><td><tt>pkg-config</tt></td><td> </td><td>Analyzes and configures a Haiku package.</td></tr>
-<tr><td><tt>pkgman</tt></td><td> </td><td>Manages packages and package repositories.</td></tr>
+<tr><td><tt>pkg-config</tt></td><td> </td><td>Анализирует и конфигурирует пакет Haiku.</td></tr>
+<tr><td><tt>pkgman</tt></td><td> </td><td>Управляет пакетами и репозиториями.</td></tr>
 <tr><td><tt>play</tt></td><td> </td><td>Воспроизводит трек с CD.</td></tr>
 <tr><td><tt>pr</tt></td><td> </td><td>Разбивает на страници или колонки файл для печати.</td></tr>
 <tr><td><tt>printenv</tt></td><td> </td><td>Выводит значение переменной среды.</td></tr>
@@ -255,13 +248,12 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>pwd</tt></td><td> </td><td>Выводит текущий каталог.</td></tr>
 <tr><td><tt>query</tt></td><td> </td><td>Утилита командной строки эмулирующая функционал Tracker'a "Найти по формуле".  <a href="cli-apps.html">(специфично для Haiku)</a></td></tr>
 <tr><td><tt>quit</tt></td><td> </td><td>Завершает работу приложения.</td></tr>
-<tr><td><tt>ramdisk</tt></td><td> </td><td>Creates a ramdisk. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
+<tr><td><tt>ramdisk</tt></td><td> </td><td>Создает ramdisk. <a href="cli-apps.html"> (специфично для Haiku)</a></td></tr>
 <tr><td><tt>rc</tt></td><td> </td><td>Компиллятор ресурсов</td></tr>
 <tr><td><tt>readlink</tt></td><td> </td><td>Выводит путь до объекта символической ссылки.</td></tr>
 <tr><td><tt>reindex</tt></td><td> </td><td>Помещает атрибуты существующих файлов во вновь созданный индекс. <a href="cli-apps.html">(специфично для Haiku)</a></td></tr>
 <tr><td><tt>release</tt></td><td> </td><td>Освобождает семафор.</td></tr>
 <tr><td><tt>renice</tt></td><td> </td><td>Изменяет приоритер запущенных процессов.</td></tr>
-<tr><td><tt>rlog</tt></td><td> </td><td>Выводит лог-сообщения и другую информацию о файлах RCS.</td></tr>
 <tr><td><tt>rm</tt></td><td> </td><td>Удаляет файлы и директории.</td></tr>
 <tr><td><tt>rmattr</tt></td><td> </td><td>Удаляет атрибут из файла. <a href="cli-apps.html">(специфично для Haiku)</a></td></tr>
 <tr><td><tt>rmdir</tt></td><td> </td><td>Удаляет каталоги.</td></tr>
@@ -278,7 +270,6 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>settype</tt></td><td> </td><td>Устанавливает MIME-тип, сигнатуру и предпочитаемое приложение для файла.</td></tr>
 <tr><td><tt>setversion</tt></td><td> </td><td>Показывает версию файла.</td></tr>
 <tr><td><tt>setvolume</tt></td><td> </td><td>Устанавливает уровень громкости системы.</td></tr>
-<tr><td><tt>setwep</tt></td><td> </td><td>Provides WEP encryption for wireless networks. </td></tr>
 <tr><td><tt>sh</tt></td><td> </td><td>См. <tt>bash</tt>. </td></tr>
 <tr><td><tt>sha1sum</tt></td><td> </td><td>Отображает или проверяет контрольные суммы SHA1.</td></tr>
 <tr><td><tt>shar</tt></td><td> </td><td>Создает архивы Unix.</td></tr>
@@ -366,7 +357,7 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <div class="nav">
 <div class="inner"><span>
 <a href="../applications.html#cli-apps" class="uplink">Приложения</a>
-::  <a href="cli-apps.html">Haiku-specific commands</a>  »
+::  <a href="cli-apps.html">Haiku-specific commands</a>  »
 </span></div>
 </div>
 

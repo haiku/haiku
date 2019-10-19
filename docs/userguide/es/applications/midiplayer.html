@@ -32,10 +32,12 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/es.png" alt="" /> Español</li>
+<li><a href="../../id/applications/midiplayer.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/midiplayer.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/applications/midiplayer.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/applications/midiplayer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../fr/applications/midiplayer.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/midiplayer.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/midiplayer.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/midiplayer.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pl/applications/midiplayer.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
@@ -59,6 +61,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">La traducción de esta página aún no está completa. Hasta que lo esté, las partes sin traducir se muestran en el inglés original.</div>
 
 <h2><img src="../../images/apps-images/midiplayer-icon_64.png" alt="midiplayer-icon_64.png" width="64" height="64" />MidiPlayer</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -69,8 +72,8 @@
 <p><br /></p>
 <p>Como el nombre sugiere, el Reproductor de MIDIs (MidiPlayer) se utiliza para reproducir archivos de música MIDI. Los archivos MIDI son especiales, pues no contienen la música propiamente codificada de alguna manera y digitalizada, sino más bien una descripción de ella: Mantenga esta nota por tanto tiempo a este volumen y use el instrumento X por un momento.<br />
 Mientras esto mantiene los tamaños de los archivos bastante pequeños, también resulta que dependiendo de la biblioteca de instrumentos (la llamada "SoundFont"), los resultados pueden variar en gran manera. También estos SoundFonts suelen ser grandes, y aumentan aún más con el número y calidad de las muestras de instrumentos.</p>
-<div class="box-info"><p>Haiku no incluye un SoundFont instalado, porque son tan grandes y generalmente son pocas las personas que requieren uno. La mayoría de los que la requieren, ya tienen SoundFonts personalizados y de alta calidad. Para poder escuchar <i>algo</i> puede instalar uno gratuito desde un paquete opcional. En la Terminal, ingrese: <tt>installoptionalpackage TimGMSoundFont</tt></p>
-<p>Para utilizar cualquier otro SoundFont, debe crear un enlace a él en <tt>/boot/system/data/synth</tt> y nombrarlo <tt>big_synth.sy</tt>.</p></div>
+<div class="box-info"><p>Haiku releases include a small but relatively high quality SoundFont. People who use MIDI more seriously often already have very high quality or custom SoundFonts.</p>
+<p>To use other SoundFonts (that don't come installable via HaikuDepot as a HPKG), just copy the .sf file to e.g. <tt>~/config/non-packaged/data/synth/</tt>. You can select the active SoundFont in the Media preferences under <span class="menu">MIDI</span>.</p></div>
 <img src="../images/apps-images/midiplayer.png" alt="midiplayer.png" />
 <p>La interfaz del Reproductor de MIDIs es muy sencilla. Solamente debe hacer doble clic o arrastrar un archivo MIDI al programa y se inicia la reproducción. El volumen se controla con el deslizador y añade efectos de reverberación desde el menú emergente <span class="menu">Reverb</span>. 
 

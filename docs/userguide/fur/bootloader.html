@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fur" xml:lang="fur">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2019, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Fabio Tomat
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Il Boot Loader</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/fur.png" alt="" /> Furlan</li>
+<li><a href="../id/bootloader.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
+<li><a href="../ca/bootloader.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../de/bootloader.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+<li><a href="../es/bootloader.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../fr/bootloader.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../it/bootloader.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../hu/bootloader.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../pl/bootloader.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
+<li><a href="../pt_PT/bootloader.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../pt_BR/bootloader.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../ro/bootloader.html"><img src="../images/flags/ro.png" alt="" />Română</a></li>
+<li><a href="../sk/bootloader.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../fi/bootloader.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sv_SE/bootloader.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../zh_CN/bootloader.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../ru/bootloader.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../uk/bootloader.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../jp/bootloader.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+</ul>
+<span>
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="filesystem-layout.html">Filesystem layout</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h1>Il Boot Loader</h1>
+
+<p>Lis opzions dal Boot Loader di Haiku a puedin judâ cuant che si à a ce fâ un problemis di hardware opûr cuant che si à plui instalazions di Haiku e si desidere sielzi cuale instalazion di Haiku fâ partî (par esempli un CD di instalazion o une clavute USB). Al è ancje utile se si à instalât un component software che al impedìs di inviâ Haiku e duncje di gjavâlu, viôt la <a href="#troubleshooting">Risoluzion dai problemis</a> chi sot.</p>
+<p>Par jentrâ tes Opzions dal Boot Loader, tu âs di tignî fracât il tast <span class="key">MAIUSC</span> prime che al tachi il procès di inviament di Haiku. Se al è instalât un gjestôr di inviament, tu puedis tacâ a tignî fracât <span class="key">MAIUSC</span> prime di invocâ la vôs dal menù par Haiku. Se Haiku al è l'unic sisteme operatîf inte machine, tu puedis tacâ a fracâ il tast bielzà cuant che tu viodis i messaçs di inviament dal BIOS.</p>
+<div class="box-info">Sui computer che a doprin UEFI pal inviament al puest dal classic BIOS, tu scugnis doprâ invezit la <span class="key">SBARE DI SPAZI</span>.</div>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="options" name="options">Opzions dal Boot Loader</a></h2>
+<p>Une volte lì, ti si presentin cuatri menù:</p>
+<table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
+<tr><td><b>Select boot volume</b></td><td> </td><td>Sielç cuâl stât/instalazion di Haiku fâ partî (viôt la <a href="#troubleshooting">Risoluzion dai problemis</a> chi sot).</td></tr>
+<tr><td><b>Select safe mode options</b></td><td> </td><td>A son diviersis opzions di provâ tal câs di un probleme hardware o se il sisteme al devente instabil o no si pues inviâ par vie di un compuartament sbaliât di un component zontât. Cuant che si sposte la sbare di selezion suntune opzion, e ven fûr une curte spiegazion in bas tal schermi.</td></tr>
+<tr><td></td><td></td><td>
+	<p><span class="menu">Safe mode</span><br />
+		Al met il sisteme in modalitât sigure. Chest al pues jessi abilitât in maniere indipendente di altris opzions.</p>
+	<p><span class="menu">Disable user add-ons</span><br />
+		Al impedìs il cjariament di dutis lis zontis (add-on) instaladis dal utent. Dome lis zontis inte cartele di sisteme a vignaran dopradis. Viôt la <a href="#troubleshooting">Risoluzion dai problemis</a> chi sot.</p>
+	<p><span class="menu">Disable IDE DMA</span><br />
+		Al disabilite il DMA dal IDE, aumentant la compatibilitât IDE al cost des prestazions.</p>
+	<p><span class="menu">Ignore memory beyond 4 GiB</span><br />
+		Al ignore dute la memorie che e supere il limit di direzion di 4 GiB, passant parsore de impostazion tal file des impostazions dal kernel.
+</p>
+	<p><span class="menu">Use fail-safe graphics driver</span><br />
+		Il sisteme al doprarà la modalitât VESA e no cirarà di doprâ nissun driver grafic di schede video.</p>
+	<p><span class="menu">Disable IO-APIC</span><br />
+		Al disabilite l'ûs dal IO APIC pal indreçament dai interrupt, sfuarçant invezit l'ûs dal PIC vecje maniere.</p>
+	<p><span class="menu">Disable local APIC</span><br />
+		Al disabilite l'ûs dal APIC locâl, al disabilite ancje il SMP.</p>
+	<p><span class="menu">Disable SMP</span><br />
+		Al disabilite ducj i cûrs de CPU infûr di un.</p>
+	<p><span class="menu">Don't call the BIOS</span><br />
+		Al ferme il sisteme dal clamâ lis funzions dal BIOS.</p>
+	<p><span class="menu">Disable APM</span><br />
+		Al disabilite il supuart hardware dal Advanced Power Management (gjestion alimentazion avanzade), passant parsore de impostazion APM tal file des impostazions dal kernel.</p>
+	<p><span class="menu">Disable ACPI</span><br />
+		Al disabilite il supuart hardware dal Advanced Configuration and Power Interface (configurazion avanzade e interface di alimentazion), passant parsore de configurazion ACPI intal file des impostazions dal kernel.</p>
+	<p><span class="menu">Blacklist entries</span><br />
+		Al permet di selezionâ i file di sisteme che si à di ignorâ. Util p.e. par disabilitâ i driver in mût temponi. Viôt la <a href="#troubleshooting">Risoluzion dai problemis</a> chi sot.</p></td></tr>
+<tr><td><b>Select debug options</b></td><td> </td><td>Chi tu cjatarâs diviersis opzions che a judin cul debug o a vê detais par fâ une <a href="../../welcome/en/bugreports.html">segnalazion di erôr</a>. Di gnûf, une curte spiegazion par ogni opzion e ven mostrade in bas.</td></tr>
+<tr><td></td><td></td><td>
+	<p><span class="menu">Enable serial debug output</span><br />
+		Al ative il mandâ fûr l'output dal syslog te interface seriâl (predefinît: 115200, 8N1).</p>
+	<p><span class="menu">Enable on screen debug output</span><br />
+		Mostre l'output dal debug sul schermi intant che si invie il sisteme, invezit che il normâl logo di inviament.</p>
+	<p><span class="menu">Disable on screen paging</span><br />
+		Al disabilite il paging cuant che la jessude dal debug su schermi e je abilitade.</p>
+	<p><span class="menu">Enable debug syslog</span><br />
+		Al abilite, par cheste session, un buffer dal syslog in-memorie speciâl, che il boot loader al rivarà a acedi daspò vê tornât a inviâ il sisteme.</p>
+	<p><span class="menu">Display current boot loader log</span><br />
+		Al mostre lis informazions di debug che il boot loader al à regjistrât (frache <span class="key">Q</span> par jessî dal regjistri)</p>
+	<p><span class="menu">Add advanced debug option</span><br />
+		Al permet di inserì, in maniere direte, opzions di debug avanzadis.</p></td></tr>
+<tr><td></td><td></td><td>Se <span class="menu">Enable debug syslog</span> al è ativât, un tornâ a inviâ a cjalt daspà un colàs, al mostre chestis opzions adizionâls:</td></tr>
+<tr><td></td><td></td><td>	<p><span class="menu">Save syslog from previous session during boot</span><br />
+		Al salve il syslog de session precedente di Haiku su <span class="path">/var/log/previous_syslog</span> cuant che si invie.</p>
+	<p><span class="menu">Display syslog from previous session</span><br />
+		Al mostre il syslog de session precedente di Haiku.</p>
+	<p><span class="menu">Save syslog from previous session</span><br />
+		Al salve il syslog de session precedente di Haiku sul disc. Pal moment a son supuartâts dome volums FAT32.</p></td></tr>
+<tr><td class="onelinetop"><b>Select screen resolution</b></td><td> </td><td>Ti permet di sfuarçâ une cierte risoluzion di sisteme e profonditât di colôr.</td></tr>
+</table>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="troubleshooting" name="troubleshooting">Risoluzion dai problemis</a></h2>
+<p>Se Haiku al refude di inviâsi sul vuestri hardware dal inizi, prove a stabilî opzions diferentissot di <span class="menu">Select safe mode options</span>. Considere la idee di inviâ une <a href="../../welcome/en/bugreports.html">segnalazion di erôr</a> in ogni câs.</p>
+<p>Di chê altre bande, se Haiku al tache a dâ problemis dome dopo vê instalât cualchi software, specialmentri driver hardware, tu âs diviersis opzions par vê di gnûf Haiku funzionant cussì di podê disinstalâ il pachet incriminât:</p>
+<ul>
+<li><p>Ativant <span class="menu">Safe mode</span> si impedirà ae plui part dai servidôrs, demonis e il UserBootscript di jessi inviâts.</p></li>
+<li><p>Ativant <span class="menu">Disable user add-ons</span> si impedirà l'ûs di cualsisei zonte (add-on) (driver, tradutôrs, e vie indenant) che tu âs instalât inte gjerarchie utent sot de tô cartele Home.</p></li>
+<li><p>Se ativant <span class="menu">Use fail-safe graphics driver</span> al risolf i tiei problemis cessant ae grafiche VESA, tu puedis rindi permanente la impostazion lant a gjavâ il <tt>#</tt> de rie <i>#fail_safe_video_mode true</i> intal file di test <span class="path">/boot/home/config/settings/kernel/drivers/kernel</span>.</p></li>
+<li><p>Se il driver incriminât, o la zonte e vie indenant, al è instalât te gjerarchie dal sisteme, lis robis a diventin un tic plui complicadis, parcè che chê aree e je in dome-leture. Chi, il <span class="menu">Blacklist entries</span> al jentre in zûc. Cun chel, tu puedis navigâ su dute la gjerarchie dal sisteme e disabilitâ il component che fâs damps segnant une vôs cul tast <span class="key">SPAZI</span> o <span class="key">INVIE</span>. <span class="key">ESC</span> ti fâs tornâ insù di un nivel ae cartele superiôr.</p>
+<p>In rêt, al è l'articul <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a> che al mostre ce mût fâ in mût di mantignî lis modifichis.</p></li>
+<li><p>Sot di <span class="menu">Select boot volume</span> tu puedis specificâ cuale "version" precedente di Haiku inviâ. Ogni volte che tu dis/instalis un pachet, il stât vecjo al ven salvât etu puedis inviâlu sielzintlu de liste presentade intes opzions dal boot loader.<br />
+Cussì, se ti si presentin problemis di inviament dopo vê instalât cualchi pachet, invie un stât di Haiku precedent a chê volte e disinstale il pachet incriminât.</p></li>
+</ul>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="booting" name="booting">Inviament di Haiku</a></h2>
+<p>Dopo vê ativât une o plui opzions, si torne al menù principâl e si continue l'inviament, che si presentarà cun cheste videade di inviament:</p>
+<img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
+
+<p>Se dut al va ben, si impie un simbul daûr di chel altri.<br />
+I simbui diferents a corispuindin sù par jù a chestis fasis:</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>Inizializazion dai modui.</td></tr>
+	<tr><td><b>Disc + lint di ingrandiment</b></td><td> </td><td>Creazion di rootfs (<span class="path">/</span>) e montaç di devfs (<span class="path">/dev</span>).</td></tr>
+	<tr><td><b>Schede interne</b></td><td> </td><td>Inizializazion dal gjestôr dai dispositîfs.</td></tr>
+	<tr><td><b>Disc di inviament</b></td><td> </td><td>Montaç dal disc di inviament.</td></tr>
+	<tr><td><b>Microchip</b></td><td> </td><td>Cjariament dai modui specifics de CPU.</td></tr>
+	<tr><td><b>Cartele</b></td><td> </td><td>Inizializazion finâl dal sot-sisteme.</td></tr>
+	<tr><td><b>Missil</b></td><td> </td><td>Launch_daemon al à inviât il sisteme.</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="filesystem-layout.html">Filesystem layout</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

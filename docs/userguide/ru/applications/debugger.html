@@ -4,17 +4,19 @@
 <head>
 <!-- 
  *
- * Copyright 2015-2018, Haiku. All rights reserved.
+ * Copyright 2015-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Vsevolod
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Debugger</title>
+	<title>Отладчик (Debugger)</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
@@ -28,11 +30,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/ru.png" alt="" /> Русский</li>
+<li><a href="../../id/applications/debugger.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/debugger.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/applications/debugger.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/applications/debugger.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/applications/debugger.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/applications/debugger.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/debugger.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/debugger.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/debugger.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pl/applications/debugger.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
@@ -58,7 +62,7 @@
 <div>
 <div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
-<h2><img src="../../images/apps-images/debugger-icon_64.png" alt="debugger-icon_64.png" width="64" height="64" />Debugger</h2>
+<h2><img src="../../images/apps-images/debugger-icon_64.png" alt="debugger-icon_64.png" width="64" height="64" />Отладчик (Debugger)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Расположение в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Приложения (Applications)</span></td></tr>
 <tr><td>Расположение в Tracker:</td><td></td><td><span class="path">/boot/system/apps/Debugger</span></td></tr>
@@ -72,9 +76,9 @@
 <ul>
 <li><p><span class="button">Terminate</span> will clean up after the crashed app but otherwise does nothing further.</p></li>
 <li><p><span class="button">Debug</span> will start the Debugger for further investigation.</p></li>
-<li><p><span class="button">Write core file</span> creates a possibly huge dump of the system's state. Better attach a regular debug report first when submitting a bug report and only provide a core file on request.</p></li>
 <li><p><span class="button">Save report</span> creates a debug report which is saved as a text file on the Desktop and can be emailed to the developer of the crashed app or attached to a ticket at its bugtracker, if available.<br />
 The debug report contains information on your hardware (type of CPU and used memory etc.), the exact version of Haiku and all available information on the state of the system that could be relevant to the crash.</p></li>
+<li><p><span class="button">Write core file</span> creates a possibly huge dump of the system's state. Better attach a regular debug report first when submitting a bug report and only provide a core file on request.</p></li>
 </ul>
 <p>The default action when a crash happens can be configured with a text file <span class="path">~/config/settings/system/debug_server/settings</span>.<br />
 The file takes on a driver_settings style format as follows:</p>
@@ -111,7 +115,7 @@ executable_actions {
 </div>
 <div class="nav">
 <div class="inner"><span>
- «  <a href="codycam.html">CodyCam</a> 
+ «  <a href="codycam.html">Вебкамера (CodyCam)</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Приложения</a> 
 ::  <a href="deskcalc.html">Калькулятор (DeskCalc)</a>  »
 </span></div>

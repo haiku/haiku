@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2012-2016, Haiku, Inc. All rights reserved.
+ * Copyright 2012-2019, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,11 +31,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/sk.png" alt="" /> Slovenčina</li>
+<li><a href="../id/workshop-wlan.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/workshop-wlan.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/workshop-wlan.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/workshop-wlan.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/workshop-wlan.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/workshop-wlan.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/workshop-wlan.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/workshop-wlan.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/workshop-wlan.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/workshop-wlan.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -65,29 +67,19 @@
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Obsah</td></tr>
 <tr class="index"><td>
-	<a href="#firmware">Ako rozchodiť podporovaný hardvér</a><br />
-	<a href="#gui">Ako sa pripojiť k bezdrôtovej sieti</a><br />
-	<a href="#commandline">Ako sa pripojiť z príkazového riadka</a><br />
-	<a href="#tips">Tipy</a>
+	<a href="#gui">Joining a wireless network</a><br />
+	<a href="#commandline">Joining from the command line</a><br />
+	<a href="#firmware">Getting supported hardware to work</a><br />
+	<a href="#tips">Tips</a>
 </td></tr>
 </table>
 
 <h1>Workshop: Bezdrôtová sieť</h1>
 
-<p>Rozchodenie bezdrôtovej siete je nevyhnutné v dnešnej dobe neustáleho sieťového pripojenia. Pretože udržiavanie aktuálnej podpory rozličného a neustále sa meniaceho hardvéru a ovládačov je pre malý projekt celkom nemožné, Haiku sa pri implementácii sieťových ovládačov spolieha na vrstvu kompatibility <a href="http://www.freebsd.org">FreeBSD</a>.<br />
-Tá nám zabezpečuje obrovské množstvo podporovaného hardvéru, hoci zrejme nie 100% všetkých, ktoré existujú. Pozrite si online <a href="https://www.haiku-os.org/guides/daily-tasks/wireless#hardware-notes">zoznam podporovaných modelov</a> alebo sa pozrite do <a href="http://www.freebsd.org/releases/11.1R/hardware.html#WLAN">Poznámok o hardvéri FreeBSD 11.1</a>.</p>
+<p>Getting the networking to run is essential in today's need for permanent internet connection. As keeping up to date with all the different and ever changing hardware and drivers is quite impossible for a small project, Haiku relies on a <a href="http://www.freebsd.org">FreeBSD</a> compatibility layer for its networking drivers.<br />
+This ensures a massive amount of supported hardware, though probably not 100% of what's out there. See <a href="http://www.freebsd.org/releases/12.0R/hardware.html#wlan">FreeBSD 12.0's release hardware notes</a> for a list of supported models.</p>
 <div class="box-info">Momentálne sa očakáva, že budú fungovať iba zariadenia PCI, PCI-X, PCI-Express, Mini PCI a Mini PCI-Express.<br />
 Zariadenia PCMCIA, CardBus, ExpressCard, USB a ISA ešte vyžadujú ďalšiu prácu, než budú funkčné.</div>
-
-<h2>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="firmware" name="firmware">Ako rozchodiť podporovaný hardvér</a></h2>
-<p>Hoci sme prvú prekážku všeobecne podporovaného hardvéru prekonali, niektoré bezdrôtové ovládače vyžadujú binárne moduly firmvéru, aby správne fungovali. Haiku nemôže distribuovať niektoré z týchto proprietárnych súborov firmvéru z licenčných dôvodov. Haiku však obsahuje jednoduchý skript, ktorý stiahne a nainštaluje všetky proprietárne súbory za vás. Vo všeobecnosti, ak plánujete používať bezdrôtovú sieť, odporúča sa spustiť tento skript, aby ste zabezpečili, že váš systém má všetok tento firmvér k dispozícii, keď ho budete potrebovať.</p>
-<p>Otvorte Terminál a napíšte:</p>
-<pre class="terminal">install-wifi-firmwares.sh</pre>
-<p>Teraz si prečítajte licencie a prijmite ich, aby sa nainštalovali všetky dostupné súbory firmvéru.</p>
-
-<p>Ak nemáte prístup k internetu, aby ste mohli stiahnuť tieto súbory s firmvérom v Haiku, existuje aj offline spôsob, pozri <a href="#tips">tipy</a> below.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -116,17 +108,20 @@ Výstup zobrazuje verejné meno (SSID), MAC adresu, silu signálu a spôsob over
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="tips" name="tips">Tipy</a></h2>
-<h3>Offline stiahnutie binárnych súborov s firmvérom</h3>
+<a id="firmware" name="firmware">Ako rozchodiť podporovaný hardvér</a></h2>
+<p>All supported modern wireless hardware works out of the box.</p>
+
+<p>A few quite old chipsets (Intel 2100/2200/2225/2915, Broadcom 43xx, Marvell 88w8335) require binary firmware modules that Haiku cannot include due to licensing issues, though. To get these wireless cards to work, a simple script is included which will retrieve and install all of the needed proprietary bits for you.</p>
+<p>Otvorte Terminál a napíšte:</p>
+<pre class="terminal">install-wifi-firmwares.sh</pre>
+<p>Teraz si prečítajte licencie a prijmite ich, aby sa nainštalovali všetky dostupné súbory firmvéru.</p>
+
 <p>If you cannot obtain the binary firmware files via the <tt>install-wifi-firmwares.sh</tt> script (for example due to lack of internet connection within Haiku), you can also download <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt">this shell script</a>, and run it from another OS that has <tt>wget</tt> and <tt>zip</tt> installed.<br />
 Windows users need to have <a href="http://gnuwin32.sourceforge.net/packages/wget.htm">wget</a> and <a href="http://gnuwin32.sourceforge.net/packages/zip.htm">zip</a> for Windows installed in their default locations and use <a href="https://www.haiku-os.org/files/download-data-for-wlan-firmwares.bat">this batch script</a>.<br />
 The script will download the needed files and create a zip file that is to be extracted to Haiku's <tt>/boot</tt>. Once unpacked, open a Terminal and type:</p>
 <pre class="terminal">install-wifi-firmwares.sh</pre>
 <p>Review the licenses and accept them to install all of the now available firmware files.</p>
-<h3>Predchádzanie strate spojenia</h3>
-<p>Haiku's drivers for some WLAN chipsets like the iprowifi4965 are prone to lose connection when using WPA encryption. If you're affected by that, try to disable the "HT mode" (high throughput, 802.11n) before connecting to a network:</p>
-<pre class="terminal">ifconfig /dev/net/iprowifi4965/0 -ht</pre>
-<p>If that fixes the problem, put the line into <span class="path">~/config/settings/boot/UserBootscript</span> to have it applied automatically every boot-up.</p>
+
 </div>
 </div>
 

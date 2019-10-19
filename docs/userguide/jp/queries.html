@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,11 +31,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/jp.png" alt="" /> 日本語</li>
+<li><a href="../id/queries.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/queries.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/queries.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/queries.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/queries.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/queries.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/queries.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/queries.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/queries.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/queries.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -112,7 +114,7 @@
 <p>これにより、テキストボックスの左側にポップアップメニューを、また下側に<span class="button">追加 (Add)</span> と<span class="button">削除 (Remove)</span> ボタンを追加します。メニューから、クエリする属性を決めます。<span class="button">追加 (Add)</span> および<span class="button">削除 (Remove)</span> ボタンで追加の属性のクエリや、再びそれらを削除できます。これらの属性は、AND/OR で論理的にリンクできます。</p>
 <p>例として、メールをクエリしましょう。</p>
 <img src="images/queries-images/query-window-filled.png" alt="query-window-filled.png" />
-<p>件名が "vibraphone" あるいは "skepticality" である、過去 2 か月に Clara Botter が送信したすべてのメールを探している場合、検索ウィンドウはこのようになります。<br />ごらんのように、時間ベースの属性を介した検索は、いくつかの便利なフレーズをサポートしています。"last 2 months (最後の 2 ヶ月)" に加えて、"today (今日)"、"yesterday (昨日)"、"Monday (月曜日)"、"last Monday" (先週の月曜日になるでしょう)、または "last 2 minutes/hours/days/weeks (最後の 2 分間/時間/日/週)" も使えます。<br />
+<p>件名が "sufflé" あるいは "impossible" である、過去 2 か月に Clara Oswald が送信したすべてのメールを探している場合、検索ウィンドウはこのようになります。<br />ごらんのように、時間ベースの属性を介した検索は、いくつかの便利な表現をサポートしています。"last 2 months (過去 2 ヶ月)" に加えて、"today (今日)"、"yesterday (昨日)"、"Monday (月曜日)"、"last Monday" (先週の月曜日になるでしょう)、または "last 2 minutes/hours/days/weeks (過去 2 分間 / 時間 / 日 / 週)" も使えます。<br />
 検索結果の数を減らすのに良い方法です。</p>
 
 <h2>
@@ -121,7 +123,7 @@
 <p>式クエリの手入力はとっつきにくく、かつ、まったく非実用的です。にもかかわらず、それには用途があります。
 
 </p>
-<p>上記の、vibraphone などに関する Clara のメールの属性によるクエリを例にとります。属性と検索語がすべて確定された場合に、<span class="menu">式で検索 (by Formula)</span> モードへの変更を試みると、この 1 行のクエリ文字列に圧倒されるでしょう。</p>
+<p>上記の、sufflé などに関する Clara のメールの属性によるクエリを例にとります。属性と検索語がすべて確定された場合に、<span class="menu">式で検索 (by Formula)</span> モードへの変更を試みると、この 1 行のクエリ文字列に圧倒されるでしょう。</p>
 <img src="images/queries-images/formula-query.png" alt="formula-query.png" />
 <p>読みやすく編集されたテキストとしてもう一度。</p>
 <pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [bB][oO][tT][tT][eE][rR][sS]*")
@@ -132,7 +134,7 @@
 <p>何に使えるでしょうか。</p>
 <ul>
 <li><p>メール、フォーラム、あるいは IRC に、文字列をコピーし貼り付けることで、ほかの人が使ったり、デバッグできたりするかもしれません。</p></li>
-<li><p>この方法を使って、<span class="menu">Attribute</span> モードでクエリを構築した後、<span class="menu">Formula</span> モードへ変更して、ターミナルのクエリあるいはスクリプトに使用する検索文字列を簡単に生成できます。</p></li>
+<li><p>この方法を使って、<span class="menu">Attribute</span> モードでクエリを構築した後、<span class="menu">Formula</span> モードへ変更して、検索文字列を楽に生成できます。シングルクオートで囲むと、この文字列はターミナル中の <span class="cli">query</span> コマンドで使用できます。</p></li>
 <li><p>必要なところへの括弧の挿入や、部分的に大文字小文字を区別することや、修正により論理結合を否定 (例:NOT AND のために "<tt>==</tt>" を "<tt>!=</tt> に変える) することでクエリを微調整できます。必要とすることは、<a href="http://ja.wikipedia.org/wiki/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE" class="external free" title="Wikipedia: Regular expression">正規表現</a>に対する基本的な理解と、たぶんいくつかのスクリプトの基本だけです。</p></li>
 </ul>
 

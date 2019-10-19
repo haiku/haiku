@@ -31,11 +31,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/zh_CN.png" alt="" />  中文 ［中文］</li>
+<li><a href="../../id/applications/midiplayer.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/midiplayer.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/applications/midiplayer.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/applications/midiplayer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/applications/midiplayer.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/applications/midiplayer.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/midiplayer.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/midiplayer.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/midiplayer.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pl/applications/midiplayer.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
@@ -59,6 +61,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <h2><img src="../../images/apps-images/midiplayer-icon_64.png" alt="midiplayer-icon_64.png" width="64" height="64" />Midi播放器</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -69,8 +72,8 @@
 <p><br /></p>
 <p>如其名称所说，Midi播放器用于播放 midi 音乐文件。Midi 文件比较特别，它们实际的数字化和其他编码方式的音乐，但是仅为它的一个描述： Hold this note for that long with this volume and use instrument X for it.<br />
 这样可以使文件非常小，而且根据乐器库的不同（所谓的“声音字体”），其结果相差很大。并且，随着乐器样本的数量的增加和质量的提升，声音字体可能会变得非常之大。</p>
-<div class="box-info"><p>Haiku 并没有安装声音字体，这是因为它们都非常大，而且很少人会用到。大部分用到的用户，已经有了高质量或自定义的声音字体。为了能够听听<i>某些东西</i>，您可以通过附加包安装自由的声音字体。进入终端，输入：<tt>installoptionalpackage TimGMSoundFont</tt></p>
-<p>为了使用任何其他声音字体，在 <tt>/boot/system/data/synth</tt> 中为其创建一个链接，然后将其命名为 <tt>big_synth.sy</tt>。</p></div>
+<div class="box-info"><p>Haiku releases include a small but relatively high quality SoundFont. People who use MIDI more seriously often already have very high quality or custom SoundFonts.</p>
+<p>To use other SoundFonts (that don't come installable via HaikuDepot as a HPKG), just copy the .sf file to e.g. <tt>~/config/non-packaged/data/synth/</tt>. You can select the active SoundFont in the Media preferences under <span class="menu">MIDI</span>.</p></div>
 <img src="../images/apps-images/midiplayer.png" alt="midiplayer.png" />
 <p>Midi播放器的界面非常简单。仅需双击或者拖拽 midi 文件，即可启动播放。您可以使用滑块控制音量，并且从 <span class="menu">混响效果</span> 弹出菜单中添加混响效果。激活滚动将会在顶端显示示波器样式的虚拟效果。</p>
 

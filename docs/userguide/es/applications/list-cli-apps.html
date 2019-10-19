@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2017, Haiku. All rights reserved.
+ * Copyright 2010-2018, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,10 +31,12 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/es.png" alt="" /> Español</li>
+<li><a href="../../id/applications/list-cli-apps.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/list-cli-apps.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/applications/list-cli-apps.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/applications/list-cli-apps.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../fr/applications/list-cli-apps.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/list-cli-apps.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/list-cli-apps.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/list-cli-apps.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pl/applications/list-cli-apps.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
@@ -52,7 +54,7 @@
 
 <span>
 <a href="../applications.html#cli-apps" class="uplink">Applications</a>
-::  <a href="cli-apps.html">Haiku-specific commands</a>  »
+::  <a href="cli-apps.html">Haiku-specific commands</a>  »
 </span></div>
 </div>
 
@@ -86,8 +88,7 @@ A continuación se muestra una lista de todas las aplicaciones de línea de coma
 <tr><td><tt>beep</tt></td><td> </td><td>Emite un pitido.</td></tr>
 <tr><td><tt>bunzip2</tt></td><td> </td><td>Vea <tt>bzip2</tt>.</td></tr>
 <tr><td><tt>bzip2</tt></td><td> </td><td>Compresor de archivos.</td></tr>
-<tr><td><tt>c++</tt></td><td> </td><td>Compilador de C.</td></tr>
-<tr><td><tt>cal</tt></td><td> </td><td>muestra un calendario.</td></tr>
+<tr><td><tt>c++</tt></td><td> </td><td>C++-Compiler.</td></tr>
 <tr><td><tt>cat</tt></td><td> </td><td>concatena archivos y muestra a la salida estandar.</td></tr>
 <tr><td><tt>catattr</tt></td><td> </td><td>Muestra el contenido de los atributos de un archivo. <a href="cli-apps.html">(específico a Haiku)</a></td></tr>
 <tr><td><tt>cc</tt></td><td> </td><td>Compilador de C.</td></tr>
@@ -100,11 +101,9 @@ A continuación se muestra una lista de todas las aplicaciones de línea de coma
 <tr><td><tt>chroot</tt></td><td> </td><td>Ejecuta una orden dentro de un directorio raíz especificado.</td></tr>
 <tr><td><tt>cksum</tt></td><td> </td><td>Imprime suma de comprobación CRC y conteo de bytes de archivos.</td></tr>
 <tr><td><tt>clear</tt></td><td> </td><td>Limpia la ventana de la terminal.</td></tr>
-<tr><td><tt>clockconfig</tt></td><td> </td><td>Imprime la configuración del reloj.</td></tr>
 <tr><td><tt>cmp</tt></td><td> </td><td>Compara archivos byte por byte.</td></tr>
 <tr><td><tt>collectcatkeys </tt></td><td> </td><td>[Remanente del traslado de locale-kit.] </td></tr>
 <tr><td><tt>comm</tt></td><td> </td><td>Compara archivos ordenados línea por línea.</td></tr>
-<tr><td><tt>compress</tt></td><td> </td><td>programa de compresión de datos.</td></tr>
 <tr><td><tt>consoled</tt></td><td> </td><td>Daemon de la consola.</td></tr>
 <tr><td><tt>copyattr</tt></td><td> </td><td>Copia todos los atributos o un subconjunto de ellos de uno o más archivos a otro o a nuevo archivo(s). <a href="cli-apps.html">(específico a Haiku)</a></td></tr>
 <tr><td><tt>cp</tt></td><td> </td><td>Copia archivos y directorios.</td></tr>
@@ -145,7 +144,6 @@ A continuación se muestra una lista de todas las aplicaciones de línea de coma
 <tr><td><tt>fmt</tt></td><td> </td><td>Reformatea los párrafos de un archivo.</td></tr>
 <tr><td><tt>fold</tt></td><td> </td><td>Ajusta las lineas de entrada de un archivo.</td></tr>
 <tr><td><tt>fortune</tt></td><td> </td><td>Imprime un adagio, posiblemente interesante, al azar.</td></tr>
-<tr><td><tt>frcode</tt></td><td> </td><td>Invocado por updatedb para comprimir la lista de nombres de archivos.</td></tr>
 <tr><td><tt>freetype-config</tt></td><td> </td><td>Muestra información de vinculado y compilado de FreeType.</td></tr>
 <tr><td><tt>fstrim</tt></td><td> </td><td>Envía una orden TRIM a una unidad SSD.</td></tr>
 <tr><td><tt>ftp</tt></td><td> </td><td>Programa de transferencia de archivos.</td></tr>
@@ -153,9 +151,7 @@ A continuación se muestra una lista de todas las aplicaciones de línea de coma
 <tr><td><tt>funzip</tt></td><td> </td><td>Extrae el primer elemento de un archivo comprimido.</td></tr>
 <tr><td><tt>fwcontrol</tt></td><td> </td><td>Programa de control para FireWire.</td></tr>
 <tr><td><tt>gawk</tt></td><td> </td><td>Lenguaje de rastreo de patrones y procesamiento.</td></tr>
-<tr><td><tt>gdb</tt></td><td> </td><td>depurador GNU.</td></tr>
 <tr><td><tt>getarch</tt></td><td> </td><td>Muestra la versión del compilador del entorno.</td></tr>
-<tr><td><tt>getlimits</tt></td><td> </td><td>Imprime limites dependientes de plataforma en un formato útil para scripts de intérprete de comandos.</td></tr>
 <tr><td><tt>grep</tt></td><td> </td><td>Busca por patrón.</td></tr>
 <tr><td><tt>groups</tt></td><td> </td><td>Imprime la afiliación de grupos de cada usuario.</td></tr>
 <tr><td><tt>gunzip</tt></td><td> </td><td>Vea <tt>gzip</tt>.</td></tr>
@@ -166,7 +162,6 @@ A continuación se muestra una lista de todas las aplicaciones de línea de coma
 <tr><td><tt>hey</tt></td><td> </td><td>Una pequeña herramienta útil al hacer scripts con aplicaciones de interfaz gráfica de usuario.</td></tr>
 <tr><td><tt>hostname</tt></td><td> </td><td>Imprime o establece el nombre de host del sistema.</td></tr>
 <tr><td><tt>id</tt></td><td> </td><td>Imprime información de usuario y de grupo.</td></tr>
-<tr><td><tt>ident</tt></td><td> </td><td>Identifica palabras clave RCS en archivos.</td></tr>
 <tr><td><tt>ifconfig</tt></td><td> </td><td>Configura una interface de red.</td></tr>
 <tr><td><tt>install</tt></td><td> </td><td>Copia archivos a un destino sin perturbar el sistema en ejecución.</td></tr>
 <tr><td><tt>install-wifi-firmwares.sh</tt></td><td> </td><td>Instala firmware para varias tarjetas de red inalámbricas.</td></tr>
@@ -206,7 +201,6 @@ A continuación se muestra una lista de todas las aplicaciones de línea de coma
 <tr><td><tt>mbox2mail</tt></td><td> </td><td>Convierte archivos de mailbox de Unix a archivos de correo electrónico de BeOS.</td></tr>
 <tr><td><tt>md5sum</tt></td><td> </td><td>Imprime o revisa sumas de comprobación MD5.</td></tr>
 <tr><td><tt>media_client</tt></td><td> </td><td>"media_client play" reproduce archivos de audio.</td></tr>
-<tr><td><tt>merge</tt></td><td> </td><td>Hace combinación de archivo de tres vías.</td></tr>
 <tr><td><tt>message</tt></td><td> </td><td>Imprime un archivo BMessage aplanado. </td></tr>
 <tr><td><tt>mimeset</tt></td><td> </td><td>Establece el tipo MIME de un archivo.</td></tr>
 <tr><td><tt>mkdepend</tt></td><td> </td><td>Generador de dependencias de archivo makefile.</td></tr>
@@ -223,7 +217,6 @@ A continuación se muestra una lista de todas las aplicaciones de línea de coma
 <tr><td><tt>mountvolume</tt></td><td> </td><td>Monta un volumen por su nombre.</td></tr>
 <tr><td><tt>mv</tt></td><td> </td><td>Mueve/cambia el nombre de un archivo.</td></tr>
 <tr><td><tt>nano</tt></td><td> </td><td>El editor de texto predeterminado en la Terminal, un clon de 'Pico'. </td></tr>
-<tr><td><tt>netcat</tt></td><td> </td><td>utilidad TCP y UDP.</td></tr>
 <tr><td><tt>netstat</tt></td><td> </td><td>Imprime conexiones de red, tablas de enrutamiento, estadísticas de interfaz, conexiones enmascaradas y afiliaciones multidifusión.</td></tr>
 <tr><td><tt>nl</tt></td><td> </td><td>Imprime cada archivo con números de línea añadidos.</td></tr>
 <tr><td><tt>nohup</tt></td><td> </td><td>Ejecuta una orden ignorando señales de colgado.</td></tr>
@@ -258,7 +251,6 @@ A continuación se muestra una lista de todas las aplicaciones de línea de coma
 <tr><td><tt>reindex</tt></td><td> </td><td>Pone atributos de archivos eixtentes en índices nuevamente creados. <a href="cli-apps.html">(específico a Haiku)</a></td></tr>
 <tr><td><tt>release</tt></td><td> </td><td>Libera un semáforo.</td></tr>
 <tr><td><tt>renice</tt></td><td> </td><td>Altera la prioridad de un proceso en ejecución.</td></tr>
-<tr><td><tt>rlog</tt></td><td> </td><td>Imprime historial de mensajes y otra información sobre archivos RCS.</td></tr>
 <tr><td><tt>rm</tt></td><td> </td><td>Elimina archivos y directorios.</td></tr>
 <tr><td><tt>rmattr</tt></td><td> </td><td>Elimina un atributo de un archivo. <a href="cli-apps.html">(específico a Haiku)</a></td></tr>
 <tr><td><tt>rmdir</tt></td><td> </td><td>Elimina directorios.</td></tr>
@@ -275,7 +267,6 @@ A continuación se muestra una lista de todas las aplicaciones de línea de coma
 <tr><td><tt>settype</tt></td><td> </td><td>Establece el tipo MIME de un archivo, su firma y aplicación predilecta.</td></tr>
 <tr><td><tt>setversion</tt></td><td> </td><td>Muestra la versión de un archivo.</td></tr>
 <tr><td><tt>setvolume</tt></td><td> </td><td>Establece el volumen de sonido del sistema.</td></tr>
-<tr><td><tt>setwep</tt></td><td> </td><td>Provides WEP encryption for wireless networks. </td></tr>
 <tr><td><tt>sh</tt></td><td> </td><td>Vea <tt>bash</tt>. </td></tr>
 <tr><td><tt>sha1sum</tt></td><td> </td><td>Imprime o revisa sumas de control SHA1. </td></tr>
 <tr><td><tt>shar</tt></td><td> </td><td>Crea archivos de intérprete de comandos.</td></tr>
@@ -363,7 +354,7 @@ A continuación se muestra una lista de todas las aplicaciones de línea de coma
 <div class="nav">
 <div class="inner"><span>
 <a href="../applications.html#cli-apps" class="uplink">Aplicaciones</a>
-::  <a href="cli-apps.html">Haiku-specific commands</a>  »
+::  <a href="cli-apps.html">Haiku-specific commands</a>  »
 </span></div>
 </div>
 

@@ -30,11 +30,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/pl.png" alt="" /> Polski</li>
+<li><a href="../../id/preferences/virtualmemory.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/preferences/virtualmemory.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/preferences/virtualmemory.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/preferences/virtualmemory.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/preferences/virtualmemory.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/preferences/virtualmemory.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/preferences/virtualmemory.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/preferences/virtualmemory.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/preferences/virtualmemory.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_PT/preferences/virtualmemory.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
@@ -56,23 +58,22 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tłumaczenie tej strony jest niekompletne. Nieukończone części wyświetlane są w języku angielskim.</div>
 
 <h2><img src="../../images/prefs-images/virtualmemory-icon_64.png" alt="virtualmemory-icon_64.png" width="64" height="64" />PamięćWirtualna</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferencje</span></td></tr>
 <tr><td>Ścieżka:</td><td></td><td><span class="path">/boot/system/preferences/VirtualMemory</span></td></tr>
 <tr><td>Ustawienia:</td><td></td><td><span class="path">~/config/settings/kernel/drivers/virtual_memory</span><br />
-<span class="path">~/config/settings/VM_data</span> - Stores the panel's window position.</td></tr>
+<span class="path">~/config/settings/VM_data</span> – przechowuje pozycję okna panelu</td></tr>
 </table>
-<p>Virtual memory let's the system swap out memory to harddisk, if the RAM can be used more sensibly for other things. So, even if you have lots of RAM, providing virtual memory is never a bad idea.</p>
+<p>Pamięć wirtualna pozwala systemowi zrzucać fragmenty pamięci operacyjnej na dysk twardy, jeżeli pamięć RAM może być wykorzystana w lepszy sposób do innych rzeczy. Z tego względu ustawienie obszaru wymiany jest dobrym pomysłem, nawet jeśli komputer ma zainstalowaną dużą ilość RAM-u.</p>
 <img src="../images/prefs-images/virtualmemory.png" alt="virtualmemory.png" />
-<p>You can set the size to even more than your physical memory size if needed. With today's huge harddisks, assigning the physical memory size shouldn't be a problem. Still, you can quickly adjust the size if your free space ever runs low. In that case you should also have a look at <a href="../applications/diskusage.html">DiskUsage</a> to find out what's eating up your diskspace.</p>
-<p>Normally, the swap file's written to your boot partition. If you often run into disk thrashing due to the virtual memory system swapping memory in and out, you can try to use a separate harddisk for you swap file. Simply another partition on the same harddisk with your system/data won't help.<br />
-Upgrading your RAM is of course the most effective way to go...</p>
+<p>Rozmiar obszaru wymiany może być nawet większy niż ilość dostępnej pamięci RAM. Przy dzisiejszych pojemnościach dysków twardych, przypisanie takiej ilości nie powinno być problemem. Zawsze możesz prosto dostosować rozmiar, jeżeli zaczyna brakować miejsca na dysku. W takim przypadku warto również rzucić okiem na aplikację <a href="../applications/diskusage.html">DiskUsage</a>, która wskaże pliki zajmujące go najwięcej.</p>
+<p>Standardowo plik wymiany zostaje zapisany na partycji rozruchowej. Jeżeli często zauważasz problem nadmiernej pracy dysku z powodu ciągłej wymiany pamięci między dyskiem twardym a RAM-em, możesz spróbować użyć osobnego dysku do przechowywania pliku wymiany. Osobna partycja na tym samym dysku nie pomoże.<br />
+Oczywiście, najbardziej efektywne będzie zainstalowanie dodatkowej pamięci RAM...</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="button">Przywróć domyślne </span></td><td> </td><td>ustawia domyślne wartości dla każdego z pól.</td></tr>
-<tr><td><span class="button">Cofnij</span></td><td> </td><td>brings back the settings that were active when you started the VirtualMemory preferences.</td></tr>
+<tr><td><span class="button">Cofnij</span></td><td> </td><td>przywraca ustawienia aktywne w momencie uruchomienia panelu preferencji.</td></tr>
 </table>
 
 </div>

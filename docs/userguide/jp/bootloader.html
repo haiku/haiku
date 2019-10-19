@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2018, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,11 +31,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/jp.png" alt="" /> 日本語</li>
+<li><a href="../id/bootloader.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/bootloader.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/bootloader.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/bootloader.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/bootloader.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/bootloader.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/bootloader.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/bootloader.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/bootloader.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -62,8 +64,9 @@
 
 <h1>ブートローダー</h1>
 
-<p>Haiku のブートローダーオプションは、ハードウェア周りに関連した問題に悩んだ場合や、Haiku を複数インストールしていて (おそらくインストール CD 上あるいは USB メモリ上の Haiku)、そのいずれかを選択する場合に役立ちます。また、あるソフトウェアコンポーネントをインストールしたもののそれが正しく動作せず、システムの起動を妨げてしまう場合にもそれは役立ちます。以下の<a href="#troubleshooting">トラブルシューティング</a>を見てください。</p>
+<p>Haiku のブートローダーオプションは、ハードウェア周りの問題で悩んだ場合や、Haiku を複数インストールしていて (おそらくインストール CD 上あるいは USB メモリ上の Haiku)、そのいずれかを選択する場合に役立ちます。また、あるソフトウェアコンポーネントをインストールしたもののそれが正しく動作せず、システムの起動を妨げてしまう場合にもそれは役立ちます。以下の<a href="#troubleshooting">トラブルシューティング</a>を見てください。</p>
 <p>ブートローダーオプションに入るには、Haiku の起動プロセスが始まる前に <span class="key">SHIFT</span> キーを押し続ける必要があります。ブートマネージャーがインストールされているなら、Haiku のブートエントリーを実行する前に <span class="key">SHIFT</span> を押し続ける動作を始めても構いません。Haiku がそのマシンの唯一のオペレーティングシステムであれば、BIOS からのブートメッセージがまだ表示されている状態から SHIFT キーを押し続ける動作を始められます。</p>
+<div class="box-info">昔からの BIOS でなく UEFI をブートに使用しているコンピューター上では、代わりに <span class="key">SPACEBAR</span> を押してください。</div>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="options" name="options">ブートローダーオプション</a></h2>
@@ -81,7 +84,7 @@
 	<p><span class="menu">Ignore memory beyond 4 GiB</span><br />
 		4 GiB アドレス限界を超えるすべてのメモリを無視します。カーネル設定ファイル中の設定を上書きします。</p>
 	<p><span class="menu">Use fail-safe graphics driver</span><br />
-		システムは VESA モードを使用し、どのビデオグラフィックドライバーも使用しようとはしません。</p>
+		システムは VESA モードを使用し、どのビデオグラフィックドライバーも使用しません。</p>
 	<p><span class="menu">Disable IO-APIC</span><br />
 		割り込みルーティング用の IO APIC の使用を無効にし、従来の PIC を使用します。</p>
 	<p><span class="menu">Disable local APIC</span><br />
@@ -136,10 +139,10 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="booting" name="booting">Haiku のブート</a></h2>
-<p>1 つ以上のオプションを有効にしてメインメニューに戻り、起動を続行すると、このブートスクリーンが表示されます:</p>
+<p>オプションを 1 つ以上有効にしてメインメニューに戻り、起動を続行すると、このブートスクリーンが表示されます:</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
-<p>すべてが順調に進むと、各シンボルが次々に点灯します。<br />
+<p>すべてが順調に進むと、シンボルが次々に点灯します。<br />
 それぞれのシンボルは大まかに次のブートステージに対応します:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><b>原子</b></td><td style="width:10px;"> </td><td>モジュールの初期化</td></tr>

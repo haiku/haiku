@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2018, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,11 +31,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/jp.png" alt="" /> 日本語</li>
+<li><a href="../id/tracker.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/tracker.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/tracker.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/tracker.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/tracker.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/tracker.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/tracker.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/tracker.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/tracker.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/tracker.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -58,7 +60,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 
 <table class="index" id="index" summary="index">
@@ -129,7 +130,7 @@
 <ul>
 <li><p><span class="menu">アイコン表示 (Icon view)</span> (<span class="key">ALT</span> <span class="key">1</span>) - 大きいアイコンで表示します。サブメニューからサイズを変更できます。また、<span class="key">ALT</span> <span class="key">+</span>/<span class="key">-</span> で、アイコンを拡大縮小できます。</p></li>
 <li><p><span class="menu">ミニアイコン表示 (Mini icon view)</span> (<span class="key">ALT</span> <span class="key">2</span>) - 小さいアイコンで表示します。</p></li>
-<li><p><span class="menu">List view</span> (<span class="key">ALT</span> <span class="key">3</span>) - A detailed list of your files enabling you to show/hide file attributes. (See topic <a href="attributes.html">Attributes</a>.) From the submenu you can choose to use either mini or large icons.</p></li>
+<li><p><span class="menu">一覧表示 (List view)</span> (<span class="key">ALT</span> <span class="key">3</span>) - ファイルを詳細リストで表示します。また、利用可能な<i>属性</i>を表示または非表示にできます (<a href="attributes.html">属性</a>のトピックを見てください)。</p></li>
 </ul>
 <p><span class="menu">ウィンドウ (Window)</span> メニューはほかに多くの機能を提供します。</p>
 <ul>
@@ -178,10 +179,15 @@
 <br /><br />
 <img src="images/tracker-images/open-with-preferred.png" alt="open-with-preferred" />
 <p>ここで、再びサブメニューにプログラムのリストを見つけるでしょう。1 つのファイルを選択して、<span class="button">関連づけて開く (Open and make preferred)</span> ボタンをクリックすると、そのファイルタイプ (ここでは <tt>text/plain</tt>) を持つすべてのファイルに対する優先アプリケーションを変更できます。</p></li>
-<li><span class="menu">詳細情報… (Get info)</span>
-<br /><br />
+<li><span class="menu">詳細情報</span>
+<p>これは、ファイルのメタデータを表示し、アクセス権を編集するパネルを開きます。ファイルをリネームするには、一番上のファイル名上でクリックします。</p>
 <img src="images/tracker-images/get-info.png" alt="get-info" />
-<p>このパネルでは、選択されたファイルの情報の表示およびデフォルトアプリケーションの設定が行えます。また、パネルの一部を拡げると、ファイルのパーミッションおよび所有者を設定できます。パスをクリックすると、Tracker ウィンドウ中にファイルを選択します。</p></li>
+<p>パネルは3つのタブに別れます:</p>
+<ul>
+<li><span class="menu">情報 (Information)</span>: サイズ、作成日 / 更新日、ファイルタイプ及び場所のようないつものデータを表示します。 ロケーションパスをクリックすると、ファイルの親フォルダーが開きます。<span class="menu">指定アプリケーションで開く (Open with)</span> メニューは、この特定のファイルを開く推奨のアプリケーションを設定します。</li>
+<li><span class="menu">アクセス権 (Permissions)</span>: オーナー、グループ、およびファイルのアクセス権を変更します。</li>
+<li><span class="menu">属性 (Attibutes)</span>: すべての追加属性を、その値と形と共に一覧します。</li>
+</ul></li>
 <li><p><span class="menu">名前の変更 (Edit name)</span>, <span class="menu">複製 (Duplicate)</span>、<span class="menu">ごみ箱に移動 (Move to Trash)</span> - ファイル名の編集、ファイルの複製、または選択したファイルをごみ箱へ移動できます。</p></li>
 <li><p><span class="menu">次へ移動 (Move to)</span>、<span class="menu">次へコピー (Copy to)</span>、<span class="menu">指定先にリンクを作成 (Create link)</span> - サブメニューナビゲーション方法を使用して、選択したファイルの移動、コピー、またはリンクができます。メニューを起動する間に <span class="key">SHIFT</span> を押し続けると、相対リンクを作成するオプションを提供します。</p></li>
 <li><p><span class="menu">切り取り (Cut)</span>、<span class="menu">コピー (Copy)</span>、<span class="menu">貼り付け (Paste)</span> - クリップボードを使ってファイルのカット、コピー、そしてペーストができます。メニューを起動する間に <span class="key">SHIFT</span> を押し続けることによって、おそらく別のフォルダーからファイルを<span class="menu">さらにコピー / 切り取り (Copy/Cut more)</span> でき、後でほかのどこかにペーストできます。さらに、<span class="key">SHIFT</span> を押し続ける間、クリップボードにコピーされたファイルをリンクとしてペーストできます。</p></li>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -30,11 +30,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/uk.png" alt="" /> Українська</li>
+<li><a href="../id/queries.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/queries.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/queries.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/queries.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/queries.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/queries.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/queries.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/queries.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/queries.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/queries.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -57,6 +59,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Переклад даної сторінки ще неповний. Допоки це так, незавершені частини користайте у англійському варіанті. </div>
 
 
 <table class="index" id="index" summary="index">
@@ -111,10 +114,9 @@
 <p>Це додасть зліва випадаючі меню та кнопки <span class="button">Додати (Add)</span> та <span class="button">Видалити (Remove)</span> під ними.  У меню Ви зможете вибирати атрибути пошуку. За допомогою кнопок <span class="button">Додати (Add)</span> та <span class="button">Видалити (Remove)</span> Ви можете додати до запиту додаткові атрибути або назад видалити їх. Ці атрибути можуть бути логічно пов'язані між собою за допомогою  кнопок Та (And) / Або (Or).</p>
 <p>Зробимо це для запиту пошти як у прикладі:</p>
 <img src="images/queries-images/query-window-filled.png" alt="query-window-filled.png" />
-<p>Це Ваше вікно Пошук (Find) при пошуку листів від Clara Botters відправлених протягом останніх  двох місяців що мали у темі слова "вібрафон" або "скептицизм".<br />
-Як ви бачите, пошук по атрибутам на основі часу підтримує деякі корисні фрази: замість "за останні 2 місяці", ви можете також використовувати "сьогодні", "вчора", "понеділок" або " минулого понеділка" (понеділок минулого тижня), або "останні 2 хвилини / години / дні / тижні". <br />
-Хороший спосіб скоротити кількість результатів пошуку.
-</p>
+<p>This is your Find window when you're looking for all emails Clara Oswald has sent to you in the last two months that had in the subject "sufflé" or "impossible".<br />
+As you see, searching through time-based attributes supports some useful phrases: besides for the "last 2 months", you could also use "today", "yesterday", "Monday" or "last Monday" (which would be the Monday last week), or "last 2 minutes/hours/days/weeks".<br />
+A good way to cut down the number of search results.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -123,15 +125,15 @@
 <p>Візьміть вище запит по атрибуту листів Клари щодо вібрафон і т.д. Якщо у вас встановлені всі атрибути та умови їх пошуку, спробуйте перейти до режиму <span class="menu">за формулою (by Formula)</span> та перевантажте рядок запиту цієї однієї лінії :</p>
 <img src="images/queries-images/formula-query.png" alt="formula-query.png" />
 <p>Ще раз як текст, відредагований для зручності читання:</p>
-<pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [bB][oO][tT][tT][eE][rR][sS]*")
+<pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [oO][sS][wW][aA][lL][dD]*")
        &amp;&amp;(MAIL:when&gt;=%2 months%))
-       &amp;&amp;(MAIL:subject=="*[vV][iI][bB][rR][aA][pP][hH][oO][nN][eE]*"))
-       ||(MAIL:subject=="*[sS][kK][eE][pP][tT][iI][cC][aA][lL][iI][tT][yY]*"))
+       &amp;&amp;(MAIL:subject=="*[sS][uU][fF][fF][lL][éÉ]*"))
+       ||(MAIL:subject=="*[iI][mM][pP][oO][sS][sS][iI][bB][lL][eE]*"))
        &amp;&amp;(BEOS:TYPE=="text/x-email"))</pre>
 <p>Що ж робити?</p>
 <ul>
 <li><p>Ви можете скопіювати і вставити рядок в електронну пошту, форум або IRC іншим для використання або відладки.</p></li>
-<li><p>Ви можете використовувати цей метод для побудови запиту в режимі <span class="menu">за атрибутом</span>, а тоді переключитись до пошуку <span class="menu">за формулою</span> щоб згенерувати зручний пошуковий рядок для використання у Терміналі або сценарії.</p></li>
+<li><p>You can use this method to construct a query in <span class="menu">Attribute</span> mode and then switch to <span class="menu">Formula</span> mode, to comfortably generate a search string. Enclosed in single quotes, that string can then be used with the <span class="cli">query</span> command in the Terminal.</p></li>
 <li><p>Ви можете точно налаштувати запит, вставивши круглі дужки, де це необхідно, зробити деталі чутливими до регістру або звести нанівець логічні комбінації шляхом заміни, наприклад, "<tt>==</tt>" на "<tt>!=</tt>" для NOT AND. Все, що вам потрібно, це базове розуміння <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression">регулярних виразів</a> та можливо, розуміння основ створення сценарії.</p></li>
 </ul>
 

@@ -30,11 +30,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/pl.png" alt="" /> Polski</li>
+<li><a href="../../id/applications/stylededit.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/stylededit.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/applications/stylededit.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/applications/stylededit.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/applications/stylededit.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/applications/stylededit.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/stylededit.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/stylededit.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/stylededit.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_PT/applications/stylededit.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
@@ -57,7 +59,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tłumaczenie tej strony jest niekompletne. Nieukończone części wyświetlane są w języku angielskim.</div>
 
 <h2><img src="../../images/apps-images/stylededit-icon_64.png" alt="stylededit-icon_64.png" width="64" height="64" />StyledEdit</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -66,9 +67,9 @@
 <tr><td>Ustawienia:</td><td></td><td><i>brak</i></td></tr>
 </table>
 <p><br /></p>
-<p>StyledEdit is Haiku's simple text editor. Although it saves files in plain text format, additional attributes are written in order to have limited formatting capabilities when viewed with StyledEdit.</p>
+<p>StyledEdit jest prostym edytorem tekstu. Mimo że zapisuje pliki jako czysty tekst, korzysta również z dodatkowych atrybutów umożliwiając ograniczone formatowanie, gdy plik wyświetlany jest w StyledEdit.</p>
 <img src="../images/apps-images/stylededit.png" alt="stylededit.png" />
-<p>If you're interested, this is what those additional attributes look like when examined in Terminal with <span class="cli">listattr</span>:</p>
+<p>Wyżej wspomniane atrybuty wyglądają w poniższy sposób, wyświetlone w Terminalu komendą <span class="cli">listattr</span>:</p>
 <pre class="terminal">~&gt; listattr /boot/home/Desktop/test.txt
 File: /boot/home/Desktop/test.txt
   Type         Size                 Name
@@ -80,10 +81,10 @@ MIME String         11  "BEOS:TYPE"
    Raw Data       1048  "styles"
 
 1071 bytes total in attributes.</pre>
-<p>As you can see, all the formatting options from StyledEdit's menu are present: line wrapping (on/off) and alignment (left/center/right), each in one attribute. Styles (font, size, color) of each letter mangled into another.</p>
-<div class="box-info">Because these attributes are a file system feature of BFS, this means that not only other platforms just see a plain text file, it also follows, that the formatting will be lost when a file is stored on a non-BFS partition. The above attributes are simply stripped and what's left is the ordinary, plain text file.</div>
-<p>In any case, it's a nice idea having the possibility of colored text in different fonts and sizes while still being a normal text file. A <span class="cli">ReadMe.txt</span>, for example, is therefore readable in a shell on any platform and still has a bit of style when viewed via double-click from Haiku.</p>
-<p>Actually using StyledEdit is so simple, we'll skip explaining every mundane menu item. Just write down your text then select the words you'd like to format and apply font, size and color from the <span class="menu">Font</span> menu. Line wrapping and alignment from the <span class="menu">Document</span> menu only work on the whole file.</p>
+<p>Jak widać, obecne są wszystkie opcje formatowania dostępne w menu StyledEdit: zawijanie linii (wł./wył.) i wyrównanie (do lewej/do środka/do prawej), każda we własnym atrybucie. Styl (font, rozmiar, kolor) każdej litery jest złączony w jednym polu.</p>
+<div class="box-info">Ze względu na to, że atrybuty są funkcjonalnością systemu plików BFS, inne platformy zobaczą tylko czysty tekst. Ponadto skopiowanie pliku na partycję z innym systemem plików spowoduje utratę formatowania. Atrybuty po prostu nie zostaną skopiowane i pozostanie wyłącznie zwykły plik zawierający sam tekst.</div>
+<p>W każdym razie, możliwość kolorowania tekstu zapisanego różnymi fontami o różnych rozmiarach w zwykłym pliku tekstowym jest niezłym pomysłem. Przykładowo, dzięki temu plik <span class="cli">ReadMe.txt</span> jest czytelny w powłoce na każdej platformie i nadal zawiera formatowanie, gdy jest wyświetlany na Haiku.</p>
+<p>Korzystanie ze StyledEdit jest na tyle proste, że nie ma tutaj wyjaśnienia każdej pojedynczej opcji w menu. Po prostu napisz kilka słów, zaznacz część z nich i zmień ich font, rozmiar oraz kolor wybierając je z menu <span class="menu">Font</span>. Zawijanie linii i wyrównanie z menu <span class="menu">Dokument</span> działają tylko na całym pliku.</p>
 
 </div>
 </div>

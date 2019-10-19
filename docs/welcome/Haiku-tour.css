@@ -1,0 +1,54 @@
+/*
+ * Copyright 2019, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *		Augustin Cavalier <waddlesplash>
+ */
+
+/* Some headers act as anchors, don't give them a hover effect */
+h1 a:hover, a:active {
+	text-decoration: none;
+	color: #0c3762;
+}
+
+.navdots a {
+	font-weight: normal;
+	text-decoration: none;
+}
+
+.navdots a:hover, a:active {
+	color: #dc3c01;
+}
+
+.navdots a {
+	color: white;
+}
+
+.navdots acronym, .navdots a {
+	text-decoration: none;
+}
+
+acronym.current-page {
+	color: #892601;
+}
+
+x-topic {
+	display:block;
+	position: relative;
+	min-height: calc(100vh - 100px);
+	margin-bottom: 5vh;
+	padding-bottom: 100px;
+}
+
+div.further {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	color: silver;
+	background: #f8f8f8;
+	border-top: dotted thin #a0a0a0;
+	padding: 5px;
+}
+

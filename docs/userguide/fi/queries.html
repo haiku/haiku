@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -30,11 +30,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/fi.png" alt="" /> Suomi</li>
+<li><a href="../id/queries.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/queries.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/queries.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/queries.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/queries.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/queries.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/queries.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/queries.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/queries.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/queries.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -111,7 +113,7 @@ Mikä parempaa, sinun ei tarvitse kaksoisnapsauttaa kyselyn tekemiseksi uudellee
 <p>Tämä lisää ponnahdusvalikon teksti-ikkunan vasemmalle puolelle ja painikkeet <span class="button">Lisää</span> ja <span class="button">Poista</span> sen alle. Valikosta voi valita, että mitä attribuuttia kyselee. Painikkeilla <span class="button">Lisää</span> ja <span class="button">Poista</span> voit kysellä lisäattribuutteja ja poistaa niitä taas. Nämä attribuutit linkitetään loogisesti binaarilogiikan AND- tai OR-tiloilla.</p>
 <p>Tehkäämme sähköpostikysely esimerkkinä:</p>
 <img src="images/queries-images/query-window-filled.png" alt="query-window-filled.png" />
-<p>Tämä on Haku-ikkunasi, kun etsit kaikkia niitä sähköpostiviestejä, jotka Clara Botters on lähettänyt sinulle viimeisen kahden kuukauden aikana ja joissa aiheena on "vibraphone" tai "skepticality".<br />
+<p>Tämä on Haku-ikkunasi, kun etsit kaikkia niitä sähköpostiviestejä, jotka Clara Botters on lähettänyt sinulle viimeisen kahden kuukauden aikana ja joissa aiheena on "sufflé" tai "impossible".<br />
 Kuten näet, aikaperustaisten attribuuttien kautta hakeminen tukee joitakin hyödyllisiä lauseita: paitsi "viimeiset 2 kuukautta", voisit käyttää myös "tänään", "eilen", "maanantai" tai "viime maanantai" (mikä olisi maanantai viime viikolla), tai "viimeiset 2 minuuttia/tuntia/päivää/viikkoa".<br />
 Hyvä tapa rajoittaa hakutulosten lukumäärää.</p>
 
@@ -122,15 +124,15 @@ Hyvä tapa rajoittaa hakutulosten lukumäärää.</p>
 <p>Ota yllä oleva kysely attribuutilla Claran niistä sähköpostiviesteistä, jotka koskevatt vibrafonista jne. Jos sinulla on kaikki attribuutit ja niiden hakutermit asetettuna, yritä vaihtaa <span class="menu">Kaavalla</span>-tilaan ja saat näkyviin tämän yksirivisen kyselymerkkijonon:</p>
 <img src="images/queries-images/formula-query.png" alt="formula-query.png" />
 <p>Vielä kerran kun teksti on muokattu luettavammaksi:</p>
-<pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [bB][oO][tT][tT][eE][rR][sS]*")
+<pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [oO][sS][wW][aA][lL][dD]*")
        &amp;&amp;(MAIL:when&gt;=%2 months%))
-       &amp;&amp;(MAIL:subject=="*[vV][iI][bB][rR][aA][pP][hH][oO][nN][eE]*"))
-       ||(MAIL:subject=="*[sS][kK][eE][pP][tT][iI][cC][aA][lL][iI][tT][yY]*"))
+       &amp;&amp;(MAIL:subject=="*[sS][uU][fF][fF][lL][éÉ]*"))
+       ||(MAIL:subject=="*[iI][mM][pP][oO][sS][sS][iI][bB][lL][eE]*"))
        &amp;&amp;(BEOS:TYPE=="text/x-email"))</pre>
 <p>Mihin käyttöön?</p>
 <ul>
 <li><p>Voisit kopioida ja liittää merkkijonon sähköpostiviestiin, foorumille tai IRC-kanavalle toisten käyttöön vianjäljitystä varten.</p></li>
-<li><p>Voit käyttää tätä menetelmää kyselyn rakentamiseki <span class="menu">Attribuutti</span>-tilassa ja vaihtaa sitten <span class="menu">Kaava</span>-tilaan hakumerkkijonojen helpompaa tuottamista varten Pääteikkunassa tai skriptissä käyttöä varten.</p></li>
+<li><p>Voit käyttää tätä menetelmää kyselyn rakentamiseksi <span class="menu">Attribuutti</span>-tilassa ja vaihtaa sitten <span class="menu">Kaava</span>-tilaan hakumerkkijonojen helpompaa tuottamista varten. Yksittäislainausmerkillä ympäröityä merkkijonoa voi sitten käyttää <span class="cli">kysely</span>-komennossa Pääteikkunassa.</p></li>
 <li><p>Voit hienosäätää kyselyäsi lisäämällä lainausmerkkejä milloin tarvetta ilmenee, tekemällä osan kirjainkoosta riippuvaksi tai muuttamalla loogisen yhdistelmän negaatioksi "<tt>==</tt>"-muodosta "<tt>!=</tt>"-muotoon NOT AND. Tarvitset ainoastaan <a href="http://fi.wikipedia.org/wiki/S%C3%A4%C3%A4nn%C3%B6llinen_lauseke" class="external free" title="Wikipedia: Säännöllinen lauseke">säännöllisten lausekkeiden</a> ja ehkä joidenkin skriptausperusteiden ymmärtämistä.</p></li>
 </ul>
 

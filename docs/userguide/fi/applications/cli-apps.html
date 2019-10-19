@@ -31,11 +31,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/fi.png" alt="" /> Suomi</li>
+<li><a href="../../id/applications/cli-apps.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/cli-apps.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/applications/cli-apps.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/applications/cli-apps.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/applications/cli-apps.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/applications/cli-apps.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/cli-apps.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/cli-apps.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/cli-apps.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pl/applications/cli-apps.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
@@ -58,7 +60,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Haiku-kohtaiset komentorivisovellukset</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -103,10 +104,10 @@ Haluaisitko linkittää sen?" "Työpöydälle" "Työpöytäpalkkiin" "Ei kiitos"
 <td valign="top"><p><span class="cli">hey</span> on pieni aputyökalu, joka lähettää BMessage-viestit sovellukseen ja tulostaa niiden vastauksen. Sitä voidaan käyttää sovellusskriptaukseen, toisin sanoen sovelluksen  määritellyin ”kauko-ohjaukseen” skriptistä tai komentoriviltä. Sen käyttö on hiukan mutkikasta... <a href="https://www.haiku-os.org/blog/humdinger/2017-11-05_scripting_the_gui_with_hey/">Humdingerin blogikirjoitus</a> palvelee hyvänä esittelynä, ja Scot Hackerin BeOS-raamatussa on perusteellinen <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey-oppikurssi</a>, jonka tekijä on Chris Herborth.</p>
 </td></tr>
 <tr><td><p><span class="cli">notify</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">notify</span> shows a notification panel with a message. There are various parameters that are described when you call <span class="cli">notify --help</span>. A notification can also be used to show the progress of some action. When doing that, it's important to set a <i>messageID</i> and always use it when you update the progress (a float between 0.0 and 1.0 that's printed as percent). Otherwise you'll see several notification panels if you update quicker then the set timeout.<br />
-An example:</p>
-<pre class="terminal">notify --type progress --group "--group" --title "--title" --icon /boot/home/bebook.hvif \
---messageID MyMessageID --progress .75 "Keep waiting"</pre>
+		<td valign="top"><p><span class="cli">notify</span> näyttää ilmoituspaneelin viestillä. Paneelille on eri parametreja, jotka kuvataan, kun kutsut ohjelmaa: <span class="cli">notify --help</span>. Ilmoitusta voidaan käyttää myös näyttämään jonkun toiminnon edistymistä. Kun teet niin, on tärkeää asettaa <i>messageID</i> ja käyttää sitä aina kun päivität edistymistä (liukuluku välillä 0.0 ... 1.0 tulostetaan prosentteina). Muussa tapauksessa näet useita ilmoituspaneeleja, jos päivität nopeammin, aseta silloin aikavalvonta.<br />
+Esimerkki:</p>
+<pre class="terminal">notify --type progress --group "--ryhmä" --title "--otsikko" --icon /boot/home/bebook.hvif \
+--messageID MyMessageID --progress .75 "Jatka odottamista"</pre>
 <p><img src="../images/apps-images/cli-notification.png" alt="cli-notification.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2012-2016, Haiku, Inc. All rights reserved.
+ * Copyright 2012-2019, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -30,10 +30,12 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/es.png" alt="" /> Español</li>
+<li><a href="../id/workshop-wlan.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/workshop-wlan.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/workshop-wlan.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/workshop-wlan.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../fr/workshop-wlan.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/workshop-wlan.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/workshop-wlan.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/workshop-wlan.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/workshop-wlan.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -58,33 +60,25 @@
 
 <div id="content">
 <div>
+<div class="box-info">La traducción de esta página aún no está completa. Hasta que lo esté, las partes sin traducir se muestran en el inglés original.</div>
 
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Contenido</td></tr>
 <tr class="index"><td>
-	<a href="#firmware">Como hacer funcionar hardware compatible</a><br />
-	<a href="#gui">Como unirse a una red inalámbrica</a><br />
-	<a href="#commandline">Como unirse a la red desde la línea de comandos</a><br />
-	<a href="#tips">Consejos</a></td></tr>
+	<a href="#gui">Joining a wireless network</a><br />
+	<a href="#commandline">Joining from the command line</a><br />
+	<a href="#firmware">Getting supported hardware to work</a><br />
+	<a href="#tips">Tips</a>
+</td></tr>
 </table>
 
 <h1>Taller: Redes inalámbricas</h1>
 
-<p>Hoy en día existe una necesidad de tener una conexión permanente a internet, y para ello es esencial tener la red funcionando. La variedad de controladores y dispositivos existentes es amplia y siempre cambiante, y lograr mantener compatibilidad al día es prácticamente imposible para un pequeño proyecto. Por esta razón, Haiku se ampara de una capa de compatibilidad con <a href="http://www.freebsd.org">FreeBSD</a> para sus controladores de red.<br />
-Con esto, se asegura una cantidad masiva de hardware compatible, aunque probablemente no el 100% de lo que hay en el mercado. Vea <a href="https://www.haiku-os.org/guides/daily-tasks/wireless#hardware-notes">esta lista en línea</a> de los modelos compatibles o revise las <a href="http://www.freebsd.org/releases/11.1R/hardware.html#wlan">notas sobre el hardware sobre la versión FreeBSD 11.1</a>.</p>
+<p>Getting the networking to run is essential in today's need for permanent internet connection. As keeping up to date with all the different and ever changing hardware and drivers is quite impossible for a small project, Haiku relies on a <a href="http://www.freebsd.org">FreeBSD</a> compatibility layer for its networking drivers.<br />
+This ensures a massive amount of supported hardware, though probably not 100% of what's out there. See <a href="http://www.freebsd.org/releases/12.0R/hardware.html#wlan">FreeBSD 12.0's release hardware notes</a> for a list of supported models.</p>
 <div class="box-info">Actualmente sólo está previsto que funcionen los dispositivos PCI, PCI-X, PCI-Express, Mini PCI, y Mini PCI-Express.<br />
 Los dispositivos PCMCIA, CardBus, ExpressCard, ISA y USB todavía requieren de trabajo adicional para que puedan ser funcionales.</div>
-
-<h2>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="firmware" name="firmware">Como hacer funcionar hardware compatible</a></h2>
-<p>Aún si se ha superado el primer obstáculo de lograr tener hardware compatible, algunas tarjetas de red inalámbricas requieres módulos de firmware binarios para operar. Haiku no puede incluir algunos de estos archivos de firmware propietarios, debido a temas relativos a la licencia. No obstante, Haiku incluye un pequeño script que obtendrá e instalará todos los componentes necesarios. Generalmente, si planea utilizar redes inalámbricas, es buena idea ejecutar este script para asegurarse que su sistema tenga todos los firmwares disponibles cuando se necesiten.</p>
-<p>Abra una Terminal y escriba:</p>
-<pre class="terminal">install-wifi-firmwares.sh</pre>
-<p>Ahora repase la licencia y aceptela si está de acuerdo para instalar todos los archivos de firmware disponibles.</p>
-
-<p>Si no tiene acceso a internet bajo Haiku para descargar los firmwares faltantes, hay un método para hacerlo fuera de línea, vea los <a href="#tips">Consejos</a> abajo.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -113,17 +107,20 @@ La salida muestra el nombre público (SSID), dirección MAC, intensidad de la se
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="tips" name="tips">Consejos</a></h2>
-<h3>Descarga fuera de línea para archivos de firmware binario</h3>
+<a id="firmware" name="firmware">Como hacer funcionar hardware compatible</a></h2>
+<p>All supported modern wireless hardware works out of the box.</p>
+
+<p>A few quite old chipsets (Intel 2100/2200/2225/2915, Broadcom 43xx, Marvell 88w8335) require binary firmware modules that Haiku cannot include due to licensing issues, though. To get these wireless cards to work, a simple script is included which will retrieve and install all of the needed proprietary bits for you.</p>
+<p>Abra una Terminal y escriba:</p>
+<pre class="terminal">install-wifi-firmwares.sh</pre>
+<p>Ahora repase la licencia y aceptela si está de acuerdo para instalar todos los archivos de firmware disponibles.</p>
+
 <p>En caso que no pudiera obtener los archivos binarios de firmware a través del script <tt>install-wifi-firmwares.sh</tt> (por ejemplo, debido a una falta de conexión de otro tipo desde adentro de Haiku), también puede descargar <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt">este script de intérprete de comandos</a>, y ejecutarlo desde otro sistema operativo que tenga instalados <tt>wget</tt> y <tt>zip</tt>.<br />
 Los usuarios de Windows deberán tener <a href="http://gnuwin32.sourceforge.net/packages/wget.htm">wget</a> y <a href="http://gnuwin32.sourceforge.net/packages/zip.htm">zip</a> para Windows instalados en sus ubicaciones predeterminadas y usar <a href="https://www.haiku-os.org/files/download-data-for-wlan-firmwares.bat">este archivo por lotes</a>.<br />
 Con esto se descargaran los archivos requeridos, y se creará una archivo zip que deberá ser extraído en el directorio <tt>/boot</tt> de Haiku. Una vez desempacado, abra una Terminal e ingrese:</p>
 <pre class="terminal">install-wifi-firmwares.sh</pre>
 <p>Repase las licencias y aceptela si está de acuerdo para instalar los archivos de firmware que estan ahora disponibles.</p>
-<h3>Prevención de Pérdida de Conexión</h3>
-<p>Los controladores de Haiku para algunos chipsets WLAN como el iprowifi4965 están propensos a perder la conexión cuando están usando cifrado WPA. Si se encuentra afectado por ese problema, intente desactivar el "modo HT" (802.11n, alto rendimiento, o "high throughput" por sus siglas en inglés) antes de unirse a la red:</p>
-<pre class="terminal">ifconfig /dev/net/iprowifi4965/0 -ht</pre>
-<p>Si eso resuelve el problema, ponga la línea en <span class="path">~/config/settings/boot/UserBootscript</span> para que sea aplicada automaticamente en cada arranque.</p>
+
 </div>
 </div>
 

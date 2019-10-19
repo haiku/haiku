@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,11 +32,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/fi.png" alt="" /> Suomi</li>
+<li><a href="../id/bugreports.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/bugreports.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/bugreports.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/bugreports.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/bugreports.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/bugreports.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/bugreports.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/bugreports.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/bugreports.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/bugreports.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -57,7 +59,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Hakemisto</td></tr>
@@ -124,7 +125,7 @@ Riippuen siitä mikä kaatui voit yrittää tallentaa kaatumisilmoituksen Työp�
 Huomaa, että KDL-tilassa näppäimistösi ei ehkä toimi. PS/2-näppäimistöt toimivat aina, USB-näppäimistöjen kohdalla se riippuu USB-ohjaimen (UCHI/ECHI) tyypistä. Yleensä näppäimistöt olisi liitettävä suoraan porttiin, ei minkään keskittimen (hub) kautta. Joissakin tilanteissa näppäimistöt toimivat vain jos KDL-tilaan on siirrytty pikanäppäinten avulla vähintään kerran. USB OHCI-näppäimistöä ei tällä hetkellä tueta.</p>
 <p>KDL itse on erään tyyppinen komentotulkki. Käyttäjä voi suorittaa komentoja, jotka tulostavat tietoja järjestelmästä. Seuraavat komennot saattavat olla kiinnostavia:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="cli">bt</span> (eli <span class="cli">sc</span>)</td><td> </td><td>Prints a back trace (aka stack crawl). If the system entered KDL on its on volition, a back trace is normally printed automatically. Enter the command if that didn't happen or part of it is obscured (e.g. when the stack trace is so long that it wrapped around) and your only way of providing the information to developers is by taking a picture of the screen.</td></tr>
+<tr><td><span class="cli">bt</span> (eli <span class="cli">sc</span>)</td><td> </td><td>Tulostaa paluujäljen (eli pinoryöminnän). Jos järjestelmä siirtyy KDL-tilaan omasta tahdostaan, paluujälki tulostetaan tavallisesti automaattisesti. Kirjoita tämä komento, jos näin ei tapahtunut tai osa siitä on vaikeaselkoinen (esimerkiksi kun pinojälki on niin pitkä, että se kiertää ympäri) ja ainoa tapasi tarjota tietoja kehittäjille on näytön valokuvaaminen.</td></tr>
 <tr><td><span class="cli">ints</span></td><td> </td><td>Näyttää käsitellyt ja käsittelemättömät laitteistokeskeytykset.</td></tr>
 <tr><td class="onelinetop"><span class="cli">co</span> (eli <span class="cli">continue</span>)</td><td> </td><td>Jättää järjestelmävianjäljittimen ja jatkaa normaalia järjestelmän toimintaa, jos se on mahdollista.</td></tr>
 <tr><td><span class="cli">reboot</span></td><td> </td><td>Alkulataa järjestelmän välittömästi. Menetät kaiken tallentamattomat tiedot ja vieläpä nuo, jotka on tallennettu, mutta joita ei ole vielä kirjoitettu levylle.</td></tr>
@@ -157,6 +158,7 @@ Yksi tai useampia tekstisivuja näytetään näytölle, vain muutama harva viime
 <tr><td>- <span class="cli">listusb -v</span></td><td> </td><td>Otaksutaan sen olevan USB:hen liittyvä pulma, sama kuin <span class="cli">lsusb</span>.</td></tr>
 <tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>Haikun käyttämään ensisijaiseen järjestelmälokiin tutustumiseksi katso yllä <a href="#syslog">Syslog</a>, joka on kuin vianjäljitys näytölle käynnistyksen aikana. Komennolla <span class="cli">open</span> voit poimia olennaisen osan järjestelmälokista testieditorissa.</td></tr>
 <tr><td class="onelinetop">- <span class="cli">listimage | grep drivers/</span></td><td> </td><td>Luettelee kaikki käytetyt ajurit.</td></tr>
+<tr><td>- <span class="cli">usb_hid_report</span></td><td> </td><td>USB-syötelaitteiden tapauksessa lisää tiedosto <span class="cli">/tmp/usb_hid_report_descriptor_*.bin</span>.</td></tr>
 <tr><td>- <span class="cli">ints</span></td><td> </td><td>Käytettävissä vain <i>Käyttöjärjestelmäytimen vianjäljitysalueella</i> (katso yllä). Näyttää keskeytysten käytön. Eri laitteiden kesken jaettuja keskeytyksiä ei pitäisi olla montaa.</td></tr>
 <tr><td colspan="3">- Vianjäljitystulostuksessa näytölle (turvatilan käynnistysvalitsin, katso <a href="#onscreen">yllä</a>).</td></tr>
 </table>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2017, Haiku. All rights reserved.
+ * Copyright 2008-2018, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -15,6 +15,7 @@
  *		Rodastahm Islamov
  *		Humdinger
  *		Michael Smirnov
+ *		Vsevolod
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -33,11 +34,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="images/flags/ru.png" alt="" /> Русский</li>
+<li><a href="welcome_id.html"><img src="images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="welcome_ca.html"><img src="images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="welcome_de.html"><img src="images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="welcome_en.html"><img src="images/flags/gb.png" alt="" />English</a></li>
 <li><a href="welcome_es.html"><img src="images/flags/es.png" alt="" />Español</a></li>
 <li><a href="welcome_fr.html"><img src="images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="welcome_fur.html"><img src="images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="welcome_it.html"><img src="images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="welcome_hu.html"><img src="images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="welcome_pl.html"><img src="images/flags/pl.png" alt="" />Polski</a></li>
@@ -58,7 +61,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Содержание</td></tr>
@@ -67,50 +69,51 @@
 	<a href="#bugreport">Остерегайтесь ошибок!</a><br />
 	<a href="#system">Знакомство с системой</a><br />
 	<a href="#software">Установка дополнительных программ</a><br />
+	<a href="#update">Обновление Haiku</a><br />
 	<a href="#wifi">Wifi в Haiku</a><br />
 	<a href="#api">Знакомство с API</a><br />
 	<a href="#contact">Желаете пообщаться?</a>
 </td></tr>
 </table>
 
-<h2>
-<a id="welcome" name="welcome">Добро пожаловать в Haiku!</a></h2>
-<p>Thanks for checking out Haiku! This is our fifth public release. We hope to attract new developers to our project and give users a chance to check out Haiku. While this first <i>beta release</i> includes all major features planned for the final Haiku release, it still has many bugs and a few rough edges that need further polishing. However, we think that this release is quite usable and hope it lets you discover Haiku's great potential and that you share our excitement.</p>
+<h1>
+<a id="welcome" name="welcome">Добро пожаловать в Haiku!</a></h1>
+<p>Большое спасибо за проявленный интерес к Haiku! Это наш пятый публичный релиз. Мы надеемся привлечь новых разработчиков к нашему проекту и дать будущим пользователям шанс увидеть Haiku в деле. Хотя этот <i>бета-релиз</i> включает в себя большинство основных функций, запланированных для финальной версии Haiku, в нем все еще много ошибок и есть некоторые аспекты, требующие доработки. Однако мы считаем, что этот релиз вполне пригоден к использованию и надеемся, что он позволит вам заметить большой потенциал Haiku, и вы разделите наш энтузиазм.</p>
 <p>Посетите сайт нашего проекта <a hrf="http://www.haiku-os.org">Haiku-os.org</a> чтобы узнать последние новости и объявления.</p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="bugreport" name="bugreport">Остерегайтесь ошибок!</a></h2>
-<p>We have been working hard to fix potentially critical bugs, however, being a beta release, there are bound to be some left undiscovered.</p>
-<div class="box-warning">We discourage using beta versions as a production system. Your data could be altered, mangled or downright destroyed. Keep up-to-date backups!</div>
+<p>Мы провели тяжёлую работу по выявлению и устранению ошибок ("багов"), однако, так как это бета-релиз, в нём наверняка осталось несколько ненайденных.</p>
+<div class="box-warning">Мы не рекомендуем использовать бета-версии в качестве основной операционной системы. Ваши данные могут быть искажены или даже уничтожены. Не забывайте своевременно делать резервные копии!</div>
 
-<p>One of the main reasons for releasing a beta version is to attract more people to test the system and discover bugs or provide suggestions for future enhancements. Please file bugs and enhancements in our bug tracker after using its search function to avoid duplicates.</p>
+<p>Одной из главных причин для выпуска бета-версии явиляется желание привлечь больше пользователей для тестирования и обнаружения ошибок, а также для получения от них предложений по дальнейшему улучшению Haiku. Пожалуйста, оставляйте отчёты о найденных багах и предложения по улучшению в нашей системе отслеживания ошибок (bug tracker), но только после использования поиска, чтобы избежать дубликатов.</p>
 <ul>
-	<li><a href="https://dev.haiku-os.org/wiki" class="printurl">Haiku Bug Tracker</a></li>
+	<li><a href="https://dev.haiku-os.org/wiki" class="printurl">Система отслеживания ошибок в Haiku (Bug Tracker)</a></li>
 	<li><a href="ru/bugreports.html">Советы по сообщениям об ошибках</a></li>
 </ul>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="system" name="system">Знакомство с системой</a></h2>
-<p>Первые релизы Haiku будут похожи по функционалу и вешнему виду на BeOS R5, которую она и призвана повторить. Если вы никогда не пользовались этой операционной системой, то рекомендуется воспользоваться следующими ссылками:</p>
+<p>Первые релизы Haiku будут похожи по функционалу и вешнему виду на BeOS R5, которую она и призвана повторить. Если вы никогда не пользовались этой операционной системой, то рекомендуем воспользоваться следующими ссылками:</p>
 <ul>
 	<li><a href="../userguide/ru/contents.html">Руководство пользователя Haiku</a></li>
-	<li><a href="https://www.haiku-os.org/community/" class="printurl">Get help and support and become a part of  the community</a></li>
+	<li><a href="https://www.haiku-os.org/community/" class="printurl">Список сайтов о BeOS/Haiku</a></li>
 </ul>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="software" name="software">Установка дополнительных программ</a></h2>
-<p>Most of the available software can be downloaded and installed with the application <a href="../userguide/ru/applications/haikudepot.html">HaikuDepot</a> that comes with Haiku.<br />
-Because of our binary and source compatibility, most BeOS applications run on Haiku. Many of those have been re-packaged for Haiku or still run unmodified. You'll find more information on installing new programs in the user guide's chapter on <a href="../userguide/ru/applications.html">Applications</a>.</p>
-<p>There are several community-based software collections. See the <a href="https://www.haiku-os.org/community/software">Software Sites</a> page on our website.</p>
+<p>Большую часть доступного программного обеспечения можно загрузить и установить с помощью приложения <a href="../userguide/ru/applications/haikudepot.html">Склад</a>, которое поставляется вместе с Haiku.<br />
+Благодаря совместимости на бинарном уровне и на уровне исходных кодов многие BeOS-приложения работают и в Haiku. Многие из них были перепакованы под Haiku или могут запускаться без модификаций. Больше информации об установке новых программ можно найти в главе руководства пользователя о <a href="../userguide/ru/applications.html">Приложениях</a>.</p>
+<p>Существует несколько коллекций приложений, созданных сообществом. Их можно найти в разделе <a href="https://www.haiku-os.org/community/software">Сайты программного обеспечения (Software Sites)</a> на нашем сайте.</p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="update" name="update">Updating Haiku</a></h2>
-<p>Updating Haiku as well as third party packages is done with the application <a href="../userguide/ru/applications/softwareupdater.html">SoftwareUpdater</a>. When it's finished, reboot.<br />
-For more details, see the guide <a href="https://www.haiku-os.org/guides/daily-tasks/updating-system">Updating and downgrading your system</a> on our website.</p>
+<a id="update" name="update">Обновление Haiku</a></h2>
+<p>Обновление Haiku и сторонних пакетов производится при помощи инструмента <a href="../userguide/ru/applications/softwareupdater.html">Обновление приложений (SoftwareUpdater)</a>. После завершения обновления перезагрузите компьютер.<br />
+За более детальной информацией обратитесь к руководству <a href="https://www.haiku-os.org/guides/daily-tasks/updating-system">Обновление и откат системы (Updating and downgrading your system)</a> на нашем сайте.</p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -121,15 +124,15 @@ For more details, see the guide <a href="https://www.haiku-os.org/guides/daily-t
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="api" name="api">Знакомство с интерфейсом программирования приложений (API)</a></h2>
 <p>Так как Haiku повторяет BeOS R5, то и всё, что касается API у них схоже (с некоторыми исключениями), потому документация в BeBook всё ещё актуальна. Благодаря компании ACCESS, которой принадлежат права на интеллектуальную собственность Be Inc., нам позволено распространять BeBook.
-Изменения в BeOS API и Haiku специфические дополнения собраны в Книге Haiku.</p>
+Изменения в BeOS API и дополнения, специфичные для Haiku собраны в Книге Haiku.</p>
 
 <p>Существуют и другие ресурсы, которые должны помочь Вам начать изучение:</p>
 <ul>
-	<li><a href="https://www.haiku-os.org/development/faq" class="printurl">Development FAQ</a></li>
+	<li><a href="https://www.haiku-os.org/development" class="printurl">Начните программировать для Haiku</a></li>
 	<li><a href="http://cgit.haiku-os.org/" class="printurl">Браузер исходного кода </a></li>
-	<li><a href="https://www.haiku-os.org/legacy-docs/bebook/" class="printurl">The Be Book</a></li>
+	<li><a href="https://www.haiku-os.org/legacy-docs/bebook/" class="printurl">BeBook</a></li>
 	<li><a href="https://www.haiku-os.org/docs/api/" class="printurl">Книга Haiku</a></li>
-	<li><a href="https://www.haiku-os.org/legacy-docs/benewsletter/" class="printurl">Be Newsletter Archive</a></li>
+	<li><a href="https://www.haiku-os.org/legacy-docs/benewsletter/" class="printurl">Архив Be Newsletter</a></li>
 </ul>
 
 <h2>
@@ -137,12 +140,12 @@ For more details, see the guide <a href="https://www.haiku-os.org/guides/daily-t
 <a id="contact" name="contact">Желаете пообщаться?</a></h2>
 <p>Вы можете связаться с разработчиками и другими пользователями, присоединившись к обсуждению на IRC (<a href="http://webchat.freenode.net/?channels=haiku">#haiku</a> в вебчате), каналах, нашем форуме или в списках рассылки. Когда множество людей обсуждают что-то вместе, то необходимо соблюдать некоторые правила для сохранения эффективности общения. Пожалуйста, придерживайтесь <a href="http://www.haiku-os.org/community/ml/etiquette">Этикета списков рассылки</a>.</p>
 <ul>
-	<li><a href="https://www.haiku-os.org/community/irc" class="printurl">IRC channels</a></li>
-	<li><a href="https://www.haiku-os.org/forum" class="printurl">Forums</a></li>
-	<li><a href="https://www.freelists.org/list/haiku" class="printurl">General mailing list</a></li>
-	<li><a href="https://www.freelists.org/list/haiku-development" class="printurl">Development mailing list concerning Haiku itself</a></li>
-	<li><a href="https://www.freelists.org/list/haiku-3rdparty-dev" class="printurl">Mailing list for 3rd party application programmers</a></li>
-	<li><a href="https://www.haiku-os.org/community/ml" class="printurl">Overview of all mailing lists</a></li>
+	<li><a href="https://www.haiku-os.org/community/irc" class="printurl">IRC каналы</a></li>
+	<li><a href="https://www.haiku-os.org/forum" class="printurl">Форумы</a></li>
+	<li><a href="https://www.freelists.org/list/haiku" class="printurl">Основной список рассылки</a></li>
+	<li><a href="https://www.freelists.org/list/haiku-development" class="printurl">Список рассылки непосредственных разработчиков Haiku</a></li>
+	<li><a href="https://www.freelists.org/list/haiku-3rdparty-dev" class="printurl">Список рассылки для разработчиков сторонних приложений</a></li>
+	<li><a href="https://www.haiku-os.org/community/ml" class="printurl">Обзор всех списков рассылки</a></li>
 </ul>
 
 </div>

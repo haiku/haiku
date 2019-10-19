@@ -4,11 +4,12 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ *		Kacper Kasper <kacperkasper@gmail.com>
  * Translators:
  *		Humdinger
  *		Matthias
@@ -32,10 +33,12 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/de.png" alt="" /> Deutsch</li>
+<li><a href="../../id/applications/drivesetup.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/drivesetup.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/applications/drivesetup.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/applications/drivesetup.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/applications/drivesetup.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/drivesetup.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/drivesetup.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/drivesetup.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pl/applications/drivesetup.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
@@ -51,9 +54,9 @@
 <li><a href="../../jp/applications/drivesetup.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 </ul>
 <span>
- «  <a href="diskusage.html">DiskUsage</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Anwendungen</a> 
-::  <a href="expander.html">Expander</a>  »
+ «  <a href="diskusage.html">DiskUsage</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Anwendungen</a> 
+::  <a href="expander.html">Expander</a>  »
 </span></div>
 </div>
 
@@ -67,38 +70,65 @@
 <tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/DriveSetup</span></td></tr>
 </table>
 <p><br /></p>
-<p><acronym title="DriveSetup">Datenträgerverwaltung</acronym> ist ein Programm zum Erstellen, Löschen und Initialisieren von Partitionen. Aktuell ist es noch nicht möglich, bestehende Partitionen zu verschieben oder in ihrer Größe zu verändern. Man benötigt also entweder Platz auf einem unpartitionierte Teil einer Disk (vielleicht ein USB Laufwerk oder eine zweite Festplatte) oder man muss auf externe Werkzeuge, wie der 
+<p><acronym title="DriveSetup">Datenträgerverwaltung</acronym> ist ein Programm zum Erstellen, Löschen und Formatieren von Partitionen. Aktuell ist es noch nicht möglich, bestehende Partitionen zu verschieben oder in ihrer Größe zu verändern. Man benötigt also entweder Platz auf einem unpartitionierte Teil einer Disk (vielleicht ein USB Laufwerk oder eine zweite Festplatte) oder man muss auf externe Werkzeuge, wie die 
 <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> zurückgreifen.</p>
 <img src="../images/apps-images/drivesetup.png" alt="drivesetup.png" />
-<p>Oben ist die Partitionierung des unten ausgewählten Datenträgers graphisch dargestellt. Neben maximal vier Primären Partitionen, kann jede von ihnen eine Anzahl von erweiterten/logischen Partitionen enthalten. Über das + / - Symbol können derart "versteckte" Partitionen auf- und eingeklappt werden.</p>
-<p>Die ausgewählte Partition kann über die Befehle im Menü <span class="menu">Partition</span> oder mit der Tastenkombination <span class="key">ALT</span> <span class="key">M</span>, beziehungsweise <span class="key">ALT</span> <span class="key">U</span> in das System eingebunden oder ausgehängt werden.</p>
-<p>Mit <span class="menu">Partition | Löschen</span> kann eine Partition auch komplett gelöscht werden.<br /></p>
-<div class="box-stop">Mit Partitionen zu arbeiten, insbesondere sie zu initialisieren, erstellen oder zu löschen ist höchst gefährlich. Ein unbedachter Klick, eine falsch ausgewählte Partition und gespeicherte Daten sind unwiederbringlich verloren! Es bietet sich an, sicherheitshalber alles zweimal zu überprüfen und eine aktuelle Sicherheitskopie wichtiger Daten parat zu haben.</div>
+<p>Oben ist die Partitionierung des unten ausgewählten Datenträgers graphisch dargestellt. Standardmäßig kann jedes Gerät 4 <i>Primäre</i> Partitionen enthalten. Diese Einschränkung lässt sich umgehen, indem man eine von ihnen zu einer <i>Erweiterten</i> Parrtition macht, welche wiederum eine theoretisch unbegrenzte Zahl an <i>Logischen</i> Partitionen enthalten kann (praktisch wird deren Anzahl jedoch beispielsweise von den anderen installierten Betriebssystemen begrenzt).<br />
+Über das + / - Symbol können derart "versteckte" Partitionen auf- und eingeklappt werden.</p>
+<p>Symbole und Farben bieten weitere Informationen zu den vorhandenen Datenträgern und Partitionen.<br />
+Neben den bekannten Symbolen für Festplatten, CD-Laufwerken, USB-Sticks etc., zeigen einige weitere auf welche Art sie eingehängt wurden:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="4">
+<tr><td><img src="../../images/apps-images/drivesetup-icon_boot.png" alt="drivesetup-icon_boot.png" width="16" height="16" /></td><td style="width:10px;"> </td>
+<td>Die /boot Partition</td></tr>
+<tr><td><img src="../../images/apps-images/drivesetup-icon_encrypted.png" alt="drivesetup-icon_encrypted.png" width="16" height="16" /></td><td> </td>
+<td>Eine verschlüsselte Partition</td></tr>
+<tr><td><img src="../../images/apps-images/drivesetup-icon_shared.png" alt="drivesetup-icon_shared.png" width="16" height="16" /></td><td> </td>
+<td>Eine per SMB/NFS etc. geteilte Partition</td></tr>
+<tr><td><img src="../../images/apps-images/drivesetup-icon_read-only.png" alt="drivesetup-icon_read-only.png" width="16" height="16" /></td><td> </td>
+<td>Eine schreibgeschützt eingehägte Partition</td></tr>
+<tr><td><img src="../../images/apps-images/drivesetup-icon_virtual.png" alt="drivesetup-icon_virtual.png" width="16" height="16" /></td><td> </td>
+<td>Eine eingehängte Image-Datei (siehe dazu den <a href="./cli-apps.html">diskimage Befehl</a>)</td></tr>
+</table>
+<p>Ein farbiger Balken zeigt den belegten Speicherplatz einer eingehängten Partition. Die verwendete Farbe  hängt von der Art der Partition ab:</p>
+<table summary="layout" border="0" cellspacing="2" cellpadding="4">
+<tr><td style="background-color:#BEFFBE" width="20"></td><td width="3"></td><td>Eine BFS-formatierte Partition</td></tr>
+<tr><td style="background-color:#ACACFF"></td><td></td><td>Eine nicht-BFS formatierte Partition</td></tr>
+<tr><td style="background-color:#FFACAC"></td><td></td><td>Eine schreibgeschützte Partition</td></tr>
+<tr><td style="background-image: repeating-linear-gradient(135deg, #E0E000 1%, #C0C0C0 15%)"></td><td></td><td>Eine verschlüsselte Partition</td></tr>
+</table>
+<p>Auf eine ausgewählte Partition können per Kontextmenü bzw. dem Menü <span class="menu">Partition</span> diverse Befehle angewendet werden. Darunter <span class="menu">Einhängen</span>/<span class="menu">Aushängen</span>, oder <span class="menu">Öffnen mit DiskProbe</span>.</p>
+<p>Partitionen lassen sich so auch <span class="menu">Formatieren</span> und komplett <span class="menu">Löschen</span>.</p>
+<div class="box-stop">Mit Partitionen zu arbeiten, insbesondere sie zu formatieren, zu erstellen oder zu löschen ist höchst gefährlich. Ein unbedachter Klick, eine falsch ausgewählte Partition, und gespeicherte Daten sind unwiederbringlich verloren! Es wird dringend geraten, sicherheitshalber alles zweimal zu überprüfen und eine aktuelle Sicherheitskopie wichtiger Daten parat zu haben!</div>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="initializing" name="initializing">Datenträger initialisieren</a></h2>
+<p>Falls man nicht nur eine Partition auf einem größeren Datenträger nutzen will, sondern die gesamte Festplatte als eine Partition, z. B. einen USB Stick oder Compact Flash Karte, muss der Datenträger zuerst initialisiert werden.</p>
+<p>Dazu wird der Datenträger in der Liste markiert und eine "Partition Map" aus dem <span class="menu">Datenträger | Initialisieren</span> Menü ausgewählt. Die <span class="menu">Intel Partition Map</span> ist die richtige Wahl wenn klassisch per BIOS gebootet wird.</p>
+<div class="box-stop">Das Initialisieren zerstört sämliche Daten auf dem Datenträger!</div>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="creating" name="creating">Eine neue Partition erstellen</a></h2>
-<div class="box-info">Wenn man einen Datenträger mit nur einer Partition komplett ausfüllen möchte, beispielsweise bei einem USB-Stick oder einer Speicherkarte, kann man direkt mit <a href="#initializing">Initialisierung</a> anfangen.</div>
 <p>Wenn auf einem Datenträger ein unformatierter Bereich existiert, wie der Bereich <tt>&lt;leer&gt;</tt> im obigen Bild, kann man hierin mit <span class="menu">Partition | Anlegen...</span> (<span class="key">ALT</span> <span class="key">C</span>) eine neue Partition anlegen.</p>
 <img src="../images/apps-images/drivesetup-create.png" alt="drivesetup-create.png" />
 <p>Es erscheint ein Dialog um Partitionsgröße und -typ einzustellen. Für eine Haiku-Installation wäre <span class="menu">Be File System</span> zu wählen. Ebenso, wenn man all die interessanten Haiku Feature, wie Attribute und Queries, nutzen will. Man bedenke jedoch, dass andere Betriebssysteme auf so eine Partition eventuell nicht zugreifen können.</p>
-<p>Bei der Erstellung einer primären Partition - im Gegensatz zu einer erweiterten/logischen Partition innerhalb einer solchen Primärpartition - kann sie in diesem Dialogfeld noch mit <span class="menu">Aktiv</span> gekennzeichnet werden. Der Haken muss also gesetzt werden, um von solch einer Partition Haiku booten zu können.</p>
-<p>Um eine neu angelegte Partition verwenden oder ins System einbinden zu können, muss sie zuerst mit einem Dateisystem initialisiert werden.</p>
+<p>Als <span class="menu">Aktive Partition</span> lassen sich nur Primäre Partitionen kennzeichnen, keine Logischen innerhalb einer Erweiterten Partition. Der Haken muss gesetzt werden, um Haiku von dieser Partition booten zu können.</p>
+<p>Um eine neu angelegte Partition verwenden oder ins System einbinden zu können, muss sie zuerst mit einem Dateisystem formatiert werden.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="initializing" name="initializing">Initialisierung einer Partition</a></h2>
-<p>Nur wenn eine Partition nicht ins System eingebunden ist, kann sie mit dem Menüpunkt <span class="menu">Partition | Initialisieren</span> initialisiert werden.</p>
+<a id="initializing" name="formatting">Formatierung einer Partition</a></h2>
+<p>Nur wenn eine Partition nicht ins System eingehängt ist, kann sie mit einem Dateisystem, das im Untermenü von <span class="menu">Partition | Formatieren</span> auszuwählen ist, formatiert werden. Das <span class="menu">Be File System</span> (BFS) ist zwingend für die Haiku Boot-Partition nötig, und auch für Datenpartition mit denen unter Haiku gearbeitet werden soll empfohlen. Nur BFS-formatierte Partitionen können per Queries durchsucht werden und unterstützen Haikus Dateiattribute.</p>
 <img src="../images/apps-images/drivesetup-initialize.png" alt="drivesetup-initialize.png" />
-<p>Beim Initialisieren muss ein Name für diese Partition und die Blockgröße angegeben werden. Ein "Block" ist dabei der Speicherplatz in Byte, den eine Datei auf dem Datenträger mindestens belegt. Den vorgeschlagenen Wert von 2048 sollte man am besten beibehalten, außer man ist sicher, dass man wirklich einen anderen braucht.<br />
-Durch das Initialisieren gehen alle Daten auf dieser Partition unwiederbringlich verloren!</p>
-
+<p>Beim Formatieren muss ein Name für die Partition und die Blockgröße angegeben werden. Ein "Block" ist dabei der Speicherplatz in Bytes, den eine Datei auf dem Datenträger mindestens belegt. Den vorgeschlagenen Wert von 2048 sollte man am besten beibehalten, außer man ist seiner wirklich sicher.<br />
+Falls die zukünftigen Daten auf der Partition nicht per Queries durchsucht werden sollen, kann die Option <span class="menu">Query-Unterstützung aktivieren</span> ausgeschaltet werden, um ein kleines bisschen 'Overhead' für das Verwalten des Index zu sparen.</p>
+<div class="box-stop">Das Formatieren zerstört sämliche Daten auf der Partition!</div>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="diskusage.html">DiskUsage</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Anwendungen</a> 
-::  <a href="expander.html">Expander</a>  »
+ «  <a href="diskusage.html">DiskUsage</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Anwendungen</a> 
+::  <a href="expander.html">Expander</a>  »
 </span></div>
 </div>
 

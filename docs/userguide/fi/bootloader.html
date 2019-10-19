@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2018, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,11 +31,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/fi.png" alt="" /> Suomi</li>
+<li><a href="../id/bootloader.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/bootloader.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/bootloader.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/bootloader.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/bootloader.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/bootloader.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/bootloader.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/bootloader.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/bootloader.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -59,12 +61,12 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <h1>Käynnistyslataaja</h1>
 
 <p>Haikun käynnistyslataaja voi auttaa kun koet laitteistopulmia tai haluat valita, minkä Haiku-asennuksen käynnistät, jos sinulla on useampia kuin yksi asennettu järjestelmä (ehkä asennus-CD:ltä tai USB-tikulta). Se on myös kätevä kun olet asentanut ohjelmistokomponentin, joka oireilee ja estää sinua käynnistämästä järjestelmää uudelleen komponentin poistamiseksi, katso alla <a href="#troubleshooting">Vianjäljitys</a>.</p>
 <p>Käynnistyslataajan valitsimiin pääsemiseksi sinun on painettava ja pidettävä alhaalla  <span class="key">VAIHTO</span>-näppäintä ennen Haikun käynnistysprosessin alkamista. Jos käynnistyshallinta on asennettu, voit aloittaa pitämällä <span class="key">VAIHTO</span>-näppäintä alhaalla ennen Haikun käynnistysrivin valintaa. Jos Haiku on ainoa koneeseen asennettu käyttöjärjestelmä, voit aloittaa näppäimen pitämisen alhaalla jo silloin, kun näet näytölläsi BIOS-käynnistysviestit.</p>
+<div class="box-info">Niissä tietokoneissa, joissa käytetään UEFI:a käynnistämiseen klassisen BIOS:in sijasta, sinun on käytettävä sen sijaan <span class="key">VÄLILYÖNTI</span>-painiketta.</div>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="options" name="options">Käynnistyslataajavalitsimet</a></h2>
@@ -131,7 +133,7 @@
 <ul>
 <li><p><span class="menu">Turvatila</span>-aktivointi estää useimpien palvelin-, taustaprosessi- ja KäyttäjäKäynnistysSkriptien käynnistymisen.</p></li>
 <li><p><span class="menu">Ota pois käytöstä käyttäjälisäosat</span>-aktivointi estää kaikkien lisäosien käytön (ajurit, kääntäjät, jne.), jotka olet asentanut kotikansion alaiseen hierarkkiaan.</p></li>
-<li><p>If activating <span class="menu">Use fail-safe graphics driver</span> solves your troubles by falling back to VESA graphics, you can make the setting permanent by removing the <tt>#</tt> of the line <i>#fail_safe_video_mode true</i> in the text file <span class="path">/boot/home/config/settings/kernel/drivers/kernel</span>.</p></li>
+<li><p>Jos <span class="menu">Käyttäjäturvallisen grafiikkaohjaimen käyttö</span>-aktivointi ratkaisee pulmasi putoamalla takaisin VESA-grafiikkaan, voit tehdä tämän asetuksen pysyväksi poistamalla merkin <tt>#</tt> riviltä <i>#fail_safe_video_mode true</i> tekstitiedostosta <span class="path">/boot/home/config/settings/kernel/drivers/kernel</span>.</p></li>
 <li><p>Jos häiritsevä ajuri, lisäosa jne. on asennettu järjestelmähierarkiaan, asiat ovat hiukan mutkikkaampia, koska se alue on kirjoitussuojattu. Tässä <span class="menu">Merkitse kohteita mustalle listalle</span> voi näytellä tärkeää roolia. Sen avulla voit navigoida läpi koko järjestelmähierarkian ja ottaa pois käytöstä komponentit, jotka sotkevat järjestelmää merkitsemällä kohteita <span class="key">VÄLILYÖNTI</span>-näppäimellä tai <span class="key">RETURN</span>-näppäimellä. <span class="key">ESC</span>-näppäin palauttaa sinut yhden tason ylöspäin ylempään hakemistoon.</p>
 <p>Verkossa oleva artikkeli <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">Kuinka merkitä pakkaustiedoston mustalle listalle pysyvästi</a> näyttää, kuinka tästä asetuksesta tekee pysyvän.</p></li>
 <li><p>Kohdasta <span class="menu">Valitse käynnistyslevy</span> voit määritellä, että minkä aikaisemman ”version” käynnistät. Joka kerta kun asennat pakkauksen tai poistat sen, vanha tila tallennetaan ja voit käynnistää järjestelmän siihen tilaan valitsemalla sen käynnistyslatausvalitsimissa esitetystä luettelosta.<br />

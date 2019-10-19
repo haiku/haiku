@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2018, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,10 +32,12 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/fr.png" alt="" /> Français</li>
+<li><a href="../id/tracker.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/tracker.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/tracker.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/tracker.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/tracker.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../fur/tracker.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/tracker.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/tracker.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/tracker.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -133,7 +135,7 @@ Ce filtrage lors de la frappe est défini dans les <a href="#tracker-preferences
 <ul>
 <li><p><span class="menu">Icon View</span> (Vue par icônes, <span class="key">Alt</span> <span class="key">1</span>) - Grandes icônes, vous pouvez modifier la taille à partir du sous-menu ou bien agrandir/réduire leur taille avec <span class="key">Alt</span> <span class="key">+</span>/<span class="key">Alt</span> <span class="key">-</span>.</p></li>
 <li><p><span class="menu">Mini Icon View</span> (Vue miniature, <span class="key">Alt</span> <span class="key">2</span>) - Petites icônes.</p></li>
-<li><p><span class="menu">List view</span> (<span class="key">ALT</span> <span class="key">3</span>) - A detailed list of your files enabling you to show/hide file attributes. (See topic <a href="attributes.html">Attributes</a>.) From the submenu you can choose to use either mini or large icons.</p></li>
+<li><p><span class="menu">List view</span> (<span class="key">ALT</span> <span class="key">3</span>) - A detailed list of your files enabling you to show/hide file attributes (see topic <a href="attributes.html">Attributes</a>.)</p></li>
 </ul>
 <p>Le menu <span class="menu">Window</span> offre de nombreuses autres fonctions :</p>
 <ul>
@@ -188,9 +190,15 @@ En ajoutant un fichier dans ce dossier, vous rajouterez une option dans le menu 
 <img src="images/tracker-images/open-with-preferred.png" alt="open-with-preferred" />
 <p>Vous y trouvez à nouveau les programmes listés dans le sous-menu. En en sélectionnant un et en choisissant le bouton <span class="button">Open and Make Preferred</span> vous changerez l’application utilisée pour tous les fichiers du même type, ici <tt>text/plain</tt>.</p></li>
 <li><span class="menu">Get info</span>
-<br /><br />
+<p>This opens a panel that shows the meta data of a file and lets you edit its permissions. You can rename it by clicking on the file name at the top.</p>
 <img src="images/tracker-images/get-info.png" alt="get-info" />
-<p>Ce panneau affiche des informations sur le fichier sélectionné et vous permet de définir l’application par défaut, et si vous développer les <i>Permissions</i>, les droits d'accès et le propriétaire du fichier. Un clic sur le chemin d’accès (<i>Location</i>) l’ouvrira dans une nouvelle fenêtre Tracker.</p></li>
+<p>The panel consists of three tabs:</p>
+<ul>
+<li><span class="menu">Information</span>: Shows standard data like size, date of creation/modification, file type and location. Click on the location path to open the files parent folder. The <span class="menu">Open with</span> menu sets the preferred application to open this particular file.</li>
+<li><span class="menu">Permissions</span>: Lets you change owner, group and file permissions.</li>
+<li><span class="menu">Attibutes</span>: Lists all extra file attributes with their value and type.</li>
+</ul>
+</li>
 <li><p><span class="menu">Edit Name</span> (Renommer), <span class="menu">Duplicate</span> (Dupliquer) et <span class="menu">Move to Trash</span> (Déplacer vers la corbeille) - permettent respectivement de renommer, dupliquer ou supprimer le(s) fichier(s) sélectionné(s).</p></li>
 <li><p><span class="menu">Move to</span> (Déplacer), <span class="menu">Copy to</span> (Copier vers) et <span class="menu">Create Link</span> (Créer un lien) - vous permettent de déplacer, copier ou créer un lien vers le(s) fichier(s) sélectionné(s) en utilisant la méthode de navigation par sous-menus. EN maintenant <span class="key">Maj</span> enfoncée lors de l’ouverture du menu, vous obtiendrez une option pour créer un lien relatif.</p></li>
 <li><p><span class="menu">Cut</span> (Couper), <span class="menu">Copy</span> (Copier) et <span class="menu">Paste</span> (Coller) - vous permettent de manipuler des fichiers en utilisant le presse-papiers. En maintenant la touche <span class="key">Maj</span> enfoncée lors de l’ouverture du menu, vous pourrez <span>Copy/Cut more</span> (copier/coller plus de) fichiers, par exemple d’un autre dossier, que vous pourrez coller ailleurs plus tard. De plus, maintenir <span class="key">Maj</span> vous permettra de coller les fichiers copiés en tant que liens.</p></li>

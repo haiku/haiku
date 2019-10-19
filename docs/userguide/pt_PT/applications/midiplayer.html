@@ -31,11 +31,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/pt_PT.png" alt="" /> Português</li>
+<li><a href="../../id/applications/midiplayer.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/midiplayer.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/applications/midiplayer.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/applications/midiplayer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/applications/midiplayer.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/applications/midiplayer.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/midiplayer.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/midiplayer.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/midiplayer.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pl/applications/midiplayer.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
@@ -67,10 +69,10 @@
 <tr><td>Definições:</td><td></td><td><span class="path">~/config/settings/MidiPlayerSettings</span></td></tr>
 </table>
 <p><br /></p>
-<p>As the name suggests, MidiPlayer is used to playback midi music files. Midi files are special, as they don't contain the actual digitized and in some way encoded music, but only a description of it: Hold this note for that long with this volume and use instrument X for it.<br />
+<p>As the name suggests, MidiPlayer is used to playback MIDI music files. MIDI files are special, as they don't contain the actual digitized and in some way encoded music, but only a description of it: Hold this note for that long with this volume and use instrument X for it.<br />
 While this keeps file sizes pretty small, it also follows that depending on the instrument library (the so-called "SoundFont") the results can differ hugely. Also, these SoundFonts tend to be quite large, increasingly so with the number and quality of the instrument samples.</p>
-<div class="box-info"><p>Haiku doesn't come with a SoundFont installed, because they are so large and only few people generally need one. Most of those who do, already have high quality or custom SoundFonts. To be able to at least hear <i>something</i> you can install a free one from an optional package. In Terminal, enter: <tt>installoptionalpackage TimGMSoundFont</tt></p>
-<p>To use any other SoundFont, create a link to it in <tt>/boot/system/data/synth</tt> and name it <tt>big_synth.sy</tt>.</p></div>
+<div class="box-info"><p>Haiku releases include a small but relatively high quality SoundFont. People who use MIDI more seriously often already have very high quality or custom SoundFonts.</p>
+<p>To use other SoundFonts (that don't come installable via HaikuDepot as a HPKG), just copy the .sf file to e.g. <tt>~/config/non-packaged/data/synth/</tt>. You can select the active SoundFont in the Media preferences under <span class="menu">MIDI</span>.</p></div>
 <img src="../images/apps-images/midiplayer.png" alt="midiplayer.png" />
 <p>MidiPlayer's interface is very simple. Just double-click or drag &amp; drop a midi file and playback starts. You control the volume with the slider and add reverb effects from the <span class="menu">Reverb</span> pop-up menu. Activating the scope will show a visualization in form of an oscilloscope running at the top.</p>
 

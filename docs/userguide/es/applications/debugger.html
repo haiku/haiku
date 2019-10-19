@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2015-2018, Haiku. All rights reserved.
+ * Copyright 2015-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -30,10 +30,12 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/es.png" alt="" /> Español</li>
+<li><a href="../../id/applications/debugger.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/debugger.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/applications/debugger.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/applications/debugger.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../fr/applications/debugger.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/debugger.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/debugger.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/debugger.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pl/applications/debugger.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
@@ -73,9 +75,9 @@
 <ul>
 <li><p><span class="button">Terminar</span> hará limpieza tras el cuelgue de la aplicación, pero aparte de eso no hará nada más.</p></li>
 <li><p><span class="button">Depurar</span> iniciará el Depurador para investigar.</p></li>
-<li><p><span class="button">Escribir archivo de volcado</span> crea una volcado posiblemente grande sobre el estado del sistema. Cuando esté presentando un informe, es mejor adjuntar antes un informe de depurado regular, y solamente incluir un archivo de volcado si se le solicita.</p></li>
 <li><p><span class="button">Guardar informe</span> crea un informe de depuración que es guardado como archivo de texto en el Escritorio y puede ser enviado por correo electrónico al desarrollador de la aplicación con la falla, o adjuntado a una entrada en el rastreador de fallos, si es que está disponible.<br />
 El informe de depuración contiene información sobre su hardware (tipo de CPU y memoria utilizada, etc.), la versión exacta de Haiku y toda la información disponible sobre el estado del sistema que pudiera ser relevante al fallo.</p></li>
+<li><p><span class="button">Escribir archivo de volcado</span> crea una volcado posiblemente grande sobre el estado del sistema. Cuando esté presentando un informe, es mejor adjuntar antes un informe de depurado regular, y solamente incluir un archivo de volcado si se le solicita.</p></li>
 </ul>
 <p>La acción predeterminada cuando una aplicación deja de responder puede ser configurada con un archivo de texto <span class="path">~/config/settings/system/debug_server/settings</span>.<br />
 El archivo toma el formato de estilo de driver_settings de la siguiente manera:</p>

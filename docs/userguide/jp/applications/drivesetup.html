@@ -4,11 +4,12 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ *		Kacper Kasper <kacperkasper@gmail.com>
  * Translators:
  *		hiromu1996
  *		mt
@@ -31,11 +32,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/jp.png" alt="" /> 日本語</li>
+<li><a href="../../id/applications/drivesetup.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/drivesetup.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/applications/drivesetup.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/applications/drivesetup.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/applications/drivesetup.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/applications/drivesetup.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/drivesetup.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/drivesetup.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/drivesetup.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pl/applications/drivesetup.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
@@ -50,9 +53,9 @@
 <li><a href="../../uk/applications/drivesetup.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 </ul>
 <span>
- «  <a href="diskusage.html">DiskUsage</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
-::  <a href="expander.html">ファイル解凍</a>  »
+ «  <a href="diskusage.html">DiskUsage</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
+::  <a href="expander.html">ファイル解凍</a>  »
 </span></div>
 </div>
 
@@ -66,37 +69,63 @@
 <tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/DriveSetup</span></td></tr>
 </table>
 <p><br /></p>
-<p>DriveSetup はパーティションの作成、削除、初期化をするツールです。このツールでは既存パーティションのリサイズや移動はできないので、パーティションが作成されていないディスク (外部 USB ドライブや別のハードディスクなど) を用意するか、<a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> のようなツールで初期化する必要があるでしょう。</p>
+<p>DriveSetup はパーティションの作成、削除、フォーマットをするツールです。現段階では既存パーティションのリサイズや移動はできないので、パーティションが作成されていないディスク (外部 USB ドライブや別のハードディスクなど) を用意するか、<a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> のようなツールで初期設定する必要があるでしょう。</p>
 <img src="../images/apps-images/drivesetup.png" alt="drivesetup.png" />
-<p>一番上の図は、下のリストで選択されたデバイスのパーティションの分割状態を表しています。それぞれのデバイスは 4 つまでのプライマリパーティションに分割でき、それぞれにいくつかの拡張パーティションや論理パーティションを格納できます。論理パーティションの詳細を見るには、+/- ボタンでリストを展開する必要があるかもしれません。</p>
-<p>リストからパーティションを選択して、<span class="key">ALT</span> <span class="key">M</span> / <span class="key">ALT</span> <span class="key">U</span> を押すか、<span class="menu">パーティション (Partition)</span> メニューから操作することで、マウント / アンマウントを行えます。</p>
-<p><span class="menu">パーティション | 削除 (Partition | Delete)</span> からパーティションの削除もできます。<br /></p>
-<div class="box-stop">パーティションの作成・削除・初期化は非常に危険です。操作しているパーティションが適切なものであることと、万が一に備えて最新のバックアップをしていることを、必ず 2 度確認してください。</div>
+<p>一番上は、下のリストで選択されたデバイスのすべてのパーティションを図で表示しています。デフォルトで、それぞれのデバイスは 4 つまでの<i>プライマリ</i>パーティションを持てます。この限界はよくある<i>拡張</i>パーティションを作成することで取り除けます。拡張パーティションは、同様に理論上は無制限の<i>論理</i>パーティションを次々に格納できます (実質的な制限は、たとえばほかの OS がインストールされていることによります)。<br />
+論理パーティションの詳細を見るには、デバイスの前に表示される+/- ボタンでリストを展開する必要があるかもしれません。</p>
+<p>色とアイコンは、利用可能なボリュームとパーティションに関するいくらか詳しい情報を与えます。<br />
+ハードディスク、CD ドライブおよび USB スティックなどに対するおなじみのアイコンに加えて、それらのマウントモードを表す少数のアイコンがあります。</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="4">
+<tr><td><img src="../../images/apps-images/drivesetup-icon_boot.png" alt="drivesetup-icon_boot.png" width="16" height="16" /></td><td style="width:10px;"> </td>
+<td>/boot パーティション</td></tr>
+<tr><td><img src="../../images/apps-images/drivesetup-icon_encrypted.png" alt="drivesetup-icon_encrypted.png" width="16" height="16" /></td><td> </td>
+<td>暗号化されたパーティション</td></tr>
+<tr><td><img src="../../images/apps-images/drivesetup-icon_shared.png" alt="drivesetup-icon_shared.png" width="16" height="16" /></td><td> </td>
+<td>SMB/NFS などで共用されているパーティション</td></tr>
+<tr><td><img src="../../images/apps-images/drivesetup-icon_read-only.png" alt="drivesetup-icon_read-only.png" width="16" height="16" /></td><td> </td>
+<td>読み取り専用でマウントされたパーティション</td></tr>
+<tr><td><img src="../../images/apps-images/drivesetup-icon_virtual.png" alt="drivesetup-icon_virtual.png" width="16" height="16" /></td><td> </td>
+<td>マウントされたイメージファイル (<a href="./cli-apps.html">diskimage コマンド</a>も参照ください)</td></tr>
+</table>
+<p>マウントされると、カラーバーがパーティションの使用領域を表示します。パーティションの状態によって色が決まります。</p>
+<table summary="layout" border="0" cellspacing="2" cellpadding="4">
+<tr><td style="background-color:#BEFFBE" width="20"></td><td width="3"></td><td>BFS でフォーマットされたパーティション</td></tr>
+<tr><td style="background-color:#ACACFF"></td><td></td><td>BFS 以外でフォーマットされたパーティション</td></tr>
+<tr><td style="background-color:#FFACAC"></td><td></td><td>読み取り専用のパーティション</td></tr>
+<tr><td style="background-image: repeating-linear-gradient(135deg, #E0E000 1%, #C0C0C0 15%)"></td><td></td><td>暗号化されたパーティション</td></tr>
+</table>
+<p>リストからパーティションを選択して、コンテキストメニューまたは<span class="menu">パーティション (Partition)</span> メニューから、<span class="menu">マウント (Mount)</span>/<span class="menu">Unmount</span>のようなさまざまなコマンドを選択でき、<span class="menu">DiskProbe で開く (Open in DiskProbe)</span> こともできます。</p>
+<p>また、パーティションの <span class="menu">フォーマット (Format)</span> や 完全に <span class="menu">削除 (Delete)</span> もできます。</p>
+<div class="box-stop">パーティションの作成・削除・初期化処理は非常に危険です。操作しているパーティションが適切なものであることと、万が一に備えてデーターの最新バックアップをしていることを、必ず 2 度確認してください。</div>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="initializing" name="initializing">ディスクを初期化する</a></h2>
+<p>大容量ディスクのパーティションのひとつだけを使うのではなく、ドライブ全体をひとつのパーティションとして使うつもりなら (たとえば USB スティックやコンパクトフラッシュカード)、まずディスクを初期化する必要があります。</p>
+<p>初期化をするには、デバイスリストからディスク (raw disk) を選んで、<span class="menu">ディスク | 初期化 (Disk | Initialize)</span> メニューからパーティションマップを選択します。標準的な BIOS からの起動には <span class="menu">Intel Partition Map</span> が適切な選択です。</p>
+<div class="box-stop">初期化はドライブ上のすべてのデーターを破壊します!</div>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="creating" name="creating">新しいパーティションを作成する</a></h2>
-<div class="box-info">もし、(USB フラッシュメモリやコンパクトフラッシュを利用するなどして) ディスクに 1 つのパーティションしか作らないならば、<a href="#initializing">パーティションの初期化</a>までスキップしてください。</div>
 <p>上の画像のように、<tt>&lt;empty&gt;</tt> となっている未フォーマットのスペースがあれば、<span class="menu">パーティション | 新規作成... (Partition | Create...)</span> (<span class="key">ALT</span> <span class="key">C</span>) で、パーティションを作成できます。</p>
 <img src="../images/apps-images/drivesetup-create.png" alt="drivesetup-create.png" />
 <p>ダイアログでパーティションのサイズとタイプを調節してください。パーティションを Haiku のインストールに用いる場合、または Haiku の特徴的な属性やクエリを使用する場合は、<span class="menu">Be File System</span> をパーティションタイプに設定してください。また、<span class="menu">Be File System</span> のパーティションは、ほかの OS からアクセスできないことにご注意ください。</p>
-<p>もし、拡張パーティションや論理パーティションと一緒にプライマリパーティションを 1 つのディスクに作成した時、ダイアログに、<span class="menu">アクティブパーティション (Active partition)</span> というチェックボックスが現れます。パーティションを Haiku のブートディスクとして利用するにはチェックしてください。</p>
-<p>新しく作成されたパーティションを使用する前に、ファイルシステムを初期化する必要があります。</p>
-<h2>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="initializing" name="initializing">パーティションの初期化</a></h2>
-<p>アンマウントされたパーティションを、<span class="menu">パーティション | 初期化 (Partition | Initialize)</span> から初期化できます。</p>
+<p>よくある、拡張パーティションの中の論理パーティション作成の代わりにプライマリパーティションを作成した時のみ、ダイアログに、<span class="menu">アクティブパーティション (Active partition)</span> チェックボックスが使用できます。パーティションを Haiku のブートディスクとして利用するつもりなら、チェックする必要があるでしょう。</p>
+<p>新しく作成されたパーティションを使用する前、またはマウントする前でも、ファイルシステムでフォーマットする必要があります。</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="initializing" name="formatting">パーティションをフォーマットする</a></h2>
+<p>アンマウントされたパーティションだけが、<span class="menu">パーティション | 初期化 (Partition | Initialize)</span> からファイルシステムを選択することで初期化できます。The <span class="menu">Be File System</span> (BFS) は、Haiku のブートパーティションには必須のものです。また、Haiku で使用するデータパーティションに推奨されるものです。BFS でフォーマットされたパーティションだけが、クエリすることができ、Haikuのファイル属性のフルサポートが可能です。</p>
 <img src="../images/apps-images/drivesetup-initialize.png" alt="drivesetup-initialize.png" />
-<p>ダイアログにパーティションの名前とブロックサイズを入力してください。ブロックサイズは 2048 が推奨されますが、特に必要なら大きなサイズにも小さなサイズにも設定できます。<br />
-初期化により、パーティションのすべてのデータが消されるので注意してください!</p>
-
+<p>ダイアログで、パーティションの名前とブロックサイズを入力します。ブロックサイズはファイルが最小限に割り当てるスペースのバイト数です。ブロック当たり 2048 が推奨されますが、特に必要なら大きなサイズにも小さなサイズにも設定できます。<br />
+パーティション上のデーターが将来クエリを全く必要としないなら、<span class="menu">Enable query support (クエリのサポートを有効にする)</span>のチェックを外して、インデックスを管理するオーバーヘッドを少し減らせます。</p>
+<div class="box-stop">フォーマットはドライブ上のすべてのデーターを破壊します!</div>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="diskusage.html">DiskUsage</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
-::  <a href="expander.html">ファイル解凍</a>  »
+ «  <a href="diskusage.html">DiskUsage</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
+::  <a href="expander.html">ファイル解凍</a>  »
 </span></div>
 </div>
 

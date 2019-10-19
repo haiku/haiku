@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008, 2019 Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -30,11 +30,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/ro.png" alt="" /> Română</li>
+<li><a href="../id/workshop-filetypes+attributes.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/workshop-filetypes+attributes.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/workshop-filetypes+attributes.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/workshop-filetypes+attributes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/workshop-filetypes+attributes.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/workshop-filetypes+attributes.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/workshop-filetypes+attributes.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/workshop-filetypes+attributes.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/workshop-filetypes+attributes.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/workshop-filetypes+attributes.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -144,7 +146,7 @@ In any case, to these files we add a couple of attributes. Here we have to decid
 <li><i>Type</i> - Defines the value the attribute can hold and therefore how it can be queried.
     <ul>
     <li><span class="menu">String</span> for normal text</li>
-    <li><span class="menu">Boolean</span> for binary data: 0 or 1</li>
+    <li><span class="menu">Boolean</span> for binary data: 0 (false) or &gt;=1 (true)</li>
     <li><span class="menu">Integer</span> for integer numbers with different ranges:
         <ul>
         <li><span class="menu">8 bit</span>: ± 255</li>
@@ -153,16 +155,22 @@ In any case, to these files we add a couple of attributes. Here we have to decid
         <li><span class="menu">64 bit</span>: ± 18,446,744,073,709,551,615</li>
         </ul>
     </li>
-    <li><span class="menu">Float</span> for floatingpoint numbers, single precision</li>
-    <li><span class="menu">Double</span> for floatingpoint numbers, double precision</li>
+    <li><span class="menu">Float</span> for floating-point numbers, single precision</li>
+    <li><span class="menu">Double</span> for floating-point numbers, double precision</li>
     <li><span class="menu">Time</span> for time and date format</li>
     </ul>
 </li>
 </ul>
 <ul>
 <li><i>Visible</i> - This checkbox determines if the attribute is visible in a Tracker window at all. Since the Tracker will be the interface to our DVD database, we check it and define its appearance with:<ul>
-    <li><span class="menu">Display as</span> - Leave on "Default". In the future more option will become available, e.g. a bar or stars for a rating etc.</li>
+    <li><span class="menu">Display as</span> - Left on "Default" if the values are to be displayed according to the attribute's "Type" (e.g. string/integer/float etc.). The other options are:
+	<ul>
+		<li><span class="menu">Checkbox</span> - Can be used to show either one of two symbols, see <span class="menu">Special</span> below.</li>
+		<li><span class="menu">Duration</span> - Shows an integer as 1/60, e.g. "90" becomes "1:30".</li>
+		<li><span class="menu">Rating</span> - Shows a rating between 0 and 10 as star symbols.</li>
+	</ul></li>
     <li><span class="menu">Editable</span> - Determines if the attribute shall be editable in Tracker.</li>
+    <li><span class="menu">Special</span> - Defines the two symbols used for a checkbox display. For example, "xo" will show a "x" for all values &gt;0 and "o" for 0.</li>
     <li><span class="menu">Width</span> - The default width of that attributes column in a Tracker window.</li>
     <li><span class="menu">Alignment</span> - The attribute can be displayed left, center, or right aligned.</li>
 </ul></li></ul>

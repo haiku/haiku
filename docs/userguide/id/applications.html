@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="id" xml:lang="id">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2017, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		mazbrili abu ibrahim
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<meta name="robots" content="all" />
+	<title>Aplikasi</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/id.png" alt="" /> Bahasa Indonesia</li>
+<li><a href="../ca/applications.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../de/applications.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../en/applications.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+<li><a href="../es/applications.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../fr/applications.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/applications.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
+<li><a href="../it/applications.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../hu/applications.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../pl/applications.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
+<li><a href="../pt_PT/applications.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../pt_BR/applications.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../ro/applications.html"><img src="../images/flags/ro.png" alt="" />Română</a></li>
+<li><a href="../sk/applications.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../fi/applications.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sv_SE/applications.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../zh_CN/applications.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../ru/applications.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../uk/applications.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../jp/applications.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+</ul>
+<span>
+ «  <a href="workshop-filetypes+attributes.html">Workshop</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="desktop-applets.html">Desktop Applets</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<div class="box-info">Terjemahan halaman ini belum lengkap. Sampai saat itu, bagian yang belum selesai menggunakan aslinya bahasa Inggris.</div>
+
+<h1>Aplikasi</h1>
+
+<p>Sebelum menyelam ke semua aplikasi yang datang dengan Haiku, mari kita lihat lebih rinci tentang cara menginstal dan menghapus program. Cara paling mudah untuk menemukan, menginstal, memperbarui, dan menghapus instalasi aplikasi adalah melalui sistem manajemen paket Haiku. Namun, karena Haiku sebagian besar biner dan sumbernya kompatibel dengan leluhurnya BeOS, Anda mungkin menemukan arsip lama (.zip dan .pkg) yang masih dapat diinstal juga.</p>
+<div class="box-info">Di bawah ini Anda akan selalu menemukan hierarki <tt>/system/</tt> yang disebutkan. Jika Anda bermaksud menginstal paket hanya untuk satu pengguna (setelah Haiku menjadi sadar akan multi-pengguna), Anda harus menggunakan hierarki sistem file cermin di bawah rumah: <tt>~/config/</tt>. Lihat topik <a href="filesystem-layout.html"> tata letak Filesystem </a> untuk informasi lebih lanjut.</div>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="hpkg" name="hpkg">Paket Haiku(.hpkg)</a></h2>
+<p>Cara paling sederhana adalah dengan menggunakan <a href="applications/haikudepot.html"> HaikuDepot</a> untuk menemukan, mengunduh, dan secara otomatis menginstal dan menghapus instalasi suatu paket. Jika Anda telah mengunduh paket dari tempat lain - mungkin karena itu belum (belum) ada di repositori publik - cukup klik dua kali untuk membuka di HaikuDepot dan instal dari sana.</p>
+<p>Anda akan menemukan aplikasi yang baru diinstal di <tt>/system/apps/</tt> atau, jika ada aplikasi commandline, di <tt>/system/bin/</tt>. Semua file lain yang bergantung pada program (pustaka, data, add-on, dll.) Muncul secara otomatis di lokasi yang tepat di sistem file.</p>
+<p>Topik <a href="deskbar.html">Deskbar</a> atau <a href="desktop-applets/launchbox.html">LaunchBox</a> menjelaskan cara menambahkan pintasan ke aplikasi Anda yang baru diinstal.</p>
+<div class="box-info">Ngomong-ngomong, meskipun Anda bisa membongkar file .hpkg seperti arsip lainnya, ini bukan apa yang dilakukan manajemen paket ketika Anda menginstal paket. Sistem file yang mendasarinya hanya muncul untuk menyebarkan file di folder masing-masing, tidak ada gerakan fisik yang terjadi. Inilah sebabnya mengapa menginstal / menghapus instalan sangat cepat dan bersih.</div>
+<p>Jika paket tergantung pada beberapa pustaka atau paket lain, sebuah jendela akan muncul, menanyakan apakah file yang diperlukan akan diunduh dan diinstal juga.</p>
+<p>Menghapus instalan semudah ini: Cukup temukan paket di HaikuDepot dan klik <span class="button"> copot installasi </span>.</p>
+<p>Jika Anda bekerja di Terminal atau ingin melakukan install/uninstal paket dalam skrip, Anda harus melihat pada perintah <tt> pkgman --help </tt>.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="beos_apps" name="beos_apps">Arsip BeOS lama (.zip and .pkg)</a></h2>
+<p>Arsip BeOS yang menyertakan semua yang mereka butuhkan di folder aplikasi mereka dapat dibongkar (klik dua kali membuka <span class="app"> Expander </span> atau <span class="app"> PackageInstaller </span> yang lama) di mana saja di <tt>/boot/home/</tt> dan jalankan dari sana. Menghapus instalasi aplikasi mandiri semacam itu mudah: cukup hapus folder aplikasi.</p>
+<p>Ini berlaku untuk sebagian besar aplikasi BeOS lama. Jika Anda menemukan salah satu yang tidak bekerja, karena ingin menyebarkan file-nya ke lokasi yang dikodekan dengan kaku yang tidak dijamin ada, Anda dapat mencoba memperbaikinya secara manual. Folder <tt>/system/non-package/</tt> memungkinkan Anda untuk membuat ulang hierarki folder yang diperlukan. Karena semakin banyak paket .hpkg yang nyata tersedia dan aplikasi BeOS lama dikemas ulang, ini akan menjadi kurang dibutuhkan. Silakan baca <a href="http://www.haiku-os.org/guides/daily-tasks/install-applications"> artikel online </a> ini tentang cara menggunakan hierarki <tt> tanpa paket </tt> .</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="list-of-apps" name="list-of-apps">Aplikasi-aplikasi Haiku</a></h2>
+<p>Haiku hadir dengan satu set aplikasi yang sebagian besar kecil namun penting. Anda akan menemukan semuanya di <span class="path">/boot/system/apps/</span>. Aplikasi yang biasanya tidak diluncurkan dengan mengklik dua kali pada file data (mis. ShowImage untuk file gambar) dapat ditemukan di menu <span class="menu"> Applications </span> di Deskbar.</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td style="width:24px;"><img src="../images/apps-images/activitymonitor-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/activitymonitor.html">ActivityMonitor</a></td><td style="width:10px;"> </td>
+		<td valign="top">Alat untuk melacak sumber daya sistem seperti penggunaan CPU dan memori.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/bootmanager-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bootmanager.html">BootManager</a></td><td> </td>
+		<td valign="top">Alat untuk menginstal menu boot di Master Boot Record (MBR) drive.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/charactermap-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/charactermap.html">CharacterMap</a></td><td> </td>
+		<td valign="top">An application that shows the Unicode character map.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/codycam-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/codycam.html">CodyCam</a></td><td> </td>
+		<td valign="top">A tool to regularly upload images from a webcam to a server.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/debugger-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/debugger.html">Debugger</a></td><td> </td>
+		<td valign="top">A graphical debugger.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/deskcalc-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/deskcalc.html">DeskCalc</a></td><td> </td>
+		<td valign="top">A calculator.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/diskprobe-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/diskprobe.html">DiskProbe</a></td><td> </td>
+		<td valign="top">A HEX editor for files and devices.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/diskusage-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/diskusage.html">DiskUsage</a></td><td> </td>
+		<td valign="top">A tool to visualize a disk's memory usage.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/drivesetup-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/drivesetup.html">DriveSetup</a></td><td> </td>
+		<td valign="top">A harddisk partitioning tool.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/expander-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/expander.html">Expander</a></td><td> </td>
+		<td valign="top">A tool to unpack common archives.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/haikudepot-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/haikudepot.html">HaikuDepot</a></td><td> </td>
+		<td valign="top">A tool to find, download, install, update and uninstall (application) packages</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/icon-o-matic-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/icon-o-matic.html">Icon-O-Matic</a></td><td> </td>
+		<td valign="top">An app to create Haiku's vector icons.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/installer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/installer.html">Installer</a></td><td> </td>
+		<td valign="top">The tool to install Haiku to a partition.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/magnify-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/magnify.html">Magnify</a></td><td> </td>
+		<td valign="top">A magnified view of the area around your mouse pointer.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/mail-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mail.html">Mail</a></td><td> </td>
+		<td valign="top">An email client.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/mediaplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mediaplayer.html">MediaPlayer</a></td><td> </td>
+		<td valign="top">A player for all supported audio/video files.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/midiplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/midiplayer.html">MidiPlayer</a></td><td> </td>
+		<td valign="top">A player for MIDI files.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/packageinstaller-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/packageinstaller.html">LegacyPackageInstaller</a></td><td> </td>
+		<td valign="top">Installer for BeOS packages in PKG format.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/people-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/people.html">People</a></td><td> </td>
+		<td valign="top">A contact manager.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/poorman-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/poorman.html">PoorMan</a></td><td> </td>
+		<td valign="top">A simple web server.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/screenshot-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/screenshot.html">Screenshot</a></td><td> </td>
+		<td valign="top">A tool to take screenshots.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/showimage-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/showimage.html">ShowImage</a></td><td> </td>
+		<td valign="top">A simple image viewer.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/softwareupdater-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/softwareupdater.html">SoftwareUpdater</a></td><td> </td>
+		<td valign="top">A tool to update software packages and Haiku itself.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/soundrecorder-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/soundrecorder.html">SoundRecorder</a></td><td> </td>
+		<td valign="top"><span style="color:silver">A tool to record audio from line-in or a microphone. [<i>still missing</i>]</span></td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/stylededit-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/stylededit.html">StyledEdit</a></td><td> </td>
+		<td valign="top">A simple text editor.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/terminal-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/terminal.html">Terminal</a></td><td> </td>
+		<td valign="top">Access to the bash.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/textsearch-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/textsearch.html">TextSearch</a></td><td> </td>
+		<td valign="top">A search tool for text files.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/tv-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/tv.html">TV</a></td><td> </td>
+		<td valign="top"><span style="color:silver">A viewer for analog TV. [<i>still missing</i>]</span></td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/webpositive-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/webpositive.html">WebPositive</a></td><td> </td>
+		<td valign="top">A native web browser</td></tr>
+</table>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="cli-apps" name="cli-apps">Haiku's commandline applications</a></h2>
+<p>Besides the normal commandline tools coming with the bash shell or are necessary to be POSIX compliant, there are a few Haiku-specific commandline applications worth mentioning. These commands are often useful for scripting purposes, see also topic <a href="bash-scripting.html">Bash and Scripting</a>.</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+		<tr><td style="width:24px;"><img src="../images/apps-images/cli-app-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/list-cli-apps.html">List of all commandline applications</a></td><td> </td></tr>
+		<tr><td style="width:24px;"><img src="../images/apps-images/cli-app-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cli-apps.html">Haiku-specific commandline applications</a></td><td> </td></tr>
+</table>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="list-of-bundled-apps" name="list-of-bundled-apps">Bundled applications</a></h2>
+<p>Besides the above listed programs, which are all maintained by the Haiku project, there are a few essential applications bundled in a standard Haiku system. Bugs and feature requests for those have to be filed with the particular maintainer.</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+		<tr><td style="width:24px;"><img src="../images/apps-images/bepdf-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bepdf.html">BePDF</a></td><td style="width:10px;"> </td>
+		<td valign="top">A <acronym title="Portable Document Format">PDF</acronym> viewer.</td></tr>
+<!--	<tr><td style="width:24px;"><img src="../images/apps-images/bezillabrowser-icon_16.png" alt="icon" width="16" height="16" /></td><td _translation_id="270"><a href="applications/bezillabrowser.html">BeZillaBrowser</a></td><td> </td>
+		<td valign="top" _translation_id="271">A web browser based on Mozilla's source code.</td></tr> -->
+	<tr><td style="width:24px;"><img src="../images/apps-images/pe-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/pe.html">Pe</a></td><td> </td>
+		<td valign="top">An advanced texteditor with syntax coloring and much more.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/vision-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/vision.html">Vision</a></td><td> </td>
+		<td valign="top">An <acronym title="Internet Relay Chat">IRC</acronym> client.</td></tr>
+<!--	<tr><td style="width:24px;"><img src="../images/apps-images/vlc-icon_16.png" alt="icon" width="16" height="16" /></td><td _translation_id="276"><a href="applications/vlc.html">VLC media player</a></td><td> </td>
+		<td valign="top" _translation_id="277">VideoLAN's media player.</td></tr> -->
+	<tr><td style="width:24px;"><img src="../images/apps-images/wonderbrush-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/wonderbrush.html">WonderBrush</a></td><td> </td>
+		<td valign="top">YellowBite's graphics programm.</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="workshop-filetypes+attributes.html">Workshop</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="desktop-applets.html">Desktop Applets</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

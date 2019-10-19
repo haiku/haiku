@@ -32,11 +32,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/ru.png" alt="" /> Русский</li>
+<li><a href="../id/filesystem-layout.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/filesystem-layout.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/filesystem-layout.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/filesystem-layout.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/filesystem-layout.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/filesystem-layout.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/filesystem-layout.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/filesystem-layout.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/filesystem-layout.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/filesystem-layout.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -63,7 +65,7 @@
 
 <h1>Иерархия файловой системы</h1>
 
-<p>Иерархия файловой системы Haiku очень простая. По возможности используются понятные названия для файлов и папок для того, чтобы не вводить пользователя в замешательство. Важные для системы файлы и папки защищены от случайного изменения, предупреждая следующим образом:</p>
+<p>Иерархия файловой системы Haiku очень проста. По возможности используются понятные названия для файлов и папок, чтобы не вводить пользователя в замешательство. Важные для системы файлы и папки защищены от случайного изменения, предупреждая следующим образом:</p>
 <img src="images/filesystem-layout-images/achtung-user.png" alt="achtung-user.png" /> 
 <img src="images/filesystem-layout-images/achtung-system.png" alt="achtung-system.png" />
 <p>Второе предупреждение появляется в случае, если Вы попытаетесь удалить или переименовать что-нибудь в иерархии системы. Для того чтобы активировать кнопку "<span class="button">Сделать это</span>" нужно удерживать клавишу <span class="key">SHIFT</span>.</p>
@@ -72,21 +74,21 @@
 <tr><td><span class="path">/boot/system/</span></td><td> </td><td>Содержит системные файлы и приложения/пакеты, общие для всех пользователей.</td></tr>
 <tr><td><span class="path">/boot/home/</span></td><td> </td><td>Это ваша личная папка, где хранятся ваши данные и настройки, а также приложения/пакеты, <i>не</i> общие для всех пользователей.</td></tr>
 </table>
-<p>As long as Haiku isn't multi-user, this distinction between shared and not-shared applications/packages has no apparent effect, as there's only one user with one home folder. But since there will be support for more users than one eventually, it makes sense to learn the right way from the start.</p>
+<p>Пока Haiku не является многопользовательской системой, разделение на общие и пользовательские файлы не дает очевидного эффекта, так как в системе есть только один пользователь с одной домашней папкой. Однако, так как планируется поддержка более, чем одного пользователя, разумно привыкать к правильным методам с самого начала.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="system" name="system">Системная папка - <span class="path">/boot/system/</span></a></h2>
-<p>Under Haiku's predecessor BeOS, this folder was named <span class="path">/boot/beos/</span>. You may still find it in some older documentation (e.g. in the original BeBook).<br />
-Most of the folders inside <span class="path">/boot/system/</span> are read-only, which is sensible as they contain the files necessary for Haiku to function correctly and therefore have to be safe from (accidental) alteration. The only user-writable folders are:</p>
+<p>У BeOS, предшественника Haiku, эта папка находилась по адресу <span class="path">/boot/beos/</span>. Вы всё ещё можете её найти в старой документации (например, в оригинальной BeBook).<br />
+Для большинства папок в иерархии <span class="path">/boot/system/</span> установлен доступ только для чтения, что разумно, так как они содержат файлы, необходимые для правильной работы Haiku и поэтому должны быть защищены от изменений (в том числе ненамеренных). Единственные папки, в которые возможна запись со стороны пользователя - это:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="path">/boot/system/cache/</span></td><td> </td><td>Contains cached files and the temporary folder linked to <span class="path">/tmp/</span>.</td></tr>
 <tr><td class="onelinetop"><span class="path">/boot/system/non-packaged/</span></td><td> </td><td>Contains a hierarchy for files that aren't part of a .hpkg (probably from old BeOS archives).</td></tr>
-<tr><td><span class="path">/boot/system/packages/</span></td><td> </td><td>Besides holding Haiku's system packages, you can add/remove packages shared by all users.</td></tr>
-<tr><td><span class="path">/boot/system/settings/</span></td><td> </td><td>Contains system-wide settings.</td></tr>
+<tr><td><span class="path">/boot/system/packages/</span></td><td> </td><td>Содержит системные пакеты Haiku. Также сюда можно добавлять/удалять пакеты, общие для всех пользователей.</td></tr>
+<tr><td><span class="path">/boot/system/settings/</span></td><td> </td><td>Содержит системные настройки.</td></tr>
 <tr><td><span class="path">/boot/system/var/</span></td><td> </td><td>Contains logs like the syslog (important when troubleshooting) and is the default location for the swap file.</td></tr>
 </table>
-<p><span class="box-info">Для более подробной информации о папках <span class="path">packages</span> и <span class="path">non-packaged</span> обратитесь к теме <a href="applications.html">Приложения</a>.</span></p>
+<p><span class="box-info">За более подробной информацией о папках <span class="path">packages</span> и <span class="path">non-packaged</span> обратитесь к теме <a href="applications.html">Приложения</a>.</span></p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -98,7 +100,7 @@ Files that you'd like to share with other users in a future multi-user environme
 <tr><td><span class="path">~/Desktop/</span></td><td style="width:10px;"> </td>
 <td>Holds the files of your desktop. Double-clicking won't open it, as it is already always visible. When your files happen to be obscured by open windows, just switch quickly to another <a href="workspaces.html">Workspace</a>. Of course, <a href="tracker.html#drill-down">drilling</a> down by right-clicking is also possible.</td></tr>
 <tr><td><span class="path">~/mail/</span></td><td style="width:10px;"> </td>
-<td>This is the default location for your mails.</td></tr>
+<td>Здесь по умолчанию находится ваша почта.</td></tr>
 <tr><td><span class="path">~/people/</span></td><td style="width:10px;"> </td>
 <td>This is the default location for you contact files, see <a href="applications/people.html">People</a>.</td></tr>
 <tr><td><span class="path">~/queries/</span></td><td style="width:10px;"> </td>
@@ -118,7 +120,7 @@ Files that you'd like to share with other users in a future multi-user environme
 <td>Эта папка содержит настройки для всех приложений и некоторые настройки системы. Некоторые приложения хранят свои настройки в собственных папках, другие просто хранят конфигурационные файлы прямо здесь.</td></tr>
 </table>
 
-<p><span class="box-info">Для более подробной информации о папках <span class="path">packages</span> и <span class="path">non-packaged</span> обратитесь к теме <a href="applications.html">Приложения</a>.</span></p>
+<p><span class="box-info">За более подробной информацией о папках <span class="path">packages</span> и <span class="path">non-packaged</span> обратитесь к теме <a href="applications.html">Приложения</a>.</span></p>
 <p>Вот несколько наиболее интересных подпапок в иерархии <span class="path">~/config/settings/</span>:</p>
 
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">
@@ -132,7 +134,7 @@ Files that you'd like to share with other users in a future multi-user environme
 <td>В этой <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> -базе данных Haiku отслеживает все <a href="filetypes.html">типы файлов</a> и их настройки (примечание: MIME - Multipurpose Internet Mail Extension — многоцелевые расширения интернет-почты, произносится как «майм»).</td></tr>
 
 <tr><td class="onelinetop"><span class="path">deskbar/menu/</span></td><td> </td>
-<td>Copied or linked to files/folders/queries in this folder appear in the <a href="deskbar.html#deskbar-menu">Deskbar menu</a>.</td></tr>
+<td>Файлы, папки и запросы, а также ссылки на них, скопированные в эту папку, появляются в <a href="deskbar.html#deskbar-menu">меню Deskbar</a>.</td></tr>
 
 <tr><td class="onelinetop"><span class="path">kernel/drivers/</span></td><td> </td>
 <td>Здесь располагается один из файлов с настройками, которые могут быть интересны: файл <span class="cli">kernel</span> предлагает некоторые низкоуровневые настройки, например, отключение <acronym title="Symmetric Multi Processing">SMP</acronym>, активация APM. Вы можете активировать настройки путем удаления символа комментария "<tt>#</tt>". Будьте осторожны!</td></tr>

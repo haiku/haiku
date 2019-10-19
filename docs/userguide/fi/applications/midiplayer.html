@@ -31,11 +31,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/fi.png" alt="" /> Suomi</li>
+<li><a href="../../id/applications/midiplayer.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/midiplayer.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/applications/midiplayer.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/applications/midiplayer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/applications/midiplayer.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/applications/midiplayer.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/midiplayer.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/midiplayer.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/midiplayer.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pl/applications/midiplayer.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
@@ -67,9 +69,9 @@
 </table>
 <p><br /></p>
 <p>Kuten nimi paljastaa, Midi-soitinta käytetään midi-musiikkitiedostojen soittamiseen. Midi-tiedostot ovat erityisiä, koska ne eivät sisällä varsinaista digitointia ja jollain tavalla koodattua musiikkia, vaan kuvauksen siitä: Pidä tämä nuotti näin pitkään tällä äänenvoimakkuudella ja käytä sen soittamiseen instrumenttia X.<br />
-Samalla kun tämä pitää tiedostot aika pieninä, siitä seuraa myös riippuvuus soitinkirjastoon (niin kutsuttu "SoundFont"), joiden tulos voi erota valtavasti. Näillä SoundFonts-kirjastoilal on taipumus olla aika laajoja, kasvattaen soitinnäytteiden laatua ja lukumäärää.</p>
-<div class="box-info"><p>Haikun mukana ei tule asennettuja SoundFont-kirjastoja, koska ne ovat niin laajoja ja vain muutamat ihmiset yleensä tarvitsevat sellaista. Useimmilla heillä on jo korkealaatuinen tai räätälöity SoundFonts-kirjasto. Jotta kykenisit kuulemaan edes <i>jotakin</i> voit asentaa ilmaisen kirjaston valinnaispakkauksesta. Kirjoita Pääteikkunassa: <tt>installoptionalpackage TimGMSoundFont</tt></p>
-<p>Kaikkien muiden SoundFont-kirjastojen käyttämiseksi luo linkki siihen kansiossa <tt>/boot/system/data/synth</tt> ja nimeä se nimellä <tt>big_synth.sy</tt>.</p></div>
+Samalla kun tämä pitää tiedostot aika pieninä, siitä seuraa myös riippuvuus soitinkirjastoon (niin kutsuttu "SoundFont"), joiden tulokset voivat erota valtavasti. Näillä SoundFonts-kirjastoilla on taipumus olla aika laajoja, kasvattaen soitinnäytteiden laatua ja lukumäärää.</p>
+<div class="box-info"><p>Haiku-julkaisu sisältää pienen, mutta suhteellisen korkealaatuisen SoundFont-kirjaston. MIDI:ä vakavammin käyttävillä on usein hyvin korkealaatuisia tai itse tehtyjä SoundFont-kirjastoja.</p>
+<p>Muiden (kuin niiden, jotka tulevat HaikuVaraston kautta HPKG-tiedostoina) SoundFont-kirjastojen käyttämiseksi kopioi vain .sf-tiedosto esimerkiksi hakemistoon <tt>~/config/non-packaged/data/synth/</tt>. Voit valita aktiivin SoundFont-kirjaston Media-asetuksissa valikosta <span class="menu">MIDI</span></p></div>
 <img src="../images/apps-images/midiplayer.png" alt="midiplayer.png" />
 <p>Midi-soittimen käyttöliittymä on hyvin yksinkertainen. Vain kaksoisnapsauta tai raahaa ja pudota midi-tiedosto ja soittaminen alkaa. Ohjaat äänenvoimakkuutta liukukytkimellä ja lisäät kaikuefektejä <span class="menu">Kaikuefekti</span>-ponnahdusvalikosta. Näkyvyysalueen aktivoiminen näyttää visualisoinnin ylhäällä näkyvänä oskilloskooppikuvana.</p>
 

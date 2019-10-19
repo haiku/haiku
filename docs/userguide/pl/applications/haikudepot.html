@@ -30,11 +30,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/pl.png" alt="" /> Polski</li>
+<li><a href="../../id/applications/haikudepot.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/haikudepot.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/applications/haikudepot.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/applications/haikudepot.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/applications/haikudepot.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/applications/haikudepot.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/haikudepot.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/haikudepot.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/haikudepot.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_PT/applications/haikudepot.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
@@ -85,25 +87,25 @@
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="filter" name="filter">Filtr</a></h2>
-<p>At the top we find a few means to filter the list of available packages below:</p>
+<p>U góry znajduje się kilka możliwości filtrowania listy dostępnych pakietów:</p>
 <ul>
-<li><p>The <span class="menu">Category</span> pop-up menu lets you limit the list to individual categories like "<i>Audio</i>" or "<i>Games</i>".</p></li>
-<li><p>The <span class="menu">Search terms</span> text field filters the list to those packages that have all the entered (space-delimited) strings in their name or description.</p></li>
+<li><p>Menu <span class="menu">Kategoria</span> pozwala zawęzić listę wyników do konkretnych kategorii, jak <i>Audio</i> czy <i>Gry</i>.</p></li>
+<li><p>Pole tekstowe <span class="menu">Wyszukaj frazę</span> filtruje pakiety według podanych słów, występujących w ich nazwie lub opisie.</p></li>
 <li><p>The checkbox to <span class="menu">Show only featured packages</span> can be activated to further filter the results in the set category or of the entered search terms.</p></li>
-<li><p>The <span class="menu">Repositories</span> menu of the menu bar determines which repos are being queried. "<i>Local</i>" packages are the ones that were installed from somewhere other than an online repo; maybe from a USB thumb drive or downloaded from some website or a package that you've built yourself.</p></li>
+<li><p>Menu <span class="menu">Repozytoria</span> decyduje które repozytoria sieciowe są odpytywane oraz czy wyświetlać tylko pakiety spoza repozytoriów (lokalne). Takie pakiety mogą pochodzić z dysku USB, strony internetowej lub być zbudowane samodzielnie.</p></li>
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="list" name="list">Lista</a></h2>
-<p>Like in any Tracker window, you can choose from a context menu which columns to display by right-clicking the column heading. A left-click sorts the list according to that column. Of course, you can rearrange the columns by dragging them to a new position.</p>
-<p>The status column of a package can have one of several states:</p>
+<p>Tak jak w oknie Trackera, możesz wybrać wyświetlane kolumny z menu kontekstowego klikając prawym przyciskiem myszy na nagłówkach kolumn. Kliknięcie lewym przyciskiem sortuje listę według tej kolumny. Oczywiście można również zmieniać kolejność kolumn przeciągając je na nową pozycję.</p>
+<p>Kolumna <i>Status</i> może być w jednym z kilku stanów:</p>
 <ul>
-<li><p><span class="menu">Active</span>: The package is currently installed and ready to be used.</p></li>
-<li><p><span class="menu">Available</span>: The package exists in that repository and can be downloaded and installed. If there are any dependencies on other packages, you'll be informed of that while installing and get the choice of downloading/installing all that's necessary.</p></li>
-<li><p><span class="menu">Pending / %</span>: <i>Pending</i> is shown for a package that is queued for download/installation. While a package is downloaded, the progress is shown as percentage.</p></li>
-<li><p><span class="menu">Update available</span>: There's a newer version than your installed one available.</p></li>
+<li><p><span class="menu">Aktywny</span>: pakiet jest zainstalowany i gotowy do pracy.</p></li>
+<li><p><span class="menu">Dostępny</span>: pakiet istnieje w repozytorium oraz może być pobrany i zainstalowany. Jeżeli występują zależności od innych pakietów, otrzymasz o tym informację podczas instalacji oraz dostaniesz wybór czy pobrać/zainstalować wszystkie brakujące pakiety.</p></li>
+<li><p><span class="menu">Oczekiwanie / %</span>: ten status wyświetla się przy pakietach zakolejkowanych do pobrania/instalacji. Gdy pakiet jest w trakcie pobierania wyświetlany jest postęp w procentach.</p></li>
+<li><p><span class="menu">Aktualizacja dostępna</span>: dostępny jest pakiet w nowszej wersji niż zainstalowana.</p></li>
 </ul>
-<p>You can grab the dotted line between the packages list and the info area to vertically resize the packages list.</p>
+<p>Wykropkowana linia pomiędzy Obszarem informacji a listą pakietów pozwala zmienić proporcje rozmiarów w oknie.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="info" name="info">Obszar informacji</a></h2>
@@ -128,7 +130,7 @@ In the middle are user comments with their nickname, the number of stars they ga
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="menu" name="menu">Tools and Show menu</a></h2>
+<a id="menu" name="menu">Menu Narzędzia i Pokaż</a></h2>
 <p>In the <span class="menu">Tools</span> menu at the top of the window, you'll find an item to <span class="menu">Refresh repositories</span>. This will request an up-to-date list of all available packages from the repositories.<br />
 The second item is to <span class="menu">Manage repositories...</span>. It opens the <a href="../preferences/repositories.html">Repositories</a> preferences, to add/remove or disable and enable repositories.<br />
 <span class="menu">Check for updates...</span> opens the <a href="../apps/softwareupdater.html">SoftwareUpdater</a> to search and install updated packages.</p>

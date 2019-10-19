@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2012-2016, Haiku, Inc. All rights reserved.
+ * Copyright 2012-2019, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,11 +31,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/fi.png" alt="" /> Suomi</li>
+<li><a href="../id/workshop-wlan.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/workshop-wlan.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/workshop-wlan.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/workshop-wlan.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/workshop-wlan.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/workshop-wlan.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/workshop-wlan.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/workshop-wlan.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/workshop-wlan.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/workshop-wlan.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -64,9 +66,9 @@
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Hakemisto</td></tr>
 <tr class="index"><td>
-	<a href="#firmware">Kuinka tuettu laitteisto saadaan toimimaan</a><br />
 	<a href="#gui">Langattomaan verkkoon liittyminen</a><br />
 	<a href="#commandline">Liittyminen komentoriviltä</a><br />
+	<a href="#firmware">Kuinka tuettu laitteisto saadaan toimimaan</a><br />
 	<a href="#tips">Vihjeet</a>
 </td></tr>
 </table>
@@ -74,19 +76,9 @@
 <h1>Työpaja: Langaton verkko</h1>
 
 <p>Verkkoyhteyksien saaminen toimimaan on olennasta nykypäivän tarpeessa pysyvään internet-yhteyteen. Koska erilaisten ja jatkuvasti muuttuvien laitteistojen ja ajurien pitäminen ajan tasalla on aika mahdotonta pienelle projektille, Haiku käyttää <a href="http://www.freebsd.org">FreeBSD</a>-yhteensopivuuskerrosta verkkoajureissaan.<br />
-Tämä takaa valtavan joukon tuettuja laitteita, vaikka se ei luultavasti kata 100 prosenttia markkinoilla olevista. Katso <a href="https://www.haiku-os.org/guides/daily-tasks/wireless#hardware-notes">tätä luetteloa verkossa</a> tuetuista malleista tai tarkista <a href="http://www.freebsd.org/releases/11.1R/hardware.html#WLAN">FreeBSD 11.1:n julkistettujen laitteiden tiedot</a>.</p>
+Tämä takaa valtavan joukon tuettuja laitteita, vaikka se ei luultavasti kata 100 prosenttia markkinoilla olevista. Katso tuettujen mallien luettelo <a href="http://www.freebsd.org/releases/12.0R/hardware.html#wlan">FreeBSD 12.0:n julkistuksen laitteiden tiedot</a>.</p>
 <div class="box-info">Nykyisin vain PCI-, PCI-X-, PCI-Express-, Mini PCI-, ja Mini PCI-Express-laitteiden otaksutaan toimivan.<br />
 PCMCIA-, CardBus-, ExpressCard-, USB- ja ISA-laitteet tarvitsevat vielä työtä tullakseen toimiviksi.</div>
-
-<h2>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="firmware" name="firmware">Kuinka tuettu laitteisto saadaan toimimaan</a></h2>
-<p>Vieläpä kun ensimmäinen estä yleisesti tuetulle laitteistolle on otettu, niin jotkut langattomat verkkokortit vaativat binaarimikro-ohjelmistomoduuleja toimiakseen oikein. Haiku ei voi sisällyttää joitakin näitä yksityisomistuksellisia mikro-ohjelmistotiedostoja lisenssointiehtojen vuoksi. Haiku sisältää kuitenkin joitakin skriptejä, jotka noutavat ja asentavat kaikki tarvittavat yksityisoikeudelliset palaset sinulle. Jos suunnittelet langatonta verkko, on yleensä hyvä ajatus suorittaa nämä skriptit, jotta varmistut, että järjestelmässäsi on kaikki nämä tarvitsemasi tarvittavat mikro-ohjelmistot käytettävissä.</p>
-<p>Avaa Pääteikkuna ja kirjoita:</p>
-<pre class="terminal">install-wifi-firmwares.sh</pre>
-<p>Katselmoi nyt lisenssit ja hyväksy ne, jotta voit asentaa kaikki tarvittavat mikro-ohjelmistotiedostot.</p>
-
-<p>Jos sinulla ei ole Haikussa pääsyä internettiin puuttuvien mikro-ohjelmistotiedostojen lataamiseksi, on olemassa erillismenetelmä, katso <a href="#tips">Vihjeet</a> alla.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -115,17 +107,20 @@ Tulostus näyttää julkisen nimen (SSID), MAC-osoitteen, signaalivoimakkuuden j
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="tips" name="tips">Vihjeet</a></h2>
-<h3>Laiteohjelmistotiedostojen lataus ilman verkkoa</h3>
+<a id="firmware" name="firmware">Kuinka tuettu laitteisto saadaan toimimaan</a></h2>
+<p>Kaikki tuetut nykyaikaiset langattomat laitteet toimivat suoraan pakkauslaatikosta otettuna.</p>
+
+<p>Muutamat vanhat piirisarjat (Intel 2100/2200/2225/2915, Broadcom 43xx, Marvell 88w8335) vaativat binaarisia laitteisto-ohjelmistomoduuleja, joita Haiku ei kuitenkaan voi jakaa lisensointisyistä. Jotta nämä langattomat kortit saataisiin toimimaan, mukaan on lisätty yksinkertainen skripti, joka noutaa ja asentaa tarvittavat yksityisomistukselliset palaset sinulle.</p>
+<p>Avaa Pääteikkuna ja kirjoita:</p>
+<pre class="terminal">install-wifi-firmwares.sh</pre>
+<p>Katselmoi nyt lisenssit ja hyväksy ne, jotta voit asentaa kaikki tarvittavat mikro-ohjelmistotiedostot.</p>
+
 <p>Jos et saa binaarilaiteohjelmistotiedostoja <tt>install-wifi-firmwares.sh</tt>-skriptin avulla (esimerkiksi koska sinulla ei ole internet-yhteyttä Haiku-käyttöjärjestelmässä), voi myös ladata <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt">tämän pääteikkunaskriptin</a>, ja suorittaa sen toisessa käyttöjärjestelmässä, jossa on <tt>wget</tt> ja <tt>zip</tt> asennettuna.<br />
 Windows-käyttäjillä on oltava <a href="http://gnuwin32.sourceforge.net/packages/wget.htm">wget</a> ja <a href="http://gnuwin32.sourceforge.net/packages/zip.htm">zip</a> asennettuna Windowsin oletussijainteihin ja heidän on käytettävä <a href="https://www.haiku-os.org/files/download-data-for-wlan-firmwares.bat">tätä eräajoskriptiä</a>.<br />
 Skripti lataa tarvittavat tiedostot ja luo zip-tiedoston, joka puretaan Haikun <tt>/boot</tt>-kansioon. Kun purkaminen on suoritettu, avaa Pääteikkuna ja kirjoita:</p>
 <pre class="terminal">install-wifi-firmwares.sh</pre>
 <p>Käy läpi lisenssit ja hyväksy ne kaikkien nyt saatavissa olevien laiteohjelmistotiedostojen asentamiseksi.</p>
-<h3>Yhteyden katkeamisen välttäminen</h3>
-<p>Haiku-ajureilla joillekin WLAN-piirisarjoille kuten iprowifi4965:lle on taipumusta kadottaa yhteys, kun käytetään WPA-salausta. Jos sinulla tapahtuu tällaista, yritä ottaa pois käytöstä ”HT mode” (high throughput, 802.11n) ennen verkkoon kytkeytymistä:</p>
-<pre class="terminal">ifconfig /dev/net/iprowifi4965/0 -ht</pre>
-<p>Jos se korjaa pulman, laita kyseinen rivi <span class="path">~/config/settings/boot/UserBootscript</span>-skriptiin, jotta se suoritetaan automaattisesti joka kerta käynnistymisen yhteydessä.</p>
+
 </div>
 </div>
 

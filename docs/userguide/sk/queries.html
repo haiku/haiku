@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,11 +31,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/sk.png" alt="" /> Slovenčina</li>
+<li><a href="../id/queries.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/queries.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/queries.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/queries.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/queries.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/queries.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/queries.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/queries.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/queries.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/queries.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -58,6 +60,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Preklad tejto stránky zatiaľ nie je dokončený. Dovtedy sa nedokončené časti zobrazia v anglickom origináli.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -112,9 +115,9 @@ Je to ešte lepšie - na opätovné vykonanie požiadavky na ňu nemusíte ani d
 <p>Týmto pribudne naľavo od textového poľa rozbaľovacieho menu a tlačidlá <span class="button">Pridať</span> a <span class="button">Odstrániť</span> pod tým. Z menu si vyberiete, ktorý atribút má byť predmetom požiadavky. Tlačidlami <span class="button">Pridať</span> a <span class="button">Odstrániť</span> môžete hľadať ďalšie atribúty alebo ich znova odstrániť. Tieto atribúty môžete logicky spojiť operátormi A alebo ALEBO.</p>
 <p>Ako príklad spravme požiadavku na e-mail:</p>
 <img src="images/queries-images/query-window-filled.png" alt="query-window-filled.png" />
-<p>Takto vyzerá okno Nájsť, keď hľadáte všetky e-maily, ktoré vám Clara Botters poslala za posledné 2 mesiace a mali v predmete slová „vibrafón“ alebo „skeptickosť“.<br />
-Ako vidíte, hľadanie časovo založených atribútov ponúka zopár užitočných fráz: okrem „posledné 2 mesiace“ môžete použiť „dnes“, „včera“, „Pondelok“ alebo „minulý pondelok“ (čo by bol pondelok minulého týždňa), či „posledné 2 minúty/hodiny/dni/týždne“.<br />
-Je to dobrý spôsob na zúženie výsledkov hľadania.</p>
+<p>This is your Find window when you're looking for all emails Clara Oswald has sent to you in the last two months that had in the subject "sufflé" or "impossible".<br />
+As you see, searching through time-based attributes supports some useful phrases: besides for the "last 2 months", you could also use "today", "yesterday", "Monday" or "last Monday" (which would be the Monday last week), or "last 2 minutes/hours/days/weeks".<br />
+A good way to cut down the number of search results.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -123,15 +126,15 @@ Je to dobrý spôsob na zúženie výsledkov hľadania.</p>
 <p>Vezmite si hore uvedenú požiadavku podľa atribútu ohľadom e-mailov od Clary. Ak máte všetky atribúty a hľadané výrazy nastavené, skúste prepnúť do režimu <span class="menu">podľa vzorca</span> a nechajte sa ohromiť týmto jednoriadkovým reťazcom:</p>
 <img src="images/queries-images/formula-query.png" alt="formula-query.png" />
 <p>Ešte raz ako text upravený pre lepšiu čitateľnosť:</p>
-<pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [bB][oO][tT][tT][eE][rR][sS]*")
-       &amp;&amp;(MAIL:when&gt;=%2 mesiace%))
-       &amp;&amp;(MAIL:subject=="*[vV][iI][bB][rR][aA][fF][óÓ][nN]*"))
-       ||(MAIL:subject=="*[sS][kK][eE][pP][tT][iI][cC][kK][oO][sS][ťŤ]*"))
+<pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [oO][sS][wW][aA][lL][dD]*")
+       &amp;&amp;(MAIL:when&gt;=%2 months%))
+       &amp;&amp;(MAIL:subject=="*[sS][uU][fF][fF][lL][éÉ]*"))
+       ||(MAIL:subject=="*[iI][mM][pP][oO][sS][sS][iI][bB][lL][eE]*"))
        &amp;&amp;(BEOS:TYPE=="text/x-email"))</pre>
 <p>Aké je využitie?</p>
 <ul>
 <li><p>Reťazec môžete kopírovať a vložiť do e-mailu, fóra alebo IRC pre iných na použitie alebo ladenie.</p></li>
-<li><p>Môžete použiť túto metódu na skonštruovanie požiadavky v režime <span class="menu">podľa atribútu</span> a potom prepnúť do režimu <span class="menu">podľa vzorca</span>, čím môžete pohodlne vygenerovať reťazec na hľadanie s použitím Terminálu alebo skriptu.</p></li>
+<li><p>You can use this method to construct a query in <span class="menu">Attribute</span> mode and then switch to <span class="menu">Formula</span> mode, to comfortably generate a search string. Enclosed in single quotes, that string can then be used with the <span class="cli">query</span> command in the Terminal.</p></li>
 <li><p>Môžete doladiť vašu požiadavku vložením zátvorky kde to je potrebné, nastavením odlišovania veľkosti písma alebo negáciou logických kombinácií napr. zmenou „<tt>==</tt>“ na „<tt>!=</tt>“ pre A ANI. Potrebujete iba základné chápanie <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression">regulárnych výrazov</a> a možno nejaké základy skriptovania.</p></li>
 </ul>
 

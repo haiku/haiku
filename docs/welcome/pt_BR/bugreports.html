@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -33,11 +33,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../id/bugreports.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/bugreports.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/bugreports.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/bugreports.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/bugreports.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/bugreports.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/bugreports.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/bugreports.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/bugreports.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/bugreports.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -158,6 +160,7 @@ Uma ou mais páginas de texto serão exibidas na tela, apenas as últimas poucas
 <tr><td>- <span class="cli">listusb -v</span></td><td> </td><td>Supondo que seja um problema relacionado a USB, é similar ao <span class="cli">lsusb</span>.</td></tr>
 <tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>The primary system log used by Haiku, see <a href="#syslog">Syslog</a> above, akin to on screen debugging during boot. With the <span class="cli">open</span> command you can crop down the relevant part of the syslog in a text editor.</td></tr>
 <tr><td class="onelinetop">- <span class="cli">listimage | grep drivers/</span></td><td> </td><td>Lista todos os drivers utilizados.</td></tr>
+<tr><td>- <span class="cli">usb_hid_report</span></td><td> </td><td>In case of USB input devices, add the <span class="cli">/tmp/usb_hid_report_descriptor_*.bin</span> file.</td></tr>
 <tr><td>- <span class="cli">ints</span></td><td> </td><td>Apenas disponível na <i>Terra da Deupração do Kernel</i> (ver acima). Exibe a utilização das interrupções. There shouldn't be too many that are shared by different devices.</td></tr>
 <tr><td colspan="3">- On screen debug output (a safe mode boot time option, see <a href="#onscreen">above</a>).</td></tr>
 </table>

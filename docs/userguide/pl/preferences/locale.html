@@ -10,12 +10,14 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  *		Gerard Stanczak (Google Code-In student)
+ * Translators:
+ *		Kacper Kasper
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Locale</title>
+	<title>Język i format</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
@@ -29,11 +31,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/pl.png" alt="" /> Polski</li>
+<li><a href="../../id/preferences/locale.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/preferences/locale.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/preferences/locale.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/preferences/locale.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/preferences/locale.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/preferences/locale.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/preferences/locale.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/preferences/locale.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/preferences/locale.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_PT/preferences/locale.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
@@ -57,38 +61,37 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tłumaczenie tej strony jest niekompletne. Nieukończone części wyświetlane są w języku angielskim.</div>
 
-<h2><img src="../../images/prefs-images/locale-icon_64.png" alt="locale-icon_64.png" width="64" height="64" />Locale</h2>
+<h2><img src="../../images/prefs-images/locale-icon_64.png" alt="locale-icon_64.png" width="64" height="64" />Język i format</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferencje</span></td></tr>
 <tr><td>Ścieżka:</td><td></td><td><span class="path">/boot/system/preferences/Locale</span></td></tr>
 <tr><td>Ustawienia:</td><td></td><td><span class="path">~/config/settings/Locale settings</span></td></tr>
 </table>
 <p><br /></p>
-<p>Haiku's localization system does not only include replacing texts with their translations, but also more complex tasks such as formatting numbers, dates, and times in a way that matches your Locale preferences.</p>
-<div class="box-info">If you would like to help with translations or start with a language that is currently missing, please get in contact on the <a href="http://www.freelists.org/list/haiku-i18n">Haiku-i18n mailing list</a>.</div>
+<p>System lokalizacji Haiku obejmuje nie tylko zamianę komunikatów w języku angielskim na ich tłumaczenia, ale też bardziej skomplikowane zadania, takie jak formatowanie liczb, dat oraz czasu w sposób odpowiadający ustawieniom językowym.</p>
+<div class="box-info">Jeżeli chcesz pomóc z tłumaczeniem lub rozpocząć nowe, skontaktuj się z nami na <a href="http://www.freelists.org/list/haiku-i18n">liście mejlingowej Haiku-i18n</a>.</div>
 <h2>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Language</h2>
-<p>Haiku has been translated to dozens of languages, unfortunately some translations are not complete yet. For that reason, you can choose more than one language as “Preferred languages”. If some text is missing in a translation, it's replaced with the words of the next preferred language. English is the default fallback (also when not listed).</p>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Język</h2>
+<p>System Haiku został przetłumaczony na kilkanaście języków, ale niestety niektóre z tych tłumaczeń nie są kompletne. Z tego powodu możliwe jest wybranie kilku preferowanych języków. Jeżeli w jednym z nich brakuje danego tłumaczenia, zostanie ono wybrane z kolejnego języka na liście. Angielski jest zawsze na jej końcu, nawet jeśli nie jest wyświetlony.</p>
 <img src="../images/prefs-images/locale-language.png" alt="locale-language.png" />
-<p>In this example, the preferred language is set to Spanish. The first fallback is Italian, and if the text is missing there too, it's back to default English.<br />
-As you can see, expanding a language entry on the left side reveals sub-entries for specific variations or dialects of a language (if available).</p>
+<p>W tym przykładzie preferowanym językiem jest hiszpański, zapasowym – włoski, a jeżeli i w nim brakuje tłumaczenia, wybrany zostaje angielski.<br />
+Jak widać, rozwijanie wpisów na liście z lewej strony, pokazuje różne warianty oraz dialekty danego języka (jeżeli istnieją).</p>
 <h2>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Formatting</h2>
-<p>On the <span class="menu">Formatting</span> tab you can set up the formatting of date, time, number and currency formats independently from the settings of your preferred language.</p>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Formatowanie</h2>
+<p>Na karcie <span class="menu">Formatowanie</span> można ustawić sposób formatowania dat, godzin, liczb i walut niezależnie od ustawień preferowanego języka.</p>
 <img src="../images/prefs-images/locale-formatting.png" alt="locale-formatting.png" />
-<p>You may be a Spanish fellow located in the Italian speaking part of Switzerland. So, you'd prefer your system in Spanish, but numbers and currency formatted like at work: Swiss/Italian.<br />
-If you're more comfortable with your Spanish names for days and months (think of the modified dates of files, for example), you can override this time-specific formatting with the checkbox at the top to <span class="menu">Use month/day-names from preferred language</span>.</p>
-<p>Granted, the above example is maybe not the most common scenario, but it demonstrates the flexibility of the system.</p>
+<p>Jeżeli pochodzisz z Hiszpanii, a mieszkasz we włoskojęzycznej części Szwajcarii, możesz ustawić język systemu na hiszpański, ale liczby i waluty skonfigurować jak w pracy.<br />
+Nazwy dni i miesięcy (np. przy wyświetlaniu dat modyfikacji plików), mogą pochodzić z preferowanego języka po zaznaczeniu pola wyboru <span class="menu">Użyj nazw dni i miesięcy z preferowanego języka</span>, które nadpisuje pozostałe ustawienia formatowania czasu.</p>
+<p>Oczywiście powyższy przykład nie zdarza się zbyt często, ale pokazuje elastyczność systemu.</p>
 <h2>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Options</h2>
-<p>The last tab provides an option that will <span class="menu">Translate application and folder names in Deskbar and Tracker</span>. Disable the checkbox if you prefer the graphical interface localized, while retaining the original English names for preference panels, applications and standard folder names.</p>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Opcje</h2>
+<p>Ostatnia karta zawiera pole wyboru <span class="menu">Tłumacz aplikacje i nazwy folderów w Deskbarze i Trakerze</span>. Wyłączenie go pozostawi nazwy aplikacji, panelów preferencji i standardowych katalgów w angielskim oryginale, mimo że reszta interfejsu będzie wyświetlana w preferowanym języku.</p>
 <p><br /> </p>
-<p>Changes are applied immediately, though currently running applications may require to be closed and restarted before showing the new setting.</p>
+<p>Wszystkie ustawienia są natychmiast stosowane, chociaż w przypadku już działających aplikacji wymagane jest ich ponowne uruchomienie.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="button">Przywróć domyślne </span></td><td> </td><td>ustawia domyślne wartości dla każdego z pól.</td></tr>
-<tr><td><span class="button">Cofnij</span></td><td> </td><td>brings back the settings that were active when you started the Locale preferences.</td></tr>
+<tr><td><span class="button">Cofnij</span></td><td> </td><td>przywraca ustawienia aktywne w momencie uruchomienia panelu preferencji.</td></tr>
 </table>
 
 </div>

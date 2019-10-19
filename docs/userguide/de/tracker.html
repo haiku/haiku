@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2018, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,10 +32,12 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/de.png" alt="" /> Deutsch</li>
+<li><a href="../id/tracker.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/tracker.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../en/tracker.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/tracker.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/tracker.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/tracker.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/tracker.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/tracker.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/tracker.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -59,6 +61,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Solange die Übersetzung dieser Seite noch nicht ganz fertig ist, erscheint für die noch fehlenden Teile die englische Version.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -105,7 +108,7 @@ Dies gilt auch bei der Navigation über die Tastatur. Mehr hierzu unter <a href=
 Wenn man bei dieser Art der Navigation zusätzlich noch einen Datei zieht, wird sie an den Ort verschoben (innerhalb des gleichen Datenträgers) oder kopiert (auf einen anderen Datenträger) über dem man sie los lässt.</p>
 <p>Eine ähnliche Navigationsmethode steht in jedem Tracker-Fenster zur Verfügung:</p>
 <img src="images/tracker-images/window-drill-down.png" alt="window-drill-down.png" />
-<p>Ein Klick auf den linken unteren Bereich - dort wo die Anzahl der angezeigten Einträge steht - öffnet ein Menü, dass alle übergeordneten Ordner bis zur obersten Ebene (dem Arbeitsplatz) enthält, was ein Navigieren zum gewünschten Zielordner möglich macht.</p>
+<p>Ein Klick auf den linken unteren Bereich - dort wo die Anzahl der Objekte gezeigt wird - öffnet ein Menü, dass alle übergeordneten Ordner bis zur obersten Ebene (dem Arbeitsplatz) enthält, was ein Navigieren zum gewünschten Zielordner möglich macht.</p>
 <p>Als Hinweis: der Arbeitsplatz (Desktop) ist immer die höchste Ebene in der Ordnerstruktur, da im Tracker dort die eingebundenen Datenträger angezeigt werden. Wenn man - über diese Art der Navigation - auf einen anderen Datenträger wechseln möchte, muss man zum Arbeitsplatz, um dort alle eingebundenen Laufwerke angezeigt zu bekommen.</p><br />
 <p>Die gleiche Möglichkeit der Navigation über Untermenüs erhält man auch, wenn man eine Datei über einen Ordner zieht und einen kurzen Moment verweilt. Es klappt dann ein Untermenü auf, in dem man sich bis zum gewünschten Ordner vorarbeiten kann, um die Datei dorthin zu verschieben. Wenn die Datei mit der rechten Maustaste gezogen wurde, dann öffnet sich nach dem Loslassen ein Auswahlmenü zum Kopieren, Verschieben oder Verweis erstellen der Datei.</p>
 
@@ -130,7 +133,7 @@ Dieses "type-ahead" filtern wird in den <a href="#tracker-preferences.html">Trac
 <ul>
 <li><p><span class="menu">Icon-Ansicht</span> (<span class="key">ALT</span> <span class="key">1</span>) - Große Icons; die Größe kann im dazugehörigen Untermenü oder über die Tastenkombination <span class="key">ALT</span> <span class="key">+</span>/<span class="key">-</span> eingestellt werden.</p></li>
 <li><p><span class="menu">Mini-Icon-Ansicht</span> (<span class="key">ALT</span> <span class="key">2</span>) - Kleine Icons.</p></li>
-<li><p><span class="menu">Listenansicht</span> (<span class="key">ALT</span> <span class="key">3</span>) - Eine detaillierte Liste der Dateien; hier ist es möglich die unterschiedlichen <i>Attribute</i> zu den Dateien anzeigen zu lassen. (Mehr dazu im Abschnitt <a href="attributes.html">Attribute</a>.) Aus dem Untermenü lässt sich eine Darstellung mit mini oder großen Icons wählen.</p></li>
+<li><p><span class="menu">Listen-Ansicht</span> (<span class="key">ALT</span> <span class="key">3</span>) - Eine detaillierte Liste der Dateien; hier ist es möglich die unterschiedlichen <i>Attribute</i> zu den Dateien anzeigen zu lassen (mehr dazu im Kapitel <a href="attributes.html">Attribute</a>.)</p></li>
 </ul>
 <p>Das <span class="menu">Fenster</span>-Menü hat noch weitere Einträge:</p>
 <ul>
@@ -185,10 +188,16 @@ Dieses "type-ahead" filtern wird in den <a href="#tracker-preferences.html">Trac
 <br /><br />
 <img src="images/tracker-images/open-with-preferred.png" alt="open-with-preferred" />
 <p>Hier werden nochmals alle Programme aufgelistet, die bereits im Untermenü zu sehen waren, jedoch mit zusätzlichen Informationen. Wenn man ein Programm auswählt und auf <span class="button">Öffnen und zur Bevorzugten machen</span> klickt, kann man gleichzeitig die bevorzugte Anwendung für diesen Dateityp, hier <tt>text/plain</tt> setzen.</p></li>
-<li><span class="menu">Datei-Info</span>
-<br /><br />
+<li><span class="menu">Get info</span>
+<p>This opens a panel that shows the meta data of a file and lets you edit its permissions. You can rename it by clicking on the file name at the top.</p>
 <img src="images/tracker-images/get-info.png" alt="get-info" />
-<p>In dem sich öffnenden Fenster werden Informationen zu der ausgewählten Datei angezeigt. Ein Klick auf den Dateipfad öffnet ein Tracker-Fenster. Es besteht hier auch die Möglichkeit, für diese Datei die bevorzugte Anwendung auszuwählen und - wenn das kleine Dreieck neben Berechtigungen geklickt wird - im Weiteren die Dateirechte und den Besitzer der Datei festlegen. (Hinweis: bis Haiku ein Mehr-Benutzer-System ist, "gehören" alle Dateien dem Benutzer "baron"; wer das ist, und warum ihm alle Dateien gehören, erschließt sich nach der Lektüre der "BeOS Bible" von Scott Hacker.)</p></li>
+<p>The panel consists of three tabs:</p>
+<ul>
+<li><span class="menu">Information</span>: Shows standard data like size, date of creation/modification, file type and location. Click on the location path to open the files parent folder. The <span class="menu">Open with</span> menu sets the preferred application to open this particular file.</li>
+<li><span class="menu">Permissions</span>: Lets you change owner, group and file permissions.</li>
+<li><span class="menu">Attibutes</span>: Lists all extra file attributes with their value and type.</li>
+</ul>
+</li>
 <li><p><span class="menu">Umbenennen</span>, <span class="menu">Duplizieren</span> and <span class="menu">In Papierkorb verschieben</span> - Hiermit wird der Dateiname geändert, die Datei wird dupliziert oder in den Papierkorb verschoben.</p></li>
 <li><p><span class="menu">Verschieben nach</span>, <span class="menu">Kopieren nach</span> and <span class="menu">Verknüpfung erstellen</span> - Über die Navigation durch Untermenüs wird die Datei zum Ziel verschoben, kopiert oder dort ein Verweis zu der Datei erzeugt. Wenn man gleichzeitig <span class="key">SHIFT</span> drück, kann man einen relativen Verweis anlegen.</p></li>
 <li><p><span class="menu">Ausschneiden</span>, <span class="menu">Kopieren</span> and <span class="menu">Einfügen</span> - Die Datei wird mittels Zwischenablage ausgeschnitten, kopiert oder eingefügt. Wenn gleichzeitig <span class="key">SHIFT</span> gedrückt wird, beim Aufrufen dieses Menüpunktes, können per <span class="menu">Mehr kopieren/ausschneiden</span> mehrere Dateien in die Zwischenablage kopiert / ausgeschnitten werden; bei Drücken von <span class="key">SHIFT</span> wird die Datei bei der entsprechenden Auswahl nicht eingefügt, sondern lediglich ein Verweis dazu.</p></li>

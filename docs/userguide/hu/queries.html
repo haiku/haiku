@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -30,11 +30,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../id/queries.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/queries.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/queries.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/queries.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/queries.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/queries.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/queries.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/queries.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../pl/queries.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
 <li><a href="../pt_PT/queries.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
@@ -57,6 +59,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Az oldal fordítása még folyamatban van. Amíg tart a fordítás, addig a lefordítatlan részek angolul jelennek meg.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -111,9 +114,9 @@ Persze, nem csak e módon kaphatjuk meg a keresések eredményét. A <a href="tr
 <p>Ekkor megjelenik egy menü, egy beviteli mező és egy  <span class="button">Hozzáadás</span> és <span class="button">Eltávolítás</span> gomb. A menüből ki kell választanunk azt a jellemzőt, amire keresni szeretnénk. A <span class="button">Hozzáadás</span> és az <span class="button">Eltávolítás</span> gombbal további jellemzők is hozzáadhatóak, vagy meglévők törölhetőek. Több jellemző között És és Vagy kapcsolat közül választhatunk.</p>
 <p>Most hajtsunk végre egy keresést a leveleinkre:</p>
 <img src="images/queries-images/query-window-filled.png" alt="query-window-filled.png" />
-<p>Így néz ki egy keresési ablak, ha azokra a levelekre akarunk keresni, ahol a feladó neve tartalmazza a "trac" szót, a levél állapota új ("New"), a levél tárgyában pedig szerepel a "Translator" és az "About" szó.<br />
-Kereshetünk időben is: "last 2 months" (utóbbi 2 hónapban), "today" (ma), "yesterday" (tegnap), "Monday" (hétfőn) vagy "last Monday" (a legutóbbi hétfőn, vagy "last 2 minutes/hours/days/weeks" (az utóbbi 2 percben/órában/napon/héten).<br />
-Ez egy jó megoldás a keresés eredményének a számának a csökkentésére..</p>
+<p>This is your Find window when you're looking for all emails Clara Oswald has sent to you in the last two months that had in the subject "sufflé" or "impossible".<br />
+As you see, searching through time-based attributes supports some useful phrases: besides for the "last 2 months", you could also use "today", "yesterday", "Monday" or "last Monday" (which would be the Monday last week), or "last 2 minutes/hours/days/weeks".<br />
+A good way to cut down the number of search results.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -122,15 +125,15 @@ Ez egy jó megoldás a keresés eredményének a számának a csökkentésére..
 <p>Ha már megadtunk minden jellemzőt és feltételt, akkor a <span class="menu">képlet alapján</span> mód választásakor megkapjuk az annak megfelelő képletet:</p>
 <img src="images/queries-images/formula-query.png" alt="formula-query.png" />
 <p>Kicsit olvashatóbb formában:</p>
-<pre>(((((MAIL:from=="*[tT][rR][aA][cC]*")
-       &amp;&amp;(MAIL:status=="[nN][eE][wW]"))
-       &amp;&amp;(MAIL:subject=="*[tT][rR][aA][nN][sS][lL][aA][tT][oO][rR]*"))
-       &amp;&amp;(MAIL:subject=="*[aA][bB][oO][uU][tT]*"))
+<pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [oO][sS][wW][aA][lL][dD]*")
+       &amp;&amp;(MAIL:when&gt;=%2 months%))
+       &amp;&amp;(MAIL:subject=="*[sS][uU][fF][fF][lL][éÉ]*"))
+       ||(MAIL:subject=="*[iI][mM][pP][oO][sS][sS][iI][bB][lL][eE]*"))
        &amp;&amp;(BEOS:TYPE=="text/x-email"))</pre>
 <p>Mire is használható mindez?</p>
 <ul>
 <li><p>Levélben, fórumon vagy IRC-n keresztül is megosztható másokkal.</p></li>
-<li><p><span class="menu">Jellemzők</span> módban megadva a feltételeket miután átváltunk <span class="menu">képlet</span> módra a kapott szöveg (képlet) már felhasználható a parancssorban, így például szkriptek írásánál is.</p></li>
+<li><p>You can use this method to construct a query in <span class="menu">Attribute</span> mode and then switch to <span class="menu">Formula</span> mode, to comfortably generate a search string. Enclosed in single quotes, that string can then be used with the <span class="cli">query</span> command in the Terminal.</p></li>
 <li><p>Tovább hangolható a képlet, ha helyettesítő karaktereket is használunk, figyelünk a betű-érzékenységre illetve ellentétes feltételeket adunk meg. Például: "<tt>==</tt>" helyett "<tt>!=</tt>" az És tagadásaként. Csupán az alapokat kell elsajátítanunk a <a href="http://hu.wikipedia.org/wiki/Regul%C3%A1ris_kifejez%C3%A9s" class="external free" title="Wikipedia: Regular expression">általános kifejezés</a> oldalon és esetleg egy kis szkriptelési ismereteket is szereznünk kell.</p></li>
 </ul>
 

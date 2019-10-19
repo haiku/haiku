@@ -31,11 +31,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/fi.png" alt="" /> Suomi</li>
+<li><a href="../id/deskbar.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/deskbar.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/deskbar.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/deskbar.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/deskbar.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/deskbar.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/deskbar.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/deskbar.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/deskbar.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/deskbar.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -58,6 +60,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Hakemisto</td></tr>
@@ -79,7 +82,7 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="deskbar-menu" name="deskbar-menu">Työpöytäpalkkivalikko</a></h2>
-<p>Valikko avautuu, kun napsautat Työpöytäpalkin yläosaa.</p>
+<p>Valikko avautuu, kun napsautat Työpöytäpalkin yläosaa:</p>
 <img src="images/deskbar-images/deskbar.png" alt="deskbar.png" />
 <ul>
 <li><p><b>Haikusta...</b> - Näyttää joitakin järjestelmän perustietoja, lisenssitiedot ja Haiku-hankkeen tunnustukset kehittäjille.</p></li>
@@ -89,8 +92,8 @@
 <li><p><b>Liitä</b> - Tarjoaa samat valitsimet kuin kutsuttaessa hiiren kakkospainikkeella työpöydältä (katso <a href="tracker.html#mounting-volumes">Liitä taltiot</a>).</p></li>
 <li><p><b>Työpöytäpalkkiasetukset...</b> - Avaa paneelin Työpöytäpalkin asetuksia varten (katso alla).</p></li>
 <li><p><b>Sammuttaminen</b> - Avaa joko <span class="menu">Käynnistä järjestelmä uudelleen</span>- tai <span class="menu">Sammuta virta</span>-valitsimet.</p></li>
-<li><p><b>Äskettäiset asiakirjat, kansiot ja sovellukset</b> - Viimeiseksi avattujen asiakirjojen, kansioiden ja sovellusten luettelo (katso <span class="menu">Työpöytäpalkkiasetukset</span> alla).</p></li>
-<li><p><b>Sovellukset, Esittelyohjelmat, Työpöytäsovelmat ja Asetusohjelmat</b> - Asennettujen sovellusten, esittelyohjelmien, sovelmien ja asetusohjelmien luettelo.<br />Voit lisätä linkin muihin ohjelmiin (tai mihin tahansa kansioon, asiakirjaan, kyselyyn jne.) laittamalla ne kansioon <span class="path">~/config/settings/deskbar/menu/</span>.</p></li>
+<li><p><b>Äskettäiset asiakirjat, kansiot, sovellukset</b> - Viimeiseksi avattujen asiakirjojen, kansioiden ja sovellusten luettelo (katso <span class="menu">Työpöytäpalkkiasetukset</span> alla).</p></li>
+<li><p><b>Sovellukset, Esittelyohjelmat, Työpöytäsovelmat, Asetusohjelmat</b> - Asennettujen sovellusten, esittelyohjelmien, sovelmien ja asetusohjelmien luettelo.<br />Voit lisätä linkin muihin ohjelmiin (tai mihin tahansa kansioon, asiakirjaan, kyselyyn jne.) laittamalla ne kansioon <span class="path">~/config/settings/deskbar/menu/</span>.</p></li>
 </ul>
 
 <h3>
@@ -110,9 +113,10 @@
 </table>
 
 <h4>Valikko</h4>
-<p>Vaikka Työpöytäpalkin pari ensimmäistä valikkoriviä ovat kiinteitä, voit räätälöidä <span class="menu">Sammuta virta...</span>-valikkorivin alla olevia.<br />
-Tässä voit asettaa Työpöytäpalkin valikossa näkyvien äskettäisten asiakirjojen, kansioiden ja sovellusten lukumäärän, tai haluatko nähdä niitä ollenkaan.<br />Painike <span class="button">Muokkaa valikkoa...</span> avaa kansion <span class="path">~/config/settings/deskbar/menu/</span>. Siitä löydät tiedostot ja kansiot, jotka ilmaantuvat Työpöytäpalkkiin, oletuksena näitä ovat <span class="menu">Sovellukset</span>, <span class="menu">Esittelyohjelmat</span>, <span class="menu">Työpöytäsovelmat</span>, ja <span class="menu">Asetusohjelmat</span>.<br />
-Voit poistaa ja lisätä kohteita kuten linkkejä sovelluksiin, asiakirjoihin tai jopa kyselyjä yksinkertaisesti kopioimalla/poistamalla niitä tästä kansiosta tai tähän kansioon.</p>
+<p>While the first couple of menu items of the Deskbar are fixed, you can customized the ones below <span class="menu">Shutdown...</span>.<br />
+Here you can set the number of recent documents, folders and applications that are shown in their menu in the Deskbar, or if you want to see them at all.<br />
+The button <span class="button">Edit in Tracker...</span> opens the folder <span class="path">~/config/settings/deskbar/menu/</span>. In it you'll find the files and folders that appear in the Deskbar, by default these are <span class="menu">Applications</span>, <span class="menu">Demos</span>, <span class="menu">Deskbar applets</span>, and <span class="menu">Preferences</span>.<br />
+You can delete or add entries like links to applications, documents or even queries by simply copying/deleting them to/from this folder.</p>
 <!-- <p _translation_id="432">It's even easier to simply drag a file, folder or saved query and drop it where you want it into the Deskbar.</p> -->
 <div class="box-info"><p>Pakkauksesta automaattisesti asennetut ohjelmat laittavat valikkorivin Työpöytäpalkkiin. Asennettujen pakkausten lukumäärästä riippuen Työpöytäpalkki voi kasvaa liian laajaksi. Jos haluat mieluiten ohjata asetuksia itse ja haluat nähdä Työpöytäpalkissa vain ne sovellukset, jotka linkität sinne (mahdollisesti luokittelemalla alikansioihin), niin tee se näin:<br />
 Luo valikolle <span class="path">menu</span>-kansion linkki paikkaan <span class="path">~/config/settings/deskbar/</span> ja nimeä uudelleen <span class="path">menu_entries</span>. Pääteikkunassa linkki luodaan:</p>

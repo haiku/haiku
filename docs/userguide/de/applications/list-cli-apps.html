@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2017, Haiku. All rights reserved.
+ * Copyright 2010-2018, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,10 +32,12 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/de.png" alt="" /> Deutsch</li>
+<li><a href="../../id/applications/list-cli-apps.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/list-cli-apps.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/applications/list-cli-apps.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/applications/list-cli-apps.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/applications/list-cli-apps.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/list-cli-apps.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/list-cli-apps.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/list-cli-apps.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pl/applications/list-cli-apps.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
@@ -53,7 +55,7 @@
 
 <span>
 <a href="../applications.html#cli-apps" class="uplink">Applications</a>
-::  <a href="cli-apps.html">Haiku-specific commands</a>  »
+::  <a href="cli-apps.html">Haiku-specific commands</a>  »
 </span></div>
 </div>
 
@@ -87,8 +89,7 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>beep</tt></td><td> </td><td>Gibt einen Klang aus.</td></tr>
 <tr><td><tt>bunzip2</tt></td><td> </td><td>Siehe <tt>bzip2</tt>.</td></tr>
 <tr><td><tt>bzip2</tt></td><td> </td><td>Blöcke-sortierender Datei-Komprimierer.</td></tr>
-<tr><td><tt>c++</tt></td><td> </td><td>C++ Kompiler.</td></tr>
-<tr><td><tt>cal</tt></td><td> </td><td>Zeigt einen Kalender.</td></tr>
+<tr><td><tt>c++</tt></td><td> </td><td>C++-Compiler.</td></tr>
 <tr><td><tt>cat</tt></td><td> </td><td>Hängt Dateien aneinander und leitet das Ergebnis zur Standardausgabe.</td></tr>
 <tr><td><tt>catattr</tt></td><td> </td><td>Gibt den Inhalt eines Attributs einer Datei aus. <a href="cli-apps.html">(Haiku spezifisch)</a></td></tr>
 <tr><td><tt>cc</tt></td><td> </td><td>C Kompiler.</td></tr>
@@ -101,11 +102,9 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>chroot</tt></td><td> </td><td>Ändert das Root-Verzeichnis für einen Prozess.</td></tr>
 <tr><td><tt>cksum</tt></td><td> </td><td>Gibt die CRC Checksumme einer Datei und Größe in Bytes aus.</td></tr>
 <tr><td><tt>clear</tt></td><td> </td><td>Löscht den Inhalt des Terminal Fensters.</td></tr>
-<tr><td><tt>clockconfig</tt></td><td> </td><td>Gibt die Zeiteinstellungen aus.</td></tr>
 <tr><td><tt>cmp</tt></td><td> </td><td>Vergleicht Dateien Byte-für-Byte.</td></tr>
 <tr><td><tt>collectcatkeys </tt></td><td> </td><td>[Überbleibsel des ursprünglichen Locale Kit.]</td></tr>
 <tr><td><tt>comm</tt></td><td> </td><td>Vergleicht sortierte Dateien Zeile-für-Zeile.</td></tr>
-<tr><td><tt>compress</tt></td><td> </td><td>Daten-Komprimierer.</td></tr>
 <tr><td><tt>consoled</tt></td><td> </td><td>Konsolen Daemon.</td></tr>
 <tr><td><tt>copyattr</tt></td><td> </td><td>Kopiert einige oder alle Attribute einer oder mehrerer Dateien zu einer bestehenden oder neuen Datei. <a href="cli-apps.html">(Haiku spezifisch)</a></td></tr>
 <tr><td><tt>cp</tt></td><td> </td><td>Kopiert Dateien und Verzeichnisse.</td></tr>
@@ -146,7 +145,6 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>fmt</tt></td><td> </td><td>Formattiert Absätze einer Datei neu.</td></tr>
 <tr><td><tt>fold</tt></td><td> </td><td>Sorgt für einen Zeilenumbruch in einer Datei.</td></tr>
 <tr><td><tt>fortune</tt></td><td> </td><td>Gibt einen zufälligen, hoffentlich interessanten, Sinnspruch aus.</td></tr>
-<tr><td><tt>frcode</tt></td><td> </td><td>Wird von updatedb benutzt um die Liste mit Dateinamen zu komprimieren.</td></tr>
 <tr><td><tt>freetype-config</tt></td><td> </td><td>Zeigt Informationen über FreeType's Kompilierung und Verlinkung.</td></tr>
 <tr><td><tt>fstrim</tt></td><td> </td><td>Sendet einen TRIM Befehl zu einem SSD Laufwerk.</td></tr>
 <tr><td><tt>ftp</tt></td><td> </td><td>Programm zur Datenübertragung per FTP.</td></tr>
@@ -154,9 +152,7 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>funzip</tt></td><td> </td><td>Entpackt das erste Objekt eines Archivs und gibt es zur Standardausgabe aus.</td></tr>
 <tr><td><tt>fwcontrol</tt></td><td> </td><td>FireWire Steuerprogramm.</td></tr>
 <tr><td><tt>gawk</tt></td><td> </td><td>Sprache zur Mustererkennung und Verarbeitung.</td></tr>
-<tr><td><tt>gdb</tt></td><td> </td><td>GNU Debugger.</td></tr>
 <tr><td><tt>getarch</tt></td><td> </td><td>Zeigt die Compiler Version der Umgebung.</td></tr>
-<tr><td><tt>getlimits</tt></td><td> </td><td>Zeigt die plattformspezifischen Limits in einem für Skripte nutzbaren Format.</td></tr>
 <tr><td><tt>grep</tt></td><td> </td><td>Sucht nach Mustern.</td></tr>
 <tr><td><tt>groups</tt></td><td> </td><td>Zeigt die Grupopenzugehörigkeit aller Benutzer.</td></tr>
 <tr><td><tt>gunzip</tt></td><td> </td><td>Siehe <tt>gzip</tt>.</td></tr>
@@ -167,7 +163,6 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>hey</tt></td><td> </td><td>Ein kleines Tool, um GUI Anwendungen zu skripten.</td></tr>
 <tr><td><tt>hostname</tt></td><td> </td><td>Zeigt oder setzt den Hostnamen des Systems.</td></tr>
 <tr><td><tt>id</tt></td><td> </td><td>Gibt Informationen zu Benutzer und Gruppen aus.</td></tr>
-<tr><td><tt>ident</tt></td><td> </td><td>Findet RCS Keywords in einer Datei.</td></tr>
 <tr><td><tt>ifconfig</tt></td><td> </td><td>Konfiguriert eine Netzwerk Schnittstelle.</td></tr>
 <tr><td><tt>install</tt></td><td> </td><td>Kopiert Systemdateien ohne das laufende System zu stören.</td></tr>
 <tr><td><tt>install-wifi-firmwares.sh</tt></td><td> </td><td>Installiert die Firmware für eine Reihe von WLAN-Karten.</td></tr>
@@ -207,7 +202,6 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>mbox2mail</tt></td><td> </td><td>Konvertiert Unix mailbox Dateien zu BeOS E-mail Dateien.</td></tr>
 <tr><td><tt>md5sum</tt></td><td> </td><td>Zeigt oder überprüft MD5 Checksummen.</td></tr>
 <tr><td><tt>media_client</tt></td><td> </td><td>"media_client play" spielt Audiodateien ab.</td></tr>
-<tr><td><tt>merge</tt></td><td> </td><td>Vereint drei Datei-Versionen.</td></tr>
 <tr><td><tt>message</tt></td><td> </td><td>Gibt eine "flattened BMessage" Datei aus.</td></tr>
 <tr><td><tt>mimeset</tt></td><td> </td><td>Setzt den MIME-Typ einer Datei.</td></tr>
 <tr><td><tt>mkdepend</tt></td><td> </td><td>Der Makefile Dependency Generator.</td></tr>
@@ -224,7 +218,6 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>mountvolume</tt></td><td> </td><td>Hängt eine Partition anhand ihres Namens ein.</td></tr>
 <tr><td><tt>mv</tt></td><td> </td><td>Verschiebt eine Datei oder benennt sie um.</td></tr>
 <tr><td><tt>nano</tt></td><td> </td><td>Der standard Texteditor im Terminal, ein Klon von 'Pico'. </td></tr>
-<tr><td><tt>netcat</tt></td><td> </td><td>Ein TCP und UDP Tool.</td></tr>
 <tr><td><tt>netstat</tt></td><td> </td><td>Zeigt die aktuellen Netzwerkverbindungen, Routing Tabellen, Statistiken und Informationen zu Masquerading und Multicast.</td></tr>
 <tr><td><tt>nl</tt></td><td> </td><td>Gibt jede Datei mit Zeilennummern aus.</td></tr>
 <tr><td><tt>nohup</tt></td><td> </td><td>Führt einen Befehl aus, der Hangup Signale ignoriert.</td></tr>
@@ -259,7 +252,6 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>reindex</tt></td><td> </td><td>Nimmt Attribute bestehender Dateien in einen neu angelegten index auf. <a href="cli-apps.html">(Haiku spezifisch)</a></td></tr>
 <tr><td><tt>release</tt></td><td> </td><td>Gibt eine Semaphore frei.</td></tr>
 <tr><td><tt>renice</tt></td><td> </td><td>Ändert die Priorität eines laufenden Prozesses.</td></tr>
-<tr><td><tt>rlog</tt></td><td> </td><td>Gibt Log-Einträge und andere Informationen zu RCS Dateien aus.</td></tr>
 <tr><td><tt>rm</tt></td><td> </td><td>Entfernt Dateien und Verzeichnisse.</td></tr>
 <tr><td><tt>rmattr</tt></td><td> </td><td>Entfernt ein Attribut von einer Datei. <a href="cli-apps.html">(Haiku spezifisch)</a></td></tr>
 <tr><td><tt>rmdir</tt></td><td> </td><td>Entfernt Verzeichnisse.</td></tr>
@@ -276,7 +268,6 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>settype</tt></td><td> </td><td>Setzt den MIME Typ, Signatur und die bevorzugte Anwendung einer Datei.</td></tr>
 <tr><td><tt>setversion</tt></td><td> </td><td>Zeigt die Version einer Datei.</td></tr>
 <tr><td><tt>setvolume</tt></td><td> </td><td>Regelt die Lautstärke im System.</td></tr>
-<tr><td><tt>setwep</tt></td><td> </td><td>Provides WEP encryption for wireless networks. </td></tr>
 <tr><td><tt>sh</tt></td><td> </td><td>Siehe <tt>bash</tt>. </td></tr>
 <tr><td><tt>sha1sum</tt></td><td> </td><td>Zeigt oder überprüft SHA1 Checksummen.</td></tr>
 <tr><td><tt>shar</tt></td><td> </td><td>Erzeugt Shell-Archive.</td></tr>
@@ -364,7 +355,7 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <div class="nav">
 <div class="inner"><span>
 <a href="../applications.html#cli-apps" class="uplink">Anwendungen</a>
-::  <a href="cli-apps.html">Haiku-specific commands</a>  »
+::  <a href="cli-apps.html">Haiku-specific commands</a>  »
 </span></div>
 </div>
 

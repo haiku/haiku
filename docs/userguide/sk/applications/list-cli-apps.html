@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2017, Haiku. All rights reserved.
+ * Copyright 2010-2018, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,11 +32,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/sk.png" alt="" /> Slovenčina</li>
+<li><a href="../../id/applications/list-cli-apps.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/list-cli-apps.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/applications/list-cli-apps.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/applications/list-cli-apps.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/applications/list-cli-apps.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/applications/list-cli-apps.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/list-cli-apps.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/list-cli-apps.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/list-cli-apps.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pl/applications/list-cli-apps.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
@@ -53,7 +55,7 @@
 
 <span>
 <a href="../applications.html#cli-apps" class="uplink">Applications</a>
-::  <a href="cli-apps.html">Haiku-specific commands</a>  »
+::  <a href="cli-apps.html">Haiku-specific commands</a>  »
 </span></div>
 </div>
 
@@ -87,8 +89,7 @@ Tu je zoznam všetkých aplikácií príkazového riadka, ktoré sa nachádzajú
 <tr><td><tt>beep</tt></td><td> </td><td>Zazvoní zvonček.</td></tr>
 <tr><td><tt>bunzip2</tt></td><td> </td><td>Pozrite <tt>bzip2</tt>.</td></tr>
 <tr><td><tt>bzip2</tt></td><td> </td><td>Komprimácia súborov.</td></tr>
-<tr><td><tt>c++</tt></td><td> </td><td>Kompilátor jazyka C++.</td></tr>
-<tr><td><tt>cal</tt></td><td> </td><td>Zobrazí kalendár.</td></tr>
+<tr><td><tt>c++</tt></td><td> </td><td>C++-Compiler.</td></tr>
 <tr><td><tt>cat</tt></td><td> </td><td>Zreťazí súbory a vypisuje na štandardný výstup.</td></tr>
 <tr><td><tt>catattr</tt></td><td> </td><td>Vypíše obsah atribútu súboru. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
 <tr><td><tt>cc</tt></td><td> </td><td>Kompilátor jazyka C</td></tr>
@@ -101,11 +102,9 @@ Tu je zoznam všetkých aplikácií príkazového riadka, ktoré sa nachádzajú
 <tr><td><tt>chroot</tt></td><td> </td><td>Spustí príkaz v rámci zadaného koreňového adresára.</td></tr>
 <tr><td><tt>cksum</tt></td><td> </td><td>Vypíše kontrolný súčet CRC a počet bajtov súborov.</td></tr>
 <tr><td><tt>clear</tt></td><td> </td><td>Vymaže okno terminálu.</td></tr>
-<tr><td><tt>clockconfig</tt></td><td> </td><td>Vypíše konfiguráciu hodín.</td></tr>
 <tr><td><tt>cmp</tt></td><td> </td><td>Porovná súbory bajt po bajte.</td></tr>
 <tr><td><tt>collectcatkeys </tt></td><td> </td><td>[Pozostatok po prechode z locale-kit.]</td></tr>
 <tr><td><tt>comm</tt></td><td> </td><td>Porovná utriedené súbory riadok po riadku.</td></tr>
-<tr><td><tt>compress</tt></td><td> </td><td>Program na kompresiu dát</td></tr>
 <tr><td><tt>consoled</tt></td><td> </td><td>Démon konzoly</td></tr>
 <tr><td><tt>copyattr</tt></td><td> </td><td>Skopíruje všetky alebo podmnožinu atribútov z jedného súboru do iného alebo do nového súboru. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
 <tr><td><tt>cp</tt></td><td> </td><td>Skopíruje súbory a priečinky.</td></tr>
@@ -146,7 +145,6 @@ Tu je zoznam všetkých aplikácií príkazového riadka, ktoré sa nachádzajú
 <tr><td><tt>fmt</tt></td><td> </td><td>Preformátuje odstavce súboru.</td></tr>
 <tr><td><tt>fold</tt></td><td> </td><td>Zalomí riadky vstupného súboru.</td></tr>
 <tr><td><tt>fortune</tt></td><td> </td><td>Vypíše náhodné, snáď zaujímavé, porekadlo.</td></tr>
-<tr><td><tt>frcode</tt></td><td> </td><td>Zavolaním tohto príkazu updatedb skomprimuje zoznam názvov súborov.</td></tr>
 <tr><td><tt>freetype-config</tt></td><td> </td><td>Zobrazí informácie o kompilácii a linkovaní FreeType.</td></tr>
 <tr><td><tt>fstrim</tt></td><td> </td><td>Pošle príkaz TRIM disku SSD.</td></tr>
 <tr><td><tt>ftp</tt></td><td> </td><td>Program na prenos súborov</td></tr>
@@ -154,9 +152,7 @@ Tu je zoznam všetkých aplikácií príkazového riadka, ktoré sa nachádzajú
 <tr><td><tt>funzip</tt></td><td> </td><td>Rozbalí prvý súbor z archívu na štandardný výstup.</td></tr>
 <tr><td><tt>fwcontrol</tt></td><td> </td><td>Program na ovládanie FireWire</td></tr>
 <tr><td><tt>gawk</tt></td><td> </td><td>Jazyk na hľadanie a spracovanie vzorov.</td></tr>
-<tr><td><tt>gdb</tt></td><td> </td><td>GNU debugger</td></tr>
 <tr><td><tt>getarch</tt></td><td> </td><td>Shows the environment's compiler version. </td></tr>
-<tr><td><tt>getlimits</tt></td><td> </td><td>Zobrazí obmedzenia závislé na platforme vo formáte užitočnom pre skripty shellu.</td></tr>
 <tr><td><tt>grep</tt></td><td> </td><td>Hľadá vzory.</td></tr>
 <tr><td><tt>groups</tt></td><td> </td><td>Vypíše členstvá v skupinách každého používateľského mena.</td></tr>
 <tr><td><tt>gunzip</tt></td><td> </td><td>Pozrite <tt>gzip</tt>.</td></tr>
@@ -167,7 +163,6 @@ Tu je zoznam všetkých aplikácií príkazového riadka, ktoré sa nachádzajú
 <tr><td><tt>hey</tt></td><td> </td><td>Malý nástroj na skriptovanie aplikácií grafického rozhrania.</td></tr>
 <tr><td><tt>hostname</tt></td><td> </td><td>Vypíše alebo nastaví názov hostiteľa systému.</td></tr>
 <tr><td><tt>id</tt></td><td> </td><td>Vypíše informácie o používateľovi a skupine.</td></tr>
-<tr><td><tt>ident</tt></td><td> </td><td>Identifikuje kľúčové slová RCS v súboroch.</td></tr>
 <tr><td><tt>ifconfig</tt></td><td> </td><td>Konfiguruje sieťové rozhranie.</td></tr>
 <tr><td><tt>install</tt></td><td> </td><td>Skopíruje súbory na miesto určenia bez narušenia bežiaceho systému.</td></tr>
 <tr><td><tt>install-wifi-firmwares.sh</tt></td><td> </td><td>Nainštaluje firmvér niektorým bezdrôtovým sieťovým kartám.</td></tr>
@@ -207,7 +202,6 @@ Tu je zoznam všetkých aplikácií príkazového riadka, ktoré sa nachádzajú
 <tr><td><tt>mbox2mail</tt></td><td> </td><td>Zmení unixové súbory mailbox na e-mailové súbory BeOS.</td></tr>
 <tr><td><tt>md5sum</tt></td><td> </td><td>Vypíše alebo skontroluje kontrolný súčet MD5.</td></tr>
 <tr><td><tt>media_client</tt></td><td> </td><td>„media_client play“ prehráva zvukové súbory.</td></tr>
-<tr><td><tt>merge</tt></td><td> </td><td>Trojcestné zlúčenie súboru.</td></tr>
 <tr><td><tt>message</tt></td><td> </td><td>Vypíše sploštený súbor BMessage.</td></tr>
 <tr><td><tt>mimeset</tt></td><td> </td><td>Nastaví typ MIME súboru. </td></tr>
 <tr><td><tt>mkdepend</tt></td><td> </td><td>Generátor závislostí Makefile.</td></tr>
@@ -224,7 +218,6 @@ Tu je zoznam všetkých aplikácií príkazového riadka, ktoré sa nachádzajú
 <tr><td><tt>mountvolume</tt></td><td> </td><td>Pripojí zväzok podľa názvu.</td></tr>
 <tr><td><tt>mv</tt></td><td> </td><td>Presunie/premenuje súbor.</td></tr>
 <tr><td><tt>nano</tt></td><td> </td><td>Predvolený textový editor v Termináli. Klon editora „Pico“.</td></tr>
-<tr><td><tt>netcat</tt></td><td> </td><td>TCP a UDP nástroj.</td></tr>
 <tr><td><tt>netstat</tt></td><td> </td><td>Vypíše sieťové spojenia, smerovacie tabuľky, štatistiky rozhraní, spojenia NAT a členstvá v multicastových skupinách.</td></tr>
 <tr><td><tt>nl</tt></td><td> </td><td>Vypíše všetky súbory s pridanými číslami riadkov.</td></tr>
 <tr><td><tt>nohup</tt></td><td> </td><td>Spustí príkaz ignorujúc signály zavesenia (HUP).</td></tr>
@@ -259,7 +252,6 @@ Tu je zoznam všetkých aplikácií príkazového riadka, ktoré sa nachádzajú
 <tr><td><tt>reindex</tt></td><td> </td><td>Vloží atribúty existujúcich súborov do novo vytvorených indexov. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
 <tr><td><tt>release</tt></td><td> </td><td>Uvoľní semafor.</td></tr>
 <tr><td><tt>renice</tt></td><td> </td><td>Zmení prioritu bežiaceho procesu.</td></tr>
-<tr><td><tt>rlog</tt></td><td> </td><td>Vypíše správy záznamu a iné informácie o súboroch RCS.</td></tr>
 <tr><td><tt>rm</tt></td><td> </td><td>Odstráni súbor alebo priečinok.</td></tr>
 <tr><td><tt>rmattr</tt></td><td> </td><td>Odstráni zo súboru atribút. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
 <tr><td><tt>rmdir</tt></td><td> </td><td>Odstráni priečinky.</td></tr>
@@ -276,7 +268,6 @@ Tu je zoznam všetkých aplikácií príkazového riadka, ktoré sa nachádzajú
 <tr><td><tt>settype</tt></td><td> </td><td>Nastaví typ MIME, podpis a preferovanú aplikáciu súboru.</td></tr>
 <tr><td><tt>setversion</tt></td><td> </td><td>Zobrazí verziu súboru.</td></tr>
 <tr><td><tt>setvolume</tt></td><td> </td><td>Nastaví systémovú úroveň hlasitosti.</td></tr>
-<tr><td><tt>setwep</tt></td><td> </td><td>Provides WEP encryption for wireless networks. </td></tr>
 <tr><td><tt>sh</tt></td><td> </td><td>Pozrite <tt>bash</tt>. </td></tr>
 <tr><td><tt>sha1sum</tt></td><td> </td><td>Vypíše alebo skontroluje kontrolné súčty SHA1. </td></tr>
 <tr><td><tt>shar</tt></td><td> </td><td>Vytvára shell archívy.</td></tr>
@@ -364,7 +355,7 @@ Tu je zoznam všetkých aplikácií príkazového riadka, ktoré sa nachádzajú
 <div class="nav">
 <div class="inner"><span>
 <a href="../applications.html#cli-apps" class="uplink">Aplikácie</a>
-::  <a href="cli-apps.html">Haiku-specific commands</a>  »
+::  <a href="cli-apps.html">Haiku-specific commands</a>  »
 </span></div>
 </div>
 

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2012-2016, Haiku, Inc. All rights reserved.
+ * Copyright 2012-2019, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,11 +31,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/jp.png" alt="" /> 日本語</li>
+<li><a href="../id/workshop-wlan.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/workshop-wlan.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/workshop-wlan.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/workshop-wlan.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/workshop-wlan.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/workshop-wlan.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/workshop-wlan.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/workshop-wlan.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/workshop-wlan.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/workshop-wlan.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -63,29 +65,18 @@
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>インデックス</td></tr>
-<tr class="index"><td>
-	<a href="#firmware">サポートされているハードウェアを動くようにする</a><br />
-	<a href="#gui">ワイヤレスネットワークに接続する</a><br />
+<tr class="index"><td><a href="#gui">ワイヤレスネットワークに接続する</a><br />
 	<a href="#commandline">コマンドラインから接続する</a><br />
+	<a href="#firmware">サポートされているハードウェアを動くようにする</a><br />
 	<a href="#tips">ヒント</a>
 </td></tr>
 </table>
 
 <h1>ワークショップ: ワイヤレスネットワーク</h1>
 
-<p>ネットワークを動作させることは、インターネット常時接続に対する今日の要求で必要不可欠なことです。小さなプロジェクトにとって、さまざまな、絶え間なく変化するハードウェアとドライバーについていくことはとても困難なことです。Haiku はネットワークドライバーを <a href="http://www.freebsd.org">FreeBSD</a>  互換レイヤーに依存しています。<br />
-これは、大量のハードウェアのサポートを保証します。しかし、それらの 100% がサポートされるわけではありません。サポートされているモデルの<a href="https://www.haiku-os.org/guides/daily-tasks/wireless#hardware-notes">リスト</a>をオンラインで参照するか、<a href="http://www.freebsd.org/releases/11.1R/hardware.html#wlan">FreeBSD 11.1 リリースのハードウェアノート</a>をチェックしてください。</p>
+<p>ネットワークを動作させることは、インターネット常時接続に対する今日の要求で必要不可欠なことです。小規模のプロジェクトにとって、さまざまな、絶え間なく変化するハードウェアとドライバーについていくことはとても困難なことです。Haiku は<a href="http://www.freebsd.org">FreeBSD</a> ネットワークドライバー用の互換レイヤーに頼っています。<br />
+これは、大量のハードウェアのサポートを確保します。しかし、それらの 100% がサポートされるわけではありません。サポートされているモデルを <a href="http://www.freebsd.org/releases/12.0R/hardware.html#wlan">FreeBSD 12.0's release hardware notes</a>でオンラインで参照ください。</p>
 <div class="box-info">現在のところ、PCI、PCI-X、PCI-Express、Mini PCI、および Mini PCI-Express デバイスのみサポートされているはずです。<br />PCMCIA、CardBus、ExpressCard、USB、および ISA デバイスは動作するようになるのにまだ作業が必要です。</div>
-
-<h2>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="firmware" name="firmware">サポートされているハードウェアを動くようにする</a></h2>
-<p>一般にサポートされたハードウェアの最初のハードルを超えたとしても、いくつかのワイヤレスネットワークカードは正しく動作させるためにバイナリのファームウェアを必要とします。ライセンス問題のため、Haiku はいくつかのプロエタリなファームウェアを同梱できません。しかし、Haiku には、ユーザーのために必要なプロエタリバイナリをすべて取得してインストールする簡単なスクリプトが入っています。一般に、ワイヤレスネットワークを使おうとするなら、このスクリプトを動かして、システムが必要とするときに、これらすべてのファームウェアを利用可能な状態にすることは良い考えです。</p>
-<p>ターミナルを立ち上げて、次のように入力します。</p>
-<pre class="terminal">install-wifi-firmwares.sh</pre>
-<p>ライセンスを見なおして承認後、利用できるファームウェアファイルをすべてインストールします。</p>
-
-<p>これらの不足するファームウェアをダウンロードするためのインターネットアクセスが Haiku に無い場合、オフラインで行う方法があります。以下の <a href="#tips">tips</a> を見てください。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -115,18 +106,20 @@ ArcorInternet123                 00:20:12:a4:29:e1        15  WPA</pre>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="tips" name="tips">ヒント</a></h2>
-<h3>ファームウェアファイルをオフラインでダウンロードする</h3>
+<a id="firmware" name="firmware">サポートされているハードウェアを動くようにする</a></h2>
+<p>サポートされた最新のワイヤレスハードウェアはそのままで動作します。</p>
+
+<p>少数のかなり古いチップセット (Intel 2100/2200/2225/2915, Broadcom 43xx, Marvell 88w8335) は、バイナリハードウェアモジュールを必要とします。しかし、ライセンス上の理由から Haiku はそれらを含められません。これらのワイヤレスカードを動作させるために、必要なすべてのプロエタリなバイナリを取得してインストールする小さなスクリプトが含まれています。</p>
+<p>ターミナルを立ち上げて、次のように入力します。</p>
+<pre class="terminal">install-wifi-firmwares.sh</pre>
+<p>ライセンスを見なおして承認後、利用できるファームウェアファイルをすべてインストールします。</p>
+
 <p>バイナリファームウェアファイルを <tt>install-wifi-firmwares.sh</tt> スクリプトで入手できない場合 (たとえば、Haiku でインターネット接続ができないため)、同様に<a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt">このシェルスクリプト</a>をダウンロードし、<tt>wget</tt> と <tt>zip</tt> がインストールされたほかの OS から実行できます。<br />
 Windows ユーザーは、Windows 用の <a href="http://gnuwin32.sourceforge.net/packages/wget.htm">wget</a> と <a href="http://gnuwin32.sourceforge.net/packages/zip.htm">zip</a> を規定の位置にインストールしている必要があります。それから、<a href="https://www.haiku-os.org/files/download-data-for-wlan-firmwares.bat">このバッチファイルスクリプト</a>を使用してください。<br />
 このスクリプトは必要なファイルをダウンロードし、Haiku の <tt>/boot</tt> で解凍するための zip ファイルを作成するでしょう。解凍後、ターミナルを開いて以下を入力します。</p>
 <pre class="terminal">install-wifi-firmwares.sh</pre>
 <p>ライセンスを見なおして承認後、利用できるファームウェアファイルをすべてインストールします。</p>
-<h3>接続の切断を避ける</h3>
-<p>iprowifi4965 のようないくつかのワイヤレスネットワークチップセット用の Haiku ドライバーは、WPA 暗号化を使用している時に接続が失われがちです。その影響を受けているなら、ネットワークに接続する前に、"HT モード" (802.11n の高スループットモード) を無効にしてみてください。
-</p>
-<pre class="terminal">ifconfig /dev/net/iprowifi4965/0 -ht</pre>
-<p>それで問題が解決するなら、毎起動時に自動的に適用されるよう、<span class="path">~/config/settings/boot/UserBootscript</span> にその行を記載してください。</p>
+
 </div>
 </div>
 

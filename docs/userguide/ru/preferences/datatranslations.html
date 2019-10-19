@@ -13,6 +13,7 @@
  *		Sergei Reznikov
  *		Rodastahm Islamov
  *		mrNoisy
+ *		Vsevolod
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -32,11 +33,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/ru.png" alt="" /> Русский</li>
+<li><a href="../../id/preferences/datatranslations.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/preferences/datatranslations.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/preferences/datatranslations.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/preferences/datatranslations.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/preferences/datatranslations.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/preferences/datatranslations.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/preferences/datatranslations.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/preferences/datatranslations.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/preferences/datatranslations.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pl/preferences/datatranslations.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
@@ -59,7 +62,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <h2><img src="../../images/prefs-images/datatranslations-icon_64.png" alt="datatranslations-icon_64.png" width="64" height="64" />Трансляция данных (DataTranslations)</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
@@ -74,30 +76,30 @@
 <p>В зависимости от возможностей, каждый транслятор имеет свои собственные настройки. Как минимум вы увидите кнопку <span class="button">Инфо...</span>, которая открывает окно о создателях транслятора и пути установки.<br />
 Таблица, представленная ниже, дает краткую характеристику трансляторов, установленных по умолчанию и их наиболее полезные параметры.</p>
 <table summary="translators" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Apple icons</span></td><td>Valid image sizes are 16, 32, 48, 128, 256, 512, 1024 (RGB32 and RGBA32)</td></tr>
+<tr><td><span class="menu">Apple значки</span></td><td>Допустимые размеры изображения - 16, 32, 48, 128, 256, 512, 1024 (RGB32 и RGBA32)</td></tr>
 <tr><td><span class="menu">BMP изображения</span></td><td>24 бита, без сжатия, без прозрачности</td></tr>
 <tr><td><span class="menu">EXR изображения</span></td><td><acronym title="Industrial Light &amp; Magic">ILM</acronym> формат растровых изображений расширенного динамического диапазона (HDR).</td></tr>
 <tr><td><span class="menu">GIF изображения</span></td><td>8 бит, сжатие без потерь, поддерживает прозрачность.<br />
 Вы можете уменьшить размер файла, ограничив количество используемых цветов или выбрав другую палитру<br />
 Канал прозрачности может быть выбран автоматически или вручную - установкой соответствующей RGB-величины. </td></tr>
-<tr><td><span class="menu">HVIF icons</span></td><td>Translator for Haiku's vector icon format</td></tr>
+<tr><td><span class="menu">HVIF значки</span></td><td>Транслятор для векторного формата значков Haiku</td></tr>
 <tr><td><span class="menu">JPEG2000 изображения</span></td><td>24 бита, поддерживается сжатие, не поддерживается прозрачность.<br />
 Скорее всего здесь вам понадобится только уровень качества выходного изображения.</td></tr>
 <tr><td><span class="menu">JPEG изображения</span></td><td>24 бита, поддерживается сжатие, не поддерживается прозрачность.<br />
 Кроме качества выходного изображения, вы также можете установить уровень размытия, который уменьшит количество артефактов компрессии, но сделает изображение чуть менее четким.</td></tr>
 <tr><td><span class="menu">PCX изображения</span></td><td>24 бита, поддерживается сжатие, не поддерживается прозрачность, стандартный формат программы PC Paintbrush.</td></tr>
-<tr><td><span class="menu">Photoshop images</span></td><td>32bit, lossless compression, transparency<br />
-The translator reduces all layers to one bitmap layer.</td></tr>
+<tr><td><span class="menu">Изображение Photoshop</span></td><td>32 бита, сжатие без потерь, поддерживает прозрачность<br />
+Этот транслятор сливает все слои в один растровый слой.</td></tr>
 <tr><td><span class="menu">PNG изображения</span></td><td>32 бита, сжатие без потерь, поддерживает прозрачность</td></tr>
 <tr><td><span class="menu">PPM изображения</span></td><td>24 бита, без сжатия, не поддерживает прозрачность, формат Portable PixMap</td></tr>
 <tr><td><span class="menu">RAW изображения</span></td><td>вплоть до 48 бит, без сжатия, не поддерживает прозрачность</td></tr>
 <tr><td><span class="menu">RTF текстовые файлы</span></td><td>Форматированный текст</td></tr>
 <tr><td><span class="menu">SGI изображения</span></td><td>24 бита, сжатие без потерь (опционально), поддерживает прозрачность</td></tr>
-<tr><td><span class="menu">Файлы StyledEdit</span></td><td>Plain text with formatting stored in attibutes</td></tr>
+<tr><td><span class="menu">Файлы StyledEdit</span></td><td>Простой текст с форматированием, хранящимся в атрибутах</td></tr>
 <tr><td><span class="menu">TGA изображения</span></td><td>32 бита, сжатие без потерь (опционально), поддерживает прозрачность</td></tr>
 <tr><td><span class="menu">TIFF изображения</span></td><td>24 бита, сжатие без потерь (опционально), поддерживает слои и прозрачность</td></tr>
-<tr><td><span class="menu">WebP images</span></td><td>8-bit YUV 4:2:0 image format, compressed, no transparency</td></tr>
-<tr><td><span class="menu">Windows icons</span></td><td>Valid image sizes are 16, 32, 48</td></tr>
+<tr><td><span class="menu">WebP изображения</span></td><td>8 бит, формат изображения YUV 4:2:0, поддерживается сжатие, не поддерживается прозрачность.</td></tr>
+<tr><td><span class="menu">Windows значки</span></td><td>Допустимые размеры изображения - 16, 32, 48</td></tr>
 <tr><td class="onelinetop"><span class="menu">WonderBrush изображения </span></td><td>32 бита, поддерживает слои и прозрачность, хранит векторные и пиксельные данные</td></tr>
 </table>
 <p><br /></p>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2018, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -30,11 +30,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/uk.png" alt="" /> Українська</li>
+<li><a href="../id/tracker.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/tracker.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/tracker.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/tracker.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/tracker.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/tracker.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/tracker.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/tracker.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/tracker.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/tracker.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -130,7 +132,7 @@
 <li><p><span class="menu">У вигляді іконок (Icon view)</span> (<span class="key">ALT</span> <span class="key">1</span>) - 
 великі іконки, Ви можете вибрати розмір з підменю або змінити їх розмір за допомогою  <span class="key">ALT</span> <span class="key">+</span>/<span class="key">-</span>.</p></li>
 <li><p><span class="menu">У вигляді маленьких  іконок (Mini icon view)</span> (<span class="key">ALT</span> <span class="key">2</span>) - маленькі іконки.</p></li>
-<li><p><span class="menu">List view</span> (<span class="key">ALT</span> <span class="key">3</span>) - A detailed list of your files enabling you to show/hide file attributes. (See topic <a href="attributes.html">Attributes</a>.) From the submenu you can choose to use either mini or large icons.</p></li>
+<li><p><span class="menu">List view</span> (<span class="key">ALT</span> <span class="key">3</span>) - A detailed list of your files enabling you to show/hide file attributes (see topic <a href="attributes.html">Attributes</a>.)</p></li>
 </ul>
 <p>Меню <span class="menu">Вікно (Window)</span> надає доступ до кількох інших функцій:</p>
 <ul>
@@ -184,11 +186,16 @@
 <br /><br />
 <img src="images/tracker-images/open-with-preferred.png" alt="open-with-preferred" />
 <p>Там Ви знову знайдете програми, які були перечислені у підменю. При виборі однієї з них натисніть на кнопку <span class="button">Відкрити та зробити бажаним (Open and make preferred)</span>, Ви змінете бажаний додаток для кожного файлу такого типу, для нашого випадку  це<tt>text/plain</tt>.</p></li>
-<li><span class="menu">
-Отримати інформацію (Get info)</span>
-<br /><br />
+<li><span class="menu">Get info</span>
+<p>This opens a panel that shows the meta data of a file and lets you edit its permissions. You can rename it by clicking on the file name at the top.</p>
 <img src="images/tracker-images/get-info.png" alt="get-info" />
-<p>Панель показує дані вибраного файлу та дає змогу встановити типовий додаток, а після того як розвернете нижню частину панелі дозволи та власника. Клікання по шляху до файлу відкриє його у вікні Tracker.</p></li>
+<p>The panel consists of three tabs:</p>
+<ul>
+<li><span class="menu">Information</span>: Shows standard data like size, date of creation/modification, file type and location. Click on the location path to open the files parent folder. The <span class="menu">Open with</span> menu sets the preferred application to open this particular file.</li>
+<li><span class="menu">Permissions</span>: Lets you change owner, group and file permissions.</li>
+<li><span class="menu">Attibutes</span>: Lists all extra file attributes with their value and type.</li>
+</ul>
+</li>
 <li><p><span class="menu">Редагувати Ім'я (Edit name)</span>, <span class="menu">
 Дублювати (Duplicate)</span> та <span class="menu">Перемістити до Кошика (Move to trash)</span> - дозволяє переіменувати або дублювати файл або покласти вибраний файл(и) до смітника.</p></li>
 <li><p><span class="menu">Перемістити до (Move to)</span>, <span class="menu">Копіювати до (Copy to)</span> та <span class="menu">Створити посилання (Create link)</span> - дозволяє перемістити, копіювати та створити посилання вибраного файла(ів) використовуючи підменю метода навігації. Затискання клавіші <span class="key">SHIFT</span> при виклику меню надає можливість створити відносне посилання.</p></li>

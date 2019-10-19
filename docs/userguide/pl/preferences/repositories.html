@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Kacper Kasper
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Repositories</title>
+	<title>Repozytoria</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
@@ -28,11 +30,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/pl.png" alt="" /> Polski</li>
+<li><a href="../../id/preferences/repositories.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/preferences/repositories.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/preferences/repositories.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/preferences/repositories.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/preferences/repositories.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/preferences/repositories.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/preferences/repositories.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/preferences/repositories.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/preferences/repositories.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_PT/preferences/repositories.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
@@ -56,24 +60,23 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tłumaczenie tej strony jest niekompletne. Nieukończone części wyświetlane są w języku angielskim.</div>
 
-<h2><img src="../../images/prefs-images/repositories-icon_64.png" alt="repositories-icon_64.png" width="64" height="64" />Repositories</h2>
+<h2><img src="../../images/prefs-images/repositories-icon_64.png" alt="repositories-icon_64.png" width="64" height="64" />Repozytoria</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferencje</span></td></tr>
 <tr><td>Ścieżka:</td><td></td><td><span class="path">/boot/system/preferences/Repositories</span></td></tr>
 <tr><td>Ustawienia:</td><td></td><td><span class="path">~/config/settings/Repositories_settings</span></td></tr>
 </table>
-<p>Repositories are collections of software packages. Set up by default, there's the <i>Haiku</i> repo with all of the operating system's packages and <i>HaikuPorts</i>, which provides a large number of ported and native Haiku software. There are several more repositories, curated by members of the Haiku community. Checkout <a href="https://www.haiku-os.org/community/software">Software Sites</a> on the website.</p>
-<p>This is the preference panel to manage your respositories (you can open it also from <a href="../applications/haikudepot.html">HaikuDepot's</a> <span class="menu">Tools</span> menu):</p>
+<p>Repozytoria to zbiory pakietów z oprogramowaniem. Domyślnie ustawione są dwa: repozytorium <i>Haiku</i> zawierające pakiety systemowe oraz <i>HaikuPorts</i>, w którym jest mnóstwo oprogramowania napisanego dla Haiku oraz przeniesionego z innych systemów operacyjnych. Istnieje kilka innych repozytoriów, utrzymywanych przez członków społeczności Haiku. Strona <a href="https://www.haiku-os.org/community/software">Software Sites</a> (ang.) zawiera listę tych repozytoriów.</p>
+<p>Tak wygląda panel preferencji do zarządzania repozytoriami (można go uruchomić również z menu <span class="menu">Narzędzia</span> w <a href="../applications/haikudepot.html">HaikuDepot</a>):</p>
 <img src="../images/prefs-images/repositories.png" alt="repositories.png" />
-<p>The first column in the list of known repositories shows if a repo is currently enabled. If it doesn't have a checkmark, it will not be queried by HaikuDepot or <span class="cli">pkgman</span> from the command line. Use the buttons to <span class="button">Enable</span> or <span class="button">Disable</span> the selected repositories, or double-click a repo to toggle the status.</p>
-<p>Depending on the size of the repository and the speed of the internet connection, enabling a repository may take a few seconds. If it takes longer, you're informed of pending tasks in the little text box above the <span class="button">+/-</span> buttons. If it takes unusually long, you'll be asked to either cancel or retry.</p>
-<p>To be able to remove a repository completely with the "<span class="button">-</span>" button, it has to be disabled.<br />
-You add a new repository with the "<span class="button"> </span>" button, which will open this panel:</p>
+<p>Pierwsza kolumna listy wyświetla czy repozytorium jest włączone. Jeżeli nie ma w niej haczyka, nie będzie ono odpytywane przez HaikuDepot i program <span class="cli">pkgman</span> w linii komend. Aby zmienić ten stan, należy użyć przycisków <span class="button">Włącz</span> lub <span class="button">Wyłącz</span> wcześniej zaznaczając wybrane repozytorium, lub po prostu dwukrotnie na nim kliknąć.</p>
+<p>W zależności od rozmiaru repozytorium i szybkości połączenia internetowego, włączenie repozytorium może zająć kilka sekund. Jeśli trwa to dłużej, informacje o aktualnie wykonywanych czynnościach znajdują się w małym pasku nad przyciskami <span class="button">+/-</span>. W przypadku nadzwyczaj długiego oczekiwania pojawi się pytanie, czy anulować operację lub spróbować ponownie.</p>
+<p>Aby repozytorium mogło zostać całkowicie usunięte przyciskiem <span class="button">-</span>, musi najpierw zostać wyłączone.<br />
+Nowe repozytoria dodaje się przyciskiem <span class="button">+</span>, który otwiera następujące okno dialogowe:</p>
 <img src="../images/prefs-images/repositories_add.png" alt="repositories_add.png" />
-<p>To add a new repository, just paste its URL into the text field. It'll be named "Unknown" until you enable it.</p>
-<div class="box-warning">It goes without saying that adding a repository and downloading and installing software from it is a matter of trust. Don't carelessly just add any URL you happen upon on the internets.</div>
+<p>Wystarczy wkleić tam adres URL nowego repozytorium. Będzie ono miało nazwę „Nieznane” dopóki nie zostanie włączone.</p>
+<div class="box-warning">Rozumie się samo przez się, że dodanie repozytorium, a następnie pobieranie i instalowanie z niego oprogramowania jest kwestią zaufania. Nie dodawaj każdego adresu URL, na który natkniesz się w internecie.</div>
 </div>
 </div>
 
@@ -81,7 +84,7 @@ You add a new repository with the "<span class="button"> </span>" button, which 
 <div class="inner"><span>
  «  <a href="printers.html">Printers</a> 
 ::  <a href="../preferences.html" class="uplink">Preferences</a>
-::  <a href="screen.html">Screen</a>  »
+::  <a href="screen.html">Ekran</a>  »
 </span></div>
 </div>
 

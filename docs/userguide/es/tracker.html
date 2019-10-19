@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2018, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,10 +31,12 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/es.png" alt="" /> Español</li>
+<li><a href="../id/tracker.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/tracker.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/tracker.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/tracker.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../fr/tracker.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/tracker.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/tracker.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/tracker.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/tracker.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -58,6 +60,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">La traducción de esta página aún no está completa. Hasta que lo esté, las partes sin traducir se muestran en el inglés original.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -129,7 +132,7 @@ Este filtrado de type-ahead se selecciona en las <a href="#tracker-preferences.h
 <ul>
 <li><p><span class="menu">Icon view</span> (vista de iconos, <span class="key">ALT</span> <span class="key">1</span>) - Íconos grandes, se puede cambiar el tamaño desde el submenú o incrementando/decrementando su tamaño con <span class="key">ALT</span> <span class="key">+</span>/<span class="key">ALT</span> <span class="key">-</span>.</p></li>
 <li><p><span class="menu">Mini icon view</span> (vista de iconos mini, <span class="key">ALT</span> <span class="key">2</span>) - Iconos pequeños.</p></li>
-<li><p><span class="menu">List view</span> (vista de lista, <span class="key">ALT</span> <span class="key">3</span>) - Una lista detallada de los archivos que posibilita mostrar/ocultar <i>atributos</i>. (Vea el tema <a href="attributes.html">Atributos</a>). Desde el submenú puede escoger usar ya sea íconos pequeños o grandes.</p></li>
+<li><p><span class="menu">List view</span> (<span class="key">ALT</span> <span class="key">3</span>) - A detailed list of your files enabling you to show/hide file attributes (see topic <a href="attributes.html">Attributes</a>.)</p></li>
 </ul>
 <p>El menú <span class="menu">Ventana</span> ofrece otras cuantas funciones:</p>
 <ul>
@@ -185,10 +188,16 @@ Este filtrado de type-ahead se selecciona en las <a href="#tracker-preferences.h
 <br /><br />
 <img src="images/tracker-images/open-with-preferred.png" alt="open-with-preferred" />
 <p>Aquí de nuevo encontrará los programas que se listaron en el submenú. Al seleccionar uno y dar clic en el botón <span class="button">Open and Make Preferred</span> (abrir y hacerla preferida), puede cambiarse la aplicación preferida para todos los archivos con ese tipo de archivo, en este ejemplo <tt>text/plain</tt>.</p></li>
-<li><span class="menu">Obtener información</span>
-<br /><br />
+<li><span class="menu">Get info</span>
+<p>This opens a panel that shows the meta data of a file and lets you edit its permissions. You can rename it by clicking on the file name at the top.</p>
 <img src="images/tracker-images/get-info.png" alt="get-info" />
-<p>El cuadro de diálogo presenta información sobre el archivo seleccionado y le permite elegir la aplicación preferida y, tras expander esa parte del panel, los permisos y el dueño. Al dar clic en la ruta, la abrirá en una ventana de Tracker.</p></li>
+<p>The panel consists of three tabs:</p>
+<ul>
+<li><span class="menu">Information</span>: Shows standard data like size, date of creation/modification, file type and location. Click on the location path to open the files parent folder. The <span class="menu">Open with</span> menu sets the preferred application to open this particular file.</li>
+<li><span class="menu">Permissions</span>: Lets you change owner, group and file permissions.</li>
+<li><span class="menu">Attibutes</span>: Lists all extra file attributes with their value and type.</li>
+</ul>
+</li>
 <li><p><span class="menu">Editar nombre</span>, <span class="menu">Duplicar</span> y <span class="menu">Mover a la papelera</span> - le permite renombrar o duplicar un archivo o poner el (los) archivo(s) seleccionado(s) en la papelera.</p></li>
 <li><p><span class="menu">Mover a</span>, <span class="menu">Copiar a</span> y <span class="menu">Crear enlace</span> - le permiten mover, copiar o hacer un enlace al (a los) archivo(s) seleccionado(s) usando el método de navegación de submenús. Al mantener presionada la tecla <span class="key">MAYÚSCULAS</span> mientras invoca el menú ofrece la opción de crear un enlace relativo.</p></li>
 <li><p><span class="menu">Cortar</span>,  <span class="menu">Copiar</span> y <span class="menu">Pegar</span> - le permiten cortar, copiar y pegar archivos usando el portapapeles. Al mantener presionada la tecla <span class="key">MAYÚSCULAS</span> mientras se invoca el menú se pueden <b>Copiar/Cortar más</b> archivos, tal vez desde otra carpeta que puede pegar en algún otro lugar después. También, mientras se mantiene presionada la tecla <span class="key">MAYÚSCULAS</span> se pueden pegar los archivos copiados en el portapapeles como enlaces.</p></li>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2018, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -35,11 +35,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/ru.png" alt="" /> Русский</li>
+<li><a href="../id/bootloader.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/bootloader.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/bootloader.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/bootloader.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/bootloader.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/bootloader.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/bootloader.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/bootloader.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/bootloader.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -69,12 +71,13 @@
 
 <p>Haiku's Boot Loader Options can help when you experience hardware related problems or want to choose which Haiku installation to start, if you have more than one (maybe on an installation CD or USB stick). It's also handy if you have installed a software component that acts up and prevents you from booting Haiku, see <a href="#troubleshooting">Troubleshooting</a> below.</p>
 <p>Для того чтобы зайти в настройки загрузчика, необходимо нажать и удерживать клавишу <span class="key">SHIFT</span> до начала загрузки Haiku. Если загрузчик установлен, то вы можете начать удерживать <span class="key">SHIFT</span> перед выбором загрузочной записи Haiku, а если она является единственной операционной системой на компьютере, то вы можете начать удерживать клавишу во время стартовых сообщений BIOS.</p>
+<div class="box-info">On computers that use UEFI for booting instead of the classic BIOS, you need to use the <span class="key">SPACEBAR</span> instead.</div>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="options" name="options">Опции загрузчика</a></h2>
 <p>Вы увидите три пункта меню:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
-<tr><td><b>Выбор загрузочного раздела <br />(Select boot volume)</b></td><td> </td><td>Choose which Haiku installation/state to start (see <a href="#troubleshooting">Troubleshooting</a> below).</td></tr>
+<tr><td><b>Выбор загрузочного раздела <br />(Select boot volume)</b></td><td> </td><td>Выбор конкретной инсталляции/версии Haiku для запуска (см. ниже в разделе <a href="#troubleshooting">Исправление проблем</a>).</td></tr>
 <tr><td><b>Выбор опций безопасного режима <br />(Select safe mode options)</b><br />
 </td><td> </td><td>Здесь находится несколько опций, которые могут помочь с решением аппаратных проблем или же побороть нестабильную работу системы в случае некорректно ведущего себя адд-она. При выборе опции в нижней части экрана отображается её краткое описание.</td></tr>
 <tr><td></td><td></td><td>
@@ -103,7 +106,8 @@
 		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
 	<p><span class="menu">Blacklist entries</span><br />
 		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
-<tr><td><b>Select debug options</b></td><td> </td><td>Here you'll find several options that help with debugging or getting details for a <a href="../../welcome/en/bugreports.html">bug report</a>. Again, a short explanation for each option is displayed at the bottom.</td></tr>
+<tr><td><b>Выбор опций отладки (Select debug options)</b>
+</td><td> </td><td>Здесь вы найдете несколько опций, которые помогут вам при поиске неисправностей или при получении дополнительных сведений при составлении <a href="../../welcome/ru/bugreports.html">отчета об ошибке</a>. Опять же, внизу отображается короткое описание для каждой опции.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Enable serial debug output</span><br />
 		Turns on forwarding the syslog output to the serial interface (default: 115200, 8N1).</p>
@@ -117,14 +121,14 @@
 		Displays the debug info the boot loader has logged (press <span class="key">Q</span> to exit the log)</p>
 	<p><span class="menu">Add advanced debug option</span><br />
 		Allows advanced debugging options to be entered directly.</p></td></tr>
-<tr><td></td><td></td><td>If <span class="menu">Enable debug syslog</span> is activated, a warm reboot after a crash shows these additional options:</td></tr>
+<tr><td></td><td></td><td>Если активирован пункт меню <span class="menu">Enable debug syslog</span>, то после горячей перезагрузки после системного сбоя появятся эти дополнительные опции:</td></tr>
 <tr><td></td><td></td><td>	<p><span class="menu">Save syslog from previous session during boot</span><br />
 		Saves the syslog from the previous Haiku session to <span class="path">/var/log/previous_syslog</span> when booting.</p>
 	<p><span class="menu">Display syslog from previous session</span><br />
 		Displays the syslog from the previous Haiku session.</p>
 	<p><span class="menu">Save syslog from previous session</span><br />
 		Saves the syslog from the previous Haiku session to disk. Currently only FAT32 volumes are supported.</p></td></tr>
-<tr><td class="onelinetop"><b>Select screen resolution</b></td><td> </td><td>Lets you force a certain screen resolution and color depth.</td></tr>
+<tr><td class="onelinetop"><b>Выбор разрешения экрана <br />(Select screen resolution)</b></td><td> </td><td>Позволяет принудительно задать разрешение экрана и глубину цвета.</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>

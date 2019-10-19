@@ -30,11 +30,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/pl.png" alt="" /> Polski</li>
+<li><a href="../id/deskbar.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/deskbar.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/deskbar.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/deskbar.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/deskbar.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/deskbar.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/deskbar.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/deskbar.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/deskbar.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pt_PT/deskbar.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
@@ -49,9 +51,9 @@
 <li><a href="../jp/deskbar.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
 </ul>
 <span>
- «  <a href="tracker-add-ons.html">Tracker Add-Ons</a> 
+ «  <a href="tracker-add-ons.html">Dodatki Trackera</a> 
 ::  <a href="contents.html" class="uplink">Spis treści</a> 
-::  <a href="filetypes.html">Filetypes</a>  »
+::  <a href="filetypes.html">Typy plików</a>  »
 </span></div>
 </div>
 
@@ -70,12 +72,12 @@
 
 <h1>Deskbar</h1>
 
-<p>The Deskbar is the little panel that by default is located in the upper right corner of the screen. It's Haiku's version of Windows' taskbar with its Start button. It contains the Deskbar menu from where you can start applications and preferences, a tray with a clock and other tools below that and a list of currently running programs at the bottom.</p>
+<p>Deskbar jest małym panelikiem domyślnie umieszczonym w prawym górnym rogu ekranu. Jest to odpowiednik paska zadań z przyciskiem Start w systemie Windows. Składa się on z menu Deskbara, z którego można uruchomić aplikacje i panele preferencji, tacki z zegarem i innymi narzędziami poniżej, oraz z listy uruchomionych aplikacji na samym dole.</p>
 <img src="images/deskbar-images/positions.png" alt="positions" />
-<p>You can move the Deskbar to any corner or as a bar along the upper or lower border of the screen by gripping the knobbly area on one side of the tray and drag &amp; drop it into the new position. You can also fold it into a more compact layout by drag &amp; dropping the knobbly area onto the Deskbar menu.</p>
-<p>By gripping the other knobbly widget of the tray, you can change the width of the Deskbar by dragging the mouse left or right:</p>
+<p>Deskbara można przesunąć w dowolny róg ekranu lub zamienić w pasek u góry lub na dole ekranu, klikając na uchwyt po prawej stronie tacki i przeciągając w pożądane miejsce. Można go także złożyć do nieco bardziej oszczędnej formy, przeciągając uchwyt na menu Deskbara.</p>
+<p>Łapiąc uchwyt po przeciwnej stronie, można zmienić szerokość Deskbara ciągnąc w lewo lub w prawo:</p>
 <img src="images/deskbar-images/width.png" alt="width" />
-<p>A wider Deskbar allows for more icons in the tray on a single row. It also truncates longer application names in the list of running programs less often, especially if you use larger icons.</p>
+<p>Szerszy Deskbar umożliwia wyświetlenie w tacce większej liczby ikon w rzędzie, będzie również rzadziej obcinał dłuższe nazwy uruchomionych aplikacji, zwłaszcza jeśli używane są większe ikony.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -83,29 +85,29 @@
 <p>Gdy klikniesz na górze Deskbara, otworzy się menu:</p>
 <img src="images/deskbar-images/deskbar.png" alt="deskbar.png" />
 <ul>
-<li><p><b>About this system...</b> - Shows some basic information of the system, licenses and the credits of the Haiku project.</p></li>
+<li><p><b>Informacje o systemie...</b> – wyświetla podstawowe informacje o systemie, licencje i „listę płac” projektu Haiku.</p></li>
 
-<li><p><b>Find...</b> - Opens the <a href="queries.html">Query</a> dialog.</p></li>
-<li><p><b>Show replicants</b> - Shows/hides the little <a href="gui.html#replicants">Replicant</a> widget you use to drag it around, remove or access its context menu.</p></li>
-<li><p><b>Mount</b> - Offers the same options as when invoked by right-clicking the Desktop (see <a href="tracker.html#mounting-volumes">Mounting Volumes</a>).</p></li>
-<li><p><b>Deskbar preferences...</b> - Opens a panel to configure the Deskbar (see below).</p></li>
-<li><p><b>Shutdown</b> - Offers options to either <span class="menu">Restart system</span> or <span class="menu">Power off</span>.</p></li>
-<li><p><b>Recent documents, folders, applications</b> - List of the last recently opened documents, folders and applications (see <span class="menu">Deskbar preferences</span> below).</p></li>
-<li><p><b>Applications, Demos, Deskbar applets, Preferences</b> - List of installed applications, demos, applets and preferences.<br />You can add links to other programs (or any folder, document, query etc.) by putting them into <span class="path">~/config/settings/deskbar/menu/</span>.</p></li>
+<li><p><b>Znajdź...</b> – otwiera okno <a href="queries.html">Zapytania</a>.</p></li>
+<li><p><b>Pokaż replikanty</b> – pokazuje/ukrywa mały widżet <a href="gui.html#replicants">Replikanta</a> używany do jego przeciągania, usuwania i dostępu do menu.</p></li>
+<li><p><b>Zamontuj</b> – oferuje te same opcje co menu wywołane prawym przyciskiem myszy na Pulpicie (zobacz <a href="tracker.html#mounting-volumes">Montowanie partycji</a>).</p></li>
+<li><p><b>Ustawienia Deskbara...</b> – otwiera panel konfiguracji Deskbara (zobacz niżej).</p></li>
+<li><p><b>Wyłącz komputer...</b> – pozwala <span class="menu">Uruchomić ponownie</span> lub <span class="menu">Wyłączyć</span> komputer.</p></li>
+<li><p><b>Ostatnio używane...</b> – lista ostatnio używanych dokumentów, katalogów i aplikacji (zobacz sekcję <span class="menu">Ustawienia Deskbara</span> niżej).</p></li>
+<li><p><b>Aplikacje, Dema, aplety Deskbara, Preferencje</b> – lista zainstalowanych aplikacji, dem, apletów i panelów preferencji.<br />Możesz dodać dowiązania do innych programów (lub katalogów, dokumentów, zapytać itp.) umieszczając je w katalogu <span class="path">~/config/settings/deskbar/menu/</span>.</p></li>
 </ul>
 
 <h3>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>Preferencje Deskbara</h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>Ustawienia Deskbara</h3>
 <img src="images/deskbar-images/prefs-deskbar.png" alt="prefs-deskbar.png" />
 <p>Panel preferencji Deskbara jest podzielony na trzy sekcje.</p>
 
 <h4>Aplikacje</h4>
-<p>Poniższe ustawienia nie dotyczą zainstalowanych programów, tylko zachowania i wyglądu listy uruchomionych aplikacji.</p>
+<p>Poniższe ustawienia nie mają wpływu na działanie samych programów, a tylko na zachowanie i wygląd listy uruchomionych aplikacji.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Sortuj uruchomione aplikacje</span></td><td> </td><td>Sortuje alfabetycznie listę uruchomionych aplikacji.</td></tr>
-<tr><td><span class="menu">Tracker zawsze pierwszy</span></td><td> </td><td>Nawet jeśli włączysz sortowanie alfabetyczne, wpis Trackera pozostanie pierwszy na liście.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Show application expander</span></td><td> </td><td>Włącza mały widżet pozwalający pokazać/ukryć wszystkie okna aplikacji bezpośrednio pod jej wpisem w Deskbarze.</td></tr>
-<tr><td><span class="menu">Expand new applications</span></td><td> </td><td>Nowo uruchomione aplikacje będą wyświetlać swoje okna automatycznie pod swoim wpisem w Deskbarze.</td></tr>
+<tr><td><span class="menu">Sortuj aplikacje po nazwie</span></td><td> </td><td>Sortuje alfabetycznie listę uruchomionych aplikacji.</td></tr>
+<tr><td><span class="menu">Tracker zawsze na początku</span></td><td> </td><td>Tracker zawsze będzie pierwszy na liście, nawet mimo włączonego sortowania alfabetycznego.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Aplikacje jako elementy rozwijalne</span></td><td> </td><td>Włącza mały widżet pozwalający pokazać/ukryć wszystkie okna aplikacji bezpośrednio pod jej wpisem w Deskbarze.</td></tr>
+<tr><td><span class="menu">Rozwijaj uruchamiane aplikacje</span></td><td> </td><td>Nowo uruchomione aplikacje będą wyświetlać swoje okna automatycznie pod swoim wpisem w Deskbarze.</td></tr>
 <tr><td><span class="menu">Ukryj nazwy aplikacji</span></td><td> </td><td>Usuwa etykiety tekstowe uruchomionych aplikacji.</td></tr>
 <tr><td><span class="menu">Rozmiar ikon</span></td><td> </td><td>Dostosowuje rozmiar ikon uruchomionych aplikacji.</td></tr>
 </table>
@@ -116,43 +118,42 @@ Here you can set the number of recent documents, folders and applications that a
 The button <span class="button">Edit in Tracker...</span> opens the folder <span class="path">~/config/settings/deskbar/menu/</span>. In it you'll find the files and folders that appear in the Deskbar, by default these are <span class="menu">Applications</span>, <span class="menu">Demos</span>, <span class="menu">Deskbar applets</span>, and <span class="menu">Preferences</span>.<br />
 You can delete or add entries like links to applications, documents or even queries by simply copying/deleting them to/from this folder.</p>
 <!-- <p _translation_id="432">It's even easier to simply drag a file, folder or saved query and drop it where you want it into the Deskbar.</p> -->
-<div class="box-info"><p>Programs installed from a package automatically put an entry into the Deskbar. Depending on the number of packages you have installed, this can become a bit crowded. If you prefer to have total control, and only want to see applications you link there yourself (possibly in categorizing sub-folders), here's how to do it:<br />
-You create a link of the <span class="path">menu</span> folder in <span class="path">~/config/settings/deskbar/</span> and rename to <span class="path">menu_entries</span>. From Terminal that is achieved with:</p>
+<div class="box-info"><p>Programy zainstalowane z pakietów automatycznie umieszczają swój wpis w Deskbarze. W zależności od ich liczby może zrobić się w nim tłoczno. Jeżeli wolisz kompletną kontrolę i chcesz tam widzieć tylko samodzielnie umieszczone aplikacje (np. w katalogach wg kategorii), możesz to zrobić w następujący sposób: stwórz dowiązanie do katalogu <span class="path">menu</span> w <span class="path">~/config/settings/deskbar/</span> i zmień jego nazwę na <span class="path">menu_entries</span>. Z Terminala użyj następującej komendy:</p>
 <pre class="terminal">ln -s ~/config/settings/deskbar/menu ~/config/settings/deskbar/menu_entries</pre></div>
 
 <h4>Okno</h4>
-<p>Finally, the preferences for the Deskbar window.</p>
+<p>Wreszcie, ustawienia okna Deskbara:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Zawsze na wierzchu</span></td><td> </td><td>The Deskbar always stays above all other windows.</td></tr>
-<tr><td><span class="menu">Auto-raise</span></td><td> </td><td>The Deskbar pops to the front if the mouse pointer touches it.</td></tr>
-<tr><td><span class="menu">Auto-hide</span></td><td> </td><td>The Deskbar is reduced to only a few pixels and only pops up if the mouse pointer touches them.</td></tr>
+<tr><td><span class="menu">Zawsze na wierzchu</span></td><td> </td><td>Deskbar będzie zawsze widoczny nad innymi oknami.</td></tr>
+<tr><td><span class="menu">Autoaktywacja</span></td><td> </td><td>Deskbar przeskoczy na wierzch, gdy tylko dotknie go wskaźnik myszy.</td></tr>
+<tr><td><span class="menu">Autoukrywanie</span></td><td> </td><td>Deskbar zostanie zredukowany do kilku pikseli i pojawi się tylko wtedy, gdy dotknie ich wskaźnik myszy.</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tray" name="tray">Tacka</a></h2>
 <img src="images/deskbar-images/calendar.png" alt="calendar.png" />
-<p>Among other things, the tray is housing the clock. Hover the mouse over it to display the date in a tooltip. Left-click it to show a calendar. Right-click it to hide/show the clock or launch the <a href="preferences/time.html">Time</a> preferences to set it.</p>
-<p>Any program can install an icon in the tray to provide an interface to the user. The email system, for instance, shows a different symbol when there's unread mail and offers a context menu to e.g. create or check for new mail. <span class="app">ProcessController</span> is another example that uses its icon in the tray to provide information (CPU/memory usage) and to offer a context menu.</p>
+<p>W tacce znajduje się, między innymi, zegar. Najechanie na niego wskaźnikiem myszy wyświetli podpowiedź z aktualną datą. Kliknięcie lewym przyciskiem myszy pokazuje kalendarz, prawym – menu pozwalające ukryć/pokazać zegar lub uruchomić panel preferencji <a href="preferences/time.html">Czas</a> w celu zmiany jego ustawień.</p>
+<p>Każdy program może zainstalować ikonę w tacce jako interfejs dla użytkownika. Dla przykładu, system mejlowy wyświetla różne symbole, gdy są nieprzeczytane wiadomości, oraz oferuje menu kontekstowe pozwalające stworzyć wiadomość lub sprawdzić czy nie dotarły nowe. <span class="app">ProcessController</span> to kolejny przykład aplikacji, która korzysta z ikony w tacce, aby informować użytkownika o bieżącym stanie systemu (użycie procesora/pamięci) oraz udostępnić menu z dodatkowymi opcjami.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="list-of-apps" name="list-of-apps">Lista uruchomionych aplikacji</a></h2>
 <img src="images/deskbar-images/list-of-apps.png" alt="list-of-apps.png" />
-<p>You can change to a specific running application by clicking on its entry in the Deskbar and choosing (one of) its windows from the submenu. By right-clicking you can <span class="menu">Hide/Show all</span> windows or <span class="menu">Close all</span> and with them the entire application.</p>
-<p>A <span class="key">SHIFT</span> <span class="key">CTRL</span> click on an application hides all its windows, a <span class="key">CTRL</span> click shows them again.</p>
-<div class="box-info">Sometimes an application may hang and even though all its windows are gone, the entry in the list of running applications in the Deskbar just won't disappear. In such a situation you use the Vulcan Death Grip to get rid of it: hold <span class="key">SHIFT</span> <span class="key">CTRL</span> <span class="key">ALT</span> and click on the offending entry in the Deskbar. Fascinating!</div>
-<p>If you activated Expanders in the Deskbar settings, you can expand/collapse the list of windows directly under an application's entry.</p>
-<p>In front of every application's windows is a symbol providing info on its state. A bright symbol means a window is visible, a dark one that it's minimized. Three lines in front of a symbol shows that it's not on the current workspace.</p>
+<p>Możesz przełączyć się na konkretną aplikację klikając jej wpis w Deskbarze i wybierając jedno z jej okien w podmenu. Klikając prawym przyciskiem myszy możesz <span class="menu">Ukryć/Pokazać wszystkie okna</span>, lub zamknąć je, a razem z nimi całą aplikację.</p>
+<p>Kliknięcie wpisu aplikacji z <span class="key">SHIFT</span> <span class="key">CTRL</span> ukrywa wszystkie jej okna, a z samym <span class="key">CTRL</span> pokazuje je.</p>
+<div class="box-info">Czasami aplikacja może się zawiesić i, mimo że wszystkie jej okna zostały zamknięte, jej wpis na liście w Deskbarze nie zniknie. W takiej sytuacji pomoże Wulkaniczny Chwyt Śmierci: kliknięcie wpisu z <span class="key">SHIFT</span> <span class="key">CTRL</span> <span class="key">ALT</span> pozbędzie się aplikacji bez zbędnej zwłoki. Fascynujące!</div>
+<p>Jeżeli włączone zostało rozwijanie elementów w ustawieniach Deskbara, możesz rozwijać/zwijać listę okien bezpośrednio pod wpisem aplikacji.</p>
+<p>Z przodu każdego wpisu okna znajduje się symbol reprezentujący jego aktualny stan. Jasny oznacza że okno jest widoczne, ciemny – ukryte (zminimalizowane). Trzy linie obok oznaczają, że okno jest na innej przestrzeni roboczej.</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="tracker-add-ons.html">Tracker Add-Ons</a> 
+ «  <a href="tracker-add-ons.html">Dodatki Trackera</a> 
 ::  <a href="contents.html" class="uplink">Spis treści</a> 
-::  <a href="filetypes.html">Filetypes</a>  »
+::  <a href="filetypes.html">Typy plików</a>  »
 </span></div>
 </div>
 

@@ -32,11 +32,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/jp.png" alt="" /> 日本語</li>
+<li><a href="../id/applications.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/applications.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/applications.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/applications.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/applications.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/applications.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/applications.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/applications.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/applications.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/applications.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -67,8 +69,8 @@
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="hpkg" name="hpkg">Haiku パッケージ (.hpkg)</a></h2>
-<p>パッケージの検索、ダウンロード、および自動的なインストール / アンインストールをするには、<a href="applications/haikudepot.html">HaikuDepot</a> 
-を使うのがもっとも簡単です。もし、どこかからパッケージをダウンロードしたなら -  おそらくそれが (まだ) 公式のリポジトリに入っていないからでしょう - それをダブルクリックすると、HaikuDepotで開き、そこからインストールできます。</p>
+<p>パッケージの検索、ダウンロード、および自動的なインストール / アンインストールには、<a href="applications/haikudepot.html">HaikuDepot</a> 
+を使うのがもっとも簡単です。もし、どこかからパッケージをダウンロードしたなら -  おそらくそれが (まだ) 公式のリポジトリに入っていないからでしょう - それをダブルクリックすると、HaikuDepotで開いてインストールできます。</p>
 <p>新規インストールされたアプリケーションは <tt>/system/apps/</tt> の中に、また、コマンドラインアプリケーションの場合は、<tt>/system/bin/</tt> の中に見つかります。アプリケーション以外のプログラムが依存するファイル (ライブラリ、データ、アドオンなど) は自動的にファイルシステム中の適切な位置に現れます。</p>
 <p><a href="deskbar.html">Deskbar</a> または<a href="desktop-applets/launchbox.html">ランチャー</a>のトピックに、新規インストールしたアプリケーションへのショートカットを追加する方法が記載されています。</p>
 <div class="box-info">ところで、.hpkg ファイルは解凍できますが、それはパッケージをインストールするときにパッケージ管理システムが行っていることではありません。下層のファイルシステムは、ファイルを適切なフォルダーに分散するためだけに出現します。解凍の前後で物理的な移動はありません。これが、インストール / アンインストールがとても速くクリーンである理由です。
@@ -76,17 +78,17 @@
 <p>パッケージがほかのいくつかのライブラリやパッケージに依存している場合、ウィンドウが表示され、必要なファイルをダウンロードして同様にインストールしてよいか尋ねます。
 </p>
 <p>アンインストールも同じく簡単です。パッケージを HaikuDepot 内で検索して、<span class="button">アンインストール (Uninstall)</span> ボタンを押すだけです。</p>
-<p>ターミナル内で作業しているか、パッケージのアンインストール / インストールをスクリプトで行うなら、コマンド <tt>pkgman --help</tt> を見るべきです。</p>
+<p>ターミナル内で作業しているか、スクリプトでパッケージのアンインストール / インストールを行うなら、コマンド <tt>pkgman --help</tt> を見るべきです。</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="beos_apps" name="beos_apps">以前の BeOS アーカイブ (.zip および .pkg)</a></h2>
-<p>BeOS のアーカイブで、フォルダー内にアプリケーションに必要なものをすべて含んでいるものは、単に <tt>/boot/home/</tt> 内のどこかに解凍して (ダブルクリックで<span class="app">ファイル解凍</span>または以前の <span class="app">PackageInstaller</span> が開きます)、そこから実行できます。そのようなすべてを含んでいるアプリケーションをアンインストールすることは簡単です。つまり、そのフォルダーを削除するだけです。</p>
-<p>これは、ほとんどの古い BeOS アプリケーションについて当てはまります。アーカイブがファイルを存在しないハードコートされた場所にまき散らすため、それを解凍しただけでアプリケーションが動かない場合、手動で修正する必要があります。<tt>/system/non-packaged/</tt> フォルダーに必要なフォルダー階層を作成できます。本物の.hpkg ファイルがより多く利用できるようになり、古い BeOS アプリケーションが再パッケージされるようになれば、手動で行う必要は少なくなるでしょう。<tt>non-packaged</tt> フォルダー階層の使い方は、この<a href="http://www.haiku-os.org/guides/daily-tasks/install-applications">オンライン記事</a>を参照ください。</p>
+<p>BeOS のアーカイブで、フォルダー内にアプリケーションに必要なものをすべて含んでいるものは、単に <tt>/boot/home/</tt> 内のどこかに解凍して (ダブルクリックで<span class="app">ファイル解凍</span>または以前の <span class="app">PackageInstaller</span> が開きます)、そこから実行できます。そのようなアプリケーションのアンインストールは簡単です。つまり、フォルダーを削除するだけです。</p>
+<p>これは、ほとんどの古い BeOS アプリケーションについて当てはまります。解凍しただけではアプリケーションが動かない場合、それはアーカイブがファイルを存在しないハードコートされた場所にまき散らすためですが、手動で修正する必要があります。<tt>/system/non-packaged/</tt> フォルダーに必要なフォルダー階層を作成できます。本物の.hpkg ファイルがより多く利用できるようになり、古い BeOS アプリケーションが再パッケージされるようになれば、手動で行う必要は減るでしょう。<tt>non-packaged</tt> フォルダー階層の使い方は、この<a href="http://www.haiku-os.org/guides/daily-tasks/install-applications">オンライン記事</a>を参照ください。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="list-of-apps" name="list-of-apps">Haiku に付属するアプリケーション</a></h2>
-<p>Haiku には、大部分は小さいが必要不可欠な一連のアプリケーションが付属しています。これらすべてのアプリケーションは、<span class="path">/boot/system/apps/</span> にあります。データファイルのダブルクリックで通常起動 (たとえば、画像ファイルをダブルクリックすると、画像ビューワ (ShowImage) が起動します) しないアプリケーションについては Deskbar の <span class="menu">Applications</span> メニューの中にあります。</p>
+<p>Haiku には、大部分は小さいが必要不可欠な一連のアプリケーションが付属しています。これらすべてのアプリケーションは、<span class="path">/boot/system/apps/</span> にあります。データファイルのダブルクリックで通常起動 (たとえば、画像ファイルをダブルクリックすると、画像ビューワ (ShowImage) が起動します) しないアプリケーションは Deskbar の <span class="menu">Applications</span> メニュー中にあります。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td style="width:24px;"><img src="../images/apps-images/activitymonitor-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/activitymonitor.html">利用状況モニター</a></td><td style="width:10px;"> </td>
 		<td valign="top">CPU やメモリの使用量のようなシステムリソースを追跡するツール</td></tr>
@@ -103,7 +105,7 @@
 	<tr><td style="width:24px;"><img src="../images/apps-images/diskprobe-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/diskprobe.html">DiskProbe</a></td><td> </td>
 		<td valign="top">ファイルやデバイス用 16 進エディター</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/diskusage-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/diskusage.html">DiskUsage</a></td><td> </td>
-		<td valign="top">ディスクの使用量を可視化するツール</td></tr>
+		<td valign="top">ディスク使用量を可視化するツール</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/drivesetup-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/drivesetup.html">DriveSetup</a></td><td> </td>
 		<td valign="top">ハードディスクのパーティションを編集するツール</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/expander-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/expander.html">ファイル解凍</a></td><td> </td>
@@ -135,7 +137,7 @@
 	<tr><td style="width:24px;"><img src="../images/apps-images/softwareupdater-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/softwareupdater.html">ソフトウェアの更新</a></td><td> </td>
 		<td valign="top">ソフトウェアパッケージや、Haiku 自身を更新するためのツール</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/soundrecorder-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/soundrecorder.html">サウンドレコーダー</a></td><td> </td>
-		<td valign="top"><span style="color:silver">ライン入力やマイクから音声を録音するためのツール [<i>まだありません</i>]</span></td></tr>
+		<td valign="top"><span style="color:silver">ライン入力やマイクから音声を録音するツール [<i>まだありません</i>]</span></td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/stylededit-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/stylededit.html">StyledEdit</a></td><td> </td>
 		<td valign="top">シンプルなテキストエディター</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/terminal-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/terminal.html">ターミナル</a></td><td> </td>

@@ -31,11 +31,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../../id/applications/midiplayer.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/midiplayer.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../de/applications/midiplayer.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../../en/applications/midiplayer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/applications/midiplayer.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/applications/midiplayer.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/midiplayer.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/midiplayer.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../pl/applications/midiplayer.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
 <li><a href="../../pt_PT/applications/midiplayer.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
@@ -58,6 +60,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Az oldal fordítása még folyamatban van. Amíg tart a fordítás, addig a lefordítatlan részek angolul jelennek meg.</div>
 
 <h2><img src="../../images/apps-images/midiplayer-icon_64.png" alt="midiplayer-icon_64.png" width="64" height="64" />Midilejátszó (MidiPlayer)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -68,8 +71,8 @@
 <p><br /></p>
 <p>Ahogy a neve is mutatja, a Midilejátszó midi zene lejátszására való. A midi egy speciális formátum, ugyanis nem tartalmazza a digitális, kódolt zenét, hanem csak a leírását.<br />
 A fájl mérete általában kicsi, viszont függ a használt eszköz-tártól is ("Hangszereknek" is hívják), így a méret akár elég nagy is lehet. Ugyanakkor ezek a Hangszerek mérete is elég nagy lehet attól függően, hogy mennyi és milyen minőségű hangszer-mintát tárolnak.</p>
-<div class="box-info"><p>A Haiku alap esetben nem rendelkezik Hangszerekkel, mert ezek elég nagy méretűek, és csak néhány ember használja. Akik pedig használnak, azoknak már van minőségi vagy egyéni Hangszere. Ahhoz, hogy egyártalán hallj <i>valamit</i>, egy kiegészítő csomagot kell telepíteni. A Terminálban add ki a következő parancsot: <tt>installoptionalpackage TimGMSoundFont</tt></p>
-<p>Ha más hangokat szeretnél használni, akkor készíts egy hivatkozást a <tt>/boot/system/data/synth</tt> mappába, és nevezzd el <tt>big_synth.sy</tt>-re.</p></div>
+<div class="box-info"><p>Haiku releases include a small but relatively high quality SoundFont. People who use MIDI more seriously often already have very high quality or custom SoundFonts.</p>
+<p>To use other SoundFonts (that don't come installable via HaikuDepot as a HPKG), just copy the .sf file to e.g. <tt>~/config/non-packaged/data/synth/</tt>. You can select the active SoundFont in the Media preferences under <span class="menu">MIDI</span>.</p></div>
 <img src="../images/apps-images/midiplayer.png" alt="midiplayer.png" />
 <p>A Midilejátszó felülete nagyon egyszerű. Csak indítsunk el egy midi fájlt, vagy húzzuk a lejátszó ablakába, és máris indul a lejátszás. Módosíthatjuk a hangerőt, visszhangot adhatunk hozzá a <span class="menu">Visszhang</span> menüből, az ablak felső részében pedig egy oszcilloszkóp található.</p>
 

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2018, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -35,11 +35,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/ru.png" alt="" /> Русский</li>
+<li><a href="../id/tracker.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/tracker.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/tracker.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/tracker.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/tracker.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/tracker.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/tracker.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/tracker.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/tracker.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/tracker.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -89,8 +91,8 @@
 <img src="images/tracker-images/mount-settings.png" alt="drill-down.png" />
 <p>Для того, чтобы после каждой перезагрузки не монтировать снова все вручную, существуют <span class="menu">Настройки подключения дисков</span>.<br />
 Эти настройки позволяют автоматически смонтировать любое устройство хранения при подключении и настроить монтирование при загрузке системы всех дисков, которые были смонтированы ранее.</p>
-<div class="box-warning">Before you disconnect e.g. a harddrive or USB stick, make sure you have successfully unmounted the volume and its icon has disappeared. This guarantees that all data transfer has finished. Otherwise you may lose data or corrupt the disk!</div>
-<div class="box-warning">Haiku is able to mount non-BFS formatted volumes. Be warned, however, that these non-BFS filesystems haven't been rigorously tested. Writing to those volumes may cause corruption in some cases. If you want to be on the safe side, always choose <span class="button">Mount read-only</span> when mounting!</div>
+<div class="box-warning">Перед тем как отключить жёсткий диск или USB-диск, убедитесь, что Вы успешно его отмонтировали, и иконка диска исчезла. Это гарантирует, что передача данных завершена. Иначе Вы можете потерять данные либо повредить диск!</div>
+<div class="box-warning">Haiku способна подключать разделы, отформатированные не в файловой системе BFS. Однако имейте в виду, что  скрупулёзное тестирование работы с этими файловыми системами не проводилось. Запись на эти разделы в некоторых случаях может вызвать повреждение данных. Если вы хотите быть уверены в их сохранности, при подключении раздела всегда выбирайте вариант <span class="button">Только чтение</span>!</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -134,20 +136,20 @@
 <ul>
 <li><p><span class="menu">Большие значки</span> (<span class="key">ALT</span> <span class="key">1</span>) - Большие иконки, размер которых вы можете изменять в меню или при помощи сочетания клавиш <span class="key">ALT</span> <span class="key">+</span>/<span class="key">ALT</span> <span class="key">-</span>.</p></li>
 <li><p><span class="menu">Мелкие значки</span> (<span class="key">ALT</span> <span class="key">2</span>) - название говорит само за себя.</p></li>
-<li><p><span class="menu">Список</span> (<span class="key">ALT</span> <span class="key">3</span>) - Подробный список файлов, позволяющий отобразить/скрыть доступные атрибуты файлов. (Смотрите тему <a href="attributes.html">Атрибуты</a>.) В подменю можно выбрать, использовать ли маленькие или большие иконки.</p></li>
+<li><p><span class="menu">List view</span> (<span class="key">ALT</span> <span class="key">3</span>) - A detailed list of your files enabling you to show/hide file attributes (see topic <a href="attributes.html">Attributes</a>.)</p></li>
 </ul>
 <p>Меню <span class="menu">Окно</span> также предоставляет ряд других функций:</p>
 <ul>
 <li><p><span class="menu">Подогнать размер окна</span> (<span class="key">ALT</span> <span class="key">Y</span>) - Подогнать окно по размеру содержимого.</p></li>
-<li><p><span class="menu">Arrange by...</span> - Only available in Icon or Mini icon view, a submenu allows to set the sorting order to various properties:</p>
+<li><p><span class="menu">Упорядочить по...</span> - Доступно только в режиме просмотра в виде больших или мелких значков, подменю позволяет выбрать порядок cjhnbhjdrb по различным параметрам:</p>
 	<ul>
-	<li><p><span class="menu">Name</span>, <span class="menu">Real name</span>, <span class="menu">Size</span>, <span class="menu">Modified</span>, <span class="menu">Created</span>, <span class="menu">Kind</span>, <span class="menu">Location</span>, <span class="menu">Permissions</span></p></li>
-	<li><p><span class="menu">Reverse order</span> - Inverts the sorting order</p></li>
-	<li _translation_id="4339"><p><span class="menu">Clean up</span> (<span class="key">ALT</span> <span class="key">K</span>) - Aligns all icons to an invisible grid. Hold down <span class="key">SHIFT</span> and the menu becomes <span class="menu">Clean up all</span> which additionally sorts all icons according to the above selected criterium.</p></li>
+	<li><p><span class="menu">Имени</span>, <span class="menu">Настоящему имени</span>, <span class="menu">Размеру</span>, <span class="menu">Дате изменения</span>, <span class="menu">Дате создания</span>, <span class="menu">Типу</span>, <span class="menu">Расположению</span>, <span class="menu">Правам</span></p></li>
+	<li><p><span class="menu">Обратить порядок</span> - Обратить порядок отображения</p></li>
+	<li _translation_id="4339"><p><span class="menu">Выстроить</span> (<span class="key">ALT</span> <span class="key">K</span>) - Выстраивает иконки по невидимой сетке. Если зажать клавишу <span class="key">SHIFT</span>, название этого пункта меню изменится на <span class="menu">Выстроить все</span>, что дополнительно сортирует все иконки по выбранному выше критерию.</p></li>
 	</ul></li>
-<li><p><span class="menu">Select...</span> (<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">A</span>) - Select files according to a <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression">regular expression</a>.</p></li>
-<li><p><span class="menu">Close</span> (<span class="key">ALT</span> <span class="key">W</span>) - Closes the window. Hold down <span class="key">SHIFT</span> and the menu becomes <span class="menu">Close all</span> which closes every Tracker window.</p></li>
-<li><p><span class="menu">Close all in workspace</span> (<span class="key">ALT</span> <span class="key">Q</span>) - Closes every Tracker window in the current workspace. A useful shortcut if you forgot to hold the <span class="key">OPT</span> key while clicking through folders and all those still open Tracker windows clutter your workspace.</p></li>
+<li><p><span class="menu">Выбрать...</span> (<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">A</span>) - Выбрать файлы согласно <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="http://en.wikipedia.org/wiki/Regular expression">регулярному выражению</a>.</p></li>
+<li><p><span class="menu">Закрыть</span> (<span class="key">ALT</span> <span class="key">W</span>) - Закрыть текущее окно. Если удерживать клавишу <span class="key">SHIFT</span>, название этого пункта меню изменится на <span class="menu">Закрыть все</span>, это означает, что все окна Tracker будут закрыты.</p></li>
+<li><p><span class="menu">Закрыть всё на этом столе</span> (<span class="key">ALT</span> <span class="key">Q</span>) - Закрыть все окна Tracker, находящиеся на текущем рабочем столе. Очень удобно, если вы забыли зажать клавишу <span class="key">OPT</span> при переходе по папкам, и оставшиеся открытыми окна Tracker загромождают ваш рабочий стол.</p></li>
 </ul>
 <p>Бывают случаи, когда вам нужно перенести несколько иконок без выравнивания всех по сетке при помощи <span class="menu">Выстроить</span> (<span class="key">ALT</span> <span class="key">K</span>).В этом случае выберите нужные иконки и перед тем, как перенести их на новое место, нажмите и удерживайте клавишу <span class="key">ALT</span>. После того, как вы отпустите их, они выровняются по сетке.</p>
 <p>Остальные функции говорят сами за себя.</p>
@@ -188,15 +190,21 @@
 <br /><br />
 <img src="images/tracker-images/open-with-preferred.png" alt="open-with-preferred" />
 <p>Здесь вы найдете те же приложения, которые были предложены в подменю. Выбрав одно из них и нажав кнопку <span class="button">Открыть и сделать предпочтительным</span>, вы измените предпочтительное приложение для данного типа файлов, в нашем случае для <tt>text/plain</tt>.</p></li>
-<li><span class="menu">Информация</span>
-<br /><br />
+<li><span class="menu">Get info</span>
+<p>This opens a panel that shows the meta data of a file and lets you edit its permissions. You can rename it by clicking on the file name at the top.</p>
 <img src="images/tracker-images/get-info.png" alt="get-info" />
-<p>Это окно отображает информацию о выбранном файле, позволяет установить предпочтительное приложение для данного типа файлов, а также права доступа (эта часть окна изначально свернута). Щелчок по пути файла покажет его в окне Tracker.</p></li>
+<p>The panel consists of three tabs:</p>
+<ul>
+<li><span class="menu">Information</span>: Shows standard data like size, date of creation/modification, file type and location. Click on the location path to open the files parent folder. The <span class="menu">Open with</span> menu sets the preferred application to open this particular file.</li>
+<li><span class="menu">Permissions</span>: Lets you change owner, group and file permissions.</li>
+<li><span class="menu">Attibutes</span>: Lists all extra file attributes with their value and type.</li>
+</ul>
+</li>
 <li><p><span class="menu">Переименовать</span>, <span class="menu">Дублировать</span> и <span class="menu">В корзину</span> - позволяют переименовать или дублировать файл(ы) или перенести его/их в корзину.</p></li>
-<li><p><span class="menu">Move to</span>, <span class="menu">Copy to</span> and <span class="menu">Create link</span> - lets you move, copy or link the selected file(s) using the submenu navigating method. Holding <span class="key">SHIFT</span> while invoking the menu offers the option to create a relative link.</p></li>
-<li><p><span class="menu">Cut</span>, <span class="menu">Copy</span> and <span class="menu">Paste</span> - lets you cut, copy and paste files using the clipboard. By holding <span class="key">SHIFT</span> while invoking the menu you can <span class="menu">Copy/Cut more</span> files, maybe from another folder that you can paste somewhere else later. Also, while holding <span class="key">SHIFT</span> you can paste the copied files in the clipboard as links.</p></li>
-<li><p><span class="menu">Identify</span> - will sniff out and set the type of files if they didn't have one before, e.g. if you transferred a file with <span class="cli">wget</span> which doesn't set a filetype itself. Holding <span class="key">SHIFT</span> while invoking the menu changes the item to <span class="menu">Force identify</span> which identifies the filetype and corrects it if it was false before.</p></li>
-<li><p><span class="menu">Add-Ons</span> - offers you every generic Tracker add-on and those that can handle the selected file(s). See topic <a href="tracker-add-ons.html">Tracker Add-ons</a> for more information.</p></li>
+<li><p><span class="menu">Переместить в</span>, <span class="menu">Скопировать в</span> и <span class="menu">Создать ссылку</span> - позволяют переместить, скопировать или создать ссылку для выделенных файлов, выбрав место назначения, используя ниспадающие подменю. При удержании клавиши <span class="key">SHIFT</span> при вызове меню также будет доступна опция создания относительной ссылки.</p></li>
+<li><p><span class="menu">Вырезать</span>, <span class="menu">Скопировать</span> и <span class="menu">Вставить</span> - позволяют вырезать, скопировать или вставить файл или папку, используя буфер обмена. Удерживая клавишу <span class="key">SHIFT</span> при вызове меню, вы можете <span class="menu">Скопировать/Вырезать еще</span> файлы, возможно, из другой папки, которую впоследствии вы можете вставить куда-нибудь ещё. Также, удерживая клавишу <span class="key">SHIFT</span>, вы можете вставить скопированные файлы в буфер обмена как ссылки.</p></li>
+<li><p><span class="menu">Опознать</span> - позволяет определить тип файлов и установить его в случае отсутствия - например, если вы скачали файл при помощи <span class="cli">wget</span>, который не устанавливает тип файла. Удерживая клавишу <span class="key">SHIFT</span> при вызове меню, можно изменить опцию на <span class="menu">Опознать принудительно</span>, что позволит идентифицировать тип файла и исправить его, если он был ложным.</p></li>
+<li><p><span class="menu">Дополнения</span> - предлагает воспользоваться любыми дополнениями для Tracker, которые способны обработать выбранный(е) файл(ы). Подробно описаны в теме <a href="tracker-add-ons.html">Дополнения для Tracker</a>.</p></li>
 </ul>
 
 <h2>

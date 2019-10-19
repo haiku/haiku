@@ -33,10 +33,12 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../../images/flags/de.png" alt="" /> Deutsch</li>
+<li><a href="../../id/applications/midiplayer.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../../ca/applications/midiplayer.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../../en/applications/midiplayer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../../es/applications/midiplayer.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../fr/applications/midiplayer.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../fur/applications/midiplayer.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../../it/applications/midiplayer.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../../hu/applications/midiplayer.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pl/applications/midiplayer.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
@@ -68,12 +70,12 @@
 <tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/MidiPlayerSettings</span></td></tr>
 </table>
 <p><br /></p>
-<p>Wie der Name schon verrät, dient der MidiPlayer zum Abspielen von Midi-Dateien. Midi-Dateien sind insofern besonders, als sie nicht digitalisierte und irgendwie kodierte Musik enthalten, sondern nur eine Beschreibung von ihr: Halte diese Note für soundso lang mit dieser Lautstärke und benutze dafür Instrument X.<br />
+<p>Wie der Name schon verrät, dient der MidiPlayer zum Abspielen von MIDI-Dateien. MIDI-Dateien sind insofern besonders, als sie nicht digitalisierte und irgendwie kodierte Musik enthalten, sondern nur eine Beschreibung von ihr: Halte diese Note für soundso lang mit dieser Lautstärke und benutze dafür Instrument X.<br />
 Während die so zustande kommenden Dateien sehr klein sind, folgt daraus auch, dass sich das Ergebnis je nach verwendeter Instrumentenbibliothek (der "SoundFont") stark unterscheidet. Diese SoundFont-Dateien sind meistens recht groß; um so größer, je höher die Qualität und Anzahl der Instrumenten-Samples ist.</p>
-<div class="box-info"><p>Haiku kommt ohne vorinstallierte SoundFonts, weil sie so groß sind und sie nur relativ wenige Leute wirklich brauchen. Und die, die tatsächlich welche einsetzen, besitzen meist schon einen eigenen SoundFont hochwertiger Instrumente. Um aber zumindest <i>irgendwas</i> zu hören, kann ein frei verfügbarer mit einem optionalen Paket installiert werden. Im Terminal schreibt man dazu: <tt>installoptionalpackage TimGMSoundFont</tt></p>
-<p>Um einen anderen SoundFont zu benutzen, legt man eine Verknüpfung auf ihn in <tt>/boot/system/data/synth</tt> an und nennt sie <tt>big_synth.sy</tt>.</p></div>
+<div class="box-info"><p>Haikus vorinstallierter SoundFont ist klein, jedoch von relativ guter Qualität. Leute, die ernsthaft mit MIDI arbeiten, benutzen oft SoundFonts sehr hoher Qualität oder maßgeschneidert für spezifische Einsätze.</p>
+<p>Um andere SoundFonts zu nutzen, die nicht per HaikuDepot als HPKG installierbar sind, werden deren .sf Dateien einfach nach z. B. <tt>~/config/non-packaged/data/synth</tt> kopiert. Der aktive SoundFont kann in den <acronym title="Media">Audio &amp; Video</acronym> Einstellungen ausgewählt werden.</p></div>
 <img src="../images/apps-images/midiplayer.png" alt="midiplayer.png" />
-<p>Die Oberfläche des MidiPlayers ist sehr einfach gehalten. Wird eine Midi-Datei doppelgeklickt oder auf dem Fenster fallen gelassen, beginnt automatisch die Wiedergabe. Mit einem Regler wird die Lautstärke geändert und aus einem <span class="menu">Hall</span> Menü lassen sich Effekte zuschalten. Zur Visualisierung kann eine Wellenform oben im Fenster angezeigt werden.</p>
+<p>Die Oberfläche des MidiPlayers ist sehr einfach gehalten. Wird eine MIDI-Datei doppelgeklickt oder auf dem Fenster fallen gelassen, beginnt automatisch die Wiedergabe. Mit einem Regler wird die Lautstärke geändert und aus einem <span class="menu">Hall</span> Menü lassen sich Effekte zuschalten. Zur Visualisierung kann eine Wellenform oben im Fenster angezeigt werden.</p>
 
 </div>
 </div>

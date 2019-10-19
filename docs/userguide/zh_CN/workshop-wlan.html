@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2012-2016, Haiku, Inc. All rights reserved.
+ * Copyright 2012-2019, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,11 +31,13 @@
 <div class="inner">
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/zh_CN.png" alt="" />  中文 ［中文］</li>
+<li><a href="../id/workshop-wlan.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
 <li><a href="../ca/workshop-wlan.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../de/workshop-wlan.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
 <li><a href="../en/workshop-wlan.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 <li><a href="../es/workshop-wlan.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../fr/workshop-wlan.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../fur/workshop-wlan.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
 <li><a href="../it/workshop-wlan.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../hu/workshop-wlan.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pl/workshop-wlan.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
@@ -59,34 +61,25 @@
 
 <div id="content">
 <div>
+<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>索引</td></tr>
 <tr class="index"><td>
-	<a href="#firmware">添加支持硬件</a><br />
-	<a href="#gui">无线网络连接</a><br />
-	<a href="#commandline">命令行连接</a><br />
-	<a href="#tips">建议</a>
+	<a href="#gui">Joining a wireless network</a><br />
+	<a href="#commandline">Joining from the command line</a><br />
+	<a href="#firmware">Getting supported hardware to work</a><br />
+	<a href="#tips">Tips</a>
 </td></tr>
 </table>
 
 <h1>操作练习：无线网络</h1>
 
-<p>在目前永久网络连接需求下，网络的运行就显得尤为必要。对于小的项目来说，对日新月异的硬件提供驱动支持基本上是不可能的，Haiku 目前基于 <a href="http://www.freebsd.org">FreeBSD</a> 兼容层提供网络驱动的支持。<br />
-尽管并没有提供 100% 硬件的支持，但是保证了对大量硬件的支持。更多硬件支持信息请查阅 <a href="https://www.haiku-os.org/guides/daily-tasks/wireless#hardware-notes">在线列表</a> 或者 <a href="http://www.freebsd.org/releases/11.1R/hardware.html#WLAN">FreeBSD 11.1 硬件发布声明</a>。</p>
+<p>Getting the networking to run is essential in today's need for permanent internet connection. As keeping up to date with all the different and ever changing hardware and drivers is quite impossible for a small project, Haiku relies on a <a href="http://www.freebsd.org">FreeBSD</a> compatibility layer for its networking drivers.<br />
+This ensures a massive amount of supported hardware, though probably not 100% of what's out there. See <a href="http://www.freebsd.org/releases/12.0R/hardware.html#wlan">FreeBSD 12.0's release hardware notes</a> for a list of supported models.</p>
 <div class="box-info">目前只有 PCI, PCI-X, PCI-Express, Mini PCI, and Mini PCI-Express 设备能够很好运行。<br />
 PCMCIA, CardBus, ExpressCard, USB and ISA 设备仍需要一些功能完善。</div>
-
-<h2>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="firmware" name="firmware">添加支持硬件</a></h2>
-<p>虽然我们已经越过了首个障碍，提供了常用的硬件支持，但是一些无线网卡可能需要一些二进制固件模块。由于授权问题，Haiku无法包含这些私有固件文件。Haiku 包含了一个简单的脚本，它可用于为你检索和安装所有这些需要的私有位。一般情况下，如果您计划使用无线网络，您最好执行该脚本以确保您的系统包含所有这些需要的固件文件。</p>
-<p>打开终端，输入：</p>
-<pre class="terminal">install-wifi-firmwares.sh</pre>
-<p>接下来查看授权协议，然后接受协议并安装所有可用的固件文件。</p>
-
-<p>如果您在Haiku下无法访问网络，不能够下载缺失的固件，我们还提供了离线的方式，详情参考如下 <a href="#tips">建议</a> 。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -115,18 +108,21 @@ ArcorInternet123                 00:20:12:a4:29:e1        15  WPA</pre>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="tips" name="tips">建议</a></h2>
-<h3>离线下载二进制固件文件</h3>
+<a id="firmware" name="firmware">添加支持硬件</a></h2>
+<p>All supported modern wireless hardware works out of the box.</p>
+
+<p>A few quite old chipsets (Intel 2100/2200/2225/2915, Broadcom 43xx, Marvell 88w8335) require binary firmware modules that Haiku cannot include due to licensing issues, though. To get these wireless cards to work, a simple script is included which will retrieve and install all of the needed proprietary bits for you.</p>
+<p>打开终端，输入：</p>
+<pre class="terminal">install-wifi-firmwares.sh</pre>
+<p>接下来查看授权协议，然后接受协议并安装所有可用的固件文件。</p>
+
 <p>如果您无法通过 <tt>install-wifi-firmwares.sh</tt> 脚本来获取二进制固件文件（例如，在 Haiku 中缺少互联网连接），您可以下载 <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt">此 shell 脚本</a>，然后从其他包安装有 <tt>wget</tt> 和 <tt>zip</tt> 命令的系统中运行。<br />
 Windows 用户需要使用 Windows 可执行的 <a href="http://gnuwin32.sourceforge.net/packages/wget.htm">wget</a> 和 <a href="http://gnuwin32.sourceforge.net/packages/zip.htm">zip</a> 安装在默认位置，然后使用 <a href="https://www.haiku-os.org/files/download-data-for-wlan-firmwares.bat">BAT脚本</a>。<br />
 该脚本将会下载所需要的文件，并创建一个可以解压到 Haiku <tt>/boot</tt> 目录的压缩文件。在解压之后，在终端中输入如下指令：
 </p>
 <pre class="terminal">install-wifi-firmwares.sh</pre>
 <p>检查授权并接受一边安装所有目前可用的固件文件。</p>
-<h3>避免连接断开</h3>
-<p>Haiku 系统的一些 WLAN 芯片驱动，如 iprowifi4965 已经证实在使用 WPA 加密时会断开连接。如果您也受此影响，可以尝试在连接网络之前，禁用 "HT 模式" (高吞吐量模式，802.11n) 。</p>
-<pre class="terminal">ifconfig /dev/net/iprowifi4965/0 -ht</pre>
-<p>如果该指令可以解决问题，可以将该指令行写入  <span class="path">~/config/settings/boot/UserBootscript</span> 启动脚本，在每次开机时自动调用执行。</p>
+
 </div>
 </div>
 
