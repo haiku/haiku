@@ -507,7 +507,7 @@ intel_extreme_init(intel_info &info)
 	if (status == B_OK) {
 		info.shared_info->overlay_offset = (addr_t)info.overlay_registers
 			- info.aperture_base;
-		TRACE("Overlay registers mapped at %" B_PRIxADDR " = %p - %"
+		TRACE("Overlay registers mapped at 0x%" B_PRIx32 " = %p - %"
 			B_PRIxADDR " (%" B_PRIxPHYSADDR ")\n",
 			info.shared_info->overlay_offset, info.overlay_registers,
 			info.aperture_base, info.shared_info->physical_overlay_registers);
