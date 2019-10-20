@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Haiku, Inc.
+ * Copyright 2009-2019, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -385,10 +385,11 @@ RemoteMessage::ReadBitmap(BBitmap** _bitmap, bool minimal,
 status_t
 RemoteMessage::ReadFontState(BFont& font)
 {
-	uint8 encoding, spacing;
+	uint8 direction;
+	uint8 encoding;
+	uint8 spacing;
 	uint16 face;
 	uint32 flags, familyAndStyle;
-	font_direction direction;
 	float falseBoldWidth, rotation, shear, size;
 
 	Read(direction);
