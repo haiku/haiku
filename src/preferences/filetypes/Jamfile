@@ -33,6 +33,7 @@ DoCatalogs FileTypes :
 	:
 	ApplicationTypeWindow.cpp
 	ApplicationTypesWindow.cpp
+	AttributeListView.cpp
 	AttributeWindow.cpp
 	ExtensionWindow.cpp
 	FileTypes.cpp
