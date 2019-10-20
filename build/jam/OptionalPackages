@@ -184,8 +184,9 @@ if [ IsOptionalHaikuImagePackageAdded Welcome ] {
 
 	AddPackageFilesToHaikuImage system : haiku_welcome.hpkg : nameFromMetaInfo ;
 
-	AddSymlinkToHaikuImage home Desktop	: /boot/system/bin/welcome
-		: Welcome ;
+	AddSymlinkToHaikuImage home Desktop	: /boot/system/bin/quicktour
+		: Quick\ Tour ;
+
 	AddSymlinkToHaikuImage home Desktop	: /boot/system/bin/userguide
 		: User\ Guide ;
 }

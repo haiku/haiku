@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src data bin ;
+
+rule PrepareScriptWithIcon file : iconFile
+{
+	local source = [ FGristFiles $(file) ] ;
+	local icon = [ FGristFiles $(iconFile) ] ;
+	SEARCH on $(icon) = [ FDirName $(HAIKU_TOP) src data bin ] ;
+	local target = $(source:G=) ;
+	MakeLocateCommonPlatform $(target) ;
+	File $(target) : $(source) ;
+	MODE on $(target) = 755 ;
+	AddFileDataAttribute $(target) : BEOS:ICON : icon : $(icon) ;
+}
+
+PrepareScriptWithIcon quicktour : Alert_Idea.hvif ;
+PrepareScriptWithIcon userguide : Misc_Book.hvif ;

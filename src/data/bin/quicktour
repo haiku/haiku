@@ -1,0 +1,16 @@
+#!/bin/sh
+
+quicktourURL="\
+	https://www.haiku-os.org/docs/welcome/en/quicktour.html"
+quicktourDir=/boot/system/documentation/welcome/en/
+quicktourFile=$quicktourDir/quicktour.html
+localizedQuicktourDir=/boot/system/documentation/welcome/"$LANG"/
+localizedQuicktourFile=$localizedQuicktourDir/quicktour.html
+
+if [ -f $localizedQuicktourFile ]; then
+	open file://$localizedQuicktourFile
+elif [ -f $quicktourFile ]; then
+	open $quicktourFile
+else
+	open $quicktourURL
+fi

@@ -3,7 +3,9 @@ HaikuPackage $(haikuWelcomePackage) ;
 
 CopyDirectoryToPackage documentation : [ FDirName $(HAIKU_TOP) docs welcome ]
 	: welcome ;
+
 SEARCH on welcome = [ FDirName $(HAIKU_TOP) data bin ] ;
-AddFilesToPackage bin : welcome ;
+
+AddFilesToPackage bin : quicktour welcome ;
 
 BuildHaikuPackage $(haikuWelcomePackage) : haiku_welcome ;

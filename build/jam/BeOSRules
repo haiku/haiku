@@ -24,7 +24,7 @@ rule AddFileDataAttribute target : attrName : attrType : dataFile
 
 	ATTRIBUTE_NAME on $(attrMetaFile) = $(attrName) ;
 	ATTRIBUTE_TYPE on $(attrMetaFile) = $(attrType) ;
-	MakeLocateArch $(attrMetaFile) ;
+	MakeLocateCommonPlatform $(attrMetaFile) ;
 	CreateAttributeMetaFile $(attrMetaFile) ;
 
 	Depends $(target) : <build>addattr $(attrMetaFile) $(dataFile) ;
