@@ -126,6 +126,9 @@ bool is_valid_char(uint8 c);
 
 const char VERSION[] = "v1.2.8";
 
+#define MAX_INPUT_SIZE 1024
+	// Maximum amount of input data that "hey" can process at a time
+
 #define DEBUG_HEY 0		// 1: prints the script message to be sent to the target application, 0: prints only the reply
 
 
@@ -338,10 +341,10 @@ HeyInterpreterThreadHook(void* arg)
 	if (environment.HasMessenger("Target"))
 		environment.FindMessenger("Target", &target);
 
-	char command[1024];
+	char command[MAX_INPUT_SIZE];
 	status_t err;
 	BMessage reply;
-	while (gets(command)) {
+	while (fgets(command, sizeof(command), stdin)) {
 		reply.MakeEmpty();
 		err = Hey(&target, command, &reply);
 		if (!err) {
