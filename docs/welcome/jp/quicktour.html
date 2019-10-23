@@ -89,7 +89,7 @@
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Index</td></tr>
 <tr class="index"><td>
-[1] <a href="#start">Start</a><br />
+[1] <a href="#start">Welcome</a><br />
 [2] <a href="#deskbar">The Deskbar</a><br />
 [3] <a href="#window">The window widgets</a><br />
 [4] <a href="#shortcutkey">The shortcut key</a><br />
@@ -116,107 +116,108 @@
 <p>Haikuは、多くのアイデアをほかのOSと共有していますが、確かに注目すべき独自のアプローチをいくつか持っています。このツアーで、もっとも重要なHaikuの特徴と独自性を学びます。それは、Haikuを始めるのに役立つでしょう。</p>
 <p>各ページ右下の、"参考"リンクは、<a href="https://www.haiku-os.org/docs/userguide/{LANG}/contents.html" target="_blank">ユーザーガイド</a>中の関連するトピックなどの追加リソースを指しています。</p>
 
+</div>
 
-<x-topic>
-<h1><a id="deskbar" name="deskbar">The Deskbar</a></h1>
+<div class="topic">
+<h1><a id="deskbar" name="deskbar">Deskbar</a></h1>
 
-<p>By default at the top right corner of the desktop, the Deskbar is the hub of interacting with Haiku. You can start applications, applets and preferences from there, for example, and switch between running applications.</p>
+<p>デフォルトではデスクトップの右上にあるDeskbarは、Haiku操作の中心となります。例えばここからアプリケーション、アプレットおよびプリファレンスの起動や実行中のアプリケーションの切り替えができます。</p>
 
 <!-- [screenshot of opened deskbar, annotated] -->
 <div class="shot">
 <img src="./images/quicktour/deskbar.png" alt="The Deskbar" />
 </div>
 
-<div class="further">Further reading:<br />
+<div class="further">参考:<br />
 <a href="https://www.haiku-os.org/docs/userguide/{LANG}/deskbar.html" target="_blank">Deskbar</a></div>
-</x-topic>
+</div>
 
 
-<x-topic>
-<h1><a id="window" name="window">The window widgets</a></h1>
+<div class="topic">
+<h1><a id="window" name="window">ウィンドウの詳細</a></h1>
 
-<p>Here's a typical Haiku window with its usual widgets:</p>
+<p>ここに、普通のGUI部品を備えた典型的なHaikuウィンドウがあります。</p>
 
 <!-- [screenshot of window, annotated: Close button, Zoom button (usually maximizes the window), Double-click the tab to hide/minimize a window (find it again in the Deskbar), Move a window by grabbing it at the tab or border, Resize from the corner or by dragging a border with the right mouse button.] -->
 <div class="shot">
 <img src="./images/quicktour/window.png" alt="A window and its widgets" />
 </div>
 
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/{LANG}/gui.html" target="_blank">Haiku's GUI</a></div>
-</x-topic>
+<div class="further">参考:<br />
+<a href="https://www.haiku-os.org/docs/userguide/{LANG}/gui.html" target="_blank">Haiku のグラフィカルユーザーインターフェース</a></div>
+</div>
 
 
-<x-topic>
-<h1><a id="shortcutkey" name="shortcutkey">The shortcut key</a></h1>
+<div class="topic">
+<h1><a id="shortcutkey" name="shortcutkey">ショートカットキー</a></h1>
 
-<p>The <span class="app">Keymap</span> preferences let you switch from the Haiku standard <span class="key">ALT</span> key to <span class="key">CTRL</span> (Windows/Linux mode). This is a global switch, so for example quitting a program in the shell will then be done with <span class="key">ALT</span> <span class="key">C</span> instead the usual <span class="key">CTRL</span> <span class="key">C</span>.<br />
-This inconsistancy is one reason for the default <span class="key">ALT</span> shortcut in Haiku.</p>
+<p><span class="app">キーマップ</span>プレファレンスで、Haiku標準の<span class="key">ALT</span>キーから<span class="key">CTRL</span> (Windows/Linuxモード)へ切り替わります。これは全体的な切り替えなので、例えばシェル中でのプログラムの終了が通常の<span class="key">CTRL</span> <span class="key">C</span>の代わりに<span class="key">ALT</span> <span class="key">C</span>で実行されます。<br />この不一致が、Haikuのデフォルトショートカットが <span class="key">ALT</span>である理由のひとつです。</p>
 
 <!-- [screenshot: Two edit menus (copy/paste/cut) with ALT and CTRL shortcut)] -->
 <div class="shot">
 <img src="./images/quicktour/alt-ctrl.png" alt="Shortcut key: ALT vs. CTRL" />
 </div>
 
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/{LANG}/keyboard-shortcuts.html" target="_blank">Shortcuts and key combinations</a></div>
-</x-topic>
+<div class="further">参考:<br />
+<a href="https://www.haiku-os.org/docs/userguide/{LANG}/keyboard-shortcuts.html" target="_blank">ショートカットとキーの組み合わせ</a></div>
+</div>
 
 
-<x-topic>
-<h1><a id="twitcher" name="twitcher">The Twitcher</a></h1>
+<div class="topic">
+<h1><a id="twitcher" name="twitcher">Twitcher</a></h1>
 
-<p>Holding <span class="key">CTRL</span> <span class="key">TAB</span> summons the <span class="app">Twitcher</span> where you switch between running applications.<br />
-Tapping the <span class="key">TAB</span> key only quickly while holding <span class="key">CTRL</span> switches to the last used application.</p>
+<p><span class="key">CTRL</span> <span class="key">TAB</span> を押すと、<span class="app">Twitcher</span>を呼び出します。そこで実行中アプリケーションを切り替えます。<br />
+<span class="key">CTRL</span>を押しながら、<span class="key">TAB</span>を素早くタップすると、最後に使ったアプリケーションと切り替えます。</p>
 
 <div class="shot">
 <img src="../images/quicktour/twitcher.png" alt="The Twitcher switching between apps" />
 </div>
 
-<div class="further">Further reading:<br />
+<div class="further">参考:<br />
 <a href="https://www.haiku-os.org/docs/userguide/{LANG}/twitcher.html" target="_blank">Twitcher</a></div>
-</x-topic>
+</div>
 
 
-<x-topic>
-<h1><a id="teammonitor" name="teammonitor">The Team monitor</a></h1>
+<div class="topic">
+<h1><a id="teammonitor" name="teammonitor">チームモニター</a></h1>
 
-<p>If some application crashed badly and maybe won't disappear from Deskbar's running application list, press <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">DEL</span> to invoke the <span class="app">Team monitor</span>. Here you can select an entry and kill a misbehaving app.</p>
+<p>一部のアプリケーションがひどくクラッシュして、Deskbarのアプリケーションのリストから消せなくなったら、<span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">DEL</span>を押して<span class="app">チームモニター</span>を起動します。そこで項目を選んで不正なアプリケーションを強制終了できます。</p>
 
 <div class="shot">
 <img src="./images/quicktour/teammonitor.png" alt="The Team monitor" />
 </div>
 
-<p>A neat way to quickly get rid of an app hanging in the Deskbar is the Vulcan Death Grip.<br />
-Hold <span class="key">SHIFT</span> <span class="key">CTRL</span> <span class="key">ALT</span> and click on the offending entry in the Deskbar. Poof!</p>
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/{LANG}/teammonitor.html" target="_blank">Team monitor</a></div>
-</x-topic>
+<p>Vulcan Death Gripは、クラッシュしたアプリケーションをDeskbar内で素早く取り除く素晴らしい方法です。<br />
+<span class="key">SHIFT</span> <span class="key">CTRL</span> <span class="key">ALT</span>を押しながら、Deskbar 内で問題となる項目をクリックします。Poof!
+</p>
+<div class="further">参考:<br />
+<a href="https://www.haiku-os.org/docs/userguide/{LANG}/teammonitor.html" target="_blank">チームモニター</a></div>
+</div>
 
 
-<x-topic>
-<h1><a id="move-resize" name="move-resize">Window management: Move &amp; Resize</a></h1>
+<div class="topic">
+<h1><a id="move-resize" name="move-resize">ウィンドウ管理: 移動とリサイズ </a></h1>
 
-<p>Haiku offers a neat way to quickly move or resize windows:<br />
-Holding down <span class="key">CTRL</span> <span class="key">ALT</span> will highlight the window borders nearest to the mouse pointer.<br />
-Click and dragging with the <i>right</i> mouse button will resize the window along the highlighted border(s).<br />
-Click and drag with the <i>left</i> mouse button to move it around.</p>
+<p>Haikuには、ウィンドウを素早く移動 / リサイズする素敵な方法があります。<br />
+<span class="key">CTRL</span> <span class="key">ALT</span>を押すと、マウスポインターに一番近いウィンドウ枠がハイライトします。<br />
+マウスの<i>右</i>ボタンでクリック&amp;ドラッグすると、ハイライトした枠に沿ってリサイズします。<br />
+マウスの<i>左</i>ボタンでクリック&amp;ドラッグすると、リサイズします。</p>
 
 <div class="shot">
 <img src="./images/quicktour/move-resize.png" alt="Move with CTRL+ALT+left mouse button" />
 </div>
 
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/{LANG}/gui.html#move-resize" target="_blank">A quick way to move or resize windows</a></div>
-</x-topic>
+<div class="further">参考:<br />
+<a href="https://www.haiku-os.org/docs/userguide/{LANG}/gui.html#move-resize" target="_blank">ウィンドウを素早く移動 / リサイズする方法</a></div>
+</div>
 
 
-<x-topic>
-<h1><a id="stack" name="stack">Window management: Stack</a></h1>
+<div class="topic">
+<h1><a id="stack" name="stack">ウィンドウ管理: スタック</a></h1>
 
-<p>"Stacking" is putting windows on top of each other, automatically moving the yellow tabs into position.<br />
-While holding the <span class="key">OPT</span> key (normally that's <span class="key">WIN</span> on the keyboard), tabs change color when they overlap; drop the window to establish the stacking.<br />
-You un-stack by holding <span class="key">OPT</span> and dragging a window out of its group by the yellow tab.</p>
+<p>"スタック"とは、ウィンドウを互いに重ね合わせて、黄色いタブを自動的に再配置することです。<br />
+<span class="key">OPT</span> キー (通常キーボード上の <span class="key">WIN</span> です)を押していると、重なったタブの色が替わるので、ウィンドウをドロップしてスタックが確立します。<br />
+<span class="key">OPT</span>を押しながら、ウィンドウを黄色いタブのグループ外へドラッグすれば、スタックが解除されます。</p>
 
 <!-- Gif created from 3 images at https://ezgif.com/maker/
 Delay time 200 (= 2 secs), option "Don't stack frames" -->
@@ -224,17 +225,17 @@ Delay time 200 (= 2 secs), option "Don't stack frames" -->
 <img src="./images/quicktour/stack.gif" alt="Stacking windows" />
 </div>
 
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/{LANG}/gui.html#stack-tile" target="_blank">Stack &amp; Tile</a></div>
-</x-topic>
+<div class="further">参考:<br />
+<a href="https://www.haiku-os.org/docs/userguide/{LANG}/gui.html#stack-tile" target="_blank">スタック&amp;タイル</a></div>
+</div>
 
 
-<x-topic>
-<h1><a id="tile" name="tile">Window management: Tile</a></h1>
+<div class="topic">
+<h1><a id="tile" name="tile">ウィンドウ管理: タイル</a></h1>
 
-<p>"Tiling" means gluing windows horizontally or vertically together.<br />
-While holding <span class="key">OPT</span>, the borders that'll fuse together when you drop the window change color when brought near each other.<br />
-You un-tile by holding <span class="key">OPT</span> and dragging a window out of its group by the yellow tab.</p>
+<p>"タイル"はウィンドウを互いに水平または垂直にくっつけることです。<br />
+<span class="key">OPT</span> を押しながら、ウィンドウを別のウィンドウの近くへ移動すると色が替わるので、ドロップするとくっつきます。<br />
+<span class="key">OPT</span>を押しながら、ウィンドウを黄色いタブのグループ外へドラッグすれば、タイルが解除されます。</p>
 
 <!-- Gif created from 3 images at https://ezgif.com/maker/
 Delay time 200 (= 2 secs), option "Don't stack frames" -->
@@ -242,183 +243,183 @@ Delay time 200 (= 2 secs), option "Don't stack frames" -->
 <img src="./images/quicktour/tile.gif" alt="Tiling windows" />
 </div>
 
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/{LANG}/gui.html#stack-tile" target="_blank">Stack &amp; Tile</a></div>
-</x-topic>
+<div class="further">参考:<br />
+<a href="https://www.haiku-os.org/docs/userguide/{LANG}/gui.html#stack-tile" target="_blank">スタック&amp;タイル</a></div>
+</div>
 
 
-<x-topic>
-<h1><a id="workspaces" name="workspaces">Workspaces</a></h1>
+<div class="topic">
+<h1><a id="workspaces" name="workspaces">ワークスペース</a></h1>
 
-<p>Workspaces are virtual desktops, complete with their own resolution, color depth and background.<br />
-Up to 32 of these workspaces can be set from the <span class="app">Screen</span> preferences.</p>
-<p>The <span class="app">Workspaces</span> desktop applet can be used to change workspaces or to drag a window from one to another.</p>
-<p>The quick keyboard shortcut to change workspaces is <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span> / <span class="key">↑</span> / <span class="key">↓</span>.<br />
-If you add <span class="key">SHIFT</span> to that, the active window is taken with you to that workspace.</p>
+<p>ワークスペースは独自の解像度、色深度および背景を備えた仮想デスクトップです。<br />
+これらのワークスペースは、32 個まで<span class="app">画面</span>プレファレンスから設定できます。</p>
+<p><span class="app">ワークスペース</span>デスクトップアプレットは、ワークスペースの切り替えやワークスペース間のウィンドウの移動に使われます。</p>
+<p>ワークスペースを切り替える素早いショートカットは、<span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span> / <span class="key">↑</span> / <span class="key">↓</span>です。<br />
+それに<span class="key">SHIFT</span>を加えると、アクティブウィンドウも一緒に移動します。</p>
 
 <div class="shot">
 <img src="./images/quicktour/workspaces.png" alt="The Workspaces applet" />
 </div>
 
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/{LANG}/workspaces.html" target="_blank">Workspaces</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/{LANG}/preferences/screen.html" target="_blank">Screen</a></div>
-</x-topic>
+<div class="further">参考:<br />
+<a href="https://www.haiku-os.org/docs/userguide/{LANG}/workspaces.html" target="_blank">ワークスペース</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/{LANG}/preferences/screen.html" target="_blank">画面</a></div>
+</div>
 
 
-<x-topic>
-<h1><a id="replicants" name="replicants">Replicants</a></h1>
+<div class="topic">
+<h1><a id="replicants" name="replicants">レプリカント</a></h1>
 
-<p>Replicants are small self-contained parts of applications that can be integrated into the Desktop (and other programs).<br />
-Provided Deskbar's option to <span class="menu">Show replicants</span> is activated, replicants are indicated by a small handle.<br />
-You can drag &amp; drop them by the handle onto the Desktop, where they are fully functional without their parent app running.</p>
+<p>レプリカントは、アプリケーションの小さな内蔵パーツで、デスクトップ(やその他のプログラム)に組み込めます。<br />
+Deskbarの<span class="menu">レプリカントを表示</span>オプションが有効なら、レプリカントは小さなハンドルで表示されます。<br />
+そのハンドルをデスクトップにドラッグ&amp;ドロップすれば、元のアプリケーションが動いてなくてもそこで完全に機能します。</p>
 
 <!-- [screenshot of various Replicants] -->
 <div class="shot">
 <img src="./images/quicktour/replicant.png" alt="A weather app and its replicant" />
 </div>
 
-<p>You can move a replicant by its handle and remove it with a right-click on it and choosing <span class="menu">Remove replicant</span>.</p>
+<p>ハンドルでレプリカントを移動でき、ハンドルの左クリックで<span class="menu">レプリカントを削除</span>を選ぶとレプリカントを削除できます。</p>
 
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/{LANG}/gui.html#replicants" target="_blank">Replicants</a></div>
-</x-topic>
+<div class="further">参考:<br />
+<a href="https://www.haiku-os.org/docs/userguide/{LANG}/gui.html#replicants" target="_blank">レプリカント</a></div>
+</div>
 
 
-<x-topic>
-<h1><a id="singlewindow" name="singlewindow">Single window navigation</a></h1>
+<div class="topic">
+<h1><a id="singlewindow" name="singlewindow">シングルウィンドウナビゲーション</a></h1>
 
-<p>Double-clicking your way down folder after folder, you'll quickly end up with many open Tracker windows.<br />
-Holding the <span class="key">OPT</span> key (normally <span class="key">WIN</span> on the keyboard) prevents this as it automatically closes the parent folder.<br />
-Alternatively, you can activate <span class="menu">Single window navigation</span> from the <span class="app">Tracker</span> preferences.<br />
-<span class="menu">Show navigator</span> will add back/forward buttons.</p>
+<p>ダブルクリックでフォルダーを次々に下っていくやり方では、すぐにTrackerウィンドウをたくさん開いてしまいます。<br />
+<span class="key">OPT</span>キー(通常、キーボード上の<span class="key">WIN</span>です)を押すと、自動で親フォルダーを閉じるのでこれを防げます。<br />
+もう一つの方法として、<span class="menu">シングルウィンドウナビゲーション</span>を<span class="app">Tracker</span>設定から有効にします。<br />
+<span class="menu">ナビゲーターを表示</span>は戻る/進むボタンを追加します。</p>
 
 <!-- [screenshot: Tracker preferences and Tracker window with navigator] -->
 <div class="shot">
 <img src="./images/quicktour/singlewindow.png" alt="Using Single window navigation" />
 </div>
 
-<div class="further">Further reading:<br />
+<div class="further">参考:<br />
 <a href="https://www.haiku-os.org/docs/userguide/{LANG}/tracker.html" target="_blank">Tracker</a></div>
-</x-topic>
+</div>
 
 
-<x-topic>
-<h1><a id="drilldown" name="drilldown">Drill-down navigation</a></h1>
+<div class="topic">
+<h1><a id="drilldown" name="drilldown">ドリルダウンナビゲーション</a></h1>
 
-<p>A nice alternative to opening a deep hierarchy of folders is called "drill-down navigation". Right-clicking a folder or anywhere in a Tracker window (or the Desktop) will open a context menu. Beside various expected commands, there's a menu of the current folder at the top that contains all its subfolders.<br />
-Drill your way down until you find the folder or file to open.</p>
+<p>フォルダーの深い階層を開くもうひとつの素敵な方法は、"ドリルダウンナビゲーション"と呼ばれています。フォルダーか、Trackerウィンドウのどこか(またはデスクトップ)の右クリックでコンテキストメニューが開きます。いろいろなコマンドの中に、サブフォルダーを含む現在のフォルダーのメニューがあります。<br />
+開きたいフォルダーかファイルが見つかるまでドリルダウンします。</p>
 
 <div class="shot">
 <img src="./images/quicktour/drilldown.png" alt="Drilling down folder hierarchies" />
 </div>
 
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/{LANG}/tracker.html#navigating" target="_blank">Tracker navigation</a></div>
-</x-topic>
+<div class="further">参考:<br />
+<a href="https://www.haiku-os.org/docs/userguide/{LANG}/tracker.html#navigating" target="_blank">Tracker ナビゲーション</a></div>
+</div>
 
 
-<x-topic>
-<h1><a id="mounting" name="mounting">Mounting volumes</a></h1>
+<div class="topic">
+<h1><a id="mounting" name="mounting">ボリュームのマウント</a></h1>
 
-<p>In order to access a harddisk, CD, USB stick etc., you first have to mount the volume. Once mounted, its icon appears on the Desktop.<br />
-This is done with a right-click on the Desktop or an already mounted volume (like the boot disk) and choosing the volume from the <span class="menu">Mount</span> submenu. You find the same <span class="menu">Mount</span> menu in the Deskbar. ISO images can be mounted with a double-click.</p>
+<p>ハードディスク、CD、USBメモリなどにアクセスするには、まずボリュームをマウントする必要があります。マウンドされれば、アイコンがデスクトップ上に現れます。<br />
+これは、デスクトップやマウント済のボリューム(起動ディスクのような)を右クリックして、<span class="menu">マウント</span>サブメニューからボリュームを選ぶことで実行されます。同じ<span class="menu">マウント</span>メニューは、Deskbarにもあります。ISOイメージは、ダブルクリックでマウントできます。</p>
 
-<div class="box-warning">Before removing a USB drive etc., you have to right-click its icon and choose <span class="menu">Unmount</span> and wait for its icon to disappear. Otherwise you may lose data not yet written to it!</div>
+<div class="box-warning">USBドライブなどを取り外す前には、アイコンを右クリックして<span class="menu">アンマウント</span>メニューを選択し、アイコンが消えるまで待ちます。そうしないと、まだ書き込まれていないデータを失うかもしれません!</div>
 
 <div class="shot">
 <img src="./images/quicktour/mount.png" alt="Mounting a volume" />
 </div>
 
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/{LANG}/tracker.html#mounting-volumes" target="_blank">Mounting volumes</a></div>
-</x-topic>
+<div class="further">参考:<br />
+<a href="https://www.haiku-os.org/docs/userguide/{LANG}/tracker.html#mounting-volumes" target="_blank">ボリュームのマウント</a></div>
+</div>
 
 
-<x-topic>
-<h1><a id="filesystem" name="filesystem">Filesystem layout</a></h1>
+<div class="topic">
+<h1><a id="filesystem" name="filesystem">ファイルシステムレイアウト</a></h1>
 
-<p>While Haiku is currently not multi-user, there are already two branches in the filesystem tree:</p>
+<p>現在、Haikuはマルチユーザーではありませんが、ファイルシステムツリーにはすでに2つのブランチがあります:</p>
 
 <table summary="layout" border="0" cellspacing="0" cellpadding="8">
-<tr><td><img src="../images/quicktour/folder_haiku.png" alt="System" /><br /><span class="path">/boot/system/</span></td><td> </td><td>The system hierarchy contains system files and settings for all users. The package management makes most folders under /system effectively read-only. Packages contain all their files in a fixed folder hierarchy. Upon installation, a package gets "mounted" and all its files just appear to be in that hierarchy in the /system folder.<br />
-The folders there (like <i>add-ons</i>, <i>apps</i>, <i>bin</i> etc.) are just a virtual amalgamation of all the installed packages and are therefore read-only. Exceptions are <i>cache</i>, <i>non-packaged</i>, <i>settings</i>, and <i>var</i>.
+<tr><td><img src="../images/quicktour/folder_haiku.png" alt="System" /><br /><span class="path">/boot/system/</span></td><td> </td><td>System階層は、システムファイルとすべてのユーザー用の設定を含みます。パッケージ管理は、/system以下のほとんどのフォルダーを事実上読み取り専用にします。パッケージは一定のフォルダ階層の中にすべてのファイルを含みます。インストール中に、パッケージは"マウント"され、含まれるすべてのファイルは/systemフォルダー階層に現れます。<br />
+階層内にあるフォルダー(<i>add-ons</i>、<i>apps</i>、<i>bin</i>などのような)は、インストール済パッケージの仮想融合であり、そのため読み取り専用となっています。例外は、<i>cache</i>、<i>non-packaged</i>、<i>settings</i>、および<i>var</i>です。
 <ul>
-<li><span class="path">/system/packages/</span> is the default install location for software.</li>
-<li><span class="path">/system/documentation/</span> is used by some applications to store their manual.</li>
-</ul>
-</td></tr>
-<tr><td><img src="../images/quicktour/folder_home.png" alt="Home" /><br /><span class="path">/boot/home/</span></td><td> </td><td>The home hierarchy is your personal folder where you keep your data and settings. The folder /boot/home/config (or shortened ~/config) mirrors the /system folder described above and is likewise virtually read-only with the same exceptions of <i>cache</i>, <i>non-packaged</i>, <i>settings</i>, and <i>var</i>.
+<li><span class="path">/system/packages/</span>は、ソフトウェアがデフォルトでインストールされる場所です。</li>
+<li><span class="path">/system/documentation/</span>は、いくつかのソフトウェアがマニュアルをインストールするのに用います。</li>
+</ul></td></tr>
+<tr><td><img src="../images/quicktour/folder_home.png" alt="Home" /><br /><span class="path">/boot/home/</span></td><td> </td><td>Home階層は、ユーザー個人のフォルダーで、ユーザーのデータや設定を保存します。/boot/home/configフォルダー(または縮めて~/config)は、既に述べた/systemフォルダーのミラーで、同様に仮想的に読み取り専用です。例外は同じく<i>cache</i>、<i>non-packaged</i>、<i>settings</i>,および<i>var</i>です。
 <ul>
-<li><span class="path">~/Desktop/</span> is where the files of your Desktop live.</li>
-<li><span class="path">~/config/settings/</span> is where the system and applications store your settings.</li>
+<li><span class="path">~/Desktop/</span>は、デスクトップ上のファイルがある場所です。</li>
+<li><span class="path">~/config/settings/</span>は、システムとアプリケーションがユーザー設定を保存する場所です。</li>
 </ul>
 </td></tr>
 </table>
 
-<p>The writable <i>non-packaged</i> folders mirror the hierarchy of the /system or ~/config/ hierarchy (<i>add-ons</i>, <i>apps</i>, <i>bin</i>…).<br />
-Software that doesn't come in form of a HPKG package can be installed here.</p>
+<p>書込み可能な<i>non-packaged</i>フォルダーは、/system階層または~/config/階層(<i>add-ons</i>、<i>apps</i>、<i>bin</i>…)のコピーです。<br />
+HPKGパッケージの形で供給されないソフトウェアはここにインストールされます。</p>
 
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/{LANG}/filesystem-layout.html" target="_blank">Filesystem layout</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/{LANG}/applications.html" target="_blank">Applications</a><br />
+<div class="further">参考:<br />
+<a href="https://www.haiku-os.org/docs/userguide/{LANG}/filesystem-layout.html" target="_blank">ファイルシステムレイアウト</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/{LANG}/applications.html" target="_blank">アプリケーション</a><br />
 <a href="https://git.haiku-os.org/haiku/tree/docs/develop/packages/DirectoryStructure.rst" target="_blank">Directory structure</a></div>
-</x-topic>
+</div>
 
 
-<x-topic>
-<h1><a id="queries" name="queries">Finding files with queries</a></h1>
+<div class="topic">
+<h1><a id="queries" name="queries">クエリでファイルを探す</a></h1>
 
-<p>Files on Haiku formatted (BFS) volumes are quickly searched with <span class="menu">Find…</span> from the Deskbar. Instead of file and folder names, you can also look through filetype specific attributes, e.g. for an artist in your MP3 collection.</p>
+<p>Haikuフォーマット(BFS)ボリューム上のファイルは、Deskbarからの<span class="menu">検索…</span>で素早く検索されます。ファイルやフォルダの名前の代わりに、ファイルタイプに特有な属性、
+たとえば、MP3コレクション内のアーティスト名も検索できます。</p>
 
 <!-- [screenshot of Find window and result window of Artitst == Fairport] -->
 <div class="shot">
 <img src="./images/quicktour/query.png" alt="Finding all MP3s of an artist" />
 </div>
 
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/{LANG}/queries.html" target="_blank">Queries</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/{LANG}/workshop-filetypes+attributes.html" target="_blank">Filetypes, Attributes, Index and Queries</a></div>
-</x-topic>
+<div class="further">参考:<br />
+<a href="https://www.haiku-os.org/docs/userguide/{LANG}/queries.html" target="_blank">クエリ</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/{LANG}/workshop-filetypes+attributes.html" target="_blank">ファイルタイプ、属性、インデックス、およびクエリ</a></div>
+</div>
 
 
-<x-topic>
-<h1><a id="wireless" name="wireless">Wireless connection</a></h1>
+<div class="topic">
+<h1><a id="wireless" name="wireless">ワイヤレス接続</a></h1>
 
-<p>You can connect to your WLAN router either by right-clicking the <span class="app">NetworkStatus</span> icon in Deskbar's tray,<br />
-or by selecting your network from the <span class="app">Network</span> preferences.<br />
-When the connection is established, you'll be asked for the network's encryption and password.</p>
+<p>WLANルーターへの接続は、Deskbarトレイ内の<span class="app">ネットワーク状況</span>をクリックでできます。<br />
+または、<span class="app">ネットワーク</span>プレファレンスからネットワークを選択することでできます。<br />
+接続が確立すると、ネットワークの暗号化とパスワードについて質問されます。</p>
 
 <!-- [screenshot of Network prefs, context menu of icon in deskbar] -->
 <div class="shot">
 <img src="./images/quicktour/wireless.png" alt="Connecting with a wireless network" />
 </div>
 
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/{LANG}/workshop-wlan.html" target="_blank">Wireless networking</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/{LANG}/desktop-applets/networkstatus.html" target="_blank">NetworkStatus</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/{LANG}/preferences/network.html" target="_blank">Network preferences</a></div>
-</x-topic>
+<div class="further">参考:<br />
+<a href="https://www.haiku-os.org/docs/userguide/{LANG}/workshop-wlan.html" target="_blank">ワイヤレスネットワーク</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/{LANG}/desktop-applets/networkstatus.html" target="_blank">ネットワーク状況</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/{LANG}/preferences/network.html" target="_blank">ネットワークプレファレンス</a></div>
+</div>
 
 
-<x-topic>
-<h1><a id="moresoftware" name="moresoftware">Getting more and updating software</a></h1>
+<div class="topic">
+<h1><a id="moresoftware" name="moresoftware">ソフトウェアの入手と更新</a></h1>
 
-<p><span class="app">HaikuDepot</span> from the Deskbar's applications menu is where to search, install and uninstall software packages.<br />
-<span class="app">SoftwareUpdater</span> should be started from time to time to update installed software as well as Haiku itself.</p>
+<p>Deskbarのアプリケーションメニューにある<span class="app">HaikuDepot</span>は、ソフトウェアパッケージを検索、インストール及びアンインストールする場所です。<br />
+<span class="app">ソフトウェアの更新</span>は、インストール済ソフトウェアおよびHaiku自体をアップデートするために時々起動されるべきです。</p>
 
 <!-- [screenshot of HaikuDepot and SoftwareUpdater] -->
 <div class="shot">
 <img src="./images/quicktour/moresoftware.png" alt="Installing and updating apps" />
 </div>
 
-<div class="further">Further reading:<br />
+<div class="further">参考:<br />
 <a href="https://www.haiku-os.org/docs/userguide/{LANG}/applications/haikudepot.html" target="_blank">HaikuDepot</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/{LANG}/applications/softwareupdater.html" target="_blank">SoftwareUpdater</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/{LANG}/preferences/repositories.html" target="_blank">Repositories</a></div>
-</x-topic>
+<a href="https://www.haiku-os.org/docs/userguide/{LANG}/applications/softwareupdater.html" target="_blank">ソフトウェアの更新</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/{LANG}/preferences/repositories.html" target="_blank">リポジトリ</a></div>
+</div>
 
-
+<div>
 <h1><a id="end" name="end">終わりに</a></h1>
 
 <p>これでツアーは終わりです。これが新しいOSにすぐに慣れる手助けになることを期待します!</p>

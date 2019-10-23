@@ -34,8 +34,11 @@ acronym.current-page {
 	color: #892601;
 }
 
-x-topic {
-	display:block;
+div.nav {
+	z-index: 1;
+}
+
+div.topic {
 	position: relative;
 	min-height: calc(100vh - 100px);
 	margin-bottom: 5vh;
