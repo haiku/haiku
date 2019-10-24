@@ -4810,7 +4810,11 @@ iflib_device_register(device_t dev, void *sc, if_shared_ctx_t sctx, if_ctx_t *ct
 		 * aren't the default NULL implementation.
 		 */
 		kobj_desc = &ifdi_rx_queue_intr_enable_desc;
+#ifdef __HAIKU__
+		kobj_method = kobj_lookup_method(ctx->ops.cls, NULL,
+#else
 		kobj_method = kobj_lookup_method(((kobj_t)ctx), NULL,
+#endif
 		    kobj_desc);
 		if (kobj_method == &kobj_desc->deflt) {
 			device_printf(dev,
@@ -4819,7 +4823,11 @@ iflib_device_register(device_t dev, void *sc, if_shared_ctx_t sctx, if_ctx_t *ct
 			goto fail_queues;
 		}
 		kobj_desc = &ifdi_tx_queue_intr_enable_desc;
+#ifdef __HAIKU__
+		kobj_method = kobj_lookup_method(ctx->ops.cls, NULL,
+#else
 		kobj_method = kobj_lookup_method(((kobj_t)ctx), NULL,
+#endif
 		    kobj_desc);
 		if (kobj_method == &kobj_desc->deflt) {
 			device_printf(dev,
