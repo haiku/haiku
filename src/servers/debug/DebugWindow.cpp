@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "DebugWindow.h"
 
 #include <algorithm>
@@ -70,7 +71,7 @@ DebugWindow::DebugWindow(const char* appName)
 	BRadioButton *core = new BRadioButton("core",
 		B_TRANSLATE("Write core file"), new BMessage(kActionWriteCoreFile));
 
-	BButton *close = new BButton("close", B_TRANSLATE("Oh no!"),
+	fOKButton = new BButton("close", B_TRANSLATE("Oh no!"),
 		new BMessage(B_QUIT_REQUESTED));
 
 	terminate->SetValue(B_CONTROL_ON);
@@ -89,7 +90,7 @@ DebugWindow::DebugWindow(const char* appName)
 				.End()
 				.AddGroup(B_HORIZONTAL)
 					.AddGlue()
-					.Add(close)
+					.Add(fOKButton)
 				.End()
 			.End()
 		.End();
@@ -118,6 +119,8 @@ DebugWindow::MessageReceived(BMessage* message)
 		case kActionWriteCoreFile:
 		case kActionSaveReportTeam:
 			fAction = message->what;
+			fOKButton->SetLabel(fAction == kActionDebugTeam
+				? B_TRANSLATE("Oh yeah!") : B_TRANSLATE("Oh no!"));
 			return;
 	}
 

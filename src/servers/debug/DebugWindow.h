@@ -2,7 +2,6 @@
  * Copyright 2019, Adrien Destugues, pulkomandy@pulkomandy.tk.
  * Distributed under the terms of the MIT License.
  */
-
 #ifndef DEBUGWINDOW_H
 #define DEBUGWINDOW_H
 
@@ -33,11 +32,13 @@ public:
 
 	void			MessageReceived(BMessage* message);
 	int32			Go();
+
 private:
 	static	BRect	IconSize();
 
 private:
 	BBitmap			fBitmap;
+	BButton*		fOKButton;
 	sem_id			fSemaphore;
 	int32			fAction;
 };
