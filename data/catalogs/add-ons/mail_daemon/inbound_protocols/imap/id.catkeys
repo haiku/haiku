@@ -1,8 +1,12 @@
-1	indonesian	x-vnd.Haiku-IMAP	1938678311
+1	indonesian	x-vnd.Haiku-IMAP	1343128980
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Tidak dapat terhubung ke server \"%server%\":\n%error%
+Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		Memperbarui langganan ke folder IMAP, harap bersabar…
 Failed to fetch available storage.	IMAPFolderConfig		Gagal untuk mengambil penyimpanan yang tersedia.
 Cancel	IMAPFolderConfig		Batal
+OK	IMAPFolderConfig		OKE
+Server storage: %s / %s used.	IMAPFolderConfig		Penyimpanan server: %s / %s terpakai.
 No encryption	imap_config		Tak ada enkripsi
+Fetching IMAP folders, please be patient…	IMAPFolderConfig		Mengambil folder IMAP, harap bersabar…
 Configure IMAP Folders	imap_config		Mengkonfigurasi folder IMAP
 SSL	imap_config		SSL
 Apply	IMAPFolderConfig		Terapkan

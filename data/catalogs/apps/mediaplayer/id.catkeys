@@ -1,27 +1,45 @@
-1	indonesian	x-vnd.Haiku-MediaPlayer	4253895224
+1	indonesian	x-vnd.Haiku-MediaPlayer	4235582491
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Hapus Entri ke Sampah
 Close	MediaPlayer-PlaylistWindow		Tutup
 Volume of background clips	MediaPlayer-SettingsWindow		Volume dari klip latar
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Gunakan overlay dari perangkat kasar video bila tersedia
 Audio	MediaPlayer-InfoWin		Audio
+Subtitle placement:	MediaPlayer-SettingsWindow		Penempatan subtitel:
 MediaPlayer	System name		MediaPlayer
+Audio track	MediaPlayer-Main		Trek audio
 Muted	MediaPlayer-SettingsWindow		Diam
 OK	MediaPlayer-RemovePLItemsCmd		OKE
+Open Playlist	MediaPlayer-PlaylistWindow		Buka Daftar Putar
+Subtitles	MediaPlayer-Main		Subtitel
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% mengalami kesalahan internal. Berkas tidak dapat dibuka.
+DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
+File info	MediaPlayer-InfoWin		Info berkas
 raw audio	MediaPlayer-InfoWin		audio mentah
 Select all	MediaPlayer-PlaylistWindow		Pilih semua
+New player…	MediaPlayer-Main		Pemutar baru…
 Move Entries	MediaPlayer-MovePLItemsCmd		Pindahkan Entri
 OK	MediaPlayer-Main		OKE
 Remove	MediaPlayer-PlaylistWindow		Hapus
+<unknown>	MediaPlayer-InfoWin		<tak diketahui>
 Resume:	MediaPlayer-SettingsWindow		Lanjut:
 Duration	MediaPlayer-InfoWin		Durasi
 Import Entries	MediaPlayer-ImportPLItemsCmd		Impor Entri
+Open network stream	MediaPlayer-Main		Buka aliran-data jaringan
+Move file to Trash	MediaPlayer-PlaylistWindow		Pindahkan berkas ke Sampah
 Open file…	MediaPlayer-Main		Buka berkas…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Skalakan kontrol dalam mode layar penuh
 View options	MediaPlayer-SettingsWindow		Opsi tampilan
 %d kHz	MediaPlayer-InfoWin		%d kHz
 Full volume	MediaPlayer-SettingsWindow		Suara penuh
+<untitled>	PlaylistItem-title		<tak diketahui>
+Start media server	MediaPlayer-Main		Mulai server media
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Tampaknya server media tidak berjalan. \nApakah Anda ingin menjalankannya?
 Location	MediaPlayer-InfoWin		Lokasi
 Medium	MediaPlayer-SettingsWindow		Medium
+Play mode	MediaPlayer-SettingsWindow		Mode putar
+Playlist	MediaPlayer-PlaylistWindow		Daftar putar
 %d Bit	MediaPlayer-InfoWin		%d Bit
+Track	Audio Track Menu		Trek
 Close	MediaPlayer-Main		Tutup
 Save error	MediaPlayer-PlaylistWindow		Simpan galat
 Attributes	MediaPlayer-Main		Atribut

@@ -1,5 +1,6 @@
-1	indonesian	x-vnd.haiku-softwareupdater	4294742959
+1	indonesian	x-vnd.haiku-softwareupdater	369324613
 Updating version	SoftwareUpdaterWindow	List item text	Memperbarui versi
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Klik di sini untuk menginstal {0, plural, one{# updated package} other{# updated packages}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Paket-paket yang akan dihapus
 No active network connection was found	UpdateManager	Error message	Tidak ditemukan koneksi jaringan aktif
 Quit	SoftwareUpdaterWindow	Alert button label	Berhenti
@@ -7,6 +8,7 @@ There were no updates found.	CheckManager		Tidak ada pembaruan yang ditemukan.
 Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Pembaruan belum selesai, apakah anda yakin ingin berhenti?
 Updates found	SoftwareUpdaterWindow		Pembaruan ditemukan
 Update now	SoftwareUpdaterWindow		Membarui sekarang
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Untuk beberapa alasan, kami tidak dapat mem-boot ulang komputer Anda.
 OK	UpdateManager		OKE
 Unrecognized argument	SoftwareUpdaterApp	Error message	Argumen tidak dikenal
 There were no updates found.	CheckAction		Tidak ada pembaruan yang ditemukan.
@@ -14,6 +16,7 @@ No updates available	UpdateAction		Tidak ada pembaruan yang tersedia
 New packages to be installed	SoftwareUpdaterWindow	List super item label	Paket baru yang akan diinstal
 Packages to be updated	SoftwareUpdaterWindow	List super item label	Paket diperbarui
 to	SoftwareUpdaterWindow	List item text	ke
+Attempting to cancel the updates…	SoftwareUpdaterWindow		Mencoba membatalkan pembaruan…
 Contacting software repositories to check for package updates.	CheckManager		Menghubungi repositori perangkat halus untuk memeriksa pembaruan paket.
 Available updates found	CheckManager		Ketersedian pembaruan ditemukan
 from repository	SoftwareUpdaterWindow	List item text	dari repositori
@@ -31,7 +34,9 @@ No active network connection was found.\n	CheckManager		Tidak ditemukan koneksi 
 Applying changes	UpdateManager		Menerapkan perubahan
 Full sync	SoftwareUpdaterWindow	Alert button label	Sinkronisasi penuh
 Quit	SoftwareUpdaterWindow	Button label	Berhenti
+Updates have been successfully installed.	UpdateManager		Pembaruan telah berhasil diinstal.
 Exception occurred while updating packages : %s\n	UpdateAction		Pengecualian terjadi saat memperbarui paket : %s\n
+A reboot is necessary to complete the update process.	UpdateManager		Boot-ulang diperlukan untuk menyelesaikan proses pembaruan.
 Exception occurred while checking for updates: %s\n	CheckAction		Pengecualian terjadi saat memeriksa pembaruan: %s\n
 Packages are being updated	UpdateManager		Paket sedang diperbarui
 Cancel	SoftwareUpdaterWindow		Batal
@@ -39,10 +44,13 @@ Don't quit	SoftwareUpdaterWindow		Jangan berhenti
 Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Klik di sini untuk menjalankan SoftwareUpdater. Beberapa pembaruan akan membutuhkan solusi masalah untuk dipilih.
 Checking for updates	SoftwareUpdaterWindow		Memeriksa pembaruan
 Updates completed	UpdateManager		Pembaruan selesai
+Reboot	SoftwareUpdaterWindow		Boot-ulang
 Show more details	SoftwareUpdaterWindow		Tampilkan lebih detail
 Installing version	SoftwareUpdaterWindow	List item text	Memasang versi
 Checking for updates	CheckManager		Memeriksa pembaruan
 No remote repositories are available	UpdateManager	Error message	Tidak ada repositori remote yang tersedia
+Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, one{update} other{updates}} aplikasi tersedia
+Reboot	SoftwareUpdaterWindow	Button label	Boot-ulang
 Update	SoftwareUpdaterWindow	Alert button label	Memperbarui
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Buka Repositori
 Updates did not complete	UpdateAction		Pembaruan tidak selesai

@@ -17,7 +17,7 @@ allow downgrade of %source% to %target%	SolverProblemSolution		consenti il downg
 dependency problem	SolverProblem		problema di dipendenza
 %dependency% is provided by the system	SolverProblem		%dependency% è già fornito dal sistema
 keep %source% despite its inferior architecture	SolverProblemSolution		mantieni %source% nonostante l'architettura di livello inferiore
-%source% does not belong to a distupgrade repository	SolverProblem		%source% non appartiene a un repository 'distupgrade'
+%source% does not belong to a distupgrade repository	SolverProblem		%source% non appartiene a un repository distupgrade
 installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		il pacchetto installato %source% rende obsoleta %dependency% fornita da %target%
 allow name change of %source% to %target%	SolverProblemSolution		consenti rinomina di %source% su %target%
 package %source% conflicts with %dependency% provided by %target%	SolverProblem		il pacchetto %source% genera un conflitto con %dependency% fornita da %target%

@@ -42,7 +42,7 @@ OK	DeskbarPulseView		OK
 Info	PulseApp		Informazioni
 Pulse	System name		Pulse
 Active color	ConfigView		Colore attivo
-Installing in Deskbar failed\n%s	PulseApp		Installazione nella Deskbar fallita.\n%s
+Installing in Deskbar failed\n%s	PulseApp		Installazione nella Deskbar fallita\n%s
 Idle color	ConfigView		Colore di inattività
 Normal mode	PrefsWindow		Modalità normale
 Pulse settings	PulseWindow		Impostazioni di Pulse

@@ -2,7 +2,7 @@
 Key	Modifier keys window	As in a computer keyboard key	Tast
 Japanese	KeymapNames		Gjaponês
 US	KeymapNames		Stâts Unîts
-PG ↑	Keyboard Layout View	Very short for 'page up'	Pag ↑
+PG ↑	Keyboard Layout View	Very short for 'page up'	PAGJ
 Brazilian	KeymapNames		Brasilian
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
 Right control	Keyboard Layout View		Control a diestre
@@ -43,7 +43,7 @@ PAGE ↑	Keyboard Layout View		PAGJINE ↑
 Set modifier keys	Modifier keys window		Stabilìs i tascj modificadôrs
 Apple Aluminium International	KeyboardLayoutNames		Apple Aluminium Internazionâl
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Tast Win/Cmd
-PG ↓	Keyboard Layout View	Very short for 'page down'	PAG ↓
+PG ↓	Keyboard Layout View	Very short for 'page down'	PAGJ
 ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (US)
 Apple Aluminum	KeyboardLayoutNames		Apple Aluminum
 Spanish	KeymapNames		Spagnûl

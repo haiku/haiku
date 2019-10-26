@@ -1,5 +1,5 @@
 1	belarusian	x-vnd.Haiku-debug_server	1440673937
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		Праграма:\n\n      %app\n\nапавясцiла аб памылцы, якая перешкаджае яе працы. Haiku вымушана спыніць гэтую праграму.
 Debug	DebugServer		Адладка
 Terminate	DebugServer		Спыніць
-The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		Праграма:\n\n      %app\n\nапавясцiла аб памылцы, якая перешкаджае яе працы. Haiku вымушана спыніць гэтую праграму.
 Save report	DebugServer		Захаваць справаздачу

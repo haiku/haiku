@@ -1,8 +1,8 @@
 1	danish	x-vnd.Haiku-libtracker	838081337
 Created	ContainerWindow		Oprettet
 Open and make preferred	OpenWithWindow		Åbn og lav foretrukket
-Open with…	ContainerWindow		Åbn med…
 Kind	ContainerWindow		Slags
+Open with…	ContainerWindow		Åbn med…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Fejl ved flytning af \"%name\" til papirkurven. (%error)
 Or	FindPanel		Eller
 before	FindPanel		før
@@ -55,8 +55,8 @@ Replace	FSUtils		Erstat
 Move to	ContainerWindow		Flyt til
 Status	Email Query Columns		Status
 New folder	FSUtils		Ny mappe
-New Query	FindPanel		Ny forespørgsel
 Junk on end.	libtracker		Skrald i slutningen.
+New Query	FindPanel		Ny forespørgsel
 system	B_SYSTEM_DIRECTORY		system
 Preparing to delete items…	StatusWindow		Forbereder at slette elementerne…
 Open %name with:	OpenWithWindow		Åbn %name med:
@@ -98,31 +98,31 @@ Edit templates…	TemplatesMenu		Rediger skabeloner…
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used brugt -- %free ledig)
 Hide dotfiles	SettingsView		Skjul dot-filer
 Trash	Model		Papirkurv
+Enable type-ahead filtering	SettingsView		Aktivér forudskrivningsfiltrering
 copy	FSUtils	filename copy	kopiér
 New folder%ld	FSUtils		Ny mappe%ld
-Enable type-ahead filtering	SettingsView		Aktivér forudskrivningsfiltrering
 Location	OpenWithWindow		Placering
 %Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		Tilpas størrelsen til at passe
-Find	FSUtils		Find
 List folders first	SettingsView		Vis mapper først
+Find	FSUtils		Find
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Navnet \"%name\" eksisterer allerede i mappen. Vil du erstatte den med det symbolske link du er ved at lave?
 List view	ContainerWindow		Listevisning
 Temporary	FindPanel		Midlertidig
-Create relative link	ContainerWindow		Opret lignende link
 Modified	QueryPoseView		Ændret
+Create relative link	ContainerWindow		Opret lignende link
 Owner	FilePermissionsView		Ejer
 Cancel	FSClipBoard		Annuller
 Modified	PoseView		Ændret
-All files and folders	FindPanel		Alle filer og mapper
 Move to Trash	ContainerWindow		Flyt til papirkurven
+All files and folders	FindPanel		Alle filer og mapper
 Add-ons	ContainerWindow		Tilføjelser
 Too many parenthesis.	libtracker		For mange parenteser.
 Increase size	ContainerWindow		Forøg størrelse
 \nShould this be fixed?	FSUtils		\nSkal dette ordnes?
 URL	Bookmark Query Columns		URL
-Cancel	ContainerWindow		Annuller
 Move	PoseView		Flyt
+Cancel	ContainerWindow		Annuller
 Attributes	ContainerWindow		Attributter
 Error deleting items	FSUtils		Fejl ved sletning af elementerne
 Cut	ContainerWindow		Klip
@@ -158,8 +158,8 @@ Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUt
 Work Phone	Person Query Columns		Arbejdstelefon
 Close	ContainerWindow		Luk
 Get info	ContainerWindow		Få information
-There was an error resolving the link.	Tracker		Der opstod en fejl ved løsning af linket.
 Show folder location in title tab	SettingsView		Vis mappeplacering i fanebladstitlen
+There was an error resolving the link.	Tracker		Der opstod en fejl ved løsning af linket.
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Der opstod et problem under forsøget i at gemme i den mappe du angav. Prøv venligst en anden.
 Desktop	TrackerSettingsWindow		Skrivebord
 Nested *?+.	libtracker		Indlejret *?+.
@@ -167,21 +167,21 @@ Move	FSUtils	button label	Flyt
 Clean up	DeskWindow		Ryd op
 Group	FilePermissionsView		Gruppe
 Could not find an application to open \"%name\" (%error). 	FSUtils		Kunne ikke finde en program til at åbne \"%name\" (%error). 
-Mini icon view	DeskWindow		Miniikonvisning
 Internal error.	libtracker		Intern fejl.
-Replace	FilePanelPriv		Erstat
+Mini icon view	DeskWindow		Miniikonvisning
 contains	SelectionWindow		indeholder
+Replace	FilePanelPriv		Erstat
 is not	FindPanel		er ikke
 Icon view	DeskWindow		Ikonvisning
 Mount settings…	ContainerWindow		Monteringsindstillinger…
 Keywords	Bookmark Query Columns		Nøgleord
-by name	FindPanel		efter navn
 Copy more	ContainerWindow		Kopiér mere
+by name	FindPanel		efter navn
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Beklager, du kan ikke lagre noget i roden af dit system.
 Restore	ContainerWindow		Gendan
 Location	ContainerWindow		Sted
-Skip	FSUtils		Spring over
 Warning space color	SettingsView		Farve for advarselsmellemrum
+Skip	FSUtils		Spring over
 Used space color	SettingsView		Farve for brugt plads
 Cancel	FSUtils		Annuller
 Original name	ContainerWindow		Originalt navn
@@ -197,9 +197,9 @@ Cancel	FilePanelPriv		Annuller
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Beklager, du kan ikke redigere den attribut.
 Cancel	OpenWithWindow		Annuller
 Select…	DeskWindow		Vælg…
+Files cannot be moved or deleted from a read-only volume.	PoseView		Filer kan ikke blive flyttet eller slettet fra et skrivebeskyttede diskområde.
 Edit name	FilePanelPriv		Rediger navn
 There was an error deleting \"%name\":\n\t%error	FSUtils		Der skete en fejl ved sletning af \"%name\":\n\t%error
-Files cannot be moved or deleted from a read-only volume.	PoseView		Filer kan ikke blive flyttet eller slettet fra et skrivebeskyttede diskområde.
 Resize to fit	ContainerWindow		Tilpas størrelse
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Link \"%name\" til:
 Mount server error	AutoMounterSettings		Monteringsserverfejl
@@ -212,8 +212,8 @@ Replace all	FSUtils		Erstat alle
 The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Programmet \"%appname\" understøtter ikke den type af dokument som du er ved at åbne.\nEr du sikker på, at du vil fortsætte?\n\nHvis du ved at programmet understøtter dokumenttypen, så skal du kontakte udgiveren af programmet og spørge om de vil opdatere deres program så det oplister at understøtte typen af dit dokument.
 Reverse order	ContainerWindow		Omvendt rækkefølge
 Copying: 	StatusWindow		Kopiere: 
-Select all	DeskWindow		Vælg alt
 Show navigator	SettingsView		Vis navigatør
+Select all	DeskWindow		Vælg alt
 Decrease size	ContainerWindow		Formindsk størrelse
 Recent queries	FindPanel		Nylige forespørgsler
 Mount all	MountMenu		Monter alle
@@ -228,8 +228,8 @@ Tracker status	StatusWindow		Trackerstatus
 Handles any %type	OpenWithWindow		Håndterer alle %type
 The mount server could not be contacted.	AutoMounterSettings		Monteringsserveren kunne ikke blive kontaktet.
 Query template	FindPanel		Forespørgselsskabelon
-Open	OpenWithWindow		Åbn
 ends with	SelectionWindow		ender med
+Open	OpenWithWindow		Åbn
 You must have at least one attribute showing.	PoseView		Du skal have mindst én egenskab vist.
 Cut	FilePanelPriv		Klip
 Favorites	FilePanelPriv		Favoritter
@@ -239,8 +239,8 @@ Disk mounting during boot	AutoMounterSettings		Disk monterer under opstart
 Don't automount	AutoMounterSettings		Automonter ikke
 Could not find application \"%appname\"	OpenWithWindow		Kunne ikke finde programmet \"%appname\"
 Unmatched parenthesis.	libtracker		Ikke-matchede parenteser.
-Error %error loading Add-On %name.	ContainerWindow		Fejl %error ved indlæsning af tilføjelsen %name.
 Unmatched brackets.	libtracker		Ikke-matchede klammer.
+Error %error loading Add-On %name.	ContainerWindow		Fejl %error ved indlæsning af tilføjelsen %name.
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Du er i gang med at erstatte:\n\t%name%dest\nmed:\n\t%name%src\n\nVil du erstatte den med den du %movemode?
 Empty Trash	ContainerWindow		Tøm papirkurven
 no supporting apps	OpenWithWindow		ingen understøttende apps
@@ -258,8 +258,8 @@ Preferred for file	OpenWithWindow		Anbefalet til fil
 OK	AutoMounterSettings		OK
 copying	FSUtils		kopiering
 Get info	FilePanelPriv		Få information
-Execute	FilePermissionsView		Eksekver
 Delete	ContainerWindow		Slet
+Execute	FilePermissionsView		Eksekver
 Show volumes on Desktop	SettingsView		Vis diskområder på skrivebordet
 Recent folders	ContainerWindow		Nylige mapper
 Desktop	Model		Skrivebord
@@ -293,8 +293,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Kunne
 Create %s clipping	PoseView		Lav %s klipning
 Error moving \"%name\"	FSUtils		Fejl ved flytning af \"%name\"
 To: %dir	StatusWindow		Til: %dir
-Cancel	Tracker		Annuller
 Paste layout	ContainerWindow		Indsæt layout
+Cancel	Tracker		Annuller
 Make active printer	ContainerWindow		Gør til aktiv printer
 Copy to	ContainerWindow		Kopiér til
 Name	SelectionWindow		Navn
@@ -312,8 +312,8 @@ Add printer…	ContainerWindow		Tilføj printer…
 On	FindPanel		På
 Permissions	ContainerWindow		Tilladelser
 Size:	InfoWindow		Størrelse:
-Copy	ContainerWindow		Kopiér
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Det valgte element kan ikke blive flyttet til papirkurven. Vil du slette den i stedet? (Handlingen kan ikke fortrydes).
+Copy	ContainerWindow		Kopiér
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Beklager, 'Character'-attributten kan ikke gemme en multi-byte glyf.
 And	FindPanel		Og
 multiple disks	FindPanel		flere diske
@@ -327,17 +327,17 @@ Automatic disk mounting	AutoMounterSettings		Automatisk diskmontering
 parent folder	NavMenu		forrige mappe
 Create link here	ContainerWindow		Opret lænke her
 Force identify	ContainerWindow		Tving identificering
-no items	CountView		ingen elementer
 48 x 48	DeskWindow		48 x 48
-Query name:	FindPanel		Forespørgselsnavn:
+no items	CountView		ingen elementer
 Disks	DirMenu		Diske
+Query name:	FindPanel		Forespørgselsnavn:
 Open parent	ContainerWindow		Åbn forrige
 Find…	ContainerWindow		Find…
 moving	FSUtils		flytter
-Add	FindPanel		Tilføj
-greater than	FindPanel		større end
-Created:	InfoWindow		Lavet:
 Single window navigation	SettingsView		Enkelt vinduesnavigation
+greater than	FindPanel		større end
+Add	FindPanel		Tilføj
+Created:	InfoWindow		Lavet:
 Edit Query template	FindPanel		Rediger forespørgselsskabelon
 Save query as template…	FindPanel		Gem forespørgsel som skabelon…
 All disks	AutoMounterSettings		Alle diske
@@ -346,8 +346,8 @@ Proceed	FSUtils		Fortsæt
 Edit favorites…	FilePanelPriv		Rediger favoritter…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Du kan ikke flytte en mappe ind i sig selv eller en af sine egne undermapper.
 New	ContainerWindow		Ny
-You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Du skal slippe elementer på et af diskikonerne i \"Diske\"-vinduet.
 Fewer options	FindPanel		Færre valgmuligheder
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Du skal slippe elementer på et af diskikonerne i \"Diske\"-vinduet.
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Hvis du ændre %target, så vil %osName måske ikke opføre sig korrekt!\n\nEr du sikker på, at du vil gøre det?
 Sorry, you can't copy items to the Trash.	FSClipBoard		Beklager, du kan ikke kopiere elementer til papirkurven.
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Nogle af elementerne eksisterer allerede i mappen med de samme navne som de elementer du %verb.\n \nVil du erstatte dem med dem du %verb eller blive bedt om for hver eneste?
@@ -371,8 +371,8 @@ Revert	TrackerSettingsWindow		Tilbagefør
 trash	B_TRASH_DIRECTORY		papirkurv
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Hvis du flytter systemmappen eller dens indhold, så vil du ikke være i stand til at opstarte %osName!\n\nEr du sikker på, at du vil gøre det?\n\nFor alligevel at flytte systemmappen eller dens indhold, hold Skift-tasten nede og klik på \"Flyt\".
 Close all in workspace	ContainerWindow		Luk alt på skrivebordet
-32 x 32	DeskWindow		32 x 32
 Corrupted expression.	libtracker		Beskadiget udtryk.
+32 x 32	DeskWindow		32 x 32
 Finish: %time - %finishtime left	StatusWindow		Færdig: %time - %finishtime tilbage
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Kunne ikke åbne \"%document\" (Manglende biblioteker: %library). \n
 Create relative link here	ContainerWindow		Opret lignende link her
@@ -400,12 +400,12 @@ ends with	FindPanel		ender med
 Show Disks icon	SettingsView		Vis diskikoner
 Outline selection rectangle only	SettingsView		Omrids markering kun for rektanglen
 by formula	FindPanel		af formlen
-is	FindPanel		er
 Move to Trash	FilePanelPriv		Flyt til papirkurven
+is	FindPanel		er
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Hvis du omdøber systemmappen eller dens indhold, så vil du ikke være i stand til at opstarte %osName!\n\nEr du sikker på, at du vil gøre det?\n\nFor alligevel at omdøbe systemmappen eller dens indhold, hold Skift-tasten nede og klik på \"Omdøb\".
-Permissions	FilePermissionsView		Tilladelser
-40 x 40	ContainerWindow		40 x 40
 40 x 40	DeskWindow		40 x 40
+40 x 40	ContainerWindow		40 x 40
+Permissions	FilePermissionsView		Tilladelser
 New folder %ld	FSUtils		Ny mappe %ld
 64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" er en forældet eksekverbar. Hent venligst en opdateret version eller genkompiler programmet.
@@ -414,16 +414,16 @@ That name is already taken. Please type another one.	WidgetAttributeText		Det na
 Modified	Default Query Columns		Ændret
 Default application	InfoWindow		Standardprogram
 Untitled bitmap	PoseView		Unavngivet bitmap
-Invert selection	ContainerWindow		Omvend markering
 matches regular expression	SelectionWindow		matcher regulært udtryk
+Invert selection	ContainerWindow		Omvend markering
 Real name	ContainerWindow		Rigtige navn
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Kan ikke åbne \"%name\". Filen er ved en fejl markeret som eksekverbar. 
-Save	FindPanel		Gem
 Go to parent	FilePanelPriv		Gå til forrige
+Save	FindPanel		Gem
 Name	FindPanel		Navn
 Cancel	WidgetAttributeText		Annuller
-Expression too long.	libtracker		Udtryk for langt.
 Memory corruption.	libtracker		Hukommelseskorruption.
+Expression too long.	libtracker		Udtryk for langt.
 Copy layout	ContainerWindow		Kopiér layout
 Duplicate	ContainerWindow		Dupliker
 Untitled clipping	PoseView		Unavngivet klip
@@ -432,8 +432,8 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Version:	InfoWindow		Version:
 OK	PoseView		OK
 Add-ons	DeskWindow		Tilføjelser
-Find	FindPanel		Find
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Er du sikker på, at du vil flytte eller kopiere de valgte elementer til mappen?
+Find	FindPanel		Find
 Empty folder	NavMenu		Tøm mappe
 Defaults	TrackerSettingsWindow		Standardværdier
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Beklager, der er ikke nok ledig plads på destinationsdiskområdet til at kopiere markeringen.

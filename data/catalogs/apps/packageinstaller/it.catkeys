@@ -11,7 +11,7 @@ Other…	PackageView		Altro…
 The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Il link simbolico chiamato '%s' esiste già nel percorso dato.\nSostituisci con quello presente in questo pacchetto o salta?
 Stop	PackageStatus		Interrompi
 Install to:	PackageView		Installare su:
-The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Il pacchetto sembra essere già stato installato sul sistema. Vuoi continuare con l'installazione? Il pacchetto già presente sarà disinstallato.
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Il pacchetto sembra essere già stato installato sul sistema. Vuoi rimuovere il pacchetto già presente e continuare con l'installazione?
 Skip all	PackageView		Salta tutti
 The installation of the package has been aborted.	PackageView		L'installazione del pacchetto è stata annullata.
 No installation type selected	PackageView		Non è stato scelto il tipo di installazione

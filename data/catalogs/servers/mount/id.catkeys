@@ -1,9 +1,10 @@
-1	indonesian	x-vnd.Haiku-mount_server	819316177
+1	indonesian	x-vnd.Haiku-mount_server	2818767263
 Mount read-only	AutoMounter		Pasang hanya-baca
 Error mounting volume:\n\n%s	AutoMounter		Ada kesalahan saat memasang Volume:\n\n%s
 Cancel	AutoMounter		Batal
 OK	AutoMounter		Oke
 Unmount error	AutoMounter		Terjadi kesalahan unmount
+The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		Sistem file pada volume ini bukan sistem file Be. Disarankan untuk memasangnya dalam mode baca-saja, untuk mencegah kehilangan data yang tidak disengaja karena bug di Haiku.
 Mount read/write	AutoMounter		Mount baca/tulis
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		Tak bisa melepas disk \"%s\":\n\t%s
 Mounting volume '%s'\n\n	AutoMounter		Mengkaitkan volume '%s'\n\n

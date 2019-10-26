@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku.TextSearch	2123129416
+1	indonesian	x-vnd.Haiku.TextSearch	1867528375
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Silakan pilih file yang ingin Anda pilih untuk Anda di Tracker.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Gagal memulai program xargs!
@@ -27,6 +27,7 @@ Show lines	GrepWindow		Tampilkan garis
 Failed to open errors pipe!	Grepper		Gagal membuka pipa galat!
 The unselected files will be removed from the list.	GrepWindow		File yang tidak dipilih akan dihapus dari daftar.
 Skip folders starting with a dot	GrepWindow		Lewati folder yang dimulai dengan titik
+Open files in code editor	GrepWindow		Buka berkas dalam editor kode
 Failed to open output pipe!	Grepper		Gagal membuka pipa keluaran!
 Cancel	GrepWindow		Batal
 History	GrepWindow		Sejarah

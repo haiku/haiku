@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-GLifeScreensaver	2074508370
+1	indonesian	x-vnd.Haiku-GLifeScreensaver	2182395945
 by Aaron Hill	GLife ScreenSaver		oleh Aaron Hill
 None	GLife ScreenSaver		Tak satupun
 none	GLife ScreenSaver		tak satupun
@@ -6,6 +6,7 @@ Grid Height: %li	GLife ScreenSaver		Tinggi Kisi: %li
 Grid Width: 	GLife ScreenSaver		Lebar Kisi: 
 Grid Border: %li	GLife ScreenSaver		Perbatasan Kisi: %li
 Grid Border: 	GLife ScreenSaver		Batas Kisi: 
+Grid Life Delay: <number>x	This is a factor: the x represents 'times'		Tundaan Kisi hidup: <number>x
 OpenGL \"Game of Life\"	GLife ScreenSaver		OpenGL \"Game of Life\"
 Grid Height: 	GLife ScreenSaver		Tinggi Kisi: 
 4x	GLife ScreenSaver	This is a factor: the x represents 'times'	4x

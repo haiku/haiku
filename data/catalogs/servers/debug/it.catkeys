@@ -1,7 +1,7 @@
 1	italian	x-vnd.Haiku-debug_server	166857212
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		A causa di un errore, l'applicazione:\n\n      %app\n\nnon può continuare l'esecuzione e sarà terminata da Haiku.
 Debug	DebugServer		Debug
 Terminate	DebugServer		Termina
-The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		A causa di un errore, l'applicazione:\n\n      %app\n\nnon può continuare l'esecuzione e sarà terminata da Haiku.
 Save report	DebugServer		Salva rapporto
 Write core file	DebugServer		Scrivi file di registro
 Oh no!	DebugServer		Oh no!

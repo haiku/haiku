@@ -1,5 +1,5 @@
 1	italian	x-vnd.Be-MAIL	1477453861
-Set to Saved	Mail		Imposta a 'Salvato'
+Set to Saved	Mail		Imposta come Salvato
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Il testo contiene %ld caratteri non codificabili. Se premi 'Invio' questi caratteri saranno sostituiti. Premi 'Annulla' per tornare indietro e verificare il set di caratteri utilizzato.
 Text wrapping:	Mail		A capo automatico
 Show icons & labels	Mail		Mostra icone e testo
@@ -76,7 +76,7 @@ View	Mail		Visualizza
 Signatures	Mail		Firme
 On	Mail		Attivo
 Find	Mail		Cerca
-Sorry, could not find an application that supports the 'Person' data type.	Mail		Il tipo di dato 'Persona' non è attualmente supportato da alcuna applicazione. Spiacente.
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Spiacente, il tipo di dato 'Persona' non è attualmente supportato da alcuna applicazione.
 Date:	Mail		Data:
 Expert	Mail		Esperto
 Automatically mark mail as read:	Mail		Contrassegna automaticamente i messaggi come già letti:
@@ -95,7 +95,7 @@ Find again	Mail		Cerca di nuovo
 Size:	Mail		Dimensione:
 To:	Mail		A:
 Need Tracker to move items to trash	Mail		Per spostare questi oggetti nel cestino, Tracker deve essere disponibile
-The mail_daemon could not be started:\n\t	Mail		Non è stato possibile avviare il server 'mail_daemon':\n\t
+The mail_daemon could not be started:\n\t	Mail		Non è stato possibile avviare il server mail_daemon:\n\t
 <no account found>	Mail		<account non trovato>
 Mail couldn't find its dictionary.	Mail		Mail non trova il dizionario.
 Mail preferences	Mail		Preferenze Mail
@@ -127,7 +127,7 @@ Forward	Mail		Inoltra
 Open attachment	Mail		Apri allegato
 mail	B_USER_DIRECTORY/mail		mail
 Save this message as a draft before closing?	Mail		Salva questo messaggio come bozza prima della chiusura?
-The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Il server 'mail_daemon' non è attivo. Il messaggio è in coda e sarà inviato quando il server sarà avviato.
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Il server mail_daemon non è attivo. Il messaggio è in coda e sarà inviato quando il server sarà avviato.
 None	Mail		Nessuno
 Resend	Mail		Invia di nuovo
 Hide	Mail		Nascondi
@@ -151,7 +151,7 @@ New mail message	Mail		Nuovo messaggio
 An error occurred trying to open this signature.	Mail		Si è verificato un errore durante l'apertura del file contenente la firma.
 Edit signatures…	Mail		Modifica firme…
 User interface	Mail		Interfaccia utente
-Inconsistency occurred in the undo/redo buffer.	Mail		Si è verificata un'inconsistenza nel buffer 'annulla/ripeti'.
+Inconsistency occurred in the undo/redo buffer.	Mail		Si è verificata un'inconsistenza nel buffer annulla/ripeti.
 Remove attachment	Mail		Rimuovi allegato
 Set to…	Mail		Imposta a…
 Edit	Mail		Modifica

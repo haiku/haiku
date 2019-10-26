@@ -1,6 +1,6 @@
 1	polish	x-vnd.Haiku-debug_server	2134779566
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		Aplikacja:\n\n      %app\n\nnapotkała problem który uniemożliwia jej kontynuację. Haiku przerwie jej działanie i posprząta po niej.
 Debug	DebugServer		Debug
 Terminate	DebugServer		Przerwij
-The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		Aplikacja:\n\n      %app\n\nnapotkała problem który uniemożliwia jej kontynuację. Haiku przerwie jej działanie i posprząta po niej.
 Save report	DebugServer		Zapisz raport
 Write core file	DebugServer		Zapisz zrzut pamięci

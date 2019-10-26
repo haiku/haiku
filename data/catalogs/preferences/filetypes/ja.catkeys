@@ -13,7 +13,7 @@ Select same preferred application as	FileTypes Window		このタイプと同じ�
 Could not change attributes	Attribute Window		属性を変更できません
 Icon	FileTypes Window		アイコン
 Add…	Application Type Window		追加…
-Attribute name:	Attribute Window		属性の名前:
+Attribute name:	Attribute Window		属性名:
 Long description:	Application Type Window		詳細説明:
 Cancel	Preferred App Menu		中止
 Remove	FileTypes Window		削除
@@ -110,7 +110,7 @@ Application types…	FileTypes Window		アプリケーションタイプ…
 Add icon…	Icon View		アイコンを追加…
 Cancel	FileTypes Window		中止
 Save into resource file…	Application Type Window		リソースファイルに保存…
-Special:	Attribute Window		特別:
+Special:	Attribute Window		スペシャル:
 Type:	Attribute Window		タイプ:
 Could not retrieve application signature	Preferred App Menu		アプリケーションの署名を読みだせませんでした。
 Beta	Application Types Window		ベータ版
@@ -148,7 +148,7 @@ FileTypes	System name		FileTypes
 Version	Application Types Window		バージョン
 Quit	FileTypes Window		終了
 File type	FileType Window		ファイルタイプ
-Internal name:	FileTypes Window		内部的な名前:
+Internal name:	FileTypes Window		内部名:
 Add…	FileTypes Window		追加…
 Edit icon…	Icon View		アイコンの編集…
 Internal name:	Attribute Window		内部名:

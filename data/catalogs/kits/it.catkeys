@@ -1,7 +1,7 @@
 1	italian	x-vnd.Haiku-libbe	3337473349
 {0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte} other{# byte}}
 All Rights Reserved.	AboutWindow		Tutti i diritti riservati.
-gold master	AboutWindow		"gold master"
+gold master	AboutWindow		gold master
 Undo	TextView		Annulla
 gamma	AboutWindow		gamma
 development	AboutWindow		sviluppo

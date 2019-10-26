@@ -1,8 +1,8 @@
 1	korean	x-vnd.Haiku-libtracker	2738005582
 Created	ContainerWindow		만든 때
 Open and make preferred	OpenWithWindow		열고 연결프로그램으로 지정
-Open with…	ContainerWindow		연결 프로그램...
 Kind	ContainerWindow		종류
+Open with…	ContainerWindow		연결 프로그램...
 Error moving \"%name\" to Trash. (%error)	FSUtils		\"%name\"를 휴지통으로 이동시키는 중 오류 벌생. (%error
 Or	FindPanel		이나
 before	FindPanel		이전
@@ -78,28 +78,28 @@ Save as Query template:	FindPanel		질의 원형으로 저장
 Edit templates…	TemplatesMenu		원형 편집...
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used 사용 -- %free 안 사용)
 Trash	Model		휴지통
+Enable type-ahead filtering	SettingsView		표시전 버퍼 필터링 가능
 copy	FSUtils	filename copy	복사
 New folder%ld	FSUtils		새 폴더%ld
-Enable type-ahead filtering	SettingsView		표시전 버퍼 필터링 가능
 Location	OpenWithWindow		위치
 %Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		화면에 맞게 크기 조정
-Find	FSUtils		찾기
 List folders first	SettingsView		목록에서 폴더를 처음으로
+Find	FSUtils		찾기
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		\"%name\"란 이름의 아이템은 이 폴더에 이미 존재합니다. 당신은 이것을 당신이 만드는 심볼릭 링크로 바꾸겠습니까?
 Temporary	FindPanel		임시
-Create relative link	ContainerWindow		상대 링크 만들기
 Modified	QueryPoseView		고친 때
+Create relative link	ContainerWindow		상대 링크 만들기
 Owner	FilePermissionsView		소유자
 Cancel	FSClipBoard		취소
 Modified	PoseView		고친 때
-All files and folders	FindPanel		모든 파일과 폴더
 Move to Trash	ContainerWindow		휴지통으로 이동
+All files and folders	FindPanel		모든 파일과 폴더
 Add-ons	ContainerWindow		추가-기능
 Increase size	ContainerWindow		크기 늘리기
 \nShould this be fixed?	FSUtils		\n고치겠습니까?
-Cancel	ContainerWindow		취소
 Move	PoseView		이동
+Cancel	ContainerWindow		취소
 Attributes	ContainerWindow		속성
 Error deleting items	FSUtils		아이템 지우는 중 에러 발생
 Cut	ContainerWindow		잘라내기
@@ -128,8 +128,8 @@ Open selection with:	OpenWithWindow		선택한 것 열 곳:
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		응용 프로그램\"%app\" 가 휴지통에 잇어서  \"%document\"을 열수 없습니다.
 Close	ContainerWindow		닫기
 Get info	ContainerWindow		정보 얻기
-There was an error resolving the link.	Tracker		링크를 해석하는 도중 오류가 발생했습니다.
 Show folder location in title tab	SettingsView		제목 탭에 폴더 위치 보이기
+There was an error resolving the link.	Tracker		링크를 해석하는 도중 오류가 발생했습니다.
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		당신이 지정한 폴더에 저장하려고 하는 중 문제가 발생했습니다. 다른 곳에서 시도해보십시오.
 Desktop	TrackerSettingsWindow		데스크탑
 Move	FSUtils	button label	이동
@@ -137,18 +137,18 @@ Clean up	DeskWindow		정리하기
 Group	FilePermissionsView		그룹
 Could not find an application to open \"%name\" (%error). 	FSUtils		\"%name\"를 열 응용프로그램을 찾지 못햇습니다(%error). 
 Mini icon view	DeskWindow		작은 아이콘으로 보기
-Replace	FilePanelPriv		바꾸기
 contains	SelectionWindow		포함
+Replace	FilePanelPriv		바꾸기
 is not	FindPanel		는 아님
 Icon view	DeskWindow		아이콘으로 보기
 Mount settings…	ContainerWindow		마운트 설정...
-by name	FindPanel		이름으로
 Copy more	ContainerWindow		더 복사하기
+by name	FindPanel		이름으로
 Sorry, you can't save things at the root of your system.	FilePanelPriv		미안합니다, 당신은 시스템의 루트에 저장할 수 없습니다.
 Restore	ContainerWindow		복원
 Location	ContainerWindow		위치
-Skip	FSUtils		지나치기
 Warning space color	SettingsView		경고 공간 색상
+Skip	FSUtils		지나치기
 Used space color	SettingsView		사용된 공간 색상
 Cancel	FSUtils		취소
 Original name	ContainerWindow		원래 이름
@@ -164,9 +164,9 @@ Cancel	FilePanelPriv		취소
 Sorry, you cannot edit that attribute.	WidgetAttributeText		미안합니다,당신은 속성을 고칠 수 없습니다.
 Cancel	OpenWithWindow		취소
 Select…	DeskWindow		선택...
+Files cannot be moved or deleted from a read-only volume.	PoseView		파일들은 읽기-전용 볼륨에서 이동되거나 지울 수 없습니다.
 Edit name	FilePanelPriv		이름 고치기
 There was an error deleting \"%name\":\n\t%error	FSUtils		\"%name\"를 지우는 중에 오류가 발생함:\n\t%error
-Files cannot be moved or deleted from a read-only volume.	PoseView		파일들은 읽기-전용 볼륨에서 이동되거나 지울 수 없습니다.
 Resize to fit	ContainerWindow		딱 맞게 크기 조정
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	\"%name\"을 링크 시킬 곳:
 Mount server error	AutoMounterSettings		마운트 서버 에러
@@ -176,8 +176,8 @@ New folder	TemplatesMenu		새 폴더
 Replace all	FSUtils		모두 바꾸기
 Reverse order	ContainerWindow		반대 순서
 Copying: 	StatusWindow		복사중:
-Select all	DeskWindow		모두 선택
 Show navigator	SettingsView		탐색기 보기
+Select all	DeskWindow		모두 선택
 Decrease size	ContainerWindow		크기 줄이기
 Mount all	MountMenu		모두 마운트
 Size	Default Query Columns		크기
@@ -190,8 +190,8 @@ Tracker status	StatusWindow		트랙커 상태
 Handles any %type	OpenWithWindow		어떤 %type의 핸들
 The mount server could not be contacted.	AutoMounterSettings		마운트 서버에 연결 할 수 없습니다.
 Query template	FindPanel		질의 원형
-Open	OpenWithWindow		열기
 ends with	SelectionWindow		끝 단어
+Open	OpenWithWindow		열기
 You must have at least one attribute showing.	PoseView		당신은 적어도 하나의 보여줄 속성이 있어야합니다.
 Cut	FilePanelPriv		잘라내기
 Favorites	FilePanelPriv		즐겨찾기
@@ -217,8 +217,8 @@ Preferred for file	OpenWithWindow		파일의 연결 프로그램
 OK	AutoMounterSettings		확인
 copying	FSUtils		복사중
 Get info	FilePanelPriv		정보 얻기
-Execute	FilePermissionsView		실행
 Delete	ContainerWindow		지우기
+Execute	FilePermissionsView		실행
 Show volumes on Desktop	SettingsView		데스크탑에 볼륨 보여주기
 Recent folders	ContainerWindow		최근 폴더
 Desktop	Model		데스크탑
@@ -249,8 +249,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		응�
 Create %s clipping	PoseView		%s 클립보드 만들기
 Error moving \"%name\"	FSUtils		\"%name\ 이동 중 에러 발생"
 To: %dir	StatusWindow		목적:%dir
-Cancel	Tracker		취소
 Paste layout	ContainerWindow		배치 붙여넣기
+Cancel	Tracker		취소
 Make active printer	ContainerWindow		활성 프린터 만들기
 Copy to	ContainerWindow		복사할 곳
 Name	SelectionWindow		이름
@@ -265,8 +265,8 @@ Add printer…	ContainerWindow		프린터 추가
 On	FindPanel		에서
 Permissions	ContainerWindow		권한
 Size:	InfoWindow		크기:
-Copy	ContainerWindow		복사
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		선택된 아이템들을 휴지통으로 이동시킬 수 없습니다. 대신  그것들을 지우겠습니까?(이 작업은 되돌릴 수 없습니다.)
+Copy	ContainerWindow		복사
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		미안합니다,'Character' 속성에 다중-바이트 문자를 저장할 수 없습니다.
 And	FindPanel		그리고
 multiple disks	FindPanel		여러 디스크들
@@ -279,17 +279,17 @@ Automatic disk mounting	AutoMounterSettings		자동으로 디스크 마운트
 parent folder	NavMenu		상위 폴더
 Create link here	ContainerWindow		여기에 링크 만들기
 Force identify	ContainerWindow		강제 식별
-no items	CountView		아이템이 없음
 48 x 48	DeskWindow		48 x 48
-Query name:	FindPanel		질의 이름:
+no items	CountView		아이템이 없음
 Disks	DirMenu		디스크
+Query name:	FindPanel		질의 이름:
 Open parent	ContainerWindow		상위 열기
 Find…	ContainerWindow		찾기...
 moving	FSUtils		이동중
-Add	FindPanel		추가
-greater than	FindPanel		보다 큰
-Created:	InfoWindow		만든 때:
 Single window navigation	SettingsView		하나의 창으로 탐색
+greater than	FindPanel		보다 큰
+Add	FindPanel		추가
+Created:	InfoWindow		만든 때:
 Edit Query template	FindPanel		질의 원형 편집
 All disks	AutoMounterSettings		모든 디스크
 link	FSUtils	filename link	링크
@@ -340,10 +340,10 @@ ends with	FindPanel		끝 단어
 Show Disks icon	SettingsView		디스크 아이콘 보기
 Outline selection rectangle only	SettingsView		오직 바깥선의 선택된 사각형만
 by formula	FindPanel		공식으로
-is	FindPanel		는
 Move to Trash	FilePanelPriv		휴지통으로 이동
-40 x 40	ContainerWindow		40 x 40
+is	FindPanel		는
 40 x 40	DeskWindow		40 x 40
+40 x 40	ContainerWindow		40 x 40
 New folder %ld	FSUtils		새 폴더 %ld
 64 x 64	DeskWindow		64 x 64
 Only the boot disk	AutoMounterSettings		오직 부트 디스크만
@@ -351,12 +351,12 @@ That name is already taken. Please type another one.	WidgetAttributeText		이 �
 Modified	Default Query Columns		고친 때
 Default application	InfoWindow		기본 응용프로그램
 Untitled bitmap	PoseView		이름없는 비트맵
-Invert selection	ContainerWindow		선택 반전
 matches regular expression	SelectionWindow		일치하는 정규 표현식
+Invert selection	ContainerWindow		선택 반전
 Real name	ContainerWindow		진짜 이름
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		\"%name\"를 열 수 없습니다. 이 파일은 실행파일로 잘못 표시되었습니다.
-Save	FindPanel		저장
 Go to parent	FilePanelPriv		상위로 가기
+Save	FindPanel		저장
 Name	FindPanel		이름
 Cancel	WidgetAttributeText		취소
 Copy layout	ContainerWindow		배치 복사
@@ -367,8 +367,8 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Version:	InfoWindow		버젼:
 OK	PoseView		확인
 Add-ons	DeskWindow		추가-기능
-Find	FindPanel		찾기
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		당신은 선택한 아이템(들)을 이 폴더로 이동이나 복사하기를 원합니까?확실합니까?
+Find	FindPanel		찾기
 Empty folder	NavMenu		빈 폴더
 Defaults	TrackerSettingsWindow		기본
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		미안합니다.선택한 것을  목적 볼륨에 복사하기에는 남은 용량이 충분하지 않습니다.

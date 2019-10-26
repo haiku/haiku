@@ -1,6 +1,7 @@
-1	indonesian	x-vnd.Haiku-debug_server	2134779566
+1	indonesian	x-vnd.Haiku-debug_server	166857212
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		Aplikasi:\n\n       %app\n\nmengalami kesalahan yang mencegahnya untuk lanjut. Haiku akan mematikan aplikasi dan melakukan pembersihan.
 Debug	DebugServer		Debug
 Terminate	DebugServer		Matikan
-The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		Aplikasi:\n\n       %app\n\nmengalami kesalahan yang mencegahnya untuk lanjut. Haiku akan mematikan aplikasi dan melakukan pembersihan.
 Save report	DebugServer		Simpan laporan
 Write core file	DebugServer		Menulis berkas inti
+Oh no!	DebugServer		Ah tidak!
