@@ -656,9 +656,7 @@ Volume::FindBlock(off_t logical, off_t& physical)
 status_t
 Volume::WriteSuperBlock()
 {
-	fSuperBlock.checksum = calculate_crc((uint32)~1,
-			(uint8 *)(*(&fSuperBlock + sizeof(fSuperBlock.checksum))),
-			sizeof(fSuperBlock) - sizeof(fSuperBlock.checksum));
+	// TODO(lesderid): Calculate checksum
 
 	if (write_pos(fDevice, BTRFS_SUPER_BLOCK_OFFSET, &fSuperBlock,
 			sizeof(btrfs_super_block))
