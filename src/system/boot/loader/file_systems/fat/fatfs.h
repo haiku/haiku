@@ -24,8 +24,7 @@ class Volume;
 #define read32(buffer,off) \
         B_LENDIAN_TO_HOST_INT32(*(uint32 *)&buffer[off])
 
-#define read16(buffer,off) \
-        B_LENDIAN_TO_HOST_INT16(*(uint16 *)&buffer[off])
+#define read16(buffer,off) (buffer[off] + (buffer[off + 1] << 8))
 
 #define write32(buffer, off, value) \
         *(uint32*)&buffer[off] = B_HOST_TO_LENDIAN_INT32(value)
