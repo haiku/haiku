@@ -76,7 +76,7 @@ extern intptr_t of_call_client_function(const char *method, intptr_t numArgs,
 	intptr_t numReturns, ...);
 extern intptr_t of_interpret(const char *command, intptr_t numArgs,
 	intptr_t numReturns, ...);
-extern intptr_t of_call_method(intptr_t handle, const char *method,
+extern intptr_t of_call_method(uint32_t handle, const char *method,
 	intptr_t numArgs, intptr_t numReturns, ...);
 extern intptr_t of_test(const char *service);
 extern intptr_t of_milliseconds(void);

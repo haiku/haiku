@@ -115,7 +115,7 @@ platform_init_video(void)
 {
 	gKernelArgs.frame_buffer.enabled = false;
 
-	int screen = of_finddevice("screen");
+	intptr_t screen = of_finddevice("screen");
 	if (screen == OF_FAILED)
 		return B_NO_INIT;
 	edid1_raw edidRaw;

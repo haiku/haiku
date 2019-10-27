@@ -122,7 +122,7 @@ of_interpret(const char *command, intptr_t numArgs, intptr_t numReturns, ...)
 
 
 intptr_t
-of_call_method(intptr_t handle, const char *method, intptr_t numArgs,
+of_call_method(uint32_t handle, const char *method, intptr_t numArgs,
 	intptr_t numReturns, ...)
 {
 	struct {

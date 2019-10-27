@@ -39,7 +39,7 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 		return B_ENTRY_NOT_FOUND;
 	printf("boot path = \"%s\"\n", sBootPath);
 
-	int node = of_finddevice(sBootPath);
+	intptr_t node = of_finddevice(sBootPath);
 	if (node != OF_FAILED) {
 		char type[16];
 		of_getprop(node, "device_type", type, sizeof(type));
@@ -65,7 +65,7 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 				}
 			}
 			if (bootAddress == 0) {
-				int package = of_finddevice("/options");
+				intptr_t package = of_finddevice("/options");
 				char defaultServerIP[16];
 				int bytesRead = of_getprop(package, "default-server-ip",
 					defaultServerIP, sizeof(defaultServerIP) - 1);

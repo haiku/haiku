@@ -44,7 +44,7 @@ public:
 	virtual ssize_t Receive(void *buffer, size_t size);
 
 private:
-	int			fHandle;
+	intptr_t	fHandle;
 	mac_addr_t	fMACAddress;
 };
 
@@ -109,7 +109,7 @@ OFEthernetInterface::Init(const char *device, const char *parameters)
 		return B_ERROR;
 	}
 
-	int package = of_instance_to_package(fHandle);
+	intptr_t package = of_instance_to_package(fHandle);
 
 	// get MAC address
 	int bytesRead = of_getprop(package, "local-mac-address", &fMACAddress,
@@ -250,7 +250,7 @@ platform_net_stack_init()
 		*parameters = '\0';
 
 	// get device node
-	int node = of_finddevice(bootPath);
+	intptr_t node = of_finddevice(bootPath);
 	if (node == OF_FAILED)
 		return B_ERROR;
 
