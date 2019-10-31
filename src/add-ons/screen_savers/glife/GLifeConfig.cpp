@@ -42,7 +42,7 @@ GLifeConfig::GLifeConfig(BRect frame, GLifeState* pglsState)
 
 	// Sliders
 	fGridDelay = new BSlider(frame, "GridDelay",
-		B_TRANSLATE("Grid Life Delay: "),
+		B_TRANSLATE("Grid life delay: "),
 		new BMessage(kGridDelay),
 		0, 4, B_BLOCK_THUMB);
 
@@ -53,7 +53,7 @@ GLifeConfig::GLifeConfig(BRect frame, GLifeState* pglsState)
 	fGridDelay->SetHashMarkCount(5);
 
 	fGridBorder = new BSlider(frame, "GridBorder",
-		B_TRANSLATE("Grid Border: "),
+		B_TRANSLATE("Grid border: "),
 		new BMessage(kGridBorder),
 		0, 10, B_BLOCK_THUMB);
 
@@ -63,7 +63,7 @@ GLifeConfig::GLifeConfig(BRect frame, GLifeState* pglsState)
 	fGridBorder->SetHashMarkCount(11);
 
 	fGridWidth = new BSlider(frame, "GridWidth",
-		B_TRANSLATE("Grid Width: "),
+		B_TRANSLATE("Grid width: "),
 		new BMessage(kGridWidth),
 		10, 100, B_BLOCK_THUMB);
 
@@ -73,7 +73,7 @@ GLifeConfig::GLifeConfig(BRect frame, GLifeState* pglsState)
 	fGridWidth->SetHashMarkCount(10);
 
 	fGridHeight = new BSlider(frame, "GridHeight",
-		B_TRANSLATE("Grid Height: "),
+		B_TRANSLATE("Grid height: "),
 		new BMessage(kGridHeight),
 		10, 100, B_BLOCK_THUMB);
 
@@ -126,25 +126,24 @@ void
 GLifeConfig::_UpdateLabels()
 {
 	BString newLabel;
-	newLabel.SetToFormat(B_TRANSLATE("Grid Width: %li"), fGridWidth->Value());
+	newLabel.SetToFormat(B_TRANSLATE("Grid width: %li"), fGridWidth->Value());
 	fGridWidth->SetLabel(newLabel);
 
-	newLabel.SetToFormat(B_TRANSLATE("Grid Height: %li"), fGridHeight->Value());
+	newLabel.SetToFormat(B_TRANSLATE("Grid height: %li"), fGridHeight->Value());
 	fGridHeight->SetLabel(newLabel);
 
-	newLabel.SetToFormat(B_TRANSLATE("Grid Border: %li"), fGridBorder->Value());
+	newLabel.SetToFormat(B_TRANSLATE("Grid border: %li"), fGridBorder->Value());
 	fGridBorder->SetLabel(newLabel);
 
-	BString delay;
-	if (fGridDelay->Value() <= 0)
-		delay = B_TRANSLATE("none");
+	int32 delay = fGridDelay->Value();
+	if (delay <= 0)
+		newLabel = B_TRANSLATE("Grid life delay: none");
 	else {
-		BString format = (B_TRANSLATE_CONTEXT("Grid Life Delay: <number>x",
-			"This is a factor: the x represents 'times'"));
-		format.ReplaceAll("<number>", B_PRId32);
-		format.SetToFormat(format.String(), fGridDelay->Value());
+		newLabel.SetToFormat(B_TRANSLATE_CONTEXT("Grid life delay: "
+			"%" B_PRId32 "x", "This is a factor: the x represents 'times', "
+			"don't translate '%" B_PRId32"'"), delay);
 	}
-	fGridDelay->SetLabel(delay);
+	fGridDelay->SetLabel(newLabel);
 }
 
 
