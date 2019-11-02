@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-StyledEdit	537696910
+1	dutch; flemish	x-vnd.Haiku-StyledEdit	727465241
 Document statistics	Statistics		Documentstatistieken
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan niet herstellen, het bestand \"%s\" werd niet gevonden.
 Cut	Menus		Knippen
@@ -12,21 +12,29 @@ New	Menus		Nieuw
 Document	Menus		Document
 Search backwards	FindandReplaceWindow		Achteruit zoeken
 Find again	Menus		Opnieuw zoeken
+Read-only	StatusView		Alleen-lezen
 Save	Menus		Opslaan
 Cancel	QuitAlert		Annuleren
 Copy	Menus		Kopiëren
+Reload	NodeMonitorAlerts		Herladen
+line %d, column %d	StatusView		regel %d, rij %d
 Words:	Statistics		Woorden:
 ???	LoadAlert		???
+Recover	NodeMonitorAlerts		Herstellen
 Error saving \"%s\":\n%s	SaveAlert		Fout bij opslaan van \"%s\":\n%s
 OK	RevertToSavedAlert		Oké
+Unlock file	StatusView		Bestand ontgrendelen
 Italic	Menus		Cursief
 Can't undo	Menus		Kan niet ongedaan maken
 Replace…	Menus		Vervangen...
 File	Menus		Bestand
 Bold	Menus		Vet
 Paste	Menus		Plakken
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Bestand \"%file%\" was gewijzigd door een andere toepassing. Bestand herladen?
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Bestand \"%file%\" was verwijderd door een andere toepassing. Bestand herstellen?
 Lines:	Statistics		Regels:
 Replace in all windows	FindandReplaceWindow		Vervang in alle vensters
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" bevat niet opgeslagen wijzigingen.\nHerstellen naar de laatst opgeslagen versie?
 Save	SaveAlert		Opslaan
 Default	Open_and_SaveAsPanel		Standaard
 Cancel	RevertToSavedAlert		Annuleren
@@ -46,17 +54,24 @@ Find:	FindandReplaceWindow		Vind:
 Undo typing	QuitAlert		Typen ongedaan maken
 Error loading \"%s\":\n\t%s	LoadAlert		Fout bij het laden van \"%s\":\n\t%s
 Don't save	SaveAlert		Niet opslaan
+Reload…	Menus		Herladen…
 Print…	Menus		Afdrukken...
 Quit	Menus		Sluiten
 Redo typing	QuitAlert		Opnieuw typen
+Ignore	NodeMonitorAlerts		Negeren
 Wrap lines	Menus		Regels afbreken
+Text encoding	Menus		Tekstcodering
+Unable to unlock file\n\t%s	QuitAlert		Bestand kan niet ontgrendeld worden\n\t%s
+Modified	StatusView		Gewijzigd
 OK	LoadAlert		Oké
 Save	QuitAlert		Opslaan
 Case-sensitive	FindandReplaceWindow		Hoofdlettergevoelig
 Find selection	Menus		Selectie vinden
 Cancel	SaveAlert		Annuleren
 Find…	Menus		Zoeken...
+Revert	RevertToSavedAlert		Herstellen
 Size	Menus		Grootte
+Autodetect	Menus		Automatisch detecteren
 Replace next	Menus		Volgende vervangen
 OK	QuitAlert		Oké
 Replace with:	FindandReplaceWindow		Vervangen door:
@@ -66,6 +81,7 @@ Save as…	Menus		Opslaan als...
 Replace	FindandReplaceWindow		Vervangen
 Characters:	Statistics		Karakters:
 Don't save	QuitAlert		Niet opslaan
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Dit bestand is aangeduid als alleen-lezen. Wijzigingen opslaan in document \"%s\"? 
 Align	Menus		Uitlijnen
 Font	Menus		Lettertype
 Select all	Menus		Alles selecteren

@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-libtracker	4194609390
+1	portuguese	x-vnd.Haiku-libtracker	1733865386
 Created	ContainerWindow		Criado
 Open and make preferred	OpenWithWindow		Abrir e tornar preferida
 Kind	ContainerWindow		Tipo
@@ -61,6 +61,7 @@ Skip all	FSUtils		Saltar tudo
 Preparing to restore items…	StatusWindow		A preparar para restaurar itens…
 Mount	ContainerWindow		Montar
 Desktop	B_DESKTOP_DIRECTORY		Área de Trabalho
+Corrupted pointers.	libtracker		Apontadores corrompidos.
 Copy here	ContainerWindow		Copiar para aqui
 All disks	FindPanel		Todos os discos
 Window	ContainerWindow		Janela
@@ -72,6 +73,7 @@ Edit templates…	TemplatesMenu		Editar modelos…
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used utilizados -- %free livres)
 Hide dotfiles	SettingsView		Esconder ficheiros com nome iniciando por ponto
 Trash	Model		Lixo
+copy	FSUtils	filename copy	cópia
 New folder%ld	FSUtils		Nova pasta%ld
 Location	OpenWithWindow		Localização
 Resize to fit	QueryContainerWindow		Redimensionar para caber
@@ -180,6 +182,7 @@ Empty Trash	ContainerWindow		Esvaziar Lixo
 Preparing to empty Trash…	StatusWindow		A preparar para esvaziar o Lixo…
 the MIME settings	FSUtils		configurações MIME
 You can't move or copy the trash.	FSUtils		Não é possível mover ou copiar o lixo.
+Error creating link to \"%name\".	FSUtils		Erro ao criar atalho para \"%name\".
 Unknown	FilePermissionsView		Desconhecido
 calculating…	InfoWindow		a calcular…
 OK	AutoMounterSettings		OK
@@ -211,6 +214,7 @@ Would you like to find some other suitable application?	FSUtils		Gostaria de pro
 Recent folders	FavoritesMenu		Pastas recentes
 The specified name is illegal. Please choose another name.	FilePanelPriv		O nome especificado é ilegal. Por favor escolha outro nome.
 of %items	StatusWindow		de %items
+Creating links: 	StatusWindow		Criando atalhos: 
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Não foi possível abrir \"%document\" com a aplicação \"%app\" (%error). 
 Error moving \"%name\"	FSUtils		Erro ao mover \"%name\"
 To: %dir	StatusWindow		Para: %dir

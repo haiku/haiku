@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Terminal	2677418285
+1	dutch; flemish	x-vnd.Haiku-Terminal	2053249969
 Close other tabs	Terminal TermWindow		Andere tabs sluiten
 Insert path	Terminal TermView		Voeg pad in
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal kon de shell niet starten. Sorry.
@@ -18,11 +18,13 @@ Selected background	Terminal AppearancePrefView		Geselecteerde achtergrond
 Error!	Terminal getString		Fout!
 Set tab title	Terminal TermWindow		De tabtitel instellen
 Appearance	Terminal PrefWindow		Uiterlijk
+Encoding:	Terminal AppearancePrefView		Codering:
 Create link here	Terminal TermView		Hier een link maken
 Selected text	Terminal AppearancePrefView		Geselecteerde tekst
 Change directory	Terminal TermView		Directory veranderen
 Page setup…	Terminal TermWindow		Paginaconfiguratie
 Cancel	Terminal TermView		Annuleren
+Revert	Terminal PrefWindow		Herstellen
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 Use selection	Terminal FindWindow		Gebruik selectie
 Find next	Terminal TermWindow		Volgende zoeken

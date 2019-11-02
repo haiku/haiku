@@ -1,8 +1,12 @@
-1	dutch; flemish	x-vnd.Haiku-IMAP	1938678311
+1	dutch; flemish	x-vnd.Haiku-IMAP	1343128980
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Kan niet met de server \"%server%\" verbinden:\n%error%
+Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		Update abonnementen voor IMAP folders, even geduld...
 Failed to fetch available storage.	IMAPFolderConfig		Fout bij het ophalen van de beschikbare opslag.
 Cancel	IMAPFolderConfig		Annuleren
+OK	IMAPFolderConfig		OK
+Server storage: %s / %s used.	IMAPFolderConfig		Server opslag: %s / %s gebruikt.
 No encryption	imap_config		Geen versleuteling
+Fetching IMAP folders, please be patient…	IMAPFolderConfig		IMAP folders ophalen, even geduld...
 Configure IMAP Folders	imap_config		IMAP-mappen configureren
 SSL	imap_config		SSL
 Apply	IMAPFolderConfig		Toepassen

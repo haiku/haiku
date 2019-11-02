@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Pulse	3788463253
+1	dutch; flemish	x-vnd.Haiku-Pulse	139895817
 Normal mode	DeskbarPulseView		Standaardmodus
 Info	CPUButton		Info
 Quit	DeskbarPulseView		Afsluiten
@@ -37,6 +37,7 @@ Deskbar menu	CPUButton		Deskbarmenu
 Mini mode	NormalPulseView		Minimodus
 Quit	MiniPulseView		Afsluiten
 Info	PulseView		Info
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		Gebruik: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]
 OK	DeskbarPulseView		Oké
 Info	PulseApp		Info
 Pulse	System name		Pulse

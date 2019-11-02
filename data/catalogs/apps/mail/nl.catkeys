@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Be-MAIL	1020614035
+1	dutch; flemish	x-vnd.Be-MAIL	1630923361
 Set to Saved	Mail		Als Bewaard markeren
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Uw hoofdtekst bevat %ld niet-codeerbare tekens. Mogelijk werkt een andere letterset beter? Klik op 'Versturen' om de tekst toch te versturen (een vervangend teken zal dan gebruikt worden op de plaats van elk niet-codeerbaar teken), of kies 'Annuleren' om terug te keren voor een herstelpoging.
 Text wrapping:	Mail		Tekstafbreking:
@@ -12,6 +12,7 @@ Copy to new	Mail		Kopiëren naar nieuw
 Save as draft	Mail		Bewaren als concept
 Encoding:	Mail		Coderen:
 Print	Mail		Afdrukken
+Encoding	Mail		Coderen
 Default account:	Mail		Standaard-account:
 Message	Mail		Bericht
 Bcc:	Mail		Bcc:
@@ -119,6 +120,7 @@ Sorry	Mail		Sorry
 Forward	Mail		Doorsturen
 Open attachment	Mail		Bijlage openen
 mail	B_USER_DIRECTORY/mail		mail
+Save this message as a draft before closing?	Mail		Bericht bewaren als concept alvorens het te sluiten?
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		De mail_daemon is niet actief. Het bericht staat in de wachtrij en zal worden verzonden zodra de mail_daemon is gestart.
 None	Mail		Geen
 Resend	Mail		Opnieuw versturen

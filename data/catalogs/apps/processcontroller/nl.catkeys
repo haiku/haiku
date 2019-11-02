@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-ProcessController	1250949018
+1	dutch; flemish	x-vnd.Haiku-ProcessController	168752057
 Error saving file	ProcessController		Fout bij bestandsopslag
 Display priority	ProcessController		Weergave prioriteit
 That's no Fun!	ProcessController		Da's niet Leuk!
@@ -6,6 +6,7 @@ What do you want to do with the team \"%s\"?	ProcessController		Wat wilt u met h
 Your setting file could not be saved!\n(%s)	ProcessController		Uw instellingenbestand kon niet opgeslagen worden!\n(%s)
 Processor %d	ProcessController		Processor %d
 Live in the Deskbar	ProcessController		Actief in Deskbar
+Kill this team!	ProcessController		Dit team afbreken!
 OK	ProcessController		Oké
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		U kunt ProcessController in een venster actief hebben, of in Deskbar installeren.
 Real-time priority	ProcessController		Real-time prioriteit
@@ -34,12 +35,16 @@ Gone teams…	ProcessController		Verdwenen teams...
 Quit an application	ProcessController		Een toepassing afsluiten
 Cancel	ProcessController		Annuleren
 Install in Deskbar	ProcessController		Installeren in Deskbar
+Debug this team!	ProcessController		Debug dit team!
+Low latency	ProcessController		Lage latentie
 ProcessController	System name		ProcessController
 Lowest active priority	ProcessController		Laagste actieve prioriteit
 Restart Tracker	ProcessController		Tracker herstarten
 System resources & caches…	ProcessController		Systeembronnen en -caches...
 Damned!	ProcessController		Verdomme!
 New Terminal	ProcessController		Nieuwe Terminal
+Power saving	ProcessController		Energiebesparing
 ProcessController is already installed in Deskbar.	ProcessController		ProcessController is al in Deskbar geïnstalleerd.
+This is the last active processor…\nYou can't turn it off!	ProcessController		Dit is de laatste actieve processor…\nDeze kan u niet uitschakelen!
 This thread is already gone…	ProcessController		Deze thread is al weg...
 Run in window	ProcessController		Actief in venster

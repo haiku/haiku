@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Sudoku	2463385585
+1	dutch; flemish	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		Momentopname terugzetten
 File	SudokuWindow		Bestand
 Mark invalid values	SudokuWindow		Ongeldige waarden markeren
@@ -19,6 +19,7 @@ Copy	SudokuWindow		Kopiëren
 Solve	SudokuWindow		Oplossen
 HTML	SudokuWindow		HTML
 Advanced	SudokuWindow		Geavanceerd
+Set all hints	SudokuWindow		Alle hints inschakelen
 Searching for removable values	SudokuGenerator		Zoeken naar verwijderbare waarden
 Abort	ProgressWindow		Afbreken
 Could not set Sudoku:\n%s\n	SudokuWindow		Sudoku kon niet ingesteld worden:\n%s\n

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-MediaPlayer	277523627
+1	dutch; flemish	x-vnd.Haiku-MediaPlayer	1371563582
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Onderdeel verwijderen naar Trash
 Close	MediaPlayer-PlaylistWindow		Afsluiten
 Volume of background clips	MediaPlayer-SettingsWindow		Volume van achtergrondclips
@@ -74,6 +74,7 @@ Import Entry	MediaPlayer-ImportPLItemsCmd		Onderdeel importeren
 unknown format	MediaPlayer-InfoWin		onbekend formaat
 Track %d	MediaPlayer-Main		Track %d
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Niet alle bestanden konden Trash in.
+Total duration: %s	MediaPlayer-PlaylistWindow		Totale duur: %s
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 Move into trash error	MediaPlayer-RemovePLItemsCmd		Fout bij het verplaatsen naar de vuilnisbak
 50% scale	MediaPlayer-Main		50% schaal

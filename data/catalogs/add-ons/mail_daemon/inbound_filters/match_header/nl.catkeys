@@ -1,8 +1,9 @@
-1	dutch; flemish	x-vnd.Haiku-MatchHeader	3544711400
+1	dutch; flemish	x-vnd.Haiku-MatchHeader	1946584206
 Delete message	ConfigView		Bericht verwijderen
 Match \"%attribute\" against \"%regex\"	RuleFilter		Match \"%attribute\" tegen \"%regex\"
 Match header	RuleFilter		Header matchen
 Set flags to	ConfigView		Markeer als
+Header field (e.g. Subject, From, …)	ConfigView		Header veld (e.g. Onderwerp, Van, …)
 <Choose account>	ConfigView		<Kies account>
 Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Wildcard-waarde zoals \"*spam*\".\nGebruik voorvoegsel \"REGEX:\" om reguliere expressies te gebruiken.
 Then	ConfigView		Dan

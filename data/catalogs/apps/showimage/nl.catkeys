@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-ShowImage	466377502
+1	dutch; flemish	x-vnd.Haiku-ShowImage	3998703664
 Use as background…	Menus		Gebruik als achtergrond…
 File	Menus		Bestand
 Slide delay	Menus		Dia-vertraging
@@ -7,6 +7,7 @@ Zoom in	Menus		Inzoomen
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Het document '%s' werd gewijzigd. Wilt u het document sluiten?
 Page setup…	Menus		Paginaconfiguratie...
 Print…	Menus		Afdrukken...
+Get info…	Menus		Informatie ophalen…
 OK	SaveToFile		Oké
 Previous page	Menus		Vorige pagina
 View	Menus		Beeld
@@ -52,6 +53,7 @@ Select all	Menus		Alles selecteren
 Zoom factor in %:	PrintOptionsWindow		Zoomfactor in %:
 Width:	PrintOptionsWindow		Breedte:
 Image	Menus		Afbeelding
+Move to Trash	Menus		Naar Prullenbak verplaatsen
 OK	Alerts		Oké
 Rotate clockwise	Menus		Roteer rechtsom
 Job setup	PrintOptionsWindow		Taakconfiguratie

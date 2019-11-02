@@ -1,10 +1,28 @@
-1	dutch; flemish	x-vnd.Haiku-DeskCalc	1694821448
+1	dutch; flemish	x-vnd.Haiku-DeskCalc	793682894
+cos	CalcView		cos
+acos	CalcView		acos
+C	CalcView	Key label, 'C' means clear	C
+ceil	CalcView		ceil
+cbrt	CalcView		cbrt
+BS	CalcView	Key label, 'BS' means backspace	BS
+floor	CalcView		floor
+sin	CalcView		sin
+sinh	CalcView		sinh
+tanh	CalcView		tanh
+cosh	CalcView		cosh
+ln	CalcView		ln
 Compact	CalcView		Compact
 Calculating	CalcView		Berekenen
 Enable Num Lock on startup	CalcView		Opstarten met Num Lock aan
 Scientific	CalcView		Wetenschappelijk
+log	CalcView		log
+sqrt	CalcView		sqrt
+asin	CalcView		asin
 Radians	CalcView		Radialen
+tan	CalcView		tan
+exp	CalcView		exp
 Audio Feedback	CalcView		Geluidsfeedback
+atan	CalcView		atan
 DeskCalc	System name		DeskCalc
 Degrees	CalcView		Graden
 Basic	CalcView		Eenvoudig

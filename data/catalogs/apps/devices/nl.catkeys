@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Devices	490380176
+1	dutch; flemish	x-vnd.Haiku-Devices	3345509916
 ACPI bus	DevicesView		ACPI-bus
 Encryption controller	Device		Encryptie-controller
 Bus Information	Device		Businformatie
@@ -54,7 +54,9 @@ Device name	DeviceACPI		Apparaatnaam
 Card Reader	DeviceSCSI		Kaartlezer
 Display controller	Device		Displaycontroller
 Basic information	DevicesView		Basisinformatie
+ACPI Button '%1'	DeviceACPI		ACPI Knop '%1'
 Bus	DevicesView		Bus
+ACPI <unknown>	DeviceACPI		ACPI <onbekend>
 Device name	DevicePCI		Apparaatnaam
 Disk Drive	DeviceSCSI		Schijf
 Other	DeviceSCSI		Andere

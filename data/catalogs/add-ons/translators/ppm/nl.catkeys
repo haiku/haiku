@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-PPMTranslator	3151796093
+1	dutch; flemish	x-vnd.Haiku-PPMTranslator	292474603
 None	PPMTranslator		Geen
 PPM Settings	PPMMain		PPM Instellingen
 System palette 8 bits	PPMTranslator		Systeemkleurenpalet 8 bits
@@ -15,12 +15,14 @@ CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 bits
 OK	PPMMain		OK
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bits
 PPM image	PPMTranslator		PPM afbeelding
+Input color space:	PPMTranslator		Input kleur plaats:
 RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 bits big-endian
 RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bits big-endian
 Write ASCII	PPMTranslator		ASCII schrijven
 RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 bits
 RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 bits big-endian
 RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 bits
+Version %d.%d.%d, %s	PPMTranslator		Versie %d.%d.%d, %s
 CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 bits
 RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 bits
 RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 bits

@@ -1,5 +1,5 @@
-1	dutch; flemish	x-vnd.Haiku-FontDemo	1226842549
-Stop cycling	ControlView		Stop met fietsen
+1	dutch; flemish	x-vnd.Haiku-FontDemo	3449067186
+Stop cycling	ControlView		Stop doorlopen
 Haiku, Inc.	FontDemoView		Haiku, Inc.
 Rotation: %d	ControlView		Rotatie: %d
 Shear: %d	ControlView		Schuintrekken: %d
@@ -9,6 +9,7 @@ Font:	ControlView		Lettertype:
 Drawing mode:	ControlView		Tekenmodus:
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Besturing
+FontDemo	System name		FontDemo
 Outline: %d	ControlView		Omlijning: %d
 Text:	ControlView		Tekst:
 Antialiased text	ControlView		Tekst met antialiassing

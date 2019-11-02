@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Keymap	1642205776
+1	dutch; flemish	x-vnd.Haiku-Keymap	4224552113
 Key	Modifier keys window	As in a computer keyboard key	Toets
 Japanese	KeymapNames		Japans
 Brazilian	KeymapNames		Braziliaans
@@ -35,6 +35,7 @@ Modifier keys	Modifier keys window		Modificatietoetsen
 Kazakh	KeymapNames		Kazachs
 Save as…	Keymap window		Opslaan als...
 Lithuanian (Standard)	KeymapNames		Litouws (Standaard)
+Error: duplicate keys	Modifier keys window		Fout: meerdere rollen voor dezelfde toets
 Bulgarian (Phonetic)	KeymapNames		Bulgaars (fonetisch)
 Canadian-French	KeymapNames		Canadees-Frans
 Hungarian	KeymapNames		Hongaars

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-SGITranslator	549601281
+1	dutch; flemish	x-vnd.Haiku-SGITranslator	129108011
 SGI images	SGITranslator		SGI afbeeldingen
 Use compression:	SGIView		Gebruik compressie:
 SGI image translator	SGIView		SGI afbeelding vertaler
@@ -7,6 +7,7 @@ SGITranslator Settings	SGITranslator		SGIVertaler Instellingen
 SGI Settings	SGIMain		SGI Instellingen
 SGI image translator	SGITranslator		SGI afbeelding vertaler
 None	SGIView		Geen
+Version %d.%d.%d, %s	SGIView		Versie %d.%d.%d, %s
 \nbased on GIMP SGI plugin v1.5:\n	SGIView		\ngebaseerd op GIMP SGI plugin v1.5:\n
 RLE	SGIView		RLE
 written by:\n	SGIView		geschreven door:\n

@@ -1,10 +1,11 @@
-1	dutch; flemish	x-vnd.Haiku-ActivityMonitor	1439119227
+1	dutch; flemish	x-vnd.Haiku-ActivityMonitor	1155619009
 P-faults	DataSource		P-onderbrekingen
 Media nodes	DataSource		Media-eenheid
 Threads	DataSource		Threads
 Always on top	ActivityWindow		Altijd bovenop
 Add graph	ActivityWindow		Voeg grafiek toe
 Teams	DataSource		Teams
+MiB	DataSource		MiB
 Network send	DataSource		Netwerk (uitgaand)
 CPU usage (combined)	DataSource		CPU-gebruik (gecombineerd)
 CPU	DataSource		CPU
@@ -31,6 +32,7 @@ Remove graph	ActivityView		Verwijder grafiek
 CPU usage	DataSource		CPU-gebruik
 Raw clipboard	DataSource		Onbewerkt klembord
 Sems	DataSource		Semaforen
+%.1f MiB	DataSource		%.1f MiB
 ActivityMonitor	System name		ActivityMonitor
 Running applications	DataSource		Lopende toepassingen
 Semaphores	DataSource		Semaforen

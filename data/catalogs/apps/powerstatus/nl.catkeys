@@ -1,8 +1,10 @@
-1	dutch; flemish	x-vnd.Haiku-PowerStatus	2428503748
+1	dutch; flemish	x-vnd.Haiku-PowerStatus	3173765686
 Design capacity low warning: 	PowerStatus		Waarschuwing lage ontwerpcapaciteit:
 Show percent	PowerStatus		Toon percentage
 Design capacity: 	PowerStatus		Ontwerpcapaciteit
  mW	PowerStatus		mW
+The battery level is getting low, please plug in the device.	PowerStatus		De accu is bijna leeg. Sluit alstublieft het apparaat aan op een spanningsbron.
+Battery low	PowerStatus		Accu bijna leeg
 Type: 	PowerStatus		Type:
 non-rechargeable	PowerStatus		Niet-oplaadbaar
 Empty battery slot	PowerStatus		Accuvak is leeg
@@ -27,10 +29,12 @@ Install in Deskbar	PowerStatus		Installeer in Deskbar
 Capacity: 	PowerStatus		Capaciteit
 Battery discharging	PowerStatus		Accu bezig met ontladen
 Serial number: 	PowerStatus		Serienummer:
+Battery critical	PowerStatus		Accu-niveau kritisch laag
 Capacity granularity 1: 	PowerStatus		Capaciteit van granulariteit 1:
 OEM info: 	PowerStatus		OEM-info:
 Design voltage: 	PowerStatus		Ontwerpvoltage:
 Battery charging	PowerStatus		Accu laadt
+The battery level is critical, please plug in the device immediately.	PowerStatus		Het accu-niveau is kritisch laag. Sluit alstublieft het apparaat onmiddelijk aan op een spanningsbron.
 Design capacity warning: 	PowerStatus		Waarschuwing ontwerpcapaciteit:
 Quit	PowerStatus		Afsluiten
 rechargeable	PowerStatus		oplaadbaar

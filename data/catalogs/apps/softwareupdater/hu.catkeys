@@ -1,8 +1,21 @@
-1	hungarian	x-vnd.haiku-softwareupdater	420642285
+1	hungarian	x-vnd.haiku-softwareupdater	818772601
+Updating version	SoftwareUpdaterWindow	List item text	Verzió frissítése
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Kattints ide {0, plural, one{# friss csomag} other{# friss csomag}} telepítéséhez.
+Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Eltávolítandó csomagok
 No active network connection was found	UpdateManager	Error message	Nincs aktív hálózati kapcsolat.
 Quit	SoftwareUpdaterWindow	Alert button label	Kilépés
+There were no updates found.	CheckManager		Nem találtam frissítést.
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		A frissítések telepítése még nem ért véget. Biztosan kilépsz?
+Updates found	SoftwareUpdaterWindow		Frissítéseket találtam
 Update now	SoftwareUpdaterWindow		Frissítés
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Egy hiba miatt nem tudom újraindítani a gépet.
+OK	UpdateManager		Rendben
+Unrecognized argument	SoftwareUpdaterApp	Error message	Ismeretlen paraméter
+There were no updates found.	CheckAction		Nem találtam frissítéseket.
 No updates available	UpdateAction		Nincs elérhető frissítés
+New packages to be installed	SoftwareUpdaterWindow	List super item label	Újonnan telepítendő csomagok
+Packages to be updated	SoftwareUpdaterWindow	List super item label	Frissítendő csomagok
+Attempting to cancel the updates…	SoftwareUpdaterWindow		Frissítés megszakítása…
 Available updates found	CheckManager		Frissítések érhetők el
 from repository	SoftwareUpdaterWindow	List item text	tárolóból
 Cancelling updates	SoftwareUpdaterWindow		Frissítések megszakítása

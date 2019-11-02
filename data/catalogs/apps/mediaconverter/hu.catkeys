@@ -1,8 +1,10 @@
-1	hungarian	x-vnd.Haiku-MediaConverter	1322040280
+1	hungarian	x-vnd.Haiku-MediaConverter	2251404027
+Writing audio track: %d%% complete	MediaConverter		Hangsáv írása: %d%% kész
 Input file not recognized as Audio or Video	MediaConverter		A bemeneti fájl nem azonosítható hang- vagy videóként
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Videó minősége: %3d%%
 Source files	MediaConverter		Forrásfájlok
+Error writing video frame %ld	MediaConverter		Hiba történt a képkocka írása közben: %ld
 Error converting '%filename'	MediaConverter		Hiba történt a(z) '%filename' fájl átalakítása közben
 Selected directory not found. Defaulting to /boot/home	MediaConverter		A választott mappa nem található. Használom az alapértelmezettet: /boot/home
 Conversion completed	MediaConverter		Átalakítás kész
@@ -41,6 +43,7 @@ Error loading files	MediaConverter		Hiba történt a fájlok betöltése során
 End   [ms]: 	MediaConverter		Vége [ms]:
 Cancel	MediaConverter		Mégse
 OK	MediaConverter-FileInfo		Rendben
+Error read audio frame %ld	MediaConverter		Hangsáv olvasási hiba: %ld
 Video encoding:	MediaConverter		Videó kódolása:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Hiba történt a fájl beolvasása közben.\n\nHiba:
 Error	MediaConverter		Hiba
@@ -54,9 +57,11 @@ Duration:	MediaConverter-FileInfo		Időtartam:
 MediaConverter	System name		Médiaátalakító
 Error launching: %strError%	MediaConverter		Hiba történt a %strError% indítása közben
 File format:	MediaConverter		Fájlformátum:
+Error writing audio frame %ld	MediaConverter		Hangsáv írási hiba: %ld
 File	Menu		Fájl
 Video quality not supported	MediaConverter		Nem támogatott videóminőség
 Select this folder	MediaConverter		E mappa kijelölése
+Error read video frame %ld	MediaConverter		Képkocka olvasási hiba: %ld
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld csatorna
 %d bit 	MediaFileInfo		%d bit
 No video	Video codecs list		Nincs videó
@@ -64,5 +69,6 @@ Continue	MediaConverter		Folytatás
 Convert	MediaConverter		Átalakítás
 Audio quality not supported	MediaConverter		Ez a hangminőség nem támogatott
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Nem sikerült írni a megadott útvonalra: %strPath%. Használom az alapértelmezettet: /boot/home
+Writing video track: %d%% complete	MediaConverter		Videósáv írása: %d%% kész
 Preview	MediaConverter		Előnézet
 Start [ms]: 	MediaConverter		Kezdet [ms]:

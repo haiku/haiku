@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-BluetoothPrefs	67867884
+1	hungarian	x-vnd.Haiku-BluetoothPrefs	4182847000
 Laptop	Settings view		Laptop
 Only from trusted devices	Settings view		Csak biztonságos eszközöktől
 15 secs	Settings view		15 mp
@@ -17,9 +17,11 @@ Stop bluetooth services…	Window		Bluetooth-szolgáltatások leállítása…
 Add…	Remote devices		Hozzáadás…
 As blocked	Remote devices		Blokkoltként
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Nincs egy regisztrált Bluetooth eszköz sem a rendszerben
+Policy…	Settings view		Irányelv…
 Revert	Window		Visszaállít
 Refresh local devices…	Window		Helyi eszközök frissítése…
 Disconnect	Remote devices		Kapcsolatbontás
+Identify us as…	Settings view		Azonosítás, mint…
 From all devices	Settings view		Minden eszköztől
 Defaults	Window		Alapértelmezés
 Start bluetooth services…	Window		Bluetooth-szolgáltatások elindítása…
@@ -28,12 +30,14 @@ Scanning progress	Inquiry panel		Keresés folyamatban
 Bluetooth	System name		Bluetooth
 Launch now	main		Indítás
 Remove	Remote devices		Eltávolítás
+Pick device…	Settings view		Eszköz kiválasztása…
 Always ask	Settings view		Mindig kérdezze
 Help	Window		Segítség
 Pair…	Remote devices		Párosítás…
 Retrieving name of %1	Inquiry panel		%1 nevének fogadása
 Inquiry	Inquiry panel		Lekérdezés
 Incoming connections policy:	Settings view		Bejövő kapcsolatokra vonatkozó szabály:
+Retrieving names…	Inquiry panel		Nevek beolvasása…
 Show name	Extended local device view		Név mutatása
 Add device to list	Inquiry panel		Eszköz hozzáadása
 Remaining %1 seconds	Inquiry panel		%1 másodperc van hátra
@@ -47,3 +51,4 @@ Server	Settings view		Kiszolgáló
 Handheld	Settings view		Mobiltelefon
  packets: 	Device View		csomagok:
 About Bluetooth…	Window		A Bluetooth-ról…
+Starting scan…	Inquiry panel		Keresés indítása…

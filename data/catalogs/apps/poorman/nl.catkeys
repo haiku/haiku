@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-PoorMan	3296382959
+1	dutch; flemish	x-vnd.Haiku-PoorMan	1829050509
 Select web folder	PoorMan		Webmap selecteren
 Console logging	PoorMan		Loggen naar console
 Create Log File	PoorMan		Logbestand maken
@@ -30,6 +30,7 @@ Done	PoorMan		Klaar
 Site	PoorMan		Site
 Cannot start the server	PoorMan		Kon de server niet starten
 Create log file	PoorMan		Logbestand maken
+Create public_html	PoorMan		Aanmaken public_html
 Clear hit counter	PoorMan		Maak de hitteller leeg
 Status: Stopped	PoorMan		Status: gestopt
 File	PoorMan		Bestand
@@ -45,6 +46,7 @@ PoorMan	System name		PoorMan
 Clear console log	PoorMan		Console-log wissen
 Run server	PoorMan		Server activeren
 Create	PoorMan		Maken
+{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# verbinding} other{# verbindingen}}
 done.\n	PoorMan		klaar.\n
 PoorMan settings	PoorMan		PoorMan-instellingen
 Console Logging	PoorMan		Consoleloggen

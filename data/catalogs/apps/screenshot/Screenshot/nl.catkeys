@@ -1,7 +1,11 @@
-1	dutch; flemish	x-vnd.haiku-screenshot	4088965159
+1	dutch; flemish	x-vnd.haiku-screenshot	3958461128
 Include window border	ScreenshotWindow		Vensterrand insluiten
 Overwrite	ScreenshotWindow		Overschrijven
 Save in:	ScreenshotWindow		Opslaan in:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Fout bij opslaan \"%s\":\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Het bestand bestaat reeds.\n Weet u zeker dat u het bestand wilt overschrijven?
+OK	ScreenshotWindow		OK
+The destination path exists but is not a folder.	ScreenshotWindow		Het doelpad bestaat, maar is geen map.
 Select	ScreenshotWindow		Selecteren
 Save as:	ScreenshotWindow		Opslaan als:
 seconds	ScreenshotWindow		seconden
@@ -15,7 +19,9 @@ overwrite	ScreenshotWindow		overschrijven
 Settings…	ScreenshotWindow		Instellingen...
 Choose folder	ScreenshotWindow		Kies map
 Name:	ScreenshotWindow		Naam:
+Choose folder…	ScreenshotWindow		Kies map…
 Please select	ScreenshotWindow		Kies alstublieft
+Failed to save screenshot	ScreenshotWindow		Opslaan schermafbeelding mislukt
 Cancel	ScreenshotWindow		Annuleren
 Delay:	ScreenshotWindow		Vertraging:
 Copy to clipboard	ScreenshotWindow		Kopieer naar het klembord

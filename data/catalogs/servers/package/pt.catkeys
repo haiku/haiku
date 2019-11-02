@@ -1,10 +1,12 @@
-1	portuguese	x-vnd.haiku-package_daemon	1846641235
+1	portuguese	x-vnd.haiku-package_daemon	2287015401
+Package changes	PackageResult	Window title	Alterações ao pacote
 uninstall package %s\n	PackageResult	Don't change '%s' variable	desinstalar pacote %s\n
 ignore problem for now	PackageProblem		ignorar o problema por agora
 solution %d:	PackageProblem	Don't change the %d variable	solução %d:
 The following problems have been encountered. Please select a solution for each:	PackageProblem		Foram encontrados os seguintes problemas. Por favor, escolha uma solução para cada um:
 Apply changes	PackageResult		Aplicar alterações
 install package %s from repository %s\n	PackageResult	Don't change '%s' variables	instalar pacote %s do repositório %s\n
+The following additional package changes have to be made:	PackageResult		É necessário efetuar as seguintes alterações adicionais ao pacote:
 Warning	PackageManager		Aviso
 Cancel	PackageProblem		Cancelar
 don't activate package %source%	PackageProblem	don't change '%source%	não ativar o pacote %source%

@@ -1,3 +1,8 @@
-1	dutch; flemish	x-vnd.Haiku-Mandelbrot	1096689144
+1	dutch; flemish	x-vnd.Haiku-Mandelbrot	3919643994
+About	MandelbrotWindow		Over
+Palette	MandelbrotWindow		Palet
+1 (none)	MandelbrotWindow		1 (geen)
+Quit	MandelbrotWindow		Afsluiten
+File	MandelbrotWindow		Bestand
 Mandelbrot	System name		Mandelbrot
 Mandelbrot	MandelbrotWindow		Mandelbrot

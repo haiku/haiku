@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Magnify	1150104797
+1	dutch; flemish	x-vnd.Haiku-Magnify	2576356921
 Decrease pixel size	Magnify-Main		Pixelgrootte verkleinen
 Increase pixel size	Magnify-Main		Pixelformaat vergroten
 Stick coordinates	Magnify-Main		Coördinaten vasthouden
@@ -6,8 +6,11 @@ Copy image	Magnify-Main		Afbeelding kopiëren
 Decrease window size	Magnify-Main		Venster verkleinen
 Remove a crosshair	Magnify-Main		Een dradenkruis verwijderen
 Add a crosshair	Magnify-Main		Een dradenkruis toevoegen
+Freeze image	Magnify-Main		Afbeelding vastleggen
 Increase window size	Magnify-Main		Venster vergroten
 Save image	Magnify-Main		Afbeelding opslaan
+Show grid	Magnify-Main		Toon raster
 Magnify	System name		Magnify
 Info	Magnify-Main		Info
+Show info	Magnify-Main		Toon info
 Make square	Magnify-Main		Vierkant maken

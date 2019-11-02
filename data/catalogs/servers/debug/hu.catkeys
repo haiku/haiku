@@ -1,5 +1,6 @@
-1	hungarian	x-vnd.Haiku-debug_server	166857212
+1	hungarian	x-vnd.Haiku-debug_server	3188340596
 The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		A következő program:\n\n %app\n\nhibába ütközött, és nem tud tovább futni. A Haiku leállítja a programot.
+Oh yeah!	DebugServer		Remek!
 Debug	DebugServer		Hibakeresés
 Terminate	DebugServer		Megszakítás
 Save report	DebugServer		Jelentés mentése

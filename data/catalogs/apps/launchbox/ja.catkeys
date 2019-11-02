@@ -5,7 +5,7 @@ OK	LaunchBox		OK
 Ignore double-click	LaunchBox		ダブルクリックを無視する
 Show on all workspaces	LaunchBox		すべてのワークスペースに表示
 Name Panel	LaunchBox		名前パネル
-Autostart	LaunchBox		自動起動
+Autostart	LaunchBox		自動的に起動
 Clone	LaunchBox		複製
 Description for '%3'	LaunchBox		'%3' の説明
 Show window border	LaunchBox		ウィンドウ枠を表示

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.haiku-icon_o_matic	488985677
+1	dutch; flemish	x-vnd.haiku-icon_o_matic	3554185674
 None	Icon-O-Matic-Properties		Geen
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Pad-indices roteren
 Add empty	Icon-O-Matic-ShapesList		Lege toevoegen
@@ -16,6 +16,7 @@ Rotate	Icon-O-Matic-TransformationBoxStates		Roteren
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		Controlepunten verwijderen
 Shorten	Icon-O-Matic-PropertyNames		Afkorten
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Pad ontzeggen
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		De tekst die u probeert te importeren is vrij lang. Weet u het zeker?
 Paste	Icon-O-Matic-Properties		Plakken
 Detect Orient.	Icon-O-Matic-PropertyNames		Oriëntatie opmerken.
 Click on a shape above	Empty transformers list - 1st line		Klik op een vorm hierboven
@@ -75,6 +76,7 @@ Remove	Icon-O-Matic-PathManipulator		Verwijderen
 Duplicate	Icon-O-Matic-ShapesList		Dupliceren
 Contour	Transformation		Contour
 Perspective	Icon-O-Matic-TransformersList		Perspectief
+Save icon	Dialog title		Icoon opslaan
 Move Paths	Icon-O-Matic-MovePathsCmd		Paden verplaatsen
 Rounding	Icon-O-Matic-PropertyNames		Afronding
 Joins	Icon-O-Matic-PropertyNames		Hechtpunten
@@ -91,6 +93,7 @@ Diamond	Icon-O-Matic-StyleTypes		Diamantvormig
 Add Style	Icon-O-Matic-AddStylesCmd		Stijl toevoegen
 Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Controlepunten benaderen
 Move Styles	Icon-O-Matic-MoveStylesCmd		Stijlen verplaatsen
+Don't save	Icon-O-Matic-Menu-Settings		Niet opslaan
 Add shape with path	Icon-O-Matic-Menu-Shape		Pad met vorm toevoegen
 Translation X	Icon-O-Matic-PropertyNames		X-verschuiving
 Flip Control Points	Icon-O-Matic-FlipPointsCmd		Controlepunten omwisselen
@@ -140,11 +143,13 @@ Insert Control Point	Icon-O-Matic-InsertPointCmd		Controlepunt invoegen
 Add shape with path & style	Icon-O-Matic-Menu-Shape		Vorm met pad & stijl toevoegen
 Move Shape	Icon-O-Matic-MoveShapesCommand		Vorm verplaatsen
 Radial	Icon-O-Matic-StyleTypes		Radiaal
+Text too long	Icon-O-Matic-StyledTextImport		Tekst te lang
 Caps	Icon-O-Matic-PropertyNames		Hoofdletters
 OK	Icon-O-Matic-SVGImport		Oké
 Append…	Icon-O-Matic-Menu-File		Toepassen...
 Scale Y	Icon-O-Matic-PropertyNames		Y-schaal
 Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Kon het bestand '%s' niet als SVG-document openen.\n\nFout: %s
+Export icon	Dialog title		Exporteer icoon
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Kleur (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Gradiënt aanpassen
 Set 	Set (property name)		Instellen

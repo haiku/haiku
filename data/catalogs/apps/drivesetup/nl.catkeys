@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-DriveSetup	233536944
+1	dutch; flemish	x-vnd.Haiku-DriveSetup	1934767996
 Could not unmount partition %s.	MainWindow		Kon partitie %s niet onttrekken.
 Mount all	MainWindow		Alles betrekken
 Disk	MainWindow		Schijf
@@ -6,9 +6,14 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Device	PartitionList		Apparaat
 Initialize	MainWindow		Initialiseren
 Could not change the parameters of the selected partition.	MainWindow		Kon de parameters van de geselecteerde partitie niet wijzigen.
+PGP encrypted	Encryption utils		PGP versleuteld
 Delete partition	MainWindow		Partitie verwijderen
 Error: 	MainWindow	in any error alert	Fout:
+Removable	PartitionList		Verwijderbaar
+Block size	PartitionList		Blok grootte
+The panel experienced a problem!	MainWindow		Het paneel ondervond een probleem!
 Device	DiskView		Apparaat
+Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Bent u zeker dat u de Intel Uitgebreide Partitie wil formatteren? Elke sub partitie hierin zal overschreven worden als u doorgaat. U wordt nog gevraagd voordat de wijzigingen geschreven worden naar de schijf.
 Unmount	MainWindow		Onttrekken
 Failed to format the partition %s!\n	MainWindow		Formatteren van partitie %s is mislukt!\n
 Partition size	CreateParametersPanel		Partitiegrootte
@@ -24,45 +29,76 @@ Validation of the given creation parameters failed.	MainWindow		Natrekken van de
 Eject	MainWindow		Uitwerpen
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\n&U zult alle gegevens op de %s schijf onherroepelijk kwijt zijn als u dit doet!
 Surface test (not implemented)	MainWindow		Oppervlaktetest (niet geïmplementeerd)
+Read only	PartitionList		Alleen lezen
+The panel could not return successfully.	MainWindow		Het paneel kon niet succesvol terugkeren.
+Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Fout tijdens het schrijven van de parameters van de partitie. Er werden geen veranderingen naar de schijf geschreven.
 Partition %ld	DiskView		Partitie %ld
 There's no space on the partition where a child partition could be created.	MainWindow		De partitie heeft geen ruimte waarin een onderliggende partitie kan worden gemaakt.
 No disk devices have been recognized.	DiskView		Er werden geen schijfapparaten herkend.
+Attributes	PartitionList		Attributen
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Kon de partitie niet verwijderen. Er werden geen veranderingen naar de schijf geschreven.
+Change parameters…	MainWindow		Wijzig parameters…
+Format	InitializeParametersPanel		Formateer
 Could not unmount partition	MainWindow		Kon partitie niet onttrekken.
+Create	CreateParametersPanel		Maken
 File system	PartitionList		Bestandssysteem
 The selected partition does not contain a partitioning system.	MainWindow		De geselecteerde partitie bevat geen partitioneringssysteem.
+End: %s	Support		Einde: %s
+Partition type	PartitionList		Partitie type
 Unable to find the selected partition by ID.	MainWindow		Kan de geselecteerde partitie niet vinden op basis van ID.
 The currently selected partition is not empty.	MainWindow		De nu geselecteerde partitie is niet leeg.
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Weet u zeker dat u een gegevensdrager direct wil formatteren zonder initialisatie? (Normaliter wordt deze eerst voorzien van een partitietabel.) U krijgt deze vraag nogmaals voordat de wijzigingen op de schijf weggeschreven worden.
 Wipe (not implemented)	MainWindow		Wissen (niet geïmplementeerd)
 The currently selected partition does not have a parent partition.	MainWindow		De nu geselecteerde partitie heeft geen bovenliggende partitie.
 Validation of the given initialization parameters failed.	MainWindow		Natrekken van de opgegeven initialisatieparameters is mislukt.
+Shared	PartitionList		Gedeeld
+MIMEs	PartitionList		MIMEs
+BitLocker encrypted	Encryption utils		BitLocker versleuteld
 You need to select a partition entry from the list.	MainWindow		U dient een partitie uit de lijst te selecteren.
+Offset: %s	Support		Offset: %s
+SafeBoot encrypted	Encryption utils		SafeBoot versleuteld
 Volume name	PartitionList		Naam gegevensdrager
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\nU zult alle gegevens op de partitie onherroepelijk kwijt zijn als u dit doet!
 Change	ChangeParametersPanel		Wijzigen
+Partition name:	ChangeParametersPanel		Partitie naam:
+LUKS encrypted	Encryption utils		LUKS versleuteld
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\nU zult alle gegevens op de %s partitie onherroepelijk kwijt zijn als u dit doet!
 Cancel	AbstractParametersPanel		Annuleren
 Format	MainWindow		Formatteren
+<empty or unknown>	DiskView		<leeg of onbekend>
 OK	MainWindow		Oké
+Open with DiskProbe	MainWindow		Open met DiskProbe
 Could not delete the selected partition.	MainWindow		Kon de geselecteerde partitie niet verwijderen.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Weet u zeker at u de geselecteerde schijf wilt initialiseren? Alle gegevens zullen verloren gaan. Het zal u nogmaals gevraagd worden voordat de gegevens naar de schrijf geschreven zullen worden.\n
 There was an error preparing the disk for modifications.	MainWindow		Fout tijdens het voorbereiden van de schijf voor aanpassingen.
 The disk has been successfully initialized.\n	MainWindow		De schijf werd met succes geïnitialiseerd.\n
+Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Moet het onttrekken geforceerd worden?\n\nNota: als een toepassing op dit moment schrijft naar de gegevensdrager, kan het nu onttrekken potentieel leiden tot dataverlies.\n
 Cancel	MainWindow		Annuleren
+Free space	PartitionList		Vrije ruimte
+Queries	PartitionList		Zoekopdrachten
+Force unmount	MainWindow		Forceer onttrekking
 Partition	MainWindow		Partitie
+Change parameters	MainWindow		Verander parameters
 Rescan	MainWindow		Opnieuw afzoeken
 There was an error acquiring the partition row.	MainWindow		Er is een fout ontstaan bij het verkrijgen van de partitieregel.
 Failed to initialize the disk %s!\n	MainWindow		Initialisatie van de schijf %s is mislukt!\n
+Disk system \"%s\" not found!	MainWindow		Mediaschema \"%s\" niet gevonden!
 Delete	MainWindow		Verwijderen
+Partition type:	ChangeParametersPanel		Partitie type:
 Parameters	PartitionList		Parameters
 Could not acquire partitioning information.	MainWindow		Kon niet alle partitioneringsinformatie verkrijgen.
 Cannot delete the selected partition.	MainWindow		Kan de geselecteerde partitie niet verwijderen.
 Continue	MainWindow		Doorgaan
 Could not mount partition %s.	MainWindow		Kon partitie %s niet betrekken.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Weet u zeker dat u de partitie wilt formatteren? U krijgt deze vraag nogmaals voordat de wijzigingen op de schijf weggeschreven worden.
+<empty or unknown>	PartitionList		<leeg of onbekend>
 The selected disk is read-only.	MainWindow		De geselecteerde schijf is alleen-lezen.
 The partition %s is already unmounted.	MainWindow		De partitie %s is al onttrokken.
+Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Weet u zeker dat u de parameters van de geselecteerde partitie wilt wijzigen?\n\nNa de wijziging kan de partitie mogelijk niet meer herkend worden door andere besturingssystemen!
+Boot	PartitionList		Opstarten
 OK	AbstractParametersPanel		Oké
+Virtual	PartitionList		Virtueel
+Virtual	DiskView		Virtueel
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\nU zult alle gegevens op de geselecteerde schijf onherroepelijk kwijt zijn als u dit doet!
 Select a partition from the list below.	DiskView		Selecteer een partitie uit onderstaande lijst.
 Active	PartitionList		Actief

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-CodyCam	1770279704
+1	dutch; flemish	x-vnd.Haiku-CodyCam	2593355250
 destination directory expected	CodyCam		doelmap verwacht
 reply: '%s'\n	SftpClient		antwoord: '%s'\n
 JPEG image	CodyCam		JPEG-afbeelding
@@ -27,6 +27,7 @@ Every 2 hours	CodyCam		Elke 2 uur
 Cannot get a time source	CodyCam		Kan geen tijdsbron krijgen
 Every 4 hours	CodyCam		Elke 4 uur
 cmd: '%s'\n	FtpClient		cmd: '%s'\n
+Closing the window	VideoConsumer.cpp		Venster sluiten
 Never	CodyCam		Nooit
 Every 8 hours	CodyCam		Elke 8 uur
 Cannot start the video source	CodyCam		Kan videobron niet starten
@@ -38,6 +39,7 @@ still image filename expected	CodyCam		bestandsnaam van afbeelding verwacht
 File name:	CodyCam		Bestandsnaam:
 Directory:	CodyCam		Map:
 Error setting type of output file	VideoConsumer.cpp		Fout bij het instellen van het type uitvoerbestand
+Locking the window	VideoConsumer.cpp		Venster vergrendelen
 Cannot find an available video stream	CodyCam		Kan geen beschikbare videostream vinden
 Upload…	VideoConsumer.cpp		Uploaden…
 password expected	CodyCam		wachtwoord verwacht

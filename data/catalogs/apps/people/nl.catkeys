@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Be-PEPL	3676386979
+1	dutch; flemish	x-vnd.Be-PEPL	2332202134
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Het starten van het Bestandstypespreflet om de attributen van de persoon in te stellen is mislukt.\n\nFout:
 Unnamed person	People		Naamloze persoon
 New person…	People		Nieuw persoon...
@@ -32,6 +32,7 @@ Contact information for a person.	Long mimetype description		Contactinfo voor ee
 Remove image	People		Afbeelding verwijderen
 City	People		Stad
 Undo	People		Ongedaan maken
+Don't save	People		Niet opslaan
 Configure attributes	People		Attributen configureren
 Work phone	People		Telefoon werk
 State	People		Provincie

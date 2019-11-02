@@ -15,7 +15,7 @@ Follow symbolic links	GrepWindow		シンボリックリンクに従う
 Regular expression	GrepWindow		正規表現
 Text files only	GrepWindow		テキストファイルのみ
 Quit	GrepWindow		終了
-Show files in Tracker	GrepWindow		Tracker でファイルを選択
+Show files in Tracker	GrepWindow		ファイルの場所を表示
 Please select the files you wish to keep searching.	GrepWindow		検索したいファイルを選択してください。
 Trim to selection	GrepWindow		選択部のみ残す
 Set target…	GrepWindow		ターゲットの指定…

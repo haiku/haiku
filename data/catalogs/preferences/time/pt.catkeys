@@ -1,9 +1,14 @@
-1	portuguese	x-vnd.Haiku-Time	3878512619
+1	portuguese	x-vnd.Haiku-Time	752043118
 OK	Time		OK
 Message receiving failed	Time		Falha ao receber a mensagem
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Data & Hora, escrito por:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nTodos os direitos reservados 2004-2012, Haiku.
 Australia	Time		Austrália
 America	Time		América
+Reset to default server list	Time		Predefinir para a lista de servidores original
+Could not resolve server address	Time		Não foi possível resolver o endereço do servidor
 Set time zone	Time		Definir fuso horário
+Waiting for answer failed	Time		Falha na espera de resposta
+<Other>	Time		<Outro>
 Received invalid time	Time		Recebida hora inválida
 Remove	Time		Remover
 Synchronize again	Time		Sincronizar novamente
@@ -24,6 +29,7 @@ Time zone	Time		Fuso horário
 Clock	Time		Relógio
 Network time	Time		Hora da rede
 Sending request failed	Time		Falha ao enviar pedido
+Preview time:	Time		Pré-visualizar hora:
 \nNow: 	Time		\nAgora: 
 Could not create socket	Time		Não foi possível criar o socket
 Pacific	Time		Pacífico

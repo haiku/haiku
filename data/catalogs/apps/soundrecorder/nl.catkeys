@@ -1,13 +1,15 @@
-1	dutch; flemish	x-vnd.Haiku-SoundRecorder	3982150268
+1	dutch; flemish	x-vnd.Haiku-SoundRecorder	24440888
 Loop	RecorderWindow		Herhalen
 Cannot find default audio hardware	RecorderWindow		Kan de standaard-hardware voor geluid niet vinden
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Kan het tijdelijke bestand van de nieuwe opname niet vinden.
 Sample size:	RecorderWindow		Samplegrootte:
 Nothing to play	RecorderWindow		Niets om af te spelen
+None of the files appear to be audio files.	RecorderWindow		Geen van de bestanden lijken audiobestanden te zijn.
 Duration: 	RecorderWindow		Tijdsduur:
 File info	RecorderWindow		Bestandsinfo
 Drop files here	SoundListView		Sleep bestanden hierheen
 Input	RecorderWindow		Input
+Some of the files don't appear to be audio files.	RecorderWindow		Sommige van de bestanden lijken geen audiobestanden te zijn.
 Stop	RecorderWindow		Stop
 Format:	RecorderWindow		Formaat:
 Sound List	RecorderWindow		Geluidlijst
@@ -40,4 +42,5 @@ Channels: 	RecorderWindow		Kanalen:
 Save	RecorderWindow		Opslaan
 Sample rate: 	RecorderWindow		Sample-waarde:
 Cannot connect to media server	RecorderWindow		Kan geen verbinding maken met mediaserver
+The file doesn't appear to be an audio file.	RecorderWindow		Het bestand lijkt geen audiobestand te zijn.
 File name:	RecorderWindow		Bestandsnaam:

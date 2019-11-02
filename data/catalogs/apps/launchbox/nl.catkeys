@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-LaunchBox	3016105370
+1	dutch; flemish	x-vnd.Haiku-LaunchBox	3692177981
 Set description…	LaunchBox		Naamgeving...
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Deze balk echt sluiten?\n(De balk wordt niet onthouden.)
 OK	LaunchBox		Oké
@@ -13,6 +13,7 @@ Failed to launch 'something', error in Pad data.	LaunchBox		Het starten van 'iet
 LaunchBox	System name		LaunchBox
 Auto-raise	LaunchBox		Automatisch bovenop
 Icon size	LaunchBox		Icoongrootte
+Open containing folder	LaunchBox		Bijbehorende map openen
 Add button here	LaunchBox		Voeg hier knop toe
 Cancel	LaunchBox		Annuleren
 launch popup	LaunchBox		Pop-up starten

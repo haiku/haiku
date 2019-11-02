@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku.TextSearch	293043021
+1	dutch; flemish	x-vnd.Haiku.TextSearch	1652401640
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Kies alstublieft de bestanden die u in Tracker geselecteerd wilt hebben.
 Open selection	GrepWindow		Selectie openen
 Actions	GrepWindow		Acties
@@ -9,13 +9,14 @@ Close	GrepWindow		Sluiten
 Look in sub-folders	GrepWindow		In submappen zoeken
 %s: Not enough room to escape the filename.	Grepper		%s: Niet genoeg ruimte om de bestandsnaam om te vormen.
 Follow symbolic links	GrepWindow		Symbolische koppelingen volgen
+Regular expression	GrepWindow		Reguliere expressie
 Text files only	GrepWindow		Alleen tekstbestanden
 Quit	GrepWindow		Afsluiten
 Show files in Tracker	GrepWindow		Toon bestanden in Tracker
 Please select the files you wish to keep searching.	GrepWindow		Selecteer alstublieft de bestanden waarin u wilt blijven zoeken. 
 Trim to selection	GrepWindow		Beperken tot selectie
 Set target…	GrepWindow		Doel instellen...
-TextSearch	GrepWindow		Text_search
+TextSearch	GrepWindow		Tekst zoeken
 Search	GrepWindow		Zoeken
 Copy text to clipboard	GrepWindow		Kopieer de tekst naar het klembord
 Show lines	GrepWindow		Toon regels

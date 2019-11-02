@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Installer	4200011523
+1	dutch; flemish	x-vnd.Haiku-Installer	3797764231
 Performing installation.	InstallProgress		Uitvoering installatie.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Kies de bronschijf in de pop-up-menu's. Klik daarna \"Begin\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Sluit alstublieft het DriveSetup-venster voordat u het Installer-venster sluit.
@@ -27,14 +27,17 @@ Running Boot Manager…\n\nClose Boot Manager to continue with the installation.
 Quit DriveSetup	InstallerWindow		DriveSetup afsluiten
 Write boot sector	InstallerWindow		Schrijf opstartsector
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld van %2ld
+Finishing installation.	InstallProgress		Installatie afronden.
 Install from:	InstallerWindow		Installeer vanaf:
 Additional disk space required: 0.0 KiB	InstallerWindow		Meer schijfruimte vereist: 0.0 KiB
+This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Dit is bèta kwaliteits-software! Dit betekend dat er een risico is bij het verlies van belangrijke data. Maak geregeld back-ups!U bent gewaarschuwd.\n\n\n
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Wanneer u met succes Haiku voor het eerst start, lees dan onze \"Welkom\" en \"Gebruikersgids\" documentatie. Er staan links op het bureaublad en in de bladwijzers van WebPositive.\n\n
 ???	InstallerWindow	Unknown currently copied item	???
 Install anyway	InstallProgress		Toch installeren
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Kies bron- en doelschijf in de pop-up-menu's. Klik daarna \"Begin\".
 Hide optional packages	InstallerWindow		Optionele paketten niet tonen
 ???	InstallerWindow	Unknown partition name	???
+Have fun and thanks for trying out Haiku!	InstallerApp		Veel plezier en bedankt voor het uitproberen van Haiku!
 Quit	InstallerApp		Afsluiten
 OK	InstallerWindow		Oké
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Sluit alstublieft de vensters van Boot Manager en DriveSetup, voordat u het Installer-venster sluit.

@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-Appearance	2192653334
+1	portuguese	x-vnd.Haiku-Appearance	3614952073
 Control border	Colors tab		Limite do controlo
 Control mark	Colors tab		Marca de controlo
 Off	AntialiasingSettingsView		Desligado
@@ -15,6 +15,7 @@ Reduce colored edges filter strength:	AntialiasingSettingsView		Reduzir força d
 Glyph hinting:	AntialiasingSettingsView		Melhoramento de glifos:
 Default Haiku ControlLook	DecorSettingsView		Controlador de aspeto predefinido do Haiku
 Menu item text	Colors tab		Texto do item de menu
+About decorator	DecorSettingsView		Acerca do decorador
 Antialiasing menu	AntialiasingSettingsView		Menu anti-aliasing
 Success	Colors tab		Sucesso
 About	DecorSettingsView		Acerca
@@ -49,6 +50,7 @@ Window tab	Colors tab		Separador de janela
 Link text	Colors tab		Texto de ligação
 Tooltip background	Colors tab		Fundo da descrição
 ControlLook:	DecorSettingsView		Controlador de aspeto:
+Default	DecorSettingsView		Pré-definido
 Link visited	Colors tab		Ligação visitada
 Selected menu item border	Colors tab		Limite do item de menu seleccionado
 Tooltip text	Colors tab		Texto da descrição
@@ -71,3 +73,4 @@ Inactive window border	Colors tab		Limite de janela inativa
 Colors	APRWindow		Cores
 Control highlight	Colors tab		Realce do controlo
 Status bar	Colors tab		Barra de estado
+Single:	DecorSettingsView		Único:

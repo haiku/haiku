@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-BootManager	1736861229
+1	dutch; flemish	x-vnd.Haiku-BootManager	867546001
 Old Master Boot Record backup failure	BootManagerController	Title	Backup vorige Master Boot Record mislukt
 At least one partition must be selected!	BootManagerController		Er moet tenminste één partitie geselecteerd worden!
 No space available!	DrivesPage	Cannot install	Geen ruimte beschikbaar!
@@ -16,6 +16,7 @@ Never	DefaultPartitionPage		Nooit
 Summary	BootManagerController	Title	Overzicht
 An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Er is een fout opgetreden bij het schrijven van het boot-menu. De Master Boot Record zou kunnen worden vernietigd, daarom moet u de MBR nu herstellen!
 After three seconds	DefaultPartitionPage		Na drie seconden
+Read only!	DrivesPage	Cannot install	Enkel lezen!
 Write boot menu	BootManagerController	Button	Opstartmenu schrijven
 OK	BootManagerController	Button	Ok
 Uninstall boot manager	BootManagerController	Title	Boot manager verwijderen
@@ -23,7 +24,7 @@ About to write the following boot menu to the boot disk (%s). Please verify the 
 The first partition on the disk starts too early and does not leave enough space free for a boot menu.\nBoot Manager needs 2 KiB available space before the first partition.	BootManagerController		De eerste partitie op de schijf begint te vroeg en laat niet genoeg ruimte vrij voor het opstartmenu.\nBoot Manager heeft 2 KiB vrije ruimte nodig voor de eerste partitie.
 Uninstall	DrivesPage	Button	Verwijderen
 Update	DrivesPage	Button	Bijwerken
-The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Het Master Boot Record (MBR) van het opstartapparaat:\n\t%s\nwordt nu opgeslagen op de schijf. Selecteerd a.u.b. een map om de MRB in op te slaan.\n\nAls er iets misgaat met de installatie of als je later het opstartmenu wilt verwijderen, open simpelweg het bootman programma en kies de 'Verwijderen' optie.
+The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Het Master Boot Record (MBR) van het opstartapparaat:\n\t%s\nzal nu worden opgeslagen op de schijf. Kies alstublieft een bestand om een backup van de MBR in op te slaan.\n\nAls er iets misgaat met de installatie of als u later het opstartmenu wilt verwijderen, open simpelweg het bootman programma en kies de optie 'Verwijderen'.
 Default Partition	DefaultPartitionPage	Title	Standaardpartitie
 Installation of boot menu completed	BootManagerController	Title	Installatie van opstartmenu voltooid
 After one minute	DefaultPartitionPage		Na één minuut
@@ -40,6 +41,7 @@ The partition table of the first hard disk is not compatible with Boot Manager.\
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Selecteer a.u.b de schijf waar je de boot manager op wilt installeren of van verwijderen.
 After four seconds	DefaultPartitionPage		Na vier seconden
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Naamloos %d
+First partition starts too early	BootManagerController	Title	Eerste partitie begint te vroeg
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Op het punt om het opstartmenu naar de schijf te schrijven. Ben je zeker dat je wilt doorgaan?
 Partitions	DefaultPartitionPage	Pop up menu title	Partities
 Default Partition:	DefaultPartitionPage	Menu field label	Standaardpartitie:
