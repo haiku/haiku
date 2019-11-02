@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-void hpet_init(void);
+void arch_timer_init(void);
 
 #ifdef __cplusplus
 }

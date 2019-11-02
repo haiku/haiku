@@ -22,11 +22,11 @@
 #include "acpi.h"
 #include "console.h"
 #include "efi_platform.h"
-#include "hpet.h"
 #include "cpu.h"
 #include "mmu.h"
 #include "serial.h"
 #include "smp.h"
+#include "timer.h"
 
 
 extern void (*__ctor_list)(void);
@@ -88,8 +88,10 @@ convert_kernel_args()
 	fix_address(gKernelArgs.edid_info);
 	fix_address(gKernelArgs.debug_output);
 	fix_address(gKernelArgs.boot_splash);
+	#if defined(__x86_64__) || defined(__x86__)
 	fix_address(gKernelArgs.arch_args.apic);
 	fix_address(gKernelArgs.arch_args.hpet);
+	#endif
 
 	convert_preloaded_image(static_cast<preloaded_elf64_image*>(
 		gKernelArgs.kernel_image.Pointer()));
@@ -261,12 +263,14 @@ efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systemTable)
 	gKernelArgs.platform_args.apm.version = 0;
 
 	gKernelArgs.num_cpus = 1;
+	#if defined(__x86_64__) || defined(__x86__)
 	gKernelArgs.arch_args.hpet_phys = 0;
 	gKernelArgs.arch_args.hpet = NULL;
+	#endif
 
 	cpu_init();
 	acpi_init();
-	hpet_init();
+	timer_init();
 	smp_init();
 
 	main(&args);

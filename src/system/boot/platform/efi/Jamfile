@@ -27,9 +27,9 @@ local platform_src =
 	mmu.cpp
 	heap.cpp
 	acpi.cpp
+	timer.cpp
 	menu.cpp
 	devices.cpp
-	hpet.cpp
 	cpu.cpp
 	smp.cpp
 	serial.cpp

@@ -7,11 +7,13 @@
 */
 
 
+#include "arch_timer.h"
+
 #include "mmu.h"
 #include "acpi.h"
-#include "hpet.h"
 
 #include <KernelExport.h>
+#include <SupportDefs.h>
 
 #include <kernel.h>
 #include <safemode.h>
@@ -23,15 +25,15 @@
 
 #include <string.h>
 
-//#define TRACE_HPET
-#ifdef TRACE_HPET
+//#define TRACE_TIMER
+#ifdef TRACE_TIMER
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
 #endif
 
 
-void
+static void
 hpet_init(void)
 {
 	// Try to find the HPET ACPI table.
@@ -52,4 +54,11 @@ hpet_init(void)
 	gKernelArgs.arch_args.hpet_phys = hpet->hpet_address.address;
 	gKernelArgs.arch_args.hpet = (void *)mmu_map_physical_memory(
 		gKernelArgs.arch_args.hpet_phys, B_PAGE_SIZE, EfiACPIReclaimMemory);
+}
+
+
+void
+arch_timer_init(void)
+{
+	hpet_init();
 }

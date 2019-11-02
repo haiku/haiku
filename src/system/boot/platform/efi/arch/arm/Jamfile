@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src system boot platform efi arch x86_64 ;
+SubDir HAIKU_TOP src system boot platform efi arch arm ;
 
 SubDirHdrs $(HAIKU_TOP) src system boot platform efi ;
 
@@ -8,14 +8,14 @@ UseBuildFeatureHeaders gnuefi : headersProtocol ;
 UseBuildFeatureHeaders gnuefi : headersArch ;
 
 local arch_src =
-	entry.S
+	#entry.S
 	relocation_func.cpp
-	arch_smp.cpp
-	arch_mmu.cpp
+	#arch_smp.cpp
+	#arch_mmu.cpp
 	arch_timer.cpp
 	;
 
-BootMergeObject boot_platform_efi_x86_64.o :
+BootMergeObject boot_platform_efi_arm.o :
 	$(arch_src)
 	;
 

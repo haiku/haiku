@@ -203,7 +203,11 @@ mmu_post_efi_setup(UINTN memory_map_size, EFI_MEMORY_DESCRIPTOR *memory_map, UIN
 	kRuntimeServices->SetVirtualAddressMap(memory_map_size, descriptor_size, descriptor_version, memory_map);
 
 	// Important.  Make sure supervisor threads can fault on read only pages...
+	#if defined(__x86_64__) || defined(__x86__)
 	asm("mov %%rax, %%cr0" : : "a" ((1 << 31) | (1 << 16) | (1 << 5) | 1));
+	#else
+	#error Ensure supervisor threads can fault on read-only pages on this architecture!
+	#endif
 }
 
 
