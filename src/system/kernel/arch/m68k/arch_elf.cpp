@@ -148,7 +148,7 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 	int i;
 	Elf32_Sym *sym;
 	int vlErr;
-	addr_t S = 0;	// symbol address
+	elf_addr S = 0;	// symbol address
 	addr_t R = 0;	// section relative symbol address
 
 	addr_t G = 0;	// GOT address
