@@ -1,0 +1,95 @@
+SubDir HAIKU_TOP src system boot platform next_m68k ;
+
+SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform next_m68k ;
+
+UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
+UsePrivateHeaders [ FDirName kernel platform $(TARGET_BOOT_PLATFORM) ] ;
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName graphics common ] ;
+#UsePrivateHeaders [ FDirName graphics vesa ] ;
+UsePrivateHeaders [ FDirName storage ] ;
+
+{
+	local defines = _BOOT_MODE ;
+
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) ; # -save-temps
+	SubDirC++Flags $(defines) -fno-rtti ;
+}
+
+local platform ;
+for platform in [ MultiBootSubDirSetup next_m68k ] {
+	on $(platform) {
+		#SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
+
+		BootMergeObject boot_platform_next_m68k_shell.o :
+			shell.S
+			: -Wa,--pcrel
+		;
+
+
+		# cpu-specific stuff
+		# should be moved to boot/arch/m68k/...
+		# TODO: add 020+68851 support
+
+
+		BootMergeObject boot_platform_next_m68k_other.o :
+		#	shell.S
+			start.cpp
+			debug.cpp
+			#bios.S
+			console.cpp
+			#serial.cpp
+#			Handle.cpp
+			devices.cpp
+			keyboard.cpp
+			menu.cpp
+			mmu.cpp
+			cpu.cpp
+			#smp.cpp
+			#smp_trampoline.S
+		#	support.S
+			video.cpp
+			#apm.cpp
+
+			# VESA/DDC EDID
+			#decode_edid.c
+			#dump_edid.c
+
+			: #-Wa,--pcrel
+			: boot_platform_generic_next_m68k.a
+		;
+
+
+		BootMergeObject boot_platform_next_m68k.o :
+			: :
+			boot_platform_next_m68k_shell.o
+			boot_platform_next_m68k_other.o
+#			boot_arch_m68k_030.o
+#			boot_arch_m68k_040.o
+		;
+
+		BootMergeObject aligntest_prg.o :
+			aligntest.c
+			: -Wa,--pcrel
+		;
+
+		# used to check alignment of struct mon_global
+		# The simplest way to do it was to build a program on a platform we know how to link and run
+		# and we can already build Atari programs as long as they don't need relocations.
+		AtariBootPrgLd aligntest.prg :
+			aligntest_prg.o
+			: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/boot_prg_atari_m68k.ld
+			: -Bstatic
+		;
+	}
+}
+
+SEARCH on [ FGristFiles $(genericPlatformSources) ]
+	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
+
+# Tell the build system to where stage1.bin can be found, so it can be used
+# elsewhere.
+SEARCH on stage1.bin = $(SUBDIR) ;
+
+# cf pxe_ia32 Jamfile for stage1

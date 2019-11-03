@@ -28,6 +28,10 @@ rule BuildOpenFirmwareLoader {
 rule BuildAoutLoader {
 	local haikuLoader = $(1) ;
 	local bootLoader = $(2) ;
+
+	Depends $(haikuLoader) : $(bootLoader) ;
+	MakeLocateDebug $(haikuLoader) ;
+
 	ELF2AOUT on $(haikuLoader) = <build>elf2aout ;
 	Depends $(haikuLoader) : <build>elf2aout ;
 }
@@ -374,6 +378,9 @@ for platform in [ MultiBootSubDirSetup ] {
 					: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/boot_prg_$(TARGET_BOOT_PLATFORM).ld
 					: -Bstatic
 				;
+
+			case next_m68k :
+				BuildAoutLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
 
 			case * :
 				Exit "Currently unsupported haiku_loader:" $(TARGET_BOOT_PLATFORM) ;
