@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Network	3694799483
+1	french	x-vnd.Haiku-Network	3039697761
 Ethernet device	InterfaceListItem		Périphérique Ethernet
 Link speed:	IntefaceView		Vitesse du lien :
 disconnected	IntefaceView		déconnecté
@@ -40,6 +40,7 @@ disabled	InterfaceListItem		désactivé
 Dial-up connection	InterfaceListItem		Connexion téléphonique
 on	ServiceListItem		allumé
 The method for obtaining an IP address	IntefaceAddressView		Méthode d’obtention de l’adresse IP
+disconnected	InterfaceListItem		déconnecté
 Automatic	IntefaceAddressView		Automatique
 Choose automatically	IntefaceView		Choisir automatiquement
 Status:	IntefaceView		État :

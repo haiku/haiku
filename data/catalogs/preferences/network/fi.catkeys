@@ -35,7 +35,7 @@ Static	IntefaceAddressView		Staattinen
 launch error	NetworkWindow		käynnistysvirhe
 Renegotiate	IntefaceView		Neuvottele uudelleen
 MAC address:	IntefaceView		MAC-osoite:
-%name% (%authenticationMode%)	WirelessNetworkMenuItem		%nimi% (%authenticationMode%)
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 disabled	InterfaceListItem		poissa käytöstä
 Dial-up connection	InterfaceListItem		Valintayhteys
 on	ServiceListItem		päällä

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	3113422709
+1	german	x-vnd.Haiku-libtracker	1684779063
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -87,6 +87,7 @@ Select…	FilePanelPriv		Auswählen…
 Name	Person Query Columns		Name
 Skip all	FSUtils		Alle überspringen
 Corrupted opcode.	libtracker		Fehlerhafter Opcode.
+Atom	AttributesView		Atom
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed von %TotalSize, %BytesPerSecond/s
 Preparing to restore items…	StatusWindow		Wiederherstellen wird vorbereitet…
 Mount	ContainerWindow		Einhängen

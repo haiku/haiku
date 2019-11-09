@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	3946161202
+1	french	x-vnd.Haiku-HaikuDepot	1789676577
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Une erreur est survenue lors du rafraîchissement : %error%
 Check for updates…	MainWindow		Vérifier les mises à jour…
 Uninstall	PackageManager		Désinstaller
@@ -64,13 +64,16 @@ HaikuDepot needs the package daemon to function, and it appears to be not runnin
 Click a package to view information	PackageInfoView		Cliquez sur un paquet pour afficher ses informations
 Contents	PackageInfoView		Contenu
 Close	PackageManager		Fermer
+A network transport error has arisen communicating with the HaikuDepot server system: %s	ServerHelper		Une erreur de transmission réseau est survenue lors de la communication avec le serveur HaikuDepot : %s
 Changelog	PackageInfoView		Journal des modifications
 Rating not possible	MainWindow		Évaluation impossible
+Package update error	MainWindow		Erreur de mise à jour du paquet
 About	PackageInfoView		À propos
 Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		L’authentification a échoué. L’utilisateur n’existe pas, ou le mot de passe est incorrect.
 Reboot required	PackageManager		Redémarrage nécessaire
 Very unstable	RatePackageWindow		Très instable
 All packages	PackageListView		Tous les paquets
+Network Transport Error	ServerHelper		Erreur de transmission réseau
 Stability	RatePackageWindow		Stabilité
 Send	RatePackageWindow		Envoyer
 Start package daemon	App		Démarrer le serveur de paquets
@@ -90,6 +93,7 @@ Repository	PackageListView		Dépôt
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (version %hd.version%)
 Close	UserLoginWindow		Fermer
 Close	RatePackageWindow		Fermer
+View the usage conditions	UserLoginWindow		Voir les conditions d'utilisation
 Failed to create account: %s\n	UserLoginWindow		Impossible de créer le compte : %s\n
 Size	PackageListView		Taille
 Your rating:	RatePackageWindow		Votre évaluation :

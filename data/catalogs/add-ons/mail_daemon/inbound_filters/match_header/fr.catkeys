@@ -5,7 +5,7 @@ Match header	RuleFilter		Entête de correspondance
 Set flags to	ConfigView		Placez les drapeaux à
 Header field (e.g. Subject, From, …)	ConfigView		Champ d’en-tête (par ex. Sujet, De …)
 <Choose account>	ConfigView		<Choisir un compte>
-Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Expression générique comme « *spam* ».\nPréfixer avec « REGEX: » afin d’utiliser des expressions régulières.
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Expression joker comme « *spam* ».\nPréfixer avec « REGEX: » afin d’utiliser des expressions régulières.
 Then	ConfigView		Alors
 If	ConfigView		Si
 Set as read	ConfigView		Marquer comme lu

@@ -1,7 +1,7 @@
 1	friulian	x-vnd.Haiku-HaikuDepot	913112167
 Repository update error	LocalRepositoryUpdateProcess		Erôr di inzornament dal dipuesit
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificât un erôr intal inzornâ il dipuesit: %error%
-Check for updates…	MainWindow		Control inzornaments…
+Check for updates…	MainWindow		Controle inzornaments…
 Uninstall	PackageManager		Disinstale
 (%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Disinstalât

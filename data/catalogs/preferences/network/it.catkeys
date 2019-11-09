@@ -40,7 +40,7 @@ disabled	InterfaceListItem		disabilitato
 Dial-up connection	InterfaceListItem		Connessione Dial-up
 on	ServiceListItem		attivata
 The method for obtaining an IP address	IntefaceAddressView		Modalità di assegnazione indirizzo IP
-disconnected	InterfaceListItem		disconnessa
+disconnected	InterfaceListItem		disconnesso
 Automatic	IntefaceAddressView		Automatico
 Choose automatically	IntefaceView		Scegli automaticamente
 Status:	IntefaceView		Stato:

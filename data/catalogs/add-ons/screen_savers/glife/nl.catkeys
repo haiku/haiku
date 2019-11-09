@@ -1,14 +1,5 @@
-1	dutch; flemish	x-vnd.Haiku-GLifeScreensaver	2182395945
+1	dutch; flemish	x-vnd.Haiku-GLifeScreensaver	3635568819
 by Aaron Hill	GLife ScreenSaver		door Aaron Hill
 None	GLife ScreenSaver		Geen
-none	GLife ScreenSaver		geen
-Grid Height: %li	GLife ScreenSaver		Rasterhoogte: %li
-Grid Width: 	GLife ScreenSaver		Rasterbreedte:
-Grid Border: %li	GLife ScreenSaver		Rasterrand: %li
-Grid Border: 	GLife ScreenSaver		Rasterrand:
-Grid Life Delay: <number>x	This is a factor: the x represents 'times'		Grid vertragingsduur:<number>x
 OpenGL \"Game of Life\"	GLife ScreenSaver		OpenGL \"Game of Life\"
-Grid Height: 	GLife ScreenSaver		Rasterhoogte:
 4x	GLife ScreenSaver	This is a factor: the x represents 'times'	4x
-Grid Width: %li	GLife ScreenSaver		Rasterbreedte: %li
-Grid Life Delay: 	GLife ScreenSaver		Vertraging levensduur raster:

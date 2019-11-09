@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-DeskCalc	3849297615
+1	french	x-vnd.Haiku-DeskCalc	2149599445
 cos	CalcView		cos
 acos	CalcView		acos
 sin	CalcView		sin
@@ -10,6 +10,8 @@ Compact	CalcView		Compact
 Calculating	CalcView		Calcul en cours
 Enable Num Lock on startup	CalcView		Verrouiller le pavé numérique au démarrage
 Scientific	CalcView		Scientifique
+log	CalcView		log
+sqrt	CalcView		√
 asin	CalcView		asin
 Radians	CalcView		Radians
 tan	CalcView		tan
