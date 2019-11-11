@@ -97,8 +97,6 @@ public:
 			fIgnorePaths.insert("rr_moved");
 			fIgnorePaths.insert("boot.catalog");
 			fIgnorePaths.insert("haiku-boot-floppy.image");
-			fIgnorePaths.insert("system/cache");
-			fIgnorePaths.insert("home/config/cache");
 			fIgnorePaths.insert("system/var/swap");
 			fIgnorePaths.insert("system/var/shared_memory");
 			fIgnorePaths.insert("system/var/log/syslog");
