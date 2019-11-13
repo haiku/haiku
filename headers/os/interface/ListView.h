@@ -188,6 +188,7 @@ private:
 			bool				_MoveItem(int32 from, int32 to);
 			bool				_ReplaceItem(int32 index, BListItem* item);
 			void				_RescanSelection(int32 from, int32 to);
+			void				_DoSelection(int32 index);
 
 private:
 			BList				fList;
