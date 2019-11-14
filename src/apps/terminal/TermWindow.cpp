@@ -32,12 +32,14 @@
 #include <Dragger.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <Keymap.h>
 #include <LayoutBuilder.h>
 #include <LayoutUtils.h>
 #include <Locale.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
+#include <ObjectList.h>
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <PrintJob.h>
@@ -47,6 +49,7 @@
 #include <ScrollBar.h>
 #include <ScrollView.h>
 #include <String.h>
+#include <UnicodeChar.h>
 #include <UTF8.h>
 
 #include <AutoLocker.h>
@@ -547,6 +550,23 @@ TermWindow::_SetupMenu()
 	AddShortcut('C', B_COMMAND_KEY | B_CONTROL_KEY,
 		new BMessage(SHORTCUT_DEBUG_CAPTURE));
 #endif
+
+	BKeymap keymap;
+	keymap.SetToCurrent();
+	BObjectList<const char> unmodified(3, true);
+	if (keymap.GetModifiedCharacters("+", B_SHIFT_KEY, 0, &unmodified)
+			== B_OK) {
+		int32 count = unmodified.CountItems();
+		for (int32 i = 0; i < count; i++) {
+			uint32 key = BUnicodeChar::FromUTF8(unmodified.ItemAt(i));
+			if (!HasShortcut(key, 0)) {
+				// Add semantic + shortcut, bug #7428
+				AddShortcut(key, B_COMMAND_KEY,
+					new BMessage(kIncreaseFontSize));
+			}
+		}
+	}
+	unmodified.MakeEmpty();
 }
 
 
