@@ -1,12 +1,13 @@
-1	indonesian	x-vnd.Haiku-Touchpad	607725922
+1	indonesian	x-vnd.Haiku-Touchpad	526581388
 Scrolling	TouchpadPrefView		Menggulir
 Tapping	TouchpadPrefView		Mengetuk
 Touchpad	System name		Touchpad
 Cancel	TouchpadPrefView		Batalkan
-OK	TouchpadPrefView		Oke
-Horizontal scrolling	TouchpadPrefView		Gulungan Horisontal
+OK	TouchpadPrefView		OKE
+Horizontal scrolling	TouchpadPrefView		Gulungan horisontal
 Slow	TouchpadPrefView		Lambat
 Two finger scrolling	TouchpadPrefView		Menggulung dua jari
+No touchpad found, the settings will have no effect.	TouchpadPrefView		Tidak ada touchpad yang ditemukan, pengaturan tidak akan berpengaruh.
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Area gulir baru sangat besar dan dapat menghambat operasi mouse normal. Apakah Anda benar-benar ingin mengubahnya?
 Defaults	TouchpadPrefView		Bawaan
 High	TouchpadPrefView		Tinggi

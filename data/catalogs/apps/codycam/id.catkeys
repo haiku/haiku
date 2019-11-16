@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-CodyCam	1770279704
+1	indonesian	x-vnd.Haiku-CodyCam	2593355250
 destination directory expected	CodyCam		direktori tujuan diharapkan
 reply: '%s'\n	SftpClient		balas: '%s'\n
 JPEG image	CodyCam		Gambar JPEG
@@ -27,6 +27,7 @@ Every 2 hours	CodyCam		Setiap 2 jam
 Cannot get a time source	CodyCam		Tidak mendapatkan sumber waktu
 Every 4 hours	CodyCam		Setiap 4 jam
 cmd: '%s'\n	FtpClient		cmd: '%s'\n
+Closing the window	VideoConsumer.cpp		Menutup jendela
 Never	CodyCam		Tidak pernah
 Every 8 hours	CodyCam		Setiap 8 jam
 Cannot start the video source	CodyCam		Tidak dapat memulai sumber video
@@ -38,6 +39,7 @@ still image filename expected	CodyCam		nama berkas gambar tak bergerak diharapka
 File name:	CodyCam		Nama berkas:
 Directory:	CodyCam		Direktori:
 Error setting type of output file	VideoConsumer.cpp		Galat pengaturan tipe dari file keluaran
+Locking the window	VideoConsumer.cpp		Mengunci jendela
 Cannot find an available video stream	CodyCam		Tidak dapat menemukan aliran video yang tersedia
 Upload…	VideoConsumer.cpp		Unggah…
 password expected	CodyCam		kata sandi diharapkan

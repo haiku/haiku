@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Shortcuts	2363891926
+1	indonesian	x-vnd.Haiku-Shortcuts	3834857117
 *MouseUp	ShortcutsWindow		*MouseUp
 Application	ShortcutsWindow		Aplikasi
 Option	ShortcutsSpec	Name for modifier on keyboard	Opsi
@@ -9,8 +9,10 @@ Don't save	ShortcutsWindow		Jangan simpan
 *Beep	ShortcutsWindow		*Beep
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Pemintas tidak bisa menyimpan keyset Anda.
 Save	ShortcutsWindow		Simpan
+Either	ShortcutsSpec		Salah-satu
 Oh no	ShortcutsWindow		Oh tidak
 Key	ShortcutsWindow		Kunci
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
 Select	ShortcutsWindow		Pilih
 Shortcuts	System name		Pintasan
 Quit	ShortcutsWindow		Keluar
@@ -24,15 +26,20 @@ Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Pintasan tidak d
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Teks Anda Disini\"
 Remove selected shortcut	ShortcutsWindow		Hapus pintasan yang dipilih
 Error, NULL state description?	ShortcutsSpec		Ada Kesalahan, deskripsi kondisi NULL?
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Pintasan tidak dapat membuka file KeySet Anda!
 Save & apply	ShortcutsWindow		Simpan & terapkan
 Open	ShortcutsWindow		Buka
 Append	ShortcutsWindow		Tambahkan
+Both	ShortcutsSpec		Keduanya
 Save KeySet as…	ShortcutsWindow		Simpan keyset sebagai...
 Append KeySet…	ShortcutsWindow		Tambah Keyset...
 *MouseButton 1	ShortcutsWindow		*TombolMouse 1
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
+Right	ShortcutsSpec		Kanan
 OK	ShortcutsWindow		OKE
 Add new shortcut	ShortcutsWindow		Tambahkan pintasan baru
+(None)	ShortcutsSpec		(tiada)
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 Open KeySet…	ShortcutsWindow		Buka Keyset...
 File	ShortcutsWindow		Berkas

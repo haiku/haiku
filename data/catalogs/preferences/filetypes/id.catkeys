@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-FileTypes	3116280330
+1	indonesian	x-vnd.Haiku-FileTypes	734679611
 Left	Attribute Window	Attribute column alignment in Tracker	Kiri
 Final	Application Types Window		Final
 FileTypes request	FileTypes Window		Permintaan FileTypes
@@ -23,6 +23,7 @@ Gamma	Application Type Window		Gama
 Cancel	Application Type Window		Batal
 Attribute	Attribute Window		Atribut
 Multiple launch	Application Type Window		Beberapa peluncuran
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# Application type could be removed} other{# Application types could be removed}}
 Edit…	Application Types Window		Sunting…
 Could not set preferred application	FileTypes Window		Tidak bisa mengatur aplikasi yang disukai
 Description	FileTypes Window		Keterangan

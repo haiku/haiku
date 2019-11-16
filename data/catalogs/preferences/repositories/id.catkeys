@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Repositories	2658607939
+1	indonesian	x-vnd.Haiku-Repositories	1220143449
 This is not a valid URL.	AddRepoWindow	Add URL error message	Ini bukan merupakan URL yang valid
 Repository URL:	AddRepoWindow	Text box label	URL Repositori:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Terjadi kesalahan menyegarkan cache repositori untuk %name%
@@ -10,6 +10,7 @@ Disable	RepositoriesView	Button label	Menon-aktifkan
 Cancel task	TaskTimer	Button label	Batalkan tugas
 Changes completed	RepositoriesView	Status view text	Perubahan selesai
 Details	TaskLooper	Job log details header	Rincian
+Enabled	RepoRow	Tag in the Status column	Diaktifkan
 Remove	Constants	Button label	Hapus
 There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Terjadi kesalahan saat mengaktifkan repositori %url%
 Remove this repository?	RepositoriesView	Removal alert confirmation message	Hapus repositori ini?

@@ -1,8 +1,10 @@
-1	indonesian	x-vnd.Haiku-Keymap	1039047705
+1	indonesian	x-vnd.Haiku-Keymap	3348782469
 Key	Modifier keys window	As in a computer keyboard key	Tombol
 Japanese	KeymapNames		Jepang
 US	KeymapNames		AS
+PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Brazil
+ThinkPad (US)	KeyboardLayoutNames		ThinkPad (AS)
 Right control	Keyboard Layout View		Control kanan
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Pilihan:
@@ -11,6 +13,8 @@ Sample and clipboard:	Keymap window		Sampel dan clipboard:
 Polish	KeymapNames		Polandia
 Latin-American	KeymapNames		Amerika Latin
 Ukrainian	KeymapNames		Ukraina
+PAGE ↓	Keyboard Layout View		PAGE ↓
+DEL	Keyboard Layout View		DEL
 United-Kingdom	KeymapNames		Inggris Raya
 Turkish (Type-F)	KeymapNames		Turki (Type-F)
 Serbian (Cyrillic)	KeymapNames		Serbia (Cyrillic)
@@ -23,30 +27,46 @@ Spanish (Dvorak)	KeymapNames		Spanyol (Dvorak)
 Scroll lock	Keyboard Layout View		Scroll lock
 US-International	KeymapNames		AS-Internasional
 Right option	Keyboard Layout View		Pilihan kanan
-Turkish (Type-Q)	KeymapNames		Turki  (Type-Q)
+Turkish (Type-Q)	KeymapNames		Turki (Type-Q)
 Revert	Modifier keys window		Pulihkan
 Slovak	KeymapNames		Slovakia
+CAPS LOCK	Keyboard Layout View		CAPS LOCK
 Colemak	KeymapNames		Colemak
 Dvorak (programmer's)	KeymapNames		Dvorak (programmer)
+PRINT	Keyboard Layout View		PRINT
 German (Mac)	KeymapNames		Jerman (Mac)
 Arabic (102)	KeymapNames		Arabi (102)
+ThinkPad	KeyboardLayoutNames		ThinkPad
 Belarusian (Mac)	KeymapNames		Belarusia (Mac)
 Croatian	KeymapNames		Kroasia
+PAGE ↑	Keyboard Layout View		PAGE ↑
 Set modifier keys	Modifier keys window		Atur tombol pengubah
+Apple Aluminium International	KeyboardLayoutNames		Apple Aluminium International
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Tombol Win/Cmd
+PG ↓	Keyboard Layout View	Very short for 'page down'	PG ↓
+ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (AS)
+Apple Aluminum	KeyboardLayoutNames		Apple Aluminum
 Spanish	KeymapNames		Spanyol
+HOME	Keyboard Layout View		HOME
+COMMAND	Keyboard Layout View		COMMAND
 Ukrainian (Mac)	KeymapNames		Ukraina (Mac)
 Command:	Modifier keys window	Command key role name	Perintah:
 French (Bépo)	KeymapNames		Perancis (Bépo)
 Russian (Typewriter)	KeymapNames		Russia (Mesin ketik)
 Acute trigger	Keymap window		Pemicu akut
 Italian	KeymapNames		Italia
+ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s Internasional
+Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminum (AS)
+Kinesis Ergo Elan International	KeyboardLayoutNames		Kinesis Ergo Elan International
 Modifier keys	Modifier keys window		Tombol pengubah
+ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 International
 Kazakh	KeymapNames		Kazakhtan
-Save as…	Keymap window		Simpan sebagai:
+Save as…	Keymap window		Simpan sebagai…
 Lithuanian (Standard)	KeymapNames		Lithuania (Standard)
 Error: duplicate keys	Modifier keys window		Kesalahan: terjadi duplikat tuts
+NUM	Keyboard Layout View	Very short for 'num lock'	NUM
 Bulgarian (Phonetic)	KeymapNames		Bulgaria (fonetis)
+Kinesis Advantage	KeyboardLayoutNames		Kinesis Advantage
 Canadian-French	KeymapNames		Kanada-perancis
 Hungarian	KeymapNames		Hungaria
 Control	Keyboard Layout View	Control key	Kontrol
@@ -54,12 +74,16 @@ Irish	KeymapNames		Irlandia
 Remove	Keyboard Layout View		Hapus
 Tilde trigger	Keymap window		Pemicu tilde
 Shift	Keyboard Layout View	Shift key	Shift
+CONTROL	Keyboard Layout View		CONTROL
 Macedonian	KeymapNames		Makedonia
 Czech (Mac)	KeymapNames		Ceko (Mac)
 Left command	Keyboard Layout View		Perintah kiri
 Albanian	KeymapNames		Albania
 (Current)	Keymap window		(Saat ini)
+OPT	Keyboard Layout View	Very short for 'option'	OPT
+Friulian	KeymapNames		Friulian
 Left option	Keyboard Layout View		Pilihan kiri
+END	Keyboard Layout View		END
 Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Belarusia
 Warning: left and right key roles do not match	Modifier keys window		Peringatan: key-role kiri dan kanan tidak cocok
@@ -67,26 +91,33 @@ Circumflex trigger	Keymap window		Pemicu sirkomfleks
 Caps lock	Keyboard Layout View		Caps lock
 Left shift	Keyboard Layout View		Shift kiri
 Russian (Yawert)	KeymapNames		Russia (Yawert)
+ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e Internasional
 Bulgarian (Cyrillic)	KeymapNames		Bulgaria (Cyrillic)
 Swedish	KeymapNames		Swedia
 Left control	Keyboard Layout View		Tombol kontrol kiri
+CAPS	Keyboard Layout View	Very short for 'caps lock'	CAPS
 Role	Modifier keys window	As in the role of a modifier key	Peran
 Svorak	KeymapNames		Shorak
+ThinkPad X100e (US)	KeyboardLayoutNames		ThinkPad X100e (AS)
 German	KeymapNames		Jerman
 Swiss-German	KeymapNames		Swiss-Jerman
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Tombol ctrl
 Czech	KeymapNames		Ceko
 Russian (Udmurt, Komi, Mari)	KeymapNames		Russia (Udmurt, Komi, Mari)
+Thai (TIS-820.2538)	KeymapNames		Thai (TIS-820.2538)
 Control:	Modifier keys window	Control key role name	Kontrol:
+Generic 105-key International	KeyboardLayoutNames		Generik 105-key Internasional
 Disabled	Modifier keys window	Do nothing	Dinonaktifkan
 Select dead keys	Keymap window		Pilih tombol mati
 Russian (Mac)	KeymapNames		Rusia (Mac)
 Right shift	Keyboard Layout View		Shift kanan
+ESC	Keyboard Layout View		ESC
 Belarusian (Latin)	KeymapNames		Belarusia (Latin)
 Hebrew	KeymapNames		Ibrani
 Layout	Keymap window		Tata letak
 Greek	KeymapNames		Yunani
 Revert	Keymap window		Pulihkan
+CTRL	Keyboard Layout View	Very short for 'control'	CTRL
 Grave trigger	Keymap window		Pemicu grave
 Menu	Keyboard Layout View	Menu key	Menu
 Faeroese	KeymapNames		Faeroese
@@ -94,7 +125,9 @@ Quit	Keymap window		Keluar
 Polish (Typewriter)	KeymapNames		Polandia (Mesin ketik)
 French (Mac)	KeymapNames		Perancis (Mac)
 User:	Keymap window		Pengguna:
+Apple Aluminium Extended International	KeyboardLayoutNames		Apple Aluminium Extended International
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Tombol Alt/Opt
+SHIFT	Keyboard Layout View		SHIFT
 Estonian	KeymapNames		Estonia
 Serbian (Latin)	KeymapNames		Serbia (Latin)
 French	KeymapNames		Perancis
@@ -109,19 +142,31 @@ Switch shortcut keys to Haiku mode	Keymap window		Beralih shortcut kunci untuk m
 Defaults	Keymap window		Bawaan
 ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		Sistem:
+ThinkPad International	KeyboardLayoutNames		ThinkPad International
+Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Aluminum Extended (AS)
 Switch shortcut keys	Keymap window		Tukar tombol pintas
 Right command	Keyboard Layout View		Perintah kanan
+NUM LOCK	Keyboard Layout View		NUM LOCK
+MENU	Keyboard Layout View		MENU
 Belgian (comma)	KeymapNames		Belgia (koma)
 Norwegian	KeymapNames		Norwegia
 Font	Keymap window		Fon
 Danish	KeymapNames		Denmark
+Generic 104-key	KeyboardLayoutNames		Generic 104-key
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tombol shift
+PAUSE	Keyboard Layout View		PAUSE
 Russian	KeymapNames		Russia
+TypeMatrix 2030	KeyboardLayoutNames		TypeMatrix 2030
 Romanian	KeymapNames		Rumania
+CMD	Keyboard Layout View	Very short for 'command'	CMD
 Command	Keyboard Layout View	Command key	Perintah
+SCROLL	Keyboard Layout View		SCROLL
 File	Keymap window		Berkas
 Brazilian (ABNT2)	KeymapNames		Brazil (ABNT2)
+INS	Keyboard Layout View		INS
+OPTION	Keyboard Layout View		OPTION
 Dutch	KeymapNames		Belanda
 Diaeresis trigger	Keymap window		Pemicu diaeresis
 Icelandic	KeymapNames		Islandia
 Open…	Keymap window		Buka…
+ThinkPad T400s (US)	KeyboardLayoutNames		ThinkPad T400s (AS)

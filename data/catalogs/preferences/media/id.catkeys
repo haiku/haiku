@@ -1,10 +1,11 @@
-1	indonesian	x-vnd.Haiku-Media	4205337498
+1	indonesian	x-vnd.Haiku-Media	1682972002
 Audio mixer	Media Window		Mixer audio
 Show volume control on Deskbar	Media views		Tampilkan kontrol volume pada Deskbar
 Quit	Media Window		Keluar
 Restart media services	Media views		Restart layanan media
 Couldn't add volume control in Deskbar: %s\n	Media views		Tidak dapat menambahkan kontrol volume di Deskbar: %s\n
 Start media server	Media Window		Memulai server media
+<none>	VideoInputMenu	Used when no video input is available	<tiada>
 Audio settings	Media Window		Setting audio
 Quit anyway	Media Window		Keluar saja
 Couldn't remove volume control in Deskbar: %s\n	Media views		Tidak dapat menghapus kontrol volume di Deskbar: %s\n
@@ -22,3 +23,4 @@ Channel:	Media views		Kanal:
 Defaults	Media views		Bawaan
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Tidak bisa terhubung ke server media.\nApakah anda ingin memulainya?
 Video settings	Media Window		Pengaturan video
+<none>	VideoOutputMenu	Used when no video output is available	<tiada>

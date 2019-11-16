@@ -1,12 +1,21 @@
-1	indonesian	x-vnd.Be-MAIL	3962701620
+1	indonesian	x-vnd.Be-MAIL	1477453861
+Set to Saved	Mail		Setel ke Disimpan
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Teks utama Anda mengandung %ld karakter tak bisa terenkod. Mungkin set karakter lain akan bekerja lebih baik? Tekan kirim untuk tetap mengirim (sebuah karakter pengganti akan digunakan pada karakter yang tak terenkod), atau tekan Batal untuk kembali dan membetulkannya.
+Text wrapping:	Mail		Pembungkus teks:
 Show icons & labels	Mail		Tampilkan ikon dan label
+(Date unavailable)	Mail		(Tanggal tidak tersedia)
 Reply	Mail		Balas
 Next message	Mail		Pesan selanjutnya
+Mailing	Mail		Pengiriman surat
 Unread	Mail		Belum dibaca
+Same sender	Mail		Pengirim yang sama
 Copy to new	Mail		Salin ke baru
 Save as draft	Mail		Simpan sebagai draf
+Encoding:	Mail		Pengkodean:
 Print	Mail		Cetak
+Decrease quote level	Mail		Kurangi tingkat penawaran
+Encoding	Mail		Pengkodean
+Default account:	Mail		Akun standar:
 Message	Mail		Pesan
 Bcc:	Mail		Bcc:
 New	Mail		Baru
@@ -24,11 +33,14 @@ Only files can be added as attachments.	Mail		Hanya berkas yang bisa ditambahkan
 Close	Mail		Tutup
 Untitled	Mail		Tanpa judul
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Menghapus lampiran dari surat yang diteruskan belum diterapkan\nItu belum akan berfungsi dengan benar.
+Same recipient	Mail		Penerima yang sama
 Previous message	Mail		Pesan sebelumnya
 (Address unavailable)	Mail		(Alamat tidak tersedia)
 Mail	System name		Surel
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Lampiran: %name% (Tipe: %type%)
 Copy link location	Mail		Salin lokasi tautan
 Attachments: 	Mail		Lampiran: 
+Remove enclosure	Mail		Hapus lampiran
 Next	Mail		Selanjutnya
 Attachments:	Mail		Lampiran:
 Show icons only	Mail		Tampilkan ikon saja
@@ -40,6 +52,8 @@ Title:	Mail		Judul:
 Account from mail	Mail		Akun dari surat
 %e - E-mail address	Mail		%e - Alamat surel
 Cc:	Mail		Cc:
+No matches	Mail		Tidak ada yang cocok
+Queries	Mail		Kueri
 Cut	Mail		Potong
 Reply to sender	Mail		Balas ke pengirim
 \\n - Newline	Mail		\\n - Newline
@@ -47,7 +61,9 @@ Copy	Mail		Salin
 Add signature	Mail		Tambah tanda tangan
 %n - Full name	Mail		%n - Nama Lengkap
 Signature	Mail		Tanda tangan
+Use default account	Mail		Gunakan akun standar
 draft	B_USER_DIRECTORY/mail/draft		draf
+Really delete this signature? This cannot be undone.	Mail		Benarkah menghapus tanda tangan ini? Ini tidak dapat dibatalkan.
 spam	B_USER_DIRECTORY/mail/spam		spam
 Reply to all	Mail		Balas ke semua
 Cancel	Mail		Batal
@@ -58,7 +74,9 @@ Forward without attachments	Mail		Teruskan tanpa lampiran
 queries	B_USER_DIRECTORY/mail/queries		kueri
 View	Mail		Melihat
 Signatures	Mail		Tanda tangan
+On	Mail		Di
 Find	Mail		Menemukan
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Maaf, tidak dapat menemukan aplikasi yang mendukung tipe data 'Orang'.
 Date:	Mail		Tanggal:
 Expert	Mail		Ahli
 Automatically mark mail as read:	Mail		Otomatis menandai email sebagai telah dibaca:
@@ -66,6 +84,8 @@ Close and 	Mail		Tutup dan
 Colored quotes:	Mail		Kutipan berwarna:
 Automatic	Mail		Otomatis
 Open this link	Mail		Buka tautan ini
+Auto signature:	Mail		Tanda tangan otomatis:
+Same subject	Mail		Subjek yang sama
 Send	Mail		Kirim
 Open draft	Mail		Buka draf
 Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Tinggalkan sebagai 'Baru'
@@ -74,7 +94,9 @@ Attach attributes:	Mail		Lampirkan atribut:
 Find again	Mail		Temukan lagi
 Size:	Mail		Ukuran:
 To:	Mail		Untuk:
-The mail_daemon could not be started:\n\t	Mail		mail_daemon tidak bisa dijalankan:\n\t
+Need Tracker to move items to trash	Mail		Perlu Tracker untuk memindahkan item ke sampah
+The mail_daemon could not be started:\n\t	Mail		Mail_daemon tidak bisa dijalankan:\n\t
+<no account found>	Mail		<tiada akun ditemukan>
 Mail couldn't find its dictionary.	Mail		Mail tidak dapat menemukan kamusnya.
 Mail preferences	Mail		Preferensi surat
 helpful message	Mail		pesan bermanfaat
@@ -84,8 +106,11 @@ Accounts…	Mail		Akun…
 Previous	Mail		Sebelumnya
 Include file attributes in attachments	Mail		Sertakan atribut berkas dalam lampiran
 Start now	Mail		Mulai sekarang
+(Name unavailable)	Mail		Nama tidak tersedia)
+Move to trash	Mail		Pindah ke tempat sampah
 <none>	Mail		<none>
 %d - Date	Mail		Tanggal - %d
+Check spelling	Mail		Periksa ejaan
 Redo	Mail		Ulangi
 Leave as '%s'	Mail		Biarkan sebagai '%s'
 Print…	Mail		Cetak…
@@ -98,22 +123,30 @@ Select all	Mail		Pilih semua
 Show header	Mail		Tampilkan header
 Reply account:	Mail		Balas akun:
 Sorry	Mail		Sori
+Forward	Mail		Meneruskan
 Open attachment	Mail		Buka lampiran
 mail	B_USER_DIRECTORY/mail		surat
 Save this message as a draft before closing?	Mail		Simpan pesan ini sebagai draf sebelum ditutup?
-The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		mail_daemon tidak jalan. Pesan ini mengantre dan akan dikirim ketika mail_daemon dijalankan.
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Mail_daemon tidak jalan. Pesan ini mengantre dan akan dikirim ketika mail_daemon dijalankan.
+None	Mail		Tidak ada
 Resend	Mail		Kirim ulang
 Hide	Mail		Sembunyikan
 From:	Mail		Dari:
 No file attributes, just plain data	Mail		Tidak ada atribut file, hanya data biasa
 Add	Mail		Tambah
+out	B_USER_DIRECTORY/mail/out		di luar
+Send this message before closing?	Mail		Kirim pesan ini sebelum ditutup?
 in	B_USER_DIRECTORY/mail/in		di
 Open	Mail		Buka
 Don't save	Mail		Jangan simpan
+Leave same	Mail		Tinggalkan yang sama
 An error occurred trying to save the attachment.	Mail		Terjadi kesalahan saat mencoba menyimpan lampiran.
+Save address	Mail		Simpan alamat
+Initial spell check mode:	Mail		Mode periksa ejaan awal:
 Edit queries…	Mail		Sunting kueri…
 There is no installed handler for URL links.	Mail		Tidak ada aplikasi pembuka yang terpasang untuk tautan URL.
 File	Mail		Berkas
+Reply preamble:	Mail		Pembukaan balasan:
 New mail message	Mail		Pesan email baru
 An error occurred trying to open this signature.	Mail		Sebuah kesalahan terjadi ketika mencoba membuka tanda tangan ini.
 Edit signatures…	Mail		Sunting tanda tangan…
@@ -123,10 +156,14 @@ Remove attachment	Mail		Hapus lampiran
 Set to…	Mail		Atur untuk…
 Edit	Mail		Edit
 Page setup…	Mail		Pengaturan halaman…
+An error occurred trying to save this signature.	Mail		Terjadi kesalahan saat mencoba menyimpan tanda tangan ini.
 Beginner	Mail		Pemula
 Send message	Mail		Kirim pesan
 Delete	Mail		Hapus
 Put your favorite e-mail queries and query templates in this folder.	Mail		Taruh kueri email favorite dan kueri templat anda dalam folder ini.
+Spam	Mail		Spam
 Couldn't open this signature. Sorry.	Mail		Tidak dapat membuka tanda tangan ini. Sori.
+Revert	Mail		Pulihkan
 Unknown	Mail		Tidak diketahui
+Increase quote level	Mail		Tingkatkan level petikan
 Add enclosure…	Mail		Tambah lampiran…

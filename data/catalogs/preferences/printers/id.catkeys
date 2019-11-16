@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Be-PRNT	2042381362
+1	indonesian	x-vnd.Be-PRNT	1465107170
 Test page	TestPageView		Halaman test
 Remove	PrintersWindow		Hapus
 Red	TestPageView		Merah
@@ -16,9 +16,11 @@ Waiting	JobListView		Menunggu
 Processing	JobListView		Pemrosesan
 Cancel	AddPrinterDialog		Batal
 Unknown status	JobListView		Status tidak diketahui
+Print jobs for %printer_name%	PrintersWindow		Pekerjaan cetak untuk %printer_name%
+{0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? pages}=1{# page}other{# pages}}
 Add printer	AddPrinterDialog		Tambah printer
 Printers	PrintersWindow		Pencetak
-No printer found!	TransportMenu		Tidak ada printer ditemukan
+No printer found!	TransportMenu		Tidak ada printer ditemukan!
 Add…	PrintersWindow		Tambahkan...
 Magenta	TestPageView		Magenta
 Transport: %transport% %transport_address%	TestPageView		Transport: %transport% %transport_address%
@@ -29,6 +31,7 @@ Yellow	TestPageView		Kuning
 Black	TestPageView		Hitam
 Printer type:	AddPrinterDialog		Tipe pencetak:
 Printers	System name		Pencetak
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Pencetak: %printer_name%\nDriver:  %driver%\n
 Green	TestPageView		Hijau
 Print test page	PrintersWindow		Cetak halaman test
