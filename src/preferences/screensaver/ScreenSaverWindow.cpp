@@ -577,6 +577,8 @@ ModulesView::ModulesView(const char* name, ScreenSaverSettings& settings)
 
 	fScreenSaversListView->SetSelectionMessage(
 		new BMessage(kMsgSaverSelected));
+	fScreenSaversListView->SetInvocationMessage(
+		new BMessage(kMsgTestSaver));
 	BScrollView* saversListScrollView = new BScrollView("scroll_list",
 		fScreenSaversListView, 0, false, true);
 
@@ -592,10 +594,7 @@ ModulesView::ModulesView(const char* name, ScreenSaverSettings& settings)
 		.AddGroup(B_VERTICAL)
 			.Add(fPreviewView)
 			.Add(saversListScrollView)
-			.AddGroup(B_HORIZONTAL)
-				.Add(fTestButton)
-				.AddGlue()
-				.End()
+			.Add(fTestButton)
 			.End()
 		.Add(fSettingsBox)
 		.End();
@@ -634,7 +633,6 @@ void
 ModulesView::AllAttached()
 {
 	PopulateScreenSaverList();
-	fScreenSaversListView->Invoke();
 }
 
 
