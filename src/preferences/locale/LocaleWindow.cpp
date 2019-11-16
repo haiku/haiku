@@ -350,15 +350,18 @@ LocaleWindow::MessageReceived(BMessage* message)
 			if (message->FindInt32("drop_index", &dropIndex) != B_OK)
 				dropIndex = fPreferredListView->CountItems();
 
-			int32 index = 0;
-			for (int32 i = 0; message->FindInt32("index", i, &index) == B_OK;
-					i++) {
+			int32 i = 0;
+			for (int32 index = 0;
+					message->FindInt32("index", i, &index) == B_OK; i++) {
 				LanguageListItem* item = static_cast<LanguageListItem*>(
 					fLanguageListView->ItemAt(index));
 				_InsertPreferredLanguage(item, dropIndex++);
 			}
+
+			fPreferredListView->Select(dropIndex - i, dropIndex - 1);
 			break;
 		}
+
 		case kMsgLanguageInvoked:
 		{
 			int32 index = 0;
@@ -381,8 +384,8 @@ LocaleWindow::MessageReceived(BMessage* message)
 			if (target == fPreferredListView) {
 				// change ordering
 				int32 dropIndex = message->FindInt32("drop_index");
-				int32 index = 0;
-				for (int32 i = 0;
+				int32 i = 0;
+				for (int32 index = 0;
 						message->FindInt32("index", i, &index) == B_OK;
 						i++, dropIndex++) {
 					if (dropIndex > index) {
@@ -393,6 +396,7 @@ LocaleWindow::MessageReceived(BMessage* message)
 					fPreferredListView->AddItem(item, dropIndex);
 				}
 
+				fPreferredListView->Select(dropIndex - i, dropIndex - 1);
 				_PreferredLanguagesChanged();
 				break;
 			}
