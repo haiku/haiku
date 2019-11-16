@@ -155,25 +155,44 @@ BImageResources::GetIconResource(int32 id, icon_size size,
 	}
 
 	// fall back to R5 icon
-	if (size != B_LARGE_ICON && size != B_MINI_ICON)
-		return B_ERROR;
-
 	length = 0;
-	data = LoadResource(size == B_LARGE_ICON ? 'ICON' : 'MICN', id, &length);
+	size = (size == B_MINI_ICON ? B_MINI_ICON : B_LARGE_ICON);
 
-	if (data == NULL
-		|| length != (size_t)(size == B_LARGE_ICON ? 1024 : 256)) {
+	data = LoadResource(size == B_MINI_ICON ? 'MICN' : 'ICON', id, &length);
+	if (data == NULL || length != (size_t)(size * size)) {
 		TRESPASS();
 		return B_ERROR;
 	}
 
-	if (dest->ColorSpace() != B_CMAP8) {
-		return BIconUtils::ConvertFromCMAP8((uint8*)data, size, size,
-			size, dest);
+	if (dest->ColorSpace() == B_RGBA32) {
+		// fill with transparent
+		uint8* destBits = (uint8*)dest->Bits();
+		int32 i = 0;
+		while (i < dest->BitsLength()) {
+			destBits[i++] = B_TRANSPARENT_32_BIT.red;
+			destBits[i++] = B_TRANSPARENT_32_BIT.green;
+			destBits[i++] = B_TRANSPARENT_32_BIT.blue;
+			destBits[i++] = B_TRANSPARENT_32_BIT.alpha;
+		}
+
+		// scale and convert from B_CMAP8 to B_RGBA32
+		if (BIconUtils::ConvertFromCMAP8((uint8*)data, size, size, size,
+				dest) == B_OK) {
+			return B_OK;
+		}
+	} else { // assume B_CMAP8
+		// fill with transparent
+		uint8* destBits = (uint8*)dest->Bits();
+		for (int32 i = 0; i < dest->BitsLength(); i++)
+			destBits[i] = B_TRANSPARENT_MAGIC_CMAP8;
 	}
 
-	dest->SetBits(data, (int32)length, 0, B_CMAP8);
-	return B_OK;
+	// import bits into the middle of dest without scaling
+	// color space is converted from B_CMAP8 to B_RGBA32
+	float x = roundf((dest->Bounds().Width() - size) / 2);
+	float y = roundf((dest->Bounds().Height() - size) / 2);
+	return dest->ImportBits(data, (int32)length, size, B_CMAP8,
+		BPoint(0, 0), BPoint(x, y), size, size);
 }
 
 
