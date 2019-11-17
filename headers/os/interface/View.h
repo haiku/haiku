@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2015 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2019 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_VIEW_H
@@ -471,6 +471,12 @@ public:
 			void				DrawBitmap(const BBitmap* aBitmap,
 									BPoint where);
 			void				DrawBitmap(const BBitmap* aBitmap);
+
+			void				DrawTiledBitmapAsync(const BBitmap* aBitmap,
+									BRect viewRect, BPoint phase = B_ORIGIN);
+
+			void				DrawTiledBitmap(const BBitmap* aBitmap,
+									BRect viewRect, BPoint phase = B_ORIGIN);
 
 			void				DrawChar(char aChar);
 			void				DrawChar(char aChar, BPoint location);

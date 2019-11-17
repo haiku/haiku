@@ -271,6 +271,7 @@ SubInclude HAIKU_TOP src tests servers app statusbar ;
 SubInclude HAIKU_TOP src tests servers app stress_test ;
 SubInclude HAIKU_TOP src tests servers app text_rendering ;
 SubInclude HAIKU_TOP src tests servers app textview ;
+SubInclude HAIKU_TOP src tests servers app tiled_bitmap_test ;
 SubInclude HAIKU_TOP src tests servers app transformation ;
 SubInclude HAIKU_TOP src tests servers app unit_tests ;
 SubInclude HAIKU_TOP src tests servers app view_state ;

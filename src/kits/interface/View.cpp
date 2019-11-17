@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2017 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2019 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -3117,6 +3117,38 @@ void
 BView::DrawBitmap(const BBitmap* bitmap)
 {
 	DrawBitmap(bitmap, PenLocation());
+}
+
+
+void
+BView::DrawTiledBitmapAsync(const BBitmap* bitmap, BRect viewRect,
+	BPoint phase)
+{
+	if (bitmap == NULL || fOwner == NULL || !viewRect.IsValid())
+		return;
+
+	_CheckLockAndSwitchCurrent();
+
+	ViewDrawBitmapInfo info;
+	info.bitmapToken = bitmap->_ServerToken();
+	info.options = B_TILE_BITMAP;
+	info.viewRect = viewRect;
+	info.bitmapRect = bitmap->Bounds().OffsetToCopy(phase);
+
+	fOwner->fLink->StartMessage(AS_VIEW_DRAW_BITMAP);
+	fOwner->fLink->Attach<ViewDrawBitmapInfo>(info);
+
+	_FlushIfNotInTransaction();
+}
+
+
+void
+BView::DrawTiledBitmap(const BBitmap* bitmap, BRect viewRect, BPoint phase)
+{
+	if (fOwner) {
+		DrawTiledBitmapAsync(bitmap, viewRect, phase);
+		Sync();
+	}
 }
 
 

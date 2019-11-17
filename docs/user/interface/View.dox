@@ -2706,8 +2706,13 @@ SetViewColor(Parent()->ViewColor());
 	otherwise stated. Notes on specific methods are provided below:
 
 	DrawBitmap()
+	DrawTiledBitmap()
 
-	If the the image is bigger than the destination rectangle, it is scaled to fit.
+	DrawBitmap() scales the image to fit if the image has different size than
+	the destination rectangle.
+
+	DrawTiledBitmap() fills the destination rectangle with copies of the source
+	image, without changing its size.
 
 	The asynchronous versions pass the image to Application Server and return
 	immediately.
@@ -2752,6 +2757,7 @@ SetViewColor(Parent()->ViewColor());
 	\fn void BView::DrawBitmapAsync(const BBitmap* bitmap, BRect bitmapRect,
 		BRect viewRect, uint32 options)
 	\brief Draws \a bitmap on the view within \a viewRect asynchronously.
+		   \a bitmap portion is scaled to fit \a viewRect.
 
 	\param bitmap The bitmap to draw onto the view.
 	\param bitmapRect The portion of the bitmap to draw in the bitmap's
@@ -2768,6 +2774,7 @@ SetViewColor(Parent()->ViewColor());
 	\fn void BView::DrawBitmapAsync(const BBitmap* bitmap, BRect bitmapRect,
 		BRect viewRect)
 	\brief Draws \a bitmap on the view within \a viewRect asynchronously.
+		   \a bitmap portion is scaled to fit \a viewRect.
 
 	\param bitmap The bitmap to draw onto the view.
 	\param bitmapRect The portion of the bitmap to draw in the bitmap's
@@ -2782,6 +2789,7 @@ SetViewColor(Parent()->ViewColor());
 /*!
 	\fn void BView::DrawBitmapAsync(const BBitmap* bitmap, BRect viewRect)
 	\brief Draws \a bitmap on the view within \a viewRect asynchronously.
+		   \a bitmap is scaled to fit \a viewRect.
 
 	\param bitmap The bitmap to draw onto the view.
 	\param viewRect The area in the view's coordinate system to draw the
@@ -2815,7 +2823,8 @@ SetViewColor(Parent()->ViewColor());
 /*!
 	\fn void BView::DrawBitmap(const BBitmap* bitmap, BRect bitmapRect,
 		BRect viewRect, uint32 options)
-	\brief brief Draws \a bitmap on the view within \a viewRect.
+	\brief Draws \a bitmap on the view within \a viewRect. \a bitmap portion
+		   is scaled to fit \a viewRect.
 
 	\param bitmap The bitmap to draw onto the view.
 	\param bitmapRect The portion of the bitmap to draw in the bitmap's
@@ -2831,7 +2840,8 @@ SetViewColor(Parent()->ViewColor());
 /*!
 	\fn void BView::DrawBitmap(const BBitmap* bitmap, BRect bitmapRect,
 		BRect viewRect)
-	\brief Draws \a bitmap on the view within \a viewRect.
+	\brief Draws \a bitmap on the view within \a viewRect. \a bitmap portion
+		   is scaled to fit \a viewRect.
 
 	\param bitmap The bitmap to draw onto the view.
 	\param bitmapRect The portion of the bitmap to draw in the bitmap's
@@ -2845,7 +2855,8 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::DrawBitmap(const BBitmap* bitmap, BRect viewRect)
-	\brief Draws \a bitmap on the view within \a viewRect.
+	\brief Draws \a bitmap on the view within \a viewRect. \a bitmap is scaled
+		   to fit \a viewRect.
 
 	\param bitmap The bitmap to draw onto the view.
 	\param viewRect The area in the view's coordinate system to draw the
@@ -2873,6 +2884,37 @@ SetViewColor(Parent()->ViewColor());
 	\param bitmap The bitmap to draw onto the view.
 
 	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BView::DrawTiledBitmapAsync(const BBitmap* bitmap, BRect viewRect,
+		BPoint phase = B_ORIGIN)
+	\brief Draws \a bitmap on the view within \a viewRect asynchronously.
+		   If \a bitmap is smaller, it is cloned to fill remaining space
+		   in \a viewRect.
+
+	\param bitmap The bitmap to draw onto the view.
+	\param viewRect The area in the view's coordinate system to draw the
+	       bitmap in.
+	\param phase Source bitmap offset used as starting point for drawing.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BView::DrawTiledBitmap(const BBitmap* bitmap, BRect viewRect,
+		BPoint phase = B_ORIGIN)
+	\brief Draws \a bitmap on the view within \a viewRect. If \a bitmap is
+		   smaller, it is cloned to fill remaining space in \a viewRect.
+
+	\param bitmap The bitmap to draw onto the view.
+	\param viewRect The area in the view's coordinate system to draw the
+	       bitmap in.
+	\param phase Source bitmap offset used as starting point for drawing.
+
+	\since Haiku R1
 */
 
 

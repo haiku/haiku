@@ -11,6 +11,25 @@
 #include "Painter.h"
 
 
+struct Fill {};
+struct Tile {};
+
+template<typename PixFmt, typename Mode>
+struct ImageAccessor {};
+
+template<typename PixFmt>
+struct ImageAccessor<PixFmt, Fill> {
+	typedef agg::image_accessor_clone<PixFmt> type;
+};
+
+template<typename PixFmt>
+struct ImageAccessor<PixFmt, Tile> {
+	typedef agg::image_accessor_wrap<PixFmt,
+		agg::wrap_mode_repeat, agg::wrap_mode_repeat> type;
+};
+
+
+template<typename FillMode>
 struct DrawBitmapGeneric {
 	static void
 	Draw(const Painter* painter, PainterAggInterface& aggInterface,
@@ -44,7 +63,8 @@ struct DrawBitmapGeneric {
 		agg::span_allocator<pixfmt_image::color_type> spanAllocator;
 
 		// image accessor attached to pixel format of bitmap
-		typedef agg::image_accessor_clone<pixfmt_image> source_type;
+		typedef
+			typename ImageAccessor<pixfmt_image, FillMode>::type source_type;
 		source_type source(pixf_img);
 
 		// clip to the current clipping region's frame

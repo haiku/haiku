@@ -65,8 +65,8 @@ Painter::BitmapPainter::Draw(const BRect& sourceRect,
 
 	TRACE("BitmapPainter::Draw()\n");
 	TRACE("   bitmapBounds = (%.1f, %.1f) - (%.1f, %.1f)\n",
-		bitmapBounds.left, bitmapBounds.top,
-		bitmapBounds.right, bitmapBounds.bottom);
+		fBitmapBounds.left, fBitmapBounds.top,
+		fBitmapBounds.right, fBitmapBounds.bottom);
 	TRACE("   sourceRect = (%.1f, %.1f) - (%.1f, %.1f)\n",
 		sourceRect.left, sourceRect.top,
 		sourceRect.right, sourceRect.bottom);
@@ -78,27 +78,29 @@ Painter::BitmapPainter::Draw(const BRect& sourceRect,
 	if (!success)
 		return;
 
-	// optimized version for no scale in CMAP8 or RGB32 OP_OVER
-	if (!_HasScale() && !_HasAffineTransform() && !_HasAlphaMask()) {
-		if (fColorSpace == B_CMAP8) {
-			if (fPainter->fDrawingMode == B_OP_COPY) {
-				DrawBitmapNoScale<CMap8Copy> drawNoScale;
-				drawNoScale.Draw(fPainter->fInternal, fBitmap, 1, fOffset,
-					fDestinationRect);
-				return;
-			}
-			if (fPainter->fDrawingMode == B_OP_OVER) {
-				DrawBitmapNoScale<CMap8Over> drawNoScale;
-				drawNoScale.Draw(fPainter->fInternal, fBitmap, 1, fOffset,
-					fDestinationRect);
-				return;
-			}
-		} else if (fColorSpace == B_RGB32) {
-			if (fPainter->fDrawingMode == B_OP_OVER) {
-				DrawBitmapNoScale<Bgr32Over> drawNoScale;
-				drawNoScale.Draw(fPainter->fInternal, fBitmap, 4, fOffset,
-					fDestinationRect);
-				return;
+	if ((fOptions & B_TILE_BITMAP) == 0) {
+		// optimized version for no scale in CMAP8 or RGB32 OP_OVER
+		if (!_HasScale() && !_HasAffineTransform() && !_HasAlphaMask()) {
+			if (fColorSpace == B_CMAP8) {
+				if (fPainter->fDrawingMode == B_OP_COPY) {
+					DrawBitmapNoScale<CMap8Copy> drawNoScale;
+					drawNoScale.Draw(fPainter->fInternal, fBitmap, 1, fOffset,
+						fDestinationRect);
+					return;
+				}
+				if (fPainter->fDrawingMode == B_OP_OVER) {
+					DrawBitmapNoScale<CMap8Over> drawNoScale;
+					drawNoScale.Draw(fPainter->fInternal, fBitmap, 1, fOffset,
+						fDestinationRect);
+					return;
+				}
+			} else if (fColorSpace == B_RGB32) {
+				if (fPainter->fDrawingMode == B_OP_OVER) {
+					DrawBitmapNoScale<Bgr32Over> drawNoScale;
+					drawNoScale.Draw(fPainter->fInternal, fBitmap, 4, fOffset,
+						fDestinationRect);
+					return;
+				}
 			}
 		}
 	}
@@ -106,62 +108,69 @@ Painter::BitmapPainter::Draw(const BRect& sourceRect,
 	ObjectDeleter<BBitmap> convertedBitmapDeleter;
 	_ConvertColorSpace(convertedBitmapDeleter);
 
-	// optimized version if there is no scale
-	if (!_HasScale() && !_HasAffineTransform() && !_HasAlphaMask()) {
-		if (fPainter->fDrawingMode == B_OP_COPY) {
-			DrawBitmapNoScale<Bgr32Copy> drawNoScale;
-			drawNoScale.Draw(fPainter->fInternal, fBitmap, 4, fOffset,
-				fDestinationRect);
-			return;
+	if ((fOptions & B_TILE_BITMAP) == 0) {
+		// optimized version if there is no scale
+		if (!_HasScale() && !_HasAffineTransform() && !_HasAlphaMask()) {
+			if (fPainter->fDrawingMode == B_OP_COPY) {
+				DrawBitmapNoScale<Bgr32Copy> drawNoScale;
+				drawNoScale.Draw(fPainter->fInternal, fBitmap, 4, fOffset,
+					fDestinationRect);
+				return;
+			}
+			if (fPainter->fDrawingMode == B_OP_OVER
+				|| (fPainter->fDrawingMode == B_OP_ALPHA
+					 && fPainter->fAlphaSrcMode == B_PIXEL_ALPHA
+					 && fPainter->fAlphaFncMode == B_ALPHA_OVERLAY)) {
+				DrawBitmapNoScale<Bgr32Alpha> drawNoScale;
+				drawNoScale.Draw(fPainter->fInternal, fBitmap, 4, fOffset,
+					fDestinationRect);
+				return;
+			}
 		}
-		if (fPainter->fDrawingMode == B_OP_OVER
-			|| (fPainter->fDrawingMode == B_OP_ALPHA
-				 && fPainter->fAlphaSrcMode == B_PIXEL_ALPHA
-				 && fPainter->fAlphaFncMode == B_ALPHA_OVERLAY)) {
-			DrawBitmapNoScale<Bgr32Alpha> drawNoScale;
-			drawNoScale.Draw(fPainter->fInternal, fBitmap, 4, fOffset,
-				fDestinationRect);
-			return;
-		}
-	}
 
-	if (!_HasScale() && !_HasAffineTransform() && _HasAlphaMask()) {
-		if (fPainter->fDrawingMode == B_OP_COPY) {
-			DrawBitmapNoScale<Bgr32CopyMasked> drawNoScale;
-			drawNoScale.Draw(fPainter->fInternal, fBitmap, 4, fOffset,
-				fDestinationRect);
+		if (!_HasScale() && !_HasAffineTransform() && _HasAlphaMask()) {
+			if (fPainter->fDrawingMode == B_OP_COPY) {
+				DrawBitmapNoScale<Bgr32CopyMasked> drawNoScale;
+				drawNoScale.Draw(fPainter->fInternal, fBitmap, 4, fOffset,
+					fDestinationRect);
+				return;
+			}
+		}
+
+		// bilinear and nearest-neighbor scaled, OP_COPY only
+		if (fPainter->fDrawingMode == B_OP_COPY
+			&& !_HasAffineTransform() && !_HasAlphaMask()) {
+			if ((fOptions & B_FILTER_BITMAP_BILINEAR) != 0) {
+				DrawBitmapBilinear<ColorTypeRgb, DrawModeCopy> drawBilinear;
+				drawBilinear.Draw(fPainter, fPainter->fInternal,
+					fBitmap, fOffset, fScaleX, fScaleY, fDestinationRect);
+			} else {
+				DrawBitmapNearestNeighborCopy::Draw(fPainter, fPainter->fInternal,
+					fBitmap, fOffset, fScaleX, fScaleY, fDestinationRect);
+			}
 			return;
 		}
-	}
 
-	// bilinear and nearest-neighbor scaled, OP_COPY only
-	if (fPainter->fDrawingMode == B_OP_COPY
-		&& !_HasAffineTransform() && !_HasAlphaMask()) {
-		if ((fOptions & B_FILTER_BITMAP_BILINEAR) != 0) {
-			DrawBitmapBilinear<ColorTypeRgb, DrawModeCopy> drawBilinear;
+		if (fPainter->fDrawingMode == B_OP_ALPHA
+			&& fPainter->fAlphaSrcMode == B_PIXEL_ALPHA
+			&& fPainter->fAlphaFncMode == B_ALPHA_OVERLAY
+			&& !_HasAffineTransform() && !_HasAlphaMask()
+			&& (fOptions & B_FILTER_BITMAP_BILINEAR) != 0) {
+			DrawBitmapBilinear<ColorTypeRgba, DrawModeAlphaOverlay> drawBilinear;
 			drawBilinear.Draw(fPainter, fPainter->fInternal,
 				fBitmap, fOffset, fScaleX, fScaleY, fDestinationRect);
-		} else {
-			DrawBitmapNearestNeighborCopy::Draw(fPainter, fPainter->fInternal,
-				fBitmap, fOffset, fScaleX, fScaleY, fDestinationRect);
+			return;
 		}
-		return;
 	}
 
-	if (fPainter->fDrawingMode == B_OP_ALPHA
-		&& fPainter->fAlphaSrcMode == B_PIXEL_ALPHA
-		&& fPainter->fAlphaFncMode == B_ALPHA_OVERLAY
-		&& !_HasAffineTransform() && !_HasAlphaMask()
-		&& (fOptions & B_FILTER_BITMAP_BILINEAR) != 0) {
-		DrawBitmapBilinear<ColorTypeRgba, DrawModeAlphaOverlay> drawBilinear;
-		drawBilinear.Draw(fPainter, fPainter->fInternal,
-			fBitmap, fOffset, fScaleX, fScaleY, fDestinationRect);
-		return;
+	if ((fOptions & B_TILE_BITMAP) != 0) {
+		DrawBitmapGeneric<Tile>::Draw(fPainter, fPainter->fInternal, fBitmap,
+			fOffset, fScaleX, fScaleY, fDestinationRect, fOptions);
+	} else {
+		// for all other cases (non-optimized drawing mode or scaled drawing)
+		DrawBitmapGeneric<Fill>::Draw(fPainter, fPainter->fInternal, fBitmap,
+			fOffset, fScaleX, fScaleY, fDestinationRect, fOptions);
 	}
-
-	// for all other cases (non-optimized drawing mode or scaled drawing)
-	DrawBitmapGeneric::Draw(fPainter, fPainter->fInternal, fBitmap, fOffset,
-		fScaleX, fScaleY, fDestinationRect, fOptions);
 }
 
 
@@ -183,33 +192,38 @@ Painter::BitmapPainter::_DetermineTransform(BRect sourceRect,
 		align_rect_to_pixels(&fDestinationRect);
 	}
 
-	fScaleX = (fDestinationRect.Width() + 1) / (sourceRect.Width() + 1);
-	fScaleY = (fDestinationRect.Height() + 1) / (sourceRect.Height() + 1);
+	if((fOptions & B_TILE_BITMAP) == 0) {
+		fScaleX = (fDestinationRect.Width() + 1) / (sourceRect.Width() + 1);
+		fScaleY = (fDestinationRect.Height() + 1) / (sourceRect.Height() + 1);
 
-	if (fScaleX == 0.0 || fScaleY == 0.0)
-		return false;
+		if (fScaleX == 0.0 || fScaleY == 0.0)
+			return false;
 
-	// constrain source rect to bitmap bounds and transfer the changes to
-	// the destination rect with the right scale
-	if (sourceRect.left < fBitmapBounds.left) {
-		float diff = fBitmapBounds.left - sourceRect.left;
-		fDestinationRect.left += diff * fScaleX;
-		sourceRect.left = fBitmapBounds.left;
-	}
-	if (sourceRect.top < fBitmapBounds.top) {
-		float diff = fBitmapBounds.top - sourceRect.top;
-		fDestinationRect.top += diff * fScaleY;
-		sourceRect.top = fBitmapBounds.top;
-	}
-	if (sourceRect.right > fBitmapBounds.right) {
-		float diff = sourceRect.right - fBitmapBounds.right;
-		fDestinationRect.right -= diff * fScaleX;
-		sourceRect.right = fBitmapBounds.right;
-	}
-	if (sourceRect.bottom > fBitmapBounds.bottom) {
-		float diff = sourceRect.bottom - fBitmapBounds.bottom;
-		fDestinationRect.bottom -= diff * fScaleY;
-		sourceRect.bottom = fBitmapBounds.bottom;
+		// constrain source rect to bitmap bounds and transfer the changes to
+		// the destination rect with the right scale
+		if (sourceRect.left < fBitmapBounds.left) {
+			float diff = fBitmapBounds.left - sourceRect.left;
+			fDestinationRect.left += diff * fScaleX;
+			sourceRect.left = fBitmapBounds.left;
+		}
+		if (sourceRect.top < fBitmapBounds.top) {
+			float diff = fBitmapBounds.top - sourceRect.top;
+			fDestinationRect.top += diff * fScaleY;
+			sourceRect.top = fBitmapBounds.top;
+		}
+		if (sourceRect.right > fBitmapBounds.right) {
+			float diff = sourceRect.right - fBitmapBounds.right;
+			fDestinationRect.right -= diff * fScaleX;
+			sourceRect.right = fBitmapBounds.right;
+		}
+		if (sourceRect.bottom > fBitmapBounds.bottom) {
+			float diff = sourceRect.bottom - fBitmapBounds.bottom;
+			fDestinationRect.bottom -= diff * fScaleY;
+			sourceRect.bottom = fBitmapBounds.bottom;
+		}
+	} else {
+		fScaleX = 1.0;
+		fScaleY = 1.0;
 	}
 
 	fOffset.x = fDestinationRect.left - sourceRect.left;
