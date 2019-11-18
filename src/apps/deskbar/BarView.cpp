@@ -733,6 +733,10 @@ TBarView::_ChangeState(BMessage* message)
 			// enable or disable preference items.
 
 		if (vertSwap) {
+			TBarWindow* window = dynamic_cast<TBarWindow*>(Window());
+			if (window != NULL)
+				window->SetSizeLimits();
+
 			fReplicantTray->fTime->SetOrientation(fVertical);
 			if (fExpandoMenuBar != NULL) {
 				if (fVertical) {

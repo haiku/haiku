@@ -102,6 +102,8 @@ TBarWindow::TBarWindow()
 
 	RemoveShortcut('H', B_COMMAND_KEY | B_CONTROL_KEY);
 	AddShortcut('F', B_COMMAND_KEY, new BMessage(kFindButton));
+
+	SetSizeLimits();
 }
 
 
@@ -294,6 +296,7 @@ TBarWindow::ScreenChanged(BRect size, color_space depth)
 	BWindow::ScreenChanged(size, depth);
 
 	fBarView->UpdatePlacement();
+	SetSizeLimits();
 }
 
 
@@ -644,6 +647,20 @@ bool
 TBarWindow::IsShowingMenu() const
 {
 	return fShowingMenu;
+}
+
+
+void
+TBarWindow::SetSizeLimits()
+{
+	BRect screenFrame = (BScreen(this)).Frame();
+	if (fBarView->Vertical()) {
+		BWindow::SetSizeLimits(gMinimumWindowWidth, gMaximumWindowWidth,
+			kMenuBarHeight - 1, screenFrame.Height());
+	} else {
+		BWindow::SetSizeLimits(screenFrame.Width(), screenFrame.Width(),
+			kMenuBarHeight - 1, kMaximumIconSize + 4);
+	}
 }
 
 

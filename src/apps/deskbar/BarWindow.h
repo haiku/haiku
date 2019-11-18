@@ -87,6 +87,8 @@ public:
 
 			bool				IsShowingMenu() const;
 
+			void				SetSizeLimits();
+
 private:
 			bool				_IsFocusMessage(BMessage* message);
 
