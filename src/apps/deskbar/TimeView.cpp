@@ -52,8 +52,8 @@ All rights reserved.
 #include <Window.h>
 
 #include "BarApp.h"
-#include "StatusView.h"
 #include "CalendarMenuWindow.h"
+#include "StatusView.h"
 
 
 static const float kHMargin = 2.0;
@@ -76,6 +76,7 @@ TTimeView::TTimeView(float maxWidth, float height)
 	fShowSeconds(false),
 	fShowDayOfWeek(false),
 	fShowTimeZone(false),
+	fCalendarWindow(NULL),
 	fTimeFormat(NULL),
 	fDateFormat(NULL)
 {
@@ -106,6 +107,9 @@ TTimeView::TTimeView(BMessage* data)
 
 TTimeView::~TTimeView()
 {
+	if (fCalendarWindow != NULL)
+		fCalendarWindow->Quit();
+
 	delete fTimeFormat;
 	delete fDateFormat;
 }
@@ -369,13 +373,13 @@ TTimeView::SetShowTimeZone(bool show)
 void
 TTimeView::ShowCalendar(BPoint where)
 {
-	if (fCalendarWindow.IsValid()) {
+	if (fCalendarWindowMessenger.IsValid()) {
 		// If the calendar is already shown, just activate it
 		BMessage activate(B_SET_PROPERTY);
 		activate.AddSpecifier("Active");
 		activate.AddBool("data", true);
 
-		if (fCalendarWindow.SendMessage(&activate) == B_OK)
+		if (fCalendarWindowMessenger.SendMessage(&activate) == B_OK)
 			return;
 	}
 
@@ -385,10 +389,16 @@ TTimeView::ShowCalendar(BPoint where)
 	if (where.y >= BScreen().Frame().bottom)
 		where.y -= (Bounds().Height() + 4.0);
 
-	CalendarMenuWindow* window = new CalendarMenuWindow(where);
-	fCalendarWindow = BMessenger(window);
+	fCalendarWindow = new CalendarMenuWindow(where);
+	fCalendarWindowMessenger = BMessenger(fCalendarWindow);
+	fCalendarWindow->Show();
+}
 
-	window->Show();
+
+bool
+TTimeView::IsShowingCalendar()
+{
+	return fCalendarWindow != NULL && !fCalendarWindow->IsHidden();
 }
 
 
@@ -413,6 +423,7 @@ TTimeView::UpdateTimeFormat()
 	delete fDateFormat;
 	fDateFormat = new BDateFormat(BLocale::Default());
 }
+
 
 void
 TTimeView::GetCurrentTime()

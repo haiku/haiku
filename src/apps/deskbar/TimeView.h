@@ -69,6 +69,7 @@ const uint32 kGetClockSettings = 'GCkS';
 
 class BCountry;
 class BMessageRunner;
+class CalendarMenuWindow;
 
 #ifdef AS_REPLICANT
 class _EXPORT	TTimeView;
@@ -108,6 +109,7 @@ public:
 				void			SetShowTimeZone(bool show);
 
 				void			ShowCalendar(BPoint where);
+				bool			IsShowingCalendar();
 
 private:
 		friend class TReplicantTray;
@@ -147,7 +149,8 @@ private:
 				BPoint			fTimeLocation;
 				BPoint			fDateLocation;
 
-				BMessenger		fCalendarWindow;
+				BMessenger		fCalendarWindowMessenger;
+		CalendarMenuWindow* 	fCalendarWindow;
 
 				// For date and time localization purposes
 				BDateTimeFormat* fTimeFormat;
