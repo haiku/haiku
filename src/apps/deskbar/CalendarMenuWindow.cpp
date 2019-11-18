@@ -79,7 +79,8 @@ CalendarMenuWindow::CalendarMenuWindow(BPoint where)
 	:
 	BWindow(BRect(0.0, 0.0, 100.0, 130.0), "", B_BORDERED_WINDOW,
 		B_AUTO_UPDATE_SIZE_LIMITS | B_ASYNCHRONOUS_CONTROLS | B_CLOSE_ON_ESCAPE
-		| B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE),
+			| B_NOT_MINIMIZABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE
+			| B_NOT_ZOOMABLE),
 	fYearLabel(NULL),
 	fMonthLabel(NULL),
 	fCalendarView(NULL),
