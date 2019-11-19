@@ -69,6 +69,7 @@ const uint32 kGetClockSettings = 'GCkS';
 class BCountry;
 class BMessageRunner;
 class CalendarMenuWindow;
+class TBarView;
 
 #ifdef AS_REPLICANT
 class _EXPORT	TTimeView;
@@ -76,7 +77,8 @@ class _EXPORT	TTimeView;
 
 class TTimeView : public BView {
 public:
-								TTimeView(float maxWidth, float height);
+								TTimeView(float maxWidth, float height,
+									TBarView* barView = NULL);
 								TTimeView(BMessage* data);
 								~TTimeView();
 
@@ -94,9 +96,6 @@ public:
 				void			MouseDown(BPoint where);
 				void			Pulse();
 				void			ResizeToPreferred();
-
-				bool			Orientation() const;
-				void			SetOrientation(bool o);
 
 				bool			ShowSeconds() const;
 				void			SetShowSeconds(bool show);
@@ -120,6 +119,9 @@ private:
 				void			ShowTimeOptions(BPoint);
 				void			Update();
 
+				bool			Vertical();
+
+				TBarView*		fBarView;
 				BView*			fParent;
 				bool			fNeedToUpdate;
 
@@ -137,8 +139,7 @@ private:
 
 				float			fMaxWidth;
 				float			fHeight;
-				bool			fOrientation;
-									// vertical = true
+
 				int16			fShowLevel;
 
 				bool			fShowSeconds;
@@ -155,13 +156,6 @@ private:
 				BDateTimeFormat* fTimeFormat;
 				BDateFormat*	fDateFormat;
 };
-
-
-inline bool
-TTimeView::Orientation() const
-{
-	return fOrientation;
-}
 
 
 #endif	/* TIME_VIEW_H */

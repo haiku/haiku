@@ -397,16 +397,17 @@ BPoint
 TDeskbarMenu::ScreenLocation()
 {
 	bool vertical = fBarView->Vertical();
-	int32 expando = (fBarView->State() == kExpandoState);
+	int32 expando = fBarView->ExpandoState();
+	bool left = fBarView->Left();
 	BPoint point;
 
 	BRect rect = Supermenu()->Bounds();
 	Supermenu()->ConvertToScreen(&rect);
 
-	if (expando && vertical && fBarView->Left()) {
+	if (vertical && expando && left) {
 		PRINT(("Left\n"));
 		point = rect.RightTop() + BPoint(0, 3);
-	} else if (expando && vertical && !fBarView->Left()) {
+	} else if (vertical && expando && !left) {
 		PRINT(("Right\n"));
 		point = rect.LeftTop() - BPoint(Bounds().Width(), 0) + BPoint(0, 3);
 	} else

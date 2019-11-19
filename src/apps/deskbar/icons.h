@@ -8,6 +8,6 @@ enum {
 	R_WindowHiddenIcon = 21,
 	R_ResizeIcon = 22,
 	R_WindowShownSwitchIcon = 23,
-	R_WindowHiddenSwitchIcon = 24
+	R_WindowHiddenSwitchIcon = 24,
+	R_TeamIconVector = 25
 };
-

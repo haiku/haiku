@@ -157,16 +157,8 @@ TTeamMenuItem::GetContentSize(float* width, float* height)
 			else
 				*width = gMinimumWindowWidth - (kDragRegionWidth + kGutter) * 2;
 		} else if (!fBarView->Vertical()) {
-			if (hideLabels)
-				*width = iconOnlyWidth;
-			else {
-				float labelWidth = gMinimumWindowWidth;
-				BFont font;
-				Menu()->GetFont(&font);
-				labelWidth += (font.Size() - 12) * 4 + iconSize - 16;
-					// do font and icon scaling
-				*width = iconOnlyWidth + labelWidth;
-			}
+			TExpandoMenuBar* menu = static_cast<TExpandoMenuBar*>(Menu());
+			*width = menu->MaxHorizontalItemWidth();
 		} else
 			*width = static_cast<TBarApp*>(be_app)->Settings()->width;
 	}

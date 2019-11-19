@@ -39,21 +39,29 @@ All rights reserved.
 #include <Bitmap.h>
 #include <ControlLook.h>
 #include <Debug.h>
+#include <Region.h>
 
 #include "BarApp.h"
 #include "BarView.h"
 #include "BarWindow.h"
+#include "DeskbarMenu.h"
 
 
 TBarMenuTitle::TBarMenuTitle(float width, float height, const BBitmap* icon,
-	BMenu* menu, bool expando)
+	BMenu* menu, TBarView* barView)
 	:
 	BMenuItem(menu, new BMessage(B_REFS_RECEIVED)),
 	fWidth(width),
 	fHeight(height),
-	fInExpando(expando),
-	fIcon(icon)
+	fIcon(icon),
+	fMenu(menu),
+	fBarView(barView),
+	fInitStatus(B_NO_INIT)
 {
+	if (fIcon == NULL || fMenu == NULL || fBarView == NULL)
+		fInitStatus = B_BAD_VALUE;
+	else
+		fInitStatus = B_OK;
 }
 
 
@@ -82,7 +90,7 @@ void
 TBarMenuTitle::Draw()
 {
 	BMenu* menu = Menu();
-	if (menu == NULL)
+	if (fInitStatus != B_OK || menu == NULL)
 		return;
 
 	BRect frame(Frame());
@@ -111,37 +119,52 @@ TBarMenuTitle::Draw()
 void
 TBarMenuTitle::DrawContent()
 {
-	if (fIcon == NULL)
+	if (fInitStatus != B_OK)
 		return;
 
 	BMenu* menu = Menu();
-	BRect frame(Frame());
-	BRect iconRect(fIcon->Bounds());
+	if (menu == NULL)
+		return;
 
 	menu->SetDrawingMode(B_OP_ALPHA);
-	iconRect.OffsetTo(frame.LeftTop());
+
+	const BRect frame(Frame());
+	BRect iconRect(fIcon->Bounds().OffsetToCopy(frame.LeftTop()));
 
 	float widthOffset = rintf((frame.Width() - iconRect.Width()) / 2);
-	float heightOffset = 0;
-	if (frame.Height() > iconRect.Height() + 2)
-		heightOffset = rintf((frame.Height() - iconRect.Height()) / 2);
-	iconRect.OffsetBy(widthOffset - 1.0f, heightOffset + 2.0f);
+	float heightOffset = rintf((frame.Height() - iconRect.Height()) / 2);
+
+	// cut-off the leaf
+	bool isLeafMenu = dynamic_cast<TDeskbarMenu*>(fMenu) != NULL;
+	if (fBarView->Vertical() && isLeafMenu)
+		iconRect.OffsetBy(widthOffset, frame.Height() - iconRect.Height() + 2);
+	else
+		iconRect.OffsetBy(widthOffset, heightOffset);
+
+	// clip to menu item frame
+	if (iconRect.Width() > frame.Width()) {
+		float diff = iconRect.Width() - frame.Width();
+		BRect mask(iconRect.InsetByCopy(floorf(diff / 2), 0));
+		BRegion clipping(mask);
+		menu->ConstrainClippingRegion(&clipping);
+	}
 
 	menu->DrawBitmapAsync(fIcon, iconRect);
+	menu->ConstrainClippingRegion(NULL);
 }
 
 
 status_t
 TBarMenuTitle::Invoke(BMessage* message)
 {
-	TBarView* barview = dynamic_cast<TBarApp*>(be_app)->BarView();
-	if (barview) {
-		BLooper* looper = barview->Looper();
-		if (looper->Lock()) {
-			// tell barview to add the refs to the deskbar menu
-			barview->HandleDeskbarMenu(NULL);
-			looper->Unlock();
-		}
+	if (fInitStatus != B_OK || fBarView == NULL)
+		return fInitStatus;
+
+	BLooper* looper = fBarView->Looper();
+	if (looper->Lock()) {
+		// tell barview to add the refs to the deskbar menu
+		fBarView->HandleDeskbarMenu(NULL);
+		looper->Unlock();
 	}
 
 	return BMenuItem::Invoke(message);

@@ -44,15 +44,19 @@ All rights reserved.
 #include <Menu.h>
 
 
+class TBarView;
+
 class TTeamMenu : public BMenu {
 public:
-							TTeamMenu();
+							TTeamMenu(TBarView* barView = NULL);
 
 			void			AttachedToWindow();
 			void			DetachedFromWindow();
 
 	static	int				CompareByName(const void* first,
 								const void* second);
+private:
+			TBarView*		fBarView;
 };
 
 

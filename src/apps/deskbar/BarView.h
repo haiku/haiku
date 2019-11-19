@@ -57,8 +57,6 @@ enum {
 	kFullState = 2
 };
 
-
-const float kMiniHeight = 46.0f;
 const float kHModeHeight = 21.0f;
 const float kMenuBarHeight = 21.0f;
 const float kStatusHeight = 22.0f;
@@ -172,6 +170,7 @@ public:
 			TReplicantTray*		ReplicantTray() const { return fReplicantTray; }
 
 			float			TeamMenuItemHeight() const;
+			float			TabHeight() const { return fTabHeight; };
 
 private:
 	friend class TBarApp;
@@ -217,6 +216,8 @@ private:
 
 			TTeamMenuItem*	fLastDragItem;
 			BMessageFilter*	fMouseFilter;
+
+			float			fTabHeight;
 };
 
 

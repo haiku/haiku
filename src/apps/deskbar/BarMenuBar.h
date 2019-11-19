@@ -79,11 +79,17 @@ public:
 								bool (* hookfunction)(BMenu*, void*),
 								void* state, bool both = false);
 
+	const	BBitmap*		FetchTeamIcon();
+
 private:
 			TBarView*		fBarView;
 			TBarMenuTitle*	fDeskbarMenuItem;
 			TBarMenuTitle*	fAppListMenuItem;
 			TSeparatorItem*	fSeparatorItem;
+
+	const	uint8*			fTeamIconData;
+			size_t			fTeamIconSize;
 };
+
 
 #endif	// BARMENUBAR_H

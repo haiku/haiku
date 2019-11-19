@@ -66,15 +66,15 @@ static const float kHMargin = 2.0;
 #define B_TRANSLATION_CONTEXT "TimeView"
 
 
-TTimeView::TTimeView(float maxWidth, float height)
+TTimeView::TTimeView(float maxWidth, float height, TBarView* barView)
 	:
 	BView(BRect(-100, -100, -90, -90), "_deskbar_tv_",
 		B_FOLLOW_RIGHT | B_FOLLOW_TOP,
 		B_WILL_DRAW | B_PULSE_NEEDED | B_FRAME_EVENTS),
+	fBarView(barView),
 	fParent(NULL),
 	fMaxWidth(maxWidth),
 	fHeight(height),
-	fOrientation(true),
 	fShowLevel(0),
 	fShowSeconds(false),
 	fShowDayOfWeek(false),
@@ -133,7 +133,7 @@ status_t
 TTimeView::Archive(BMessage* data, bool deep) const
 {
 	BView::Archive(data, deep);
-	data->AddBool("orientation", fOrientation);
+	data->AddBool("orientation", Vertical());
 	data->AddInt16("showLevel", fShowLevel);
 	data->AddBool("showSeconds", fShowSeconds);
 	data->AddBool("showDayOfWeek", fShowDayOfWeek);
@@ -193,9 +193,10 @@ TTimeView::GetPreferredSize(float* width, float* height)
 	// set the height based on the font size
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
-	fHeight = fontHeight.ascent + fontHeight.descent;
+	fHeight = fontHeight.ascent + fontHeight.descent - 2;
+		// reduce height by 2px so that clock doesn't draw on top of border
 
-	if (fOrientation) {
+	if (Vertical()) {
 		float appWidth = static_cast<TBarApp*>(be_app)->Settings()->width;
 		*width = fMaxWidth
 			= std::min(appWidth - (kDragRegionWidth + kHMargin) * 2, timeWidth);
@@ -318,16 +319,6 @@ TTimeView::ResizeToPreferred()
 
 
 //	# pragma mark - Public methods
-
-
-void
-TTimeView::SetOrientation(bool orientation)
-{
-	fOrientation = orientation;
-	ResizeToPreferred();
-	CalculateTextPlacement();
-	Invalidate();
-}
 
 
 bool
@@ -480,7 +471,7 @@ TTimeView::CalculateTextPlacement()
 	fTimeLocation.y = fDateLocation.y = ceilf((Bounds().Height()
 		- rectArray[0].Height() + 1.0) / 2.0 - rectArray[0].top);
 
-	if (fOrientation) {
+	if (Vertical()) {
 		float timeWidth = StringWidth(fCurrentTimeStr);
 		if (timeWidth > fMaxWidth) {
 			// time does not fit, push it over to truncate the left side
@@ -532,4 +523,15 @@ TTimeView::Update()
 
 	if (fParent != NULL)
 		fParent->Invalidate();
+}
+
+
+bool
+TTimeView::Vertical()
+{
+	if (fBarView == NULL)
+		return true;
+
+	return fBarView->Vertical()
+		&& (fBarView->ExpandoState() || fBarView->FullState());
 }

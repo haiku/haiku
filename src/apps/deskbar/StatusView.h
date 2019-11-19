@@ -38,6 +38,7 @@ All rights reserved.
 
 #include <Control.h>
 #include <Node.h>
+#include <Region.h>
 #include <Query.h>
 #include <Shelf.h>
 #include <View.h>
@@ -45,6 +46,8 @@ All rights reserved.
 #include "BarView.h"
 #include "TimeView.h"
 
+
+//#define FULL_MODE
 
 const float kDragWidth = 4.0f;
 const float kMinReplicantHeight = 16.0f;
@@ -79,8 +82,7 @@ class TReplicantShelf;
 
 class TReplicantTray : public BView {
 public:
-									TReplicantTray(TBarView* barView,
-										bool vertical);
+									TReplicantTray(TBarView* barView);
 		virtual						~TReplicantTray();
 
 		virtual	void				AttachedToWindow();
@@ -91,10 +93,6 @@ public:
 
 				void				AdjustPlacement();
 				void				ShowReplicantMenu(BPoint);
-
-				void				SetMultiRow(bool state);
-				bool				IsMultiRow() const
-										{ return fMultiRowMode; }
 
 				TTimeView*			Time() const { return fTime; }
 				void				ShowHideTime();
@@ -181,7 +179,6 @@ private:
 				float				fMaxReplicantHeight;
 				float				fMinTrayHeight;
 
-				bool				fMultiRowMode;
 				float				fMinimumTrayWidth;
 
 				bool				fAlignmentSupport;
@@ -209,15 +206,16 @@ public:
 	virtual void AttachedToWindow();
 	virtual void GetPreferredSize(float*, float*);
 	virtual void Draw(BRect);
+	virtual void DrawAfterChildren(BRect);
 	virtual void MouseDown(BPoint);
 	virtual void MouseUp(BPoint);
 	virtual void MouseMoved(BPoint, uint32, const BMessage*);
 
-	void DrawDragRegion();
 	BRect DragRegion() const;
 
-	bool SwitchModeForRect(BPoint mouse, BRect rect,
+	bool SwitchModeForRegion(BPoint where, BRegion region,
 		bool newVertical, bool newLeft, bool newTop, int32 newState);
+	void CalculateRegions();
 
 	int32 DragRegionLocation() const;
 	void SetDragRegionLocation(int32);
@@ -225,10 +223,26 @@ public:
 	bool IsDragging() { return IsTracking(); };
 
 private:
+	void DrawDragger();
+
+private:
 	TBarView* fBarView;
 	BView* fReplicantTray;
 	BPoint fPreviousPosition;
 	int32 fDragLocation;
+
+	BRegion fTopLeft;
+	BRegion fTopRight;
+	BRegion fBottomLeft;
+	BRegion fBottomRight;
+	BRegion fMiddleLeft;
+	BRegion fMiddleRight;
+#ifdef FULL_MODE
+	BRegion fLeftSide;
+	BRegion fRightSide;
+#endif
+	BRegion fTopHalf;
+	BRegion fBottomHalf;
 };
 
 class TResizeControl : public BControl {
