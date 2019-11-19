@@ -178,7 +178,7 @@ BPath::SetTo(const char* path, const char* leaf, bool normalize)
 		}
 		// check, if necessary to normalize
 		if (error == B_OK && !normalize)
-			normalize = normalize || _MustNormalize(newPath, &error);
+			normalize = _MustNormalize(newPath, &error);
 
 		// normalize the path, if necessary, otherwise just set it
 		if (error == B_OK) {
