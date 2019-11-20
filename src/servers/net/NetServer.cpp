@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2019, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -731,7 +731,8 @@ NetServer::_ConfigureDevices(const char* startPath,
 		BPath path;
 		if (entry.GetName(name) != B_OK
 			|| entry.GetPath(&path) != B_OK
-			|| entry.GetStat(&stat) != B_OK)
+			|| entry.GetStat(&stat) != B_OK
+			|| devicesAlreadyConfigured.HasString(path.Path()))
 			continue;
 
 		if (S_ISBLK(stat.st_mode) || S_ISCHR(stat.st_mode)) {
@@ -739,7 +740,7 @@ NetServer::_ConfigureDevices(const char* startPath,
 				&& suggestedInterface->SetString("device", path.Path()) == B_OK
 				&& _ConfigureInterface(*suggestedInterface) == B_OK)
 				suggestedInterface = NULL;
-			else if (!devicesAlreadyConfigured.HasString(path.Path()))
+			else
 				_ConfigureDevice(path.Path());
 		} else if (entry.IsDirectory()) {
 			_ConfigureDevices(path.Path(), devicesAlreadyConfigured,
