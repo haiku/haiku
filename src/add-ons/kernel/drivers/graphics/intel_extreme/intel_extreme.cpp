@@ -102,9 +102,12 @@ intel_get_interrupt_mask(intel_info& info, int pipes, bool enable)
 
 	// Intel changed the PCH register mapping between Sandy Bridge and the
 	// later generations (Ivy Bridge and up).
+	// The PCH register itself does not exist in pre-PCH platforms, and the
+	// previous interrupt register of course also had a different mapping.
 
 	if ((pipes & INTEL_PIPE_A) != 0) {
-		if (info.device_type.InGroup(INTEL_GROUP_SNB))
+		if (info.device_type.InGroup(INTEL_GROUP_SNB)
+				|| info.device_type.InGroup(INTEL_GROUP_ILK))
 			mask |= PCH_INTERRUPT_VBLANK_PIPEA_SNB;
 		else if (hasPCH)
 			mask |= PCH_INTERRUPT_VBLANK_PIPEA;
@@ -113,7 +116,8 @@ intel_get_interrupt_mask(intel_info& info, int pipes, bool enable)
 	}
 
 	if ((pipes & INTEL_PIPE_B) != 0) {
-		if (info.device_type.InGroup(INTEL_GROUP_SNB))
+		if (info.device_type.InGroup(INTEL_GROUP_SNB)
+				|| info.device_type.InGroup(INTEL_GROUP_ILK))
 			mask |= PCH_INTERRUPT_VBLANK_PIPEB_SNB;
 		else if (hasPCH)
 			mask |= PCH_INTERRUPT_VBLANK_PIPEB;
@@ -123,15 +127,15 @@ intel_get_interrupt_mask(intel_info& info, int pipes, bool enable)
 
 #if 0 // FIXME enable when we support the 3rd pipe
 	if ((pipes & INTEL_PIPE_C) != 0) {
-		if (hasPCH && !info.device_type.InGroup(INTEL_GROUP_SNB))
+		// Older generations only had two pipes
+		if (hasPCH && info.device_type.Generation() > 6)
 			mask |= PCH_INTERRUPT_VBLANK_PIPEC;
 	}
 #endif
 
 	// On SandyBridge, there is an extra "global enable" flag, which must also
 	// be set when enabling the interrupts (but not when testing for them).
-	if (enable && (info.device_type.InGroup(INTEL_GROUP_SNB)
-			|| info.device_type.InGroup(INTEL_GROUP_HAS)))
+	if (enable && info.device_type.InFamily(INTEL_FAMILY_SER5))
 		mask |= PCH_INTERRUPT_GLOBAL_SNB;
 
 	return mask;
