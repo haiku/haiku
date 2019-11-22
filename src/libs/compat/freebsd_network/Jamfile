@@ -16,11 +16,10 @@ KernelStaticLibrary libfreebsd_network.a :
 	bus.cpp
 	callout.cpp
 	clock.c
-	compat.c
-	compat_cpp.cpp
 	condvar.c
 	Condvar.cpp
 	device.c
+	device_hooks.c
 	driver.c
 	eventhandler.c
 	fbsd_busdma_x86.c
@@ -38,6 +37,7 @@ KernelStaticLibrary libfreebsd_network.a :
 	firmware.c
 	if.c
 	libkern.cpp
+	malloc.cpp
 	mbuf.c
 	mii.c
 	mutex.c

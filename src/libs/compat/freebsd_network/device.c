@@ -1,305 +1,662 @@
 /*
- * Copyright 2007-2009, Axel Dörfler, axeld@pinc-software.de.
- * Copyright 2007, Hugo Santos. All Rights Reserved.
+ * Copyright 2007, Hugo Santos, hugosantos@gmail.com. All Rights Reserved.
+ * Copyright 2007, Axel Dörfler, axeld@pinc-software.de. All Rights Reserved.
  * Copyright 2004, Marcus Overhagen. All Rights Reserved.
+ *
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "device.h"
 
-#include <stdlib.h>
-#include <sys/sockio.h>
+#include <stdio.h>
 
-#include <Drivers.h>
-#include <ether_driver.h>
+#include <KernelExport.h>
+#include <image.h>
+#include <kernel/heap.h>
 
-#include <compat/sys/haiku-module.h>
-
+#include <compat/machine/resource.h>
+#include <compat/dev/mii/mii.h>
 #include <compat/sys/bus.h>
-#include <compat/sys/mbuf.h>
-#include <compat/net/ethernet.h>
 #include <compat/net/if_media.h>
 
+#include <compat/dev/mii/miivar.h>
 
-static status_t
-compat_open(const char *name, uint32 flags, void **cookie)
+
+spinlock __haiku_intr_spinlock;
+
+struct net_stack_module_info *gStack;
+pci_module_info *gPci;
+struct pci_x86_module_info *gPCIx86;
+
+static struct list sRootDevices;
+static int sNextUnit;
+
+//	#pragma mark - private functions
+
+
+static device_t
+init_device(device_t device, driver_t *driver)
 {
-	struct ifnet *ifp;
-	struct ifreq ifr;
-	int i;
-	status_t status;
+	list_init_etc(&device->children, offsetof(struct device, link));
+	device->unit = sNextUnit++;
 
-	for (i = 0; i < MAX_DEVICES; i++) {
-		if (gDevices[i] != NULL && !strcmp(gDevices[i]->device_name, name))
-			break;
+	if (driver != NULL && device_set_driver(device, driver) < 0)
+		return NULL;
+
+	return device;
+}
+
+
+static device_t
+new_device(driver_t *driver)
+{
+	device_t dev = malloc(sizeof(struct device));
+	if (dev == NULL)
+		return NULL;
+
+	memset(dev, 0, sizeof(struct device));
+
+	if (init_device(dev, driver) == NULL) {
+		free(dev);
+		return NULL;
 	}
 
-	if (i == MAX_DEVICES)
-		return B_ERROR;
+	return dev;
+}
 
-	if (get_module(NET_STACK_MODULE_NAME, (module_info **)&gStack) != B_OK)
-		return B_ERROR;
 
-	ifp = gDevices[i];
-	if_printf(ifp, "compat_open(0x%" B_PRIx32 ")\n", flags);
-
-	if (atomic_or(&ifp->open_count, 1)) {
-		put_module(NET_STACK_MODULE_NAME);
-		return B_BUSY;
-	}
-
-	ifp->if_init(ifp->if_softc);
-
-	if (!HAIKU_DRIVER_REQUIRES(FBSD_WLAN_FEATURE)) {
-		ifp->if_flags &= ~IFF_UP;
-		ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);
-
-		memset(&ifr, 0, sizeof(ifr));
-		ifr.ifr_media = IFM_MAKEWORD(IFM_ETHER, IFM_AUTO, 0, 0);
-		status = ifp->if_ioctl(ifp, SIOCSIFMEDIA, (caddr_t)&ifr);
-		if (status != B_OK) {
-			ifr.ifr_media = IFM_MAKEWORD(IFM_ETHER, IFM_10_T, 0, 0);
-			status = ifp->if_ioctl(ifp, SIOCSIFMEDIA, (caddr_t)&ifr);
+static image_id
+find_own_image()
+{
+	int32 cookie = 0;
+	image_info info;
+	while (get_next_image_info(B_SYSTEM_TEAM, &cookie, &info) == B_OK) {
+		if (((addr_t)info.text <= (addr_t)find_own_image
+			&& (addr_t)info.text + (addr_t)info.text_size
+				> (addr_t)find_own_image)) {
+			// found our own image
+			return info.id;
 		}
 	}
 
-	ifp->if_flags |= IFF_UP;
-	ifp->flags &= ~DEVICE_CLOSED;
-	ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);
-
-	*cookie = ifp;
-	return B_OK;
+	return B_ENTRY_NOT_FOUND;
 }
 
 
-static status_t
-compat_close(void *cookie)
+static device_method_signature_t
+resolve_method(driver_t *driver, const char *name)
 {
-	struct ifnet *ifp = cookie;
+	device_method_signature_t method = NULL;
+	int i;
 
-	if_printf(ifp, "compat_close()\n");
-
-	atomic_or(&ifp->flags, DEVICE_CLOSED);
-
-	wlan_close(cookie);
-
-	release_sem_etc(ifp->receive_sem, 1, B_RELEASE_ALL);
-
-	return B_OK;
-}
-
-
-static status_t
-compat_free(void *cookie)
-{
-	struct ifnet *ifp = cookie;
-
-	if_printf(ifp, "compat_free()\n");
-
-	// TODO: empty out the send queue
-
-	atomic_and(&ifp->open_count, 0);
-	put_module(NET_STACK_MODULE_NAME);
-	return B_OK;
-}
-
-
-static status_t
-compat_read(void *cookie, off_t position, void *buffer, size_t *numBytes)
-{
-	struct ifnet *ifp = cookie;
-	uint32 semFlags = B_CAN_INTERRUPT;
-	status_t status;
-	struct mbuf *mb;
-	size_t length;
-
-	//if_printf(ifp, "compat_read(%lld, %p, [%lu])\n", position,
-	//	buffer, *numBytes);
-
-	if (ifp->flags & DEVICE_CLOSED)
-		return B_INTERRUPTED;
-
-	if (ifp->flags & DEVICE_NON_BLOCK)
-		semFlags |= B_RELATIVE_TIMEOUT;
-
-	do {
-		status = acquire_sem_etc(ifp->receive_sem, 1, semFlags, 0);
-		if (ifp->flags & DEVICE_CLOSED)
-			return B_INTERRUPTED;
-
-		if (status == B_WOULD_BLOCK) {
-			*numBytes = 0;
-			return B_OK;
-		} else if (status < B_OK)
-			return status;
-
-		IF_DEQUEUE(&ifp->receive_queue, mb);
-	} while (mb == NULL);
-
-	length = min_c(max_c((size_t)mb->m_pkthdr.len, 0), *numBytes);
-
-#if 0
-	mb = m_defrag(mb, 0);
-	if (mb == NULL) {
-		*numBytes = 0;
-		return B_NO_MEMORY;
+	for (i = 0; method == NULL && driver->methods[i].name != NULL; i++) {
+		if (strcmp(driver->methods[i].name, name) == 0)
+			method = driver->methods[i].method;
 	}
+
+	if (method == NULL)
+		panic("resolve_method: method%s not found\n", name);
+
+	return method;
+}
+
+
+//	#pragma mark - Device
+
+
+void
+driver_printf(const char *format, ...)
+{
+	va_list vl;
+	va_start(vl, format);
+	driver_vprintf(format, vl);
+	va_end(vl);
+}
+
+
+static int
+driver_vprintf_etc(const char *extra, const char *format, va_list vl)
+{
+	char buf[256];
+	int ret = vsnprintf(buf, sizeof(buf), format, vl);
+
+	if (extra)
+		dprintf("[%s] (%s) %s", gDriverName, extra, buf);
+	else
+		dprintf("[%s] %s", gDriverName, buf);
+
+	return ret;
+}
+
+
+int
+driver_vprintf(const char *format, va_list vl)
+{
+	return driver_vprintf_etc(NULL, format, vl);
+}
+
+
+int
+device_printf(device_t dev, const char *format, ...)
+{
+	va_list vl;
+
+	va_start(vl, format);
+	driver_vprintf_etc(dev->device_name, format, vl);
+	va_end(vl);
+	return 0;
+}
+
+
+void
+device_set_desc(device_t dev, const char *desc)
+{
+	dev->description = desc;
+}
+
+
+void
+device_set_desc_copy(device_t dev, const char *desc)
+{
+	dev->description = strdup(desc);
+	dev->flags |= DEVICE_DESC_ALLOCED;
+}
+
+
+const char *
+device_get_desc(device_t dev)
+{
+	return dev->description;
+}
+
+
+device_t
+device_get_parent(device_t dev)
+{
+	return dev->parent;
+}
+
+
+devclass_t
+device_get_devclass(device_t dev)
+{
+	// TODO find out what to do
+	return 0;
+}
+
+
+int
+device_get_children(device_t dev, device_t **devlistp, int *devcountp)
+{
+	int count;
+	device_t child = NULL;
+	device_t *list;
+
+	count = 0;
+	while ((child = list_get_next_item(&dev->children, child)) != NULL) {
+		count++;
+	}
+
+	list = malloc(count * sizeof(device_t));
+	if (!list)
+		return (ENOMEM);
+
+	count = 0;
+	while ((child = list_get_next_item(&dev->children, child)) != NULL) {
+		list[count] = child;
+		count++;
+	}
+
+	*devlistp = list;
+	*devcountp = count;
+
+	return (0);
+}
+
+
+void
+device_set_ivars(device_t dev, void *ivars)
+{
+	dev->ivars = ivars;
+}
+
+
+void *
+device_get_ivars(device_t dev)
+{
+	return dev->ivars;
+}
+
+
+const char *
+device_get_name(device_t dev)
+{
+	if (dev == NULL)
+		return NULL;
+
+	return dev->device_name;
+}
+
+
+int
+device_get_unit(device_t dev)
+{
+	return dev->unit;
+}
+
+
+const char *
+device_get_nameunit(device_t dev)
+{
+	return dev->nameunit;
+}
+
+
+void *
+device_get_softc(device_t dev)
+{
+	return dev->softc;
+}
+
+
+void
+device_set_softc(device_t dev, void *softc)
+{
+	if (dev->softc == softc)
+		return;
+
+	if ((dev->flags & DEVICE_SOFTC_SET) == 0) {
+		// Not externally allocated. We own it so we must clean it up.
+		free(dev->softc);
+	}
+
+	dev->softc = softc;
+	if (dev->softc != NULL)
+		dev->flags |= DEVICE_SOFTC_SET;
+	else
+		dev->flags &= ~DEVICE_SOFTC_SET;
+}
+
+
+u_int32_t
+device_get_flags(device_t dev)
+{
+	return dev->flags;
+}
+
+
+int
+device_set_driver(device_t dev, driver_t *driver)
+{
+	int i;
+
+	dev->softc = malloc(driver->size);
+	if (dev->softc == NULL)
+		return -1;
+
+	memset(dev->softc, 0, driver->size);
+	dev->driver = driver;
+
+	for (i = 0; driver->methods[i].name != NULL; i++) {
+		device_method_t *mth = &driver->methods[i];
+
+		if (strcmp(mth->name, "device_register") == 0)
+			dev->methods.device_register = (void *)mth->method;
+		else if (strcmp(mth->name, "device_probe") == 0)
+			dev->methods.probe = (void *)mth->method;
+		else if (strcmp(mth->name, "device_attach") == 0)
+			dev->methods.attach = (void *)mth->method;
+		else if (strcmp(mth->name, "device_detach") == 0)
+			dev->methods.detach = (void *)mth->method;
+		else if (strcmp(mth->name, "device_suspend") == 0)
+			dev->methods.suspend = (void *)mth->method;
+		else if (strcmp(mth->name, "device_resume") == 0)
+			dev->methods.resume = (void *)mth->method;
+		else if (strcmp(mth->name, "device_shutdown") == 0)
+			dev->methods.shutdown = (void *)mth->method;
+		else if (strcmp(mth->name, "miibus_readreg") == 0)
+			dev->methods.miibus_readreg = (void *)mth->method;
+		else if (strcmp(mth->name, "miibus_writereg") == 0)
+			dev->methods.miibus_writereg = (void *)mth->method;
+		else if (strcmp(mth->name, "miibus_statchg") == 0)
+			dev->methods.miibus_statchg = (void *)mth->method;
+		else if (!strcmp(mth->name, "miibus_linkchg"))
+			dev->methods.miibus_linkchg = (void *)mth->method;
+		else if (!strcmp(mth->name, "miibus_mediainit"))
+			dev->methods.miibus_mediainit = (void *)mth->method;
+		else if (!strcmp(mth->name, "bus_child_location_str"))
+			dev->methods.bus_child_location_str = (void *)mth->method;
+		else if (!strcmp(mth->name, "bus_child_pnpinfo_str"))
+			dev->methods.bus_child_pnpinfo_str = (void *)mth->method;
+		else if (!strcmp(mth->name, "bus_hinted_child"))
+			dev->methods.bus_hinted_child = (void *)mth->method;
+		else if (!strcmp(mth->name, "bus_print_child"))
+			dev->methods.bus_print_child = (void *)mth->method;
+		else if (!strcmp(mth->name, "bus_read_ivar"))
+			dev->methods.bus_read_ivar = (void *)mth->method;
+		else if (!strcmp(mth->name, "bus_get_dma_tag"))
+			dev->methods.bus_get_dma_tag = (void *)mth->method;
+		else
+			panic("device_set_driver: method %s not found\n", mth->name);
+
+	}
+
+	return 0;
+}
+
+
+int
+device_is_alive(device_t device)
+{
+	return (device->flags & DEVICE_ATTACHED) != 0;
+}
+
+
+device_t
+device_add_child_driver(device_t parent, const char* name, driver_t* _driver,
+	int unit)
+{
+	device_t child = NULL;
+
+	if (_driver == NULL && name != NULL) {
+		if (strcmp(name, "miibus") == 0)
+			child = new_device(&miibus_driver);
+		else {
+			// find matching driver structure
+			driver_t** driver;
+			char symbol[128];
+
+			snprintf(symbol, sizeof(symbol), "__fbsd_%s_%s", name,
+				parent->driver->name);
+			if (get_image_symbol(find_own_image(), symbol, B_SYMBOL_TYPE_DATA,
+					(void**)&driver) == B_OK) {
+				child = new_device(*driver);
+			} else
+				device_printf(parent, "couldn't find symbol %s\n", symbol);
+		}
+	} else if (_driver != NULL) {
+		child = new_device(_driver);
+	} else
+		child = new_device(NULL);
+
+	if (child == NULL)
+		return NULL;
+
+	if (name != NULL)
+		strlcpy(child->device_name, name, sizeof(child->device_name));
+
+	child->parent = parent;
+
+	if (parent != NULL) {
+		list_add_item(&parent->children, child);
+		child->root = parent->root;
+	} else {
+		if (sRootDevices.link.next == NULL)
+			list_init_etc(&sRootDevices, offsetof(struct device, link));
+		list_add_item(&sRootDevices, child);
+	}
+
+	return child;
+}
+
+
+device_t
+device_add_child(device_t parent, const char* name, int unit)
+{
+	return device_add_child_driver(parent, name, NULL, unit);
+}
+
+
+/*!	Delete the child and all of its children. Detach as necessary.
+*/
+int
+device_delete_child(device_t parent, device_t child)
+{
+	int status;
+
+	if (child == NULL)
+		return 0;
+
+	if (parent != NULL)
+		list_remove_item(&parent->children, child);
+	else
+		list_remove_item(&sRootDevices, child);
+
+	// We differentiate from the FreeBSD logic here - it will first delete
+	// the children, and will then detach the device.
+	// This has the problem that you cannot safely call device_delete_child()
+	// as you don't know if one of the children deletes its own children this
+	// way when it is detached.
+	// Therefore, we'll detach first, and then delete whatever is left.
+
+	parent = child;
+	child = NULL;
+
+	// detach children
+	while ((child = list_get_next_item(&parent->children, child)) != NULL) {
+		device_detach(child);
+	}
+
+	// detach device
+	status = device_detach(parent);
+	if (status != 0)
+		return status;
+
+	// delete children
+	while ((child = list_get_first_item(&parent->children)) != NULL) {
+		device_delete_child(parent, child);
+	}
+
+	// delete device
+	if (parent->flags & DEVICE_DESC_ALLOCED)
+		free((char *)parent->description);
+
+	// Delete softc if we were the ones to allocate it.
+	if ((parent->flags & DEVICE_SOFTC_SET) == 0)
+		free(parent->softc);
+
+	free(parent);
+	return 0;
+}
+
+
+int
+device_is_attached(device_t device)
+{
+	return (device->flags & DEVICE_ATTACHED) != 0;
+}
+
+
+int
+device_attach(device_t device)
+{
+	int result;
+
+	if (device->driver == NULL
+		|| device->methods.attach == NULL)
+		return B_ERROR;
+
+	result = device->methods.attach(device);
+
+	if (result == 0)
+		atomic_or(&device->flags, DEVICE_ATTACHED);
+
+	if (result == 0 && HAIKU_DRIVER_REQUIRES(FBSD_WLAN_FEATURE))
+		result = start_wlan(device);
+
+	return result;
+}
+
+
+int
+device_detach(device_t device)
+{
+	if (device->driver == NULL)
+		return B_ERROR;
+
+	if ((atomic_and(&device->flags, ~DEVICE_ATTACHED) & DEVICE_ATTACHED) != 0
+			&& device->methods.detach != NULL) {
+		int result = 0;
+		if (HAIKU_DRIVER_REQUIRES(FBSD_WLAN_FEATURE))
+			result = stop_wlan(device);
+		if (result != 0 && result != B_BAD_VALUE) {
+			atomic_or(&device->flags, DEVICE_ATTACHED);
+			return result;
+		}
+
+		result = device->methods.detach(device);
+		if (result != 0) {
+			atomic_or(&device->flags, DEVICE_ATTACHED);
+			return result;
+		}
+	}
+
+	return 0;
+}
+
+
+int
+bus_generic_attach(device_t dev)
+{
+	device_t child = NULL;
+
+	while ((child = list_get_next_item(&dev->children, child)) != NULL) {
+		if (child->driver == NULL) {
+			driver_t *driver = __haiku_select_miibus_driver(child);
+			if (driver == NULL) {
+				struct mii_attach_args *ma = device_get_ivars(child);
+
+				device_printf(dev, "No PHY module found (%x/%x)!\n",
+					MII_OUI(ma->mii_id1, ma->mii_id2), MII_MODEL(ma->mii_id2));
+			} else
+				device_set_driver(child, driver);
+		} else
+			child->methods.probe(child);
+
+		if (child->driver != NULL) {
+			int result = device_attach(child);
+			if (result != 0)
+				return result;
+		}
+	}
+
+	return 0;
+}
+
+
+int
+bus_generic_detach(device_t device)
+{
+	device_t child = NULL;
+
+	if ((device->flags & DEVICE_ATTACHED) == 0)
+		return B_ERROR;
+
+	while (true) {
+		child = list_get_next_item(&device->children, child);
+		if (child == NULL)
+			break;
+
+		device_detach(child);
+	}
+
+	return 0;
+}
+
+
+//	#pragma mark - Misc, Malloc
+
+
+device_t
+find_root_device(int unit)
+{
+	device_t device = NULL;
+
+	while ((device = list_get_next_item(&sRootDevices, device)) != NULL) {
+		if (device->unit <= unit)
+			return device;
+	}
+
+	return NULL;
+}
+
+
+driver_t *
+__haiku_probe_miibus(device_t dev, driver_t *drivers[])
+{
+	driver_t *selected = NULL;
+	int i, selectedResult = 0;
+
+	if (drivers == NULL)
+		return NULL;
+
+	for (i = 0; drivers[i]; i++) {
+		device_probe_t *probe = (device_probe_t *)
+			resolve_method(drivers[i], "device_probe");
+		if (probe) {
+			int result = probe(dev);
+			if (result >= 0) {
+				if (selected == NULL || result < selectedResult) {
+					selected = drivers[i];
+					selectedResult = result;
+					device_printf(dev, "Found MII: %s\n", selected->name);
+				}
+			}
+		}
+	}
+
+	return selected;
+}
+
+
+int
+printf(const char *format, ...)
+{
+	char buf[256];
+	va_list vl;
+	va_start(vl, format);
+	vsnprintf(buf, sizeof(buf), format, vl);
+	va_end(vl);
+	dprintf(buf);
+
+	return 0;
+}
+
+
+#ifndef __clang__
+int
+ffs(int value)
+{
+	int i = 1;
+
+	if (value == 0)
+		return 0;
+
+	for (; !(value & 1); i++)
+		value >>= 1;
+
+	return i;
+}
 #endif
 
-	m_copydata(mb, 0, length, buffer);
-	*numBytes = length;
 
-	m_freem(mb);
-	return B_OK;
-}
-
-
-static status_t
-compat_write(void *cookie, off_t position, const void *buffer,
-	size_t *numBytes)
+int
+resource_int_value(const char *name, int unit, const char *resname,
+	int *result)
 {
-	struct ifnet *ifp = cookie;
-	struct mbuf *mb;
-
-	//if_printf(ifp, "compat_write(%lld, %p, [%lu])\n", position,
-	//	buffer, *numBytes);
-
-	if (*numBytes > MHLEN) {
-		mb = m_getcl(0, MT_DATA, M_PKTHDR);
-		*numBytes = min_c(*numBytes, (size_t)MCLBYTES);
-	} else {
-		mb = m_gethdr(0, MT_DATA);
-	}
-
-	if (mb == NULL)
-		return ENOBUFS;
-
-	// if we waited, check after if the ifp is still valid
-
-	mb->m_pkthdr.len = mb->m_len = *numBytes;
-	memcpy(mtod(mb, void *), buffer, mb->m_len);
-
-	return ifp->if_output(ifp, mb, NULL, NULL);
+	/* no support for hints */
+	return -1;
 }
 
 
-static status_t
-compat_control(void *cookie, uint32 op, void *arg, size_t length)
+int
+resource_disabled(const char *name, int unit)
 {
-	struct ifnet *ifp = cookie;
+	int error, value;
 
-	//if_printf(ifp, "compat_control(op %lu, %p, [%lu])\n", op,
-	//	arg, length);
-
-	switch (op) {
-		case ETHER_INIT:
-			return B_OK;
-
-		case ETHER_GETADDR:
-			return user_memcpy(arg, IF_LLADDR(ifp), ETHER_ADDR_LEN);
-
-		case ETHER_NONBLOCK:
-		{
-			int32 value;
-			if (length < 4)
-				return B_BAD_VALUE;
-			if (user_memcpy(&value, arg, sizeof(int32)) < B_OK)
-				return B_BAD_ADDRESS;
-			if (value)
-				ifp->flags |= DEVICE_NON_BLOCK;
-			else
-				ifp->flags &= ~DEVICE_NON_BLOCK;
-			return B_OK;
-		}
-
-		case ETHER_SETPROMISC:
-		{
-			int32 value;
-			if (length < 4)
-				return B_BAD_VALUE;
-			if (user_memcpy(&value, arg, sizeof(int32)) < B_OK)
-				return B_BAD_ADDRESS;
-			if (value)
-				ifp->if_flags |= IFF_PROMISC;
-			else
-				ifp->if_flags &= ~IFF_PROMISC;
-			return ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);
-		}
-
-		case ETHER_GETFRAMESIZE:
-		{
-			uint32 frameSize;
-			if (length < 4)
-				return B_BAD_VALUE;
-
-			frameSize = ifp->if_mtu + ETHER_HDR_LEN;
-			return user_memcpy(arg, &frameSize, 4);
-		}
-
-		case ETHER_ADDMULTI:
-		case ETHER_REMMULTI:
-		{
-			struct sockaddr_dl address;
-
-			if ((ifp->if_flags & IFF_MULTICAST) == 0)
-				return B_NOT_SUPPORTED;
-
-			memset(&address, 0, sizeof(address));
-			address.sdl_family = AF_LINK;
-			memcpy(LLADDR(&address), arg, ETHER_ADDR_LEN);
-
-			if (op == ETHER_ADDMULTI)
-				return if_addmulti(ifp, (struct sockaddr *)&address, NULL);
-
-			return if_delmulti(ifp, (struct sockaddr *)&address);
-		}
-
-		case ETHER_GET_LINK_STATE:
-		{
-			struct ifmediareq mediareq;
-			ether_link_state_t state;
-			status_t status;
-
-			if (length < sizeof(ether_link_state_t))
-				return EINVAL;
-
-			memset(&mediareq, 0, sizeof(mediareq));
-			status = ifp->if_ioctl(ifp, SIOCGIFMEDIA, (caddr_t)&mediareq);
-			if (status < B_OK)
-				return status;
-
-			state.media = mediareq.ifm_active;
-			if ((mediareq.ifm_status & IFM_ACTIVE) != 0)
-				state.media |= IFM_ACTIVE;
-			if ((mediareq.ifm_active & IFM_10_T) != 0)
-				state.speed = 10000000;
-			else if ((mediareq.ifm_active & IFM_100_TX) != 0)
-				state.speed = 100000000;
-			else
-				state.speed = 1000000000;
-			state.quality = 1000;
-
-			return user_memcpy(arg, &state, sizeof(ether_link_state_t));
-		}
-
-		case ETHER_SET_LINK_STATE_SEM:
-			if (user_memcpy(&ifp->link_state_sem, arg, sizeof(sem_id)) < B_OK) {
-				ifp->link_state_sem = -1;
-				return B_BAD_ADDRESS;
-			}
-			return B_OK;
-	}
-
-	return wlan_control(cookie, op, arg, length);
+	error = resource_int_value(name, unit, "disabled", &value);
+	if (error)
+	       return (0);
+	return (value);
 }
-
-
-device_hooks gDeviceHooks = {
-	compat_open,
-	compat_close,
-	compat_free,
-	compat_control,
-	compat_read,
-	compat_write,
-};
