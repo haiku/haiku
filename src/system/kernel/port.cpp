@@ -989,11 +989,14 @@ create_port(int32 queueLength, const char* name)
 		return B_BAD_TEAM_ID;
 
 	// create a port
-	Port* port = new(std::nothrow) Port(team_get_current_team_id(), queueLength,
-		name != NULL ? name : "unnamed port");
-	if (port == NULL)
-		return B_NO_MEMORY;
-	BReference<Port> portRef(port, true);
+	BReference<Port> port;
+	{
+		Port* newPort = new(std::nothrow) Port(team_get_current_team_id(),
+			queueLength, name != NULL ? name : "unnamed port");
+		if (newPort == NULL)
+			return B_NO_MEMORY;
+		port.SetTo(newPort, true);
+	}
 
 	// check the ports limit
 	const int32 previouslyUsed = atomic_add(&sUsedPorts, 1);
