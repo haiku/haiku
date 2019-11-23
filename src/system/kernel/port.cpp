@@ -633,9 +633,10 @@ get_locked_port(port_id id) GCC_2_NRV(portRef)
 		portRef.SetTo(sPorts.Lookup(id));
 	}
 
-	if (portRef != NULL && portRef->state == Port::kActive)
-		mutex_lock(&portRef->lock);
-	else
+	if (portRef != NULL && portRef->state == Port::kActive) {
+		if (mutex_lock(&portRef->lock) != B_OK)
+			portRef.Unset();
+	} else
 		portRef.Unset();
 
 	return portRef;
