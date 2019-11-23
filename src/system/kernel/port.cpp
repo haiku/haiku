@@ -993,12 +993,12 @@ create_port(int32 queueLength, const char* name)
 		name != NULL ? name : "unnamed port");
 	if (port == NULL)
 		return B_NO_MEMORY;
+	BReference<Port> portRef(port, true);
 
 	// check the ports limit
 	const int32 previouslyUsed = atomic_add(&sUsedPorts, 1);
 	if (previouslyUsed + 1 >= sMaxPorts) {
 		atomic_add(&sUsedPorts, -1);
-		delete port;
 		return B_NO_MORE_PORTS;
 	}
 
