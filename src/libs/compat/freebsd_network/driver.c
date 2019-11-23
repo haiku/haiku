@@ -193,8 +193,6 @@ _fbsd_init_drivers(driver_t *drivers[])
 	if (status < B_OK)
 		goto err4;
 
-	init_bounce_pages();
-
 	if (HAIKU_DRIVER_REQUIRES(FBSD_TASKQUEUES)) {
 		status = init_taskqueues();
 		if (status < B_OK)
@@ -244,7 +242,6 @@ err6:
 	if (HAIKU_DRIVER_REQUIRES(FBSD_TASKQUEUES))
 		uninit_taskqueues();
 err5:
-	uninit_bounce_pages();
 	uninit_callout();
 err4:
 	uninit_mbufs();
@@ -281,7 +278,6 @@ _fbsd_uninit_drivers(driver_t *drivers[])
 	uninit_sysinit();
 	if (HAIKU_DRIVER_REQUIRES(FBSD_TASKQUEUES))
 		uninit_taskqueues();
-	uninit_bounce_pages();
 	uninit_callout();
 	uninit_mbufs();
 	uninit_mutexes();

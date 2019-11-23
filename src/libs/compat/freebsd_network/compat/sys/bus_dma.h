@@ -185,13 +185,6 @@ typedef void bus_dmamap_callback_t(void *, bus_dma_segment_t *, int, int);
 typedef void bus_dmamap_callback2_t(void *, bus_dma_segment_t *, int, bus_size_t, int);
 
 /*
- * XXX sparc64 uses the same interface, but a much different implementation.
- *     <machine/bus_dma.h> for the sparc64 arch contains the equivalent
- *     declarations.
- */
-#if !defined(__sparc64__)
-
-/*
  * Allocate a handle for mapping from kva/uva/physical
  * address space into bus device space.
  */
@@ -266,6 +259,5 @@ void _bus_dmamap_unload(bus_dma_tag_t dmat, bus_dmamap_t map);
 			_bus_dmamap_unload(dmat, dmamap);	\
 	} while (0)
 
-#endif /* __sparc64__ */
 
 #endif /* _BUS_DMA_H_ */

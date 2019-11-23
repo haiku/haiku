@@ -30,9 +30,6 @@
 #define ptoa(x)			((unsigned long)((x) << PAGE_SHIFT))
 #define atop(x)			((unsigned long)((x) >> PAGE_SHIFT))
 
-/* MAJOR FIXME */
-#define Maxmem			(32768)
-
 #ifndef MSIZE
 #define MSIZE 256
 #endif

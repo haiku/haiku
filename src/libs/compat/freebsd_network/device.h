@@ -76,10 +76,6 @@ void uninit_callout(void);
 
 device_t find_root_device(int);
 
-/* busdma_machdep.c */
-void init_bounce_pages(void);
-void uninit_bounce_pages(void);
-
 void driver_printf(const char *format, ...)
 	__attribute__ ((format (__printf__, 1, 2)));
 int driver_vprintf(const char *format, va_list vl);
