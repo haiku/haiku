@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Terminal	2815667231
+1	swedish	x-vnd.Haiku-Terminal	2664488407
 Close other tabs	Terminal TermWindow		Stäng övriga flikar
 Insert path	Terminal TermView		Lägg till sökväg
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminalen kunde inte starta skalet.
@@ -87,6 +87,7 @@ Use text:	Terminal FindWindow		Använd text:
 Close active tab	Terminal TermWindow		Stäng aktiv flik
 Save as default	Terminal TermWindow		Spara som standard
 Nothing is selected.	Terminal TermWindow		Ingenting markerat.
+Use left Option as Meta key	Terminal AppearancePrefView		Använd vänster Alternativ som Meta-tangent
 Find	Terminal FindWindow		Sök
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Mönstret bestämmer namn på den aktiva fliken. Följande alternativ finns:\n
 Professional	Terminal colors scheme		Professionell

@@ -38,9 +38,9 @@ Don't save	Application Type Window		Jangan disimpan
 Center	Attribute Window	Attribute column alignment in Tracker	Tengah
 Done	Extension Window		Selesai
 Development	Application Types Window		Pengembangan
+Same as…	FileType Window	The same APPLICATION as ...	Sama seperti…
 Abort	Application Types Window		Batal
 Save	Application Type Window		Simpan
-Same as…	FileType Window	The same APPLICATION as ...	Sama seperti…
 %1 application type	Application Type Window		%1 tipe aplikasi
 Icon	Application Type Window		Ikon
 Version:	Application Type Window		Versi:
@@ -62,8 +62,8 @@ Done	Attribute Window		Selesai
 FileTypes request	FileTypes		Permintaan FileTypes
 Select same type as	FileType Window		Pilih jenis yang sama seperti
 Version:	Application Types Window		Versi:
-Application types	Application Types Window		Jenis aplikasi
 (from application)	FileTypes Window		(dari aplikasi)
+Application types	Application Types Window		Jenis aplikasi
 Description:	Application Types Window		Keterangan:
 Name:	Application Types Window		Nama:
 File could not be opened	Preferred App Menu		Berkas tidak dapat dibuka
@@ -87,8 +87,8 @@ Could not install file type	New File Type Window		Tidak bisa menginstal jenis fi
 Same as…	FileTypes Window		Sama seperti…
 Golden master	Application Type Window		Master emas
 FileTypes request	Preferred App Menu		Permintaan FileType
-Single launch	Application Type Window		Peluncuran tunggal
 no icon	FileTypes Window		tidak ada ikon
+Single launch	Application Type Window		Peluncuran tunggal
 %s file type	FileType Window		%s tipe berkas
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Menghapus tipe super tidak dapat dipulihkan.\nSemua jenis file yang termasuk dalam tipe super akan hilang!\n\nApakah Anda yakin ingin melakukan ini? Untuk menghapus seluruh kelompok, tahan tombol Shift dan tekan \"Remove\".
 Add type	New File Type Window		Tambah tipe
@@ -124,8 +124,8 @@ Application flags	Application Type Window		Tanda aplikasi
 OK	FileTypes		OKE
 Group name:	New File Type Window		Nama grup:
 Move up	FileTypes Window		Naik
-Add	Attribute Window		Tambah
 File	FileTypes Window		Berkas
+Add	Attribute Window		Tambah
 Open file	FileTypes		Buka file
 Version info	Application Type Window		Info versi
 Final	Application Type Window		Final

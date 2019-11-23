@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Appearance	3106786237
+1	catalan; valencian	x-vnd.Haiku-Appearance	663472720
 Control border	Colors tab		Control de la vora
 Control mark	Colors tab		Marca de control
 Off	AntialiasingSettingsView		Apagat
@@ -8,10 +8,12 @@ Defaults	APRWindow		Valors predeterminats
 Shadow	Colors tab		Ombra
 Document background	Colors tab		Fons del document
 List background	Colors tab		Fons de la llista
+No effect on running applications	DecorSettingsView		Sense efecte a les aplicacions que s'executen
 Fixed font:	Font view		Tipus de lletra d'amplada fixa:
 Appearance	System name		Aparença
 Reduce colored edges filter strength:	AntialiasingSettingsView		Redueix el filtre de les vores de color:
 Glyph hinting:	AntialiasingSettingsView		Millora per glifs:
+Default Haiku ControlLook	DecorSettingsView		Control d'aparença del Haiku per defecte
 Menu item text	Colors tab		Text de l'element del menú
 About decorator	DecorSettingsView		Quant al decorador
 Antialiasing menu	AntialiasingSettingsView		Menú del suavitzat
@@ -28,6 +30,7 @@ OK	DecorSettingsView		D'acord
 Control text	Colors tab		Text de control
 Look and feel	APRWindow		Aparença i comportament
 Selected menu item background	Colors tab		Fons de l'element seleccionat del menú
+Link active	Colors tab		Enllaç actiu
 Antialiasing	APRWindow		Suavitzat
 Menu font:	Font view		Tipus de lletra del menú:
 Bold font:	Font view		Negreta:
@@ -44,8 +47,12 @@ Window tab text	Colors tab		Text de la pestanya de la finestra
 Navigation pulse	Colors tab		Pols de la navegació
 LCD subpixel	AntialiasingSettingsView		Subpíxel LCD
 Window tab	Colors tab		Pestanya de la finestra
+Link text	Colors tab		Text de l'enllaç
 Tooltip background	Colors tab		Fons del consell
+ControlLook:	DecorSettingsView		Control d'aparença:
 Scroll bar thumb	Colors tab		Cursor de la barra de desplaçament
+Default	DecorSettingsView		Per defecte
+Link visited	Colors tab		Enllaç visitat
 Selected menu item border	Colors tab		Vora de l'element seleccionat del menú
 Tooltip text	Colors tab		Text del consell
 Control background	Colors tab		Color del rerefons
@@ -60,9 +67,13 @@ Antialiasing type:	AntialiasingSettingsView		Tipus de suavitzat:
 Panel text	Colors tab		Text del tauler
 Hinting menu	AntialiasingSettingsView		Menú de millora del tipus de lletra
 Scroll bar:	DecorSettingsView		Barra de desplaçament:
+Choose ControlLook	DecorSettingsView		Trieu el Control d'aparença
 Monospaced fonts only	AntialiasingSettingsView		Només tipus de lletra monoespai
 Document text	Colors tab		Text del document
 Inactive window border	Colors tab		Vora de la finestra inactiva
 Colors	APRWindow		Colors
+About control look	DecorSettingsView		Quant al control d'aparença
 Control highlight	Colors tab		Control de realçat
+Status bar	Colors tab		Barra d'estat
+Link hover	Colors tab		Pas per l'enllaç
 Single:	DecorSettingsView		Senzill

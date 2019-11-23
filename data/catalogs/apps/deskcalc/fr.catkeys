@@ -1,6 +1,7 @@
-1	french	x-vnd.Haiku-DeskCalc	2149599445
+1	french	x-vnd.Haiku-DeskCalc	3990157744
 cos	CalcView		cos
 acos	CalcView		acos
+floor	CalcView		Ent
 sin	CalcView		sin
 sinh	CalcView		sinh
 tanh	CalcView		tanh

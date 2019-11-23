@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-BootManager	3355843558
+1	catalan; valencian	x-vnd.Haiku-BootManager	1719213568
 At least one partition must be selected!	BootManagerController		Cal triar al menys una partició!
 No space available!	DrivesPage	Cannot install	No hi ha espai disponible!
 Boot Manager is unable to read the partition table!	BootManagerController		El Gestor d'Arrencada no ha pogut llegir la taula de particions!
@@ -10,6 +10,7 @@ Backup Master Boot Record	BootManagerController	Title	Còpia de seguretat del re
 Cannot access!	DrivesPage	Cannot install	No es pot accedir!
 After one second	DefaultPartitionPage		Després d'un segon
 The old Master Boot Record was successfully saved to %s.	BootManagerController		S'ha desat correctament l'antic registre mestre d'arrencada (MBR) a %s.
+Quit	WizardView	Button	Surt
 Never	DefaultPartitionPage		Mai
 Summary	BootManagerController	Title	Resum
 An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Hi hagut un error en escriure el menú d'arrencada. El registre mestre d'arrencada (MBR) podria estar en mal estat, l'hauríeu de restaurar ara!

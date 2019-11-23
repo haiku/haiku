@@ -38,9 +38,9 @@ Don't save	Application Type Window		Ne mentse
 Center	Attribute Window	Attribute column alignment in Tracker	Középre
 Done	Extension Window		Kész
 Development	Application Types Window		Fejlesztés alatt
+Same as…	FileType Window	The same APPLICATION as ...	Ugyanaz, mint…
 Abort	Application Types Window		Megszakítás
 Save	Application Type Window		Mentés
-Same as…	FileType Window	The same APPLICATION as ...	Ugyanaz, mint…
 %1 application type	Application Type Window		%1 programtípus
 Icon	Application Type Window		Ikon
 Version:	Application Type Window		Verzió:
@@ -62,8 +62,8 @@ Done	Attribute Window		Kész
 FileTypes request	FileTypes		Fájltípusok-kérés
 Select same type as	FileType Window		Ugyanazon típus kiválasztása, mint
 Version:	Application Types Window		Verzió:
-Application types	Application Types Window		Programtípusok
 (from application)	FileTypes Window		(programból)
+Application types	Application Types Window		Programtípusok
 Description:	Application Types Window		Leírás:
 Name:	Application Types Window		Név:
 File could not be opened	Preferred App Menu		A fájl nem nyitható meg
@@ -87,8 +87,8 @@ Could not install file type	New File Type Window		A fájltípus nem telepíthet�
 Same as…	FileTypes Window		Ugyanaz, mint…
 Golden master	Application Type Window		Végleges kiadás
 FileTypes request	Preferred App Menu		Fájltípusok kérés
-Single launch	Application Type Window		Egyszer indítható
 no icon	FileTypes Window		nincs ikon
+Single launch	Application Type Window		Egyszer indítható
 %s file type	FileType Window		%s fájltípusok
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Egy szupertípus eltávolítását nem lehet visszavonni.\nMinden fájltípus ami ehhez a szupertípushoz tartozik el fog vészni!\n\nBiztos ezt akarja tenni? A teljes csoport eltávolításához tartsa lenyomva a „Shift” billentyűt és nyomjon az „Eltávolítás” gombra.
 Add type	New File Type Window		Típus hozzáadása
@@ -124,8 +124,8 @@ Application flags	Application Type Window		Program megjelölése
 OK	FileTypes		Rendben
 Group name:	New File Type Window		Csoport neve:
 Move up	FileTypes Window		Mozgatás le
-Add	Attribute Window		Hozzáadás
 File	FileTypes Window		Fájl
+Add	Attribute Window		Hozzáadás
 Open file	FileTypes		Fájl megnyitása
 Version info	Application Type Window		Verzió információ
 Final	Application Type Window		Végleges

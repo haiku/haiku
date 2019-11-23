@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Be-MAIL	2849540371
+1	swedish	x-vnd.Be-MAIL	1477453861
 Set to Saved	Mail		Set till Sparad
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Din text innehåller %ld tecken som inte kan hanteras. En annan teckenuppsättning kanske skulle fungera bättre? Klicka Skicka för att skicka det ändå (Ersättnings tecken kommer att användas till de tecken som inte kunde översättas), eller välj avbryt och försök att fixa felet.
 Text wrapping:	Mail		Textradbrytning:
@@ -13,6 +13,7 @@ Copy to new	Mail		Kopiera till ny
 Save as draft	Mail		Spara som utkast
 Encoding:	Mail		Kodning:
 Print	Mail		Skriv ut
+Decrease quote level	Mail		Sänk kvotnivå
 Encoding	Mail		Kodning
 Default account:	Mail		Standardkonto:
 Message	Mail		Meddelande
@@ -164,4 +165,5 @@ Spam	Mail		Skräppost
 Couldn't open this signature. Sorry.	Mail		Kunde inte öppna denna signatur.
 Revert	Mail		Återgå
 Unknown	Mail		Okänd
+Increase quote level	Mail		Öka kvotnivå
 Add enclosure…	Mail		Lägg till område…

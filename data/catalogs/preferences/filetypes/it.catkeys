@@ -38,9 +38,9 @@ Don't save	Application Type Window		Non salvare
 Center	Attribute Window	Attribute column alignment in Tracker	Centro
 Done	Extension Window		Applica
 Development	Application Types Window		Sviluppo
+Same as…	FileType Window	The same APPLICATION as ...	La stessa di…
 Abort	Application Types Window		Annulla
 Save	Application Type Window		Salva
-Same as…	FileType Window	The same APPLICATION as ...	La stessa di…
 %1 application type	Application Type Window		%1 tipo applicazione
 Icon	Application Type Window		Icona
 Version:	Application Type Window		Versione:
@@ -62,8 +62,8 @@ Done	Attribute Window		Applica
 FileTypes request	FileTypes		Richiesta di FileTypes
 Select same type as	FileType Window		Seleziona lo stesso tipo di
 Version:	Application Types Window		Versione:
-Application types	Application Types Window		Tipi applicazioni
 (from application)	FileTypes Window		(dall'applicazione)
+Application types	Application Types Window		Tipi applicazioni
 Description:	Application Types Window		Descrizione
 Name:	Application Types Window		Nome
 File could not be opened	Preferred App Menu		Impossibile aprire il file
@@ -87,8 +87,8 @@ Could not install file type	New File Type Window		Impossibile installare il tipo
 Same as…	FileTypes Window		La stesso di…
 Golden master	Application Type Window		Golden Master
 FileTypes request	Preferred App Menu		Richiesta di FileTypes
-Single launch	Application Type Window		Avvio singolo
 no icon	FileTypes Window		nessun'icona
+Single launch	Application Type Window		Avvio singolo
 %s file type	FileType Window		%s tipo di file
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		La rimozione di un super tipo non può essere annullata.\nTutti i tipi di file appartenenti a questo super tipo saranno perduti!\n\nSei sicuro di voler continuare? Per rimuovere l'intero gruppo, tieni premuto il tasto Maiuscole e premi \"Rimuovi\".
 Add type	New File Type Window		Aggiungi tipo
@@ -124,8 +124,8 @@ Application flags	Application Type Window		Opzioni applicazione
 OK	FileTypes		OK
 Group name:	New File Type Window		Nome del gruppo:
 Move up	FileTypes Window		Sposta su
-Add	Attribute Window		Aggiungi
 File	FileTypes Window		File
+Add	Attribute Window		Aggiungi
 Open file	FileTypes		Apri File
 Version info	Application Type Window		Informazioni versione
 Final	Application Type Window		Finale

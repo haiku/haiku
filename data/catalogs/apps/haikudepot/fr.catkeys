@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	1789676577
+1	french	x-vnd.Haiku-HaikuDepot	2027988172
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Une erreur est survenue lors du rafraîchissement : %error%
 Check for updates…	MainWindow		Vérifier les mises à jour…
 Uninstall	PackageManager		Désinstaller
@@ -102,6 +102,7 @@ All categories	FilterView		Toutes les catégories
 Repositories	MainWindow		Dépôts
 n/a	PackageInfoView		n/a
 Cancel	MainWindow		Annuler
+{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 de plus à télécharger)}other{(# de plus à télécharger)}}
 Refresh repositories	MainWindow		Rafraîchir les dépôts
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Si vous ne fournissez pas d’adresse email, vous ne pourrez pas réinitialiser votre mot de passe en cas d’oubli.
 Tools	MainWindow		Outils

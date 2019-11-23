@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-FileTypes	3116280330
+1	catalan; valencian	x-vnd.Haiku-FileTypes	734679611
 Left	Attribute Window	Attribute column alignment in Tracker	Esquerra
 Final	Application Types Window		Acabat
 FileTypes request	FileTypes Window		Sol·licitud de Tipus de fitxer
@@ -23,6 +23,7 @@ Gamma	Application Type Window		Gama
 Cancel	Application Type Window		Anul·la
 Attribute	Attribute Window		Atribut
 Multiple launch	Application Type Window		Instàncies múltiples
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# El tipus d'aplicació s'ha pogut suprimir.} other{# Els tipus d'aplicacions s'han pogut suprimir.}}
 Edit…	Application Types Window		Edita...
 Could not set preferred application	FileTypes Window		No ha estat possible tria l'aplicació preferida
 Description	FileTypes Window		Descripció
@@ -37,9 +38,9 @@ Don't save	Application Type Window		No ho desis
 Center	Attribute Window	Attribute column alignment in Tracker	Centre
 Done	Extension Window		Fet
 Development	Application Types Window		Desenvolupament
+Same as…	FileType Window	The same APPLICATION as ...	El mateix que...
 Abort	Application Types Window		Interromp
 Save	Application Type Window		Desa
-Same as…	FileType Window	The same APPLICATION as ...	El mateix que...
 %1 application type	Application Type Window		Tipus d'aplicació %1
 Icon	Application Type Window		Icona
 Version:	Application Type Window		Versió:
@@ -61,8 +62,8 @@ Done	Attribute Window		Fet
 FileTypes request	FileTypes		Petició d'un tipus de fitxer
 Select same type as	FileType Window		Selecciona el mateix tipus que
 Version:	Application Types Window		Versió:
-Application types	Application Types Window		Tipus de l'aplicacions
 (from application)	FileTypes Window		(De l'aplicació)
+Application types	Application Types Window		Tipus de l'aplicacions
 Description:	Application Types Window		Descripció:
 Name:	Application Types Window		Nom:
 File could not be opened	Preferred App Menu		No s'ha pogut obrir el fitxer
@@ -86,8 +87,8 @@ Could not install file type	New File Type Window		No s'han pogut instal·lar el 
 Same as…	FileTypes Window		Igual que...
 Golden master	Application Type Window		Candidat
 FileTypes request	Preferred App Menu		Demana un tipus de fitxer
-Single launch	Application Type Window		Només una instància
 no icon	FileTypes Window		cap icona
+Single launch	Application Type Window		Només una instància
 %s file type	FileType Window		Tipus de fitxer %s
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		No es pot recuperar un tipus de fitxer super suprimit..\nEs perdran tots els fitxers d'aquest super tipus!\n\nEsteu segur que ho voleu fer? per suprimir tot el grup, premeu \"Suprimeix\" mantenint premuda la tecla Shift.
 Add type	New File Type Window		Afegeix un tipus
@@ -123,8 +124,8 @@ Application flags	Application Type Window		Indicador de l'aplicació
 OK	FileTypes		D'acord
 Group name:	New File Type Window		Nom del grup:
 Move up	FileTypes Window		Puja
-Add	Attribute Window		Afegeix
 File	FileTypes Window		Fitxer
+Add	Attribute Window		Afegeix
 Open file	FileTypes		Obre un fitxer
 Version info	Application Type Window		Informació de la versió
 Final	Application Type Window		Acabat

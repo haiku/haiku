@@ -38,9 +38,9 @@ Don't save	Application Type Window		Älä tallenna
 Center	Attribute Window	Attribute column alignment in Tracker	Keskitä
 Done	Extension Window		Valmis
 Development	Application Types Window		Kehitys
+Same as…	FileType Window	The same APPLICATION as ...	Sama asetuksena…
 Abort	Application Types Window		Keskeytä
 Save	Application Type Window		Tallenna
-Same as…	FileType Window	The same APPLICATION as ...	Sama asetuksena…
 %1 application type	Application Type Window		%1-sovellustyyppi
 Icon	Application Type Window		Kuvake
 Version:	Application Type Window		Versio:
@@ -62,8 +62,8 @@ Done	Attribute Window		Valmis
 FileTypes request	FileTypes		Tiedostotyyppien pyyntö
 Select same type as	FileType Window		Valitse sama tyyppi asetuksena
 Version:	Application Types Window		Versio:
-Application types	Application Types Window		Sovellustyypit
 (from application)	FileTypes Window		(sovelluksesta)
+Application types	Application Types Window		Sovellustyypit
 Description:	Application Types Window		Kuvaus:
 Name:	Application Types Window		Nimi:
 File could not be opened	Preferred App Menu		Tiedoston avaus epäonnistui
@@ -87,8 +87,8 @@ Could not install file type	New File Type Window		Tiedostotyypin asentaminen ep�
 Same as…	FileTypes Window		Sama asetuksena…
 Golden master	Application Type Window		Tuotantoversio
 FileTypes request	Preferred App Menu		Tiedostotyyppien pyyntö
-Single launch	Application Type Window		Yksittäiskäynnistys
 no icon	FileTypes Window		ei kuvaketta
+Single launch	Application Type Window		Yksittäiskäynnistys
 %s file type	FileType Window		%s-tiedostotyyppi
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Kantatyypin poistamista ei voida perua.\nMenetät kaikki tiedostotyypit, jotka polveutuvat tästä kantatyypistä!\n\nOletko varma, että haluat tehdä tämän? Koko ryhmän poistamiseksi pidä Vaihto-näppäin alhaalla ja paina ”Poista”.
 Add type	New File Type Window		Lisää tyyppi
@@ -124,8 +124,8 @@ Application flags	Application Type Window		Sovellusliput
 OK	FileTypes		Valmis
 Group name:	New File Type Window		Ryhmänimi:
 Move up	FileTypes Window		Siirrä ylös
-Add	Attribute Window		Lisää
 File	FileTypes Window		Tiedosto
+Add	Attribute Window		Lisää
 Open file	FileTypes		Avaa tiedosto
 Version info	Application Type Window		Versiotiedot
 Final	Application Type Window		Lopullinen

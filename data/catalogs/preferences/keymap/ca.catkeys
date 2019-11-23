@@ -1,30 +1,117 @@
-1	catalan; valencian	x-vnd.Haiku-Keymap	761976561
+1	catalan; valencian	x-vnd.Haiku-Keymap	3836060204
 Key	Modifier keys window	As in a computer keyboard key	Tecla
+Japanese	KeymapNames		Japonès
+US	KeymapNames		EUA
+PG ↑	Keyboard Layout View	Very short for 'page up'	PÀG ↑
+Brazilian	KeymapNames		Brasiler
+ThinkPad (US)	KeyboardLayoutNames		ThinkPad (EUA)
+Right control	Keyboard Layout View		Control dret
+Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Opció:
 Cancel	Modifier keys window		Anul·la
 Sample and clipboard:	Keymap window		Exemple i porta-retalls:
+Polish	KeymapNames		Polonès
+Latin-American	KeymapNames		Llatinoamericà
+Ukrainian	KeymapNames		Ucraïnès
+PAGE ↓	Keyboard Layout View		PÀGINA ↓
+DEL	Keyboard Layout View		SUPR
+United-Kingdom	KeymapNames		Regne Unit
+Turkish (Type-F)	KeymapNames		Turc (Tipus-F)
+Serbian (Cyrillic)	KeymapNames		Sèrbi (Cyrillic)
+Belgian (point)	KeymapNames		Belga (punt)
+Finnish	KeymapNames		Acaba
+Num lock	Keyboard Layout View		Bloqueig numèric
 Switch shortcut keys to Windows/Linux mode	Keymap window		Canvia les dreceres de tecla al mode Windows/Linux
+Option	Keyboard Layout View	Option key	Opció
+Spanish (Dvorak)	KeymapNames		Espanyol (Dvorak)
+Scroll lock	Keyboard Layout View		Bloqueig de desplaçament
+US-International	KeymapNames		US-Internacional
+Right option	Keyboard Layout View		Opció dreta
+Turkish (Type-Q)	KeymapNames		Turc (Tipus-Q)
 Revert	Modifier keys window		Reverteix
+Slovak	KeymapNames		Eslovac
+CAPS LOCK	Keyboard Layout View		BLOQUEIG DE MAJÚSCULES
+Colemak	KeymapNames		Colemak
+Dvorak (programmer's)	KeymapNames		Dvorak (del programador)
+PRINT	Keyboard Layout View		IMPRIMEIX
+German (Mac)	KeymapNames		Alemany (Mac)
+Arabic (102)	KeymapNames		Àrab (102)
+ThinkPad	KeyboardLayoutNames		ThinkPad
+Belarusian (Mac)	KeymapNames		Bielorús (Mac)
+Croatian	KeymapNames		Croat
+PAGE ↑	Keyboard Layout View		PÀGINA ↑
 Set modifier keys	Modifier keys window		Configura les tecles modificadores
+Apple Aluminium International	KeyboardLayoutNames		Apple Alumini Internacional
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Tecla Win/Cmd
+PG ↓	Keyboard Layout View	Very short for 'page down'	PÀG ↓
+ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (US)
+Apple Aluminum	KeyboardLayoutNames		Apple d'alumini
+Spanish	KeymapNames		Espanyol
+HOME	Keyboard Layout View		INICI
+COMMAND	Keyboard Layout View		ORDRE
+Ukrainian (Mac)	KeymapNames		Ucraïnès (Mac)
 Command:	Modifier keys window	Command key role name	Ordre:
+French (Bépo)	KeymapNames		Francès (Bépo)
+Russian (Typewriter)	KeymapNames		Rus (màquina d'escriure)
 Acute trigger	Keymap window		Accent agut
+Italian	KeymapNames		Italià
+ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s Internacional
+Apple Aluminum (US)	KeyboardLayoutNames		Apple d'alumini (US)
 Modifier keys	Modifier keys window		Tecles modificadores
 Save as…	Keymap window		Anomena i desa…
+Error: duplicate keys	Modifier keys window		Error: tecles duplicades
+NUM	Keyboard Layout View	Very short for 'num lock'	NÚM
+Bulgarian (Phonetic)	KeymapNames		Búlgar (fonètic)
+Kinesis Advantage	KeyboardLayoutNames		Avantatge de kinesi
+Canadian-French	KeymapNames		Francès canadenc
+Hungarian	KeymapNames		Hongarès
+Control	Keyboard Layout View	Control key	Control
+Irish	KeymapNames		Irlandès
+Remove	Keyboard Layout View		Suprimeix
 Tilde trigger	Keymap window		Forma d'afegir els accents
+Shift	Keyboard Layout View	Shift key	Maj.
+CONTROL	Keyboard Layout View		CONTROL
+Macedonian	KeymapNames		Macedoni
+Czech (Mac)	KeymapNames		Txec (Mac)
+Left command	Keyboard Layout View		Ordre esquerra
+Albanian	KeymapNames		Albanès
 (Current)	Keymap window		(Actual)
+OPT	Keyboard Layout View	Very short for 'option'	OPT
+Friulian	KeymapNames		Friülà
+Left option	Keyboard Layout View		Opció esquerra
+END	Keyboard Layout View		FI
+Esperanto	KeymapNames		Esperanto
+Belarusian	KeymapNames		Bielorús
+Warning: left and right key roles do not match	Modifier keys window		Avís: les funcions de la tecla esquerra i dreta no coincideixen.
 Circumflex trigger	Keymap window		Accent circumflex
+Caps lock	Keyboard Layout View		Bloqueig de majúscules
+Left shift	Keyboard Layout View		Maj. de l'esquerra
+Russian (Yawert)	KeymapNames		Rus (Yawert)
+ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e Internacional
+Bulgarian (Cyrillic)	KeymapNames		Búlgar (ciríl·lic)
+Swedish	KeymapNames		Suís
+Left control	Keyboard Layout View		Control esquerre
+CAPS	Keyboard Layout View	Very short for 'caps lock'	MAJÚSCULES
 Role	Modifier keys window	As in the role of a modifier key	Funció
+Svorak	KeymapNames		Svorak
+ThinkPad X100e (US)	KeyboardLayoutNames		ThinkPad X100e (EUA)
+German	KeymapNames		Alemany
+Swiss-German	KeymapNames		Alemany suís
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Tecla de Control
+Czech	KeymapNames		Txec
 Control:	Modifier keys window	Control key role name	Control:
 Disabled	Modifier keys window	Do nothing	Desactivat
 Select dead keys	Keymap window		Trieu les tecles inútils
+Right shift	Keyboard Layout View		Maj. de la dreta
+ESC	Keyboard Layout View		ESC
 Layout	Keymap window		Disposició
 Revert	Keymap window		Reverteix
 Grave trigger	Keymap window		Accent greu
+Menu	Keyboard Layout View	Menu key	Menú
 Quit	Keymap window		Surt
 User:	Keymap window		Usuari:
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Tecla Alt/Opció
+SHIFT	Keyboard Layout View		MAJÚSCULES
 Shift:	Modifier keys window	Shift key role name	Tecla de majúscules
 Keymap	System name		Mapa de tecles
 Set modifier keys…	Keymap window		Tria les tecles modificadores...

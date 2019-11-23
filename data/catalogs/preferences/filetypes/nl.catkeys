@@ -38,9 +38,9 @@ Don't save	Application Type Window		Niet opslaan
 Center	Attribute Window	Attribute column alignment in Tracker	Centreren
 Done	Extension Window		Klaar
 Development	Application Types Window		Ontwikkeling
+Same as…	FileType Window	The same APPLICATION as ...	Zelfde als...
 Abort	Application Types Window		Afbreken
 Save	Application Type Window		Opslaan
-Same as…	FileType Window	The same APPLICATION as ...	Zelfde als...
 %1 application type	Application Type Window		%1 toepassingstype
 Icon	Application Type Window		Icoon
 Version:	Application Type Window		Versie:
@@ -62,8 +62,8 @@ Done	Attribute Window		Klaar
 FileTypes request	FileTypes		BestandsTypen-verzoek
 Select same type as	FileType Window		Selecteer dezelfde soort als
 Version:	Application Types Window		Versie:
-Application types	Application Types Window		Applicatietypes...
 (from application)	FileTypes Window		(van de applicatie)
+Application types	Application Types Window		Applicatietypes...
 Description:	Application Types Window		Beschrijving:
 Name:	Application Types Window		Naam:
 File could not be opened	Preferred App Menu		Bestand kon niet geopend worden
@@ -87,8 +87,8 @@ Could not install file type	New File Type Window		Kon bestandstype niet installe
 Same as…	FileTypes Window		Zelfde als...
 Golden master	Application Type Window		Golden master
 FileTypes request	Preferred App Menu		BestandsTypen-verzoek
-Single launch	Application Type Window		Enkelvoudige opstart
 no icon	FileTypes Window		geen icoon
+Single launch	Application Type Window		Enkelvoudige opstart
 %s file type	FileType Window		%s bestandstype
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Het verwijderen van een supertype kan niet ongedaan gemaakt worden.\nAlle bestandstypes die toebehoren aan dit supertype zullen verloren gaan!\n\nBent u zeker dat u dit wilt doen? Om de hele groep te verwijderen, druk de Shift-toets in en klik op \"Remove\".
 Add type	New File Type Window		Voeg een type toe
@@ -124,8 +124,8 @@ Application flags	Application Type Window		Toepassingsvlaggen
 OK	FileTypes		Oké
 Group name:	New File Type Window		Groepnaam:
 Move up	FileTypes Window		Naar boven verplaatsen
-Add	Attribute Window		Toevoegen
 File	FileTypes Window		Bestand
+Add	Attribute Window		Toevoegen
 Open file	FileTypes		Open Bestand
 Version info	Application Type Window		Versie-info
 Final	Application Type Window		Laatste

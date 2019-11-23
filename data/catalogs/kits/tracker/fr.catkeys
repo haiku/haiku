@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	2668933057
+1	french	x-vnd.Haiku-libtracker	2575711432
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -49,6 +49,7 @@ Preparing to move items…	StatusWindow		Préparation au déplacement des élém
 Size	ContainerWindow		Taille
 Select…	ContainerWindow		Sélectionner…
 Show shared volumes on Desktop	SettingsView		Afficher les volumes partagés sur le Bureau
+<%ld values>	AttributesView		<%ld valeurs>
 Size	PoseView		Taille
 matches wildcard expression	SelectionWindow		correspond à l’expression générique
 96 x 96	ContainerWindow		96 x 96
@@ -88,6 +89,7 @@ preferences	B_PREFERENCES_DIRECTORY		préférences
 Name	Person Query Columns		Nom
 Skip all	FSUtils		Tout ignorer
 Corrupted opcode.	libtracker		Code d’opération corrompu.
+Atom	AttributesView		Atomique
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed sur %TotalSize, %BytesPerSecond/s
 Preparing to restore items…	StatusWindow		Restauration des éléments en préparation...
 Mount	ContainerWindow		Monter
@@ -97,6 +99,7 @@ Link to:	InfoWindow		Lier à :
 Copy here	ContainerWindow		Copier ici
 Character	AttributesView		Caractère
 All disks	FindPanel		Tous les disques
+Affine transform	AttributesView		Transformation affine
 Window	ContainerWindow		Fenêtre
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Supprimer
@@ -185,10 +188,12 @@ Group	FilePermissionsView		Groupe
 Could not find an application to open \"%name\" (%error). 	FSUtils		Impossible de trouver une application pour ouvrir « %name » (%error). 
 Internal error.	libtracker		Erreur interne.
 Mini icon view	DeskWindow		Vue en petites icônes
+Geometric size	AttributesView		Taille géométrique
 contains	SelectionWindow		contient
 Replace	FilePanelPriv		Remplacer
 is not	FindPanel		n’est pas
 Icon view	DeskWindow		Vue en icônes
+<%ld rectangles>	AttributesView		<%ld rectangles>
 Mount settings…	ContainerWindow		Réglages du montage…
 Keywords	Bookmark Query Columns		Mots-clés
 Copy more	ContainerWindow		Copier plus
@@ -198,6 +203,7 @@ Restore	ContainerWindow		Restaurer
 Location	ContainerWindow		Emplacement
 Warning space color	SettingsView		Couleur d’espace faible
 Skip	FSUtils		Passer
+Text list	AttributesView		Liste de textes
 Used space color	SettingsView		Couleur de l’espace utilisé
 Cancel	FSUtils		Annuler
 Original name	ContainerWindow		Nom d’origine
@@ -298,6 +304,7 @@ Edit name	ContainerWindow		Éditer le nom
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Impossible d’ouvrir « %document » (Il manque le symbole : %symbol).\n
 ASCII Text	AttributesView		Texte ASCII
 More options	FindPanel		Plus d’options
+Atom reference	AttributesView		Référence atomique
 config	B_USER_CONFIG_DIRECTORY		configuration
 Error moving \"%name\".	FSUtils		Erreur au déplacement de « %name ».
 Select…	QueryContainerWindow		Sélectionner…
@@ -306,10 +313,12 @@ Settings…	MountMenu		Réglages…
 You cannot put the selected item(s) into the trash.	FSUtils		Vous ne pouvez pas déplacer l(es) élément(s) sélectionné(s) vers la corbeille.
 Increase size	DeskWindow		Augmenter la taille
 starts with	SelectionWindow		commence par
+Any	AttributesView		Tous
 New	DeskWindow		Nouveau
 Invert	SelectionWindow		Inverser
 Would you like to find some other suitable application?	FSUtils		Souhaitez-vous rechercher une autre application appropriée ?
 *+? operand may be empty.	libtracker		Les opérandes *+? pourraient être vides.
+(unknown)	AttributesView		(inconnu)
 Recent folders	FavoritesMenu		Dossiers récents
 Signed memory size	AttributesView		Taille mémoire signée
 The specified name is illegal. Please choose another name.	FilePanelPriv		Le nom indiqué n’est pas valide. Veuillez choisir un autre nom.
@@ -330,6 +339,7 @@ Name	SelectionWindow		Nom
 by attribute	FindPanel		par attribut
  info	InfoWindow		 informations
 Write	FilePermissionsView		Écrire
+<%ld bytes of data>	AttributesView		<%ld octets de données>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Si vous altérez le dossier système ou son contenu, vous ne pourrez plus démarrer %osName !\n\nÊtes vous sûr de vouloir le faire ?\n\nPour altérer quand-même le dossier système ou son contenu , maintenez la touche Majuscule enfoncée et cliquez sur « Je sais ce que je fais ».
 Save	FilePanelPriv		Sauvegarder
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Impossible d’ouvrir « %document » avec l’application « %app » (Il manque la bibliothèque : %library).\n

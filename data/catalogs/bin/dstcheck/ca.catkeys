@@ -1,3 +1,5 @@
-1	catalan; valencian	x-vnd.Haiku-cmd-dstconfig	81357278
+1	catalan; valencian	x-vnd.Haiku-cmd-dstconfig	684321431
+Keep this time	dstcheck		Mantén aquesta hora
 Manually adjust time…	dstcheck		Ajusta el temps de forma manual...
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		Atenció!\n\nA causa del canvi de l'horari d'estiu, el rellotge de l'ordinador pot estar una hora malament.\nL'ordinador pensa que l'hora és %current time%.\n\nÉs correcta?
 Ask me later	dstcheck		Pregunta-ho més tard

@@ -38,9 +38,9 @@ Don't save	Application Type Window		不保存
 Center	Attribute Window	Attribute column alignment in Tracker	居中
 Done	Extension Window		完成
 Development	Application Types Window		开发版
+Same as…	FileType Window	The same APPLICATION as ...	应用程序相同于...
 Abort	Application Types Window		放弃
 Save	Application Type Window		保存
-Same as…	FileType Window	The same APPLICATION as ...	应用程序相同于...
 %1 application type	Application Type Window		%1 程序类型
 Icon	Application Type Window		图标
 Version:	Application Type Window		版本:
@@ -62,8 +62,8 @@ Done	Attribute Window		完成
 FileTypes request	FileTypes		需要文件类型
 Select same type as	FileType Window		选择相同的文件类型
 Version:	Application Types Window		版本：
-Application types	Application Types Window		应用类型
 (from application)	FileTypes Window		（来自应用程序）
+Application types	Application Types Window		应用类型
 Description:	Application Types Window		描述：
 Name:	Application Types Window		名称：
 File could not be opened	Preferred App Menu		文件无法打开
@@ -87,8 +87,8 @@ Could not install file type	New File Type Window		无法安装文件类型
 Same as…	FileTypes Window		相同于...
 Golden master	Application Type Window		发运版
 FileTypes request	Preferred App Menu		文件类型要求
-Single launch	Application Type Window		单个启动
 no icon	FileTypes Window		无图标
+Single launch	Application Type Window		单个启动
 %s file type	FileType Window		%s 文件类型
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		超级类型的删除无法恢复。\n所有处于该超级类型的文件类型将会丢失！\n\n您确定要执行此操作吗？按下Shift键，同时点击\"删除\"，将会删除整个类型组。
 Add type	New File Type Window		增加类型
@@ -124,8 +124,8 @@ Application flags	Application Type Window		程序标识
 OK	FileTypes		确定
 Group name:	New File Type Window		组名：
 Move up	FileTypes Window		上移
-Add	Attribute Window		增加
 File	FileTypes Window		文件
+Add	Attribute Window		增加
 Open file	FileTypes		打开文件
 Version info	Application Type Window		版本信息
 Final	Application Type Window		最终版

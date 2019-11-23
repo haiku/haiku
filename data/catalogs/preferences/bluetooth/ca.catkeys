@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-BluetoothPrefs	416765820
+1	catalan; valencian	x-vnd.Haiku-BluetoothPrefs	4276705900
 Laptop	Settings view		Portàtil
 Only from trusted devices	Settings view		Només els dispositius de confiança
 15 secs	Settings view		15 s
@@ -17,24 +17,32 @@ Stop bluetooth services…	Window		Atura els serveis del Bluetooth…
 Add…	Remote devices		Afegeix…
 As blocked	Remote devices		Como si fos bloquejat
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		No hi ha cap dispositiu local registrat al sistema.
+Policy…	Settings view		Política...
 Revert	Window		Reverteix
+Refresh local devices…	Window		Actualitza els dispositius locals...
 Disconnect	Remote devices		Desconnecta
+Identify us as…	Settings view		Identificació com a...
 From all devices	Settings view		Tots els dispositius
 Defaults	Window		Predeterminats
 Start bluetooth services…	Window		Inicia el servei del Bluetooth
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Comproveu que el vostre dispositiu disposa de Bluetooth o que el vostre dispositiu remot està activat.  Premeu 'Cerca' per iniciar la cerca. No es pot saber el temps necessari per trobar els dispositius, però no hauria de ser superior a 3 segons per dispositiu. Després els podreu afegir a la vostra llista principal, des d'on els podreu emparellar.
 Scanning progress	Inquiry panel		Progrés de la cerca
 Bluetooth	System name		Bluetooth
+Launch now	main		Llança ara
 Remove	Remote devices		Suprimeix
+Pick device…	Settings view		Trieu un dispositiu...
 Always ask	Settings view		Demana-ho sempre
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Amb el suport de\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nGràcies a les persones que hi heu ajudat…\n\nEnviant / donant maquinari:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconòmicament:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nAmb pedaços:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nFent-ne proves:\n - Petter H. Juliussen\nQui em va proporcionar tot el coneixement:\n - the yellowTAB team
 Help	Window		Ajuda
 Pair…	Remote devices		Emparella...
 Retrieving name of %1	Inquiry panel		S'esta recuperant el nom de %1
 Inquiry	Inquiry panel		Consulta
 Incoming connections policy:	Settings view		Estratègia de connexions entrants
+Retrieving names…	Inquiry panel		S'obtenen els noms...
 Show name	Extended local device view		Mostra el nom
 Add device to list	Inquiry panel		Afegeix el dispositiu a la llista
 Remaining %1 seconds	Inquiry panel		Queden %1 segons
+The Bluetooth services are not currently running on this system.	main		Els serveis de Bluetooth ara no s'executen en aquest sistema.
 Discoverable	Extended local device view		Visible
 Authenticate	Extended local device view		Autenticació
 Smart phone	Settings view		Telèfon intel·ligent
@@ -44,3 +52,4 @@ Server	Settings view		Servidor
 Handheld	Settings view		Dispositiu de butxaca
  packets: 	Device View		 paquets: 
 About Bluetooth…	Window		Quant al Bluetooth…
+Starting scan…	Inquiry panel		S'inicia l'escaneig...

@@ -1,5 +1,6 @@
-1	french	x-vnd.Haiku-debug_server	166857212
+1	french	x-vnd.Haiku-debug_server	3188340596
 The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		L’application :\n\n      %app\n\na rencontré une erreur l’empêchant de continuer. Haiku va fermer l’application et libérer ses ressources.
+Oh yeah!	DebugServer		Ah oui !
 Debug	DebugServer		Déboguer
 Terminate	DebugServer		Terminer
 Save report	DebugServer		Enregistrer le rapport

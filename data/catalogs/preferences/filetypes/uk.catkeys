@@ -38,9 +38,9 @@ Don't save	Application Type Window		Не зберігати
 Center	Attribute Window	Attribute column alignment in Tracker	Центр
 Done	Extension Window		Виконати
 Development	Application Types Window		Розробка
+Same as…	FileType Window	The same APPLICATION as ...	Таке як…
 Abort	Application Types Window		Відмінити
 Save	Application Type Window		Зберегти
-Same as…	FileType Window	The same APPLICATION as ...	Таке як…
 %1 application type	Application Type Window		%1 тип програми
 Icon	Application Type Window		Іконка
 Version:	Application Type Window		Версія:
@@ -62,8 +62,8 @@ Done	Attribute Window		Виконано
 FileTypes request	FileTypes		Запит Типів файлів
 Select same type as	FileType Window		Вибрати такий тип як
 Version:	Application Types Window		Версія:
-Application types	Application Types Window		Типи програм
 (from application)	FileTypes Window		(з програми)
+Application types	Application Types Window		Типи програм
 Description:	Application Types Window		Опис:
 Name:	Application Types Window		Ім'я:
 File could not be opened	Preferred App Menu		Файл неможливо відкрити
@@ -87,8 +87,8 @@ Could not install file type	New File Type Window		Неможливо встан�
 Same as…	FileTypes Window		Такий як…
 Golden master	Application Type Window		Золотий майстер
 FileTypes request	Preferred App Menu		Запит Типів файлів
-Single launch	Application Type Window		Одноразовий запуск
 no icon	FileTypes Window		іконка відсутня
+Single launch	Application Type Window		Одноразовий запуск
 %s file type	FileType Window		%s тип файлу
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Видалення головного типу незоротнє.\nВсі типи файлів що відносяться до нього будуть втрачені!\n\nВи впевнені , що бажаєте цього? Для видалення цілої групи утримуючи клавішу Shift натисніть \"Видалити\".
 Add type	New File Type Window		Додати тип
@@ -124,8 +124,8 @@ Application flags	Application Type Window		Флаги програм
 OK	FileTypes		Гаразд
 Group name:	New File Type Window		Ім'я групи:
 Move up	FileTypes Window		Перемістити вверх
-Add	Attribute Window		Додати
 File	FileTypes Window		Файл
+Add	Attribute Window		Додати
 Open file	FileTypes		Відкрити файл
 Version info	Application Type Window		Інформація про версію
 Final	Application Type Window		Завершення

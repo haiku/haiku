@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Keymap	221508000
+1	french	x-vnd.Haiku-Keymap	824461838
 Key	Modifier keys window	As in a computer keyboard key	Touche
 Japanese	KeymapNames		Japonais
 US	KeymapNames		US
@@ -85,11 +85,13 @@ Disabled	Modifier keys window	Do nothing	Désactivé
 Select dead keys	Keymap window		Sélection des touches mortes
 Russian (Mac)	KeymapNames		Russe (Mac)
 Right shift	Keyboard Layout View		Majuscule droite
+ESC	Keyboard Layout View		Esc
 Belarusian (Latin)	KeymapNames		Biélorusse (Latin)
 Hebrew	KeymapNames		Hébreu
 Layout	Keymap window		Disposition
 Greek	KeymapNames		Grec
 Revert	Keymap window		Défaire
+CTRL	Keyboard Layout View	Very short for 'control'	Ctrl
 Grave trigger	Keymap window		Accent grave
 Menu	Keyboard Layout View	Menu key	Menu
 Faeroese	KeymapNames		Féroïen

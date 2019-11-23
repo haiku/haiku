@@ -23,7 +23,7 @@ Write changes	MainWindow		Desa els canvis
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		No ha estat possible iniciar la partició %s. (No s'han desat els canvis al disc.)
 Validation of the given creation parameters failed.	MainWindow		No ha estat possible validar els paràmetres de la validació.
 Eject	MainWindow		Expulsa
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Esteu segur que voleu tornar a desar els canvis al disc ara?\n\nSi ho feu, totes les dades del disc %s es perdran i no es podran recuperar!
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Segur que voleu desar els canvis al disc ara?\n\nSi ho feu, es perdran totes les dades del disc %s i no es podran recuperar!
 Surface test (not implemented)	MainWindow		Prova de la superfície (no està implementat)
 The panel could not return successfully.	MainWindow		La finestra a retornat una fallada.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		No ha estat possible canviar el paràmetres de la partició. No s'han desat els canvis al disc.

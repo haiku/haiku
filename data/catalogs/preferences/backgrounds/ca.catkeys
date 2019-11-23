@@ -1,11 +1,14 @@
-1	catalan; valencian	x-vnd.Haiku-Backgrounds	5390252
+1	catalan; valencian	x-vnd.Haiku-Backgrounds	681978856
 Backgrounds	System name		Fons
 X:	Main View		X:
+Setting the background image failed:	Main View		Ha fallat establir la imatge del fons:
 Resolution: 	Image Filepanel		Resolució: 
 pick one	Main View		trieu-ne un
 Default	Main View		Predeterminat
 Center	Main View		Centra
+Folder: %path	Main View		Carpeta: %path
 Manual	Main View		Manual
+Set background image error	Main View		Error d'establiment de la imatge de fons
 Default folder	Main View		Carpeta predeterminada
 Revert	Main View		Desfés
 None	Main View		Cap
@@ -19,6 +22,7 @@ Y:	Main View		Y:
 Tile	Main View		Mosaic
 Select	Main View		Seleccioneu
 Scale to fit	Main View		Amplia fins a omplir
+OK	Main View		D'acord
 Placement:	Main View		Posició:
 Preview	Main View		Vista prèvia
 Image:	Main View		Imatge:

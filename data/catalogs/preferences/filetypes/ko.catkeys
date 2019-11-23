@@ -36,9 +36,9 @@ Cancel	Type List Window		취소
 Center	Attribute Window	Attribute column alignment in Tracker	가운데
 Done	Extension Window		완료
 Development	Application Types Window		개발자
+Same as…	FileType Window	The same APPLICATION as ...	같은 것...
 Abort	Application Types Window		취소
 Save	Application Type Window		저장
-Same as…	FileType Window	The same APPLICATION as ...	같은 것...
 %1 application type	Application Type Window		%1 어플리케이션 형식
 Icon	Application Type Window		아이콘
 Version:	Application Type Window		버젼:
@@ -60,8 +60,8 @@ Done	Attribute Window		완료
 FileTypes request	FileTypes		파일 형식이 요구됨
 Select same type as	FileType Window		같은 형식 선택
 Version:	Application Types Window		버젼:
-Application types	Application Types Window		어플리케이션 형식
 (from application)	FileTypes Window		(응용프로그램으로부터)
+Application types	Application Types Window		어플리케이션 형식
 Description:	Application Types Window		설명:
 Name:	Application Types Window		이름:
 File could not be opened	Preferred App Menu		파일을 열 수 없습니다
@@ -84,8 +84,8 @@ Could not install file type	New File Type Window		파일 형식을 설치 할 �
 Same as…	FileTypes Window		동일하게…
 Golden master	Application Type Window		골든 마스터
 FileTypes request	Preferred App Menu		파일 형식이 요구됨
-Single launch	Application Type Window		단일 실행
 no icon	FileTypes Window		아이콘 없음
+Single launch	Application Type Window		단일 실행
 %s file type	FileType Window		%s 파일 형식
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		상위 형식의 제거는 되돌릴수 없습니다.\n상위 형식에 속한 모든 파일 형식을 잃어버리게 될것입니다!\n\n당신은 정말로 이 작업을 하시겠습니까? 모든 그룹을 제거하려면, Shift키를 길게 누르고 \"제거\"를 누르십시오.
 Add type	New File Type Window		형식 추가
@@ -121,8 +121,8 @@ Application flags	Application Type Window		어플리케이션 플래그
 OK	FileTypes		확인
 Group name:	New File Type Window		그룹 이름:
 Move up	FileTypes Window		아래로 이동
-Add	Attribute Window		추가
 File	FileTypes Window		파일
+Add	Attribute Window		추가
 Open file	FileTypes		파일 열기
 Version info	Application Type Window		버젼 정보
 Final	Application Type Window		최종

@@ -37,9 +37,9 @@ Don't save	Application Type Window		Не захоўваць
 Center	Attribute Window	Attribute column alignment in Tracker	Цэнтр
 Done	Extension Window		Зроблена
 Development	Application Types Window		Распрацоўная
+Same as…	FileType Window	The same APPLICATION as ...	Такая ж, як…
 Abort	Application Types Window		Адмяніць
 Save	Application Type Window		Захаваць
-Same as…	FileType Window	The same APPLICATION as ...	Такая ж, як…
 %1 application type	Application Type Window		%1 тып праграмы
 Icon	Application Type Window		Іконка
 Version:	Application Type Window		Версія:
@@ -61,8 +61,8 @@ Done	Attribute Window		Зроблена
 FileTypes request	FileTypes		Запыт FileTypes
 Select same type as	FileType Window		Пазначыць падобны тып як
 Version:	Application Types Window		Версія:
-Application types	Application Types Window		Тыпы праграм
 (from application)	FileTypes Window		(з праграмы)
+Application types	Application Types Window		Тыпы праграм
 Description:	Application Types Window		Апісанне:
 Name:	Application Types Window		Імя:
 File could not be opened	Preferred App Menu		Файля ня можа быць адчынены
@@ -86,8 +86,8 @@ Could not install file type	New File Type Window		Немагчыма ўстал�
 Same as…	FileTypes Window		Такая ж, як…
 Golden master	Application Type Window		Залаты
 FileTypes request	Preferred App Menu		Запыт FileTypes
-Single launch	Application Type Window		Запуск па адной
 no icon	FileTypes Window		няма іконкі
+Single launch	Application Type Window		Запуск па адной
 %s file type	FileType Window		файл тыпу %s
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Выдаленне галоўнага тыпу не можа быць адменена.\nУсе тыпы файлаў, якія належаць да гэтага галоўнага тыпы, будуць згублены!\n\nСапраўды жадаеце зрабіць гэта? Каб выдаліць усю группу, націсніце \"Remove\", трымаючы клавішу Shift.
 Add type	New File Type Window		Дадаць тып
@@ -123,8 +123,8 @@ Application flags	Application Type Window		Флагі праграм
 OK	FileTypes		Так
 Group name:	New File Type Window		Імя групы:
 Move up	FileTypes Window		Перасунуць уверх
-Add	Attribute Window		Дадаць
 File	FileTypes Window		Файл
+Add	Attribute Window		Дадаць
 Open file	FileTypes		Адчыніць Файл
 Version info	Application Type Window		Інфармацыя пра версію
 Final	Application Type Window		Канчатковы

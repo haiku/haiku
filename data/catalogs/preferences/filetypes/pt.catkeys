@@ -36,9 +36,9 @@ Don't save	Application Type Window		Não guardar
 Center	Attribute Window	Attribute column alignment in Tracker	Ao centro
 Done	Extension Window		Terminar
 Development	Application Types Window		Desenvolvimento
+Same as…	FileType Window	The same APPLICATION as ...	Igual a…
 Abort	Application Types Window		Cancelar
 Save	Application Type Window		Guardar
-Same as…	FileType Window	The same APPLICATION as ...	Igual a…
 Icon	Application Type Window		Ícone
 Version:	Application Type Window		Versão:
 Default application	FileType Window		Aplicação predefinida
@@ -80,8 +80,8 @@ Could not install file type	New File Type Window		Não foi possível instalar o 
 Same as…	FileTypes Window		Igual a…
 Golden master	Application Type Window		Mestre dourado
 FileTypes request	Preferred App Menu		Pedido de Tipos de Ficheiro
-Single launch	Application Type Window		Instância única
 no icon	FileTypes Window		sem ícone
+Single launch	Application Type Window		Instância única
 Add type	New File Type Window		Adicionar tipo
 Remove icon	Icon View		Remover ícone
 Cancel	Extension Window		Cancelar
@@ -114,8 +114,8 @@ Application flags	Application Type Window		Sinalizadores da aplicação
 OK	FileTypes		OK
 Group name:	New File Type Window		Nome do grupo:
 Move up	FileTypes Window		Mover para cima
-Add	Attribute Window		Adicionar
 File	FileTypes Window		Ficheiro
+Add	Attribute Window		Adicionar
 Open file	FileTypes		Abrir ficheiro
 Version info	Application Type Window		Informações da versão
 Final	Application Type Window		Final

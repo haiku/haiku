@@ -38,9 +38,9 @@ Don't save	Application Type Window		No sta salvâ
 Center	Attribute Window	Attribute column alignment in Tracker	Centre
 Done	Extension Window		Fat
 Development	Application Types Window		Disvilup
+Same as…	FileType Window	The same APPLICATION as ...	La stesse di…
 Abort	Application Types Window		Cancele
 Save	Application Type Window		Salve
-Same as…	FileType Window	The same APPLICATION as ...	La stesse di…
 %1 application type	Application Type Window		Gjenar di aplicazion %1
 Icon	Application Type Window		Icone
 Version:	Application Type Window		Version:
@@ -62,8 +62,8 @@ Done	Attribute Window		Fat
 FileTypes request	FileTypes		Richieste di FileTypes
 Select same type as	FileType Window		Selezione il stes gjenar di
 Version:	Application Types Window		Version:
-Application types	Application Types Window		Gjenars di aplicazion
 (from application)	FileTypes Window		(de aplicazion)
+Application types	Application Types Window		Gjenars di aplicazion
 Description:	Application Types Window		Descrizion:
 Name:	Application Types Window		Non:
 File could not be opened	Preferred App Menu		Impussibil vierzi il file
@@ -87,8 +87,8 @@ Could not install file type	New File Type Window		Impussibil instalâ il gjenar 
 Same as…	FileTypes Window		Il stes di…
 Golden master	Application Type Window		Golden master
 FileTypes request	Preferred App Menu		Richieste di FileTypes
-Single launch	Application Type Window		Inviament singul
 no icon	FileTypes Window		nissune icone
+Single launch	Application Type Window		Inviament singul
 %s file type	FileType Window		Gjenar di file %s
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		La rimozion di un super-gjenar no pues jessi anulade.\nDucj i gjenars di file che a fasin part di chest super-gjenar a laran pierdûts!\n\nContinuâ pardabon? Par gjavâ il grup intîr, ten fracât il tast Maiusc e frache \"Gjave\".
 Add type	New File Type Window		Zonte gjenar
@@ -124,8 +124,8 @@ Application flags	Application Type Window		Opzions aplicazion
 OK	FileTypes		Va ben
 Group name:	New File Type Window		Non dal grup:
 Move up	FileTypes Window		Sposte jù
-Add	Attribute Window		Zonte
 File	FileTypes Window		File
+Add	Attribute Window		Zonte
 Open file	FileTypes		Vierç file
 Version info	Application Type Window		Informazions version
 Final	Application Type Window		Finâl

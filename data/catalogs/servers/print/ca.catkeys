@@ -51,4 +51,4 @@ A5	ConfigWindow	ISO 216 paper size	A5
 Would you like to make @ the default printer?	PrintServerApp		Voleu que la impressora predeterminada sigui @?
 Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloide
 Page setup	ConfigWindow		Configuració de la pàgina
-Paper setup:	ConfigWindow		Configuració del paper:
+Paper setup:	ConfigWindow		Configuració de la pàgina:

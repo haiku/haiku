@@ -38,9 +38,9 @@ Don't save	Application Type Window		Nu salva
 Center	Attribute Window	Attribute column alignment in Tracker	Centru
 Done	Extension Window		Finalizat
 Development	Application Types Window		Dezvoltare
+Same as…	FileType Window	The same APPLICATION as ...	Aceeași ca…
 Abort	Application Types Window		Renunță
 Save	Application Type Window		Salvează
-Same as…	FileType Window	The same APPLICATION as ...	Aceeași ca…
 %1 application type	Application Type Window		%1 tip aplicație
 Icon	Application Type Window		Pictogramă
 Version:	Application Type Window		Versiune:
@@ -62,8 +62,8 @@ Done	Attribute Window		Finalizat
 FileTypes request	FileTypes		Cerere TipuriFișier
 Select same type as	FileType Window		Selectează același tip ca
 Version:	Application Types Window		Versiune:
-Application types	Application Types Window		Tipuri de aplicație
 (from application)	FileTypes Window		(de la aplicație)
+Application types	Application Types Window		Tipuri de aplicație
 Description:	Application Types Window		Descriere:
 Name:	Application Types Window		Nume:
 File could not be opened	Preferred App Menu		Fișierul nu a putut fi deschis
@@ -87,8 +87,8 @@ Could not install file type	New File Type Window		Nu s-a putut instala tipul de 
 Same as…	FileTypes Window		La fel ca…
 Golden master	Application Type Window		Principal
 FileTypes request	Preferred App Menu		Cerere TipuriFișier
-Single launch	Application Type Window		Pornire unică
 no icon	FileTypes Window		fără pictogramă
+Single launch	Application Type Window		Pornire unică
 %s file type	FileType Window		%s tip fișier
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Eliminarea unui tip super nu este reversibilă.\nToate tipurile de fișier care aparțin acestui tip super vor fi pierdute!\n\nSigur doriți să faceți acest lucru? Pentru a elimina un grup întreg, mențineți apăsată tasta Shift și apăsați pe \"Elimină\".
 Add type	New File Type Window		Adaugă tip
@@ -124,8 +124,8 @@ Application flags	Application Type Window		Indicatoare de aplicație
 OK	FileTypes		OK
 Group name:	New File Type Window		Nume grup:
 Move up	FileTypes Window		Deplasează în sus
-Add	Attribute Window		Adaugă
 File	FileTypes Window		Fișier
+Add	Attribute Window		Adaugă
 Open file	FileTypes		Deschide fișier
 Version info	Application Type Window		Info versiune
 Final	Application Type Window		Final

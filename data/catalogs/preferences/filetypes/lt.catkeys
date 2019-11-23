@@ -37,9 +37,9 @@ Don't save	Application Type Window		Neįrašyti
 Center	Attribute Window	Attribute column alignment in Tracker	centrinė
 Done	Extension Window		Atlikta
 Development	Application Types Window		Kuriama
+Same as…	FileType Window	The same APPLICATION as ...	Ta pati, kaip…
 Abort	Application Types Window		Nutraukti
 Save	Application Type Window		Įrašyti
-Same as…	FileType Window	The same APPLICATION as ...	Ta pati, kaip…
 %1 application type	Application Type Window		Programos „%1“ tipas
 Icon	Application Type Window		Piktograma
 Version:	Application Type Window		Versija:
@@ -61,8 +61,8 @@ Done	Attribute Window		Atlikta
 FileTypes request	FileTypes		Failų tipų užklausa
 Select same type as	FileType Window		Nurašyti tipą nuo
 Version:	Application Types Window		Versija:
-Application types	Application Types Window		Programų tipai
 (from application)	FileTypes Window		(iš programos)
+Application types	Application Types Window		Programų tipai
 Description:	Application Types Window		Aprašas:
 Name:	Application Types Window		Pavadinimas:
 File could not be opened	Preferred App Menu		Failo atverti nepavyko
@@ -86,8 +86,8 @@ Could not install file type	New File Type Window		Failų tipo įdiegti nepavyko
 Same as…	FileTypes Window		Ta pati, kaip…
 Golden master	Application Type Window		Galutinės ruošinys
 FileTypes request	Preferred App Menu		Failų tipų užklausa
-Single launch	Application Type Window		Vieninė paleistis
 no icon	FileTypes Window		be piktogramos
+Single launch	Application Type Window		Vieninė paleistis
 %s file type	FileType Window		Failo „%s“ tipas
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Supertipo pašalinimas yra negrįžtamas.\nKartu su juo bus pašalinti ir visi jam priklausantys failų tipai!\n\nAr tikrai norite jį pašalinti? Jeigu vis tiek norite pašalinti visą grupę, spustelėkite mygtuką „Pašalinti“, laikydami nuspaustą Lyg2 klavišą.
 Add type	New File Type Window		Pridėti tipą
@@ -123,8 +123,8 @@ Application flags	Application Type Window		Programos žymos
 OK	FileTypes		Gerai
 Group name:	New File Type Window		Grupės pavadinimas:
 Move up	FileTypes Window		Pakelti
-Add	Attribute Window		Pridėti
 File	FileTypes Window		Failas
+Add	Attribute Window		Pridėti
 Open file	FileTypes		Atverti failą
 Version info	Application Type Window		Versijos savybės
 Final	Application Type Window		Galutinė

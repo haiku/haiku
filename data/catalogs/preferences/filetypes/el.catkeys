@@ -36,9 +36,9 @@ Cancel	Type List Window		Άκυρο
 Center	Attribute Window	Attribute column alignment in Tracker	Κέντρο
 Done	Extension Window		Ολοκληρώθηκε
 Development	Application Types Window		Ανάπτυξη
+Same as…	FileType Window	The same APPLICATION as ...	Ίδιο με...
 Abort	Application Types Window		Ακύρωση
 Save	Application Type Window		Αποθήκευση
-Same as…	FileType Window	The same APPLICATION as ...	Ίδιο με...
 %1 application type	Application Type Window		τύπος εφαρμογής %1
 Icon	Application Type Window		Εικονίδιο
 Version:	Application Type Window		Έκδοση:
@@ -60,8 +60,8 @@ Done	Attribute Window		Ολοκληρώθηκε
 FileTypes request	FileTypes		Αίτηση Τύποι Αρχείων
 Select same type as	FileType Window		Επιλογή ίδιου τύπου ως
 Version:	Application Types Window		Έκδοση
-Application types	Application Types Window		Τύποι εφαρμογής
 (from application)	FileTypes Window		(από την εφαρμογή)
+Application types	Application Types Window		Τύποι εφαρμογής
 Description:	Application Types Window		Περιγραφή:
 Name:	Application Types Window		Όνομα:
 File could not be opened	Preferred App Menu		Το αρχείο δεν μπoρεί να ανοιχτεί
@@ -84,8 +84,8 @@ Could not install file type	New File Type Window		Δεν μπορεί να γί�
 Same as…	FileTypes Window		Ίδιο με...
 Golden master	Application Type Window		Χρυσή έκδοση
 FileTypes request	Preferred App Menu		Αίτηση Τύποι Αρχείων
-Single launch	Application Type Window		Απλή εκκίνηση
 no icon	FileTypes Window		χωρίς εικονίδιο
+Single launch	Application Type Window		Απλή εκκίνηση
 %s file type	FileType Window		%s τύπος αρχείου
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Διαγράφοντας ένα υπέρ τύπο, δεν θα μπορείτε να το επαναφέρετε.\n Όλοι οι τύποι αρχείων που ανήκουν σε αυτό το υπέρ τύπο θα χαθούν!\n\nΕίστε σίγουρος ότι θέλετε να το κάνετε αυτό; Για να καταργήσετε ολόκληρη την ομάδα, κρατήστε πατημένο το πλήκτρο Shift και πατήστε το \"Διαγραφή\".
 Add type	New File Type Window		Προσθήκη τύπου
@@ -121,8 +121,8 @@ Application flags	Application Type Window		Σημαίες εφαρμογής
 OK	FileTypes		Εντάξει
 Group name:	New File Type Window		Όνομα ομάδας:
 Move up	FileTypes Window		Κίνηση κάτω
-Add	Attribute Window		Προσθήκη
 File	FileTypes Window		Αρχείο
+Add	Attribute Window		Προσθήκη
 Open file	FileTypes		Άνοιγμα αρχείου
 Version info	Application Type Window		Πληροφορίες έκδοσης
 Final	Application Type Window		Τελικό

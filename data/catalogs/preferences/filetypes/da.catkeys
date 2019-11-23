@@ -38,9 +38,9 @@ Don't save	Application Type Window		Gem ikke
 Center	Attribute Window	Attribute column alignment in Tracker	I midten
 Done	Extension Window		Færdig
 Development	Application Types Window		Udvikling
+Same as…	FileType Window	The same APPLICATION as ...	Samme som…
 Abort	Application Types Window		Afbryd
 Save	Application Type Window		Gem
-Same as…	FileType Window	The same APPLICATION as ...	Samme som…
 %1 application type	Application Type Window		%1-programtype
 Icon	Application Type Window		Ikon
 Version:	Application Type Window		Version:
@@ -62,8 +62,8 @@ Done	Attribute Window		Færdig
 FileTypes request	FileTypes		Filtyper-anmodning
 Select same type as	FileType Window		Vælg samme type som
 Version:	Application Types Window		Version:
-Application types	Application Types Window		Programtyper
 (from application)	FileTypes Window		(fra program)
+Application types	Application Types Window		Programtyper
 Description:	Application Types Window		Beskrivelse:
 Name:	Application Types Window		Navn:
 File could not be opened	Preferred App Menu		Filen kunne ikke åbnes
@@ -87,8 +87,8 @@ Could not install file type	New File Type Window		Kunne ikke installere filtype
 Same as…	FileTypes Window		Samme som…
 Golden master	Application Type Window		Golden master
 FileTypes request	Preferred App Menu		Filtyper-anmodning
-Single launch	Application Type Window		Enkel start
 no icon	FileTypes Window		intet ikon
+Single launch	Application Type Window		Enkel start
 %s file type	FileType Window		%s-filtype
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Fjernelse af en super-type kan ikke fortrydes.\nAlle filtyper som tilhører denne filtype vil gå tabt!\n\nEr du sikker på, at du vil gøre det? Hold Skift-tasten nede og tryk på \"Fjern\", for at fjerne hele gruppen.
 Add type	New File Type Window		Tilføj type
@@ -124,8 +124,8 @@ Application flags	Application Type Window		Programflag
 OK	FileTypes		OK
 Group name:	New File Type Window		Gruppenavn:
 Move up	FileTypes Window		Flyt op
-Add	Attribute Window		Tilføj
 File	FileTypes Window		Fil
+Add	Attribute Window		Tilføj
 Open file	FileTypes		Åbn fil
 Version info	Application Type Window		Versionsinfo
 Final	Application Type Window		Endelig

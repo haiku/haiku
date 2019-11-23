@@ -38,9 +38,9 @@ Don't save	Application Type Window		Spara inte
 Center	Attribute Window	Attribute column alignment in Tracker	Mitten
 Done	Extension Window		Klar
 Development	Application Types Window		Utveckling
+Same as…	FileType Window	The same APPLICATION as ...	Samma som...
 Abort	Application Types Window		Avbryt
 Save	Application Type Window		Spara
-Same as…	FileType Window	The same APPLICATION as ...	Samma som...
 %1 application type	Application Type Window		%1 programtyp
 Icon	Application Type Window		Ikon
 Version:	Application Type Window		Version:
@@ -62,8 +62,8 @@ Done	Attribute Window		Klar
 FileTypes request	FileTypes		FilTyper - fråga
 Select same type as	FileType Window		Välj samma typ som
 Version:	Application Types Window		Version:
-Application types	Application Types Window		Programtyper
 (from application)	FileTypes Window		(från program)
+Application types	Application Types Window		Programtyper
 Description:	Application Types Window		Beskrivning:
 Name:	Application Types Window		Namn:
 File could not be opened	Preferred App Menu		Filen kunde inte öppnas
@@ -87,8 +87,8 @@ Could not install file type	New File Type Window		Kunde inte installera filtyp
 Same as…	FileTypes Window		Samma som...
 Golden master	Application Type Window		Produktionsversion
 FileTypes request	Preferred App Menu		Filtypsbegäran
-Single launch	Application Type Window		Starta en
 no icon	FileTypes Window		ingen ikon
+Single launch	Application Type Window		Starta en
 %s file type	FileType Window		%s filtyp
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Borttagning av huvudtyp kan inte ångras.\nAlla filtyper som hör till huvudtypen kommer att gå förlorade!\n\nÄr du säker på att du vill fortsätta? För att ta bort en hel grupp, håll nere shift-tangenten och tryck på \"Ta bort\".
 Add type	New File Type Window		Lägg till typ
@@ -124,8 +124,8 @@ Application flags	Application Type Window		Programflaggor
 OK	FileTypes		OK
 Group name:	New File Type Window		Gruppnamn:
 Move up	FileTypes Window		Flytta upp
-Add	Attribute Window		Lägg till
 File	FileTypes Window		Arkiv
+Add	Attribute Window		Lägg till
 Open file	FileTypes		Öppna fil
 Version info	Application Type Window		Versionsinfo
 Final	Application Type Window		Slutgiltig

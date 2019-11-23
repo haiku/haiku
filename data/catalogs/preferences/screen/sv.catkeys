@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Screen	4090394050
+1	swedish	x-vnd.Haiku-Screen	2685901476
 no	Screen		nej
 bits/pixel	Screen		bitar/pixel
 15 bits/pixel, 32768 colors	Screen		15 bitar/pixel, 32768 färger
@@ -33,6 +33,7 @@ Warning	Screen		Varning
 24 bits/pixel, 16 Million colors	Screen		24 bitar/pixel, 16 miljoner färger
 Hz	Screen		Hz
 Workspaces	Screen		Arbetsytor
+Brightness:	Screen		Ljusstyrka:
 32 bits/pixel, 16 Million colors	Screen		32 bitar/pixel, 16 miljoner färger
 Done	Screen		Klar
 16 bits/pixel, 65536 colors	Screen		16 bitar/pixel, 65536 färger

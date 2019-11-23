@@ -38,9 +38,9 @@ Don't save	Application Type Window		保存しない
 Center	Attribute Window	Attribute column alignment in Tracker	中央揃え
 Done	Extension Window		完了
 Development	Application Types Window		開発
+Same as…	FileType Window	The same APPLICATION as ...	このアプリケーションと同様…
 Abort	Application Types Window		中断
 Save	Application Type Window		保存
-Same as…	FileType Window	The same APPLICATION as ...	このアプリケーションと同様…
 %1 application type	Application Type Window		%1のアプリケーションタイプ
 Icon	Application Type Window		アイコン
 Version:	Application Type Window		バージョン:
@@ -62,8 +62,8 @@ Done	Attribute Window		完了
 FileTypes request	FileTypes		ファイルタイプの登録
 Select same type as	FileType Window		このアプリケーションと同じタイプを選ぶ
 Version:	Application Types Window		バージョン:
-Application types	Application Types Window		アプリケーションタイプ
 (from application)	FileTypes Window		(アプリケーションから)
+Application types	Application Types Window		アプリケーションタイプ
 Description:	Application Types Window		説明:
 Name:	Application Types Window		名前:
 File could not be opened	Preferred App Menu		ファイルを開けませんでした
@@ -87,8 +87,8 @@ Could not install file type	New File Type Window		ファイルタイプをイン
 Same as…	FileTypes Window		このタイプと同様…
 Golden master	Application Type Window		ゴールデンマスター
 FileTypes request	Preferred App Menu		ファイルタイプの登録
-Single launch	Application Type Window		複数同時起動不可
 no icon	FileTypes Window		アイコン無し
+Single launch	Application Type Window		複数同時起動不可
 %s file type	FileType Window		%sのファイルタイプ
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		スーパータイプの削除は取り消せません。\n削除されるスーパータイプに属するファイルタイプはすべて削除されます！\n\nそれでも削除を実行しますか?グループ全体を削除するには、シフトキーを押しながら\"削除\"を押してください。
 Add type	New File Type Window		タイプの追加
@@ -124,8 +124,8 @@ Application flags	Application Type Window		アプリケーションフラグ
 OK	FileTypes		OK
 Group name:	New File Type Window		グループ名:
 Move up	FileTypes Window		上へ移動
-Add	Attribute Window		追加
 File	FileTypes Window		ファイル
+Add	Attribute Window		追加
 Open file	FileTypes		ファイルを開く
 Version info	Application Type Window		バージョン情報
 Final	Application Type Window		リリース版

@@ -38,9 +38,9 @@ Don't save	Application Type Window		Neukladať
 Center	Attribute Window	Attribute column alignment in Tracker	Na stred
 Done	Extension Window		Hotovo
 Development	Application Types Window		Vývojové
+Same as…	FileType Window	The same APPLICATION as ...	Rovnaká ako…
 Abort	Application Types Window		Zrušiť
 Save	Application Type Window		Uložiť
-Same as…	FileType Window	The same APPLICATION as ...	Rovnaká ako…
 %1 application type	Application Type Window		%1 typ aplikácie
 Icon	Application Type Window		Ikona
 Version:	Application Type Window		Verzia:
@@ -62,8 +62,8 @@ Done	Attribute Window		Hotovo
 FileTypes request	FileTypes		Požiadavka Typy súborov
 Select same type as	FileType Window		Vybrať rovnaký typ ako
 Version:	Application Types Window		Verzia:
-Application types	Application Types Window		Typy aplikácie
 (from application)	FileTypes Window		(z aplikácie)
+Application types	Application Types Window		Typy aplikácie
 Description:	Application Types Window		Popis:
 Name:	Application Types Window		Názov:
 File could not be opened	Preferred App Menu		Súbor nebolo možné otvoriť
@@ -87,8 +87,8 @@ Could not install file type	New File Type Window		Nebolo možné nainštalovať 
 Same as…	FileTypes Window		Rovnaký ako…
 Golden master	Application Type Window		Hlavný originál
 FileTypes request	Preferred App Menu		Požiadavka Typy súborov
-Single launch	Application Type Window		Jednoduché spustenie
 no icon	FileTypes Window		bez ikony
+Single launch	Application Type Window		Jednoduché spustenie
 %s file type	FileType Window		typ súboru %s
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Odstránenie supertypu nemožno vrátiť.\nVšetky typy, ktoré patria tomuto supertypu budú stratené!\n\nSte si istí, že to chcete urobiť? Ak chcete odstrániť celú skupinu, podržte kláves Shift a stlačte „Odstrániť“.
 Add type	New File Type Window		Pridať typ
@@ -124,8 +124,8 @@ Application flags	Application Type Window		Príznaky aplikácie
 OK	FileTypes		OK
 Group name:	New File Type Window		Názov skupiny:
 Move up	FileTypes Window		Presunúť vyššie
-Add	Attribute Window		Pridať
 File	FileTypes Window		Súbor
+Add	Attribute Window		Pridať
 Open file	FileTypes		Otvoriť súbor
 Version info	Application Type Window		Info o verzii
 Final	Application Type Window		Finálne

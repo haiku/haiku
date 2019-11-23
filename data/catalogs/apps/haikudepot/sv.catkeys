@@ -1,4 +1,5 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	1059339987
+1	swedish	x-vnd.Haiku-HaikuDepot	913112167
+Repository update error	LocalRepositoryUpdateProcess		Fel vid uppdatering av repositorie
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ett fel inträffade vid uppdatering av repositoriet: %error%
 Check for updates…	MainWindow		Leta efter uppdateringar…
 Uninstall	PackageManager		Avinstallera
@@ -48,6 +49,7 @@ User rating	RatePackageWindow		Användarbetyg
 Installed packages	MainWindow		Installerade paket
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Ett begärt objekt eller ett objekt involverat i begäran hittades inte på servern.
 Other users can see this rating	RatePackageWindow		Andra användare kan se denna bedömning
+The minimum age requirements must be met.	UserLoginWindow		Minimiålderskraven måste uppfyllas.
 Stable	RatePackageWindow		Stabil
 This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		Denna applikation är för gammal för att kommunicera med  HaikuDepot-serversystemet.  Få en nyare version av HaikuDepot  genom att uppdatera Haiku.  Den minsta versionen av  HaikuDepot som krävs är \ "% s \".
 Fatal error	PackageManager		Allvarligt fel
@@ -70,6 +72,7 @@ Close	PackageManager		Stäng
 A network transport error has arisen communicating with the HaikuDepot server system: %s	ServerHelper		Ett nättransportfel har uppstått i kommunikationen med HaikuDepot-serversystemet: %s
 Changelog	PackageInfoView		Ändringslogg
 Rating not possible	MainWindow		Betyg ej möjligt
+Package update error	MainWindow		Paketuppdateringsfel
 About	PackageInfoView		Om
 Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Autentisering misslyckades. Användaren finns inte eller så är fel lösenord angivet.
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processer}}
@@ -87,6 +90,7 @@ Inactive	PackageListView		Inaktiv
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synkroniserar metadata från repositorier
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# enhet} other{# enheter}}
+Usage conditions download problem	UserLoginWindow		Fel vid hämtning av användarvillkor
 OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Mestadels stabil
 Success	UserLoginWindow		Klar
@@ -98,14 +102,17 @@ Repository	PackageListView		Repositorie
 Close	UserLoginWindow		Stäng
 Close	RatePackageWindow		Stäng
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synkroniserar paketdata för repositoriet '%REPO_NAME%'
+View the usage conditions	UserLoginWindow		Visa användarvillkor
 Failed to create account: %s\n	UserLoginWindow		Misslyckades skapa konto: %s\n
 Size	PackageListView		Storlek
 Your rating:	RatePackageWindow		Dina betyg:
+I am %MinimumAgeYears% years of age or older	UserLoginWindow		Jag är %MinimumAgeYears% år eller äldre
 Your rating was updated.	RatePackageWindow		Ditt betyg ändrades.
 All categories	FilterView		Alla kategorier
 Repositories	MainWindow		Repositorier
 n/a	PackageInfoView		oviktigt
 Cancel	MainWindow		Avbryt
+View agreed usage conditions…	MainWindow		Visa godkända användarvillkor…
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 kvar att ladda hem)}other{(# kvar att ladda hem)}}
 Refresh repositories	MainWindow		Ladda om repositorier
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Om du inte anger en e-mail adress, kommer du inte kunna återställa ditt lösenord om du glömmer det.
@@ -132,15 +139,19 @@ Source packages	MainWindow		Källkodspaket
 User name:	UserLoginWindow		Användarnamn:
 Try again	App		Försök igen
 Rate package	RatePackageWindow		Betygsatt paket
+The usage conditions must be agreed to.	UserLoginWindow		Du måste godkänna användarvillkoren.
 The email address appears to be malformed.	UserLoginWindow		E-post adressen är fel formulerat.
 You have not solved the captcha puzzle correctly.	UserLoginWindow		Du har inte löst captcha pusslet rätt.
 Unknown	PackageListView		Okänd
+I agree to the usage conditions	UserLoginWindow		Jag godkänner användarvillkoren
+An error has arisen downloading the usage conditions. Check the log for details and try again.	UserLoginWindow		Ett fel har uppstått vid hämtning av användarvillkoren. Se loggen för mer information eller försök igen.
 Log in	UserLoginWindow		Logga in
 Logged in as %User%	MainWindow		Inloggad som %User%
 Email address:	UserLoginWindow		E-postadress:
 Screenshot	ScreenshotWindow		Skärmdump
 HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		En omstart är nödvändig för att slutföra installationsprocessen.
+View latest usage conditions…	MainWindow		Se de senaste användarvillkoren…
 Search terms:	FilterView		Sökvillkor
 Pending…	PackageListView		Väntar...
 Repeat pass phrase:	UserLoginWindow		Upprepa lösenord:
@@ -158,6 +169,7 @@ Log in…	MainWindow		Logga in...
 You need to be logged into an account before you can rate packages.	MainWindow		Du måste logga in för att kunna betygsätta paket.
 Client version too old	ServerHelper		Klientversionen är för gammal
 Authorization or security issue	ServerHelper		Autoriserings- eller säkerhetsproblem
+Local repository load error	LocalPkgDataLoadProcess		Fel vid laddning av lokalt repositorie
 9999.99 KiB	PackageListView		9999.99 KiB
 All repositories	MainWindow		Alla repositorier
 %Version%	PackageInfoView		%Version%
