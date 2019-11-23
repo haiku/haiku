@@ -272,12 +272,7 @@ compat_control(void *cookie, uint32 op, void *arg, size_t length)
 			state.media = mediareq.ifm_active;
 			if ((mediareq.ifm_status & IFM_ACTIVE) != 0)
 				state.media |= IFM_ACTIVE;
-			if ((mediareq.ifm_active & IFM_10_T) != 0)
-				state.speed = 10000000;
-			else if ((mediareq.ifm_active & IFM_100_TX) != 0)
-				state.speed = 100000000;
-			else
-				state.speed = 1000000000;
+			state.speed = ifmedia_baudrate(mediareq.ifm_active);
 			state.quality = 1000;
 
 			return user_memcpy(arg, &state, sizeof(ether_link_state_t));
