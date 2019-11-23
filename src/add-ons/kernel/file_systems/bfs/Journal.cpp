@@ -7,6 +7,8 @@
 //! Transaction and logging
 
 
+#include <StackOrHeapArray.h>
+
 #include "Journal.h"
 
 #include "Debug.h"
@@ -799,8 +801,8 @@ Journal::_WriteTransactionToLog()
 	int32 maxVecs = runArrays.MaxArrayLength() + 1;
 		// one extra for the index block
 
-	iovec* vecs = (iovec*)malloc(sizeof(iovec) * maxVecs);
-	if (vecs == NULL) {
+	BStackOrHeapArray<iovec, 8> vecs(maxVecs);
+	if (!vecs.IsValid()) {
 		// TODO: write back log entries directly?
 		return B_NO_MEMORY;
 	}
@@ -836,10 +838,8 @@ Journal::_WriteTransactionToLog()
 				// make blocks available in the cache
 				const void* data = block_cache_get(fVolume->BlockCache(),
 					blockNumber + j);
-				if (data == NULL) {
-					free(vecs);
+				if (data == NULL)
 					return B_IO_ERROR;
-				}
 
 				add_to_iovec(vecs, index, maxVecs, data, fVolume->BlockSize());
 				count++;
@@ -866,8 +866,6 @@ Journal::_WriteTransactionToLog()
 
 		logStart = logPosition % fLogSize;
 	}
-
-	free(vecs);
 
 	LogEntry* logEntry = new(std::nothrow) LogEntry(this, fVolume->LogEnd(),
 		runArrays.LogEntryLength());
