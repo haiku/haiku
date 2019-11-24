@@ -92,6 +92,5 @@ extern	bool				gInDeskbar;
 
 #define kBarWidth 100
 #define kMargin	12
-#define kBarPadding 7
 
 #endif // _PCVIEW_H_

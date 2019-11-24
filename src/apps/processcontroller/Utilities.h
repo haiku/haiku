@@ -20,8 +20,10 @@
 #define UTILITIES_H
 
 
-#include <OS.h>
+#include <Font.h>
 #include <GraphicsDefs.h>
+#include <Rect.h>
+#include <OS.h>
 
 
 class BDeskbar;
@@ -42,6 +44,8 @@ void mix_colors(rgb_color& target, rgb_color& first, rgb_color& second, float mi
 void find_self(entry_ref& ref);
 void move_to_deskbar(BDeskbar& deskbar);
 void make_window_visible(BWindow* window, bool mayResize = false);
+
+BRect bar_rect(BRect& frame, BFont* font);
 
 extern const uchar k_cpu_mini[];
 

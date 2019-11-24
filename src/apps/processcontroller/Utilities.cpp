@@ -176,3 +176,20 @@ make_window_visible(BWindow* window, bool mayResize)
 		window->MoveBy(0, screen.top-frame.top);
 }
 
+
+BRect
+bar_rect(BRect& frame, BFont* font)
+{
+	BRect rect(frame);
+	font_height metrics;
+	font->GetHeight(&metrics);
+	float barHeight = metrics.ascent;
+	rect.top = frame.top + (frame.Height() - barHeight) / 2;
+	rect.bottom = frame.top + (frame.Height() + barHeight) / 2;
+
+	rect.left = frame.right - kMargin - kBarWidth;
+	rect.right = frame.right - kMargin;
+
+	return rect;
+}
+

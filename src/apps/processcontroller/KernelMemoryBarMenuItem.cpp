@@ -72,10 +72,11 @@ KernelMemoryBarMenuItem::DrawBar(bool force)
 	BMenu* menu = Menu();
 	rgb_color highColor = menu->HighColor();
 
-	// draw the bar itself
-	BRect cadre (frame.right - kMargin - kBarWidth, frame.top + kBarPadding,
-		frame.right - kMargin, frame.bottom  - kBarPadding);
+	BFont font;
+	menu->GetFont(&font);
+	BRect cadre = bar_rect(frame, &font);
 
+	// draw the bar itself
 	if (fLastSum < 0)
 		force = true;
 	if (force) {

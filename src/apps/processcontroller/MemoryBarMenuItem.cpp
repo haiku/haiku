@@ -116,10 +116,11 @@ MemoryBarMenuItem::DrawBar(bool force)
 	BMenu* menu = Menu();
 	rgb_color highColor = menu->HighColor();
 
-	// draw the bar itself
+	BFont font;
+	menu->GetFont(&font);
+	BRect rect = bar_rect(frame, &font);
 
-	BRect rect(frame.right - kMargin - kBarWidth, frame.top + kBarPadding,
-		frame.right - kMargin, frame.bottom - kBarPadding);
+	// draw the bar itself
 	if (fWriteMemory < 0)
 		return;
 

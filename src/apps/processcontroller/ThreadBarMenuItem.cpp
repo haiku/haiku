@@ -22,6 +22,7 @@
 #include "Colors.h"
 #include "PriorityMenu.h"
 #include "ProcessController.h"
+#include "Utilities.h"
 
 #include <stdio.h>
 
@@ -57,10 +58,11 @@ ThreadBarMenuItem::DrawBar(bool force)
 	BRect frame = Frame();
 	BMenu* menu = Menu();
 	rgb_color highColor = menu->HighColor();
-	frame.right -= 24;
-	frame.left = frame.right - kBarWidth;
-	frame.top += kBarPadding;
-	frame.bottom -= kBarPadding;
+
+	BFont font;
+	menu->GetFont(&font);
+	frame = bar_rect(frame, &font);
+
 	if (fKernel < 0)
 		return;
 

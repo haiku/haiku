@@ -22,6 +22,7 @@
 #include "Catalog.h"
 #include "Colors.h"
 #include "ProcessController.h"
+#include "Utilities.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "ProcessController"
@@ -52,10 +53,11 @@ NoiseBarMenuItem::DrawBar(bool force)
 	BRect frame = Frame();
 	BMenu* menu = Menu();
 	rgb_color highColor = menu->HighColor();
-	frame.right -= 24;
-	frame.left = frame.right - kBarWidth;
-	frame.top += kBarPadding;
-	frame.bottom -= kBarPadding;
+
+	BFont font;
+	menu->GetFont(&font);
+	frame = bar_rect(frame, &font);
+
 	if (fBusyWaiting < 0)
 		return;
 
