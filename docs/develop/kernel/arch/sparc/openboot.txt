@@ -65,4 +65,9 @@ Debugging
 
 4000 1000 dump (dump 1000 bytes from address 4000)
 
+.registers (show global registers)
+.locals (show local/windowed registers)
+
+%pc dis (disassemble code being exectuted)
+
 ctrace (backtrace)
