@@ -321,7 +321,7 @@ string_for_message_code(uint32 code)
 		CODE(AS_COLOR_MAP_UPDATED);
 
 		default:
-			return "unkown code";
+			return "unknown code";
 			break;
 	}
 }
