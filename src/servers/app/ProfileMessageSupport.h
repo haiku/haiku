@@ -12,7 +12,7 @@
 #include <String.h>
 
 
-void string_for_message_code(uint32 code, BString& string);
+const char* string_for_message_code(uint32 code);
 
 
 #endif // PROFILE_MESSAGE_SUPPORT_H

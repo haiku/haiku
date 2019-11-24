@@ -12,14 +12,12 @@
 #include <ServerProtocol.h>
 
 
-void
-string_for_message_code(uint32 code, BString& string)
+const char*
+string_for_message_code(uint32 code)
 {
-	string = "";
-
 	switch (code) {
 		// Return the exact name for each constant
-		#define CODE(x) case x: string = #x; break
+		#define CODE(x) case x: return #x
 
 		CODE(AS_GET_DESKTOP);
 		CODE(AS_REGISTER_INPUT_SERVER);
@@ -323,7 +321,7 @@ string_for_message_code(uint32 code, BString& string)
 		CODE(AS_COLOR_MAP_UPDATED);
 
 		default:
-			string << "unkown code: " << code;
+			return "unkown code";
 			break;
 	}
 }

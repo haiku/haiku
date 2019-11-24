@@ -236,13 +236,11 @@ ServerWindow::~ServerWindow()
 
 	profiles.SortItems(compare_message_profiles);
 
-	BString codeName;
 	int32 count = profiles.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		profile* p = (profile*)profiles.ItemAtFast(i);
-		string_for_message_code(p->code, codeName);
 		printf("[%s] called %" B_PRId32 " times, %g secs (%" B_PRId64 " usecs "
-			"per call)\n", codeName.String(), p->count, p->time / 1000000.0,
+			"per call)\n", string_for_message_code(p->code), p->count, p->time / 1000000.0,
 			p->time / p->count);
 	}
 	if (sRedrawProcessingTime.count > 0) {
@@ -1184,11 +1182,9 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 		default:
 			if (fCurrentView == NULL) {
-				BString codeName;
-				string_for_message_code(code, codeName);
 				debug_printf("ServerWindow %s received unexpected code - "
 					"message '%s' before top_view attached.\n",
-					Title(), codeName.String());
+					Title(), string_for_message_code(code));
 				if (link.NeedsReply()) {
 					fLink.StartMessage(B_ERROR);
 					fLink.Flush();
@@ -3220,10 +3216,8 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 		}
 
 		default:
-			BString codeString;
-			string_for_message_code(code, codeString);
 			debug_printf("ServerWindow %s received unexpected code: %s\n",
-				Title(), codeString.String());
+				Title(), string_for_message_code(code));
 
 			if (link.NeedsReply()) {
 				// the client is now blocking and waiting for a reply!
