@@ -1913,8 +1913,8 @@ elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 			leaf++;
 
 		length = strlen(leaf);
-		if (length > B_OS_NAME_LENGTH - 8)
-			sprintf(baseName, "...%s", leaf + length + 8 - B_OS_NAME_LENGTH);
+		if (length > B_OS_NAME_LENGTH - 16)
+			snprintf(baseName, B_OS_NAME_LENGTH, "...%s", leaf + length + 16 - B_OS_NAME_LENGTH);
 		else
 			strcpy(baseName, leaf);
 	}
@@ -1961,7 +1961,7 @@ elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 			memUpperBound = ROUNDUP(memUpperBound, B_PAGE_SIZE);
 			fileUpperBound = ROUNDUP(fileUpperBound, B_PAGE_SIZE);
 
-			sprintf(regionName, "%s_seg%drw", baseName, i);
+			snprintf(regionName, B_OS_NAME_LENGTH, "%s_seg%drw", baseName, i);
 
 			id = vm_map_file(team->id, regionName, (void **)&regionAddress,
 				addressSpec, fileUpperBound,
