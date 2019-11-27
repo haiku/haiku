@@ -5,7 +5,7 @@ RemotePackageRepository HaikuPorts
 	# architecture "any" packages
 	be_book-2008_10_26-3
 	ca_root_certificates-2019_01_23-1
-	gnu_efi_kernel-3.0.9-1
+	gnu_efi_kernel-3.0.10-1
 	haikuporter-1.2.2-2
 	noto-20170920-3
 	timgmsoundfont-fixed-5
