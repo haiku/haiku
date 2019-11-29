@@ -38,6 +38,7 @@ ServerIconExportUpdateProcess::ServerIconExportUpdateProcess(
 	fModel(model),
 	fCountIconsSet(0)
 {
+	AutoLocker<BLocker> locker(fModel->Lock());
 	if (fModel->IconStoragePath(fLocalIconStoragePath) != B_OK) {
 		printf("[%s] unable to obtain the path for storing icons\n", Name());
 		fLocalIconStoragePath.Unset();

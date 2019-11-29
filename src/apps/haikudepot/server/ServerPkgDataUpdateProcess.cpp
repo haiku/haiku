@@ -284,6 +284,7 @@ ServerPkgDataUpdateProcess::GetLocalPath(BPath& path) const
 	BString webAppRepositorySourceCode = _DeriveWebAppRepositorySourceCode();
 
 	if (!webAppRepositorySourceCode.IsEmpty()) {
+		AutoLocker<BLocker> locker(fModel->Lock());
 		return fModel->DumpExportPkgDataPath(path, webAppRepositorySourceCode);
 	}
 

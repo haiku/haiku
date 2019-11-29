@@ -850,24 +850,30 @@ Model::SetAuthorization(const BString& nickname, const BString& passwordClear,
 status_t
 Model::_LocalDataPath(const BString leaf, BPath& path) const
 {
-	BString leafAssembled(leaf);
-	leafAssembled.ReplaceAll("%languageCode%",
-		LanguageModel().PreferredLanguage().Code());
+	BPath resultPath;
+	status_t result = B_OK;
 
-	BPath repoDataPath;
+	if (result == B_OK)
+		result = find_directory(B_USER_CACHE_DIRECTORY, &resultPath);
 
-	if (find_directory(B_USER_CACHE_DIRECTORY, &repoDataPath) == B_OK
-		&& repoDataPath.Append("HaikuDepot") == B_OK
-		&& create_directory(repoDataPath.Path(), 0777) == B_OK
-		&& repoDataPath.Append(leafAssembled) == B_OK) {
-		path.SetTo(repoDataPath.Path());
-		return B_OK;
+	if (result == B_OK)
+		result = resultPath.Append("HaikuDepot");
+
+	if (result == B_OK)
+		result = create_directory(resultPath.Path(), 0777);
+
+	if (result == B_OK)
+		result = resultPath.Append(leaf);
+
+	if (result == B_OK)
+		path.SetTo(resultPath.Path());
+	else {
+		path.Unset();
+		fprintf(stdout, "unable to find the user cache file for "
+			"[%s] data; %s\n", leaf.String(), strerror(result));
 	}
 
-	path.Unset();
-	fprintf(stdout, "unable to find the user cache file for [%s] data",
-		leaf.String());
-	return B_ERROR;
+	return result;
 }
 
 
@@ -880,7 +886,10 @@ Model::_LocalDataPath(const BString leaf, BPath& path) const
 status_t
 Model::DumpExportRepositoryDataPath(BPath& path) const
 {
-	return _LocalDataPath("repository-all_%languageCode%.json.gz", path);
+	BString leaf;
+	leaf.SetToFormat("repository-all_%s.json.gz",
+		LanguageModel().PreferredLanguage().Code());
+	return _LocalDataPath(leaf, path);
 }
 
 
@@ -892,7 +901,10 @@ Model::DumpExportRepositoryDataPath(BPath& path) const
 status_t
 Model::DumpExportReferenceDataPath(BPath& path) const
 {
-	return _LocalDataPath("reference-all_%languageCode%.json.gz", path);
+	BString leaf;
+	leaf.SetToFormat("reference-all_%s.json.gz",
+		LanguageModel().PreferredLanguage().Code());
+	return _LocalDataPath(leaf, path);
 }
 
 
@@ -900,18 +912,29 @@ status_t
 Model::IconStoragePath(BPath& path) const
 {
 	BPath iconStoragePath;
+	status_t result = B_OK;
 
-	if (find_directory(B_USER_CACHE_DIRECTORY, &iconStoragePath) == B_OK
-		&& iconStoragePath.Append("HaikuDepot") == B_OK
-		&& iconStoragePath.Append("__allicons") == B_OK
-		&& create_directory(iconStoragePath.Path(), 0777) == B_OK) {
+	if (result == B_OK)
+		result = find_directory(B_USER_CACHE_DIRECTORY, &iconStoragePath);
+
+	if (result == B_OK)
+		result = iconStoragePath.Append("HaikuDepot");
+
+	if (result == B_OK)
+		result = iconStoragePath.Append("__allicons");
+
+	if (result == B_OK)
+		result = create_directory(iconStoragePath.Path(), 0777);
+
+	if (result == B_OK)
 		path.SetTo(iconStoragePath.Path());
-		return B_OK;
+	else {
+		path.Unset();
+		fprintf(stdout, "unable to find the user cache directory for "
+			"icons; %s\n", strerror(result));
 	}
 
-	path.Unset();
-	fprintf(stdout, "unable to find the user cache directory for icons");
-	return B_ERROR;
+	return result;
 }
 
 
@@ -919,23 +942,10 @@ status_t
 Model::DumpExportPkgDataPath(BPath& path,
 	const BString& repositorySourceCode) const
 {
-	BPath repoDataPath;
-	BString leafName;
-
-	leafName.SetToFormat("pkg-all-%s-%s.json.gz", repositorySourceCode.String(),
+	BString leaf;
+	leaf.SetToFormat("pkg-all-%s-%s.json.gz", repositorySourceCode.String(),
 		LanguageModel().PreferredLanguage().Code());
-
-	if (find_directory(B_USER_CACHE_DIRECTORY, &repoDataPath) == B_OK
-		&& repoDataPath.Append("HaikuDepot") == B_OK
-		&& create_directory(repoDataPath.Path(), 0777) == B_OK
-		&& repoDataPath.Append(leafName.String()) == B_OK) {
-		path.SetTo(repoDataPath.Path());
-		return B_OK;
-	}
-
-	path.Unset();
-	fprintf(stdout, "unable to find the user cache file for pkgs' data");
-	return B_ERROR;
+	return _LocalDataPath(leaf, path);
 }
 
 

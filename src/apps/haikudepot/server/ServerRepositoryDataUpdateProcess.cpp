@@ -189,6 +189,7 @@ ServerRepositoryDataUpdateProcess::UrlPathComponent()
 status_t
 ServerRepositoryDataUpdateProcess::GetLocalPath(BPath& path) const
 {
+	AutoLocker<BLocker> locker(fModel->Lock());
 	return fModel->DumpExportRepositoryDataPath(path);
 }
 
