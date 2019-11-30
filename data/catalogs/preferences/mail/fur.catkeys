@@ -28,7 +28,7 @@ Enter a valid e-mail address.	AutoConfigWindow		Inserî une direzion e-mail vali
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nImpussibil tornâ aes impostazions gjenerâls precedentis.\n\nErôr tal recuperâ lis impostazions gjenerâls:\n%s\n
 Incoming	E-Mail		In jentrade
 Choose Protocol	E-Mail		Sielç il protocol
-Return address:	Config Views		Direzion dal mitent:
+Return address:	Config Views		Direzion pe rispueste:
 Password:	E-Mail		Peraule di ordin:
 Error retrieving general settings: %s\n	Config Window		Erôr tal recuperâ lis impostazions gjenerâls: %s\n
 The filter could not be moved. Deleting filter.	Config Views		Impussibil spostâ il filtri. Si elimine il filtri.
