@@ -255,13 +255,17 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 	screenBox->AddChild(BLayoutBuilder::Group<>()
 		.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
 			.Add(workspaces)
-			.AddGrid(B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING)
-				// columns
-				.Add(fColumnsControl->CreateLabelLayoutItem(), 0, 0)
-				.Add(fColumnsControl->CreateTextViewLayoutItem(), 1, 0)
-				// rows
-				.Add(fRowsControl->CreateLabelLayoutItem(), 0, 1)
-				.Add(fRowsControl->CreateTextViewLayoutItem(), 1, 1)
+			.AddGroup(B_HORIZONTAL, 0)
+				.AddGlue()
+				.AddGrid(B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING)
+					// columns
+					.Add(fColumnsControl->CreateLabelLayoutItem(), 0, 0)
+					.Add(fColumnsControl->CreateTextViewLayoutItem(), 1, 0)
+					// rows
+					.Add(fRowsControl->CreateLabelLayoutItem(), 0, 1)
+					.Add(fRowsControl->CreateTextViewLayoutItem(), 1, 1)
+					.End()
+				.AddGlue()
 				.End()
 			.End()
 		.View());
