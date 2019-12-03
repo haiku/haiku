@@ -30,7 +30,7 @@ status_t
 ppc_openfirmware_pci_controller_init(void)
 {
 	char path[256];
-	int cookie = 0;
+	intptr_t cookie = 0;
 	while (of_get_next_device(&cookie, 0, "pci", path, sizeof(path))
 			== B_OK) {
 dprintf("ppc_openfirmware_pci_controller_init(): pci device node: %s\n", path);

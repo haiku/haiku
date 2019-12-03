@@ -36,6 +36,7 @@ for platform in [ MultiBootSubDirSetup ] {
 				case "ppc" :
 				{
 					DEFINES +=
+						BOOT_SUPPORT_ELF32 #How to deal with PPC970 ?
 						BOOT_SUPPORT_PARTITION_AMIGA
 						BOOT_SUPPORT_PARTITION_APPLE
 

@@ -2,8 +2,8 @@
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef SYSTEM_ARCH_X86_ASM_DEFS_H
-#define SYSTEM_ARCH_X86_ASM_DEFS_H
+#ifndef SYSTEM_ARCH_PPC_ASM_DEFS_H
+#define SYSTEM_ARCH_PPC_ASM_DEFS_H
 
 
 #define SYMBOL(name)			.global name; name
@@ -13,5 +13,5 @@
 #define FUNCTION_END(name)		1: .size name, 1b - name
 
 
-#endif	/* SYSTEM_ARCH_X86_ASM_DEFS_H */
+#endif	/* SYSTEM_ARCH_PPC_ASM_DEFS_H */
 

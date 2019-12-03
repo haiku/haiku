@@ -1618,9 +1618,10 @@ actions BuildCDBootPPCImage1 bind MAPS
 	# Extras (readme files, etc)
 	cp $(>[4]) $(HAIKU_OUTPUT_DIR)/cd/
 
-	xorriso -as mkisofs -v -hfs -part -map $(MAPS) -no-desktop -hfs-volid bootimg \
-		-V $(VOLID) -hfs-bless $(HAIKU_OUTPUT_DIR)/cd/boot -prep-boot \
-		boot/haikuloader.xcf -r -o $(<) $(HAIKU_OUTPUT_DIR)/cd
+	xorriso -as mkisofs -v -hfsplus \
+		-hfs-bless $(HAIKU_OUTPUT_DIR)/cd/boot \
+		-prep-boot-part $(HAIKU_OUTPUT_DIR)/cd/boot/haikuloader.xcf \
+		-r -J -o $(<) $(HAIKU_OUTPUT_DIR)/cd
 	$(RM) -r $(HAIKU_OUTPUT_DIR)/cd
 }
 

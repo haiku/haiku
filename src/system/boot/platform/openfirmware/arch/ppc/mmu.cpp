@@ -574,7 +574,7 @@ map_callback(struct of_arguments *args)
 	void *virtualAddress = (void *)args->Argument(1);
 	int length = args->Argument(2);
 	int mode = args->Argument(3);
-	int &error = args->ReturnValue(0);
+	intptr_t &error = args->ReturnValue(0);
 
 	// insert range in physical allocated if needed
 
@@ -618,9 +618,9 @@ static int
 translate_callback(struct of_arguments *args)
 {
 	addr_t virtualAddress = (addr_t)args->Argument(0);
-	int &error = args->ReturnValue(0);
-	int &physicalAddress = args->ReturnValue(1);
-	int &mode = args->ReturnValue(2);
+	intptr_t &error = args->ReturnValue(0);
+	intptr_t &physicalAddress = args->ReturnValue(1);
+	intptr_t &mode = args->ReturnValue(2);
 
 	// Find page table entry for this address
 

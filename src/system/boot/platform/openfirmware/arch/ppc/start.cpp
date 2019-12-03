@@ -5,11 +5,13 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "start.h"
 
-#include "machine.h"
+#include <string.h>
+#include <OS.h>
+#include <platform/openfirmware/openfirmware.h>
 
+#include "machine.h"
 
 extern "C" void _start(uint32 _unused1, uint32 _unused2,
 	void *openFirmwareEntry);

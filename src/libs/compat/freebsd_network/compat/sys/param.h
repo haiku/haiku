@@ -65,6 +65,8 @@
 	|| defined(__sparc__) || defined(__riscv64__) \
 	|| defined(__aarch64__) || defined(__arm64__)
 #define CACHE_LINE_SIZE 64
+#elif defined(__powerpc__)
+#define CACHE_LINE_SIZE 128
 #else
 #error Need definition of CACHE_LINE_SIZE for this arch!
 #endif

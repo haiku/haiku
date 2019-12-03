@@ -114,7 +114,7 @@ status_t
 PPCOpenFirmware::Init(struct kernel_args *kernelArgs)
 {
 	return of_init(
-		(int(*)(void*))kernelArgs->platform_args.openfirmware_entry);
+		(intptr_t(*)(void*))kernelArgs->platform_args.openfirmware_entry);
 }
 
 // InitSerialDebug

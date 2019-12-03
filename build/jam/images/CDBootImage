@@ -16,7 +16,7 @@ local extras = README.html ;
 
 if $(TARGET_ARCH) = ppc {
 	local elfloader = boot_loader_openfirmware ;
-	local coffloader = boot_loader_openfirmware_coff ;
+	local coffloader = haiku_loader.openfirmware ;
 
 	# OpenFirmware / Mac boot support files:
 	# CHRP script

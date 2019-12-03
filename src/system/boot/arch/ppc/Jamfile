@@ -1,33 +1,30 @@
 SubDir HAIKU_TOP src system boot arch ppc ;
 
-{
-	local defines = _BOOT_MODE ;
-
-	defines = [ FDefines $(defines) ] ;
-	SubDirCcFlags $(defines) ;
-	SubDirC++Flags $(defines) -fno-rtti ;
-}
-
-
 local kernelLibArchObjects =
 	<src!system!kernel!lib!arch!$(TARGET_ARCH)>byteorder.o
 	<src!system!kernel!lib!arch!$(TARGET_ARCH)>memcpy.o
 	<src!system!kernel!lib!arch!$(TARGET_ARCH)>memset.o
 ;
 
-BootMergeObject boot_arch_$(TARGET_KERNEL_ARCH).o :
-	debug_uart_8250.cpp
-	arch_uart_8250.cpp
-	arch_elf.cpp
-	: # additional flags
-	:
-	$(kernelArchObjects)
-	$(kernelLibArchObjects)
-;
+local platform ;
+for platform in [ MultiBootSubDirSetup openfirmware ] {
+    on $(platform) {
+		DEFINES += _BOOT_MODE ;
 
-SEARCH on [ FGristFiles arch_elf.cpp arch_uart_8250.cpp ]
-    = [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH) ] ;
+		BootMergeObject [ FGristFiles boot_arch_$(TARGET_KERNEL_ARCH).o ] :
+			debug_uart_8250.cpp
+			#arch_uart_8250.cpp
+			arch_elf.cpp
+			: # additional flags
+			:
+			$(kernelArchObjects)
+			$(kernelLibArchObjects)
+		;
 
-SEARCH on [ FGristFiles debug_uart_8250.cpp ]
-	= [ FDirName $(HAIKU_TOP) src system kernel arch generic ] ;
+		SEARCH on [ FGristFiles arch_elf.cpp arch_uart_8250.cpp ]
+		    = [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH) ] ;
 
+		SEARCH on [ FGristFiles debug_uart_8250.cpp ]
+			= [ FDirName $(HAIKU_TOP) src system kernel arch generic ] ;
+	}
+}

@@ -45,7 +45,7 @@ boot_arch_cpu_init(void)
 	}
 
 	char cpuPath[256];
-	int cookie = 0;
+	intptr_t cookie = 0;
 	int cpuCount = 0;
 	while (of_get_next_device(&cookie, cpus, "cpu", cpuPath,
 			sizeof(cpuPath)) == B_OK) {
@@ -88,9 +88,9 @@ boot_arch_cpu_init(void)
 			gKernelArgs.arch_args.bus_frequency = busFrequency;
 			gKernelArgs.arch_args.time_base_frequency = timeBaseFrequency;
 
-			TRACE(("  CPU clock frequency: %ld\n", clockFrequency));
-			TRACE(("  bus clock frequency: %ld\n", busFrequency));
-			TRACE(("  time base frequency: %ld\n", timeBaseFrequency));
+			TRACE(("  CPU clock frequency: %" B_PRId32 "\n", clockFrequency));
+			TRACE(("  bus clock frequency: %" B_PRId32 "\n", busFrequency));
+			TRACE(("  time base frequency: %" B_PRId32 "\n", timeBaseFrequency));
 		}
 
 		cpuCount++;
