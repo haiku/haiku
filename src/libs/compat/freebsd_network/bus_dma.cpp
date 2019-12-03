@@ -84,14 +84,6 @@ bus_dma_tag_create(bus_dma_tag_t parent, bus_size_t alignment, bus_size_t bounda
 	newtag->maxsegsz = maxsegsz;
 	newtag->ref_count = 1;
 
-	newtag->segments = (bus_dma_segment_t*)kernel_malloc(
-		sizeof(bus_dma_segment_t) * newtag->nsegments, M_DEVBUF,
-		M_NOWAIT);
-	if (newtag->segments == NULL) {
-		kernel_free(dmat, M_DEVBUF);
-		return ENOMEM;
-	}
-
 	if (newtag->parent != NULL) {
 		atomic_add(&parent->ref_count, 1);
 
@@ -147,6 +139,17 @@ bus_dmamap_create(bus_dma_tag_t dmat, int flags, bus_dmamap_t* mapp)
 {
 	// We never bounce, so we do not need maps.
 	*mapp = NULL;
+
+	// However, since bus_dmamap_create() must be called before buffers
+	// are loaded, we allocate the "segments" field (if not yet done.)
+	if (dmat->segments == NULL) {
+		dmat->segments = (bus_dma_segment_t*)kernel_malloc(
+			sizeof(bus_dma_segment_t) * dmat->nsegments, M_DEVBUF,
+			M_ZERO | M_NOWAIT);
+		if (dmat->segments == NULL)
+			return ENOMEM;
+	}
+
 	return 0;
 }
 
