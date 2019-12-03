@@ -29,10 +29,10 @@ struct bus_dma_tag {
 	bus_dma_filter_t* filter;
 	void*			filterarg;
 	phys_size_t		maxsize;
-	uint32			nsegments;
+	uint32			maxsegments;
+	bus_dma_segment_t* segments;
 	phys_size_t		maxsegsz;
 	int32			ref_count;
-	bus_dma_segment_t* segments;
 };
 
 
@@ -80,7 +80,7 @@ bus_dma_tag_create(bus_dma_tag_t parent, bus_size_t alignment, bus_size_t bounda
 	newtag->filter = filter;
 	newtag->filterarg = filterarg;
 	newtag->maxsize = maxsize;
-	newtag->nsegments = nsegments;
+	newtag->maxsegments = nsegments;
 	newtag->maxsegsz = maxsegsz;
 	newtag->ref_count = 1;
 
@@ -139,17 +139,6 @@ bus_dmamap_create(bus_dma_tag_t dmat, int flags, bus_dmamap_t* mapp)
 {
 	// We never bounce, so we do not need maps.
 	*mapp = NULL;
-
-	// However, since bus_dmamap_create() must be called before buffers
-	// are loaded, we allocate the "segments" field (if not yet done.)
-	if (dmat->segments == NULL) {
-		dmat->segments = (bus_dma_segment_t*)kernel_malloc(
-			sizeof(bus_dma_segment_t) * dmat->nsegments, M_DEVBUF,
-			M_ZERO | M_NOWAIT);
-		if (dmat->segments == NULL)
-			return ENOMEM;
-	}
-
 	return 0;
 }
 
@@ -268,7 +257,7 @@ _bus_dmamap_load_buffer(bus_dma_tag_t dmat, bus_dmamap_t /* map */, void* buf,
 							== (phys_addr & boundary_mask))) {
 				segs[seg].ds_len += segment_size;
 			} else {
-				if (++seg >= dmat->nsegments)
+				if (++seg >= dmat->maxsegments)
 					break;
 				segs[seg].ds_addr = phys_addr;
 				segs[seg].ds_len = segment_size;
@@ -293,6 +282,14 @@ bus_dmamap_load(bus_dma_tag_t dmat, bus_dmamap_t map, void *buf,
 	bus_addr_t lastaddr = 0;
 	int error, nsegs = 0;
 
+	if (dmat->segments == NULL) {
+		dmat->segments = (bus_dma_segment_t*)kernel_malloc(
+			sizeof(bus_dma_segment_t) * dmat->maxsegments, M_DEVBUF,
+			M_ZERO | M_NOWAIT);
+		if (dmat->segments == NULL)
+			return ENOMEM;
+	}
+
 	error = _bus_dmamap_load_buffer(dmat, map, buf, buflen, flags,
 		&lastaddr, dmat->segments, nsegs, true);
 
@@ -313,6 +310,14 @@ bus_dmamap_load_mbuf(bus_dma_tag_t dmat, bus_dmamap_t map, struct mbuf* mb,
 	bus_dmamap_callback2_t* callback, void* callback_arg, int flags)
 {
 	M_ASSERTPKTHDR(mb);
+
+	if (dmat->segments == NULL) {
+		dmat->segments = (bus_dma_segment_t*)kernel_malloc(
+			sizeof(bus_dma_segment_t) * dmat->maxsegments, M_DEVBUF,
+			M_ZERO | M_NOWAIT);
+		if (dmat->segments == NULL)
+			return ENOMEM;
+	}
 
 	int nsegs = 0, error = 0;
 	if (mb->m_pkthdr.len <= dmat->maxsize) {
