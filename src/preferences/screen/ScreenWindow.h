@@ -68,7 +68,7 @@ private:
 			bool			fIsVesa;
 			bool			fBootWorkspaceApplied;
 
-			BStringView*	fMonitorInfo;
+			BBox*			fScreenBox;
 			BStringView*	fDeviceInfo;
 			MonitorView*	fMonitorView;
 			BMenuItem*		fAllWorkspacesItem;
@@ -101,8 +101,6 @@ private:
 			BButton*		fDefaultsButton;
 			BButton*		fApplyButton;
 			BButton*		fRevertButton;
-
-			BButton*		fBackgroundsButton;
 
 			ScreenMode		fScreenMode;
 			ScreenMode		fUndoScreenMode;
