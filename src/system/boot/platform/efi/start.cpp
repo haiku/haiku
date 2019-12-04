@@ -12,17 +12,18 @@
 #include <KernelExport.h>
 
 #include <arch/cpu.h>
+#include <kernel.h>
+
+#include <boot/arch/x86/arch_cpu.h>
 #include <boot/kernel_args.h>
 #include <boot/platform.h>
 #include <boot/stage2.h>
 #include <boot/stdio.h>
-#include <kernel.h>
 
 #include "arch_mmu.h"
 #include "acpi.h"
 #include "console.h"
 #include "efi_platform.h"
-#include "cpu.h"
 #include "mmu.h"
 #include "serial.h"
 #include "smp.h"

@@ -28,6 +28,7 @@ for platform in [ MultiBootSubDirSetup bios_ia32 efi pxe_ia32 ] {
 			$(kernelArchSpecificSources)
 			$(kernelLibArchSpecificSources)
 			$(librootOsArchSources)
+			cpu.cpp
 			: -std=c++11 # additional flags
 		;
 
