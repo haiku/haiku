@@ -233,7 +233,7 @@ BGeolocation::Country(const float latitude, const float longitude,
 
 #include "DefaultGeolocationServiceKey.h"
 
-const char* BGeolocation::kDefaultService
+const char* BGeolocation::kDefaultGeolocationService
 	= "https://location.services.mozilla.com/v1/geolocate?key="
 		DEFAULT_GEOLOCATION_SERVICE_KEY;
 
