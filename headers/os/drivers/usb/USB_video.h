@@ -17,7 +17,7 @@
 
 
 enum { // Video Interface Class Code
-	USB_VIDEO_INTERFACE_VIDEO_CLASS		= 0x0e
+	USB_VIDEO_DEVICE_CLASS		= 0x0e
 };
 
 
@@ -68,7 +68,7 @@ enum { // Video Class-Specific VideoStreaming Interface descriptor subtypes
 	USB_VIDEO_VS_FRAME_MJPEG					= 0x07,
 	USB_VIDEO_VS_FORMAT_MPEG2TS					= 0x0a,
 	USB_VIDEO_VS_FORMAT_DV						= 0x0c,
-	USB_VIDDE_VS_COLORFORMAT					= 0x0d,
+	USB_VIDEO_VS_COLORFORMAT					= 0x0d,
 	USB_VIDEO_VS_FORMAT_FRAME_BASED				= 0x10,
 	USB_VIDEO_VS_FRAME_FRAME_BASED				= 0x11,
 	USB_VIDEO_VS_FORMAT_STREAM_BASED			= 0x12,
@@ -202,7 +202,7 @@ typedef struct {
 	following values: 0 = reserved, 1 = VideoControl interface,
 	2 = VideoStreaming interface. */
 	struct status_type {
-		LBITFIELD8_2 (
+		B_LBITFIELD8_2 (
 				originator: 4,
 				reserved: 4
 			     );
@@ -286,7 +286,7 @@ typedef struct {
 typedef struct {
 	uint8 header_length;
 	struct header_info {
-		LBITFIELD8_8 (
+		B_LBITFIELD8_8 (
 				frame_id: 1,
 				end_of_frame: 1,
 				presentation_time: 1,
@@ -332,7 +332,7 @@ typedef struct {
 	// a variable size
 	uint8 control_size;
 	struct controls {
-		LBITFIELD8_8 (
+		B_LBITFIELD8_8 (
 				vendor_specific0 : 1,
 				vendor_specific1 : 1,
 				vendor_specific2 : 1,
@@ -352,14 +352,14 @@ typedef struct {
 	uint8 length; // 7 bytes
 	uint8 descriptor_type;
 	struct end_point_address {
-		LBITFIELD8_3 (
+		B_LBITFIELD8_3 (
 				endpoint_number: 4, // Determined by the designer
 				reserved: 3, // Reserved. Set to zero.
 				direction: 1 // 0 = OUT, 1 = IN
 			     );
 	} _end_point_address;
 	struct attributes {
-		LBITFIELD8_3 (
+		B_LBITFIELD8_3 (
 				transfer_type: 2, // Must be set to 11 (Interrupt)
 				synchronization_type: 2, // Must be set to 00 (None)
 				reserved: 4 // Reserved. Must be set to zero
@@ -422,14 +422,14 @@ typedef struct {
 	uint8 num_formats;
 	uint16 total_length;
 	struct endpoint_address {
-		LBITFIELD8_3 (
+		B_LBITFIELD8_3 (
 				endpoint_number: 4, // Determined by the designer
 				reserved: 3, // Set to zero.
 				direction: 1 // 0 = OUT, 1 = IN
 			     );
 	}  _endpoint_address;
 	struct info {
-		LBITFIELD8_2 (
+		B_LBITFIELD8_2 (
 				dynamic_format_change_support: 1,
 				reserved: 7 // Set to zero.
 			     );
@@ -443,7 +443,7 @@ typedef struct {
 		// For four first bits, a bit set to 1 indicates that the named field
 		// is supported by the Video Probe and Commit Control when
 		// its format_index is 1:
-		LBITFIELD8_7 (
+		B_LBITFIELD8_7 (
 				key_frame_rate: 1,
 				p_frame_rate: 1,
 				comp_quality: 1,
@@ -481,7 +481,7 @@ typedef struct {
 	uint8 num_formats;
 	uint16 total_length;
 	struct endpoint_address {
-		LBITFIELD8_3 (
+		B_LBITFIELD8_3 (
 				endpoint_number: 4, // Determined by the designer
 				reserved: 3, // Set to zero.
 				direction: 1 // 0 = OUT
@@ -493,7 +493,7 @@ typedef struct {
 		// For four first bits, a bit set to 1 indicates that the named field
 		// is supported by the Video Probe and Commit Control when its
 		// format_index is 1:
-		LBITFIELD8_5 (
+		B_LBITFIELD8_5 (
 				key_frame_rate: 1,
 				p_frame_rate: 1,
 				comp_quality: 1,
@@ -514,80 +514,86 @@ typedef struct {
 	uint8	source_id;
 	uint16	max_multiplier;
 	uint8	control_size;
+	union {
 #if B_HOST_IS_LENDIAN
-	struct controls {
-		struct control_a {
-			LBITFIELD16 (
-					brightness: 1,
-					contrast: 1,
-					hue: 1,
-					saturation: 1,
-					sharpness: 1,
-					gamma: 1,
-					white_balance_temperature: 1,
-					white_balance_component: 1,
-					backlight_compensation: 1,
-					gain: 1,
-					power_line_frequency: 1,
-					hue_auto: 1,
-					white_balance_temperature_auto: 1,
-					white_balance_component_auto: 1,
-					digital_multiplier: 1,
-					digital_multiplier_limit: 1
-				    );
-		} _control_a;
-		struct control_b {
-			LBITFIELD3 (
-					analog_video_standard: 1,
-					analog_video_lock_status: 1,
-					reserved: 14 // Reserved. Se to zero.
-				   );
-		} _control_b;
-	} _controls;
+		struct {
+			struct control_a {
+				B_LBITFIELD16_16 (
+						brightness: 1,
+						contrast: 1,
+						hue: 1,
+						saturation: 1,
+						sharpness: 1,
+						gamma: 1,
+						white_balance_temperature: 1,
+						white_balance_component: 1,
+						backlight_compensation: 1,
+						gain: 1,
+						power_line_frequency: 1,
+						hue_auto: 1,
+						white_balance_temperature_auto: 1,
+						white_balance_component_auto: 1,
+						digital_multiplier: 1,
+						digital_multiplier_limit: 1
+						);
+			} _control_a;
+			struct control_b {
+				B_LBITFIELD16_3 (
+						analog_video_standard: 1,
+						analog_video_lock_status: 1,
+						reserved: 14 // Reserved. Se to zero.
+						);
+			} _control_b;
+		} _controls;
 #else
-	struct controls {
-		struct control_b {
-			LBITFIELD3 (
-					analog_video_standard: 1,
-					analog_video_lock_status: 1,
-					reserved: 14 // Reserved. Se to zero.
-				   );
-		} _control_b;
-		struct control_a {
-			LBITFIELD16 (
-					brightness: 1,
-					contrast: 1,
-					hue: 1,
-					saturation: 1,
-					sharpness: 1,
-					gamma: 1,
-					white_balance_temperature: 1,
-					white_balance_component: 1,
-					backlight_compensation: 1,
-					gain: 1,
-					power_line_frequency: 1,
-					hue_auto: 1,
-					white_balance_temperature_auto: 1,
-					white_balance_component_auto: 1,
-					digital_multiplier: 1,
-					digital_multiplier_limit: 1
-				    );
-		} _control_a;
-	} _controls;
+		struct {
+			struct control_b {
+				B_LBITFIELD16_3 (
+						analog_video_standard: 1,
+						analog_video_lock_status: 1,
+						reserved: 14 // Reserved. Se to zero.
+						);
+			} _control_b;
+			struct control_a {
+				B_LBITFIELD16_16 (
+						brightness: 1,
+						contrast: 1,
+						hue: 1,
+						saturation: 1,
+						sharpness: 1,
+						gamma: 1,
+						white_balance_temperature: 1,
+						white_balance_component: 1,
+						backlight_compensation: 1,
+						gain: 1,
+						power_line_frequency: 1,
+						hue_auto: 1,
+						white_balance_temperature_auto: 1,
+						white_balance_component_auto: 1,
+						digital_multiplier: 1,
+						digital_multiplier_limit: 1
+						);
+			} _control_a;
+		} _controls;
 #endif
+		uint8_t controls[4];
+	};
 	uint8 processing;
-	struct video_standards {
-		LBITFIELD8_8 (
-				none: 1,
-				ntsc_525_60: 1,
-				pal_625_50: 1,
-				secam_625_50: 1,
-				ntsc_625_50: 1,
-				pal_525_60: 1,
-				reserved6: 1, // Reserved. Set to zero.
-				reserved7: 1  // Reserved. Set to zero.
-			     );
-	} _video_standards;
+	union {
+		struct video_standards {
+			B_LBITFIELD8_8 (
+					none: 1,
+					ntsc_525_60: 1,
+					pal_625_50: 1,
+					secam_625_50: 1,
+					ntsc_625_50: 1,
+					pal_525_60: 1,
+					reserved6: 1, // Reserved. Set to zero.
+					reserved7: 1  // Reserved. Set to zero.
+					);
+		} _video_standards;
+		uint8_t video_standards;
+	};
 } _PACKED usb_video_processing_unit_descriptor;
 
 
@@ -606,7 +612,7 @@ typedef struct {
 #if B_HOST_IS_LENDIAN
 	struct controls {
 		struct control_a {
-			LBITFIELD16 (
+			B_LBITFIELD16_16 (
 					scanning_mode: 1,
 					auto_exposure_mode: 1,
 					auto_exposure_priority: 1,
@@ -626,7 +632,7 @@ typedef struct {
 				    );
 		} _control_a;
 		struct control_b {
-			LBITFIELD4 (
+			B_LBITFIELD16_4 (
 					reserved16: 1,
 					focus_auto: 1,
 					privacy: 1,
@@ -638,7 +644,7 @@ typedef struct {
 #else
 	struct controls {
 		struct control_b {
-			LBITFIELD4 (
+			B_LBITFIELD16_4 (
 					reserved16: 1,
 					focus_auto: 1,
 					privacy: 1,
@@ -647,7 +653,7 @@ typedef struct {
 				   );
 		} _contorl_b;
 		struct control_a {
-			LBITFIELD16 (
+			B_LBITFIELD16_16 (
 					scanning_mode: 1,
 					auto_exposure_mode: 1,
 					auto_exposure_priority: 1,
@@ -692,13 +698,13 @@ typedef struct {
 		} continuous;
 		uint32	discrete_frame_intervals[0];
 	};
-} _PACKED;
+} _PACKED usb_video_frame_descriptor;
 
 
 typedef struct {
 	uint8 length; // 34 bytes
 	struct hint {
-		LBITFIELD5 (
+		B_LBITFIELD16_5 (
 				frame_interval: 1,
 				key_frame_rate: 1,
 				p_frame_rate: 1,
@@ -718,7 +724,7 @@ typedef struct {
 	uint32 max_payload_transfer_size;
 	uint32 clock_frequency;
 	struct framing_info {
-		LBITFIELD8_3 (
+		B_LBITFIELD8_3 (
 				is_frame_id_required: 1,
 				is_end_of_frame_present: 1,
 				reserved: 6
@@ -758,14 +764,14 @@ typedef struct {
 typedef struct {
 	uint8 length; // 7 bytes
 	struct endpoint_address {
-		LBITFIELD8_3 (
+		B_LBITFIELD8_3 (
 				endpoint_number: 4, // Determined by the designer
 				reserved: 3,
 				direction: 1 // Set to 1 = IN endpoint)
 			);
 	} _endpoint_address;
 	struct attributes {
-		LBITFIELD8_2 (
+		B_LBITFIELD8_2 (
 				transfer_type: 2, // Set to 10 = Bulk
 				reserved: 6
 			     );
@@ -789,14 +795,14 @@ typedef struct {
 	uint8 length; // 7 bytes
 	uint8 descriptor_type;
 	struct endpoint_address {
-		LBITFIELD8_3 (
+		B_LBITFIELD8_3 (
 				endpoint_number: 4, // Determined by the designer
 				reserved: 3, // Reset to zero.
 				direction: 1 // 0 = OUT endpoint, 1 = IN endpoint
 			     );
 	} _endpoint_address;
 	struct attributes {
-		LBITFIELD8_3 (
+		B_LBITFIELD8_3 (
 				transfer_type: 2, // 01 = isochronous
 				synchronization_type: 2, // 01 = asynchronous
 				reserved: 4
@@ -811,14 +817,14 @@ typedef struct {
 	uint8 length; // 7 bytes
 	uint8 descriptor_type;
 	struct endpoint_address {
-		LBITFIELD8_3 (
+		B_LBITFIELD8_3 (
 				endpoint_number: 4, // Determined by the designer
 				reserved: 3, // Reset to zero.
 				direction: 1 // 0 = OUT endpoint
 			     );
 	} _endpoint_address;
 	struct attributes {
-		LBITFIELD8_2 (
+		B_LBITFIELD8_2 (
 				transfer_type: 2, // Set to 10 = Bulk
 				reserved: 6
 			     );
