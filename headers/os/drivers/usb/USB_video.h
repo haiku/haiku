@@ -549,30 +549,30 @@ typedef struct {
 		struct {
 			struct control_b {
 				B_LBITFIELD16_3 (
-						analog_video_standard: 1,
-						analog_video_lock_status: 1,
-						reserved: 14 // Reserved. Se to zero.
-						);
+					analog_video_standard: 1,
+					analog_video_lock_status: 1,
+					reserved: 14 // Reserved. Se to zero.
+				);
 			} _control_b;
 			struct control_a {
 				B_LBITFIELD16_16 (
-						brightness: 1,
-						contrast: 1,
-						hue: 1,
-						saturation: 1,
-						sharpness: 1,
-						gamma: 1,
-						white_balance_temperature: 1,
-						white_balance_component: 1,
-						backlight_compensation: 1,
-						gain: 1,
-						power_line_frequency: 1,
-						hue_auto: 1,
-						white_balance_temperature_auto: 1,
-						white_balance_component_auto: 1,
-						digital_multiplier: 1,
-						digital_multiplier_limit: 1
-						);
+					brightness: 1,
+					contrast: 1,
+					hue: 1,
+					saturation: 1,
+					sharpness: 1,
+					gamma: 1,
+					white_balance_temperature: 1,
+					white_balance_component: 1,
+					backlight_compensation: 1,
+					gain: 1,
+					power_line_frequency: 1,
+					hue_auto: 1,
+					white_balance_temperature_auto: 1,
+					white_balance_component_auto: 1,
+					digital_multiplier: 1,
+					digital_multiplier_limit: 1
+				);
 			} _control_a;
 		} _controls;
 #endif
@@ -580,17 +580,17 @@ typedef struct {
 	};
 	uint8 processing;
 	union {
-		struct video_standards {
+		struct {
 			B_LBITFIELD8_8 (
-					none: 1,
-					ntsc_525_60: 1,
-					pal_625_50: 1,
-					secam_625_50: 1,
-					ntsc_625_50: 1,
-					pal_525_60: 1,
-					reserved6: 1, // Reserved. Set to zero.
-					reserved7: 1  // Reserved. Set to zero.
-					);
+				none: 1,
+				ntsc_525_60: 1,
+				pal_625_50: 1,
+				secam_625_50: 1,
+				ntsc_625_50: 1,
+				pal_525_60: 1,
+				reserved6: 1, // Reserved. Set to zero.
+				reserved7: 1  // Reserved. Set to zero.
+			);
 		} _video_standards;
 		uint8_t video_standards;
 	};
