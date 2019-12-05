@@ -216,15 +216,23 @@ console_init(void)
 void
 console_clear_screen(void)
 {
+#ifdef __sparc__
+	sOutput.Write("\014", 1);
+#else
 	of_interpret("erase-screen", 0, 0);
+#endif
 }
 
 
 int32
 console_width(void)
 {
-	int columnCount;
+	intptr_t columnCount;
+#ifdef __sparc__
+	if (of_interpret("screen-#columns", 0, 1, &columnCount) == OF_FAILED)
+#else
 	if (of_interpret("#columns", 0, 1, &columnCount) == OF_FAILED)
+#endif
 		return 0;
 	return columnCount;
 }
@@ -233,8 +241,12 @@ console_width(void)
 int32
 console_height(void)
 {
-	int lineCount;
+	intptr_t lineCount;
+#ifdef __sparc__
+	if (of_interpret("screen-#rows", 0, 1, &lineCount) == OF_FAILED)
+#else
 	if (of_interpret("#lines", 0, 1, &lineCount) == OF_FAILED)
+#endif
 		return 0;
 	return lineCount;
 }
@@ -243,6 +255,12 @@ console_height(void)
 void
 console_set_cursor(int32 x, int32 y)
 {
+#ifdef __sparc__
+	char buffer[11];
+	int len = snprintf(buffer, sizeof(buffer),
+		"\033[%" B_PRId32 ";%" B_PRId32 "H", y, x);
+	sOutput.Write(buffer, len);
+#else
 	// Note: We toggle the cursor temporarily to prevent a cursor artifact at
 	// at the old location.
 	of_interpret("toggle-cursor"
@@ -250,7 +268,7 @@ console_set_cursor(int32 x, int32 y)
 		" to column#"
 		" toggle-cursor",
 		2, 0, y, x);
-
+#endif
 }
 
 
@@ -266,6 +284,7 @@ console_hide_cursor(void)
 }
 
 
+#ifndef __sparc__
 static int
 translate_color(int32 color)
 {
@@ -292,11 +311,19 @@ translate_color(int32 color)
 		return color;
 	return 0;
 }
+#endif
 
 
 void
 console_set_color(int32 foreground, int32 background)
 {
+#ifdef __sparc__
+	// Sadly it seems we can only get inverse video, nothing else seems to work
+	if (background != 0)
+		sOutput.Write("\033[1m", 4);
+	else
+		sOutput.Write("\033[0m", 4);
+#else
 	// Note: Toggling the cursor doesn't seem to help. We still get cursor
 	// artifacts.
 	of_interpret("toggle-cursor"
@@ -304,6 +331,7 @@ console_set_color(int32 foreground, int32 background)
 		" to background-color"
 		" toggle-cursor",
 		2, 0, translate_color(foreground), translate_color(background));
+#endif
 }
 
 
