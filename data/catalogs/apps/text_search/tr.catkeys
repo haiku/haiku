@@ -1,0 +1,38 @@
+1	turkish	x-vnd.Haiku.TextSearch	1867528375
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Lütfen sizin için İzleyici'de seçilmesini dilediğiniz dosyaları seçin.
+%appname% : %path%	GrepWindow		%appname% : %path%
+Failed to start xargs program!	Grepper		xargs programı başlatılamadı!
+Open selection	GrepWindow		Seçimi aç
+Actions	GrepWindow		Eylemler
+New window	GrepWindow		Yeni pencere
+Encoding	GrepWindow		Kodlama
+OK	GrepWindow		Tamam
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Close	GrepWindow		Kapat
+Look in sub-folders	GrepWindow		Alt klasörlerde bak
+%s: Not enough room to escape the filename.	Grepper		%s: Dosya adını kaçıracak kadar yer yok.
+Follow symbolic links	GrepWindow		Sembolik bağlantıları izle
+Regular expression	GrepWindow		Düzenli ifade
+Text files only	GrepWindow		Yalnızca metin dosyaları
+Quit	GrepWindow		Çık
+Show files in Tracker	GrepWindow		Dosyaları İzleyici'de göster
+Please select the files you wish to keep searching.	GrepWindow		Lütfen aramayı sürdürmeyi dilediğiniz dosyaları seçin.
+Trim to selection	GrepWindow		Seçime kırp
+Set target…	GrepWindow		Hedef belirle…
+TextSearch	GrepWindow		Metin Arama
+Failed to open input pipe!	Grepper		Girdi veri yolu açılamadı!
+Search	GrepWindow		Arama
+Copy text to clipboard	GrepWindow		Metni panoya kopyala
+Show lines	GrepWindow		Satırları göster
+Failed to open errors pipe!	Grepper		Hata veri yolu açılamadı!
+The unselected files will be removed from the list.	GrepWindow		Seçilmeyen dosyalar listeden kaldırılacaktır.
+Skip folders starting with a dot	GrepWindow		Nokta ile başlayan klasörleri atla
+Open files in code editor	GrepWindow		Dosyaları kod düzenleyicisinde aç
+Failed to open output pipe!	Grepper		Çıktı veri yolu açılamadı!
+Cancel	GrepWindow		İptal
+History	GrepWindow		Geçmiş
+File	GrepWindow		Dosya
+Case-sensitive	GrepWindow		BÜYÜK/küçük harf duyarlı
+Select all	GrepWindow		Tümünü seç
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME bir veya birden fazla klasörü açamadı.
+Settings	GrepWindow		Ayarlar

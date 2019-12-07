@@ -1,0 +1,35 @@
+1	turkish	x-vnd.Haiku-Notifications	332239666
+Lower left	GeneralView		Sol alt
+Application does not have a valid signature	NotificationView	Alert message	Uygulama geçerli bir imzaya sahip değil
+Status	NotificationView		Durum
+Add…	NotificationView		Ekle…
+Lower right	GeneralView		Sağ alt
+Muted	NotificationView		Sessiz
+Window width:	GeneralView		Pencere genişliği:
+ is already listed	NotificationView	Alert message	 zaten listelenmiş
+OK	PrefletWin		Tamam
+Notifications	PrefletWin		Bildirimler
+Notifications preflet sample	PrefletWin		Bildirimler preflet örneği
+Mute notifications from this application	NotificationView		Bu uygulamadan gelen bildirimleri sessize al
+pixels	GeneralView		piksel
+seconds	GeneralView		saniye
+Revert	PrefletWin		Eski haline döndür
+Applications	PrefletView		Uygulamalar
+Timeout:	GeneralView		Zaman aşımı:
+Upper right	GeneralView		Sağ üst
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Tercihler kaydedilirken bir hata oluştu.\nDiskinizde yeterli boş alan olmayabilir.
+Defaults	PrefletWin		Öntanımlılar
+Upper left	GeneralView		Sol üst
+Applications	NotificationView		Uygulamalar
+Width:	GeneralView		Genişlik:
+General	PrefletView		Genel
+OK	NotificationView		Tamam
+Follow Deskbar	GeneralView		Masaüstü Çubuğu'nu izle
+Notifications	System name		Bildirimler
+Allowed	NotificationView		İzin verilenler
+Duration:	GeneralView		Uzunluk:
+Application	NotificationView		Uygulama
+Enable notifications	GeneralView		Bildirimleri etkinleştir
+This is a test notification message	PrefletWin		Bu bir sınama bildirimidir
+Remove	NotificationView		Kaldır
+Position:	GeneralView		Konum:

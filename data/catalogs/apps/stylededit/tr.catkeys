@@ -1,0 +1,88 @@
+1	turkish	x-vnd.Haiku-StyledEdit	727465241
+Document statistics	Statistics		Belge istatistikleri
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Geri alınamıyor, dosya bulunamadı: \"%s\".
+Cut	Menus		Kes
+Center	Menus		Ortala
+Wrap-around search	FindandReplaceWindow		Tüm dosyada ara
+Page setup…	Menus		Sayfa yapısı…
+Untitled 	StyledEditWindow		Adsız 
+OK	Statistics		Tamam
+Find	FindandReplaceWindow		Bul
+New	Menus		Yeni
+Document	Menus		Belge
+Search backwards	FindandReplaceWindow		Geriye doğru ara
+Find again	Menus		Yeniden bul
+Read-only	StatusView		Saltokunur
+Save	Menus		Kaydet
+Cancel	QuitAlert		İptal
+Copy	Menus		Kopyala
+Reload	NodeMonitorAlerts		Yeniden yükle
+line %d, column %d	StatusView		%d. satır, %d. sütun
+Words:	Statistics		Sözcükler:
+???	LoadAlert		???
+Recover	NodeMonitorAlerts		Kurtar
+Error saving \"%s\":\n%s	SaveAlert		\"%s\" kaydedilirken hata:\n%s
+OK	RevertToSavedAlert		Tamam
+Unlock file	StatusView		Dosya kilidini aç
+Italic	Menus		Eğik
+Can't undo	Menus		Geri alınamıyor
+Replace…	Menus		Değiştir…
+File	Menus		Dosya
+Bold	Menus		Kalın
+Paste	Menus		Yapıştır
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		\"%file%\" başka bir uygulama tarafından değiştirilmiş, yeniden yüklensin mi?
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		\"%file%\" başka bir uygulama tarafından kaldırılmış, kurtarılsın mı?
+Lines:	Statistics		Satırlar:
+Replace in all windows	FindandReplaceWindow		Tüm pencerelerde değiştir
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" içinde kaydedilmeyen değişiklikler var.\nDeğişiklikleri yoksaymak istediğinizden emin misiniz?
+Save	SaveAlert		Kaydet
+Default	Open_and_SaveAsPanel		Öntanımlı
+Cancel	RevertToSavedAlert		İptal
+Cancel	FindandReplaceWindow		İptal
+Statistics…	Menus		İstatistikler…
+Encoding	Open_and_SaveAsPanel		Kodlama
+Replace all	FindandReplaceWindow		Tümünü değiştir
+Close	Menus		Kapat
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		\"%s\" yüklenirken hata:\n\tDesteklenmeyen biçim
+Left	Menus		Sol
+Default	Menus		Öntanımlı
+OK	SaveAlert		Tamam
+Color	Menus		Renk
+Save changes to the document \"%s\"? 	QuitAlert		\"%s\" içindeki değişiklikler kaydedilsin mi?
+StyledEdit	System name		StyledEdit
+Find:	FindandReplaceWindow		Bul:
+Undo typing	QuitAlert		Yazımı geri al
+Error loading \"%s\":\n\t%s	LoadAlert		\"%s\" yüklenirken hata:\n\t%s
+Don't save	SaveAlert		Kaydetme!
+Reload…	Menus		Yeniden yükle…
+Print…	Menus		Yazdır…
+Quit	Menus		Çık
+Redo typing	QuitAlert		Yazımı yinele
+Ignore	NodeMonitorAlerts		Yoksay
+Wrap lines	Menus		Satırları kaydır
+Text encoding	Menus		Metin kodlaması
+Unable to unlock file\n\t%s	QuitAlert		Dosya kilidi açılamıyor\n\t%s
+Modified	StatusView		Değiştirildi
+OK	LoadAlert		Tamam
+Save	QuitAlert		Kaydet
+Case-sensitive	FindandReplaceWindow		BÜYÜK/küçük harf duyarlı
+Find selection	Menus		Seçimi bul
+Cancel	SaveAlert		İptal
+Find…	Menus		Bul…
+Revert	RevertToSavedAlert		Eski haline döndür
+Size	Menus		Boyut
+Autodetect	Menus		Kendiliğinden algıla
+Replace next	Menus		Sonrakini değiştir
+OK	QuitAlert		Tamam
+Replace with:	FindandReplaceWindow		Şununla değiştir:
+Edit	Menus		Düzen
+Open…	Menus		Aç…
+Save as…	Menus		Farklı kaydet…
+Replace	FindandReplaceWindow		Değiştir
+Characters:	Statistics		Karakterler:
+Don't save	QuitAlert		Kaydetme!
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Bu dosya saltokunur olarak imlenmiş. \"%s\" belgesindeki değişiklikler kaydedilsin mi? 
+Align	Menus		Hizalama
+Font	Menus		Yazıtipi
+Select all	Menus		Tümünü seç
+Right	Menus		Sağ

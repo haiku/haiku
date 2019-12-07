@@ -1,0 +1,5 @@
+1	turkish	x-vnd.Haiku-cmd-dstconfig	684321431
+Keep this time	dstcheck		Bu zamanı tut
+Manually adjust time…	dstcheck		Zamanı el ile ayarla…
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		Dikkat!\n\nYaz saati uygulaması nedeniyle bilgisayarınızın saati bir saat eksik/fazla olabilir.\nBilgisayarınıza göre şu anki saat %current time%.\n\nBu saat doğru mu?
+Ask me later	dstcheck		Daha sonra sor

@@ -1,0 +1,48 @@
+1	turkish	x-vnd.Haiku-Pulse	139895817
+Normal mode	DeskbarPulseView		Normal kip
+Info	CPUButton		Bilgi
+Quit	DeskbarPulseView		Çık
+Info	DeskbarPulseView		Bilgi
+Normal mode	MiniPulseView		Normal kip
+Frame color	ConfigView		Çerçeve rengi
+Error	PulseApp		Hata
+Bar colors	ConfigView		Çubuk renkleri
+%.2f GHz	NormalPulseView		%.2f GHz
+Defaults	PrefsWindow		Öntanımlılar
+%ld MHz	NormalPulseView		%ld MHz
+Mini mode	PrefsWindow		Ufak kip
+CPU progress bar	NormalPulseView		CPU ilerleme çubuğu
+Fade colors	ConfigView		Renkleri soldur
+About Pulse…	PulseView		Nabız hakkında…
+Pulse	NormalPulseView		Nabız
+Deskbar mode	NormalPulseView		Masaüstü Çubuğu kipi
+Remove replicant	CPUButton		Yinelenmişi kaldır
+You can't disable the last active CPU.	PulseView		Son etkin CPU'yu devre dışı bırakamazsınız.
+Width of icon:	ConfigView		Simge genişliği:
+Deskbar mode	MiniPulseView		Masaüstü Çubuğu kipi
+OK	PulseView		Tamam
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nYazanlar: David Ramsey ve Arve Hjønnevåg\nGüncelleme: Daniel Switkin\n
+OK	PrefsWindow		Tamam
+Pulse	PulseApp		Nabız
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Masaüstü Çubuğu'ndan kaldırma başarısız oldu.\n%s
+OK	PulseApp		Tamam
+About Pulse…	CPUButton		Nabız hakkında…
+Deskbar mode	PrefsWindow		Masaüstü Çubuğu kipi
+Mini mode	DeskbarPulseView		Ufak kip
+You can't disable the last active CPU.	CPUButton		Son etkin CPU'yu devre dışı bırakamazsınız.
+OK	CPUButton		Tamam
+Deskbar	CPUButton		Masaüstü Çubuğu
+Settings…	PulseView		Ayarlar…
+Deskbar menu	CPUButton		Masaüstü Çubuğu menüsü
+Mini mode	NormalPulseView		Ufak kip
+Quit	MiniPulseView		Çık
+Info	PulseView		Bilgi
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		Kullanım: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]
+OK	DeskbarPulseView		Tamam
+Info	PulseApp		Bilgi
+Pulse	System name		Nabız
+Active color	ConfigView		Etkin renk
+Installing in Deskbar failed\n%s	PulseApp		Masaüstü Çubuğu'na yükleme başarısız oldu\n%s
+Idle color	ConfigView		Boştaki renk
+Normal mode	PrefsWindow		Normal kip
+Pulse settings	PulseWindow		Nabız ayarları

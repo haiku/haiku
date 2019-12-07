@@ -1,0 +1,74 @@
+1	turkish	x-vnd.Haiku-MediaConverter	2251404027
+Writing audio track: %d%% complete	MediaConverter		Ses parçası yazılıyor: %d%% tamamlandı
+Input file not recognized as Audio or Video	MediaConverter		Girdi dosyası ses veya görüntü değil
+%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
+Video quality: %3d%%	MediaConverter		Video kalitesi: %3d%%
+Source files	MediaConverter		Kaynak dosyaları
+Error writing video frame %ld	MediaConverter		%ld. video karesi yazılırken hata
+Error converting '%filename'	MediaConverter		'%filename' dönüştürülürken hata
+Selected directory not found. Defaulting to /boot/home	MediaConverter		Seçili dizin bulunamadı. Yerine /boot/home kullanılacak.
+Conversion completed	MediaConverter		Dönüştürme tamamlandı
+Audio:	MediaConverter-FileInfo		Ses:
+MediaConverter+:SaveDirectory	MediaConverter		Ortam Dönüştürücüsü+:KaydetmeDizini
+Error creating video.	MediaConverter		Video oluşturulurken hata.
+Cancelling	MediaConverter		İptal ediliyor
+None available	Audio codecs		Hiçbiri mevcut değil
+No file selected	MediaConverter-FileInfo		Seçili dosya yok
+High	MediaConverter		Yüksek
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Dosya desteklenen bir ortam dosyası olarak tanımlanamadı:} other{# dosya desteklenen bir ortam dosyası olarak tanımlanamadı:}}
+File Error	MediaConverter-FileInfo		Dosya hatası
+None available	Video codecs		Hiçbiri mevcut değil
+Output format	MediaConverter		Çıktı biçimi
+%.1f kHz mono	MediaFileInfo		%.1f kHz tek kanallı
+%.1f kHz stereo	MediaFileInfo		%.1f kHz çift kanallı
+OK	MediaConverter		Tamam
+Error creating '%filename'	MediaConverter		'%filename' oluşturulurken hata
+Error loading a file	MediaConverter		Dosya yüklenirken hata
+Encoder parameters	MediaConverter-EncoderWindow		Kodlayıcı parametreleri
+Open…	Menu		Aç…
+Audio encoding:	MediaConverter		Ses kodlaması:
+Audio quality: %3d%%	MediaConverter		Ses kalitesi: %3d%%
+Cancelling…	MediaConverter		İptal ediliyor…
+Output file '%filename' created	MediaConverter		'%filename' çıktı dosyası oluşturuldu
+Output folder	MediaConverter		Çıktı klasörü
+Error creating track.	MediaConverter		Parça oluşturulurken hata.
+ seconds	MediaFileInfo		 saniye
+Video using parameters form settings	MediaConverter		Video ayarlardaki parametreleri kullanıyor
+Video:	MediaConverter-FileInfo		Video:
+Select	MediaConverter		Seç
+Conversion cancelled	MediaConverter		Dönüştürme iptal edildi
+Low	MediaConverter		Düşük
+Error loading files	MediaConverter		Dosyalar yüklenirken hata
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, other{# bit}}
+End   [ms]: 	MediaConverter		Son [ms]: 
+Cancel	MediaConverter		İptal
+OK	MediaConverter-FileInfo		Tamam
+Error read audio frame %ld	MediaConverter		Ses karesi %ld okunurken hata
+Video encoding:	MediaConverter		Video kodlaması:
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Dosya bilgisi okunurken bir hata oluştu.\n\nError: 
+Error	MediaConverter		Hata
+File details	MediaConverter		Dosya ayrıntıları
+No audio	Audio codecs list		Ses yok
+Drop media files onto this window	MediaConverter		Bu pencereye ortam dosyalarını bırakın
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, other{# kare}}
+Quit	Menu		Çık
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, other{# bayt}}
+Duration:	MediaConverter-FileInfo		Uzunluk:
+MediaConverter	System name		Ortam Dönüştürücüsü
+Error launching: %strError%	MediaConverter		Başlatılırken hata: %strError%
+File format:	MediaConverter		Dosya biçimi:
+Error writing audio frame %ld	MediaConverter		Ses karesi %ld yazılırken hata
+File	Menu		Dosya
+Video quality not supported	MediaConverter		Video kalitesi desteklenmiyor
+Select this folder	MediaConverter		Bu klasörü seç
+Error read video frame %ld	MediaConverter		Video karesi %ld okunurken hata
+%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanal
+%d bit 	MediaFileInfo		%d bit 
+No video	Video codecs list		Video yok
+Continue	MediaConverter		Sürdür
+Convert	MediaConverter		Dönüştür
+Audio quality not supported	MediaConverter		Ses kalitesi desteklenmiyor
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Konuma yazılırken hata: %strPath%. Yerine kullanılacak konum: /boot/home
+Writing video track: %d%% complete	MediaConverter		Video parçası yazılıyor: %d%% tamamlandı
+Preview	MediaConverter		Önizleme
+Start [ms]: 	MediaConverter		Başlangıç [ms]: 

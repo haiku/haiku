@@ -1,0 +1,54 @@
+1	turkish	x-vnd.Haiku-Mail	2750130554
+Account settings	AutoConfigWindow		Hesap ayarları
+\t\t· Outgoing	Config Window		\t\t· Giden e-posta
+An error occurred while creating the config view: %error.	Config Views		Yapılandırma görünümü oluşturulurken bir hata oluştu: %error.
+E-mail address:	E-Mail		E-posta adresi:
+Create new account	AutoConfigWindow		Yeni hesap oluştur
+While sending and receiving	Config Window		Gönderirken ve alırken
+Error!	Config Views		Hata!
+Apply	Config Window		Uygula
+Incoming mail filters	Config Views		Gelen posta süzgeçleri
+Outgoing mail filters	Config Views		Giden posta süzgeçleri
+Server name:	E-Mail		Sunucu adı:
+Add	Config Window		Ekle
+Back	AutoConfigWindow		Geri
+Real name:	E-Mail		Gerçek adınız:
+Real name:	Config Views		Gerçek adınız:
+\t\t· E-mail filters	Config Window		\t\t· E-posta süzgeçleri
+Outgoing	E-Mail		Giden e-posta
+Accounts	Config Window		Hesaplar
+Outgoing	Config Window		Giden e-posta
+Remove	Config Views		Kaldır
+Show notifications:	Config Window		Bildirimleri göster:
+Settings	Config Window		Ayarlar
+Never	Config Window	show status window	Hiçbir zaman
+Account name:	Config Views		Hesap adı:
+\t\t· Incoming	Config Window		\t\t· Gelen e-posta
+Enter a valid e-mail address.	AutoConfigWindow		Geçerli bir e-posta adresi girin.
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nGenel ayarlar eski haline döndürülemedi.\n\nGenel ayarlar getirilirken hata:\n%s\n
+Incoming	E-Mail		Gelen e-posta
+Choose Protocol	E-Mail		Protokol seçin
+Return address:	Config Views		Dönüş adresi:
+Password:	E-Mail		Parola:
+Error retrieving general settings: %s\n	Config Window		Genel ayarlar getirilirken hata: %s\n
+The filter could not be moved. Deleting filter.	Config Views		Süzgeç taşınamadı, siliniyor.
+OK	Config Views		Tamam
+Revert	Config Window		Eski haline döndür
+Incoming	Config Window		Gelen e-posta
+Finish	AutoConfigWindow		Bitir
+Add filter	Config Views		Süzgeç ekle
+Account settings	Config Views		Hesap ayarları
+minutes	Config Window		dakikada bir denetle
+E-mail	System name		E-posta
+Check every	Config Window		Her
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Ekle düğmesine tıklayarak yeni bir hesap ekleyin.\n\nKaldır düğmesine tıklayarak seçili hesabı kaldırabilirsiniz.\n\nListedeki bir ögenin ayarlarını değiştirmek için ögeyi seçin.
+Account name:	E-Mail		Hesap adı:
+Edit mailbox menu…	Config Window		Posta kutusu menüsünü düzenle…
+Server Name:	E-Mail		Sunucu adı:
+Remove	Config Window		Kaldır
+Login name:	E-Mail		Kullanıcı adı:
+While sending	Config Window		Gönderilirken
+OK	Config Window		Tamam
+OK	AutoConfigWindow		Tamam
+Next	AutoConfigWindow		Sonraki
+Error	Config Window		Hata

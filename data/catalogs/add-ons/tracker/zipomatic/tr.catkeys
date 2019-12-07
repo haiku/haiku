@@ -1,0 +1,17 @@
+1	turkish	x-vnd.haiku.zip-o-matic	2032806096
+Drop files here.	file:ZipOMaticWindow.cpp		Dosyaları buraya bırakın.
+Filename: %s	file:ZipOMaticWindow.cpp		Dosya adı: %s
+Do you want to stop them?	file:ZipOMatic.cpp		Durdurmak istiyor musunuz?
+Error creating archive	file:ZipOMaticWindow.cpp		Arşiv oluşturulurken hata
+Stop them	file:ZipOMatic.cpp		Durdur
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Arşiv oluşturmayı durdurmak istiyor musunuz?
+Preparing to archive	file:ZipperThread.cpp		Arşivlemeye hazırlanıyor
+Let them continue	file:ZipOMatic.cpp		Sürdürmelerine izin ver
+Continue	file:ZipOMaticWindow.cpp		Sürdür
+Archive created OK	file:ZipOMaticWindow.cpp		Arşiv oluşturma başarılı
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, other{# dosya eklendi.}}
+Stop	file:ZipOMaticWindow.cpp		Durdur
+Stopped	file:ZipOMaticWindow.cpp		Durduruldu.
+Archive	file:ZipperThread.cpp		Arşiv
+Creating archive: %s	file:ZipOMaticWindow.cpp		Arşiv oluşturuluyor: %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		{0, plural, one{# Zip-O-Matic} other{# Zip-O-Matic}} çalışıyor.\n\n

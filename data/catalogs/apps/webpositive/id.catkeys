@@ -1,155 +1,155 @@
 1	indonesian	x-vnd.Haiku-WebPositive	2763299522
-Show home button	Settings Window		Tampilkan tombol rumah
-Username:	Authentication Panel		Nama pengguna:
-Copy URL to clipboard	Download Window		Salin URL ke papan klip
-Cancel	Settings Window		Batal
-Close window	WebPositive Window		Tutup jendela
-Quit	WebPositive		Keluar
-The download could not be opened.	Download Window		Unduhan tidak bisa dibuka.
-The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Folder unduhan tidak bisa dibuka.\n\nGalat: %error
-Close	Download Window		Tutup
-Open location	WebPositive Window		Buka lokasi
-Clear history	WebPositive Window		Hapus riwayat
-WebPositive	System name		WebPositive
-Yesterday	WebPositive Window		Kemarin
-Default standard font size:	Settings Window		Ukuran fon standar bawaan:
-Start page:	Settings Window		Halaman awal:
-History	WebPositive Window		Riwayat
-Error opening downloads folder	Download Window		Galat membuka folder unduhan
-Paste	WebPositive Window		Tempel
-Expiration	Cookie Manager		Kedaluwarsa
-Double-click or middle-click to open new tab.	Tab Manager		Klik ganda atau klik tengah untuk membuka tab baru.
-Proxy username:	Settings Window		Nama pengguna proksi:
-Save page as…	WebPositive Window		Simpan halaman sebagai…
-Settings	Settings Window		Pengaturan
-Confirmation	WebPositive Window		Konfirmasi
-Window	WebPositive Window		Jendela
-Cookie manager	Cookie Manager		Manajer kuki
-Decrease size	WebPositive Window		Perkecil ukuran
-Serif font:	Settings Window		Fon serif:
-Loading %url	WebPositive Window		Memuat %url
-Download aborted	Download Window		Unduhan dibatalkan
-Value	Cookie Manager		Nilai
-Page source	WebPositive Window		Sumber halaman
-Next	WebPositive Window		Selanjutnya
-Find next	WebPositive Window		Cari selanjutnya
-Download folder:	Settings Window		Folder unduhan:
-Edit	WebPositive Window		Sunting
-Cancel	Authentication Panel		Batal
-Match case	WebPositive Window		Cocok persis
-Search page:	Settings Window		Halaman pencarian:
-Zoom text only	WebPositive Window		Perbesar teks saja
-Default fixed font size:	Settings Window		Ukuran fon tetap standar:
-Close tab	WebPositive Window		Tutup tab
-Auto-hide mouse pointer	Settings Window		Sembunyikan otomatis penunjuk tetikus
-Quit	WebPositive Window		Keluar
-Full screen	WebPositive Window		Layar penuh
-Open download error	Download Window		Galat membuka unduhan
-The cookie jar is empty!	Cookie Manager		Tempat kuki kosong!
-Standard font:	Settings Window		Fon standar:
-Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Temukan kemunculan istilah pencarian sebelumnya
-Restart	Download Window		Mulai ulang
-Proxy server	Settings Window		Server proksi
-Open containing folder	Download Window		Buka folder yang berisi
-New window	WebPositive Window		Jendela baru
-WebPositive	Download Window		WebPositive
-Open	Download Window		Buka
-Reload	WebPositive Window		Muat ulang
-Downloads	Download Window		Unduhan
-Sans serif font:	Settings Window		Fon sans serif:
-Delete	Cookie Manager		Hapus
-Forward	WebPositive Window		Selanjutnya
-of	Download Window	...as in '12kB of 256kB'	dari
-Revert	Settings Window		Pulihkan
-Fixed font:	Settings Window		Fon tetap:
-Cut	WebPositive Window		Potong
-Bookmark this page	WebPositive Window		Tandai halaman ini
-There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Terjadi kesalahan saat mencoba menampilkan folder Bookmark.\n\nKesalahan: %error
-Open downloads folder	Download Window		Buka folder unduhan
-Proxy password:	Settings Window		Sandi proksi:
-Number of days to keep links in History menu:	Settings Window		Jumlah hari untuk menyimpan tautan di menu Riwayat:
-Reset size	WebPositive Window		Atur ulang ukuran
-Find:	WebPositive Window		Cari:
-Increase size	WebPositive Window		Perbesar ukuran
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Terjadi kesalahan saat mengambil folder bookmark.\n\nKesalahan: %error
-Downloads	WebPositive Window		Unduhan
-Requesting %url	WebPositive Window		Meminta %url
-Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Temukan kemunculan istilah pencarian selanjutnya
-Apply	Settings Window		Terapkan
-Bookmark info	WebPositive Window		Info penanda
-Size:	Font Selection view		Ukuran:
-Show tabs if only one page is open	Settings Window		Tampilkan tab ketika hanya satu laman yang terbuka
-About	WebPositive Window		Tentang
-Fonts	Settings Window		Fon
-OK	Download Window		OKE
-Page source error	WebPositive Window		Kesalahan sumber laman
-Open blank page	Settings Window		Buka laman kosong
-New tabs:	Settings Window		Tab baru:
-Cancel	WebPositive Window		Batalkan
-Open all	WebPositive Window		Buka semua
-Proxy server requires authentication	Settings Window		Server proksi membutuhkan otentikasi
-Clear	URL Bar		Bersihkan
-Cut	URL Bar		Potong
-Clear	WebPositive Window		Bersihkan
-Script console	Console Window		Konsol skrip
-Remove	Download Window		Hilangkan
-Find	WebPositive Window		Cari
-Find previous	WebPositive Window		Cari sebelumnya
-Settings	WebPositive Window		Pengaturan
-(Finish: %date)	Download Window		(Selesai: %date)
-Script console	WebPositive Window		Konsol skrip
-Name	Cookie Manager		Nama
-Proxy server address:	Settings Window		Alamat proksi server:
-Proxy server port:	Settings Window		Port proksi server:
-Bookmarks	WebPositive Window		Bookmark
-Paste	URL Bar		Tempel
-Cookie manager	WebPositive Window		Manajer kuki
-/s)	Download Window	...as in 'per second'	/s)
-Hide password text	Authentication Panel		Sembunyikan teks sandi
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Wibowo naik vespa dari Roxy ke Islamic Center Jakarta ikut program tahfizh Alquran.
-Open start page	Settings Window		Buka laman mulai
-Continue downloads	WebPositive		Lanjutkan unduhan
-Cancel	Download Window		Batalkan
-Flags	Cookie Manager		Bendera
-Open search page	Settings Window		Buka laman pencarian
-Clear	Console Window		Bersihkan
-Password:	Authentication Panel		Sandi:
-Path	Cookie Manager		Jalur
-Back	WebPositive Window		Mundur
-New browser window	Download Window		Jendela peramban baru
-Today	WebPositive Window		Hari ini
-Remember username and password for this site	Authentication Panel		Ingat nama pengguna dan kata sandi untuk situs ini
-Earlier	WebPositive Window		Sebelumnya
 Authentication required	Authentication Panel		Otentikasi dibutuhkan
-Use proxy server to connect to the internet	Settings Window		Gunakan server proksi untuk terhubung ke internet
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Masih ada unduhan yang berjalan, apakah Anda ingin keluar dari WebPositive sekarang?
-Auto-hide interface in full screen mode	Settings Window		Otomatis sembunyikan antarmuka pada jendela mode penuh
-%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url gagal dimuat
-New tab	WebPositive Window		Tab baru
-Downloads in progress	WebPositive		Pengunduhan dalam proses
-(Finish: %date - %duration left)	Download Window		(Selesai: %date - %duration tersisa)
-Style:	Font Selection view		Gaya:
-General	Settings Window		Umum
-View	WebPositive Window		Tampilan
 Previous	WebPositive Window		Sebelumnya
-There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Terjadi kesalahan saat membuat berkas bookmark.\n\nKesalahan: %error
-(Finish: %date - Over %duration left)	Download Window		(Selesai: %date - Diatas %duration tersisa)
-Bookmark error	WebPositive Window		Kesalahan bookmark
-Do you really want to clear the browsing history?	WebPositive Window		Apakah anda ingin membersihkan riwayat jelajah?
-Copy	WebPositive Window		Salin
+(Finish: %date)	Download Window		(Selesai: %date)
 Open bookmarks confirmation	WebPositive Window		Buka konfirmasi bookmark
-Remove missing	Download Window		Hapus yang hilang
-Clone current page	Settings Window		Gandakan laman saat ini
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Apakah Anda ingin membuka %addedCount sekaligus?
-Session cookie	Cookie Manager		Sesi kuki
-OK	Authentication Panel		OKE
-Copy	URL Bar		Salin
-Download finished	Download Window		Unduhan selesai
-Show bookmark bar	WebPositive Window		Tampilkan bilah bookmark
-OK	WebPositive Window		OKE
-Manage bookmarks	WebPositive Window		Kelola bookmark
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Bookmark untuk halaman ini (%bookmarkName) sudah ada.
-Cookies for %s	Cookie Manager		Kuki untuk %s
-New windows:	Settings Window		Jendela baru:
+Download folder:	Settings Window		Folder unduhan:
+Close window	WebPositive Window		Tutup jendela
+Find:	WebPositive Window		Cari:
+Script console	WebPositive Window		Konsol skrip
+Fonts	Settings Window		Fon
+Path	Cookie Manager		Jalur
+of	Download Window	...as in '12kB of 256kB'	dari
+Bookmarks	WebPositive Window		Bookmark
+Use proxy server to connect to the internet	Settings Window		Gunakan server proksi untuk terhubung ke internet
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url selesai
+Auto-hide interface in full screen mode	Settings Window		Otomatis sembunyikan antarmuka pada jendela mode penuh
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Terjadi kesalahan saat mengambil folder bookmark.\n\nKesalahan: %error
+Delete	Cookie Manager		Hapus
+(Finish: %date - Over %duration left)	Download Window		(Selesai: %date - Diatas %duration tersisa)
+Open containing folder	Download Window		Buka folder yang berisi
+Find previous	WebPositive Window		Cari sebelumnya
+Full screen	WebPositive Window		Layar penuh
+Downloads in progress	WebPositive		Pengunduhan dalam proses
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Apakah Anda ingin membuka %addedCount sekaligus?
+Copy URL to clipboard	Download Window		Salin URL ke papan klip
+Clone current page	Settings Window		Gandakan laman saat ini
+Start page:	Settings Window		Halaman awal:
+Cancel	Download Window		Batalkan
+Settings	Settings Window		Pengaturan
+Downloads	WebPositive Window		Unduhan
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Bookmark untuk halaman ini (%bookmarkName) sudah ada.
+Match case	WebPositive Window		Cocok persis
+Proxy password:	Settings Window		Sandi proksi:
+Size:	Font Selection view		Ukuran:
+Page source	WebPositive Window		Sumber halaman
+Proxy server port:	Settings Window		Port proksi server:
+Error opening downloads folder	Download Window		Galat membuka folder unduhan
+Show bookmark bar	WebPositive Window		Tampilkan bilah bookmark
+Find	WebPositive Window		Cari
+Standard font:	Settings Window		Fon standar:
+Open download error	Download Window		Galat membuka unduhan
+General	Settings Window		Umum
+New tabs:	Settings Window		Tab baru:
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url gagal dimuat
+Open downloads folder	Download Window		Buka folder unduhan
+Proxy server	Settings Window		Server proksi
+Decrease size	WebPositive Window		Perkecil ukuran
+Default fixed font size:	Settings Window		Ukuran fon tetap standar:
+Sans serif font:	Settings Window		Fon sans serif:
+Clear	WebPositive Window		Bersihkan
+Cookies for %s	Cookie Manager		Kuki untuk %s
+The download could not be opened.	Download Window		Unduhan tidak bisa dibuka.
+Close	Download Window		Tutup
+WebPositive	System name		WebPositive
+Reload	WebPositive Window		Muat ulang
+Expiration	Cookie Manager		Kedaluwarsa
+Download finished	Download Window		Unduhan selesai
+Cookie manager	WebPositive Window		Manajer kuki
+OK	Authentication Panel		OKE
+Hide password text	Authentication Panel		Sembunyikan teks sandi
+Username:	Authentication Panel		Nama pengguna:
+Name	Cookie Manager		Nama
 Remove finished	Download Window		Penghapusan selesai
+Earlier	WebPositive Window		Sebelumnya
+Edit	WebPositive Window		Sunting
+Back	WebPositive Window		Mundur
+Yesterday	WebPositive Window		Kemarin
+Quit	WebPositive		Keluar
+Download aborted	Download Window		Unduhan dibatalkan
+Number of days to keep links in History menu:	Settings Window		Jumlah hari untuk menyimpan tautan di menu Riwayat:
+Password:	Authentication Panel		Sandi:
+Forward	WebPositive Window		Selanjutnya
+Clear	Console Window		Bersihkan
+Cut	URL Bar		Potong
+View	WebPositive Window		Tampilan
+Paste	URL Bar		Tempel
+Find next	WebPositive Window		Cari selanjutnya
+Open search page	Settings Window		Buka laman pencarian
+Increase size	WebPositive Window		Perbesar ukuran
+New tab	WebPositive Window		Tab baru
+Today	WebPositive Window		Hari ini
+Open location	WebPositive Window		Buka lokasi
+New browser window	Download Window		Jendela peramban baru
+Open	Download Window		Buka
+New window	WebPositive Window		Jendela baru
+New windows:	Settings Window		Jendela baru:
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Folder unduhan tidak bisa dibuka.\n\nGalat: %error
+Cancel	Authentication Panel		Batal
+Style:	Font Selection view		Gaya:
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Terjadi kesalahan saat membuat berkas bookmark.\n\nKesalahan: %error
+OK	Download Window		OKE
+Proxy username:	Settings Window		Nama pengguna proksi:
+Manage bookmarks	WebPositive Window		Kelola bookmark
+/s)	Download Window	...as in 'per second'	/s)
+Restart	Download Window		Mulai ulang
+Serif font:	Settings Window		Fon serif:
+Apply	Settings Window		Terapkan
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Terjadi kesalahan saat mencoba menampilkan folder Bookmark.\n\nKesalahan: %error
+Revert	Settings Window		Pulihkan
+Copy	WebPositive Window		Salin
+Default standard font size:	Settings Window		Ukuran fon standar bawaan:
+Bookmark this page	WebPositive Window		Tandai halaman ini
+Show tabs if only one page is open	Settings Window		Tampilkan tab ketika hanya satu laman yang terbuka
+Close tab	WebPositive Window		Tutup tab
+Remove	Download Window		Hilangkan
+About	WebPositive Window		Tentang
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Masih ada unduhan yang berjalan, apakah Anda ingin keluar dari WebPositive sekarang?
+Continue downloads	WebPositive		Lanjutkan unduhan
+Proxy server requires authentication	Settings Window		Server proksi membutuhkan otentikasi
+Cancel	Settings Window		Batal
+History	WebPositive Window		Riwayat
+Reset size	WebPositive Window		Atur ulang ukuran
+Do you really want to clear the browsing history?	WebPositive Window		Apakah anda ingin membersihkan riwayat jelajah?
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Temukan kemunculan istilah pencarian selanjutnya
+Fixed font:	Settings Window		Fon tetap:
+Quit	WebPositive Window		Keluar
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Temukan kemunculan istilah pencarian sebelumnya
+Remember username and password for this site	Authentication Panel		Ingat nama pengguna dan kata sandi untuk situs ini
+(Finish: %date - %duration left)	Download Window		(Selesai: %date - %duration tersisa)
+Cookie manager	Cookie Manager		Manajer kuki
+Show home button	Settings Window		Tampilkan tombol rumah
+The cookie jar is empty!	Cookie Manager		Tempat kuki kosong!
+Value	Cookie Manager		Nilai
+Remove missing	Download Window		Hapus yang hilang
+Paste	WebPositive Window		Tempel
+Double-click or middle-click to open new tab.	Tab Manager		Klik ganda atau klik tengah untuk membuka tab baru.
+Next	WebPositive Window		Selanjutnya
+Bookmark error	WebPositive Window		Kesalahan bookmark
+OK	WebPositive Window		OKE
+WebPositive	Download Window		WebPositive
+Zoom text only	WebPositive Window		Perbesar teks saja
+Save page as…	WebPositive Window		Simpan halaman sebagai…
+Page source error	WebPositive Window		Kesalahan sumber laman
+Auto-hide mouse pointer	Settings Window		Sembunyikan otomatis penunjuk tetikus
+Requesting %url	WebPositive Window		Meminta %url
+Flags	Cookie Manager		Bendera
+Window	WebPositive Window		Jendela
+Proxy server address:	Settings Window		Alamat proksi server:
+Search page:	Settings Window		Halaman pencarian:
+Settings	WebPositive Window		Pengaturan
+Clear	URL Bar		Bersihkan
+Loading %url	WebPositive Window		Memuat %url
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Wibowo naik vespa dari Roxy ke Islamic Center Jakarta ikut program tahfizh Alquran.
+Confirmation	WebPositive Window		Konfirmasi
+Session cookie	Cookie Manager		Sesi kuki
+Open all	WebPositive Window		Buka semua
+Cut	WebPositive Window		Potong
+Downloads	Download Window		Unduhan
+Open blank page	Settings Window		Buka laman kosong
+Clear history	WebPositive Window		Hapus riwayat
+Cancel	WebPositive Window		Batalkan
+Bookmark info	WebPositive Window		Info penanda
+Script console	Console Window		Konsol skrip
+Copy	URL Bar		Salin
+Open start page	Settings Window		Buka laman mulai

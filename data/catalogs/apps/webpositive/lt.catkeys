@@ -1,135 +1,135 @@
 1	lithuanian	x-vnd.Haiku-WebPositive	2159718606
-Show home button	Settings Window		Rodyti Namų mygtuką
-Username:	Authentication Panel		Naudotojo vardas:
-Copy URL to clipboard	Download Window		Kopijuoti URL adresą į iškarpinę
-Cancel	Settings Window		Atsisakyti
+Authentication required	Authentication Panel		Būtina nustatyti tapatybę
+Previous	WebPositive Window		Ankstesnis
+Open bookmarks confirmation	WebPositive Window		Adresyno įrašų atvėrimo patvirtinimas
+Download folder:	Settings Window		Parsiuntimų aplankas:
 Close window	WebPositive Window		Užverti langą
-Quit	WebPositive		Baigti darbą
-The download could not be opened.	Download Window		Parsiųsto failo atverti nepavyko.
-The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Parsiuntimų aplanko atverti nepavyko.\n\nKlaida: %error
-Open location	WebPositive Window		Atverti adresą
-Clear history	WebPositive Window		Išvalyti žurnalą
-WebPositive	System name		WebPositive
-Yesterday	WebPositive Window		Vakar
-Default standard font size:	Settings Window		Numatytasis šrifto dydis:
+Find:	WebPositive Window		Ieškoti:
+Script console	WebPositive Window		Scenarijų pultas
+Fonts	Settings Window		Šriftai
+of	Download Window	...as in '12kB of 256kB'	iš
+Bookmarks	WebPositive Window		Adresynas
+Use proxy server to connect to the internet	Settings Window		Jungimuisi prie interneto naudoti įgaliotąjį serverį
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	Tinklapis „%url“ įkeltas.
+Auto-hide interface in full screen mode	Settings Window		Automatiškai slėpti programos sąsają viso ekrano veiksenoje
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Bandant atverti adresyno aplanką, įvyko klaida.\n\nKlaida: %error
+Open containing folder	Download Window		Atverti gaubiantįjį aplanką
+Find previous	WebPositive Window		Ieškoti ankstesnio frazės egzemplioriaus
+Full screen	WebPositive Window		Visas ekranas
+Downloads in progress	WebPositive		Vyksta parsiuntimai
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Ar tikrai norite atverti iškart %addedCount adresyno įrašus(-ų)?
+Copy URL to clipboard	Download Window		Kopijuoti URL adresą į iškarpinę
+Clone current page	Settings Window		Klonuoti atvertą tinklapį
 Start page:	Settings Window		Pradžios tinklapis:
-History	WebPositive Window		Žurnalas
+Cancel	Download Window		Atsisakyti
+Settings	Settings Window		Nuostatos
+Downloads	WebPositive Window		Parsiuntimai
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Šis tinklapis (%bookmarkName) jau yra įtrauktas į adresyną.
+Match case	WebPositive Window		Paisyti raidžių registro
+Proxy password:	Settings Window		Įgaliotojo serverio slaptažodis:
+Size:	Font Selection view		Dydis:
+Page source	WebPositive Window		Tinklapio pirminis tekstas
+Proxy server port:	Settings Window		Įgaliotojo serverio prievadas:
 Error opening downloads folder	Download Window		Klaida atveriant parsiuntimų aplanką
+Find	WebPositive Window		Ieškoti
+Standard font:	Settings Window		Numatytasis šriftas:
+Open download error	Download Window		Klaida atveriant parsiųstą failą
+General	Settings Window		Bendrosios
+New tabs:	Settings Window		Naujos kortelės:
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	Įkelti %url nepavyko
+Open downloads folder	Download Window		Atverti parsiuntimų aplanką
+Proxy server	Settings Window		Įgaliotasis serveris
+Decrease size	WebPositive Window		Sumažinti dydį
+Default fixed font size:	Settings Window		Numatytasis lygiapločio šrifto dydis:
+Sans serif font:	Settings Window		Šriftas be užraitų:
+Clear	WebPositive Window		Išvalyti
+The download could not be opened.	Download Window		Parsiųsto failo atverti nepavyko.
+WebPositive	System name		WebPositive
+Reload	WebPositive Window		Atsiųsti iš naujo
+OK	Authentication Panel		Gerai
+Hide password text	Authentication Panel		Nerodyti slaptažodžio teksto
+Username:	Authentication Panel		Naudotojo vardas:
+Remove finished	Download Window		Pašalinti užbaigtus
+Earlier	WebPositive Window		Anksčiau
+Edit	WebPositive Window		Taisa
+Back	WebPositive Window		Atgal
+Yesterday	WebPositive Window		Vakar
+Quit	WebPositive		Baigti darbą
+Number of days to keep links in History menu:	Settings Window		Kiek dienų laikyti saitus žurnalo meniu:
+Password:	Authentication Panel		Slaptažodis:
+Forward	WebPositive Window		Pirmyn
+Clear	Console Window		Išvalyti
+Cut	URL Bar		Iškirpti
+View	WebPositive Window		Rodymas
+Paste	URL Bar		Įdėti
+Find next	WebPositive Window		Ieškoti toliau
+Open search page	Settings Window		Atverti paieškos tinklapį
+Increase size	WebPositive Window		Padidinti
+New tab	WebPositive Window		Nauja kortelė
+Today	WebPositive Window		Šiandien
+Open location	WebPositive Window		Atverti adresą
+New browser window	Download Window		Naujas naršyklės langas
+Open	Download Window		Atverti
+New window	WebPositive Window		Naujas langas
+New windows:	Settings Window		Nauji langai:
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Parsiuntimų aplanko atverti nepavyko.\n\nKlaida: %error
+Cancel	Authentication Panel		Atsisakyti
+Style:	Font Selection view		Stilius:
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Sukuriant adresyno įrašą, įvyko klaida.\n\nKlaida: %error
+OK	Download Window		Gerai
+Proxy username:	Settings Window		Įgaliotojo serverio naudotojo vardas:
+Manage bookmarks	WebPositive Window		Tvarkyti adresyną
+/s)	Download Window	...as in 'per second'	/s)
+Restart	Download Window		Paleisti iš naujo
+Serif font:	Settings Window		Šriftas su užraitais:
+Apply	Settings Window		Taikyti
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Bandant atverti Adresyno aplanką, įvyko klaida.\n\nKlaida: %error
+Revert	Settings Window		Atšaukti pakeitimus
+Copy	WebPositive Window		Kopijuoti
+Default standard font size:	Settings Window		Numatytasis šrifto dydis:
+Bookmark this page	WebPositive Window		Įtraukti šį tinklapį į adresyną
+Show tabs if only one page is open	Settings Window		Rodyti korteles net kai jų tėra viena
+Close tab	WebPositive Window		Užverti kortelę
+Remove	Download Window		Pašalinti
+About	WebPositive Window		Apie
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Dar yra vykstančių parsiuntimų. Ar tikrai norite baigti „WebPositive“ darbą?
+Continue downloads	WebPositive		Tęsti parsiuntimus
+Proxy server requires authentication	Settings Window		Įgaliotasis serveris reikalauja patvirtinti tapatybę
+Cancel	Settings Window		Atsisakyti
+History	WebPositive Window		Žurnalas
+Reset size	WebPositive Window		Atstatyti pradinį dydį
+Do you really want to clear the browsing history?	WebPositive Window		Ar tikrai norite išvalyti naršymo žurnalą?
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Rasti tolesnį ieškomos frazės pasikartojimą
+Fixed font:	Settings Window		Lygiaplotis šriftas:
+Quit	WebPositive Window		Baigti darbą
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Rasti ankstesnį ieškomos frazės pasikartojimą
+Remember username and password for this site	Authentication Panel		Įsiminti naudotojo vardą ir slaptažodį šioje svetainėje
+Show home button	Settings Window		Rodyti Namų mygtuką
+Remove missing	Download Window		Pašalinti trūkstamus
 Paste	WebPositive Window		Įdėti
 Double-click or middle-click to open new tab.	Tab Manager		Dukart spustelėkite arba spustelėkite vidurinį mygtuką naujai kortelei atverti.
-Proxy username:	Settings Window		Įgaliotojo serverio naudotojo vardas:
-Settings	Settings Window		Nuostatos
-Confirmation	WebPositive Window		Patvirtinimas
-Window	WebPositive Window		Langas
-Decrease size	WebPositive Window		Sumažinti dydį
-Serif font:	Settings Window		Šriftas su užraitais:
-Loading %url	WebPositive Window		Įkeliamas %url
-Page source	WebPositive Window		Tinklapio pirminis tekstas
 Next	WebPositive Window		Toliau
-Find next	WebPositive Window		Ieškoti toliau
-Download folder:	Settings Window		Parsiuntimų aplankas:
-Edit	WebPositive Window		Taisa
-Cancel	Authentication Panel		Atsisakyti
-Match case	WebPositive Window		Paisyti raidžių registro
-Search page:	Settings Window		Paieškos tinklapis:
-Zoom text only	WebPositive Window		Keisti tik teksto dydį
-Default fixed font size:	Settings Window		Numatytasis lygiapločio šrifto dydis:
-Close tab	WebPositive Window		Užverti kortelę
-Auto-hide mouse pointer	Settings Window		Automatiškai slėpti pelės žymeklį
-Quit	WebPositive Window		Baigti darbą
-Full screen	WebPositive Window		Visas ekranas
-Open download error	Download Window		Klaida atveriant parsiųstą failą
-Standard font:	Settings Window		Numatytasis šriftas:
-Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Rasti ankstesnį ieškomos frazės pasikartojimą
-Restart	Download Window		Paleisti iš naujo
-Proxy server	Settings Window		Įgaliotasis serveris
-Open containing folder	Download Window		Atverti gaubiantįjį aplanką
-New window	WebPositive Window		Naujas langas
-Open	Download Window		Atverti
-Reload	WebPositive Window		Atsiųsti iš naujo
-Downloads	Download Window		Parsiuntimai
-Sans serif font:	Settings Window		Šriftas be užraitų:
-Forward	WebPositive Window		Pirmyn
-of	Download Window	...as in '12kB of 256kB'	iš
-Revert	Settings Window		Atšaukti pakeitimus
-Fixed font:	Settings Window		Lygiaplotis šriftas:
-Cut	WebPositive Window		Iškirpti
-Bookmark this page	WebPositive Window		Įtraukti šį tinklapį į adresyną
-There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Bandant atverti Adresyno aplanką, įvyko klaida.\n\nKlaida: %error
-Open downloads folder	Download Window		Atverti parsiuntimų aplanką
-Proxy password:	Settings Window		Įgaliotojo serverio slaptažodis:
-Number of days to keep links in History menu:	Settings Window		Kiek dienų laikyti saitus žurnalo meniu:
-Reset size	WebPositive Window		Atstatyti pradinį dydį
-Find:	WebPositive Window		Ieškoti:
-Increase size	WebPositive Window		Padidinti
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Bandant atverti adresyno aplanką, įvyko klaida.\n\nKlaida: %error
-Downloads	WebPositive Window		Parsiuntimai
-Requesting %url	WebPositive Window		Siunčiama užklausa tinklapiui %url
-Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Rasti tolesnį ieškomos frazės pasikartojimą
-Apply	Settings Window		Taikyti
-Bookmark info	WebPositive Window		Adresyno įrašo savybės
-Size:	Font Selection view		Dydis:
-Show tabs if only one page is open	Settings Window		Rodyti korteles net kai jų tėra viena
-About	WebPositive Window		Apie
-Fonts	Settings Window		Šriftai
-OK	Download Window		Gerai
-Page source error	WebPositive Window		Tinklapio pirminio teksto klaida
-Open blank page	Settings Window		Atverti tuščią tinklapį
-New tabs:	Settings Window		Naujos kortelės:
-Cancel	WebPositive Window		Atsisakyti
-Open all	WebPositive Window		Atverti viską
-Proxy server requires authentication	Settings Window		Įgaliotasis serveris reikalauja patvirtinti tapatybę
-Clear	URL Bar		Išvalyti
-Cut	URL Bar		Iškirpti
-Clear	WebPositive Window		Išvalyti
-Script console	Console Window		Scenarijų pultas
-Remove	Download Window		Pašalinti
-Find	WebPositive Window		Ieškoti
-Find previous	WebPositive Window		Ieškoti ankstesnio frazės egzemplioriaus
-Settings	WebPositive Window		Nuostatos
-Script console	WebPositive Window		Scenarijų pultas
-Proxy server address:	Settings Window		Įgaliotojo serverio adresas:
-Proxy server port:	Settings Window		Įgaliotojo serverio prievadas:
-Bookmarks	WebPositive Window		Adresynas
-Paste	URL Bar		Įdėti
-/s)	Download Window	...as in 'per second'	/s)
-Hide password text	Authentication Panel		Nerodyti slaptažodžio teksto
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Įlinkdama fechtuotojo špaga sublykčiojusi pragręžė apvalų arbūzą.
-Open start page	Settings Window		Atverti pradžios tinklapį
-Continue downloads	WebPositive		Tęsti parsiuntimus
-Cancel	Download Window		Atsisakyti
-Open search page	Settings Window		Atverti paieškos tinklapį
-Clear	Console Window		Išvalyti
-Password:	Authentication Panel		Slaptažodis:
-Back	WebPositive Window		Atgal
-New browser window	Download Window		Naujas naršyklės langas
-Today	WebPositive Window		Šiandien
-Remember username and password for this site	Authentication Panel		Įsiminti naudotojo vardą ir slaptažodį šioje svetainėje
-Earlier	WebPositive Window		Anksčiau
-Authentication required	Authentication Panel		Būtina nustatyti tapatybę
-Use proxy server to connect to the internet	Settings Window		Jungimuisi prie interneto naudoti įgaliotąjį serverį
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Dar yra vykstančių parsiuntimų. Ar tikrai norite baigti „WebPositive“ darbą?
-Auto-hide interface in full screen mode	Settings Window		Automatiškai slėpti programos sąsają viso ekrano veiksenoje
-%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	Įkelti %url nepavyko
-New tab	WebPositive Window		Nauja kortelė
-Downloads in progress	WebPositive		Vyksta parsiuntimai
-Style:	Font Selection view		Stilius:
-General	Settings Window		Bendrosios
-View	WebPositive Window		Rodymas
-Previous	WebPositive Window		Ankstesnis
-There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Sukuriant adresyno įrašą, įvyko klaida.\n\nKlaida: %error
 Bookmark error	WebPositive Window		Adresyno įrašo klaida
-Do you really want to clear the browsing history?	WebPositive Window		Ar tikrai norite išvalyti naršymo žurnalą?
-Copy	WebPositive Window		Kopijuoti
-Open bookmarks confirmation	WebPositive Window		Adresyno įrašų atvėrimo patvirtinimas
-Remove missing	Download Window		Pašalinti trūkstamus
-Clone current page	Settings Window		Klonuoti atvertą tinklapį
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Ar tikrai norite atverti iškart %addedCount adresyno įrašus(-ų)?
-OK	Authentication Panel		Gerai
-Copy	URL Bar		Kopijuoti
 OK	WebPositive Window		Gerai
-Manage bookmarks	WebPositive Window		Tvarkyti adresyną
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Šis tinklapis (%bookmarkName) jau yra įtrauktas į adresyną.
-New windows:	Settings Window		Nauji langai:
-%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	Tinklapis „%url“ įkeltas.
-Remove finished	Download Window		Pašalinti užbaigtus
+Zoom text only	WebPositive Window		Keisti tik teksto dydį
+Page source error	WebPositive Window		Tinklapio pirminio teksto klaida
+Auto-hide mouse pointer	Settings Window		Automatiškai slėpti pelės žymeklį
+Requesting %url	WebPositive Window		Siunčiama užklausa tinklapiui %url
+Window	WebPositive Window		Langas
+Proxy server address:	Settings Window		Įgaliotojo serverio adresas:
+Search page:	Settings Window		Paieškos tinklapis:
+Settings	WebPositive Window		Nuostatos
+Clear	URL Bar		Išvalyti
+Loading %url	WebPositive Window		Įkeliamas %url
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Įlinkdama fechtuotojo špaga sublykčiojusi pragręžė apvalų arbūzą.
+Confirmation	WebPositive Window		Patvirtinimas
+Open all	WebPositive Window		Atverti viską
+Cut	WebPositive Window		Iškirpti
+Downloads	Download Window		Parsiuntimai
+Open blank page	Settings Window		Atverti tuščią tinklapį
+Clear history	WebPositive Window		Išvalyti žurnalą
+Cancel	WebPositive Window		Atsisakyti
+Bookmark info	WebPositive Window		Adresyno įrašo savybės
+Script console	Console Window		Scenarijų pultas
+Copy	URL Bar		Kopijuoti
+Open start page	Settings Window		Atverti pradžios tinklapį

@@ -1,0 +1,24 @@
+1	turkish	x-vnd.Haiku-GLTeapot	1569683445
+Upper center	TeapotWindow		Üst merkez
+Lighting	TeapotWindow		Işıklandırma
+Off	TeapotWindow		Kapalı
+Lower left	TeapotWindow		Alt sol
+White	TeapotWindow		Beyaz
+Yellow	TeapotWindow		Sarı
+Blue	TeapotWindow		Mavi
+Gouraud shading	TeapotWindow		Gouraud tonlaması
+Quit	TeapotWindow		Çık
+Filled polygons	TeapotWindow		Dolu poligonlar
+Settings	TeapotWindow		Ayarlar
+Fog	TeapotWindow		Sis
+Backface culling	TeapotWindow		Arka yüz ayırma
+Z-buffered	TeapotWindow		Z arabellekli
+File	TeapotWindow		Dosya
+Perspective	TeapotWindow		Perspektif
+GLTeapot	System name		GL Çaydanlık
+Green	TeapotWindow		Yeşil
+Right	TeapotWindow		Sağ
+FPS display	TeapotWindow		FPS ekranı
+Add a teapot	TeapotWindow		Çaydanlık ekle
+Red	TeapotWindow		Kırmızı
+Lights	TeapotWindow		Işıklar

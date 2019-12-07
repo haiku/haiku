@@ -1,155 +1,155 @@
 1	german	x-vnd.Haiku-WebPositive	2763299522
-Show home button	Settings Window		Home-Symbol anzeigen
-Username:	Authentication Panel		Benutzername:
-Copy URL to clipboard	Download Window		Adresse kopieren
-Cancel	Settings Window		Abbrechen
-Close window	WebPositive Window		Fenster schließen
-Quit	WebPositive		Beenden
-The download could not be opened.	Download Window		Die heruntergeladene Datei kann nicht geöffnet werden.
-The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Der Download-Ordner kann nicht geöffnet werden.\n\nFehler: %error
-Close	Download Window		Schließen
-Open location	WebPositive Window		URL öffnen
-Clear history	WebPositive Window		Verlauf leeren
-WebPositive	System name		WebPositive
-Yesterday	WebPositive Window		Gestern
-Default standard font size:	Settings Window		Größe der Standard-Schrift:
-Start page:	Settings Window		Startseite:
-History	WebPositive Window		Verlauf
-Error opening downloads folder	Download Window		Fehler beim Öffnen des Download-Ordners
-Paste	WebPositive Window		Einfügen
-Expiration	Cookie Manager		Ablaufdatum
-Double-click or middle-click to open new tab.	Tab Manager		Doppel- oder Mittelklick, um neuen Reiter zu öffnen.
-Proxy username:	Settings Window		Proxy-Nutzername:
-Save page as…	WebPositive Window		Seite speichern unter…
-Settings	Settings Window		Einstellungen
-Confirmation	WebPositive Window		Bestätigung
-Window	WebPositive Window		Fenster
-Cookie manager	Cookie Manager		Cookieverwaltung
-Decrease size	WebPositive Window		Verkleinern
-Serif font:	Settings Window		Serifenschrift:
-Loading %url	WebPositive Window		%url wird geladen
-Download aborted	Download Window		Download abgebrochen
-Value	Cookie Manager		Wert
-Page source	WebPositive Window		Quelltext der Seite
-Next	WebPositive Window		Vorwärts
-Find next	WebPositive Window		Nächster Treffer
-Download folder:	Settings Window		Download-Ordner:
-Edit	WebPositive Window		Bearbeiten
-Cancel	Authentication Panel		Abbrechen
-Match case	WebPositive Window		Groß-/Kleinschreibung beachten
-Search page:	Settings Window		Suchmachine:
-Zoom text only	WebPositive Window		Nur Text vergrößern
-Default fixed font size:	Settings Window		Größe der Schrift fester Breite:
-Close tab	WebPositive Window		Reiter schließen
-Auto-hide mouse pointer	Settings Window		Mauszeiger automatisch ausblenden
-Quit	WebPositive Window		Beenden
-Full screen	WebPositive Window		Vollbild
-Open download error	Download Window		Fehler beim Öffnen
-The cookie jar is empty!	Cookie Manager		Keine Cookies vorhanden!
-Standard font:	Settings Window		Standardschrift:
-Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Vorheriger Treffer
-Restart	Download Window		Neustart
-Proxy server	Settings Window		Proxy-Server
-Open containing folder	Download Window		Speicherort öffnen
-New window	WebPositive Window		Neues Fenster
-WebPositive	Download Window		WebPositive
-Open	Download Window		Öffnen
-Reload	WebPositive Window		Aktualisieren
-Downloads	Download Window		Downloads
-Sans serif font:	Settings Window		Serifenlose Schrift:
-Delete	Cookie Manager		Löschen
-Forward	WebPositive Window		Vorwärts
-of	Download Window	...as in '12kB of 256kB'	von
-Revert	Settings Window		Anfangswerte
-Fixed font:	Settings Window		Schrift fester Breite:
-Cut	WebPositive Window		Ausschneiden
-Bookmark this page	WebPositive Window		Lesezeichen für diese Seite anlegen
-There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Der Lesezeichen-Ordner kann nicht angezeigt werden.\n\nFehler: %error
-Open downloads folder	Download Window		Download-Ordner öffnen
-Proxy password:	Settings Window		Proxy-Passwort:
-Number of days to keep links in History menu:	Settings Window		Anzahl der Tage im Verlauf-Menü:
-Reset size	WebPositive Window		Größe zurücksetzen
-Find:	WebPositive Window		Suchen:
-Increase size	WebPositive Window		Vergrößern
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Auf den Lesezeichen-Ordner kann nicht zugegriffen werden.\n\nFehler: %error
-Downloads	WebPositive Window		Downloads
-Requesting %url	WebPositive Window		%url wird angefordert
-Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Nächster Treffer
-Apply	Settings Window		Anwenden
-Bookmark info	WebPositive Window		Lesezeichen Info
-Size:	Font Selection view		Größe:
-Show tabs if only one page is open	Settings Window		Reiter immer anzeigen
-About	WebPositive Window		Über
-Fonts	Settings Window		Schriftarten
-OK	Download Window		OK
-Page source error	WebPositive Window		Fehler im Quellcode der Seite
-Open blank page	Settings Window		Leere Seite öffnen
-New tabs:	Settings Window		Neue Reiter:
-Cancel	WebPositive Window		Abbrechen
-Open all	WebPositive Window		Alle öffnen
-Proxy server requires authentication	Settings Window		Der Proxy-Server verlangt eine Authentifizierung
-Clear	URL Bar		Leeren
-Cut	URL Bar		Ausschneiden
-Clear	WebPositive Window		Leeren
-Script console	Console Window		Skript-Konsole
-Remove	Download Window		Entfernen
-Find	WebPositive Window		Suchen
-Find previous	WebPositive Window		Vorheriger Treffer
-Settings	WebPositive Window		Einstellungen
-(Finish: %date)	Download Window		(Fertig: %date)
-Script console	WebPositive Window		Skript-Konsole
-Name	Cookie Manager		Name
-Proxy server address:	Settings Window		Proxy-Serveradresse:
-Proxy server port:	Settings Window		Proxy-Serverport:
-Bookmarks	WebPositive Window		Lesezeichen
-Paste	URL Bar		Einfügen
-Cookie manager	WebPositive Window		Cookieverwaltung
-/s)	Download Window	...as in 'per second'	/s)
-Hide password text	Authentication Panel		Passwort verstecken
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Falsches Üben von Xylophonmusik quält jeden größeren Zwerg.
-Open start page	Settings Window		Startseite öffnen
-Continue downloads	WebPositive		Downloads fortsetzen
-Cancel	Download Window		Abbrechen
-Flags	Cookie Manager		Kennzeichen
-Open search page	Settings Window		Suchmaschine öffnen
-Clear	Console Window		Leeren
-Password:	Authentication Panel		Kennwort:
-Path	Cookie Manager		Pfad
-Back	WebPositive Window		Zurück
-New browser window	Download Window		Neues Browser-Fenster
-Today	WebPositive Window		Heute
-Remember username and password for this site	Authentication Panel		Benutzername und Kennwort für diese Seite speichern
-Earlier	WebPositive Window		Früher
 Authentication required	Authentication Panel		Anmeldung erforderlich
-Use proxy server to connect to the internet	Settings Window		Proxy-Server zur Verbindung mit dem Internet nutzen
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Es werden noch Dateien heruntergeladen. Soll WebPositive wirklich beendet werden?
-Auto-hide interface in full screen mode	Settings Window		Bedienelemente im Vollbildmodus ausblenden
-%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url fehlgeschlagen
-New tab	WebPositive Window		Neuer Reiter
-Downloads in progress	WebPositive		Download Warnung
-(Finish: %date - %duration left)	Download Window		(Fertig: %date - %duration übrig)
-Style:	Font Selection view		Stil:
-General	Settings Window		Allgemein
-View	WebPositive Window		Ansicht
 Previous	WebPositive Window		Zurück
-There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Das Lesezeichen konnte nicht angelegt werden.\n\nFehler: %error
-(Finish: %date - Over %duration left)	Download Window		(Fertig: %date - über %duration übrig)
-Bookmark error	WebPositive Window		Lesezeichen Fehler
-Do you really want to clear the browsing history?	WebPositive Window		Soll der Verlauf wirklich gelöscht werden?
-Copy	WebPositive Window		Kopieren
+(Finish: %date)	Download Window		(Fertig: %date)
 Open bookmarks confirmation	WebPositive Window		Lesezeichen öffnen
-Remove missing	Download Window		Fehlende entfernen
-Clone current page	Settings Window		Aktuelle Seite verwenden
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Sollen alle %addedCount Lesezeichen auf einmal geöffnet werden?
-Session cookie	Cookie Manager		Sitzungs-Cookie
-OK	Authentication Panel		OK
-Copy	URL Bar		Kopieren
-Download finished	Download Window		Download abgeschlossen
-Show bookmark bar	WebPositive Window		Lesezeichenleiste einblenden
-OK	WebPositive Window		OK
-Manage bookmarks	WebPositive Window		Lesezeichen verwalten
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Für diese Seite existiert bereits ein Lesezeichen (%bookmarkName).
-Cookies for %s	Cookie Manager		Cookies für %s
-New windows:	Settings Window		Neue Fenster:
+Download folder:	Settings Window		Download-Ordner:
+Close window	WebPositive Window		Fenster schließen
+Find:	WebPositive Window		Suchen:
+Script console	WebPositive Window		Skript-Konsole
+Fonts	Settings Window		Schriftarten
+Path	Cookie Manager		Pfad
+of	Download Window	...as in '12kB of 256kB'	von
+Bookmarks	WebPositive Window		Lesezeichen
+Use proxy server to connect to the internet	Settings Window		Proxy-Server zur Verbindung mit dem Internet nutzen
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url geladen
+Auto-hide interface in full screen mode	Settings Window		Bedienelemente im Vollbildmodus ausblenden
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Auf den Lesezeichen-Ordner kann nicht zugegriffen werden.\n\nFehler: %error
+Delete	Cookie Manager		Löschen
+(Finish: %date - Over %duration left)	Download Window		(Fertig: %date - über %duration übrig)
+Open containing folder	Download Window		Speicherort öffnen
+Find previous	WebPositive Window		Vorheriger Treffer
+Full screen	WebPositive Window		Vollbild
+Downloads in progress	WebPositive		Download Warnung
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Sollen alle %addedCount Lesezeichen auf einmal geöffnet werden?
+Copy URL to clipboard	Download Window		Adresse kopieren
+Clone current page	Settings Window		Aktuelle Seite verwenden
+Start page:	Settings Window		Startseite:
+Cancel	Download Window		Abbrechen
+Settings	Settings Window		Einstellungen
+Downloads	WebPositive Window		Downloads
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Für diese Seite existiert bereits ein Lesezeichen (%bookmarkName).
+Match case	WebPositive Window		Groß-/Kleinschreibung beachten
+Proxy password:	Settings Window		Proxy-Passwort:
+Size:	Font Selection view		Größe:
+Page source	WebPositive Window		Quelltext der Seite
+Proxy server port:	Settings Window		Proxy-Serverport:
+Error opening downloads folder	Download Window		Fehler beim Öffnen des Download-Ordners
+Show bookmark bar	WebPositive Window		Lesezeichenleiste einblenden
+Find	WebPositive Window		Suchen
+Standard font:	Settings Window		Standardschrift:
+Open download error	Download Window		Fehler beim Öffnen
+General	Settings Window		Allgemein
+New tabs:	Settings Window		Neue Reiter:
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url fehlgeschlagen
+Open downloads folder	Download Window		Download-Ordner öffnen
+Proxy server	Settings Window		Proxy-Server
+Decrease size	WebPositive Window		Verkleinern
+Default fixed font size:	Settings Window		Größe der Schrift fester Breite:
+Sans serif font:	Settings Window		Serifenlose Schrift:
+Clear	WebPositive Window		Leeren
+Cookies for %s	Cookie Manager		Cookies für %s
+The download could not be opened.	Download Window		Die heruntergeladene Datei kann nicht geöffnet werden.
+Close	Download Window		Schließen
+WebPositive	System name		WebPositive
+Reload	WebPositive Window		Aktualisieren
+Expiration	Cookie Manager		Ablaufdatum
+Download finished	Download Window		Download abgeschlossen
+Cookie manager	WebPositive Window		Cookieverwaltung
+OK	Authentication Panel		OK
+Hide password text	Authentication Panel		Passwort verstecken
+Username:	Authentication Panel		Benutzername:
+Name	Cookie Manager		Name
 Remove finished	Download Window		Fertige entfernen
+Earlier	WebPositive Window		Früher
+Edit	WebPositive Window		Bearbeiten
+Back	WebPositive Window		Zurück
+Yesterday	WebPositive Window		Gestern
+Quit	WebPositive		Beenden
+Download aborted	Download Window		Download abgebrochen
+Number of days to keep links in History menu:	Settings Window		Anzahl der Tage im Verlauf-Menü:
+Password:	Authentication Panel		Kennwort:
+Forward	WebPositive Window		Vorwärts
+Clear	Console Window		Leeren
+Cut	URL Bar		Ausschneiden
+View	WebPositive Window		Ansicht
+Paste	URL Bar		Einfügen
+Find next	WebPositive Window		Nächster Treffer
+Open search page	Settings Window		Suchmaschine öffnen
+Increase size	WebPositive Window		Vergrößern
+New tab	WebPositive Window		Neuer Reiter
+Today	WebPositive Window		Heute
+Open location	WebPositive Window		URL öffnen
+New browser window	Download Window		Neues Browser-Fenster
+Open	Download Window		Öffnen
+New window	WebPositive Window		Neues Fenster
+New windows:	Settings Window		Neue Fenster:
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Der Download-Ordner kann nicht geöffnet werden.\n\nFehler: %error
+Cancel	Authentication Panel		Abbrechen
+Style:	Font Selection view		Stil:
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Das Lesezeichen konnte nicht angelegt werden.\n\nFehler: %error
+OK	Download Window		OK
+Proxy username:	Settings Window		Proxy-Nutzername:
+Manage bookmarks	WebPositive Window		Lesezeichen verwalten
+/s)	Download Window	...as in 'per second'	/s)
+Restart	Download Window		Neustart
+Serif font:	Settings Window		Serifenschrift:
+Apply	Settings Window		Anwenden
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Der Lesezeichen-Ordner kann nicht angezeigt werden.\n\nFehler: %error
+Revert	Settings Window		Anfangswerte
+Copy	WebPositive Window		Kopieren
+Default standard font size:	Settings Window		Größe der Standard-Schrift:
+Bookmark this page	WebPositive Window		Lesezeichen für diese Seite anlegen
+Show tabs if only one page is open	Settings Window		Reiter immer anzeigen
+Close tab	WebPositive Window		Reiter schließen
+Remove	Download Window		Entfernen
+About	WebPositive Window		Über
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Es werden noch Dateien heruntergeladen. Soll WebPositive wirklich beendet werden?
+Continue downloads	WebPositive		Downloads fortsetzen
+Proxy server requires authentication	Settings Window		Der Proxy-Server verlangt eine Authentifizierung
+Cancel	Settings Window		Abbrechen
+History	WebPositive Window		Verlauf
+Reset size	WebPositive Window		Größe zurücksetzen
+Do you really want to clear the browsing history?	WebPositive Window		Soll der Verlauf wirklich gelöscht werden?
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Nächster Treffer
+Fixed font:	Settings Window		Schrift fester Breite:
+Quit	WebPositive Window		Beenden
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Vorheriger Treffer
+Remember username and password for this site	Authentication Panel		Benutzername und Kennwort für diese Seite speichern
+(Finish: %date - %duration left)	Download Window		(Fertig: %date - %duration übrig)
+Cookie manager	Cookie Manager		Cookieverwaltung
+Show home button	Settings Window		Home-Symbol anzeigen
+The cookie jar is empty!	Cookie Manager		Keine Cookies vorhanden!
+Value	Cookie Manager		Wert
+Remove missing	Download Window		Fehlende entfernen
+Paste	WebPositive Window		Einfügen
+Double-click or middle-click to open new tab.	Tab Manager		Doppel- oder Mittelklick, um neuen Reiter zu öffnen.
+Next	WebPositive Window		Vorwärts
+Bookmark error	WebPositive Window		Lesezeichen Fehler
+OK	WebPositive Window		OK
+WebPositive	Download Window		WebPositive
+Zoom text only	WebPositive Window		Nur Text vergrößern
+Save page as…	WebPositive Window		Seite speichern unter…
+Page source error	WebPositive Window		Fehler im Quellcode der Seite
+Auto-hide mouse pointer	Settings Window		Mauszeiger automatisch ausblenden
+Requesting %url	WebPositive Window		%url wird angefordert
+Flags	Cookie Manager		Kennzeichen
+Window	WebPositive Window		Fenster
+Proxy server address:	Settings Window		Proxy-Serveradresse:
+Search page:	Settings Window		Suchmachine:
+Settings	WebPositive Window		Einstellungen
+Clear	URL Bar		Leeren
+Loading %url	WebPositive Window		%url wird geladen
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Falsches Üben von Xylophonmusik quält jeden größeren Zwerg.
+Confirmation	WebPositive Window		Bestätigung
+Session cookie	Cookie Manager		Sitzungs-Cookie
+Open all	WebPositive Window		Alle öffnen
+Cut	WebPositive Window		Ausschneiden
+Downloads	Download Window		Downloads
+Open blank page	Settings Window		Leere Seite öffnen
+Clear history	WebPositive Window		Verlauf leeren
+Cancel	WebPositive Window		Abbrechen
+Bookmark info	WebPositive Window		Lesezeichen Info
+Script console	Console Window		Skript-Konsole
+Copy	URL Bar		Kopieren
+Open start page	Settings Window		Startseite öffnen

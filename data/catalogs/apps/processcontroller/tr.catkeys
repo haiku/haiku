@@ -1,0 +1,50 @@
+1	turkish	x-vnd.Haiku-ProcessController	168752057
+Error saving file	ProcessController		Dosya kaydedilirken hata
+Display priority	ProcessController		Görüntüleme önceliği
+That's no Fun!	ProcessController		O da nesi öyle!
+What do you want to do with the team \"%s\"?	ProcessController		\"%s\" takımı ile ne yapmak istiyorsunuz?
+Your setting file could not be saved!\n(%s)	ProcessController		Ayar dosyanız kaydedilemedi!\n(%s)
+Processor %d	ProcessController		İşlemci %d
+Live in the Deskbar	ProcessController		Masaüstü Çubuğu'nda canlı
+Kill this team!	ProcessController		Bu takımı sonlandır!
+OK	ProcessController		Tamam
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		İşlem Denetimcisi'ni bir pencerede çalıştırabilir veya Masaüstü Çubuğu'na yükleyebilirsiniz.
+Real-time priority	ProcessController		Gerçek zamanlı öncelik
+Custom priority	ProcessController		Özel öncelik
+Debug this thread!	ProcessController		Bu iş parçacığını ayıkla!
+Low priority	ProcessController		Düşük öncelik
+Urgent display priority	ProcessController		İvedi görüntüleme önceliği
+Memory usage	ProcessController		Bellek kullanımı
+Ok!	ProcessController		Tamam!
+Normal priority	ProcessController		Normal öncelik
+Restart Deskbar	ProcessController		Masaüstü Çubuğu'nu yeniden başlat
+About ProcessController…	ProcessController		İşlem Denetimcisi hakkında…
+Usage: %s [-deskbar]\n	ProcessController		Kullanım: %s [-deskbar]\n
+Please confirm	ProcessController		Lütfen onaylayın
+Urgent priority	ProcessController		İvedi öncelik
+What do you want to do with the thread \"%s\"?	ProcessController		\"%s\" iş parçacığı ile ne yapmak istiyorsanız?
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+Idle priority	ProcessController		Boştaki öncelik
+Real-time display priority	ProcessController		Gerçek zamanlı görüntüleme önceliği
+Threads and CPU usage	ProcessController		İş parçacıkları ve CPU kullanımı
+Quit application	ProcessController		Uygulamadan çık
+Info	ProcessController		Bilgi
+Kill this thread!	ProcessController		Bu iş parçacığını sonlandır!
+This team is already gone…	ProcessController		Bu takım zaten gitmiş…
+Gone teams…	ProcessController		Gidik takımlar…
+Quit an application	ProcessController		Bir uygulamadan çık
+Cancel	ProcessController		İptal
+Install in Deskbar	ProcessController		Masaüstü Çubuğu'na yükle
+Debug this team!	ProcessController		Bu takımı ayıkla!
+Low latency	ProcessController		Düşük gecikme
+ProcessController	System name		İşlem Denetimcisi
+Lowest active priority	ProcessController		En düşük etkin öncelik
+Restart Tracker	ProcessController		İzleyici'yi yeniden başlat
+System resources & caches…	ProcessController		Sistem kaynakları ve önbellekler…
+Damned!	ProcessController		Hadi be!
+New Terminal	ProcessController		Yeni uçbirim
+Power saving	ProcessController		Güç tasarrufu
+ProcessController is already installed in Deskbar.	ProcessController		İşlem Denetimcisi Masaüstü Çubuğu'nda zaten kurulu
+This is the last active processor…\nYou can't turn it off!	ProcessController		Bu son etkin işlemci…\nBu yüzden onu kapatamazsınız!
+This thread is already gone…	ProcessController		Bu iş parçacığı zaten gitmiş…
+Run in window	ProcessController		Pencere içinde çalıştır

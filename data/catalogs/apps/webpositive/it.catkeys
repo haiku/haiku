@@ -1,155 +1,155 @@
 1	italian	x-vnd.Haiku-WebPositive	2763299522
-Show home button	Settings Window		Mostra pulsante home
-Username:	Authentication Panel		Nome utente:
-Copy URL to clipboard	Download Window		Copia URL negli appunti
-Cancel	Settings Window		Annulla
-Close window	WebPositive Window		Chiudi finestra
-Quit	WebPositive		Esci
-The download could not be opened.	Download Window		La cartella dei file scaricati non può essere aperta.
-The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	La cartella dei file scaricati non può essere aperta.\n\nErrore: %error
-Close	Download Window		Chiudi
-Open location	WebPositive Window		Apri indirizzo
-Clear history	WebPositive Window		Cancella cronologia
-WebPositive	System name		WebPositive
-Yesterday	WebPositive Window		Ieri
-Default standard font size:	Settings Window		Dimensione predefinita caratteri:
-Start page:	Settings Window		Pagina di avvio:
-History	WebPositive Window		Cronologia
-Error opening downloads folder	Download Window		Errore nell'apertura della cartella dei file scaricati
-Paste	WebPositive Window		Incolla
-Expiration	Cookie Manager		Scadenza
-Double-click or middle-click to open new tab.	Tab Manager		Doppio click o click centrale per aprire una nuova tab.
-Proxy username:	Settings Window		Nome utente server proxy:
-Save page as…	WebPositive Window		Salva pagina come…
-Settings	Settings Window		Impostazioni
-Confirmation	WebPositive Window		Conferma
-Window	WebPositive Window		Finestra
-Cookie manager	Cookie Manager		Gestione dei Cookie
-Decrease size	WebPositive Window		Diminuisci dimensioni
-Serif font:	Settings Window		Carattere serif:
-Loading %url	WebPositive Window		Caricamento %url
-Download aborted	Download Window		Download interrotto
-Value	Cookie Manager		Valore
-Page source	WebPositive Window		Sorgente della pagina
-Next	WebPositive Window		Prossimo
-Find next	WebPositive Window		Trova successivo
-Download folder:	Settings Window		Cartella dei file scaricati:
-Edit	WebPositive Window		Modifica
-Cancel	Authentication Panel		Annulla
-Match case	WebPositive Window		Distingui maiuscole/minuscole
-Search page:	Settings Window		Cerca nella pagina:
-Zoom text only	WebPositive Window		Ingrandisci solo il testo
-Default fixed font size:	Settings Window		Dimensione predefinita caratteri a spaziatura fissa:
-Close tab	WebPositive Window		Chiudi tab
-Auto-hide mouse pointer	Settings Window		Nascondi automaticamente puntatore del mouse
-Quit	WebPositive Window		Esci
-Full screen	WebPositive Window		Schermo intero
-Open download error	Download Window		Errore nell'apertura del file scaricato
-The cookie jar is empty!	Cookie Manager		Il barattolo dei biscotti è vuoto!
-Standard font:	Settings Window		Carattere predefinito:
-Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Cerca la precedente occorrenza dei termini di ricerca
-Restart	Download Window		Riavvia
-Proxy server	Settings Window		Server proxy
-Open containing folder	Download Window		Mostra nella cartella
-New window	WebPositive Window		Nuova finestra
-WebPositive	Download Window		WebPositive
-Open	Download Window		Apri
-Reload	WebPositive Window		Ricarica
-Downloads	Download Window		File scaricati
-Sans serif font:	Settings Window		Carattere sans serif:
-Delete	Cookie Manager		Elimina
-Forward	WebPositive Window		Avanti
-of	Download Window	...as in '12kB of 256kB'	di
-Revert	Settings Window		Ripristina
-Fixed font:	Settings Window		Carattere a spaziatura fissa:
-Cut	WebPositive Window		Taglia
-Bookmark this page	WebPositive Window		Aggiungi questa pagina ai segnalibri
-There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	C'è stato un errore nel tentativo di mostrare la cartella dei segnalibri.\n\nErrore: %error
-Open downloads folder	Download Window		Apri cartella dei file scaricati
-Proxy password:	Settings Window		Password server proxy:
-Number of days to keep links in History menu:	Settings Window		Numero di giorni in cui mantenere i collegamenti nel menu Cronologia:
-Reset size	WebPositive Window		Reimposta dimensioni
-Find:	WebPositive Window		Trova:
-Increase size	WebPositive Window		Aumenta dimensioni
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	C'è stato un errore nell'accedere alla dei segnalibri.\n\nErrore: %error
-Downloads	WebPositive Window		File scaricati
-Requesting %url	WebPositive Window		In attesa di %url
-Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Trova la prossima occorrenza dei termini di ricerca
-Apply	Settings Window		Applica
-Bookmark info	WebPositive Window		Informazioni sul segnalibro
-Size:	Font Selection view		Dimensione:
-Show tabs if only one page is open	Settings Window		Mostra tab anche se solo una pagina è aperta
-About	WebPositive Window		Informazioni
-Fonts	Settings Window		Caratteri
-OK	Download Window		OK
-Page source error	WebPositive Window		Errore nel sorgente della pagina
-Open blank page	Settings Window		Apri pagina vuota
-New tabs:	Settings Window		Nuove tab:
-Cancel	WebPositive Window		Annulla
-Open all	WebPositive Window		Apri tutti
-Proxy server requires authentication	Settings Window		Il server proxy richiede l'autenticazione
-Clear	URL Bar		Pulisci
-Cut	URL Bar		Taglia
-Clear	WebPositive Window		Pulisci
-Script console	Console Window		Console
-Remove	Download Window		Rimuovi
-Find	WebPositive Window		Trova
-Find previous	WebPositive Window		Trova precedente
-Settings	WebPositive Window		Impostazioni
-(Finish: %date)	Download Window		(Terminato: %date)
-Script console	WebPositive Window		Console
-Name	Cookie Manager		Nome
-Proxy server address:	Settings Window		Indirizzo del server proxy:
-Proxy server port:	Settings Window		Porta del server proxy:
-Bookmarks	WebPositive Window		Segnalibri
-Paste	URL Bar		Incolla
-Cookie manager	WebPositive Window		Gestore dei cookie
-/s)	Download Window	...as in 'per second'	/s)
-Hide password text	Authentication Panel		Nascondi testo password
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	La vispa Teresa avea tra l’erbetta a volo sorpresa gentil farfalletta.
-Open start page	Settings Window		Apri pagina iniziale
-Continue downloads	WebPositive		Riprendi i download
-Cancel	Download Window		Annulla
-Flags	Cookie Manager		Attributi
-Open search page	Settings Window		Apri pagina di ricerca
-Clear	Console Window		Pulisci
-Password:	Authentication Panel		Password:
-Path	Cookie Manager		Percorso:
-Back	WebPositive Window		Indietro
-New browser window	Download Window		Nuova finestra del browser
-Today	WebPositive Window		Oggi
-Remember username and password for this site	Authentication Panel		Ricorda nome utente e password per questo sito
-Earlier	WebPositive Window		Più remoti
 Authentication required	Authentication Panel		Richiesta autenticazione
-Use proxy server to connect to the internet	Settings Window		Utilizza un server proxy per connettersi a Internet
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Ci sono ancora dei download in corso, sei sicuro di voler uscire da WebPositive adesso?
-Auto-hide interface in full screen mode	Settings Window		Nasconti automaticamente l'interfaccia in modalità a schermo intero
-%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url fallito
-New tab	WebPositive Window		Nuova tab
-Downloads in progress	WebPositive		Download in corso
-(Finish: %date - %duration left)	Download Window		(Termine: %date - mancano %duration)
-Style:	Font Selection view		Stile:
-General	Settings Window		Generali
-View	WebPositive Window		Vista
 Previous	WebPositive Window		Precedente
-There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	C'è stato un errore nella creazione del file del segnalibro.\n\nErrore: %error
-(Finish: %date - Over %duration left)	Download Window		(Termine: %date - Mancano oltre %duration)
-Bookmark error	WebPositive Window		Errore nel segnalibro
-Do you really want to clear the browsing history?	WebPositive Window		Sei sicuro di voler cancellare la cronologia del browser?
-Copy	WebPositive Window		Copia
+(Finish: %date)	Download Window		(Terminato: %date)
 Open bookmarks confirmation	WebPositive Window		Conferma apertura segnalibri
-Remove missing	Download Window		Rimuovi mancanti
-Clone current page	Settings Window		Clona la pagina corrente
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Sei sicuro di voler aprire %addedCount segnalibri contemporaneamente?
-Session cookie	Cookie Manager		Cookie di sessione
-OK	Authentication Panel		OK
-Copy	URL Bar		Copia
-Download finished	Download Window		Download completato
-Show bookmark bar	WebPositive Window		Mostra barra dei segnalibri
-OK	WebPositive Window		OK
-Manage bookmarks	WebPositive Window		Gestisci segnalibri
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Un segnalibro per questa pagina (%bookmarkName) esiste già.
-Cookies for %s	Cookie Manager		Cookie per %s
-New windows:	Settings Window		Nuove finestre:
+Download folder:	Settings Window		Cartella dei file scaricati:
+Close window	WebPositive Window		Chiudi finestra
+Find:	WebPositive Window		Trova:
+Script console	WebPositive Window		Console
+Fonts	Settings Window		Caratteri
+Path	Cookie Manager		Percorso:
+of	Download Window	...as in '12kB of 256kB'	di
+Bookmarks	WebPositive Window		Segnalibri
+Use proxy server to connect to the internet	Settings Window		Utilizza un server proxy per connettersi a Internet
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url completato
+Auto-hide interface in full screen mode	Settings Window		Nasconti automaticamente l'interfaccia in modalità a schermo intero
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	C'è stato un errore nell'accedere alla dei segnalibri.\n\nErrore: %error
+Delete	Cookie Manager		Elimina
+(Finish: %date - Over %duration left)	Download Window		(Termine: %date - Mancano oltre %duration)
+Open containing folder	Download Window		Mostra nella cartella
+Find previous	WebPositive Window		Trova precedente
+Full screen	WebPositive Window		Schermo intero
+Downloads in progress	WebPositive		Download in corso
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Sei sicuro di voler aprire %addedCount segnalibri contemporaneamente?
+Copy URL to clipboard	Download Window		Copia URL negli appunti
+Clone current page	Settings Window		Clona la pagina corrente
+Start page:	Settings Window		Pagina di avvio:
+Cancel	Download Window		Annulla
+Settings	Settings Window		Impostazioni
+Downloads	WebPositive Window		File scaricati
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Un segnalibro per questa pagina (%bookmarkName) esiste già.
+Match case	WebPositive Window		Distingui maiuscole/minuscole
+Proxy password:	Settings Window		Password server proxy:
+Size:	Font Selection view		Dimensione:
+Page source	WebPositive Window		Sorgente della pagina
+Proxy server port:	Settings Window		Porta del server proxy:
+Error opening downloads folder	Download Window		Errore nell'apertura della cartella dei file scaricati
+Show bookmark bar	WebPositive Window		Mostra barra dei segnalibri
+Find	WebPositive Window		Trova
+Standard font:	Settings Window		Carattere predefinito:
+Open download error	Download Window		Errore nell'apertura del file scaricato
+General	Settings Window		Generali
+New tabs:	Settings Window		Nuove tab:
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url fallito
+Open downloads folder	Download Window		Apri cartella dei file scaricati
+Proxy server	Settings Window		Server proxy
+Decrease size	WebPositive Window		Diminuisci dimensioni
+Default fixed font size:	Settings Window		Dimensione predefinita caratteri a spaziatura fissa:
+Sans serif font:	Settings Window		Carattere sans serif:
+Clear	WebPositive Window		Pulisci
+Cookies for %s	Cookie Manager		Cookie per %s
+The download could not be opened.	Download Window		La cartella dei file scaricati non può essere aperta.
+Close	Download Window		Chiudi
+WebPositive	System name		WebPositive
+Reload	WebPositive Window		Ricarica
+Expiration	Cookie Manager		Scadenza
+Download finished	Download Window		Download completato
+Cookie manager	WebPositive Window		Gestore dei cookie
+OK	Authentication Panel		OK
+Hide password text	Authentication Panel		Nascondi testo password
+Username:	Authentication Panel		Nome utente:
+Name	Cookie Manager		Nome
 Remove finished	Download Window		Rimuovi completati
+Earlier	WebPositive Window		Più remoti
+Edit	WebPositive Window		Modifica
+Back	WebPositive Window		Indietro
+Yesterday	WebPositive Window		Ieri
+Quit	WebPositive		Esci
+Download aborted	Download Window		Download interrotto
+Number of days to keep links in History menu:	Settings Window		Numero di giorni in cui mantenere i collegamenti nel menu Cronologia:
+Password:	Authentication Panel		Password:
+Forward	WebPositive Window		Avanti
+Clear	Console Window		Pulisci
+Cut	URL Bar		Taglia
+View	WebPositive Window		Vista
+Paste	URL Bar		Incolla
+Find next	WebPositive Window		Trova successivo
+Open search page	Settings Window		Apri pagina di ricerca
+Increase size	WebPositive Window		Aumenta dimensioni
+New tab	WebPositive Window		Nuova tab
+Today	WebPositive Window		Oggi
+Open location	WebPositive Window		Apri indirizzo
+New browser window	Download Window		Nuova finestra del browser
+Open	Download Window		Apri
+New window	WebPositive Window		Nuova finestra
+New windows:	Settings Window		Nuove finestre:
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	La cartella dei file scaricati non può essere aperta.\n\nErrore: %error
+Cancel	Authentication Panel		Annulla
+Style:	Font Selection view		Stile:
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	C'è stato un errore nella creazione del file del segnalibro.\n\nErrore: %error
+OK	Download Window		OK
+Proxy username:	Settings Window		Nome utente server proxy:
+Manage bookmarks	WebPositive Window		Gestisci segnalibri
+/s)	Download Window	...as in 'per second'	/s)
+Restart	Download Window		Riavvia
+Serif font:	Settings Window		Carattere serif:
+Apply	Settings Window		Applica
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	C'è stato un errore nel tentativo di mostrare la cartella dei segnalibri.\n\nErrore: %error
+Revert	Settings Window		Ripristina
+Copy	WebPositive Window		Copia
+Default standard font size:	Settings Window		Dimensione predefinita caratteri:
+Bookmark this page	WebPositive Window		Aggiungi questa pagina ai segnalibri
+Show tabs if only one page is open	Settings Window		Mostra tab anche se solo una pagina è aperta
+Close tab	WebPositive Window		Chiudi tab
+Remove	Download Window		Rimuovi
+About	WebPositive Window		Informazioni
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Ci sono ancora dei download in corso, sei sicuro di voler uscire da WebPositive adesso?
+Continue downloads	WebPositive		Riprendi i download
+Proxy server requires authentication	Settings Window		Il server proxy richiede l'autenticazione
+Cancel	Settings Window		Annulla
+History	WebPositive Window		Cronologia
+Reset size	WebPositive Window		Reimposta dimensioni
+Do you really want to clear the browsing history?	WebPositive Window		Sei sicuro di voler cancellare la cronologia del browser?
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Trova la prossima occorrenza dei termini di ricerca
+Fixed font:	Settings Window		Carattere a spaziatura fissa:
+Quit	WebPositive Window		Esci
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Cerca la precedente occorrenza dei termini di ricerca
+Remember username and password for this site	Authentication Panel		Ricorda nome utente e password per questo sito
+(Finish: %date - %duration left)	Download Window		(Termine: %date - mancano %duration)
+Cookie manager	Cookie Manager		Gestione dei Cookie
+Show home button	Settings Window		Mostra pulsante home
+The cookie jar is empty!	Cookie Manager		Il barattolo dei biscotti è vuoto!
+Value	Cookie Manager		Valore
+Remove missing	Download Window		Rimuovi mancanti
+Paste	WebPositive Window		Incolla
+Double-click or middle-click to open new tab.	Tab Manager		Doppio click o click centrale per aprire una nuova tab.
+Next	WebPositive Window		Prossimo
+Bookmark error	WebPositive Window		Errore nel segnalibro
+OK	WebPositive Window		OK
+WebPositive	Download Window		WebPositive
+Zoom text only	WebPositive Window		Ingrandisci solo il testo
+Save page as…	WebPositive Window		Salva pagina come…
+Page source error	WebPositive Window		Errore nel sorgente della pagina
+Auto-hide mouse pointer	Settings Window		Nascondi automaticamente puntatore del mouse
+Requesting %url	WebPositive Window		In attesa di %url
+Flags	Cookie Manager		Attributi
+Window	WebPositive Window		Finestra
+Proxy server address:	Settings Window		Indirizzo del server proxy:
+Search page:	Settings Window		Cerca nella pagina:
+Settings	WebPositive Window		Impostazioni
+Clear	URL Bar		Pulisci
+Loading %url	WebPositive Window		Caricamento %url
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	La vispa Teresa avea tra l’erbetta a volo sorpresa gentil farfalletta.
+Confirmation	WebPositive Window		Conferma
+Session cookie	Cookie Manager		Cookie di sessione
+Open all	WebPositive Window		Apri tutti
+Cut	WebPositive Window		Taglia
+Downloads	Download Window		File scaricati
+Open blank page	Settings Window		Apri pagina vuota
+Clear history	WebPositive Window		Cancella cronologia
+Cancel	WebPositive Window		Annulla
+Bookmark info	WebPositive Window		Informazioni sul segnalibro
+Script console	Console Window		Console
+Copy	URL Bar		Copia
+Open start page	Settings Window		Apri pagina iniziale

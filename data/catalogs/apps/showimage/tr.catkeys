@@ -1,0 +1,62 @@
+1	turkish	x-vnd.Haiku-ShowImage	3998703664
+Use as background…	Menus		Arkaplan olarak kullan…
+File	Menus		Dosya
+Slide delay	Menus		Slayt gecikmesi
+Selection mode	Menus		Seçim kipi
+Zoom in	Menus		Yakınlaştır
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		'%s' belgesi değiştirildi. Belgeyi kapatmak istiyor musunuz?
+Page setup…	Menus		Sayfa yapısı…
+Print…	Menus		Yazdır…
+Get info…	Menus		Bilgi al…
+OK	SaveToFile		Tamam
+Previous page	Menus		Önceki sayfa
+View	Menus		Görünüm
+Full screen	Menus		Tam ekran
+Go to page	Menus		Sayfaya git
+Zoom out	Menus		Uzaklaştır
+Quit	Menus		Çık
+Rotate counterclockwise	Menus		Saat yönünün tersine döndür
+High-quality zooming	Menus		Yüksek kalite yakınlaştırma
+Browse	Menus		Gözat
+Edit	Menus		Düzen
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Görsel yüklenemedi. Bu dosya için gerekli çözücü büyük olasılıkla mevcut değil.
+First page	Menus		İlk sayfa
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		'%s' belgesi (sayfa %d) değiştirildi. Belgeyi kapatmak istiyor musunuz?
+Leave full screen	Menus		Tam ekrandan çık
+Close	Menus		Kapat
+Close	ClosePrompt		Kapat
+Resize to (in 1/72 inches):	PrintOptionsWindow		Yeniden boyutlandır (1/72 inç):
+Rating	Menus		Derecelendirme
+Flip left to right	Menus		Soldan sağa doğru ters çevir
+Show caption in full screen mode	Menus		Tam ekran kipinde altyazıları göster
+DPI:	PrintOptionsWindow		DPI:
+Open…	Menus		Aç…
+Next file	Menus		Sonraki dosya
+Clear selection	Menus		Seçimi temizle
+Close document	ClosePrompt		Belgeyi kapat
+Height: 	PrintOptionsWindow		Yükseklik: 
+The file '%s' could not be written.	SaveToFile		'%s' dosyası yazılamadı.
+Cancel	ClosePrompt		İptal
+Show tool bar	Menus		Araç çubuğunu göster
+Fit to window	Menus		Pencereye sığdır
+Print options	PrintOptionsWindow		Yazdırma seçenekleri
+Copy	Menus		Kopyala
+Progress monitor	ProgressWindow		İlerleme monitörü
+Last page	Menus		Son sayfa
+Stretch to window	Menus		Pencereye gerdir
+Previous file	Menus		Önceki dosya
+ShowImage	System name		ShowImage
+Slide show	Menus		Slayt gösterisi
+Fit image to page	PrintOptionsWindow		Görseli sayfaya sığdır
+Flip top to bottom	Menus		Üstten alta doğru ters çevir
+Select all	Menus		Tümünü seç
+Zoom factor in %:	PrintOptionsWindow		% olarak yakınlaştırma derecesi:
+Width:	PrintOptionsWindow		Genişlik:
+Image	Menus		Görsel
+Move to Trash	Menus		Çöp'e taşı
+OK	Alerts		Tamam
+Rotate clockwise	Menus		Saat yönünde döndür
+Job setup	PrintOptionsWindow		İş yapısı
+Original size	Menus		Orijinal boyut
+Next page	Menus		Sonraki sayfa
+Save as…	Menus		Farklı kaydet…

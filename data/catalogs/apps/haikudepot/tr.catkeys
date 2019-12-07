@@ -1,0 +1,175 @@
+1	turkish	x-vnd.Haiku-HaikuDepot	913112167
+Repository update error	LocalRepositoryUpdateProcess		Depo güncelleme hatası
+An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Depo güncellenirken bir hata oluştu: %error%
+Check for updates…	MainWindow		Güncellemeleri denetle…
+Uninstall	PackageManager		Kaldır
+(%Votes%)	FeaturedPackagesView		(%Votes%)
+Uninstalled	PackageListView		Kaldırıldı
+Available packages	MainWindow		Kullanılabilir paketler
+Create account	UserLoginWindow		Hesap oluştur
+OK	App		Tamam
+Mostly stable	RatePackageWindow		Çoğunlukla kararlı
+Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Hesap başarıyla oluşturuldu. Artık paketleri oylayabilir ve daha birçok özellikten yararlanabilirsiniz.
+The response to the captcha was incorrect.	ServerHelper		Captcha yanıtı yanlış.
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Paket bilgisi güncellenirken verinin geçersiz olmasına veya uygulamanın ekranından kaybolmasına neden olabilen bir hata oluştu. Bu sorun hakkındaki ek ayrıntılar uygulamanın hata günlüklerinden edinilebilir.
+Develop packages	MainWindow		Geliştirme paketleri
+Rate package…	PackageInfoView		Paketi derecelendir…
+Starting the package daemon failed:\n\n%Error%	App		Paket hizmeti başlatılamadı:\n\n%Error%
+<no info>	PackageInfoView		<bilgi yok>
+No user ratings available.	PackageInfoView		Kullanıcı oyları mevcut değil.
+The user name needs to be at least 3 letters long.	UserLoginWindow		Kullanıcı adı en az 3 karakter uzunluğunda olmalıdır.
+Downloading package '%name%'	WorkStatusView		'%name%' paketi indiriliyor
+Failed to create account	UserLoginWindow		Hesap oluşturulamadı
+Rating	PackageListView		Derecelendirme
+Synchronizing icons	ServerIconExportUpdateProcess		Simgeler eşitleniyor
+Does not start	RatePackageWindow		Başlamıyor
+Show	MainWindow		Göster
+But none could be listed here, sorry.	UserLoginWindow		Üzgünüm, burada listelenemiyor.
+An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Paket listesi alınırken bir hata oluştu: %message%
+There are problems with the data you entered:\n\n	UserLoginWindow		Girdiğiniz veri düzgün değil:\n\n
+The authentication was successful.	UserLoginWindow		Kimlik doğrulama başarılı.
+Not specified	RatePackageWindow		Belirtilmemiş
+Unstable but usable	RatePackageWindow		Kararlı değil fakat kullanılabilir
+Active	PackageListView		Etkin
+Login or Create account	MainWindow		Giriş yap veya hesap oluştur
+<Package contents not available for remote packages>	PackageContentsView		<Uzaktaki paketler için paket içeriği mevcut değil>
+{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural, other{# paket indirilecek}}
+Ratings	PackageInfoView		Derecelendirmeler
+Switch account…	MainWindow		Hesap değiştir…
+Preferred language:	UserLoginWindow		Tercih edilen dil:
+Server Error	ServerHelper		Sunucu hatası
+It was not possible to contact the web service.	UserLoginWindow		Web servisine bağlanamadı.
+Name	PackageListView		Ad
+Local	LocalPkgDataLoadProcess		Yerel
+Rate %Package%	RatePackageWindow		%Package% paketini derecelendir
+An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Paket yöneticisi başlatılırken bir hata oluştu: %message%
+Quit HaikuDepot	App		Haiku Deposu'ndan çık
+Category	FilterView		Kategori
+User rating	RatePackageWindow		Kullanıcı oyları
+Installed packages	MainWindow		Yüklü paketler
+A requested object or an object involved in the request was not found on the server.	ServerHelper		İstenen nesne veya istekle ilgili bir nesne sunucuda bulunamadı.
+Other users can see this rating	RatePackageWindow		Diğer kullanıcılar bu derecelendirmeyi görebilir
+The minimum age requirements must be met.	UserLoginWindow		Yaşınız yeterince büyük değil.
+Stable	RatePackageWindow		Kararlı
+This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		Bu uygulama Haiku Deposu sunucu sistemi ile iletişim kurmak için çok eski. Sisteminizi güncelleyerek Haiku Deposu'nun yeni bir sürümünü edinin. Gereken en düşük Haiku Deposu sürümü: \"%s\".
+Fatal error	PackageManager		Onulmaz hata
+Package action failed	PackageInfoView		Paket eylemi başarısız oldu
+No changelog available.	PackageInfoView		Değişiklik günlüğü mevcut değil
+There are problems in the form:\n\n	UserLoginWindow		Formda sıkıntılar var:\n\n
+Error	App		Hata
+There was a puzzling response from the web service.	UserLoginWindow		Web servisinden kafa karıştıran bir yanıt alındı.
+Not logged in	MainWindow		Giriş yapılmadı
+No, quit HaikuDepot	App		Hayır, Haiku Deposu'ndan çık
+Featured packages	FeaturedPackagesView		Öne çıkan paketler
+Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Derecelendirmeniz başarıyla yüklendi. Haiku Deposu sunucu web sitesinden güncelleyebilir veya silebilirsiniz.
+Network Error	ServerHelper		Ağ hatası
+Available	PackageListView		Kullanılabilir
+Cancel	UserLoginWindow		İptal
+HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Haiku Deposu, paket hizmetine gereksinim duyuyor ancak şu anda çalışmıyor görünüyor.\nŞimdi başlatılsın mı?
+Click a package to view information	PackageInfoView		Paket bilgisini görmek için üzerine tıklayın
+Contents	PackageInfoView		İçerik
+Close	PackageManager		Kapat
+A network transport error has arisen communicating with the HaikuDepot server system: %s	ServerHelper		Haiku Deposu sunucu sistemi ile iletişim kurmaya çalışırken bir ağ iletim hatası oluştu: %s
+Changelog	PackageInfoView		Değişiklik günlüğü
+Rating not possible	MainWindow		Derecelendirme olanaklı değil
+Package update error	MainWindow		Paket güncelleme hatası
+About	PackageInfoView		Hakkında
+Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Kimlik doğrulama başarısız oldu. Ya parola yanlış ya da böyle bir kullanıcı yok.
+%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, other{# işlem}}
+Reboot required	PackageManager		Yeniden başlatma gerekli
+Very unstable	RatePackageWindow		Hiç kararlı değil
+All packages	PackageListView		Tüm paketler
+Network Transport Error	ServerHelper		Ağ iletim hatası
+Stability	RatePackageWindow		Kararlılık
+Send	RatePackageWindow		Gönder
+Start package daemon	App		Paket hizmetini başlat
+The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Parola zayıf veya geçersiz. Lütfen en az 2 sayı ve 2 büyük harf içeren 8 karakterlik bir parola kullanın.
+The package action could not be scheduled: %Error%	PackageInfoView		Paket eylemi zamanlanamadı: %Error%
+Cancel	RatePackageWindow		İptal
+Inactive	PackageListView		Etkin değil
+Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Depoların üst bilgileri eşitleniyor
+OK	MainWindow		Tamam
+{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, other{# öge}}
+Usage conditions download problem	UserLoginWindow		Kullanım koşulları indirilirken hata
+OK	PackageInfoView		Tamam
+Downloading:	PackageInfoView		İndiriliyor:
+Success	UserLoginWindow		Başarılı
+It responded with: %message%	UserLoginWindow		%message% ile yanıtladı
+Package daemon problem	App		Paket hizmeti sorunu
+(%Votes%)	PackageInfoView		(%Votes%)
+Repository	PackageListView		Depo
+%hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (sürüm %hd.version%)
+Close	UserLoginWindow		Kapat
+Close	RatePackageWindow		Kapat
+Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		'%REPO_NAME%' deposu paket bilgisi eşitleniyor
+View the usage conditions	UserLoginWindow		Kullanım koşullarını görüntüle
+Failed to create account: %s\n	UserLoginWindow		Hesap oluşturulamadı: %s\n
+Size	PackageListView		Boyut
+Your rating:	RatePackageWindow		Derecelendirmeniz:
+I am %MinimumAgeYears% years of age or older	UserLoginWindow		Ben %MinimumAgeYears% yaşındayım veya daha büyüğüm
+Your rating was updated.	RatePackageWindow		Derecelendirmeniz güncellendi.
+All categories	FilterView		Tüm kategoriler
+Repositories	MainWindow		Depolar
+n/a	PackageInfoView		yok
+Cancel	MainWindow		İptal
+View agreed usage conditions…	MainWindow		Kabul edilen kullanım koşullarını görüntüle…
+{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 tane daha indirilecek)}other{(# tane daha indirilecek)}}
+Refresh repositories	MainWindow		Depoları yenile
+If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Parolanızı unutmanız durumunda sıfırlamak için bir e-posta adresi sağlamalısınız.
+Tools	MainWindow		Araçlar
+The passwords do not match.	UserLoginWindow		Parolalar birbirini tutmuyor
+This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Bu paket Haiku Deposu sunucusunda değil gibi görünüyor, bu yüzden bir derecelendirme yapmak veya mevcut derecelendirmeyi değiştirmek olanaklı değil.
+Language	RatePackageWindow		Dil
+Authentication failed. Connection to the service failed.	UserLoginWindow		Kimlik doğrulama başarısız. Servise bağlanamadı.
+Log out	MainWindow		Çıkış yap
+Comment language:	RatePackageWindow		Yorum dili:
+Status	PackageListView		Durum
+The username is already taken. Please choose another.	UserLoginWindow		Bu kullanıcı adı daha önceden alınmış. Lütfen başka bir tane seçin.
+Update	RatePackageWindow		Güncelle
+OK	ServerHelper		Tamam
+Language	UserLoginWindow		Dil
+OK	UserLoginWindow		Tamam
+Reading repository data	LocalPkgDataLoadProcess		Depo bilgisi okunuyor
+Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Başvuru bilgisi sunucudan eşitleniyor
+Stability:	RatePackageWindow		Kararlılık:
+A validation error has occurred	ServerHelper		Bir doğrulama hatası oluştu
+The captcha puzzle needs to be solved.	UserLoginWindow		Captcha yapbozunun çözülmesi gerekiyor
+Source packages	MainWindow		Kaynak paketleri
+-	no package size		-
+User name:	UserLoginWindow		Kullanıcı adı:
+Try again	App		Yeniden dene
+Rate package	RatePackageWindow		Paketi derecelendir
+The usage conditions must be agreed to.	UserLoginWindow		Kullanım koşullarını kabul etmelisiniz.
+The email address appears to be malformed.	UserLoginWindow		Düzgün bir e-posta adresi gibi görünmüyor.
+You have not solved the captcha puzzle correctly.	UserLoginWindow		Captcha yapbozunu çözmediniz.
+Unknown	PackageListView		Bilinmeyen
+I agree to the usage conditions	UserLoginWindow		Kullanım koşullarını kabul ediyorum
+An error has arisen downloading the usage conditions. Check the log for details and try again.	UserLoginWindow		Kullanım koşulları indirilirken bir hata oluştu. Hata günlüklerini denetleyin ve yeniden deneyin.
+Log in	UserLoginWindow		Giriş yap
+Logged in as %User%	MainWindow		%User% olarak giriş yapıldı
+Email address:	UserLoginWindow		E-posta adresi:
+Screenshot	ScreenshotWindow		Ekran görüntüsü
+HaikuDepot	System name		Haiku Deposu
+A reboot is necessary to complete the installation process.	PackageManager		Yükleme işlemini tamamlamak için bilgisayarı yeniden başlatmalısınız.
+View latest usage conditions…	MainWindow		Güncel kullanım koşullarını görüntüle…
+Search terms:	FilterView		Arama metni:
+Pending…	PackageListView		Bekliyor…
+Repeat pass phrase:	UserLoginWindow		Parolayı tekrarla:
+Category:	FilterView		Kategori:
+Authentication failed	UserLoginWindow		Kimlik doğrulanamadı
+Manage repositories…	MainWindow		Depoları yönet…
+Fetching remote repository data	LocalRepositoryUpdateProcess		Uzak depo bilgisi alınıyor
+Description	PackageListView		Tanım
+Pass phrase:	UserLoginWindow		Parola:
+Open %DeskbarLink%	PackageManager		Aç: %DeskbarLink%
+Install	PackageManager		Yükle
+Input validation	UserLoginWindow		Girdi doğrulaması
+An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Haiku Deposu sunucusundan beklenmeyen bir hata alındı [%i]
+Log in…	MainWindow		Giriş yap…
+You need to be logged into an account before you can rate packages.	MainWindow		Paketleri derecelendirmek için giriş yapmalısınız.
+Client version too old	ServerHelper		İstemci sürümü çok eski
+Authorization or security issue	ServerHelper		Kimlik doğrulama veya güvenlik sorunu
+Local repository load error	LocalPkgDataLoadProcess		Yerel depo yükleme hatası
+9999.99 KiB	PackageListView		9999.99 KiB
+All repositories	MainWindow		Tüm depolar
+%Version%	PackageInfoView		%Version%

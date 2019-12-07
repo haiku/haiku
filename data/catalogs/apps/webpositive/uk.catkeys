@@ -1,155 +1,155 @@
 1	ukrainian	x-vnd.Haiku-WebPositive	2763299522
-Show home button	Settings Window		Показати домашню кнопку
-Username:	Authentication Panel		Користувач:
-Copy URL to clipboard	Download Window		Копіювати до буферу обміну
-Cancel	Settings Window		Відмінити
-Close window	WebPositive Window		Закрити вікно
-Quit	WebPositive		Вийти
-The download could not be opened.	Download Window		Неможливо відкрити завантажене.
-The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Неможливо відкрити теку завантажень.\n\nПомилка: %error
-Close	Download Window		Закрити
-Open location	WebPositive Window		Відкрити розташування
-Clear history	WebPositive Window		Очистити історію
-WebPositive	System name		WebPositive
-Yesterday	WebPositive Window		Вчора
-Default standard font size:	Settings Window		Шрифт по замовчуванню:
-Start page:	Settings Window		Стартова сторінка:
-History	WebPositive Window		Історія
-Error opening downloads folder	Download Window		Помилка відкриття теки завантажень
-Paste	WebPositive Window		Вставити
-Expiration	Cookie Manager		Термін дії
-Double-click or middle-click to open new tab.	Tab Manager		Подвійний або середній клік для відкриття нової вкладки.
-Proxy username:	Settings Window		Ім'я проксі:
-Save page as…	WebPositive Window		Зберегти сторінку як…
-Settings	Settings Window		Налаштування
-Confirmation	WebPositive Window		Підтвердження
-Window	WebPositive Window		Вікно
-Cookie manager	Cookie Manager		Менеджер coookie
-Decrease size	WebPositive Window		Зменшити розмір
-Serif font:	Settings Window		Шрифт Serif:
-Loading %url	WebPositive Window		Завантаження %url
-Download aborted	Download Window		Завантаження зупинене
-Value	Cookie Manager		Величина
-Page source	WebPositive Window		Джерело
-Next	WebPositive Window		Наступне
-Find next	WebPositive Window		Знайти текст
-Download folder:	Settings Window		Тека завантажень:
-Edit	WebPositive Window		Правка
-Cancel	Authentication Panel		Відмінити
-Match case	WebPositive Window		Враховуючи регістр
-Search page:	Settings Window		Сторінка пошуку:
-Zoom text only	WebPositive Window		Збільшити тільки текст
-Default fixed font size:	Settings Window		Типовий розмір шрифту:
-Close tab	WebPositive Window		Закрити вкладку
-Auto-hide mouse pointer	Settings Window		Автоматично ховати курсор
-Quit	WebPositive Window		Вийти
-Full screen	WebPositive Window		Повний екран
-Open download error	Download Window		Помилка відкриття завантаження
-The cookie jar is empty!	Cookie Manager		Комірка cookie порожня!
-Standard font:	Settings Window		Стандартний шрифт:
-Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Знайти попередню появу пошукових запитів
-Restart	Download Window		Перезапустити
-Proxy server	Settings Window		Сервер проксі
-Open containing folder	Download Window		Відкрити теку, що містить
-New window	WebPositive Window		Нове вікно
-WebPositive	Download Window		WebPositive
-Open	Download Window		Відкрити
-Reload	WebPositive Window		Перезавантажити
-Downloads	Download Window		Завантаження
-Sans serif font:	Settings Window		Шрифт Sans serif:
-Delete	Cookie Manager		Видалити
-Forward	WebPositive Window		Вперед
-of	Download Window	...as in '12kB of 256kB'	з
-Revert	Settings Window		Повернути
-Fixed font:	Settings Window		Моноширинний шрифт:
-Cut	WebPositive Window		Вирізати
-Bookmark this page	WebPositive Window		Закласти цю сторінку
-There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Сталася помилка при показі теки Закладки.\n\nПомилка: %error
-Open downloads folder	Download Window		Відкрити теку завантажень
-Proxy password:	Settings Window		Гасло проксі:
-Number of days to keep links in History menu:	Settings Window		Кількість днів збереження посилань Історії
-Reset size	WebPositive Window		Зкинути розмір
-Find:	WebPositive Window		Знайти:
-Increase size	WebPositive Window		Збільшити розмір
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Сталася помилка під час завантаження теки закладок.\n\nПомилка: %error
-Downloads	WebPositive Window		Завантаження
-Requesting %url	WebPositive Window		Запит %url
-Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Знайти наступну появу умов пошуку
-Apply	Settings Window		Застосувати
-Bookmark info	WebPositive Window		Про Закладки
-Size:	Font Selection view		Розмір:
-Show tabs if only one page is open	Settings Window		Показати вкладки, якщо відкрито лише одну сторінку
-About	WebPositive Window		Про
-Fonts	Settings Window		Шрифти
-OK	Download Window		Гаразд
-Page source error	WebPositive Window		Помилка джерела
-Open blank page	Settings Window		Відкрити порожню сторінку
-New tabs:	Settings Window		Нові вкладки:
-Cancel	WebPositive Window		Відмінити
-Open all	WebPositive Window		Відкрити всі
-Proxy server requires authentication	Settings Window		Проксі-сервер вимагає аутентифікації
-Clear	URL Bar		Очистити
-Cut	URL Bar		Вирізати
-Clear	WebPositive Window		Очистити
-Script console	Console Window		Косоль сценаріїв
-Remove	Download Window		Видалити
-Find	WebPositive Window		Знайти
-Find previous	WebPositive Window		Знайти попереднє
-Settings	WebPositive Window		Налаштування
-(Finish: %date)	Download Window		(Завершення: %date)
-Script console	WebPositive Window		Консоль сценаріїв
-Name	Cookie Manager		Ім'я
-Proxy server address:	Settings Window		Адреса проксі-сервер
-Proxy server port:	Settings Window		Порт проксі-сервера:
-Bookmarks	WebPositive Window		Закладки
-Paste	URL Bar		Вставити
-Cookie manager	WebPositive Window		Менеджер Cookie
-/s)	Download Window	...as in 'per second'	/s)
-Hide password text	Authentication Panel		Сховати текст гасла
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Жебракують філософи при ґанку церкви в Гадячі, ще й шатро їхнє п’яне знаємо.
-Open start page	Settings Window		Відкрити стартову сторінку
-Continue downloads	WebPositive		Продовжити завантаження
-Cancel	Download Window		Відмінити
-Flags	Cookie Manager		Прапори
-Open search page	Settings Window		Відкрити сторінку пошуку
-Clear	Console Window		Очистити
-Password:	Authentication Panel		Гасло:
-Path	Cookie Manager		Шлях
-Back	WebPositive Window		Назад
-New browser window	Download Window		Нове вікно переглядача
-Today	WebPositive Window		Сьогодні
-Remember username and password for this site	Authentication Panel		Запам'ятати логін та гасло для цього сайту
-Earlier	WebPositive Window		Раніше
 Authentication required	Authentication Panel		Потребується авторизація
-Use proxy server to connect to the internet	Settings Window		Використовувати проксі-сервер для під'єднання
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Триває завантаження, ви дійсно бажаєте покинути WebPositive зараз?
-Auto-hide interface in full screen mode	Settings Window		Автоматично ховати інтерфейс в повноекранному режимі
-%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url призупинено
-New tab	WebPositive Window		Нова вкладка
-Downloads in progress	WebPositive		Завантаження триває
-(Finish: %date - %duration left)	Download Window		(Завершення: %date - %duration залишилось)
-Style:	Font Selection view		Стиль:
-General	Settings Window		Основні
-View	WebPositive Window		Перегляд
 Previous	WebPositive Window		Попереднє
-There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Сталася помилка при створенні закладки.\n\nПомилка: %error
-(Finish: %date - Over %duration left)	Download Window		(Завершення: %date - Понад %duration залишилось)
-Bookmark error	WebPositive Window		Помилка закладки
-Do you really want to clear the browsing history?	WebPositive Window		Видійсно бажаєте очистити історії перегляду?
-Copy	WebPositive Window		Копіювати
+(Finish: %date)	Download Window		(Завершення: %date)
 Open bookmarks confirmation	WebPositive Window		Відкрити підтвердження закладок
-Remove missing	Download Window		Очікування видалення
-Clone current page	Settings Window		Клонувати поточну сторінку
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Ви бажаєте відкрити всі закладки %addedCount одразу?
-Session cookie	Cookie Manager		Сесійний файл cookie
-OK	Authentication Panel		Гаразд
-Copy	URL Bar		Копіювати
-Download finished	Download Window		Завантаження завершене
-Show bookmark bar	WebPositive Window		Показати панель закладок
-OK	WebPositive Window		Гаразд
-Manage bookmarks	WebPositive Window		Керування закладками
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Закладка цієї сторінки (%bookmarkName) вже існує.
-Cookies for %s	Cookie Manager		Cookies для %s
-New windows:	Settings Window		Нове вікно:
+Download folder:	Settings Window		Тека завантажень:
+Close window	WebPositive Window		Закрити вікно
+Find:	WebPositive Window		Знайти:
+Script console	WebPositive Window		Консоль сценаріїв
+Fonts	Settings Window		Шрифти
+Path	Cookie Manager		Шлях
+of	Download Window	...as in '12kB of 256kB'	з
+Bookmarks	WebPositive Window		Закладки
+Use proxy server to connect to the internet	Settings Window		Використовувати проксі-сервер для під'єднання
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url завершене
+Auto-hide interface in full screen mode	Settings Window		Автоматично ховати інтерфейс в повноекранному режимі
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Сталася помилка під час завантаження теки закладок.\n\nПомилка: %error
+Delete	Cookie Manager		Видалити
+(Finish: %date - Over %duration left)	Download Window		(Завершення: %date - Понад %duration залишилось)
+Open containing folder	Download Window		Відкрити теку, що містить
+Find previous	WebPositive Window		Знайти попереднє
+Full screen	WebPositive Window		Повний екран
+Downloads in progress	WebPositive		Завантаження триває
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Ви бажаєте відкрити всі закладки %addedCount одразу?
+Copy URL to clipboard	Download Window		Копіювати до буферу обміну
+Clone current page	Settings Window		Клонувати поточну сторінку
+Start page:	Settings Window		Стартова сторінка:
+Cancel	Download Window		Відмінити
+Settings	Settings Window		Налаштування
+Downloads	WebPositive Window		Завантаження
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Закладка цієї сторінки (%bookmarkName) вже існує.
+Match case	WebPositive Window		Враховуючи регістр
+Proxy password:	Settings Window		Гасло проксі:
+Size:	Font Selection view		Розмір:
+Page source	WebPositive Window		Джерело
+Proxy server port:	Settings Window		Порт проксі-сервера:
+Error opening downloads folder	Download Window		Помилка відкриття теки завантажень
+Show bookmark bar	WebPositive Window		Показати панель закладок
+Find	WebPositive Window		Знайти
+Standard font:	Settings Window		Стандартний шрифт:
+Open download error	Download Window		Помилка відкриття завантаження
+General	Settings Window		Основні
+New tabs:	Settings Window		Нові вкладки:
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url призупинено
+Open downloads folder	Download Window		Відкрити теку завантажень
+Proxy server	Settings Window		Сервер проксі
+Decrease size	WebPositive Window		Зменшити розмір
+Default fixed font size:	Settings Window		Типовий розмір шрифту:
+Sans serif font:	Settings Window		Шрифт Sans serif:
+Clear	WebPositive Window		Очистити
+Cookies for %s	Cookie Manager		Cookies для %s
+The download could not be opened.	Download Window		Неможливо відкрити завантажене.
+Close	Download Window		Закрити
+WebPositive	System name		WebPositive
+Reload	WebPositive Window		Перезавантажити
+Expiration	Cookie Manager		Термін дії
+Download finished	Download Window		Завантаження завершене
+Cookie manager	WebPositive Window		Менеджер Cookie
+OK	Authentication Panel		Гаразд
+Hide password text	Authentication Panel		Сховати текст гасла
+Username:	Authentication Panel		Користувач:
+Name	Cookie Manager		Ім'я
 Remove finished	Download Window		Видалення завершене
+Earlier	WebPositive Window		Раніше
+Edit	WebPositive Window		Правка
+Back	WebPositive Window		Назад
+Yesterday	WebPositive Window		Вчора
+Quit	WebPositive		Вийти
+Download aborted	Download Window		Завантаження зупинене
+Number of days to keep links in History menu:	Settings Window		Кількість днів збереження посилань Історії
+Password:	Authentication Panel		Гасло:
+Forward	WebPositive Window		Вперед
+Clear	Console Window		Очистити
+Cut	URL Bar		Вирізати
+View	WebPositive Window		Перегляд
+Paste	URL Bar		Вставити
+Find next	WebPositive Window		Знайти текст
+Open search page	Settings Window		Відкрити сторінку пошуку
+Increase size	WebPositive Window		Збільшити розмір
+New tab	WebPositive Window		Нова вкладка
+Today	WebPositive Window		Сьогодні
+Open location	WebPositive Window		Відкрити розташування
+New browser window	Download Window		Нове вікно переглядача
+Open	Download Window		Відкрити
+New window	WebPositive Window		Нове вікно
+New windows:	Settings Window		Нове вікно:
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Неможливо відкрити теку завантажень.\n\nПомилка: %error
+Cancel	Authentication Panel		Відмінити
+Style:	Font Selection view		Стиль:
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Сталася помилка при створенні закладки.\n\nПомилка: %error
+OK	Download Window		Гаразд
+Proxy username:	Settings Window		Ім'я проксі:
+Manage bookmarks	WebPositive Window		Керування закладками
+/s)	Download Window	...as in 'per second'	/s)
+Restart	Download Window		Перезапустити
+Serif font:	Settings Window		Шрифт Serif:
+Apply	Settings Window		Застосувати
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Сталася помилка при показі теки Закладки.\n\nПомилка: %error
+Revert	Settings Window		Повернути
+Copy	WebPositive Window		Копіювати
+Default standard font size:	Settings Window		Шрифт по замовчуванню:
+Bookmark this page	WebPositive Window		Закласти цю сторінку
+Show tabs if only one page is open	Settings Window		Показати вкладки, якщо відкрито лише одну сторінку
+Close tab	WebPositive Window		Закрити вкладку
+Remove	Download Window		Видалити
+About	WebPositive Window		Про
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Триває завантаження, ви дійсно бажаєте покинути WebPositive зараз?
+Continue downloads	WebPositive		Продовжити завантаження
+Proxy server requires authentication	Settings Window		Проксі-сервер вимагає аутентифікації
+Cancel	Settings Window		Відмінити
+History	WebPositive Window		Історія
+Reset size	WebPositive Window		Зкинути розмір
+Do you really want to clear the browsing history?	WebPositive Window		Видійсно бажаєте очистити історії перегляду?
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Знайти наступну появу умов пошуку
+Fixed font:	Settings Window		Моноширинний шрифт:
+Quit	WebPositive Window		Вийти
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Знайти попередню появу пошукових запитів
+Remember username and password for this site	Authentication Panel		Запам'ятати логін та гасло для цього сайту
+(Finish: %date - %duration left)	Download Window		(Завершення: %date - %duration залишилось)
+Cookie manager	Cookie Manager		Менеджер coookie
+Show home button	Settings Window		Показати домашню кнопку
+The cookie jar is empty!	Cookie Manager		Комірка cookie порожня!
+Value	Cookie Manager		Величина
+Remove missing	Download Window		Очікування видалення
+Paste	WebPositive Window		Вставити
+Double-click or middle-click to open new tab.	Tab Manager		Подвійний або середній клік для відкриття нової вкладки.
+Next	WebPositive Window		Наступне
+Bookmark error	WebPositive Window		Помилка закладки
+OK	WebPositive Window		Гаразд
+WebPositive	Download Window		WebPositive
+Zoom text only	WebPositive Window		Збільшити тільки текст
+Save page as…	WebPositive Window		Зберегти сторінку як…
+Page source error	WebPositive Window		Помилка джерела
+Auto-hide mouse pointer	Settings Window		Автоматично ховати курсор
+Requesting %url	WebPositive Window		Запит %url
+Flags	Cookie Manager		Прапори
+Window	WebPositive Window		Вікно
+Proxy server address:	Settings Window		Адреса проксі-сервер
+Search page:	Settings Window		Сторінка пошуку:
+Settings	WebPositive Window		Налаштування
+Clear	URL Bar		Очистити
+Loading %url	WebPositive Window		Завантаження %url
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Жебракують філософи при ґанку церкви в Гадячі, ще й шатро їхнє п’яне знаємо.
+Confirmation	WebPositive Window		Підтвердження
+Session cookie	Cookie Manager		Сесійний файл cookie
+Open all	WebPositive Window		Відкрити всі
+Cut	WebPositive Window		Вирізати
+Downloads	Download Window		Завантаження
+Open blank page	Settings Window		Відкрити порожню сторінку
+Clear history	WebPositive Window		Очистити історію
+Cancel	WebPositive Window		Відмінити
+Bookmark info	WebPositive Window		Про Закладки
+Script console	Console Window		Косоль сценаріїв
+Copy	URL Bar		Копіювати
+Open start page	Settings Window		Відкрити стартову сторінку

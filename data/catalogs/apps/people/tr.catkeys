@@ -1,0 +1,50 @@
+1	turkish	x-vnd.Be-PEPL	2332202134
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Dosya Türleri preflet'i Kişi özniteliğini yapılandırmak için çalıştırılamadı.\n\nHata: 
+Unnamed person	People		Adsız kişi
+New person…	People		Yeni kişi…
+Address	People		Adres
+Zip	People		Posta kodu
+Select all	People		Tümünü seç
+Could not create %s.	People		%s oluşturulamadı.
+Quit	People		Çık
+Company	People		Şirket
+Name	People		Ad
+The file '%name%' could not be written.	People		'%name' dosyası yazılamadı.
+Contact name	People		Kişi adı
+Cancel	People		İptal
+Edit	People		Düzen
+Save changes before closing?	People		Kapatmadan önce değişiklikler kaydedilsin mi?
+People	System name		Kişiler
+Error	People		Hata
+Revert	People		Eski haline döndür
+Country	People		Ülke
+Person	Short mimetype description		Kişi
+New person	People		Yeni kişi
+Save	People		Kaydet
+Fax	People		Belgegeçer
+URL	People		URL
+%name% picture	People		%name% resmi
+Home phone	People		Ev telefonu
+none	Groups list		yok
+Save as…	People		Farklı kaydet…
+Cut	People		Kes
+Contact information for a person.	Long mimetype description		Kişi iletişim bilgileri
+Remove image	People		Görseli kaldır
+City	People		Kent
+Undo	People		Geri al
+Don't save	People		Kaydetme!
+Configure attributes	People		Öznitelikleri yapılandır
+Work phone	People		İş telefonu
+State	People		Eyalet
+Nickname	People		Takma ad
+OK	People		Tamam
+File	People		Dosya
+Redo	People		Yinele
+Close	People		Kapat
+Copy	People		Kopyala
+Paste	People		Yapıştır
+E-mail	People		E-posta
+Group	People		Grup
+Drop an image here,\nor use the contextual menu.	People		Buraya bir görsel bırakın,\nveya sağ tık menüsünü kullanın.
+Load image…	People		Görsel yükle…
+Sorry	People		Üzgünüm

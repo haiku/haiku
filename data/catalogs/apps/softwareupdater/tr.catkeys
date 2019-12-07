@@ -1,0 +1,64 @@
+1	turkish	x-vnd.haiku-softwareupdater	369324613
+Updating version	SoftwareUpdaterWindow	List item text	Güncellendiği sürüm
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		{0, plural, other{# güncellenmiş paketi}} yüklemek için buraya tıklayın.
+Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Kaldırılacak paketler
+No active network connection was found	UpdateManager	Error message	Etkin bir ağ bağlantısı bulunamadı
+Quit	SoftwareUpdaterWindow	Alert button label	Çık
+There were no updates found.	CheckManager		Güncelleme bulunamadı.
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Güncellemeler tamamlanmadı, çıkmak istediğinizden emin misiniz?
+Updates found	SoftwareUpdaterWindow		Güncellemeler bulundu
+Update now	SoftwareUpdaterWindow		Şimdi güncelle
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Bir nedenden dolayı bilgisayarınızı yeniden başlatamadık.
+OK	UpdateManager		Tamam
+Unrecognized argument	SoftwareUpdaterApp	Error message	Tanımlanamayan değişken
+There were no updates found.	CheckAction		Güncelleme bulunamadı.
+No updates available	UpdateAction		Kullanılabilir güncelleme yok
+New packages to be installed	SoftwareUpdaterWindow	List super item label	Yüklenecek yeni paketler
+Packages to be updated	SoftwareUpdaterWindow	List super item label	Güncellenecek paketler
+to	SoftwareUpdaterWindow	List item text	 ->
+Attempting to cancel the updates…	SoftwareUpdaterWindow		Güncellemeler iptal edilmeye çalışılıyor…
+Contacting software repositories to check for package updates.	CheckManager		Paket güncellemeleri için yazılım depoları ile iletişim kuruluyor.
+Available updates found	CheckManager		Yeni güncellemeler bulundu
+from repository	SoftwareUpdaterWindow	List item text	depodan
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Paket güncellemeleri için yazılım depoları ile iletişim kuruluyor.
+Cancelling updates	SoftwareUpdaterWindow		Güncellemeler iptal ediliyor
+Cancel	SoftwareUpdaterWindow	Alert button label	İptal
+There were no updates found.	UpdateAction		Güncelleme bulunamadı.
+OK	SoftwareUpdaterWindow		Tamam
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Aşağıdaki güncelleme seçeneklerinden birini seçiniz:\n\nGüncelle:\n\tYüklü tüm paketleri günceller.\nTam eşitleme:\n\tYüklü paketleri depolar ile eşitler.
+The following changes will be made:	SoftwareUpdaterWindow		Aşağıdaki değişiklikler yapılacak:
+Argument variables are no longer accepted\n	SoftwareUpdaterApp		Değişkenler artık kabul edilmiyor\n
+Fatal error while checking for updates: %s\n	CheckAction		Güncellemeler denetlenirken onulmaz hata: %s\n
+SoftwareUpdater	System name		Yazılım Güncelleyicisi
+No active network connection was found.\n	CheckManager		Etkin bir ağ bağlantısı bulunamadı.\n
+Applying changes	UpdateManager		Değişiklikler uygulanıyor
+Full sync	SoftwareUpdaterWindow	Alert button label	Tam eşitleme
+Quit	SoftwareUpdaterWindow	Button label	Çık
+Updates have been successfully installed.	UpdateManager		Güncellemeler başarıyla yüklendi.
+Exception occurred while updating packages : %s\n	UpdateAction		Paketler güncellenirken kural dışı durum oluştu: %s\n
+A reboot is necessary to complete the update process.	UpdateManager		Güncellemeleri tamamlamak için yeniden başlatma gerekiyor.
+Exception occurred while checking for updates: %s\n	CheckAction		Güncellemeler denetlenirken kural dışı durum oluştu: %s\n
+Packages are being updated	UpdateManager		Paketler güncelleniyor
+Cancel	SoftwareUpdaterWindow		İptal
+Don't quit	SoftwareUpdaterWindow		Çıkma!
+Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Yazılım Güncelleyicisi'ni çalıştırmak için buraya tıklayın. Bazı güncellemeler bir sorun çözümünün seçilmesini gerektirecektir.
+Checking for updates	SoftwareUpdaterWindow		Güncellemeler denetleniyor
+Updates completed	UpdateManager		Güncellemeler tamamlandı
+Reboot	SoftwareUpdaterWindow		Yeniden başlat
+Show more details	SoftwareUpdaterWindow		Daha fazla ayrıntı
+Installing version	SoftwareUpdaterWindow	List item text	Yüklenen sürüm
+Checking for updates	CheckManager		Güncellemeler denetleniyor
+No remote repositories are available	UpdateManager	Error message	Uzak depolar mevcut değil
+Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, other{güncelleme}} mevcut
+Reboot	SoftwareUpdaterWindow	Button label	Yeniden başlat
+Update	SoftwareUpdaterWindow	Alert button label	Güncelle
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Açık depolar
+Updates did not complete	UpdateAction		Güncellemeler tamamlanmadı
+Invalid update type, cannot continue with updates	UpdateAction		Geçersiz güncelleme türü, güncellemeler sürdürülemiyor
+Uninstalling version	SoftwareUpdaterWindow	List item text	Kaldırılan sürüm
+%i of %i	UpdateManager	Do not translate %i	%i/%i
+Quit	SoftwareUpdaterWindow		Çık
+No updates available	CheckManager		Güncelleme bulunamadı
+Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Kullanım:  SoftwareUpdater <komut> [ <seçenek> ]\nKurulu paketleri günceller.\n\nKomutlar:\n  update     - Paket güncellemeleri için depoları tarar ve güncellemeleri kurar.\n  check      - Mevcut güncellemeleri denetler ancak yalnızca sonuçları listeler.\n  full-sync  - Kurulu paketleri depolarla eşitler.\n\nSeçenekler:\n  -h or --help       Bu yardım iletisini gösterir\n  -v or --verbose    Ayrıntılı sözlü çıktıyı gösterir\n
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Hiçbir uzak depo kullanılabilir değil. Lütfen en azından bazı depoların ulaşılabilir olduğunu depo preflet'lerini veya 'pkgman' komutunu kullanarak denetleyin.
+Downloading packages	UpdateManager		Paketler indiriliyor

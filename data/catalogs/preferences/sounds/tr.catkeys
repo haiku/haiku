@@ -1,0 +1,15 @@
+1	turkish	x-vnd.Haiku-Sounds	1784495232
+Sounds	System name		Sesler
+Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sesler\n  Yazanlar:\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  İlk geliştiren: Atsuşi Takamatsu.\nTelif hakkı ©2003-2006 Haiku
+No such file or directory	HEventList		Böyle bir dosya veya dizin yok
+OK	HWindow		Tamam
+Other…	HWindow		Diğer…
+OK	SoundsHApp		Tamam
+Sound file:	HWindow		Ses dosyası:
+This is not an audio file.	HWindow		Bu bir ses dosyası değil.
+<none>	HEventList		<yok>
+OK	HEventList		Tamam
+About Sounds	SoundsHApp		Sesler hakkında
+Sound	HEventList		Ses
+Event	HEventList		Olay
+<none>	HWindow		<yok>

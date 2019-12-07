@@ -1,0 +1,9 @@
+1	turkish	x-vnd.Haiku-EXRTranslator	3596882613
+Version %d.%d.%d, %s	ConfigView		Sürüm %d.%d.%d, %s
+EXR image translator	EXRTranslator		EXR görseli çevirmeni
+EXR Settings	main		EXR ayarları
+EXR images	EXRTranslator		EXR görselleri
+a division of Lucasfilm Entertainment Company Ltd	ConfigView		Lucasfilm Entertainment Company Ltd.'nin bir birimi
+EXR image	EXRTranslator		EXR görseli
+EXR image translator	ConfigView		EXR görseli çevirmeni
+Based on OpenEXR %version%	ConfigView		OpenEXR %version% temel alınmıştır

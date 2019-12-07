@@ -1,0 +1,8 @@
+1	turkish	x-vnd.Haiku-BFSAddOn	1570987954
+Enable query support	BFS_Initialize_Parameter		Sorgu desteğini etkinleştir
+Disabling query support may speed up certain file system operations, but should\nonly be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		Sorgulama desteğini devre dışı bırakmak bazı dosya sistemi işlemlerini hızlandırabilir, ancak\nyalnızca sorgulamaya gerek duymayacağınızdan eminseniz kullanılmalıdır.\nHaiku'yu önyüklemek için kullanacağınız bölümde sorgulama desteği etkin durumda olmalıdır.
+Name:	BFS_Initialize_Parameter		Ad:
+8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (Çoğunlukla büyük dosyalar)
+2048 (Recommended)	BFS_Initialize_Parameter		2048 (Önerilen)
+1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (Çoğunlukla küçük dosyalar)
+Blocksize:	BFS_Initialize_Parameter		Blok boyutu:

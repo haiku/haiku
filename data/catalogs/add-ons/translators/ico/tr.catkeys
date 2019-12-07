@@ -1,0 +1,14 @@
+1	turkish	x-vnd.Haiku-ICOTranslator	3916328565
+Cursor	ICOTranslator		İmleç
+Version %d.%d.%d, %s	ConfigView		Sürüm %d.%d.%d, %s
+Windows %s %ld bit image	ICOTranslator		Windows %s %ld bit görsel
+Valid icon sizes are 16, 32, or 48	ConfigView		Geçerli simge boyutları: 16, 32 veya 48
+Windows icons	ICOTranslator		Windows simgeleri
+Enforce valid icon sizes	ConfigView		Simgeler geçerli bir boyut olmalı
+ICO Settings	main		ICO ayarları
+Windows icon translator	ICOTranslator		Windows simge çevirmeni
+pixels in either direction.	ConfigView		pikseller herhangi bir yana.
+Write 32 bit images on true color input	ConfigView		32 bit görselleri gerçek renk girdisine göre yaz
+Icon	ICOTranslator		Simge
+ICOTranslator Settings	ConfigView		ICOTranslator ayarları
+Windows icon translator	ConfigView		Windows simge çevirmeni

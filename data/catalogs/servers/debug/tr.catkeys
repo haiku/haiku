@@ -1,0 +1,8 @@
+1	turkish	x-vnd.Haiku-debug_server	3188340596
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		Uygulama:\n\n      %app\n\nbir hatayla karşılaştı ve sürdürülemiyor. Haiku uygulamayı sonlandırıp ortalığı temizleyecek.
+Oh yeah!	DebugServer		İşte bu!
+Debug	DebugServer		Hata ayıkla
+Terminate	DebugServer		Sonlandır
+Save report	DebugServer		Raporu kaydet
+Write core file	DebugServer		Çekirdek dosya yaz
+Oh no!	DebugServer		N'ayır!

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libtracker	1737016276
+1	italian	x-vnd.Haiku-libtracker	2745737133
 Created	ContainerWindow		Creato
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Apri e rendi preferito
@@ -21,6 +21,7 @@ contains	FindPanel		contiene
 Open	FilePanelPriv		Apri
 Bitmap icon	AttributesView		Icona bitmap
 You can't replace a folder with one of its sub-folders.	FSUtils		Non è possibile sostituire una cartella con una delle sue sotto-cartelle.
+<%ld dates>	AttributesView		<%ld date>
 Name	Default Query Columns		Nome
 Unmount	ContainerWindow		Smonta
 Eject when unmounting	AutoMounterSettings		Espelli i volumi una volta smontati
@@ -98,6 +99,7 @@ Link to:	InfoWindow		Collegamento a:
 Copy here	ContainerWindow		Copia qui
 Character	AttributesView		Carattere
 All disks	FindPanel		Tutti i dischi
+Affine transform	AttributesView		Trasformazione affine
 Window	ContainerWindow		Finestra
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Rimuovi
@@ -162,8 +164,10 @@ There was an error writing the attribute.	WidgetAttributeText		Si è presentato 
 Path	Default Query Columns		Percorso
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Se rinomini %target, %osName potrebbe non funzionare correttamente!\n\nSei sicuro di voler procedere?
 Could not open \"%name\" (%error). 	FSUtils		Non è stato possibile aprire \"%name\" (%error). 
+Media parameter group	AttributesView		Gruppo di parametri multimediali
 %name info	InfoWindow	InfoWindow Title	Informazioni su %name
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Se sposti la tua cartella personale, %osName potrebbe non funzionare correttamente!\n\nSei sicuro di voler procedere?\n\nPer spostare la cartella home, tieni premuto il tasto Maiusc e clicca su \"Sposta\".
+Property info	AttributesView		Dettagli proprietà
 Sorry, you can't create links in the Trash.	PoseView		Non è possibile creare collegamenti nel Cestino.
 From	Email Query Columns		Da
 Invert selection	QueryContainerWindow		Inverti selezione
@@ -193,6 +197,7 @@ Icon view	DeskWindow		Visualizza icone
 <%ld rectangles>	AttributesView		<%ld rettangoli>
 Mount settings…	ContainerWindow		Impostazioni di mount
 Keywords	Bookmark Query Columns		Parole chiave
+Media parameter web	AttributesView		Parametro multimediale web
 Copy more	ContainerWindow		Copia ancora
 by name	FindPanel		per nome
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Non è possibile salvare nulla sulla directory principale (root) del sistema.
@@ -310,6 +315,7 @@ Settings…	MountMenu		Impostazioni…
 You cannot put the selected item(s) into the trash.	FSUtils		Non puoi spostare l'oggetto (o gli oggetti) selezionato nel cestino.
 Increase size	DeskWindow		Aumenta dimensioni
 starts with	SelectionWindow		incomincia con
+Any	AttributesView		Qualsiasi
 New	DeskWindow		Nuovo
 Invert	SelectionWindow		Inverti
 Would you like to find some other suitable application?	FSUtils		Vuoi cercare qualche altra applicazione adatta?

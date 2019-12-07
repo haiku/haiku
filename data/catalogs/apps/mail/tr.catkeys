@@ -1,0 +1,169 @@
+1	turkish	x-vnd.Be-MAIL	1477453861
+Set to Saved	Mail		Kaydedilenlere ekle
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ana metniniz %ld kodlanamayan karakter içeriyor. Gönder'e basmak bu iletinizi gönderir, ancak kodlanamayan karakterin yerine bir başkası kullanılır. Bu durumda başka bir karakter seti kullanmayı deneyebilirsiniz. Sorunu çözmeyi denemek için İptal'e tıklayın.
+Text wrapping:	Mail		Metin kaydırma:
+Show icons & labels	Mail		Simgeleri ve etiketleri göster
+(Date unavailable)	Mail		(Tarih mevcut değil)
+Reply	Mail		Yanıtla
+Next message	Mail		Sonraki ileti
+Mailing	Mail		Posta
+Unread	Mail		Okunmamış
+Same sender	Mail		Aynı gönderici
+Copy to new	Mail		Yeni ileti yap
+Save as draft	Mail		Taslak olarak kaydet
+Encoding:	Mail		Kodlama:
+Print	Mail		Yazdır
+Decrease quote level	Mail		Alıntı düzeyini azalt
+Encoding	Mail		Kodlama
+Default account:	Mail		Öntanımlı hesap
+Message	Mail		İleti
+Bcc:	Mail		Gizli:
+New	Mail		Yeni
+Save	Mail		Kaydet
+Undo	Mail		Geri al
+Button bar:	Mail		Düğme çubuğu
+%e wrote:\\n	Mail		%e yazdı:\\n
+Save changes to this signature?	Mail		İmzaya yapılan değişiklikler kaydedilsin mi?
+Save attachment…	Mail		Eki kaydet…
+Paste	Mail		Yapıştır
+E-mail draft could not be saved!	Mail		E-posta taslağı kaydedilemedi!
+Don't send	Mail		Gönderme!
+sent	B_USER_DIRECTORY/mail/sent		gönderildi
+Only files can be added as attachments.	Mail		Yalnızca dosyalar eklenebilir.
+Close	Mail		Kapat
+Untitled	Mail		Adsız
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		İletilmiş postalardan ekleri kaldırma özelliği henüz işlevsel değil.\nŞu an için düzgün çalışmıyor.
+Same recipient	Mail		Aynı alıcı
+Previous message	Mail		Önceki ileti
+(Address unavailable)	Mail		(Adres mevcut değil)
+Mail	System name		Posta
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	İlişik: %name% (Tür: %type%)
+Copy link location	Mail		Bağlantı konumunu kopyala
+Attachments: 	Mail		Ekler: 
+Remove enclosure	Mail		İlişiği kaldır
+Next	Mail		Sonraki
+Attachments:	Mail		Ekler:
+Show icons only	Mail		Yalnızca simgeler
+Subject:	Mail		Konu:
+OK	Mail		Tamam
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
+Quit	Mail		Çık
+Title:	Mail		Başlık:
+Account from mail	Mail		E-posta hesabı
+%e - E-mail address	Mail		%e - E-posta adresi
+Cc:	Mail		Bilgi:
+No matches	Mail		Eşleşme yok
+Queries	Mail		Sorgular
+Cut	Mail		Kes
+Reply to sender	Mail		Göndereni yanıtla
+\\n - Newline	Mail		\\n - Yeni satır
+Copy	Mail		Kopyala
+Add signature	Mail		İmza ekle
+%n - Full name	Mail		%n - Tam ad
+Signature	Mail		İmza
+Use default account	Mail		Öntanımlı hesabı kullan
+draft	B_USER_DIRECTORY/mail/draft		taslak
+Really delete this signature? This cannot be undone.	Mail		İmza silinsin mi? Bu işlem geri alınamaz.
+spam	B_USER_DIRECTORY/mail/spam		istenmeyen
+Reply to all	Mail		Tümünü yanıtla
+Cancel	Mail		İptal
+Off	Mail		Kapalı
+Set to %s	Mail		%s olarak ayarla
+Signature:	Mail		İmza:
+Forward without attachments	Mail		Ekler olmadan ilet
+queries	B_USER_DIRECTORY/mail/queries		sorgular
+View	Mail		Görünüm
+Signatures	Mail		İmzalar
+On	Mail		Açık
+Find	Mail		Bul
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Üzgünüm, 'Kişi' veri türünü destekleyen bir uygulama bulunamadı.
+Date:	Mail		Tarih:
+Expert	Mail		Uzman
+Automatically mark mail as read:	Mail		E-postaları kendiliğinden okundu olarak imle:
+Close and 	Mail		Kapat ve 
+Colored quotes:	Mail		Renkli alıntılar:
+Automatic	Mail		Otomatik
+Open this link	Mail		Bu bağlantıyı aç
+Auto signature:	Mail		Hep eklenecek imza:
+Same subject	Mail		Aynı konu
+Send	Mail		Gönder
+Open draft	Mail		Taslağı aç
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	'Yeni' olarak bırak
+Random	Mail		Rastgele
+Attach attributes:	Mail		Öznitelik ekle:
+Find again	Mail		Yeniden bul
+Size:	Mail		Boyut:
+To:	Mail		Kime:
+Need Tracker to move items to trash	Mail		İzleyici'nin ögeleri çöpe taşıması gerekiyor
+The mail_daemon could not be started:\n\t	Mail		mail_daemon başlatılamadı:\n\t
+<no account found>	Mail		<hesap bulunamadı>
+Mail couldn't find its dictionary.	Mail		Posta, kendi sözlüğünü bulamadı.
+Mail preferences	Mail		Posta tercihleri
+helpful message	Mail		yararlı ileti
+ Read 	Mail		 Oku 
+Font:	Mail		Yazıtipi:
+Accounts…	Mail		Hesaplar…
+Previous	Mail		Önceki
+Include file attributes in attachments	Mail		Eklerde dosya özniteliklerini içer
+Start now	Mail		Şimdi başla
+(Name unavailable)	Mail		(Ad mevcut değil)
+Move to trash	Mail		Çöp'e taşı
+<none>	Mail		<yok>
+%d - Date	Mail		%d - Tarih
+Check spelling	Mail		Yazımı denetle
+Redo	Mail		Yinele
+Leave as '%s'	Mail		'%s' olarak bırak
+Print…	Mail		Yazdır…
+Settings…	Mail		Ayarlar…
+Warn unencodable:	Mail		Kodlanamayanları uyar:
+Trash	Mail		Çöp
+Show raw message	Mail		Ham iletiyi göster
+Find…	Mail		Bul…
+Select all	Mail		Tümünü seç
+Show header	Mail		Başlığı göster
+Reply account:	Mail		Yanıtlama hesabı:
+Sorry	Mail		Üzgünüm
+Forward	Mail		İleri
+Open attachment	Mail		Eki aç
+mail	B_USER_DIRECTORY/mail		posta
+Save this message as a draft before closing?	Mail		Kapatmadan önce bu ileti taslak olarak kaydedilsin mi?
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		mail_daemon şu anda çalışmıyor. İleti gönderme kuyruğuna eklendi ve mail_daemon başladığında gönderilecek.
+None	Mail		Yok
+Resend	Mail		Yeniden gönder
+Hide	Mail		Gizle
+From:	Mail		Kimden:
+No file attributes, just plain data	Mail		Dosya özniteliği yok, yalnızca düz veri
+Add	Mail		Ekle
+out	B_USER_DIRECTORY/mail/out		giden
+Send this message before closing?	Mail		Kapatmadan önce bu ileti gönderilsin mi?
+in	B_USER_DIRECTORY/mail/in		gelen
+Open	Mail		Aç
+Don't save	Mail		Kaydetme!
+Leave same	Mail		Aynı bırak
+An error occurred trying to save the attachment.	Mail		Ek kaydedilirken bir hata oluştu.
+Save address	Mail		Adresi kaydet
+Initial spell check mode:	Mail		Başlangıç yazım denetimi kipi:
+Edit queries…	Mail		Sorguları düzenle…
+There is no installed handler for URL links.	Mail		URL bağlantılarını açacak bir uygulama yüklü değil.
+File	Mail		Dosya
+Reply preamble:	Mail		Yanıt başlangıcı:
+New mail message	Mail		Yeni e-posta
+An error occurred trying to open this signature.	Mail		Bu imza açılırken bir hata oluştu.
+Edit signatures…	Mail		İmzaları düzenle…
+User interface	Mail		Kullanıcı arayüzü
+Inconsistency occurred in the undo/redo buffer.	Mail		Geri al/yinele arabelleğinde bir uyuşmazlık meydana geldi.
+Remove attachment	Mail		Eki kaldır
+Set to…	Mail		Ayarla…
+Edit	Mail		Düzen
+Page setup…	Mail		Sayfa yapısı…
+An error occurred trying to save this signature.	Mail		İmza kaydedilirken bir hata oluştu.
+Beginner	Mail		Yeni başlayan
+Send message	Mail		İletiyi gönder
+Delete	Mail		Sil
+Put your favorite e-mail queries and query templates in this folder.	Mail		Favori e-posta sorgularınızı ve sorgu şablonlarını bu klasöre koyun.
+Spam	Mail		İstenmeyen
+Couldn't open this signature. Sorry.	Mail		Üzgünüm, bu imza açılamadı.
+Revert	Mail		Eski haline döndür
+Unknown	Mail		Bilinmeyen
+Increase quote level	Mail		Alıntı düzeyini arttır
+Add enclosure…	Mail		İlişik ekle…

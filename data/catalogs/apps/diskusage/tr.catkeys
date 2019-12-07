@@ -1,0 +1,23 @@
+1	turkish	x-vnd.Haiku-DiskUsage	2951688400
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%size%/{0, plural, other{# dosya}}
+Scanning %refName%	Scanner		%refName% taranıyor
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d dosya
+Size	Info Window		Boyut
+Rescan	Pie View		Yeniden tara
+Kind	Info Window		Tür
+file unavailable	Pie View		dosya mevcut değil
+no supporting apps	Pie View		destekleyen uygulama yok
+Path	Info Window		Yol
+Scan	Status View		Tara
+Rescan	Status View		Yeniden tara
+file unavailable	Status View		dosya mevcut değil
+Get info	Pie View		Bilgi al
+DiskUsage	System name		Disk Kullanımı
+Created	Info Window		Oluşturulma:
+Modified	Info Window		Değiştirilme:
+Abort	Status View		Durdur
+Open with	Pie View		Birlikte aç
+Open	Pie View		Aç
+{0, plural, one{# file} other{# files}}	Status View		{0, plural, other{# dosya}}
+%a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+Free on %refName%	Scanner		%refName% üzerinde kullanılmayan

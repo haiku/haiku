@@ -1,0 +1,16 @@
+1	turkish	x-vnd.Haiku-TGATranslator	3075011211
+Save with RLE compression	TGAView		RLE sıkıştırması ile kaydet
+Targa image (%d bits truecolor)	TGATranslator		Targa görseli (%d bit gerçek renk)
+Ignore TGA alpha channel	TGAView		TGA alfa kanalını yoksay
+Targa image (%d bits colormap)	TGATranslator		Targa görseli (%d bit renk eşlem)
+TGA image translator	TGAView		TGA görseli çevirmeni
+Targa image (%d bits RLE colormap)	TGATranslator		Targa görseli (%d bit RLE renk eşlem)
+Targa image (%d bits gray)	TGATranslator		Targa görseli (%d bit gri)
+Written by the Haiku Translation Kit Team	TGAView		Haiku Çeviri Kiti Takımı tarafından yazılmıştır
+Targa image (%d bits RLE truecolor)	TGATranslator		Targa görseli (%d bit RLE gerçek renk)
+TGA images	TGATranslator		TGA görselleri
+Version %d.%d.%d, %s	TGAView		Sürüm %d.%d.%d, %s
+TGATranslator Settings	TGATranslator		TGATranslator ayarları
+TGA image translator	TGATranslator		TGA görseli çevirmeni
+Targa image (%d bits RLE gray)	TGATranslator		Targa görseli (%d bit RLE gri)
+TGA Settings	TGAMain		TGA ayarları

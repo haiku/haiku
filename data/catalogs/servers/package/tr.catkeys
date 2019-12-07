@@ -1,0 +1,16 @@
+1	turkish	x-vnd.haiku-package_daemon	1440586681
+Package changes	PackageResult	Window title	Paket değişiklikleri
+uninstall package %s\n	PackageResult	Don't change '%s' variable	%s paketini kaldır\n
+ignore problem for now	PackageProblem		sorunu şimdilik yoksay
+solution %d:	PackageProblem	Don't change the %d variable	çözüm %d:
+The following problems have been encountered. Please select a solution for each:	PackageProblem		Aşağıdaki sorunlar oluştu. Lütfen her sorun için bir çözüm seçin:
+Apply changes	PackageResult		Değişiklikleri uygula
+Package daemon	PackageManager		Paket hizmeti
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	%s paketini %s deposundan yükle\n
+The following additional package changes have to be made:	PackageResult		Aşağıdaki ek paket değişikliklerinin yapılması gerekiyor:
+Warning	PackageManager		Uyarı
+Cancel	PackageProblem		İptal
+don't activate package %source%	PackageProblem	don't change '%source%	%source% paketini etkinleştirme!
+Cancel	PackageResult		İptal
+Retry	PackageProblem		Yeniden dene
+Package problems	PackageProblem	Window title	Paket sorunları

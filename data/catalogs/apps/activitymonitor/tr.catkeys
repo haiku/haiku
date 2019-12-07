@@ -1,0 +1,47 @@
+1	turkish	x-vnd.Haiku-ActivityMonitor	1155619009
+P-faults	DataSource		Olasılık hataları
+Media nodes	DataSource		Ortam uçları
+Threads	DataSource		İş parçacıkları
+Always on top	ActivityWindow		Her zaman üstte
+Add graph	ActivityWindow		Grafik ekle
+Teams	DataSource		Takımlar
+MiB	DataSource		MiB
+Network send	DataSource		Ağ göndermeleri
+CPU usage (combined)	DataSource		CPU kullanımı (birleştirilmiş)
+CPU	DataSource		CPU
+Used memory	DataSource		Kullanılan bellek
+Cached memory	DataSource		Önbellekteki dosya
+Apps	DataSource		Uygulamalar
+Show legend	ActivityView		Göstergeleri aç
+Text clipboard	DataSource		Metin panosu
+Settings	ActivityWindow		Ayarlar
+Receiving	DataSource		Alınıyor
+Settings…	ActivityWindow		Ayarlar…
+Ports	DataSource		Portlar
+Page faults	DataSource		Sayfa hataları
+Sending	DataSource		Gönderiliyor
+Cache	DataSource		Önbellek
+%.1f faults/s	DataSource		%.1f hata/s
+Update time interval:	SettingsWindow		Yenileme aralığı:
+TX	DataSource	Shorter version for Sending	TX
+Quit	ActivityWindow		Çık
+Block cache memory	DataSource		Blok önbellek dosyası
+Remove graph	ActivityView		Grafiği kaldır
+%lld sec.	SettingsWindow		%lld san.
+%lld ms	SettingsWindow		%lld ms
+CPU usage	DataSource		CPU kullanımı
+Raw clipboard	DataSource		Ham pano
+Sems	DataSource		Semler
+%.1f MiB	DataSource		%.1f MiB
+ActivityMonitor	System name		Etkinlik Monitörü
+Running applications	DataSource		Çalışan uygulamalar
+Semaphores	DataSource		Semaforlar
+Block cache	DataSource		Blok önbelleği
+Swap space	DataSource		Takas alanı
+Swap	DataSource		Takas
+File	ActivityWindow		Dosya
+usage	DataSource		kullanım
+Additional items	ActivityView		Ek ögeler
+Network receive	DataSource		Ağ gelen trafik
+Memory	DataSource		Bellek
+RX	DataSource	Shorter version for Receiving.	RX

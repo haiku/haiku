@@ -1,0 +1,173 @@
+1	turkish	x-vnd.Haiku-FileTypes	436017301
+Left	Attribute Window	Attribute column alignment in Tracker	Sol
+Float	Attribute ListView		Kayan
+Final	Application Types Window		Final
+FileTypes request	FileTypes Window		Dosya Türleri isteği
+This file type already exists	New File Type Window		Bu dosya türü hâlihazırda mevcut
+Preferred application	FileTypes Window		Tercih edilen uygulama
+Launch	Application Types Window		Çalıştır
+Removing uninstalled application types	Application Types Window		Silinmiş uygulama türleri kaldırılıyor
+Width:	Attribute Window	Default column width in Tracker for this attribute.	Genişlik:
+Same as…	FileType Window	The same TYPE as ...	Aynısı…
+(from super type)	FileTypes Window		(üst türden)
+Select same preferred application as	FileTypes Window		Şununla aynı tercih edilen uygulamayı seç
+Could not change attributes	Attribute Window		Öznitelikler değiştirilemedi
+Icon	FileTypes Window		Simge
+Add…	Application Type Window		Ekle…
+Attribute name:	Attribute Window		Öznitelik adı:
+Long description:	Application Type Window		Uzun açıklama:
+Cancel	Preferred App Menu		İptal
+Remove	FileTypes Window		Kaldır
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		\"%s\" uygulaması bu dosya türünü desteklemiyor.\nYine de ayarlamak istiyor musunuz?
+Remove	Application Type Window		Kaldır
+Gamma	Application Type Window		Gama
+Cancel	Application Type Window		İptal
+Attribute	Attribute Window		Öznitelik
+Multiple launch	Application Type Window		Çoklu çalıştırma
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, other{# uygulama türü kaldırılabilir}}
+Edit…	Application Types Window		Düzenle…
+Could not set preferred application	FileTypes Window		Tercih edilen uygulama ayarlanamadı
+Description	FileTypes Window		Açıklama
+Signature:	Application Types Window		İmza:
+None	FileTypes Window		Yok
+Exclusive launch	Application Type Window		Özel çalıştır
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Dosya türü kaldırma geri alınamaz.\nKaldırmak istediğinizden emin misiniz?
+Integer 64 bit	Attribute ListView		64 bit tamsayı
+Cancel	New File Type Window		İptal
+Select same preferred application as	FileType Window		Aynı tercih edilen uygulamayı seç
+Cancel	Type List Window		İptal
+Don't save	Application Type Window		Kaydetme!
+Center	Attribute Window	Attribute column alignment in Tracker	Merkez
+Done	Extension Window		Tamamlandı
+Development	Application Types Window		Geliştirme
+Same as…	FileType Window	The same APPLICATION as ...	Aynısı…
+Abort	Application Types Window		İptal et
+Save	Application Type Window		Kaydet
+%1 application type	Application Type Window		%1 uygulama türü
+Icon	Application Type Window		Simge
+Duration	Attribute ListView		Uzunluk
+Version:	Application Type Window		Sürüm:
+Default application	FileType Window		Öntanımlı uygulama
+Internal name:	New File Type Window		İç ad:
+Integer 8 bit	Attribute ListView		8 bit tamsayı
+Extension:	Extension Window		Genişletme:
+Time	Attribute ListView		Zaman
+Extensions:	FileTypes Window		Genişletmeler:
+Select preferred application	FileType Window		Tercih edilen uygulamayı seç
+Description:	FileTypes Window		Açıklama:
+Multiple files from \"%s\" file type	FileType Window		\"%s\" dosya türünden birden çok dosya
+Add new group	New File Type Window		Yeni grup ekle
+Remove uninstalled	Application Types Window		Silinenleri kaldır
+File	Application Type Window		Dosya
+Progress	Application Types Window		İlerleme
+Select…	FileType Window		Seç…
+Information	Application Types Window		Bilgi
+Settings	FileTypes Window		Ayarlar
+Done	Attribute Window		Tamamlandı
+FileTypes request	FileTypes		Dosya Türleri isteği
+Select same type as	FileType Window		Şununla aynı türü seç
+Version:	Application Types Window		Sürüm:
+(from application)	FileTypes Window		(uygulamadan)
+Application types	Application Types Window		Uygulama türleri
+Description:	Application Types Window		Açıklama:
+Name:	Application Types Window		Ad:
+Rating	Attribute ListView		Derecelendirme
+duration	Attribute ListView		uzunluk
+File could not be opened	Preferred App Menu		Dosya açılamadı
+Args only	Application Type Window		Yalnızca değişkenler
+Could not open \"%s\":\n%s	FileTypes		\"%s\" açılamadı:\n%s
+Right	Attribute Window	Attribute column alignment in Tracker	Sağ
+Save changes before closing?	Application Type Window		Kapatmadan önce değişiklikler kaydedilsin mi?
+Background app	Application Type Window		Arkaplan uygulaması
+Recognition rule is not valid:\n\n	FileTypes Window		Tanımlanma kuralı geçerli değil\n\n
+Show icons in list	FileTypes Window		Listede simgeleri göster
+Editable	Attribute Window	If Tracker allows to edit this attribute.	Düzenlenebilir
+New resource file…	FileTypes Window		Yeni kaynak dosyası…
+[Multiple files] file types	FileType Window		[Birden çok dosya] dosya türleri
+Application type	Application Type Window		Uygulama türü
+Show in Tracker…	Application Types Window		İzleyici'de göster…
+Type name:	FileTypes Window		Tür adı:
+Visible	Attribute Window		Görünür
+Select preferred application	FileTypes Window		Tercih edilen uygulamayı seç
+Path:	Application Types Window		Yol:
+rating	Attribute ListView		derecelendirme
+Could not install file type	New File Type Window		Dosya türü yüklenemedi
+Same as…	FileTypes Window		Şununla aynı…
+Golden master	Application Type Window		Altın kopya
+Checkbox	Attribute ListView		Denetim kutusu
+FileTypes request	Preferred App Menu		Dosya Türleri isteği
+no icon	FileTypes Window		simge yok
+Single launch	Application Type Window		Tekil çalıştır
+%s file type	FileType Window		%s dosya türü
+Default	Attribute ListView		Öntanımlı
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Bir süper türü kaldırma işlemi geri alınamaz.\nBu süper türe ait olan tüm dosya türleri silinecek!\n\nBunu yapmak istediğinizden emin misiniz? Tüm grubu kaldırmak için Shift düğmesine basılı tutun ve \"Kaldır\"ı tıklayın.
+String	Attribute ListView		Dizi
+Add type	New File Type Window		Tür ekle
+Remove icon	Icon View		Simgeyi kaldır
+Boolean	Attribute ListView		Boolean
+Cancel	Extension Window		İptal
+Alignment:	Attribute Window		Hizalama
+Icon	FileType Window		Simge
+Signature:	Application Type Window		İmza:
+Development	Application Type Window		Geliştirme
+Golden master	Application Types Window		Altın kopya
+Add	Extension Window		Ekle
+Open…	FileTypes Window		Aç…
+checkbox	Attribute ListView		denetim kutusu
+Could not change file extensions	Extension Window		Dosya türleri değiştirilemedi
+Could not open file	FileType Window		Dosya açılamadı
+Choose type	Type List Window		Tür seç
+Select…	FileTypes Window		Seç…
+File recognition	FileTypes Window		Dosya tanımlanması
+Application types…	FileTypes Window		Uygulama türleri…
+Add icon…	Icon View		Simge ekle…
+Cancel	FileTypes Window		İptal
+Save into resource file…	Application Type Window		Kaynak dosyasına kaydet…
+Special:	Attribute Window		Özel:
+Type:	Attribute Window		Tür:
+Could not retrieve application signature	Preferred App Menu		Uygulama imzası bulunup getirilemedi
+Beta	Application Types Window		Beta
+Add group	New File Type Window		Grup ekle
+Cancel	Attribute Window		İptal
+Gamma	Application Types Window		Gama
+Supported types	Application Type Window		Desteklenen türler
+Integer 32 bit	Attribute ListView		32 bit tamsayı
+Beta	Application Type Window		Beta
+Could not retrieve preferred application of this file	Preferred App Menu		Bu dosyanın tercih ettiği uygulama bulunup getirilemedi
+Application flags	Application Type Window		Uygulama bayrakları
+OK	FileTypes		Tamam
+Group name:	New File Type Window		Grup adı:
+Move up	FileTypes Window		Yukarı taşı
+File	FileTypes Window		Dosya
+Add	Attribute Window		Ekle
+Open file	FileTypes		Dosya aç
+Version info	Application Type Window		Sürüm bilgisi
+Final	Application Type Window		Final
+Preferred application	FileType Window		Tercih edilen uygulama
+FileTypes	FileTypes		Dosya Türleri
+Set preferred application	Preferred App Menu		Tercih edilen uygulamayı ayarla
+New file type	New File Type Window		Yeni dosya türü
+Short description:	Application Type Window		Kısa açıklama:
+Save request	Application Type Window		Kaydetme isteği
+Could not remove file type: %s\n	FileTypes Window		Dosya türü kaldırılamadı: %s\n
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	Şöyle göster:
+Done	Type List Window		Tamamlandı
+Extra attributes	FileTypes Window		Ek öznitelikler
+Group:	New File Type Window		Grup:
+Alpha	Application Types Window		Alfa
+Close	Application Type Window		Kapat
+Integer 16 bit	Attribute ListView		16 bit tamsayı
+Extension	Extension Window		Genişletme
+Rule:	FileTypes Window		Kural:
+FileTypes	System name		Dosya Türleri
+Version	Application Types Window		Sürüm
+Quit	FileTypes Window		Çık
+File type	FileType Window		Dosya türü
+Internal name:	FileTypes Window		İç ad:
+Add…	FileTypes Window		Ekle…
+Edit icon…	Icon View		Simgeyi düzenle…
+Internal name:	Attribute Window		İç ad:
+Show recognition rule	FileTypes Window		Tanımlama kuralını göster
+Double	Attribute ListView		Çift
+Move down	FileTypes Window		Aşağı taşı
+Alpha	Application Type Window		Alfa

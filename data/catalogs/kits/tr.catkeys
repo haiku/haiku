@@ -1,0 +1,42 @@
+1	turkish	x-vnd.Haiku-libbe	3337473349
+{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, other{# bayt}}
+All Rights Reserved.	AboutWindow		Tüm hakları saklıdır.
+gold master	AboutWindow		altın kopya
+Undo	TextView		Geri al
+gamma	AboutWindow		gama
+development	AboutWindow		geliştirme
+OK	Dragger		Tamam
+OK	PrintJob		Tamam
+Print Server is not responding.	PrintJob		Yazdırma sunucusu yanıt vermiyor.
+About %app%	AboutMenuItem		%app% hakkında
+Warning	Dragger		Uyarı
+Green:	ColorControl		Yeşil:
+Redo	TextView		Yinele
+No pages to print!	PrintJob		Yazdırılacak bir sayfa yok!
+beta	AboutWindow		beta
+OK	ZombieReplicantView		Tamam
+Cut	TextView		Kes
+%3.2f GiB	StringForSize		%3.2f GiB
+Can't delete this replicant from its original application. Life goes on.	Dragger		Bu yinelenmiş kendi özgün uygulamasından silinemiyor.
+Error	ZombieReplicantView		Hata
+Paste	TextView		Yapıştır
+OK	AboutWindow		Tamam
+Special Thanks:	AboutWindow		Özel teşekkürlerimizle:
+%.2f TiB	StringForSize		%.2f TiB
+Remove replicant	Dragger		Yinelenmişi kaldır
+Version	AboutWindow		Sürüm
+Red:	ColorControl		Kırmızı:
+<empty>	Menu		<boş>
+Copy	TextView		Kopyala
+Select all	TextView		Tümünü seç
+alpha	AboutWindow		alfa
+%3.2f MiB	StringForSize		%3.2f MiB
+Error	PrintJob		Hata
+About %app%	AboutWindow		%app% hakkında
+About %app…	Dragger		%app hakkında…
+Version history:	AboutWindow		Sürüm geçmişi:
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Yinelenmiş uygulaması konumu bulunamıyor. Hiçbir uygulama imzası sağlanmamış.\n%error
+%3.2f KiB	StringForSize		%3.2f KiB
+Blue:	ColorControl		Mavi:
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		\"%description\" için yinelenmiş oluşturulamıyor.\n%error
+Written by:	AboutWindow		Yazan:

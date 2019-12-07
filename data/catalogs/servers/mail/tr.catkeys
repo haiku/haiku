@@ -1,0 +1,19 @@
+1	turkish	x-vnd.Be-POST	2949558073
+No new messages	MailDaemon		Yeni ileti yok
+No new messages	DeskbarView		Yeni ileti yok
+Shutdown mail services	DeskbarView		E-posta servislerini kapat
+Mail status	MailDaemon		E-posta durumu
+Fetching mail for %name	Notifier		%name için e-postalar alınıyor
+{0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, other{# yeni ileti}}
+{0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		%name için {0, plural, other{# yeni ileti}}\n
+Create new message…	DeskbarView		Yeni ileti oluştur...
+Send pending mails	DeskbarView		Bekleyen e-postaları gönder
+Settings…	DeskbarView		Ayarlar...
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Bir yeni ileti} other{# yeni ileti}}
+New Messages	MailDaemon		Yeni iletiler
+<no accounts>	DeskbarView		<hesap yok>
+Mail status	Notifier		E-posta durumu
+Check for mails only	DeskbarView		Yalnızca e-postaları denetle
+Check for mail now	DeskbarView		E-postaları şimdi denetle
+Sending mail for %name	Notifier		%name için e-posta gönderiliyor
+Mail daemon status log	MailDaemon		E-posta hizmeti durum günlüğü

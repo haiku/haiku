@@ -1,0 +1,523 @@
+1	turkish	x-vnd.Haiku-libtracker	124641333
+Created	ContainerWindow		Oluşturulma
+Icon	AttributesView		Simge
+Open and make preferred	OpenWithWindow		Aç ve tercih edilen yap
+Kind	ContainerWindow		Tür
+Open with…	ContainerWindow		Birlikte aç…
+Error moving \"%name\" to Trash. (%error)	FSUtils		\"%name\" Çöp'e taşınırken hata (%error)
+Or	FindPanel		veya
+before	FindPanel		önce
+Volume icons	TrackerSettingsWindow		Ses düzeyi simgeleri
+Ignore case	SelectionWindow		BÜYÜK/küçük harf yoksay
+Current folder	ContainerWindow		Şu anki klasör
+Finish: %time - Over %finishtime left	StatusWindow		Bitiş: %time - Yaklaşık %finishtime kaldı
+Mount all disks now	AutoMounterSettings		Tüm diskleri şimdi bağla
+Location:	InfoWindow		Konum:
+Name	PoseView		Ad
+Kind:	InfoWindow		Tür:
+{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, other{# bayt}}
+contains	FindPanel		içerir:
+32 x 32	ContainerWindow		32 x 32
+Open	FilePanelPriv		Aç
+Bitmap icon	AttributesView		Biteşlem simge
+You can't replace a folder with one of its sub-folders.	FSUtils		Bir klasörü kendi alt klasörlerinden biriyle değiştiremezsiniz.
+<%ld dates>	AttributesView		<%ld tarih>
+Name	Default Query Columns		Ad
+Unmount	ContainerWindow		Bağlantıyı kes
+Eject when unmounting	AutoMounterSettings		Bağlantıyı keserken çıkart
+Searching for disks to mount…	StatusWindow		Bağlanacak diskler aranıyor…
+Value	AttributesView		Değer
+Information	InfoWindow		Bilgi
+Error emptying Trash	FSUtils		Çöp boşaltılırken hata
+Opens with:	InfoWindow		Şununla açılır:
+Size	QueryPoseView		Boyut
+128 x 128	ContainerWindow		128 x 128
+Disk mount	TrackerSettingsWindow		Disk bağlama
+Type	AttributesView		Tür
+Prompt	FSUtils		İstem
+Error in regular expression:\n\n'%errstring'	PoseView		Düzenli ifadede hata:\n\n'%errstring'
+Small bitmap icon	AttributesView		Küçük biteşlem simge
+Would you like to find a suitable application to open the file?	FSUtils		Bu dosyayı açmak için uygun bir uygulama bulmak ister misiniz?
+64 x 64	ContainerWindow		64 x 64
+You cannot replace a folder or a symbolic link with a file.	FSUtils		Bir klasörü veya sembolik bağlantıyı bir dosya ile değiştiremezsiniz.
+Trailing \\.	libtracker		İzleyen \\.
+At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		%func işlevinde \nfind_directory() başarısız oldu. \nSebep: %error
+Handles any file	OpenWithWindow		Her tür dosyayı işler
+save text	FilePanelPriv		metni kaydet
+Raw data	AttributesView		Ham veri
+Preparing to move items…	StatusWindow		Ögeler taşınmaya hazırlanıyor…
+Size	ContainerWindow		Boyut
+Select…	ContainerWindow		Seç…
+Show shared volumes on Desktop	SettingsView		Paylaşılan diskleri Masaüstü'nde göster
+<%ld values>	AttributesView		<%ld değer>
+Size	PoseView		Boyut
+matches wildcard expression	SelectionWindow		joker ifadesi ile eşleşiyor
+96 x 96	ContainerWindow		96 x 96
+Title	Bookmark Query Columns		Başlık
+Identify	ContainerWindow		Tanımla
+You can't move or copy items to read-only volumes.	FSUtils		Ögeler saltokunur disklere kopyalanamaz veya taşınamaz.
+Create link	ContainerWindow		Bağlantı oluştur
+starts with	FindPanel		ile başlar
+Replace	FSUtils		Değiştir
+?+* follows nothing.	libtracker		?+* hiçbir şeyi izlemiyor.
+Rectangle	AttributesView		Dikdörtgen
+Move to	ContainerWindow		Taşı
+Status	Email Query Columns		Durum
+New folder	FSUtils		Yeni klasör
+Junk on end.	libtracker		Sonda çöp
+New Query	FindPanel		Yeni sorgu
+system	B_SYSTEM_DIRECTORY		sistem
+Preparing to delete items…	StatusWindow		Ögeler silinmeye hazırlanıyor…
+Open %name with:	OpenWithWindow		%name ögesini şununla aç:
+\"%name\" is an unsupported executable.	FSUtils		\"%name\" desteklenmeyen bir çalıştırılabilir türü
+You cannot copy or move the root directory.	FSUtils		Kök dizine kopyalama veya taşıma yapılamaz.
+Plain text	AttributesView		Düz metin
+Capacity:	InfoWindow		Kapasite:
+File	ContainerWindow		Dosya
+Relation	OpenWithWindow		İlişki
+Moving: 	StatusWindow		Taşınıyor: 
+Select	SelectionWindow		Seç
+Select	InfoWindow		Seç
+OK	OpenWithWindow		Tamam
+Include trash	FindPanel		Çöp'ü içer
+GiB	WidgetAttributeText		GiB
+Clean up	ContainerWindow		Temizle
+Modified	FindPanel		Değiştirilme
+Select all	QueryContainerWindow		Tümünü seç
+Select…	FilePanelPriv		Seç…
+preferences	B_PREFERENCES_DIRECTORY		tercihler
+Name	Person Query Columns		Ad
+Skip all	FSUtils		Tümünü atla
+Corrupted opcode.	libtracker		Hasar görmüş işlem kodu.
+Atom	AttributesView		Atom
+%SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed/%TotalSize, %BytesPerSecond/s
+Preparing to restore items…	StatusWindow		Ögeler eski haline getirilmeye hazırlanıyor…
+Mount	ContainerWindow		Bağla
+Desktop	B_DESKTOP_DIRECTORY		Masaüstü
+Corrupted pointers.	libtracker		Hasar görmüş işaretçiler.
+Link to:	InfoWindow		Şuraya bağla:
+Copy here	ContainerWindow		Buraya kopyala
+Character	AttributesView		Karakter
+All disks	FindPanel		Tüm diskler
+Affine transform	AttributesView		Afin dönüşüm
+Window	ContainerWindow		Pencere
+%BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
+Remove	FindPanel		Kaldır
+Company	Person Query Columns		Şirket
+Recent documents	FavoritesMenu		Son belgeler
+Save as Query template:	FindPanel		Sorgu şablonu olarak kaydet:
+Edit templates…	TemplatesMenu		Şablonları düzenle…
+{0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, other{# bayt}}
+8-bit integer	AttributesView		8 bit tamsayı
+8-bit unsigned integer	AttributesView		8 bit imzalanmamış tamsayı
+%capacity (%used used -- %free free)	InfoWindow		%capacity (%used kullanılıyor -- %free kullanılmayan)
+Hide dotfiles	SettingsView		Nokta ile başlayan dosyaları gizle
+Trash	Model		Çöp
+Enable type-ahead filtering	SettingsView		Otomatik tamamlayan süzgeçlemeyi etkinleştir
+copy	FSUtils	filename copy	kopyala
+New folder%ld	FSUtils		Yeni klasör%ld
+Location	OpenWithWindow		Konum
+%Ld B	WidgetAttributeText		%Ld B
+Resize to fit	QueryContainerWindow		Sığacak biçimde boyutlandır
+List folders first	SettingsView		Klasörleri ilk listele
+Find	FSUtils		Bul
+An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Bu klasörde \"%name\" adında bir öge hâlihazırda mevcut. Bu ögeyi oluşturduğunuz sembolik bağlantı ile değiştirmek istediğinizden emin misiniz?
+List view	ContainerWindow		Liste görünümü
+Temporary	FindPanel		Geçici
+Modified	QueryPoseView		Değiştirilme
+Create relative link	ContainerWindow		Göreceli bağlantı oluştur
+Owner	FilePermissionsView		Sahibi
+Cancel	FSClipBoard		İptal
+Modified	PoseView		Değiştirilme
+Move to Trash	ContainerWindow		Çöp'e taşı
+All files and folders	FindPanel		Tüm dosyalar ve klasörler
+Add-ons	ContainerWindow		Eklentiler
+Too many parenthesis.	libtracker		Çok fazla parantez.
+Increase size	ContainerWindow		Boyutu arttır
+\nShould this be fixed?	FSUtils		\nBu düzeltilsin mi?
+URL	Bookmark Query Columns		URL
+Move	PoseView		Taşı
+Floating point number	AttributesView		Kayan noktalı değer
+Cancel	ContainerWindow		İptal
+Attributes	ContainerWindow		Öznitelikler
+Error deleting items	FSUtils		Ögeler silinirken hata
+Cut	ContainerWindow		Kes
+Disks	Model		Diskler
+Create a Query template	FindPanel		Bir sorgu şablonu oluştur
+Size	FindPanel		Boyut
+Window	FilePanelPriv		Pencere
+Replace other file	WidgetAttributeText		Diğer dosyayı değiştir
+OK	Email Query Columns		Tamam
+Location	QueryPoseView		Konum
+Edit query	ContainerWindow		Sorguyu düzenle
+{0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, other{(# bayt)}}
+Previously mounted disks	AutoMounterSettings		Daha önceden bağlanan diskler
+You cannot replace a file with a folder or a symbolic link.	FSUtils		Bir dosyayı bir klasör veya sembolik bağlantı ile değiştiremezsiniz.
+The target disk does not support creating links.	FSUtils		Hedef disk bağlantı oluşturmayı desteklemiyor.
+develop	B_SYSTEM_DEVELOP_DIRECTORY		geliştirme
+64-bit integer	AttributesView		64 bit tamsayı
+Cut more	ContainerWindow		Daha fazla kes
+The Tracker must be running to see Info windows.	PoseView		Bilgi pencerelerini görüntüleyebilmek için İzleyici çalışıyor olmalıdır.
+Tracker preferences	TrackerSettingsWindow		İzleyici tercihleri
+Read	FilePermissionsView		Okuma
+There was an error writing the attribute.	WidgetAttributeText		Öznitelik yazılırken bir hata oluştu.
+Path	Default Query Columns		Yol
+If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		%target% ögesini yeniden adlandırırsanız %osName düzgün çalışmayabilir.\n\nBunu yapmak istediğinizden emin misiniz?
+Could not open \"%name\" (%error). 	FSUtils		\"%name\" açılamadı (%error). 
+Media parameter group	AttributesView		Ortam parametreleri grubu
+%name info	InfoWindow	InfoWindow Title	%name bilgisi
+If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Ev klasörünü taşırsanız %osName düzgün çalışmayabilir!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de taşımak istiyorsanız Shift düğmesini basılı tutun ve \"Taşı\"ya basın.
+Property info	AttributesView		Özellik bilgisi
+Sorry, you can't create links in the Trash.	PoseView		Üzgünüm, Çöp içinde bağlantılar oluşturamazsınız.
+From	Email Query Columns		Şuradan
+Invert selection	QueryContainerWindow		Seçimi tersine çevir
+Open selection with:	OpenWithWindow		Seçimi şununla aç:
+Preferences…	ContainerWindow		Tercihler…
+Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		\"%document\" açılamadı çünkü \"%app\" uygulaması Çöp'te. 
+Work Phone	Person Query Columns		İş telefonu
+Close	ContainerWindow		Kapat
+Get info	ContainerWindow		Bilgi al
+MIME Type	AttributesView		MIME türü
+Show folder location in title tab	SettingsView		Başlık sekmesinde klasör konumunu göster
+There was an error resolving the link.	Tracker		Bağlantı çözülürken hata oluştu.
+There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Belirttiğiniz klasör içinde kaydetmek isterken bir sorun oluştu. Lütfen başka bir tane deneyin.
+Desktop	TrackerSettingsWindow		Masaüstü
+Nested *?+.	libtracker		İç içe geçmiş *?+.
+Move	FSUtils	button label	Taşı
+Clean up	DeskWindow		Temizle
+Group	FilePermissionsView		Grup
+Could not find an application to open \"%name\" (%error). 	FSUtils		\"%name\" ögesini açabilecek bir uygulama bulunamadı (%error). 
+Internal error.	libtracker		İç hata.
+Mini icon view	DeskWindow		Ufak simge görünümü
+Geometric size	AttributesView		Geometrik boyut
+contains	SelectionWindow		içerir
+Replace	FilePanelPriv		Değiştir
+is not	FindPanel		değil
+Icon view	DeskWindow		Simge görünümü
+<%ld rectangles>	AttributesView		<%ld dikdörtgen>
+Mount settings…	ContainerWindow		Bağlama ayarları…
+Keywords	Bookmark Query Columns		Anahtar sözcükler
+Media parameter web	AttributesView		Ortam parametre ağı
+Copy more	ContainerWindow		Daha fazla kopyala
+by name	FindPanel		ad ile
+Sorry, you can't save things at the root of your system.	FilePanelPriv		Üzgünüm, sistem kök dizinine dosya kaydedilemez.
+Restore	ContainerWindow		Eski haline döndür
+Location	ContainerWindow		Konum
+Warning space color	SettingsView		Uyarı boşluk rengi
+Skip	FSUtils		Atla
+Text list	AttributesView		Metin listesi
+Used space color	SettingsView		Kullanılmış alan rengi
+Cancel	FSUtils		İptal
+Original name	ContainerWindow		Orijinal adı
+Unknown	WidgetAttributeText		Bilinmeyen
+32-bit integer	AttributesView		32 bit tamsayı
+The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Belirtilen ad hâlihazırda bir klasör adı olarak kullanılıyor. Lütfen başka bir ad seçin.
+48 x 48	ContainerWindow		48 x 48
+Modified	ContainerWindow		Değiştirilme
+Mini icon view	ContainerWindow		Ufak simge görünümü
+File	FilePanelPriv		Dosya
+Search	FindPanel		Ara
+Modified:	InfoWindow		Değiştirilme:
+Cancel	FilePanelPriv		İptal
+Sorry, you cannot edit that attribute.	WidgetAttributeText		Üzgünüm, bu öznitelik düzenlenemez.
+Memory pointer	AttributesView		Bellek işaretçisi
+Cancel	OpenWithWindow		İptal
+Select…	DeskWindow		Seç…
+Files cannot be moved or deleted from a read-only volume.	PoseView		Dosyalar saltokunur bir diskten taşınamaz veya silinemez.
+Edit name	FilePanelPriv		Adı düzenle
+There was an error deleting \"%name\":\n\t%error	FSUtils		\%name\" silinirken hata:\n\t%error
+Resize to fit	ContainerWindow		Sığacak biçimde boyutlandır
+Link \"%name\" to:	InfoWindow	File dialog title for new sym link	\"%name\" ögesini şuraya bağla:
+Mount server error	AutoMounterSettings		Bağlama sunucusu hatası
+If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		Ev klasörünün adını değiştirirseniz %osName düzgün çalışmayabilir!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de değiştirmek istiyorsanız Shift düğmesini basılı tutun ve \"Yeniden adlandır\"a basın.
+Boolean	AttributesView		Boolean
+Invert selection	FilePanelPriv		Seçimi tersine çevir
+Memory size	AttributesView		Bellek boyutu
+TiB	WidgetAttributeText		TiB
+New folder	TemplatesMenu		Yeni klasör
+ (broken)	InfoWindow		 (çalışmıyor)
+Replace all	FSUtils		Tümünü değiştir
+The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		\"%appname\" uygulaması açmak istediğiniz belge türünü desteklemiyor.\nSürdürmek istediğinizden emin misiniz?\n\nUygulamanın bu dosyayı açtığını biliyorsanız, uygulama geliştiricisi ile iletişime geçip uygulamalarının bu dosya türünü desteklediğini belirtecek biçimde güncellemesi gerektiğini iletin.
+Reverse order	ContainerWindow		Ters sıra
+Copying: 	StatusWindow		Kopyalanıyor: 
+Show navigator	SettingsView		Navigatörü göster
+Select all	DeskWindow		Tümünü seç
+Double-precision floating point number	AttributesView		Çifte keskinlikli kayan noktalı sayı
+Decrease size	ContainerWindow		Boyutu düşür
+Recent queries	FindPanel		Son sorgular
+Mount all	MountMenu		Tümünü bağla
+128 x 128	DeskWindow		128 x 128
+Size	Default Query Columns		Boyut
+Favorites	FavoritesMenu		Favoriler
+Delete	FilePanelPriv		Sil
+<No recent items>	FavoritesMenu		<Son kullanılan yok>
+Formula %formula	FindPanel	FindResultTitle	%formula formülü
+Preparing to create links…	StatusWindow		Bağlantılar oluşturulmaya hazırlanıyor…
+Tracker status	StatusWindow		İzleyici durumu
+Handles any %type	OpenWithWindow		Her tür %type işler
+The mount server could not be contacted.	AutoMounterSettings		Bağlama sunucusu ile iletişim kurulamadı.
+Query template	FindPanel		Sorgu şablonu
+ends with	SelectionWindow		ile biter
+Open	OpenWithWindow		Aç
+You must have at least one attribute showing.	PoseView		En azından bir öznitelik görünür olmalı.
+Cut	FilePanelPriv		Kes
+Favorites	FilePanelPriv		Favoriler
+Point	AttributesView		Nokta
+home	B_USER_DIRECTORY		ev
+Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		İzleyici Yeni şablonlar
+Disk mounting during boot	AutoMounterSettings		Disk önyükleme sırasında bağlanıyor
+Don't automount	AutoMounterSettings		Kendiliğinden bağlama
+Could not find application \"%appname\"	OpenWithWindow		\"%appname\" uygulaması bulunamıyor
+Unmatched parenthesis.	libtracker		Eşleşmeyen parantezler.
+Extended attribute	AttributesView		Genişletilmiş öznitelik
+Unmatched brackets.	libtracker		Eşleşmeyen köşeli parantezler.
+Error %error loading Add-On %name.	ContainerWindow		%name eklentisi yüklenirken %error hatası
+You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		\t%name%dest\nögesini şununla değiştirmeye çalışıyorsunuz:\n\t%name%src\n\nBu ögeyi %movemode ögeyle değiştirmek istediğinizden emin misiniz?
+Empty Trash	ContainerWindow		Çöp'ü boşalt
+no supporting apps	OpenWithWindow		destekleyen uygulama yok
+32-bit unsigned integer	AttributesView		32 bit imzalanmamış tamsayı
+Preparing to empty Trash…	StatusWindow		Çöp'ü boşaltmaya hazırlanıyor…
+Deleting: 	StatusWindow		Siliniyor: 
+the MIME settings	FSUtils		MIME ayarları
+You can't move or copy the trash.	FSUtils		Çöp kopyalanamaz veya taşınamaz.
+label too long	PoseView		etiket çok uzun
+Error creating link to \"%name\".	FSUtils		\"%name\" ögesine bağlantı yaratılırken hata.
+Unknown	FilePermissionsView		Bilinmeyen
+Paste links	ContainerWindow		Bağlantıları yapıştır
+Restoring: 	StatusWindow		Eski haline getiriliyor: 
+calculating…	InfoWindow		hesaplanıyor…
+Preferred for file	OpenWithWindow		Dosya için tercih edilen
+OK	AutoMounterSettings		Tamam
+copying	FSUtils		kopyaladığınız
+Get info	FilePanelPriv		Bilgi al
+MIME String	AttributesView		MIME dizisi
+Delete	ContainerWindow		Sil
+Execute	FilePermissionsView		Çalıştırma
+Show volumes on Desktop	SettingsView		Diskleri Masaüstü'nde göster
+no	AttributesView		hayır
+Recent folders	ContainerWindow		Son klasörler
+Desktop	Model		Masaüstü
+Select all	ContainerWindow		Tümünü seç
+apps	B_APPS_DIRECTORY		uygulamalar
+Error calculating folder size.	InfoWindow		Klasör boyutu hesaplanırken hata.
+MiB	WidgetAttributeText		MB
+Delete	FSUtils		Sil
+Edit name	ContainerWindow		Adı düzenle
+Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" açılamıyor (Eksik sembol: %symbol).\n
+ASCII Text	AttributesView		ASCII metin
+More options	FindPanel		Daha fazla seçenek
+Atom reference	AttributesView		Atom başvurusu
+config	B_USER_CONFIG_DIRECTORY		yapılandırma
+Error moving \"%name\".	FSUtils		\"%name\" taşınırken hata.
+Select…	QueryContainerWindow		Seç…
+Open	ContainerWindow		Aç
+Settings…	MountMenu		Ayarlar…
+You cannot put the selected item(s) into the trash.	FSUtils		Seçili ögeyi/ögeleri Çöp'e atamazsınız.
+Increase size	DeskWindow		Boyutu arttır
+starts with	SelectionWindow		başlar
+Any	AttributesView		Herhangi biri
+New	DeskWindow		Yeni
+Invert	SelectionWindow		Tersine çevir
+Would you like to find some other suitable application?	FSUtils		Uygun başka bir uygulama bulmak ister misiniz?
+*+? operand may be empty.	libtracker		*+? işleneni boş olabilir
+(unknown)	AttributesView		(bilinmeyen)
+Recent folders	FavoritesMenu		Son kullanılan klasörler
+Signed memory size	AttributesView		İmzalı bellek boyutu
+The specified name is illegal. Please choose another name.	FilePanelPriv		Belirtilen ad kullanılamaz. Lütfen başka bir ad seçin.
+of %items	StatusWindow		/ %items
+less than	FindPanel		daha az
+Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		\"%name\" dosyasını kopyalarken hata:\n\t%error\n\nİşlem sürdürülsün mü?
+Creating links: 	StatusWindow		Bağlantılar oluşturuluyor: 
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		\"%document\" \"%app\" uygulaması ile açılamıyor (%error). 
+Create %s clipping	PoseView		%s kırpma oluştur
+Error moving \"%name\"	FSUtils		\"%name\" taşınırken hata
+To: %dir	StatusWindow		Şuraya: %dir
+Paste layout	ContainerWindow		Yerleşimi yapıştır
+Cancel	Tracker		İptal
+yes	AttributesView		evet
+Make active printer	ContainerWindow		Etkin yazıcı yap
+Copy to	ContainerWindow		Kopyala
+Name	SelectionWindow		Ad
+by attribute	FindPanel		öznitelik ile
+ info	InfoWindow		 bilgisi
+Write	FilePermissionsView		Yazma
+<%ld bytes of data>	AttributesView		<%ld bayt veri>
+If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Sistem klasörünü veya içeriğini değiştirirseniz %osName çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de değiştirmek istiyorsanız, Shift düğmesini basılı tutun ve \"Ne yaptığımı biliyorum\"a tıklayın.
+Save	FilePanelPriv		Kaydet
+Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		\"%document\" \"%app\" uygulaması ile açılamadı (Eksik kitaplıklar: %library). \n
+Finish: %time	StatusWindow		Bitiş: %time
+Messenger	AttributesView		Ulak
+after	FindPanel		sonra
+Version	OpenWithWindow		Sürüm
+Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Seçili ögelerden bazıları Çöp'e taşınamaz. Bunun yerine doğrudan silmek ister misiniz? (Bu işlem geri alınamaz.)
+Add printer…	ContainerWindow		Yazıcı ekle…
+On	FindPanel		Açık
+Permissions	ContainerWindow		İzinler
+Size:	InfoWindow		Boyut:
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Seçili öge Çöp'e taşınamaz. Bunun yerine doğrudan silmek ister misiniz? (Bu işlem geri alınamaz.)
+Copy	ContainerWindow		Kopyala
+Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Üzgünüm, 'Karakter' özniteliği bir çoklu bayt glifi depolayamaz.
+And	FindPanel		ve
+Palette-indexed picture	AttributesView		Palet sıralı resim
+multiple disks	FindPanel		çoklu diskler
+Drawing pattern	AttributesView		Çizim deseni
+File offset	AttributesView		Dosya ofseti
+Name = %name	FindPanel	FindResultTitle	Ad = %name
+Subject	Email Query Columns		Konu
+Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		\"%name\" klasörü kopyalanırken hata:\n\t%error\n\nİşlemi sürdürmek istiyor musunuz?
+You cannot create a link to the root directory.	FSUtils		Kök dizine bir bağlantı oluşturulamaz.
+Select all	FilePanelPriv		Tümünü seç
+Other	FilePermissionsView		Diğer
+Automatic disk mounting	AutoMounterSettings		Kendiliğinden disk bağlama
+parent folder	NavMenu		üst klasör
+Create link here	ContainerWindow		Bağlantıyı burada oluştur
+Force identify	ContainerWindow		Tanımlamaya zorla
+48 x 48	DeskWindow		48 x 48
+no items	CountView		öge yok
+Time	AttributesView		Zaman
+Disks	DirMenu		Diskler
+Query name:	FindPanel		Sorgu adı:
+Open parent	ContainerWindow		Üst klasörünü aç
+Find…	ContainerWindow		Bul…
+moving	FSUtils		taşıdığınız
+Single window navigation	SettingsView		Tek pencereli dolaşım
+greater than	FindPanel		daha büyük
+Add	FindPanel		Ekle
+Created:	InfoWindow		Oluşturulma:
+Edit Query template	FindPanel		Sorgu şablonunu düzenle
+Save query as template…	FindPanel		Sorguyu şablon olarak kaydet…
+All disks	AutoMounterSettings		Tüm diskler
+link	FSUtils	filename link	bağlantı
+16-bit unsigned integer	AttributesView		16 bit imzalanmamış tamsayı
+Proceed	FSUtils		Sürdür
+Edit favorites…	FilePanelPriv		Favorileri düzenle…
+You can't move a folder into itself or any of its own sub-folders.	FSUtils		Bir klasörü kendi içine veya herhangi bir alt klasörünün içine taşıyamazsınız.
+New	ContainerWindow		Yeni
+Fewer options	FindPanel		Daha az seçenek
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Ögeleri \"Diskler\" penceresinin içindeki disk simgelerinden birinin üzerine bırakmalısınız.
+If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		%target ögesini değiştirirseniz %osName düzgün çalışmayabilir!\n\nBunu yapmak istediğinizden emin misiniz?
+Sorry, you can't copy items to the Trash.	FSClipBoard		Üzgünüm, ögeler Çöp'e kopyalanamaz.
+Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Bu klasördeki bazı ögeler %verb bazı ögelerle aynı ada sahip.\n\nBu ögeleri %verb ögelerle değiştirmek ister misiniz veya teker teker sorulsun mu?
+When	Email Query Columns		Ne zaman
+Object	AttributesView		Nesne
+Paste	FilePanelPriv		Yapıştır
+Paste	ContainerWindow		Yapıştır
+An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		\"%name\" adındaki bir öge bu klasörde hâlihazırda var ve aynı adlı ögeler\niçeriyor olabilir. Bu ögeleri %verb ögelerle değiştirmek ister misiniz?
+Cannot unmount the boot volume \"%name\".	FSUtils		\"%name\" önyükleme diskinin bağlantısı kesilemez.
+Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" \"%app\" uygulaması ile açılamadı (Eksik sembol: %symbol). \n
+Reference	AttributesView		Başvuru
+New folder	ContainerWindow		Yeni klasör
+Name	OpenWithWindow		Ad
+There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		\"%name\" ögesi değiştirilmeye çalışılırken bir sorun çıktı. Öge açık veya meşgul olabilir.
+Windows	TrackerSettingsWindow		Pencereler
+Show space bars on volumes	SettingsView		Disklerde doluluk çubuklarını göster
+Could not update permissions of file \"%name\". %error	FSUtils		\"%name\" dosyasının izinleri güncellenemedi. %error
+Decrease size	DeskWindow		Boyutu azalt
+Emptying Trash… 	StatusWindow		Çöp boşaltılıyor… 
+{0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, other{for # dosya}}
+KiB	WidgetAttributeText		KiB
+Revert	TrackerSettingsWindow		Eski haline döndür
+trash	B_TRASH_DIRECTORY		çöp
+If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Sistem klasörünü veya içindekileri taşırsanız %osName çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de taşımak istiyorsanız Shift düğmesini basılı tutun ve \"Taşı\"ya basın.
+Close all in workspace	ContainerWindow		Tüm çalışma alanlarında kapat
+Corrupted expression.	libtracker		Hasar görmüş ifade.
+32 x 32	DeskWindow		32 x 32
+Network address	AttributesView		Ağ adresi
+Finish: %time - %finishtime left	StatusWindow		Bitiş: %time - %finishtime kaldı
+Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		\"%document\" açılamadı (Eksik kitaplıklar: %library). \n
+Create relative link here	ContainerWindow		Burada göreceli bağlantı oluştur
+Copy	FilePanelPriv		Kopyala
+All Haiku disks	AutoMounterSettings		Tüm Haiku diskleri
+Close all	ContainerWindow		Tümünü kapat
+Paused: click to resume or stop	StatusWindow		Duraklatıldı: Sürdür'e veya Durdur'a tıklayın
+Name	QueryPoseView		Ad
+Error %error loading add-On %name.	ContainerWindow		%name eklentisi yüklenirken %error hatası.
+Does not handle file	OpenWithWindow		Dosyayı işleyemez
+E-mail	Person Query Columns		E-posta
+Arrange by	ContainerWindow		Sırala
+Attributes	AttributesView		Öznitelikler
+Sorry, saving more than one item is not allowed.	FilePanelPriv		Üzgünüm, birden fazla öge kaydetmeye izin verilmiyor.
+64-bit unsigned integer	AttributesView		64 bit imzalanmamış tamsayı
+Move here	ContainerWindow		Buraya taşı
+the config folder	FSUtils		yapılandırma klasörü
+Sorry, could not create a new folder.	FSUtils		Üzgünüm, yeni bir klasör oluşturulamadı.
+Rename	FSUtils	button label	Yeniden adlandır
+Clean up all	ContainerWindow		Tümünü temizle
+Add current folder	FilePanelPriv		Şu anki klasörü ekle
+Description:	InfoWindow		Açıklama:
+The Tracker must be running to see set the default printer.	PoseView		Öntanımlı yazıcıyı görebilmesi için İzleyici'nin çalışıyor olması gerekir.
+Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Seçili öge/ögeleri silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
+Grayscale picture	AttributesView		Gri tonlu resim
+Mount	DeskWindow		Bağla
+ends with	FindPanel		biter
+Show Disks icon	SettingsView		Diskler simgesini göster
+Outline selection rectangle only	SettingsView		Yalnızca dış hat seçim dikdörtgeni
+by formula	FindPanel		formül ile
+Move to Trash	FilePanelPriv		Çöp'e taşı
+If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Sistem klasörünü veya içeriğini yeniden adlandırırsanız %osName çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de adlandırmak istiyorsanız, Shift düğmesini basılı tutun ve \"Yeniden adlandır\"a tıklayın.
+40 x 40	DeskWindow		40 x 40
+40 x 40	ContainerWindow		40 x 40
+Permissions	FilePermissionsView		İzinler
+New folder %ld	FSUtils		Yeni klasör %ld
+64 x 64	DeskWindow		64 x 64
+\"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" tarihi geçmiş bir çalıştırılabilir. Lütfen güncellenmiş bir sürümünü edinin veya uygulamayı yeniden derleyin.
+Only the boot disk	AutoMounterSettings		Yalnızca önyükleme diski
+That name is already taken. Please type another one.	WidgetAttributeText		Bu ad daha önce alınmış. Lütfen başka bir tane yazın.
+Message	AttributesView		İleti
+Modified	Default Query Columns		Değiştirilme
+Default application	InfoWindow		Öntanımlı uygulama
+Untitled bitmap	PoseView		Adsız biteşlem
+matches regular expression	SelectionWindow		düzenli ifade ile eşleşir
+Invert selection	ContainerWindow		Seçimi tersine çevir
+Monochrome picture	AttributesView		Siyah beyaz resim
+Real name	ContainerWindow		Gerçek adı
+Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		\"%name\" açılamadı. Dosya yanlışlıkla çalıştırılabilir olarak imlenmiş. 
+Go to parent	FilePanelPriv		Üst klasöre git
+Save	FindPanel		Kaydet
+Name	FindPanel		Ad
+Cancel	WidgetAttributeText		İptal
+Memory corruption.	libtracker		Bellek hasarı.
+Expression too long.	libtracker		İfade çok uzun.
+Color	AttributesView		Renk
+Copy layout	ContainerWindow		Yerleşimi kopyala
+Duplicate	ContainerWindow		Çoğalt
+16-bit integer	AttributesView		16 bit tamsayı
+Untitled clipping	PoseView		Adsız kırpma
+The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		\"%name\" adı belirtilen klasörde hâlihazırda mevcut. Değiştirmek istiyor musunuz?
+You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Ögeleri \"Diskler\" penceresinin içindeki herhangi bir disk simgesinin üzerine bırakmalısınız.
+Version:	InfoWindow		Sürüm:
+OK	PoseView		Tamam
+Add-ons	DeskWindow		Eklentiler
+Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Seçili ögeleri bu klasöre taşımak veya kopyalamak istediğinizden emin misiniz?
+Find	FindPanel		Bul
+Empty folder	NavMenu		Boş klasör
+Defaults	TrackerSettingsWindow		Öntanımlılar
+Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Üzgünüm, hedef diskte seçimi kopyalayabilecek kadar boş alan mevcut değil.
+True-color picture	AttributesView		Gerçek renkli resim
+Add-ons	FilePanelPriv		Eklentiler
+96 x 96	DeskWindow		96 x 96
+Empty folder	SlowContextPopup		Boş klasör
+Alignment	AttributesView		Hizalama
+Move to Trash	FSUtils		Çöp'e taşı
+Handles %type	OpenWithWindow		%type işler
+Cancel	PoseView		İptal
+Delete	PoseView		Sil
+Media parameter	AttributesView		Ortam parametresi
+If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Ev klasörünü değiştirirseniz %osName düzgün çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de değiştirmek istiyorsanız, Shift düğmesini basılı tutun ve \"Ne yaptığımı biliyorum\"a tıklayın.
+Sorry, you can't copy items to the Trash.	PoseView		Üzgünüm, ögeler Çöp'e kopyalanamaz.
+New folder	FilePanelPriv		Yeni klasör
+{0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, other{# öge}}
+Name	AttributesView		Ad
+Invalid bracket range.	libtracker		Geçersiz köşeli parantez erimi.
+the settings folder	FSUtils		ayarlar klasörü
+If you move %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		%target ögesini taşırsanız %osName düzgün çalışmayabilir!\n\nBunu yapmak istediğinizden emin misiniz?
+Create a Query	FindPanel		Sorgu oluştur
+Close	QueryContainerWindow		Kapat
+I know what I'm doing	FSUtils	button label	Ne yaptığımı biliyorum
+Preparing to copy items…	StatusWindow		Ögeleri kopyalamaya hazırlanıyor…
+Icon view	ContainerWindow		Simge görünümü
+Name	ContainerWindow		Ad
+Preferred for %type	OpenWithWindow		%type için tercih edilen
+Free space color	SettingsView		Boş alan rengi
+OK	WidgetAttributeText		Tamam
+OK	FSUtils		Tamam

@@ -1,0 +1,17 @@
+1	turkish	x-vnd.Haiku-FontDemo	3449067186
+Stop cycling	ControlView		Çevirmeyi durdur
+Haiku, Inc.	FontDemoView		Haiku, Inc.
+Rotation: %d	ControlView		Dönüş: %d
+Shear: %d	ControlView		Kırp: %d
+Spacing: %d	ControlView		Boşluk: %d
+Cycle fonts	ControlView		Yazıtiplerini çevir
+Font:	ControlView		Yazıtipi:
+Drawing mode:	ControlView		Çizim kipi:
+Haiku, Inc.	ControlView		Haiku, Inc.
+Controls	FontDemo		Denetimler
+FontDemo	System name		FontDemo
+Outline: %d	ControlView		Anahat: %d
+Text:	ControlView		Metin:
+Antialiased text	ControlView		Düzgünleştirilmiş metin
+Bounding boxes	ControlView		Zıplayan kutular
+Size: %d	ControlView		Boyut: %d

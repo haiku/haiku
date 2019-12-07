@@ -1,0 +1,5 @@
+1	turkish	x-vnd.Haiku-notification_server	2022780929
+Warning	NotificationWindow		Uyarı
+Notification	NotificationWindow		Bildirim
+OK	NotificationWindow		Tamam
+Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Genel ayarlar monitörü başlatılamadı.\nCanlı süzgeç değişiklikleri devre dışı.

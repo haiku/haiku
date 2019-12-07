@@ -1,0 +1,20 @@
+1	turkish	x-vnd.Haiku-VirtualMemory	2090796060
+Requested swap file size:	SettingsWindow		İstenen takas dosyası boyutu:
+VirtualMemory	System name		Sanal Bellek
+OK	VirtualMemoryApp		Tamam
+Use volume:	SettingsWindow		Şu diski kullan:
+Turn off	SettingsWindow		Kapat
+Changes will take effect upon reboot.	SettingsWindow		Değişiklikler yeniden başlatma sonrası geçerli olacaktır.
+Revert	SettingsWindow		Eski haline döndür
+Keep enabled	SettingsWindow		Etkin durumda tut
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Ayarlar dosyasında belirtilen ayarlar geçersiz. Öntanımlıları yükleyebilir veya uygulamadan çıkabilirsiniz.
+VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Sanal Bellek\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n
+The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		Ayarlar dosyasında belirtilen disk bulunamadı. Önyükleme diskini kullanabilir veya uygulamadan çıkabilirsiniz.
+Current Swap:	SettingsWindow		Kullanılan takas:
+Load defaults	SettingsWindow		Öntanımlıları yükle
+Use boot volume	SettingsWindow		Önyükleme diskini kullan
+Automatic swap management	SettingsWindow		Otomatik takas yönetimi
+Defaults	SettingsWindow		Öntanımlılar
+Quit	SettingsWindow		Çık
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Sanal belleği devre dışı bırakmanın sistem belleği dolduğunda genel kararlılık üzerinde istenmeyen etkileri vardır.\nSanal belleğin bu noktaya ulaşıncaya değin sistem başarımı üzerinde herhangi bir etkisi yoktur.\n\nYine de kapatmak istiyor musunuz?
+Enable virtual memory	SettingsWindow		Sanal belleği etkinleştir

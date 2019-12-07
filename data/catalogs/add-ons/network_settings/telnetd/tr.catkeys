@@ -1,0 +1,3 @@
+1	turkish	x-vnd.Haiku-TelnetService	1209067113
+The Telnet server allows you to remotely access your machine with a terminal session using the telnet protocol.\n\nPlease note that it is an insecure and unencrypted connection.	TelnetServiceAddOn		Telnet sunucusu, telnet protokolünü kullanarak makinenize bir uçbirim aracılığıyla bağlanmanızı sağlar.\n\nLütfen bunun güvenli olmayan ve şifrelenmemiş bir bağlantı olduğunu göz önünde bulundurun.
+Telnet server	TelnetServiceAddOn		Telnet sunucusu

@@ -1,0 +1,22 @@
+1	turkish	x-vnd.Haiku-JPEGTranslator	3788699631
+Read	JPEGTranslator		Oku
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be Biteşlem Biçimi (JPEGTranslator)
+Show warning messages	JPEGTranslator		Uyarı iletilerini göster
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		%100 renk kapsamı için 0 ile CMYK kodu kullan
+JPEG Library Error: %s\n	be_jerror		JPEG kitaplığı hatası: %s\n
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nIJG kitaplığı temel alınmıştır © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\n\"kayıpsız\" kodlama desteği yamasını yazan: Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nMagnus Hellman tarafından yazılan renk alanı dönüşüm rutinleri ile\n\thttp://www.bebits.com/app/802\n
+None	JPEGTranslator		Yok
+About	JPEGTranslator		Hakkında
+Version %d.%d.%d	JPEGTranslator		Sürüm %d.%d.%d
+Write black-and-white images as RGB24	JPEGTranslator		Siyah beyaz görselleri RGB24 olarak yaz
+Output smoothing strength	JPEGTranslator		Çıktı düzgünleştirme gücü
+Use progressive compression	JPEGTranslator		İlerleyen sıkıştırma kullan
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Dosyayı daha küçük yap (kaliteyi biraz bozar)
+High	JPEGTranslator		Yüksek
+Read greyscale images as RGB32	JPEGTranslator		Gri tonlu görselleri RGB32 olarak oku
+Output quality	JPEGTranslator		Çıktı kalitesi
+Low	JPEGTranslator		Düşük
+Write	JPEGTranslator		Yaz
+Prevent colors 'washing out'	JPEGTranslator		Renklerin 'akmasını' engelle
+JPEG Library Warning: %s\n	be_jerror		JPEG kitaplığı uyarısı: %s\n
+JPEG images	JPEGTranslator		JPEG görselleri

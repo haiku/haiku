@@ -1,0 +1,88 @@
+1	turkish	x-vnd.Haiku-CodyCam	2593355250
+destination directory expected	CodyCam		hedef dizin bekleniyordu
+reply: '%s'\n	SftpClient		yanıtla: '%s'\n
+JPEG image	CodyCam		JPEG görseli
+Remote host has closed the connection.\n	FtpClient		Uzaktaki makine bağlantıyı kapattı.\n
+image file format expected	CodyCam		görsel dosya biçimi bekleniydu
+Every 30 minutes	CodyCam		Her 30 dakikada bir
+Capturing Image…	VideoConsumer.cpp		Görsel yakalanıyor…
+Cannot start time source!	CodyCam		Zaman kaynağı başlatılamıyor!
+Waiting…	CodyCam		Bekleniyor…
+Passive FTP	CodyCam		Pasif FTP
+Every 10 minutes	CodyCam		Her 10 dakikada bir
+Every minute	CodyCam		Her dakika
+Capture Rate Menu	CodyCam		Yakalama oranı menüsü
+Cannot seek time source!	CodyCam		Zaman kaynağına bakılamıyor!
+Server login failed	VideoConsumer.cpp		Sunucu oturum açması başarısız oldu
+on or off expected	Settings	Do not translate 'on' and 'off'	açık veya kapalı bekleniyordu
+invalid upload client %ld\n	VideoConsumer.cpp		geçersiz yükleme istemcisi %ld\n
+Every 30 seconds	CodyCam		Her 30 saniyede bir
+Cannot create a video window	CodyCam		Bir video penceresi oluşturulamıyor
+Cannot register the video window	CodyCam		Video penceresi kaydedilemiyor
+capture rate expected	CodyCam		yakalama oranı bekleniyordu
+Quit	CodyCam		Çık
+Cannot connect the video source to the video window	CodyCam		Video kaynağı video penceresine bağlanamıyor
+read: %d\n	SftpClient		oku: %d\n
+Every 2 hours	CodyCam		Her 2 saatte bir
+Cannot get a time source	CodyCam		Bir zaman kaynağı alınamıyor
+Every 4 hours	CodyCam		Her 4 saatte bir
+cmd: '%s'\n	FtpClient		komut: '%s'\n
+Closing the window	VideoConsumer.cpp		Pencere kapatılıyor
+Never	CodyCam		Hiçbir zaman
+Every 8 hours	CodyCam		Her 8 saatte bir
+Cannot start the video source	CodyCam		Video kaynağı başlatılamıyor
+Cannot set the time source for the video source	CodyCam		Video kaynağı için zaman kaynağı belirlenemiyor
+Renaming…	VideoConsumer.cpp		Yeniden adlandırılıyor…
+Send to…	CodyCam		Gönder…
+Password:	CodyCam		Parola:
+still image filename expected	CodyCam		düz görsel dosya adı bekleniyordu
+File name:	CodyCam		Dosya adı:
+Directory:	CodyCam		Dizin:
+Error setting type of output file	VideoConsumer.cpp		Çıktı dosyası türü belirtilirken hata
+Locking the window	VideoConsumer.cpp		Pencere kilitleniyor
+Cannot find an available video stream	CodyCam		Uygun bir video akışı bulunamıyor
+Upload…	VideoConsumer.cpp		Yükle…
+password expected	CodyCam		parola bekleniyordu
+PASS <suppressed>  (real password sent)\n	FtpClient		PASS <suppressed>  (gerçek parola gönderildi)\n
+SFTP	CodyCam		SFTP
+Output	CodyCam		Çıktı
+server address expected	CodyCam		sunucu adresi bekleniyordu
+Cannot start the video window	CodyCam		Video penceresi başlatılamıyor
+reply: %d, %d\n	FtpClient		yanıtla: %d, %d\n
+Cannot set the time source for the video window	CodyCam		Video penceresi için zaman kaynağı ayarlanamıyor
+Every 15 minutes	CodyCam		Her 15 dakikada bir
+Every 24 hours	CodyCam		Her 24 saatte bir
+Image Format Menu	CodyCam		Görsel biçimi menüsü
+Every 5 minutes	CodyCam		Her 5 dakikada bir
+File upload failed	VideoConsumer.cpp		Dosya yüklemesi başarısız oldu
+Format:	CodyCam		Biçim:
+Start video	CodyCam		Videoyu başlat
+Connected…	VideoConsumer.cpp		Bağlandı…
+upload client name expected	CodyCam		yüklenecek istemci adı bekleniyordu
+Every 15 seconds	CodyCam		Her 15 saniyede bir
+Error getting initial latency for the capture node	CodyCam		Yakalama ucu için ilk gecikme alınırken hata
+password	CodyCam		parola
+Local	CodyCam		Yerel
+Stop video	CodyCam		Videoyu durdur
+Last Capture: 	VideoConsumer.cpp		Son yakalama: 
+Rate:	CodyCam		Oran:
+Couldn't find requested directory on server	VideoConsumer.cpp		İstenilen dizin sunucuda bulunamadı
+Cannot find the media roster	CodyCam		Ortam listesi bulunamıyor
+Type:	CodyCam		Tür:
+Rename failed	VideoConsumer.cpp		Yeniden adlandırma başarısız oldu
+unrecognized upload client specified	CodyCam		tanınmayan yükleme istemcisi belirtildi
+Server:	CodyCam		Sunucu:
+Login:	CodyCam		Giriş yap:
+File	CodyCam		Dosya
+read: %ld\n	SftpClient		oku: %ld\n
+Every hour	CodyCam		Her saat
+login ID expected	CodyCam		giriş ID'si bekleniyordu
+Video settings	CodyCam		Video ayarları
+Can't find an available connection to the video window	CodyCam		Video penceresine uygun bir bağlantı bulunamıyor
+FTP	CodyCam		FTP
+Error creating output file	VideoConsumer.cpp		Çıktı dosyası oluşturulurken hata
+Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Bir video kaynağı bulunamıyor:\nCodyCam'i kullanmak için bir web kameranız olmalı.
+Logging in…	VideoConsumer.cpp		Giriş yapılıyor…
+CodyCam	System name		CodyCam
+Error writing output file	VideoConsumer.cpp		Çıktı dosyası yazılırken hata
+Capture controls	CodyCam		Yakalama denetimleri

@@ -1,0 +1,111 @@
+1	turkish	x-vnd.Haiku-DriveSetup	1934767996
+Could not unmount partition %s.	MainWindow		%s bölümü bağlantısı kesilemedi.
+Mount all	MainWindow		Hepsini bağla
+Disk	MainWindow		Disk
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Değişiklikleri diske şimdi yazmak istediğinizden emin misiniz?\n\nSeçili bölüm üzerindeki tüm veri geri getirilemeyecek bir biçimde kaybolacak!
+Device	PartitionList		Aygıt
+Initialize	MainWindow		İlkçalıştır
+Could not change the parameters of the selected partition.	MainWindow		Seçili bölümün parametreleri değiştirilemedi.
+PGP encrypted	Encryption utils		PGP şifreli
+Delete partition	MainWindow		Bölümü sil
+Error: 	MainWindow	in any error alert	Hata: 
+Removable	PartitionList		Çıkarılabilir
+Block size	PartitionList		Blok boyutu
+The panel experienced a problem!	MainWindow		Panel bir sorun yaşadı!
+Device	DiskView		Aygıt
+Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Intel Genişletilmiş Bölümünü biçimlendirmek istediğinizden emin misiniz? İçerdiği tüm altbölümler üzerine yazılacaktır. Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.
+Unmount	MainWindow		Bağlantıyı kes
+Failed to format the partition %s!\n	MainWindow		%s bölümünün biçimlendirilmesi başarısız oldu!\n
+Partition size	CreateParametersPanel		Bölüm boyutu
+Validation of the given parameters failed.	MainWindow		Verilen ayarların doğrulaması başarısız oldu.
+The partition %s is currently mounted.	MainWindow		%s bölümü şu anda bağlı
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		\"%s\" bölümünü biçimlendirmek istediğinizden emin misiniz? Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.
+DriveSetup	System name		Disk İzlencesi
+Mounted at	PartitionList		Bağlama noktası
+Create…	MainWindow		Oluştur…
+Write changes	MainWindow		Değişiklikleri yaz
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		%s bölümünün ilkçalıştırması başarısız oldu (Diske hiçbir şey yazılmadı).
+Validation of the given creation parameters failed.	MainWindow		Verilen oluşturma parametrelerinin doğrulaması başarısız oldu.
+Eject	MainWindow		Çıkart
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Değişiklikleri diske şimdi yazmak istediğinizden emin misiniz?\n\n%s diski üzerindeki tüm veri geri alınamayacak bir biçimde kaybolacak!
+Surface test (not implemented)	MainWindow		Yüzey sınaması (işlevsel değil)
+Read only	PartitionList		Saltokunur
+The panel could not return successfully.	MainWindow		Panel başarılı bir biçimde dönemedi.
+Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Bölüm parametrelerinin değiştirilmesi başarısız oldu. Değişiklikler diske yazılmadı.
+Partition %ld	DiskView		%ld bölümü
+There's no space on the partition where a child partition could be created.	MainWindow		Bölüm üzerinde altbölüm oluşturabilecek kadar boş alan yok.
+No disk devices have been recognized.	DiskView		Hiçbir disk aygıtı tanımlanamadı.
+Attributes	PartitionList		Öznitelikler
+Failed to delete the partition. No changes have been written to disk.	MainWindow		Bölüm silinemedi. Değişiklikler diske yazılmadı.
+Change parameters…	MainWindow		Parametreleri değiştir…
+Format	InitializeParametersPanel		Biçim
+Could not unmount partition	MainWindow		Bölüm bağlantısı kesilemedi
+Create	CreateParametersPanel		Oluştur
+File system	PartitionList		Dosya sistemi
+The selected partition does not contain a partitioning system.	MainWindow		Seçili bölüm bir bölümlendirme sistemi içermiyor.
+End: %s	Support		Son: %s
+Partition type	PartitionList		Bölüm türü
+Unable to find the selected partition by ID.	MainWindow		Seçili bölüm ID ile bulunamıyor.
+The currently selected partition is not empty.	MainWindow		Mevcut seçili bölüm boş değil.
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Ham bir diski biçimlendirmek istediğinizden emin misiniz? (Genelde önce diski bir bölümlendirme sistemi ile ilkçalıştırmak daha makbuldür.) Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.
+Wipe (not implemented)	MainWindow		Sil (işlevsel değil)
+The currently selected partition does not have a parent partition.	MainWindow		Mevcut seçili disk bölümü ana bir disk bölümüne sahip değil.
+Validation of the given initialization parameters failed.	MainWindow		Verilen ilkçalıştırma parametrelerinin doğrulaması başarısız oldu.
+Shared	PartitionList		Paylaşılan
+MIMEs	PartitionList		MIME'ler
+BitLocker encrypted	Encryption utils		BitLocker şifreli
+You need to select a partition entry from the list.	MainWindow		Listeden bir disk bölümü seçmelisiniz.
+Offset: %s	Support		Ofset: %s
+SafeBoot encrypted	Encryption utils		SafeBoot şifreli
+Volume name	PartitionList		Disk adı
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Değişiklikleri diske şimdi yazmak istediğinizden emin misiniz?\n\nBölüm üzerindeki tüm veri geri alınamayacak bir biçimde kaybolacak!
+Change	ChangeParametersPanel		Değiştir
+Partition name:	ChangeParametersPanel		Bölüm adı:
+LUKS encrypted	Encryption utils		LUKS şifreli
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Değişiklikleri diske şimdi yazmak istediğinizden emin misiniz?\n\n%s bölümü üzerindeki tüm veri geri alınamayacak bir biçimde kaybolacak!
+Cancel	AbstractParametersPanel		İptal
+Format	MainWindow		Biçimlendir
+<empty or unknown>	DiskView		<boş veya bilinmeyen>
+OK	MainWindow		Tamam
+Open with DiskProbe	MainWindow		DiskProbe ile aç
+Could not delete the selected partition.	MainWindow		Seçili bölüm silinemedi.
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Seçili diski ilkçalıştırmak istediğinizden emin misiniz? Tüm veriler kaybolacak. Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.\n
+There was an error preparing the disk for modifications.	MainWindow		Diski değişikliklere hazırlarken bir hata oluştu.
+The disk has been successfully initialized.\n	MainWindow		Disk başarıyla ilkçalıştırıldı.\n
+Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Disk bağlantısı kesilmeye zorlansın mı?\n\nNot: Eğer bir uygulama diske yazmakta ise, disk bağlantısını kesmek veri kaybına neden olabilir.\n
+Cancel	MainWindow		İptal
+Free space	PartitionList		Boş alan
+Queries	PartitionList		Sorgular
+Force unmount	MainWindow		Zorla bağlantısını kes
+Partition	MainWindow		Bölüm
+Change parameters	MainWindow		Parametreleri değiştir
+Rescan	MainWindow		Yeniden tara
+There was an error acquiring the partition row.	MainWindow		Bölüm satırını alırken bir hata oluştu.
+Failed to initialize the disk %s!\n	MainWindow		%s diski ilkçalıştırılamadı!\n
+Disk system \"%s\" not found!	MainWindow		\"%s\" disk sistemi bulunamadı!
+Delete	MainWindow		Sil
+Partition type:	ChangeParametersPanel		Bölüm türü:
+Parameters	PartitionList		Parametreler
+Could not acquire partitioning information.	MainWindow		Bölümlendirme bilgisi alınamadı.
+Cannot delete the selected partition.	MainWindow		Seçili bölüm silinemiyor.
+Continue	MainWindow		Sürdür
+Could not mount partition %s.	MainWindow		%s bölümü bağlanamadı.
+Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Bölümü biçimlendirmek istediğinizden emin misiniz? Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.
+<empty or unknown>	PartitionList		<boş veya bilinmeyen>
+The selected disk is read-only.	MainWindow		Seçili disk saltokunur.
+The partition %s is already unmounted.	MainWindow		%s bölümünün bağlantısı zaten kesilmiş.
+Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Seçili bölümün parametrelerini değiştirmek istediğinizden emin misiniz?\n\nBölüm artık başka işletim sistemleri tarafından tanınamayabilir!
+Boot	PartitionList		Önyükleme
+OK	AbstractParametersPanel		Tamam
+Virtual	PartitionList		Sanal
+Virtual	DiskView		Sanal
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Değişiklikleri diske şimdi yazmak istediğinizden emin misiniz?\n\nSeçili disk üzerindeki tüm veri geri getirilemeyecek bir biçimde kaybolacak!
+Select a partition from the list below.	DiskView		Aşağıdaki listeden bir bölüm seçin.
+Active	PartitionList		Etkin
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Seçili bölümü silmek istediğinizden emin misiniz?\n\nBölüm üzerindeki tüm veri geri getirilemeyecek bir biçimde kaybolacak!
+Failed to format the partition. No changes have been written to disk.	MainWindow		Bölüm biçimlendirilemedi. Değişiklikler diske yazılmadı.
+The partition %s has been successfully formatted.\n	MainWindow		%s bölümü başarıyla biçimlendirildi.\n
+The partition %s is already mounted.	MainWindow		%s bölümü zaten bağlı.
+Size	PartitionList		Boyut
+Creation of the partition has failed.	MainWindow		Bölüm oluşturulamadı.
+Mount	MainWindow		Bağla

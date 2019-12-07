@@ -1,0 +1,9 @@
+1	turkish	x-vnd.Haiku-RAWTranslator	2975919330
+RAWTranslator Settings	ConfigView		RAWTranslator ayarları
+Version %d.%d.%d, %s	ConfigView		Sürüm %d.%d.%d, %s
+RAW image translator	RAWTranslator		RAW görseli çevirmeni
+RAW Settings	RAWTranslator main		RAW ayarları
+RAW images	RAWTranslator		RAW görselleri
+RAW image translator	ConfigView		RAW görseli çevirmeni
+%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	%s RAW görseli
+Based on Dave Coffin's dcraw 8.63	ConfigView		Dave Coffin tarafından yazılan dcraw 8.63 temellidir

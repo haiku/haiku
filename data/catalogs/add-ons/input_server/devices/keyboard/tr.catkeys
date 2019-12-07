@@ -1,0 +1,10 @@
+1	turkish	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
+If the application will not quit you may have to kill it.	Team monitor		Eğer uygulama kapanmıyorsa sonlandırabilirsiniz.
+Quit application	Team monitor		Uygulamadan çık
+Restart the desktop	Team monitor		Masaüstü'nü yeniden başlat
+Force reboot	Team monitor		Yeniden başlatmaya zorla
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Uygulamayı kapatmak için listeden seçin ve 'Uygulamayı sonlandır' ya da 'Uygulamadan çık' düğmelerinden birine tıklayın.\n\nYeniden başlatmak için CTRL+ALT+DELETE düğmelerini %ld saniye basılı tutun.
+Team monitor	Team monitor		Takım monitörü
+Kill application	Team monitor		Uygulamayı sonlandır
+Cancel	Team monitor		İptal
+(This team is a system component)	Team monitor		(Bu takım bir sistem parçasıdır)

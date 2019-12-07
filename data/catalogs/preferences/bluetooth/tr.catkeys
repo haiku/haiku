@@ -1,0 +1,55 @@
+1	turkish	x-vnd.Haiku-BluetoothPrefs	4276705900
+Laptop	Settings view		Dizüstü
+Only from trusted devices	Settings view		Yalnızca güvenilir aygıtlardan
+15 secs	Settings view		15 saniye
+Quit	main		Çık
+Manufacturer: 	Device View		Üretici: 
+Desktop	Settings view		Masaüstü
+Server	Window		Sunucu
+Identify host as:	Settings view		Anamakineyi şöyle tanımla:
+Refresh…	Remote devices		Yenile…
+Local devices found on system:	Settings view		Sistemde bulunan yerel aygıtlar
+Service classes: 	Device View		Servis sınıfları: 
+Remote devices	Window		Uzak aygıtlar
+Settings	Window		Ayarlar
+Stop bluetooth services…	Window		Bluetooth servislerini durdur...
+61 secs	Settings view		61 saniye
+Add…	Remote devices		Ekle…
+As blocked	Remote devices		Engellenmiş
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Sistemde kayıtlı Bluetooth aygıtı bulunamadı.
+Policy…	Settings view		İlke…
+Revert	Window		Eski haline döndür
+Refresh local devices…	Window		Yerel aygıtları yenile…
+Disconnect	Remote devices		Bağlantıyı kes
+Identify us as…	Settings view		Bizi şöyle tanımla…
+From all devices	Settings view		Tüm aygıtlardan
+Defaults	Window		Öntanımlılar
+Start bluetooth services…	Window		Bluetooth servislerini başlat…
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Uzak aygıtınızın Bluetooth özelliğinin açık olduğundan emin olun. 'Tara'ya basıp taramayı başlatın. Aygıt adlarının getirilme süresi tam bilinememekle birlikte, aygıt başına 3 saniyeyi genelde aşmaz. Bundan sonra aygıtları ana listenize ekleyip bağlanma kısmına geçebilirsiniz.
+Scanning progress	Inquiry panel		Tarama ilerlemesi
+Bluetooth	System name		Bluetooth
+Launch now	main		Şimdi çalıştır
+Remove	Remote devices		Kaldır
+Pick device…	Settings view		Aygıt seç…
+Always ask	Settings view		Her zaman sor
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Yardımda bulunanlar:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nYardımda bulunan herkese çok teşekkürler…\n\nDonanım gönderenler/bağışta bulunanlar:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nFinansal olarak yardımda bulunanlar:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nKod katkısında bulunanlar:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nSınamada bulunanlar:\n - Petter H. Juliussen\nBildiğim her şeyi öğretenler:\n - yellowTAB takımı
+Help	Window		Yardım
+Pair…	Remote devices		Eşleştir…
+Retrieving name of %1	Inquiry panel		%1 adı alınıyor
+Inquiry	Inquiry panel		Tara
+Incoming connections policy:	Settings view		Gelen bağlantılar ilkesi:
+Retrieving names…	Inquiry panel		Adlar alınıyor…
+Show name	Extended local device view		Adını göster
+Add device to list	Inquiry panel		Aygıtı listeye ekle
+Remaining %1 seconds	Inquiry panel		%1 saniye kaldı
+The Bluetooth services are not currently running on this system.	main		Bluetooth servisleri açık değil.
+Discoverable	Extended local device view		Bulunabilir
+Authenticate	Extended local device view		Kimlik doğrula
+Smart phone	Settings view		Akıllı telefon
+Scanning completed.	Inquiry panel		Tarama bitti.
+Default inquiry time:	Settings view		Öntanımlı tarama süresi:
+Server	Settings view		Sunucu
+Handheld	Settings view		Elde taşınabilir
+ packets: 	Device View		 paketler: 
+About Bluetooth…	Window		Bluetooth hakkında...
+Starting scan…	Inquiry panel		Tarama başlatılıyor…

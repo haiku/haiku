@@ -1,0 +1,16 @@
+1	turkish	x-vnd.Haiku-TIFFTranslator	2234713102
+TIFF Library:	TIFFView		TIFF kitaplığı:
+RLE (Packbits)	TIFFView		RLE (Paket bitleri)
+ZIP (Deflate)	TIFFView		ZIP (Söndür)
+identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: geçersiz belge dizini\n
+Use compression:	TIFFView		Sıkıştırma kullan:
+TIFF image translator	TIFFView		TIFF görseli çevirmeni
+TIFF image	TIFFTranslator		TIFF görseli
+TIFF Settings	TIFFMain		TIFF ayarları
+TIFF image translator	TIFFTranslator		TIFF görsel çevirmeni
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: dizin belirlenemedi\n
+Version %d.%d.%d, %s	TIFFView		Sürüm %d.%d.%d, %s
+TIFFTranslator Settings	TIFFTranslator		TIFFTranslator ayarları
+LZW	TIFFView		LZW
+TIFF images	TIFFTranslator		TIFF görselleri
+None	TIFFView		Yok

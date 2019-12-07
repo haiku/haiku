@@ -1,0 +1,20 @@
+1	turkish	x-vnd.Haiku-MidiPlayer	1046133011
+This tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Ufacık tefecik\nŞarkı da söylermiş\nGeçmişe gidip
+Dungeon	Main Window		Zindan
+Could not load song	Main Window		Şarkı yüklenemedi
+Igor's lab	Main Window		İgor'un laboratuvarı
+Off	Main Window		Kapalı
+Loading instruments…	Scope View		Çalgılar yükleniyor…
+Volume:	Main Window		Ses düzeyi:
+Closet	Main Window		Dolap
+Scope	Main Window		Kapsam
+Drop MIDI file here	Scope View		MIDI dosyasını buraya bırakın
+None	Main Window		Yok
+Reverb:	Main Window		Yankı:
+MidiPlayer	System name		MIDI Oynatıcı
+OK	Main Window		Tamam
+Stop	Main Window		Durdur
+Live input:	Main Window		Canlı girdi:
+Garage	Main Window		Garaj
+Play	Main Window		Oynat
+Cavern	Main Window		İn

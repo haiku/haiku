@@ -1,0 +1,41 @@
+1	turkish	x-vnd.Be-PRNT	1465107170
+Test page	TestPageView		Test sayfası
+Remove	PrintersWindow		Kaldır
+Red	TestPageView		Kırmızı
+Default Printer	PrinterListView		Öntanımlı yazıcı
+<pick one>	AddPrinterDialog		<birini seçin>
+Connected to:	AddPrinterDialog		Bağlı:
+Make default	PrintersWindow		Öntanımlı yap
+Cyan	TestPageView		Camgöbeği
+Completed	JobListView		Tamamlandı
+Test page	PrintersWindow		Sınama sayfası
+Transport: %transport% %transport_address%	PrinterListView		Taşıyıcı: %transport% %transport_address%
+Failed	JobListView		Başarısız
+Blue	TestPageView		Mavi
+Waiting	JobListView		Bekleyen
+Processing	JobListView		İşleniyor
+Cancel	AddPrinterDialog		İptal
+Unknown status	JobListView		Bilinmeyen durum
+Print jobs for %printer_name%	PrintersWindow		%printer_name% işleri
+{0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? sayfa}=1{# sayfa}other{# sayfa}}
+Add printer	AddPrinterDialog		Yazıcı ekle
+Printers	PrintersWindow		Yazıcılar
+No printer found!	TransportMenu		Yazıcı bulunamadı!
+Add…	PrintersWindow		Ekle…
+Magenta	TestPageView		Eflatun
+Transport: %transport% %transport_address%	TestPageView		Taşıyıcı: %transport% %transport_address%
+Add	AddPrinterDialog		Ekle
+Print jobs: No printer selected	PrintersWindow		Yazdırma işleri: Yazıcı seçilmedi
+Printer name:	AddPrinterDialog		Yazıcı adı:
+Yellow	TestPageView		Sarı
+Black	TestPageView		Siyah
+Printer type:	AddPrinterDialog		Yazıcı türü:
+Printers	System name		Yazıcılar
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{Bekleyen iş yok}=1{1 bekleyen iş}other{# bekleyen iş}}
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Yazıcı: %printer_name%\nSürücü:  %driver%\n
+Green	TestPageView		Yeşil
+Print test page	PrintersWindow		Sınama sayfası yazdır
+Restart job	PrintersWindow		İşi yeniden başlat
+Driver: %driver%	PrinterListView		Sürücü: %driver%
+Cancel job	PrintersWindow		İşi iptal et
+%.2f KB	JobListView		%.2f KB

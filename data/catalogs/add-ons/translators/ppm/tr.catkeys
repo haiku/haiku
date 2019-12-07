@@ -1,0 +1,30 @@
+1	turkish	x-vnd.Haiku-PPMTranslator	292474603
+None	PPMTranslator		Yok
+PPM Settings	PPMMain		PPM ayarları
+System palette 8 bits	PPMTranslator		8 bit sistem paleti
+Sample code copyright 1999, Be Incorporated	PPMTranslator		Örnek kod telif hakkı 1999, Be Incorporated
+Something is wrong with the PPMTranslator!	PPMMain		PPMTranslator'da bir şeyler ters gidiyor!
+Grayscale 8 bits	PPMTranslator		8 bit gri tonlu
+Based on PPMTranslator sample code	PPMTranslator		PPMTranslator örnek kodu temel alınmıştır
+RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 bit yüksek son haneli
+PPM image translator	PPMTranslator		PPM görseli çevirmeni
+Bitmap 1 bit	PPMTranslator		1 bit biteşlem
+RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 bit yüksek son haneli
+PPMTranslator Settings	PPMTranslator		PPMTranslator ayarları
+CMY 8:8:8 32 bits	PPMTranslator		32 bit CMY 8:8:8
+OK	PPMMain		Tamam
+CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bit
+PPM image	PPMTranslator		PPM görseli
+Input color space:	PPMTranslator		Renk girdisi alanı:
+RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 bit yüksek son haneli
+RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bit yüksek son haneli
+Write ASCII	PPMTranslator		ASCII yaz
+RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 bit
+RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 bit yüksek son haneli
+RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 bit
+Version %d.%d.%d, %s	PPMTranslator		Sürüm %d.%d.%d, %s
+CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 bit
+RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 bit
+RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 bit
+RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 bit
+Be Bitmap Format (PPMTranslator)	PPMTranslator		Be Biteşlem Biçimi (PPMTranslator)

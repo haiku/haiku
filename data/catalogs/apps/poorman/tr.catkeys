@@ -1,0 +1,66 @@
+1	turkish	x-vnd.Haiku-PoorMan	1829050509
+Select web folder	PoorMan		Web klasörü seç
+Console logging	PoorMan		Konsol günlüklemesi
+Create Log File	PoorMan		Günlük dosyası oluştur
+File logging	PoorMan		Dosya günlükleme
+Website options	PoorMan		Web sitesi seçenekleri
+Log to file	PoorMan		Dosyaya günlükle
+Shutting down.	PoorMan		Kapatılıyor.
+Error Dir	PoorMan		Hata dizini
+Web folder:	PoorMan		Web klasörü:
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Lütfen web'de yayınlanacak klasörü seçin.\n\nPoorMan sizin yerinize Ev klasörünüzde \"public_html\" adında öntanımlı bir klasör\noluşturabilir, isterseniz bunun yerine kendi belirleyeceğiniz bir klasörü de seçebilirsiniz.
+Log To Console	PoorMan		Konsola günlükle
+File Name	PoorMan		Dosya adı
+Starting up... 	PoorMan		Başlatılıyor... 
+Select	PoorMan		Seç
+Logging view	PoorMan		Günlük görünümü
+Save console as…	PoorMan		Konsolu farklı kaydet…
+Edit	PoorMan		Düzen
+Cancel	PoorMan		İptal
+Directory: 	PoorMan		Dizin: 
+Hits: %lu	PoorMan		Görüntülenme: %lu
+Hits: 0	PoorMan		Görüntülenme: 0
+Shutting down.\n	PoorMan		Kapatılıyor.\n
+Select all	PoorMan		Tümünü seç
+Error Server	PoorMan		Hata sunucusu
+Send file listing if there's no start page	PoorMan		Bir başlangıç sayfası yoksa dosya listesini gönder
+Create PoorMan log	PoorMan		PoorMan günlüğü oluştur
+Max. simultaneous connections:	PoorMan		En çok eşzamanlı bağlantı:
+Done	PoorMan		Tamamlandı
+Site	PoorMan		Site
+Cannot start the server	PoorMan		Sunucu başlatılamıyor
+Create log file	PoorMan		Günlük dosyası oluştur
+Create public_html	PoorMan		public_html oluştur
+Clear hit counter	PoorMan		Görüntülenme sayacını sıfırla
+Status: Stopped	PoorMan		Durum: Durduruldu
+File	PoorMan		Dosya
+Settings…	PoorMan		Ayarlar…
+Log To File	PoorMan		Dosyaya günlükle
+Connections	PoorMan		Bağlantılar
+Controls	PoorMan		Denetimler
+Log to console	PoorMan		Konsola günlükle
+Advanced	PoorMan		Gelişmiş
+Copy	PoorMan		Kopyala
+Logging	PoorMan		Günlükleme
+PoorMan	System name		PoorMan
+Clear console log	PoorMan		Konsol kayıtlarını temizle
+Run server	PoorMan		Sunucuyu çalıştır
+Create	PoorMan		Oluştur
+{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, other{# bağlantı}}
+done.\n	PoorMan		tamamlandı.\n
+PoorMan settings	PoorMan		PoorMan ayarları
+Console Logging	PoorMan		Konsol günlüğü
+Clear log file	PoorMan		Günlük dosyasını temizle
+Save log console selection	PoorMan		Konsol seçimi günlüğünü kaydet
+File Logging	PoorMan		Dosya günlükleme
+Log file name:	PoorMan		Günlük dosyası adı:
+Status: Running	PoorMan		Durum: Çalışıyor
+Directory: (none)	PoorMan		Dizin: (yok)
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Öntanımlı bir web klasörü \"/boot/home/public_html\" konumunda oluşturuldu.\nBu klasörde \"index.html\" adında bir dosya olduğundan emin olun.
+Dir Created	PoorMan		Dizin oluşturuldu
+Save console selections as…	PoorMan		Konsol seçimlerini farklı kaydet…
+Quit	PoorMan		Çık
+Save log console	PoorMan		Günlük konsolunu kaydet
+Start page:	PoorMan		Başlangıç sayfası:
+OK	PoorMan		Tamam
+Website location	PoorMan		Web sitesi konumu

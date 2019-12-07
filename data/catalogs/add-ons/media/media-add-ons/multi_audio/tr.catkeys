@@ -1,0 +1,34 @@
+1	turkish	x-vnd.Haiku-hmulti_audio.media_addon	451057402
+Master	MultiAudio		Ana
+SPDIF	MultiAudio		SPDIF
+Gain	MultiAudio		Kazanç
+Output 3D center	MultiAudio		3B merkez çıktı
+Extended Setup	MultiAudio		Genişletilmiş kurulum
+CD	MultiAudio		CD
+Tone control	MultiAudio		Ton denetimi
+Phone	MultiAudio		Telefon
+Aux	MultiAudio		Aux
+Output bass	MultiAudio		Çıktı bası
+Headphones	MultiAudio		Kulaklık
+Beep	MultiAudio		Bip
+Output mono mix	MultiAudio		Tek kanallı çıktı karışımı
+Output stereo mix	MultiAudio		Çift kanallı çıktı karışımı
+Input	MultiAudio		Girdi
+Output treble	MultiAudio		Çıktı tizi
+Mono mix	MultiAudio		Tek kanallı karışım
+General	MultiAudio		Genel
+Input & Output	MultiAudio		Girdi ve çıktı
+Enhanced Setup	MultiAudio		Genişletilmiş kurulum
+Stereo mix	MultiAudio		Çift kanallı karışım
+Output 3D depth	MultiAudio		3B çıktı derinliği
+Volume	MultiAudio		Ses düzeyi
+Output	MultiAudio		Çıktı
+Video	MultiAudio		Video
+Line	MultiAudio		Hat
+Mic	MultiAudio		Mikrofon
+ frequency:	MultiAudio		 frekansı:
+Enable	MultiAudio		Etkinleştir
+Mute	MultiAudio		Sessiz
+Wave	MultiAudio		Dalga
+Setup	MultiAudio		Kurulum
+Level	MultiAudio		Düzey

@@ -1,0 +1,19 @@
+1	turkish	x-vnd.Haiku-GIFTranslator	2201651797
+Websafe	GIFView		Web için güvenli
+Write interlaced images	GIFView		Üst üste bindirilmiş görseller yaz
+Optimal	GIFView		Optimal
+Greyscale	GIFView		Gri tonlu
+Colors:	GIFView		Renkler:
+GIF image translator	GIFTranslator		GIF görseli çevirmeni
+Be Bitmap Format (GIFTranslator)	GIFTranslator		Be Biteşlem Biçimi (GIFTranslator)
+GIF image translator	GIFView		GIF görseli çevirmeni
+Palette:	GIFView		Palet:
+GIF image	GIFTranslator		GIF görseli
+Write transparent images	GIFView		Saydam görseller yaz
+GIF images	GIFTranslator		GIF görselleri
+Version %d.%d.%d, %s	GIFView		Sürüm %d.%d.%d, %s
+Use RGB color	GIFView		RGB renkleri kullan
+Use dithering	GIFView		Titreklik kullan
+GIF Settings	GIFTranslator		GIF ayarları
+BeOS system	GIFView		BeOS sistemi
+Automatic (from alpha channel)	GIFView		Otomatik (alfa kanalından)

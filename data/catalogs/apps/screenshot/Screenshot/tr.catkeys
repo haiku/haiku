@@ -1,0 +1,31 @@
+1	turkish	x-vnd.haiku-screenshot	3958461128
+Include window border	ScreenshotWindow		Pencere kenarlığını içer
+Overwrite	ScreenshotWindow		Üzerine yaz
+Save in:	ScreenshotWindow		Şuraya kaydet:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		\"%s\" kaydedilirken hata:\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Bu dosya hâlihazırda mevcut.\n Üzerine yazmak istediğinizden emin misiniz?
+OK	ScreenshotWindow		Tamam
+The destination path exists but is not a folder.	ScreenshotWindow		Hedef yol mevcut ancak bir klasör değil.
+Select	ScreenshotWindow		Seç
+Save as:	ScreenshotWindow		Farklı kaydet:
+seconds	ScreenshotWindow		saniye
+New screenshot	ScreenshotWindow		Yeni ekran görüntüsü
+Screenshot	System name		Ekran Görüntüsü
+Desktop	ScreenshotWindow		Masaüstü
+Artwork folder	ScreenshotWindow		Çizimler klasörü
+Translator Settings	ScreenshotWindow		Çevirmen ayarları
+Include mouse pointer	ScreenshotWindow		Fare imlecini içer
+overwrite	ScreenshotWindow		üzerine yaz
+Settings…	ScreenshotWindow		Ayarlar…
+Choose folder	ScreenshotWindow		Klasör seç
+Name:	ScreenshotWindow		Ad:
+Choose folder…	ScreenshotWindow		Klasör seç…
+Please select	ScreenshotWindow		Lütfen seçin
+Failed to save screenshot	ScreenshotWindow		Ekran görüntüsü kaydedilemedi
+Cancel	ScreenshotWindow		İptal
+Delay:	ScreenshotWindow		Gecikme:
+Copy to clipboard	ScreenshotWindow		Panoya kopyala
+screenshot	Screenshot	Base filename of screenshot files	ekran görüntüsü
+Home folder	ScreenshotWindow		Ev klasörü
+Save	ScreenshotWindow		Kaydet
+Capture active window	ScreenshotWindow		Etkin pencereyi yakala

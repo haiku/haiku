@@ -1,0 +1,54 @@
+1	turkish	x-vnd.Haiku-Screen	2685901476
+no	Screen		hayır
+bits/pixel	Screen		bit/piksel
+15 bits/pixel, 32768 colors	Screen		15 bit/piksel, 32768 renk
+Rows:	Screen		Satırlar:
+%.1f Hz	Screen		%.1f Hz
+The screen mode could not be set:\n\t%s\n	Screen		Ekran kipi ayarlanamıyor:\n\t%s\n
+Keep	Screen		Tut
+/other…	Screen		/diğer…
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Yatay frekans:\t%lu - %lu kHz\nDikey frekans:\t%lu - %lu Hz\n\nMaksimum piksel saati:\t%g MHz
+Refresh rate:	Screen		Yenileme hızı:
+Video format:	Screen		Video biçimi:
+Undo	Screen		Geri al
+OK	Screen		Tamam
+Current workspace	Screen		Mevcut çalışma alanı
+vertically	Screen		dikey olarak
+All workspaces	Screen		Tüm çalışma alanları
+Use laptop panel:	Screen		Dizüstü panelini kullan:
+Could not write VESA mode settings file:\n\t	Screen		VESA kipi ayar dosyasına yazılamıyor:\n\t
+Settings will revert in %seconds.	Screen		Ayarlar %s saniye içinde eski haline dönecektir.
+Cancel	Screen		İptal
+Other…	Screen		Diğer…
+Screen	Screen		Ekran
+Colors:	Screen		Renkler:
+yes	Screen		evet
+Swap displays:	Screen		Ekranları değiştir:
+%sSerial no.: %s	Screen		%sSeri numarası.: %s
+8 bits/pixel, 256 colors	Screen		8 bit/piksel, 256 renk
+Revert	Screen		Eski haline döndür
+always	Screen		her zaman
+Confirm changes	Screen		Değişiklikleri onayla
+Warning	Screen		Uyarı
+24 bits/pixel, 16 Million colors	Screen		24 bit/piksel, 16 Milyon renk
+Hz	Screen		Hz
+Workspaces	Screen		Çalışma alanları
+Brightness:	Screen		Parlaklık:
+32 bits/pixel, 16 Million colors	Screen		32 bit/piksel, 16 milyon renk
+Done	Screen		Tamamlandı
+16 bits/pixel, 65536 colors	Screen		16 bit/piksel, 65536 renk
+Screen preferences by the Haiku team	Screen		Haiku takımı tarafından ekran ayarları
+Refresh rate	Screen		Yenileme oranı
+if needed	Screen		Gerekliyse
+Combine displays:	Screen		Ekranları birleştir:
+Unknown mode	Screen		Bilinmeyen kip
+About	Screen		Hakkında
+Columns:	Screen		Sütunlar:
+Resolution:	Screen		Çözünürlük:
+Apply	Screen		Uygula
+horizontally	Screen		yatay olarak
+disable	Screen		devre dışı bırak
+Set background…	Screen		Arka planı belirle…
+Type or use the left and right arrow keys.	Screen		Yazın, veya sağ ve sol ok tuşlarını kullanın.
+Screen	System name		Ekran
+Do you wish to keep these settings?	Screen		Bu ayarları tutmak istiyor musunuz?

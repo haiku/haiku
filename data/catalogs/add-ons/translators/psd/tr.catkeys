@@ -1,0 +1,22 @@
+1	turkish	x-vnd.Haiku-PSDTranslator	3654055550
+Lab	PSDLoader		Lab
+Uncompressed	PSDConfig		Sıkıştırılmamış
+Indexed	PSDLoader		İndekslenmiş
+Grayscale	PSDLoader		Gri tonlu
+Photoshop image translator	PSDConfig		Photoshop görseli çevirmeni
+Photoshop image translator	PSDTranslator		Photoshop görseli çevirmeni
+Version %d.%d.%d, %s	PSDConfig		Sürüm %d.%d.%d, %s
+Photoshop Document (PSD file)	PSDConfig		Photoshop Belgesi (PSD dosyası)
+Photoshop image	PSDTranslator		Photoshop görseli
+RLE	PSDConfig		RLE
+Photoshop Big Document (PSB file)	PSDConfig		Büyük Photoshop Belgesi (PSB dosyası)
+RGBA	PSDLoader		RGBA
+Photoshop image (%s)	PSDTranslator		Photoshop görseli (%s)
+PSDTranslator Settings	PSDConfig		PSDTranslator ayarları
+RGB	PSDLoader		RGB
+Bitmap	PSDLoader		Biteşlem
+CMYK	PSDLoader		CMYK
+Compression: 	PSDConfig		Sıkıştırma: 
+Format: 	PSDConfig		Biçim: 
+Multichannel	PSDLoader		Çok kanallı
+Duotone	PSDLoader		İki tonlu

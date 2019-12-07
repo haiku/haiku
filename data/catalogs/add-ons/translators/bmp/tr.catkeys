@@ -1,0 +1,9 @@
+1	turkish	x-vnd.Haiku-BMPTranslator	2497639570
+BMP images	BMPTranslator		BMP görselleri
+BMPTranslator Settings	BMPTranslator		BMPTranslator ayarları
+BMP image (OS/2 format, %d bits)	BMPTranslator		BMP görseli (OS/2 biçimi, %d bit)
+BMP image translator	BMPView		BMP görsel çevirmeni
+BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	BMP görseli (MS biçimi %d bit)
+BMP Settings	BMPMain		BMP ayarları
+Version %d.%d.%d, %s	BMPView		Sürüm %d.%d.%d, %s
+BMP image translator	BMPTranslator		BMP görseli çevirmeni

@@ -1,0 +1,32 @@
+1	turkish	x.vnd.OBOS-Inspector	577867100
+\nInput Formats:	ImageView		\nGirdi biçimleri:
+Next Page	ImageWindow		Sonraki sayfa
+Previous Page	ImageWindow		Önceki sayfa
+Active Translators	InspectorApp		Etkin çevirmenler
+System Translators	ActiveTranslatorsWindow		Sistem çevirmenleri
+\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nTür: '%1' (%2)\nGrup: '%3' (%4)\nKalite: %5\nKapasite: %6\nMIME türü: %7\nAd: %8\n
+OK	ImageWindow		Tamam
+View	ImageWindow		Görünüm
+Open…	ImageWindow		Aç…
+Save feature not implemented yet.	ImageWindow		Kaydetme özelliği henüz işlevsel değil.
+Active Translators	ImageWindow		Etkin çevirmenler
+Info	ImageWindow		Bilgi
+Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Görsel: %1\nRenk alanı: %2 (%3)\nBoyutlar: %4 x %5\nSatır başına bit Sayısı: %6\nToplam bit: %7\n\nTanımlama bilgisi:\nDizi numarası: %8\nMIME türü: %9\nTür: '%10' (%11)\nÇevirmen numarası: %12\nGrup: '%13' (%14)\nKalite: %15\nKabiliyet: %16\n\nGenişletme bilgisi:\n
+No image available to save.	ImageWindow		Kaydedilebilecek bir görsel yok.
+OK	ImageView		Tamam
+Bummer	ImageWindow		Hay aksi
+\nOutput Formats:	ImageView		\nÇıktı biçimleri:
+Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Belge sayısı: %1\n\nKullanılan çevirmen:\nAd: %2\nBilgi: %3\nSürüm: %4\n
+User Translators	ActiveTranslatorsWindow		Kullanıcı çevirmenler
+Last Page	ImageWindow		Son sayfa
+\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nKullanılan çevirmen:\nAd: %1\nBilgi: %2\nSürüm: %3\n
+Unknown	ImageView		Bilinmeyen
+Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Bilgi Penceresi
+Sorry, unable to load the image.	ImageView		Üzgünüm, görsel yüklenemiyor.
+File	ImageWindow		Dosya
+Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Seçili belge: %1\n\nKullanılan çevirmen:\nAd: %2\nBilgi: %3\nSürüm: %4\n
+Quit	ImageWindow		Çıkış
+Sorry, unable to write the image file.	ImageView		Üzgünüm, görsel dosyası kaydedilemedi.
+Save…	ImageWindow		Kaydet…
+Window	ImageWindow		Pencere
+First Page	ImageWindow		İlk sayfa

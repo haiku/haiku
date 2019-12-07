@@ -1,0 +1,27 @@
+1	turkish	x-vnd.Haiku.TV	1995288111
+No menu	MainWin		Menü yok
+No border	MainWin		Kenarlık yok
+force 704 x 576, display aspect 4:3	MainWin		704 x 576, 4:3 görüntüleme oranını zorla
+Error, connecting to interface failed:\n\n	MainWin		Hata, arayüze bağlanma başarısız oldu:\n\n
+force 544 x 576, display aspect 4:3	MainWin		544 x 576, 4:3 görüntüleme oranını zorla
+Full screen	MainWin		Tam ekran
+Scale to native size	MainWin		Doğal boyuta ölçekle
+unknown	MainWin		bilinmeyen
+Next channel	MainWin		Sonraki kanal
+Keep aspect ratio	MainWin		En-boy oranını koru
+DVB - Digital Video Broadcasting TV	MainWin		DVB - Sayısal Video Yayını TV
+Always on top	MainWin		Her zaman üstte
+Debug	MainWin		Hata ayıkla
+Interface	MainWin		Arayüz
+force 720 x 576, display aspect 4:3	MainWin		720 x 576, 4:3 görüntü oranını koru
+Quit	MainWin		Çık
+Channel	MainWin		Kanal
+Previous channel	MainWin		Önceki kanal
+OK	MainWin		Tamam
+TV	MainWin		TV
+Settings	MainWin		Ayarlar
+TV	System name		TV
+Settings…	MainWin		Ayarlar…
+None	MainWin		Hiçbiri
+Error, interface is busy:\n\n	MainWin		Hata, arayüz meşgul:\n\n
+pixel aspect ratio	MainWin		piksel en-boy oranı

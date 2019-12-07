@@ -1,0 +1,13 @@
+1	turkish	x-vnd.Be-WORK	3927737357
+Quit	Workspaces		Çık
+Invalid argument: %s\n	Workspaces		Geçersiz değişken: %s\n
+Change workspace count…	Workspaces		Çalışma alanı sayısını değiştir…
+Always on top	Workspaces		Her zaman üstte
+Show window border	Workspaces		Pencere kenarlığını göster
+Show window tab	Workspaces		Pencere sekmesini göster
+Auto-raise	Workspaces		Kendiliğinden öne getir
+Remove replicant	Workspaces		Yinelenmişi kaldır
+Live in the Deskbar	Workspaces		Masaüstü Çubuğu'nda canlı
+Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Kullanım: %s [seçenekler] [çalışma alanı]\nŞu \"seçenekler\" için:\n  --notitle\t\tbaşlık çubuğu kaldırılmış, kenarlık ve boyutlandırma korunmuş\n  --noborder\t\tbaşlık, kenarlık ve boyutlandırma kaldırılmış\n  --avoidfocus\t\tpencereyi klavye olaylarının hedefi olmaktan korur\n  --alwaysontop\t\tpencereyi en üstte tutar\n  --notmovable\t\tpencere taşınamaz\n  --autoraise\t\tekran kenarındayken çalışma alanı penceresini kendiliğinden öne getirir\n  --help\t\tbu yardım iletisini gösterir ve çıkar\nve \"çalışma alanı\" ise geçilecek çalışma alanının numarasıdır (0-31 arasından)\n
+Switch on mouse wheel	Workspaces		Fare tekerleği ile değiştir
+Workspaces	System name		Çalışma Alanları

@@ -1,0 +1,22 @@
+1	turkish	x-vnd.Haiku-Mouse	3990055017
+Mouse type:	SettingsView		Fare türü
+Warp	SettingsView		Büküm
+2-Button	SettingsView		2 düğmeli
+Double-click test area	SettingsView		Çift tıklama sınama alanı
+Revert	MouseWindow		Eski haline döndür
+...by Andrew Edward McCall	MouseApplication		Yazan: Andrew Edward McCall
+Mouse acceleration	SettingsView		Fare ivmelendirmesi
+Click to focus	SettingsView		Odak için tıklayın
+Click to focus and raise	SettingsView		Odaklayıp öne getirmek için tıklayın
+3-Button	SettingsView		3 düğmeli
+Mouse speed	SettingsView		Fare hızı
+Focus mode:	SettingsView		Odak kipi:
+Instant warp	SettingsView		Anında bükme
+Dig Deal	MouseApplication		Dig Deal
+1-Button	SettingsView		1 düğmeli
+Double-click speed	SettingsView		Çift tıklama hızı
+Defaults	MouseWindow		Öntanımlılar
+Focus follows mouse	SettingsView		Odak fareyi izler
+Accept first click	SettingsView		İlk tıklamayı kabul et
+Normal	SettingsView		Normal
+Mouse	System name		Fare

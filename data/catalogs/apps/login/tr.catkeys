@@ -1,0 +1,20 @@
+1	turkish	x-vnd.Haiku-Login	336867745
+Invalid login!	Login View		Geçersiz giriş!
+Error	Login App		Hata
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tMasaüstü'nün özelleştirilebilmesi için raf düzenleme kipinde başlatır.\n
+Welcome to Haiku	Login Window		Haiku'ya hoş geldiniz
+Halt	Login View		Dur
+Login application for Haiku\nUsage:\n	Login App		Haiku'ya giriş yapma uygulaması\nKullanım:\n
+--nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tPencereyi kipsel yapma\n
+Desktop	Desktop Window		Masaüstü
+Hide password	Login View		Parolayı gizle
+Reboot	Login View		Yeniden başlat
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Giriş uygulamasının arkasında gösterilen masaüstünü üzerine yinelenmişler bırakarak özelleştirebilirsiniz.\n\nİşiniz bittiğinde uygulamadan çıkın. (Cmd-Q).
+OK	Login View		Tamam
+Info	Login App		Bilgi
+Login:	Login View		Giriş:
+Password:	Login View		Parola:
+Unimplemented	Login App		İşlevsel değil
+OK	Login App		Tamam
+Error: %1	Login App		Hata: %1
+error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	hata %s\n

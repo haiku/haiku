@@ -1,0 +1,16 @@
+1	turkish	x-vnd.Haiku-desklink	3568085956
+desklink	MediaReplicant	Title of an alert box	desklink
+Sound preferences…	MediaReplicant		Ses tercihleri...
+Muted	MediaReplicant		Sessiz
+%g dB	MediaReplicant		%g dB
+OK	MediaReplicant		Tamam
+Couldn't launch 	MediaReplicant		Çalıştırılamadı: 
+Volume	VolumeControl		Ses düzeyi
+Open MediaPlayer	MediaReplicant		Ortam Oynatıcısı'nı aç
+%d dB	VolumeControl		%d dB
+Media preferences…	MediaReplicant		Ortam tercihleri...
+Options	MediaReplicant		Seçenekler
+Beep	MediaReplicant		Bip
+Open %name	DeskButton	Don't translate variable %name	%name aç
+Control physical output	MediaReplicant		Fiziksel çıkışı kontrol et
+No media server running	VolumeControl		Çalışan ortam sunucusu bulunamadı

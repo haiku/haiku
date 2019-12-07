@@ -1,0 +1,35 @@
+1	turkish	x-vnd.Haiku-Sudoku	3382377306
+Restore snapshot	SudokuWindow		Anlık görüntüyü eski durumuna getir
+File	SudokuWindow		Dosya
+Mark invalid values	SudokuWindow		Geçersiz değerleri imle
+Solve single field	SudokuWindow		Tek alanı çöz
+Hard	SudokuWindow		Zor
+Start again	SudokuWindow		Yeniden başlat
+New	SudokuWindow		Yeni
+Easy	SudokuWindow		Kolay
+Undo	SudokuWindow		Geri al
+Export as…	SudokuWindow		Dışarı aktar…
+Quit	SudokuWindow		Çık
+Redo	SudokuWindow		Yinele
+Could not open \"%s\":\n%s\n	SudokuWindow		\"%s\" açılamıyor:\n%s\n
+Blank	SudokuWindow		Boş
+Sudoku solved - congratulations!\n	SudokuWindow		Sudokü çözüldü - tebrikler!\n
+Text	SudokuWindow		Metin
+Copy	SudokuWindow		Kopyala
+Solve	SudokuWindow		Çöz
+HTML	SudokuWindow		HTML
+Advanced	SudokuWindow		Gelişmiş
+Set all hints	SudokuWindow		Tüm ipuçlarını yerleştir
+Searching for removable values	SudokuGenerator		Kaldırılabilir değerler aranıyor
+Abort	ProgressWindow		İptal et
+Could not set Sudoku:\n%s\n	SudokuWindow		Sudoku ayarlanamıyor:\n%s\n
+Help	SudokuWindow		Yardım
+OK	SudokuWindow		Tamam
+Sudoku	System name		Sudoku
+Progress monitor	ProgressWindow		Durum monitörü
+Creating solvable field	SudokuGenerator		Çözülebilir alan yaratılıyor
+View	SudokuWindow		Görünüm
+Snapshot current	SudokuWindow		Şu anki durumun görüntüsünü al
+Mark valid hints	SudokuWindow		Geçerli ipuçlarını imle
+Sudoku request	SudokuWindow		Sudoku isteği
+Open file…	SudokuWindow		Dosya aç...

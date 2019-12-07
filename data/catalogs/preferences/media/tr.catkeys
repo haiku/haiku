@@ -1,0 +1,26 @@
+1	turkish	x-vnd.Haiku-Media	1682972002
+Audio mixer	Media Window		Ses karıştırıcısı
+Show volume control on Deskbar	Media views		Ses denetimini Masaüstü Çubuğu'nda göster
+Quit	Media Window		Çık
+Restart media services	Media views		Ortam servislerini yeniden başlat
+Couldn't add volume control in Deskbar: %s\n	Media views		Ses denetimi Masaüstü Çubuğu'na eklenemedi: %s\n
+Start media server	Media Window		Ortam sunucusunu başlat
+<none>	VideoInputMenu	Used when no video input is available	<yok>
+Audio settings	Media Window		Ses ayarları
+Quit anyway	Media Window		Yine de çık
+Couldn't remove volume control in Deskbar: %s\n	Media views		Ses denetimi Masaüstü Çubuğu'ndan kaldırılamadı: %s\n
+Media	System name		Ortam
+Warning!	Media Window		Uyarı!
+MIDI Settings	Media Window		MIDI ayarları
+Video output:	Media views		Video çıkışı:
+Audio output:	Media views		Ses çıkışı:
+Video input:	Media views		Video girişi:
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Ortam'dan çıkma ortam servislerinin yeniden başlatılmalarını durduracaktır. Bu işlem ortam işlevlerini sekteye uğratabilir.
+Audio input:	Media views		Ses girişi:
+<none>	Media views		<yok>
+This hardware has no controls.	Media Window		Bu donanımın herhangi bir denetimi yok.
+Channel:	Media views		Kanal:
+Defaults	Media views		Öntanımlılar
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Ortam sunucusuna bağlanılamadı.\nŞimdi başlatmak ister misiniz?
+Video settings	Media Window		Video ayarları
+<none>	VideoOutputMenu	Used when no video output is available	<yok>

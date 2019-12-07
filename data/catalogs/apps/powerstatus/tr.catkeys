@@ -1,0 +1,46 @@
+1	turkish	x-vnd.Haiku-PowerStatus	3173765686
+Design capacity low warning: 	PowerStatus		Fabrika çıkış kapasite düşük uyarısı: 
+Show percent	PowerStatus		Yüzdeyi göster
+Design capacity: 	PowerStatus		Fabrika çıkış kapasite: 
+ mW	PowerStatus		 mW
+The battery level is getting low, please plug in the device.	PowerStatus		Pil düzeyi düşük, lütfen aygıtınızı fişe takın.
+Battery low	PowerStatus		Pil düşük
+Type: 	PowerStatus		Tür: 
+non-rechargeable	PowerStatus		yeniden doldurulamaz
+Empty battery slot	PowerStatus		Boş pil yuvası
+ mV	PowerStatus		 mV
+Run in window	PowerStatus		Pencere içinde çalış
+PowerStatus	System name		Güç Durumu
+ mWh	PowerStatus		 mWh
+Battery info…	PowerStatus		Pil bilgisi…
+Damaged battery	PowerStatus		Pil hasar görmüş
+Show time	PowerStatus		Zamanı göster
+Last full charge: 	PowerStatus		Son tam dolum: 
+Battery unused	PowerStatus		Pil kullanılmamış
+Extended battery info	PowerStatus		Ek pil bilgisi
+ mA	PowerStatus		 mA
+Current rate: 	PowerStatus		Şu anki yüzde: 
+discharging	PowerStatus		boşalıyor
+Show text label	PowerStatus		Metin etiketlerini göster
+About…	PowerStatus		Hakkında…
+Model number: 	PowerStatus		Model numarası: 
+Install in Deskbar	PowerStatus		Masaüstü Çubuğu'na yükle
+ mAh	PowerStatus		 mAh
+Capacity: 	PowerStatus		Kapasite: 
+Battery discharging	PowerStatus		Pil boşalıyor
+Serial number: 	PowerStatus		Seri numarası: 
+Battery critical	PowerStatus		Pil düzeyi kritik
+Capacity granularity 1: 	PowerStatus		Kapasite tanecikliği 1: 
+OEM info: 	PowerStatus		OEM bilgisi: 
+Design voltage: 	PowerStatus		Fabrika çıkış voltaj: 
+Battery charging	PowerStatus		Pil doluyor
+The battery level is critical, please plug in the device immediately.	PowerStatus		Pil düzeyi kritik, lütfen aygıtınızı hemen fişe takın.
+Design capacity warning: 	PowerStatus		Fabrika çıkış kapasite uyarısı: 
+Quit	PowerStatus		Çık
+rechargeable	PowerStatus		yeniden doldurulabilir
+charging	PowerStatus		doluyor
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Güç Durumu'nu bir pencere içinde çalıştırabilir veya Masaüstü Çubuğu'na yükleyebilirsiniz.
+Show status icon	PowerStatus		Durum simgesini göster
+Capacity granularity 2: 	PowerStatus		Kapasite tanecikliği 2: 
+Technology: 	PowerStatus		Teknoloji: 
+no battery	PowerStatus		pil yok

@@ -1,0 +1,17 @@
+1	turkish	x-vnd.Haiku-MatchHeader	1946584206
+Delete message	ConfigView		İletiyi sil
+Match \"%attribute\" against \"%regex\"	RuleFilter		\"%attribute\" özniteliğini şununla eşleştir: \"%regex\
+Match header	RuleFilter		Başlık eşleştir
+Set flags to	ConfigView		Bayrakları şu şekilde ayarla:
+Header field (e.g. Subject, From, …)	ConfigView		Başlık alanı (örn. Konu, Kimden, …)
+<Choose account>	ConfigView		<Hesap seçin>
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		\"*spam\" gibi joker değer.\nDüzenli ifadeleri kullanmak için önüne \"REGEX\" koyun.
+Then	ConfigView		sonra
+If	ConfigView		Eğer
+Set as read	ConfigView		Okunmuş olarak işaretle
+Reply with	ConfigView		Şununla yanıtla:
+<Choose action>	ConfigView		<Eylem seçin>
+Move to	ConfigView		Taşı
+this field is based on the action	ConfigView		bu alan eyleme dayanmaktadır
+Account	ConfigView		Hesap
+has	ConfigView		var

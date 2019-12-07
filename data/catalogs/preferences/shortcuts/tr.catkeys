@@ -1,0 +1,47 @@
+1	turkish	x-vnd.Haiku-Shortcuts	3834857117
+*MouseUp	ShortcutsWindow		*FareYukarı
+Application	ShortcutsWindow		Uygulama
+Option	ShortcutsSpec	Name for modifier on keyboard	Seçenek
+Save changes before closing?	ShortcutsWindow		Kapatmadan önce değişiklikler kaydedilsin mi?
+Revert to saved	ShortcutsWindow		Kaydedilene döndür
+Don't save	ShortcutsWindow		Kaydetme!
+*MouseDown	ShortcutsWindow		*FareAşağı
+*Beep	ShortcutsWindow		*Bip
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Kısayollar düğme setinizi kaydedemedi.
+Save	ShortcutsWindow		Kaydet
+Either	ShortcutsSpec		Herhangi biri
+Oh no	ShortcutsWindow		N'olamaz
+Key	ShortcutsWindow		Düğme
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*İletiGönder application/x-vnd.Be-TRAK 'Tfnd'
+Select	ShortcutsWindow		Seç
+Shortcuts	System name		Kısayollar
+Quit	ShortcutsWindow		Çık
+(Choose application with file requester)	ShortcutsWindow		(Dosya isteyicisi olan bir uygulama seçin)
+Cancel	ShortcutsWindow		İptal
+*MoveMouse +20 +0	ShortcutsWindow		*FareyiHareketEttir +20 +0
+Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
+Left	ShortcutsSpec		Sol
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Kısayollar düğme seti dosyanızı işleyemedi!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Kısayollar düğme seti dosyanızı kaydedemedi!
+*InsertString \"Your Text Here\"	ShortcutsWindow		*DiziGir \"Buraya metin girin\"
+Remove selected shortcut	ShortcutsWindow		Seçili kısayolu kaldır
+Error, NULL state description?	ShortcutsSpec		Hata, NULL durum açıklaması?
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Kısayollar düğme setinizi açamadı!
+Save & apply	ShortcutsWindow		Kaydet & uygula
+Open	ShortcutsWindow		Aç
+Append	ShortcutsWindow		İliştir
+Both	ShortcutsSpec		Her ikisi de
+Save KeySet as…	ShortcutsWindow		Düğme setini farklı kaydet…
+Append KeySet…	ShortcutsWindow		Düğme seti iliştir…
+*MouseButton 1	ShortcutsWindow		*FareDüğmesi 1
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Çoklu \"*FareyiHareketEttir %100 0\" \"*FareDüğmesi 1\"
+Right	ShortcutsSpec		Sağ
+OK	ShortcutsWindow		Tamam
+Add new shortcut	ShortcutsWindow		Yeni kısayol ekle
+(None)	ShortcutsSpec		(Yok)
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Open KeySet…	ShortcutsWindow		Düğme seti aç…
+File	ShortcutsWindow		Dosya
+*LaunchHandler text/html	ShortcutsWindow		*Başlatmaİşleyicisi metin/html
+*MoveMouseTo 50% 50%	ShortcutsWindow		*FareyiHareketEttir %50 %50

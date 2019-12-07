@@ -1,0 +1,13 @@
+1	turkish	x-vnd.Haiku-SGITranslator	129108011
+SGI images	SGITranslator		SGI görselleri
+Use compression:	SGIView		Sıkıştırma kullan:
+SGI image translator	SGIView		SGI görseli çevirmeni
+SGI image	SGITranslator		SGI görseli
+SGITranslator Settings	SGITranslator		SGITranslator ayarları
+SGI Settings	SGIMain		SGI ayarları
+SGI image translator	SGITranslator		SGI görseli çevirmeni
+None	SGIView		Yok
+Version %d.%d.%d, %s	SGIView		Sürüm %d.%d.%d, %s
+\nbased on GIMP SGI plugin v1.5:\n	SGIView		\nGIMP SGI eklentisi v1.5 temel alınmıştır:\n
+RLE	SGIView		RLE
+written by:\n	SGIView		yazan:\n

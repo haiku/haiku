@@ -1,5 +1,6 @@
-1	swedish	x-vnd.Haiku-FileTypes	734679611
+1	swedish	x-vnd.Haiku-FileTypes	436017301
 Left	Attribute Window	Attribute column alignment in Tracker	Vänster
+Float	Attribute ListView		Flytande
 Final	Application Types Window		Slutgiltig
 FileTypes request	FileTypes Window		FilTyper - begäran
 This file type already exists	New File Type Window		Filtypen finns redan
@@ -31,6 +32,7 @@ Signature:	Application Types Window		Signatur:
 None	FileTypes Window		Ingen
 Exclusive launch	Application Type Window		Exklusiv start
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Att ta bort en filtyp kan inte ångras.\nÄr du säker på att du vill ta bort filtypen?
+Integer 64 bit	Attribute ListView		Integer 64-bitars
 Cancel	New File Type Window		Avbryt
 Select same preferred application as	FileType Window		Välj samma förinställda program som
 Cancel	Type List Window		Avbryt
@@ -43,10 +45,13 @@ Abort	Application Types Window		Avbryt
 Save	Application Type Window		Spara
 %1 application type	Application Type Window		%1 programtyp
 Icon	Application Type Window		Ikon
+Duration	Attribute ListView		Duration
 Version:	Application Type Window		Version:
 Default application	FileType Window		Förinställt program
 Internal name:	New File Type Window		Internt namn:
+Integer 8 bit	Attribute ListView		Integer 8-bitars
 Extension:	Extension Window		Tillägg:
+Time	Attribute ListView		Tid
 Extensions:	FileTypes Window		Tillägg:
 Select preferred application	FileType Window		Välj förinställda program
 Description:	FileTypes Window		Beskrivning:
@@ -66,6 +71,8 @@ Version:	Application Types Window		Version:
 Application types	Application Types Window		Programtyper
 Description:	Application Types Window		Beskrivning:
 Name:	Application Types Window		Namn:
+Rating	Attribute ListView		Betyg
+duration	Attribute ListView		duration
 File could not be opened	Preferred App Menu		Filen kunde inte öppnas
 Args only	Application Type Window		Endast argument
 Could not open \"%s\":\n%s	FileTypes		Kunde inte öppna  \"%s\":\n%s
@@ -83,16 +90,21 @@ Type name:	FileTypes Window		Typnamn:
 Visible	Attribute Window		Synlig
 Select preferred application	FileTypes Window		Välj förinställt program
 Path:	Application Types Window		Sökväg:
+rating	Attribute ListView		betyg
 Could not install file type	New File Type Window		Kunde inte installera filtyp
 Same as…	FileTypes Window		Samma som...
 Golden master	Application Type Window		Produktionsversion
+Checkbox	Attribute ListView		Kryssruta
 FileTypes request	Preferred App Menu		Filtypsbegäran
 no icon	FileTypes Window		ingen ikon
 Single launch	Application Type Window		Starta en
 %s file type	FileType Window		%s filtyp
+Default	Attribute ListView		Förvald
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Borttagning av huvudtyp kan inte ångras.\nAlla filtyper som hör till huvudtypen kommer att gå förlorade!\n\nÄr du säker på att du vill fortsätta? För att ta bort en hel grupp, håll nere shift-tangenten och tryck på \"Ta bort\".
+String	Attribute ListView		Sträng
 Add type	New File Type Window		Lägg till typ
 Remove icon	Icon View		Ta bort ikon
+Boolean	Attribute ListView		Boolean
 Cancel	Extension Window		Avbryt
 Alignment:	Attribute Window		Linjering:
 Icon	FileType Window		Ikon
@@ -101,6 +113,7 @@ Development	Application Type Window		Utveckling
 Golden master	Application Types Window		Produktionsversion
 Add	Extension Window		Lägg till
 Open…	FileTypes Window		Öppna...
+checkbox	Attribute ListView		kryssruta
 Could not change file extensions	Extension Window		Kunde inte ändra filtillägget
 Could not open file	FileType Window		Kunde inte öppna filen
 Choose type	Type List Window		Välj typ
@@ -118,6 +131,7 @@ Add group	New File Type Window		Lägg till grupp
 Cancel	Attribute Window		Avbryt
 Gamma	Application Types Window		Gamma
 Supported types	Application Type Window		Stödda typer
+Integer 32 bit	Attribute ListView		Integer 32-bitars
 Beta	Application Type Window		Beta
 Could not retrieve preferred application of this file	Preferred App Menu		Kunde inte hämta förinställt program för denna fil
 Application flags	Application Type Window		Programflaggor
@@ -142,6 +156,7 @@ Extra attributes	FileTypes Window		Extra attribut
 Group:	New File Type Window		Grupp:
 Alpha	Application Types Window		Alfa
 Close	Application Type Window		Stäng
+Integer 16 bit	Attribute ListView		Integer 16-bitars
 Extension	Extension Window		Tillägg
 Rule:	FileTypes Window		Regel:
 FileTypes	System name		FilTyper
@@ -153,5 +168,6 @@ Add…	FileTypes Window		Lägg till...
 Edit icon…	Icon View		Redigera ikon...
 Internal name:	Attribute Window		Internt namn:
 Show recognition rule	FileTypes Window		Visa igenkänningsregel
+Double	Attribute ListView		Dubbel
 Move down	FileTypes Window		Flytta ner
 Alpha	Application Type Window		Alfa

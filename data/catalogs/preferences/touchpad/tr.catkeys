@@ -1,0 +1,21 @@
+1	turkish	x-vnd.Haiku-Touchpad	526581388
+Scrolling	TouchpadPrefView		Kaydırma
+Tapping	TouchpadPrefView		Dokunma
+Touchpad	System name		İzleme Dörtgeni
+Cancel	TouchpadPrefView		İptal
+OK	TouchpadPrefView		Tamam
+Horizontal scrolling	TouchpadPrefView		Yatay kaydırma
+Slow	TouchpadPrefView		Yavaş
+Two finger scrolling	TouchpadPrefView		İki parmak kaydırma
+No touchpad found, the settings will have no effect.	TouchpadPrefView		Bir izleme dörtgeni bulunamadı, bu ayarların herhangi bir etkisi olmayacak.
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Yeni kaydırma alanı çok geniş ve normal fare işlemlerine engel olabilir. Değiştirmek istediğinizden emin misiniz?
+Defaults	TouchpadPrefView		Öntanımlılar
+High	TouchpadPrefView		Yüksek
+Off	TouchpadPrefView		Kapalı
+Fast	TouchpadPrefView		Hızlı
+Vertical	TouchpadPrefView		Dikey
+Please confirm	TouchpadPrefView		Lütfen onaylayın
+Acceleration	TouchpadPrefView		İvmelenme
+Horizontal	TouchpadPrefView		Yatay
+Sensitivity	TouchpadPrefView		Duyarlılık
+Revert	TouchpadPrefView		Eski haline döndür

@@ -1,0 +1,64 @@
+1	turkish	x-vnd.Haiku-PackageInstaller	2472572058
+Package description	UninstallView		Paket tanımı
+none	PackageView		yok
+Continue	PackageInstall		Sürdür
+Running post-installation scripts	PackageInstall		Yükleme sonrası betikleri çalıştırılıyor
+Package installer	PackageView		Paket yükleyicisi
+All existing files will be skipped?	PackageView		Tüm var olan dosyalar atlansın mı?
+Replace	PackageView		Değiştir
+All existing files will be replaced?	PackageView		Tüm var olan dosyalar değiştirilsin mi?
+Other…	PackageView		Diğer…
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Verilen yolda '%s' adlı sembolik bağ zaten var.\nBu bağ paketteki ile değiştirilsin mi?
+Stop	PackageStatus		Durdur
+Install to:	PackageView		Yükleme konumu:
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Bu paket hâlihazırda sisteminizde yüklü gibi görünüyor. Kaldırılıp yeniden yüklensin mi?
+Skip all	PackageView		Tümünü atla
+The installation of the package has been aborted.	PackageView		Paket kurulumu iptal edildi.
+No installation type selected	PackageView		Hiçbir kurulum türü seçilmedi
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Bu seçimi kurulumun geri kalanında hatırlamak istiyor musunuz?\n
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Seçili paket sisteminizden kaldırılamadı. Paket bilgisi dosyası hasar görmüş olabilir.
+Install…	UninstallView		Yükle…
+The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Verilen yolda '%s' adlı öge zaten var.\nBu öge paketteki ile değiştirilsin mi?
+Installing files and folders	PackageInstall		Dosyalar ve klasörler yükleniyor
+Installed packages	UninstallWindow		Yüklü paketler
+Remove	UninstallView		Kaldır
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		İstenilen paket sisteminize yüklenemedi. Hedef paket dosyasında bir sorun olabilir. Bu durumu paket dağıtıcısı ile paylaşın.
+OK	UninstallView		Tamam
+Accept	PackageTextViewer		Kabul et
+Abort	PackageView		İptal et
+Disclaimer	PackageTextViewer		Sorumluluk Belgesi
+Preparing package	PackageInstall		Paket hazırlanıyor
+The package you requested has been successfully installed on your system.	PackageView		İstediğiniz paket sisteminize başarıyla kuruldu.
+Installation progress	PackageView		Kurulum ilerlemesi
+Decline	PackageTextViewer		Reddet
+Continue	PackageTextViewer		Sürdür
+Installing package	PackageStatus		Paket yükleniyor
+Install %name%	PackageView		%name% paketini yükle
+%index% of %total%	PackageInstall		%index%/%total%
+No package selected.	UninstallView		Hiçbir paket seçilmedi.
+%name% (%size% free)	PackageView		%name% (%size% kullanılmayan)
+Error while installing the package\n	PackageView		Paket yüklenirken hata\n
+Finishing installation	PackageInstall		Kurulum tamamlanıyor
+No package available.	PackageInfo		Hiçbir paket mevcut değil
+The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Verilen yolda '%s' adlı betik zaten var.\nBu betik paketteki ile değiştirilsin mi?
+Installation type:	PackageView		Kurulum türü:
+The package you selected has been successfully removed from your system.	UninstallView		Seçtiğiniz paket sisteminizden başarıyla kaldırıldı.
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Paket dosyasında bir dosya boyutu uyuşmazlığı mevcut. Paket hasar görmüş veya sonradan değiştirilmiş olabilir. Yine de sürdürmek istiyor musunuz?
+%name% (%size%)	PackageView		%name% (%size%)
+Abort	PackageInstall		İptal et
+The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Verilen yolda '%s' adlı dosya zaten var.\nBu dosya paketteki ile değiştirilsin mi?
+Replace all	PackageView		Tümünü değiştir
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Paket dosyası okunabilir değil.\nBunun olası nedenlerinden bir tanesi istenilen dosyanın geçerli bir BeOS .pkg paketi olmaması olabilir.
+Continue	PackageInfo		Sürdür
+No package selected.	PackageInfo		Hiçbir paket seçilmedi.
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Hata! \"%s\" geçerli bir yol değil.\n
+The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Verilen yolda '%s' adlı dizin zaten var.\nBu dizin paketteki ile değiştirilsin mi?
+LegacyPackageInstaller	System name		Eski Paket Yükleyicisi
+Ask again	PackageView		Yeniden sor
+Begin	PackageView		Başla
+OK	PackageView		Tamam
+Abort	PackageInfo		İptal et
+Done	PackageInstall		Tamamlandı
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Hata (%s)! \"%s\" açılamadı.\n
+Skip	PackageView		Atla
+Image not loaded correctly	PackageImageViewer		Görsel doğru yüklenmedi

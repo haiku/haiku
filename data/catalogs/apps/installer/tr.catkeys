@@ -1,0 +1,89 @@
+1	turkish	x-vnd.Haiku-Installer	116830250
+Performing installation.	InstallProgress		Kuruluyor.
+Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Açılır menüden kaynak diski seçin ve \"Başla\"ya tıklayın.
+Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Yükleyici penceresini kapatmadan önce Disk İzlencesi penceresini kapatın.
+No optional packages available.	PackagesView		İsteğe bağlı paketler mevcut değil.
+Restart system	InstallerWindow		Yeniden başlat
+The mount point could not be retrieved.	InstallProgress		Bağlama noktası bulunup getirilemedi.
+<none>	InstallerWindow	No partition available	<yok>
+Please choose target	InstallerWindow		Lütfen hedef seçin
+Cancel	InstallProgress		İptal
+Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Kurulum tamamlandı. Önyükleme alanı '%s' içine yazıldı. Bilgisayarınızı yeniden başlatın veya başka bir kurulum gerçekleştirmek için yeni bir hedef bölüm seçin.
+Are you sure you want to to stop the installation?	InstallerWindow		Kurulumu durdurmak istediğinizden emin misiniz?
+Installer	System name		Yükleyici
+Unknown Type	InstallProgress	Partition content type	Bilinmeyen tür
+Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		'%1s' üzerinden '%2s' konumuna kurulum yapmak için Başla düğmesine tıklayın.
+Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Açılır menüden kurulum yapmak istediğiniz diski seçin ve \"Başla\"ya tıklayın.
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Kurulum tamamlandı. Önyükleme alanı '%s' içine yazıldı. Yükleyici'den çıkın veya başka bir kurulum gerçekleştirmek için yeni bir hedef bölüm seçin.
+README	InstallerApp		BENİOKU
+Quit	InstallerWindow		Çık
+Write boot sector to '%s'	InstallerWindow		Önyükleme alanını '%s' içine yaz
+Boot sector not written because of an internal error.	InstallProgress		Bir iç hatadan dolayı önyükleme alanı yazılamadı.
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Disk İzlencesi açılamadı.
+Welcome to the Haiku Installer!\n\n	InstallerApp		Haiku yükleyicisine hoş geldiniz!\n\n
+?? of ??	InstallerWindow	Unknown progress	??/??
+Quit Boot Manager	InstallerWindow		Önyükleme Yöneticisi'nden çık
+Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Önyükleme Yöneticisi çalışıyor…\n\nKurulumu sürdürmek için Önyükleme Yöneticisi'ni kapatın.
+Quit DriveSetup	InstallerWindow		Disk İzlencesi'nden çık
+Write boot sector	InstallerWindow		Önyükleme alanını yaz
+%1ld of %2ld	InstallerWindow	number of files copied	%1ld/%2ld
+Finishing installation.	InstallProgress		Kurulum tamamlanıyor.
+Install from:	InstallerWindow		Şuradan yükle:
+Additional disk space required: 0.0 KiB	InstallerWindow		Gereken ek disk alanı: 0.0 KiB
+This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Bu yazılım geliştirilme aşamasındadır; (önemli) verilerinizin kaybolma riski mevcuttur! Sık sık yedek almayı unutmayın! Demedi demeyin sonra.\n\n\n
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Haiku masaüstünü ilk kez gördükten sonra \"Hoş geldiniz\" ve \"Kullanıcı Kılavuzu\" belgelerini okumayı unutmayın. Masaüstü'nde ve WebPositive yer imleri içerisinde bağlantılar bulabilirsiniz.\n\n
+???	InstallerWindow	Unknown currently copied item	???
+Install anyway	InstallProgress		Yine de yükle
+1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Haiku'yu bir öykünücü değil de gerçek bir makineye kuruyorsanız, başka işletim sistemi için bir disk bölümü bırakmak isteyebilirsiniz (bunun için örneğin GParted Live-CD sürümünü kullanabilirsiniz, bu sürüm mevcut bölümlerin de boyutunu değiştirebilir).\nEğer isterseniz disk bölümlendirme için Disk İzlencesi uygulamasını Yükleyici içinden çalıştırabilirsiniz, ancak bu yazılım mevcut bölümlerin boyutunu değiştiremez. Disk İzlencesi uzun yıllardır kullanılan denenmiş bir yazılım olmasına rağmen diğer disk bölümlerinin güncel bir yedeğine sahip olmanız tavsiye edilir. N'olur n'olmaz…
+Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Açılır menülerden kaynak ve hedef diskleri seçip \"Başla\"ya tıklayın.
+Hide optional packages	InstallerWindow		İsteğe bağlı paketleri gizle
+???	InstallerWindow	Unknown partition name	???
+Have fun and thanks for trying out Haiku!	InstallerApp		Haiku'yu denediğiniz için teşekkür ederiz!
+Quit	InstallerApp		Çık
+Starting installation.	InstallProgress		Kurulum başlatılıyor.
+Error writing boot sector.	InstallProgress		Önyükleme alanı yazılırken hata.
+OK	InstallerWindow		Tamam
+Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Yükleyici penceresini kapatmadan önce Önyükleme Yöneticisi ve Disk İzlencesi pencerelerini kapatın.
+Failed to launch Boot Manager	InstallerWindow		Önyükleme Yönetici başlatılamadı
+Try installing anyway	InstallProgress		Yine de kurmayı dene
+IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		HAİKU'YU YÜKLEMEDEN ÖNCE LÜTFEN OKUYUN!\n\n
+Additional disk space required: %s	InstallerWindow		Gereken ek disk alanı: %s
+Stop	InstallerWindow	In alert after pressing Stop	Durdur
+Boot sector successfully written.	InstallProgress		Önyükleme alanı başarıyla yazıldı.
+An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Bir hatadan dolayı kurulum tamamlanamadı:\n\nHata:  %s
+Restart	InstallerWindow		Yeniden başlat
+The disk can't be mounted. Please choose a different disk.	InstallProgress		Disk bağlanamıyor. Lütfen başka bir disk seçin.
+Begin	InstallerWindow		Başla
+Collecting copy information.	InstallProgress		Kopya bilgisi toplanıyor.
+Show optional packages	InstallerWindow		İsteğe bağlı paketleri göster
+The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Hedef diskte yeteri kadar boş alan olmayabilir. Başka bir disk seçin veya isteğe bağlı yüklemeleri gözden geçirin.
+Installation canceled.	InstallProgress		Kurulum iptal edildi.
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Hedef disk bölümü boş değil. Yine de kurmak istiyor musunuz?\n\nNot: 'system' klasörünün tümüyle üzerine yazılırken mevcut sistem ayarları korunacaktır. Diğer tüm klasörler yeni kurulumda korunurken hem kaynak hem de hedef konumda bulunan dosyalar ve bağlar kaynak sürümleri ile değiştirilecektir.
+OK	InstallerApp		Tamam
+Are you sure you want to abort the installation?	InstallerWindow		Kurulumu durdurmak istediğinizden emin misiniz?
+Stop	InstallerWindow		Durdur
+Cancel	InstallerWindow		İptal
+Continue	InstallerWindow	In alert after pressing Stop	Sürdür
+No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Kurulum için uygun bir disk bölümü bulunamadı. Lütfen disk bölümlerini ayarlayın ve en azından bir disk bölümünü Be Dosya Sistemi ile ilkçalıştırın.
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Disk İzlencesi uygulamasını mevcut disk\nbölümlerini ve diğer ortamları biçimlendirmek\niçin çalıştırın. Haiku yüklenecek disk\nbölümlerinin Be Dosya Sistemi ile ilkçalıştırılması\ngerekmektedir.
+Scanning for disks…	InstallerWindow		Diskler taranıyor…
+Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Disk İzlencesi çalışıyor…\n\nKurulumu sürdürmek için Disk İzlencesi'ni kapatın.
+Abort	InstallerWindow		İptal et
+The partition can't be mounted. Please choose a different partition.	InstallProgress		Bölüm bağlanamıyor. Lütfen başka bir bölüm seçin.
+Set up partitions…	InstallerWindow		Bölümleri ayarla…
+Install progress:  	InstallerWindow		Kurulum ilerlemesi:  
+You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Bir diskin içeriğini kendi üzerine yükleyemezsiniz. Lütfen başka bir disk seçin.
+Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Önyükleme Yöneticisi çalıştırılamadı.
+Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Yükleyici'yi kapatmadan önce Önyükleme Yöneticisi penceresini kapatın.
+OK	InstallProgress		Tamam
+Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Önyükleme Yöneticisi ve Disk İzlencesi çalışıyor…\n\nKurulumu sürdürmek için her iki uygulamayı da kapatın.
+Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Mevcut önyükleme diskine yüklemek istediğinizden emin misiniz? Yükleyici makinenizi yeniden başlatacaktır.
+Onto:	InstallerWindow		Şuraya:
+Quit Boot Manager and DriveSetup	InstallerWindow		Önyükleme Yöneticisi'nden ve Disk İzlencesi'nden çık
+Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Yükleyici\n\tYazanlar: Jérôme Duval ve Stephan Aßmus\n\tCopyright 2005-2020, Haiku.\n\n
+Tools	InstallerWindow		Araçlar
+scanning…	InstallerWindow		taranıyor…
+2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2).  Yükleyici Haiku bölümünü önyüklenebilir duruma getirecektir, ancak Haiku'yu mevcut önyükleme menüsüne eklemek için bir şey yapmaz. Eğer sisteminizde GRUB kurulu ise Haiku'yu buraya ekleyebilirsiniz.\nAyrıntılar için web sitemizdeki Haiku'yu önyükleme bölümüne bir göz atın: https://www.haiku-os.org/guides/booting.\nEğer isterseniz Yükleyici'nin \"Araçlar\" menüsünden bir önyükleme menüsü hazırlayabilirsiniz, bunun için Kullanıcı Kılavuzu'nun \"Önyükleme Yöneticisi\" konu başlığına başvurun.\n\n\n
+Set up boot menu	InstallerWindow		Önyükleme menüsünü ayarla
+Continue	InstallerApp		Sürdür
+Are you sure you want to abort the installation and restart the system?	InstallerWindow		Kurulumu iptal edip bilgisayarınızı yeniden başlatmak istediğinizden emin misiniz?

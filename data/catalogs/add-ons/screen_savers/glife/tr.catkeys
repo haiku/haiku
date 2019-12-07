@@ -1,0 +1,14 @@
+1	turkish	x-vnd.Haiku-GLifeScreensaver	2955223231
+by Aaron Hill	GLife ScreenSaver		Yazan: Aaron Hill
+Grid life delay: none	GLife ScreenSaver		Izgara yaşam gecikmesi: yok
+None	GLife ScreenSaver		Yok
+Grid height: %li	GLife ScreenSaver		Izgara yüksekliği: %li
+Grid width: 	GLife ScreenSaver		Izgara genişliği: 
+Grid life delay: %dx	This is a factor: the x represents 'times', don't translate '%d'		Izgara yaşam gecikmesi: %dx
+Grid border: %li	GLife ScreenSaver		Izgara kenarlığı: %li
+Grid border: 	GLife ScreenSaver		Izgara kenarlığı: 
+OpenGL \"Game of Life\"	GLife ScreenSaver		OpenGL \"Hayat Oyunu\"
+Grid height: 	GLife ScreenSaver		Izgara yüksekliği: 
+4x	GLife ScreenSaver	This is a factor: the x represents 'times'	4x
+Grid width: %li	GLife ScreenSaver		Izgara genişliği: %li
+Grid life delay: 	GLife ScreenSaver		Izgara yaşam gecikmesi: 

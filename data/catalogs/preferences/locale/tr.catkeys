@@ -1,0 +1,31 @@
+1	turkish	x-vnd.Haiku-Locale	1488345554
+Available languages	Locale Preflet Window		Kullanılabilir diller
+Negative:	TimeFormatSettings		Negatif:
+already chosen	LanguageListView		zaten seçilmiş
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Kullanılabilir diller bulunamıyor! Bu preflet'i kullanamazsınız!
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Bu değişikliğin etkin olması için Masaüstü Çubuğu ve İzleyici'nin yeniden başlatılması gerekiyor. Şimdi yeniden başlatmak ister misiniz?
+Long format:	TimeFormatSettings		Uzun biçim:
+Currency	TimeFormatSettings		Para birimi
+Locale	System name		Yerelleştirme
+Short format:	TimeFormatSettings		Kısa biçim:
+Language	Locale Preflet Window		Dil:
+Preferred languages	Locale Preflet Window		Tercih edilen diller
+Use month/day-names from preferred language	TimeFormatSettings		Ay/gün adlarını tercih edilen dillerden al
+Formatting	Locale Preflet Window		Biçimlendirme
+Locale	Locale Preflet Window		Yerelleştirme
+Numbers	TimeFormatSettings		Sayılar
+24 hour	TimeFormatSettings		24 saat
+OK	Locale Preflet Window		Tamam
+Restart	Locale Preflet Window		Yeniden başlat
+Full format:	TimeFormatSettings		Tam biçim:
+Defaults	Locale Preflet Window		Öntanımlılar
+Cancel	Locale Preflet Window		İptal
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Masaüstü Çubuğu ve İzleyici'deki uygulama adlarını çevir.
+Revert	Locale Preflet Window		Eski haline döndür
+Medium format:	TimeFormatSettings		Orta biçim:
+12 hour	TimeFormatSettings		12 saat
+Time	TimeFormatSettings		Zaman
+Date	TimeFormatSettings		Tarih
+Positive:	TimeFormatSettings		Pozitif:
+Locale	Locale Preflet		Yerelleştirme
+Options	Locale Preflet Window		Seçenekler

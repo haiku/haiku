@@ -1,0 +1,14 @@
+1	turkish	x-vnd.Haiku-NewMailNotification	1375000288
+Log window	NotifierConfigView		Günlük penceresi
+none	NotifierConfigView		yok
+New mails notification	NotifierFilter		Yeni posta bildirimi
+Alert	NotifierConfigView		Uyarı
+OK	NotifierFilter		Tamam
+Central alert	NotifierConfigView		Merkezi uyarı
+Beep	NotifierConfigView		Bip
+Central beep	NotifierConfigView		Merkezi bip
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{Bir yeni ileti} other{# yeni ileti}}
+New messages	NotifierFilter		Yeni iletiler
+Method:	NotifierConfigView		Yöntem:
+Keyboard LEDs	NotifierConfigView		Klavye LED'leri
+You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		%account hesabında {0, plural, one{bir yeni iletiniz} other{# yeni iletiniz}} var.

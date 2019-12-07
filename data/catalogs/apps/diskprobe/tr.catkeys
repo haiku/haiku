@@ -1,0 +1,133 @@
+1	turkish	x-vnd.Haiku-DiskProbe	2944605311
+Raw editor	AttributeWindow		Raw düzenleyicisi
+Remove	AttributeWindow		Kaldır
+Close	ProbeView		Kapat
+Boolean value:	TypeEditors		Boolean değeri:
+File	ProbeView		Dosya
+Block size	ProbeView	Menu item. This is in the same menu window than 'Base' and 'Font size'	Blok boyutu
+MIME type editor	TypeEditors		MIME türü düzenleyicisi
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Onaltılık
+16 bit unsigned value:	TypeEditors		16 bit imzalanmamış değer:
+8 bit signed value:	TypeEditors		8 bit imzalanmış değer:
+ (native)	ProbeView		 (yerel)
+Attribute offset: 	ProbeView		Öznitelik ofseti: 
+Text	TypeEditors	This is the type of editor	Metin
+File offset: 	ProbeView		Dosya ofseti: 
+Add	ProbeView		Ekle
+64 bit signed value:	TypeEditors		64 bit imzalanmış değer:
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		\"%s\" özniteliğini \"%s\" dosyasından kaldırmak istediğinizden emin misiniz?\n\nBu işlem geri alınamaz.
+No type editor available	AttributeWindow		Bir tür düzenleyicisi mevcut değil
+Print…	ProbeView		Yazdır…
+New…	FileWindow		Yeni…
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	ne: '%.4s'\n\n
+OK	DiskProbe		Tamam
+DiskProbe	System name		DiskProbe
+Back	ProbeView		Geri
+Device: 	ProbeView		Aygıt: 
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Sayı sistemi
+Open file…	FileWindow		Dosya aç…
+32 bit unsigned pointer:	TypeEditors		32 bit imzalanmamış işaretleyici:
+DiskProbe request	DiskProbe		DiskProbe isteği
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Onaltılık
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Dosyaya yazma başarısız oldu:\n%s\n\nÇıktığınız zaman tüm değişiklikler kaybolacaktır.
+Examine device:	OpenWindow		Aygıtı incele:
+Number editor	TypeEditors		Sayı düzenleyicisi
+Icon	TypeEditors		Simge
+Attribute	ProbeView		Öznitelik
+Don't save	ProbeView		Kaydetme!
+Undo	ProbeView		Geri al
+Flattened bitmap	TypeEditors		Düzleştirilmiş biteşlem
+Block %Ld (0x%Lx)	ProbeView		Blok: %Ld (0x%Lx)
+Cancel	OpenWindow		İptal
+Unknown format	TypeEditors		Bilinmeyen biçim
+File: 	ProbeView		Dosya: 
+Swapped: %Ld (0x%0*Lx)	ProbeView		Takas edildi: %Ld (0x%0*Lx)
+Stop	ProbeView		Durdur
+Cancel	ProbeView		İptal
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	\"%s\" açılamadı:\n%s
+Font size	ProbeView		Yazıtipi boyutu
+Type editor not supported	ProbeView		Tür düzenleyicisi desteklenmiyor
+Native: 0x%0*Lx	ProbeView		Yerel: 0x%0*Lx
+Copy	ProbeView		Kopyala
+Redo	ProbeView		Yinele
+Floating-point value:	TypeEditors		Kayan nokta değeri:
+Cancel	AttributeWindow		İptal
+16 bit signed value:	TypeEditors		16 bit imzalanmış değer:
+DiskProbe request	AttributeWindow		DiskProbe isteği
+Next	ProbeView		Sonraki
+64 bit signed offset:	TypeEditors		64 bit imzalanmış ofset:
+32 bit signed value:	TypeEditors		32 bit imzalanmış değer:
+Could not find search string.	ProbeView		Arama dizisi bulunamadı.
+Close	FileWindow		Kapat
+Unknown type	TypeEditors		Bilinmeyen tür
+Open device	FileWindow		Aygıt aç
+Number:	TypeEditors		Sayı:
+Quit	FileWindow		Çık
+Text	FindWindow		Metin
+Block 0x%Lx	ProbeView		Blok 0x%Lx
+Attribute	AttributeWindow		Öznitelik
+Mode:	FindWindow		Kip:
+16 bit	TypeEditors		16 bit
+32 bit size or status:	TypeEditors		32 bit boyut veya durum:
+of 	ProbeView		/ 
+Contents:	TypeEditors		İçerik:
+Could not open file \"%s\": %s\n	DiskProbe		\"%s\" dosyası açılamadı: %s\n
+Probe file…	OpenWindow		Dosya araştır…
+Block: 	ProbeView		Blok: 
+Bookmarks	ProbeView		Yer imleri
+Probe device	OpenWindow		Aygıt araştır
+none	ProbeView	No attributes	yok
+Case sensitive	FindWindow		BÜYÜK/küçük harf duyarlı
+32 bit unsigned value:	TypeEditors		32 bit imzalanmamış değer:
+Remove from file	AttributeWindow		Dosyadan kaldır
+Attributes	ProbeView		Öznitelikler
+Message	TypeEditors	This is the type of view	İleti
+Message View	TypeEditors		İleti görünümü
+Offset: 	ProbeView		Ofset: 
+Swapped: 0x%0*Lx	ProbeView		Takas edildi: 0x%0*Lx
+MIME type:	TypeEditors		MIME türü:
+Fit	ProbeView	Size of fonts, fits to available room	Sığdır
+Type editor	ProbeView		Tür düzenleyicisi
+File	FileWindow		Dosya
+Grayscale	TypeEditors		Gri tonlu
+32 bit	TypeEditors		32 bit
+Native: %Ld (0x%0*Lx)	ProbeView		Yerel: %Ld (0x%0*Lx)
+Device	ProbeView		Aygıt
+Close	AttributeWindow		Kapat
+Type editor	AttributeWindow		Tür düzenleyicisi
+Save	ProbeView		Kaydet
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	/ 0x0
+Attribute type: 	ProbeView		Öznitelik türü: 
+15 bit	TypeEditors		15 bit
+Page setup…	ProbeView		Sayfa yapısı…
+Boolean	TypeEditors	This is the type of editor	Boolean
+Icon view	TypeEditors		Simge görünümü
+Select all	ProbeView		Tümünü seç
+64 bit unsigned value:	TypeEditors		64 bit imzalanmamış değer:
+OK	ProbeView		Tamam
+Previous	ProbeView		Önceki
+Selection	ProbeView		Seçim
+Find	FindWindow		Bul
+8 bit unsigned value:	TypeEditors		8 bit imzalanmamış değer:
+%ld (native)	ProbeView		%ld (yerel)
+Attribute: 	ProbeView		Öznitelik: 
+Block	ProbeView		Blok
+Find again	ProbeView		Yeniden bul
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Görünüm
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Görsel okunamadı
+DiskProbe request	ProbeView		DiskProbe isteği
+Double precision floating-point value:	TypeEditors		Çifte kesinlikli kayan noktalı değer:
+Image	TypeEditors	This is the type of view	Görsel
+Save changes before closing?	ProbeView		Kapatmadan önce değişiklikler kaydedilsin mi?
+PNG format	TypeEditors		PNG biçimi
+Number	TypeEditors	This is the type of editor	Sayı
+Edit	ProbeView		Düzenle
+String editor	TypeEditors		Dizi düzenleyicisi
+Boolean editor	TypeEditors		Boolean düzenleyicisi
+Device offset: 	ProbeView		Aygıt ofseti: 
+Find…	ProbeView		Bul…
+8 bit palette	TypeEditors		8 bit palet
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Onluk
+Image view	TypeEditors	Image means here a picture file, not a disk image.	Görsel görünümü
+Paste	ProbeView		Yapıştır
+32 bit unsigned size:	TypeEditors		32 bit imzalanmamış boyut:

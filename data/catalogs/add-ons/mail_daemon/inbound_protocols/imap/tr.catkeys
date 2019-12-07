@@ -1,0 +1,15 @@
+1	turkish	x-vnd.Haiku-IMAP	1343128980
+Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		\"%server%\" sunucusuna bağlanılamadı:\n%error%
+Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		IMAP klasörlerine olan abonelikler güncelleniyor, lütfen bekleyin…
+Failed to fetch available storage.	IMAPFolderConfig		Kullanılabilir depolama alanı getirilemedi.
+Cancel	IMAPFolderConfig		İptal
+OK	IMAPFolderConfig		Tamam
+Server storage: %s / %s used.	IMAPFolderConfig		Sunucu depolaması: %s/%s kullanılıyor.
+No encryption	imap_config		Şifreleme yok
+Fetching IMAP folders, please be patient…	IMAPFolderConfig		IMAP klasörleri getiriliyor, lütfen bekleyin…
+Configure IMAP Folders	imap_config		IMAP klasörlerini yapılandır
+SSL	imap_config		SSL
+Apply	IMAPFolderConfig		Uygula
+status	IMAPFolderConfig		durum
+IMAP Folders	IMAPFolderConfig		IMAP klasörleri
+Destination:	imap_config		Hedef:

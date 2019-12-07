@@ -1,142 +1,142 @@
 1	dutch; flemish	x-vnd.Haiku-WebPositive	2121601852
-Show home button	Settings Window		Thuisknop tonen
-Username:	Authentication Panel		Gebruikersnaam:
-Copy URL to clipboard	Download Window		URL naar klembord kopiëren
-Cancel	Settings Window		Annuleren
-Close window	WebPositive Window		Venster sluiten
-Quit	WebPositive		Afsluiten
-The download could not be opened.	Download Window		De download kan niet worden geöpend.
-The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	De downloadmap wordt niet geopend.\n\nFout: %error
-Close	Download Window		Sluiten
-Open location	WebPositive Window		Locatie openen
-Clear history	WebPositive Window		Geschiedenis legen
-WebPositive	System name		WebPositive
-Yesterday	WebPositive Window		Gisteren
-Default standard font size:	Settings Window		Standaard lettertypegrootte:
-Start page:	Settings Window		Startpagina:
-History	WebPositive Window		Geschiedenis
-Error opening downloads folder	Download Window		Fout bij het openen van de downloads-map
-Paste	WebPositive Window		Plakken
-Expiration	Cookie Manager		Vervaldatum
-Double-click or middle-click to open new tab.	Tab Manager		Dubbelklik of middel-klik om een nieuw tabblad te openen.
-Proxy username:	Settings Window		Gebruikersnaam proxyserver:
-Save page as…	WebPositive Window		Pagina opslaan als…
-Settings	Settings Window		Instellingen
-Confirmation	WebPositive Window		Bevestiging
-Window	WebPositive Window		Venster
-Decrease size	WebPositive Window		Grootte verkleinen
-Serif font:	Settings Window		Lettertype met schreef:
-Loading %url	WebPositive Window		Bezig met het laden van %url
-Download aborted	Download Window		Download afgebroken
-Value	Cookie Manager		Waarde
-Page source	WebPositive Window		Paginabron
-Next	WebPositive Window		Volgende
-Find next	WebPositive Window		Volgende zoeken
-Download folder:	Settings Window		Downloadmap:
-Edit	WebPositive Window		Bewerken
-Cancel	Authentication Panel		Annuleren
-Match case	WebPositive Window		Hoofdlettergevoelig
-Search page:	Settings Window		Zoekpagina:
-Zoom text only	WebPositive Window		Alleen tekst inzoomen
-Default fixed font size:	Settings Window		Standaardgrootte van proportioneel lettertype:
-Close tab	WebPositive Window		Tabblad sluiten
-Auto-hide mouse pointer	Settings Window		Muisaanwijzer automatisch verbergen
-Quit	WebPositive Window		Afsluiten
-Full screen	WebPositive Window		Volledig scherm
-Open download error	Download Window		Open download fout
-The cookie jar is empty!	Cookie Manager		De koektrommel is leeg!
-Standard font:	Settings Window		Standaardlettertype:
-Restart	Download Window		Herstarten
-Proxy server	Settings Window		Proxyserver
-Open containing folder	Download Window		Bijbehorende map openen
-New window	WebPositive Window		Nieuw venster
-Open	Download Window		Openen
-Reload	WebPositive Window		Herladen
-Downloads	Download Window		Downloads
-Sans serif font:	Settings Window		Schreefloos lettertype:
-Delete	Cookie Manager		Verwijderen
-Forward	WebPositive Window		Volgende
-of	Download Window	...as in '12kB of 256kB'	van
-Revert	Settings Window		Ongedaan maken
-Fixed font:	Settings Window		Lettertype met vaste breedte:
-Cut	WebPositive Window		Knippen
-Bookmark this page	WebPositive Window		Bladwijzer van deze pagina maken
-There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Er was een fout bij het openen van de Bladwijzermap.\n\nFout: %error
-Open downloads folder	Download Window		Downloadmap openen
-Proxy password:	Settings Window		Wachtwoord proxyserver:
-Number of days to keep links in History menu:	Settings Window		Aantal dagen dat links in het geschiedenismenu staan:
-Reset size	WebPositive Window		Grootte opnieuw instellen
-Find:	WebPositive Window		Zoeken:
-Increase size	WebPositive Window		Vergroten
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Er was een fout bij het ophalen van de bladwijzermap.\n\nFout: %error
-Downloads	WebPositive Window		Downloads
-Requesting %url	WebPositive Window		Opvragen van %url
-Apply	Settings Window		Toepassen
-Bookmark info	WebPositive Window		Bladwijzerinfo
-Size:	Font Selection view		Grootte:
-Show tabs if only one page is open	Settings Window		Tabbladen ook tonen als slechts een pagina open is
-About	WebPositive Window		Over
-Fonts	Settings Window		Lettertypen
-OK	Download Window		Ok
-Page source error	WebPositive Window		Paginabronfout
-Open blank page	Settings Window		Lege pagina openen
-New tabs:	Settings Window		Nieuwe tabbladen:
-Cancel	WebPositive Window		Annuleren
-Open all	WebPositive Window		Alles openen
-Proxy server requires authentication	Settings Window		Proxyserver vereist authenticatie
-Clear	URL Bar		Wissen
-Cut	URL Bar		Knippen
-Clear	WebPositive Window		Wissen
-Remove	Download Window		Verwijderen
-Find	WebPositive Window		Zoeken
-Find previous	WebPositive Window		Vorige zoeken
-Settings	WebPositive Window		Instellingen
-Name	Cookie Manager		Naam
-Proxy server address:	Settings Window		Adres proxyserver:
-Proxy server port:	Settings Window		Poort proxyserver:
-Bookmarks	WebPositive Window		Bladwijzers
-Paste	URL Bar		Plakken
-/s)	Download Window	...as in 'per second'	/s)
-Hide password text	Authentication Panel		Wachtwoordtekst verbergen
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Pa's wijze lynx bezag vroom het fikse aquaduct.
-Open start page	Settings Window		Startpagina openen
-Continue downloads	WebPositive		Downloads hervatten
-Cancel	Download Window		Annuleren
-Open search page	Settings Window		Zoekpagina openen
-Password:	Authentication Panel		Wachtwoord:
-Path	Cookie Manager		Pad
-Back	WebPositive Window		Terug
-New browser window	Download Window		Nieuw browservenster
-Today	WebPositive Window		Vandaag
-Remember username and password for this site	Authentication Panel		Gebruikersnaam en wachtwoord voor deze site onthouden
-Earlier	WebPositive Window		Vroeger
 Authentication required	Authentication Panel		Aanmelding is vereist
-Use proxy server to connect to the internet	Settings Window		Gebruik een proxyserver om met het internet te verbinden
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Er zijn nog downloads bezig, wilt u WebPositive echt afsluiten?
-Auto-hide interface in full screen mode	Settings Window		Verberg interface automatisch in volledig-scherm modus
-%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url mislukt
-New tab	WebPositive Window		Nieuw tabblad
-Downloads in progress	WebPositive		Actieve downloads
-Style:	Font Selection view		Stijl:
-General	Settings Window		Algemeen
-View	WebPositive Window		Beeld
 Previous	WebPositive Window		Vorige
-There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Er was een fout bij het maken van het bladwijzerbestand.\n\nFout: %error
-Bookmark error	WebPositive Window		Bladwijzerfout
-Do you really want to clear the browsing history?	WebPositive Window		Wilt u echt de browsergeschiedenis wissen?
-Copy	WebPositive Window		Kopiëren
 Open bookmarks confirmation	WebPositive Window		Bladwijzerbevestiging openen
-Remove missing	Download Window		Ontbrekende verwijderen
-Clone current page	Settings Window		Huidige pagina klonen
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Wilt u %addedCount bladwijzers tegelijkertijd openen?
-OK	Authentication Panel		Ok
-Copy	URL Bar		Kopiëren
-Download finished	Download Window		Download gereed
-Show bookmark bar	WebPositive Window		Toon bladwijzerbalk
-OK	WebPositive Window		Ok
-Manage bookmarks	WebPositive Window		Bladwijzers beheren
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Een bladwijzer voor deze pagina (%bookmarkName) bestaat al.
-Cookies for %s	Cookie Manager		Cookies voor %s
-New windows:	Settings Window		Nieuwe vensters:
+Download folder:	Settings Window		Downloadmap:
+Close window	WebPositive Window		Venster sluiten
+Find:	WebPositive Window		Zoeken:
+Fonts	Settings Window		Lettertypen
+Path	Cookie Manager		Pad
+of	Download Window	...as in '12kB of 256kB'	van
+Bookmarks	WebPositive Window		Bladwijzers
+Use proxy server to connect to the internet	Settings Window		Gebruik een proxyserver om met het internet te verbinden
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url gereed
+Auto-hide interface in full screen mode	Settings Window		Verberg interface automatisch in volledig-scherm modus
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Er was een fout bij het ophalen van de bladwijzermap.\n\nFout: %error
+Delete	Cookie Manager		Verwijderen
+Open containing folder	Download Window		Bijbehorende map openen
+Find previous	WebPositive Window		Vorige zoeken
+Full screen	WebPositive Window		Volledig scherm
+Downloads in progress	WebPositive		Actieve downloads
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Wilt u %addedCount bladwijzers tegelijkertijd openen?
+Copy URL to clipboard	Download Window		URL naar klembord kopiëren
+Clone current page	Settings Window		Huidige pagina klonen
+Start page:	Settings Window		Startpagina:
+Cancel	Download Window		Annuleren
+Settings	Settings Window		Instellingen
+Downloads	WebPositive Window		Downloads
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Een bladwijzer voor deze pagina (%bookmarkName) bestaat al.
+Match case	WebPositive Window		Hoofdlettergevoelig
+Proxy password:	Settings Window		Wachtwoord proxyserver:
+Size:	Font Selection view		Grootte:
+Page source	WebPositive Window		Paginabron
+Proxy server port:	Settings Window		Poort proxyserver:
+Error opening downloads folder	Download Window		Fout bij het openen van de downloads-map
+Show bookmark bar	WebPositive Window		Toon bladwijzerbalk
+Find	WebPositive Window		Zoeken
+Standard font:	Settings Window		Standaardlettertype:
+Open download error	Download Window		Open download fout
+General	Settings Window		Algemeen
+New tabs:	Settings Window		Nieuwe tabbladen:
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url mislukt
+Open downloads folder	Download Window		Downloadmap openen
+Proxy server	Settings Window		Proxyserver
+Decrease size	WebPositive Window		Grootte verkleinen
+Default fixed font size:	Settings Window		Standaardgrootte van proportioneel lettertype:
+Sans serif font:	Settings Window		Schreefloos lettertype:
+Clear	WebPositive Window		Wissen
+Cookies for %s	Cookie Manager		Cookies voor %s
+The download could not be opened.	Download Window		De download kan niet worden geöpend.
+Close	Download Window		Sluiten
+WebPositive	System name		WebPositive
+Reload	WebPositive Window		Herladen
+Expiration	Cookie Manager		Vervaldatum
+Download finished	Download Window		Download gereed
+OK	Authentication Panel		Ok
+Hide password text	Authentication Panel		Wachtwoordtekst verbergen
+Username:	Authentication Panel		Gebruikersnaam:
+Name	Cookie Manager		Naam
 Remove finished	Download Window		Voltooide verwijderen
+Earlier	WebPositive Window		Vroeger
+Edit	WebPositive Window		Bewerken
+Back	WebPositive Window		Terug
+Yesterday	WebPositive Window		Gisteren
+Quit	WebPositive		Afsluiten
+Download aborted	Download Window		Download afgebroken
+Number of days to keep links in History menu:	Settings Window		Aantal dagen dat links in het geschiedenismenu staan:
+Password:	Authentication Panel		Wachtwoord:
+Forward	WebPositive Window		Volgende
+Cut	URL Bar		Knippen
+View	WebPositive Window		Beeld
+Paste	URL Bar		Plakken
+Find next	WebPositive Window		Volgende zoeken
+Open search page	Settings Window		Zoekpagina openen
+Increase size	WebPositive Window		Vergroten
+New tab	WebPositive Window		Nieuw tabblad
+Today	WebPositive Window		Vandaag
+Open location	WebPositive Window		Locatie openen
+New browser window	Download Window		Nieuw browservenster
+Open	Download Window		Openen
+New window	WebPositive Window		Nieuw venster
+New windows:	Settings Window		Nieuwe vensters:
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	De downloadmap wordt niet geopend.\n\nFout: %error
+Cancel	Authentication Panel		Annuleren
+Style:	Font Selection view		Stijl:
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Er was een fout bij het maken van het bladwijzerbestand.\n\nFout: %error
+OK	Download Window		Ok
+Proxy username:	Settings Window		Gebruikersnaam proxyserver:
+Manage bookmarks	WebPositive Window		Bladwijzers beheren
+/s)	Download Window	...as in 'per second'	/s)
+Restart	Download Window		Herstarten
+Serif font:	Settings Window		Lettertype met schreef:
+Apply	Settings Window		Toepassen
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Er was een fout bij het openen van de Bladwijzermap.\n\nFout: %error
+Revert	Settings Window		Ongedaan maken
+Copy	WebPositive Window		Kopiëren
+Default standard font size:	Settings Window		Standaard lettertypegrootte:
+Bookmark this page	WebPositive Window		Bladwijzer van deze pagina maken
+Show tabs if only one page is open	Settings Window		Tabbladen ook tonen als slechts een pagina open is
+Close tab	WebPositive Window		Tabblad sluiten
+Remove	Download Window		Verwijderen
+About	WebPositive Window		Over
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Er zijn nog downloads bezig, wilt u WebPositive echt afsluiten?
+Continue downloads	WebPositive		Downloads hervatten
+Proxy server requires authentication	Settings Window		Proxyserver vereist authenticatie
+Cancel	Settings Window		Annuleren
+History	WebPositive Window		Geschiedenis
+Reset size	WebPositive Window		Grootte opnieuw instellen
+Do you really want to clear the browsing history?	WebPositive Window		Wilt u echt de browsergeschiedenis wissen?
+Fixed font:	Settings Window		Lettertype met vaste breedte:
+Quit	WebPositive Window		Afsluiten
+Remember username and password for this site	Authentication Panel		Gebruikersnaam en wachtwoord voor deze site onthouden
+Show home button	Settings Window		Thuisknop tonen
+The cookie jar is empty!	Cookie Manager		De koektrommel is leeg!
+Value	Cookie Manager		Waarde
+Remove missing	Download Window		Ontbrekende verwijderen
+Paste	WebPositive Window		Plakken
+Double-click or middle-click to open new tab.	Tab Manager		Dubbelklik of middel-klik om een nieuw tabblad te openen.
+Next	WebPositive Window		Volgende
+Bookmark error	WebPositive Window		Bladwijzerfout
+OK	WebPositive Window		Ok
+Zoom text only	WebPositive Window		Alleen tekst inzoomen
+Save page as…	WebPositive Window		Pagina opslaan als…
+Page source error	WebPositive Window		Paginabronfout
+Auto-hide mouse pointer	Settings Window		Muisaanwijzer automatisch verbergen
+Requesting %url	WebPositive Window		Opvragen van %url
+Window	WebPositive Window		Venster
+Proxy server address:	Settings Window		Adres proxyserver:
+Search page:	Settings Window		Zoekpagina:
+Settings	WebPositive Window		Instellingen
+Clear	URL Bar		Wissen
+Loading %url	WebPositive Window		Bezig met het laden van %url
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Pa's wijze lynx bezag vroom het fikse aquaduct.
+Confirmation	WebPositive Window		Bevestiging
+Open all	WebPositive Window		Alles openen
+Cut	WebPositive Window		Knippen
+Downloads	Download Window		Downloads
+Open blank page	Settings Window		Lege pagina openen
+Clear history	WebPositive Window		Geschiedenis legen
+Cancel	WebPositive Window		Annuleren
+Bookmark info	WebPositive Window		Bladwijzerinfo
+Copy	URL Bar		Kopiëren
+Open start page	Settings Window		Startpagina openen

@@ -1,0 +1,49 @@
+1	turkish	x-vnd.Haiku-Time	834234238
+OK	Time		Tamam
+Message receiving failed	Time		İleti alımı başarısız
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Zaman ve Tarih, yazanlar:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nTelif hakkı 2004-2012, Haiku.
+Australia	Time		Avustralya
+America	Time		Amerika
+Reset to default server list	Time		Öntanımlı sunucu listesine sıfırla
+Could not resolve server address	Time		Sunucu adı çözülemedi
+Set time zone	Time		Saat dilimi ayarla
+Waiting for answer failed	Time		Yanıt bekleme başarısız
+<Other>	Time		<Diğer>
+Received invalid time	Time		Geçersiz saat alındı
+Remove	Time		Kaldır
+Synchronize again	Time		Yeniden eşitle
+Asia	Time		Asya
+Try all servers	Time		Tüm sunucuları dene
+Time	Time		Zaman
+Current time:	Time		Şimdiki zaman:
+The following error occured while synchronizing:\n%s: %s	Time		Eşitleme sırasında aşağıdaki hatalar oluştu:\n%s: %s
+Europe	Time		Avrupa
+Show day of week	Time		Haftanın gününü göster
+Local time (Windows compatible)	Time		Yerel saat (Windows uyumlu)
+Hardware clock set to:	Time		Donanım saati şuna ayarlı:
+Arctic	Time		Kuzey Kutup Bölgesi
+Antarctica	Time		Antartika
+GMT (UNIX compatible)	Time		GMT (UNIX uyumlu)
+Africa	Time		Afrika
+Stop	Time		Durdur
+Time zone	Time		Saat dilimi
+Clock	Time		Saat
+Network time	Time		Ağ saati
+Sending request failed	Time		Gönderme isteği başarısız
+Preview time:	Time		Saati önizle:
+\nNow: 	Time		\nŞimdi: 
+Could not create socket	Time		Uç oluşturulamadı
+Pacific	Time		Pasifik
+Atlantic	Time		Atlantik
+Show clock in Deskbar	Time		Saati Masaüstü Çubuğu'nda göster
+Display time with seconds	Time		Saniyeleri göster
+Time	System name		Zaman
+about	Time		hakkında
+Show time zone	Time		Saat dilimini göster
+Synchronize at boot	Time		Önyükleme sırasında eşitle
+Indian	Time		Hint
+Revert	Time		Eski haline döndür
+Date and time	Time		Tarih ve zaman
+The following error occured while synchronizing:\n%s	Time		Eşitleme sırasında aşağıdaki hatalar oluştu:\n%s
+Synchronize	Time		Eşitle
+Add	Time		Ekle

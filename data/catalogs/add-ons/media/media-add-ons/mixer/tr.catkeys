@@ -1,0 +1,27 @@
+1	turkish	x-vnd.Haiku-mixer.media_addon	3450667169
+Input gain controls represent	AudioMixer		Girdi kazanım denetimleri şunu yansıtmakta:
+Linear interpolation	AudioMixer		Doğrusal aradeğerleme
+Virtual output channels	AudioMixer		Sanal çıktı kanalları
+Refuse output format changes	AudioMixer		Çıktı biçimi değişimlerini reddet
+Output mapping	AudioMixer		Çıktı eşleme
+Allow input channel remapping	AudioMixer		Girdi kanalı yeniden eşlemesine izin ver
+Resampling algorithm	AudioMixer		Yeniden örnekleme algoritması
+Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Karıştırıcı çıktısını 3dB azalt (BeOS R5'teki gibi)
+Display balance control for stereo connections	AudioMixer		Çift kanallı bağlantılar için denge denetimini göster
+To output	AudioMixer		Çıktıya
+not connected	AudioMixer		bağlı değil
+Refuse input format changes	AudioMixer		Girdi biçimi değişikliklerini reddet
+Drop/repeat samples	AudioMixer		Örnekleri bırak/tekrar et
+Output channel sources	AudioMixer		Çıktı kanalı kaynakları
+dB	AudioMixer		dB
+Gain controls	AudioMixer		Kazanç ayarları
+Input mapping	AudioMixer		Girdi eşleme
+Mute	AudioMixer		Sessiz
+Input channel destinations	AudioMixer		Girdi kanalı hedefleri
+To master	AudioMixer		Ana denetleyiciye
+Master output	AudioMixer		Ana çıktı
+Setup	AudioMixer		Kurulum
+Use non linear gain sliders (like BeOS R5)	AudioMixer		Doğrusal olmayan kazanç kaydırıcısı kullan (BeOS R5'teki gibi)
+Gain	AudioMixer		Kazanç
+Allow output channel remapping	AudioMixer		Çıktı kanalı yeniden eşlemesine izin ver
+Physical input channels	AudioMixer		Fiziksel girdi kanalları

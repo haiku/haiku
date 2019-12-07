@@ -1,0 +1,46 @@
+1	turkish	x-vnd.Haiku-SoundRecorder	24440888
+Loop	RecorderWindow		Sürekli
+Cannot find default audio hardware	RecorderWindow		Öntanımlı ses donanımı bulunamıyor
+Cannot find the temporary file created to hold the new recording	RecorderWindow		Yeni kaydı içermesi için yaratılan geçici dosya bulunamıyor
+Sample size:	RecorderWindow		Örnek boyut:
+Nothing to play	RecorderWindow		Oynatacak bir şey yok
+None of the files appear to be audio files.	RecorderWindow		Bu dosyaların hiçbiri ses dosyası değil gibi görünüyor.
+Duration: 	RecorderWindow		Uzunluk: 
+File info	RecorderWindow		Dosya bilgisi
+Drop files here	SoundListView		Dosyaları buraya bırakın
+Input	RecorderWindow		Girdi
+Some of the files don't appear to be audio files.	RecorderWindow		Bu dosyaların bazıları ses dosyası değil gibi görünüyor.
+Stop	RecorderWindow		Durdur
+Format:	RecorderWindow		Biçim:
+Sound List	RecorderWindow		Ses listesi
+Compression: 	RecorderWindow		Sıkıştırma: 
+Rewind	RecorderWindow		Geriye sar
+Sample rate:	RecorderWindow		Örnek oran:
+Invalid audio files	RecorderWindow		Geçersiz ses dosyaları
+ seconds	RecorderWindow		 saniye
+OK	RecorderWindow		Tamam
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Yeni kaydı içermesi için yaratılan geçici dosya açılamıyor
+Input:	RecorderWindow		Girdi:
+Forward	RecorderWindow		İleri sar
+Play	RecorderWindow		Oynat
+SoundRecorder	System name		Ses Kaydedicisi
+Channels:	RecorderWindow		Kanallar:
+ bits	RecorderWindow		 bit
+None	RecorderWindow		Yok
+Record	RecorderWindow		Kayıt
+Sample size: 	RecorderWindow		Örnek boyut: 
+Cannot recognize this file as a media file	RecorderWindow		Bu dosya bir ortam dosyası olarak tanımlanamıyor
+Format: 	RecorderWindow		Biçim: 
+File name: 	RecorderWindow		Dosya adı: 
+Cannot connect to the selected sound input	RecorderWindow		Seçili ses girdi aygıtına bağlanamıyor
+Cannot get the file to play	RecorderWindow		Dosya oynatılamıyor
+Cannot record a sound that long	RecorderWindow		Bu kadar uzun bir ses kaydı yapılamıyor
+Duration:	RecorderWindow		Uzunluk:
+Compression:	RecorderWindow		Sıkıştırma:
+Cannot find an unused name to use for the new recording	RecorderWindow		Yeni kayıt için daha önce kullanılmamış bir ad bulunamıyor
+Channels: 	RecorderWindow		Kanallar: 
+Save	RecorderWindow		Kaydet
+Sample rate: 	RecorderWindow		Örnek oran: 
+Cannot connect to media server	RecorderWindow		Ortam sunucusuna bağlanamıyor
+The file doesn't appear to be an audio file.	RecorderWindow		Bu dosya bir ses dosyası değil gibi görünüyor.
+File name:	RecorderWindow		Dosya adı:

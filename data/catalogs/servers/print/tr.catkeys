@@ -1,0 +1,55 @@
+1	turkish	x-vnd.Be-PSRV	1222926379
+Undefined	ConfigWindow		Tanımlanmamış
+Return the number of available transports	PrintServerApp Scripting		Kullanılabilir taşıyıcı sayısını döndür
+Return the number of available printers	PrintServerApp Scripting		Kullanılabilir yazıcı sayısını döndür
+Get currently available ports/devices	Transport Scripting		Şu anda kullanılabilir portları/aygıtları getir
+Retrieve or select the active printer	PrintServerApp Scripting		Etkin yazıcıyı seç veya bulup getir
+Cancel	PrintServerApp		İptal
+Retrieve a specific printer	PrintServerApp Scripting		Belirli bir yazıcıyı bulup getir
+Page %1 to %2	ConfigWindow		Sayfa %1-%2
+Get name of the printer add-on used for this printer	Printer Scripting		Bu yazıcı için kullanılan yazıcı eklentisinin adını al
+B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
+OK	ConfigWindow		Tamam
+Cancel	ConfigWindow		İptal
+Printer server	ConfigWindow		Yazıcı sunucusu
+Page %1 to %2, %3 copies	ConfigWindow		Sayfa %1-%2, %3 kopya
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Bu adda bir yazıcı mevcut, fakat sürücüsü bulunamadı! Değiştirilsin mi?
+Yes	PrintServerApp		Evet
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger
+Would you like to set one up now?	PrintServerApp		Şimdi bir tane ayarlamak ister misiniz?
+Print job setup:	ConfigWindow		Yazdırma işi kurulumu:
+A6	ConfigWindow	ISO 216 paper size	A6
+Portrait	ConfigWindow		Dikey
+All pages	ConfigWindow		Tüm sayfalar
+There is no default printer set up.	PrintServerApp		Öntanımlı bir yazıcı ayarlanmamış.
+B5	ConfigWindow	ISO 216 paper size	B5
+A0	ConfigWindow	ISO 216 paper size	A0
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	Letter
+Printer:	ConfigWindow		Yazıcı:
+A2	ConfigWindow	ISO 216 paper size	A2
+Select a printer	ConfigWindow		Yazıcı seç
+Show configuration window	PrintServerApp Scripting		Yapılandırma penceresini göster
+A4	ConfigWindow	ISO 216 paper size	A4
+Get comments about this printer	Printer Scripting		Bu yazıcı hakkında yorumları al
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Bu adda bir yazıcı mevcut, fakat kullanılabilir değil! Değiştirilsin mi?
+No	PrintServerApp		Hayır
+Get the transport configuration for this printer	Printer Scripting		Bu yazıcı için taşıyıcı yapılandırmasını al
+Landscape	ConfigWindow		Yatay
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
+There are no printers set up.	PrintServerApp		Kullanılabilir bir yazıcı yok.
+Get name of the transport add-on used for this printer	Printer Scripting		Bu yazıcı için kullanılan taşıyıcı eklentisinin adını al
+All pages, %1 copies	ConfigWindow		Tüm sayfalar, %1 kopya
+Delete a specific printer	PrintServerApp Scripting		Belirli bir yazıcıyı sil
+Create a new printer	PrintServerApp Scripting		Yeni bir yazıcı oluştur
+OK	PrintServerApp		Tamam
+Print setup	ConfigWindow		Yazdırma ayarları
+A1	ConfigWindow	ISO 216 paper size	A1
+Retrieve a specific transport	PrintServerApp Scripting		Belirli bir taşıyıcıyı bulup getir
+Get name of printer	Printer Scripting		Yazıcının adını al
+A3	ConfigWindow	ISO 216 paper size	A3
+Get name of transport	Transport Scripting		Taşıyıcının adını al
+A5	ConfigWindow	ISO 216 paper size	A5
+Would you like to make @ the default printer?	PrintServerApp		@ yazıcısını öntanımlı yapmak ister misiniz?
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid
+Page setup	ConfigWindow		Sayfa yapısı
+Paper setup:	ConfigWindow		Kâğıt yapısı:

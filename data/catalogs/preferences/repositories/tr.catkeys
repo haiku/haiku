@@ -1,0 +1,42 @@
+1	turkish	x-vnd.Haiku-Repositories	1220143449
+This is not a valid URL.	AddRepoWindow	Add URL error message	Bu geçerli bir URL değil.
+Repository URL:	AddRepoWindow	Text box label	Depo URL'si:
+There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	%name% depo önbelleği yenilenirken bir hata oluştu
+There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	%name% deposu devre dışı bırakılırken bir hata oluştu
+Unknown	Constants	Unknown repository name	Bilinmeyen
+Remove all	RepositoriesView	Button label	Tümünü kaldır
+Enable repositories to use with package management:	RepositoriesView	Label text	Paket yönetimi ile kullanılacak depoları etkinleştirin
+Disable	RepositoriesView	Button label	Devre dışı bırak
+Cancel task	TaskTimer	Button label	Görevi iptal et
+Changes completed	RepositoriesView	Status view text	Değişiklikler tamamlandı
+Details	TaskLooper	Job log details header	Ayrıntılar
+Enabled	RepoRow	Tag in the Status column	Etkinleştirildi
+Remove	Constants	Button label	Kaldır
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	%url% deposu etkinleştirilirken bir hata oluştu
+Remove this repository?	RepositoriesView	Removal alert confirmation message	Bu depo kaldırılsın mı?
+The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	%name% deposunun görevinin tamamlanması uzun sürüyor.
+Completed	TaskLooper	Completed task status message	Tamamlandı
+OK	Constants	Button label	Tamam
+Status	RepositoriesView	Column title	Durum
+Name	RepositoriesView	Column title	Ad
+Add	AddRepoWindow	Button label	Ekle
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Depolar mevcut etkin depoların adını bulup getiremedi.
+Enable all	RepositoriesView	Button label	Tümünü etkinleştir
+Aborted	TaskLooper	Aborted task status message	İptal edildi
+URL	RepositoriesView	Column title	URL
+Enable	RepositoriesView	Button label	Etkinleştir
+Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	%name% için yapılandırma alınamıyor.
+Description	TaskLooper	Failed task error description	Açıklama
+Failed	TaskLooper	Failed task status message	Başarısız
+Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	İyi haber! %name% deposunun görevi tamamlandı.
+Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Bazı görevler hâlâ çalışıyor. Bu görevleri durdurup çıkılsın mı?
+This repository URL already exists.	RepositoriesView	Error message	Bu depo URL'si hâlihazırda mevcut.
+Repositories	System name		Depolar
+Changes pending:	RepositoriesView	Status view text	Bekleyen değişiklikler:
+Remove	RepositoriesView	Button label	Kaldır
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	Bu depolar kaldırılsın mı?
+Keep trying	TaskTimer	Button label	Denemeyi sürdür
+Cancel	Constants	Button label	İptal
+Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Her depo için yalnızca bir URL etkinleştirilebilir. Lütfen seçimlerinizi değiştirin.
+Stop and quit	RepositoriesWindow	Button label	Durdur ve çık
+Disable all	RepositoriesView	Button label	Tümünü devre dışı bırak

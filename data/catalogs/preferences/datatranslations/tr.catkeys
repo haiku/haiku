@@ -1,0 +1,17 @@
+1	turkish	x-vnd.Haiku-DataTranslations	4156631142
+Path:	DataTranslations		Yol:
+Name:	DataTranslations		Ad:
+DataTranslations - Note	DataTranslations		Veri Çevirileri - Not
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		'%name' ögesi bir çevirmen değil gibi görünüyor ve yüklenmeyecek.
+Could not install %s:\n%s	DataTranslations		%s yüklenemedi:\n%s
+OK	DataTranslations		Tamam
+Cancel	DataTranslations		İptal
+Info:	DataTranslations		Bilgi:
+DataTranslations - Error	DataTranslations		Veri Çevirileri - Hata
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Bu denetim panelini çeviriciler için öntanımlı değerler atamak için kullanın. Bu ayarlar uygulamalar kendi ayarlarını belirtmezler ise kullanılırlar.
+The new translator has been installed successfully.	DataTranslations		Yeni çevirmen başarıyla yüklendi.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		'%name' adlı bir öge Çevirmenler klasöründe hâlihazırda var! Mevcut çevirmenin üzerine yazılsın mı?
+DataTranslations	System name		Veri Çevirileri
+Info	DataTranslations		Bilgi
+Overwrite	DataTranslations		Üzerine yaz
+Version:	DataTranslations		Sürüm:

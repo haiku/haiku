@@ -1,0 +1,7 @@
+1	turkish	x-vnd.Haiku-libpackage	2012114212
+Refreshing repository \"%s\" failed	PackageManagerKit		\"%s\" deposunu güncelleme başarısız oldu
+Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		\"%s\" deposu için yapılandırma alınamadı. Atlanıyor.
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		\"%s\" deposu için önbellek alınamadı. Atlanıyor.
+Failed to get repository names	PackageManagerKit		Depo adları alınamadı
+Failed to remove transaction directory	PackageManagerKit		İşlem dizini kaldırılamadı
+Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		%s-%s paketi kendi temel paketi olan \"%s\" için bir eşleşmeye sahip değil

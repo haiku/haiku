@@ -1,0 +1,92 @@
+1	turkish	x-vnd.Haiku-Devices	3345509916
+ACPI bus	DevicesView		ACPI veri yolu
+Encryption controller	Device		Şifreleme denetleyicisi
+Bus Information	Device		Veri yolu bilgisi
+Devices	System name		Aygıtlar
+Graphics Peripheral	DeviceSCSI		Grafik çevre birimi
+Processor	Device		İşlemci
+Generate system information	DevicesView		Sistem bilgisini oluştur
+Class info	DevicePCI		Sınıf bilgisi
+ACPI Information	DeviceACPI		ACPI bilgisi
+Detailed	DevicesView		Ayrıntılı
+Computer	DevicesView		Bilgisayar
+Communications	DeviceSCSI		İletişim
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Sınıf bilgisi:\t\t\t\t: %classInfo%
+Mass storage controller	Device		Yığın depolama denetleyicisi
+Connection	DevicesView		Bağlantı
+Printer	DeviceSCSI		Yazıcı
+ACPI Processor Namespace '%2'	DeviceACPI		ACPI işlemci ad alanı '%2'
+SCSI Information	DeviceSCSI		SCSI bilgisi
+Manufacturer	Device		Üretici
+Device name:	Device		Aygıt adı:
+Scanner	DeviceSCSI		Tarayıcı
+Memory controller	Device		Bellek denetleyicisi
+Unknown device	DevicesView		Bilinmeyen aygıt
+Unknown	DevicePCI		Bilinmeyen
+ACPI node '%1'	DeviceACPI		'%1' ACPI düğümü
+Optical Drive	DeviceSCSI		Optik sürücü
+Name	PropertyList		Ad
+Manufacturer	DeviceSCSI		Üretici
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Aygıt adı\t\t\t\t: %Name%\nÜretici\t\t\t: %Manufacturer%\nKullanılan sürücü\t\t\t\t: %DriverUsed%\nAygıt yolu\t: %DevicePaths%
+Device name	Device		Aygıt adı
+Satellite communications controller	Device		Uydu iletişimi denetleyicisi
+Device class	DeviceSCSI		Aygıt sınıfı
+Device	Device		Aygıt
+Input device controller	Device		Girdi aygıtı denetleyicisi
+PCI bus	DevicesView		PCI veri yolu
+ACPI System Indicator	DeviceACPI		ACPI sistem belirteci
+ACPI System Bus	DeviceACPI		ACPI sistem veri yolu
+PCI Information	DevicePCI		PCI bilgisi
+Tape Drive	DeviceSCSI		Kaset sürücüsü
+Changer	DeviceSCSI		Değiştirici
+Serial bus controller	Device		Seri veri yolu denetleyicisi
+Refresh devices	DevicesView		Aygıtları yenile
+Category	DevicesView		Kategori
+RBC	DeviceSCSI		RBC
+None	Device		Yok
+Device paths	Device		Aygıt yolları
+Unknown device	Device		Bilinmeyen aygıt
+Wireless controller	Device		Kablosuz denetleyicisi
+Generic system peripheral	Device		Genel sistem çevre birimi
+Value	PropertyList		Değer
+Devices	DevicesView		Aygıtlar
+Device name	DeviceACPI		Aygıt adı
+Card Reader	DeviceSCSI		Kart okuyucusu
+Display controller	Device		Görüntü denetleyicisi
+Basic information	DevicesView		Temel bilgi
+ACPI Button '%1'	DeviceACPI		ACPI düğmesi '%1'
+Bus	DevicesView		Veri yolu
+ACPI <unknown>	DeviceACPI		ACPI <bilinmiyor>
+Device name	DevicePCI		Aygıt adı
+Disk Drive	DeviceSCSI		Disk sürücüsü
+Other	DeviceSCSI		Diğer
+Report compatibility	DevicesView		Uyumluluğu bildir
+Computer	Device		Bilgisayar
+PCI bus	Device		PCI veri yolu
+Enclosure	DeviceSCSI		Kapanma
+Order by:	DevicesView		Veren:
+ACPI Thermal Zone	DeviceACPI		ACPI ısıl bölgesi
+Intelligent controller	Device		Akıllı denetleyici
+Multimedia controller	Device		Çokluortam denetleyicisi
+Quit	DevicesView		Çık
+ISA bus	Device		ISA veri yolu
+ISA bus	DevicesView		ISA veri yolu
+Processor	DeviceSCSI		İşlemci
+Manufacturer:	Device		Üretici:
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Sınıf bilgisi:\t\t\t\t: %classInfo%
+Bridge	Device		Köprü
+Worm	DeviceSCSI		Solucan
+CD-ROM	DeviceSCSI		CD-ROM
+Manufacturer	DevicePCI		Üretici
+Bridge	DeviceSCSI		Köprü
+Signal processing controller	Device		Sinyal işleme denetleyicisi
+Device name	DeviceSCSI		Aygıt adı
+Docking station	Device		Takma istasyonu
+Array	DeviceSCSI		Diziliş
+Unclassified device	Device		Sınıflandırılmamış aygıt
+ACPI controller	Device		ACPI denetleyicisi
+Network controller	Device		Ağ denetleyicisi
+Driver used	Device		Kullanılan sürücü
+Communication controller	Device		İletişim denetleyicisi
+ACPI bus	Device		ACPI veri yolu
+unknown	Device		bilinmeyen

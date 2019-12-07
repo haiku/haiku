@@ -1,0 +1,11 @@
+1	turkish	x-vnd.Haiku-libmail	3450478295
+Partially download messages larger than	ProtocolConfigView		Şu boyuttan büyük iletileri kısmî olarak indir:
+Password:	ProtocolConfigView		Parola:
+Remove mail from server when deleted	ProtocolConfigView		E-postalar silindiğinde sunucudan da sil
+Mail server:	ProtocolConfigView		E-posta sunucusu
+Select…	MailKit		Seç...
+Connection type:	ProtocolConfigView		Bağlantı türü:
+KB	ProtocolConfigView	kilo byte	KB
+Leave mail on server	ProtocolConfigView		E-postaları sunucuda bırak
+Username:	ProtocolConfigView		Kullanıcı adı:
+Login type:	ProtocolConfigView		Giriş türü:

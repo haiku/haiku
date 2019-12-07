@@ -1,0 +1,30 @@
+1	turkish	x-vnd.Haiku-DeskCalc	2904979661
+cos	CalcView		cos
+acos	CalcView		acos
+7   8   9   (   )  \n4   5   6   *   /  \n1   2   3   +   -  \n0   .   BS  =   C  \n	CalcView		7   8   9   (   )  \n4   5   6   *   /  \n1   2   3   +   -  \n0   .   BS  =   C  \n
+C	CalcView	Key label, 'C' means clear	C
+ceil	CalcView		tavan
+cbrt	CalcView		kpkök
+BS	CalcView	Key label, 'BS' means backspace	BS
+floor	CalcView		tbnyvrla
+sin	CalcView		sin
+sinh	CalcView		sinh
+tanh	CalcView		tanh
+cosh	CalcView		cosh
+ln	CalcView		İçinde
+Compact	CalcView		Kompakt
+Calculating	CalcView		Hesaplanıyor
+Enable Num Lock on startup	CalcView		Başlangıçta Num Lock'u etkinleştir
+Scientific	CalcView		Bilimsel
+log	CalcView		log
+sqrt	CalcView		krkök
+asin	CalcView		asin
+Radians	CalcView		Radyan
+tan	CalcView		tan
+exp	CalcView		exp
+Audio Feedback	CalcView		Sesli geribildirim
+atan	CalcView		atan
+ln    sin   cos   tan   π    \nlog   asin  acos  atan  sqrt \nexp   sinh  cosh  tanh  cbrt \n!     ceil  floor E     ^    \n7     8     9     (     )    \n4     5     6     *     /    \n1     2     3     +     -    \n0     .     BS    =     C    \n	CalcView		ln    sin   cos   tan   π    \nlog   asin  acos  atan  krkök\nexp   sinh  cosh  tanh  kpkök\n!     tavan  tbnyvrla  E     ^    \n7     8     9     (     )    \n4     5     6     *     /    \n1     2     3     +     -    \n0     .     BS    =     C    \n
+DeskCalc	System name		Hesap Makinesi
+Degrees	CalcView		Derece
+Basic	CalcView		Basit
