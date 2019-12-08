@@ -11,6 +11,8 @@
 
 #include <StreamingGameSound.h>
 
+#include <DataIO.h>
+
 
 struct entry_ref;
 struct _gs_media_tracker;
@@ -23,6 +25,9 @@ public:
 									bool looping = true,
 									BGameSoundDevice* device = NULL);
 								BFileGameSound(const char* file,
+									bool looping = true,
+									BGameSoundDevice* device = NULL);
+								BFileGameSound(BDataIO* data,
 									bool looping = true,
 									BGameSoundDevice* device = NULL);
 
@@ -52,7 +57,7 @@ private:
 			BFileGameSound&		operator=(const BFileGameSound& other);
 									// not implemented
 
-			status_t			Init(const entry_ref* file);
+			status_t			Init(BDataIO* data);
 
 			bool				Load();
 			bool				Read(void* buffer, size_t bytes);
@@ -95,14 +100,17 @@ private:
 			size_t				fBufferSize;
 			size_t				fPlayPosition;
 
-			thread_id			fReadThread;
-			port_id				fPort;
-
 			_gs_ramp*			fPausing;
 			bool				fPaused;
 			float				fPauseGain;
 
+			BDataIO*            fDataSource;
+
+#ifdef B_HAIKU_64_BIT
 			uint32				_reserved[9];
+#else
+			uint32				_reserved[10];
+#endif
 };
 
 

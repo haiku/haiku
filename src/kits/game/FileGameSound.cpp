@@ -13,6 +13,7 @@
 #include <string.h>
 
 #include <Entry.h>
+#include <File.h>
 #include <FileGameSound.h>
 #include <MediaFile.h>
 #include <MediaTrack.h>
@@ -130,7 +131,7 @@ BFileGameSound::BFileGameSound(const entry_ref* file, bool looping,
 	fPauseGain(1.0)
 {
 	if (InitCheck() == B_OK)
-		SetInitError(Init(file));
+		SetInitError(Init(new(std::nothrow) BFile(file, B_READ_ONLY)));
 }
 
 
@@ -152,24 +153,36 @@ BFileGameSound::BFileGameSound(const char* file, bool looping,
 
 		if (get_ref_for_path(file, &node) != B_OK)
 			SetInitError(B_ENTRY_NOT_FOUND);
-		else
-			SetInitError(Init(&node));
+		else {
+			BFile* file = new(std::nothrow) BFile(&node, B_READ_ONLY);
+			SetInitError(Init(file));
+		}
 	}
+}
+
+
+BFileGameSound::BFileGameSound(BDataIO* data, bool looping,
+	BGameSoundDevice* device)
+	:
+	BStreamingGameSound(device),
+	fAudioStream(NULL),
+	fStopping(false),
+	fLooping(looping),
+	fBuffer(NULL),
+	fPlayPosition(0),
+	fPausing(NULL),
+	fPaused(false),
+	fPauseGain(1.0)
+{
+	if (InitCheck() == B_OK)
+		SetInitError(Init(data));
 }
 
 
 BFileGameSound::~BFileGameSound()
 {
-	if (fReadThread >= 0) {
-		// TODO: kill_thread() is very bad, since it will leak any resources
-		// that the thread had allocated. It will also keep locks locked that
-		// the thread holds! Set a flag to make the thread quit and use
-		// wait_for_thread() here!
-		kill_thread(fReadThread);
-	}
-
-	if (fAudioStream) {
-		if (fAudioStream->stream)
+	if (fAudioStream != NULL) {
+		if (fAudioStream->stream != NULL)
 			fAudioStream->file->ReleaseTrack(fAudioStream->stream);
 
 		delete fAudioStream->file;
@@ -177,6 +190,7 @@ BFileGameSound::~BFileGameSound()
 
 	delete [] fBuffer;
 	delete fAudioStream;
+	delete fDataSource;
 }
 
 
@@ -204,7 +218,7 @@ BFileGameSound::StopPlaying()
 {
 	status_t error = BStreamingGameSound::StopPlaying();
 
-	if (!fAudioStream || !fAudioStream->stream)
+	if ((fAudioStream == NULL) || (fAudioStream->stream == NULL))
 		return B_OK;
 
 	// start reading next time from the start of the file
@@ -367,15 +381,19 @@ BFileGameSound::IsPaused()
 
 
 status_t
-BFileGameSound::Init(const entry_ref* file)
+BFileGameSound::Init(BDataIO* data)
 {
+	fDataSource = data;
+	if (fDataSource == NULL)
+		return B_NO_MEMORY;
+
 	fAudioStream = new(std::nothrow) _gs_media_tracker;
-	if (!fAudioStream)
+	if (fAudioStream == NULL)
 		return B_NO_MEMORY;
 
 	memset(fAudioStream, 0, sizeof(_gs_media_tracker));
-	fAudioStream->file = new(std::nothrow) BMediaFile(file);
-	if (!fAudioStream->file) {
+	fAudioStream->file = new(std::nothrow) BMediaFile(data);
+	if (fAudioStream->file == NULL) {
 		delete fAudioStream;
 		fAudioStream = NULL;
 		return B_NO_MEMORY;
@@ -443,7 +461,7 @@ BFileGameSound::Init(const entry_ref* file)
 bool
 BFileGameSound::Load()
 {
-	if (!fAudioStream || !fAudioStream->stream)
+	if ((fAudioStream == NULL) || (fAudioStream->stream == NULL))
 		return false;
 
 	// read a new buffer
