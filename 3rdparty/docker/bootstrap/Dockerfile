@@ -5,8 +5,8 @@ ENV DEBIAN_FRONTEND="noninteractive"
 RUN apt-get update
 
 # Base Haiku requirements
-RUN apt-get install -y git nasm autoconf automake texinfo flex \
-	bison gawk build-essential unzip wget zip less zlib1g-dev \
+RUN apt-get install -y git nasm autoconf automake autopoint texinfo \
+	flex bison gawk build-essential unzip wget zip less zlib1g-dev \
 	libcurl4-openssl-dev genisoimage libtool mtools gcc-multilib \
 	u-boot-tools util-linux device-tree-compiler bc
 
