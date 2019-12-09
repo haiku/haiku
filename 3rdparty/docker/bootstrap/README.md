@@ -25,7 +25,7 @@ from the end users host and create more-reproduceable bootstrap builds.
 
 2) Check out the required sources
 
-```make init```
+```make prep```
 
 
 3) Build the crosstools (gcc only) for your target architecture
