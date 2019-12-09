@@ -38,9 +38,10 @@ if [ ! -d $WORKPATH/src/haiku ]; then
 	git clone $GIT_HAIKU $WORKPATH/src/haiku
 fi
 
-mkdir $WORKPATH/bin
+mkdir -p $WORKPATH/bin
 if [ ! -f $WORKPATH/bin/jam ]; then
 	cd $WORKPATH/src/buildtools/jam
+	rm -rf bin.*
 	make
 	cp -f bin.linuxx86/jam $WORKPATH/bin/jam
 	cd -
