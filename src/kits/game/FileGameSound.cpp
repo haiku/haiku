@@ -218,7 +218,7 @@ BFileGameSound::StopPlaying()
 {
 	status_t error = BStreamingGameSound::StopPlaying();
 
-	if ((fAudioStream == NULL) || (fAudioStream->stream == NULL))
+	if (fAudioStream == NULL || fAudioStream->stream == NULL)
 		return B_OK;
 
 	// start reading next time from the start of the file
@@ -461,7 +461,7 @@ BFileGameSound::Init(BDataIO* data)
 bool
 BFileGameSound::Load()
 {
-	if ((fAudioStream == NULL) || (fAudioStream->stream == NULL))
+	if (fAudioStream == NULL || fAudioStream->stream == NULL)
 		return false;
 
 	// read a new buffer
