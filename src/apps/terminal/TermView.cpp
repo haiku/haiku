@@ -1648,20 +1648,21 @@ TermView::MessageReceived(BMessage *msg)
 		{
 			int32 i;
 			BMessage specifier;
-			if (msg->GetCurrentSpecifier(&i, &specifier) == B_OK
-				&& strcmp("encoding",
+			if (msg->GetCurrentSpecifier(&i, &specifier) == B_OK) {
+				if (strcmp("encoding",
 					specifier.FindString("property", i)) == 0) {
-				BMessage reply(B_REPLY);
-				reply.AddInt32("result", Encoding());
-				msg->SendReply(&reply);
-			} else if (strcmp("tty",
+					BMessage reply(B_REPLY);
+					reply.AddInt32("result", Encoding());
+					msg->SendReply(&reply);
+				} else if (strcmp("tty",
 					specifier.FindString("property", i)) == 0) {
-				BMessage reply(B_REPLY);
-				reply.AddString("result", TerminalName());
-				msg->SendReply(&reply);
-			} else {
+					BMessage reply(B_REPLY);
+					reply.AddString("result", TerminalName());
+					msg->SendReply(&reply);
+				} else
+					BView::MessageReceived(msg);
+			} else
 				BView::MessageReceived(msg);
-			}
 			break;
 		}
 
