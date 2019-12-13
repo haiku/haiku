@@ -17,7 +17,7 @@
 #include <AutoDeleter.h>
 #include <disk_device_types.h>
 
-#include "efi_gpt.h"
+#include "gpt.h"
 
 #include "GPTPartitionHandle.h"
 #include "Utility.h"

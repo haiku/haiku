@@ -8,7 +8,7 @@
 #define GPT_HEADER_H
 
 
-#include "efi_gpt.h"
+#include "gpt.h"
 
 
 namespace EFI {
@@ -31,13 +31,13 @@ public:
 									{ return fHeader.FirstUsableBlock(); }
 			uint64				LastUsableBlock() const
 									{ return fHeader.LastUsableBlock(); }
-			const efi_table_header& TableHeader() const
+			const gpt_table_header& TableHeader() const
 									{ return fHeader; }
 
 			uint32				EntryCount() const
 									{ return fHeader.EntryCount(); }
-			efi_partition_entry& EntryAt(int32 index) const
-									{ return *(efi_partition_entry*)(fEntries
+			gpt_partition_entry& EntryAt(int32 index) const
+									{ return *(gpt_partition_entry*)(fEntries
 										+ fHeader.EntrySize() * index); }
 
 #ifndef _BOOT_MODE
@@ -51,14 +51,14 @@ private:
 			status_t			_Write(int fd, off_t offset, const void* data,
 									size_t size) const;
 			void				_UpdateCRC();
-			void				_UpdateCRC(efi_table_header& header);
+			void				_UpdateCRC(gpt_table_header& header);
 #endif
 
 			status_t			_Read(int fd, off_t offset, void* data,
 									size_t size) const;
-			static bool			_IsHeaderValid(efi_table_header& header,
+			static bool			_IsHeaderValid(gpt_table_header& header,
 									uint64 block);
-			static bool			_ValidateHeaderCRC(efi_table_header& header);
+			static bool			_ValidateHeaderCRC(gpt_table_header& header);
 			bool				_ValidateEntriesCRC() const;
 			void				_SetBackupHeaderFromPrimary(uint64 lastBlock);
 			size_t				_EntryArraySize() const
@@ -66,14 +66,14 @@ private:
 										* fHeader.EntryCount(); }
 
 			const char*			_PrintGUID(const guid_t& id);
-			void				_Dump(const efi_table_header& header);
+			void				_Dump(const gpt_table_header& header);
 			void				_DumpPartitions();
 
 private:
 			uint32				fBlockSize;
 			status_t			fStatus;
-			efi_table_header	fHeader;
-			efi_table_header	fBackupHeader;
+			gpt_table_header	fHeader;
+			gpt_table_header	fBackupHeader;
 			uint8*				fEntries;
 			bool				fDirty;
 };

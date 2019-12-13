@@ -12,7 +12,7 @@
 #include <ByteOrder.h>
 
 
-struct efi_table_header {
+struct gpt_table_header {
 	char	header[8];
 	uint32	revision;
 	uint32	header_size;
@@ -88,7 +88,7 @@ struct efi_table_header {
 #define EFI_PARTITION_ENTRY_COUNT		128
 #define EFI_PARTITION_ENTRY_SIZE		128
 
-struct efi_partition_entry {
+struct gpt_partition_entry {
 	guid_t	partition_type;
 	guid_t	unique_guid;
 	uint64	start_block;

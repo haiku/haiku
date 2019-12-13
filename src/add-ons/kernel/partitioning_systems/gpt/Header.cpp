@@ -59,7 +59,7 @@ Header::Header(int fd, uint64 lastBlock, uint32 blockSize)
 	// Read and check the partition table header
 
 	fStatus = _Read(fd, (uint64)EFI_HEADER_LOCATION * blockSize,
-		&fHeader, sizeof(efi_table_header));
+		&fHeader, sizeof(gpt_table_header));
 	if (fStatus == B_OK) {
 		if (!_IsHeaderValid(fHeader, EFI_HEADER_LOCATION))
 			fStatus = B_BAD_DATA;
@@ -73,7 +73,7 @@ Header::Header(int fd, uint64 lastBlock, uint32 blockSize)
 
 	// Read backup header, too
 	status_t status = _Read(fd, lastBlock * blockSize, &fBackupHeader,
-		sizeof(efi_table_header));
+		sizeof(gpt_table_header));
 	if (status == B_OK) {
 		if (!_IsHeaderValid(fBackupHeader, lastBlock))
 			status = B_BAD_DATA;
@@ -275,12 +275,12 @@ Header::_WriteHeader(int fd)
 	_UpdateCRC();
 
 	status_t status = _Write(fd, fHeader.AbsoluteBlock() * fBlockSize,
-		&fHeader, sizeof(efi_table_header));
+		&fHeader, sizeof(gpt_table_header));
 	if (status != B_OK)
 		return status;
 
 	return _Write(fd, fBackupHeader.AbsoluteBlock() * fBlockSize,
-		&fBackupHeader, sizeof(efi_table_header));
+		&fBackupHeader, sizeof(gpt_table_header));
 }
 
 
@@ -306,11 +306,11 @@ Header::_UpdateCRC()
 
 
 void
-Header::_UpdateCRC(efi_table_header& header)
+Header::_UpdateCRC(gpt_table_header& header)
 {
 	header.SetEntriesCRC(crc32(fEntries, _EntryArraySize()));
 	header.SetHeaderCRC(0);
-	header.SetHeaderCRC(crc32((uint8*)&header, sizeof(efi_table_header)));
+	header.SetHeaderCRC(crc32((uint8*)&header, sizeof(gpt_table_header)));
 }
 #endif // !_BOOT_MODE
 
@@ -329,7 +329,7 @@ Header::_Read(int fd, off_t offset, void* data, size_t size) const
 
 
 bool
-Header::_IsHeaderValid(efi_table_header& header, uint64 block)
+Header::_IsHeaderValid(gpt_table_header& header, uint64 block)
 {
 	return !memcmp(header.header, EFI_PARTITION_HEADER, sizeof(header.header))
 		&& _ValidateHeaderCRC(header)
@@ -338,13 +338,13 @@ Header::_IsHeaderValid(efi_table_header& header, uint64 block)
 
 
 bool
-Header::_ValidateHeaderCRC(efi_table_header& header)
+Header::_ValidateHeaderCRC(gpt_table_header& header)
 {
 	uint32 originalCRC = header.HeaderCRC();
 	header.SetHeaderCRC(0);
 
 	bool matches = originalCRC == crc32((const uint8*)&header,
-		sizeof(efi_table_header));
+		sizeof(gpt_table_header));
 
 	header.SetHeaderCRC(originalCRC);
 	return matches;
@@ -385,7 +385,7 @@ Header::_PrintGUID(const guid_t &id)
 
 
 void
-Header::_Dump(const efi_table_header& header)
+Header::_Dump(const gpt_table_header& header)
 {
 	dprintf("EFI header: %.8s\n", header.header);
 	dprintf("EFI revision: %" B_PRIx32 "\n", header.Revision());
@@ -407,7 +407,7 @@ void
 Header::_DumpPartitions()
 {
 	for (uint32 i = 0; i < EntryCount(); i++) {
-		const efi_partition_entry &entry = EntryAt(i);
+		const gpt_partition_entry &entry = EntryAt(i);
 
 		if (entry.partition_type == kEmptyGUID)
 			continue;

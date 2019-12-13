@@ -6,7 +6,7 @@
  */
 
 
-#include "efi_gpt.h"
+#include "gpt.h"
 
 #include <KernelExport.h>
 #include <disk_device_manager/ddm_modules.h>
@@ -115,7 +115,7 @@ efi_gpt_scan_partition(int fd, partition_data* partition, void* _cookie)
 	uint32 index = 0;
 
 	for (uint32 i = 0; i < header->EntryCount(); i++) {
-		const efi_partition_entry& entry = header->EntryAt(i);
+		const gpt_partition_entry& entry = header->EntryAt(i);
 
 		if (entry.partition_type == kEmptyGUID)
 			continue;
@@ -378,7 +378,7 @@ efi_gpt_validate_create_child(partition_data* partition, off_t* start,
 	EFI::Header* header = (EFI::Header*)partition->content_cookie;
 	int32 entryIndex = -1;
 	for (uint32 i = 0; i < header->EntryCount(); i++) {
-		const efi_partition_entry& entry = header->EntryAt(i);
+		const gpt_partition_entry& entry = header->EntryAt(i);
 		if (entry.partition_type == kEmptyGUID) {
 			entryIndex = i;
 			break;
@@ -524,7 +524,7 @@ efi_gpt_resize_child(int fd, partition_id partitionID, off_t size,
 
 	update_disk_device_job_progress(job, 0.0);
 
-	efi_partition_entry& entry = header->EntryAt(entryIndex);
+	gpt_partition_entry& entry = header->EntryAt(entryIndex);
 	entry.SetBlockCount(validatedSize / partition->block_size);
 
 	status_t result = header->WriteEntry(fd, entryIndex);
@@ -589,7 +589,7 @@ efi_gpt_move_child(int fd, partition_id partitionID, partition_id childID,
 
 	update_disk_device_job_progress(job, 0.0);
 
-	efi_partition_entry& entry = header->EntryAt(entryIndex);
+	gpt_partition_entry& entry = header->EntryAt(entryIndex);
 	uint64 blockCount = entry.BlockCount();
 	entry.SetStartBlock((validatedOffset - partition->offset)
 		/ partition->block_size);
@@ -639,7 +639,7 @@ efi_gpt_set_name(int fd, partition_id partitionID, const char* name,
 
 	update_disk_device_job_progress(job, 0.0);
 
-	efi_partition_entry& entry = header->EntryAt(entryIndex);
+	gpt_partition_entry& entry = header->EntryAt(entryIndex);
 	to_ucs2(name, strlen(name), entry.name, EFI_PARTITION_NAME_LENGTH);
 
 	status_t result = header->WriteEntry(fd, entryIndex);
@@ -689,7 +689,7 @@ efi_gpt_set_type(int fd, partition_id partitionID, const char* type,
 
 	update_disk_device_job_progress(job, 0.0);
 
-	efi_partition_entry& entry = header->EntryAt(entryIndex);
+	gpt_partition_entry& entry = header->EntryAt(entryIndex);
 	entry.partition_type = typeGUID;
 
 	status_t result = header->WriteEntry(fd, entryIndex);
@@ -815,7 +815,7 @@ efi_gpt_create_child(int fd, partition_id partitionID, off_t offset,
 	if (child == NULL)
 		return B_ERROR;
 
-	efi_partition_entry& entry = header->EntryAt(entryIndex);
+	gpt_partition_entry& entry = header->EntryAt(entryIndex);
 	entry.partition_type = typeGUID;
 	uuid_t uuid;
 	uuid_generate_random(uuid);
@@ -882,8 +882,8 @@ efi_gpt_delete_child(int fd, partition_id partitionID, partition_id childID,
 	if (!delete_partition(childID))
 		return B_ERROR;
 
-	efi_partition_entry& entry = header->EntryAt(entryIndex);
-	memset(&entry, 0, sizeof(efi_partition_entry));
+	gpt_partition_entry& entry = header->EntryAt(entryIndex);
+	memset(&entry, 0, sizeof(gpt_partition_entry));
 	entry.partition_type = kEmptyGUID;
 
 	status_t result = header->WriteEntry(fd, entryIndex);

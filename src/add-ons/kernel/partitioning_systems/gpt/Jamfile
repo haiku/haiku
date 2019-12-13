@@ -20,7 +20,7 @@ if $(TARGET_ARCH) = "x86" || $(TARGET_ARCH) = "x86_64" {
 }
 
 KernelAddon efi_gpt :
-	efi_gpt.cpp
+	gpt.cpp
 	Header.cpp
 	crc32.cpp
 	utility.cpp

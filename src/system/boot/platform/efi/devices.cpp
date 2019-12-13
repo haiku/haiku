@@ -414,7 +414,7 @@ device_contains_partition(EfiDevice *device, boot::Partition *partition)
 			return false;
 
 		if (memcmp(deviceHeader, &header->TableHeader(),
-				sizeof(efi_table_header)) != 0)
+				sizeof(gpt_table_header)) != 0)
 			return false;
 
 		// partition->cookie == int partition entry index
@@ -427,7 +427,7 @@ device_contains_partition(EfiDevice *device, boot::Partition *partition)
 			return false;
 
 		if (memcmp(&entries[index], &header->EntryAt(index),
-				sizeof(efi_partition_entry)) != 0)
+				sizeof(gpt_partition_entry)) != 0)
 			return false;
 
 		for (size_t i = 0; i < sizeof(kTypeMap) / sizeof(struct type_map); ++i)

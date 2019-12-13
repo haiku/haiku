@@ -272,7 +272,7 @@ get_partition_offset(int deviceFD, off_t deviceStart, off_t deviceSize,
 		EFI::Header gptHeader(deviceFD, deviceSize, blockSize);
 		error = gptHeader.InitCheck();
 		if (error == B_OK && partitionIndex < gptHeader.EntryCount()) {
-			efi_partition_entry partition = gptHeader.EntryAt(partitionIndex - 1);
+			gpt_partition_entry partition = gptHeader.EntryAt(partitionIndex - 1);
 
 			static_guid bfs_uuid = {0x42465331, 0x3BA3, 0x10F1,
 				0x802A4861696B7521LL};

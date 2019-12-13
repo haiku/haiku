@@ -46,7 +46,7 @@ SEARCH_SOURCE
 	+= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems efi ] ;
 
 Addon <userland>efi_gpt :
-	efi_gpt.cpp
+	gpt.cpp
 	PartitionLocker.cpp
 	: <nogrist>PartitioningSystemsTest libkernelland_emu.so
 ;
