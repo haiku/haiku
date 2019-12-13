@@ -884,8 +884,10 @@ BTextView::MessageReceived(BMessage* message)
 			const char* property;
 
 			if (message->GetCurrentSpecifier(NULL, &specifier) < B_OK
-				|| specifier.FindString("property", &property) < B_OK)
+				|| specifier.FindString("property", &property) < B_OK) {
+				BView::MessageReceived(message);
 				return;
+			}
 
 			if (propInfo.FindMatch(message, 0, &specifier, specifier.what,
 					property) < B_OK) {

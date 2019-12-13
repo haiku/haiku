@@ -313,6 +313,7 @@ BListView::MessageReceived(BMessage* message)
 
 			if (message->GetCurrentSpecifier(NULL, &specifier) != B_OK
 				|| specifier.FindString("property", &property) != B_OK) {
+				BView::MessageReceived(message);
 				return;
 			}
 
