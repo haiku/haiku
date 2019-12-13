@@ -232,20 +232,20 @@ acpi_find_table(const char* signature)
 void
 acpi_init()
 {
-	EFI_GUID acpi = ACPI_20_TABLE_GUID;
-	EFI_CONFIGURATION_TABLE *table = kSystemTable->ConfigurationTable;
-	UINTN entries = kSystemTable->NumberOfTableEntries;
+	efi_guid acpi = ACPI_20_TABLE_GUID;
+	efi_configuration_table *table = kSystemTable->ConfigurationTable;
+	size_t entries = kSystemTable->NumberOfTableEntries;
 
 	// Try to find the ACPI RSDP.
 	for (uint32 i = 0; i < entries; i++) {
 		acpi_rsdp *rsdp = NULL;
 
-		EFI_GUID vendor = table[i].VendorGuid;
+		efi_guid vendor = table[i].VendorGuid;
 
-		if (vendor.Data1 == acpi.Data1
-			&& vendor.Data2 == acpi.Data2
-			&& vendor.Data3 == acpi.Data3
-			&& strncmp((char *)vendor.Data4, (char *)acpi.Data4, 8) == 0) {
+		if (vendor.data1 == acpi.data1
+			&& vendor.data2 == acpi.data2
+			&& vendor.data3 == acpi.data3
+			&& strncmp((char *)vendor.data4, (char *)acpi.data4, 8) == 0) {
 			rsdp = (acpi_rsdp *)(table[i].VendorTable);
 			if (strncmp((char *)rsdp, ACPI_RSDP_SIGNATURE, 8) == 0)
 				TRACE(("acpi_init: found ACPI RSDP signature at %p\n", rsdp));

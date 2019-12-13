@@ -34,14 +34,14 @@
     SUCH DAMAGE.
 */
 
-#include <efi.h>
+#include <efi/types.h>
 #include <efilib.h>
 
 #include <elf.h>
 
-EFI_STATUS _relocate (long ldbase, Elf32_Dyn *dyn,
-		      EFI_HANDLE image EFI_UNUSED,
-		      EFI_SYSTEM_TABLE *systab EFI_UNUSED)
+efi_status _relocate(long ldbase, Elf32_Dyn *dyn,
+		      efi_handle image EFI_UNUSED,
+		      efi_system_table *systab EFI_UNUSED)
 {
 	long relsz = 0, relent = 0;
 	Elf32_Rel *rel = 0;

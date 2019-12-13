@@ -18,6 +18,7 @@
 #include <util/list.h>
 
 #include "efi_platform.h"
+#include <efi/protocol/graphics-output.h>
 
 
 //#define TRACE_VIDEO
@@ -30,14 +31,14 @@
 
 struct video_mode {
 	list_link	link;
-	UINTN		mode;
-	UINTN		width, height, bits_per_pixel, bytes_per_row;
+	size_t		mode;
+	size_t		width, height, bits_per_pixel, bytes_per_row;
 };
 
 
-static EFI_GUID sGraphicsOutputGuid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
-static EFI_GRAPHICS_OUTPUT_PROTOCOL *sGraphicsOutput;
-static UINTN sGraphicsMode;
+static efi_guid sGraphicsOutputGuid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
+static efi_graphics_output_protocol *sGraphicsOutput;
+static size_t sGraphicsMode;
 static struct list sModeList;
 static uint32 sModeCount;
 static bool sModeChosen;
@@ -157,7 +158,7 @@ platform_init_video(void)
 
 	// make a guess at the best video mode to use, and save the mode ID
 	// for switching to graphics mode
-	EFI_STATUS status = kBootServices->LocateProtocol(&sGraphicsOutputGuid,
+	efi_status status = kBootServices->LocateProtocol(&sGraphicsOutputGuid,
 		NULL, (void **)&sGraphicsOutput);
 	if (sGraphicsOutput == NULL || status != EFI_SUCCESS) {
 		gKernelArgs.frame_buffer.enabled = false;
@@ -165,16 +166,16 @@ platform_init_video(void)
 		return B_ERROR;
 	}
 
-	UINTN bestArea = 0;
-	UINTN bestDepth = 0;
+	size_t bestArea = 0;
+	size_t bestDepth = 0;
 
 	TRACE(("looking for best graphics mode...\n"));
 
-	for (UINTN mode = 0; mode < sGraphicsOutput->Mode->MaxMode; ++mode) {
-		EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *info;
-		UINTN size, depth;
+	for (size_t mode = 0; mode < sGraphicsOutput->Mode->MaxMode; ++mode) {
+		efi_graphics_output_mode_information *info;
+		size_t size, depth;
 		sGraphicsOutput->QueryMode(sGraphicsOutput, mode, &size, &info);
-		UINTN area = info->HorizontalResolution * info->VerticalResolution;
+		size_t area = info->HorizontalResolution * info->VerticalResolution;
 		TRACE(("  mode: %lu\n", mode));
 		TRACE(("  width: %u\n", info->HorizontalResolution));
 		TRACE(("  height: %u\n", info->VerticalResolution));
@@ -264,7 +265,7 @@ video_mode_hook(Menu *menu, MenuItem *item)
 	Menu* submenu = item->Submenu();
 	MenuItem* subitem = submenu->FindMarked();
 	if (subitem != NULL) {
-		sGraphicsMode = (UINTN)subitem->Data();
+		sGraphicsMode = (size_t)subitem->Data();
 		sModeChosen = true;
 	}
 

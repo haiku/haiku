@@ -2,10 +2,8 @@ SubDir HAIKU_TOP src system boot platform efi arch arm ;
 
 SubDirHdrs $(HAIKU_TOP) src system boot platform efi ;
 
+UsePrivateHeaders [ FDirName kernel platform ] ;
 UsePrivateHeaders [ FDirName kernel boot platform efi ] ;
-UseBuildFeatureHeaders gnuefi ;
-UseBuildFeatureHeaders gnuefi : headersProtocol ;
-UseBuildFeatureHeaders gnuefi : headersArch ;
 
 local arch_src =
 	#entry.S
@@ -18,13 +16,3 @@ local arch_src =
 BootMergeObject boot_platform_efi_arm.o :
 	$(arch_src)
 	;
-
-Includes [ FGristFiles $(arch_src) ]
-    :
-    [ BuildFeatureAttribute gnuefi : headers ]
-    [ BuildFeatureAttribute gnuefi : headersProtocol ]
-    [ BuildFeatureAttribute gnuefi : headersArch ]
-	;
-
-Depends [ FGristFiles $(arch_src) ]
-	: [ BuildFeatureAttribute gnuefi : libdir ] ;

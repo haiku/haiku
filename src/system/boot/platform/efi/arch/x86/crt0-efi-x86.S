@@ -1,8 +1,6 @@
-/* reloc_x86_64.c - position independent x86_64 ELF shared object relocator
+/* crt0-efi-ia32.S - x86 EFI startup code.
    Copyright (C) 1999 Hewlett-Packard Co.
 	Contributed by David Mosberger <davidm@hpl.hp.com>.
-   Copyright (C) 2005 Intel Co.
-	Contributed by Fenghua Yu <fenghua.yu@intel.com>.
 
     All rights reserved.
 
@@ -35,64 +33,44 @@
     SUCH DAMAGE.
 */
 
-#include <efi/types.h>
-#include <efi/system-table.h>
+	.text
+	.align 4
 
-#include <elf.h>
+	.globl _start
+_start:
+	pushl %ebp
+	movl %esp,%ebp
 
-extern "C" efi_status _relocate (long ldbase, Elf64_Dyn *dyn,
-		      efi_handle image __attribute__((__unused__)),
-		      efi_system_table *systab __attribute__((__unused__)))
-{
-	long relsz = 0, relent = 0;
-	Elf64_Rel *rel = 0;
-	unsigned long *addr;
-	int i;
+	pushl 12(%ebp)			# copy "image" argument
+	pushl  8(%ebp)			# copy "systab" argument
 
-	for (i = 0; dyn[i].d_tag != DT_NULL; ++i) {
-		switch (dyn[i].d_tag) {
-			case DT_RELA:
-				rel = (Elf64_Rel*)
-					((unsigned long)dyn[i].d_un.d_ptr
-					 + ldbase);
-				break;
+	call 0f
+0:	popl %eax
+	movl %eax,%ebx
 
-			case DT_RELASZ:
-				relsz = dyn[i].d_un.d_val;
-				break;
+	addl $ImageBase-0b,%eax		# %eax = ldbase
+	addl $_DYNAMIC-0b,%ebx		# %ebx = _DYNAMIC
 
-			case DT_RELAENT:
-				relent = dyn[i].d_un.d_val;
-				break;
+	pushl %ebx			# pass _DYNAMIC as second argument
+	pushl %eax			# pass ldbase as first argument
+	call _relocate
+	popl %ebx
+	popl %ebx
+ 	testl %eax,%eax
+ 	jne .exit
+  
+  	call efi_main			# call app with "image" and "systab" argument
 
-			default:
-				break;
-		}
-	}
+.exit:	leave
+  	ret
+ 
+ 	// hand-craft a dummy .reloc section so EFI knows it's a relocatable executable:
+ 
+ 	.data
+dummy:	.long	0
 
-        if (!rel && relent == 0)
-                return EFI_SUCCESS;
-
-	if (!rel || relent == 0)
-		return EFI_LOAD_ERROR;
-
-	while (relsz > 0) {
-		/* apply the relocs */
-		switch (ELF64_R_TYPE (rel->r_info)) {
-			case R_X86_64_NONE:
-				break;
-
-			case R_X86_64_RELATIVE:
-				addr = (unsigned long *)
-					(ldbase + rel->r_offset);
-				*addr += ldbase;
-				break;
-
-			default:
-				break;
-		}
-		rel = (Elf64_Rel*) ((char *) rel + relent);
-		relsz -= relent;
-	}
-	return EFI_SUCCESS;
-}
+#define IMAGE_REL_ABSOLUTE	0
+ 	.section .reloc
+ 	.long	dummy					// Page RVA
+ 	.long	10					// Block Size (2*4+2)
+ 	.word	(IMAGE_REL_ABSOLUTE<<12) +  0		// reloc for dummy

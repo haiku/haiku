@@ -13,7 +13,7 @@
 #define STAGE_PAGES	0x2000 /* 32 MB */
 
 
-static EFI_PHYSICAL_ADDRESS staging;
+static efi_physical_addr staging;
 
 
 extern "C" void

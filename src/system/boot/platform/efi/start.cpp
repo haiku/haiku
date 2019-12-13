@@ -33,10 +33,10 @@ extern void (*__ctor_list)(void);
 extern void (*__ctor_end)(void);
 
 
-const EFI_SYSTEM_TABLE		*kSystemTable;
-const EFI_BOOT_SERVICES		*kBootServices;
-const EFI_RUNTIME_SERVICES	*kRuntimeServices;
-EFI_HANDLE kImage;
+const efi_system_table		*kSystemTable;
+const efi_boot_services		*kBootServices;
+const efi_runtime_services	*kRuntimeServices;
+efi_handle kImage;
 
 
 static uint32 sBootOptions;
@@ -139,50 +139,59 @@ platform_start_kernel(void)
 
 	// map in a kernel stack
 	void *stack_address = NULL;
-	if (platform_allocate_region(&stack_address, KERNEL_STACK_SIZE + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE, 0, false) != B_OK) {
+	if (platform_allocate_region(&stack_address,
+		KERNEL_STACK_SIZE + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE, 0, false)
+		!= B_OK) {
 		panic("Unabled to allocate a stack");
 	}
 	gKernelArgs.cpu_kstack[0].start = fix_address((uint64_t)stack_address);
-	gKernelArgs.cpu_kstack[0].size = KERNEL_STACK_SIZE + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE;
+	gKernelArgs.cpu_kstack[0].size = KERNEL_STACK_SIZE
+		+ KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE;
 	dprintf("Kernel stack at %#lx\n", gKernelArgs.cpu_kstack[0].start);
 
 	// Prepare to exit EFI boot services.
 	// Read the memory map.
 	// First call is to determine the buffer size.
-	UINTN memory_map_size = 0;
-	EFI_MEMORY_DESCRIPTOR dummy;
-	EFI_MEMORY_DESCRIPTOR *memory_map;
-	UINTN map_key;
-	UINTN descriptor_size;
-	UINT32 descriptor_version;
-	if (kBootServices->GetMemoryMap(&memory_map_size, &dummy, &map_key, &descriptor_size, &descriptor_version) != EFI_BUFFER_TOO_SMALL) {
+	size_t memory_map_size = 0;
+	efi_memory_descriptor dummy;
+	efi_memory_descriptor *memory_map;
+	size_t map_key;
+	size_t descriptor_size;
+	uint32_t descriptor_version;
+	if (kBootServices->GetMemoryMap(&memory_map_size, &dummy, &map_key,
+		&descriptor_size, &descriptor_version) != EFI_BUFFER_TOO_SMALL) {
 		panic("Unable to determine size of system memory map");
 	}
 
 	// Allocate a buffer twice as large as needed just in case it gets bigger between
 	// calls to ExitBootServices.
-	UINTN actual_memory_map_size = memory_map_size * 2;
-	memory_map = (EFI_MEMORY_DESCRIPTOR *)kernel_args_malloc(actual_memory_map_size);
+	size_t actual_memory_map_size = memory_map_size * 2;
+	memory_map
+		= (efi_memory_descriptor *)kernel_args_malloc(actual_memory_map_size);
+
 	if (memory_map == NULL)
 		panic("Unable to allocate memory map.");
 
 	// Read (and print) the memory map.
 	memory_map_size = actual_memory_map_size;
-	if (kBootServices->GetMemoryMap(&memory_map_size, memory_map, &map_key, &descriptor_size, &descriptor_version) != EFI_SUCCESS) {
+	if (kBootServices->GetMemoryMap(&memory_map_size, memory_map, &map_key,
+		&descriptor_size, &descriptor_version) != EFI_SUCCESS) {
 		panic("Unable to fetch system memory map.");
 	}
 
 	addr_t addr = (addr_t)memory_map;
 	dprintf("System provided memory map:\n");
-	for (UINTN i = 0; i < memory_map_size / descriptor_size; ++i) {
-		EFI_MEMORY_DESCRIPTOR *entry = (EFI_MEMORY_DESCRIPTOR *)(addr + i * descriptor_size);
-		dprintf("  %#lx-%#lx  %#lx %#x %#lx\n",
-			entry->PhysicalStart, entry->PhysicalStart + entry->NumberOfPages * 4096,
+	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
+		efi_memory_descriptor *entry
+			= (efi_memory_descriptor *)(addr + i * descriptor_size);
+		dprintf("  %#lx-%#lx  %#lx %#x %#lx\n", entry->PhysicalStart,
+			entry->PhysicalStart + entry->NumberOfPages * 4096,
 			entry->VirtualStart, entry->Type, entry->Attribute);
 	}
 
 	// Generate page tables for use after ExitBootServices.
-	uint64_t final_pml4 = mmu_generate_post_efi_page_tables(memory_map_size, memory_map, descriptor_size, descriptor_version);
+	uint64_t final_pml4 = mmu_generate_post_efi_page_tables(memory_map_size,
+		memory_map, descriptor_size, descriptor_version);
 	dprintf("Final PML4 at %#lx\n", final_pml4);
 
 	// Attempt to fetch the memory map and exit boot services.
@@ -208,20 +217,21 @@ platform_start_kernel(void)
 		}
 
 		memory_map_size = actual_memory_map_size;
-		if (kBootServices->GetMemoryMap(&memory_map_size, memory_map, &map_key, &descriptor_size, &descriptor_version) != EFI_SUCCESS) {
+		if (kBootServices->GetMemoryMap(&memory_map_size, memory_map, &map_key,
+			&descriptor_size, &descriptor_version) != EFI_SUCCESS) {
 			panic("Unable to fetch system memory map.");
 		}
 	}
 
 	// Update EFI, generate final kernel physical memory map, etc.
-	mmu_post_efi_setup(memory_map_size, memory_map, descriptor_size, descriptor_version);
+	mmu_post_efi_setup(memory_map_size, memory_map,
+		descriptor_size, descriptor_version);
 
 	smp_boot_other_cpus(final_pml4, gLongKernelEntry);
 
 	// Enter the kernel!
-	efi_enter_kernel(final_pml4,
-			 gLongKernelEntry,
-			 gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size);
+	efi_enter_kernel(final_pml4, gLongKernelEntry,
+		gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size);
 
 	panic("Shouldn't get here");
 }
@@ -239,8 +249,8 @@ platform_exit(void)
  * @image: firmware-allocated handle that identifies the image
  * @systemTable: EFI system table
  */
-extern "C" EFI_STATUS
-efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systemTable)
+extern "C" efi_status
+efi_main(efi_handle image, efi_system_table *systemTable)
 {
 	stage2_args args;
 

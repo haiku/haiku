@@ -33,8 +33,8 @@ static allocated_memory_region *allocated_memory_regions = NULL;
 
 static uint64_t mmu_allocate_page()
 {
-	EFI_PHYSICAL_ADDRESS addr;
-	EFI_STATUS s = kBootServices->AllocatePages(AllocateAnyPages, EfiLoaderData, 1, &addr);
+	efi_physical_addr addr;
+	efi_status s = kBootServices->AllocatePages(AllocateAnyPages, EfiLoaderData, 1, &addr);
 	if (s != EFI_SUCCESS)
 		panic("Unabled to allocate memory: %li", s);
 
@@ -43,9 +43,9 @@ static uint64_t mmu_allocate_page()
 
 
 uint64_t
-mmu_generate_post_efi_page_tables(UINTN memory_map_size,
-	EFI_MEMORY_DESCRIPTOR *memory_map, UINTN descriptor_size,
-	UINTN descriptor_version)
+mmu_generate_post_efi_page_tables(size_t memory_map_size,
+	efi_memory_descriptor *memory_map, size_t descriptor_size,
+	uint32_t descriptor_version)
 {
 	// Generate page tables, matching bios_ia32/long.cpp.
 	uint64_t *pml4;
@@ -72,8 +72,8 @@ mmu_generate_post_efi_page_tables(UINTN memory_map_size,
 	// into the kernel address space, so we want to make sure we map everything
 	// we have available.
 	uint64 maxAddress = 0;
-	for (UINTN i = 0; i < memory_map_size / descriptor_size; ++i) {
-		EFI_MEMORY_DESCRIPTOR *entry = (EFI_MEMORY_DESCRIPTOR *)((addr_t)memory_map + i * descriptor_size);
+	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
+		efi_memory_descriptor *entry = (efi_memory_descriptor *)((addr_t)memory_map + i * descriptor_size);
 		maxAddress = std::max(maxAddress,
 				      entry->PhysicalStart + entry->NumberOfPages * 4096);
 	}
@@ -146,13 +146,13 @@ mmu_generate_post_efi_page_tables(UINTN memory_map_size,
 // Currently assumes that the memory map is sane... Sorted and no overlapping
 // regions.
 void
-mmu_post_efi_setup(UINTN memory_map_size, EFI_MEMORY_DESCRIPTOR *memory_map, UINTN descriptor_size, UINTN descriptor_version)
+mmu_post_efi_setup(size_t memory_map_size, efi_memory_descriptor *memory_map, size_t descriptor_size, uint32_t descriptor_version)
 {
 	// Add physical memory to the kernel args and update virtual addresses for EFI regions..
 	addr_t addr = (addr_t)memory_map;
 	gKernelArgs.num_physical_memory_ranges = 0;
-	for (UINTN i = 0; i < memory_map_size / descriptor_size; ++i) {
-		EFI_MEMORY_DESCRIPTOR *entry = (EFI_MEMORY_DESCRIPTOR *)(addr + i * descriptor_size);
+	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
+		efi_memory_descriptor *entry = (efi_memory_descriptor *)(addr + i * descriptor_size);
 		switch (entry->Type) {
 		case EfiLoaderCode:
 		case EfiLoaderData:
@@ -228,14 +228,14 @@ platform_allocate_region(void **_address, size_t size, uint8 /* protection */, b
 	if (exactAddress)
 		return B_NO_MEMORY;
 
-	EFI_PHYSICAL_ADDRESS addr;
+	efi_physical_addr addr;
 	size_t aligned_size = ROUNDUP(size, B_PAGE_SIZE);
 	allocated_memory_region *region = new(std::nothrow) allocated_memory_region;
 
 	if (region == NULL)
 		return B_NO_MEMORY;
 
-	EFI_STATUS status = kBootServices->AllocatePages(AllocateAnyPages,
+	efi_status status = kBootServices->AllocatePages(AllocateAnyPages,
 		EfiLoaderData, aligned_size / B_PAGE_SIZE, &addr);
 	if (status != EFI_SUCCESS) {
 		delete region;
@@ -402,7 +402,7 @@ platform_free_region(void *address, size_t size)
 	if (!region)
 		panic("Unknown region??");
 
-	kBootServices->FreePages((EFI_PHYSICAL_ADDRESS)address, ROUNDUP(size, B_PAGE_SIZE) / B_PAGE_SIZE);
+	kBootServices->FreePages((efi_physical_addr)address, ROUNDUP(size, B_PAGE_SIZE) / B_PAGE_SIZE);
 
 	return B_OK;
 }

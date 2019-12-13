@@ -58,7 +58,7 @@ Console::WriteAt(void *cookie, off_t /*pos*/, const void *buffer,
 	size_t bufferSize)
 {
 	const char *string = (const char *)buffer;
-	CHAR16 ucsBuffer[bufferSize + 3];
+	char16_t ucsBuffer[bufferSize + 3];
 	uint32 j = 0;
 
 	for (uint32 i = 0; i < bufferSize; i++) {
@@ -77,7 +77,7 @@ Console::WriteAt(void *cookie, off_t /*pos*/, const void *buffer,
 				continue;
 			}
 			default:
-				ucsBuffer[j++] = (CHAR16) string[i];
+				ucsBuffer[j++] = (char16_t)string[i];
 		}
 	}
 
@@ -145,10 +145,10 @@ console_set_color(int32 foreground, int32 background)
 int
 console_wait_for_key(void)
 {
-	UINTN index;
-	EFI_STATUS status;
-	EFI_INPUT_KEY key;
-	EFI_EVENT event = kSystemTable->ConIn->WaitForKey;
+	size_t index;
+	efi_status status;
+	efi_input_key key;
+	efi_event event = kSystemTable->ConIn->WaitForKey;
 
 	do {
 		kBootServices->WaitForEvent(1, &event, &index);
@@ -184,9 +184,9 @@ console_wait_for_key(void)
 
 static void update_screen_size(void)
 {
-	UINTN width, height;
-	UINTN area = 0;
-	SIMPLE_TEXT_OUTPUT_INTERFACE *ConOut = kSystemTable->ConOut;
+	size_t width, height;
+	size_t area = 0;
+	efi_simple_text_output_protocol *ConOut = kSystemTable->ConOut;
 
 	for (int mode = 0; mode < ConOut->Mode->MaxMode; ++mode) {
 		if (ConOut->QueryMode(ConOut, mode, &width, &height) == EFI_SUCCESS) {
@@ -220,8 +220,8 @@ console_init(void)
 uint32
 console_check_boot_keys(void)
 {
-	EFI_STATUS status;
-	EFI_INPUT_KEY key;
+	efi_status status;
+	efi_input_key key;
 
 	// give the user a chance to press a key
 	kBootServices->Stall(500000);

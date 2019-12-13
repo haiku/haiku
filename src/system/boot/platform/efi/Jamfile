@@ -1,11 +1,10 @@
 SubDir HAIKU_TOP src system boot platform efi ;
 
 UsePrivateHeaders [ FDirName kernel boot ] ;
+UsePrivateHeaders [ FDirName kernel platform ] ;
 UsePrivateHeaders [ FDirName kernel boot platform efi ] ;
 UsePrivateHeaders [ FDirName kernel arch $(TARGET_KERNEL_ARCH) ] ;
-UseBuildFeatureHeaders gnuefi ;
-UseBuildFeatureHeaders gnuefi : headersProtocol ;
-UseBuildFeatureHeaders gnuefi : headersArch ;
+
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems gpt ;
 
 {
@@ -14,10 +13,6 @@ SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems gpt ;
 	SubDirCcFlags $(defines) ;
 	SubDirC++Flags $(defines) -fno-rtti ;
 }
-
-local efi_glue_src =
-	crt0-efi-$(TARGET_ARCH).S
-	;
 
 local platform_src =
 	start.cpp
@@ -37,19 +32,11 @@ local platform_src =
 	support.S
 	;
 
-Includes [ FGristFiles $(efi_glue_src) $(platform_src) ]
-	:
-	[ BuildFeatureAttribute gnuefi : headers ]
-	[ BuildFeatureAttribute gnuefi : headersProtocol ]
-	[ BuildFeatureAttribute gnuefi : headersArch ]
-	;
-
 local platform ;
 for platform in [ MultiBootSubDirSetup efi ] {
 	on $(platform) {
 
 		BootMergeObject boot_platform_efi_common.o :
-			$(efi_glue_src)
 			$(platform_src)
 			:
 			: boot_platform_generic_efi.a
@@ -60,13 +47,6 @@ for platform in [ MultiBootSubDirSetup efi ] {
 			boot_platform_efi_$(TARGET_ARCH).o
 			boot_platform_efi_common.o
 		;
-
-		LOCATE on [ FGristFiles $(efi_glue_src) ]
-			= [ BuildFeatureAttribute gnuefi : libdir : path ] ;
-		Depends [ FGristFiles $(efi_glue_src) ]
-			: [ BuildFeatureAttribute gnuefi : libdir ] ;
-		Depends [ FGristFiles $(platform_src) ]
-			: [ BuildFeatureAttribute gnuefi : headers ] ;
 	}
 }
 

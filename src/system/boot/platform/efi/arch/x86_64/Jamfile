@@ -2,12 +2,11 @@ SubDir HAIKU_TOP src system boot platform efi arch x86_64 ;
 
 SubDirHdrs $(HAIKU_TOP) src system boot platform efi ;
 
+UsePrivateHeaders [ FDirName kernel platform ] ;
 UsePrivateHeaders [ FDirName kernel boot platform efi ] ;
-UseBuildFeatureHeaders gnuefi ;
-UseBuildFeatureHeaders gnuefi : headersProtocol ;
-UseBuildFeatureHeaders gnuefi : headersArch ;
 
 local arch_src =
+	crt0-efi-$(TARGET_ARCH).S
 	entry.S
 	relocation_func.cpp
 	arch_smp.cpp
@@ -18,13 +17,3 @@ local arch_src =
 BootMergeObject boot_platform_efi_x86_64.o :
 	$(arch_src)
 	;
-
-Includes [ FGristFiles $(arch_src) ]
-    :
-    [ BuildFeatureAttribute gnuefi : headers ]
-    [ BuildFeatureAttribute gnuefi : headersProtocol ]
-    [ BuildFeatureAttribute gnuefi : headersArch ]
-	;
-
-Depends [ FGristFiles $(arch_src) ]
-	: [ BuildFeatureAttribute gnuefi : libdir ] ;
