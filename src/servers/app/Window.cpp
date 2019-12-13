@@ -900,26 +900,26 @@ Window::MouseDown(BMessage* message, BPoint where,
 			if (!IsFocus()) {
 				bool acceptFirstClick
 					= (Flags() & B_WILL_ACCEPT_FIRST_CLICK) != 0;
-				bool avoidFocus = (Flags() & B_AVOID_FOCUS) != 0;
 
 				// Activate or focus the window in case it doesn't accept first
 				// click, depending on the mouse mode
-				DesktopSettings desktopSettings(fDesktop);
-				if (desktopSettings.MouseMode() == B_NORMAL_MOUSE
-					&& !acceptFirstClick)
-					fDesktop->ActivateWindow(this);
-				else if (!avoidFocus)
-					fDesktop->SetFocusWindow(this);
+				if (!acceptFirstClick) {
+					bool avoidFocus = (Flags() & B_AVOID_FOCUS) != 0;
+					DesktopSettings desktopSettings(fDesktop);
+					if (desktopSettings.MouseMode() == B_NORMAL_MOUSE)
+						fDesktop->ActivateWindow(this);
+					else if (!avoidFocus)
+						fDesktop->SetFocusWindow(this);
 
-				// Eat the click if we don't accept first click
-				// (B_AVOID_FOCUS never gets the focus, so they always accept
-				// the first click)
-				// TODO: the latter is unlike BeOS - if we really wanted to
-				// imitate this behaviour, we would need to check if we're
-				// the front window instead of the focus window
-				if (!acceptFirstClick && !desktopSettings.AcceptFirstClick()
-					&& !avoidFocus)
-					return;
+					// Eat the click if we don't accept first click
+					// (B_AVOID_FOCUS never gets the focus, so they always accept
+					// the first click)
+					// TODO: the latter is unlike BeOS - if we really wanted to
+					// imitate this behaviour, we would need to check if we're
+					// the front window instead of the focus window
+					if (!desktopSettings.AcceptFirstClick() && !avoidFocus)
+						return;
+				}
 			}
 
 			// fill out view token for the view under the mouse
