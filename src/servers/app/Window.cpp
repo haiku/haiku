@@ -1740,44 +1740,8 @@ Window::_TriggerContentRedraw(BRegion& dirtyContentRegion)
 
 	// put this into the pending dirty region
 	// to eventually trigger a client redraw
-	bool wasExpose = fPendingUpdateSession->IsExpose();
-	BRegion* backgroundClearingRegion = &dirtyContentRegion;
 
 	_TransferToUpdateSession(&dirtyContentRegion);
-
-	if (fPendingUpdateSession->IsExpose()) {
-		if (!fContentRegionValid)
-			_UpdateContentRegion();
-
-		if (!wasExpose) {
-			// there was suddenly added a dirty region
-			// caused by exposing content, we need to clear
-			// the entire background
-			backgroundClearingRegion = &fPendingUpdateSession->DirtyRegion();
-		}
-
-		if (fDrawingEngine->LockParallelAccess()) {
-			bool copyToFrontEnabled = fDrawingEngine->CopyToFrontEnabled();
-			fDrawingEngine->SetCopyToFrontEnabled(true);
-			fDrawingEngine->SuspendAutoSync();
-
-//sCurrentColor.red = rand() % 255;
-//sCurrentColor.green = rand() % 255;
-//sCurrentColor.blue = rand() % 255;
-//sPendingColor.red = rand() % 255;
-//sPendingColor.green = rand() % 255;
-//sPendingColor.blue = rand() % 255;
-//fDrawingEngine->FillRegion(*backgroundClearingRegion, sCurrentColor);
-//snooze(10000);
-
-			fTopView->Draw(fDrawingEngine, backgroundClearingRegion,
-				&fContentRegion, true);
-
-			fDrawingEngine->Sync();
-			fDrawingEngine->SetCopyToFrontEnabled(copyToFrontEnabled);
-			fDrawingEngine->UnlockParallelAccess();
-		}
-	}
 }
 
 
@@ -1950,8 +1914,7 @@ Window::BeginUpdate(BPrivate::PortLink& link)
 	// supress back to front buffer copies in the drawing engine
 	fDrawingEngine->SetCopyToFrontEnabled(false);
 
-	if (!fCurrentUpdateSession->IsExpose()
-		&& fDrawingEngine->LockParallelAccess()) {
+	if (fDrawingEngine->LockParallelAccess()) {
 		fDrawingEngine->SuspendAutoSync();
 
 		fTopView->Draw(fDrawingEngine, dirty, &fContentRegion, true);
