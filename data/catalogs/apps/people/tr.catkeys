@@ -19,7 +19,7 @@ Error	People		Hata
 Revert	People		Eski haline döndür
 Country	People		Ülke
 Person	Short mimetype description		Kişi
-New person	People		Yeni kişi
+New person	People		Yeni Kişi
 Save	People		Kaydet
 Fax	People		Belgegeçer
 URL	People		URL
@@ -32,7 +32,7 @@ Contact information for a person.	Long mimetype description		Kişi iletişim bil
 Remove image	People		Görseli kaldır
 City	People		Kent
 Undo	People		Geri al
-Don't save	People		Kaydetme!
+Don't save	People		Kaydetme
 Configure attributes	People		Öznitelikleri yapılandır
 Work phone	People		İş telefonu
 State	People		Eyalet

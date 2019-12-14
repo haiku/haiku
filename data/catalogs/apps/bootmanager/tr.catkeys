@@ -56,7 +56,7 @@ Uninstallation of boot menu completed	BootManagerController	Title	Önyükleme me
 After two seconds	DefaultPartitionPage		İki saniye sonra
 Partition table not compatible	BootManagerController	Title	Bölüm tablosu uyumlu değil
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Önyükleme aygıtının Ana Önyükleme Kaydı (%DISK) şuradan başarıyla geri yüklendi: %FILE.
-Done	BootManagerController	Button	Tamamlandı
+Done	BootManagerController	Button	Tamam
 BootManager	System name		Önyükleme Yöneticisi
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Geri yüklemenin yapılacağı Ana Önyükleme Kaydı (MBR) dosyasının konumunu belirtin. Bu dosya önyükleme yöneticisi ilk kurulduğunda oluşturulan dosyadır.
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Lütfen Ana Önyükleme Kaydı dosyasını konumunu belirtin. Bu dosya önyükleme yöneticisi ilk kurulduğunda oluşturulan dosyadır.

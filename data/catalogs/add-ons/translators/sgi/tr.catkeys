@@ -3,8 +3,8 @@ SGI images	SGITranslator		SGI görselleri
 Use compression:	SGIView		Sıkıştırma kullan:
 SGI image translator	SGIView		SGI görseli çevirmeni
 SGI image	SGITranslator		SGI görseli
-SGITranslator Settings	SGITranslator		SGITranslator ayarları
-SGI Settings	SGIMain		SGI ayarları
+SGITranslator Settings	SGITranslator		SGITranslator Ayarları
+SGI Settings	SGIMain		SGI Ayarları
 SGI image translator	SGITranslator		SGI görseli çevirmeni
 None	SGIView		Yok
 Version %d.%d.%d, %s	SGIView		Sürüm %d.%d.%d, %s

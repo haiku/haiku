@@ -38,7 +38,7 @@ No disk devices have been recognized.	DiskView		Hiçbir disk aygıtı tanımlana
 Attributes	PartitionList		Öznitelikler
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Bölüm silinemedi. Değişiklikler diske yazılmadı.
 Change parameters…	MainWindow		Parametreleri değiştir…
-Format	InitializeParametersPanel		Biçim
+Format	InitializeParametersPanel		Biçimlendir
 Could not unmount partition	MainWindow		Bölüm bağlantısı kesilemedi
 Create	CreateParametersPanel		Oluştur
 File system	PartitionList		Dosya sistemi

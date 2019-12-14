@@ -6,11 +6,11 @@ identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_hea
 Use compression:	TIFFView		Sıkıştırma kullan:
 TIFF image translator	TIFFView		TIFF görseli çevirmeni
 TIFF image	TIFFTranslator		TIFF görseli
-TIFF Settings	TIFFMain		TIFF ayarları
+TIFF Settings	TIFFMain		TIFF Ayarları
 TIFF image translator	TIFFTranslator		TIFF görsel çevirmeni
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: dizin belirlenemedi\n
 Version %d.%d.%d, %s	TIFFView		Sürüm %d.%d.%d, %s
-TIFFTranslator Settings	TIFFTranslator		TIFFTranslator ayarları
+TIFFTranslator Settings	TIFFTranslator		TIFFTranslator Ayarları
 LZW	TIFFView		LZW
 TIFF images	TIFFTranslator		TIFF görselleri
 None	TIFFView		Yok

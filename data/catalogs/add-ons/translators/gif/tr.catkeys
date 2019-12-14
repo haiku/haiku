@@ -14,6 +14,6 @@ GIF images	GIFTranslator		GIF görselleri
 Version %d.%d.%d, %s	GIFView		Sürüm %d.%d.%d, %s
 Use RGB color	GIFView		RGB renkleri kullan
 Use dithering	GIFView		Titreklik kullan
-GIF Settings	GIFTranslator		GIF ayarları
+GIF Settings	GIFTranslator		GIF Ayarları
 BeOS system	GIFView		BeOS sistemi
 Automatic (from alpha channel)	GIFView		Otomatik (alfa kanalından)

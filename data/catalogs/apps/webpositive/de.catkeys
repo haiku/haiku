@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-WebPositive	2763299522
+1	german	x-vnd.Haiku-WebPositive	1879106286
 Authentication required	Authentication Panel		Anmeldung erforderlich
 Previous	WebPositive Window		Zurück
 (Finish: %date)	Download Window		(Fertig: %date)
@@ -28,7 +28,9 @@ Start page:	Settings Window		Startseite:
 Cancel	Download Window		Abbrechen
 Settings	Settings Window		Einstellungen
 Downloads	WebPositive Window		Downloads
+Browse…	Settings Window		Auswählen…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Für diese Seite existiert bereits ein Lesezeichen (%bookmarkName).
+Resume prior session	Settings Window		Vorige Sitzung fortsetzen
 Match case	WebPositive Window		Groß-/Kleinschreibung beachten
 Proxy password:	Settings Window		Proxy-Passwort:
 Size:	Font Selection view		Größe:
@@ -119,6 +121,7 @@ Remember username and password for this site	Authentication Panel		Benutzername 
 (Finish: %date - %duration left)	Download Window		(Fertig: %date - %duration übrig)
 Cookie manager	Cookie Manager		Cookieverwaltung
 Show home button	Settings Window		Home-Symbol anzeigen
+Start new session	Settings Window		Neue Sitzung starten
 The cookie jar is empty!	Cookie Manager		Keine Cookies vorhanden!
 Value	Cookie Manager		Wert
 Remove missing	Download Window		Fehlende entfernen
@@ -141,6 +144,7 @@ Settings	WebPositive Window		Einstellungen
 Clear	URL Bar		Leeren
 Loading %url	WebPositive Window		%url wird geladen
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Falsches Üben von Xylophonmusik quält jeden größeren Zwerg.
+Start up:	Settings Window		Start:
 Confirmation	WebPositive Window		Bestätigung
 Session cookie	Cookie Manager		Sitzungs-Cookie
 Open all	WebPositive Window		Alle öffnen

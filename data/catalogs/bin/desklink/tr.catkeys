@@ -12,5 +12,5 @@ Media preferences…	MediaReplicant		Ortam tercihleri...
 Options	MediaReplicant		Seçenekler
 Beep	MediaReplicant		Bip
 Open %name	DeskButton	Don't translate variable %name	%name aç
-Control physical output	MediaReplicant		Fiziksel çıkışı kontrol et
+Control physical output	MediaReplicant		Fiziksel çıkışı denetle
 No media server running	VolumeControl		Çalışan ortam sunucusu bulunamadı

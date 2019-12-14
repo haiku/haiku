@@ -58,7 +58,7 @@ Ask again	PackageView		Yeniden sor
 Begin	PackageView		Başla
 OK	PackageView		Tamam
 Abort	PackageInfo		İptal et
-Done	PackageInstall		Tamamlandı
+Done	PackageInstall		Tamam
 Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Hata (%s)! \"%s\" açılamadı.\n
 Skip	PackageView		Atla
 Image not loaded correctly	PackageImageViewer		Görsel doğru yüklenmedi

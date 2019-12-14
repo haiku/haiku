@@ -2,7 +2,7 @@
 Control border	Colors tab		Denetim kenarlığı
 Control mark	Colors tab		Denetim imi
 Off	AntialiasingSettingsView		Kapalı
-Window border	Colors tab		Pencere kenarı
+Window border	Colors tab		Pencere kenarlığı
 Inactive window tab	Colors tab		Etkin olmayan pencere sekmesi
 Defaults	APRWindow		Öntanımlı
 Shadow	Colors tab		Gölge
@@ -75,5 +75,5 @@ Colors	APRWindow		Renkler
 About control look	DecorSettingsView		ControlLook hakkında
 Control highlight	Colors tab		Denetim vurgulaması
 Status bar	Colors tab		Durum çubuğu
-Link hover	Colors tab		Bağlantı üzerine gelme
+Link hover	Colors tab		İmleç bağlantı üzerinde
 Single:	DecorSettingsView		Tekil:

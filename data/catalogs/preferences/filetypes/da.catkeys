@@ -1,5 +1,6 @@
-1	danish	x-vnd.Haiku-FileTypes	734679611
+1	danish	x-vnd.Haiku-FileTypes	436017301
 Left	Attribute Window	Attribute column alignment in Tracker	Venstre
+Float	Attribute ListView		Flydende kommatal
 Final	Application Types Window		Endelig
 FileTypes request	FileTypes Window		Filtyper-anmodning
 This file type already exists	New File Type Window		Filtypen findes allerede
@@ -31,6 +32,7 @@ Signature:	Application Types Window		Signatur:
 None	FileTypes Window		Intet
 Exclusive launch	Application Type Window		Eksklusiv start
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Fjernelse af en filtype kan ikke fortrydes.\nEr du sikker på, at du vil fjerne den?
+Integer 64 bit	Attribute ListView		Heltal 64 bit
 Cancel	New File Type Window		Annuller
 Select same preferred application as	FileType Window		Vælg samme foretrukne program som
 Cancel	Type List Window		Annuller
@@ -43,10 +45,13 @@ Abort	Application Types Window		Afbryd
 Save	Application Type Window		Gem
 %1 application type	Application Type Window		%1-programtype
 Icon	Application Type Window		Ikon
+Duration	Attribute ListView		Varighed
 Version:	Application Type Window		Version:
 Default application	FileType Window		Standardprogram
 Internal name:	New File Type Window		Internt navn:
+Integer 8 bit	Attribute ListView		Heltal 8 bit
 Extension:	Extension Window		Udvidelse:
+Time	Attribute ListView		Tid
 Extensions:	FileTypes Window		Udvidelser:
 Select preferred application	FileType Window		Vælg foretrukne program
 Description:	FileTypes Window		Beskrivelse:
@@ -66,6 +71,8 @@ Version:	Application Types Window		Version:
 Application types	Application Types Window		Programtyper
 Description:	Application Types Window		Beskrivelse:
 Name:	Application Types Window		Navn:
+Rating	Attribute ListView		Bedømmelse
+duration	Attribute ListView		varighed
 File could not be opened	Preferred App Menu		Filen kunne ikke åbnes
 Args only	Application Type Window		Kun argumenter
 Could not open \"%s\":\n%s	FileTypes		Kunne ikke åbne \"%s\":\n%s
@@ -83,16 +90,21 @@ Type name:	FileTypes Window		Typenavn:
 Visible	Attribute Window		Synlig
 Select preferred application	FileTypes Window		Vælg foretrukne program
 Path:	Application Types Window		Sti:
+rating	Attribute ListView		bedømmelse
 Could not install file type	New File Type Window		Kunne ikke installere filtype
 Same as…	FileTypes Window		Samme som…
 Golden master	Application Type Window		Golden master
+Checkbox	Attribute ListView		Afkrydsningsboks
 FileTypes request	Preferred App Menu		Filtyper-anmodning
 no icon	FileTypes Window		intet ikon
 Single launch	Application Type Window		Enkel start
 %s file type	FileType Window		%s-filtype
+Default	Attribute ListView		Standard
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Fjernelse af en super-type kan ikke fortrydes.\nAlle filtyper som tilhører denne filtype vil gå tabt!\n\nEr du sikker på, at du vil gøre det? Hold Skift-tasten nede og tryk på \"Fjern\", for at fjerne hele gruppen.
+String	Attribute ListView		Streng
 Add type	New File Type Window		Tilføj type
 Remove icon	Icon View		Fjern ikon
+Boolean	Attribute ListView		Boolesk
 Cancel	Extension Window		Annuller
 Alignment:	Attribute Window		Justering:
 Icon	FileType Window		Ikon
@@ -101,6 +113,7 @@ Development	Application Type Window		Udvikling
 Golden master	Application Types Window		Golden master
 Add	Extension Window		Tilføj
 Open…	FileTypes Window		Åbn…
+checkbox	Attribute ListView		afkrydsningsboks
 Could not change file extensions	Extension Window		Kunne ikke skifte filendelser
 Could not open file	FileType Window		Kunne ikke åbne fil
 Choose type	Type List Window		Vælg type
@@ -118,6 +131,7 @@ Add group	New File Type Window		Tilføj gruppe
 Cancel	Attribute Window		Annuller
 Gamma	Application Types Window		Gamma
 Supported types	Application Type Window		Understøttede typer
+Integer 32 bit	Attribute ListView		Heltal 32 bit
 Beta	Application Type Window		Beta
 Could not retrieve preferred application of this file	Preferred App Menu		Kunne ikke indhente foretrukne program af filen
 Application flags	Application Type Window		Programflag
@@ -142,6 +156,7 @@ Extra attributes	FileTypes Window		Ekstra attributter
 Group:	New File Type Window		Gruppe:
 Alpha	Application Types Window		Alfa
 Close	Application Type Window		Luk
+Integer 16 bit	Attribute ListView		Heltal 16 bit
 Extension	Extension Window		Udvidelse
 Rule:	FileTypes Window		Rolle:
 FileTypes	System name		Filtyper
@@ -153,5 +168,6 @@ Add…	FileTypes Window		Tilføj…
 Edit icon…	Icon View		Rediger ikon…
 Internal name:	Attribute Window		Internt navn:
 Show recognition rule	FileTypes Window		Vis genkendelsesregel
+Double	Attribute ListView		Double
 Move down	FileTypes Window		Flyt ned
 Alpha	Application Type Window		Alfa

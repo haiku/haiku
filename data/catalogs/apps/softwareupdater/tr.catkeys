@@ -19,7 +19,7 @@ to	SoftwareUpdaterWindow	List item text	 ->
 Attempting to cancel the updates…	SoftwareUpdaterWindow		Güncellemeler iptal edilmeye çalışılıyor…
 Contacting software repositories to check for package updates.	CheckManager		Paket güncellemeleri için yazılım depoları ile iletişim kuruluyor.
 Available updates found	CheckManager		Yeni güncellemeler bulundu
-from repository	SoftwareUpdaterWindow	List item text	depodan
+from repository	SoftwareUpdaterWindow	List item text	şu depodan:
 Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Paket güncellemeleri için yazılım depoları ile iletişim kuruluyor.
 Cancelling updates	SoftwareUpdaterWindow		Güncellemeler iptal ediliyor
 Cancel	SoftwareUpdaterWindow	Alert button label	İptal
@@ -36,7 +36,7 @@ Full sync	SoftwareUpdaterWindow	Alert button label	Tam eşitleme
 Quit	SoftwareUpdaterWindow	Button label	Çık
 Updates have been successfully installed.	UpdateManager		Güncellemeler başarıyla yüklendi.
 Exception occurred while updating packages : %s\n	UpdateAction		Paketler güncellenirken kural dışı durum oluştu: %s\n
-A reboot is necessary to complete the update process.	UpdateManager		Güncellemeleri tamamlamak için yeniden başlatma gerekiyor.
+A reboot is necessary to complete the update process.	UpdateManager		Güncellemelerin tamamlanabilmesi için yeniden başlatma gerekiyor.
 Exception occurred while checking for updates: %s\n	CheckAction		Güncellemeler denetlenirken kural dışı durum oluştu: %s\n
 Packages are being updated	UpdateManager		Paketler güncelleniyor
 Cancel	SoftwareUpdaterWindow		İptal

@@ -35,9 +35,9 @@ Hz	Screen		Hz
 Workspaces	Screen		Çalışma alanları
 Brightness:	Screen		Parlaklık:
 32 bits/pixel, 16 Million colors	Screen		32 bit/piksel, 16 milyon renk
-Done	Screen		Tamamlandı
+Done	Screen		Tamam
 16 bits/pixel, 65536 colors	Screen		16 bit/piksel, 65536 renk
-Screen preferences by the Haiku team	Screen		Haiku takımı tarafından ekran ayarları
+Screen preferences by the Haiku team	Screen		Ekran tercihleri, Haiku takımı
 Refresh rate	Screen		Yenileme oranı
 if needed	Screen		Gerekliyse
 Combine displays:	Screen		Ekranları birleştir:
@@ -48,7 +48,7 @@ Resolution:	Screen		Çözünürlük:
 Apply	Screen		Uygula
 horizontally	Screen		yatay olarak
 disable	Screen		devre dışı bırak
-Set background…	Screen		Arka planı belirle…
+Set background…	Screen		Arkaplanı belirle…
 Type or use the left and right arrow keys.	Screen		Yazın, veya sağ ve sol ok tuşlarını kullanın.
 Screen	System name		Ekran
 Do you wish to keep these settings?	Screen		Bu ayarları tutmak istiyor musunuz?

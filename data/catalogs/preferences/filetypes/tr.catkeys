@@ -36,9 +36,9 @@ Integer 64 bit	Attribute ListView		64 bit tamsayı
 Cancel	New File Type Window		İptal
 Select same preferred application as	FileType Window		Aynı tercih edilen uygulamayı seç
 Cancel	Type List Window		İptal
-Don't save	Application Type Window		Kaydetme!
+Don't save	Application Type Window		Kaydetme
 Center	Attribute Window	Attribute column alignment in Tracker	Merkez
-Done	Extension Window		Tamamlandı
+Done	Extension Window		Tamam
 Development	Application Types Window		Geliştirme
 Same as…	FileType Window	The same APPLICATION as ...	Aynısı…
 Abort	Application Types Window		İptal et
@@ -63,7 +63,7 @@ Progress	Application Types Window		İlerleme
 Select…	FileType Window		Seç…
 Information	Application Types Window		Bilgi
 Settings	FileTypes Window		Ayarlar
-Done	Attribute Window		Tamamlandı
+Done	Attribute Window		Tamam
 FileTypes request	FileTypes		Dosya Türleri isteği
 Select same type as	FileType Window		Şununla aynı türü seç
 Version:	Application Types Window		Sürüm:
@@ -151,7 +151,7 @@ Short description:	Application Type Window		Kısa açıklama:
 Save request	Application Type Window		Kaydetme isteği
 Could not remove file type: %s\n	FileTypes Window		Dosya türü kaldırılamadı: %s\n
 Display as:	Attribute Window	Tracker offers different display modes for attributes.	Şöyle göster:
-Done	Type List Window		Tamamlandı
+Done	Type List Window		Tamam
 Extra attributes	FileTypes Window		Ek öznitelikler
 Group:	New File Type Window		Grup:
 Alpha	Application Types Window		Alfa

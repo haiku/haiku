@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-libtracker	1733865386
+1	portuguese	x-vnd.Haiku-libtracker	1992706028
 Created	ContainerWindow		Criado
 Open and make preferred	OpenWithWindow		Abrir e tornar preferida
 Kind	ContainerWindow		Tipo
@@ -25,6 +25,7 @@ Error emptying Trash	FSUtils		Erro ao esvaziar o Lixo
 Opens with:	InfoWindow		Abre com:
 Size	QueryPoseView		Tamanho
 128 x 128	ContainerWindow		128 x 128
+Disk mount	TrackerSettingsWindow		Montagem de discos
 Error in regular expression:\n\n'%errstring'	PoseView		Erro na expressão regular:\n\n'%errstring'
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Não pode substituir uma pasta ou uma ligação simbólica por um ficheiro.

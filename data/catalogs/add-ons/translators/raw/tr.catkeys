@@ -1,8 +1,8 @@
 1	turkish	x-vnd.Haiku-RAWTranslator	2975919330
-RAWTranslator Settings	ConfigView		RAWTranslator ayarları
+RAWTranslator Settings	ConfigView		RAWTranslator Ayarları
 Version %d.%d.%d, %s	ConfigView		Sürüm %d.%d.%d, %s
 RAW image translator	RAWTranslator		RAW görseli çevirmeni
-RAW Settings	RAWTranslator main		RAW ayarları
+RAW Settings	RAWTranslator main		RAW Ayarları
 RAW images	RAWTranslator		RAW görselleri
 RAW image translator	ConfigView		RAW görseli çevirmeni
 %s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	%s RAW görseli

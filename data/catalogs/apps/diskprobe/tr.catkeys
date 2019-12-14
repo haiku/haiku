@@ -34,7 +34,7 @@ Examine device:	OpenWindow		Aygıtı incele:
 Number editor	TypeEditors		Sayı düzenleyicisi
 Icon	TypeEditors		Simge
 Attribute	ProbeView		Öznitelik
-Don't save	ProbeView		Kaydetme!
+Don't save	ProbeView		Kaydetme
 Undo	ProbeView		Geri al
 Flattened bitmap	TypeEditors		Düzleştirilmiş biteşlem
 Block %Ld (0x%Lx)	ProbeView		Blok: %Ld (0x%Lx)

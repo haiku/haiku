@@ -1,4 +1,5 @@
-1	catalan; valencian	x-vnd.Haiku-BootManager	1719213568
+1	catalan; valencian	x-vnd.Haiku-BootManager	3845928884
+Old Master Boot Record backup failure	BootManagerController	Title	Falla da de la còpia de seguretat del Registre d'arrencada mestre antic.
 At least one partition must be selected!	BootManagerController		Cal triar al menys una partició!
 No space available!	DrivesPage	Cannot install	No hi ha espai disponible!
 Boot Manager is unable to read the partition table!	BootManagerController		El Gestor d'Arrencada no ha pogut llegir la taula de particions!
@@ -15,6 +16,7 @@ Never	DefaultPartitionPage		Mai
 Summary	BootManagerController	Title	Resum
 An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Hi hagut un error en escriure el menú d'arrencada. El registre mestre d'arrencada (MBR) podria estar en mal estat, l'hauríeu de restaurar ara!
 After three seconds	DefaultPartitionPage		Després de 3 segons
+Read only!	DrivesPage	Cannot install	Només de lectura!
 Write boot menu	BootManagerController	Button	Escriu el menú d'arrencada
 OK	BootManagerController	Button	D'acord
 Uninstall boot manager	BootManagerController	Title	Desinstal·la el gestor d'arrencada
@@ -37,12 +39,14 @@ The Master Boot Record could not be restored!	BootManagerController		No ha estat
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Trieu si us plau el disc al que voleu instal·lar o del que voleu desinstal·lar el gestor de l'arrencada.
 After four seconds	DefaultPartitionPage		Després de 4 segons
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Sense nom %d
+First partition starts too early	BootManagerController	Title	La primera partició comença massa aviat.
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Ara es desarà el menú d'arrencada al disc. Esteu segur que voleu continuar?
 Partitions	DefaultPartitionPage	Pop up menu title	Particions
 Default Partition:	DefaultPartitionPage	Menu field label	Partició per omissió:
 Next	WizardView	Button	Següent
 Previous	WizardView	Button	Anterior
 Uninstallation of boot menu failed	BootManagerController	Title	Ha fallat la desinstal·lació del menú d'arrencada
+Incompatible format!	DrivesPage	Cannot install	Format no compatible!
 Old Master Boot Record saved	BootManagerController	Title	S'ha desat el registre de l'antic gestor d'arrencada
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Trieu una partició predeterminada i un temps d'espera. \nEl menú d'arrancada carregarà la partició predeterminada quan hagi passat el temps d'espera. També és possible indicar que el menú d'arrancada esperi un tempo indefinit abans de triar una partició. \nPremeu la tecla 'ALT' per a desactivar el temps d'espera de l'arrencada.
 Partitions	PartitionsPage	Title	Particions

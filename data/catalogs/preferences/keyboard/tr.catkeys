@@ -4,7 +4,7 @@ Typing test area	KeyboardView		Yazma sınama alanı
 Defaults	KeyboardWindow		Öntanımlılar
 Key repeat rate	KeyboardView		Düğme yineleme oranı
 Revert	KeyboardWindow		Eski haline döndür
-Delay until key repeat	KeyboardView		Düğme yinelemesine kadar olan gecikme
+Delay until key repeat	KeyboardView		Düğme yineleme hızı
 Keyboard	System name		Klavye
 OK	KeyboardApplication		Tamam
 Fast	KeyboardView		Hızlı

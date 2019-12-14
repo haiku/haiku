@@ -38,7 +38,7 @@ Assign Style	Icon-O-Matic-AssignStyleCmd		Biçem ata
 Transformation	Icon-O-Matic-TransformationBoxStates		Dönüşüm
 Closed	Icon-O-Matic-PropertyNames		Kapalı
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Denetim noktasını ortadan böl
-<nothing to redo>	Icon-O-Matic-Menu-Edit		<yinelenecek hiçbir şey yok>
+<nothing to redo>	Icon-O-Matic-Menu-Edit		<yinelenecek bir şey yok>
 Height	Icon-O-Matic-PropertyNames		Yükseklik
 Add Shape	Icon-O-Matic-AddShapesCmd		Şekil ekle
 warning	Icon-O-Matic-SVGExport		uyarı

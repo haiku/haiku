@@ -4,7 +4,7 @@ Application	ShortcutsWindow		Uygulama
 Option	ShortcutsSpec	Name for modifier on keyboard	Seçenek
 Save changes before closing?	ShortcutsWindow		Kapatmadan önce değişiklikler kaydedilsin mi?
 Revert to saved	ShortcutsWindow		Kaydedilene döndür
-Don't save	ShortcutsWindow		Kaydetme!
+Don't save	ShortcutsWindow		Kaydetme
 *MouseDown	ShortcutsWindow		*FareAşağı
 *Beep	ShortcutsWindow		*Bip
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Kısayollar düğme setinizi kaydedemedi.

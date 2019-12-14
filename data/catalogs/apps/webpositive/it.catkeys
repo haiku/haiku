@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-WebPositive	2763299522
+1	italian	x-vnd.Haiku-WebPositive	1879106286
 Authentication required	Authentication Panel		Richiesta autenticazione
 Previous	WebPositive Window		Precedente
 (Finish: %date)	Download Window		(Terminato: %date)
@@ -28,7 +28,9 @@ Start page:	Settings Window		Pagina di avvio:
 Cancel	Download Window		Annulla
 Settings	Settings Window		Impostazioni
 Downloads	WebPositive Window		File scaricati
+Browse…	Settings Window		Sfoglia…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Un segnalibro per questa pagina (%bookmarkName) esiste già.
+Resume prior session	Settings Window		Continua sessione precedente
 Match case	WebPositive Window		Distingui maiuscole/minuscole
 Proxy password:	Settings Window		Password server proxy:
 Size:	Font Selection view		Dimensione:
@@ -119,6 +121,7 @@ Remember username and password for this site	Authentication Panel		Ricorda nome 
 (Finish: %date - %duration left)	Download Window		(Termine: %date - mancano %duration)
 Cookie manager	Cookie Manager		Gestione dei Cookie
 Show home button	Settings Window		Mostra pulsante home
+Start new session	Settings Window		Inizia una nuova sessione
 The cookie jar is empty!	Cookie Manager		Il barattolo dei biscotti è vuoto!
 Value	Cookie Manager		Valore
 Remove missing	Download Window		Rimuovi mancanti
@@ -141,6 +144,7 @@ Settings	WebPositive Window		Impostazioni
 Clear	URL Bar		Pulisci
 Loading %url	WebPositive Window		Caricamento %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	La vispa Teresa avea tra l’erbetta a volo sorpresa gentil farfalletta.
+Start up:	Settings Window		Avvio:
 Confirmation	WebPositive Window		Conferma
 Session cookie	Cookie Manager		Cookie di sessione
 Open all	WebPositive Window		Apri tutti

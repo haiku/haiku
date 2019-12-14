@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-WebPositive	2763299522
+1	danish	x-vnd.Haiku-WebPositive	1879106286
 Authentication required	Authentication Panel		Autentifikation kræves
 Previous	WebPositive Window		Forrige
 (Finish: %date)	Download Window		(færdig: %date)
@@ -28,7 +28,9 @@ Start page:	Settings Window		Startside:
 Cancel	Download Window		Annuller
 Settings	Settings Window		Indstillinger
 Downloads	WebPositive Window		Downloads
+Browse…	Settings Window		Gennemse…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Der findes allerede et bogmærke til siden (%bookmarkName).
+Resume prior session	Settings Window		Genoptag forrige session
 Match case	WebPositive Window		Der skelnes mellem store og små bogstaver
 Proxy password:	Settings Window		Proxy-adgangskode:
 Size:	Font Selection view		Størrelse:
@@ -119,6 +121,7 @@ Remember username and password for this site	Authentication Panel		Husk brugerna
 (Finish: %date - %duration left)	Download Window		(færdig: %date - %duration tilbage)
 Cookie manager	Cookie Manager		Cookiehåndtering
 Show home button	Settings Window		Vis hjem-knap
+Start new session	Settings Window		Start ny session
 The cookie jar is empty!	Cookie Manager		Kagedåsen er tom!
 Value	Cookie Manager		Værdi
 Remove missing	Download Window		Fjern manglende
@@ -141,6 +144,7 @@ Settings	WebPositive Window		Indstillinger
 Clear	URL Bar		Ryd
 Loading %url	WebPositive Window		Indlæser %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Blåbærgrød med fløde i en dyb tallerken.
+Start up:	Settings Window		Opstart:
 Confirmation	WebPositive Window		Bekræftelse
 Session cookie	Cookie Manager		Sessionscookie
 Open all	WebPositive Window		Åbn alle

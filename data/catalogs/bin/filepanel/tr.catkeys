@@ -1,5 +1,5 @@
 1	turkish	x-vnd.mmu_man.filepanel	1802971238
-display a load/save file panel\n	FilePanelApp		dosya yükle/kaydet panelini göster\n
+display a load/save file panel\n	FilePanelApp		dosya yükle/kaydet paneli göster\n
 short\tlong\tdescription\n	FilePanelApp		kısa\tuzun\taçıklama\n
 %s not a valid option\n	FilePanelApp		%s geçerli bir seçenek değil\n
 -s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tFilePanel kaydet kullan\n
@@ -16,5 +16,5 @@ usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]      
 -a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tişlevsel değil\n
 -m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tFilePanel'ı kipsel yapar\n
 options:\n	FilePanelApp		seçenekler:\n
--d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\t<folder> içinde aç\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\t<klasör> içinde aç\n
 usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		kullanım: %s [--help] [--directory dizin] [--load|--save] [--title bşlk] [--single] [--modal] [--allow desen] [--forbid desen]\n

@@ -1,7 +1,7 @@
 1	turkish	x-vnd.Haiku-PCXTranslator	938242683
-PCX Settings	main		PCX ayarları
+PCX Settings	main		PCX Ayarları
 Version %d.%d.%d, %s	ConfigView		Sürüm %d.%d.%d, %s
-PCXTranslator Settings	ConfigView		PCXTranslator ayarları
+PCXTranslator Settings	ConfigView		PCXTranslator Ayarları
 PCX image translator	PCXTranslator		PCX görseli çevirmeni
 PCX %lu bit image	PCXTranslator		PCX %lu bit görsel
 PCX images	PCXTranslator		PCX görselleri

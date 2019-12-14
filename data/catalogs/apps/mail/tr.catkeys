@@ -28,7 +28,7 @@ Save attachment…	Mail		Eki kaydet…
 Paste	Mail		Yapıştır
 E-mail draft could not be saved!	Mail		E-posta taslağı kaydedilemedi!
 Don't send	Mail		Gönderme!
-sent	B_USER_DIRECTORY/mail/sent		gönderildi
+sent	B_USER_DIRECTORY/mail/sent		gönderilen
 Only files can be added as attachments.	Mail		Yalnızca dosyalar eklenebilir.
 Close	Mail		Kapat
 Untitled	Mail		Adsız
@@ -62,7 +62,7 @@ Add signature	Mail		İmza ekle
 %n - Full name	Mail		%n - Tam ad
 Signature	Mail		İmza
 Use default account	Mail		Öntanımlı hesabı kullan
-draft	B_USER_DIRECTORY/mail/draft		taslak
+draft	B_USER_DIRECTORY/mail/draft		taslaklar
 Really delete this signature? This cannot be undone.	Mail		İmza silinsin mi? Bu işlem geri alınamaz.
 spam	B_USER_DIRECTORY/mail/spam		istenmeyen
 Reply to all	Mail		Tümünü yanıtla
@@ -138,7 +138,7 @@ out	B_USER_DIRECTORY/mail/out		giden
 Send this message before closing?	Mail		Kapatmadan önce bu ileti gönderilsin mi?
 in	B_USER_DIRECTORY/mail/in		gelen
 Open	Mail		Aç
-Don't save	Mail		Kaydetme!
+Don't save	Mail		Kaydetme
 Leave same	Mail		Aynı bırak
 An error occurred trying to save the attachment.	Mail		Ek kaydedilirken bir hata oluştu.
 Save address	Mail		Adresi kaydet

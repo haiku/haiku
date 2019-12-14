@@ -10,7 +10,7 @@ Written by the Haiku Translation Kit Team	TGAView		Haiku Çeviri Kiti Takımı t
 Targa image (%d bits RLE truecolor)	TGATranslator		Targa görseli (%d bit RLE gerçek renk)
 TGA images	TGATranslator		TGA görselleri
 Version %d.%d.%d, %s	TGAView		Sürüm %d.%d.%d, %s
-TGATranslator Settings	TGATranslator		TGATranslator ayarları
+TGATranslator Settings	TGATranslator		TGATranslator Ayarları
 TGA image translator	TGATranslator		TGA görseli çevirmeni
 Targa image (%d bits RLE gray)	TGATranslator		Targa görseli (%d bit RLE gri)
-TGA Settings	TGAMain		TGA ayarları
+TGA Settings	TGAMain		TGA Ayarları

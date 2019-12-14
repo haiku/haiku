@@ -1,5 +1,5 @@
 1	turkish	x-vnd.Haiku-LaunchBox	1530497419
-Set description…	LaunchBox		Açıklamayı ayarla...
+Set description…	LaunchBox		Açıklama koy...
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Bu rampa kaldırılsın mı?\n(Rampa hatırlanmayacaktır.)
 OK	LaunchBox		Tamam
 Ignore double-click	LaunchBox		Çift tıklamayı yoksay
@@ -18,7 +18,7 @@ Open containing folder	LaunchBox		İçeren klasörü aç
 Add button here	LaunchBox		Buraya düğme ekle
 Cancel	LaunchBox		İptal
 launch popup	LaunchBox		açılır pencere çalıştır
-Clear button	LaunchBox		Temizle düğmesi
+Clear button	LaunchBox		Düğmeyi temizle
 Bummer	LaunchBox		Hay aksi
 last chance	LaunchBox		son şans
 You can drag an icon here.	LaunchBox		Buraya bir simge sürükleyebilirsiniz.

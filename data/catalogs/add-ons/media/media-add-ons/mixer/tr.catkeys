@@ -14,14 +14,14 @@ Refuse input format changes	AudioMixer		Girdi biçimi değişikliklerini reddet
 Drop/repeat samples	AudioMixer		Örnekleri bırak/tekrar et
 Output channel sources	AudioMixer		Çıktı kanalı kaynakları
 dB	AudioMixer		dB
-Gain controls	AudioMixer		Kazanç ayarları
+Gain controls	AudioMixer		Kazanım ayarları
 Input mapping	AudioMixer		Girdi eşleme
 Mute	AudioMixer		Sessiz
 Input channel destinations	AudioMixer		Girdi kanalı hedefleri
 To master	AudioMixer		Ana denetleyiciye
 Master output	AudioMixer		Ana çıktı
 Setup	AudioMixer		Kurulum
-Use non linear gain sliders (like BeOS R5)	AudioMixer		Doğrusal olmayan kazanç kaydırıcısı kullan (BeOS R5'teki gibi)
-Gain	AudioMixer		Kazanç
+Use non linear gain sliders (like BeOS R5)	AudioMixer		Doğrusal olmayan kazanım kaydırıcısı kullan (BeOS R5'teki gibi)
+Gain	AudioMixer		Kazanım
 Allow output channel remapping	AudioMixer		Çıktı kanalı yeniden eşlemesine izin ver
 Physical input channels	AudioMixer		Fiziksel girdi kanalları

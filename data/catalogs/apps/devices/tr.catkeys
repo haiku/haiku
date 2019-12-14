@@ -5,7 +5,7 @@ Bus Information	Device		Veri yolu bilgisi
 Devices	System name		Aygıtlar
 Graphics Peripheral	DeviceSCSI		Grafik çevre birimi
 Processor	Device		İşlemci
-Generate system information	DevicesView		Sistem bilgisini oluştur
+Generate system information	DevicesView		Sistem bilgisi oluştur
 Class info	DevicePCI		Sınıf bilgisi
 ACPI Information	DeviceACPI		ACPI bilgisi
 Detailed	DevicesView		Ayrıntılı
@@ -64,7 +64,7 @@ Report compatibility	DevicesView		Uyumluluğu bildir
 Computer	Device		Bilgisayar
 PCI bus	Device		PCI veri yolu
 Enclosure	DeviceSCSI		Kapanma
-Order by:	DevicesView		Veren:
+Order by:	DevicesView		Sıralama:
 ACPI Thermal Zone	DeviceACPI		ACPI ısıl bölgesi
 Intelligent controller	Device		Akıllı denetleyici
 Multimedia controller	Device		Çokluortam denetleyicisi
@@ -89,4 +89,4 @@ Network controller	Device		Ağ denetleyicisi
 Driver used	Device		Kullanılan sürücü
 Communication controller	Device		İletişim denetleyicisi
 ACPI bus	Device		ACPI veri yolu
-unknown	Device		bilinmeyen
+unknown	Device		bilinmiyor
