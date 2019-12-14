@@ -448,6 +448,9 @@ extern status_t		_kern_memory_advice(void *address, size_t size,
 extern status_t		_kern_get_memory_properties(team_id teamID,
 						const void *address, uint32* _protected, uint32* _lock);
 
+extern status_t		_kern_mlock(const void* address, size_t size);
+extern status_t		_kern_munlock(const void* address, size_t size);
+
 /* kernel port functions */
 extern port_id		_kern_create_port(int32 queue_length, const char *name);
 extern status_t		_kern_close_port(port_id id);
