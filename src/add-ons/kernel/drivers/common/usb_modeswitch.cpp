@@ -358,7 +358,7 @@ my_transfer_data(my_device *device, bool directionIn, void *data,
 	}
 
 	do {
-		bigtime_t timeout = directionIn ? 500000 : 500000;
+		bigtime_t timeout = 500000;
 		result = acquire_sem_etc(device->notify, 1, B_RELATIVE_TIMEOUT,
 			timeout);
 		if (result == B_TIMED_OUT) {
