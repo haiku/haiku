@@ -1,14 +1,26 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network sis19x ;
 
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
+	: true ;
+UsePrivateHeaders net system ;
 UsePrivateKernelHeaders ;
-UsePrivateHeaders net ;
 
-UsePrivateHeaders [ FDirName kernel util ] ;
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
+
+UseHeaders [ FDirName $(SUBDIR) ] : true ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev mii ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev sge ] ;
 
 KernelAddon sis19x :
-	Driver.cpp
-	Device.cpp
-	MIIBus.cpp
-	DataRing.cpp
-	Settings.cpp
+	glue.c
+	ukphy.c
+	ukphy_subr.c
+	if_sge.c
+	: libfreebsd_network.a
 	;
+
+ObjectHdrs [ FGristFiles icsphy$(SUFOBJ) nsphyter$(SUFOBJ) ukphy$(SUFOBJ) ]
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)) libs
+		compat freebsd_network ] ;
+Includes [ FGristFiles icsphy.c nsphyter.c ukphy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;
