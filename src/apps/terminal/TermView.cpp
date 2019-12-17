@@ -732,9 +732,6 @@ TermView::SetEncoding(int encoding)
 void
 TermView::SetKeymap(const key_map* keymap, const char* chars)
 {
-	delete fKeymap;
-	delete[] fKeymapChars;
-
 	fKeymap = keymap;
 	fKeymapChars = chars;
 
