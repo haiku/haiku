@@ -266,6 +266,7 @@ StreamBase::Open()
 		TRACE("StreamBase::Open() - avformat_open_input() failed!\n");
 		// avformat_open_input() frees the context in case of failure
 		fContext = NULL;
+		av_free(fIOContext->buffer);
 		av_free(fIOContext);
 		fIOContext = NULL;
 		return B_NOT_SUPPORTED;
