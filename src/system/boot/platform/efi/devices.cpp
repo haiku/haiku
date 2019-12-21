@@ -43,16 +43,6 @@ static efi_guid LoadedImageGUID = EFI_LOADED_IMAGE_PROTOCOL_GUID;
 static efi_guid DevicePathGUID = EFI_DEVICE_PATH_PROTOCOL_GUID;
 
 
-static void
-device_set_path_end(efi_device_path_protocol* path)
-{
-	path->Type = DEVICE_PATH_END;
-	path->SubType = DEVICE_PATH_ENTIRE_END;
-	path->Length[0] = sizeof(efi_device_path_protocol);
-	path->Length[1] = 0;
-}
-
-
 static bool
 device_path_end(efi_device_path_protocol* path)
 {
@@ -323,8 +313,6 @@ add_boot_device_for_image(NodeList *devicesList)
 		if (device_path_end(node))
 			return B_ERROR;
 	}
-
-	device_set_path_end(NextDevicePathNode(node));
 
 	size_t length = device_path_length(devicePath);
 	efi_device_path_protocol *savedDevicePath
