@@ -187,9 +187,9 @@ NodeManager::RegisterNode(media_addon_id addOnID, int32 flavorID,
 	fNextNodeID++;
 
 	TRACE("NodeManager::RegisterNode: node %" B_PRId32 ", addon_id %" B_PRId32
-		", flavor_id %" B_PRId32 ", name \"%s\", kinds %#Lx, port %" B_PRId32
-		", team %" B_PRId32 "\n", *_nodeID, addOnID, flavorID, name, kinds,
-		port, team);
+		", flavor_id %" B_PRId32 ", name \"%s\", kinds %#" B_PRIx64", port %"
+		B_PRId32 ", team %" B_PRId32 "\n", *_nodeID, addOnID, flavorID, name,
+		kinds, port, team);
 	return B_OK;
 }
 
@@ -439,7 +439,8 @@ NodeManager::GetClone(node_type type, team_id team, media_node* node,
 	ASSERT(id == node->node);
 
 	TRACE("NodeManager::GetClone leave: node id %" B_PRId32 ", node port %"
-		B_PRId32 ", node kind %#lx\n", node->node, node->port, node->kind);
+		B_PRId32 ", node kind %#" B_PRIx64 "\n", node->node, node->port,
+		node->kind);
 	return B_OK;
 }
 

@@ -174,7 +174,7 @@ BMediaNode::Release()
 			// Only addons needs the configuration to be saved.
 			int32 id;
 			if (AddOn(&id) != NULL) {
-				TRACE("BMediaNode::Release() saving node %ld"
+				TRACE("BMediaNode::Release() saving node %" B_PRId32
 					" configuration\n", fNodeID);
 				MediaRosterEx(roster)->SaveNodeConfiguration(this);
 			}
@@ -246,7 +246,7 @@ BMediaNode::TimeSource() const
 	if (fTimeSource != 0)
 		return fTimeSource;
 
-	TRACE("BMediaNode::TimeSource node %ld enter\n", ID());
+	TRACE("BMediaNode::TimeSource node %" B_PRId32 " enter\n", ID());
 
 	// If the node doesn't have a time source object, we need to create one.
 	// If the node is still unregistered, we can't call MakeTimeSourceFor(),
@@ -266,7 +266,7 @@ BMediaNode::TimeSource() const
 		fTimeSource->AddMe(self);
 	}
 
-	TRACE("BMediaNode::TimeSource node %ld leave\n", ID());
+	TRACE("BMediaNode::TimeSource node %" B_PRId32 " leave\n", ID());
 
 	return fTimeSource;
 }
@@ -335,8 +335,8 @@ BMediaNode::TimerExpired(bigtime_t notifyPoint, int32 cookie, status_t error)
 {
 	CALLED();
 	if (write_port((port_id)cookie, 0, &error, sizeof(error)) < 0) {
-		TRACE("BMediaNode::TimerExpired: error writing port" B_PRId32
-			", at notifyPoint" B_PRId64 "\n", cookie, notifyPoint);
+		TRACE("BMediaNode::TimerExpired: error writing port %" B_PRId32
+			", at notifyPoint %" B_PRId64 "\n", cookie, notifyPoint);
 	}
 }
 
@@ -381,8 +381,8 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil, uint32 flags,
 		return error;
 	}
 
-	TRACE("BMediaNode::WaitForMessage request is: %#lx, node %ld, this %p\n",
-		message, fNodeID, this);
+	TRACE("BMediaNode::WaitForMessage request is: %#" B_PRIx32 ", node %"
+		B_PRId32 ", this %p\n", message, fNodeID, this);
 
 	if (message == GENERAL_PURPOSE_WAKEUP)
 		return B_OK;
@@ -567,7 +567,8 @@ BMediaNode::SetTimeSource(BTimeSource* time_source)
 status_t
 BMediaNode::HandleMessage(int32 message, const void* data, size_t size)
 {
-	TRACE("BMediaNode::HandleMessage %#lx, node %ld\n", message, fNodeID);
+	TRACE("BMediaNode::HandleMessage %#" B_PRIx32", node %" B_PRId32 "\n",
+		message, fNodeID);
 	switch (message) {
 		case NODE_FINAL_RELEASE:
 		{
@@ -591,7 +592,8 @@ BMediaNode::HandleMessage(int32 message, const void* data, size_t size)
 		{
 			const node_start_command* command
 				= static_cast<const node_start_command*>(data);
-			TRACE("BMediaNode::HandleMessage NODE_START, node %ld\n", fNodeID);
+			TRACE("BMediaNode::HandleMessage NODE_START, node %" B_PRId32 "\n",
+				fNodeID);
 			Start(command->performance_time);
 			return B_OK;
 		}
@@ -600,7 +602,8 @@ BMediaNode::HandleMessage(int32 message, const void* data, size_t size)
 		{
 			const node_stop_command* command
 				= static_cast<const node_stop_command*>(data);
-			TRACE("BMediaNode::HandleMessage NODE_STOP, node %ld\n", fNodeID);
+			TRACE("BMediaNode::HandleMessage NODE_STOP, node %" B_PRId32 "\n",
+				fNodeID);
 			Stop(command->performance_time, command->immediate);
 			return B_OK;
 		}
@@ -609,7 +612,8 @@ BMediaNode::HandleMessage(int32 message, const void* data, size_t size)
 		{
 			const node_seek_command* command
 				= static_cast<const node_seek_command*>(data);
-			TRACE("BMediaNode::HandleMessage NODE_SEEK, node %ld\n", fNodeID);
+			TRACE("BMediaNode::HandleMessage NODE_SEEK, node %" B_PRId32 "\n",
+				fNodeID);
 			Seek(command->media_time, command->performance_time);
 			return B_OK;
 		}
@@ -619,7 +623,7 @@ BMediaNode::HandleMessage(int32 message, const void* data, size_t size)
 			const node_set_run_mode_command* command
 				= static_cast<const node_set_run_mode_command*>(data);
 			TRACE("BMediaNode::HandleMessage NODE_SET_RUN_MODE,"
-				" node %ld\n", fNodeID);
+				" node %" B_PRId32 "\n", fNodeID);
 			// Need to change PRODUCER_SET_RUN_MODE_DELAY
 			fRunMode = command->mode;
 			SetRunMode(fRunMode);
@@ -631,7 +635,7 @@ BMediaNode::HandleMessage(int32 message, const void* data, size_t size)
 			const node_time_warp_command* command
 				= static_cast<const node_time_warp_command*>(data);
 			TRACE("BMediaNode::HandleMessage NODE_TIME_WARP,"
-				" node %ld\n", fNodeID);
+				" node %" B_PRId32 "\n", fNodeID);
 			TimeWarp(command->at_real_time, command->to_performance_time);
 			return B_OK;
 		}
@@ -639,7 +643,7 @@ BMediaNode::HandleMessage(int32 message, const void* data, size_t size)
 		case NODE_PREROLL:
 		{
 			TRACE("BMediaNode::HandleMessage NODE_PREROLL, "
-				" node %ld\n", fNodeID);
+				" node %" B_PRId32 "\n", fNodeID);
 			Preroll();
 			return B_OK;
 		}
@@ -649,7 +653,7 @@ BMediaNode::HandleMessage(int32 message, const void* data, size_t size)
 			const node_roll_command* command
 				= static_cast<const node_roll_command*>(data);
 
-			TRACE("BMediaNode::HandleMessage NODE_ROLL, node %ld\n",
+			TRACE("BMediaNode::HandleMessage NODE_ROLL, node %" B_PRId32 "\n",
 				fNodeID);
 
 			if (command->seek_media_time != B_INFINITE_TIMEOUT)
@@ -667,8 +671,8 @@ BMediaNode::HandleMessage(int32 message, const void* data, size_t size)
 				= static_cast<const node_sync_to_request*>(data);
 			node_sync_to_reply reply;
 
-			TRACE("BMediaNode::HandleMessage NODE_SYNC_TO, node %ld\n",
-				fNodeID);
+			TRACE("BMediaNode::HandleMessage NODE_SYNC_TO, node %" B_PRId32
+				"\n", fNodeID);
 
 			// If AddTimer return an error the caller will know that the node
 			// doesn't support this feature or there was a problem when adding
@@ -687,7 +691,7 @@ BMediaNode::HandleMessage(int32 message, const void* data, size_t size)
 				= static_cast<const node_set_timesource_command*>(data);
 
 			TRACE("BMediaNode::HandleMessage NODE_SET_TIMESOURCE,"
-				" node %ld, timesource %ld enter\n",
+				" node %" B_PRId32 ", timesource %" B_PRId32 " enter\n",
 				fNodeID, command->timesource_id);
 
 			fTimeSourceID = command->timesource_id;
@@ -707,8 +711,9 @@ BMediaNode::HandleMessage(int32 message, const void* data, size_t size)
 			fTimeSource = TimeSource();
 			SetTimeSource(fTimeSource);
 
-			TRACE("BMediaNode::HandleMessage NODE_SET_TIMESOURCE, node %ld,"
-				"timesource %ld leave\n", fNodeID, command->timesource_id);
+			TRACE("BMediaNode::HandleMessage NODE_SET_TIMESOURCE, node %"
+				B_PRId32 ", timesource %" B_PRId32 " leave\n", fNodeID,
+				command->timesource_id);
 
 			return B_OK;
 		}
@@ -719,7 +724,7 @@ BMediaNode::HandleMessage(int32 message, const void* data, size_t size)
 				= static_cast<const node_get_timesource_request*>(data);
 
 			TRACE("BMediaNode::HandleMessage NODE_GET_TIMESOURCE,"
-				" node %ld\n", fNodeID);
+				" node %" B_PRId32 "\n", fNodeID);
 
 			node_get_timesource_reply reply;
 			reply.timesource_id = fTimeSourceID;
@@ -733,7 +738,7 @@ BMediaNode::HandleMessage(int32 message, const void* data, size_t size)
 				(const node_get_attributes_for_request*) data;
 
 			TRACE("BMediaNode::HandleMessage NODE_GET_ATTRIBUTES_FOR,"
-				"node %ld\n", fNodeID);
+				"node %" B_PRId32 "\n", fNodeID);
 
 			node_get_attributes_for_reply reply;
 
@@ -768,7 +773,7 @@ BMediaNode::HandleMessage(int32 message, const void* data, size_t size)
 			const node_request_completed_command* command
 				= static_cast<const node_request_completed_command*>(data);
 			TRACE("BMediaNode::HandleMessage NODE_REQUEST_COMPLETED,"
-				" node %ld\n", fNodeID);
+				" node %" B_PRId32 "\n", fNodeID);
 			RequestCompleted(command->info);
 			return B_OK;
 		}
@@ -786,8 +791,8 @@ BMediaNode::HandleBadMessage(int32 code, const void* buffer, size_t size)
 {
 	CALLED();
 
-	TRACE("BMediaNode::HandleBadMessage: code %#08lx, buffer %p, size %ld\n",
-		code, buffer, size);
+	TRACE("BMediaNode::HandleBadMessage: code %#08" B_PRIx32 ", buffer %p, size %"
+		B_PRIuSIZE "\n", code, buffer, size);
 	if (code < NODE_MESSAGE_START || code > TIMESOURCE_MESSAGE_END) {
 		ERROR("BMediaNode::HandleBadMessage: unknown code!\n");
 	} else {
@@ -804,7 +809,8 @@ BMediaNode::HandleBadMessage(int32 code, const void* buffer, size_t size)
 void
 BMediaNode::AddNodeKind(uint64 kind)
 {
-	TRACE("BMediaNode::AddNodeKind: node %ld, this %p\n", fNodeID, this);
+	TRACE("BMediaNode::AddNodeKind: node %" B_PRId32 ", this %p\n", fNodeID,
+		this);
 	fKinds |= kind;
 }
 
@@ -927,7 +933,8 @@ BMediaNode &BMediaNode::operator=(const BMediaNode &clone)
 void
 BMediaNode::_InitObject(const char* name, media_node_id id, uint64 kinds)
 {
-	TRACE("BMediaNode::_InitObject: nodeid %ld, this %p\n", id, this);
+	TRACE("BMediaNode::_InitObject: nodeid %" B_PRId32 ", this %p\n", id,
+		this);
 
 	fNodeID = id;
 	fRefCount = 1;
@@ -957,8 +964,8 @@ BMediaNode::_InitObject(const char* name, media_node_id id, uint64 kinds)
 
 BMediaNode::BMediaNode(const char* name, media_node_id id, uint32 kinds)
 {
-	TRACE("BMediaNode::BMediaNode: name '%s', nodeid %ld, kinds %#lx\n",
-		name, id, kinds);
+	TRACE("BMediaNode::BMediaNode: name '%s', nodeid %" B_PRId32 ", kinds %#"
+		B_PRIx32 "\n", name, id, kinds);
 	_InitObject(name, id, kinds);
 }
 

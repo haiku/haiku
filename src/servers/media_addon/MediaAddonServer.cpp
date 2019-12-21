@@ -143,13 +143,13 @@ DumpFlavorInfo(const flavor_info* info)
 {
 	printf("  name = %s\n", info->name);
 	printf("  info = %s\n", info->info);
-	printf("  internal_id = %ld\n", info->internal_id);
-	printf("  possible_count = %ld\n", info->possible_count);
-	printf("  flavor_flags = 0x%lx", info->flavor_flags);
+	printf("  internal_id = %" B_PRId32 "\n", info->internal_id);
+	printf("  possible_count = %" B_PRId32 "\n", info->possible_count);
+	printf("  flavor_flags = 0x%" B_PRIx32, info->flavor_flags);
 	if (info->flavor_flags & B_FLAVOR_IS_GLOBAL) printf(" B_FLAVOR_IS_GLOBAL");
 	if (info->flavor_flags & B_FLAVOR_IS_LOCAL) printf(" B_FLAVOR_IS_LOCAL");
 	printf("\n");
-	printf("  kinds = 0x%Lx", info->kinds);
+	printf("  kinds = 0x%" B_PRIx64, info->kinds);
 	if (info->kinds & B_BUFFER_PRODUCER) printf(" B_BUFFER_PRODUCER");
 	if (info->kinds & B_BUFFER_CONSUMER) printf(" B_BUFFER_CONSUMER");
 	if (info->kinds & B_TIME_SOURCE) printf(" B_TIME_SOURCE");
@@ -160,8 +160,8 @@ DumpFlavorInfo(const flavor_info* info)
 	if (info->kinds & B_PHYSICAL_OUTPUT) printf(" B_PHYSICAL_OUTPUT");
 	if (info->kinds & B_SYSTEM_MIXER) printf(" B_SYSTEM_MIXER");
 	printf("\n");
-	printf("  in_format_count = %ld\n", info->in_format_count);
-	printf("  out_format_count = %ld\n", info->out_format_count);
+	printf("  in_format_count = %" B_PRId32 "\n", info->in_format_count);
+	printf("  out_format_count = %" B_PRId32 "\n", info->out_format_count);
 }
 #endif
 
@@ -441,7 +441,8 @@ MediaAddonServer::_ScanAddOnFlavors(BMediaAddOn* addon)
 {
 	ASSERT(addon->AddonID() > 0);
 
-	TRACE("MediaAddonServer::_ScanAddOnFlavors: id %ld\n", addon->AddonID());
+	TRACE("MediaAddonServer::_ScanAddOnFlavors: id %" B_PRId32 "\n",
+		addon->AddonID());
 
 	// cache the media_addon_id in a local variable to avoid
 	// calling BMediaAddOn::AddonID() too often
@@ -457,7 +458,8 @@ MediaAddonServer::_ScanAddOnFlavors(BMediaAddOn* addon)
 	int32 newFlavorCount = addon->CountFlavors();
 	info.flavor_count = newFlavorCount;
 
-	TRACE("%ld old flavors, %ld new flavors\n", oldFlavorCount, newFlavorCount);
+	TRACE("%" B_PRId32 " old flavors, %" B_PRId32 " new flavors\n",
+		oldFlavorCount, newFlavorCount);
 
 	// during the first update (i == 0), the server removes old dormant_flavor_infos
 	for (int i = 0; i < newFlavorCount; i++) {
@@ -526,16 +528,19 @@ MediaAddonServer::_AddOnAdded(const char* path, ino_t fileNode)
 		return;
 	}
 
-	TRACE("MediaAddonServer::_AddOnAdded: loading addon %ld now...\n", id);
+	TRACE("MediaAddonServer::_AddOnAdded: loading addon %" B_PRId32 " now..."
+		"\n", id);
 
 	BMediaAddOn* addon = gDormantNodeManager->GetAddOn(id);
 	if (addon == NULL) {
-		ERROR("MediaAddonServer::_AddOnAdded: failed to get add-on %s\n", path);
+		ERROR("MediaAddonServer::_AddOnAdded: failed to get add-on %s\n",
+			path);
 		gDormantNodeManager->UnregisterAddOn(id);
 		return;
 	}
 
-	TRACE("MediaAddonServer::_AddOnAdded: loading finished, id %ld\n", id);
+	TRACE("MediaAddonServer::_AddOnAdded: loading finished, id %" B_PRId32
+		"\n", id);
 
 	try {
 		// put file's inode and addon's id into map
@@ -565,7 +570,7 @@ MediaAddonServer::_AddOnAdded(const char* path, ino_t fileNode)
 	info.wants_autostart = addon->WantsAutoStart();
 
 	if (info.wants_autostart)
-		TRACE("add-on %ld WantsAutoStart!\n", id);
+		TRACE("add-on %" B_PRId32 " WantsAutoStart!\n", id);
 
 	// During startup, first all add-ons are loaded, then all
 	// nodes (flavors) representing physical inputs and outputs
@@ -739,7 +744,8 @@ MediaAddonServer::_InstantiateAutostartFlavors(AddOnInfo& info)
 		return;
 
 	for (int32 index = 0;; index++) {
-		TRACE("trying autostart of node %ld, index %ld\n", info.id, index);
+		TRACE("trying autostart of node %" B_PRId32 ", index %" B_PRId32 "\n",
+			info.id, index);
 
 		BMediaNode* node;
 		int32 internalID;

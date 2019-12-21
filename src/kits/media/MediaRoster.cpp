@@ -2247,14 +2247,14 @@ BMediaRoster::UnregisterNode(BMediaNode* node)
 		return B_OK;
 	}
 	if (node->ID() == NODE_UNREGISTERED_ID) {
-		PRINT(1, "Warning: BMediaRoster::UnregisterNode: node id %ld, name "
-			"'%s' already unregistered\n", node->ID(), node->Name());
+		PRINT(1, "Warning: BMediaRoster::UnregisterNode: node id %" B_PRId32
+			", name '%s' already unregistered\n", node->ID(), node->Name());
 		return B_OK;
 	}
 	if (node->fRefCount != 0) {
-		PRINT(1, "Warning: BMediaRoster::UnregisterNode: node id %ld, name "
-			"'%s' has local reference count of %ld\n", node->ID(), node->Name(),
-			node->fRefCount);
+		PRINT(1, "Warning: BMediaRoster::UnregisterNode: node id %" B_PRId32
+			", name '%s' has local reference count of %" B_PRId32 "\n",
+			node->ID(), node->Name(), node->fRefCount);
 		// no return here, we continue and unregister!
 	}
 
