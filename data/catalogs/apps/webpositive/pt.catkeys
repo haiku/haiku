@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-WebPositive	2763299522
+1	portuguese	x-vnd.Haiku-WebPositive	1879106286
 Authentication required	Authentication Panel		Autenticação necessária
 Previous	WebPositive Window		Anterior
 (Finish: %date)	Download Window		(Fim: %date)
@@ -28,7 +28,9 @@ Start page:	Settings Window		Página inicial:
 Cancel	Download Window		Cancelar
 Settings	Settings Window		Configurações
 Downloads	WebPositive Window		Descargas
+Browse…	Settings Window		Navegar…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Já existe um marcador para esta página (%bookmarkName).
+Resume prior session	Settings Window		Retomar sessão anterior
 Match case	WebPositive Window		Distinguir maiúsculas/minúsculas
 Proxy password:	Settings Window		Palavra-passe do proxy:
 Size:	Font Selection view		Tamanho:
@@ -67,7 +69,7 @@ Back	WebPositive Window		Retroceder
 Yesterday	WebPositive Window		Ontem
 Quit	WebPositive		Sair
 Download aborted	Download Window		Descarga interrompida
-Number of days to keep links in History menu:	Settings Window		Número de dias a manter ligações no menu Histórico:
+Number of days to keep links in History menu:	Settings Window		Número de dias a manter hiperligações no menu Histórico:
 Password:	Authentication Panel		Palavra-passe:
 Forward	WebPositive Window		Avançar
 Clear	Console Window		Limpar
@@ -119,6 +121,7 @@ Remember username and password for this site	Authentication Panel		Lembrar nome 
 (Finish: %date - %duration left)	Download Window		(Fim: %date - falta %duration)
 Cookie manager	Cookie Manager		Gestor de cookies
 Show home button	Settings Window		Mostrar botão da página inicial
+Start new session	Settings Window		Iniciar nova sessão
 The cookie jar is empty!	Cookie Manager		A caixa de cookies está vazia!
 Value	Cookie Manager		Valor
 Remove missing	Download Window		Remover em falta
@@ -141,6 +144,7 @@ Settings	WebPositive Window		Configurações
 Clear	URL Bar		Limpar
 Loading %url	WebPositive Window		A carregar %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Um pequeno jabuti xereta viu dez cegonhas felizes.
+Start up:	Settings Window		Arranque:
 Confirmation	WebPositive Window		Confirmação
 Session cookie	Cookie Manager		Cookie de sessão
 Open all	WebPositive Window		Abrir tudo

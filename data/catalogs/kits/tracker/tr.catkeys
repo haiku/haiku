@@ -158,7 +158,7 @@ develop	B_SYSTEM_DEVELOP_DIRECTORY		geliştirme
 64-bit integer	AttributesView		64 bit tamsayı
 Cut more	ContainerWindow		Daha fazla kes
 The Tracker must be running to see Info windows.	PoseView		Bilgi pencerelerini görüntüleyebilmek için İzleyici çalışıyor olmalıdır.
-Tracker preferences	TrackerSettingsWindow		İzleyici tercihleri
+Tracker preferences	TrackerSettingsWindow		İzleyici Tercihleri
 Read	FilePermissionsView		Okuma
 There was an error writing the attribute.	WidgetAttributeText		Öznitelik yazılırken bir hata oluştu.
 Path	Default Query Columns		Yol

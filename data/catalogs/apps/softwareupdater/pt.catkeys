@@ -1,5 +1,6 @@
-1	portuguese	x-vnd.haiku-softwareupdater	3685902047
+1	portuguese	x-vnd.haiku-softwareupdater	369324613
 Updating version	SoftwareUpdaterWindow	List item text	A atualizar versão
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Clique aqui para instalar {0, plural, one{# pacote atualizado} other{# pacotes atualizados}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pacotes a desinstalar
 No active network connection was found	UpdateManager	Error message	Não foi encontrada nenhuma ligação de rede ativa
 Quit	SoftwareUpdaterWindow	Alert button label	Sair
@@ -15,6 +16,7 @@ No updates available	UpdateAction		Não há atualizações
 New packages to be installed	SoftwareUpdaterWindow	List super item label	Novos pacotes a instalar
 Packages to be updated	SoftwareUpdaterWindow	List super item label	Pacotes a atualizar
 to	SoftwareUpdaterWindow	List item text	para
+Attempting to cancel the updates…	SoftwareUpdaterWindow		Tentando cancelar as atualizações…
 Contacting software repositories to check for package updates.	CheckManager		A contactar os repositórios de software para verificar atualizações de pacotes.
 Available updates found	CheckManager		Encontradas atualizações disponíveis
 from repository	SoftwareUpdaterWindow	List item text	do repositório
@@ -32,6 +34,7 @@ No active network connection was found.\n	CheckManager		Não foi encontrada nenh
 Applying changes	UpdateManager		A aplicar alterações
 Full sync	SoftwareUpdaterWindow	Alert button label	Sincronizar tudo
 Quit	SoftwareUpdaterWindow	Button label	Sair
+Updates have been successfully installed.	UpdateManager		As atualizações foram instaladas com sucesso.
 Exception occurred while updating packages : %s\n	UpdateAction		Ocorreu uma exceção ao atualizar pacotes: %s\n
 A reboot is necessary to complete the update process.	UpdateManager		É necessário reiniciar para completar o processo de atualização.
 Exception occurred while checking for updates: %s\n	CheckAction		Ocorreu uma exceção ao verificar a existência de atualizações: %s\n
@@ -46,6 +49,7 @@ Show more details	SoftwareUpdaterWindow		Mostrar mais detalhes
 Installing version	SoftwareUpdaterWindow	List item text	A instalar versão
 Checking for updates	CheckManager		A verificar atualizações
 No remote repositories are available	UpdateManager	Error message	Não há repositórios remotos disponíveis
+Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, one{Atualização} other{Atualizações}} de software {0, plural, one{disponível} other{disponíveis}}
 Reboot	SoftwareUpdaterWindow	Button label	Reiniciar
 Update	SoftwareUpdaterWindow	Alert button label	Atualizar
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Abrir Repositórios

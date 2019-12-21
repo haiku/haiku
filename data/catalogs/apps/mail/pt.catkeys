@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Be-MAIL	1301706747
+1	portuguese	x-vnd.Be-MAIL	2210643361
 Show icons & labels	Mail		Mostrar ícones e legendas
 Next message	Mail		Próxima mensagem
 Unread	Mail		Por ler
@@ -21,6 +21,7 @@ Close	Mail		Fechar
 Untitled	Mail		Sem título
 Previous message	Mail		Mensagem anterior
 (Address unavailable)	Mail		(Endereço indisponível)
+Copy link location	Mail		Copiar localização da hiperligação
 Next	Mail		Próximo
 Attachments:	Mail		Anexos:
 Show icons only	Mail		Mostrar apenas ícones
@@ -46,6 +47,7 @@ Date:	Mail		Data:
 Expert	Mail		Experiente
 Automatically mark mail as read:	Mail		Marcar e-mail como lido automaticamente:
 Colored quotes:	Mail		Citações coloridas:
+Open this link	Mail		Abrir esta hiperligação
 Send	Mail		Enviar
 Open draft	Mail		Abrir rascunho
 Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Deixar como 'New'

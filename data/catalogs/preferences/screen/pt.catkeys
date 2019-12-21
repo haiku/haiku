@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-Screen	4090394050
+1	portuguese	x-vnd.Haiku-Screen	2685901476
 no	Screen		não
 bits/pixel	Screen		bits/píxel
 15 bits/pixel, 32768 colors	Screen		15 bits/píxel, 32768 cores
@@ -33,6 +33,7 @@ Warning	Screen		Aviso
 24 bits/pixel, 16 Million colors	Screen		24 bits/píxel, 16 milhões de cores
 Hz	Screen		Hz
 Workspaces	Screen		Áreas de Trabalho
+Brightness:	Screen		Brilho:
 32 bits/pixel, 16 Million colors	Screen		32 bits/píxel, 16 milhões de cores
 Done	Screen		Feito
 16 bits/pixel, 65536 colors	Screen		16 bits/píxel, 65536 cores

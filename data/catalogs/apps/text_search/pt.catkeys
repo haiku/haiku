@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku.TextSearch	1475102075
+1	portuguese	x-vnd.Haiku.TextSearch	1072726998
 Failed to start xargs program!	Grepper		Falha ao iniciar o programa xargs!
 Open selection	GrepWindow		Abrir seleção
 Actions	GrepWindow		Ações
@@ -6,6 +6,7 @@ New window	GrepWindow		Nova janela
 Encoding	GrepWindow		Codificação
 Close	GrepWindow		Fechar
 Look in sub-folders	GrepWindow		Procurar nas subpastas
+Follow symbolic links	GrepWindow		Seguir ligações simbólicas
 Regular expression	GrepWindow		Expressão regular
 Text files only	GrepWindow		Apenas ficheiros de texto
 Quit	GrepWindow		Sair

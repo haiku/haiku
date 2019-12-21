@@ -69,7 +69,7 @@ Rate:	CodyCam		Taxa:
 Couldn't find requested directory on server	VideoConsumer.cpp		Não foi possível localizar o diretório solicitado no servidor
 Cannot find the media roster	CodyCam		Não é possível encontrar a lista de média
 Type:	CodyCam		Tipo:
-Rename failed	VideoConsumer.cpp		Renomeação falhou
+Rename failed	VideoConsumer.cpp		Alteração de nome falhou
 unrecognized upload client specified	CodyCam		ignorado o upload especifique o cliente
 Server:	CodyCam		Servidor:
 Login:	CodyCam		Login:
@@ -85,4 +85,4 @@ Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Não foi
 Logging in…	VideoConsumer.cpp		A iniciar sessão…
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Erro ao escrever o ficheiro de saída
-Capture controls	CodyCam		Capturar  controles
+Capture controls	CodyCam		Controlos de captura

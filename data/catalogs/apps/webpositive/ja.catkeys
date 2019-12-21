@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-WebPositive	2763299522
+1	japanese	x-vnd.Haiku-WebPositive	1879106286
 Authentication required	Authentication Panel		認証が必要です
 Previous	WebPositive Window		前へ
 (Finish: %date)	Download Window		(完了: %date)
@@ -28,7 +28,9 @@ Start page:	Settings Window		スタートページ:
 Cancel	Download Window		キャンセル
 Settings	Settings Window		設定
 Downloads	WebPositive Window		ダウンロード
+Browse…	Settings Window		ブラウズ…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	このページ (%bookmarkName) のブックマークはすでに存在します。
+Resume prior session	Settings Window		以前のセッションを再開する
 Match case	WebPositive Window		大文字小文字を区別
 Proxy password:	Settings Window		パスワード:
 Size:	Font Selection view		サイズ:
@@ -119,6 +121,7 @@ Remember username and password for this site	Authentication Panel		このサイ�
 (Finish: %date - %duration left)	Download Window		(完了: %date - 残り %duration)
 Cookie manager	Cookie Manager		Cookie マネージャー
 Show home button	Settings Window		ホームボタンを表示
+Start new session	Settings Window		新しいセッションの開始
 The cookie jar is empty!	Cookie Manager		cookie ジャーは空です!
 Value	Cookie Manager		値
 Remove missing	Download Window		行方不明のものを削除
@@ -141,6 +144,7 @@ Settings	WebPositive Window		設定
 Clear	URL Bar		クリア
 Loading %url	WebPositive Window		%url を読み込み中
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	The quick brown fox jumps over the lazy dog.
+Start up:	Settings Window		スタートアップ:
 Confirmation	WebPositive Window		確認
 Session cookie	Cookie Manager		セッション cookie
 Open all	WebPositive Window		すべてを開く

@@ -1,7 +1,8 @@
-1	portuguese	x-vnd.Haiku-MatchHeader	709288665
+1	portuguese	x-vnd.Haiku-MatchHeader	631274947
 Delete message	ConfigView		Eliminar mensagem
 Set flags to	ConfigView		Definir sinalizadores para
 <Choose account>	ConfigView		<Escolher conta>
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Valor com caracteres genéricos como \"*spam*\".\nPrefixar com \"REGEX:\" para utilizar expressões regulares.
 Then	ConfigView		Depois
 If	ConfigView		Se
 Set as read	ConfigView		Marcar como lida

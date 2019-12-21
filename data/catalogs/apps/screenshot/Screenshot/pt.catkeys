@@ -26,6 +26,6 @@ Cancel	ScreenshotWindow		Cancelar
 Delay:	ScreenshotWindow		Atraso:
 Copy to clipboard	ScreenshotWindow		Copiar para a Área de Transferência
 screenshot	Screenshot	Base filename of screenshot files	captura_de_ecrã
-Home folder	ScreenshotWindow		Pasta home
+Home folder	ScreenshotWindow		Pasta pessoal
 Save	ScreenshotWindow		Guardar
 Capture active window	ScreenshotWindow		Capturar janela ativa

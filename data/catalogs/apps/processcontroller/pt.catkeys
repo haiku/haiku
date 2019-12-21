@@ -1,22 +1,50 @@
-1	portuguese	x-vnd.Haiku-ProcessController	315281146
+1	portuguese	x-vnd.Haiku-ProcessController	168752057
 Error saving file	ProcessController		Erro ao guardar o ficheiro
+Display priority	ProcessController		Prioridade de apresentação
+That's no Fun!	ProcessController		Isso não tem piada!
+What do you want to do with the team \"%s\"?	ProcessController		O que pretende fazer com a equipa \"%s\"?
+Your setting file could not be saved!\n(%s)	ProcessController		O seu ficheiro de configuração não pôde ser guardado!\n(%s)
 Processor %d	ProcessController		Processador %d
+Live in the Deskbar	ProcessController		Residir na Deskbar
+Kill this team!	ProcessController		Matar esta equipa!
+OK	ProcessController		OK
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Pode executar o Gestor de Processos numa janela ou instalá-lo na Deskbar.
 Real-time priority	ProcessController		Prioridade em tempo real
+Custom priority	ProcessController		Prioridade personalizada
+Debug this thread!	ProcessController		Depurar esta thread!
+Low priority	ProcessController		Baixa prioridade
+Urgent display priority	ProcessController		Pioridade de apresentação urgente
 Memory usage	ProcessController		Utilização de memória
+Ok!	ProcessController		Ok!
 Normal priority	ProcessController		Prioridade normal
 Restart Deskbar	ProcessController		Reiniciar a Deskbar
 About ProcessController…	ProcessController		Acerca do Gestor de Processos…
 Usage: %s [-deskbar]\n	ProcessController		Utilização: %s [-deskbar]\n
 Please confirm	ProcessController		Por favor confirme
+Urgent priority	ProcessController		Prioridade urgente
+What do you want to do with the thread \"%s\"?	ProcessController		O que pretende fazer com a thread \"%s\"?
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+Idle priority	ProcessController		Prioridade ociosa
+Real-time display priority	ProcessController		Prioridade de apresentação em tempo real
+Threads and CPU usage	ProcessController		Utilização de CPU e threads
 Quit application	ProcessController		Sair da aplicação
 Info	ProcessController		Informações
+Kill this thread!	ProcessController		Matar esta thread!
+This team is already gone…	ProcessController		Esta equipa já se foi…
+Gone teams…	ProcessController		Equipas que já se foram…
+Quit an application	ProcessController		Sair de uma aplicação
 Cancel	ProcessController		Cancelar
 Install in Deskbar	ProcessController		Instalar na Deskbar
+Debug this team!	ProcessController		Depurar esta equipa!
+Low latency	ProcessController		Baixa latência
 ProcessController	System name		Gestor de Processos
+Lowest active priority	ProcessController		Prioridade ativa mais baixa
 Restart Tracker	ProcessController		Reiniciar o Tracker
+System resources & caches…	ProcessController		Caches e recursos de sistema…
+Damned!	ProcessController		Caramba!
 New Terminal	ProcessController		Novo Terminal
 Power saving	ProcessController		Poupança de energia
 ProcessController is already installed in Deskbar.	ProcessController		O Gestor de Processos já está instalado na Deskbar.
+This is the last active processor…\nYou can't turn it off!	ProcessController		Este é o último processador ativo…\nNão o pode desligar!
+This thread is already gone…	ProcessController		Esta thread já se foi…
 Run in window	ProcessController		Executar numa janela
