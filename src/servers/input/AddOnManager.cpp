@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <syslog.h>
 
 #include <Autolock.h>
 #include <Deskbar.h>
@@ -126,6 +127,7 @@ AddOnManager::AddOnManager()
 	AddOnMonitor(),
 	fHandler(new(std::nothrow) MonitorHandler(this))
 {
+	openlog("input_server", LOG_PERROR, LOG_USER);
 	SetHandler(fHandler);
 }
 
@@ -152,6 +154,9 @@ AddOnManager::MessageReceived(BMessage* message)
 			break;
 		case IS_WATCH_DEVICES:
 			status = _HandleWatchDevices(message, &reply);
+			break;
+		case IS_NOTIFY_DEVICE:
+			status = _HandleNotifyDevice(message, &reply);
 			break;
 		case IS_IS_DEVICE_RUNNING:
 			status = _HandleIsDeviceRunning(message, &reply);
@@ -750,7 +755,22 @@ AddOnManager::_HandleFindDevices(BMessage* message, BMessage* reply)
 status_t
 AddOnManager::_HandleWatchDevices(BMessage* message, BMessage* reply)
 {
-	// TODO
+	// TODO handle multiple watchers at the same time
+	if (message->FindBool("start"))
+		message->FindMessenger("target", &fWatcherMessenger);
+	else
+		fWatcherMessenger = BMessenger();
+	return B_OK;
+}
+
+
+status_t
+AddOnManager::_HandleNotifyDevice(BMessage* message, BMessage* reply)
+{
+	// TODO handle multiple watchers at the same time
+	status_t result = fWatcherMessenger.SendMessage(message);
+	syslog(LOG_NOTICE, "Notify of added/removed device (%s)", strerror(result));
+
 	return B_OK;
 }
 
@@ -871,6 +891,7 @@ AddOnManager::_HandleDeviceMonitor(BMessage* message)
 
 				addOn->Device()->Control(NULL, NULL, B_NODE_MONITOR, message);
 			}
+
 			break;
 		}
 	}

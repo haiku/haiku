@@ -1,9 +1,10 @@
 /*
- * Copyright 2019, Haiku, Inc.
+ * Copyright 2019-2020, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
- * Author:
+ * Authors:
  *		Preetpal Kaur <preetpalok123@gmail.com>
+ *		Adrien Destugues <pulkomandy@gmail.com>
  */
 
 
@@ -19,8 +20,8 @@
 #include <LayoutBuilder.h>
 #include <SplitView.h>
 #include <Screen.h>
-#include <stdio.h>
 
+#include <private/input/InputServerTypes.h>
 
 #include "InputConstants.h"
 #include "InputDeviceView.h"
@@ -53,12 +54,10 @@ InputWindow::InputWindow(BRect rect)
 void
 InputWindow::MessageReceived(BMessage* message)
 {
-	int32 name = message->GetInt32("index", 0);
-
 	switch (message->what) {
-
 		case ITEM_SELECTED:
 		{
+			int32 name = message->GetInt32("index", 0);
 			fCardView->CardLayout()->SetVisibleItem(name);
 		}
 		case kMsgMouseType:
@@ -93,11 +92,58 @@ InputWindow::MessageReceived(BMessage* message)
 				fCardView->CardLayout()->VisibleItem()->View());
 			break;
 		}
+
+		case IS_NOTIFY_DEVICE:
+		{
+			bool added = message->FindBool("added");
+			BString name = message->FindString("name");
+
+			if (added) {
+				BInputDevice* device = find_input_device(name);
+				if (device)
+					AddDevice(device);
+			} else {
+				for (int i = 0; i < fDeviceListView->fDeviceList->CountItems();
+					i++) {
+					BStringItem* item = dynamic_cast<BStringItem*>(
+						fDeviceListView->fDeviceList->ItemAt(i));
+					if (item->Text() == name) {
+						fDeviceListView->fDeviceList->RemoveItem(i);
+						BView* settings = fCardView->ChildAt(i);
+						fCardView->RemoveChild(settings);
+						delete settings;
+						break;
+					}
+				}
+			}
+
+			break;
+		}
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
 	}
 }
+
+
+void
+InputWindow::Show()
+{
+	CenterOnScreen();
+	BWindow::Show();
+	status_t x = watch_input_devices(this, true);
+	puts(strerror(x));
+}
+
+
+void
+InputWindow::Hide()
+{
+	BWindow::Hide();
+	watch_input_devices(this, false);
+}
+
 
 status_t
 InputWindow::FindDevice()
@@ -119,30 +165,33 @@ InputWindow::FindDevice()
 		}
 		i++;
 
-		BString name = dev->Name();
-
-		if (dev->Type() == B_POINTING_DEVICE
-			&& name.FindFirst("Touchpad") >= 0) {
-
-			fTouchPad = dev;
-			TouchpadPrefView* view = new TouchpadPrefView(dev);
-			fCardView->AddChild(view);
-			fDeviceListView->fDeviceList->AddItem(new BStringItem(name));
-		} else if (dev->Type() == B_POINTING_DEVICE) {
-
-			fMouse = dev;
-			InputMouse* view = new InputMouse(dev);
-			fCardView->AddChild(view);
-			fDeviceListView->fDeviceList->AddItem(new BStringItem(name));
-		} else if (dev->Type() == B_KEYBOARD_DEVICE) {
-
-			fKeyboard = dev;
-			InputKeyboard* view = new InputKeyboard(dev);
-			fCardView->AddChild(view);
-			fDeviceListView->fDeviceList->AddItem(new BStringItem(name));
-		} else {
-			delete dev;
-		}
+		AddDevice(dev);
 	}
-	return B_ENTRY_NOT_FOUND;
+
+	return B_OK;
+}
+
+
+void
+InputWindow::AddDevice(BInputDevice* dev)
+{
+	BString name = dev->Name();
+
+	if (dev->Type() == B_POINTING_DEVICE
+		&& name.FindFirst("Touchpad") >= 0) {
+
+		TouchpadPrefView* view = new TouchpadPrefView(dev);
+		fCardView->AddChild(view);
+		fDeviceListView->fDeviceList->AddItem(new BStringItem(name));
+	} else if (dev->Type() == B_POINTING_DEVICE) {
+		InputMouse* view = new InputMouse(dev);
+		fCardView->AddChild(view);
+		fDeviceListView->fDeviceList->AddItem(new BStringItem(name));
+	} else if (dev->Type() == B_KEYBOARD_DEVICE) {
+		InputKeyboard* view = new InputKeyboard(dev);
+		fCardView->AddChild(view);
+		fDeviceListView->fDeviceList->AddItem(new BStringItem(name));
+	} else {
+		delete dev;
+	}
 }

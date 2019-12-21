@@ -63,6 +63,8 @@ private:
 									BMessage* reply);
 			status_t			_HandleWatchDevices(BMessage* message,
 									BMessage* reply);
+			status_t			_HandleNotifyDevice(BMessage* message,
+									BMessage* reply);
 			status_t			_HandleIsDeviceRunning(BMessage* message,
 									BMessage* reply);
 			status_t			_HandleStartStopDevices(BMessage* message,
@@ -123,6 +125,7 @@ private:
 			PathList			fDevicePaths;
 
 			MonitorHandler*		fHandler;
+			BMessenger			fWatcherMessenger;
 
 			bool				fSafeMode;
 };

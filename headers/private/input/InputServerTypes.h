@@ -35,6 +35,7 @@
 
 #define IS_FIND_DEVICES					'Ifdv'
 #define IS_WATCH_DEVICES				'Iwdv'
+#define IS_NOTIFY_DEVICE				'Intf'
 #define IS_IS_DEVICE_RUNNING			'Idvr'
 #define IS_START_DEVICE					'Istd'
 #define IS_STOP_DEVICE					'Ispd'

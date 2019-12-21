@@ -50,16 +50,17 @@ class InputWindow : public BWindow
 public:
 							InputWindow(BRect rect);
 		void				MessageReceived(BMessage* message);
+		void				Show();
+		void				Hide();
+	
 		status_t			FindDevice();
+		void				AddDevice(BInputDevice* device);
 private:
 
 	DeviceListView*			fDeviceListView;
 	BCardView*				fCardView;
 	MouseSettings			fSettings;
 	SettingsView*			fSettingsView;
-	BInputDevice*			fKeyboard;
-	BInputDevice*			fMouse;
-	BInputDevice*			fTouchPad;
 };
 
 #endif /* INPUT_WINDOW_H */

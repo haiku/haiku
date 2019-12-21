@@ -1156,8 +1156,13 @@ InputServer::UnregisterDevices(BInputServerDevice& serverDevice,
 
 				if (item->ServerDevice() == &serverDevice && item->HasName(device->name)) {
 					item->Stop();
-					if (fInputDeviceList.RemoveItem(j))
+					if (fInputDeviceList.RemoveItem(j)) {
+						BMessage message(IS_NOTIFY_DEVICE);
+						message.AddBool("added", false);
+						message.AddString("name", device->name);
+						fAddOnManager->PostMessage(&message);
 						delete item;
+					}
 					break;
 				}
 			}
@@ -1215,6 +1220,10 @@ debug_printf("InputServer::RegisterDevices() device_ref already exists: %s\n", d
 				*device);
 			if (item != NULL && fInputDeviceList.AddItem(item)) {
 				item->Start();
+				BMessage message(IS_NOTIFY_DEVICE);
+				message.AddBool("added", true);
+				message.AddString("name", device->name);
+				fAddOnManager->PostMessage(&message);
 			} else {
 				delete item;
 				return B_NO_MEMORY;
