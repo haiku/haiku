@@ -46,6 +46,7 @@ enum {
 	B_REG_GET_CLIPBOARD_MESSENGER			= 'rgcm',
 	B_REG_GET_DISK_DEVICE_MESSENGER			= 'rgdm',
 	B_REG_SHUT_DOWN							= 'rgsh',
+	B_REG_IS_SHUT_DOWN_IN_PROGRESS			= 'rgsi',
 
 	// roster requests
 	B_REG_ADD_APP							= 'rgaa',

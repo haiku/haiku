@@ -1343,6 +1343,43 @@ BRoster::_ShutDown(bool reboot, bool confirm, bool synchronous)
 }
 
 
+/*!	Checks whether a shutdown process is in progress.
+
+	\param inProgress: Pointer to a pre-allocated bool to be filled in
+	       by this method, indicating whether or not a shutdown process
+	       is in progress.
+	\return A status code, \c B_OK on success or another error code in case
+	        something went wrong.
+*/
+status_t
+BRoster::_IsShutDownInProgress(bool* inProgress)
+{
+	status_t error = B_OK;
+
+	// compose the request message
+	BMessage request(B_REG_IS_SHUT_DOWN_IN_PROGRESS);
+
+	// send the request
+	BMessage reply;
+	if (error == B_OK)
+		error = fMessenger.SendMessage(&request, &reply);
+
+	// evaluate the reply
+	if (error == B_OK) {
+		if (reply.what == B_REG_SUCCESS) {
+			if (inProgress != NULL
+				&& reply.FindBool("in-progress", inProgress) != B_OK) {
+				error = B_ERROR;
+			}
+		} else if (reply.FindInt32("error", &error) != B_OK)
+			error = B_ERROR;
+	}
+
+	return error;
+}
+
+
+
 /*!	(Pre-)Registers an application with the registrar.
 
 	This methods is invoked either to register or to pre-register an

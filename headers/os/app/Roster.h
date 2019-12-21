@@ -147,6 +147,7 @@ private:
 
 			status_t			_ShutDown(bool reboot, bool confirm,
 									bool synchronous);
+			status_t			_IsShutDownInProgress(bool* inProgress);
 
 			status_t			_AddApplication(const char* signature,
 									const entry_ref* ref, uint32 flags,

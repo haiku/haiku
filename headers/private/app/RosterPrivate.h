@@ -39,6 +39,8 @@ class BRoster::Private {
 
 		status_t ShutDown(bool reboot, bool confirm, bool synchronous)
 			{ return fRoster->_ShutDown(reboot, confirm, synchronous); }
+		status_t IsShutDownInProgress(bool* inProgress)
+			{ return fRoster->_IsShutDownInProgress(inProgress); }
 
 		// needed by BApplication
 

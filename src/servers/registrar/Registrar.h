@@ -58,6 +58,7 @@ public:
 private:
 	void _MessageReceived(BMessage *message);
 	void _HandleShutDown(BMessage *message);
+	void _HandleIsShutDownInProgress(BMessage *message);
 
 	TRoster					*fRoster;
 	ClipboardHandler		*fClipboardHandler;

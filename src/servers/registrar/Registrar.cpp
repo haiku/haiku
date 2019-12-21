@@ -248,6 +248,13 @@ Registrar::_MessageReceived(BMessage *message)
 			_HandleShutDown(message);
 			break;
 		}
+		case B_REG_IS_SHUT_DOWN_IN_PROGRESS:
+		{
+			PRINT("B_REG_IS_SHUT_DOWN_IN_PROGRESS\n");
+
+			_HandleIsShutDownInProgress(message);
+			break;
+		}
 		case B_REG_TEAM_DEBUGGER_ALERT:
 		{
 			if (fShutdownProcess != NULL)
@@ -413,6 +420,18 @@ Registrar::_HandleShutDown(BMessage *request)
 
 	if (needsReply)
 		ShutdownProcess::SendReply(request, error);
+}
+
+
+/*!	\brief Handle a is shut down in progress request message.
+	\param request The request to be handled.
+*/
+void
+Registrar::_HandleIsShutDownInProgress(BMessage *request)
+{
+	BMessage reply(B_REG_SUCCESS);
+	reply.AddBool("in-progress", fShutdownProcess != NULL);
+	request->SendReply(&reply);
 }
 
 
