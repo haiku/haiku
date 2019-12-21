@@ -527,9 +527,15 @@ LaunchDaemon::MessageReceived(BMessage* message)
 				job->TeamDeleted();
 
 				if (job->IsService()) {
-					// TODO: take restart throttle into account
-					// TODO: don't restart on shutdown
-					_LaunchJob(job);
+					bool inProgress = false;
+					BRoster roster;
+					BRoster::Private rosterPrivate(roster);
+					status_t status = rosterPrivate.IsShutDownInProgress(
+						&inProgress);
+					if (status != B_OK || !inProgress) {
+						// TODO: take restart throttle into account
+						_LaunchJob(job);
+					}
 				}
 			}
 			break;
