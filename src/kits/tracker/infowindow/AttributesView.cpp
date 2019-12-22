@@ -29,6 +29,7 @@ AttributesView::AttributesView(Model* model)
 {
 	SetName(B_TRANSLATE("Attributes"));
 	AddChild(fListView);
+	GroupLayout()->SetInsets(-1, -1, -1, -1);
 
 	float nameWidth = StringWidth("SYS:PACKAGE_FILE") + 16;
 	float typeMaxWidth = StringWidth(B_TRANSLATE(

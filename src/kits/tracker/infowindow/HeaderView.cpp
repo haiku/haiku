@@ -84,7 +84,7 @@ HeaderView::HeaderView(Model* model)
 	fIconRect.Set(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1);
 	// Offset taken from BAlert
 	fIconRect.OffsetBy(kIconHorizOffset, kIconVertOffset);
-	SetExplicitMinSize(BSize(B_SIZE_UNSET, B_LARGE_ICON + 2 * kIconVertOffset));
+	SetExplicitSize(BSize(B_SIZE_UNSET, B_LARGE_ICON + 2 * kIconVertOffset));
 
 	// The title rect
 	// The magic numbers are used to properly calculate the rect so that

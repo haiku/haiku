@@ -98,7 +98,7 @@ BInfoWindow::BInfoWindow(Model* model, int32 group_index,
 	:
 	BWindow(BInfoWindow::InfoWindowRect(),
 		"InfoWindow", B_TITLED_WINDOW,
-		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS,
+		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS,
 		B_CURRENT_WORKSPACE),
 	fModel(model),
 	fStopCalc(false),
