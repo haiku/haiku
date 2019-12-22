@@ -755,7 +755,7 @@ OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length,
 			if (ioRequest != NULL)
 				;// TODO: handle this case
 			else
-				memset(pointer, 0, gapSize);
+				user_memset(pointer, 0, gapSize);
 
 			bytesLeft -= gapSize;
 			position += gapSize;
