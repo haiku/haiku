@@ -78,22 +78,86 @@ static const float kMinimumHeightScientific	= 200.0f;
 static const float kMaximumHeightScientific	= 400.0f;
 
 // basic mode keypad layout (default)
-const char *kKeypadDescriptionBasic = B_TRANSLATE_MARK(
-	"7   8   9   (   )  \n"
-	"4   5   6   *   /  \n"
-	"1   2   3   +   -  \n"
-	"0   .   BS  =   C  \n");
+const char *kKeypadDescriptionBasic[] = {
+	B_TRANSLATE_MARK("7"),
+	B_TRANSLATE_MARK("8"),
+	B_TRANSLATE_MARK("9"),
+	B_TRANSLATE_MARK("("),
+	B_TRANSLATE_MARK(")"),
+	"\n",
+	B_TRANSLATE_MARK("4"),
+	B_TRANSLATE_MARK("5"),
+	B_TRANSLATE_MARK("6"),
+	B_TRANSLATE_MARK("*"),
+	B_TRANSLATE_MARK("/"),
+	"\n",
+	B_TRANSLATE_MARK("1"),
+	B_TRANSLATE_MARK("2"),
+	B_TRANSLATE_MARK("3"),
+	B_TRANSLATE_MARK("+"),
+	B_TRANSLATE_MARK("-"),
+	"\n",
+	B_TRANSLATE_MARK("0"),
+	B_TRANSLATE_MARK("."),
+	B_TRANSLATE_MARK("BS"),
+	B_TRANSLATE_MARK("="),
+	B_TRANSLATE_MARK("C"),
+	"\n",
+	NULL
+};
 
 // scientific mode keypad layout
-const char *kKeypadDescriptionScientific = B_TRANSLATE_MARK(
-	"ln    sin   cos   tan   π    \n"
-	"log   asin  acos  atan  sqrt \n"
-	"exp   sinh  cosh  tanh  cbrt \n"
-	"!     ceil  floor E     ^    \n"
-	"7     8     9     (     )    \n"
-	"4     5     6     *     /    \n"
-	"1     2     3     +     -    \n"
-	"0     .     BS    =     C    \n");
+const char *kKeypadDescriptionScientific[] = {
+	B_TRANSLATE_MARK("ln"),
+	B_TRANSLATE_MARK("sin"),
+	B_TRANSLATE_MARK("cos"),
+	B_TRANSLATE_MARK("tan"),
+	B_TRANSLATE_MARK("π"),
+	"\n",
+	B_TRANSLATE_MARK("log"),
+	B_TRANSLATE_MARK("asin"),
+	B_TRANSLATE_MARK("acos"),
+	B_TRANSLATE_MARK("atan"),
+	B_TRANSLATE_MARK("sqrt"),
+	"\n",
+	B_TRANSLATE_MARK("exp"),
+	B_TRANSLATE_MARK("sinh"),
+	B_TRANSLATE_MARK("cosh"),
+	B_TRANSLATE_MARK("tanh"),
+	B_TRANSLATE_MARK("cbrt"),
+	"\n",
+	B_TRANSLATE_MARK("!"),
+	B_TRANSLATE_MARK("ceil"),
+	B_TRANSLATE_MARK("floor"),
+	B_TRANSLATE_MARK("E"),
+	B_TRANSLATE_MARK("^"),
+	"\n",
+	B_TRANSLATE_MARK("7"),
+	B_TRANSLATE_MARK("8"),
+	B_TRANSLATE_MARK("9"),
+	B_TRANSLATE_MARK("("),
+	B_TRANSLATE_MARK(")"),
+	"\n",
+	B_TRANSLATE_MARK("4"),
+	B_TRANSLATE_MARK("5"),
+	B_TRANSLATE_MARK("6"),
+	B_TRANSLATE_MARK("*"),
+	B_TRANSLATE_MARK("/"),
+	"\n",
+	B_TRANSLATE_MARK("1"),
+	B_TRANSLATE_MARK("2"),
+	B_TRANSLATE_MARK("3"),
+	B_TRANSLATE_MARK("+"),
+	B_TRANSLATE_MARK("-"),
+	"\n",
+	B_TRANSLATE_MARK("0"),
+	B_TRANSLATE_MARK("."),
+	B_TRANSLATE_MARK("BS"),
+	B_TRANSLATE_MARK("="),
+	B_TRANSLATE_MARK("C"),
+	"\n",
+	NULL
+};
 
 
 enum {
@@ -135,7 +199,7 @@ CalcView::CalcView(BRect frame, rgb_color rgbBaseColor, BMessage* settings)
 	fWidth(1),
 	fHeight(1),
 
-	fKeypadDescription(strdup(kKeypadDescriptionBasic)),
+	fKeypadDescription(kKeypadDescriptionBasic),
 	fKeypad(NULL),
 
 #ifdef __HAIKU__
@@ -174,7 +238,7 @@ CalcView::CalcView(BMessage* archive)
 	fWidth(1),
 	fHeight(1),
 
-	fKeypadDescription(strdup(kKeypadDescriptionBasic)),
+	fKeypadDescription(kKeypadDescriptionBasic),
 	fKeypad(NULL),
 
 #ifdef __HAIKU__
@@ -203,7 +267,6 @@ CalcView::~CalcView()
 {
 	delete[] fKeypad;
 	delete fOptions;
-	free(fKeypadDescription);
 	delete fEvaluateMessageRunner;
 	delete_sem(fEvaluateSemaphore);
 }
@@ -866,7 +929,9 @@ CalcView::SaveSettings(BMessage* archive) const
 
 	// record calculator description
 	if (ret == B_OK)
-		ret = archive->AddString("calcDesc", fKeypadDescription);
+		ret = archive->AddString("calcDesc",
+			fKeypadDescription == kKeypadDescriptionBasic
+			? "basic" : "scientific");
 
 	return ret;
 }
@@ -982,8 +1047,7 @@ CalcView::SetKeypadMode(uint8 mode)
 
 		case KEYPAD_MODE_SCIENTIFIC:
 		{
-			free(fKeypadDescription);
-			fKeypadDescription = strdup(kKeypadDescriptionScientific);
+			fKeypadDescription = kKeypadDescriptionScientific;
 			fRows = 8;
 			_ParseCalcDesc(fKeypadDescription);
 
@@ -1012,8 +1076,7 @@ CalcView::SetKeypadMode(uint8 mode)
 		case KEYPAD_MODE_BASIC:
 		default:
 		{
-			free(fKeypadDescription);
-			fKeypadDescription = strdup(kKeypadDescriptionBasic);
+			fKeypadDescription = kKeypadDescriptionBasic;
 			fRows = 4;
 			_ParseCalcDesc(fKeypadDescription);
 
@@ -1101,13 +1164,12 @@ CalcView::_LoadSettings(BMessage* archive)
 		return B_BAD_VALUE;
 
 	// record calculator description
-	const char* calcDesc;
-	if (archive->FindString("calcDesc", &calcDesc) < B_OK)
-		calcDesc = kKeypadDescriptionBasic;
-
-	// save calculator description for reference
-	free(fKeypadDescription);
-	fKeypadDescription = strdup(calcDesc);
+	BString calcDesc;
+	archive->FindString("calcDesc", &calcDesc);
+	if (calcDesc == "scientific" || calcDesc.StartsWith("ln"))
+		fKeypadDescription = kKeypadDescriptionScientific;
+	else
+		fKeypadDescription = kKeypadDescriptionBasic;
 
 	// read grid dimensions
 	if (archive->FindInt16("cols", &fColumns) < B_OK)
@@ -1163,21 +1225,20 @@ CalcView::_LoadSettings(BMessage* archive)
 
 
 void
-CalcView::_ParseCalcDesc(const char* keypadDescription)
+CalcView::_ParseCalcDesc(const char** keypadDescription)
 {
 	// TODO: should calculate dimensions from desc here!
 	fKeypad = new CalcKey[fRows * fColumns];
 
 	// scan through calculator description and assemble keypad
 	CalcKey* key = fKeypad;
-	const char* p = keypadDescription;
+	for (int i = 0; const char* p = keypadDescription[i]; i++) {
+		// Move to next row as needed
+		if (strcmp(p, "\n") == 0)
+			continue;
 
-	while (*p != 0) {
 		// copy label
-		char* l = key->label;
-		while (!isspace(*p))
-			*l++ = *p++;
-		*l = '\0';
+		strlcpy(key->label, B_TRANSLATE_NOCOLLECT(p), sizeof(key->label));
 
 		// set code
 		if (strcmp(key->label, "=") == 0)
@@ -1198,8 +1259,6 @@ CalcView::_ParseCalcDesc(const char* keypadDescription)
 		fExpressionTextView->AddKeypadLabel(key->label);
 
 		// advance
-		while (isspace(*p))
-			++p;
 		key++;
 	}
 }

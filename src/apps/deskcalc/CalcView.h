@@ -101,7 +101,7 @@ class CalcView : public BView {
 	static	status_t			_EvaluateThread(void* data);
 			void				_Init(BMessage* settings);
 			status_t			_LoadSettings(BMessage* archive);
-			void				_ParseCalcDesc(const char* keypadDescription);
+			void				_ParseCalcDesc(const char** keypadDescription);
 
 			void				_PressKey(int key);
 			void				_PressKey(const char* label);
@@ -144,7 +144,7 @@ class CalcView : public BView {
 			// keypad grid
 			struct CalcKey;
 
-			char*				fKeypadDescription;
+			const char**		fKeypadDescription;
 			CalcKey*			fKeypad;
 
 			// icon
