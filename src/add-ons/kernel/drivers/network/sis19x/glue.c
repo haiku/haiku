@@ -4,6 +4,8 @@
  */
 
 
+#include <PCI.h>
+
 #include <sys/bus.h>
 #include <sys/rman.h>
 #include <sys/systm.h>
@@ -13,6 +15,7 @@
 #include <net/if.h>
 #include <net/if_media.h>
 
+#include <dev/pci/pcivar.h>
 #include <dev/sge/if_sgereg.h>
 
 
@@ -21,6 +24,7 @@ HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_FAST_TASKQUEUE);
 NO_HAIKU_REENABLE_INTERRUPTS();
 
 
+extern pci_module_info *gPci;
 extern driver_t* DRIVER_MODULE_NAME(ukphy, miibus);
 
 
@@ -55,4 +59,54 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 
 	sc->haiku_interrupt_status = status;
 	return 1;
+}
+
+
+int
+haiku_sge_get_mac_addr_apc(device_t dev, uint8_t* dest, int* rgmii)
+{
+	// SiS96x can use APC CMOS RAM to store MAC address,
+	// this is accessed through ISA bridge.
+
+	// look for PCI-ISA bridge
+	uint16 ids[] = { 0x0965, 0x0966, 0x0968 };
+
+	pci_info pciInfo = {0};
+	for (long i = 0; B_OK == (*gPci->get_nth_pci_info)(i, &pciInfo); i++) {
+		if (pciInfo.vendor_id != 0x1039)
+			continue;
+
+		for (size_t idx = 0; idx < B_COUNT_OF(ids); idx++) {
+			if (pciInfo.device_id == ids[idx]) {
+				// enable ports 0x78 0x79 to access APC registers
+				uint32 reg = gPci->read_pci_config(pciInfo.bus,
+					pciInfo.device, pciInfo.function, 0x48, 1);
+				reg &= ~0x02;
+				gPci->write_pci_config(pciInfo.bus,
+					pciInfo.device, pciInfo.function, 0x48, 1, reg);
+				snooze(50);
+				reg = gPci->read_pci_config(pciInfo.bus,
+					pciInfo.device, pciInfo.function, 0x48, 1);
+
+				// read factory MAC address
+				for (size_t i = 0; i < 6; i++) {
+					gPci->write_io_8(0x78, 0x09 + i);
+					dest[i] = gPci->read_io_8(0x79);
+				}
+
+				// check MII/RGMII
+				gPci->write_io_8(0x78, 0x12);
+				if ((gPci->read_io_8(0x79) & 0x80) != 0)
+					*rgmii = 1;
+
+				// close access to APC registers
+				gPci->write_pci_config(pciInfo.bus,
+					pciInfo.device, pciInfo.function, 0x48, 1, reg);
+
+				return B_OK;
+			}
+		}
+	}
+
+	return B_ERROR;
 }

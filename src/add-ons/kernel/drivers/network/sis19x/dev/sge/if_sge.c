@@ -254,7 +254,14 @@ sge_get_mac_addr_eeprom(struct sge_softc *sc, uint8_t *dest)
 static int
 sge_get_mac_addr_apc(struct sge_softc *sc, uint8_t *dest)
 {
-#if (defined(__amd64__) || defined(__i386__)) && !defined(__HAIKU__)
+#if defined(__HAIKU__)
+	int rgmii = 0;
+	int res = haiku_sge_get_mac_addr_apc(sc->sge_dev, dest, &rgmii);
+	if (rgmii != 0)
+		sc->sge_flags |= SGE_FLAG_RGMII;
+	return res;
+#else
+#if defined(__amd64__) || defined(__i386__)
 	devclass_t pci;
 	device_t bus, dev = NULL;
 	device_t *kids;
@@ -315,6 +322,7 @@ apc_found:
 	return (0);
 #else
 	return (EINVAL);
+#endif
 #endif
 }
 
