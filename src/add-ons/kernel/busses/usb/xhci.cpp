@@ -1176,6 +1176,8 @@ XHCI::CreateDescriptor(uint32 trbCount, uint32 bufferCount, size_t bufferSize)
 			return NULL;
 		}
 		result->buffer_addrs = (phys_addr_t*)&result->buffers[bufferCount];
+		result->buffer_size = bufferSize;
+		result->buffer_count = bufferCount;
 
 		// Optimization: If the requested total size of all buffers is less
 		// than 32*B_PAGE_SIZE (the maximum size that the physical memory
@@ -1200,8 +1202,9 @@ XHCI::CreateDescriptor(uint32 trbCount, uint32 bufferCount, size_t bufferSize)
 			for (uint32 i = 0; i < bufferCount; i++) {
 				if (fStack->AllocateChunk(&result->buffers[i],
 						&result->buffer_addrs[i], bufferSize) < B_OK) {
-					TRACE_ERROR("unable to allocate space for the buffer (size %ld)\n",
-						bufferSize);
+					TRACE_ERROR("unable to allocate space for a buffer (size "
+						"%" B_PRIuSIZE ", count %" B_PRIu32 ")\n",
+						bufferSize, bufferCount);
 					FreeDescriptor(result);
 					return NULL;
 				}
@@ -1211,8 +1214,6 @@ XHCI::CreateDescriptor(uint32 trbCount, uint32 bufferCount, size_t bufferSize)
 		result->buffers = NULL;
 		result->buffer_addrs = NULL;
 	}
-	result->buffer_size = bufferSize;
-	result->buffer_count = bufferCount;
 
 	// Initialize all other fields.
 	result->transfer = NULL;
