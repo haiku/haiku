@@ -710,22 +710,6 @@ if [ IsPackageAvailable expat_devel ] {
 }
 
 
-# gnu-efi
-if [ IsPackageAvailable gnu_efi_kernel ] {
-	ExtractBuildFeatureArchives gnuefi :
-		file: base gnu_efi_kernel
-			headers: develop/headers/gnuefi
-			headersProtocol: develop/headers/gnuefi/protocol
-			headersArch: develop/headers/gnuefi/$(TARGET_ARCH)
-			libdir: develop/lib/gnuefi
-		;
-
-	EnableBuildFeatures gnuefi ;
-} else {
-	unavailableBuildFeatures += gnu_efi_kernel ;
-}
-
-
 # zstd
 if [ IsPackageAvailable zstd_devel ] {
 	ExtractBuildFeatureArchives zstd :
