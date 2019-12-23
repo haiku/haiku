@@ -203,7 +203,8 @@ PackageVolumeInfo::SetTo(Directory* baseDirectory, const char* packagesPath)
 
 
 status_t
-PackageVolumeInfo::LoadOldStates() {
+PackageVolumeInfo::LoadOldStates()
+{
 	if (fPackagesDir == NULL) {
 		TRACE("PackageVolumeInfo::LoadOldStates(): package directory is NULL");
 		return B_ERROR;
@@ -226,7 +227,7 @@ PackageVolumeInfo::LoadOldStates() {
 		fStates.Sort(&PackageVolumeState::IsNewer);
 
 		// initialize the old states
-		PackageVolumeState* state = NULL;
+		PackageVolumeState* state = fStates.Head();
 		status_t error;
 		for (state = fStates.GetNext(state); state != NULL;) {
 			PackageVolumeState* nextState = fStates.GetNext(state);
