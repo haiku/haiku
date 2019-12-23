@@ -160,7 +160,8 @@ PhysicalMemoryAllocator::Allocate(size_t size, void **logicalAddress,
 	if (!locker.IsLocked())
 		return B_ERROR;
 
-	while (true) {
+	const bigtime_t limit = system_time() + 2 * 1000 * 1000;
+	do {
 		TRACE(("PMA: will use array %ld (blocksize: %ld) to allocate %ld bytes\n", arrayToUse, fBlockSize[arrayToUse], size));
 		uint8 *targetArray = fArray[arrayToUse];
 		uint32 arrayOffset = fArrayOffset[arrayToUse] % arrayLength;
@@ -209,17 +210,16 @@ PhysicalMemoryAllocator::Allocate(size_t size, void **logicalAddress,
 		TRACE_ERROR(("PMA: found no free slot to store %ld bytes, waiting\n",
 			size));
 
-		if (entry.Wait(B_RELATIVE_TIMEOUT, 2 * 1000 * 1000) == B_TIMED_OUT) {
-			TRACE_ERROR(("PMA: timed out waiting for a free slot, giving up\n"));
+		if (entry.Wait(B_RELATIVE_TIMEOUT, 1 * 1000 * 1000) == B_TIMED_OUT)
 			break;
-		}
 
 		if (!locker.Lock())
 			return B_ERROR;
 
 		fMemoryWaitersCount--;
-	}
+	} while (system_time() < limit);
 
+	TRACE_ERROR(("PMA: timed out waiting for a free slot, giving up\n"));
 	return B_NO_MEMORY;
 }
 
