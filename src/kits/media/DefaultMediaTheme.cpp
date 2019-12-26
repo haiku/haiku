@@ -34,6 +34,8 @@ using namespace BPrivate;
 
 namespace BPrivate {
 
+namespace DefaultMediaControls {
+
 class SeparatorView : public BView {
 	public:
 		SeparatorView(orientation orientation);
@@ -139,6 +141,10 @@ class DiscreteMessageFilter : public MessageFilter {
 	private:
 		BDiscreteParameter	&fParameter;
 };
+
+};
+
+using namespace DefaultMediaControls;
 
 }	// namespace BPrivate
 
