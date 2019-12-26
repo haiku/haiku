@@ -242,13 +242,16 @@ static const Translation kTranslations[] = {
 	{ "pt",
 		"Marcos Alves (Xeon3D)\n"
 		"Vasco Costa (gluon)\n"
+		"Victor Domingos\n"
 		"Adriano Duarte\n"
 		"Louis de M.\n"
 		"pedrothegameroficialtm\n"
+		"zeru\n"
 		// "taos\n" bugfixes only, no actual translations
 	},
 	{ "pt_BR",
 		"Cabral Bandeira (beyraq)\n"
+		"Victor Domingos\n"
 		"Adriano A. Duarte (Sri_Dhryko)\n"
 		"Wallace Maia\n"
 		"Tiago Matos (tiagoms)\n"
