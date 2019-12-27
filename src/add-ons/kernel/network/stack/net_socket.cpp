@@ -1468,7 +1468,7 @@ socket_send(net_socket* socket, msghdr* header, const void* data, size_t length,
 		}
 
 		// attach ancillary data to the first buffer
-		status_t status = B_OK;
+		status_t status;
 		if (ancillaryData != NULL) {
 			gNetBufferModule.set_ancillary_data(buffer, ancillaryData);
 			ancillaryDataDeleter.Detach();
@@ -1481,10 +1481,7 @@ socket_send(net_socket* socket, msghdr* header, const void* data, size_t length,
 		memcpy(buffer->destination, address, addressLength);
 		buffer->destination->sa_len = addressLength;
 
-		if (status == B_OK) {
-			status = socket->first_info->send_data(socket->first_protocol,
-				buffer);
-		}
+		status = socket->first_info->send_data(socket->first_protocol, buffer);
 		if (status != B_OK) {
 			size_t sizeAfterSend = buffer->size;
 			gNetBufferModule.free(buffer);
@@ -1655,8 +1652,7 @@ socket_socketpair(int family, int type, int protocol, net_socket* sockets[2])
 	if (error != B_OK)
 		return error;
 
-	if (error == B_OK)
-		error = socket_open(family, type, protocol, &sockets[1]);
+	error = socket_open(family, type, protocol, &sockets[1]);
 
 	// bind one
 	if (error == B_OK)

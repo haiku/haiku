@@ -955,8 +955,7 @@ ClientConnection::VisitCloseRequest(CloseRequest* request)
 		// no volume ID given, so this is a query handle
 		// lock the handle
 		QueryHandle* handle = NULL;
-		if (result == B_OK)
-			SET_ERROR(result, _LockQueryHandle(request->cookie, &handle));
+		SET_ERROR(result, _LockQueryHandle(request->cookie, &handle));
 		QueryHandleUnlocker handleUnlocker(this, handle);
 
 		// close it
@@ -2366,12 +2365,10 @@ ClientConnection::VisitOpenQueryRequest(OpenQueryRequest* request)
 	VolumeManagerLocker managerLocker;
 
 	// open the query
-	status_t result = B_OK;
+	status_t result;
 	QueryHandle* handle = NULL;
-	if (result == B_OK) {
-		result = _OpenQuery(request->queryString.GetString(),
+	result = _OpenQuery(request->queryString.GetString(),
 			request->flags, request->port, request->token, &handle);
-	}
 	QueryHandleUnlocker handleUnlocker(this, handle);
 
 	// prepare the reply
@@ -2890,12 +2887,10 @@ ClientConnection::_NodeMonitoringProcessor()
 		ObjectDeleter<NodeMonitoringRequest> requestDeleter(request);
 
 		// send the request
-		if (error == B_OK) {
-			error = fConnection->SendRequest(request);
-			if (error != B_OK) {
-				ERROR(("ClientConnection::_NodeMonitoringProcessor(): "
-					"Failed to send request.\n"));
-			}
+		error = fConnection->SendRequest(request);
+		if (error != B_OK) {
+			ERROR(("ClientConnection::_NodeMonitoringProcessor(): "
+				"Failed to send request.\n"));
 		}
 	}
 	return 0;
