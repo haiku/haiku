@@ -73,12 +73,15 @@ haiku_sge_get_mac_addr_apc(device_t dev, uint8_t* dest, int* rgmii)
 	uint16 ids[] = { 0x0965, 0x0966, 0x0968 };
 
 	pci_info pciInfo = {0};
-	for (long i = 0; B_OK == (*gPci->get_nth_pci_info)(i, &pciInfo); i++) {
+	long i;
+	for (i = 0; B_OK == (*gPci->get_nth_pci_info)(i, &pciInfo); i++) {
+		size_t idx;
 		if (pciInfo.vendor_id != 0x1039)
 			continue;
 
-		for (size_t idx = 0; idx < B_COUNT_OF(ids); idx++) {
+		for (idx = 0; idx < B_COUNT_OF(ids); idx++) {
 			if (pciInfo.device_id == ids[idx]) {
+				size_t i;
 				// enable ports 0x78 0x79 to access APC registers
 				uint32 reg = gPci->read_pci_config(pciInfo.bus,
 					pciInfo.device, pciInfo.function, 0x48, 1);
@@ -90,7 +93,7 @@ haiku_sge_get_mac_addr_apc(device_t dev, uint8_t* dest, int* rgmii)
 					pciInfo.device, pciInfo.function, 0x48, 1);
 
 				// read factory MAC address
-				for (size_t i = 0; i < 6; i++) {
+				for (i = 0; i < 6; i++) {
 					gPci->write_io_8(0x78, 0x09 + i);
 					dest[i] = gPci->read_io_8(0x79);
 				}
