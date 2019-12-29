@@ -1,0 +1,284 @@
+/*
+ * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adam Fowler, adamfowleruk@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/add-ins/graphics/Accelerant.h	rev 53658
+ */
+
+
+/*!
+	\file Accelerant.h
+	\ingroup graphics
+	\ingroup libbe
+	\brief Defines the structures used by an Accelerant (and \c BScreen).
+*/
+
+/*!
+	\name Display mode structs and constants
+*/
+
+//! @{
+
+/*!
+	\enum display_timing_flags
+	\ingroup graphics
+	\brief Constants for \c display_timing::flags
+	
+	\since BeOS R5
+*/
+
+/*!
+	\var display_timing_flags B_BLANK_PEDESTAL
+	
+	Specifies the blank pedestal flag.
+	
+	\since BeOS R5
+*/
+
+/*!
+	\var display_timing_flags B_TIMING_INTERLACED
+	
+	Interlaced mode enabled.
+	
+	\since BeOS R5
+*/
+
+/*!
+	\var display_timing_flags B_POSITIVE_HSYNC
+	
+	Specifies a positive horizontal sync polarity.
+	
+	\since BeOS R5
+*/
+
+/*!
+	\var display_timing_flags B_POSITIVE_VSYNC
+	
+	Specifies a positive vertical sync polarity.
+	
+	\since BeOS R5
+*/
+
+/*!
+	\var display_timing_flags B_SYNC_ON_GREEN
+	
+	Specifies that sync on green is used (sometimes called SOG or RGsB)
+	
+	\since BeOS R5
+*/
+
+
+/*!
+	\struct display_timing
+	\brief Provides timing information about a display mode
+		   supported by a graphics card.
+*/
+
+/*!
+	\var uint32 display_timing::pixel_clock
+	
+	Refresh rate in kHz.
+	
+	\since BeOS R5
+*/
+
+/*!
+	\var uint16 display_timing::h_display
+
+	Horizontal display width in pixels (not character clocks).
+	
+	\since BeOS R5
+*/
+
+/*!
+	\var uint16 display_timing::h_sync_start
+	
+	Horizontal sync start in pixels.
+	
+	\since BeOS R5
+*/
+
+/*!
+	\var uint display_timing::h_sync_end
+	
+	Horizontal sync end in pixels.
+	
+	\since BeOS R5
+*/
+
+/*!
+	\var uint16 display_timing::h_total
+	
+	Horizontal total in pixels.
+	
+	\since BeOS R5
+*/
+
+/*!
+	\var uint16 display_timing::v_display
+	
+	Vertical display height in lines (not pixels).
+	
+	\since BeOS R5
+*/
+
+/*!
+	\var uint16 display:timing::v_sync_start
+	
+	Vertical sync start in lines.
+	
+	\since BeOS R5
+*/
+
+/*!
+	\var uint16 display_timing::v_sync_end
+	
+	Vertical sync end in lines.
+	
+	\since BeOS R5
+*/
+
+/*!
+	\var uint16 display_timing::v_total
+	
+	Total number of vertical lines.
+	
+	\since BeOS R5
+*/
+
+/*!
+	\var uint21 display_timing::flags
+	
+	Timing flags, for sync polarity, interlaced, double scan etc.
+	
+	\since BeOS R5
+*/
+
+
+/*!
+	\enum  display_mode_flags
+	\ingroup graphics
+	\brief Constants for \c display_mode:flags
+	
+	\since BeOS R5
+*/
+
+/*!
+	\var display_mode_flags B_SCROLL
+	
+	Specifies scroll supported. Set when the display uses a virtual screen.
+	
+	\since BeOS R5
+*/
+
+/*!
+	\var display_mode_flags B_8_BIT_DAC
+	
+	Specifies that the DAC is in 8-bit mode.
+	
+	\since BeOS R5
+*/
+
+/*!
+	\var display_mode_flags B_HARDWARE_CURSOR
+	
+	Specifies that a hardware cursor is supported.
+	
+	\since BeOS R5
+*/
+
+/*!
+	\var display_mode_flags B_PARALLEL_ACCESS
+	
+	Specifies that parallel access to the map is allowed in this display mode.
+	
+	\since BeOS R5
+*/
+
+/*!
+	\var display_mode_flags B_DPMS
+	
+	Specifies that the Display Power Management System is supported.
+	
+	\since beOS R5
+*/
+
+/*!
+	\var display_mode_flags B_IO_FB_NA
+	
+	Indicates that the app_server should not use the video memory 
+	of the graphics card. Appears on older graphics cards.
+	
+	\since BeOS R5
+*/
+
+
+/*!
+	\struct	display_mode
+	\brief Provides information about a display mode supported
+		   by a graphics card.
+		   
+*/
+
+/*!
+	\var display_timing display_mode::timing
+	
+	The display timing of this mode.
+	
+	\since BeOS R5
+*/
+
+/*!
+	\var uint32 display_mode::space
+	
+	Pixel Configuration.
+	
+	\since BeOS R5
+*/
+
+/*!
+	\var uint16 display_mode::virtual_width
+	
+	Width of this mode in pixels.
+	
+	\since BeOS R5
+*/
+
+/*!
+	\var uint16 display_mode::virtual_height
+	
+	Height of this mode in lines of the display.
+	
+	\since BeOS R5
+*/
+
+/*!
+	\var uint16 display_mode::h_display_start
+	
+	The index of the first displayed pixel in the line.
+	
+	\since BeOS R5
+*/
+
+/*!
+	\var uint16 display_mode::v_display_start
+	
+	The index of the first displayed line.
+	
+	\since BeOS R5
+*/
+
+/*!
+	\var uint32 display_mode::flags
+	
+	The flags of this mode. Some drivers use this for
+	dual head related options.
+	
+	\since BeOSR5
+*/
+
+// @}
