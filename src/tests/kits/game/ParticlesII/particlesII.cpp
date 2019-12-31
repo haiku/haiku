@@ -32,8 +32,8 @@ public:
 	NWindowScreen(status_t*);
 private:
 	void ScreenConnected(bool);
-	long MyCode();
-	static long Entry(void*);
+	int32 MyCode();
+	static int32 Entry(void*);
 	// handy stuff
 	void set_frame_rate(float fps) {frame_pause = (bigtime_t)((1000 * 1000)/fps);}
 	// special for demos
@@ -271,14 +271,14 @@ NWindowScreen::ScreenConnected(bool connected)
 }
 
 
-long
+int32
 NWindowScreen::Entry(void* p)
 {
    return ((NWindowScreen*)p)->MyCode();
 }
 
 
-long
+int32
 NWindowScreen::MyCode()
 {
 	bigtime_t trgt = system_time() + frame_pause;
