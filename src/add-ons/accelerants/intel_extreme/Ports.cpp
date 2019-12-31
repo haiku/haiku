@@ -406,18 +406,15 @@ LVDSPort::IsConnected()
 		// Linux seems to look at lid status for LVDS port detection
 		// If we don't get EDID, we can use vbios native mode or vesa?
 		if (!HasEDID()) {
-			#if 0
-			if (gInfo->shared_info->got_vbt) {
-				// TODO: Fake EDID from vbios native mode?
-				// I feel like this would be more accurate
-			} else if...
-			#endif
 			if (gInfo->shared_info->has_vesa_edid_info) {
 				TRACE("LVDS: Using VESA edid info\n");
 				memcpy(&fEDIDInfo, &gInfo->shared_info->vesa_edid_info,
 					sizeof(edid1_info));
 				fEDIDState = B_OK;
 				// HasEDID now true
+			} else if (gInfo->shared_info->got_vbt) {
+				TRACE("LVDS: No EDID, but force enabled as we have a VBT\n");
+				return true;
 			} else {
 				TRACE("LVDS: Couldn't find any valid EDID!\n");
 				return false;
@@ -503,6 +500,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	bool needsScaling = false;
 		// Try to get the panel preferred screen mode from EDID info
 
+#if 0
 	if (gInfo->shared_info->got_vbt) {
 		// Set vbios hardware panel mode as base
 		memcpy(&hardwareTarget, &gInfo->shared_info->panel_mode,
@@ -521,6 +519,8 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 			hardwareTarget.virtual_width, hardwareTarget.virtual_height,
 			needsScaling ? "scaled" : "unscaled");
 	} else {
+#endif
+	{
 		// We don't have EDID data, try to set the requested mode directly
 		hardwareTarget = *target;
 	}
