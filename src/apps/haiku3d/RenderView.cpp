@@ -38,8 +38,6 @@ RenderView::RenderView(BRect frame)
 
 RenderView::~RenderView()
 {
-	_StopRenderThread();
-	_DeleteScene();
 }
 
 
@@ -52,6 +50,16 @@ RenderView::AttachedToWindow()
 	_InitGL();
 	if (_CreateRenderThread() != B_OK)
 		printf("Error trying to start the render thread!\n");
+}
+
+
+void
+RenderView::DetachedFromWindow()
+{
+	_StopRenderThread();
+	_DeleteScene();
+
+	BGLView::DetachedFromWindow();
 }
 
 

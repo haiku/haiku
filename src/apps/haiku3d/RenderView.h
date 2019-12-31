@@ -23,6 +23,7 @@ public:
 					~RenderView();
 
 	virtual void	AttachedToWindow();
+	virtual void	DetachedFromWindow();
 	virtual void	FrameResized(float width, float height);
 	virtual	void	ErrorCallback(unsigned long error);
 
