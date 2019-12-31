@@ -66,6 +66,9 @@ BLanguage::SetTo(const char* language)
 	if (fICULocale == NULL)
 		return B_NO_MEMORY;
 
+	if (fICULocale.IsBogus())
+		return B_BAD_VALUE;
+
 	return B_OK;
 }
 
