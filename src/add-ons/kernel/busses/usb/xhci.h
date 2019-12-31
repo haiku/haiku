@@ -62,6 +62,8 @@ typedef struct xhci_endpoint {
 	xhci_device*	device;
 	uint8			id;
 
+	uint16			max_burst_payload;
+
 	xhci_td*		td_head;
 	uint8			used;
 	uint8			current;
@@ -137,8 +139,8 @@ private:
 			int32				Interrupt();
 
 			// Endpoint management
-			status_t			ConfigureEndpoint(uint8 slot, uint8 number,
-									uint8 type, bool directionIn, uint64 ringAddr,
+			status_t			ConfigureEndpoint(xhci_endpoint* ep, uint8 slot,
+									uint8 number, uint8 type, bool directionIn,
 									uint16 interval, uint16 maxPacketSize,
 									usb_speed speed, uint8 maxBurst,
 									uint16 bytesPerInterval);
