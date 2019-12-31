@@ -36,7 +36,7 @@ target desktop {
 	}
 
 	job update-time {
-		launch /system/preferences/Time "" --update
+		launch /system/preferences/Time --update
 		if setting ~/config/settings/networktime\ settings "synchronize at boot"
 		on network_available
 	}
