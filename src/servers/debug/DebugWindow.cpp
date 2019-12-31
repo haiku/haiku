@@ -73,6 +73,7 @@ DebugWindow::DebugWindow(const char* appName)
 
 	fOKButton = new BButton("close", B_TRANSLATE("Oh no!"),
 		new BMessage(B_QUIT_REQUESTED));
+	fOKButton->MakeDefault(true);
 
 	terminate->SetValue(B_CONTROL_ON);
 
