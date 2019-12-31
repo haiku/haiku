@@ -45,8 +45,8 @@
 
 static pll_limits kLimits85x = {
 	// p, p1, p2,  n,   m, m1, m2
-	{  4,  2,  4,  5,  96, 20,  8},
-	{128, 33,  2, 18, 140, 28, 18},
+	{  4,  2,  2,  5,  96, 20,  8},
+	{128, 33,  4, 18, 140, 28, 18},
 	165000, 930000, 1400000
 };
 
@@ -84,8 +84,8 @@ static pll_limits kLimitsG4xSdvo = {
 #if 0
 static pll_limits kLimitsG4xHdmi = {
 	// p, p1, p2,  n,   m, m1, m2
-	{  5,  1, 10,  5,  70, 12,  7},	// min
-	{ 80,  8,  5, 10, 120, 22, 11},	// max
+	{  5,  1,  5,  5,  70, 12,  7},	// min
+	{ 80,  8, 10, 10, 120, 22, 11},	// max
 	165000, 1400000, 2800000
 };
 #endif
@@ -151,15 +151,15 @@ static pll_limits kLimitsIlkLvdsDual100 = {
 #if 0
 static pll_limits kLimitsChv = {
 	// p, p1, p2, n,   m, m1, m2
-	{  0,  2, 14, 1,  79, 2,   24 << 22}, // min
-	{  0,  4,  1, 1, 127, 2,  175 << 22}, // max
+	{  0,  2,  1, 1,  79, 2,   24 << 22}, // min
+	{  0,  4, 14, 1, 127, 2,  175 << 22}, // max
 	0, 4800000, 6480000
 };
 
 static pll_limits kLimitsVlv = {
 	// p, p1, p2, n,   m, m1, m2
-	{  0,  2, 20, 1,  79, 2,   11},	// min
-	{  0,  3,  2, 7, 127, 3,  156},	// max
+	{  0,  2,  2, 1,  79, 2,   11},	// min
+	{  0,  3, 20, 7, 127, 3,  156},	// max
 	0, 4000000, 6000000
 };
 
@@ -173,8 +173,8 @@ static pll_limits kLimitsBxt = {
 
 static pll_limits kLimitsPinSdvo = {
 	// p, p1, p2, n,   m, m1,  m2
-	{  5,  1, 10, 3,   2,  0,   0},	// min
-	{ 80,  8,  5, 6, 256,  0, 254},	// max
+	{  5,  1,  5, 3,   2,  0,   0},	// min
+	{ 80,  8, 10, 6, 256,  0, 254},	// max
 	200000, 1700000, 3500000
 };
 
@@ -224,10 +224,10 @@ compute_pll_p2(display_mode* current, pll_divisors* divisors,
 	if (isLVDS) {
 		if (lvds_dual_link(current)) {
 			// fast DAC timing via 2 channels (dual link LVDS)
-			divisors->p2 = limits->max.p2;
+			divisors->p2 = limits->min.p2;
 		} else {
 			// slow DAC timing
-			divisors->p2 = limits->min.p2;
+			divisors->p2 = limits->max.p2;
 		}
 	} else {
 		if (current->timing.pixel_clock < limits->dot_limit) {
