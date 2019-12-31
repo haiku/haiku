@@ -828,7 +828,7 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 		// The "TD Size" field of a transfer TRB indicates the number of
 		// remaining maximum-size *packets* in this TD, *not* including the
 		// packets in the current TRB, and capped at 31 if there are more
-		// than 31 packets remaining in the TD. (XHCI 1.1 § 4.11.2.4 p210.)
+		// than 31 packets remaining in the TD. (XHCI 1.2 § 4.11.2.4 p218.)
 		int32 tdSize = remainingPackets > 31 ? 31 : remainingPackets;
 		if (tdSize < 0)
 			tdSize = 0;
@@ -982,7 +982,7 @@ XHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 			endpoint->device->slot);
 
 		// We don't need to do anything else to restart the ring, as it will resume
-		// operation as normal upon the next doorbell. (XHCI 1.1 § 4.6.9 p132.)
+		// operation as normal upon the next doorbell. (XHCI 1.2 § 4.6.9 p136.)
 	} else {
 		// We couldn't stop the endpoint. Most likely the device has been
 		// removed and the endpoint was stopped by the hardware, or is
@@ -1991,7 +1991,7 @@ XHCI::ConfigureEndpoint(uint8 slot, uint8 number, uint8 type, bool directionIn,
 	uint64 qwendpoint2 = 0;
 	uint32 dwendpoint4 = 0;
 
-	// Compute and assign the endpoint type. (XHCI 1.1 § 6.2.3 Table 6-9 p429.)
+	// Compute and assign the endpoint type. (XHCI 1.2 § 6.2.3 Table 6-9 p452.)
 	uint8 xhciType = 4;
 	if ((type & USB_OBJECT_INTERRUPT_PIPE) != 0)
 		xhciType = 3;
@@ -2002,7 +2002,7 @@ XHCI::ConfigureEndpoint(uint8 slot, uint8 number, uint8 type, bool directionIn,
 	xhciType |= directionIn ? (1 << 2) : 0;
 	dwendpoint1 |= ENDPOINT_1_EPTYPE(xhciType);
 
-	// Compute and assign interval. (XHCI 1.1 § 6.2.3.6 p433.)
+	// Compute and assign interval. (XHCI 1.2 § 6.2.3.6 p456.)
 	uint16 calcInterval;
 	if ((type & USB_OBJECT_BULK_PIPE) != 0
 			|| (type & USB_OBJECT_CONTROL_PIPE) != 0) {
@@ -2040,12 +2040,12 @@ XHCI::ConfigureEndpoint(uint8 slot, uint8 number, uint8 type, bool directionIn,
 	dwendpoint0 |= ENDPOINT_0_INTERVAL(calcInterval);
 
 	// For non-isochronous endpoints, we want the controller to retry failed
-	// transfers, if possible. (XHCI 1.1 § 4.10.2.3 p189.)
+	// transfers, if possible. (XHCI 1.2 § 4.10.2.3 p197.)
 	if ((type & USB_OBJECT_ISO_PIPE) == 0)
 		dwendpoint1 |= ENDPOINT_1_CERR(3);
 
 	// Assign maximum burst size. For USB3 devices this is passed in; for
-	// all other devices we compute it. (XHCI 1.1 § 4.8.2 p154.)
+	// all other devices we compute it. (XHCI 1.2 § 4.8.2 p161.)
 	if (speed == USB_SPEED_HIGHSPEED && (type & (USB_OBJECT_INTERRUPT_PIPE
 			| USB_OBJECT_ISO_PIPE)) != 0) {
 		maxBurst = (maxPacketSize & 0x1800) >> 11;
@@ -2055,7 +2055,7 @@ XHCI::ConfigureEndpoint(uint8 slot, uint8 number, uint8 type, bool directionIn,
 	dwendpoint1 |= ENDPOINT_1_MAXBURST(maxBurst);
 
 	// Assign maximum packet size, set the ring address, and set the
-	// "Dequeue Cycle State" bit. (XHCI 1.1 § 6.2.3 Table 6-10 p430.)
+	// "Dequeue Cycle State" bit. (XHCI 1.2 § 6.2.3 Table 6-10 p453.)
 	dwendpoint1 |= ENDPOINT_1_MAXPACKETSIZE(maxPacketSize);
 	qwendpoint2 |= ENDPOINT_2_DCS_BIT | ringAddr;
 
@@ -2074,7 +2074,7 @@ XHCI::ConfigureEndpoint(uint8 slot, uint8 number, uint8 type, bool directionIn,
 		dwendpoint4 |= ENDPOINT_4_AVGTRBLENGTH(maxPacketSize * 4);
 	}
 
-	// Assign maximum ESIT payload. (XHCI 1.1 § 4.14.2 p250.)
+	// Assign maximum ESIT payload. (XHCI 1.2 § 4.14.2 p259.)
 	if ((type & (USB_OBJECT_INTERRUPT_PIPE | USB_OBJECT_ISO_PIPE)) != 0) {
 		// TODO: For SuperSpeedPlus endpoints, there is yet another descriptor
 		// for isochronous endpoints that specifies the maximum ESIT payload.
@@ -2738,7 +2738,7 @@ XHCI::SetTRDequeue(uint64 dequeue, uint16 stream, uint8 endpoint, uint8 slot)
 	xhci_trb trb;
 	trb.address = dequeue | ENDPOINT_2_DCS_BIT;
 		// The DCS bit is copied from the address field as in ConfigureEndpoint.
-		// (XHCI 1.1 § 4.6.10 p142.)
+		// (XHCI 1.2 § 4.6.10 p142.)
 	trb.status = TRB_2_STREAM(stream);
 	trb.flags = TRB_3_TYPE(TRB_TYPE_SET_TR_DEQUEUE)
 		| TRB_3_SLOT(slot) | TRB_3_ENDPOINT(endpoint);
