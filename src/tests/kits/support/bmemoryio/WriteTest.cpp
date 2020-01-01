@@ -54,7 +54,16 @@ WriteTest::PerformTest(void)
 	memset(buf, 0, 10);
 	pos = mem.Position();
 	err = mem.WriteAt(-10, writeBuf, 5);
-	CPPUNIT_ASSERT(err == 5);
+	CPPUNIT_ASSERT(err == B_BAD_VALUE);
+	CPPUNIT_ASSERT(mem.Position() == pos);
+
+	NextSubTest();
+	memset(buf, 0, 10);
+	BMemoryIO read_only_mem(const_cast<const char*>(buf), 10);
+	pos = read_only_mem.Position();
+	err = read_only_mem.WriteAt(3, writeBuf, 2);
+	CPPUNIT_ASSERT(err == B_NOT_ALLOWED);
+	CPPUNIT_ASSERT(read_only_mem.Position() == pos);
 }
 
 
