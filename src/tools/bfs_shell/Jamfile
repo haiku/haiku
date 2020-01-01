@@ -60,6 +60,7 @@ local bfsSource =
 	Journal.cpp
 	Query.cpp
 	QueryParserUtils.cpp
+	ResizeVisitor.cpp
 	Volume.cpp
 
 	kernel_interface.cpp

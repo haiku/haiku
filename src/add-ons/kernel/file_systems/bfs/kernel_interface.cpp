@@ -7,6 +7,7 @@
 //!	file system interface to Haiku's vnode layer
 
 
+#include "Attribute.h"
 #include "CheckVisitor.h"
 #include "Debug.h"
 #include "Volume.h"
@@ -14,7 +15,7 @@
 #include "Index.h"
 #include "BPlusTree.h"
 #include "Query.h"
-#include "Attribute.h"
+#include "ResizeVisitor.h"
 #include "bfs_control.h"
 #include "bfs_disk_system.h"
 
