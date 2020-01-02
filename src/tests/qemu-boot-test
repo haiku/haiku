@@ -1,0 +1,79 @@
+#!/bin/bash
+#
+# A quick standard test of Haiku booting under qemu in various configurations
+#
+
+if [ $# -lt 3 ]; then
+	echo "Usage: $0 <arch> <bios|efi> <image>"
+	exit 1;
+fi
+
+ARCH=$1
+PLATFORM=$2
+IMAGE=$3
+EMULATOR=qemu-system-$ARCH
+EXTRAS=""
+
+function check_logs {
+	FILE=$1
+	echo -n "    Potential KDL Detected: "
+	if grep -q "kdebug>" $FILE; then
+		echo "YES"
+	else
+		echo "NO"
+	fi
+	echo "    Potential issues in logs:"
+	egrep -i "FATAL|ERROR|FAIL|GDB" $FILE | grep -vi " No error"
+}
+
+case "$C" in
+"bios")
+	EXTRAS="$EXTRAS"
+    ;;
+"efi")
+	EXTRAS="$EXTRAS -bios /usr/share/edk2/ovmf/OVMF_CODE.fd"
+    ;;
+*)
+	EXTRAS="$EXTRAS"
+    ;;
+esac
+
+echo "We're going to step through the potential boot options for $ARCH under qemu"
+echo ""
+echo -n "Press enter to begin..."
+read
+
+case "$ARCH" in
+"x86" | "x86_64")
+	MEMORY=2048
+	TEST_FILE="/tmp/test-$ARCH.iso"
+	TEST_SERIALLOG="/tmp/test-$ARCH-serial.mon"
+	EXTRAS="$EXTRAS -serial file:$TEST_SERIALLOG"
+	EMULATOR="$EMULATOR --enable-kvm -m $MEMORY $EXTRAS"
+	rm -f $TEST_FILE $TEST_SERIALLOG
+
+	echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	echo "+++ Testing $PLATFORM CDROM boot..."
+	cp $IMAGE $TEST_FILE
+	$EMULATOR -cdrom $TEST_FILE
+	check_logs $TEST_SERIALLOG
+	rm -f $TEST_FILE $TEST_SERIALLOG
+
+	echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	echo "+++ Testing $PLATFORM IDE boot..."
+	cp $IMAGE $TEST_FILE
+	$EMULATOR -drive file=$TEST_FILE,format=raw,if=ide
+	check_logs $TEST_SERIALLOG
+	rm -f $TEST_FILE $TEST_SERIALLOG
+
+	echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	echo "+++ Testing $PLATFORM USB boot..."
+	cp $IMAGE $TEST_FILE
+	$EMULATOR -drive if=none,id=stick,file=$TEST_FILE,format=raw -device qemu-xhci,id=xhci -device usb-storage,bus=xhci.0,drive=stick
+	check_logs $TEST_SERIALLOG
+	rm -f $TEST_FILE $TEST_SERIALLOG
+    ;;
+*)
+	echo "Error: Unknown architecture!"
+    ;;
+esac
