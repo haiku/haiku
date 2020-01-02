@@ -1,10 +1,11 @@
 /*
- * Copyright 2002-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2020, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Mattias Sundblad
  *		Andrew Bachmann
+ *		Pascal R. G. Abresch
  */
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
@@ -53,6 +54,8 @@ const uint32 FONT_STYLE					= 'FSch';
 const uint32 FONT_COLOR					= 'Fcol';
 const uint32 kMsgSetItalic				= 'Fita';
 const uint32 kMsgSetBold				= 'Fbld';
+const uint32 kMsgSetFontDown				= 'Fsdw';
+const uint32 kMsgSetFontUp				= 'Fsup';
 
 const rgb_color palette[] = {
 	{ 220, 0, 0, 255 },		// red
@@ -92,6 +95,9 @@ const uint32 UPDATE_STATUS				= 'UPSt';
 const uint32 UPDATE_STATUS_REF			= 'UPSr';
 const uint32 UNLOCK_FILE				= 'UNLk';
 const uint32 UPDATE_LINE_SELECTION		= 'UPls';
+
+// fontSize constant
+const int32 fontSizes[] = {9, 10, 11, 12, 14, 18, 24, 36, 48, 72};
 
 #endif	// CONSTANTS_H
 
