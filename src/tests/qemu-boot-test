@@ -26,7 +26,7 @@ function check_logs {
 	egrep -i "FATAL|ERROR|FAIL|GDB" $FILE | grep -vi " No error"
 }
 
-case "$C" in
+case "$PLATFORM" in
 "bios")
 	EXTRAS="$EXTRAS"
     ;;
