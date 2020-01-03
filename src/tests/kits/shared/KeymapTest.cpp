@@ -70,22 +70,23 @@ KeymapTest::TestGetChars()
 	CPPUNIT_ASSERT(keymap != NULL);
 
 	// Test each of the keymap's character tables
-	std::map<uint32, int(*)[128]> tables = {
-		{0,								&keymap->normal_map},
-		{B_SHIFT_KEY,					&keymap->shift_map},
-		{B_CAPS_LOCK,					&keymap->caps_map},
-		{B_CAPS_LOCK | B_SHIFT_KEY,		&keymap->caps_shift_map},
-		{B_CONTROL_KEY,					&keymap->control_map},
-		{B_OPTION_KEY,					&keymap->option_map},
-		{B_OPTION_KEY | B_SHIFT_KEY,	&keymap->option_shift_map},
-		{B_OPTION_KEY | B_CAPS_LOCK,	&keymap->option_caps_map},
-		{B_OPTION_KEY | B_SHIFT_KEY | B_CAPS_LOCK,
-			&keymap->option_caps_shift_map}
-	};
+	typedef std::map<uint32, int32(*)[128]> table_map_t;
+	table_map_t tables;
+	tables[0] = &keymap->normal_map;
+	tables[B_SHIFT_KEY] = &keymap->shift_map;
+	tables[B_CAPS_LOCK] = &keymap->caps_map;
+	tables[B_CAPS_LOCK | B_SHIFT_KEY] = &keymap->caps_shift_map;
+	tables[B_CONTROL_KEY] = &keymap->control_map;
+	tables[B_OPTION_KEY] = &keymap->option_map;
+	tables[B_OPTION_KEY | B_SHIFT_KEY] = &keymap->option_shift_map;
+	tables[B_OPTION_KEY | B_CAPS_LOCK] = &keymap->option_caps_map;
+	tables[B_OPTION_KEY | B_SHIFT_KEY | B_CAPS_LOCK] =
+		&keymap->option_caps_shift_map;
 
-	for (auto p = tables.begin(); p != tables.end(); p++) {
+	for (table_map_t::const_iterator p = tables.begin();
+		 p != tables.end(); p++) {
 		const uint32 modifiers = (*p).first;
-		const int (*table)[128] = (*p).second;
+		const int32(*table)[128] = (*p).second;
 
 		// Test, for every keycode, that the result from BKeymap::GetChars()
 		// matches what we find in our our own copy of the keymap
