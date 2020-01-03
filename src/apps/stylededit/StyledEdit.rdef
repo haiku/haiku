@@ -12,7 +12,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "StyledEdit",
-	long_info = "StyledEdit ©2002-2009 Haiku, Inc."
+	long_info = "StyledEdit ©2002-2020 Haiku, Inc."
 };
 
 resource app_flags B_SINGLE_LAUNCH;
