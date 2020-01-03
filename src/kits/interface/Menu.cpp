@@ -1911,39 +1911,29 @@ BMenu::_UpdateStateOpenSelect(BMenuItem* item, BPoint position,
 			return;
 		}
 
-		BRect menuBounds = ConvertToScreen(Bounds());
-
-		BRect submenuBounds;
-		if (fSelected->Submenu()->LockLooper()) {
-			fSelected->Submenu()->ConvertToScreen(
-				fSelected->Submenu()->Bounds());
-			fSelected->Submenu()->UnlockLooper();
-		}
-
-		float xOffset;
-
-		// navAreaRectAbove and navAreaRectBelow have the same X
-		// position and width, so it doesn't matter which one we use to
-		// calculate the X offset
-		if (menuBounds.left < submenuBounds.left)
-			xOffset = position.x - navAreaRectAbove.left;
-		else
-			xOffset = navAreaRectAbove.right - position.x;
-
-		bool inNavArea;
+		bool isLeft = ConvertFromScreen(navAreaRectAbove).left == 0;
+		BPoint p1, p2;
 
 		if (inNavAreaRectAbove) {
-			float yOffset = navAreaRectAbove.bottom - position.y;
-			float ratio = navAreaRectAbove.Width() / navAreaRectAbove.Height();
-
-			inNavArea = yOffset <= xOffset / ratio;
+			if (!isLeft) {
+				p1 = navAreaRectAbove.LeftBottom();
+				p2 = navAreaRectAbove.RightTop();
+			} else {
+				p2 = navAreaRectAbove.RightBottom();
+				p1 = navAreaRectAbove.LeftTop();
+			}
 		} else {
-			float yOffset = navAreaRectBelow.bottom - position.y;
-			float ratio = navAreaRectBelow.Width() / navAreaRectBelow.Height();
-
-			inNavArea = yOffset >= (navAreaRectBelow.Height() - xOffset
-				/ ratio);
+			if (!isLeft) {
+				p2 = navAreaRectBelow.LeftTop();
+				p1 = navAreaRectBelow.RightBottom();
+			} else {
+				p1 = navAreaRectBelow.RightTop();
+				p2 = navAreaRectBelow.LeftBottom();
+			}
 		}
+		bool inNavArea =
+			  (p1.y - p2.y) * position.x + (p2.x - p1.x) * position.y
+			+ (p1.x - p2.x) * p1.y + (p2.y - p1.y) * p1.x >= 0;
 
 		bigtime_t systime = system_time();
 
