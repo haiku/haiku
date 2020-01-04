@@ -468,12 +468,18 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		panelStatus = PCH_PANEL_STATUS;
 	}
 
-	// Power off Panel
-	write32(panelControl, read32(panelControl) & ~PANEL_CONTROL_POWER_TARGET_ON);
-	read32(panelControl);
+	if (gInfo->shared_info->device_type.Generation() != 4) {
+		// TODO not needed on any generation if we are using the panel fitter
+		// Power off Panel
+		write32(panelControl,
+			read32(panelControl) & ~PANEL_CONTROL_POWER_TARGET_ON);
+		read32(panelControl);
 
-	if (!wait_for_clear(panelStatus, PANEL_STATUS_POWER_ON, 1000))
-		ERROR("%s: %s didn't power off within 1000ms!\n", __func__, PortName());
+		if (!wait_for_clear(panelStatus, PANEL_STATUS_POWER_ON, 1000)) {
+			ERROR("%s: %s didn't power off within 1000ms!\n", __func__,
+				PortName());
+		}
+	}
 
 #if 0
 	// Disabled for now as our code doesn't work. Let's hope VESA/EFI has
@@ -484,52 +490,40 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		link->Train(target);
 #endif
 
-#if 0
-	// Disable PanelFitter for now
-	addr_t panelFitterControl = PCH_PANEL_FITTER_BASE_REGISTER
-		+ PCH_PANEL_FITTER_CONTROL;
-	if (fPipe->Index() == INTEL_PIPE_B)
-		panelFitterControl += PCH_PANEL_FITTER_PIPE_OFFSET;
-	write32(panelFitterControl, (read32(panelFitterControl) & ~PANEL_FITTER_ENABLED));
-	read32(panelFitterControl);
-#endif
-
 	// For LVDS panels, we actually always set the native mode in hardware
 	// Then we use the panel fitter to scale the picture to that.
 	display_mode hardwareTarget;
 	bool needsScaling = false;
-		// Try to get the panel preferred screen mode from EDID info
 
-#if 0
-	if (gInfo->shared_info->got_vbt) {
+	// TODO needed for the other generations as well, in some way?
+	if (gInfo->shared_info->device_type.Generation() == 4
+			&& gInfo->shared_info->got_vbt) {
 		// Set vbios hardware panel mode as base
 		memcpy(&hardwareTarget, &gInfo->shared_info->panel_mode,
 			sizeof(display_mode));
-		hardwareTarget.space = target->space;
 
-		if ((hardwareTarget.virtual_width <= target->virtual_width
-				&& hardwareTarget.virtual_height <= target->virtual_height
-				&& hardwareTarget.space <= target->space)
-			|| intel_propose_display_mode(&hardwareTarget, target, target)) {
+		if (hardwareTarget.virtual_width == target->virtual_width
+				&& hardwareTarget.virtual_height == target->virtual_height) {
+			// We are setting the native video mode, nothing special to do
 			hardwareTarget = *target;
-		} else
-			needsScaling = true;
+		} else {
+			// We need to enable the panel fitter
+			TRACE("%s: hardware mode will actually be %dx%d\n", __func__,
+				hardwareTarget.virtual_width, hardwareTarget.virtual_height);
 
-		TRACE("%s: hardware mode will actually be %dx%d (%s)\n", __func__,
-			hardwareTarget.virtual_width, hardwareTarget.virtual_height,
-			needsScaling ? "scaled" : "unscaled");
+			hardwareTarget.space = target->space;
+			// FIXME we should also get the refresh frequency from the target
+			// mode, and then "sanitize" the resulting mode we made up.
+
+			needsScaling = true;
+		}
 	} else {
-#endif
-	{
-		// We don't have EDID data, try to set the requested mode directly
+		// We don't have VBT data, try to set the requested mode directly
 		hardwareTarget = *target;
 	}
 
 	pll_divisors divisors;
-	if (needsScaling)
-		compute_pll_divisors(&hardwareTarget, &divisors, true);
-	else
-		compute_pll_divisors(target, &divisors, true);
+	compute_pll_divisors(&hardwareTarget, &divisors, true);
 
 	uint32 lvds = read32(_PortRegister())
 		| LVDS_PORT_EN | LVDS_A0A2_CLKA_POWER_UP;
@@ -583,103 +577,50 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	// Program general pipe config
 	fPipe->Configure(target);
 
-	// Program pipe PLL's (pixel_clock is *always* the hardware pixel clock)
+	// Program pipe PLL's (using the hardware mode timings, since that's what
+	// the PLL is used for)
 	fPipe->ConfigureClocks(divisors, hardwareTarget.timing.pixel_clock,
 		extraPLLFlags);
 
-	// Disable panel fitting, but enable 8 to 6-bit dithering
-	write32(INTEL_PANEL_FIT_CONTROL, 0x4);
-		// TODO: do not do this if the connected panel is 24-bit
-		// (I don't know how to detect that)
+	if (gInfo->shared_info->device_type.Generation() != 4) {
+		// G45: no need to power the panel off
+		// Power on Panel
+		write32(panelControl,
+			read32(panelControl) | PANEL_CONTROL_POWER_TARGET_ON);
+		read32(panelControl);
 
-	// Power on Panel
-	write32(panelControl, read32(panelControl) | PANEL_CONTROL_POWER_TARGET_ON);
-	read32(panelControl);
-
-	if (!wait_for_set(panelStatus, PANEL_STATUS_POWER_ON, 1000))
-		ERROR("%s: %s didn't power on within 1000ms!\n", __func__, PortName());
+		if (!wait_for_set(panelStatus, PANEL_STATUS_POWER_ON, 1000)) {
+			ERROR("%s: %s didn't power on within 1000ms!\n", __func__,
+				PortName());
+		}
+	}
 
 	// Program target display mode
-	fPipe->ConfigureTimings(target);
+	fPipe->ConfigureTimings(target, false);
 
-#if 0
-	// update timing parameters
 	if (needsScaling) {
-		// TODO: Alternatively, it should be possible to use the panel
-		// fitter and scale the picture.
-
-		// TODO: Perform some sanity check, for example if the target is
-		// wider than the hardware mode we end up with negative borders and
-		// broken timings
-		uint32 borderWidth = hardwareTarget.timing.h_display
-			- target->timing.h_display;
-
-		uint32 syncWidth = hardwareTarget.timing.h_sync_end
-			- hardwareTarget.timing.h_sync_start;
-
-		uint32 syncCenter = target->timing.h_display
-			+ (hardwareTarget.timing.h_total
-			- target->timing.h_display) / 2;
-
-		write32(INTEL_DISPLAY_B_HTOTAL,
-			((uint32)(hardwareTarget.timing.h_total - 1) << 16)
-			| ((uint32)target->timing.h_display - 1));
-		write32(INTEL_DISPLAY_B_HBLANK,
-			((uint32)(hardwareTarget.timing.h_total - borderWidth / 2 - 1)
-				<< 16)
-			| ((uint32)target->timing.h_display + borderWidth / 2 - 1));
-		write32(INTEL_DISPLAY_B_HSYNC,
-			((uint32)(syncCenter + syncWidth / 2 - 1) << 16)
-			| ((uint32)syncCenter - syncWidth / 2 - 1));
-
-		uint32 borderHeight = hardwareTarget.timing.v_display
-			- target->timing.v_display;
-
-		uint32 syncHeight = hardwareTarget.timing.v_sync_end
-			- hardwareTarget.timing.v_sync_start;
-
-		syncCenter = target->timing.v_display
-			+ (hardwareTarget.timing.v_total
-			- target->timing.v_display) / 2;
-
-		write32(INTEL_DISPLAY_B_VTOTAL,
-			((uint32)(hardwareTarget.timing.v_total - 1) << 16)
-			| ((uint32)target->timing.v_display - 1));
-		write32(INTEL_DISPLAY_B_VBLANK,
-			((uint32)(hardwareTarget.timing.v_total - borderHeight / 2 - 1)
-				<< 16)
-			| ((uint32)target->timing.v_display
-				+ borderHeight / 2 - 1));
-		write32(INTEL_DISPLAY_B_VSYNC,
-			((uint32)(syncCenter + syncHeight / 2 - 1) << 16)
-			| ((uint32)syncCenter - syncHeight / 2 - 1));
-
-		// This is useful for debugging: it sets the border to red, so you
-		// can see what is border and what is porch (black area around the
-		// sync)
-		// write32(0x61020, 0x00FF0000);
+		// Enable panel fitter in automatic mode. It will figure out
+		// the scaling ratios automatically.
+		uint32 panelFitterControl = read32(INTEL_PANEL_FIT_CONTROL);
+		panelFitterControl |= PANEL_FITTER_ENABLED;
+		panelFitterControl &= ~(PANEL_FITTER_SCALING_MODE_MASK
+			| PANEL_FITTER_PIPE_MASK);
+		panelFitterControl |= PANEL_FITTER_PIPE_B;
+			// LVDS is always on pipe B.
+		write32(INTEL_PANEL_FIT_CONTROL, panelFitterControl);
 	} else {
-		write32(INTEL_DISPLAY_B_HTOTAL,
-			((uint32)(target->timing.h_total - 1) << 16)
-			| ((uint32)target->timing.h_display - 1));
-		write32(INTEL_DISPLAY_B_HBLANK,
-			((uint32)(target->timing.h_total - 1) << 16)
-			| ((uint32)target->timing.h_display - 1));
-		write32(INTEL_DISPLAY_B_HSYNC,
-			((uint32)(target->timing.h_sync_end - 1) << 16)
-			| ((uint32)target->timing.h_sync_start - 1));
-
-		write32(INTEL_DISPLAY_B_VTOTAL,
-			((uint32)(target->timing.v_total - 1) << 16)
-			| ((uint32)target->timing.v_display - 1));
-		write32(INTEL_DISPLAY_B_VBLANK,
-			((uint32)(target->timing.v_total - 1) << 16)
-			| ((uint32)target->timing.v_display - 1));
-		write32(INTEL_DISPLAY_B_VSYNC, (
-			(uint32)(target->timing.v_sync_end - 1) << 16)
-			| ((uint32)target->timing.v_sync_start - 1));
+		if (gInfo->shared_info->device_type.Generation() == 4) {
+			// Bypass the panel fitter
+			uint32 panelFitterControl = read32(INTEL_PANEL_FIT_CONTROL);
+			panelFitterControl &= ~PANEL_FITTER_ENABLED;
+			write32(INTEL_PANEL_FIT_CONTROL, panelFitterControl);
+		} else {
+			// Disable panel fitting, but enable 8 to 6-bit dithering
+			write32(INTEL_PANEL_FIT_CONTROL, 0x4);
+				// TODO: do not do this if the connected panel is 24-bit
+				// (I don't know how to detect that)
+		}
 	}
-#endif
 
 	// Set fCurrentMode to our set display mode
 	memcpy(&fCurrentMode, target, sizeof(display_mode));

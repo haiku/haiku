@@ -993,7 +993,11 @@ struct intel_free_graphics_memory {
 #define PCH_PANEL_FITTER_H_SCALE		0x90
 
 #define PANEL_FITTER_ENABLED			(1 << 31)
-#define PANEL_FITTER_FILTER_MASK		(3 << 23)
+#define PANEL_FITTER_PIPE_MASK			(3 << 29)
+#define PANEL_FITTER_PIPE_A				(0 << 29)
+#define PANEL_FITTER_PIPE_B				(1 << 29)
+#define PANEL_FITTER_SCALING_MODE_MASK	(7 << 26)
+#define PANEL_FITTER_FILTER_MASK		(3 << 24)
 
 struct overlay_scale {
 	uint32 _reserved0 : 3;

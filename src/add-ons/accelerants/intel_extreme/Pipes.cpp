@@ -171,7 +171,7 @@ Pipe::_ConfigureTranscoder(display_mode* target)
 
 
 void
-Pipe::ConfigureTimings(display_mode* target)
+Pipe::ConfigureTimings(display_mode* target, bool hardware)
 {
 	CALLED();
 
@@ -185,7 +185,7 @@ Pipe::ConfigureTimings(display_mode* target)
 	/* If there is a transcoder, leave the display at its native resolution,
 	 * and configure only the transcoder (panel fitting will match them
 	 * together). */
-	if (!fHasTranscoder)
+	if (!fHasTranscoder && hardware)
 	{
 		// update timing (fPipeOffset bumps the DISPLAY_A to B when needed)
 		write32(INTEL_DISPLAY_A_HTOTAL + fPipeOffset,
