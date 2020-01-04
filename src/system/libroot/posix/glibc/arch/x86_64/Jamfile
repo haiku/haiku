@@ -32,7 +32,7 @@ local genericSources =
 	mplog.c mpsqrt.c mptan.c sincos32.c slowexp.c slowpow.c
 
 	e_acos.c e_acosf.c e_acosh.c e_acoshf.c e_acoshl.c e_asin.c e_asinf.c
-	e_asinl.c e_atan2f.c e_atanh.c e_atanhf.c e_atanhl.c e_cosh.c
+	e_asinl.c e_atan2.c e_atan2f.c e_atanh.c e_atanhf.c e_atanhl.c e_cosh.c
 	e_coshf.c e_coshl.c e_exp.c e_exp10.c e_exp10f.c e_exp10l.c e_exp2.c
 	e_exp2f.c e_expf.c e_fmod.c e_fmodf.c e_gamma_r.c e_gammaf_r.c e_gammal_r.c
 	e_hypot.c e_hypotf.c e_hypotl.c e_ilogbl.c e_j0.c e_j0f.c e_j0l.c e_j1.c
@@ -84,17 +84,15 @@ local genericSources =
 	w_tgammal.c
 	;
 
-local x86Sources = e_atan2.S ;
-
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup x86_64 ] {
 	on $(architectureObject) {
 		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
 		MergeObject <$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_e.o :
-			e_acosl.c $(x86Sources) e_atan2l.c e_exp2l.S e_expl.S e_fmodl.S
-			e_log10l.S e_log2l.S e_logl.S e_powl.S e_remainderl.S e_rem_pio2l.c
-			e_scalbl.S e_sqrt.c e_sqrtf.c e_sqrtl.c
+			e_acosl.c e_atan2l.c e_exp2l.S e_expl.S e_fmodl.S e_log10l.S
+			e_log2l.S e_logl.S e_powl.S e_remainderl.S e_rem_pio2l.c e_scalbl.S
+			e_sqrt.c e_sqrtf.c e_sqrtl.c
 			;
 
 
@@ -139,10 +137,6 @@ for architectureObject in [ MultiArchSubDirSetup x86_64 ] {
 			<$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_other.o
 			<$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_generic.o
 			;
-
-		SEARCH on [ FGristFiles $(x86Sources) ]
-			= [ FDirName $(HAIKU_TOP) src system libroot posix glibc arch x86 ] ;
-
 
 		SEARCH on [ FGristFiles $(genericSources) ]
 			= [ FDirName $(HAIKU_TOP) src system libroot posix glibc arch
