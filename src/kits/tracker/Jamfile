@@ -143,6 +143,7 @@ DoCatalogs libtracker.so :
 	Tracker.cpp
 	TrackerInitialState.cpp
 	TrackerSettingsWindow.cpp
+	VirtualDirectoryWindow.cpp
 	WidgetAttributeText.cpp
 ;
 
