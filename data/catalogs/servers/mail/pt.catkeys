@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Be-POST	2370492867
+1	portuguese	x-vnd.Be-POST	75185538
 No new messages	MailDaemon		Sem mensagens novas
 No new messages	DeskbarView		Sem mensagens novas
 Shutdown mail services	DeskbarView		Desligar serviços de correio
@@ -14,3 +14,4 @@ New Messages	MailDaemon		Mensagens Novas
 Check for mails only	DeskbarView		Verificar apenas o correio
 Check for mail now	DeskbarView		Verificar correio agora
 Sending mail for %name	Notifier		A enviar correio para %name
+Mail daemon status log	MailDaemon		Registo de estado do serviço de correio

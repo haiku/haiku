@@ -5,7 +5,7 @@ OK	LaunchBox		Tamam
 Ignore double-click	LaunchBox		Çift tıklamayı yoksay
 Show on all workspaces	LaunchBox		Tüm çalışma alanlarında göster
 Name Panel	LaunchBox		Ad paneli
-Autostart	LaunchBox		Kendiliğinden başlat
+Autostart	LaunchBox		Sistem açılırken başlat
 Clone	LaunchBox		Aynısından ekle
 Description for '%3'	LaunchBox		'%3' için açıklama
 Show window border	LaunchBox		Pencere kenarlığını göster

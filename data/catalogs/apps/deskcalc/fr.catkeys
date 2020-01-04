@@ -1,24 +1,24 @@
 1	french	x-vnd.Haiku-DeskCalc	3990157744
-cos	CalcView		cos
 acos	CalcView		acos
-floor	CalcView		Ent
-sin	CalcView		sin
 sinh	CalcView		sinh
-tanh	CalcView		tanh
 cosh	CalcView		cosh
-ln	CalcView		ln
-Compact	CalcView		Compact
-Calculating	CalcView		Calcul en cours
-Enable Num Lock on startup	CalcView		Verrouiller le pavé numérique au démarrage
-Scientific	CalcView		Scientifique
 log	CalcView		log
-sqrt	CalcView		√
 asin	CalcView		asin
 Radians	CalcView		Radians
-tan	CalcView		tan
 exp	CalcView		exp
-Audio Feedback	CalcView		Échos sonores
 atan	CalcView		atan
-DeskCalc	System name		Calculatrice
 Degrees	CalcView		Degrés
+cos	CalcView		cos
+sin	CalcView		sin
+floor	CalcView		Ent
+tanh	CalcView		tanh
+ln	CalcView		ln
+Calculating	CalcView		Calcul en cours
+Compact	CalcView		Compact
+Enable Num Lock on startup	CalcView		Verrouiller le pavé numérique au démarrage
+Scientific	CalcView		Scientifique
+sqrt	CalcView		√
+tan	CalcView		tan
+Audio Feedback	CalcView		Échos sonores
+DeskCalc	System name		Calculatrice
 Basic	CalcView		Basique

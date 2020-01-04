@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-WebPositive	2763299522
+1	friulian	x-vnd.Haiku-WebPositive	1879106286
 Authentication required	Authentication Panel		Autenticazion necessarie
 Previous	WebPositive Window		Precedent
 (Finish: %date)	Download Window		(Terminât: %date)
@@ -28,7 +28,9 @@ Start page:	Settings Window		Pagjine di inizi:
 Cancel	Download Window		Anule
 Settings	Settings Window		Impostazions
 Downloads	WebPositive Window		File discjariâts
+Browse…	Settings Window		Esplore…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Un segnelibri par cheste pagjine (%bookmarkName) al esist za.
+Resume prior session	Settings Window		Ripie la session precedente
 Match case	WebPositive Window		Corispondence maiusc./minusc.
 Proxy password:	Settings Window		Peraule di ordin dal proxy:
 Size:	Font Selection view		Dimension:
@@ -119,6 +121,7 @@ Remember username and password for this site	Authentication Panel		Visâsi non u
 (Finish: %date - %duration left)	Download Window		(Fin: %date - a mancjin %duration)
 Cookie manager	Cookie Manager		Gjestôr dai Cookie
 Show home button	Settings Window		Mostre boton di inizi
+Start new session	Settings Window		Tache une gnove session
 The cookie jar is empty!	Cookie Manager		Il bussulot dai biscots al è vueit!
 Value	Cookie Manager		Valôr
 Remove missing	Download Window		Gjave mancjants
@@ -141,6 +144,7 @@ Settings	WebPositive Window		Impostazions
 Clear	URL Bar		Nete
 Loading %url	WebPositive Window		Daûr a cjariâ %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Ogni mês si fâs la lune, ogni dì si impare une.
+Start up:	Settings Window		Inviament:
 Confirmation	WebPositive Window		Conferme
 Session cookie	Cookie Manager		Cookie di session
 Open all	WebPositive Window		Vierç ducj

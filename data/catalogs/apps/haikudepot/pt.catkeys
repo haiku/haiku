@@ -14,7 +14,7 @@ The response to the captcha was incorrect.	ServerHelper		A resposta ao captcha e
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Ao atualizar os dados de pacotes, surgiu um problema que pode causar a apresentação de dados desatualizados ou em falta. Nos ficheiros de registo da aplicação é possível obter mais detalhes sobre este problema.
 Develop packages	MainWindow		Pacotes de desenvolvimento
 Rate package…	PackageInfoView		Avaliar pacote…
-Starting the package daemon failed:\n\n%Error%	App		Falhou a inicialização do package daemon:\n\n%Erro%
+Starting the package daemon failed:\n\n%Error%	App		Falhou a inicialização do serviço de pacotes:\n\n%Erro%
 <no info>	PackageInfoView		<sem informação>
 No user ratings available.	PackageInfoView		Não há avaliações de utilizadores disponíveis.
 The user name needs to be at least 3 letters long.	UserLoginWindow		O nome de utilizador tem de ter, no mínimo, 3 letras.
@@ -65,7 +65,7 @@ Your rating was uploaded successfully. You can update or remove it at the HaikuD
 Network Error	ServerHelper		Erro de Rede
 Available	PackageListView		Disponível
 Cancel	UserLoginWindow		Cancelar
-HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		O HaikuDepot requer o package daemon para funcionar, mas parece que ele não está em execução.\nDeseja iniciá-lo agora?
+HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		O HaikuDepot requer o serviço de pacotes para funcionar, mas parece que ele não está em execução.\nDeseja iniciá-lo agora?
 Click a package to view information	PackageInfoView		Clique num pacote para visualizar a informação
 Contents	PackageInfoView		Conteúdo
 Close	PackageManager		Fechar
@@ -82,7 +82,7 @@ All packages	PackageListView		Todos os pacotes
 Network Transport Error	ServerHelper		Erro de Transporte de Rede
 Stability	RatePackageWindow		Estabilidade
 Send	RatePackageWindow		Enviar
-Start package daemon	App		Iniciar package daemon
+Start package daemon	App		Iniciar serviço de pacotes
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		A palavra-passe é inválida ou demasiado fraca. Por favor, utilize pelo menos 8 caracteres, incluindo pelo menos 2 números e 2 letras maiúsculas.
 The package action could not be scheduled: %Error%	PackageInfoView		A ação do pacote não pôde ser agendada: %Error%
 Cancel	RatePackageWindow		Cancelar
@@ -95,7 +95,7 @@ OK	PackageInfoView		OK
 Downloading:	PackageInfoView		A descarregar:
 Success	UserLoginWindow		Sucesso
 It responded with: %message%	UserLoginWindow		Respondeu com: %message%
-Package daemon problem	App		Problema do package daemon
+Package daemon problem	App		Problema do serviço de pacotes
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Repositório
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (versão %hd.version%)

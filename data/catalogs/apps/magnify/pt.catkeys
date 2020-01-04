@@ -1,6 +1,9 @@
-1	portuguese	x-vnd.Haiku-Magnify	94607167
+1	portuguese	x-vnd.Haiku-Magnify	1248284405
+  size must be > 4 and a multiple of 4	Console		  tamanho deve ser > 4 e um múltiplo de 4
 Decrease pixel size	Magnify-Main		Diminuir tamanho do pixel
+no clip msg	In console, when clipboard is empty after clicking Copy image		no clip msg
 Increase pixel size	Magnify-Main		Aumentar tamanho do pixel
+magnify: size must be a multiple of 4	Console		magnify: tamanho deve ser um múltiplo de 4
 Stick coordinates	Magnify-Main		Coordenadas fixas
 %width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}
 Copy image	Magnify-Main		Copiar imagem
@@ -8,6 +11,7 @@ Decrease window size	Magnify-Main		Diminuir tamanho da janela
 Remove a crosshair	Magnify-Main		Remover uma mira
 Add a crosshair	Magnify-Main		Adicionar uma mira
 Freeze image	Magnify-Main		Congelar imagem
+usage: magnify [size] (magnify size * size pixels)	Console		utilização: magnify [tamanho] (ampliar tamanho * tamanho pixels)
 Increase window size	Magnify-Main		Aumentar tamanho da janela
 Save image	Magnify-Main		Guardar imagem
 Show grid	Magnify-Main		Mostrar grelha

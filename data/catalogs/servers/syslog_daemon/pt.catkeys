@@ -1,0 +1,4 @@
+1	portuguese	x-vnd.Haiku-SystemLogger	57960782
+Syslog Daemon	SyslogDaemon		Serviço de Registo do Sistema
+OK	SyslogDaemon		OK
+%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nEste serviço é responsável por recolher todas as mensagens de sistema e escreve-las no ficheiro de registo global do sistema em \"%s\".\n\n

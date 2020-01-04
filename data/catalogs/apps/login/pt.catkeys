@@ -1,15 +1,18 @@
-1	portuguese	x-vnd.Haiku-Login	1930903997
+1	portuguese	x-vnd.Haiku-Login	336867745
 Invalid login!	Login View		Acesso inválido!
 Error	Login App		Erro
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tIniciar no modo de edição de shell para permitir personalizar a área de trabalho.\n
 Welcome to Haiku	Login Window		Bem-vindo ao Haiku
 Halt	Login View		Suspender
 Login application for Haiku\nUsage:\n	Login App		Aplicação de autenticação para Haiku\nUtilização:\n
+--nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tNão tornar modal a janela\n
 Desktop	Desktop Window		Área de Trabalho
 Hide password	Login View		Esconder palavra-passe
 Reboot	Login View		Reiniciar
 You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Pode personalizar a secretária apresentada por detrás da Aplicação de Autenticação largando replicantes nela..\n\nQuanto tiver terminado, basta sair da aplicação (Cmd-Q).
 OK	Login View		OK
 Info	Login App		Informação
+Login:	Login View		Autenticação:
 Password:	Login View		Palavra-passe:
 Unimplemented	Login App		Não implementado
 OK	Login App		OK

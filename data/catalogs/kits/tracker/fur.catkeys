@@ -1,5 +1,6 @@
-1	friulian	x-vnd.Haiku-libtracker	1751940171
+1	friulian	x-vnd.Haiku-libtracker	3461847187
 Created	ContainerWindow		Creât
+Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
 Kind	ContainerWindow		Gjenar
 Open with…	ContainerWindow		Vierç cun…
@@ -20,6 +21,7 @@ contains	FindPanel		al conten
 Open	FilePanelPriv		Vierç
 Bitmap icon	AttributesView		Icone Bitmap
 You can't replace a folder with one of its sub-folders.	FSUtils		No si pues sostituî une cartele cuntune des sôs sot-cartelis.
+<%ld dates>	AttributesView		<%ld datis>
 Name	Default Query Columns		Non
 Unmount	ContainerWindow		Dismonte
 Eject when unmounting	AutoMounterSettings		Pare fûr une volte che al è dismontât
@@ -47,6 +49,7 @@ Preparing to move items…	StatusWindow		Daûr a prontâ il spostament dai eleme
 Size	ContainerWindow		Dimension
 Select…	ContainerWindow		Selezione…
 Show shared volumes on Desktop	SettingsView		Mostre i volums condividûts sul Scritori
+<%ld values>	AttributesView		<%ld valôrs>
 Size	PoseView		Dimension
 matches wildcard expression	SelectionWindow		al coincît cu la espression cun matis (*)
 96 x 96	ContainerWindow		96 x 96
@@ -96,6 +99,7 @@ Link to:	InfoWindow		Colegament a:
 Copy here	ContainerWindow		Copie chi
 Character	AttributesView		Caratar
 All disks	FindPanel		Ducj i discs
+Affine transform	AttributesView		Trasformazion simile
 Window	ContainerWindow		Barcon
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Gjave
@@ -160,8 +164,10 @@ There was an error writing the attribute.	WidgetAttributeText		Si è presentât 
 Path	Default Query Columns		Percors
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Se si cambie non a %target, %osName al podaès funzionâ mâl!\n\nContinuâ pardabon?
 Could not open \"%name\" (%error). 	FSUtils		Nol è stât pussibil vierzi \"%name\" (%error). 
+Media parameter group	AttributesView		Grup di parametris multimediâi
 %name info	InfoWindow	InfoWindow Title	Informazions su %name
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Se si sposte la cartele home (chê personâl), %osName al podarès funzionâ mâl!\n\nContinuâ pardabon?\n\nPar spostâ distès la cartele home, ten fracât il tast Maiusc e fâs clic su \"Sposte\".
+Property info	AttributesView		Informazions de proprietât
 Sorry, you can't create links in the Trash.	PoseView		No si pues creâ un colegament te Scovacere.
 From	Email Query Columns		Di
 Invert selection	QueryContainerWindow		Invertìs selezion
@@ -315,6 +321,7 @@ Would you like to find some other suitable application?	FSUtils		Cirî cualchi a
 *+? operand may be empty.	libtracker		la cuantitât de operazion *+? e podarès jessi vueide.
 (unknown)	AttributesView		(no cognossût)
 Recent folders	FavoritesMenu		Cartelis resintis
+Signed memory size	AttributesView		Dimension memorie cun segn
 The specified name is illegal. Please choose another name.	FilePanelPriv		Il non specificât al è illegâl. Par plasê, sielç un altri non.
 of %items	StatusWindow		di %items
 less than	FindPanel		mancul di
@@ -349,7 +356,9 @@ The selected item cannot be moved to the Trash. Would you like to delete it inst
 Copy	ContainerWindow		Copie
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Mi displâs, l'atribût 'Character' nol pues contignî un glif a plui byte.
 And	FindPanel		E
+Palette-indexed picture	AttributesView		Imagjin cun palete intabelade
 multiple disks	FindPanel		plui discs
+Drawing pattern	AttributesView		Trame
 Name = %name	FindPanel	FindResultTitle	Non = %name
 Subject	Email Query Columns		Ogjet
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Erôr tal copiâ la cartele \"%name\":\n\t%error\n\nContinuâ?
@@ -491,6 +500,7 @@ Move to Trash	FSUtils		Sposte te Scovacere
 Handles %type	OpenWithWindow		Al gjestìs %type
 Cancel	PoseView		Anule
 Delete	PoseView		Elimine
+Media parameter	AttributesView		Parametri multimediâl
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se si modifiche la cartele home (chê personâl), %osName al funzionarà mâl!\n\nContinuâ pardabon?\n\nPar modificâ distès la cartele home, ten fracât il tast Maiusc e fâs clic su \"O sai ce che o fâs\".
 Sorry, you can't copy items to the Trash.	PoseView		Nol è pussibil copiâ i elements te Scovacere.
 New folder	FilePanelPriv		Gnove cartele

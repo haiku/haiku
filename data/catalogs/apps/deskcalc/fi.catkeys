@@ -1,30 +1,29 @@
-1	finnish	x-vnd.Haiku-DeskCalc	2904979661
-cos	CalcView		cos
+1	finnish	x-vnd.Haiku-DeskCalc	3968679316
 acos	CalcView		acos
-7   8   9   (   )  \n4   5   6   *   /  \n1   2   3   +   -  \n0   .   BS  =   C  \n	CalcView		7   8   9   (   )  \n4   5   6   *   /  \n1   2   3   +   -  \n0   .   BS  =   C  \n
-C	CalcView	Key label, 'C' means clear	C
 ceil	CalcView		ceil
 cbrt	CalcView		cbrt
-BS	CalcView	Key label, 'BS' means backspace	BS
-floor	CalcView		floor
-sin	CalcView		sin
 sinh	CalcView		sinh
-tanh	CalcView		tanh
+BS	CalcView	Key label, 'BS' means backspace	BS
 cosh	CalcView		cosh
-ln	CalcView		ln
-Compact	CalcView		Taskulaskin
-Calculating	CalcView		Lasketaan
-Enable Num Lock on startup	CalcView		Ota käyttöön ”Num Lock”-asetukset käynnistettäessä
-Scientific	CalcView		Tieteislaskin
 log	CalcView		log
-sqrt	CalcView		sqrt
 asin	CalcView		asin
 Radians	CalcView		Radiaanit
-tan	CalcView		tan
 exp	CalcView		exp
-Audio Feedback	CalcView		Äänipalaute
 atan	CalcView		atan
-ln    sin   cos   tan   π    \nlog   asin  acos  atan  sqrt \nexp   sinh  cosh  tanh  cbrt \n!     ceil  floor E     ^    \n7     8     9     (     )    \n4     5     6     *     /    \n1     2     3     +     -    \n0     .     BS    =     C    \n	CalcView		ln    sin   cos   tan   π    \nlog   asin  acos  atan  sqrt \nexp   sinh  cosh  tanh  cbrt \n!     ceil  floor E     ^    \n7     8     9     (     )    \n4     5     6     *     /    \n1     2     3     +     -    \n0     .     BS    =     C    \n
-DeskCalc	System name		Työpöytälaskin
 Degrees	CalcView		Asteet
+cos	CalcView		cos
+BS	CalcView		BS
+C	CalcView	Key label, 'C' means clear	C
+sin	CalcView		sin
+floor	CalcView		floor
+tanh	CalcView		tanh
+ln	CalcView		ln
+Calculating	CalcView		Lasketaan
+Compact	CalcView		Taskulaskin
+Enable Num Lock on startup	CalcView		Ota käyttöön ”Num Lock”-asetukset käynnistettäessä
+Scientific	CalcView		Tieteislaskin
+sqrt	CalcView		sqrt
+tan	CalcView		tan
+Audio Feedback	CalcView		Äänipalaute
+DeskCalc	System name		Työpöytälaskin
 Basic	CalcView		Peruslaskin
