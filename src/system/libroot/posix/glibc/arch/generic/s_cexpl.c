@@ -38,10 +38,10 @@ __cexpl (__complex__ long double x)
       if (icls >= FP_ZERO)
 	{
 	  /* Imaginary part is finite.  */
-	  long double exp_val = __ieee754_expl (__real__ x);
+	  long double exp_val = expl (__real__ x);
 	  long double sinix, cosix;
 
-	  __sincosl (__imag__ x, &sinix, &cosix);
+	  sincosl (__imag__ x, &sinix, &cosix);
 
 	  if (isfinite (exp_val))
 	    {
@@ -50,16 +50,16 @@ __cexpl (__complex__ long double x)
 	    }
 	  else
 	    {
-	      __real__ retval = __copysignl (exp_val, cosix);
-	      __imag__ retval = __copysignl (exp_val, sinix);
+	      __real__ retval = copysignl (exp_val, cosix);
+	      __imag__ retval = copysignl (exp_val, sinix);
 	    }
 	}
       else
 	{
 	  /* If the imaginary part is +-inf or NaN and the real part
 	     is not +-inf the result is NaN + iNaN.  */
-	  __real__ retval = __nanl ("");
-	  __imag__ retval = __nanl ("");
+	  __real__ retval = nanl ("");
+	  __imag__ retval = nanl ("");
 
 #ifdef FE_INVALID
 	  feraiseexcept (FE_INVALID);
@@ -84,16 +84,16 @@ __cexpl (__complex__ long double x)
 	    {
 	      long double sinix, cosix;
 
-	      __sincosl (__imag__ x, &sinix, &cosix);
+	      sincosl (__imag__ x, &sinix, &cosix);
 
-	      __real__ retval = __copysignl (value, cosix);
-	      __imag__ retval = __copysignl (value, sinix);
+	      __real__ retval = copysignl (value, cosix);
+	      __imag__ retval = copysignl (value, sinix);
 	    }
 	}
       else if (signbit (__real__ x) == 0)
 	{
 	  __real__ retval = HUGE_VALL;
-	  __imag__ retval = __nanl ("");
+	  __imag__ retval = nanl ("");
 
 #ifdef FE_INVALID
 	  if (icls == FP_INFINITE)
@@ -103,14 +103,14 @@ __cexpl (__complex__ long double x)
       else
 	{
 	  __real__ retval = 0.0;
-	  __imag__ retval = __copysignl (0.0, __imag__ x);
+	  __imag__ retval = copysignl (0.0, __imag__ x);
 	}
     }
   else
     {
       /* If the real part is NaN the result is NaN + iNaN.  */
-      __real__ retval = __nanl ("");
-      __imag__ retval = __nanl ("");
+      __real__ retval = nanl ("");
+      __imag__ retval = nanl ("");
 
 #ifdef FE_INVALID
       if (rcls != FP_NAN || icls != FP_NAN)

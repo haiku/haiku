@@ -41,11 +41,11 @@ __csinf (__complex__ float x)
       if (rcls >= FP_ZERO)
 	{
 	  /* Real part is finite.  */
-	  float sinh_val = __ieee754_sinhf (__imag__ x);
-	  float cosh_val = __ieee754_coshf (__imag__ x);
+	  float sinh_val = sinhf (__imag__ x);
+	  float cosh_val = coshf (__imag__ x);
 	  float sinix, cosix;
 
-	  __sincosf (__real__ x, &sinix, &cosix);
+	  sincosf (__real__ x, &sinix, &cosix);
 
 	  __real__ retval = cosh_val * sinix;
 	  __imag__ retval = sinh_val * cosix;
@@ -58,7 +58,7 @@ __csinf (__complex__ float x)
 	  if (icls == FP_ZERO)
 	    {
 	      /* Imaginary part is 0.0.  */
-	      __real__ retval = __nanf ("");
+	      __real__ retval = nanf ("");
 	      __imag__ retval = __imag__ x;
 
 #ifdef FE_INVALID
@@ -68,8 +68,8 @@ __csinf (__complex__ float x)
 	    }
 	  else
 	    {
-	      __real__ retval = __nanf ("");
-	      __imag__ retval = __nanf ("");
+	      __real__ retval = nanf ("");
+	      __imag__ retval = nanf ("");
 
 #ifdef FE_INVALID
 	      feraiseexcept (FE_INVALID);
@@ -83,7 +83,7 @@ __csinf (__complex__ float x)
       if (rcls == FP_ZERO)
 	{
 	  /* Real part is 0.0.  */
-	  __real__ retval = __copysignf (0.0, negate ? -1.0 : 1.0);
+	  __real__ retval = copysignf (0.0, negate ? -1.0 : 1.0);
 	  __imag__ retval = __imag__ x;
 	}
       else if (rcls > FP_ZERO)
@@ -91,10 +91,10 @@ __csinf (__complex__ float x)
 	  /* Real part is finite.  */
 	  float sinix, cosix;
 
-	  __sincosf (__real__ x, &sinix, &cosix);
+	  sincosf (__real__ x, &sinix, &cosix);
 
-	  __real__ retval = __copysignf (HUGE_VALF, sinix);
-	  __imag__ retval = __copysignf (HUGE_VALF, cosix);
+	  __real__ retval = copysignf (HUGE_VALF, sinix);
+	  __imag__ retval = copysignf (HUGE_VALF, cosix);
 
 	  if (negate)
 	    __real__ retval = -__real__ retval;
@@ -104,7 +104,7 @@ __csinf (__complex__ float x)
       else
 	{
 	  /* The addition raises the invalid exception.  */
-	  __real__ retval = __nanf ("");
+	  __real__ retval = nanf ("");
 	  __imag__ retval = HUGE_VALF;
 
 #ifdef FE_INVALID
@@ -116,10 +116,10 @@ __csinf (__complex__ float x)
   else
     {
       if (rcls == FP_ZERO)
-	__real__ retval = __copysignf (0.0, negate ? -1.0 : 1.0);
+	__real__ retval = copysignf (0.0, negate ? -1.0 : 1.0);
       else
-	__real__ retval = __nanf ("");
-      __imag__ retval = __nanf ("");
+	__real__ retval = nanf ("");
+      __imag__ retval = nanf ("");
     }
 
   return retval;

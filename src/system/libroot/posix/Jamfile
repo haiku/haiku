@@ -62,3 +62,4 @@ SubInclude HAIKU_TOP src system libroot posix unistd ;
 SubInclude HAIKU_TOP src system libroot posix wchar ;
 
 SubInclude HAIKU_TOP src system libroot posix glibc ;
+SubInclude HAIKU_TOP src system libroot posix musl ;

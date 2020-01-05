@@ -34,8 +34,8 @@ __ctanhl (__complex__ long double x)
     {
       if (__isinfl (__real__ x))
 	{
-	  __real__ res = __copysignl (1.0, __real__ x);
-	  __imag__ res = __copysignl (0.0, __imag__ x);
+	  __real__ res = copysignl (1.0, __real__ x);
+	  __imag__ res = copysignl (0.0, __imag__ x);
 	}
       else if (__imag__ x == 0.0)
 	{
@@ -43,8 +43,8 @@ __ctanhl (__complex__ long double x)
 	}
       else
 	{
-	  __real__ res = __nanl ("");
-	  __imag__ res = __nanl ("");
+	  __real__ res = nanl ("");
+	  __imag__ res = nanl ("");
 
 #ifdef FE_INVALID
 	  if (__isinfl (__imag__ x))
@@ -57,11 +57,11 @@ __ctanhl (__complex__ long double x)
       long double sin2ix, cos2ix;
       long double den;
 
-      __sincosl (2.0 * __imag__ x, &sin2ix, &cos2ix);
+      sincosl (2.0 * __imag__ x, &sin2ix, &cos2ix);
 
-      den = (__ieee754_coshl (2.0 * __real__ x) + cos2ix);
+      den = (coshl (2.0 * __real__ x) + cos2ix);
 
-      __real__ res = __ieee754_sinhl (2.0 * __real__ x) / den;
+      __real__ res = sinhl (2.0 * __real__ x) / den;
       __imag__ res = sin2ix / den;
     }
 

@@ -35,13 +35,13 @@ __casinl (__complex__ long double x)
 	}
       else if (__isinfl (__real__ x) || __isinfl (__imag__ x))
 	{
-	  __real__ res = __nanl ("");
-	  __imag__ res = __copysignl (HUGE_VALL, __imag__ x);
+	  __real__ res = nanl ("");
+	  __imag__ res = copysignl (HUGE_VALL, __imag__ x);
 	}
       else
 	{
-	  __real__ res = __nanl ("");
-	  __imag__ res = __nanl ("");
+	  __real__ res = nanl ("");
+	  __imag__ res = nanl ("");
 	}
     }
   else

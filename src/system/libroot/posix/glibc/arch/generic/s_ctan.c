@@ -34,8 +34,8 @@ __ctan (__complex__ double x)
     {
       if (__isinf (__imag__ x))
 	{
-	  __real__ res = __copysign (0.0, __real__ x);
-	  __imag__ res = __copysign (1.0, __imag__ x);
+	  __real__ res = copysign (0.0, __real__ x);
+	  __imag__ res = copysign (1.0, __imag__ x);
 	}
       else if (__real__ x == 0.0)
 	{
@@ -43,8 +43,8 @@ __ctan (__complex__ double x)
 	}
       else
 	{
-	  __real__ res = __nan ("");
-	  __imag__ res = __nan ("");
+	  __real__ res = nan ("");
+	  __imag__ res = nan ("");
 
 #ifdef FE_INVALID
 	  if (__isinf (__real__ x))
@@ -57,12 +57,12 @@ __ctan (__complex__ double x)
       double sin2rx, cos2rx;
       double den;
 
-      __sincos (2.0 * __real__ x, &sin2rx, &cos2rx);
+      sincos (2.0 * __real__ x, &sin2rx, &cos2rx);
 
-      den = cos2rx + __ieee754_cosh (2.0 * __imag__ x);
+      den = cos2rx + cosh (2.0 * __imag__ x);
 
       __real__ res = sin2rx / den;
-      __imag__ res = __ieee754_sinh (2.0 * __imag__ x) / den;
+      __imag__ res = sinh (2.0 * __imag__ x) / den;
     }
 
   return res;

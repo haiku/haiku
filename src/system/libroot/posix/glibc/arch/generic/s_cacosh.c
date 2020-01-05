@@ -36,9 +36,9 @@ __cacosh (__complex__ double x)
 	  __real__ res = HUGE_VAL;
 
 	  if (rcls == FP_NAN)
-	    __imag__ res = __nan ("");
+	    __imag__ res = nan ("");
 	  else
-	    __imag__ res = __copysign ((rcls == FP_INFINITE
+	    __imag__ res = copysign ((rcls == FP_INFINITE
 					? (__real__ x < 0.0
 					   ? M_PI - M_PI_4 : M_PI_4)
 					: M_PI_2), __imag__ x);
@@ -48,21 +48,21 @@ __cacosh (__complex__ double x)
 	  __real__ res = HUGE_VAL;
 
 	  if (icls >= FP_ZERO)
-	    __imag__ res = __copysign (signbit (__real__ x) ? M_PI : 0.0,
+	    __imag__ res = copysign (signbit (__real__ x) ? M_PI : 0.0,
 				       __imag__ x);
 	  else
-	    __imag__ res = __nan ("");
+	    __imag__ res = nan ("");
 	}
       else
 	{
-	  __real__ res = __nan ("");
-	  __imag__ res = __nan ("");
+	  __real__ res = nan ("");
+	  __imag__ res = nan ("");
 	}
     }
   else if (rcls == FP_ZERO && icls == FP_ZERO)
     {
       __real__ res = 0.0;
-      __imag__ res = __copysign (M_PI_2, __imag__ x);
+      __imag__ res = copysign (M_PI_2, __imag__ x);
     }
   else
     {

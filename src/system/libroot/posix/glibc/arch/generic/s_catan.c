@@ -35,26 +35,26 @@ __catan (__complex__ double x)
     {
       if (rcls == FP_INFINITE)
 	{
-	  __real__ res = __copysign (M_PI_2, __real__ x);
-	  __imag__ res = __copysign (0.0, __imag__ x);
+	  __real__ res = copysign (M_PI_2, __real__ x);
+	  __imag__ res = copysign (0.0, __imag__ x);
 	}
       else if (icls == FP_INFINITE)
 	{
 	  if (rcls >= FP_ZERO)
-	    __real__ res = __copysign (M_PI_2, __real__ x);
+	    __real__ res = copysign (M_PI_2, __real__ x);
 	  else
-	    __real__ res = __nan ("");
-	  __imag__ res = __copysign (0.0, __imag__ x);
+	    __real__ res = nan ("");
+	  __imag__ res = copysign (0.0, __imag__ x);
 	}
       else if (icls == FP_ZERO || icls == FP_INFINITE)
 	{
-	  __real__ res = __nan ("");
-	  __imag__ res = __copysign (0.0, __imag__ x);
+	  __real__ res = nan ("");
+	  __imag__ res = copysign (0.0, __imag__ x);
 	}
       else
 	{
-	  __real__ res = __nan ("");
-	  __imag__ res = __nan ("");
+	  __real__ res = nan ("");
+	  __imag__ res = nan ("");
 	}
     }
   else if (rcls == FP_ZERO && icls == FP_ZERO)
@@ -69,7 +69,7 @@ __catan (__complex__ double x)
 
       den = 1 - r2 - __imag__ x * __imag__ x;
 
-      __real__ res = 0.5 * __ieee754_atan2 (2.0 * __real__ x, den);
+      __real__ res = 0.5 * atan2 (2.0 * __real__ x, den);
 
       num = __imag__ x + 1.0;
       num = r2 + num * num;
@@ -77,7 +77,7 @@ __catan (__complex__ double x)
       den = __imag__ x - 1.0;
       den = r2 + den * den;
 
-      __imag__ res = 0.25 * __ieee754_log (num / den);
+      __imag__ res = 0.25 * log (num / den);
     }
 
   return res;

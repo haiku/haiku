@@ -35,13 +35,13 @@ __casin (__complex__ double x)
 	}
       else if (__isinf (__real__ x) || __isinf (__imag__ x))
 	{
-	  __real__ res = __nan ("");
-	  __imag__ res = __copysign (HUGE_VAL, __imag__ x);
+	  __real__ res = nan ("");
+	  __imag__ res = copysign (HUGE_VAL, __imag__ x);
 	}
       else
 	{
-	  __real__ res = __nan ("");
-	  __imag__ res = __nan ("");
+	  __real__ res = nan ("");
+	  __imag__ res = nan ("");
 	}
     }
   else

@@ -1,0 +1,102 @@
+SubDir HAIKU_TOP src system libroot posix musl math x86 ;
+
+SubDirSysHdrs [ FDirName $(SUBDIR) .. .. include ] ;
+UseHeaders [ FDirName $(SUBDIR) .. .. internal ] ;
+
+local arch ;
+for arch in $(TARGET_ARCHS) {
+	UseHeaders [ FDirName $(SUBDIR) .. .. arch $(arch) ] ;
+}
+UseHeaders [ FDirName $(SUBDIR) .. .. arch generic ] [ FDirName $(SUBDIR) .. ]  ;
+
+
+local generics =
+	acosh.c acoshf.c acoshl.c
+	asinh.c asinhf.c asinhl.c
+	atanh.c atanhf.c atanhl.c
+	cbrt.c cbrtf.c cbrtl.c
+	copysign.c copysignf.c copysignl.c
+	__cos.c cos.c __cosdf.c cosf.c cosh.c coshf.c coshl.c __cosl.c cosl.c
+	erf.c erff.c erfl.c
+	exp10.c exp10f.c exp10l.c __expo2.c __expo2f.c
+	exp_data.c exp2f_data.c
+	fdim.c fdimf.c fdiml.c
+	finite.c finitef.c
+	fma.c fmaf.c fmal.c
+	fmax.c fmaxf.c fmaxl.c
+	fmin.c fminf.c fminl.c
+	__fpclassify.c __fpclassifyf.c __fpclassifyl.c
+	frexp.c frexpf.c frexpl.c
+	hypotl.c
+	ilogb.c ilogbf.c ilogbl.c
+	j0.c j0f.c j1.c j1f.c jn.c jnf.c
+	lgamma.c lgammaf.c lgammaf_r.c lgammal.c lgamma_r.c
+	llround.c llroundf.c llroundl.c
+	log10.c log10f.c
+	logb.c logbf.c logbl.c
+	lround.c lroundf.c lroundl.c
+	__math_divzero.c __math_divzerof.c __math_invalid.c __math_invalidf.c
+	__math_oflow.c __math_oflowf.c __math_uflow.c __math_uflowf.c
+	__math_xflow.c __math_xflowf.c modf.c modff.c modfl.c
+	nan.c nanf.c nanl.c
+	nearbyint.c nearbyintf.c nearbyintl.c
+	nextafter.c nextafterf.c nextafterl.c
+	nexttoward.c nexttowardf.c nexttowardl.c
+	__polevll.c
+	pow.c pow_data.c powf.c powf_data.c powl.c
+	__rem_pio2.c __rem_pio2f.c __rem_pio2_large.c __rem_pio2l.c
+	round.c roundf.c roundl.c
+	scalb.c scalbf.c
+	__signbit.c __signbitf.c __signbitl.c
+	signgam.c
+	significand.c significandf.c
+	__sin.c sin.c sincos.c sincosf.c sincosl.c __sinl.c sinl.c
+	__sindf.c sinf.c sinh.c sinhf.c sinhl.c
+	__tan.c tan.c __tandf.c tanf.c __tanl.c tanl.c
+	tanh.c tanhf.c tanhl.c
+	tgamma.c tgammaf.c tgammal.c
+	;
+
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		if $(architecture) = x86_gcc2 {
+			# GCC 2 miscompiles some of the files in here, so we use GCC 8.
+			original_TARGET_CC_x86_gcc2 = $(TARGET_CC_x86_gcc2) ;
+			TARGET_CC_x86_gcc2 = $(TARGET_CC_x86) -Wa,-mrelax-relocations=no -Wno-unused-but-set-variable ;
+		}
+
+		MergeObject <$(architecture)>posix_musl_math.o :
+			__invtrigl.s
+			acos.s acosl.s acosf.s asin.s asinf.s asinl.s atan.s atan2.s atan2f.s
+			atan2l.s atanf.s atanl.s
+			ceil.s ceilf.s ceill.s
+			exp.s exp2.s exp2f.s exp2l.s expl.s expf.s expm1.s expm1f.s expm1l.s
+			fabs.s fabsf.s fabsl.s floor.s floorf.s floorl.s
+			fmod.s fmodf.s fmodl.s
+			hypot.s hypotf.s
+			ldexp.s ldexpf.s ldexpl.s llrintf.s llrintl.s llrint.s
+			log.s log1p.s log1pf.s log2.s log2f.s log2l.s
+			log10l.s log1pl.s logf.s logl.s lrintf.s lrintl.s lrint.s
+			remainder.s remainderf.s remainderl.s
+			remquo.s remquof.s remquol.s rint.s rintf.s rintl.s
+			scalbln.s scalblnf.s scalblnl.s
+			scalbn.s scalbnf.s scalbnl.s
+			sqrtf.s sqrtl.s sqrt.s
+			truncl.s trunc.s truncf.s
+
+			gamma.c
+
+			$(generics)
+			;
+
+		if $(architecture) = x86_gcc2 {
+			TARGET_CC_x86_gcc2 = $(original_TARGET_CC_x86_gcc2) ;
+		}
+
+
+		SEARCH on [ FGristFiles $(generics) ] = [ FDirName $(SUBDIR) .. ] ;
+	}
+}

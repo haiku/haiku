@@ -23,6 +23,6 @@
 float
 __cabsf (float _Complex z)
 {
-  return __hypotf (__real__ z, __imag__ z);
+  return hypotf (__real__ z, __imag__ z);
 }
 weak_alias (__cabsf, cabsf)

@@ -23,7 +23,7 @@
 double
 __cabs (double _Complex z)
 {
-  return __hypot (__real__ z, __imag__ z);
+  return hypot (__real__ z, __imag__ z);
 }
 weak_alias (__cabs, cabs)
 #ifdef NO_LONG_DOUBLE

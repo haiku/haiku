@@ -35,21 +35,21 @@ __catanhf (__complex__ float x)
     {
       if (icls == FP_INFINITE)
 	{
-	  __real__ res = __copysignf (0.0, __real__ x);
-	  __imag__ res = __copysignf (M_PI_2, __imag__ x);
+	  __real__ res = copysignf (0.0, __real__ x);
+	  __imag__ res = copysignf (M_PI_2, __imag__ x);
 	}
       else if (rcls == FP_INFINITE || rcls == FP_ZERO)
 	{
-	  __real__ res = __copysignf (0.0, __real__ x);
+	  __real__ res = copysignf (0.0, __real__ x);
 	  if (icls >= FP_ZERO)
-	    __imag__ res = __copysignf (M_PI_2, __imag__ x);
+	    __imag__ res = copysignf (M_PI_2, __imag__ x);
 	  else
-	    __imag__ res = __nanf ("");
+	    __imag__ res = nanf ("");
 	}
       else
 	{
-	  __real__ res = __nanf ("");
-	  __imag__ res = __nanf ("");
+	  __real__ res = nanf ("");
+	  __imag__ res = nanf ("");
 	}
     }
   else if (rcls == FP_ZERO && icls == FP_ZERO)
@@ -68,11 +68,11 @@ __catanhf (__complex__ float x)
       den = 1.0 - __real__ x;
       den = i2 + den * den;
 
-      __real__ res = 0.25 * (__ieee754_logf (num) - __ieee754_logf (den));
+      __real__ res = 0.25 * (logf (num) - logf (den));
 
       den = 1 - __real__ x * __real__ x - i2;
 
-      __imag__ res = 0.5 * __ieee754_atan2f (2.0 * __imag__ x, den);
+      __imag__ res = 0.5 * atan2f (2.0 * __imag__ x, den);
     }
 
   return res;

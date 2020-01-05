@@ -41,11 +41,11 @@ __csinl (__complex__ long double x)
       if (rcls >= FP_ZERO)
 	{
 	  /* Real part is finite.  */
-	  long double sinh_val = __ieee754_sinhl (__imag__ x);
-	  long double cosh_val = __ieee754_coshl (__imag__ x);
+	  long double sinh_val = sinhl (__imag__ x);
+	  long double cosh_val = coshl (__imag__ x);
 	  long double sinix, cosix;
 
-	  __sincosl (__real__ x, &sinix, &cosix);
+	  sincosl (__real__ x, &sinix, &cosix);
 
 	  __real__ retval = cosh_val * sinix;
 	  __imag__ retval = sinh_val * cosix;
@@ -58,7 +58,7 @@ __csinl (__complex__ long double x)
 	  if (icls == FP_ZERO)
 	    {
 	      /* Imaginary part is 0.0.  */
-	      __real__ retval = __nanl ("");
+	      __real__ retval = nanl ("");
 	      __imag__ retval = __imag__ x;
 
 #ifdef FE_INVALID
@@ -68,8 +68,8 @@ __csinl (__complex__ long double x)
 	    }
 	  else
 	    {
-	      __real__ retval = __nanl ("");
-	      __imag__ retval = __nanl ("");
+	      __real__ retval = nanl ("");
+	      __imag__ retval = nanl ("");
 
 #ifdef FE_INVALID
 	      feraiseexcept (FE_INVALID);
@@ -83,7 +83,7 @@ __csinl (__complex__ long double x)
       if (rcls == FP_ZERO)
 	{
 	  /* Real part is 0.0.  */
-	  __real__ retval = __copysignl (0.0, negate ? -1.0 : 1.0);
+	  __real__ retval = copysignl (0.0, negate ? -1.0 : 1.0);
 	  __imag__ retval = __imag__ x;
 	}
       else if (rcls > FP_ZERO)
@@ -91,10 +91,10 @@ __csinl (__complex__ long double x)
 	  /* Real part is finite.  */
 	  long double sinix, cosix;
 
-	  __sincosl (__real__ x, &sinix, &cosix);
+	  sincosl (__real__ x, &sinix, &cosix);
 
-	  __real__ retval = __copysignl (HUGE_VALL, sinix);
-	  __imag__ retval = __copysignl (HUGE_VALL, cosix);
+	  __real__ retval = copysignl (HUGE_VALL, sinix);
+	  __imag__ retval = copysignl (HUGE_VALL, cosix);
 
 	  if (negate)
 	    __real__ retval = -__real__ retval;
@@ -104,7 +104,7 @@ __csinl (__complex__ long double x)
       else
 	{
 	  /* The addition raises the invalid exception.  */
-	  __real__ retval = __nanl ("");
+	  __real__ retval = nanl ("");
 	  __imag__ retval = HUGE_VALL;
 
 #ifdef FE_INVALID
@@ -116,10 +116,10 @@ __csinl (__complex__ long double x)
   else
     {
       if (rcls == FP_ZERO)
-	__real__ retval = __copysignl (0.0, negate ? -1.0 : 1.0);
+	__real__ retval = copysignl (0.0, negate ? -1.0 : 1.0);
       else
-	__real__ retval = __nanl ("");
-      __imag__ retval = __nanl ("");
+	__real__ retval = nanl ("");
+      __imag__ retval = nanl ("");
     }
 
   return retval;

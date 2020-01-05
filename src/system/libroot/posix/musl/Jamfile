@@ -1,0 +1,21 @@
+SubDir HAIKU_TOP src system libroot posix musl ;
+
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		MergeObjectFromObjects <$(architecture)>posix_musl.o :
+			:
+			<$(architecture)>posix_musl_math.o
+			<$(architecture)>posix_musl_string.o
+			;
+	}
+}
+
+local arch ;
+for arch in $(TARGET_ARCHS) {
+	HaikuSubInclude math $(arch) ;
+}
+
+HaikuSubInclude string ;

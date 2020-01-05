@@ -38,10 +38,10 @@ __cexpf (__complex__ float x)
       if (icls >= FP_ZERO)
 	{
 	  /* Imaginary part is finite.  */
-	  float exp_val = __ieee754_expf (__real__ x);
+	  float exp_val = expf (__real__ x);
 	  float sinix, cosix;
 
-	  __sincosf (__imag__ x, &sinix, &cosix);
+	  sincosf (__imag__ x, &sinix, &cosix);
 
 	  if (isfinite (exp_val))
 	    {
@@ -50,16 +50,16 @@ __cexpf (__complex__ float x)
 	    }
 	  else
 	    {
-	      __real__ retval = __copysignf (exp_val, cosix);
-	      __imag__ retval = __copysignf (exp_val, sinix);
+	      __real__ retval = copysignf (exp_val, cosix);
+	      __imag__ retval = copysignf (exp_val, sinix);
 	    }
 	}
       else
 	{
 	  /* If the imaginary part is +-inf or NaN and the real part
 	     is not +-inf the result is NaN + iNaN.  */
-	  __real__ retval = __nanf ("");
-	  __imag__ retval = __nanf ("");
+	  __real__ retval = nanf ("");
+	  __imag__ retval = nanf ("");
 
 #ifdef FE_INVALID
 	  feraiseexcept (FE_INVALID);
@@ -84,16 +84,16 @@ __cexpf (__complex__ float x)
 	    {
 	      float sinix, cosix;
 
-	      __sincosf (__imag__ x, &sinix, &cosix);
+	      sincosf (__imag__ x, &sinix, &cosix);
 
-	      __real__ retval = __copysignf (value, cosix);
-	      __imag__ retval = __copysignf (value, sinix);
+	      __real__ retval = copysignf (value, cosix);
+	      __imag__ retval = copysignf (value, sinix);
 	    }
 	}
       else if (signbit (__real__ x) == 0)
 	{
 	  __real__ retval = HUGE_VALF;
-	  __imag__ retval = __nanf ("");
+	  __imag__ retval = nanf ("");
 
 #ifdef FE_INVALID
 	  if (icls == FP_INFINITE)
@@ -103,14 +103,14 @@ __cexpf (__complex__ float x)
       else
 	{
 	  __real__ retval = 0.0;
-	  __imag__ retval = __copysignf (0.0, __imag__ x);
+	  __imag__ retval = copysignf (0.0, __imag__ x);
 	}
     }
   else
     {
       /* If the real part is NaN the result is NaN + iNaN.  */
-      __real__ retval = __nanf ("");
-      __imag__ retval = __nanf ("");
+      __real__ retval = nanf ("");
+      __imag__ retval = nanf ("");
 
 #ifdef FE_INVALID
       if (rcls != FP_NAN || icls != FP_NAN)

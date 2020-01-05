@@ -1,2 +1,0 @@
-/* Nothing to do.  This function is the same as scalbnl.  So we define an
-   alias.  */

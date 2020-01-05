@@ -41,11 +41,11 @@ __csinh (__complex__ double x)
       if (icls >= FP_ZERO)
 	{
 	  /* Imaginary part is finite.  */
-	  double sinh_val = __ieee754_sinh (__real__ x);
-	  double cosh_val = __ieee754_cosh (__real__ x);
+	  double sinh_val = sinh (__real__ x);
+	  double cosh_val = cosh (__real__ x);
 	  double sinix, cosix;
 
-	  __sincos (__imag__ x, &sinix, &cosix);
+	  sincos (__imag__ x, &sinix, &cosix);
 
 	  __real__ retval = sinh_val * cosix;
 	  __imag__ retval = cosh_val * sinix;
@@ -58,8 +58,8 @@ __csinh (__complex__ double x)
 	  if (rcls == FP_ZERO)
 	    {
 	      /* Real part is 0.0.  */
-	      __real__ retval = __copysign (0.0, negate ? -1.0 : 1.0);
-	      __imag__ retval = __nan ("") + __nan ("");
+	      __real__ retval = copysign (0.0, negate ? -1.0 : 1.0);
+	      __imag__ retval = nan ("") + nan ("");
 
 #ifdef FE_INVALID
 	      if (icls == FP_INFINITE)
@@ -68,8 +68,8 @@ __csinh (__complex__ double x)
 	    }
 	  else
 	    {
-	      __real__ retval = __nan ("");
-	      __imag__ retval = __nan ("");
+	      __real__ retval = nan ("");
+	      __imag__ retval = nan ("");
 
 #ifdef FE_INVALID
 	      feraiseexcept (FE_INVALID);
@@ -91,10 +91,10 @@ __csinh (__complex__ double x)
 	  /* Imaginary part is finite.  */
 	  double sinix, cosix;
 
-	  __sincos (__imag__ x, &sinix, &cosix);
+	  sincos (__imag__ x, &sinix, &cosix);
 
-	  __real__ retval = __copysign (HUGE_VAL, cosix);
-	  __imag__ retval = __copysign (HUGE_VAL, sinix);
+	  __real__ retval = copysign (HUGE_VAL, cosix);
+	  __imag__ retval = copysign (HUGE_VAL, sinix);
 
 	  if (negate)
 	    __real__ retval = -__real__ retval;
@@ -103,7 +103,7 @@ __csinh (__complex__ double x)
 	{
 	  /* The addition raises the invalid exception.  */
 	  __real__ retval = HUGE_VAL;
-	  __imag__ retval = __nan ("") + __nan ("");
+	  __imag__ retval = nan ("") + nan ("");
 
 #ifdef FE_INVALID
 	  if (icls == FP_INFINITE)
@@ -113,8 +113,8 @@ __csinh (__complex__ double x)
     }
   else
     {
-      __real__ retval = __nan ("");
-      __imag__ retval = __imag__ x == 0.0 ? __imag__ x : __nan ("");
+      __real__ retval = nan ("");
+      __imag__ retval = __imag__ x == 0.0 ? __imag__ x : nan ("");
     }
 
   return retval;

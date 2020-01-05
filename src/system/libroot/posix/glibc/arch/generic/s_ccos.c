@@ -32,7 +32,7 @@ __ccos (__complex__ double x)
     {
       if (__real__ x == 0.0 || __imag__ x == 0.0)
 	{
-	  __real__ res = __nan ("");
+	  __real__ res = nan ("");
 	  __imag__ res = 0.0;
 
 #ifdef FE_INVALID
@@ -43,7 +43,7 @@ __ccos (__complex__ double x)
       else if (__isinf (__imag__ x))
 	{
 	  __real__ res = HUGE_VAL;
-	  __imag__ res = __nan ("");
+	  __imag__ res = nan ("");
 
 #ifdef FE_INVALID
 	  if (__isinf (__real__ x))
@@ -52,8 +52,8 @@ __ccos (__complex__ double x)
 	}
       else
 	{
-	  __real__ res = __nan ("");
-	  __imag__ res = __nan ("");
+	  __real__ res = nan ("");
+	  __imag__ res = nan ("");
 
 #ifdef FE_INVALID
 	  if (isfinite (__imag__ x))

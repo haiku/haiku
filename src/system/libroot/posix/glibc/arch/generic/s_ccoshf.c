@@ -38,19 +38,19 @@ __ccoshf (__complex__ float x)
       if (icls >= FP_ZERO)
 	{
 	  /* Imaginary part is finite.  */
-	  float sinh_val = __ieee754_sinhf (__real__ x);
-	  float cosh_val = __ieee754_coshf (__real__ x);
+	  float sinh_val = sinhf (__real__ x);
+	  float cosh_val = coshf (__real__ x);
 	  float sinix, cosix;
 
-	  __sincosf (__imag__ x, &sinix, &cosix);
+	  sincosf (__imag__ x, &sinix, &cosix);
 
 	  __real__ retval = cosh_val * cosix;
 	  __imag__ retval = sinh_val * sinix;
 	}
       else
 	{
-	  __imag__ retval = __real__ x == 0.0 ? 0.0 : __nanf ("");
-	  __real__ retval = __nanf ("");
+	  __imag__ retval = __real__ x == 0.0 ? 0.0 : nanf ("");
+	  __real__ retval = nanf ("");
 
 #ifdef FE_INVALID
 	  if (icls == FP_INFINITE)
@@ -65,24 +65,24 @@ __ccoshf (__complex__ float x)
 	{
 	  /* Imaginary part is 0.0.  */
 	  __real__ retval = HUGE_VALF;
-	  __imag__ retval = __imag__ x * __copysignf (1.0, __real__ x);
+	  __imag__ retval = __imag__ x * copysignf (1.0, __real__ x);
 	}
       else if (icls > FP_ZERO)
 	{
 	  /* Imaginary part is finite.  */
 	  float sinix, cosix;
 
-	  __sincosf (__imag__ x, &sinix, &cosix);
+	  sincosf (__imag__ x, &sinix, &cosix);
 
-	  __real__ retval = __copysignf (HUGE_VALF, cosix);
-	  __imag__ retval = (__copysignf (HUGE_VALF, sinix)
-			     * __copysignf (1.0, __real__ x));
+	  __real__ retval = copysignf (HUGE_VALF, cosix);
+	  __imag__ retval = (copysignf (HUGE_VALF, sinix)
+			     * copysignf (1.0, __real__ x));
 	}
       else
 	{
 	  /* The addition raises the invalid exception.  */
 	  __real__ retval = HUGE_VALF;
-	  __imag__ retval = __nanf ("") + __nanf ("");
+	  __imag__ retval = nanf ("") + nanf ("");
 
 #ifdef FE_INVALID
 	  if (icls == FP_INFINITE)
@@ -92,8 +92,8 @@ __ccoshf (__complex__ float x)
     }
   else
     {
-      __real__ retval = __nanf ("");
-      __imag__ retval = __imag__ x == 0.0 ? __imag__ x : __nanf ("");
+      __real__ retval = nanf ("");
+      __imag__ retval = __imag__ x == 0.0 ? __imag__ x : nanf ("");
     }
 
   return retval;

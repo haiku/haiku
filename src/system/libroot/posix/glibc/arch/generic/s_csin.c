@@ -41,11 +41,11 @@ __csin (__complex__ double x)
       if (rcls >= FP_ZERO)
 	{
 	  /* Real part is finite.  */
-	  double sinh_val = __ieee754_sinh (__imag__ x);
-	  double cosh_val = __ieee754_cosh (__imag__ x);
+	  double sinh_val = sinh (__imag__ x);
+	  double cosh_val = cosh (__imag__ x);
 	  double sinix, cosix;
 
-	  __sincos (__real__ x, &sinix, &cosix);
+	  sincos (__real__ x, &sinix, &cosix);
 
 	  __real__ retval = cosh_val * sinix;
 	  __imag__ retval = sinh_val * cosix;
@@ -58,7 +58,7 @@ __csin (__complex__ double x)
 	  if (icls == FP_ZERO)
 	    {
 	      /* Imaginary part is 0.0.  */
-	      __real__ retval = __nan ("");
+	      __real__ retval = nan ("");
 	      __imag__ retval = __imag__ x;
 
 #ifdef FE_INVALID
@@ -68,8 +68,8 @@ __csin (__complex__ double x)
 	    }
 	  else
 	    {
-	      __real__ retval = __nan ("");
-	      __imag__ retval = __nan ("");
+	      __real__ retval = nan ("");
+	      __imag__ retval = nan ("");
 
 #ifdef FE_INVALID
 	      feraiseexcept (FE_INVALID);
@@ -83,7 +83,7 @@ __csin (__complex__ double x)
       if (rcls == FP_ZERO)
 	{
 	  /* Real part is 0.0.  */
-	  __real__ retval = __copysign (0.0, negate ? -1.0 : 1.0);
+	  __real__ retval = copysign (0.0, negate ? -1.0 : 1.0);
 	  __imag__ retval = __imag__ x;
 	}
       else if (rcls > FP_ZERO)
@@ -91,10 +91,10 @@ __csin (__complex__ double x)
 	  /* Real part is finite.  */
 	  double sinix, cosix;
 
-	  __sincos (__real__ x, &sinix, &cosix);
+	  sincos (__real__ x, &sinix, &cosix);
 
-	  __real__ retval = __copysign (HUGE_VAL, sinix);
-	  __imag__ retval = __copysign (HUGE_VAL, cosix);
+	  __real__ retval = copysign (HUGE_VAL, sinix);
+	  __imag__ retval = copysign (HUGE_VAL, cosix);
 
 	  if (negate)
 	    __real__ retval = -__real__ retval;
@@ -104,7 +104,7 @@ __csin (__complex__ double x)
       else
 	{
 	  /* The addition raises the invalid exception.  */
-	  __real__ retval = __nan ("");
+	  __real__ retval = nan ("");
 	  __imag__ retval = HUGE_VAL;
 
 #ifdef FE_INVALID
@@ -116,10 +116,10 @@ __csin (__complex__ double x)
   else
     {
       if (rcls == FP_ZERO)
-	__real__ retval = __copysign (0.0, negate ? -1.0 : 1.0);
+	__real__ retval = copysign (0.0, negate ? -1.0 : 1.0);
       else
-	__real__ retval = __nan ("");
-      __imag__ retval = __nan ("");
+	__real__ retval = nan ("");
+      __imag__ retval = nan ("");
     }
 
   return retval;

@@ -50,90 +50,90 @@ __kernel_casinhf (__complex__ float x, int adj)
       if (adj)
 	{
 	  float t = __real__ y;
-	  __real__ y = __copysignf (__imag__ y, __imag__ x);
+	  __real__ y = copysignf (__imag__ y, __imag__ x);
 	  __imag__ y = t;
 	}
 
-      res = __clogf (y);
+      res = clogf (y);
       __real__ res += (float) M_LN2;
     }
   else if (rx >= 0.5f && ix < FLT_EPSILON / 8.0f)
     {
-      float s = __ieee754_hypotf (1.0f, rx);
+      float s = hypotf (1.0f, rx);
 
-      __real__ res = __ieee754_logf (rx + s);
+      __real__ res = logf (rx + s);
       if (adj)
-	__imag__ res = __ieee754_atan2f (s, __imag__ x);
+	__imag__ res = atan2f (s, __imag__ x);
       else
-	__imag__ res = __ieee754_atan2f (ix, s);
+	__imag__ res = atan2f (ix, s);
     }
   else if (rx < FLT_EPSILON / 8.0f && ix >= 1.5f)
     {
-      float s = __ieee754_sqrtf ((ix + 1.0f) * (ix - 1.0f));
+      float s = sqrtf ((ix + 1.0f) * (ix - 1.0f));
 
-      __real__ res = __ieee754_logf (ix + s);
+      __real__ res = logf (ix + s);
       if (adj)
-	__imag__ res = __ieee754_atan2f (rx, __copysignf (s, __imag__ x));
+	__imag__ res = atan2f (rx, copysignf (s, __imag__ x));
       else
-	__imag__ res = __ieee754_atan2f (s, rx);
+	__imag__ res = atan2f (s, rx);
     }
   else if (ix > 1.0f && ix < 1.5f && rx < 0.5f)
     {
       if (rx < FLT_EPSILON * FLT_EPSILON)
 	{
 	  float ix2m1 = (ix + 1.0f) * (ix - 1.0f);
-	  float s = __ieee754_sqrtf (ix2m1);
+	  float s = sqrtf (ix2m1);
 
-	  __real__ res = __log1pf (2.0f * (ix2m1 + ix * s)) / 2.0f;
+	  __real__ res = log1pf (2.0f * (ix2m1 + ix * s)) / 2.0f;
 	  if (adj)
-	    __imag__ res = __ieee754_atan2f (rx, __copysignf (s, __imag__ x));
+	    __imag__ res = atan2f (rx, copysignf (s, __imag__ x));
 	  else
-	    __imag__ res = __ieee754_atan2f (s, rx);
+	    __imag__ res = atan2f (s, rx);
 	}
       else
 	{
 	  float ix2m1 = (ix + 1.0f) * (ix - 1.0f);
 	  float rx2 = rx * rx;
 	  float f = rx2 * (2.0f + rx2 + 2.0f * ix * ix);
-	  float d = __ieee754_sqrtf (ix2m1 * ix2m1 + f);
+	  float d = sqrtf (ix2m1 * ix2m1 + f);
 	  float dp = d + ix2m1;
 	  float dm = f / dp;
-	  float r1 = __ieee754_sqrtf ((dm + rx2) / 2.0f);
+	  float r1 = sqrtf ((dm + rx2) / 2.0f);
 	  float r2 = rx * ix / r1;
 
 	  __real__ res
-	    = __log1pf (rx2 + dp + 2.0f * (rx * r1 + ix * r2)) / 2.0f;
+	    = log1pf (rx2 + dp + 2.0f * (rx * r1 + ix * r2)) / 2.0f;
 	  if (adj)
-	    __imag__ res = __ieee754_atan2f (rx + r1, __copysignf (ix + r2,
+	    __imag__ res = atan2f (rx + r1, copysignf (ix + r2,
 								   __imag__ x));
 	  else
-	    __imag__ res = __ieee754_atan2f (ix + r2, rx + r1);
+	    __imag__ res = atan2f (ix + r2, rx + r1);
 	}
     }
   else if (ix == 1.0f && rx < 0.5f)
     {
       if (rx < FLT_EPSILON / 8.0f)
 	{
-	  __real__ res = __log1pf (2.0f * (rx + __ieee754_sqrtf (rx))) / 2.0f;
+	  __real__ res = log1pf (2.0f * (rx + sqrtf (rx))) / 2.0f;
 	  if (adj)
-	    __imag__ res = __ieee754_atan2f (__ieee754_sqrtf (rx),
-					     __copysignf (1.0f, __imag__ x));
+	    __imag__ res = atan2f (sqrtf (rx),
+					     copysignf (1.0f, __imag__ x));
 	  else
-	    __imag__ res = __ieee754_atan2f (1.0f, __ieee754_sqrtf (rx));
+	    __imag__ res = atan2f (1.0f, sqrtf (rx));
 	}
       else
 	{
-	  float d = rx * __ieee754_sqrtf (4.0f + rx * rx);
-	  float s1 = __ieee754_sqrtf ((d + rx * rx) / 2.0f);
-	  float s2 = __ieee754_sqrtf ((d - rx * rx) / 2.0f);
+	  float d = rx * sqrtf (4.0f + rx * rx);
+	  float s1 = sqrtf ((d + rx * rx) / 2.0f);
+	  float s2 = sqrtf ((d - rx * rx) / 2.0f);
 
-	  __real__ res = __log1pf (rx * rx + d + 2.0f * (rx * s1 + s2)) / 2.0f;
+	  __real__ res = log1pf (rx * rx + d + 2.0f * (rx * s1 + s2)) / 2.0f;
 	  if (adj)
-	    __imag__ res = __ieee754_atan2f (rx + s1,
-					     __copysignf (1.0f + s2,
+	    __imag__ res = atan2f (rx + s1,
+					     copysignf (1.0f + s2,
 							  __imag__ x));
 	  else
-	    __imag__ res = __ieee754_atan2f (1.0f + s2, rx + s1);
+	    __imag__ res = atan2f (1.0f + s2, rx + s1);
 	}
     }
   else if (ix < 1.0f && rx < 0.5f)
@@ -143,44 +143,44 @@ __kernel_casinhf (__complex__ float x, int adj)
 	  if (rx < FLT_EPSILON * FLT_EPSILON)
 	    {
 	      float onemix2 = (1.0f + ix) * (1.0f - ix);
-	      float s = __ieee754_sqrtf (onemix2);
+	      float s = sqrtf (onemix2);
 
-	      __real__ res = __log1pf (2.0f * rx / s) / 2.0f;
+	      __real__ res = log1pf (2.0f * rx / s) / 2.0f;
 	      if (adj)
-		__imag__ res = __ieee754_atan2f (s, __imag__ x);
+		__imag__ res = atan2f (s, __imag__ x);
 	      else
-		__imag__ res = __ieee754_atan2f (ix, s);
+		__imag__ res = atan2f (ix, s);
 	    }
 	  else
 	    {
 	      float onemix2 = (1.0f + ix) * (1.0f - ix);
 	      float rx2 = rx * rx;
 	      float f = rx2 * (2.0f + rx2 + 2.0f * ix * ix);
-	      float d = __ieee754_sqrtf (onemix2 * onemix2 + f);
+	      float d = sqrtf (onemix2 * onemix2 + f);
 	      float dp = d + onemix2;
 	      float dm = f / dp;
-	      float r1 = __ieee754_sqrtf ((dp + rx2) / 2.0f);
+	      float r1 = sqrtf ((dp + rx2) / 2.0f);
 	      float r2 = rx * ix / r1;
 
 	      __real__ res
-		= __log1pf (rx2 + dm + 2.0f * (rx * r1 + ix * r2)) / 2.0f;
+		= log1pf (rx2 + dm + 2.0f * (rx * r1 + ix * r2)) / 2.0f;
 	      if (adj)
-		__imag__ res = __ieee754_atan2f (rx + r1,
-						 __copysignf (ix + r2,
+		__imag__ res = atan2f (rx + r1,
+						 copysignf (ix + r2,
 							      __imag__ x));
 	      else
-		__imag__ res = __ieee754_atan2f (ix + r2, rx + r1);
+		__imag__ res = atan2f (ix + r2, rx + r1);
 	    }
 	}
       else
 	{
-	  float s = __ieee754_hypotf (1.0f, rx);
+	  float s = hypotf (1.0f, rx);
 
-	  __real__ res = __log1pf (2.0f * rx * (rx + s)) / 2.0f;
+	  __real__ res = log1pf (2.0f * rx * (rx + s)) / 2.0f;
 	  if (adj)
-	    __imag__ res = __ieee754_atan2f (s, __imag__ x);
+	    __imag__ res = atan2f (s, __imag__ x);
 	  else
-	    __imag__ res = __ieee754_atan2f (ix, s);
+	    __imag__ res = atan2f (ix, s);
 	}
       if (__real__ res < FLT_MIN)
 	{
@@ -193,7 +193,7 @@ __kernel_casinhf (__complex__ float x, int adj)
       __real__ y = (rx - ix) * (rx + ix) + 1.0f;
       __imag__ y = 2.0f * rx * ix;
 
-      y = __csqrtf (y);
+      y = csqrtf (y);
 
       __real__ y += rx;
       __imag__ y += ix;
@@ -201,16 +201,16 @@ __kernel_casinhf (__complex__ float x, int adj)
       if (adj)
 	{
 	  float t = __real__ y;
-	  __real__ y = __copysignf (__imag__ y, __imag__ x);
+	  __real__ y = copysignf (__imag__ y, __imag__ x);
 	  __imag__ y = t;
 	}
 
-      res = __clogf (y);
+      res = clogf (y);
     }
 
   /* Give results the correct sign for the original argument.  */
-  __real__ res = __copysignf (__real__ res, __real__ x);
-  __imag__ res = __copysignf (__imag__ res, (adj ? 1.0f : __imag__ x));
+  __real__ res = copysignf (__real__ res, __real__ x);
+  __imag__ res = copysignf (__imag__ res, (adj ? 1.0f : __imag__ x));
 
   return res;
 }

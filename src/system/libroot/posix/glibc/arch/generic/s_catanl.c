@@ -35,26 +35,26 @@ __catanl (__complex__ long double x)
     {
       if (rcls == FP_INFINITE)
 	{
-	  __real__ res = __copysignl (M_PI_2l, __real__ x);
-	  __imag__ res = __copysignl (0.0, __imag__ x);
+	  __real__ res = copysignl (M_PI_2l, __real__ x);
+	  __imag__ res = copysignl (0.0, __imag__ x);
 	}
       else if (icls == FP_INFINITE)
 	{
 	  if (rcls >= FP_ZERO)
-	    __real__ res = __copysignl (M_PI_2l, __real__ x);
+	    __real__ res = copysignl (M_PI_2l, __real__ x);
 	  else
-	    __real__ res = __nanl ("");
-	  __imag__ res = __copysignl (0.0, __imag__ x);
+	    __real__ res = nanl ("");
+	  __imag__ res = copysignl (0.0, __imag__ x);
 	}
       else if (icls == FP_ZERO || icls == FP_INFINITE)
 	{
-	  __real__ res = __nanl ("");
-	  __imag__ res = __copysignl (0.0, __imag__ x);
+	  __real__ res = nanl ("");
+	  __imag__ res = copysignl (0.0, __imag__ x);
 	}
       else
 	{
-	  __real__ res = __nanl ("");
-	  __imag__ res = __nanl ("");
+	  __real__ res = nanl ("");
+	  __imag__ res = nanl ("");
 	}
     }
   else if (rcls == FP_ZERO && icls == FP_ZERO)
@@ -69,7 +69,7 @@ __catanl (__complex__ long double x)
 
       den = 1 - r2 - __imag__ x * __imag__ x;
 
-      __real__ res = 0.5 * __ieee754_atan2l (2.0 * __real__ x, den);
+      __real__ res = 0.5 * atan2l (2.0 * __real__ x, den);
 
       num = __imag__ x + 1.0;
       num = r2 + num * num;
@@ -77,7 +77,7 @@ __catanl (__complex__ long double x)
       den = __imag__ x - 1.0;
       den = r2 + den * den;
 
-      __imag__ res = 0.25 * __ieee754_logl (num / den);
+      __imag__ res = 0.25 * logl (num / den);
     }
 
   return res;

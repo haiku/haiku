@@ -33,12 +33,12 @@ __casinhf (__complex__ float x)
     {
       if (icls == FP_INFINITE)
 	{
-	  __real__ res = __copysignf (HUGE_VALF, __real__ x);
+	  __real__ res = copysignf (HUGE_VALF, __real__ x);
 
 	  if (rcls == FP_NAN)
-	    __imag__ res = __nanf ("");
+	    __imag__ res = nanf ("");
 	  else
-	    __imag__ res = __copysignf (rcls >= FP_ZERO ? M_PI_2 : M_PI_4,
+	    __imag__ res = copysignf (rcls >= FP_ZERO ? M_PI_2 : M_PI_4,
 					__imag__ x);
 	}
       else if (rcls <= FP_INFINITE)
@@ -46,14 +46,14 @@ __casinhf (__complex__ float x)
 	  __real__ res = __real__ x;
 	  if ((rcls == FP_INFINITE && icls >= FP_ZERO)
 	      || (rcls == FP_NAN && icls == FP_ZERO))
-	    __imag__ res = __copysignf (0.0, __imag__ x);
+	    __imag__ res = copysignf (0.0, __imag__ x);
 	  else
-	    __imag__ res = __nanf ("");
+	    __imag__ res = nanf ("");
 	}
       else
 	{
-	  __real__ res = __nanf ("");
-	  __imag__ res = __nanf ("");
+	  __real__ res = nanf ("");
+	  __imag__ res = nanf ("");
 	}
     }
   else if (rcls == FP_ZERO && icls == FP_ZERO)

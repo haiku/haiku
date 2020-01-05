@@ -38,19 +38,19 @@ __ccosh (__complex__ double x)
       if (icls >= FP_ZERO)
 	{
 	  /* Imaginary part is finite.  */
-	  double sinh_val = __ieee754_sinh (__real__ x);
-	  double cosh_val = __ieee754_cosh (__real__ x);
+	  double sinh_val = sinh (__real__ x);
+	  double cosh_val = cosh (__real__ x);
 	  double sinix, cosix;
 
-	  __sincos (__imag__ x, &sinix, &cosix);
+	  sincos (__imag__ x, &sinix, &cosix);
 
 	  __real__ retval = cosh_val * cosix;
 	  __imag__ retval = sinh_val * sinix;
 	}
       else
 	{
-	  __imag__ retval = __real__ x == 0.0 ? 0.0 : __nan ("");
-	  __real__ retval = __nan ("") + __nan ("");
+	  __imag__ retval = __real__ x == 0.0 ? 0.0 : nan ("");
+	  __real__ retval = nan ("") + nan ("");
 
 #ifdef FE_INVALID
 	  if (icls == FP_INFINITE)
@@ -65,24 +65,24 @@ __ccosh (__complex__ double x)
 	{
 	  /* Imaginary part is 0.0.  */
 	  __real__ retval = HUGE_VAL;
-	  __imag__ retval = __imag__ x * __copysign (1.0, __real__ x);
+	  __imag__ retval = __imag__ x * copysign (1.0, __real__ x);
 	}
       else if (icls > FP_ZERO)
 	{
 	  /* Imaginary part is finite.  */
 	  double sinix, cosix;
 
-	  __sincos (__imag__ x, &sinix, &cosix);
+	  sincos (__imag__ x, &sinix, &cosix);
 
-	  __real__ retval = __copysign (HUGE_VAL, cosix);
-	  __imag__ retval = (__copysign (HUGE_VAL, sinix)
-			     * __copysign (1.0, __real__ x));
+	  __real__ retval = copysign (HUGE_VAL, cosix);
+	  __imag__ retval = (copysign (HUGE_VAL, sinix)
+			     * copysign (1.0, __real__ x));
 	}
       else
 	{
 	  /* The addition raises the invalid exception.  */
 	  __real__ retval = HUGE_VAL;
-	  __imag__ retval = __nan ("") + __nan ("");
+	  __imag__ retval = nan ("") + nan ("");
 
 #ifdef FE_INVALID
 	  if (icls == FP_INFINITE)
@@ -92,8 +92,8 @@ __ccosh (__complex__ double x)
     }
   else
     {
-      __real__ retval = __nan ("");
-      __imag__ retval = __imag__ x == 0.0 ? __imag__ x : __nan ("");
+      __real__ retval = nan ("");
+      __imag__ retval = __imag__ x == 0.0 ? __imag__ x : nan ("");
     }
 
   return retval;

@@ -32,7 +32,7 @@ __cproj (__complex__ double x)
   else if (!isfinite (__real__ x) || !isfinite (__imag__ x))
     {
       __real__ res = INFINITY;
-      __imag__ res = __copysign (0.0, __imag__ x);
+      __imag__ res = copysign (0.0, __imag__ x);
     }
   else
     {

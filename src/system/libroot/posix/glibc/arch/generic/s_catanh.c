@@ -35,21 +35,21 @@ __catanh (__complex__ double x)
     {
       if (icls == FP_INFINITE)
 	{
-	  __real__ res = __copysign (0.0, __real__ x);
-	  __imag__ res = __copysign (M_PI_2, __imag__ x);
+	  __real__ res = copysign (0.0, __real__ x);
+	  __imag__ res = copysign (M_PI_2, __imag__ x);
 	}
       else if (rcls == FP_INFINITE || rcls == FP_ZERO)
 	{
-	  __real__ res = __copysign (0.0, __real__ x);
+	  __real__ res = copysign (0.0, __real__ x);
 	  if (icls >= FP_ZERO)
-	    __imag__ res = __copysign (M_PI_2, __imag__ x);
+	    __imag__ res = copysign (M_PI_2, __imag__ x);
 	  else
-	    __imag__ res = __nan ("");
+	    __imag__ res = nan ("");
 	}
       else
 	{
-	  __real__ res = __nan ("");
-	  __imag__ res = __nan ("");
+	  __real__ res = nan ("");
+	  __imag__ res = nan ("");
 	}
     }
   else if (rcls == FP_ZERO && icls == FP_ZERO)
@@ -68,11 +68,11 @@ __catanh (__complex__ double x)
       den = 1.0 - __real__ x;
       den = i2 + den * den;
 
-      __real__ res = 0.25 * (__ieee754_log (num) - __ieee754_log (den));
+      __real__ res = 0.25 * (log (num) - log (den));
 
       den = 1 - __real__ x * __real__ x - i2;
 
-      __imag__ res = 0.5 * __ieee754_atan2 (2.0 * __imag__ x, den);
+      __imag__ res = 0.5 * atan2 (2.0 * __imag__ x, den);
     }
 
   return res;

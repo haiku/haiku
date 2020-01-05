@@ -32,7 +32,7 @@ __ccosl (__complex__ long double x)
     {
       if (__real__ x == 0.0 || __imag__ x == 0.0)
 	{
-	  __real__ res = __nanl ("");
+	  __real__ res = nanl ("");
 	  __imag__ res = 0.0;
 
 #ifdef FE_INVALID
@@ -43,7 +43,7 @@ __ccosl (__complex__ long double x)
       else if (__isinfl (__imag__ x))
 	{
 	  __real__ res = HUGE_VALL;
-	  __imag__ res = __nanl ("");
+	  __imag__ res = nanl ("");
 
 #ifdef FE_INVALID
 	  if (__isinfl (__real__ x))
@@ -52,8 +52,8 @@ __ccosl (__complex__ long double x)
 	}
       else
 	{
-	  __real__ res = __nanl ("");
-	  __imag__ res = __nanl ("");
+	  __real__ res = nanl ("");
+	  __imag__ res = nanl ("");
 
 #ifdef FE_INVALID
 	  if (isfinite (__imag__ x))

@@ -33,12 +33,12 @@ __casinh (__complex__ double x)
     {
       if (icls == FP_INFINITE)
 	{
-	  __real__ res = __copysign (HUGE_VAL, __real__ x);
+	  __real__ res = copysign (HUGE_VAL, __real__ x);
 
 	  if (rcls == FP_NAN)
-	    __imag__ res = __nan ("");
+	    __imag__ res = nan ("");
 	  else
-	    __imag__ res = __copysign (rcls >= FP_ZERO ? M_PI_2 : M_PI_4,
+	    __imag__ res = copysign (rcls >= FP_ZERO ? M_PI_2 : M_PI_4,
 				       __imag__ x);
 	}
       else if (rcls <= FP_INFINITE)
@@ -46,14 +46,14 @@ __casinh (__complex__ double x)
 	  __real__ res = __real__ x;
 	  if ((rcls == FP_INFINITE && icls >= FP_ZERO)
 	      || (rcls == FP_NAN && icls == FP_ZERO))
-	    __imag__ res = __copysign (0.0, __imag__ x);
+	    __imag__ res = copysign (0.0, __imag__ x);
 	  else
-	    __imag__ res = __nan ("");
+	    __imag__ res = nan ("");
 	}
       else
 	{
-	  __real__ res = __nan ("");
-	  __imag__ res = __nan ("");
+	  __real__ res = nan ("");
+	  __imag__ res = nan ("");
 	}
     }
   else if (rcls == FP_ZERO && icls == FP_ZERO)

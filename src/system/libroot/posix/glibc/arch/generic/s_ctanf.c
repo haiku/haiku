@@ -34,8 +34,8 @@ __ctanf (__complex__ float x)
     {
       if (__isinff (__imag__ x))
 	{
-	  __real__ res = __copysignf (0.0, __real__ x);
-	  __imag__ res = __copysignf (1.0, __imag__ x);
+	  __real__ res = copysignf (0.0, __real__ x);
+	  __imag__ res = copysignf (1.0, __imag__ x);
 	}
       else if (__real__ x == 0.0)
 	{
@@ -43,8 +43,8 @@ __ctanf (__complex__ float x)
 	}
       else
 	{
-	  __real__ res = __nanf ("");
-	  __imag__ res = __nanf ("");
+	  __real__ res = nanf ("");
+	  __imag__ res = nanf ("");
 
 #ifdef FE_INVALID
 	  if (__isinff (__real__ x))
@@ -57,12 +57,12 @@ __ctanf (__complex__ float x)
       float sin2rx, cos2rx;
       float den;
 
-      __sincosf (2.0 * __real__ x, &sin2rx, &cos2rx);
+      sincosf (2.0 * __real__ x, &sin2rx, &cos2rx);
 
-      den = cos2rx + __ieee754_coshf (2.0 * __imag__ x);
+      den = cos2rx + coshf (2.0 * __imag__ x);
 
       __real__ res = sin2rx / den;
-      __imag__ res = __ieee754_sinhf (2.0 * __imag__ x) / den;
+      __imag__ res = sinhf (2.0 * __imag__ x) / den;
     }
 
   return res;

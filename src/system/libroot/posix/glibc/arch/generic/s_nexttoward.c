@@ -1,1 +1,0 @@
-/* This function is the same as nextafter so we use an alias there.  */

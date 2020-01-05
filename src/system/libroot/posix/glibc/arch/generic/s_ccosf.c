@@ -32,7 +32,7 @@ __ccosf (__complex__ float x)
     {
       if (__real__ x == 0.0 || __imag__ x == 0.0)
 	{
-	  __real__ res = __nanf ("");
+	  __real__ res = nanf ("");
 	  __imag__ res = 0.0;
 
 #ifdef FE_INVALID
@@ -43,7 +43,7 @@ __ccosf (__complex__ float x)
       else if (__isinff (__imag__ x))
 	{
 	  __real__ res = HUGE_VALF;
-	  __imag__ res = __nanf ("");
+	  __imag__ res = nanf ("");
 
 #ifdef FE_INVALID
 	  if (__isinff (__real__ x))
@@ -52,8 +52,8 @@ __ccosf (__complex__ float x)
 	}
       else
 	{
-	  __real__ res = __nanf ("");
-	  __imag__ res = __nanf ("");
+	  __real__ res = nanf ("");
+	  __imag__ res = nanf ("");
 
 #ifdef FE_INVALID
 	  if (isfinite (__imag__ x))

@@ -105,7 +105,7 @@
 
 /* Define if the regparm attribute shall be used for local functions
    (gcc on ix86 only).  */
-#define	USE_REGPARMS 1
+#undef	USE_REGPARMS
 
 /* Defined on PowerPC if the GCC being used has a problem with clobbering
    certain registers (CR0, MQ, CTR, LR) in asm statements.  */

@@ -43,20 +43,20 @@ __csqrtl (__complex__ long double x)
 	{
 	  if (__real__ x < 0.0)
 	    {
-	      __real__ res = icls == FP_NAN ? __nanl ("") : 0;
-	      __imag__ res = __copysignl (HUGE_VALL, __imag__ x);
+	      __real__ res = icls == FP_NAN ? nanl ("") : 0;
+	      __imag__ res = copysignl (HUGE_VALL, __imag__ x);
 	    }
 	  else
 	    {
 	      __real__ res = __real__ x;
 	      __imag__ res = (icls == FP_NAN
-			      ? __nanl ("") : __copysignl (0.0, __imag__ x));
+			      ? nanl ("") : copysignl (0.0, __imag__ x));
 	    }
 	}
       else
 	{
-	  __real__ res = __nanl ("");
-	  __imag__ res = __nanl ("");
+	  __real__ res = nanl ("");
+	  __imag__ res = nanl ("");
 	}
     }
   else
@@ -66,42 +66,42 @@ __csqrtl (__complex__ long double x)
 	  if (__real__ x < 0.0)
 	    {
 	      __real__ res = 0.0;
-	      __imag__ res = __copysignl (__ieee754_sqrtl (-__real__ x),
+	      __imag__ res = copysignl (sqrtl (-__real__ x),
 					  __imag__ x);
 	    }
 	  else
 	    {
-	      __real__ res = fabsl (__ieee754_sqrtl (__real__ x));
-	      __imag__ res = __copysignl (0.0, __imag__ x);
+	      __real__ res = fabsl (sqrtl (__real__ x));
+	      __imag__ res = copysignl (0.0, __imag__ x);
 	    }
 	}
       else if (rcls == FP_ZERO)
 	{
-	  long double r = __ieee754_sqrtl (0.5 * fabsl (__imag__ x));
+	  long double r = sqrtl (0.5 * fabsl (__imag__ x));
 
-	  __real__ res = __copysignl (r, __imag__ x);
+	  __real__ res = copysignl (r, __imag__ x);
 	  __imag__ res = r;
 	}
       else
 	{
 	  long double d, r, s;
 
-	  d = __ieee754_hypotl (__real__ x, __imag__ x);
+	  d = hypotl (__real__ x, __imag__ x);
 	  /* Use the identity   2  Re res  Im res = Im x
 	     to avoid cancellation error in  d +/- Re x.  */
 	  if (__real__ x > 0)
 	    {
-	      r = __ieee754_sqrtl (0.5L * d + 0.5L * __real__ x);
+	      r = sqrtl (0.5L * d + 0.5L * __real__ x);
 	      s = (0.5L * __imag__ x) / r;
 	    }
 	  else
 	    {
-	      s = __ieee754_sqrtl (0.5L * d - 0.5L * __real__ x);
+	      s = sqrtl (0.5L * d - 0.5L * __real__ x);
 	      r = fabsl ((0.5L * __imag__ x) / s);
 	    }
 
 	  __real__ res = r;
-	  __imag__ res = __copysignl (s, __imag__ x);
+	  __imag__ res = copysignl (s, __imag__ x);
 	}
     }
 

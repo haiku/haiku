@@ -43,20 +43,20 @@ __csqrtf (__complex__ float x)
 	{
 	  if (__real__ x < 0.0)
 	    {
-	      __real__ res = icls == FP_NAN ? __nanf ("") : 0;
-	      __imag__ res = __copysignf (HUGE_VALF, __imag__ x);
+	      __real__ res = icls == FP_NAN ? nanf ("") : 0;
+	      __imag__ res = copysignf (HUGE_VALF, __imag__ x);
 	    }
 	  else
 	    {
 	      __real__ res = __real__ x;
 	      __imag__ res = (icls == FP_NAN
-			      ? __nanf ("") : __copysignf (0.0, __imag__ x));
+			      ? nanf ("") : copysignf (0.0, __imag__ x));
 	    }
 	}
       else
 	{
-	  __real__ res = __nanf ("");
-	  __imag__ res = __nanf ("");
+	  __real__ res = nanf ("");
+	  __imag__ res = nanf ("");
 	}
     }
   else
@@ -66,42 +66,42 @@ __csqrtf (__complex__ float x)
 	  if (__real__ x < 0.0)
 	    {
 	      __real__ res = 0.0;
-	      __imag__ res = __copysignf (__ieee754_sqrtf (-__real__ x),
+	      __imag__ res = copysignf (sqrtf (-__real__ x),
 					  __imag__ x);
 	    }
 	  else
 	    {
-	      __real__ res = fabsf (__ieee754_sqrtf (__real__ x));
-	      __imag__ res = __copysignf (0.0, __imag__ x);
+	      __real__ res = fabsf (sqrtf (__real__ x));
+	      __imag__ res = copysignf (0.0, __imag__ x);
 	    }
 	}
       else if (rcls == FP_ZERO)
 	{
-	  float r = __ieee754_sqrtf (0.5 * fabsf (__imag__ x));
+	  float r = sqrtf (0.5 * fabsf (__imag__ x));
 
-	  __real__ res = __copysignf (r, __imag__ x);
+	  __real__ res = copysignf (r, __imag__ x);
 	  __imag__ res = r;
 	}
       else
 	{
 	  float d, r, s;
 
-	  d = __ieee754_hypotf (__real__ x, __imag__ x);
+	  d = hypotf (__real__ x, __imag__ x);
 	  /* Use the identity   2  Re res  Im res = Im x
 	     to avoid cancellation error in  d +/- Re x.  */
 	  if (__real__ x > 0)
 	    {
-	      r = __ieee754_sqrtf (0.5f * d + 0.5f * __real__ x);
+	      r = sqrtf (0.5f * d + 0.5f * __real__ x);
 	      s = (0.5f * __imag__ x) / r;
 	    }
 	  else
 	    {
-	      s = __ieee754_sqrtf (0.5f * d - 0.5f * __real__ x);
+	      s = sqrtf (0.5f * d - 0.5f * __real__ x);
 	      r = fabsf ((0.5f * __imag__ x) / s);
 	    }
 
 	  __real__ res = r;
-	  __imag__ res = __copysignf (s, __imag__ x);
+	  __imag__ res = copysignf (s, __imag__ x);
 	}
     }
 

@@ -36,9 +36,9 @@ __cacoshl (__complex__ long double x)
 	  __real__ res = HUGE_VALL;
 
 	  if (rcls == FP_NAN)
-	    __imag__ res = __nanl ("");
+	    __imag__ res = nanl ("");
 	  else
-	    __imag__ res = __copysignl ((rcls == FP_INFINITE
+	    __imag__ res = copysignl ((rcls == FP_INFINITE
 					 ? (__real__ x < 0.0
 					    ? M_PIl - M_PI_4l : M_PI_4l)
 					 : M_PI_2l), __imag__ x);
@@ -48,21 +48,21 @@ __cacoshl (__complex__ long double x)
 	  __real__ res = HUGE_VALL;
 
 	  if (icls >= FP_ZERO)
-	    __imag__ res = __copysignl (signbit (__real__ x) ? M_PIl : 0.0,
+	    __imag__ res = copysignl (signbit (__real__ x) ? M_PIl : 0.0,
 					__imag__ x);
 	  else
-	    __imag__ res = __nanl ("");
+	    __imag__ res = nanl ("");
 	}
       else
 	{
-	  __real__ res = __nanl ("");
-	  __imag__ res = __nanl ("");
+	  __real__ res = nanl ("");
+	  __imag__ res = nanl ("");
 	}
     }
   else if (rcls == FP_ZERO && icls == FP_ZERO)
     {
       __real__ res = 0.0;
-      __imag__ res = __copysignl (M_PI_2l, __imag__ x);
+      __imag__ res = copysignl (M_PI_2l, __imag__ x);
     }
   else
     {

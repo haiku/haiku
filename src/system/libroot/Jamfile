@@ -35,6 +35,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			posix_pthread.o
 			posix_signal.o
 			posix_stdio.o
+			posix_musl.o
 			posix_gnu_arch_$(TARGET_ARCH).o
 			posix_gnu_ctype.o
 			posix_gnu_ext.o

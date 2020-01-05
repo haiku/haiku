@@ -43,20 +43,20 @@ __csqrt (__complex__ double x)
 	{
 	  if (__real__ x < 0.0)
 	    {
-	      __real__ res = icls == FP_NAN ? __nan ("") : 0;
-	      __imag__ res = __copysign (HUGE_VAL, __imag__ x);
+	      __real__ res = icls == FP_NAN ? nan ("") : 0;
+	      __imag__ res = copysign (HUGE_VAL, __imag__ x);
 	    }
 	  else
 	    {
 	      __real__ res = __real__ x;
 	      __imag__ res = (icls == FP_NAN
-			      ? __nan ("") : __copysign (0.0, __imag__ x));
+			      ? nan ("") : copysign (0.0, __imag__ x));
 	    }
 	}
       else
 	{
-	  __real__ res = __nan ("");
-	  __imag__ res = __nan ("");
+	  __real__ res = nan ("");
+	  __imag__ res = nan ("");
 	}
     }
   else
@@ -66,42 +66,42 @@ __csqrt (__complex__ double x)
 	  if (__real__ x < 0.0)
 	    {
 	      __real__ res = 0.0;
-	      __imag__ res = __copysign (__ieee754_sqrt (-__real__ x),
+	      __imag__ res = copysign (sqrt (-__real__ x),
 					 __imag__ x);
 	    }
 	  else
 	    {
-	      __real__ res = fabs (__ieee754_sqrt (__real__ x));
-	      __imag__ res = __copysign (0.0, __imag__ x);
+	      __real__ res = fabs (sqrt (__real__ x));
+	      __imag__ res = copysign (0.0, __imag__ x);
 	    }
 	}
       else if (rcls == FP_ZERO)
 	{
-	  double r = __ieee754_sqrt (0.5 * fabs (__imag__ x));
+	  double r = sqrt (0.5 * fabs (__imag__ x));
 
-	  __real__ res = __copysign (r, __imag__ x);
+	  __real__ res = copysign (r, __imag__ x);
 	  __imag__ res = r;
 	}
       else
 	{
 	  double d, r, s;
 
-	  d = __ieee754_hypot (__real__ x, __imag__ x);
+	  d = hypot (__real__ x, __imag__ x);
 	  /* Use the identity   2  Re res  Im res = Im x
 	     to avoid cancellation error in  d +/- Re x.  */
 	  if (__real__ x > 0)
 	    {
-	      r = __ieee754_sqrt (0.5 * d + 0.5 * __real__ x);
+	      r = sqrt (0.5 * d + 0.5 * __real__ x);
 	      s = (0.5 * __imag__ x) / r;
 	    }
 	  else
 	    {
-	      s = __ieee754_sqrt (0.5 * d - 0.5 * __real__ x);
+	      s = sqrt (0.5 * d - 0.5 * __real__ x);
 	      r = fabs ((0.5 * __imag__ x) / s);
 	    }
 
 	  __real__ res = r;
-	  __imag__ res = __copysign (s, __imag__ x);
+	  __imag__ res = copysign (s, __imag__ x);
 	}
     }
 

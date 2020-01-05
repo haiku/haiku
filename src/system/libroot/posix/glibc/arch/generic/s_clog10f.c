@@ -35,25 +35,25 @@ __clog10f (__complex__ float x)
     {
       /* Real and imaginary part are 0.0.  */
       __imag__ result = signbit (__real__ x) ? M_PI : 0.0;
-      __imag__ result = __copysignf (__imag__ result, __imag__ x);
+      __imag__ result = copysignf (__imag__ result, __imag__ x);
       /* Yes, the following line raises an exception.  */
       __real__ result = -1.0 / fabsf (__real__ x);
     }
   else if (rcls != FP_NAN && icls != FP_NAN)
     {
       /* Neither real nor imaginary part is NaN.  */
-      __real__ result = __ieee754_log10f (__ieee754_hypotf (__real__ x,
+      __real__ result = log10f (hypotf (__real__ x,
 							    __imag__ x));
-      __imag__ result = M_LOG10E * __ieee754_atan2f (__imag__ x, __real__ x);
+      __imag__ result = M_LOG10E * atan2f (__imag__ x, __real__ x);
     }
   else
     {
-      __imag__ result = __nanf ("");
+      __imag__ result = nanf ("");
       if (rcls == FP_INFINITE || icls == FP_INFINITE)
 	/* Real or imaginary part is infinite.  */
 	__real__ result = HUGE_VALF;
       else
-	__real__ result = __nanf ("");
+	__real__ result = nanf ("");
     }
 
   return result;

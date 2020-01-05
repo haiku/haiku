@@ -35,25 +35,25 @@ __clogl (__complex__ long double x)
     {
       /* Real and imaginary part are 0.0.  */
       __imag__ result = signbit (__real__ x) ? M_PIl : 0.0;
-      __imag__ result = __copysignl (__imag__ result, __imag__ x);
+      __imag__ result = copysignl (__imag__ result, __imag__ x);
       /* Yes, the following line raises an exception.  */
       __real__ result = -1.0 / fabsl (__real__ x);
     }
   else if (rcls != FP_NAN && icls != FP_NAN)
     {
       /* Neither real nor imaginary part is NaN.  */
-      __real__ result = __ieee754_logl (__ieee754_hypotl (__real__ x,
+      __real__ result = logl (hypotl (__real__ x,
 							  __imag__ x));
-      __imag__ result = __ieee754_atan2l (__imag__ x, __real__ x);
+      __imag__ result = atan2l (__imag__ x, __real__ x);
     }
   else
     {
-      __imag__ result = __nanl ("");
+      __imag__ result = nanl ("");
       if (rcls == FP_INFINITE || icls == FP_INFINITE)
 	/* Real or imaginary part is infinite.  */
 	__real__ result = HUGE_VALL;
       else
-	__real__ result = __nanl ("");
+	__real__ result = nanl ("");
     }
 
   return result;

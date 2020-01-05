@@ -35,13 +35,13 @@ __casinf (__complex__ float x)
 	}
       else if (__isinff (__real__ x) || __isinff (__imag__ x))
 	{
-	  __real__ res = __nanf ("");
-	  __imag__ res = __copysignf (HUGE_VALF, __imag__ x);
+	  __real__ res = nanf ("");
+	  __imag__ res = copysignf (HUGE_VALF, __imag__ x);
 	}
       else
 	{
-	  __real__ res = __nanf ("");
-	  __imag__ res = __nanf ("");
+	  __real__ res = nanf ("");
+	  __imag__ res = nanf ("");
 	}
     }
   else
