@@ -338,7 +338,15 @@ extern float		y1f(float x);
 extern float		ynf(int x, float y);
 extern float		lgammaf_r(float x, int *y);
 
-
+#if __GNUC__ >= 7 || defined(__clang__)
+#define fpclassify(value) \
+	__builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, (value))
+#define signbit(value)	__builtin_signbit((value))
+#define isfinite(value)	__builtin_isfinite((value))
+#define isnormal(value)	__builtin_isnormal((value))
+#define isnan(value)	__builtin_isnan((value))
+#define isinf(value)	__builtin_isinf_sign((value))
+#else
 /* prototypes for functions used in the macros below */
 extern int			__fpclassifyf(float value);
 extern int			__signbitf(float value);
@@ -391,6 +399,7 @@ extern int			__isinf(double value);
 	(sizeof(value) == sizeof(float) ? __isinff(value)			\
 		: sizeof(value) == sizeof(double) ? __isinf(value)		\
 		: __isinfl(value))
+#endif
 
 #if __GNUC__ >= 4
 	#define isgreater(x, y)			__builtin_isgreater((x), (y))
