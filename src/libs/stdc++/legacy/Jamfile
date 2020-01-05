@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src libs stdc++ legacy ;
 
+AddSubDirSupportedPlatforms libbe_test ;
+
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup x86_gcc2 ] {
 	on $(architectureObject) {

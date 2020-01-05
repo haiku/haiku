@@ -271,6 +271,11 @@ rule CreateAsmStructOffsetsHeader header : source
 	local systemIncludesOption ;
 
 	on $(header) { # use on $(1) variable values
+		if ! $(PLATFORM) in $(SUPPORTED_PLATFORMS) {
+			Echo $(PLATFORM) is not in SUPPORTED_PLATFORMS, cannot make struct-offsets header! ;
+			return ;
+		}
+
 		# headers and defines
 		headers = $(HAIKU_CONFIG_HEADERS) $(SEARCH_SOURCE) $(SUBDIRHDRS)
 			$(HDRS) ;

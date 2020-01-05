@@ -22,12 +22,6 @@ rule TargetLibstdc++ asPath
 	# Returns the c++-standard-library for the target.
 	# Invoking with <asPath> = true will return the full library path.
 
-	if $(TARGET_PLATFORM) = libbe_test {
-		if $(TARGET_PACKAGING_ARCH) = x86_gcc2 {
-			return stdc++.r4 ;
-		}
-	}
-
 	if $(TARGET_PLATFORM) = haiku || $(TARGET_PLATFORM) = libbe_test {
 		if $(TARGET_PACKAGING_ARCH) = x86_gcc2 {
 			# the libstdc++.so for our legacy compiler (needs to be built)
