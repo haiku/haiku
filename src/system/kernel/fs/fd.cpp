@@ -984,6 +984,8 @@ _user_read_dir(int fd, struct dirent* userBuffer, size_t bufferSize,
 	if (status != B_OK)
 		return status;
 
+	ASSERT(count <= maxCount);
+
 	// copy the buffer back -- determine the total buffer size first
 	size_t sizeToCopy = 0;
 	BytePointer<struct dirent> entry = buffer;
@@ -992,6 +994,8 @@ _user_read_dir(int fd, struct dirent* userBuffer, size_t bufferSize,
 		sizeToCopy += length;
 		entry += length;
 	}
+
+	ASSERT(sizeToCopy <= bufferSize);
 
 	if (user_memcpy(userBuffer, buffer, sizeToCopy) != B_OK)
 		return B_BAD_ADDRESS;
