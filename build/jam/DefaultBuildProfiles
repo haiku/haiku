@@ -20,6 +20,14 @@ switch $(HAIKU_BUILD_PROFILE) {
 		TARGET_DEFINES += HAIKU_MINIMUM_BUILD ;
 	}
 
+	case "test-*" : {
+		HAIKU_BUILD_TYPE = test ;
+		EnableBuildFeatures minimum_image ;
+
+		HAIKU_DEFINES += HAIKU_MINIMUM_BUILD ;
+		TARGET_DEFINES += HAIKU_MINIMUM_BUILD ;
+	}
+
 	case "*" : {
 		HAIKU_BUILD_TYPE = regular ;
 		EnableBuildFeatures regular_image ;
@@ -63,6 +71,9 @@ rule DefineDefaultBuildProfiles
 	DefineBuildProfile minimum-cd : cd-image : "haiku-minimum.iso" ;
 	DefineBuildProfile minimum-anyboot : anyboot-image
 		: "haiku-minimum-anyboot.iso" ;
+
+	# test profiles
+	DefineBuildProfile test-raw : image : "haiku-test.image" ;
 
 	switch $(HAIKU_BUILD_PROFILE) {
 		case "release-*" : {
@@ -166,6 +177,18 @@ rule DefineDefaultBuildProfiles
 
 		case "minimum-*" : {
 			Echo Building Haiku Minimum Target ;
+			HAIKU_IMAGE_HOST_NAME ?= shredder ;
+			if $(DEBUG) != 0 {
+				HAIKU_IMAGE_SIZE ?= 450 ;
+			}
+
+			AddHaikuImageSystemPackages
+				openssl3
+				;
+		}
+
+		case "test-*" : {
+			Echo Building Haiku UnitTest Target ;
 			HAIKU_IMAGE_HOST_NAME ?= shredder ;
 			if $(DEBUG) != 0 {
 				HAIKU_IMAGE_SIZE ?= 450 ;

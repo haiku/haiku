@@ -1,0 +1,9 @@
+local haikuUnitTestsPackage = haiku_unittests.hpkg ;
+HaikuPackage $(haikuUnitTestsPackage) ;
+
+CopyDirectoryToPackage add-ons
+	:
+	$(TARGET_UNIT_TEST_DIR)
+;
+
+BuildHaikuPackage $(haikuUnitTestsPackage) : haiku_unittests ;

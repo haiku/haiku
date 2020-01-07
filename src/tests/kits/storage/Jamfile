@@ -28,12 +28,28 @@ UnitTestLib libstoragetest.so
 	: be [ TargetLibstdc++ ]
 ;
 
+rule CopyResources {
+	local files = $(1) ;
+	local sourceDir = $(2) ;
+	local targetDir = $(3) ;
+	for file in $(files) {
+		LOCATE on $(file) = $(sourceDir) ;
+		local targetFile = $(file:G=tests!unittests) ;
+		MakeLocate $(targetFile) : [ FDirName $(TARGET_UNIT_TEST_DIR) $(targetDir) ] ;
+		File $(targetFile) : $(file) ;
+		MODE on $(targetFile) = $(EXEMODE) ;
+		MimeSet $(targetFile) ;
+	}
+}
+
 # To run the tests some test files must be around.
 {
-	local resdir = <src!tests!kits!storage>resources ;
-	MakeLocate $(resdir) : $(TARGET_UNIT_TEST_DIR) ;
-	RelSymLink $(resdir) : [ FDirName $(HAIKU_TOP) src tests kits storage resources ] : false ;
-	Depends libstoragetest.so : $(resdir) ;
+	local sourceDir = src tests kits storage resources ;
+	local files = elf elf-no-res pef pef-no-res ppc.rsrc x86.rsrc ;
+	local sourceDirName = [ FDirName $(HAIKU_TOP) $(sourceDir) ] ;
+	local grist = [ FGrist $(sourceDir) ] ;
+	CopyResources $(files:G=$(grist)) : $(sourceDirName) : resources ;
+	Depends libstoragetest.so : $(files:G=tests!unittests) ;
 }
 
 SubInclude HAIKU_TOP src tests kits storage disk_device ;

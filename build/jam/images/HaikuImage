@@ -7,6 +7,8 @@ if $(HAIKU_BUILD_TYPE) = bootstrap {
 	include [ FDirName $(HAIKU_BUILD_RULES_DIR) images definitions bootstrap ] ;
 } else if $(HAIKU_BUILD_TYPE) = minimum {
 	include [ FDirName $(HAIKU_BUILD_RULES_DIR) images definitions minimum ] ;
+} else if $(HAIKU_BUILD_TYPE) = test {
+	include [ FDirName $(HAIKU_BUILD_RULES_DIR) images definitions minimum ] ;
 } else {
 	include [ FDirName $(HAIKU_BUILD_RULES_DIR) images definitions regular ] ;
 }
@@ -22,6 +24,10 @@ AddPackageFilesToHaikuImage system packages :
 	:
 	nameFromMetaInfo
 	;
+
+if $(HAIKU_BUILD_TYPE) = test {
+	AddPackageFilesToHaikuImage system packages : haiku_unittests.hpkg ;
+}
 
 # import what is shared by all images
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) images definitions common-tail ] ;

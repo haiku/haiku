@@ -18,6 +18,10 @@ if $(HAIKU_BUILD_TYPE) = bootstrap {
 	packages += Haiku ;
 }
 
+if $(HAIKU_BUILD_TYPE) = test {
+	packages += HaikuUnitTests ;
+}
+
 local archDependentPackages =
 	HaikuCrossDevel
 	WebPositive

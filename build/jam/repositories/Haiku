@@ -30,6 +30,10 @@ if $(HAIKU_IS_BOOTSTRAP) != 1 && $(HAIKU_BUILD_TYPE) != minimum {
 	}
 }
 
+if $(HAIKU_BUILD_TYPE) = test {
+	packages += haiku_unittests ;
+}
+
 local webPositiveIsAvailable ;
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {

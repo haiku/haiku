@@ -15,6 +15,8 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) cppunit ] ;
 	}
 }
 
+MakeLocate libcppunit.so : $(TARGET_UNIT_TEST_LIB_DIR) ;
+
 SharedLibrary libcppunit.so :
 	BTestCase.cpp
 	BTestSuite.cpp
@@ -53,12 +55,4 @@ SharedLibrary libcppunit.so :
 
 if  ( $(OS) = BEOS || $(OS) = HAIKU ) && $(OSPLAT) != PPC {
 	LinkAgainst libcppunit.so : libelfsymbolpatcher.a debug ;
-}
-
-# To run the tests we need the cppunit library.
-{
-	local target = <src!tools!cppunit>libcppunit.so ;
-	MakeLocate $(target) : $(TARGET_UNIT_TEST_LIB_DIR) ;
-	RelSymLink $(target) : libcppunit.so ;
-	Depends libcppunit.so : $(target) ;
 }

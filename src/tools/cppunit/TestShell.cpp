@@ -444,26 +444,28 @@ BTestShell::LoadDynamicSuites() {
 	}
 
 	set<string>::iterator i;
+	int count = 0;
 	for (i = fLibDirs.begin(); i != fLibDirs.end(); i++) {
 		BDirectory libDir((*i).c_str());
 		if (Verbosity() >= v3)
 			cout << "Checking " << *i << endl;
-/*		int count =*/ LoadSuitesFrom(&libDir);
+		count += LoadSuitesFrom(&libDir);
 		if (Verbosity() >= v3) {
-//			cout << "Loaded " << count << " suite" << (count == 1 ? "" : "s");
-//			cout << " from " << *i << endl;
+			cout << "Loaded " << count << " suite" << (count == 1 ? "" : "s");
+			cout << " from " << *i << endl;
 		}
 	}
 
-	if (Verbosity() >= v3)
+	if (Verbosity() >= v3) {
 		cout << endl;
+	}
 
 	// Look for suites and tests with the same name and give a
 	// warning, as this is only asking for trouble... :-)
 	for (SuiteMap::const_iterator i = fSuites.begin(); i != fSuites.end(); i++) {
 		if (fTests.find(i->first) != fTests.end() && Verbosity() > v0) {
 			cout << "WARNING: '" << i->first << "' refers to both a test suite *and* an individual" <<
-			endl << "         test. Both will be executed, but it is reccommended you rename" <<
+			endl << "         test. Both will be executed, but it is recommended you rename" <<
 			endl << "         one of them to resolve the conflict." <<
 			endl << endl;
 		}

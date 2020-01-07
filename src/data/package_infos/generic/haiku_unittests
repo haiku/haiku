@@ -1,0 +1,19 @@
+name			haiku_unittests
+version			%HAIKU_VERSION%
+architecture	%HAIKU_PACKAGING_ARCH%
+summary			"Haiku unit tests"
+description 	"Unit tests to ensure the continued stability of Haiku"
+
+packager		"The Haiku build system"
+vendor			"Haiku Project"
+
+copyrights		"2007-2026 Haiku, Inc."
+licenses		MIT
+
+provides {
+	haiku_unittests=%HAIKU_VERSION%
+}
+
+requires {
+	haiku
+}
