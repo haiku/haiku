@@ -74,11 +74,13 @@ LongAndDragTrackingFilter::Filter(BMessage* message, BHandler** target)
 		return B_DISPATCH_MESSAGE;
 
 	switch (message->what) {
-		case B_MOUSE_DOWN:
+		case B_MOUSE_DOWN: {
+			int32 clicks = 0;
 
 			message->FindInt32("buttons", (int32*)&fClickButtons);
+			message->FindInt32("clicks", (int32*)&clicks);
 
-			if (fClickButtons != 0) {
+			if (fClickButtons != 0 && clicks == 1) {
 
 				BView* targetView = dynamic_cast<BView*>(*target);
 				if (targetView != NULL)
@@ -94,10 +96,12 @@ LongAndDragTrackingFilter::Filter(BMessage* message, BHandler** target)
 					BMessenger(*target), &message, fDurationThreshold, 1);
 			}
 			return B_DISPATCH_MESSAGE;
+		}
 
 		case B_MOUSE_UP:
 			_StopTracking();
 			message->AddInt32("last_buttons", (int32)fClickButtons);
+			message->FindInt32("buttons", (int32*)&fClickButtons);
 			return B_DISPATCH_MESSAGE;
 
 		case B_MOUSE_MOVED:

@@ -745,6 +745,7 @@ protected:
 	const BPose* fRealPivotPose;
 	BMessageRunner* fKeyRunner;
 	bool fTrackRightMouseUp;
+	bool fTrackMouseUp;
 
 	struct SelectionRectInfo {
 		SelectionRectInfo()

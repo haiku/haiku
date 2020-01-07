@@ -251,6 +251,7 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	fRealPivotPose(NULL),
 	fKeyRunner(NULL),
 	fTrackRightMouseUp(false),
+	fTrackMouseUp(false),
 	fSelectionVisible(true),
 	fMultipleSelection(true),
 	fDragEnabled(true),
@@ -7305,6 +7306,7 @@ BPoseView::MouseDragged(const BMessage* message)
 		fTextWidgetToCheck->CancelWait();
 
 	fTrackRightMouseUp = false;
+	fTrackMouseUp = false;
 
 	BPoint where;
 	uint32 buttons = 0;
@@ -7329,6 +7331,7 @@ void
 BPoseView::MouseLongDown(const BMessage* message)
 {
 	fTrackRightMouseUp = false;
+	fTrackMouseUp = false;
 
 	BPoint where;
 	if (message->FindPoint("where", &where) != B_OK)
@@ -7383,6 +7386,7 @@ BPoseView::MouseDown(BPoint where)
 	bool secondaryMouseButtonDown
 		= SecondaryMouseButtonDown(modifierKeys, buttons);
 	fTrackRightMouseUp = secondaryMouseButtonDown;
+	fTrackMouseUp = !secondaryMouseButtonDown;
 	bool extendSelection = (modifierKeys & B_COMMAND_KEY) != 0
 		&& fMultipleSelection;
 
@@ -7403,6 +7407,8 @@ BPoseView::MouseDown(BPoint where)
 			&& buttons == B_PRIMARY_MOUSE_BUTTON
 			&& fLastClickButtons == B_PRIMARY_MOUSE_BUTTON
 			&& (modifierKeys & B_CONTROL_KEY) == 0) {
+			fTrackRightMouseUp = false;
+			fTrackMouseUp = false;
 			// special handling for path field double-clicks
 			if (!WasClickInPath(pose, index, where))
 				OpenSelection(pose, &index);
@@ -7468,7 +7474,12 @@ BPoseView::MouseUp(BPoint where)
 		}
 		ShowContextMenu(where);
 	}
+
+	if (fTrackMouseUp)
+		Window()->Activate();
+
 	fTrackRightMouseUp = false;
+	fTrackMouseUp = false;
 }
 
 
