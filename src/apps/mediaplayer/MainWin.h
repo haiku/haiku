@@ -47,7 +47,7 @@ public:
 
 			void				OpenPlaylist(const BMessage* playlistArchive);
 			void				OpenPlaylistItem(const PlaylistItemRef& item);
-
+			void				Eject();
 			void				ShowFileInfo();
 			void				ShowPlaylistWindow();
 			void				ShowSettingsWindow();
@@ -189,6 +189,7 @@ private:
 			bool				fScaleFullscreenControls;
 			bigtime_t			fInitialSeekPosition;
 			bool				fAllowWinding;
+			int					fDevice;
 
 	static	int					sNoVideoWidth;
 };

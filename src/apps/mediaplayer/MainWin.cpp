@@ -20,6 +20,8 @@
 #include <Autolock.h>
 #include <Catalog.h>
 #include <Debug.h>
+#include <Directory.h>
+#include <Drivers.h>
 #include <fs_attr.h>
 #include <LayoutBuilder.h>
 #include <Language.h>
@@ -67,6 +69,7 @@ enum {
 	M_DUMMY = 0x100,
 	M_FILE_OPEN = 0x1000,
 	M_NETWORK_STREAM_OPEN,
+	M_EJECT_DEVICE,
 	M_FILE_INFO,
 	M_FILE_PLAYLIST,
 	M_FILE_CLOSE,
@@ -887,6 +890,10 @@ MainWin::MessageReceived(BMessage* msg)
 			break;
 		}
 
+		case M_EJECT_DEVICE:
+			Eject();
+			break;
+
 		case M_FILE_INFO:
 			ShowFileInfo();
 			break;
@@ -1199,6 +1206,62 @@ MainWin::OpenPlaylistItem(const PlaylistItemRef& item)
 		string.SetToFormat(B_TRANSLATE("Opening '%s'."), item->Name().String());
 		fControls->SetDisabledString(string.String());
 	}
+}
+
+
+static int
+FindCdPlayerDevice(const char* directory)
+{
+	BDirectory dir;
+	dir.SetTo(directory);
+	if (dir.InitCheck() != B_NO_ERROR)
+		return false;
+	dir.Rewind();
+	BEntry entry;
+	while (dir.GetNextEntry(&entry) >= 0) {
+		BPath path;
+		if (entry.GetPath(&path) != B_NO_ERROR)
+			continue;
+		const char* name = path.Path();
+		entry_ref e;
+		if (entry.GetRef(&e) != B_NO_ERROR)
+			continue;
+		if (entry.IsDirectory()) {
+			if (strcmp(e.name, "floppy") == 0)
+				continue; // ignore floppy
+			int deviceFD = FindCdPlayerDevice(name);
+			if (deviceFD >= 0)
+				return deviceFD;
+		} else {
+			if (strcmp(e.name, "raw") != 0)
+				continue;
+			int deviceFD = open(name, O_RDONLY);
+			if (deviceFD < 0)
+				continue;
+			device_geometry geometry;
+			if (ioctl(deviceFD, B_GET_GEOMETRY, &geometry, sizeof(geometry)) >= 0
+				&& geometry.device_type == B_CD)
+				return deviceFD;
+			close(deviceFD);
+		}
+	}
+	return B_ERROR;
+}
+
+
+void
+MainWin::Eject()
+{
+	status_t mediaStatus = B_DEV_NO_MEDIA;
+	// find the cd player device
+	fDevice = FindCdPlayerDevice("/dev/disk");
+	// get the status first
+	ioctl(fDevice, B_GET_MEDIA_STATUS, &mediaStatus, sizeof(mediaStatus));
+	// if door open, load the media, else eject the cd
+	status_t result = ioctl(fDevice,
+		mediaStatus == B_DEV_DOOR_OPEN ? B_LOAD_MEDIA : B_EJECT_DEVICE);
+	if (result != B_NO_ERROR)
+		printf("Error ejecting device");
 }
 
 
@@ -1548,6 +1611,10 @@ MainWin::_CreateMenu()
 
 	item = new BMenuItem(B_TRANSLATE("Open network stream"),
 		new BMessage(M_NETWORK_STREAM_OPEN));
+	fFileMenu->AddItem(item);
+
+	item = new BMenuItem(B_TRANSLATE("Eject Device"),
+		new BMessage(M_EJECT_DEVICE));
 	fFileMenu->AddItem(item);
 
 	fFileMenu->AddSeparatorItem();
@@ -2745,5 +2812,3 @@ MainWin::_AdoptGlobalSettings()
 	fLoopSounds = settings.loopSound;
 	fScaleFullscreenControls = settings.scaleFullscreenControls;
 }
-
-
