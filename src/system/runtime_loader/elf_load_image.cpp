@@ -416,7 +416,7 @@ parse_elf_header(elf_ehdr* eheader, int32* _pheaderSize,
 	*_pheaderSize = eheader->e_phentsize * eheader->e_phnum;
 	*_sheaderSize = eheader->e_shentsize * eheader->e_shnum;
 
-	if (*_pheaderSize <= 0 || *_sheaderSize <= 0)
+	if (*_pheaderSize <= 0)
 		return B_NOT_AN_EXECUTABLE;
 
 	return B_OK;
@@ -444,7 +444,7 @@ parse_elf32_header(Elf32_Ehdr* eheader, int32* _pheaderSize,
 	*_pheaderSize = eheader->e_phentsize * eheader->e_phnum;
 	*_sheaderSize = eheader->e_shentsize * eheader->e_shnum;
 
-	if (*_pheaderSize <= 0 || *_sheaderSize <= 0)
+	if (*_pheaderSize <= 0)
 		return B_NOT_AN_EXECUTABLE;
 
 	return B_OK;
@@ -469,7 +469,7 @@ parse_elf64_header(Elf64_Ehdr* eheader, int32* _pheaderSize,
 	*_pheaderSize = eheader->e_phentsize * eheader->e_phnum;
 	*_sheaderSize = eheader->e_shentsize * eheader->e_shnum;
 
-	if (*_pheaderSize <= 0 || *_sheaderSize <= 0)
+	if (*_pheaderSize <= 0)
 		return B_NOT_AN_EXECUTABLE;
 
 	return B_OK;

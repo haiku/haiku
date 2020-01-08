@@ -23,6 +23,9 @@ static bool
 analyze_object_gcc_version(int fd, image_t* image, elf_ehdr& eheader,
 	int32 sheaderSize, char* buffer, size_t bufferSize)
 {
+	if (sheaderSize <= 0)
+		return false;
+
 	if (sheaderSize > (int)bufferSize) {
 		FATAL("%s: Cannot handle section headers bigger than %lu bytes\n",
 			image->path, bufferSize);
