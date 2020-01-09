@@ -10,3 +10,4 @@ HaikuSubInclude random_file_actions ;
 HaikuSubInclude random_read ;
 HaikuSubInclude udf ;
 HaikuSubInclude userlandfs ;
+HaikuSubInclude xfs ;

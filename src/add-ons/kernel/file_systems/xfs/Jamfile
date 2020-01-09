@@ -1,0 +1,36 @@
+SubDir HAIKU_TOP src add-ons kernel file_systems xfs ;
+
+# set some additional defines
+{
+    local defines =
+        XFS_DEBUGGER_COMMANDS
+        ;
+
+    defines = [ FDefines $(defines) ] ;
+    SubDirCcFlags $(defines) ;
+    SubDirC++Flags $(defines) ;
+}
+
+UsePrivateHeaders [ FDirName kernel util ] ;
+UsePrivateHeaders shared storage file_systems ;
+UsePrivateKernelHeaders ;
+
+DEFINES += DEBUG_APP="\\\"xfs\\\"" ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src libs uuid ] : true ;
+
+local xfsSources =
+    kernel_cpp.cpp
+    kernel_interface.cpp
+    ;
+KernelAddon xfs :
+    $(xfsSources)
+    :
+	libuuid_kernel.a
+;
+
+SEARCH on [ FGristFiles $(xfsSources) ]
+    = [ FDirName  $(HAIKU_TOP) src add-ons kernel file_systems xfs ] ;
+
+SEARCH on [ FGristFiles kernel_cpp.cpp ]
+    = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
