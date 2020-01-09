@@ -135,8 +135,7 @@ public:
 
 			const rgb_color& ViewColor() const
 								{ return fViewColor; }
-			void			SetViewColor(const rgb_color& color)
-								{ fViewColor = color; }
+			void			SetViewColor(const rgb_color& color);
 
 			void			ColorUpdated(color_which which, rgb_color color);
 			void			SetViewUIColor(color_which which, float tint);
