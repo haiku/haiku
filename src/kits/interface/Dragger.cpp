@@ -251,16 +251,6 @@ BDragger::Draw(BRect update)
 	BRect bounds(Bounds());
 
 	if (AreDraggersDrawn() && (fShelf == NULL || fShelf->AllowsDragging())) {
-		if (Parent() != NULL && (Parent()->Flags() & B_DRAW_ON_CHILDREN) == 0) {
-			uint32 flags = Parent()->Flags();
-			Parent()->SetFlags(flags | B_DRAW_ON_CHILDREN);
-			SetHighColor(Parent()->ViewColor());
-			FillRect(Bounds());
-			Parent()->Draw(Frame() & ConvertToParent(update));
-			Parent()->Flush();
-			Parent()->SetFlags(flags);
-		}
-
 		BPoint where = bounds.RightBottom() - BPoint(fBitmap->Bounds().Width(),
 			fBitmap->Bounds().Height());
 		SetDrawingMode(B_OP_OVER);
