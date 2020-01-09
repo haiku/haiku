@@ -3022,8 +3022,6 @@ TermView::_HandleInputMethodChanged(BMessage *message)
 			KeyDown(prevPos, currPos - prevPos);
 			prevPos = currPos;
 		}
-
-		Invalidate();
 	} else {
 		// temporarily show transient state of inline input
 		int32 selectionStart = 0;
@@ -3033,8 +3031,8 @@ TermView::_HandleInputMethodChanged(BMessage *message)
 
 		fInline->SetSelectionOffset(selectionStart);
 		fInline->SetSelectionLength(selectionEnd - selectionStart);
-		Invalidate();
 	}
+	Invalidate();
 }
 
 
