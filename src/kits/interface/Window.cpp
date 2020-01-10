@@ -1187,23 +1187,6 @@ FrameMoved(origin);
 				float height;
 				fLink->Read<float>(&width);
 				fLink->Read<float>(&height);
-				if (origin != fFrame.LeftTop()) {
-					// TODO: remove code duplicatation with
-					// B_WINDOW_MOVED case...
-					//printf("window position was not up to date\n");
-					fFrame.OffsetTo(origin);
-					FrameMoved(origin);
-				}
-				if (width != fFrame.Width() || height != fFrame.Height()) {
-					// TODO: remove code duplicatation with
-					// B_WINDOW_RESIZED case...
-					//printf("window size was not up to date\n");
-					fFrame.right = fFrame.left + width;
-					fFrame.bottom = fFrame.top + height;
-
-					_AdoptResize();
-					FrameResized(width, height);
-				}
 
 				// read tokens for views that need to be drawn
 				// NOTE: we need to read the tokens completely
@@ -1232,6 +1215,26 @@ FrameMoved(origin);
 					if (error < B_OK)
 						break;
 				}
+				// Hooks should be called after finishing reading reply because
+				// they can access fLink.
+				if (origin != fFrame.LeftTop()) {
+					// TODO: remove code duplicatation with
+					// B_WINDOW_MOVED case...
+					//printf("window position was not up to date\n");
+					fFrame.OffsetTo(origin);
+					FrameMoved(origin);
+				}
+				if (width != fFrame.Width() || height != fFrame.Height()) {
+					// TODO: remove code duplicatation with
+					// B_WINDOW_RESIZED case...
+					//printf("window size was not up to date\n");
+					fFrame.right = fFrame.left + width;
+					fFrame.bottom = fFrame.top + height;
+
+					_AdoptResize();
+					FrameResized(width, height);
+				}
+				
 				// draw
 				int32 count = infos.CountItems();
 				for (int32 i = 0; i < count; i++) {
