@@ -6,10 +6,17 @@
 #define EXTENT_ALLOCATOR_H
 
 
-#include "Volume.h"
 #include "BTree.h"
+#include "Volume.h"
 
+#include "system_dependencies.h"
+
+
+#ifdef FS_SHELL
+#define ERROR(x...) TRACE(x)
+#else
 #include <DebugSupport.h>
+#endif
 
 
 //#define TRACE_BTRFS

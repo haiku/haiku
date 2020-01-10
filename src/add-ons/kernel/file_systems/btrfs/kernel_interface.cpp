@@ -12,10 +12,20 @@
 #include "AttributeIterator.h"
 #include "btrfs.h"
 #include "btrfs_disk_system.h"
-#include "DebugSupport.h"
 #include "DirectoryIterator.h"
 #include "Inode.h"
+#include "system_dependencies.h"
 #include "Utility.h"
+
+
+#ifdef FS_SHELL
+#define ERROR(x...) TRACE(x)
+#define INFORM(x...) TRACE(x)
+#define init_debugging()
+#define exit_debugging()
+#else
+#include <DebugSupport.h>
+#endif
 
 
 //#define TRACE_BTRFS
@@ -928,7 +938,7 @@ btrfs_initialize(int fd, partition_id partitionID, const char* name,
 	if (parameters.verbose) {
 		btrfs_super_block super = volume.SuperBlock();
 
-		INFORM(("Disk was initialized successfully.\n"));
+		INFORM("Disk was initialized successfully.\n");
 		INFORM("\tlabel: \"%s\"\n", super.label);
 		INFORM("\tblock size: %u bytes\n", (unsigned)super.BlockSize());
 		INFORM("\tsector size: %u bytes\n", (unsigned)super.SectorSize());

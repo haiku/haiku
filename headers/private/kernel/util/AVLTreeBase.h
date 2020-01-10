@@ -9,7 +9,6 @@
 #ifndef FS_SHELL
 #	include <SupportDefs.h>
 #else
-#	include <algorithm>
 #	include "fssh_api_wrapper.h"
 #endif
 

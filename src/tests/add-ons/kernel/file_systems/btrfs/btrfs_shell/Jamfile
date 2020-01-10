@@ -9,6 +9,7 @@ DEFINES += HAIKU_BUILD_COMPATIBILITY_H ;
 {
 	local defines =
 		FS_SHELL
+		Z_SOLO # prevent inclusion of system headers from zlib.h
 		TRACE_BTRFS # ENABLE DEBUGGING
 		USER=1
 		;

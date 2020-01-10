@@ -16,12 +16,16 @@
 #include "CachedBlock.h"
 #include "Chunk.h"
 #include "CRCTable.h"
-#include "DebugSupport.h"
 #include "ExtentAllocator.h"
 #include "Inode.h"
 #include "Journal.h"
 #include "Utility.h"
 
+#ifdef FS_SHELL
+#define RETURN_ERROR return
+#else
+#include "DebugSupport.h"
+#endif
 
 //#define TRACE_BTRFS
 #ifdef TRACE_BTRFS

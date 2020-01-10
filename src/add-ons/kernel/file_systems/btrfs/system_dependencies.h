@@ -8,14 +8,22 @@
 
 #ifdef FS_SHELL
 
-// This needs to be included before the fs_shell wrapper
-#include <zlib.h>
-
-#include <util/AVLTree.h>
-#include <uuid.h>
-
 #include "fssh_api_wrapper.h"
 #include "fssh_auto_deleter.h"
+
+#include <util/AVLTree.h>
+#include <zlib.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+typedef unsigned char uuid_t[16];
+
+void uuid_generate(uuid_t out);
+#ifdef __cplusplus
+}
+#endif
+
 
 #else	// !FS_SHELL
 
