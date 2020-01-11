@@ -580,6 +580,10 @@ TermView::Columns() const
 BRect
 TermView::SetTermSize(int rows, int columns, bool notifyShell)
 {
+	// if nothing changed, don't do anything
+	if (rows == fRows && columns == fColumns)
+		return BRect(0, 0, fColumns * fFontWidth, fRows * fFontHeight);
+
 //debug_printf("TermView::SetTermSize(%d, %d)\n", rows, columns);
 	if (rows > 0)
 		fRows = rows;
