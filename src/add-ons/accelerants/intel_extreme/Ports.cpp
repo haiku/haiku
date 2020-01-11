@@ -490,14 +490,17 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		link->Train(target);
 #endif
 
-	// For LVDS panels, we actually always set the native mode in hardware
-	// Then we use the panel fitter to scale the picture to that.
+	// For LVDS panels, we may need to set the timings according to the panel
+	// native video mode, and let the panel fitter do the scaling. But the
+	// place where the scaling happens varies accross generations of devices.
 	display_mode hardwareTarget;
 	bool needsScaling = false;
 
-	// TODO needed for the other generations as well, in some way?
-	if (gInfo->shared_info->device_type.Generation() == 4
-			&& gInfo->shared_info->got_vbt) {
+	// TODO figure out how it's done (or if we need to configure something at
+	// all) for other generations
+	if ((gInfo->shared_info->device_type.Generation() == 4
+			|| gInfo->shared_info->device_type.Generation() == 3)
+		&& gInfo->shared_info->got_vbt) {
 		// Set vbios hardware panel mode as base
 		memcpy(&hardwareTarget, &gInfo->shared_info->panel_mode,
 			sizeof(display_mode));
@@ -519,6 +522,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		}
 	} else {
 		// We don't have VBT data, try to set the requested mode directly
+		// and hope for the best
 		hardwareTarget = *target;
 	}
 
@@ -609,7 +613,8 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 			// LVDS is always on pipe B.
 		write32(INTEL_PANEL_FIT_CONTROL, panelFitterControl);
 	} else {
-		if (gInfo->shared_info->device_type.Generation() == 4) {
+		if (gInfo->shared_info->device_type.Generation() == 4
+			|| gInfo->shared_info->device_type.Generation() == 3) {
 			// Bypass the panel fitter
 			uint32 panelFitterControl = read32(INTEL_PANEL_FIT_CONTROL);
 			panelFitterControl &= ~PANEL_FITTER_ENABLED;
