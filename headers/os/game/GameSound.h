@@ -1,21 +1,16 @@
 /*
- *  Copyright 2001-2002, Haiku Inc. All Rights Reserved.
+ *  Copyright 2020, Haiku, Inc. All Rights Reserved.
  *  Distributed under the terms of the MIT License.
- *
- * Author:
- *		Christopher ML Zumwalt May (zummy@users.sf.net)
  */
 #ifndef _GAMESOUND_H
 #define _GAMESOUND_H
 
 
 #include <GameSoundDefs.h>
-
 #include <new>
 
 
 class BGameSoundDevice;
-
 
 class BGameSound {
 public:
@@ -25,22 +20,16 @@ public:
 	virtual	BGameSound*			Clone() const = 0;
 			status_t			InitCheck() const;
 
-	// BGameSound attributes
 			BGameSoundDevice*	Device() const;
 			gs_id				ID() const;
-			const gs_audio_format& Format() const;
-				//	only valid after Init()
+	const	gs_audio_format&	Format() const;
 
-	// Playing sounds
 	virtual	status_t			StartPlaying();
 	virtual	bool				IsPlaying();
 	virtual	status_t			StopPlaying();
 
-	// Modifing the playback
 			status_t			SetGain(float gain, bigtime_t duration = 0);
-				//	ramp duration in seconds
 			status_t			SetPan(float pan, bigtime_t duration = 0);
-				//	ramp duration in seconds
 
 			float				Gain();
 			float				Pan();
@@ -54,14 +43,14 @@ public:
 			void*				operator new(size_t size,
 									const std::nothrow_t&) throw();
 			void				operator delete(void* ptr);
-			void				operator delete(void* ptr, 
+			void				operator delete(void* ptr,
 									const std::nothrow_t&) throw();
 
 	static	status_t			SetMemoryPoolSize(size_t poolSize);
 	static	status_t			LockMemoryPool(bool lockInCore);
 	static	int32				SetMaxSoundCount(int32 maxCount);
 
-	virtual	status_t	 		Perform(int32 selector, void* data);
+	virtual	status_t			Perform(int32 selector, void* data);
 
 protected:
 			status_t			SetInitError(status_t initError);
@@ -72,7 +61,6 @@ protected:
 
 private:
 								BGameSound();
-									// not implemented
 
 	virtual	status_t			_Reserved_BGameSound_0(int32 arg, ...);
 	virtual	status_t			_Reserved_BGameSound_1(int32 arg, ...);
@@ -126,12 +114,12 @@ private:
 private:
 			BGameSoundDevice*	fDevice;
 			status_t			fInitError;
-			
-			gs_audio_format		fFormat;		
+
+			gs_audio_format		fFormat;
 			gs_id				fSound;
 
 			uint32				_reserved[16];
 };
 
 
-#endif	// _GAME_SOUND_H
+#endif
