@@ -166,6 +166,8 @@ BookmarkBar::FrameResized(float width, float height)
 		for (int j = i; j < count; j++)
 			fOverflowMenu->AddItem(RemoveItem(j));
 	}
+
+	BMenuBar::FrameResized(width, height);
 }
 
 
