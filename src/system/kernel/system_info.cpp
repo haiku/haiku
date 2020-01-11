@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004-2014, Haiku, Inc.
+ * Copyright (c) 2004-2020, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -49,8 +49,8 @@ const static char *kKernelName = "kernel_" HAIKU_ARCH;
 static int
 dump_info(int argc, char **argv)
 {
-	kprintf("kernel build: %s %s (gcc%d %s)\n", __DATE__, __TIME__, __GNUC__,
-		__VERSION__);
+	kprintf("kernel build: %s %s (gcc%d %s), debug level %d\n", __DATE__,
+		__TIME__, __GNUC__, __VERSION__, KDEBUG_LEVEL);
 	kprintf("revision: %s\n\n", get_haiku_revision());
 
 	kprintf("cpu count: %" B_PRId32 "\n", smp_get_num_cpus());
