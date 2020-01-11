@@ -275,7 +275,7 @@ get_test_app_ref(RecentAppsTestAppId id, entry_ref *ref)
 		err = testDir ? B_OK : B_NAME_NOT_FOUND;
 	if (!err) {
 		char path[B_PATH_NAME_LENGTH];
-		sprintf(path, "%s/../kits/app/%s%s", testDir, kRecentAppsTestAppFilenames[id],
+		sprintf(path, "%s/%s%s", testDir, kRecentAppsTestAppFilenames[id],
 #if TEST_R5
 		"_r5"
 #else
