@@ -1050,9 +1050,6 @@ AboutView::_CreateCreditsView()
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
 	fCreditsView->Insert(B_TRANSLATE("\nCopyrights\n\n"));
 
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
-	fCreditsView->Insert(B_TRANSLATE("[Click a license name to read the "
-		"respective license.]\n\n"));
 
 	// Haiku license
 	BString haikuLicense = B_TRANSLATE_COMMENT("The code that is unique to "
@@ -1069,26 +1066,31 @@ AboutView::_CreateCreditsView()
 	int32 licensePart4 = haikuLicense.FindLast(">");
 	BString part;
 	haikuLicense.CopyInto(part, 0, licensePart1);
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(part);
 
 	part.Truncate(0);
 	haikuLicense.CopyInto(part, licensePart1 + 1, licensePart2 - 1
 		- licensePart1);
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kLinkBlue);
 	fCreditsView->InsertHyperText(part, new OpenFileAction(mitPath.Path()));
 
 	part.Truncate(0);
 	haikuLicense.CopyInto(part, licensePart2 + 1, licensePart3 - 1
 		- licensePart2);
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(part);
 
 	part.Truncate(0);
 	haikuLicense.CopyInto(part, licensePart3 + 1, licensePart4 - 1
 		- licensePart3);
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kLinkBlue);
 	fCreditsView->InsertHyperText(part, new OpenFileAction(lgplPath.Path()));
 
 	part.Truncate(0);
 	haikuLicense.CopyInto(part, licensePart4 + 1, haikuLicense.Length() - 1
 		- licensePart4);
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(part);
 
 	// GNU copyrights
