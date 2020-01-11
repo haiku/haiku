@@ -1,6 +1,6 @@
 /*
  * Copyright 2018, Jérôme Duval, jerome.duval@gmail.com.
- * Copyright 2002-2015, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2020, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -130,7 +130,8 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		debug_init(&sKernelArgs);
 		set_dprintf_enabled(true);
 		dprintf("Welcome to kernel debugger output!\n");
-		dprintf("Haiku revision: %s\n", get_haiku_revision());
+		dprintf("Haiku revision: %s, debug level: %d\n", get_haiku_revision(),
+			KDEBUG_LEVEL);
 
 		// init modules
 		TRACE("init CPU\n");
