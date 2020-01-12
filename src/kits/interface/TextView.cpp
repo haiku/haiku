@@ -787,8 +787,10 @@ BTextView::MakeFocus(bool focus)
 		if (!fActive)
 			_Activate();
 	} else {
-		if (fActive)
+		if (fActive) {
+			Select(fCaretOffset, fCaretOffset);
 			_Deactivate();
+		}
 	}
 }
 

@@ -52,7 +52,7 @@ private:
 		BTextControl	*TextControl();
 
 		char			*fPreviousText;
-		bool			fBool;
+		bool			fInMouseDown;
 };
 
 }	// namespace BPrivate
