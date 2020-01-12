@@ -4915,6 +4915,8 @@ BTextView::_MessageDropped(BMessage* message, BPoint where, BPoint offset)
 		}
 
 		Insert(dropOffset, text, dataLength, runArray);
+		if (IsFocus())
+			Select(dropOffset, dropOffset + dataLength);
 	}
 
 	return true;
