@@ -600,7 +600,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	}
 
 	// Program target display mode
-	fPipe->ConfigureTimings(target, false);
+	fPipe->ConfigureTimings(target, !needsScaling);
 
 	if (needsScaling) {
 		// Enable panel fitter in automatic mode. It will figure out

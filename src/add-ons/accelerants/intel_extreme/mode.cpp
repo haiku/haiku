@@ -73,7 +73,6 @@ get_color_space_format(const display_mode &mode, uint32 &colorMode,
 	bytesPerRow = mode.virtual_width * bytesPerPixel;
 
 	// Make sure bytesPerRow is a multiple of 64
-	// TODO: check if the older chips have the same restriction!
 	if ((bytesPerRow & 63) != 0)
 		bytesPerRow = (bytesPerRow + 63) & ~63;
 }
