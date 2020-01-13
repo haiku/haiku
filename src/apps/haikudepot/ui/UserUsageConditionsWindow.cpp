@@ -1,5 +1,5 @@
 /*
- * Copyright 2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -21,6 +21,7 @@
 #include "MarkupTextView.h"
 #include "Model.h"
 #include "UserUsageConditions.h"
+#include "ServerHelper.h"
 #include "WebAppInterface.h"
 
 
@@ -318,40 +319,69 @@ UserUsageConditionsWindow::_FetchUserUsageConditionsCodePerform(
 	switch (fMode) {
 		case LATEST:
 			code.SetTo("");
-				// no code for the latest
+				// no code in order to get the latest
 			return B_OK;
 		case USER:
-		{
-			WebAppInterface interface = fModel.GetWebAppInterface();
-
-			if (interface.Nickname().IsEmpty())
-				debugger("attempt to get user details for the current user, but"
-					" there is no current user");
-
-			status_t result = interface.RetrieveCurrentUserDetail(userDetail);
-
-			if (result == B_OK) {
-				BString userUsageConditionsCode = userDetail.Agreement().Code();
-				if (Logger::IsDebugEnabled()) {
-					printf("the user [%s] has agreed to uuc [%s]\n",
-						interface.Nickname().String(),
-						userUsageConditionsCode.String());
-				}
-				code.SetTo(userUsageConditionsCode);
-			} else {
-				if (Logger::IsDebugEnabled()) {
-					printf("unable to get details of the user [%s]\n",
-						interface.Nickname().String());
-				}
-			}
-
-			return result;
-			break;
-		}
+			return _FetchUserUsageConditionsCodeForUserPerform(
+				userDetail, code);
 		default:
 			debugger("unhanded mode");
 			return B_ERROR;
 	}
+}
+
+
+status_t
+UserUsageConditionsWindow::_FetchUserUsageConditionsCodeForUserPerform(
+	UserDetail& userDetail, BString& code)
+{
+	WebAppInterface interface = fModel.GetWebAppInterface();
+
+	if (interface.Nickname().IsEmpty())
+		debugger("attempt to get user details for the current user, but"
+			" there is no current user");
+
+	BMessage responseEnvelopeMessage;
+	status_t result = interface.RetrieveCurrentUserDetail(
+		responseEnvelopeMessage);
+
+	if (result == B_OK) {
+		// could be an error or could be a valid response envelope
+		// containing data.
+		switch (interface.ErrorCodeFromResponse(responseEnvelopeMessage)) {
+			case ERROR_CODE_NONE:
+				result = WebAppInterface::UnpackUserDetail(
+					responseEnvelopeMessage, userDetail);
+				break;
+			default:
+				ServerHelper::NotifyServerJsonRpcError(responseEnvelopeMessage);
+				result = B_ERROR;
+					// just any old error to stop
+				break;
+		}
+	} else {
+		fprintf(stderr, "an error has arisen communicating with the"
+			" server to obtain data for a user's user usage conditions"
+			" [%s]\n", strerror(result));
+		ServerHelper::NotifyTransportError(result);
+	}
+
+	if (result == B_OK) {
+		BString userUsageConditionsCode = userDetail.Agreement().Code();
+		if (Logger::IsDebugEnabled()) {
+			printf("the user [%s] has agreed to uuc [%s]\n",
+				interface.Nickname().String(),
+				userUsageConditionsCode.String());
+		}
+		code.SetTo(userUsageConditionsCode);
+	} else {
+		if (Logger::IsDebugEnabled()) {
+			printf("unable to get details of the user [%s]\n",
+				interface.Nickname().String());
+		}
+	}
+
+	return result;
 }
 
 

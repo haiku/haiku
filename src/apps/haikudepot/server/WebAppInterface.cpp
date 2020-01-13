@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -437,7 +437,7 @@ WebAppInterface::RetreiveUserRatingForPackageAndVersionByUser(
 
 status_t
 WebAppInterface::RetrieveUserDetailForCredentials(
-	const UserCredentials& credentials, UserDetail& userDetail)
+	const UserCredentials& credentials, BMessage& message)
 {
 	if (!credentials.IsValid()) {
 		debugger("the credentials supplied are invalid so it is not possible "
@@ -459,14 +459,10 @@ WebAppInterface::RetrieveUserDetailForCredentials(
 	requestEnvelopeWriter.WriteArrayEnd();
 	requestEnvelopeWriter.WriteObjectEnd();
 
-	BMessage responseEnvelopeMessage;
 	status_t result = _SendJsonRequest("user", credentials, requestEnvelopeData,
 		_LengthAndSeekToZero(requestEnvelopeData), NEEDS_AUTHORIZATION,
-		responseEnvelopeMessage);
+		message);
 		// note that the credentials used here are passed in as args.
-
-	if (result == B_OK)
-		result = _UnpackUserDetails(responseEnvelopeMessage, userDetail);
 
 	return result;
 }
@@ -477,9 +473,9 @@ WebAppInterface::RetrieveUserDetailForCredentials(
 */
 
 status_t
-WebAppInterface::RetrieveCurrentUserDetail(UserDetail& userDetail)
+WebAppInterface::RetrieveCurrentUserDetail(BMessage& message)
 {
-	return RetrieveUserDetailForCredentials(fCredentials, userDetail);
+	return RetrieveUserDetailForCredentials(fCredentials, message);
 }
 
 
@@ -489,7 +485,7 @@ WebAppInterface::RetrieveCurrentUserDetail(UserDetail& userDetail)
 */
 
 /*static*/ status_t
-WebAppInterface::_UnpackUserDetails(BMessage& responseEnvelopeMessage,
+WebAppInterface::UnpackUserDetail(BMessage& responseEnvelopeMessage,
 	UserDetail& userDetail)
 {
 	BMessage resultMessage;
@@ -874,12 +870,12 @@ WebAppInterface::AuthenticateUser(const BString& nickName,
 */
 
 int32
-WebAppInterface::ErrorCodeFromResponse(BMessage& response)
+WebAppInterface::ErrorCodeFromResponse(BMessage& responseEnvelopeMessage)
 {
 	BMessage error;
 	double code;
 
-	if (response.FindMessage("error", &error) == B_OK
+	if (responseEnvelopeMessage.FindMessage("error", &error) == B_OK
 		&& error.FindDouble("code", &code) == B_OK) {
 		return (int32) code;
 	}

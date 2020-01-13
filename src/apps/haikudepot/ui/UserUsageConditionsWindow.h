@@ -1,5 +1,5 @@
 /*
- * Copyright 2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef USER_USAGE_CONDITIONS_WINDOW_H
@@ -53,6 +53,8 @@ private:
 	static int32				_FetchDataThreadEntry(void* data);
 	void						_FetchDataPerform();
 	status_t					_FetchUserUsageConditionsCodePerform(
+									UserDetail& userDetail, BString& code);
+	status_t					_FetchUserUsageConditionsCodeForUserPerform(
 									UserDetail& userDetail, BString& code);
 	void						_NotifyFetchProblem();
 

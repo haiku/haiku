@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef WEB_APP_INTERFACE_H
@@ -91,10 +91,10 @@ public:
 
 			status_t			RetrieveUserDetailForCredentials(
 									const UserCredentials& credentials,
-									UserDetail& userDetail);
+									BMessage& message);
 
 			status_t			RetrieveCurrentUserDetail(
-									UserDetail& userDetail);
+									BMessage& message);
 
 			status_t			RetrieveUserUsageConditions(
 									const BString& code,
@@ -120,12 +120,14 @@ public:
 									const BString& passwordClear,
 									BMessage& message);
 
-	static int32				ErrorCodeFromResponse(BMessage& response);
+	static	int32				ErrorCodeFromResponse(
+									BMessage& responseEnvelopeMessage);
 
-private:
-	static	status_t			_UnpackUserDetails(
+	static	status_t			UnpackUserDetail(
 									BMessage& responseEnvelopeMessage,
 									UserDetail& userDetail);
+private:
+
 
 			status_t			_RetrieveUserUsageConditionsMeta(
 									const BString& code, BMessage& message);

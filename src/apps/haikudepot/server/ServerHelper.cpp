@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -63,11 +63,15 @@ ServerHelper::AlertServerJsonRpcError(BMessage* message)
 				" in the request was not found on the server.");
 			break;
 		case ERROR_CODE_CAPTCHABADRESPONSE:
-			alertText = B_TRANSLATE("The response to the captcha was incorrect.");
+			alertText = B_TRANSLATE("The response to the captcha was"
+				" incorrect.");
 			break;
 		case ERROR_CODE_AUTHORIZATIONFAILURE:
 		case ERROR_CODE_AUTHORIZATIONRULECONFLICT:
-			alertText = B_TRANSLATE("Authorization or security issue");
+			alertText = B_TRANSLATE("Authorization or security issue.  Logout"
+				" and log back in again to check that your password is correct"
+				" and also check that you have agreed to the latest usage"
+				" conditions.");
 			break;
 		default:
 			alertText.SetToFormat(
