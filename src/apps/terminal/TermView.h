@@ -82,7 +82,7 @@ public:
 			void				GetFontSize(float* width, float* height);
 			int					Rows() const;
 			int					Columns() const;
-			BRect				SetTermSize(int rows, int cols,
+			BRect				SetTermSize(int rows, int columns,
 									bool notifyShell);
 			void				SetTermSize(BRect rect,
 									bool notifyShell = false);
@@ -152,8 +152,8 @@ protected:
 	virtual void				ScrollTo(BPoint where);
 	virtual void				TargetedByScrollView(BScrollView *scrollView);
 
-	virtual status_t			GetSupportedSuites(BMessage* msg);
-	virtual BHandler*			ResolveSpecifier(BMessage* msg, int32 index,
+	virtual status_t			GetSupportedSuites(BMessage* message);
+	virtual BHandler*			ResolveSpecifier(BMessage* message, int32 index,
 									BMessage* specifier, int32 form,
 									const char* property);
 
@@ -215,8 +215,8 @@ private:
 
 			void				_DoPrint(BRect updateRect);
 			void				_UpdateScrollBarRange();
-			void				_SecondaryMouseButtonDropped(BMessage* msg);
-			void				_DoSecondaryMouseDropAction(BMessage* msg);
+			void				_SecondaryMouseButtonDropped(BMessage* message);
+			void				_DoSecondaryMouseDropAction(BMessage* message);
 			void				_DoFileDrop(entry_ref &ref);
 
 			void				_SynchronizeWithTextBuffer(

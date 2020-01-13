@@ -135,7 +135,8 @@ private:
 			struct Session;
 
 private:
-			void				_SetTermColors(TermViewContainerView* termView);
+			void				_SetTermColors(
+									TermViewContainerView* containerView);
 			void				_InitWindow();
 			void				_SetupMenu();
 	static	BMenu*				_MakeFontSizeMenu(uint32 command,
