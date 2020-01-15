@@ -1352,8 +1352,8 @@ PathTest::FlattenableTest()
 		// flatten the path
 		struct flattened_ref { dev_t device; ino_t directory; char name[1]; };
 		size = path.FlattenedSize();
-		ssize_t expectedSize	// hehe, that's hacky ;-)
-			= (ssize_t)((flattened_ref*)NULL)->name + strlen(ref.name) + 1;
+		ssize_t expectedSize
+			= sizeof(dev_t) + sizeof(ino_t) + strlen(ref.name) + 1;
 		CPPUNIT_ASSERT( size ==  expectedSize);
 		CPPUNIT_ASSERT( path.Flatten(buffer, sizeof(buffer)) == B_OK );
 		// check the flattened data

@@ -431,18 +431,18 @@ BPath::Flatten(void* buffer, ssize_t size) const
 		return flattenedSize;
 	if (size < flattenedSize)
 		return B_BAD_VALUE;
-	status_t status = InitCheck();
-	if (status != B_OK)
-		return status;
 
 	// convert the path to an entry_ref
 	BEntry entry;
 	entry_ref ref;
-	status = entry.SetTo(Path());
-	if (status == B_OK)
-		status = entry.GetRef(&ref);
-	if (status != B_OK)
-		return status;
+
+	if (Path() != NULL) {
+		status_t status = entry.SetTo(Path());
+		if (status == B_OK)
+			status = entry.GetRef(&ref);
+		if (status != B_OK)
+			return status;
+	}
 
 	// store the entry_ref in the buffer
 	flattened_entry_ref& fref = *(flattened_entry_ref*)buffer;

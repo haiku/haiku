@@ -8,8 +8,6 @@
 #include <StorageDefs.h>
 #include <SupportDefs.h>
 
-class CppUnit::Test;
-
 class PathTest : public BasicTest
 {
 public:
