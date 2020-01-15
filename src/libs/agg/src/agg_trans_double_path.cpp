@@ -38,7 +38,7 @@ namespace agg
         m_src_vertices1.remove_all();
         m_src_vertices2.remove_all();
         m_kindex1 = 0.0;
-        m_kindex1 = 0.0;
+        m_kindex2 = 0.0;
         m_status1 = initial;
         m_status2 = initial;
     }
