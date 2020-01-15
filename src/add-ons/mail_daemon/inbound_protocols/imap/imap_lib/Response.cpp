@@ -656,7 +656,7 @@ Response::ExtractNumber(BDataIO& stream)
 	const char* end;
 	size_t number = strtoul(string.String(), (char**)&end, 10);
 	if (end == NULL || end[0] != '\0')
-		ParseException("Invalid number!");
+		throw ParseException("Invalid number!");
 
 	return number;
 }
