@@ -620,10 +620,18 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 			panelFitterControl &= ~PANEL_FITTER_ENABLED;
 			write32(INTEL_PANEL_FIT_CONTROL, panelFitterControl);
 		} else {
+			// We don't need to do anything more for later generations, the
+			// scaling is handled at the transcoder level. We may want to
+			// configure dithering, but the code below ignores the previous
+			// value in the register and may mess things up so we should do
+			// this in a safeer way. For now, assume the BIOS did the right
+			// thing.
+#if 0
 			// Disable panel fitting, but enable 8 to 6-bit dithering
 			write32(INTEL_PANEL_FIT_CONTROL, 0x4);
 				// TODO: do not do this if the connected panel is 24-bit
 				// (I don't know how to detect that)
+#endif
 		}
 	}
 
