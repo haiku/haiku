@@ -86,7 +86,6 @@ protected:
 	virtual	BSize		MinSize();
 #endif
 
-	virtual void		FrameResized(float width, float height);
 	virtual void		MouseDown(BPoint where);
 	virtual void		MouseUp(BPoint where);
 	virtual void		MouseMoved(BPoint where, uint32 transit,
@@ -101,8 +100,6 @@ private:
 			::Scale*	_ScaleFor(scale_type type);
 			void		_Refresh();
 	static	status_t	_RefreshThread(void* self);
-			void		_UpdateOffscreenBitmap();
-			BView*		_OffscreenView();
 			void		_UpdateFrame();
 			BRect		_HistoryFrame() const;
 			float		_LegendHeight() const;
@@ -111,7 +108,7 @@ private:
 			BRect		_LegendColorFrameAt(BRect frame, int32 index) const;
 			float		_PositionForValue(DataSource* source,
 							DataHistory* values, int64 value);
-			void		_DrawHistory(bool drawBackground);
+			void		_DrawHistory();
 			void		_UpdateResolution(int32 resolution,
 							bool broadcast = true);
 
@@ -124,7 +121,6 @@ private:
 
 	rgb_color			fHistoryBackgroundColor;
 	rgb_color			fLegendBackgroundColor;
-	BBitmap*			fOffscreen;
 #ifdef __HAIKU__
 	BLayoutItem*		fHistoryLayoutItem;
 	BLayoutItem*		fLegendLayoutItem;
