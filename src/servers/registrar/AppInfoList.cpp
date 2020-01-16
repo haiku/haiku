@@ -291,8 +291,14 @@ int32
 AppInfoList::IndexOf(const entry_ref *ref) const
 {
 	if (ref) {
+		// Dereference symlink if needed
+		BEntry entry(ref, true);
+		entry_ref realRef;
+		if (entry.GetRef(&realRef) != B_OK)
+			realRef = *ref;
+
 		for (int32 i = 0; RosterAppInfo *info = InfoAt(i); i++) {
-			if (info->ref == *ref)
+			if (info->ref == realRef)
 				return i;
 		}
 	}
