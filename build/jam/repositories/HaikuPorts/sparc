@@ -3,27 +3,27 @@ RemotePackageRepository HaikuPorts
 	: https://eu.hpkg.haiku-os.org/haikuports/master/build-packages
 	:
 	# architecture "any" packages
-	be_book-2008_10_26-2
-	ca_root_certificates-2018_01_17-2
-	gnu_efi_kernel-3.0.8-1
+	be_book-2008_10_26-3
+	ca_root_certificates-2019_01_23-1
+	gnu_efi_kernel-3.0.9-1
 	timgmsoundfont-fixed-5
 	wqy_microhei-0.2.0~beta-4
 	:
 	# repository architecture packages
 	# primary architecture (arm)
-	curl-7.26.0-1
-	curl_devel-7.26.0-1
-	freetype-2.4.9-1
-	freetype_devel-2.4.9-1
+	curl-7.40.0-1
+	curl_devel-7.40.0-1
+	freetype-2.6.3-1
+	freetype_devel-2.6.3-1
 	gawk-3.1.8-2
-	gcc_syslibs_devel-4.8.3_2014_08_03-1
-	gcc_syslibs-4.8.3_2014_08_03-1
-	icu-4.8.1.1-1
-	icu_devel-4.8.1.1-1
-	libsolv-0.3.0_haiku_2013_10_01-1
-	libsolv_devel-0.3.0_haiku_2013_10_01-1
-	zlib-1.2.8-4
-	zlib_devel-1.2.8-4
+	gcc_syslibs_devel-8.3.0_2019_05_24-1
+	gcc_syslibs-8.3.0_2019_05_24-1
+	icu-57.1-2
+	icu_devel-57.1-2
+	libsolv-0.3.0_haiku_2014_12_22-1
+	libsolv_devel-0.3.0_haiku_2014_12_22-1
+	zlib-1.2.11-1
+	zlib_devel-1.2.11-1
 	:
 	# source packages
 	apr
@@ -100,4 +100,3 @@ RemotePackageRepository HaikuPorts
 	:
 	# debuginfo packages
 	;
-
