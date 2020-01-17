@@ -6,6 +6,8 @@ RemotePackageRepository HaikuPorts
 	be_book-2008_10_26-3
 	ca_root_certificates-2019_01_23-1
 	gnu_efi_kernel-3.0.9-1
+	haikuporter-1.2.2-2
+	noto-20170920-3
 	timgmsoundfont-fixed-5
 	wqy_microhei-0.2.0~beta-4
 	:
