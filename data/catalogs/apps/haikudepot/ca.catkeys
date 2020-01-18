@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	4101014534
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	625064456
 Uninstall	PackageManager		Desinstal·la
 (%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Desinstal·lat
@@ -28,4 +28,3 @@ HaikuDepot	System name		Repertori Haiku
 Search terms:	FilterView		Paraules que voleu cercar:
 Description	PackageListView		Descripció
 Install	PackageManager		Instal·la
-%Version%	PackageInfoView		%Version%

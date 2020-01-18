@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-HaikuDepot	428608888
+1	lithuanian	x-vnd.Haiku-HaikuDepot	1247626106
 Uninstall	PackageManager		Išdiegti
 (%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Išdiegti
@@ -31,4 +31,3 @@ Search terms:	FilterView		Ieškomi žodžiai:
 Pending…	PackageListView		Laukiama…
 Description	PackageListView		Aprašas
 Install	PackageManager		Įdiegti
-%Version%	PackageInfoView		%Version%

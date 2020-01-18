@@ -1,5 +1,7 @@
-1	portuguese	x-vnd.Haiku-SGITranslator	1741261396
+1	portuguese	x-vnd.Haiku-SGITranslator	2011936698
 Use compression:	SGIView		Usar compressão:
 None	SGIView		Nenhum
+Version %d.%d.%d, %s	SGIView		Versão %d.%d.%d, %s
+\nbased on GIMP SGI plugin v1.5:\n	SGIView		\nbaseado no plugin GIMP SGI v1.5:\n
 RLE	SGIView		RLE
 written by:\n	SGIView		escrito por:\n

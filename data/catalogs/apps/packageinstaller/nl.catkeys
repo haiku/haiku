@@ -16,7 +16,7 @@ Skip all	PackageView		Alles overslaan
 The installation of the package has been aborted.	PackageView		De installatie van het pakket is afgebroken.
 No installation type selected	PackageView		Er is geen installatietype geselecteerd
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Wil je deze keuze laten onthouden voor de rest van de installatie?\n
-The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Het geselecteerde pakket is niet van uw systeem verwijderd. Het opgegeven geïnstalleerde pakketinformatiebestand is mogelijk beschadigd.
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Het geselecteerde pakket is niet van uw systeem verwijderd. Het opgegeven geïnstalleerde pakketinformatiebestand is mogelijk gecorrumpeerd.
 Install…	UninstallView		Installeren…
 The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Het opgegeven pad bevat al een item met de naam '%s'.\nWilt u het item vervangen met de pakketinhoud, of wilt u deze overslaan?
 Installing files and folders	PackageInstall		Bestanden en mappen worden geïnstalleerd

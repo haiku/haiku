@@ -11,7 +11,7 @@ Delete partition	MainWindow		Partitie verwijderen
 Error: 	MainWindow	in any error alert	Fout:
 Removable	PartitionList		Verwijderbaar
 Block size	PartitionList		Blok grootte
-The panel experienced a problem!	MainWindow		Het paneel ondervond een probleem!
+The panel experienced a problem!	MainWindow		Het paneel ervoer een probleem!
 Device	DiskView		Apparaat
 Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Bent u zeker dat u de Intel Uitgebreide Partitie wil formatteren? Elke sub partitie hierin zal overschreven worden als u doorgaat. U wordt nog gevraagd voordat de wijzigingen geschreven worden naar de schijf.
 Unmount	MainWindow		Onttrekken
@@ -44,7 +44,7 @@ Create	CreateParametersPanel		Maken
 File system	PartitionList		Bestandssysteem
 The selected partition does not contain a partitioning system.	MainWindow		De geselecteerde partitie bevat geen partitioneringssysteem.
 End: %s	Support		Einde: %s
-Partition type	PartitionList		Partitie type
+Partition type	PartitionList		Type partitie
 Unable to find the selected partition by ID.	MainWindow		Kan de geselecteerde partitie niet vinden op basis van ID.
 The currently selected partition is not empty.	MainWindow		De nu geselecteerde partitie is niet leeg.
 Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Weet u zeker dat u een gegevensdrager direct wil formatteren zonder initialisatie? (Normaliter wordt deze eerst voorzien van een partitietabel.) U krijgt deze vraag nogmaals voordat de wijzigingen op de schijf weggeschreven worden.
@@ -60,7 +60,7 @@ SafeBoot encrypted	Encryption utils		SafeBoot versleuteld
 Volume name	PartitionList		Naam gegevensdrager
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\nU zult alle gegevens op de partitie onherroepelijk kwijt zijn als u dit doet!
 Change	ChangeParametersPanel		Wijzigen
-Partition name:	ChangeParametersPanel		Partitie naam:
+Partition name:	ChangeParametersPanel		Naam partitie:
 LUKS encrypted	Encryption utils		LUKS versleuteld
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\nU zult alle gegevens op de %s partitie onherroepelijk kwijt zijn als u dit doet!
 Cancel	AbstractParametersPanel		Annuleren
@@ -72,11 +72,11 @@ Could not delete the selected partition.	MainWindow		Kon de geselecteerde partit
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Weet u zeker at u de geselecteerde schijf wilt initialiseren? Alle gegevens zullen verloren gaan. Het zal u nogmaals gevraagd worden voordat de gegevens naar de schrijf geschreven zullen worden.\n
 There was an error preparing the disk for modifications.	MainWindow		Fout tijdens het voorbereiden van de schijf voor aanpassingen.
 The disk has been successfully initialized.\n	MainWindow		De schijf werd met succes geïnitialiseerd.\n
-Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Moet het onttrekken geforceerd worden?\n\nNota: als een toepassing op dit moment schrijft naar de gegevensdrager, kan het nu onttrekken potentieel leiden tot dataverlies.\n
+Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Moet het onttrekken geforceerd worden?\n\nNota: als een toepassing op dit moment schrijft naar de gegevensdrager, dan kan dat potentieel leiden tot dataverlies.\n
 Cancel	MainWindow		Annuleren
 Free space	PartitionList		Vrije ruimte
 Queries	PartitionList		Zoekopdrachten
-Force unmount	MainWindow		Forceer onttrekking
+Force unmount	MainWindow		Forceer onttrekken
 Partition	MainWindow		Partitie
 Change parameters	MainWindow		Verander parameters
 Rescan	MainWindow		Opnieuw afzoeken
@@ -84,7 +84,7 @@ There was an error acquiring the partition row.	MainWindow		Er is een fout ontst
 Failed to initialize the disk %s!\n	MainWindow		Initialisatie van de schijf %s is mislukt!\n
 Disk system \"%s\" not found!	MainWindow		Mediaschema \"%s\" niet gevonden!
 Delete	MainWindow		Verwijderen
-Partition type:	ChangeParametersPanel		Partitie type:
+Partition type:	ChangeParametersPanel		Type partitie:
 Parameters	PartitionList		Parameters
 Could not acquire partitioning information.	MainWindow		Kon niet alle partitioneringsinformatie verkrijgen.
 Cannot delete the selected partition.	MainWindow		Kan de geselecteerde partitie niet verwijderen.

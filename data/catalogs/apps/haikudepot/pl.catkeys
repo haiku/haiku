@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-HaikuDepot	4085946009
+1	polish	x-vnd.Haiku-HaikuDepot	609995931
 Uninstall	PackageManager		Usuń
 (%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Niezainstalowany
@@ -118,4 +118,3 @@ Log in…	MainWindow		Zaloguj się…
 You need to be logged into an account before you can rate packages.	MainWindow		Musisz być zalogowany, aby móc oceniać pakiety.
 9999.99 KiB	PackageListView		9999.99 KiB
 All repositories	MainWindow		Wszystkie repozytoria
-%Version%	PackageInfoView		%Version%

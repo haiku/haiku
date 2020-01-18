@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	2444042308
+1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	3263059526
 Uninstall	PackageManager		Desinstalar
 (%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Não instalado
@@ -112,4 +112,3 @@ Input validation	UserLoginWindow		Validação de entrada
 Log in…	MainWindow		Entrar…
 You need to be logged into an account before you can rate packages.	MainWindow		Você precisa estar autenticado em uma conta antes de poder classificar pacotes.
 9999.99 KiB	PackageListView		9999.99 KiB
-%Version%	PackageInfoView		%Version%

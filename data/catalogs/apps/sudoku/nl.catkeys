@@ -2,7 +2,7 @@
 Restore snapshot	SudokuWindow		Momentopname terugzetten
 File	SudokuWindow		Bestand
 Mark invalid values	SudokuWindow		Ongeldige waarden markeren
-Solve single field	SudokuWindow		Eén veld oplossen
+Solve single field	SudokuWindow		Één veld oplossen
 Hard	SudokuWindow		Moeilijk
 Start again	SudokuWindow		Opnieuw beginnen
 New	SudokuWindow		Nieuw
@@ -19,7 +19,7 @@ Copy	SudokuWindow		Kopiëren
 Solve	SudokuWindow		Oplossen
 HTML	SudokuWindow		HTML
 Advanced	SudokuWindow		Geavanceerd
-Set all hints	SudokuWindow		Alle hints inschakelen
+Set all hints	SudokuWindow		Stel alle hints in
 Searching for removable values	SudokuGenerator		Zoeken naar verwijderbare waarden
 Abort	ProgressWindow		Afbreken
 Could not set Sudoku:\n%s\n	SudokuWindow		Sudoku kon niet ingesteld worden:\n%s\n

@@ -77,7 +77,7 @@ Tab title:	Terminal TermWindow		Sekme başlığı:
 Window title:	Terminal TermWindow		Pencere başlığı:
 Default	Terminal colors scheme		Öntanımlı
 Window size:	Terminal AppearancePrefView		Pencere boyutu:
-Switch Terminals	Terminal TermWindow		Uçbirimleri değiştir
+Switch Terminals	Terminal TermWindow		Diğer uçbirime geç
 Decrease	Terminal TermWindow		Azalt
 Settings…	Terminal TermWindow		Ayarlar...
 Cancel	Terminal SetTitleWindow		İptal

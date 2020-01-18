@@ -1,5 +1,6 @@
-1	portuguese	x-vnd.Haiku-PPMTranslator	3737528374
+1	portuguese	x-vnd.Haiku-PPMTranslator	2767335281
 None	PPMTranslator		Nenhum
 Grayscale 8 bits	PPMTranslator		Escala de cinza de 8 bits
 OK	PPMMain		OK
 Write ASCII	PPMTranslator		Escrever ASCII
+Version %d.%d.%d, %s	PPMTranslator		Versão %d.%d.%d, %s

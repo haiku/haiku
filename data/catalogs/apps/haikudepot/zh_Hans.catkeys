@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-HaikuDepot	2578538409
+1	english	x-vnd.Haiku-HaikuDepot	3397555627
 Check for updates…	MainWindow		检查更新…
 Uninstall	PackageManager		卸载
 (%Votes%)	FeaturedPackagesView		（%Votes%）
@@ -125,4 +125,3 @@ Log in…	MainWindow		登录…
 You need to be logged into an account before you can rate packages.	MainWindow		在对软件包进行评级之前，您需要进行账户登录。
 9999.99 KiB	PackageListView		9999.99 KiB
 All repositories	MainWindow		确定
-%Version%	PackageInfoView		%Version%

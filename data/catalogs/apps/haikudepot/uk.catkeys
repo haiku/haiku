@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	1059339987
+1	ukrainian	x-vnd.Haiku-HaikuDepot	1833593564
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Під час оновлення репозиторію сталася помилка: %error%
 Check for updates…	MainWindow		Оцінити пакунок…
 Uninstall	PackageManager		Видалити
@@ -157,7 +157,5 @@ An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		
 Log in…	MainWindow		Авторизуватись…
 You need to be logged into an account before you can rate packages.	MainWindow		Для оцінки пакетів спочатку необхідно авторизуватись.
 Client version too old	ServerHelper		Застаріла версія клієнту
-Authorization or security issue	ServerHelper		Проблема з авторизацією або безпекою
 9999.99 KiB	PackageListView		9999.99 KiB
 All repositories	MainWindow		Всі сховища
-%Version%	PackageInfoView		%Version%

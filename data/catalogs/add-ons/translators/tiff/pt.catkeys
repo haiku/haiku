@@ -1,4 +1,7 @@
-1	portuguese	x-vnd.Haiku-TIFFTranslator	3268879897
+1	portuguese	x-vnd.Haiku-TIFFTranslator	3801310733
+TIFF Library:	TIFFView		Biblioteca TIFF:
 Use compression:	TIFFView		Usar compressão:
 TIFF image	TIFFTranslator		Imagem TIFF
+Version %d.%d.%d, %s	TIFFView		Versão %d.%d.%d, %s
+TIFF images	TIFFTranslator		Imagens TIFF
 None	TIFFView		Nenhum

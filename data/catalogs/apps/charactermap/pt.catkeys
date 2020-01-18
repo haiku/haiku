@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-CharacterMap	3234680527
+1	portuguese	x-vnd.Haiku-CharacterMap	28953206
 Enclosed alphanumerics	UnicodeBlocks		Caracteres delimitados
 Basic Latin	UnicodeBlocks		Latim Básico
 Cyrillic extended C	UnicodeBlocks		Cirílico Expandido C
@@ -147,3 +147,8 @@ Private use area	UnicodeBlocks		Área de uso privado
 CJK unified ideographs extension B	UnicodeBlocks		Extensão de ideogramas CJK unificados B
 Dingbats	UnicodeBlocks		Dingbats
 CharacterMap	System name		Mapa de Caracteres
+Miscellaneous symbols and arrows	UnicodeBlocks		Setas e símbolos diversos
+Supplemental mathematical operators	UnicodeBlocks		Operadores matemáticos suplementares
+Mathematical alphanumeric symbols	UnicodeBlocks		Símbolos matemáticos alfanuméricos
+Copy character	CharacterView		Copiar caráter
+Domino tiles	UnicodeBlocks		Peças de dominó

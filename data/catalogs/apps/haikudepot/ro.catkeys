@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	3044073414
+1	romanian	x-vnd.Haiku-HaikuDepot	3818326991
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		A apărut o eroare în timpul reîmprospătării depozitului: %error%
 Check for updates…	MainWindow		Verifică pentru actualizări…
 Uninstall	PackageManager		Dezinstalare
@@ -159,7 +159,5 @@ An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		
 Log in…	MainWindow		Autentificare…
 You need to be logged into an account before you can rate packages.	MainWindow		Trebuie să fiți autentificat într-un cont înainte de a evalua pachete.
 Client version too old	ServerHelper		Versiunea clientului este prea veche
-Authorization or security issue	ServerHelper		Problemă de autorizare sau de securitate
 9999.99 KiB	PackageListView		9999.99 KiB
 All repositories	MainWindow		Toate depozitele
-%Version%	PackageInfoView		%Version%

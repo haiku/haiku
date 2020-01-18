@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	913112167
+1	swedish	x-vnd.Haiku-HaikuDepot	1687365744
 Repository update error	LocalRepositoryUpdateProcess		Fel vid uppdatering av repositorie
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ett fel inträffade vid uppdatering av repositoriet: %error%
 Check for updates…	MainWindow		Leta efter uppdateringar…
@@ -168,8 +168,6 @@ An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		
 Log in…	MainWindow		Logga in...
 You need to be logged into an account before you can rate packages.	MainWindow		Du måste logga in för att kunna betygsätta paket.
 Client version too old	ServerHelper		Klientversionen är för gammal
-Authorization or security issue	ServerHelper		Autoriserings- eller säkerhetsproblem
 Local repository load error	LocalPkgDataLoadProcess		Fel vid laddning av lokalt repositorie
 9999.99 KiB	PackageListView		9999.99 KiB
 All repositories	MainWindow		Alla repositorier
-%Version%	PackageInfoView		%Version%

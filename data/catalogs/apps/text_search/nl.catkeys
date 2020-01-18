@@ -25,7 +25,7 @@ Skip folders starting with a dot	GrepWindow		Mappen overslaan die met een punt (
 Cancel	GrepWindow		Annuleren
 History	GrepWindow		Geschiedenis
 File	GrepWindow		Bestand
-Case-sensitive	GrepWindow		Hoofd-/kleine lettergevoelig
+Case-sensitive	GrepWindow		Hoofdlettergevoelig
 Select all	GrepWindow		Alles selecteren
 %APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME kon één of meerdere mappen niet openen
 Settings	GrepWindow		Instellingen

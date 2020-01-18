@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	3271407775
+1	hungarian	x-vnd.Haiku-HaikuDepot	4090424993
 Check for updates…	MainWindow		Frissítések keresése…
 Uninstall	PackageManager		Eltávolítás
 (%Votes%)	FeaturedPackagesView		(%Votes%)
@@ -119,4 +119,3 @@ Log in…	MainWindow		Bejelentkezés…
 You need to be logged into an account before you can rate packages.	MainWindow		Csomag értékelése előtt be kell jelentkezni egy felhasználói fiókba.
 9999.99 KiB	PackageListView		9999.99 KiB
 All repositories	MainWindow		Összes tároló
-%Version%	PackageInfoView		%Version%

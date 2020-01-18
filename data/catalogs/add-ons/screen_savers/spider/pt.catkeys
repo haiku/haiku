@@ -1,8 +1,13 @@
-1	portuguese	x-vnd.Haiku-SpiderScreensaver	315231900
+1	portuguese	x-vnd.Haiku-SpiderScreensaver	2602622234
 Blue	SpiderView		Azul
 Gray	SpiderView		Cinzento
+Max. points per polygon	SpiderView		Máx. de pontos por polígono
+Max. polygon count	SpiderView		Nº máx. de polígonos
+Purple	SpiderView		Roxo
 Red	SpiderView		Vermelho
 Color	SpiderView		Cor
+Spider by stippi	SpiderView		Aranha por stippi
 Green	SpiderView		Verde
 Cyan	SpiderView		Ciano
 Yellow	SpiderView		Amarelo
+Trail depth	SpiderView		Profundidade de rasto

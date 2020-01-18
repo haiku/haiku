@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-HaikuDepot	428608888
+1	belarusian	x-vnd.Haiku-HaikuDepot	1247626106
 Uninstall	PackageManager		Выдаліць
 (%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Выдаленныя
@@ -31,4 +31,3 @@ Search terms:	FilterView		Умовы пошуку:
 Pending…	PackageListView		Чакае…
 Description	PackageListView		Апісанне
 Install	PackageManager		Усталяваць
-%Version%	PackageInfoView		%Version%

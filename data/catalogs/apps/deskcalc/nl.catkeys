@@ -1,21 +1,37 @@
-1	dutch; flemish	x-vnd.Haiku-DeskCalc	3968679316
+1	dutch; flemish	x-vnd.Haiku-DeskCalc	3448493419
+1	CalcView		1
 acos	CalcView		acos
+C	CalcView		C
+8	CalcView		8
+-	CalcView		-
 ceil	CalcView		ceil
 cbrt	CalcView		cbrt
 sinh	CalcView		sinh
 BS	CalcView	Key label, 'BS' means backspace	BS
 cosh	CalcView		cosh
+4	CalcView		4
+)	CalcView		)
 log	CalcView		log
 asin	CalcView		asin
 Radians	CalcView		Radialen
+0	CalcView		0
 exp	CalcView		exp
 atan	CalcView		atan
+7	CalcView		7
 Degrees	CalcView		Graden
+!	CalcView		!
+π	CalcView		π
 cos	CalcView		cos
+3	CalcView		3
+(	CalcView		(
 BS	CalcView		BS
+E	CalcView		E
+/	CalcView		/
 C	CalcView	Key label, 'C' means clear	C
 sin	CalcView		sin
+6	CalcView		6
 floor	CalcView		floor
++	CalcView		+
 tanh	CalcView		tanh
 ln	CalcView		ln
 Calculating	CalcView		Berekenen
@@ -23,7 +39,14 @@ Compact	CalcView		Compact
 Enable Num Lock on startup	CalcView		Opstarten met Num Lock aan
 Scientific	CalcView		Wetenschappelijk
 sqrt	CalcView		sqrt
+^	CalcView		^
+=	CalcView		=
+2	CalcView		2
 tan	CalcView		tan
 Audio Feedback	CalcView		Geluidsfeedback
+9	CalcView		9
+.	CalcView		.
 DeskCalc	System name		DeskCalc
+5	CalcView		5
+*	CalcView		*
 Basic	CalcView		Eenvoudig

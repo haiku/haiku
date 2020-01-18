@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-HaikuDepot	913112167
+1	indonesian	x-vnd.Haiku-HaikuDepot	1687365744
 Repository update error	LocalRepositoryUpdateProcess		Kesalahan pembaruan repositori
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Terjadi kesalahan saat menyegarkan repositori: %error%
 Check for updates…	MainWindow		Memeriksa pembaruan…
@@ -168,8 +168,6 @@ An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		
 Log in…	MainWindow		Log masuk…
 You need to be logged into an account before you can rate packages.	MainWindow		Anda harus masuk ke akun sebelum dapat memberi nilai paket.
 Client version too old	ServerHelper		Versi klien terlalu lama
-Authorization or security issue	ServerHelper		Otorisasi atau masalah keamanan
 Local repository load error	LocalPkgDataLoadProcess		Kesalahan pemuatan repositori lokal
 9999.99 KiB	PackageListView		9999.99 KiB
 All repositories	MainWindow		Semua repositori
-%Version%	PackageInfoView		%Version%

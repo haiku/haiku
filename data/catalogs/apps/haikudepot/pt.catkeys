@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-HaikuDepot	913112167
+1	portuguese	x-vnd.Haiku-HaikuDepot	1687365744
 Repository update error	LocalRepositoryUpdateProcess		Erro na atualização de repositório
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ocorreu um erro ao atualizar o repositório: %error%
 Check for updates…	MainWindow		Verificar atualizações…
@@ -168,8 +168,6 @@ An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		
 Log in…	MainWindow		Entrar…
 You need to be logged into an account before you can rate packages.	MainWindow		Você precisa de ter sessão iniciada com uma conta antes de poder avaliar pacotes.
 Client version too old	ServerHelper		Versão de cliente demasiado antiga
-Authorization or security issue	ServerHelper		Problema de autorização ou segurança
 Local repository load error	LocalPkgDataLoadProcess		Erro de carga do repositório local
 9999.99 KiB	PackageListView		9999.99 KiB
 All repositories	MainWindow		Todos os repositórios
-%Version%	PackageInfoView		%Version%

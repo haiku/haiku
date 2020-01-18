@@ -1,8 +1,9 @@
-1	dutch; flemish	x-vnd.Haiku-HaikuDepot	3659055048
+1	dutch; flemish	x-vnd.Haiku-HaikuDepot	1687365744
 Repository update error	LocalRepositoryUpdateProcess		Fout bij updaten softwarebronnen
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Er is een fout opgetreden bij het verversen van de softwarebronnen: %error%
 Check for updates…	MainWindow		Controleer op updates…
 Uninstall	PackageManager		Verwijderen
+(%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Verwijderd
 Available packages	MainWindow		Beschikbare pakketten
 Create account	UserLoginWindow		Registreren
@@ -47,14 +48,14 @@ Category	FilterView		Categorie
 User rating	RatePackageWindow		Beoordeling
 Installed packages	MainWindow		Geïnstalleerde pakketten
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Een gevraagd object of een object verbonden in het verzoek werd niet gevonden op de server.
-Other users can see this rating	RatePackageWindow		Andere gebruikers kunnen deze beoordeling zien
+Other users can see this rating	RatePackageWindow		Andere gebruikers mogen deze beoordeling zien
 The minimum age requirements must be met.	UserLoginWindow		Aan de minimale leeftijdseisen moet worden voldaan.
 Stable	RatePackageWindow		Stabiel
 This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		De toepassing is te oud om te communiceren met het HaikuDepot server systeel? Vervang deze door een nieuwere versie door het updated van u Haiku systeem. De minimum versie van HaikuDepot vereist is \"%s\".
 Fatal error	PackageManager		Fatale fout
 Package action failed	PackageInfoView		Pakketactie mislukt
 No changelog available.	PackageInfoView		Geen changelog beschikbaar.
-There are problems in the form:\n\n	UserLoginWindow		Er zijn problemen in het formulier:\n\n
+There are problems in the form:\n\n	UserLoginWindow		Er zijn problemen in de vorm van:\n\n
 Error	App		Fout
 There was a puzzling response from the web service.	UserLoginWindow		De webservice gaf een raadselachtig antwoord.
 Not logged in	MainWindow		Niet ingelogd
@@ -94,7 +95,8 @@ OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Downloaden:
 Success	UserLoginWindow		Succes
 It responded with: %message%	UserLoginWindow		Het antwoordde met: %message%
-Package daemon problem	App		Pakket-daemon probleem
+Package daemon problem	App		Pakket-daemonprobleem
+(%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Pakketbron
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (versie %hd.version%)
 Close	UserLoginWindow		Sluiten
@@ -114,7 +116,7 @@ View agreed usage conditions…	MainWindow		Afgesproken gebruiksvoorwaarden beki
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(nog 1 om te downloaden)}other{(# meer om te downloaden)}}
 Refresh repositories	MainWindow		Pakketbronnen verversen
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Wanneer u geen e-mailadres opgeeft, dan zal het niet mogelijk zijn om uw wachtwoord te resetten in het geval u deze vergeet.
-Tools	MainWindow		Gereedschappen
+Tools	MainWindow		Gereedschap
 The passwords do not match.	UserLoginWindow		De wachtwoorden komen niet overeen.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Dit pakket lijkt niet op de HaikuDepot-server aanwezig te zijn, waardoor het niet mogelijk is om een nieuwe beoordeling te maken of een bestaande beoordeling te bewerken.
 Language	RatePackageWindow		Taal
@@ -152,22 +154,20 @@ A reboot is necessary to complete the installation process.	PackageManager		Een 
 View latest usage conditions…	MainWindow		Bekijk laatste gebruiksvoorwaarden...
 Search terms:	FilterView		Zoektermen:
 Pending…	PackageListView		In behandeling…
-Repeat pass phrase:	UserLoginWindow		Herhaal wachwoord:
+Repeat pass phrase:	UserLoginWindow		Herhaal wachtwoord:
 Category:	FilterView		Categorie:
 Authentication failed	UserLoginWindow		Authenticatie mislukt
 Manage repositories…	MainWindow		Beheer pakketbronnen...
 Fetching remote repository data	LocalRepositoryUpdateProcess		Ophalen pakketbron data op afstand
 Description	PackageListView		Beschrijving
-Pass phrase:	UserLoginWindow		Wachtwoord:
+Pass phrase:	UserLoginWindow		Wachtzin:
 Open %DeskbarLink%	PackageManager		Open %DeskbarLink%
-Install	PackageManager		Installeer
+Install	PackageManager		Installeren
 Input validation	UserLoginWindow		Invoervalidatie
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Een onverwachte fout is verstuurd van de HaikuDepot server [%i]
 Log in…	MainWindow		Inloggen…
 You need to be logged into an account before you can rate packages.	MainWindow		U moet ingelogd zijn om pakketten te kunnen beoordelen.
 Client version too old	ServerHelper		Client versie te oud
-Authorization or security issue	ServerHelper		Autorisatie of beveiliging kwestie
 Local repository load error	LocalPkgDataLoadProcess		Fout bij laden lokaal pakketbron
 9999.99 KiB	PackageListView		9999.99 KiB
 All repositories	MainWindow		Alle pakketbronnen
-%Version%	PackageInfoView		%Versie%

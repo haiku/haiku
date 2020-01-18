@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	2027988172
+1	french	x-vnd.Haiku-HaikuDepot	2802241749
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Une erreur est survenue lors du rafraîchissement : %error%
 Check for updates…	MainWindow		Vérifier les mises à jour…
 Uninstall	PackageManager		Désinstaller
@@ -151,7 +151,5 @@ Input validation	UserLoginWindow		Validation des entrées
 Log in…	MainWindow		Connexion…
 You need to be logged into an account before you can rate packages.	MainWindow		Vous devez vous authentifier pour évaluer les paquets.
 Client version too old	ServerHelper		Version du client obsolète
-Authorization or security issue	ServerHelper		Problème d'autorisation ou de sécurité
 9999.99 KiB	PackageListView		9999.99 Kio
 All repositories	MainWindow		Tous les dépôts
-%Version%	PackageInfoView		%Version%
