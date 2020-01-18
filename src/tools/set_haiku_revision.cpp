@@ -696,7 +696,7 @@ main(int argc, const char* const* argv)
 			min((size_t)SYSTEM_REVISION_LENGTH, strlen(revisionString) + 1),
 			"Failed to write revision.");
 
-	} catch (Exception exception) {
+	} catch (Exception& exception) {
 		if (exception.Description() == "") {
 			fprintf(stderr, "%s\n", strerror(exception.Error()));
 		} else {

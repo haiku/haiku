@@ -73,25 +73,25 @@ UpdateAction::Perform(update_type action_request)
 			throw BException(B_TRANSLATE(
 				"Invalid update type, cannot continue with updates"));
 	
-	} catch (BFatalErrorException ex) {
+	} catch (BFatalErrorException& ex) {
 		fUpdateManager->FinalUpdate(B_TRANSLATE("Updates did not complete"),
 			ex.Message());
 		return ex.Error();
-	} catch (BAbortedByUserException ex) {
+	} catch (BAbortedByUserException& ex) {
 		if (fVerbose)
 			fprintf(stderr, "Updates aborted by user: %s\n",
 				ex.Message().String());
 		// No need for a final message since user initiated cancel request
 		be_app->PostMessage(kMsgFinalQuit);
 		return B_OK;
-	} catch (BNothingToDoException ex) {
+	} catch (BNothingToDoException& ex) {
 		if (fVerbose)
 			fprintf(stderr, "Nothing to do while updating packages : %s\n",
 				ex.Message().String());
 		fUpdateManager->FinalUpdate(B_TRANSLATE("No updates available"),
 			B_TRANSLATE("There were no updates found."));
 		return B_OK;
-	} catch (BException ex) {
+	} catch (BException& ex) {
 		if (fVerbose)
 			fprintf(stderr, B_TRANSLATE(
 				"Exception occurred while updating packages : %s\n"),

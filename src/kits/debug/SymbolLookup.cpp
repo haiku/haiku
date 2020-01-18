@@ -278,7 +278,7 @@ SymbolLookup::Init()
 				TRACE(("SymbolLookup::Init(): translated debug area is at: %p, "
 					"loaded_images: %p\n", fDebugArea, fDebugArea->loaded_images));
 			}
-		} catch (Exception exception) {
+		} catch (Exception& exception) {
 			// we can live without the debug area
 		}
 	}

@@ -112,9 +112,9 @@ LocalRepositoryUpdateProcess::_RunForRepositoryName(const BString& repoName,
 				BRefreshRepositoryRequest refreshRequest(context, repoConfig);
 				result = refreshRequest.Process();
 				result = B_OK;
-			} catch (BFatalErrorException ex) {
+			} catch (BFatalErrorException& ex) {
 				_NotifyError(ex.Message(), ex.Details());
-			} catch (BException ex) {
+			} catch (BException& ex) {
 				_NotifyError(ex.Message());
 			}
 		}

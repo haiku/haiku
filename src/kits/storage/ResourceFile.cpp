@@ -244,7 +244,7 @@ ResourceFile::SetTo(BFile* file, bool clobber)
 	if (error == B_OK) {
 		try {
 			_InitFile(*file, clobber);
-		} catch (Exception exception) {
+		} catch (Exception& exception) {
 			Unset();
 			if (exception.Error() != B_OK)
 				error = exception.Error();
@@ -295,7 +295,7 @@ ResourceFile::InitContainer(ResourcesContainer& container)
 			_ReadIndex(parseInfo);
 			_ReadInfoTable(parseInfo);
 			container.SetModified(false);
-		} catch (Exception exception) {
+		} catch (Exception& exception) {
 			if (exception.Error() != B_OK)
 				error = exception.Error();
 			else
@@ -1272,7 +1272,7 @@ ResourceFile::_WriteResources(ResourcesContainer& container)
 		tableEnd->rite_terminator = 0;
 		write_exactly(fFile, infoTableOffset, buffer, infoTableSize,
 			"Failed to write info table.");
-	} catch (Exception exception) {
+	} catch (Exception& exception) {
 		if (exception.Error() != B_OK)
 			error = exception.Error();
 		else
@@ -1302,7 +1302,7 @@ ResourceFile::_MakeEmptyResourceFile()
 			fFileType = FILE_TYPE_X86_RESOURCE;
 			fFile.SetTo(file, kX86ResourcesOffset);
 			fEmptyResources = true;
-		} catch (Exception exception) {
+		} catch (Exception& exception) {
 			if (exception.Error() != B_OK)
 				error = exception.Error();
 			else

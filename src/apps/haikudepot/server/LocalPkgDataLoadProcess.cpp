@@ -130,7 +130,7 @@ LocalPkgDataLoadProcess::RunInternal()
  	try {
  		manager.Init(PackageManager::B_ADD_INSTALLED_REPOSITORIES
  			| PackageManager::B_ADD_REMOTE_REPOSITORIES);
- 	} catch (BException ex) {
+	} catch (BException& ex) {
  		BString message(B_TRANSLATE("An error occurred while "
  			"initializing the package manager: %message%"));
  		message.ReplaceFirst("%message%", ex.Message());
@@ -362,12 +362,12 @@ LocalPkgDataLoadProcess::RunInternal()
  					it->second->SetSystemDependency(true);
  			}
  		}
- 	} catch (BFatalErrorException ex) {
+	} catch (BFatalErrorException& ex) {
  		printf("Fatal exception occurred while resolving system dependencies: "
  			"%s, details: %s\n", strerror(ex.Error()), ex.Details().String());
- 	} catch (BNothingToDoException) {
+	} catch (BNothingToDoException&) {
  		// do nothing
- 	} catch (BException ex) {
+	} catch (BException& ex) {
  		printf("Exception occurred while resolving system dependencies: %s\n",
  			ex.Message().String());
  	} catch (...) {

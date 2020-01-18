@@ -51,21 +51,21 @@ CheckAction::Perform()
 		int packageCount = 0;
 		const char* const packages = "";
 		fCheckManager->Update(&packages, packageCount);
-	} catch (BFatalErrorException ex) {
+	} catch (BFatalErrorException& ex) {
 		fprintf(stderr, B_TRANSLATE(
 				"Fatal error while checking for updates: %s\n"),
 			ex.Message().String());
 		be_app->PostMessage(kMsgFinalQuit);
 		return ex.Error();
-	} catch (BAbortedByUserException ex) {
+	} catch (BAbortedByUserException& ex) {
 		be_app->PostMessage(kMsgFinalQuit);
 		return B_OK;
-	} catch (BNothingToDoException ex) {
+	} catch (BNothingToDoException& ex) {
 		puts(B_TRANSLATE("There were no updates found."));
 		fCheckManager->NoUpdatesNotification();
 		be_app->PostMessage(kMsgFinalQuit);
 		return B_OK;
-	} catch (BException ex) {
+	} catch (BException& ex) {
 		fprintf(stderr, B_TRANSLATE(
 				"Exception occurred while checking for updates: %s\n"),
 			ex.Message().String());

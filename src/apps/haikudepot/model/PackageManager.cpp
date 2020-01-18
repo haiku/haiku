@@ -148,7 +148,7 @@ public:
 		const char* packageNameString = packageName.String();
 		try {
 			fPackageManager->Install(&packageNameString, 1);
-		} catch (BFatalErrorException ex) {
+		} catch (BFatalErrorException& ex) {
 			BString errorString;
 			errorString.SetToFormat(
 				"Fatal error occurred while installing package %s: "
@@ -162,18 +162,18 @@ public:
 			_SetDownloadedPackagesState(NONE);
 			ref->SetState(state);
 			return ex.Error();
-		} catch (BAbortedByUserException ex) {
+		} catch (BAbortedByUserException& ex) {
 			fprintf(stderr, "Installation of package "
 				"%s aborted by user: %s\n", packageNameString,
 				ex.Message().String());
 			_SetDownloadedPackagesState(NONE);
 			ref->SetState(state);
 			return B_OK;
-		} catch (BNothingToDoException ex) {
+		} catch (BNothingToDoException& ex) {
 			fprintf(stderr, "Nothing to do while installing package "
 				"%s: %s\n", packageNameString, ex.Message().String());
 			return B_OK;
-		} catch (BException ex) {
+		} catch (BException& ex) {
 			fprintf(stderr, "Exception occurred while installing package "
 				"%s: %s\n", packageNameString, ex.Message().String());
 			_SetDownloadedPackagesState(NONE);
@@ -273,7 +273,7 @@ public:
 		const char* packageName = ref->Name().String();
 		try {
 			fPackageManager->Uninstall(&packageName, 1);
-		} catch (BFatalErrorException ex) {
+		} catch (BFatalErrorException& ex) {
 			BString errorString;
 			errorString.SetToFormat(
 				"Fatal error occurred while uninstalling package %s: "
@@ -286,11 +286,11 @@ public:
 				alert->Go();
 			ref->SetState(state);
 			return ex.Error();
-		} catch (BAbortedByUserException ex) {
+		} catch (BAbortedByUserException& ex) {
 			return B_OK;
-		} catch (BNothingToDoException ex) {
+		} catch (BNothingToDoException& ex) {
 			return B_OK;
-		} catch (BException ex) {
+		} catch (BException& ex) {
 			fprintf(stderr, "Exception occurred while uninstalling package "
 				"%s: %s\n", packageName, ex.Message().String());
 			ref->SetState(state);
@@ -634,11 +634,11 @@ PackageManager::RefreshRepository(const BRepositoryConfig& repoConfig)
 	status_t result;
 	try {
 		result = BPackageManager::RefreshRepository(repoConfig);
-	} catch (BFatalErrorException ex) {
+	} catch (BFatalErrorException& ex) {
 		fprintf(stderr, "Fatal error occurred while refreshing repository: "
 			"%s (%s)\n", ex.Message().String(), ex.Details().String());
 		result = ex.Error();
-	} catch (BException ex) {
+	} catch (BException& ex) {
 		fprintf(stderr, "Exception occurred while refreshing "
 			"repository: %s\n", ex.Message().String());
 		result = B_ERROR;
@@ -656,12 +656,12 @@ PackageManager::DownloadPackage(const BString& fileURL,
 	try {
 		result = BPackageManager::DownloadPackage(fileURL, targetEntry,
 			checksum);
-	} catch (BFatalErrorException ex) {
+	} catch (BFatalErrorException& ex) {
 		fprintf(stderr, "Fatal error occurred while downloading package: "
 			"%s: %s (%s)\n", fileURL.String(), ex.Message().String(),
 			ex.Details().String());
 		result = ex.Error();
-	} catch (BException ex) {
+	} catch (BException& ex) {
 		fprintf(stderr, "Exception occurred while downloading package "
 			"%s: %s\n", fileURL.String(), ex.Message().String());
 		result = B_ERROR;

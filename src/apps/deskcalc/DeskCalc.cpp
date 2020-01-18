@@ -37,7 +37,7 @@ main(int argc, char* argv[])
 			ExpressionParser parser;
 			BString result = parser.Evaluate(expression.String());
 			printf("%s\n", result.String());
-		} catch (ParseException e) {
+		} catch (ParseException& e) {
 			printf("%s at %" B_PRId32 "\n", e.message.String(), e.position + 1);
 			return 1;
 		}

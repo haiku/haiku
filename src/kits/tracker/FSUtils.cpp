@@ -1788,7 +1788,7 @@ MoveItem(BEntry* entry, BDirectory* destDir, BPoint* loc, uint32 moveMode,
 	} catch (status_t error) {
 		// no alert, was already taken care of before
 		return error;
-	} catch (MoveError error) {
+	} catch (MoveError& error) {
 		BString errorString(B_TRANSLATE("Error moving \"%name\""));
 		errorString.ReplaceFirst("%name", ref.name);
 		BAlert* alert = new BAlert("", errorString.String(), B_TRANSLATE("OK"),
@@ -1796,7 +1796,7 @@ MoveItem(BEntry* entry, BDirectory* destDir, BPoint* loc, uint32 moveMode,
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		return error.fError;
-	} catch (FailWithAlert error) {
+	} catch (FailWithAlert& error) {
 		BString buffer(error.fString);
 		if (error.fName != NULL)
 			buffer.ReplaceFirst("%name", error.fName);

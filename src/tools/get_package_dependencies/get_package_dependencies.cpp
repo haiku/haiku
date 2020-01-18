@@ -90,7 +90,7 @@ main(int argc, const char* const* argv)
 		for (int i = 0; i < packageCount; i++)
 			installedRepositoryBuilder.AddPackage(packages[i]);
 		installedRepositoryBuilder.AddToSolver(solver, true);
-	} catch (BFatalErrorException e) {
+	} catch (BFatalErrorException& e) {
 		DIE(e.Error(), "%s %s", e.Message().String(), e.Details().String());
 	}
 

@@ -51,7 +51,7 @@ CLanguageFamily::EvaluateExpression(const BString& expression,
 	try {
 		_output = evaluator.Evaluate(expression, manager, info);
 		return B_OK;
-	} catch (ParseException ex) {
+	} catch (ParseException& ex) {
 		BString error;
 		error.SetToFormat("Parse error at position %" B_PRId32 ": %s",
 			ex.position, ex.message.String());
@@ -64,7 +64,7 @@ CLanguageFamily::EvaluateExpression(const BString& expression,
 			return B_NO_MEMORY;
 		_output->SetToPrimitive(value);
 		return B_BAD_DATA;
-	} catch (ValueNeededException ex) {
+	} catch (ValueNeededException& ex) {
 		_neededNode = ex.value;
 	}
 

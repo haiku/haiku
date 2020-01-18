@@ -518,7 +518,7 @@ GPJob::Write(const char* data, size_t size)
 {
 	try {
 		fOutputStream->Write(data, size);
-	} catch (TransportException e) {
+	} catch (TransportException& e) {
 		fStatus = B_IO_ERROR;
 	}
 }

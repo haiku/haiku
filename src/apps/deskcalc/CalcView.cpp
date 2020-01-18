@@ -1124,7 +1124,7 @@ CalcView::_EvaluateThread(void* data)
 		BString expression(calcView->fExpressionTextView->Text());
 		try {
 			result = parser.Evaluate(expression.String());
-		} catch (ParseException e) {
+		} catch (ParseException& e) {
 			result << e.message.String() << " at " << (e.position + 1);
 			status = B_ERROR;
 		}
