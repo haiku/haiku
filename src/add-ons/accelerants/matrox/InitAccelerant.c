@@ -114,7 +114,8 @@ status_t INIT_ACCELERANT(int the_fd)
 	result = init_common(the_fd);
 
 	/* bail out if the common initialization failed */
-	if (result != B_OK) goto error0;
+	if (result != B_OK)
+		goto error0;
 	// LOG now available: !NULL si
 
 	/* ensure that INIT_ACCELERANT is executed just once (copies should be clones) */
@@ -131,7 +132,8 @@ status_t INIT_ACCELERANT(int the_fd)
 	result = gx00_general_powerup();
 
 	/* bail out if it failed */
-	if (result != B_OK) goto error1;
+	if (result != B_OK)
+		goto error1;
 
 	/*
 	Now would be a good time to figure out what video modes your card supports.
@@ -141,10 +143,8 @@ status_t INIT_ACCELERANT(int the_fd)
 	Everybody else get's a read-only clone.
 	*/
 	result = create_mode_list();
-	if (result != B_OK) 
-	{
+	if (result != B_OK)
 		goto error1;
-	}
 
 	/*
 	Put the cursor at the start of the frame buffer.  The typical 64x64 4 color
@@ -187,9 +187,6 @@ status_t INIT_ACCELERANT(int the_fd)
 
 	/* note that overlay is not in use (for gx00_bes_move_overlay()) */
 	si->overlay.active = false;
-
-	/* bail out if something failed */
-	if (result != B_OK) goto error1;
 
 	/* initialise various cursor stuff*/
 	gx00_crtc_cursor_init();

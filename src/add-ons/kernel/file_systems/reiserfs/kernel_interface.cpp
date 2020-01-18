@@ -572,30 +572,27 @@ FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 				|| (statData.IsEsoteric() && volume->GetHideEsoteric())) {
 				continue;
 			}
+			// get the name
+			size_t nameLen = 0;
+			const char *name = item.EntryNameAt(index, &nameLen);
+			if (!name || nameLen == 0)	// bad data: skip it gracefully
+				continue;
+			// fill in the entry name -- checks whether the
+			// entry fits into the buffer
+			error = set_dirent_name(buffer, bufferSize, name, nameLen);
 			if (error == B_OK) {
-				// get the name
-				size_t nameLen = 0;
-				const char *name = item.EntryNameAt(index, &nameLen);
-				if (!name || nameLen == 0)	// bad data: skip it gracefully
-					continue;
-				// fill in the entry name -- checks whether the
-				// entry fits into the buffer
-				error = set_dirent_name(buffer, bufferSize, name,
-										nameLen);
-				if (error == B_OK) {
-					// fill in the other data
-					buffer->d_dev = volume->GetID();
-					buffer->d_ino = VNode::GetIDFor(dirID, objectID);
-					*count = 1;
+				// fill in the other data
+				buffer->d_dev = volume->GetID();
+				buffer->d_ino = VNode::GetIDFor(dirID, objectID);
+				*count = 1;
 PRINT(("Successfully read entry: dir: (%Ld: %ld, %ld), name: `%s', "
-	   "id: (%Ld, %ld, %ld), reclen: %hu\n", node->GetID(), node->GetDirID(),
-	   node->GetObjectID(), buffer->d_name, buffer->d_ino, dirID, objectID,
-	   buffer->d_reclen));
-					if (!strcmp("..", buffer->d_name))
-						iterator->SetEncounteredDotDot(true);
-					done = true;
-				}
-	 		}
+   "id: (%Ld, %ld, %ld), reclen: %hu\n", node->GetID(), node->GetDirID(),
+   node->GetObjectID(), buffer->d_name, buffer->d_ino, dirID, objectID,
+   buffer->d_reclen));
+				if (!strcmp("..", buffer->d_name))
+					iterator->SetEncounteredDotDot(true);
+				done = true;
+			}
  		}
  		if (error == B_ENTRY_NOT_FOUND) {
  			if (iterator->EncounteredDotDot()) {

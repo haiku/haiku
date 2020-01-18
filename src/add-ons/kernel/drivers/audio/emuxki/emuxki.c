@@ -1774,11 +1774,9 @@ emuxki_gpr_set(emuxki_dev *card, emuxki_gpr *gpr, int32 type, float *values)
 			for (i = 0; i < count; i++) {
 				if (values[i]>gpr->max_gain || values[i]<gpr->min_gain)
 					return;
-				index = (int32)(values[i] / gpr->granularity);
+				index = values[i] / gpr->granularity;
 				if (index > sizeof(db_table)/sizeof(db_table[0]))
 					index = sizeof(db_table)/sizeof(db_table[0]);
-				else if (index < 0)
-					index = 0;
 				LOG(("emuxki_set_gpr gpr: %d \n", gpr->gpr + i));
 				LOG(("emuxki_set_gpr values[i]: %g \n", values[i]));
 				LOG(("emuxki_set_gpr index: %u \n", index));

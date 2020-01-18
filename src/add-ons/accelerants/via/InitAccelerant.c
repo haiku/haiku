@@ -28,7 +28,8 @@ static status_t init_common(int the_fd) {
 	gpd.magic = VIA_PRIVATE_DATA_MAGIC;
 	/* contact driver and get a pointer to the registers and shared data */
 	result = ioctl(fd, ENG_GET_PRIVATE_DATA, &gpd, sizeof(gpd));
-	if (result != B_OK) goto error0;
+	if (result != B_OK)
+		goto error0;
 
 	/* clone the shared area for our use */
 	shared_info_area = clone_area(DRIVER_PREFIX " shared", (void **)&si, B_ANY_ADDRESS,
@@ -112,14 +113,16 @@ status_t INIT_ACCELERANT(int the_fd) {
 	result = init_common(the_fd);
 
 	/* bail out if the common initialization failed */
-	if (result != B_OK) goto error0;
+	if (result != B_OK)
+		goto error0;
 	// LOG now available: !NULL si
 	
 	/* call the device specific init code */
 	result = eng_general_powerup();
 
 	/* bail out if it failed */
-	if (result != B_OK) goto error1;
+	if (result != B_OK)
+		goto error1;
 
 	/*
 	Now would be a good time to figure out what video modes your card supports.
@@ -129,10 +132,8 @@ status_t INIT_ACCELERANT(int the_fd) {
 	Everybody else get's a read-only clone.
 	*/
 	result = create_mode_list();
-	if (result != B_OK) 
-	{
+	if (result != B_OK)
 		goto error1;
-	}
 
 	/*
 	Put the cursor at the start of the frame buffer.
@@ -175,9 +176,6 @@ status_t INIT_ACCELERANT(int the_fd) {
 
 	/* note that overlay is not in use (for eng_bes_move_overlay()) */
 	si->overlay.active = false;
-
-	/* bail out if something failed */
-	if (result != B_OK) goto error1;
 
 	/* initialise various cursor stuff */
 	head1_cursor_init();
