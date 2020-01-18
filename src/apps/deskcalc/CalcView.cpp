@@ -23,7 +23,6 @@
 #include <Alert.h>
 #include <Application.h>
 #include <AppFileInfo.h>
-#include <Beep.h>
 #include <Bitmap.h>
 #include <Catalog.h>
 #include <ControlLook.h>
@@ -33,7 +32,6 @@
 #include <MenuItem.h>
 #include <Message.h>
 #include <MessageRunner.h>
-#include <PlaySound.h>
 #include <Point.h>
 #include <PopUpMenu.h>
 #include <Region.h>
@@ -210,7 +208,6 @@ CalcView::CalcView(BRect frame, rgb_color rgbBaseColor, BMessage* settings)
 
 	fPopUpMenu(NULL),
 	fAutoNumlockItem(NULL),
-	fAudioFeedbackItem(NULL),
 	fOptions(new CalcOptions()),
 	fEvaluateThread(-1),
 	fEvaluateMessageRunner(NULL),
@@ -249,7 +246,6 @@ CalcView::CalcView(BMessage* archive)
 
 	fPopUpMenu(NULL),
 	fAutoNumlockItem(NULL),
-	fAudioFeedbackItem(NULL),
 	fOptions(new CalcOptions()),
 	fEvaluateThread(-1),
 	fEvaluateMessageRunner(NULL),
@@ -314,10 +310,6 @@ CalcView::MessageReceived(BMessage* message)
 		switch (message->what) {
 			case MSG_OPTIONS_AUTO_NUM_LOCK:
 				ToggleAutoNumlock();
-				return;
-
-			case MSG_OPTIONS_AUDIO_FEEDBACK:
-				ToggleAudioFeedback();
 				return;
 
 			case MSG_OPTIONS_ANGLE_MODE_RADIAN:
@@ -810,15 +802,16 @@ CalcView::Copy()
 {
 	// access system clipboard
 	if (be_clipboard->Lock()) {
-		be_clipboard->Clear();
-		BMessage* clipper = be_clipboard->Data();
-		clipper->what = B_MIME_DATA;
-		// TODO: should check return for errors!
-		BString expression = fExpressionTextView->Text();
-		clipper->AddData("text/plain", B_MIME_TYPE,
-			expression.String(), expression.Length());
-		//clipper->PrintToStream();
-		be_clipboard->Commit();
+		BMessage* clipper;
+		if (be_clipboard->Clear() == B_OK
+			&& (clipper = be_clipboard->Data()) == B_OK) {
+			BString expression = fExpressionTextView->Text();
+			if (clipper->AddData("text/plain", B_MIME_TYPE,
+				expression.String(), expression.Length() == B_OK) {
+				clipper->what = B_MIME_DATA;
+				be_clipboard->Commit();
+			}
+		}
 		be_clipboard->Unlock();
 	}
 }
@@ -953,7 +946,6 @@ CalcView::Evaluate()
 		return;
 	}
 
-	_AudioFeedback(false);
 	_SetEnabled(false);
 		// Disable input while we evaluate
 
@@ -992,14 +984,6 @@ CalcView::ToggleAutoNumlock(void)
 {
 	fOptions->auto_num_lock = !fOptions->auto_num_lock;
 	fAutoNumlockItem->SetMarked(fOptions->auto_num_lock);
-}
-
-
-void
-CalcView::ToggleAudioFeedback(void)
-{
-	fOptions->audio_feedback = !fOptions->audio_feedback;
-	fAudioFeedbackItem->SetMarked(fOptions->audio_feedback);
 }
 
 
@@ -1331,8 +1315,6 @@ CalcView::_PressKey(int key)
 			fExpressionTextView->Insert(fKeypad[key].code);
 		}
 	}
-
-	_AudioFeedback(true);
 }
 
 
@@ -1380,22 +1362,6 @@ CalcView::_FlashKey(int32 key, uint32 flashFlags)
 
 
 void
-CalcView::_AudioFeedback(bool inBackGround)
-{
-	// TODO: Use beep events... This interface is not implemented on Haiku
-	// anyways...
-#if 0
-	if (fOptions->audio_feedback) {
-		BEntry zimp("key.AIFF");
-		entry_ref zimp_ref;
-		zimp.GetRef(&zimp_ref);
-		play_sound(&zimp_ref, true, false, inBackGround);
-	}
-#endif
-}
-
-
-void
 CalcView::_Colorize()
 {
 	// calculate light and dark color from base color
@@ -1429,8 +1395,6 @@ CalcView::_CreatePopUpMenu(bool addKeypadModeMenuItems)
 	// construct items
 	fAutoNumlockItem = new BMenuItem(B_TRANSLATE("Enable Num Lock on startup"),
 		new BMessage(MSG_OPTIONS_AUTO_NUM_LOCK));
-	fAudioFeedbackItem = new BMenuItem(B_TRANSLATE("Audio Feedback"),
-		new BMessage(MSG_OPTIONS_AUDIO_FEEDBACK));
 	fAngleModeRadianItem = new BMenuItem(B_TRANSLATE("Radians"),
 		new BMessage(MSG_OPTIONS_ANGLE_MODE_RADIAN));
 	fAngleModeDegreeItem = new BMenuItem(B_TRANSLATE("Degrees"),
@@ -1446,7 +1410,6 @@ CalcView::_CreatePopUpMenu(bool addKeypadModeMenuItems)
 
 	// apply current settings
 	fAutoNumlockItem->SetMarked(fOptions->auto_num_lock);
-	fAudioFeedbackItem->SetMarked(fOptions->audio_feedback);
 	fAngleModeRadianItem->SetMarked(!fOptions->degree_mode);
 	fAngleModeDegreeItem->SetMarked(fOptions->degree_mode);
 
@@ -1454,9 +1417,6 @@ CalcView::_CreatePopUpMenu(bool addKeypadModeMenuItems)
 	fPopUpMenu = new BPopUpMenu("pop-up", false, false);
 
 	fPopUpMenu->AddItem(fAutoNumlockItem);
-	// TODO: Enable this when we use beep events which can be configured
-	// in the Sounds preflet.
-	//fPopUpMenu->AddItem(fAudioFeedbackItem);
 	fPopUpMenu->AddSeparatorItem();
 	fPopUpMenu->AddItem(fAngleModeRadianItem);
 	fPopUpMenu->AddItem(fAngleModeDegreeItem);

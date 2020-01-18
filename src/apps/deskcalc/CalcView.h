@@ -18,7 +18,6 @@
 
 enum {
 	MSG_OPTIONS_AUTO_NUM_LOCK				= 'oanl',
-	MSG_OPTIONS_AUDIO_FEEDBACK				= 'oafb',
 	MSG_OPTIONS_ANGLE_MODE_RADIAN			= 'oamr',
 	MSG_OPTIONS_ANGLE_MODE_DEGREE			= 'oamd',
 	MSG_OPTIONS_KEYPAD_MODE_COMPACT			= 'okmc',
@@ -87,10 +86,6 @@ class CalcView : public BView {
 			// Toggle whether or not the Num Lock key starts on
 			void				ToggleAutoNumlock(void);
 
-			// Toggle whether or not to provide audio feedback
-			// (option currently disabled)
-			void				ToggleAudioFeedback(void);
-
 			// Set the angle mode to degrees or radians
 			void				SetDegreeMode(bool degrees);
 
@@ -107,7 +102,6 @@ class CalcView : public BView {
 			void				_PressKey(const char* label);
 			int32				_KeyForLabel(const char* label) const;
 			void				_FlashKey(int32 key, uint32 flashFlags);
-			void				_AudioFeedback(bool inBackGround);
 
 			void				_Colorize();
 
@@ -156,7 +150,6 @@ class CalcView : public BView {
 			// pop-up context menu.
 			BPopUpMenu*			fPopUpMenu;
 			BMenuItem*			fAutoNumlockItem;
-			BMenuItem*			fAudioFeedbackItem;
 
 			BMenuItem*			fAngleModeRadianItem;
 			BMenuItem*			fAngleModeDegreeItem;
