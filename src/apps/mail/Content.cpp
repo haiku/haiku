@@ -2478,7 +2478,7 @@ TTextView::Reader::Run(void *_this)
 				size_t length = eol - header;
 
 				free(buffer);
-				buffer = (char *)malloc(buffer, length + 1);
+				buffer = (char *)malloc(length + 1);
 				if (buffer == NULL)
 		 			goto done;
 
