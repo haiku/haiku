@@ -260,18 +260,6 @@ BDragger::Draw(BRect update)
 		if (fIsZombie) {
 			// TODO: should draw it differently ?
 		}
-	} else if (IsVisibilityChanging()) {
-		if (Parent() != NULL) {
-			if ((Parent()->Flags() & B_DRAW_ON_CHILDREN) == 0) {
-				uint32 flags = Parent()->Flags();
-				Parent()->SetFlags(flags | B_DRAW_ON_CHILDREN);
-				Parent()->Invalidate(Frame() & ConvertToParent(update));
-				Parent()->SetFlags(flags);
-			}
-		} else {
-			SetHighColor(255, 255, 255);
-			FillRect(bounds);
-		}
 	}
 }
 
@@ -326,10 +314,7 @@ BDragger::MessageReceived(BMessage* msg)
 			// This code is used whenever the "are draggers drawn" option is
 			// changed.
 			if (fRelation == TARGET_IS_CHILD) {
-				fTransition = true;
-				Draw(Bounds());
-				Flush();
-				fTransition = false;
+				Invalidate(Bounds());
 			} else {
 				if ((fShelf != NULL && fShelf->AllowsDragging()
 						&& AreDraggersDrawn())
