@@ -372,12 +372,26 @@ LVDSPort::LVDSPort()
 pipe_index
 LVDSPort::PipePreference()
 {
-	// TODO: Technically INTEL_PIPE_B is only required on < gen 4
-	// otherwise we can use INTEL_PIPE_ANY, however it seems to break
-	// modesetting atm. (likely due to a bug on our end)
-	//if (gInfo->shared_info->device_type.Generation() < 4)
-	//	return INTEL_PIPE_B;
+	// Older devices have hardcoded pipe/port mappings, so just use that
+	if (gInfo->shared_info->device_type.Generation() < 4)
+		return INTEL_PIPE_B;
 
+	// Ideally we could just return INTEL_PIPE_ANY for the newer devices, but
+	// this doesn't quite work yet.
+
+	// For Ibex Point, read the existing LVDS configuration and just reuse that
+	// (it seems our attempt to change it doesn't work, anyway)
+	if (gInfo->shared_info->pch_info == INTEL_PCH_IBX) {
+		uint32 portState = read32(_PortRegister());
+		if (portState & DISPLAY_MONITOR_PIPE_B)
+			return INTEL_PIPE_B;
+		else
+			return INTEL_PIPE_A;
+	}
+
+	// For later PCH versions, assume pipe B for now. Note that Cougar Point
+	// and probably later devices add a pipe C, so we'd need to handle that
+	// and the port register has a different format because of it.
 	return INTEL_PIPE_B;
 }
 

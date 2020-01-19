@@ -491,6 +491,13 @@ struct intel_free_graphics_memory {
 #define DISPLAY_MONITOR_POSITIVE_VSYNC	(2UL << 3)
 #define DISPLAY_MONITOR_PORT_DETECTED	(1UL << 2) // TMDS/DisplayPort only
 
+// Cougar Point transcoder pipe selection
+// (replaces DISPLAY_MONITOR_PIPE_B)
+#define  PORT_TRANS_A_SEL_CPT			0
+#define  PORT_TRANS_B_SEL_CPT			(1<<29)
+#define  PORT_TRANS_C_SEL_CPT			(2<<29)
+#define  PORT_TRANS_SEL_MASK			(3<<29)
+
 #define LVDS_POST2_RATE_SLOW			14 // PLL Divisors
 #define LVDS_POST2_RATE_FAST			7
 #define LVDS_B0B3_POWER_MASK			(3UL << 2)
@@ -551,12 +558,6 @@ struct intel_free_graphics_memory {
 
 #define INTEL_DISPLAY_A_PIPE_SIZE		(0x001c | REGS_NORTH_PIPE_AND_PORT)
 #define INTEL_DISPLAY_B_PIPE_SIZE		(0x101c | REGS_NORTH_PIPE_AND_PORT)
-
-// Cougar Point transcoder pipe selection
-#define  PORT_TRANS_A_SEL_CPT			0
-#define  PORT_TRANS_B_SEL_CPT			(1<<29)
-#define  PORT_TRANS_C_SEL_CPT			(2<<29)
-#define  PORT_TRANS_SEL_MASK			(3<<29)
 
 // on PCH we also have to set the transcoder
 #define INTEL_TRANSCODER_A_HTOTAL		(0x0000 | REGS_SOUTH_TRANSCODER_PORT)
