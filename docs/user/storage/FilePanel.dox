@@ -14,7 +14,7 @@
 /*!
 	\file FilePanel.h
 	\ingroup storage
-	\ingroup libbe
+	\ingroup libtracker
 	\brief Provides the BFilePanel and BRefFilter classes and support enums.
 */
 
@@ -76,7 +76,7 @@
 /*!
 	\class BRefFilter
 	\ingroup storage
-	\ingroup libbe
+	\ingroup libtracker
 	\brief Allows you to filter the items displayed in a file panel.
 
 	\since BeOS R3
@@ -106,7 +106,7 @@
 /*!
 	\class BFilePanel
 	\ingroup storage
-	\ingroup libbe
+	\ingroup libtracker
 	\brief Displays a standard Open/Save dialog.
 
 	A save panel looks like this:
