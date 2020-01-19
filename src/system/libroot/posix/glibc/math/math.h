@@ -441,12 +441,6 @@ extern int matherr (struct exception *__exc);
 # define __NO_MATH_INLINES	1
 #endif
 
-/* Get machine-dependent inline versions (if there are any).  */
-#ifdef __USE_EXTERN_INLINES
-# include <bits/mathinline.h>
-#endif
-
-
 #if __USE_ISOC99
 /* ISO C99 defines some macros to compare number while taking care
    for unordered numbers.  Since many FPUs provide special
