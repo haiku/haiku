@@ -658,7 +658,7 @@ BDragger::_AddToList()
 		// The dragger is not shown - but we can't hide us in case we're the
 		// parent of the actual target view (because then you couldn't see
 		// it anymore).
-		if (fRelation != TARGET_IS_CHILD && !IsHidden())
+		if (fRelation != TARGET_IS_CHILD && !IsHidden(this))
 			Hide();
 	}
 }
