@@ -47,7 +47,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			posix_gnu_regex.o
 			posix_gnu_stdio.o
 			posix_gnu_stdlib.o
-			posix_gnu_string.o
 			posix_gnu_wcsmbs.o
 			posix_stdlib.o
 			posix_string.o
