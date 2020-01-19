@@ -65,7 +65,7 @@
 # define PAD(f, c, n) __printf_pad (f, c, n)
 ssize_t __printf_pad __P ((FILE *, char pad, int n)); /* In vfprintf.c.  */
 #endif	/* USE_IN_LIBIO */
-
+
 /* Macros for doing the actual output.  */
 
 #define outchar(ch)							      \
@@ -107,7 +107,7 @@ ssize_t __printf_pad __P ((FILE *, char pad, int n)); /* In vfprintf.c.  */
       done += len;							      \
     }									      \
   while (0)
-
+
 /* We use the GNU MP library to handle large numbers.
 
    An MP variable occupies a varying number of entries in its array.  We keep
@@ -119,8 +119,6 @@ ssize_t __printf_pad __P ((FILE *, char pad, int n)); /* In vfprintf.c.  */
   memcpy (dst, src, (dst##size = src##size) * sizeof (mp_limb_t))
 #define MPN_GE(u,v) \
   (u##size > v##size || (u##size == v##size && __mpn_cmp (u, v, u##size) >= 0))
-
-extern int __isinfl (long double), __isnanl (long double);
 
 extern mp_size_t __mpn_extract_double (mp_ptr res_ptr, mp_size_t size,
 				       int *expt, int *is_neg,
@@ -328,7 +326,7 @@ hack_digit_end:
       fpnum.ldbl = *(const long double *) args[0];
 
       /* Check for special values: not a number or infinity.  */
-      if (__isnanl (fpnum.ldbl))
+      if (isnan (fpnum.ldbl))
 	{
 	  if (isupper (info->spec))
 	    {
@@ -342,7 +340,7 @@ hack_digit_end:
 	      }
 	  is_neg = 0;
 	}
-      else if (__isinfl (fpnum.ldbl))
+      else if (isinf (fpnum.ldbl))
 	{
 	  if (isupper (info->spec))
 	    {
@@ -372,7 +370,7 @@ hack_digit_end:
       fpnum.dbl = *(const double *) args[0];
 
       /* Check for special values: not a number or infinity.  */
-      if (__isnan (fpnum.dbl))
+      if (isnan (fpnum.dbl))
 	{
 	  if (isupper (info->spec))
 	    {
@@ -386,7 +384,7 @@ hack_digit_end:
 	    }
 	  is_neg = 0;
 	}
-      else if (__isinf (fpnum.dbl))
+      else if (isinf (fpnum.dbl))
 	{
 	  if (isupper (info->spec))
 	    {
@@ -1162,7 +1160,7 @@ hack_digit_callee3:
   }
   return done;
 }
-
+
 /* Return the number of extra grouping characters that will be inserted
    into a number with INTDIG_MAX integer digits.  */
 

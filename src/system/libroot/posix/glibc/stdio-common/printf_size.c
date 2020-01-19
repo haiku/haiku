@@ -45,7 +45,7 @@
 # define PAD(f, c, n) __printf_pad (f, c, n)
 ssize_t __printf_pad __P ((FILE *, char pad, int n)); /* In vfprintf.c.  */
 #endif	/* USE_IN_LIBIO */
-
+
 /* Macros for doing the actual output.  */
 
 #define outchar(ch)							      \
@@ -87,12 +87,12 @@ ssize_t __printf_pad __P ((FILE *, char pad, int n)); /* In vfprintf.c.  */
       done += len;							      \
     }									      \
   while (0)
-
+
 /* Prototype for helper functions.  */
 extern int __printf_fp (FILE *fp, const struct printf_info *info,
 			const void *const *args);
 
-
+
 int
 printf_size (FILE *fp, const struct printf_info *info, const void *const *args)
 {
@@ -134,13 +134,13 @@ printf_size (FILE *fp, const struct printf_info *info, const void *const *args)
       fpnum.ldbl.d = *(const long double *) args[0];
 
       /* Check for special values: not a number or infinity.  */
-      if (__isnanl (fpnum.ldbl.d))
+      if (isnan (fpnum.ldbl.d))
 	{
 	  special = "nan";
 	  wspecial = L"nan";
 	  negative = 0;
 	}
-      else if (__isinfl (fpnum.ldbl.d))
+      else if (isinf (fpnum.ldbl.d))
 	{
 	  special = "inf";
 	  wspecial = L"inf";
@@ -160,13 +160,13 @@ printf_size (FILE *fp, const struct printf_info *info, const void *const *args)
       fpnum.dbl.d = *(const double *) args[0];
 
       /* Check for special values: not a number or infinity.  */
-      if (__isnan (fpnum.dbl.d))
+      if (isnan (fpnum.dbl.d))
 	{
 	  special = "nan";
 	  wspecial = L"nan";
 	  negative = 0;
 	}
-      else if (__isinf (fpnum.dbl.d))
+      else if (isinf (fpnum.dbl.d))
 	{
 	  special = "inf";
 	  wspecial = L"inf";
@@ -250,7 +250,7 @@ printf_size (FILE *fp, const struct printf_info *info, const void *const *args)
 
   return done;
 }
-
+
 /* This is the function used by `vfprintf' to determine number and
    type of the arguments.  */
 int
