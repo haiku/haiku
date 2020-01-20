@@ -762,8 +762,10 @@ validate_instantiation(BMessage* from, const char* className)
 		const char* archiveClassName;
 		for (int32 index = 0; from->FindString(B_CLASS_FIELD, index,
 				&archiveClassName) == B_OK; ++index) {
-			if (name == archiveClassName)
+			if (name == archiveClassName) {
+				errno = B_OK;
 				return true;
+			}
 		}
 
 		if (!add_private_namespace(name))
