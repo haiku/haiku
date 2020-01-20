@@ -39,7 +39,7 @@ actions BuildUBootSDImage1
     MTOOLSRC=$(1).mtools mformat -L 32 -v "HAIKU" i:
 
     # generate u-boot environment variables
-    echo '$(HAIKU_BOARD_SDIMAGE_UBOOT_UENV)' > uEnv.txt
+    echo 'os=haiku' > uEnv.txt
     # populate
     $(CP) $(2[2-2]) haiku_loader.ub
     MTOOLSRC=$(1).mtools mcopy haiku_loader.ub i:
@@ -58,6 +58,7 @@ actions BuildUBootSDImage1
     # cleanup
     $(RM) $(1).mtools
     $(RM) uEnv.txt
+    $(RM) boot.scr
     # Add haiku bootstrap partition to MMC image
     cat $(2[0]) >> $(1)
 }
