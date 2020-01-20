@@ -76,9 +76,8 @@ ScreenConfigurations::BestFit(int32 id, const monitor_info* info,
 			&& !strcasecmp(configuration->info.name, info->name)
 			&& configuration->info.product_id == info->product_id) {
 			score += 2;
-			if (info->serial_number[0] != '\0'
-				&& !strcmp(configuration->info.serial_number,
-						info->serial_number)) {
+			if (strcmp(configuration->info.serial_number,
+					info->serial_number) == 0) {
 				exactMatch = true;
 				score += 2;
 			}
