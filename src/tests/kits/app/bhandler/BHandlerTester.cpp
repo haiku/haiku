@@ -264,15 +264,15 @@ void TBHandlerTester::SetName2()
 //------------------------------------------------------------------------------
 /**
 	Perform(perform_code d, void *arg)
-	@case		feed meaningless data, should return B_ERROR
+	@case		feed meaningless data, should return B_NAME_NOT_FOUND
 	@param	d	N/A
 	@param	arg	NULL
-	@results	Returns B_ERROR
+	@results	Returns B_NAME_NOT_FOUND
  */
 void TBHandlerTester::Perform1()
 {
 	BHandler Handler;
-	CPPUNIT_ASSERT(Handler.Perform(0, NULL) == B_ERROR);
+	CPPUNIT_ASSERT(Handler.Perform(0, NULL) == B_NAME_NOT_FOUND);
 }
 //------------------------------------------------------------------------------
 /**
