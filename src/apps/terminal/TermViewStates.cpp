@@ -218,12 +218,13 @@ TermView::DefaultState::KeyDown(const char* bytes, int32 numBytes)
 		// Determine the character produced by the same keypress without the
 		// Option key
 		mod &= B_SHIFT_KEY | B_CAPS_LOCK | B_CONTROL_KEY;
-		if (mod == 0) {
+		const int32 (*keymapTable)[128] = (mod == 0)
+			? NULL
+			: fView->fKeymapTableForModifiers.Get(mod);
+		if (keymapTable == NULL) {
 			bytes = (const char*)&rawChar;
 			numBytes = 1;
 		} else {
-			const int32 (*keymapTable)[128] =
-				fView->fKeymapTableForModifiers.Get(mod);
 			bytes = &fView->fKeymapChars[(*keymapTable)[key]];
 			numBytes = *(bytes++);
 		}
