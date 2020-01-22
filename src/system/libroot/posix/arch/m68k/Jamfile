@@ -3,13 +3,17 @@ SubDir HAIKU_TOP src system libroot posix arch m68k ;
 local architecture = $(TARGET_ARCH) ;
 
 UsePrivateSystemHeaders ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
+#SubDirCcFlags -save-temps ;
 
 local genericSources =
+	fesetround.c
 	setjmp_save_sigs.c
 	longjmp_return.c
 ;
 
 MergeObject <$(TARGET_ARCH)>posix_arch_$(TARGET_ARCH).o :
+	fenv.c
 	sigsetjmp.S
 	siglongjmp.S
 

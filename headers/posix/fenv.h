@@ -15,6 +15,8 @@
 #  include <arch/riscv64/fenv.h>
 #elif defined(__sparc__)
 #  include <arch/sparc64/fenv.h>
+#elif defined(__M68K__)
+#  include <arch/m68k/fenv.h>
 #else
 #  error There is no fenv.h for this architecture!
 #endif
