@@ -270,7 +270,10 @@ Grepper::_RunnerThread()
 	if (! fCaseSensitive)
 		argv[argc++] = "-i";
 	if (! fRegularExpression)
-		argv[argc++] = "-F";	 // no a regexp: force fixed string, 
+		argv[argc++] = "-F";	 // no a regexp: force fixed string,
+	// Add double dash argument to tell grep
+	// it's the end of commands options
+	argv[argc++] = "--";
 	argv[argc++] = fPattern;
 	argv[argc] = NULL;
 
@@ -420,7 +423,7 @@ Grepper::_RunnerThread()
 					if (strcmp(fileName, currentFileName) != 0) {
 						fTarget.SendMessage(&message);
 
-						strncpy(currentFileName, fileName, 
+						strncpy(currentFileName, fileName,
 							sizeof(currentFileName));
 
 						message.MakeEmpty();
