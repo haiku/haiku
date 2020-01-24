@@ -335,6 +335,7 @@ Parser::parse(const char* pathToFile)
 	FILE* fd = fopen(pathToFile, "r");
 	if (fd == 0) {
 		sprintf(msg, "Couldn't open file %s", pathToFile);
+		XML_ParserFree(p);
 		throw exception(msg);
 	}
 
@@ -346,6 +347,8 @@ Parser::parse(const char* pathToFile)
 			sprintf(msg, "%s at line %ld\n",
 					XML_ErrorString(XML_GetErrorCode(p)),
 					XML_GetCurrentLineNumber(p));
+			fclose(fd);
+			XML_ParserFree(p);
 			throw exception(msg);
 		}
 	} while (!done);
