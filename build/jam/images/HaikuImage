@@ -14,7 +14,7 @@ if $(HAIKU_BUILD_TYPE) = bootstrap {
 # build the haiku system packages and add them
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) HaikuPackages ] ;
 
-AddPackageFilesToHaikuImage system :
+AddPackageFilesToHaikuImage system packages :
 	haiku_loader.hpkg
 	haiku.hpkg
 	haiku_$(TARGET_PACKAGING_ARCHS[2-]).hpkg

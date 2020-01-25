@@ -142,7 +142,7 @@ ExtractArchiveToHaikuImage develop tools
 
 # Add the optional package WonderBrush to the image. The package is downloaded
 # via wget (i.e. wget must be installed).
-AddHaikuImagePackages WonderBrush ;
+AddHaikuImageSystemPackages WonderBrush ;
 
 # Add the optional package WebPositive to the image but don't add its
 # dependent SQLite optional package to the image. WebPositive still needs
@@ -212,7 +212,7 @@ switch $(HAIKU_BUILD_PROFILE) {
 	case "disk" : {
 		AddOptionalHaikuImagePackages BeBook BeHappy Bluetooth Development
 			OpenSSH OpenSSL Welcome ;
-		AddHaikuImagePackages bepdf cvs p7zip pe subversion vision wonderbrush ;
+		AddHaikuImageSystemPackages bepdf cvs p7zip pe subversion vision wonderbrush ;
 	}
 
 	case "qemu" : {
@@ -223,7 +223,7 @@ switch $(HAIKU_BUILD_PROFILE) {
 		HAIKU_IMAGE_SIZE = 400 ;
 		HAIKU_DONT_CLEAR_IMAGE = 1 ;
 		AddOptionalHaikuImagePackages Development ;
-		AddHaikuImagePackages pe ;
+		AddHaikuImageSystemPackages pe ;
 	}
 
 	case "anyboot" : {
@@ -234,7 +234,7 @@ switch $(HAIKU_BUILD_PROFILE) {
 		HAIKU_IMAGE_SIZE = 1024 ;
 		HAIKU_DONT_CLEAR_IMAGE = 1 ;
 		AddOptionalHaikuImagePackages Development ;
-		AddHaikuImagePackages pe ;
+		AddHaikuImageSystemPackages pe ;
 		CopyDirectoryToHaikuImage home Desktop : $(HAIKU_TOP)/../crash-tests ;
 	}
 }
