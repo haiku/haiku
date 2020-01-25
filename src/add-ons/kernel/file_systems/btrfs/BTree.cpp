@@ -268,7 +268,9 @@ BTree::Node::MoveEntries(uint32 start, uint32 end, int length) const
 		TRACE("Node::MoveEntries() inserting ... start %" B_PRIu32 " end %"
 			B_PRIu32 " length %i\n", start, end, length);
 		length -= _CalculateSpace(start, end - 1);
-		std::swap(start, end);
+		uint32 tmp = start;
+		start = end;
+		end = tmp;
 	}
 
 	if (end >= ItemCount())
