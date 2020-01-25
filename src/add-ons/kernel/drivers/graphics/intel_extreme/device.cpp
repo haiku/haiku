@@ -96,6 +96,91 @@ getset_register(int argc, char** argv)
 
 	return 0;
 }
+
+
+static int
+dump_pipe_info(int argc, char** argv)
+{
+	int pipeOffset = 0;
+
+	if (argc > 2) {
+		kprintf("usage: %s [pipe index]\n", argv[0]);
+		return 0;
+	}
+
+	if (argc > 1) {
+		uint32 pipe = parse_expression(argv[1]);
+		if (pipe != 0)
+			pipeOffset = INTEL_DISPLAY_OFFSET; // Use pipe B if requested
+	}
+
+	intel_info &info = *gDeviceInfo[0];
+	uint32 value;
+
+	kprintf("intel_extreme pipe configuration:\n");
+
+	value = read32(info, INTEL_DISPLAY_A_HTOTAL + pipeOffset);
+	kprintf("  HTOTAL start %" B_PRIu32 " end %" B_PRIu32 "\n", value >> 16,
+		value & 0xFFFF);
+	value = read32(info, INTEL_DISPLAY_A_HBLANK + pipeOffset);
+	kprintf("  HBLANK start %" B_PRIu32 " end %" B_PRIu32 "\n", value >> 16,
+		value & 0xFFFF);
+	value = read32(info, INTEL_DISPLAY_A_HSYNC + pipeOffset);
+	kprintf("  HSYNC start %" B_PRIu32 " end %" B_PRIu32 "\n", value >> 16,
+		value & 0xFFFF);
+	value = read32(info, INTEL_DISPLAY_A_VTOTAL + pipeOffset);
+	kprintf("  VTOTAL start %" B_PRIu32 " end %" B_PRIu32 "\n", value >> 16,
+		value & 0xFFFF);
+	value = read32(info, INTEL_DISPLAY_A_VBLANK + pipeOffset);
+	kprintf("  VBLANK start %" B_PRIu32 " end %" B_PRIu32 "\n", value >> 16,
+		value & 0xFFFF);
+	value = read32(info, INTEL_DISPLAY_A_VSYNC + pipeOffset);
+	kprintf("  VSYNC start %" B_PRIu32 " end %" B_PRIu32 "\n", value >> 16,
+		value & 0xFFFF);
+	value = read32(info, INTEL_DISPLAY_A_PIPE_SIZE + pipeOffset);
+	kprintf("  SIZE %" B_PRIu32 "x%" B_PRIu32 "\n", value >> 16,
+		value & 0xFFFF);
+
+	if (info.pch_info != INTEL_PCH_NONE) {
+		kprintf("intel_extreme transcoder configuration:\n");
+
+		value = read32(info, INTEL_TRANSCODER_A_HTOTAL + pipeOffset);
+		kprintf("  HTOTAL start %" B_PRIu32 " end %" B_PRIu32 "\n", value >> 16,
+			value & 0xFFFF);
+		value = read32(info, INTEL_TRANSCODER_A_HBLANK + pipeOffset);
+		kprintf("  HBLANK start %" B_PRIu32 " end %" B_PRIu32 "\n", value >> 16,
+			value & 0xFFFF);
+		value = read32(info, INTEL_TRANSCODER_A_HSYNC + pipeOffset);
+		kprintf("  HSYNC start %" B_PRIu32 " end %" B_PRIu32 "\n", value >> 16,
+			value & 0xFFFF);
+		value = read32(info, INTEL_TRANSCODER_A_VTOTAL + pipeOffset);
+		kprintf("  VTOTAL start %" B_PRIu32 " end %" B_PRIu32 "\n", value >> 16,
+			value & 0xFFFF);
+		value = read32(info, INTEL_TRANSCODER_A_VBLANK + pipeOffset);
+		kprintf("  VBLANK start %" B_PRIu32 " end %" B_PRIu32 "\n", value >> 16,
+			value & 0xFFFF);
+		value = read32(info, INTEL_TRANSCODER_A_VSYNC + pipeOffset);
+		kprintf("  VSYNC start %" B_PRIu32 " end %" B_PRIu32 "\n", value >> 16,
+			value & 0xFFFF);
+		value = read32(info, INTEL_TRANSCODER_A_IMAGE_SIZE + pipeOffset);
+		kprintf("  SIZE %" B_PRIu32 "x%" B_PRIu32 "\n", value >> 16,
+			value & 0xFFFF);
+	}
+
+	kprintf("intel_extreme display plane configuration:\n");
+
+	value = read32(info, INTEL_DISPLAY_A_CONTROL + pipeOffset);
+	kprintf("  CONTROL: %" B_PRIx32 "\n", value);
+	value = read32(info, INTEL_DISPLAY_A_BASE + pipeOffset);
+	kprintf("  BASE: %" B_PRIx32 "\n", value);
+	value = read32(info, INTEL_DISPLAY_A_BYTES_PER_ROW + pipeOffset);
+	kprintf("  BYTES_PER_ROW: %" B_PRIx32 "\n", value);
+	value = read32(info, INTEL_DISPLAY_A_SURFACE + pipeOffset);
+	kprintf("  SURFACE: %" B_PRIx32 "\n", value);
+
+	return 0;
+}
+
 #endif	// DEBUG_COMMANDS
 
 
@@ -133,6 +218,8 @@ device_open(const char* name, uint32 /*flags*/, void** _cookie)
 #ifdef DEBUG_COMMANDS
 			add_debugger_command("ie_reg", getset_register,
 				"dumps or sets the specified intel_extreme register");
+			add_debugger_command("ie_pipe", dump_pipe_info,
+				"show pipe configuration information");
 #endif
 		}
 	}
@@ -171,6 +258,7 @@ device_free(void* data)
 
 #ifdef DEBUG_COMMANDS
 		remove_debugger_command("ie_reg", getset_register);
+		remove_debugger_command("ie_pipe", dump_pipe_info);
 #endif
 	}
 
