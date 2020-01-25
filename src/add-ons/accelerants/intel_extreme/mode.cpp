@@ -285,9 +285,6 @@ intel_set_display_mode(display_mode* mode)
 
 	display_mode target = *mode;
 
-	// TODO: it may be acceptable to continue when using panel fitting or
-	// centering, since the data from propose_display_mode will not actually be
-	// used as is in this case.
 	if (sanitize_display_mode(target)) {
 		TRACE("Video mode was adjusted by sanitize_display_mode\n");
 		TRACE("Initial mode: Hd %d Hs %d He %d Ht %d Vd %d Vs %d Ve %d Vt %d\n",
@@ -326,7 +323,7 @@ intel_set_display_mode(display_mode* mode)
 	if (intel_allocate_memory(bytesPerRow * target.virtual_height, 0,
 			base) < B_OK) {
 		// oh, how did that happen? Unfortunately, there is no really good way
-		// back
+		// back. Try to restore a framebuffer for the previous mode, at least.
 		if (intel_allocate_memory(gInfo->current_mode.virtual_height
 				* sharedInfo.bytes_per_row, 0, base) == B_OK) {
 			sharedInfo.frame_buffer = base;

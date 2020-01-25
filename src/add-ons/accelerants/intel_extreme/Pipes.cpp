@@ -101,11 +101,19 @@ Pipe::IsEnabled()
 void
 Pipe::Configure(display_mode* mode)
 {
+#if 0
+	// FIXME the previous values are never masked out from the
+	// register, so we just OR things together and hope to fall on a working
+	// mode. Better do nothing at all for now.
 	uint32 pipeControl = read32(INTEL_DISPLAY_A_PIPE_CONTROL + fPipeOffset);
 
 	// TODO: Haswell+ dithering changes.
 	if (gInfo->shared_info->device_type.Generation() >= 4) {
 		pipeControl |= (INTEL_PIPE_DITHER_EN | INTEL_PIPE_DITHER_TYPE_SP);
+		// FIXME this makes no sense, if only because B_CMAP8, B_RGB24 and
+		// B_RGB32 have the same color precision (8bit per component).
+		// Also because the color mode is a property of the hardware
+		// (depends on which LVDS panel is used, typically), not the video mode.
 		switch (mode->space) {
 			case B_CMAP8:
 			case B_RGB15_LITTLE:
@@ -129,6 +137,7 @@ Pipe::Configure(display_mode* mode)
 
 	write32(INTEL_DISPLAY_A_PIPE_CONTROL + fPipeOffset, pipeControl);
 	read32(INTEL_DISPLAY_A_PIPE_CONTROL + fPipeOffset);
+#endif
 }
 
 
@@ -209,25 +218,36 @@ Pipe::ConfigureTimings(display_mode* target, bool hardware)
 			| ((uint32)target->timing.v_sync_start - 1));
 	}
 
+	if (gInfo->shared_info->device_type.Generation() != 6) {
+		// FIXME check on which generations this register exists
+		// (it appears it would be available only for cursor planes, not
+		// display planes)
+		// Since we set the plane to be the same size as the display, we can
+		// just show it starting at top-left.
+		write32(INTEL_DISPLAY_A_POS + fPipeOffset, 0);
+	}
+
+	// The only thing that really matters: set the image size and let the
+	// panel fitter or the transcoder worry about the rest
 	write32(INTEL_DISPLAY_A_PIPE_SIZE + fPipeOffset,
-		((uint32)(target->timing.h_display - 1) << 16)
-			| ((uint32)target->timing.v_display - 1));
+		((uint32)(target->virtual_width - 1) << 16)
+			| ((uint32)target->virtual_height - 1));
 
 	// Set the plane size as well while we're at it (this is independant, we
 	// could have a larger plane and scroll through it).
-	if (gInfo->shared_info->device_type.Generation() > 4) {
+	if (gInfo->shared_info->device_type.Generation() == 5
+		|| gInfo->shared_info->device_type.Generation() > 6) {
+		// FIXME check which generations actually need this.
 		// This is "reserved" on G45 and below.
+		// This register does not exist on generation 6.
 		write32(INTEL_DISPLAY_A_IMAGE_SIZE + fPipeOffset,
 			((uint32)(target->virtual_width - 1) << 16)
 			| ((uint32)target->virtual_height - 1));
 	}
 
-	// Since we set the plane to be the same size as the display, we can just
-	// show it starting at top-left.
-	write32(INTEL_DISPLAY_A_POS + fPipeOffset, 0);
-
-	if (fHasTranscoder)
+	if (fHasTranscoder && hardware) {
 		_ConfigureTranscoder(target);
+	}
 }
 
 
