@@ -87,10 +87,6 @@ CalcWindow::MessageReceived(BMessage* message)
 			fCalcView->ToggleAutoNumlock();
 			break;
 
-		case MSG_OPTIONS_AUDIO_FEEDBACK:
-			fCalcView->ToggleAudioFeedback();
-			break;
-
 		case MSG_OPTIONS_ANGLE_MODE_RADIAN:
 			fCalcView->SetDegreeMode(false);
 			return;

@@ -23,6 +23,7 @@
 #include <Alert.h>
 #include <Application.h>
 #include <AppFileInfo.h>
+#include <Beep.h>
 #include <Bitmap.h>
 #include <Catalog.h>
 #include <ControlLook.h>
@@ -807,7 +808,7 @@ CalcView::Copy()
 			&& (clipper = be_clipboard->Data()) == B_OK) {
 			BString expression = fExpressionTextView->Text();
 			if (clipper->AddData("text/plain", B_MIME_TYPE,
-				expression.String(), expression.Length() == B_OK) {
+				expression.String(), expression.Length()) == B_OK) {
 				clipper->what = B_MIME_DATA;
 				be_clipboard->Commit();
 			}
