@@ -1,5 +1,5 @@
 # Execute pre-image user config rules.
-UserBuildConfigRulePreImage	;
+UserBuildConfigRulePreImage ;
 
 # Set cd file name and directory defaults and locate the cd file.
 HAIKU_CD_NAME ?= $(HAIKU_DEFAULT_CD_NAME) ;

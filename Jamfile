@@ -19,7 +19,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 # Include required packages:
 # primary architecture
-AddHaikuImagePackages [ FFilterByBuildFeatures
+AddHaikuImageSystemPackages [ FFilterByBuildFeatures
 	bash bc coreutils curl freetype icu libsolv zlib zstd
 
 	regular_image @{
@@ -44,7 +44,7 @@ AddHaikuImageSourcePackages [ FFilterByBuildFeatures
 	}@
 ] ;
 if $(HAIKU_PACKAGING_ARCHS[1]) != x86_gcc2 {
-	AddHaikuImagePackages [ FFilterByBuildFeatures gcc_syslibs ] ;
+	AddHaikuImageSystemPackages [ FFilterByBuildFeatures gcc_syslibs ] ;
 }
 
 if $(HAIKU_PACKAGING_ARCHS[2]) {
@@ -53,7 +53,7 @@ if $(HAIKU_PACKAGING_ARCHS[2]) {
 	for architectureObject
 			in [ MultiArchSubDirSetup $(HAIKU_PACKAGING_ARCHS[2-]) ] {
 		on $(architectureObject) {
-			AddHaikuImagePackages [ FFilterByBuildFeatures
+			AddHaikuImageSystemPackages [ FFilterByBuildFeatures
 				curl freetype icu libsolv zlib
 
 				regular_image @{
@@ -61,7 +61,7 @@ if $(HAIKU_PACKAGING_ARCHS[2]) {
 				}@
 			] ;
 			if $(TARGET_PACKAGING_ARCH) != x86_gcc2 {
-				AddHaikuImagePackages [ FFilterByBuildFeatures gcc_syslibs
+				AddHaikuImageSystemPackages [ FFilterByBuildFeatures gcc_syslibs
 					mesa_swpipe ] ;
 			}
 		}
@@ -70,11 +70,11 @@ if $(HAIKU_PACKAGING_ARCHS[2]) {
 
 # If enabled, make sure that OpenSSL is added to the image.
 if [ FIsBuildFeatureEnabled openssl ] {
-	AddHaikuImagePackages openssl ;
+	AddHaikuImageSystemPackages openssl ;
 }
 
 # add additionally requested packages
-AddHaikuImagePackages $(HAIKU_IMAGE_ADDITIONAL_PACKAGES) ;
+AddHaikuImageSystemPackages $(HAIKU_IMAGE_ADDITIONAL_PACKAGES) ;
 
 # Optionally we allow not to include the "src" subdirectory.
 if $(HAIKU_DONT_INCLUDE_SRC) {
