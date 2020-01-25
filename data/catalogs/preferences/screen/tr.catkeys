@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Screen	2685901476
+1	turkish	x-vnd.Haiku-Screen	133788249
 no	Screen		hayır
 bits/pixel	Screen		bit/piksel
 15 bits/pixel, 32768 colors	Screen		15 bit/piksel, 32768 renk
@@ -17,6 +17,7 @@ vertically	Screen		dikey olarak
 All workspaces	Screen		Tüm çalışma alanları
 Use laptop panel:	Screen		Dizüstü panelini kullan:
 Could not write VESA mode settings file:\n\t	Screen		VESA kipi ayar dosyasına yazılamıyor:\n\t
+Display info	Screen		Ekran bilgisi
 Settings will revert in %seconds.	Screen		Ayarlar %s saniye içinde eski haline dönecektir.
 Cancel	Screen		İptal
 Other…	Screen		Diğer…

@@ -1,11 +1,11 @@
 1	dutch; flemish	x-vnd.Haiku-PNGTranslator	2504765797
-Version %d.%d.%d, %s	PNGTranslator		Versie %d.%d.%d, %s
-Interlace Option	PNGTranslator		Interlace opties
-PNG Interlace Menu	PNGTranslator		PNG Interlace Menu
-PNG image	PNGTranslator		PNG afbeelding
 PNG Settings	PNGTranslator		PNG Instellingen
-PNG image translator	PNGTranslator		PNG afbeelding vertaler
 None	PNGTranslator		Geen
+PNG image	PNGTranslator		PNG afbeelding
 PNG images	PNGTranslator		PNG afbeeldingen
 Interlacing type:	PNGTranslator		Interlacing type:
+PNG Interlace Menu	PNGTranslator		PNG Interlace Menu
 PNGTranslator Settings	PNGTranslator		PNGVertaler Instellingen
+Version %d.%d.%d, %s	PNGTranslator		Versie %d.%d.%d, %s
+PNG image translator	PNGTranslator		PNG afbeelding vertaler
+Interlace Option	PNGTranslator		Interlace opties

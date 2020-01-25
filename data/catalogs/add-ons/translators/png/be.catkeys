@@ -1,11 +1,11 @@
 1	belarusian	x-vnd.Haiku-PNGTranslator	2504765797
-Version %d.%d.%d, %s	PNGTranslator		Версія %d.%d.%d, %s
-Interlace Option	PNGTranslator		Чаргаванне
-PNG Interlace Menu	PNGTranslator		Меню чаргавання PNG
-PNG image	PNGTranslator		Выява PNG
 PNG Settings	PNGTranslator		Наладкі PNG
-PNG image translator	PNGTranslator		Канвертар выяваў PNG
 None	PNGTranslator		Адсутнічае
+PNG image	PNGTranslator		Выява PNG
 PNG images	PNGTranslator		Выявы PNG
 Interlacing type:	PNGTranslator		Тып чаргавання:
+PNG Interlace Menu	PNGTranslator		Меню чаргавання PNG
 PNGTranslator Settings	PNGTranslator		Наладкі канвертару PNG
+Version %d.%d.%d, %s	PNGTranslator		Версія %d.%d.%d, %s
+PNG image translator	PNGTranslator		Канвертар выяваў PNG
+Interlace Option	PNGTranslator		Чаргаванне

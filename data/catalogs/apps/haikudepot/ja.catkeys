@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	1687365744
+1	japanese	x-vnd.Haiku-HaikuDepot	3877862636
 Repository update error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
 Check for updates…	MainWindow		更新をチェック…
@@ -80,6 +80,7 @@ Reboot required	PackageManager		再起動が必要です
 Very unstable	RatePackageWindow		非常に不安定
 All packages	PackageListView		すべてのパッケージ
 Network Transport Error	ServerHelper		ネットワークトランスポートエラー
+Authorization or security issue.  Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		認証またはセキュリティの問題。ログアウト後、もう一度ログインして、パスワードが正しいことを確認してください。また、使用条件を承認していることも確認ください。
 Stability	RatePackageWindow		安定度
 Send	RatePackageWindow		送信する
 Start package daemon	App		パッケージデーモンを起動

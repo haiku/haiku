@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-FileTypes	1695974510
+1	french	x-vnd.Haiku-FileTypes	455777172
 Left	Attribute Window	Attribute column alignment in Tracker	À gauche
 Final	Application Types Window		Finale
 FileTypes request	FileTypes Window		Requête sur les Types de Fichiers
@@ -89,6 +89,7 @@ Type name:	FileTypes Window		Nom du type :
 Visible	Attribute Window		Visible
 Select preferred application	FileTypes Window		Sélectionner l’application préférée
 Path:	Application Types Window		Chemin :
+rating	Attribute ListView		évaluation
 Could not install file type	New File Type Window		Impossible d’installer le type de fichier
 Same as…	FileTypes Window		Identique à…
 Golden master	Application Type Window		Candidate
@@ -97,6 +98,7 @@ FileTypes request	Preferred App Menu		Requête sur les Types de Fichiers
 no icon	FileTypes Window		pas d’icône
 Single launch	Application Type Window		Instance unique
 %s file type	FileType Window		Type de fichier %s
+Default	Attribute ListView		Par défaut
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		La suppression d’un super type ne peut pas être annulée.\nTous les types de fichiers sous-jacents seront perdus !\n\nÊtes-vous sûr de vouloir l’effacer ? Pour supprimer l’ensemble du groupe, maintenez la touche « Maj » enfoncée et appuyez sur « Supprimer ».
 String	Attribute ListView		Chaîne
 Add type	New File Type Window		Ajouter un type

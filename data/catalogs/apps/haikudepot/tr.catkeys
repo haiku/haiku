@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	1687365744
+1	turkish	x-vnd.Haiku-HaikuDepot	3877862636
 Repository update error	LocalRepositoryUpdateProcess		Depo güncelleme hatası
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Depo güncellenirken bir hata oluştu: %error%
 Check for updates…	MainWindow		Güncellemeleri denetle…
@@ -43,7 +43,7 @@ Name	PackageListView		Ad
 Local	LocalPkgDataLoadProcess		Yerel
 Rate %Package%	RatePackageWindow		%Package% paketini derecelendir
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Paket yöneticisi başlatılırken bir hata oluştu: %message%
-Quit HaikuDepot	App		Haiku Deposu'ndan çık
+Quit HaikuDepot	App		Haiku Depo'dan çık
 Category	FilterView		Kategori
 User rating	RatePackageWindow		Kullanıcı oyları
 Installed packages	MainWindow		Yüklü paketler
@@ -51,7 +51,7 @@ A requested object or an object involved in the request was not found on the ser
 Other users can see this rating	RatePackageWindow		Diğer kullanıcılar bu derecelendirmeyi görebilir
 The minimum age requirements must be met.	UserLoginWindow		Yaşınız yeterince büyük değil.
 Stable	RatePackageWindow		Kararlı
-This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		Bu uygulama Haiku Deposu sunucu sistemi ile iletişim kurmak için çok eski. Sisteminizi güncelleyerek Haiku Deposu'nun yeni bir sürümünü edinin. Gereken en düşük Haiku Deposu sürümü: \"%s\".
+This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		Bu uygulama Haiku Depo sunucu sistemi ile iletişim kurmak için çok eski. Sisteminizi güncelleyerek Haiku Depo'nun yeni bir sürümünü edinin. Gereken en düşük Haiku Depo sürümü: \"%s\".
 Fatal error	PackageManager		Onulmaz hata
 Package action failed	PackageInfoView		Paket eylemi başarısız oldu
 No changelog available.	PackageInfoView		Değişiklik günlüğü mevcut değil
@@ -59,17 +59,17 @@ There are problems in the form:\n\n	UserLoginWindow		Formda sıkıntılar var:\n
 Error	App		Hata
 There was a puzzling response from the web service.	UserLoginWindow		Web servisinden kafa karıştıran bir yanıt alındı.
 Not logged in	MainWindow		Giriş yapılmadı
-No, quit HaikuDepot	App		Hayır, Haiku Deposu'ndan çık
+No, quit HaikuDepot	App		Hayır, Haiku Depo'dan çık
 Featured packages	FeaturedPackagesView		Öne çıkan paketler
-Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Derecelendirmeniz başarıyla yüklendi. Haiku Deposu sunucu web sitesinden güncelleyebilir veya silebilirsiniz.
+Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Derecelendirmeniz başarıyla yüklendi. Haiku Depo sunucusu web sitesinden güncelleyebilir veya silebilirsiniz.
 Network Error	ServerHelper		Ağ hatası
 Available	PackageListView		Kullanılabilir
 Cancel	UserLoginWindow		İptal
-HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Haiku Deposu, paket hizmetine gereksinim duyuyor ancak şu anda çalışmıyor görünüyor.\nŞimdi başlatılsın mı?
+HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Haiku Depo, paket hizmetine gereksinim duyuyor ancak şu anda çalışmıyor görünüyor.\nŞimdi başlatılsın mı?
 Click a package to view information	PackageInfoView		Paket bilgisini görmek için üzerine tıklayın
 Contents	PackageInfoView		İçerik
 Close	PackageManager		Kapat
-A network transport error has arisen communicating with the HaikuDepot server system: %s	ServerHelper		Haiku Deposu sunucu sistemi ile iletişim kurmaya çalışırken bir ağ iletim hatası oluştu: %s
+A network transport error has arisen communicating with the HaikuDepot server system: %s	ServerHelper		Haiku Depo sunucu sistemi ile iletişim kurmaya çalışırken bir ağ iletim hatası oluştu: %s
 Changelog	PackageInfoView		Değişiklik günlüğü
 Rating not possible	MainWindow		Derecelendirme olanaklı değil
 Package update error	MainWindow		Paket güncelleme hatası
@@ -80,6 +80,7 @@ Reboot required	PackageManager		Yeniden başlatma gerekli
 Very unstable	RatePackageWindow		Hiç kararlı değil
 All packages	PackageListView		Tüm paketler
 Network Transport Error	ServerHelper		Ağ iletim hatası
+Authorization or security issue.  Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Kimlik doğrulama veya güvenlik sorunu.  Parolanızın doğru olduğundan ve güncel kullanım koşullarını kabul etmiş olduğunuzdan emin olmak için hesabınızdan çıkıp yeniden giriş yapın.
 Stability	RatePackageWindow		Kararlılık
 Send	RatePackageWindow		Gönder
 Start package daemon	App		Paket hizmetini başlat
@@ -118,7 +119,7 @@ Refresh repositories	MainWindow		Depoları yenile
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Parolanızı unutmanız durumunda sıfırlamak için bir e-posta adresi sağlamalısınız.
 Tools	MainWindow		Araçlar
 The passwords do not match.	UserLoginWindow		Parolalar birbirini tutmuyor
-This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Bu paket Haiku Deposu sunucusunda değil gibi görünüyor, bu yüzden bir derecelendirme yapmak veya mevcut derecelendirmeyi değiştirmek olanaklı değil.
+This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Bu paket Haiku Depo sunucusunda değil gibi görünüyor, bu yüzden bir derecelendirme yapmak veya mevcut derecelendirmeyi değiştirmek olanaklı değil.
 Language	RatePackageWindow		Dil
 Authentication failed. Connection to the service failed.	UserLoginWindow		Kimlik doğrulama başarısız. Servise bağlanamadı.
 Log out	MainWindow		Çıkış yap
@@ -149,7 +150,7 @@ Log in	UserLoginWindow		Giriş yap
 Logged in as %User%	MainWindow		%User% olarak giriş yapıldı
 Email address:	UserLoginWindow		E-posta adresi:
 Screenshot	ScreenshotWindow		Ekran görüntüsü
-HaikuDepot	System name		Haiku Deposu
+HaikuDepot	System name		Haiku Depo
 A reboot is necessary to complete the installation process.	PackageManager		Yükleme işlemini tamamlamak için bilgisayarı yeniden başlatmalısınız.
 View latest usage conditions…	MainWindow		Güncel kullanım koşullarını görüntüle…
 Search terms:	FilterView		Arama metni:
@@ -164,7 +165,7 @@ Pass phrase:	UserLoginWindow		Parola:
 Open %DeskbarLink%	PackageManager		Aç: %DeskbarLink%
 Install	PackageManager		Yükle
 Input validation	UserLoginWindow		Girdi doğrulaması
-An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Haiku Deposu sunucusundan beklenmeyen bir hata alındı [%i]
+An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Haiku Depo sunucusundan beklenmeyen bir hata alındı [%i]
 Log in…	MainWindow		Giriş yap…
 You need to be logged into an account before you can rate packages.	MainWindow		Paketleri derecelendirmek için giriş yapmalısınız.
 Client version too old	ServerHelper		İstemci sürümü çok eski

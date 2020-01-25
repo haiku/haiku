@@ -1,11 +1,11 @@
 1	korean	x-vnd.Haiku-PNGTranslator	2504765797
-Version %d.%d.%d, %s	PNGTranslator		버젼 %d.%d.%d, %s
-Interlace Option	PNGTranslator		엇갈림 옵션
-PNG Interlace Menu	PNGTranslator		PNG 엇갈림 메뉴
-PNG image	PNGTranslator		PNG 이미지
 PNG Settings	PNGTranslator		PNG 설정
-PNG image translator	PNGTranslator		PNG 이미지 변환기
 None	PNGTranslator		없음
+PNG image	PNGTranslator		PNG 이미지
 PNG images	PNGTranslator		PNG 이미지들
 Interlacing type:	PNGTranslator		엇갈림 형식:
+PNG Interlace Menu	PNGTranslator		PNG 엇갈림 메뉴
 PNGTranslator Settings	PNGTranslator		PNG변환기 설정
+Version %d.%d.%d, %s	PNGTranslator		버젼 %d.%d.%d, %s
+PNG image translator	PNGTranslator		PNG 이미지 변환기
+Interlace Option	PNGTranslator		엇갈림 옵션

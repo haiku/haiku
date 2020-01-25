@@ -1,11 +1,11 @@
 1	japanese	x-vnd.Haiku-PNGTranslator	2504765797
-Version %d.%d.%d, %s	PNGTranslator		バージョン %d.%d.%d, %s
-Interlace Option	PNGTranslator		インタレースオプション
-PNG Interlace Menu	PNGTranslator		PNG インターレースメニュー
-PNG image	PNGTranslator		PNG イメージ
 PNG Settings	PNGTranslator		PNG設定
-PNG image translator	PNGTranslator		PNG イメージトランスレーター
 None	PNGTranslator		無し
+PNG image	PNGTranslator		PNG イメージ
 PNG images	PNGTranslator		PNG イメージ
 Interlacing type:	PNGTranslator		インターレース:
+PNG Interlace Menu	PNGTranslator		PNG インターレースメニュー
 PNGTranslator Settings	PNGTranslator		PNG トランスレーター設定
+Version %d.%d.%d, %s	PNGTranslator		バージョン %d.%d.%d, %s
+PNG image translator	PNGTranslator		PNG イメージトランスレーター
+Interlace Option	PNGTranslator		インタレースオプション

@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-softwareupdater	1722463448
+1	french	x-vnd.haiku-softwareupdater	369324613
 Updating version	SoftwareUpdaterWindow	List item text	Mise à jour de la version
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Cliquez ici pour installer {0, plural, one{le paquet révisé} other{les # paquets révisés}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Paquets à désinstaller
@@ -49,6 +49,7 @@ Show more details	SoftwareUpdaterWindow		Afficher plus de détails
 Installing version	SoftwareUpdaterWindow	List item text	Installation de la version
 Checking for updates	CheckManager		Recherche de mises à jour
 No remote repositories are available	UpdateManager	Error message	Aucun dépôt distant n’est disponible
+Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, one{Mise à jour logicielle disponible} other{Mises à jour logicielles disponibles}}
 Reboot	SoftwareUpdaterWindow	Button label	Redémarrer
 Update	SoftwareUpdaterWindow	Alert button label	Mise à jour
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Ouvrir les Dépôts

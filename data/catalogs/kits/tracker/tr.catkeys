@@ -206,7 +206,7 @@ Location	ContainerWindow		Konum
 Warning space color	SettingsView		Uyarı boşluk rengi
 Skip	FSUtils		Atla
 Text list	AttributesView		Metin listesi
-Used space color	SettingsView		Kullanılmış alan rengi
+Used space color	SettingsView		Kullanılan alan rengi
 Cancel	FSUtils		İptal
 Original name	ContainerWindow		Orijinal adı
 Unknown	WidgetAttributeText		Bilinmeyen
@@ -265,8 +265,8 @@ Favorites	FilePanelPriv		Favoriler
 Point	AttributesView		Nokta
 home	B_USER_DIRECTORY		ev
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		İzleyici Yeni şablonlar
-Disk mounting during boot	AutoMounterSettings		Disk önyükleme sırasında bağlanıyor
-Don't automount	AutoMounterSettings		Kendiliğinden bağlama
+Disk mounting during boot	AutoMounterSettings		Önyükleme sırasında bağlama
+Don't automount	AutoMounterSettings		Otomatik bağlanmaz
 Could not find application \"%appname\"	OpenWithWindow		\"%appname\" uygulaması bulunamıyor
 Unmatched parenthesis.	libtracker		Eşleşmeyen parantezler.
 Extended attribute	AttributesView		Genişletilmiş öznitelik
@@ -368,7 +368,7 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 You cannot create a link to the root directory.	FSUtils		Kök dizine bir bağlantı oluşturulamaz.
 Select all	FilePanelPriv		Tümünü seç
 Other	FilePermissionsView		Diğer
-Automatic disk mounting	AutoMounterSettings		Kendiliğinden disk bağlama
+Automatic disk mounting	AutoMounterSettings		Otomatik disk bağlama
 parent folder	NavMenu		üst klasör
 Create link here	ContainerWindow		Bağlantıyı burada oluştur
 Force identify	ContainerWindow		Tanımlamaya zorla

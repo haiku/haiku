@@ -1,11 +1,11 @@
 1	english	x-vnd.Haiku-PNGTranslator	2504765797
-Version %d.%d.%d, %s	PNGTranslator		版本 %d.%d.%d，%s
-Interlace Option	PNGTranslator		交错选项
-PNG Interlace Menu	PNGTranslator		PNG 交错菜单
-PNG image	PNGTranslator		PNG 图像
 PNG Settings	PNGTranslator		PNG 设置
-PNG image translator	PNGTranslator		NG 图像转换器
 None	PNGTranslator		无
+PNG image	PNGTranslator		PNG 图像
 PNG images	PNGTranslator		PNG 图像
 Interlacing type:	PNGTranslator		交错类型：
+PNG Interlace Menu	PNGTranslator		PNG 交错菜单
 PNGTranslator Settings	PNGTranslator		PNG 转换器设置
+Version %d.%d.%d, %s	PNGTranslator		版本 %d.%d.%d，%s
+PNG image translator	PNGTranslator		NG 图像转换器
+Interlace Option	PNGTranslator		交错选项

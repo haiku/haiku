@@ -1,11 +1,11 @@
 1	catalan; valencian	x-vnd.Haiku-PNGTranslator	2504765797
-Version %d.%d.%d, %s	PNGTranslator		Versió %d.%d.%d, %s
-Interlace Option	PNGTranslator		Opció d'entrellaçat
-PNG Interlace Menu	PNGTranslator		Menú d'entrellaçat del PNG
-PNG image	PNGTranslator		Imatge PNG
 PNG Settings	PNGTranslator		Paràmetres del PNG
-PNG image translator	PNGTranslator		Traductor d'imatges PNG
 None	PNGTranslator		Cap
+PNG image	PNGTranslator		Imatge PNG
 PNG images	PNGTranslator		Imatges PNG
 Interlacing type:	PNGTranslator		Tipus d'entrellaçat:
+PNG Interlace Menu	PNGTranslator		Menú d'entrellaçat del PNG
 PNGTranslator Settings	PNGTranslator		Paràmetres del PNGTranslator
+Version %d.%d.%d, %s	PNGTranslator		Versió %d.%d.%d, %s
+PNG image translator	PNGTranslator		Traductor d'imatges PNG
+Interlace Option	PNGTranslator		Opció d'entrellaçat

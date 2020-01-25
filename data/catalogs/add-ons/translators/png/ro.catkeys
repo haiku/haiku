@@ -1,11 +1,11 @@
 1	romanian	x-vnd.Haiku-PNGTranslator	2504765797
-Version %d.%d.%d, %s	PNGTranslator		Versiune %d.%d.%d, %s
-Interlace Option	PNGTranslator		Opțiuni de îmbinare
-PNG Interlace Menu	PNGTranslator		Meniu de îmbinare PNG
-PNG image	PNGTranslator		Imagine PNG
 PNG Settings	PNGTranslator		Configurări PNG
-PNG image translator	PNGTranslator		Traducător imagine PNG
 None	PNGTranslator		Nimic
+PNG image	PNGTranslator		Imagine PNG
 PNG images	PNGTranslator		Imagini PNG
 Interlacing type:	PNGTranslator		Tip de îmbinare:
+PNG Interlace Menu	PNGTranslator		Meniu de îmbinare PNG
 PNGTranslator Settings	PNGTranslator		Configurări TraducătorPNG
+Version %d.%d.%d, %s	PNGTranslator		Versiune %d.%d.%d, %s
+PNG image translator	PNGTranslator		Traducător imagine PNG
+Interlace Option	PNGTranslator		Opțiuni de îmbinare

@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Screen	2685901476
+1	danish	x-vnd.Haiku-Screen	133788249
 no	Screen		nej
 bits/pixel	Screen		bit/pixel
 15 bits/pixel, 32768 colors	Screen		15 bit/pixel, 32768 farver
@@ -17,6 +17,7 @@ vertically	Screen		lodret
 All workspaces	Screen		Alle arbejdsområder
 Use laptop panel:	Screen		Brug bærbar computer panel:
 Could not write VESA mode settings file:\n\t	Screen		Kunne ikke skrive VESA-tilstand indstillingsfil:\n\t
+Display info	Screen		Skærminformation
 Settings will revert in %seconds.	Screen		Indstillingerne tilbageføres om %seconds.
 Cancel	Screen		Annuller
 Other…	Screen		Andet…

@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Keymap	3348782469
+1	danish	x-vnd.Haiku-Keymap	1075970008
 Key	Modifier keys window	As in a computer keyboard key	Tast
 Japanese	KeymapNames		Japansk
 US	KeymapNames		USA
@@ -58,6 +58,7 @@ Italian	KeymapNames		Italiensk
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s International
 Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminum (USA)
 Kinesis Ergo Elan International	KeyboardLayoutNames		Kinesis Ergo Elan International
+French (NF Z71-300)	KeymapNames		Fransk (NF Z71-300)
 Modifier keys	Modifier keys window		Ændringstaster
 ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 International
 Kazakh	KeymapNames		Kasakhisk

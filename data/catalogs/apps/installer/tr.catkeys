@@ -12,7 +12,7 @@ Installation completed. Boot sector has been written to '%s'. Press Restart to r
 Are you sure you want to to stop the installation?	InstallerWindow		Kurulumu durdurmak istediğinizden emin misiniz?
 Installer	System name		Yükleyici
 Unknown Type	InstallProgress	Partition content type	Bilinmeyen tür
-Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		'%1s' üzerinden '%2s' konumuna yüklemek için Başla düğmesine tıklayın.
+Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		'%1s' → '%2s' yüklemesine başlamak için Başla düğmesine tıklayın.
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Açılır menüden kurulum yapmak istediğiniz diski seçin ve \"Başla\"ya tıklayın.
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Kurulum tamamlandı. Önyükleme alanı '%s' içine yazıldı. Yükleyici'den çıkın veya başka bir kurulum gerçekleştirmek için yeni bir hedef bölüm seçin.
 README	InstallerApp		BENİOKU

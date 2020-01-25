@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Screen	2685901476
+1	japanese	x-vnd.Haiku-Screen	133788249
 no	Screen		いいえ
 bits/pixel	Screen		ビット/ピクセル
 15 bits/pixel, 32768 colors	Screen		15ビット/ピクセル, 32768色
@@ -17,6 +17,7 @@ vertically	Screen		垂直に
 All workspaces	Screen		すべてのワークスペース
 Use laptop panel:	Screen		ラップトップパネルを使用:
 Could not write VESA mode settings file:\n\t	Screen		VESA モード設定ファイルを書き込めませんでした:\n\t
+Display info	Screen		ディスプレイ情報
 Settings will revert in %seconds.	Screen		設定は %seconds 秒以内に元に戻ります。
 Cancel	Screen		取り消し
 Other…	Screen		その他…

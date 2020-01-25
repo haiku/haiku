@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-WebPositive	2763299522
+1	french	x-vnd.Haiku-WebPositive	1879106286
 Authentication required	Authentication Panel		Authentification requise
 Previous	WebPositive Window		Précédent
 (Finish: %date)	Download Window		(Fin : %date)
@@ -28,7 +28,9 @@ Start page:	Settings Window		Page d’accueil :
 Cancel	Download Window		Annuler
 Settings	Settings Window		Réglages
 Downloads	WebPositive Window		Téléchargements
+Browse…	Settings Window		Parcourir…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Un signet « %bookmarkName » existe déjà pour cette page.
+Resume prior session	Settings Window		Restaurer la session précédente
 Match case	WebPositive Window		Respecter la casse
 Proxy password:	Settings Window		Mot de passe du serveur mandataire :
 Size:	Font Selection view		Taille :
@@ -119,6 +121,7 @@ Remember username and password for this site	Authentication Panel		Mémoriser l�
 (Finish: %date - %duration left)	Download Window		(Fin : %date - il reste %duration)
 Cookie manager	Cookie Manager		Gestionnaire de cookies
 Show home button	Settings Window		Afficher le bouton de la page d’accueil
+Start new session	Settings Window		Démarrer une nouvelle session
 The cookie jar is empty!	Cookie Manager		La boîte à biscuits est vide !
 Value	Cookie Manager		Valeur
 Remove missing	Download Window		Nettoyer les éléments orphelins
@@ -141,6 +144,7 @@ Settings	WebPositive Window		Réglages
 Clear	URL Bar		Vider
 Loading %url	WebPositive Window		Chargement de %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Voix ambiguë d’un cœur qui au zéphyr préfère les jattes de kiwis.
+Start up:	Settings Window		Démarrage :
 Confirmation	WebPositive Window		Confirmation
 Session cookie	Cookie Manager		Cookie de session
 Open all	WebPositive Window		Tout ouvrir

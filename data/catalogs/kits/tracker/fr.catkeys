@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	2575711432
+1	french	x-vnd.Haiku-libtracker	1015934522
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -355,7 +355,9 @@ The selected item cannot be moved to the Trash. Would you like to delete it inst
 Copy	ContainerWindow		Copier
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Désolé, un attribut “Caractère” ne peut pas contenir un glyphe multi-octet.
 And	FindPanel		Et
+Palette-indexed picture	AttributesView		Image à palette indexée
 multiple disks	FindPanel		disques multiples
+Drawing pattern	AttributesView		Motif de dessin
 File offset	AttributesView		Déplacement dans le fichier
 Name = %name	FindPanel	FindResultTitle	Nom = %name
 Subject	Email Query Columns		Sujet
@@ -489,6 +491,7 @@ Find	FindPanel		Rechercher
 Empty folder	NavMenu		Dossier vide
 Defaults	TrackerSettingsWindow		Par défaut
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Désolé, il n’y a pas assez d’espace libre dans le volume cible pour copier la sélection.
+True-color picture	AttributesView		Image Vraies-couleurs
 Add-ons	FilePanelPriv		Extensions
 96 x 96	DeskWindow		96 x 96
 Empty folder	SlowContextPopup		Dossier vide

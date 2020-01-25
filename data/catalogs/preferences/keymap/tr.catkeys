@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Keymap	3348782469
+1	turkish	x-vnd.Haiku-Keymap	1075970008
 Key	Modifier keys window	As in a computer keyboard key	Düğme
 Japanese	KeymapNames		Japonca
 US	KeymapNames		Birleşik Devletler
@@ -58,6 +58,7 @@ Italian	KeymapNames		İtalyanca
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s Uluslararası
 Apple Aluminum (US)	KeyboardLayoutNames		Apple Alüminyum (US)
 Kinesis Ergo Elan International	KeyboardLayoutNames		Kinesis Ergo Elan Uluslararası
+French (NF Z71-300)	KeymapNames		Fransızca (NF Z71-300)
 Modifier keys	Modifier keys window		Değiştiren düğmeler
 ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 Uluslararası
 Kazakh	KeymapNames		Kazak
