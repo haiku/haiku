@@ -802,19 +802,23 @@ void
 CalcView::Copy()
 {
 	// access system clipboard
-	if (be_clipboard->Lock()) {
-		BMessage* clipper;
-		if (be_clipboard->Clear() == B_OK
-			&& (clipper = be_clipboard->Data()) == B_OK) {
-			BString expression = fExpressionTextView->Text();
-			if (clipper->AddData("text/plain", B_MIME_TYPE,
-				expression.String(), expression.Length()) == B_OK) {
-				clipper->what = B_MIME_DATA;
-				be_clipboard->Commit();
-			}
-		}
-		be_clipboard->Unlock();
+	if (!be_clipboard->Lock())
+		return;
+	if (be_clipboard->Clear() != B_OK)
+		return;
+
+	BMessage* clipper;
+	clipper = be_clipboard->Data();
+	if (clipper == NULL)
+		return;
+
+	BString expression = fExpressionTextView->Text();
+	if (clipper->AddData("text/plain", B_MIME_TYPE,
+		expression.String(), expression.Length()) == B_OK) {
+		clipper->what = B_MIME_DATA;
+		be_clipboard->Commit();
 	}
+	be_clipboard->Unlock();
 }
 
 
