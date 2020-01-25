@@ -27,6 +27,9 @@ public:
 
 	virtual	BGameSound*	Clone() const;
 
+	typedef	void		(*hook)(void* cookie, void* buffer, size_t byteCount,
+							BStreamingGameSound* me);
+
 	virtual	status_t	SetStreamHook(hook h, void* cookie);
 
 	virtual	void		FillBuffer(void* buffer, size_t byteCount);
@@ -35,9 +38,6 @@ public:
 							size_t attributeCount);
 
 	virtual	status_t	Perform(int32 selector, void* data);
-
-	typedef	void		(*hook)(void* cookie, void* buffer, size_t byteCount,
-							BStreamingGameSound* me);
 
 protected:
 						BStreamingGameSound(BGameSoundDevice* device);
