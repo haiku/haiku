@@ -97,14 +97,13 @@ rule DefineDefaultBuildProfiles
 				wpa_supplicant
 				wqy_microhei
 				# xz_utils can't be built with gcc2, so we install it for
-				# primary gcc 4 architectures or gcc 2 hybrids.
+				# primary gcc 8 architectures or gcc 2 hybrids.
 				xz_utils@!gcc2
 				gcc2 @{ xz_utils_x86@secondary_x86 }@
 				;
 			AddHaikuImageSourcePackages
 				bepdf
 				man
-				mercurial
 				nano
 				p7zip
 				gcc
