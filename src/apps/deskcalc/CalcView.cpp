@@ -351,7 +351,7 @@ CalcView::MessageReceived(BMessage* message)
 			{
 				// access system clipboard
 				ClipboardLocker locker(be_clipboard);
-				if (locker.Lock()) {
+				if (locker.IsLocked()) {
 					BMessage* clipper = be_clipboard->Data();
 					if (clipper)
 						Paste(clipper);
@@ -809,13 +809,13 @@ CalcView::Copy()
 {
 	// access system clipboard
 	ClipboardLocker locker(be_clipboard);
-	if (!locker.Lock())
+	if (!locker.IsLocked())
 		return;
+
 	if (be_clipboard->Clear() != B_OK)
 		return;
 
-	BMessage* clipper;
-	clipper = be_clipboard->Data();
+	BMessage* clipper = be_clipboard->Data();
 	if (clipper == NULL)
 		return;
 
