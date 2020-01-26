@@ -351,8 +351,6 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 			{
 				BMenuItem* menuItem;
 				TTeamMenuItem* item = TeamItemAtPoint(where, &menuItem);
-				TWindowMenuItem* windowMenuItem
-					= dynamic_cast<TWindowMenuItem*>(menuItem);
 
 				if (item == NULL || menuItem == NULL) {
 					// item is NULL, remove the tooltip and break out
@@ -365,6 +363,9 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 					// already set the tooltip for this item, break out
 					break;
 				}
+
+				TWindowMenuItem* windowMenuItem
+					= dynamic_cast<TWindowMenuItem*>(menuItem);
 
 				if (windowMenuItem != NULL && fBarView->Vertical()
 					&& fBarView->ExpandoState() && item->IsExpanded()) {
