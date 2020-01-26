@@ -2764,7 +2764,7 @@ SetViewColor(Parent()->ViewColor());
 	       coordinate system.
 	\param viewRect The area in the view's coordinate system to draw the
 	       bitmap in.
-	\param options ??
+	\param options combination of \a bitmap_drawing_options flags
 
 	\since Haiku R1
 */
