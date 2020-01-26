@@ -23,6 +23,7 @@
 #include <Alert.h>
 #include <Application.h>
 #include <AppFileInfo.h>
+#include <AutoLocker.h>
 #include <Beep.h>
 #include <Bitmap.h>
 #include <Catalog.h>
@@ -172,6 +173,9 @@ struct CalcView::CalcKey {
 	uint32		flags;
 //	float		width;
 };
+
+
+typedef AutoLocker<BClipboard> ClipboardLocker;
 
 
 CalcView*
@@ -344,14 +348,16 @@ CalcView::MessageReceived(BMessage* message)
 
 			// handle paste
 			case B_PASTE:
+			{
 				// access system clipboard
-				if (be_clipboard->Lock()) {
+				ClipboardLocker locker(be_clipboard);
+				if (locker.Lock()) {
 					BMessage* clipper = be_clipboard->Data();
-					//clipper->PrintToStream();
-					Paste(clipper);
-					be_clipboard->Unlock();
+					if (clipper)
+						Paste(clipper);
 				}
 				break;
+			}
 
 			// (replicant) about box requested
 			case B_ABOUT_REQUESTED:
@@ -802,7 +808,8 @@ void
 CalcView::Copy()
 {
 	// access system clipboard
-	if (!be_clipboard->Lock())
+	ClipboardLocker locker(be_clipboard);
+	if (!locker.Lock())
 		return;
 	if (be_clipboard->Clear() != B_OK)
 		return;
@@ -818,7 +825,6 @@ CalcView::Copy()
 		clipper->what = B_MIME_DATA;
 		be_clipboard->Commit();
 	}
-	be_clipboard->Unlock();
 }
 
 
