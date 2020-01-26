@@ -304,8 +304,10 @@ slower_sample:
 extern "C" bigtime_t
 system_time()
 {
-	uint128 tsc(rdtsc());
-	return uint64((tsc * gTimeConversionFactor) >> 32);
+	uint64 tsc = rdtsc();
+	uint64 lo = (uint32)tsc;
+	uint64 hi = tsc >> 32;
+	return ((lo * gTimeConversionFactor) >> 32) + hi * gTimeConversionFactor;
 }
 
 
