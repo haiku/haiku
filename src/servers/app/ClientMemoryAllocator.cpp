@@ -324,10 +324,11 @@ ClientMemory::ClientMemory()
 
 ClientMemory::~ClientMemory()
 {
-	if (fBlock != NULL)
-		fAllocator->Free(fBlock);
-	if (fAllocator != NULL)
+	if (fAllocator != NULL) {
+		if (fBlock != NULL)
+			fAllocator->Free(fBlock);
 		fAllocator->ReleaseReference();
+	}
 }
 
 
