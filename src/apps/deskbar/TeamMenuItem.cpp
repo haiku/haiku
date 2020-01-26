@@ -96,16 +96,18 @@ TTeamMenuItem::~TTeamMenuItem()
 status_t
 TTeamMenuItem::Invoke(BMessage* message)
 {
-	if (fBarView->InvokeItem(Signature())) {
-		// handles drop on application
-		return B_OK;
-	}
+	if (fBarView != NULL) {
+		if (fBarView->InvokeItem(Signature())) {
+			// handles drop on application
+			return B_OK;
+		}
 
-	// if the app could not handle the drag message
-	// and we were dragging, then kill the drag
-	// should never get here, disabled item will not invoke
-	if (fBarView != NULL && fBarView->Dragging())
-		fBarView->DragStop();
+		// if the app could not handle the drag message
+		// and we were dragging, then kill the drag
+		// should never get here, disabled item will not invoke
+		if (fBarView->Dragging())
+			fBarView->DragStop();
+	}
 
 	// bring to front or minimize shortcuts
 	uint32 mods = modifiers();
