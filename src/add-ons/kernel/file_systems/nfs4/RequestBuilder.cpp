@@ -806,10 +806,13 @@ RequestBuilder::ReleaseLockOwner(OpenState* state, LockOwner* owner)
 RPC::Call*
 RequestBuilder::Request()
 {
+	if (fRequest == NULL)
+		return NULL;
+
 	if (fProcedure == ProcCompound)
 		fRequest->Stream().InsertUInt(fOpCountPosition, fOpCount);
 
-	if (fRequest == NULL || fRequest->Stream().Error() == B_OK)
+	if (fRequest->Stream().Error() == B_OK)
 		return fRequest;
 	else
 		return NULL;

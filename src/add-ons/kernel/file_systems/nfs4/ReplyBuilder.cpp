@@ -46,10 +46,13 @@ ReplyBuilder::_InitHeader()
 RPC::CallbackReply*
 ReplyBuilder::Reply()
 {
+	if (fReply == NULL)
+		return NULL;
+
 	fReply->Stream().InsertUInt(fStatusPosition, _HaikuErrorToNFS4(fStatus));
 	fReply->Stream().InsertUInt(fOpCountPosition, fOpCount);
 
-	if (fReply == NULL || fReply->Stream().Error() == B_OK)
+	if (fReply->Stream().Error() == B_OK)
 		return fReply;
 	else
 		return NULL;
