@@ -12,6 +12,7 @@ HAIKU_PROVIDER_INFOS =
 	hotmail.com
 	laposte.net
 	lycos.de
+	mycosmos.gr
 	mymail.ch
 	netcologne.de
 	o2online.de
@@ -23,6 +24,8 @@ HAIKU_PROVIDER_INFOS =
 	web.de
 	yahoo.com
 	yahoo.de
+	yandex.com
+	yandex.ru
 ;
 
 for file in $(HAIKU_PROVIDER_INFOS) {
