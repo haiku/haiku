@@ -7,11 +7,6 @@
 #define FUNCTION(x) .global x; .type x,@function; x
 
 
-/* uint64 rdtsc() */
-FUNCTION(rdtsc):
-	rdtsc
-	ret
-
 FUNCTION(execute_n_instructions):
 	movl	4(%esp), %ecx
 	shrl	$4, %ecx

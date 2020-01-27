@@ -32,11 +32,6 @@ static ring_buffer* sDebugSyslogBuffer = NULL;
 static bool sPostCleanup = false;
 
 
-#ifdef PRINT_TIME_STAMPS
-extern "C" uint64 rdtsc();
-#endif
-
-
 static void
 syslog_write(const char* buffer, size_t length)
 {
@@ -65,7 +60,7 @@ dprintf_args(const char *format, va_list args)
 
 	if (sNewLine) {
 		char timeBuffer[32];
-		snprintf(timeBuffer, sizeof(timeBuffer), "[%" B_PRIu64 "] ", rdtsc());
+		snprintf(timeBuffer, sizeof(timeBuffer), "[%" B_PRIu64 "] ", __rdtsc());
 		syslog_write(timeBuffer, strlen(timeBuffer));
 		serial_puts(timeBuffer, strlen(timeBuffer));
 	}

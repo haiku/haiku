@@ -7,14 +7,6 @@
 #define FUNCTION(x) .global x; .type x,@function; x
 
 
-/* uint64 rdtsc() */
-FUNCTION(rdtsc):
-	rdtsc
-	/* Convert to 64-bit result in rax. */
-	shlq    $32, %rdx
-	orq     %rdx, %rax
-	ret
-
 FUNCTION(execute_n_instructions):
 	movl	%edi, %ecx
 	shrl	$4, %ecx

@@ -23,8 +23,6 @@
 #include <string.h>
 
 
-extern "C" uint64 rdtsc();
-
 uint32 gTimeConversionFactor;
 
 // PIT definitions
@@ -66,6 +64,17 @@ uint32 gTimeConversionFactor;
 	// TODO: These are arbitrary. They are here to avoid spinning indefinitely
 	// if the TSC just isn't stable and we can't get our desired error range.
 
+#if __GNUC__ <= 2
+// It's a builtin on later compiler versions, but not in gcc2...
+static inline uint64_t __rdtsc()
+{
+	uint64 tsc;
+
+	asm volatile ("rdtsc\n" : "=A"(tsc));
+
+	return tsc;
+}
+#endif
 
 struct uint128 {
 	uint128(uint64 low, uint64 high = 0)
@@ -198,7 +207,7 @@ calibration_loop(uint8 desiredHighByte, uint8 channel, uint64& tscDelta,
 	} while (startHigh != 255);
 
 	// Read in the first TSC value
-	uint64 startTSC = rdtsc();
+	uint64 startTSC = __rdtsc();
 
 	// Wait for the PIT to count down to our desired value
 	uint8 endLow;
@@ -210,7 +219,7 @@ calibration_loop(uint8 desiredHighByte, uint8 channel, uint64& tscDelta,
 	} while (endHigh > desiredHighByte);
 
 	// And read the second TSC value
-	uint64 endTSC = rdtsc();
+	uint64 endTSC = __rdtsc();
 
 	tscDelta = endTSC - startTSC;
 	expired = ((startHigh << 8) | startLow) - ((endHigh << 8) | endLow);
@@ -304,7 +313,7 @@ slower_sample:
 extern "C" bigtime_t
 system_time()
 {
-	uint64 tsc = rdtsc();
+	uint64 tsc = __rdtsc();
 	uint64 lo = (uint32)tsc;
 	uint64 hi = tsc >> 32;
 	return ((lo * gTimeConversionFactor) >> 32) + hi * gTimeConversionFactor;
