@@ -27,8 +27,6 @@ SimpleTest setpgid_test : setpgid_test.cpp ;
 SimpleTest setjmp_test : setjmp_test.c ;
 if $(TARGET_ARCH) = x86 {
 	SimpleTest setjmp_test2 : setjmp_test2.S ;
-} else {
-	echo "Skipping setjmp_test2.S test on non-x86" ;
 }
 SimpleTest signal_in_allocator_test : signal_in_allocator_test.cpp ;
 SimpleTest signal_in_allocator_test2 : signal_in_allocator_test2.cpp ;
