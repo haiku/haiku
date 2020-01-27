@@ -78,7 +78,11 @@
 #define _PACKED __attribute__((packed))
 #define _PRINTFLIKE(_format_, _args_) \
 	__attribute__((format(__printf__, _format_, _args_)))
-#define _EXPORT
+#if __GNUC__ >= 4
+# define _EXPORT __attribute__((visibility("default")))
+#else
+# define _EXPORT
+#endif
 #define _IMPORT
 
 #define B_DEFINE_SYMBOL_VERSION(function, versionedSymbol)	\

@@ -31,7 +31,7 @@ extern CommandActuator* CreateCommandActuator(const char* command);
 // when that key combo is detected.
 
 // The abstract base class. Defines the interface.
-_EXPORT class CommandActuator;
+class _EXPORT CommandActuator;
 class CommandActuator : public BArchivable {
 public:
 								CommandActuator(int32 argc, char** argv);
@@ -61,7 +61,7 @@ public:
 
 
 // This is the most common thing to do--launch a process.
-_EXPORT class LaunchCommandActuator;
+class _EXPORT LaunchCommandActuator;
 class LaunchCommandActuator : public CommandActuator {
 public:
 								LaunchCommandActuator(int32 argc, char** argv);
@@ -87,7 +87,7 @@ private:
 
 
 // Stupid actuator--just calls beep().
-_EXPORT class BeepCommandActuator;
+class _EXPORT BeepCommandActuator;
 class BeepCommandActuator : public CommandActuator {
 public:
 								BeepCommandActuator(int32 argc, char** argv);
@@ -104,7 +104,7 @@ public:
 
 
 // This class will insert a string of keystrokes into the input stream.
-_EXPORT class KeyStrokeSequenceCommandActuator;
+class _EXPORT KeyStrokeSequenceCommandActuator;
 class KeyStrokeSequenceCommandActuator : public CommandActuator {
 public:
 								KeyStrokeSequenceCommandActuator(int32 argc,
@@ -141,7 +141,7 @@ private:
 
 
 // This class will insert a string of keystrokes into the input stream.
-_EXPORT class MIMEHandlerCommandActuator;
+class _EXPORT MIMEHandlerCommandActuator;
 class MIMEHandlerCommandActuator : public CommandActuator {
 public:
 								MIMEHandlerCommandActuator(int32 argc,
@@ -164,7 +164,7 @@ private:
 
 
 // Abstract base class for actuators that affect mouse buttons
-_EXPORT class MouseCommandActuator;
+class _EXPORT MouseCommandActuator;
 class MouseCommandActuator : public CommandActuator {
 public:
 								MouseCommandActuator(int32 argc, char** argv);
@@ -187,7 +187,7 @@ private:
 
 // This class sends a single mouse down event when activated, causing the mouse
 // pointer to enter a "sticky down" state. Good for some things(like dragging).
-_EXPORT class MouseDownCommandActuator;
+class _EXPORT MouseDownCommandActuator;
 class MouseDownCommandActuator : public MouseCommandActuator {
 public:
 								MouseDownCommandActuator(int32 argc,
@@ -206,7 +206,7 @@ public:
 
 // This class sends a single mouse down up when activated, releasing any
 // previously set "sticky down" state. Good for some things (like dragging).
-_EXPORT class MouseUpCommandActuator;
+class _EXPORT MouseUpCommandActuator;
 class MouseUpCommandActuator : public MouseCommandActuator {
 public:
 								MouseUpCommandActuator(int32 argc,
@@ -227,7 +227,7 @@ public:
 // This class will send B_MOUSE_UP and B_MOUSE_DOWN events whenever B_KEY_UP or
 // B_KEY_DOWN events are detected for its key This way a key can act sort of
 // like a mouse button.
-_EXPORT class MouseButtonCommandActuator;
+class _EXPORT MouseButtonCommandActuator;
 class MouseButtonCommandActuator : public MouseCommandActuator {
 public:
 								MouseButtonCommandActuator(int32 argc,
@@ -249,7 +249,7 @@ private:
 
 
 // Base class for some actuators that control the position of the mouse pointer
-_EXPORT class MoveMouseCommandActuator;
+class _EXPORT MoveMouseCommandActuator;
 class MoveMouseCommandActuator : public CommandActuator {
 public:
 								MoveMouseCommandActuator(int32 argc,
@@ -277,7 +277,7 @@ private:
 
 
 // Actuator that specifies multiple sub-actuators to be executed in series
-_EXPORT class MultiCommandActuator;
+class _EXPORT MultiCommandActuator;
 class MultiCommandActuator : public CommandActuator {
 public:
 								MultiCommandActuator(int32 argc, char** argv);
@@ -298,7 +298,7 @@ private:
 
 
 // Actuator for moving a mouse relative to its current position
-_EXPORT class MoveMouseToCommandActuator;
+class _EXPORT MoveMouseToCommandActuator;
 class MoveMouseToCommandActuator : public MoveMouseCommandActuator {
 public:
 								MoveMouseToCommandActuator(int32 argc,
@@ -317,7 +317,7 @@ public:
 
 
 // Actuator for moving a mouse relative to its current position
-_EXPORT class MoveMouseByCommandActuator;
+class _EXPORT MoveMouseByCommandActuator;
 class MoveMouseByCommandActuator : public MoveMouseCommandActuator {
 public:
 									MoveMouseByCommandActuator(int32 argc,
@@ -335,7 +335,7 @@ public:
 
 
 // Actuator to send BMessage to an application - written by Daniel Wesslen
-_EXPORT class SendMessageCommandActuator;
+class _EXPORT SendMessageCommandActuator;
 class SendMessageCommandActuator : public CommandActuator {
 public:
 									SendMessageCommandActuator(int32 argc,

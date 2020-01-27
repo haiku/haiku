@@ -40,8 +40,7 @@ struct CalcOptions;
 class CalcOptionsWindow;
 class ExpressionTextView;
 
-_EXPORT
-class CalcView : public BView {
+class _EXPORT CalcView : public BView {
  public:
 
 	static	CalcView*			Instantiate(BMessage* archive);
