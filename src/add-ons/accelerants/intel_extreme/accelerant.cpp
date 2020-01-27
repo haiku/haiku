@@ -597,12 +597,10 @@ intel_get_accelerant_device_info(accelerant_device_info* info)
 
 	DeviceType* type = &gInfo->shared_info->device_type;
 
-	if (type->InFamily(INTEL_FAMILY_7xx) || type->InFamily(INTEL_FAMILY_8xx))
+	if (type->InFamily(INTEL_FAMILY_8xx))
 		strcpy(info->name, "Intel Extreme");
 	else if (type->InFamily(INTEL_FAMILY_9xx))
 		strcpy(info->name, "Intel GMA");
-	else if (type->InFamily(INTEL_FAMILY_POVR))
-		strcpy(info->name, "Intel PowerVR");
 	else if (type->InFamily(INTEL_FAMILY_SOC0))
 		strcpy(info->name, "Intel Atom");
 	else if (type->InFamily(INTEL_FAMILY_SER5))

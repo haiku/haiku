@@ -25,14 +25,14 @@
 #define INTEL_GROUP_MASK	0x00fffff0
 #define INTEL_MODEL_MASK	0x00ffffff
 #define INTEL_TYPE_MASK		0x0000000f
+
 // families
-#define INTEL_FAMILY_7xx	0x00010000	// First Gen
 #define INTEL_FAMILY_8xx	0x00020000	// Second Gen
 #define INTEL_FAMILY_9xx	0x00040000	// Third Gen +
 #define INTEL_FAMILY_SER5	0x00080000	// Intel5 Series
-#define INTEL_FAMILY_POVR	0x00100000	// PowerVR (uugh)
 #define INTEL_FAMILY_SOC0	0x00200000  // Atom SOC
 #define INTEL_FAMILY_LAKE	0x00400000	// Intel Lakes
+
 // groups
 #define INTEL_GROUP_83x		(INTEL_FAMILY_8xx  | 0x0010)
 #define INTEL_GROUP_85x		(INTEL_FAMILY_8xx  | 0x0020)
@@ -46,8 +46,6 @@
 #define INTEL_GROUP_SNB		(INTEL_FAMILY_SER5 | 0x0020)  // SandyBridge
 #define INTEL_GROUP_IVB		(INTEL_FAMILY_SER5 | 0x0040)  // IvyBridge
 #define INTEL_GROUP_HAS		(INTEL_FAMILY_SER5 | 0x0080)  // Haswell
-#define INTEL_GROUP_SLT		(INTEL_FAMILY_POVR | 0x0010)  // Saltwell
-#define INTEL_GROUP_FSM		(INTEL_FAMILY_POVR | 0x0020)  // Fu.Silvermont
 #define INTEL_GROUP_VLV		(INTEL_FAMILY_SOC0 | 0x0010)  // ValleyView
 #define INTEL_GROUP_CHV		(INTEL_FAMILY_SOC0 | 0x0020)  // CherryView
 #define INTEL_GROUP_BDW		(INTEL_FAMILY_SOC0 | 0x0040)  // Broadwell
@@ -191,8 +189,6 @@ struct DeviceType {
 
 	int Generation() const
 	{
-		if (InFamily(INTEL_FAMILY_7xx))
-			return 1;
 		if (InFamily(INTEL_FAMILY_8xx))
 			return 2;
 		if (InGroup(INTEL_GROUP_91x) || InGroup(INTEL_GROUP_94x)
@@ -211,7 +207,7 @@ struct DeviceType {
 		if (InFamily(INTEL_FAMILY_LAKE))
 			return 9;
 
-		// Generation 0 means somethins is wrong :-)
+		// Generation 0 means something is wrong :-)
 		return 0;
 	}
 };

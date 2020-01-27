@@ -81,29 +81,25 @@ get_color_space_format(const display_mode &mode, uint32 &colorMode,
 static bool
 sanitize_display_mode(display_mode& mode)
 {
-	// Some cards only support even pixel counts, while others require an odd
-	// one.
 	uint16 pixelCount = 1;
+	// Older cards require pixel count to be even
 	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_Gxx)
 			|| gInfo->shared_info->device_type.InGroup(INTEL_GROUP_96x)
 			|| gInfo->shared_info->device_type.InGroup(INTEL_GROUP_94x)
 			|| gInfo->shared_info->device_type.InGroup(INTEL_GROUP_91x)
-			|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_8xx)
-			|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_7xx)) {
+			|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_8xx)) {
 		pixelCount = 2;
 	}
 
-	// TODO: verify constraints - these are more or less taken from the
-	// radeon driver!
 	display_constraints constraints = {
 		// resolution
-		320, 8192, 200, 4096,
+		320, 4096, 200, 4096,
 		// pixel clock
 		gInfo->shared_info->pll_info.min_frequency,
 		gInfo->shared_info->pll_info.max_frequency,
 		// horizontal
 		{pixelCount, 0, 8160, 32, 8192, 0, 8192},
-		{1, 1, 4092, 2, 63, 1, 4096}
+		{1, 1, 8190, 2, 8192, 1, 8192}
 	};
 
 	return sanitize_display_mode(mode, constraints,

@@ -276,9 +276,8 @@ determine_gtt_stolen(intel_info &info)
 		}
 	} else if (info.type->InGroup(INTEL_GROUP_85x)
 		|| info.type->InFamily(INTEL_FAMILY_9xx)
-        || info.type->InFamily(INTEL_FAMILY_SER5)
-        || info.type->InFamily(INTEL_FAMILY_SOC0)
-        || info.type->InFamily(INTEL_FAMILY_POVR)) {
+		|| info.type->InFamily(INTEL_FAMILY_SER5)
+		|| info.type->InFamily(INTEL_FAMILY_SOC0)) {
 		switch (memoryConfig & STOLEN_MEMORY_MASK) {
 			case i855_STOLEN_MEMORY_4M:
 				memorySize *= 4;
