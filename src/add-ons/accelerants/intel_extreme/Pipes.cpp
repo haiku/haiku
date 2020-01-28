@@ -235,14 +235,14 @@ Pipe::ConfigureTimings(display_mode* target, bool hardware)
 
 	// Set the plane size as well while we're at it (this is independant, we
 	// could have a larger plane and scroll through it).
-	if (gInfo->shared_info->device_type.Generation() == 5
-		|| gInfo->shared_info->device_type.Generation() > 6) {
-		// FIXME check which generations actually need this.
-		// This is "reserved" on G45 and below.
-		// This register does not exist on generation 6.
+	if (gInfo->shared_info->device_type.Generation() <= 4) {
+		// This is "reserved" on G35 and GMA965, but needed on 945 (for which
+		// there is no public documentation), and I assume earlier devices as
+		// well. Note that the height and width are swapped when compared to
+		// the other registers.
 		write32(INTEL_DISPLAY_A_IMAGE_SIZE + fPipeOffset,
-			((uint32)(target->virtual_width - 1) << 16)
-			| ((uint32)target->virtual_height - 1));
+			((uint32)(target->virtual_height - 1) << 16)
+			| ((uint32)target->virtual_width - 1));
 	}
 
 	if (fHasTranscoder && hardware) {
