@@ -123,13 +123,13 @@ platform_start_kernel(void)
 	mmu_init_for_kernel();
 //	smp_boot_other_cpus();
 
-	dprintf("ncpus %lx\n", gKernelArgs.num_cpus);
-	dprintf("kernel entry at %lx\n", kernelEntry);
+	dprintf("ncpus %" B_PRId32 "\n", gKernelArgs.num_cpus);
+	dprintf("kernel entry at 0x%" B_PRIxADDR "\n", kernelEntry);
 
 	status_t error = arch_start_kernel(&gKernelArgs, kernelEntry,
 		stackTop);
 
-	panic("kernel returned %lx!\n", error);
+	panic("kernel returned 0x%" B_PRIx32 "!\n", error);
 }
 
 
@@ -270,8 +270,10 @@ start_gen(int argc, const char **argv, struct image_header *uimage, void *fdt)
 	{ //DEBUG:
 		int i;
 		dprintf("argc = %d\n", argc);
-		for (i = 0; i < argc; i++)
-			dprintf("argv[%d] @%lx = '%s'\n", i, (uint32)argv[i], argv[i]);
+		for (i = 0; i < argc; i++) {
+			dprintf("argv[%d] @%" B_PRIxADDR " = '%s'\n", i,
+				(addr_t)argv[i], argv[i]);
+		}
 		dprintf("os: %d\n", (int)gUBootOS);
 		dprintf("gd @ %p\n", gUBootGlobalData);
 		if (gUBootGlobalData) {
@@ -335,8 +337,8 @@ start_gen(int argc, const char **argv, struct image_header *uimage, void *fdt)
 		}
 		dprintf("args.arguments_count = %" B_PRId32 "\n", args.arguments_count);
 		for (int i = 0; i < args.arguments_count; i++)
-			dprintf("args.arguments[%d] @%lx = '%s'\n", i,
-				(uint32)args.arguments[i], args.arguments[i]);
+			dprintf("args.arguments[%d] @%" B_PRIxADDR " = '%s'\n", i,
+				(addr_t)args.arguments[i], args.arguments[i]);
 	}
 
 	// wait a bit to give the user the opportunity to press a key
