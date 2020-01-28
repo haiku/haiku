@@ -29,7 +29,7 @@
 
 
 static bigtime_t sActivationDelay = 40000;
-static const uint32 kIconSizes[] = { 16, 20, 24, 32, 40, 48, 64 };
+static const uint32 kIconSizes[] = { 16, 20, 24, 32, 40, 48, 64, 96, 128 };
 
 
 enum {
