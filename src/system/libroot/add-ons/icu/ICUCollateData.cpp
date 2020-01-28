@@ -113,6 +113,11 @@ ICUCollateData::Strcoll(const char* a, const char* b, int& result)
 status_t
 ICUCollateData::Strxfrm(char* out, const char* in, size_t size, size_t& outSize)
 {
+	if (in == NULL) {
+		outSize = 0;
+		return B_OK;
+	}
+
 	if (fCollator == NULL || strcmp(fPosixLocaleName, "POSIX") == 0) {
 		// handle POSIX here as the collator ICU uses for that (english) is
 		// incompatible in too many ways
@@ -121,11 +126,6 @@ ICUCollateData::Strxfrm(char* out, const char* in, size_t size, size_t& outSize)
 			if (*inIter < 0)
 				return B_BAD_VALUE;
 		}
-		return B_OK;
-	}
-
-	if (in == NULL) {
-		outSize = 0;
 		return B_OK;
 	}
 
