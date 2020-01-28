@@ -22,6 +22,19 @@
 
 #include <string.h>
 
+#if __GNUC__ > 2
+#include <x86intrin.h>
+#else
+static inline uint64_t __rdtsc()
+{
+	uint64 tsc;
+
+	asm volatile ("rdtsc\n" : "=A"(tsc));
+
+	return tsc;
+}
+#endif
+
 
 uint32 gTimeConversionFactor;
 
@@ -64,17 +77,6 @@ uint32 gTimeConversionFactor;
 	// TODO: These are arbitrary. They are here to avoid spinning indefinitely
 	// if the TSC just isn't stable and we can't get our desired error range.
 
-#if __GNUC__ <= 2
-// It's a builtin on later compiler versions, but not in gcc2...
-static inline uint64_t __rdtsc()
-{
-	uint64 tsc;
-
-	asm volatile ("rdtsc\n" : "=A"(tsc));
-
-	return tsc;
-}
-#endif
 
 struct uint128 {
 	uint128(uint64 low, uint64 high = 0)
