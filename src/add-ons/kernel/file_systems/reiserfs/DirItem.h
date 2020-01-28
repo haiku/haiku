@@ -142,12 +142,15 @@ public:
 
 	int32 IndexOfName(const char *name) const
 	{
+		if (name == NULL)
+			return -1;
+
 		int32 count = GetEntryCount();
 		size_t len = strlen(name);
 		for (int32 i = 0; i < count; i++) {
 			size_t nameLen = 0;
 			const char *itemName = EntryNameAt(i, &nameLen);
-			if (name && nameLen == len && !strncmp(name, itemName, len)) {
+			if (nameLen == len && !strncmp(name, itemName, len)) {
 				return i;
 			}
 		}
