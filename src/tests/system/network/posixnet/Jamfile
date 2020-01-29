@@ -6,6 +6,7 @@ UnitTestLib posixnettest.so :
 	PosixNetTestAddon.cpp
 
 	GetAddrInfo.cpp
+	SocketTests.cpp
 
 	: be $(TARGET_NETWORK_LIBS) [ TargetLibstdc++ ]
 	;

@@ -272,12 +272,29 @@ EndpointManager::SetConnection(TCPEndpoint* endpoint, const sockaddr* _local,
 		local.SetPort(port);
 	}
 
+	// We want to create a connection for (local, peer), so check to make sure
+	// that this pair is not already in use by an existing connection.
 	if (_LookupConnection(*local, peer) != NULL)
 		return EADDRINUSE;
 
 	endpoint->LocalAddress().SetTo(*local);
 	endpoint->PeerAddress().SetTo(peer);
 	T(Connect(endpoint));
+
+	// BOpenHashTable doesn't support inserting duplicate objects. Since
+	// BOpenHashTable is a chained hash table where the items are required to
+	// be intrusive linked list nodes, inserting the same object twice will
+	// create a cycle in the linked list, which is not handled currently.
+	//
+	// We need to makes sure to remove any existing copy of this endpoint
+	// object from the table in order to handle calling connect() on a closed
+	// socket to connect to a different remote (address, port) than it was
+	// originally used for.
+	//
+	// We use RemoveUnchecked here because we don't want the hash table to
+	// resize itself after this removal when we are planning to just add
+	// another.
+	fConnectionHash.RemoveUnchecked(endpoint);
 
 	fConnectionHash.Insert(endpoint);
 	return B_OK;

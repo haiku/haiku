@@ -76,6 +76,12 @@ CppUnit::Test* BOpenHashTableTest::Suite()
 					   "BOpenHashTable::Insert test",
 					   &BOpenHashTableTest::InsertTest));
 	suite->addTest(new CppUnit::TestCaller<BOpenHashTableTest>(
+					   "BOpenHashTable::Insert unchecked test",
+					   &BOpenHashTableTest::InsertUncheckedTest));
+	suite->addTest(new CppUnit::TestCaller<BOpenHashTableTest>(
+					   "BOpenHashTable::Insert unchecked uninitialized test",
+					   &BOpenHashTableTest::InsertUncheckedUninitializedTest));
+	suite->addTest(new CppUnit::TestCaller<BOpenHashTableTest>(
 					   "BOpenHashTable::Iterate and count test",
 					   &BOpenHashTableTest::IterateAndCountTest));
 	suite->addTest(new CppUnit::TestCaller<BOpenHashTableTest>(
@@ -87,6 +93,12 @@ CppUnit::Test* BOpenHashTableTest::Suite()
 	suite->addTest(new CppUnit::TestCaller<BOpenHashTableTest>(
 					   "BOpenHashTable::Remove test",
 					   &BOpenHashTableTest::RemoveTest));
+	suite->addTest(new CppUnit::TestCaller<BOpenHashTableTest>(
+					   "BOpenHashTable::Remove unchecked test",
+					   &BOpenHashTableTest::RemoveUncheckedTest));
+	suite->addTest(new CppUnit::TestCaller<BOpenHashTableTest>(
+					   "BOpenHashTable::Remove when not present test",
+					   &BOpenHashTableTest::RemoveWhenNotPresentTest));
 	suite->addTest(new CppUnit::TestCaller<BOpenHashTableTest>(
 					   "BOpenHashTable::Duplicate insert test",
 					   &BOpenHashTableTest::DuplicateInsertTest));
@@ -124,6 +136,28 @@ void BOpenHashTableTest::InsertTest()
 }
 
 
+void BOpenHashTableTest::InsertUncheckedTest()
+{
+	Entry entry(123);
+
+	BOpenHashTable<EntryDefinition> table;
+	CPPUNIT_ASSERT_EQUAL(table.Init(), B_OK);
+
+	table.InsertUnchecked(&entry);
+}
+
+
+void BOpenHashTableTest::InsertUncheckedUninitializedTest()
+{
+	Entry entry(123);
+
+	BOpenHashTable<EntryDefinition> table;
+	CPPUNIT_ASSERT_EQUAL(table.Init(), B_OK);
+
+	table.InsertUnchecked(&entry);
+}
+
+
 void BOpenHashTableTest::IterateAndCountTest() {
 	const size_t kEntryCount = 20;
 
@@ -144,6 +178,7 @@ void BOpenHashTableTest::IterateAndCountTest() {
 	while (iterator.HasNext()) {
 		Entry* entry = iterator.Next();
 		CPPUNIT_ASSERT_EQUAL(0, map & (1 << entry->Value()));
+		map |= (1 << entry->Value());
 	}
 
 	CPPUNIT_ASSERT_EQUAL(map, (1 << kEntryCount) - 1);
@@ -206,6 +241,46 @@ void BOpenHashTableTest::RemoveTest() {
 
 	table.Remove(&entry);
 	CPPUNIT_ASSERT_EQUAL(table.Lookup(123), NULL);
+}
+
+
+void BOpenHashTableTest::RemoveUncheckedTest()
+{
+	Entry entry(123);
+
+	BOpenHashTable<EntryDefinition> table;
+	CPPUNIT_ASSERT_EQUAL(table.Init(0), B_OK);
+
+	CPPUNIT_ASSERT_EQUAL(table.Insert(&entry), B_OK);
+	CPPUNIT_ASSERT_EQUAL(table.Lookup(123), &entry);
+
+	table.RemoveUnchecked(&entry);
+	CPPUNIT_ASSERT_EQUAL(table.Lookup(123), NULL);
+}
+
+
+void BOpenHashTableTest::RemoveWhenNotPresentTest()
+{
+	Entry entry1(123);
+	Entry entry2(456);
+	Entry entry3(789);
+
+	BOpenHashTable<EntryDefinition> table;
+	CPPUNIT_ASSERT_EQUAL(table.Init(), B_OK);
+
+	// Only add the first two entries.
+	table.Insert(&entry1);
+	table.Insert(&entry2);
+
+	// entry3 is not in the table, but we'll remove it anyway.
+	table.Remove(&entry3);
+	table.RemoveUnchecked(&entry3);
+
+	// The original two entries should still be there.
+	CPPUNIT_ASSERT_EQUAL(table.CountElements(), 2);
+	CPPUNIT_ASSERT_EQUAL(table.Lookup(123), &entry1);
+	CPPUNIT_ASSERT_EQUAL(table.Lookup(456), &entry2);
+	CPPUNIT_ASSERT_EQUAL(table.Lookup(789), NULL);
 }
 
 
