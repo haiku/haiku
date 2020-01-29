@@ -7,7 +7,12 @@
 #include <stddef.h>
 #include <stdint.h>
 
+// EFI on x86 uses the Microsoft ABI which is not the default for gcc
+#if defined(__x86_64__) || defined(__x86__)
 #define EFIAPI __attribute__((ms_abi))
+#else
+#define EFIAPI
+#endif
 
 #define EFI_ERROR_MASK 0x8000000000000000
 #define EFI_ERR(x) (EFI_ERROR_MASK | x)
