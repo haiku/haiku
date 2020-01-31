@@ -97,13 +97,13 @@ KPathTest::TestSetToAndPath()
 	CPPUNIT_ASSERT_MESSAGE("2. ", status == B_OK);
 	CPPUNIT_ASSERT(strcmp(path.Path(), "a/b/c") == 0);
 	CPPUNIT_ASSERT(path.Length() == 5);
-	CPPUNIT_ASSERT(path.BufferSize() == B_PATH_NAME_LENGTH);
+	CPPUNIT_ASSERT(path.BufferSize() == B_PATH_NAME_LENGTH + 1);
 
 	status = path.SetPath("abc/def");
 	CPPUNIT_ASSERT_MESSAGE("3. ", status == B_OK);
 	CPPUNIT_ASSERT(strcmp(path.Path(), "abc/def") == 0);
 	CPPUNIT_ASSERT(path.Length() == 7);
-	CPPUNIT_ASSERT(path.BufferSize() == B_PATH_NAME_LENGTH);
+	CPPUNIT_ASSERT(path.BufferSize() == B_PATH_NAME_LENGTH + 1);
 
 	status = path.SetTo("a/b/c", false, 10);
 	CPPUNIT_ASSERT_MESSAGE("4. ", status == B_OK);
@@ -127,20 +127,20 @@ KPathTest::TestLazyAlloc()
 	KPath path(NULL, KPath::LAZY_ALLOC);
 	CPPUNIT_ASSERT(path.Path() == NULL);
 	CPPUNIT_ASSERT(path.Length() == 0);
-	CPPUNIT_ASSERT(path.BufferSize() == B_PATH_NAME_LENGTH);
+	CPPUNIT_ASSERT(path.BufferSize() == B_PATH_NAME_LENGTH + 1);
 	CPPUNIT_ASSERT(path.InitCheck() == B_OK);
 
 	path.SetPath("/b");
 	CPPUNIT_ASSERT(path.Path() != NULL);
 	CPPUNIT_ASSERT(strcmp(path.Path(), "/b") == 0);
 	CPPUNIT_ASSERT(path.Length() == 2);
-	CPPUNIT_ASSERT(path.BufferSize() == B_PATH_NAME_LENGTH);
+	CPPUNIT_ASSERT(path.BufferSize() == B_PATH_NAME_LENGTH + 1);
 
 	KPath second("yo", KPath::LAZY_ALLOC);
 	CPPUNIT_ASSERT(second.Path() != NULL);
 	CPPUNIT_ASSERT(strcmp(second.Path(), "yo") == 0);
 	CPPUNIT_ASSERT(second.Length() == 2);
-	CPPUNIT_ASSERT(second.BufferSize() == B_PATH_NAME_LENGTH);
+	CPPUNIT_ASSERT(second.BufferSize() == B_PATH_NAME_LENGTH + 1);
 
 	status_t status = path.SetTo(NULL, KPath::LAZY_ALLOC, SIZE_MAX);
 	CPPUNIT_ASSERT(status == B_OK);
