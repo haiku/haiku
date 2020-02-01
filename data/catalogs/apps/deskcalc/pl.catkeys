@@ -1,10 +1,9 @@
-1	polish	x-vnd.Haiku-DeskCalc	1694821448
-Radians	CalcView		Radiany
-Degrees	CalcView		Stopnie
-Calculating	CalcView		Obliczanie
+1	polish	x-vnd.Haiku-DeskCalc	1425096792
 Compact	CalcView		Minimalny
+Calculating	CalcView		Obliczanie
 Enable Num Lock on startup	CalcView		Włącz Num Lock przy uruchamianiu
 Scientific	CalcView		Naukowy
-Audio Feedback	CalcView		Podpowiedzi dźwiękowe
+Radians	CalcView		Radiany
 DeskCalc	System name		DeskCalc
+Degrees	CalcView		Stopnie
 Basic	CalcView		Prosty

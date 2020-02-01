@@ -1,29 +1,28 @@
-1	hungarian	x-vnd.Haiku-DeskCalc	3968679316
-acos	CalcView		acos
-ceil	CalcView		ceil
-cbrt	CalcView		cbrt
-sinh	CalcView		sinh
-BS	CalcView	Key label, 'BS' means backspace	BS
-cosh	CalcView		cosh
-log	CalcView		log
-asin	CalcView		asin
-Radians	CalcView		Radián
-exp	CalcView		exp
-atan	CalcView		atan
-Degrees	CalcView		Fok
+1	hungarian	x-vnd.Haiku-DeskCalc	3698954660
 cos	CalcView		cos
 BS	CalcView		BS
+acos	CalcView		acos
 C	CalcView	Key label, 'C' means clear	C
-sin	CalcView		sin
+ceil	CalcView		ceil
+cbrt	CalcView		cbrt
+BS	CalcView	Key label, 'BS' means backspace	BS
 floor	CalcView		floor
+sinh	CalcView		sinh
+sin	CalcView		sin
 tanh	CalcView		tanh
+cosh	CalcView		cosh
 ln	CalcView		ln
-Calculating	CalcView		Számolás
 Compact	CalcView		Kompakt
+Calculating	CalcView		Számolás
 Enable Num Lock on startup	CalcView		Numerikus billentyűzet bekapcsolása indításkor
 Scientific	CalcView		Tudományos
 sqrt	CalcView		sqrt
+log	CalcView		log
+asin	CalcView		asin
+Radians	CalcView		Radián
 tan	CalcView		tan
-Audio Feedback	CalcView		Hangos visszajelzés
+exp	CalcView		exp
+atan	CalcView		atan
 DeskCalc	System name		Számológép
+Degrees	CalcView		Fok
 Basic	CalcView		Alap

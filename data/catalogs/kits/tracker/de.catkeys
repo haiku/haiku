@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	1684779063
+1	german	x-vnd.Haiku-libtracker	3410222442
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -22,6 +22,7 @@ Open	FilePanelPriv		Öffnen
 Bitmap icon	AttributesView		Bitmap Icon
 You can't replace a folder with one of its sub-folders.	FSUtils		Ordner können nicht mit einem seiner Unterordner ersetzt werden.
 <%ld dates>	AttributesView		<%ld Daten>
+Select…	VirtualDirectoryWindow		Auswählen…
 Name	Default Query Columns		Name
 Unmount	ContainerWindow		Aushängen
 Eject when unmounting	AutoMounterSettings		Auswerfen beim Aushängen
@@ -352,6 +353,7 @@ Size:	InfoWindow		Größe:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Das ausgewählte Objekt kann nicht in den Papierkorb verschoben werden. Soll es stattdessen gelöscht werden? (Diese Aktion kann nicht rückgängig gemacht werden.)
 Copy	ContainerWindow		Kopieren
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Das 'Zeichen' Attribut kann leider keine Multi-Byte Zeichen speichern.
+Open parent	VirtualDirectoryWindow		Eine Ebene höher
 And	FindPanel		Und
 Palette-indexed picture	AttributesView		Paletten-indiziertes Bild
 multiple disks	FindPanel		mehrere Datenträger
@@ -436,6 +438,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Es kann leider i
 Move here	ContainerWindow		Hierher verschieben
 the config folder	FSUtils		der Config Ordner
 Sorry, could not create a new folder.	FSUtils		Der neue Ordner konnte leider nicht erstellt werden.
+Select all	VirtualDirectoryWindow		Alles auswählen
 Rename	FSUtils	button label	Umbenennen
 Clean up all	ContainerWindow		Icons ordnen
 Add current folder	FilePanelPriv		Aktuellen Ordner hinzufügen
@@ -448,6 +451,7 @@ ends with	FindPanel		endet mit
 Show Disks icon	SettingsView		Datenträger-Icon anzeigen
 Outline selection rectangle only	SettingsView		Auswahlrahmen als Kontur
 by formula	FindPanel		nach Formel
+Resize to fit	VirtualDirectoryWindow		Optimale Größe
 Move to Trash	FilePanelPriv		In Papierkorb verschieben
 is	FindPanel		ist
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Wird der System Ordner oder dessen Inhalt umbenannt, kann %osName nicht mehr gestartet werden!\n\nTrotzdem umbenennen?\n\nUm den System Ordner oder dessen Inhalt trotzdem umzubenennen, Shift-Taste gedrückt halten und \"Umbenennen\" klicken.
@@ -465,6 +469,7 @@ Default application	InfoWindow		Standardanwendung
 Untitled bitmap	PoseView		Unbenannte Bitmap
 matches regular expression	SelectionWindow		entspricht regulärem Ausdruck
 Invert selection	ContainerWindow		Auswahl umkehren
+Close	VirtualDirectoryWindow		Schließen
 Monochrome picture	AttributesView		Monochromes Bild
 Real name	ContainerWindow		Systemname
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		\"%name\" konnte nicht geöffnet werden. Die Datei ist fälschlicherweise als ausführbar gekennzeichnet.
@@ -501,6 +506,7 @@ Delete	PoseView		Löschen
 Media parameter	AttributesView		Media Parameter
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Wird der Home Ordner geändert, kann es sein dass %osName nicht mehr richtig funktioniert!\n\nTrotzdem ändern?\n\nUm den Home Ordner trotzdem zu ändern, Shift-Taste gedrückt halten und \"Ich bin sicher\" klicken.
 Sorry, you can't copy items to the Trash.	PoseView		Objekte können leider nicht in den Papierkorb kopiert werden.
+Invert selection	VirtualDirectoryWindow		Auswahl umkehren
 New folder	FilePanelPriv		Neuer Ordner
 {0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# Objekt} other{# Objekte}}
 Name	AttributesView		Name

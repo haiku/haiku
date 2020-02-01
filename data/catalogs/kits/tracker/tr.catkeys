@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	124641333
+1	turkish	x-vnd.Haiku-libtracker	1850084712
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen yap
@@ -22,6 +22,7 @@ Open	FilePanelPriv		Aç
 Bitmap icon	AttributesView		Biteşlem simge
 You can't replace a folder with one of its sub-folders.	FSUtils		Bir klasörü kendi alt klasörlerinden biriyle değiştiremezsiniz.
 <%ld dates>	AttributesView		<%ld tarih>
+Select…	VirtualDirectoryWindow		Seç…
 Name	Default Query Columns		Ad
 Unmount	ContainerWindow		Bağlantıyı kes
 Eject when unmounting	AutoMounterSettings		Bağlantıyı keserken çıkart
@@ -357,6 +358,7 @@ Size:	InfoWindow		Boyut:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Seçili öge Çöp'e taşınamaz. Bunun yerine doğrudan silmek ister misiniz? (Bu işlem geri alınamaz.)
 Copy	ContainerWindow		Kopyala
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Üzgünüm, 'Karakter' özniteliği bir çoklu bayt glifi depolayamaz.
+Open parent	VirtualDirectoryWindow		Üst klasörü aç
 And	FindPanel		ve
 Palette-indexed picture	AttributesView		Palet sıralı resim
 multiple disks	FindPanel		çoklu diskler
@@ -441,6 +443,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Üzgünüm, bird
 Move here	ContainerWindow		Buraya taşı
 the config folder	FSUtils		yapılandırma klasörü
 Sorry, could not create a new folder.	FSUtils		Üzgünüm, yeni bir klasör oluşturulamadı.
+Select all	VirtualDirectoryWindow		Tümünü seç
 Rename	FSUtils	button label	Yeniden adlandır
 Clean up all	ContainerWindow		Tümünü temizle
 Add current folder	FilePanelPriv		Şu anki klasörü ekle
@@ -453,6 +456,7 @@ ends with	FindPanel		biter
 Show Disks icon	SettingsView		Diskler simgesini göster
 Outline selection rectangle only	SettingsView		Yalnızca dış hat seçim dikdörtgeni
 by formula	FindPanel		formül ile
+Resize to fit	VirtualDirectoryWindow		Sığacak biçimde boyutlandır
 Move to Trash	FilePanelPriv		Çöp'e taşı
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Sistem klasörünü veya içeriğini yeniden adlandırırsanız %osName çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de adlandırmak istiyorsanız, Shift düğmesini basılı tutun ve \"Yeniden adlandır\"a tıklayın.
 40 x 40	DeskWindow		40 x 40
@@ -469,6 +473,7 @@ Default application	InfoWindow		Öntanımlı uygulama
 Untitled bitmap	PoseView		Adsız biteşlem
 matches regular expression	SelectionWindow		düzenli ifade ile eşleşir
 Invert selection	ContainerWindow		Seçimi tersine çevir
+Close	VirtualDirectoryWindow		Kapat
 Monochrome picture	AttributesView		Siyah beyaz resim
 Real name	ContainerWindow		Gerçek adı
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		\"%name\" açılamadı. Dosya yanlışlıkla çalıştırılabilir olarak imlenmiş. 
@@ -505,6 +510,7 @@ Delete	PoseView		Sil
 Media parameter	AttributesView		Ortam parametresi
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Ev klasörünü değiştirirseniz %osName düzgün çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de değiştirmek istiyorsanız, Shift düğmesini basılı tutun ve \"Ne yaptığımı biliyorum\"a tıklayın.
 Sorry, you can't copy items to the Trash.	PoseView		Üzgünüm, ögeler Çöp'e kopyalanamaz.
+Invert selection	VirtualDirectoryWindow		Seçimi tersine çevir
 New folder	FilePanelPriv		Yeni klasör
 {0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, other{# öge}}
 Name	AttributesView		Ad

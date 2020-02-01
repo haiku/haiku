@@ -1,52 +1,51 @@
-1	friulian	x-vnd.Haiku-DeskCalc	3448493419
-1	CalcView		1
-acos	CalcView		arccos
-C	CalcView		C
-8	CalcView		8
--	CalcView		-
-ceil	CalcView		taronde
-cbrt	CalcView		∛
-sinh	CalcView		sinh
-BS	CalcView	Key label, 'BS' means backspace	←
-cosh	CalcView		cosh
-4	CalcView		4
-)	CalcView		)
-log	CalcView		log
-asin	CalcView		asin
-Radians	CalcView		Radiants
-0	CalcView		0
-exp	CalcView		^
-atan	CalcView		atan
-7	CalcView		7
-Degrees	CalcView		Grâts
-!	CalcView		!
-π	CalcView		π
+1	friulian	x-vnd.Haiku-DeskCalc	3178768763
 cos	CalcView		cos
 3	CalcView		3
 (	CalcView		(
 BS	CalcView		←
+1	CalcView		1
+acos	CalcView		arccos
 E	CalcView		E
 /	CalcView		/
+C	CalcView		C
 C	CalcView	Key label, 'C' means clear	C
-sin	CalcView		sin
-6	CalcView		6
+8	CalcView		8
+ceil	CalcView		taronde
+-	CalcView		-
+cbrt	CalcView		∛
+BS	CalcView	Key label, 'BS' means backspace	←
 floor	CalcView		staronzâ
-+	CalcView		+
+sinh	CalcView		sinh
+6	CalcView		6
+sin	CalcView		sin
 tanh	CalcView		tanh
++	CalcView		+
+cosh	CalcView		cosh
 ln	CalcView		ln
-Calculating	CalcView		Daûr a calcolâ
 Compact	CalcView		Compate
+Calculating	CalcView		Daûr a calcolâ
 Enable Num Lock on startup	CalcView		Ative BlocNum al inviament
+4	CalcView		4
 Scientific	CalcView		Sientifiche
-sqrt	CalcView		√
+)	CalcView		)
 ^	CalcView		^
+sqrt	CalcView		√
+log	CalcView		log
+asin	CalcView		asin
 =	CalcView		=
+Radians	CalcView		Radiants
 2	CalcView		2
 tan	CalcView		tan
-Audio Feedback	CalcView		Tornade di informazion sonore
+0	CalcView		0
+exp	CalcView		^
+atan	CalcView		atan
 9	CalcView		9
 .	CalcView		,
 DeskCalc	System name		DeskCalc
+Degrees	CalcView		Grâts
+7	CalcView		7
+!	CalcView		!
+π	CalcView		π
 5	CalcView		5
-*	CalcView		*
 Basic	CalcView		Normâl
+*	CalcView		*

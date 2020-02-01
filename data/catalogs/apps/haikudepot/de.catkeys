@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	1687365744
+1	german	x-vnd.Haiku-HaikuDepot	3877862636
 Repository update error	LocalRepositoryUpdateProcess		Fehler bei Paketquellenaktualisierung
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Fehler bei der Aktualisierung der Paketquelle: %error%
 Check for updates…	MainWindow		Aktualisierungen suchen…
@@ -80,6 +80,7 @@ Reboot required	PackageManager		Neustart erforderlich
 Very unstable	RatePackageWindow		Sehr instabil
 All packages	PackageListView		Alle Pakete
 Network Transport Error	ServerHelper		Netzwerk-Übertragungsfehler 
+Authorization or security issue.  Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Es ist ein Anmelde- oder Sicherheitsproblem aufgetreten. Bitte aus- und wieder einloggen, um sicherzustellen dass das Kennwort korrekt ist. Außerdem ist zu prüfen, ob den aktuellen Nutzungsbedingungen zugestimmt wurde.
 Stability	RatePackageWindow		Stabilität
 Send	RatePackageWindow		Senden
 Start package daemon	App		Paket-Daemon starten

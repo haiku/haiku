@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	2745737133
+1	japanese	x-vnd.Haiku-libtracker	176213216
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -22,6 +22,7 @@ Open	FilePanelPriv		開く
 Bitmap icon	AttributesView		ビットマップアイコン
 You can't replace a folder with one of its sub-folders.	FSUtils		サブフォルダーを同名のフォルダーと置き換えられません。
 <%ld dates>	AttributesView		<%ld 個の日付>
+Select…	VirtualDirectoryWindow		選択…
 Name	Default Query Columns		名前
 Unmount	ContainerWindow		マウント解除
 Eject when unmounting	AutoMounterSettings		マウント解除時メディアを取り出す
@@ -357,6 +358,7 @@ Size:	InfoWindow		サイズ:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		選択した項目をごみ箱に移動できません。完全に削除しても良いでしょうか? 元には戻せませんので、ご注意ください。
 Copy	ContainerWindow		コピー
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		「Character」属性にはマルチバイト文字を保存できません。
+Open parent	VirtualDirectoryWindow		親フォルダーを開く
 And	FindPanel		かつ
 Palette-indexed picture	AttributesView		パレット付き画像
 multiple disks	FindPanel		複数ディスク
@@ -441,6 +443,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		2 項目以上�
 Move here	ContainerWindow		ここに移動
 the config folder	FSUtils		config フォルダー
 Sorry, could not create a new folder.	FSUtils		新規フォルダーを作成できませんでした。
+Select all	VirtualDirectoryWindow		すべて選択
 Rename	FSUtils	button label	名前の変更
 Clean up all	ContainerWindow		すべてを整列
 Add current folder	FilePanelPriv		このフォルダーを追加
@@ -453,6 +456,7 @@ ends with	FindPanel		指定文字列で終わる
 Show Disks icon	SettingsView		ディスクアイコンを表示
 Outline selection rectangle only	SettingsView		マウスドラッグ選択時アウトラインのみ表示
 by formula	FindPanel		式で検索
+Resize to fit	VirtualDirectoryWindow		最適な表示サイズに変更
 Move to Trash	FilePanelPriv		ごみ箱に移動
 is	FindPanel		と等しい
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		システムフォルダーやその内容の名前を変更すると、%osNameが起動しなくなります!\n\n変更しますか?\n\nそれでもシステムフォルダーやその内容の名前を変更するなら、シフトキーを押しながら\"名前の変更\"をクリックしてください。
@@ -470,6 +474,7 @@ Default application	InfoWindow		デフォルトアプリケーション
 Untitled bitmap	PoseView		無名ビットマップ
 matches regular expression	SelectionWindow		正規表現と一致
 Invert selection	ContainerWindow		選択範囲を反転
+Close	VirtualDirectoryWindow		閉じる
 Monochrome picture	AttributesView		白黒画像
 Real name	ContainerWindow		実名
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		ファイルが誤って実行可能に設定されているため、\"%name\" を開けませんでした。
@@ -506,6 +511,7 @@ Delete	PoseView		削除
 Media parameter	AttributesView		メディアパラメーター
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		ホームフォルダーの内容を変更すると、%osNameは正しく動作しないかもしれません!\n\n内容を変更しますか?\n\nそれでもホームフォルダーの内容を変更するなら、シフトキーを押しながら\"私はなにをするか理解しています\"をクリックしてください。
 Sorry, you can't copy items to the Trash.	PoseView		ごみ箱にコピーすることはできません。
+Invert selection	VirtualDirectoryWindow		選択範囲を反転
 New folder	FilePanelPriv		新規フォルダー
 {0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# アイテム} other{# アイテム}}
 Name	AttributesView		名前

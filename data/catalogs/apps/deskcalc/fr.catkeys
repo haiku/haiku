@@ -1,46 +1,46 @@
-1	french	x-vnd.Haiku-DeskCalc	4029858368
-1	CalcView		1
-acos	CalcView		acos
-8	CalcView		8
--	CalcView		-
-sinh	CalcView		sinh
-BS	CalcView	Key label, 'BS' means backspace	SUPPR
-cosh	CalcView		cosh
-4	CalcView		4
-)	CalcView		)
-log	CalcView		log
-asin	CalcView		asin
-Radians	CalcView		Radians
-0	CalcView		0
-exp	CalcView		exp
-atan	CalcView		atan
-7	CalcView		7
-Degrees	CalcView		Degrés
-!	CalcView		!
-π	CalcView		π
+1	french	x-vnd.Haiku-DeskCalc	2640162838
 cos	CalcView		cos
 3	CalcView		3
 (	CalcView		(
+BS	CalcView		SUPPR
+1	CalcView		1
+acos	CalcView		acos
 /	CalcView		/
-sin	CalcView		sin
-6	CalcView		6
+8	CalcView		8
+-	CalcView		-
+BS	CalcView	Key label, 'BS' means backspace	SUPPR
 floor	CalcView		Ent
-+	CalcView		+
+sinh	CalcView		sinh
+6	CalcView		6
+sin	CalcView		sin
 tanh	CalcView		tanh
++	CalcView		+
+cosh	CalcView		cosh
 ln	CalcView		ln
-Calculating	CalcView		Calcul en cours
 Compact	CalcView		Compact
+Calculating	CalcView		Calcul en cours
 Enable Num Lock on startup	CalcView		Verrouiller le pavé numérique au démarrage
+4	CalcView		4
 Scientific	CalcView		Scientifique
-sqrt	CalcView		√
+)	CalcView		)
 ^	CalcView		^
+sqrt	CalcView		√
+log	CalcView		log
+asin	CalcView		asin
 =	CalcView		=
+Radians	CalcView		Radians
 2	CalcView		2
 tan	CalcView		tan
-Audio Feedback	CalcView		Échos sonores
+0	CalcView		0
+exp	CalcView		exp
+atan	CalcView		atan
 9	CalcView		9
 .	CalcView		.
 DeskCalc	System name		Calculatrice
+Degrees	CalcView		Degrés
+7	CalcView		7
+!	CalcView		!
+π	CalcView		π
 5	CalcView		5
-*	CalcView		*
 Basic	CalcView		Basique
+*	CalcView		*

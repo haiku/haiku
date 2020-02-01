@@ -1,9 +1,8 @@
-1	catalan; valencian	x-vnd.Haiku-DeskCalc	3276968552
-Radians	CalcView		Radians
-Degrees	CalcView		Graus
+1	catalan; valencian	x-vnd.Haiku-DeskCalc	3007243896
 Compact	CalcView		Compacte
 Enable Num Lock on startup	CalcView		Activa la tecla 'Bloq Num' al inici
 Scientific	CalcView		Científic
-Audio Feedback	CalcView		Confirmació sonora
+Radians	CalcView		Radians
 DeskCalc	System name		Calculadora de l'Escriptori
+Degrees	CalcView		Graus
 Basic	CalcView		Bàsic

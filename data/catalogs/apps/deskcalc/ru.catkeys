@@ -1,10 +1,9 @@
-1	russian	x-vnd.Haiku-DeskCalc	1694821448
-Radians	CalcView		Радианы
-Degrees	CalcView		Градусы
-Calculating	CalcView		Вычисление
+1	russian	x-vnd.Haiku-DeskCalc	1425096792
 Compact	CalcView		Компактный
+Calculating	CalcView		Вычисление
 Enable Num Lock on startup	CalcView		Включать Num Lock при запуске
 Scientific	CalcView		Научный
-Audio Feedback	CalcView		Звуковая реакция
+Radians	CalcView		Радианы
 DeskCalc	System name		Калькулятор
+Degrees	CalcView		Градусы
 Basic	CalcView		Простой
