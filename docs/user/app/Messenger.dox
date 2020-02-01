@@ -36,6 +36,11 @@
 	is roughly equivalent in terms of efficiency to posting a message
 	directly to the messenger's target (i.e. BLooper::PostMessage()).
 
+	If you supply a target BMessenger or BHandler to SendMessage() the method
+	will return immediately after delivery and the response will be handled
+	asynchronously, otherwise the method will return once the reply has been
+	delivered or after a set timeout.
+
 	The global \a be_app_messenger pointer targets the main message
 	loop of \a be_app is automatically initialized for you when you create
 	a BApplication object, you can use it wherever a BMessenger is called for.
@@ -88,7 +93,7 @@
 	\param handler The target handler. May be \c NULL.
 	\param looper The target looper. May be \c NULL.
 	\param _result An optional pointer to a pre-allocated status_t into which
-		   the result of the initialization is written.
+	       the result of the initialization is written.
 
 	\since BeOS R3
 */
@@ -206,8 +211,9 @@
 
 /*!
 	\fn	status_t BMessenger::SendMessage(uint32 command, BHandler* replyTo) const
-	\brief Delivers a BMessage with a \c what parameter set to \a command
-	       synchronously to the messenger's target, without waiting for a reply.
+	\brief Delivers a BMessage with \a command \c what identifier to the
+	       messenger's target. A response may be sent to the \a replyTo handler
+	       asynchronously.
 
 	If the target's message port is full, the method waits indefinitely, until
 	space becomes available in the port. After delivery the method returns
@@ -230,8 +236,8 @@
 /*!
 	\fn status_t BMessenger::SendMessage(BMessage* message, BHandler* replyTo,
 		bigtime_t timeout) const
-	\brief Delivers a BMessage synchronously to the messenger's target,
-	       without waiting for a reply.
+	\brief Delivers a \a message to the messenger's target. A response message
+	       may be sent back to the \a replyTo handler asynchronously.
 
 	A copy of the supplied message is sent and the caller retains ownership
 	of \a message.
@@ -241,10 +247,13 @@
 	first). After delivery the method returns immediately. It does not wait
 	until the target processes the message or even sends a reply.
 
+	This method does not return by default until the message has been delivered.
+	You can set a delivery \a timeout in microseconds.
+
 	\param message The message to be sent.
-	\param replyTo The handler to which a reply to the message shall be sent.
+	\param replyTo The handler for a response message to be sent.
 	       May be \c NULL.
-	\param timeout A timeout for the delivery of the message.
+	\param timeout The message delivery timeout in microseconds. (optional)
 
 	\return A status code, \c B_OK on success or an error code otherwise.
 	\retval B_OK Everything went fine.
@@ -262,8 +271,8 @@
 /*!
 	\fn	status_t BMessenger::SendMessage(BMessage* message, BMessenger replyTo,
 		bigtime_t timeout) const
-	\brief Delivers a BMessage synchronously to the messenger's target,
-	       without waiting for a reply.
+	\brief Delivers a \a message to the messenger's target. A response message
+	       may be sent back to the \a replyTo messenger's target asynchronously.
 
 	A copy of the supplied message is sent and the caller retains ownership
 	of \a message.
@@ -273,9 +282,12 @@
 	first). After delivery the method returns immediately. It does not wait
 	until the target processes the message or even sends a reply.
 
+	This method does not return by default until the message has been delivered.
+	You can set a delivery \a timeout in microseconds.
+
 	\param message The message to be sent.
-	\param replyTo A messenger specifying the target for a reply to \a message.
-	\param timeout A timeout for the delivery of the message.
+	\param replyTo A messenger specifying the target for a response message.
+	\param timeout The message delivery timeout in microseconds. (optional)
 
 	\return A status code, \c B_OK on success or an error code otherwise.
 	\retval B_OK Everything went fine.
@@ -292,16 +304,16 @@
 
 /*!
 	\fn	status_t BMessenger::SendMessage(uint32 command, BMessage* reply) const
-	\brief Delivers a BMessage with a \c what parameter set to \a command
-	       synchronously to the messenger's target and waits for a reply.
+	\brief Delivers a BMessage with \a command \c what identifier to the
+	       messenger's target and waits for a \a reply BMessage synchronously.
 
 	The method does wait for a reply. The reply message is copied into
 	\a reply. If the target doesn't send a reply, the \c what field of
 	\a reply is set to \c B_NO_REPLY.
 
 	\param command The what field of the message to deliver.
-	\param reply A pointer to a pre-allocated BMessage into which the reply
-	       message will be copied.
+	\param reply A pointer to a pre-allocated BMessage object which the reply
+	       message will be copied into.
 
 	\return A status code, \c B_OK on success or an error code otherwise.
 	\retval B_OK Everything went fine.
@@ -316,8 +328,8 @@
 /*!
 	\fn	status_t BMessenger::SendMessage(BMessage* message, BMessage* reply,
 		bigtime_t deliveryTimeout, bigtime_t replyTimeout) const
-	\brief Delivers a BMessage synchronously to the messenger's target and
-	       waits for a reply.
+	\brief Delivers a \a message to the messenger's target and waits for a
+	       \a reply to come back synchronously.
 
 	A copy of the supplied message is sent and the caller retains ownership
 	of \a message.
@@ -326,11 +338,16 @@
 	\a reply. If the target doesn't send a reply or if a reply timeout occurs,
 	the \c what field of \a reply is set to \c B_NO_REPLY.
 
+	This method does not return by default until the message has been delivered
+	and the reply has come back. You can set a \a deliveryTimeout and a
+	\a replyTimeout in microseconds.
+
 	\param message The message to be sent.
-	\param reply A pointer to a pre-allocated BMessage into which the reply
-		   message will be copied.
-	\param deliveryTimeout A timeout for the delivery of the message.
-	\param replyTimeout A timeout for waiting for the reply.
+	\param reply A pointer to a pre-allocated BMessage which the reply
+		   message will be copied into.
+	\param deliveryTimeout The message delivery timeout in microseconds.
+	       (optional)
+	\param replyTimeout The reply message timeout in microseconds. (optional)
 
 	\return A status code, \c B_OK on success or an error code otherwise.
 	\retval B_OK Everything went fine.

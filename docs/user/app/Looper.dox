@@ -220,7 +220,7 @@
 	Posting a message puts it in the message queue. The message passes through
 	the default handler chain.
 
-	\param command The \c what identifier of the message that needs to be sent.
+	\param command The \c what identifier of the message to be sent.
 
 	\return A status code.
 	\retval B_OK The operation succeeded, and the message is sent to the port.
@@ -262,7 +262,7 @@
 	\retval B_OK The operation succeeded, and the message is sent to the port.
 	\retval B_ERROR There was a general operation error.
 	\retval B_BAD_VALUE This looper is not yet running and therefore cannot
-		receive messages.
+	        receive messages.
 
 	\see PostMessage(uint32) if you want to send a message without data
 	     members.
@@ -278,9 +278,9 @@
 /*!
 	\fn status_t BLooper::PostMessage(uint32 command, BHandler* handler,
 		BHandler* replyTo)
-	\brief Send a message with the \a command as \c what identifier to the
-	      \a handler associated with this looper, and (optionally) request a
-	      reply.
+	\brief Sends a message with \a command \c what identifier to the
+	      \a handler associated with this looper. A response may be sent to the
+	      \a replyTo handler asynchronously.
 
 	The target \a handler should be associated with this looper. This method
 	bypasses the default message queue.
@@ -313,8 +313,8 @@
 /*!
 	\fn status_t BLooper::PostMessage(BMessage* message, BHandler* handler,
 		BHandler* replyTo)
-	\brief Send a \a message to the \a handler associated with this looper,
-	       and (optionally) request a reply.
+	\brief Send a \a message to the \a handler associated with this looper.
+	       A response may be sent to the \a replyTo handler asynchronously.
 
 	The target \a handler should be associated with this looper. This method
 	bypasses the default message queue.
