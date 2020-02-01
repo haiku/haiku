@@ -17,15 +17,18 @@ HAIKU_PROVIDER_INFOS =
 	netcologne.de
 	o2online.de
 	physik.rwth-aachen.de
+	rediffmail
 	rwth-aachen.de
 	shaw.ca
 	t-online.de
 	telus.net
+	uoc.gr
 	web.de
 	yahoo.com
 	yahoo.de
 	yandex.com
 	yandex.ru
+	zoho.com
 ;
 
 for file in $(HAIKU_PROVIDER_INFOS) {
