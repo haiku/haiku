@@ -250,11 +250,9 @@ WorkerThread::ScanDisksPartitions(BMenu *srcMenu, BMenu *targetMenu)
 	BDiskDevice device;
 	BPartition *partition = NULL;
 
-	printf("\nScanDisksPartitions source partitions begin\n");
 	SourceVisitor srcVisitor(srcMenu);
 	fDDRoster.VisitEachMountedPartition(&srcVisitor, &device, &partition);
 
-	printf("\nScanDisksPartitions target partitions begin\n");
 	TargetVisitor targetVisitor(targetMenu);
 	fDDRoster.VisitEachPartition(&targetVisitor, &device, &partition);
 }
@@ -775,9 +773,6 @@ bool
 SourceVisitor::Visit(BPartition *partition, int32 level)
 {
 	BPath path;
-	printf("SourceVisitor::Visit(BPartition *) : %s '%s'\n",
-		(partition->GetPath(&path) == B_OK) ? path.Path() : "",
-		partition->ContentName());
 
 	if (partition->ContentType() == NULL)
 		return false;
@@ -834,23 +829,15 @@ TargetVisitor::Visit(BDiskDevice *device)
 bool
 TargetVisitor::Visit(BPartition *partition, int32 level)
 {
-	BPath path;
-	if (partition->GetPath(&path) == B_OK)
-		printf("TargetVisitor::Visit(BPartition *) : %s\n", path.Path());
-	printf("TargetVisitor::Visit(BPartition *) : %s\n",
-		partition->ContentName());
-
 	if (partition->ContentSize() < 20 * 1024 * 1024) {
 		// reject partitions which are too small anyway
 		// TODO: Could depend on the source size
-		printf("  too small\n");
 		return false;
 	}
 
 	if (partition->CountChildren() > 0) {
 		// Looks like an extended partition, or the device itself.
 		// Do not accept this as target...
-		printf("  no leaf partition\n");
 		return false;
 	}
 
@@ -864,9 +851,11 @@ TargetVisitor::Visit(BPartition *partition, int32 level)
 		isBootPartition = strcmp(BOOT_PATH, mountPoint.Path()) == 0;
 	}
 
-	// Only non-boot BFS partitions are valid targets, but we want to display the
-	// other partitions as well, in order not to irritate the user.
+	// Only writable non-boot BFS partitions are valid targets, but we want to
+	// display the other partitions as well, to inform the user that they are
+	// detected but somehow not appropriate.
 	bool isValidTarget = isBootPartition == false
+		&& !partition->IsReadOnly()
 		&& partition->ContentType() != NULL
 		&& strcmp(partition->ContentType(), kPartitionTypeBFS) == 0;
 
