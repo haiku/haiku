@@ -174,7 +174,6 @@ InstallerWindow::InstallerWindow()
 	fStatusView = new BTextView("statusView", be_plain_font, NULL,
 		B_WILL_DRAW);
 	fStatusView->SetViewColor(255, 255, 255, 255);
-	fStatusView->SetInsets(10, 0, 10, 0);
 	fStatusView->MakeEditable(false);
 	fStatusView->MakeSelectable(false);
 
@@ -185,8 +184,9 @@ InstallerWindow::InstallerWindow()
 
 	// Explicitly create group view to set the background white in case
 	// height resizing is needed for the status view
-	fLogoGroup = new BGroupView(B_HORIZONTAL, 0);
+	fLogoGroup = new BGroupView(B_HORIZONTAL, 10);
 	fLogoGroup->SetViewColor(255, 255, 255);
+	fLogoGroup->GroupLayout()->SetInsets(0, 0, 10, 0);
 	fLogoGroup->GroupLayout()->AddView(logoView);
 	fLogoGroup->GroupLayout()->AddView(fStatusView);
 
