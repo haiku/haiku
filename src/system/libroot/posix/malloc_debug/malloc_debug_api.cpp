@@ -302,3 +302,21 @@ posix_memalign(void **pointer, size_t alignment, size_t size)
 
 	return 0;
 }
+
+
+extern "C" size_t
+malloc_usable_size(void *ptr)
+{
+	size_t size;
+	thread_id thread;
+
+	if (ptr == NULL)
+		return 0;
+
+	status_t res = sCurrentHeap->get_allocation_info(ptr, &size, &thread);
+
+	if (res != B_OK)
+		return 0;
+
+	return size;
+}
