@@ -23,6 +23,8 @@ resource(1, "logo.png") #'PNG ' import "../../../data/artwork/HAIKU logo - black
 #else
 resource(1, "logo.png") #'PNG ' import "../../../data/artwork/HAIKU logo - black on white - installer - development.png";
 #endif
+#else
+resource(1, "logo.png") #'PNG ' import "../../../data/artwork/Walter logo.png";
 #endif
 
 resource vector_icon {
