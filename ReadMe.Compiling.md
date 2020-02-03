@@ -91,7 +91,7 @@ git clone ssh://git.haiku-os.org/buildtools
 
 Building Jam
 -------------------------------------------
-(*This step applies only to non-Haiku platforms.*)
+(*This step applies only to non-Haiku platforms. Haiku already ships with the correct version of Jam*)
 
 Change to the `buildtools` folder and run the following commands to
 generate and install `jam`:
@@ -125,7 +125,13 @@ haiku/
 haiku/generated.x86gcc2
 ```
 
-### Configure a GCC 2.95/GCC 7 Hybrid, from a non-Haiku platform
+### Configure an x86_64 (GCC 8) build
+```bash
+cd haiku/generated.x86_64
+../configure --build-cross-tools x86_64 ../../buildtools/
+```
+
+### Configure a 32-bit GCC 2.95/GCC 8 Hybrid, from a non-Haiku platform
 ```bash
 cd haiku/generated.x86gcc2
 ../configure \
@@ -133,14 +139,8 @@ cd haiku/generated.x86gcc2
 	--build-cross-tools x86
 ```
 
-### Configure an x86_64 (GCC 7) build, from a non-Haiku platform
-```
-cd haiku/generated.x86_64
-../configure --build-cross-tools x86_64 ../../buildtools/
-```
-
-### Configure a GCC 2.95/GCC 7 Hybrid, from Haiku
-```
+### Configure a 32-bit GCC 2.95/GCC 8 Hybrid, from Haiku
+```bash
 cd haiku/generated.x86gcc2
 ../configure --target-arch x86_gcc2 --target-arch x86
 ```
