@@ -546,7 +546,6 @@ BSecureSocket::Read(void* buffer, size_t size)
 		return B_ERROR;
 
 	int bytesRead;
-	int error;
 	int retry;
 	do {
 		bytesRead = SSL_read(fPrivate->fSSL, buffer, size);
