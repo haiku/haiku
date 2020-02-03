@@ -224,11 +224,11 @@ BSecureSocket::Private::ErrorCode(int returnValue)
 
 			if (returnValue == -1)
 			{
-				fprintf(stderr, "SSL %s\n", ERR_error_string(error, NULL));
+				fprintf(stderr, "SSL rv -1 %s\n", ERR_error_string(error, NULL));
 				return errno;
 			}
 
-			fprintf(stderr, "SSL %s\n", ERR_error_string(error, NULL));
+			fprintf(stderr, "SSL rv other %s\n", ERR_error_string(error, NULL));
 			return B_ERROR;
 		}
 
@@ -239,7 +239,7 @@ BSecureSocket::Private::ErrorCode(int returnValue)
 		case SSL_ERROR_WANT_X509_LOOKUP:
 		default:
 			// TODO: translate SSL error codes!
-			fprintf(stderr, "SSL %s\n", ERR_error_string(error, NULL));
+			fprintf(stderr, "SSL other %s\n", ERR_error_string(error, NULL));
 			return B_ERROR;
 	}
 }
@@ -545,9 +545,15 @@ BSecureSocket::Read(void* buffer, size_t size)
 	if (!IsConnected())
 		return B_ERROR;
 
-	int bytesRead = SSL_read(fPrivate->fSSL, buffer, size);
-	if (bytesRead >= 0)
-		return bytesRead;
+	int bytesRead;
+	int error;
+	int retry;
+	do {
+		bytesRead = SSL_read(fPrivate->fSSL, buffer, size);
+		if (bytesRead >= 0)
+			return bytesRead;
+		retry = BIO_should_retry(SSL_get_rbio(fPrivate->fSSL));
+	} while(retry != 0);
 
 	return fPrivate->ErrorCode(bytesRead);
 }
