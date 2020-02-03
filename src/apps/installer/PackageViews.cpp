@@ -17,6 +17,8 @@
 #include <LayoutUtils.h>
 #include <Locale.h>
 #include <Messenger.h>
+#include <package/PackageInfo.h>
+#include <Path.h>
 #include <ScrollBar.h>
 #include <String.h>
 #include <View.h>
@@ -51,58 +53,63 @@ Package::~Package()
 Package *
 Package::PackageFromEntry(BEntry &entry)
 {
-	char folder[B_FILE_NAME_LENGTH];
-	entry.GetName(folder);
-	BDirectory directory(&entry);
-	if (directory.InitCheck() != B_OK)
+	BPath path;
+	entry.GetPath(&path);
+
+	BPackageKit::BPackageInfo info;
+	info.ReadFromPackageFile(path.Path());
+
+	if (info.InitCheck() != B_OK)
 		return NULL;
-	Package *package = new Package(folder);
-	bool alwaysOn;
-	bool onByDefault;
-	int32 size;
+
+	Package *package = new Package(path.Path());
+	package->fName = info.Name();
+	package->fDescription = info.Summary();
+
+	bool alwaysOn = false;
+	bool onByDefault = true;
+	off_t size = 0;
+	entry.GetSize(&size);
 	char group[64];
 	memset(group, 0, 64);
-	if (directory.ReadAttr("INSTALLER PACKAGE: NAME", B_STRING_TYPE, 0,
-		package->fName, 64) < 0) {
-		goto err;
-	}
-	if (directory.ReadAttr("INSTALLER PACKAGE: GROUP", B_STRING_TYPE, 0,
+
+	BNode node(&entry);
+	// FIXME enable these when the attributes on the packages are actually
+	// populated by the buildsystem. For now, assume everything is
+	// on-by-default and optional, and have no groups.
+#if 0
+	if (node.ReadAttr("INSTALLER PACKAGE: GROUP", B_STRING_TYPE, 0,
 		group, 64) < 0) {
 		goto err;
 	}
-	if (directory.ReadAttr("INSTALLER PACKAGE: DESCRIPTION", B_STRING_TYPE, 0,
-		package->fDescription, 64) < 0) {
-		goto err;
-	}
-	if (directory.ReadAttr("INSTALLER PACKAGE: ON_BY_DEFAULT", B_BOOL_TYPE, 0,
+	if (node.ReadAttr("INSTALLER PACKAGE: ON_BY_DEFAULT", B_BOOL_TYPE, 0,
 		&onByDefault, sizeof(onByDefault)) < 0) {
 		goto err;
 	}
-	if (directory.ReadAttr("INSTALLER PACKAGE: ALWAYS_ON", B_BOOL_TYPE, 0,
+	if (node.ReadAttr("INSTALLER PACKAGE: ALWAYS_ON", B_BOOL_TYPE, 0,
 		&alwaysOn, sizeof(alwaysOn)) < 0) {
 		goto err;
 	}
-	if (directory.ReadAttr("INSTALLER PACKAGE: SIZE", B_INT32_TYPE, 0,
-		&size, sizeof(size)) < 0) {
-		goto err;
-	}
+#endif
 	package->SetGroupName(group);
 	package->SetSize(size);
 	package->SetAlwaysOn(alwaysOn);
 	package->SetOnByDefault(onByDefault);
 
-	attr_info info;
-	if (directory.GetAttrInfo(ICON_ATTRIBUTE, &info) == B_OK) {
-		char buffer[info.size];
+	attr_info attributes;
+	if (node.GetAttrInfo(ICON_ATTRIBUTE, &attributes) == B_OK) {
+		char buffer[attributes.size];
 		BMessage msg;
-		if ((directory.ReadAttr(ICON_ATTRIBUTE, info.type, 0, buffer,
-				info.size) == info.size)
+		if ((node.ReadAttr(ICON_ATTRIBUTE, attributes.type, 0, buffer,
+				attributes.size) == attributes.size)
 			&& (msg.Unflatten(buffer) == B_OK)) {
 			package->SetIcon(new BBitmap(&msg));
 		}
 	}
 	return package;
+#if 0
 err:
+#endif
 	delete package;
 	return NULL;
 }

@@ -22,7 +22,7 @@ Application Installer :
 	Utility.cpp
 
 	: be tracker translation shared [ TargetLibstdc++ ]
-		localestub
+		localestub package
 	: Installer.rdef
 ;
 
