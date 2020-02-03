@@ -179,7 +179,7 @@ InstallerWindow::InstallerWindow()
 
 	BSize logoSize = logoView->MinSize();
 	logoView->SetExplicitMaxSize(logoSize);
-	fStatusView->SetExplicitMinSize(BSize(fStatusView->StringWidth("W") * 30,
+	fStatusView->SetExplicitMinSize(BSize(fStatusView->StringWidth("W") * 22,
 		logoSize.height));
 
 	// Explicitly create group view to set the background white in case
@@ -187,8 +187,8 @@ InstallerWindow::InstallerWindow()
 	fLogoGroup = new BGroupView(B_HORIZONTAL, 10);
 	fLogoGroup->SetViewColor(255, 255, 255);
 	fLogoGroup->GroupLayout()->SetInsets(0, 0, 10, 0);
-	fLogoGroup->GroupLayout()->AddView(logoView);
-	fLogoGroup->GroupLayout()->AddView(fStatusView);
+	fLogoGroup->AddChild(logoView);
+	fLogoGroup->AddChild(fStatusView);
 
 	fDestMenu = new BPopUpMenu(B_TRANSLATE("scanning" B_UTF8_ELLIPSIS),
 		true, false);
@@ -220,9 +220,8 @@ InstallerWindow::InstallerWindow()
 		= B_TRANSLATE("Additional disk space required: 0.0 KiB");
 	fSizeView = new BStringView("size_view", requiredDiskSpaceString);
 	fSizeView->SetAlignment(B_ALIGN_RIGHT);
-	fSizeView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 	fSizeView->SetExplicitAlignment(
-		BAlignment(B_ALIGN_RIGHT, B_ALIGN_MIDDLE));
+		BAlignment(B_ALIGN_RIGHT, B_ALIGN_TOP));
 
 	fProgressBar = new BStatusBar("progress",
 		B_TRANSLATE("Install progress:  "));
@@ -250,6 +249,12 @@ InstallerWindow::InstallerWindow()
 	toolsMenu->AddItem(fMakeBootableItem);
 	mainMenu->AddItem(toolsMenu);
 
+	BGroupView* packagesGroup = new BGroupView(B_VERTICAL, B_USE_ITEM_SPACING);
+	packagesGroup->AddChild(fPackagesSwitch);
+	packagesGroup->AddChild(packagesScrollView);
+	packagesGroup->AddChild(fProgressBar);
+	packagesGroup->AddChild(fSizeView);
+
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.Add(mainMenu)
 		.Add(fLogoGroup)
@@ -257,23 +262,19 @@ InstallerWindow::InstallerWindow()
 		.AddGroup(B_VERTICAL, B_USE_ITEM_SPACING)
 			.SetInsets(B_USE_WINDOW_SPACING)
 			.AddGrid(new BGridView(B_USE_ITEM_SPACING, B_USE_ITEM_SPACING))
-				.Add(fSrcMenuField->CreateLabelLayoutItem(), 0, 0)
-				.Add(fSrcMenuField->CreateMenuBarLayoutItem(), 1, 0)
-				.Add(fDestMenuField->CreateLabelLayoutItem(), 0, 1)
-				.Add(fDestMenuField->CreateMenuBarLayoutItem(), 1, 1)
-
-				.Add(BSpaceLayoutItem::CreateVerticalStrut(5), 0, 2, 2)
-
-				.Add(fPackagesSwitch, 0, 3, 2)
-				.Add(packagesScrollView, 0, 4, 2)
-				.Add(fProgressBar, 0, 5, 2)
-				.Add(fSizeView, 0, 6, 2)
+				.AddMenuField(fSrcMenuField, 0, 0)
+				.AddMenuField(fDestMenuField, 0, 1)
+				.AddGlue(2, 0, 1, 2)
+				.Add(BSpaceLayoutItem::CreateVerticalStrut(5), 0, 2, 3)
 			.End()
-
+			.Add(packagesGroup)
 			.AddGroup(B_HORIZONTAL, B_USE_WINDOW_SPACING)
 				.Add(fLaunchDriveSetupButton)
 				.AddGlue()
-				.Add(fBeginButton);
+				.Add(fBeginButton)
+			.End()
+		.End()
+	.End();
 
 	// Make the optional packages and progress bar invisible on start
 	fPackagesLayoutItem = layout_item_for(packagesScrollView);
@@ -436,6 +437,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			snprintf(string, sizeof(string),
 				B_TRANSLATE("Additional disk space required: %s"), buffer);
 			fSizeView->SetText(string);
+			fSizeView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 			break;
 		}
 		case ENCOURAGE_DRIVESETUP:
@@ -450,10 +452,6 @@ InstallerWindow::MessageReceived(BMessage *msg)
 		}
 		case MSG_STATUS_MESSAGE:
 		{
-// TODO: Was this supposed to prevent status messages still arriving
-// after the copy engine was shut down?
-//			if (fInstallStatus != kInstalling)
-//				break;
 			float progress;
 			if (msg->FindFloat("progress", &progress) == B_OK) {
 				const char* currentItem;
@@ -875,7 +873,9 @@ void
 InstallerWindow::_SetStatusMessage(const char *text)
 {
 	fStatusView->SetText(text);
-	fLogoGroup->GroupLayout()->InvalidateLayout();
+	fStatusView->InvalidateLayout();
+		// In case the status message makes the text view higher than the
+		// logo, then we need to resize te whole window to fit it.
 }
 
 

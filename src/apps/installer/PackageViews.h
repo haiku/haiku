@@ -79,7 +79,7 @@ private:
 
 class PackageCheckBox : public BCheckBox {
 public:
-								PackageCheckBox(BRect rect, Package* item);
+								PackageCheckBox(Package* item);
 	virtual						~PackageCheckBox();
 
 	virtual	void				Draw(BRect updateRect);
@@ -95,7 +95,7 @@ private:
 
 class GroupView : public BStringView {
 public:
-								GroupView(BRect rect, Group* group);
+								GroupView(Group* group);
 	virtual						~GroupView();
 
 private:
@@ -105,7 +105,6 @@ private:
 
 class PackagesView : public BView {
 public:
-								PackagesView(BRect rect, const char* name);
 								PackagesView(const char* name);
 	virtual						~PackagesView();
 
@@ -115,13 +114,7 @@ public:
 									size_t stringSize);
 			void				GetPackagesToInstall(BList* list, int32* size);
 
-	virtual	void				FrameResized(float width, float height);
 	virtual	void				Draw(BRect updateRect);
-	virtual	void				GetPreferredSize(float* _width, float* _height);
-	virtual	BSize				MaxSize();
-
-private:
-			BList				fViews;
 };
 
 #endif	// __PACKAGEVIEWS_H__
