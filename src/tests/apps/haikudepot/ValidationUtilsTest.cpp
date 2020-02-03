@@ -153,10 +153,6 @@ ValidationUtilsTest::AddTests(BTestSuite& parent)
 
 	suite.addTest(
 		new CppUnit::TestCaller<ValidationUtilsTest>(
-			"ValidationUtilsTest::TestEmailInvalid",
-			&ValidationUtilsTest::TestEmailInvalid));
-	suite.addTest(
-		new CppUnit::TestCaller<ValidationUtilsTest>(
 			"ValidationUtilsTest::TestEmailValid",
 			&ValidationUtilsTest::TestEmailValid));
 	suite.addTest(
