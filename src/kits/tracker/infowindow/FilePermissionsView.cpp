@@ -35,11 +35,13 @@ All rights reserved.
 
 #include "FilePermissionsView.h"
 
+#include <algorithm>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <Beep.h>
 #include <Catalog.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 
 
@@ -55,17 +57,50 @@ const uint32 kNewGroupEntered = 'nwgr';
 class RotatedStringView: public BStringView
 {
 public:
-	RotatedStringView(BRect r, const char* name, const char* label)
-		: BStringView(r, name, label)
+	RotatedStringView(const char* name, const char* label)
+		: BStringView(name, label)
 	{
+		BFont currentFont;
+		GetFont(&currentFont);
+
+		currentFont.SetRotation(57);
+		SetFont(&currentFont);
+
+		// Get the dimension of the bounding box of the string, taking care
+		// of the orientation
+		const char* stringArray[1];
+		stringArray[0] = label;
+		BRect rectArray[1];
+		escapement_delta delta = { 0.0, 0.0 };
+		currentFont.GetBoundingBoxesForStrings(stringArray, 1, B_SCREEN_METRIC,
+			&delta,	rectArray);
+
+		// Adjust the size to avoid partial drawing of first and last chars
+		// due to the orientation
+		fExplicitSize = BSize(rectArray[0].Width(), rectArray[0].Height()
+			+ currentFont.Size() / 2);
+
+		SetExplicitSize(fExplicitSize);
 	}
 
 	void Draw(BRect invalidate)
 	{
-		RotateBy(-M_PI / 5);
-		TranslateBy(0, Bounds().Height() / 3);
+		BFont currentFont;
+		GetFont(&currentFont);
+
+		// Small adjustment to draw in the calculated area
+		TranslateBy(currentFont.Size() / 1.9 + 1, 0);
+
 		BStringView::Draw(invalidate);
 	}
+
+	BSize ExplicitSize()
+	{
+		return fExplicitSize;
+	}
+
+private:
+	BSize fExplicitSize;
 };
 
 
@@ -79,145 +114,103 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model* model)
 {
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
-	// Constants for the column labels: "User", "Group" and "Other".
-	const float kColumnLabelMiddle = 77, kColumnLabelTop = 0,
-		kColumnLabelSpacing = 37, kColumnLabelBottom = 39,
-		kColumnLabelWidth = 80, kAttribFontHeight = 10;
-
-	BStringView* strView;
-
-	strView = new RotatedStringView(
-		BRect(kColumnLabelMiddle - kColumnLabelWidth / 2,
-			kColumnLabelTop,
-			kColumnLabelMiddle + kColumnLabelWidth / 2,
-			kColumnLabelBottom),
-		"", B_TRANSLATE("Owner"));
-	AddChild(strView);
-	strView->SetFontSize(kAttribFontHeight);
-
-	strView = new RotatedStringView(
-		BRect(kColumnLabelMiddle - kColumnLabelWidth / 2
-				+ kColumnLabelSpacing,
-			kColumnLabelTop,
-			kColumnLabelMiddle + kColumnLabelWidth / 2 + kColumnLabelSpacing,
-			kColumnLabelBottom),
-		"", B_TRANSLATE("Group"));
-	AddChild(strView);
-	strView->SetFontSize(kAttribFontHeight);
-
-	strView = new RotatedStringView(
-		BRect(kColumnLabelMiddle - kColumnLabelWidth / 2
-				+ 2 * kColumnLabelSpacing,
-			kColumnLabelTop,
-			kColumnLabelMiddle + kColumnLabelWidth / 2
-				+ 2 * kColumnLabelSpacing,
-			kColumnLabelBottom),
-		"", B_TRANSLATE("Other"));
-	AddChild(strView);
-	strView->SetFontSize(kAttribFontHeight);
-
-	// Constants for the row labels: "Read", "Write" and "Execute".
-	const float kRowLabelLeft = 10, kRowLabelTop = kColumnLabelBottom + 5,
-		kRowLabelVerticalSpacing = 18, kRowLabelRight = kColumnLabelMiddle
-		- kColumnLabelSpacing / 2 - 5, kRowLabelHeight = 14;
-
-	strView = new BStringView(BRect(kRowLabelLeft, kRowLabelTop,
-			kRowLabelRight, kRowLabelTop + kRowLabelHeight),
-		"", B_TRANSLATE("Read"));
-	AddChild(strView);
-	strView->SetAlignment(B_ALIGN_RIGHT);
-	strView->SetFontSize(kAttribFontHeight);
-
-	strView = new BStringView(BRect(kRowLabelLeft, kRowLabelTop
-			+ kRowLabelVerticalSpacing, kRowLabelRight, kRowLabelTop
-			+ kRowLabelVerticalSpacing + kRowLabelHeight),
-		"", B_TRANSLATE("Write"));
-	AddChild(strView);
-	strView->SetAlignment(B_ALIGN_RIGHT);
-	strView->SetFontSize(kAttribFontHeight);
-
-	strView = new BStringView(BRect(kRowLabelLeft, kRowLabelTop
-			+ 2 * kRowLabelVerticalSpacing, kRowLabelRight, kRowLabelTop
-			+ 2 * kRowLabelVerticalSpacing + kRowLabelHeight),
-		"", B_TRANSLATE("Execute"));
-	AddChild(strView);
-	strView->SetAlignment(B_ALIGN_RIGHT);
-	strView->SetFontSize(kAttribFontHeight);
-
-	// Constants for the 3x3 check box array.
-	const float kLeftMargin = kRowLabelRight + 5,
-		kTopMargin = kRowLabelTop - 2,
-		kHorizontalSpacing = kColumnLabelSpacing,
-		kVerticalSpacing = kRowLabelVerticalSpacing,
-		kCheckBoxWidth = 18, kCheckBoxHeight = 18;
-
-	BCheckBox** checkBoxArray[3][3] = {
-		{
-			&fReadUserCheckBox,
-			&fReadGroupCheckBox,
-			&fReadOtherCheckBox
-		},
-		{
-			&fWriteUserCheckBox,
-			&fWriteGroupCheckBox,
-			&fWriteOtherCheckBox
-		},
-		{
-			&fExecuteUserCheckBox,
-			&fExecuteGroupCheckBox,
-			&fExecuteOtherCheckBox
-		}
-	};
-
-	for (int32 x = 0; x < 3; x++) {
-		for (int32 y = 0; y < 3; y++) {
-			*checkBoxArray[y][x] =
-				new BCheckBox(BRect(kLeftMargin + kHorizontalSpacing * x,
-						kTopMargin + kVerticalSpacing * y,
-						kLeftMargin + kHorizontalSpacing * x + kCheckBoxWidth,
-						kTopMargin + kVerticalSpacing * y + kCheckBoxHeight),
-					"", "", new BMessage(kPermissionsChanged));
-			AddChild(*checkBoxArray[y][x]);
-		}
-	}
-
-	const float kTextControlLeft = 170, kTextControlRight = 270,
-		kTextControlTop = kRowLabelTop - 29,
-		kTextControlHeight = 14, kTextControlSpacing = 16;
-
-	strView = new BStringView(BRect(kTextControlLeft, kTextControlTop,
-		kTextControlRight, kTextControlTop + kTextControlHeight), "",
+	RotatedStringView* ownerRightLabel = new RotatedStringView("",
 		B_TRANSLATE("Owner"));
-	strView->SetAlignment(B_ALIGN_CENTER);
-	strView->SetFontSize(kAttribFontHeight);
-	AddChild(strView);
+	RotatedStringView* groupRightLabel = new RotatedStringView("",
+		B_TRANSLATE("Group"));
+	RotatedStringView* otherRightLabel = new RotatedStringView("",
+		B_TRANSLATE("Other"));
 
-	fOwnerTextControl = new BTextControl(
-		BRect(kTextControlLeft,
-			kTextControlTop - 2 + kTextControlSpacing,
-			kTextControlRight,
-			kTextControlTop + kTextControlHeight - 2 + kTextControlSpacing),
-		"", "", "", new BMessage(kNewOwnerEntered));
-	fOwnerTextControl->SetDivider(0);
-	AddChild(fOwnerTextControl);
+	// Get the largest inclined area of the three
+	BSize ownerRightLabelSize, groupRightLabelSize, otherRightLabelSize,
+		maxSize;
 
-	strView = new BStringView(BRect(kTextControlLeft,
-			kTextControlTop + 11 + 2 * kTextControlSpacing,
-			kTextControlRight,
-			kTextControlTop + 11 + 2 * kTextControlSpacing
-				+ kTextControlHeight),
-		"", B_TRANSLATE("Group"));
-	strView->SetAlignment(B_ALIGN_CENTER);
-	strView->SetFontSize(kAttribFontHeight);
-	AddChild(strView);
+	ownerRightLabelSize = ownerRightLabel->ExplicitSize();
+	groupRightLabelSize = groupRightLabel->ExplicitSize();
 
-	fGroupTextControl = new BTextControl(BRect(kTextControlLeft,
-			kTextControlTop + 10 + 3 * kTextControlSpacing,
-			kTextControlRight,
-			kTextControlTop + 10 + 3 * kTextControlSpacing + kTextControlHeight),
-		"", "", "", new BMessage(kNewGroupEntered));
-	fGroupTextControl->SetDivider(0);
-	AddChild(fGroupTextControl);
+	maxSize.width = std::max(ownerRightLabelSize.width,
+		groupRightLabelSize.width);
+	maxSize.width = std::max(maxSize.width,
+		otherRightLabel->ExplicitSize().width);
+
+	maxSize.height = std::max(ownerRightLabel->ExplicitSize().height,
+		groupRightLabel->ExplicitSize().height);
+	maxSize.height = std::max(maxSize.height,
+		otherRightLabel->ExplicitSize().height);
+
+
+	// Set all the component with this size
+	ownerRightLabel->SetExplicitSize(maxSize);
+	groupRightLabel->SetExplicitSize(maxSize);
+	otherRightLabel->SetExplicitSize(maxSize);
+
+	BStringView* readLabel = new BStringView("", B_TRANSLATE("Read"));
+	readLabel->SetAlignment(B_ALIGN_RIGHT);
+
+	BStringView* writeLabel = new BStringView("", B_TRANSLATE("Write"));
+	writeLabel->SetAlignment(B_ALIGN_RIGHT);
+
+	BStringView* executeLabel = new BStringView("", B_TRANSLATE("Execute"));
+	executeLabel->SetAlignment(B_ALIGN_RIGHT);
+
+	// Creating checkbox
+	fReadUserCheckBox = new BCheckBox("", "",
+		new BMessage(kPermissionsChanged));
+	fReadGroupCheckBox = new BCheckBox("", "",
+		new BMessage(kPermissionsChanged));
+	fReadOtherCheckBox = new BCheckBox("", "",
+		new BMessage(kPermissionsChanged));
+
+	fWriteUserCheckBox = new BCheckBox("", "",
+		new BMessage(kPermissionsChanged));
+	fWriteGroupCheckBox = new BCheckBox("", "",
+		new BMessage(kPermissionsChanged));
+	fWriteOtherCheckBox = new BCheckBox("", "",
+		new BMessage(kPermissionsChanged));
+
+	fExecuteUserCheckBox = new BCheckBox("", "",
+		new BMessage(kPermissionsChanged));
+	fExecuteGroupCheckBox = new BCheckBox("", "",
+		new BMessage(kPermissionsChanged));
+	fExecuteOtherCheckBox = new BCheckBox("", "",
+		new BMessage(kPermissionsChanged));
+
+	fOwnerTextControl = new BTextControl("", B_TRANSLATE("Owner"), "",
+		new BMessage(kNewOwnerEntered));
+	fGroupTextControl = new BTextControl("", B_TRANSLATE("Group"), "",
+		new BMessage(kNewGroupEntered));
+
+	BGroupLayout* groupLayout = new BGroupLayout(B_HORIZONTAL);
+
+	SetLayout(groupLayout);
+
+	BLayoutBuilder::Group<>(groupLayout)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.AddGrid(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
+			.Add(ownerRightLabel, 1, 0)
+			.Add(groupRightLabel, 2, 0)
+			.Add(otherRightLabel, 3, 0)
+			.Add(readLabel, 0, 1)
+			.Add(writeLabel, 0, 2)
+			.Add(executeLabel, 0, 3)
+			.Add(fReadUserCheckBox, 1, 1)
+			.Add(fReadGroupCheckBox, 1, 2)
+			.Add(fReadOtherCheckBox, 1, 3)
+			.Add(fWriteUserCheckBox, 2, 1)
+			.Add(fWriteGroupCheckBox, 2, 2)
+			.Add(fWriteOtherCheckBox, 2, 3)
+			.Add(fExecuteUserCheckBox, 3, 1)
+			.Add(fExecuteGroupCheckBox, 3, 2)
+			.Add(fExecuteOtherCheckBox, 3, 3)
+			.AddGlue(0, 4)
+		.End()
+		.AddGrid(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
+			.AddGlue(0, 0)
+			.AddTextControl(fOwnerTextControl, 0, 1)
+			.AddTextControl(fGroupTextControl, 0, 2)
+			.AddGlue(0, 3)
+		.End()
+		.AddGlue();
 
 	ModelChanged(model);
 }
