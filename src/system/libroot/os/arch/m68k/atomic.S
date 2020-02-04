@@ -209,3 +209,26 @@ FUNCTION(atomic_get64):
 		movem.l	(%a7)+,%d2-%d3/%a2
 		rts
 FUNCTION_END(atomic_get64)
+.text
+
+#warning IMPLEMENT GCC 64-bit ATOMICS ON m68k!
+
+/* These are to fill in 64-bit atomic calls emitted by
+ * by GCC when 64-bit atomics are unavailable.
+ */
+
+FUNCTION(__atomic_fetch_add_8):
+		nop
+		rts
+FUNCTION_END(__atomic_fetch_add_8)
+
+FUNCTION(__atomic_store_8):
+		nop
+		rts
+FUNCTION_END(__atomic_store_8)
+
+FUNCTION(__atomic_load_8):
+		nop
+		rts
+FUNCTION_END(__atomic_load_8)
+
