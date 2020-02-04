@@ -58,7 +58,7 @@ for platform in [ MultiBootSubDirSetup atari_m68k ] {
 			#dump_edid.c
 
 			: #-Wa,--pcrel
-			: boot_platform_generic.a
+			: boot_platform_generic_atari_m68k.a
 		;
 
 
