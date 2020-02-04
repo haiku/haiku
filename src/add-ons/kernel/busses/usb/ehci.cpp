@@ -2221,11 +2221,16 @@ EHCI::LinkInterruptQueueHead(ehci_qh *queueHead, Pipe *pipe)
 		queueHead->endpoint_caps |= (0xff << EHCI_QH_CAPS_ISM_SHIFT);
 	} else {
 		// As we do not yet support FSTNs to correctly reference low/full
-		// speed interrupt transfers, we simply put them into the 1 interval
+		// speed interrupt transfers, we simply put them into the 1 or 8 interval
 		// queue. This way we ensure that we reach them on every micro frame
 		// and can do the corresponding start/complete split transactions.
 		// ToDo: use FSTNs to correctly link non high speed interrupt transfers
-		interval = 1;
+		if (pipe->Speed() == USB_SPEED_LOWSPEED) {
+			// Low speed devices can't be polled faster than 8ms, so just use
+			// that.
+			interval = 4;
+		} else
+			interval = 1;
 
 		// For now we also force start splits to be in micro frame 0 and
 		// complete splits to be in micro frame 2, 3 and 4.
