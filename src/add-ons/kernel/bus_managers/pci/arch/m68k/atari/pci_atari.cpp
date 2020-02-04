@@ -39,6 +39,8 @@
 #define DLL 1
 // default latency
 #define DL 0
+// default header_type
+#define DH PCI_header_type_generic
 // default bist
 #define DB 0
 
@@ -53,12 +55,12 @@ struct fake_pci_device {
 };
 
 static struct fake_pci_device gFakePCIDevices[] = {
-{ {FAKEV, 0x0000, BN, 0, 0, 0, 0xff, PCI_host, PCI_bridge, DLL, DL, DB, 0, PEI }}, /* cpu */
-{ {FAKEV, 0x0001, BN, 1, 0, 0, 0xff, 0x68/*fake*/, PCI_processor, DLL, DL, DB, 0, PEI }}, /* cpu */
-{ {FAKEV, 0x0002, BN, 2, 0, 0, 0xff, PCI_display_other, PCI_display, DLL, DL, DB, 0, 0xFFFF8200, PEI }}, /* gfx */
-{ {FAKEV, 0x0003, BN, 3, 0, 0, 0xff, PCI_ide, PCI_mass_storage, DLL, DL, DB, 0, 0xFFF00000, PEI }}, /* ide */
-{ {FAKEV, 0x0004, BN, 4, 0, 0, 0xff, PCI_scsi, PCI_mass_storage, DLL, DL, DB, 0, PEI }}, /* scsi */
-{ {FAKEV, 0x0005, BN, 5, 0, 0, 0xff, 0x0/*CHANGEME*/, PCI_multimedia, DLL, DL, DB, 0x00, 0, 0xFFFF8900, PEI }}, /* snd */
+{ {FAKEV, 0x0000, BN, 0, 0, 0, 0xff, PCI_host, PCI_bridge, DLL, DL, DH, DB, 0, PEI }}, /* cpu */
+{ {FAKEV, 0x0001, BN, 1, 0, 0, 0xff, 0x68/*fake*/, PCI_processor, DLL, DL, DH, DB, 0, PEI }}, /* cpu */
+{ {FAKEV, 0x0002, BN, 2, 0, 0, 0xff, PCI_display_other, PCI_display, DLL, DL, DH, DB, 0, /*0xFFFF8200,*/ PEI }}, /* gfx */
+{ {FAKEV, 0x0003, BN, 3, 0, 0, 0xff, PCI_ide, PCI_mass_storage, DLL, DL, DH, DB, 0, /*0xFFF00000,*/ PEI }}, /* ide */
+{ {FAKEV, 0x0004, BN, 4, 0, 0, 0xff, PCI_scsi, PCI_mass_storage, DLL, DL, DH, DB, 0, PEI }}, /* scsi */
+{ {FAKEV, 0x0005, BN, 5, 0, 0, 0xff, 0x0/*CHANGEME*/, PCI_multimedia, DLL, DL, DH, DB, /*0x00,*/ 0, /*0xFFFF8900,*/ PEI }}, /* snd */
 //UART ?
 //centronics?
 { {INVV, INVD} }

@@ -47,7 +47,7 @@
 #define ALIGN_BYTES		(sizeof(unsigned long) - 1)
 #define ALIGN(x)		((((unsigned long)x) + ALIGN_BYTES) & ~ALIGN_BYTES)
 
-#if defined(__x86_64__) || defined(__i386__)
+#if defined(__x86_64__) || defined(__i386__) || defined(__M68K__)
 #define	ALIGNED_POINTER(p, t)	1
 #elif defined(__powerpc__)
 #define	ALIGNED_POINTER(p, t)	((((uintptr_t)(p)) & (sizeof (t) - 1)) == 0)
@@ -67,6 +67,8 @@
 #define CACHE_LINE_SIZE 64
 #elif defined(__powerpc__)
 #define CACHE_LINE_SIZE 128
+#elif defined(__M68K__)
+#define CACHE_LINE_SIZE 16
 #else
 #error Need definition of CACHE_LINE_SIZE for this arch!
 #endif
