@@ -23,6 +23,7 @@ for architectureObject in [ MultiArchSubDirSetup m68k ] {
 			time.c
 			tls.c
 
+			generic_stack_trace.cpp
 			generic_system_time_nsecs.cpp
 			;
 	}
