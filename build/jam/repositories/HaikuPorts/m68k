@@ -1,30 +1,60 @@
 RemotePackageRepository HaikuPorts
 	: m68k
-	: http://packages.haiku-os.org/haikuports/master/repo/m68k
+	: https://eu.hpkg.haiku-os.org/haikuports/master/build-packages
 	:
 	# architecture "any" packages
-	be_book-2008_10_26-1
-	ca_root_certificates-2015_02_25-1
-	dejavu-2.34-1
-	texi2html-1.82-2
-	timgmsoundfont-2004_01_24-4
-	vl_gothic-20141206-1
-	wqy_microhei-0.2.0~beta-3
+	be_book-2008_10_26-3
+	ca_root_certificates-2020_01_01-1
+	gnu_efi_kernel-3.0.9-1
+	haikuporter-1.2.3-2
+	noto-20170920-4
+	timgmsoundfont-fixed-5
+	wqy_microhei-0.2.0~beta-4
 	:
 	# repository architecture packages
 	# primary architecture (m68k)
-
+	bash-4.4.023-1
+	binutils-2.28.1_2017_08_05-1
+	bison-3.0.5-1
+	coreutils-8.22-1
+	curl-7.40.0-1
+	curl_devel-7.40.0-1
+	expat-2.1.0-1
+	expat_devel-2.1.0-1
+	findutils-4.6.0-1
+	flex-2.5.35-1
+	freetype-2.6.3-1
+	freetype_devel-2.6.3-1
+	gawk-3.1.8-2
+	gcc-8.3.0_2019_05_24-3
+	gcc_syslibs_devel-8.3.0_2019_05_24-3
+	gcc_syslibs-8.3.0_2019_05_24-3
+	icu-57.1-2
+	icu_devel-57.1-2
+	less-451-1
+	libsolv-0.3.0_haiku_2014_12_22-1
+	libsolv_devel-0.3.0_haiku_2014_12_22-1
+	m4-1.4.16-1
+	make-4.1-2
+	ncurses6-6.0-1
+	ncurses6_devel-6.0-1
+	python-2.7.6-1
+	sed-4.2.1-1
+	texinfo-4.13a-1
+	zlib-1.2.11-1
+	zlib_devel-1.2.11-1
 	:
-
 	# source packages
 	apr
 	autoconf
 	automake
+	bash
 #	bepdf
 	binutils
 	bison
 	bzip2
 	cdrtools
+	coreutils
 	cmake
 	ctags
 	curl
@@ -32,8 +62,10 @@ RemotePackageRepository HaikuPorts
 	doxygen
 	expat
 #	ffmpeg
+	findutils
 	flex
 	freetype
+	gawk
 	gcc
 	gettext
 	git
@@ -47,6 +79,7 @@ RemotePackageRepository HaikuPorts
 	jam
 	jpeg
 	keymapswitcher
+	less
 	libedit
 	libiconv
 #	libogg
@@ -65,7 +98,7 @@ RemotePackageRepository HaikuPorts
 	mesa
 	mkdepend
 	nano
-	ncurses
+	ncurses6
 	neon
 	openssh
 	openssl
