@@ -1,56 +1,63 @@
 /*
  * Copyright 2014, Henry Harrington, henry.harrington@gmail.com.
+ * Copyright 2019-2020, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-
 #ifndef MMU_H
 #define MMU_H
 
-#include <arch/x86/descriptors.h>
-
-#undef BOOT_GDT_SEGMENT_COUNT
-#define BOOT_GDT_SEGMENT_COUNT	(USER_DATA_SEGMENT + 1)
 
 #ifndef _ASSEMBLER
+
 
 #include "efi_platform.h"
 
 #include <util/FixedWidthPointer.h>
 
 
-extern segment_descriptor gBootGDT[BOOT_GDT_SEGMENT_COUNT];
-
-static const uint32 kDefaultPageFlags = 0x3;
-	// present, R/W
-static const uint64 kTableMappingFlags = 0x7;
-	// present, R/W, user
-static const uint64 kLargePageMappingFlags = 0x183;
-	// present, R/W, user, global, large
-static const uint64 kPageMappingFlags = 0x103;
-	// present, R/W, user, global
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern addr_t mmu_map_physical_memory(addr_t physicalAddress,
-	size_t size, uint32 flags);
+static const uint32 kDefaultPageFlags = 0x3;
+    // present, R/W
+static const uint64 kTableMappingFlags = 0x7;
+    // present, R/W, user
+static const uint64 kLargePageMappingFlags = 0x183;
+    // present, R/W, user, global, large
+static const uint64 kPageMappingFlags = 0x103;
+    // present, R/W, user, global
+
+
+extern addr_t get_next_virtual_address(size_t size);
+extern addr_t get_current_virtual_address();
+
+extern void mmu_init();
+
+extern uint64_t mmu_allocate_page();
+
+extern addr_t mmu_map_physical_memory(addr_t physicalAddress, size_t size,
+	uint32 flags);
+
 extern void mmu_free(void *virtualAddress, size_t size);
-
-extern void mmu_post_efi_setup(size_t memory_map_size,
-	efi_memory_descriptor *memory_map, size_t descriptor_size,
-	uint32_t descriptor_version);
-
-extern uint64_t mmu_generate_post_efi_page_tables(size_t memory_map_size,
-	efi_memory_descriptor *memory_map, size_t descriptor_size,
-	uint32_t descriptor_version);
 
 extern status_t platform_kernel_address_to_bootloader_address(uint64_t address,
 	void **_result);
 
 extern status_t platform_bootloader_address_to_kernel_address(void *address,
 	uint64_t *_result);
+
+// Architecture dependant
+
+extern void arch_mmu_post_efi_setup(size_t memory_map_size,
+    efi_memory_descriptor *memory_map, size_t descriptor_size,
+    uint32_t descriptor_version);
+
+extern uint64_t arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
+    efi_memory_descriptor *memory_map, size_t descriptor_size,
+    uint32_t descriptor_version);
+
+void arch_mmu_init();
 
 #ifdef __cplusplus
 }

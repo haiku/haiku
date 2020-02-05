@@ -16,8 +16,8 @@
 .code64
 
 
-/*!	void efi_enter_kernel(uint64 pml4, uint64 entry_point, uint64 stackTop); */
-FUNCTION(efi_enter_kernel):
+/*!	void arch_enter_kernel(uint64 pml4, uint64 entry_point, uint64 stackTop); */
+FUNCTION(arch_enter_kernel):
 	// Point CR3 to the kernel's PML4.
 	movq	%rdi, %cr3
 

@@ -29,8 +29,6 @@ local platform_src =
 	quirks.cpp
 	smp.cpp
 	serial.cpp
-	smp_trampoline.S
-	support.S
 	;
 
 local platform ;

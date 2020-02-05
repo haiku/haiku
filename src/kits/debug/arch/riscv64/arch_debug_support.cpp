@@ -20,6 +20,8 @@ status_t
 arch_debug_get_instruction_pointer(debug_context *context, thread_id thread,
 	void **ip, void **stackFrameAddress)
 {
+	#warning TODO RISCV64 get instruction pointer
+	#if 0
 	// get the CPU state
 	debug_cpu_state cpuState;
 	status_t error = debug_get_cpu_state(context, thread, NULL, &cpuState);
@@ -28,6 +30,7 @@ arch_debug_get_instruction_pointer(debug_context *context, thread_id thread,
 
 	*ip = (void*)cpuState.rip;
 	*stackFrameAddress = (void*)cpuState.rbp;
+	#endif
 
 	return B_OK;
 }
@@ -37,6 +40,8 @@ status_t
 arch_debug_get_stack_frame(debug_context *context, void *stackFrameAddress,
 	debug_stack_frame_info *stackFrameInfo)
 {
+	#warning TODO RISCV64 get stack frame
+	#if 0
 	stack_frame stackFrame;
 	ssize_t bytesRead = debug_read_memory(context, stackFrameAddress,
 		&stackFrame, sizeof(stackFrame));
@@ -48,5 +53,7 @@ arch_debug_get_stack_frame(debug_context *context, void *stackFrameAddress,
 	stackFrameInfo->frame = stackFrameAddress;
 	stackFrameInfo->parent_frame = stackFrame.previous;
 	stackFrameInfo->return_address = stackFrame.return_address;
+	#endif
+
 	return B_OK;
 }

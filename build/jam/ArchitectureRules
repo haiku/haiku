@@ -302,8 +302,8 @@ rule KernelArchitectureSetup architecture
 			}
 
 		case riscv64 :
-			HAIKU_KERNEL_PLATFORM ?= u-boot ;
-			HAIKU_BOOT_TARGETS += u-boot ;
+			HAIKU_KERNEL_PLATFORM ?= efi ;
+			HAIKU_BOOT_TARGETS += efi ;
 
 			HAIKU_BOOT_SDIMAGE_SIZE ?= 128 ;
 			# SOC's like allwinner need an offset to skip the hardcoded initial loader

@@ -20,7 +20,7 @@
 #include <boot/stage2.h>
 #include <boot/stdio.h>
 
-#include "arch_mmu.h"
+#include "arch_start.h"
 #include "acpi.h"
 #include "console.h"
 #include "efi_platform.h"
@@ -42,7 +42,6 @@ efi_handle kImage;
 
 
 static uint32 sBootOptions;
-static uint64 gLongKernelEntry;
 
 
 extern "C" int main(stage2_args *args);
@@ -136,8 +135,8 @@ platform_start_kernel(void)
 	convert_kernel_args();
 
 	// Save the kernel entry point address.
-	gLongKernelEntry = image->elf_header.e_entry;
-	dprintf("kernel entry at %#lx\n", gLongKernelEntry);
+	addr_t kernelEntry = image->elf_header.e_entry;
+	dprintf("kernel entry at %#lx\n", kernelEntry);
 
 	// map in a kernel stack
 	void *stack_address = NULL;
@@ -154,91 +153,10 @@ platform_start_kernel(void)
 	// Apply any weird EFI quirks
 	quirks_init();
 
-	// Prepare to exit EFI boot services.
-	// Read the memory map.
-	// First call is to determine the buffer size.
-	size_t memory_map_size = 0;
-	efi_memory_descriptor dummy;
-	efi_memory_descriptor *memory_map;
-	size_t map_key;
-	size_t descriptor_size;
-	uint32_t descriptor_version;
-	if (kBootServices->GetMemoryMap(&memory_map_size, &dummy, &map_key,
-		&descriptor_size, &descriptor_version) != EFI_BUFFER_TOO_SMALL) {
-		panic("Unable to determine size of system memory map");
-	}
+	// Begin architecture-centric kernel entry.
+	arch_start_kernel(kernelEntry);
 
-	// Allocate a buffer twice as large as needed just in case it gets bigger between
-	// calls to ExitBootServices.
-	size_t actual_memory_map_size = memory_map_size * 2;
-	memory_map
-		= (efi_memory_descriptor *)kernel_args_malloc(actual_memory_map_size);
-
-	if (memory_map == NULL)
-		panic("Unable to allocate memory map.");
-
-	// Read (and print) the memory map.
-	memory_map_size = actual_memory_map_size;
-	if (kBootServices->GetMemoryMap(&memory_map_size, memory_map, &map_key,
-		&descriptor_size, &descriptor_version) != EFI_SUCCESS) {
-		panic("Unable to fetch system memory map.");
-	}
-
-	addr_t addr = (addr_t)memory_map;
-	dprintf("System provided memory map:\n");
-	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
-		efi_memory_descriptor *entry
-			= (efi_memory_descriptor *)(addr + i * descriptor_size);
-		dprintf("  %#lx-%#lx  %#lx %#x %#lx\n", entry->PhysicalStart,
-			entry->PhysicalStart + entry->NumberOfPages * 4096,
-			entry->VirtualStart, entry->Type, entry->Attribute);
-	}
-
-	// Generate page tables for use after ExitBootServices.
-	uint64_t final_pml4 = mmu_generate_post_efi_page_tables(memory_map_size,
-		memory_map, descriptor_size, descriptor_version);
-	dprintf("Final PML4 at %#lx\n", final_pml4);
-
-	// Attempt to fetch the memory map and exit boot services.
-	// This needs to be done in a loop, as ExitBootServices can change the
-	// memory map.
-	// Even better: Only GetMemoryMap and ExitBootServices can be called after
-	// the first call to ExitBootServices, as the firmware is permitted to
-	// partially exit. This is why twice as much space was allocated for the
-	// memory map, as it's impossible to allocate more now.
-	// A changing memory map shouldn't affect the generated page tables, as
-	// they only needed to know about the maximum address, not any specific
-	// entry.
-	dprintf("Calling ExitBootServices. So long, EFI!\n");
-	while (true) {
-		if (kBootServices->ExitBootServices(kImage, map_key) == EFI_SUCCESS) {
-			// The console was provided by boot services, disable it.
-			stdout = NULL;
-			stderr = NULL;
-			// Also switch to legacy serial output (may not work on all systems)
-			serial_switch_to_legacy();
-			dprintf("Switched to legacy serial output\n");
-			break;
-		}
-
-		memory_map_size = actual_memory_map_size;
-		if (kBootServices->GetMemoryMap(&memory_map_size, memory_map, &map_key,
-			&descriptor_size, &descriptor_version) != EFI_SUCCESS) {
-			panic("Unable to fetch system memory map.");
-		}
-	}
-
-	// Update EFI, generate final kernel physical memory map, etc.
-	mmu_post_efi_setup(memory_map_size, memory_map,
-		descriptor_size, descriptor_version);
-
-	smp_boot_other_cpus(final_pml4, gLongKernelEntry);
-
-	// Enter the kernel!
-	efi_enter_kernel(final_pml4, gLongKernelEntry,
-		gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size);
-
-	panic("Shouldn't get here");
+	panic("Shouldn't get here!");
 }
 
 

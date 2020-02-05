@@ -50,12 +50,15 @@ serial_putc(char ch)
 	if (sSerialUsesEFI) {
 		size_t bufSize = 1;
 		sSerial->Write(sSerial, &bufSize, &ch);
-	} else {
-		while ((in8(sSerialBasePort + SERIAL_LINE_STATUS) & 0x20) == 0)
-			asm volatile ("pause;");
-
-		out8(ch, sSerialBasePort + SERIAL_TRANSMIT_BUFFER);
+		return;
 	}
+
+	#if defined(__x86__) || defined(__x86_64__)
+	while ((in8(sSerialBasePort + SERIAL_LINE_STATUS) & 0x20) == 0)
+		asm volatile ("pause;");
+
+	out8(ch, sSerialBasePort + SERIAL_TRANSMIT_BUFFER);
+	#endif
 }
 
 
@@ -115,6 +118,7 @@ serial_init(void)
 }
 
 
+#if defined(__x86__) || defined(__x86_64__)
 extern "C" void
 serial_switch_to_legacy(void)
 {
@@ -135,3 +139,4 @@ serial_switch_to_legacy(void)
 	out8(3, sSerialBasePort + SERIAL_LINE_CONTROL);
 		// 8N1
 }
+#endif
