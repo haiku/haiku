@@ -97,8 +97,8 @@ InputMouse::MessageReceived(BMessage* message)
 		case kMsgMouseType:
 		{
 			int32 type;
-			if (message->FindInt32("index", &type) == B_OK) {
-				fSettings.SetMouseType(++type);
+			if (message->FindInt32("be:value", &type) == B_OK) {
+				fSettings.SetMouseType(type);
 				fSettingsView->SetMouseType(type);
 				fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
 				fRevertButton->SetEnabled(fSettings.IsRevertable());
@@ -196,16 +196,7 @@ InputMouse::MessageReceived(BMessage* message)
 			int32 button;
 			if (message->FindInt32("index", &index) == B_OK
 				&& message->FindInt32("button", &button) == B_OK) {
-				int32 mapping = B_PRIMARY_MOUSE_BUTTON;
-				switch (index) {
-					case 1:
-						mapping = B_SECONDARY_MOUSE_BUTTON;
-						break;
-					case 2:
-						mapping = B_TERTIARY_MOUSE_BUTTON;
-						break;
-				}
-
+				int32 mapping = B_MOUSE_BUTTON(index + 1);
 				fSettings.SetMapping(button, mapping);
 				fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
 				fRevertButton->SetEnabled(fSettings.IsRevertable());

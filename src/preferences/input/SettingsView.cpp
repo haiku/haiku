@@ -72,17 +72,13 @@ SettingsView::SettingsView(MouseSettings& settings)
 	fSettings(settings)
 {
 	// Add the "Mouse Type" pop up menu
-	fTypeMenu = new BPopUpMenu("unknown");
-	fTypeMenu->AddItem(new BMenuItem(B_TRANSLATE("1-Button"),
-		new BMessage(kMsgMouseType)));
-	fTypeMenu->AddItem(new BMenuItem(B_TRANSLATE("2-Button"),
-		new BMessage(kMsgMouseType)));
-	fTypeMenu->AddItem(new BMenuItem(B_TRANSLATE("3-Button"),
-		new BMessage(kMsgMouseType)));
-
-	BMenuField* typeField = new BMenuField(B_TRANSLATE("Mouse type:"),
-		fTypeMenu);
-	typeField->SetAlignment(B_ALIGN_LEFT);
+	fTypeMenu = new BOptionPopUp("type", B_TRANSLATE("Mouse type:"),
+		new BMessage(kMsgMouseType));
+	fTypeMenu->AddOption(B_TRANSLATE("1-Button"), 1);
+	fTypeMenu->AddOption(B_TRANSLATE("2-Button"), 2);
+	fTypeMenu->AddOption(B_TRANSLATE("3-Button"), 3);
+	fTypeMenu->AddOption(B_TRANSLATE("4-Button"), 4);
+	fTypeMenu->AddOption(B_TRANSLATE("5-Button"), 5);
 
 	// Create the "Double-click speed slider...
 	fClickSpeedSlider = new BSlider("double_click_speed",
@@ -174,12 +170,7 @@ SettingsView::SettingsView(MouseSettings& settings)
 
 			// Vertical block A: mouse type/view/test
 			.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING)
-				.AddGroup(B_HORIZONTAL, 0)
-					.AddGlue()
-					.Add(typeField)
-					.AddGlue()
-					.End()
-				.AddGlue()
+				.Add(fTypeMenu)
 				.AddGroup(B_HORIZONTAL, 0)
 					.AddGlue()
 					.Add(fMouseView)
@@ -260,13 +251,11 @@ SettingsView::UpdateFromSettings()
 		// slow = 0, fast = 262144
 	fAccelerationSlider->SetValue(value);
 
-	BMenuItem* item = fTypeMenu->ItemAt(fSettings.MouseType() - 1);
-	if (item != NULL)
-		item->SetMarked(true);
-
+	fTypeMenu->SelectOptionFor(fSettings.MouseType());
 	fMouseView->SetMouseType(fSettings.MouseType());
 
-	item = fFocusMenu->ItemAt(mouse_mode_to_index(fSettings.MouseMode()));
+	BMenuItem* item = fFocusMenu->ItemAt(
+		mouse_mode_to_index(fSettings.MouseMode()));
 	if (item != NULL)
 		item->SetMarked(true);
 

@@ -29,6 +29,11 @@
 	\var B_PRIMARY_MOUSE_BUTTON
 	\brief Primary mouse button mask parameter.
 
+	The primary mouse button should be used for main operations (selecting,
+	dragging, or opening objects).
+
+	This maps to B_MOUSE_BUTTON(1).
+
 	\since BeOS R3
 */
 
@@ -36,6 +41,11 @@
 /*!
 	\var B_SECONDARY_MOUSE_BUTTON
 	\brief Secondary mouse button mask parameter.
+
+	The secondary button should be used for additional operations on the
+	pointed objects, such as popup menus.
+
+	This maps to B_MOUSE_BUTTON(2).
 
 	\since BeOS R3
 */
@@ -45,7 +55,24 @@
 	\var B_TERTIARY_MOUSE_BUTTON
 	\brief Tertiary mouse button mask parameter.
 
+	The tertiary button should be used for clipboard paste.
+
+	This maps to B_MOUSE_BUTTON(3).
+
 	\since BeOS R3
+*/
+
+
+/*!
+	\var B_MOUSE_BUTTON(n)
+	\brief Compute mouse button mask for button n
+
+	Buttons are numbered from 1 to 32.
+
+	Some mice may not have more than 2 buttons, so the extra buttons should
+	only be used as shortcuts for actions that can be done in alternative ways.
+
+	\since Haiku R1
 */
 
 

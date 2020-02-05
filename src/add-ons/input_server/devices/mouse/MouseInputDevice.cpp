@@ -183,9 +183,8 @@ MouseDevice::MouseDevice(MouseInputDevice& target, const char* driverPath)
 	fDeviceRef.cookie = this;
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
-	fSettings.map.button[0] = B_PRIMARY_MOUSE_BUTTON;
-	fSettings.map.button[1] = B_SECONDARY_MOUSE_BUTTON;
-	fSettings.map.button[2] = B_TERTIARY_MOUSE_BUTTON;
+	for (int i = 0; i < B_MAX_MOUSE_BUTTONS; i++)
+		fSettings.map.button[i] = B_MOUSE_BUTTON(i + 1);
 #endif
 };
 

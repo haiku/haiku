@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2019 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_VIEW_H
@@ -16,10 +16,13 @@
 
 
 // mouse button
+#define B_MOUSE_BUTTON(n) (1 << ((n) - 1))
+
+// Legacy BeOS R5 mouse button definitions
 enum {
-	B_PRIMARY_MOUSE_BUTTON				= 0x01,
-	B_SECONDARY_MOUSE_BUTTON			= 0x02,
-	B_TERTIARY_MOUSE_BUTTON				= 0x04
+	B_PRIMARY_MOUSE_BUTTON				= B_MOUSE_BUTTON(1),
+	B_SECONDARY_MOUSE_BUTTON			= B_MOUSE_BUTTON(2),
+	B_TERTIARY_MOUSE_BUTTON				= B_MOUSE_BUTTON(3)
 };
 
 // mouse transit
@@ -41,10 +44,11 @@ enum {
 	B_LOCK_WINDOW_FOCUS					= 0x00000001,
 	B_SUSPEND_VIEW_FOCUS				= 0x00000002,
 	B_NO_POINTER_HISTORY				= 0x00000004,
-	// NOTE: New in Haiku (unless this flag is
-	// specified, both BWindow and BView::GetMouse()
-	// will filter out older mouse moved messages)
+		// NOTE: This is the default behavior in Haiku, unlike in BeOS
 	B_FULL_POINTER_HISTORY				= 0x00000008
+		// NOTE: New in Haiku (unless this flag is
+		// specified, both BWindow and BView::GetMouse()
+		// will filter out older mouse moved messages)
 };
 
 enum {
@@ -76,11 +80,11 @@ const uint32 B_FRAME_EVENTS				= 0x04000000UL;	/* 26 */
 const uint32 B_NAVIGABLE				= 0x02000000UL;	/* 25 */
 const uint32 B_SUBPIXEL_PRECISE			= 0x01000000UL;	/* 24 */
 const uint32 B_DRAW_ON_CHILDREN			= 0x00800000UL;	/* 23 */
-const uint32 B_INPUT_METHOD_AWARE		= 0x00400000UL;	/* 23 */
-const uint32 B_SCROLL_VIEW_AWARE		= 0x00200000UL;	/* 22 */
-const uint32 B_SUPPORTS_LAYOUT			= 0x00100000UL;	/* 21 */
-const uint32 B_INVALIDATE_AFTER_LAYOUT	= 0x00080000UL;	/* 20 */
-const uint32 B_TRANSPARENT_BACKGROUND	= 0x00040000UL;	/* 19 */
+const uint32 B_INPUT_METHOD_AWARE		= 0x00400000UL;	/* 22 */
+const uint32 B_SCROLL_VIEW_AWARE		= 0x00200000UL;	/* 21 */
+const uint32 B_SUPPORTS_LAYOUT			= 0x00100000UL;	/* 20 */
+const uint32 B_INVALIDATE_AFTER_LAYOUT	= 0x00080000UL;	/* 19 */
+const uint32 B_TRANSPARENT_BACKGROUND	= 0x00040000UL;	/* 18 */
 
 #define _RESIZE_MASK_ (0xffff)
 

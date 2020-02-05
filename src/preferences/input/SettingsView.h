@@ -15,6 +15,7 @@
 #include <Bitmap.h>
 #include <Button.h>
 #include <CheckBox.h>
+#include <OptionPopUp.h>
 #include <PopUpMenu.h>
 #include <Slider.h>
 
@@ -25,30 +26,31 @@ class MouseView;
 
 class SettingsView : public BBox {
 	public:
-		SettingsView(MouseSettings &settings);
-		virtual ~SettingsView();
+								SettingsView(MouseSettings &settings);
+		virtual 				~SettingsView();
 
-		virtual void AttachedToWindow();
+		virtual void 			AttachedToWindow();
 
-		void SetMouseType(int32 type);
-		void MouseMapUpdated();
-		void UpdateFromSettings();
+				void 			SetMouseType(int32 type);
+				void 			MouseMapUpdated();
+				void 			UpdateFromSettings();
 
-		BPopUpMenu*	fFocusFollowsMouseMenu;
-		BCheckBox*	fAcceptFirstClickBox;
+	public:
+				// FIXME use proper getters/setters for this?
+				BPopUpMenu*		fFocusFollowsMouseMenu;
+				BCheckBox*		fAcceptFirstClickBox;
 
 	private:
+		typedef	BBox			inherited;
 
-		typedef BBox inherited;
+		const	MouseSettings&	fSettings;
 
-		const MouseSettings &fSettings;
-
-		BPopUpMenu*	fTypeMenu;
-		BPopUpMenu*	fFocusMenu;
-		MouseView*	fMouseView;
-		BSlider*	fClickSpeedSlider;
-		BSlider*	fMouseSpeedSlider;
-		BSlider*	fAccelerationSlider;
+				BOptionPopUp*	fTypeMenu;
+				BPopUpMenu*		fFocusMenu;
+				MouseView*		fMouseView;
+				BSlider*		fClickSpeedSlider;
+				BSlider*		fMouseSpeedSlider;
+				BSlider*		fAccelerationSlider;
 };
 
 #endif	/* SETTINGS_VIEW_H */

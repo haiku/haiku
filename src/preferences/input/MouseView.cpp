@@ -35,12 +35,15 @@ static const int32 kButtonTop = 3;
 static const int32 kMouseDownWidth = 72;
 static const int32 kMouseDownHeight = 35;
 
-static const int32 kOneButtonOffsets[4]
-	= { 0, kMouseDownWidth };
-static const int32 kTwoButtonOffsets[4]
-	= { 0, kMouseDownWidth / 2, kMouseDownWidth };
-static const int32 kThreeButtonOffsets[4]
-	= { 0, kMouseDownWidth / 3 + 1, kMouseDownWidth / 3 * 2, kMouseDownWidth };
+#define W kMouseDownWidth / 100
+static const int32 kButtonOffsets[][6] = {
+	{ 0, 100 * W },
+	{ 0, 50 * W, 100 * W },
+	{ 0, 35 * W, 65 * W, 100 * W },
+	{ 0, 27 * W, 54 * W, 81 * W, 100 * W },
+	{ 0, 23 * W, 46 * W, 69 * W, 84 * W, 100 * W }
+};
+#undef W
 
 static const rgb_color kButtonTextColor = { 0, 0, 0, 255 };
 static const rgb_color kMouseShadowColor = { 100, 100, 100, 128 };
@@ -54,30 +57,23 @@ static const rgb_color kButtonPressedColor = { 110, 110, 110, 110 };
 static const int32*
 getButtonOffsets(int32 type)
 {
-	switch (type) {
-		case 1:
-			return kOneButtonOffsets;
-		case 2:
-			return kTwoButtonOffsets;
-		case 3:
-		default:
-			return kThreeButtonOffsets;
-	}
+	if ((type - 1) >= (int32)B_COUNT_OF(kButtonOffsets))
+		return kButtonOffsets[2];
+	return kButtonOffsets[type - 1];
 }
 
 
 static uint32
 getMappingNumber(int32 mapping)
 {
-	switch (mapping) {
-		case B_PRIMARY_MOUSE_BUTTON:
-			return 0;
-		case B_SECONDARY_MOUSE_BUTTON:
-			return 1;
-		case B_TERTIARY_MOUSE_BUTTON:
-			return 2;
-	}
-	return 0;
+	if (mapping == 0)
+		return 0;
+
+	int i;
+	for (i = 0; mapping != 1; i++)
+		mapping >>= 1;
+
+	return i;
 }
 
 MouseView::MouseView(const MouseSettings &settings)
@@ -89,7 +85,7 @@ MouseView::MouseView(const MouseSettings &settings)
 	fOldButtons(0)
 {
 	SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
-	fScaling = std::max(1.0f, be_plain_font->Size() / 12.0f);
+	fScaling = std::max(1.0f, be_plain_font->Size() / 7.0f);
 }
 
 
@@ -195,9 +191,11 @@ MouseView::MouseDown(BPoint where)
 		BMessage message(kMsgMouseMap);
 		message.AddInt32("button", button);
 
-		menu.AddItem(new BMenuItem("1", new BMessage(message)));
-		menu.AddItem(new BMenuItem("2", new BMessage(message)));
-		menu.AddItem(new BMenuItem("3", new BMessage(message)));
+		for (int i = 1; i < 6; i++) {
+			char tmp[2];
+			sprintf(tmp, "%d", i);
+			menu.AddItem(new BMenuItem(tmp, new BMessage(message)));
+		}
 
 		menu.ItemAt(getMappingNumber(fSettings.Mapping(button)))
 			->SetMarked(true);
@@ -261,20 +259,21 @@ MouseView::Draw(BRect updateFrame)
 	SetScale(1);
 	SetOrigin(0, 0);
 
+	mouse_map map;
+	fSettings.Mapping(map);
+
+	SetDrawingMode(B_OP_OVER);
+
+	// All button drawing is clipped to the outline of the buttons area,
+	// simplifying the code below as it can overdraw things.
+	ClipToPicture(&fButtonsPicture, B_ORIGIN, false);
+
 	// Separator between the buttons
 	const int32* offset = getButtonOffsets(fType);
 	for (int32 i = 1; i < fType; i++) {
 		BRect buttonRect = _ButtonRect(offset, i);
 		StrokeLine(buttonRect.LeftTop(), buttonRect.LeftBottom());
 	}
-
-	mouse_map map;
-	fSettings.Mapping(map);
-
-	SetDrawingMode(B_OP_OVER);
-
-	if (fButtons != 0)
-		ClipToPicture(&fButtonsPicture, B_ORIGIN, false);
 
 	for (int32 i = 0; i < fType; i++) {
 		// draw mapping number centered over the button
@@ -307,8 +306,7 @@ MouseView::Draw(BRect updateFrame)
 				+ (border.IntegerHeight() - fDigitHeight) / 2));
 	}
 
-	if (fButtons != 0)
-		ClipToPicture(NULL);
+	ClipToPicture(NULL);
 }
 
 
@@ -329,6 +327,8 @@ MouseView::_ButtonRect(const int32* offsets, int index) const
 }
 
 
+/** The buttons on a mouse are normally 1 (left), 2 (right), 3 (middle) so
+ * we need to reorder them */
 int32
 MouseView::_ConvertFromVisualOrder(int32 i)
 {
@@ -337,12 +337,13 @@ MouseView::_ConvertFromVisualOrder(int32 i)
 
 	switch (i) {
 		case 0:
-		default:
 			return 0;
 		case 1:
 			return 2;
 		case 2:
 			return 1;
+		default:
+			return i;
 	}
 }
 
