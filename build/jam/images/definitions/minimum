@@ -66,12 +66,12 @@ SYSTEM_PREFERENCES = [ FFilterByBuildFeatures
 	Backgrounds
 	<preference>Deskbar
 	FileTypes
-	Keyboard Keymap
+	Input
+	Keymap
 	Locale
-	Mouse
 	Network Notifications
 	Screen Shortcuts
-	Time Touchpad <preference>Tracker
+	Time <preference>Tracker
 	VirtualMemory
 ] ;
 
