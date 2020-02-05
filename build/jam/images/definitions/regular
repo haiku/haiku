@@ -267,6 +267,7 @@ AddFilesToHaikuImage home config settings Tracker "Tracker New Templates"
 	"<tracker-new-templates>C++ header"
 	"<tracker-new-templates>C++ source"
 	"<tracker-new-templates>Makefile"
+	"<tracker-new-templates>Person"
 	"<tracker-new-templates>text file"
 ;
 
