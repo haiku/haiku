@@ -403,13 +403,6 @@ device_open(const char *dname, uint32 flags, void** cookie)
 	int n;
 	status_t ret = B_ERROR;
 
-	char controlDevicePath[1024];
-	sprintf(controlDevicePath, "%s%s", kBasePublishPath, "control");
-	if (strcmp(dname, controlDevicePath) == 0) {
-		dprintf(ID "device_open() -> refuse to open control device\n");
-		return B_ERROR;
-	}
-
 	n = atoi(dname + strlen(kBasePublishPath));
 
 	DPRINTF_INFO((ID "device_open(\"%s\",%d,...)\n", dname, flags));
@@ -725,12 +718,7 @@ publish_devices()
 				i++;
 			}
 		}
-		// publish the currently fake control device
-		sDeviceNames[i] = (char*)malloc(strlen(kBasePublishPath) + 8);
-		if (sDeviceNames[i])
-			sprintf(sDeviceNames[i], "%s%s", kBasePublishPath, "control");
-
-		sDeviceNames[i + 1] = NULL;
+		sDeviceNames[i] = NULL;
 	}
 
 	release_sem(sDeviceListLock);
