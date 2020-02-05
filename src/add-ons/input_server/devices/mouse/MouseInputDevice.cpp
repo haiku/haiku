@@ -300,12 +300,18 @@ MouseDevice::UpdateTouchpadSettings(const BMessage* message)
 char*
 MouseDevice::_BuildShortName() const
 {
+	// TODO It would be simpler and better to use B_GET_DEVICE_NAME, but...
+	// - This is currently called before the device is open
+	// - We need to implement that in our input drivers first
 	BString string(fPath);
+	BString deviceName;
 	BString name;
 
 	int32 slash = string.FindLast("/");
-	string.CopyInto(name, slash + 1, string.Length() - slash);
-	int32 index = atoi(name.String()) + 1;
+	string.CopyInto(deviceName, slash + 1, string.Length() - slash);
+	// FIXME the device name may be more than just a number (for example
+	// ibm_trackpoint_0)
+	int32 index = atoi(deviceName.String()) + 1;
 
 	int32 previousSlash = string.FindLast("/", slash);
 	string.CopyInto(name, previousSlash + 1, slash - previousSlash - 1);
@@ -313,15 +319,18 @@ MouseDevice::_BuildShortName() const
 	if (name == "ps2")
 		name = "PS/2";
 
-	if (name.Length() < 4)
+	if (name.Length() <= 4)
 		name.ToUpper();
 	else
 		name.Capitalize();
 
-	if (string.FindFirst("touchpad") >= 0) {
+	if (deviceName.FindFirst("touchpad") >= 0) {
 		name << " Touchpad ";
+	} else if (deviceName.FindFirst("trackpoint") >= 0) {
+		// That's always PS/2, so don't keep the bus name
+		name = "Trackpoint ";
 	} else {
-		if (string.FindFirst("intelli") >= 0)
+		if (deviceName.FindFirst("intelli") >= 0)
 			name.Prepend("Extended ");
 
 		name << " Mouse ";
