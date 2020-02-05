@@ -29,6 +29,7 @@
 #include <Rect.h>
 #include <Region.h>
 #include <String.h>
+#include <Window.h>
 
 #include <binary_compatibility/Support.h>
 
@@ -640,6 +641,8 @@ BTabView::MessageReceived(BMessage* message)
 		}
 
 #if 0
+		// TODO this would be annoying as-is, but maybe it makes sense with
+		// a modifier or using only deltaX (not the main mouse wheel)
 		case B_MOUSE_WHEEL_CHANGED:
 		{
 			float deltaX = 0.0f;
@@ -712,11 +715,31 @@ BTabView::KeyDown(const char* bytes, int32 numBytes)
 void
 BTabView::MouseDown(BPoint where)
 {
-	for (int32 i = 0; i < CountTabs(); i++) {
-		if (TabFrame(i).Contains(where)
-			&& i != Selection()) {
-			Select(i);
-			return;
+	// Which button is pressed?
+	uint32 buttons = 0;
+	BMessage* currentMessage = Window()->CurrentMessage();
+	if (currentMessage != NULL) {
+		currentMessage->FindInt32("buttons", (int32*)&buttons);
+	}
+
+	int32 selection = Selection();
+	int32 numTabs = CountTabs();
+	if (buttons & B_BACK_MOUSE_BUTTON) {
+		// The "back" mouse button moves to previous tab
+		if (selection > 0 && numTabs > 1)
+			Select(Selection() - 1);
+	} else if (buttons & B_FORWARD_MOUSE_BUTTON) {
+		// The "forward" mouse button moves to next tab
+		if (selection < numTabs - 1)
+			Select(Selection() + 1);
+	} else {
+		// Other buttons are used to select a tab by clicking directly on it
+		for (int32 i = 0; i < CountTabs(); i++) {
+			if (TabFrame(i).Contains(where)
+					&& i != Selection()) {
+				Select(i);
+				return;
+			}
 		}
 	}
 
