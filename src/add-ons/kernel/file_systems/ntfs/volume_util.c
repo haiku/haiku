@@ -64,17 +64,22 @@ static uint8 ntfs_count_bits(unsigned char byte, unsigned char shift)
 int ntfs_calc_free_space(nspace *_ns)
 {
 	nspace		*ns = (nspace*)_ns;
-	ntfs_volume *vol = ns->ntvol;	
-	ntfs_attr 	*data = vol->lcnbmp_na;
+	ntfs_volume *vol;
+	ntfs_attr 	*data;
 	s64 		free_clusters = 0;
 	off_t 	 	pos = 0;
 	size_t 	 	readed;
-	unsigned 	char *buf = NULL;
-			
-	if (ns == NULL || vol == NULL || data == NULL)
+	unsigned 	char *buf;
+
+	if (ns == NULL)
 		return -1;
-		
-	if (vol->lcnbmp_na == NULL)
+
+	vol = ns->ntvol;
+	if (vol == NULL)
+		return -1;
+
+	data = vol->lcnbmp_na;
+	if (data == NULL)
 		return -1;
 
 	if (!(ns->state & NF_FreeClustersOutdate))
