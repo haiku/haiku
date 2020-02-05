@@ -41,6 +41,7 @@ private:
 			HIDReportItem &		fXAxis;
 			HIDReportItem &		fYAxis;
 			HIDReportItem *		fWheel;
+			HIDReportItem *		fHorizontalPan;
 			HIDReportItem *		fButtons[B_MAX_MOUSE_BUTTONS];
 
 			uint32				fLastButtons;
