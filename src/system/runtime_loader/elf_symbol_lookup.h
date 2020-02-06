@@ -69,14 +69,17 @@ struct SymbolLookupCache {
 
 			size_t elementCount = (fTableSize + 31) / 32;
 			fValuesResolved = (uint32*)malloc(4 * elementCount);
-			if (fValuesResolved != NULL)
-				memset(fValuesResolved, 0, 4 * elementCount);
 
 			if (fValues == NULL || fDSOs == NULL || fValuesResolved == NULL) {
 				free(fValuesResolved);
+				fValuesResolved = NULL;
 				free(fValues);
+				fValues = NULL;
 				free(fDSOs);
+				fDSOs = NULL;
 				fTableSize = 0;
+			} else {
+				memset(fValuesResolved, 0, 4 * elementCount);
 			}
 		}
 	}
