@@ -57,8 +57,10 @@ InputWindow::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case ITEM_SELECTED:
 		{
-			int32 name = message->GetInt32("index", 0);
-			fCardView->CardLayout()->SetVisibleItem(name);
+			int32 index = message->GetInt32("index", 0);
+			if (index >= 0)
+				fCardView->CardLayout()->SetVisibleItem(index);
+			break;
 		}
 		case kMsgMouseType:
 		case kMsgMouseMap:

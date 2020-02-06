@@ -16,6 +16,7 @@ Preference Input :
 	MouseSettings.cpp
 	SettingsView.cpp
 	: be [ TargetLibsupc++ ] localestub
+	: Input.rdef
 	;
 DoCatalogs Input :
 	x-vnd.Haiku-Input
