@@ -170,6 +170,6 @@ main(int argc, char **argv)
 	}
 
 	puts(buffer + start);
-	free(buffer)
+	free(buffer);
 	return 0;
 }
