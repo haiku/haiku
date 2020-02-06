@@ -779,12 +779,14 @@ error:
 static void
 oce_mq_free(struct oce_mq *mq)
 {
+	POCE_SOFTC sc;
+	struct oce_mbx mbx;
+	struct mbx_destroy_common_mq *fwcmd;
+
 	if (mq == NULL)
 		return;
 
-	POCE_SOFTC sc = (POCE_SOFTC) mq->parent;
-	struct oce_mbx mbx;
-	struct mbx_destroy_common_mq *fwcmd;
+	sc = (POCE_SOFTC) mq->parent;
 
 	if (mq->ring != NULL) {
 		oce_destroy_ring_buffer(sc, mq->ring);
