@@ -179,7 +179,7 @@ InstallerWindow::InstallerWindow()
 
 	BSize logoSize = logoView->MinSize();
 	logoView->SetExplicitMaxSize(logoSize);
-	fStatusView->SetExplicitMinSize(BSize(logoSize.width * 0.8,
+	fStatusView->SetExplicitMinSize(BSize(fStatusView->StringWidth("W") * 30,
 		logoSize.height));
 
 	// Explicitly create group view to set the background white in case
