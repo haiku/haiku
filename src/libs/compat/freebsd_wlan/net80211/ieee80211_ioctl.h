@@ -428,14 +428,8 @@ struct ieee80211req_sta_info {
 	uint16_t	isi_len;		/* total length (mult of 4) */
 	uint16_t	isi_ie_off;		/* offset to IE data */
 	uint16_t	isi_ie_len;		/* IE length */
-#ifdef __HAIKU__
-	uint32_t	isi_flags;		/* channel flags */
-	uint16_t	isi_freq;		/* MHz */
-	int8_t		padding[10];
-#else
 	uint16_t	isi_freq;		/* MHz */
 	uint32_t	isi_flags;		/* channel flags */
-#endif
 	uint32_t	isi_state;		/* state flags */
 	uint8_t		isi_authmode;		/* authentication algorithm */
 	int8_t		isi_rssi;		/* receive signal strength */
@@ -568,9 +562,7 @@ struct ieee80211_devcaps_req {
 	uint32_t	dc_drivercaps;		/* general driver caps */
 	uint32_t	dc_cryptocaps;		/* hardware crypto support */
 	uint32_t	dc_htcaps;		/* HT/802.11n support */
-#ifndef __HAIKU__
 	uint32_t	dc_vhtcaps;		/* VHT/802.11ac capabilities */
-#endif
 	struct ieee80211req_chaninfo dc_chaninfo;
 };
 #define	IEEE80211_DEVCAPS_SIZE(_nchan) \
@@ -837,14 +829,8 @@ struct ieee80211req_scan_result {
 	uint16_t	isr_len;		/* total length (mult of 4) */
 	uint16_t	isr_ie_off;		/* offset to SSID+IE data */
 	uint16_t	isr_ie_len;		/* IE length */
-#ifdef __HAIKU__
-	uint32_t	isr_flags;		/* channel flags */
-	uint16_t	isr_freq;		/* MHz */
-	int8_t		padding[10];
-#else
 	uint16_t	isr_freq;		/* MHz */
 	uint16_t	isr_flags;		/* channel flags */
-#endif
 	int8_t		isr_noise;
 	int8_t		isr_rssi;
 	uint16_t	isr_intval;		/* beacon interval */

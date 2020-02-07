@@ -698,18 +698,9 @@ ieee80211_ioctl_getdevcaps(struct ieee80211com *ic,
 
 	maxchans = 1 + ((ireq->i_len - sizeof(struct ieee80211_devcaps_req)) /
 	    sizeof(struct ieee80211_channel));
-#ifdef __HAIKU__
-	/* HACK */
-	if (ireq->i_len < sizeof(struct ieee80211_devcaps_req))
-		maxchans = 0;
-#endif
 	/* NB: require 1 so we know ic_nchans is accessible */
 	if (maxchans < 1)
-#ifndef __HAIKU__
 		return EINVAL;
-#else
-		maxchans = 0;
-#endif
 	/* constrain max request size, 2K channels is ~24Kbytes */
 	if (maxchans > 2048)
 		maxchans = 2048;
@@ -721,26 +712,13 @@ ieee80211_ioctl_getdevcaps(struct ieee80211com *ic,
 	dc->dc_drivercaps = ic->ic_caps;
 	dc->dc_cryptocaps = ic->ic_cryptocaps;
 	dc->dc_htcaps = ic->ic_htcaps;
-#ifndef __HAIKU__
 	dc->dc_vhtcaps = ic->ic_vhtcaps;
-#endif
 	ci = &dc->dc_chaninfo;
-#ifdef __HAIKU__
-	if (maxchans != 0) {
-#endif
 	ic->ic_getradiocaps(ic, maxchans, &ci->ic_nchans, ci->ic_chans);
 	KASSERT(ci->ic_nchans <= maxchans,
 	    ("nchans %d maxchans %d", ci->ic_nchans, maxchans));
 	ieee80211_sort_channels(ci->ic_chans, ci->ic_nchans);
-#ifdef __HAIKU__
-	} else
-		dc->dc_chaninfo.ic_nchans = 0; /* HACK */
-#endif
-#ifdef __HAIKU__
-	error = copyout(dc, ireq->i_data, ireq->i_len);
-#else
 	error = copyout(dc, ireq->i_data, IEEE80211_DEVCAPS_SPACE(dc));
-#endif
 	IEEE80211_FREE(dc, M_TEMP);
 	return error;
 }

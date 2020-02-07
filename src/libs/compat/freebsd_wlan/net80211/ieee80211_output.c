@@ -640,6 +640,7 @@ ieee80211_output(struct ifnet *ifp, struct mbuf *m,
 	 * a raw 802.11 frame.
 	 */
 #ifdef __HAIKU__
+	// FIXME why is this different on Haiku?
 	if (!dst || dst->sa_family != AF_IEEE80211)
 		return ieee80211_vap_xmitpkt(vap, m);
 #else
