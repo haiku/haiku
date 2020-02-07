@@ -875,7 +875,7 @@ UserLoginWindow::_UnpackCaptcha(BMessage& responsePayload, Captcha& captcha)
 			captcha.SetToken(token);
 			captcha.SetPngImageData(buffer, decodedSize);
 		}
-		delete buffer;
+		delete[] buffer;
 	}
 
 	return result;
