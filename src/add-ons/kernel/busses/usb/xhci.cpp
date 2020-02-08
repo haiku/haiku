@@ -739,7 +739,7 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 			| TRB_2_BYTES(requestData->Length)
 			| TRB_2_TD_SIZE(0);
 		descriptor->trbs[index].flags = TRB_3_TYPE(TRB_TYPE_DATA_STAGE)
-				| (directionIn ? (TRB_3_DIR_IN | TRB_3_ISP_BIT) : 0)
+				| (directionIn ? TRB_3_DIR_IN : 0)
 				| TRB_3_CYCLE_BIT;
 
 		if (!directionIn) {
@@ -832,8 +832,7 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 			| TRB_2_BYTES(trbLength)
 			| TRB_2_TD_SIZE(tdSize);
 		td->trbs[i].flags = TRB_3_TYPE(TRB_TYPE_NORMAL)
-			| TRB_3_CYCLE_BIT | TRB_3_CHAIN_BIT
-			| (directionIn ? TRB_3_ISP_BIT : 0);
+			| TRB_3_CYCLE_BIT | TRB_3_CHAIN_BIT;
 
 		td->trb_used++;
 		remaining -= trbLength;
