@@ -173,7 +173,7 @@ platform_register_boot_device(Node *device)
 
 	gBootVolume.SetInt32(BOOT_METHOD, efiDevice->ReadOnly() ? BOOT_METHOD_CD:
 		BOOT_METHOD_HARD_DISK);
-	gBootVolume.SetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, true);
+	gBootVolume.SetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, efiDevice->ReadOnly());
 	gBootVolume.SetData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE,
 		&identifier, sizeof(disk_identifier));
 
