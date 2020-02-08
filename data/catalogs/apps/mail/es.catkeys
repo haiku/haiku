@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Be-MAIL	1559146339
+1	spanish; castilian	x-vnd.Be-MAIL	1477453861
 Set to Saved	Mail		Ajustar como Guardado
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		El texto que ha escrito contiene %ld caracteres indecodificables. ¿Quizás un carácter diferente podría funcionar mejor? Presione enviar de cualquier manera (un carácter sustituto se utilizará en lugar de los indecodificables), o presione Cancelar para regresar e intentar arreglarlo.
 Text wrapping:	Mail		Ajuste del texto:
@@ -8,10 +8,12 @@ Reply	Mail		Responder
 Next message	Mail		Mensaje siguiente
 Mailing	Mail		Envío de correo
 Unread	Mail		Sin leer
+Same sender	Mail		El mismo emisor
 Copy to new	Mail		Copiar a mensaje nuevo
 Save as draft	Mail		Guardar como borrador
 Encoding:	Mail		Codificación:
 Print	Mail		Imprimir
+Decrease quote level	Mail		Reducir el nivel de cuota
 Encoding	Mail		Codificación
 Default account:	Mail		Cuenta predeterminada:
 Message	Mail		Mensaje
@@ -31,6 +33,7 @@ Only files can be added as attachments.	Mail		Solo se pueden agregar archivos co
 Close	Mail		Cerrar
 Untitled	Mail		Sin título
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		La función de remover archivos adjuntos de un correo reenviado todavía no se implementa.\nTodavía no funciona correctamente.
+Same recipient	Mail		El mismo receptor
 Previous message	Mail		Mensaje anterior
 (Address unavailable)	Mail		(Dirección indisponible)
 Mail	System name		Correo
@@ -82,6 +85,7 @@ Colored quotes:	Mail		Citas coloreadas:
 Automatic	Mail		Automático
 Open this link	Mail		Abrir este enlace
 Auto signature:	Mail		Autofirma:
+Same subject	Mail		El mismo asunto
 Send	Mail		Enviar
 Open draft	Mail		Abrir borrador
 Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Dejar como 'Nuevo'
@@ -161,4 +165,5 @@ Spam	Mail		Correo basura
 Couldn't open this signature. Sorry.	Mail		No se pudo abrir la firma. Disculpe.
 Revert	Mail		Revertir
 Unknown	Mail		Desconocido
+Increase quote level	Mail		Incrementar el nivel de cuota
 Add enclosure…	Mail		Agregar anexo…

@@ -1,24 +1,18 @@
-1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	3263059526
+1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	1859905157
 Uninstall	PackageManager		Desinstalar
 (%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Não instalado
 Available packages	MainWindow		Pacotes disponíveis
 Create account	UserLoginWindow		Criar conta
 Mostly stable	RatePackageWindow		Na maior parte estável
-Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Conta criada com sucesso. Você pode agora classificar pacotes e fazer outras coisas úteis.
 Develop packages	MainWindow		Desenvolver pacotes
 Rate package…	PackageInfoView		Avaliar pacote...
 Starting the package daemon failed:\n\n%Error%	App		A inicialização do daemon de pacote falhou:\n\n%Error%
 <no info>	PackageInfoView		<sem informação>
 No user ratings available.	PackageInfoView		Nenhuma avaliação de usuário disponível.
-The user name needs to be at least 3 letters long.	UserLoginWindow		O nome de usuário precisa ter pelo menos 3 letras.
-Failed to create account	UserLoginWindow		Falhou ao criar conta
 Rating	PackageListView		Avaliação
 Does not start	RatePackageWindow		Não iniciar
 Show	MainWindow		Exibir
-But none could be listed here, sorry.	UserLoginWindow		Mas nenhum pode ser listado aqui, desculpe.
-There are problems with the data you entered:\n\n	UserLoginWindow		Existem problemas com os dados que você inseriu:\n\n
-The authentication was successful.	UserLoginWindow		A autenticação foi bem sucedida.
 Not specified	RatePackageWindow		Não especificado
 Unstable but usable	RatePackageWindow		Instável mas utilizável
 Active	PackageListView		Ativo
@@ -27,7 +21,6 @@ Login or Create account	MainWindow		Autenticar-se ou Criar conta
 Ratings	PackageInfoView		Classificações
 Switch account…	MainWindow		Alternar conta…
 Preferred language:	UserLoginWindow		Idioma preferido:
-It was not possible to contact the web service.	UserLoginWindow		Não foi possível contatar o serviço web.
 Name	PackageListView		Nome
 Rate %Package%	RatePackageWindow		Avaliar %Package%
 Quit HaikuDepot	App		Fechar o Depósito Haiku
@@ -38,7 +31,6 @@ Stable	RatePackageWindow		Estável
 Fatal error	PackageManager		Erro fatal
 Package action failed	PackageInfoView		Ação do pacote falhou
 No changelog available.	PackageInfoView		Nenhum relatório de mudanças disponível.
-There are problems in the form:\n\n	UserLoginWindow		Existem problemas no formulário:\n\n
 There was a puzzling response from the web service.	UserLoginWindow		Houve uma resposta enigmática do serviço web.
 Not logged in	MainWindow		Não autenticado
 No, quit HaikuDepot	App		Não, fechar Depósito Haiku
@@ -50,12 +42,10 @@ Contents	PackageInfoView		Conteúdo
 Close	PackageManager		Fechar
 Changelog	PackageInfoView		Registro de alterações
 About	PackageInfoView		Sobre
-Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Autenticação falhou. O usuário não existe ou uma senha errada foi fornecida.
 Very unstable	RatePackageWindow		Muito instável
 Stability	RatePackageWindow		Estabilidade
 Send	RatePackageWindow		Enviar
 Start package daemon	App		Iniciar daemon de pacote
-The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		A senha é muito fraca ou inválida. Por favor, utilize ao menos 8 caracteres com pelo menos 2 números e 2 letras maiúsculas.
 The package action could not be scheduled: %Error%	PackageInfoView		A ação do pacote não pode ser agendada: %Error%
 Cancel	RatePackageWindow		Cancelar
 Inactive	PackageListView		Inativo
@@ -66,33 +56,24 @@ Success	UserLoginWindow		Sucesso
 (%Votes%)	PackageInfoView		(%Votes%)
 Close	UserLoginWindow		Fechar
 Close	RatePackageWindow		Fechar
-Failed to create account: %s\n	UserLoginWindow		Falhou ao criar conta: %s\n
 Size	PackageListView		Tamanho
 Your rating:	RatePackageWindow		Sua avaliação:
 All categories	FilterView		Todas as categorias
 n/a	PackageInfoView		n/a
 Cancel	MainWindow		Cancelar
-If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Se não fornecer um endereço de e-mail, você não será capaz de redefinir sua senha se esquecê-la.
 Tools	MainWindow		Ferramentas
-The passwords do not match.	UserLoginWindow		As senhas não conferem.
 Language	RatePackageWindow		Idioma
-Authentication failed. Connection to the service failed.	UserLoginWindow		Autenticação falhou. Conexão ao serviço falhou.
 Log out	MainWindow		Sair
 Comment language:	RatePackageWindow		Idioma do comentário:
 Status	PackageListView		Estado
-The username is already taken. Please choose another.	UserLoginWindow		Este nome de usuário já pertence a alguém. Escolha outro, por favor.
 Update	RatePackageWindow		Atualizar
 Language	UserLoginWindow		Idioma
 OK	UserLoginWindow		OK
 Stability:	RatePackageWindow		Estabilidade:
-The captcha puzzle needs to be solved.	UserLoginWindow		O quebra-cabeça captcha precisa ser resolvido.
 Source packages	MainWindow		Pacotes fonte
 -	no package size		-
-User name:	UserLoginWindow		Nome do usuário:
 Try again	App		Tente novamente
 Rate package	RatePackageWindow		Avaliar pacote…
-The email address appears to be malformed.	UserLoginWindow		O endereço de e-mail parece disforme.
-You have not solved the captcha puzzle correctly.	UserLoginWindow		Você não resolveu o quebra-cabeça captcha corretamente.
 Unknown	PackageListView		Desconhecido
 Log in	UserLoginWindow		Entrar
 Logged in as %User%	MainWindow		Autenticado como %User%
@@ -101,11 +82,9 @@ Screenshot	ScreenshotWindow		Captura de tela
 HaikuDepot	System name		Depósito Haiku
 Search terms:	FilterView		Termos para pesquisa:
 Pending…	PackageListView		Pendente…
-Repeat pass phrase:	UserLoginWindow		Repita a frase secreta:
 Category:	FilterView		Categoria:
 Authentication failed	UserLoginWindow		A autenticação falhou
 Description	PackageListView		Descrição
-Pass phrase:	UserLoginWindow		Frase secreta:
 Open %DeskbarLink%	PackageManager		Abrir %DeskbarLink%
 Install	PackageManager		Instalar
 Input validation	UserLoginWindow		Validação de entrada

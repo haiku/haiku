@@ -8,7 +8,7 @@ CD	MultiAudio		Компакт-диск
 Tone control	MultiAudio		Управление тоном
 Phone	MultiAudio		Телефон
 Aux	MultiAudio		Вспомогательный
-Output bass	MultiAudio		Выход баса
+Output bass	MultiAudio		Выход НЧ
 Headphones	MultiAudio		Наушники
 Beep	MultiAudio		Сигнал
 Output mono mix	MultiAudio		Выход моно микс
@@ -28,7 +28,7 @@ Line	MultiAudio		Линия
 Mic	MultiAudio		Микрофон
  frequency:	MultiAudio		 частота:
 Enable	MultiAudio		Включить
-Mute	MultiAudio		Приглушить
+Mute	MultiAudio		Выключить звук
 Wave	MultiAudio		Волна
 Setup	MultiAudio		Настройки
 Level	MultiAudio		Уровень

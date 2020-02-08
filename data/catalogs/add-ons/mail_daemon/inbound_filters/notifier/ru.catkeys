@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-NewMailNotification	2111731137
+1	russian	x-vnd.Haiku-NewMailNotification	1375000288
 Log window	NotifierConfigView		Окно журнала
 none	NotifierConfigView		нет
 New mails notification	NotifierFilter		Уведомление о новой почте
@@ -11,3 +11,4 @@ Central beep	NotifierConfigView		Центральный звуковой сиг�
 New messages	NotifierFilter		Новые сообщения
 Method:	NotifierConfigView		Метод:
 Keyboard LEDs	NotifierConfigView		Клавиатурные светодиоды
+You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		Вы получили {0, plural, one{одно новое сообщение} few{# новых сообщения} other{# новых сообщений}} для %account.

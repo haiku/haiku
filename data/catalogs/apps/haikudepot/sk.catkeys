@@ -1,24 +1,18 @@
-1	slovak	x-vnd.Haiku-HaikuDepot	2538586074
+1	slovak	x-vnd.Haiku-HaikuDepot	1135431705
 Uninstall	PackageManager		Odinštalovať
 (%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Odinštalované
 Available packages	MainWindow		Dostupné balíky
 Create account	UserLoginWindow		Vytvoriť účet
 Mostly stable	RatePackageWindow		Prevažne stabilný
-Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Účet bol úspešne vytvorený. Teraz môžete hodnotiť balíky a robiť ďalšie užitočné veci.
 Develop packages	MainWindow		Vývoj balíkov
 Rate package…	PackageInfoView		Ohodnotiť balík…
 Starting the package daemon failed:\n\n%Error%	App		Spustenie démona balíkov zlyhalo:\n\n%Error%
 <no info>	PackageInfoView		<žiadne info>
 No user ratings available.	PackageInfoView		Používateľské hodnotenie nie je dostupné.
-The user name needs to be at least 3 letters long.	UserLoginWindow		Meno používateľa musí byť aspoň 3 písmená dlhé.
-Failed to create account	UserLoginWindow		Nepodarilo sa vytvoriť účet
 Rating	PackageListView		Hodnotenie
 Does not start	RatePackageWindow		Nespúšťa sa
 Show	MainWindow		Zobraziť
-But none could be listed here, sorry.	UserLoginWindow		Ale žiadne tu nebolo možné uviesť, ľutujeme.
-There are problems with the data you entered:\n\n	UserLoginWindow		Vyskytli sa problémy v údajoch, ktoré ste zadali:\n\n
-The authentication was successful.	UserLoginWindow		Overenie prebehlo úspešne.
 Not specified	RatePackageWindow		Neuvedené
 Unstable but usable	RatePackageWindow		Nestabilný, ale použiteľný
 Active	PackageListView		Aktívny
@@ -27,7 +21,6 @@ Login or Create account	MainWindow		Prihlásiť sa alebo Vytvoriť účet
 Ratings	PackageInfoView		Hodnotenia
 Switch account…	MainWindow		Prepnúť účet…
 Preferred language:	UserLoginWindow		Preferovaný jazyk:
-It was not possible to contact the web service.	UserLoginWindow		Nepodarilo sa kontaktovať webovú službu.
 Name	PackageListView		Názov
 Rate %Package%	RatePackageWindow		Ohodnotiť %Package%
 Quit HaikuDepot	App		Ukončiť HaikuDepot
@@ -38,7 +31,6 @@ Stable	RatePackageWindow		Stabilný
 Fatal error	PackageManager		Kritická chyba
 Package action failed	PackageInfoView		Operácia s balíkom zlyhala
 No changelog available.	PackageInfoView		Záznam zmien nie je dostupný.
-There are problems in the form:\n\n	UserLoginWindow		Vyskytli sa problémy s formulárom:\n\n
 There was a puzzling response from the web service.	UserLoginWindow		Od webovej služby prišla neočakávaná odpoveď.
 Not logged in	MainWindow		Neprihlásený
 No, quit HaikuDepot	App		Nie, ukončiť HaikuDepot
@@ -50,12 +42,10 @@ Contents	PackageInfoView		Obsah
 Close	PackageManager		Zatvoriť
 Changelog	PackageInfoView		Záznam zmien
 About	PackageInfoView		O aplikácii
-Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Overenie zlyhalo. Používateľ neexistuje alebo bolo zadané chybné heslo.
 Very unstable	RatePackageWindow		Veľmi nestabilný
 Stability	RatePackageWindow		Stabilita
 Send	RatePackageWindow		Poslať
 Start package daemon	App		Spustiť démona balíkov
-The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Heslo je príliš slabé alebo je neplatné. Použite najmenej 8 znakov s aspoň 2 číslami a 2 veľkými písmenami.
 The package action could not be scheduled: %Error%	PackageInfoView		Operáciu s balíkom nebolo možné naplánovať: %Error%
 Cancel	RatePackageWindow		Zrušiť
 Inactive	PackageListView		Neaktívne
@@ -66,34 +56,25 @@ Success	UserLoginWindow		Úspech
 (%Votes%)	PackageInfoView		(%Votes%)
 Close	UserLoginWindow		Zatvoriť
 Close	RatePackageWindow		Zatvoriť
-Failed to create account: %s\n	UserLoginWindow		Nepodarilo sa vytvoriť účet: %s\n
 Size	PackageListView		Veľkosť
 Your rating:	RatePackageWindow		Vaše hodnotenie:
 All categories	FilterView		Všetky kategórie
 n/a	PackageInfoView		n/a
 Cancel	MainWindow		Zrušiť
 Refresh repositories	MainWindow		Obnoviť zdroje softvéru
-If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Ak nezadáte emailovú adresu, nebudete môcť obnoviť svoje heslo, ak ho zabudnete.
 Tools	MainWindow		Nástroje
-The passwords do not match.	UserLoginWindow		Heslá sa nezhodujú.
 Language	RatePackageWindow		Jazyk
-Authentication failed. Connection to the service failed.	UserLoginWindow		Overenie totožnosti zlyhalo. Pripojenie k službe zlyhalo.
 Log out	MainWindow		Odhlásiť sa
 Comment language:	RatePackageWindow		Jazyk komentára:
 Status	PackageListView		Stav
-The username is already taken. Please choose another.	UserLoginWindow		Toto používateľské meno už niekto používa. Prosím, vyberte si iné.
 Update	RatePackageWindow		Aktualizovať
 Language	UserLoginWindow		Jazyk
 OK	UserLoginWindow		OK
 Stability:	RatePackageWindow		Stabilita:
-The captcha puzzle needs to be solved.	UserLoginWindow		Je potrebné vyriešiť captcha.
 Source packages	MainWindow		Zdrojové balíky
 -	no package size		-
-User name:	UserLoginWindow		Používateľské meno:
 Try again	App		Skúsiť znova
 Rate package	RatePackageWindow		Ohodnotiť balík
-The email address appears to be malformed.	UserLoginWindow		Zdá sa, že formát emailovej adresy je chybný.
-You have not solved the captcha puzzle correctly.	UserLoginWindow		Nevyriešili ste správne captcha.
 Unknown	PackageListView		Neznámy
 Log in	UserLoginWindow		Prihlásiť sa
 Logged in as %User%	MainWindow		Prihlásený ako %User%
@@ -102,12 +83,10 @@ Screenshot	ScreenshotWindow		Snímka obrazovky
 HaikuDepot	System name		HaikuDepot
 Search terms:	FilterView		Hľadaný výraz:
 Pending…	PackageListView		Čaká sa…
-Repeat pass phrase:	UserLoginWindow		Zopakujte heslo:
 Category:	FilterView		Kategória:
 Authentication failed	UserLoginWindow		Overenie totožnosti zlyhalo
 Manage repositories…	MainWindow		Spravovať zdroje softvéru…
 Description	PackageListView		Popis
-Pass phrase:	UserLoginWindow		Heslo:
 Open %DeskbarLink%	PackageManager		Otvoriť %DeskbarLink%
 Install	PackageManager		Nainštalovať
 Input validation	UserLoginWindow		Overenie platnosti vstupu

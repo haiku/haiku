@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-BluetoothPrefs	67867884
+1	spanish; castilian	x-vnd.Haiku-BluetoothPrefs	4276705900
 Laptop	Settings view		PC Portátil
 Only from trusted devices	Settings view		Sólo desde dispositivos de confianza
 15 secs	Settings view		15 segundos
@@ -17,9 +17,11 @@ Stop bluetooth services…	Window		Detener servicios Bluetooth…
 Add…	Remote devices		Añadir…
 As blocked	Remote devices		Como bloqueado
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		No hay ningún dispositivo local Bluetooth registrado en el sistema.
+Policy…	Settings view		Política…
 Revert	Window		Revertir
 Refresh local devices…	Window		Actualizando dispositivos locales…
 Disconnect	Remote devices		Desconectar
+Identify us as…	Settings view		Identifícanos como...
 From all devices	Settings view		Desde todos los dispositivos
 Defaults	Window		Valores predeterminados
 Start bluetooth services…	Window		Iniciar servicios Bluetooth...
@@ -28,12 +30,15 @@ Scanning progress	Inquiry panel		Progreso de la búsqueda
 Bluetooth	System name		Bluetooth
 Launch now	main		Ejecutar ahora
 Remove	Remote devices		Eliminar
+Pick device…	Settings view		Escoge dispositivo…
 Always ask	Settings view		Preguntar siempre
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Con el soporte de:\n- Mika Lindqvist\n- Adrien Destugues\n- Maksym Yevmenkin\n\nGracias a los individuos que ayudaron…\n\nTransportando/donando hardware:\n- Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n- Edwin Erik Amsler\n- Dennis d'Entremont\n- Luroh\n- Pieter Panman\n\nEconómicamente:\n- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n- Matt M, Doug F, Hubert H,\n- Sebastian B, Andrew M, Jared E,\n- Frederik H, Tom S, Ferry B,\n- Greg G, David F, Richard S, Martin W:\n\nCon parches:\n- Michael Weirauch\n- Fredrik Ekdahl\n- Raynald Lesieur\n- Andreas Färber\n- Joerg Meyer\nProbando:\n- Petter H. Juliussen\nQuien me dio todo el conocimiento:\n- the yellowTAB team
 Help	Window		Ayuda
 Pair…	Remote devices		Emparejar…
 Retrieving name of %1	Inquiry panel		Recuperando nombre de %1
 Inquiry	Inquiry panel		Consulta
 Incoming connections policy:	Settings view		Politica para conexiones entrantes:
+Retrieving names…	Inquiry panel		Recuperando nombres...
 Show name	Extended local device view		Mostrar nombre
 Add device to list	Inquiry panel		Añadir dispositivo a la lista
 Remaining %1 seconds	Inquiry panel		Restan %1 segundos
@@ -47,3 +52,4 @@ Server	Settings view		Servidor
 Handheld	Settings view		PC de bolsillo
  packets: 	Device View		 paquetes: 
 About Bluetooth…	Window		Acerca de Bluetooth...
+Starting scan…	Inquiry panel		Comenzando escaneado...

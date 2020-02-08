@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Screen	4090394050
+1	russian	x-vnd.Haiku-Screen	133788249
 no	Screen		нет
 bits/pixel	Screen		бита на пиксель
 15 bits/pixel, 32768 colors	Screen		15 бит на пиксель, 32768 цветов
@@ -17,6 +17,7 @@ vertically	Screen		вертикально
 All workspaces	Screen		Все рабочие столы
 Use laptop panel:	Screen		Использовать экран ноутбука:
 Could not write VESA mode settings file:\n\t	Screen		Ну удалось записать файл настроек VESA режима:\n\t
+Display info	Screen		Информация о дисплее
 Settings will revert in %seconds.	Screen		Настройки будут отменены через %seconds секунд.
 Cancel	Screen		Отмена
 Other…	Screen		Другая…
@@ -33,6 +34,7 @@ Warning	Screen		Предупреждение
 24 bits/pixel, 16 Million colors	Screen		24 бита на пиксель, 16 миллионов цветов
 Hz	Screen		Гц
 Workspaces	Screen		Рабочие столы
+Brightness:	Screen		Яркость:
 32 bits/pixel, 16 Million colors	Screen		32 бита на пиксель, 16 миллионов цветов
 Done	Screen		Готово
 16 bits/pixel, 65536 colors	Screen		16 бит на пиксель, 65536 цветов

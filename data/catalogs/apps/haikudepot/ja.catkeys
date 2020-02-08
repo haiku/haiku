@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	3877862636
+1	japanese	x-vnd.Haiku-HaikuDepot	3605875353
 Repository update error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
 Check for updates…	MainWindow		更新をチェック…
@@ -9,7 +9,6 @@ Available packages	MainWindow		使用可能なパッケージ
 Create account	UserLoginWindow		アカウントの作成
 OK	App		OK
 Mostly stable	RatePackageWindow		ほとんど安定
-Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		アカウントが正常に作成されました。これからパッケージの評価やほかの便利なことができます。
 The response to the captcha was incorrect.	ServerHelper		キャプチャの回答が間違っていました
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		パッケージデーターの更新中に問題が発生しました。その問題によりデータが期限切れに、つまり、アプリケーションの表示から消えてしまいます。この問題に関する追加のデータは、アプリケーションのログから得られるかもしれません。
 Develop packages	MainWindow		開発用パッケージ
@@ -17,17 +16,12 @@ Rate package…	PackageInfoView		パッケージを評価…
 Starting the package daemon failed:\n\n%Error%	App		パッケージデーモンの起動に失敗しました:\n\n%Error%
 <no info>	PackageInfoView		<情報無し>
 No user ratings available.	PackageInfoView		ユーザー評価はありません。
-The user name needs to be at least 3 letters long.	UserLoginWindow		ユーザー名は少なくとも 3 文字は必要です。
 Downloading package '%name%'	WorkStatusView		パッケージ '%name%' をダウンロード中
-Failed to create account	UserLoginWindow		アカウントの作成に失敗しました
 Rating	PackageListView		評価
 Synchronizing icons	ServerIconExportUpdateProcess		アイコンを同期しています。
 Does not start	RatePackageWindow		起動しない
 Show	MainWindow		表示
-But none could be listed here, sorry.	UserLoginWindow		すみません。しかし、ここにはなにもリストされていません。
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		パッケージリストの取得中にエラーが発生しました: %message%
-There are problems with the data you entered:\n\n	UserLoginWindow		入力したデーターに問題があります:\n\n
-The authentication was successful.	UserLoginWindow		認証に成功しました。
 Not specified	RatePackageWindow		指定なし
 Unstable but usable	RatePackageWindow		不安定であるが使用できる
 Active	PackageListView		有効
@@ -38,7 +32,6 @@ Ratings	PackageInfoView		評価
 Switch account…	MainWindow		アカウントの切り替え…
 Preferred language:	UserLoginWindow		優先言語:
 Server Error	ServerHelper		サーバーエラー
-It was not possible to contact the web service.	UserLoginWindow		ウェブサービスにコンタクトできませんでした。
 Name	PackageListView		名前
 Local	LocalPkgDataLoadProcess		ローカル
 Rate %Package%	RatePackageWindow		%Package% を評価
@@ -49,13 +42,11 @@ User rating	RatePackageWindow		ユーザーによる評価
 Installed packages	MainWindow		インストール済みパッケージ
 A requested object or an object involved in the request was not found on the server.	ServerHelper		要求されたオブジェクトまたはリクエストに関連するオブジェクトがサーバー上に見つかりませんでした。　　
 Other users can see this rating	RatePackageWindow		ほかのユーザーがこの評価を見ることができます
-The minimum age requirements must be met.	UserLoginWindow		最低年齢制限を満たさなければいけない。
 Stable	RatePackageWindow		安定
 This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		アプリケーションが古いので、HaikuDepot サーバーシステムと通信できません。Haiku システムを更新して、HaikuDepot の新しいバージョンを入手してください。必要とされる HaikuDepot の最小簿バージョンは、\"%s\" です。
 Fatal error	PackageManager		致命的なエラー
 Package action failed	PackageInfoView		パッケージアクションに失敗しました
 No changelog available.	PackageInfoView		変更記録はありません。
-There are problems in the form:\n\n	UserLoginWindow		次のフォームに問題があります:\n\n
 Error	App		エラー
 There was a puzzling response from the web service.	UserLoginWindow		ウェブサービスから不可解なレスポンスがあった。
 Not logged in	MainWindow		ログインしていません
@@ -74,7 +65,6 @@ Changelog	PackageInfoView		変更履歴
 Rating not possible	MainWindow		評価不能
 Package update error	MainWindow		パッケージアップデートエラー
 About	PackageInfoView		パッケージについて
-Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		認証に失敗しました。ユーザーが存在しないか、不正なパスワードが入力されました。
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# プロセス} other{# プロセス}}
 Reboot required	PackageManager		再起動が必要です
 Very unstable	RatePackageWindow		非常に不安定
@@ -84,7 +74,6 @@ Authorization or security issue.  Logout and log back in again to check that you
 Stability	RatePackageWindow		安定度
 Send	RatePackageWindow		送信する
 Start package daemon	App		パッケージデーモンを起動
-The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		パスワードが弱すぎるか不正です。8 文字以上で、数字が 2 文字以上、大文字が 2 文字以上のパスワードを使用してください。
 The package action could not be scheduled: %Error%	PackageInfoView		パッケージアクションを予約できませんでした: %Error%
 Cancel	RatePackageWindow		キャンセル
 Inactive	PackageListView		無効
@@ -95,7 +84,6 @@ Usage conditions download problem	UserLoginWindow		使用条件のダウンロ�
 OK	PackageInfoView		OK
 Downloading:	PackageInfoView		ダウンロード中:
 Success	UserLoginWindow		成功
-It responded with: %message%	UserLoginWindow		応答: %message%
 Package daemon problem	App		パッケージデーモンの問題
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		リポジトリ
@@ -104,7 +92,6 @@ Close	UserLoginWindow		閉じる
 Close	RatePackageWindow		閉じる
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		リポジトリ '%REPO_NAME%' のパッケージデーターを同期中
 View the usage conditions	UserLoginWindow		使用条件を見る
-Failed to create account: %s\n	UserLoginWindow		次のアカウントの作成に失敗しました: %s\n
 Size	PackageListView		サイズ
 Your rating:	RatePackageWindow		評価:
 I am %MinimumAgeYears% years of age or older	UserLoginWindow		私は %MinimumAgeYears% 歳以上です
@@ -116,16 +103,12 @@ Cancel	MainWindow		キャンセル
 View agreed usage conditions…	MainWindow		同意した使用条件を見る…
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 個以上のダウンロード)}other{(# 個以上のダウンロード)}}
 Refresh repositories	MainWindow		リポジトリの更新
-If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		メールアドレスを入力しない場合、パスワードを忘れた時にリセットできないでしょう。
 Tools	MainWindow		ツール
-The passwords do not match.	UserLoginWindow		パスワードが一致しません。
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		このパッケージは HaikuDepot Server 上には無いようです。従って新規の評価の作成や既存の評価の更新はできません。
 Language	RatePackageWindow		言語
-Authentication failed. Connection to the service failed.	UserLoginWindow		認証が失敗しました。サービスへの接続が失敗しました。
 Log out	MainWindow		ログアウト
 Comment language:	RatePackageWindow		コメント言語:
 Status	PackageListView		状態
-The username is already taken. Please choose another.	UserLoginWindow		ユーザー名はすでに使われています。他の名前を選んでください。
 Update	RatePackageWindow		更新
 OK	ServerHelper		OK
 Language	UserLoginWindow		言語
@@ -134,18 +117,12 @@ Reading repository data	LocalPkgDataLoadProcess		リポジトリのデーター�
 Synchronizing reference data from server	ServerReferenceDataUpdateProcess		サーバーから参照データーを同期中
 Stability:	RatePackageWindow		安定度:
 A validation error has occurred	ServerHelper		検証エラーが発生しました
-The captcha puzzle needs to be solved.	UserLoginWindow		Captcha パズルを解く必要があります。
 Source packages	MainWindow		ソースパッケージ
 -	no package size		-
-User name:	UserLoginWindow		ユーザー名:
 Try again	App		再試行
 Rate package	RatePackageWindow		パッケージを評価
-The usage conditions must be agreed to.	UserLoginWindow		使用条件は同意される必要があります。
-The email address appears to be malformed.	UserLoginWindow		メールアドレスが不正なようです。
-You have not solved the captcha puzzle correctly.	UserLoginWindow		Captcha パズルを正しく解いていません。
 Unknown	PackageListView		不明
 I agree to the usage conditions	UserLoginWindow		使用条件に同意します
-An error has arisen downloading the usage conditions. Check the log for details and try again.	UserLoginWindow		使用条件のダウンロード中にエラーが発生しました。ログで詳細を見て再度試してください。
 Log in	UserLoginWindow		ログイン
 Logged in as %User%	MainWindow		%User% としてログイン
 Email address:	UserLoginWindow		メールアドレス:
@@ -155,13 +132,11 @@ A reboot is necessary to complete the installation process.	PackageManager		イ�
 View latest usage conditions…	MainWindow		最新の使用条件を見る…
 Search terms:	FilterView		検索:
 Pending…	PackageListView		保留中…
-Repeat pass phrase:	UserLoginWindow		パスフレーズの再入力:
 Category:	FilterView		分類:
 Authentication failed	UserLoginWindow		認証に失敗しました
 Manage repositories…	MainWindow		リポジトリの管理…
 Fetching remote repository data	LocalRepositoryUpdateProcess		リモートリポジトリデータを取得中
 Description	PackageListView		説明
-Pass phrase:	UserLoginWindow		パスフレーズ:
 Open %DeskbarLink%	PackageManager		%DeskbarLink% を開く
 Install	PackageManager		インストール
 Input validation	UserLoginWindow		入力検証

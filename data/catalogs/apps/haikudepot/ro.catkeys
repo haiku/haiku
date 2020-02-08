@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	3818326991
+1	romanian	x-vnd.Haiku-HaikuDepot	1574204456
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		A apărut o eroare în timpul reîmprospătării depozitului: %error%
 Check for updates…	MainWindow		Verifică pentru actualizări…
 Uninstall	PackageManager		Dezinstalare
@@ -8,7 +8,6 @@ Available packages	MainWindow		Pachete disponibile
 Create account	UserLoginWindow		Creează cont
 OK	App		OK
 Mostly stable	RatePackageWindow		Majoritatea stabile
-Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Cont creat cu succes. Acum puteți evalua pachete și face alte lucruri folositoare.
 The response to the captcha was incorrect.	ServerHelper		Răspunsul la captcha nu a fost corect.
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		În timpul actualizării datelor pachetului, a apărut o problemă care poate face ca datele să fie depășite sau să lipsească din afișajul aplicației. Detalii adiționale în legătură cu această problemă pot fi obținute din istoricul aplicației.
 Develop packages	MainWindow		Dezvoltă pachete
@@ -16,17 +15,12 @@ Rate package…	PackageInfoView		Evaluați pachet…
 Starting the package daemon failed:\n\n%Error%	App		Pornirea demonului de pachete a eșuat:\n\n%Error%
 <no info>	PackageInfoView		<no info>
 No user ratings available.	PackageInfoView		Nu sunt disponibile evaluările utilizatorilor.
-The user name needs to be at least 3 letters long.	UserLoginWindow		Numele de utilizator trebuie să fie de cel puțin 3 litere.
 Downloading package '%name%'	WorkStatusView		Se descarcă pachetul „%name%”
-Failed to create account	UserLoginWindow		Eșec la crearea contului
 Rating	PackageListView		Evaluare
 Synchronizing icons	ServerIconExportUpdateProcess		Se sincronizează iconițele
 Does not start	RatePackageWindow		Nu pornește
 Show	MainWindow		Arată
-But none could be listed here, sorry.	UserLoginWindow		Dar nu s-a putut lista niciuna, scuze.
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		A apărut o eroare în timpul obținerii listei de pachete: %message%
-There are problems with the data you entered:\n\n	UserLoginWindow		Există probleme cu datele pe care le-ați introdus:\n\n
-The authentication was successful.	UserLoginWindow		Autentificarea a fost reușită.
 Not specified	RatePackageWindow		Nespecificat
 Unstable but usable	RatePackageWindow		Instabil dar utilizabil
 Active	PackageListView		Activ
@@ -37,7 +31,6 @@ Ratings	PackageInfoView		Evaluări
 Switch account…	MainWindow		Schimbare cont…
 Preferred language:	UserLoginWindow		Limbă preferată:
 Server Error	ServerHelper		Eroare de server
-It was not possible to contact the web service.	UserLoginWindow		Contactarea serviciului web nu a fost posibilă.
 Name	PackageListView		Nume
 Local	LocalPkgDataLoadProcess		Local
 Rate %Package%	RatePackageWindow		Evaluează %Package%
@@ -48,13 +41,11 @@ User rating	RatePackageWindow		Evaluarea utilizatorului
 Installed packages	MainWindow		Pachete instalate
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Un obiect cerut sau un obiect implicat în cerere nu a fost găsit pe server.
 Other users can see this rating	RatePackageWindow		Alți utilizatori pot vedea această evaluare
-The minimum age requirements must be met.	UserLoginWindow		Cerințele de vârstă minimă trebuie îndeplinite.
 Stable	RatePackageWindow		Stabil
 This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		Această aplicație este prea veche pentru a comunica cu  sistemul de servere HaikuDepot.  Obțineți o versiune nouă a HaikuDepot  prin actualizarea sistemului Haiku.  Versiunea minimă a  HaikuDepot necesară este \„%s\”.
 Fatal error	PackageManager		Eroare fatală
 Package action failed	PackageInfoView		Acțiune pachet eșuată
 No changelog available.	PackageInfoView		Nu există jurnal de modificări disponibil.
-There are problems in the form:\n\n	UserLoginWindow		Sunt probleme de forma:\n\n
 Error	App		Eroare
 There was a puzzling response from the web service.	UserLoginWindow		A apărut un răspuns neobișnuit de la serviciul web.
 Not logged in	MainWindow		Nu sunteți autentificat
@@ -72,7 +63,6 @@ A network transport error has arisen communicating with the HaikuDepot server sy
 Changelog	PackageInfoView		Jurnal de modificări
 Rating not possible	MainWindow		Evaluarea nu este posibilă
 About	PackageInfoView		Despre
-Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Autentificare eșuată. Utilizatorul nu există sau parola incorectă a fost furnizată.
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}
 Reboot required	PackageManager		Repornire necesară
 Very unstable	RatePackageWindow		Foarte instabil
@@ -81,7 +71,6 @@ Network Transport Error	ServerHelper		Eroare de transport în rețea
 Stability	RatePackageWindow		Stabilitate
 Send	RatePackageWindow		Trimitere
 Start package daemon	App		Pornire demon de pachet
-The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Parola e prea slabă sau nevalidă. Utilizați cel puțin 8 caractere cu minimum 2 numere și 2 litere majuscule.
 The package action could not be scheduled: %Error%	PackageInfoView		Actiunea pachetului n-a putut fi programată: %Error%
 Cancel	RatePackageWindow		Anulează
 Inactive	PackageListView		Inactiv
@@ -91,7 +80,6 @@ OK	MainWindow		OK
 OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Se descarcă:
 Success	UserLoginWindow		Succes
-It responded with: %message%	UserLoginWindow		A răspuns cu: %message%
 Package daemon problem	App		Problemă la serviciul pachetului
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Depozit
@@ -99,7 +87,6 @@ Repository	PackageListView		Depozit
 Close	UserLoginWindow		Închidere
 Close	RatePackageWindow		Închidere
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Se sincronizează datele pachetelor pentru depozitul „%REPO_NAME%”
-Failed to create account: %s\n	UserLoginWindow		Nu s-a putut crea contul: %s\n
 Size	PackageListView		Mărime
 Your rating:	RatePackageWindow		Evaluare:
 I am %MinimumAgeYears% years of age or older	UserLoginWindow		Sunt în vârstă de %MinimumAgeYears% de ani sau mai mult
@@ -110,16 +97,12 @@ n/a	PackageInfoView		n/a
 Cancel	MainWindow		Anulează
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 more to download)}other{(# more to download)}}
 Refresh repositories	MainWindow		Actualizare depozite
-If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Dacă nu furnizați o adresă de email, nu veți putea reseta parola dacă o uitați.
 Tools	MainWindow		Unelte
-The passwords do not match.	UserLoginWindow		Parolele nu se potrivesc.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Acest pachet nu pare a fi pe Server HaikuDepot, prin urmare nu este posibil să creați o evaluare nouă sau să editați o evaluare existentă.
 Language	RatePackageWindow		Limbă
-Authentication failed. Connection to the service failed.	UserLoginWindow		Autentificare eșuată. Conectare la serviciu eșuată.
 Log out	MainWindow		Ieșire
 Comment language:	RatePackageWindow		Limbă comentariu:
 Status	PackageListView		Stare
-The username is already taken. Please choose another.	UserLoginWindow		Acest nume de utilizator este deja folosit. Alegeți altul.
 Update	RatePackageWindow		Actualizare
 OK	ServerHelper		OK
 Language	UserLoginWindow		Limbă
@@ -128,14 +111,10 @@ Reading repository data	LocalPkgDataLoadProcess		Se citesc datele depozitului
 Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Se sincronizează datele de referință de la server
 Stability:	RatePackageWindow		Stabilitate:
 A validation error has occurred	ServerHelper		A apărut o eroare de validare
-The captcha puzzle needs to be solved.	UserLoginWindow		Puzzle captcha trebuie rezolvat.
 Source packages	MainWindow		Pachete sursă
 -	no package size		-
-User name:	UserLoginWindow		Nume utilizator:
 Try again	App		Încearcă din nou
 Rate package	RatePackageWindow		Evaluați pachet
-The email address appears to be malformed.	UserLoginWindow		Adresa de email pare a fi incorectă.
-You have not solved the captcha puzzle correctly.	UserLoginWindow		Nu ați rezolvat corect puzzle captcha.
 Unknown	PackageListView		Necunoscut
 Log in	UserLoginWindow		Autentificare
 Logged in as %User%	MainWindow		Autentificat ca %User%
@@ -145,13 +124,11 @@ HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		O repornire este necesară pentru a completa procesul de instalare.
 Search terms:	FilterView		Termeni de căutat:
 Pending…	PackageListView		În așteptare…
-Repeat pass phrase:	UserLoginWindow		Repetare parolă:
 Category:	FilterView		Categorie:
 Authentication failed	UserLoginWindow		Autentificarea a eșuat
 Manage repositories…	MainWindow		Gestionare depozite...
 Fetching remote repository data	LocalRepositoryUpdateProcess		Se aduc datele depozitului de la distanță
 Description	PackageListView		Descriere
-Pass phrase:	UserLoginWindow		Parolă:
 Open %DeskbarLink%	PackageManager		Deschide %DeskbarLink%
 Install	PackageManager		Instalare
 Input validation	UserLoginWindow		Validare intrare

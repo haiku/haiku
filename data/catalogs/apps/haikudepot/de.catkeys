@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	3877862636
+1	german	x-vnd.Haiku-HaikuDepot	3605875353
 Repository update error	LocalRepositoryUpdateProcess		Fehler bei Paketquellenaktualisierung
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Fehler bei der Aktualisierung der Paketquelle: %error%
 Check for updates…	MainWindow		Aktualisierungen suchen…
@@ -9,7 +9,6 @@ Available packages	MainWindow		Verfügbare Pakete
 Create account	UserLoginWindow		Benutzerkonto erstellen
 OK	App		OK
 Mostly stable	RatePackageWindow		Ziemlich stabil
-Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Benutzerkonto erfolgreich angelegt. Jetzt können Pakete bewertet werden, etc.
 The response to the captcha was incorrect.	ServerHelper		Das Captcha wurde nicht richtig beantwortet.
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Bei der Aktualisierung von Paketdaten trat ein Problem auf. Dadurch könnten die angezeigten Daten der Anwendung veraltet sein oder fehlen. Weitere Details zu diesem Problem können dem Anwendungs-Log entnommen werden.
 Develop packages	MainWindow		Entwicklungs-Pakete
@@ -17,17 +16,12 @@ Rate package…	PackageInfoView		Paket bewerten…
 Starting the package daemon failed:\n\n%Error%	App		Der Paket-Daemon konnte nicht gestartet werden:\n\n%Error%
 <no info>	PackageInfoView		<keine Info>
 No user ratings available.	PackageInfoView		Keine Bewertungen vorhanden.
-The user name needs to be at least 3 letters long.	UserLoginWindow		Der Benutzername muss mindestens 3 Zeichen lang sein.
 Downloading package '%name%'	WorkStatusView		Paket '%name%' wird heruntergeladen
-Failed to create account	UserLoginWindow		Benutzerkonto konnte nicht angelegt werden
 Rating	PackageListView		Bewertung
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronisierungs-Icons
 Does not start	RatePackageWindow		Startet nicht
 Show	MainWindow		Anzeigen
-But none could be listed here, sorry.	UserLoginWindow		Leider können sie hier nicht aufgeführt werden.
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Fehler beim Beschaffen der Paketliste: %message%
-There are problems with the data you entered:\n\n	UserLoginWindow		Mit den eingegebenen Daten gab es Probleme:\n\n
-The authentication was successful.	UserLoginWindow		Anmeldung erfolgreich.
 Not specified	RatePackageWindow		Keine Angaben
 Unstable but usable	RatePackageWindow		Instabil aber brauchbar
 Active	PackageListView		Aktiviert
@@ -38,7 +32,6 @@ Ratings	PackageInfoView		Bewertungen
 Switch account…	MainWindow		Konto wechseln…
 Preferred language:	UserLoginWindow		Bevorzugte Sprache:
 Server Error	ServerHelper		Serverfehler
-It was not possible to contact the web service.	UserLoginWindow		Der Web-Dienst konnte nicht erreicht werden.
 Name	PackageListView		Name
 Local	LocalPkgDataLoadProcess		Lokal
 Rate %Package%	RatePackageWindow		%Package% bewerten
@@ -49,13 +42,11 @@ User rating	RatePackageWindow		Bewertung
 Installed packages	MainWindow		Installierte Pakete
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Ein angefordertes Objekt bzw. ein bei der Anfrage beteiligtes Objekt, wurde auf dem Server  nicht gefunden.
 Other users can see this rating	RatePackageWindow		Diese Bewertung ist für andere Anwender sichtbar
-The minimum age requirements must be met.	UserLoginWindow		Das Mindestalter muss erfüllt sein.
 Stable	RatePackageWindow		Stabil
 This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		Die Anwendung ist zu alt, um mit dem HaikuDepot Server zu kommunizieren. Um eine neuere HaikuDepot Anwendung zu nutzen, muss Haiku aktualisiert werden. Die HaikuDepot Version muss zumindest \"%s\" sein.
 Fatal error	PackageManager		Schwerwiegender Fehler
 Package action failed	PackageInfoView		Paket-Aktion fehlgeschlagen
 No changelog available.	PackageInfoView		Änderungsprotokoll nicht vorhanden.
-There are problems in the form:\n\n	UserLoginWindow		Es gibt Probleme mit dem Format:\n\n
 Error	App		Fehler
 There was a puzzling response from the web service.	UserLoginWindow		Der Web-Dienst hat mit einer wirren Meldung geantwortet.
 Not logged in	MainWindow		Nicht angemeldet
@@ -74,7 +65,6 @@ Changelog	PackageInfoView		Änderungsprotokoll
 Rating not possible	MainWindow		Bewertung nicht möglich
 Package update error	MainWindow		Fehler bei Paketaktualisierung
 About	PackageInfoView		Über
-Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Anmeldung fehlgeschlagen. Entweder dieses Benutzerkonto existiert nicht oder es wurde ein falsches Kennwort eingegeben.
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# Prozess} other{# Prozesse}}
 Reboot required	PackageManager		Neustart erforderlich
 Very unstable	RatePackageWindow		Sehr instabil
@@ -84,7 +74,6 @@ Authorization or security issue.  Logout and log back in again to check that you
 Stability	RatePackageWindow		Stabilität
 Send	RatePackageWindow		Senden
 Start package daemon	App		Paket-Daemon starten
-The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Das Kennwort ist zu schwach oder ungültig. Es muss mindestens 8 Zeichen lang sein und mindestens 2 Zahlen und 2 Großbuchstaben enthalten.
 The package action could not be scheduled: %Error%	PackageInfoView		Die Aktion konnte nicht auf das Paket angewandt werden: %Error%
 Cancel	RatePackageWindow		Abbrechen
 Inactive	PackageListView		Deaktiviert
@@ -95,7 +84,6 @@ Usage conditions download problem	UserLoginWindow		Problem beim Herunterladen de
 OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Aktueller Download:
 Success	UserLoginWindow		Erfolg
-It responded with: %message%	UserLoginWindow		Antwort: %message%
 Package daemon problem	App		Paket Daemon Problem
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Paketquelle
@@ -104,7 +92,6 @@ Close	UserLoginWindow		Schließen
 Close	RatePackageWindow		Schließen
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchronisieren von Paketdaten für Paketquelle '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Nutzungsbedingungen lesen
-Failed to create account: %s\n	UserLoginWindow		Benutzerkonto konnte nicht angelegt werden: %s\n
 Size	PackageListView		Größe
 Your rating:	RatePackageWindow		Eigene Bewertung:
 I am %MinimumAgeYears% years of age or older	UserLoginWindow		Ich bin %MinimumAgeYears% Jahre oder älter
@@ -116,16 +103,12 @@ Cancel	MainWindow		Abbrechen
 View agreed usage conditions…	MainWindow		Zugestimmte Nutzungsbedingungen lesen…
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 weiterer Download)}other{(# weitere Downloads)}}
 Refresh repositories	MainWindow		Paketquellen aktualisieren
-If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Wird keine E-Mail-Adresse hinterlegt, kann das Kennwort nicht zurückgesetzt werden, wenn es mal vergessen wird.
 Tools	MainWindow		Werkzeuge
-The passwords do not match.	UserLoginWindow		Die Kennwörter stimmen nicht überein.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Dieses Paket scheint nicht auf dem HaikuDepot Server zu sein. Es ist daher nicht möglich eine neue Bewertung abzugeben, bzw. eine bestehende zu ändern.
 Language	RatePackageWindow		Sprache
-Authentication failed. Connection to the service failed.	UserLoginWindow		Anmeldung fehlgeschlagen. Verbindung zum Dienst nicht möglich.
 Log out	MainWindow		Abmelden
 Comment language:	RatePackageWindow		Kommentar-Sprache:
 Status	PackageListView		Status
-The username is already taken. Please choose another.	UserLoginWindow		Dieser Benutzername ist bereits vergeben. Bitte einen anderen versuchen.
 Update	RatePackageWindow		Aktualisieren
 OK	ServerHelper		OK
 Language	UserLoginWindow		Sprache
@@ -134,18 +117,12 @@ Reading repository data	LocalPkgDataLoadProcess		Einlesen von Paketquellendaten
 Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Synchronisieren von Referenzdaten vom Server
 Stability:	RatePackageWindow		Stabilität:
 A validation error has occurred	ServerHelper		Fehler bei der Validieren
-The captcha puzzle needs to be solved.	UserLoginWindow		Die Captcha-Frage muss beantwortet werden.
 Source packages	MainWindow		Quellcode-Pakete
 -	no package size		-
-User name:	UserLoginWindow		Benutzername:
 Try again	App		Nochmal versuchen
 Rate package	RatePackageWindow		Paket bewerten
-The usage conditions must be agreed to.	UserLoginWindow		Den Nutzungsbedingungen muss zugestimmt werden.
-The email address appears to be malformed.	UserLoginWindow		Das Format der angegebenen E-Mail-Adresse ist fehlerhaft.
-You have not solved the captcha puzzle correctly.	UserLoginWindow		Die Captcha-Frage wurde nicht richtig beantwortet.
 Unknown	PackageListView		Unbekannt
 I agree to the usage conditions	UserLoginWindow		I stimme den Nutzungsbedingungen zu
-An error has arisen downloading the usage conditions. Check the log for details and try again.	UserLoginWindow		Beim Herunterladen der Nutzungsbedingungen ist ein Fehler aufgetreten. Bitte Logdatei überprüfen und nochmals versuchen.
 Log in	UserLoginWindow		Anmelden
 Logged in as %User%	MainWindow		Angemeldet als %User%
 Email address:	UserLoginWindow		E-Mail-Adresse:
@@ -155,13 +132,11 @@ A reboot is necessary to complete the installation process.	PackageManager		Um d
 View latest usage conditions…	MainWindow		Aktuelle Nutzungsbedingungen lesen…
 Search terms:	FilterView		Suchbegriffe:
 Pending…	PackageListView		Ausstehend…
-Repeat pass phrase:	UserLoginWindow		Kennwort wiederholen:
 Category:	FilterView		Kategorie:
 Authentication failed	UserLoginWindow		Anmeldung fehlgeschlagen
 Manage repositories…	MainWindow		Paketquellen verwalten…
 Fetching remote repository data	LocalRepositoryUpdateProcess		Abrufen von Paketquellendaten
 Description	PackageListView		Beschreibung
-Pass phrase:	UserLoginWindow		Kennwort:
 Open %DeskbarLink%	PackageManager		%DeskbarLink% öffnen
 Install	PackageManager		Installieren
 Input validation	UserLoginWindow		Eingabeprüfung

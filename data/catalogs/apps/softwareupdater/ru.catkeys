@@ -1,5 +1,6 @@
-1	russian	x-vnd.haiku-softwareupdater	347109711
+1	russian	x-vnd.haiku-softwareupdater	1722463448
 Updating version	SoftwareUpdaterWindow	List item text	Обновляется версия
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Нажмите здесь для установки {0, plural, one{# обновленного пакета} other{# обновленных пакетов}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Пакеты, которые будут удалены
 No active network connection was found	UpdateManager	Error message	Отсутствует соединение с сетью
 Quit	SoftwareUpdaterWindow	Alert button label	Выйти

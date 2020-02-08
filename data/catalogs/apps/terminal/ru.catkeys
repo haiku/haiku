@@ -1,10 +1,11 @@
-1	russian	x-vnd.Haiku-Terminal	116723326
+1	russian	x-vnd.Haiku-Terminal	2058440251
 Close other tabs	Terminal TermWindow		Закрыть остальные вкладки
 Insert path	Terminal TermView		Вставить путь
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Терминал не смог запустить оболочку. Простите.
 Text encoding	Terminal TermWindow		Кодировка
 OK	Terminal SetTitleWindow		ОК
 Edit	Terminal TermWindow		Изменить
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               распечатать эту справку\n  -t,     --title              установить заголовок окна\n  -f,     --fullscreen         запускать в полноэкранном режиме\n  -w,     --working-directory  установить исходную рабочую директорию\n
 Select all	Terminal TermWindow		Выделить всё
 Confirm exit if active programs exist	Terminal AppearancePrefView		Подтверждать выход если процессы еще запущены
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tТекущая директория активного процесса текущей вкладки.\n\t\t\tОпционально можно указать максимальное число отображаемых компонентов пути.\n\t\t\tНапример '%2d' отобразит последние 2 компонента.\n\t%T\t-\tИмя приложения Терминал для текущей локали.\n\t%e\t-\tКодировка текущей вкладки. Для UTF-8 не отображается.\n\t%i\t-\tНомер окна.\n\t%p\t-\tНазвание активного процесса в текущей вкладке.\n\t%t\t-\tЗаголовок текущей вкладки.\n
@@ -85,6 +86,7 @@ Use text:	Terminal FindWindow		Использовать текст:
 Close active tab	Terminal TermWindow		Закрыть активную вкладку
 Save as default	Terminal TermWindow		Сохранить по умолчанию
 Nothing is selected.	Terminal TermWindow		Ничего не выделено
+Use left Option as Meta key	Terminal AppearancePrefView		Использовать левый Option как клавишу Meta
 Find	Terminal FindWindow		Найти
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Этот шаблон описывает заголовок текущей вкладки.\nВозможно использовать следующие переменные:\n
 Professional	Terminal colors scheme		Профессионал
@@ -108,6 +110,7 @@ Set window title	Terminal TermWindow		Установить заголовок о
 Increase	Terminal TermWindow		Увеличить
 OK	Terminal TermWindow		ОК
 Close window	Terminal TermWindow		Закрыть окно
+Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nВсе права защищены © 2001-2019 Haiku, Inc.\nВсе права защищены © 1999 Kazuho Okui и Takashi Murai.\n\nИспользование: %s [OPTION] [SHELL]\n
 Solarized Light	Terminal colors scheme		Солнечный свет
 Clear all	Terminal TermWindow		Очистить всё
 Search forward	Terminal FindWindow		Искать сверху вниз

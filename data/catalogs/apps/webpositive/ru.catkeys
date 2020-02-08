@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-WebPositive	2763299522
+1	russian	x-vnd.Haiku-WebPositive	1879106286
 Authentication required	Authentication Panel		Требуется авторизация
 Previous	WebPositive Window		Ранее
 (Finish: %date)	Download Window		(Завершение: %date)
@@ -28,7 +28,9 @@ Start page:	Settings Window		Начальная страница:
 Cancel	Download Window		Отмена
 Settings	Settings Window		Настройки
 Downloads	WebPositive Window		Загрузки
+Browse…	Settings Window		Просмотр…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Закладка для этой страницы (%bookmarkName) уже существует.
+Resume prior session	Settings Window		Восстановить предыдущую сессию
 Match case	WebPositive Window		Учитывать регистр
 Proxy password:	Settings Window		Пароль прокси:
 Size:	Font Selection view		Размер:
@@ -119,6 +121,7 @@ Remember username and password for this site	Authentication Panel		Запомн�
 (Finish: %date - %duration left)	Download Window		(Завершение: %date - %duration осталось)
 Cookie manager	Cookie Manager		Менеджер куков
 Show home button	Settings Window		Показывать кнопку Домой
+Start new session	Settings Window		Запуск нового сеанса
 The cookie jar is empty!	Cookie Manager		Архив куков пуст!
 Value	Cookie Manager		Значение
 Remove missing	Download Window		Убрать отсутствующие
@@ -141,6 +144,7 @@ Settings	WebPositive Window		Настройки
 Clear	URL Bar		Очистить
 Loading %url	WebPositive Window		Загрузка %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф.
+Start up:	Settings Window		При запуске:
 Confirmation	WebPositive Window		Подтверждение
 Session cookie	Cookie Manager		Куки сессии
 Open all	WebPositive Window		Открыть все

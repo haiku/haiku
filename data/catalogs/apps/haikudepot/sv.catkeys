@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	1687365744
+1	swedish	x-vnd.Haiku-HaikuDepot	1415378461
 Repository update error	LocalRepositoryUpdateProcess		Fel vid uppdatering av repositorie
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ett fel inträffade vid uppdatering av repositoriet: %error%
 Check for updates…	MainWindow		Leta efter uppdateringar…
@@ -9,7 +9,6 @@ Available packages	MainWindow		Tillgängliga paket
 Create account	UserLoginWindow		Skapa konto
 OK	App		OK
 Mostly stable	RatePackageWindow		Mestadels stabil
-Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Kontot lyckades skapas. Du kan nu betygsätta paket och göra andra vettiga saker.
 The response to the captcha was incorrect.	ServerHelper		Svaret på captchan var inkorrekt.
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Vid uppdatering av paketdata har ett problem uppstått som kan göra att data är föråldrade eller saknas från programmets display. Ytterligare information om det här problemet kan hämtas från applikationsloggarna.
 Develop packages	MainWindow		Utvecklingspaket
@@ -17,17 +16,12 @@ Rate package…	PackageInfoView		Betygsätt paket...
 Starting the package daemon failed:\n\n%Error%	App		Starta package daemon misslyckades:\n\n%Error%
 <no info>	PackageInfoView		<Ingen information>
 No user ratings available.	PackageInfoView		Ingen betygsättnings tillgänglig.
-The user name needs to be at least 3 letters long.	UserLoginWindow		användarnamnet måste vara minst 3 bokstäver långt.
 Downloading package '%name%'	WorkStatusView		Laddar hem paket '%name%'
-Failed to create account	UserLoginWindow		Misslyckades skapa konto
 Rating	PackageListView		Betyg
 Synchronizing icons	ServerIconExportUpdateProcess		Synkroniserar ikoner
 Does not start	RatePackageWindow		Starta inte
 Show	MainWindow		Visa
-But none could be listed here, sorry.	UserLoginWindow		Ursäkta, Men ingen kunde listas här.
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Ett fel inträffade vid hämtning av paketlistan: %message%
-There are problems with the data you entered:\n\n	UserLoginWindow		Det är något problem med data du skrev:\n\n
-The authentication was successful.	UserLoginWindow		Behörighetskontrollen lyckades.
 Not specified	RatePackageWindow		Inte angivet
 Unstable but usable	RatePackageWindow		Ostabil men kan användas
 Active	PackageListView		Aktiv
@@ -38,7 +32,6 @@ Ratings	PackageInfoView		Betyg
 Switch account…	MainWindow		Byt konto...
 Preferred language:	UserLoginWindow		Föredraget språk:
 Server Error	ServerHelper		Serverfel
-It was not possible to contact the web service.	UserLoginWindow		Det gick inte att kontakta webb servicen.
 Name	PackageListView		Namn
 Local	LocalPkgDataLoadProcess		Lokal
 Rate %Package%	RatePackageWindow		Betyg %Package%
@@ -49,13 +42,11 @@ User rating	RatePackageWindow		Användarbetyg
 Installed packages	MainWindow		Installerade paket
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Ett begärt objekt eller ett objekt involverat i begäran hittades inte på servern.
 Other users can see this rating	RatePackageWindow		Andra användare kan se denna bedömning
-The minimum age requirements must be met.	UserLoginWindow		Minimiålderskraven måste uppfyllas.
 Stable	RatePackageWindow		Stabil
 This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		Denna applikation är för gammal för att kommunicera med  HaikuDepot-serversystemet.  Få en nyare version av HaikuDepot  genom att uppdatera Haiku.  Den minsta versionen av  HaikuDepot som krävs är \ "% s \".
 Fatal error	PackageManager		Allvarligt fel
 Package action failed	PackageInfoView		Paketåtgärden misslyckades
 No changelog available.	PackageInfoView		Ingen ändringslogg finns.
-There are problems in the form:\n\n	UserLoginWindow		Det finns problem i formuläret:\n\n
 Error	App		Fel
 There was a puzzling response from the web service.	UserLoginWindow		Det komm ett konstigt meddelande från webb servicen.
 Not logged in	MainWindow		Inte inloggad
@@ -74,7 +65,6 @@ Changelog	PackageInfoView		Ändringslogg
 Rating not possible	MainWindow		Betyg ej möjligt
 Package update error	MainWindow		Paketuppdateringsfel
 About	PackageInfoView		Om
-Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Autentisering misslyckades. Användaren finns inte eller så är fel lösenord angivet.
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processer}}
 Reboot required	PackageManager		Omstart krävs
 Very unstable	RatePackageWindow		Mycket ostabil
@@ -83,7 +73,6 @@ Network Transport Error	ServerHelper		Nättransportfel
 Stability	RatePackageWindow		Stabilitet
 Send	RatePackageWindow		Skicka
 Start package daemon	App		Starta paket-servicen
-The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Lösenordet är för svagt eller inte rätt. Varvänlig och använd minst 8 tecken med minst 2 nummer och 2 stora bokstäver.
 The package action could not be scheduled: %Error%	PackageInfoView		Paket körningen kunde inte planeras: %Error%
 Cancel	RatePackageWindow		Avbryt
 Inactive	PackageListView		Inaktiv
@@ -94,7 +83,6 @@ Usage conditions download problem	UserLoginWindow		Fel vid hämtning av använda
 OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Mestadels stabil
 Success	UserLoginWindow		Klar
-It responded with: %message%	UserLoginWindow		Den svarade med: %message%
 Package daemon problem	App		Problem med paketdemonen
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Repositorie
@@ -103,7 +91,6 @@ Close	UserLoginWindow		Stäng
 Close	RatePackageWindow		Stäng
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synkroniserar paketdata för repositoriet '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Visa användarvillkor
-Failed to create account: %s\n	UserLoginWindow		Misslyckades skapa konto: %s\n
 Size	PackageListView		Storlek
 Your rating:	RatePackageWindow		Dina betyg:
 I am %MinimumAgeYears% years of age or older	UserLoginWindow		Jag är %MinimumAgeYears% år eller äldre
@@ -115,16 +102,12 @@ Cancel	MainWindow		Avbryt
 View agreed usage conditions…	MainWindow		Visa godkända användarvillkor…
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 kvar att ladda hem)}other{(# kvar att ladda hem)}}
 Refresh repositories	MainWindow		Ladda om repositorier
-If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Om du inte anger en e-mail adress, kommer du inte kunna återställa ditt lösenord om du glömmer det.
 Tools	MainWindow		Verktyg
-The passwords do not match.	UserLoginWindow		Lösenorden stämmer inte överens.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Det här paketet verkar inte finnas på HaikuDepot-servern, så det är inte möjligt att skapa ett nytt betyg eller redigera ett befintligt betyg.
 Language	RatePackageWindow		Språk
-Authentication failed. Connection to the service failed.	UserLoginWindow		Autentiseringen misslyckades. Koppling till servicen misslyckades.
 Log out	MainWindow		Logga ut
 Comment language:	RatePackageWindow		Kommentarspråk:
 Status	PackageListView		Status
-The username is already taken. Please choose another.	UserLoginWindow		Användarnamnet används redan. Välj ett annat.
 Update	RatePackageWindow		Uppdatera
 OK	ServerHelper		OK
 Language	UserLoginWindow		Språk
@@ -133,18 +116,12 @@ Reading repository data	LocalPkgDataLoadProcess		Läser repositoriedata
 Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Synkroniserar referensdata från server
 Stability:	RatePackageWindow		Stabilitet:
 A validation error has occurred	ServerHelper		Ett valideringsfel har inträffat
-The captcha puzzle needs to be solved.	UserLoginWindow		Captcha pusslet behöver lösas.
 Source packages	MainWindow		Källkodspaket
 -	no package size		-
-User name:	UserLoginWindow		Användarnamn:
 Try again	App		Försök igen
 Rate package	RatePackageWindow		Betygsatt paket
-The usage conditions must be agreed to.	UserLoginWindow		Du måste godkänna användarvillkoren.
-The email address appears to be malformed.	UserLoginWindow		E-post adressen är fel formulerat.
-You have not solved the captcha puzzle correctly.	UserLoginWindow		Du har inte löst captcha pusslet rätt.
 Unknown	PackageListView		Okänd
 I agree to the usage conditions	UserLoginWindow		Jag godkänner användarvillkoren
-An error has arisen downloading the usage conditions. Check the log for details and try again.	UserLoginWindow		Ett fel har uppstått vid hämtning av användarvillkoren. Se loggen för mer information eller försök igen.
 Log in	UserLoginWindow		Logga in
 Logged in as %User%	MainWindow		Inloggad som %User%
 Email address:	UserLoginWindow		E-postadress:
@@ -154,13 +131,11 @@ A reboot is necessary to complete the installation process.	PackageManager		En o
 View latest usage conditions…	MainWindow		Se de senaste användarvillkoren…
 Search terms:	FilterView		Sökvillkor
 Pending…	PackageListView		Väntar...
-Repeat pass phrase:	UserLoginWindow		Upprepa lösenord:
 Category:	FilterView		Kategori:
 Authentication failed	UserLoginWindow		Autentisering misslyckades
 Manage repositories…	MainWindow		Hantera repositorier...
 Fetching remote repository data	LocalRepositoryUpdateProcess		Hämtar fjärrdata från repositorie
 Description	PackageListView		Beskrivning
-Pass phrase:	UserLoginWindow		Lösen fras:
 Open %DeskbarLink%	PackageManager		Öppna %DeskbarLink%
 Install	PackageManager		Installera
 Input validation	UserLoginWindow		Ogiltigt indata

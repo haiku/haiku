@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	4090424993
+1	hungarian	x-vnd.Haiku-HaikuDepot	2687270624
 Check for updates…	MainWindow		Frissítések keresése…
 Uninstall	PackageManager		Eltávolítás
 (%Votes%)	FeaturedPackagesView		(%Votes%)
@@ -6,20 +6,14 @@ Uninstalled	PackageListView		Eltávolítva
 Available packages	MainWindow		Elérhető csomagok
 Create account	UserLoginWindow		Felhasználói fiók létrehozása
 Mostly stable	RatePackageWindow		Nagyrészt stabil
-Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		A fiók sikeresen létrehozva. Mostmár lehetőség van a csomagok értékelésére és további funkciókra.
 Develop packages	MainWindow		Fejlesztői csomagok
 Rate package…	PackageInfoView		Csomag értékelése…
 Starting the package daemon failed:\n\n%Error%	App		A csomag démon indítása sikertelen:\n\n%Error%
 <no info>	PackageInfoView		<nincs információ>
 No user ratings available.	PackageInfoView		Felhasználói értékelés nem áll rendelkezésre.
-The user name needs to be at least 3 letters long.	UserLoginWindow		A felhasználói névnek legalább 3 karakter hosszúnak kell lennie.
-Failed to create account	UserLoginWindow		Nem sikerült a fiók létrehozása
 Rating	PackageListView		Értékelés
 Does not start	RatePackageWindow		Nem indul el
 Show	MainWindow		Megjelenítés
-But none could be listed here, sorry.	UserLoginWindow		A felsoroltak közül egyik sem használható.
-There are problems with the data you entered:\n\n	UserLoginWindow		Tévesen megadott adatok:\n\n
-The authentication was successful.	UserLoginWindow		A felhasználóazonosítás sikeres volt
 Not specified	RatePackageWindow		Nincs megadva
 Unstable but usable	RatePackageWindow		Instabil, de használható
 Active	PackageListView		Aktív
@@ -28,7 +22,6 @@ Login or Create account	MainWindow		Belépés vagy fiók létrehozása
 Ratings	PackageInfoView		Értékelés
 Switch account…	MainWindow		Másik fiók…
 Preferred language:	UserLoginWindow		Előnyben részesített nyelv:
-It was not possible to contact the web service.	UserLoginWindow		Nem sikerült elérni a webes szolgáltatást.
 Name	PackageListView		Név
 Rate %Package%	RatePackageWindow		%Package% értékelése
 Quit HaikuDepot	App		Raktár bezárása
@@ -39,7 +32,6 @@ Stable	RatePackageWindow		Stabil
 Fatal error	PackageManager		Végzetes hiba
 Package action failed	PackageInfoView		A csomag telepítése sikertelen
 No changelog available.	PackageInfoView		Nincs módosítás-előzmény
-There are problems in the form:\n\n	UserLoginWindow		Az űrlap hibás:\n\n
 There was a puzzling response from the web service.	UserLoginWindow		A webes szolgáltatás rejtélyes választ adott.
 Not logged in	MainWindow		Nincs bejelentkezve
 No, quit HaikuDepot	App		Nem, a Raktár bezárása.
@@ -51,12 +43,10 @@ Contents	PackageInfoView		Tartalom
 Close	PackageManager		Bezárás
 Changelog	PackageInfoView		Változásnapló
 About	PackageInfoView		Névjegy
-Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Hitelesítési hiba. A felhasználó nem létezik vagy hibás jelszó került megadásra.
 Very unstable	RatePackageWindow		Nagyon instabil
 Stability	RatePackageWindow		Stabilitás
 Send	RatePackageWindow		Küldés
 Start package daemon	App		Csomag démon indítása
-The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		A jelszó érvénytelen vagy könnyen megfejthető. A jelszónak legalább 8 karakterből kell álnia, illetve legalább 2 számot és 2 nagybetűt tartalmaz.
 The package action could not be scheduled: %Error%	PackageInfoView		A csomaggal történő művelet nem ütemezhető be: %Error%
 Cancel	RatePackageWindow		Mégse
 Inactive	PackageListView		Inaktív
@@ -69,7 +59,6 @@ Success	UserLoginWindow		Sikeres
 Repository	PackageListView		Tároló
 Close	UserLoginWindow		Bezárás
 Close	RatePackageWindow		Bezárás
-Failed to create account: %s\n	UserLoginWindow		%s létrehozása sikertelen\n
 Size	PackageListView		Méret
 Your rating:	RatePackageWindow		Saját értékelés:
 Your rating was updated.	RatePackageWindow		Az értékelés módosítása sikerült.
@@ -77,27 +66,19 @@ All categories	FilterView		Minden kategória
 n/a	PackageInfoView		nincs értékelve
 Cancel	MainWindow		Mégse
 Refresh repositories	MainWindow		Tárolók frissítése
-If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		E-mail cím hiányában a jelszó helyreállítása nem lehetséges.
 Tools	MainWindow		Eszközök
-The passwords do not match.	UserLoginWindow		A jelszavak nem egyeznek.
 Language	RatePackageWindow		Nyelv
-Authentication failed. Connection to the service failed.	UserLoginWindow		A hitelesítés sikertelen. Nem tudtam kapcsolódni a szolgáltatáshoz.
 Log out	MainWindow		Kijelentkezés
 Comment language:	RatePackageWindow		Hozzászólás nyelve:
 Status	PackageListView		Állapot
-The username is already taken. Please choose another.	UserLoginWindow		Ez a felhasználónév már foglalt. Válasszon másikat.
 Update	RatePackageWindow		Frissítés
 Language	UserLoginWindow		Nyelv
 OK	UserLoginWindow		Rendben
 Stability:	RatePackageWindow		Stabilitás:
-The captcha puzzle needs to be solved.	UserLoginWindow		A kapta kód megadása szükséges.
 Source packages	MainWindow		Forráskód csomagok
 -	no package size		-
-User name:	UserLoginWindow		Felhasználónév:
 Try again	App		Próbálja újra
 Rate package	RatePackageWindow		Csomag értékelése
-The email address appears to be malformed.	UserLoginWindow		Hibás az e-mail cím formátuma.
-You have not solved the captcha puzzle correctly.	UserLoginWindow		A megadott kapta kód érvényes.
 Unknown	PackageListView		Ismeretlen
 Log in	UserLoginWindow		Bejelentkezés
 Logged in as %User%	MainWindow		Bejelentkezett mint %User%
@@ -106,12 +87,10 @@ Screenshot	ScreenshotWindow		Képernyőkép
 HaikuDepot	System name		Raktár
 Search terms:	FilterView		Keresési feltétel:
 Pending…	PackageListView		Folyamatban…
-Repeat pass phrase:	UserLoginWindow		Jelszó ismétlése:
 Category:	FilterView		Kategória:
 Authentication failed	UserLoginWindow		A hitelesítés sikertelen
 Manage repositories…	MainWindow		Csomagtárolók kezelése…
 Description	PackageListView		Leírás
-Pass phrase:	UserLoginWindow		Jelszó:
 Open %DeskbarLink%	PackageManager		%DeskbarLink% megnyitása
 Install	PackageManager		Telepítés
 Input validation	UserLoginWindow		Bevitel érvényesítése

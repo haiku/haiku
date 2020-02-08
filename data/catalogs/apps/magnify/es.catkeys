@@ -1,6 +1,8 @@
-1	spanish; castilian	x-vnd.Haiku-Magnify	94607167
+1	spanish; castilian	x-vnd.Haiku-Magnify	3228180819
+  size must be > 4 and a multiple of 4	Console		  El tamaño debe ser mayor a 4, y múltiplo de 4.
 Decrease pixel size	Magnify-Main		Disminuir tamaño del píxel
 Increase pixel size	Magnify-Main		Aumentar tamaño del píxel
+magnify: size must be a multiple of 4	Console		Magnify: el tamaño debe ser múltiplo de 4
 Stick coordinates	Magnify-Main		Pegar coordenadas
 %width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}
 Copy image	Magnify-Main		Copiar imagen
@@ -8,6 +10,7 @@ Decrease window size	Magnify-Main		Disminuir tamaño de ventana
 Remove a crosshair	Magnify-Main		Eliminar un punto de mira
 Add a crosshair	Magnify-Main		Agregar un punto de mira
 Freeze image	Magnify-Main		Congelar imagen
+usage: magnify [size] (magnify size * size pixels)	Console		forma de uso: magnify [tamaño] (tamaño a aumentar * número de pixeles)
 Increase window size	Magnify-Main		Aumentar tamaño de ventana
 Save image	Magnify-Main		Guardar imagen
 Show grid	Magnify-Main		Mostrar cuadrícula

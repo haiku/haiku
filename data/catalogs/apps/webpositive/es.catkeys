@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-WebPositive	2763299522
+1	spanish; castilian	x-vnd.Haiku-WebPositive	1879106286
 Authentication required	Authentication Panel		Autenticación requerida
 Previous	WebPositive Window		Anterior
 (Finish: %date)	Download Window		(Finaliza: %date)
@@ -28,7 +28,9 @@ Start page:	Settings Window		Página de inicio:
 Cancel	Download Window		Cancelar
 Settings	Settings Window		Configuración
 Downloads	WebPositive Window		Descargas
+Browse…	Settings Window		Navegar...
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Ya existe un marcador para esta página (%bookmarkName).
+Resume prior session	Settings Window		Continuar con sesión anterior
 Match case	WebPositive Window		Coincidir mayúsculas y minúsculas
 Proxy password:	Settings Window		Contraseña del proxy:
 Size:	Font Selection view		Tamaño:
@@ -119,6 +121,7 @@ Remember username and password for this site	Authentication Panel		Recordar nomb
 (Finish: %date - %duration left)	Download Window		(Finalizado: %date - %duration restante)
 Cookie manager	Cookie Manager		Administrador de cookies
 Show home button	Settings Window		Mostrar botón de inicio
+Start new session	Settings Window		Comenzar nueva sesión
 The cookie jar is empty!	Cookie Manager		¡El contenedor de cookies está vacío!
 Value	Cookie Manager		Valor
 Remove missing	Download Window		Quitar elementos faltantes
@@ -141,6 +144,7 @@ Settings	WebPositive Window		Configuración
 Clear	URL Bar		Limpiar
 Loading %url	WebPositive Window		Cargando %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	El pingüino Wenceslao hizo kilómetros bajo exhaustiva lluvia y frío, añoraba a su querido cachorro.
+Start up:	Settings Window		Iniciar:
 Confirmation	WebPositive Window		Confirmación
 Session cookie	Cookie Manager		Cookie de sesión
 Open all	WebPositive Window		Abrir todos

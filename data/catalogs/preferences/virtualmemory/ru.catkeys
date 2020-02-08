@@ -8,7 +8,7 @@ Changes will take effect upon reboot.	SettingsWindow		Изменения вст�
 Revert	SettingsWindow		Вернуть
 Keep enabled	SettingsWindow		Оставить включенной
 The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Параметры указанные в файле настроек неверны. Загрузить настройки по умолчанию или выйти?
-VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\n\tразработал Axel Dörfler\n\tCopyright 2005, Haiku.\n
+VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\n\tразработал Axel Dörfler\n\tВсе права защищены © 2005, Haiku.\n
 The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		Раздел, указанный в файле настроек не был найден. Вы можете использовать загрузочный раздел или выйти.
 Current Swap:	SettingsWindow		Текущий файл подкачки:
 Load defaults	SettingsWindow		По умолчанию

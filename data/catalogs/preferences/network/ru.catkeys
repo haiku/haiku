@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Network	804107944
+1	russian	x-vnd.Haiku-Network	3039697761
 Ethernet device	InterfaceListItem		Ethernet устройство
 Link speed:	IntefaceView		Скорость соединения:
 disconnected	IntefaceView		отключено
@@ -30,6 +30,7 @@ WPA2	WPA2 protected network		WPA2
 Show network status in Deskbar	NetworkWindow		Отображать статус интерфейсов в Deskbar
 Mode:	IntefaceAddressView		Режим:
 connected	InterfaceListItem		подключено
+OK	NetworkWindow		OK
 Static	IntefaceAddressView		Статический
 launch error	NetworkWindow		Ошибка запуска
 Renegotiate	IntefaceView		Переполучить
@@ -39,6 +40,7 @@ disabled	InterfaceListItem		отключен
 Dial-up connection	InterfaceListItem		Коммутируемый доступ
 on	ServiceListItem		включен
 The method for obtaining an IP address	IntefaceAddressView		Метод получения IP-адреса
+disconnected	InterfaceListItem		отключен
 Automatic	IntefaceAddressView		Автоматический
 Choose automatically	IntefaceView		Выбрать автоматически
 Status:	IntefaceView		Статус:

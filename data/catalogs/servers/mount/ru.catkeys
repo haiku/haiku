@@ -1,9 +1,10 @@
-1	russian	x-vnd.Haiku-mount_server	819316177
+1	russian	x-vnd.Haiku-mount_server	2818767263
 Mount read-only	AutoMounter		Только чтение
 Error mounting volume:\n\n%s	AutoMounter		Ошибка подключения раздела:\n\n%s
 Cancel	AutoMounter		Отмена
 OK	AutoMounter		ОК
 Unmount error	AutoMounter		Ошибка отключения
+The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		Файловая система на этом разделе не является файловой системой Be (BeFS). Рекомендуется монтировать его в режиме только для чтения, чтобы предотвратить непреднамеренную потерю данных из-за возможных ошибок в Haiku.
 Mount read/write	AutoMounter		Чтение и запись
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		Невозможно отключить диск \"%s\":\n\t%s
 Mounting volume '%s'\n\n	AutoMounter		Подключение раздела '%s'\n\n

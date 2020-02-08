@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-HaikuDepot	3877862636
+1	danish	x-vnd.Haiku-HaikuDepot	3605875353
 Repository update error	LocalRepositoryUpdateProcess		Fejl ved opdatering af softwarekilde
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Der opstod en fejl under opdatering af softwarekilden: %error%
 Check for updates…	MainWindow		Søg efter opdateringer…
@@ -9,7 +9,6 @@ Available packages	MainWindow		Tilgængelige pakker
 Create account	UserLoginWindow		Opret konto
 OK	App		OK
 Mostly stable	RatePackageWindow		Hovedsageligt stabil
-Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Kontooprettelse lykkedes. Du kan nu bedømme pakker og gøre andre nyttige ting.
 The response to the captcha was incorrect.	ServerHelper		Svaret på captchaen var forkert.
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Ved opdatering af pakkedata er der opstået et problem som kan forårsage forældet eller manglende data i programmets visning. Yderligere detaljer om problemet kan ses i programloggene.
 Develop packages	MainWindow		Udviklingspakker
@@ -17,17 +16,12 @@ Rate package…	PackageInfoView		Bedøm pakke…
 Starting the package daemon failed:\n\n%Error%	App		Start af pakkedæmon mislykkedes:\n\n%Error%
 <no info>	PackageInfoView		<ingen info>
 No user ratings available.	PackageInfoView		Ingen tilgængelige brugerbedømmelser.
-The user name needs to be at least 3 letters long.	UserLoginWindow		Brugernavnet skal være mindst 3 bogstaver langt.
 Downloading package '%name%'	WorkStatusView		Downloader pakken '%name%'
-Failed to create account	UserLoginWindow		Kunne ikke oprette konto
 Rating	PackageListView		Bedømmelse
 Synchronizing icons	ServerIconExportUpdateProcess		Synkroniserer ikoner
 Does not start	RatePackageWindow		Starter ikke
 Show	MainWindow		Vis
-But none could be listed here, sorry.	UserLoginWindow		Men ingen kunne oplistes her, beklager.
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Der opstod en fejl ved indhentning af pakkelisten: %message%
-There are problems with the data you entered:\n\n	UserLoginWindow		Der er problemer med den data du indtastede:\n\n
-The authentication was successful.	UserLoginWindow		Autentifikationen lykkedes.
 Not specified	RatePackageWindow		Ikke angivet
 Unstable but usable	RatePackageWindow		Ustabil men anvendelig
 Active	PackageListView		Aktiv
@@ -38,7 +32,6 @@ Ratings	PackageInfoView		Bedømmelser
 Switch account…	MainWindow		Skift konto…
 Preferred language:	UserLoginWindow		Foretrukne sprog:
 Server Error	ServerHelper		Fejl ved server
-It was not possible to contact the web service.	UserLoginWindow		Det er ikke muligt at kontakte webtjenesten.
 Name	PackageListView		Navn
 Local	LocalPkgDataLoadProcess		Lokal
 Rate %Package%	RatePackageWindow		Bedøm %Package%
@@ -49,13 +42,11 @@ User rating	RatePackageWindow		Brugerbedømmelse
 Installed packages	MainWindow		Installerede pakker
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Et anmodet objekt eller et objekt som er involveret i anmodningen blev ikke fundet på serveren.
 Other users can see this rating	RatePackageWindow		Andre brugere kan se bedømmelsen
-The minimum age requirements must be met.	UserLoginWindow		Kravene om laveste alder skal være mødt.
 Stable	RatePackageWindow		Stabil
 This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		Programmet er for gammelt til at kommunikere med HaikuDepot-serversystemet. Hent en nyere version af HaikuDepot ved at opdatere dit Haiku-system. Den laveste version af HaikuDepot som kræves er \"%s\".
 Fatal error	PackageManager		Fatal fejl
 Package action failed	PackageInfoView		Pakkehandling mislykkedes
 No changelog available.	PackageInfoView		Ingen ændringslog tilgængelig.
-There are problems in the form:\n\n	UserLoginWindow		Der er problemer i formularen:\n\n
 Error	App		Fejl
 There was a puzzling response from the web service.	UserLoginWindow		Der var et gådesvar fra webtjenesten.
 Not logged in	MainWindow		Ikke logget ind
@@ -74,7 +65,6 @@ Changelog	PackageInfoView		Ændringslog
 Rating not possible	MainWindow		Bedømmelse ikke mulig
 Package update error	MainWindow		Fejl ved opdatering af pakke
 About	PackageInfoView		Om
-Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Autentifikation mislykkedes. Brugeren findes ikke eller den forkerte adgangskode blev angivet.
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# proces} other{# processer}}
 Reboot required	PackageManager		Kræver genstart
 Very unstable	RatePackageWindow		Meget ustabil
@@ -84,7 +74,6 @@ Authorization or security issue.  Logout and log back in again to check that you
 Stability	RatePackageWindow		Stabilitet
 Send	RatePackageWindow		Send
 Start package daemon	App		Start pakkedæmon
-The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Adgangskoden er for svag eller ugyldig. Brug venligst mindst 8 tegn med mindst 2 tal og 2 store bogstaver.
 The package action could not be scheduled: %Error%	PackageInfoView		Pakkehandlingen kunne ikke planlægges: %Error%
 Cancel	RatePackageWindow		Annuller
 Inactive	PackageListView		Inaktiv
@@ -95,7 +84,6 @@ Usage conditions download problem	UserLoginWindow		Problem ved download af anven
 OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Downloader:
 Success	UserLoginWindow		Lykkedes
-It responded with: %message%	UserLoginWindow		Den svarede med: %message%
 Package daemon problem	App		Problem med pakkedæmon
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Softwarekilde
@@ -104,7 +92,6 @@ Close	UserLoginWindow		Luk
 Close	RatePackageWindow		Luk
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synkroniserer pakkedata for softwarekilden '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Vis anvendelsesbetingelserne
-Failed to create account: %s\n	UserLoginWindow		Kunne ikke oprette konto: %s\n
 Size	PackageListView		Størrelse
 Your rating:	RatePackageWindow		Din bedømmelse:
 I am %MinimumAgeYears% years of age or older	UserLoginWindow		Jeg er mindst %MinimumAgeYears% år
@@ -116,16 +103,12 @@ Cancel	MainWindow		Annuller
 View agreed usage conditions…	MainWindow		Vis aftalte anvendelsesbetingelser…
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 mere at downloade)}other{(# mere at downloade)}}
 Refresh repositories	MainWindow		Genopfrisk softwarekilder
-If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Hvis du ikke angiver en e-mailadresse, så vil du ikke være i stand til at nulstille din adgangskode hvis du glemmer den.
 Tools	MainWindow		Værktøjer
-The passwords do not match.	UserLoginWindow		Adgangskoderne er ikke ens.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Pakken ser ikke ud til at være på HaikuDepot-serveren, så det er ikke muligt at oprette en ny bedømmelse eller redigere end eksisterende bedømmelse.
 Language	RatePackageWindow		Sprog
-Authentication failed. Connection to the service failed.	UserLoginWindow		Autentifikation mislykkedes. Forbindelsen til tjenesten mislykkedes.
 Log out	MainWindow		Log ud
 Comment language:	RatePackageWindow		Kommentarsprog:
 Status	PackageListView		Status
-The username is already taken. Please choose another.	UserLoginWindow		Brugernavnet er allerede taget. Vælg venligst et andet.
 Update	RatePackageWindow		Opdater
 OK	ServerHelper		OK
 Language	UserLoginWindow		Sprog
@@ -134,18 +117,12 @@ Reading repository data	LocalPkgDataLoadProcess		Læser data for softwarekilde
 Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Synkroniserer referencedata fra server
 Stability:	RatePackageWindow		Stabilitet:
 A validation error has occurred	ServerHelper		Der opstod en fejl ved validering
-The captcha puzzle needs to be solved.	UserLoginWindow		Captcha-gåden skal løses.
 Source packages	MainWindow		Kildepakker
 -	no package size		-
-User name:	UserLoginWindow		Brugernavn:
 Try again	App		Prøv igen
 Rate package	RatePackageWindow		Bedøm pakke
-The usage conditions must be agreed to.	UserLoginWindow		Anvendelsesbetingelserne skal accepteres.
-The email address appears to be malformed.	UserLoginWindow		E-mailadressen ser ud til at være forkert udformet.
-You have not solved the captcha puzzle correctly.	UserLoginWindow		Du løste ikke captcha-gåden korrekt.
 Unknown	PackageListView		Ukendt
 I agree to the usage conditions	UserLoginWindow		Jeg accepterer anvendelsesbetingelserne
-An error has arisen downloading the usage conditions. Check the log for details and try again.	UserLoginWindow		Der opstod en fejl ved download af anvendelsesbetingelserne. Tjek loggen for detaljer og prøv igen.
 Log in	UserLoginWindow		Log ind
 Logged in as %User%	MainWindow		Logger ind som %User%
 Email address:	UserLoginWindow		E-mailadresse:
@@ -155,13 +132,11 @@ A reboot is necessary to complete the installation process.	PackageManager		Der 
 View latest usage conditions…	MainWindow		Vis seneste anvendelsesbetingelser…
 Search terms:	FilterView		Søgetermer:
 Pending…	PackageListView		Afventer…
-Repeat pass phrase:	UserLoginWindow		Gentag adgangsfrase:
 Category:	FilterView		Kategori:
 Authentication failed	UserLoginWindow		Autentifikation mislykkedes
 Manage repositories…	MainWindow		Håndter softwarekilder…
 Fetching remote repository data	LocalRepositoryUpdateProcess		Henter data for fjernsoftwarekilde
 Description	PackageListView		Beskrivelse
-Pass phrase:	UserLoginWindow		Adgangsfrase:
 Open %DeskbarLink%	PackageManager		Åbn %DeskbarLink%
 Install	PackageManager		Installer
 Input validation	UserLoginWindow		Inputvalidering

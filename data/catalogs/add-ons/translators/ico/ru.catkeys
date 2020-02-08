@@ -4,7 +4,7 @@ Version %d.%d.%d, %s	ConfigView		Версия %d.%d.%d, %s
 Windows %s %ld bit image	ICOTranslator		Windows %s %ld битное изображение
 Valid icon sizes are 16, 32, or 48	ConfigView		Корректные размеры значков 16, 32 или 48
 Windows icons	ICOTranslator		Windows значки
-Enforce valid icon sizes	ConfigView		Форсировать корректные размеры значков
+Enforce valid icon sizes	ConfigView		Форсировать допустимые размеры значков
 ICO Settings	main		Настройки ICO транслятора
 Windows icon translator	ICOTranslator		Транслятор значков Windows
 pixels in either direction.	ConfigView		пикселей в оба направления.

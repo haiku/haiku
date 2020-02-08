@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Shortcuts	3404737811
+1	spanish; castilian	x-vnd.Haiku-Shortcuts	3834857117
 *MouseUp	ShortcutsWindow		*Ratón arriba
 Application	ShortcutsWindow		Aplicación
 Option	ShortcutsSpec	Name for modifier on keyboard	Opción
@@ -9,6 +9,7 @@ Don't save	ShortcutsWindow		No guardar
 *Beep	ShortcutsWindow		*Pitido
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Atajos no pudo guardar tu conjunto de teclas.
 Save	ShortcutsWindow		Guardar
+Either	ShortcutsSpec		Cualquiera
 Oh no	ShortcutsWindow		Oh no
 Key	ShortcutsWindow		Tecla
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*aplicación enviar mensaje/x-vnd.Be-TRAK 'Tfnd'

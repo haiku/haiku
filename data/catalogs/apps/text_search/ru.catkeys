@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku.TextSearch	2123129416
+1	russian	x-vnd.Haiku.TextSearch	1867528375
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Пожалуйста, выберите файлы, которые вы хотите увидеть выделенными в Tracker.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Не удалось запустить программу xargs!
@@ -27,6 +27,7 @@ Show lines	GrepWindow		Показывать строки
 Failed to open errors pipe!	Grepper		Не удалось открыть канал ошибок!
 The unselected files will be removed from the list.	GrepWindow		Невыделенные файлы будут удалены из списка.
 Skip folders starting with a dot	GrepWindow		Не искать в папках, начинающихся с точки
+Open files in code editor	GrepWindow		Открывать файлы в редакторе кода
 Failed to open output pipe!	Grepper		Не удалось открыть канал вывода!
 Cancel	GrepWindow		Стоп
 History	GrepWindow		История

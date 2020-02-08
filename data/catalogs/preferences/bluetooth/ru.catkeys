@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-BluetoothPrefs	67867884
+1	russian	x-vnd.Haiku-BluetoothPrefs	4276705900
 Laptop	Settings view		Ноутбук
 Only from trusted devices	Settings view		Только от доверенных устройств
 15 secs	Settings view		15 сек
@@ -17,9 +17,11 @@ Stop bluetooth services…	Window		Остановить службу bluetooth�
 Add…	Remote devices		Добавить…
 As blocked	Remote devices		Как блокированный
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Не было найдено ни одного bluetooth устройства, зарегистрированного в системе.
+Policy…	Settings view		Политики…
 Revert	Window		Вернуть
 Refresh local devices…	Window		Обновить локальные устройства…
 Disconnect	Remote devices		Отключить
+Identify us as…	Settings view		Определять нас как…
 From all devices	Settings view		От всех устройств
 Defaults	Window		По умолчанию
 Start bluetooth services…	Window		Запуск службы bluetooth…
@@ -28,12 +30,15 @@ Scanning progress	Inquiry panel		Прогресс сканирования
 Bluetooth	System name		Bluetooth
 Launch now	main		Запустить сейчас
 Remove	Remote devices		Удалить
+Pick device…	Settings view		Выбрать устройство…
 Always ask	Settings view		Всегда спрашивать
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		При поддержке:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nСпасибо людям, которые помогали…\n\nПредоставляли/дарили оборудование:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nЭкономически:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nС патчами:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nПроводили тестирование:\n - Petter H. Juliussen\nКто научил меня всему:\n - the yellowTAB team
 Help	Window		Помощь
 Pair…	Remote devices		Пара…
 Retrieving name of %1	Inquiry panel		Получение имени %1
 Inquiry	Inquiry panel		Запрос
 Incoming connections policy:	Settings view		Политика входящих соединений:
+Retrieving names…	Inquiry panel		Получение имён…
 Show name	Extended local device view		Показывать имя
 Add device to list	Inquiry panel		Добавить устройство в список
 Remaining %1 seconds	Inquiry panel		Осталось %1 секунд
@@ -47,3 +52,4 @@ Server	Settings view		Сервер
 Handheld	Settings view		Переносной
  packets: 	Device View		 пакетов: 
 About Bluetooth…	Window		О программе…
+Starting scan…	Inquiry panel		Запуск сканирования…

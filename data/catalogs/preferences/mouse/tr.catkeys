@@ -7,7 +7,7 @@ Revert	MouseWindow		Eski haline döndür
 ...by Andrew Edward McCall	MouseApplication		Yazan: Andrew Edward McCall
 Mouse acceleration	SettingsView		Fare ivmelenmesi
 Click to focus	SettingsView		Odak için tıklayın
-Click to focus and raise	SettingsView		Odaklayıp öne getirmek için tıklayın
+Click to focus and raise	SettingsView		Odaklayıp öne getirmek için tıkla
 3-Button	SettingsView		3 düğmeli
 Mouse speed	SettingsView		Fare hızı
 Focus mode:	SettingsView		Odak kipi:

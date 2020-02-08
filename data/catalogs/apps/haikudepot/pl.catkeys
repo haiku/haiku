@@ -1,24 +1,18 @@
-1	polish	x-vnd.Haiku-HaikuDepot	609995931
+1	polish	x-vnd.Haiku-HaikuDepot	3501808858
 Uninstall	PackageManager		Usuń
 (%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Niezainstalowany
 Available packages	MainWindow		Dostępne pakiety
 Create account	UserLoginWindow		Utwórz konto
 Mostly stable	RatePackageWindow		Całkiem stabilny
-Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Konto zostało utworzone. Możesz teraz oceniać pakiety oraz robić inne przydatne rzeczy.
 Develop packages	MainWindow		Pakiety deweloperskie
 Rate package…	PackageInfoView		Oceń pakiet…
 Starting the package daemon failed:\n\n%Error%	App		Uruchamianie demona pakietów nie powiodło się:\n\n%Error%
 <no info>	PackageInfoView		<brak informacji>
 No user ratings available.	PackageInfoView		Brak ocen użytkowników.
-The user name needs to be at least 3 letters long.	UserLoginWindow		Nazwa użytkownika powinna składać się z co najmniej 3 znaków.
-Failed to create account	UserLoginWindow		Nie udało się utworzyć konta
 Rating	PackageListView		Ocena
 Does not start	RatePackageWindow		Nie uruchamia się
 Show	MainWindow		Pokaż
-But none could be listed here, sorry.	UserLoginWindow		Ale żaden nie mógł zostać tutaj wyświetlony.
-There are problems with the data you entered:\n\n	UserLoginWindow		We wprowadzonych danych występują problemy:\n\n
-The authentication was successful.	UserLoginWindow		Autoryzacja powiodła się.
 Not specified	RatePackageWindow		Nieokreślony
 Unstable but usable	RatePackageWindow		Niestabilny, ale używalny
 Active	PackageListView		Aktywny
@@ -27,7 +21,6 @@ Login or Create account	MainWindow		Zaloguj lub utwórz konto
 Ratings	PackageInfoView		Oceny
 Switch account…	MainWindow		Przełącz konto…
 Preferred language:	UserLoginWindow		Preferowany język:
-It was not possible to contact the web service.	UserLoginWindow		Nie udało się połączyć z usługą sieciową.
 Name	PackageListView		Nazwa
 Rate %Package%	RatePackageWindow		Oceń %Package%
 Quit HaikuDepot	App		Zakończ HaikuDepot
@@ -38,7 +31,6 @@ Stable	RatePackageWindow		Stabilny
 Fatal error	PackageManager		Błąd krytyczny
 Package action failed	PackageInfoView		Akcja dla pakietu nie powiodła się
 No changelog available.	PackageInfoView		Dziennik zmian nie jest dostępny.
-There are problems in the form:\n\n	UserLoginWindow		W formularzu występują problemy:\n\n
 There was a puzzling response from the web service.	UserLoginWindow		Odebrano dziwną odpowiedź od usługi sieciowej.
 Not logged in	MainWindow		Niezalogowany
 No, quit HaikuDepot	App		Nie, zakończ HaikuDepot
@@ -50,12 +42,10 @@ Contents	PackageInfoView		Zawartość
 Close	PackageManager		Zamknij
 Changelog	PackageInfoView		Dziennik zmian
 About	PackageInfoView		O pakiecie
-Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Autoryzacja nie powiodła się. Użytkownik nie istnieje lub podano złe hasło.
 Very unstable	RatePackageWindow		Bardzo niestabilny
 Stability	RatePackageWindow		Stabilność
 Send	RatePackageWindow		Wyślij
 Start package daemon	App		Uruchom demona pakietów
-The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Hasło jest zbyt słabe lub niepoprawne. Użyj minimum 8 znaków, w tym co najmniej 2 cyfr i 2 wielkich liter.
 The package action could not be scheduled: %Error%	PackageInfoView		Akcja dla pakietu nie mogła zostać dodana do kolejki: %Error%
 Cancel	RatePackageWindow		Anuluj
 Inactive	PackageListView		Nieaktywny
@@ -68,7 +58,6 @@ Success	UserLoginWindow		Powodzenie
 Repository	PackageListView		Repozytorium
 Close	UserLoginWindow		Zamknij
 Close	RatePackageWindow		Zamknij
-Failed to create account: %s\n	UserLoginWindow		Nie udało się utworzyć konta: %s\n
 Size	PackageListView		Rozmiar
 Your rating:	RatePackageWindow		Twoja ocena:
 All categories	FilterView		Wszystkie kategorie
@@ -76,27 +65,19 @@ Repositories	MainWindow		Repozytoria
 n/a	PackageInfoView		Nie dotyczy
 Cancel	MainWindow		Anuluj
 Refresh repositories	MainWindow		Odśwież repozytoria
-If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Jeśli nie podasz adresu e-mail, nie będziesz mógł zresetować hasła, jeśli go zapomnisz.
 Tools	MainWindow		Narzędzia
-The passwords do not match.	UserLoginWindow		Hasła nie zgadzają się.
 Language	RatePackageWindow		Język
-Authentication failed. Connection to the service failed.	UserLoginWindow		Autoryzacja nie powiodła się. Nie udało się połączyć z usługą sieciową.
 Log out	MainWindow		Wyloguj
 Comment language:	RatePackageWindow		Język komentarza:
 Status	PackageListView		Status
-The username is already taken. Please choose another.	UserLoginWindow		Ta nazwa użytkownika jest już zajęta. Wybierz inną.
 Update	RatePackageWindow		Zaktualizuj
 Language	UserLoginWindow		Język
 OK	UserLoginWindow		OK
 Stability:	RatePackageWindow		Stabilność:
-The captcha puzzle needs to be solved.	UserLoginWindow		Musisz rozwiązać test CAPTCHA.
 Source packages	MainWindow		Pakiety źródłowe
 -	no package size		-
-User name:	UserLoginWindow		Nazwa użytkownika:
 Try again	App		Spróbuj ponownie
 Rate package	RatePackageWindow		Oceń pakiet
-The email address appears to be malformed.	UserLoginWindow		Adres e-mail wygląda na zniekształcony.
-You have not solved the captcha puzzle correctly.	UserLoginWindow		Nie udało ci się przejść testu CAPTCHA.
 Unknown	PackageListView		Nieznany
 Log in	UserLoginWindow		Zaloguj
 Logged in as %User%	MainWindow		Zalogowano jako %User%
@@ -105,12 +86,10 @@ Screenshot	ScreenshotWindow		Zrzut ekranu
 HaikuDepot	System name		HaikuDepot
 Search terms:	FilterView		Szukana fraza:
 Pending…	PackageListView		Oczekiwanie…
-Repeat pass phrase:	UserLoginWindow		Powtórz hasło:
 Category:	FilterView		Kategoria:
 Authentication failed	UserLoginWindow		Autoryzacja nie powiodła się
 Manage repositories…	MainWindow		Zarządzaj repozytoriami…
 Description	PackageListView		Opis
-Pass phrase:	UserLoginWindow		Hasło:
 Open %DeskbarLink%	PackageManager		Otwórz %DeskbarLink%
 Install	PackageManager		Zainstaluj
 Input validation	UserLoginWindow		Walidacja wejścia

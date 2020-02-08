@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libsolvsolver	1617515826
+1	russian	x-vnd.Haiku-libsolvsolver	3980067060
 allow architecture change of %source% to %target%	SolverProblemSolution		разрешить изменение архитектуры пакета с %source% на %target%
 install %source% from excluded repository	SolverProblemSolution		установить пакет %source% из исключённого репозитория
 unspecified problem	SolverProblem		неопределенная проблема
@@ -20,10 +20,14 @@ keep %source% despite its inferior architecture	SolverProblemSolution		оста�
 %source% does not belong to a distupgrade repository	SolverProblem		пакет %source% не принадлежит к репозиторию обновления дистрибутива
 allow name change of %source% to %target%	SolverProblemSolution		разрешить изменение имени пакета с %source% на %target%
 package %source% conflicts with %dependency% provided by %target%	SolverProblem		пакет %source% конфликтует с %dependency% предоставляемым %target%
-install %selection% despite its old version	SolverProblemSolution		установить %selection% несмотря на более старую версию
+do something	SolverProblemSolution		сделать что-нибудь
+install %selection% despite its old version	SolverProblemSolution		установить %selection% несмотря на его старую версию
 cannot install both %source% and %target%	SolverProblem		невозможно установить сразу %source% и %target%
 package %source% is not installable	SolverProblem		пакет %source% невозможно установить
+problem with installed package %source%	SolverProblem		проблема с установленным пакетом %source%
 allow deinstallation of %source%	SolverProblemSolution		разрешить удаление пакета %source%
+keep %source% from excluded repository	SolverProblemSolution		оставить пакет %source% из исключенного репозитория
 keep old %source%	SolverProblemSolution		оставить старый пакет %source%
+allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		разрешить смену поставщика с \"%sourceVendor%\" (%source%) на \"%targetVendor%\" (%target%)
 do not lock \"%selection%\"	SolverProblemSolution		не блокировать пакет \"%selection%\"
 do not install \"%selection%\"	SolverProblemSolution		не устанавливать пакет \"%selection%\"

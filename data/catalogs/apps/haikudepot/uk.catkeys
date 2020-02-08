@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	1833593564
+1	ukrainian	x-vnd.Haiku-HaikuDepot	695215238
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Під час оновлення репозиторію сталася помилка: %error%
 Check for updates…	MainWindow		Оцінити пакунок…
 Uninstall	PackageManager		Видалити
@@ -8,7 +8,6 @@ Available packages	MainWindow		Доступні пакунки
 Create account	UserLoginWindow		Створити обліковий запис
 OK	App		Гаразд
 Mostly stable	RatePackageWindow		Найстабільніший
-Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Акаунт успішно створено. Тепер Ви зможете оцінювати пакети і робити інші корисні речі.
 The response to the captcha was incorrect.	ServerHelper		Невірна відповідь на капчу.
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Під час оновлення пакунку сталася помилка, що може призвести до появи у вікні застосунку застарілих елементів або їх відсутності. Додаткові відомості щодо цього можна переглянути у лог-файлах застосунку.
 Develop packages	MainWindow		Пакети розробника
@@ -16,17 +15,12 @@ Rate package…	PackageInfoView		Оцінити пакет…
 Starting the package daemon failed:\n\n%Error%	App		Запуск демона пакету призупинено:\n\n%Error%
 <no info>	PackageInfoView		<немає інформації>
 No user ratings available.	PackageInfoView		Оцінка для користувача недоступна.
-The user name needs to be at least 3 letters long.	UserLoginWindow		Ім'я користувача повинно бути хоча б у 3 літери завдовжки.
 Downloading package '%name%'	WorkStatusView		Завантажити пакунок '%name%'
-Failed to create account	UserLoginWindow		Створення облікового запису призупинено
 Rating	PackageListView		Оцінка
 Synchronizing icons	ServerIconExportUpdateProcess		Синхронізую піктограми
 Does not start	RatePackageWindow		Не починається
 Show	MainWindow		Показати
-But none could be listed here, sorry.	UserLoginWindow		Жодних перечислень тут, вибачте
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Під час отримання переліку пакунків сталася помилка: %message%
-There are problems with the data you entered:\n\n	UserLoginWindow		Сталися проблеми з введеними даними:\n\n
-The authentication was successful.	UserLoginWindow		Активізація успішна.
 Not specified	RatePackageWindow		Не визначено
 Unstable but usable	RatePackageWindow		Нестабільний але використання можливе
 Active	PackageListView		Активний
@@ -37,7 +31,6 @@ Ratings	PackageInfoView		Оцінки
 Switch account…	MainWindow		Перемкнути обліковий запис…
 Preferred language:	UserLoginWindow		Бажана мова:
 Server Error	ServerHelper		Помилка на сервері
-It was not possible to contact the web service.	UserLoginWindow		Неможливо під'єднатись до мережевого сервісу.
 Name	PackageListView		Ім'я
 Local	LocalPkgDataLoadProcess		На цьому пристрої
 Rate %Package%	RatePackageWindow		Оцінити %Package%
@@ -53,7 +46,6 @@ This application is too old to communicate with the  HaikuDepot server system.  
 Fatal error	PackageManager		Критична помилка
 Package action failed	PackageInfoView		Роботу пакету призупинено
 No changelog available.	PackageInfoView		Історія змін недоступна
-There are problems in the form:\n\n	UserLoginWindow		Існують проблеми у вигляді:\n\n
 Error	App		Помилка
 There was a puzzling response from the web service.	UserLoginWindow		Отримано загадкову відповідь від мережевого сервісу.
 Not logged in	MainWindow		Не авторизований
@@ -71,7 +63,6 @@ A network transport error has arisen communicating with the HaikuDepot server sy
 Changelog	PackageInfoView		Журнал змін
 Rating not possible	MainWindow		Оцінка неможлива
 About	PackageInfoView		Про програму
-Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Авторизацію призупинено. Користувач відсутній або введено невірний пароль.
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# процес} few{# процеси} other{# процесів}}
 Reboot required	PackageManager		Потрібно перезавантаження
 Very unstable	RatePackageWindow		Дуже нестабільний
@@ -80,7 +71,6 @@ Network Transport Error	ServerHelper		Помилка передачі даних
 Stability	RatePackageWindow		Стабільність
 Send	RatePackageWindow		Надіслати
 Start package daemon	App		Запустити демон пакетів
-The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Гасло заслабке або недійсне. Будь-ласка, використовуйте принаймні 8 символів, посеред них хоча би 2 цифри та 2 прописні букви.
 The package action could not be scheduled: %Error%	PackageInfoView		Дію пакета неможливо спрогнозувати: %Error%
 Cancel	RatePackageWindow		Відмінити
 Inactive	PackageListView		Неактивний
@@ -90,7 +80,6 @@ OK	MainWindow		Гаразд
 OK	PackageInfoView		Згода
 Downloading:	PackageInfoView		Завантаження:
 Success	UserLoginWindow		Успішно
-It responded with: %message%	UserLoginWindow		Відповідно з: %message%
 Package daemon problem	App		Проблема демона пакета
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Сховище
@@ -98,7 +87,6 @@ Repository	PackageListView		Сховище
 Close	UserLoginWindow		Закрити
 Close	RatePackageWindow		Закрити
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Синхронізую дані пакунку з репозиторієм '%REPO_NAME%'
-Failed to create account: %s\n	UserLoginWindow		Призупинено створення облікового запису: %s\n
 Size	PackageListView		Розмір
 Your rating:	RatePackageWindow		Ваш рейтинг:
 Your rating was updated.	RatePackageWindow		Ваша оцінка оновлена.
@@ -108,16 +96,12 @@ n/a	PackageInfoView		немає
 Cancel	MainWindow		Відмінити
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 більше для завантаження)}other{(# більше для завантаження)}}
 Refresh repositories	MainWindow		Оновити репозиторії
-If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Якщо Ви не вкажете адресу пошти, то не зможете відновити гасло у випадку його забування.
 Tools	MainWindow		Інструменти
-The passwords do not match.	UserLoginWindow		Гасла не співпадають
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Цей пакет, здається, не знаходиться на HaikuDepot Server, тому неможливо створити нову оцінку або відредагувати існуючу.
 Language	RatePackageWindow		Мова
-Authentication failed. Connection to the service failed.	UserLoginWindow		Авторизацію та під'єднання до сервісу призупинено.
 Log out	MainWindow		Вийти
 Comment language:	RatePackageWindow		Мова коментарів:
 Status	PackageListView		Стан
-The username is already taken. Please choose another.	UserLoginWindow		Ім'я користувача задіяне. Виберіть інше, буль-ласка.
 Update	RatePackageWindow		Оновлення
 OK	ServerHelper		Вдало!
 Language	UserLoginWindow		Мова
@@ -126,14 +110,10 @@ Reading repository data	LocalPkgDataLoadProcess		Отримую дані реп�
 Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Синхронізую вихідні дані з сервером
 Stability:	RatePackageWindow		Стабільність:
 A validation error has occurred	ServerHelper		Сталася помилка перевірки достовірності
-The captcha puzzle needs to be solved.	UserLoginWindow		Розв'язати головоломку captcha
 Source packages	MainWindow		Пакети з вихідними текстами
 -	no package size		-
-User name:	UserLoginWindow		Користувач:
 Try again	App		Спробувати знову
 Rate package	RatePackageWindow		Оцінка пакета
-The email address appears to be malformed.	UserLoginWindow		Почтова адреса очевидно має неправильний формат.
-You have not solved the captcha puzzle correctly.	UserLoginWindow		Головоломка captcha розв'язана неправильно.
 Unknown	PackageListView		Невідомо
 Log in	UserLoginWindow		Авторизуватись
 Logged in as %User%	MainWindow		Авторизуваний як %User%
@@ -143,13 +123,11 @@ HaikuDepot	System name		Сховище Haiku
 A reboot is necessary to complete the installation process.	PackageManager		Для завершення прочесу встановлення потрібне перезавантаження.
 Search terms:	FilterView		Умови пошуку:
 Pending…	PackageListView		Очікування…
-Repeat pass phrase:	UserLoginWindow		Повторити гасло:
 Category:	FilterView		Категорія:
 Authentication failed	UserLoginWindow		Авторизацію призупинено
 Manage repositories…	MainWindow		Обробка репозиторіїв…
 Fetching remote repository data	LocalRepositoryUpdateProcess		Отримання даних з віддаленого репозиторію
 Description	PackageListView		Опис
-Pass phrase:	UserLoginWindow		Гасло:
 Open %DeskbarLink%	PackageManager		Відкрити %DeskbarLink%
 Install	PackageManager		Встановити
 Input validation	UserLoginWindow		Перевірка вхідних даних

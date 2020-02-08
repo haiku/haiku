@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-DriveSetup	4010642876
+1	russian	x-vnd.Haiku-DriveSetup	858693404
 Could not unmount partition %s.	MainWindow		Невозможно отключить раздел %s.
 Mount all	MainWindow		Подключить все
 Disk	MainWindow		Диск
@@ -51,6 +51,7 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Форматировать (еще не реализовано)
 The currently selected partition does not have a parent partition.	MainWindow		Выбранный раздел не имеет родительского раздела.
 Validation of the given initialization parameters failed.	MainWindow		Не удалось применить параметры, введенные при инициализации.
+MIMEs	PartitionList		MIME типы
 BitLocker encrypted	Encryption utils		Зашифрован с BitLocker
 You need to select a partition entry from the list.	MainWindow		Вам нужно выбрать раздел из списка.
 Offset: %s	Support		Смещение: %s

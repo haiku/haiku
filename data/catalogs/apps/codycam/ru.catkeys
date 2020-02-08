@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-CodyCam	1770279704
+1	russian	x-vnd.Haiku-CodyCam	2593355250
 destination directory expected	CodyCam		укажите папку назначения
 reply: '%s'\n	SftpClient		ответ: '%s'\n
 JPEG image	CodyCam		JPEG изображение
@@ -27,6 +27,7 @@ Every 2 hours	CodyCam		Каждые 2 часа
 Cannot get a time source	CodyCam		Невозможно получить продолжительность
 Every 4 hours	CodyCam		Каждые 4 часа
 cmd: '%s'\n	FtpClient		команда: '%s'\n
+Closing the window	VideoConsumer.cpp		Закрываем окно
 Never	CodyCam		Никогда
 Every 8 hours	CodyCam		Каждые 8 часов
 Cannot start the video source	CodyCam		Невозможно запустить видео источник
@@ -38,6 +39,7 @@ still image filename expected	CodyCam		укажите название изоб�
 File name:	CodyCam		Имя файла:
 Directory:	CodyCam		Каталог:
 Error setting type of output file	VideoConsumer.cpp		Ошибка при задании типа выходного файла
+Locking the window	VideoConsumer.cpp		Блокируем окно
 Cannot find an available video stream	CodyCam		Невозможно найти видео поток
 Upload…	VideoConsumer.cpp		Загрузить…
 password expected	CodyCam		укажите пароль

@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-DriveSetup	1195596759
+1	spanish; castilian	x-vnd.Haiku-DriveSetup	1934767996
 Could not unmount partition %s.	MainWindow		No se pudo desmontar la partición %s.
 Mount all	MainWindow		Montar todo
 Disk	MainWindow		Disco
@@ -38,6 +38,7 @@ No disk devices have been recognized.	DiskView		No se reconoce ningún dispositi
 Attributes	PartitionList		Atributos
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Falló el borrado de la partición. No se han escrito cambios en el disco.
 Change parameters…	MainWindow		Cambiar parámetros…
+Format	InitializeParametersPanel		Formato
 Could not unmount partition	MainWindow		No se pudo desmontar la partición
 Create	CreateParametersPanel		Crear
 File system	PartitionList		Sistema de archivos
@@ -74,6 +75,7 @@ The disk has been successfully initialized.\n	MainWindow		El disco se ha inicial
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		¿Debería forzarse el desmontaje?\n\nNota: Si una aplicación está escribiendo en el volumen, desmontarlo ahora podría resultar en pérdida de datos.\n
 Cancel	MainWindow		Cancelar
 Free space	PartitionList		Espacio disponible
+Queries	PartitionList		Consultas
 Force unmount	MainWindow		Forzar desmontaje
 Partition	MainWindow		Partición
 Change parameters	MainWindow		Cambiar parámetros
@@ -89,9 +91,11 @@ Cannot delete the selected partition.	MainWindow		No se puede borrar la partici�
 Continue	MainWindow		Continuar
 Could not mount partition %s.	MainWindow		No se pudo montar la partición  %s.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		¿Está seguro que desea formatear la partición? Se le preguntará de nuevo antes que se escriban los cambios al disco.
+<empty or unknown>	PartitionList		<vacío o desconocido>
 The selected disk is read-only.	MainWindow		El disco seleccionado es de sólo lectura.
 The partition %s is already unmounted.	MainWindow		La partición %s ya está montada.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		¿Está seguro que desea cambiar los parámetros de la partición seleccionada?\n\n¡La partición ya no podrá reconocerse por otros sistemas operativos!
+Boot	PartitionList		Arranque
 OK	AbstractParametersPanel		Aceptar
 Virtual	PartitionList		Virtual
 Virtual	DiskView		Virtual

@@ -1,8 +1,12 @@
-1	russian	x-vnd.Haiku-IMAP	1938678311
+1	russian	x-vnd.Haiku-IMAP	1343128980
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Не удалось подключиться к серверу \"%server%\":\n%error%
+Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		Обновление подписок на папки IMAP, наберитесь терпения…
 Failed to fetch available storage.	IMAPFolderConfig		Не удалось запросить доступное пространство.
 Cancel	IMAPFolderConfig		Отмена
+OK	IMAPFolderConfig		OK
+Server storage: %s / %s used.	IMAPFolderConfig		Серверное хранилище: %s / %s использовано.
 No encryption	imap_config		Без шифрования
+Fetching IMAP folders, please be patient…	IMAPFolderConfig		Получение списка папок IMAP, пожалуйста, будьте терпеливы…
 Configure IMAP Folders	imap_config		Настроить папки IMAP
 SSL	imap_config		SSL
 Apply	IMAPFolderConfig		Применить

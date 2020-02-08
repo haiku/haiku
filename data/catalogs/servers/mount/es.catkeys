@@ -1,9 +1,10 @@
-1	spanish; castilian	x-vnd.Haiku-mount_server	819316177
+1	spanish; castilian	x-vnd.Haiku-mount_server	2818767263
 Mount read-only	AutoMounter		Montar como sólo lectura
 Error mounting volume:\n\n%s	AutoMounter		Error montando el volumen:\n\n%s
 Cancel	AutoMounter		Cancelar
 OK	AutoMounter		Aceptar
 Unmount error	AutoMounter		Error desmontando
+The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		El sistema de archivos de este volumen no es el sistema de archivos Be. Se recomienda montarlo en modo de "solo lectura" para prevenir la pérdida de datos no intencionada debido a fallos de Haiku.
 Mount read/write	AutoMounter		Montar como lectura/escritura
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		No se puede desmontar el disco \"%s\":\n\t%s
 Mounting volume '%s'\n\n	AutoMounter		Montando el volumen '%s'\n\n

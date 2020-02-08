@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-PackageInstaller	3110601390
+1	russian	x-vnd.Haiku-PackageInstaller	2472572058
 Package description	UninstallView		Описание пакета
 none	PackageView		нет
 Continue	PackageInstall		Продолжить
@@ -53,6 +53,7 @@ Continue	PackageInfo		Продолжить
 No package selected.	PackageInfo		Ни один пакет не выбран.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Ошибка! \"%s\" не является правильным путем.\n
 The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Папка с именем '%s' уже существует по данному пути.\nЗаменить эту папку той, что находится в данном пакете или пропустить ее?
+LegacyPackageInstaller	System name		LegacyPackageInstaller
 Ask again	PackageView		Спрашивать снова
 Begin	PackageView		Установить
 OK	PackageView		ОК

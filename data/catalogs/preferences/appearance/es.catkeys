@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Appearance	4226716962
+1	spanish; castilian	x-vnd.Haiku-Appearance	663472720
 Control border	Colors tab		Borde del control
 Control mark	Colors tab		Marca de control
 Off	AntialiasingSettingsView		Desactivado
@@ -13,6 +13,7 @@ Fixed font:	Font view		Tipo de letra monoespaciado:
 Appearance	System name		Apariencia
 Reduce colored edges filter strength:	AntialiasingSettingsView		Reducir fortaleza del filtro de bordes coloreados:
 Glyph hinting:	AntialiasingSettingsView		Mejorado de símbolos:
+Default Haiku ControlLook	DecorSettingsView		ControlLook de Haiku predeterminado
 Menu item text	Colors tab		Texto de elemento de menú
 About decorator	DecorSettingsView		Acerca de Decorador
 Antialiasing menu	AntialiasingSettingsView		Menú de suavizado
@@ -23,7 +24,7 @@ Arrow style	DecorSettingsView		Estilo de flecha
 On	AntialiasingSettingsView		Activado
 Decorator:	DecorSettingsView		Decorador:
 Menu background	Colors tab		Fondo de menú
-Revert	APRWindow		Revertir
+Revert	APRWindow		Deshacer
 List item text	Colors tab		Texto de elemento de lista
 OK	DecorSettingsView		Aceptar
 Control text	Colors tab		Texto de control
@@ -48,9 +49,11 @@ LCD subpixel	AntialiasingSettingsView		Subpíxel LCD
 Window tab	Colors tab		Pestaña de ventana
 Link text	Colors tab		Texto del enlace
 Tooltip background	Colors tab		Fondo de descripción emergente
+ControlLook:	DecorSettingsView		ControlLook:
 Scroll bar thumb	Colors tab		Miniatura de barra de desplazamiento
+Default	DecorSettingsView		Predeterminado
 Link visited	Colors tab		Enlace visitado
-Selected menu item border	Colors tab		Borde de item de menú seleccionado
+Selected menu item border	Colors tab		Borde de ítem de menú seleccionado
 Tooltip text	Colors tab		Texto de descripción emergente
 Control background	Colors tab		Fondo de control
 Selected list item text	Colors tab		Texto de elemento de menú seleccionado
@@ -64,11 +67,13 @@ Antialiasing type:	AntialiasingSettingsView		Tipo de suavizado:
 Panel text	Colors tab		Texto de panel
 Hinting menu	AntialiasingSettingsView		Menú mejorado de tipo de letra
 Scroll bar:	DecorSettingsView		Barra de desplazamiento:
-Monospaced fonts only	AntialiasingSettingsView		Sólo tipos de letra monoespaciados
+Choose ControlLook	DecorSettingsView		Escoge ControlLook
+Monospaced fonts only	AntialiasingSettingsView		Solo tipos de letra monoespaciados
 Document text	Colors tab		Texto de documento
 Inactive window border	Colors tab		Borde de ventana inactiva
 Colors	APRWindow		Colores
+About control look	DecorSettingsView		Sobre ControlLook
 Control highlight	Colors tab		Resaltado del control
 Status bar	Colors tab		Barra de estado
-Link hover	Colors tab		Encima de un enlace
+Link hover	Colors tab		Enlace flotante
 Single:	DecorSettingsView		Sencillo:

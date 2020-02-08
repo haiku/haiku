@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Pulse	3788463253
+1	russian	x-vnd.Haiku-Pulse	139895817
 Normal mode	DeskbarPulseView		Обычный режим
 Info	CPUButton		Информация
 Quit	DeskbarPulseView		Выход
@@ -37,6 +37,7 @@ Deskbar menu	CPUButton		Меню Deskbar
 Mini mode	NormalPulseView		Мини режим
 Quit	MiniPulseView		Выход
 Info	PulseView		Информация
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		Использование: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]
 OK	DeskbarPulseView		ОК
 Info	PulseApp		Информация
 Pulse	System name		Пульс

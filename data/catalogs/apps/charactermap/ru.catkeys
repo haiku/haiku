@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-CharacterMap	2521734027
+1	russian	x-vnd.Haiku-CharacterMap	124574598
 Enclosed alphanumerics	UnicodeBlocks		Вложенные буквы и цифры
 Basic Latin	UnicodeBlocks		Основная латиница
 Cyrillic extended C	UnicodeBlocks		Кириллица расширенная A
@@ -179,6 +179,8 @@ Alphabetic presentation forms	UnicodeBlocks		Формы алфавитного �
 Halfwidth and fullwidth forms	UnicodeBlocks		Полуширинные и полноширинные формы
 Lydian	UnicodeBlocks		Лидийский
 Ethiopic supplement	UnicodeBlocks		Эфиопские дополнения
+Glagolitic supplement	UnicodeBlocks		Дополнение Глаголицы
+CJK unified ideographs extension E	UnicodeBlocks		Расширение E унифицированных идеограмм CJK
 Latin extended B	UnicodeBlocks		Латинский расширение B
 Box drawing	UnicodeBlocks		Символы рисования рамок
 Mathematical alphanumeric symbols	UnicodeBlocks		Математические буквенно-цифровые символы
@@ -195,4 +197,5 @@ Kannada	UnicodeBlocks		Каннада
 Copy as escaped byte string	CharacterView		Скопировать как экранированную строку байт
 Phonetic extensions supplement	UnicodeBlocks		Дополнительные фонетические расширения
 Domino tiles	UnicodeBlocks		Плитки домино
+Bhaiksuki	UnicodeBlocks		Бхайкшуки
 Katakana phonetic extensions	UnicodeBlocks		Фонетические расширения катаканы

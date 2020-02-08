@@ -52,7 +52,7 @@ Select…	ContainerWindow		Seç…
 Show shared volumes on Desktop	SettingsView		Paylaşılan diskleri Masaüstü'nde göster
 <%ld values>	AttributesView		<%ld değer>
 Size	PoseView		Boyut
-matches wildcard expression	SelectionWindow		joker ifadesi ile eşleşiyor
+matches wildcard expression	SelectionWindow		joker ifadesi ile eşleşir
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Başlık
 Identify	ContainerWindow		Tanımla
@@ -254,7 +254,7 @@ Delete	FilePanelPriv		Sil
 <No recent items>	FavoritesMenu		<Son kullanılan yok>
 Formula %formula	FindPanel	FindResultTitle	%formula formülü
 Preparing to create links…	StatusWindow		Bağlantılar oluşturulmaya hazırlanıyor…
-Tracker status	StatusWindow		İzleyici durumu
+Tracker status	StatusWindow		İzleyici Durumu
 Handles any %type	OpenWithWindow		Her tür %type işler
 The mount server could not be contacted.	AutoMounterSettings		Bağlama sunucusu ile iletişim kurulamadı.
 Query template	FindPanel		Sorgu şablonu
@@ -332,7 +332,7 @@ Creating links: 	StatusWindow		Bağlantılar oluşturuluyor:
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		\"%document\" \"%app\" uygulaması ile açılamıyor (%error). 
 Create %s clipping	PoseView		%s kırpma oluştur
 Error moving \"%name\"	FSUtils		\"%name\" taşınırken hata
-To: %dir	StatusWindow		Şuraya: %dir
+To: %dir	StatusWindow		Konum: %dir
 Paste layout	ContainerWindow		Yerleşimi yapıştır
 Cancel	Tracker		İptal
 yes	AttributesView		evet
