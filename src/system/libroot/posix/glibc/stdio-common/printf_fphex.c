@@ -54,7 +54,7 @@ int __printf_fphex (FILE *fp, const struct printf_info *info,
 # define PAD(f, c, n) __printf_pad (f, c, n)
 ssize_t __printf_pad __P ((FILE *, char pad, int n)); /* In vfprintf.c.  */
 #endif	/* USE_IN_LIBIO */
-
+
 /* Macros for doing the actual output.  */
 
 #define outchar(ch)							      \
@@ -90,7 +90,7 @@ ssize_t __printf_pad __P ((FILE *, char pad, int n)); /* In vfprintf.c.  */
 #ifndef MIN
 # define MIN(a,b) ((a)<(b)?(a):(b))
 #endif
-
+
 
 
 #if defined(__x86_64__) || defined(__i386__)
@@ -253,7 +253,7 @@ __printf_fphex (FILE *fp,
       fpnum.ldbl.d = *(const long double *) args[0];
 
       /* Check for special values: not a number or infinity.  */
-      if (isnanl (fpnum.ldbl.d))
+      if (isnan (fpnum.ldbl.d))
 	{
 	  if (isupper (info->spec))
 	    {
@@ -269,7 +269,7 @@ __printf_fphex (FILE *fp,
 	}
       else
 	{
-	  if (isinfl (fpnum.ldbl.d))
+	  if (isinf (fpnum.ldbl.d))
 	    {
 	      if (isupper (info->spec))
 		{
