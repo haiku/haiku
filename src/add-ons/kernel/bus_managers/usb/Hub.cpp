@@ -212,7 +212,9 @@ Hub::Explore(change_item **changeList)
 		}
 #endif
 
-		if (fPortStatus[i].change & PORT_STATUS_CONNECTION) {
+		if ((fPortStatus[i].change & PORT_STATUS_CONNECTION)
+				|| ((fPortStatus[i].status & PORT_STATUS_CONNECTION)
+					&& fChildren[i] == NULL)) {
 			// clear status change
 			DefaultPipe()->SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
 				USB_REQUEST_CLEAR_FEATURE, C_PORT_CONNECTION, i + 1,
