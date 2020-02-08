@@ -297,7 +297,7 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 			sectorPerCluster = 2;
 		if (size <= 4182016LL)				// smaller than fat32 must fail
 			sectorPerCluster = 0;
-	} if (fatbits == 32) {
+	} else if (fatbits == 32) {
 		sectorPerCluster = 64;				// default is 32k clusters
 		if (size <= (32 * 1024 * 1024 * 1024LL))	// up to 32GB, use 16k clusters
 			sectorPerCluster = 32;
