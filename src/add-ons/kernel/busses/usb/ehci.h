@@ -143,11 +143,13 @@ static int32						FinishIsochronousThread(void *data);
 		status_t					FillQueueWithRequest(Transfer *transfer,
 										ehci_qh *queueHead,
 										ehci_qtd **dataDescriptor,
-										bool *directionIn);
+										bool *directionIn,
+										bool prepareKernelAccess);
 		status_t					FillQueueWithData(Transfer *transfer,
 										ehci_qh *queueHead,
 										ehci_qtd **dataDescriptor,
-										bool *directionIn);
+										bool *directionIn,
+										bool prepareKernelAccess);
 
 		bool						LockIsochronous();
 		void						UnlockIsochronous();

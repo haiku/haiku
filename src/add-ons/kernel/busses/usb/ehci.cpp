@@ -793,10 +793,10 @@ EHCI::StartDebugTransfer(Transfer *transfer)
 
 	if ((pipe->Type() & USB_OBJECT_CONTROL_PIPE) != 0) {
 		result = FillQueueWithRequest(transfer, transferData.queue_head,
-			&transferData.data_descriptor, &transferData.incoming);
+			&transferData.data_descriptor, &transferData.incoming, false);
 	} else {
 		result = FillQueueWithData(transfer, transferData.queue_head,
-			&transferData.data_descriptor, &transferData.incoming);
+			&transferData.data_descriptor, &transferData.incoming, false);
 	}
 
 	if (result != B_OK) {
@@ -988,10 +988,10 @@ EHCI::SubmitTransfer(Transfer *transfer)
 	ehci_qtd *dataDescriptor;
 	if ((pipe->Type() & USB_OBJECT_CONTROL_PIPE) != 0) {
 		result = FillQueueWithRequest(transfer, queueHead, &dataDescriptor,
-			&directionIn);
+			&directionIn, true);
 	} else {
 		result = FillQueueWithData(transfer, queueHead, &dataDescriptor,
-			&directionIn);
+			&directionIn, true);
 	}
 
 	if (result != B_OK) {
@@ -1895,11 +1895,10 @@ EHCI::FinishTransfers()
 						transfer->transfer->AdvanceByFragment(actualLength);
 						if (transfer->transfer->VectorLength() > 0) {
 							FreeDescriptorChain(transfer->data_descriptor);
-							transfer->transfer->PrepareKernelAccess();
 							status_t result = FillQueueWithData(
 								transfer->transfer,
 								transfer->queue_head,
-								&transfer->data_descriptor, NULL);
+								&transfer->data_descriptor, NULL, true);
 
 							if (result == B_OK && Lock()) {
 								// reappend the transfer
@@ -2294,7 +2293,7 @@ EHCI::UnlinkQueueHead(ehci_qh *queueHead, ehci_qh **freeListHead)
 
 status_t
 EHCI::FillQueueWithRequest(Transfer *transfer, ehci_qh *queueHead,
-	ehci_qtd **_dataDescriptor, bool *_directionIn)
+	ehci_qtd **_dataDescriptor, bool *_directionIn, bool prepareKernelAccess)
 {
 	Pipe *pipe = transfer->TransferPipe();
 	usb_request_data *requestData = transfer->RequestData();
@@ -2334,6 +2333,8 @@ EHCI::FillQueueWithRequest(Transfer *transfer, ehci_qh *queueHead,
 		}
 
 		if (!directionIn) {
+			if (prepareKernelAccess)
+				transfer->PrepareKernelAccess();
 			WriteDescriptorChain(dataDescriptor, transfer->Vector(),
 				transfer->VectorCount());
 		}
@@ -2357,7 +2358,7 @@ EHCI::FillQueueWithRequest(Transfer *transfer, ehci_qh *queueHead,
 
 status_t
 EHCI::FillQueueWithData(Transfer *transfer, ehci_qh *queueHead,
-	ehci_qtd **_dataDescriptor, bool *_directionIn)
+	ehci_qtd **_dataDescriptor, bool *_directionIn, bool prepareKernelAccess)
 {
 	Pipe *pipe = transfer->TransferPipe();
 	bool directionIn = (pipe->Direction() == Pipe::In);
@@ -2374,6 +2375,8 @@ EHCI::FillQueueWithData(Transfer *transfer, ehci_qh *queueHead,
 
 	lastDescriptor->token |= EHCI_QTD_IOC;
 	if (!directionIn) {
+		if (prepareKernelAccess)
+			transfer->PrepareKernelAccess();
 		WriteDescriptorChain(firstDescriptor, transfer->Vector(),
 			transfer->VectorCount());
 	}
