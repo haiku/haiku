@@ -1638,7 +1638,7 @@ actions BuildEfiSystemPartition1
 {
 	$(RM) $(<)
 	dd if=/dev/zero of=$(<) bs=1024 count=2880
-	mformat -i $(<) -n 36 -h 2 -t 80
+	mformat -i $(<) -f 2880
 	mmd -D s -i $(<) ::/EFI
 	mmd -D s -i $(<) ::/EFI/BOOT
 	mcopy -D o -i $(<) $(>) ::/EFI/BOOT/BOOTX64.EFI
