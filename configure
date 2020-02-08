@@ -915,6 +915,12 @@ else
 		fi
 	fi
 
+	if [ "$targetArchs" = " x86_gcc2" ]; then
+		echo "Building a GCC2-only Haiku is no longer supported."
+		echo "Please configure the secondary architecture."
+		exit 1
+	fi
+
 	isPrimaryArch=1
 	for targetArch in $targetArchs; do
 		# Note: targetArch is "unknown<n>" at this point if a cross-tools
