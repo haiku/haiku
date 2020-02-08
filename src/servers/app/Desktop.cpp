@@ -211,7 +211,7 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 				fDesktop->SetWorkspaceAsync(key - B_F1_KEY, takeWindow);
 				return B_SKIP_MESSAGE;
 			}
-		} if (key == 0x11
+		} else if (key == 0x11
 			&& (modifiers & (B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY))
 					== B_COMMAND_KEY) {
 			// switch to previous workspace (command + `)
