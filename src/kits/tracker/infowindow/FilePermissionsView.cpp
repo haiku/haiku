@@ -122,8 +122,7 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model* model)
 		B_TRANSLATE("Other"));
 
 	// Get the largest inclined area of the three
-	BSize ownerRightLabelSize, groupRightLabelSize, otherRightLabelSize,
-		maxSize;
+	BSize ownerRightLabelSize, groupRightLabelSize, maxSize;
 
 	ownerRightLabelSize = ownerRightLabel->ExplicitSize();
 	groupRightLabelSize = groupRightLabel->ExplicitSize();
