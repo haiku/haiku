@@ -43,276 +43,8 @@ All rights reserved.
 #include "Window.h"
 
 
-const uint32 kValueChanged = 'swch';
-
 const rgb_color kNormalColor = {150, 150, 150, 255};
 const rgb_color kHighlightColor = {100, 100, 0, 255};
-
-
-static void
-AddSelf(BView* self, BView* to)
-{
-	to->AddChild(self);
-}
-
-
-void
-ViewList::RemoveAll(BView*)
-{
-	EachListItemIgnoreResult(this, &BView::RemoveSelf);
-}
-
-
-void
-ViewList::AddAll(BView* toParent)
-{
-	EachListItem(this, &AddSelf, toParent);
-}
-
-
-//	#pragma mark - DialogPane
-
-
-DialogPane::DialogPane(BRect mode1Frame, BRect mode2Frame, int32 initialMode,
-	const char* name, uint32 followFlags, uint32 flags)
-	:
-	BView(FrameForMode(initialMode, mode1Frame, mode2Frame, mode2Frame),
-		name, followFlags, flags),
-	fMode(initialMode),
-	fMode1Frame(mode1Frame),
-	fMode2Frame(mode2Frame),
-	fMode3Frame(mode2Frame)
-{
-	SetMode(fMode, true);
-}
-
-
-DialogPane::DialogPane(BRect mode1Frame, BRect mode2Frame, BRect mode3Frame,
-	int32 initialMode, const char* name, uint32 followFlags, uint32 flags)
-	:
-	BView(FrameForMode(initialMode, mode1Frame, mode2Frame, mode3Frame),
-		name, followFlags, flags),
-	fMode(initialMode),
-	fMode1Frame(mode1Frame),
-	fMode2Frame(mode2Frame),
-	fMode3Frame(mode3Frame)
-{
-	SetMode(fMode, true);
-}
-
-
-DialogPane::~DialogPane()
-{
-	fMode3Items.RemoveAll(this);
-	fMode2Items.RemoveAll(this);
-}
-
-
-void
-DialogPane::SetMode(int32 mode, bool initialSetup)
-{
-	ASSERT(mode < 3 && mode >= 0);
-
-	if (!initialSetup && mode == fMode)
-		return;
-
-	int32 oldMode = fMode;
-	fMode = mode;
-
-	bool followBottom = (ResizingMode() & B_FOLLOW_BOTTOM) != 0;
-	// if we are follow bottom, we will move ourselves, need to place us back
-	float bottomOffset = 0;
-	if (followBottom && Window() != NULL)
-		bottomOffset = Window()->Bounds().bottom - Frame().bottom;
-
-	BRect newBounds(BoundsForMode(fMode));
-	if (!initialSetup)
-		ResizeParentWindow(fMode, oldMode);
-
-	ResizeTo(newBounds.Width(), newBounds.Height());
-
-	float delta = 0;
-	if (followBottom && Window() != NULL)
-		delta = (Window()->Bounds().bottom - Frame().bottom) - bottomOffset;
-
-	if (delta != 0) {
-		MoveBy(0, delta);
-		if (fLatch && (fLatch->ResizingMode() & B_FOLLOW_BOTTOM))
-			fLatch->MoveBy(0, delta);
-	}
-
-	switch (fMode) {
-		case 0:
-		{
-			if (oldMode > 1)
-				fMode3Items.RemoveAll(this);
-			if (oldMode > 0)
-				fMode2Items.RemoveAll(this);
-
-			BView* separator = FindView("separatorLine");
-			if (separator) {
-				BRect frame(separator->Frame());
-				frame.InsetBy(-1, -1);
-				RemoveChild(separator);
-				Invalidate();
-			}
-
-			AddChild(new SeparatorLine(BPoint(newBounds.left, newBounds.top
-				+ newBounds.Height() / 2), newBounds.Width(), false,
-				"separatorLine"));
-			break;
-		}
-
-		case 1:
-		{
-			if (oldMode > 1)
-				fMode3Items.RemoveAll(this);
-			else
-				fMode2Items.AddAll(this);
-
-			BView* separator = FindView("separatorLine");
-			if (separator) {
-				BRect frame(separator->Frame());
-				frame.InsetBy(-1, -1);
-				RemoveChild(separator);
-				Invalidate();
-			}
-			break;
-		}
-
-		case 2:
-		{
-			fMode3Items.AddAll(this);
-			if (oldMode < 1)
-				fMode2Items.AddAll(this);
-
-			BView* separator = FindView("separatorLine");
-			if (separator) {
-				BRect frame(separator->Frame());
-				frame.InsetBy(-1, -1);
-				RemoveChild(separator);
-				Invalidate();
-			}
-			break;
-		}
-	}
-}
-
-
-void
-DialogPane::AttachedToWindow()
-{
-	AdoptParentColors();
-}
-
-
-void
-DialogPane::ResizeParentWindow(int32 from, int32 to)
-{
-	if (Window() == NULL)
-		return;
-
-	BRect oldBounds = BoundsForMode(from);
-	BRect newBounds = BoundsForMode(to);
-
-	BPoint by = oldBounds.RightBottom() - newBounds.RightBottom();
-	if (by != BPoint(0, 0))
-		Window()->ResizeBy(by.x, by.y);
-}
-
-
-void
-DialogPane::AddItem(BView* view, int32 toMode)
-{
-	if (toMode == 1)
-		fMode2Items.AddItem(view);
-	else if (toMode == 2)
-		fMode3Items.AddItem(view);
-
-	if (fMode >= toMode)
-		AddChild(view);
-}
-
-
-BRect
-DialogPane::FrameForMode(int32 mode)
-{
-	switch (mode) {
-		case 0:
-			return fMode1Frame;
-
-		case 1:
-			return fMode2Frame;
-
-		case 2:
-			return fMode3Frame;
-	}
-
-	return fMode1Frame;
-}
-
-
-BRect
-DialogPane::BoundsForMode(int32 mode)
-{
-	BRect result;
-	switch (mode) {
-		case 0:
-			result = fMode1Frame;
-			break;
-
-		case 1:
-			result = fMode2Frame;
-			break;
-
-		case 2:
-			result = fMode3Frame;
-			break;
-	}
-	result.OffsetTo(0, 0);
-
-	return result;
-}
-
-
-BRect
-DialogPane::FrameForMode(int32 mode, BRect mode1Frame, BRect mode2Frame,
-	BRect mode3Frame)
-{
-	switch (mode) {
-		case 0:
-			return mode1Frame;
-
-		case 1:
-			return mode2Frame;
-
-		case 2:
-			return mode3Frame;
-	}
-
-	return mode1Frame;
-}
-
-
-void
-DialogPane::SetSwitch(BControl* control)
-{
-	fLatch = control;
-	control->SetMessage(new BMessage(kValueChanged));
-	control->SetTarget(this);
-}
-
-
-void
-DialogPane::MessageReceived(BMessage* message)
-{
-	if (message->what == kValueChanged) {
-		int32 value;
-		if (message->FindInt32("be:value", &value) == B_OK)
-			SetMode(value);
-	} else
-		_inherited::MessageReceived(message);
-}
 
 
 //	#pragma mark - PaneSwitch
@@ -360,7 +92,8 @@ PaneSwitch::Draw(BRect)
 
 	if (label != NULL) {
 		BPoint point;
-		float labelDist = sLatchSize + ceilf(sLatchSize / 2.0);
+		float latchSize = be_plain_font->Size();
+		float labelDist = latchSize + ceilf(latchSize / 2.0);
 		if (fLeftAligned)
 			point.x = labelDist;
 		else
@@ -431,14 +164,15 @@ PaneSwitch::MinSize()
 	float onLabelWidth = StringWidth(fLabelOn);
 	float offLabelWidth = StringWidth(fLabelOff);
 	float labelWidth = max_c(onLabelWidth, offLabelWidth);
-	size.width = sLatchSize;
+	float latchSize = be_plain_font->Size();
+	size.width = latchSize;
 	if (labelWidth > 0.0)
-		size.width += ceilf(sLatchSize / 2.0) + labelWidth;
+		size.width += ceilf(latchSize / 2.0) + labelWidth;
 
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 	size.height = ceilf(fontHeight.ascent) + ceilf(fontHeight.descent);
-	size.height = max_c(size.height, sLatchSize);
+	size.height = max_c(size.height, latchSize);
 
 	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
 }

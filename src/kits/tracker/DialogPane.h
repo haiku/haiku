@@ -41,76 +41,6 @@ All rights reserved.
 
 namespace BPrivate {
 
-class ViewList : public BObjectList<BView> {
-public:
-								ViewList()
-									:
-									BObjectList<BView>(5, true)
-								{
-								}
-
-			void				RemoveAll(BView* fromParent);
-			void				AddAll(BView* toParent);
-};
-
-
-class DialogPane : public BView {
-	// dialog with collapsible panes
-public:
-								DialogPane(BRect mode1Frame, BRect mode2Frame,
-									int32 initialMode, const char* name,
-									uint32 followFlags
-										= B_FOLLOW_LEFT | B_FOLLOW_TOP,
-									uint32 flags = B_WILL_DRAW);
-								DialogPane(BRect mode1Frame, BRect mode2Frame,
-									BRect mode3Frame, int32 initialMode,
-									const char* name, uint32 followFlags
-										= B_FOLLOW_LEFT | B_FOLLOW_TOP,
-									uint32 flags = B_WILL_DRAW);
-
-	virtual						~DialogPane();
-
-			BRect				FrameForMode(int32);
-			BRect				BoundsForMode(int32);
-
-			int32				Mode() const;
-	virtual	void				SetMode(int32, bool initialSetup = false);
-
-			void				AddItem(BView*, int32 toMode);
-
-			void				SetSwitch(BControl*);
-
-	virtual	void				AttachedToWindow();
-
-protected:
-			void				ResizeParentWindow(int32 from, int32 to);
-	static	BRect				FrameForMode(int32, BRect, BRect, BRect);
-		// called only by the constructor
-
-	virtual	void				MessageReceived(BMessage* message);
-
-private:
-			int32				fMode;
-
-			BRect				fMode1Frame;
-			BRect				fMode2Frame;
-			BRect				fMode3Frame;
-
-			ViewList			fMode2Items;
-			ViewList			fMode3Items;
-			BControl*			fLatch;
-
-	typedef BView _inherited;
-};
-
-
-inline int32
-DialogPane::Mode() const
-{
-	return fMode;
-}
-
-
 class PaneSwitch : public BControl {
 public:
 								PaneSwitch(BRect frame, const char* name,
@@ -156,8 +86,6 @@ private:
 
 			char*				fLabelOn;
 			char*				fLabelOff;
-
-	static	const int32			sLatchSize = 11;
 };
 
 } // namespace BPrivate

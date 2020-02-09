@@ -86,10 +86,6 @@ All rights reserved.
 
 const uint32 kNewTargetSelected = 'selc';
 
-const uint32 kPaneSwitchClosed = 0;
-const uint32 kPaneSwitchOpen = 2;
-
-
 //	#pragma mark - BInfoWindow
 
 
