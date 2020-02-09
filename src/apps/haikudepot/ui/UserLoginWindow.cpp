@@ -593,7 +593,7 @@ UserLoginWindow::_HandleAuthenticationFailed()
 {
 	AppUtils::NotifySimpleError(
 		B_TRANSLATE("Authentication failed"),
-		B_TRANSLATE("The user does not exist or the wrong was"
+		B_TRANSLATE("The user does not exist or the wrong password was"
 			" supplied. Check your credentials and try again.")
 	);
 	fPasswordField->SetText("");
