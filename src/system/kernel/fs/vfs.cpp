@@ -45,6 +45,7 @@
 #include <lock.h>
 #include <low_resource_manager.h>
 #include <slab/Slab.h>
+#include <StackOrHeapArray.h>
 #include <syscalls.h>
 #include <syscall_restart.h>
 #include <tracing.h>
@@ -8987,7 +8988,7 @@ _user_get_next_fd_info(team_id team, uint32* userCookie, fd_info* userInfo,
 	struct fd_info info;
 	uint32 cookie;
 
-	// only root can do this (or should root's group be enough?)
+	// only root can do this
 	if (geteuid() != 0)
 		return B_NOT_ALLOWED;
 
@@ -9640,7 +9641,7 @@ status_t
 _user_read_stat(int fd, const char* userPath, bool traverseLink,
 	struct stat* userStat, size_t statSize)
 {
-	struct stat stat;
+	struct stat stat = {0};
 	status_t status;
 
 	if (statSize > sizeof(struct stat))
@@ -9969,7 +9970,7 @@ status_t
 _user_read_index_stat(dev_t device, const char* userName, struct stat* userStat)
 {
 	char name[B_FILE_NAME_LENGTH];
-	struct stat stat;
+	struct stat stat = {0};
 	status_t status;
 
 	if (!IS_USER_ADDRESS(userName) || !IS_USER_ADDRESS(userStat))
@@ -10102,8 +10103,6 @@ int
 _user_open_query(dev_t device, const char* userQuery, size_t queryLength,
 	uint32 flags, port_id port, int32 token)
 {
-	char* query;
-
 	if (device < 0 || userQuery == NULL || queryLength == 0)
 		return B_BAD_VALUE;
 
@@ -10114,18 +10113,14 @@ _user_open_query(dev_t device, const char* userQuery, size_t queryLength,
 	if (queryLength >= 65536)
 		return B_NAME_TOO_LONG;
 
-	query = (char*)malloc(queryLength + 1);
-	if (query == NULL)
+	BStackOrHeapArray<char, 128> query(queryLength);
+	if (!query.IsValid())
 		return B_NO_MEMORY;
-	if (user_strlcpy(query, userQuery, queryLength + 1) < B_OK) {
-		free(query);
+
+	if (user_strlcpy(query, userQuery, queryLength + 1) < B_OK)
 		return B_BAD_ADDRESS;
-	}
 
-	int fd = query_open(device, query, flags, port, token, false);
-
-	free(query);
-	return fd;
+	return query_open(device, query, flags, port, token, false);
 }
 
 
