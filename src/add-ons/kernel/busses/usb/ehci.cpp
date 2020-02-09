@@ -971,13 +971,17 @@ EHCI::SubmitTransfer(Transfer *transfer)
 	if ((pipe->Type() & USB_OBJECT_ISO_PIPE) != 0)
 		return SubmitIsochronous(transfer);
 
+	status_t result = transfer->InitKernelAccess();
+	if (result != B_OK)
+		return result;
+
 	ehci_qh *queueHead = CreateQueueHead();
 	if (!queueHead) {
 		TRACE_ERROR("failed to allocate queue head\n");
 		return B_NO_MEMORY;
 	}
 
-	status_t result = InitQueueHead(queueHead, pipe);
+	result = InitQueueHead(queueHead, pipe);
 	if (result != B_OK) {
 		TRACE_ERROR("failed to init queue head\n");
 		FreeQueueHead(queueHead);
@@ -1046,6 +1050,10 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 			"isochronous packetSize is bigger than pipe MaxPacketSize\n");
 		return B_BAD_VALUE;
 	}
+
+	status_t result = transfer->InitKernelAccess();
+	if (result != B_OK)
+		return result;
 
 	// Ignore the fact that the last descriptor might need less bandwidth.
 	// The overhead is not worthy.
@@ -1172,7 +1180,7 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 	TRACE("isochronous filled itds count %d\n", itdIndex);
 
 	// Add transfer to the list
-	status_t result = AddPendingIsochronousTransfer(transfer, isoRequest,
+	result = AddPendingIsochronousTransfer(transfer, isoRequest,
 		itdIndex - 1, directionIn, bufferPhy, bufferLog,
 		transfer->DataLength());
 	if (result != B_OK) {
@@ -1527,12 +1535,6 @@ EHCI::AddPendingTransfer(Transfer *transfer, ehci_qh *queueHead,
 	if (!data)
 		return B_NO_MEMORY;
 
-	status_t result = transfer->InitKernelAccess();
-	if (result != B_OK) {
-		delete data;
-		return result;
-	}
-
 	data->transfer = transfer;
 	data->queue_head = queueHead;
 	data->data_descriptor = dataDescriptor;
@@ -1569,12 +1571,6 @@ EHCI::AddPendingIsochronousTransfer(Transfer *transfer, ehci_itd **isoRequest,
 		= new(std::nothrow) isochronous_transfer_data;
 	if (!data)
 		return B_NO_MEMORY;
-
-	status_t result = transfer->InitKernelAccess();
-	if (result != B_OK) {
-		delete data;
-		return result;
-	}
 
 	data->transfer = transfer;
 	data->descriptors = isoRequest;
