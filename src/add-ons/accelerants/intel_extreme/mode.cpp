@@ -145,6 +145,21 @@ set_frame_buffer_base()
 }
 
 
+static bool
+limit_modes_for_gen3_lvds(display_mode* mode)
+{
+	// Filter out modes with resolution higher than the internal LCD can
+	// display.
+	// FIXME do this only for that display. The whole display mode logic
+	// needs to be adjusted to know which display we're talking about.
+	if (gInfo->shared_info->panel_mode.virtual_width < mode->virtual_width)
+		return false;
+	if (gInfo->shared_info->panel_mode.virtual_height < mode->virtual_height)
+		return false;
+
+	return true;
+}
+
 /*!	Creates the initial mode list of the primary accelerant.
 	It's called from intel_init_accelerant().
 */
@@ -184,10 +199,14 @@ create_mode_list(void)
 		// We could not read any EDID info. Fallback to creating a list with
 		// only the mode set up by the BIOS.
 
+		check_display_mode_hook limitModes = NULL;
+		if (gInfo->shared_info->device_type.Generation() < 4)
+			limitModes = limit_modes_for_gen3_lvds;
+
 		// TODO: support lower modes via scaling and windowing
 		gInfo->mode_list_area = create_display_modes("intel extreme modes",
 			NULL, &gInfo->shared_info->panel_mode, 1,
-			supportedSpaces, colorSpaceCount, NULL, &list, &count);
+			supportedSpaces, colorSpaceCount, limitModes, &list, &count);
 	} else {
 		// Otherwise return the 'real' list of modes
 		gInfo->mode_list_area = create_display_modes("intel extreme modes",
@@ -247,7 +266,7 @@ intel_propose_display_mode(display_mode* target, const display_mode* low,
 
 	// first search for the specified mode in the list, if no mode is found
 	// try to fix the target mode in sanitize_display_mode
-	// TODO: Only sanitize_display_mode should be used. However, at the moments
+	// TODO: Only sanitize_display_mode should be used. However, at the moment
 	// the mode constraints are not optimal and do not work for all
 	// configurations.
 	for (uint32 i = 0; i < gInfo->shared_info->mode_count; i++) {
