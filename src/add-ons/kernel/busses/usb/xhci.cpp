@@ -935,23 +935,19 @@ XHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 		return B_OK;
 	}
 
-	// Get the head TD from the endpoint.
-	xhci_td* td_head = endpoint->td_head;
-	endpoint->td_head = NULL;
-
-	// We don't want to call the callbacks while holding the endpoint lock,
-	// as they could potentially cause deadlocks, so we instead store
-	// them in a pointer array. We need to do this separately from freeing
-	// the TDs, for in the case we fail to stop the endpoint, we cancel
-	// the transfers but do not free the TDs.
+	// Calling the callbacks while holding the endpoint lock could potentially
+	// cause deadlocks, so we instead store them in a pointer array. We need
+	// to do this separately from freeing the TDs, for in the case we fail
+	// to stop the endpoint, we cancel the transfers but do not free the TDs.
 	Transfer* transfers[XHCI_MAX_TRANSFERS];
 	int32 transfersCount = 0;
 
-	// We can't cancel or delete transfers under "force", as they probably
-	// are not safe to use anymore.
-	for (xhci_td* td = td_head; td != NULL; td = td->next) {
+	for (xhci_td* td = endpoint->td_head; td != NULL; td = td->next) {
 		if (td->transfer == NULL)
 			continue;
+
+		// We can't cancel or delete transfers under "force", as they probably
+		// are not safe to use anymore.
 		if (!force) {
 			transfers[transfersCount] = td->transfer;
 			transfersCount++;
@@ -959,8 +955,18 @@ XHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 		td->transfer = NULL;
 	}
 
+	// It is possible that while waiting for the stop-endpoint command to
+	// complete, one of the queued transfers posts a completion event, so in
+	// order to avoid a deadlock, we must unlock the endpoint.
+	endpointLocker.Unlock();
 	status_t status = StopEndpoint(false, endpoint->id + 1,
 		endpoint->device->slot);
+	endpointLocker.Lock();
+
+	// Detach the head TD from the endpoint.
+	xhci_td* td_head = endpoint->td_head;
+	endpoint->td_head = NULL;
+
 	if (status == B_OK) {
 		// Clear the endpoint's TRBs.
 		memset(endpoint->trbs, 0, sizeof(xhci_trb) * XHCI_ENDPOINT_RING_SIZE);
