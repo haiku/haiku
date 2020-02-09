@@ -147,7 +147,6 @@ intel_interrupt_handler(void* data)
 {
 	intel_info &info = *(intel_info*)data;
 	uint32 reg = find_reg(info, INTEL_INTERRUPT_IDENTITY);
-	bool hasPCH = (info.pch_info != INTEL_PCH_NONE);
 	uint32 identity;
 
 	identity = read32(info, reg);
@@ -250,8 +249,6 @@ init_interrupt_handler(intel_info &info)
 				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
 			write32(info, INTEL_DISPLAY_B_PIPE_STATUS,
 				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
-
-			bool hasPCH = (info.pch_info != INTEL_PCH_NONE);
 
 			uint32 enable = intel_get_interrupt_mask(info,
 				INTEL_PIPE_A | INTEL_PIPE_B, true);
@@ -550,8 +547,6 @@ intel_extreme_uninit(intel_info &info)
 	CALLED();
 
 	if (!info.fake_interrupts && info.shared_info->vblank_sem > 0) {
-		bool hasPCH = (info.pch_info != INTEL_PCH_NONE);
-
 		// disable interrupt generation
 		write32(info, find_reg(info, INTEL_INTERRUPT_ENABLED), 0);
 		write32(info, find_reg(info, INTEL_INTERRUPT_MASK), ~0);
