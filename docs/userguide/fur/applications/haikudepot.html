@@ -4,11 +4,13 @@
 <head>
 <!-- 
  *
- * Copyright 2013-2018 Haiku. All rights reserved.
+ * Copyright 2013-2019 Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Fabio Tomat
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -43,13 +45,14 @@
 <li><a href="../../sk/applications/haikudepot.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/applications/haikudepot.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sv_SE/applications/haikudepot.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/applications/haikudepot.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../zh_CN/applications/haikudepot.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../ru/applications/haikudepot.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../uk/applications/haikudepot.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../jp/applications/haikudepot.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 </ul>
 <span>
- «  <a href="expander.html">Expander</a> 
+ «  <a href="expander.html">Espansôr</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Aplicazions</a> 
 ::  <a href="icon-o-matic.html">Icon-O-Matic</a>  »
 </span></div>
@@ -61,12 +64,12 @@
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Tabele</td></tr>
-<tr class="index"><td><a href="#filter">The Filter</a><br />
-                <a href="#list">The List</a><br />
-                <a href="#info">The Info Area</a><br />
-                <a href="#menu">Tools and Show menus</a><br />
-                <a href="#account">Creating a User Account</a><br />
-                <a href="#rating">Rating and Commenting</a><br />
+<tr class="index"><td><a href="#filter">Il filtri</a><br />
+                <a href="#list">La liste</a><br />
+                <a href="#info">La aree des informazions</a><br />
+                <a href="#menu">I menù Struments e Mostre</a><br />
+                <a href="#account">Creâ un account utent</a><br />
+                <a href="#rating">Valutâ e comentâ</a><br />
 </td></tr>
 </table>
 
@@ -75,90 +78,90 @@
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
 <tr><td>Posizion:</td><td></td><td><span class="path">/boot/system/apps/HaikuDepot</span></td></tr>
 <tr><td>Impostazions:</td><td></td><td><span class="path">~/config/settings/HaikuDepot/main_settings</span><br />
-<span class="path">~/config/cache/HaikuDepot/</span> - Cached icons, screenshots, descriptions etc.</td></tr>
+<span class="path">~/config/cache/HaikuDepot/</span> - Iconis in cache, schermadis, descrizions e vie indenant...</td></tr>
 </table>
 <p><br /></p>
-<p>HaikuDepot is the central application when it comes to managing your software packages. With it you can browse and search through package repositories and install, update and uninstall packages. By default, HaikuDepot starts up with a list of "<i>Featured packages</i>", software that's deemed interesting to many users.</p>
+<p>HaikuDepot e je la aplicazion centrâl cuant che si cjacare di gjestî i pachets software. Cun lui tu puedis esplorâ, cirî sui dipuesits dai pachets, instalâ, inzornâ e disinstalâ pachets. In maniere predefinide HaikuDepot al partìs mostrant une liste di "<i>Pachets in risalt</i>", software che, de bande di tancj utents, a vegnin ritignûts interessants.</p>
 <img src="../images/apps-images/haikudepot.png" alt="haikudepot.png" />
-<p>When the <span class="menu">Show only featured packages</span> checkbox is deactivated, all available packages are shown and the display changes to smaller icons and more information arranged in columns:</p>
+<p>The second tab shows <span class="menu">All packages</span>, the display changes to smaller icons and more information arranged in columns:</p>
 <img src="../images/apps-images/haikudepot_all.png" alt="haikudepot.png" />
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="filter" name="filter">The Filter</a></h2>
-<p>At the top we find a few means to filter the list of available packages below:</p>
+<a id="filter" name="filter">Il filtri</a></h2>
+<p>Parsore o cjatin cualchi strument par filtrâ la liste dai pachets software disot:</p>
 <ul>
-<li><p>The <span class="menu">Category</span> pop-up menu lets you limit the list to individual categories like "<i>Audio</i>" or "<i>Games</i>".</p></li>
-<li><p>The <span class="menu">Search terms</span> text field filters the list to those packages that have all the entered (space-delimited) strings in their name or description.</p></li>
-<li><p>The checkbox to <span class="menu">Show only featured packages</span> can be activated to further filter the results in the set category or of the entered search terms.</p></li>
-<li><p>The <span class="menu">Repositories</span> menu of the menu bar determines which repos are being queried. "<i>Local</i>" packages are the ones that were installed from somewhere other than an online repo; maybe from a USB thumb drive or downloaded from some website or a package that you've built yourself.</p></li>
+<li><p>Il menù a tende <span class="menu">Categorie</span> ti permet di limitâ la liste a specifichis categoriis come "<i>Audio</i>" o "<i>Zûcs</i>".</p></li>
+<li><p>Il cjamp di test <span class="menu">Tiermins di ricercje</span> al filtre la liste a chei pachets che a àn la stringhe inseride (delimitade di spazi) tal lôr non o te lôr descrizion.</p></li>
+<li><p>Il menù <span class="menu">Dipuesits</span> de sbare dai menù al determine cuâi dipuesits a àn di sei interogâts. I pachets "<i>Locâl</i>" a son chei che a son stâts instalâts di cualchi altre bande rispiet ai dipuesits in rêt; forsit di une clavute USB o discjariâts di cualchi sît web opûr un pachet che tu âs costruît di bessôl.</p></li>
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="list" name="list">The List</a></h2>
-<p>Like in any Tracker window, you can choose from a context menu which columns to display by right-clicking the column heading. A left-click sorts the list according to that column. Of course, you can rearrange the columns by dragging them to a new position.</p>
-<p>The status column of a package can have one of several states:</p>
+<a id="list" name="list">La liste</a></h2>
+<p>Come in ogni barcon di Tracker, tu puedis sielzi di un menù contestuâl cuale colone visualizâ, fasint clic diestri su pe intestazion de colone. Un clic di çampe al ordenarà la liste in base a chê colone. E po sì, tu puedis rangjâ lis colonis strissinantlis suntune gnove posizion.</p>
+<p>Il stât de colone di un pachet al pues vê diviers stâts:</p>
 <ul>
-<li><p><span class="menu">Active</span>: The package is currently installed and ready to be used.</p></li>
-<li><p><span class="menu">Available</span>: The package exists in that repository and can be downloaded and installed. If there are any dependencies on other packages, you'll be informed of that while installing and get the choice of downloading/installing all that's necessary.</p></li>
-<li><p><span class="menu">Pending / %</span>: <i>Pending</i> is shown for a package that is queued for download/installation. While a package is downloaded, the progress is shown as percentage.</p></li>
-<li><p><span class="menu">Update available</span>: There's a newer version than your installed one available.</p></li>
+<li><p><span class="menu">Atîf</span>: Il pachet al è instalât e pront par jessi doprât.</p></li>
+<li><p><span class="menu">Disponibil</span>: Il pachet al esist in chel dipuesit e al pues jessi discjariât e instalât. Se al à cualsisei dipendence su altris pachets, tu vignarâs informât in merit intal procès di instalazion e ti vignarà dade la sielte di discjariâ/instalâ dut ce che al covente.</p></li>
+<li><p><span class="menu">In spiete / %</span>: <i>In spiete</i> al ven mostrât par un pachet che al è in code pal discjariament/instalazion. Cuant che un pachet al ven discjariât, l'avanzament al ven mostrât tant che percentuâl.</p></li>
+<li><p><span class="menu">Inzornament disponibil</span>: E je disponibile une version plui gnove rispiet a chê che tu âs instalât.</p></li>
 </ul>
-<p>You can grab the dotted line between the packages list and the info area to vertically resize the packages list.</p>
+<p>Tu puedis cjapâ la linie a ponts tra la liste dai pachets e la aree des informazions par ridimensionâ in verticâl la liste dai pachets.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="info" name="info">The Info Area</a></h2>
-<p>At the bottom is an area that displays information on the package that is currently selected in the list above it.<br />
-To the right of package name, author, rating and version is a button, that – depending on the current state of the package – lets you <span class="button">Install</span>, <span class="button">Uninstall</span> or <span class="button">Update</span> it. If a package is already installed, you'll find an additional button there to <span class="button">Open</span> the application.</p>
-<p>Below are four tabs: About, Ratings, Changelog and Contents.</p>
+<a id="info" name="info">La aree des informazions</a></h2>
+<p>In bas e je une aree che e mostre lis informazions sul pachet che si à selezionât te liste parsore.<br />
+A drete dal non dal pachet, autôr valutazion e de version al è un boton, che – in base al stât atuâl dal pachet – ti permet di fâi <span class="button">Instale</span>, <span class="button">Disinstale</span> o <span class="button">Inzorne</span>. Se un pachet al è za instalât, in diplui lì tu cjatarâs in boton <span class="button">Vierç</span>, che ti fasarà vierzi la aplicazion.</p>
+<p>Chi a son cuatri schedis: Informazions su, Valutazions, Regjistri modifichis e Contignût.</p>
 <ul>
-<li><p _translation_id="5252"><span class="menu">About</span></p>
-<p _translation_id="5253">The first tab has a detailed description of the package, as well as screenshots and a contact address and URL of the team that maintains the packaged software, if available. Clicking the screenshot thumbnail will open it full-size in a new window</p></li>
-<li><p _translation_id="5254"><span class="menu">Ratings</span></p>
-<p _translation_id="5255">The second tab shows ratings and comments of users, if available.</p>
+<li><p _translation_id="5252"><span class="menu">Informazions su</span></p>
+<p _translation_id="5253">La prime schede e à une descrizion detaiade dal pachet, cussì ancje videadis e direzion dal contat e URL dal grup che al manten il pachet software, se disponibii. Fasint clic su pe miniature de schermade caturade te vierzarà a plene dimension intun gnûf barcon</p></li>
+<li><p _translation_id="5254"><span class="menu">Valutazions</span></p>
+<p _translation_id="5255">La seconde schede e mostre lis valutazions e i coments dai utents, se disponibii.</p>
 <img src="../images/apps-images/haikudepot-rating-tab.png" alt="haikudepot-rating-tab.png" />
-<p _translation_id="5268">To the left is a statistic, showing the number of stars (1 to 5) the package got from how many users.<br />
-In the middle are user comments with their nickname, the number of stars they gave the package and which version of the package they were rating or commenting on. You'll find more on how to rate a package yourself <a href="#rating">further down</a>.<br />
+<p _translation_id="5268">A çampe si cjate une statistiche, che e mostre il numar di stelis (di 1 a 5) che il pachet al à vût e di trops utents.<br />
+Intal mieç a stan i coments dai utents cul lôr sorenon, il numar di stelis che a àn dât al pachet e cuale version dal pachet che a àn valutât o comentât. Tu cjatarâs plui informazions su ce mût valutâ un pachet di bessôl <a href="#rating">plui in bas</a>.<br />
 <!--  With the little thumb up/down icons to the right, you can show your approval or disapproval with a certain comment.
 -->
 </p></li>
-<li><p _translation_id="5257"><span class="menu">Changelog</span></p>
-<p _translation_id="5258">Here you find a detailed history of all the  versions of the package that have been released so far, if the maintainer of the package  provides that information.</p></li>
-<li><p><span class="menu">Contents</span></p>
-<p>The last tab shows all the files and folders a package contains. This only works for already downloaded packages.</p></li>
+<li><p _translation_id="5257"><span class="menu">Regjistri modifichis</span></p>
+<p _translation_id="5258">Chi tu cjatis une cronologjie detaiade di dutis lis version dal pachet che a son stadis publicadis fin cumò, se chel che lu manten al furnìs chê informazion.</p></li>
+<li><p><span class="menu">Contignût</span></p>
+<p>La ultime schede e mostre ducj i file e lis cartelis che un pachet al conten. Chest al funzione dome pai pachets za discjariâts.</p></li>
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="menu" name="menu">Tools and Show menu</a></h2>
-<p>In the <span class="menu">Tools</span> menu at the top of the window, you'll find an item to <span class="menu">Refresh repositories</span>. This will request an up-to-date list of all available packages from the repositories.<br />
-The second item is to <span class="menu">Manage repositories...</span>. It opens the <a href="../preferences/repositories.html">Repositories</a> preferences, to add/remove or disable and enable repositories.<br />
-<span class="menu">Check for updates...</span> opens the <a href="../apps/softwareupdater.html">SoftwareUpdater</a> to search and install updated packages.</p>
-<p>Under <span class="menu">Show</span> you can choose to also display <span class="menu">Develop packages</span> and <span class="menu">Source packages</span> in the packages list. For the normal user those are of no interest and would only clutter the list. They are important, however, for people who need the libraries, headers etc. of a package to develop and compile programs depending on them.</p>
-<p>Of more interest are the options to only show <span class="menu">Available packages</span> and <span class="menu">Installed packages</span>.</p>
+<a id="menu" name="menu">I menù Struments e Mostre</a></h2>
+<p>Intal menù <span class="menu">Struments</span> in alt tal barcon, tu cjatis l'element <span class="menu">Inzorne dipuesits</span>. Chest al domandarà dai dipuesits une liste inzornade dai pachets disponibii.<br />
+Cul secont element, <span class="menu">Gjestìs dipuesits...</span>, tu gjestissis i dipuesits. Al vierç lis preferencis dai <a href="../preferences/repositories.html">Dipuesits</a>, par zontâ/gjavâ o disabilitâ e abilitât i dipuesits.<br />
+<span class="menu">Controle inzornaments...</span> al vierç <a href="../apps/softwareupdater.html">SoftwareUpdater</a> par cirî e instalâ i pachets inzornâts.</p>
+<p>Sot di <span class="menu">Mostre</span> tu puedis sielzi di mostrâ ancje i <span class="menu">Pachets di svilup</span> e i <span class="menu">Pachets sorzint</span> te liste dai pachets. Pal utent normâl chei no son di nissune utilitât e dome a confusionaran la liste. Dut câs a son impuartants pes personis che a àn dibisugne des librariis e dai header (...) di un pachet par disvilupâ e compilâ programs che a dipendin di chescj.</p>
+<p>Plui interessantis a son lis opzions par mostrâ dome i <span class="menu">Pachets disponibii</span> e i <span class="menu">Pachets instalâts</span>.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="account" name="account">Creating a User Account</a></h2>
-<p>To be able to rate a package, you need a user account at the <a href="http://depot.haiku-os.org">Haiku Depot Server</a> that serves all the packages and keeps track of ratings and user comments. You can create an account within the HaikuDepot application by clicking on the menu in the far right of the menu bar that shows your current status: <span class="menu">Not logged in</span>. Choosing <span class="menu">Log in...</span> opens a window with two tabs; one to enter your user name and password (once you have those) to log in, and the other to create a new account:</p>
+<a id="account" name="account">Creâ un account utent</a></h2>
+<p>Par podê valutâ un pachet ti covente un account utent sul <a href="http://depot.haiku-os.org">Servidôr di Haiku Depot</a> che al servìs ducj i pachets e al ten olme des valutazions e dai coments dai utents. Tu puedis creâ un account di dentri de aplicazion HaikuDepot, fasint clic sul menù te bande diestre de sbare dal menù che al mostre il to stât atuâl: <span class="menu">No jentrât</span>. Sielzint <span class="menu">Acès...</span> al vierzarà un barcon cun dôs schedis; une par meti dentri il to non utent e la peraule di ordin (une volte che tu lis âs) par jentrâ, e chê altre par creâ un gnûf account:</p>
 <img src="../images/apps-images/haikudepot-login-tab.png" alt="haikudepot-login-tab.png" /> 
-<p>To create an account you need to:</p>
-<ul><li>use an all lower-case user name without special characters</li>
-<li>use a password that's at least 8 characters long with at least 2 capitals and 2 numbers</li>
-<li>provide a valid email address (if you want a new password sent to you in case you forgot it)</li>
-<li>solve the captcha</li></ul>
-<p>After logging in, the top-right menu of the HaikuDepot window will now say <span class="menu">Logged in as (...)</span>, showing your user name. The menu now offers you to <span class="menu">Switch account...</span> or <span class="menu">Log out</span>.</p>
+<p>Par creâ un account tu âs di:</p>
+<ul><li>doprâ un non utent fat di caratars minuscui e cence caratars speciâi</li>
+<li>doprâ une peraule di ordin che e sedi lungje almancul 8 caratars cun almancul 2 letaris maiusculis e 2 numars</li>
+<li>indicâ une direzion e-mail valide (se tu desideris che ti vegni inviade une gnove peraule di ordin tal câs che tu te dismenteedis)</li>
+<li>risolvi il captcha</li>
+<li>tick the checkmarks to confirm you're over 16 and have read the usage conditions linked below them.</li></ul>
+<p>Daspò sei jentrâts, il menù in alt a drete tal barcon di HaikuDepot al mostrarà <span class="menu">Jentrât come (...)</span>, mostrant il to non utent. Cumò cul menù ti puedis sielzi tra <span class="menu">Cambie account...</span> o <span class="menu">Termine session</span>.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="rating" name="rating">Rating and Commenting</a></h2>
-<p>After you've created a user account and are logged in, you can rate a package and leave a comment, if you want. Just hover the mouse over the rating stars in the info area of a package and they turn into a <span class="button">Rating...</span> button. Click it to open the rating window:</p>
+<a id="rating" name="rating">Valutâ e comentâ</a></h2>
+<p>Daspò vê creât un account utent e jessi jentrâts, tu puedis valutâ un pachet e lassâ un coment, se tu lu desideris. Al baste passâ parsore il mouse su pes stelis di valutazion te aree des informazions di un pachet e chestis a deventaran un boton <span class="button">Vote pachet...</span>. Fâsi clic par vierzi il barcon di valutazion:</p>
 <img src="../images/apps-images/haiku-depot-ratingpanel.png" alt="haiku-depot-ratingpanel.png" />
-<p>Here you move the mouse over the stars to light them up and choose your rating, you can also choose from a number of levels to judge the stability of the application and pick the language of your optional comment. To make a comment meaningful, you should have worked with the application you're about to rate for a while to become familiar with its features, bugs and quirks. And don't write the next great American novel... keep it short, sweet and polite. :)<br />
-After you click <span class="button">Send</span> the data is transmitted to the server. You may have to go to the <span class="menu">Tools</span> menu to <span class="menu">Refresh repositories</span> before you can see your changes.</p>
+<p>Chi tu spostis il mouse parsore des stelis par impiâlis e sielzi il to vôt, tu puedis ancje sielzi il grât di stabilitât de aplicazion e sielzi la lenghe dal to coment opzionâl. Par creâ un coment che al vedi sens, tu varessis di vê doprât par un pôc la aplicazion che tu stâs par valutâ, in mût di cognossi lis sôs funzionalitâts, erôrs e stramberiis. E no sta scrivi la gnove divine comedie... tegnilu curt, dolç e gjentîl. :)<br />
+Dopo vê clicât su <span class="button">Invie</span>, i dâts a vegnin trasmetûts al servidôr. Tu podaressis vê di lâ sul menù <span class="menu">Struments</span> e fâ <span class="menu">Inzorne dipuesits</span> prime di podê viodi lis tôs modifichis.</p>
 <p>At any time, you can come back and edit your comment and re-rate it. You can also hide your rating from other users by deactivating the checkbox <span class="menu">Other users can see this rating</span>.</p>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="expander.html">Expander</a> 
+ «  <a href="expander.html">Espansôr</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Aplicazions</a> 
 ::  <a href="icon-o-matic.html">Icon-O-Matic</a>  »
 </span></div>

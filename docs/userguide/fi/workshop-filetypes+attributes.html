@@ -45,6 +45,7 @@
 <li><a href="../ro/workshop-filetypes+attributes.html"><img src="../images/flags/ro.png" alt="" />Română</a></li>
 <li><a href="../sk/workshop-filetypes+attributes.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../sv_SE/workshop-filetypes+attributes.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../tr/workshop-filetypes+attributes.html"><img src="../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../zh_CN/workshop-filetypes+attributes.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../ru/workshop-filetypes+attributes.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../uk/workshop-filetypes+attributes.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
@@ -59,7 +60,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -141,11 +141,11 @@
 <ul>
 <li><p><i>Attribuuttinimi</i> - näkyy esimerkiksi Seuraaja-ikkunoiden sarakeotsakkeissa.</p></li>
 <li><p><i>Sisäinen nimi</i> - Käytetään attribuutin indeksointiin ja kyselyyn.</p></li>
-<li><i>Type</i> - Defines the value the attribute can hold and therefore how it can be queried.
+<li><i>Tyyppi</i> - Määrittää arvon, jonka attribuutti voi sisältää ja siten kuinka sitä voidaan kysellä.
     <ul>
-    <li><span class="menu">String</span> for normal text</li>
-    <li><span class="menu">Boolean</span> for binary data: 0 (false) or &gt;=1 (true)</li>
-    <li><span class="menu">Integer</span> for integer numbers with different ranges:
+    <li><span class="menu">String</span> normaalille tekstille</li>
+    <li><span class="menu">Boolean</span> binaaritiedolle: 0 (epätosi) tai &gt;=1 (tosi)</li>
+    <li><span class="menu">Integer</span> eri lukualueiden kokonaisluvuille:
         <ul>
         <li><span class="menu">8 bit</span>: ± 255</li>
         <li><span class="menu">16 bit</span>: ± 65,535</li>
@@ -153,24 +153,24 @@
         <li><span class="menu">64 bit</span>: ± 18,446,744,073,709,551,615</li>
         </ul>
     </li>
-    <li><span class="menu">Float</span> for floating-point numbers, single precision</li>
-    <li><span class="menu">Double</span> for floating-point numbers, double precision</li>
-    <li><span class="menu">Time</span> for time and date format</li>
+    <li><span class="menu">Float</span> liukulukunumeroille, perustarkkuus</li>
+    <li><span class="menu">Double</span> liukulukunumeroille, kaksoistarkkuus</li>
+    <li><span class="menu">Time</span> ajalle ja päimäärämuodoille</li>
     </ul>
 </li>
 </ul>
 <ul>
-<li><i>Visible</i> - This checkbox determines if the attribute is visible in a Tracker window at all. Since the Tracker will be the interface to our DVD database, we check it and define its appearance with:<ul>
-    <li><span class="menu">Display as</span> - Left on "Default" if the values are to be displayed according to the attribute's "Type" (e.g. string/integer/float etc.). The other options are:
-	<ul>
-		<li><span class="menu">Checkbox</span> - Can be used to show either one of two symbols, see <span class="menu">Special</span> below.</li>
-		<li><span class="menu">Duration</span> - Shows an integer as 1/60, e.g. "90" becomes "1:30".</li>
-		<li><span class="menu">Rating</span> - Shows a rating between 0 and 10 as star symbols.</li>
+<li><i>Näkyvä</i> - Tämä valintaruutu määrittää, onko attribuutti ollenkaan näkyvä Seuraajan ikkunassa. Koska Seuraaja on käyttöliitymä DVD-tietokantaamme, merkitsemme sen ja määritämme sen ulkoasun valikoilla:<ul>
+    <li><span class="menu">Näytä kohteena</span> - Jätä arvoon "Oletus", jos arvot näytetään attribuutin "Tyypin"-kaltaisena (esim.: string/integer/float jne.). Muut valitsimet ovat:
+<ul>
+<li><span class="menu">Valintaruutu</span> - Voidaan käyttää näyttämään toinen kahdesta symbolista, katso <span class="menu">Erikoinen</span> alla.</li>
+		<li><span class="menu">Kesto</span> - Näyttää kokonaisluvun kuten 1/60, esim.: "90" tulee "1:30".</li>
+		<li><span class="menu">Arvosana</span> - Näyttää arvosanan väliltä 0 ... 10 tähtisymboleina.</li>
 	</ul></li>
-    <li><span class="menu">Editable</span> - Determines if the attribute shall be editable in Tracker.</li>
-    <li><span class="menu">Special</span> - Defines the two symbols used for a checkbox display. For example, "xo" will show a "x" for all values &gt;0 and "o" for 0.</li>
-    <li><span class="menu">Width</span> - The default width of that attributes column in a Tracker window.</li>
-    <li><span class="menu">Alignment</span> - The attribute can be displayed left, center, or right aligned.</li>
+    <li><span class="menu">Muokattava</span> - Määrittää, onko attribuutti muokattavissa Seuraajassa.</li>
+    <li><span class="menu">Erikoinen</span> - Määrittää kaksi valintaruutunäytössä käytettyä symbolia. Esimerkiksi, "xo" näyttää "x" kaikille arvoille &gt;0 ja "o" arvolle 0.</li>
+    <li><span class="menu">Leveys</span> - Attribuuttisarakkeen oletusleveys Seuraajassa.</li>
+    <li><span class="menu">Tasaus</span> - Attribuutti voidaan näyttää vasemmalle, keskelle tai oikealle tasattuna.</li>
 </ul></li></ul>
 <p>Lisää nyt kaikki tietomme attribuutteihimme:</p>
 <table summary="DVDdb Attributes" cellpadding="10" border="1">

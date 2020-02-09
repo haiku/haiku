@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -45,6 +45,7 @@
 <li><a href="../../ro/applications/textsearch.html"><img src="../../images/flags/ro.png" alt="" />Română</a></li>
 <li><a href="../../sk/applications/textsearch.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../sv_SE/applications/textsearch.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/applications/textsearch.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../zh_CN/applications/textsearch.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../ru/applications/textsearch.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../uk/applications/textsearch.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
@@ -77,16 +78,17 @@
 <table summary="menus" border="0" cellpadding="2" cellspacing="0">
 <tr><td colspan="5"><h3>Tiedostovalikko</h3></td></tr>
 <tr><td class="onelinetop"><span class="menu">Uusi ikkuna</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Avaa uuden ikkunan, jossa voit kirjoittaa toisen merkkijonon ja etsiä sitä samoista tiedostoista/kansioista.</td></tr>
-<tr><td><span class="menu">Aseta kohde...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Valitaan uusi tiedostojen ja kansioiden joukko etsittäväksi.</td></tr>
+<tr><td><span class="menu">Aseta kohde...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Valitaan uusi tiedostojen ja kansioiden joukko etsittäväksi. Vaihtoehtoisesti voit raahata ja pudottaa tiedostot/kansiot ikkunaan.</td></tr>
 <tr><td colspan="5"><h3>Toimintovalikko</h3></td></tr>
 <tr><td><span class="menu">Karsi-valinta</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Poistaa kaikki rivit luettelosta, joka ei ole nykyisin valittu.</td></tr>
 <tr><td><span class="menu">Avaa-valinta</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>Avaa nykyiset valitut tiedostot ensijaisella sovelluksella (sama kuin kaksoisnapsauttamalla). Jos se on tekstieditori, joka tukee sitä  (kuten Pe), voit hypätä tarkalleen sille riville, josta hakumerkkijono löytyi.</td></tr>
-<tr><td><span class="menu">Avaa tiedostoja Seuraajassa</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Avaa nykyisin valittujen tiedostojen sijainnin Seuraajassa.</td></tr>
+<tr><td><span class="menu">Näyttää tiedostot Seuraajassa</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Avaa nykyisin valittujen tiedostojen sijainnin Seuraajassa.</td></tr>
 <tr><td class="onelinetop"><span class="menu">Kopioi tekstin leikepöydälle</span></td><td></td><td><span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Kopioi nykyisen valinnan leikepöydälle.</td></tr>
 <tr><td colspan="5"><h3>Asetukset-valikko</h3></td></tr>
 <tr><td colspan="3" class="onelinetop"><span class="menu">Ohita kansiot, jotka alkavat pisteellä</span></td><td> </td><td>Tämä on hyödyllinen työskenteltäessä "unixy"-ympäristössä, missä usein hallinnointitiedostot piilotetaan "<tt>.folders/</tt>"-kansioiden sisälle. Versionhallintajärjestelmät, kuten SVN ja CVS ovat esimerkkejä sovelluksista, jotka käyttävät tätä ja niitä käytetään laajalti Haikussa.</td></tr>
-<tr><td colspan="3"><span class="menu">Koodinvaihtohakumerkkijono</span></td><td> </td><td>Tekstihaku käyttää komentorivityökalua <span class="cli">grep</span>. Sitä varten erikoismerkit, kuten <tt>'"*\\$?!</tt> ja välilyönnit ilmaistaan koodinvaihtomerkillä <tt>\\</tt>. Tämän aktivoinnin poistaminen tarkoittaa, että sinun on tehtävä tämä itse, mutta vaihdossa sinulle myönnetään <a href="http://fi.wikipedia.org/wiki/S%C3%A4%C3%A4nn%C3%B6llinen_lauseke" class="external free" title="Wikipedia: säännöllinen lauseke" rel="nofollow">säännöllisten lausekkeiden</a> voima.</td></tr>
+<tr><td colspan="3"><span class="menu">Säännöllinen lauseke</span></td><td> </td><td>Tekstihaku käyttää komentorivityökalua <span class="cli">grep</span>. Sitä varten erikoismerkit, kuten <tt>'"*\$?!</tt> ja välilyönnit ilmaistaan koodinvaihtomerkillä <tt>\</tt>. Tämän aktivoinnin poistaminen tarkoittaa, että sinun on tehtävä tämä itse, mutta vaihdossa sinulle myönnetään <a href="http://fi.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: säännöllinen lauseke" rel="nofollow">säännöllisten lausekkeiden</a> voima.</td></tr>
 <tr><td colspan="3"><span class="menu">Vain tekstitiedostot</span></td><td> </td><td>Tekstihaku on nykyisin hyödyllinen etsittäessä merkkijonoja pelkistä tekstitiedostoista. Tämä asetuksen poistaminen saa tekstihaun kuitenkin etsimään sitä kaikentyyppisistä tiedostoista.</td></tr>
+<tr><td colspan="3"><span class="menu">Avaa tiedostot koodimuokkaimessa</span></td><td> </td><td>Pakottaa tiedostojen avautumisen ensisijaiseksi määritellyssä koodimuokkaimessa (joka käsittelee text/x-source-code-tyyppistä koodia). Muussa tapauksessa tiedosto avautuu missä tahansa sovelluksessa, joka on asetettu sen tiedostotyypille. Hyödyllinen esimerkiksi kun muokataan HTML-tiedostoja, jotka avautuvat normaalisti webbiselaimessasi. </td></tr>
 <tr><td colspan="5"><h3>Historiavalikko</h3></td></tr>
 <tr><td colspan="4"></td><td>Sisältää äskettäin käytetyt etsintämerkkijonot.</td></tr>
 <tr><td colspan="5"><h3>Koodausvalikko</h3></td></tr>

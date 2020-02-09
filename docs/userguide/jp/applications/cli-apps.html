@@ -48,6 +48,7 @@
 <li><a href="../../sk/applications/cli-apps.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/applications/cli-apps.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sv_SE/applications/cli-apps.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/applications/cli-apps.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../zh_CN/applications/cli-apps.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../ru/applications/cli-apps.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../uk/applications/cli-apps.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
@@ -125,8 +126,8 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 		<td><p><span class="cli">checkfs</span> はファイルシステムのエラーをチェックする重要なツールです。実行は単に <span class="path">/Haiku</span> のようなボリューム名またはデバイス名を追加するだけです。すると、すべてのファイルを走査して、可能なら不整合を修復します。</p>
 </td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">desklink</span> を使用すると、任意のファイルやフォルダー、クエリ、アプリケーションのアイコンを Deskbar トレイにインストールできます。特別なアクションを実行するためにアイコンを右クリックしたときに表示されるコンテキストメニューを定義するオプションもあります。例として、次のようにいろいろなオプション (1 行目の "<tt>\\</tt>" はターミナルでの改行を表します) を付けて、<span class="app">スクリーンショット (screenshot) </span> を Deskbar に追加してみましょう。</p>
-<pre class="terminal">desklink "cmd=Active window (2s):/bin/screenshot --window --border --delay 2" \\
+		<td valign="top"><p><span class="cli">desklink</span> を使用すると、任意のファイルやフォルダー、クエリ、アプリケーションのアイコンを Deskbar トレイにインストールできます。特別なアクションを実行するためにアイコンを右クリックしたときに表示されるコンテキストメニューを定義するオプションもあります。例として、次のようにいろいろなオプション (1 行目の "<tt>\</tt>" はターミナルでの改行を表します) を付けて、<span class="app">スクリーンショット (screenshot) </span> を Deskbar に追加してみましょう。</p>
+<pre class="terminal">desklink "cmd=Active window (2s):/bin/screenshot --window --border --delay 2" \
 "cmd=Remove replicant:desklink --remove=screenshot" /bin/screenshot
 </pre>
 <p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>

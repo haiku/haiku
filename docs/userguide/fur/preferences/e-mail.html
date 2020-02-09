@@ -9,6 +9,8 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Fabio Tomat
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -43,6 +45,7 @@
 <li><a href="../../sk/preferences/e-mail.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/preferences/e-mail.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sv_SE/preferences/e-mail.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/preferences/e-mail.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../zh_CN/preferences/e-mail.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../ru/preferences/e-mail.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../uk/preferences/e-mail.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
@@ -51,24 +54,22 @@
 <span>
  «  <a href="deskbar.html">Deskbar</a> 
 ::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="filetypes.html">FileTypes</a>  »
+::  <a href="filetypes.html">Gjenars di file</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Tabele</td></tr>
 <tr class="index"><td>
-	<a href="#creating">Creating a new e-mail account</a><br />
-	<a href="#account-settings">Account settings</a><br />
-	<a href="#incoming">Setting up incoming e-mail</a><br />
-	<a href="#outgoing">Setting up outgoing e-mail</a><br />
-	<a href="#filters">Notifications and e-mail filters</a><br />
-	<a href="#settings">Setting up the Mail Service</a>
-</td></tr>
+	<a href="#creating">Creâ un gnûf account e-mail</a><br />
+	<a href="#account-settings">Impostazions account</a><br />
+	<a href="#incoming">Configurâ la pueste in jentrade</a><br />
+	<a href="#outgoing">Configurâ la pueste in jessude</a><br />
+	<a href="#filters">Notifichis e filtris di e-mail</a><br />
+	<a href="#settings">Configurâ il Servizi de Pueste</a></td></tr>
 </table>
 
 <h2><img src="../../images/prefs-images/e-mail-icon_64.png" alt="e-mail-icon_64.png" width="64" height="64" />E-mail</h2>
@@ -77,154 +78,154 @@
 <tr><td>Posizion:</td><td></td><td><span class="path">/boot/system/preferences/E-mail</span></td></tr>
 <tr><td>Impostazions:</td><td></td><td><span class="path">~/config/settings/Mail/*</span></td></tr>
 </table>
-<p>Haiku provides a system that retrieves e-mail regularly via a Mail Service (also known as mail_daemon) and saves each mail as a single text file. It parses the mail and fills its attributes with all necessary header information, like from, to, subject and its unread status. Now it can be queried by you or any application. This system also makes switching e-mail clients easy as all the data and your configuration stays the same.<br />
-The configuration is done in the E-Mail preference panel.</p>
+<p>Haiku al furnìs un sisteme che al recupere lis e-mail in maniere regolâr gracie a un Servizi de Pueste (cognossût ancje come mail_daemon) e al salve ogni e-mail come singul file di test. Al analize la pueste e al jemple i siei atribûts cun dutis lis informazions di intestazion necessaris, come par esempli "di", "a", "ogjet" e il lôr stâts di leture. Cumò a puedin jessi interogâts di te o di cualsisei aplicazion. Chest sisteme al rint ancje facil il cambiâ client pe pueste, viodût che ducj i dâts e lis configurazions a restin i stes.<br />
+La configurazion e ven fate tal panel des preferencis E-mail.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="creating" name="creating">Creating a new e-mail account</a></h2>
-<p>Let's go through the process of setting up an e-mail account.<br />
-You start by clicking the <span class="button">Add</span> button to create a new, unnamed account. This opens a panel where you fill in your account info:</p>
+<a id="creating" name="creating">Creâ un gnûf account e-mail</a></h2>
+<p>Viodin ce mût che si fâs a configurâ un account e-mail.<br />
+Tu tachis clicant il boton <span class="button">Zonte</span> cussì di creâ un gnûf account cence non. Chest al vierzarà un panel dulà che tu inserirâs lis informazions dal to account:</p>
 <img src="../images/prefs-images/e-mail-new-account.png" alt="e-mail-new-account.png" />
-<p>First, you set how you get your mail, via <span class="menu">POP3</span> or <span class="menu">IMAP</span>.</p>
-<p>Now you enter your <i>E-mail address</i>, <i>Login name</i> and <i>Password</i>, give an <i>Account name</i> under which it will be known under Haiku and your <i>Real name</i>.</p>
-<p>If your account is from a major e-mail provider, Haiku already knows all technical details like server IP addresses. If that is not the case, clicking <span class="button">Next</span> will open another window to enter this information by hand:</p>
+<p>Par prin, tu stabilissis ce mût che tu otegnis la tô pueste, vie <span class="menu">POP3</span> o vie <span class="menu">IMAP</span>.</p>
+<p>Cumò tu inserissis la tô <i>Direzion e-mail</i>, il <i>Non di acès</i> e la <i>Peraule di ordin</i>, da un <i>Non account</i> cussì di ricognossilu sot di Haiku e il to <i>Non reâl</i>.</p>
+<p>Se il to account al ven dât di un dai furnidôrs plui cognossûts, Haiku al cognossarà za ducj i detais tecnics come par esempli la direzion IP dal servidôr. Se nol è chest il câs, fasint clic su <span class="button">Sucessîf</span> si vierzarà un altri barcon par inserî chestis informazions a man:</p>
 <img src="../images/prefs-images/e-mail-new-account-2.png" alt="e-mail-new-account-2.png" />
-<p>You first set the <i>Server name</i>, <i>Login type</i> and <i>Connection type</i> for the incoming mail, below that for the outgoing mail. You should find the necessary information on your email provider's website.<br />
-See below for more info about the various settings and additional options.</p>
+<p>Prime tu stabilissis il <i>Non servidôr</i>, il <i>Gjenar di acès</i> e il <i>Gjenar di conession</i> pe pueste in jentrade, sot di chel i dâts pe pueste in jessude. Tu varessis di cjatâ lis informazions necessaris tal sît web dal to furnidôr di e-mail.<br />
+Viôt chi sot par vê plui informazions su lis variis impostazions e su lis opzions adizionâls.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="account-settings" name="account-settings">Account settings</a></h2>
-<p>By selecting the name of an account in the left list, you can change some general settings:</p>
+<a id="account-settings" name="account-settings">Impostazions account</a></h2>
+<p>Selezionant il non di un account te liste a çampe, si pues cambiâ cualchi impostazions gjenerâl:</p>
 <img src="../images/prefs-images/e-mail-accounts.png" alt="e-mail-accounts.png" />
-<p>The <i>Account name</i> is the name that's shown for example in the list of accounts in the E-mail preferences. <i>Real name</i> is the name someone sees when she gets mail from you. <i>Return address</i> is the email address that is used when someone replies to your mail. Normally that is the same address you've sent your email from.</p>
-<p>If you'd like to use an email account to only send or only receive email, you can de/activate that usage by right-clicking the account's name in the leftside list to set the checkmarks accordingly.</p>
+<p>Il <i>Non account</i> al è il non che al ven mostrât, par esempli, te liste dai account intes preferencis di E-mail. <i>Non reâl</i> al è il non che al ven viodût cuant che cualchidun al ricêf la tô e-mail. <i>Direzion pe rispueste</i> e je la direzion e-mail che e ven doprade cuant che cualchidun al rispuint ae tô e-mail. Di solit cheste e je la stesse direzion che si dopre par inviâ la pueste.</p>
+<p>Se tu preferissis doprâ un account e-mail dome par inviâ o ricevi pueste, tu puedis dis/ativâ chê funzion fasint clic diestri sul non dal account inte liste a çampe e meti i segns juscj secont lis tôs necessitâts.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="incoming" name="incoming">More on setting up incoming e-mail</a></h2>
-<p>Click on <span class="menu">Incoming</span> under your account's name to set up how e-mails are received.</p>
+<a id="incoming" name="incoming">Di plui sul configurâ la pueste in jentrade</a></h2>
+<p>Fâs clic su <span class="menu">In jentrade</span> sot dal non dal account par stabilî ce mût che lis e-mail a vegnin ricevudis.</p>
 <img src="../images/prefs-images/e-mail-in.png" alt="e-mail-in.png" />
-<p>First is the <span class="menu">Mail server</span> address for incoming mails. If your provider needs you to log into a specific port, you add that to the address, separated by a colon. For example, <tt>pop.your-provider.org:1400</tt>.</p>
-<p>Then you enter your login information, <i>Login name</i> and <i>Password</i>, and if necessary change the <i>Login type</i> from the default <span class="menu">Plain text</span> to <span class="menu">APOP</span> for authentication.</p>
-<p>If you use <i>POP3</i> and retrieve mails of this account from different computers, you may want to activate the option to <span class="menu">Leave mail on server</span> and only <span class="menu">Remove mail from server when deleted</span> locally.</p>
-<p>If you use <i>IMAP</i> instead, you have the option to <span class="menu">Remove mail from server when deleted</span> locally. You can specify <span class="menu">IMAP folders</span> to only synchronize with a specific folder and its subfolders.</p>
-<p>Also, you can opt to only <span class="menu">Partially download messages larger than</span> a certain size. This will only get the header and you can decide if you want to download the rest of the message plus possible attachments after seeing the subject and who sent it. Useful if you have a slow connection.</p>
-<p>You can change the <i>Destination</i> of your inbox (default: <span class="path">/boot/home/mail/in/</span>), which is useful if you'd like to separate the mails from different accounts into their own folders. However, queries let you sort things out just as well.</p>
+<p>Prime e je la direzion dal <span class="menu">Servidôr di pueste</span> pe pueste in jentrade. Se il to furnidôr lu domande, tu pedis fâ l'acès suntune specifiche puarte, al baste zontâle te direzion, separade di doi ponts. Par esempli: <tt>pop.your-provider.org:1400</tt>.</p>
+<p>Daspò tu inserissis lis informazions di acès, <i>Non utent</i> e <i>Peraule di ordin</i>, e se al covente cambiâ il <i>Gjenar di acès</i>, di <span class="menu">Test sempliç</span> (che al è chel predefinît) a <span class="menu">APOP</span> pe autenticazion.</p>
+<p>Se tu dopris <i>POP3</i> e tu recuperis la pueste di chest account doprant altris computer, tu podaressis volê ativâ la opzion<span class="menu">Lasse la pueste sul servidôr</span> e, dome in locâl, <span class="menu">Elimine la pueste ancje sul servidôr</span>.</p>
+<p>Se invezit tu dopris <i>IMAP</i>, tu âs la pussibilitât di sielzi la opzion <span class="menu">Elimine la pueste ancje dal servidôr</span> in locâl. Tu puedis specificâ lis <span class="menu">Cartelis IMAP</span> par sincronizâsi dome cuntune specifiche cartele e lis sôs sot-cartelis.</p>
+<p>Tu puedis ancje sielzi <span class="menu">No sta discjariâ dal dut i messaçs plui grancj di</span> une determinade dimension. Cheste opzion ti fasarâ vê dome la intestazion e tu podarâs decidi se, dopo vê viodût l'ogjet e il mitent, discjariâ il rest dal messaç e i pussibii alegâts. Util se si à une conession lente.</p>
+<p>Tu puedis cambiâ la <i>Destinazion</i> de tô casele di pueste (predefinide: <span class="path">/boot/home/mail/in/</span>), che al è util se tu desideris separâ la pueste di account diferents intes lôr cartelis. Dut câs, lis interogazions ti permin di risolvi istès ben lis robis.</p>
 
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="outgoing" name="outgoing">More on setting up outgoing e-mail</a></h2>
-<p>Click on <span class="menu">Outgoing</span> under your account's name to set up how e-mails are sent.</p>
+<a id="outgoing" name="outgoing">Configurâ la pueste in jessude</a></h2>
+<p>Fâs clic su <span class="menu">In jessude</span> sot dal non dal to account name par configurâ ce mût che a vegnin inviadis lis e-mail.</p>
 <img src="../images/prefs-images/e-mail-out.png" alt="e-mail-out.png" />
-<p>First is the <i>SMTP server</i> address for outgoing mails. As with the incoming server before, you can use a specific port if needed, e.g. <tt>mail.your-provider.org:1200</tt>.</p>
-<p>If you need to login, you change the <i>Login Type</i> to <span class="menu">ESMTP</span> and enter username and password above. The other type is used for providers that need you to check for mail with <span class="menu">POP3 before SMTP</span> for identification.</p>
-<p>As with incoming mail, you can also change the <i>Destination</i> of your outbox (default: <span class="path">/boot/home/mail/out/</span>).</p>
+<p>Prime e je la direzion dal <i>Servidôr SMTP</i> pe pueste in jessude. Come pal servidôr in jentrade che o ven viodût prime, tu puedis doprâ une specifiche puarte se al covente, p.e. <tt>mail.your-provider.org:1200</tt>.</p>
+<p>Se ti covente fâ l'acès, tu cambis il <i>Gjenar di acès</i> a <span class="menu">ESMTP</span> e tu inserissis il non utent e la peraule di ordin parsore. Chel altri gjenar al ven doprât pai furnidôrs di servizis di pueste che a àn bisugne dal control de pueste cun <span class="menu">POP3 prime di SMTP</span> pe identificazion.</p>
+<p>Come pe pueste in jentrade, tu puedis ancje cambiâ la  <i>Destinazion</i> de tô casele de pueste (predefinide: <span class="path">/boot/home/mail/out/</span>).</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="filters" name="filters">Notifications and other e-mail filters</a></h2>
-<p>Notifications for newly arrived email and methods to sort and filter emails are found in <span class="menu">E-Mail filters</span> under an account's name. You can add any number of filters that are applied one after the other and rearrange them by drag &amp; dropping them to their new position.<br />
-Currently there are three <span class="menu">Incoming mail filters</span> you can add. After adding a filter, you have to select it to see its options.</p>
+<a id="filters" name="filters">Notifichis e altris filtris di e-mail</a></h2>
+<p>Lis notifichis pes gnovis e-mail rivadis e i metodis par ordenâ e filtrâ lis e-mail si cjatin in <span class="menu">Filtris e-mail</span> sot di un di account. Tu puedis zontâ cualsisei numar di filtris che a vegnin aplicâts un daûr di chel altri e rangjâju strissinant e molant te lôr gnove posizion.<br />
+Pal moment a son trê <span class="menu">filtris de pueste in jentrade</span> che tu puedis zontâ. Dopo vê zontât un filtri, tu âs di selezionâlu par viodi lis sôs opzions.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Spam filter (AGMS Bayesian)</h3>
+Filtri malvolûts (AGMS Bayesian)</h3>
 <img src="../images/prefs-images/e-mail-filter-spam.png" alt="e-mail-filter-spam.png" />
-<p>The spam filter uses statistical methods to classify a mail as unwanted spam. It assigns a value between 0 and 1 to it and you can decide what are the limits for a genuine mail and what will be considered spam.<br />
-You can have that spam rating added to the start of the subject.<br />
-Also, the spam filter can learn from all incoming e-mail. Of course, you'll have to teach it by sorting out the false positives, mails that were mistakenly marked as spam. You'll find more on that when we discuss the application <span class="app">Mail</span>.</p>
-<p>Together with the following <span class="menu">Rule filter</span>, you're able to automatically sort out detected spam mails.</p>
+<p>Il filtri pe pueste malvolude (spam) al dopre metodis statistics par classificâ une mail come spam malvolût. I assegne un valôr tra 0 e 1 e tu puedis decidi cuâi che a son i limits par une mail sane e ce che al vignarà considerât malvolût.<br />
+Tu puedis vê chê valutazion di malvolûts zontade al inizi dal ogjet.<br />
+In di plui, il filtri dai malvolûts al pues imparâ di dutis lis e-mail in jentrade. Clâr, tu varâs di insegnâi sbrumant i fals positîfs, la pueste che e je stade segnade par erôr come malvolude. Tu cjatarâs plui informazions in merit cuant che o cjacararin de aplicazion <span class="app">Mail</span>.</p>
+<p>Adun cul <span class="menu">Filtri di regule</span> chi sot, tu puedis organizâ in automatic la pueste malvolude rilevade.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Rule filter</h3>
+Filtri di regule</h3>
 <img src="../images/prefs-images/e-mail-filter-header.png" alt="e-mail-filter-header.png" />
-<p>This filter compares the mail header to a search pattern and performs some action according to the rules you set up.<br />
- With the first text field you specify which header to check against. These are available:</p>
+<p>Chest filtri al confronte la intestazion de pueste cuntun model di ricercje e al eseguìs cualchi azion in base aes regulis stabilidis.<br />
+ Cul prin cjamp di test tu specifichis cuale intestazion controlâ. Chestis a son chês disponibilis:</p>
 <table summary="match header" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><span class="menu">Name</span></td><td style="width:5px;"> </td>
-		<td>the name of the sender</td></tr>
+		<td>il non dal mitent</td></tr>
 	<tr><td><span class="menu">From</span></td><td> </td>
-		<td>the e-mail address of the sender</td></tr>
+		<td>la direzion e-mail dal mitent</td></tr>
 	<tr><td><span class="menu">To</span></td><td> </td>
-		<td>your e-mail address (different for each e-mail account)</td></tr>
+		<td>la tô direzion e-mail (diferente par ogni account e-mail)</td></tr>
 	<tr><td><span class="menu">Reply to</span></td><td> </td>
-		<td>the e-mail address replies are sent to</td></tr>
+		<td>la direzion e-mail dulà che si invie lis rispuestis</td></tr>
 	<tr><td><span class="menu">When</span></td><td> </td>
-		<td>the date and time the mail was received</td></tr>
+		<td>la date e la ore che e je stade ricevude la mail</td></tr>
 	<tr><td><span class="menu">Subject</span></td><td> </td>
-		<td>the subject line</td></tr>
+		<td>la rie dal ogjet</td></tr>
 	<tr><td><span class="menu">Cc</span></td><td> </td>
-		<td>addresses of anyone receiving a carbon copy (Cc)</td></tr>
+		<td>lis direzions di ducj chei che a àn ricevût une copie compagne (carbon copy) (Cc)</td></tr>
 	<tr><td><span class="menu">Account</span></td><td> </td>
-		<td>the name of the e-mail's account</td></tr>
+		<td>il non dal account e-mail</td></tr>
 	<tr><td><span class="menu">Status</span></td><td> </td>
-		<td>The current status of the e-mail. Normally, this can be "Read", "Replied", "Sent", "Forwarded", "New", or anything you have defined yourself. However, unless you change it yourself in a filter, it will always be "New" after the Mail Service fetched the mail.</td></tr>
+		<td>Il stât atuâl de e-mail. Di solit chest al pues jessi "Read" (let), "Replied" (rispuindût), "Sent" (inviât), "Forwarded" (mandât indenant), "New" (gnûf), o dut ce che tu âs definît tu. Dut câs, une volte che il Servizi de Pueste al à recuperât la pueste, se no tu lu cambiis cuntun filtri, il so stât al sarà simpri "New" (gnûf).</td></tr>
 	<tr><td><span class="menu">Priority</span></td><td> </td>
-		<td>is set by the sender's e-mail program (e.g. "urgent")</td></tr>
+		<td>al ven stabilît dal program e-mail dal mitent (p.e. "urgjent")</td></tr>
 	<tr><td><span class="menu">Thread</span></td><td> </td>
-		<td>essentially the same as "Subject", but without things like Re: or Fwd:</td></tr>
+		<td>in pratiche al è come "Subject", ma cence robis come Re: o Fwd:</td></tr>
 	<tr><td><span class="menu">Classification group</span></td><td> </td>
-		<td>depending on what the spam filter classified it as, this will either be empty (if uncertain) or contain the word "Genuine" or "Spam"</td></tr>
+		<td>in base a ce mût che il filtri malvolûts ju à classificâts, chest al sarà o vueit (se no sigûr) o al varà la peraule "Genuine" (san) o "Spam" (malvolût)</td></tr>
 	<tr><td class="onelinetop"><span class="menu">Spam/Genuine estimate</span></td><td> </td>
-		<td>this is a numerical estimate that the spam filter assigned to the e-mail. They are shown in scientific notation, where 1.065e-12 translates to 1.065 divided by 10 to the 12th power, which in this case translates to 0.000000000001065.</td></tr>
+		<td>cheste e je une stime numeriche che il filtri malvolûts al à assegnât ae e-mail. A vegnin mostrâts in notazion sientifiche, dulà che 1.065e-12 si tradûs in 1.065 dividût par 10 ae 12ᵐᵉ potence, che in chest câs si tradûs in 0.000000000001065.</td></tr>
 </table>
-<p>The second text field holds your search pattern. It accepts <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression" rel="nofollow">regular expressions</a> which gives it great flexibility, while unfortunately complicating things a bit. Read up on it a bit, it's well worth it and simple search patterns aren't <i>that</i> complicated at all.</p>
-<p>With the pop-up menu below it, you assign an action when the pattern matches. You can move or delete a mail, set the status to "Read" or anything else or set the e-mail account you'll reply with.</p>
+<p>Il secont cjamp di test al ten il to model di ricercje. Al acete <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression" rel="nofollow">espressions regolârs</a> che a permetin grande flessibilitât, però par cuintri, complicant un tic lis robis. Lei alc in merit, al merete e sempliçs modei di ricercje no son <i>cussì</i> complicâts.</p>
+<p>Cul menù a tendine sot di chel, tu assegnis une azion par chês voltis che al model al corispuint un risultât de ricercje. Tu puedis spostâ o eliminâ une e-mail, stabilî il stât a "Read" (let) o altri opûr stabilî cun cuâl account di e-mail rispuindi.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-New mails notification</h3>
+Notifiche gnove pueste</h3>
 <img src="../images/prefs-images/e-mail-filter-notification.png" alt="e-mail-filter-notification.png" />
-<p>There are several ways you can choose to be notified of newly arrived email. Under <span class="menu">Method</span> you find a number of options that can be combined as well:</p>
+<p>Tu puedis sielzi diviersis manieris par jessi notificât che e je rivade gnove pueste. Sot di <span class="menu">Metodi</span> tu cjatis un ciert numar di opzions che a puedin ancje jessi cumbinâts tra di lôr:</p>
 <table summary="notofications" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><span class="menu">none</span></td><td style="width:5px;"> </td>
-		<td>No notification</td></tr>
-	<tr><td><span class="menu">Beep</span></td><td> </td>
-		<td>Plays the sound file of the "New E-mail" event set in the <a href="sounds.html">Sounds</a> preferences for <i>every</i> new email</td></tr>
-	<tr><td><span class="menu">Alert</span></td><td> </td>
-		<td>Shows an alert window for <i>every</i> new email</td></tr>
-	<tr><td><span class="menu">Keyboard LEDs</span></td><td> </td>
-		<td>Blinks some LEDs like the caps-lock indicator</td></tr>
-	<tr><td class="onelinetop"><span class="menu">Central alert</span></td><td> </td>
-		<td>Shows <i>one</i> alert window for all new mails</td></tr>
-	<tr><td><span class="menu">Central beep</span></td><td> </td>
-		<td>Plays the sound file of the "New E-mail" event set in the <a href="sounds.html">Sounds</a> preferences <i>once</i> for new mail</td></tr>
-	<tr><td><span class="menu">Log window</span></td><td> </td>
-		<td>Shows the log window</td></tr>
+	<tr><td><span class="menu">nissun</span></td><td style="width:5px;"> </td>
+		<td>Nissune notifiche</td></tr>
+	<tr><td><span class="menu">Bip</span></td><td> </td>
+		<td>Al riprodûs il file sunôr dal event "New E-mail", stabilît tes preferencis <a href="sounds.html">Suns</a>, par <i>ogni</i> gnove e-mail</td></tr>
+	<tr><td><span class="menu">Alarme</span></td><td> </td>
+		<td>Al mostre un barcon di alerte par <i>ogni</i> gnove e-mail</td></tr>
+	<tr><td><span class="menu">LED de tastiere</span></td><td> </td>
+		<td>Al fâs lampâ cualchi LED come l'indicadôr bloc-maiusc</td></tr>
+	<tr><td class="onelinetop"><span class="menu">Alarme centrâl</span></td><td> </td>
+		<td>Al mostre <i>un</i> barcon di alerte par dutis lis gnovis e-mail</td></tr>
+	<tr><td><span class="menu">Bip centrâl</span></td><td> </td>
+		<td>Al riprodûs il file sunôr dal event "New E-mail", stabilît tes preferencis <a href="sounds.html">Suns</a>, <i>une volte sole</i> pe gnove pueste</td></tr>
+	<tr><td><span class="menu">Barcon dal regjistri</span></td><td> </td>
+		<td>Al mostre il barcon dal regjistri di stât</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Outgoing Mail Filters</h3>
-<p>At this moment, there's only one filter that deals with outgoing mail: <span class="cli">fortune</span>.
-<br />It will attach a randomly chosen funny or wise "fortune cookie" to the end of every mail before it's sent out. You can do a dry run by issuing the command <span class="cli">fortune</span> in a Terminal.</p>
+Filtris pe pueste in jessude</h3>
+<p>Pal moment, al è dome un filtri che al à a cefâ cu la pueste in jessude: <span class="cli">fortune</span>.
+<br />Al tacarà ae fin di ogni mail un "biscot de furtune" divertent o savi sielt a câs,  prime di inviâle. Tu puedis fâ une prove a frêt inviant il comant <span class="cli">fortune</span> intun Terminâl.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="settings" name="settings">Setting up the Mail Service</a></h2>
-<p>Now that your incoming and outgoing mail servers (and maybe some filters, too), are configured, you have to tell the Mail Service that does all the actual checking and fetching how to do its job.</p>
+<a id="settings" name="settings">Configurâ il servizi de pueste</a></h2>
+<p>Cumò che i servidôrs di pueste in jentrade e jessude (e magari ancje cualchi filtri) a son configurâts, tu âs di dî al Servizi de Pueste  che di fat al eseguìs il control e il recupar de pueste, ce mût fâ chest lavôr.</p>
 <img src="../images/prefs-images/e-mail-settings.png" alt="e-mail-settings.png" />
-<p>Under <i>Mail checking</i> you configure the interval at which the account's mail server is probed for new mail.<br />
-If you're on a dial-up connection, you may want to do that <span class="menu">Only when dial-up is connected</span> and also <span class="menu">Schedule outgoing mail when dial-up is disconnected</span> to avoid dialing automatically in regularly only to check for mail.</p>
-<p>The Mail Service has a status window which you can set to show up <span class="menu">Never</span>, <span class="menu">While sending</span>, <span class="menu">While sending and receiving</span> or <span class="menu">Always</span>.</p>
-<p>Make sure to <span class="menu">Start mail services on startup</span> or there will be no mail_daemon running to do your bidding...</p>
+<p>Sot di <i>Control de pueste</i> tu configuris ogni trop timp che si interogarà il servidôr par vê gnove pueste.<br />
+Se tu stâs doprant une conession a consum, tu podaressis desiderâ chê funzion <span class="menu">Dome cuant che il modem al è conetût</span> e ancje <span class="menu">Rimandâ l'inviamente de pueste cuant il modem al è disconetût</span> al fin di evitâ di conetisi in automatic dome par controlâ la pueste.</p>
+<p>Il Servizi de Pueste al à un barcon di stât che tu puedis configurâ in mût che al vegni fûr <span class="menu">Mai</span>, <span class="menu">Dilunc l'inviament</span>, <span class="menu">Dilunc l'inviament e la ricezion</span> opûr <span class="menu">Simpri</span>.</p>
+<p>Siguriti che al sedi selezionât <span class="menu">Invie i servizis de pueste al inviament</span> o nol sarà in esecuzion nissun  mail_daemon par eseguî lis tôs richiestis...</p>
 <img src="../images/prefs-images/e-mail-mailbox.png" alt="e-mail-mailbox.png" />
-<p><span class="menu">Edit mailbox menu...</span> will open the folder <span class="path">/boot/home/config/Mail/Menu Links/</span>. All folders or queries (!) or their links put into this folder will appear in the context menu of the mailbox icon of the Mail Services in the Deskbar tray.</p>
-<p>From that menu, you can also <span class="menu">Create new message...</span>, <span class="menu">Check for mail now</span> or edit <span class="menu">Preferences...</span>.</p>
-<p>If you hold down <span class="key">SHIFT</span> when invoking the context menu, you'll get additional commands:</p>
+<p><span class="menu">Modifiche menù de casele de pueste</span> al vierzarà la cartele <span class="path">/boot/home/config/Mail/Menu Links/</span>. Dutis lis cartleis o lis interogazions (!) o i lôr colegaments metûts in cheste cartele a vignaran fûr tal menù contestuâl de icone a forme di casele di pueste dal Servizi de Pueste inte guantiere dal Deskbar.</p>
+<p>Di chel menù tu puedis ancje fâ <span class="menu">Cree un gnûf messaç...</span>, <span class="menu">Controle cumò la pueste</span> o modificâ lis <span class="menu">Impostazions...</span>.</p>
+<p>Se tu tegnis fracât <span class="key">MAIUSC</span> cuant che tu clamis il menù contestuâl, tu otignarâs comants adizionâi:</p>
 <table summary="notofications" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><span class="menu">Check for mails only</span></td><td style="width:5px;"> </td>
-		<td>Offers a submenu to check only one specific account</td></tr>
-	<tr><td><span class="menu">Send pending mails</span></td><td> </td>
-		<td>Allows you to send pending mails without also checking for new mails</td></tr>
-	<tr><td><span class="menu">Shutdown mail services</span></td><td> </td>
-		<td>Quits the whole email infrastructure (mail_daemon)</td></tr>
+	<tr><td><span class="menu">Controle dome la pueste</span></td><td style="width:5px;"> </td>
+		<td>Al ufrìs un sot-menù par controlâ dome un specific account</td></tr>
+	<tr><td><span class="menu">Invie la pueste in spiete</span></td><td> </td>
+		<td>Ti permet di inviâ la pueste in spiete cence ancje controlâ se e je rivade gnove pueste</td></tr>
+	<tr><td><span class="menu">Arest dai servizis di pueste</span></td><td> </td>
+		<td>Al jes di dute la infrastruture de pueste (mail_daemon)</td></tr>
 </table>
-<p>The mailbox icon itself shows if there are unread messages (status "New") when there are envelopes inside.</p>
+<p>Za la icone a forme di casele de pueste e mostre se si à messaçs no lets (stât "New"), chest al è il câs di cuant che si à bustis dentri de casele de pueste.</p>
 
 </div>
 </div>
@@ -233,7 +234,7 @@ If you're on a dial-up connection, you may want to do that <span class="menu">On
 <div class="inner"><span>
  «  <a href="deskbar.html">Deskbar</a> 
 ::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="filetypes.html">FileTypes</a>  »
+::  <a href="filetypes.html">Gjenars di file</a>  »
 </span></div>
 </div>
 

@@ -46,6 +46,7 @@
 <li><a href="../ro/deskbar.html"><img src="../images/flags/ro.png" alt="" />Română</a></li>
 <li><a href="../sk/deskbar.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../sv_SE/deskbar.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../tr/deskbar.html"><img src="../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../zh_CN/deskbar.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../ru/deskbar.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../uk/deskbar.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
@@ -102,13 +103,13 @@
 <p>Työpöytäpalkin asetuspaneeli on jaettu kolmeen lohkoon.</p>
 
 <h4>Sovellukset</h4>
-<p>Seuraava asetus ei koske asennettuja sovelluksia, mutta suoritettavien sovellusten luettelon käyttäytymistä ja ulkonäköä.</p>
+<p>Seuraava asetus ei koske asennettuja sovelluksia, vaan suoritettavien sovellusten luettelon käyttäytymistä ja ulkonäköä.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Lajittele suoritettavat sovellukset</span></td><td> </td><td>Lajittelee suoritettavat ohjelmat aakkosjärjestykseen.</td></tr>
-<tr><td><span class="menu">Seuraaja aina ensimmäisenä</span></td><td> </td><td>Vieläpä silloin, kun sovellukset on lajiteltu aakkosjärjestykseen, Seuraaja on aina ensimmäisenä luettelossa.</td></tr>
+<tr><td><span class="menu">Lajittelesovellukset nimen perusteella</span></td><td> </td><td>Lajittelee suoritettavat ohjelmat aakkosjärjestykseen.</td></tr>
+<tr><td><span class="menu">Seuraaja aina ensimmäisenä</span></td><td> </td><td>Seuraaja on aina ensimmäisenä luettelossa jopa silloin kun sovellukset on lajiteltu aakkosjärjestykseen.</td></tr>
 <tr><td class="onelinetop"><span class="menu">Näytä sovelluslaajentaja</span></td><td> </td><td>Tarjoaa pienen käyttöliittymäkomponentin näyttämään/piilottamaan ohjelman kaikki ikkunat sen Työpöytäpalkkirivin alle.</td></tr>
 <tr><td><span class="menu">Laajenna uudet sovellukset</span></td><td> </td><td>Vasta käynnistettyjen ohjelmien ikkunat laajenevat automaattisesti niiden Työpöytäpalkkirivillä.</td></tr>
-<tr><td><span class="menu">Piilota sovellusten nimet</span></td><td> </td><td>Poistaa suoritettavien sovellusten tekstinimiöt.</td></tr>
+<tr><td><span class="menu">Piilota sovellusnimet</span></td><td> </td><td>Poistaa suoritettavien sovellusten tekstinimiöt.</td></tr>
 <tr><td><span class="menu">Kuvakekoko</span></td><td> </td><td>Säätää suoritettavien sovellusten kuvakekoon.</td></tr>
 </table>
 
@@ -119,7 +120,7 @@ The button <span class="button">Edit in Tracker...</span> opens the folder <span
 You can delete or add entries like links to applications, documents or even queries by simply copying/deleting them to/from this folder.</p>
 <!-- <p _translation_id="432">It's even easier to simply drag a file, folder or saved query and drop it where you want it into the Deskbar.</p> -->
 <div class="box-info"><p>Pakkauksesta automaattisesti asennetut ohjelmat laittavat valikkorivin Työpöytäpalkkiin. Asennettujen pakkausten lukumäärästä riippuen Työpöytäpalkki voi kasvaa liian laajaksi. Jos haluat mieluiten ohjata asetuksia itse ja haluat nähdä Työpöytäpalkissa vain ne sovellukset, jotka linkität sinne (mahdollisesti luokittelemalla alikansioihin), niin tee se näin:<br />
-Luo valikolle <span class="path">menu</span>-kansion linkki paikkaan <span class="path">~/config/settings/deskbar/</span> ja nimeä uudelleen <span class="path">menu_entries</span>. Pääteikkunassa linkki luodaan:</p>
+Luo valikkoon <span class="path">menu</span>-kansio linkkipaikkaan <span class="path">~/config/settings/deskbar/</span> ja nimeä uudelleen <span class="path">menu_entries</span>. Pääteikkunassa linkki luodaan:</p>
 <pre class="terminal">ln -s ~/config/settings/deskbar/menu ~/config/settings/deskbar/menu_entries</pre></div>
 
 <h4>Ikkuna</h4>
@@ -134,8 +135,8 @@ Luo valikolle <span class="path">menu</span>-kansion linkki paikkaan <span class
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tray" name="tray">Tarjotin</a></h2>
 <img src="images/deskbar-images/calendar.png" alt="calendar.png" />
-<p>Muiden asioiden lisäksi tarjotin on säilytyspaikka kellolle. Hiiren kohdistimen siirtäminen sen yläpuolelle näyttää päivämäärän työkaluvihjeessä. Hiiren vasemmalla painikkeella saa näkyviin kalenterin. Hiiren oikealla painikkeella piilotetaan/näytetään kello tai käynnistetään <a href="preferences/time.html">Aika</a>-asetukset sen asettamiseksi.</p>
-<p>Mikä tahansa ohjelma voi asentaa kuvakkeen tarjottimelle tarjoten käyttöliittymän käyttäjälle. Sähköpostijärjestelmä, esimerkiksi, näyttää erilaisen symbolin silloin kun on lukematonta postia ja tarjoaa asiayhteysvalikon esimerkiksi uuden sähköpostiviestin luomiseksi tai lukemiseksi. <span class="app">Prosessivalvonta</span> on toinen esimerkki, joka käyttää tarjottimen kuvakkeita tietojen tarjoamiseen (prosessori/muistikäyttö) ja tarjoaa asiayhteysvalikon.</p>
+<p>Muiden asioiden lisäksi tarjotin on säilytyspaikka kellolle. Hiiren kohdistimen siirtäminen sen yläpuolelle näyttää päivämäärän työkaluvihjeessä. Hiiren ykköspainikkeella (yleensä vasen painike) saa näkyviin kalenterin. Hiiren kakkospainikkeella (yleensä oikeanpuoleisin painike) piilotetaan/näytetään kello tai käynnistetään <a href="preferences/time.html">Aika</a>-asetukset sen asettamiseksi.</p>
+<p>Mikä tahansa ohjelma voi asentaa kuvakkeen tarjottimelle tarjoten käyttöliittymän käyttäjälle. Esimerkiksi sähköpostijärjestelmä näyttää erilaisen symbolin silloin kun on lukematonta postia ja tarjoaa asiayhteysvalikon esimerkiksi uuden sähköpostiviestin luomiseksi tai lukemiseksi. <span class="app">Prosessivalvonta</span> on toinen esimerkki, joka käyttää tarjottimen kuvakkeita tietojen tarjoamiseen (prosessori/muistikäyttö) ja tarjoaa asiayhteysvalikon.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -145,7 +146,7 @@ Luo valikolle <span class="path">menu</span>-kansion linkki paikkaan <span class
 <p>Painamalla näppäimiä <span class="key">VAIHTO</span> <span class="key">CTRL</span> ja napsauttamalla sovellusta piilotat kaikki sen ikkunat, näppäin <span class="key">CTRL</span> ja hiiren napsautus näyttää ne taas.</p>
 <div class="box-info">Joskus sovellus voi kaatua ja vaikka kaikki sen ikkunat ovat kadonneet, niin se voi näkyä käynnissä olevana sovelluksena Työpöytäpalkissa. Sellaisissa tapauksissa Vulcan-kuolonotteella pääset siitä: pidä alhaalla näppäimiä <span class="key">VAIHTO</span> <span class="key">CTRL</span> <span class="key">ALT</span> ja napsauta kyseistä valikkoriviä Työpöytäpalkissa. Mielenkiintoista!</div>
 <p>Jos aktivoit Laajentajat Työpöytäpalkin asetuksissa, voit laajentaa/supistaa ikkunoiden luettelon suoraan sovellusrivin alla.</p>
-<p>Jokaisen sovellusikkunan edessä on symboli, joka tarjoaa tietoa sen tilasta. Kirkas symboli tarkoittaa, että ikkuna on näkyvissä, tumma symboli tarkoittaa, että se on minimoitu. Kolme viivaa symbolin edessä näyttää, että se ei ole nykyisessä työtilassa.</p>
+<p>Jokaisen sovellusikkunan edessä on symboli, joka tarjoaa tietoa ikkunan tilasta. Kirkas symboli tarkoittaa, että ikkuna on näkyvissä, tumma symboli tarkoittaa, että se on minimoitu. Kolme viivaa symbolin edessä näyttää, että se ei ole nykyisessä työtilassa.</p>
 
 </div>
 </div>

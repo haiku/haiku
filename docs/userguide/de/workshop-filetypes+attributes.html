@@ -47,6 +47,7 @@
 <li><a href="../sk/workshop-filetypes+attributes.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../fi/workshop-filetypes+attributes.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../sv_SE/workshop-filetypes+attributes.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../tr/workshop-filetypes+attributes.html"><img src="../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../zh_CN/workshop-filetypes+attributes.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../ru/workshop-filetypes+attributes.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../uk/workshop-filetypes+attributes.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
@@ -145,11 +146,11 @@ Auf alle Fälle hängen wir an diese Dateien eine Reihe von Attributen. Hier mü
 <ul>
 <li><p><i>Attributname</i> - Erscheint als Spaltenkopf im Tracker-Fenster</p></li>
 <li><p><i>Interner Name</i> - Wird für die Indizierung und Suche verwendet.</p></li>
-<li><i>Type</i> - Defines the value the attribute can hold and therefore how it can be queried.
+<li><i>Typ</i> - Beschreibt die Art des Attributs und entsprechend wie es gesucht werden kann.
     <ul>
-    <li><span class="menu">String</span> for normal text</li>
-    <li><span class="menu">Boolean</span> for binary data: 0 (false) or &gt;=1 (true)</li>
-    <li><span class="menu">Integer</span> for integer numbers with different ranges:
+    <li><span class="menu">String</span> - normaler Text</li>
+    <li><span class="menu">Boolean</span> - für binäre Werte: 0 (falsch) oder &gt;=1 (wahr)</li>
+    <li><span class="menu">Integer</span> - für ganzzahlige Werte diesen Umfangs:
         <ul>
         <li><span class="menu">8 bit</span>: ± 255</li>
         <li><span class="menu">16 bit</span>: ± 65,535</li>
@@ -157,11 +158,10 @@ Auf alle Fälle hängen wir an diese Dateien eine Reihe von Attributen. Hier mü
         <li><span class="menu">64 bit</span>: ± 18,446,744,073,709,551,615</li>
         </ul>
     </li>
-    <li><span class="menu">Float</span> for floating-point numbers, single precision</li>
-    <li><span class="menu">Double</span> for floating-point numbers, double precision</li>
-    <li><span class="menu">Time</span> for time and date format</li>
-    </ul>
-</li>
+    <li><span class="menu">Float</span> - Gleitkommazahlen einfacher Genauigkeit</li>
+    <li><span class="menu">Double</span> - Gleitkommazahlen doppelter Genauigkeit</li>
+    <li><span class="menu">Time</span> - Zeit- und Datumswerte</li>
+    </ul></li>
 </ul>
 <ul>
 <li><i>Visible</i> - This checkbox determines if the attribute is visible in a Tracker window at all. Since the Tracker will be the interface to our DVD database, we check it and define its appearance with:<ul>

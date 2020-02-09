@@ -4,17 +4,19 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Fabio Tomat
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>VirtualMemory</title>
+	<title>Memorie virtuâl</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
@@ -43,6 +45,7 @@
 <li><a href="../../sk/preferences/virtualmemory.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/preferences/virtualmemory.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sv_SE/preferences/virtualmemory.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/preferences/virtualmemory.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../zh_CN/preferences/virtualmemory.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../ru/preferences/virtualmemory.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../uk/preferences/virtualmemory.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
@@ -56,23 +59,21 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/prefs-images/virtualmemory-icon_64.png" alt="virtualmemory-icon_64.png" width="64" height="64" />VirtualMemory</h2>
+<h2><img src="../../images/prefs-images/virtualmemory-icon_64.png" alt="virtualmemory-icon_64.png" width="64" height="64" />Memorie virtuâl</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
 <tr><td>Posizion:</td><td></td><td><span class="path">/boot/system/preferences/VirtualMemory</span></td></tr>
 <tr><td>Impostazions:</td><td></td><td><span class="path">~/config/settings/kernel/drivers/virtual_memory</span><br />
-<span class="path">~/config/settings/VM_data</span> - Stores the panel's window position.</td></tr>
+<span class="path">~/config/settings/VM_data</span> - Al archivie la posizion dal barcon dal panel.</td></tr>
 </table>
-<p>Virtual memory let's the system swap out memory to harddisk, if the RAM can be used more sensibly for other things. So, even if you have lots of RAM, providing virtual memory is never a bad idea.</p>
+<p>Memorie virtuâl al permet al sisteme di butâ sul disc fis la memorie, se la RAM e pues jessi doprade miôr par altris robis. Cussì, ancje se tu âs une vore di RAM, vê memorie virtuâl no je mai une brute idee.</p>
 <img src="../images/prefs-images/virtualmemory.png" alt="virtualmemory.png" />
-<p>You can set the size to even more than your physical memory size if needed. With today's huge harddisks, assigning the physical memory size shouldn't be a problem. Still, you can quickly adjust the size if your free space ever runs low. In that case you should also have a look at <a href="../applications/diskusage.html">DiskUsage</a> to find out what's eating up your diskspace.</p>
-<p>Normally, the swap file's written to your boot partition. If you often run into disk thrashing due to the virtual memory system swapping memory in and out, you can try to use a separate harddisk for you swap file. Simply another partition on the same harddisk with your system/data won't help.<br />
-Upgrading your RAM is of course the most effective way to go...</p>
+<p>Di norme, il file di scambi al ven scrit te partizion di inviament (boot). Se tu âs pocje memorie libare lì, tu puedis disativâ la <span class="menu">Gjestion automatiche de memorie di scambi</span> e sielzi une altre partizion montade dal menù a tende. La dimension dal file di scambi e ven stabilide cul cursôr de sbare lì sot.<br />
+Se al capite dispès che la testine dal disc fis e pinduli masse par vie memorie di scambi virtuâl, tu puedis provâ a doprâ un disc fis separât pal to file di scambi in mût di evitâ une congjestion dal I/O. Une altre partizion sul stes disc fis dal sisteme/dâts no judarà. Aumentâ la RAM e je di sigûr la vie plui buine par risolvi il fastidi...</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="button">Predefinîts</span></td><td> </td><td>al puarte dut ai valôrs predefinîts.</td></tr>
-<tr><td><span class="button">Torne indaûr</span></td><td> </td><td>brings back the settings that were active when you started the VirtualMemory preferences.</td></tr>
+<tr><td><span class="button">Torne indaûr</span></td><td> </td><td>al torne a puartâ indaûr lis impostazions a chês che si veve ativis cuant che si à inviât lis preferencis di Memorie virtuâl.</td></tr>
 </table>
 
 </div>

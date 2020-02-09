@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -45,6 +45,7 @@
 <li><a href="../../sk/applications/textsearch.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/applications/textsearch.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sv_SE/applications/textsearch.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/applications/textsearch.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../zh_CN/applications/textsearch.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../ru/applications/textsearch.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../uk/applications/textsearch.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
@@ -79,16 +80,17 @@
 <tr><td colspan="5"><h3>Meniu fișier</h3></td></tr>
 <tr><td class="onelinetop"><span class="menu">New window</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Opens a new window where you can enter another string and search through the same files/folders.
 </td></tr>
-<tr><td><span class="menu">Set target...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Lets you choose a new set of files and folders to search through.</td></tr>
+<tr><td><span class="menu">Set target...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Lets you choose a new set of files and folders to search through. Alternatively you can drag and drop files/folders into the window.</td></tr>
 <tr><td colspan="5"><h3>Meniu acțiune</h3></td></tr>
 <tr><td><span class="menu">Trim selection</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Removes all entries from the list that are not currently selected.</td></tr>
 <tr><td><span class="menu">Open selection</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>Opens the currently selected files with their preferred application (same as a double-click). If it's a text editor supporting it (like Pe), you can jump to the exact line the search string was found.</td></tr>
-<tr><td><span class="menu">Open files in Tracker</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Opens the location of the currently selected files in Tracker.</td></tr>
+<tr><td><span class="menu">Show files in Tracker</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Opens the location of the currently selected files in Tracker.</td></tr>
 <tr><td class="onelinetop"><span class="menu">Copy text to clipboard</span></td><td></td><td><span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Copies the current selection to the clipboard.</td></tr>
 <tr><td colspan="5"><h3>Meniu configurări</h3></td></tr>
 <tr><td colspan="3" class="onelinetop"><span class="menu">Skip folders starting with a dot</span></td><td> </td><td>This is useful when working in a "unixy" environment, where often administrative files are hidden inside "<tt>.folders/</tt>". Source versioning systems like SVN and CVS are examples of applications using this and are also widely used in Haiku.</td></tr>
-<tr><td colspan="3"><span class="menu">Escape search text</span></td><td> </td><td>TextSearch uses the command line tool <span class="cli">grep</span>. For it, special characters like <tt>'"*\$?!</tt> and spaces have to be escaped with a <tt>\</tt>. Deactivating this setting means you have to do this yourself, but in exchange grants you the power of <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">regular expressions</a>.</td></tr>
+<tr><td colspan="3"><span class="menu">Regular expression</span></td><td> </td><td>TextSearch uses the command line tool <span class="cli">grep</span>. For it, special characters like <tt>'"*\$?!</tt> and spaces have to be escaped with a <tt>\</tt>. Activating this setting means you have to do this yourself, but in exchange grants you the power of <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">regular expressions</a>.</td></tr>
 <tr><td colspan="3"><span class="menu">Doar fișiere text</span></td><td> </td><td>TextSearch is currently only useful for finding strings in plain text files. Deactivating this setting will have it look through any kind of file anyway.</td></tr>
+<tr><td colspan="3"><span class="menu">Open files in code editor</span></td><td> </td><td>Forces files to be opened in the preferred code editor (that handles text/x-source-code). Otherwise a file will be opened in whatever app is set for its filetype. Useful, for example, when editing HTML files that normally would open in your browser.</td></tr>
 <tr><td colspan="5"><h3>Meniu istoric</h3></td></tr>
 <tr><td colspan="4"></td><td>Conține șiruri de căutat recent utilizate.</td></tr>
 <tr><td colspan="5"><h3>Meniu codare</h3></td></tr>

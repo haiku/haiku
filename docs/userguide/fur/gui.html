@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Fabio Tomat
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Haiku's GUI</title>
+	<title>Interface grafiche di Haiku</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
@@ -43,13 +45,14 @@
 <li><a href="../sk/gui.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../fi/gui.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../sv_SE/gui.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../tr/gui.html"><img src="../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../zh_CN/gui.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../ru/gui.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../uk/gui.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../jp/gui.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
 </ul>
 <span>
- «  <a href="filesystem-layout.html">Filesystem layout</a> 
+ «  <a href="filesystem-layout.html">Disposizion dal filesystem</a> 
 ::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="workspaces.html">Workspaces</a>  »
 </span></div>
@@ -57,109 +60,108 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Tabele</td></tr>
 <tr class="index"><td>
-		<a href="#move-resize">Easy moving and resizing</a><br />
-                <a href="#stack-tile">Stack &amp; Tile</a><br />
-                <a href="#open-save-panel">Open and save panels</a><br />
+		<a href="#move-resize">Un mût veloç par spostâ e ridimensionâ i barcons</a><br />
+                <a href="#stack-tile">Intassâ e piastrelâ (Stack &amp; Tile)</a><br />
+                <a href="#open-save-panel">I panei vierç e salve</a><br />
                 <a href="#replicants">Replicants</a></td></tr>
 </table>
 
-<h1>Haiku's GUI</h1>
+<h1>Interface grafiche di Haiku</h1>
 
-<p>Haiku's graphical user interface is an integral part of the system. Unlike other Unix-like operating systems, there is no separate window manager and booting just into a command-line shell is not possible. Haiku's focus being on the desktop user, this is just not considered necessary.</p>
-<p>As you probably have experience with other graphical environments, let's skip over the standards like menus, right-click context menus, drag &amp; drop etc. Let's have a look at the few unique aspects of Haiku's GUI instead.</p>
+<p>La interface utent grafiche di Haiku e je une part integrante dal sisteme. A diference dai sistemis operatîfs simil Unix, no si à un gjestôr dai barcons separât e l'inviament su shell a rie di comant nol è pussibil. Jessint Haiku rivolt al utent di scritori, cheste ultime funzionalitât no je considerade necessarie.</p>
+<p>Viodût che al è probabil che tu vedis provât altris ambients grafics, saltin lis robis standard come i menù, i menù contestuâi cul clic diestri, il strissinâ e molâ e vie indenant. Viodin invezit cualchi aspiet unic de interface grafiche di Haiku.</p>
 <img src="images/gui-images/gui.png" alt="gui.png" />
-<p>There are only a few things in Haiku's GUI that aren't obvious and deserve an explanation.</p>
+<p>A son dome pocjis robis, inte interface utent di Haiku, che no son scontadis e a meretin une spiegazion.</p>
 <ol>
-<li><p>The Deskbar is Haiku's "Start" menu and taskbar, if you will. See topic <a href="deskbar.html">Deskbar</a>.</p></li>
-<li>The yellow tab offers more than just a program's name or a document's filename:
-<ul><li>You can move it by holding the <span class="key">SHIFT</span> key while dragging it to another position, enabling you to stack a number of windows and conveniently access them by their named tab.</li>
-<li>You minimize a window with a double-click on its tab (or with <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span>). A such hidden window can be accessed by its entry in the <a href="deskbar.html">Deskbar</a> or the <a href="twitcher.html">Twitcher</a>.</li>
-<li>You can send a window to the back with a right-click on its tab (or its border).</li></ul></li>
-<li><p>The close button.</p></li>
-<li><p>The "zoom" button (or <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). In most applications, this will expand a window to maximum size without obscuring the Deskbar (hold <span class="key">SHIFT</span> to cover the Deskbar as well). It doesn't have to, however. Tracker windows, for example, will resize to best fit the contents.</p></li>
-<li><p>The window border. Left-dragging moves the window, right-dragging resizes.</p></li>
-<li><p>The resize corner.</p></li>
+<li><p>Il Deskbar al è il menù "Start" e la sbare des ativitâts di Haiku, se ti plâs viodile cussì. Viôt l'argoment <a href="deskbar.html">Deskbar</a>.</p></li>
+<li>La lenghete zale e ufrìs plui che nome il non dal program o un non dal file dal document:
+<ul><li>Tu puedis movile tignint fracât il tast <span class="key">MAIUSC</span> intant che tu lu strissinis suntune altre posizion, permetint cussì di intassâ un numar di barcons e di passâ tra un e chel altri in maniere comude gracie al lôr non su pe lenghete.</li>
+<li>Tu minimizis un barcon cuntun dopli clic su pe sô lenghete (o cun <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span>). Un barcon cussì platât al pues jessi doprât gracie ae sô vôs tal <a href="deskbar.html">Deskbar</a> o al <a href="twitcher.html">Twitcher</a>.</li>
+<li>Tu puedis inviâ un barcon daûr di chei altris, cuntun clic diestri su pe sô lenghete (opûr il so ôr).</li></ul></li>
+<li><p>Il boton par sierâ.</p></li>
+<li><p>Il boton par "slargjâ" (o <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). Te plui part des aplicazions, chest al slargjarà il barcon ae massime dimension cence taponâ il Deskbar (ten fracât <span class="key">MAIUSC</span> par cuvierzi ancje il Deskbar). Dut câs nol è obleât a compuartâsi cussì. I barcons di Tracker, par esempli, si ridimensionaran in mût di adatâsi al lôr contignût.</p></li>
+<li><p>L'ôr dal barcon. Strissinâ cul clic di çampe al sposte il barcon, strissinâ cul clic di diestre al ridimensione.</p></li>
+<li><p>L'angul par ridimensionâ.</p></li>
 </ol>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="move-resize" name="move-resize">A quick way to move or resize windows</a></h2>
-<p>Moving and resizing windows is a large part of interacting with several concurrently running applications. Instead of aiming at the small yellow title tab or the even tinier window border, there's a more convenient way to move a window. Also, additionally to its small size, the resize corner has another limitation: It only allows resizing at and in the direction of the lower right corner. <br />Right-dragging a border for resizing works, but again you'll have to aim carefully.</p>
-<p>To address these issues, Haiku provides a neat solution using the window management key combo <span class="key">CTRL</span> <span class="key">ALT</span> and the mouse. See also chapter <a href="keyboard-shortcuts.html#general">Shortcuts and key combinations</a> for more shortcuts concerning window management.</p>
+<a id="move-resize" name="move-resize">Un mût veloç par spostâ e ridimensionâ i barcons</a></h2>
+<p>Spostâ e ridimensionâ i barcons e je une part impuartante de interazion cun diviersis aplicazions in esecuzion contemporanie. Invezit di vê a ce fâ cun la piçule lenghete dal titul zale o l'ancjemò plui fin ôr dal barcon, al esist un mût plui convenient par spostâ un barcon. Cence contâ che, in diplui ae sô piçule dimension, l'angul par ridimensionâ al à un altri limit: al permet di ridimensionâ dome de bande dal angul in bas a diestre. <br />Strissinâ cul tast diestri un ôr al funzione, ma tu âs di smicjâ ben e sta atent.</p>
+<p>Par risolvi chescj fastidis, Haiku al furnìs une soluzion nete, doprant la cumbinazion di tascj pe gjestion dai barcons <span class="key">CTRL</span> <span class="key">ALT</span> a il mouse. Viôt ancje il cjapitul <a href="keyboard-shortcuts.html#general">Scurtis e cumbinazions di tascj</a> par cognossi plui scurtis in merit ae gjestion dai barcons.</p>
 <img src="images/gui-images/resizing.png" alt="resizing.png" />
-<p>Holding down <span class="key">CTRL</span> <span class="key">ALT</span> will highlight the window borders nearest to the mouse pointer. Move the mouse in the direction of another border to change the target. Click and dragging with the <i>right mouse button</i> will resize the window along the highlighted border(s).</p>
-<p>Hold down <span class="key">CTRL</span> <span class="key">ALT</span> and click and drag with the <i>left mouse button</i> anywhere in a window to move it around. A quick click with the <i>right mouse button</i> sends it to the back.</p>
+<p>Tignint fracât jù <span class="key">CTRL</span> <span class="key">ALT</span> si evidenziaran i ôrs dal barcon plui vicins dal pontadôr dal mouse. Sposte il mouse te direzion di un altri ôr par cambiâ l'ôr interessât. Fâ clic e strissinâ cul <i>boton diestri dal mouse</i> al ridimensionarà il barcon inte direzion dal ôr o dai ôrs evidenziâts.</p>
+<p>Ten fracât jù <span class="key">CTRL</span> <span class="key">ALT</span> fâs clic e strissine cul <i>boton di çampe dal mouse</i> dulà che tu vûs intun barcon par spostâlu ator. Un clic veloç cul <i>boton diestri dal mouse</i> lu mande daûr dai altris barcons.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="stack-tile" name="stack-tile">Stack &amp; Tile</a></h2>
-<p>Haiku's user interface provides a unique feature that puts the fact that windows have a yellow tab instead of a full-width title bar to perfect use. It's called "Stack &amp; Tile".<br />
-In the example below, a Tracker window with bookmarks is tiled to the left of a WebPositive window, which itself is stacked with another Tracker window showing the source folder <tt>haiku</tt>. In this animation, the user clicks on the tabs of the stacked windows to alternately bring one or  the other to the front.</p> 
+<a id="stack-tile" name="stack-tile">Intassâ e piastrelâ (Stack &amp; Tile)</a></h2>
+<p>La interface utent di Haiku e furnìs une funzionalitât uniche che e sfrute la particolaritât che i barcons a àn une lenghete zale invezit di vê une sbare dal titul largje tant che il barcon. E je clamade "Intassâ e piastrelâ", in inglês "Stack &amp; Tile".<br />
+Tal esempli chi sot, un barcon di Tracker cui segnelibris al è "piastrelât" a çampe di un barcon di WebPositive, chel chi invezit al è intassât cuntun altri barcon di Tracker che al mostre la cartele sorzint <tt>haiku</tt>. In cheste animazion, l'utent al fâs clic su lis lenghetis dai barcons "intassâts" par puartâ denant prime un e dopo chel altri.</p> 
 <img src="images/gui-images/gui-s+t.gif" alt="gui-s+t.gif" />
-<p>Connected like this, the group of windows can be moved and resized together - a nice arrangement to work in a more project centric environment. Instead of looking for the right browser window with documentation, editor and Tracker windows and maybe a related email concerning one project you are currently working on, just stack&amp;tile them together.</p>
-<p>Doing the actual arranging of windows is easy: Hold down <span class="key">OPT</span> while dragging a window by its tab close to another window's tab or border until it's highlighted and release the mouse button.</p>
-<p>Stack &amp; Tile consists of two related parts.</p>
+<p>Colegât cussì, il grup di barcons al pues jessi spostât e ridimensionât adun - une disposizion plasevule par lavorâ intun ambient plui orientât ai progjets. Invezit di stâ a cirî il just barcon, sedi il navigadôr di documentazions, un editôr o un barcon dal Tracker o magari ancje une mail che e rivuarde il progjet, metiju ducj adun intassant e piastrellant.</p>
+<p>Eseguî chest mût di disponi i barcons al è facil: ten fracât <span class="key">OPT</span> intant che tu strissinis un barcon pe sô lenghete, strissinilu dongje di une altre lenghete di un altri barcon o dal so ôr fintremai che al ven evidenziât, daspò mole il boton dal mouse e il lavôr al è fat.</p>
+<p>Intassâ e piastrelâ al consist di dôs parts colegadis.</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><img src="images/gui-images/gui-stacking.png" alt="gui-stacking.png" /></td><td width="10"></td>
-<td><p>"<i>Stacking</i>" is putting windows on top of each other, automatically moving the yellow tabs into position.<br />
-While holding <span class="key">OPT</span>, tabs change color when they overlap; drop the window to establish the stacking.</p></td></tr></table>
+<td><p>"<i>Intassâ</i>" al significhe meti un barcon sore di chel altri, spostant in automatic lis lenghetis zalis in posizion.<br />
+Intant che si ten fracât <span class="key">OPT</span>, lis lenghetis a cambiin colôr cuant che si soreponin; mole il barcon par stabilî la tasse.</p></td></tr></table>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2" vspace="10">
 <tr><td><img src="images/gui-images/gui-tiling.png" alt="gui-tilinging.png" /></td><td></td>
-<td><p>"<i>Tiling</i>" means gluing windows horizontally or vertically together.<br />
-Again, while holding <span class="key">OPT</span>, the borders that'll fuse together when you drop the window change color when brought near each other.</p></td></tr></table>
-<p>Separation is done in the same way, by holding <span class="key">OPT</span> while dragging a window by its tab out of the group.</p>
+<td><p>"<i>Piastrelâ</i>" al significhe incolâ in orizontâl o in verticâl i barcons.<br />
+Di gnûf, intant che si ten fracât <span class="key">OPT</span>, i ôrs che si cumbinaran cuant che tu molarâs il barcon, a cambiin colôr cuant che a saran dongje un di chel altri.</p></td></tr></table>
+<p>La separazion e ven fate te stesse maniere, fracant <span class="key">OPT</span> intant che dal grup si strissine fûr un barcon pe sô lenghete.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="open-save-panel" name="open-save-panel">Open and save panels</a></h2>
-<p>When opening or saving a file from any application, a panel like this opens:</p>
+<a id="open-save-panel" name="open-save-panel">I panei vierç e salve</a></h2>
+<p>Cuant che si vierç o si salve un file di cualsise aplicazion, si vierç un panel come chest:</p>
 <img src="images/gui-images/open-save.png" alt="open-save.png" />
-<p>It has all the usual things: A list of files of the current folder to choose from, in case of a save panel, a text field to enter a filename and a pop-up menu for different file formats and their settings.<br />
-You can enter parent folders with the pop-up menu above the file listing.</p>
-<p>If you already have a Tracker window with the location for a file open, you can simply drag either any file or the folder-representation (i.e. the symbol to the far right in its menu bar) into the panel. This changes the panel to that new location.</p>
+<p>Al à dutis lis solitis robis: Une liste di file de cartele atuâl di podê sielzi, e tal câs di un panel par salvâ, un cjamp di test par inserî un non di file e un menù a tende pai diviers formâts di file e lis lôr impostazions.<br />
+Tu puedis lâ tes cartelis superiôrs cul menù a tende parsore de liste di file.</p>
+<p>Se tu âs za viert un barcon di Tracker cu la posizion dal file, al baste strissinâ o cualsisei file o la rapresentazion de cartele (p.e. il simbul in alt a drete te sô sbare dai menù) sul panel. Chest al puarte il panel dret te gnove posizion.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="open-save-shortcuts" name="open-save-shortcuts">Keyboard shortcuts</a></h3>
-<p>Many shortcuts in open and save panels are the same used in Tracker. Besides the commands that are also available through the <span class="menu">File</span> menu, there are a few not that obvious:</p>
+<a id="open-save-shortcuts" name="open-save-shortcuts">Scurtis di tastiere</a></h3>
+<p>Tantis scurtis tai panei vierç e salve a son lis stessis dopradis in Tracker. Di là dai comants che a son ancje disponibii cul menù <span class="menu">File</span>, indi son un pâr che no son scontâts:</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td> Creates a new folder.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td> Lets you rename the selected entry.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:24px;"></td><td> Moves into the parent folder.</td></tr>
-<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> or <span class="key">ENTER</span></td><td></td><td> Moves into the selected folder.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td></td><td> Takes you to your Desktop.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td></td><td> Takes you to your Home folder.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td> Al cree un gnove cartele.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td> Ti permet di cambiâ non ae vôs selezionade.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:24px;"></td><td> Ti sposte te cartele superiôr.</td></tr>
+<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> o <span class="key">INVIE</span></td><td></td><td> Ti sposte te cartele selezionade.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td></td><td> Ti puarte sul Scritori.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td></td><td> Ti puarte te tô cartele Home.</td></tr>
 </table>
-<p>For keyboard shortcuts in Haiku in general, see chapter <a href="keyboard-shortcuts.html">Shortcuts and key combinations</a>.</p>
+<p>Pes scurtis di tastiere in Haiku in gjenerâl, viôt il cjapitul <a href="keyboard-shortcuts.html">Scurtis e cumbinazions di tascj</a>.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="favorites-recent" name="favorites-recent">Favorites and recent folders</a></h3>
-<p>The <span class="menu">Favorites</span> menu in open and save panels provides recently visited folders and favorite locations that you can set up yourself. As indicated by the little arrow, you can also use these locations to navigate further down the hierarchy via submenus.</p>
+<a id="favorites-recent" name="favorites-recent">Preferîts e cartelis resintis</a></h3>
+<p>Il menù <span class="menu">Preferîts</span> intai panei vierç e salve al furnìs lis cartelis visitadis di resint e lis posizions preferidis che tu âs stabilît tu. Come indicât de piçule frece, tu puedis ancje doprâ chestis posizions par navigâ ancjemò plui jù te gjerarchie, cui sot-menù.</p>
 <img src="images/gui-images/favorites.png" alt="favorites.png" />
-<p>To add a Favorite, you simply navigate to your destination and choose <span class="menu">Favorites | Add current folder</span>. From now on it will appear in every open/save panel. To remove a Favorite, choose <span class="menu">Favorites | Edit favorites...</span> and delete its entry.<br />
-All Favorites are kept in <span class="path">/boot/home/config/settings/Tracker/Go/</span>. So you might as well add and remove links to files and folders there directly.</p>
+<p>Par zontâ un Preferît, tu âs dome di lâ te to destinazion e sielzi <span class="menu">Preferîts | Zonte cartele atuâl</span>. Di cumò indenant al vignarà fûr in ogni panel vierç/salve. Par gjavâ un Preferît, sielç <span class="menu">Preferîtss | Modifiche preferîts...</span> e elimine la sô vôs.<br />
+Ducj i Preferîts a son tignûts in <span class="path">/boot/home/config/settings/Tracker/Go/</span>. Cussì che di lì tu puedis ancje zontâ e gjavâ i colegaments ai file.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="replicants" name="replicants">Replicants</a></h2>
-<p>Replicants are small self-contained parts of applications that can be integrated into other programs. Provided Deskbar's option to <span class="menu">Show replicants</span> is activated, you'll recognize a replicantable part of an application by its small handle, normally in the bottom right corner:</p>
+<p>I replicants a son piçulis parts di aplicazions auto-contignudis che a puedin jessi integradis in altris programs. Se la opzion dal Deskbar <span class="menu">Mostre replicants</span> e je ativade, tu ricognossarâs une part di aplicazion che si pues replicâ de sô piçule mantie, che di solit e sta tal angul in bas a diestre:</p>
 <img src="../images/gui-images/replicant.png" alt="replicant.png" />
-<p>The most prominent place that accepts Replicants is the Desktop: You simply drag &amp; drop the little handle onto it. From now on it's part of the Desktop and the Replicant's originating app doesn't have to be started for it to work.<br />
-A right-click on a Replicant handle offers a context menu to show the originating app's <span class="menu">About</span> window and to <span class="menu">Remove replicant</span>.</p>
-<div class="box-info">Should you experience difficulties with a Replicant on the Desktop and just can't get rid of it, delete <span class="path">~/config/settings/Tracker/tracker_shelf</span>. Unfortunately, this will remove <i>all</i> Replicants from the Desktop.</div>
-<p>Examples for replicatable applications are the graphs of the <a href="applications/activitymonitor.html">ActivityMonitor</a>, the <a href="workspaces.html">Workspaces applet</a> or <a href="applications/deskcalc.html">DeskCalc</a>.</p>
+<p>Il puest prominent che al acete i Replicants al è il Scritori: tu âs dome di strissinâ e molâ la piçule mantie su di lui. Di cumò indenant al fâs part dal Scritori e la aplicazion che e à dât origjin al Replicant no covente che e sedi inviade par che al funzioni.<br />
+Un clic diestri suntune mantie di Replicant al presente un menù contestuâl par mostrâ il barcon (About) <span class="menu">Informazions</span> de aplicazion di origjin e par fâ <span class="menu">Gjave replicant</span> (Remove replicant).</p>
+<div class="box-info">Âstu fastidis cuntun Replicant sul Scritori e no tu rivis a gjavâlu vie? Elimine <span class="path">~/config/settings/Tracker/tracker_shelf</span>. Di cuintri, cheste operazion e gjavarà vie  <i>ducj</i> i Replicants dal Desktop.</div>
+<p>Esemplis di aplicazions che si puedin replicâ a son i grafics dal <a href="applications/activitymonitor.html">Controlôr dai procès</a>, la <a href="workspaces.html">applet Spazis di lavôr</a> o <a href="applications/deskcalc.html">DeskCalc</a>.</p>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="filesystem-layout.html">Filesystem layout</a> 
+ «  <a href="filesystem-layout.html">Disposizion dal filesystem</a> 
 ::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="workspaces.html">Workspaces</a>  »
 </span></div>

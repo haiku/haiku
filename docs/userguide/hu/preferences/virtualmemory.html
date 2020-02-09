@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -45,6 +45,7 @@
 <li><a href="../../sk/preferences/virtualmemory.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/preferences/virtualmemory.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sv_SE/preferences/virtualmemory.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/preferences/virtualmemory.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../zh_CN/preferences/virtualmemory.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../ru/preferences/virtualmemory.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../uk/preferences/virtualmemory.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
@@ -58,19 +59,19 @@
 
 <div id="content">
 <div>
+<div class="box-info">Az oldal fordítása még folyamatban van. Amíg tart a fordítás, addig a lefordítatlan részek angolul jelennek meg.</div>
 
 <h2><img src="../../images/prefs-images/virtualmemory-icon_64.png" alt="virtualmemory-icon_64.png" width="64" height="64" />Virtuális memória (VirtualMemory)</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Asztalsáv:</td><td style="width:15px;"></td><td><span class="menu">Beállítások</span></td></tr>
 <tr><td>Útvonal:</td><td></td><td><span class="path">/boot/system/preferences/VirtualMemory</span></td></tr>
-<tr><td>Bellítások:</td><td></td><td><span class="path">~/config/settings/kernel/drivers/virtual_memory</span><br />
+<tr><td>Beállítások:</td><td></td><td><span class="path">~/config/settings/kernel/drivers/virtual_memory</span><br />
 <span class="path">~/config/settings/VM_data</span> - az ablak pozícióját tartalmazza</td></tr>
 </table>
 <p>A virtuális memória lehetőséget ad arra, hogy a memória tartalmát átrakjuk a lemezre ha fontosabb adat tárolására van szükségünk a memóriában. Tehát, hacsak nem rendelkezik a számítógépünk sok memóriával, akkor a virtuális memória használata ajánlott.</p>
 <img src="../images/prefs-images/virtualmemory.png" alt="virtualmemory.png" />
-<p>A méret megadásakor a fizikai memória méreténél többet ajánlott megadni. A napjainkban kapható lemezek mérete miatt ez nem okozhat problémát. Azonban, ha mégis kifogynánk a helyből, a virtuális memória mérete gyorsan módosítható. Ebben az esetben érdemes egy pillantást vetni a <a href="../applications/diskusage.html">Lemezhasználat</a>ra, hogy kiderüljön mi okozza a lemez terheltségét.</p>
-<p>Normál esetben a virtuális memória a rendszerlemezre kerül. Ha azt tapasztaljuk, hogy a lemezen nagyon gyakori az írás/olvasás, akkor használjunk másik lemezt a virtuális memória számára. Csak egy másik partíció ugyan azon a lemezen nem segít.<br />
-Persze a legjobb megoldás a fizikai memória méretének növelése lenne...</p>
+<p>Normally, the swap file is written to the boot partition. If you're running low on free memory there, you can deactivate the <span class="menu">Automatic swap management</span> and choose another mounted partition from the popup menu. The swap file size is set with the slider below.<br />
+If you often run into disk thrashing due to the virtual memory system swapping memory in and out, you can try to use a separate harddisk for you swap file to avoid I/O congestion. Simply another partition on the same harddisk with your system/data won't help. Upgrading your RAM is of course the most effective way to go...</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="button">Eredeti</span></td><td> </td><td>Az eredeti beállítások megadása.</td></tr>
 <tr><td><span class="button">Visszaállít</span></td><td> </td><td>Visszaállítás a program indításakori állapotra.</td></tr>

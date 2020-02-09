@@ -19,7 +19,7 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Media-Player</title>
+	<title>MediaPlayer</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
@@ -48,6 +48,7 @@
 <li><a href="../../sk/applications/mediaplayer.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/applications/mediaplayer.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sv_SE/applications/mediaplayer.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/applications/mediaplayer.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../zh_CN/applications/mediaplayer.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../ru/applications/mediaplayer.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../uk/applications/mediaplayer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
@@ -63,14 +64,14 @@
 <div id="content">
 <div>
 
-<h2><img src="../../images/apps-images/mediaplayer-icon_64.png" alt="mediaplayer-icon_64.png" width="64" height="64" /><acronym title="MediaPlayer">Media-Player</acronym></h2>
+<h2><img src="../../images/apps-images/mediaplayer-icon_64.png" alt="mediaplayer-icon_64.png" width="64" height="64" />MediaPlayer</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Anwendungen</span></td></tr>
 <tr><td>Ort:</td><td></td><td><span class="path">/boot/system/apps/MediaPlayer</span></td></tr>
 <tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/MediaPlayer</span></td></tr>
 </table>
 <p><br /></p>
-<p><acronym title="MediaPlayer">Media-Player</acronym> ist die Standardanwendung zum Abspielen aller Audio- und Videodateien. Da es auf <a href="http://www.ffmpeg.org/">ffmpeg</a> basiert, werden eine Unmenge an verbreiteten Formaten unterstützt. Die einfache Oberfläche enthält alle Bedienelemente, die man so erwartet:</p>
+<p>MediaPlayer ist die Standardanwendung zum Abspielen aller Audio- und Videodateien. Da es auf <a href="http://www.ffmpeg.org/">ffmpeg</a> basiert, werden eine Unmenge an verbreiteten Formaten unterstützt. Die einfache Oberfläche enthält alle Bedienelemente, die man so erwartet:</p>
 <img src="../images/apps-images/mediaplayer.png" alt="mediaplayer.png" />
 <p>Mit dem Zeiger auf dem Fortschrittsbalken lässt sich schnell zur gewünschten Position springen. Hält man den Mauszeiger über den Balken, wird die aktuelle und verbleibende Zeit für diesen Clip eingeblendet. Klicke auf die Zeitanzeige rechts davon, lässt sie zwischen Gesamtzeit, momentaner Zeit und Restzeit wechseln.<br />
 Darunter befinden sich die üblichen Tasten um zum vorigen Clip zu springen, Wiedergabe/Pause, Stopp und um zum nächsten Clip zu springen. Daneben befindet sich ein Lautstärkeregler (das Lautsprechersymbol schaltet stumm) und eine Pegelanzeige.</p>
@@ -81,22 +82,22 @@ Darunter befinden sich die üblichen Tasten um zum vorigen Clip zu springen, Wie
 <p>Für alle Medien zeigt <span class="menu">Datei Info...</span> (<span class="key">ALT</span> <span class="key">I</span>) Informationen wie Spieldauer oder Details zu Audio/Video Track und den verwendeten Codecs der aktuellen Datei.</p>
 <p>Die meisten der oft benutzten Befehle aus den Menüs stehen auch in einem Kontextmenü mittels Rechtsklick auf die Videofläche zur Verfügung. Praktisch vor allem im Vollbildmodus.<br />
 Unter <span class="menu">Video</span> befinden sich Befehle, um das Fenster auf verschiedene Größen zu zoomen oder das Seitenverhältnis auf diverse Standardwerte erzwingen zu können. Für korrekt erstellte Dateien fährt man mit <span class="menu">Stream-Einstellungen</span> am besten.</p>
-<p>Media-Player kann Untertitel im <a href="http://en.wikipedia.org/wiki/SubRip">SRT</a> Format darstellen. Damit sie unter <span class="menu">Untertitel</span> auftauchen, muss ihr Dateiname identisch zu der Videodatei sein, allerdings mit einem angehängten Sprachkürzel und der Endung ".srt" statt der Videoformat-Endung. Also:</p>
+<p>MediaPlayer kann Untertitel im <a href="http://en.wikipedia.org/wiki/SubRip">SRT</a> Format darstellen. Damit sie unter <span class="menu">Untertitel</span> auftauchen, muss ihr Dateiname identisch zu der Videodatei sein, allerdings mit einem angehängten Sprachkürzel und der Endung ".srt" statt der Videoformat-Endung. Also:</p>
 <pre>DerFilm.avi
 DerFilm.Deutsch.srt
 DerFilm.English.srt
 DerFilm.Français.srt</pre>
 <p>Mehrere Audiotracks, meist für unterschiedliche Sprachen innerhalb einer Videodatei benutzt, finden sich im <span class="menu">Audiospur</span> Menü. <span class="menu">Videospur</span> bietet das entsprechend falls mehrere Videostreams vorhanden sind.</p>
-<p>Mittels <span class="menu">Vollbild</span> mode (<span class="key">ALT</span> <span class="key">RETURN</span> oder <span class="key">F</span> oder einen Doppel-Linksklick) lässt sich in den Vollbildmodus wechseln, <span class="menu">Oberfläche ausblenden</span> (<span class="key">ALT</span> <span class="key">H</span> oder ein Doppel-Rechtsklick) blendet Media-Players Fensterrahmen und Bedienelemente aus, und durch <span class="menu">Immer im Vordergrund</span> (<span class="key">ALT</span> <span class="key">A</span>) schwebt der Media-Player immer über allen anderen Fenstern.</p>
+<p>Mittels <span class="menu">Vollbild</span> mode (<span class="key">ALT</span> <span class="key">RETURN</span> oder <span class="key">F</span> oder einen Doppel-Linksklick) lässt sich in den Vollbildmodus wechseln, <span class="menu">Oberfläche ausblenden</span> (<span class="key">ALT</span> <span class="key">H</span> oder ein Doppel-Rechtsklick) blendet MediaPlayers Fensterrahmen und Bedienelemente aus, und durch <span class="menu">Immer im Vordergrund</span> (<span class="key">ALT</span> <span class="key">A</span>) schwebt der MediaPlayer immer über allen anderen Fenstern.</p>
 
 <h2>Playlisten</h2>
-<p><span class="menu">Media-Player | Playliste...</span> (<span class="key">ALT</span> <span class="key">P</span>) öffnet ein Fenster mit allen Dateien die zur Wiedergabe anstehen. Ein Doppelklick auf einen Eintrag startet die Wiedergabe.</p>
+<p><span class="menu">MediaPlayer | Playliste...</span> (<span class="key">ALT</span> <span class="key">P</span>) öffnet ein Fenster mit allen Dateien die zur Wiedergabe anstehen. Ein Doppelklick auf einen Eintrag startet die Wiedergabe.</p>
 <img src="../images/apps-images/mediaplayer-playlist.png" alt="mediaplayer-playlist.png" />
 <p>Um weitere Dateien anzufügen, lässt man sie einfach über der Liste fallen und ändert ihre Position per Drag &amp; Drop. Aus dem <span class="menu">Bearbeiten</span> Menü lässt sich eine <span class="menu">Zufällige Reihenfolge</span> erzeugen oder einzelne Einträge aus der Liste <span class="menu">Entfernen</span> (<span class="key">ENTF</span>). Die eigentliche Datei lässt sich auch direkt von hier <span class="menu">In Papierkorb verschieben</span> (<span class="key">ALT</span> <span class="key">T</span>).</p>
 <p>Natürlich lässt sich eine Playliste auch <span class="menu">Speichern</span> und später wieder <span class="menu">Öffnen</span>. Oder man startet die Wiedergabe gleich mit einem Doppelklick auf eine Playlist-Datei.</p>
 
 <h2>Einstellungen</h2>
-<p>Am Verhalten des Media-Players lässt sich mit ein paar Einstellungen drehen:</p>
+<p>Das Verhalten des MediaPlayers lässt sich mit ein paar Einstellungen ändern:</p>
 <img src="../images/apps-images/mediaplayer-settings.png" alt="mediaplayer-settings.png" />
 <p>Die ersten Optionen unter <span class="menu">Wiedergabe</span> sind ziemlich selbstsprechend. Wiedergabe automatisch starten, Fenster nach vollendetem Abspielen schließen, oder Clips in Endlosschleife spielen.</p>
 <p>Es folgen Einstellungen zur <span class="menu">Darstellung</span>.<br />
@@ -107,7 +108,7 @@ Dann folgen Optionen zur <span class="menu">Untertitelgröße</span> und <span c
 <p>Die letzte Option bestimmen in welcher Lautstärke Clips abgespielt werden, deren Fenster gerade nicht im Vordergrund sind. Entweder alle spielen immer <span class="menu">Volle Lautstärke</span>, mit weniger nervende <span class="menu">Niedrige Lautstärke</span> oder ganz <span class="menu">Stumm geschaltet</span>.</p>
 
 <h2>Tastenkürzel</h2>
-<p>Media-Player kennt einige nützliche Tastenkürzel um die Wiedergabe zu steuern ohne die Maus zu benutzen.</p>
+<p>MediaPlayer kennt einige nützliche Tastenkürzel um die Wiedergabe zu steuern ohne die Maus zu benutzen.</p>
 <table summary="keycombos" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="key">Y</span></td><td style="width:15px;"></td><td>Voriger Track</td></tr>
 <tr><td><span class="key">X</span></td><td></td><td>Wiedergabe</td></tr>

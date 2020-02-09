@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -47,6 +47,7 @@
 <li><a href="../../sk/applications/textsearch.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/applications/textsearch.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sv_SE/applications/textsearch.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/applications/textsearch.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../zh_CN/applications/textsearch.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../ru/applications/textsearch.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../uk/applications/textsearch.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
@@ -78,16 +79,17 @@
 <table summary="menus" border="0" cellpadding="2" cellspacing="0">
 <tr><td colspan="5"><h3>ファイル (File) メニュー</h3></td></tr>
 <tr><td class="onelinetop"><span class="menu">新規ウィンドウ (New window)</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>新しいウィンドウを開き、同じファイルやフォルダーを別の文字列で検索。</td></tr>
-<tr><td><span class="menu">ターゲットの指定... (Set target...)</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>検索する新しいファイルやフォルダーを選択。</td></tr>
+<tr><td><span class="menu">ターゲットの指定... (Set target...)</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>新しく検索するファイルやフォルダーを選択できます。ほかの方法として、ファイル / フォルダーをウィンドウにドラッグ＆ドロップできます。</td></tr>
 <tr><td colspan="5"><h3>アクション (Action) メニュー</h3></td></tr>
 <tr><td><span class="menu">選択部のみ残す (Trim selection)</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>リストから選択されてない部分を取り除く。</td></tr>
 <tr><td><span class="menu">選択部を開く (Open selection)</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>現在選択しているファイルを標準のアプリケーションで開く (ダブルクリックと同じ)。Pe などのテキストエディターが開かれた場合、検索文字列が見つかった行にジャンプする。</td></tr>
-<tr><td><span class="menu">Tracker で開く (Open files in Tracker)</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>現在選択しているファイルの場所を Tracker で開く。</td></tr>
+<tr><td><span class="menu">ファイルの場所を表示 (Show files in Tracker)</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>現在選択しているファイルの場所を Tracker で開く。</td></tr>
 <tr><td class="onelinetop"><span class="menu">テキストをクリップボードにコピー (Copy text to clipboard)</span></td><td></td><td><span class="key">ALT</span> <span class="key">B</span></td><td></td><td>選択部分をクリップボードにコピー。</td></tr>
 <tr><td colspan="5"><h3>設定メニュー</h3></td></tr>
 <tr><td colspan="3" class="onelinetop"><span class="menu">ドットで始まるフォルダーを無視する (Skip folders starting with a dot)</span></td><td> </td><td>これは管理用ファイルが "<tt>.folders/</tt>" フォルダーの中に隠されている "unix 的" な環境で作業している時に便利です。このフォルダーは SVN や CVS などのソースバージョン管理システムに使用されていて、Haiku でも広く使われています。</td></tr>
-<tr><td colspan="3"><span class="menu">検索文字をエスケープする (Escape search text)</span></td><td> </td><td>テキスト検索は、コマンドラインツール <span class="cli">grep</span> を使用します。これは <tt>'"*\\$?!</tt> およびスペースなどの特別な文字には <tt>\\</tt> を付けなければいけません。この設定をオフにすると、自分で <tt>\\</tt> を付けなければいけませんが、それと引き換えに<a href="http://ja.wikipedia.org/wiki/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">正規表現</a>のパワーを手に入れられます。</td></tr>
-<tr><td colspan="3"><span class="menu">テキストファイルのみ (Text files only)</span></td><td> </td><td>テキスト検索は現在テキストファイル中の文字列を探すのだけに役立ちます。この設定を無効にするとすべてのファイルの内容をチェックします。</td></tr>
+<tr><td colspan="3"><span class="menu">正規表現 (Regular expression)</span></td><td> </td><td>テキスト検索は、コマンドラインツール <span class="cli">grep</span> を使用します。そのため、<tt>'"*\\$?!</tt> およびスペースなどの特別な文字は <tt>\</tt> でエスケープする必要があります。この設定を有効にすると、自分でそれを行わなければいけませんが、それと引き換えに<a href="http://ja.wikipedia.org/wiki/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">正規表現</a>のパワーを手に入れられます。</td></tr>
+<tr><td colspan="3"><span class="menu">テキストファイルのみ (Text files only)</span></td><td> </td><td>テキスト検索はいまのところテキストファイル中の文字列検索だけに有効です。この設定を無効にするとすべてのファイルの内容をチェックします。</td></tr>
+<tr><td colspan="3"><span class="menu">コードエディターでファイルを開く (Open files in code editor)</span></td><td> </td><td>ファイルを推奨のコードエディター (text/x-source-codeを扱えるもの) で強制的に開きます。言い方を変えれば、ファイルはファイルタイプにどんなアプリが設定されていてもエディターで開けます。たとえば、通常ブラウザーで開く HTML ファイルを編集するときに便利です。</td></tr>
 <tr><td colspan="5"><h3>検索履歴 (History) メニュー</h3></td></tr>
 <tr><td colspan="4"></td><td>最近検索した文字列が含まれています。</td></tr>
 <tr><td colspan="5"><h3>文字コード (Encoding) メニュー</h3></td></tr>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -46,6 +46,7 @@
 <li><a href="../../sk/preferences/virtualmemory.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/preferences/virtualmemory.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sv_SE/preferences/virtualmemory.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/preferences/virtualmemory.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../zh_CN/preferences/virtualmemory.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../ru/preferences/virtualmemory.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../jp/preferences/virtualmemory.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
@@ -58,6 +59,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Переклад даної сторінки ще неповний. Допоки це так, незавершені частини користайте у англійському варіанті. </div>
 
 <h2><img src="../../images/prefs-images/virtualmemory-icon_64.png" alt="virtualmemory-icon_64.png" width="64" height="64" />Віртуальна пам'ять (VirtualMemory)</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
@@ -68,9 +70,8 @@
 </table>
 <p>Віртуальна пам'ять дозволяє використовувати область підкачки з жорсткого диску, якщо фізична пам'ять більше потрібна для інших речей. Таким чином, навіть якщо у вас багато оперативної пам'яті,  використання віртуальної зовсім непогана ідея.</p>
 <img src="../images/prefs-images/virtualmemory.png" alt="virtualmemory.png" />
-<p>Ви можете встановити її розмір, навіть більший, ніж обсяг вашої оперативної пам'яті, якщо це необхідно.  При величезних розмірах сучасних жорстких дисків, призначити свап величиною у фізичну  пам'ять не повинно стати жодною проблемою. Тим не менше, ви зможете швидко змінити її розмір, якщо ваш вільний простір трохи зменшиться. Подивіться програмою <a href="../applications/diskusage.html"> Використання диску (DiskUsage)</a>, що забирає ваш вільний дисковий простор.</p>
-<p>Як правило, файл підкачки виділяють на завантажувальному розділі. Якщо ви часто будете зтикатися з необхідністю змінювати розмір свапа, ви можете спробувати використовувати для вашого файла підкачки окремий жорсткий диск. Просто інший розділ на тому ж жорсткому диску з вашою системою та  даними не допоможе. <br />
-Збільшення оперативної пам'яті буде у такому випадку найбільш ефективним виходом ...</p>
+<p>Normally, the swap file is written to the boot partition. If you're running low on free memory there, you can deactivate the <span class="menu">Automatic swap management</span> and choose another mounted partition from the popup menu. The swap file size is set with the slider below.<br />
+If you often run into disk thrashing due to the virtual memory system swapping memory in and out, you can try to use a separate harddisk for you swap file to avoid I/O congestion. Simply another partition on the same harddisk with your system/data won't help. Upgrading your RAM is of course the most effective way to go...</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="button">Типово (Defaults)</span></td><td> </td><td>Скинути всі налаштування до типових значень.</td></tr>
 <tr><td><span class="button">Повернути (Revert)</span></td><td> </td><td>Повернути ті налаштування що були до запуску аплету Віртуальна пам'ять (VirtualMemory).</td></tr>

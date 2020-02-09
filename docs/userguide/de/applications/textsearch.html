@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -46,6 +46,7 @@
 <li><a href="../../sk/applications/textsearch.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/applications/textsearch.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sv_SE/applications/textsearch.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/applications/textsearch.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../zh_CN/applications/textsearch.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../ru/applications/textsearch.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../uk/applications/textsearch.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
@@ -76,21 +77,22 @@
 
 <p>Nur ein paar kurze Erläuterungen zu den ansonsten sich selbst erklärenden Menüpunkten:</p>
 <table summary="menus" border="0" cellpadding="2" cellspacing="0">
-<tr><td colspan="5"><h3>Menü Datei</h3></td></tr>
+<tr><td colspan="5"><h3>Datei</h3></td></tr>
 <tr><td class="onelinetop"><span class="menu">Neues Fenster</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Öffnet ein neues Fenster, um dieselben Dateien/Ordner nach einem neuen Begriff zu durchsuchen.</td></tr>
-<tr><td><span class="menu">Ziel wählen...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Zum Ändern der Dateien oder Ordner, die durchsucht werden sollen.</td></tr>
-<tr><td colspan="5"><h3>Menü Aktionen</h3></td></tr>
+<tr><td><span class="menu">Ziel wählen...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Zum Ändern der Dateien oder Ordner, die durchsucht werden sollen. Dateien/Ordner ins Fenster ziehen funktioniert auch.</td></tr>
+<tr><td colspan="5"><h3>Aktionen</h3></td></tr>
 <tr><td><span class="menu">Auf Auswahl begrenzen</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Entfernt alle Suchergebnisse aus der Liste, die nicht  ausgewählt sind.</td></tr>
 <tr><td><span class="menu">Auswahl öffnen</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>Öffnet die ausgewählten Dateien mit ihrer bevorzugten Anwendung (wie bei einem Doppelklick). Falls es sich um einen Texteditor handelt, der das unterstützt (wie Pe), lässt sich auch genau zu der Zeile der Fundstelle springen.</td></tr>
 <tr><td><span class="menu">Dateien im Tracker zeigen</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Öffnet die Speicherorte der gerade ausgewählten Dateien im Tracker.</td></tr>
 <tr><td class="onelinetop"><span class="menu">Text in Ablage kopieren</span></td><td></td><td><span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Kopiert die momentane Auswahl in die Ablage.</td></tr>
-<tr><td colspan="5"><h3>Menü Einstellungen</h3></td></tr>
+<tr><td colspan="5"><h3>Einstellungen</h3></td></tr>
 <tr><td colspan="3" class="onelinetop"><span class="menu">Mit Punkt beginnende Ordner ignorieren</span></td><td> </td><td>Nützlich wenn man sich in einer Unix-Umgebung bewegt, in der Verwaltungsdateien oft in "<tt>.Ordner</tt>" versteckt werden. Sourcecode Versionierungssysteme wie SVN und CVS sind Beispiele für Anwendungen, die das so machen und auch unter Haiku weit verbreitet sind.</td></tr>
-<tr><td colspan="3"><span class="menu">Escape-Sequenzen benutzen</span></td><td> </td><td>TextSearch benutzt das Konsolenprogramm <span class="cli">grep</span>. Dazu müssen spezielle Zeichen wie <tt>'"*\\$?!</tt> und Leerzeichen mit einem <tt>\\</tt> "escaped" werden. Deaktiviert man diese Option, heißt das, dass man das von Hand machen muss, im Gegenzug erhält man allerdings die mächtigen Möglichkeiten von <a href="http://de.wikipedia.org/wiki/Regul%C3%A4re_Ausdr%C3%BCcke" class="external free" title="Reguläre Ausdrücke" rel="nofollow">Regulären Ausdrücken</a>.</td></tr>
+<tr><td colspan="3"><span class="menu">Regulärer Ausdruck</span></td><td> </td><td>TextSearch benutzt das Konsolenprogramm <span class="cli">grep</span>. Dazu müssen spezielle Zeichen wie <tt>'"*\$?!</tt> und Leerzeichen mit einem <tt>\</tt> "escaped" werden. Aktiviert man diese Option, muss man das selbst machen. Im Gegenzug stehen einem die mächtigen Möglichkeiten von <a href="http://de.wikipedia.org/wiki/Regul%C3%A4re_Ausdr%C3%BCcke" class="external free" title="Reguläre Ausdrücke" rel="nofollow">Regulären Ausdrücken</a> zur Verfügung.</td></tr>
 <tr><td colspan="3"><span class="menu">Nur Textdateien</span></td><td> </td><td>TextSearch ist momentan nur zur Suche von Begriffen in reinen Textdateien sinnvoll zu gebrauchen. Deaktiviert man diese Option, werden alle Arten von Dateien durchsucht.</td></tr>
-<tr><td colspan="5"><h3>Menü Historie</h3></td></tr>
+<tr><td colspan="3"><span class="menu">Öffne Dateien im Code-Editor</span></td><td> </td><td>Erzwingt das Öffnen im bevorzugten Code-Editor (der für text/x-source-code eingestellt ist). Ansonsten wird die Datei in der für diesen Dateityp gesetzten Anwendung geöffnet. Praktisch wenn z. B. HTML Dateien bearbeitet werden sollen, die sonst den Browser starten.</td></tr>
+<tr><td colspan="5"><h3>Historie</h3></td></tr>
 <tr><td colspan="4"></td><td>Enthält kürzlich benutzte Suchbegriffe.</td></tr>
-<tr><td colspan="5"><h3>Menü Kodierung</h3></td></tr>
+<tr><td colspan="5"><h3>Kodierung</h3></td></tr>
 <tr><td colspan="4"></td><td>Erlaubt bei Bedarf verschiedene Zeichencodierungen.</td></tr>
 </table>
 </div>

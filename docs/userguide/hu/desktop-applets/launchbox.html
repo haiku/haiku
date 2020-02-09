@@ -45,6 +45,7 @@
 <li><a href="../../sk/desktop-applets/launchbox.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/desktop-applets/launchbox.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sv_SE/desktop-applets/launchbox.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/desktop-applets/launchbox.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../zh_CN/desktop-applets/launchbox.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../ru/desktop-applets/launchbox.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../uk/desktop-applets/launchbox.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
@@ -58,12 +59,13 @@
 
 <div id="content">
 <div>
+<div class="box-info">Az oldal fordítása még folyamatban van. Amíg tart a fordítás, addig a lefordítatlan részek angolul jelennek meg.</div>
 
 <h2><img src="../../images/desktop-applets-images/launchbox-icon_64.png" alt="launchbox-icon_64.png" width="64" height="64" />Indítósáv (LaunchBox)</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Asztalsáv:</td><td style="width:15px;"></td><td><span class="menu">Asztali kisalkalmazások</span></td></tr>
 <tr><td>Útvonal:</td><td></td><td><span class="path">/boot/system/apps/LaunchBox</span></td></tr>
-<tr><td>Bellítások:</td><td></td><td><span class="path">~/config/settings/LaunchBox/*</span></td></tr>
+<tr><td>Beállítások:</td><td></td><td><span class="path">~/config/settings/LaunchBox/*</span></td></tr>
 </table>
 <p>Egy vagy több Indítósávot is elindíthatunk a kedvenc programjaink és dokumentumaink gyorsindítására. Akár az összes munkaasztalon is megjelenhetnek. A program a dokumentumokat a megadott programmal is elindíthatja. Például, ha egy HTML fájlt egy, az Indítósávon lévő szövegszerkesztőre dobunk, akkor a program megnyitja azt a fájlt a szövegszerkesztőben.</p>
 <img src="../images/desktop-applets-images/launchbox.png" alt="launchbox.png" />
@@ -73,19 +75,21 @@
 <tr><td><span class="menu">Gomb kiürítése</span></td><td> </td><td>Egy meglévő gombot kiürít.</td></tr>
 <tr><td><span class="menu">Gomb eltávolítása</span></td><td> </td><td>Eltávolítja a gombot.</td></tr>
 <tr><td><span class="menu">Leírás...</span></td><td> </td><td>Az egeret az ikon felett tartva megjelenik egy kis üzenet a fájl nevével, és program esetében az ahhoz tartozó rövid leírással (további információ a <a href="../filetypes.html#settings-apps">Fájltípusok</a> fejezetben). Ezzel a menüvel személyre szabhatjuk a megjelenő üzenetet.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Beállítások</span><br />
-<span class="menu">- Vízszintes elrendezés</span><br />
-<span class="menu">- Ikonméret</span><br />
-<span class="menu">- Dupla kattintás figyelmen kívül hagyása</span><br />
-<span class="menu">- Ablak keretének mutatása</span><br />
-<span class="menu">- Automatikus előrehozás</span><br />
-<span class="menu">- Megjelenítés az összes munkaasztalon</span></td><td> </td><td class="onelinetop"><br />
-A gombok vízszintesen helyzekednek el.<br />
-Az ikon méretének beállítása 16 és 64 képpont közötti méretre.<br />
-A gombok tartalmának indítása csupán egyszer, akkor is, ha (véletlenül) duplán kattintunk rajta.<br />
-Az ablak keretének megjelenítése.<br />
-Az Indítósáv előugrik, ha az egér a képernyő éle közelébe ér.<br />
-Az Indítósáv az összes munkaasztalon megjelenik.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Settings</span><br />
+<span class="menu">- Horizontal layout</span><br />
+<span class="menu">- Icon size</span><br />
+<span class="menu">- Ignore double-click</span><br />
+<span class="menu">- Show window border</span><br />
+<span class="menu">- Autostart</span><br />
+<span class="menu">- Auto raise</span><br />
+<span class="menu">- Show on all workspaces</span></td><td> </td><td class="onelinetop"><br />
+Aligns the buttons horizontally.<br />
+Sets the icon size between 16 and 64 pixel.<br />
+Launches the object only once, even when you (accidentally) double-click.<br />
+Shows the window border.<br />
+Starts LaunchBox automatically on boot-up.<br />
+LaunchBox pops up if the mouse is near the screen edge.<br />
+Shows the LaunchBox on every workspace.</td></tr>
 <tr><td><span class="menu">Tálca</span><br />
 <span class="menu">- Új</span><br />
 <span class="menu">- Klónozás</span><br />

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -45,6 +45,7 @@
 <li><a href="../../sk/preferences/virtualmemory.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/preferences/virtualmemory.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sv_SE/preferences/virtualmemory.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/preferences/virtualmemory.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../zh_CN/preferences/virtualmemory.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../ru/preferences/virtualmemory.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../uk/preferences/virtualmemory.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
@@ -58,6 +59,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Traducerea acestei pagini nu este completă încă. Până când va fi, părțile incomplete utilizează originalul în limba engleză.</div>
 
 <h2><img src="../../images/prefs-images/virtualmemory-icon_64.png" alt="virtualmemory-icon_64.png" width="64" height="64" />VirtualMemory</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
@@ -68,9 +70,8 @@
 </table>
 <p>Memoria virtuală permite sistemului să schimbe memorie la hard disc, dacă memoria RAM poate fi utilizată mai eficient pentru alte lucruri. Prin urmare, deși aveți multă memorie RAM, furnizarea de memorie virtuală nu e niciodată o idee greșită.</p>
 <img src="../images/prefs-images/virtualmemory.png" alt="virtualmemory.png" />
-<p>Puteți stabili dimensiunea chiar și peste mărimea fizică a memoriei dacă este necesar. Având în vedere hard discurile uriașe de azi, atribuirea mărimii memoriei fizice nu ar trebui să fie o problemă. Oricum, puteți ajusta dimensiunea rapid dacă spațiul liber devine scăzut vreodată. În acest caz ar trebui de asemenea să vă uitați la <a href="../applications/diskusage.html">DiskUsage</a> pentru a determina sursa care ocupă spațiul pe disc.</p>
-<p>De obicei fișierul swap este scris pe partiția de boot. Dacă întâmpinați vreodată avertismente ale discului din cauza sistemului de memorie virtuală care schimbă memorie, puteți încerca să utilizați un hard disc separat pentru fișierul swap. Doar o partiție pe același hard disc cu sistemul/datele nu va ajuta.<br />
-Desigur că actualizarea memoriei RAM este cel mai eficient mod de a rezolva...</p>
+<p>Normally, the swap file is written to the boot partition. If you're running low on free memory there, you can deactivate the <span class="menu">Automatic swap management</span> and choose another mounted partition from the popup menu. The swap file size is set with the slider below.<br />
+If you often run into disk thrashing due to the virtual memory system swapping memory in and out, you can try to use a separate harddisk for you swap file to avoid I/O congestion. Simply another partition on the same harddisk with your system/data won't help. Upgrading your RAM is of course the most effective way to go...</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="button">Implicit</span></td><td> </td><td>resetează totul la valorile implicite.</td></tr>
 <tr><td><span class="button">Revenire</span></td><td> </td><td>aduce înapoi configurările care au fost active când ați pornit preferințele VirtualMemory.</td></tr>

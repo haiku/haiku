@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Fabio Tomat
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Installer</title>
+	<title>Instaladôr</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
@@ -43,6 +45,7 @@
 <li><a href="../../sk/applications/installer.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/applications/installer.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sv_SE/applications/installer.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/applications/installer.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../zh_CN/applications/installer.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../ru/applications/installer.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../uk/applications/installer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
@@ -57,36 +60,35 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/apps-images/installer-icon_64.png" alt="installer-icon_64.png" width="64" height="64" />Installer</h2>
+<h2><img src="../../images/apps-images/installer-icon_64.png" alt="installer-icon_64.png" width="64" height="64" />Instaladôr</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
 <tr><td>Posizion:</td><td></td><td><span class="path">/boot/system/apps/Installer</span></td></tr>
-<tr><td>Impostazions:</td><td></td><td><i>none</i></td></tr>
+<tr><td>Impostazions:</td><td></td><td><i>nissune</i></td></tr>
 </table>
 <p><br /></p>
-<p>The Installer is used to copy Haiku onto another volume.<br />
-Upon launch it displays a start window with important information. It's not a mindless EULA you're used to click away in the blink of an eye, it states:</p>
+<p>L'instaladôr al ven doprât par copiâ Haiku suntu altri volum.<br />
+Cuant che lu si invie, al mostre un barcon di inizi cun informazions impuartantis. No je une EULA cence sens, come che tu sês abituât a viodi e a fâ il clic necessari par parâle vie intun bati di cee, e declare che:</p>
 <ul>
-<li><p>This is beta-quality software. Make backups or suffer the consequences!</p></li>
-<li><p>The Installer needs a prepared partition. You can use <a href="drivesetup.html">DriveSetup</a> to create and format a partition, but cannot yet resize existing partitions. For that you'll have to use a <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> or a similar tool for now.</p></li>
-<li>Haiku can be added manually to the bootmanager <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>. How that is done exactly is available as an <a href="http://www.haiku-os.org/get-haiku/installation-guide">online guide</a>.</li>
+<li><p>Chest al è software di cualitât beta. Fâs copiis di  backup o tu patirâs lis consecuencis!</p></li>
+<li><p>L'instaladôr al à bisugne di une partizion preparade. Tu puedis doprâ <a href="drivesetup.html">Gjestion disc</a> par creâ e formatâ une partizion, ma ancjemò no ridimensionâ  partizions esistentis. Par chest lavôr tu scugnis doprâ un <a href="http://gparted.sourceforge.net/livecd.php">CD Live di GParted</a> o un strument simil, pal moment.</p></li>
+<li>Haiku al pues jessi zontât a man sul gjestôr di inviament <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>. La maniere esate par fâlu e je disponibile te <a href="http://www.haiku-os.org/get-haiku/installation-guide">vuide in rêt</a>.</li>
 </ul>
 <p><br /><br /></p>
-<p>Once you acknowledged with <span class="button">Continue</span>, you're presented with the main window:</p>
+<p>Une volte che tu âs acetât cun <span class="button">Continue</span>, ti si presente il barcon principâl:</p>
 <img src="../images/apps-images/installer.png" alt="installer.png" />
-<p>In the first pop-up menu you choose the source for the installation. It can be a currently installed Haiku or can come from an install CD or USB drive, etc.<br />
-The second pop-up menu specifies the target for the installation. This target partition/volume will be completely overwritten and has to be set aside beforehand by a partitioning tool like GParted.</p>
-<p>Clicking the little expander widget will <i>Show optional packages</i>, if available, that you can choose to install in addition to the basic Haiku.</p>
-<p>You should do a last check if you really picked the right target before starting the installation process. Click on <span class="button">Setup partitions...</span> to open <a href="drivesetup.html">DriveSetup</a> and have a look at the naming and layout of the available volumes and partitions.</p>
-<p><span class="button">Begin</span> starts the installation procedure, which basically copies the <span class="path">/home/</span> and <span class="path">/system/</span> folder onto the target volume and makes it bootable.</p>
+<p>Tal prin menù a tende tu puedis sielzi la sorzint di instalazion. E pues jessi la instalazion atuâl di Haiku o e pues rivâ di un CD di instalazion o une unitât USB, e vie indenant.<br />
+Il secont menù a tende al specifiche la destinazion de instalazion. Cheste partizion/volum di destinazion a vignarà sorescrite dal dut e e à di sei preparade in anticip cuntun strument di partizionament come GParted.</p>
+<p>Fasint clic sul piçul widget par pandi <i>Mostre pachets opzionâi</i>, se disponibii, tu podarâs sielzi di instalâ pachets adizionâi al sisteme Haiku di base.</p>
+<p>Tu varessis di fâ un ultin control se tu âs sielt la juste destinazion prime di tacâ il procès di instalazion. Fâs clic su <span class="button">Configure partizions...</span> par vierzi <a href="drivesetup.html">Gjestion disc</a> e vê une viodude sui nons e la disposizion dai volums e des partizions disponibii.</p>
+<p><span class="button">Scomence</span> al tache la procedure di instalazion, che di fonde al copie lis cartelis <span class="path">/home/</span> e <span class="path">/system/</span> sul volum di destinazion e lu rint inviabil.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="tools" name="tools">Tools</a></h2>
-<p>At the end of the installation procedure, the partition is automatically made bootable. However, it can happen that some other operating system or partitioning tool (accidentally) overwrites the boot sector of your Haiku volume. In this case, boot your installation CD and start the Installer. Select your Haiku boot partition from the <span class="menu">Onto: Please choose target</span> menu and select <span class="menu">Write boot sector</span> from the <span class="menu">Tools</span> menu to make it bootable again.</p>
-<p>The other item in the <span class="menu">Tools</span> menu is used to <span class="menu">Set up a boot menu</span> that puts a menu in the boot sector to choose what operating system to boot. See topic <a href="bootmanager.html">BootManager</a> for more information.<br />
- You don't need to run the <span class="app">BootManager</span> if you already use a bootmanager like GRUB, in which case you have to add Haiku manually (see above), or Haiku runs exclusively on your machine.</p>
+<a id="tools" name="tools">Struments</a></h2>
+<p>Ae fin de procedure di instalazion, la partizion e ven rindude inviabil in automatic. Dut câs, al pues sucedi che cualchi altri sisteme operatîf o strument di partizionament (par erôr) al sorescrivi il setôr di inviament dal to volum di Haiku. In chest câs, invie il to CD di instalazion e fâs partî l'Instaladôr. Selezione la partizion di inviament di Haiku dal menù <span class="menu">Su : Sielç la destinazion</span> e selezione <span class="menu">Scrîf setôr di inviament</span> dal menù <span class="menu">Struments</span> par rindilu di gnûf inviabil.</p>
+<p>L'altri element tal menù <span class="menu">Struments</span> al <span class="menu">Configure il menù di inviament</span>, chest al met un menù tal setôr di inviament cussì di podê sielzi cuâl sisteme operatîf inviâ. Viôt l'argoment <a href="bootmanager.html">BootManager (Gjestôr di inviament)</a> par vê plui informazions.<br />
+ Nol covente eseguî il <span class="app">Gjestôr di inviament</span> se tu dopris za un gjestôr di inviament come GRUB, in chel câs tu âs di zontâ Haiku a man (viôt parsore) opûr te to machine al zirarà dome Haiku.</p>
 
 
 </div>

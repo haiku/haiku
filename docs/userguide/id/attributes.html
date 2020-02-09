@@ -9,19 +9,21 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		mazbrili abu ibrahim
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Attributes</title>
+	<title>Atribut</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Panduan pengguna</span></div>
 </div>
 
 <div class="nav">
@@ -43,6 +45,7 @@
 <li><a href="../sk/attributes.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../fi/attributes.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../sv_SE/attributes.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../tr/attributes.html"><img src="../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../zh_CN/attributes.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../ru/attributes.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../uk/attributes.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
@@ -50,7 +53,7 @@
 </ul>
 <span>
  «  <a href="filetypes.html">Filetypes</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Daftar Isi</a> 
 ::  <a href="index.html">Indeks</a>  »
 </span></div>
 </div>
@@ -59,35 +62,35 @@
 <div>
 <div class="box-info">Terjemahan halaman ini belum lengkap. Sampai saat itu, bagian yang belum selesai menggunakan aslinya bahasa Inggris.</div>
 
-<h1>Attributes</h1>
+<h1>Atribut</h1>
 
-<p>Attributes are data fields that belong to a file but aren't part of that file, e.g. they are not computed into the file size and can be copied or changed without touching the file itself. The system uses these attributes to store e.g. file size, file type or date of the last modification. This is similar to other operating systems and their filesystems.</p>
-<p>What's different is that you can add any kind of attribute to any file and display it or make it editable in a Tracker window. You just have to define the kind of attribute you want to add to a file type (e.g. string, integer or time) and give it a name and description.</p>
-<p>The file itself doesn't even need any contents at all. Take a look at these People files for example:</p>
+<p>Atribut adalah bidang data yang dimiliki file tetapi bukan bagian dari file itu, mis. mereka tidak dihitung ke dalam ukuran file dan dapat disalin atau diubah tanpa menyentuh file itu sendiri. Sistem menggunakan atribut ini untuk menyimpan mis. ukuran file, tipe file atau tanggal modifikasi terakhir. Ini mirip dengan sistem operasi lain dan sistem file mereka.</p>
+<p>Yang berbeda adalah bahwa Anda dapat menambahkan segala jenis atribut ke file apa pun dan menampilkannya atau membuatnya dapat diedit di jendela Tracker. Anda hanya perlu mendefinisikan jenis atribut yang ingin Anda tambahkan ke jenis file (mis. String, integer atau waktu) dan berikan nama dan deskripsi.</p>
+<p>File itu sendiri bahkan tidak memerlukan konten sama sekali. Lihatlah file Orang-orang ini misalnya:</p>
 <img src="images/attributes-images/people.png" alt="people.png" />
 <br />
-<p>As you can see, these are all 0-sized files with attached attributes, the E-mail attribute of "John Nox" being edited right in Tracker.</p>
-<p>If you index these attributes, as People, Email or audio files are by default, they are also searchable with Haiku's fast query system.</p>
+<p>Seperti yang Anda lihat, ini semua file berukuran 0 dengan atribut yang dilampirkan, atribut Email "John Nox" sedang diedit langsung di Tracker.</p>
+<p>Jika Anda mengindeks atribut ini, karena Orang, Email atau file audio secara default, mereka juga dapat dicari dengan sistem kueri cepat Haiku.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="attributes-tracker" name="attributes-tracker">Attributes in Tracker</a></h2>
-<p>Attributes are displayed quite similar to a database or spreadsheet. Using Tracker you can choose which attributes to display (columns) and sort file listings (rows) accordingly.</p>
-<p>To do this, open a Tracker window, click on the <span class="menu">Attributes</span> menu, and select the attributes you want to display. Alternatively, simply right-click onto a column heading and mark the items in the context menu. You can rearrange the columns by a simple drag &amp; drop of the column heading. Moving a column out of a window, is a fast way to get rid of columns you don't need.</p>
-<p>Double-click on the line between two attributes in the heading to automatically resize a column to its optimal width.</p>
-<p>Click on a column heading to toggle the sorting order from ascending to descending. You can establish a secondary sort order by pressing the <span class="key">SHIFT</span> key while clicking on a column heading. You can sort your People files by company and within that order sort by contact name, for instance. See the above screenshot as an example. The secondary sort order is marked by a lighter colored indicator beside the heading.</p>
-<p>Editing these attributes is as simple as renaming a file: Either click on an entry or press <span class="key">ALT</span> <span class="key">E</span> and move between the attributes with <span class="key">TAB</span> and <span class="key">SHIFT</span> <span class="key">TAB</span>. <span class="key">ESC</span> leaves the editing mode without applying the changes.</p>
+<a id="attributes-tracker" name="attributes-tracker">Atribut di Tracker</a></h2>
+<p>Atribut yang ditampilkan sangat mirip dengan database atau spreadsheet. Menggunakan Tracker Anda dapat memilih atribut mana yang akan ditampilkan (kolom) dan mengurutkan daftar file (baris) yang sesuai.</p>
+<p>To do this, open a Tracker window, click on the <span class="menu">Attributes</span> menu, menu, dan pilih atribut yang ingin Anda tampilkan. Atau, cukup klik kanan ke judul kolom dan tandai item dalam konteks menu. Anda dapat mengatur ulang kolom dengan drag &amp; drop sederhana dari judul kolom. Memindahkan kolom dari jendela, adalah cara cepat untuk menghilangkan kolom yang tidak Anda butuhkan.</p>
+<p>Klik dua kali pada garis di antara dua atribut dalam heading untuk secara otomatis mengubah ukuran kolom ke lebar optimalnya.</p>
+<p>Klik pada judul kolom untuk beralih urutan penyortiran dari naik ke turun. Anda dapat membuat urutan pengurutan sekunder dengan menekan <span class="key">SHIFT</span> key while clicking on a column heading. You can sort your People files by company and within that order sort by contact name, for instance. See the above screenshot as an example. The secondary sort order is marked by a lighter colored indicator beside the heading.</p>
+<p>Mengedit atribut ini semudah mengganti nama file: Entah klik pada entri atau tekan <span class="key">ALT</span> <span class="key">E</span> dan pindahkan diantara atribut dengan <span class="key">TAB</span> dan <span class="key">SHIFT</span> <span class="key">TAB</span>. <span class="key">ESC</span> meninggalkan mode sunting tanpa menyimpan perubahan.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="attributes-terminal" name="attributes-terminal">Attributes in Terminal</a></h2>
-<p>If you prefer to use the commandline or plan to work with many files using scripting, there are several commands for controlling attributes from Terminal.</p>
+<a id="attributes-terminal" name="attributes-terminal">Attribut di Terminal</a></h2>
+<p>Jika Anda lebih suka menggunakan baris perintah atau berencana untuk bekerja dengan banyak file menggunakan skrip, ada beberapa perintah untuk mengendalikan atribut dari Terminal.</p>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="listattr" name="listattr">listattr</a></h3>
-<p><span class="cli">listattr</span> lists a file's attributes, but doesn't show the contents of the attributes.</p>
-<pre>usage: listattr 'filename' ['filename' ...]</pre>
-<p>From our screenshot example above:</p>
+<p><span class="cli">listattr</span> mengeluarkan daftar atribut file, tetapi tidak menunjukkan konten atribut.</p>
+<pre>penggunaan: listattr 'filename' ['filename' ...]</pre>
+<p>Dari contoh tangkapan layar kami di atas:</p>
 <pre class="terminal"> ~/people -&gt;listattr Clara\ Botters
 File: Clara Botters
    Type         Size                 Name
@@ -131,7 +134,7 @@ Clara Botters : string : Whelton</pre>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="addattr" name="addattr">addattr</a></h3>
-<p><span class="cli">addattr</span> adds an attribute to a file and/or fills it with a value.</p>
+<p><span class="cli">addattr</span> menambahkan atribut ke file dan / atau mengisinya dengan nilai.</p>
 <pre>usage: addattr [-t type] attr value file1 [file2...]
     or: addattr [-f value-from-file] [-t type] attr file1 [file2...]
  
@@ -139,7 +142,7 @@ Clara Botters : string : Whelton</pre>
                  string, mime, int, llong, float, double, bool, icon, raw
                  or a numeric value (ie. 0x1234, 42, 'ABCD', ...)
          The default is "string"</pre>
-<p>So, say dear Clara took a job with the multi-national Barkelbaer Inc., you fill the formerly empty "Company" attribute with that data (which is of type "string"):</p>
+<p>Jadi, katakanlah Clara mengambil pekerjaan dengan perusahaan multi-nasional Barkelbaer Inc., Anda mengisi atribut "Perusahaan" yang sebelumnya kosong dengan data itu (yang bertipe "string"):</p>
 <pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre>
 
 <h3>
@@ -157,12 +160,12 @@ Clara Botters : string : Whelton</pre>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="copyattr" name="copyattr">copyattr</a></h3>
 <p><span class="cli">copyattr</span> copies attributes from one or more files to another. By default, the actual contents of the file is <b>not</b> copied.</p>
-<pre>Usage: copyattr &lt;options&gt; &lt;source&gt; [ ... ] &lt;destination&gt;</pre>
+<pre>Penggunaan: copyattr &lt;opsi&gt; &lt;sumber&gt; [ ... ] &lt;tujuan&gt;</pre>
 
-<p>If you do want to copy the attributes plus the data of the file itself, you can add the option "<span class="cli">-d</span>" or "<span class="cli">--data</span>".</p>
+<p>Jika Anda ingin menyalin atribut plus data file itu sendiri, Anda dapat menambahkan opsi "<span class="cli">-d</span>" atau "<span class="cli">--data</span>".</p>
 
 <p><br /></p>
-<p>More information on these commands and their options can be found by typing the command name followed by "<span class="cli">-h</span>" or "<span class="cli">--help</span>".</p>
+<p>Informasi lebih lanjut tentang perintah-perintah ini dan opsinya dapat ditemukan dengan mengetikkan nama perintah diikuti oleh "<span class="cli">-h</span>" atau "<span class="cli">--help</span>".</p>
 
 </div>
 </div>
@@ -170,7 +173,7 @@ Clara Botters : string : Whelton</pre>
 <div class="nav">
 <div class="inner"><span>
  «  <a href="filetypes.html">Filetypes</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Daftar Isi</a> 
 ::  <a href="index.html">Indeks</a>  »
 </span></div>
 </div>

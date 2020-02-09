@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -45,6 +45,7 @@
 <li><a href="../../sk/applications/textsearch.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/applications/textsearch.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sv_SE/applications/textsearch.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/applications/textsearch.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../zh_CN/applications/textsearch.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../ru/applications/textsearch.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../uk/applications/textsearch.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
@@ -59,12 +60,13 @@
 
 <div id="content">
 <div>
+<div class="box-info">Az oldal fordítása még folyamatban van. Amíg tart a fordítás, addig a lefordítatlan részek angolul jelennek meg.</div>
 
 <h2><img src="../../images/apps-images/textsearch-icon_64.png" alt="textsearch-icon_64.png" width="64" height="64" />Szövegkeresés (TextSearch)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Asztalsáv:</td><td style="width:15px;"></td><td><i>Nincs. Nyomkövető kiegészítőként indítható.</i></td></tr>
 <tr><td>Útvonal:</td><td></td><td><span class="path">/boot/system/apps/TextSearch</span></td></tr>
-<tr><td>Bellítások:</td><td></td><td><span class="path">~/config/settings/TextSearch</span></td></tr>
+<tr><td>Beállítások:</td><td></td><td><span class="path">~/config/settings/TextSearch</span></td></tr>
 </table>
 <p><br /></p>
 <p>Ez a program szöveges fájlokban való keresgélésre szolgál. Elsődlegesen a <a href="../tracker-add-ons.html">Nyomkövető kiegészítők</a> listából indítható a kiválasztott fájlon vagy mappán, ahol keresni szeretnénk.</p>
@@ -78,16 +80,17 @@
 <tr><td colspan="5"><h3>Fájl menü</h3></td></tr>
 <tr><td class="onelinetop"><span class="menu">Új ablak</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Új ablakot nyit meg, ahol új keresést indíthatunk ugyan abban a fájlba vagy mappában.
 </td></tr>
-<tr><td><span class="menu">Cél megadása...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Új fájlok illetve mappák megadása ahol keresni szeretnénk.</td></tr>
+<tr><td><span class="menu">Cél megadása...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Lets you choose a new set of files and folders to search through. Alternatively you can drag and drop files/folders into the window.</td></tr>
 <tr><td colspan="5"><h3>Műveletek menü</h3></td></tr>
 <tr><td><span class="menu">Kijelölés kivágása</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Az összes bejegyzés elávolítása a listából ami nincs kijelölve.</td></tr>
 <tr><td><span class="menu">Kijelölés megnyitása</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>A kijelölt fájl megnyitása a hozzá társított programmal (ugyan úgy, mint dupla-kattintásskor). Ha egy szövegszerkesztő (például a Pe) lehetőséget nyújt rá, akkor megnyitáskor a program automatikusan arra a sorra ugrik a fájlban, ahol megtalálta a keresett szöveget.</td></tr>
-<tr><td><span class="menu">Fájlok megjelenítése a Nyomkövetőben</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>A kijelölt fájl megnyitása a Nyomkövetőben.</td></tr>
+<tr><td><span class="menu">Show files in Tracker</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>A kijelölt fájl megnyitása a Nyomkövetőben.</td></tr>
 <tr><td class="onelinetop"><span class="menu">Szöveg másolása a vágólapra</span></td><td></td><td><span class="key">ALT</span> <span class="key">B</span></td><td></td><td>A jelenleg kijelölt szöveget a vágólapra másolja.</td></tr>
 <tr><td colspan="5"><h3>Beállítások menü</h3></td></tr>
 <tr><td colspan="3" class="onelinetop"><span class="menu">Ponttal kezdődő mappák átugrása</span></td><td> </td><td>Ez akkor lehet hasznos, ha "unix-szerű" környezetben dolgozunk, ahol gyakran a fontos fájlok egy rejtett mappában (<tt>.mappa/</tt>) találhatóak. A forráskód-kezelő rendszerek, mint például az SVN és CVS, és a Haiku esetén is találkozhatunk ilyennel.</td></tr>
-<tr><td colspan="3"><span class="menu">Keresési szöveg kihagyása</span></td><td> </td><td>A program egy másik parancssori programot használ, a <span class="cli">grep</span>-et. Ehhez a speciális karaktereket, mint például <tt>'"*\\$?!</tt> és a szóközt külön fogja jelölni a <tt>\\</tt> jellel. Ennek a kikapcsolása annyit tesz, hogy ezt kézzel kell megadni, de lehetőségünk van az <a href="http://hu.wikipedia.org/wiki/Regul%C3%A1ris_kifejez%C3%A9s" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">általános kifejezések</a> használatára is.</td></tr>
+<tr><td colspan="3"><span class="menu">Regular expression</span></td><td> </td><td>TextSearch uses the command line tool <span class="cli">grep</span>. For it, special characters like <tt>'"*\$?!</tt> and spaces have to be escaped with a <tt>\</tt>. Activating this setting means you have to do this yourself, but in exchange grants you the power of <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">regular expressions</a>.</td></tr>
 <tr><td colspan="3"><span class="menu">Csak szövegfájlokban</span></td><td> </td><td>Jelenleg a program csak a szöveges fájlokban való kereséskor hatékony. Ez az opció kikapcsolása esetén a program az összes típusú fájlban fog keresést végezni.</td></tr>
+<tr><td colspan="3"><span class="menu">Open files in code editor</span></td><td> </td><td>Forces files to be opened in the preferred code editor (that handles text/x-source-code). Otherwise a file will be opened in whatever app is set for its filetype. Useful, for example, when editing HTML files that normally would open in your browser.</td></tr>
 <tr><td colspan="5"><h3>Előzmények menü</h3></td></tr>
 <tr><td colspan="4"></td><td>Ez előzőleg használt keresési beállítások.</td></tr>
 <tr><td colspan="5"><h3>Kódolás menü</h3></td></tr>

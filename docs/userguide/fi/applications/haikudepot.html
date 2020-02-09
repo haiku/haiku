@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2013-2018 Haiku. All rights reserved.
+ * Copyright 2013-2019 Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -45,6 +45,7 @@
 <li><a href="../../ro/applications/haikudepot.html"><img src="../../images/flags/ro.png" alt="" />Română</a></li>
 <li><a href="../../sk/applications/haikudepot.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../sv_SE/applications/haikudepot.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/applications/haikudepot.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../zh_CN/applications/haikudepot.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../ru/applications/haikudepot.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../uk/applications/haikudepot.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
@@ -79,19 +80,18 @@
 <span class="path">~/config/cache/HaikuDepot/</span> - Välimuistissa olevat kuvakkeet, kuvakaappaukset, kuvaukset jne.</td></tr>
 </table>
 <p><br /></p>
-<p>HaikuVarasto on keskeinen sovellus ohjelmistopakkaustesi hallintaan. Sovelluksella voit selata ja etsiä tietovarastoja sekä asentaa, päivittää ja poistaa pakkauksia. HaikuVarasto alkaa <i>Viralliset pakkaukset</i>-luettelolla, jossa on ohjelmistoja, jotka tuntuvat kiinnostavan monia käyttäjiä.</p>
+<p>HaikuVarasto on keskeinen sovellus ohjelmistopakkaustesi hallintaan. Sovelluksella voit selata ja etsiä tietovarastoja sekä asentaa, päivittää ja poistaa pakkauksia. HaikuVarasto alkaa <i>Jakeluversiopakkaukset</i>-luettelolla, jossa on ohjelmistoja, jotka tuntuvat kiinnostavan monia käyttäjiä.</p>
 <img src="../images/apps-images/haikudepot.png" alt="haikudepot.png" />
-<p>Kun <span class="menu">Näytä vain viralliset pakkaukset</span>-valintaruutu ei ole aktivoituna, näytetään kaikki saatavilla olevat pakkaukset ja näyttö vaihtaa pienempiin kuvakkeisiin ja sarakkeisiin, joissa on lisätietoa:</p>
+<p>Toinen välilehti näyttää <span class="menu">Kaikki pakkaukset</span>, näyttöön vaihtuu pienempi kuvake ja lisätiedot järjestetään sarakkeisiin:</p>
 <img src="../images/apps-images/haikudepot_all.png" alt="haikudepot.png" />
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="filter" name="filter">Suodatin</a></h2>
 <p>Ylimpänä löydämme muutamia keinoja suodattaa allapuolella näkyvien saatavilla olevien pakkausten luetteloa:</p>
 <ul>
-<li><p><span class="menu">Luokka</span> ponnahdusvalikko sallii sinun rajoittaa luettelon yksittäisiksi luokiksi kuten "<i>Audio</i>" tai "<i>Pelit</i>".</p></li>
-<li><p><span class="menu">Etsintätermit</span>-tekstikenttäsuodattimet sitten luetteloivat ne pakkaukset, jotka on kirjoitettu (välilyönneillä eroteltuina) merkkijonoina niiden nimissä tai kuvauksissa.</p></li>
-<li><p>Valintaruutu <span class="menu">Näytä vain viralliset pakkaukset</span> voidaan aktivoida tulosten lisäsuodattamiseen valitussa luokassa tai kirjoitetussa hakutermissä.</p></li>
-<li><p>Valikkopalkin <span class="menu">Tietovarasto</span>-valikko määrittää, mitkä verkkovarastot kysellään. ("<i>Paikallinen</i>")-pakkaukset ovat niitä, jotka on asennettu jostain muualta kuin verkkotietovarastosta: ehkä USB-tikulta tai joltain webbisivulta ladatut tai pakkaukset, jotka olet rakentanut itse.</p></li>
+<li><p><span class="menu">Luokka</span>-ponnahdusvalikko sallii sinun rajoittaa luettelon yksittäisiksi luokiksi kuten "<i>Audio</i>" tai "<i>Pelit</i>".</p></li>
+<li><p><span class="menu">Hakusanat</span>-tekstikenttäsuodattimet luetteloivat ne pakkaukset, jotka on kirjoitettu (välilyönneillä eroteltuina) merkkijonoina niminä tai kuvauksina.</p></li>
+<li><p>Valikkopalkin <span class="menu">Tietovarastot</span>-valikko määrittää, mitkä verkkovarastot kysellään. "<i>Paikallinen</i>"-pakkaukset ovat niitä, jotka on asennettu jostain muualta kuin verkkotietovarastosta; ehkä USB-tikulta tai joltain webbisivulta ladatut tai pakkaukset, jotka olet rakentanut itse.</p></li>
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -143,7 +143,8 @@ Keskellä on käyttäjäkommentteja käyttäjätunnuksilla, heidän antamiensa t
 <ul><li>käytettävä käyttäjätunnusta, joka koostuu pienistä kirjaimista ilman erikoismerkkejä (äöå)</li>
 <li>käytettävä salasanaa, jossa on vähintään 8 merkkiä, joista vähintään 2 on suuria kirjaimia ja 2 numeroita</li>
 <li>tarjottava sähköpostiosoite (jos haluat uuden salasana lähetettäväksi siinä tapauksessa että unohdat sen)</li>
-<li>ratkaistava captcha-kuva-arvoitus</li></ul>
+<li>ratkaistava captcha-kuva-arvoitus</li>
+<li>napsauta valintoja vahvistaaksesi, että olet yli 16-vuotias ja olet lukenut alapuolella linkitetyt käyttöehdot.</li></ul>
 <p>Kirjautumisen jälkeen HaikuVaraston valikon yläoikealla lukee <span class="menu">Kirjautuneena tunnuksella (...)</span>, mikä näyttää käyttäjätunnuksesi. Valikko tarjoaa nyt sinulle <span class="menu">Vaihda tiliä...</span> tai <span class="menu">Kirjaudu ulos</span>.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>

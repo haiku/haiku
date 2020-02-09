@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -45,6 +45,7 @@
 <li><a href="../../sk/preferences/virtualmemory.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/preferences/virtualmemory.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sv_SE/preferences/virtualmemory.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/preferences/virtualmemory.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../zh_CN/preferences/virtualmemory.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../ru/preferences/virtualmemory.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../uk/preferences/virtualmemory.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
@@ -58,6 +59,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Cette page n'est pas encore entièrement traduite. Les parties non encore traduites seront en anglais.</div>
 
 <h2><img src="../../images/prefs-images/virtualmemory-icon_64.png" alt="virtualmemory-icon_64.png" width="64" height="64" />VirtualMemory (Mémoire virtuelle)</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
@@ -68,9 +70,8 @@
 </table>
 <p>La mémoire virtuelle permet au système de placer une partie de l'espace mémoire des applications sur le disque dur, si la RAM peut être utilisée pour d'autres tâches plus utiles. Même si vous avez beaucoup de RAM, activer la mémoire virtuelle n'est jamais une mauvaise idée.</p>
 <img src="../images/prefs-images/virtualmemory.png" alt="virtualmemory.png" />
-<p>Les disques durs actuels fournissant beaucoup d'espace, vous devriez pouvoir au moins allouer une taille de mémoire virtuelle égale à celle de la mémoire physique, ou d'avantage. Néanmoins, vous pouvez aussi baisser cette taille si l'espace libre sur votre disque dur devient faible. Dans ce cas, vous pouvez utiliser <a href="../applications/diskusage.html">DiskUsage</a> pour trouver ce qui consomme votre espace disque.</p>
-<p>En temps normal, le fichier d'échange (qui contient la mémoire virtuelle) est écrit sur la partition de démarrage. Les opérations de lecture/écriture sur le disque dur concerné seront ralenties lorsque le système utilisera la mémoire virtuelle. Si vous rencontrez des problèmes, vous pouvez essayer d'utiliser une partition sur un autre disque dur pour la mémoire virtuelle. Utiliser une autre partition du disque dur de démarrage ne suffira pas.<br />
-Augmenter la quantité de RAM de votre ordinateur sera bien sûr plus efficace…</p>
+<p>Normally, the swap file is written to the boot partition. If you're running low on free memory there, you can deactivate the <span class="menu">Automatic swap management</span> and choose another mounted partition from the popup menu. The swap file size is set with the slider below.<br />
+If you often run into disk thrashing due to the virtual memory system swapping memory in and out, you can try to use a separate harddisk for you swap file to avoid I/O congestion. Simply another partition on the same harddisk with your system/data won't help. Upgrading your RAM is of course the most effective way to go...</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="button">Defaults</span></td><td> </td><td>réinitialise toutes les réglages.</td></tr>
 <tr><td><span class="button">Revert</span></td><td> </td><td>rétablit les réglages qui étaient actifs quand vous avez démarré les préférences VirtualMemory.</td></tr>

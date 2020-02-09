@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -47,6 +47,7 @@
 <li><a href="../../sk/preferences/virtualmemory.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/preferences/virtualmemory.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sv_SE/preferences/virtualmemory.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/preferences/virtualmemory.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../zh_CN/preferences/virtualmemory.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../ru/preferences/virtualmemory.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../uk/preferences/virtualmemory.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
@@ -60,21 +61,19 @@
 <div id="content">
 <div>
 
-<h2><img src="../../images/prefs-images/virtualmemory-icon_64.png" alt="virtualmemory-icon_64.png" width="64" height="64" />仮想メモリ (VirtualMemory)</h2>
+<h2><img src="../../images/prefs-images/virtualmemory-icon_64.png" alt="virtualmemory-icon_64.png" width="64" height="64" />仮想メモリー (VirtualMemory)</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
 <tr><td>場所:</td><td></td><td><span class="path">/boot/system/preferences/VirtualMemory</span></td></tr>
 <tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/kernel/drivers/virtual_memory</span><br />
 <span class="path">~/config/settings/VM_data</span> - ここに設定が保存されます。</td></tr>
 </table>
-<p>仮想メモリを設定すると、メモリが不足している場合にハードディスクにスワッピングできます。<br />RAM が大量に使用できる場合は、仮想メモリを設定する必要はないでしょう。</p>
+<p>仮想メモリーを設定すると、メモリーが不足している場合にハードディスクにスワッピングできます。<br />RAM が大量に使用できる場合は、仮想メモリーを設定する必要はないでしょう。</p>
 <img src="../images/prefs-images/virtualmemory.png" alt="virtualmemory.png" />
-<p>必要に応じて、物理メモリより大きいサイズさえ設定できます。現在の巨大なハードディスクでは、物理メモリのサイズを割り当てても問題ないでしょう。空き領域が少なくなってきたなら、すぐに割り当て量を調節できます。その場合は、<a href="../applications/diskusage.html">DiskUsage</a> で、なにがハードディスクの容量を消費しているかを確認すると良いでしょう。</p>
-<p>通常はブートパーティションにスワップファイルが書きこまれます。スワップインやスワップアウトによってハードディスクがたびたびスラッシング状態に陥ってしまうなら、スワップファイル用に別のハードディスクを使うこともできます。同じディスクにパーティションを作成してそこをスワップに使用しても、状態は改善されません。<br />
-RAM の量を増やすのが一番有効な方法であることをお忘れなく。</p>
+<p>通常はブートパーティションにスワップファイルが書きこまれます。そこで空きメモリーが少ない状態が続くなら、<span class="menu">自動スワップファイル管理 (Automatic swap management)</span> を無効にして、ポップアップメニューから別のマウントされたパーティションを選択できます。スワップファイルのサイズは下のスライダーで設定します。<br />スワップインやスワップアウトによってたびたびディスクスラッシングに陥ってしまうなら、スワップファイル用に別のハードディスクを使って I/O の混雑を避けることができます。単純に、システム/データと同じハードディスク上の別のパーティションを使っては、状態は改善されません。もちろん、RAM を増やすのが一番有効な行うべき方法です…</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="button">デフォルト (Defaults)</span></td><td> </td><td>すべてをデフォルト値にリセット。</td></tr>
-<tr><td><span class="button">元に戻す (Revert)</span></td><td> </td><td>仮想メモリが起動されたときの設定に戻します。</td></tr>
+<tr><td><span class="button">元に戻す (Revert)</span></td><td> </td><td>仮想メモリーが起動されたときの設定に戻します。</td></tr>
 </table>
 
 </div>

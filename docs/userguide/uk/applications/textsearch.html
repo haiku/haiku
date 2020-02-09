@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -46,6 +46,7 @@
 <li><a href="../../sk/applications/textsearch.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/applications/textsearch.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sv_SE/applications/textsearch.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/applications/textsearch.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../zh_CN/applications/textsearch.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../ru/applications/textsearch.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../jp/applications/textsearch.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
@@ -59,6 +60,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Переклад даної сторінки ще неповний. Допоки це так, незавершені частини користайте у англійському варіанті. </div>
 
 <h2><img src="../../images/apps-images/textsearch-icon_64.png" alt="textsearch-icon_64.png" width="64" height="64" />Пошук тексту (TextSearch)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -78,17 +80,18 @@
 <tr><td colspan="5"><h3>Меню Файл (File)</h3></td></tr>
 <tr><td class="onelinetop"><span class="menu">Нове вікно (New window)</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Відкриває нове вікно, в якому можна ввести інший рядок для пошуку серед тих самих файлів / тек.
 </td></tr>
-<tr><td><span class="menu">Встановити мету... (Set target...)</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Дозволяє вибрати новий набір файлів і тек для пошуку.</td></tr>
+<tr><td><span class="menu">Встановити мету... (Set target...)</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Lets you choose a new set of files and folders to search through. Alternatively you can drag and drop files/folders into the window.</td></tr>
 <tr><td colspan="5"><h3>Меню Дія (Action)
 </h3></td></tr>
 <tr><td><span class="menu">Урізати вибір (Trim selection)</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Видаляє всі записи зі списку, які не вибрані в даний момент.</td></tr>
 <tr><td><span class="menu">Почати вибір (Open selection)</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>Відкриває вибрані файли у бажаному додатку (так само як при двокліку мишкою). Якщо це текстовий редактор, що підтримує таке (як от Pe), Ви можете перейти до точної стрічки що була задана у рядку пошуку.</td></tr>
-<tr><td><span class="menu">Відкрити файли у Tracker'і (Open files in Tracker)</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Відкриє розташування поточно вибраних файлів у Tracker'і.</td></tr>
+<tr><td><span class="menu">Show files in Tracker</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Відкриє розташування поточно вибраних файлів у Tracker'і.</td></tr>
 <tr><td class="onelinetop"><span class="menu">Копіювати текст до буферу обміну (Copy text to clipboard)</span></td><td></td><td><span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Копіюватиме поточно вибране до буферу обміну.</td></tr>
 <tr><td colspan="5"><h3> Меню Налаштування (Settings)</h3></td></tr>
 <tr><td colspan="3" class="onelinetop"><span class="menu">Пропустити теки що починаються з крапки (Skip folders starting with a dot)</span></td><td> </td><td>Це корисно при роботі в "юніксовому" середовищі, де часто адміністративні файли приховані всередині "<tt>.тек/</tt>". Системи керування версіями вихідних текстів, такі як SVN і CVS є прикладами додатків, що використовують їх, вони також досить поширені в Haiku.</td></tr>
-<tr><td colspan="3"><span class="menu">Покинути пошук тексту (Escape search text)</span></td><td> </td><td>Пошук тексту (TextSearch) використовує інструмент командного рядка <span class="cli">grep</span>. Для цього, спеціальні символи, такі як<tt>'"*\\$?!</tt> та пробіл повинні бути екрановані за допомогою <tt>\\</tt>. Деактивація даного параметру означає, що ви повинні зробити це самостійно, але в обмін надаються повноваження <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">регулярних виразів</a>.</td></tr>
+<tr><td colspan="3"><span class="menu">Regular expression</span></td><td> </td><td>TextSearch uses the command line tool <span class="cli">grep</span>. For it, special characters like <tt>'"*\$?!</tt> and spaces have to be escaped with a <tt>\</tt>. Activating this setting means you have to do this yourself, but in exchange grants you the power of <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">regular expressions</a>.</td></tr>
 <tr><td colspan="3"><span class="menu">Тільки текстові файли (Text files only)</span></td><td> </td><td>Пошук тексту (TextSearch) в цьому випадку використовуватиметься тільки для пошуку рядків в звичайних текстових файлах. Деактивація параметру дозволить переглядати будь-який файл будь-коли.</td></tr>
+<tr><td colspan="3"><span class="menu">Open files in code editor</span></td><td> </td><td>Forces files to be opened in the preferred code editor (that handles text/x-source-code). Otherwise a file will be opened in whatever app is set for its filetype. Useful, for example, when editing HTML files that normally would open in your browser.</td></tr>
 <tr><td colspan="5"><h3>Меню Історія (History)</h3></td></tr>
 <tr><td colspan="4"></td><td>Містить стрічки пошуку що використовувались недавно.</td></tr>
 <tr><td colspan="5"><h3>Меню Кодування (Encoding)</h3></td></tr>

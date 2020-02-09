@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -46,6 +46,7 @@
 <li><a href="../../ro/preferences/virtualmemory.html"><img src="../../images/flags/ro.png" alt="" />Română</a></li>
 <li><a href="../../sk/preferences/virtualmemory.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/preferences/virtualmemory.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../tr/preferences/virtualmemory.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../zh_CN/preferences/virtualmemory.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../ru/preferences/virtualmemory.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../uk/preferences/virtualmemory.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
@@ -59,6 +60,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Översättningen av denna sida är inte komplett. Delar av innehållet kommer därför att visas på engelska.</div>
 
 <h2><img src="../../images/prefs-images/virtualmemory-icon_64.png" alt="virtualmemory-icon_64.png" width="64" height="64" />VirtualMemory</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
@@ -69,9 +71,8 @@
 </table>
 <p>Virtuellt minne låter systemet temporärt lägga ut data på hårddisken om RAM-minnet kan utnyttjas bättre till något annat. Så även om du har massor av RAM är det aldrig en dålig idé att avsätta virtuellt minne.</p>
 <img src="../images/prefs-images/virtualmemory.png" alt="virtualmemory.png" />
-<p>Du kan ange en storlek ännu större än ditt fysiska minne om det behövs. Med dagens gigantiska hårddiskar borde det inte vara något problem att ange en storlek lika stor som det fysiska minnet. Skulle du någon gång få ont om hårddiskutrymme kan du snabbt ändra storleken. I så fall borde du också ta en titt på <a href="../applications/diskusage.html">DiskUsage</a> för att ta reda på vad det är som äter upp ditt hårddiskutrymme.</p>
-<p>Normalt lagras den temporära filen på din startpartition. Om du ofta råkar ut för att hårddisken rasslar långa stunder när systemet för virtuellt minne skriver och läser data kan du prova att använda en separat hårddisk till den temporära filen. Det räcker inte att bara använda en annan partition på samma hårddisk.<br />
-Att uppgradera RAM-minnet är självklart den mest effektiva lösningen.</p>
+<p>Normally, the swap file is written to the boot partition. If you're running low on free memory there, you can deactivate the <span class="menu">Automatic swap management</span> and choose another mounted partition from the popup menu. The swap file size is set with the slider below.<br />
+If you often run into disk thrashing due to the virtual memory system swapping memory in and out, you can try to use a separate harddisk for you swap file to avoid I/O congestion. Simply another partition on the same harddisk with your system/data won't help. Upgrading your RAM is of course the most effective way to go...</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="button">Förval</span></td><td> </td><td>återställer allt till standardinställningarna.</td></tr>
 <tr><td><span class="button">Återställ</span></td><td> </td><td>ställer tillbaka inställningarna som de var när du startade intällningarna för VirtualMemory. </td></tr>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -48,6 +48,7 @@
 <li><a href="../../sk/preferences/virtualmemory.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/preferences/virtualmemory.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sv_SE/preferences/virtualmemory.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/preferences/virtualmemory.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../zh_CN/preferences/virtualmemory.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../uk/preferences/virtualmemory.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../jp/preferences/virtualmemory.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
@@ -60,6 +61,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <h2><img src="../../images/prefs-images/virtualmemory-icon_64.png" alt="virtualmemory-icon_64.png" width="64" height="64" />Виртуальная память (VirtualMemory)</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
@@ -70,9 +72,8 @@
 </table>
 <p>Виртуальная память позволяет системе осуществлять подкачку данных с диска, в случае если ОЗУ может быть использована более рационально для других задач. Даже если у вас установлен большой объем ОЗУ, использование виртуальной памяти не будет плохой идеей.</p>
 <img src="../images/prefs-images/virtualmemory.png" alt="virtualmemory.png" />
-<p>Вы можете установить объем виртуальной памяти значительно больший объема ОЗУ. С размерами современных жестких дисков выделение такого объема пространства не должно быть проблематичным. Конечно, в случае, если размер свободного места на диске невелик, вы можете легко уменьшить объем виртуальной памяти. Рекомендуется взглянуть на вывод программы <a href="../applications/diskusage.html">Использования диска</a>, чтобы понять, куда подевалось свободное место.</p>
-<p>Обычно файл подкачки записывается на ваш загрузочный диск. Если вы сталкиваетесь с проблемами производительности дисковой подсистемы во время операций с виртуальной памятью, то вам следует попробовать использовать отдельный жесткий диск для файла подкачки. Выбор другого раздела на том же жестком диске не решит это проблему.<br />
-Естественно, самым эффективным решением станет повышение объема оперативной памяти.</p>
+<p>Normally, the swap file is written to the boot partition. If you're running low on free memory there, you can deactivate the <span class="menu">Automatic swap management</span> and choose another mounted partition from the popup menu. The swap file size is set with the slider below.<br />
+If you often run into disk thrashing due to the virtual memory system swapping memory in and out, you can try to use a separate harddisk for you swap file to avoid I/O congestion. Simply another partition on the same harddisk with your system/data won't help. Upgrading your RAM is of course the most effective way to go...</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="button">По умолчанию</span></td><td> </td><td>сбросить текущие настройки и установить их на значения по умолчанию.</td></tr>
 <tr><td><span class="button">Вернуть</span></td><td> </td><td>возвращает настройки, активные на момент запуска программы Виртуальная память.</td></tr>

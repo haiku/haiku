@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -46,6 +46,7 @@
 <li><a href="../../sk/applications/textsearch.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/applications/textsearch.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sv_SE/applications/textsearch.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/applications/textsearch.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../ru/applications/textsearch.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../uk/applications/textsearch.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../jp/applications/textsearch.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
@@ -60,6 +61,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <h2><img src="../../images/apps-images/textsearch-icon_64.png" alt="textsearch-icon_64.png" width="64" height="64" />文本搜索</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -78,16 +80,17 @@
 <table summary="menus" border="0" cellpadding="2" cellspacing="0">
 <tr><td colspan="5"><h3>File 菜单</h3></td></tr>
 <tr><td class="onelinetop"><span class="menu">New window</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>打开新窗口，您可以输入其他的字符，然后在相同的文件/文件夹中进行搜索。</td></tr>
-<tr><td><span class="menu">Set target...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>让你选择新的目标文件和文件夹进行搜索。</td></tr>
+<tr><td><span class="menu">Set target...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Lets you choose a new set of files and folders to search through. Alternatively you can drag and drop files/folders into the window.</td></tr>
 <tr><td colspan="5"><h3>Action 菜单</h3></td></tr>
 <tr><td><span class="menu">Trim selection</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>删除列表中目前未选中的所有项目。</td></tr>
 <tr><td><span class="menu">Open selection</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>在首选程序中打开当前选中文件（与双击文件相同）。 如果它支持文本编辑器（例如 Pe），您可以跳转至匹配字符所在的确切的行。</td></tr>
-<tr><td><span class="menu">Open files in Tracker</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>在 Tracker 中打开当前选中文件所在的文件夹。</td></tr>
+<tr><td><span class="menu">Show files in Tracker</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>在 Tracker 中打开当前选中文件所在的文件夹。</td></tr>
 <tr><td class="onelinetop"><span class="menu">Copy text to clipboard</span></td><td></td><td><span class="key">ALT</span> <span class="key">B</span></td><td></td><td>复制当前选中项目至剪贴板。</td></tr>
 <tr><td colspan="5"><h3>Settings 菜单</h3></td></tr>
 <tr><td colspan="3" class="onelinetop"><span class="menu">Skip folders starting with a dot</span></td><td> </td><td>如果处在 “unixy” 环境下，所有的管理员文件隐藏在 “<tt>.folders/</tt>” 下，它将会非常有用。 源版本控制系统 SVN 和 CVS 属于此类程序，而且在Haiku中使用非常广泛。</td></tr>
-<tr><td colspan="3"><span class="menu">Escape search text</span></td><td> </td><td>文本搜索使用了命令行工具 <span class="cli">grep</span>。对于它，特殊字符如 <tt>'"*\\$?!</tt> 以及空格必须要使用 <tt>\\</tt> 来进行控制显示。而撤销该设置则意味着您必须手动的进行操作，但是作为交换，它给予了您强大的 <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">正则表达式</a>。</td></tr>
+<tr><td colspan="3"><span class="menu">Regular expression</span></td><td> </td><td>TextSearch uses the command line tool <span class="cli">grep</span>. For it, special characters like <tt>'"*\$?!</tt> and spaces have to be escaped with a <tt>\</tt>. Activating this setting means you have to do this yourself, but in exchange grants you the power of <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">regular expressions</a>.</td></tr>
 <tr><td colspan="3"><span class="menu">Text files only</span></td><td> </td><td>文本搜索目前仅可用于查找普通文本文件中的字符。如果撤销该设置，它将会对所有类型的文件进行搜索。</td></tr>
+<tr><td colspan="3"><span class="menu">Open files in code editor</span></td><td> </td><td>Forces files to be opened in the preferred code editor (that handles text/x-source-code). Otherwise a file will be opened in whatever app is set for its filetype. Useful, for example, when editing HTML files that normally would open in your browser.</td></tr>
 <tr><td colspan="5"><h3>History 菜单</h3></td></tr>
 <tr><td colspan="4"></td><td>包含最近查询的字符。</td></tr>
 <tr><td colspan="5"><h3>Encoding 菜单</h3></td></tr>

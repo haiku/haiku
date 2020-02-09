@@ -47,6 +47,7 @@
 <li><a href="../../sk/applications/cli-apps.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/applications/cli-apps.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sv_SE/applications/cli-apps.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/applications/cli-apps.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../ru/applications/cli-apps.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../uk/applications/cli-apps.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../jp/applications/cli-apps.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
@@ -125,9 +126,9 @@ An example:</p>
 		<td><p><span class="cli">checkfs</span>是一个非常重要的工具，主要用于检查文件系统中的错误。只需在该命令之后添加磁卷，如  <span class="path">/Haiku</span> 或者设备名，它就会遍历所有的文件，然后修复所有可能出现不一致的地方。</p>
 </td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">desklink</span>可以为任何文件，文件夹，查询或者程序在桌面栏托盘中安装图标。它也可以为相应的图标提供一个右键菜单。例如，尝试下面的脚本，为 <span class="app">Screenshot</span> 添加不同的选项 （第一行中的"<tt>\\</tt>" 用于在终端中进行换行）：
+		<td valign="top"><p><span class="cli">desklink</span>可以为任何文件，文件夹，查询或者程序在桌面栏托盘中安装图标。它也可以为相应的图标提供一个右键菜单。例如，尝试下面的脚本，为 <span class="app">Screenshot</span> 添加不同的选项 （第一行中的"<tt>\</tt>" 用于在终端中进行换行）：
 </p>
-<pre class="terminal">desklink "cmd=Active window (2s):/boot/system/apps/Screenshot --window --border --delay 2" \\
+<pre class="terminal">desklink "cmd=Active window (2s):/boot/system/apps/Screenshot --window --border --delay 2" \
 "cmd=Remove replicant:desklink --remove=Screenshot" /boot/system/apps/Screenshot
 </pre>
 <p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>

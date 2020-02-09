@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Repositories</title>
+	<title>Raktárak</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
@@ -43,6 +45,7 @@
 <li><a href="../../sk/preferences/repositories.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/preferences/repositories.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sv_SE/preferences/repositories.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/preferences/repositories.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../zh_CN/preferences/repositories.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../ru/preferences/repositories.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../uk/preferences/repositories.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
@@ -60,16 +63,16 @@
 <div>
 <div class="box-info">Az oldal fordítása még folyamatban van. Amíg tart a fordítás, addig a lefordítatlan részek angolul jelennek meg.</div>
 
-<h2><img src="../../images/prefs-images/repositories-icon_64.png" alt="repositories-icon_64.png" width="64" height="64" />Repositories</h2>
+<h2><img src="../../images/prefs-images/repositories-icon_64.png" alt="repositories-icon_64.png" width="64" height="64" />Raktárak</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
-<tr><td>Location:</td><td></td><td><span class="path">/boot/system/preferences/Repositories</span></td></tr>
-<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/Repositories_settings</span></td></tr>
+<tr><td>Asztalsáv:</td><td style="width:15px;"></td><td><span class="menu">Beállítások</span></td></tr>
+<tr><td>Útvonal:</td><td></td><td><span class="path">/boot/system/preferences/Repositories</span></td></tr>
+<tr><td>Beállítások:</td><td></td><td><span class="path">~/config/settings/Repositories_settings</span></td></tr>
 </table>
 <p>Repositories are collections of software packages. Set up by default, there's the <i>Haiku</i> repo with all of the operating system's packages and <i>HaikuPorts</i>, which provides a large number of ported and native Haiku software. There are several more repositories, curated by members of the Haiku community. Checkout <a href="https://www.haiku-os.org/community/software">Software Sites</a> on the website.</p>
 <p>This is the preference panel to manage your respositories (you can open it also from <a href="../applications/haikudepot.html">HaikuDepot's</a> <span class="menu">Tools</span> menu):</p>
 <img src="../images/prefs-images/repositories.png" alt="repositories.png" />
-<p>The first column in the list of known repositories shows if a repo is currently enabled. If it doesn't have a checkmark, it will not be queried by HaikuDepot or <span class="cli">pkgman</span> from the command line. Use the buttons to <span class="button">Enable</span> or <span class="button">Disable</span> the selected repositories, or double-click a repo to toggle the status.</p>
+<p>The first column in the list of known repositories shows if a repo is currently enabled. If it isn't, it will not be queried by HaikuDepot or <span class="cli">pkgman</span> from the command line. Use the buttons to <span class="button">Enable</span> or <span class="button">Disable</span> the selected repositories, or double-click a repo to toggle the status.</p>
 <p>Depending on the size of the repository and the speed of the internet connection, enabling a repository may take a few seconds. If it takes longer, you're informed of pending tasks in the little text box above the <span class="button">+/-</span> buttons. If it takes unusually long, you'll be asked to either cancel or retry.</p>
 <p>To be able to remove a repository completely with the "<span class="button">-</span>" button, it has to be disabled.<br />
 You add a new repository with the "<span class="button"> </span>" button, which will open this panel:</p>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -48,6 +48,7 @@
 <li><a href="../../sk/applications/textsearch.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/applications/textsearch.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sv_SE/applications/textsearch.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/applications/textsearch.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../zh_CN/applications/textsearch.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../uk/applications/textsearch.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../jp/applications/textsearch.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
@@ -61,6 +62,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <h2><img src="../../images/apps-images/textsearch-icon_64.png" alt="textsearch-icon_64.png" width="64" height="64" />Текстовый Поиск (TextSearch)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -80,16 +82,17 @@
 <tr><td colspan="5"><h3>Файл</h3></td></tr>
 <tr><td class="onelinetop"><span class="menu">Новое окно</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Открыть новое окно, в котором вы можете произвести новый поиск по тем же файлам или папка.
 </td></tr>
-<tr><td><span class="menu">Выбрать цель...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Выбрать другие файлы или папку для поиска.</td></tr>
+<tr><td><span class="menu">Выбрать цель...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Lets you choose a new set of files and folders to search through. Alternatively you can drag and drop files/folders into the window.</td></tr>
 <tr><td colspan="5"><h3>Действия</h3></td></tr>
 <tr><td><span class="menu">Искать в выделенных</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Удалить из списка все файлы, которые не выделены.</td></tr>
 <tr><td><span class="menu">Открыть выделенные файлы</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>Открыть выделенные файлы при помощи предпочтительных для них приложений. Если это текстовый редактор (например, Pe), то файл откроется на той строчке, в которой найдена искомая строка.</td></tr>
-<tr><td><span class="menu">Открыть файлы в Tracker</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Открыть папки, в которых расположены выделенные файлы.</td></tr>
+<tr><td><span class="menu">Show files in Tracker</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Открыть папки, в которых расположены выделенные файлы.</td></tr>
 <tr><td class="onelinetop"><span class="menu">Скопировать текст в буфер</span></td><td></td><td><span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Скопировать выделенный текст в буфер обмена.</td></tr>
 <tr><td colspan="5"><h3>Настройки</h3></td></tr>
 <tr><td colspan="3" class="onelinetop"><span class="menu">Не искать в папках, начинающихся с точки</span></td><td> </td><td>Это очень удобно когда вы работаете в unix окружении, где зачастую административные файлы скрыты внутри "<tt>.папок/</tt>". Например, системы контроля версий такие как SVN и CVS используют папки начинающиеся с точек.</td></tr>
-<tr><td colspan="3"><span class="menu">Экранировать текст поиска</span></td><td> </td><td>Текстовый Поиск использует приложение командной строки <span class="cli">grep</span>. Для него специальные символы, такие, как <tt>'"*\$?!</tt> и пробелы должны экранироваться с помощью символа <tt>\</tt>. Отключение этой опции означает, что вам придется делать это самостоятельно, но взамен позволяет использовать <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">регулярные выражения</a>.</td></tr>
+<tr><td colspan="3"><span class="menu">Regular expression</span></td><td> </td><td>TextSearch uses the command line tool <span class="cli">grep</span>. For it, special characters like <tt>'"*\$?!</tt> and spaces have to be escaped with a <tt>\</tt>. Activating this setting means you have to do this yourself, but in exchange grants you the power of <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">regular expressions</a>.</td></tr>
 <tr><td colspan="3"><span class="menu">Только текстовые файлы</span></td><td> </td><td>Текстовый Поиск по умолчанию ищет строки только в текстовых файлах. Однако, если вы отключите эту опцию, то поиск будет выполняться по всем типам файлов.</td></tr>
+<tr><td colspan="3"><span class="menu">Open files in code editor</span></td><td> </td><td>Forces files to be opened in the preferred code editor (that handles text/x-source-code). Otherwise a file will be opened in whatever app is set for its filetype. Useful, for example, when editing HTML files that normally would open in your browser.</td></tr>
 <tr><td colspan="5"><h3>История</h3></td></tr>
 <tr><td colspan="4"></td><td>Содержит список строк, по которым производился поиск.</td></tr>
 <tr><td colspan="5"><h3>Кодировка</h3></td></tr>

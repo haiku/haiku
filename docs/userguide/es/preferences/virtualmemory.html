@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -46,6 +46,7 @@
 <li><a href="../../sk/preferences/virtualmemory.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/preferences/virtualmemory.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sv_SE/preferences/virtualmemory.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/preferences/virtualmemory.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../zh_CN/preferences/virtualmemory.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../ru/preferences/virtualmemory.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../uk/preferences/virtualmemory.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
@@ -59,6 +60,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">La traducción de esta página aún no está completa. Hasta que lo esté, las partes sin traducir se muestran en el inglés original.</div>
 
 <h2><img src="../../images/prefs-images/virtualmemory-icon_64.png" alt="virtualmemory-icon_64.png" width="64" height="64" />VirtualMemory</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
@@ -69,9 +71,8 @@
 </table>
 <p>La memoria virtual permite al sistema intercambiar memoria hacia el disco duro, si la RAM pudiera usarse más sensiblemente para otras cosas. Así, incluso si se tuvieran montones de RAM, el proporcionar memoria virtual nunca es una mala idea.</p>
 <img src="../images/prefs-images/virtualmemory.png" alt="virtualmemory.png" />
-<p>Se puede seleccionar el espacio inclusive a una cantidad mayor del tamaño de la memoria física si se necesita. Con los discos duros tan grandes de hoy, asignar el tamaño de memoria física no debiera ser un problema. De cualquier forma, se puede ajustar rápidamente el tamaño si el espacio libre se acabara alguna vez. En ese caso tabmién se debiera dar un vistazo a <a href="../applications/diskusage.html">DiskUsage</a> para averiguar qué se está comiendo el espacio en disco.</p>
-<p>Normalmente, el archivo de intercambio se escribe en su partición de arranque. Si a menudo se sobrecarga el disco debido al sistema de memoria virtual esté intercambiando constantemente de memoria, puede probar el usar un disco duro separado para el archivo de intercambio. Simplemente otra partición en el mismo disco duro con el sistema/información no le ayudará.<br />
-Aumentar su RAM es por supuesto el camino más efectivo a seguir...</p>
+<p>Normally, the swap file is written to the boot partition. If you're running low on free memory there, you can deactivate the <span class="menu">Automatic swap management</span> and choose another mounted partition from the popup menu. The swap file size is set with the slider below.<br />
+If you often run into disk thrashing due to the virtual memory system swapping memory in and out, you can try to use a separate harddisk for you swap file to avoid I/O congestion. Simply another partition on the same harddisk with your system/data won't help. Upgrading your RAM is of course the most effective way to go...</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="button">Valores predeterminados</span></td><td> </td><td>restablece todo a los valores predeterminados.</td></tr>
 <tr><td><span class="button">Revertir</span></td><td> </td><td>regresa las selecciones que estaban activas cuando se inició el cuadro de diálogo de preferencias VirtualMemory.</td></tr>

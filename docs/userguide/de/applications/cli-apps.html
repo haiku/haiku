@@ -46,6 +46,7 @@
 <li><a href="../../sk/applications/cli-apps.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/applications/cli-apps.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sv_SE/applications/cli-apps.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/applications/cli-apps.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../zh_CN/applications/cli-apps.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../ru/applications/cli-apps.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../uk/applications/cli-apps.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
@@ -125,8 +126,8 @@ Ein Beispiel:</p>
 		<td><p><span class="cli">checkfs</span> ist ein wichtiges Tool um das Dateisystem zu überprüfen. Es wird einfach ein Partitionsname, beispielsweise <span class="path">/Haiku</span> oder ein Device-Pfad übergeben, um dort alle Dateien durchzusehen und Inkonsistenzen zu beheben, sofern möglich.</p>
 </td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p>Mit <span class="cli">desklink</span> kann im Deskbar Tray ein Icon für jedwede Datei, Ordner, Query oder Anwendung installiert werden. Dabei gibt es die Möglichkeit bei einem Rechtsklick auf das entsprechende Icon ein Kontextmenü mit besonderen Funktionen anzubieten. Folgendes Beispiel macht das mit dem Konsolenprogramm <span class="app">screenshot</span> (das "<tt>\\</tt>" in der ersten Zeile dient nur einem Zeilenumbruch im Terminal):</p>
-<pre class="terminal">desklink "cmd=Aktives Fenster (2s):/bin/screenshot --window --border --delay 2" \\
+		<td valign="top"><p>Mit <span class="cli">desklink</span> kann im Deskbar Tray ein Icon für jedwede Datei, Ordner, Query oder Anwendung installiert werden. Dabei gibt es die Möglichkeit bei einem Rechtsklick auf das entsprechende Icon ein Kontextmenü mit besonderen Funktionen anzubieten. Folgendes Beispiel macht das mit dem Konsolenprogramm <span class="app">screenshot</span> (das "<tt>\</tt>" in der ersten Zeile dient nur einem Zeilenumbruch im Terminal):</p>
+<pre class="terminal">desklink "cmd=Aktives Fenster (2s):/bin/screenshot --window --border --delay 2" \
 "cmd=Replicant entfernen:desklink --remove=screenshot" /bin/screenshot
 </pre>
 <p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>

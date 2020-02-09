@@ -9,19 +9,21 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		mazbrili abu ibrahim
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Filesystem layout</title>
+	<title>Layout Filesystem</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Panduan pengguna</span></div>
 </div>
 
 <div class="nav">
@@ -43,6 +45,7 @@
 <li><a href="../sk/filesystem-layout.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../fi/filesystem-layout.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../sv_SE/filesystem-layout.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../tr/filesystem-layout.html"><img src="../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../zh_CN/filesystem-layout.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../ru/filesystem-layout.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../uk/filesystem-layout.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
@@ -50,7 +53,7 @@
 </ul>
 <span>
  «  <a href="bootloader.html">Boot Loader</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Daftar Isi</a> 
 ::  <a href="gui.html">Antar Muka Haiku</a>  »
 </span></div>
 </div>
@@ -59,16 +62,16 @@
 <div>
 <div class="box-info">Terjemahan halaman ini belum lengkap. Sampai saat itu, bagian yang belum selesai menggunakan aslinya bahasa Inggris.</div>
 
-<h1>Filesystem layout</h1>
+<h1>Layout Filesystem</h1>
 
-<p>Haiku's filesystem layout is quite transparent, trying to always use non-cryptic names for files and folders, that don't leave the user guessing. Files and folders that are important for the system to function properly, are protected from accidental tempering by showing one of these alerts:</p>
+<p>Tata letak sistem file Haiku cukup transparan, berusaha untuk selalu menggunakan nama tak-samar untuk file dan folder, yang tidak membuat pengguna menebak-nebak. Berkas dan folder yang penting bagi sistem untuk berfungsi dengan baik, dilindungi dari penempaan tidak disengaja dengan menunjukkan salah satu peringatan ini:</p>
 <img src="images/filesystem-layout-images/achtung-user.png" alt="achtung-user.png" /> 
 <img src="images/filesystem-layout-images/achtung-system.png" alt="achtung-system.png" />
-<p>The second alert pops up if you try to rename or delete something in the system hierarchy. Here, the "<span class="button">Rename</span>" button will only become clickable when you're holding down the <span class="key">SHIFT</span> key.</p>
-<p>Generally, there are two separate branches springing from the root folder of the boot volume:</p>
+<p>Lansiran kedua muncul jika Anda mencoba mengubah nama atau menghapus sesuatu di hierarki sistem. Di sini, tombol "<span class="button">Rename</span>" hanya akan dapat diklik saat Anda menahan tombol <span class="key">SHIFT</span> .</p>
+<p>Secara umum, ada dua cabang terpisah yang muncul dari folder root volume boot:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/</span></td><td> </td><td>Contains system files and applications/packages shared by all users.</td></tr>
-<tr><td><span class="path">/boot/home/</span></td><td> </td><td>This is your personal folder where you keep your data and settings and the applications/packages that are <i>not</i> shared by all users.</td></tr>
+<tr><td><span class="path">/boot/system/</span></td><td> </td><td>Berisi file sistem dan aplikasi/paket yang dipakai bersama oleh semua pengguna.</td></tr>
+<tr><td><span class="path">/boot/home/</span></td><td> </td><td>Ini adalah folder pribadi Anda tempat Anda menyimpan data dan pengaturan Anda serta aplikasi/paket yang tidak dipakai bersama oleh semua pengguna.</td></tr>
 </table>
 <p>As long as Haiku isn't multi-user, this distinction between shared and not-shared applications/packages has no apparent effect, as there's only one user with one home folder. But since there will be support for more users than one eventually, it makes sense to learn the right way from the start.</p>
 
@@ -153,7 +156,7 @@ Files that you'd like to share with other users in a future multi-user environme
 <div class="nav">
 <div class="inner"><span>
  «  <a href="bootloader.html">Boot Loader</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Daftar Isi</a> 
 ::  <a href="gui.html">Antar Muka Haiku</a>  »
 </span></div>
 </div>

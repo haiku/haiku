@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2019, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -46,6 +46,7 @@
 <li><a href="../../sk/preferences/virtualmemory.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../fi/preferences/virtualmemory.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sv_SE/preferences/virtualmemory.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../tr/preferences/virtualmemory.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
 <li><a href="../../ru/preferences/virtualmemory.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../../uk/preferences/virtualmemory.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../jp/preferences/virtualmemory.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
@@ -58,6 +59,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <h2><img src="../../images/prefs-images/virtualmemory-icon_64.png" alt="virtualmemory-icon_64.png" width="64" height="64" />虚拟内存</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
@@ -68,9 +70,8 @@
 </table>
 <p>如果RAM可以用于更加智能的处理其他的任务，虚拟内存可以使系统将内存内容调换到硬盘。所以，即使您具有很大的RAM，提供虚拟内存也不是一个坏主意。</p>
 <img src="../images/prefs-images/virtualmemory.png" alt="virtualmemory.png" />
-<p>如果需要的话，您可以将设置其大小超过实际的物理内存。现在的硬盘容量都很大，将其设置为物理内存大小不会有任何问题。而且，如果磁盘剩余空间剩余很小，您也可以对其进行快速的调整。在这种情况下，您可以使用 <a href="../applications/diskusage.html">磁盘查看器</a> 找出耗掉您磁盘空间的原因。</p>
-<p>通常，交换文件将会写入到您的启动分区。如果由于虚拟内存系统的交换文件而经常导致磁盘超荷，您可以尝试使用独立的硬盘用于交换文件。简单的使用同一硬盘的其他分区用于系统和数据将不会有任何效果。<br />
-当然，升级您的内存将会是最有效的解决方法。</p>
+<p>Normally, the swap file is written to the boot partition. If you're running low on free memory there, you can deactivate the <span class="menu">Automatic swap management</span> and choose another mounted partition from the popup menu. The swap file size is set with the slider below.<br />
+If you often run into disk thrashing due to the virtual memory system swapping memory in and out, you can try to use a separate harddisk for you swap file to avoid I/O congestion. Simply another partition on the same harddisk with your system/data won't help. Upgrading your RAM is of course the most effective way to go...</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="button">Defaults</span></td><td> </td><td>重置所有设置未默认值。</td></tr>
 <tr><td><span class="button">取消</span></td><td> </td><td>返回到启动虚拟内存首选项之前的设置状态。</td></tr>
