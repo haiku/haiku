@@ -150,10 +150,7 @@ intel_interrupt_handler(void* data)
 	bool hasPCH = (info.pch_info != INTEL_PCH_NONE);
 	uint32 identity;
 
-	if (hasPCH)
-		identity = read32(info, reg);
-	else
-		identity = read16(info, reg);
+	identity = read32(info, reg);
 
 	if (identity == 0)
 		return B_UNHANDLED_INTERRUPT;
@@ -182,7 +179,7 @@ intel_interrupt_handler(void* data)
 		}
 
 #if 0
-		// FIXME we don't have supprot for the 3rd pipe yet
+		// FIXME we don't have support for the 3rd pipe yet
 		mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEC
 			: 0;
 		if ((identity & mask) != 0) {
@@ -195,13 +192,9 @@ intel_interrupt_handler(void* data)
 #endif
 
 		// setting the bit clears it!
-		if (hasPCH) {
-			write32(info, reg, identity);
-			identity = read32(info, reg);
-		} else {
-			write16(info, reg, identity);
-			identity = read16(info, reg);
-		}
+		write32(info, reg, identity);
+		// update our identity register with the remaining interupts
+		identity = read32(info, reg);
 	}
 
 	return handled;
@@ -239,7 +232,7 @@ init_interrupt_handler(intel_info &info)
 				info.pci->function, 1, &msiVector) == B_OK
 			&& gPCIx86Module->enable_msi(info.pci->bus, info.pci->device,
 				info.pci->function) == B_OK) {
-			ERROR("using message signaled interrupts\n");
+			TRACE("using message signaled interrupts\n");
 			info.irq = msiVector;
 			info.use_msi = true;
 		}
@@ -263,22 +256,12 @@ init_interrupt_handler(intel_info &info)
 			uint32 enable = intel_get_interrupt_mask(info,
 				INTEL_PIPE_A | INTEL_PIPE_B, true);
 
-			if (hasPCH) {
-				// Clear all the interrupts
-				write32(info, find_reg(info, INTEL_INTERRUPT_IDENTITY), ~0);
+			// Clear all the interrupts
+			write32(info, find_reg(info, INTEL_INTERRUPT_IDENTITY), ~0);
 
-				// enable interrupts - we only want VBLANK interrupts
-				write32(info, find_reg(info, INTEL_INTERRUPT_ENABLED), enable);
-				write32(info, find_reg(info, INTEL_INTERRUPT_MASK), ~enable);
-			} else {
-				// Clear all the interrupts
-				write16(info, find_reg(info, INTEL_INTERRUPT_IDENTITY), ~0);
-
-				// enable interrupts - we only want VBLANK interrupts
-				write16(info, find_reg(info, INTEL_INTERRUPT_ENABLED), enable);
-				write16(info, find_reg(info, INTEL_INTERRUPT_MASK), ~enable);
-			}
-
+			// enable interrupts - we only want VBLANK interrupts
+			write32(info, find_reg(info, INTEL_INTERRUPT_ENABLED), enable);
+			write32(info, find_reg(info, INTEL_INTERRUPT_MASK), ~enable);
 		}
 	}
 	if (status < B_OK) {
@@ -288,7 +271,7 @@ init_interrupt_handler(intel_info &info)
 		info.fake_interrupts = true;
 
 		// TODO: fake interrupts!
-		TRACE("Fake interrupt mode (no PCI interrupt line assigned\n");
+		ERROR("Fake interrupt mode (no PCI interrupt line assigned\n");
 		status = B_ERROR;
 	}
 
@@ -570,13 +553,8 @@ intel_extreme_uninit(intel_info &info)
 		bool hasPCH = (info.pch_info != INTEL_PCH_NONE);
 
 		// disable interrupt generation
-		if (hasPCH) {
-			write32(info, find_reg(info, INTEL_INTERRUPT_ENABLED), 0);
-			write32(info, find_reg(info, INTEL_INTERRUPT_MASK), ~0);
-		} else {
-			write16(info, find_reg(info, INTEL_INTERRUPT_ENABLED), 0);
-			write16(info, find_reg(info, INTEL_INTERRUPT_MASK), ~0);
-		}
+		write32(info, find_reg(info, INTEL_INTERRUPT_ENABLED), 0);
+		write32(info, find_reg(info, INTEL_INTERRUPT_MASK), ~0);
 
 		remove_io_interrupt_handler(info.irq, intel_interrupt_handler, &info);
 
