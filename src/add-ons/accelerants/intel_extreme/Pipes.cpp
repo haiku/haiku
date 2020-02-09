@@ -218,7 +218,7 @@ Pipe::ConfigureTimings(display_mode* target, bool hardware)
 			| ((uint32)target->timing.v_sync_start - 1));
 	}
 
-	if (gInfo->shared_info->device_type.Generation() != 6) {
+	if (gInfo->shared_info->device_type.Generation() < 6) {
 		// FIXME check on which generations this register exists
 		// (it appears it would be available only for cursor planes, not
 		// display planes)

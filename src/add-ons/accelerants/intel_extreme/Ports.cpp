@@ -130,6 +130,8 @@ Port::SetPipe(Pipe* pipe)
 
 	uint32 portState = read32(portRegister);
 
+	// FIXME is the use of PORT_TRANS_* constants correct for Sandy Bridge /
+	// Cougar Point? Or is it only for Ivy Bridge / Panther point onwards?
 	if (gInfo->shared_info->pch_info == INTEL_PCH_CPT) {
 		portState &= PORT_TRANS_SEL_MASK;
 		if (pipe->Index() == INTEL_PIPE_A)
@@ -379,10 +381,10 @@ LVDSPort::PipePreference()
 	// Ideally we could just return INTEL_PIPE_ANY for the newer devices, but
 	// this doesn't quite work yet.
 
-	// For Ibex Point, read the existing LVDS configuration and just reuse that
-	// (it seems our attempt to change it doesn't work, anyway)
-	if (gInfo->shared_info->pch_info == INTEL_PCH_IBX
-		|| gInfo->shared_info->pch_info == INTEL_PCH_CPT) {
+	// For Ibex Point and Sandy Bridge, read the existing LVDS configuration
+	// and just reuse that (it seems our attempt to change it doesn't work,
+	// anyway)
+	if (gInfo->shared_info->device_type.Generation() <= 6) {
 		uint32 portState = read32(_PortRegister());
 		if (portState & DISPLAY_MONITOR_PIPE_B)
 			return INTEL_PIPE_B;
@@ -393,6 +395,7 @@ LVDSPort::PipePreference()
 	// For later PCH versions, assume pipe B for now. Note that later devices
 	// add a pipe C (but do they add a transcoder C?), so we'd need to handle
 	// that and the port register has a different format because of it.
+	// (using PORT_TRANS_*_SEL_CPT to select which transcoder to use)
 	return INTEL_PIPE_B;
 }
 
