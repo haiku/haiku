@@ -155,7 +155,7 @@ MixerControl::Connect(int32 volumeWhich, float* _value, const char** _error)
 		errorString = "Media services not running";
 
 	if (status != B_OK) {
-		fGainMediaNode = media_node::null;
+		_Disconnect();
 		fMuteMediaNode = media_node::null;
 	}
 
