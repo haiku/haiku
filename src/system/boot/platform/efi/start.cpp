@@ -25,6 +25,7 @@
 #include "console.h"
 #include "efi_platform.h"
 #include "mmu.h"
+#include "quirks.h"
 #include "serial.h"
 #include "smp.h"
 #include "timer.h"
@@ -149,6 +150,9 @@ platform_start_kernel(void)
 	gKernelArgs.cpu_kstack[0].size = KERNEL_STACK_SIZE
 		+ KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE;
 	dprintf("Kernel stack at %#lx\n", gKernelArgs.cpu_kstack[0].start);
+
+	// Apply any weird EFI quirks
+	quirks_init();
 
 	// Prepare to exit EFI boot services.
 	// Read the memory map.

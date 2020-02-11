@@ -26,6 +26,7 @@ local platform_src =
 	menu.cpp
 	devices.cpp
 	cpu.cpp
+	quirks.cpp
 	smp.cpp
 	serial.cpp
 	smp_trampoline.S
