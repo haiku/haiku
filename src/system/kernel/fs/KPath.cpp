@@ -432,14 +432,13 @@ KPath::_AllocateBuffer()
 		else
 #endif
 			fBuffer = (char*)malloc(fBufferSize);
-		memset(fBuffer, 0, fBufferSize);
 	}
 	if (fBuffer == NULL) {
 		fFailed = true;
 		return B_NO_MEMORY;
 	}
 
-	fBuffer[0] = '\0';
+	memset(fBuffer, 0, fBufferSize);
 	fFailed = false;
 	return B_OK;
 }
