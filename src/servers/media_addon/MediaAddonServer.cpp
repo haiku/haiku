@@ -407,7 +407,10 @@ MediaAddonServer::_HandleMessage(int32 code, const void* data, size_t size)
 
 		case ADD_ON_SERVER_RESCAN_FINISHED_NOTIFY:
 			if (fStartupSound) {
-				system_beep(MEDIA_SOUNDS_STARTUP);
+				BMessage msg(MEDIA_ADD_ON_SERVER_PLAY_MEDIA);
+				msg.AddString(MEDIA_NAME_KEY, MEDIA_SOUNDS_STARTUP);
+				msg.AddString(MEDIA_TYPE_KEY, MEDIA_TYPE_SOUNDS);
+				BMessageRunner::StartSending(this, &msg, 2000000, 1);
 				fStartupSound = false;
 			}
 			break;
