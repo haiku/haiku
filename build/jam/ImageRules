@@ -1618,10 +1618,13 @@ actions BuildCDBootPPCImage1 bind MAPS
 	# Extras (readme files, etc)
 	cp $(>[4]) $(HAIKU_OUTPUT_DIR)/cd/
 
-	xorriso -as mkisofs -v -hfsplus \
-		-hfs-bless $(HAIKU_OUTPUT_DIR)/cd/boot \
-		-prep-boot-part $(HAIKU_OUTPUT_DIR)/cd/boot/haikuloader.xcf \
-		-r -J -o $(<) $(HAIKU_OUTPUT_DIR)/cd
+	# Xorriso doesn't have map and some other required tools
+	# to make bootable PowerPC images
+	genisoimage -v -hfsplus -map $(MAPS) \
+		-hfs-bless $(HAIKU_OUTPUT_DIR)/cd/boot -part -no-desktop \
+		-hfs-parms MAX_XTCSIZE=2656248 -hfs-volid Haiku \
+		--chrp-boot -r -J -o $(<) $(HAIKU_OUTPUT_DIR)/cd
+
 	$(RM) -r $(HAIKU_OUTPUT_DIR)/cd
 }
 
