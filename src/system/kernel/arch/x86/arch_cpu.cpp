@@ -462,6 +462,8 @@ dump_feature_string(int currentCPU, cpu_ent* cpu)
 		strlcat(features, "mmxext ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_FFXSR)
 		strlcat(features, "ffxsr ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_PDPE1GB)
+		strlcat(features, "pdpe1gb ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_LONG)
 		strlcat(features, "long ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_3DNOWEXT)
@@ -552,8 +554,16 @@ dump_feature_string(int currentCPU, cpu_ent* cpu)
 		strlcat(features, "msr_arch ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_7_EDX] & IA32_FEATURE_SSBD)
 		strlcat(features, "ssbd ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT_8_EBX] & IA32_FEATURE_AMD_EXT_IBPB)
+	if (cpu->arch.feature[FEATURE_EXT_8_EBX] & IA32_FEATURE_CLZERO)
+		strlcat(features, "clzero ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT_8_EBX] & IA32_FEATURE_IBPB)
 		strlcat(features, "ibpb ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT_8_EBX] & IA32_FEATURE_AMD_SSBD)
+		strlcat(features, "amd_ssbd ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT_8_EBX] & IA32_FEATURE_VIRT_SSBD)
+		strlcat(features, "virt_ssbd ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT_8_EBX] & IA32_FEATURE_AMD_SSB_NO)
+		strlcat(features, "amd_ssb_no ", sizeof(features));
 	dprintf("CPU %d: features: %s\n", currentCPU, features);
 }
 #endif	// DUMP_FEATURE_STRING
