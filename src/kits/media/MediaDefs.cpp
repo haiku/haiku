@@ -1315,6 +1315,9 @@ shutdown_media_server(bigtime_t timeout,
 	bool (*progress)(int stage, const char* message, void* cookie),
 	void* cookie)
 {
+	BLaunchRoster launchRoster;
+	launchRoster.StopTarget(B_MEDIA_SERVER_SIGNATURE);
+
 	BMessage msg(B_QUIT_REQUESTED);
 	status_t err = B_MEDIA_SYSTEM_FAILURE;
 	bool shutdown = false;
