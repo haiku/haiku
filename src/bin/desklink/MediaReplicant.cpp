@@ -408,6 +408,10 @@ MediaReplicant::MessageReceived(BMessage* message)
 			_ConnectMixer();
 			break;
 
+		case B_MEDIA_SERVER_QUIT:
+			_DisconnectMixer();
+			break;
+
 		case B_MEDIA_NODE_CREATED:
 		{
 			// It's not enough to wait for B_MEDIA_SERVER_STARTED message, as
@@ -594,7 +598,9 @@ MediaReplicant::_DisconnectMixer()
 	if (roster == NULL)
 		return;
 
-	roster->StopWatching(this, B_MEDIA_SERVER_STARTED | B_MEDIA_NODE_CREATED);
+	roster->StopWatching(this, B_MEDIA_SERVER_STARTED);
+	roster->StopWatching(this, B_MEDIA_SERVER_QUIT);
+	roster->StopWatching(this, B_MEDIA_NODE_CREATED);
 
 	if (fMixerControl == NULL)
 		return;
@@ -618,7 +624,9 @@ MediaReplicant::_ConnectMixer()
 	if (roster == NULL)
 		return B_ERROR;
 
-	roster->StartWatching(this, B_MEDIA_SERVER_STARTED | B_MEDIA_NODE_CREATED);
+	roster->StartWatching(this, B_MEDIA_SERVER_STARTED);
+	roster->StartWatching(this, B_MEDIA_SERVER_QUIT);
+	roster->StartWatching(this, B_MEDIA_NODE_CREATED);
 
 	fMixerControl = new MixerControl(fVolumeWhich);
 
