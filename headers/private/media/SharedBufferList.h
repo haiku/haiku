@@ -30,6 +30,7 @@ public:
 			status_t					AddBuffer(sem_id groupReclaimSem,
 											const buffer_clone_info& info,
 											BBuffer** buffer);
+			status_t					RemoveBuffer(BBuffer* buffer);
 
 			// Call AddBuffer and CheckID locked
 			status_t					AddBuffer(sem_id groupReclaimSem,

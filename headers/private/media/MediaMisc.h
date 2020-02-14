@@ -44,6 +44,10 @@ progress_shutdown(int stage,
 #define MEDIA_SERVER_PORT_NAME			"__media_server_port"
 #define MEDIA_ADDON_SERVER_PORT_NAME	"__media_addon_server_port"
 
+#define BUFFER_TO_RECLAIM				0x20000000
+#define BUFFER_MARKED_FOR_DELETION		0x40000000
+
+
 extern const char *B_MEDIA_ADDON_SERVER_SIGNATURE;
 
 namespace BPrivate { namespace media {

@@ -378,6 +378,48 @@ SharedBufferList::RecycleBuffer(BBuffer* buffer)
 }
 
 
+status_t
+SharedBufferList::RemoveBuffer(BBuffer* buffer)
+{
+	CALLED();
+
+	media_buffer_id id = buffer->ID();
+
+	if (Lock() != B_OK)
+		return B_ERROR;
+
+	int32 notRemovedCount = 0;
+
+	for (int32 i = 0; i < fCount; i++) {
+		// find the buffer id, and remove it in all groups it belongs to
+		if (fInfos[i].id == id) {
+			if (!fInfos[i].reclaimed) {
+				notRemovedCount++;
+				ERROR("SharedBufferList::RequestBuffer, BBuffer %p, id = %"
+					B_PRId32 " not reclaimed\n", buffer, id);
+				DEBUG_ONLY(debugger("buffer not reclaimed"));
+				continue;
+			}
+			fInfos[i].buffer = NULL;
+			fInfos[i].id = -1;
+			fInfos[i].reclaim_sem = -1;
+		}
+	}
+
+	if (Unlock() != B_OK)
+		return B_ERROR;
+
+	if (notRemovedCount != 0) {
+		ERROR("SharedBufferList::RemoveBuffer, BBuffer %p, id = %" B_PRId32
+			" not reclaimed\n", buffer, id);
+		return B_ERROR;
+	}
+
+	return B_OK;
+}
+
+
+
 /*!	Returns exactly \a bufferCount buffers from the group specified via its
 	\a groupReclaimSem if successful.
 */

@@ -14,6 +14,8 @@
 #include <Buffer.h>
 
 #include "MediaDebug.h"
+#include "MediaMisc.h"
+#include "SharedBufferList.h"
 
 
 namespace BPrivate {
@@ -41,8 +43,10 @@ BufferCache::GetBuffer(media_buffer_id id, port_id port)
 		return NULL;
 
 	buffer_cache_entry* existing;
-	if (fMap.Get(id, existing))
+	if (fMap.Get(id, existing)) {
+		existing->buffer->fFlags |= BUFFER_TO_RECLAIM;
 		return existing->buffer;
+	}
 
 	buffer_clone_info info;
 	info.buffer = id;
@@ -65,6 +69,7 @@ BufferCache::GetBuffer(media_buffer_id id, port_id port)
 		return NULL;
 	}
 
+	buffer->fFlags |= BUFFER_TO_RECLAIM;
 	return buffer;
 }
 
@@ -76,8 +81,17 @@ BufferCache::FlushCacheForPort(port_id port)
 	while (iterator.HasNext()) {
 		BufferMap::Entry entry = iterator.Next();
 		if (entry.value.port == port) {
-			// Delete the buffer
-			delete entry.value.buffer;
+			BBuffer* buffer = entry.value.buffer;
+			bool isReclaimed = (buffer->fFlags & BUFFER_TO_RECLAIM) == 0;
+			if (isReclaimed && buffer->fBufferList != NULL)
+				isReclaimed = buffer->fBufferList->RemoveBuffer(buffer) == B_OK;
+
+			if (isReclaimed)
+				delete buffer;
+			else {
+				// mark the buffer for deletion
+				buffer->fFlags |= BUFFER_MARKED_FOR_DELETION;
+			}
 			// Then remove it from the map
 			fMap.Remove(iterator);
 		}
