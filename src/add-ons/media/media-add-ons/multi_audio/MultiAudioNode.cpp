@@ -1256,7 +1256,6 @@ MultiAudioNode::_HandleStart(const media_timed_event* event, bigtime_t lateness,
 {
 	CALLED();
 	if (RunState() != B_STARTED) {
-		_StartOutputThreadIfNeeded();
 	}
 	return B_OK;
 }
@@ -1292,7 +1291,7 @@ MultiAudioNode::_HandleStop(const media_timed_event* event, bigtime_t lateness,
 	EventQueue()->FlushEvents(0, BTimedEventQueue::B_ALWAYS, true,
 		BTimedEventQueue::B_HANDLE_BUFFER);
 
-	_StopOutputThread();
+	//_StopOutputThread();
 	return B_OK;
 }
 
