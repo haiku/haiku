@@ -26,7 +26,10 @@ import optparse
 import os
 import re
 import socket
+import ssl
+import subprocess
 import sys
+import tempfile
 import zlib
 
 
@@ -148,6 +151,14 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                     # server port will be stripped from these headers when
                     # echoed to the response body.
                     header_value = re.sub(r':[0-9]+', ':PORT', header_value)
+
+                    # The scheme will also be in this header value, and we want
+                    # to return the same reguardless of whether http:// or
+                    # https:// was used.
+                    header_value = re.sub(
+                        r'https?://',
+                        'SCHEME://',
+                        header_value)
                 if header == 'Content-Type':
                     match = MULTIPART_FORM_BOUNDARY_RE.match(
                         self.headers.get('Content-Type', 'text/plain'))
@@ -341,6 +352,20 @@ def extract_desired_status_code_from_path(path, default=200):
     return status_code
 
 
+def generate_self_signed_tls_cert(common_name, cert_path, key_path):
+    subprocess.check_call([
+        'openssl',
+        'req',
+        '-x509',
+        '-nodes',
+        '-subj', '/CN={}'.format(common_name),
+        '-newkey', 'rsa:4096',
+        '-keyout', key_path,
+        '-out', cert_path,
+        '-days', '1'
+    ])
+
+
 def compute_digest_challenge_response_hash(
         request_method,
         request_uri,
@@ -419,33 +444,54 @@ def parse_kv_pair_header(header_value, sep=','):
 def main():
     options = parse_args(sys.argv)
 
-    if options.use_tls:
-        # TODO: Generate a self-signed TLS cert to test HTTPS.
-        raise NotImplementedError()
+    bind_addr = (
+        options.bind_addr,
+        0 if options.port is None else options.port)
 
-    bind_addr = (options.bind_addr, options.port)
+    server = http.server.HTTPServer(
+        bind_addr,
+        RequestHandler,
+        bind_and_activate=False)
+    if options.port is None:
+        server.server_port = server.socket.getsockname()[1]
+    else:
+        server.server_port = options.port
 
     if options.server_socket_fd:
-        server = http.server.HTTPServer(
-            bind_addr,
-            RequestHandler,
-            bind_and_activate=False)
         server.socket = socket.fromfd(
             options.server_socket_fd,
             socket.AF_INET,
             socket.SOCK_STREAM)
-        server.server_port = server.socket.getsockname()[1]
-    else:
-        # A socket hasn't been open for us already, so we'll just use
-        # a random port here.
-        server = http.server.HTTPServer(bind_addr, RequestHandler)
 
-    try:
+    def run_server():
+        if not options.server_socket_fd:
+            server.server_bind()
+            server.server_activate()
         print(
             'Test server listening on port',
             server.server_port,
             file=sys.stderr)
         server.serve_forever(0.01)
+
+    try:
+        if options.use_tls:
+            with tempfile.TemporaryDirectory() as temp_cert_dir:
+                common_name = options.bind_addr + ':' + str(options.port)
+                cert_file = os.path.join(temp_cert_dir, 'cert.pem')
+                key_file = os.path.join(temp_cert_dir, 'key.pem')
+                generate_self_signed_tls_cert(
+                    common_name,
+                    cert_file,
+                    key_file)
+                server.socket = ssl.wrap_socket(
+                    server.socket,
+                    certfile=cert_file,
+                    keyfile=key_file,
+                    server_side=True,
+                    do_handshake_on_connect=False)
+            run_server()
+        else:
+            run_server()
     except KeyboardInterrupt:
         server.server_close()
 
@@ -469,7 +515,7 @@ def parse_args(argv):
     parser.add_option(
         '--port',
         dest='port',
-        default=0,
+        default=None,
         type='int',
         help='If not specified a random port will be used.')
     parser.add_option(

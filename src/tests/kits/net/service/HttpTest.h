@@ -12,11 +12,12 @@
 #include <TestSuite.h>
 
 #include <cppunit/TestSuite.h>
+#include <tools/cppunit/ThreadedTestCase.h>
 
 #include "TestServer.h"
 
 
-class HttpTest: public BTestCase {
+class HttpTest: public BThreadedTestCase {
 public:
 											HttpTest(TestServerMode mode
 												= TEST_SERVER_MODE_HTTP);

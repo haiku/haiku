@@ -13,13 +13,15 @@
 #include <cstring>
 #include <fstream>
 #include <map>
+#include <posix/libgen.h>
 #include <string>
 
+#include <AutoDeleter.h>
 #include <HttpRequest.h>
 #include <NetworkKit.h>
 #include <UrlProtocolListener.h>
 
-#include <cppunit/TestCaller.h>
+#include <tools/cppunit/ThreadedTestCaller.h>
 
 #include "TestServer.h"
 
@@ -66,6 +68,28 @@ public:
 		}
 	}
 
+
+	virtual bool CertificateVerificationFailed(
+		BUrlRequest* caller,
+		BCertificate& certificate,
+		const char* message)
+	{
+		// TODO: Add tests that exercize this behavior.
+		//
+		// At the moment there doesn't seem to be any public API for providing
+		// an alternate certificate authority, or for constructing a
+		// BCertificate to be sent to BUrlContext::AddCertificateException().
+		// Once we have such a public API then it will be useful to create
+		// test scenarios that exercize the validation performed by the
+		// undrelying TLS implementaiton to verify that it is configured
+		// to do so.
+		//
+		// For now we just disable TLS certificate validation entirely because
+		// we are generating a self-signed TLS certificate for these tests.
+		return true;
+	}
+
+
 	void Verify()
 	{
 		CPPUNIT_ASSERT_EQUAL(fExpectedResponseBody, fActualResponseBody);
@@ -101,7 +125,10 @@ void SendAuthenticatedRequest(
 {
 	TestListener listener(expectedResponseBody, expectedResponseHeaders);
 
-	BHttpRequest request(testUrl, false, "HTTP", &listener, &context);
+	BHttpRequest request(testUrl, testUrl.Protocol() == "https");
+	request.SetContext(&context);
+	request.SetListener(&listener);
+
 	request.SetUserName("walter");
 	request.SetPassword("secret");
 
@@ -118,6 +145,18 @@ void SendAuthenticatedRequest(
 	CPPUNIT_ASSERT_EQUAL(BString("OK"), result.StatusText());
 
 	listener.Verify();
+}
+
+
+// Return the path of a file path relative to this source file.
+std::string TestFilePath(const std::string& relativePath)
+{
+	char *testFileSource = strdup(__FILE__);
+	MemoryDeleter _(testFileSource);
+
+	std::string testSrcDir(::dirname(testFileSource));
+
+	return testSrcDir + "/" + relativePath;
 }
 
 }
@@ -168,9 +207,13 @@ HttpTest::GetTest()
 	expectedResponseHeaders["Content-Type"] = "text/plain";
 	expectedResponseHeaders["Date"] = "Sun, 09 Feb 2020 19:32:42 GMT";
 	expectedResponseHeaders["Server"] = "Test HTTP Server for Haiku";
+
 	TestListener listener(expectedResponseBody, expectedResponseHeaders);
 
-	BHttpRequest request(testUrl, false, "HTTP", &listener, context);
+	BHttpRequest request(testUrl, testUrl.Protocol() == "https");
+	request.SetContext(context);
+	request.SetListener(&listener);
+
 	CPPUNIT_ASSERT(request.Run());
 	while (request.IsRunning())
 		snooze(1000);
@@ -202,7 +245,7 @@ HttpTest::ProxyTest()
 	c->AcquireReference();
 	c->SetProxy("120.203.214.182", 83);
 
-	BHttpRequest t(testUrl);
+	BHttpRequest t(testUrl, testUrl.Protocol() == "https");
 	t.SetContext(c);
 
 	BUrlProtocolListener l;
@@ -230,12 +273,14 @@ HttpTest::ProxyTest()
 void
 HttpTest::UploadTest()
 {
+	std::string testFilePath = TestFilePath("testfile.txt");
+
 	// The test server will echo the POST body back to us in the HTTP response,
 	// so here we load it into memory so that we can compare to make sure that
 	// the server received it.
 	std::string fileContents;
 	{
-		std::ifstream inputStream("/system/data/licenses/MIT");
+		std::ifstream inputStream(testFilePath);
 		CPPUNIT_ASSERT(inputStream.is_open());
 		fileContents = std::string(
 			std::istreambuf_iterator<char>(inputStream),
@@ -254,14 +299,14 @@ HttpTest::UploadTest()
 		"Connection: close\r\n"
 		"User-Agent: Services Kit (Haiku)\r\n"
 		"Content-Type: multipart/form-data; boundary=<<BOUNDARY-ID>>\r\n"
-		"Content-Length: 1381\r\n"
+		"Content-Length: 1404\r\n"
 		"\r\n"
 		"Request body:\r\n"
 		"-------------\r\n"
 		"--<<BOUNDARY-ID>>\r\n"
 		"Content-Disposition: form-data; name=\"_uploadfile\";"
-		" filename=\"MIT\"\r\n"
-		"Content-Type: text/plain\r\n"
+		" filename=\"testfile.txt\"\r\n"
+		"Content-Type: application/octet-stream\r\n"
 		"\r\n"
 		+ fileContents
 		+ "\r\n"
@@ -273,7 +318,7 @@ HttpTest::UploadTest()
 		"\r\n");
 	HttpHeaderMap expectedResponseHeaders;
 	expectedResponseHeaders["Content-Encoding"] = "gzip";
-	expectedResponseHeaders["Content-Length"] = "900";
+	expectedResponseHeaders["Content-Length"] = "913";
 	expectedResponseHeaders["Content-Type"] = "text/plain";
 	expectedResponseHeaders["Date"] = "Sun, 09 Feb 2020 19:32:42 GMT";
 	expectedResponseHeaders["Server"] = "Test HTTP Server for Haiku";
@@ -282,13 +327,16 @@ HttpTest::UploadTest()
 	BUrl testUrl(fTestServer.BaseUrl(), "/post");
 
 	BUrlContext context;
-	BHttpRequest request(testUrl, false, "HTTP", &listener, &context);
+
+	BHttpRequest request(testUrl, testUrl.Protocol() == "https");
+	request.SetContext(&context);
+	request.SetListener(&listener);
 
 	BHttpForm form;
 	form.AddString("hello", "world");
 	CPPUNIT_ASSERT_EQUAL(
 		B_OK,
-		form.AddFile("_uploadfile", BPath("/system/data/licenses/MIT")));
+		form.AddFile("_uploadfile", BPath(testFilePath.c_str())));
 
 	request.SetPostFields(form);
 
@@ -303,7 +351,7 @@ HttpTest::UploadTest()
 		dynamic_cast<const BHttpResult &>(request.Result());
 	CPPUNIT_ASSERT_EQUAL(200, result.StatusCode());
 	CPPUNIT_ASSERT_EQUAL(BString("OK"), result.StatusText());
-	CPPUNIT_ASSERT_EQUAL(900, result.Length());
+	CPPUNIT_ASSERT_EQUAL(913, result.Length());
 
 	listener.Verify();
 }
@@ -326,12 +374,12 @@ HttpTest::AuthBasicTest()
 		"Accept-Encoding: gzip\r\n"
 		"Connection: close\r\n"
 		"User-Agent: Services Kit (Haiku)\r\n"
-		"Referer: http://127.0.0.1:PORT/auth/basic/walter/secret\r\n"
+		"Referer: SCHEME://127.0.0.1:PORT/auth/basic/walter/secret\r\n"
 		"Authorization: Basic d2FsdGVyOnNlY3JldA==\r\n");
 
 	HttpHeaderMap expectedResponseHeaders;
 	expectedResponseHeaders["Content-Encoding"] = "gzip";
-	expectedResponseHeaders["Content-Length"] = "210";
+	expectedResponseHeaders["Content-Length"] = "212";
 	expectedResponseHeaders["Content-Type"] = "text/plain";
 	expectedResponseHeaders["Date"] = "Sun, 09 Feb 2020 19:32:42 GMT";
 	expectedResponseHeaders["Server"] = "Test HTTP Server for Haiku";
@@ -362,7 +410,7 @@ HttpTest::AuthDigestTest()
 		"Accept-Encoding: gzip\r\n"
 		"Connection: close\r\n"
 		"User-Agent: Services Kit (Haiku)\r\n"
-		"Referer: http://127.0.0.1:PORT/auth/digest/walter/secret\r\n"
+		"Referer: SCHEME://127.0.0.1:PORT/auth/digest/walter/secret\r\n"
 		"Authorization: Digest username=\"walter\","
 		" realm=\"user@shredder\","
 		" nonce=\"f3a95f20879dd891a5544bf96a3e5518\","
@@ -377,7 +425,7 @@ HttpTest::AuthDigestTest()
 
 	HttpHeaderMap expectedResponseHeaders;
 	expectedResponseHeaders["Content-Encoding"] = "gzip";
-	expectedResponseHeaders["Content-Length"] = "401";
+	expectedResponseHeaders["Content-Length"] = "403";
 	expectedResponseHeaders["Content-Type"] = "text/plain";
 	expectedResponseHeaders["Date"] = "Sun, 09 Feb 2020 19:32:42 GMT";
 	expectedResponseHeaders["Server"] = "Test HTTP Server for Haiku";
@@ -409,23 +457,16 @@ HttpTest::AuthDigestTest()
 /* static */ template<class T> void
 HttpTest::_AddCommonTests(BString prefix, CppUnit::TestSuite& suite)
 {
-	BString name;
+	T* test = new T();
+	BThreadedTestCaller<T>* testCaller
+		= new BThreadedTestCaller<T>(prefix.String(), test);
 
-	name = prefix;
-	name << "GetTest";
-	suite.addTest(new CppUnit::TestCaller<T>(name.String(), &T::GetTest));
+	testCaller->addThread("GetTest", &T::GetTest);
+	testCaller->addThread("UploadTest", &T::UploadTest);
+	testCaller->addThread("BasicAuthTest", &T::AuthBasicTest);
+	testCaller->addThread("DigestAuthTest", &T::AuthDigestTest);
 
-	name = prefix;
-	name << "UploadTest";
-	suite.addTest(new CppUnit::TestCaller<T>(name.String(), &T::UploadTest));
-
-	name = prefix;
-	name << "AuthBasicTest";
-	suite.addTest(new CppUnit::TestCaller<T>(name.String(), &T::AuthBasicTest));
-
-	name = prefix;
-	name << "AuthDigestTest";
-	suite.addTest(new CppUnit::TestCaller<T>(name.String(), &T::AuthDigestTest));
+	suite.addTest(testCaller);
 }
 
 
@@ -446,9 +487,6 @@ HttpTest::AddTests(BTestSuite& parent)
 		parent.addTest("HttpTest", &suite);
 	}
 
-	// The HTTPS tests are disabled for now until --use-tls is implemented
-	// in testserver.py.
-#if 0
 	{
 		CppUnit::TestSuite& suite = *new CppUnit::TestSuite("HttpsTest");
 
@@ -457,7 +495,6 @@ HttpTest::AddTests(BTestSuite& parent)
 
 		parent.addTest("HttpsTest", &suite);
 	}
-#endif
 }
 
 
