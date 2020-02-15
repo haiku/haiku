@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-PRNT	3895489488
+1	russian	x-vnd.Be-PRNT	1465107170
 Test page	TestPageView		Тестовая страница
 Remove	PrintersWindow		Удалить
 Red	TestPageView		Красный
@@ -17,6 +17,7 @@ Processing	JobListView		Обрабатывается
 Cancel	AddPrinterDialog		Отмена
 Unknown status	JobListView		Состояние неизвестно
 Print jobs for %printer_name%	PrintersWindow		Задания печати для %printer_name%
+{0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? страниц}=1{# страница}few{# страницы}other{# страниц}}
 Add printer	AddPrinterDialog		Добавить принтер
 Printers	PrintersWindow		Принтеры
 No printer found!	TransportMenu		Принтер не найден!
@@ -30,6 +31,7 @@ Yellow	TestPageView		Жёлтый
 Black	TestPageView		Черный
 Printer type:	AddPrinterDialog		Тип принтера:
 Printers	System name		Принтеры
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{Нет заданий в очереди}=1{1 задание в очереди}few{# задания в очереди}other{# заданий в очереди}}
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Принтер: %printer_name%\nДрайвер: %driver%\n
 Green	TestPageView		Зеленый
 Print test page	PrintersWindow		Пробная страница

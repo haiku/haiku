@@ -1,5 +1,6 @@
-1	ukrainian	x-vnd.Haiku-FileTypes	734679611
+1	ukrainian	x-vnd.Haiku-FileTypes	436017301
 Left	Attribute Window	Attribute column alignment in Tracker	Вліво
+Float	Attribute ListView		З рухомою комою
 Final	Application Types Window		Завершення
 FileTypes request	FileTypes Window		Запит Типів файлів
 This file type already exists	New File Type Window		Тип файлу повністю присутній
@@ -31,6 +32,7 @@ Signature:	Application Types Window		Підпис:
 None	FileTypes Window		Жоден
 Exclusive launch	Application Type Window		Виключний запуск
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Видалення типу файлу незворотнє.\nВи впевнені, що бажаєте видалити його?
+Integer 64 bit	Attribute ListView		Ціле 64 біта
 Cancel	New File Type Window		Відмінити
 Select same preferred application as	FileType Window		Вибрати таку ж бажану програму як
 Cancel	Type List Window		Відмінити
@@ -43,10 +45,13 @@ Abort	Application Types Window		Відмінити
 Save	Application Type Window		Зберегти
 %1 application type	Application Type Window		%1 тип програми
 Icon	Application Type Window		Іконка
+Duration	Attribute ListView		Тривалість
 Version:	Application Type Window		Версія:
 Default application	FileType Window		Додаток по замовчуванню
 Internal name:	New File Type Window		Внутрішнє і'мя:
+Integer 8 bit	Attribute ListView		Ціле 8 бітів
 Extension:	Extension Window		Розширення:
+Time	Attribute ListView		Час
 Extensions:	FileTypes Window		Розширення:
 Select preferred application	FileType Window		Вибрати бажану програму
 Description:	FileTypes Window		Опис:
@@ -66,6 +71,8 @@ Version:	Application Types Window		Версія:
 Application types	Application Types Window		Типи програм
 Description:	Application Types Window		Опис:
 Name:	Application Types Window		Ім'я:
+Rating	Attribute ListView		Рейтинг
+duration	Attribute ListView		тривалість
 File could not be opened	Preferred App Menu		Файл неможливо відкрити
 Args only	Application Type Window		Тільки аргументи
 Could not open \"%s\":\n%s	FileTypes		Неможливо відкрити \"%s\":\n%s
@@ -83,16 +90,21 @@ Type name:	FileTypes Window		І'мя типу:
 Visible	Attribute Window		Видимий
 Select preferred application	FileTypes Window		Вибрати бажану програму
 Path:	Application Types Window		Шлях:
+rating	Attribute ListView		рейтинг
 Could not install file type	New File Type Window		Неможливо встановити тип файла
 Same as…	FileTypes Window		Такий як…
 Golden master	Application Type Window		Золотий майстер
+Checkbox	Attribute ListView		Чек-бокс
 FileTypes request	Preferred App Menu		Запит Типів файлів
 no icon	FileTypes Window		іконка відсутня
 Single launch	Application Type Window		Одноразовий запуск
 %s file type	FileType Window		%s тип файлу
+Default	Attribute ListView		Замовчування
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Видалення головного типу незоротнє.\nВсі типи файлів що відносяться до нього будуть втрачені!\n\nВи впевнені , що бажаєте цього? Для видалення цілої групи утримуючи клавішу Shift натисніть \"Видалити\".
+String	Attribute ListView		Рядок
 Add type	New File Type Window		Додати тип
 Remove icon	Icon View		Видалити іконку
+Boolean	Attribute ListView		Булевий
 Cancel	Extension Window		Відмінити
 Alignment:	Attribute Window		Вирівнювання:
 Icon	FileType Window		Іконка
@@ -101,6 +113,7 @@ Development	Application Type Window		Розробка
 Golden master	Application Types Window		Золотий майстер
 Add	Extension Window		Додати
 Open…	FileTypes Window		Відкрити…
+checkbox	Attribute ListView		чек-бокс
 Could not change file extensions	Extension Window		Неможливо змінити розширення файлу
 Could not open file	FileType Window		Неможливо відкрити файл
 Choose type	Type List Window		Вибрати тип
@@ -118,6 +131,7 @@ Add group	New File Type Window		Додати групу
 Cancel	Attribute Window		Скасувати
 Gamma	Application Types Window		Гамма
 Supported types	Application Type Window		Типи, що підтримуються
+Integer 32 bit	Attribute ListView		Ціле 32 біта
 Beta	Application Type Window		Бета
 Could not retrieve preferred application of this file	Preferred App Menu		Неможливо виправити бажану програму для цього файлу
 Application flags	Application Type Window		Флаги програм
@@ -142,6 +156,7 @@ Extra attributes	FileTypes Window		Суператрибути
 Group:	New File Type Window		Неможливо встановити бажану програму
 Alpha	Application Types Window		Aльфа
 Close	Application Type Window		Закрити
+Integer 16 bit	Attribute ListView		Ціле 16 бітів
 Extension	Extension Window		Розширення
 Rule:	FileTypes Window		Правило:
 FileTypes	System name		Типи файлів
@@ -153,5 +168,6 @@ Add…	FileTypes Window		Додати…
 Edit icon…	Icon View		Редагувати іконки…
 Internal name:	Attribute Window		Внутрішнє ім'я:
 Show recognition rule	FileTypes Window		Показати правило розпізнавання
+Double	Attribute ListView		Подвійної точності
 Move down	FileTypes Window		Перемістити вниз
 Alpha	Application Type Window		Альфа

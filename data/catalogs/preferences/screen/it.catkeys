@@ -17,7 +17,7 @@ vertically	Screen		verticalmente
 All workspaces	Screen		Tutti gli spazi di lavoro
 Use laptop panel:	Screen		Usa pannello del portatile:
 Could not write VESA mode settings file:\n\t	Screen		Non è stato possibile scrivere le impostazioni della modalità VESA:\n\t
-Settings will revert in %seconds.	Screen		Le impostazioni saranno ripristinate in %seconds secondi.
+Settings will revert in %seconds.	Screen		Le impostazioni saranno ripristinate in %seconds.
 Cancel	Screen		Cancella
 Other…	Screen		Altro…
 Screen	Screen		Schermo

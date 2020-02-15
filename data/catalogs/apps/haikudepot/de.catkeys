@@ -1,10 +1,12 @@
-1	german	x-vnd.Haiku-HaikuDepot	3605875353
+1	german	x-vnd.Haiku-HaikuDepot	149184511
 Repository update error	LocalRepositoryUpdateProcess		Fehler bei Paketquellenaktualisierung
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Fehler bei der Aktualisierung der Paketquelle: %error%
+User Created	UserLoginWindow		Benutzerkonto erstellt
 Check for updates…	MainWindow		Aktualisierungen suchen…
 Uninstall	PackageManager		Deinstallieren
 (%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Deinstalliert
+It was not possible to create the new user.	UserLoginWindow		Das neue Benutzerkonto konntenicht angelegt werden.
 Available packages	MainWindow		Verfügbare Pakete
 Create account	UserLoginWindow		Benutzerkonto erstellen
 OK	App		OK
@@ -14,9 +16,11 @@ While updating package data, a problem has arisen that may cause data to be outd
 Develop packages	MainWindow		Entwicklungs-Pakete
 Rate package…	PackageInfoView		Paket bewerten…
 Starting the package daemon failed:\n\n%Error%	App		Der Paket-Daemon konnte nicht gestartet werden:\n\n%Error%
+You have successfully authenticated as user %Nickname%.	UserLoginWindow		Der Benutzer %Nickname% wurde erfolgreich angemeldet.
 <no info>	PackageInfoView		<keine Info>
 No user ratings available.	PackageInfoView		Keine Bewertungen vorhanden.
 Downloading package '%name%'	WorkStatusView		Paket '%name%' wird heruntergeladen
+It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Aus den vom Server geschickten Daten konnten nicht die benötigten Captcha Infos gewonnen werden.
 Rating	PackageListView		Bewertung
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronisierungs-Icons
 Does not start	RatePackageWindow		Startet nicht
@@ -37,9 +41,12 @@ Local	LocalPkgDataLoadProcess		Lokal
 Rate %Package%	RatePackageWindow		%Package% bewerten
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Fehler beim Initialisieren des Paketmanagers: %message%
 Quit HaikuDepot	App		HaikuDepot beenden
+An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Es trat ein unerwarteter Fehler '%Message%'  mit der Eigenschaft '%Property%' auf.
+A response to the captcha question must be provided.	UserLoginWindow		Das Captcha muss beantwortet werden.
 Category	FilterView		Kategorie
 User rating	RatePackageWindow		Bewertung
 Installed packages	MainWindow		Installierte Pakete
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again.	UserLoginWindow		Beim Herunterladen der Nutzungsbedingungen für die Erstellung eines neuen Benutzerkontos ist ein Fehler aufgetreten. Bitte Log prüfen und nochmal probieren.
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Ein angefordertes Objekt bzw. ein bei der Anfrage beteiligtes Objekt, wurde auf dem Server  nicht gefunden.
 Other users can see this rating	RatePackageWindow		Diese Bewertung ist für andere Anwender sichtbar
 Stable	RatePackageWindow		Stabil
@@ -52,12 +59,14 @@ There was a puzzling response from the web service.	UserLoginWindow		Der Web-Die
 Not logged in	MainWindow		Nicht angemeldet
 No, quit HaikuDepot	App		Nein, HaikuDepot beenden
 Featured packages	FeaturedPackagesView		Empfohlene Pakete
+It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Es konnte keine Verbindung mit dem Server aufgebaut werden, um ein Captcha für das Anlegen eines neuen Benutzerkontos zu erhalten.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Die Bewertung wurde erfolgreich hochgeladen. Auf der HaikuDepot Server Webseite lässt sie sich aktualisieren oder auch wieder löschen.
 Network Error	ServerHelper		Netzwerkfehler
 Available	PackageListView		Verfügbar
 Cancel	UserLoginWindow		Abbrechen
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Um richtig zu funktionieren, benötigt HaikuDepot den Paket-Daemon, der aber anscheinend gerade nicht läuft.\nSoll er gestartet werden?
 Click a package to view information	PackageInfoView		Paket anklicken, um Infos anzuzeigen
+The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		Das Kennwort muss mindestens acht Zeichen lang sein und wenigstens zwei Zahlen und einen Großbuchstaben enthalten.
 Contents	PackageInfoView		Inhalt
 Close	PackageManager		Schließen
 A network transport error has arisen communicating with the HaikuDepot server system: %s	ServerHelper		Bei der Kommunikation mit dem HaikuDepot Server ist ein Netzwerk-Übertragungsfehler aufgetreten: %s
@@ -68,16 +77,21 @@ About	PackageInfoView		Über
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# Prozess} other{# Prozesse}}
 Reboot required	PackageManager		Neustart erforderlich
 Very unstable	RatePackageWindow		Sehr instabil
+Password:	UserLoginWindow		Kennwort:
 All packages	PackageListView		Alle Pakete
 Network Transport Error	ServerHelper		Netzwerk-Übertragungsfehler 
 Authorization or security issue.  Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Es ist ein Anmelde- oder Sicherheitsproblem aufgetreten. Bitte aus- und wieder einloggen, um sicherzustellen dass das Kennwort korrekt ist. Außerdem ist zu prüfen, ob den aktuellen Nutzungsbedingungen zugestimmt wurde.
 Stability	RatePackageWindow		Stabilität
+The nickname must be unique, but the supplied nickname is already taken.  Choose a different nickname.	UserLoginWindow		Der angegebene Benutzername ist bereits vergeben.  Bitte einen anderen Benutzernamen wählen.
 Send	RatePackageWindow		Senden
 Start package daemon	App		Paket-Daemon starten
+The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Das Kennwort muss wiederholt werden, um die Wahrscheinlichket einer Falscheingabe zu verringern.
 The package action could not be scheduled: %Error%	PackageInfoView		Die Aktion konnte nicht auf das Paket angewandt werden: %Error%
 Cancel	RatePackageWindow		Abbrechen
 Inactive	PackageListView		Deaktiviert
+Nickname:	UserLoginWindow		Benutzername:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synchronisieren der Metadaten von Paketquellen
+There are problems in the supplied data:	UserLoginWindow		Es gibt Probleme mit den eingegebenen Daten:
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# Objekt} other{# Objekte}}
 Usage conditions download problem	UserLoginWindow		Problem beim Herunterladen der Nutzungsbedingungen
@@ -88,6 +102,7 @@ Package daemon problem	App		Paket Daemon Problem
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Paketquelle
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (Version %hd.version%)
+The email is malformed.	UserLoginWindow		Das Format der Emailadresse ist inkorrekt.
 Close	UserLoginWindow		Schließen
 Close	RatePackageWindow		Schließen
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchronisieren von Paketdaten für Paketquelle '%REPO_NAME%'
@@ -104,19 +119,24 @@ View agreed usage conditions…	MainWindow		Zugestimmte Nutzungsbedingungen lese
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 weiterer Download)}other{(# weitere Downloads)}}
 Refresh repositories	MainWindow		Paketquellen aktualisieren
 Tools	MainWindow		Werkzeuge
+A password is required.	UserLoginWindow		Es wird ein Kennwort benötigt.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Dieses Paket scheint nicht auf dem HaikuDepot Server zu sein. Es ist daher nicht möglich eine neue Bewertung abzugeben, bzw. eine bestehende zu ändern.
 Language	RatePackageWindow		Sprache
 Log out	MainWindow		Abmelden
 Comment language:	RatePackageWindow		Kommentar-Sprache:
 Status	PackageListView		Status
+The password has been incorrectly repeated.	UserLoginWindow		Das Kennwort wurde falsch wiederholt.
 Update	RatePackageWindow		Aktualisieren
 OK	ServerHelper		OK
 Language	UserLoginWindow		Sprache
 OK	UserLoginWindow		OK
 Reading repository data	LocalPkgDataLoadProcess		Einlesen von Paketquellendaten
 Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Synchronisieren von Referenzdaten vom Server
+The nickname is malformed.  The nickname may only contain digits and lower case latin characters.  The nickname must be between four and sixteen characters in length.	UserLoginWindow		Das Format des Benutzernamens ist inkorrekt.  Ein Benutzername darf nur aus Zahlen und Kleinbuchstaben bestehen und zwischen 4 und 16 Zeichen lang sein.
 Stability:	RatePackageWindow		Stabilität:
+The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Die Nutzungsbedingungen müssen akzeptiert werden und der anzulegende Benutzer muss das geforderte Mindestalter haben.
 A validation error has occurred	ServerHelper		Fehler bei der Validieren
+The nickname is required.	UserLoginWindow		Der Benutzername wird benötigt.
 Source packages	MainWindow		Quellcode-Pakete
 -	no package size		-
 Try again	App		Nochmal versuchen
@@ -133,11 +153,15 @@ View latest usage conditions…	MainWindow		Aktuelle Nutzungsbedingungen lesen�
 Search terms:	FilterView		Suchbegriffe:
 Pending…	PackageListView		Ausstehend…
 Category:	FilterView		Kategorie:
+The user %Nickname% has been successfully created in the HaikuDepotServer system.  You can administer your user details by using the web interface.  You are now logged-in as this new user.	UserLoginWindow		Der Benutzer %Nickname% wurde erfolgreich im HaikuDepotServer System angelegt. Die Benutzerdaten können auf der Webseite verwaltet werden. Die Anmeldung mit diesem neuen Benutzer war erfolgreich.
 Authentication failed	UserLoginWindow		Anmeldung fehlgeschlagen
+The supplied response to the captcha is incorrect.  A new captcha will be generated; try again.	UserLoginWindow		Die Antwort auf das Captcha war inkorrekt.  Ein neues Captcha wird erzeugt, bitte nochmal probieren.
+Captcha error	UserLoginWindow		Captcha Fehler
 Manage repositories…	MainWindow		Paketquellen verwalten…
 Fetching remote repository data	LocalRepositoryUpdateProcess		Abrufen von Paketquellendaten
 Description	PackageListView		Beschreibung
 Open %DeskbarLink%	PackageManager		%DeskbarLink% öffnen
+User creation error	UserLoginWindow		Fehler beim Erstellen des Benutzerkontos
 Install	PackageManager		Installieren
 Input validation	UserLoginWindow		Eingabeprüfung
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Der HaikuDepot Server hat einen unerwarteten Fehler gesandt [%i]
@@ -146,4 +170,5 @@ You need to be logged into an account before you can rate packages.	MainWindow		
 Client version too old	ServerHelper		Client Version zu alt
 Local repository load error	LocalPkgDataLoadProcess		Fehler bem Laden einer lokalen Paketquelle
 9999.99 KiB	PackageListView		9999.99 KiB
+Repeat password:	UserLoginWindow		Kennwort wiederholen:
 All repositories	MainWindow		Alle Paketquellen

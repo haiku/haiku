@@ -1,10 +1,11 @@
-1	ukrainian	x-vnd.Haiku-Media	4205337498
+1	ukrainian	x-vnd.Haiku-Media	1682972002
 Audio mixer	Media Window		Аудіо міксер
 Show volume control on Deskbar	Media views		Показати регулятор гучності в Deskbar
 Quit	Media Window		Вихід
 Restart media services	Media views		Перезапустити медіа служби
 Couldn't add volume control in Deskbar: %s\n	Media views		Неможливо додати регулятор гучності в Deskbar: %s\n
 Start media server	Media Window		Запуск медіа сервера
+<none>	VideoInputMenu	Used when no video input is available	<немає>
 Audio settings	Media Window		Налаштування звуку
 Quit anyway	Media Window		Вийти будь-що
 Couldn't remove volume control in Deskbar: %s\n	Media views		Неможливо видалити регулятор гучності з Deskbar: %s\n
@@ -22,3 +23,4 @@ Channel:	Media views		Канал:
 Defaults	Media views		Типово
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Медіа сервер не запущено\nЗапустити його?
 Video settings	Media Window		Налаштування відео
+<none>	VideoOutputMenu	Used when no video output is available	<немає>

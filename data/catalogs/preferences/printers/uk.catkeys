@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Be-PRNT	2042381362
+1	ukrainian	x-vnd.Be-PRNT	1465107170
 Test page	TestPageView		Пробна сторінка
 Remove	PrintersWindow		Видалити
 Red	TestPageView		Червоний
@@ -16,6 +16,8 @@ Waiting	JobListView		Очікування
 Processing	JobListView		Виконання
 Cancel	AddPrinterDialog		Скасувати
 Unknown status	JobListView		Стан невідомий
+Print jobs for %printer_name%	PrintersWindow		Завдання на %printer_name%
+{0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? сторінок}=1{# сторінка}few{# сторінки}other{# сторінок}}
 Add printer	AddPrinterDialog		Додати принтер
 Printers	PrintersWindow		Принтери
 No printer found!	TransportMenu		Принтера не знайдено!
@@ -29,6 +31,7 @@ Yellow	TestPageView		Жовтий
 Black	TestPageView		Чорний
 Printer type:	AddPrinterDialog		Підключений до:
 Printers	System name		Принтери
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{Черга вільна}=few{# завдання на черзі}other{# завдань на черзі}}
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Принтер: %printer_name%\nДрайвер: %driver%\n
 Green	TestPageView		Зелений
 Print test page	PrintersWindow		Друк пробної сторінки

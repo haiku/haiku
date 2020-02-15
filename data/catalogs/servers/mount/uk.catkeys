@@ -1,9 +1,10 @@
-1	ukrainian	x-vnd.Haiku-mount_server	819316177
+1	ukrainian	x-vnd.Haiku-mount_server	2818767263
 Mount read-only	AutoMounter		Змонтувати тільки для читання
 Error mounting volume:\n\n%s	AutoMounter		Помилка підмонтування тому:\n\n%s
 Cancel	AutoMounter		Скасувати
 OK	AutoMounter		Гаразд
 Unmount error	AutoMounter		Помилка відмонтування
+The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		На цьому розділі - відмінна від bfs файлова система. Для уникнення втрати даних через баги у Haiku рекомендуємо монтувати його в режимі "тільки читання".
 Mount read/write	AutoMounter		Підмонтувати для запису/читання
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		Неможливо відмонтувати диск \"%s\":\n\t%s
 Mounting volume '%s'\n\n	AutoMounter		Підмонтування тому '%s'\n\n

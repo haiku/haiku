@@ -1,10 +1,12 @@
-1	italian	x-vnd.Haiku-HaikuDepot	1415378461
+1	italian	x-vnd.Haiku-HaikuDepot	1876129087
 Repository update error	LocalRepositoryUpdateProcess		Errore nell'aggiornamento del Repository
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificato un errore nell'aggiornamento del repository: %error%
+User Created	UserLoginWindow		Utente Creato
 Check for updates…	MainWindow		Controllo aggiornamenti…
 Uninstall	PackageManager		Disinstalla
 (%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Disinstallato
+It was not possible to create the new user.	UserLoginWindow		Non è stato possble creare il nuovo utente.
 Available packages	MainWindow		Pacchetti disponibili
 Create account	UserLoginWindow		Crea account
 OK	App		OK
@@ -14,6 +16,7 @@ While updating package data, a problem has arisen that may cause data to be outd
 Develop packages	MainWindow		Sviluppo
 Rate package…	PackageInfoView		Vota pacchetto…
 Starting the package daemon failed:\n\n%Error%	App		Avvio del demone dei pacchetti fallito:\n\n%Error%
+You have successfully authenticated as user %Nickname%.	UserLoginWindow		Ti sei autenticato con successo come utente %Nickname%.
 <no info>	PackageInfoView		<nessuna informazione>
 No user ratings available.	PackageInfoView		Nessuna valutazione utente è disponibile.
 Downloading package '%name%'	WorkStatusView		Download del pacchetto '%name%' in corso
@@ -68,14 +71,17 @@ About	PackageInfoView		Informazioni su…
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# processo} other{# processi}}
 Reboot required	PackageManager		È richiesto il riavvio
 Very unstable	RatePackageWindow		Molto instabile
+Password:	UserLoginWindow		Password:
 All packages	PackageListView		Tutti i pacchetti
 Network Transport Error	ServerHelper		Errore di Rete
 Stability	RatePackageWindow		Stabilità
+The nickname must be unique, but the supplied nickname is already taken.  Choose a different nickname.	UserLoginWindow		Il soprannome deve essere univoco, ma quello da te inserito risulta già utilizzato.  Per favore, scegline uno differente.
 Send	RatePackageWindow		Invia
 Start package daemon	App		Avvia server dei pacchetti
 The package action could not be scheduled: %Error%	PackageInfoView		Non è stato possibile pianificare l'azione sul pacchetto: %Error%
 Cancel	RatePackageWindow		Annulla
 Inactive	PackageListView		Inattivo
+Nickname:	UserLoginWindow		Soprannome:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Sincronizzazione dei metadati dei repository in corso
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
@@ -87,6 +93,7 @@ Package daemon problem	App		Problema con il server dei pacchetti
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Repository
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (versione %hd.version%)
+The email is malformed.	UserLoginWindow		L'indirizzo email è malformato.
 Close	UserLoginWindow		Chiudi
 Close	RatePackageWindow		Chiudi
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sincronizzazione dei dati dei pacchetti del repository '%REPO_NAME%' in corso
@@ -133,6 +140,7 @@ Search terms:	FilterView		Termini di ricerca:
 Pending…	PackageListView		In attesa…
 Category:	FilterView		Categoria:
 Authentication failed	UserLoginWindow		Autenticazione non riuscita
+Captcha error	UserLoginWindow		Errore validazione Captcha
 Manage repositories…	MainWindow		Gestisci repository…
 Fetching remote repository data	LocalRepositoryUpdateProcess		Recupero dati repository remoto
 Description	PackageListView		Descrizione
@@ -145,4 +153,5 @@ You need to be logged into an account before you can rate packages.	MainWindow		
 Client version too old	ServerHelper		Versione del client troppo vecchia
 Local repository load error	LocalPkgDataLoadProcess		Errore nel caricamento del repository locale
 9999.99 KiB	PackageListView		9999.99 KiB
+Repeat password:	UserLoginWindow		Ripeti password:
 All repositories	MainWindow		Tutti i repository

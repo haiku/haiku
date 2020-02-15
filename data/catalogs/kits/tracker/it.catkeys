@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libtracker	2745737133
+1	italian	x-vnd.Haiku-libtracker	1551358313
 Created	ContainerWindow		Creato
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Apri e rendi preferito
@@ -22,6 +22,7 @@ Open	FilePanelPriv		Apri
 Bitmap icon	AttributesView		Icona bitmap
 You can't replace a folder with one of its sub-folders.	FSUtils		Non è possibile sostituire una cartella con una delle sue sotto-cartelle.
 <%ld dates>	AttributesView		<%ld date>
+Select…	VirtualDirectoryWindow		Seleziona…
 Name	Default Query Columns		Nome
 Unmount	ContainerWindow		Smonta
 Eject when unmounting	AutoMounterSettings		Espelli i volumi una volta smontati
@@ -357,6 +358,7 @@ Size:	InfoWindow		Dimensione:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		L'elemento selezionato non può essere spostato nel Cestino. Desideri eliminarlo definitivamente? (Gli elementi non potranno essere recuperati.)
 Copy	ContainerWindow		Copia
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Spiacenti, l'attributo 'Character' non può contenere un glifo multi-byte.
+Open parent	VirtualDirectoryWindow		Apri livello superiore
 And	FindPanel		E
 Palette-indexed picture	AttributesView		Immagine con palette indicizzata
 multiple disks	FindPanel		più dischi
@@ -441,6 +443,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Spiacenti, salva
 Move here	ContainerWindow		Sposta qui
 the config folder	FSUtils		la cartella di configurazione
 Sorry, could not create a new folder.	FSUtils		Non è stato possible creare la nuova cartella.
+Select all	VirtualDirectoryWindow		Seleziona tutto
 Rename	FSUtils	button label	Rinomina
 Clean up all	ContainerWindow		Ordina tutte le icone
 Add current folder	FilePanelPriv		Aggiungi cartella corrente
@@ -470,6 +473,7 @@ Default application	InfoWindow		Applicazione predefinita
 Untitled bitmap	PoseView		Bitmap senza nome
 matches regular expression	SelectionWindow		espressione regolare
 Invert selection	ContainerWindow		Inverti selezione
+Close	VirtualDirectoryWindow		Chiudi
 Monochrome picture	AttributesView		Immagine monocromatica
 Real name	ContainerWindow		Nome reale
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Non è stato possibile aprire \"%name\". Il file è stato erroneamente marcato come eseguibile. 
@@ -506,6 +510,7 @@ Delete	PoseView		Elimina
 Media parameter	AttributesView		Parametro media
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se modifichi la tua cartella personale, %osName potrebbe non funzionare correttamente!\n\nSei sicuro di voler procedere?\n\nPer modificare la cartella home, tieni premuto il tasto Maiusc e clicca su \"So quello che faccio\".
 Sorry, you can't copy items to the Trash.	PoseView		Non è possibile copiare elementi nel Cestino.
+Invert selection	VirtualDirectoryWindow		Inverti selezione
 New folder	FilePanelPriv		Nuova cartella
 {0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# elemento} other{# elementi}}
 Name	AttributesView		Nome

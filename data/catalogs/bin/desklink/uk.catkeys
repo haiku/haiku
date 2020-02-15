@@ -3,7 +3,7 @@ desklink	MediaReplicant	Title of an alert box	desklink
 Sound preferences…	MediaReplicant		Налаштування звуку…
 Muted	MediaReplicant		Приглушити
 %g dB	MediaReplicant		%g dB
-OK	MediaReplicant		Гаразд
+OK	MediaReplicant		ОК
 Couldn't launch 	MediaReplicant		Не вдалося запустити 
 Volume	VolumeControl		Гучність
 Open MediaPlayer	MediaReplicant		Відкрити Медіапрогравач

@@ -114,7 +114,7 @@ Edit templates…	TemplatesMenu		Şablonları düzenle…
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used kullanılıyor -- %free kullanılmayan)
 Hide dotfiles	SettingsView		Nokta ile başlayan dosyaları gizle
 Trash	Model		Çöp
-Enable type-ahead filtering	SettingsView		Otomatik tamamlayan süzgeçlemeyi etkinleştir
+Enable type-ahead filtering	SettingsView		Otomatik tamamlayan süzmeyi etkinleştir
 copy	FSUtils	filename copy	kopyala
 New folder%ld	FSUtils		Yeni klasör%ld
 Location	OpenWithWindow		Konum
@@ -379,7 +379,7 @@ no items	CountView		öge yok
 Time	AttributesView		Zaman
 Disks	DirMenu		Diskler
 Query name:	FindPanel		Sorgu adı:
-Open parent	ContainerWindow		Üst klasörünü aç
+Open parent	ContainerWindow		Üst klasörü aç
 Find…	ContainerWindow		Bul…
 moving	FSUtils		taşıdığınız
 Single window navigation	SettingsView		Tek pencereli dolaşım

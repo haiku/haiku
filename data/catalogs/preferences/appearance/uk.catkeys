@@ -26,7 +26,7 @@ Decorator:	DecorSettingsView		Декоратор:
 Menu background	Colors tab		Тло меню
 Revert	APRWindow		Повернути
 List item text	Colors tab		Текст елементів списку
-OK	DecorSettingsView		Гаразд
+OK	DecorSettingsView		ОК
 Control text	Colors tab		Текст керування
 Look and feel	APRWindow		Вигляд і поведінка
 Selected menu item background	Colors tab		Тло вибраного пункта меню
@@ -72,7 +72,7 @@ Monospaced fonts only	AntialiasingSettingsView		Тільки моноширин�
 Document text	Colors tab		Текст документа
 Inactive window border	Colors tab		Межа неактивного вікна
 Colors	APRWindow		Кольори
-About control look	DecorSettingsView		При вигляд віджетів
+About control look	DecorSettingsView		Про вигляд віджетів
 Control highlight	Colors tab		Керування виділенням
 Status bar	Colors tab		Смуга стану
 Link hover	Colors tab		Зависле посилання

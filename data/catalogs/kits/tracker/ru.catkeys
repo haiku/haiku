@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	4024830985
+1	russian	x-vnd.Haiku-libtracker	251818569
 Created	ContainerWindow		Создан
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
@@ -41,6 +41,7 @@ Small bitmap icon	AttributesView		Малый растровый значок
 Would you like to find a suitable application to open the file?	FSUtils		Хотите найти подходящее приложение для открытия файла?
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Невозможно заменить папку или символическую ссылку файлом.
+Trailing \\.	libtracker		Конечный \\.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Не удалось выполнить %func в find_directory(). \nПричина: %error
 Handles any file	OpenWithWindow		Поддерживает любые файлы
 save text	FilePanelPriv		сохранить текст
@@ -97,6 +98,7 @@ Desktop	B_DESKTOP_DIRECTORY		Рабочий стол
 Corrupted pointers.	libtracker		Поврежденные указатели.
 Link to:	InfoWindow		Ссылка на:
 Copy here	ContainerWindow		Копировать сюда
+Character	AttributesView		Символьный
 All disks	FindPanel		всех дисках
 Affine transform	AttributesView		Аффинное преобразование
 Window	ContainerWindow		Окно
@@ -193,8 +195,10 @@ contains	SelectionWindow		содержит
 Replace	FilePanelPriv		Заменить
 is not	FindPanel		не равен
 Icon view	DeskWindow		Большие значки
+<%ld rectangles>	AttributesView		<%ld прямоугольников>
 Mount settings…	ContainerWindow		Настройка подключения дисков…
 Keywords	Bookmark Query Columns		Ключевые слова
+Media parameter web	AttributesView		Медиа параметры веб
 Copy more	ContainerWindow		Копировать ещё
 by name	FindPanel		по имени
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Извините, сохранение объектов в корневой папке системы невозможно.
@@ -259,6 +263,7 @@ Open	OpenWithWindow		Открыть
 You must have at least one attribute showing.	PoseView		Вы должны оставить хотя бы один атрибут для просмотра.
 Cut	FilePanelPriv		Вырезать
 Favorites	FilePanelPriv		Закладки
+Point	AttributesView		Указатель
 home	B_USER_DIRECTORY		Домашняя
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Шаблоны
 Disk mounting during boot	AutoMounterSettings		Подключение дисков при загрузке
@@ -302,6 +307,7 @@ Edit name	ContainerWindow		Переименовать
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Невозможно открыть \"%document\" (Отсутствует символ: %symbol). \n
 ASCII Text	AttributesView		Текст ASCII
 More options	FindPanel		Больше опций
+Atom reference	AttributesView		ссылочный Atom
 config	B_USER_CONFIG_DIRECTORY		Конфигурация
 Error moving \"%name\".	FSUtils		Ошибка при перемещении \"%name\".
 Select…	QueryContainerWindow		Выделить…
@@ -390,6 +396,7 @@ You can't move a folder into itself or any of its own sub-folders.	FSUtils		Не
 New	ContainerWindow		Создать
 Fewer options	FindPanel		Меньше опций
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Вам следует перенести объект(ы) на один из значков диска в окне \"Диски\".
+If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Если изменить %target, %osName может вести себя непредсказуемо!\n\nВы уверены, что это хотите это сделать?
 Sorry, you can't copy items to the Trash.	FSClipBoard		Извините, но вы не можете копировать объекты в корзину.
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Некоторые объекты с такими же именами, которые вы %verb, уже существуют в этой папке.\n \nЗаменить их теми, которые вы %verb или спрашивать для каждого объекта?
 When	Email Query Columns		Когда
@@ -399,6 +406,7 @@ Paste	ContainerWindow		Вставить
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Папка \"%name\" уже существует.\nЗаменить существующие файлы при совпадении имён?
 Cannot unmount the boot volume \"%name\".	FSUtils		Невозможно отключить загрузочный раздел \"%name\".
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Невозможно открыть \"%document\" приложением \"%app\" (Отсутствует символ: %symbol). \n
+Reference	AttributesView		Ссылочный
 New folder	ContainerWindow		Новая папка
 Name	OpenWithWindow		Имя
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Ошибка при замене \"%name\". Возможно файл открыт или занят.
@@ -450,6 +458,7 @@ by formula	FindPanel		по формуле
 Resize to fit	VirtualDirectoryWindow		Подогнать по размеру
 Move to Trash	FilePanelPriv		В корзину
 is	FindPanel		равен
+If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Если вы переименуете системную папку или её содержимое, вы не сможете загрузить %osName!\n\nВы уверены, что хотите это сделать?\n\nЧтобы переименовать системную папку или её содержимое, зажмите клавишу "Shift" и нажмите \"Переименовать\".
 40 x 40	DeskWindow		40 x 40
 40 x 40	ContainerWindow		40 x 40
 Permissions	FilePermissionsView		Права
@@ -499,6 +508,7 @@ Handles %type	OpenWithWindow		Поддерживает %type
 Cancel	PoseView		Отмена
 Delete	PoseView		Удалить
 Media parameter	AttributesView		Параметры медиа
+If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Если вы измените домашнюю папку, %osName может вести себя непредсказуемо!\n\nВы уверены, что это нужно сделать?\n\nЧтобы изменить домашнюю папку, зажмите клавишу "Shift" и нажмите \"Я знаю, что я делаю\".
 Sorry, you can't copy items to the Trash.	PoseView		Извините, но вы не можете копировать объекты в корзину.
 Invert selection	VirtualDirectoryWindow		Инвертировать выделение
 New folder	FilePanelPriv		Новая папка

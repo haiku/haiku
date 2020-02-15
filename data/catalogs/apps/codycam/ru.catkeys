@@ -8,7 +8,7 @@ Every 30 minutes	CodyCam		Каждые 30 минут
 Capturing Image…	VideoConsumer.cpp		Захват изображения…
 Cannot start time source!	CodyCam		Невозможно начать отсчет времени!
 Waiting…	CodyCam		Ожидание…
-Passive FTP	CodyCam		Пасивный FTP
+Passive FTP	CodyCam		Пассивный FTP
 Every 10 minutes	CodyCam		Каждые 10 минут
 Every minute	CodyCam		Каждую минуту
 Capture Rate Menu	CodyCam		Меню периодичности захвата

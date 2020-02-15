@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Time	752043118
+1	ukrainian	x-vnd.Haiku-Time	834234238
 OK	Time		Гаразд
 Message receiving failed	Time		Не вдалось отримати повідомлення
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Дата та Час, автори:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nВсі права застережені 2004-2012, Haiku.
@@ -16,6 +16,7 @@ Asia	Time		Азія
 Try all servers	Time		Випробувати всі сервери
 Time	Time		Час
 Current time:	Time		Поточний час:
+The following error occured while synchronizing:\n%s: %s	Time		При синхронізації сталася наступна помилка:\n%s: %s
 Europe	Time		Європа
 Show day of week	Time		Показувати день тижня
 Local time (Windows compatible)	Time		Місцевий час (сумісний з Windows)
@@ -43,5 +44,6 @@ Synchronize at boot	Time		Синхронізувати при завантаже
 Indian	Time		Індійський
 Revert	Time		Повернути
 Date and time	Time		Дата і час
+The following error occured while synchronizing:\n%s	Time		При синхронізації сталася наступна помилка:\n%s
 Synchronize	Time		Синхронізувати
 Add	Time		Додати

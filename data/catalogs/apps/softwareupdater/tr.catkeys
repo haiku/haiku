@@ -1,5 +1,5 @@
 1	turkish	x-vnd.haiku-softwareupdater	369324613
-Updating version	SoftwareUpdaterWindow	List item text	Güncellendiği sürüm
+Updating version	SoftwareUpdaterWindow	List item text	Güncellenen sürüm:
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		{0, plural, other{# güncellenmiş paketi}} yüklemek için buraya tıklayın.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Kaldırılacak paketler
 No active network connection was found	UpdateManager	Error message	Etkin bir ağ bağlantısı bulunamadı
@@ -45,7 +45,7 @@ Click here to run SoftwareUpdater. Some updates will require a problem solution 
 Checking for updates	SoftwareUpdaterWindow		Güncellemeler denetleniyor
 Updates completed	UpdateManager		Güncellemeler tamamlandı
 Reboot	SoftwareUpdaterWindow		Yeniden başlat
-Show more details	SoftwareUpdaterWindow		Daha fazla ayrıntı
+Show more details	SoftwareUpdaterWindow		Ayrıntıları göster
 Installing version	SoftwareUpdaterWindow	List item text	Yüklenen sürüm
 Checking for updates	CheckManager		Güncellemeler denetleniyor
 No remote repositories are available	UpdateManager	Error message	Uzak depolar mevcut değil

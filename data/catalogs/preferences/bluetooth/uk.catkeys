@@ -1,6 +1,6 @@
-1	ukrainian	x-vnd.Haiku-BluetoothPrefs	67867884
+1	ukrainian	x-vnd.Haiku-BluetoothPrefs	4276705900
 Laptop	Settings view		Ноутбук
-Only from trusted devices	Settings view		Тільки для перевірених приладів
+Only from trusted devices	Settings view		Тільки від довірених пристроїв
 15 secs	Settings view		15 сек
 Quit	main		Вийти
 Manufacturer: 	Device View		Виробник: 
@@ -17,9 +17,11 @@ Stop bluetooth services…	Window		Зупинити служби Блютуз…
 Add…	Remote devices		Додати…
 As blocked	Remote devices		Як заблокований
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		В системі не зареєстровано жодного пристрою Блютуз.
+Policy…	Settings view		Політики…
 Revert	Window		Повернути
 Refresh local devices…	Window		Обновлення локальних пристроїв…
 Disconnect	Remote devices		Роз’єднати
+Identify us as…	Settings view		Виглядати як…
 From all devices	Settings view		Для всіх приладів
 Defaults	Window		Типово
 Start bluetooth services…	Window		Запуск служб Блютуз…
@@ -28,12 +30,15 @@ Scanning progress	Inquiry panel		Хід сканування
 Bluetooth	System name		Блютуз
 Launch now	main		Увімкнути
 Remove	Remote devices		Видалити
+Pick device…	Settings view		Оберіть пристрій…
 Always ask	Settings view		Завжди питати
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		За підтримки:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nПодяка людям, які допомогали…\n\nНадавали/дарували обладнання:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nФінансували:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nЗ патчами:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nТестували:\n - Petter H. Juliussen\nХто всьому мене навчив:\n - the yellowTAB team
 Help	Window		Допомога
 Pair…	Remote devices		Пара…
 Retrieving name of %1	Inquiry panel		Відновлення імені %1
 Inquiry	Inquiry panel		Запит
 Incoming connections policy:	Settings view		Правило вхідних під'єднань:
+Retrieving names…	Inquiry panel		Отримую імена…
 Show name	Extended local device view		Показати Ім'я
 Add device to list	Inquiry panel		Додати прилад до списку
 Remaining %1 seconds	Inquiry panel		Залишилось %1 секунд
@@ -47,3 +52,4 @@ Server	Settings view		Сервер
 Handheld	Settings view		Переносний
  packets: 	Device View		 пакетів: 
 About Bluetooth…	Window		Про Блютуз…
+Starting scan…	Inquiry panel		Сканую…

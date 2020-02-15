@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-WebPositive	2763299522
+1	swedish	x-vnd.Haiku-WebPositive	1879106286
 Authentication required	Authentication Panel		Autentisiering krävs
 Previous	WebPositive Window		Tidigare
 (Finish: %date)	Download Window		(Avsluta: %date)
@@ -28,7 +28,9 @@ Start page:	Settings Window		Startsida:
 Cancel	Download Window		Avbryt
 Settings	Settings Window		Inställningar
 Downloads	WebPositive Window		Nedladdningar
+Browse…	Settings Window		Bläddra…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Ett bokmärke för denna sida (%bookmarkName) finns redan.
+Resume prior session	Settings Window		Återuppta föregående session
 Match case	WebPositive Window		Matcha skiftläge
 Proxy password:	Settings Window		Lösenord för proxy:
 Size:	Font Selection view		Storlek:
@@ -119,6 +121,7 @@ Remember username and password for this site	Authentication Panel		Kom ihåg anv
 (Finish: %date - %duration left)	Download Window		(Avsluta: %date - %duration left)
 Cookie manager	Cookie Manager		Kakhanterare
 Show home button	Settings Window		Visa hemknapp
+Start new session	Settings Window		Starta ny session
 The cookie jar is empty!	Cookie Manager		Kakburken är tom!
 Value	Cookie Manager		Värde
 Remove missing	Download Window		Ta bort saknade
@@ -141,6 +144,7 @@ Settings	WebPositive Window		Inställningar
 Clear	URL Bar		Rensa
 Loading %url	WebPositive Window		Laddar %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Yxmördaren Julia Blomqvist på fäktning i Schweiz.
+Start up:	Settings Window		Börja:
 Confirmation	WebPositive Window		Bekräftelse
 Session cookie	Cookie Manager		Sessionskaka
 Open all	WebPositive Window		Öppna alla

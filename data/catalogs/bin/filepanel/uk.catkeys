@@ -16,5 +16,5 @@ usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]      
 -a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tнереалізовано\n
 -m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tробити панель модальною\n
 options:\n	FilePanelApp		опції:\n
--d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\topen at <folder>\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tвідкрити у <папці>\n
 usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		використання: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n

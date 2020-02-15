@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-MAIL	2849540371
+1	russian	x-vnd.Be-MAIL	1477453861
 Set to Saved	Mail		Послать в сохраненные
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основной текст содержит %ld некодируемых символов. Возможно, другая кодировка подойдет лучше? Нажмите Отправить чтобы все равно отправить письмо (некодиуемые символы будут заменены на кодируемые), или нажмите Отмена и попробуйте исправить их вручную.
 Text wrapping:	Mail		Перенос строк:
@@ -13,6 +13,7 @@ Copy to new	Mail		Копировать в новое
 Save as draft	Mail		Сохранить как черновик
 Encoding:	Mail		Кодировка:
 Print	Mail		Печать
+Decrease quote level	Mail		Убрать префикс цитирования
 Encoding	Mail		Кодировка:
 Default account:	Mail		Аккаунт по умолчанию:
 Message	Mail		Сообщение
@@ -164,4 +165,5 @@ Spam	Mail		Спам
 Couldn't open this signature. Sorry.	Mail		Невозможно открыть эту подпись. Извините.
 Revert	Mail		Вернуть
 Unknown	Mail		Неизвестно
+Increase quote level	Mail		Добавить префикс цитирования
 Add enclosure…	Mail		Добавить вложение…

@@ -2,7 +2,7 @@
 Performing installation.	InstallProgress		Kuruluyor.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Açılır menüden kaynak diski seçin ve \"Başla\"ya tıklayın.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Yükleyici penceresini kapatmadan önce Disk İzlencesi penceresini kapatın.
-No optional packages available.	PackagesView		İsteğe bağlı paketler mevcut değil.
+No optional packages available.	PackagesView		İsteğe bağlı paket yok.
 Restart system	InstallerWindow		Yeniden başlat
 The mount point could not be retrieved.	InstallProgress		Bağlama noktası bulunup getirilemedi.
 <none>	InstallerWindow	No partition available	<yok>

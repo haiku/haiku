@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku-softwareupdater	1722463448
+1	russian	x-vnd.haiku-softwareupdater	369324613
 Updating version	SoftwareUpdaterWindow	List item text	Обновляется версия
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Нажмите здесь для установки {0, plural, one{# обновленного пакета} other{# обновленных пакетов}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Пакеты, которые будут удалены
@@ -49,6 +49,7 @@ Show more details	SoftwareUpdaterWindow		Показать больше инфо�
 Installing version	SoftwareUpdaterWindow	List item text	Устанавливаемая версия
 Checking for updates	CheckManager		Проверка обновлений
 No remote repositories are available	UpdateManager	Error message	Нет доступных репозиториев
+Software {0, plural, one{update} other{updates}} available	CheckManager		Доступно {0, plural, one{обновление} few{# обновления} other{обновлений}} программного обеспечения
 Reboot	SoftwareUpdaterWindow	Button label	Перезагрузить
 Update	SoftwareUpdaterWindow	Alert button label	Обновить
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Открыть Репозитории

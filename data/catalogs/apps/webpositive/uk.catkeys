@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-WebPositive	2763299522
+1	ukrainian	x-vnd.Haiku-WebPositive	1879106286
 Authentication required	Authentication Panel		Потребується авторизація
 Previous	WebPositive Window		Попереднє
 (Finish: %date)	Download Window		(Завершення: %date)
@@ -28,7 +28,9 @@ Start page:	Settings Window		Стартова сторінка:
 Cancel	Download Window		Відмінити
 Settings	Settings Window		Налаштування
 Downloads	WebPositive Window		Завантаження
+Browse…	Settings Window		Перегляд…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Закладка цієї сторінки (%bookmarkName) вже існує.
+Resume prior session	Settings Window		Продовжити попередній сеанс
 Match case	WebPositive Window		Враховуючи регістр
 Proxy password:	Settings Window		Гасло проксі:
 Size:	Font Selection view		Розмір:
@@ -119,6 +121,7 @@ Remember username and password for this site	Authentication Panel		Запам'я
 (Finish: %date - %duration left)	Download Window		(Завершення: %date - %duration залишилось)
 Cookie manager	Cookie Manager		Менеджер coookie
 Show home button	Settings Window		Показати домашню кнопку
+Start new session	Settings Window		Запуск нового сеансу
 The cookie jar is empty!	Cookie Manager		Комірка cookie порожня!
 Value	Cookie Manager		Величина
 Remove missing	Download Window		Очікування видалення
@@ -141,6 +144,7 @@ Settings	WebPositive Window		Налаштування
 Clear	URL Bar		Очистити
 Loading %url	WebPositive Window		Завантаження %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Жебракують філософи при ґанку церкви в Гадячі, ще й шатро їхнє п’яне знаємо.
+Start up:	Settings Window		При старті:
 Confirmation	WebPositive Window		Підтвердження
 Session cookie	Cookie Manager		Сесійний файл cookie
 Open all	WebPositive Window		Відкрити всі

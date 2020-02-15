@@ -18,7 +18,7 @@ All workspaces	Screen		Alle Arbeitsflächen
 Use laptop panel:	Screen		Laptop-Panel verwenden:
 Could not write VESA mode settings file:\n\t	Screen		Die VESA-Modus-Datei konnte nicht gespeichert werden:\n\t
 Display info	Screen		Bildschirminfo
-Settings will revert in %seconds.	Screen		Die Einstellungen werden in %seconds Sekunden zurückgesetzt.
+Settings will revert in %seconds.	Screen		Die Einstellungen werden in %seconds zurückgesetzt.
 Cancel	Screen		Abbrechen
 Other…	Screen		Andere…
 Screen	Screen		Bildschirm

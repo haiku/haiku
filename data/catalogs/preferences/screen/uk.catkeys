@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Screen	4090394050
+1	ukrainian	x-vnd.Haiku-Screen	133788249
 no	Screen		ні
 bits/pixel	Screen		бітів/піксель
 15 bits/pixel, 32768 colors	Screen		15 біт/піксель, 32768 кольорів
@@ -17,6 +17,7 @@ vertically	Screen		вертикально
 All workspaces	Screen		Всі робочі простори
 Use laptop panel:	Screen		Використовувати панель ноутбука:
 Could not write VESA mode settings file:\n\t	Screen		Не вдалося записати файл налаштувань режиму VESA :\n\t
+Display info	Screen		Інфо про дісплей
 Settings will revert in %seconds.	Screen		Налаштування повернуться через %seconds.
 Cancel	Screen		Скасувати
 Other…	Screen		Інше…
@@ -33,6 +34,7 @@ Warning	Screen		Увага
 24 bits/pixel, 16 Million colors	Screen		24біти/піксель, 16 міліонів кольорів
 Hz	Screen		Hz
 Workspaces	Screen		Робочі простори
+Brightness:	Screen		Яскравість:
 32 bits/pixel, 16 Million colors	Screen		32біти/піксель, 16 мільйонів кольорів
 Done	Screen		Готово
 16 bits/pixel, 65536 colors	Screen		16 біт/піксель, 65536 кольорів

@@ -39,7 +39,7 @@ No package selected.	UninstallView		Hiçbir paket seçilmedi.
 %name% (%size% free)	PackageView		%name% (%size% kullanılmayan)
 Error while installing the package\n	PackageView		Paket yüklenirken hata\n
 Finishing installation	PackageInstall		Kurulum tamamlanıyor
-No package available.	PackageInfo		Hiçbir paket mevcut değil
+No package available.	PackageInfo		Paket yok
 The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Verilen yolda '%s' adlı betik zaten var.\nBu betik paketteki ile değiştirilsin mi?
 Installation type:	PackageView		Kurulum türü:
 The package you selected has been successfully removed from your system.	UninstallView		Seçtiğiniz paket sisteminizden başarıyla kaldırıldı.

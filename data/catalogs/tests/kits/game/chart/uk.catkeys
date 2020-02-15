@@ -2,7 +2,7 @@
 Slow rotation	ChartWindow		Повільне обертання
 Pink	ChartWindow		Рожевий
 Comet	ChartWindow		Комета
-DirectWindow	ChartWindow		Вікно
+DirectWindow	ChartWindow		DirectWindow
 Orange	ChartWindow		Оранжевий
 Refresh rate	ChartWindow		Частота оновлення
 Blue	ChartWindow		Блакитний
