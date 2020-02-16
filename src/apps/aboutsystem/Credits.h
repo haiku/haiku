@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2014, Haiku, Inc.
+ * Copyright 2005-2020, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -460,6 +460,7 @@ static const Translation kTranslations[] = {
 	"\n"
 
 #define kContributors \
+	"Kyle Ambroff-Kao\n" \
 	"Andrea Anzani\n" \
 	"Sean Bartell\n" \
 	"Sambuddha Basu\n" \
@@ -468,6 +469,7 @@ static const Translation kTranslations[] = {
 	"Michael Bulash\n" \
 	"Bruce Cameron\n" \
 	"Jean-Loïc Charroud\n" \
+	"Ilya Chugin (X512)\n" \
 	"Greg Crain\n" \
 	"Michael Davidson\n" \
 	"David Dengg\n" \
