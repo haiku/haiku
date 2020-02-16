@@ -1145,6 +1145,12 @@ arch_cpu_init_percpu(kernel_args* args, int cpu)
 			gCpuIdleFunc = halt_idle;
 	}
 
+#ifdef __x86_64__
+	// if RDTSCP is available write cpu number in TSC_AUX
+	if (x86_check_feature(IA32_FEATURE_AMD_EXT_RDTSCP, FEATURE_EXT_AMD))
+		x86_write_msr(IA32_MSR_TSC_AUX, cpu);
+#endif
+
 	return __x86_patch_errata_percpu(cpu);
 }
 

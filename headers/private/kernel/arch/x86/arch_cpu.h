@@ -114,6 +114,7 @@
 #define IA32_MSR_FS_BASE				0xc0000100
 #define IA32_MSR_GS_BASE				0xc0000101
 #define IA32_MSR_KERNEL_GS_BASE			0xc0000102
+#define IA32_MSR_TSC_AUX				0xc0000103
 
 // K8 MSR registers
 #define K8_MSR_IPM						0xc0010055

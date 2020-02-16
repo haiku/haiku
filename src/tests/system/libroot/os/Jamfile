@@ -24,6 +24,10 @@ SimpleTest system_watching_test :
 	system_watching_test.cpp
 ;
 
+SimpleTest get_cpu_num_test :
+	get_cpu_num_test.cpp
+;
+
 # Tell Jam where to find these sources
 SEARCH on [ FGristFiles
 		driver_settings.cpp
