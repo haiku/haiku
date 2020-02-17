@@ -363,6 +363,34 @@ init_dependencies(image_t *image, bool initHead)
 
 
 static void
+call_term_functions(image_t* image)
+{
+	init_term_function before;
+	if (find_symbol(image,
+			SymbolLookupInfo(B_TERM_BEFORE_FUNCTION_NAME, B_SYMBOL_TYPE_TEXT),
+			(void**)&before) == B_OK) {
+		before(image->id);
+	}
+
+	if (image->term_array) {
+		uint count_term = image->term_array_len / sizeof(addr_t);
+		for (uint i = count_term; i-- > 0;)
+			((initfini_array_function)image->term_array[i])();
+	}
+
+	if (image->term_routine)
+		((init_term_function)image->term_routine)(image->id);
+
+	init_term_function after;
+	if (find_symbol(image,
+			SymbolLookupInfo(B_TERM_AFTER_FUNCTION_NAME, B_SYMBOL_TYPE_TEXT),
+			(void**)&after) == B_OK) {
+		after(image->id);
+	}
+}
+
+
+static void
 inject_runtime_loader_api(image_t* rootImage)
 {
 	// We patch any exported __gRuntimeLoader symbols to point to our private
@@ -718,28 +746,7 @@ unload_library(void* handle, image_id imageID, bool addOn)
 
 			image_event(image, IMAGE_EVENT_UNINITIALIZING);
 
-			init_term_function before;
-			if (find_symbol(image,
-					SymbolLookupInfo(B_TERM_BEFORE_FUNCTION_NAME, B_SYMBOL_TYPE_TEXT),
-					(void**)&before) == B_OK) {
-				before(image->id);
-			}
-
-			if (image->term_array) {
-				uint count_term = image->term_array_len / sizeof(addr_t);
-				for (uint i = count_term; i-- > 0;)
-					((initfini_array_function)image->term_array[i])();
-			}
-
-			if (image->term_routine)
-				((init_term_function)image->term_routine)(image->id);
-
-			init_term_function after;
-			if (find_symbol(image,
-					SymbolLookupInfo(B_TERM_AFTER_FUNCTION_NAME, B_SYMBOL_TYPE_TEXT),
-					(void**)&after) == B_OK) {
-				after(image->id);
-			}
+			call_term_functions(image);
 
 			TLSBlockTemplates::Get().Unregister(image->dso_tls_id);
 
@@ -1148,14 +1155,7 @@ terminate_program(void)
 
 		image_event(image, IMAGE_EVENT_UNINITIALIZING);
 
-		if (image->term_array) {
-			uint count_term = image->term_array_len / sizeof(addr_t);
-			for (uint j = count_term; j-- > 0;)
-				((init_term_function)image->term_array[j])(image->id);
-		}
-
-		if (image->term_routine)
-			((init_term_function)image->term_routine)(image->id);
+		call_term_functions(image);
 
 		image_event(image, IMAGE_EVENT_UNLOADING);
 	}
