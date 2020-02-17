@@ -42,8 +42,8 @@ If you're submitting a patch to us, please make sure you're following the
 If you're having trouble finding something in the source tree, you can use
 one of our web-based source code browsers:
 
- * http://xref.plausible.coop/ (OpenGrok, provided by Landon Fuller)
- * http://cgit.haiku-os.org/ (cgit, provided by Haiku, Inc.)
+ * https://xref.landonf.org/ (OpenGrok, provided by Landon Fuller)
+ * https://git.haiku-os.org/ (git, provided by Haiku, Inc.)
 
 ### Contributing documentation
 The main piece of documentation that still needs work are the API docs (found
