@@ -25,14 +25,6 @@ struct xhci_endpoint;
 class XHCIRootHub;
 
 
-enum xhci_state {
-	XHCI_STATE_DISABLED = 0,
-	XHCI_STATE_ENABLED,
-	XHCI_STATE_DEFAULT,
-	XHCI_STATE_ADDRESSED,
-	XHCI_STATE_CONFIGURED,
-};
-
 #define XHCI_ENDPOINT_RING_SIZE	(XHCI_MAX_TRANSFERS * 2 + 1)
 
 
@@ -76,7 +68,6 @@ typedef struct xhci_endpoint {
 typedef struct xhci_device {
 	uint8 slot;
 	uint8 address;
-	enum xhci_state state;
 	area_id trb_area;
 	phys_addr_t trb_addr;
 	struct xhci_trb *trbs; // [XHCI_MAX_ENDPOINTS - 1][XHCI_ENDPOINT_RING_SIZE]

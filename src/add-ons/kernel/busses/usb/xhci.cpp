@@ -1343,14 +1343,13 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		return NULL;
 	}
 
-	if (fDevices[slot].state != XHCI_STATE_DISABLED) {
+	if (fDevices[slot].slot != 0) {
 		TRACE_ERROR("AllocateDevice() slot already used\n");
 		return NULL;
 	}
 
 	struct xhci_device *device = &fDevices[slot];
 	memset(device, 0, sizeof(struct xhci_device));
-	device->state = XHCI_STATE_ENABLED;
 	device->slot = slot;
 
 	device->input_ctx_area = fStack->AllocateArea((void **)&device->input_ctx,
@@ -1358,7 +1357,6 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		"XHCI input context");
 	if (device->input_ctx_area < B_OK) {
 		TRACE_ERROR("unable to create a input context area\n");
-		device->state = XHCI_STATE_DISABLED;
 		return NULL;
 	}
 
@@ -1444,7 +1442,6 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		TRACE_ERROR("unable to create a device context area\n");
 		delete_area(device->input_ctx_area);
 		memset(device, 0, sizeof(xhci_device));
-		device->state = XHCI_STATE_DISABLED;
 		return NULL;
 	}
 	memset(device->device_ctx, 0, sizeof(*device->device_ctx) << fContextSizeShift);
@@ -1457,7 +1454,6 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		delete_area(device->input_ctx_area);
 		delete_area(device->device_ctx_area);
 		memset(device, 0, sizeof(xhci_device));
-		device->state = XHCI_STATE_DISABLED;
 		return NULL;
 	}
 
@@ -1496,7 +1492,6 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		delete_area(device->device_ctx_area);
 		delete_area(device->trb_area);
 		memset(device, 0, sizeof(xhci_device));
-		device->state = XHCI_STATE_DISABLED;
 		return NULL;
 	}
 
@@ -1507,11 +1502,9 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		delete_area(device->device_ctx_area);
 		delete_area(device->trb_area);
 		memset(device, 0, sizeof(xhci_device));
-		device->state = XHCI_STATE_DISABLED;
 		return NULL;
 	}
 
-	device->state = XHCI_STATE_ADDRESSED;
 	device->address = SLOT_3_DEVICE_ADDRESS_GET(_ReadContext(
 		&device->device_ctx->slot.dwslot3));
 
@@ -1553,7 +1546,6 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		delete_area(device->device_ctx_area);
 		delete_area(device->trb_area);
 		memset(device, 0, sizeof(xhci_device));
-		device->state = XHCI_STATE_DISABLED;
 		return NULL;
 	}
 
@@ -1598,7 +1590,6 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 			delete_area(device->device_ctx_area);
 			delete_area(device->trb_area);
 			memset(device, 0, sizeof(xhci_device));
-			device->state = XHCI_STATE_DISABLED;
 			return NULL;
 		}
 
@@ -1631,7 +1622,6 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		delete_area(device->device_ctx_area);
 		delete_area(device->trb_area);
 		memset(device, 0, sizeof(xhci_device));
-		device->state = XHCI_STATE_DISABLED;
 		return NULL;
 	}
 
@@ -1664,7 +1654,6 @@ XHCI::FreeDevice(Device *device)
 	delete_area(fDevices[slot].device_ctx_area);
 
 	memset(&fDevices[slot], 0, sizeof(xhci_device));
-	fDevices[slot].state = XHCI_STATE_DISABLED;
 }
 
 
@@ -1754,8 +1743,6 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 		TRACE("endpoint[%d] state 0x%08" B_PRIx32 "\n", id,
 			ENDPOINT_0_STATE_GET(_ReadContext(
 				&device->device_ctx->endpoints[id].dwendpoint0)));
-
-		device->state = XHCI_STATE_CONFIGURED;
 	}
 	pipe->SetControllerCookie(&device->endpoints[id]);
 
@@ -1803,8 +1790,6 @@ XHCI::_RemoveEndpointForPipe(Pipe *pipe)
 			ConfigureEndpoint(device->input_ctx_addr, true, device->slot);
 		else
 			EvaluateContext(device->input_ctx_addr, device->slot);
-
-		device->state = XHCI_STATE_ADDRESSED;
 	}
 	pipe->SetControllerCookie(NULL);
 
