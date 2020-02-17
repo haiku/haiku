@@ -14,9 +14,20 @@
 
 #include <boot/stage2.h>
 #include <boot/platform.h>
+#include <efi/protocol/console-control.h>
 #include <util/kernel_cpp.h>
 
 #include "efi_platform.h"
+
+
+// This likely won't work without moving things around.
+// Too early (pre-console init)
+//#define TRACE_CONSOLE
+#ifdef TRACE_CONSOLE
+#   define TRACE(x...) dprintf(x)
+#else
+#   define TRACE(x...)
+#endif
 
 
 class Console : public ConsoleNode {
@@ -202,9 +213,43 @@ static void update_screen_size(void)
 }
 
 
+static void
+console_control(bool graphics)
+{
+	TRACE("Checking for EFI Console Control...\n");
+	efi_guid consoleControlProtocolGUID = EFI_CONSOLE_CONTROL_PROTOCOL_GUID;
+	efi_console_control_protocol* consoleControl = NULL;
+
+	efi_status status = kSystemTable->BootServices->LocateProtocol(
+		&consoleControlProtocolGUID, NULL, (void**)&consoleControl);
+
+	// Some EFI implementations boot up in an EFI graphics mode (Apple)
+	// If this protocol doesn't exist, we can assume we're already in text mode.
+	if (status != EFI_SUCCESS || consoleControl == NULL) {
+		TRACE("EFI Console Control not found. Skipping.\n");
+		return;
+	}
+
+	TRACE("Located EFI Console Control. Setting EFI %s mode...\n",
+		graphics ? "graphics" : "text");
+
+	if (graphics) {
+		status = consoleControl->SetMode(consoleControl,
+			EfiConsoleControlScreenGraphics);
+	} else {
+		status = consoleControl->SetMode(consoleControl,
+			EfiConsoleControlScreenText);
+	}
+
+	TRACE("Setting EFI %s mode was%s successful.\n",
+		graphics ? "graphics" : "text", (status == EFI_SUCCESS) ? "" : " not");
+}
+
+
 status_t
 console_init(void)
 {
+	console_control(true);
 	update_screen_size();
 	console_hide_cursor();
 	console_clear_screen();
@@ -243,6 +288,7 @@ console_check_boot_keys(void)
 extern "C" void
 platform_switch_to_text_mode(void)
 {
+	console_control(false);
 	kSystemTable->ConOut->Reset(kSystemTable->ConOut, false);
 	kSystemTable->ConOut->SetMode(kSystemTable->ConOut, sScreenMode);
 }
