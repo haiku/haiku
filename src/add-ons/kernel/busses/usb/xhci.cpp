@@ -1765,13 +1765,14 @@ XHCI::_RemoveEndpointForPipe(Pipe *pipe)
 	if (endpoint == NULL || endpoint->trbs == NULL)
 		return B_NO_INIT;
 
-	xhci_device *device = endpoint->device;
+	pipe->SetControllerCookie(NULL);
 
 	if (endpoint->id > 0) {
-		mutex_lock(&endpoint->lock);
-
+		xhci_device *device = endpoint->device;
 		uint8 epNumber = endpoint->id + 1;
 		StopEndpoint(true, epNumber, device->slot);
+
+		mutex_lock(&endpoint->lock);
 
 		// See comment in CancelQueuedTransfers.
 		xhci_td* td;
@@ -1791,7 +1792,6 @@ XHCI::_RemoveEndpointForPipe(Pipe *pipe)
 		else
 			EvaluateContext(device->input_ctx_addr, device->slot);
 	}
-	pipe->SetControllerCookie(NULL);
 
 	return B_OK;
 }
