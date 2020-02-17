@@ -266,8 +266,14 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 	TRACE("runtime register offset: %" B_PRId32 "\n", fRuntimeRegisterOffset);
 	TRACE("doorbell register offset: %" B_PRId32 "\n", fDoorbellRegisterOffset);
 
-	TRACE_ALWAYS("interface version: 0x%04" B_PRIx32 "\n",
-		HCI_VERSION(ReadCapReg32(XHCI_HCI_VERSION)));
+	int32 interfaceVersion = HCI_VERSION(ReadCapReg32(XHCI_HCI_VERSION));
+	if (interfaceVersion < 0x0090 || interfaceVersion > 0x0120) {
+		TRACE_ERROR("unsupported interface version: 0x%04" B_PRIx32 "\n",
+			interfaceVersion);
+		return;
+	}
+	TRACE_ALWAYS("interface version: 0x%04" B_PRIx32 "\n", interfaceVersion);
+
 	TRACE_ALWAYS("structural parameters: 1:0x%08" B_PRIx32 " 2:0x%08"
 		B_PRIx32 " 3:0x%08" B_PRIx32 "\n", ReadCapReg32(XHCI_HCSPARAMS1),
 		ReadCapReg32(XHCI_HCSPARAMS2), ReadCapReg32(XHCI_HCSPARAMS3));
