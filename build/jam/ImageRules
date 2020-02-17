@@ -1632,7 +1632,13 @@ actions BuildCDBootPPCImage1 bind MAPS
 
 rule BuildEfiSystemPartition image : efiLoader
 {
+	local macVolumeIcon = [ FDirName
+		$(HAIKU_TOP) data artwork VolumeIcon.icns ] ;
+
 	Depends $(image) : $(efiLoader) ;
+	Depends $(image) : $(macVolumeIcon) ;
+
+	EFIICON on $(image) = $(macVolumeIcon) ;
 
 	BuildEfiSystemPartition1 $(image) : $(efiLoader) ;
 }
@@ -1644,5 +1650,6 @@ actions BuildEfiSystemPartition1
 	mformat -i $(<) -f 2880
 	mmd -D s -i $(<) ::/EFI
 	mmd -D s -i $(<) ::/EFI/BOOT
+	mcopy -D o -i $(<) $(EFIICON) ::/.VolumeIcon.icns
 	mcopy -D o -i $(<) $(>) ::/EFI/BOOT/BOOTX64.EFI
 }
