@@ -184,6 +184,9 @@ TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
 	// If mini mode, hide the application menubar
 	if (state == kMiniState)
 		fInlineScrollView->Hide();
+
+	if (fBarApp->Settings()->autoHide && !IsHidden())
+		Hide();
 }
 
 
@@ -292,10 +295,10 @@ TBarView::MessageReceived(BMessage* message)
 void
 TBarView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 {
-	if (fDragRegion->IsDragging()) {
-		fDragRegion->MouseMoved(where, transit, dragMessage);
-		return;
-	}
+	if (fDragRegion->IsDragging())
+		return fDragRegion->MouseMoved(where, transit, dragMessage);
+	else if (fResizeControl->IsResizing())
+		return BView::MouseMoved(where, transit, dragMessage);
 
 	desk_settings* settings = fBarApp->Settings();
 	bool alwaysOnTop = settings->alwaysOnTop;
@@ -805,13 +808,20 @@ void
 TBarView::HideDeskbar(bool hide)
 {
 	BRect screenFrame = (BScreen(Window())).Frame();
+	TBarWindow* barWindow = dynamic_cast<TBarWindow*>(Window());
 
 	if (hide) {
 		Hide();
+		if (barWindow != NULL)
+			barWindow->SetSizeLimits();
+
 		PositionWindow(screenFrame);
 		SizeWindow(screenFrame);
 	} else {
 		Show();
+		if (barWindow != NULL)
+			barWindow->SetSizeLimits();
+
 		SizeWindow(screenFrame);
 		PositionWindow(screenFrame);
 	}

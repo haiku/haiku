@@ -237,7 +237,7 @@ TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 	} else {
 		// if last replicant overruns clock then resize to accomodate
 		if (ReplicantCount() > 0) {
-			if (!fTime->IsHidden() && Bounds().right - kTrayPadding - 2
+			if (!fTime->IsHidden(fTime) && Bounds().right - kTrayPadding - 2
 						- fTime->Frame().Width() - kClockMargin
 					< fRightBottomReplicant.right + kClockMargin) {
 				width = fRightBottomReplicant.right + kClockMargin
@@ -329,7 +329,7 @@ TReplicantTray::MessageReceived(BMessage* message)
 			if (fTime == NULL)
 				return;
 
-			bool showClock = !fTime->IsHidden();
+			bool showClock = !fTime->IsHidden(fTime);
 			bool showSeconds = fTime->ShowSeconds();
 			bool showDayOfWeek = fTime->ShowDayOfWeek();
 			bool showTimeZone = fTime->ShowTimeZone();
@@ -409,7 +409,7 @@ TReplicantTray::ShowReplicantMenu(BPoint point)
 
 	// If clock is visible show the extended menu, otherwise show "Show clock"
 
-	if (!fTime->IsHidden())
+	if (!fTime->IsHidden(fTime))
 		fTime->ShowTimeOptions(ConvertToScreen(point));
 	else {
 		BMenuItem* item = new BMenuItem(B_TRANSLATE("Show clock"),
@@ -1177,7 +1177,7 @@ TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 				loc.x + static_cast<TBarApp*>(be_app)->Settings()->width
 					- (kTrayPadding + kDragWidth + kGutter) * 2,
 				loc.y + fMaxReplicantHeight);
-			if (row == 0 && !fTime->IsHidden())
+			if (row == 0 && !fTime->IsHidden(fTime))
 				rowRect.right -= kClockMargin + fTime->Frame().Width();
 
 			BRect replicantRect = rowRect;

@@ -654,12 +654,24 @@ void
 TBarWindow::SetSizeLimits()
 {
 	BRect screenFrame = (BScreen(this)).Frame();
-	if (fBarView->Vertical()) {
-		BWindow::SetSizeLimits(gMinimumWindowWidth, gMaximumWindowWidth,
-			kMenuBarHeight - 1, screenFrame.Height());
+	bool setToHiddenSize = static_cast<TBarApp*>(be_app)->Settings()->autoHide
+		&& fBarView->IsHidden() && !fBarView->DragRegion()->IsDragging();
+
+	if (setToHiddenSize) {
+		if (fBarView->Vertical())
+			BWindow::SetSizeLimits(0, kHiddenDimension, 0, kHiddenDimension);
+		else {
+			BWindow::SetSizeLimits(screenFrame.Width(), screenFrame.Width(),
+				0, kHiddenDimension);
+		}
 	} else {
-		BWindow::SetSizeLimits(screenFrame.Width(), screenFrame.Width(),
-			kMenuBarHeight - 1, kMaximumIconSize + 4);
+		if (fBarView->Vertical()) {
+			BWindow::SetSizeLimits(gMinimumWindowWidth, gMaximumWindowWidth,
+				kMenuBarHeight - 1, screenFrame.Height());
+		} else {
+			BWindow::SetSizeLimits(screenFrame.Width(), screenFrame.Width(),
+				kMenuBarHeight - 1, kMaximumIconSize + 4);
+		}
 	}
 }
 
