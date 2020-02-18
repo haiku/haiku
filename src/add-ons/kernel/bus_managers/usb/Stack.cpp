@@ -154,7 +154,7 @@ usb_id
 Stack::GetUSBID(Object *object)
 {
 	if (!Lock())
-		return 0;
+		return fObjectMaxCount;
 
 	uint32 id = fObjectIndex;
 	uint32 tries = fObjectMaxCount;
@@ -169,20 +169,26 @@ Stack::GetUSBID(Object *object)
 		id = (id + 1) % fObjectMaxCount;
 	}
 
-	TRACE_ERROR("the stack did run out of usb_ids\n");
+	TRACE_ERROR("the stack has run out of usb_ids\n");
 	Unlock();
 	return 0;
 }
 
 
 void
-Stack::PutUSBID(usb_id id)
+Stack::PutUSBID(Object *object)
 {
 	if (!Lock())
 		return;
 
+	usb_id id = object->USBID();
 	if (id >= fObjectMaxCount) {
 		TRACE_ERROR("tried to put an invalid usb_id\n");
+		Unlock();
+		return;
+	}
+	if (fObjectArray[id] != object) {
+		TRACE_ERROR("tried to put an object with incorrect usb_id\n");
 		Unlock();
 		return;
 	}

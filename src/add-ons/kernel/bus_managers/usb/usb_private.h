@@ -123,7 +123,7 @@ public:
 		void							Unlock();
 
 		usb_id							GetUSBID(Object *object);
-		void							PutUSBID(usb_id id);
+		void							PutUSBID(Object *object);
 		Object *						GetObject(usb_id id);
 
 		// only for the kernel debugger
@@ -269,6 +269,9 @@ virtual	const char *					TypeName() const { return "object"; }
 virtual	status_t						SetFeature(uint16 selector);
 virtual	status_t						ClearFeature(uint16 selector);
 virtual	status_t						GetStatus(uint16 *status);
+
+protected:
+		void							PutUSBID();
 
 private:
 		Object *						fParent;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Haiku Inc. All rights reserved.
+ * Copyright 2004-2020, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -21,6 +21,8 @@ Pipe::Pipe(Object *parent)
 
 Pipe::~Pipe()
 {
+	PutUSBID();
+
 	CancelQueuedTransfers(true);
 	GetBusManager()->NotifyPipeChange(this, USB_CHANGE_DESTROYED);
 }

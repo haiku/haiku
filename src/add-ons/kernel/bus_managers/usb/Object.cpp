@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku Inc. All rights reserved.
+ * Copyright 2006-2020, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -29,7 +29,16 @@ Object::Object(Object *parent)
 
 Object::~Object()
 {
-	fStack->PutUSBID(fUSBID);
+	PutUSBID();
+}
+
+
+void
+Object::PutUSBID()
+{
+	if (fUSBID != UINT32_MAX)
+		fStack->PutUSBID(this);
+	fUSBID = UINT32_MAX;
 }
 
 
