@@ -824,6 +824,9 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 	// Normal Stage
 	size_t remaining = transfer->DataLength();
 	for (int32 i = 0; i < trbCount; i++) {
+		int32 trbLength = (remaining < trbSize) ? remaining : trbSize;
+		remaining -= trbLength;
+
 		// The "TD Size" field of a transfer TRB indicates the number of
 		// remaining maximum-size *packets* in this TD, *not* including the
 		// packets in the current TRB, and capped at 31 if there are more
@@ -831,7 +834,6 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 		int32 tdSize = remaining / pipe->MaxPacketSize();
 		if (tdSize > 31)
 			tdSize = 31;
-		int32 trbLength = (remaining < trbSize) ? remaining : trbSize;
 
 		td->trbs[i].address = td->buffer_addrs[i];
 		td->trbs[i].status = TRB_2_IRQ(0)
@@ -841,7 +843,6 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 			| TRB_3_CYCLE_BIT | TRB_3_CHAIN_BIT;
 
 		td->trb_used++;
-		remaining -= trbLength;
 	}
 
 	// Isochronous-specific
