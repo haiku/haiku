@@ -1569,20 +1569,24 @@ BWindow::Zoom()
 				break;
 
 			case B_DESKBAR_BOTTOM:
+			case B_DESKBAR_LEFT_BOTTOM:
+			case B_DESKBAR_RIGHT_BOTTOM:
 				zoomArea.bottom = deskbarFrame.top - 2;
 				break;
 
-			// in vertical mode, only if not always on top and not auto-raise
+			// in vertical expando mode only if not always-on-top or auto-raise
 			case B_DESKBAR_LEFT_TOP:
-			case B_DESKBAR_LEFT_BOTTOM:
-				if (!deskbar.IsAlwaysOnTop() && !deskbar.IsAutoRaise())
+				if (!deskbar.IsExpanded())
+					zoomArea.top = deskbarFrame.bottom + 2;
+				else if (!deskbar.IsAlwaysOnTop() && !deskbar.IsAutoRaise())
 					zoomArea.left = deskbarFrame.right + 2;
 				break;
 
 			default:
 			case B_DESKBAR_RIGHT_TOP:
-			case B_DESKBAR_RIGHT_BOTTOM:
-				if (!deskbar.IsAlwaysOnTop() && !deskbar.IsAutoRaise())
+				if (!deskbar.IsExpanded())
+					break;
+				else if (!deskbar.IsAlwaysOnTop() && !deskbar.IsAutoRaise())
 					zoomArea.right = deskbarFrame.left - 2;
 				break;
 		}
