@@ -1254,7 +1254,7 @@ TBarView::TeamMenuItemHeight() const
 	if (hideLabels && iconSize > B_MINI_ICON) {
 		// height is determined based solely on icon size
 		return iconSizePadded;
-	} else if (!fVertical || fVertical && iconSize <= B_LARGE_ICON) {
+	} else if (!fVertical || (fVertical && iconSize <= B_LARGE_ICON)) {
 		// horizontal or vertical with label on same row as icon:
 		// height based on icon size or font size, whichever is bigger
 		return std::max(iconSizePadded, labelHeight);

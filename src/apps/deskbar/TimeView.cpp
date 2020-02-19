@@ -195,7 +195,7 @@ TTimeView::GetPreferredSize(float* width, float* height)
 	GetFontHeight(&fontHeight);
 	fHeight = fontHeight.ascent + fontHeight.descent;
 
-	if (Vertical()) {
+	if (fOrientation) {
 		float appWidth = static_cast<TBarApp*>(be_app)->Settings()->width;
 		*width = fMaxWidth
 			= std::min(appWidth - (kDragRegionWidth + kHMargin) * 2, timeWidth);
