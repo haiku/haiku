@@ -822,6 +822,7 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 		return B_NO_MEMORY;
 
 	// Normal Stage
+	const size_t maxPacketSize = pipe->MaxPacketSize();
 	size_t remaining = transfer->DataLength();
 	for (int32 i = 0; i < trbCount; i++) {
 		int32 trbLength = (remaining < trbSize) ? remaining : trbSize;
@@ -831,7 +832,7 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 		// remaining maximum-size *packets* in this TD, *not* including the
 		// packets in the current TRB, and capped at 31 if there are more
 		// than 31 packets remaining in the TD. (XHCI 1.2 § 4.11.2.4 p218.)
-		int32 tdSize = remaining / pipe->MaxPacketSize();
+		int32 tdSize = (remaining + maxPacketSize - 1) / maxPacketSize;
 		if (tdSize > 31)
 			tdSize = 31;
 
