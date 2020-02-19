@@ -249,7 +249,7 @@ TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 
 		// this view has a fixed minimum width
 		width = std::max(kMinimumTrayWidth, width);
-		height = height = fBarView->TeamMenuItemHeight();
+		height = fBarView->TeamMenuItemHeight();
 	}
 
 	*preferredWidth = width;
