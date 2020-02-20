@@ -164,7 +164,7 @@ keyboard_handle_int(ps2_dev *dev)
 			emergencyKeyStatus &= ~(scancode == LEFT_ALT_KEY
 				? EMERGENCY_LEFT_ALT : EMERGENCY_RIGHT_ALT);
 		}
-	} else if (scancode == SYS_REQ_KEY || scancode == PRNT_SCRN_KEY_DOWN) {
+	} else if (scancode == SYS_REQ_KEY || scancode == PRNT_SCRN_KEY) {
 		if (keyInfo.is_keydown)
 			emergencyKeyStatus |= EMERGENCY_SYS_REQ;
 		else
