@@ -1626,7 +1626,7 @@ _user_system_profiler_next_buffer(size_t bytesRead, uint64* _droppedEvents)
 	BReference<SystemProfiler> reference(profiler);
 	locker.Unlock();
 
-	uint64 droppedEvents;
+	uint64 droppedEvents = 0;
 	status_t error = profiler->NextBuffer(bytesRead,
 		_droppedEvents != NULL ? &droppedEvents : NULL);
 	if (error == B_OK && _droppedEvents != NULL)
