@@ -2504,7 +2504,7 @@ Inode::Remove(Transaction& transaction, const char* name, ino_t* _id,
 	status_t status = vnode.Get(&inode);
 	if (status < B_OK) {
 		REPORT_ERROR(status);
-		return B_ENTRY_NOT_FOUND;
+		return fTree->Remove(transaction, name, id);
 	}
 
 	T(Remove(inode, name));
