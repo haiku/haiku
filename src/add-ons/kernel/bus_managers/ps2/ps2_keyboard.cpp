@@ -168,7 +168,7 @@ keyboard_handle_int(ps2_dev *dev)
 		if (keyInfo.is_keydown)
 			emergencyKeyStatus |= EMERGENCY_SYS_REQ;
 		else
-			emergencyKeyStatus &= EMERGENCY_SYS_REQ;
+			emergencyKeyStatus &= ~EMERGENCY_SYS_REQ;
 	} else if (emergencyKeyStatus > EMERGENCY_SYS_REQ
 		&& debug_emergency_key_pressed(kUnshiftedKeymap[scancode])) {
 		static const int kKeys[] = {LEFT_ALT_KEY, RIGHT_ALT_KEY, SYS_REQ_KEY};
