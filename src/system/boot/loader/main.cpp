@@ -128,6 +128,7 @@ main(stage2_args *args)
 
 			gKernelArgs.ucode_data = NULL;
 			gKernelArgs.ucode_data_size = 0;
+			platform_load_ucode(bootVolume);
 
 			// apply boot settings
 			apply_boot_settings();
