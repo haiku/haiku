@@ -15,19 +15,42 @@ local kernelLibArchObjects =
 	<src!system!kernel!lib!arch!$(TARGET_ARCH)>memset.o
 ;
 
-BootMergeObject boot_arch_$(TARGET_KERNEL_ARCH).o :
-	debug_uart_8250.cpp
-	#arch_uart_8250.cpp
-	arch_elf.cpp
-	: # additional flags
-	:
-	$(kernelArchObjects)
-	$(kernelLibArchObjects)
+local kernelDebugSources =
+	blue_screen.cpp
+	frame_buffer_console.cpp
 ;
 
-SEARCH on [ FGristFiles arch_elf.cpp arch_uart_8250.cpp ]
-    = [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH) ] ;
+local kernelArchDriverSources =
+	arch_elf.cpp
+	# Serial UART Drivers
+	#arch_uart_8250.cpp
+	#arch_uart_8250_omap.cpp
+	#arch_uart_pl011.cpp
+;
 
-SEARCH on [ FGristFiles debug_uart_8250.cpp ]
-	= [ FDirName $(HAIKU_TOP) src system kernel arch generic ] ;
+local kernelGenericDriverSources =
+	debug_uart_8250.cpp
+;
 
+local platform ;
+for platform in [ MultiBootSubDirSetup u-boot efi ] {
+	on $(platform) {
+		DEFINES += _BOOT_MODE ;
+		BootMergeObject [ FGristFiles boot_arch_$(TARGET_KERNEL_ARCH).o ] :
+			$(kernelDebugSources)
+			$(kernelArchDriverSources)
+			$(kernelGenericDriverSources)
+			: # additional flags
+			:
+			$(kernelArchObjects)
+			$(kernelLibArchObjects)
+		;
+
+		SEARCH on [ FGristFiles $(kernelArchDriverSources) ]
+			= [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH) ] ;
+		SEARCH on [ FGristFiles $(kernelGenericDriverSources) ]
+			= [ FDirName $(HAIKU_TOP) src system kernel arch generic ] ;
+		SEARCH on [ FGristFiles $(kernelDebugSources) ]
+			= [ FDirName $(HAIKU_TOP) src system kernel debug ] ;
+	}
+}

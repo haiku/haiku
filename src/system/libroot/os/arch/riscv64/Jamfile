@@ -23,6 +23,7 @@ for architectureObject in [ MultiArchSubDirSetup riscv64 ] {
 			thread.c
 
 			generic_atomic.cpp
+			generic_stack_trace.cpp
 			generic_system_time_nsecs.cpp
 			;
 	}
