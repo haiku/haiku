@@ -34,9 +34,12 @@
 
 // MSR registers (possibly Intel specific)
 #define IA32_MSR_TSC					0x10
+#define IA32_MSR_PLATFORM_ID			0x17
 #define IA32_MSR_APIC_BASE				0x1b
 #define IA32_MSR_SPEC_CTRL				0x48
 #define IA32_MSR_PRED_CMD				0x49
+#define IA32_MSR_UCODE_WRITE			0x79	// IA32_BIOS_UPDT_TRIG
+#define IA32_MSR_UCODE_REV				0x8b	// IA32_BIOS_SIGN_ID
 #define IA32_MSR_PLATFORM_INFO			0xce
 #define IA32_MSR_MPERF					0xe7
 #define IA32_MSR_APERF					0xe8
@@ -431,6 +434,7 @@ typedef struct arch_cpu_info {
 	int					stepping;
 	int					model;
 	int					extended_model;
+	uint32				patch_level;
 
 	uint32				logical_apic_id;
 
@@ -446,6 +450,37 @@ typedef struct arch_cpu_info {
 	void*				kernel_tls;
 #endif
 } arch_cpu_info;
+
+
+// Reference Intel SDM Volume 3 9.11 "Microcode Update Facilities"
+// https://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-vol-3a-part-1-manual.pdf
+// 9.11.1 Table 9-7. Microcode Update Field Definitions
+struct intel_microcode_header {
+	uint32 header_version;
+	uint32 update_revision;
+	uint32 date;
+	uint32 processor_signature;
+	uint32 checksum;
+	uint32 loader_revision;
+	uint32 processor_flags;
+	uint32 data_size;
+	uint32 total_size;
+	uint32 reserved[3];
+};
+
+
+struct intel_microcode_extended_signature_header {
+	uint32 extended_signature_count;
+	uint32 extended_checksum;
+	uint32 reserved[3];
+};
+
+
+struct intel_microcode_extended_signature {
+	uint32 processor_signature;
+	uint32 processor_flags;
+	uint32 checksum;
+};
 
 
 #define nop() __asm__ ("nop"::)

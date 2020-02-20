@@ -96,7 +96,11 @@ non_boot_cpu_init(void* args, int currentCPU)
 extern "C" int
 _start(kernel_args *bootKernelArgs, int currentCPU)
 {
-	if (bootKernelArgs->kernel_args_size != sizeof(kernel_args)
+	if (bootKernelArgs->version == CURRENT_KERNEL_ARGS_VERSION
+		&& bootKernelArgs->kernel_args_size == kernel_args_size_v1) {
+		sKernelArgs.ucode_data = NULL;
+		sKernelArgs.ucode_data_size = 0;
+	} else if (bootKernelArgs->kernel_args_size != sizeof(kernel_args)
 		|| bootKernelArgs->version != CURRENT_KERNEL_ARGS_VERSION) {
 		// This is something we cannot handle right now - release kernels
 		// should always be able to handle the kernel_args of earlier
@@ -113,7 +117,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 
 	// the passed in kernel args are in a non-allocated range of memory
 	if (currentCPU == 0)
-		memcpy(&sKernelArgs, bootKernelArgs, sizeof(kernel_args));
+		memcpy(&sKernelArgs, bootKernelArgs, bootKernelArgs->kernel_args_size);
 
 	smp_cpu_rendezvous(&sCpuRendezvous2);
 

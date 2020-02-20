@@ -39,8 +39,9 @@
 #include "paging/X86VMTranslationMap.h"
 
 
-#define DUMP_FEATURE_STRING 1
+#define DUMP_FEATURE_STRING	1
 #define DUMP_CPU_TOPOLOGY	1
+#define DUMP_CPU_PATCHLEVEL	1
 
 
 /* cpu vendor info */
@@ -113,6 +114,11 @@ static uint32 sHierarchyShift[CPU_TOPOLOGY_LEVELS];
 
 /* Cache topology information */
 static uint32 sCacheSharingMask[CPU_MAX_CACHE_LEVEL];
+
+static void* sUcodeData = NULL;
+static size_t sUcodeDataSize = 0;
+static struct intel_microcode_header* sLoadedUcodeUpdate;
+static spinlock sUcodeUpdateLock = B_SPINLOCK_INITIALIZER;
 
 
 static status_t
@@ -880,6 +886,174 @@ detect_cpu_topology(int currentCPU, cpu_ent* cpu, uint32 maxBasicLeaf,
 
 
 static void
+detect_intel_patch_level(cpu_ent* cpu)
+{
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_HYPERVISOR) {
+		cpu->arch.patch_level = 0;
+		return;
+	}
+
+	x86_write_msr(IA32_MSR_UCODE_REV, 0);
+	cpuid_info cpuid;
+	get_current_cpuid(&cpuid, 1, 0);
+
+	uint64 value = x86_read_msr(IA32_MSR_UCODE_REV);
+	cpu->arch.patch_level = value >> 32;
+}
+
+
+static void
+detect_amd_patch_level(cpu_ent* cpu)
+{
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_HYPERVISOR) {
+		cpu->arch.patch_level = 0;
+		return;
+	}
+
+	uint64 value = x86_read_msr(IA32_MSR_UCODE_REV);
+	cpu->arch.patch_level = value >> 32;
+}
+
+
+static struct intel_microcode_header*
+find_microcode_intel(addr_t data, size_t size, uint32 patchLevel)
+{
+	// 9.11.3 Processor Identification
+	cpuid_info cpuid;
+	get_current_cpuid(&cpuid, 1, 0);
+	uint32 signature = cpuid.regs.eax;
+	// 9.11.4 Platform Identification
+	uint64 platformBits = (x86_read_msr(IA32_MSR_PLATFORM_ID) >> 50) & 0x7;
+	uint64 mask = 1 << platformBits;
+
+	while (size > 0) {
+		if (size < sizeof(struct intel_microcode_header)) {
+			dprintf("find_microcode_intel update is too small for header\n");
+			break;
+		}
+		struct intel_microcode_header* header =
+			(struct intel_microcode_header*)data;
+
+		uint32 totalSize = header->total_size;
+		uint32 dataSize = header->data_size;
+		if (dataSize == 0) {
+			dataSize = 2000;
+			totalSize = sizeof(struct intel_microcode_header)
+				+ dataSize;
+		}
+		if (totalSize > size) {
+			dprintf("find_microcode_intel update is too small for data\n");
+			break;
+		}
+
+		uint32* dwords = (uint32*)data;
+		// prepare the next update
+		size -= totalSize;
+		data += totalSize;
+
+		if (header->loader_revision != 1) {
+			dprintf("find_microcode_intel incorrect loader version\n");
+			continue;
+		}
+		// 9.11.6 The microcode update data requires a 16-byte boundary
+		// alignment.
+		if (((addr_t)header % 16) != 0) {
+			dprintf("find_microcode_intel incorrect alignment\n");
+			continue;
+		}
+		uint32 sum = 0;
+		for (uint32 i = 0; i < totalSize / 4; i++) {
+			sum += dwords[i];
+		}
+		if (sum != 0) {
+			dprintf("find_microcode_intel incorrect checksum\n");
+			continue;
+		}
+		if (patchLevel > header->update_revision) {
+			dprintf("find_microcode_intel update_revision is lower\n");
+			continue;
+		}
+		if (signature == header->processor_signature
+			&& (mask & header->processor_flags) != 0) {
+			return header;
+		}
+		if (totalSize <= (sizeof(struct intel_microcode_header) + dataSize
+			+ sizeof(struct intel_microcode_extended_signature_header))) {
+			continue;
+		}
+		struct intel_microcode_extended_signature_header* extSigHeader =
+			(struct intel_microcode_extended_signature_header*)((addr_t)header
+				+ sizeof(struct intel_microcode_header) + dataSize);
+		struct intel_microcode_extended_signature* extended_signature =
+			(struct intel_microcode_extended_signature*)((addr_t)extSigHeader
+				+ sizeof(struct intel_microcode_extended_signature_header));
+		for (uint32 i = 0; i < extSigHeader->extended_signature_count; i++) {
+			if (signature == extended_signature[i].processor_signature
+				&& (mask & extended_signature[i].processor_flags) != 0)
+				return header;
+		}
+	}
+	return NULL;
+}
+
+
+static void
+load_microcode_intel(int currentCPU, cpu_ent* cpu)
+{
+	// serialize for HT cores
+	if (currentCPU != 0)
+		acquire_spinlock(&sUcodeUpdateLock);
+	detect_intel_patch_level(cpu);
+	uint32 revision = cpu->arch.patch_level;
+	struct intel_microcode_header* update = sLoadedUcodeUpdate;
+	if (update == NULL) {
+		update = find_microcode_intel((addr_t)sUcodeData, sUcodeDataSize,
+			revision);
+	}
+	if (update != NULL) {
+		addr_t data = (addr_t)update + sizeof(struct intel_microcode_header);
+		wbinvd();
+		x86_write_msr(IA32_MSR_UCODE_WRITE, data);
+		detect_intel_patch_level(cpu);
+		if (revision == cpu->arch.patch_level) {
+			dprintf("CPU %d: update failed\n", currentCPU);
+		} else {
+			if (sLoadedUcodeUpdate == NULL)
+				sLoadedUcodeUpdate = update;
+			dprintf("CPU %d: updated from revision %" B_PRIu32 " to %" B_PRIu32
+				"\n", currentCPU, revision, cpu->arch.patch_level);
+		}
+	} else {
+		dprintf("CPU %d: no update found\n", currentCPU);
+	}
+	if (currentCPU != 0)
+		release_spinlock(&sUcodeUpdateLock);
+}
+
+
+static void
+load_microcode_amd(int currentCPU, cpu_ent* cpu)
+{
+	dprintf("CPU %d: no update found\n", currentCPU);
+}
+
+
+static void
+load_microcode(int currentCPU)
+{
+	if (sUcodeData == NULL)
+		return;
+	cpu_ent* cpu = get_cpu_struct();
+	if ((cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_HYPERVISOR) != 0)
+		return;
+	if (cpu->arch.vendor == VENDOR_INTEL)
+		load_microcode_intel(currentCPU, cpu);
+	else if (cpu->arch.vendor == VENDOR_AMD)
+		load_microcode_amd(currentCPU, cpu);
+}
+
+
+static void
 detect_cpu(int currentCPU)
 {
 	cpu_ent* cpu = get_cpu_struct();
@@ -1023,8 +1197,17 @@ detect_cpu(int currentCPU)
 
 	detect_cpu_topology(currentCPU, cpu, maxBasicLeaf, maxExtendedLeaf);
 
+	if (cpu->arch.vendor == VENDOR_INTEL)
+		detect_intel_patch_level(cpu);
+	else if (cpu->arch.vendor == VENDOR_AMD)
+		detect_amd_patch_level(cpu);
+
 #if DUMP_FEATURE_STRING
 	dump_feature_string(currentCPU, cpu);
+#endif
+#if DUMP_CPU_PATCHLEVEL
+	dprintf("CPU %d: patch_level %" B_PRIu32 "\n", currentCPU,
+		cpu->arch.patch_level);
 #endif
 }
 
@@ -1136,6 +1319,7 @@ detect_amdc1e_noarat()
 status_t
 arch_cpu_init_percpu(kernel_args* args, int cpu)
 {
+	load_microcode(cpu);
 	detect_cpu(cpu);
 
 	if (!gCpuIdleFunc) {
@@ -1158,6 +1342,14 @@ arch_cpu_init_percpu(kernel_args* args, int cpu)
 status_t
 arch_cpu_init(kernel_args* args)
 {
+	if (args->ucode_data != NULL
+		&& args->ucode_data_size > 0) {
+		sUcodeData = args->ucode_data;
+		sUcodeDataSize = args->ucode_data_size;
+	} else {
+		dprintf("CPU: no microcode provided\n");
+	}
+
 	// init the TSC -> system_time() conversion factors
 
 	uint32 conversionFactor = args->arch_args.system_time_cv_factor;
