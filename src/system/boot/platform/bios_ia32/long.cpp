@@ -244,6 +244,7 @@ convert_kernel_args()
 	fix_address(gKernelArgs.debug_output);
 	fix_address(gKernelArgs.previous_debug_output);
 	fix_address(gKernelArgs.boot_splash);
+	fix_address(gKernelArgs.ucode_data);
 	fix_address(gKernelArgs.arch_args.apic);
 	fix_address(gKernelArgs.arch_args.hpet);
 

@@ -17,6 +17,7 @@
 #include <boot/stdio.h>
 
 #include <arch/cpu.h>
+#include <arch/x86/arch_cpu.h>
 #include <arch_kernel.h>
 #include <arch_system_info.h>
 
@@ -309,6 +310,62 @@ slower_sample:
 		out8(in8(PIT_CHANNEL_2_CONTROL) & ~PIT_CHANNEL_2_GATE_HIGH,
 			PIT_CHANNEL_2_CONTROL);
 	}
+}
+
+extern int open_maybe_packaged(BootVolume& volume, const char* path,
+	int openMode);
+
+void
+ucode_load(BootVolume& volume)
+{
+	cpuid_info info;
+	if (get_current_cpuid(&info, 0, 0) != B_OK
+		|| strncmp(info.eax_0.vendor_id, "GenuineIntel", 12) != 0)
+		return;
+
+	if (get_current_cpuid(&info, 1, 0) != B_OK)
+		return;
+
+	char path[128];
+	int family = info.eax_1.family;
+	int model = info.eax_1.model;
+	if (family == 0x6 || family == 0xf) {
+		family += info.eax_1.extended_family;
+		model += (info.eax_1.extended_model << 4);
+	}
+	snprintf(path, sizeof(path), "system/data/firmware/intel-ucode/"
+		"%02x-%02x-%02x", family, model, info.eax_1.stepping);
+	dprintf("ucode_load: %s\n", path);
+
+	int fd = open_maybe_packaged(volume, path, O_RDONLY);
+	if (fd < B_OK) {
+		dprintf("ucode_load: couldn't find microcode\n");
+		return;
+	}
+	struct stat stat;
+	if (fstat(fd, &stat) < 0) {
+		dprintf("ucode_load: couldn't stat microcode file\n");
+		close(fd);
+		return;
+	}
+
+	ssize_t length = stat.st_size;
+	const uint32 alignment = 16;
+#define ALIGN(size, align)	(((size) + align - 1) & ~(align - 1))
+	void *buffer = kernel_args_malloc(length + alignment - 1);
+	if (buffer != NULL) {
+		buffer = (void*)ALIGN((addr_t)buffer, alignment);
+		if (read(fd, buffer, length) != length) {
+			dprintf("ucode_load: couldn't read microcode file\n");
+			kernel_args_free(buffer);
+		} else {
+			gKernelArgs.ucode_data = buffer;
+			gKernelArgs.ucode_data_size = length;
+			dprintf("ucode_load: microcode file read in memory\n");
+		}
+	}
+
+	close(fd);
 }
 
 

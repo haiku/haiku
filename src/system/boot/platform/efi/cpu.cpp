@@ -16,3 +16,10 @@ cpu_init()
 	gKernelArgs.num_cpus = 1;
 		// this will eventually be corrected later on
 }
+
+
+extern "C" void
+platform_load_ucode(BootVolume& volume)
+{
+	ucode_load(volume);
+}
