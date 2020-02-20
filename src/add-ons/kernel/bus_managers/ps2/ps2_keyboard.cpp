@@ -41,7 +41,8 @@ enum {
 
 	LEFT_ALT_KEY	= 0x38,
 	RIGHT_ALT_KEY	= 0xb8,
-	SYS_REQ_KEY		= 0x54
+	SYS_REQ_KEY		= 0x54,
+	PRNT_SCRN_KEY	= 0x80 | 0x37,
 };
 
 
@@ -163,7 +164,7 @@ keyboard_handle_int(ps2_dev *dev)
 			emergencyKeyStatus &= ~(scancode == LEFT_ALT_KEY
 				? EMERGENCY_LEFT_ALT : EMERGENCY_RIGHT_ALT);
 		}
-	} else if (scancode == SYS_REQ_KEY) {
+	} else if (scancode == SYS_REQ_KEY || scancode == PRNT_SCRN_KEY_DOWN) {
 		if (keyInfo.is_keydown)
 			emergencyKeyStatus |= EMERGENCY_SYS_REQ;
 		else
