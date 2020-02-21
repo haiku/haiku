@@ -11,7 +11,6 @@
 #include <boot/addr_range.h>
 #include <boot/platform.h>
 #include <boot/stage2.h>
-#include <kernel/arch/x86/arch_kernel.h>
 #include <kernel/kernel.h>
 
 #include "efi_platform.h"
@@ -27,7 +26,15 @@ struct allocated_memory_region {
 };
 
 
+#if defined(KERNEL_LOAD_BASE_64_BIT)
 static addr_t sNextVirtualAddress = KERNEL_LOAD_BASE_64_BIT + 32 * 1024 * 1024;
+#elif defined(KERNEL_LOAD_BASE)
+static addr_t sNextVirtualAddress = KERNEL_LOAD_BASE + 32 * 1024 * 1024;
+#else
+#error Unable to find kernel load base on this architecture!
+#endif
+
+
 static allocated_memory_region *allocated_memory_regions = NULL;
 
 
