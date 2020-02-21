@@ -19,6 +19,7 @@
 #include "apm.h"
 #include "bios.h"
 #include "console.h"
+#include "cpu.h"
 #include "debug.h"
 #include "hpet.h"
 #include "interrupts.h"

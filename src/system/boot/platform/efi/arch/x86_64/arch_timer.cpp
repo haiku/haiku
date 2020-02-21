@@ -19,6 +19,7 @@
 #include <safemode.h>
 #include <boot/stage2.h>
 #include <boot/menu.h>
+#include <boot/arch/x86/arch_cpu.h>
 #include <arch/x86/arch_acpi.h>
 #include <arch/x86/arch_hpet.h>
 #include <arch/x86/arch_system_info.h>
@@ -40,13 +41,15 @@ hpet_init(void)
 	TRACE(("hpet_init: Looking for HPET...\n"));
 	acpi_hpet *hpet = (acpi_hpet *)acpi_find_table(ACPI_HPET_SIGNATURE);
 
+	// Clear hpet kernel args to known invalid state;
+	gKernelArgs.arch_args.hpet_phys = 0;
+	gKernelArgs.arch_args.hpet = NULL;
+
 	if (hpet == NULL) {
 		// No HPET table in the RSDT.
 		// Since there are no other methods for finding it,
 		// assume we don't have one.
 		TRACE(("hpet_init: HPET not found.\n"));
-		gKernelArgs.arch_args.hpet_phys = 0;
-		gKernelArgs.arch_args.hpet = NULL;
 		return;
 	}
 
@@ -60,5 +63,6 @@ hpet_init(void)
 void
 arch_timer_init(void)
 {
+	calculate_cpu_conversion_factor(2);
 	hpet_init();
 }

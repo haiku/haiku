@@ -8,14 +8,11 @@
 #include <boot/kernel_args.h>
 #include <boot/stage2.h>
 #include <arch/cpu.h>
-#include <arch/x86/arch_cpu.h>
 
 
-extern "C" void
+void
 cpu_init()
 {
-	calculate_cpu_conversion_factor(2);
-
 	gKernelArgs.num_cpus = 1;
 		// this will eventually be corrected later on
 }

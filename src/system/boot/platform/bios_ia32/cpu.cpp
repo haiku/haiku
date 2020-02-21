@@ -59,7 +59,7 @@ check_cpu_features()
 //	#pragma mark -
 
 
-extern "C" void
+void
 cpu_init()
 {
 	if (check_cpu_features() != B_OK)

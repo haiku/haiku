@@ -13,7 +13,6 @@
 extern "C" {
 #endif
 
-extern void cpu_init(void);
 
 void calculate_cpu_conversion_factor(uint8 channel);
 

@@ -14,7 +14,6 @@
 #include <arch/cpu.h>
 #include <kernel.h>
 
-#include <boot/arch/x86/arch_cpu.h>
 #include <boot/kernel_args.h>
 #include <boot/platform.h>
 #include <boot/stage2.h>
@@ -23,6 +22,7 @@
 #include "arch_start.h"
 #include "acpi.h"
 #include "console.h"
+#include "cpu.h"
 #include "efi_platform.h"
 #include "mmu.h"
 #include "quirks.h"
@@ -194,12 +194,6 @@ efi_main(efi_handle image, efi_system_table *systemTable)
 
 	// disable apm in case we ever load a 32-bit kernel...
 	gKernelArgs.platform_args.apm.version = 0;
-
-	gKernelArgs.num_cpus = 1;
-	#if defined(__x86_64__) || defined(__x86__)
-	gKernelArgs.arch_args.hpet_phys = 0;
-	gKernelArgs.arch_args.hpet = NULL;
-	#endif
 
 	cpu_init();
 	acpi_init();
