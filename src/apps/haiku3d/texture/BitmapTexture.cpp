@@ -37,7 +37,7 @@ BitmapTexture::_Load(BBitmap* bitmap) {
 	glBindTexture(GL_TEXTURE_2D, fId);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, 4,
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8,
 		(int) bitmap->Bounds().Width() + 1,
 		(int) bitmap->Bounds().Height() + 1,
 		0, GL_BGRA, GL_UNSIGNED_BYTE,

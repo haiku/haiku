@@ -142,6 +142,8 @@ void RenderView::_InitGL(void)
 void
 RenderView::_CreateScene()
 {
+	LockGL();
+
 	Texture* texture = new BitmapTexture(
 		BTranslationUtils::GetBitmap(B_PNG_FORMAT, "texture"));
 
@@ -187,17 +189,23 @@ RenderView::_CreateScene()
 	texture->ReleaseReference();
 
 	fMainCamera = new Camera(Vector3(0, 0, 0), Quaternion(0, 0, 0, 1), 50);
+
+	UnlockGL();
 }
 
 
 void
 RenderView::_DeleteScene()
 {
+	LockGL();
+
 	MeshInstanceList::iterator it = fMeshInstances.begin();
 	for (; it != fMeshInstances.end(); it++) {
 		delete (*it);
 	}
 	fMeshInstances.clear();
+
+	UnlockGL();
 }
 
 
