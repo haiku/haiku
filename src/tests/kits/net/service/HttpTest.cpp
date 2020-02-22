@@ -159,6 +159,16 @@ std::string TestFilePath(const std::string& relativePath)
 	return testSrcDir + "/" + relativePath;
 }
 
+
+template <typename T>
+void AddCommonTests(BThreadedTestCaller<T>& testCaller)
+{
+	testCaller.addThread("GetTest", &T::GetTest);
+	testCaller.addThread("UploadTest", &T::UploadTest);
+	testCaller.addThread("BasicAuthTest", &T::AuthBasicTest);
+	testCaller.addThread("DigestAuthTest", &T::AuthDigestTest);
+}
+
 }
 
 
@@ -180,7 +190,7 @@ HttpTest::setUp()
 	CPPUNIT_ASSERT_EQUAL_MESSAGE(
 		"Starting up test server",
 		B_OK,
-		fTestServer.StartIfNotRunning());
+		fTestServer.Start());
 }
 
 
@@ -239,34 +249,62 @@ HttpTest::GetTest()
 void
 HttpTest::ProxyTest()
 {
-	BUrl testUrl(fTestServer.BaseUrl(), "/user-agent");
+	BUrl testUrl(fTestServer.BaseUrl(), "/");
 
-	BUrlContext* c = new BUrlContext();
-	c->AcquireReference();
-	c->SetProxy("120.203.214.182", 83);
+	TestProxyServer proxy;
+	CPPUNIT_ASSERT_EQUAL_MESSAGE(
+		"Test proxy server startup",
+		B_OK,
+		proxy.Start());
 
-	BHttpRequest t(testUrl, testUrl.Protocol() == "https");
-	t.SetContext(c);
+	BUrlContext* context = new BUrlContext();
+	context->AcquireReference();
+	context->SetProxy("127.0.0.1", proxy.Port());
 
-	BUrlProtocolListener l;
-	t.SetListener(&l);
+	std::string expectedResponseBody(
+		"Path: /\r\n"
+		"\r\n"
+		"Headers:\r\n"
+		"--------\r\n"
+		"Host: 127.0.0.1:PORT\r\n"
+		"Content-Length: 0\r\n"
+		"Accept: */*\r\n"
+		"Accept-Encoding: gzip\r\n"
+		"Connection: close\r\n"
+		"User-Agent: Services Kit (Haiku)\r\n"
+		"X-Forwarded-For: 127.0.0.1:PORT\r\n");
+	HttpHeaderMap expectedResponseHeaders;
+	expectedResponseHeaders["Content-Encoding"] = "gzip";
+	expectedResponseHeaders["Content-Length"] = "169";
+	expectedResponseHeaders["Content-Type"] = "text/plain";
+	expectedResponseHeaders["Date"] = "Sun, 09 Feb 2020 19:32:42 GMT";
+	expectedResponseHeaders["Server"] = "Test HTTP Server for Haiku";
 
-	CPPUNIT_ASSERT(t.Run());
+	TestListener listener(expectedResponseBody, expectedResponseHeaders);
 
-	while (t.IsRunning())
+	BHttpRequest request(testUrl);
+	request.SetContext(context);
+	request.SetListener(&listener);
+
+	CPPUNIT_ASSERT(request.Run());
+
+	while (request.IsRunning())
 		snooze(1000);
 
-	CPPUNIT_ASSERT_EQUAL(B_OK, t.Status());
+	CPPUNIT_ASSERT_EQUAL(B_OK, request.Status());
 
-	const BHttpResult& r = dynamic_cast<const BHttpResult&>(t.Result());
-	CPPUNIT_ASSERT_EQUAL(200, r.StatusCode());
-	CPPUNIT_ASSERT_EQUAL(BString("OK"), r.StatusText());
-	CPPUNIT_ASSERT_EQUAL(42, r.Length());
+	const BHttpResult& response
+		= dynamic_cast<const BHttpResult&>(request.Result());
+	CPPUNIT_ASSERT_EQUAL(200, response.StatusCode());
+	CPPUNIT_ASSERT_EQUAL(BString("OK"), response.StatusText());
+	CPPUNIT_ASSERT_EQUAL(169, response.Length());
 		// Fixed size as we know the response format.
-	CPPUNIT_ASSERT(!c->GetCookieJar().GetIterator().HasNext());
+	CPPUNIT_ASSERT(!context->GetCookieJar().GetIterator().HasNext());
 		// This page should not set cookies
 
-	c->ReleaseReference();
+	listener.Verify();
+
+	context->ReleaseReference();
 }
 
 
@@ -454,45 +492,36 @@ HttpTest::AuthDigestTest()
 }
 
 
-/* static */ template<class T> void
-HttpTest::_AddCommonTests(BString prefix, CppUnit::TestSuite& suite)
-{
-	T* test = new T();
-	BThreadedTestCaller<T>* testCaller
-		= new BThreadedTestCaller<T>(prefix.String(), test);
-
-	testCaller->addThread("GetTest", &T::GetTest);
-	testCaller->addThread("UploadTest", &T::UploadTest);
-	testCaller->addThread("BasicAuthTest", &T::AuthBasicTest);
-	testCaller->addThread("DigestAuthTest", &T::AuthDigestTest);
-
-	suite.addTest(testCaller);
-}
-
-
 /* static */ void
 HttpTest::AddTests(BTestSuite& parent)
 {
 	{
 		CppUnit::TestSuite& suite = *new CppUnit::TestSuite("HttpTest");
 
+		HttpTest* httpTest = new HttpTest();
+		BThreadedTestCaller<HttpTest>* httpTestCaller
+			= new BThreadedTestCaller<HttpTest>("HttpTest::", httpTest);
+
 		// HTTP + HTTPs
-		_AddCommonTests<HttpTest>("HttpTest::", suite);
+		AddCommonTests<HttpTest>(*httpTestCaller);
 
-		// TODO: reaches out to some mysterious IP 120.203.214.182 which does
-		// not respond anymore?
-		//suite.addTest(new CppUnit::TestCaller<HttpTest>("HttpTest::ProxyTest",
-		//	&HttpTest::ProxyTest));
+		httpTestCaller->addThread("ProxyTest", &HttpTest::ProxyTest);
 
+		suite.addTest(httpTestCaller);
 		parent.addTest("HttpTest", &suite);
 	}
 
 	{
 		CppUnit::TestSuite& suite = *new CppUnit::TestSuite("HttpsTest");
 
-		// HTTP + HTTPs
-		_AddCommonTests<HttpsTest>("HttpsTest::", suite);
+		HttpsTest* httpsTest = new HttpsTest();
+		BThreadedTestCaller<HttpsTest>* httpsTestCaller
+			= new BThreadedTestCaller<HttpsTest>("HttpsTest::", httpsTest);
 
+		// HTTP + HTTPs
+		AddCommonTests<HttpsTest>(*httpsTestCaller);
+
+		suite.addTest(httpsTestCaller);
 		parent.addTest("HttpsTest", &suite);
 	}
 }

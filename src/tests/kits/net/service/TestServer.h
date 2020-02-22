@@ -8,8 +8,39 @@
 #ifndef TEST_SERVER_H
 #define TEST_SERVER_H
 
+#include <string>
+#include <vector>
+
 #include <os/support/SupportDefs.h>
 #include <os/support/Url.h>
+
+
+// Binds to a random unused TCP port.
+class RandomTCPServerPort {
+public:
+						RandomTCPServerPort();
+						~RandomTCPServerPort();
+
+	status_t			InitCheck()							const;
+	int					FileDescriptor()					const;
+	uint16_t			Port()								const;
+
+private:
+	status_t			fInitStatus;
+	int					fSocketFd;
+	uint16_t			fServerPort;
+};
+
+
+class ChildProcess {
+public:
+						ChildProcess();
+						~ChildProcess();
+
+	status_t			Start(const std::vector<std::string>& args);
+private:
+	pid_t				fChildPid;
+};
 
 
 enum TestServerMode {
@@ -20,18 +51,26 @@ enum TestServerMode {
 
 class TestServer {
 public:
-	TestServer(TestServerMode mode);
-	~TestServer();
+						TestServer(TestServerMode mode);
 
-	status_t	StartIfNotRunning();
-	BUrl		BaseUrl()	const;
+	status_t			Start();
+	BUrl				BaseUrl()							const;
 
 private:
-	TestServerMode	fMode;
-	bool			fRunning;
-	pid_t			fChildPid;
-	int				fSocketFd;
-	uint16_t		fServerPort;
+	TestServerMode		fMode;
+	ChildProcess		fChildProcess;
+	RandomTCPServerPort fPort;
+};
+
+
+class TestProxyServer {
+public:
+	status_t			Start();
+	uint16_t			Port()								const;
+
+private:
+	ChildProcess		fChildProcess;
+	RandomTCPServerPort	fPort;
 };
 
 

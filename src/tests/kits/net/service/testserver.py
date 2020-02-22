@@ -144,7 +144,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
         output_stream.write(b'--------\r\n')
         for header in self.headers:
             for header_value in self.headers.get_all(header):
-                if header == 'Host' or header == 'Referer':
+                if header in ('Host', 'Referer', 'X-Forwarded-For'):
                     # The server port can change between runs which will change
                     # the size and contents of the response body. To make tests
                     # that verify the contents of the response body easier the
