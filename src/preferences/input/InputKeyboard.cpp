@@ -50,10 +50,9 @@ InputKeyboard::InputKeyboard(BInputDevice* dev)
 			.End()
 		.Add(new BSeparatorView(B_HORIZONTAL))
 		.AddGroup(B_HORIZONTAL)
-			.SetInsets(B_USE_WINDOW_SPACING, 0, B_USE_WINDOW_SPACING,
-				B_USE_WINDOW_SPACING)
 			.Add(fDefaultsButton)
 			.Add(fRevertButton)
+			.AddGlue()
 			.End();
 
 	BSlider* slider = (BSlider* )FindView("key_repeat_rate");
