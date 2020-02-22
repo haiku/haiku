@@ -24,6 +24,15 @@
 extern "C" void arch_enter_kernel(uint64 pml4, uint64 entry_point,
 	uint64 stackTop);
 
+// From arch_mmu.cpp
+extern void arch_mmu_post_efi_setup(size_t memory_map_size,
+    efi_memory_descriptor *memory_map, size_t descriptor_size,
+    uint32_t descriptor_version);
+
+extern uint64_t arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
+    efi_memory_descriptor *memory_map, size_t descriptor_size,
+    uint32_t descriptor_version);
+
 
 void
 arch_start_kernel(addr_t kernelEntry)

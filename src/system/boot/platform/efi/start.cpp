@@ -19,6 +19,7 @@
 #include <boot/stage2.h>
 #include <boot/stdio.h>
 
+#include "arch_mmu.h"
 #include "arch_start.h"
 #include "acpi.h"
 #include "console.h"

@@ -47,18 +47,6 @@ extern status_t platform_kernel_address_to_bootloader_address(uint64_t address,
 extern status_t platform_bootloader_address_to_kernel_address(void *address,
 	uint64_t *_result);
 
-// Architecture dependant
-
-extern void arch_mmu_post_efi_setup(size_t memory_map_size,
-    efi_memory_descriptor *memory_map, size_t descriptor_size,
-    uint32_t descriptor_version);
-
-extern uint64_t arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
-    efi_memory_descriptor *memory_map, size_t descriptor_size,
-    uint32_t descriptor_version);
-
-void arch_mmu_init();
-
 #ifdef __cplusplus
 }
 #endif
