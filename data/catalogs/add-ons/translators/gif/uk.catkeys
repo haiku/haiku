@@ -1,10 +1,10 @@
 1	ukrainian	x-vnd.Haiku-GIFTranslator	2201651797
 Websafe	GIFView		Придатний для Web
-Write interlaced images	GIFView		Записати зображення, що переплітаються
+Write interlaced images	GIFView		Записати черезрядкові зображення
 Optimal	GIFView		Оптимальний
 Greyscale	GIFView		Відтінки сірого
 Colors:	GIFView		Кольори:
-GIF image translator	GIFTranslator		Транслятор GIFзображень
+GIF image translator	GIFTranslator		Транслятор зображень GIF
 Be Bitmap Format (GIFTranslator)	GIFTranslator		Формат Be Bitmap (Перетворювач GIF)
 GIF image translator	GIFView		Транслятор GIF зображень
 Palette:	GIFView		Палітра:

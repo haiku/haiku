@@ -3,7 +3,7 @@ Delete message	ConfigView		Видалити повідомлення
 Match \"%attribute\" against \"%regex\"	RuleFilter		Узгодити \"%attribute\" знову \"%regex\"
 Match header	RuleFilter		Узгодити заголовок
 Set flags to	ConfigView		Встановити прапори до
-Header field (e.g. Subject, From, …)	ConfigView		Заголовок поля (Наприклад: Тема, Від)
+Header field (e.g. Subject, From, …)	ConfigView		Поле заголовка (наприклад: Тема, Від, …)
 <Choose account>	ConfigView		<Вибрати обліковий запис>
 Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Маска, наприклад, \"*spam*\".\nПриставка з\"REGEX:\" у випадку вживання регулярних виразів.
 Then	ConfigView		Тоді

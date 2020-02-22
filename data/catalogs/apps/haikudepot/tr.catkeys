@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	149184511
+1	turkish	x-vnd.Haiku-HaikuDepot	2510596347
 Repository update error	LocalRepositoryUpdateProcess		Depo güncelleme hatası
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Depo güncellenirken bir hata oluştu: %error%
 User Created	UserLoginWindow		Kullanıcı Oluşturuldu
@@ -169,6 +169,7 @@ Log in…	MainWindow		Giriş yap…
 You need to be logged into an account before you can rate packages.	MainWindow		Paketleri derecelendirmek için giriş yapmalısınız.
 Client version too old	ServerHelper		İstemci sürümü çok eski
 Local repository load error	LocalPkgDataLoadProcess		Yerel depo yükleme hatası
+The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		Kullanıcı mevcut değil veya yanlış parola girildi. Bilgilerinizi denetleyin ve yeniden deneyin.
 9999.99 KiB	PackageListView		9999.99 KiB
 Repeat password:	UserLoginWindow		Parolayı yineleyin:
 All repositories	MainWindow		Tüm depolar

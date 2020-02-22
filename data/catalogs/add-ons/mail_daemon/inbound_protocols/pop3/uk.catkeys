@@ -7,7 +7,7 @@ Connecting to POP3 server…	pop3		Під'єднання до POP3 сервер�
 Error while authenticating user %user	pop3		Помилка при авторизації користувача %user
 Destination:	ConfigView		Призначення:
 . The server said:\n	pop3		. Відповідь сервера:\n
-Plain text	ConfigView		Звиклий текст
+Plain text	ConfigView		Звичайний текст
 Getting mailbox size…	pop3		Отримання розміру скриньки…
 Error while connecting to server %serv	pop3		Помилка при під'єднанні до сервера %serv
 Getting UniqueIDs…	pop3		Отримання унікального ID…

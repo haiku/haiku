@@ -3,8 +3,8 @@ Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Немож�
 Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		Оновлення налаштувань тек IMAP, треба трохи зачекати…
 Failed to fetch available storage.	IMAPFolderConfig		Призупинено отримання доступних масивів.
 Cancel	IMAPFolderConfig		Скасувати
-OK	IMAPFolderConfig		Гаразд
-Server storage: %s / %s used.	IMAPFolderConfig		Місткість серверу: використано %s / %s.
+OK	IMAPFolderConfig		ОК
+Server storage: %s / %s used.	IMAPFolderConfig		Сховище на сервері: %s / %s використано.
 No encryption	imap_config		Без шифрування
 Fetching IMAP folders, please be patient…	IMAPFolderConfig		Отримую дані з тек IMAP, треба трохи зачекати…
 Configure IMAP Folders	imap_config		Зконфігурувати теки IMAP

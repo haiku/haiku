@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	535251661
+1	swedish	x-vnd.Haiku-HaikuDepot	2510596347
 Repository update error	LocalRepositoryUpdateProcess		Fel vid uppdatering av repositorie
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ett fel inträffade vid uppdatering av repositoriet: %error%
 User Created	UserLoginWindow		Användare skapad
@@ -134,7 +134,9 @@ Reading repository data	LocalPkgDataLoadProcess		Läser repositoriedata
 Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Synkroniserar referensdata från server
 The nickname is malformed.  The nickname may only contain digits and lower case latin characters.  The nickname must be between four and sixteen characters in length.	UserLoginWindow		Användarnamnet är felaktigt angivet.  Användarnamnet får endast innehålla siffror och små bokstäver.  Användarnamnet måste vara mellan fyra och sexton tecken i längd.
 Stability:	RatePackageWindow		Stabilitet:
+The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Användningsavtalet måste accepteras och att den person som skapar användaren uppfyller minimikravet för ålder.
 A validation error has occurred	ServerHelper		Ett valideringsfel har inträffat
+The nickname is required.	UserLoginWindow		Ett användarnamn krävs.
 Source packages	MainWindow		Källkodspaket
 -	no package size		-
 Try again	App		Försök igen
@@ -151,11 +153,15 @@ View latest usage conditions…	MainWindow		Se de senaste användarvillkoren…
 Search terms:	FilterView		Sökvillkor
 Pending…	PackageListView		Väntar...
 Category:	FilterView		Kategori:
+The user %Nickname% has been successfully created in the HaikuDepotServer system.  You can administer your user details by using the web interface.  You are now logged-in as this new user.	UserLoginWindow		Användaren %Nickname% har skapats i HaikuDepotServer -systemet.  Du kan administrera dina användaruppgifter via webbgränssnittet.  Du är nu inloggad som din nyskapade användare.
 Authentication failed	UserLoginWindow		Autentisering misslyckades
+The supplied response to the captcha is incorrect.  A new captcha will be generated; try again.	UserLoginWindow		Ditt captchasvar var felaktigt.  En ny captcha har genererats. Prova igen.
+Captcha error	UserLoginWindow		Captcha-fel
 Manage repositories…	MainWindow		Hantera repositorier...
 Fetching remote repository data	LocalRepositoryUpdateProcess		Hämtar fjärrdata från repositorie
 Description	PackageListView		Beskrivning
 Open %DeskbarLink%	PackageManager		Öppna %DeskbarLink%
+User creation error	UserLoginWindow		Användarskapande-fel
 Install	PackageManager		Installera
 Input validation	UserLoginWindow		Ogiltigt indata
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Ett oväntat fel har skickats från HaikuDepot-servern [%i]
@@ -163,5 +169,7 @@ Log in…	MainWindow		Logga in...
 You need to be logged into an account before you can rate packages.	MainWindow		Du måste logga in för att kunna betygsätta paket.
 Client version too old	ServerHelper		Klientversionen är för gammal
 Local repository load error	LocalPkgDataLoadProcess		Fel vid laddning av lokalt repositorie
+The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		Användaren finns inte eller så är lösenordet felaktigt. Kontrollera dina inloggningsuppgifter och försök igen.
 9999.99 KiB	PackageListView		9999.99 KiB
+Repeat password:	UserLoginWindow		Repetera lösenord:
 All repositories	MainWindow		Alla repositorier

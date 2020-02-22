@@ -1,6 +1,6 @@
 1	japanese	x-vnd.Haiku-MatchHeader	1946584206
 Delete message	ConfigView		メッセージを削除する
-Match \"%attribute\" against \"%regex\"	RuleFilter		\"%regex\"  と一致する \"%attribute\" 
+Match \"%attribute\" against \"%regex\"	RuleFilter		\"%attribute\" を \"%regex\" で照合する
 Match header	RuleFilter		ヘッダー一致条件
 Set flags to	ConfigView		フラグを指定する
 Header field (e.g. Subject, From, …)	ConfigView		ヘッダーフィールド (例. 題名, 送信元, …)

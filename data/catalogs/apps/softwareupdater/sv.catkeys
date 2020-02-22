@@ -19,7 +19,7 @@ to	SoftwareUpdaterWindow	List item text	till
 Attempting to cancel the updates…	SoftwareUpdaterWindow		Försöker avbryta uppdateringarna…
 Contacting software repositories to check for package updates.	CheckManager		Kontaktar repositorier för att leta efter uppdaterade paket.
 Available updates found	CheckManager		Tillgängliga uppdateringar hittades
-from repository	SoftwareUpdaterWindow	List item text	från repositorie
+from repository	SoftwareUpdaterWindow	List item text	från repositoriet
 Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Kontaktar repositorier för att leta efter paketuppdateringar.
 Cancelling updates	SoftwareUpdaterWindow		Avbryter uppdateringar
 Cancel	SoftwareUpdaterWindow	Alert button label	Avbryt

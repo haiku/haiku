@@ -1,6 +1,7 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	2226742521
+1	japanese	x-vnd.Haiku-HaikuDepot	2510596347
 Repository update error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
+User Created	UserLoginWindow		作成されたユーザー
 Check for updates…	MainWindow		更新をチェック…
 Uninstall	PackageManager		アンインストール
 (%Votes%)	FeaturedPackagesView		(%Votes%)
@@ -168,6 +169,7 @@ Log in…	MainWindow		ログイン…
 You need to be logged into an account before you can rate packages.	MainWindow		パッケージを評価する前にアカウントにログインする必要があります。
 Client version too old	ServerHelper		クライアントのバージョンが古すぎます
 Local repository load error	LocalPkgDataLoadProcess		ローカルリポジトリ読み込みエラー
+The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		ユーザーが存在しないかパスワードが違っています。情報を確認して再度試してください。
 9999.99 KiB	PackageListView		9999.99 KiB
 Repeat password:	UserLoginWindow		パスワードの再入力:
 All repositories	MainWindow		すべてのリポジトリ

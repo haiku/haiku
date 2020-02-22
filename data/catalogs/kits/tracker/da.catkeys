@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libtracker	2745737133
+1	danish	x-vnd.Haiku-libtracker	176213216
 Created	ContainerWindow		Oprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åbn og lav foretrukket
@@ -22,6 +22,7 @@ Open	FilePanelPriv		Åbn
 Bitmap icon	AttributesView		Bitmap-ikon
 You can't replace a folder with one of its sub-folders.	FSUtils		Du kan ikke erstatte en mappe med dets undermapper.
 <%ld dates>	AttributesView		<%ld datoer>
+Select…	VirtualDirectoryWindow		Vælg …
 Name	Default Query Columns		Navn
 Unmount	ContainerWindow		Afmonter
 Eject when unmounting	AutoMounterSettings		Skub ud ved afmontering
@@ -357,6 +358,7 @@ Size:	InfoWindow		Størrelse:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Det valgte element kan ikke blive flyttet til papirkurven. Vil du slette den i stedet? (Handlingen kan ikke fortrydes).
 Copy	ContainerWindow		Kopiér
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Beklager, 'Character'-attributten kan ikke gemme en multi-byte glyf.
+Open parent	VirtualDirectoryWindow		Åbn forælder
 And	FindPanel		Og
 Palette-indexed picture	AttributesView		Paletindekseret billede
 multiple disks	FindPanel		flere diske
@@ -441,6 +443,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Beklager, det er
 Move here	ContainerWindow		Flyt her
 the config folder	FSUtils		konfigurationsmappen
 Sorry, could not create a new folder.	FSUtils		Beklager, kunne ikke lave en ny mappe.
+Select all	VirtualDirectoryWindow		Vælg alle
 Rename	FSUtils	button label	Omdøb
 Clean up all	ContainerWindow		Opryd alle
 Add current folder	FilePanelPriv		Tilføj nuværende mappe
@@ -453,6 +456,7 @@ ends with	FindPanel		ender med
 Show Disks icon	SettingsView		Vis diskikoner
 Outline selection rectangle only	SettingsView		Omrids markering kun for rektanglen
 by formula	FindPanel		af formlen
+Resize to fit	VirtualDirectoryWindow		Tilpas størrelse til at passe
 Move to Trash	FilePanelPriv		Flyt til papirkurven
 is	FindPanel		er
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Hvis du omdøber systemmappen eller dens indhold, så vil du ikke være i stand til at opstarte %osName!\n\nEr du sikker på, at du vil gøre det?\n\nFor alligevel at omdøbe systemmappen eller dens indhold, hold Skift-tasten nede og klik på \"Omdøb\".
@@ -470,6 +474,7 @@ Default application	InfoWindow		Standardprogram
 Untitled bitmap	PoseView		Unavngivet bitmap
 matches regular expression	SelectionWindow		matcher regulært udtryk
 Invert selection	ContainerWindow		Omvend markering
+Close	VirtualDirectoryWindow		Luk
 Monochrome picture	AttributesView		Sort og hvid billede
 Real name	ContainerWindow		Rigtige navn
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Kan ikke åbne \"%name\". Filen er ved en fejl markeret som eksekverbar. 
@@ -506,6 +511,7 @@ Delete	PoseView		Slet
 Media parameter	AttributesView		Medieparameter
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Hvis du ændre hjemmemappen, så virker %osName måske ikke korrekt!\n\nEr du sikker på, at du vil gøre det?\n\nFor alligevel at ændre hjemmemappen, hold Skift-tasten nede og klik på \"Jeg ved hvad jeg gør\".
 Sorry, you can't copy items to the Trash.	PoseView		Beklager, du kan ikke kopiere elementer til papirkurven.
+Invert selection	VirtualDirectoryWindow		Omvendt markering
 New folder	FilePanelPriv		Ny mappe
 {0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# punkt} other{# punkter}}
 Name	AttributesView		Navn
