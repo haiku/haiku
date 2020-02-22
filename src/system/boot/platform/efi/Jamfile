@@ -8,7 +8,7 @@ UsePrivateHeaders [ FDirName kernel arch $(TARGET_KERNEL_ARCH) ] ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems gpt ;
 
 {
-	local defines = _BOOT_MODE GNU_EFI_USE_MS_ABI _BOOT_PLATFORM_EFI ;
+	local defines = _BOOT_MODE _BOOT_PLATFORM_EFI ;
 	defines = [ FDefines $(defines) ] ;
 	SubDirCcFlags $(defines) ;
 	SubDirC++Flags $(defines) -fno-rtti ;
@@ -31,14 +31,21 @@ local platform_src =
 	serial.cpp
 	;
 
+local support_libs ;
+
+if $(TARGET_KERNEL_ARCH) in arm arm64 {
+	support_libs += boot_fdt.a ;
+}
+
 local platform ;
 for platform in [ MultiBootSubDirSetup efi ] {
 	on $(platform) {
 
 		BootMergeObject boot_platform_efi_common.o :
 			$(platform_src)
-			:
-			: boot_platform_generic_efi.a
+			: :
+			$(support_libs)
+			boot_platform_generic_efi.a
 		;
 
 		BootMergeObject boot_platform_efi.o :
