@@ -667,7 +667,7 @@ TBarWindow::SetSizeLimits()
 	} else {
 		if (fBarView->Vertical()) {
 			BWindow::SetSizeLimits(gMinimumWindowWidth, gMaximumWindowWidth,
-				kMenuBarHeight - 1, -1);
+				kMenuBarHeight - 1, screenFrame.Height());
 		} else {
 			BWindow::SetSizeLimits(screenFrame.Width(), screenFrame.Width(),
 				kMenuBarHeight - 1, kMaximumIconSize + 4);
