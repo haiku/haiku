@@ -10,7 +10,7 @@
 /*
  * Original Be Sample source modified to use a quaternion for the object's orientation
  */
- 
+
 /*
 	Copyright 1999, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
@@ -84,9 +84,9 @@ GLObject::GLObject(ObjectView* ov)
 	z(-2.0),
 	fRotation(0.0f, 0.0f, 0.0f, 1.0f),
 	spinX(2),
-	spinY(2),	
+	spinY(2),
 	solidity(0),
-	color(4),	
+	color(4),
 	changed(false),
 	fObjView(ov)
 {
@@ -136,7 +136,7 @@ GLObject::MenuInvoked(BPoint point)
 	i = m->Go(point);
 	int32 index = m->IndexOf(i);
 	delete m;
-	
+
 	if (index < 5) {
 		color = index+1;
 	} else if (index > 5) {
@@ -160,10 +160,10 @@ GLObject::SpinIt()
 {
 	bool c = changed;
 	c = c || ((spinX != 0.0f) || (spinY != 0.0f));
-	
+
 	if (c)
 		RotateWorldSpace(spinY, spinX);
-	
+
 	return c;
 }
 
@@ -172,7 +172,7 @@ void
 GLObject::Spin(float rx, float ry)
 {
 	spinX = rx;
-	spinY = ry;	
+	spinY = ry;
 }
 
 
@@ -180,7 +180,8 @@ void
 GLObject::RotateWorldSpace(float rx, float ry)
 {
 	fRotation = Quaternion(Vector3(0.0f, 1.0f, 0.0f), 0.01f * rx) * fRotation;
-	fRotation = Quaternion(Vector3(1.0f, 0.0f, 0.0f), 0.01f * ry) * fRotation;	
+	fRotation = Quaternion(Vector3(1.0f, 0.0f, 0.0f), 0.01f * ry) * fRotation;
+	fRotation.normalize();
 	changed = true;
 }
 
@@ -190,15 +191,15 @@ GLObject::Draw(bool forID, float IDcolor[])
 {
 	glPushMatrix();
 		glTranslatef(x, y, z);
-				
+
 		float mat[4][4];
 		fRotation.toOpenGLMatrix(mat);
 		glMultMatrixf((GLfloat*)mat);
-		
+
 		if (forID) {
 			glColor3fv(IDcolor);
 		}
-		
+
 		DoDrawing(forID);
 
 	glPopMatrix();
@@ -208,7 +209,7 @@ GLObject::Draw(bool forID, float IDcolor[])
 
 
 TriangleObject::TriangleObject(ObjectView* ov)
-		: 	
+		:
 		GLObject(ov),
 		fStatus(B_NO_INIT),
 		fPoints(100, 100),
