@@ -496,7 +496,7 @@ typedef struct arch_cpu_info {
 	__asm__("invlpg (%0)" : : "r" (va))
 
 #define wbinvd() \
-	__asm__("wbinvd")
+	__asm__ volatile ("wbinvd" : : : "memory")
 
 #define set_ac() \
 	__asm__ volatile (ASM_STAC : : : "memory")
