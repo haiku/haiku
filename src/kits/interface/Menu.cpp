@@ -1622,7 +1622,7 @@ BMenu::_Hide()
 // #pragma mark - mouse tracking
 
 
-const static bigtime_t kOpenSubmenuDelay = 225000;
+const static bigtime_t kOpenSubmenuDelay = 0;
 const static bigtime_t kNavigationAreaTimeout = 1000000;
 
 
