@@ -125,13 +125,8 @@ void
 PowerStatusView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
-	if (Parent() != NULL) {
-		if ((Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0)
-			SetViewColor(B_TRANSPARENT_COLOR);
-		else
-			AdoptParentColors();
-	} else
-		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+
+	SetViewColor(B_TRANSPARENT_COLOR);
 
 	if (ViewUIColor() != B_NO_COLOR)
 		SetLowUIColor(ViewUIColor());
