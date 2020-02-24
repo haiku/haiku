@@ -60,7 +60,6 @@ private:
 				kIndicator
 			};
 
-			void				_InitOffscreen();
 			void				_LayoutKeyboard();
 			void				_DrawKeyButton(BView* view, BRect& rect,
 									BRect updateRect, rgb_color base,
@@ -102,9 +101,6 @@ private:
 									uint32 displayModifier, uint32 oldCode,
 									uint32 newCode);
 			const char*			_NameForModifier(uint32 modifier, bool pretty);
-
-			BBitmap*			fOffscreenBitmap;
-			BView*				fOffscreenView;
 
 			KeyboardLayout*		fLayout;
 			Keymap*				fKeymap;

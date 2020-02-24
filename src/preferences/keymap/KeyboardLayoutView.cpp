@@ -83,7 +83,6 @@ is_mappable_to_modifier(uint32 keyCode)
 KeyboardLayoutView::KeyboardLayoutView(const char* name)
 	:
 	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
-	fOffscreenBitmap(NULL),
 	fKeymap(NULL),
 	fEditable(true),
 	fModifiers(0),
@@ -102,7 +101,6 @@ KeyboardLayoutView::KeyboardLayoutView(const char* name)
 
 KeyboardLayoutView::~KeyboardLayoutView()
 {
-	delete fOffscreenBitmap;
 }
 
 
@@ -110,7 +108,6 @@ void
 KeyboardLayoutView::SetKeyboardLayout(KeyboardLayout* layout)
 {
 	fLayout = layout;
-	_InitOffscreen();
 	_LayoutKeyboard();
 	Invalidate();
 }
@@ -159,7 +156,6 @@ KeyboardLayoutView::AttachedToWindow()
 void
 KeyboardLayoutView::FrameResized(float width, float height)
 {
-	_InitOffscreen();
 	_LayoutKeyboard();
 }
 
@@ -502,32 +498,24 @@ void
 KeyboardLayoutView::Draw(BRect updateRect)
 {
 	if (fOldSize != BSize(Bounds().Width(), Bounds().Height())) {
-		_InitOffscreen();
 		_LayoutKeyboard();
 	}
-
-	BView* view;
-	if (fOffscreenBitmap != NULL) {
-		view = fOffscreenView;
-		view->LockLooper();
-	} else
-		view = this;
 
 	// Draw background
 
 	if (Parent())
-		view->SetLowColor(Parent()->ViewColor());
+		SetLowColor(Parent()->ViewColor());
 	else
-		view->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	view->FillRect(updateRect, B_SOLID_LOW);
+	FillRect(updateRect, B_SOLID_LOW);
 
 	// Draw keys
 
 	for (int32 i = 0; i < fLayout->CountKeys(); i++) {
 		Key* key = fLayout->KeyAt(i);
 
-		_DrawKey(view, updateRect, key, _FrameFor(key),
+		_DrawKey(this, updateRect, key, _FrameFor(key),
 			_IsKeyPressed(key->code));
 	}
 
@@ -536,15 +524,8 @@ KeyboardLayoutView::Draw(BRect updateRect)
 	for (int32 i = 0; i < fLayout->CountIndicators(); i++) {
 		Indicator* indicator = fLayout->IndicatorAt(i);
 
-		_DrawIndicator(view, updateRect, indicator, _FrameFor(indicator->frame),
+		_DrawIndicator(this, updateRect, indicator, _FrameFor(indicator->frame),
 			(fModifiers & indicator->modifier) != 0);
-	}
-
-	if (fOffscreenBitmap != NULL) {
-		view->Sync();
-		view->UnlockLooper();
-
-		DrawBitmapAsync(fOffscreenBitmap, BPoint(0, 0));
 	}
 }
 
@@ -694,49 +675,15 @@ KeyboardLayoutView::MessageReceived(BMessage* message)
 
 
 void
-KeyboardLayoutView::_InitOffscreen()
-{
-	delete fOffscreenBitmap;
-	fOffscreenView = NULL;
-
-	fOffscreenBitmap = new(std::nothrow) BBitmap(Bounds(),
-		B_BITMAP_ACCEPTS_VIEWS, B_RGB32);
-	if (fOffscreenBitmap != NULL && fOffscreenBitmap->IsValid()) {
-		fOffscreenBitmap->Lock();
-		fOffscreenView = new(std::nothrow) BView(Bounds(), "offscreen view",
-			0, 0);
-		if (fOffscreenView != NULL) {
-			if (Parent() != NULL) {
-				fOffscreenView->SetViewColor(Parent()->ViewColor());
-			} else {
-				fOffscreenView->SetViewColor(
-					ui_color(B_PANEL_BACKGROUND_COLOR));
-			}
-
-			fOffscreenView->SetLowColor(fOffscreenView->ViewColor());
-			fOffscreenBitmap->AddChild(fOffscreenView);
-		}
-		fOffscreenBitmap->Unlock();
-	}
-
-	if (fOffscreenView == NULL) {
-		// something went wrong
-		delete fOffscreenBitmap;
-		fOffscreenBitmap = NULL;
-	}
-}
-
-
-void
 KeyboardLayoutView::_LayoutKeyboard()
 {
 	float factorX = Bounds().Width() / fLayout->Bounds().Width();
 	float factorY = Bounds().Height() / fLayout->Bounds().Height();
 
 	fFactor = min_c(factorX, factorY);
-	fOffset = BPoint((Bounds().Width() - fLayout->Bounds().Width()
-			* fFactor) / 2,
-		(Bounds().Height() - fLayout->Bounds().Height() * fFactor) / 2);
+	fOffset = BPoint(floorf((Bounds().Width() - fLayout->Bounds().Width()
+			* fFactor) / 2),
+		floorf((Bounds().Height() - fLayout->Bounds().Height() * fFactor) / 2));
 
 	if (fLayout->DefaultKeySize().width < 11)
 		fGap = 1;
@@ -860,10 +807,6 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 		BRegion region(rect);
 		region.Exclude(bottomLeft);
 		view->ConstrainClippingRegion(&region);
-
-		// Fill in the rect with the background color
-		SetHighColor(background);
-		FillRect(rect);
 
 		// draw the button background
 		BRect bgRect = rect.InsetByCopy(2, 2);
