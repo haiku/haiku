@@ -29,8 +29,6 @@
 
 FontDemoView::FontDemoView(BRect rect)
 	: BView(rect, "FontDemoView", B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS),
-	fBitmap(NULL),
-	fBufferView(NULL),
 	fFontSize(50.0),
 	fSpacing(0.0),
 	fOutLineLevel(0),
@@ -39,22 +37,16 @@ FontDemoView::FontDemoView(BRect rect)
 	fDrawShapes(false),
 	fShapes(NULL)
 {
-	SetViewColor(B_TRANSPARENT_COLOR);
 	BString setStr = B_TRANSLATE("Haiku, Inc.");
 	SetString(setStr);
 	SetFontSize(fFontSize);
 	SetAntialiasing(true);
-
-	_NewBitmap(Bounds());
 }
 
 
 FontDemoView::~FontDemoView()
 {
 	free(fShapes);
-
-	fBitmap->Lock();
-	delete fBitmap;
 }
 
 
@@ -71,33 +63,15 @@ FontDemoView::FrameResized(float width, float height)
 void
 FontDemoView::Draw(BRect updateRect)
 {
+	SetDrawingMode(B_OP_COPY);
+
 	BRect rect = Bounds();
-	fBufferView = _GetView(rect);
-	_DrawView(fBufferView);
-
-	fBufferView->Sync();
-	DrawBitmap(fBitmap, rect);
-	fBitmap->Unlock();
-}
-
-
-void
-FontDemoView::_DrawView(BView* view)
-{
-	if (!view)
-		return;
-
-	view->SetDrawingMode(B_OP_COPY);
-
-
-	BRect rect = view->Bounds();
-	view->SetHighColor(255, 255, 255);
-	view->FillRect(rect);
+	SetHighColor(255, 255, 255);
 
 	if (!fString)
 		return;
 
-	view->SetFont(&fFont, B_FONT_ALL);
+	SetFont(&fFont, B_FONT_ALL);
 
 	const size_t size = fString.CountChars();
 	BStackOrHeapArray<BRect, 64> boundBoxes(size);
@@ -136,7 +110,7 @@ FontDemoView::_DrawView(BView* view)
 	// region area instead of the whole view.
 
 	fBoxRegion.MakeEmpty();
-	
+
 	for (size_t i = 0; i < size; i++) {
 		xCoordArray[i] = 0.0f;
 		yCoordArray[i] = 0.0f;
@@ -150,28 +124,28 @@ FontDemoView::_DrawView(BView* view)
 		boundBoxes[i].OffsetBy(xCoordArray[i], yCoordArray[i]);
 
 		if (OutLineLevel()) {
-			view->MovePenTo(xCoordArray[i], yCoordArray[i]);
-			view->SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-			view->FillShape(fShapes[i]);
-			view->SetPenSize(OutLineLevel());
-			view->SetHighColor(0, 0, 0);
-			view->StrokeShape(fShapes[i]);
+			MovePenTo(xCoordArray[i], yCoordArray[i]);
+			SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+			FillShape(fShapes[i]);
+			SetPenSize(OutLineLevel());
+			SetHighColor(0, 0, 0);
+			StrokeShape(fShapes[i]);
 		} else {
-			view->SetHighColor(0, 0, 0);
-			view->SetDrawingMode(fDrawingMode);
+			SetHighColor(0, 0, 0);
+			SetDrawingMode(fDrawingMode);
 			int32 charLength;
 			const char* charAt = fString.CharAt(i, &charLength);
-			view->DrawString(charAt, charLength,
+			DrawString(charAt, charLength,
 				BPoint(xCoordArray[i], yCoordArray[i]));
 		}
 
 		if (BoundingBoxes() && !OutLineLevel()) {
 			if (i % 2)
-				view->SetHighColor(0, 255, 0);
+				SetHighColor(0, 255, 0);
 			else
-				view->SetHighColor(255, 0, 0);
-			view->SetDrawingMode(B_OP_COPY);
-			view->StrokeRect(boundBoxes[i]);
+				SetHighColor(255, 0, 0);
+			SetDrawingMode(B_OP_COPY);
+			StrokeRect(boundBoxes[i]);
 		}
 
 		// add the bounding to the region.
@@ -428,33 +402,5 @@ FontDemoView::_AddShapes(BString string)
 
 	for (size_t i = 0; i < size; i++) {
 		fShapes[i] = new BShape();
-	}
-}
-
-
-BView*
-FontDemoView::_GetView(BRect rect)
-{
-	if (!fBitmap || fBitmap->Bounds() != rect)
-		_NewBitmap(rect);
-
-	fBitmap->Lock();
-	return fBitmap->ChildAt(0);
-}
-
-
-void
-FontDemoView::_NewBitmap(BRect rect)
-{
-	delete fBitmap;
-	fBitmap = new BBitmap(rect, B_RGB16, true);
-
-	if (fBitmap->Lock()) {
-		BView* view = new BView(rect, "", B_FOLLOW_NONE, B_WILL_DRAW);
-		fBitmap->AddChild(view);
-		fBitmap->Unlock();
-	} else {
-		delete fBitmap;
-		fBitmap = NULL;
 	}
 }

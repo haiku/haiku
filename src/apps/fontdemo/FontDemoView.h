@@ -51,13 +51,6 @@ class FontDemoView : public BView {
 
 	private:
 		void _AddShapes(BString string);
-		void _DrawView(BView* view);
-
-		BView* _GetView(BRect rect);
-		void _NewBitmap(BRect rect);
-
-		BBitmap*	fBitmap;
-		BView*		fBufferView;
 
 		BString		fString;
 		float		fFontSize;
