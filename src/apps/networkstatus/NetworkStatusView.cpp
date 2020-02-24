@@ -232,18 +232,8 @@ void
 NetworkStatusView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
-	if (Parent() != NULL) {
-		if ((Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0)
-			SetViewColor(B_TRANSPARENT_COLOR);
-		else
-			AdoptParentColors();
-	} else
-		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
-	if (ViewUIColor() != B_NO_COLOR)
-		SetLowUIColor(ViewUIColor());
-	else
-		SetLowColor(ViewColor());
+	SetViewColor(B_TRANSPARENT_COLOR);
 
 	start_watching_network(
 		B_WATCH_NETWORK_INTERFACE_CHANGES | B_WATCH_NETWORK_LINK_CHANGES, this);
