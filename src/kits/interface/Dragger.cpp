@@ -227,6 +227,7 @@ BDragger::AttachedToWindow()
 		SetLowColor(kZombieColor);
 		SetViewColor(kZombieColor);
 	} else {
+		SetFlags(Flags() | B_TRANSPARENT_BACKGROUND);
 		SetLowColor(B_TRANSPARENT_COLOR);
 		SetViewColor(B_TRANSPARENT_COLOR);
 	}

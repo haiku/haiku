@@ -94,7 +94,7 @@ signal_strength_compare(const wireless_network &a,
 NetworkStatusView::NetworkStatusView(BRect frame, int32 resizingMode,
 		bool inDeskbar)
 	: BView(frame, kDeskbarItemName, resizingMode,
-		B_WILL_DRAW | B_FRAME_EVENTS),
+		B_WILL_DRAW | B_TRANSPARENT_BACKGROUND | B_FRAME_EVENTS),
 	fInDeskbar(inDeskbar)
 {
 	_Init();

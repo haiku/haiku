@@ -613,6 +613,7 @@ ActivityView::_Init(const BMessage* settings)
 	fLegendLayoutItem = NULL;
 #endif
 	SetViewColor(B_TRANSPARENT_COLOR);
+	SetFlags(Flags() | B_TRANSPARENT_BACKGROUND);
 
 	fLastRefresh = 0;
 	fDrawResolution = 1;

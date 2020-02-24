@@ -1050,7 +1050,8 @@ BView::SetFlags(uint32 flags)
 
 		uint32 changesFlags = flags ^ fFlags;
 		if (changesFlags & (B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE
-				| B_FRAME_EVENTS | B_SUBPIXEL_PRECISE)) {
+				| B_FRAME_EVENTS | B_SUBPIXEL_PRECISE
+				| B_TRANSPARENT_BACKGROUND)) {
 			_CheckLockAndSwitchCurrent();
 
 			fOwner->fLink->StartMessage(AS_VIEW_SET_FLAGS);

@@ -66,7 +66,7 @@ PowerStatusView::PowerStatusView(PowerStatusDriverInterface* interface,
 	BRect frame, int32 resizingMode,  int batteryID, bool inDeskbar)
 	:
 	BView(frame, kDeskbarItemName, resizingMode,
-		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
+		B_WILL_DRAW | B_TRANSPARENT_BACKGROUND | B_FULL_UPDATE_ON_RESIZE),
 	fDriverInterface(interface),
 	fBatteryID(batteryID),
 	fInDeskbar(inDeskbar)
