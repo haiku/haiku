@@ -125,15 +125,13 @@ rule BootLd
 
 	# Remove any preset LINKLIBS, but link against libgcc.a. Linking against
 	# libsupc++ is opt-out.
-	if $(TARGET_BOOT_PLATFORM) != efi {
-		local libs ;
-		if ! [ on $(1) return $(HAIKU_NO_LIBSUPC++) ] {
-			libs += [ TargetBootLibsupc++ true ] ;
-			Depends $(1) : [ TargetBootLibsupc++ ] ;
-		}
-		LINKLIBS on $(1) = $(libs) [ TargetBootLibgcc true ] ;
-		Depends $(1) : [ TargetBootLibgcc ] ;
+	local libs ;
+	if ! [ on $(1) return $(HAIKU_NO_LIBSUPC++) ] {
+		libs += [ TargetBootLibsupc++ true ] ;
+		Depends $(1) : [ TargetBootLibsupc++ ] ;
 	}
+	LINKLIBS on $(1) = $(libs) [ TargetBootLibgcc true ] ;
+	Depends $(1) : [ TargetBootLibgcc ] ;
 
 	# TODO: Do we really want to invoke SetupBoot here? The objects should
 	# have been compiled with BootObjects anyway, so we're doing that twice.
