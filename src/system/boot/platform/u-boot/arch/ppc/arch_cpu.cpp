@@ -257,7 +257,7 @@ check_cpu_features()
 
 
 extern "C" void
-arch_spin(bigtime_t microseconds)
+spin(bigtime_t microseconds)
 {
 	for(bigtime_t i=0;i<microseconds;i=i+1)
 	{

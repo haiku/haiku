@@ -123,13 +123,6 @@ arch_cpu_memory_write_barrier(void)
 }
 
 
-extern "C" void
-arch_spin(bigtime_t microseconds)
-{
-	panic("No timing support in bootloader yet!");
-}
-
-
 extern "C" status_t
 boot_arch_cpu_init(void)
 {
@@ -143,4 +136,22 @@ boot_arch_cpu_init(void)
 		// this will eventually be corrected later on
 
 	return B_OK;
+}
+
+
+extern "C" bigtime_t
+system_time()
+{
+	#warning Implement system_time in ARM bootloader!
+	return 0;
+}
+
+
+extern "C" void
+spin(bigtime_t microseconds)
+{
+	#warning Implment spin in ARM bootloader!
+	//bigtime_t time = system_time();
+	//while ((system_time() - time) < microseconds)
+	//	asm volatile ("nop;");
 }

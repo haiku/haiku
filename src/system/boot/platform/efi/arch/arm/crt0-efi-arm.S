@@ -69,7 +69,7 @@ extra_header_fields:
 	// Everything before the kernel image is considered part of the header
 	.long	_start - ImageBase		// SizeOfHeaders
 	.long	0				// CheckSum
-	.short	EFI_SUBSYSTEM			// Subsystem
+	.short	10				// Subsystem (EFI)
 	.short	0				// DllCharacteristics
 	.long	0				// SizeOfStackReserve
 	.long	0				// SizeOfStackCommit
@@ -122,6 +122,7 @@ section_table:
 	.short	0		// NumberOfLineNumbers  (0 for executables)
 	.long	0xe0500020	// Characteristics (section flags)
 
+	.globl _start
 _start:
 	stmfd		sp!, {r0-r2, lr}
 

@@ -13,7 +13,6 @@
 extern "C" {
 #endif
 
-extern void arch_spin(bigtime_t microseconds);
 extern status_t boot_arch_cpu_init(void);
 extern void cpu_init(void);
 

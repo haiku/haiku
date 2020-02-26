@@ -61,6 +61,8 @@ SECTIONS
 	. = ALIGN(4096);
 	.dynstr   : { *(.dynstr) }
 	. = ALIGN(4096);
+
+	_end = . ;
 	.note.gnu.build-id : { *(.note.gnu.build-id) }
 	/DISCARD/ : {
 		*(.rel.reloc)

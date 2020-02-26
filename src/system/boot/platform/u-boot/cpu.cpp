@@ -27,17 +27,6 @@
 
 
 extern "C" void
-spin(bigtime_t microseconds)
-{
-	#warning U-Boot:TODO!!
-	// TODO: use API if available
-
-	// fallback to arch-specific code
-	arch_spin(microseconds);
-}
-
-
-extern "C" void
 cpu_init()
 {
 	gKernelArgs.num_cpus = 1;
