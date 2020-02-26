@@ -69,6 +69,7 @@ const float kMaxPreventHidingDist = 80.0f;
 class BShelf;
 class TBarApp;
 class TBarMenuBar;
+class TBarWindow;
 class TExpandoMenuBar;
 class TReplicantTray;
 class TDragRegion;
@@ -89,9 +90,10 @@ public:
 
 	virtual	void			MessageReceived(BMessage* message);
 
+	virtual	void			MouseDown(BPoint where);
 	virtual	void			MouseMoved(BPoint where, uint32 transit,
 								const BMessage* dragMessage);
-	virtual	void			MouseDown(BPoint where);
+	virtual	void			MouseUp(BPoint where);
 
 			void			SaveSettings();
 
@@ -186,6 +188,7 @@ private:
 			void			_ChangeState(BMessage* message);
 
 			TBarApp*			fBarApp;
+			TBarWindow*			fBarWindow;
 			TInlineScrollView*	fInlineScrollView;
 			TBarMenuBar*		fBarMenuBar;
 			TExpandoMenuBar*	fExpandoMenuBar;
@@ -194,6 +197,9 @@ private:
 			TDragRegion*	fDragRegion;
 			TResizeControl*	fResizeControl;
 			TReplicantTray*	fReplicantTray;
+
+			bool			fIsRaised : 1;
+			bool			fMouseDownOutside : 1;
 
 			bool			fVertical : 1;
 			bool			fTop : 1;

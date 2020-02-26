@@ -40,8 +40,9 @@ All rights reserved.
 #include <Window.h>
 
 
-class TDeskbarMenu;
+class TBarApp;
 class TBarView;
+class TDeskbarMenu;
 
 class TBarWindow : public BWindow {
 public:
@@ -94,8 +95,9 @@ private:
 
 private:
 	static	TDeskbarMenu*		sDeskbarMenu;
+			TBarApp*			fBarApp;
 			TBarView*			fBarView;
-			bool				fShowingMenu;
+			int32				fMenusShown;
 };
 
 
