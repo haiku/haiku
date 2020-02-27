@@ -785,7 +785,8 @@ UserLoginWindow::_CreateAccountUserUsageConditionsSetupThread(
 			B_TRANSLATE("Usage conditions download problem"),
 			B_TRANSLATE("An error has arisen downloading the usage "
 				"conditions required to create a new user. Check the log for "
-				"details and try again."));
+				"details and try again. "
+				ALERT_MSG_LOGS_USER_GUIDE));
 	}
 
 	return result;

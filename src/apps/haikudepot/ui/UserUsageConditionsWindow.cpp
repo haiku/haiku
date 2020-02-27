@@ -391,7 +391,8 @@ UserUsageConditionsWindow::_NotifyFetchProblem()
 	AppUtils::NotifySimpleError(
 		B_TRANSLATE("Usage conditions download problem"),
 		B_TRANSLATE("An error has arisen downloading the usage "
-			"conditions. Check the log for details and try again."));
+			"conditions. Check the log for details and try again. "
+			ALERT_MSG_LOGS_USER_GUIDE));
 }
 
 

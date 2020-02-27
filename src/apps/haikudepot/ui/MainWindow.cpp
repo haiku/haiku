@@ -972,7 +972,8 @@ MainWindow::_BulkLoadProcessCoordinatorFinished(
 				"that may cause data to be outdated or missing from the "
 				"application's display. Additional details regarding this "
 				"problem may be able to be obtained from the application "
-				"logs."));
+				"logs."
+				ALERT_MSG_LOGS_USER_GUIDE));
 	}
 	BMessenger messenger(this);
 	messenger.SendMessage(MSG_BULK_LOAD_DONE);
