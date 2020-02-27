@@ -34,7 +34,8 @@
 #define ALIGN(size, align)	(((size) + align - 1) & ~(align - 1))
 
 
-#define PCI_VENDOR_AMD			0x1002
+#define PCI_VENDOR_ATI			0x1002
+#define PCI_VENDOR_AMD			0x1022
 #define PCI_VENDOR_CREATIVE		0x1102
 #define PCI_VENDOR_INTEL		0x8086
 #define PCI_VENDOR_NVIDIA		0x10de
@@ -81,9 +82,15 @@ static const struct {
 	{ PCI_VENDOR_INTEL, 0xa171, HDA_QUIRK_SNOOP },
 	{ PCI_VENDOR_INTEL, 0xa2f0, HDA_QUIRK_SNOOP },
 	{ PCI_VENDOR_INTEL, 0xa348, HDA_QUIRK_SNOOP },
-	// Enable snooping for ATI and Nvidia, right now for all their hda-devices,
+	{ PCI_VENDOR_ATI, 0x437b, HDA_QUIRK_SNOOP },
+	{ PCI_VENDOR_ATI, 0x4383, HDA_QUIRK_SNOOP },
+	{ PCI_VENDOR_AMD, 0x157a, HDA_QUIRK_SNOOP },
+	{ PCI_VENDOR_AMD, 0x780d, HDA_QUIRK_SNOOP },
+	{ PCI_VENDOR_AMD, 0x1457, HDA_QUIRK_SNOOP },
+	{ PCI_VENDOR_AMD, 0x1487, HDA_QUIRK_SNOOP },
+	{ PCI_VENDOR_AMD, 0x15e3, HDA_QUIRK_SNOOP },
+	// Enable snooping for Nvidia, right now for all their hda-devices,
 	// but only based on guessing.
-	{ PCI_VENDOR_AMD, PCI_ALL_DEVICES, HDA_QUIRK_SNOOP },
 	{ PCI_VENDOR_NVIDIA, PCI_ALL_DEVICES, HDA_QUIRK_SNOOP | HDA_QUIRK_NO_MSI
 		| HDA_QUIRK_NO_CORBRP_RESET_ACK },
 	{ PCI_VENDOR_CREATIVE, 0x0010, HDA_QUIRK_NO_MSI },
@@ -1071,6 +1078,7 @@ hda_hw_init(hda_controller* controller)
 			}
 
 			case PCI_VENDOR_AMD:
+			case PCI_VENDOR_ATI:
 			{
 				controller->dma_snooping = update_pci_register(controller,
 					ATI_HDA_MISC_CNTR2, ATI_HDA_MISC_CNTR2_MASK,
