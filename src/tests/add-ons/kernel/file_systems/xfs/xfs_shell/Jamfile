@@ -38,15 +38,17 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers private ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src tools fs_shell ] ;
 
 local xfsSource =
+	xfs.cpp
+	Volume.cpp
 	kernel_interface.cpp
 ;
 
-BuildPlatformMergeObject <build>xfs.o : $(xfsSource) ;
+BuildPlatformMergeObject <build>xfs_shell.o : $(xfsSource) ;
 
 BuildPlatformMain <build>xfs_shell
 	:
 	:
-	<build>xfs.o
+	<build>xfs_shell.o
 	<build>fs_shell.a $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
 	$(HOST_LIBROOT) $(fsShellCommandLibs)
 ;
@@ -54,7 +56,7 @@ BuildPlatformMain <build>xfs_shell
 BuildPlatformMain <build>xfs_fuse
 	:
 	:
-	<build>xfs.o
+	<build>xfs_shell.o
 	<build>fuse_module.a
 	$(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
 	$(HOST_STATIC_LIBROOT) $(fsShellCommandLibs) fuse
