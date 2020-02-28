@@ -283,7 +283,7 @@ find_physical_memory_ranges(phys_addr_t &total)
 
 
 extern "C" void
-mmu_init(void)
+mmu_init(void* fdt)
 {
 	size_t tableSize, tlbSize;
 	status_t err;

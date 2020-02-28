@@ -305,7 +305,7 @@ start_gen(int argc, const char **argv, struct image_header *uimage, void *fdt)
 	size_t fdtSize = gFDT ? fdt_totalsize(gFDT) : 0;
 	dprintf("fdtSize: 0x%" B_PRIxSIZE "\n", fdtSize);
 
-	mmu_init();
+	mmu_init(gFDT);
 
 	// Handle our tarFS post-mmu
 	if (args.platform.boot_tgz_size > 0) {

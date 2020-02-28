@@ -42,9 +42,6 @@ extern "C" {
 	// You also need to define ENABLE_SERIAL in serial.cpp
 	// for output to work.
 
-extern void *gFDT;
-
-
 /*
 TODO:
 	-recycle bit!
@@ -354,7 +351,7 @@ map_pages_loader()
 
 //TODO:move this to generic/ ?
 static status_t
-fdt_map_memory_ranges(const char* path, bool physical = false)
+fdt_map_memory_ranges(void* fdt, const char* path, bool physical = false)
 {
 	int node;
 	const void *prop;
@@ -362,15 +359,15 @@ fdt_map_memory_ranges(const char* path, bool physical = false)
 	uint64 total;
 
 	dprintf("checking FDT for %s...\n", path);
-	node = fdt_path_offset(gFDT, path);
+	node = fdt_path_offset(fdt, path);
 
 	total = 0;
 
 	int32 regAddressCells = 1;
 	int32 regSizeCells = 1;
-	fdt_get_cell_count(gFDT, node, regAddressCells, regSizeCells);
+	fdt_get_cell_count(fdt, node, regAddressCells, regSizeCells);
 
-	prop = fdt_getprop(gFDT, node, "reg", &len);
+	prop = fdt_getprop(fdt, node, "reg", &len);
 	if (prop == NULL) {
 		dprintf("Unable to locate %s in FDT!\n", path);
 		return B_ERROR;
@@ -420,8 +417,26 @@ fdt_map_memory_ranges(const char* path, bool physical = false)
 }
 
 
-void
-init_page_directory()
+static void
+fdt_map_peripheral(void* fdt)
+{
+	if (fdt == NULL) {
+		dprintf("Invalid FDT provided to %s!", __func__);
+		return;
+	}
+
+	// map peripheral devices (such as uart) from fdt
+
+	#warning Map peripherals from the fdt we want to use in the bootloader!
+	// this assumes /pl011@9000000 which is the qemu virt uart
+	fdt_map_memory_ranges(fdt, "/pl011@9000000");
+	// this assumes /axi which is broadcom!
+	fdt_map_memory_ranges(fdt, "/axi");
+}
+
+
+static void
+init_page_directory(void* fdt)
 {
 	TRACE(("init_page_directory\n"));
 
@@ -441,10 +456,8 @@ init_page_directory()
 	// map our well known / static pages
 	map_pages_loader();
 
-	// map peripheral devices (such as uart) from fdt
-	// TODO: Iterate over for "simple-bus" compatible devices!
-	// this assumes /axi which is broadcom!
-	fdt_map_memory_ranges("/axi");
+	// map our fdt peripherals
+	fdt_map_peripheral(fdt);
 
 	mmu_flush_TLB();
 
@@ -693,7 +706,7 @@ mmu_init_for_kernel(void)
 
 
 extern "C" void
-mmu_init(void)
+mmu_init(void* fdt)
 {
 	TRACE(("mmu_init\n"));
 
@@ -701,7 +714,7 @@ mmu_init(void)
 	if (gKernelArgs.num_physical_memory_ranges == 0) {
 		// get map of physical memory (fill in kernel_args structure)
 
-		if (fdt_map_memory_ranges("/memory", true) != B_OK) {
+		if (fdt_map_memory_ranges(fdt, "/memory", true) != B_OK) {
 			panic("Error: could not find physical memory ranges from FDT!\n");
 
 #ifdef SDRAM_BASE
@@ -743,7 +756,7 @@ mmu_init(void)
 		(addr_t)&_end - (addr_t)&_start);
 	insert_physical_allocated_range((addr_t)sPageDirectory, 0x200000);
 
-	init_page_directory();
+	init_page_directory(fdt);
 
 	// map in a kernel stack
 	gKernelArgs.cpu_kstack[0].size = KERNEL_STACK_SIZE

@@ -18,7 +18,7 @@ static const uint32 kDefaultPageFlags = 0x3;
 extern "C" {
 #endif
 
-extern void mmu_init(void);
+extern void mmu_init(void* fdt);
 extern void mmu_init_for_kernel(void);
 extern addr_t mmu_map_physical_memory(addr_t physicalAddress,
 	size_t size, uint32 flags);
