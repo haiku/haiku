@@ -27,14 +27,14 @@ Every 2 hours	CodyCam		Кожні 2 години
 Cannot get a time source	CodyCam		Неможливо отримати тривалість джерела
 Every 4 hours	CodyCam		Кожні 4 години
 cmd: '%s'\n	FtpClient		команда: '%s'\n
-Closing the window	VideoConsumer.cpp		Закривання вікна
+Closing the window	VideoConsumer.cpp		Закрити вікно
 Never	CodyCam		Ніколи
 Every 8 hours	CodyCam		Кожні 8 годин
 Cannot start the video source	CodyCam		Неможливо запустити джерело відео
 Cannot set the time source for the video source	CodyCam		Неможливо встановити лічильник для джерела відео
 Renaming…	VideoConsumer.cpp		Переіменування…
 Send to…	CodyCam		Відправити до…
-Password:	CodyCam		Гасло:
+Password:	CodyCam		Пароль:
 still image filename expected	CodyCam		надалі очікується назва зображення
 File name:	CodyCam		Ім’я файлу:
 Directory:	CodyCam		Тека:
@@ -43,7 +43,7 @@ Locking the window	VideoConsumer.cpp		Блокування вікна
 Cannot find an available video stream	CodyCam		Неможливо знайти доступний поток відео
 Upload…	VideoConsumer.cpp		Вивантаження…
 password expected	CodyCam		очікується пароль
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <suppressed>  (дійсне гасло відправлено)\n
+PASS <suppressed>  (real password sent)\n	FtpClient		PASS <suppressed>  (дійсний пороль відправлено)\n
 SFTP	CodyCam		SFTP
 Output	CodyCam		Вивід
 server address expected	CodyCam		вкажіть адресу сервера
@@ -61,7 +61,7 @@ Connected…	VideoConsumer.cpp		Підключення…
 upload client name expected	CodyCam		вкажіть ім’я клієнта вивантаження
 Every 15 seconds	CodyCam		Кожні 15 секунд
 Error getting initial latency for the capture node	CodyCam		Помилка при отриманні затримки для вузла захоплення
-password	CodyCam		гасло
+password	CodyCam		пароль
 Local	CodyCam		Локальний
 Stop video	CodyCam		Зупинити відео
 Last Capture: 	VideoConsumer.cpp		Останнє захоплення: 
@@ -72,7 +72,7 @@ Type:	CodyCam		Тип:
 Rename failed	VideoConsumer.cpp		Переіменування призупинено
 unrecognized upload client specified	CodyCam		нерозпізнаний клієнт вивантаження
 Server:	CodyCam		Сервер:
-Login:	CodyCam		Авторизація:
+Login:	CodyCam		Логін:
 File	CodyCam		Файл
 read: %ld\n	SftpClient		читання: %ld\n
 Every hour	CodyCam		Кожну годину
@@ -83,6 +83,6 @@ FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		Помилка при створенні вихідного файла
 Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Не знайдено джерело зображення.\nДля використання Камери потрібна вебкамера.
 Logging in…	VideoConsumer.cpp		Авторизація…
-CodyCam	System name		Камера
+CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Помилка запису вихідного файлу
 Capture controls	CodyCam		Керування захопленням

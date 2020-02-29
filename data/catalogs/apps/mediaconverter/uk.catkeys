@@ -21,7 +21,7 @@ None available	Video codecs		Недоступний
 Output format	MediaConverter		Формат виходу
 %.1f kHz mono	MediaFileInfo		%.1f kHz монo
 %.1f kHz stereo	MediaFileInfo		%.1f kHz стерео
-OK	MediaConverter		Гаразд
+OK	MediaConverter		ОК
 Error creating '%filename'	MediaConverter		Помилка створення '%filename'
 Error loading a file	MediaConverter		Помилка завантаження файлу
 Encoder parameters	MediaConverter-EncoderWindow		Параметри декодера
@@ -42,7 +42,7 @@ Error loading files	MediaConverter		Помилка завантаження фа
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit}, other{# bits}}
 End   [ms]: 	MediaConverter		Кінець [ms]: 
 Cancel	MediaConverter		Відмінити
-OK	MediaConverter-FileInfo		Гаразд
+OK	MediaConverter-FileInfo		ОК
 Error read audio frame %ld	MediaConverter		Помилка читання аудіокадра %ld
 Video encoding:	MediaConverter		Кодування відео:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Сталася помилка при зчитуванні даних про файл.\n\nПомилка : 

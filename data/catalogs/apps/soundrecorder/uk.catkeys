@@ -18,7 +18,7 @@ Rewind	RecorderWindow		Перемотка
 Sample rate:	RecorderWindow		Частота дискретизації:
 Invalid audio files	RecorderWindow		Невірні аудіо файли
  seconds	RecorderWindow		 секунд
-OK	RecorderWindow		Гаразд
+OK	RecorderWindow		ОК
 Cannot open the temporary file created to hold the new recording	RecorderWindow		Неможливо відкрити тимчасовий файл створений для збереження нового запису
 Input:	RecorderWindow		Вхід:
 Forward	RecorderWindow		Вперед

@@ -4,7 +4,7 @@ Name:	DataTranslations		І’мя:
 DataTranslations - Note	DataTranslations		Перетворення даних — Примітка
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Елемент '%name' не є транслятором і не може бути встановленим.
 Could not install %s:\n%s	DataTranslations		Неможливо встановити %s:\n%s
-OK	DataTranslations		Гаразд
+OK	DataTranslations		ОК
 Cancel	DataTranslations		Скасувати
 Info:	DataTranslations		Інформація:
 DataTranslations - Error	DataTranslations		Перетворення даних - Помилка

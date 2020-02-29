@@ -13,10 +13,10 @@ Applications	B_USER_DESKBAR_DIRECTORY/Applications		Програми
 Find…	DeskbarMenu		Знайти…
 Show clock	Tray		Показати годинник
 Window	PreferencesWindow		Вікно
-Defaults	PreferencesWindow		Типово
+Defaults	PreferencesWindow		За замовчуванням
 Menu	PreferencesWindow		Меню
 Recent documents	DeskbarMenu		Недавні документи
-Auto-hide	PreferencesWindow		Автозникнення
+Auto-hide	PreferencesWindow		Автоматично ховати
 Always on top	PreferencesWindow		Завжди зверху
 <Deskbar folder is empty>	DeskbarMenu		<Тека Deskbar'у порожня>
 Show all	WindowMenu		Показати все
@@ -29,7 +29,7 @@ Recent folders:	PreferencesWindow		Недавні теки:
 Show application expander	PreferencesWindow		Показувати розпаковувач програми
 Close all	WindowMenu		Закрити все
 Deskbar preferences	PreferencesWindow		Налаштування Deskbar
-Mount	DeskbarMenu		Підмонтувати
+Mount	DeskbarMenu		Підключити
 Revert	PreferencesWindow		Повернути
 Small	PreferencesWindow		Маленькі
 Recent applications:	PreferencesWindow		Недавні програми:

@@ -18,11 +18,11 @@ An error occurred writing the boot menu. The Master Boot Record might be destroy
 After three seconds	DefaultPartitionPage		Після трьох секунд
 Read only!	DrivesPage	Cannot install	Тільки для читання!
 Write boot menu	BootManagerController	Button	Записати завантажувальне меню
-OK	BootManagerController	Button	Гаразд
+OK	BootManagerController	Button	ОК
 Uninstall boot manager	BootManagerController	Title	Видалити Завантажувач
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Про запис завантажувального меню до загрузочного диску (%s). Перевірте інформацію перед продовженням.
 The first partition on the disk starts too early and does not leave enough space free for a boot menu.\nBoot Manager needs 2 KiB available space before the first partition.	BootManagerController		Перший розділ починається зарано і на ньому немає жодного місця для встановлення завантажувального меню.\nЗавантажувач потребує принаймні 2 KiB перед першим розділом.
-Uninstall	DrivesPage	Button	Видалити
+Uninstall	DrivesPage	Button	Деінсталяція
 Update	DrivesPage	Button	Обновити
 The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Основний завантажувальний запис (MBR) завантажувального пристрою:\n\t%s\nзараз буде збережено на диск. Виберіть файл для збереження MBR.\n\nКоли під час встановлення щось піде не так або Ви бажатимете видалити завантажувальне меню просто запустіть Завантажувач і виберіть опцію 'Деінсталювати'.
 Default Partition	DefaultPartitionPage	Title	Розділ за замовчуванням
@@ -42,13 +42,13 @@ Please select the drive you want the boot manager to be installed to or uninstal
 After four seconds	DefaultPartitionPage		Після 4 секунд
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Неназваний %d
 First partition starts too early	BootManagerController	Title	Перший розділ починається занадто рано
-About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Про запис завнтажувального меню на диск. Ви дійсно бажаєте продовжити?
+About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Про запис завантажувального меню на диск. Ви дійсно бажаєте продовжити?
 Partitions	DefaultPartitionPage	Pop up menu title	Розділи
 Default Partition:	DefaultPartitionPage	Menu field label	Розділ за замовчуванням:
-Next	WizardView	Button	Наступне
-Previous	WizardView	Button	Попереднє
+Next	WizardView	Button	Наступний
+Previous	WizardView	Button	Пепередній
 Uninstallation of boot menu failed	BootManagerController	Title	Видалення завантажувального меню призупинено
-Incompatible format!	DrivesPage	Cannot install	Формат несумісний!
+Incompatible format!	DrivesPage	Cannot install	Несумісний формат!
 Old Master Boot Record saved	BootManagerController	Title	Збереження старого MBR
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Визначте розділ по замовчуванню і затримку.\nБутменю загрузить розділ по замовчуванню після затримки, якщо Ви не вкажете іншого розділу. Ви також можете встановити невизначене очікування для вибраного Вами розділу.\nУтримуйте клавішу 'ALT' для невілювання затримки під час завантаження.
 Partitions	PartitionsPage	Title	Розділи

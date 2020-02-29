@@ -35,7 +35,7 @@ Animation:	ChartWindow		Анімація:
 Frames/s	ChartWindow		Кадрів/с
 Auto demo	ChartWindow		Демонстрація
 CPU load	ChartWindow		Завантаження процесора
-DrawBitmap	ChartWindow		Растове зображення
+DrawBitmap	ChartWindow		DrawBitmap
 Red	ChartWindow		Червоний
 None	ChartWindow		Жодного
 Battle	ChartWindow		Битва

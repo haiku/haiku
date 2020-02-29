@@ -89,8 +89,8 @@ Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Weißrussisch
 Warning: left and right key roles do not match	Modifier keys window		Achtung: linke und rechte Tasten-Funktion passen nicht zusammen
 Circumflex trigger	Keymap window		^ Zirkumflex
-Caps lock	Keyboard Layout View		Hochstelltaste
-Left shift	Keyboard Layout View		Shift left
+Caps lock	Keyboard Layout View		Shift-Feststelltaste
+Left shift	Keyboard Layout View		Shift links
 Russian (Yawert)	KeymapNames		Russisch (Yawert)
 ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e International
 Bulgarian (Cyrillic)	KeymapNames		Bulgarisch (Kyrillisch)

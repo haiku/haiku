@@ -8,9 +8,9 @@ Desktop	Settings view		Робочий стіл
 Server	Window		Сервер
 Identify host as:	Settings view		Визначити хост як:
 Refresh…	Remote devices		Обновити…
-Local devices found on system:	Settings view		Локальні прилади знайдені в системі:
+Local devices found on system:	Settings view		Локальні пристрої знайдені в системі:
 Service classes: 	Device View		Класи сервісу: 
-Remote devices	Window		Віддалені прилади
+Remote devices	Window		Віддалені пристрої
 Settings	Window		Налаштування
 Stop bluetooth services…	Window		Зупинити служби Блютуз…
 61 secs	Settings view		61 сек
@@ -21,14 +21,14 @@ Policy…	Settings view		Політики…
 Revert	Window		Повернути
 Refresh local devices…	Window		Обновлення локальних пристроїв…
 Disconnect	Remote devices		Роз’єднати
-Identify us as…	Settings view		Виглядати як…
-From all devices	Settings view		Для всіх приладів
-Defaults	Window		Типово
+Identify us as…	Settings view		Ідентифікувати як…
+From all devices	Settings view		Для всіх пристроїв
+Defaults	Window		За замовчуванням
 Start bluetooth services…	Window		Запуск служб Блютуз…
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Переконайтесь, що функція Блютуз віддаленого пристрою активована. Натисніть 'Запит' для початку сканування. Час для отримання імен не повинен перевищувати 3 секунди. Після цього ви зможете додати їх до головного списку, де потім з’єднуватися з ними.
 Scanning progress	Inquiry panel		Хід сканування
 Bluetooth	System name		Блютуз
-Launch now	main		Увімкнути
+Launch now	main		Запустити
 Remove	Remote devices		Видалити
 Pick device…	Settings view		Оберіть пристрій…
 Always ask	Settings view		Завжди питати
@@ -37,14 +37,14 @@ Help	Window		Допомога
 Pair…	Remote devices		Пара…
 Retrieving name of %1	Inquiry panel		Відновлення імені %1
 Inquiry	Inquiry panel		Запит
-Incoming connections policy:	Settings view		Правило вхідних під'єднань:
+Incoming connections policy:	Settings view		Політики вхідних з'єднань:
 Retrieving names…	Inquiry panel		Отримую імена…
 Show name	Extended local device view		Показати Ім'я
-Add device to list	Inquiry panel		Додати прилад до списку
+Add device to list	Inquiry panel		Додати пристрій до списку
 Remaining %1 seconds	Inquiry panel		Залишилось %1 секунд
 The Bluetooth services are not currently running on this system.	main		Служби Блютуз все ще не запущені у системі.
 Discoverable	Extended local device view		Видимий
-Authenticate	Extended local device view		Справдити
+Authenticate	Extended local device view		Автентифікувати
 Smart phone	Settings view		Смартфон
 Scanning completed.	Inquiry panel		Сканування завершене.
 Default inquiry time:	Settings view		Час запиту типовий:

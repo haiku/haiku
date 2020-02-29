@@ -1,5 +1,5 @@
 1	ukrainian	x-vnd.haiku-icon_o_matic	3554185674
-None	Icon-O-Matic-Properties		Жоден
+None	Icon-O-Matic-Properties		Пусто
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Повернути індекси шляху
 Add empty	Icon-O-Matic-ShapesList		Додати порожній
 Opening the icon failed!	Icon-O-Matic-Main		Відкриття іконки призупинене!
@@ -145,7 +145,7 @@ Move Shape	Icon-O-Matic-MoveShapesCommand		Перемістити фігуру
 Radial	Icon-O-Matic-StyleTypes		Радіальний
 Text too long	Icon-O-Matic-StyledTextImport		Текст надзвичайно довгий
 Caps	Icon-O-Matic-PropertyNames		Шапки
-OK	Icon-O-Matic-SVGImport		Гаразд
+OK	Icon-O-Matic-SVGImport		ОК
 Append…	Icon-O-Matic-Menu-File		Додати…
 Scale Y	Icon-O-Matic-PropertyNames		Масштаб по Y
 Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Не вдалося відкрити файл '%s' як документ SVG.\n\nПомилка: %s

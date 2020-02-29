@@ -4,9 +4,9 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Неможливо п
 Cut	Menus		Вирізати
 Center	Menus		Центр
 Wrap-around search	FindandReplaceWindow		Шукати по всьому документу
-Page setup…	Menus		Настройка друку…
+Page setup…	Menus		Налаштування сторінки…
 Untitled 	StyledEditWindow		Неназваний 
-OK	Statistics		Гаразд
+OK	Statistics		ОК
 Find	FindandReplaceWindow		Знайти
 New	Menus		Новий
 Document	Menus		Документ
@@ -17,12 +17,12 @@ Save	Menus		Зберегти
 Cancel	QuitAlert		Відмінити
 Copy	Menus		Копіювати
 Reload	NodeMonitorAlerts		Перезавантажити
-line %d, column %d	StatusView		стрічка %d, колонка %d
+line %d, column %d	StatusView		рядок %d, колонка %d
 Words:	Statistics		Слова:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Відновити
 Error saving \"%s\":\n%s	SaveAlert		Помилка збереження \"%s\":\n%s
-OK	RevertToSavedAlert		Гаразд
+OK	RevertToSavedAlert		ОК
 Unlock file	StatusView		Розблокувати
 Italic	Menus		Italic
 Can't undo	Menus		Неможливо відмінити
@@ -32,11 +32,11 @@ Bold	Menus		Товстий
 Paste	Menus		Вставити
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Файл \"%file%\" був змінений іншою програмою, перезавантажити його?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Файл \"%file%\" був видалений іншою програмою, відновити його?
-Lines:	Statistics		Стрічки:
+Lines:	Statistics		Рядків:
 Replace in all windows	FindandReplaceWindow		Замінити у всіх вікнах
 \"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" має незбережені зміни.\nПовернути його до останньої збереженої версії? 
 Save	SaveAlert		Зберегти
-Default	Open_and_SaveAsPanel		По замовчуванню
+Default	Open_and_SaveAsPanel		За замовчуванням
 Cancel	RevertToSavedAlert		Відмінити
 Cancel	FindandReplaceWindow		Відмінити
 Statistics…	Menus		Статистика…
@@ -46,10 +46,10 @@ Close	Menus		Закрити
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		Помилка завантаження \"%s\":\n\tФормат не підтримується
 Left	Menus		Вліво
 Default	Menus		По замовчуванню
-OK	SaveAlert		Гаразд
+OK	SaveAlert		ОК
 Color	Menus		Колір
 Save changes to the document \"%s\"? 	QuitAlert		Зберегти зміни в документі \"%s\" ? 
-StyledEdit	System name		Редактор тексту
+StyledEdit	System name		StyledEdit
 Find:	FindandReplaceWindow		Знайти:
 Undo typing	QuitAlert		Відміна друку
 Error loading \"%s\":\n\t%s	LoadAlert		Помилка завантаження \"%s\":\n\t%s
@@ -63,7 +63,7 @@ Wrap lines	Menus		Перенос по словах
 Text encoding	Menus		Кодування
 Unable to unlock file\n\t%s	QuitAlert		Неможливо розблокувати файл\n\t%s
 Modified	StatusView		Змінений
-OK	LoadAlert		Гаразд
+OK	LoadAlert		ОК
 Save	QuitAlert		Зберегти
 Case-sensitive	FindandReplaceWindow		Чутливий до регістра
 Find selection	Menus		Знайти вибране
@@ -73,7 +73,7 @@ Revert	RevertToSavedAlert		Повернути
 Size	Menus		Розмір
 Autodetect	Menus		Автовизначення
 Replace next	Menus		Замінити наступний
-OK	QuitAlert		Гаразд
+OK	QuitAlert		ОК
 Replace with:	FindandReplaceWindow		Перемістити з:
 Edit	Menus		Редагувати
 Open…	Menus		Відкрити…

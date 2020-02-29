@@ -6,7 +6,7 @@ Muted	MediaReplicant		Приглушити
 OK	MediaReplicant		ОК
 Couldn't launch 	MediaReplicant		Не вдалося запустити 
 Volume	VolumeControl		Гучність
-Open MediaPlayer	MediaReplicant		Відкрити Медіапрогравач
+Open MediaPlayer	MediaReplicant		Відкрити MediaPlayer
 %d dB	VolumeControl		%d dB
 Media preferences…	MediaReplicant		Налаштування медіа…
 Options	MediaReplicant		Опції

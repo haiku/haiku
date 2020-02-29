@@ -1,5 +1,5 @@
 1	ukrainian	x-vnd.Haiku-MediaPlayer	1313616492
-Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Видалити запис до Кошика
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Видалити запис до смітника
 Close	MediaPlayer-PlaylistWindow		Закрити
 Volume of background clips	MediaPlayer-SettingsWindow		Гучність фонових кліпів
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Використати апаратне відеонакладення, якщо доступне
@@ -8,7 +8,7 @@ Subtitle placement:	MediaPlayer-SettingsWindow		Розміщення субти�
 MediaPlayer	System name		Медіапрогравач
 Audio track	MediaPlayer-Main		Аудіо трек
 Muted	MediaPlayer-SettingsWindow		Приглушений
-OK	MediaPlayer-RemovePLItemsCmd		Гаразд
+OK	MediaPlayer-RemovePLItemsCmd		ОК
 Open Playlist	MediaPlayer-PlaylistWindow		Відкрити список відтворення
 Subtitles	MediaPlayer-Main		Субтитри
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% викликав внутрішню помилку. Файл неможливо відкрити.
@@ -18,7 +18,7 @@ raw audio	MediaPlayer-InfoWin		raw аудіо
 Select all	MediaPlayer-PlaylistWindow		Вибрати все
 New player…	MediaPlayer-Main		Новий програвач…
 Move Entries	MediaPlayer-MovePLItemsCmd		Перемістити записи
-OK	MediaPlayer-Main		Гаразд
+OK	MediaPlayer-Main		ОК
 Remove	MediaPlayer-PlaylistWindow		Видалити
 <unknown>	MediaPlayer-InfoWin		<невідомий>
 Resume:	MediaPlayer-SettingsWindow		Підсумок:
@@ -45,7 +45,7 @@ Save error	MediaPlayer-PlaylistWindow		Помилка збереження
 Attributes	MediaPlayer-Main		Атрибути
 Bottom of screen	MediaPlayer-SettingsWindow		Нижня частина екрана
 MediaPlayer settings	MediaPlayer-SettingsWindow		Налаштування Медіапрогравача
-Copyright	MediaPlayer-InfoWin		Всі права застережені
+Copyright	MediaPlayer-InfoWin		Авторське право
 Invalid URL inserted!	MediaPlayer-NetworkStream		Помилка введення URL!
 Aspect ratio	MediaPlayer-Main		Співідношення сторін
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Збереження списку відтворення призупинено.\n\nПомилка: 
@@ -59,7 +59,7 @@ Save	MediaPlayer-PlaylistWindow		Зберегти
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Випадкові записи
 Cancel	MediaPlayer-NetworkStream		Відмінити
 Nothing to Play	MediaPlayer-Main		Нічого для відтворення
-OK	MediaPlayer-SettingsWindow		Гаразд
+OK	MediaPlayer-SettingsWindow		ОК
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Видалити записи
 never	MediaPlayer-SettingsWindow		ніколи
 Loop audio	MediaPlayer-SettingsWindow		Закільцювати звук
@@ -78,10 +78,10 @@ Large	MediaPlayer-SettingsWindow		Великий
 Import Entry	MediaPlayer-ImportPLItemsCmd		Імпортувати запис
 unknown format	MediaPlayer-InfoWin		невідомий формат
 Track %d	MediaPlayer-Main		Трек %d
-All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Не вдалося відправити всі файли до Кошика.
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Не можна відправити всі файли до смітника.
 Total duration: %s	MediaPlayer-PlaylistWindow		Загальна тривалість: %s
 %.3f kHz	MediaPlayer-InfoWin		%.3f кГц
-Move into trash error	MediaPlayer-RemovePLItemsCmd		Помилка переміщення до кошика
+Move into trash error	MediaPlayer-RemovePLItemsCmd		Помилка переміщення до смітника
 50% scale	MediaPlayer-Main		Масштаб 50%
 Drop files to play	MediaPlayer-Main		Скинути файли для відтворення
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Копіювати запис
@@ -120,7 +120,7 @@ File info…	MediaPlayer-Main		Інформація про файл…
 <unnamed>	PlaylistItem-name		<неназваний>
 Track	Video Track Menu		Трек
 Full screen	MediaPlayer-Main		Повний екран
-OK	MediaPlayer-NetworkStream		Гаразд
+OK	MediaPlayer-NetworkStream		ОК
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутрішня помилка (закриття призупинено). Збереження списку відтворення призупинено.
 100% scale	MediaPlayer-Main		Масштаб 100%
 <nothing to redo>	MediaPlayer-PlaylistWindow		<нічого для відміни>
@@ -152,4 +152,4 @@ Randomize	MediaPlayer-PlaylistWindow		Випадковий
 Off	Subtitles menu		Вимкнути
 400% scale	MediaPlayer-Main		Масштаб 400%
 h	MediaPlayer-InfoWin	Hours	г
-OK	MediaPlayer-PlaylistWindow		Гаразд
+OK	MediaPlayer-PlaylistWindow		ОК

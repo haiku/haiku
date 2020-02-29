@@ -17,7 +17,7 @@ vertically	Screen		verticalement
 All workspaces	Screen		Tous les espaces de travail
 Use laptop panel:	Screen		Utiliser l’écran du portable :
 Could not write VESA mode settings file:\n\t	Screen		Impossible d’écrire le fichier des réglages du mode VESA :\n\t
-Settings will revert in %seconds.	Screen		Les réglages seront rétablis dans %seconds secondes.
+Settings will revert in %seconds.	Screen		Les réglages seront rétablis dans %seconds.
 Cancel	Screen		Annuler
 Other…	Screen		Autre…
 Screen	Screen		Écran

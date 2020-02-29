@@ -8,7 +8,7 @@ The document '%s' has been changed. Do you want to close the document?	CloseProm
 Page setup…	Menus		Налаштування сторінки…
 Print…	Menus		Друк…
 Get info…	Menus		Інформація…
-OK	SaveToFile		Гаразд
+OK	SaveToFile		ОК
 Previous page	Menus		Попередня сторінка
 View	Menus		Вигляд
 Full screen	Menus		Повноекранний режим
@@ -54,7 +54,7 @@ Zoom factor in %:	PrintOptionsWindow		Масштаб зображення %:
 Width:	PrintOptionsWindow		Ширина:
 Image	Menus		Зображення
 Move to Trash	Menus		Перемістити у Кошик
-OK	Alerts		Гаразд
+OK	Alerts		ОК
 Rotate clockwise	Menus		Поворот за годинниковою стрілкою
 Job setup	PrintOptionsWindow		Налаштування завдання
 Original size	Menus		Розмір оригіналу

@@ -8,7 +8,7 @@ Frame color	ConfigView		Колір рамки
 Error	PulseApp		Помилка
 Bar colors	ConfigView		Кольори смуги
 %.2f GHz	NormalPulseView		%.2f GHz
-Defaults	PrefsWindow		Типово
+Defaults	PrefsWindow		За замовчуванням
 %ld MHz	NormalPulseView		%ld MHz
 Mini mode	PrefsWindow		Режим міні
 CPU progress bar	NormalPulseView		Індикатор CPU
@@ -18,28 +18,28 @@ Pulse	NormalPulseView		Pulse
 Deskbar mode	NormalPulseView		Deskbar режим
 Remove replicant	CPUButton		Видалити реплікант
 You can't disable the last active CPU.	PulseView		Неможливо усунути останній активний процесор.
-Width of icon:	ConfigView		Ширина іконки:
+Width of icon:	ConfigView		Ширина значка:
 Deskbar mode	MiniPulseView		Deskbar режим
-OK	PulseView		Гаразд
+OK	PulseView		ОК
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nАвтори David Ramsey і Arve Hjønnevåg\nПереробка Daniel Switkin\n
-OK	PrefsWindow		Гаразд
+OK	PrefsWindow		ОК
 Pulse	PulseApp		Pulse
 Removing from Deskbar failed.\n%s	DeskbarPulseView		Видалення з Deskbar призупинене.\n%s
-OK	PulseApp		Гаразд
+OK	PulseApp		ОК
 About Pulse…	CPUButton		Про Pulse…
 Deskbar mode	PrefsWindow		Deskbar режим
 Mini mode	DeskbarPulseView		Режим міні
 You can't disable the last active CPU.	CPUButton		Неможливо усунути останній активний процесор.
-OK	CPUButton		Гаразд
+OK	CPUButton		ОК
 Deskbar	CPUButton		Deskbar
 Settings…	PulseView		Налаштування…
 Deskbar menu	CPUButton		Меню Deskbar'a
 Mini mode	NormalPulseView		Режим міні
 Quit	MiniPulseView		Вийти
-Info	PulseView		Дані
+Info	PulseView		Інфо
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		Застосування: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]
-OK	DeskbarPulseView		Гаразд
-Info	PulseApp		Дані
+OK	DeskbarPulseView		ОК
+Info	PulseApp		Інфо
 Pulse	System name		Pulse
 Active color	ConfigView		Колір активності
 Installing in Deskbar failed\n%s	PulseApp		Встановлення у Deskbar призупинене\n%s

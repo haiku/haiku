@@ -1,7 +1,7 @@
 1	ukrainian	x-vnd.Haiku-Keyboard	1711838804
 Written by Andrew Edward McCall	KeyboardApplication		Автор Andrew Edward McCall
 Typing test area	KeyboardView		Зона перевірки набору
-Defaults	KeyboardWindow		Типово
+Defaults	KeyboardWindow		За замовчуванням
 Key repeat rate	KeyboardView		Швидкість повтору
 Revert	KeyboardWindow		Повернути
 Delay until key repeat	KeyboardView		Затримка при повторі

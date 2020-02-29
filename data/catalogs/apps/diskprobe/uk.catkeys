@@ -6,7 +6,7 @@ Boolean value:	TypeEditors		Булеве значення:
 File	ProbeView		Файл
 Block size	ProbeView	Menu item. This is in the same menu window than 'Base' and 'Font size'	Розмір блоку
 MIME type editor	TypeEditors		Редактор MIME типу
-Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Шістнадцятичний
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Шістнадцятковий
 16 bit unsigned value:	TypeEditors		16-ти бітна беззнакова величина:
 8 bit signed value:	TypeEditors		8-ми бітне знакове значення
  (native)	ProbeView		 (рідна)
@@ -16,15 +16,15 @@ File offset: 	ProbeView		Зміщення файлу:
 Add	ProbeView		Додати
 64 bit signed value:	TypeEditors		64-х бітна знакова величина:
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Ви дійсно бажаєте видалити атрибут \"%s\" для файлу \"%s\"?\n\nЦя дія незворотня.
-No type editor available	AttributeWindow		Недоступний редактор типу
+No type editor available	AttributeWindow		Відсутній доступний редактор типу
 Print…	ProbeView		Друк…
 New…	FileWindow		Новий…
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	what: '%.4s'\n\n
-OK	DiskProbe		Гаразд
+OK	DiskProbe		ОК
 DiskProbe	System name		DiskProbe
 Back	ProbeView		Назад
 Device: 	ProbeView		Пристрій: 
-Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Основа
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Система счислення
 Open file…	FileWindow		Відкрити файл…
 32 bit unsigned pointer:	TypeEditors		32-х бітний беззнаковий вказівник:
 DiskProbe request	DiskProbe		Запит DiskProbe
@@ -32,7 +32,7 @@ Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is sh
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Запис до файлу зупинено:\n%s\n\nВсі зміни будуть втрачені при виході.
 Examine device:	OpenWindow		Перевірка пристрою:
 Number editor	TypeEditors		Числовий редактор
-Icon	TypeEditors		Іконка
+Icon	TypeEditors		Значок
 Attribute	ProbeView		Атрибут
 Don't save	ProbeView		Не зберігати
 Undo	ProbeView		Відмінити
@@ -57,11 +57,11 @@ DiskProbe request	AttributeWindow		Запит DiskProbe
 Next	ProbeView		Наступне
 64 bit signed offset:	TypeEditors		64-бітне знакове зміщення
 32 bit signed value:	TypeEditors		32-х бітне знакове значення:
-Could not find search string.	ProbeView		Неможливо знайти запитаний рядок.
+Could not find search string.	ProbeView		Не вдалося знайти рядок.
 Close	FileWindow		Закрити
 Unknown type	TypeEditors		Невідомий тип
 Open device	FileWindow		Відкрити пристрій
-Number:	TypeEditors		Номер:
+Number:	TypeEditors		Число:
 Quit	FileWindow		Вийти
 Text	FindWindow		Текст
 Block 0x%Lx	ProbeView		Блок 0x%Lx
@@ -71,7 +71,7 @@ Mode:	FindWindow		Режим:
 32 bit size or status:	TypeEditors		32-х бітний розмір або стан:
 of 	ProbeView		з 
 Contents:	TypeEditors		Вміст:
-Could not open file \"%s\": %s\n	DiskProbe		Неможливо відкрити файл \"%s\": %s\n
+Could not open file \"%s\": %s\n	DiskProbe		Не вдалося відкрити файл \"%s\": %s\n
 Probe file…	OpenWindow		Перевірити файл…
 Block: 	ProbeView		Блок: 
 Bookmarks	ProbeView		Закладки
@@ -82,7 +82,7 @@ Case sensitive	FindWindow		Враховувати регістр
 Remove from file	AttributeWindow		Видалити з файла
 Attributes	ProbeView		Атрибути
 Message	TypeEditors	This is the type of view	Повідомлення
-Message View	TypeEditors		Вид повідомлення
+Message View	TypeEditors		Перегляд повідомлення
 Offset: 	ProbeView		Зміщення: 
 Swapped: 0x%0*Lx	ProbeView		Перевернутий: 0x%0*Lx
 MIME type:	TypeEditors		MIME тип:
@@ -101,10 +101,10 @@ Attribute type: 	ProbeView		Тип атрибуту:
 15 bit	TypeEditors		15 біт
 Page setup…	ProbeView		Налаштування сторінки…
 Boolean	TypeEditors	This is the type of editor	Булевий
-Icon view	TypeEditors		У вигляді іконки
+Icon view	TypeEditors		Значки
 Select all	ProbeView		Вибрати все
 64 bit unsigned value:	TypeEditors		64-х бітне беззнакове значення:
-OK	ProbeView		Гаразд
+OK	ProbeView		ОК
 Previous	ProbeView		Попереднє
 Selection	ProbeView		Вибір
 Find	FindWindow		Знайти
@@ -112,15 +112,15 @@ Find	FindWindow		Знайти
 %ld (native)	ProbeView		%ld (рідна)
 Attribute: 	ProbeView		Атрибут: 
 Block	ProbeView		Блок
-Find again	ProbeView		Знайти знову
+Find again	ProbeView		Знайти далі
 View	ProbeView	This is the last menubar item 'File Edit Block View'	Перегляд
-Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Неможливо прочитати образ
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Не вдалося прочитати образ
 DiskProbe request	ProbeView		Запит DiskProbe
 Double precision floating-point value:	TypeEditors		Значення з плаваючою комою подвійної точності
 Image	TypeEditors	This is the type of view	Зображення
 Save changes before closing?	ProbeView		Зберегти зміни перед закриттям?
 PNG format	TypeEditors		PNG формат
-Number	TypeEditors	This is the type of editor	Номер
+Number	TypeEditors	This is the type of editor	Число
 Edit	ProbeView		Редагувати
 String editor	TypeEditors		Редактор рядків
 Boolean editor	TypeEditors		Булевий редактор

@@ -1,7 +1,7 @@
 1	ukrainian	x-vnd.Haiku-PowerStatus	3173765686
 Design capacity low warning: 	PowerStatus		Попередження про зниження проектної ємності: 
 Show percent	PowerStatus		Показати процент
-Design capacity: 	PowerStatus		Проектна ємність: 
+Design capacity: 	PowerStatus		Паспортна ємність: 
  mW	PowerStatus		 мВт
 The battery level is getting low, please plug in the device.	PowerStatus		Рівень заряда батареї знижується, будь-ласка, під'єднайте пристрій до електромережі.
 Battery low	PowerStatus		Батарея розряджена
@@ -9,7 +9,7 @@ Type: 	PowerStatus		Тип:
 non-rechargeable	PowerStatus		не підлягає зарядці
 Empty battery slot	PowerStatus		Слот підключення батареї пустий
  mV	PowerStatus		 мВ
-Run in window	PowerStatus		Запустити у вікні
+Run in window	PowerStatus		Виконувати у вікні
 PowerStatus	System name		PowerStatus
  mWh	PowerStatus		 мВт·год
 Battery info…	PowerStatus		Дані батареї…
@@ -32,7 +32,7 @@ Serial number: 	PowerStatus		Серійний номер:
 Battery critical	PowerStatus		Розряд батареї критичний
 Capacity granularity 1: 	PowerStatus		Градація ємності 1: 
 OEM info: 	PowerStatus		Дані OEM: 
-Design voltage: 	PowerStatus		Проектна напруга: 
+Design voltage: 	PowerStatus		Паспортна напруга: 
 Battery charging	PowerStatus		Батарея заряджається
 The battery level is critical, please plug in the device immediately.	PowerStatus		Розряд батареї критичний негайно починайте її зарядку.
 Design capacity warning: 	PowerStatus		Попередження про проектну ємність: 

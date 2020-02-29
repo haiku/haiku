@@ -137,7 +137,7 @@ Yi Radicals	UnicodeBlocks		Корені Юі
 Cyrillic extended B	UnicodeBlocks		Кирилиця розширення В
 Mongolian supplement	UnicodeBlocks		Монгольські доповнення
 Supplemental Symbols and Pictographs	UnicodeBlocks		Додаткові символи та піктограми
-Quit	CharacterWindow		Вихід
+Quit	CharacterWindow		Вийти
 Ancient symbols	UnicodeBlocks		Античні символи
 Newa	UnicodeBlocks		Newa
 Adlam	UnicodeBlocks		Adlam
@@ -197,5 +197,5 @@ Kannada	UnicodeBlocks		Каннада
 Copy as escaped byte string	CharacterView		Скопіювати як екрановану стрічку байтів
 Phonetic extensions supplement	UnicodeBlocks		Додаткові фонетичні розширення
 Domino tiles	UnicodeBlocks		Плитки доміно
-Bhaiksuki	UnicodeBlocks		Bhaiksuki
+Bhaiksuki	UnicodeBlocks		Байксукі
 Katakana phonetic extensions	UnicodeBlocks		Фонетичні розширення катакани

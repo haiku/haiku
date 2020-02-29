@@ -17,7 +17,7 @@ Logging view	PoorMan		Перегляд реєстрації
 Save console as…	PoorMan		Зберегти консоль як…
 Edit	PoorMan		Редагувати
 Cancel	PoorMan		Відмінити
-Directory: 	PoorMan		Тека: 
+Directory: 	PoorMan		Директорія: 
 Hits: %lu	PoorMan		Підказки: %lu
 Hits: 0	PoorMan		Підказка: 0
 Shutting down.\n	PoorMan		Вимкнення.\n
@@ -37,7 +37,7 @@ File	PoorMan		Файл
 Settings…	PoorMan		Налаштування…
 Log To File	PoorMan		Лог в файл
 Connections	PoorMan		Підє'днання
-Controls	PoorMan		Органи управління
+Controls	PoorMan		Управління
 Log to console	PoorMan		Виводити лог в консоль
 Advanced	PoorMan		Розширені
 Copy	PoorMan		Копіювати
@@ -62,5 +62,5 @@ Save console selections as…	PoorMan		Зберегти вибране конс�
 Quit	PoorMan		Вийти
 Save log console	PoorMan		Зберегти лог консолі
 Start page:	PoorMan		Запустити сторінку:
-OK	PoorMan		Гаразд
+OK	PoorMan		ОК
 Website location	PoorMan		Розташування сайту

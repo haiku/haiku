@@ -9,22 +9,22 @@ Retrieve a specific printer	PrintServerApp Scripting		Відновити виз�
 Page %1 to %2	ConfigWindow		Стор. %1 до %2
 Get name of the printer add-on used for this printer	Printer Scripting		Отримати і'мя додатка, що працює з цим принтером.
 B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
-OK	ConfigWindow		Гаразд
+OK	ConfigWindow		ОК
 Cancel	ConfigWindow		Скасувати
 Printer server	ConfigWindow		Принт-сервер
 Page %1 to %2, %3 copies	ConfigWindow		Стор. %1 до %2, %3 копій
 A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Принтер з цим іменем існує, але драйвер для нього не знайдено! Замінити?
 Yes	PrintServerApp		Так
-Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Книжкова
-Would you like to set one up now?	PrintServerApp		Бажаєте встановити його зараз?
-Print job setup:	ConfigWindow		Налаштування завдань друку
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	ANSI B (ledger)
+Would you like to set one up now?	PrintServerApp		Бажаєте налаштувати його зараз?
+Print job setup:	ConfigWindow		Налаштування завдань друку:
 A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		Портрет
 All pages	ConfigWindow		Всі сторінки
-There is no default printer set up.	PrintServerApp		Не встановлено типовий  принтер.
+There is no default printer set up.	PrintServerApp		Не вибрано принтер за замовчуванням.
 B5	ConfigWindow	ISO 216 paper size	B5
 A0	ConfigWindow	ISO 216 paper size	A0
-Letter	ConfigWindow	ANSI A (letter), a North American paper size	Лист
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	ANSI A (letter)
 Printer:	ConfigWindow		Принтер:
 A2	ConfigWindow	ISO 216 paper size	A2
 Select a printer	ConfigWindow		Вибрати принтер
@@ -35,21 +35,21 @@ A printer with that name already exists, but it's not usable at all! Replace?	Pr
 No	PrintServerApp		Ні
 Get the transport configuration for this printer	Printer Scripting		Отримати конфігурацію транспорту цього принтера
 Landscape	ConfigWindow		Альбом
-Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Легальний
-There are no printers set up.	PrintServerApp		Принтер не встановлено.
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
+There are no printers set up.	PrintServerApp		Принтери не встановлені.
 Get name of the transport add-on used for this printer	Printer Scripting		Отримати ім'я транспорту для цього принтера
 All pages, %1 copies	ConfigWindow		Всі сторінки, %1 копій
 Delete a specific printer	PrintServerApp Scripting		Видалити зазначений принтер
 Create a new printer	PrintServerApp Scripting		Створити новий принтер
-OK	PrintServerApp		Гаразд
+OK	PrintServerApp		ОК
 Print setup	ConfigWindow		Налаштування друку
 A1	ConfigWindow	ISO 216 paper size	A1
 Retrieve a specific transport	PrintServerApp Scripting		Відновити зазначений транспорт
-Get name of printer	Printer Scripting		Отримати ім'я принтер
+Get name of printer	Printer Scripting		Отримати назву принтеру
 A3	ConfigWindow	ISO 216 paper size	A3
 Get name of transport	Transport Scripting		Отримати ім'я транспорту
 A5	ConfigWindow	ISO 216 paper size	A5
 Would you like to make @ the default printer?	PrintServerApp		Бажаєте зробити @ типовим принтером?
-Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Таблоїд
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	ANSI B (tabloid)
 Page setup	ConfigWindow		Налаштування друку
 Paper setup:	ConfigWindow		Налаштування паперу:

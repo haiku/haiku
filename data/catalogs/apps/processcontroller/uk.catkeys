@@ -7,7 +7,7 @@ Your setting file could not be saved!\n(%s)	ProcessController		Файл наст
 Processor %d	ProcessController		Процесор %d
 Live in the Deskbar	ProcessController		Помістити у Deskbar
 Kill this team!	ProcessController		Вбити цей поток!
-OK	ProcessController		Гаразд
+OK	ProcessController		ОК
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Ви можете запустити Контролер процесів у вікні або встановити у Deskbar.
 Real-time priority	ProcessController		Перевага реального часу
 Custom priority	ProcessController		Задана перевага
@@ -15,7 +15,7 @@ Debug this thread!	ProcessController		Відладнати цю нитку!
 Low priority	ProcessController		Низька перевага
 Urgent display priority	ProcessController		Термінова перевага відображення
 Memory usage	ProcessController		Використання пам'яті
-Ok!	ProcessController		Гаразд!
+Ok!	ProcessController		Ок!
 Normal priority	ProcessController		Нормальна перевага
 Restart Deskbar	ProcessController		Перезапустити Deskbar
 About ProcessController…	ProcessController		Про Контролер процесів…
@@ -47,4 +47,4 @@ Power saving	ProcessController		Режим енергозбереження
 ProcessController is already installed in Deskbar.	ProcessController		Контролер процесів повністю встановлений у Deskbar.
 This is the last active processor…\nYou can't turn it off!	ProcessController		Це останній активний процесор…\nВи не можете вимкнути його!
 This thread is already gone…	ProcessController		Ці нитки повністю запущені…
-Run in window	ProcessController		Запустити у вікні
+Run in window	ProcessController		Виконувати у вікні

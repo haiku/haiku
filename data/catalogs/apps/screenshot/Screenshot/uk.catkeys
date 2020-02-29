@@ -1,11 +1,11 @@
 1	ukrainian	x-vnd.haiku-screenshot	3958461128
-Include window border	ScreenshotWindow		Включаючи межу вікна
+Include window border	ScreenshotWindow		Включаючи рамку вікна
 Overwrite	ScreenshotWindow		Переписати
 Save in:	ScreenshotWindow		Зберегти в:
 Error saving \"%s\":\n\t%s	ScreenshotWindow		Помилка збереження \"%s\":\n\t%s
 This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Цей файл вже існує.\nВи впевнені, що бажаєте перезаписати його?
-OK	ScreenshotWindow		Гаразд
-The destination path exists but is not a folder.	ScreenshotWindow		Шлях по замовчуванню присутній але це не тека.
+OK	ScreenshotWindow		ОК
+The destination path exists but is not a folder.	ScreenshotWindow		Шлях по замовчуванню присутній але це не папка.
 Select	ScreenshotWindow		Вибрати
 Save as:	ScreenshotWindow		Зберегти як:
 seconds	ScreenshotWindow		секунд

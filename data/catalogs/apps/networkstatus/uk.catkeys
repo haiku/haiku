@@ -2,13 +2,13 @@
 Netmask	NetworkStatusView		Маска мережі
 Quit	NetworkStatusView		Вийти
 Unknown	NetworkStatusView		Невідомий
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		Під'єднання мережевого придатку призупинене.\n\nПомилка: 
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Збій запуску аплета мережевих параметрів.\n\nПомилка: 
 Install in Deskbar	NetworkStatus		Встановити у Deskbar
 NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		NetworkStatus опції:\n\t--deskbar\tавтоматично додати реплікант до Deskbar'у\n\t--help\t\tпоказати цю інформацію та вийти
 Open network preferences…	NetworkStatusView		Відкрити налаштування мережі…
 NetworkStatus	System name		Стан мережі
-OK	NetworkStatusView		Гаразд
-No link	NetworkStatusView		Посилання відсутнє
+OK	NetworkStatusView		ОК
+No link	NetworkStatusView		З'єднання відсутнє
 Could not join wireless network:\n	NetworkStatusView		Бездротові мережі не під'єднані:\n
 Ready	NetworkStatusView		Готово
 Network Status	NetworkStatusView		Network Status
@@ -16,8 +16,8 @@ Address	NetworkStatusView		Адреса
 Deskbar is not running, giving up.	NetworkStatus		Deskbar iне працює, відмова.
 No stateful configuration	NetworkStatusView		Немає стабільної конфігурації
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Ви можете запустити NetworkStatus у вікні або встановити у Deskbar.
-Broadcast	NetworkStatusView		Передача
+Broadcast	NetworkStatusView		Широкомовна передача
 %ifaceName information:\n	NetworkStatusView		%ifaceName інформація:\n
-Run in window	NetworkStatus		Запустити у вікні
+Run in window	NetworkStatus		Виконувати у вікні
 <no wireless networks found>	NetworkStatusView		<бездротова мережа не знайдена>
 Configuring	NetworkStatusView		Конфігурування

@@ -17,7 +17,7 @@ force 720 x 576, display aspect 4:3	MainWin		примусово 720 x 576, сп�
 Quit	MainWin		Вийти
 Channel	MainWin		Канал
 Previous channel	MainWin		Попередній канал
-OK	MainWin		Гаразд
+OK	MainWin		ОК
 TV	MainWin		Телебачення
 Settings	MainWin		Налаштування
 TV	System name		Телебачення

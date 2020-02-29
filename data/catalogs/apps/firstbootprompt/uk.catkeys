@@ -5,4 +5,4 @@ Boot to Desktop	BootPromptWindow		Завантажити на робочий с�
 Keymap	BootPromptWindow		Розкладка
 Welcome to Haiku!	BootPromptWindow		Ласкаво просимо в Haiku!
 Language	BootPromptWindow		Мова
-Run Installer	BootPromptWindow		Запустити Встановлювач
+Run Installer	BootPromptWindow		Запустити Installer

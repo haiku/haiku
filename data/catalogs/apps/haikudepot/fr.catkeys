@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	1399087380
+1	french	x-vnd.Haiku-HaikuDepot	149632738
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Une erreur est survenue lors du rafraîchissement : %error%
 Check for updates…	MainWindow		Vérifier les mises à jour…
 Uninstall	PackageManager		Désinstaller
@@ -63,14 +63,17 @@ Package update error	MainWindow		Erreur de mise à jour du paquet
 About	PackageInfoView		À propos
 Reboot required	PackageManager		Redémarrage nécessaire
 Very unstable	RatePackageWindow		Très instable
+Password:	UserLoginWindow		Mot de passe :
 All packages	PackageListView		Tous les paquets
 Network Transport Error	ServerHelper		Erreur de transmission réseau
 Stability	RatePackageWindow		Stabilité
+The nickname must be unique, but the supplied nickname is already taken.  Choose a different nickname.	UserLoginWindow		Le surnom doit être unique, mais le surnom proposé est déjà pris.  Veuillez choisir un autre surnom.
 Send	RatePackageWindow		Envoyer
 Start package daemon	App		Démarrer le serveur de paquets
 The package action could not be scheduled: %Error%	PackageInfoView		L’action du paquet n’a pas eu lieu : %Error%
 Cancel	RatePackageWindow		Annuler
 Inactive	PackageListView		Inactif
+Nickname:	UserLoginWindow		Surnom :
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synchronisation des métadonnées des dépôts
 OK	MainWindow		Valider
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# objet} other{# objets}}
@@ -94,6 +97,7 @@ Cancel	MainWindow		Annuler
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 de plus à télécharger)}other{(# de plus à télécharger)}}
 Refresh repositories	MainWindow		Rafraîchir les dépôts
 Tools	MainWindow		Outils
+A password is required.	UserLoginWindow		Un mot de passe est requis
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Ce paquet ne semble pas se trouver sur le serveur du Dépôt Haiku, il n’est donc pas possible de créer une nouvelle évaluation ou de modifier une évaluation existante.
 Language	RatePackageWindow		Langue
 Log out	MainWindow		Déconnexion
@@ -106,11 +110,13 @@ OK	UserLoginWindow		OK
 Reading repository data	LocalPkgDataLoadProcess		Lecture des données du dépôt
 Stability:	RatePackageWindow		Stabilité :
 A validation error has occurred	ServerHelper		Une erreur de validation est survenue
+The nickname is required.	UserLoginWindow		Le surnom est requis.
 Source packages	MainWindow		Paquets sources
 -	no package size		-
 Try again	App		Essayer à nouveau
 Rate package	RatePackageWindow		Évaluer le paquet
 Unknown	PackageListView		Inconnu
+I agree to the usage conditions	UserLoginWindow		J'accepte les conditions d'utilisation
 Log in	UserLoginWindow		Connexion
 Logged in as %User%	MainWindow		Connecté en tant que %User%
 Email address:	UserLoginWindow		Adresse e-mail :

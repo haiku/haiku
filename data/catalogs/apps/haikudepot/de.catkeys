@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	149184511
+1	german	x-vnd.Haiku-HaikuDepot	2510596347
 Repository update error	LocalRepositoryUpdateProcess		Fehler bei Paketquellenaktualisierung
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Fehler bei der Aktualisierung der Paketquelle: %error%
 User Created	UserLoginWindow		Benutzerkonto erstellt
@@ -169,6 +169,7 @@ Log in…	MainWindow		Anmelden…
 You need to be logged into an account before you can rate packages.	MainWindow		Nur angemeldete Benutzer können Pakete bewerten.
 Client version too old	ServerHelper		Client Version zu alt
 Local repository load error	LocalPkgDataLoadProcess		Fehler bem Laden einer lokalen Paketquelle
+The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		Das Benutzerkonto existiert nicht oder das Kennwort wurde falsch eingegeben. Bitte Zugangsdaten kontrollieren und nochmal probieren.
 9999.99 KiB	PackageListView		9999.99 KiB
 Repeat password:	UserLoginWindow		Kennwort wiederholen:
 All repositories	MainWindow		Alle Paketquellen

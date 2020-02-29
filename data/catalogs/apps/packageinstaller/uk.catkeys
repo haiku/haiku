@@ -3,7 +3,7 @@ Package description	UninstallView		Опис пакунку
 none	PackageView		жодного
 Continue	PackageInstall		Продовжити
 Running post-installation scripts	PackageInstall		Запуск післяінсталяційного скрипта
-Package installer	PackageView		Встановлювач пакунків
+Package installer	PackageView		Інсталятор пакетів
 All existing files will be skipped?	PackageView		Всі наявні файли будуть пропущені?
 Replace	PackageView		Замінити
 All existing files will be replaced?	PackageView		Замінити всі наявні файли?
@@ -17,31 +17,31 @@ The installation of the package has been aborted.	PackageView		Встановл�
 No installation type selected	PackageView		Не вибрано тип інсталяції
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Запам'ятати вибране рішення для решти цього встановлення?\n
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Вибраний пакет неможливо видалити з системи. Інформаційний файл встановленого пакету ймовірно може бути пошкодженим.
-Install…	UninstallView		Встановити…
+Install…	UninstallView		Інсталяція…
 The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Елемент з іменем '%s' повністю присутній за вказаним шляхом.\nЗамінити його подібним з цього пакунку чи пропустити?
 Installing files and folders	PackageInstall		Встановлення файлів та тек
-Installed packages	UninstallWindow		Встановлення пакунків
+Installed packages	UninstallWindow		Встановлені пакети
 Remove	UninstallView		Видалити
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Неможливо встановити даний пакунок у вашій системі. Проблема може бути пов'язана з файлом пакунка. Зверніться до постачальника пакунка.
-OK	UninstallView		Гаразд
+OK	UninstallView		ОК
 Accept	PackageTextViewer		Прийняти
 Abort	PackageView		Перервати
 Disclaimer	PackageTextViewer		Відмова від гарантій
 Preparing package	PackageInstall		Підготовка пакунка
 The package you requested has been successfully installed on your system.	PackageView		Запитуваний пакунок успішно встановлено на вашій системі.
-Installation progress	PackageView		Хід встановлення
+Installation progress	PackageView		Хід інсталяції
 Decline	PackageTextViewer		Відхилити
 Continue	PackageTextViewer		Продовжити
 Installing package	PackageStatus		Встановлення пакунку
 Install %name%	PackageView		Встановити %name%
 %index% of %total%	PackageInstall		%index% з %total%
-No package selected.	UninstallView		Не вибрано пакунок.
+No package selected.	UninstallView		Не вибрано пакет.
 %name% (%size% free)	PackageView		%name% (%size% вільно)
 Error while installing the package\n	PackageView		Помилка при встановленні пакунка\n
-Finishing installation	PackageInstall		Завершення встановлення
-No package available.	PackageInfo		Пакунок недоступний.
+Finishing installation	PackageInstall		Завершення інсталяції
+No package available.	PackageInfo		Пакет недоступний.
 The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Скрипт з іменем '%s' повністю присутній за вказаним шляхом.\nЗамінити його подібним з цього пакунку чи пропустити?
-Installation type:	PackageView		Тип встановлення:
+Installation type:	PackageView		Тип інсталяції:
 The package you selected has been successfully removed from your system.	UninstallView		Вибраний пакет успішно видалений з вашої системи.
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Існує невідповідність розміру пакета і розміру файла. Пакет міг бути пошкодженим або зміненим після створення. Ви бажаєте продовжувати далі?
 %name% (%size%)	PackageView		%name% (%size%)
@@ -50,13 +50,13 @@ The file named '%s' already exists in the given path.\nReplace the file with the
 Replace all	PackageView		Замінити всі
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Файл пакунка не читається.\nОдна з можливих причин: він не є правильним файлом пакунка BeOS .pkg.
 Continue	PackageInfo		Продовжити
-No package selected.	PackageInfo		Не вибрано пакунок.
+No package selected.	PackageInfo		Не вибрано пакет.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Помилка! \"%s\" не є правильним шляхом.\n
 The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Каталог з іменем '%s' повністю присутній за вказаним шляхом.\nЗамінити його подібним з цього пакунку чи пропустити?
 LegacyPackageInstaller	System name		Встановлювач попередніх версій
 Ask again	PackageView		Запитати знову
 Begin	PackageView		Почати
-OK	PackageView		Гаразд
+OK	PackageView		ОК
 Abort	PackageInfo		Перервати
 Done	PackageInstall		Зроблено
 Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Помилка (%s)! Неможливо відкрити \"%s\".\n

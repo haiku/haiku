@@ -1,5 +1,5 @@
 1	ukrainian	x-vnd.Haiku-WebPositive	1879106286
-Authentication required	Authentication Panel		Потребується авторизація
+Authentication required	Authentication Panel		Потрібна авторизація
 Previous	WebPositive Window		Попереднє
 (Finish: %date)	Download Window		(Завершення: %date)
 Open bookmarks confirmation	WebPositive Window		Відкрити підтвердження закладок
@@ -32,7 +32,7 @@ Browse…	Settings Window		Перегляд…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Закладка цієї сторінки (%bookmarkName) вже існує.
 Resume prior session	Settings Window		Продовжити попередній сеанс
 Match case	WebPositive Window		Враховуючи регістр
-Proxy password:	Settings Window		Гасло проксі:
+Proxy password:	Settings Window		Пароль проксі:
 Size:	Font Selection view		Розмір:
 Page source	WebPositive Window		Джерело
 Proxy server port:	Settings Window		Порт проксі-сервера:
@@ -58,7 +58,7 @@ Reload	WebPositive Window		Перезавантажити
 Expiration	Cookie Manager		Термін дії
 Download finished	Download Window		Завантаження завершене
 Cookie manager	WebPositive Window		Менеджер Cookie
-OK	Authentication Panel		Гаразд
+OK	Authentication Panel		ОК
 Hide password text	Authentication Panel		Сховати текст гасла
 Username:	Authentication Panel		Користувач:
 Name	Cookie Manager		Ім'я
@@ -70,7 +70,7 @@ Yesterday	WebPositive Window		Вчора
 Quit	WebPositive		Вийти
 Download aborted	Download Window		Завантаження зупинене
 Number of days to keep links in History menu:	Settings Window		Кількість днів збереження посилань Історії
-Password:	Authentication Panel		Гасло:
+Password:	Authentication Panel		Пароль:
 Forward	WebPositive Window		Вперед
 Clear	Console Window		Очистити
 Cut	URL Bar		Вирізати
@@ -90,8 +90,8 @@ The downloads folder could not be opened.\n\nError: %error	Download Window	Don't
 Cancel	Authentication Panel		Відмінити
 Style:	Font Selection view		Стиль:
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Сталася помилка при створенні закладки.\n\nПомилка: %error
-OK	Download Window		Гаразд
-Proxy username:	Settings Window		Ім'я проксі:
+OK	Download Window		ОК
+Proxy username:	Settings Window		Користувач проксі:
 Manage bookmarks	WebPositive Window		Керування закладками
 /s)	Download Window	...as in 'per second'	/s)
 Restart	Download Window		Перезапустити
@@ -101,7 +101,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Повернути
 Copy	WebPositive Window		Копіювати
 Default standard font size:	Settings Window		Шрифт по замовчуванню:
-Bookmark this page	WebPositive Window		Закласти цю сторінку
+Bookmark this page	WebPositive Window		Додати до закладок
 Show tabs if only one page is open	Settings Window		Показати вкладки, якщо відкрито лише одну сторінку
 Close tab	WebPositive Window		Закрити вкладку
 Remove	Download Window		Видалити
@@ -117,19 +117,19 @@ Find next occurrence of search terms	WebPositive Window	find bar next button too
 Fixed font:	Settings Window		Моноширинний шрифт:
 Quit	WebPositive Window		Вийти
 Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Знайти попередню появу пошукових запитів
-Remember username and password for this site	Authentication Panel		Запам'ятати логін та гасло для цього сайту
+Remember username and password for this site	Authentication Panel		Запам'ятати логін та пароль для цього сайту
 (Finish: %date - %duration left)	Download Window		(Завершення: %date - %duration залишилось)
 Cookie manager	Cookie Manager		Менеджер coookie
 Show home button	Settings Window		Показати домашню кнопку
 Start new session	Settings Window		Запуск нового сеансу
-The cookie jar is empty!	Cookie Manager		Комірка cookie порожня!
+The cookie jar is empty!	Cookie Manager		Архів cookie порожній!
 Value	Cookie Manager		Величина
 Remove missing	Download Window		Очікування видалення
 Paste	WebPositive Window		Вставити
 Double-click or middle-click to open new tab.	Tab Manager		Подвійний або середній клік для відкриття нової вкладки.
 Next	WebPositive Window		Наступне
 Bookmark error	WebPositive Window		Помилка закладки
-OK	WebPositive Window		Гаразд
+OK	WebPositive Window		ОК
 WebPositive	Download Window		WebPositive
 Zoom text only	WebPositive Window		Збільшити тільки текст
 Save page as…	WebPositive Window		Зберегти сторінку як…
@@ -154,6 +154,6 @@ Open blank page	Settings Window		Відкрити порожню сторінк�
 Clear history	WebPositive Window		Очистити історію
 Cancel	WebPositive Window		Відмінити
 Bookmark info	WebPositive Window		Про Закладки
-Script console	Console Window		Косоль сценаріїв
+Script console	Console Window		Консоль сценаріїв
 Copy	URL Bar		Копіювати
 Open start page	Settings Window		Відкрити стартову сторінку

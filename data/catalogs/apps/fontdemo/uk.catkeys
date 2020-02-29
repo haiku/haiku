@@ -9,9 +9,9 @@ Font:	ControlView		Шрифт:
 Drawing mode:	ControlView		Режим малювання:
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Керування
-FontDemo	System name		Огляд шрифтів
+FontDemo	System name		FontDemo
 Outline: %d	ControlView		Контур: %d
 Text:	ControlView		Текст:
 Antialiased text	ControlView		Згладжений текст
-Bounding boxes	ControlView		Обмежувальні коробки
+Bounding boxes	ControlView		Обмежувальні рамки
 Size: %d	ControlView		Розмір: %d

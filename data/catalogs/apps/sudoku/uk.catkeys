@@ -9,7 +9,7 @@ New	SudokuWindow		Новий
 Easy	SudokuWindow		Простий
 Undo	SudokuWindow		Скасувати
 Export as…	SudokuWindow		Експортувати як…
-Quit	SudokuWindow		Вихід
+Quit	SudokuWindow		Вийти
 Redo	SudokuWindow		Відмінити відміну
 Could not open \"%s\":\n%s\n	SudokuWindow		Неможливо відкрити \"%s\":\n%s\n
 Blank	SudokuWindow		Порожній
@@ -24,7 +24,7 @@ Searching for removable values	SudokuGenerator		Пошук значень для
 Abort	ProgressWindow		Припинити
 Could not set Sudoku:\n%s\n	SudokuWindow		Неможливо встановити Судоку: \n%s\n
 Help	SudokuWindow		Довідка
-OK	SudokuWindow		Гаразд
+OK	SudokuWindow		ОК
 Sudoku	System name		Судоку
 Progress monitor	ProgressWindow		Монітор ходу
 Creating solvable field	SudokuGenerator		Створити поле для розв'язку

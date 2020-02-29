@@ -6,7 +6,7 @@ short\tlong\tdescription\n	FilePanelApp		короткий\tдовгий\tопи�
 %s: this option requires a parameter\n	FilePanelApp		%s: ця опція потребує параметра\n
 -h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tпоказує використання\n
 -l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tвживати типову панель завантаження\n
--n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tвстановити типове ім'я для збереження\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tвстановити ім'я для збереження за замовчуванням\n
 -k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tтипи даних, які можуть бути відкрити: будь-яка комбінація з f, d, s (файл (типовий), тека, посилання)\n
 %s: UNIMPLEMENTED\n	FilePanelApp		%s: НЕРЕАЛІЗОВАНО\n
 -t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tвстановити заголовок вікна\n

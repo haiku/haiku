@@ -6,7 +6,7 @@ Open selection	GrepWindow		Відкрити вибране
 Actions	GrepWindow		Дії
 New window	GrepWindow		Нове вікно
 Encoding	GrepWindow		Кодування
-OK	GrepWindow		Гаразд
+OK	GrepWindow		ОК
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		Закрити
 Look in sub-folders	GrepWindow		Дивитися в підтеках

@@ -1,27 +1,27 @@
 1	ukrainian	x-vnd.Haiku-LaunchBox	1530497419
 Set description…	LaunchBox		Встановити опис…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Дійсно закрити цю панель?\n(Вона не збережеться.)
-OK	LaunchBox		Гаразд
+OK	LaunchBox		ОК
 Ignore double-click	LaunchBox		Ігнорувати подвійне натискання
-Show on all workspaces	LaunchBox		Показати на всіх робочих просторах
-Name Panel	LaunchBox		Панель назви
+Show on all workspaces	LaunchBox		Показати на всіх робочих областях
+Name Panel	LaunchBox		Назва Панелі
 Autostart	LaunchBox		Автозапуск
 Clone	LaunchBox		Клонувати
 Description for '%3'	LaunchBox		Опис для '%3'
-Show window border	LaunchBox		Показувати межі вікна
+Show window border	LaunchBox		Показувати рамку вікна
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nНе вдалось запустити програму з сигнатурою'%2'.\n\nПомилка:
 Failed to launch 'something', error in Pad data.	LaunchBox		Не вдалось запустити 'дещо'. Помилка в даних панелі.
 LaunchBox	System name		Панель запуску
 Auto-raise	LaunchBox		Автоматичне спливання
-Icon size	LaunchBox		Розмір іконки
+Icon size	LaunchBox		Розмір значка
 Open containing folder	LaunchBox		Відкрити теку що містить
 Add button here	LaunchBox		Додати кнопку тут
 Cancel	LaunchBox		Відмінити
-launch popup	LaunchBox		увімкнути спливаючі повідомлення
+launch popup	LaunchBox		launch popup
 Clear button	LaunchBox		Очистити кнопку
 Bummer	LaunchBox		Помилка
 last chance	LaunchBox		остання спроба
-You can drag an icon here.	LaunchBox		Ви можете перемістити іконки сюди.
+You can drag an icon here.	LaunchBox		Ви можете перемістити значок сюди.
 Pad 1	LaunchBox		Панель 1
 Failed to launch '%1'.\n\nError:	LaunchBox		Призупинено запуск '%1'.\n\nПомилка:
 Settings	LaunchBox		Налаштування

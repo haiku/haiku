@@ -11,7 +11,7 @@ Decrease window size	Magnify-Main		Зменшити розмір вікна
 Remove a crosshair	Magnify-Main		Видалити перехрестя
 Add a crosshair	Magnify-Main		Додати перехрестя
 Freeze image	Magnify-Main		Зображення заморожено
-usage: magnify [size] (magnify size * size pixels)	Console		використання: magnify [size] (magnify size * size pixels)
+usage: magnify [size] (magnify size * size pixels)	Console		використання: збільшення [розмір] (розмір збільшення * розмір пікселя)
 Increase window size	Magnify-Main		Збільшити розмір вікна
 Save image	Magnify-Main		Зберегти зображення
 Show grid	Magnify-Main		Показати сітку

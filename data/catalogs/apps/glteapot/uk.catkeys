@@ -1,6 +1,6 @@
 1	ukrainian	x-vnd.Haiku-GLTeapot	1569683445
 Upper center	TeapotWindow		Вище центру
-Lighting	TeapotWindow		Свічення
+Lighting	TeapotWindow		Освітлення
 Off	TeapotWindow		Вимкнути
 Lower left	TeapotWindow		Нижній лівий
 White	TeapotWindow		Білий
@@ -11,7 +11,7 @@ Quit	TeapotWindow		Вийти
 Filled polygons	TeapotWindow		Заповнити багатокутники
 Settings	TeapotWindow		Налаштування
 Fog	TeapotWindow		Туман
-Backface culling	TeapotWindow		Усунути тло
+Backface culling	TeapotWindow		Відсікти фон
 Z-buffered	TeapotWindow		Z-буферизація
 File	TeapotWindow		Файл
 Perspective	TeapotWindow		Перспектива

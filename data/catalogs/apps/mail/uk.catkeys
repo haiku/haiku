@@ -2,7 +2,7 @@
 Set to Saved	Mail		Перемкнути до збереження
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основний текст містить %ld нерозкодованих символів. Можливо інше кодування спрацює краще? Виберіть Відправити якщо хочете зробити це не зважаючи(нерозкодований символ буде замінено таким що ситуативно підходить), або натисніть Відмінити щоб повернутися назад і виправити ситуацію.
 Text wrapping:	Mail		Обтікання тексту:
-Show icons & labels	Mail		Показати іконки і мітки
+Show icons & labels	Mail		Показати значки & надписи
 (Date unavailable)	Mail		(Дата недоступна)
 Reply	Mail		Відповісти
 Next message	Mail		Наступний лист
@@ -26,7 +26,7 @@ Button bar:	Mail		Панель кнопок:
 Save changes to this signature?	Mail		Зберегти зміни в цьому підписі?
 Save attachment…	Mail		Зберегти вкладення…
 Paste	Mail		Вставити
-E-mail draft could not be saved!	Mail		Чорновик листа не збережено!
+E-mail draft could not be saved!	Mail		Чорнового листа не збережено!
 Don't send	Mail		Не надсилати
 sent	B_USER_DIRECTORY/mail/sent		відіслати
 Only files can be added as attachments.	Mail		Тільки файли можуть бути додані як вкладення.
@@ -45,9 +45,9 @@ Next	Mail		Наступний
 Attachments:	Mail		Вкладення:
 Show icons only	Mail		Показувати тільки іконки
 Subject:	Mail		Тема:
-OK	Mail		Гаразд
+OK	Mail		ОК
 UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
-Quit	Mail		Завершити
+Quit	Mail		Вийти
 Title:	Mail		Назва:
 Account from mail	Mail		Обліковий запис пошти
 %e - E-mail address	Mail		%e - поштова адреса
@@ -62,7 +62,7 @@ Add signature	Mail		Додати підпис
 %n - Full name	Mail		%n - повне ім'я
 Signature	Mail		Підпис
 Use default account	Mail		Використати типовий обліковий запис
-draft	B_USER_DIRECTORY/mail/draft		чорновик
+draft	B_USER_DIRECTORY/mail/draft		чорновий
 Really delete this signature? This cannot be undone.	Mail		Дійсно видалити цей підпис? Це буде незворотним.
 spam	B_USER_DIRECTORY/mail/spam		спам
 Reply to all	Mail		Відповісти всім
@@ -87,7 +87,7 @@ Open this link	Mail		Відкрити це посилання
 Auto signature:	Mail		Автопідпис:
 Same subject	Mail		Та сама тема
 Send	Mail		Відіслати
-Open draft	Mail		Відкрити чорновик
+Open draft	Mail		Відкрити чорновий
 Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Зберегти як 'Нове'
 Random	Mail		Випадковий
 Attach attributes:	Mail		Додати атрибути:
@@ -107,8 +107,8 @@ Previous	Mail		Попередній
 Include file attributes in attachments	Mail		Включити файлові атрибути у вкладеннях
 Start now	Mail		Запустити зараз
 (Name unavailable)	Mail		(Ім'я недоступне)
-Move to trash	Mail		Видалити у Кошик
-<none>	Mail		<жодного>
+Move to trash	Mail		Перемістити до смітника
+<none>	Mail		<пусто>
 %d - Date	Mail		%d - Дата
 Check spelling	Mail		Перевірити правопис
 Redo	Mail		Відмінити відміну
@@ -116,8 +116,8 @@ Leave as '%s'	Mail		Зберегти як '%s'
 Print…	Mail		Друкувати…
 Settings…	Mail		Налаштування…
 Warn unencodable:	Mail		Увага нерозкодоване:
-Trash	Mail		Кошик
-Show raw message	Mail		Показати лист
+Trash	Mail		Смітник
+Show raw message	Mail		Показати чернетку листа
 Find…	Mail		Знайти…
 Select all	Mail		Виділити все
 Show header	Mail		Показати заголовок
@@ -165,5 +165,5 @@ Spam	Mail		Спам
 Couldn't open this signature. Sorry.	Mail		Прикро, неможливо відкрити цей підпис.
 Revert	Mail		Повернути
 Unknown	Mail		Невідомо
-Increase quote level	Mail		Підняти лапки
+Increase quote level	Mail		Додати префікс цитування
 Add enclosure…	Mail		Додати вкладення…

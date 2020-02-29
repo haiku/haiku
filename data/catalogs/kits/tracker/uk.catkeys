@@ -15,7 +15,7 @@ Mount all disks now	AutoMounterSettings		Монтувати всі диски з
 Location:	InfoWindow		Розташування:
 Name	PoseView		Ім'я
 Kind:	InfoWindow		Вид:
-{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# byte}, other{# bytes}}
+{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# байт} few{# байти} other{# байтів}}
 contains	FindPanel		містить
 32 x 32	ContainerWindow		32 x 32
 Open	FilePanelPriv		Відкрити
@@ -24,16 +24,16 @@ You can't replace a folder with one of its sub-folders.	FSUtils		Ви не мо�
 <%ld dates>	AttributesView		<%ld дат>
 Select…	VirtualDirectoryWindow		Вибрати…
 Name	Default Query Columns		Ім'я
-Unmount	ContainerWindow		Відмонтувати
+Unmount	ContainerWindow		Відключити
 Eject when unmounting	AutoMounterSettings		Виштовхнути після відмонтування
-Searching for disks to mount…	StatusWindow		Пошук дисків для монтування…
+Searching for disks to mount…	StatusWindow		Пошук дисків для підключення…
 Value	AttributesView		Значення
 Information	InfoWindow		Повідомлення
 Error emptying Trash	FSUtils		Помилка спустошення Кошика!
 Opens with:	InfoWindow		Відкрити за допомогою:
 Size	QueryPoseView		Розмір
 128 x 128	ContainerWindow		128 x 128
-Disk mount	TrackerSettingsWindow		Підмонтувати диск
+Disk mount	TrackerSettingsWindow		Підключення дисків
 Type	AttributesView		Тип
 Prompt	FSUtils		Швидкий
 Error in regular expression:\n\n'%errstring'	PoseView		Помилка у регулярному виразі:\n\n'%errstring'
@@ -93,7 +93,7 @@ Corrupted opcode.	libtracker		Пошкоджений опкод.
 Atom	AttributesView		Атом
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed з %TotalSize, %BytesPerSecond/с
 Preparing to restore items…	StatusWindow		Підготовка до відновлення елементів…
-Mount	ContainerWindow		Підмонтувати
+Mount	ContainerWindow		Підключити
 Desktop	B_DESKTOP_DIRECTORY		Робочий стіл
 Corrupted pointers.	libtracker		Пошкоджені вказівники.
 Link to:	InfoWindow		Посилання на:
@@ -108,12 +108,12 @@ Company	Person Query Columns		Компанія
 Recent documents	FavoritesMenu		Недавні документи
 Save as Query template:	FindPanel		Зберегти як шаблон запиту:
 Edit templates…	TemplatesMenu		Редагувати шаблони…
-{0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte}, other{# bytes}}
+{0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# байт} few{# байти} other{# байтів}}
 8-bit integer	AttributesView		8-бітове ціле
 8-bit unsigned integer	AttributesView		8-бітове ціле беззнакове
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used використано -- %free вільно)
 Hide dotfiles	SettingsView		Сховати точкові файли
-Trash	Model		Кошик
+Trash	Model		Смітник
 Enable type-ahead filtering	SettingsView		Включити випереджаючу фільтрацію
 copy	FSUtils	filename copy	копія
 New folder%ld	FSUtils		Нова тека%ld
@@ -130,7 +130,7 @@ Create relative link	ContainerWindow		Створити відносне поси
 Owner	FilePermissionsView		Власник
 Cancel	FSClipBoard		Відмінити
 Modified	PoseView		Змінений
-Move to Trash	ContainerWindow		Перемістити до Кошика
+Move to Trash	ContainerWindow		До смітника
 All files and folders	FindPanel		Всі файли і теки
 Add-ons	ContainerWindow		Додатки
 Too many parenthesis.	libtracker		Забагато фігурних дужок
@@ -151,8 +151,8 @@ Replace other file	WidgetAttributeText		Замінити інший файл
 OK	Email Query Columns		Гаразд
 Location	QueryPoseView		Розташування
 Edit query	ContainerWindow		Редагувати запит
-{0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)}, other{# (bytes)}}
-Previously mounted disks	AutoMounterSettings		Раніше підмонтовані диски
+{0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# байт)} few{(# байти)} other{# (байтів)}}
+Previously mounted disks	AutoMounterSettings		Раніше підключені диски
 You cannot replace a file with a folder or a symbolic link.	FSUtils		Ви не можете замінити файл текою або посиланням.
 The target disk does not support creating links.	FSUtils		Цільовий диск не підтримує створення посилань.
 develop	B_SYSTEM_DEVELOP_DIRECTORY		develop
@@ -196,7 +196,7 @@ Replace	FilePanelPriv		Замінити
 is not	FindPanel		не є
 Icon view	DeskWindow		У вигляді іконок
 <%ld rectangles>	AttributesView		<%ld прямокутників>
-Mount settings…	ContainerWindow		Налаштування монтування…
+Mount settings…	ContainerWindow		Налаштування підключення…
 Keywords	Bookmark Query Columns		Ключові слова
 Media parameter web	AttributesView		Медіа параметри веб
 Copy more	ContainerWindow		Копіювати ще
@@ -229,7 +229,7 @@ Edit name	FilePanelPriv		Редагувати ім'я
 There was an error deleting \"%name\":\n\t%error	FSUtils		Виникла помилка при видаленні \"%name\":\n\t%error
 Resize to fit	ContainerWindow		Припасувати
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Посилання \"%name\" на:
-Mount server error	AutoMounterSettings		Помилка сервера монтування
+Mount server error	AutoMounterSettings		Помилка сервера підключення
 If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		При переіменуванні теки home, %osName може працювати неправильно !\n\nВи впевнені що бажаєте цього?\n\nДля переіменування теки home будь-що затисніть кнопку Shift і клікніть по фразі \"Переіменувати\".
 Boolean	AttributesView		Булевий
 Invert selection	FilePanelPriv		Інвертувати виділення
@@ -246,7 +246,7 @@ Select all	DeskWindow		Вибрати все
 Double-precision floating point number	AttributesView		Число з рухомою комою подвійної точності
 Decrease size	ContainerWindow		Зменшити розмір
 Recent queries	FindPanel		Недавні запити
-Mount all	MountMenu		Монтувати все
+Mount all	MountMenu		Підключити все
 128 x 128	DeskWindow		128 x 128
 Size	Default Query Columns		Розмір
 Favorites	FavoritesMenu		Вибране
@@ -267,20 +267,20 @@ Point	AttributesView		Вказівник
 home	B_USER_DIRECTORY		дім
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Нові шаблони Tracker'a
 Disk mounting during boot	AutoMounterSettings		Диск що монтується при завантаженні
-Don't automount	AutoMounterSettings		Не монтувати автоматично
+Don't automount	AutoMounterSettings		Не підключати автоматично
 Could not find application \"%appname\"	OpenWithWindow		Програма \"%appname\" не знайдена
 Unmatched parenthesis.	libtracker		Невизначені фігурні дужки
 Extended attribute	AttributesView		Розширені атрибути
 Unmatched brackets.	libtracker		Неузгоджені дужки.
 Error %error loading Add-On %name.	ContainerWindow		Помилка %error при завантаженні програми %name.
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Ви намагаєтесь замінити елемент:\n\t%name%dest\nелементом:\n\t%name%src\n\nВибажаєте замінити його тим який ви %movemode?
-Empty Trash	ContainerWindow		Очистити Кошик
+Empty Trash	ContainerWindow		Очистити смітник
 no supporting apps	OpenWithWindow		програми не підтримуються
 32-bit unsigned integer	AttributesView		32-бітове ціле беззнакове
-Preparing to empty Trash…	StatusWindow		Підготовка Кошика до очищення …
+Preparing to empty Trash…	StatusWindow		Підготовка смітника до спорожнення …
 Deleting: 	StatusWindow		Видалення: 
 the MIME settings	FSUtils		налаштування MIME
-You can't move or copy the trash.	FSUtils		Ви не можете копіювати або переміщати Кошик.
+You can't move or copy the trash.	FSUtils		Ви не можете копіювати або переміщати смітник.
 label too long	PoseView		мітка задовга
 Error creating link to \"%name\".	FSUtils		Помилка створення посилання на \"%name\".
 Unknown	FilePermissionsView		Невідомий
@@ -313,7 +313,7 @@ Error moving \"%name\".	FSUtils		Помилка переміщення \"%name\"
 Select…	QueryContainerWindow		Вибрати…
 Open	ContainerWindow		Відкрити
 Settings…	MountMenu		Налаштування…
-You cannot put the selected item(s) into the trash.	FSUtils		Ви не можете перемістити обрані об'єкт(и) в Кошик.
+You cannot put the selected item(s) into the trash.	FSUtils		Ви не можете перемістити обрані об'єкт(и) в смітник.
 Increase size	DeskWindow		Збільшити розмір
 starts with	SelectionWindow		починаючи з
 Any	AttributesView		Якийсь
@@ -370,7 +370,7 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 You cannot create a link to the root directory.	FSUtils		Ви не можете створювати посилання на кореневий каталог.
 Select all	FilePanelPriv		Вибрати все
 Other	FilePermissionsView		Інший
-Automatic disk mounting	AutoMounterSettings		Автоматичне монтування диску
+Automatic disk mounting	AutoMounterSettings		Автоматичне підключення диску
 parent folder	NavMenu		батьківська тека
 Create link here	ContainerWindow		Створити посилання тут
 Force identify	ContainerWindow		Ідентифікувати примусово
@@ -415,11 +415,11 @@ Windows	TrackerSettingsWindow		Вікна
 Show space bars on volumes	SettingsView		Показувати діаграми місця на томах
 Could not update permissions of file \"%name\". %error	FSUtils		Не вдалося обновити дозволи файлу \"%name\". %error
 Decrease size	DeskWindow		Зменшити розмір
-Emptying Trash… 	StatusWindow		Очищення Кошика… 
-{0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # file}, other{for # files}}
+Emptying Trash… 	StatusWindow		Спорожнення смітника… 
+{0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # файл} few{# файли} other{for # файлів}}
 KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		Повернути
-trash	B_TRASH_DIRECTORY		кошик
+trash	B_TRASH_DIRECTORY		смітник
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		При переміщенні теки system або її вмісту, Ви не зможете завантажити %osName!\n\nВи впевнені що бажаєте цього?\n\nДля переміщення теки system або її вмісту будь-що затисніть кнопку Shift і клікніть по фразі \"Перемістити\".
 Close all in workspace	ContainerWindow		Закрити всі робочі простори
 Corrupted expression.	libtracker		Пошкоджений вираз.
@@ -451,13 +451,13 @@ Description:	InfoWindow		Опис:
 The Tracker must be running to see set the default printer.	PoseView		Щоб побачити типовий принтер Tracker має бути запущеним.
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Ви впевнені що бажаєте видалити вибрані елемент(и)? Ця операція незворотня.
 Grayscale picture	AttributesView		Напівтоновий малюнок
-Mount	DeskWindow		Підмонтувати
+Mount	DeskWindow		Підключити
 ends with	FindPanel		закінчити з
 Show Disks icon	SettingsView		Показати іконку Диски
 Outline selection rectangle only	SettingsView		Тільки контур у прямокутнику
 by formula	FindPanel		за формулою
 Resize to fit	VirtualDirectoryWindow		Вписати у розмір
-Move to Trash	FilePanelPriv		Перемістити до Кошика
+Move to Trash	FilePanelPriv		До смітника
 is	FindPanel		є
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		При зміні назви теки system або її вмісту може стати неможливим завантаження %osName!\n\nВи впевнені що бажаєте цього? \n\nДля зміни назви теки system або її вмісту будь-що затиснувши кнопку Shift клікніть \"Переіменувати\".
 40 x 40	DeskWindow		40 x 40
@@ -504,7 +504,7 @@ Add-ons	FilePanelPriv		Додатки
 96 x 96	DeskWindow		96 x 96
 Empty folder	SlowContextPopup		Порожня тека
 Alignment	AttributesView		Вирівнювання
-Move to Trash	FSUtils		Перемістити до Кошика
+Move to Trash	FSUtils		До смітника
 Handles %type	OpenWithWindow		Обробляє %type
 Cancel	PoseView		Відмінити
 Delete	PoseView		Видалити
@@ -513,7 +513,7 @@ If you alter the home folder, %osName may not behave properly!\n\nAre you sure y
 Sorry, you can't copy items to the Trash.	PoseView		Вибачте, Ви не можете копіювати елементи до Кошика.
 Invert selection	VirtualDirectoryWindow		Інвертувати вибране
 New folder	FilePanelPriv		Нова тека
-{0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# item}, other{# items}}
+{0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# елемент} few{# елементи} other{# елементів}}
 Name	AttributesView		Ім’я
 Invalid bracket range.	libtracker		Неприпустимий діапазон дужок
 the settings folder	FSUtils		тека налаштувань

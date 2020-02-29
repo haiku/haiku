@@ -8,7 +8,7 @@ File expanded	ExpanderWindow		Розпаковка файлу
 The destination is read only.	ExpanderWindow		Ціль тільки для читання.
 Expander: Open	ExpanderWindow		Expander: Відкрити
  is not supported	ExpanderWindow		 не підтримується
-Expander settings	ExpanderPreferences		Налаштування Розпаковувача
+Expander settings	ExpanderPreferences		Налаштування Expander
 Select current	DirectoryFilePanel		Вибрати поточний
 Source	ExpanderWindow		Джерело
 Error when expanding archive	ExpanderWindow		Помилка при розпаковці архіва
@@ -26,11 +26,11 @@ Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		�
 Same directory as source (archive) file	ExpanderPreferences		Та ж папка що і джерела (архіву)
 Settings	ExpanderMenu		Налаштування
 Settings…	ExpanderMenu		Налаштування…
-Expander: Choose destination	DirectoryFilePanel		Розпаковувач: Виберіть ціль
+Expander: Choose destination	DirectoryFilePanel		Expander: Виберіть ціль
 Select	ExpanderPreferences		Вибрати
 Show contents	ExpanderWindow		Показати вміст
 Automatically show contents listing	ExpanderPreferences		Автоматично показувати список вмісту
-OK	ExpanderPreferences		Гаразд
+OK	ExpanderPreferences		ОК
 Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Ви впевнені що бажаєте зупинити розпаковку архіву? Видобуті елементи можуть бути неповними.
 Leave destination folder path empty	ExpanderPreferences		Зберегти шлях теки призначення пустим
 Failed to create the destination folder.	ExpanderWindow		Не вдалося створити теку призначення.
@@ -39,7 +39,7 @@ Create	ExpanderWindow		Створити
 The file doesn't exist	ExpanderWindow		Файл відсутній
 Stop	ExpanderMenu		Зупинити
 File	ExpanderMenu		Файл
-Expander	System name		Розпаковувач
+Expander	System name		Expander
 Expand	ExpanderWindow		Розпакувати
 Close	ExpanderMenu		Закрити
 The destination is not a folder.	ExpanderWindow		Ціль не є текою.

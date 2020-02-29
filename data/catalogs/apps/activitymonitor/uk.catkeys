@@ -1,6 +1,6 @@
 1	ukrainian	x-vnd.Haiku-ActivityMonitor	1155619009
 P-faults	DataSource		Р-помилки
-Media nodes	DataSource		Мультимедійні вузли
+Media nodes	DataSource		Медіа вузли
 Threads	DataSource		Потоки
 Always on top	ActivityWindow		Завжди зверху
 Add graph	ActivityWindow		Додати графік
@@ -22,7 +22,7 @@ Page faults	DataSource		Помилки на сторінці
 Sending	DataSource		Відправка
 Cache	DataSource		Кеш
 %.1f faults/s	DataSource		%.1f помилок/сек
-Update time interval:	SettingsWindow		Інтервал часу поновлення:
+Update time interval:	SettingsWindow		Інтервал оновлення:
 TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		Вийти
 Block cache memory	DataSource		Блок кеш пам'яті
@@ -31,13 +31,13 @@ Remove graph	ActivityView		Видалити графік
 %lld ms	SettingsWindow		%lld мілісек.
 CPU usage	DataSource		Використання CPU
 Raw clipboard	DataSource		Буфер обміну
-Sems	DataSource		Сімс
+Sems	DataSource		Sems
 %.1f MiB	DataSource		%.1f МіБ
 ActivityMonitor	System name		Монітор активності
-Running applications	DataSource		Запущені додатки
+Running applications	DataSource		Запущені програми
 Semaphores	DataSource		Семафори
 Block cache	DataSource		Кеш блоку
-Swap space	DataSource		Розмір файлу підкачки
+Swap space	DataSource		Розмір своп-файлу
 Swap	DataSource		Файл підкачки
 File	ActivityWindow		Файл
 usage	DataSource		використання

@@ -1,5 +1,5 @@
 1	ukrainian	x-vnd.Haiku-Login	336867745
-Invalid login!	Login View		Невірна авторизація!
+Invalid login!	Login View		Невірний логін!
 Error	Login App		Помилка
 --edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tЗапустити в режимі редагування для того, щоб налаштувати робочий стіл.\n
 Welcome to Haiku	Login Window		Запрошуємо в Haiku
@@ -10,11 +10,11 @@ Desktop	Desktop Window		Робочий стіл
 Hide password	Login View		Приховати пароль
 Reboot	Login View		Перезавантажити
 You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Ви можете налаштувати робочий стіл позаду програми Авторизація, скинувши на нього репліканти.\n\n Коли Ви завершите просто вийдіть з додатку (Cmd-Q).
-OK	Login View		Гаразд
+OK	Login View		ОК
 Info	Login App		Інформація
-Login:	Login View		Авторизація:
-Password:	Login View		Гасло:
+Login:	Login View		Логін:
+Password:	Login View		Пароль:
 Unimplemented	Login App		Не реалізовано
-OK	Login App		Гаразд
+OK	Login App		ОК
 Error: %1	Login App		Помилка: %1
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	помилка %s\n

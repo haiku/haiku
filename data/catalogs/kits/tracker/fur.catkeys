@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	3461847187
+1	friulian	x-vnd.Haiku-libtracker	94919807
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -22,6 +22,7 @@ Open	FilePanelPriv		Vierç
 Bitmap icon	AttributesView		Icone Bitmap
 You can't replace a folder with one of its sub-folders.	FSUtils		No si pues sostituî une cartele cuntune des sôs sot-cartelis.
 <%ld dates>	AttributesView		<%ld datis>
+Select…	VirtualDirectoryWindow		Selezione…
 Name	Default Query Columns		Non
 Unmount	ContainerWindow		Dismonte
 Eject when unmounting	AutoMounterSettings		Pare fûr une volte che al è dismontât
@@ -197,6 +198,7 @@ Icon view	DeskWindow		Viodude a iconis
 <%ld rectangles>	AttributesView		<%ld retangui>
 Mount settings…	ContainerWindow		Impostazions di montaç…
 Keywords	Bookmark Query Columns		Peraulis clâf
+Media parameter web	AttributesView		Parametri multimediâl web
 Copy more	ContainerWindow		Copie ancjemò
 by name	FindPanel		par non
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Mi displâs, ma no si pues salvâ robis te lidrîs dal sisteme.
@@ -355,6 +357,7 @@ Size:	InfoWindow		Dimension:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		L'element selezionât nol pues jessi spostât te Scovacere. Eliminâlu dal dut? (Cheste operazion e sarà permanente.)
 Copy	ContainerWindow		Copie
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Mi displâs, l'atribût 'Character' nol pues contignî un glif a plui byte.
+Open parent	VirtualDirectoryWindow		Vierç nivel superiôr
 And	FindPanel		E
 Palette-indexed picture	AttributesView		Imagjin cun palete intabelade
 multiple disks	FindPanel		plui discs
@@ -467,6 +470,7 @@ Default application	InfoWindow		Aplicazion predefinide
 Untitled bitmap	PoseView		Bitmap cence non
 matches regular expression	SelectionWindow		al coincît cu la espression regolâr
 Invert selection	ContainerWindow		Invertìs selezion
+Close	VirtualDirectoryWindow		Siere
 Monochrome picture	AttributesView		Imagjin monocromatiche
 Real name	ContainerWindow		Non reâl
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Nol è stât pussibil vierzi \"%name\". Il file al è stât segnât par erôr come eseguibil. 
@@ -503,6 +507,7 @@ Delete	PoseView		Elimine
 Media parameter	AttributesView		Parametri multimediâl
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se si modifiche la cartele home (chê personâl), %osName al funzionarà mâl!\n\nContinuâ pardabon?\n\nPar modificâ distès la cartele home, ten fracât il tast Maiusc e fâs clic su \"O sai ce che o fâs\".
 Sorry, you can't copy items to the Trash.	PoseView		Nol è pussibil copiâ i elements te Scovacere.
+Invert selection	VirtualDirectoryWindow		Invertìs selezion
 New folder	FilePanelPriv		Gnove cartele
 {0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# element} other{# elements}}
 Name	AttributesView		Non

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	1015934522
+1	french	x-vnd.Haiku-libtracker	2762248491
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -22,6 +22,7 @@ Open	FilePanelPriv		Ouvrir
 Bitmap icon	AttributesView		Icône bitmap
 You can't replace a folder with one of its sub-folders.	FSUtils		Vous ne pouvez pas remplacer un dossier par l’un de ses sous-dossiers.
 <%ld dates>	AttributesView		<%ld dates>
+Select…	VirtualDirectoryWindow		Sélectionner…
 Name	Default Query Columns		Nom
 Unmount	ContainerWindow		Démonter
 Eject when unmounting	AutoMounterSettings		Éjecter en démontant
@@ -415,7 +416,7 @@ Emptying Trash… 	StatusWindow		Vidage de la Corbeille…
 KiB	WidgetAttributeText		Kio
 Revert	TrackerSettingsWindow		Rétablir
 trash	B_TRASH_DIRECTORY		corbeille
-If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Si vous déplacez le dossier système ou son contenu, vous ne pourre plus démarrer %osName !\n\nÊtes vous sûr de vouloir le faire ?\n\nPour déplacez quand-même le dossier système ou son contenu , maintenez la touche Majuscule enfoncée et cliquez sur « Déplacer ».
+If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Si vous déplacez le dossier système ou son contenu, vous ne pourrez plus démarrer %osName !\n\nÊtes vous sûr de vouloir le faire ?\n\nPour déplacez quand-même le dossier système ou son contenu, maintenez la touche Majuscule enfoncée et cliquez sur « Déplacer ».
 Close all in workspace	ContainerWindow		Fermer tout dans l’espace de travail
 Corrupted expression.	libtracker		Expression corrompu.
 32 x 32	DeskWindow		32 x 32
@@ -438,6 +439,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Désolé, il n�
 Move here	ContainerWindow		Déplacer ici
 the config folder	FSUtils		le dossier de configuration
 Sorry, could not create a new folder.	FSUtils		Désolé, impossible de créer un nouveau dossier.
+Select all	VirtualDirectoryWindow		Sélectionner tout
 Rename	FSUtils	button label	Renommer
 Clean up all	ContainerWindow		Nettoyer tout
 Add current folder	FilePanelPriv		Ajouter le dossier courant
@@ -467,6 +469,7 @@ Default application	InfoWindow		Application par défaut
 Untitled bitmap	PoseView		Image sans nom
 matches regular expression	SelectionWindow		correspond à l’expression régulière
 Invert selection	ContainerWindow		Inverser la sélection
+Close	VirtualDirectoryWindow		Fermer
 Monochrome picture	AttributesView		Image monochrome
 Real name	ContainerWindow		Nom réel
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Impossible d’ouvrir « %name ». Le fichier est marqué exécutable par erreur. 
@@ -502,6 +505,7 @@ Cancel	PoseView		Annuler
 Delete	PoseView		Supprimer
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Si vous altérer votre dossier d’accueil, %osName pourrait ne plus se comporter correctement!\n\nÊtes vous sûr de vouloir le faire ?\n\nPour altérer quand-même d’accueil, maintenez la touche Majuscule enfoncée et cliquez sur « Je sais ce que je fais ».
 Sorry, you can't copy items to the Trash.	PoseView		Désolé, vous ne pouvez pas copier des éléments dans la Corbeille.
+Invert selection	VirtualDirectoryWindow		Inverser la sélection
 New folder	FilePanelPriv		Nouveau dossier
 {0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# élément} other{# éléments}}
 Name	AttributesView		Nom
