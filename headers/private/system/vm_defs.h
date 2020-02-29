@@ -11,14 +11,6 @@
 #include <OS.h>
 
 
-// additional protection flags
-// Note: the VM probably won't support all combinations - it will try
-// its best, but create_area() will fail if it has to.
-// Of course, the exact behaviour will be documented somewhere...
-
-#define B_KERNEL_EXECUTE_AREA	0x40
-#define B_KERNEL_STACK_AREA		0x80
-
 #define B_USER_PROTECTION \
 	(B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA | B_STACK_AREA)
 #define B_KERNEL_PROTECTION \
