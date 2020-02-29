@@ -335,8 +335,9 @@ GlyphLayoutEngine::_WriteLockAndAcquireFallbackEntry(
 	// Try to get the glyph from the fallback fonts
 	while (fallbacks[i] != NULL) {
 		if (gFontManager->Lock()) {
-			FontStyle* fallbackStyle = gFontManager->GetStyleByIndex(
-				fallbacks[i], 0);
+			FontStyle* fallbackStyle = gFontManager->GetStyle(
+				fallbacks[i], font.Style());
+
 			if (fallbackStyle != NULL) {
 				ServerFont fallbackFont(*fallbackStyle, font.Size());
 				gFontManager->Unlock();
