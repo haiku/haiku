@@ -1,28 +1,10 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2004, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		clipping.h
-//	Author:			Stefano Ceccherini (burton666@libero.it)
-//	Description:	Helper methods to manipulate clipping_rects
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2004, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ *	Authors:
+ *		Stefano Ceccherini, burton666@libero.it
+ */
 #ifndef __CLIPPING_H
 #define __CLIPPING_H
 
@@ -43,12 +25,12 @@ static inline clipping_rect
 union_rect(const clipping_rect &r1, const clipping_rect &r2)
 {
 	clipping_rect rect;
-	
+
 	rect.left = min_c(r1.left, r2.left);
 	rect.top = min_c(r1.top, r2.top);
 	rect.right = max_c(r1.right, r2.right);
 	rect.bottom = max_c(r1.bottom, r2.bottom);
-	
+
 	return rect;
 }
 
@@ -60,12 +42,12 @@ static inline clipping_rect
 sect_rect(const clipping_rect &r1, const clipping_rect &r2)
 {
 	clipping_rect rect;
-	
+
 	rect.left = max_c(r1.left, r2.left);
 	rect.top = max_c(r1.top, r2.top);
 	rect.right = min_c(r1.right, r2.right);
 	rect.bottom = min_c(r1.bottom, r2.bottom);
-	
+
 	return rect;
 }
 
@@ -119,7 +101,7 @@ to_clipping_rect(const BRect &rect)
 	clipRect.top = (int32)rect.top;
 	clipRect.right = (int32)rect.right;
 	clipRect.bottom = (int32)rect.bottom;
-	
+
 	return clipRect;
 }
 
@@ -128,7 +110,7 @@ to_clipping_rect(const BRect &rect)
 static inline bool
 point_in(const clipping_rect &rect, int32 px, int32 py)
 {
-	if (px >= rect.left && px <= rect.right 
+	if (px >= rect.left && px <= rect.right
 			&& py >= rect.top && py <= rect.bottom)
 		return true;
 	return false;
@@ -139,7 +121,7 @@ point_in(const clipping_rect &rect, int32 px, int32 py)
 static inline bool
 point_in(const clipping_rect &rect, const BPoint &pt)
 {
-	if (pt.x >= rect.left && pt.x <= rect.right 
+	if (pt.x >= rect.left && pt.x <= rect.right
 			&& pt.y >= rect.top && pt.y <= rect.bottom)
 		return true;
 	return false;
@@ -173,7 +155,7 @@ rects_intersect(const clipping_rect &rectA, const clipping_rect &rectB)
 	if (!valid_rect(rectA) || !valid_rect(rectB))
 		return false;
 
-	// TODO: Is there a better algorithm ? 
+	// TODO: Is there a better algorithm ?
 	// the one we used is faster than
 	// ' return valid_rect(sect_rect(rectA, rectB)); ', though.
 
