@@ -289,7 +289,7 @@ BEntry entry("/boot/home/fido");
 	\retval B_NO_INIT The object has been Unset() or is uninitialized.
 
 	\since BeOS R3
-
+*/
 
 
 /*!

@@ -592,6 +592,7 @@
 /*!
 	\fn void BTabView::FrameResized(float newWidth, float newHeight)
 	\copydoc BView::FrameResized()
+*/
 
 
 /*!

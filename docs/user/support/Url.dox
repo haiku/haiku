@@ -177,7 +177,7 @@
 	\param authority The authority component.
 
 	The username, password, host and port fields are replaced. The authority
-	can be of the form username:password@host:port
+	can be of the form username:password\@host:port
 */
 
 /*!
@@ -225,7 +225,7 @@
 
 	\returns the string representation of the URL.
 
-	A complete URL string is of the form protocol://username:passord@host:port/path?request#fragment . All the fields are optional, for example a file URL will
+	A complete URL string is of the form protocol://username:passord\@host:port/path?request#fragment . All the fields are optional, for example a file URL will
 	have only a protocol and a path.
 */
 
@@ -282,7 +282,7 @@
 
 	\returns The authority url as a string.
 
-	The authority is of the form username:password@host:port.
+	The authority is of the form username:password\@host:port.
 */
 
 /*!

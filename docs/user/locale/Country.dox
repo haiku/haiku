@@ -93,8 +93,6 @@
 	\fn status_t BCountry::InitCheck()
 	\brief Check validity of the BCountry object.
 
-	\param countryCode The country code to initialize from.
-
 	\returns B_OK if everything went fine, B_BAD_DATA if the specified country
 	         code is not valid, B_NO_MEMORY if the object could not be
 			 allocated properly.

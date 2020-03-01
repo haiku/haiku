@@ -8,6 +8,7 @@
  * Corresponds to:
  *		headers/os/interface/Button.h	 hrev47274
  *		src/kits/interface/Button.cpp	 hrev47273
+ */
 
 
 /*!

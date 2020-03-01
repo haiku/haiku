@@ -6,8 +6,8 @@
  *		Adrien Destugues, pulkomandy@pulkomandy.tk
  * 
  * Corresponds to:
- *		headers/private/shared/Geolocation.h	hrev53489
- *		src/kits/shared/Geolocation.cpp			hrev53489
+ *		headers/private/shared/Geolocation.h	hrev53611
+ *		src/kits/shared/Geolocation.cpp			hrev53613S
  */
 
 
@@ -59,8 +59,8 @@
 
 
 /*!
-	\fn BGeolocation::BGeolocation(BUrl& geolocationService,
-		BUrl& geocodingService)
+	\fn BGeolocation::BGeolocation(const BUrl& geolocationService,
+		const BUrl& geocodingService)
 	\brief Initialize a BGeolocation using custom services or API keys.
 
 	You can use this constructor to provide your own URL to a webservice to

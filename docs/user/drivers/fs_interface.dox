@@ -1296,6 +1296,8 @@
 	\name Directory Operations
 */
 
+//! @{
+
 /*!
 	\fn status_t (*fs_vnode_ops::create_dir)(fs_volume *volume,
 			fs_vnode *parent, const char *name, int perms)
@@ -1683,7 +1685,7 @@
 	\name Node and FS Layers
 */
 
-//! {@
+//! @{
 
 /*!
 	\fn status_t (*fs_vnode_ops::create_special_node)(fs_volume *volume,
@@ -1703,6 +1705,12 @@
 
 
 ///// Vnode functions /////
+
+/*!
+	\name Vnode functions
+*/
+
+//! @{
 
 /*!
 	\fn status_t new_vnode(fs_volume *volume, ino_t vnodeID, void *privateNode,
@@ -1870,6 +1878,7 @@
 	\return The volume object for the given vnode.
 */
 
+//! @}
 
 ///// Notification Functions
 
@@ -1883,6 +1892,8 @@
 	The node monitor will then notify all registered listeners for the nodes
 	that changed.
 */
+
+//! @{
 
 /*!
 	\fn status_t notify_entry_created(dev_t device, ino_t directory,

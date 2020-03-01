@@ -490,6 +490,7 @@
 	\see IsStylable()
 */
 
+//! @{
 
 /*!
 	\fn void BTextView::Insert(const char* text, const text_run_array* runs)

@@ -1245,9 +1245,6 @@ SetViewColor(Parent()->ViewColor());
 */
 
 
-//! @}
-
-
 /*!
 	\fn uint32 BView::Flags() const
 	\brief Return the view flags set in the constructor or by SetFlags().
