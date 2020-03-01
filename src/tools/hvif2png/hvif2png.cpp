@@ -263,8 +263,8 @@ h2p_parse_args(h2p_parameters* result, int argc, char* argv[])
 
 				result->size = atoi(argv[i + 1]);
 
-				if (result->size <= 0 || result->size > 1024) {
-					fprintf(stderr,"bad size specified; '%s'\n", argv[i]);
+				if (result->size <= 0 || result->size > 8192) {
+					fprintf(stderr,"bad size specified; '%s'\n", argv[i + 1]);
 					h2p_fprintsyntax(stderr);
 					return false;
 				}
