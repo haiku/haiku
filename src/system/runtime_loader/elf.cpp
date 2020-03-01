@@ -306,7 +306,7 @@ relocate_dependencies(image_t *image)
 static void
 init_dependencies(image_t *image, bool initHead)
 {
-	image_t **initList;
+	image_t **initList = NULL;
 	ssize_t count, i;
 
 	if (initHead && image->preinit_array) {
@@ -316,8 +316,10 @@ init_dependencies(image_t *image, bool initHead)
 	}
 
 	count = get_sorted_image_list(image, &initList, RFLAG_INITIALIZED);
-	if (count <= 0)
+	if (count <= 0) {
+		free(initList);
 		return;
+	}
 
 	if (!initHead) {
 		// this removes the "calling" image
