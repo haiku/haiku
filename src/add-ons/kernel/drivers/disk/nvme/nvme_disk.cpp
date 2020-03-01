@@ -465,7 +465,7 @@ nvme_disk_write(void* cookie, off_t pos, const void* buffer, size_t* length)
 		// blocks before we copy our information to the bounce buffer.
 		// TODO: This would be faster if we queued both reads at once!
 		size_t readlen = block_size;
-		status_t status;
+		status_t status = B_OK;
 		if (rounded_pos != pos) {
 			status = do_nvme_io(handle->info, rounded_pos, bounceBuffer,
 				&readlen);
