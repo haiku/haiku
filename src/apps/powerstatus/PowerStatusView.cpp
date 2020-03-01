@@ -58,9 +58,6 @@ const uint32 kMsgToggleTime = 'tgtm';
 const uint32 kMsgToggleStatusIcon = 'tgsi';
 const uint32 kMsgToggleExtInfo = 'texi';
 
-const uint32 kMinIconWidth = 16;
-const uint32 kMinIconHeight = 16;
-
 const int32 kLowBatteryPercentage = 15;
 const int32 kNoteBatteryPercentage = 30;
 
@@ -319,18 +316,10 @@ PowerStatusView::DrawTo(BView* view, BRect rect)
 
 	if (fShowStatusIcon) {
 		iconRect = rect;
-		if (showLabel) {
-			if (inside == false)
-				iconRect.right -= textWidth + 2;
-		}
+		if (showLabel && inside == false)
+			iconRect.right -= textWidth + 2;
 
-		if (iconRect.Width() + 1 >= kMinIconWidth
-			&& iconRect.Height() + 1 >= kMinIconHeight) {
-			_DrawBattery(view, iconRect);
-		} else {
-			// there is not enough space for the icon
-			iconRect.Set(0, 0, -1, -1);
-		}
+		_DrawBattery(view, iconRect);
 	}
 
 	if (showLabel) {
