@@ -277,12 +277,10 @@ View::AddChild(View* view)
 			// trigger redraw
 			IntRect clippedFrame = view->Frame();
 			ConvertToVisibleInTopView(&clippedFrame);
-			BRegion* dirty = fWindow->GetRegion();
-			if (dirty) {
-				dirty->Set((clipping_rect)clippedFrame);
-				fWindow->MarkContentDirtyAsync(*dirty);
-				fWindow->RecycleRegion(dirty);
-			}
+
+			BRegion dirty;
+			dirty.Set((clipping_rect)clippedFrame);
+			fWindow->MarkContentDirtyAsync(dirty);
 		}
 	}
 }
@@ -333,12 +331,10 @@ View::RemoveChild(View* view)
 			// trigger redraw
 			IntRect clippedFrame = view->Frame();
 			ConvertToVisibleInTopView(&clippedFrame);
-			BRegion* dirty = fWindow->GetRegion();
-			if (dirty) {
-				dirty->Set((clipping_rect)clippedFrame);
-				fWindow->MarkContentDirtyAsync(*dirty);
-				fWindow->RecycleRegion(dirty);
-			}
+
+			BRegion dirty;
+			dirty.Set((clipping_rect)clippedFrame);
+			fWindow->MarkContentDirtyAsync(dirty);
 		}
 	}
 
@@ -1282,12 +1278,10 @@ View::SetHidden(bool hidden)
 				// trigger a redraw
 				IntRect clippedBounds = Bounds();
 				ConvertToVisibleInTopView(&clippedBounds);
-				BRegion* dirty = fWindow->GetRegion();
-				if (!dirty)
-					return;
-				dirty->Set((clipping_rect)clippedBounds);
-				fWindow->MarkContentDirty(*dirty);
-				fWindow->RecycleRegion(dirty);
+
+				BRegion dirty;
+				dirty.Set((clipping_rect)clippedBounds);
+				fWindow->MarkContentDirty(dirty);
 			}
 		}
 	}
@@ -1532,12 +1526,9 @@ View::_ScreenClipping(BRegion* windowContentClipping, bool force) const
 		ConvertToVisibleInTopView(&clippedBounds);
 		if (clippedBounds.Width() < fScreenClipping.Frame().Width()
 			|| clippedBounds.Height() < fScreenClipping.Frame().Height()) {
-			BRegion* temp = fWindow->GetRegion();
-			if (temp) {
-				temp->Set((clipping_rect)clippedBounds);
-				fScreenClipping.IntersectWith(temp);
-				fWindow->RecycleRegion(temp);
-			}
+			BRegion temp;
+			temp.Set((clipping_rect)clippedBounds);
+			fScreenClipping.IntersectWith(&temp);
 		}
 
 		fScreenClipping.IntersectWith(windowContentClipping);
