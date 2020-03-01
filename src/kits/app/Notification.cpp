@@ -140,8 +140,6 @@ BNotification::~BNotification()
 }
 
 
-/*! \brief Returns initialization status.
- */
 status_t
 BNotification::InitCheck() const
 {
@@ -149,16 +147,6 @@ BNotification::InitCheck() const
 }
 
 
-/*! \brief Returns a new BNotification object from @archive.
-
-	Returns a new BNotification object, allocated by new and created
-	with the version of the constructor that takes BMessage archive.
-	However, if the message doesn't contain an archived data for a
-	BNotification object, this method returns NULL.
-
-	\return BNotification object from @archive or NULL if it doesn't
-			contain a valid BNotification object.
-*/
 BArchivable*
 BNotification::Instantiate(BMessage* archive)
 {
@@ -169,13 +157,6 @@ BNotification::Instantiate(BMessage* archive)
 }
 
 
-/*! \brief Archives the BNotification in the BMessages @archive.
-
-	\sa BArchivable::Archive(), Instantiate() static function.
-	\return
-	- \c B_OK: Everything went fine.
-	- \c Other errors: Archiving has failed.
-*/
 status_t
 BNotification::Archive(BMessage* archive, bool deep) const
 {
@@ -241,10 +222,6 @@ BNotification::Archive(BMessage* archive, bool deep) const
 }
 
 
-/*! \brief Returns source application signature.
-
-	\return Source application signature.
-*/
 const char*
 BNotification::SourceSignature() const
 {
@@ -252,10 +229,6 @@ BNotification::SourceSignature() const
 }
 
 
-/*! \brief Returns source application name.
-
-	\return Source application name.
-*/
 const char*
 BNotification::SourceName() const
 {
@@ -263,11 +236,6 @@ BNotification::SourceName() const
 }
 
 
-/*! \brief Notification's type.
-
-	\return A value of the notification_type enum that represents
-			notification type.
-*/
 notification_type
 BNotification::Type() const
 {
@@ -275,10 +243,6 @@ BNotification::Type() const
 }
 
 
-/*! \brief Returns notification's group.
-
-	\return Notification's group.
-*/
 const char*
 BNotification::Group() const
 {
@@ -288,10 +252,6 @@ BNotification::Group() const
 }
 
 
-/*! \brief Sets notification's group.
-
-	Notifications can be grouped together setting the same group.
-*/
 void
 BNotification::SetGroup(const BString& group)
 {
@@ -299,10 +259,6 @@ BNotification::SetGroup(const BString& group)
 }
 
 
-/*! \brief Returns notification's title.
-
-	\return Notification's title.
-*/
 const char*
 BNotification::Title() const
 {
@@ -312,8 +268,6 @@ BNotification::Title() const
 }
 
 
-/*! \brief Set notification's title.
-*/
 void
 BNotification::SetTitle(const BString& title)
 {
@@ -321,10 +275,6 @@ BNotification::SetTitle(const BString& title)
 }
 
 
-/*! \brief Returns notification's message.
-
-	\return Notification's message.
-*/
 const char*
 BNotification::Content() const
 {
@@ -334,8 +284,6 @@ BNotification::Content() const
 }
 
 
-/*! \brief Sets notification's message.
-*/
 void
 BNotification::SetContent(const BString& content)
 {
@@ -343,10 +291,6 @@ BNotification::SetContent(const BString& content)
 }
 
 
-/*! \brief Returns notification's message identifier.
-
-	\return Notification's message identifier.
-*/
 const char*
 BNotification::MessageID() const
 {
@@ -356,8 +300,6 @@ BNotification::MessageID() const
 }
 
 
-/*! \brief Sets notification's message identifier.
-*/
 void
 BNotification::SetMessageID(const BString& id)
 {
@@ -365,16 +307,6 @@ BNotification::SetMessageID(const BString& id)
 }
 
 
-/*! \brief Returns progress information.
-
-	If notification's type is \c B_PROGRESS_NOTIFICATION, returns a value
-	between 0.0 and 1.0 that represent progress percentage.
-
-	If notification's type is not \c B_PROGRESS_NOTIFICATION, returns -1.
-
-	\return Percentage if notification's type is B_PROGRESS_NOTIFICATION
-			or otherwise -1.
-*/
 float
 BNotification::Progress() const
 {
@@ -384,13 +316,6 @@ BNotification::Progress() const
 }
 
 
-/*! \brief Sets progress information.
-
-	Sets progress percentage, this information will be used only
-	if notification's type is \c B_PROGRESS_NOTIFICATION.
-
-	The value of @progress must be between 0.0 and 1.0.
-*/
 void
 BNotification::SetProgress(float progress)
 {
@@ -495,10 +420,6 @@ BNotification::OnClickArgAt(int32 index) const
 }
 
 
-/*! \brief Notification's icon.
-
-	\return Notification's icon.
-*/
 const BBitmap*
 BNotification::Icon() const
 {
@@ -506,17 +427,6 @@ BNotification::Icon() const
 }
 
 
-/*! \brief Sets notification's icon.
-
-	Sets notification's icon.
-	This method does not assume ownership of @icon.
-
-	\param icon Icon
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_NO_MEMORY: Allocation of @icon copy has failed.
-	- \c Other errors: Creation of @icon copy failed for some reason.
-*/
 status_t
 BNotification::SetIcon(const BBitmap* icon)
 {
@@ -534,18 +444,6 @@ BNotification::SetIcon(const BBitmap* icon)
 }
 
 
-/*! \brief Sends a notification to the notification_server.
-
-	The notification is delivered asynchronously to the notification_server,
-	which will display it according to its settings and filters.
-
-	\param timeout Microseconds after the message fades out.
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_BAD_PORT_ID: A connection to notification_server could not be
-	  established or the server is not up and running anymore.
-	- \c Other errors: Building the message from the notification failed.
-*/
 status_t
 BNotification::Send(bigtime_t timeout)
 {

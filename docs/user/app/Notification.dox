@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Copyright 2019-2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,42 +23,58 @@
 
 
 /*!
-    \enum notification_type
-    \brief Undocumented
+	\enum notification_type
+	\brief Visual style of the notification.
 
-    \since Haiku R1
+	\since Haiku R1
 */
 
 
 /*!
 	\var notification_type::B_INFORMATION_NOTIFICATION
-    \brief Undocumented
+	\brief Information type
 
-    \since Haiku R1
+	This will have the notification appear with a grey side bar.
+
+	\image html notification_information_type.png
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var notification_type::B_IMPORTANT_NOTIFICATION
-    \brief Undocumented
+	\brief Important type
 
-    \since Haiku R1
+	This will have the notification appear with a blue side bar.
+
+	\image html notification_important_type.png
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var notification_type::B_ERROR_NOTIFICATION
-    \brief Undocumented
+	\brief Error type
 
-    \since Haiku R1
+	This will have the notification appear with a red side bar.
+
+	\image html notification_error_type.png
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var notification_type::B_PROGRESS_NOTIFICATION
-    \brief Undocumented
+	\brief Progress type
 
-    \since Haiku R1
+	This will have the notification appear with a progress bar.
+
+	\image html notification_progress_type.png
+
+	\since Haiku R1
 */
 
 
@@ -66,265 +82,492 @@
 
 
 /*!
-    \class BNotification
-    \brief Undocumented
+	\class BNotification
+	\brief Construct system-default notifications to be displayed to the user.
 
-    \since Haiku R1
+	Haiku provides a notification system that allows you to display messages to
+	the user. There is quite some flexibility in how the message is presented.
+	You may use this class to build and send the notification. The properties
+	you can set are:
+	 - The \link BNotification::BNotification() type of notification\endlink,
+	   which can be an information message, a warning, an error, or a progress
+	   message.
+	 - The \link BNotification::SetGroup() group\endlink, which allows you to
+	   organize notification display into different categories.
+	 - A \link BNotification::SetTitle() title\endlink, which is a distinct
+	   text element at the top of a notification view.
+	 - The \link BNotification::SetContent() content\endlink, which is the text
+	   message that is shown to the user.
+	 - A \link BNotification::SetMessageID() message identifier\endlink that
+	   allows you to modify the contents of a message that is being displayed,
+	   which is particularly useful for progress notifications.
+	 - For progress notifications, the
+	   \link BNotification::SetProgress() percentage of completion\endlink can be
+	   set.
+	 - By default the notification uses the application's icon, but you may
+	   set an \link BNotification::SetIcon() alternative icon\endlink.
+	 - Finally there are a few ways you can configure the actions that happen
+	   when a user clicks the notification. More on that below.
+
+	For example, with the following code, you may display a notification:
+
+	\code{.cpp}
+	BNotification notification(B_PROGRESS_NOTIFICATION);
+	notification.SetGroup("Group");
+	notification.SetTitle("Title");
+	notification.SetContent("This is the content");
+	notification.SetMessageID("mainwindow_progress")
+	notification.SetProgress(0.5);
+	notification.Send();
+	\endcode
+
+	\p
+
+	\image html notification_intro.png
+
+	Note that in the previous code example, we set a
+	\link BNotification::SetMessageID message identifier\endlink, which will
+	allow to update the notification when we have progressed. The use would be:
+
+	\code{.cpp}
+	// After sending the notification, you retain ownership so that you can update it
+	notification.SetProgress(0.7);
+
+	// In order to display the update, you send it again
+	notification.Send();
+	\endcode
+
+	Furthermore, it is possible to support some form of follow-up action, when
+	the user clicks the notification. First of all, you need to choose whether
+	you want to \link BNotification::SetOnClickApp() open a specific
+	application\endlink, or whether you want to
+	\link BNotification::SetOnClickFile() open a specific file\endlink and have
+	the system determine which application fits that. Additionally, you may
+	specify \link BNotification::AddOnClickArg() command line arguments\endlink
+	or pass additional \link BNotification::AddOnClickRef() file
+	references\endlink for the receiving application to process.
+
+	Finally, a note about the \c notification_server and how it groups and
+	handles messages coming from your application. The system is aware of the
+	source of the notifications, and identifies your application by it's
+	signature. That means that the identification of your application is
+	consistent, even if it is restarted, or if you have multiple instances
+	running. This impacts the \link BNotification::SetGroup() grouping\endlink
+	functionality and the \link BNotification::SetMessageID() message
+	updating\endlink functionality. If you have an application that can have
+	multiple instances, you will need to make sure that you properly manage
+	your group names and identifiers if you want to keep things separate.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BNotification::BNotification(notification_type type)
-    \brief Undocumented
+	\brief Construct an empty message, with the specified \a type.
 
-    \since Haiku R1
+	The type influences the style of the notification view. See the
+	\ref notification_type enumerator for details.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BNotification::BNotification(BMessage* archive)
-    \brief Undocumented
+	\brief Construct a notification from an archive.
 
-    \since Haiku R1
+	\since Haiku R1
 */
 
 
 /*!
 	\fn virtual BNotification::~BNotification()
-    \brief Undocumented
+	\brief Frees all resources associated with the object.
 
-    \since Haiku R1
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BNotification::InitCheck() const
-    \brief Undocumented
+	\brief Returns the status of the constructor.
 
-    \since Haiku R1
+	\since Haiku R1
 */
 
 
 /*!
 	\fn static BArchivable* BNotification::Instantiate(BMessage* archive)
-    \brief Undocumented
+	\brief Returns a new BNotification object from \a archive.
 
-    \since Haiku R1
+	This class implements the archiving API, and as such, you can
+	build a new BNotification object from a previously created
+	BMessage archive. However, if the message doesn't contain an archived data
+	for a BNotification object, this method returns \c NULL.
+
+	\returns BNotification object from \a archive or \c NULL if it doesn't
+	         contain a valid BNotification object.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn virtual status_t BNotification::Archive(BMessage* archive,
-        bool deep = true) const
-    \brief Undocumented
+		bool deep = true) const
+	\brief Archives the BNotification in the \c archive.
 
-    \since Haiku R1
+	\see BArchivable::Archive(), Instantiate() static function.
+	\returns \c B_OK: if everything went fine, or other errors that describe why
+	         archiving has failed.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn const char* BNotification::SourceSignature() const
-    \brief Undocumented
+	\brief Returns signature of the application where the notification
+	       originated.
 
-    \since Haiku R1
+	When you build your own notifications, this will contain the signature of
+	the current application. If you receive notifications from other
+	applications, it will include theirs.
+
+	\returns Signature of the source application.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn const char* BNotification::SourceName() const
-    \brief Undocumented
+	\brief Returns the name of the application where the notification
+	       originated.
 
-    \since Haiku R1
+	When you build your own notifications, this will contain the name of
+	the current application. If you receive notifications from other
+	applications, it will include theirs.
+
+	\returns Name of the source application.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn notification_type BNotification::Type() const
-    \brief Undocumented
+	\brief Returns the type of the notification.
 
-    \since Haiku R1
+	\returns A value of the \c notification_type enum that represents
+	         notification type.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn const char* BNotification::Group() const
-    \brief Undocumented
+	\brief Returns the group of the notification.
 
-    \since Haiku R1
+	\see BNotification::SetGroup() for more information about groups.
+
+	\returns The string of the notification's group.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BNotification::SetGroup(const BString& group)
-    \brief Undocumented
+	\brief Set a group for the notifcation.
 
-    \since Haiku R1
+	The default behaviour of the \c notification_server is group the visible
+	notifications per running application, and then in order in which they have
+	been received. There may be situations where you want to override that
+	behavior and group related notifications. When you set a group name, the
+	\c notification_server will create a box with the \c group name as label,
+	and insert all related notifications in that box.
+
+	\image html notification_group.png
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn const char* BNotification::Title() const
-    \brief Undocumented
+	\brief Returns the title of the notification.
 
-    \since Haiku R1
+	\returns The title of the notification as a string.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BNotification::SetTitle(const BString& title)
-    \brief Undocumented
+	\brief Set a title for the notification.
 
-    \since Haiku R1
+	\since Haiku R1
 */
 
 
 /*!
 	\fn const char* BNotification::Content() const
-    \brief Undocumented
+	\brief Returns the message of the notification.
 
-    \since Haiku R1
+	\returns The message of the notification as a string.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BNotification::SetContent(const BString& content)
-    \brief Undocumented
+	\brief Set a message for the notification.
 
-    \since Haiku R1
+	\since Haiku R1
 */
 
 
 /*!
 	\fn const char* BNotification::MessageID() const
-    \brief Undocumented
+	\brief Returns the identifier of the notification.
 
-    \since Haiku R1
+	\see BNotification::SetMessageID() for the purpose of having an identifier.
+
+	\returns The identifier of the notification as a string.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BNotification::SetMessageID(const BString& id)
-    \brief Undocumented
+	\brief Sets notification's message identifier.
 
-    \since Haiku R1
+	If you want to update the contents of an existing notification, you can
+	set a identifier for this message. When you send a new or updated message
+	with the same identifier, the \c notification_server will update the
+	existing message with the new content.
+
+	In order to effectively use this feature, you will have to make sure the
+	identifier is unique within the current application.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn float BNotification::Progress() const
-    \brief Undocumented
+	\brief Returns the progress for the notification.
 
-    \since Haiku R1
+	\see BNotification::SetProgress() for more information about this value.
+
+	\returns A value between 0.0 and 1.0 if notification's type is
+	         \c B_PROGRESS_NOTIFICATION, or otherwise -1.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BNotification::SetProgress(float progress)
-    \brief Undocumented
+	\brief Sets progress information.
 
-    \since Haiku R1
+	When you are building a notification of the type \c B_PROGRESS_NOTIFICATION
+	the notification view will show a progress bar and a label that
+	expresses the progress in a percentage. Using this method you can set
+	what the bar and label express.
+
+	The valid range is between 0.0 and 1.0. If \c progress is lower than 0.0
+	(i.e. negative), the value will be set to 0.0. If it is higher than 1.0,
+	it will be set to 1.0.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn const char* BNotification::OnClickApp() const
-    \brief Undocumented
+	\brief Returns the signature of the application that will be called when
+	       the notification is clicked.
 
-    \since Haiku R1
+	\see More information about this property in BNotification::SetOnClickApp().
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BNotification::SetOnClickApp(const BString& app)
-    \brief Undocumented
+	\brief Set which application should be called when the notification is
+	       clicked by the user.
 
-    \since Haiku R1
+	The value \c app should be a valid application signature, for example
+	\c 'application/x-vnd.Haiku-StyledEdit'.
+
+	Using this property has precedence on when BNotification::SetOnClickFile()
+	is used. If you want interacting with the notification opening a specific
+	file, then you should use this method in combination with
+	BNotification::AddOnClickRef().
+
+	\see Additional actions and parameters can be set through
+	     BNotification::SetOnClickFile(), BNotification::AddOnClickRef()
+		 and BNotification::AddOnClickArg().
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn const entry_ref* BNotification::OnClickFile() const
-    \brief Undocumented
+	\brief Returns the reference to the file that will be opened when the
+	       notification is clicked.
 
-    \since Haiku R1
+	\see More information about this property in BNotification::SetOnClickFile().
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BNotification::SetOnClickFile(const entry_ref* file)
-    \brief Undocumented
+	\brief Set which file should be opened when the notification is
+	       clicked by the user.
 
-    \since Haiku R1
+	The file will be opened by the default application for this file type.
+
+	You cannot use this action in combination with
+	BNotification::SetOnClickApp(). If you use this way of setting an action,
+	this action will be ignored.
+
+	\see Additional actions and parameters can be set through
+	     BNotification::SetOnClickApp(), BNotification::AddOnClickRef()
+		 and BNotification::AddOnClickArg().
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BNotification::AddOnClickRef(const entry_ref* ref)
-    \brief Undocumented
+	\brief Add a \c ref to the list of arguments passed when a user clicks the
+	       notification.
 
-    \since Haiku R1
+	This method allows you to construct a list of refs, that will be sent to
+	the application specified by BNotification::AddOnClickApp(), or the one
+	that is associated with BNotification::AddOnClickFile(). The refs will be
+	handled by the application's BApplication::RefsReceived() hook method.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn int32 BNotification::CountOnClickRefs() const
-    \brief Undocumented
+	\brief Returns the number of refs to be passed when the user clicks on
+	       the notification.
 
-    \since Haiku R1
+	\see BNotification::AddOnClickRef()
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn const entry_ref* BNotification::OnClickRefAt(int32 index) const
-    \brief Undocumented
+	\brief Returns the ref that is stored at \c index.
 
-    \since Haiku R1
+	\see BNotification::AddOnClickRef()
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BNotification::AddOnClickArg(const BString& arg)
-    \brief Undocumented
+	\brief Add to a list of arguments that are passed to an application when
+	       the user clicks on the notification.
 
-    \since Haiku R1
+	This method allows you to construct a list of arguments, that will be sent
+	to the application specified by BNotification::AddOnClickApp(), or the one
+	that is associated with BNotification::AddOnClickFile(). The args will be
+	handled by the application's BApplication::ArgvReceived() hook method.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn int32 BNotification::CountOnClickArgs() const
-    \brief Undocumented
+	\brief Returns the number of args to be passed when the user clicks on
+	       the notification.
 
-    \since Haiku R1
+	\see BNotification::AddOnClickArg()
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn const char* BNotification::OnClickArgAt(int32 index) const
-    \brief Undocumented
+	\brief Returns the arg that is stored at \c index.
 
-    \since Haiku R1
+	\see BNotification::AddOnClickArg()
+	\since Haiku R1
 */
 
 
 /*!
 	\fn const BBitmap* BNotification::Icon() const
-    \brief Undocumented
+	\brief Returns the icon for the notification.
 
-    \since Haiku R1
+	\see BNotification::SetIcon() for more information on this property.
+
+	\return Returns a borrowed unchangeable reference to the icon.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BNotification::SetIcon(const BBitmap* icon)
-    \brief Undocumented
+	\brief Set the icon of the notification.
 
-    \since Haiku R1
+	Set the icon for the notification. By default, the application icon is
+	used. This method makes a copy of the \a icon. 
+
+	\param icon The icon that should be displayed with the notification.
+	\returns \c B_OK if everything went fine, \c B_NO_MEMORY when the \a icon
+	         could not be copied, or another error if something else went
+			 wrong.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BNotification::Send(bigtime_t timeout = -1)
-    \brief Undocumented
+	\brief Send the notification to the notification_server.
 
-    \since Haiku R1
+	The notification is delivered asynchronously to the notification_server,
+	which will display it according to its settings and filters.
+
+	After sending, you retain ownership of the notification. The advantage is
+	that you can re-use the notification at a later moment, or use the object to
+	update the notification. See BNotification::SetMessageID() about updating
+	displayed notifications. If you allocate the notification on the heap, be
+	sure to free the memory.
+
+	\param timeout The \a timeout in microsecond that the notification should
+	       be displayed. If you want to use the default timing, use the default
+		   argument or pass \c -1.
+	\returns \c B_OK if everything went fine, \c B_BAD_PORT_ID if there was a
+	         problem connecting to the \c notification_server, or any other
+			 errors if something went wrong transmitting the notification.
+
+	\since Haiku R1
 */

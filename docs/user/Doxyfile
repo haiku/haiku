@@ -955,6 +955,7 @@ EXAMPLE_RECURSIVE      = NO
 # \image command).
 
 IMAGE_PATH             = . \
+                         app/images \
                          interface/images \
                          keyboard \
                          midi2/images \
