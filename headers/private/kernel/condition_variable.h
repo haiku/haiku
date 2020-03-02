@@ -23,10 +23,8 @@ struct ConditionVariable;
 struct ConditionVariableEntry
 	: DoublyLinkedListLinkImpl<ConditionVariableEntry> {
 public:
-#if KDEBUG
-	inline						ConditionVariableEntry();
-	inline						~ConditionVariableEntry();
-#endif
+								ConditionVariableEntry();
+								~ConditionVariableEntry();
 
 			bool				Add(const void* object);
 			status_t			Wait(uint32 flags = 0, bigtime_t timeout = 0);
@@ -38,7 +36,8 @@ public:
 	inline	ConditionVariable*	Variable() const { return fVariable; }
 
 private:
-	inline	void				AddToLockedVariable(ConditionVariable* variable);
+	inline	void				_AddToLockedVariable(ConditionVariable* variable);
+			void				_RemoveFromVariable();
 
 private:
 			spinlock			fLock;
@@ -98,26 +97,6 @@ protected:
 			friend struct ConditionVariableEntry;
 			friend struct ConditionVariableHashDefinition;
 };
-
-
-#if KDEBUG
-
-inline
-ConditionVariableEntry::ConditionVariableEntry()
-	: fVariable(NULL)
-{
-}
-
-inline
-ConditionVariableEntry::~ConditionVariableEntry()
-{
-	if (fVariable != NULL) {
-		panic("Destroying condition variable entry %p, but it's still "
-			"attached to variable %p\n", this, fVariable);
-	}
-}
-
-#endif
 
 
 inline void

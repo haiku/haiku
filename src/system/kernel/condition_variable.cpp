@@ -90,6 +90,19 @@ dump_condition_variable(int argc, char** argv)
 // #pragma mark - ConditionVariableEntry
 
 
+ConditionVariableEntry::ConditionVariableEntry()
+	: fVariable(NULL)
+{
+}
+
+
+ConditionVariableEntry::~ConditionVariableEntry()
+{
+	if (fVariable != NULL)
+		_RemoveFromVariable();
+}
+
+
 bool
 ConditionVariableEntry::Add(const void* object)
 {
@@ -108,14 +121,14 @@ ConditionVariableEntry::Add(const void* object)
 	SpinLocker variableLocker(variable->fLock);
 	hashLocker.Unlock();
 
-	AddToLockedVariable(variable);
+	_AddToLockedVariable(variable);
 
 	return true;
 }
 
 
 inline void
-ConditionVariableEntry::AddToLockedVariable(ConditionVariable* variable)
+ConditionVariableEntry::_AddToLockedVariable(ConditionVariable* variable)
 {
 	ASSERT(fVariable == NULL);
 
@@ -124,6 +137,32 @@ ConditionVariableEntry::AddToLockedVariable(ConditionVariable* variable)
 	fVariable = variable;
 	fWaitStatus = STATUS_ADDED;
 	fVariable->fEntries.Add(this);
+}
+
+
+void
+ConditionVariableEntry::_RemoveFromVariable()
+{
+	InterruptsLocker _;
+	SpinLocker entryLocker(fLock);
+
+	if (fVariable != NULL) {
+		SpinLocker conditionLocker(fVariable->fLock);
+		if (fVariable->fEntries.Contains(this)) {
+			fVariable->fEntries.Remove(this);
+		} else {
+			entryLocker.Unlock();
+			// The variable's fEntries did not contain us, but we currently
+			// have the variable's lock acquired. This must mean we are in
+			// a race with the variable's Notify. It is possible we will be
+			// destroyed immediately upon returning here, so we need to
+			// spin until our fVariable member is unset by the Notify thread
+			// and then re-acquire our own lock to avoid a use-after-free.
+			while (atomic_pointer_get(&fVariable) != NULL) {}
+			entryLocker.Lock();
+		}
+		fVariable = NULL;
+	}
 }
 
 
@@ -157,27 +196,7 @@ ConditionVariableEntry::Wait(uint32 flags, bigtime_t timeout)
 	else
 		error = thread_block();
 
-	entryLocker.Lock();
-
-	// Remove entry from variable, if not done yet.
-	if (fVariable != NULL) {
-		SpinLocker conditionLocker(fVariable->fLock);
-		if (fVariable->fEntries.Contains(this)) {
-			fVariable->fEntries.Remove(this);
-		} else {
-			entryLocker.Unlock();
-			// The variable's fEntries did not contain us, but we currently
-			// have the variable's lock acquired. This must mean we are in
-			// a race with the variable's Notify. It is possible we will be
-			// destroyed immediately upon returning here, so we need to
-			// spin until our fVariable member is unset by the Notify thread
-			// and then re-acquire our own lock to avoid a use-after-free.
-			while (atomic_pointer_get(&fVariable) != NULL) {}
-			entryLocker.Lock();
-		}
-		fVariable = NULL;
-	}
-
+	_RemoveFromVariable();
 	return error;
 }
 
@@ -266,7 +285,7 @@ void
 ConditionVariable::Add(ConditionVariableEntry* entry)
 {
 	InterruptsSpinLocker _(fLock);
-	entry->AddToLockedVariable(this);
+	entry->_AddToLockedVariable(this);
 }
 
 
