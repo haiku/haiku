@@ -677,16 +677,16 @@ BMenu::DoLayout()
 
 
 void
-BMenu::FrameMoved(BPoint new_position)
+BMenu::FrameMoved(BPoint where)
 {
-	BView::FrameMoved(new_position);
+	BView::FrameMoved(where);
 }
 
 
 void
-BMenu::FrameResized(float new_width, float new_height)
+BMenu::FrameResized(float width, float height)
 {
-	BView::FrameResized(new_width, new_height);
+	BView::FrameResized(width, height);
 }
 
 
