@@ -325,6 +325,7 @@ struct pci_module_info {
 #define PCI_sata			0x06			/* Serial ATA controller */
 #define PCI_sas				0x07			/* Serial Attached SCSI controller */
 #define PCI_nvm				0x08			/* NVM Express controller */
+#define PCI_ufs				0x09			/* Universal Flash Storage controller */
 #define PCI_mass_storage_other 0x80			/* other mass storage controller */
 
 /* ---
@@ -359,6 +360,15 @@ struct pci_module_info {
 #define PCI_nvm_hci_enterprise	0x02	/* NVMHCI enterprise */
 
 /* ---
+	values of the class_api field for
+		class_base	= 0x01 (mass storage)
+		class_sub	= 0x09 (Universal Flash Storage controller)
+--- */
+
+#define PCI_ufs_other			0x00	/* vendor specific interface */
+#define PCI_ufs_hci				0x01	/* UFSHCI interface */
+
+/* ---
 	values for the class_sub field for class_base = 0x02 (network)
 --- */
 
@@ -369,6 +379,8 @@ struct pci_module_info {
 #define PCI_isdn            0x04            /* ISDN controller */
 #define PCI_worldfip		0x05            /* WorldFip controller */
 #define PCI_picmg			0x06            /* PICMG controller */
+#define PCI_network_infiniband	0x07		/* InfiniBand controller */
+#define PCI_hfc				0x08			/* Host fabric controller */
 #define PCI_network_other	0x80			/* other network controller */
 
 
@@ -394,6 +406,14 @@ struct pci_module_info {
 
 
 /* ---
+	values of the class_api field for
+		class_base	= 0x04 (multimedia device)
+		class_sub	= 0x03 (HD audio)
+--- */
+
+#define PCI_hd_audio_vendor	0x80	/* with additional vendor specific extensions */
+
+/* ---
 	values for the class_sub field for class_base = 0x05 (memory)
 --- */
 
@@ -415,10 +435,18 @@ struct pci_module_info {
 #define PCI_nubus			0x06			/* NuBus bridge */
 #define PCI_cardbus			0x07			/* CardBus bridge */
 #define PCI_raceway			0x08			/* RACEway bridge */
-#define PCI_bridge_transparent		0x09			/* PCI transparent */
-#define PCI_bridge_infiniband		0x0a			/* Infiniband */
+#define PCI_bridge_transparent	0x09			/* PCI transparent */
+#define PCI_bridge_infiniband	0x0a			/* Infiniband */
+#define PCI_bridge_as_pci	0x0b	/* Advanced Switching to PCI host bridge */
 #define PCI_bridge_other		0x80			/* other bridge device */
 
+/* ---
+	values of the class_api field for
+		class_base	= 0x06 (bridge), and
+		class_sub	= 0x0b (Advanced Switching to PCI host bridge)
+--- */
+
+#define PCI_bridge_as_pci_asi_sig	0x01	/* ASI-SIG Defined Portal Interface */
 
 /* ---
 	values for the class_sub field for class_base = 0x07 (simple
@@ -467,6 +495,7 @@ struct pci_module_info {
 #define PCI_generic_hot_plug        0x04    /* generic PCI hot-plug controller */
 #define PCI_sd_host					0x05	/* SD Host controller */
 #define PCI_iommu					0x06	/* IOMMU */
+#define PCI_rcec					0x07	/* Root Complex Event Collector */
 #define PCI_system_peripheral_other	0x80	/* other generic system peripheral */
 
 /* ---
@@ -556,6 +585,7 @@ struct pci_module_info {
 #define PCI_ipmi			0x07
 #define PCI_sercos			0x08
 #define PCI_canbus			0x09
+#define PCI_mipi_i3c		0x0a	/* MIPI I3C Host Controller Interface */
 
 /* ---
 	values of the class_api field for
@@ -567,17 +597,20 @@ struct pci_module_info {
 #define PCI_usb_ohci			0x10	/* Open Host Controller Interface */
 #define PCI_usb_ehci			0x20	/* Enhanced Host Controller Interface */
 #define PCI_usb_xhci			0x30	/* Extensible Host Controller Interface */
+#define PCI_usb_usb4			0x40	/* USB4 Host Interface */
 
 /* ---
 	values for the class_sub field for class_base = 0x0d (wireless controller)
 --- */
 #define PCI_wireless_irda			0x00
-#define PCI_wireless_consumer_ir		0x01
-#define PCI_wireless_rf				0x02
-#define PCI_wireless_bluetooth			0x03
-#define PCI_wireless_broadband			0x04
-#define PCI_wireless_80211A			0x10
-#define PCI_wireless_80211B			0x20
+#define PCI_wireless_consumer_ir	0x01
+#define PCI_wireless_rf				0x10
+#define PCI_wireless_bluetooth		0x11
+#define PCI_wireless_broadband		0x12
+#define PCI_wireless_80211A			0x20
+#define PCI_wireless_80211B			0x21
+#define PCI_wireless_cellular		0x40
+#define PCI_wireless_cellular_ethernet	0x41
 #define PCI_wireless_other			0x80
 
 /* ---
@@ -728,6 +761,8 @@ struct pci_module_info {
 #define PCI_cap_id_msix		0x11	/* MSI-X */
 #define PCI_cap_id_sata		0x12	/* Serial ATA Capability */
 #define PCI_cap_id_pciaf	0x13	/* PCI Advanced Features */
+#define PCI_cap_id_ea		0x14	/* Extended Allocation */
+#define PCI_cap_id_fpb		0x15	/* Flattening Portal Bridge */
 
 /** PCI Extended Capabilities */
 #define PCI_extcap_id(x)		(x & 0x0000ffff)
@@ -763,6 +798,22 @@ struct pci_module_info {
 #define PCI_extcap_id_ln_requester	0x001c	/* LN Requester */
 #define PCI_extcap_id_dpc			0x001d	/* Downstream Porto Containment */
 #define PCI_extcap_id_l1pm			0x001e	/* L1 Power Management Substates */
+#define PCI_extcap_id_ptm			0x001f	/* Precision Time Measurement */
+#define PCI_extcap_id_m_pcie		0x0020	/* PCIe over M-PHY */
+#define PCI_extcap_id_frs			0x0021	/* FRS Queuing */
+#define PCI_extcap_id_rtr			0x0022	/* Readiness Time Reporting */
+#define PCI_extcap_id_dvsec			0x0023	/* Designated Vendor-Specific */
+#define PCI_extcap_id_vf_resizable_bar	0x0024	/* VF Resizable BAR */
+#define PCI_extcap_id_datalink		0x0025	/* Data Link Feature */
+#define PCI_extcap_id_16gt			0x0026	/* Physical Layer 16.0 GT/s */
+#define PCI_extcap_id_lmr			0x0027	/* Lane Marging at the Receiver */
+#define PCI_extcap_id_hierarchy_id	0x0028	/* Hierarchy ID */
+#define PCI_extcap_id_npem			0x0029	/* Native PCIe Enclosure Management */
+#define PCI_extcap_id_pl32			0x002a	/* Physical Layer 32.0 GT/s */
+#define PCI_extcap_id_ap			0x002b	/* Alternate Protocol */
+#define PCI_extcap_id_sfi			0x002c	/* System Firmware Intermediary */
+#define PCI_extcap_id_sf			0x002d	/* Shadow Functions */
+#define PCI_extcap_id_doe			0x002e	/* Data Object Exchange */
 
 /** Power Management Control Status Register settings */
 #define PCI_pm_mask             0x03
