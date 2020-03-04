@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -379,205 +379,120 @@ BScrollBar::DetachedFromWindow()
 void
 BScrollBar::Draw(BRect updateRect)
 {
-	BRect bounds = Bounds();
-
-	rgb_color normal = ui_color(B_PANEL_BACKGROUND_COLOR);
-
-	// stroke a dark frame around the entire scrollbar
-	// (independent of enabled state)
-	// take care of border highlighting (scroll target is focus view)
-	SetHighColor(tint_color(normal, B_DARKEN_2_TINT));
-	if (fPrivateData->fBorderHighlighted && fPrivateData->fEnabled) {
-		rgb_color borderColor = HighColor();
-		rgb_color highlightColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
-		BeginLineArray(4);
-		AddLine(BPoint(bounds.left + 1, bounds.bottom),
-			BPoint(bounds.right, bounds.bottom), borderColor);
-		AddLine(BPoint(bounds.right, bounds.top + 1),
-			BPoint(bounds.right, bounds.bottom - 1), borderColor);
-		if (fOrientation == B_HORIZONTAL) {
-			AddLine(BPoint(bounds.left, bounds.top + 1),
-				BPoint(bounds.left, bounds.bottom), borderColor);
-		} else {
-			AddLine(BPoint(bounds.left, bounds.top),
-				BPoint(bounds.left, bounds.bottom), highlightColor);
-		}
-		if (fOrientation == B_HORIZONTAL) {
-			AddLine(BPoint(bounds.left, bounds.top),
-				BPoint(bounds.right, bounds.top), highlightColor);
-		} else {
-			AddLine(BPoint(bounds.left + 1, bounds.top),
-				BPoint(bounds.right, bounds.top), borderColor);
-		}
-		EndLineArray();
-	} else
-		StrokeRect(bounds);
-
-	bounds.InsetBy(1.0f, 1.0f);
-
-	bool enabled = fPrivateData->fEnabled && fMin < fMax
-		&& fProportion < 1.0f && fProportion >= 0.0f;
-
-	rgb_color light, dark, dark1, dark2;
-	if (enabled) {
-		light = tint_color(normal, B_LIGHTEN_MAX_TINT);
-		dark = tint_color(normal, B_DARKEN_3_TINT);
-		dark1 = tint_color(normal, B_DARKEN_1_TINT);
-		dark2 = tint_color(normal, B_DARKEN_2_TINT);
-	} else {
-		light = tint_color(normal, B_LIGHTEN_MAX_TINT);
-		dark = tint_color(normal, B_DARKEN_2_TINT);
-		dark1 = tint_color(normal, B_LIGHTEN_2_TINT);
-		dark2 = tint_color(normal, B_LIGHTEN_1_TINT);
-	}
-
-	SetDrawingMode(B_OP_OVER);
-
-	BRect thumbBG = bounds;
-	bool doubleArrows = _DoubleArrows();
-
-	// Draw arrows
-	if (fOrientation == B_HORIZONTAL) {
-		BRect buttonFrame(bounds.left, bounds.top,
-			bounds.left + bounds.Height(), bounds.bottom);
-
-		_DrawArrowButton(ARROW_LEFT, doubleArrows, buttonFrame, updateRect,
-			enabled, fPrivateData->fButtonDown == ARROW1);
-
-		if (doubleArrows) {
-			buttonFrame.OffsetBy(bounds.Height() + 1, 0.0f);
-			_DrawArrowButton(ARROW_RIGHT, doubleArrows, buttonFrame, updateRect,
-				enabled, fPrivateData->fButtonDown == ARROW2);
-
-			buttonFrame.OffsetTo(bounds.right - ((bounds.Height() * 2) + 1),
-				bounds.top);
-			_DrawArrowButton(ARROW_LEFT, doubleArrows, buttonFrame, updateRect,
-				enabled, fPrivateData->fButtonDown == ARROW3);
-
-			thumbBG.left += bounds.Height() * 2 + 2;
-			thumbBG.right -= bounds.Height() * 2 + 2;
-		} else {
-			thumbBG.left += bounds.Height() + 1;
-			thumbBG.right -= bounds.Height() + 1;
-		}
-
-		buttonFrame.OffsetTo(bounds.right - bounds.Height(), bounds.top);
-		_DrawArrowButton(ARROW_RIGHT, doubleArrows, buttonFrame, updateRect,
-			enabled, fPrivateData->fButtonDown == ARROW4);
-	} else {
-		BRect buttonFrame(bounds.left, bounds.top, bounds.right,
-			bounds.top + bounds.Width());
-
-		_DrawArrowButton(ARROW_UP, doubleArrows, buttonFrame, updateRect,
-			enabled, fPrivateData->fButtonDown == ARROW1);
-
-		if (doubleArrows) {
-			buttonFrame.OffsetBy(0.0f, bounds.Width() + 1);
-			_DrawArrowButton(ARROW_DOWN, doubleArrows, buttonFrame, updateRect,
-				enabled, fPrivateData->fButtonDown == ARROW2);
-
-			buttonFrame.OffsetTo(bounds.left, bounds.bottom
-				- ((bounds.Width() * 2) + 1));
-			_DrawArrowButton(ARROW_UP, doubleArrows, buttonFrame, updateRect,
-				enabled, fPrivateData->fButtonDown == ARROW3);
-
-			thumbBG.top += bounds.Width() * 2 + 2;
-			thumbBG.bottom -= bounds.Width() * 2 + 2;
-		} else {
-			thumbBG.top += bounds.Width() + 1;
-			thumbBG.bottom -= bounds.Width() + 1;
-		}
-
-		buttonFrame.OffsetTo(bounds.left, bounds.bottom - bounds.Width());
-		_DrawArrowButton(ARROW_DOWN, doubleArrows, buttonFrame, updateRect,
-			enabled, fPrivateData->fButtonDown == ARROW4);
-	}
-
-	SetDrawingMode(B_OP_COPY);
-
-	// background for thumb area
-	BRect rect(fPrivateData->fThumbFrame);
-
-	SetHighColor(dark1);
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 
 	uint32 flags = 0;
-	if (!enabled)
+	bool scrollingEnabled = fMin < fMax
+		&& fProportion >= 0.0f && fProportion < 1.0f;
+	if (scrollingEnabled)
+		flags |= BControlLook::B_PARTIALLY_ACTIVATED;
+
+	if (!fPrivateData->fEnabled || !scrollingEnabled)
 		flags |= BControlLook::B_DISABLED;
 
-	// fill background besides the thumb
-	if (fOrientation == B_HORIZONTAL) {
-		BRect leftOfThumb(thumbBG.left, thumbBG.top, rect.left - 1,
-			thumbBG.bottom);
-		BRect rightOfThumb(rect.right + 1, thumbBG.top, thumbBG.right,
-			thumbBG.bottom);
+	bool isFocused = fPrivateData->fBorderHighlighted;
+	if (isFocused)
+		flags |= BControlLook::B_FOCUSED;
 
+	bool doubleArrows = _DoubleArrows();
+
+	// draw border
+	BRect rect = Bounds();
+	be_control_look->DrawScrollBarBorder(this, rect, updateRect, base, flags,
+		fOrientation);
+
+	// inset past border
+	rect.InsetBy(1, 1);
+
+	// draw arrows buttons
+	BRect thumbBG = rect;
+	if (fOrientation == B_HORIZONTAL) {
+		BRect buttonFrame(rect.left, rect.top,
+			rect.left + rect.Height(), rect.bottom);
+
+		be_control_look->DrawScrollBarButton(this, buttonFrame, updateRect,
+			base, flags, BControlLook::B_LEFT_ARROW, fOrientation,
+			fPrivateData->fButtonDown == ARROW1);
+
+		if (doubleArrows) {
+			buttonFrame.OffsetBy(rect.Height() + 1, 0.0f);
+			be_control_look->DrawScrollBarButton(this, buttonFrame,
+				updateRect, base, flags, BControlLook::B_RIGHT_ARROW,
+				fOrientation, fPrivateData->fButtonDown == ARROW2);
+
+			buttonFrame.OffsetTo(rect.right - ((rect.Height() * 2) + 1),
+				rect.top);
+			be_control_look->DrawScrollBarButton(this, buttonFrame,
+				updateRect, base, flags, BControlLook::B_LEFT_ARROW,
+				fOrientation, fPrivateData->fButtonDown == ARROW3);
+
+			thumbBG.left += rect.Height() * 2 + 2;
+			thumbBG.right -= rect.Height() * 2 + 2;
+		} else {
+			thumbBG.left += rect.Height() + 1;
+			thumbBG.right -= rect.Height() + 1;
+		}
+
+		buttonFrame.OffsetTo(rect.right - rect.Height(), rect.top);
+		be_control_look->DrawScrollBarButton(this, buttonFrame, updateRect,
+			base, flags, BControlLook::B_RIGHT_ARROW, fOrientation,
+			fPrivateData->fButtonDown == ARROW4);
+	} else {
+		BRect buttonFrame(rect.left, rect.top, rect.right,
+			rect.top + rect.Width());
+
+		be_control_look->DrawScrollBarButton(this, buttonFrame, updateRect,
+			base, flags, BControlLook::B_UP_ARROW, fOrientation,
+			fPrivateData->fButtonDown == ARROW1);
+
+		if (doubleArrows) {
+			buttonFrame.OffsetBy(0, rect.Width() + 1);
+			be_control_look->DrawScrollBarButton(this, buttonFrame,
+				updateRect, base, flags, BControlLook::B_DOWN_ARROW,
+				fOrientation, fPrivateData->fButtonDown == ARROW2);
+
+			buttonFrame.OffsetTo(rect.left, rect.bottom
+				- ((rect.Width() * 2) + 1));
+			be_control_look->DrawScrollBarButton(this, buttonFrame,
+				updateRect, base, flags, BControlLook::B_UP_ARROW,
+				fOrientation, fPrivateData->fButtonDown == ARROW3);
+
+			thumbBG.top += rect.Width() * 2 + 2;
+			thumbBG.bottom -= rect.Width() * 2 + 2;
+		} else {
+			thumbBG.top += rect.Width() + 1;
+			thumbBG.bottom -= rect.Width() + 1;
+		}
+
+		buttonFrame.OffsetTo(rect.left, rect.bottom - rect.Width());
+		be_control_look->DrawScrollBarButton(this, buttonFrame, updateRect,
+			base, flags, BControlLook::B_DOWN_ARROW, fOrientation,
+			fPrivateData->fButtonDown == ARROW4);
+	}
+
+	// fill background besides the thumb
+	rect = fPrivateData->fThumbFrame;
+	if (fOrientation == B_HORIZONTAL) {
+		BRect leftOfThumb(thumbBG.left, thumbBG.top,
+			rect.left - 1, thumbBG.bottom);
+		BRect rightOfThumb(rect.right + 1, thumbBG.top,
+			thumbBG.right, thumbBG.bottom);
 		be_control_look->DrawScrollBarBackground(this, leftOfThumb,
-			rightOfThumb, updateRect, normal, flags, fOrientation);
+			rightOfThumb, updateRect, base, flags, fOrientation);
 	} else {
 		BRect topOfThumb(thumbBG.left, thumbBG.top,
 			thumbBG.right, rect.top - 1);
-
 		BRect bottomOfThumb(thumbBG.left, rect.bottom + 1,
 			thumbBG.right, thumbBG.bottom);
-
 		be_control_look->DrawScrollBarBackground(this, topOfThumb,
-			bottomOfThumb, updateRect, normal, flags, fOrientation);
+			bottomOfThumb, updateRect, base, flags, fOrientation);
 	}
 
-	rgb_color thumbColor = ui_color(B_SCROLL_BAR_THUMB_COLOR);
-
-	// Draw scroll thumb
-	if (enabled) {
-		// fill the clickable surface of the thumb
-		be_control_look->DrawButtonBackground(this, rect, updateRect,
-			thumbColor, 0, BControlLook::B_ALL_BORDERS, fOrientation);
-		// TODO: Add the other thumb styles - dots and lines
-	} else {
-		if (fMin >= fMax || fProportion >= 1.0f || fProportion < 0.0f) {
-			// we cannot scroll at all
-			_DrawDisabledBackground(thumbBG, light, dark, dark1);
-		} else {
-			// we could scroll, but we're simply disabled
-			float bgTint = 1.06;
-			rgb_color bgLight = tint_color(light, bgTint * 3);
-			rgb_color bgShadow = tint_color(dark, bgTint);
-			rgb_color bgFill = tint_color(dark1, bgTint);
-			if (fOrientation == B_HORIZONTAL) {
-				// left of thumb
-				BRect besidesThumb(thumbBG);
-				besidesThumb.right = rect.left - 1;
-				_DrawDisabledBackground(besidesThumb, bgLight, bgShadow, bgFill);
-				// right of thumb
-				besidesThumb.left = rect.right + 1;
-				besidesThumb.right = thumbBG.right;
-				_DrawDisabledBackground(besidesThumb, bgLight, bgShadow, bgFill);
-			} else {
-				// above thumb
-				BRect besidesThumb(thumbBG);
-				besidesThumb.bottom = rect.top - 1;
-				_DrawDisabledBackground(besidesThumb, bgLight, bgShadow, bgFill);
-				// below thumb
-				besidesThumb.top = rect.bottom + 1;
-				besidesThumb.bottom = thumbBG.bottom;
-				_DrawDisabledBackground(besidesThumb, bgLight, bgShadow, bgFill);
-			}
-			// thumb bevel
-			BeginLineArray(4);
-				AddLine(BPoint(rect.left, rect.bottom),
-						BPoint(rect.left, rect.top), light);
-				AddLine(BPoint(rect.left + 1, rect.top),
-						BPoint(rect.right, rect.top), light);
-				AddLine(BPoint(rect.right, rect.top + 1),
-						BPoint(rect.right, rect.bottom), dark2);
-				AddLine(BPoint(rect.right - 1, rect.bottom),
-						BPoint(rect.left + 1, rect.bottom), dark2);
-			EndLineArray();
-			// thumb fill
-			rect.InsetBy(1.0, 1.0);
-			SetHighColor(dark1);
-			FillRect(rect);
-		}
-	}
+	// draw thumb
+	rect = fPrivateData->fThumbFrame;
+	be_control_look->DrawScrollBarThumb(this, rect, updateRect,
+		ui_color(B_SCROLL_BAR_THUMB_COLOR), flags, fOrientation,
+		fPrivateData->fScrollBarInfo.knob);
 }
 
 
@@ -649,11 +564,15 @@ BScrollBar::MouseDown(BPoint where)
 	if (buttons & B_SECONDARY_MOUSE_BUTTON) {
 		// special absolute scrolling: move thumb to where we clicked
 		fPrivateData->fButtonDown = THUMB;
-		fPrivateData->fClickOffset = fPrivateData->fThumbFrame.LeftTop() - where;
-		if (Orientation() == B_HORIZONTAL)
-			fPrivateData->fClickOffset.x = -fPrivateData->fThumbFrame.Width() / 2;
-		else
-			fPrivateData->fClickOffset.y = -fPrivateData->fThumbFrame.Height() / 2;
+		fPrivateData->fClickOffset
+			= fPrivateData->fThumbFrame.LeftTop() - where;
+		if (Orientation() == B_HORIZONTAL) {
+			fPrivateData->fClickOffset.x
+				= -fPrivateData->fThumbFrame.Width() / 2;
+		} else {
+			fPrivateData->fClickOffset.y
+				= -fPrivateData->fThumbFrame.Height() / 2;
+		}
 
 		SetValue(_ValueFor(where + fPrivateData->fClickOffset));
 		return;
@@ -662,7 +581,8 @@ BScrollBar::MouseDown(BPoint where)
 	// hit test for the thumb
 	if (fPrivateData->fThumbFrame.Contains(where)) {
 		fPrivateData->fButtonDown = THUMB;
-		fPrivateData->fClickOffset = fPrivateData->fThumbFrame.LeftTop() - where;
+		fPrivateData->fClickOffset
+			= fPrivateData->fThumbFrame.LeftTop() - where;
 		Invalidate(fPrivateData->fThumbFrame);
 		return;
 	}
@@ -1550,101 +1470,6 @@ control_scrollbar(scroll_bar_info* info, BScrollBar* bar)
 		return B_BAD_VALUE;
 
 	return B_OK;
-}
-
-
-void
-BScrollBar::_DrawDisabledBackground(BRect area, const rgb_color& light,
-	const rgb_color& dark, const rgb_color& fill)
-{
-	if (!area.IsValid())
-		return;
-
-	if (fOrientation == B_VERTICAL) {
-		int32 height = area.IntegerHeight();
-		if (height == 0) {
-			SetHighColor(dark);
-			StrokeLine(area.LeftTop(), area.RightTop());
-		} else if (height == 1) {
-			SetHighColor(dark);
-			FillRect(area);
-		} else {
-			BeginLineArray(4);
-				AddLine(BPoint(area.left, area.top),
-						BPoint(area.right, area.top), dark);
-				AddLine(BPoint(area.left, area.bottom - 1),
-						BPoint(area.left, area.top + 1), light);
-				AddLine(BPoint(area.left + 1, area.top + 1),
-						BPoint(area.right, area.top + 1), light);
-				AddLine(BPoint(area.right, area.bottom),
-						BPoint(area.left, area.bottom), dark);
-			EndLineArray();
-			area.left++;
-			area.top += 2;
-			area.bottom--;
-			if (area.IsValid()) {
-				SetHighColor(fill);
-				FillRect(area);
-			}
-		}
-	} else {
-		int32 width = area.IntegerWidth();
-		if (width == 0) {
-			SetHighColor(dark);
-			StrokeLine(area.LeftBottom(), area.LeftTop());
-		} else if (width == 1) {
-			SetHighColor(dark);
-			FillRect(area);
-		} else {
-			BeginLineArray(4);
-				AddLine(BPoint(area.left, area.bottom),
-						BPoint(area.left, area.top), dark);
-				AddLine(BPoint(area.left + 1, area.bottom),
-						BPoint(area.left + 1, area.top + 1), light);
-				AddLine(BPoint(area.left + 1, area.top),
-						BPoint(area.right - 1, area.top), light);
-				AddLine(BPoint(area.right, area.top),
-						BPoint(area.right, area.bottom), dark);
-			EndLineArray();
-			area.left += 2;
-			area.top ++;
-			area.right--;
-			if (area.IsValid()) {
-				SetHighColor(fill);
-				FillRect(area);
-			}
-		}
-	}
-}
-
-
-void
-BScrollBar::_DrawArrowButton(int32 direction, bool doubleArrows, BRect rect,
-	const BRect& updateRect, bool enabled, bool down)
-{
-	if (!updateRect.Intersects(rect))
-		return;
-
-	uint32 flags = 0;
-	if (!enabled)
-		flags |= BControlLook::B_DISABLED;
-
-	if (down && fPrivateData->fDoRepeat)
-		flags |= BControlLook::B_ACTIVATED;
-
-	// TODO: Why does BControlLook need this as the base color for the
-	// scrollbar to look right?
-	rgb_color baseColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-		B_LIGHTEN_1_TINT);
-
-	be_control_look->DrawButtonBackground(this, rect, updateRect, baseColor,
-		flags, BControlLook::B_ALL_BORDERS, fOrientation);
-
-	// TODO: Why does BControlLook need this negative inset for the arrow to
-	// look right?
-	rect.InsetBy(-1.0f, -1.0f);
-	be_control_look->DrawArrowShape(this, rect, updateRect,
-		baseColor, direction, flags, B_DARKEN_MAX_TINT);
 }
 
 

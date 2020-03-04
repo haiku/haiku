@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2017 Haiku, Inc. All rights reserved.
+ * Copyright 2012-2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -91,9 +91,42 @@ B_IF_GCC_2(_ReservedControlLook1__Q28BPrivate12BControlLook,
 }
 
 
-void BControlLook::_ReservedControlLook2() {}
-void BControlLook::_ReservedControlLook3() {}
-void BControlLook::_ReservedControlLook4() {}
+extern "C" void
+B_IF_GCC_2(_ReservedControlLook2__Q28BPrivate12BControlLook,
+		_ZN8BPrivate12BControlLook21_ReservedControlLook2Ev)(
+	BControlLook* controlLook, BView* view, BRect rect,
+		const BRect& updateRect, const rgb_color& base, uint32 flags,
+		int32 direction, orientation orientation, bool down)
+{
+	controlLook->DrawScrollBarButton(view, rect, updateRect, base, flags,
+		direction, orientation, down);
+}
+
+
+extern "C" void
+B_IF_GCC_2(_ReservedControlLook3__Q28BPrivate12BControlLook,
+		_ZN8BPrivate12BControlLook21_ReservedControlLook3Ev)(
+	BControlLook* controlLook, BView* view, BRect rect,
+		const BRect& updateRect, const rgb_color& base, uint32 flags,
+		int32 direction, orientation orientation, uint32 knobStyle)
+{
+	controlLook->DrawScrollBarThumb(view, rect, updateRect, base, flags,
+		orientation, knobStyle);
+}
+
+
+extern "C" void
+B_IF_GCC_2(_ReservedControlLook4__Q28BPrivate12BControlLook,
+		_ZN8BPrivate12BControlLook21_ReservedControlLook4Ev)(
+	BControlLook* controlLook, BView* view, BRect rect,
+		const BRect& updateRect, const rgb_color& base, uint32 flags,
+		orientation orientation)
+{
+	controlLook->DrawScrollBarBorder(view, rect, updateRect, base, flags,
+		orientation);
+}
+
+
 void BControlLook::_ReservedControlLook5() {}
 void BControlLook::_ReservedControlLook6() {}
 void BControlLook::_ReservedControlLook7() {}

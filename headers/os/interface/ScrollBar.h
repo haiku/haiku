@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_SCROLL_BAR_H
@@ -121,14 +121,6 @@ private:
 			BRect				_ButtonRectFor(int32 button) const;
 			void				_UpdateTargetValue(BPoint where);
 			void				_UpdateArrowButtons();
-			void				_DrawDisabledBackground(BRect area,
-									const rgb_color& light,
-									const rgb_color& dark,
-									const rgb_color& fill);
-			void				_DrawArrowButton(int32 direction,
-									bool doubleArrows, BRect frame,
-									const BRect& updateRect,
-									bool enabled, bool down);
 
 			BSize				_MinSize() const;
 
