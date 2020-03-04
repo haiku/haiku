@@ -76,7 +76,8 @@ const int kScrollerHeight = 12;
 
 BMenuScroller::BMenuScroller(BRect frame)
 	:
-	BView(frame, "menu scroller", 0, B_WILL_DRAW | B_FRAME_EVENTS),
+	BView(frame, "menu scroller", 0, B_WILL_DRAW | B_FRAME_EVENTS
+		| B_FULL_UPDATE_ON_RESIZE),
 	fEnabled(false)
 {
 	SetViewUIColor(B_MENU_BACKGROUND_COLOR);
@@ -298,6 +299,15 @@ BMenuWindow::AttachScrollers()
 	fMenu->MakeFocus(true);
 
 	BRect frame = Bounds();
+	float newLimit = fMenu->Bounds().Height()
+		- (frame.Height() - 2 * kScrollerHeight);
+
+	if (!HasScrollers())
+		fValue = 0;
+	else if (fValue > newLimit)
+		_ScrollBy(newLimit - fValue);
+
+	fLimit = newLimit;
 
 	if (fUpperScroller == NULL) {
 		fUpperScroller = new UpperScroller(
@@ -312,14 +322,14 @@ BMenuWindow::AttachScrollers()
 		AddChild(fLowerScroller);
 	}
 
-	fUpperScroller->SetEnabled(false);
-	fLowerScroller->SetEnabled(true);
+	fUpperScroller->ResizeTo(frame.right, kScrollerHeight - 1);
+	fLowerScroller->ResizeTo(frame.right, kScrollerHeight - 1);
 
-	fMenuFrame->ResizeBy(0, -2 * kScrollerHeight);
-	fMenuFrame->MoveBy(0, kScrollerHeight);
+	fUpperScroller->SetEnabled(fValue > 0);
+	fLowerScroller->SetEnabled(fValue < fLimit);
 
-	fValue = 0;
-	fLimit = fMenu->Bounds().Height() - (frame.Height() - 2 * kScrollerHeight);
+	fMenuFrame->ResizeTo(frame.Width(), frame.Height() - 2 * kScrollerHeight);
+	fMenuFrame->MoveTo(0, kScrollerHeight);
 }
 
 
@@ -341,6 +351,13 @@ BMenuWindow::DetachScrollers()
 		RemoveChild(fUpperScroller);
 		delete fUpperScroller;
 		fUpperScroller = NULL;
+	}
+
+	BRect frame = Bounds();
+
+	if (fMenuFrame != NULL) {
+		fMenuFrame->ResizeTo(frame.Width(), frame.Height());
+		fMenuFrame->MoveTo(0, 0);
 	}
 }
 

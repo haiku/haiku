@@ -2931,6 +2931,9 @@ BMenu::_UpdateWindowViewSize(const bool &move)
 
 	if (fItems.CountItems() > 0) {
 		if (!scroll) {
+			if (fLayout == B_ITEMS_IN_COLUMN)
+				window->DetachScrollers();
+
 			window->ResizeTo(Bounds().Width(), Bounds().Height());
 		} else {
 			BScreen screen(window);
