@@ -1113,16 +1113,11 @@ BListView::ScrollToSelection()
 {
 	BRect itemFrame = ItemFrame(CurrentSelection(0));
 
-	if (Bounds().Contains(itemFrame))
-		return;
-
-	float scrollPos = itemFrame.top < Bounds().top ?
-		itemFrame.top : itemFrame.bottom - Bounds().Height();
-
-	if (itemFrame.top - scrollPos < Bounds().top)
-		scrollPos = itemFrame.top;
-
-	ScrollTo(itemFrame.left, scrollPos);
+	if (itemFrame.top < Bounds().top
+		|| itemFrame.Height() > Bounds().Height())
+		ScrollBy(0, itemFrame.top - Bounds().top);
+	else if (itemFrame.bottom > Bounds().bottom)
+		ScrollBy(0, itemFrame.bottom - Bounds().bottom);
 }
 
 
