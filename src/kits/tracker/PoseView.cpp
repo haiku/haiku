@@ -4047,15 +4047,25 @@ BPoseView::ScrollIntoView(BRect poseRect)
 	if (IsDesktopWindow())
 		return;
 
-	if (ViewMode() == kListMode) {
-		// if we're in list view then we only care that the entire
-		// pose is visible vertically, not horizontally
-		poseRect.left = 0;
-		poseRect.right = poseRect.left + 1;
+	BPoint oldPos = Bounds().LeftTop(), newPos = oldPos;
+
+	// In list mode, only scroll vertically
+	if (ViewMode() != kListMode) {
+		if (poseRect.left < Bounds().left
+			|| poseRect.Width() > Bounds().Width())
+			newPos.x += poseRect.left - Bounds().left;
+		else if (poseRect.right > Bounds().right)
+			newPos.x += poseRect.right - Bounds().right;
 	}
 
-	if (!Bounds().Contains(poseRect))
-		SetScrollBarsTo(poseRect.LeftTop());
+	if (poseRect.top < Bounds().top
+		|| poseRect.Height() > Bounds().Height())
+		newPos.y += poseRect.top - Bounds().top;
+	else if (poseRect.bottom > Bounds().bottom)
+		newPos.y += poseRect.bottom - Bounds().bottom;
+
+	if (newPos != oldPos)
+		SetScrollBarsTo(newPos);
 }
 
 
