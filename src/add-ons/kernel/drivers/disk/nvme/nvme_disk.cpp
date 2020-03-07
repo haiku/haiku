@@ -422,14 +422,14 @@ do_nvme_io(nvme_disk_driver_info* info, off_t rounded_pos, void* buffer,
 	mutex_unlock(&qpinfo->mtx);
 	if (ret != 0) {
 		TRACE_ERROR("attempt to queue %s I/O at %" B_PRIdOFF " of %" B_PRIuSIZE
-			" bytes failed!", write ? "write" : "read", rounded_pos, *rounded_len);
+			" bytes failed!\n", write ? "write" : "read", rounded_pos, *rounded_len);
 		return ret;
 	}
 
 	await_status(info, qpinfo->qpair, status);
 
 	if (status != B_OK) {
-		TRACE_ERROR("%s at %" B_PRIdOFF " of %" B_PRIuSIZE " bytes failed!",
+		TRACE_ERROR("%s at %" B_PRIdOFF " of %" B_PRIuSIZE " bytes failed!\n",
 			write ? "write" : "read", rounded_pos, *rounded_len);
 		*rounded_len = 0;
 	}
