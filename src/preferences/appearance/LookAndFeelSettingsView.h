@@ -5,8 +5,8 @@
  *	Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Alexander von Gluck <kallisti5@unixzen.com>
- *		John Scipione <jscipione@gmail.com>
  *		Ryan Leavengood <leavengood@gmail.com>
+ *		John Scipione <jscipione@gmail.com>
  */
 #ifndef LOOK_AND_FEEL_SETTINGS_VIEW_H
 #define LOOK_AND_FEEL_SETTINGS_VIEW_H
@@ -72,5 +72,6 @@ private:
 
 			bool				fSavedDoubleArrowsValue;
 };
+
 
 #endif // LOOK_AND_FEEL_SETTINGS_VIEW_H

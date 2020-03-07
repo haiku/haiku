@@ -67,7 +67,7 @@ static const int32 kMsgKnobStyleLines = 'mksl';
 static const bool kDefaultDoubleScrollBarArrowsSetting = false;
 
 
-//	#pragma mark -
+//	#pragma mark - LookAndFeelSettingsView
 
 
 LookAndFeelSettingsView::LookAndFeelSettingsView(const char* name)
@@ -175,13 +175,13 @@ LookAndFeelSettingsView::AttachedToWindow()
 
 
 void
-LookAndFeelSettingsView::MessageReceived(BMessage *msg)
+LookAndFeelSettingsView::MessageReceived(BMessage* message)
 {
-	switch (msg->what) {
+	switch (message->what) {
 		case kMsgSetDecor:
 		{
 			BString newDecor;
-			if (msg->FindString("decor", &newDecor) == B_OK)
+			if (message->FindString("decor", &newDecor) == B_OK)
 				_SetDecor(newDecor);
 			break;
 		}
@@ -206,9 +206,10 @@ LookAndFeelSettingsView::MessageReceived(BMessage *msg)
 			infoText.ReplaceFirst("%decorAuthors", authorsText.String());
 			infoText.ReplaceFirst("%decorLic", decor->LicenseName().String());
 			infoText.ReplaceFirst("%decorURL", decor->SupportURL().String());
-			infoText.ReplaceFirst("%decorDesc", decor->ShortDescription().String());
+			infoText.ReplaceFirst("%decorDesc",
+				decor->ShortDescription().String());
 
-			BAlert *infoAlert = new BAlert(B_TRANSLATE("About decorator"),
+			BAlert* infoAlert = new BAlert(B_TRANSLATE("About decorator"),
 				infoText.String(), B_TRANSLATE("OK"));
 			infoAlert->SetFlags(infoAlert->Flags() | B_CLOSE_ON_ESCAPE);
 			infoAlert->Go();
@@ -218,10 +219,9 @@ LookAndFeelSettingsView::MessageReceived(BMessage *msg)
 
 		case kMsgSetControlLook:
 		{
-			BString newControlLook;
-			if (msg->FindString("control_look", &newControlLook) == B_OK) {
-				BPrivate::set_control_look(newControlLook);
-			}
+			BString controlLook;
+			if (message->FindString("control_look", &controlLook) == B_OK)
+				BPrivate::set_control_look(controlLook);
 			break;
 		}
 
@@ -232,7 +232,7 @@ LookAndFeelSettingsView::MessageReceived(BMessage *msg)
 			if (!BPrivate::get_control_look(path))
 				break;
 
-			if (path.Length()) {
+			if (path.Length() > 0) {
 				BFile file(path.String(), B_READ_ONLY);
 				if (file.InitCheck() != B_OK)
 					break;
@@ -247,7 +247,7 @@ LookAndFeelSettingsView::MessageReceived(BMessage *msg)
 				infoText << "\n" << version.long_info;
 			}
 
-			BAlert *infoAlert = new BAlert(B_TRANSLATE("About control look"),
+			BAlert* infoAlert = new BAlert(B_TRANSLATE("About control look"),
 				infoText.String(), B_TRANSLATE("OK"));
 			infoAlert->SetFlags(infoAlert->Flags() | B_CLOSE_ON_ESCAPE);
 			infoAlert->Go();
@@ -264,10 +264,13 @@ LookAndFeelSettingsView::MessageReceived(BMessage *msg)
 			break;
 
 		default:
-			BView::MessageReceived(msg);
+			BView::MessageReceived(message);
 			break;
 	}
 }
+
+
+//	#pragma mark - LookAndFeelSettingsView private methods
 
 
 void
@@ -322,12 +325,13 @@ LookAndFeelSettingsView::_BuildControlLookMenu()
 	status_t error = pathFinder.FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY,
 		"control_look", paths);
 
-	for (int i = 0; i < paths.CountStrings(); ++i) {
+	int32 count = paths.CountStrings();
+	for (int32 i = 0; i < count; ++i) {
 		if (error != B_OK || dir.SetTo(paths.StringAt(i)) != B_OK)
 			continue;
 
 		BEntry entry;
-		for (; dir.GetNextEntry(&entry) == B_OK;) {
+		while (dir.GetNextEntry(&entry) == B_OK) {
 			BPath path(paths.StringAt(i), entry.Name());
 			BString name(entry.Name());
 			name.RemoveLast("ControlLook");
