@@ -1,3 +1,0 @@
-SubDir HAIKU_TOP src tests bin ;
-
-SubInclude HAIKU_TOP src tests bin makeudfimage ;
