@@ -102,8 +102,15 @@
 		- BApplication
 		- BClipboard
 		- BCursor
+		- BLaunchRoster
+		- BNotification
 		- BPropertyInfo
 		- BRoster
+
+	A third special category is the \link app_keystore Password and Key storage
+	API:\endlink
+		- BKey
+		- BKeyStore
 
 
 	\defgroup game Game Kit

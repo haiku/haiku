@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Copyright 2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -16,7 +16,11 @@
 	\ingroup app
 	\ingroup libbe
 	\brief Provides BKey and BPasswordKey classes, as well as BKeyPurpose and
-        BKeyType enums.
+		BKeyType enums.
+
+	See the \link app_keystore overview to the Password and Key Storage API
+	\endlink for an introduction to the API.
+
 */
 
 
@@ -24,58 +28,79 @@
 
 
 /*!
-    \enum BKeyPurpose
-    \brief Undocumented
+	\enum BKeyPurpose
+	\brief Descriptive constant for the purpose of the key
 
-    \since Haiku R1
+	\since Haiku R1
 */
 
 
 /*!
-    \var BKeyPurpose::B_KEY_PURPOSE_ANY
-    \brief Undocumented
+	\var BKeyPurpose::B_KEY_PURPOSE_ANY
+	\brief Query the key store for keys with any purpose.
 
-    \since Haiku R1
+	This constant does not represent a key purpose by itself, but rather is
+	used in querying the key store where you do not know or care about the
+	purpose of key you are looking for.
+
+	\since Haiku R1
 */
 
 
 /*!
-    \var BKeyPurpose::B_KEY_PURPOSE_GENERIC
-    \brief Undocumented
+	\var BKeyPurpose::B_KEY_PURPOSE_GENERIC
+	\brief Generic key purpose
 
-    \since Haiku R1
+	This type identifies keys that are not for a specific purpose.
+
+	\since Haiku R1
 */
 
 
 /*!
-    \var BKeyPurpose::B_KEY_PURPOSE_KEYRING
-    \brief Undocumented
+	\var BKeyPurpose::B_KEY_PURPOSE_KEYRING
+	\brief Keyring key purpose
 
-    \since Haiku R1
+	This is a key purpose that is internal to the \c keystore_server. It
+	represents the internals of a keyring. You cannot directly access and
+	manipulate keys with this purpose. Instead you can use the methods on
+	\ref BKeyStore to access keys within keyrings.
+
+	\since Haiku R1
 */
 
 
 /*!
-    \var BKeyPurpose::B_KEY_PURPOSE_WEB
-    \brief Undocumented
+	\var BKeyPurpose::B_KEY_PURPOSE_WEB
+	\brief Web key purpose
 
-    \since Haiku R1
+	This type refers to keys that are used on the web, such as username and
+	passwords for HTTP authentication, as well as for stored usernames and
+	passwords for form-based authentication.
+
+	\since Haiku R1
 */
 
 
 /*!
-    \var BKeyPurpose::B_KEY_PURPOSE_NETWORK
-    \brief Undocumented
+	\var BKeyPurpose::B_KEY_PURPOSE_NETWORK
+	\brief Network key purpose
 
-    \since Haiku R1
+	This type refers to keys that are used in the networking stack, such as
+	WEP/WPA keys.
+
+	\since Haiku R1
 */
 
 
 /*!
-    \var BKeyPurpose::B_KEY_PURPOSE_VOLUME
-    \brief Undocumented
+	\var BKeyPurpose::B_KEY_PURPOSE_VOLUME
+	\brief Volume key purpose
 
-    \since Haiku R1
+	This type refers to keys that are used to lock volumes, like password for
+	encryption.
+
+	\since Haiku R1
 */
 
 
@@ -83,42 +108,53 @@
 
 
 /*!
-    \enum BKeyType
-    \brief Undocumented
+	\enum BKeyType
+	\brief Descriptive constant for the type of a key.
 
-    \since Haiku R1
+	\since Haiku R1
 */
 
 
 /*!
-    \var BKeyType::B_KEY_TYPE_ANY
-    \brief Undocumented
+	\var BKeyType::B_KEY_TYPE_ANY
+	\brief Query the key store for keys of any type
 
-    \since Haiku R1
+	This constant does not represent a key type by itself, but rather is
+	used in querying the key store where you do not know or care about the
+	type of key you are looking for.
+
+	\since Haiku R1
 */
 
 
 /*!
-    \var BKeyType::B_KEY_TYPE_GENERIC
-    \brief Undocumented
+	\var BKeyType::B_KEY_TYPE_GENERIC
+	\brief Generic key type.
 
-    \since Haiku R1
+	This constant describes the type of key that does not have any particular
+	content or format. They are represented by the \ref BKey class.
+
+	\since Haiku R1
 */
 
 
 /*!
-    \var BKeyType::B_KEY_TYPE_PASSWORD
-    \brief Undocumented
+	\var BKeyType::B_KEY_TYPE_PASSWORD
+	\brief The key is a password.
 
-    \since Haiku R1
+	This key type is represented by the \ref BPasswordKey class.
+
+	\since Haiku R1
 */
 
 
 /*!
-    \var BKeyType::B_KEY_TYPE_CERTIFICATE
-    \brief Undocumented
+	\var BKeyType::B_KEY_TYPE_CERTIFICATE
+	\brief The key is a certificate. Not in use.
 
-    \since Haiku R1
+	This key type is for future expansion. It is currently not in use.
+
+	\since Haiku R1
 */
 
 
@@ -126,60 +162,101 @@
 
 
 /*!
-    \class BKey
-    \brief Undocumented
+	\class BKey
+	\ingroup app
+	\ingroup libbe
+	\brief Class that represents a generic key for or from the Haiku key
+	       store
 
-    \since Haiku R1
+	A key has the following properties:
+	 - A key \b type of \ref BKeyType, which identifies the type. For a generic
+	   key (like this key), it will be set to \ref BKeyType::B_KEY_TYPE_GENERIC.
+	 - A key \b purpose of \ref BKeyPurpose, which identifies the purpose of the
+	   key. This is a hint for your (or other) applications on how and where the
+	   key may be used.
+	 - A \b primary \b identifier that identifies a specific key. As an example,
+	   for WPA passwords, this is set to the network name. This should be a
+	   valid UTF-8 string.
+	 - A \b secondary \b identifier that can be used as additional metadata.
+	 - The \b data, the actual value of the key (such as a password or a
+	   certificate). This should be a valid UTF-8 string.
+	 - Not in use: the \b owner identifies who created and/or owns the key.
+	   This feature is not yet enabled. It will always be set to an empty
+	   string.
+	 - Not in use: the \b creation \b time will indicate when a key was stored
+	   in the central database. This feature is not yet enabled, and the value
+	   will always be 0.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BKey::BKey();
-    \brief Undocumented
+	\brief Constructor for an empty generic key.
 
-    \since Haiku R1
+	An empty key has no data associated with it, other than that it has a
+	generic purpose and a generic key type.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BKey::BKey(BKeyPurpose purpose, const char* identifier, 
-        const char* secondaryIdentifier = NULL, const uint8* data = NULL,
+		const char* secondaryIdentifier = NULL, const uint8* data = NULL,
 		size_t length = 0)
-    \brief Undocumented
+	\brief Constructor for a generic key with the provided data.
 
-    \since Haiku R1
+	See the class introduction for more information about the properties of
+	a key. As you can see, the only required parameters are the \a purpose
+	and the \a identifier. Any data you provide will be copied into the BKey
+	object.
+
+	\param purpose The purpose of this key
+	\param identifier A unique identifier for this key
+	\param secondaryIdentifier An (optional) secondary identifier for this key
+	\param data A pointer to a buffer that contains the value of the key, such
+		as the password or the certificate data.
+	\param length The length of the data in bytes that should be copied.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BKey::BKey(BKey& other)
-    \brief Undocumented
+	\brief Copy constructor that makes a copy of an \a other BKey.
 
-    \since Haiku R1
+	\since Haiku R1
 */
 
 
 /*!
 	\fn virtual BKey::~BKey()
-    \brief Undocumented
+	\brief Free all resources associated with this key.
 
-    \since Haiku R1
+	\since Haiku R1
 */
 
 
 /*!
 	\fn virtual	BKeyType BKey::Type() const
-    \brief Undocumented
+	\brief Returns the type of key.
 
-    \since Haiku R1
+	For a generic BKey, this will always be \ref BKeyType::B_KEY_TYPE_GENERIC
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BKey::Unset()
-    \brief Undocumented
+	\brief Reset the values of the key.
 
-    \since Haiku R1
+	All properties of the key will be reset, except for the identifying owner.
+
+	\since Haiku R1
 */
 
 
@@ -187,236 +264,316 @@
 	\fn status_t BKey::SetTo(BKeyPurpose purpose, const char* identifier,
 		const char* secondaryIdentifier = NULL, const uint8* data = NULL,
 		size_t length = 0)
-    \brief Undocumented
+	\brief Set the key to the specified values.
 
-    \since Haiku R1
+	All properties of the key will be set to the parameters. If the key had a
+	creation time set, it will be cleared. If there was an owner set, this
+	piece of information will \em not be cleared.
+
+	\param purpose The purpose of this key
+	\param identifier A unique identifier for this key
+	\param secondaryIdentifier An (optional) secondary identifier for this key
+	\param data A pointer to a buffer that contains the value of the key, such
+		as the password or the certificate data.
+	\param length The length of the data in bytes that should be copied.
+
+	\returns
+		- \c B_OK if the changes were successful.
+		- \c B_NO_MEMORY in case it fails to allocate memory.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BKey::SetPurpose(BKeyPurpose purpose)
-    \brief Undocumented
+	\brief Set the purpose of the key.
 
-    \since Haiku R1
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BKeyPurpose BKey::Purpose() const
-    \brief Undocumented
+	\brief Get the purpose of the key.
 
-    \since Haiku R1
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BKey::SetIdentifier(const char* identifier)
-    \brief Undocumented
+	\brief Set the identifier of the key.
 
-    \since Haiku R1
+	\param identifier A pointer to a valid UTF-8 string.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn const char* BKey::Identifier() const
-    \brief Undocumented
+	\brief Get the identifier of the key.
 
-    \since Haiku R1
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BKey::SetSecondaryIdentifier(const char* identifier)
-    \brief Undocumented
+	\brief Set the secondary identifier of the key.
 
-    \since Haiku R1
+	\param identifier A pointer to a valid UTF-8 string.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn const char* BKey::SecondaryIdentifier() const
-    \brief Undocumented
+	\brief Get the secondary identifier of the key.
 
-    \since Haiku R1
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BKey::SetData(const uint8* data, size_t length)
-    \brief Undocumented
+	\brief Set the data for the key.
 
-    \since Haiku R1
+	\param data A pointer to the buffer that contains the data of the key.
+	\param length The length in bytes of the data.
+
+	\returns
+	 - \c B_OK if the key data was updated.
+	 - \c B_NO_MEMORY in case it fails to allocate memory.
+	\since Haiku R1
 */
 
 
 /*!
 	\fn size_t BKey::DataLength() const
-    \brief Undocumented
+	\brief Get the size of the key in bytes.
 
-    \since Haiku R1
+	\since Haiku R1
 */
 
 
 /*!
 	\fn const uint8* BKey::Data() const
-    \brief Undocumented
+	\brief Get a pointer to the data of the key.
 
-    \since Haiku R1
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BKey::GetData(uint8* buffer, size_t bufferSize) const
-    \brief Undocumented
+	\brief Copy the key into the \a buffer.
 
-    \since Haiku R1
+	It is up to you to make sure the size of the buffer is the actual size of
+	the key's data. If the provided buffer is smaller, only the \a bufferSize
+	will be copied. If the buffer is larger, the key is copied, but the rest
+	of the buffer will not be touched.
+
+	\param[out] buffer The buffer to copy the key to.
+	\param[in] bufferSize The size of the provided \a buffer.
+
+	\returns
+		- \c B_OK if the data is sucessfully copied.
+		- An other error code if there was an issue copying the data.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn const char* BKey::Owner() const
-    \brief Undocumented
+	\brief Get the owner of the key.
 
-    \since Haiku R1
+	\since Haiku R1
 */
 
 
 /*!
 	\fn bigtime_t BKey::CreationTime() const
-    \brief Undocumented
+	\brief Get the creation time of the key.
 
-    \since Haiku R1
+	\since Haiku R1
 */
 
 
 /*!
 	\fn virtual status_t BKey::Flatten(BMessage& message) const
-    \brief Undocumented
+	\brief Flatten the key into a \a message.
 
-    \since Haiku R1
+	\since Haiku R1
 */
 
 
 /*!
 	\fn virtual status_t BKey::Unflatten(const BMessage& message)
-    \brief Undocumented
+	\brief Unflatten the key from a \a message.
 
-    \since Haiku R1
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BKey& BKey::operator=(const BKey& other)
-    \brief Undocumented
+	\brief Copy the data from the \a other key into this key.
 
-    \since Haiku R1
+	\since Haiku R1
 */
 
 
 /*!
 	\fn bool BKey::operator==(const BKey& other) const
-    \brief Undocumented
+	\brief Compare this key to an \a other key.
 
-    \since Haiku R1
+	\returns \c true if all the properties in both keys are identical.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn bool BKey::operator!=(const BKey& other) const
-    \brief Undocumented
+	\brief Compare this key to an \a other key.
 
-    \since Haiku R1
+	\returns \c true if any of the properties in this key differ from \a other.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn virtual void BKey::PrintToStream();
-    \brief Undocumented
+	\fn virtual void BKey::PrintToStream()
+	\brief Dump the contents of the key to standard output.
 
-    \since Haiku R1
+	This is a debug function that helps you read the contents of the key. All
+	properties, except for the actual \c data of the key, will be printed to
+	\c stdout.
+
+	\since Haiku R1
 */
 
 
 ///// BPasswordKey class /////
 
 
-
 /*!
-    \class BPasswordKey
-    \brief Undocumented
+	\class BPasswordKey
+	\ingroup app
+	\ingroup libbe
+	\brief Class that represents a password for or from the Haiku key store.
 
-    \since Haiku R1
+	This is a specialized version of the BKey class, which represents a key of
+	the \ref BKeyType::B_KEY_TYPE_PASSWORD. 
+
+	\since Haiku R1
 */
 
 /*!
 	\fn BPasswordKey::BPasswordKey()
-    \brief Undocumented
+	\brief Constructor for an empty password key.
 
-    \since Haiku R1
+	An empty key has no data associated with it, other than that it has a
+	generic purpose and a password key type.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BPasswordKey::BPasswordKey(const char* password, BKeyPurpose purpose,
-        const char* identifier, const char* secondaryIdentifier = NULL)
-    \brief Undocumented
+		const char* identifier, const char* secondaryIdentifier = NULL)
+	\brief Constructor for a password key with the provided data.
 
-    \since Haiku R1
+	See the BKey introduction for more information about the properties of
+	a key. As you can see, the only required parameters are the \a purpose
+	and the \a identifier. Any data you provide will be copied into the BKey
+	object.
+
+	\param password A null-terminated string that contains the password
+	\param purpose The purpose of this key
+	\param identifier A unique identifier for this key
+	\param secondaryIdentifier An (optional) secondary identifier for this key
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BPasswordKey::BPasswordKey(BPasswordKey& other)
-    \brief Undocumented
+	\brief Copy constructor that makes a copy of an \a other BPasswordKey.
 
-    \since Haiku R1
+	\since Haiku R1
 */
 
 
 /*!
 	\fn virtual BPasswordKey::~BPasswordKey()
-    \brief Undocumented
+	\brief Free all resources associated with this key.
 
-    \since Haiku R1
+	\since Haiku R1
 */
 
 
 /*!
 	\fn virtual BKeyType BPasswordKey::Type() const
-    \brief Undocumented
+	\brief Returns \ref BKeyType::B_KEY_TYPE_PASSWORD.
 
-    \since Haiku R1
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BPasswordKey::SetTo(const char* password, BKeyPurpose purpose,
 		const char* identifier, const char* secondaryIdentifier = NULL)
-    \brief Undocumented
+	\brief Set the key to specific values.
 
-    \since Haiku R1
+	All properties of the key will be set to the parameters. If the key had a
+	creation time set, it will be cleared. If there was an owner set, this
+	piece of information will \em not be cleared.
+
+	\param password A null-terminated string that contains the password
+	\param purpose The purpose of this key
+	\param identifier A unique identifier for this key
+	\param secondaryIdentifier An (optional) secondary identifier for this key
+
+	\returns
+		- \c B_OK if the changes were successful.
+		- \c B_NO_MEMORY in case it fails to allocate memory.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BPasswordKey::SetPassword(const char* password)
-    \brief Undocumented
+	\brief Set the \a password for this key.
 
-    \since Haiku R1
+	\param password A null-terminated string that contains the password.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn const char* BPasswordKey::Password() const
-    \brief Undocumented
+	\brief Get the password for the key.
 
-    \since Haiku R1
+	\since Haiku R1
 */
 
 
 /*!
 	\fn virtual void BPasswordKey::PrintToStream()
-    \brief Undocumented
+	\brief Dump the contents of the key to standard output.
 
-    \since Haiku R1
+	This is a debug function that helps you read the contents of the key. All
+	properties, including the actual \b password, will be printed to \c stdout.
+
+	\since Haiku R1
 */
