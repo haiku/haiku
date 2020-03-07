@@ -324,14 +324,14 @@ embedded_controller_init_driver(device_node* dev, void** _driverCookie)
 	// and GPE bit, similar to _PRW.
 	status = sc->ec_acpi->evaluate_method(sc->ec_handle, "_GPE", NULL, &buf);
 	if (status != B_OK) {
-		ERROR("can't evaluate _GPE\n");
-		goto error;
+		ERROR("can't evaluate _GPE %s\n", strerror(status));
+		goto error2;
 	}
 
 	acpi_object_type* obj;
 	obj = (acpi_object_type*)buf.pointer;
 	if (obj == NULL)
-		goto error;
+		goto error2;
 
 	switch (obj->object_type) {
 		case ACPI_TYPE_INTEGER:
@@ -340,16 +340,16 @@ embedded_controller_init_driver(device_node* dev, void** _driverCookie)
 			break;
 		case ACPI_TYPE_PACKAGE:
 			if (!ACPI_PKG_VALID(obj, 2))
-				goto error;
+				goto error2;
 			sc->ec_gpehandle = acpi_GetReference(sc->ec_acpi_module, NULL,
 				&obj->package.objects[0]);
 			if (sc->ec_gpehandle == NULL
 				|| acpi_PkgInt32(obj, 1, (uint32*)&sc->ec_gpebit) != B_OK)
-				goto error;
+				goto error2;
 			break;
 		default:
 			ERROR("_GPE has invalid type %i\n", int(obj->object_type));
-			goto error;
+			goto error2;
 	}
 
 	sc->ec_suspending = FALSE;
@@ -359,7 +359,7 @@ embedded_controller_init_driver(device_node* dev, void** _driverCookie)
 		embedded_controller_io_ports_parse_callback, sc);
 	if (status != B_OK) {
 		ERROR("Error while getting IO ports addresses\n");
-		goto error;
+		goto error2;
 	}
 
 	// Install a handler for this EC's GPE bit.  We want edge-triggered
@@ -369,7 +369,7 @@ embedded_controller_init_driver(device_node* dev, void** _driverCookie)
 		sc->ec_gpebit, ACPI_GPE_EDGE_TRIGGERED, &EcGpeHandler, sc);
 	if (status != B_OK) {
 		TRACE("can't install ec GPE handler\n");
-		goto error;
+		goto error1;
 	}
 
 	// Install address space handler
@@ -378,25 +378,32 @@ embedded_controller_init_driver(device_node* dev, void** _driverCookie)
 		ACPI_ADR_SPACE_EC, &EcSpaceHandler, &EcSpaceSetup, sc);
 	if (status != B_OK) {
 		ERROR("can't install address space handler\n");
-		goto error;
+		goto error1;
 	}
 
 	// Enable runtime GPEs for the handler.
 	status = sc->ec_acpi_module->enable_gpe(sc->ec_gpehandle, sc->ec_gpebit);
 	if (status != B_OK) {
 		ERROR("AcpiEnableGpe failed.\n");
-		goto error;
+		goto error1;
 	}
 
 	return 0;
 
-error:
-	free(buf.pointer);
-
+error1:
 	sc->ec_acpi_module->remove_gpe_handler(sc->ec_gpehandle, sc->ec_gpebit,
 		&EcGpeHandler);
 	sc->ec_acpi->remove_address_space_handler(sc->ec_handle, ACPI_ADR_SPACE_EC,
 		EcSpaceHandler);
+
+error2:
+	free(buf.pointer);
+
+	// remove child nodes
+	device_node *child = NULL;
+	const device_attr attrs[] = { { NULL } };
+	while (gDeviceManager->get_next_child_node(dev, attrs, &child) == B_OK)
+		gDeviceManager->unregister_node(child);
 
 	return ENXIO;
 }
@@ -433,15 +440,14 @@ embedded_controller_register_child_devices(void* _cookie)
 static status_t
 embedded_controller_init_device(void* driverCookie, void** cookie)
 {
-	return B_ERROR;
+	*cookie = driverCookie;
+	return B_OK;
 }
 
 
 static void
 embedded_controller_uninit_device(void* _cookie)
 {
-	acpi_ec_cookie* device = (acpi_ec_cookie*)_cookie;
-	free(device);
 }
 
 
