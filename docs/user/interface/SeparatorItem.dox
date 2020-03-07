@@ -26,10 +26,12 @@
 	\brief Display separator item for BMenu class.
 
 	A BSeparatorItem is used to separate groups of menu items in a BMenu.
-	It is drawn as a horizontal line and cannot be selected or highlighted.
+	It is drawn as a horizontal or vertical line depending on menu layout
+	and cannot be selected or highlighted.
 
 	\warning BSeparatorItems are only meant to be used with menus whose
-	         items are arranged in a \c B_ITEMS_IN_COLUMN layout.
+	         items are arranged in a \c B_ITEMS_IN_COLUMN or
+	         \c B_ITEMS_IN_ROW layout.
 
 	\since BeOS R3
 */
@@ -140,7 +142,8 @@
 	call this method yourself but you may want to override it in a derived class
 	to do something other than the default.
 
-	The default draws a light grey horizontal line through the middle of the item.
+	The default draws a light grey horizontal or vertical line through the middle
+	of the item.
 
 	\since BeOS R3
 */

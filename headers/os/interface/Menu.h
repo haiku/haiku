@@ -172,6 +172,7 @@ public:
 
 private:
 	friend class BMenuBar;
+	friend class BSeparatorItem;
 	friend class BPrivate::MenuPrivate;
 	friend status_t _init_interface_kit_();
 	friend status_t	set_menu_info(menu_info* info);
