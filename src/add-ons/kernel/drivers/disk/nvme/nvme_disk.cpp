@@ -92,6 +92,8 @@ typedef struct {
 	uint32					qpair_count;
 	uint32					next_qpair;
 
+	rw_lock					rounded_write_lock;
+
 	ConditionVariable		interrupt;
 } nvme_disk_driver_info;
 typedef nvme_disk_driver_info::qpair_info qpair_info;
@@ -244,6 +246,9 @@ nvme_disk_init_device(void* _info, void** _cookie)
 		return B_NO_MEMORY;
 	}
 
+	// set up rounded-write lock
+	rw_lock_init(&info->rounded_write_lock, "nvme rounded writes");
+
 	// set up interrupt
 	if (get_module(B_PCI_X86_MODULE_NAME, (module_info**)&sPCIx86Module)
 			!= B_OK) {
@@ -306,6 +311,8 @@ nvme_disk_uninit_device(void* _cookie)
 
 	remove_io_interrupt_handler(info->info.u.h0.interrupt_line,
 		nvme_interrupt_handler, (void*)info);
+
+	rw_lock_destroy(&info->rounded_write_lock);
 
 	nvme_ns_close(info->ns);
 	nvme_ctrlr_close(info->ctrlr);
@@ -500,6 +507,15 @@ nvme_disk_write(void* cookie, off_t pos, const void* buffer, size_t* length)
 			return B_NO_MEMORY;
 		}
 
+		// If we rounded, we must protect against simulaneous writes inside
+		// the rounded blocks, as otherwise data corruption would occur.
+		WriteLocker writeLocker;
+		ReadLocker readLocker;
+		if (rounded_pos != pos || rounded_len != *length)
+			writeLocker.SetTo(handle->info->rounded_write_lock, false);
+		else
+			readLocker.SetTo(handle->info->rounded_write_lock, false);
+
 		// Since we rounded, we need to read in the first and last logical
 		// blocks before we copy our information to the bounce buffer.
 		// TODO: This would be faster if we queued both reads at once!
@@ -542,6 +558,8 @@ nvme_disk_write(void* cookie, off_t pos, const void* buffer, size_t* length)
 		}
 		return status;
 	}
+
+	ReadLocker _(handle->info->rounded_write_lock);
 
 	// If we got here, that means the arguments are already rounded to LBAs,
 	// so just do the I/O directly.
