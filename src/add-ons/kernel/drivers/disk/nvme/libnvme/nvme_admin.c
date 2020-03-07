@@ -208,7 +208,11 @@ int nvme_admin_create_ioq(struct nvme_ctrlr *ctrlr,
 		break;
 	case NVME_IO_COMPLETION_QUEUE:
 		cmd.opc = NVME_OPC_CREATE_IO_CQ;
+#ifdef __HAIKU__ // TODO: Option!
+		cmd.cdw11 = 0x1 | 0x2; /* enable interrupts */
+#else
 		cmd.cdw11 = 0x1;
+#endif
 		cmd.dptr.prp.prp1 = qpair->cpl_bus_addr;
 		break;
 	default:

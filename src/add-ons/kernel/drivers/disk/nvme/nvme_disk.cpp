@@ -1,5 +1,5 @@
 /*
- * Copyright 2019, Haiku, Inc. All rights reserved.
+ * Copyright 2019-2020, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,15 +11,18 @@
 #include <stdlib.h>
 
 #include <algorithm>
+#include <condition_variable.h>
 #include <AutoDeleter.h>
 #include <kernel.h>
 #include <util/AutoLock.h>
 
 #include <fs/devfs.h>
 #include <bus/PCI.h>
+#include <PCI_x86.h>
 
 extern "C" {
 #include <libnvme/nvme.h>
+#include <libnvme/nvme_internal.h>
 }
 
 
@@ -69,6 +72,7 @@ static const uint8 kDriveIcon[] = {
 
 
 static device_manager_info* sDeviceManager;
+static pci_x86_module_info* sPCIx86Module;
 
 typedef struct {
 	device_node*			node;
@@ -88,6 +92,8 @@ typedef struct {
 	}						qpairs[NVME_MAX_QPAIRS];
 	uint32					qpair_count;
 	uint32					next_qpair;
+
+	ConditionVariable		interrupt;
 } nvme_disk_driver_info;
 typedef nvme_disk_driver_info::qpair_info qpair_info;
 
@@ -152,6 +158,9 @@ nvme_disk_set_capacity(nvme_disk_driver_info* info, uint64 capacity,
 
 
 //	#pragma mark - device module API
+
+
+static int nvme_interrupt_handler(void* _info);
 
 
 static status_t
@@ -238,6 +247,55 @@ nvme_disk_init_device(void* _info, void** _cookie)
 		return B_NO_MEMORY;
 	}
 
+	// set up interrupt
+	if (get_module(B_PCI_X86_MODULE_NAME, (module_info**)&sPCIx86Module)
+			!= B_OK) {
+		sPCIx86Module = NULL;
+	}
+
+	uint16 command = pci->read_pci_config(pcidev, PCI_command, 2);
+	command &= ~(PCI_command_int_disable);
+	pci->write_pci_config(pcidev, PCI_command, 2, command);
+
+	uint8 irq = info->info.u.h0.interrupt_line;
+	if (sPCIx86Module != NULL) {
+		if (sPCIx86Module->get_msix_count(info->info.bus, info->info.device,
+				info->info.function)) {
+			uint8 msixVector = 0;
+			if (sPCIx86Module->configure_msix(info->info.bus, info->info.device,
+					info->info.function, 1, &msixVector) == B_OK
+				&& sPCIx86Module->enable_msix(info->info.bus, info->info.device,
+					info->info.function) == B_OK) {
+				TRACE_ALWAYS("using MSI-X\n");
+				irq = msixVector;
+			}
+		} else if (sPCIx86Module->get_msi_count(info->info.bus,
+				info->info.device, info->info.function) >= 1) {
+			uint8 msiVector = 0;
+			if (sPCIx86Module->configure_msi(info->info.bus, info->info.device,
+					info->info.function, 1, &msiVector) == B_OK
+				&& sPCIx86Module->enable_msi(info->info.bus, info->info.device,
+					info->info.function) == B_OK) {
+				TRACE_ALWAYS("using message signaled interrupts\n");
+				irq = msiVector;
+			}
+		}
+	}
+
+	if (irq == 0 || irq == 0xFF) {
+		TRACE_ERROR("device PCI:%d:%d:%d was assigned an invalid IRQ\n",
+			info->info.bus, info->info.device, info->info.function);
+		return B_ERROR;
+	}
+	info->interrupt.Init(NULL, NULL);
+	install_io_interrupt_handler(irq, nvme_interrupt_handler, (void*)info, B_NO_HANDLED_INFO);
+
+	if (info->ctrlr->feature_supported[NVME_FEAT_INTERRUPT_COALESCING]) {
+		uint32 microseconds = 16, threshold = 32;
+		nvme_admin_set_feature(info->ctrlr, false, NVME_FEAT_INTERRUPT_COALESCING,
+			((microseconds / 100) << 8) | threshold, 0, NULL);
+	}
+
 	*_cookie = info;
 	return B_OK;
 }
@@ -248,6 +306,14 @@ nvme_disk_uninit_device(void* _cookie)
 {
 	CALLED();
 	nvme_disk_driver_info* info = (nvme_disk_driver_info*)_cookie;
+
+	remove_io_interrupt_handler(info->info.u.h0.interrupt_line,
+		nvme_interrupt_handler, (void*)info);
+
+	nvme_ns_close(info->ns);
+	nvme_ctrlr_close(info->ctrlr);
+
+	// TODO: Deallocate MSI(-X).
 }
 
 
@@ -293,6 +359,15 @@ nvme_disk_free(void* cookie)
 // #pragma mark - I/O functions
 
 
+static int
+nvme_interrupt_handler(void* _info)
+{
+	nvme_disk_driver_info* info = (nvme_disk_driver_info*)_info;
+	info->interrupt.NotifyAll();
+	return 0;
+}
+
+
 static qpair_info*
 get_next_qpair(nvme_disk_driver_info* info)
 {
@@ -309,16 +384,17 @@ disk_io_callback(status_t* status, const struct nvme_cpl* cpl)
 
 
 static void
-await_status(struct nvme_qpair* qpair, status_t& status)
+await_status(nvme_disk_driver_info* info, struct nvme_qpair* qpair, status_t& status)
 {
+	ConditionVariableEntry entry;
 	while (status == EINPROGRESS) {
-		// nvme_ioqp_poll uses locking internally on the entire device,
-		// not just this qpair, so it is entirely possible that it could
-		// return 0 (i.e. no completions processed) and yet our status
-		// changed, because some other thread processed the completion
-		// before we got to it. So, recheck it before sleeping.
-		if (nvme_ioqp_poll(qpair, 0) == 0 && status == EINPROGRESS)
-			snooze(5);
+		info->interrupt.Add(&entry);
+
+		if (status != EINPROGRESS)
+			return;
+
+		entry.Wait();
+		nvme_ioqp_poll(qpair, 0);
 	}
 }
 
@@ -351,7 +427,7 @@ do_nvme_io(nvme_disk_driver_info* info, off_t rounded_pos, void* buffer,
 		return ret;
 	}
 
-	await_status(qpinfo->qpair, status);
+	await_status(info, qpinfo->qpair, status);
 
 	if (status != B_OK) {
 		TRACE_ERROR("%s at %" B_PRIdOFF " of %" B_PRIuSIZE " bytes failed!",
@@ -523,7 +599,7 @@ nvme_disk_flush(nvme_disk_driver_info* info)
 	if (ret != 0)
 		return ret;
 
-	await_status(qpinfo->qpair, status);
+	await_status(info, qpinfo->qpair, status);
 	return status;
 }
 
