@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-HaikuDepot	1415378461
+1	indonesian	x-vnd.Haiku-HaikuDepot	2051848200
 Repository update error	LocalRepositoryUpdateProcess		Kesalahan pembaruan repositori
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Terjadi kesalahan saat menyegarkan repositori: %error%
 Check for updates…	MainWindow		Memeriksa pembaruan…
@@ -10,7 +10,6 @@ Create account	UserLoginWindow		Membuat akun
 OK	App		OKE
 Mostly stable	RatePackageWindow		Sebagian besar stabil
 The response to the captcha was incorrect.	ServerHelper		Respons terhadap captcha salah.
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Saat memperbarui data paket, muncul masalah yang dapat menyebabkan data menjadi usang atau hilang dari tampilan aplikasi. Rincian tambahan tentang masalah ini mungkin dapat diperoleh dari log aplikasi.
 Develop packages	MainWindow		Paket pengembangan
 Rate package…	PackageInfoView		Nilai paket...
 Starting the package daemon failed:\n\n%Error%	App		Mulai layanan paket gagal :\n\n%Error%

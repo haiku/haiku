@@ -2,7 +2,7 @@
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Impussibil conetisi al servidôr \"%server%\":\n%error%
 Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		Inzornament sotscrizions aes cartelis IMAP, puarte pazience…
 Failed to fetch available storage.	IMAPFolderConfig		No si è rivâts a tirâ dongje memorie disponibile.
-Cancel	IMAPFolderConfig		Scancele
+Cancel	IMAPFolderConfig		Cancele
 OK	IMAPFolderConfig		Va ben
 Server storage: %s / %s used.	IMAPFolderConfig		Memorie dal servidôr: %s / %s doprade.
 No encryption	imap_config		Nissune cifradure

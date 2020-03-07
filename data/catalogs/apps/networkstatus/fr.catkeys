@@ -13,7 +13,7 @@ Could not join wireless network:\n	NetworkStatusView		Impossible de joinde le r�
 Ready	NetworkStatusView		Prêt
 Network Status	NetworkStatusView		État du réseau
 Address	NetworkStatusView		Adresse
-Deskbar is not running, giving up.	NetworkStatus		Deskbar n'est pas lancé, abandon.
+Deskbar is not running, giving up.	NetworkStatus		Deskbar n’est pas lancé, abandon.
 No stateful configuration	NetworkStatusView		Pas de configuration dynamique
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Vous pouvez exécuter l’État du réseau dans une fenêtre ou l’installer dans la Deskbar.
 Broadcast	NetworkStatusView		Diffusion

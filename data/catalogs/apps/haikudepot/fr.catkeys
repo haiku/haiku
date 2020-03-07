@@ -19,7 +19,7 @@ Rating	PackageListView		Évaluation
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronisation des icônes
 Does not start	RatePackageWindow		Ne démarre pas
 Show	MainWindow		Afficher
-An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Erreur lors de l'obtention de la liste des paquets : %message%
+An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Erreur lors de l’obtention de la liste des paquets : %message%
 Not specified	RatePackageWindow		Non spécifié
 Unstable but usable	RatePackageWindow		Instable mais utilisable
 Active	PackageListView		Actif
@@ -33,7 +33,7 @@ Server Error	ServerHelper		Erreur du serveur
 Name	PackageListView		Nom
 Local	LocalPkgDataLoadProcess		Local
 Rate %Package%	RatePackageWindow		Évaluer %Package%
-An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Une erreur est survenue lors de l'initialisation du gestionnaire de paquets : %message%
+An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Une erreur est survenue lors de l’initialisation du gestionnaire de paquets : %message%
 Quit HaikuDepot	App		Quitter le Dépôt Haiku
 Category	FilterView		Catégorie
 User rating	RatePackageWindow		Avis de l’utilisateur
@@ -86,7 +86,7 @@ Repository	PackageListView		Dépôt
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (version %hd.version%)
 Close	UserLoginWindow		Fermer
 Close	RatePackageWindow		Fermer
-View the usage conditions	UserLoginWindow		Voir les conditions d'utilisation
+View the usage conditions	UserLoginWindow		Voir les conditions d’utilisation
 Size	PackageListView		Taille
 Your rating:	RatePackageWindow		Votre évaluation :
 Your rating was updated.	RatePackageWindow		Votre évaluation a été mise à jour.
@@ -116,7 +116,7 @@ Source packages	MainWindow		Paquets sources
 Try again	App		Essayer à nouveau
 Rate package	RatePackageWindow		Évaluer le paquet
 Unknown	PackageListView		Inconnu
-I agree to the usage conditions	UserLoginWindow		J'accepte les conditions d'utilisation
+I agree to the usage conditions	UserLoginWindow		J’accepte les conditions d’utilisation
 Log in	UserLoginWindow		Connexion
 Logged in as %User%	MainWindow		Connecté en tant que %User%
 Email address:	UserLoginWindow		Adresse e-mail :

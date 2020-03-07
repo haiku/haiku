@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-HaikuDepot	1415378461
+1	dutch; flemish	x-vnd.Haiku-HaikuDepot	2051848200
 Repository update error	LocalRepositoryUpdateProcess		Fout bij updaten softwarebronnen
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Er is een fout opgetreden bij het verversen van de softwarebronnen: %error%
 Check for updates…	MainWindow		Controleer op updates…
@@ -10,7 +10,6 @@ Create account	UserLoginWindow		Registreren
 OK	App		OK
 Mostly stable	RatePackageWindow		Meestal stabiel
 The response to the captcha was incorrect.	ServerHelper		De ingevoerde captcha is foutief.
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Bij het verversen van pakket data is er een probleem opgetreden waardoor data verouderd of niet aanwezig kan zijn in het applicatie paneel. Verdere details omtrent dit probleem kunnen wellicht verkregen worden via de applicatie logs.
 Develop packages	MainWindow		Ontwikkelaarspakketten
 Rate package…	PackageInfoView		Pakket beoordelen…
 Starting the package daemon failed:\n\n%Error%	App		Starten van de pakket-daemon mislukt:\n\n%Error%

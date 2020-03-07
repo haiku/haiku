@@ -10,10 +10,10 @@ NetworkStatus	System name		Стан мережі
 OK	NetworkStatusView		ОК
 No link	NetworkStatusView		З'єднання відсутнє
 Could not join wireless network:\n	NetworkStatusView		Бездротові мережі не під'єднані:\n
-Ready	NetworkStatusView		Готово
-Network Status	NetworkStatusView		Network Status
+Ready	NetworkStatusView		Під'єднано
+Network Status	NetworkStatusView		Стан мережі
 Address	NetworkStatusView		Адреса
-Deskbar is not running, giving up.	NetworkStatus		Deskbar iне працює, відмова.
+Deskbar is not running, giving up.	NetworkStatus		Облиште, Deskbar не працює.
 No stateful configuration	NetworkStatusView		Немає стабільної конфігурації
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Ви можете запустити NetworkStatus у вікні або встановити у Deskbar.
 Broadcast	NetworkStatusView		Широкомовна передача

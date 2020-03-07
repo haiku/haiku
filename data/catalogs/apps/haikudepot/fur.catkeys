@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	2171997917
+1	friulian	x-vnd.Haiku-HaikuDepot	91307134
 Repository update error	LocalRepositoryUpdateProcess		Erôr di inzornament dal dipuesit
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificât un erôr intal inzornâ il dipuesit: %error%
 User Created	UserLoginWindow		Utent creât
@@ -12,7 +12,6 @@ Create account	UserLoginWindow		Cree account
 OK	App		Va ben
 Mostly stable	RatePackageWindow		Pal plui stabil
 The response to the captcha was incorrect.	ServerHelper		La rispueste al captcha e jere sbaliade.
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Intant che si inzornave i dâts dal pachet, si è verificât un probleme che al podarès puartâ a vê dâts vielis o mancjants in merit a ce che la aplicazion e visualize. Detais in plui su chest probleme al è probabil otignîju dai regjistris de aplicazion.
 Develop packages	MainWindow		Pachets di svilup
 Rate package…	PackageInfoView		Vote pachet…
 Starting the package daemon failed:\n\n%Error%	App		Inviament dal demoni dai pachets falît:\n\n %Error%
@@ -45,7 +44,6 @@ A response to the captcha question must be provided.	UserLoginWindow		Si scugne 
 Category	FilterView		Categorie
 User rating	RatePackageWindow		Valutazion utents
 Installed packages	MainWindow		Pachets instalâts
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again.	UserLoginWindow		Al è vignût fûr un erôr discjariant lis condizions di ûs necessaris par creâ un gnûf utent. Controle il regjistri par vê plui detais e torne prove.
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Un ogjet domandât o un ogjet che al centrave cu la richieste nol è stât cjatât sul servidôr.
 Other users can see this rating	RatePackageWindow		I altris utents a puedin viodi cheste valutazion
 Stable	RatePackageWindow		Stabile

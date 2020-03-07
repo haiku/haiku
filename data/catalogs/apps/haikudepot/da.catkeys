@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-HaikuDepot	2510596347
+1	danish	x-vnd.Haiku-HaikuDepot	429905564
 Repository update error	LocalRepositoryUpdateProcess		Fejl ved opdatering af softwarekilde
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Der opstod en fejl under opdatering af softwarekilden: %error%
 User Created	UserLoginWindow		Bruger oprettet
@@ -12,7 +12,6 @@ Create account	UserLoginWindow		Opret konto
 OK	App		OK
 Mostly stable	RatePackageWindow		Hovedsageligt stabil
 The response to the captcha was incorrect.	ServerHelper		Svaret på captchaen var forkert.
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Ved opdatering af pakkedata er der opstået et problem som kan forårsage forældet eller manglende data i programmets visning. Yderligere detaljer om problemet kan ses i programloggene.
 Develop packages	MainWindow		Udviklingspakker
 Rate package…	PackageInfoView		Bedøm pakke…
 Starting the package daemon failed:\n\n%Error%	App		Start af pakkedæmon mislykkedes:\n\n%Error%
@@ -46,7 +45,6 @@ A response to the captcha question must be provided.	UserLoginWindow		Der skal g
 Category	FilterView		Kategori
 User rating	RatePackageWindow		Brugerbedømmelse
 Installed packages	MainWindow		Installerede pakker
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again.	UserLoginWindow		Der opstod en fejl ved download af anvendelsesbetingelser som kræves for at oprette en ny bruger. Tjek loggen for detaljer og prøv igen.
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Et anmodet objekt eller et objekt som er involveret i anmodningen blev ikke fundet på serveren.
 Other users can see this rating	RatePackageWindow		Andre brugere kan se bedømmelsen
 Stable	RatePackageWindow		Stabil

@@ -14,7 +14,7 @@ Gateway:	IntefaceAddressView		Шлюз:
 The netmask defines your local network	IntefaceAddressView		Нетмаска визначає вашу локальну мережу
 Your IP address	IntefaceAddressView		Ваша IP адреса
 DHCP	IntefaceAddressView		DHCP
-Netmask:	IntefaceAddressView		Нетмаска:
+Netmask:	IntefaceAddressView		Маска підмережі:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Служби
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Встановлення Стан'у Мережі у Deskbar призупинено: %s
@@ -27,17 +27,17 @@ connected	IntefaceView		під'єднано
 Apply	IntefaceAddressView		Застосовувати
 Disable	ServiceView		Заборонити
 WPA2	WPA2 protected network		WPA2
-Show network status in Deskbar	NetworkWindow		Показати стан мережі у Deskbar'і
+Show network status in Deskbar	NetworkWindow		Відображати стан мережі у Deskbar
 Mode:	IntefaceAddressView		Режим:
 connected	InterfaceListItem		під'єднання
-OK	NetworkWindow		Гаразд
+OK	NetworkWindow		ОК
 Static	IntefaceAddressView		Статичний
-launch error	NetworkWindow		помилка з'єднання
+launch error	NetworkWindow		помилка запуску
 Renegotiate	IntefaceView		Переукласти
 MAC address:	IntefaceView		MAC адреса:
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 disabled	InterfaceListItem		заборонити
-Dial-up connection	InterfaceListItem		Під'єднання Dial-up
+Dial-up connection	InterfaceListItem		Dial-up з'єднання 
 on	ServiceListItem		увімкнено
 The method for obtaining an IP address	IntefaceAddressView		Спосіб отримання IP адреси
 disconnected	InterfaceListItem		роз'єднано
@@ -52,4 +52,4 @@ Your gateway to the internet	IntefaceAddressView		Ваш інтернет шлю
 Enable	ServiceView		Увімкнути
 Wireless device	InterfaceListItem		Бездротова карта
 Disabled	IntefaceAddressView		Заборонити
-VPN connection	InterfaceListItem		Під'єднання VPN
+VPN connection	InterfaceListItem		VPN з'єднання

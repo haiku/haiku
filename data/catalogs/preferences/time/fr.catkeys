@@ -16,7 +16,7 @@ Asia	Time		Asie
 Try all servers	Time		Essayer tous les serveurs
 Time	Time		Heure
 Current time:	Time		Heure actuelle :
-The following error occured while synchronizing:\n%s: %s	Time		L'erreur suivante s'est produite lors de la synchronisation :\n%s : %s
+The following error occured while synchronizing:\n%s: %s	Time		L’erreur suivante s’est produite lors de la synchronisation :\n%s : %s
 Europe	Time		Europe
 Show day of week	Time		Afficher le jour de la semaine
 Local time (Windows compatible)	Time		Heure locale (compatible Windows)
@@ -44,6 +44,6 @@ Synchronize at boot	Time		Synchroniser au démarrage
 Indian	Time		Indien
 Revert	Time		Rétablir
 Date and time	Time		Date et heure
-The following error occured while synchronizing:\n%s	Time		L'erreur suivante s'est produite lors de la synchronisation :\n%s
+The following error occured while synchronizing:\n%s	Time		L’erreur suivante s’est produite lors de la synchronisation :\n%s
 Synchronize	Time		Synchroniser
 Add	Time		Ajouter

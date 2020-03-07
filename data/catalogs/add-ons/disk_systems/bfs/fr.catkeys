@@ -1,6 +1,6 @@
 1	french	x-vnd.Haiku-BFSAddOn	1570987954
 Enable query support	BFS_Initialize_Parameter		Activer le support des requêtes
-Disabling query support may speed up certain file system operations, but should\nonly be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		Désactiver le support de requête peut accélérer quelques opérations du système\nde fichiers, mais doit seulement être utilisé que si l'on est absolument certain de\nne pas avoir besoin de requêtes.\nTout volume destiné à démarrer Haiku doit pouvoir répondre aux requêtes.
+Disabling query support may speed up certain file system operations, but should\nonly be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		Désactiver le support de requête peut accélérer quelques opérations du système\nde fichiers, mais doit seulement être utilisé que si l’on est absolument certain de\nne pas avoir besoin de requêtes.\nTout volume destiné à démarrer Haiku doit pouvoir répondre aux requêtes.
 Name:	BFS_Initialize_Parameter		Label :
 8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (Surtout des gros fichiers)
 2048 (Recommended)	BFS_Initialize_Parameter		2048 (Recommandé)

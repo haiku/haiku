@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	2510596347
+1	german	x-vnd.Haiku-HaikuDepot	429905564
 Repository update error	LocalRepositoryUpdateProcess		Fehler bei Paketquellenaktualisierung
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Fehler bei der Aktualisierung der Paketquelle: %error%
 User Created	UserLoginWindow		Benutzerkonto erstellt
@@ -12,7 +12,6 @@ Create account	UserLoginWindow		Benutzerkonto erstellen
 OK	App		OK
 Mostly stable	RatePackageWindow		Ziemlich stabil
 The response to the captcha was incorrect.	ServerHelper		Das Captcha wurde nicht richtig beantwortet.
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Bei der Aktualisierung von Paketdaten trat ein Problem auf. Dadurch könnten die angezeigten Daten der Anwendung veraltet sein oder fehlen. Weitere Details zu diesem Problem können dem Anwendungs-Log entnommen werden.
 Develop packages	MainWindow		Entwicklungs-Pakete
 Rate package…	PackageInfoView		Paket bewerten…
 Starting the package daemon failed:\n\n%Error%	App		Der Paket-Daemon konnte nicht gestartet werden:\n\n%Error%
@@ -46,7 +45,6 @@ A response to the captcha question must be provided.	UserLoginWindow		Das Captch
 Category	FilterView		Kategorie
 User rating	RatePackageWindow		Bewertung
 Installed packages	MainWindow		Installierte Pakete
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again.	UserLoginWindow		Beim Herunterladen der Nutzungsbedingungen für die Erstellung eines neuen Benutzerkontos ist ein Fehler aufgetreten. Bitte Log prüfen und nochmal probieren.
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Ein angefordertes Objekt bzw. ein bei der Anfrage beteiligtes Objekt, wurde auf dem Server  nicht gefunden.
 Other users can see this rating	RatePackageWindow		Diese Bewertung ist für andere Anwender sichtbar
 Stable	RatePackageWindow		Stabil

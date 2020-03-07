@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	2510596347
+1	swedish	x-vnd.Haiku-HaikuDepot	429905564
 Repository update error	LocalRepositoryUpdateProcess		Fel vid uppdatering av repositorie
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ett fel inträffade vid uppdatering av repositoriet: %error%
 User Created	UserLoginWindow		Användare skapad
@@ -12,7 +12,6 @@ Create account	UserLoginWindow		Skapa konto
 OK	App		OK
 Mostly stable	RatePackageWindow		Mestadels stabil
 The response to the captcha was incorrect.	ServerHelper		Svaret på captchan var inkorrekt.
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Vid uppdatering av paketdata har ett problem uppstått som kan göra att data är föråldrade eller saknas från programmets display. Ytterligare information om det här problemet kan hämtas från applikationsloggarna.
 Develop packages	MainWindow		Utvecklingspaket
 Rate package…	PackageInfoView		Betygsätt paket...
 Starting the package daemon failed:\n\n%Error%	App		Starta package daemon misslyckades:\n\n%Error%
@@ -46,7 +45,6 @@ A response to the captcha question must be provided.	UserLoginWindow		Ett svar p
 Category	FilterView		Kategori
 User rating	RatePackageWindow		Användarbetyg
 Installed packages	MainWindow		Installerade paket
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again.	UserLoginWindow		Ett fel har uppstått vid nedladdning av användningsvillkoren som krävs för att skapa en ny användare. Se loggen för mer information.
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Ett begärt objekt eller ett objekt involverat i begäran hittades inte på servern.
 Other users can see this rating	RatePackageWindow		Andra användare kan se denna bedömning
 Stable	RatePackageWindow		Stabil

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	2510596347
+1	turkish	x-vnd.Haiku-HaikuDepot	429905564
 Repository update error	LocalRepositoryUpdateProcess		Depo güncelleme hatası
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Depo güncellenirken bir hata oluştu: %error%
 User Created	UserLoginWindow		Kullanıcı Oluşturuldu
@@ -12,7 +12,6 @@ Create account	UserLoginWindow		Hesap oluştur
 OK	App		Tamam
 Mostly stable	RatePackageWindow		Çoğunlukla kararlı
 The response to the captcha was incorrect.	ServerHelper		Captcha yanıtı yanlış.
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Paket bilgisi güncellenirken verinin geçersiz olmasına veya uygulamanın ekranından kaybolmasına neden olabilen bir hata oluştu. Bu sorun hakkındaki ek ayrıntılar uygulamanın hata günlüklerinden edinilebilir.
 Develop packages	MainWindow		Geliştirme paketleri
 Rate package…	PackageInfoView		Paketi derecelendir…
 Starting the package daemon failed:\n\n%Error%	App		Paket hizmeti başlatılamadı:\n\n%Error%
@@ -46,7 +45,6 @@ A response to the captcha question must be provided.	UserLoginWindow		CAPTCHA so
 Category	FilterView		Kategori
 User rating	RatePackageWindow		Kullanıcı oyları
 Installed packages	MainWindow		Yüklü paketler
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again.	UserLoginWindow		Yeni bir kullanıcı oluşturma için gerekli olan kullanım koşulları indirilirken bir hata oluştu. Ayrıntılar için hata günlüğüne bakın ve yeniden deneyin.
 A requested object or an object involved in the request was not found on the server.	ServerHelper		İstenen nesne veya istekle ilgili bir nesne sunucuda bulunamadı.
 Other users can see this rating	RatePackageWindow		Diğer kullanıcılar bu derecelendirmeyi görebilir
 Stable	RatePackageWindow		Kararlı

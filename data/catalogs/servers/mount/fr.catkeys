@@ -4,7 +4,7 @@ Error mounting volume:\n\n%s	AutoMounter		Erreur lors du montage du volume :\n\n
 Cancel	AutoMounter		Annuler
 OK	AutoMounter		OK
 Unmount error	AutoMounter		Erreur de démontage
-The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		Le système de fichiers de ce volume n'est un système de fichier Be. Il est recommandé de le monter en lecture seule, afin d'éviter toute perte de données en cas de bugs dans Haiku.
+The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		Le système de fichiers de ce volume n’est un système de fichier Be. Il est recommandé de le monter en lecture seule, afin d’éviter toute perte de données en cas de bugs dans Haiku.
 Mount read/write	AutoMounter		Monter en lecture/écriture
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		Impossible de démonter le disque « %s » :\n\t%s
 Mounting volume '%s'\n\n	AutoMounter		Montage du volume « %s »\n\n

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	2510596347
+1	japanese	x-vnd.Haiku-HaikuDepot	429905564
 Repository update error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
 User Created	UserLoginWindow		作成されたユーザー
@@ -12,7 +12,6 @@ Create account	UserLoginWindow		アカウントの作成
 OK	App		OK
 Mostly stable	RatePackageWindow		ほとんど安定
 The response to the captcha was incorrect.	ServerHelper		キャプチャの回答が間違っていました
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		パッケージデーターの更新中に問題が発生しました。その問題によりデータが期限切れに、つまり、アプリケーションの表示から消えてしまいます。この問題に関する追加のデータは、アプリケーションのログから得られるかもしれません。
 Develop packages	MainWindow		開発用パッケージ
 Rate package…	PackageInfoView		パッケージを評価…
 Starting the package daemon failed:\n\n%Error%	App		パッケージデーモンの起動に失敗しました:\n\n%Error%
@@ -46,7 +45,6 @@ A response to the captcha question must be provided.	UserLoginWindow		キャプ�
 Category	FilterView		分類
 User rating	RatePackageWindow		ユーザーによる評価
 Installed packages	MainWindow		インストール済みパッケージ
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again.	UserLoginWindow		新規ユーザーを作成するための使用条件のダウンロード中にエラーが発生しました。詳細はログをチェックして、再度試してみてください。
 A requested object or an object involved in the request was not found on the server.	ServerHelper		要求されたオブジェクトまたはリクエストに関連するオブジェクトがサーバー上に見つかりませんでした。　　
 Other users can see this rating	RatePackageWindow		ほかのユーザーがこの評価を見ることができます
 Stable	RatePackageWindow		安定

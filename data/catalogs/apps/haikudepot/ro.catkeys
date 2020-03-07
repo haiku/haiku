@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	1574204456
+1	romanian	x-vnd.Haiku-HaikuDepot	2210674195
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		A apărut o eroare în timpul reîmprospătării depozitului: %error%
 Check for updates…	MainWindow		Verifică pentru actualizări…
 Uninstall	PackageManager		Dezinstalare
@@ -9,7 +9,6 @@ Create account	UserLoginWindow		Creează cont
 OK	App		OK
 Mostly stable	RatePackageWindow		Majoritatea stabile
 The response to the captcha was incorrect.	ServerHelper		Răspunsul la captcha nu a fost corect.
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		În timpul actualizării datelor pachetului, a apărut o problemă care poate face ca datele să fie depășite sau să lipsească din afișajul aplicației. Detalii adiționale în legătură cu această problemă pot fi obținute din istoricul aplicației.
 Develop packages	MainWindow		Dezvoltă pachete
 Rate package…	PackageInfoView		Evaluați pachet…
 Starting the package daemon failed:\n\n%Error%	App		Pornirea demonului de pachete a eșuat:\n\n%Error%

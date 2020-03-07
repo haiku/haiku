@@ -1,5 +1,6 @@
-1	finnish	x-vnd.Haiku-debug_server	166857212
+1	finnish	x-vnd.Haiku-debug_server	3188340596
 The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		Sovellus:\n\n %app\n\non kohdannut virheen, joka estää ohjelman jatkamisen. Haiku lopettaa sovelluksen ja siistii jäljet.
+Oh yeah!	DebugServer		Hupsista!
 Debug	DebugServer		Vikajäljitä
 Terminate	DebugServer		Lopeta
 Save report	DebugServer		Tallenna ilmoitus

@@ -59,7 +59,7 @@ Expiration	Cookie Manager		Термін дії
 Download finished	Download Window		Завантаження завершене
 Cookie manager	WebPositive Window		Менеджер Cookie
 OK	Authentication Panel		ОК
-Hide password text	Authentication Panel		Сховати текст гасла
+Hide password text	Authentication Panel		Приховати текст пароля
 Username:	Authentication Panel		Користувач:
 Name	Cookie Manager		Ім'я
 Remove finished	Download Window		Видалення завершене
@@ -68,13 +68,13 @@ Edit	WebPositive Window		Правка
 Back	WebPositive Window		Назад
 Yesterday	WebPositive Window		Вчора
 Quit	WebPositive		Вийти
-Download aborted	Download Window		Завантаження зупинене
+Download aborted	Download Window		Завантаження перерване
 Number of days to keep links in History menu:	Settings Window		Кількість днів збереження посилань Історії
 Password:	Authentication Panel		Пароль:
 Forward	WebPositive Window		Вперед
 Clear	Console Window		Очистити
 Cut	URL Bar		Вирізати
-View	WebPositive Window		Перегляд
+View	WebPositive Window		Вигляд
 Paste	URL Bar		Вставити
 Find next	WebPositive Window		Знайти текст
 Open search page	Settings Window		Відкрити сторінку пошуку
@@ -85,8 +85,8 @@ Open location	WebPositive Window		Відкрити розташування
 New browser window	Download Window		Нове вікно переглядача
 Open	Download Window		Відкрити
 New window	WebPositive Window		Нове вікно
-New windows:	Settings Window		Нове вікно:
-The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Неможливо відкрити теку завантажень.\n\nПомилка: %error
+New windows:	Settings Window		Нові вікна:
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Неможливо відкрити папку завантажень.\n\nПомилка: %error
 Cancel	Authentication Panel		Відмінити
 Style:	Font Selection view		Стиль:
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Сталася помилка при створенні закладки.\n\nПомилка: %error
@@ -97,15 +97,15 @@ Manage bookmarks	WebPositive Window		Керування закладками
 Restart	Download Window		Перезапустити
 Serif font:	Settings Window		Шрифт Serif:
 Apply	Settings Window		Застосувати
-There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Сталася помилка при показі теки Закладки.\n\nПомилка: %error
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Сталася помилка при спробі показати папку закладок.\n\nПомилка: %error
 Revert	Settings Window		Повернути
 Copy	WebPositive Window		Копіювати
-Default standard font size:	Settings Window		Шрифт по замовчуванню:
+Default standard font size:	Settings Window		Шрифт за замовчуванням:
 Bookmark this page	WebPositive Window		Додати до закладок
 Show tabs if only one page is open	Settings Window		Показати вкладки, якщо відкрито лише одну сторінку
 Close tab	WebPositive Window		Закрити вкладку
-Remove	Download Window		Видалити
-About	WebPositive Window		Про
+Remove	Download Window		Вилучити
+About	WebPositive Window		Про програму
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Триває завантаження, ви дійсно бажаєте покинути WebPositive зараз?
 Continue downloads	WebPositive		Продовжити завантаження
 Proxy server requires authentication	Settings Window		Проксі-сервер вимагає аутентифікації

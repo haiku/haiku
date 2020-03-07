@@ -61,8 +61,8 @@ Cancel	MediaPlayer-NetworkStream		İptal
 Nothing to Play	MediaPlayer-Main		Oynatacak bir şey yok
 OK	MediaPlayer-SettingsWindow		Tamam
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Girdileri kaldır
-never	MediaPlayer-SettingsWindow		hiçbir zaman
-Loop audio	MediaPlayer-SettingsWindow		Sürekli ses çal
+never	MediaPlayer-SettingsWindow		Hiçbir zaman
+Loop audio	MediaPlayer-SettingsWindow		Sesi sürekli çal
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		İç hata (bozuk ileti). Oynatma listesi kaydedilemedi.
 Open…	MediaPlayer-PlaylistWindow		Aç…
 Revert	MediaPlayer-SettingsWindow		Eski haline döndür
@@ -90,8 +90,8 @@ Edit	MediaPlayer-PlaylistWindow		Düzen
 Copy Entries	MediaPlayer-CopyPLItemsCmd		Girdileri kopyala
 Always on top	MediaPlayer-Main		Her zaman üstte
 Open	MediaPlayer-PlaylistWindow		Aç
-always	MediaPlayer-SettingsWindow		her zaman
-Loop video	MediaPlayer-SettingsWindow		Sürekli video oynat
+always	MediaPlayer-SettingsWindow		Her zaman
+Loop video	MediaPlayer-SettingsWindow		Videoyu sürekli oynat
 Stream URL:	MediaPlayer-NetworkStream		Akış URL'si:
 <unknown>	PlaylistItem-album		<bilinmeyen>
 Stream settings	MediaPlayer-Main		Akış ayarları
@@ -145,7 +145,7 @@ Save as…	MediaPlayer-PlaylistWindow		Farklı kaydet…
 Error: 	MediaPlayer-RemovePLItemsCmd		Hata: 
 300% scale	MediaPlayer-Main		%300 ölçek
 Open	MediaPlayer-Main		Aç
-ask every time	MediaPlayer-SettingsWindow		her zaman sor
+ask every time	MediaPlayer-SettingsWindow		Her zaman sor
 (not supported)	MediaPlayer-InfoWin		(desteklenmiyor)
 Randomize	MediaPlayer-PlaylistWindow		Rastgele yap
 %.3f fps	MediaPlayer-InfoWin		%.3f fps

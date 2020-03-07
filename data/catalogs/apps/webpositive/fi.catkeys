@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-WebPositive	2763299522
+1	finnish	x-vnd.Haiku-WebPositive	1879106286
 Authentication required	Authentication Panel		Vaaditaan todentamista
 Previous	WebPositive Window		Edellinen
 (Finish: %date)	Download Window		(Päättyi: %date)
@@ -28,7 +28,9 @@ Start page:	Settings Window		Aloitussivu:
 Cancel	Download Window		Peru
 Settings	Settings Window		Asetukset
 Downloads	WebPositive Window		Lataukset
+Browse…	Settings Window		Selaa…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Kirjanmerkki tälle sivulle (%bookmarkName) on jo olemassa.
+Resume prior session	Settings Window		Aloita uudelleen varhaisempi istunto
 Match case	WebPositive Window		Täsmää kirjainkoko
 Proxy password:	Settings Window		Välityspalvelimen salasana:
 Size:	Font Selection view		Koko:
@@ -119,6 +121,7 @@ Remember username and password for this site	Authentication Panel		Muista tämä
 (Finish: %date - %duration left)	Download Window		(Päättyy: %date - %duration jäljellä)
 Cookie manager	Cookie Manager		Evästehallinta
 Show home button	Settings Window		Näytä kotipainike
+Start new session	Settings Window		Aloita uusi istunto
 The cookie jar is empty!	Cookie Manager		Evästesäiliö on tyhjä!
 Value	Cookie Manager		Arvo
 Remove missing	Download Window		Poista puuttuva
@@ -141,6 +144,7 @@ Settings	WebPositive Window		Asetukset
 Clear	URL Bar		Tyhjennä
 Loading %url	WebPositive Window		Ladataan verkko-osoite %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Albert osti fagotin ja töräytti puhkuvan melodian.
+Start up:	Settings Window		Käynnistä:
 Confirmation	WebPositive Window		Vahvistus
 Session cookie	Cookie Manager		Istuntoeväste
 Open all	WebPositive Window		Avaa kaikki

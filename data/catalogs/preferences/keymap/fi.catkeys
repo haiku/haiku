@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Keymap	3348782469
+1	finnish	x-vnd.Haiku-Keymap	1075970008
 Key	Modifier keys window	As in a computer keyboard key	Näppäin
 Japanese	KeymapNames		Japanilainen
 US	KeymapNames		US
@@ -58,6 +58,7 @@ Italian	KeymapNames		Italialainen
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s International
 Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminum (US)
 Kinesis Ergo Elan International	KeyboardLayoutNames		Kinesis Ergo Elan International
+French (NF Z71-300)	KeymapNames		French (NF Z71-300)
 Modifier keys	Modifier keys window		Muuntonäppäimet
 ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 International
 Kazakh	KeymapNames		Kazakstanilainen

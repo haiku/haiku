@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-HaikuDepot	1415378461
+1	spanish; castilian	x-vnd.Haiku-HaikuDepot	2051848200
 Repository update error	LocalRepositoryUpdateProcess		Error de actualización de repositorio
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ocurrió un error al actualizar el repositorio: %error%
 Check for updates…	MainWindow		Buscar actualizaciones…
@@ -10,7 +10,6 @@ Create account	UserLoginWindow		Crear cuenta
 OK	App		Aceptar
 Mostly stable	RatePackageWindow		Mayormente estable
 The response to the captcha was incorrect.	ServerHelper		La respuesta al captcha fue incorrecta.
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Mientras se actualizaban datos del paquete un problema ha aparecido que puede causar que los datos se desactualicen o pierdan del panel de la aplicación. Detalles adicionales respecto a este problema se pueden obtener de los informes de la aplicación.
 Develop packages	MainWindow		Paquetes para desarrollo
 Rate package…	PackageInfoView		Puntuar paquete…
 Starting the package daemon failed:\n\n%Error%	App		Fallo al iniciar el demonio de paquete:\n\n%Error%

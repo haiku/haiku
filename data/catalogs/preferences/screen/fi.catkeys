@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Screen	2685901476
+1	finnish	x-vnd.Haiku-Screen	133788249
 no	Screen		ei
 bits/pixel	Screen		bittiä/pikseli
 15 bits/pixel, 32768 colors	Screen		15 bittiä/pikseli, 32768 väriä
@@ -17,6 +17,7 @@ vertically	Screen		pystysuoraan
 All workspaces	Screen		Kaikki työtilat
 Use laptop panel:	Screen		Käytä sylimikropaneelia
 Could not write VESA mode settings file:\n\t	Screen		VESA-tila-asetustiedoston kirjoittaminen epäonnistui:\n\t
+Display info	Screen		Näyttötiedot
 Settings will revert in %seconds.	Screen		Asetukset palautuvat %seconds sekunnissa.
 Cancel	Screen		Peru
 Other…	Screen		Muut...

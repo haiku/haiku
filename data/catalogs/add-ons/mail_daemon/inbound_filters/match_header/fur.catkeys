@@ -1,5 +1,5 @@
 1	friulian	x-vnd.Haiku-MatchHeader	1946584206
-Delete message	ConfigView		Cancele messaç
+Delete message	ConfigView		Elimine messaç
 Match \"%attribute\" against \"%regex\"	RuleFilter		Corispondence \"%attribute\" rispiet a \"%regex\"
 Match header	RuleFilter		Intestazion corispondente
 Set flags to	ConfigView		Stabilìs bandieris a

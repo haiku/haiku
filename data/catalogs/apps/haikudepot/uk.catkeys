@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	2510596347
+1	ukrainian	x-vnd.Haiku-HaikuDepot	429905564
 Repository update error	LocalRepositoryUpdateProcess		Помилка оновлення репозиторія 
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Під час оновлення репозиторія сталася помилка: %error%
 User Created	UserLoginWindow		Користувача створено
@@ -12,7 +12,6 @@ Create account	UserLoginWindow		Створити обліковий запис
 OK	App		ОК
 Mostly stable	RatePackageWindow		Найстабільніший
 The response to the captcha was incorrect.	ServerHelper		Невірна відповідь на капчу.
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		Під час оновлення пакунку сталася помилка, що може призвести до появи у вікні застосунку застарілих елементів або їх відсутності. Додаткові відомості щодо цього можна переглянути у лог-файлах застосунку.
 Develop packages	MainWindow		Пакети розробника
 Rate package…	PackageInfoView		Оцінити пакет…
 Starting the package daemon failed:\n\n%Error%	App		Запуск демона пакету призупинено:\n\n%Error%
@@ -46,7 +45,6 @@ A response to the captcha question must be provided.	UserLoginWindow		Необх
 Category	FilterView		Категорія
 User rating	RatePackageWindow		Рейтинг користувача
 Installed packages	MainWindow		Встановлені пакети
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again.	UserLoginWindow		При завантаженні умов використання, необхідних для створення нового користувача, виникла помилка. Перевірте журнал для деталізації та спробуйте ще раз.
 A requested object or an object involved in the request was not found on the server.	ServerHelper		На сервері не знайдено потрібний об'єкт або об'єкт, що міститься у запиті.
 Other users can see this rating	RatePackageWindow		Інші користувачі можуть побачити цю оцінку
 Stable	RatePackageWindow		Стабільний

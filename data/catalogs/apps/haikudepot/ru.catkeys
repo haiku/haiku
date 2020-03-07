@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	149184511
+1	russian	x-vnd.Haiku-HaikuDepot	2363461024
 Repository update error	LocalRepositoryUpdateProcess		Ошибка обновления репозитория
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Произошла ошибка при обновлении репозитория: %error%
 User Created	UserLoginWindow		Пользователь создан
@@ -12,7 +12,6 @@ Create account	UserLoginWindow		Создать учётную запись
 OK	App		OK
 Mostly stable	RatePackageWindow		В основном стабилен
 The response to the captcha was incorrect.	ServerHelper		Ответ на капчу был неверным.
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.	MainWindow		При обновлении данных пакета возникла проблема, которая может стать причиной устаревших или отсутствующих данных о приложениях. Дополнительные сведения касательно этой проблемы можно получить из журнала логирования, запустив HaikuDepot из терминала.
 Develop packages	MainWindow		Пакеты для разработчиков
 Rate package…	PackageInfoView		Оценить пакет…
 Starting the package daemon failed:\n\n%Error%	App		Не удалось запустить пакетный демон:\n\n%Error%
@@ -46,7 +45,6 @@ A response to the captcha question must be provided.	UserLoginWindow		Необх
 Category	FilterView		Все категории
 User rating	RatePackageWindow		Пользовательский рейтинг
 Installed packages	MainWindow		Установленные пакеты
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again.	UserLoginWindow		Возникла ошибка при загрузке условий использования, необходимых для создания нового пользователя. Уточните детали в журнале логирования и попробуйте снова.
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Запрашиваемый объект или объект, указанный в запросе, не найден на сервере.
 Other users can see this rating	RatePackageWindow		Другие пользователи могут видеть этот рейтинг
 Stable	RatePackageWindow		Стабилен
