@@ -387,6 +387,8 @@ await_status(nvme_disk_driver_info* info, struct nvme_qpair* qpair, status_t& st
 	while (status == EINPROGRESS) {
 		info->interrupt.Add(&entry);
 
+		nvme_ioqp_poll(qpair, 0);
+
 		if (status != EINPROGRESS)
 			return;
 
