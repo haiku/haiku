@@ -83,7 +83,6 @@ typedef struct {
 	struct nvme_ns*			ns;
 	uint64					capacity;
 	uint32					block_size;
-	size_t					max_transfer_size;
 	status_t				media_status;
 
 	struct qpair_info {
@@ -225,8 +224,6 @@ nvme_disk_init_device(void* _info, void** _cookie)
 
 	// store capacity information
 	nvme_disk_set_capacity(info, nsstat.sectors, nsstat.sector_size);
-	info->max_transfer_size = ROUNDDOWN(cstat.max_xfer_size,
-		nsstat.sector_size);
 
 	TRACE("capacity: %" B_PRIu64 ", block_size %" B_PRIu32 "\n",
 		info->capacity, info->block_size);
@@ -439,42 +436,6 @@ do_nvme_io(nvme_disk_driver_info* info, off_t rounded_pos, void* buffer,
 
 
 static status_t
-do_nvme_segmented_io(nvme_disk_driver_info* info, off_t rounded_pos,
-	void* buffer, size_t* rounded_len, bool write = false)
-{
-	// The max transfer size is already a multiple of the block size,
-	// so divide and iterate appropriately. In the case where the length
-	// is less than the maximum transfer size, we'll wind up with 0 in the
-	// division, and only one transfer to take care of.
-	const size_t max_xfer = info->max_transfer_size;
-	int32 transfers = *rounded_len / max_xfer;
-	if ((*rounded_len % max_xfer) != 0)
-		transfers++;
-
-	size_t transferred = 0;
-	for (int32 i = 0; i < transfers; i++) {
-		size_t transfer_len = max_xfer;
-		// The last transfer will usually be smaller.
-		if (i == (transfers - 1))
-			transfer_len = *rounded_len - transferred;
-
-		status_t status = do_nvme_io(info, rounded_pos, buffer,
-			&transfer_len, write);
-		if (status != B_OK) {
-			*rounded_len = transferred;
-			return transferred > 0 ? (write ? B_PARTIAL_WRITE : B_PARTIAL_READ)
-				: status;
-		}
-
-		transferred += transfer_len;
-		rounded_pos += transfer_len;
-		buffer = ((int8*)buffer) + transfer_len;
-	}
-	return B_OK;
-}
-
-
-static status_t
 nvme_disk_read(void* cookie, off_t pos, void* buffer, size_t* length)
 {
 	CALLED();
@@ -494,7 +455,7 @@ nvme_disk_read(void* cookie, off_t pos, void* buffer, size_t* length)
 			return B_NO_MEMORY;
 		}
 
-		status_t status = do_nvme_segmented_io(handle->info, rounded_pos,
+		status_t status = do_nvme_io(handle->info, rounded_pos,
 			bounceBuffer, &rounded_len);
 		if (status != B_OK) {
 			// The "rounded_len" will be the actual transferred length, but
@@ -515,7 +476,7 @@ nvme_disk_read(void* cookie, off_t pos, void* buffer, size_t* length)
 
 	// If we got here, that means the arguments are already rounded to LBAs
 	// and the buffer is a kernel one, so just do the I/O directly.
-	return do_nvme_segmented_io(handle->info, pos, buffer, length);
+	return do_nvme_io(handle->info, pos, buffer, length);
 }
 
 
@@ -571,7 +532,7 @@ nvme_disk_write(void* cookie, off_t pos, const void* buffer, size_t* length)
 			return status;
 		}
 
-		status = do_nvme_segmented_io(handle->info, rounded_pos, bounceBuffer,
+		status = do_nvme_io(handle->info, rounded_pos, bounceBuffer,
 			&rounded_len, true);
 		if (status != B_OK) {
 			*length = std::min(*length, (size_t)std::max((off_t)0,
@@ -582,7 +543,7 @@ nvme_disk_write(void* cookie, off_t pos, const void* buffer, size_t* length)
 
 	// If we got here, that means the arguments are already rounded to LBAs,
 	// so just do the I/O directly.
-	return do_nvme_segmented_io(handle->info, pos, (void*)buffer, length, true);
+	return do_nvme_io(handle->info, pos, (void*)buffer, length, true);
 }
 
 
