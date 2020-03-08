@@ -65,11 +65,9 @@ All rights reserved.
 #include <strings.h>
 #include <stdlib.h>
 
-#include <algorithm>
-#include <memory>
-
 #include "Attributes.h"
 #include "AttributeStream.h"
+#include "AutoDeleter.h"
 #include "AutoLock.h"
 #include "BackgroundImage.h"
 #include "Commands.h"
@@ -298,7 +296,7 @@ AddOneAddon(const Model* model, const char* name, uint32 shortcut,
 static int32
 AddOnThread(BMessage* refsMessage, entry_ref addonRef, entry_ref directoryRef)
 {
-	std::auto_ptr<BMessage> refsMessagePtr(refsMessage);
+	ObjectDeleter<BMessage> _(refsMessage);
 
 	BEntry entry(&addonRef);
 	BPath path;
@@ -315,7 +313,7 @@ AddOnThread(BMessage* refsMessage, entry_ref addonRef, entry_ref directoryRef)
 
 			if (result >= 0) {
 				// call add-on code
-				(*processRefs)(directoryRef, refsMessagePtr.get(), NULL);
+				(*processRefs)(directoryRef, refsMessage, NULL);
 
 				unload_add_on(addonImage);
 				return B_OK;
