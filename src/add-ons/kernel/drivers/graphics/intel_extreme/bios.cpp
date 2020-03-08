@@ -77,7 +77,7 @@ struct lvds_bdb2_entry {
 struct lvds_bdb2 {
 	uint8 id;
 	uint16 size;
-	uint8 table_size; /* unapproved */
+	uint8 table_size; /* followed by one or more lvds_data_ptr structs */
 	struct lvds_bdb2_entry panels[16];
 } __attribute__((packed));
 
@@ -225,7 +225,6 @@ get_lvds_mode_from_bios(display_mode* sharedInfo)
 		delete_area(vbios.area);
 	}
 
-	TRACE((DEVICE_NAME": parsing BDB blocks\n"));
 	int blockSize;
 	int panelType = -1;
 
@@ -235,19 +234,21 @@ get_lvds_mode_from_bios(display_mode* sharedInfo)
 
 		int id = vbios.memory[start];
 		blockSize = vbios.ReadWord(start + 1) + 3;
-		// TRACE((DEVICE_NAME": found BDB block type %d\n", id));
 		switch (id) {
 			case 40: // FIXME magic numbers
 			{
 				struct lvds_bdb1 *lvds1;
 				lvds1 = (struct lvds_bdb1 *)(vbios.memory + start);
 				panelType = lvds1->panel_type;
+				TRACE((DEVICE_NAME ": panel type: %d\n", panelType));
 				break;
 			}
 			case 41:
 			{
+				// First make sure we found block 40 and the panel type
 				if (panelType == -1)
 					break;
+
 				struct lvds_bdb2 *lvds2;
 				struct lvds_bdb2_lfp_info *lvds2_lfp_info;
 
@@ -255,14 +256,23 @@ get_lvds_mode_from_bios(display_mode* sharedInfo)
 				lvds2_lfp_info = (struct lvds_bdb2_lfp_info *)
 					(vbios.memory + bdbOffset
 					+ lvds2->panels[panelType].lfp_info_offset);
-				/* found bad one terminator */
-				if (lvds2_lfp_info->terminator != 0xffff) {
+				/* check terminator */
+				if (*terminator != 0xffff) {
+					TRACE((DEVICE_NAME ": Incorrect LFP info terminator %x %x\n",
+						lvds2_lfp_info->terminator, *terminator));
+#if 0
+					// FIXME the terminator is not present on my SandyBridge
+					// laptop, but the video mode is still correct. Maybe the
+					// format of the block has changed accross versions. We
+					// could check the size of the block to detect different
+					// layouts.
 					delete_area(vbios.area);
 					return false;
+#endif
 				}
 				uint8_t* timing_data = vbios.memory + bdbOffset
 					+ lvds2->panels[panelType].lfp_edid_dtd_offset;
-				TRACE((DEVICE_NAME": found LFP of size %d x %d "
+				TRACE((DEVICE_NAME ": found LFP of size %d x %d "
 					"in BIOS VBT tables\n",
 					lvds2_lfp_info->x_res, lvds2_lfp_info->y_res));
 
