@@ -1,13 +1,13 @@
 /*!
 	\file Midi2Defs.h
 	\ingroup midi2
-	\brief Some definitions to define Identifier of MIDI events.
+	\brief Some definitions to define raw MIDI events.
 */
 
 
 /*!
 	\name Channel Message Masks
-	\brief Some definitions to define the Identifier of MIDI events.
+	\brief Some definitions to define the raw MIDI events.
 
 	The default implementation of BMidiLocalConsumer::Data() uses these
 	constants to determine which event has been passed on. If you override
@@ -65,7 +65,7 @@
 
 /*!
 	\name System Messages
-	\brief Some definitions to define the Identifier of MIDI system messages.
+	\brief Some definitions to define the raw MIDI system messages.
 
 	The default implementation of BMidiLocalConsumer::Data() uses these
 	constants to determine which event system message has been passed on.
