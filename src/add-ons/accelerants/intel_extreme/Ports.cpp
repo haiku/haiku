@@ -516,16 +516,16 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 
 	// TODO figure out how it's done (or if we need to configure something at
 	// all) for other generations
-	if ((gInfo->shared_info->device_type.Generation() == 4
-			|| gInfo->shared_info->device_type.Generation() == 3)
+	if (gInfo->shared_info->device_type.Generation() <= 6
+		&& gInfo->shared_info->device_type.Generation() >= 3
 		&& gInfo->shared_info->got_vbt) {
 		// Set vbios hardware panel mode as base
-		memcpy(&hardwareTarget, &gInfo->shared_info->panel_mode,
-			sizeof(display_mode));
+		hardwareTarget = gInfo->shared_info->panel_mode;
 
 		if (hardwareTarget.virtual_width == target->virtual_width
 				&& hardwareTarget.virtual_height == target->virtual_height) {
 			// We are setting the native video mode, nothing special to do
+			TRACE("Setting LVDS to native mode\n");
 			hardwareTarget = *target;
 		} else {
 			// We need to enable the panel fitter
@@ -539,6 +539,8 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 			needsScaling = true;
 		}
 	} else {
+		TRACE("Setting LVDS mode without VBT info or on unhandled hardware "
+			"generation, scaling may not work\n");
 		// We don't have VBT data, try to set the requested mode directly
 		// and hope for the best
 		hardwareTarget = *target;
@@ -621,15 +623,18 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	fPipe->ConfigureTimings(target, !needsScaling);
 
 	if (needsScaling) {
-		// Enable panel fitter in automatic mode. It will figure out
-		// the scaling ratios automatically.
-		uint32 panelFitterControl = read32(INTEL_PANEL_FIT_CONTROL);
-		panelFitterControl |= PANEL_FITTER_ENABLED;
-		panelFitterControl &= ~(PANEL_FITTER_SCALING_MODE_MASK
-			| PANEL_FITTER_PIPE_MASK);
-		panelFitterControl |= PANEL_FITTER_PIPE_B;
+		if (gInfo->shared_info->device_type.Generation() <= 4) {
+			// Enable panel fitter in automatic mode. It will figure out
+			// the scaling ratios automatically.
+			uint32 panelFitterControl = read32(INTEL_PANEL_FIT_CONTROL);
+			panelFitterControl |= PANEL_FITTER_ENABLED;
+			panelFitterControl &= ~(PANEL_FITTER_SCALING_MODE_MASK
+				| PANEL_FITTER_PIPE_MASK);
+			panelFitterControl |= PANEL_FITTER_PIPE_B;
 			// LVDS is always on pipe B.
-		write32(INTEL_PANEL_FIT_CONTROL, panelFitterControl);
+			write32(INTEL_PANEL_FIT_CONTROL, panelFitterControl);
+		}
+		// TODO do we need to do anything on later generations?
 	} else {
 		if (gInfo->shared_info->device_type.Generation() == 4
 			|| gInfo->shared_info->device_type.Generation() == 3) {

@@ -184,17 +184,18 @@ Pipe::ConfigureTimings(display_mode* target, bool hardware)
 {
 	CALLED();
 
-	TRACE("%s: fPipeOffset: 0x%" B_PRIx32"\n", __func__, fPipeOffset);
+	TRACE("%s(%d): fPipeOffset: 0x%" B_PRIx32"\n", __func__, hardware,
+		fPipeOffset);
 
 	if (target == NULL) {
 		ERROR("%s: Invalid display mode!\n", __func__);
 		return;
 	}
 
-	/* If there is a transcoder, leave the display at its native resolution,
+	/* If using the transcoder, leave the display at its native resolution,
 	 * and configure only the transcoder (panel fitting will match them
 	 * together). */
-	if (!fHasTranscoder && hardware)
+	if (!fHasTranscoder || hardware)
 	{
 		// update timing (fPipeOffset bumps the DISPLAY_A to B when needed)
 		write32(INTEL_DISPLAY_A_HTOTAL + fPipeOffset,
