@@ -345,6 +345,40 @@ Pipe::ConfigureClocks(const pll_divisors& divisors, uint32 pixelClock,
 	write32(pllControl, pll);
 	read32(pllControl);
 	spin(150);
+
+	if (gInfo->shared_info->device_type.Generation() >= 6) {
+		// SandyBridge has 3 transcoders, but only 2 PLLs. So there is a new
+		// register which routes the PLL output to the transcoder that we need
+		// to configure
+		uint32 pllSel = read32(SNB_DPLL_SEL);
+		TRACE("Old PLL selection: %x\n", pllSel);
+		uint32 shift = 0;
+		uint32 pllIndex = 0;
+
+		// FIXME we assume that pipe A is used with transcoder A, and pipe B
+		// with transcoder B, that may not always be the case
+		if (fPipeIndex == INTEL_PIPE_A) {
+			shift = 0;
+			pllIndex = 0;
+			TRACE("Route PLL A to transcoder A\n");
+		} else if (fPipeIndex == INTEL_PIPE_B) {
+			shift = 4;
+			pllIndex = 1;
+			TRACE("Route PLL B to transcoder B\n");
+		} else {
+			ERROR("Attempting to configure PLL for unhandled pipe");
+			return;
+		}
+
+		// Mask out the previous PLL configuration for this transcoder
+		pllSel &= ~(0xF << shift);
+
+		// Set up the new configuration for this transcoder and enable it
+		pllSel |= (8 | pllIndex) << shift;
+
+		TRACE("New PLL selection: %x\n", pllSel);
+		write32(SNB_DPLL_SEL, pllSel);
+	}
 }
 
 

@@ -723,6 +723,7 @@ struct intel_free_graphics_memory {
 #define INTEL_DISPLAY_A_PLL				(0x6014 | REGS_SOUTH_SHARED)
 #define INTEL_DISPLAY_B_PLL				(0x6018 | REGS_SOUTH_SHARED)
 #define CHV_DISPLAY_C_PLL				(0x6030 | REGS_SOUTH_SHARED)
+#define SNB_DPLL_SEL					(0x7000 | REGS_SOUTH_SHARED)
 
 // Ironlake PCH reference clk control
 #define PCH_DREF_CONTROL					(0x6200 | REGS_SOUTH_SHARED)
