@@ -406,7 +406,7 @@ FontManager::_RemoveStyle(font_directory& directory, FontStyle* style)
 	directory.styles.RemoveItem(style);
 	directory.revision++;
 
-	fStyleHashTable.RemoveItem(*style);
+	fStyleHashTable.Remove(FontKey(style->Family()->ID(), style->ID()));
 
 	style->Release();
 }
@@ -619,7 +619,7 @@ FontManager::_AddFont(font_directory& directory, BEntry& entry)
 	}
 
 	directory.styles.AddItem(style);
-	fStyleHashTable.AddItem(style);
+	fStyleHashTable.Put(FontKey(style->Family()->ID(), style->ID()), style);
 
 	if (directory.AlreadyScanned())
 		directory.revision++;
@@ -981,7 +981,7 @@ FontFamily*
 FontManager::GetFamily(uint16 familyID) const
 {
 	FontKey key(familyID, 0);
-	FontStyle* style = (FontStyle*)fStyleHashTable.GetValue(key);
+	FontStyle* style = fStyleHashTable.Get(key);
 	if (style != NULL)
 		return style->Family();
 
@@ -1074,7 +1074,7 @@ FontStyle*
 FontManager::GetStyle(uint16 familyID, uint16 styleID) const
 {
 	FontKey key(familyID, styleID);
-	return (FontStyle*)fStyleHashTable.GetValue(key);
+	return fStyleHashTable.Get(key);
 }
 
 

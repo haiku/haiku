@@ -10,8 +10,7 @@
 #define FONT_MANAGER_H
 
 
-#include "HashTable.h"
-
+#include <HashMap.h>
 #include <Looper.h>
 #include <ObjectList.h>
 
@@ -112,6 +111,25 @@ private:
 			FT_CharMap			_GetSupportedCharmap(const FT_Face& face);
 
 private:
+			struct FontKey {
+				FontKey(uint16 family, uint16 style)
+					: familyID(family), styleID(style) {}
+
+				uint32 GetHashCode() const
+				{
+					return familyID | (styleID << 16UL);
+				}
+
+				bool operator==(const FontKey& other) const
+				{
+					return familyID == other.familyID
+						&& styleID == other.styleID;
+				}
+
+				uint16 familyID, styleID;
+			};
+
+private:
 			status_t			fInitStatus;
 
 			typedef BObjectList<font_directory>		DirectoryList;
@@ -122,7 +140,7 @@ private:
 			MappingList			fMappings;
 			FamilyList			fFamilies;
 
-			HashTable			fStyleHashTable;
+			HashMap<FontKey, FontStyle*> fStyleHashTable;
 
 			ServerFont*			fDefaultPlainFont;
 			ServerFont*			fDefaultBoldFont;

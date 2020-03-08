@@ -70,7 +70,6 @@ Server app_server :
 	DrawState.cpp
 	EventDispatcher.cpp
 	EventStream.cpp
-	HashTable.cpp
 	InputManager.cpp
 	IntPoint.cpp
 	IntRect.cpp
