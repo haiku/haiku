@@ -6,6 +6,7 @@
 #define _CATALOG_H_
 
 #ifndef B_AVOID_TRANSLATION_MACROS
+#define B_TRANSLATE(x) x
 #define B_TRANSLATE_MARK(x) x
 #define B_TRANSLATE_NOCOLLECT(x) x
 #endif

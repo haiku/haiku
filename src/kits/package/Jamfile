@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src kits package ;
 
+AddResources libpackage.so : libpackage.rdef ;
+
 UsePrivateHeaders
 	app
 	kernel
@@ -144,6 +146,7 @@ DoCatalogs libpackage.so :
 	x-vnd.Haiku-libpackage
 	:
 	PackageManager.cpp
+	RefreshRepositoryRequest.cpp
 ;
 
 HaikuSubInclude solver ;
