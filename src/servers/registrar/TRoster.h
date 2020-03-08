@@ -11,19 +11,16 @@
 #include "RecentEntries.h"
 #include "WatchingService.h"
 
+#include <HashSet.h>
+#include <HashMap.h>
 #include <Locker.h>
 #include <MessageQueue.h>
 #include <Path.h>
 #include <Roster.h>
 #include <SupportDefs.h>
 
-#include <hash_set>
 #include <map>
 
-
-#if __GNUC__ >= 4
-using __gnu_cxx::hash_set;
-#endif
 
 using std::map;
 
@@ -77,7 +74,7 @@ public:
 			status_t		GetShutdownApps(AppInfoList& userApps,
 								AppInfoList& systemApps,
 								AppInfoList& backgroundApps,
-								hash_set<team_id>& vitalSystemApps);
+								HashSet<HashKey32<team_id> >& vitalSystemApps);
 			status_t		AddAppInfo(AppInfoList& apps, team_id team);
 
 			status_t		AddWatcher(Watcher* watcher);

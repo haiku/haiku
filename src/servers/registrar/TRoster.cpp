@@ -1404,7 +1404,7 @@ TRoster::SetShuttingDown(bool shuttingDown)
 */
 status_t
 TRoster::GetShutdownApps(AppInfoList& userApps, AppInfoList& systemApps,
-	AppInfoList& backgroundApps, hash_set<team_id>& vitalSystemApps)
+	AppInfoList& backgroundApps, HashSet<HashKey32<team_id> >& vitalSystemApps)
 {
 	BAutolock _(fLock);
 
@@ -1417,28 +1417,28 @@ TRoster::GetShutdownApps(AppInfoList& userApps, AppInfoList& systemApps,
 	// * debug server
 
 	// ourself
-	vitalSystemApps.insert(be_app->Team());
+	vitalSystemApps.Add(be_app->Team());
 
 	// kernel team
 	team_info teamInfo;
 	if (get_team_info(B_SYSTEM_TEAM, &teamInfo) == B_OK)
-		vitalSystemApps.insert(teamInfo.team);
+		vitalSystemApps.Add(teamInfo.team);
 
 	// app server
 	RosterAppInfo* info
 		= fRegisteredApps.InfoFor("application/x-vnd.haiku-app_server");
 	if (info != NULL)
-		vitalSystemApps.insert(info->team);
+		vitalSystemApps.Add(info->team);
 
 	// debug server
 	info = fRegisteredApps.InfoFor("application/x-vnd.haiku-debug_server");
 	if (info != NULL)
-		vitalSystemApps.insert(info->team);
+		vitalSystemApps.Add(info->team);
 
 	// populate the other groups
 	for (AppInfoList::Iterator it(fRegisteredApps.It());
 			RosterAppInfo* info = *it; ++it) {
-		if (vitalSystemApps.find(info->team) == vitalSystemApps.end()) {
+		if (!vitalSystemApps.Contains(info->team)) {
 			RosterAppInfo* clonedInfo = info->Clone();
 			if (clonedInfo) {
 				if (_IsSystemApp(info)) {
@@ -1466,7 +1466,7 @@ TRoster::GetShutdownApps(AppInfoList& userApps, AppInfoList& systemApps,
 	// not excluded in the lists above
 	info = fRegisteredApps.InfoFor("application/x-vnd.Be-input_server");
 	if (info != NULL)
-		vitalSystemApps.insert(info->team);
+		vitalSystemApps.Add(info->team);
 
 	// clean up on error
 	if (error != B_OK) {
