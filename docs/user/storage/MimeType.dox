@@ -906,7 +906,6 @@
 	\retval B_OK The ref was retrieved successfully.
 	\retval B_NO_INIT BMimeType was uninitialized.
 	\retval B_BAD_VALUE \a ref was \c NULL.
-	\retval B_NO_INIT BMimeType was uninitialized.
 
 	\since BeOS R3
 */

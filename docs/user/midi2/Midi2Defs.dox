@@ -1,13 +1,13 @@
 /*!
 	\file Midi2Defs.h
 	\ingroup midi2
-	\brief Some definitions to define raw MIDI events.
+	\brief Some definitions to define Identifier of MIDI events.
 */
 
 
 /*!
 	\name Channel Message Masks
-	\brief Some definitions to define the raw MIDI events.
+	\brief Some definitions to define the Identifier of MIDI events.
 
 	The default implementation of BMidiLocalConsumer::Data() uses these
 	constants to determine which event has been passed on. If you override
@@ -20,36 +20,43 @@
 
 /*!
 	\var B_NOTE_OFF
+	\brief Identifier of note off message.
 */
 
 
 /*!
 	\var B_NOTE_ON
+	\brief Identifier of note on message.
 */
 
 
 /*!
 	\var B_KEY_PRESSURE
+	\brief Identifier of key pressure message.
 */
 
 
 /*!
 	\var B_CONTROL_CHANGE
+	\brief Identifier of control change message.
 */
 
 
 /*!
 	\var B_PROGRAM_CHANGE
+	\brief Identifier of program change message.
 */
 
 
 /*!
 	\var B_CHANNEL_PRESSURE
+	\brief Identifier of channel pressure message.
 */
 
 
 /*!
 	\var B_PITCH_BEND
+	\brief Identifier of pitch bend message.
 */
 
 
@@ -58,7 +65,7 @@
 
 /*!
 	\name System Messages
-	\brief Some definitions to define the raw MIDI system messages.
+	\brief Some definitions to define the Identifier of MIDI system messages.
 
 	The default implementation of BMidiLocalConsumer::Data() uses these
 	constants to determine which event system message has been passed on.
@@ -73,66 +80,79 @@
 
 /*!
 	\var B_SYS_EX_START
+	\brief Identifier of system exclusive start message.
 */
 
 
 /*!
 	\var B_MIDI_TIME_CODE
+	\brief Identifier of midi time code message.
 */
 
 
 /*!
 	\var B_SONG_POSITION
+	\brief Identifier of song position message.
 */
 
 
 /*!
 	\var B_SONG_SELECT
+	\brief Identifier of song select message.
 */
 
 
 /*!
 	\var B_CABLE_MESSAGE
+	\brief Identifier of cable message.
 */
 
 
 /*!
 	\var B_TUNE_REQUEST
+	\brief Identifier of tune request message.
 */
 
 
 /*!
 	\var B_SYS_EX_END
+	\brief Identifier of system exclusive end message.
 */
 
 
 /*!
 	\var B_TIMING_CLOCK
+	\brief Identifier of timing clock message.
 */
 
 
 /*!
 	\var B_START
+	\brief Identifier of start message.
 */
 
 
 /*!
 	\var B_CONTINUE
+	\brief Identifier of continue message.
 */
 
 
 /*!
 	\var B_STOP
+	\brief Identifier of stop message.
 */
 
 
 /*!
 	\var B_ACTIVE_SENSING
+	\brief Identifier of active sensing message.
 */
 
 
 /*!
 	\var B_SYSTEM_RESET
+	\brief Identifier of system reset message.
 */
 
 
@@ -152,191 +172,225 @@
 //! @{
 
 
-*/
-
-
 /*!
 	\var B_MODULATION
+	\brief Identifier of modulation message.
 */
 
 
 /*!
 	\var B_BREATH_CONTROLLER
+	\brief Identifier of breath controller message.
 */
 
 
 /*!
 	\var B_FOOT_CONTROLLER
+	\brief Identifier of foot controller message.
 */
 
 
 /*!
 	\var B_PORTAMENTO_TIME
+	\brief Identifier of portamento time message.
 */
 
 
 /*!
 	\var B_DATA_ENTRY
+	\brief Identifier of data entry message.
 */
 
 
 /*!
 	\var B_MAIN_VOLUME
+	\brief Identifier of main volume message.
 */
 
 
 /*!
 	\var B_MIDI_BALANCE
+	\brief Identifier of MIDI balance message.
 */
 
 
 /*!
 	\var B_PAN
+	\brief Identifier of pan message.
 */
 
 
 /*!
 	\var B_EXPRESSION_CTRL
+	\brief Identifier of expression control message.
 */
 
 
 /*!
 	\var B_GENERAL_CTRL_1
+	\brief Identifier of general control 1 message.
 */
 
 
 /*!
 	\var B_GENERAL_CTRL_2
+	\brief Identifier of general control 2 message.
 */
 
 
 /*!
 	\var B_GENERAL_CTRL_3
+	\brief Identifier of general control 3 message.
 */
 
 
 /*!
 	\var B_GENERAL_CTRL_4
+	\brief Identifier of general control 4 message.
 */
 
 
 /*!
 	\var B_SUSTAIN_PEDAL
+	\brief Identifier of sustain pedal message.
 */
 
 
 /*!
 	\var B_PORTAMENTO
+	\brief Identifier of portamento message.
 */
 
 
 /*!
 	\var B_SOSTENUTO
+	\brief Identifier of sostenuto message.
 */
 
 
 /*!
 	\var B_SOFT_PEDAL
+	\brief Identifier of soft pedal message.
 */
 
 
 /*!
 	\var B_HOLD_2
+	\brief Identifier of hold 2 message.
 */
 
 
 /*!
 	\var B_GENERAL_CTRL_5
+	\brief Identifier of general control 5 message.
 */
 
 
 /*!
 	\var B_GENERAL_CTRL_6
+	\brief Identifier of general control 6 message.
 */
 
 
 /*!
 	\var B_TEMPO_CHANGE
+	\brief Identifier of tempo change message.
 */
 
 
 /*!
 	\var B_GENERAL_CTRL_7
+	\brief Identifier of general control 7 message.
 */
 
 
 /*!
 	\var B_GENERAL_CTRL_8
+	\brief Identifier of general control 8 message.
 */
 
 
 /*!
 	\var B_EFFECTS_DEPTH
+	\brief Identifier of effects depth message.
 */
 
 
 /*!
 	\var B_TREMOLO_DEPTH
+	\brief Identifier of tremelo depth message.
 */
 
 
 /*!
 	\var B_CHORUS_DEPTH
+	\brief Identifier of chorus depth message.
 */
 
 
 /*!
 	\var B_CELESTE_DEPTH
+	\brief Identifier of celeste depth message.
 */
 
 
 /*!
 	\var B_PHASER_DEPTH
+	\brief Identifier of phaser depth message.
 */
 
 
 /*!
 	\var B_DATA_INCREMENT
+	\brief Identifier of data increment message.
 */
 
 
 /*!
 	\var B_DATA_DECREMENT
+	\brief Identifier of data decrement message.
 */
 
 
 /*!
 	\var B_RESET_ALL_CONTROLLERS
+	\brief Identifier of reset all controllers message.
 */
 
 
 /*!
 	\var B_LOCAL_CONTROL
+	\brief Identifier of local control message.
 */
 
 
 /*!
 	\var B_ALL_NOTES_OFF
+	\brief Identifier of all notes off message.
 */
 
 
 /*!
 	\var B_OMNI_MODE_OFF
+	\brief Identifier of omni mode off message.
 */
 
 
 /*!
 	\var B_OMNI_MODE_ON
+	\brief Identifier of omni mode on message.
 */
 
 
 /*!
 	\var B_MONO_MODE_ON
+	\brief Identifier of mono mode on message.
 */
 
 
 /*!
 	\var B_POLY_MODE_ON
+	\brief Identifier of poly mode on message.
 */
 
 

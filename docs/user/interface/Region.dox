@@ -187,7 +187,7 @@
 
 
 /*!
-	fn clipping_rect BRegion::RectAtInt(int32 index)
+	\fn clipping_rect BRegion::RectAtInt(int32 index)
 	\brief Returns the clipping_rect contained in the region at the given
 	       \a index.
 

@@ -430,10 +430,9 @@
 
 	\retval B_OK The translated data was successfully written to
 		\a destination.
-	\retval B_NO_TRANSLATOR \a info was non-null but did not match to any
-		translator in the roster.
-	\retval B_NO_TRANSLATOR \a info was \c NULL and no suitable translator was
-		found.
+	\retval B_NO_TRANSLATOR When \a info was non-null, it did not match to any
+		translator in the roster. If \a info was \c NULL, then no suitable
+		translator was found.
 	\retval B_ERROR An error occurred.
 	\retval B_BAD_VALUE \a source or \a destination was \c NULL or
 		\a ioExtension was \c NULL or contained bad data.

@@ -89,30 +89,6 @@
 
 
 /*!
-	\fn status_t BTimeFormat::Format(char* string, size_t maxSize,
-		time_t time, BTimeFormatStyle style) const
-	\brief Fills in \a string with a formatted time for the given
-	       \a time, and \a style for the locale.
-
-	\param string The string buffer to fill with the formatted time.
-	\param time The time (in seconds since midnight) to format.
-	\param style Specify the long format or the short format.
-
-	\returns A status code.
-	\retval B_OK Everything went fine.
-	\retval B_ERROR Unable to lock the BLocale.
-	\retval B_NO_MEMORY Ran out of memory while creating the object.
-
-	\sa BLocale::FormatDate(BString*, time_t, BTimeFormatStyle,
-		const BTimeZone*) const
-	\sa BLocale::FormatDateTime(BString*, time_t, BTimeFormatStyle,
-		BTimeFormatStyle, const BTimeZone*) const
-
-	\since Haiku R1
-*/
-
-
-/*!
 	\fn status_t BTimeFormat::Format(BString& string, const time_t time,
 		const BTimeFormatStyle style, const BTimeZone* timeZone) const
 	\brief Fills in \a string with a formatted time for the given

@@ -469,6 +469,11 @@ div.contents dt {
 	margin-bottom: 8px;
 }
 
+div.image {
+	margin-top: 16px;
+	margin-bottom: 8px;
+}
+
 .icon {
 	font-weight: bold;
 	font-size: 12px;

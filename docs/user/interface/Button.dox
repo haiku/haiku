@@ -530,7 +530,7 @@
 
 
 /*!
-	\fn status_t BControl::SetIcon(const BBitmap* icon, uint32 flags)
+	\fn status_t BButton::SetIcon(const BBitmap* icon, uint32 flags)
 	\brief This convenience method is used to set the bitmaps
 	       for the standard states from a single bitmap.
 

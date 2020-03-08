@@ -83,6 +83,8 @@
 
 /*!
 	\class BNotification
+	\ingroup app
+	\ingroup libbe
 	\brief Construct system-default notifications to be displayed to the user.
 
 	Haiku provides a notification system that allows you to display messages to
@@ -120,8 +122,6 @@
 	notification.SetProgress(0.5);
 	notification.Send();
 	\endcode
-
-	\p
 
 	\image html notification_intro.png
 

@@ -637,18 +637,6 @@
 
 
 /*!
-	\fn BString& BString::operator+=(const BString& string)
-	\brief Append the given \a string to the end of the BString.
-
-	\param string The string to append.
-
-	\return This method always returns \c *this.
-
-	\sa Append(const BString&, int32)
-*/
-
-
-/*!
 	\fn BString& BString::Append(const BString& string)
 	\brief Append the given \a string to the end of the BString.
 
@@ -1998,8 +1986,6 @@
 	\fn int32 BString::IFindFirst(const char* string) const
 	\brief Find the first occurrence of the given \a string case-insensitively.
 
-	\param string The \a string to search for.
-
 	\copydetails FindFirst(const char*) const
 */
 
@@ -2580,24 +2566,6 @@
 
 
 //! @{
-
-
-/*!
-	\fn char& BString::operator[](int32 index)
-	\brief Return a reference to the data at the given offset.
-
-	This function can be used to read a byte.
-	There is no bounds checking though, so make sure the \c index
-	you supply is valid.
-
-	\param index The index (zero-based) of the byte to get.
-
-	\return Returns a reference to the specified byte.
-
-	\sa ByteAt(int32 index) for a safer version.
-
-	\since BeOS R5
-*/
 
 
 /*!

@@ -447,11 +447,6 @@
 	\retval B_OK The operation was added successfully.
 	\retval B_NO_MEMORY Ran out of memory while trying to add the operation.
 
-	\return Returns a status code, \c B_OK on success or an error code
-	        otherwise.
-	\retval B_OK The operation was added successfully.
-	\retval B_NO_MEMORY Ran out of memory while trying to add the operation.
-
 	\since BeOS R4
 */
 

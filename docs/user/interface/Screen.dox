@@ -452,7 +452,6 @@
 	       available display modes.
 
 	\retval B_OK if the operation was successful.
-	\retval B_ERROR if \a modeList or \a count is invalid.
 	\retval B_ERROR for all other errors.
 
 	\since BeOS R5

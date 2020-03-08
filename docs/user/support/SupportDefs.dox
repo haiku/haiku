@@ -29,41 +29,49 @@
 
 /*!
 	\typedef typedef __haiku_int8 int8
+	\brief 1-byte signed integer.
 */
 
 
 /*!
 	\typedef typedef __haiku_uint8 uint8
+	\brief 1-byte unsigned integer.
 */
 
 
 /*!
 	\typedef typedef __haiku_int16 int16
+	\brief 2-bytes signed integer.
 */
 
 
 /*!
 	\typedef typedef __haiku_uint16 uint16
+	\brief 2-bytes unsigned integer.
 */
 
 
 /*!
 	\typedef typedef __haiku_int32 int32
+	\brief 4-bytes signed integer.
 */
 
 
 /*!
 	\typedef typedef __haiku_uint32 uint32
+	\brief 4-bytes unsigned integer.
 */
 
 
 /*!
 	\typedef typedef __haiku_int64 int64
+	\brief 8-bytes signed integer.
 */
 
 
 /*!
 	\typedef typedef __haiku_uint64 uint64
+	\brief 8-bytes unsigned integer.
 */
 
 
@@ -80,41 +88,49 @@
 
 /*!
 	\typedef typedef volatile int8 vint8
+	\brief 1-byte volatile signed integer.
 */
 
 
 /*!
 	\typedef typedef volatile uint8 vuint8
+	\brief 1-byte volatile unsigned integer.
 */
 
 
 /*!
 	\typedef typedef volatile int16 vint16
+	\brief 2-bytes volatile signed integer.
 */
 
 
 /*!
 	\typedef typedef volatile uint16 vuint16
+	\brief 2-bytes volatile unsigned integer.
 */
 
 
 /*!
 	\typedef typedef volatile int32 vint32
+	\brief 4-bytes volatile signed integer.
 */
 
 
 /*!
 	\typedef typedef volatile uint32 vuint32
+	\brief 4-bytes volatile unsigned integer.
 */
 
 
 /*!
 	\typedef typedef volatile int64 vint64
+	\brief 8-bytes volatile signed integer.
 */
 
 
 /*!
 	\typedef typedef volatile uint64 vuint64
+	\brief 8-bytes volatile unsigned integer.
 */
 
 
@@ -131,41 +147,49 @@
 
 /*!
 	\typedef typedef volatile long vlong
+	\brief Volatile signed long.
 */
 
 
 /*!
 	\typedef typedef volatile int vint
+	\brief Volatile signed int.
 */
 
 
 /*!
 	\typedef typedef volatile short vshort
+	\brief Volatile signed short.
 */
 
 
 /*!
 	\typedef typedef volatile char vchar
+	\brief Volatile signed char.
 */
 
 
 /*!
 	\typedef typedef volatile unsigned long vulong
+	\brief Volatile unsigned long.
 */
 
 
 /*!
 	\typedef typedef volatile unsigned int vuint
+	\brief Volatile unsigned int.
 */
 
 
 /*!
 	\typedef typedef volatile unsigned short vushort
+	\brief Volatile unsigned short.
 */
 
 
 /*!
 	\typedef typedef volatile unsigned char vuchar
+	\brief Volatile unsigned char.
 */
 
 
@@ -181,12 +205,14 @@
 
 
 /*!
-  \typedef typedef unsigned char uchar
+	\typedef typedef unsigned char uchar
+	\brief Unsigned 1-byte wide character.
 */
 
 
 /*!
-  \typedef typedef unsigned short unichar
+	\typedef typedef unsigned short unichar
+	\brief Unsigned 2-byte wide character.
 */
 
 

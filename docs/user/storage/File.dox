@@ -280,7 +280,7 @@
 
 
 /*!
-	ssize_t BFile::Read(void* buffer, size_t size)
+	\fn ssize_t BFile::Read(void* buffer, size_t size)
 	\brief Reads a number of bytes from the file into a buffer.
 
 	\param buffer The buffer the data from the file shall be written to.
