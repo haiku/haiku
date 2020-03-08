@@ -21,7 +21,7 @@ using std::nothrow;
 typedef struct {} mynothrow_t;
 extern const mynothrow_t mynothrow;
 
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201103L
 #define _THROW(x)
 #define _NOEXCEPT noexcept
 #else
