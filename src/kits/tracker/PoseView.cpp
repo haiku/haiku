@@ -1905,8 +1905,8 @@ BPoseView::CreatePoses(Model** models, PoseInfo* poseInfoArray, int32 count,
 		Model* model = models[modelIndex];
 
 		// pose adopts model and deletes it when done
-		if (fInsertedNodes.find(*(model->NodeRef())) != fInsertedNodes.end()
-			|| FindZombie(model->NodeRef())) {
+		if (fInsertedNodes.Contains(*(model->NodeRef()))
+				|| FindZombie(model->NodeRef())) {
 			watch_node(model->NodeRef(), B_STOP_WATCHING, this);
 			delete model;
 			if (resultingPoses)
@@ -1914,7 +1914,7 @@ BPoseView::CreatePoses(Model** models, PoseInfo* poseInfoArray, int32 count,
 
 			continue;
 		} else
-			fInsertedNodes.insert(*(model->NodeRef()));
+			fInsertedNodes.Add(*(model->NodeRef()));
 
 		if ((clipboardMode = FSClipboardFindNodeMode(model, !clipboardLocked,
 				true)) != 0 && !HasPosesInClipboard()) {
@@ -8067,7 +8067,7 @@ BPoseView::DeletePose(const node_ref* itemNode, BPose* pose, int32 index)
 		pose = fPoseList->FindPose(itemNode, &index);
 
 	if (pose != NULL) {
-		fInsertedNodes.erase(fInsertedNodes.find(*itemNode));
+		fInsertedNodes.Remove(*itemNode);
 		if (pose->TargetModel()->IsSymLink()) {
 			fBrokenLinks->RemoveItem(pose->TargetModel());
 			StopWatchingParentsOf(pose->TargetModel()->EntryRef());
@@ -8430,7 +8430,7 @@ BPoseView::SwitchDir(const entry_ref* newDirRef, AttributeStreamNode* node)
 	// the new add_poses thread will then set fAddPosesThread to its ID and it
 	// will be allowed to add icons
 	fAddPosesThreads.clear();
-	fInsertedNodes.clear();
+	fInsertedNodes.Clear();
 
 	delete fModel;
 	fModel = model;
@@ -8511,14 +8511,12 @@ BPoseView::SwitchDir(const entry_ref* newDirRef, AttributeStreamNode* node)
 void
 BPoseView::Refresh()
 {
-	BEntry entry;
-
 	ASSERT(TargetModel());
 	if (TargetModel()->OpenNode() != B_OK)
 		return;
 
 	StopWatching();
-	fInsertedNodes.clear();
+	fInsertedNodes.Clear();
 	ClearPoses();
 	StartWatching();
 

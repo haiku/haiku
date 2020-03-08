@@ -53,39 +53,16 @@ All rights reserved.
 
 #include <Directory.h>
 #include <FilePanel.h>
+#include <HashSet.h>
 #include <MessageRunner.h>
 #include <String.h>
 #include <ScrollBar.h>
 #include <View.h>
-#include <hash_set>
 #include <set>
 
 
 class BRefFilter;
 class BList;
-
-#if __GNUC__ > 2
-namespace __gnu_cxx {
-template<>
-struct hash<node_ref>
-#else
-template<>
-struct std::hash<node_ref>
-#endif
-{
-	size_t
-	operator()(node_ref ref) const
-	{
-		return ref.node;
-	}
-};
-#if __GNUC__ > 2
-} // namespace __gnu_cxx
-typedef __gnu_cxx::hash_set<node_ref, __gnu_cxx::hash<node_ref> > NodeSet;
-#else
-typedef std::hash_set<node_ref, std::hash<node_ref> > NodeSet;
-#endif
-
 
 namespace BPrivate {
 
@@ -700,6 +677,35 @@ private:
 	void _ResetStartOffset();
 
 protected:
+	struct node_ref_key {
+		node_ref_key() {}
+		node_ref_key(const node_ref& value) : value(value) {}
+
+		uint32 GetHashCode() const
+		{
+			return (uint32)value.device ^ (uint32)value.node;
+		}
+
+		node_ref_key operator=(const node_ref_key& other)
+		{
+			value = other.value;
+			return *this;
+		}
+
+		bool operator==(const node_ref_key& other) const
+		{
+			return (value == other.value);
+		}
+
+		bool operator!=(const node_ref_key& other) const
+		{
+			return (value != other.value);
+		}
+
+		node_ref	value;
+	};
+
+protected:
 	TScrollBar* fHScrollBar;
 	BScrollBar* fVScrollBar;
 	Model* fModel;
@@ -710,7 +716,7 @@ protected:
 	PoseList* fFilteredPoseList;
 	PoseList* fVSPoseList;
 	PoseList* fSelectionList;
-	NodeSet fInsertedNodes;
+	HashSet<node_ref_key> fInsertedNodes;
 	BObjectList<BString> fMimeTypesInSelectionCache;
 		// used for mime string based icon highliting during a drag
 	BObjectList<Model>* fZombieList;
