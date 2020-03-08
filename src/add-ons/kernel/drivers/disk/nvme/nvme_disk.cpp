@@ -161,7 +161,7 @@ nvme_disk_set_capacity(nvme_disk_driver_info* info, uint64 capacity,
 //	#pragma mark - device module API
 
 
-static int nvme_interrupt_handler(void* _info);
+static int32 nvme_interrupt_handler(void* _info);
 
 
 static status_t
@@ -344,7 +344,7 @@ nvme_disk_close(void* cookie)
 {
 	CALLED();
 
-	nvme_disk_handle* handle = (nvme_disk_handle*)cookie;
+	//nvme_disk_handle* handle = (nvme_disk_handle*)cookie;
 	return B_OK;
 }
 
@@ -363,7 +363,7 @@ nvme_disk_free(void* cookie)
 // #pragma mark - I/O functions
 
 
-static int
+static int32
 nvme_interrupt_handler(void* _info)
 {
 	nvme_disk_driver_info* info = (nvme_disk_driver_info*)_info;
