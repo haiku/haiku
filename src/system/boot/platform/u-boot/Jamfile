@@ -5,6 +5,7 @@ SubDirHdrs $(HAIKU_TOP) headers private kernel platform $(TARGET_BOOT_PLATFORM) 
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers fdt ;
 
 SubDirHdrs $(HAIKU_TOP) src system boot arch $(TARGET_KERNEL_ARCH) ;
+SubDirHdrs $(HAIKU_TOP) src system boot platform u-boot arch $(TARGET_KERNEL_ARCH) ;
 
 UseLibraryHeaders [ FDirName libfdt ] ;
 

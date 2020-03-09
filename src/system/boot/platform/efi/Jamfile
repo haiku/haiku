@@ -33,10 +33,6 @@ local platform_src =
 
 local support_libs ;
 
-if $(TARGET_KERNEL_ARCH) in arm arm64 {
-	support_libs += boot_fdt.a ;
-}
-
 local platform ;
 for platform in [ MultiBootSubDirSetup efi ] {
 	on $(platform) {

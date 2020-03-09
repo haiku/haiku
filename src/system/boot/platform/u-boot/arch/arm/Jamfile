@@ -2,6 +2,9 @@ SubDir HAIKU_TOP src system boot platform u-boot arch arm ;
 
 SubDirHdrs $(HAIKU_TOP) src system boot platform $(TARGET_BOOT_PLATFORM) ;
 SubDirHdrs $(HAIKU_TOP) src system boot arch $(TARGET_KERNEL_ARCH) ;
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers fdt ;
+
+UseLibraryHeaders [ FDirName libfdt ] ;
 
 UsePrivateSystemHeaders ;
 UsePrivateHeaders kernel [ FDirName kernel platform u-boot ] ;
@@ -13,6 +16,18 @@ SubDirC++Flags -fno-rtti ;
 BootMergeObject boot_platform_u-boot_arm.o :
 	# must come first to have _start_* at correct locations
 	shell.S
+
+	# Framebuffer drivers
+	arch_framebuffer_920.cpp
+	arch_framebuffer_bcm2835.cpp
+	arch_framebuffer_omap3.cpp
+	arch_framebuffer_pxa.cpp
+
+	# Mailbox drivers
+	arch_mailbox_bcm2835.cpp
+
+	# u-boot mmu setup
+	arch_mmu.cpp
 ;
 
 #SEARCH on [ FGristFiles arch_cpu_asm.S ]

@@ -1,8 +1,6 @@
 SubDir HAIKU_TOP src system boot arch arm ;
 
-UseLibraryHeaders [ FDirName libfdt ] ;
 UsePrivateHeaders [ FDirName kernel platform $(TARGET_BOOT_PLATFORM) ] ;
-SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers fdt ;
 
 # TODO: Is there any reason to recompile arch_string.S here?
 local librootArchObjects =
@@ -15,16 +13,14 @@ local kernelLibArchObjects =
 	<src!system!kernel!lib!arch!$(TARGET_ARCH)>memset.o
 ;
 
+local kernelArchSources =
+	arch_elf.cpp
+	arch_uart_8250.cpp
+;
+
 local kernelDebugSources =
 	blue_screen.cpp
 	frame_buffer_console.cpp
-;
-
-local kernelArchDriverSources =
-	# Serial UART Drivers
-	arch_uart_8250.cpp
-	arch_uart_8250_omap.cpp
-	arch_uart_pl011.cpp
 ;
 
 local kernelGenericDriverSources =
@@ -38,20 +34,9 @@ for platform in [ MultiBootSubDirSetup u-boot efi ] {
 		BootMergeObject [ FGristFiles boot_arch_$(TARGET_KERNEL_ARCH).o ] :
 			# Kernel Drivers (src/system/kernel)
 			$(kernelGenericDriverSources)
-			$(kernelArchDriverSources)
+			$(kernelArchSources)
 
-			# Framebuffer Drivers
-			arch_framebuffer_920.cpp
-			arch_framebuffer_bcm2835.cpp
-			arch_framebuffer_pxa.cpp
-			arch_framebuffer_omap3.cpp
-
-			# Mailbox drivers
-			arch_mailbox_bcm2835.cpp
-
-			arch_elf.cpp
 			arch_cpu.cpp
-			arch_mmu.cpp
 			arch_start_kernel.S
 
 			# Reuse a subset of kernel debugging.
@@ -63,7 +48,8 @@ for platform in [ MultiBootSubDirSetup u-boot efi ] {
 			:
 			$(kernelLibArchObjects)
 		;
-		SEARCH on [ FGristFiles arch_elf.cpp $(kernelArchDriverSources) ]
+
+		SEARCH on [ FGristFiles $(kernelArchSources) ]
 			= [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH) ] ;
 
 		SEARCH on [ FGristFiles $(kernelGenericDriverSources) ]

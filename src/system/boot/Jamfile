@@ -101,6 +101,16 @@ rule BuildEFILoader {
 	local bootLoader = $(2) ;
 
 	Depends $(efiLoader) : $(bootLoader) ;
+
+	switch $(TARGET_ARCH) {
+		case x86_64 :
+			OUTPUT_TARGET on $(efiLoader) = efi-app-x86_64 ;
+		case arm :
+			OUTPUT_TARGET on $(efiLoader) = binary ;
+		case * :
+			Exit "Currently unsupported arch:" $(TARGET_ARCH) ;
+	}
+
 	MakeLocateDebug $(efiLoader) ;
 }
 
@@ -109,8 +119,7 @@ actions BuildEFILoader
 	rm -f $(1)
 	$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -j .text -j .sdata -j .data \
 		-j .dynamic -j .dynsym -j .rel -j .rela -j .reloc -j .dynstr \
-		--input-target=efi-app-x86_64 --output-target=efi-app-x86_64 \
-		$(2) $(1)
+		--output-target=$(OUTPUT_TARGET) $(2) $(1)
 }
 
 
