@@ -39,7 +39,7 @@
 
 #include <elf.h>
 
-efi_status _relocate(long ldbase, Elf32_Dyn *dyn,
+extern "C" efi_status _relocate(long ldbase, Elf32_Dyn *dyn,
 		      efi_handle image __attribute__((__unused__)),
 		      efi_system_table *systab __attribute__((__unused__)))
 {

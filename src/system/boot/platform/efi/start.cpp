@@ -43,7 +43,7 @@ efi_handle kImage;
 
 
 static uint32 sBootOptions;
-
+void* gFDT;
 
 extern "C" int main(stage2_args *args);
 extern "C" void _start(void);
@@ -177,6 +177,7 @@ extern "C" efi_status
 efi_main(efi_handle image, efi_system_table *systemTable)
 {
 	stage2_args args;
+	gFDT = NULL;
 
 	memset(&args, 0, sizeof(stage2_args));
 

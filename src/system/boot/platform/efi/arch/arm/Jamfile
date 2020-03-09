@@ -10,6 +10,7 @@ local arch_src =
 	#entry.S
 	relocation_func.cpp
 	arch_smp.cpp
+	arch_start.cpp
 	arch_mmu.cpp
 	arch_timer.cpp
 	;
