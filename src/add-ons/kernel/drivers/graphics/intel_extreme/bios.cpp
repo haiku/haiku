@@ -257,9 +257,9 @@ get_lvds_mode_from_bios(display_mode* sharedInfo)
 					(vbios.memory + bdbOffset
 					+ lvds2->panels[panelType].lfp_info_offset);
 				/* check terminator */
-				if (*terminator != 0xffff) {
-					TRACE((DEVICE_NAME ": Incorrect LFP info terminator %x %x\n",
-						lvds2_lfp_info->terminator, *terminator));
+				if (lvds2_lfp_info->terminator != 0xffff) {
+					TRACE((DEVICE_NAME ": Incorrect LFP info terminator %x\n",
+						lvds2_lfp_info->terminator));
 #if 0
 					// FIXME the terminator is not present on my SandyBridge
 					// laptop, but the video mode is still correct. Maybe the
