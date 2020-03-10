@@ -8617,7 +8617,7 @@ BPoseView::SetDefaultPrinter()
 	BMessenger trackerMessenger(kTrackerSignature);
 	if (!trackerMessenger.IsValid()) {
 		BAlert* alert = new BAlert("",
-			B_TRANSLATE("The Tracker must be running to see set the default "
+			B_TRANSLATE("The Tracker must be running to set the default "
 			"printer."), B_TRANSLATE("Cancel"), NULL, NULL, B_WIDTH_AS_USUAL,
 			B_WARNING_ALERT);
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
