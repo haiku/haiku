@@ -1638,6 +1638,21 @@ rule BuildEfiSystemPartition image : efiLoader
 	Depends $(image) : $(efiLoader) ;
 	Depends $(image) : $(macVolumeIcon) ;
 
+	switch $(TARGET_ARCH) {
+		case x86_64 :
+			EFINAME on $(image) = "BOOTX64.EFI" ;
+		case arm :
+			EFINAME on $(image) = "BOOTARM.EFI" ;
+		case arm64 :
+			EFINAME on $(image) = "BOOTAA64.EFI" ;
+		case riscv32 :
+			EFINAME on $(image) = "BOOTRISCV32.EFI" ;
+		case riscv64 :
+			EFINAME on $(image) = "BOOTRISCV64.EFI" ;
+		case * :
+			Exit "Error: Unknown EFI architecture!" ;
+	}
+
 	EFIICON on $(image) = $(macVolumeIcon) ;
 
 	BuildEfiSystemPartition1 $(image) : $(efiLoader) ;
@@ -1651,5 +1666,5 @@ actions BuildEfiSystemPartition1
 	mmd -D s -i $(<) ::/EFI
 	mmd -D s -i $(<) ::/EFI/BOOT
 	mcopy -D o -i $(<) $(EFIICON) ::/.VolumeIcon.icns
-	mcopy -D o -i $(<) $(>) ::/EFI/BOOT/BOOTX64.EFI
+	mcopy -D o -i $(<) $(>) ::/EFI/BOOT/$(EFINAME)
 }
