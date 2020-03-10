@@ -46,6 +46,7 @@ All rights reserved.
 #include <ControlLook.h>
 #include <Debug.h>
 #include <MenuPrivate.h>
+#include <MessengerPrivate.h>
 #include <NodeInfo.h>
 #include <Roster.h>
 #include <Screen.h>
@@ -263,7 +264,9 @@ TExpandoMenuBar::MouseDown(BPoint where)
 	}
 
 	int32 modifiers = 0;
+	int32 buttons = 0;
 	message->FindInt32("modifiers", &modifiers);
+	message->FindInt32("buttons", &buttons);
 
 	// check for three finger salute, a.k.a. Vulcan Death Grip
 	if ((modifiers & B_COMMAND_KEY) != 0
@@ -280,6 +283,29 @@ TExpandoMenuBar::MouseDown(BPoint where)
 		}
 		return;
 			// absorb the message
+	} else if (item != NULL
+		&& (modifiers & B_SHIFT_KEY) == 0
+		&& (buttons & B_TERTIARY_MOUSE_BUTTON) != 0) {
+		be_roster->Launch(item->Signature());
+		return;
+			// absorb the message
+	} else {
+		TWindowMenuItem* wndItem = dynamic_cast<TWindowMenuItem*>(menuItem);
+		if (wndItem != NULL
+			&& (modifiers & B_SHIFT_KEY) != 0
+			&& (buttons & B_TERTIARY_MOUSE_BUTTON) != 0) {
+			// close window
+			client_window_info* info;
+			BMessenger wnd;
+			info = get_window_info(wndItem->ID());
+			if (info == NULL) return;
+			BMessenger::Private(wnd).SetTo(
+				info->team, info->client_port, info->client_token);
+			free(info); info = NULL;
+			wnd.SendMessage(B_QUIT_REQUESTED);
+			return;
+				// absorb the message
+		}
 	}
 
 	// control click - show all/hide all shortcut
