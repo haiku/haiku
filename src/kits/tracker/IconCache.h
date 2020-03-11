@@ -45,7 +45,7 @@ All rights reserved.
 #include <String.h>
 
 #include "AutoLock.h"
-#include "OpenHashTable.h"
+#include "HashSet.h"
 #include "Utilities.h"
 
 
@@ -115,6 +115,33 @@ enum IconSource {
 };
 
 
+template<typename Class>
+struct SelfHashing {
+	typedef typename Class::HashKeyType KeyType;
+	typedef Class ValueType;
+
+	size_t HashKey(KeyType key) const
+	{
+		return Class::Hash(key);
+	}
+
+	size_t Hash(ValueType* value) const
+	{
+		return value->Hash();
+	}
+
+	bool Compare(KeyType key, ValueType* value) const
+	{
+		return *value == key;
+	}
+
+	ValueType*& GetLink(ValueType* value) const
+	{
+		return value->HashNext();
+	}
+};
+
+
 class IconCacheEntry {
 	// aliased entries don't own their icons, just point
 	// to some other entry that does
@@ -168,7 +195,8 @@ protected:
 	BBitmap* fHighlightedLargeIcon;
 	BBitmap* fMiniIcon;
 	BBitmap* fHighlightedMiniIcon;
-	int32 fAliasForIndex;
+
+	const IconCacheEntry* fAliasTo;
 
 	// list of other icon kinds would be added here
 
@@ -211,26 +239,27 @@ public:
 	const char* FileType() const;
 	const char* AppSignature() const;
 
+public:
 	// hash table support
-	uint32 Hash() const;
-	static uint32 Hash(const char* fileType, const char* appSignature = 0);
-	bool operator==(const SharedCacheEntry &) const;
-	void SetTo(const char* fileType, const char* appSignature = 0);
+	struct TypeAndSignature {
+		const char* type, *signature;
+		TypeAndSignature(const char* t, const char* s)
+			: type(t), signature(s) {}
+	};
+	typedef TypeAndSignature HashKeyType;
+	static size_t Hash(const TypeAndSignature& typeAndSignature);
 
-	int32 fNext;
+	size_t Hash() const;
+	SharedCacheEntry*& HashNext() { return fNext; }
+	bool operator==(const TypeAndSignature& typeAndSignature) const;
+
 private:
+	SharedCacheEntry* fNext;
+
 	BString fFileType;
 	BString fAppSignature;
 
 	friend class SharedIconCache;
-};
-
-
-class SharedCacheEntryArray : public OpenHashElementArray<SharedCacheEntry> {
-	// SharedIconCache stores all it's elements in this array
-public:
-	SharedCacheEntryArray(int32 initialSize);
-	SharedCacheEntry* Add();
 };
 
 
@@ -248,22 +277,18 @@ public:
 		const char* appSignature = 0) const;
 	SharedCacheEntry* AddItem(const char* fileType,
 		const char* appSignature = 0);
-	SharedCacheEntry* AddItem(SharedCacheEntry** outstandingEntry,
-		const char* fileType, const char* appSignature = 0);
-		// same as previous AddItem, updates the pointer to outstandingEntry,
-		// because adding to the hash table makes any pending pointer invalid
 	void IconChanged(SharedCacheEntry*);
 
 	void SetAliasFor(IconCacheEntry* entry,
 		const SharedCacheEntry* original) const;
 	IconCacheEntry* ResolveIfAlias(IconCacheEntry* entry) const;
-	int32 EntryIndex(const SharedCacheEntry* entry) const;
 
-	void RemoveAliasesTo(int32 index);
+	void RemoveAliasesTo(SharedCacheEntry* alias);
 
 private:
-	SharedCacheEntryArray fElementArray;
-	OpenHashTable<SharedCacheEntry, SharedCacheEntryArray> fHashTable;
+	typedef BOpenHashTable<SelfHashing<SharedCacheEntry> > EntryHashTable;
+	EntryHashTable fHashTable;
+
 	BObjectList<BBitmap> fRetiredBitmaps;
 		// icons are drawn asynchronously, can't just delete them right away,
 		// instead have to place them onto the retired bitmap list and wait
@@ -283,28 +308,25 @@ public:
 
 	const node_ref* Node() const;
 
-	uint32 Hash() const;
-	static uint32 Hash(const node_ref*);
-	bool operator==(const NodeCacheEntry&) const;
-	void SetTo(const node_ref*);
-	void MakePermanent();
 	bool Permanent() const;
 
-	int32 fNext;
+public:
+	// hash table support
+	typedef const node_ref* HashKeyType;
+	static size_t Hash(const node_ref* node);
+
+	size_t Hash() const;
+	NodeCacheEntry*& HashNext() { return fNext; }
+	bool operator==(const node_ref* ref) const;
+
 private:
+	NodeCacheEntry* fNext;
+
 	node_ref fRef;
 	bool fPermanent;
 		// special cache entry that has to be deleted explicitly
 
 	friend class NodeIconCache;
-};
-
-
-class NodeCacheEntryArray : public OpenHashElementArray<NodeCacheEntry> {
-	// NodeIconCache stores all it's elements in this array
-public:
-	NodeCacheEntryArray(int32 initialSize);
-	NodeCacheEntry* Add();
 };
 
 
@@ -321,10 +343,6 @@ public:
 
 	NodeCacheEntry* FindItem(const node_ref*) const;
 	NodeCacheEntry* AddItem(const node_ref*, bool permanent = false);
-	NodeCacheEntry* AddItem(NodeCacheEntry** outstandingEntry,
-		const node_ref*);
-		// same as previous AddItem, updates the pointer to outstandingEntry,
-		// because adding to the hash table makes any pending pointer invalid
 	void Deleting(const node_ref*);
 		// model for this node is getting deleted
 		// (not necessarily the node itself)
@@ -333,11 +351,11 @@ public:
 	void Deleting(const BView*);
 	void IconChanged(const Model*);
 
-	void RemoveAliasesTo(int32 index);
+	void RemoveAliasesTo(SharedCacheEntry* alias);
 
 private:
-	NodeCacheEntryArray fElementArray;
-	OpenHashTable<NodeCacheEntry, NodeCacheEntryArray> fHashTable;
+	typedef BOpenHashTable<SelfHashing<NodeCacheEntry> > EntryHashTable;
+	EntryHashTable fHashTable;
 };
 
 
@@ -507,18 +525,12 @@ IconCache::NeedsDeletionNotification(IconSource from)
 inline IconCacheEntry*
 SharedIconCache::ResolveIfAlias(IconCacheEntry* entry) const
 {
-	if (entry->fAliasForIndex < 0)
+	if (entry->fAliasTo == NULL)
 		return entry;
 
-	return fHashTable.ElementAt(entry->fAliasForIndex);
+	return const_cast<IconCacheEntry*>(entry->fAliasTo);
 }
 
-
-inline int32
-SharedIconCache::EntryIndex(const SharedCacheEntry* entry) const
-{
-	return fHashTable.ElementIndex(entry);
-}
 
 } // namespace BPrivate
 

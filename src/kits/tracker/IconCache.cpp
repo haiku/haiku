@@ -107,14 +107,14 @@ IconCacheEntry::IconCacheEntry()
 	fHighlightedLargeIcon(NULL),
 	fMiniIcon(NULL),
 	fHighlightedMiniIcon(NULL),
-	fAliasForIndex(-1)
+	fAliasTo(NULL)
 {
 }
 
 
 IconCacheEntry::~IconCacheEntry()
 {
-	if (fAliasForIndex < 0) {
+	if (fAliasTo == NULL) {
 		delete fLargeIcon;
 		delete fHighlightedLargeIcon;
 		delete fMiniIcon;
@@ -126,7 +126,7 @@ IconCacheEntry::~IconCacheEntry()
 		fMiniIcon = NULL;
 		fHighlightedMiniIcon = NULL;
 	}
-	fAliasForIndex = -1;
+	fAliasTo = NULL;
 }
 
 
@@ -427,7 +427,7 @@ IconCache::GetIconFromMetaMime(const char* fileType, IconDrawMode mode,
 				PRINT_ADD_ITEM(
 					("File %s; Line %d # adding entry as alias for type %s\n",
 					__FILE__, __LINE__, fileType));
-				entry = fSharedCache.AddItem(&aliasTo, fileType);
+				entry = fSharedCache.AddItem(fileType);
 				entry->SetAliasFor(&fSharedCache, aliasTo);
 			}
 			ASSERT(aliasTo->HaveIconBitmap(mode, size));
@@ -531,8 +531,7 @@ IconCache::GetIconFromFileTypes(ModelNodeLazyOpener* modelOpener,
 				 "preferredApp %s, type %s\n",
 				__FILE__, __LINE__, nodePreferredApp, fileType));
 			IconCacheEntry* aliasedEntry
-				= fSharedCache.AddItem((SharedCacheEntry**)&entry, fileType,
-					nodePreferredApp);
+				= fSharedCache.AddItem(fileType, nodePreferredApp);
 			aliasedEntry->SetAliasFor(&fSharedCache,
 				(SharedCacheEntry*)entry);
 				// OK to cast here, have a runtime check
@@ -840,8 +839,7 @@ IconCache::GetGenericIcon(AutoLock<SimpleIconCache>* sharedCacheLocker,
 		__FILE__, __LINE__, model->PreferredAppSignature(),
 		model->MimeType()));
 	IconCacheEntry* aliasedEntry = fSharedCache.AddItem(
-		(SharedCacheEntry**)&entry, model->MimeType(),
-		model->PreferredAppSignature());
+		model->MimeType(), model->PreferredAppSignature());
 	aliasedEntry->SetAliasFor(&fSharedCache, (SharedCacheEntry*)entry);
 
 	source = kMetaMime;
@@ -1223,10 +1221,9 @@ IconCache::IconChanged(const char* mimeType, const char* appSignature)
 
 	entry = (SharedCacheEntry*)fSharedCache.ResolveIfAlias(entry);
 	ASSERT(entry != NULL);
-	int32 index = fSharedCache.EntryIndex(entry);
 
-	fNodeCache.RemoveAliasesTo(index);
-	fSharedCache.RemoveAliasesTo(index);
+	fNodeCache.RemoveAliasesTo(entry);
+	fSharedCache.RemoveAliasesTo(entry);
 
 	fSharedCache.IconChanged(entry);
 }
@@ -1398,24 +1395,13 @@ IconCacheEntry::RetireIcons(BObjectList<BBitmap>* retiredBitmapList)
 //	#pragma mark - SharedIconCache
 
 
-// In debug mode keep the hash table sizes small so that they grow a lot and
-// execercise the resizing code a lot. In release mode allocate them large
-// up-front for better performance
 SharedIconCache::SharedIconCache()
 	:
-#if DEBUG
-	SimpleIconCache("Shared icon cache aka \"The Dead-Locker\""),
-	fElementArray(20),
-	fHashTable(20),
-	fRetiredBitmaps(20, true)
-#else
 	SimpleIconCache("Tracker shared icon cache"),
-	fElementArray(1024),
-	fHashTable(1000),
+	fHashTable(),
 	fRetiredBitmaps(256, true)
-#endif
 {
-	fHashTable.SetElementVector(&fElementArray);
+	fHashTable.Init(256);
 }
 
 
@@ -1445,27 +1431,8 @@ SharedIconCache::FindItem(const char* fileType,
 	if (!fileType)
 		fileType = B_FILE_MIMETYPE;
 
-	SharedCacheEntry* result
-		= fHashTable.FindFirst(SharedCacheEntry::Hash(fileType,
-			appSignature));
-
-	if (result == NULL)
-		return NULL;
-
-	for(;;) {
-		if (result->fFileType == fileType
-			&& result->fAppSignature == appSignature) {
-			return result;
-		}
-
-		if (result->fNext < 0)
-			break;
-
-		result = const_cast<SharedCacheEntry*>(&fElementArray.At(
-			result->fNext));
-	}
-
-	return NULL;
+	return fHashTable.Lookup(SharedCacheEntry::TypeAndSignature(fileType,
+		appSignature));
 }
 
 
@@ -1476,31 +1443,12 @@ SharedIconCache::AddItem(const char* fileType, const char* appSignature)
 	if (fileType == NULL)
 		fileType = B_FILE_MIMETYPE;
 
-	SharedCacheEntry* result = fHashTable.Add(SharedCacheEntry::Hash(fileType,
-		appSignature));
-	result->SetTo(fileType, appSignature);
+	SharedCacheEntry* entry = new SharedCacheEntry(fileType, appSignature);
+	if (fHashTable.Insert(entry) == B_OK)
+		return entry;
 
-	return result;
-}
-
-
-SharedCacheEntry*
-SharedIconCache::AddItem(SharedCacheEntry** outstandingEntry,
-	const char* fileType, const char* appSignature)
-{
-	int32 entryToken = fHashTable.ElementIndex(*outstandingEntry);
-	ASSERT(entryToken >= 0);
-
-	ASSERT(fileType != NULL);
-	if (fileType == NULL)
-		fileType = B_FILE_MIMETYPE;
-
-	SharedCacheEntry* result = fHashTable.Add(SharedCacheEntry::Hash(fileType,
-		appSignature));
-	result->SetTo(fileType, appSignature);
-	*outstandingEntry = fHashTable.ElementAt(entryToken);
-
-	return result;
+	delete entry;
+	return NULL;
 }
 
 
@@ -1516,13 +1464,13 @@ SharedIconCache::IconChanged(SharedCacheEntry* entry)
 
 
 void
-SharedIconCache::RemoveAliasesTo(int32 aliasIndex)
+SharedIconCache::RemoveAliasesTo(SharedCacheEntry* alias)
 {
-	int32 count = fHashTable.VectorSize();
-	for (int32 index = 0; index < count; index++) {
-		SharedCacheEntry* entry = fHashTable.ElementAt(index);
-		if (entry->fAliasForIndex == aliasIndex)
-			fHashTable.Remove(entry);
+	EntryHashTable::Iterator it = fHashTable.GetIterator();
+	while (it.HasNext()) {
+		SharedCacheEntry* entry = it.Next();
+		if (entry->fAliasTo == alias)
+			fHashTable.RemoveUnchecked(entry);
 	}
 }
 
@@ -1531,13 +1479,13 @@ void
 SharedIconCache::SetAliasFor(IconCacheEntry* entry,
 	const SharedCacheEntry* original) const
 {
-	entry->fAliasForIndex = fHashTable.ElementIndex(original);
+	entry->fAliasTo = original;
 }
 
 
 SharedCacheEntry::SharedCacheEntry()
 	:
-	fNext(-1)
+	fNext(NULL)
 {
 }
 
@@ -1545,7 +1493,7 @@ SharedCacheEntry::SharedCacheEntry()
 SharedCacheEntry::SharedCacheEntry(const char* fileType,
 	const char* appSignature)
 	:
-	fNext(-1),
+	fNext(NULL),
 	fFileType(fileType),
 	fAppSignature(appSignature)
 {
@@ -1591,55 +1539,30 @@ SharedCacheEntry::Draw(BView* view, BPoint where, IconDrawMode mode,
 }
 
 
-uint32
-SharedCacheEntry::Hash(const char* fileType, const char* appSignature)
+/* static */ size_t
+SharedCacheEntry::Hash(const TypeAndSignature& typeAndSignature)
 {
-	uint32 hash = HashString(fileType, 0);
-	if (appSignature != NULL && *appSignature != '\0')
-		hash = HashString(appSignature, hash);
+	size_t hash = HashString(typeAndSignature.type, 0);
+	if (typeAndSignature.signature != NULL
+			&& *typeAndSignature.signature != '\0')
+		hash = HashString(typeAndSignature.signature, hash);
 
 	return hash;
 }
 
 
-uint32
+size_t
 SharedCacheEntry::Hash() const
 {
-	uint32 hash = HashString(fFileType.String(), 0);
-	if (fAppSignature.Length() > 0)
-		hash = HashString(fAppSignature.String(), hash);
-
-	return hash;
+	return Hash(TypeAndSignature(fFileType.String(), fAppSignature.String()));
 }
 
 
 bool
-SharedCacheEntry::operator==(const SharedCacheEntry &entry) const
+SharedCacheEntry::operator==(const TypeAndSignature& typeAndSignature) const
 {
-	return fFileType == entry.FileType()
-		&& fAppSignature == entry.AppSignature();
-}
-
-
-void
-SharedCacheEntry::SetTo(const char* fileType, const char* appSignature)
-{
-	fFileType = fileType;
-	fAppSignature = appSignature;
-}
-
-
-SharedCacheEntryArray::SharedCacheEntryArray(int32 initialSize)
-	:
-	OpenHashElementArray<SharedCacheEntry>(initialSize)
-{
-}
-
-
-SharedCacheEntry*
-SharedCacheEntryArray::Add()
-{
-	return OpenHashElementArray<SharedCacheEntry>::Add();
+	return fFileType == typeAndSignature.type
+		&& fAppSignature == typeAndSignature.signature;
 }
 
 
@@ -1648,7 +1571,7 @@ SharedCacheEntryArray::Add()
 
 NodeCacheEntry::NodeCacheEntry(bool permanent)
 	:
-	fNext(-1),
+	fNext(NULL),
 	fPermanent(permanent)
 {
 }
@@ -1656,7 +1579,7 @@ NodeCacheEntry::NodeCacheEntry(bool permanent)
 
 NodeCacheEntry::NodeCacheEntry(const node_ref* node, bool permanent)
 	:
-	fNext(-1),
+	fNext(NULL),
 	fRef(*node),
 	fPermanent(permanent)
 {
@@ -1712,14 +1635,14 @@ NodeCacheEntry::Node() const
 }
 
 
-uint32
+size_t
 NodeCacheEntry::Hash() const
 {
 	return Hash(&fRef);
 }
 
 
-uint32
+/* static */ size_t
 NodeCacheEntry::Hash(const node_ref* node)
 {
 	return node->device ^ ((uint32*)&node->node)[0]
@@ -1728,16 +1651,9 @@ NodeCacheEntry::Hash(const node_ref* node)
 
 
 bool
-NodeCacheEntry::operator==(const NodeCacheEntry &entry) const
+NodeCacheEntry::operator==(const node_ref* node) const
 {
-	return fRef == entry.fRef;
-}
-
-
-void
-NodeCacheEntry::SetTo(const node_ref* node)
-{
-	fRef = *node;
+	return fRef == *node;
 }
 
 
@@ -1748,29 +1664,14 @@ NodeCacheEntry::Permanent() const
 }
 
 
-void
-NodeCacheEntry::MakePermanent()
-{
-	fPermanent = true;
-}
-
-
 //	#pragma mark - NodeIconCache
 
 
 NodeIconCache::NodeIconCache()
 	:
-#if DEBUG
-	SimpleIconCache("Node icon cache aka \"The Dead-Locker\""),
-	fElementArray(20),
-	fHashTable(20)
-#else
-	SimpleIconCache("Tracker node icon cache"),
-	fElementArray(100),
-	fHashTable(100)
-#endif
+	SimpleIconCache("Tracker node icon cache")
 {
-	fHashTable.SetElementVector(&fElementArray);
+	fHashTable.Init(100);
 }
 
 
@@ -1795,47 +1696,19 @@ NodeIconCache::Draw(IconCacheEntry* entry, BView* view, BPoint where,
 NodeCacheEntry*
 NodeIconCache::FindItem(const node_ref* node) const
 {
-	NodeCacheEntry* entry = fHashTable.FindFirst(NodeCacheEntry::Hash(node));
-	if (entry == NULL)
-		return NULL;
-
-	for(;;) {
-		if (*entry->Node() == *node)
-			return entry;
-
-		if (entry->fNext < 0)
-			break;
-
-		entry = const_cast<NodeCacheEntry*>(&fElementArray.At(entry->fNext));
-	}
-
-	return NULL;
+	return fHashTable.Lookup(node);
 }
 
 
 NodeCacheEntry*
 NodeIconCache::AddItem(const node_ref* node, bool permanent)
 {
-	NodeCacheEntry* entry = fHashTable.Add(NodeCacheEntry::Hash(node));
-	entry->SetTo(node);
-	if (permanent)
-		entry->MakePermanent();
+	NodeCacheEntry* entry = new NodeCacheEntry(node, permanent);
+	if (fHashTable.Insert(entry) == B_OK)
+		return entry;
 
-	return entry;
-}
-
-
-NodeCacheEntry*
-NodeIconCache::AddItem(NodeCacheEntry** outstandingEntry,
-	const node_ref* node)
-{
-	int32 entryToken = fHashTable.ElementIndex(*outstandingEntry);
-
-	NodeCacheEntry* entry = fHashTable.Add(NodeCacheEntry::Hash(node));
-	entry->SetTo(node);
-	*outstandingEntry = fHashTable.ElementAt(entryToken);
-
-	return entry;
+	delete entry;
+	return NULL;
 }
 
 
@@ -1880,31 +1753,14 @@ NodeIconCache::IconChanged(const Model* model)
 
 
 void
-NodeIconCache::RemoveAliasesTo(int32 aliasIndex)
+NodeIconCache::RemoveAliasesTo(SharedCacheEntry* alias)
 {
-	int32 count = fHashTable.VectorSize();
-	for (int32 index = 0; index < count; index++) {
-		NodeCacheEntry* entry = fHashTable.ElementAt(index);
-		if (entry->fAliasForIndex == aliasIndex)
-			fHashTable.Remove(entry);
+	EntryHashTable::Iterator it = fHashTable.GetIterator();
+	while (it.HasNext()) {
+		NodeCacheEntry* entry = it.Next();
+		if (entry->fAliasTo == alias)
+			fHashTable.RemoveUnchecked(entry);
 	}
-}
-
-
-//	#pragma mark - NodeCacheEntryArray
-
-
-NodeCacheEntryArray::NodeCacheEntryArray(int32 initialSize)
-	:
-	OpenHashElementArray<NodeCacheEntry>(initialSize)
-{
-}
-
-
-NodeCacheEntry*
-NodeCacheEntryArray::Add()
-{
-	return OpenHashElementArray<NodeCacheEntry>::Add();
 }
 
 
