@@ -102,7 +102,7 @@ GIFSave::GIFSave(BBitmap* bitmap, BPositionIO* output,
 		green_error = new(std::nothrow) int32[width + 2];
 		if (green_error == NULL) {
 			delete palette;
-			delete[] red_error;
+			delete[] &red_error[-1];
 			fatalerror = true;
 			return;
 		}
@@ -112,8 +112,8 @@ GIFSave::GIFSave(BBitmap* bitmap, BPositionIO* output,
 		blue_error = new(std::nothrow) int32[width + 2];
 		if (blue_error == NULL) {
 			delete palette;
-			delete[] red_error;
-			delete[] green_error;
+			delete[] &red_error[-1];
+			delete[] &green_error[-1];
 			fatalerror = true;
 			return;
 		}
@@ -186,9 +186,9 @@ GIFSave::GIFSave(BBitmap* bitmap, BPositionIO* output,
 
 	if (WriteGIFHeader() != B_OK) {
 		delete palette;
-		delete[] red_error;
-		delete[] green_error;
-		delete[] blue_error;
+		delete[] &red_error[-1];
+		delete[] &green_error[-1];
+		delete[] &blue_error[-1];
 		fatalerror = true;
 		return;
 	}
@@ -199,9 +199,9 @@ GIFSave::GIFSave(BBitmap* bitmap, BPositionIO* output,
 	hash = new(std::nothrow) SFHash(1 << 16);
 	if (hash == NULL) {
 		delete palette;
-		delete[] red_error;
-		delete[] green_error;
-		delete[] blue_error;
+		delete[] &red_error[-1];
+		delete[] &green_error[-1];
+		delete[] &blue_error[-1];
 		fatalerror = true;
 		return;
 	}
