@@ -1,0 +1,64 @@
+SubDir HAIKU_TOP src tests add-ons kernel file_systems ufs2 ufs2_shell ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems ufs2 ] ;
+
+# prevent inclusion of HaikuBuildCompatibility.h
+DEFINES += HAIKU_BUILD_COMPATIBILITY_H ;
+
+# set some additional defines
+{
+	local defines =
+		FS_SHELL
+		;
+
+	defines = [ FDefines $(defines) ] ;
+
+	local c++flags = ;
+
+	SubDirCcFlags $(defines) -Wno-multichar ;
+	SubDirC++Flags $(defines) $(c++flags) -Wno-multichar -fno-rtti ;
+}
+
+# platform specific libraries
+local fsShellCommandLibs ;
+if ! $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
+	fsShellCommandLibs = $(HOST_NETWORK_LIBS) ;
+}
+
+UseHeaders [ FDirName $(HAIKU_TOP) headers build ] : true ;
+
+if ! $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build os ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
+}
+
+UsePrivateHeaders shared storage ;
+UsePrivateHeaders fs_shell ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers private ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src tools fs_shell ] ;
+
+local ufs2Source =
+	kernel_interface.cpp
+;
+
+BuildPlatformMergeObject <build>ufs2.o : $(ufs2Source) ;
+
+BuildPlatformMain <build>ufs2_shell
+	:
+	:
+	<build>ufs2.o
+	<build>fs_shell.a $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
+	$(HOST_LIBROOT) $(fsShellCommandLibs)
+;
+
+BuildPlatformMain <build>ufs2_fuse
+	:
+	:
+	<build>ufs2.o
+	<build>fuse_module.a
+	$(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
+	$(HOST_STATIC_LIBROOT) $(fsShellCommandLibs) fuse
+;
+
+SEARCH on [ FGristFiles QueryParserUtils.cpp ]
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;

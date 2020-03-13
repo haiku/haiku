@@ -9,5 +9,6 @@ HaikuSubInclude iso9660 ;
 HaikuSubInclude random_file_actions ;
 HaikuSubInclude random_read ;
 HaikuSubInclude udf ;
+HaikuSubInclude ufs2 ;
 HaikuSubInclude userlandfs ;
 HaikuSubInclude xfs ;

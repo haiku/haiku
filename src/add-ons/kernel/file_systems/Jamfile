@@ -18,6 +18,7 @@ SubInclude HAIKU_TOP src add-ons kernel file_systems packagefs ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems ramfs ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems reiserfs ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems udf ;
+SubInclude HAIKU_TOP src add-ons kernel file_systems ufs2 ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems userlandfs ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems xfs ;
 
