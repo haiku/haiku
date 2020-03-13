@@ -366,9 +366,6 @@ probe_ports()
 		foundLVDS = true;
 		gInfo->ports[gInfo->port_count++] = lvdsPort;
 		gInfo->head_mode |= HEAD_MODE_LVDS_PANEL;
-		gInfo->head_mode |= HEAD_MODE_A_ANALOG;
-			// FIXME this should not be set, but without it, LVDS modesetting
-			// doesn't work on SandyBridge. Find out why it makes a difference.
 		gInfo->head_mode |= HEAD_MODE_B_DIGITAL;
 	} else
 		delete lvdsPort;
@@ -496,9 +493,6 @@ intel_init_accelerant(int device)
 	init_lock(&info.engine_lock, "intel extreme engine");
 
 	setup_ring_buffer(info.primary_ring_buffer, "intel primary ring buffer");
-
-	TRACE("pipe control for: 0x%" B_PRIx32 " 0x%" B_PRIx32 "\n",
-		read32(INTEL_PIPE_CONTROL), read32(INTEL_PIPE_CONTROL));
 
 	// Probe all ports
 	status = probe_ports();

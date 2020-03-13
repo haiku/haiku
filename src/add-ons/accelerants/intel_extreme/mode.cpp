@@ -210,9 +210,11 @@ void
 wait_for_vblank(void)
 {
 	acquire_sem_etc(gInfo->shared_info->vblank_sem, 1, B_RELATIVE_TIMEOUT,
-		25000);
+		21000);
 		// With the output turned off via DPMS, we might not get any interrupts
-		// anymore that's why we don't wait forever for it.
+		// anymore that's why we don't wait forever for it. At 50Hz, we're sure
+		// to get a vblank in at most 20ms, so there is no need to wait longer
+		// than that.
 }
 
 

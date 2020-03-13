@@ -75,10 +75,7 @@ struct accelerant_info {
 
 #define HEAD_MODE_A_ANALOG		0x0001
 #define HEAD_MODE_B_DIGITAL		0x0002
-#define HEAD_MODE_CLONE			0x0003
 #define HEAD_MODE_LVDS_PANEL	0x0008
-#define HEAD_MODE_TESTING		0x1000
-#define HEAD_MODE_STIPPI		0x2000
 
 extern accelerant_info* gInfo;
 

@@ -120,51 +120,51 @@ dump_pipe_info(int argc, char** argv)
 	kprintf("intel_extreme pipe configuration:\n");
 
 	value = read32(info, INTEL_DISPLAY_A_HTOTAL + pipeOffset);
-	kprintf("  HTOTAL start %" B_PRIu32 " end %" B_PRIu32 "\n", value >> 16,
-		value & 0xFFFF);
+	kprintf("  HTOTAL start %" B_PRIu32 " end %" B_PRIu32 "\n",
+		(value & 0xFFFF) + 1, (value >> 16) + 1);
 	value = read32(info, INTEL_DISPLAY_A_HBLANK + pipeOffset);
-	kprintf("  HBLANK start %" B_PRIu32 " end %" B_PRIu32 "\n", value >> 16,
-		value & 0xFFFF);
+	kprintf("  HBLANK start %" B_PRIu32 " end %" B_PRIu32 "\n",
+		(value & 0xFFFF) + 1, (value >> 16) + 1);
 	value = read32(info, INTEL_DISPLAY_A_HSYNC + pipeOffset);
-	kprintf("  HSYNC start %" B_PRIu32 " end %" B_PRIu32 "\n", value >> 16,
-		value & 0xFFFF);
+	kprintf("  HSYNC start %" B_PRIu32 " end %" B_PRIu32 "\n",
+		(value & 0xFFFF) + 1, (value >> 16) + 1);
 	value = read32(info, INTEL_DISPLAY_A_VTOTAL + pipeOffset);
-	kprintf("  VTOTAL start %" B_PRIu32 " end %" B_PRIu32 "\n", value >> 16,
-		value & 0xFFFF);
+	kprintf("  VTOTAL start %" B_PRIu32 " end %" B_PRIu32 "\n",
+		(value & 0xFFFF) + 1, (value >> 16) + 1);
 	value = read32(info, INTEL_DISPLAY_A_VBLANK + pipeOffset);
-	kprintf("  VBLANK start %" B_PRIu32 " end %" B_PRIu32 "\n", value >> 16,
-		value & 0xFFFF);
+	kprintf("  VBLANK start %" B_PRIu32 " end %" B_PRIu32 "\n",
+		(value & 0xFFFF) + 1, (value >> 16) + 1);
 	value = read32(info, INTEL_DISPLAY_A_VSYNC + pipeOffset);
-	kprintf("  VSYNC start %" B_PRIu32 " end %" B_PRIu32 "\n", value >> 16,
-		value & 0xFFFF);
+	kprintf("  VSYNC start %" B_PRIu32 " end %" B_PRIu32 "\n",
+		(value & 0xFFFF) + 1, (value >> 16) + 1);
 	value = read32(info, INTEL_DISPLAY_A_PIPE_SIZE + pipeOffset);
-	kprintf("  SIZE %" B_PRIu32 "x%" B_PRIu32 "\n", value >> 16,
-		value & 0xFFFF);
+	kprintf("  SIZE %" B_PRIu32 "x%" B_PRIu32 "\n",
+		(value & 0xFFFF) + 1, (value >> 16) + 1);
 
 	if (info.pch_info != INTEL_PCH_NONE) {
 		kprintf("intel_extreme transcoder configuration:\n");
 
 		value = read32(info, INTEL_TRANSCODER_A_HTOTAL + pipeOffset);
-		kprintf("  HTOTAL start %" B_PRIu32 " end %" B_PRIu32 "\n", value >> 16,
-			value & 0xFFFF);
+		kprintf("  HTOTAL start %" B_PRIu32 " end %" B_PRIu32 "\n",
+			(value & 0xFFFF) + 1, (value >> 16) + 1);
 		value = read32(info, INTEL_TRANSCODER_A_HBLANK + pipeOffset);
-		kprintf("  HBLANK start %" B_PRIu32 " end %" B_PRIu32 "\n", value >> 16,
-			value & 0xFFFF);
+		kprintf("  HBLANK start %" B_PRIu32 " end %" B_PRIu32 "\n",
+			(value & 0xFFFF) + 1, (value >> 16) + 1);
 		value = read32(info, INTEL_TRANSCODER_A_HSYNC + pipeOffset);
-		kprintf("  HSYNC start %" B_PRIu32 " end %" B_PRIu32 "\n", value >> 16,
-			value & 0xFFFF);
+		kprintf("  HSYNC start %" B_PRIu32 " end %" B_PRIu32 "\n",
+			(value & 0xFFFF) + 1, (value >> 16) + 1);
 		value = read32(info, INTEL_TRANSCODER_A_VTOTAL + pipeOffset);
-		kprintf("  VTOTAL start %" B_PRIu32 " end %" B_PRIu32 "\n", value >> 16,
-			value & 0xFFFF);
+		kprintf("  VTOTAL start %" B_PRIu32 " end %" B_PRIu32 "\n",
+			(value & 0xFFFF) + 1, (value >> 16) + 1);
 		value = read32(info, INTEL_TRANSCODER_A_VBLANK + pipeOffset);
-		kprintf("  VBLANK start %" B_PRIu32 " end %" B_PRIu32 "\n", value >> 16,
-			value & 0xFFFF);
+		kprintf("  VBLANK start %" B_PRIu32 " end %" B_PRIu32 "\n",
+			(value & 0xFFFF) + 1, (value >> 16) + 1);
 		value = read32(info, INTEL_TRANSCODER_A_VSYNC + pipeOffset);
-		kprintf("  VSYNC start %" B_PRIu32 " end %" B_PRIu32 "\n", value >> 16,
-			value & 0xFFFF);
+		kprintf("  VSYNC start %" B_PRIu32 " end %" B_PRIu32 "\n",
+			(value & 0xFFFF) + 1, (value >> 16) + 1);
 		value = read32(info, INTEL_TRANSCODER_A_IMAGE_SIZE + pipeOffset);
-		kprintf("  SIZE %" B_PRIu32 "x%" B_PRIu32 "\n", value >> 16,
-			value & 0xFFFF);
+		kprintf("  SIZE %" B_PRIu32 "x%" B_PRIu32 "\n",
+			(value & 0xFFFF) + 1, (value >> 16) + 1);
 	}
 
 	kprintf("intel_extreme display plane configuration:\n");

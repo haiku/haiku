@@ -138,6 +138,12 @@ Pipe::Configure(display_mode* mode)
 	write32(INTEL_DISPLAY_A_PIPE_CONTROL + fPipeOffset, pipeControl);
 	read32(INTEL_DISPLAY_A_PIPE_CONTROL + fPipeOffset);
 #endif
+
+	// According to SandyBridge modesetting sequence, pipe must be enabled
+	// before PLL are configured.
+	addr_t pipeReg = INTEL_DISPLAY_A_PIPE_CONTROL + fPipeOffset;
+	write32(pipeReg, read32(pipeReg) | INTEL_PIPE_ENABLED);
+
 }
 
 
@@ -320,6 +326,13 @@ Pipe::ConfigureClocks(const pll_divisors& divisors, uint32 pixelClock,
 		//		& DISPLAY_PLL_9xx_POST1_DIVISOR_MASK;
 		}
 
+		// Also configure the FP0 divisor on SandyBridge
+		if (gInfo->shared_info->device_type.Generation() == 6) {
+			pll |= ((1 << (divisors.p1 - 1))
+					<< DISPLAY_PLL_SNB_FP0_POST1_DIVISOR_SHIFT)
+				& DISPLAY_PLL_SNB_FP0_POST1_DIVISOR_MASK;
+		}
+
 		if (divisors.p2 == 5 || divisors.p2 == 7)
 			pll |= DISPLAY_PLL_DIVIDE_HIGH;
 
@@ -339,12 +352,17 @@ Pipe::ConfigureClocks(const pll_divisors& divisors, uint32 pixelClock,
 			pll |= DISPLAY_PLL_POST1_DIVIDE_2;
 	}
 
-	// Allow the PLL to warm up by masking its bit.
 	write32(pllControl, pll & ~DISPLAY_PLL_NO_VGA_CONTROL);
+		// FIXME what is this doing? Why put the PLL back under VGA_CONTROL
+		// here?
 	read32(pllControl);
 	spin(150);
+
+	// Configure and enable the PLL
 	write32(pllControl, pll);
 	read32(pllControl);
+
+	// Allow the PLL to warm up.
 	spin(150);
 
 	if (gInfo->shared_info->device_type.Generation() >= 6) {

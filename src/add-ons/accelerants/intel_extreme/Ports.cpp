@@ -381,9 +381,10 @@ LVDSPort::PipePreference()
 	// Ideally we could just return INTEL_PIPE_ANY for the newer devices, but
 	// this doesn't quite work yet.
 
-	// For Ibex Point and Sandy Bridge, read the existing LVDS configuration
-	// and just reuse that (it seems our attempt to change it doesn't work,
-	// anyway)
+	// For Ibex Point and SandyBridge, read the existing LVDS configuration and
+	// just reuse that (it seems our attempt to change it doesn't work, anyway)
+	// On SandyBridge, there is a transcoder C that can't be used by the LVDS
+	// port (but A and B would be fine).
 	if (gInfo->shared_info->device_type.Generation() <= 6) {
 		uint32 portState = read32(_PortRegister());
 		if (portState & DISPLAY_MONITOR_PIPE_B)
@@ -392,9 +393,9 @@ LVDSPort::PipePreference()
 			return INTEL_PIPE_A;
 	}
 
-	// For later PCH versions, assume pipe B for now. Note that later devices
-	// add a pipe C (but do they add a transcoder C?), so we'd need to handle
-	// that and the port register has a different format because of it.
+	// For later generations, assume pipe B for now. Note that later devices
+	// add a pipe C (and a transcoder C), so we'd need to handle that and the
+	// port register has a different format because of it.
 	// (using PORT_TRANS_*_SEL_CPT to select which transcoder to use)
 	return INTEL_PIPE_B;
 }
