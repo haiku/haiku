@@ -41,16 +41,25 @@ BuildMBR $(baseMBR) : $(mbrSource) ;
 MakeLocate $(baseMBR) : $(HAIKU_OUTPUT_DIR) ;
 MakeLocate $(HAIKU_ANYBOOT) : $(HAIKU_ANYBOOT_DIR) ;
 
-if $(HAIKU_ANYBOOT_LEGACY) = 1 {
-	BuildAnybootImage $(HAIKU_ANYBOOT) : $(baseMBR) : $(HAIKU_CD_BOOT_IMAGE)
-		: $(HAIKU_IMAGE_NAME) ;
-} else {
-	local efiLoader = haiku_loader.efi ;
-	local efiPartition = esp.image ;
-	MakeLocate $(efiPartition) ;
-	BuildEfiSystemPartition $(efiPartition) : $(efiLoader) ;
-	BuildAnybootImageEfi $(HAIKU_ANYBOOT) : $(baseMBR) : $(efiPartition) : $(HAIKU_CD_BOOT_IMAGE)
-		: $(HAIKU_IMAGE_NAME) ;
+# Currently the Anyboot image is available only for EFI+BIOS or BIOS-only
+# systems. It is not needed for other systems, where usually you can boot
+# the same way from an USB or CD drive, instead of needing completely
+# different layouts.
+for platform in [ MultiBootSubDirSetup ] {
+	on $(platform) {
+		if $(TARGET_BOOT_PLATFORM) = efi {
+			local efiLoader = haiku_loader.efi ;
+			local efiPartition = esp.image ;
+			MakeLocate $(efiPartition) ;
+			BuildEfiSystemPartition $(efiPartition) : $(efiLoader) ;
+			BuildAnybootImageEfi $(HAIKU_ANYBOOT) : $(baseMBR)
+				: $(efiPartition) : $(HAIKU_CD_BOOT_IMAGE)
+				: $(HAIKU_IMAGE_NAME) ;
+		} else if $(HAIKU_ANYBOOT_LEGACY) = 1 {
+			BuildAnybootImage $(HAIKU_ANYBOOT) : $(baseMBR)
+				: $(HAIKU_CD_BOOT_IMAGE) : $(HAIKU_IMAGE_NAME) ;
+		}
+	}
 }
 
 # TODO: this one seems to cause the build to fail each other run (caching?)

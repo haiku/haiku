@@ -13,6 +13,7 @@ NotFile $(HAIKU_CD_BOOT_IMAGE_CONTAINER_NAME) ;
 
 # common extra files to put on the boot iso
 local extras = README.html ;
+SEARCH on $(extras) = [ FDirName $(HAIKU_TOP) data boot_cd ] ;
 
 if $(TARGET_ARCH) = ppc {
 	local elfloader = boot_loader_openfirmware ;
@@ -24,23 +25,31 @@ if $(TARGET_ARCH) = ppc {
 	# HFS creator and application type mapping for mkisofs
 	local hfsmaps = hfs.map ;
 
-	SEARCH on $(chrpscript) $(hfsmaps) $(extras) = [ FDirName $(HAIKU_TOP) data boot_cd ] ;
+	SEARCH on $(chrpscript) $(hfsmaps) $(extras)
+		= [ FDirName $(HAIKU_TOP) data boot_cd ] ;
 
-	BuildCDBootPPCImage $(HAIKU_CD_BOOT_IMAGE) : $(hfsmaps) : $(elfloader) : $(coffloader) : $(chrpscript) : $(extras) ;
-} else if $(HAIKU_ANYBOOT_LEGACY) = 1 {
-	BuildCDBootImage $(HAIKU_CD_BOOT_IMAGE) : $(HAIKU_BOOT_FLOPPY) : : $(extras) ;
-
-	SEARCH on $(extras) = [ FDirName $(HAIKU_TOP) data boot_cd ] ;
+	BuildCDBootPPCImage $(HAIKU_CD_BOOT_IMAGE) : $(hfsmaps)
+		: $(elfloader) : $(coffloader) : $(chrpscript) : $(extras) ;
 } else {
-	local efiLoader = haiku_loader.efi ;
-	local efiPartition = esp.image ;
-	MakeLocate $(efiPartition) : $(HAIKU_OUTPUT_DIR) ;
-	BuildEfiSystemPartition $(efiPartition) : $(efiLoader) ;
+	# For other platforms, we have to check which bootloader is used. There
+	# can be multiple ones, making this a bit confusing.
+	for platform in [ MultiBootSubDirSetup ] {
+		on $(platform) {
+			if $(TARGET_BOOT_PLATFORM) = efi {
+				local efiLoader = haiku_loader.efi ;
+				local efiPartition = esp.image ;
+				MakeLocate $(efiPartition) : $(HAIKU_OUTPUT_DIR) ;
+				BuildEfiSystemPartition $(efiPartition) : $(efiLoader) ;
 
-	BuildCDBootImage $(HAIKU_CD_BOOT_IMAGE) : $(HAIKU_BOOT_FLOPPY)
-		: $(efiPartition) : $(extras) ;
+				BuildCDBootImage $(HAIKU_CD_BOOT_IMAGE) : $(HAIKU_BOOT_FLOPPY)
+					: $(efiPartition) : $(extras) ;
 
-	SEARCH on $(extras) = [ FDirName $(HAIKU_TOP) data boot_cd ] ;
+			} else if $(HAIKU_ANYBOOT_LEGACY) = 1 {
+				BuildCDBootImage $(HAIKU_CD_BOOT_IMAGE) : $(HAIKU_BOOT_FLOPPY) : 
+					: $(extras) ;
+			}
+		}
+	}
 }
 
 NotFile haiku-boot-cd ;
