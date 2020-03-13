@@ -986,10 +986,22 @@ Volume::_InitLatestState()
 status_t
 Volume::_InitLatestStateFromActivatedPackages()
 {
+	// open admin directory
+	BDirectory adminDirectory;
+	status_t error = _OpenPackagesSubDirectory(
+		RelativePath(kAdminDirectoryName), false, adminDirectory);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	node_ref adminNode;
+	error = adminDirectory.GetNodeRef(&adminNode);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
 	// try reading the activation file
-	NotOwningEntryRef entryRef(PackagesDirectoryRef(), kActivationFileName);
+	NotOwningEntryRef entryRef(adminNode, kActivationFileName);
 	BFile file;
-	status_t error = file.SetTo(&entryRef, B_READ_ONLY);
+	error = file.SetTo(&entryRef, B_READ_ONLY);
 	if (error != B_OK) {
 		INFORM("Failed to open packages activation file: %s\n",
 			strerror(error));
