@@ -20,7 +20,6 @@
 
 #include "console.h"
 #include "machine.h"
-#include "real_time_clock.h"
 
 
 #define HEAP_SIZE 65536
@@ -124,9 +123,6 @@ start(void *openFirmwareEntry)
 	arch_mmu_init();
 
 	if (boot_arch_cpu_init() != B_OK)
-		of_exit();
-
-	if (init_real_time_clock() != B_OK)
 		of_exit();
 
 	// check for key presses once
