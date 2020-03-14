@@ -80,12 +80,17 @@ find_physical_memory_ranges(size_t &total)
 	// #address-cells and #size-cells matches the number of 32-bit 'cells'
 	// representing the length of the base address and size fields
 	intptr_t root = of_finddevice("/");
-	int32 regAddressCells = of_address_cells(root);
 	int32 regSizeCells = of_size_cells(root);
-	if (regAddressCells == OF_FAILED || regSizeCells == OF_FAILED) {
-		dprintf("finding base/size length counts failed, assume 32-bit.\n");
-		regAddressCells = 1;
+	if (regSizeCells == OF_FAILED) {
+		dprintf("finding size of memory cells failed, assume 32-bit.\n");
 		regSizeCells = 1;
+	}
+
+	int32 regAddressCells = of_address_cells(root);
+	if (regAddressCells == OF_FAILED) {
+		// Sun Netra T1-105 is missing this, but we can guess that if the size
+		// is 64bit, the address also likely is.
+		regAddressCells = regSizeCells;
 	}
 
 	if (regAddressCells != 2 || regSizeCells != 2) {
