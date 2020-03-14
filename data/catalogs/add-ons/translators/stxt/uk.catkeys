@@ -1,8 +1,8 @@
 1	ukrainian	x-vnd.Haiku-STXTTranslator	274886668
-Be styled text file	STXTTranslator		Текстові файли формату Be
+Be styled text file	STXTTranslator		Стилізований текстовий файл Be
 Plain text file	STXTTranslator		Простий текстовий файл
-STXTTranslator Settings	STXTTranslator		Налаштування перетворювача STXT
-StyledEdit file translator	STXTView		Перетворювач файлів StyledEdit
+STXTTranslator Settings	STXTTranslator		Налаштування транслятора STXT
+StyledEdit file translator	STXTView		Транслятор файлів StyledEdit
 StyledEdit files	STXTTranslator		Файли StyledEdit
-StyledEdit file translator	STXTTranslator		Перетворювач файлів StyledEdit
+StyledEdit file translator	STXTTranslator		Транслятор файлів StyledEdit
 STXT Settings	STXTMain		Налаштування STXT

@@ -6,8 +6,8 @@ Window border	Colors tab		Pencere kenarlığı
 Inactive window tab	Colors tab		Etkin olmayan pencere sekmesi
 Defaults	APRWindow		Öntanımlı
 Shadow	Colors tab		Gölge
-Document background	Colors tab		Belge arkaplanı
-List background	Colors tab		Liste arkaplanı
+Document background	Colors tab		Belge arka planı
+List background	Colors tab		Liste arka planı
 No effect on running applications	DecorSettingsView		Çalışan uygulamalar üzerinde etkisiz
 Fixed font:	Font view		Sabit yazıtipi:
 Appearance	System name		Görünüm
@@ -23,13 +23,13 @@ Shine	Colors tab		Parla
 Arrow style	DecorSettingsView		Ok biçemi
 On	AntialiasingSettingsView		Açık
 Decorator:	DecorSettingsView		Dekorcu:
-Menu background	Colors tab		Menü arkaplanı
+Menu background	Colors tab		Menü arka planı
 Revert	APRWindow		Eski haline döndür
 List item text	Colors tab		Liste ögesi metni
 OK	DecorSettingsView		Tamam
 Control text	Colors tab		Denetim metni
 Look and feel	APRWindow		Görünüm ve his
-Selected menu item background	Colors tab		Seçili menü ögesi arkaplanı
+Selected menu item background	Colors tab		Seçili menü ögesi arka planı
 Link active	Colors tab		Etkin bağlantı
 Antialiasing	APRWindow		Kenar yumuşatma
 Menu font:	Font view		Menü yazıtipi:
@@ -41,23 +41,23 @@ Failure	Colors tab		Başarısız
 Double:	DecorSettingsView		Çift:
 Selected menu item text	Colors tab		Seçili menü ögesi metni
 Size:	Font Selection view		Boyut:
-Panel background	Colors tab		Panel arkaplanı
+Panel background	Colors tab		Panel arka planı
 Plain font:	Font view		Düz yazı tipi:
 Window tab text	Colors tab		Pencere sekmesi metni
 Navigation pulse	Colors tab		Navigasyon nabzı
 LCD subpixel	AntialiasingSettingsView		LCD altpiksel
 Window tab	Colors tab		Pencere sekmesi
 Link text	Colors tab		Bağlantı metni
-Tooltip background	Colors tab		Araç ipucu arkaplanı
+Tooltip background	Colors tab		Araç ipucu arka planı
 ControlLook:	DecorSettingsView		ControlLook:
 Scroll bar thumb	Colors tab		Kaydırma çubuğu başı
 Default	DecorSettingsView		Öntanımlı
 Link visited	Colors tab		Ziyaret edilmiş bağlantı
 Selected menu item border	Colors tab		Seçili menü ögesi kenarlığı
 Tooltip text	Colors tab		Araç ipucu metni
-Control background	Colors tab		Denetim arkaplanı
+Control background	Colors tab		Denetim arka planı
 Selected list item text	Colors tab		Seçili liste ögesi metni
-Selected list item background	Colors tab		Seçili liste ögesi arkaplanı
+Selected list item background	Colors tab		Seçili liste ögesi arka planı
 Inactive window tab text	Colors tab		Etkin olmayan pencere sekme metni
 Navigation base	Colors tab		Temel navigasyon
 Fonts	APRWindow		Yazıtipleri

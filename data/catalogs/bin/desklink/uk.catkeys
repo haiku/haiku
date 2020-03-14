@@ -2,15 +2,15 @@
 desklink	MediaReplicant	Title of an alert box	desklink
 Sound preferences…	MediaReplicant		Налаштування звуку…
 Muted	MediaReplicant		Приглушити
-%g dB	MediaReplicant		%g dB
+%g dB	MediaReplicant		%g дБ
 OK	MediaReplicant		ОК
 Couldn't launch 	MediaReplicant		Не вдалося запустити 
 Volume	VolumeControl		Гучність
 Open MediaPlayer	MediaReplicant		Відкрити MediaPlayer
-%d dB	VolumeControl		%d dB
+%d dB	VolumeControl		%d дБ
 Media preferences…	MediaReplicant		Налаштування медіа…
 Options	MediaReplicant		Опції
 Beep	MediaReplicant		Сигнал
 Open %name	DeskButton	Don't translate variable %name	Відкрити %name
 Control physical output	MediaReplicant		Керувати фізичним виходом
-No media server running	VolumeControl		Не запущено медіа сервер
+No media server running	VolumeControl		Не запущено медіа-сервер

@@ -1,50 +1,50 @@
 1	ukrainian	x-vnd.Haiku-ProcessController	168752057
 Error saving file	ProcessController		Помилка при збереженні файлу
-Display priority	ProcessController		Перевага відображення
+Display priority	ProcessController		Пріоритет відображення
 That's no Fun!	ProcessController		Це не жарт!
 What do you want to do with the team \"%s\"?	ProcessController		Що Ви бажаєте зробити з потоком \"%s\"?
 Your setting file could not be saved!\n(%s)	ProcessController		Файл настройки не був збережений!\n(%s)
 Processor %d	ProcessController		Процесор %d
-Live in the Deskbar	ProcessController		Помістити у Deskbar
-Kill this team!	ProcessController		Вбити цей поток!
+Live in the Deskbar	ProcessController		Відображати у Deskbar
+Kill this team!	ProcessController		Знищити цю команду!
 OK	ProcessController		ОК
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Ви можете запустити Контролер процесів у вікні або встановити у Deskbar.
-Real-time priority	ProcessController		Перевага реального часу
-Custom priority	ProcessController		Задана перевага
-Debug this thread!	ProcessController		Відладнати цю нитку!
-Low priority	ProcessController		Низька перевага
-Urgent display priority	ProcessController		Термінова перевага відображення
+Real-time priority	ProcessController		Пріоритет реального часу
+Custom priority	ProcessController		Заданий пріоритет
+Debug this thread!	ProcessController		Відладити цей потік!
+Low priority	ProcessController		Низький пріоритет
+Urgent display priority	ProcessController		Терміновий пріоритет відображення
 Memory usage	ProcessController		Використання пам'яті
 Ok!	ProcessController		Ок!
-Normal priority	ProcessController		Нормальна перевага
+Normal priority	ProcessController		Звичайний пріоритет
 Restart Deskbar	ProcessController		Перезапустити Deskbar
 About ProcessController…	ProcessController		Про Контролер процесів…
 Usage: %s [-deskbar]\n	ProcessController		Використання: %s [-deskbar]\n
 Please confirm	ProcessController		Підтвердити
-Urgent priority	ProcessController		Термінова перевага
-What do you want to do with the thread \"%s\"?	ProcessController		Що Ви бажаєте зробити з ниткою \"%s\"?
+Urgent priority	ProcessController		Терміновий пріоритет
+What do you want to do with the thread \"%s\"?	ProcessController		Що Ви бажаєте зробити з потоком \"%s\"?
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
-Idle priority	ProcessController		Перевага простою
-Real-time display priority	ProcessController		Перевага відображення реального часу
-Threads and CPU usage	ProcessController		Нитки і використання CPU
-Quit application	ProcessController		Закрити додаток
-Info	ProcessController		Дані
-Kill this thread!	ProcessController		Вбити цю нитку!
-This team is already gone…	ProcessController		Потік повністю запущений…
-Gone teams…	ProcessController		Запущені потоки…
+Idle priority	ProcessController		Пріоритет простою
+Real-time display priority	ProcessController		Пріоритет відображення реального часу
+Threads and CPU usage	ProcessController		Потоки і використання CPU
+Quit application	ProcessController		Вийти з програми
+Info	ProcessController		Інфо
+Kill this thread!	ProcessController		Знищити цей потік!
+This team is already gone…	ProcessController		Цієї команди вже немає…
+Gone teams…	ProcessController		Завершені команди…
 Quit an application	ProcessController		Вийти з програми
-Cancel	ProcessController		Відмінити
+Cancel	ProcessController		Скасувати
 Install in Deskbar	ProcessController		Встановити у Deskbar
-Debug this team!	ProcessController		Відладнати цей потік!
+Debug this team!	ProcessController		Відладити цю команду!
 Low latency	ProcessController		Низька затримка
-ProcessController	System name		Контролер процесів
+ProcessController	System name		ProcessController
 Lowest active priority	ProcessController		Найнижча перевага
 Restart Tracker	ProcessController		Перезапустити Tracker
-System resources & caches…	ProcessController		Системні ресурси і кеші…
-Damned!	ProcessController		Жахливо!
+System resources & caches…	ProcessController		Системні ресурси & кеш…
+Damned!	ProcessController		Чорт забирай!
 New Terminal	ProcessController		Новий Термінал
 Power saving	ProcessController		Режим енергозбереження
-ProcessController is already installed in Deskbar.	ProcessController		Контролер процесів повністю встановлений у Deskbar.
+ProcessController is already installed in Deskbar.	ProcessController		Контролер процесів вже встановлений у Deskbar.
 This is the last active processor…\nYou can't turn it off!	ProcessController		Це останній активний процесор…\nВи не можете вимкнути його!
-This thread is already gone…	ProcessController		Ці нитки повністю запущені…
+This thread is already gone…	ProcessController		Цих потоків вже немає…
 Run in window	ProcessController		Виконувати у вікні

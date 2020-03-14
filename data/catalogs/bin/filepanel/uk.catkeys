@@ -4,15 +4,15 @@ short\tlong\tdescription\n	FilePanelApp		короткий\tдовгий\tопи�
 %s not a valid option\n	FilePanelApp		%s невірна опція\n
 -s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tвживати панель збереження\n
 %s: this option requires a parameter\n	FilePanelApp		%s: ця опція потребує параметра\n
--h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tпоказує використання\n
--l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tвживати типову панель завантаження\n
--n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tвстановити ім'я для збереження за замовчуванням\n
--k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tтипи даних, які можуть бути відкрити: будь-яка комбінація з f, d, s (файл (типовий), тека, посилання)\n
+-h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tпоказати справку\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tвживати панель завантаження (за замовчуванням)\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tвстановити ім'я за замовчуванням для збереження\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tрізновиди даних, які можуть бути відкриті: будь-яка комбінація з f, d, s (файл (за замовчуванням), папка, посилання)\n
 %s: UNIMPLEMENTED\n	FilePanelApp		%s: НЕРЕАЛІЗОВАНО\n
 -t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tвстановити заголовок вікна\n
--f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tнереалізована\n
-usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		використання: %s [-h] [-d folder] [-l|-s] [-t ttl] [-1] [-m] [-a pattern] [-f pattern]\n
--1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tдозволяє вибрати тільки 1 файл\n
+-f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tнереалізовано\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		використання: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tдозволити вибрати тільки 1 файл\n
 -a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tнереалізовано\n
 -m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tробити панель модальною\n
 options:\n	FilePanelApp		опції:\n

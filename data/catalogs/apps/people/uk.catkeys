@@ -1,7 +1,7 @@
 1	ukrainian	x-vnd.Be-PEPL	2332202134
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Не вдалося запустити префлет FileTypes для налаштування атрибутів Person.\n\nПомилка: 
-Unnamed person	People		Безіменна персона
-New person…	People		Нова персона
+Unnamed person	People		Неіменнована персона
+New person…	People		Нова персона…
 Address	People		Адреса
 Zip	People		Індекс
 Select all	People		Вибрати всіх
@@ -11,40 +11,40 @@ Company	People		Компанія
 Name	People		Ім'я
 The file '%name%' could not be written.	People		Файл '%name%' не може бути записаний.
 Contact name	People		Контактне ім'я
-Cancel	People		Відмінити
+Cancel	People		Скасувати
 Edit	People		Редагувати
 Save changes before closing?	People		Зберегти зміни перед закриттям?
-People	System name		Персони
+People	System name		People
 Error	People		Помилка
-Revert	People		Повернути
+Revert	People		Без змін
 Country	People		Країна
-Person	Short mimetype description		Person
+Person	Short mimetype description		Персона
 New person	People		Нова персона
 Save	People		Зберегти
 Fax	People		Факс
 URL	People		URL
 %name% picture	People		%name% малюнок
 Home phone	People		Домашній телефон
-none	Groups list		жодного
+none	Groups list		пусто
 Save as…	People		Зберегти як…
 Cut	People		Вирізати
 Contact information for a person.	Long mimetype description		Контактна інформація персони
-Remove image	People		Видалити зображення
+Remove image	People		Вилучити зображення
 City	People		Місто
-Undo	People		Cкасувати
+Undo	People		Відкат дії
 Don't save	People		Не зберігати
 Configure attributes	People		Встановити атрибути
 Work phone	People		Робочий телефон
 State	People		Держава
-Nickname	People		Кличка
+Nickname	People		Псевдонім
 OK	People		ОК
 File	People		Файл
-Redo	People		Переробити
+Redo	People		Повторити
 Close	People		Закрити
 Copy	People		Копіювати
 Paste	People		Вставити
 E-mail	People		Пошта
 Group	People		Група
-Drop an image here,\nor use the contextual menu.	People		Перемістіть зображення сюди,\nабо використайте контекстне меню.
+Drop an image here,\nor use the contextual menu.	People		Перемістіть зображення сюди,\nабо використовуйте контекстне меню.
 Load image…	People		Завантажити зображення…
 Sorry	People		Вибачте

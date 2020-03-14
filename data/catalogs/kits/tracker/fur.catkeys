@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	94919807
+1	friulian	x-vnd.Haiku-libtracker	984805656
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -445,7 +445,6 @@ Rename	FSUtils	button label	Cambie non
 Clean up all	ContainerWindow		Met a puest dut
 Add current folder	FilePanelPriv		Zonte cartele atuâl
 Description:	InfoWindow		Descizion:
-The Tracker must be running to see set the default printer.	PoseView		Il Tracker al à di jessi in esecuzion par podê configurâ la stampadore predefinide.
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Eliminâ pardabon i elements selezionâts? Cheste operazion e sarà permanente.
 Grayscale picture	AttributesView		Imagjin a scjale di grîs
 Mount	DeskWindow		Monte

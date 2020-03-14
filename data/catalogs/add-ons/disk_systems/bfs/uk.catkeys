@@ -4,5 +4,5 @@ Disabling query support may speed up certain file system operations, but should\
 Name:	BFS_Initialize_Parameter		Ім'я:
 8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (Переважно для великих файлів)
 2048 (Recommended)	BFS_Initialize_Parameter		2048 (Рекомендовано)
-1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (Для маленьких файлів)
+1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (Переважно для малих файлів)
 Blocksize:	BFS_Initialize_Parameter		Розмір блока:

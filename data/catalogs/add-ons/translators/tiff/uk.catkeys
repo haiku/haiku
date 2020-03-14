@@ -2,15 +2,15 @@
 TIFF Library:	TIFFView		Бібліотека TIFF:
 RLE (Packbits)	TIFFView		RLE (Packbits)
 ZIP (Deflate)	TIFFView		ZIP (Deflate)
-identify_tiff_header: invalid document index\n	TIFFTranslator		визначення заголовка tiff: неправильний показник документу\n
-Use compression:	TIFFView		Використати зтиск:
-TIFF image translator	TIFFView		Перетворювач зображень TIFF
+identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: неправильний індекс документа\n
+Use compression:	TIFFView		Використати стиснення:
+TIFF image translator	TIFFView		Транслятор зображень TIFF
 TIFF image	TIFFTranslator		Зображення TIFF
 TIFF Settings	TIFFMain		Налаштування TIFF
-TIFF image translator	TIFFTranslator		Перетворювач зображень TIFF
-identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: неможливо встановити теку\n
+TIFF image translator	TIFFTranslator		Транслятор зображень TIFF
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: неможливо встановити каталог\n
 Version %d.%d.%d, %s	TIFFView		Версія %d.%d.%d, %s
-TIFFTranslator Settings	TIFFTranslator		Налаштування перетворювача TIFF
+TIFFTranslator Settings	TIFFTranslator		Налаштування транслятора TIFF
 LZW	TIFFView		LZW
 TIFF images	TIFFTranslator		Зображення TIFF
-None	TIFFView		Жоден
+None	TIFFView		Пусто

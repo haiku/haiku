@@ -2,7 +2,7 @@
 POP3 authentication failed. The server said:\n	smtp		POP3 kimlik doğrulaması başarısız oldu. Sunucu diyor ki:\n
 Destination:	ConfigView		Hedef:
 Error while logging in to %serv	smtp		%serv sunucusuna oturum açılırken hata
-Connecting to server…	smtp		Sunucuya bağlanılıyor...
+Connecting to server…	smtp		Sunucuya bağlanılıyor…
 Unencrypted	ConfigView		Şifrelenmemiş
 . The server says:\n	smtp		. Sunucu diyor ki:\n
 Error while opening connection to %serv	smtp		%serv sunucusuna bağlanırken hata

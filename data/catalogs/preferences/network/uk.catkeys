@@ -11,20 +11,20 @@ no link	InterfaceListItem		немає з'єднання
 Other	NetworkWindow		Інший
 Sent:	IntefaceView		Відправити:
 Gateway:	IntefaceAddressView		Шлюз:
-The netmask defines your local network	IntefaceAddressView		Нетмаска визначає вашу локальну мережу
+The netmask defines your local network	IntefaceAddressView		Маска підмережі визначає вашу локальну мережу
 Your IP address	IntefaceAddressView		Ваша IP адреса
 DHCP	IntefaceAddressView		DHCP
 Netmask:	IntefaceAddressView		Маска підмережі:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Служби
-Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Встановлення Стан'у Мережі у Deskbar призупинено: %s
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Не вдалося встановити NetworkStatus у Deskbar: %s
 Revert	NetworkWindow		Повернути
 off	ServiceListItem		вимкнуто
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<бездротових з'єднань не виявлено>
-Enable	IntefaceView		Увімкнути
+Enable	IntefaceView		Доступно
 connected	IntefaceView		під'єднано
-Apply	IntefaceAddressView		Застосовувати
+Apply	IntefaceAddressView		Застосувати
 Disable	ServiceView		Заборонити
 WPA2	WPA2 protected network		WPA2
 Show network status in Deskbar	NetworkWindow		Відображати стан мережі у Deskbar
@@ -49,7 +49,7 @@ Manage…	NetworkWindow		Керування…
 open	Open network		відкрити
 Network	NetworkWindow		Мережа
 Your gateway to the internet	IntefaceAddressView		Ваш інтернет шлюз
-Enable	ServiceView		Увімкнути
+Enable	ServiceView		Доступно
 Wireless device	InterfaceListItem		Бездротова карта
 Disabled	IntefaceAddressView		Заборонити
 VPN connection	InterfaceListItem		VPN з'єднання

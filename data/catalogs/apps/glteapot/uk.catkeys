@@ -8,14 +8,14 @@ Yellow	TeapotWindow		Жовтий
 Blue	TeapotWindow		Голубий
 Gouraud shading	TeapotWindow		Затінення Гуро
 Quit	TeapotWindow		Вийти
-Filled polygons	TeapotWindow		Заповнити багатокутники
+Filled polygons	TeapotWindow		Заповнені полігони
 Settings	TeapotWindow		Налаштування
 Fog	TeapotWindow		Туман
 Backface culling	TeapotWindow		Відсікти фон
 Z-buffered	TeapotWindow		Z-буферизація
 File	TeapotWindow		Файл
 Perspective	TeapotWindow		Перспектива
-GLTeapot	System name		Чайник GL
+GLTeapot	System name		GLTeapot
 Green	TeapotWindow		Зелений
 Right	TeapotWindow		Вправо
 FPS display	TeapotWindow		Показати FPS

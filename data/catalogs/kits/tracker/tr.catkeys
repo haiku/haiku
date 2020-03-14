@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	1850084712
+1	turkish	x-vnd.Haiku-libtracker	2739970561
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen yap
@@ -25,7 +25,7 @@ You can't replace a folder with one of its sub-folders.	FSUtils		Bir klasörü k
 Select…	VirtualDirectoryWindow		Seç…
 Name	Default Query Columns		Ad
 Unmount	ContainerWindow		Bağlantıyı kes
-Eject when unmounting	AutoMounterSettings		Bağlantıyı keserken çıkart
+Eject when unmounting	AutoMounterSettings		Bağlantıyı keserken çıkar
 Searching for disks to mount…	StatusWindow		Bağlanacak disk aranıyor…
 Value	AttributesView		Değer
 Information	InfoWindow		Bilgi
@@ -60,7 +60,7 @@ You can't move or copy items to read-only volumes.	FSUtils		Ögeler saltokunur d
 Create link	ContainerWindow		Bağlantı oluştur
 starts with	FindPanel		ile başlar
 Replace	FSUtils		Değiştir
-?+* follows nothing.	libtracker		?+* hiçbir şeyi izlemiyor.
+?+* follows nothing.	libtracker		?+* hiçbir şeyden sonra gelmiyor.
 Rectangle	AttributesView		Dikdörtgen
 Move to	ContainerWindow		Taşı
 Status	Email Query Columns		Durum
@@ -267,7 +267,7 @@ Point	AttributesView		Nokta
 home	B_USER_DIRECTORY		ev
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		İzleyici Yeni şablonlar
 Disk mounting during boot	AutoMounterSettings		Önyükleme sırasında bağlama
-Don't automount	AutoMounterSettings		Otomatik bağlanmaz
+Don't automount	AutoMounterSettings		Otomatik bağlama yok
 Could not find application \"%appname\"	OpenWithWindow		\"%appname\" uygulaması bulunamıyor
 Unmatched parenthesis.	libtracker		Eşleşmeyen parantezler.
 Extended attribute	AttributesView		Genişletilmiş öznitelik
@@ -448,7 +448,6 @@ Rename	FSUtils	button label	Yeniden adlandır
 Clean up all	ContainerWindow		Tümünü temizle
 Add current folder	FilePanelPriv		Şu anki klasörü ekle
 Description:	InfoWindow		Açıklama:
-The Tracker must be running to see set the default printer.	PoseView		Öntanımlı yazıcıyı görebilmesi için İzleyici'nin çalışıyor olması gerekir.
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Seçili öge/ögeleri silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
 Grayscale picture	AttributesView		Gri tonlu resim
 Mount	DeskWindow		Bağla

@@ -1,8 +1,8 @@
 1	ukrainian	x-vnd.Haiku-HVIFTranslator	249304797
-Haiku vector icon translator	HVIFTranslator		Перетворювач векторних значків Haiku
-HVIF icons	HVIFTranslator		Іконки HVIF
+Haiku vector icon translator	HVIFTranslator		Транслятор векторних значків Haiku
+HVIF icons	HVIFTranslator		Значки HVIF
 Render size:	HVIFView		Розмір рендера:
-HVIFTranslator Settings	HVIFTranslator		Налаштування перетворювача HVIFТ
+HVIFTranslator Settings	HVIFTranslator		Налаштування транслятора HVIFТ
 Haiku vector icon translator	HVIFView		Транслятор векторних значків Haiku
 HVIF Settings	HVIFMain		Налаштування HVIF
 Version %d.%d.%d, %s	HVIFView		Версія %d.%d.%d, %s

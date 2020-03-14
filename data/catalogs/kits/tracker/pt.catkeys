@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-libtracker	2745737133
+1	portuguese	x-vnd.Haiku-libtracker	3635622982
 Created	ContainerWindow		Criado
 Icon	AttributesView		Ícone
 Open and make preferred	OpenWithWindow		Abrir e tornar preferida
@@ -445,7 +445,6 @@ Rename	FSUtils	button label	Alterar nome
 Clean up all	ContainerWindow		Limpar tudo
 Add current folder	FilePanelPriv		Adicionar a pasta atual
 Description:	InfoWindow		Descrição:
-The Tracker must be running to see set the default printer.	PoseView		O Tracker deve estar em execução para ver alterar a impressora predefinida.
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Tem certeza de que deseja apagar o(s) item(ns) selecionado(s)? Esta operação não pode ser revertida.
 Grayscale picture	AttributesView		Imagem em escala de cinzentos
 Mount	DeskWindow		Montar

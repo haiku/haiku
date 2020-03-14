@@ -5,13 +5,13 @@ Create Log File	PoorMan		Günlük dosyası oluştur
 File logging	PoorMan		Dosya günlükleme
 Website options	PoorMan		Web sitesi seçenekleri
 Log to file	PoorMan		Dosyaya günlükle
-Shutting down.	PoorMan		Kapatılıyor.
+Shutting down.	PoorMan		Kapatılıyor…
 Error Dir	PoorMan		Hata dizini
 Web folder:	PoorMan		Web klasörü:
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Lütfen web'de yayınlanacak klasörü seçin.\n\nPoorMan sizin yerinize Ev klasörünüzde \"public_html\" adında öntanımlı bir klasör oluşturabilir.\nİsterseniz kendi belirleyeceğiniz bir klasörü de seçebilirsiniz.
 Log To Console	PoorMan		Konsola günlükle
 File Name	PoorMan		Dosya adı
-Starting up... 	PoorMan		Başlatılıyor... 
+Starting up... 	PoorMan		Başlatılıyor… 
 Select	PoorMan		Seç
 Logging view	PoorMan		Günlük görünümü
 Save console as…	PoorMan		Konsolu farklı kaydet…
@@ -20,7 +20,7 @@ Cancel	PoorMan		İptal
 Directory: 	PoorMan		Dizin: 
 Hits: %lu	PoorMan		Görüntülenme: %lu
 Hits: 0	PoorMan		Görüntülenme: 0
-Shutting down.\n	PoorMan		Kapatılıyor.\n
+Shutting down.\n	PoorMan		Kapatılıyor…\n
 Select all	PoorMan		Tümünü seç
 Error Server	PoorMan		Hata sunucusu
 Send file listing if there's no start page	PoorMan		Bir başlangıç sayfası yoksa dosya listesini gönder

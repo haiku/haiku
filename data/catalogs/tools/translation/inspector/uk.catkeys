@@ -4,15 +4,15 @@ Next Page	ImageWindow		Наступна сторінка
 Previous Page	ImageWindow		Попередня сторінка
 Active Translators	InspectorApp		Активні транслятори
 System Translators	ActiveTranslatorsWindow		Системні транслятори
-\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nТип: '%1' (%2)\nГрупа: '%3' (%4)\nЯкість: %5\nЄмність: %6\nТип MIME: %7\nІ'мя: %8\n
+\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nТип: '%1' (%2)\nГрупа: '%3' (%4)\nЯкість: %5\nСпромога: %6\nТип MIME: %7\nІ'мя: %8\n
 OK	ImageWindow		ОК
 View	ImageWindow		Вигляд
 Open…	ImageWindow		Відкрити…
 Save feature not implemented yet.	ImageWindow		Функція збереження не реалізована.
 Active Translators	ImageWindow		Активні транслятори
-Info	ImageWindow		Інформація
-Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Образ: %1\nПростір кольорів: %2 (%3)\nРозміри: %4 x %5\nБайтів на рядок: %6\nВсього байтів: %7\n\nІдентифікаційна інфо:\nID рядок: %8\nТип MIME: %9\nТип: '%10' (%11)\nТранслятор ID: %12\nГрупа: '%13' (%14)\nЯкість: %15\nЄмність: %16\n\nРозширена інфо:\n
-No image available to save.	ImageWindow		Доступні для збереження образи відсутні.
+Info	ImageWindow		Інфо
+Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Зображення: %1\nПростір кольорів: %2 (%3)\nРозміри: %4 x %5\nБайтів на рядок: %6\nВсього байтів: %7\n\nІдентифікаційна інфо:\nРядок ID: %8\nТип MIME: %9\nТип: '%10' (%11)\nТранслятор ID: %12\nГрупа: '%13' (%14)\nЯкість: %15\nСпромога: %16\n\nРозширена інфо:\n
+No image available to save.	ImageWindow		Доступні для збереження зображення відсутні.
 OK	ImageView		ОК
 Bummer	ImageWindow		Халепа
 \nOutput Formats:	ImageView		\nВихідні формати:

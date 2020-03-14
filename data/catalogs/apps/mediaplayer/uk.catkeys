@@ -57,7 +57,7 @@ Playlist…	MediaPlayer-Main		Список відтворення…
 <unnamed media>	MediaPlayer-InfoWin		<неназване медіа>
 Save	MediaPlayer-PlaylistWindow		Зберегти
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Випадкові записи
-Cancel	MediaPlayer-NetworkStream		Відмінити
+Cancel	MediaPlayer-NetworkStream		Скасувати
 Nothing to Play	MediaPlayer-Main		Нічого для відтворення
 OK	MediaPlayer-SettingsWindow		ОК
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Видалити записи
@@ -73,7 +73,7 @@ Quit	MediaPlayer-Main		Вийти
 Redo	MediaPlayer-PlaylistWindow		Переробити
 Move Entry	MediaPlayer-MovePLItemsCmd		Перемістити запис
 <unknown>	PlaylistItem-author		<невідомий>
-Cancel	MediaPlayer-SettingsWindow		Відмінити
+Cancel	MediaPlayer-SettingsWindow		Скасувати
 Large	MediaPlayer-SettingsWindow		Великий
 Import Entry	MediaPlayer-ImportPLItemsCmd		Імпортувати запис
 unknown format	MediaPlayer-InfoWin		невідомий формат

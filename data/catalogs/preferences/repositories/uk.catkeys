@@ -1,42 +1,42 @@
 1	ukrainian	x-vnd.Haiku-Repositories	1220143449
 This is not a valid URL.	AddRepoWindow	Add URL error message	Це невірна адреса URL.
-Repository URL:	AddRepoWindow	Text box label	URL сховища:
-There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Сталася помилка при відновленні кеша сховища для %name%
-There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Сталася помилка при відімкненні сховища %name%
+Repository URL:	AddRepoWindow	Text box label	URL репозиторія:
+There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Сталася помилка при оновленні кеша репозиторія для %name%
+There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Сталася помилка відімкнення репозиторія %name%
 Unknown	Constants	Unknown repository name	Невідомо
-Remove all	RepositoriesView	Button label	Видалити усі
-Enable repositories to use with package management:	RepositoriesView	Label text	Вибір сховищ для роботи з менеджером пакетів:
+Remove all	RepositoriesView	Button label	Вилучити всі
+Enable repositories to use with package management:	RepositoriesView	Label text	Доступні репозиторії для роботи з менеджером пакетів:
 Disable	RepositoriesView	Button label	Відімкнути
 Cancel task	TaskTimer	Button label	Скасувати завдання
 Changes completed	RepositoriesView	Status view text	Зміни проведені
 Details	TaskLooper	Job log details header	Деталі
-Enabled	RepoRow	Tag in the Status column	Увімкнуто
-Remove	Constants	Button label	Видалити
-There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Сталася помилка при підключенні сховища %url%
-Remove this repository?	RepositoriesView	Removal alert confirmation message	Видалити це сховище?
-The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	Завдання сховища %name% потребує багато часу для завершення.
+Enabled	RepoRow	Tag in the Status column	Доступно
+Remove	Constants	Button label	Вилучити
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Сталася помилка при підключенні репозиторія %url%
+Remove this repository?	RepositoriesView	Removal alert confirmation message	Вилучити цей репозиторій?
+The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	Завдання репозиторію %name% потребує багато часу для завершення.
 Completed	TaskLooper	Completed task status message	Завершено
-OK	Constants	Button label	Гаразд
-Status	RepositoriesView	Column title	Стан
+OK	Constants	Button label	ОК
+Status	RepositoriesView	Column title	Статус
 Name	RepositoriesView	Column title	Ім'я
 Add	AddRepoWindow	Button label	Додати
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Сховищам не вдалося отримати імена під'єднаних в даний час сховищ.
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Не вдалося отримати імена під'єднаних в даний час репозиторіїв.
 Enable all	RepositoriesView	Button label	Під'єднати всі
-Aborted	TaskLooper	Aborted task status message	Скасувати
+Aborted	TaskLooper	Aborted task status message	Перервано
 URL	RepositoriesView	Column title	URL адреса
 Enable	RepositoriesView	Button label	Під'єднати
-Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Помилка при налаштуванні сховища для %name%.
+Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Помилка при отриманні параметрів налаштування для %name%.
 Description	TaskLooper	Failed task error description	Опис
-Failed	TaskLooper	Failed task status message	Призупинено
-Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Добра новина! Завдання для сховища %name% завершене.
-Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Деякі завдання надалі виконуються. Зупинити їх та вийти?
-This repository URL already exists.	RepositoriesView	Error message	URL адреса цього сховища повністю присутня.
-Repositories	System name		Сховища
+Failed	TaskLooper	Failed task status message	Невдало
+Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Добра новина! Завдання для репозиторія %name% завершене.
+Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Деякі завдання ще виконуються. Зупинити їх та вийти?
+This repository URL already exists.	RepositoriesView	Error message	URL адреса цього репозиторія вже є.
+Repositories	System name		Репозиторії
 Changes pending:	RepositoriesView	Status view text	Очікування змін:
-Remove	RepositoriesView	Button label	Видалити
-Remove these repositories?	RepositoriesView	Removal alert confirmation message	Видалити ці сховища?
-Keep trying	TaskTimer	Button label	Триває збереження
-Cancel	Constants	Button label	Відмінити
+Remove	RepositoriesView	Button label	Вилучити
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	Вилучити ці репозиторії?
+Keep trying	TaskTimer	Button label	Спробувати ще
+Cancel	Constants	Button label	Скасувати
 Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Може бути включений тільки один URL для сховища. Будь-ласка змініть вибір.
 Stop and quit	RepositoriesWindow	Button label	Зупинити та вийти
-Disable all	RepositoriesView	Button label	Від'єднати усі
+Disable all	RepositoriesView	Button label	Від'єднати всі

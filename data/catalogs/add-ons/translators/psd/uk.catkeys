@@ -1,10 +1,10 @@
 1	ukrainian	x-vnd.Haiku-PSDTranslator	3654055550
 Lab	PSDLoader		Lab
-Uncompressed	PSDConfig		Без стиску
+Uncompressed	PSDConfig		Без стиснення
 Indexed	PSDLoader		Індексоване
 Grayscale	PSDLoader		Відтінки сірого
-Photoshop image translator	PSDConfig		Перетвоювач зображень Photoshop
-Photoshop image translator	PSDTranslator		Перетворювач зображень Photoshop
+Photoshop image translator	PSDConfig		Транслятор зображень Photoshop
+Photoshop image translator	PSDTranslator		Транслятор зображень Photoshop
 Version %d.%d.%d, %s	PSDConfig		Версія %d.%d.%d, %s
 Photoshop Document (PSD file)	PSDConfig		Документ Photoshop (PSD-файл)
 Photoshop image	PSDTranslator		Зображення Photoshop
@@ -12,11 +12,11 @@ RLE	PSDConfig		RLE
 Photoshop Big Document (PSB file)	PSDConfig		Документ Photoshop Big (PSB файл)
 RGBA	PSDLoader		RGBA
 Photoshop image (%s)	PSDTranslator		Зображення Photoshop (%s)
-PSDTranslator Settings	PSDConfig		Налаштування перетворювача PSD
+PSDTranslator Settings	PSDConfig		Налаштування транслятора PSD
 RGB	PSDLoader		RGB
 Bitmap	PSDLoader		Растрове зображення
 CMYK	PSDLoader		CMYK
-Compression: 	PSDConfig		Стиск: 
+Compression: 	PSDConfig		Стиснення: 
 Format: 	PSDConfig		Формат: 
 Multichannel	PSDLoader		Багатоканальний
 Duotone	PSDLoader		Дуплекс

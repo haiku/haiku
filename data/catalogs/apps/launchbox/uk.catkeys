@@ -4,33 +4,33 @@ Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Дійсн�
 OK	LaunchBox		ОК
 Ignore double-click	LaunchBox		Ігнорувати подвійне натискання
 Show on all workspaces	LaunchBox		Показати на всіх робочих областях
-Name Panel	LaunchBox		Назва Панелі
+Name Panel	LaunchBox		Назва панелі
 Autostart	LaunchBox		Автозапуск
 Clone	LaunchBox		Клонувати
 Description for '%3'	LaunchBox		Опис для '%3'
 Show window border	LaunchBox		Показувати рамку вікна
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nНе вдалось запустити програму з сигнатурою'%2'.\n\nПомилка:
 Failed to launch 'something', error in Pad data.	LaunchBox		Не вдалось запустити 'дещо'. Помилка в даних панелі.
-LaunchBox	System name		Панель запуску
-Auto-raise	LaunchBox		Автоматичне спливання
+LaunchBox	System name		LaunchBox
+Auto-raise	LaunchBox		Авто-випливати
 Icon size	LaunchBox		Розмір значка
-Open containing folder	LaunchBox		Відкрити теку що містить
+Open containing folder	LaunchBox		Відкрити папку що містить
 Add button here	LaunchBox		Додати кнопку тут
-Cancel	LaunchBox		Відмінити
+Cancel	LaunchBox		Скасувати
 launch popup	LaunchBox		launch popup
 Clear button	LaunchBox		Очистити кнопку
 Bummer	LaunchBox		Помилка
 last chance	LaunchBox		остання спроба
 You can drag an icon here.	LaunchBox		Ви можете перемістити значок сюди.
 Pad 1	LaunchBox		Панель 1
-Failed to launch '%1'.\n\nError:	LaunchBox		Призупинено запуск '%1'.\n\nПомилка:
+Failed to launch '%1'.\n\nError:	LaunchBox		Невдалий запуск '%1'.\n\nПомилка:
 Settings	LaunchBox		Налаштування
 Vertical layout	LaunchBox		Вертикальне розташування
 Pad	LaunchBox		Панель
 Close	LaunchBox		Закрити
-Remove button	LaunchBox		Видалити кнопку
+Remove button	LaunchBox		Вилучити кнопку
 Quit	LaunchBox		Вийти
 Horizontal layout	LaunchBox		Горизонтальне розташування
 New	LaunchBox		Нова
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Призупинено команду 'відкрити папку' у Tracker.\n\nПомилка: 
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Невдала команда 'відкрити папку' для Tracker.\n\nПомилка: 
 Pad %1	LaunchBox		Панель %1

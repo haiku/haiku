@@ -18,7 +18,7 @@ Settings	Terminal TermWindow		Ayarlar
 %app% settings	Terminal PrefWindow	window title	%app% Ayarları
 Use default	Terminal SetTitleWindow		Öntanımlıları kullan
 Close tab	Terminal TermWindow		Sekmeyi kapat
-Selected background	Terminal AppearancePrefView		Seçili arkaplan
+Selected background	Terminal AppearancePrefView		Seçili arka plan
 Error!	Terminal getString		Hata!
 Set tab title	Terminal TermWindow		Sekme başlığını ayarla
 Appearance	Terminal PrefWindow		Görünüm
@@ -62,7 +62,7 @@ Find previous	Terminal TermWindow		Öncekini bul
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Sekme başlıklarını belirten dizgi. Aşağıdaki yer tutucular kullanılabilir:\n
 Close	Terminal TermWindow		Kapat
 Save to file…	Terminal PrefWindow		Dosyaya kaydet...
-Background	Terminal AppearancePrefView		Arkaplan
+Background	Terminal AppearancePrefView		Arka plan
 Copy path	Terminal TermView		Yolu kopyala
 Window size	Terminal TermWindow		Pencere boyutu
 Copy absolute path	Terminal TermView		Tam yolu kopyala

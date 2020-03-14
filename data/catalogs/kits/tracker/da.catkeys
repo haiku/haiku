@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libtracker	176213216
+1	danish	x-vnd.Haiku-libtracker	1066099065
 Created	ContainerWindow		Oprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åbn og lav foretrukket
@@ -448,7 +448,6 @@ Rename	FSUtils	button label	Omdøb
 Clean up all	ContainerWindow		Opryd alle
 Add current folder	FilePanelPriv		Tilføj nuværende mappe
 Description:	InfoWindow		Beskrivelse:
-The Tracker must be running to see set the default printer.	PoseView		Trackeren skal køre for at kunne se indstil standardprinteren.
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Er du sikker på, at du vil slette de valgte elementer? Handlingen kan ikke fortrydes.
 Grayscale picture	AttributesView		Gråtone billede
 Mount	DeskWindow		Monter

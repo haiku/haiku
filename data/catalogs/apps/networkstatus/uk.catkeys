@@ -1,12 +1,12 @@
 1	ukrainian	x-vnd.Haiku-NetworkStatus	186344131
-Netmask	NetworkStatusView		Маска мережі
+Netmask	NetworkStatusView		Маска підмережі
 Quit	NetworkStatusView		Вийти
 Unknown	NetworkStatusView		Невідомий
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Збій запуску аплета мережевих параметрів.\n\nПомилка: 
 Install in Deskbar	NetworkStatus		Встановити у Deskbar
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		NetworkStatus опції:\n\t--deskbar\tавтоматично додати реплікант до Deskbar'у\n\t--help\t\tпоказати цю інформацію та вийти
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		NetworkStatus опції:\n\t--deskbar\tавтоматично додати реплікант до Deskbar\n\t--help\t\tпоказати цю інфо та вийти
 Open network preferences…	NetworkStatusView		Відкрити налаштування мережі…
-NetworkStatus	System name		Стан мережі
+NetworkStatus	System name		NetworkStatus
 OK	NetworkStatusView		ОК
 No link	NetworkStatusView		З'єднання відсутнє
 Could not join wireless network:\n	NetworkStatusView		Бездротові мережі не під'єднані:\n

@@ -1,12 +1,12 @@
 1	ukrainian	x-vnd.Haiku-Mail	2750130554
 Account settings	AutoConfigWindow		Параметри облікового запису
 \t\t· Outgoing	Config Window		\t\t· Вихідні
-An error occurred while creating the config view: %error.	Config Views		Сталася помилка при створенні виду конфігурації : %error.
+An error occurred while creating the config view: %error.	Config Views		Сталася помилка при створенні конфігурації : %error.
 E-mail address:	E-Mail		Поштова адреса:
 Create new account	AutoConfigWindow		Створити обліковий запис
 While sending and receiving	Config Window		При відправленні та отриманні
 Error!	Config Views		Помилка!
-Apply	Config Window		Прийняти
+Apply	Config Window		Застосувати
 Incoming mail filters	Config Views		Вхідний поштовий фільтр
 Outgoing mail filters	Config Views		Фільтри вихідної пошти
 Server name:	E-Mail		Ім'я сервера:
@@ -18,21 +18,21 @@ Real name:	Config Views		Справжнє ім'я:
 Outgoing	E-Mail		Вихідні
 Accounts	Config Window		Облікові записи
 Outgoing	Config Window		Вихідні
-Remove	Config Views		Видалити
+Remove	Config Views		Вилучити
 Show notifications:	Config Window		Показати оповіщення:
 Settings	Config Window		Налаштування
 Never	Config Window	show status window	Ніколи
 Account name:	Config Views		Назва облікового запису:
 \t\t· Incoming	Config Window		\t\t· Вхідні
 Enter a valid e-mail address.	AutoConfigWindow		Введіть чинну адресу пошти.
-\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nОсновні налаштування неможливо повернути.\n\nПомилка при відновленні основних налаштувань:\n%s\n
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nЗагальні налаштування неможливо повернути.\n\nПомилка при отриманні загальних налаштувань:\n%s\n
 Incoming	E-Mail		Вхідні
 Choose Protocol	E-Mail		Вибрати протокол
 Return address:	Config Views		Зворотня адреса:
-Password:	E-Mail		Гасло:
-Error retrieving general settings: %s\n	Config Window		Помилка при відновленні основних налаштувань: %s\n
+Password:	E-Mail		Пароль:
+Error retrieving general settings: %s\n	Config Window		Помилка при отриманні загальних налаштувань: %s\n
 The filter could not be moved. Deleting filter.	Config Views		Фільтр неможливо перемістити. Видалення фільтра.
-OK	Config Views		Гаразд
+OK	Config Views		ОК
 Revert	Config Window		Повернути
 Incoming	Config Window		Вхідні
 Finish	AutoConfigWindow		Завершення
@@ -41,14 +41,14 @@ Account settings	Config Views		Налаштування облікового з�
 minutes	Config Window		хвилин
 E-mail	System name		Пошта
 Check every	Config Window		Перевіряти кожний
-Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Створити новий обліковий запис натиснувши Додати \n\nУсунути обліковий запис натиснувши Видалити на вибраному елементі.\n\nВибрати елемент зі списку для зміни його налаштувань.
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Створити новий обліковий запис натиснувши 'Додати'.\n\nВилучити вибраний обліковий запис натиснувши 'Вилучити'.\n\nВибрати елемент зі списку для зміни його налаштувань.
 Account name:	E-Mail		Назва облікового запису:
 Edit mailbox menu…	Config Window		Редагувати меню скриньки…
 Server Name:	E-Mail		Ім'я сервера:
-Remove	Config Window		Видалити
+Remove	Config Window		Вилучити
 Login name:	E-Mail		Ім'я для авторизації:
 While sending	Config Window		Поки іде відправка
-OK	Config Window		Гаразд
-OK	AutoConfigWindow		Гаразд
+OK	Config Window		ОК
+OK	AutoConfigWindow		ОК
 Next	AutoConfigWindow		Наступний
 Error	Config Window		Помилка

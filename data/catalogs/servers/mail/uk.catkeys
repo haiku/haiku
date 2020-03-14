@@ -1,8 +1,8 @@
 1	ukrainian	x-vnd.Be-POST	2949558073
 No new messages	MailDaemon		Немає нових повідомлень
 No new messages	DeskbarView		Немає нових повідомлень
-Shutdown mail services	DeskbarView		Закрити поштові сервіси
-Mail status	MailDaemon		Стан пошти
+Shutdown mail services	DeskbarView		Виключити поштові сервіси
+Mail status	MailDaemon		Статус пошти
 Fetching mail for %name	Notifier		Отримання пошти для %name
 {0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# нове повідомлення} few{# нових повідомлення} other{# нових повідомлень}}
 {0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# нове повідомлення} few{# нових повідомлення} other{# нових повідомлень}} для %name\n
@@ -12,7 +12,7 @@ Settings…	DeskbarView		Налаштування…
 {0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Одне нове повідомлення} few{# нових повідомлення} other{# нових повідомлень}}
 New Messages	MailDaemon		Нові повідомлення
 <no accounts>	DeskbarView		<облікові записи відсутні>
-Mail status	Notifier		Стан пошти
+Mail status	Notifier		Статус пошти
 Check for mails only	DeskbarView		Перевірити тільки пошту
 Check for mail now	DeskbarView		Перевірити пошту зараз
 Sending mail for %name	Notifier		Відправка пошти для %name

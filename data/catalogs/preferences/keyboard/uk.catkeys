@@ -3,10 +3,10 @@ Written by Andrew Edward McCall	KeyboardApplication		Автор Andrew Edward Mc
 Typing test area	KeyboardView		Зона перевірки набору
 Defaults	KeyboardWindow		За замовчуванням
 Key repeat rate	KeyboardView		Швидкість повтору
-Revert	KeyboardWindow		Повернути
+Revert	KeyboardWindow		Без змін
 Delay until key repeat	KeyboardView		Затримка при повторі
 Keyboard	System name		Клавіатура
-OK	KeyboardApplication		Гаразд
+OK	KeyboardApplication		ОК
 Fast	KeyboardView		Швидко
 Slow	KeyboardView		Повільно
 Something has gone wrong!	KeyboardApplication		Щось пішло не так!

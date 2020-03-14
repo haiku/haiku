@@ -2,9 +2,9 @@
 Mount read-only	AutoMounter		Підключити тільки для читання
 Error mounting volume:\n\n%s	AutoMounter		Помилка підключення тому:\n\n%s
 Cancel	AutoMounter		Скасувати
-OK	AutoMounter		Гаразд
+OK	AutoMounter		ОК
 Unmount error	AutoMounter		Помилка відключення
-The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		На цьому розділі - відмінна від bfs файлова система. Для уникнення втрати даних через баги у Haiku рекомендуємо монтувати його в режимі "тільки читання".
+The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		Файлова система на цьому розділі відмінна від файлової системи Be (BeFS). Рекомендуємо підключити його в режимі 'тільки читання' щоб запобігти невмисній втраті даних через можливі помилки в Haiku.
 Mount read/write	AutoMounter		Підключити для читання/запису
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		Неможливо відключити диск \"%s\":\n\t%s
 Mounting volume '%s'\n\n	AutoMounter		Підключення тому '%s'\n\n

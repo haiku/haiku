@@ -24,7 +24,7 @@ Slow motion	ChartWindow		Повільний рух
  5% (low)	ChartWindow		 5% (низька)
 Fast motion	ChartWindow		Швидкий рух
 Special	ChartWindow		Особливий
-Status	ChartWindow		Стан
+Status	ChartWindow		Статус
 Star density	ChartWindow		Щільність зірок
 600.0 f/s	ChartWindow		600.0 f/s
 Display:	ChartWindow		Показати:
@@ -33,10 +33,10 @@ White	ChartWindow		Білий
 Chart	System name		Таблиця
 Animation:	ChartWindow		Анімація:
 Frames/s	ChartWindow		Кадрів/с
-Auto demo	ChartWindow		Демонстрація
+Auto demo	ChartWindow		АвтоДемо
 CPU load	ChartWindow		Завантаження процесора
 DrawBitmap	ChartWindow		DrawBitmap
 Red	ChartWindow		Червоний
-None	ChartWindow		Жодного
+None	ChartWindow		Пусто
 Battle	ChartWindow		Битва
 Space:	ChartWindow		Космос:

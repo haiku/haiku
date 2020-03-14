@@ -1,7 +1,7 @@
 1	ukrainian	x-vnd.Haiku-libpackage	2012114212
-Refreshing repository \"%s\" failed	PackageManagerKit		Оновлення сховища \"%s\" призупинено
-Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Неможливо отримати конфігурацію для сховища \"%s\". Пропустити.
-Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Призупинено отримання кешу для сховищ \"%s\". Пропущено.
-Failed to get repository names	PackageManagerKit		Призупинено отримання назв сховищ
+Refreshing repository \"%s\" failed	PackageManagerKit		Збій оновлення репозиторія \"%s\"
+Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Не вдалося отримати конфігурацію для репозиторія \"%s\". Пропустити.
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Збій отримання кешу для репозиторія \"%s\". Пропущено.
+Failed to get repository names	PackageManagerKit		Збій отримання назв репозиторіїв
 Failed to remove transaction directory	PackageManagerKit		Не вдалося видалити каталог транзакцій
-Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Пакунок %s-%s не вимагає відповідності з базовим \"%s\"
+Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Пакет %s-%s не вимагає відповідності з базовим \"%s\"

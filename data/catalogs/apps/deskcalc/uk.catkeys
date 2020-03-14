@@ -41,7 +41,7 @@ exp	CalcView		exp
 atan	CalcView		atan
 9	CalcView		9
 .	CalcView		.
-DeskCalc	System name		Калькулятор
+DeskCalc	System name		DeskCalc
 Degrees	CalcView		Градуси
 7	CalcView		7
 !	CalcView		!

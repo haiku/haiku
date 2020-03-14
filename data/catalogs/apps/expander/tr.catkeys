@@ -43,7 +43,7 @@ Expander	System name		Genişletici
 Expand	ExpanderWindow		Genişlet
 Close	ExpanderMenu		Kapat
 The destination is not a folder.	ExpanderWindow		Hedef bir klasör değil.
-Open destination folder after extraction	ExpanderPreferences		Çıkartma bittikten sonra hedef klasörü aç
+Open destination folder after extraction	ExpanderPreferences		Çıkarma bittikten sonra hedef klasörü aç
 Creating listing for '%s'…	ExpanderWindow		'%s' için liste oluşturuluyor…
 Set source…	ExpanderMenu		Kaynak belirle…
 Show contents	ExpanderMenu		İçeriği göster

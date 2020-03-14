@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	3696513506
+1	catalan; valencian	x-vnd.Haiku-libtracker	291432059
 Created	ContainerWindow		Generat
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
 Kind	ContainerWindow		Tipus
@@ -346,7 +346,6 @@ Sorry, could not create a new folder.	FSUtils		Ho lamentem, no ha estat possible
 Clean up all	ContainerWindow		Neteja-ho tot
 Add current folder	FilePanelPriv		Afegeix la carpeta actual
 Description:	InfoWindow		Descripció:
-The Tracker must be running to see set the default printer.	PoseView		Per veure la impressora predeterminada cal que el traçador s'estigui executant.
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Esteu segur que voleu suprimir els elements seleccionats? Aquesta operació no es pot desfer.
 Mount	DeskWindow		Munta
 ends with	FindPanel		acaba amb

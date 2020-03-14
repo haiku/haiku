@@ -1,38 +1,38 @@
 1	ukrainian	x-vnd.Haiku-libsolvsolver	3404387783
-allow architecture change of %source% to %target%	SolverProblemSolution		дозволити зміну архітектури %source% до %target%
-install %source% from excluded repository	SolverProblemSolution		встановити %source% з відключеного репозиторія
+allow architecture change of %source% to %target%	SolverProblemSolution		дозволити зміну архітектури %source% на %target%
+install %source% from excluded repository	SolverProblemSolution		встановити %source% з виключеного репозиторія
 unspecified problem	SolverProblem		невизначена проблема
-package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		пакет %source% очікує %dependency%, але жоден тне може бути встановленим
+package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		пакет %source% потребує %dependency%, але відсутні провайдери
 package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		пакет %source% має застарілі залежності %dependency% від %target%
 nothing provides requested %dependency%	SolverProblem		відсутній запит %dependency%
-do not keep %source% installed	SolverProblemSolution		не зберігати %source% встановлене
+do not keep %source% installed	SolverProblemSolution		не зберігати %source% встановленим
 do not deinstall \"%selection%\"	SolverProblemSolution		не перевстановлювати \"%selection%\"
 install %source% despite its inferior architecture	SolverProblemSolution		встановити %source% не зважаючи на нижчу архітектуру
 conflicting requests	SolverProblem		конфліктуючі запити
 do not install the most recent version of \"%selection%\"	SolverProblemSolution		не встановлюйте найновішу версію \"%selection%\"
 allow replacement of %source% with %target%	SolverProblemSolution		дозволити заміну %source% з %target%
-package %source% obsoletes %dependency% provided by %target%	SolverProblem		пакунок %source% застарів %dependency% для %target%
+package %source% obsoletes %dependency% provided by %target%	SolverProblem		пакет %source% виводить з ужитку %dependency% який надав %target%
 do not forbid installation of %source%	SolverProblemSolution		не забороняйте встановлення %source%
-allow downgrade of %source% to %target%	SolverProblemSolution		дозволити зниження %source% до %target%
+allow downgrade of %source% to %target%	SolverProblemSolution		дозволити зниження версії %source% до %target%
 dependency problem	SolverProblem		проблема залежностей
 %dependency% is provided by the system	SolverProblem		%dependency% забезпечується системою
-keep %source% despite its inferior architecture	SolverProblemSolution		зберегти %source% незважаючи на її низьку архітектуру
-%source% does not belong to a distupgrade repository	SolverProblem		%source% не належить для сховища distupgrade
-installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		встановлений пакет %source% застарів %dependency% для %target%
-allow name change of %source% to %target%	SolverProblemSolution		дозволити заміну %source% до %target%
-package %source% conflicts with %dependency% provided by %target%	SolverProblem		пакет %source% конфліктує з %dependency% забезпеченням %target%
+keep %source% despite its inferior architecture	SolverProblemSolution		зберегти %source% незважаючи на більш низьку архітектуру
+%source% does not belong to a distupgrade repository	SolverProblem		%source% не належить до репозиторія distupgrade
+installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		встановлений пакет %source% виводить з ужитку %dependency% який надав %target%
+allow name change of %source% to %target%	SolverProblemSolution		дозволити заміну назви %source% на %target%
+package %source% conflicts with %dependency% provided by %target%	SolverProblem		пакет %source% конфліктує з %dependency% який надав %target%
 do something	SolverProblemSolution		робіть щось
 install %selection% despite its old version	SolverProblemSolution		встановити %selection% незважаючи на стару версію
 cannot install both %source% and %target%	SolverProblem		неможливо встановити одразу %source% та %target%
-package %source% is not installable	SolverProblem		пакунок %source% не встановлено
+package %source% is not installable	SolverProblem		пакет %source% не інсталяційний
 problem with installed package %source%	SolverProblem		проблема з встановленим пакетом %source%
-allow deinstallation of %source%	SolverProblemSolution		дозволити перевстановлення %source%
-keep %source% from excluded repository	SolverProblemSolution		зберегти %source% з вимкнутого репозиторія
+allow deinstallation of %source%	SolverProblemSolution		дозволити деінсталяцію %source%
+keep %source% from excluded repository	SolverProblemSolution		зберегти %source% з виключеного репозиторія
 keep old %source%	SolverProblemSolution		зберегти старий %source%
-package %source% conflicts with %dependency% provided by itself	SolverProblem		пакет %source% конфліктує з %dependency% наданими йому
-allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		дозволити зміну постачальника з \"%sourceVendor%\" (%source%) до \"%targetVendor%\" (%target%)
+package %source% conflicts with %dependency% provided by itself	SolverProblem		пакет %source% конфліктує з %dependency% наданими самому собі
+allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		дозволити зміну постачальника з \"%sourceVendor%\" (%source%) на \"%targetVendor%\" (%target%)
 do not lock \"%selection%\"	SolverProblemSolution		не блокувати \"%selection%\"
 do not install \"%selection%\"	SolverProblemSolution		не встановлювати \"%selection%\"
 nothing provides %dependency% needed by %source%	SolverProblem		не забезпечено залежності %dependency% потрібні для %source%
 %source% has inferior architecture	SolverProblem		%source% має низьку архітектуру
-do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		не перевстановлювати всі зв'зки \"%selection%\"
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		не проводити деінсталяцію всіх зв'зків \"%selection%\"

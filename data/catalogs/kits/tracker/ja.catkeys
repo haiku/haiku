@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	176213216
+1	japanese	x-vnd.Haiku-libtracker	1066099065
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -448,7 +448,6 @@ Rename	FSUtils	button label	名前の変更
 Clean up all	ContainerWindow		すべてを整列
 Add current folder	FilePanelPriv		このフォルダーを追加
 Description:	InfoWindow		説明:
-The Tracker must be running to see set the default printer.	PoseView		デフォルトプリンタを設定するには、 Tracker が実行されている必要があります。
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		選択した項目を削除しますか? 削除した項目は元に戻せませんので、ご注意ください。
 Grayscale picture	AttributesView		グレースケール画像
 Mount	DeskWindow		マウント

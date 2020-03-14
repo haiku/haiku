@@ -1,41 +1,41 @@
 1	ukrainian	x-vnd.Be-PRNT	1465107170
 Test page	TestPageView		Пробна сторінка
-Remove	PrintersWindow		Видалити
+Remove	PrintersWindow		Вилучити
 Red	TestPageView		Червоний
-Default Printer	PrinterListView		Типовий принтер
+Default Printer	PrinterListView		Принтер за замовчуванням
 <pick one>	AddPrinterDialog		<виберіть>
 Connected to:	AddPrinterDialog		Підключений до:
-Make default	PrintersWindow		Зробити типовим
-Cyan	TestPageView		Голубий
+Make default	PrintersWindow		Зробити основним
+Cyan	TestPageView		Бірюзовий
 Completed	JobListView		Завершено
 Test page	PrintersWindow		Пробна сторінка
 Transport: %transport% %transport_address%	PrinterListView		Транспорт: %transport% %transport_address%
-Failed	JobListView		Призупинено
+Failed	JobListView		Невдало
 Blue	TestPageView		Синій
 Waiting	JobListView		Очікування
 Processing	JobListView		Виконання
 Cancel	AddPrinterDialog		Скасувати
 Unknown status	JobListView		Стан невідомий
-Print jobs for %printer_name%	PrintersWindow		Завдання на %printer_name%
+Print jobs for %printer_name%	PrintersWindow		Завдання на друк %printer_name%
 {0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? сторінок}=1{# сторінка}few{# сторінки}other{# сторінок}}
 Add printer	AddPrinterDialog		Додати принтер
 Printers	PrintersWindow		Принтери
-No printer found!	TransportMenu		Принтера не знайдено!
+No printer found!	TransportMenu		Принтер не знайдено!
 Add…	PrintersWindow		Додати …
-Magenta	TestPageView		Маджента
+Magenta	TestPageView		Пурпурний
 Transport: %transport% %transport_address%	TestPageView		Транспорт: %transport% %transport_address%
 Add	AddPrinterDialog		Додати
 Print jobs: No printer selected	PrintersWindow		Завдання на друк: Принтер не вибрано
 Printer name:	AddPrinterDialog		Ім'я принтера:
 Yellow	TestPageView		Жовтий
 Black	TestPageView		Чорний
-Printer type:	AddPrinterDialog		Підключений до:
+Printer type:	AddPrinterDialog		Тип принтера:
 Printers	System name		Принтери
-{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{Черга вільна}=few{# завдання на черзі}other{# завдань на черзі}}
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{Черга вільна}=1{1 завдання на черзі}few{# завдання на черзі}other{# завдань на черзі}}
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Принтер: %printer_name%\nДрайвер: %driver%\n
 Green	TestPageView		Зелений
 Print test page	PrintersWindow		Друк пробної сторінки
 Restart job	PrintersWindow		Перезапустити завдання
 Driver: %driver%	PrinterListView		Драйвер: %driver%
 Cancel job	PrintersWindow		Скасувати завдання
-%.2f KB	JobListView		%.2f KB
+%.2f KB	JobListView		%.2f KБ

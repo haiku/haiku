@@ -1,21 +1,21 @@
 1	ukrainian	x-vnd.Haiku-PPMTranslator	292474603
-None	PPMTranslator		Жоден
+None	PPMTranslator		Пусто
 PPM Settings	PPMMain		Налаштування PPM
-System palette 8 bits	PPMTranslator		Системна палета 8 біт
-Sample code copyright 1999, Be Incorporated	PPMTranslator		Приклад коду. Авторські права, 1999, Be Incorporated
-Something is wrong with the PPMTranslator!	PPMMain		Негаразди з Перетворювачем PPM!
+System palette 8 bits	PPMTranslator		Системна палітра 8 біт
+Sample code copyright 1999, Be Incorporated	PPMTranslator		Sample code copyright 1999, Be Incorporated
+Something is wrong with the PPMTranslator!	PPMMain		Негаразди з транслятором PPM!
 Grayscale 8 bits	PPMTranslator		8 бітні відтінки сірого
-Based on PPMTranslator sample code	PPMTranslator		На основі зразка коду Перетворювача PPM
+Based on PPMTranslator sample code	PPMTranslator		Базується на коді Транслятора PPM
 RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 біт big-endian
-PPM image translator	PPMTranslator		Перетворювач зображень PPM
+PPM image translator	PPMTranslator		Транслятор зображень PPM
 Bitmap 1 bit	PPMTranslator		Растрове зображення 1 біт
 RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 біт big-endian
-PPMTranslator Settings	PPMTranslator		Налаштування Перетворювача PPM
+PPMTranslator Settings	PPMTranslator		Налаштування транслятора PPM
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 біт
 OK	PPMMain		ОК
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 біт
 PPM image	PPMTranslator		Зображення PPM
-Input color space:	PPMTranslator		Вхідна палета кольорів
+Input color space:	PPMTranslator		Вхідна палітра кольорів
 RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 біт big-endian
 RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 біт big-endian
 Write ASCII	PPMTranslator		Записати в ASCII
@@ -27,4 +27,4 @@ CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 біт
 RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 біт
 RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 біт
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 біт
-Be Bitmap Format (PPMTranslator)	PPMTranslator		Форматових зображень Be (Перетворювач PPM)
+Be Bitmap Format (PPMTranslator)	PPMTranslator		Формат растрових зображень Be (Транслятор PPM)

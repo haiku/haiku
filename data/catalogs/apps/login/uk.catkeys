@@ -9,9 +9,9 @@ Login application for Haiku\nUsage:\n	Login App		Програма для авт�
 Desktop	Desktop Window		Робочий стіл
 Hide password	Login View		Приховати пароль
 Reboot	Login View		Перезавантажити
-You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Ви можете налаштувати робочий стіл позаду програми Авторизація, скинувши на нього репліканти.\n\n Коли Ви завершите просто вийдіть з додатку (Cmd-Q).
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Щоб налаштувати робочий стіл, який відображається позаду програми Авторизація, скиньте на нього репліканти.\n\n Коли Ви завершите просто вийдіть з програми (Cmd-Q).
 OK	Login View		ОК
-Info	Login App		Інформація
+Info	Login App		Інфо
 Login:	Login View		Логін:
 Password:	Login View		Пароль:
 Unimplemented	Login App		Не реалізовано

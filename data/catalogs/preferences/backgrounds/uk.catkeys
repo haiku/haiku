@@ -1,23 +1,23 @@
 1	ukrainian	x-vnd.Haiku-Backgrounds	681978856
 Backgrounds	System name		Фон
 X:	Main View		X:
-Setting the background image failed:	Main View		Не вдалося встановити зображення фону:
+Setting the background image failed:	Main View		Не вдалося встановити фонове зображення:
 Resolution: 	Image Filepanel		Роздільна здатність: 
 pick one	Main View		вибрати
 Default	Main View		За замовчуванням
 Center	Main View		Центрувати
-Folder: %path	Main View		Тека: %path
+Folder: %path	Main View		Папка: %path
 Manual	Main View		Вручну
 Set background image error	Main View		Помилка при встановленні зображення фону
-Default folder	Main View		Тека за замовчуванням
-Revert	Main View		Повернути
-None	Main View		Жодного
-All workspaces	Main View		На всі робочі простори
+Default folder	Main View		Папка за замовчуванням
+Revert	Main View		Без змін
+None	Main View		Пусто
+All workspaces	Main View		На всі робочі області
 Icon label outline	Main View		Контурний текст значків
 Other…	Main View		Інше…
-Current workspace	Main View		Поточний робочий простір
-Apply	Main View		Використати
-Other folder…	Main View		Інша тека…
+Current workspace	Main View		Поточна робоча область
+Apply	Main View		Застосувати
+Other folder…	Main View		Інша папка…
 Y:	Main View		Y:
 Tile	Main View		Заповнити
 Select	Main View		Вибрати

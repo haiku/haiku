@@ -1,13 +1,13 @@
 1	ukrainian	x-vnd.Haiku-SoundRecorder	24440888
 Loop	RecorderWindow		Петля
-Cannot find default audio hardware	RecorderWindow		Неможливо знайти типовий звуковий пристрій
-Cannot find the temporary file created to hold the new recording	RecorderWindow		Неможливо знайти тимчасовий файл створений для збереження нового запису
-Sample size:	RecorderWindow		Розмір зразка:
-Nothing to play	RecorderWindow		Нічого для відтворення
+Cannot find default audio hardware	RecorderWindow		Не вдається знайти звукове обладнання
+Cannot find the temporary file created to hold the new recording	RecorderWindow		Не вдається знайти тимчасовий файл, створений для зберігання нового запису
+Sample size:	RecorderWindow		Розмір семпла:
+Nothing to play	RecorderWindow		Нічого грати
 None of the files appear to be audio files.	RecorderWindow		Жоден з цих файлів не є звуковим.
 Duration: 	RecorderWindow		Тривалість: 
 File info	RecorderWindow		Інфо про файл
-Drop files here	SoundListView		Киньте файли сюди
+Drop files here	SoundListView		Скиньте файли сюди
 Input	RecorderWindow		Вхід
 Some of the files don't appear to be audio files.	RecorderWindow		Деякі з файлів виявилися не звуковими.
 Stop	RecorderWindow		Зупинити
@@ -15,8 +15,8 @@ Format:	RecorderWindow		Формат:
 Sound List	RecorderWindow		Список звуку
 Compression: 	RecorderWindow		Компресія: 
 Rewind	RecorderWindow		Перемотка
-Sample rate:	RecorderWindow		Частота дискретизації:
-Invalid audio files	RecorderWindow		Невірні аудіо файли
+Sample rate:	RecorderWindow		Дискретизація:
+Invalid audio files	RecorderWindow		Недійсні аудіо файли
  seconds	RecorderWindow		 секунд
 OK	RecorderWindow		ОК
 Cannot open the temporary file created to hold the new recording	RecorderWindow		Неможливо відкрити тимчасовий файл створений для збереження нового запису
@@ -26,21 +26,21 @@ Play	RecorderWindow		Відтворити
 SoundRecorder	System name		SoundRecorder
 Channels:	RecorderWindow		Канали:
  bits	RecorderWindow		 бітів
-None	RecorderWindow		Жодного
+None	RecorderWindow		Пусто
 Record	RecorderWindow		Записати
-Sample size: 	RecorderWindow		Розмір дискретизації: 
+Sample size: 	RecorderWindow		Розмір семпла: 
 Cannot recognize this file as a media file	RecorderWindow		Неможливо розпізнати файл як медіа
 Format: 	RecorderWindow		Формат: 
-File name: 	RecorderWindow		І'мя файла: 
+File name: 	RecorderWindow		І'мя: 
 Cannot connect to the selected sound input	RecorderWindow		Неможливо під'єднати вибраний аудіо вхід
 Cannot get the file to play	RecorderWindow		Неможливо отримати файл для відтворення
 Cannot record a sound that long	RecorderWindow		Неможливо записати довший звук
 Duration:	RecorderWindow		Тривалість:
 Compression:	RecorderWindow		Компресія:
-Cannot find an unused name to use for the new recording	RecorderWindow		Неможливо знайти невикористане і'мя для проведення нового запису
+Cannot find an unused name to use for the new recording	RecorderWindow		Не вдалося знайти невикористане і'мя для нового запису
 Channels: 	RecorderWindow		Канали: 
 Save	RecorderWindow		Зберегти
-Sample rate: 	RecorderWindow		Частота дискретизації: 
+Sample rate: 	RecorderWindow		Дискретизація: 
 Cannot connect to media server	RecorderWindow		Неможливо під'єднати медіа сервер
 The file doesn't appear to be an audio file.	RecorderWindow		Цей файл не є звуковим.
 File name:	RecorderWindow		І'мя файла:

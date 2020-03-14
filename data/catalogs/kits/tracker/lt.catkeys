@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	2392173362
+1	lithuanian	x-vnd.Haiku-libtracker	3282059211
 Created	ContainerWindow		Sukūrimo data
 Open and make preferred	OpenWithWindow		Atverti ir laikyti numatytąja
 Kind	ContainerWindow		Tipas
@@ -350,7 +350,6 @@ Rename	FSUtils	button label	Pervardinti
 Clean up all	ContainerWindow		Sutvarkyti visus
 Add current folder	FilePanelPriv		Įtraukti šį aplanką
 Description:	InfoWindow		Aprašas:
-The Tracker must be running to see set the default printer.	PoseView		Kad galėtumėte parinkti numatytąjį spausdintuvą, turi būti paleistas Pėdsekys.
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Ar tikrai norite pašalinti pažymėtus objektus? Neužmirškite, jog šis veiksmas negrįžtamas.
 Mount	DeskWindow		Prijungti
 ends with	FindPanel		baigiasi

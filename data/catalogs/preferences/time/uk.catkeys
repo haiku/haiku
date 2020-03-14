@@ -1,10 +1,10 @@
 1	ukrainian	x-vnd.Haiku-Time	834234238
-OK	Time		Гаразд
+OK	Time		ОК
 Message receiving failed	Time		Не вдалось отримати повідомлення
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Дата та Час, автори:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nВсі права застережені 2004-2012, Haiku.
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Дата & Час, автори:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Australia	Time		Австралія
 America	Time		Америка
-Reset to default server list	Time		Скинути до типового списку сервера
+Reset to default server list	Time		Скинути список серверів за замовчуванням
 Could not resolve server address	Time		Недозволена адреса сервера
 Set time zone	Time		Встановити часову зону
 Waiting for answer failed	Time		Відповідь не отримана
@@ -22,7 +22,7 @@ Show day of week	Time		Показувати день тижня
 Local time (Windows compatible)	Time		Місцевий час (сумісний з Windows)
 Hardware clock set to:	Time		Апаратний годинник встановлено на:
 Arctic	Time		Арктика
-Antarctica	Time		Отримано невірний час
+Antarctica	Time		Антарктида
 GMT (UNIX compatible)	Time		GMT (сумісний з UNIX)
 Africa	Time		Африка
 Stop	Time		Зупинити
@@ -32,7 +32,7 @@ Network time	Time		Мережевий час
 Sending request failed	Time		Не вдалося надіслати запит
 Preview time:	Time		Попередній час:
 \nNow: 	Time		\nЗараз: 
-Could not create socket	Time		Неможливо створити комірку
+Could not create socket	Time		Не вдалося створити сокет
 Pacific	Time		Тихий океан
 Atlantic	Time		Атлантичний океан
 Show clock in Deskbar	Time		Показувати час в Deskbar

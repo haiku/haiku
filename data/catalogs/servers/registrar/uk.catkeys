@@ -1,6 +1,6 @@
 1	ukrainian	x-vnd.haiku-registrar	2599857937
 Cancel	ShutdownProcess		Скасувати
-OK	ShutdownProcess		Гаразд
+OK	ShutdownProcess		ОК
 Do you really want to shut down the system?	ShutdownProcess		Ви справді бажаєте вимкнути систему?
 Shutdown status	ShutdownProcess		Стан вимкнення
 Shut down	ShutdownProcess		Вимкнути
@@ -14,10 +14,10 @@ Restart	ShutdownProcess		Перезапустити
 It's now safe to turn off the computer.	ShutdownProcess		Тепер можна вимкнути комп'ютер.
 Asking other processes to quit.	ShutdownProcess		Опитування інших процесів про вихід.
 Cancel shutdown	ShutdownProcess		Скасувати вимкнення
-Restarting…	ShutdownProcess		Перезавантаження…
+Restarting…	ShutdownProcess		Перезапуск…
 %action%?	ShutdownProcess		%action%?
 Tidying things up a bit.	ShutdownProcess		Ще деякі дрібниці.
-Kill application	ShutdownProcess		Вбити програму
-Shutdown aborted	ShutdownProcess		Вимкнення скасовано
+Kill application	ShutdownProcess		Знищити програму
+Shutdown aborted	ShutdownProcess		Вимкнення перервано
 Shutting down…	ShutdownProcess		Вимкнення...
 Asking \"%appName%\" to quit.	ShutdownProcess		Опитування \"%appName%\" про вихід.

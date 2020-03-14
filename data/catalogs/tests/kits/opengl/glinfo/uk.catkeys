@@ -1,9 +1,9 @@
 1	ukrainian	x-vnd.Haiku-GLInfo	3678488342
-Capability	Capabilities		Можливість
+Capability	Capabilities		Спромога
 Information	InfoView		Інформація
 GL Info	System name		Відомості про GL
-Capabilities	Capabilities		Можливості
-Maximum convolution	Capabilities		Максимальне звертання
+Capabilities	Capabilities		Спроможність
+Maximum convolution	Capabilities		Максимальне згортання
 Available extensions	Extensions		Доступні розширення
 Value	Capabilities		Значення
 Extensions	Extensions		Розширення

@@ -1,39 +1,39 @@
 1	ukrainian	x-vnd.Haiku-Pulse	139895817
-Normal mode	DeskbarPulseView		Режим нормальний
-Info	CPUButton		Інформація
+Normal mode	DeskbarPulseView		Звичайний режим
+Info	CPUButton		Інфо
 Quit	DeskbarPulseView		Вийти
-Info	DeskbarPulseView		Інформація
-Normal mode	MiniPulseView		Режим нормальний
+Info	DeskbarPulseView		Інфо
+Normal mode	MiniPulseView		Звичайний режим
 Frame color	ConfigView		Колір рамки
 Error	PulseApp		Помилка
-Bar colors	ConfigView		Кольори смуги
-%.2f GHz	NormalPulseView		%.2f GHz
+Bar colors	ConfigView		Кольори індикатора
+%.2f GHz	NormalPulseView		%.2f ГГц
 Defaults	PrefsWindow		За замовчуванням
-%ld MHz	NormalPulseView		%ld MHz
+%ld MHz	NormalPulseView		%ld МГц
 Mini mode	PrefsWindow		Режим міні
 CPU progress bar	NormalPulseView		Індикатор CPU
-Fade colors	ConfigView		Кольори затихання
+Fade colors	ConfigView		Згасання кольору
 About Pulse…	PulseView		Про Pulse…
 Pulse	NormalPulseView		Pulse
-Deskbar mode	NormalPulseView		Deskbar режим
-Remove replicant	CPUButton		Видалити реплікант
-You can't disable the last active CPU.	PulseView		Неможливо усунути останній активний процесор.
+Deskbar mode	NormalPulseView		Режим Deskbar
+Remove replicant	CPUButton		Вилучити реплікант
+You can't disable the last active CPU.	PulseView		Неможливо відключити останній активний процесор.
 Width of icon:	ConfigView		Ширина значка:
-Deskbar mode	MiniPulseView		Deskbar режим
+Deskbar mode	MiniPulseView		Режим Deskbar
 OK	PulseView		ОК
-%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nАвтори David Ramsey і Arve Hjønnevåg\nПереробка Daniel Switkin\n
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n
 OK	PrefsWindow		ОК
 Pulse	PulseApp		Pulse
-Removing from Deskbar failed.\n%s	DeskbarPulseView		Видалення з Deskbar призупинене.\n%s
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Збій вилучення з Deskbar.\n%s
 OK	PulseApp		ОК
 About Pulse…	CPUButton		Про Pulse…
-Deskbar mode	PrefsWindow		Deskbar режим
+Deskbar mode	PrefsWindow		Режим Deskbar
 Mini mode	DeskbarPulseView		Режим міні
-You can't disable the last active CPU.	CPUButton		Неможливо усунути останній активний процесор.
+You can't disable the last active CPU.	CPUButton		Неможливо відключити останній активний процесор.
 OK	CPUButton		ОК
 Deskbar	CPUButton		Deskbar
 Settings…	PulseView		Налаштування…
-Deskbar menu	CPUButton		Меню Deskbar'a
+Deskbar menu	CPUButton		Меню Deskbar
 Mini mode	NormalPulseView		Режим міні
 Quit	MiniPulseView		Вийти
 Info	PulseView		Інфо
@@ -42,7 +42,7 @@ OK	DeskbarPulseView		ОК
 Info	PulseApp		Інфо
 Pulse	System name		Pulse
 Active color	ConfigView		Колір активності
-Installing in Deskbar failed\n%s	PulseApp		Встановлення у Deskbar призупинене\n%s
-Idle color	ConfigView		Колір вільного
-Normal mode	PrefsWindow		Норм. режим
+Installing in Deskbar failed\n%s	PulseApp		Збій встановлення у Deskbar\n%s
+Idle color	ConfigView		Колір простою
+Normal mode	PrefsWindow		Звичайний режим
 Pulse settings	PulseWindow		Налаштування Pulse

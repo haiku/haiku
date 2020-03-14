@@ -2,19 +2,19 @@
 no	Screen		ні
 bits/pixel	Screen		бітів/піксель
 15 bits/pixel, 32768 colors	Screen		15 біт/піксель, 32768 кольорів
-Rows:	Screen		Стрічки:
-%.1f Hz	Screen		%.1f Hz
+Rows:	Screen		Рядки:
+%.1f Hz	Screen		%.1f Гц
 The screen mode could not be set:\n\t%s\n	Screen		Режим екрану не може бути встановлений:\n\t%s\n
 Keep	Screen		Зберегти
 /other…	Screen		/інше…
-Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Горизонтальна частота:\t%lu - %lu kHz\nВертикальна частота:\t%lu - %lu Hz\n\nМаксимально пікселів:\t%g MHz
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Горизонтальна частота:\t%lu - %lu кГц\nВертикальна частота:\t%lu - %lu Гц\n\nМаксимально пікселів:\t%g МГц
 Refresh rate:	Screen		Частота оновлення:
 Video format:	Screen		Відео формат:
 Undo	Screen		Відмінити
-OK	Screen		Гаразд
-Current workspace	Screen		Поточний робочий простір
+OK	Screen		ОК
+Current workspace	Screen		Поточна робоча область
 vertically	Screen		вертикально
-All workspaces	Screen		Всі робочі простори
+All workspaces	Screen		Всі робочі області
 Use laptop panel:	Screen		Використовувати панель ноутбука:
 Could not write VESA mode settings file:\n\t	Screen		Не вдалося записати файл налаштувань режиму VESA :\n\t
 Display info	Screen		Інфо про дісплей
@@ -32,8 +32,8 @@ always	Screen		завжди
 Confirm changes	Screen		Підтвердити зміни
 Warning	Screen		Увага
 24 bits/pixel, 16 Million colors	Screen		24біти/піксель, 16 міліонів кольорів
-Hz	Screen		Hz
-Workspaces	Screen		Робочі простори
+Hz	Screen		Гц
+Workspaces	Screen		Робочі області
 Brightness:	Screen		Яскравість:
 32 bits/pixel, 16 Million colors	Screen		32біти/піксель, 16 мільйонів кольорів
 Done	Screen		Готово
@@ -43,13 +43,13 @@ Refresh rate	Screen		Частота оновлення
 if needed	Screen		якщо потрібно
 Combine displays:	Screen		Обє'днати дисплеї:
 Unknown mode	Screen		Невідомий режим
-About	Screen		Про
+About	Screen		Про це
 Columns:	Screen		Стовбці:
-Resolution:	Screen		Роздільча здатність:
-Apply	Screen		Прийняти
+Resolution:	Screen		Роздільна здатність:
+Apply	Screen		Застосувати
 horizontally	Screen		горизонтально
 disable	Screen		вимкнути
-Set background…	Screen		Встановити тло…
+Set background…	Screen		Встановити фон…
 Type or use the left and right arrow keys.	Screen		Введіть або використовуйте стрілочки вправо вліво.
 Screen	System name		Екран
 Do you wish to keep these settings?	Screen		Ви бажаєте зберегти ці налаштування?

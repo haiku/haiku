@@ -26,7 +26,7 @@ Create…	MainWindow		Oluştur…
 Write changes	MainWindow		Değişiklikleri yaz
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		%s bölümünün ilkçalıştırması başarısız oldu (Diske hiçbir şey yazılmadı).
 Validation of the given creation parameters failed.	MainWindow		Verilen oluşturma parametrelerinin doğrulaması başarısız oldu.
-Eject	MainWindow		Çıkart
+Eject	MainWindow		Çıkar
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Değişiklikleri diske şimdi yazmak istediğinizden emin misiniz?\n\n%s diski üzerindeki tüm veri geri alınamayacak bir biçimde kaybolacak!
 Surface test (not implemented)	MainWindow		Yüzey sınaması (işlevsel değil)
 Read only	PartitionList		Saltokunur

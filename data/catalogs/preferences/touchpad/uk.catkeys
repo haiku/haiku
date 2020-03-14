@@ -3,13 +3,13 @@ Scrolling	TouchpadPrefView		Прокрутка
 Tapping	TouchpadPrefView		Торкання
 Touchpad	System name		Тачпад
 Cancel	TouchpadPrefView		Скасувати
-OK	TouchpadPrefView		Гаразд
+OK	TouchpadPrefView		ОК
 Horizontal scrolling	TouchpadPrefView		Горизонтальна прокрутка
 Slow	TouchpadPrefView		Повільно
 Two finger scrolling	TouchpadPrefView		Прокрутка двома пальцями
 No touchpad found, the settings will have no effect.	TouchpadPrefView		Налаштування не діятимуть, бо відсутній тачпад.
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Нова область прокручування дуже велика і може завадити роботі мишею. Ви дійсно хочете змінити її?
-Defaults	TouchpadPrefView		Типово
+Defaults	TouchpadPrefView		За замовчуванням
 High	TouchpadPrefView		Висока
 Off	TouchpadPrefView		Низька
 Fast	TouchpadPrefView		Швидко

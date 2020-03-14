@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	3172116229
+1	dutch; flemish	x-vnd.Haiku-libtracker	4062002078
 Created	ContainerWindow		Gemaakt
 Open and make preferred	OpenWithWindow		Openen en bevoorkeuren
 Kind	ContainerWindow		Soort
@@ -391,7 +391,6 @@ Rename	FSUtils	button label	Naam wijzigen
 Clean up all	ContainerWindow		Alles opruimen
 Add current folder	FilePanelPriv		Voeg huidige map toe
 Description:	InfoWindow		Beschrijving:
-The Tracker must be running to see set the default printer.	PoseView		Tracker moet actief zijn om de standaardprinter te kunnen laten zien/instellen.
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Bent u zeker dat u het/de geselecteerde item(s) wilt verwijderen? Deze actie kan niet ongedaan gemaakt worden.
 Mount	DeskWindow		Betrekken
 ends with	FindPanel		eindigt met

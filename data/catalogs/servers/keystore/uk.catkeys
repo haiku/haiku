@@ -4,14 +4,14 @@ This application doesn't yet have the required privileges.	AppAccessRequestWindo
 Keyring:	KeyRequestWindow		Набір ключів:
 requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		запросити доступ до набору ключів:\n%keyringName%\n\n
 Application keyring access	AppAccessRequestWindow		Доступ до набору ключів програми
-Disallow	AppAccessRequestWindow		Скасувати дозвіл
+Disallow	AppAccessRequestWindow		Заборона
 Allow once	AppAccessRequestWindow		Дозволити одноразово
 Unlock keyring	KeyRequestWindow		Рззблокувати набір ключів
-An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		Програма бажає отримати доступ до набору ключів, але він заблокований гаслом. Введіть гасло для розблокування.\nРозблокування набору ключів триватиме до вимкнення системи або до моменту нового заблокування.\nПри відміні діалогу набір ключів залишиться заблокованим.
-Password:	KeyRequestWindow		Гасло:
+An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		Програма бажає отримати доступ до набору ключів, але він заблокований паролем. Введіть пароль для розблокування.\nРозблокування набору ключів триватиме до вимкнення системи або до моменту нового заблокування.\nЯкщо скасувати діалог, набір ключів залишиться заблокованим.
+Password:	KeyRequestWindow		Пароль:
 Cancel	KeyRequestWindow		Скасувати
 This application has been updated since it was last granted access.	AppAccessRequestWindow		Ця програма оновлялася після останнього надання доступу.
 Allow always	AppAccessRequestWindow		Дозволяти завжди
 Unlock	KeyRequestWindow		Розблокувати
 The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		Програма:\n%signature% (%path%)\n\n
-This application hasn't been granted access before.	AppAccessRequestWindow		Цій програмі раніше не був наданий доступ.
+This application hasn't been granted access before.	AppAccessRequestWindow		Раніше цій програмі доступ не надавався.

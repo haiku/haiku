@@ -2,38 +2,38 @@
 Expand	ExpanderMenu		Розпакувати
 Expanding '%s'…	ExpanderWindow		Розпаковка '%s'…
 Close window when done expanding	ExpanderPreferences		Закрити вікно після розпаковки
-Set destination…	ExpanderMenu		Встановити ціль…
+Set destination…	ExpanderMenu		Куди розпакувати…
 Use:	ExpanderPreferences		Використати:
 File expanded	ExpanderWindow		Розпаковка файлу
-The destination is read only.	ExpanderWindow		Ціль тільки для читання.
+The destination is read only.	ExpanderWindow		Папка призначення тільки для читання.
 Expander: Open	ExpanderWindow		Expander: Відкрити
  is not supported	ExpanderWindow		 не підтримується
 Expander settings	ExpanderPreferences		Налаштування Expander
 Select current	DirectoryFilePanel		Вибрати поточний
-Source	ExpanderWindow		Джерело
+Source	ExpanderWindow		Що розпакувати
 Error when expanding archive	ExpanderWindow		Помилка при розпаковці архіва
 Hide contents	ExpanderWindow		Сховати вміст
-Cancel	ExpanderWindow		Відмінити
+Cancel	ExpanderWindow		Скасувати
 Automatically expand files	ExpanderPreferences		Автоматично розпакувати файли
 Continue	ExpanderWindow		Продовжити
 Destination folder	ExpanderPreferences		Папка призначення
 Other	ExpanderPreferences		Інше
-Cancel	ExpanderPreferences		Відмінити
+Cancel	ExpanderPreferences		Скасувати
 Expansion	ExpanderPreferences		Розширення
 Select	DirectoryFilePanel		Вибрати
-The folder was either moved, renamed or not supported.	ExpanderWindow		Тека була переміщена, перейменована або не підтримується.
+The folder was either moved, renamed or not supported.	ExpanderWindow		Папка була переміщена, перейменована або не підтримується.
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Папка призначення не існує. Створити її?
-Same directory as source (archive) file	ExpanderPreferences		Та ж папка що і джерела (архіву)
+Same directory as source (archive) file	ExpanderPreferences		Каталог, де знаходиться архівний файл
 Settings	ExpanderMenu		Налаштування
 Settings…	ExpanderMenu		Налаштування…
-Expander: Choose destination	DirectoryFilePanel		Expander: Виберіть ціль
+Expander: Choose destination	DirectoryFilePanel		Expander: Виберіть папку призначення
 Select	ExpanderPreferences		Вибрати
 Show contents	ExpanderWindow		Показати вміст
 Automatically show contents listing	ExpanderPreferences		Автоматично показувати список вмісту
 OK	ExpanderPreferences		ОК
-Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Ви впевнені що бажаєте зупинити розпаковку архіву? Видобуті елементи можуть бути неповними.
-Leave destination folder path empty	ExpanderPreferences		Зберегти шлях теки призначення пустим
-Failed to create the destination folder.	ExpanderWindow		Не вдалося створити теку призначення.
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Ви впевнені що бажаєте зупинити розпаковку архіву? Деякі розпаковані елементи можуть бути неповними.
+Leave destination folder path empty	ExpanderPreferences		Зберегти шлях папки призначення пустим
+Failed to create the destination folder.	ExpanderWindow		Не вдалося створити папку призначення.
 Select '%s'…	DirectoryFilePanel		Вибрати '%s'…
 Create	ExpanderWindow		Створити
 The file doesn't exist	ExpanderWindow		Файл відсутній
@@ -42,10 +42,10 @@ File	ExpanderMenu		Файл
 Expander	System name		Expander
 Expand	ExpanderWindow		Розпакувати
 Close	ExpanderMenu		Закрити
-The destination is not a folder.	ExpanderWindow		Ціль не є текою.
-Open destination folder after extraction	ExpanderPreferences		Відкрити теку призначення після розпаковки
+The destination is not a folder.	ExpanderWindow		Папка призначення не є папкою.
+Open destination folder after extraction	ExpanderPreferences		Відкрити папку призначення після розпаковки
 Creating listing for '%s'…	ExpanderWindow		Створення списку для '%s'…
-Set source…	ExpanderMenu		Встановити джерело…
+Set source…	ExpanderMenu		Що розпакувати…
 Show contents	ExpanderMenu		Показати вміст
 Stop	ExpanderWindow		Зупинити
-Destination	ExpanderWindow		Тека призначення
+Destination	ExpanderWindow		Куди розпакувати

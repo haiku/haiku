@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	2296758469
+1	slovak	x-vnd.Haiku-libtracker	3186644318
 Created	ContainerWindow		Vytvorené
 Open and make preferred	OpenWithWindow		Otvoriť a nastaviť ako preferovanú
 Kind	ContainerWindow		Druh
@@ -391,7 +391,6 @@ Rename	FSUtils	button label	Premenovať
 Clean up all	ContainerWindow		Vyčistiť všetko
 Add current folder	FilePanelPriv		Pridať aktuálny priečinok
 Description:	InfoWindow		Popis:
-The Tracker must be running to see set the default printer.	PoseView		Tracker musí bežať, aby bolo možné nastaviť predvolenú tlačiareň.
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Ste si istí, že chcete zmazať vybrané položky? Túto operáciu nemožno vrátiť.
 Mount	DeskWindow		Pripojiť
 ends with	FindPanel		končí

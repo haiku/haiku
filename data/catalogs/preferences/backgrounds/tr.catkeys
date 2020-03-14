@@ -1,14 +1,14 @@
 1	turkish	x-vnd.Haiku-Backgrounds	681978856
-Backgrounds	System name		Arkaplan
+Backgrounds	System name		Arka planlar
 X:	Main View		X:
-Setting the background image failed:	Main View		Arkaplan görselini ayarlama başarısız oldu:
+Setting the background image failed:	Main View		Arka plan görselini ayarlama başarısız oldu:
 Resolution: 	Image Filepanel		Çözünürlük: 
 pick one	Main View		birini seçin
 Default	Main View		Öntanımlı
 Center	Main View		Merkez
 Folder: %path	Main View		Klasör: %path
 Manual	Main View		El ile
-Set background image error	Main View		Arkaplan görseli ayarlama hatası
+Set background image error	Main View		Arka plan görseli ayarlama hatası
 Default folder	Main View		Öntanımlı klasör
 Revert	Main View		Eski haline döndür
 None	Main View		Yok

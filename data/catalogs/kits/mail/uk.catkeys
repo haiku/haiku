@@ -1,11 +1,11 @@
 1	ukrainian	x-vnd.Haiku-libmail	3450478295
 Partially download messages larger than	ProtocolConfigView		Частково завантажувати повідомлення більші ніж
 Password:	ProtocolConfigView		Пароль:
-Remove mail from server when deleted	ProtocolConfigView		Видалити пошту з сервера при видаленні
+Remove mail from server when deleted	ProtocolConfigView		Вилучити пошту з сервера при видаленні
 Mail server:	ProtocolConfigView		Поштовий сервер:
 Select…	MailKit		Вибрати…
 Connection type:	ProtocolConfigView		Тип підключення:
-KB	ProtocolConfigView	kilo byte	KB
+KB	ProtocolConfigView	kilo byte	KБ
 Leave mail on server	ProtocolConfigView		Зберігати пошту на сервері
 Username:	ProtocolConfigView		Користувач:
 Login type:	ProtocolConfigView		Тип авторизації:

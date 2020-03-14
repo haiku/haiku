@@ -6,13 +6,13 @@ Connecting to POP3 server…	pop3		Під'єднання до POP3 сервер�
 : The server does not support APOP.	pop3		: Сервер не підтримує APOP.
 Error while authenticating user %user	pop3		Помилка при авторизації користувача %user
 Destination:	ConfigView		Призначення:
-. The server said:\n	pop3		. Відповідь сервера:\n
+. The server said:\n	pop3		. Сервер відповідає:\n
 Plain text	ConfigView		Звичайний текст
 Getting mailbox size…	pop3		Отримання розміру скриньки…
 Error while connecting to server %serv	pop3		Помилка при під'єднанні до сервера %serv
 Getting UniqueIDs…	pop3		Отримання унікального ID…
-Sending password…	pop3		Відправка гасла…
+Sending password…	pop3		Відправка пароля…
 No encryption	ConfigView		Без шифрування
 SSL	ConfigView		SSL
 : No reply.\n	pop3		: Без відповіді.\n
-Sending APOP authentication…	pop3		Відправка визначника APOP…
+Sending APOP authentication…	pop3		Відправка APOP аутентифікації…

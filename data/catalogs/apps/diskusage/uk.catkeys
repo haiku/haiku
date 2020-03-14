@@ -4,14 +4,14 @@ Scanning %refName%	Scanner		Сканування %refName%
 %d files	Status View	For UI layouting only, use the longest plural form for your language	%d файлів
 Size	Info Window		Розмір
 Rescan	Pie View		Пересканувати
-Kind	Info Window		Тип
+Kind	Info Window		Різновид
 file unavailable	Pie View		файл недоступний
 no supporting apps	Pie View		відсутні підтримувані програми
 Path	Info Window		Шлях
 Scan	Status View		Сканувати
 Rescan	Status View		Пересканувати
 file unavailable	Status View		файл недоступний
-Get info	Pie View		Інформація
+Get info	Pie View		Отримати інфо
 DiskUsage	System name		Використання диску
 Created	Info Window		Створено
 Modified	Info Window		Змінено

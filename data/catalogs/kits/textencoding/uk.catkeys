@@ -1,29 +1,29 @@
 1	ukrainian	x-vnd.Haiku-libtextencoding	1525027211
-ISO Greek	textencodings		ISO Грецьке
-ISO South European	textencodings		ISO Південноєвропейське
-Chinese Big5	textencodings		Китайське Big5
+ISO Greek	textencodings		ISO Грецька
+ISO South European	textencodings		ISO Південноєвропейська
+Chinese Big5	textencodings		Китайська Big5
 ISO Hebrew	textencodings		ISO Іврит
-ISO Arabic	textencodings		ISO Арабське
-ISO Latin 9	textencodings		ISO Латинське 9
-Japanese Shift JIS	textencodings		Японське Shift JIS
+ISO Arabic	textencodings		ISO Арабська
+ISO Latin 9	textencodings		ISO Латинська 9
+Japanese Shift JIS	textencodings		Японська Shift JIS
 DOS Cyrillic	textencodings		Кирилиця DOS
-Windows Central European (CP 1250)	textencodings		Центрально-європейське Windows (CP 1250)
+Windows Central European (CP 1250)	textencodings		Центрально-європейська Windows (CP 1250)
 Windows Cyrillic (CP 1251)	textencodings		Кирилиця Windows (СР 1251)
-Japanese EUC	textencodings		Японське EUC
+Japanese EUC	textencodings		Японська EUC
 Unicode	textencodings		Юнікод
-Chinese GB18030	textencodings		Китайське GB18030
-ISO North European	textencodings		ISO Північноєвропейське
-ISO Celtic	textencodings		ISO Кельтське
+Chinese GB18030	textencodings		Китайська GB18030
+ISO North European	textencodings		ISO Північноєвропейська
+ISO Celtic	textencodings		ISO Кельтська
 Unicode (UCS-2)	textencodings		Юнікод (UCS-2)
-Windows Latin-1 (CP 1252)	textencodings		Латинське-1 Windows (CP 1252)
-Macintosh Roman	textencodings		Румунське Macintosh
-ISO Turkish	textencodings		ISO Турецьке
-Japanese JIS	textencodings		Японське JIS
+Windows Latin-1 (CP 1252)	textencodings		Латинська-1 Windows (CP 1252)
+Macintosh Roman	textencodings		Румунська Macintosh
+ISO Turkish	textencodings		ISO Турецька
+Japanese JIS	textencodings		Японська JIS
 KOI8-R Cyrillic	textencodings		Кирилиця KOI8-R
-ISO Baltic	textencodings		ISO Балтійське
-ISO Nordic	textencodings		ISO Скандинавське
-EUC Korean	textencodings		EUC Корейське
-ISO West European	textencodings		ISO Західноєвропейське
-ISO East European	textencodings		ISO Східноєвропейське
-DOS Latin-US	textencodings		DOS Латинське-US
+ISO Baltic	textencodings		ISO Балтійська
+ISO Nordic	textencodings		ISO Скандинавська
+EUC Korean	textencodings		EUC Корейська
+ISO West European	textencodings		ISO Західноєвропейська
+ISO East European	textencodings		ISO Східноєвропейська
+DOS Latin-US	textencodings		DOS Латинська-US
 ISO Cyrillic	textencodings		ISO Кирилиця

@@ -1,47 +1,47 @@
 1	ukrainian	x-vnd.Haiku-Shortcuts	3834857117
-*MouseUp	ShortcutsWindow		*Мишку вгору
+*MouseUp	ShortcutsWindow		*MouseUp
 Application	ShortcutsWindow		Програма
-Option	ShortcutsSpec	Name for modifier on keyboard	Параметр
+Option	ShortcutsSpec	Name for modifier on keyboard	Option
 Save changes before closing?	ShortcutsWindow		Зберегти зміни перед закриттям?
-Revert to saved	ShortcutsWindow		Повернутися до збереження
+Revert to saved	ShortcutsWindow		Повернутися до збереженого
 Don't save	ShortcutsWindow		Не зберігати
-*MouseDown	ShortcutsWindow		*Мишку вниз
-*Beep	ShortcutsWindow		*Сигнал
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Гарячим клавішам не вдалося зберегти ваші установки.
+*MouseDown	ShortcutsWindow		*MouseDown
+*Beep	ShortcutsWindow		*Beep
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Не вдалося зберегти список клавіатурних скорочень.
 Save	ShortcutsWindow		Зберегти
 Either	ShortcutsSpec		Будь-який
 Oh no	ShortcutsWindow		О ні
 Key	ShortcutsWindow		Клавіша
-*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*Відправити повідомлення додатку/x-vnd.Be-TRAK 'Tfnd'
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
 Select	ShortcutsWindow		Вибрати
-Shortcuts	System name		Гарячі клавіші
+Shortcuts	System name		Клавіатурні скорочення
 Quit	ShortcutsWindow		Вийти
 (Choose application with file requester)	ShortcutsWindow		(Виберіть програму з запитом файла)
 Cancel	ShortcutsWindow		Скасувати
-*MoveMouse +20 +0	ShortcutsWindow		*Переміщення мишки +20 +0
-Control	ShortcutsSpec	Name for modifier on keyboard	Керування
+*MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
+Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Left	ShortcutsSpec		Лівий
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Гарячим клавішам не вдалось розібратись у вашому файлі списку!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Гарячим клавішам не вдалось зберегти файл вашого списку!
-*InsertString \"Your Text Here\"	ShortcutsWindow		*Вставити рядок \"Ваш текст тут\"
-Remove selected shortcut	ShortcutsWindow		Видалити вибрану гарячу клавішу
-Error, NULL state description?	ShortcutsSpec		Помилка, опис нульового стану?
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Не вдалося розібрати Ваш файл зі списком клавіатурних скорочень!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Не вдалося зберегти Ваш файл зі списком клавіатурних скорочень!
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Ваш текст тут\"
+Remove selected shortcut	ShortcutsWindow		Вилучити вибране скорочення
+Error, NULL state description?	ShortcutsSpec		Помилка, опис стану NULL?
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Гарячим клавішам не вдалося відкрити список!
-Save & apply	ShortcutsWindow		Зберегти і використати
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Не вдалося відкрити список клавіатурних скорочень!
+Save & apply	ShortcutsWindow		Зберегти & Використати
 Open	ShortcutsWindow		Відкрити
 Append	ShortcutsWindow		Приєднати
 Both	ShortcutsSpec		Обидва
-Save KeySet as…	ShortcutsWindow		Зберегти список як…
-Append KeySet…	ShortcutsWindow		Додати список …
-*MouseButton 1	ShortcutsWindow		*Кнопка мишки 1
-*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Багато \"*Перемістити мишку до 100% 0\" \"*Кнопка мишки1\"
+Save KeySet as…	ShortcutsWindow		Зберегти список KeySet як…
+Append KeySet…	ShortcutsWindow		Додати список KeySet…
+*MouseButton 1	ShortcutsWindow		*MouseButton 1
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
 Right	ShortcutsSpec		Правий
-OK	ShortcutsWindow		Гаразд
-Add new shortcut	ShortcutsWindow		Додати нову гарячу клавішу
-(None)	ShortcutsSpec		(Не використовувати)
+OK	ShortcutsWindow		ОК
+Add new shortcut	ShortcutsWindow		Додати нове скорочення
+(None)	ShortcutsSpec		(Пусто)
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
-Open KeySet…	ShortcutsWindow		Відкрити список…
+Open KeySet…	ShortcutsWindow		Відкрити список KeySet…
 File	ShortcutsWindow		Файл
-*LaunchHandler text/html	ShortcutsWindow		*Запустити обробник текст/html
-*MoveMouseTo 50% 50%	ShortcutsWindow		*Переміщення мишки в 50% 50%
+*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
+*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%

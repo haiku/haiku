@@ -2,10 +2,10 @@
 Undefined	ConfigWindow		Невизначений
 Return the number of available transports	PrintServerApp Scripting		Повернути число доступних транспортів
 Return the number of available printers	PrintServerApp Scripting		Повернути число доступних принтерів
-Get currently available ports/devices	Transport Scripting		Надати доступні порти/пристрої
-Retrieve or select the active printer	PrintServerApp Scripting		Відновити або вибрати активний принтер
+Get currently available ports/devices	Transport Scripting		Отримати доступні порти/пристрої
+Retrieve or select the active printer	PrintServerApp Scripting		Отримати або вибрати активний принтер
 Cancel	PrintServerApp		Скасувати
-Retrieve a specific printer	PrintServerApp Scripting		Відновити визначений принтер
+Retrieve a specific printer	PrintServerApp Scripting		Отримати визначений принтер
 Page %1 to %2	ConfigWindow		Стор. %1 до %2
 Get name of the printer add-on used for this printer	Printer Scripting		Отримати і'мя додатка, що працює з цим принтером.
 B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
@@ -13,7 +13,7 @@ OK	ConfigWindow		ОК
 Cancel	ConfigWindow		Скасувати
 Printer server	ConfigWindow		Принт-сервер
 Page %1 to %2, %3 copies	ConfigWindow		Стор. %1 до %2, %3 копій
-A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Принтер з цим іменем існує, але драйвер для нього не знайдено! Замінити?
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Принтер з таким ім'ям уже існує, але його драйвер не вдалося знайти! Замінити?
 Yes	PrintServerApp		Так
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	ANSI B (ledger)
 Would you like to set one up now?	PrintServerApp		Бажаєте налаштувати його зараз?
@@ -31,7 +31,7 @@ Select a printer	ConfigWindow		Вибрати принтер
 Show configuration window	PrintServerApp Scripting		Показати вікно конфігурації
 A4	ConfigWindow	ISO 216 paper size	A4
 Get comments about this printer	Printer Scripting		Отримати опис цього принтера
-A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Принтер з цим іменем існує, але його неможливо повністю використати! Замінити?
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Принтер з таким ім'ям уже існує, але його взагалі неможливо використати! Замінити?
 No	PrintServerApp		Ні
 Get the transport configuration for this printer	Printer Scripting		Отримати конфігурацію транспорту цього принтера
 Landscape	ConfigWindow		Альбом
@@ -49,7 +49,7 @@ Get name of printer	Printer Scripting		Отримати назву принте�
 A3	ConfigWindow	ISO 216 paper size	A3
 Get name of transport	Transport Scripting		Отримати ім'я транспорту
 A5	ConfigWindow	ISO 216 paper size	A5
-Would you like to make @ the default printer?	PrintServerApp		Бажаєте зробити @ типовим принтером?
+Would you like to make @ the default printer?	PrintServerApp		Бажаєте зробити @ принтером за замовчуванням?
 Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	ANSI B (tabloid)
 Page setup	ConfigWindow		Налаштування друку
 Paper setup:	ConfigWindow		Налаштування паперу:

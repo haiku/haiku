@@ -17,10 +17,10 @@ New packages to be installed	SoftwareUpdaterWindow	List super item label	Yüklen
 Packages to be updated	SoftwareUpdaterWindow	List super item label	Güncellenecek paketler
 to	SoftwareUpdaterWindow	List item text	 →
 Attempting to cancel the updates…	SoftwareUpdaterWindow		Güncellemeler iptal edilmeye çalışılıyor…
-Contacting software repositories to check for package updates.	CheckManager		Paket güncellemeleri için yazılım depoları ile iletişim kuruluyor.
+Contacting software repositories to check for package updates.	CheckManager		Paket güncellemeleri için yazılım depoları ile iletişim kuruluyor…
 Available updates found	CheckManager		Yeni güncellemeler bulundu
 from repository	SoftwareUpdaterWindow	List item text	şu depodan:
-Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Paket güncellemeleri için yazılım depoları ile iletişim kuruluyor.
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Paket güncellemeleri için yazılım depoları ile iletişim kuruluyor…
 Cancelling updates	SoftwareUpdaterWindow		Güncellemeler iptal ediliyor
 Cancel	SoftwareUpdaterWindow	Alert button label	İptal
 There were no updates found.	UpdateAction		Güncelleme bulunamadı.

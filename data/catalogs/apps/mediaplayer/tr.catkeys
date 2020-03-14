@@ -1,7 +1,7 @@
 1	turkish	x-vnd.Haiku-MediaPlayer	1313616492
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Girdiyi Çöp'e taşı
 Close	MediaPlayer-PlaylistWindow		Kapat
-Volume of background clips	MediaPlayer-SettingsWindow		Arkaplan kliplerinin ses düzeyi
+Volume of background clips	MediaPlayer-SettingsWindow		Arka plan kliplerinin ses düzeyi
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Olanaklıysa video donanım bindirmelerini kullan
 Audio	MediaPlayer-InfoWin		Ses
 Subtitle placement:	MediaPlayer-SettingsWindow		Altyazı konumu:

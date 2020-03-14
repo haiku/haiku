@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	838081337
+1	romanian	x-vnd.Haiku-libtracker	1727967186
 Created	ContainerWindow		Creat
 Open and make preferred	OpenWithWindow		Deschide sau fixează ca preferat
 Kind	ContainerWindow		Fel
@@ -393,7 +393,6 @@ Rename	FSUtils	button label	Redenumește
 Clean up all	ContainerWindow		Curăță tot
 Add current folder	FilePanelPriv		Adaugă dosar curent
 Description:	InfoWindow		Descriere:
-The Tracker must be running to see set the default printer.	PoseView		Trackerul trebuie să ruleze pentru a vedea configurarea imprimantei implicite.
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Sigur doriți să ștergeți elementul(ele) selectat(e)? Această operație nu poate fi inversată.
 Mount	DeskWindow		Montează
 ends with	FindPanel		se termină cu

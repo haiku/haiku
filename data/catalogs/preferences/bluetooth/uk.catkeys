@@ -7,49 +7,49 @@ Manufacturer: 	Device View		Виробник:
 Desktop	Settings view		Робочий стіл
 Server	Window		Сервер
 Identify host as:	Settings view		Визначити хост як:
-Refresh…	Remote devices		Обновити…
+Refresh…	Remote devices		Оновити…
 Local devices found on system:	Settings view		Локальні пристрої знайдені в системі:
 Service classes: 	Device View		Класи сервісу: 
 Remote devices	Window		Віддалені пристрої
 Settings	Window		Налаштування
-Stop bluetooth services…	Window		Зупинити служби Блютуз…
+Stop bluetooth services…	Window		Зупинити служби bluetooth…
 61 secs	Settings view		61 сек
 Add…	Remote devices		Додати…
 As blocked	Remote devices		Як заблокований
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		В системі не зареєстровано жодного пристрою Блютуз.
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		В системі не зареєстровано жодного пристрою bluetooth.
 Policy…	Settings view		Політики…
-Revert	Window		Повернути
-Refresh local devices…	Window		Обновлення локальних пристроїв…
+Revert	Window		Без змін
+Refresh local devices…	Window		Оновлення локальних пристроїв…
 Disconnect	Remote devices		Роз’єднати
 Identify us as…	Settings view		Ідентифікувати як…
 From all devices	Settings view		Для всіх пристроїв
 Defaults	Window		За замовчуванням
-Start bluetooth services…	Window		Запуск служб Блютуз…
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Переконайтесь, що функція Блютуз віддаленого пристрою активована. Натисніть 'Запит' для початку сканування. Час для отримання імен не повинен перевищувати 3 секунди. Після цього ви зможете додати їх до головного списку, де потім з’єднуватися з ними.
+Start bluetooth services…	Window		Запуск служб bluetooth…
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Переконайтесь, що функція bluetooth віддаленого пристрою активована. Натисніть 'Запит' для початку сканування. Час для отримання імен не повинен перевищувати 3 секунди. Після цього ви зможете додати їх до списку, а потім з’єднуватися з ними.
 Scanning progress	Inquiry panel		Хід сканування
-Bluetooth	System name		Блютуз
+Bluetooth	System name		Bluetooth
 Launch now	main		Запустити
-Remove	Remote devices		Видалити
+Remove	Remote devices		Вилучити
 Pick device…	Settings view		Оберіть пристрій…
 Always ask	Settings view		Завжди питати
 With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		За підтримки:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nПодяка людям, які допомогали…\n\nНадавали/дарували обладнання:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nФінансували:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nЗ патчами:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nТестували:\n - Petter H. Juliussen\nХто всьому мене навчив:\n - the yellowTAB team
-Help	Window		Допомога
+Help	Window		Справка
 Pair…	Remote devices		Пара…
-Retrieving name of %1	Inquiry panel		Відновлення імені %1
+Retrieving name of %1	Inquiry panel		Отримання імені %1
 Inquiry	Inquiry panel		Запит
 Incoming connections policy:	Settings view		Політики вхідних з'єднань:
 Retrieving names…	Inquiry panel		Отримую імена…
 Show name	Extended local device view		Показати Ім'я
 Add device to list	Inquiry panel		Додати пристрій до списку
 Remaining %1 seconds	Inquiry panel		Залишилось %1 секунд
-The Bluetooth services are not currently running on this system.	main		Служби Блютуз все ще не запущені у системі.
+The Bluetooth services are not currently running on this system.	main		Служби Bluetooth все ще не запущені у системі.
 Discoverable	Extended local device view		Видимий
 Authenticate	Extended local device view		Автентифікувати
 Smart phone	Settings view		Смартфон
 Scanning completed.	Inquiry panel		Сканування завершене.
-Default inquiry time:	Settings view		Час запиту типовий:
+Default inquiry time:	Settings view		Час запиту за замовчуванням:
 Server	Settings view		Сервер
 Handheld	Settings view		Переносний
  packets: 	Device View		 пакетів: 
-About Bluetooth…	Window		Про Блютуз…
+About Bluetooth…	Window		Про Bluetooth…
 Starting scan…	Inquiry panel		Сканую…

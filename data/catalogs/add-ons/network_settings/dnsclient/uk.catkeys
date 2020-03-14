@@ -1,6 +1,6 @@
 1	ukrainian	x-vnd.Haiku-DNSClientService	2825577357
 DNS settings	DNSClientServiceAddOn		Параметри DNS
-Move down	DNSSettingsView		Пересунути вниз
+Move down	DNSSettingsView		Вниз
 DNS settings	DNSSettingsView		Параметри DNS
 Remove	DNSSettingsView		Вилучити
 Domain:	DNSSettingsView		Домен:

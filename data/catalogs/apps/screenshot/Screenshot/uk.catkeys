@@ -3,29 +3,29 @@ Include window border	ScreenshotWindow		Включаючи рамку вікна
 Overwrite	ScreenshotWindow		Переписати
 Save in:	ScreenshotWindow		Зберегти в:
 Error saving \"%s\":\n\t%s	ScreenshotWindow		Помилка збереження \"%s\":\n\t%s
-This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Цей файл вже існує.\nВи впевнені, що бажаєте перезаписати його?
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Цей файл вже існує.\n Ви впевнені, що бажаєте перезаписати його?
 OK	ScreenshotWindow		ОК
-The destination path exists but is not a folder.	ScreenshotWindow		Шлях по замовчуванню присутній але це не папка.
+The destination path exists but is not a folder.	ScreenshotWindow		Шлях до місця призначення існує, але не є папкою.
 Select	ScreenshotWindow		Вибрати
 Save as:	ScreenshotWindow		Зберегти як:
 seconds	ScreenshotWindow		секунд
 New screenshot	ScreenshotWindow		Новий знімок екрана
-Screenshot	System name		Знімок екрану
+Screenshot	System name		Screenshot
 Desktop	ScreenshotWindow		Робочий стіл
-Artwork folder	ScreenshotWindow		Тека Artwork
+Artwork folder	ScreenshotWindow		Папка Artwork
 Translator Settings	ScreenshotWindow		Налаштування транслятора
 Include mouse pointer	ScreenshotWindow		Включаючи курсор
 overwrite	ScreenshotWindow		переписати
 Settings…	ScreenshotWindow		Налаштування…
-Choose folder	ScreenshotWindow		Виберіть теку
+Choose folder	ScreenshotWindow		Виберіть папку
 Name:	ScreenshotWindow		Ім'я:
-Choose folder…	ScreenshotWindow		Виберіть теку…
+Choose folder…	ScreenshotWindow		Виберіть папку…
 Please select	ScreenshotWindow		Виберіть будь-ласка
-Failed to save screenshot	ScreenshotWindow		Збереження знімку екрана призупинене
-Cancel	ScreenshotWindow		Відмінити
+Failed to save screenshot	ScreenshotWindow		Не вдалося зберегти знімок екрана
+Cancel	ScreenshotWindow		Скасувати
 Delay:	ScreenshotWindow		Затримка:
 Copy to clipboard	ScreenshotWindow		Копіювати до буфера обміну
 screenshot	Screenshot	Base filename of screenshot files	знімок екрана
-Home folder	ScreenshotWindow		Тека Home
+Home folder	ScreenshotWindow		Папка Home
 Save	ScreenshotWindow		Зберегти
 Capture active window	ScreenshotWindow		Захопити активне вікно

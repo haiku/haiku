@@ -5,7 +5,7 @@ Threads	DataSource		Потоки
 Always on top	ActivityWindow		Завжди зверху
 Add graph	ActivityWindow		Додати графік
 Teams	DataSource		Команди
-MiB	DataSource		МіБ
+MiB	DataSource		МБ
 Network send	DataSource		Відправлено по мережі
 CPU usage (combined)	DataSource		Використання СPU (загальне)
 CPU	DataSource		CPU
@@ -13,7 +13,7 @@ Used memory	DataSource		Використана пам'ять
 Cached memory	DataSource		Кешована пам'ять
 Apps	DataSource		Програми
 Show legend	ActivityView		Показати легенду
-Text clipboard	DataSource		Буфер обміну тексту
+Text clipboard	DataSource		Текстовий буфер обміну
 Settings	ActivityWindow		Налаштування
 Receiving	DataSource		Отримання
 Settings…	ActivityWindow		Налаштування…
@@ -26,14 +26,14 @@ Update time interval:	SettingsWindow		Інтервал оновлення:
 TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		Вийти
 Block cache memory	DataSource		Блок кеш пам'яті
-Remove graph	ActivityView		Видалити графік
+Remove graph	ActivityView		Вилучити графік
 %lld sec.	SettingsWindow		%lld сек.
-%lld ms	SettingsWindow		%lld мілісек.
+%lld ms	SettingsWindow		%lld мс
 CPU usage	DataSource		Використання CPU
 Raw clipboard	DataSource		Буфер обміну
 Sems	DataSource		Sems
-%.1f MiB	DataSource		%.1f МіБ
-ActivityMonitor	System name		Монітор активності
+%.1f MiB	DataSource		%.1f МБ
+ActivityMonitor	System name		ActivityMonitor
 Running applications	DataSource		Запущені програми
 Semaphores	DataSource		Семафори
 Block cache	DataSource		Кеш блоку

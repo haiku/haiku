@@ -1,11 +1,11 @@
 1	ukrainian	x-vnd.Haiku.TV	1995288111
-No menu	MainWin		Немає меню
+No menu	MainWin		Без меню
 No border	MainWin		Без рамки
-force 704 x 576, display aspect 4:3	MainWin		примусово 704 x 576, співвідношення екрану 4:3
-Error, connecting to interface failed:\n\n	MainWin		Помилка, підключення до інтерфейсу не вдалось:\n\n
-force 544 x 576, display aspect 4:3	MainWin		примусово 544 x 576, співвідношення екрану 4:3
+force 704 x 576, display aspect 4:3	MainWin		примусово 704 x 576, співвідношення 4:3
+Error, connecting to interface failed:\n\n	MainWin		Помилка, збій підключення до інтерфейсу:\n\n
+force 544 x 576, display aspect 4:3	MainWin		примусово 544 x 576, співвідношення 4:3
 Full screen	MainWin		Повний екран
-Scale to native size	MainWin		Маштабувати до вихідного розміру
+Scale to native size	MainWin		Оригінальний розмір
 unknown	MainWin		невідомий
 Next channel	MainWin		Наступний канал
 Keep aspect ratio	MainWin		Зберегти співвідношення
@@ -13,7 +13,7 @@ DVB - Digital Video Broadcasting TV	MainWin		DVB - цифрове ефірне �
 Always on top	MainWin		Завжди поверх усіх
 Debug	MainWin		Відладка
 Interface	MainWin		Інтерфейс
-force 720 x 576, display aspect 4:3	MainWin		примусово 720 x 576, співвідношення екрану 4:3
+force 720 x 576, display aspect 4:3	MainWin		примусово 720 x 576, співвідношення 4:3
 Quit	MainWin		Вийти
 Channel	MainWin		Канал
 Previous channel	MainWin		Попередній канал
@@ -22,6 +22,6 @@ TV	MainWin		Телебачення
 Settings	MainWin		Налаштування
 TV	System name		Телебачення
 Settings…	MainWin		Налаштування…
-None	MainWin		Нічого
+None	MainWin		Пусто
 Error, interface is busy:\n\n	MainWin		Помилка, інтерфейс зайнятий:\n\n
-pixel aspect ratio	MainWin		піксельна пропрорція
+pixel aspect ratio	MainWin		піксельна пропорція

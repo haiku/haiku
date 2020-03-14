@@ -1,5 +1,5 @@
 1	ukrainian	x-vnd.Haiku-debug_server	3188340596
-The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		Програма:\n\n %app\n\nвикликала помилку, яка заважає продовженню. Haiku зупинить її виконання.
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		Програма:\n\n      %app\n\nвикликала помилку, яка заважає продовженню. Haiku зупинить її виконання.
 Oh yeah!	DebugServer		Так і є!
 Debug	DebugServer		Відладка
 Terminate	DebugServer		Припинити

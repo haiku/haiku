@@ -2,25 +2,25 @@
 Audio mixer	Media Window		Аудіо міксер
 Show volume control on Deskbar	Media views		Показати регулятор гучності в Deskbar
 Quit	Media Window		Вихід
-Restart media services	Media views		Перезапустити медіа служби
+Restart media services	Media views		Перезапустити медіа-служби
 Couldn't add volume control in Deskbar: %s\n	Media views		Неможливо додати регулятор гучності в Deskbar: %s\n
 Start media server	Media Window		Запуск медіа сервера
-<none>	VideoInputMenu	Used when no video input is available	<немає>
-Audio settings	Media Window		Налаштування звуку
+<none>	VideoInputMenu	Used when no video input is available	<пусто>
+Audio settings	Media Window		Налаштування аудіо
 Quit anyway	Media Window		Вийти будь-що
-Couldn't remove volume control in Deskbar: %s\n	Media views		Неможливо видалити регулятор гучності з Deskbar: %s\n
+Couldn't remove volume control in Deskbar: %s\n	Media views		Неможливо вилучити регулятор гучності з Deskbar: %s\n
 Media	System name		Mедіа
-Warning!	Media Window		Увага!
+Warning!	Media Window		Попередження!
 MIDI Settings	Media Window		Налаштування MIDI
 Video output:	Media views		Вихід відео:
 Audio output:	Media views		Вихід аудіо:
 Video input:	Media views		Вхід відео:
-Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Покидання Медіа зараз зупинить перезавантаження медіа сервісів. Ймовірне розшарування або недоступність функціоналу.
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Вихід з Медіа зупинить перезапуск медіа-служб. Імовірний результат - нестабільна робота або недоступність медіа.
 Audio input:	Media views		Вхід звуку:
-<none>	Media views		<жодного>
+<none>	Media views		<пусто>
 This hardware has no controls.	Media Window		Це залізо не керується.
 Channel:	Media views		Канал:
-Defaults	Media views		Типово
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Медіа сервер не запущено\nЗапустити його?
+Defaults	Media views		За замовчуванням
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Медіа-сервер не запущено\nЗапустити його?
 Video settings	Media Window		Налаштування відео
-<none>	VideoOutputMenu	Used when no video output is available	<немає>
+<none>	VideoOutputMenu	Used when no video output is available	<пусто>

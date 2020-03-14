@@ -10,42 +10,42 @@ OK	Statistics		ОК
 Find	FindandReplaceWindow		Знайти
 New	Menus		Новий
 Document	Menus		Документ
-Search backwards	FindandReplaceWindow		Повторний пошук
-Find again	Menus		Повторний пошук
+Search backwards	FindandReplaceWindow		Шукати від верху до низу
+Find again	Menus		Знайти далі
 Read-only	StatusView		Тільки читання
 Save	Menus		Зберегти
-Cancel	QuitAlert		Відмінити
+Cancel	QuitAlert		Скасувати
 Copy	Menus		Копіювати
 Reload	NodeMonitorAlerts		Перезавантажити
 line %d, column %d	StatusView		рядок %d, колонка %d
-Words:	Statistics		Слова:
+Words:	Statistics		Слів:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Відновити
 Error saving \"%s\":\n%s	SaveAlert		Помилка збереження \"%s\":\n%s
 OK	RevertToSavedAlert		ОК
 Unlock file	StatusView		Розблокувати
-Italic	Menus		Italic
+Italic	Menus		Курсив
 Can't undo	Menus		Неможливо відмінити
-Replace…	Menus		Перемістити…
+Replace…	Menus		Замінити…
 File	Menus		Файл
-Bold	Menus		Товстий
+Bold	Menus		Жирний
 Paste	Menus		Вставити
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Файл \"%file%\" був змінений іншою програмою, перезавантажити його?
-File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Файл \"%file%\" був видалений іншою програмою, відновити його?
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Файл \"%file%\" був вилучений іншою програмою, відновити його?
 Lines:	Statistics		Рядків:
 Replace in all windows	FindandReplaceWindow		Замінити у всіх вікнах
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" має незбережені зміни.\nПовернути його до останньої збереженої версії? 
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" має незбережені зміни.\nЗробити відкат до його останньої збереженої версії? 
 Save	SaveAlert		Зберегти
 Default	Open_and_SaveAsPanel		За замовчуванням
-Cancel	RevertToSavedAlert		Відмінити
-Cancel	FindandReplaceWindow		Відмінити
+Cancel	RevertToSavedAlert		Скасувати
+Cancel	FindandReplaceWindow		Скасувати
 Statistics…	Menus		Статистика…
 Encoding	Open_and_SaveAsPanel		Кодування
 Replace all	FindandReplaceWindow		Замінити все
 Close	Menus		Закрити
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		Помилка завантаження \"%s\":\n\tФормат не підтримується
 Left	Menus		Вліво
-Default	Menus		По замовчуванню
+Default	Menus		За замовчуванням
 OK	SaveAlert		ОК
 Color	Menus		Колір
 Save changes to the document \"%s\"? 	QuitAlert		Зберегти зміни в документі \"%s\" ? 
@@ -57,7 +57,7 @@ Don't save	SaveAlert		Не зберігати
 Reload…	Menus		Перезавантажити…
 Print…	Menus		Друкувати…
 Quit	Menus		Вийти
-Redo typing	QuitAlert		Поновлення друку
+Redo typing	QuitAlert		Повторити введення тексту
 Ignore	NodeMonitorAlerts		Ігнорувати
 Wrap lines	Menus		Перенос по словах
 Text encoding	Menus		Кодування
@@ -67,19 +67,19 @@ OK	LoadAlert		ОК
 Save	QuitAlert		Зберегти
 Case-sensitive	FindandReplaceWindow		Чутливий до регістра
 Find selection	Menus		Знайти вибране
-Cancel	SaveAlert		Відмінити
+Cancel	SaveAlert		Скасувати
 Find…	Menus		Знайти…
-Revert	RevertToSavedAlert		Повернути
+Revert	RevertToSavedAlert		Без змін
 Size	Menus		Розмір
 Autodetect	Menus		Автовизначення
 Replace next	Menus		Замінити наступний
 OK	QuitAlert		ОК
-Replace with:	FindandReplaceWindow		Перемістити з:
+Replace with:	FindandReplaceWindow		Замінити на:
 Edit	Menus		Редагувати
 Open…	Menus		Відкрити…
 Save as…	Menus		Зберегти як…
-Replace	FindandReplaceWindow		Перемістити
-Characters:	Statistics		Символи:
+Replace	FindandReplaceWindow		Замінити
+Characters:	Statistics		Символів:
 Don't save	QuitAlert		Не зберігати
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Цей файл помічений тільки для читання. Зберегти зміни в документі \"%s\"? 
 Align	Menus		Вирівняти

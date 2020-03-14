@@ -1,5 +1,5 @@
 1	ukrainian	x-vnd.Haiku.TextSearch	1867528375
-Please select the files you wish to have selected for you in Tracker.	GrepWindow		Виберіть файли які Ви маєте виділити у Tracker'i.
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Виберіть файли які Ви маєте виділити у Tracker.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Не вдалося запустити програму xargs!
 Open selection	GrepWindow		Відкрити вибране
@@ -9,30 +9,30 @@ Encoding	GrepWindow		Кодування
 OK	GrepWindow		ОК
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		Закрити
-Look in sub-folders	GrepWindow		Дивитися в підтеках
-%s: Not enough room to escape the filename.	Grepper		%s: Недостатньо місця для відміни імені файлу.
+Look in sub-folders	GrepWindow		Дивитися в підпапках
+%s: Not enough room to escape the filename.	Grepper		%s: Недостатньо місця щоб екранувати ім'я файлу.
 Follow symbolic links	GrepWindow		Дотримуйтесь символічних посилань
 Regular expression	GrepWindow		Регулярний вираз
 Text files only	GrepWindow		Тільки текстові файли
 Quit	GrepWindow		Вийти
-Show files in Tracker	GrepWindow		Показати файл у Tracker'i
-Please select the files you wish to keep searching.	GrepWindow		Будь ласка виберіть файли які ви хочете продовжувати шукати.
-Trim to selection	GrepWindow		Обрізати для вибору
+Show files in Tracker	GrepWindow		Показати файли у Tracker
+Please select the files you wish to keep searching.	GrepWindow		Будь ласка виберіть файли в яких Ви хочете продовжити пошук.
+Trim to selection	GrepWindow		Обмежитись вибраними
 Set target…	GrepWindow		Встановити ціль…
 TextSearch	GrepWindow		Пошук тексту
-Failed to open input pipe!	Grepper		Помилка при відкритті вхідного канала!
+Failed to open input pipe!	Grepper		Збій при відкритті вхідного каналу!
 Search	GrepWindow		Пошук
 Copy text to clipboard	GrepWindow		Копіювати текст до буферу обміну
 Show lines	GrepWindow		Показати лінії
-Failed to open errors pipe!	Grepper		Помилка при відкритті вихідного канала!
-The unselected files will be removed from the list.	GrepWindow		Не вибрані файли будуть вилучені зі списку.
+Failed to open errors pipe!	Grepper		Збій при відкритті каналу помилок!
+The unselected files will be removed from the list.	GrepWindow		Файли, які не вибрані, будуть вилучені зі списку.
 Skip folders starting with a dot	GrepWindow		Пропустити папки, що починаються з крапки
-Open files in code editor	GrepWindow		Відкрий файли в редакторі коду
-Failed to open output pipe!	Grepper		Призупинено выдкриття вихідного канала! 
-Cancel	GrepWindow		Відмінити
+Open files in code editor	GrepWindow		Відкрвати файли в редакторі коду
+Failed to open output pipe!	Grepper		Збій при відкритті вихідного каналу! 
+Cancel	GrepWindow		Скасувати
 History	GrepWindow		Історія
 File	GrepWindow		Файл
 Case-sensitive	GrepWindow		З урахуванням регістру
 Select all	GrepWindow		Вибрати все
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME не вдалося відкрити одну або більше тек.
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME не вдалося відкрити одну або більше папок.
 Settings	GrepWindow		Налаштування

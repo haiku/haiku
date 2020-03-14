@@ -1,12 +1,12 @@
 1	ukrainian	x-vnd.Haiku-JPEGTranslator	3788699631
 Read	JPEGTranslator		Читати
-Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Формат растрових зображень Be (Перетворювач JPEG)
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Формат растрових зображень Be (Транслятор JPEG)
 Show warning messages	JPEGTranslator		Показувати попередження
-Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Використовувати код CMYK 0 для 100% охоплення чорнила
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Використовувати код CMYK 0 для 100% чорнильного охоплення
 JPEG Library Error: %s\n	be_jerror		Помилка бібліотеки JPEG: %s\n
-©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nНа основі бібліотеки IJG © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nз заплаткою для \"lossless\" кодування Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nЗ деякою зміною передачі кольору від Magnus Hellman\n\thttp://www.bebits.com/app/802\n
-None	JPEGTranslator		Жоден
-About	JPEGTranslator		Про
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n
+None	JPEGTranslator		Пусто
+About	JPEGTranslator		Про це
 Version %d.%d.%d	JPEGTranslator		Версія %d.%d.%d
 Write black-and-white images as RGB24	JPEGTranslator		Записувати чорно-білі зображення як RGB24
 Output smoothing strength	JPEGTranslator		Інтенсивність зглажування

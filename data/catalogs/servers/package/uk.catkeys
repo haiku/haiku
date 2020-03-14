@@ -1,16 +1,16 @@
 1	ukrainian	x-vnd.haiku-package_daemon	1440586681
 Package changes	PackageResult	Window title	Зміни в пакеті
-uninstall package %s\n	PackageResult	Don't change '%s' variable	видалити пакет %s\n
-ignore problem for now	PackageProblem		ігнорувати проблему зараз
-solution %d:	PackageProblem	Don't change the %d variable	розв'язок %d:
+uninstall package %s\n	PackageResult	Don't change '%s' variable	деінсталяція пакета %s\n
+ignore problem for now	PackageProblem		ігнорувати проблему
+solution %d:	PackageProblem	Don't change the %d variable	рішення %d:
 The following problems have been encountered. Please select a solution for each:	PackageProblem		Виникли наступні проблеми. Виберіть рішення для кожної з них:
 Apply changes	PackageResult		Застосувати зміни
 Package daemon	PackageManager		Демон пакетів
-install package %s from repository %s\n	PackageResult	Don't change '%s' variables	встановити пакет %s зі сховища %s\n
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	встановити пакет %s з репозиторія %s\n
 The following additional package changes have to be made:	PackageResult		Необхідно внести наступні додаткові зміни у пакет:
 Warning	PackageManager		Попередження
-Cancel	PackageProblem		Відмінити
+Cancel	PackageProblem		Скасувати
 don't activate package %source%	PackageProblem	don't change '%source%	не активувати пакет %source%
-Cancel	PackageResult		Відмінити
+Cancel	PackageResult		Скасувати
 Retry	PackageProblem		Повторити
 Package problems	PackageProblem	Window title	Проблеми з пакетом

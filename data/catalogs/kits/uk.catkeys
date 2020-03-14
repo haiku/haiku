@@ -1,42 +1,42 @@
 1	ukrainian	x-vnd.Haiku-libbe	3337473349
-{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte}, other{# bytes}}
-All Rights Reserved.	AboutWindow		Усі права застережено.
+{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# байт} few{# байти} other{# байтів}}
+All Rights Reserved.	AboutWindow		Всі права захищені.
 gold master	AboutWindow		золотий майстер
 Undo	TextView		Відмінити
 gamma	AboutWindow		гамма
 development	AboutWindow		розробка
-OK	Dragger		Гаразд
-OK	PrintJob		Гаразд
-Print Server is not responding.	PrintJob		Принт сервер недоступний.
+OK	Dragger		ОК
+OK	PrintJob		ОК
+Print Server is not responding.	PrintJob		Принт-сервер недоступний.
 About %app%	AboutMenuItem		Про %app%
-Warning	Dragger		Увага
+Warning	Dragger		Попередження
 Green:	ColorControl		Зелений:
-Redo	TextView		Відмінити відміну
+Redo	TextView		Повторити
 No pages to print!	PrintJob		Жодної сторінки для друку!
 beta	AboutWindow		бета
-OK	ZombieReplicantView		Гаразд
+OK	ZombieReplicantView		ОК
 Cut	TextView		Вирізати
-%3.2f GiB	StringForSize		%3.2f GiB
-Can't delete this replicant from its original application. Life goes on.	Dragger		Неможливо видалити реплікант з рідної прграми. Життя продовжується.
+%3.2f GiB	StringForSize		%3.2f ГБ
+Can't delete this replicant from its original application. Life goes on.	Dragger		Не вдалося видалити реплікант з оригінальної програми. Життя продовжується.
 Error	ZombieReplicantView		Помилка
 Paste	TextView		Вставити
-OK	AboutWindow		Гаразд
+OK	AboutWindow		ОК
 Special Thanks:	AboutWindow		Особлива подяка:
-%.2f TiB	StringForSize		%.2f TiB
-Remove replicant	Dragger		Видалити реплікант
+%.2f TiB	StringForSize		%.2f ТБ
+Remove replicant	Dragger		Вилучити реплікант
 Version	AboutWindow		Версія
 Red:	ColorControl		Червоний:
 <empty>	Menu		<пусто>
 Copy	TextView		Копіювати
 Select all	TextView		Вибрати все
 alpha	AboutWindow		альфа
-%3.2f MiB	StringForSize		%3.2f MiB
+%3.2f MiB	StringForSize		%3.2f МБ
 Error	PrintJob		Помилка
 About %app%	AboutWindow		Про %app%
 About %app…	Dragger		Про %app…
-Version history:	AboutWindow		Історія версії:
+Version history:	AboutWindow		Історія версій:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Неможливо визначити програму для репліканта. Не знайдено підпису програми.\n%error
-%3.2f KiB	StringForSize		%3.2f KiB
+%3.2f KiB	StringForSize		%3.2f КБ
 Blue:	ColorControl		Синій:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Неможливо створити реплікант для \"%description\".\n%error
 Written by:	AboutWindow		Автор:

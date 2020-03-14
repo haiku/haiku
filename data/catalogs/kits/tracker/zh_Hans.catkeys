@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	2552074901
+1	english	x-vnd.Haiku-libtracker	3441960750
 Created	ContainerWindow		创建
 Open and make preferred	OpenWithWindow		打开并创建首选
 Kind	ContainerWindow		种类
@@ -357,7 +357,6 @@ Rename	FSUtils	button label	重命名
 Clean up all	ContainerWindow		清空
 Add current folder	FilePanelPriv		添加当前目录
 Description:	InfoWindow		描述：
-The Tracker must be running to see set the default printer.	PoseView		Tracker 必须运行以查看/设置默认打印机。
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		您确定要删除选中项目？该操作将无法恢复。
 Mount	DeskWindow		挂载
 ends with	FindPanel		结束方式

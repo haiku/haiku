@@ -1,6 +1,6 @@
 1	ukrainian	x-vnd.Haiku-CodyCam	2593355250
-destination directory expected	CodyCam		вкажіть папку призначення
-reply: '%s'\n	SftpClient		відповісти: '%s'\n
+destination directory expected	CodyCam		вкажіть каталог призначення
+reply: '%s'\n	SftpClient		відповідь: '%s'\n
 JPEG image	CodyCam		Зображення JPEG
 Remote host has closed the connection.\n	FtpClient		Сервер закрив з’єднання.\n
 image file format expected	CodyCam		вкажіть формат зображення
@@ -37,10 +37,10 @@ Send to…	CodyCam		Відправити до…
 Password:	CodyCam		Пароль:
 still image filename expected	CodyCam		надалі очікується назва зображення
 File name:	CodyCam		Ім’я файлу:
-Directory:	CodyCam		Тека:
-Error setting type of output file	VideoConsumer.cpp		Помилка при заданні типу вихідного файлу
+Directory:	CodyCam		Каталог:
+Error setting type of output file	VideoConsumer.cpp		При спробі встановити тип вихідного файлу виникла помилка
 Locking the window	VideoConsumer.cpp		Блокування вікна
-Cannot find an available video stream	CodyCam		Неможливо знайти доступний поток відео
+Cannot find an available video stream	CodyCam		Неможливо знайти доступний потік відео
 Upload…	VideoConsumer.cpp		Вивантаження…
 password expected	CodyCam		очікується пароль
 PASS <suppressed>  (real password sent)\n	FtpClient		PASS <suppressed>  (дійсний пороль відправлено)\n
@@ -54,7 +54,7 @@ Every 15 minutes	CodyCam		Кожні 15 хвилин
 Every 24 hours	CodyCam		Кожні 24 години
 Image Format Menu	CodyCam		Меню формата зображення
 Every 5 minutes	CodyCam		Кожні 5 хвилин
-File upload failed	VideoConsumer.cpp		Вивантаження файлу призупинене
+File upload failed	VideoConsumer.cpp		Невдале вивантаження файлу
 Format:	CodyCam		Формат:
 Start video	CodyCam		Запустити відео
 Connected…	VideoConsumer.cpp		Підключення…
@@ -66,10 +66,10 @@ Local	CodyCam		Локальний
 Stop video	CodyCam		Зупинити відео
 Last Capture: 	VideoConsumer.cpp		Останнє захоплення: 
 Rate:	CodyCam		Періодичність:
-Couldn't find requested directory on server	VideoConsumer.cpp		Неможливо знайти запитувану теку на сервері
+Couldn't find requested directory on server	VideoConsumer.cpp		Неможливо знайти потрібний каталог на сервері
 Cannot find the media roster	CodyCam		Неможливо знайти медіа ростер
 Type:	CodyCam		Тип:
-Rename failed	VideoConsumer.cpp		Переіменування призупинено
+Rename failed	VideoConsumer.cpp		Збій переіменування
 unrecognized upload client specified	CodyCam		нерозпізнаний клієнт вивантаження
 Server:	CodyCam		Сервер:
 Login:	CodyCam		Логін:
@@ -81,8 +81,8 @@ Video settings	CodyCam		Налаштування відео
 Can't find an available connection to the video window	CodyCam		Неможливо знайти доступне вікно відео
 FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		Помилка при створенні вихідного файла
-Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Не знайдено джерело зображення.\nДля використання Камери потрібна вебкамера.
+Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Не знайдено джерело зображення.\nДля використання CodyCam потрібна вебкамера.
 Logging in…	VideoConsumer.cpp		Авторизація…
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Помилка запису вихідного файлу
-Capture controls	CodyCam		Керування захопленням
+Capture controls	CodyCam		Управління захопленням

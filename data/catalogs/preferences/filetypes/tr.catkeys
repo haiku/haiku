@@ -78,7 +78,7 @@ Args only	Application Type Window		Yalnızca değişkenler
 Could not open \"%s\":\n%s	FileTypes		\"%s\" açılamadı:\n%s
 Right	Attribute Window	Attribute column alignment in Tracker	Sağ
 Save changes before closing?	Application Type Window		Kapatmadan önce değişiklikler kaydedilsin mi?
-Background app	Application Type Window		Arkaplan uygulaması
+Background app	Application Type Window		Arka plan uygulaması
 Recognition rule is not valid:\n\n	FileTypes Window		Tanımlanma kuralı geçerli değil\n\n
 Show icons in list	FileTypes Window		Listede simgeleri göster
 Editable	Attribute Window	If Tracker allows to edit this attribute.	Düzenlenebilir

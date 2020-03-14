@@ -3,25 +3,25 @@ Input gain controls represent	AudioMixer		Представлення регул�
 Linear interpolation	AudioMixer		Лінійна інтерполяція
 Virtual output channels	AudioMixer		Віртуальні вихідні канали
 Refuse output format changes	AudioMixer		Відхилити зміни вихідного формату
-Output mapping	AudioMixer		Призначення виходу
+Output mapping	AudioMixer		Перепризначення виходу
 Allow input channel remapping	AudioMixer		Дозволити перепризначення вхідного каналу
-Resampling algorithm	AudioMixer		Алгоритм ресамплінгу
-Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Зменшити вихід мікшера на 3 дБ (як у BeOS R5)
+Resampling algorithm	AudioMixer		Алгоритм передискретизації
+Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Послабити вихід мікшера на 3 дБ (як у BeOS R5)
 Display balance control for stereo connections	AudioMixer		Показати регулятор балансу для стереоз'єднань
 To output	AudioMixer		До виходу
 not connected	AudioMixer		не приєднано
 Refuse input format changes	AudioMixer		Відхилити зміни вхідного формату
-Drop/repeat samples	AudioMixer		Вкинут‏и/повторити зразки
-Output channel sources	AudioMixer		Джерела вихідних каналів
+Drop/repeat samples	AudioMixer		Пропуск/повтор семплів 
+Output channel sources	AudioMixer		Джерела вихідного канала
 dB	AudioMixer		дБ
 Gain controls	AudioMixer		Керування підсиленням
-Input mapping	AudioMixer		Призначення входу
+Input mapping	AudioMixer		Перепризначення входу
 Mute	AudioMixer		Заглушити
-Input channel destinations	AudioMixer		Призначення вхідних каналів
+Input channel destinations	AudioMixer		Напрямки вхідних каналів
 To master	AudioMixer		До головного
 Master output	AudioMixer		Головний вихід
 Setup	AudioMixer		Встановити
 Use non linear gain sliders (like BeOS R5)	AudioMixer		Використовувати нелінійні регулятори підсилення (як у BeOS R5)
 Gain	AudioMixer		Підсилення
-Allow output channel remapping	AudioMixer		Дозволити перебудову вихідного каналу
+Allow output channel remapping	AudioMixer		Дозволити перепризначення вихідного каналу
 Physical input channels	AudioMixer		Фізичні вхідні канали

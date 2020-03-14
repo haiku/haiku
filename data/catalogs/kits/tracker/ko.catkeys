@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-libtracker	2738005582
+1	korean	x-vnd.Haiku-libtracker	3627891431
 Created	ContainerWindow		만든 때
 Open and make preferred	OpenWithWindow		열고 연결프로그램으로 지정
 Kind	ContainerWindow		종류
@@ -333,7 +333,6 @@ Rename	FSUtils	button label	이름바꾸기
 Clean up all	ContainerWindow		모두 정리
 Add current folder	FilePanelPriv		현재 폴더 더하기
 Description:	InfoWindow		설명:
-The Tracker must be running to see set the default printer.	PoseView		기본 프린터 설정을 보기 위해서는 반드시 트랙커가 실행중이어야 합니다.
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		정말로 선택한 아이템(들)을 지우기를 원합니까? 이 작업은 되돌릴 수 없습니다.
 Mount	DeskWindow		마운트
 ends with	FindPanel		끝 단어

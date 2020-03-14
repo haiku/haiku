@@ -1,27 +1,27 @@
 1	ukrainian	x-vnd.Haiku-Sudoku	3382377306
-Restore snapshot	SudokuWindow		Поновити знімок
+Restore snapshot	SudokuWindow		Відновити знімок
 File	SudokuWindow		Файл
-Mark invalid values	SudokuWindow		Позначати помилки
+Mark invalid values	SudokuWindow		Позначити недійсні значення
 Solve single field	SudokuWindow		Вирішити одне поле
 Hard	SudokuWindow		Складний
 Start again	SudokuWindow		Розпочати знову
 New	SudokuWindow		Новий
 Easy	SudokuWindow		Простий
-Undo	SudokuWindow		Скасувати
+Undo	SudokuWindow		Відкат дії
 Export as…	SudokuWindow		Експортувати як…
 Quit	SudokuWindow		Вийти
-Redo	SudokuWindow		Відмінити відміну
+Redo	SudokuWindow		Повторити
 Could not open \"%s\":\n%s\n	SudokuWindow		Неможливо відкрити \"%s\":\n%s\n
-Blank	SudokuWindow		Порожній
+Blank	SudokuWindow		Бланк
 Sudoku solved - congratulations!\n	SudokuWindow		Вітаємо - Судоку розв'язане!\n
 Text	SudokuWindow		Текст
 Copy	SudokuWindow		Копіювати
 Solve	SudokuWindow		Розв'язати
 HTML	SudokuWindow		HTML
 Advanced	SudokuWindow		Підвищений
-Set all hints	SudokuWindow		Встановити підказки
+Set all hints	SudokuWindow		Встановити всі підказки
 Searching for removable values	SudokuGenerator		Пошук значень для вилучення
-Abort	ProgressWindow		Припинити
+Abort	ProgressWindow		Перервати
 Could not set Sudoku:\n%s\n	SudokuWindow		Неможливо встановити Судоку: \n%s\n
 Help	SudokuWindow		Довідка
 OK	SudokuWindow		ОК
@@ -30,6 +30,6 @@ Progress monitor	ProgressWindow		Монітор ходу
 Creating solvable field	SudokuGenerator		Створити поле для розв'язку
 View	SudokuWindow		Вигляд
 Snapshot current	SudokuWindow		Зробити знімок
-Mark valid hints	SudokuWindow		Позначати правильні підказки
+Mark valid hints	SudokuWindow		Позначити правильні підказки
 Sudoku request	SudokuWindow		Запит Судоку
 Open file…	SudokuWindow		Відкрити файл…

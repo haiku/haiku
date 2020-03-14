@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libtracker	2745737133
+1	indonesian	x-vnd.Haiku-libtracker	3635622982
 Created	ContainerWindow		Dibuat
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Buka dan buat sebagai yang disukai
@@ -445,7 +445,6 @@ Rename	FSUtils	button label	Ubah nama
 Clean up all	ContainerWindow		Bersihkan semua
 Add current folder	FilePanelPriv		Tambah folder ini
 Description:	InfoWindow		Keterangan:
-The Tracker must be running to see set the default printer.	PoseView		Tracker harus berjalan untuk melihat, mengatur printer default.
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Apakah anda yakin ingin menghapus item(-item) yang dipilih? Operasi ini tidak dapat dipulihkan.
 Grayscale picture	AttributesView		Gambar skala kelabu
 Mount	DeskWindow		Memasang

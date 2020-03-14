@@ -13,7 +13,7 @@ Run in window	PowerStatus		Виконувати у вікні
 PowerStatus	System name		PowerStatus
  mWh	PowerStatus		 мВт·год
 Battery info…	PowerStatus		Дані батареї…
-Damaged battery	PowerStatus		Батарея знищена
+Damaged battery	PowerStatus		Батарея пошкоджена
 Show time	PowerStatus		Показати час
 Last full charge: 	PowerStatus		Остання повна зарядка: 
 Battery unused	PowerStatus		Батарея не використовується
@@ -22,7 +22,7 @@ Extended battery info	PowerStatus		Розширені дані батареї
 Current rate: 	PowerStatus		Біжучий розряд: 
 discharging	PowerStatus		розрядка
 Show text label	PowerStatus		Показати текстові мітки
-About…	PowerStatus		Про…
+About…	PowerStatus		Про це…
 Model number: 	PowerStatus		Номер моделі: 
 Install in Deskbar	PowerStatus		Встановити в Deskbar
  mAh	PowerStatus		 мА·год
@@ -34,13 +34,13 @@ Capacity granularity 1: 	PowerStatus		Градація ємності 1:
 OEM info: 	PowerStatus		Дані OEM: 
 Design voltage: 	PowerStatus		Паспортна напруга: 
 Battery charging	PowerStatus		Батарея заряджається
-The battery level is critical, please plug in the device immediately.	PowerStatus		Розряд батареї критичний негайно починайте її зарядку.
+The battery level is critical, please plug in the device immediately.	PowerStatus		Розряд батареї критичний, негайно починайте її зарядку.
 Design capacity warning: 	PowerStatus		Попередження про проектну ємність: 
 Quit	PowerStatus		Вийти
 rechargeable	PowerStatus		заряджувана
 charging	PowerStatus		зарядка
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Ви можете запустити PowerStatus у вікні або встановити його у Deskbar.
-Show status icon	PowerStatus		Показати іконку стану
+Show status icon	PowerStatus		Показати значок стану
 Capacity granularity 2: 	PowerStatus		Градація ємності 2: 
 Technology: 	PowerStatus		Технологія: 
 no battery	PowerStatus		батарея відсутня

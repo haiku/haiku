@@ -2,7 +2,7 @@
 Burning Ship	MandelbrotWindow		Палаючий корабель
 Grassland	MandelbrotWindow		Газон
 Lightning	MandelbrotWindow		Свічення
-About	MandelbrotWindow		Про
+About	MandelbrotWindow		Про це
 Palette	MandelbrotWindow		Палітра
 Set	MandelbrotWindow		Встановити
 Tricorn	MandelbrotWindow		Tricorn
@@ -10,14 +10,14 @@ Royal	MandelbrotWindow		Королівський
 Orbit Trap	MandelbrotWindow		Orbit Trap
 Deepfrost	MandelbrotWindow		Глибока заморозка
 Subsampling	MandelbrotWindow		Підгрупування
-1 (none)	MandelbrotWindow		1 (жоден)
+1 (none)	MandelbrotWindow		1 (пусто)
 Quit	MandelbrotWindow		Вийти
 File	MandelbrotWindow		Файл
 Julia	MandelbrotWindow		Жуліа
 Frost	MandelbrotWindow		Мороз
 Fire	MandelbrotWindow		Вогонь
 Mandelbrot	System name		Мандельброт
-Iterations	MandelbrotWindow		Наближення
+Iterations	MandelbrotWindow		Ітерації
 High contrast	MandelbrotWindow		Високий контраст
 Multibrot	MandelbrotWindow		Multibrot
 Spring	MandelbrotWindow		Весна

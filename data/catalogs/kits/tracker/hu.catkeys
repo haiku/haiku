@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	838081337
+1	hungarian	x-vnd.Haiku-libtracker	1727967186
 Created	ContainerWindow		Létrehozva
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
 Kind	ContainerWindow		Típus
@@ -393,7 +393,6 @@ Rename	FSUtils	button label	Átnevezés
 Clean up all	ContainerWindow		Összes rendezése
 Add current folder	FilePanelPriv		Jelenlegi mappa hozzáadása
 Description:	InfoWindow		Leírás:
-The Tracker must be running to see set the default printer.	PoseView		A Nyomkövetőnek futnia kell, hogy az alapértelmezett nyomtatót át lehessen állítani.
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Biztos szeretné törölni a kiválasztott eleme(ke)t? Ez nem vonható vissza.
 Mount	DeskWindow		Csatolás
 ends with	FindPanel		ezzel végződik:

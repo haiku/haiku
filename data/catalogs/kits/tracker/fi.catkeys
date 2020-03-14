@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	176213216
+1	finnish	x-vnd.Haiku-libtracker	1066099065
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -448,7 +448,6 @@ Rename	FSUtils	button label	Nimeä uudelleen
 Clean up all	ContainerWindow		Tyhjennä kaikki
 Add current folder	FilePanelPriv		Lisää nykyinen kansio
 Description:	InfoWindow		Kuvaus:
-The Tracker must be running to see set the default printer.	PoseView		Seuraajan on oltava käynnissä oletustulostimen näkymiseksi.
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Oletko varma, että haluat poistaa valitut kohteet? Tätä toimintoa ei voi palauttaa.
 Grayscale picture	AttributesView		Harmaaskaalakuva
 Mount	DeskWindow		Liitä

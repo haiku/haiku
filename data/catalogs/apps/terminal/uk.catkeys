@@ -8,7 +8,7 @@ Edit	Terminal TermWindow		Дія
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               роздрукувати цю довідку\n  -t,     --title              встановити заголовок вікна\n  -f,     --fullscreen         запускати у повноекранному режимі\n  -w,     --working-directory  встановити початкову робочу директорію\n
 Select all	Terminal TermWindow		Вибрати все
 Confirm exit if active programs exist	Terminal AppearancePrefView		Підтверджувати вихід якщо присутні активні програми
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tПоточна робоча папка активного процесу в\n\t\t\tпоточній вкладці. При необхідності можна вказати максимальне число\n\t\t\tкомпонентів для відображення. Наприклад '%2d' для більш ніж двох компонентів.\n\t%T\t-\tНазва програми Terminal для поточної локалі.\n\t%e\t-\tКодування поточної локалі. Для UTF-8 не відображається.\n\t%i\t-\tІндекс вікна.\n\t%p\t-\tНазва активного процесу у поточній вкладці.\n\t%t\t-\tЗаголовок поточної вкладки.
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tПоточна робоча папка активного процесу в поточній вкладці.\n\t\t\tПри необхідності можна вказати максимальне число компонентів\n\t\t\tдля відображення. Наприклад '%2d' для більш ніж двох компонентів.\n\t%T\t-\tНазва програми Terminal для поточної локалі.\n\t%e\t-\tКодування поточної локалі. Для UTF-8 не відображається.\n\t%i\t-\tІндекс вікна.\n\t%p\t-\tНазва активного процесу у поточній вкладці.\n\t%t\t-\tЗаголовок поточної вкладки.
 Solarized Dark	Terminal colors scheme		Сяючий морок
 Copy	Terminal TermWindow		Копіювати
 Retro	Terminal colors scheme		Ретро
@@ -30,8 +30,8 @@ Change directory	Terminal TermView		Змінити каталог
 Page setup…	Terminal TermWindow		Налаштування друку…
 Slate	Terminal colors scheme		Сланець
 Defaults	Terminal PrefWindow		За замовчуванням
-Cancel	Terminal TermView		Відмінити
-Revert	Terminal PrefWindow		Відбій
+Cancel	Terminal TermView		Скасувати
+Revert	Terminal PrefWindow		Без змін
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Термінал
 Use selection	Terminal FindWindow		Використати вибране
 Find next	Terminal TermWindow		Знайти наступне
@@ -59,20 +59,20 @@ New Terminal	Terminal TermWindow		Новий Термінал
 Quit	Terminal TermWindow		Вийти
 Match case	Terminal FindWindow		Враховувати регістр
 Find previous	Terminal TermWindow		Знайти попереднє
-The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Шаблон визначає заголовки вкладок. Можна використовувати\nнаступні наповнювачі:
+The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Шаблон визначає заголовки вкладок.\nМожна використовувати наступні заповнювачі:\n\n
 Close	Terminal TermWindow		Закрити
 Save to file…	Terminal PrefWindow		Зберегти у файл…
 Background	Terminal AppearancePrefView		Фон
 Copy path	Terminal TermView		Копіювати шлях
 Window size	Terminal TermWindow		Розмір вікна
 Copy absolute path	Terminal TermView		Копіювати абсолютний шлях
-Cancel	Terminal TermWindow		Відмінити
+Cancel	Terminal TermWindow		Скасувати
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Процес \"%1\" все ще запущено.\nЯкщо Ви закриєте вкладку, процес буде знищено.
 Cursor	Terminal AppearancePrefView		Курсор
 Full screen	Terminal TermWindow		Повний екран
 Shell 	Terminal TermWindow		Оболонка 
 Midnight	Terminal colors scheme		Північ
-\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tСимвол '%'.\n\t%<\t-\tПочаток секції, яка буде відображена тільки у випадку, коли заповнювач\n\t\t\tопісля початку не пустий.\n\t%>\t-\tПочаток секції, яка буде відображена тільки у випадку, коли заповнювач\n\t\t\tміж попередньою секцією %< та цією не пустий.\n\t%-\t-\tКінець секції %< або %>.\n\nБудь-який не буквено-цифровий символ між '%' і буквою формату вставляє пробіл\nтільки в тому випадку, якщо значення заповнювача не порожнє. Його буде додано до секції %<.
+\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tСимвол '%'.\n\t%<\t-\tПочаток секції, яка буде відображена тільки у випадку,\n\t\t\tколи заповнювач опісля початку не пустий.\n\t%>\t-\tПочаток секції, яка буде відображена тільки у випадку,\n\t\t\tколи заповнювач між попередньою секцією %< та цією не пустий.\n\t%-\t-\tКінець секції %< або %>.\n\nБудь-який не буквено-цифровий символ між '%' і буквою формату вставляє пробіл\nтільки в тому випадку, якщо значення заповнювача не порожнє.\nЙого буде додано до секції %<.
 Tab title:	Terminal TermWindow		Заголовок вкладки:
 Window title:	Terminal TermWindow		Заголовок вікна:
 Default	Terminal colors scheme		За замовчуванням
@@ -80,20 +80,20 @@ Window size:	Terminal AppearancePrefView		Розмір вікна:
 Switch Terminals	Terminal TermWindow		Переключити термінали
 Decrease	Terminal TermWindow		Зменшити
 Settings…	Terminal TermWindow		Налаштування…
-Cancel	Terminal SetTitleWindow		Відмінити
+Cancel	Terminal SetTitleWindow		Скасувати
 Blinking cursor	Terminal AppearancePrefView		Мигання курсору
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон визначає заголовок вікна. Можна використовувати\nнаступні заповнювачі:\n
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон визначає заголовок вікна.\nМожна використовувати наступні заповнювачі:\n\n
 Use text:	Terminal FindWindow		Використати текст:
 Close active tab	Terminal TermWindow		Закрити активну вкладку
 Save as default	Terminal TermWindow		Зберегти за замовчуванням
 Nothing is selected.	Terminal TermWindow		Нічого не вибрано.
 Use left Option as Meta key	Terminal AppearancePrefView		Використовувати лівий Option як клавішу Meta 
 Find	Terminal FindWindow		Знайти
-The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон визначає заголовок поточної вкладки. Можна використовувати\nнаступні заповнювачі:\n
+The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон визначає заголовок поточної вкладки.\nМожна використовувати наступні заповнювачі:\n\n
 Professional	Terminal colors scheme		Професійний
 Font:	Terminal AppearancePrefView		Шрифт:
 Paste	Terminal TermWindow		Вставити
-The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Шаблон визначає заголовки вікна. Можна використовувати\nнаступні заповнювачі:
+The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Шаблон визначає заголовки вікна.\nМожна використовувати наступні заповнювачі:\n\n
 Copy here	Terminal TermView		Копіювати сюди
 Use default shell	Terminal Shell		Використати оболонку за замовчуванням
 Color:	Terminal AppearancePrefView		Колір:
@@ -105,7 +105,7 @@ No search string was entered.	Terminal TermWindow		Стрічка для пош�
 Text under cursor	Terminal AppearancePrefView		Текст під курсором
 Move here	Terminal TermView		Перемістити сюди
 Abort	Terminal Shell		Перервати
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tПоточний робочий каталог активного процесу.\n\t\t\tПри необхідності можна вказати максимальне число компонентів шляху.\n\t\t\tНаприклад, '%2d' для не більше ніж двох компонентів.\n\t%i\t-\tІндекс вкладки.\n\t%e\t-\tКодування поточної вкладки. Для UTF-8 не відображається.\n\t%p\t-\tІм'я активного процесу.\n\t%%\t-\tСимвол '%'.
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tПоточний робочий каталог активного процесу.\n\t\t\tПри необхідності можна вказати максимальне число компонентів шляху.\n\t\t\tНаприклад, '%2d' для не більше ніж двох компонентів.\n\t%i\t-\tІндекс вкладки.\n\t%e\t-\tКодування поточної вкладки. Для UTF-8 не відображається.\n\t%p\t-\tІм'я активного процесу.
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Наступні процеси все ще запущені:\n\n\t%1\n\nЯкщо Ви закриєте Термінал, процеси будуть знищені.
 Set window title	Terminal TermWindow		Встановити заголовок вікна
 Increase	Terminal TermWindow		Збільшити

@@ -1,5 +1,5 @@
 1	turkish	x-vnd.Haiku-Installer	116830250
-Performing installation.	InstallProgress		Kuruluyor.
+Performing installation.	InstallProgress		Kuruluyor…
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Açılır menüden kaynak diski seçin ve \"Başla\"ya tıklayın.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Yükleyici penceresini kapatmadan önce Disk İzlencesi penceresini kapatın.
 No optional packages available.	PackagesView		İsteğe bağlı paket yok.
@@ -27,7 +27,7 @@ Running Boot Manager…\n\nClose Boot Manager to continue with the installation.
 Quit DriveSetup	InstallerWindow		Disk İzlencesi'nden çık
 Write boot sector	InstallerWindow		Önyükleme alanını yaz
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld/%2ld
-Finishing installation.	InstallProgress		Kurulum tamamlanıyor.
+Finishing installation.	InstallProgress		Kurulum tamamlanıyor…
 Install from:	InstallerWindow		Şuradan yükle:
 Additional disk space required: 0.0 KiB	InstallerWindow		Gereken ek disk alanı: 0.0 KiB
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Bu yazılım geliştirilme aşamasındadır; (önemli) verilerinizin kaybolma riski mevcuttur! Sık sık yedek almayı unutmayın! Demedi demeyin sonra.\n\n\n
@@ -40,7 +40,7 @@ Hide optional packages	InstallerWindow		İsteğe bağlı paketleri gizle
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Haiku'yu denediğiniz için teşekkür ederiz!
 Quit	InstallerApp		Çık
-Starting installation.	InstallProgress		Kurulum başlatılıyor.
+Starting installation.	InstallProgress		Kurulum başlatılıyor…
 Error writing boot sector.	InstallProgress		Önyükleme alanı yazılırken hata.
 OK	InstallerWindow		Tamam
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Yükleyici penceresini kapatmadan önce Önyükleme Yöneticisi ve Disk İzlencesi pencerelerini kapatın.
@@ -54,7 +54,7 @@ An error was encountered and the installation was not completed:\n\nError:  %s	I
 Restart	InstallerWindow		Yeniden başlat
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Disk bağlanamıyor. Lütfen başka bir disk seçin.
 Begin	InstallerWindow		Başla
-Collecting copy information.	InstallProgress		Kopya bilgisi toplanıyor.
+Collecting copy information.	InstallProgress		Kopya bilgisi toplanıyor…
 Show optional packages	InstallerWindow		İsteğe bağlı paketleri göster
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Hedef diskte yeteri kadar boş alan olmayabilir. Başka bir disk seçin veya isteğe bağlı yüklemeleri gözden geçirin.
 Installation canceled.	InstallProgress		Kurulum iptal edildi.

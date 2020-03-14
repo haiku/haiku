@@ -1,17 +1,17 @@
 1	ukrainian	x-vnd.Haiku-MatchHeader	1946584206
 Delete message	ConfigView		Видалити повідомлення
-Match \"%attribute\" against \"%regex\"	RuleFilter		Узгодити \"%attribute\" знову \"%regex\"
-Match header	RuleFilter		Узгодити заголовок
+Match \"%attribute\" against \"%regex\"	RuleFilter		Зіставити \"%attribute\" з \"%regex\"
+Match header	RuleFilter		Співпадаючий заголовок
 Set flags to	ConfigView		Встановити прапори до
 Header field (e.g. Subject, From, …)	ConfigView		Поле заголовка (наприклад: Тема, Від, …)
 <Choose account>	ConfigView		<Вибрати обліковий запис>
-Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Маска, наприклад, \"*spam*\".\nПриставка з\"REGEX:\" у випадку вживання регулярних виразів.
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Значення підстановки, як \"*spam*\".\nПрефікс з\"REGEX:\" у випадку вживання регулярних виразів.
 Then	ConfigView		Тоді
 If	ConfigView		Якщо
 Set as read	ConfigView		Позначити як прочитані
 Reply with	ConfigView		Відповісти з
 <Choose action>	ConfigView		<Вибрати дію>
 Move to	ConfigView		Перемістити до
-this field is based on the action	ConfigView		це поле базується на дії
+this field is based on the action	ConfigView		це поле залежить від дії
 Account	ConfigView		Обліковий запис
 has	ConfigView		має

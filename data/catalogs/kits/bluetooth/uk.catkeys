@@ -3,7 +3,7 @@ Positioning	DeviceClass		Позиціонування
 Controller	DeviceClass		Контролер
 Common ISDN access	DeviceClass		Загальний доступ ISDN
 Unknown (reserved) minor device class	DeviceClass		Невідомий (зарезервований) незначний клас пристрою
-Uncategorized	DeviceClass		Без рубрики
+Uncategorized	DeviceClass		Без категорії
 Keyboard	DeviceClass		Клавіатура
 Smart phone	DeviceClass		Смартфон
 VCR	DeviceClass		Відеомагнітофон
@@ -15,23 +15,23 @@ Major class: 	DeviceClass		Основний клас:
 HiFi audio device	DeviceClass		HiFi аудіо-пристрій
 Microphone	DeviceClass		Мікрофон
 Capturing	DeviceClass		Захоплення
-Jacket	DeviceClass		Куртка
+Jacket	DeviceClass		Джекет
 50-67% utilized	DeviceClass		50–67% використано
 Headphones	DeviceClass		Навушники
 Imaging	DeviceClass		Зображення
 Device conforms to the headset profile	DeviceClass		Пристрій відповідає профілю гарнітури
 Remote control	DeviceClass		Віддалене управління
 Fully available	DeviceClass		Повністю доступний
-#CommandFailed#Not Valid name	RemoteDevice		#Команду призупинено#Невірне і'мя
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Недійсне ім’я
 Server	DeviceClass		Сервер
 No service available	DeviceClass		Немає доступних сервісів
 Printer	DeviceClass		Принтер
 Card reader	DeviceClass		Кардрідер
 Wired modem or voice gateway	DeviceClass		Дротовий модем або голосовий шлюз
-#ServerNotReady#Not Valid name	RemoteDevice		#Сервер не готовий#Не діюче і'мя
-#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Невірне і'мя
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Недійсне ім’я
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Недійсне ім’я
 Camcorder	DeviceClass		Відеокамера
-#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Невірне і'мя
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Недійсне ім’я
 17-33% utilized	DeviceClass		17–33% використано
 Desktop workstation	DeviceClass		Настільна робоча станція
 Unspecified	DeviceClass		Невизначений
@@ -44,18 +44,18 @@ Phone	DeviceClass		Телефон
 Laptop	DeviceClass		Ноутбук
 67-83% utilized	DeviceClass		67–83% використано
 Cordless	DeviceClass		Бездротовий
-Invalid device class!\n	DeviceClass		Невірний клас приладу!\n
+Invalid device class!\n	DeviceClass		Невірний клас пристрою!\n
 Minor class: 	DeviceClass		Малий клас: 
 Doll/Action figure	DeviceClass		Ляльки/Дійові фігури
 Not implemented	RemoteDevice		Не реалізовано
 33-50% utilized	DeviceClass		33-50% використано
 Gaming/Toy	DeviceClass		Приставка/Іграшки
 Video camera	DeviceClass		Відеокамера
-Handheld	DeviceClass		Надолонний
+Handheld	DeviceClass		Портативний
 Service classes: 	DeviceClass		Класи служби: 
 Loudspeaker	DeviceClass		Гучномовець
 83-99% utilized	DeviceClass		83–99% використано
-SIM card reader	DeviceClass		Читач SIM-карти
+SIM card reader	DeviceClass		Зчитувач SIM-карти
 Computer	DeviceClass		Комп’ютер
 Scanner	DeviceClass		Сканер
 Wearable	DeviceClass	A wearable computer	Переносний
@@ -76,7 +76,7 @@ Rendering	DeviceClass		Рендерінг
 Information	DeviceClass		Інформація
 Helmet	DeviceClass		Шолом
 Pager	DeviceClass	A small radio device to receive short text messages	Пейджер
-Hands-free	DeviceClass		Вільні руки
+Hands-free	DeviceClass		Гарнітура
 Digitizer tablet	DeviceClass		Кодуючий планшет
 Portable audio	DeviceClass		Портативне аудіо
 Camera	DeviceClass		Камера

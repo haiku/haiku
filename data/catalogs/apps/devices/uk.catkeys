@@ -7,12 +7,12 @@ Graphics Peripheral	DeviceSCSI		Графічна периферія
 Processor	Device		Процесор
 Generate system information	DevicesView		Створення інформації про систему
 Class info	DevicePCI		Інфо про клас
-ACPI Information	DeviceACPI		Інформація про ACPI
-Detailed	DevicesView		Докладно
+ACPI Information	DeviceACPI		Інформація ACPI
+Detailed	DevicesView		Подробиці
 Computer	DevicesView		Комп'ютер
 Communications	DeviceSCSI		Комунікації
 Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Дані класу:\t\t\t\t: %classInfo%
-Mass storage controller	Device		Контроллер накопичувачів
+Mass storage controller	Device		Контролер накопичувачів
 Connection	DevicesView		Підключення
 Printer	DeviceSCSI		Принтер
 ACPI Processor Namespace '%2'	DeviceACPI		Простір імен процесора ACPI '%2'
@@ -36,28 +36,28 @@ Input device controller	Device		Контролер пристроїв вводу
 PCI bus	DevicesView		Шина PCI
 ACPI System Indicator	DeviceACPI		Індикатор системи ACPI
 ACPI System Bus	DeviceACPI		Шина системи ACPI
-PCI Information	DevicePCI		Інформація про PCI
+PCI Information	DevicePCI		Інформація PCI
 Tape Drive	DeviceSCSI		Стример
 Changer	DeviceSCSI		Changer
 Serial bus controller	Device		Контроллер послідовної шини
-Refresh devices	DevicesView		Оновлення пристроїв
+Refresh devices	DevicesView		Оновити список пристроїв
 Category	DevicesView		Категорії
 RBC	DeviceSCSI		RBC
-None	Device		Відсутній
+None	Device		Пусто
 Device paths	Device		Шлях до пристрою
 Unknown device	Device		Невідомий пристрій
 Wireless controller	Device		Бездротовий контролер
-Generic system peripheral	Device		Периферійні пристрої
+Generic system peripheral	Device		Загальна системна периферія
 Value	PropertyList		Значення
 Devices	DevicesView		Пристрої
-Device name	DeviceACPI		Ім'я пристрою
+Device name	DeviceACPI		Назва пристрою
 Card Reader	DeviceSCSI		Кардрідер
 Display controller	Device		Контролер дисплея
-Basic information	DevicesView		Основна інформація
+Basic information	DevicesView		Базова інформація
 ACPI Button '%1'	DeviceACPI		Кнопка ACPI '%1'
 Bus	DevicesView		Шина
 ACPI <unknown>	DeviceACPI		ACPI <unknown>
-Device name	DevicePCI		Ім'я пристрою
+Device name	DevicePCI		Назва пристрою
 Disk Drive	DeviceSCSI		Дисковий привід
 Other	DeviceSCSI		Інше
 Report compatibility	DevicesView		Звіт про сумісність
@@ -75,12 +75,12 @@ Processor	DeviceSCSI		Процесор
 Manufacturer:	Device		Виробник:
 Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Інфо про клас:\t\t\t\t: %classInfo%
 Bridge	Device		Міст
-Worm	DeviceSCSI		Хробак
+Worm	DeviceSCSI		Worm
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		Виробник
 Bridge	DeviceSCSI		Міст
 Signal processing controller	Device		Контролер обробки сигналів
-Device name	DeviceSCSI		Ім'я пристрою
+Device name	DeviceSCSI		Назва пристрою
 Docking station	Device		Док-станція
 Array	DeviceSCSI		Масив
 Unclassified device	Device		Некласифіковані пристрої

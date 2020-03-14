@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	213554677
+1	belarusian	x-vnd.Haiku-libtracker	1103440526
 Created	ContainerWindow		Створаны
 Open and make preferred	OpenWithWindow		Адкрыць і зрабіць пажаданай
 Kind	ContainerWindow		Род
@@ -347,7 +347,6 @@ Sorry, could not create a new folder.	FSUtils		Прабачце, не ўдало
 Clean up all	ContainerWindow		Прыбраць усё
 Add current folder	FilePanelPriv		Дадаць цякучы каталог
 Description:	InfoWindow		Апісанне:
-The Tracker must be running to see set the default printer.	PoseView		Каб пабачыць стандартны прынтэр, неабходна запусціць Трэкер.
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Вы ўпэўненыя, что жадаеце беззваротна выдаліць выбраны(я) элемент(ы)?
 Mount	DeskWindow		Змантаваць
 ends with	FindPanel		аканчваецца

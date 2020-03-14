@@ -5,19 +5,19 @@ Over	Playground		Над
 Quit	Playground		Вийти
 Rect	Playground		Прямокутник
 Select	Playground		Вибрати
-Click and drag to draw an object	Playground		Натисніть кнопку мишки і переміщайте курсор для малювання об'єкту
+Click and drag to draw an object	Playground		Натисніть кнопку миші і переміщайте курсор щоб намалювати об'єкт
 Controls	Playground		Керування
 Round rect	Playground		Закругленний прямокутник
 Alpha:	Playground		Альфа-канал:
 Mode:	Playground		Режим:
 Submenu	Playground		Підменю
-Copy	Playground		Копія
+Copy	Playground		Копіювати
 Cancel	Playground		Скасувати
 Clear	Playground		Очистити
 Min	Playground		Мін
 Blend	Playground		Змішати
 Invert	Playground		Інвертувати
-Clear all drawing objects?	Playground		Видалити всі намальовані об'єкти?
+Clear all drawing objects?	Playground		Очистити всі намальовані об'єкти?
 Width:	Playground		Ширина:
 Alpha	Playground		Альфа
 New object	Playground		Новий об'єкт

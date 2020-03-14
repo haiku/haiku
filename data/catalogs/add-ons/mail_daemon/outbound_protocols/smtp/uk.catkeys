@@ -7,7 +7,7 @@ Unencrypted	ConfigView		Без шифрування
 . The server says:\n	smtp		. Сервер відповідає:\n
 Error while opening connection to %serv	smtp		Помилка відкриття з'єднання з %serv
 . The server said:\n	smtp		. Сервер відповідає:\n
-None	ConfigView		Жодного
+None	ConfigView		Пусто
 SMTP server:	ConfigView		SMTP-сервер:
 ESMTP	ConfigView		ESMTP
 POP3 before SMTP	ConfigView		POP3 перед SMTP
