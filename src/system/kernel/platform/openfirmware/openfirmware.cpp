@@ -472,14 +472,19 @@ of_write(intptr_t handle, const void *buffer, intptr_t bufferSize)
 intptr_t
 of_seek(intptr_t handle, off_t pos)
 {
+	intptr_t pos_hi = 0;
+	if (sizeof(off_t) > sizeof(intptr_t))
+		pos_hi = pos >> ((sizeof(off_t) - sizeof(intptr_t)) * CHAR_BIT);
+
 	struct {
 		const char	*name;
 		intptr_t	num_args;
 		intptr_t	num_returns;
 		intptr_t	handle;
-		int64		pos;
+		intptr_t	pos_hi;
+		intptr_t	pos;
 		intptr_t	status;
-	} args = {"seek", 3, 1, handle, pos, 0};
+	} args = {"seek", 3, 1, handle, pos_hi, pos, 0};
 
 	if (gCallOpenFirmware(&args) == OF_FAILED)
 		return OF_FAILED;
