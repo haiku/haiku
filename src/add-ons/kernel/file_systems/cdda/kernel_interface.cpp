@@ -15,17 +15,18 @@
 #include <fs_info.h>
 #include <fs_interface.h>
 #include <KernelExport.h>
+#include <lock.h>
 #include <Mime.h>
 #include <NodeMonitor.h>
 #include <TypeConstants.h>
 
 #include <AutoDeleter.h>
+#include <util/AutoLock.h>
 #include <util/SinglyLinkedList.h>
 #include <util/DoublyLinkedList.h>
 
 #include "cdda.h"
 #include "cddb.h"
-#include "Lock.h"
 
 
 //#define TRACE_CDDA
@@ -95,7 +96,7 @@ public:
 			const char*		Name() const { return fName; }
 			status_t		SetName(const char* name);
 
-			Semaphore&		Lock();
+			mutex&			Lock();
 
 			Inode*			Find(ino_t id);
 			Inode*			Find(const char* name);
@@ -122,7 +123,7 @@ private:
 			void			_RestoreSharedAttributes();
 			void			_StoreSharedAttributes();
 
-			Semaphore		fLock;
+			mutex			fLock;
 			fs_volume*		fFSVolume;
 			int				fDevice;
 			uint32			fDiscID;
@@ -564,7 +565,6 @@ count_audio_tracks(scsi_toc_toc* toc)
 
 Volume::Volume(fs_volume* fsVolume)
 	:
-	fLock("cdda"),
 	fFSVolume(fsVolume),
 	fDevice(-1),
 	fRootNode(NULL),
@@ -574,6 +574,7 @@ Volume::Volume(fs_volume* fsVolume)
 	fIgnoreCDDBLookupChanges(false),
 	fFirstEntry(NULL)
 {
+	mutex_init(&fLock, "cdda");
 }
 
 
@@ -602,15 +603,13 @@ Volume::~Volume()
 	}
 
 	free(fName);
+	mutex_destroy(&fLock);
 }
 
 
 status_t
 Volume::InitCheck()
 {
-	if (fLock.InitCheck() < B_OK)
-		return B_ERROR;
-
 	return B_OK;
 }
 
@@ -773,7 +772,7 @@ Volume::SetName(const char* name)
 }
 
 
-Semaphore&
+mutex&
 Volume::Lock()
 {
 	return fLock;
@@ -1521,7 +1520,7 @@ static status_t
 cdda_read_fs_stat(fs_volume* _volume, struct fs_info* info)
 {
 	Volume* volume = (Volume*)_volume->private_volume;
-	Locker locker(volume->Lock());
+	MutexLocker locker(volume->Lock());
 
 	// File system flags.
 	info->flags = B_FS_IS_PERSISTENT | B_FS_HAS_ATTR | B_FS_HAS_MIME
@@ -1546,7 +1545,7 @@ static status_t
 cdda_write_fs_stat(fs_volume* _volume, const struct fs_info* info, uint32 mask)
 {
 	Volume* volume = (Volume*)_volume->private_volume;
-	Locker locker(volume->Lock());
+	MutexLocker locker(volume->Lock());
 
 	status_t status = B_BAD_VALUE;
 
@@ -1579,7 +1578,7 @@ cdda_lookup(fs_volume* _volume, fs_vnode* _dir, const char* name, ino_t* _id)
 	if (!S_ISDIR(directory->Type()))
 		return B_NOT_A_DIRECTORY;
 
-	Locker _(volume->Lock());
+	MutexLocker _(volume->Lock());
 
 	Inode* inode = volume->Find(name);
 	if (inode == NULL)
@@ -1603,7 +1602,7 @@ cdda_get_vnode_name(fs_volume* _volume, fs_vnode* _node, char* buffer,
 
 	TRACE(("cdda_get_vnode_name(): inode = %p\n", inode));
 
-	Locker _(volume->Lock());
+	MutexLocker _(volume->Lock());
 	strlcpy(buffer, inode->Name(), bufferSize);
 	return B_OK;
 }
@@ -1801,7 +1800,7 @@ cdda_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 	// we only have a single directory which simplifies things a bit :-)
 
 	Volume *volume = (Volume*)_volume->private_volume;
-	Locker _(volume->Lock());
+	MutexLocker _(volume->Lock());
 
 	Inode* inode = volume->Find(oldName);
 	if (inode == NULL)
@@ -1868,7 +1867,7 @@ cdda_read_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	if ((Inode*)_node->private_node != &volume->RootNode())
 		return B_BAD_VALUE;
 
-	Locker _(volume->Lock());
+	MutexLocker _(volume->Lock());
 
 	dir_cookie* cookie = (dir_cookie*)_cookie;
 	Inode* childNode = NULL;
@@ -1979,7 +1978,7 @@ cdda_open_attr_dir(fs_volume* _volume, fs_vnode* _node, void** _cookie)
 	if (cookie == NULL)
 		return B_NO_MEMORY;
 
-	Locker _(volume->Lock());
+	MutexLocker _(volume->Lock());
 
 	inode->AddAttrCookie(cookie);
 	*_cookie = cookie;
@@ -2001,7 +2000,7 @@ cdda_free_attr_dir_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 	Inode* inode = (Inode*)_node->private_node;
 	attr_cookie* cookie = (attr_cookie*)_cookie;
 
-	Locker _(volume->Lock());
+	MutexLocker _(volume->Lock());
 
 	inode->RemoveAttrCookie(cookie);
 	delete cookie;
@@ -2016,7 +2015,7 @@ cdda_rewind_attr_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 	Inode* inode = (Inode*)_node->private_node;
 	attr_cookie* cookie = (attr_cookie*)_cookie;
 
-	Locker _(volume->Lock());
+	MutexLocker _(volume->Lock());
 
 	inode->RewindAttrCookie(cookie);
 	return B_OK;
@@ -2031,7 +2030,7 @@ cdda_read_attr_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	Inode* inode = (Inode*)_node->private_node;
 	attr_cookie* cookie = (attr_cookie*)_cookie;
 
-	Locker _(volume->Lock());
+	MutexLocker _(volume->Lock());
 	Attribute* attribute = cookie->current;
 
 	if (attribute == NULL) {
@@ -2057,7 +2056,7 @@ cdda_create_attr(fs_volume* _volume, fs_vnode* _node, const char* name,
 	Volume *volume = (Volume*)_volume->private_volume;
 	Inode *inode = (Inode*)_node->private_node;
 
-	Locker _(volume->Lock());
+	MutexLocker _(volume->Lock());
 
 	Attribute* attribute = inode->FindAttribute(name);
 	if (attribute == NULL) {
@@ -2093,7 +2092,7 @@ cdda_open_attr(fs_volume* _volume, fs_vnode* _node, const char* name,
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* inode = (Inode*)_node->private_node;
 
-	Locker _(volume->Lock());
+	MutexLocker _(volume->Lock());
 
 	Attribute* attribute = inode->FindAttribute(name);
 	if (attribute == NULL)
@@ -2129,7 +2128,7 @@ cdda_read_attr(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* inode = (Inode*)_node->private_node;
 
-	Locker _(volume->Lock());
+	MutexLocker _(volume->Lock());
 
 	Attribute* attribute = inode->FindAttribute((const char*)_cookie);
 	if (attribute == NULL)
@@ -2146,7 +2145,7 @@ cdda_write_attr(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* inode = (Inode*)_node->private_node;
 
-	Locker _(volume->Lock());
+	MutexLocker _(volume->Lock());
 
 	Attribute* attribute = inode->FindAttribute((const char*)_cookie);
 	if (attribute == NULL)
@@ -2171,7 +2170,7 @@ cdda_read_attr_stat(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* inode = (Inode*)_node->private_node;
 
-	Locker _(volume->Lock());
+	MutexLocker _(volume->Lock());
 
 	Attribute* attribute = inode->FindAttribute((const char*)_cookie);
 	if (attribute == NULL)
@@ -2199,7 +2198,7 @@ cdda_remove_attr(fs_volume* _volume, fs_vnode* _node, const char* name)
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* inode = (Inode*)_node->private_node;
 
-	Locker _(volume->Lock());
+	MutexLocker _(volume->Lock());
 
 	status_t status = inode->RemoveAttribute(name, true);
 	if (status == B_OK) {
