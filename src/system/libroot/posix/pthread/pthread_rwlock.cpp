@@ -10,7 +10,6 @@
 #include <Debug.h>
 
 #include <AutoLocker.h>
-#include <libroot_lock.h>
 #include <syscalls.h>
 #include <user_mutex_defs.h>
 #include <user_thread.h>
