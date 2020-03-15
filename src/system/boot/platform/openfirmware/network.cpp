@@ -205,12 +205,32 @@ OFEthernetInterface::MACAddress() const
 void *
 OFEthernetInterface::AllocateSendReceiveBuffer(size_t size)
 {
-	void *dmaMemory;
+	void *dmaMemory = NULL;
+
 	if (of_call_method(fHandle, "dma-alloc", 1, 1, size, &dmaMemory)
-			== OF_FAILED) {
-		return NULL;
+			!= OF_FAILED) {
+		return dmaMemory;
 	}
-	return dmaMemory;
+
+	// The dma-alloc method could be on the parent node (PCI bus, for example),
+	// rather than the device itself
+	intptr_t parentPackage = of_parent(of_instance_to_package(fHandle));
+
+	// FIXME surely there's a way to create an instance without going through
+	// the path?
+	char path[256];
+	of_package_to_path(parentPackage, path, sizeof(path));
+	intptr_t parentInstance = of_open(path);
+
+	if (of_call_method(parentInstance, "dma-alloc", 1, 1, size, &dmaMemory)
+			!= OF_FAILED) {
+		of_close(parentInstance);
+		return dmaMemory;
+	}
+
+	of_close(parentInstance);
+
+	return NULL;
 }
 
 
