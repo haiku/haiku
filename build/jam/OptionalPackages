@@ -21,7 +21,7 @@ OptionalPackageDependencies NetFS : UserlandFS ;
 
 # Haiku sources
 if $(HAIKU_INCLUDE_SOURCES) = 1 {
-	AddPackageFilesToHaikuImage _sources_
+	AddPackageFilesToHaikuImage system
 		:
 		haiku_source.hpkg
 		:
@@ -32,7 +32,7 @@ if $(HAIKU_INCLUDE_SOURCES) = 1 {
 
 # BeBook
 if [ IsOptionalHaikuImagePackageAdded BeBook ] {
-	AddHaikuImageSystemPackages be_book ;
+	AddHaikuImagePackages be_book ;
 	AddSymlinkToHaikuImage home Desktop
 		: /boot/system/documentation/BeBook/index.html
 		: BeBook ;
@@ -66,18 +66,18 @@ if [ IsOptionalHaikuImagePackageAdded BeOSCompatibility ] {
 # Development
 if [ IsOptionalHaikuImagePackageAdded Development ] {
 	# autotools and perl
-	AddHaikuImageDisabledPackages autoconf automake perl texinfo ;
+	AddHaikuImagePackages autoconf automake perl texinfo ;
 	AddHaikuImageSourcePackages autoconf automake texinfo ;
 
 	# some other build tools
-	AddHaikuImageDisabledPackages pkgconfig scons ;
+	AddHaikuImagePackages pkgconfig scons ;
 	AddHaikuImageSourcePackages pkgconfig ;
 
 	# devel packages for some of the base set
 	local architectureObject ;
 	for architectureObject in [ MultiArchSubDirSetup ] {
 		on $(architectureObject) {
-			AddHaikuImageDisabledPackages curl_devel glu_devel jpeg_devel
+			AddHaikuImagePackages curl_devel glu_devel jpeg_devel
 				libpng16_devel zlib_devel ;
 		}
 	}
@@ -90,13 +90,13 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ] {
 	local architectureObject ;
 	for architectureObject in [ MultiArchSubDirSetup ] {
 		on $(architectureObject) {
-			AddHaikuImageDisabledPackages binutils gcc ;
+			AddHaikuImagePackages binutils gcc ;
 			AddHaikuImageSourcePackages binutils gcc ;
 		}
 	}
 
 	# other commonly used tools
-	AddHaikuImageDisabledPackages bison cdrtools flex jam m4 make mkdepend nasm patch ;
+	AddHaikuImagePackages bison cdrtools flex jam m4 make mkdepend nasm patch ;
 	AddHaikuImageSourcePackages bison cdrtools m4 make patch ;
 }
 
@@ -104,7 +104,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ] {
 # DevelopmentMin
 if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ]
 		&& ( $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 ) {
-	AddPackageFilesToHaikuImage _packages_
+	AddPackageFilesToHaikuImage system
 		:
 		haiku_devel.hpkg
 		haiku_$(TARGET_PACKAGING_ARCHS[2-])_devel.hpkg
@@ -113,7 +113,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ]
 		;
 
 	if $(HAIKU_IS_BOOTSTRAP) != 1 {
-		AddPackageFilesToHaikuImage _packages_
+		AddPackageFilesToHaikuImage system
 			:
 			makefile_engine.hpkg
 			:
@@ -125,7 +125,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ]
 
 # Git
 if [ IsOptionalHaikuImagePackageAdded Git ] {
-	AddHaikuImageSystemPackages git git_daemon ;
+	AddHaikuImagePackages git git_daemon ;
 	AddHaikuImageSourcePackages git ;
 }
 
@@ -136,7 +136,7 @@ if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
 	for architectureObject in [ MultiArchSubDirSetup ] {
 		on $(architectureObject) {
 			if [ FIsBuildFeatureEnabled webpositive ] {
-				AddPackageFilesToHaikuImage system packages : webpositive.hpkg
+				AddPackageFilesToHaikuImage system : webpositive.hpkg
 					: nameFromMetaInfo ;
 				break ;
 			}
@@ -147,26 +147,42 @@ if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
 
 # Welcome
 if [ IsOptionalHaikuImagePackageAdded Welcome ] {
-	AddPackageFilesToHaikuImage system packages :
-		haiku_userguide_ca.hpkg
-		haiku_userguide_de.hpkg
-		haiku_userguide_en.hpkg
-		haiku_userguide_es.hpkg
-		haiku_userguide_fi.hpkg
-		haiku_userguide_fr.hpkg
-		haiku_userguide_hu.hpkg
-		haiku_userguide_it.hpkg
-		haiku_userguide_jp.hpkg
-		haiku_userguide_pl.hpkg
-		haiku_userguide_pt_BR.hpkg
-		haiku_userguide_pt_PT.hpkg
-		haiku_userguide_ru.hpkg
-		haiku_userguide_sk.hpkg
-		haiku_userguide_sv_SE.hpkg
-		haiku_userguide_uk.hpkg
-		haiku_userguide_zh_CN.hpkg
-		haiku_welcome.hpkg
+	AddPackageFilesToHaikuImage system : haiku_userguide_ca.hpkg
 		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_de.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_en.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_es.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_fi.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_fr.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_hu.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_it.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_jp.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_pl.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_pt_BR.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_pt_PT.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_ru.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_sk.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_sv_SE.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_uk.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_zh_CN.hpkg
+		: nameFromMetaInfo ;
+
+	AddPackageFilesToHaikuImage system : haiku_welcome.hpkg : nameFromMetaInfo ;
 
 	AddSymlinkToHaikuImage home Desktop	: /boot/system/bin/quicktour
 		: Quick\ Tour ;

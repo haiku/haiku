@@ -79,7 +79,7 @@ rule DefineDefaultBuildProfiles
 				HAIKU_IMAGE_SIZE ?= 690 ;
 			}
 
-			AddHaikuImageSystemPackages
+			AddHaikuImagePackages
 				bepdf
 				keymapswitcher
 				llvm
@@ -112,7 +112,7 @@ rule DefineDefaultBuildProfiles
 			local architectureObject ;
 			for architectureObject in [ MultiArchSubDirSetup ] {
 				on $(architectureObject) {
-					AddHaikuImageSystemPackages openssl wonderbrush@gcc2 ;
+					AddHaikuImagePackages openssl wonderbrush@gcc2 ;
 				}
 			}
 
@@ -124,6 +124,11 @@ rule DefineDefaultBuildProfiles
 			} else {
 				Echo "WebPositive not available on $(HAIKU_PACKAGING_ARCHS)" ;
 			}
+		}
+
+		case "alpha-*" : {
+			Echo The alpha-* build profiles have been renamed to release-* ;
+			Exit ;
 		}
 
 		case "nightly-*" : {
@@ -138,7 +143,7 @@ rule DefineDefaultBuildProfiles
 			HAIKU_IMAGE_SIZE ?= 600 ;
 			HAIKU_NIGHTLY_BUILD = 1 ;
 
-			AddHaikuImageSystemPackages
+			AddHaikuImagePackages
 				man
 				nano
 				noto
@@ -177,7 +182,7 @@ rule DefineDefaultBuildProfiles
 				HAIKU_IMAGE_SIZE ?= 450 ;
 			}
 
-			AddHaikuImageSystemPackages
+			AddHaikuImagePackages
 				openssl
 				;
 		}
@@ -187,58 +192,53 @@ rule DefineDefaultBuildProfiles
 			HAIKU_IMAGE_HOST_NAME ?= shredder ;
 			HAIKU_IMAGE_SIZE ?= 20000 ;
 
-			AddHaikuImageSystemPackages
+			AddHaikuImagePackages
 				binutils
 				bison
+				curl_devel
 				expat
 				flex
+				freetype_devel
 				gawk
 				gcc
 				grep
 				haikuporter
 				less
 				libedit
+				libedit_devel
 				m4
 				make
 				ncurses6
+				ncurses6_devel
 				noto
 				python
 				sed
 				texinfo
-				;
-
-			AddHaikuImageDisabledPackages
-				curl_devel
-				freetype_devel
-				libedit_devel
-				ncurses6_devel
 				zlib_devel
-			;
+				;
 
 			# secondary architecture packages
 			local architectureObject ;
 			for architectureObject
 					in [ MultiArchSubDirSetup $(TARGET_PACKAGING_ARCHS[2-]) ] {
 				on $(architectureObject) {
-					AddHaikuImageSystemPackages
+					AddHaikuImagePackages
 						binutils
 						curl
+						curl_devel
 						expat
 						freetype
+						freetype_devel
 						gcc
 						icu
 						libsolv
 						libedit
-						ncurses6
-						zlib
-						;
-					AddHaikuImageDisabledPackages
-						curl_devel
-						freetype_devel
 						libedit_devel
+						ncurses6
 						ncurses6_devel
+						zlib
 						zlib_devel
-					;
+						;
 				}
 			}
 

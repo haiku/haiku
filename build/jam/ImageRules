@@ -1039,12 +1039,13 @@ rule AddPackageFilesToHaikuImage location : packages : flags
 	HAIKU_PACKAGES_IN_IMAGE on $(HAIKU_IMAGE_CONTAINER_NAME)
 		= [ on $(HAIKU_IMAGE_CONTAINER_NAME) return $(HAIKU_PACKAGES_IN_IMAGE) ]
 			$(packages) ;
+	HAIKU_PACKAGE_INSTALLATION_LOCATION on $(packages) = $(location) ;
 
 	if nameFromMetaInfo in $(flags) {
-		AddFilesToHaikuImage $(location) : $(packages)
+		AddFilesToHaikuImage $(location) packages : $(packages)
 			: packageFileName : computeName ;
 	} else {
-		AddFilesToHaikuImage $(location) : $(packages) ;
+		AddFilesToHaikuImage $(location) packages : $(packages) ;
 	}
 }
 
@@ -1096,10 +1097,10 @@ rule OptionalPackageDependencies package : dependencies
 }
 
 
-rule AddHaikuImagePackages packages : directory
+rule AddHaikuImagePackages packages
 {
-	# AddHaikuImagePackages <packages> : <directory> ;
-	# Adds the given packages <packages> to the image in the given directory.
+	# AddHaikuImagePackages <packages> ;
+	# Adds the given packages <packages> to the image.
 
 	packages = [ FFilterByBuildFeatures $(packages) ] ;
 
@@ -1123,7 +1124,7 @@ rule AddHaikuImagePackages packages : directory
 				HAIKU_INCLUDE_IN_IMAGE on $(file) = 1 ;
 			}
 
-			AddPackageFilesToHaikuImage $(directory) : $(file) ;
+			AddPackageFilesToHaikuImage system : $(file) ;
 		}
 	}
 }
@@ -1134,26 +1135,8 @@ rule AddHaikuImageSourcePackages packages
 	# Adds the given source packages for <packages> to the image.
 
 	if $(HAIKU_INCLUDE_SOURCES) = 1 {
-		AddHaikuImagePackages $(packages)_source : _sources_ ;
+		AddHaikuImagePackages $(packages)_source ;
 	}
-}
-
-rule AddHaikuImageSystemPackages packages
-{
-	# AddHaikuImageSystemPackages <packages> ;
-	# Adds the given packages for <packages> to the image, in the system
-	# directory, so they will be activated on first boot.
-
-	AddHaikuImagePackages $(packages) : system packages ;
-}
-
-rule AddHaikuImageDisabledPackages packages
-{
-	# AddHaikuImageDisabledPackages <packages> ;
-	# Adds the given packages for <packages> to the image, in the _packages_
-	# directory, so they can be later enabled in Installer.
-
-	AddHaikuImagePackages $(packages) : _packages_ ;
 }
 
 rule IsHaikuImagePackageAdded package
