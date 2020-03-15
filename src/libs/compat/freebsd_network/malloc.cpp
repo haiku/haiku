@@ -13,6 +13,7 @@ extern "C" {
 
 #include <util/BitUtils.h>
 
+#include <kernel/heap.h>
 #include <kernel/vm/vm.h>
 
 
