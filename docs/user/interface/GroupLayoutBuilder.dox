@@ -1,20 +1,21 @@
 /*
- * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Copyright 2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Name, email@email.com
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  *
  * Corresponds to:
  *		headers/os/interface/GroupLayoutBuilder.h	hrev45833
- *		src/kits/<kitname>/GroupLayoutBuilder.cpp	hrev38207
+ *		src/kits/interface/GroupLayoutBuilder.cpp	hrev38207
  */
 
 
 /*!
 	\file GroupLayoutBuilder.h
 	\ingroup layout
-	\brief Undocumented file.
+	\ingroup libbe
+	\brief Provides \b deprecated GroupLayoutBuilder class.
 
 	\since Haiku R1
 */
@@ -22,9 +23,16 @@
 
 /*!
 	\class BGroupLayoutBuilder
-	\ingroup layout
 	\ingroup libbe
-	\brief Undocumented class.
+	\brief \b Deprecated helper class that helps building a \ref BGroupLayout.
+
+	The modern builder can be found in \ref BLayoutBuilder::Group<>.
+
+	This builder supports nested group layouts. See \ref AddGroup() and
+	\ref End().
+
+	\warning This class is deprecated and should not be used in new projects.
+		It may be removed in newer releases.
 
 	\since Haiku R1
 */
@@ -32,13 +40,10 @@
 
 /*!
 	\fn BGroupLayoutBuilder::BGroupLayoutBuilder(orientation orientation=B_HORIZONTAL, float spacing=B_USE_DEFAULT_SPACING)
-	\brief Undocumented public method
+	\brief Create a new layout builder with a new underlying BGroupLayout.
 
-	\param orientation Undocumented
-	\param spacing Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\param orientation The orientation of the group.
+	\param spacing The spacing between items.
 
 	\since Haiku R1
 */
@@ -46,12 +51,9 @@
 
 /*!
 	\fn BGroupLayoutBuilder::BGroupLayoutBuilder(BGroupLayout *layout)
-	\brief Undocumented public method
+	\brief Create a new layout builder that operates on \a layout.
 
-	\param layout Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\param layout The existing layout you want the builder to alter.
 
 	\since Haiku R1
 */
@@ -59,12 +61,9 @@
 
 /*!
 	\fn BGroupLayoutBuilder::BGroupLayoutBuilder(BGroupView *view)
-	\brief Undocumented public method
+	\brief Create a new layout builder that operates on \a view.
 
-	\param view Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\param view The existing group view you want the builder to alter.
 
 	\since Haiku R1
 */
@@ -72,10 +71,9 @@
 
 /*!
 	\fn BGroupLayout* BGroupLayoutBuilder::RootLayout() const
-	\brief Undocumented public method
+	\brief Get a reference to the closest underlying \ref BGroupLayout.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return A borrowed pointer to the current underlaying layout.
 
 	\since Haiku R1
 */
@@ -83,10 +81,9 @@
 
 /*!
 	\fn BGroupLayout* BGroupLayoutBuilder::TopLayout() const
-	\brief Undocumented public method
+	\brief Get a reference to the highest underlying \ref BGroupLayout.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return A borrowed pointer to the current underlaying layout.
 
 	\since Haiku R1
 */
@@ -94,12 +91,13 @@
 
 /*!
 	\fn BGroupLayoutBuilder& BGroupLayoutBuilder::GetTopLayout(BGroupLayout **_layout)
-	\brief Undocumented public method
+	\brief Get a reference to the highest underlying \ref BGroupLayout.
 
-	\param _layout Undocumented
+	\param[out] _layout The variable to store a borrowed pointer to the
+		highest underlying layout.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
 
 	\since Haiku R1
 */
@@ -107,10 +105,12 @@
 
 /*!
 	\fn BView* BGroupLayoutBuilder::TopView() const
-	\brief Undocumented public method
+	\brief Get a reference to the owning \ref BView.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	Returns the same BView* as BLayout::Owner(), this method is inherited from
+	BLayoutItem.
+
+	\return A borrowed pointer to the owning \ref BView.
 
 	\since Haiku R1
 */
@@ -118,12 +118,13 @@
 
 /*!
 	\fn BGroupLayoutBuilder& BGroupLayoutBuilder::GetTopView(BView **_view)
-	\brief Undocumented public method
+	\brief Get a reference to the owning \ref BView.
 
-	\param _view Undocumented
+	\param[out] _view The variable to store the borrowed pointer to the owning
+		\ref BView.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
 
 	\since Haiku R1
 */
@@ -131,12 +132,12 @@
 
 /*!
 	\fn BGroupLayoutBuilder& BGroupLayoutBuilder::Add(BView *view)
-	\brief Undocumented public method
+	\brief Add a \a view to the underlying \ref BGroupLayout.
 
-	\param view Undocumented
+	\param view The BView to add.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
 
 	\since Haiku R1
 */
@@ -144,13 +145,13 @@
 
 /*!
 	\fn BGroupLayoutBuilder& BGroupLayoutBuilder::Add(BView *view, float weight)
-	\brief Undocumented public method
+	\brief Add a \a view to the underlying \ref BGroupLayout.
 
-	\param view Undocumented
-	\param weight Undocumented
+	\param view The BView to add.
+	\param weight The weight of this view within the group.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
 
 	\since Haiku R1
 */
@@ -158,12 +159,12 @@
 
 /*!
 	\fn BGroupLayoutBuilder& BGroupLayoutBuilder::Add(BLayoutItem *item)
-	\brief Undocumented public method
+	\brief Add a \ref BLayoutItem to the underlying \ref BGroupLayout.
 
-	\param item Undocumented
+	\param item The BLayoutItem to add.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
 
 	\since Haiku R1
 */
@@ -171,13 +172,13 @@
 
 /*!
 	\fn BGroupLayoutBuilder& BGroupLayoutBuilder::Add(BLayoutItem *item, float weight)
-	\brief Undocumented public method
+	\brief Add a \ref BLayoutItem to the underlying \ref BGroupLayout.
 
-	\param item Undocumented
-	\param weight Undocumented
+	\param item The BLayoutItem to add.
+	\param weight The weight of this view within the group.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
 
 	\since Haiku R1
 */
@@ -185,14 +186,15 @@
 
 /*!
 	\fn BGroupLayoutBuilder& BGroupLayoutBuilder::AddGroup(orientation orientation, float spacing=B_USE_DEFAULT_SPACING, float weight=1.0f)
-	\brief Undocumented public method
+	\brief Add a subgroup to this layout, and return a reference to a builder
+		that works on that subgroup.
 
-	\param orientation Undocumented
-	\param spacing Undocumented
-	\param weight Undocumented
+	\param orientation The orientation of the subgroup.
+	\param spacing The spacing between elements of the subgroup.
+	\param weight The weight of the subgroup in the current group.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The method returns a reference to a builder that works on the newly
+	added group. See \ref End().
 
 	\since Haiku R1
 */
@@ -200,10 +202,15 @@
 
 /*!
 	\fn BGroupLayoutBuilder& BGroupLayoutBuilder::End()
-	\brief Undocumented public method
+	\brief Get a reference to a builder of the parent of the current subgroup.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	When you are currently in a subgroup, you may use this method to go back to
+	the higher level layout.
+
+	\return The method returns a reference to a builder that works on the
+		parent of the current subgroup. If you use this method on a toplevel
+		group, the returned reference will be unchanged from the level that you
+		are currently working on.
 
 	\since Haiku R1
 */
@@ -211,12 +218,12 @@
 
 /*!
 	\fn BGroupLayoutBuilder& BGroupLayoutBuilder::AddGlue(float weight=1.0f)
-	\brief Undocumented public method
+	\brief Set the glue for the top level group.
 
-	\param weight Undocumented
+	\param weight The weight of the glue.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
 
 	\since Haiku R1
 */
@@ -224,12 +231,12 @@
 
 /*!
 	\fn BGroupLayoutBuilder& BGroupLayoutBuilder::AddStrut(float size)
-	\brief Undocumented public method
+	\brief Add a strut to the current group.
 
-	\param size Undocumented
+	\param size The size of the strut.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
 
 	\since Haiku R1
 */
@@ -237,15 +244,15 @@
 
 /*!
 	\fn BGroupLayoutBuilder& BGroupLayoutBuilder::SetInsets(float left, float top, float right, float bottom)
-	\brief Undocumented public method
+	\brief Set the insets of the top level group.
 
-	\param left Undocumented
-	\param top Undocumented
-	\param right Undocumented
-	\param bottom Undocumented
+	\param left The left inset.
+	\param top The top inset.
+	\param right The right inset.
+	\param bottom The bottom inset.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
 
 	\since Haiku R1
 */
@@ -253,10 +260,9 @@
 
 /*!
 	\fn BGroupLayoutBuilder::operator BGroupLayout *()
-	\brief Undocumented public method
+	\brief Cast the builder to the underlying \ref BGroupLayout.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	Convenience method for the \ref RootLayout() method. 
 
 	\since Haiku R1
 */

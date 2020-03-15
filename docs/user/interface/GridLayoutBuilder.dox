@@ -1,9 +1,9 @@
 /*
- * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Copyright 2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Name, email@email.com
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  *
  * Corresponds to:
  *		headers/os/interface/GridLayoutBuilder.h	hrev38512
@@ -13,8 +13,8 @@
 
 /*!
 	\file GridLayoutBuilder.h
-	\ingroup layout
-	\brief Undocumented file.
+	\ingroup libbe
+	\brief Provides \b deprecated GridLayoutBuilder class.
 
 	\since Haiku R1
 */
@@ -24,7 +24,12 @@
 	\class BGridLayoutBuilder
 	\ingroup layout
 	\ingroup libbe
-	\brief Undocumented class.
+	\brief \b Deprecated helper class that helps building a \ref BGridLayout.
+
+	The modern builder can be found in \ref BLayoutBuilder::Grid<>.
+
+	\warning This class is deprecated and should not be used in new projects.
+		It may be removed in newer releases.
 
 	\since Haiku R1
 */
@@ -32,13 +37,10 @@
 
 /*!
 	\fn BGridLayoutBuilder::BGridLayoutBuilder(float horizontal=B_USE_DEFAULT_SPACING, float vertical=B_USE_DEFAULT_SPACING)
-	\brief Undocumented public method
+	\brief Create a new layout builder with a new underlying \ref BGridLayout.
 
-	\param horizontal Undocumented
-	\param vertical Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\param horizontal Horizontal spacing.
+	\param vertical Vertical Spacing
 
 	\since Haiku R1
 */
@@ -46,12 +48,9 @@
 
 /*!
 	\fn BGridLayoutBuilder::BGridLayoutBuilder(BGridLayout *layout)
-	\brief Undocumented public method
+	\brief Create a new layout builder that operates on a \a layout.
 
-	\param layout Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\param layout The existing layout you want the builder to alter.
 
 	\since Haiku R1
 */
@@ -59,12 +58,9 @@
 
 /*!
 	\fn BGridLayoutBuilder::BGridLayoutBuilder(BGridView *view)
-	\brief Undocumented public method
+	\brief Create a new layout builder that operates on a \a view.
 
-	\param view Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\param view The existing grid view you want the builder to alter.
 
 	\since Haiku R1
 */
@@ -72,10 +68,9 @@
 
 /*!
 	\fn BGridLayout* BGridLayoutBuilder::GridLayout() const
-	\brief Undocumented public method
+	\brief Get a reference to the underlying \ref BGridLayout.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return A borrowed pointer to the current underlaying layout.
 
 	\since Haiku R1
 */
@@ -83,12 +78,13 @@
 
 /*!
 	\fn BGridLayoutBuilder& BGridLayoutBuilder::GetGridLayout(BGridLayout **_layout)
-	\brief Undocumented public method
+	\brief Get a reference to the underlying \ref BGridLayout.
 
-	\param _layout Undocumented
+	\param[out] _layout The variable to store a borrowed pointer to the
+		underlying layout.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
 
 	\since Haiku R1
 */
@@ -96,10 +92,12 @@
 
 /*!
 	\fn BView* BGridLayoutBuilder::View() const
-	\brief Undocumented public method
+	\brief Get a reference to the owning \ref BView.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	Returns the same BView* as BLayout::Owner(), this method is inherited from
+	BLayoutItem.
+
+	\return A borrowed pointer to the owning \ref BView.
 
 	\since Haiku R1
 */
@@ -107,12 +105,13 @@
 
 /*!
 	\fn BGridLayoutBuilder& BGridLayoutBuilder::GetView(BView **_view)
-	\brief Undocumented public method
+	\brief Get a reference to the owning \ref BView.
 
-	\param _view Undocumented
+	\param[out] _view The variable to store the borrowed pointer to the owning
+		\ref BView.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
 
 	\since Haiku R1
 */
@@ -120,16 +119,16 @@
 
 /*!
 	\fn BGridLayoutBuilder& BGridLayoutBuilder::Add(BView *view, int32 column, int32 row, int32 columnCount=1, int32 rowCount=1)
-	\brief Undocumented public method
+	\brief Add a \a view to the underlying \ref BGridLayout.
 
-	\param view Undocumented
-	\param column Undocumented
-	\param row Undocumented
-	\param columnCount Undocumented
-	\param rowCount Undocumented
+	\param view The BView to add.
+	\param column The column number (zero-based) to use.
+	\param row The row number (zero-based) to use.
+	\param columnCount The number of columns to span over.
+	\param rowCount The number of rows to span over.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
 
 	\since Haiku R1
 */
@@ -137,16 +136,16 @@
 
 /*!
 	\fn BGridLayoutBuilder& BGridLayoutBuilder::Add(BLayoutItem *item, int32 column, int32 row, int32 columnCount=1, int32 rowCount=1)
-	\brief Undocumented public method
+	\brief Add a \ref BLayoutItem to the underlying \ref BGridLayout.
 
-	\param item Undocumented
-	\param column Undocumented
-	\param row Undocumented
-	\param columnCount Undocumented
-	\param rowCount Undocumented
+	\param item The \ref BLayoutItem to add.
+	\param column The column number (zero-index) to use.
+	\param row The row number (zero-index) to use.
+	\param columnCount The number of columns to span over.
+	\param rowCount The number of rows to span over.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
 
 	\since Haiku R1
 */
@@ -154,13 +153,13 @@
 
 /*!
 	\fn BGridLayoutBuilder& BGridLayoutBuilder::SetColumnWeight(int32 column, float weight)
-	\brief Undocumented public method
+	\brief Set the weight for \a column to \a weight.
 
-	\param column Undocumented
-	\param weight Undocumented
+	\param column The column to set.
+	\param weight The weight to set.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
 
 	\since Haiku R1
 */
@@ -168,13 +167,13 @@
 
 /*!
 	\fn BGridLayoutBuilder& BGridLayoutBuilder::SetRowWeight(int32 row, float weight)
-	\brief Undocumented public method
+	\brief Set the weight of \a row to \a weight.
 
-	\param row Undocumented
-	\param weight Undocumented
+	\param row The \a row number.
+	\param weight The \a weight to set.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
 
 	\since Haiku R1
 */
@@ -182,15 +181,15 @@
 
 /*!
 	\fn BGridLayoutBuilder& BGridLayoutBuilder::SetInsets(float left, float top, float right, float bottom)
-	\brief Undocumented public method
+	\brief Set the insets for the layout.
 
-	\param left Undocumented
-	\param top Undocumented
-	\param right Undocumented
-	\param bottom Undocumented
+	\param left The left inset as a \c float.
+	\param top The top inset as a \c float.
+	\param right The right inset as a \c float.
+	\param bottom The bottom inset as a \c float.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
 
 	\since Haiku R1
 */
@@ -198,10 +197,9 @@
 
 /*!
 	\fn BGridLayoutBuilder::operator BGridLayout *()
-	\brief Undocumented public method
+	\brief Casts the builder to the underlying \ref BGridLayout.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	Convenience method for the \ref GridLayout() method.
 
 	\since Haiku R1
 */

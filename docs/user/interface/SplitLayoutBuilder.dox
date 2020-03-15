@@ -1,9 +1,9 @@
 /*
- * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Copyright 2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Name, email@email.com
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  *
  * Corresponds to:
  *		headers/os/interface/SplitLayoutBuilder.h	hrev45833
@@ -14,7 +14,8 @@
 /*!
 	\file SplitLayoutBuilder.h
 	\ingroup layout
-	\brief Undocumented file.
+	\ingroup libbe
+	\brief Provides \b deprecated SplitLayoutBuilder class.
 
 	\since Haiku R1
 */
@@ -22,9 +23,13 @@
 
 /*!
 	\class BSplitLayoutBuilder
-	\ingroup layout
 	\ingroup libbe
-	\brief Undocumented class.
+	\brief \b Deprecated helper class that helps building a \ref BSplitView.
+
+	The modern builder can be found in \ref BLayoutBuilder::Split<>.
+
+	\warning This class is deprecated and should not be used in new projects.
+		It may be removed in newer releases.
 
 	\since Haiku R1
 */
@@ -32,13 +37,10 @@
 
 /*!
 	\fn BSplitLayoutBuilder::BSplitLayoutBuilder(orientation orientation=B_HORIZONTAL, float spacing=B_USE_DEFAULT_SPACING)
-	\brief Undocumented public method
+	\brief Create a new layout builder with an underlying \ref BSplitView.
 
-	\param orientation Undocumented
-	\param spacing Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\param orientation The orientation of the split view.
+	\param spacing The spacing of items within the split view.
 
 	\since Haiku R1
 */
@@ -46,12 +48,9 @@
 
 /*!
 	\fn BSplitLayoutBuilder::BSplitLayoutBuilder(BSplitView *view)
-	\brief Undocumented public method
+	\brief Create a new layout builder that operates on an existing \a view.
 
-	\param view Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\param view The existing view you want the builder to alter.
 
 	\since Haiku R1
 */
@@ -59,10 +58,9 @@
 
 /*!
 	\fn BSplitView* BSplitLayoutBuilder::SplitView() const
-	\brief Undocumented public method
+	\brief Get a reference to the underlying \ref BSplitView.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return A borrowed pointer to the current underlaying view.
 
 	\since Haiku R1
 */
@@ -70,12 +68,13 @@
 
 /*!
 	\fn BSplitLayoutBuilder& BSplitLayoutBuilder::GetSplitView(BSplitView **view)
-	\brief Undocumented public method
+	\brief Get a reference to the underlying \ref BSplitView.
 
-	\param view Undocumented
+	\param[out] view The variable to store a borrowed pointer to the
+		underlying view.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
 
 	\since Haiku R1
 */
@@ -83,12 +82,12 @@
 
 /*!
 	\fn BSplitLayoutBuilder& BSplitLayoutBuilder::Add(BView *view)
-	\brief Undocumented public method
+	\brief Add a \a view to the underlying \ref BSplitView.
 
-	\param view Undocumented
+	\param view The \ref BView to add.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
 
 	\since Haiku R1
 */
@@ -96,13 +95,13 @@
 
 /*!
 	\fn BSplitLayoutBuilder& BSplitLayoutBuilder::Add(BView *view, float weight)
-	\brief Undocumented public method
+	\brief Add a \a view to the underlying \ref BSplitView.
 
-	\param view Undocumented
-	\param weight Undocumented
+	\param view The \ref BView to add.
+	\param weight The weight of the item.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
 
 	\since Haiku R1
 */
@@ -110,12 +109,12 @@
 
 /*!
 	\fn BSplitLayoutBuilder& BSplitLayoutBuilder::Add(BLayoutItem *item)
-	\brief Undocumented public method
+	\brief Add a \ref BLayoutItem to the underlying \ref BSplitView.
 
-	\param item Undocumented
+	\param item The \ref BLayoutItem to add.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
 
 	\since Haiku R1
 */
@@ -123,13 +122,13 @@
 
 /*!
 	\fn BSplitLayoutBuilder& BSplitLayoutBuilder::Add(BLayoutItem *item, float weight)
-	\brief Undocumented public method
+	\brief Add a \ref BLayoutItem to the underlying \ref BSplitView.
 
-	\param item Undocumented
-	\param weight Undocumented
+	\param item The \ref BLayoutItem to add.
+	\param weight The weight of the \a item.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
 
 	\since Haiku R1
 */
@@ -137,12 +136,12 @@
 
 /*!
 	\fn BSplitLayoutBuilder& BSplitLayoutBuilder::SetCollapsible(bool collapsible)
-	\brief Undocumented public method
+	\brief Set the collapsability of the most recently added item.
 
-	\param collapsible Undocumented
+	\param collapsible \c true if the item is collapsible, \c false otherwise.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
 
 	\since Haiku R1
 */
@@ -150,15 +149,15 @@
 
 /*!
 	\fn BSplitLayoutBuilder& BSplitLayoutBuilder::SetInsets(float left, float top, float right, float bottom)
-	\brief Undocumented public method
+	\brief Set the insets of the underlying \ref BSplitView.
 
-	\param left Undocumented
-	\param top Undocumented
-	\param right Undocumented
-	\param bottom Undocumented
+	\param left The left inset.
+	\param top The top inset.
+	\param right The right inset.
+	\param bottom The bottom inset.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
 
 	\since Haiku R1
 */
@@ -166,10 +165,9 @@
 
 /*!
 	\fn BSplitLayoutBuilder::operator BSplitView *()
-	\brief Undocumented public method
+	\brief Cast the builder to the underlying \ref BSplitView.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	Convenience method for the \ref SplitView() method. 
 
 	\since Haiku R1
 */
