@@ -893,6 +893,53 @@ get_next_attr(device_node* node, device_attr** _attr)
 }
 
 
+static status_t
+find_child_node(device_node* parent, const device_attr* attributes,
+	device_node** _node, bool *_lastFound)
+{
+	RecursiveLocker _(sLock);
+
+	NodeList::ConstIterator iterator = parent->Children().GetIterator();
+	device_node* last = *_node;
+
+	// find the next one that fits
+	while (iterator.HasNext()) {
+		device_node* node = iterator.Next();
+
+		if (!node->IsRegistered())
+			continue;
+
+		if (node == last)
+			*_lastFound = true;
+		else if (!node->CompareTo(attributes) && *_lastFound) {
+			if (last != NULL)
+				last->Release();
+
+			node->Acquire();
+			*_node = node;
+			return B_OK;
+		}
+		if (find_child_node(node, attributes, _node, _lastFound) == B_OK)
+			return B_OK;
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+static status_t
+find_child_node(device_node* parent, const device_attr* attributes,
+	device_node** _node)
+{
+	device_node* last = *_node;
+	bool lastFound = last == NULL;
+	status_t status = find_child_node(parent, attributes, _node, &lastFound);
+	if (status == B_ENTRY_NOT_FOUND && last != NULL && lastFound)
+		last->Release();
+	return status;
+}
+
+
 struct device_manager_info gDeviceManagerModule = {
 	{
 		B_DEVICE_MANAGER_MODULE_NAME,
@@ -928,6 +975,7 @@ struct device_manager_info gDeviceManagerModule = {
 	get_attr_string,
 	get_attr_raw,
 	get_next_attr,
+	find_child_node
 };
 
 

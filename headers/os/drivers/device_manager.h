@@ -101,6 +101,10 @@ typedef struct device_manager_info {
 					const void **_data, size_t *_size, bool recursive);
 
 	status_t (*get_next_attr)(device_node *node, device_attr **_attr);
+
+	status_t (*find_child_node)(device_node *parent,
+					const device_attr *attrs, device_node **node);
+
 } device_manager_info;
 
 
