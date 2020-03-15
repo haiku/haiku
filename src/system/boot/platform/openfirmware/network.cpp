@@ -1,6 +1,7 @@
 /*
  * Copyright 2005, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
  * Copyright 2010, Andreas Faerber <andreas.faerber@web.de>
+ * Copyright 2002, Adrien Destugues <pulkomandy@pulkomandy.tk>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -30,22 +31,25 @@
 
 class OFEthernetInterface : public EthernetInterface {
 public:
-	OFEthernetInterface();
-	virtual ~OFEthernetInterface();
+						OFEthernetInterface();
+	virtual				~OFEthernetInterface();
 
-	status_t Init(const char *device, const char *parameters);
+			status_t	Init(const char *device, const char *parameters);
 
-	virtual mac_addr_t MACAddress() const;
+	virtual mac_addr_t	MACAddress() const;
 
-	virtual	void *AllocateSendReceiveBuffer(size_t size);
-	virtual	void FreeSendReceiveBuffer(void *buffer);
+	virtual	void *		AllocateSendReceiveBuffer(size_t size);
+	virtual	void		FreeSendReceiveBuffer(void *buffer);
 
-	virtual ssize_t Send(const void *buffer, size_t size);
-	virtual ssize_t Receive(void *buffer, size_t size);
+	virtual ssize_t		Send(const void *buffer, size_t size);
+	virtual ssize_t		Receive(void *buffer, size_t size);
 
 private:
-	intptr_t	fHandle;
-	mac_addr_t	fMACAddress;
+			status_t	FindMACAddress();
+
+private:
+			intptr_t	fHandle;
+			mac_addr_t	fMACAddress;
 };
 
 
@@ -97,6 +101,40 @@ OFEthernetInterface::~OFEthernetInterface()
 
 
 status_t
+OFEthernetInterface::FindMACAddress()
+{
+	intptr_t package = of_instance_to_package(fHandle);
+
+	// get MAC address
+	int bytesRead = of_getprop(package, "local-mac-address", &fMACAddress,
+		sizeof(fMACAddress));
+	if (bytesRead == (int)sizeof(fMACAddress))
+		return B_OK;
+
+	// Failed to get the MAC address of the network device. The system may
+	// have a global standard MAC address.
+	bytesRead = of_getprop(gChosen, "mac-address", &fMACAddress,
+		sizeof(fMACAddress));
+	if (bytesRead == (int)sizeof(fMACAddress)) {
+		return B_OK;
+	}
+
+	// On Sun machines, there is a global word 'mac-address' which returns
+	// the size and a pointer to the MAC address
+	size_t size;
+	void* ptr;
+	if (of_interpret("mac-address", 0, 2, &size, &ptr) != OF_FAILED) {
+		if (size == sizeof(fMACAddress)) {
+			memcpy(&fMACAddress, ptr, size);
+			return B_OK;
+		}
+	}
+
+	return B_ERROR;
+}
+
+
+status_t
 OFEthernetInterface::Init(const char *device, const char *parameters)
 {
 	if (!device)
@@ -109,20 +147,9 @@ OFEthernetInterface::Init(const char *device, const char *parameters)
 		return B_ERROR;
 	}
 
-	intptr_t package = of_instance_to_package(fHandle);
-
-	// get MAC address
-	int bytesRead = of_getprop(package, "local-mac-address", &fMACAddress,
-		sizeof(fMACAddress));
-	if (bytesRead == OF_FAILED || bytesRead < (int)sizeof(fMACAddress)) {
-		// Failed to get the MAC address of the network device. The system may
-		// have a global standard MAC address.
-		bytesRead = of_getprop(gChosen, "mac-address", &fMACAddress,
-			sizeof(fMACAddress));
-		if (bytesRead == OF_FAILED || bytesRead < (int)sizeof(fMACAddress)) {
-			printf("Failed to get MAC address\n");
-			return B_ERROR;
-		}
+	if (FindMACAddress() != B_OK) {
+		printf("Failed to get MAC address\n");
+		return B_ERROR;
 	}
 
 	// get IP address
