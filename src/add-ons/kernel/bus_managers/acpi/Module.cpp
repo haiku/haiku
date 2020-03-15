@@ -86,8 +86,7 @@ acpi_enumerate_child_devices(device_node* node, const char* root)
 			case ACPI_TYPE_PROCESSOR:
 			case ACPI_TYPE_THERMAL:
 			case ACPI_TYPE_DEVICE: {
-				char hid[16] = "";
-				device_attr attrs[] = {
+				device_attr attrs[15] = {
 					// info about device
 					{ B_DEVICE_BUS, B_STRING_TYPE, { string: "acpi" }},
 
@@ -95,24 +94,48 @@ acpi_enumerate_child_devices(device_node* node, const char* root)
 					{ ACPI_DEVICE_PATH_ITEM, B_STRING_TYPE, { string: result }},
 
 					// info about the device
-					{ ACPI_DEVICE_HID_ITEM, B_STRING_TYPE, { string: hid }},
 					{ ACPI_DEVICE_TYPE_ITEM, B_UINT32_TYPE, { ui32: type }},
 
-					// consumer specification
-					/*{ B_DRIVER_MAPPING, B_STRING_TYPE, { string:
-						"hid_%" ACPI_DEVICE_HID_ITEM "%" }},
-					{ B_DRIVER_MAPPING "/0", B_STRING_TYPE, { string:
-						"type_%" ACPI_DEVICE_TYPE_ITEM "%" }},*/
-					{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: /*B_FIND_CHILD_ON_DEMAND|*/B_FIND_MULTIPLE_CHILDREN }},
+					{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: B_FIND_MULTIPLE_CHILDREN }},
 					{ NULL }
 				};
 
-				if (type == ACPI_TYPE_DEVICE)
-					get_device_hid(result, hid, sizeof(hid));
+				uint32 attrCount = 4;
+				char* hid = NULL;
+				char* cidList[8] = { NULL };
+				if (type == ACPI_TYPE_DEVICE) {
+					if (get_device_info(result, &hid, (char**)&cidList, 8)
+						== B_OK) {
+						if (hid != NULL) {
+							attrs[attrCount].name = ACPI_DEVICE_HID_ITEM;
+							attrs[attrCount].type = B_STRING_TYPE;
+							attrs[attrCount].value.string = hid;
+							attrCount++;
+						}
+						for (int i = 0; cidList[i] != NULL; i++) {
+							attrs[attrCount].name = ACPI_DEVICE_CID_ITEM;
+							attrs[attrCount].type = B_STRING_TYPE;
+							attrs[attrCount].value.string = cidList[i];
+							attrCount++;
+						}
+					}
+					uint32 addr;
+					if (get_device_addr(result, &addr) == B_OK) {
+						attrs[attrCount].name = ACPI_DEVICE_ADDR_ITEM;
+						attrs[attrCount].type = B_UINT32_TYPE;
+						attrs[attrCount].value.ui32 = addr;
+						attrCount++;
+					}
+				}
 
-				if (gDeviceManager->register_node(node, ACPI_DEVICE_MODULE_NAME, attrs,
-						NULL, &deviceNode) == B_OK)
-	                acpi_enumerate_child_devices(deviceNode, result);
+				status_t status = gDeviceManager->register_node(node,
+						ACPI_DEVICE_MODULE_NAME, attrs, NULL, &deviceNode);
+				free(hid);
+				for (int i = 0; cidList[i] != NULL; i++)
+					free(cidList[i]);
+				if (status != B_OK)
+					break;
+				acpi_enumerate_child_devices(deviceNode, result);
 				break;
 			}
 			default:
@@ -253,7 +276,7 @@ static struct acpi_root_info sACPIRootModule = {
 	get_next_entry,
 	get_next_object,
 	get_device,
-	get_device_hid,
+	get_device_info,
 	get_object_type,
 	get_object,
 	get_object_typed,

@@ -43,7 +43,6 @@ extern "C" {
 
 #define ACPI_DEVICE_ID_LENGTH	0x08
 
-extern pci_module_info* gPCIManager;
 extern dpc_module_info* gDPC;
 void* gDPCHandle = NULL;
 
@@ -534,27 +533,57 @@ get_device(const char* hid, uint32 index, char* result, size_t resultLength)
 
 
 status_t
-get_device_hid(const char *path, char *hid, size_t bufferLength)
+get_device_info(const char *path, char** hid, char** cidList,
+	size_t cidListCount)
 {
 	ACPI_HANDLE handle;
 	ACPI_DEVICE_INFO *info;
 
-	TRACE("get_device_hid: path %s, hid %s\n", path, hid);
+	TRACE("get_device_info: path %s\n", path);
 	if (AcpiGetHandle(NULL, (ACPI_STRING)path, &handle) != AE_OK)
 		return B_ENTRY_NOT_FOUND;
-
-	if (bufferLength < ACPI_DEVICE_ID_LENGTH)
-		return B_BUFFER_OVERFLOW;
 
 	if (AcpiGetObjectInfo(handle, &info) != AE_OK)
 		return B_BAD_TYPE;
 
-	if ((info->Valid & ACPI_VALID_HID) != 0)
-		strlcpy(hid, info->HardwareId.String, bufferLength);
-	else
-		hid[0] = '\0';
+	if ((info->Valid & ACPI_VALID_HID) != 0 && hid != NULL)
+		*hid = strndup(info->HardwareId.String, info->HardwareId.Length);
+
+	if ((info->Valid & ACPI_VALID_CID) != 0 && cidList != NULL) {
+		if (cidListCount > info->CompatibleIdList.Count)
+			cidListCount = info->CompatibleIdList.Count;
+		for (size_t i = 0; i < cidListCount; i++) {
+			cidList[i] = strndup(info->CompatibleIdList.Ids[i].String,
+				info->CompatibleIdList.Ids[i].Length);
+		}
+	}
+
 	AcpiOsFree(info);
 	return B_OK;
+}
+
+
+status_t
+get_device_addr(const char *path, uint32 *addr)
+{
+	ACPI_HANDLE handle;
+
+	TRACE("get_device_adr: path %s, hid %s\n", path, hid);
+	if (AcpiGetHandle(NULL, (ACPI_STRING)path, &handle) != AE_OK)
+		return B_ENTRY_NOT_FOUND;
+
+	status_t status = B_BAD_VALUE;
+	acpi_data buf;
+	acpi_object_type object;
+	buf.pointer = &object;
+	buf.length = sizeof(acpi_object_type);
+	if (addr != NULL
+		&& evaluate_method(handle, "_ADR", NULL, &buf) == B_OK
+		&& object.object_type == ACPI_TYPE_INTEGER) {
+		status = B_OK;
+		*addr = object.integer.integer;
+	}
+	return status;
 }
 
 
@@ -838,7 +867,7 @@ struct acpi_module_info gACPIModule = {
 	get_next_entry,
 	get_next_object,
 	get_device,
-	get_device_hid,
+	get_device_info,
 	get_object_type,
 	get_object,
 	get_object_typed,

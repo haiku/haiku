@@ -83,7 +83,6 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 	char result[255];
 	char output[320];
 	char tabs[255] = "";
-	char hid[16] = "";
 	int i;
 	size_t written = 0;
 	for (i = 0; i < indenting; i++)
@@ -114,12 +113,18 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 				strlcat(output, "     FIELD UNIT", sizeof(output));
 				break;
 			case ACPI_TYPE_DEVICE:
-				hid[0] = 0; /* zero-terminate string; get_device_hid can (and will) fail! */
-				device->acpi->get_device_hid(result, hid, sizeof(hid));
+			{
+				char* hid = NULL;
+				device->acpi->get_device_info(result, &hid, NULL, 0);
 				strlcat(output, "     DEVICE (", sizeof(output));
-				strlcat(output, hid, sizeof(output));
+				if (hid != NULL) {
+					strlcat(output, hid, sizeof(output));
+					free(hid);
+				} else
+					strlcat(output, "none", sizeof(output));
 				strlcat(output, ")", sizeof(output));
 				break;
+			}
 			case ACPI_TYPE_EVENT:
 				strlcat(output, "     EVENT", sizeof(output));
 				break;
