@@ -42,8 +42,6 @@
 #include <Region.h>
 #include <float.h>
 
-#include "debug_tools.h"
-
 __USE_CORTEX_NAMESPACE
 
 // -------------------------------------------------------- //
@@ -105,7 +103,7 @@ TipManager* TipManager::Instance() {
 	BAutolock _l(s_instanceLock);
 	if(!s_instance)
 		s_instance = new TipManager();
-		
+
 	return s_instance;
 }
 
@@ -126,7 +124,7 @@ void TipManager::QuitInstance() {
 // -------------------------------------------------------- //
 
 TipManager::TipManager() :
-	
+
 	BWindow(
 		BRect(-100,-100,-100,-100),
 		"TipManager",
@@ -134,13 +132,13 @@ TipManager::TipManager() :
 		B_FLOATING_ALL_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AVOID_FOCUS),
 	m_view(0) {
-	
+
 	AddCommonFilter(
 		new BMessageFilter(
 			B_PROGRAMMED_DELIVERY,
 			B_ANY_SOURCE,
 			&ignore_quit_key));
-	
+
 	m_view = new _TipManagerView(
 		new TipWindow(),
 		this,
@@ -166,16 +164,16 @@ status_t TipManager::setTip(
 	offset_mode_t			offsetMode	/*=LEFT_OFFSET_FROM_RECT*/,
 	BPoint						offset			/*=s_useDefaultOffset*/,
 	uint32 						flags				/*=NONE*/) {
-	
+
 	ASSERT(text);
 	ASSERT(m_view);
-	
+
 	BAutolock _l(this);
 	return m_view->setTip(
 		rect, text, view, offsetMode, offset, flags);
 }
-	
-	
+
+
 status_t TipManager::setTip(
 	const char*				text,
 	BView*						view,
@@ -196,13 +194,13 @@ status_t TipManager::removeTip(
 
 	ASSERT(view);
 	ASSERT(m_view);
-	
+
 	BAutolock _l(this);
 	return m_view->removeTip(rect, view);
 }
 
 // If more than one tip is mapped to pChild, all are removed:
-	
+
 status_t TipManager::removeAll(
 	BView*					view) {
 
@@ -214,11 +212,11 @@ status_t TipManager::removeAll(
 
 //	PRINT((
 //		"### TipManager::removeAll(): %p, %p\n", this, m_view->Looper()));
-	
+
 	ASSERT(window);
 	ASSERT(m_view);
 	ASSERT(m_view->Looper() == this); // +++++
-	
+
 	BAutolock _l(this);
 	return m_view->removeAll(window);
 }
@@ -239,10 +237,10 @@ status_t TipManager::showTip(
 	offset_mode_t					offsetMode	/*=LEFT_OFFSET_FROM_RECT*/,
 	BPoint								offset			/*=s_useDefaultOffset*/,
 	uint32 								flags				/*=NONE*/) {
-	
+
 	ASSERT(text);
 	ASSERT(m_view);
-	
+
 	BAutolock _l(this);
 	return m_view->armTip(
 	  screenRect, text, offsetMode, offset, flags);
@@ -259,9 +257,9 @@ status_t TipManager::showTip(
 
 status_t TipManager::hideTip(
 	BRect									screenRect) {
-	
+
 	ASSERT(m_view);
-	
+
 	BAutolock _l(this);
 	return m_view->hideTip(screenRect);
 }
@@ -315,20 +313,20 @@ void TipManager::MessageReceived(
 //
 //	lastTime = 0;
 //	curTime = 0;
-//	
+//
 //	// [e.moon 27sep99]
 //	// store whether the tip has fired at the current point
 //	bool fired = false;
-//	
+//
 //	ASSERT(m_tree);
 //	BView* pOwningView = m_tree->target();
-//		
+//
 //	while(!stopping()) {
 //		snooze(s_sleepPeriod);
 //		if(stopping())
 //			break;
 //
-//		// wait for the view to show up		
+//		// wait for the view to show up
 //		if(!pOwningView->Parent() || !pOwningView->Window())
 //			continue;
 //
@@ -352,8 +350,8 @@ void TipManager::MessageReceived(
 //			// the mouse hasn't moved; bail out now
 //			continue;
 //		}
-//	
-//		curTime = system_time();			
+//
+//		curTime = system_time();
 //		bool bIdle = !bMoved && lastTime && (curTime - lastTime) > m_idleTime;
 //		lastPoint = point;
 //
@@ -370,11 +368,11 @@ void TipManager::MessageReceived(
 //
 //			// mouse has idled at a given point long enough;
 //			// look for a tip at that position and display one if found:
-//			
+//
 //			fired = true;
-//			
+//
 //			pOwningView->LockLooper();
-//			
+//
 //			// make sure this part of the view is actually visible
 //			if(!pOwningView->Window()->Frame().Contains(screenPoint)) {
 //				pOwningView->UnlockLooper();
@@ -385,21 +383,21 @@ void TipManager::MessageReceived(
 //			m_tipWindow->Lock();
 //			pair<BView*, const tip_entry*> found =
 //				m_tree->match(point, screenPoint);
-//			
+//
 //			if(!found.second) {
 //				// none found; move on
 //				pOwningView->UnlockLooper();
 //				m_tipWindow->Unlock();
 //				continue;
 //			}
-//			
+//
 //			BView* pTipTarget = found.first;
 //			const tip_entry& entry = *found.second;
 //
 //			// test the screen point against the view's clipping region;
 //			// if no match, the given point is likely covered by another
 //			// window (so stop recursing)
-//	
+//
 //			BRegion clipRegion;
 //			pTipTarget->GetClippingRegion(&clipRegion);
 //			if(!clipRegion.Contains(
@@ -412,15 +410,15 @@ void TipManager::MessageReceived(
 //
 //			// found one; set up the tip window:
 //			BRect entryFrame = pTipTarget->ConvertToScreen(entry.rect);
-//						
+//
 //			// set text (this has the side effect of resizing the
 //			// window)
-//					
+//
 //			ASSERT(m_tipWindow);
 //			m_tipWindow->setText(entry.text.String());
 //
 //			// figure out where to display it:
-//			
+//
 //			BPoint offset = (entry.offset == s_useDefaultOffset) ?
 //				s_defaultOffset :
 //				entry.offset;
@@ -448,15 +446,15 @@ void TipManager::MessageReceived(
 //				default:
 //					ASSERT(!"bad offset mode");
 //			}
-//										
+//
 //			// do it:
-//					
+//
 //			m_tipWindow->MoveTo(p);
 //			m_tipWindow->Show();
-//					
+//
 //			bTipVisible = true;
 //			tipScreenRect = entryFrame;
-//			
+//
 //			m_tipWindow->Unlock();
 //			pOwningView->UnlockLooper();
 //

@@ -34,8 +34,6 @@
 
 #include "MouseTrackingHelpers.h"
 
-#include "debug_tools.h"
-
 __USE_CORTEX_NAMESPACE
 
 
@@ -60,7 +58,7 @@ MouseTrackingSourceView::~MouseTrackingSourceView()
 // the mouse.
 status_t MouseTrackingSourceView::getTrackingOrigin(
 	BPoint* poPoint) const {
-	if(!m_bTracking)	
+	if(!m_bTracking)
 		return B_ERROR;
 	*poPoint = m_initPoint;
 	return B_OK;
@@ -72,7 +70,7 @@ status_t MouseTrackingSourceView::setTrackingDestination(
 	IMouseTrackingDestination* pDest) {
 	if(m_bTracking)
 		return B_ERROR;
-	
+
 	m_pDest = pDest;
 	return B_OK;
 }
@@ -89,9 +87,9 @@ void MouseTrackingSourceView::MouseDown(BPoint point) {
 	// get mouse state & initial point
 	uint32 buttons;
 	GetMouse(&point, &buttons);
-	m_prevPoint = ConvertToScreen(point);		
+	m_prevPoint = ConvertToScreen(point);
 	m_initPoint = m_prevPoint;
-		
+
 	// start tracking the mouse
 	SetMouseEventMask(B_POINTER_EVENTS,
 		B_LOCK_WINDOW_FOCUS|B_NO_POINTER_HISTORY);
@@ -99,8 +97,8 @@ void MouseTrackingSourceView::MouseDown(BPoint point) {
 
 	// notify destination
 	if(m_pDest)
-		m_pDest->mouseTrackingBegin(this, buttons, point);		
-}	
+		m_pDest->mouseTrackingBegin(this, buttons, point);
+}
 
 void MouseTrackingSourceView::MouseMoved(BPoint point, uint32 transit,
 	const BMessage* pMsg) {
@@ -112,10 +110,10 @@ void MouseTrackingSourceView::MouseMoved(BPoint point, uint32 transit,
 		uint32 buttons;
 		GetMouse(&point, &buttons, false);
 		ConvertToScreen(&point);
-		
+
 		if(point == m_prevPoint) // no motion?
 			return;
-				
+
 		float xDelta = m_trackingFlags & TRACK_HORIZONTAL ?
 			point.x - m_prevPoint.x : 0.0;
 		float yDelta = m_trackingFlags & TRACK_VERTICAL ?
@@ -125,7 +123,7 @@ void MouseTrackingSourceView::MouseMoved(BPoint point, uint32 transit,
 		if(m_pDest)
 			m_pDest->mouseTrackingUpdate(buttons, xDelta, yDelta, point);
 
-		// store point for future delta calculations			
+		// store point for future delta calculations
 		m_prevPoint = point;
 	}
 }
@@ -133,13 +131,13 @@ void MouseTrackingSourceView::MouseMoved(BPoint point, uint32 transit,
 void MouseTrackingSourceView::MouseUp(BPoint point) {
 	if(m_bTracking) {
 //		PRINT(( "MouseTrackingSourceView::MouseUp()\n"));
-		
+
 		// +++++ handle final update
-		
+
 		// clean up
 		m_bTracking = false;
 		if(m_pDest)
-			m_pDest->mouseTrackingEnd();				
+			m_pDest->mouseTrackingEnd();
 	}
 }
 
@@ -147,9 +145,9 @@ void MouseTrackingSourceView::MouseUp(BPoint point) {
 void MouseTrackingSourceView::AttachedToWindow() {
 	if(m_pDest) // already have a destination
 		return;
-		
+
 	for(BView* pParent = Parent(); pParent; pParent = pParent->Parent()) {
-		IMouseTrackingDestination* pFound = 
+		IMouseTrackingDestination* pFound =
 			dynamic_cast<IMouseTrackingDestination*>(pParent);
 		if(pFound) // found a valid destination
 			m_pDest = pFound;
@@ -161,7 +159,7 @@ void MouseTrackingSourceView::AttachedToWindow() {
 void MouseTrackingSourceView::FrameResized(float width, float height) {
 	_inherited::FrameResized(width, height);
 	m_prevFrame = Frame();
-	
+
 	// +++++ adjust if currently tracking?
 }
 */
