@@ -157,38 +157,41 @@ OFEthernetInterface::Init(const char *device, const char *parameters)
 	// Note: This is a non-standardized way. On my Mac mini the response of the
 	// DHCP server is stored as property of /chosen. We try to get it and use
 	// the IP address we find in there.
+	// TODO Sun machines may use bootp-response instead?
 	struct {
 		uint8	irrelevant[16];
 		uint32	ip_address;
 		// ...
 	} dhcpResponse;
-	bytesRead = of_getprop(gChosen, "dhcp-response", &dhcpResponse,
+	int bytesRead = of_getprop(gChosen, "dhcp-response", &dhcpResponse,
 		sizeof(dhcpResponse));
 	if (bytesRead != OF_FAILED && bytesRead == (int)sizeof(dhcpResponse)) {
 		SetIPAddress(ntohl(dhcpResponse.ip_address));
-	} else {
-		// try to read manual client IP from boot path
-		if (parameters != NULL) {
-			char *comma = strrchr(parameters, ',');
-			if (comma != NULL && comma != strchr(parameters, ',')) {
-				SetIPAddress(ip_parse_address(comma + 1));
-			}
-		}
-		if (fIPAddress == 0) {
-			// try to read default-client-ip setting
-			char defaultClientIP[16];
-			package = of_finddevice("/options");
-			bytesRead = of_getprop(package, "default-client-ip",
-				defaultClientIP, sizeof(defaultClientIP) - 1);
-			if (bytesRead != OF_FAILED && bytesRead > 1) {
-				defaultClientIP[bytesRead] = '\0';
-				ip_addr_t address = ip_parse_address(defaultClientIP);
-				SetIPAddress(address);
-			}
+		return B_OK;
+	}
+
+	// try to read manual client IP from boot path
+	if (parameters != NULL) {
+		char *comma = strrchr(parameters, ',');
+		if (comma != NULL && comma != strchr(parameters, ',')) {
+			SetIPAddress(ip_parse_address(comma + 1));
+			return B_OK;
 		}
 	}
 
-	return B_OK;
+	// try to read default-client-ip setting
+	char defaultClientIP[16];
+	intptr_t package = of_finddevice("/options");
+	bytesRead = of_getprop(package, "default-client-ip",
+		defaultClientIP, sizeof(defaultClientIP) - 1);
+	if (bytesRead != OF_FAILED && bytesRead > 1) {
+		defaultClientIP[bytesRead] = '\0';
+		ip_addr_t address = ip_parse_address(defaultClientIP);
+		SetIPAddress(address);
+		return B_OK;
+	}
+
+	return B_ERROR;
 }
 
 
