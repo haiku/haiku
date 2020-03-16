@@ -214,7 +214,7 @@ struct advisory_locking {
 	Manipulation of the fs_mount structures themselves
 	(and their destruction) requires different locks though.
 */
-static mutex sMountMutex = MUTEX_INITIALIZER("vfs_mount_lock");
+static rw_lock sMountLock = RW_LOCK_INITIALIZER("vfs_mount_lock");
 
 /*!	\brief Guards mount/unmount operations.
 
@@ -226,7 +226,7 @@ static mutex sMountMutex = MUTEX_INITIALIZER("vfs_mount_lock");
 	  sMountsTable will not be modified,
 
 	The thread trying to lock the lock must not hold sVnodeLock or
-	sMountMutex.
+	sMountLock.
 */
 static recursive_lock sMountOpLock;
 
@@ -241,7 +241,7 @@ static recursive_lock sMountOpLock;
 	locked. Write access to covered_by and covers requires to write lock
 	sVnodeLock.
 
-	The thread trying to acquire the lock must not hold sMountMutex.
+	The thread trying to acquire the lock must not hold sMountLock.
 	You must not hold this lock when calling create_sem(), as this might call
 	vfs_free_unused_vnodes() and thus cause a deadlock.
 */
@@ -732,12 +732,12 @@ public:
 
 
 /*! Finds the mounted device (the fs_mount structure) with the given ID.
-	Note, you must hold the gMountMutex lock when you call this function.
+	Note, you must hold the sMountLock lock when you call this function.
 */
 static struct fs_mount*
 find_mount(dev_t id)
 {
-	ASSERT_LOCKED_MUTEX(&sMountMutex);
+	ASSERT_READ_LOCKED_RW_LOCK(&sMountLock);
 
 	return sMountsTable->Lookup(id);
 }
@@ -749,7 +749,7 @@ get_mount(dev_t id, struct fs_mount** _mount)
 	struct fs_mount* mount;
 
 	ReadLocker nodeLocker(sVnodeLock);
-	MutexLocker mountLocker(sMountMutex);
+	ReadLocker mountLocker(sMountLock);
 
 	mount = find_mount(id);
 	if (mount == NULL)
@@ -971,10 +971,10 @@ create_new_vnode_and_lock(dev_t mountID, ino_t vnodeID, struct vnode*& _vnode,
 	}
 
 	// get the mount structure
-	mutex_lock(&sMountMutex);
+	rw_lock_read_lock(&sMountLock);
 	vnode->mount = find_mount(mountID);
 	if (!vnode->mount || vnode->mount->unmounting) {
-		mutex_unlock(&sMountMutex);
+		rw_lock_read_unlock(&sMountLock);
 		rw_lock_write_unlock(&sVnodeLock);
 		free(vnode);
 		return B_ENTRY_NOT_FOUND;
@@ -984,7 +984,7 @@ create_new_vnode_and_lock(dev_t mountID, ino_t vnodeID, struct vnode*& _vnode,
 	sVnodeTable->Insert(vnode);
 	add_vnode_to_mount_list(vnode, vnode->mount);
 
-	mutex_unlock(&sMountMutex);
+	rw_lock_read_unlock(&sMountLock);
 
 	_vnode = vnode;
 	_nodeCreated = true;
@@ -1062,7 +1062,7 @@ free_vnode(struct vnode* vnode, bool reenter)
 
 	The caller must, of course, own a reference to the vnode to call this
 	function.
-	The caller must not hold the sVnodeLock or the sMountMutex.
+	The caller must not hold the sVnodeLock or the sMountLock.
 
 	\param vnode the vnode.
 	\param alwaysFree don't move this vnode into the unused list, but really
@@ -1161,7 +1161,7 @@ create_special_sub_node(struct vnode* vnode, uint32 flags)
 
 	If the node is not yet in memory, it will be loaded.
 
-	The caller must not hold the sVnodeLock or the sMountMutex.
+	The caller must not hold the sVnodeLock or the sMountLock.
 
 	\param mountID the mount ID.
 	\param vnodeID the node ID.
@@ -1284,7 +1284,7 @@ restart:
 
 	The caller must, of course, own a reference to the vnode to call this
 	function.
-	The caller must not hold the sVnodeLock or the sMountMutex.
+	The caller must not hold the sVnodeLock or the sMountLock.
 
 	\param vnode the vnode.
 */
@@ -4163,7 +4163,7 @@ entry_cache_add(dev_t mountID, ino_t dirID, const char* name, ino_t nodeID)
 {
 	// lookup mount -- the caller is required to make sure that the mount
 	// won't go away
-	MutexLocker locker(sMountMutex);
+	ReadLocker locker(sMountLock);
 	struct fs_mount* mount = find_mount(mountID);
 	if (mount == NULL)
 		return B_BAD_VALUE;
@@ -4178,7 +4178,7 @@ entry_cache_add_missing(dev_t mountID, ino_t dirID, const char* name)
 {
 	// lookup mount -- the caller is required to make sure that the mount
 	// won't go away
-	MutexLocker locker(sMountMutex);
+	ReadLocker locker(sMountLock);
 	struct fs_mount* mount = find_mount(mountID);
 	if (mount == NULL)
 		return B_BAD_VALUE;
@@ -4193,7 +4193,7 @@ entry_cache_remove(dev_t mountID, ino_t dirID, const char* name)
 {
 	// lookup mount -- the caller is required to make sure that the mount
 	// won't go away
-	MutexLocker locker(sMountMutex);
+	ReadLocker locker(sMountLock);
 	struct fs_mount* mount = find_mount(mountID);
 	if (mount == NULL)
 		return B_BAD_VALUE;
@@ -5236,7 +5236,7 @@ vfs_get_mount_point(dev_t mountID, dev_t* _mountPointMountID,
 	ino_t* _mountPointNodeID)
 {
 	ReadLocker nodeLocker(sVnodeLock);
-	MutexLocker mountLocker(sMountMutex);
+	ReadLocker mountLocker(sMountLock);
 
 	struct fs_mount* mount = find_mount(mountID);
 	if (mount == NULL)
@@ -7574,9 +7574,9 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 
 	// insert mount struct into list before we call FS's mount() function
 	// so that vnodes can be created for this mount
-	mutex_lock(&sMountMutex);
+	rw_lock_write_lock(&sMountLock);
 	sMountsTable->Insert(mount);
-	mutex_unlock(&sMountMutex);
+	rw_lock_write_unlock(&sMountLock);
 
 	ino_t rootID;
 
@@ -7693,9 +7693,9 @@ err3:
 	if (coveredNode != NULL)
 		put_vnode(coveredNode);
 err2:
-	mutex_lock(&sMountMutex);
+	rw_lock_write_lock(&sMountLock);
 	sMountsTable->Remove(mount);
-	mutex_unlock(&sMountMutex);
+	rw_lock_write_unlock(&sMountLock);
 err1:
 	delete mount;
 
@@ -7720,16 +7720,15 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 	}
 
 	RecursiveLocker mountOpLocker(sMountOpLock);
+	ReadLocker mountLocker(sMountLock);
 
-	// this lock is not strictly necessary, but here in case of KDEBUG
-	// to keep the ASSERT in find_mount() working.
-	KDEBUG_ONLY(mutex_lock(&sMountMutex));
 	mount = find_mount(path != NULL ? pathVnode->device : mountID);
-	KDEBUG_ONLY(mutex_unlock(&sMountMutex));
 	if (mount == NULL) {
 		panic("fs_unmount: find_mount() failed on root vnode @%p of mount\n",
 			pathVnode);
 	}
+
+	mountLocker.Unlock();
 
 	if (path != NULL) {
 		put_vnode(pathVnode);
@@ -7901,9 +7900,9 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 	}
 
 	// remove the mount structure from the hash table
-	mutex_lock(&sMountMutex);
+	rw_lock_write_lock(&sMountLock);
 	sMountsTable->Remove(mount);
-	mutex_unlock(&sMountMutex);
+	rw_lock_write_unlock(&sMountLock);
 
 	mountOpLocker.Unlock();
 
@@ -8071,7 +8070,7 @@ fs_next_device(int32* _cookie)
 	struct fs_mount* mount = NULL;
 	dev_t device = *_cookie;
 
-	mutex_lock(&sMountMutex);
+	rw_lock_read_lock(&sMountLock);
 
 	// Since device IDs are assigned sequentially, this algorithm
 	// does work good enough. It makes sure that the device list
@@ -8091,7 +8090,7 @@ fs_next_device(int32* _cookie)
 	else
 		device = B_BAD_VALUE;
 
-	mutex_unlock(&sMountMutex);
+	rw_lock_read_unlock(&sMountLock);
 
 	return device;
 }
