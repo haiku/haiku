@@ -51,12 +51,36 @@ reset
 Boot from network
 -----------------
 
+static ip:
+This currently works best, because rarp does not let the called binary know the
+IP address. We need the IP address if we want to mount the root filesystem using
+remote_disk server.
+
+    boot net:192.168.1.2,somefile,192.168.1.89
+
+The first IP is the server from which to download (using TFTP), the second is
+the client IP to use. Once the bootloader starts, it will detect that it is
+booted from network and look for a the remote_disk_server on the same machine.
+
 rarp:
-boot net:,somefile
+
+This needs a reverse ARP server (easy to setup on any Linux system). You need
+to list the MAC address of the SPARC machine in /etc/ethers on the server. The
+machine will get its IP, and will use TFTP to the server which replied, to get
+the boot file from there.
+
+    boot net:,somefile
+
 (net is an alias to the network card and also sets the load address: /pci@1f,4000/network@1,1)
 
 dhcp:
-boot net:dhcp
+
+This needs a DHCP/BOOTP server configured to send the info about where to find
+the file to load and boot.
+
+    boot net:dhcp
+
+
 
 Debugging
 ---------
