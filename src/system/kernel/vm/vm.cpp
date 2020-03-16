@@ -5242,14 +5242,30 @@ vm_debug_copy_page_memory(team_id teamID, void* unsafeMemory, void* buffer,
 }
 
 
+static inline bool
+validate_user_range(const void* addr, size_t size)
+{
+	addr_t address = (addr_t)addr;
+
+	// Check for overflows on all addresses.
+	if ((address + size) < address)
+		return false;
+
+	// Validate that the address does not cross the kernel/user boundary.
+	if (IS_USER_ADDRESS(address))
+		return IS_USER_ADDRESS(address + size);
+	else
+		return !IS_USER_ADDRESS(address + size);
+}
+
+
 //	#pragma mark - kernel public API
 
 
 status_t
 user_memcpy(void* to, const void* from, size_t size)
 {
-	// don't allow address overflows
-	if ((addr_t)from + size < (addr_t)from || (addr_t)to + size < (addr_t)to)
+	if (!validate_user_range(to, size) || !validate_user_range(from, size))
 		return B_BAD_ADDRESS;
 
 	if (arch_cpu_user_memcpy(to, from, size) < B_OK)
@@ -5275,31 +5291,19 @@ user_strlcpy(char* to, const char* from, size_t size)
 		return B_BAD_VALUE;
 	if (from == NULL)
 		return B_BAD_ADDRESS;
-
-	// limit size to avoid address overflows
-	size_t maxSize = std::min((addr_t)size,
-		~(addr_t)0 - std::max((addr_t)from, (addr_t)to) + 1);
-		// NOTE: Since arch_cpu_user_strlcpy() determines the length of \a from,
-		// the source address might still overflow.
-
-	ssize_t result = arch_cpu_user_strlcpy(to, from, maxSize);
-
-	// If we hit the address overflow boundary, fail.
-	if (result < 0 || (result >= 0 && (size_t)result >= maxSize
-			&& maxSize < size)) {
+	if (!validate_user_range(to, size) || !validate_user_range(from, size))
 		return B_BAD_ADDRESS;
-	}
 
-	return result;
+	return arch_cpu_user_strlcpy(to, from, size);
 }
 
 
 status_t
 user_memset(void* s, char c, size_t count)
 {
-	// don't allow address overflows
-	if ((addr_t)s + count < (addr_t)s)
+	if (!validate_user_range(s, count))
 		return B_BAD_ADDRESS;
+
 	if (arch_cpu_user_memset(s, c, count) < B_OK)
 		return B_BAD_ADDRESS;
 
