@@ -1,14 +1,28 @@
 /*
  * Copyright 2003-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2016 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include <stdarg.h>
+#include <string.h>
 
 #include <boot/platform.h>
 #include <boot/stdio.h>
 #include <platform/openfirmware/openfirmware.h>
+
+
+static char sBuffer[16384];
+static uint32 sBufferPosition;
+
+
+static void
+syslog_write(const char* buffer, size_t length)
+{
+	memcpy(sBuffer + sBufferPosition, buffer, length);
+	sBufferPosition += length;
+}
 
 
 extern "C" void
@@ -27,19 +41,37 @@ panic(const char* format, ...)
 }
 
 
-extern "C" void
-dprintf(const char* format, ...)
+static void
+dprintf_args(const char *format, va_list args)
 {
-	va_list list;
+	char buffer[512];
+	int length = vsnprintf(buffer, sizeof(buffer), format, args);
+	if (length == 0)
+		return;
 
-	va_start(list, format);
-	vprintf(format, list);
-	va_end(list);
+	syslog_write(buffer, length);
+	printf("%s", buffer);
 }
+
+
+extern "C" void
+dprintf(const char *format, ...)
+{
+	va_list args;
+
+	va_start(args, format);
+	dprintf_args(format, args);
+	va_end(args);
+}
+
+
 
 
 char*
 platform_debug_get_log_buffer(size_t* _size)
 {
-	return NULL;
+	if (_size != NULL)
+		*_size = sizeof(sBuffer);
+
+	return sBuffer;
 }
