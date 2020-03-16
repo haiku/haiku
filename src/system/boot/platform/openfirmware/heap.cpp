@@ -12,7 +12,7 @@
 #include <platform/openfirmware/openfirmware.h>
 
 
-#define TRACE_HEAP 1
+//#define TRACE_HEAP 1
 #if TRACE_HEAP
 #	define TRACE(x) printf x
 #else

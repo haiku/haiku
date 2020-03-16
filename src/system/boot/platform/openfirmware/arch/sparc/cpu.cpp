@@ -15,7 +15,7 @@
 #include <platform/openfirmware/devices.h>
 #include <platform/openfirmware/openfirmware.h>
 
-#define TRACE_CPU
+//#define TRACE_CPU
 #ifdef TRACE_CPU
 #	define TRACE(x) dprintf x
 #else

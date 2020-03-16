@@ -71,7 +71,7 @@ remove_virtual_range_to_keep(void *start, uint32 size)
 static status_t
 find_physical_memory_ranges(size_t &total)
 {
-	dprintf("checking for memory...\n");
+	TRACE("checking for memory...\n");
 	intptr_t package = of_instance_to_package(sMemoryInstance);
 
 	total = 0;
@@ -110,10 +110,10 @@ find_physical_memory_ranges(size_t &total)
 
 	for (int32 i = 0; i < count; i++) {
 		if (regions[i].size <= 0) {
-			dprintf("%d: empty region\n", i);
+			TRACE("%d: empty region\n", i);
 			continue;
 		}
-		dprintf("%" B_PRIu32 ": base = %" B_PRIx64 ","
+		TRACE("%" B_PRIu32 ": base = %" B_PRIx64 ","
 			"size = %" B_PRIx64 "\n", i, regions[i].base, regions[i].size);
 
 		total += regions[i].size;
@@ -225,7 +225,7 @@ find_allocated_ranges(void **_exceptionHandlers)
 	}
 	length = length / sizeof(struct translation_map);
 	uint32 total = 0;
-	dprintf("found %d translations\n", length);
+	TRACE("found %d translations\n", length);
 
 	for (int i = 0; i < length; i++) {
 		struct translation_map *map = &translations[i];
@@ -271,7 +271,7 @@ find_allocated_ranges(void **_exceptionHandlers)
 
 		total += map->length;
 	}
-	dprintf("total size kept: %" B_PRIu32 "\n", total);
+	TRACE("total size kept: %" B_PRIu32 "\n", total);
 
 	// remove the boot loader code from the virtual ranges to keep in the
 	// kernel
@@ -576,7 +576,7 @@ arch_mmu_init(void)
 		dprintf("Error: could not find physical memory ranges!\n");
 		return B_ERROR;
 	}
-	dprintf("total physical memory = %luMB\n", total / (1024 * 1024));
+	TRACE("total physical memory = %luMB\n", total / (1024 * 1024));
 
 	void *exceptionHandlers = (void *)-1;
 	if (find_allocated_ranges(&exceptionHandlers) != B_OK) {
@@ -600,11 +600,11 @@ arch_mmu_init(void)
 
 	// set kernel args
 
-	dprintf("virt_allocated: %" B_PRIu32 "\n",
+	TRACE("virt_allocated: %" B_PRIu32 "\n",
 		gKernelArgs.num_virtual_allocated_ranges);
-	dprintf("phys_allocated: %" B_PRIu32 "\n",
+	TRACE("phys_allocated: %" B_PRIu32 "\n",
 		gKernelArgs.num_physical_allocated_ranges);
-	dprintf("phys_memory: %" B_PRIu32 "\n",
+	TRACE("phys_memory: %" B_PRIu32 "\n",
 		gKernelArgs.num_physical_memory_ranges);
 
 #if 0
