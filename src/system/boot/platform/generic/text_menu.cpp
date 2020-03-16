@@ -465,6 +465,37 @@ run_menu(Menu* menu)
 			|| key == TEXT_CONSOLE_KEY_SPACE) {
 			if (item != NULL && invoke_item(menu, item, selected, key))
 				break;
+		} else if (key == '\t') {
+			if (item == NULL)
+				continue;
+
+			int32 oldSelected = selected;
+
+			// Use tab to cycle between items (on some platforms, arrow keys
+			// are not available)
+			selected = select_next_valid_item(menu, selected + 1);
+
+			if (selected == oldSelected)
+				selected = first_selectable_item(menu);
+
+			// check if selected has changed
+			if (selected != oldSelected) {
+				MenuItem *item = menu->ItemAt(selected);
+				if (item != NULL)
+					item->Select(true);
+
+				make_item_visible(menu, selected);
+				// make sure that the new selected entry is visible
+				if (sMenuOffset > selected
+					|| sMenuOffset + menu_height() <= selected) {
+					if (sMenuOffset > selected)
+						sMenuOffset = selected;
+					else
+						sMenuOffset = selected + 1 - menu_height();
+
+					draw_menu(menu);
+				}
+			}
 		} else if (key == TEXT_CONSOLE_KEY_ESCAPE
 			&& menu->Type() != MAIN_MENU) {
 			// escape key was hit

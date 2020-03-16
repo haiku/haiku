@@ -168,11 +168,15 @@ pager(const PagerTextSource& textSource)
 
 				case TEXT_CONSOLE_KEY_DOWN:
 				case TEXT_CONSOLE_KEY_RETURN:
+				case 'j':
+				case 'J':
 					// next line
 					topLine++;
 					break;
 
 				case TEXT_CONSOLE_KEY_UP:
+				case 'k':
+				case 'K':
 					// previous line
 					topLine--;
 					break;
