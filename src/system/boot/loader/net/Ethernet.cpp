@@ -123,7 +123,8 @@ status_t
 EthernetService::Send(const mac_addr_t &destination, uint16 protocol,
 	ChainBuffer *buffer)
 {
-	TRACE(("EthernetService::Send(to: %012llx, proto: 0x%hx, %lu bytes)\n",
+	TRACE(("EthernetService::Send(to: %012" B_PRIx64 ", proto: 0x%hx, %"
+		PRIu32 " bytes)\n",
 		destination.ToUInt64(), protocol, (buffer ? buffer->TotalSize() : 0)));
 
 	if (!fInterface || !fSendBuffer)
@@ -199,7 +200,7 @@ EthernetService::ProcessIncomingPackets()
 		}
 
 		TRACE(("EthernetService::ProcessIncomingPackets(): received ethernet "
-			"frame: to: %012llx, proto: 0x%hx, %ld bytes\n",
+			"frame: to: %012" B_PRIx64 ", proto: 0x%hx, %" B_PRIuSIZE " bytes\n",
 			header->destination.ToUInt64(), ntohs(header->type),
 			bytesReceived - (ssize_t)sizeof(ether_header)));
 
