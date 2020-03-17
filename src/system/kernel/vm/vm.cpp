@@ -5291,10 +5291,26 @@ user_strlcpy(char* to, const char* from, size_t size)
 		return B_BAD_VALUE;
 	if (from == NULL)
 		return B_BAD_ADDRESS;
-	if (!validate_user_range(to, size) || !validate_user_range(from, size))
+
+	// Protect the source address from overflows.
+	size_t maxSize = size;
+	if ((addr_t)from + maxSize < (addr_t)from)
+		maxSize -= (addr_t)from + maxSize;
+	if (IS_USER_ADDRESS(from) && !IS_USER_ADDRESS((addr_t)from + maxSize))
+		maxSize = USER_TOP - (addr_t)from;
+
+	if (!validate_user_range(to, maxSize))
 		return B_BAD_ADDRESS;
 
-	return arch_cpu_user_strlcpy(to, from, size);
+	ssize_t result = arch_cpu_user_strlcpy(to, from, maxSize);
+	if (result < 0)
+		return result;
+
+	// If we hit the address overflow boundary, fail.
+	if ((size_t)result >= maxSize && maxSize < size)
+		return B_BAD_ADDRESS;
+
+	return result;
 }
 
 
