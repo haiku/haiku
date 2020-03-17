@@ -298,7 +298,11 @@ struct pci_module_info {
 #define PCI_intelligent_io			0x0e
 #define PCI_satellite_communications 0x0f
 #define PCI_encryption_decryption	0x10
-#define PCI_data_acquisition		0x11
+#define PCI_data_acquisition		0x11	/* data acquisition and
+												signal processing controllers */
+#define PCI_processing_accelerator	0x12	/* processing accelerators */
+#define PCI_nonessential_function	0x13	/* non-essential instrumentation
+												function  */
 
 #define PCI_undefined				0xFF	/* not in any defined class */
 
@@ -612,6 +616,15 @@ struct pci_module_info {
 #define PCI_wireless_cellular		0x40
 #define PCI_wireless_cellular_ethernet	0x41
 #define PCI_wireless_other			0x80
+
+/* ---
+	values for the class_sub field for class_base = 0x11 (data acquisition)
+--- */
+#define PCI_data_acquisition_dpio	0x00
+#define PCI_data_acquisition_performance_counters		0x01
+#define PCI_data_acquisition_communication_synchroniser	0x10
+#define PCI_data_acquisition_management					0x20
+#define PCI_data_acquisition_other						0x80
 
 /* ---
 	masks for command register bits
