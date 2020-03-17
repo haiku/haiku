@@ -21,6 +21,8 @@ static uint32 sBufferPosition;
 static void
 syslog_write(const char* buffer, size_t length)
 {
+	if (sBufferPosition + length > sizeof(sBuffer))
+		return;
 	memcpy(sBuffer + sBufferPosition, buffer, length);
 	sBufferPosition += length;
 }

@@ -17,9 +17,11 @@ static char sBuffer[16384];
 static uint32 sBufferPosition;
 
 
-static void
+static inline void
 syslog_write(const char* buffer, size_t length)
 {
+	if (sBufferPosition + length > sizeof(sBuffer))
+		return;
 	memcpy(sBuffer + sBufferPosition, buffer, length);
 	sBufferPosition += length;
 }
@@ -41,7 +43,7 @@ panic(const char* format, ...)
 }
 
 
-static void
+static inline void
 dprintf_args(const char *format, va_list args)
 {
 	char buffer[512];
