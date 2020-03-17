@@ -1909,6 +1909,8 @@ device_node::Probe(const char* devicePath, uint32 updateCycle)
 				matches = type == PCI_display;
 			} else if (!strcmp(devicePath, "video")) {
 				matches = type == PCI_multimedia && subType == PCI_video;
+			} else if (!strcmp(devicePath, "power")) {
+				matches = type == PCI_data_acquisition;
 			}
 		} else {
 			// This driver does not support types, but still wants to its
