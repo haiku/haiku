@@ -125,6 +125,8 @@ get_feature_name(uint32 feature)
 			return "host checksum";
 		case VIRTIO_NET_F_GUEST_CSUM:
 			return "guest checksum";
+		case VIRTIO_NET_F_MTU:
+			return "mtu";
 		case VIRTIO_NET_F_MAC:
 			return "macaddress";
 		case VIRTIO_NET_F_GSO:
@@ -224,7 +226,7 @@ virtio_net_init_device(void* _info, void** _cookie)
 	sDeviceManager->put_node(parent);
 
 	info->virtio->negotiate_features(info->virtio_device,
-		VIRTIO_NET_F_STATUS | VIRTIO_NET_F_MAC
+		VIRTIO_NET_F_STATUS | VIRTIO_NET_F_MAC | VIRTIO_NET_F_MTU
 		/* VIRTIO_NET_F_CTRL_VQ | VIRTIO_NET_F_MQ */,
 		 &info->features, &get_feature_name);
 
@@ -472,6 +474,21 @@ virtio_net_open(void* _info, const char* path, int openMode, void** _cookie)
 		info->virtio->read_device_config(info->virtio_device,
 			offsetof(struct virtio_net_config, mac),
 			&info->macaddr, sizeof(info->macaddr));
+	}
+
+	if ((info->features & VIRTIO_NET_F_MTU) != 0) {
+		dprintf("mtu feature\n");
+		uint16 mtu;
+		info->virtio->read_device_config(info->virtio_device,
+			offsetof(struct virtio_net_config, mtu),
+			&mtu, sizeof(mtu));
+		// check against minimum MTU
+		if (mtu > 68)
+			info->maxframesize = mtu;
+		else
+			info->virtio->clear_feature(info->virtio_device, VIRTIO_NET_F_MTU);
+	} else {
+		dprintf("no mtu feature\n");
 	}
 
 	for (int i = 0; i < info->rxSizes[0]; i++)
