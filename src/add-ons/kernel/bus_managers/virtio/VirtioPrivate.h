@@ -48,6 +48,7 @@ public:
 			status_t 			NegotiateFeatures(uint32 supported,
 									uint32* negotiated,
 									const char* (*get_feature_name)(uint32));
+			status_t 			ClearFeature(uint32 feature);
 
 			status_t			ReadDeviceConfig(uint8 offset, void* buffer,
 									size_t bufferSize);

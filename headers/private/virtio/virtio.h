@@ -101,6 +101,8 @@ typedef struct {
 	status_t (*negotiate_features)(virtio_device cookie, uint32 supported,
 		uint32* negotiated, const char* (*get_feature_name)(uint32));
 
+	status_t (*clear_feature)(virtio_device cookie, uint32 feature);
+
 	status_t (*read_device_config)(virtio_device cookie, uint8 offset,
 		void* buffer, size_t bufferSize);
 	status_t (*write_device_config)(virtio_device cookie, uint8 offset,

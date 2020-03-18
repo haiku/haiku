@@ -127,6 +127,14 @@ VirtioDevice::NegotiateFeatures(uint32 supported, uint32* negotiated,
 
 
 status_t
+VirtioDevice::ClearFeature(uint32 feature)
+{
+	fFeatures &= ~feature;
+	return fController->write_guest_features(fCookie, fFeatures);
+}
+
+
+status_t
 VirtioDevice::ReadDeviceConfig(uint8 offset, void* buffer, size_t bufferSize)
 {
 	return fController->read_device_config(fCookie, offset, buffer,

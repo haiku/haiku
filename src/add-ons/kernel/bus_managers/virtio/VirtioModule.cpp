@@ -64,6 +64,16 @@ virtio_negotiate_features(void* _device, uint32 supported,
 
 
 status_t
+virtio_clear_feature(void* _device, uint32 feature)
+{
+	CALLED();
+	VirtioDevice *device = (VirtioDevice *)_device;
+
+	return device->ClearFeature(feature);
+}
+
+
+status_t
 virtio_read_device_config(void* _device, uint8 offset, void* buffer,
 		size_t bufferSize)
 {
@@ -275,6 +285,7 @@ virtio_device_interface virtio_device_module = {
 	},
 
 	virtio_negotiate_features,
+	virtio_clear_feature,
 	virtio_read_device_config,
 	virtio_write_device_config,
 	virtio_alloc_queues,
