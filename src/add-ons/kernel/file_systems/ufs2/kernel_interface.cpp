@@ -3,6 +3,8 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "system_dependencies.h"
+#include "ufs2.h"
+#include "Volume.h"
 
 #ifdef TRACE_ufs2
 #define TRACE(x...) dprintf("\33[34mufs2:\33[0m " x)
@@ -13,9 +15,7 @@
 
 struct identify_cookie
 {
-	/*	super_block_struct super_block;
-	 *	No structure yet implemented.
-	 */
+	ufs2_super_block super_block;
 	int cookie;
 };
 
@@ -42,7 +42,16 @@ iterative_io_finished_hook(void *cookie, io_request *request, status_t status,
 static float
 ufs2_identify_partition(int fd, partition_data *partition, void **_cookie)
 {
-	return B_NOT_SUPPORTED;
+		ufs2_super_block superBlock;
+		status_t status = Volume::Identify(fd, &superBlock);
+		if (status != B_OK)
+			return -1;
+
+		identify_cookie* cookie = new identify_cookie;
+		memcpy(&cookie->super_block, &superBlock, sizeof(ufs2_super_block));
+		*_cookie = cookie;
+
+	return 0.8f;
 }
 
 

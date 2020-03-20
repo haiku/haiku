@@ -18,6 +18,7 @@ UsePrivateKernelHeaders ;
 DEFINES += DEBUG_APP="\\\"ufs2\\\"" ;
 
 local ufs2Sources =
+    Volume.cpp
     kernel_cpp.cpp
     kernel_interface.cpp
     ;
