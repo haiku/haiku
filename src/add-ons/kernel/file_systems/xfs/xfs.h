@@ -3,6 +3,12 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+/*
+Important:
+All fields in XFS metadata structures are in big-endian byte order
+except for log items which are formatted in host order.
+*/
+
 #ifndef _XFS_SB_H_
 #define _XFS_SB_H_
 
@@ -11,7 +17,8 @@
 
 #define XFS_SB_MAGIC 0x58465342 /* Identifies XFS. "XFSB" */
 #define XFS_SB_MAXSIZE 512
-
+#define BBLOCKLOG 9		/* Log of block size should be 9 */
+#define BBLOCKSIZE 1<<BBLOCKLOG		/* The size of a basic block should be 512 */
 
 
 /*	Version 4 superblock definition	*/
@@ -126,4 +133,46 @@ Superblock quota flags - sb_qflags
 #define XFS_SB_VERSION2_PROJID32BIT 0x0008	/* 32-bit project id */
 #define XFS_SB_VERSION2_CRCBIT 0x0010		/* Metadata checksumming */
 #define XFS_SB_VERSION2_FTYPE 0x0020
+
+
+/* AG Free Space Block */
+
+/* 
+index 0 for free space B+Tree indexed by block number
+index 1 for free space B+Tree indexed by extent size
+
+Version 5 has XFS_BT_NUM_AGF defined as 3. This is because the index 2 is
+for reverse-mapped B+Trees. I have spare0/1 defined here instead.
+*/
+
+#define XFS_BTNUM_AGF 2
+#define XFS_AG_MAGICNUM 0x58414746
+class AGFreeSpace{
+	public:
+			void			SwapEndian();
+	private:
+			uint32			magicnum;
+			uint32			versionnum;		// should be set to 1
+			uint32			seqno;	// defines the ag number for the sector
+			uint32			length;	// size of ag in fs blocks
+			uint32			roots[XFS_BTNUM_AGF];	// roots of trees
+			uint32			spare0;		//spare
+			uint32			levels[XFS_BTNUM_AGF];	// tree levels
+			uint32			spare1;		//spare
+			uint32			flfirst;	// index to first free list block
+			uint32			fllast;		// index to last free list block
+			uint32			flcount;	// number of blocks in freelist
+			uint32			freeblks;	// current num of free blocks in AG
+			uint32			longest;	// no.of blocks of longest
+											// contiguous free space in the AG
+
+			/*number of blocks used for the free space B+trees.
+			This is only used if the XFS_SB_VERSION2_LAZYSBCOUNTBIT
+			bit is set in sb_features2
+			*/
+
+			uint32			btreeblks;
+}
+
+
 #endif
