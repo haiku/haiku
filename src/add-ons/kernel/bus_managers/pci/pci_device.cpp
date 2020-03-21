@@ -102,6 +102,20 @@ pci_device_find_extended_capability(pci_device* device, uint16 capID,
 }
 
 
+static uint8
+pci_device_get_powerstate(pci_device *device)
+{
+	return gPCI->GetPowerstate(device->device);
+}
+
+
+static void
+pci_device_set_powerstate(pci_device *device, uint8 state)
+{
+	return gPCI->SetPowerstate(device->device, state);
+}
+
+
 static void
 pci_device_get_pci_info(pci_device* device, struct pci_info* info)
 {
@@ -196,5 +210,7 @@ pci_device_module_info gPCIDeviceModule = {
 	pci_device_write_pci_config,
 	pci_device_find_capability,
 	pci_device_get_pci_info,
-	pci_device_find_extended_capability
+	pci_device_find_extended_capability,
+	pci_device_get_powerstate,
+	pci_device_set_powerstate
 };

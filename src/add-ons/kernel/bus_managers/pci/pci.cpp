@@ -1801,3 +1801,34 @@ PCI::UpdateInterruptLine(uint8 domain, uint8 bus, uint8 _device, uint8 function,
 
 	return WriteConfig(device, PCI_interrupt_line, 1, newInterruptLineValue);
 }
+
+
+uint8
+PCI::GetPowerstate(PCIDev *device)
+{
+	uint8 capabilityOffset;
+	status_t res = FindCapability(device, PCI_cap_id_pm, &capabilityOffset);
+	if (res == B_OK) {
+		uint32 state = ReadConfig(device, capabilityOffset + PCI_pm_status, 2);
+		return (state & PCI_pm_mask);
+	}
+	return PCI_pm_state_d0;
+}
+
+
+void
+PCI::SetPowerstate(PCIDev *device, uint8 newState)
+{
+	uint8 capabilityOffset;
+	status_t res = FindCapability(device, PCI_cap_id_pm, &capabilityOffset);
+	if (res == B_OK) {
+		uint32 state = ReadConfig(device, capabilityOffset + PCI_pm_status, 2);
+		if ((state & PCI_pm_mask) != newState) {
+			WriteConfig(device, capabilityOffset + PCI_pm_status, 2,
+				(state & ~PCI_pm_mask) | newState);
+			if ((state & PCI_pm_mask) == PCI_pm_state_d3)
+				snooze(10);
+		}
+	}
+}
+

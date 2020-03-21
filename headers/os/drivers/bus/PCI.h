@@ -36,6 +36,8 @@ typedef struct pci_device_module_info {
 	void 	(*get_pci_info)(pci_device *device, struct pci_info *info);
 	status_t (*find_pci_extended_capability)(pci_device *device, uint16 capID,
 				uint16 *offset);
+	uint8	(*get_powerstate)(pci_device *device);
+	void	(*set_powerstate)(pci_device *device, uint8 state);
 } pci_device_module_info;
 
 

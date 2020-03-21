@@ -114,6 +114,9 @@ public:
 
 			void			ClearDeviceStatus(PCIBus *bus, bool dumpStatus);
 
+			uint8			GetPowerstate(PCIDev *device);
+			void			SetPowerstate(PCIDev *device, uint8 state);
+
 			void			RefreshDeviceInfo();
 
 			status_t		UpdateInterruptLine(uint8 domain, uint8 bus,
