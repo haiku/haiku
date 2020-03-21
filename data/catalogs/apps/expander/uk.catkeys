@@ -43,7 +43,7 @@ Expander	System name		Expander
 Expand	ExpanderWindow		Розпакувати
 Close	ExpanderMenu		Закрити
 The destination is not a folder.	ExpanderWindow		Папка призначення не є папкою.
-Open destination folder after extraction	ExpanderPreferences		Відкрити папку призначення після розпаковки
+Open destination folder after extraction	ExpanderPreferences		Відкрити папку після розпаковки
 Creating listing for '%s'…	ExpanderWindow		Створення списку для '%s'…
 Set source…	ExpanderMenu		Що розпакувати…
 Show contents	ExpanderMenu		Показати вміст

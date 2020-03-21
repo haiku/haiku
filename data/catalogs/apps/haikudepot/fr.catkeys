@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	149632738
+1	french	x-vnd.Haiku-HaikuDepot	308891391
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Une erreur est survenue lors du rafraîchissement : %error%
 Check for updates…	MainWindow		Vérifier les mises à jour…
 Uninstall	PackageManager		Désinstaller
@@ -12,9 +12,11 @@ The response to the captcha was incorrect.	ServerHelper		Réponse incorrecte au 
 Develop packages	MainWindow		Paquets de développement
 Rate package…	PackageInfoView		Évaluer le paquet…
 Starting the package daemon failed:\n\n%Error%	App		Le démarrage du serveur de paquets a échoué :\n\n%Error%
+You have successfully authenticated as user %Nickname%.	UserLoginWindow		Vous êtes désormais authentifié en tant que %Nickname%.
 <no info>	PackageInfoView		<pas d’info>
 No user ratings available.	PackageInfoView		Aucun avis d’utilisateurs.
 Downloading package '%name%'	WorkStatusView		Téléchargement du paquet « %name% »
+It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Il n'a pas été possible d'extraire les informations captcha nécessaires depuis les données renvoyées par le serveur.
 Rating	PackageListView		Évaluation
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronisation des icônes
 Does not start	RatePackageWindow		Ne démarre pas
@@ -35,6 +37,8 @@ Local	LocalPkgDataLoadProcess		Local
 Rate %Package%	RatePackageWindow		Évaluer %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Une erreur est survenue lors de l’initialisation du gestionnaire de paquets : %message%
 Quit HaikuDepot	App		Quitter le Dépôt Haiku
+An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Une erreur inattendue « %Message% » est survenue avec la propriété « %Property% ».
+A response to the captcha question must be provided.	UserLoginWindow		Vous devez fournir une réponse à la question Captcha.
 Category	FilterView		Catégorie
 User rating	RatePackageWindow		Avis de l’utilisateur
 Installed packages	MainWindow		Paquets installés
@@ -84,6 +88,7 @@ Package daemon problem	App		Problème du serveur de paquets
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Dépôt
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (version %hd.version%)
+The email is malformed.	UserLoginWindow		L'adresse mail est malformée.
 Close	UserLoginWindow		Fermer
 Close	RatePackageWindow		Fermer
 View the usage conditions	UserLoginWindow		Voir les conditions d’utilisation
@@ -123,10 +128,12 @@ Email address:	UserLoginWindow		Adresse e-mail :
 Screenshot	ScreenshotWindow		Capture d’écran
 HaikuDepot	System name		Dépôt Haiku
 A reboot is necessary to complete the installation process.	PackageManager		Un redémarrage est nécessaire pour terminer le processus d’installation.
+View latest usage conditions…	MainWindow		Voir les dernières conditions d'utilisation…
 Search terms:	FilterView		Termes à rechercher :
 Pending…	PackageListView		En attente…
 Category:	FilterView		Catégorie :
 Authentication failed	UserLoginWindow		L’authentification a échoué
+Captcha error	UserLoginWindow		Erreur de Captcha
 Manage repositories…	MainWindow		Gérer les dépôts…
 Fetching remote repository data	LocalRepositoryUpdateProcess		Récupération des données du dépôt distant
 Description	PackageListView		Description
@@ -137,4 +144,5 @@ Log in…	MainWindow		Connexion…
 You need to be logged into an account before you can rate packages.	MainWindow		Vous devez vous authentifier pour évaluer les paquets.
 Client version too old	ServerHelper		Version du client obsolète
 9999.99 KiB	PackageListView		9999.99 Kio
+Repeat password:	UserLoginWindow		Répéter le mot de passe :
 All repositories	MainWindow		Tous les dépôts

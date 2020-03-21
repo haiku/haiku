@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	2739970561
+1	turkish	x-vnd.Haiku-libtracker	2332899407
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen yap
@@ -60,7 +60,7 @@ You can't move or copy items to read-only volumes.	FSUtils		Ögeler saltokunur d
 Create link	ContainerWindow		Bağlantı oluştur
 starts with	FindPanel		ile başlar
 Replace	FSUtils		Değiştir
-?+* follows nothing.	libtracker		?+* hiçbir şeyden sonra gelmiyor.
+?+* follows nothing.	libtracker		?+*, hiçbir şeyden sonra gelmiyor.
 Rectangle	AttributesView		Dikdörtgen
 Move to	ContainerWindow		Taşı
 Status	Email Query Columns		Durum
@@ -286,6 +286,7 @@ Error creating link to \"%name\".	FSUtils		\"%name\" ögesine bağlantı yaratı
 Unknown	FilePermissionsView		Bilinmeyen
 Paste links	ContainerWindow		Bağlantıları yapıştır
 Restoring: 	StatusWindow		Eski haline getiriliyor: 
+The Tracker must be running to set the default printer.	PoseView		Öntanımlı yazıcıyı ayarlamak için İzleyici çalışıyor olmalıdır.
 calculating…	InfoWindow		hesaplanıyor…
 Preferred for file	OpenWithWindow		Dosya için tercih edilen
 OK	AutoMounterSettings		Tamam

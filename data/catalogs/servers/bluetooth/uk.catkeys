@@ -1,0 +1,7 @@
+1	ukrainian	x-vnd.Haiku-bluetooth_server	3418434903
+Stopping the Bluetooth server failed.	BluetoothReplicant		Не вдалося зупинити сервер Bluetooth.
+Bluetooth error	BluetoothReplicant		Помилка Bluetooth
+Settings…	BluetoothReplicant		Налаштування…
+OK	BluetoothReplicant		ОК
+Error: %status%	BluetoothReplicant		Помилка: %status%
+Quit	BluetoothReplicant		Вийти

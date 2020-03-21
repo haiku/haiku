@@ -5,11 +5,11 @@ disconnected	IntefaceView		від'єднати
 IP Address:	IntefaceAddressView		IP адреса:
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Мережа:
-Received:	IntefaceView		Отримати:
+Received:	IntefaceView		Отримано:
 New…	NetworkWindow		Новий…
 no link	InterfaceListItem		немає з'єднання
 Other	NetworkWindow		Інший
-Sent:	IntefaceView		Відправити:
+Sent:	IntefaceView		Відправлено:
 Gateway:	IntefaceAddressView		Шлюз:
 The netmask defines your local network	IntefaceAddressView		Маска підмережі визначає вашу локальну мережу
 Your IP address	IntefaceAddressView		Ваша IP адреса
@@ -18,14 +18,14 @@ Netmask:	IntefaceAddressView		Маска підмережі:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Служби
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Не вдалося встановити NetworkStatus у Deskbar: %s
-Revert	NetworkWindow		Повернути
-off	ServiceListItem		вимкнуто
+Revert	NetworkWindow		Без змін
+off	ServiceListItem		зупинено
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<бездротових з'єднань не виявлено>
 Enable	IntefaceView		Доступно
 connected	IntefaceView		під'єднано
 Apply	IntefaceAddressView		Застосувати
-Disable	ServiceView		Заборонити
+Disable	ServiceView		Відключити
 WPA2	WPA2 protected network		WPA2
 Show network status in Deskbar	NetworkWindow		Відображати стан мережі у Deskbar
 Mode:	IntefaceAddressView		Режим:
@@ -33,23 +33,23 @@ connected	InterfaceListItem		під'єднання
 OK	NetworkWindow		ОК
 Static	IntefaceAddressView		Статичний
 launch error	NetworkWindow		помилка запуску
-Renegotiate	IntefaceView		Переукласти
+Renegotiate	IntefaceView		Під'єднати 
 MAC address:	IntefaceView		MAC адреса:
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 disabled	InterfaceListItem		заборонити
 Dial-up connection	InterfaceListItem		Dial-up з'єднання 
-on	ServiceListItem		увімкнено
+on	ServiceListItem		працює
 The method for obtaining an IP address	IntefaceAddressView		Спосіб отримання IP адреси
 disconnected	InterfaceListItem		роз'єднано
 Automatic	IntefaceAddressView		Автоматично
 Choose automatically	IntefaceView		Вибрати автоматично
 Status:	IntefaceView		Стан:
-Disable	IntefaceView		Заборонити
-Manage…	NetworkWindow		Керування…
+Disable	IntefaceView		Відключити
+Manage…	NetworkWindow		Управління…
 open	Open network		відкрити
 Network	NetworkWindow		Мережа
 Your gateway to the internet	IntefaceAddressView		Ваш інтернет шлюз
-Enable	ServiceView		Доступно
+Enable	ServiceView		Старт
 Wireless device	InterfaceListItem		Бездротова карта
-Disabled	IntefaceAddressView		Заборонити
+Disabled	IntefaceAddressView		Відключити
 VPN connection	InterfaceListItem		VPN з'єднання

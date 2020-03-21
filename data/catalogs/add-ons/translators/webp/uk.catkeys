@@ -13,8 +13,8 @@ Slower but better	ConfigView		Повільніше, але краще
 WebP image	WebPTranslator		Зображення WebP
 Output preset:	ConfigView		Пресет виводу:
 Picture	ConfigView		Картинка
-Low	ConfigView		Низький
-High	ConfigView		Високий
+Low	ConfigView		Низька
+High	ConfigView		Висока
 Drawing	ConfigView		Малюнок
 Based on libwebp %version%	ConfigView		Базується на libwebp %version%
 Default	ConfigView		За замовчуванням

@@ -1,0 +1,36 @@
+1	ukrainian	x-vnd.Haiku-Input	3192745662
+Scrolling	TouchpadPrefView		Прокрутка
+Defaults	InputMouse		За замовчуванням
+Long	KeyboardView		Більше
+Cancel	TouchpadPrefView		Скасувати
+Device List	InputWindow		Список пристроїв
+Double-click speed	SettingsView		Швидкість подвійного натискання
+Typing test area	KeyboardView		Область перевірки натискання
+Mouse type:	SettingsView		Тип миші:
+Fast	KeyboardView		Більше
+Please confirm	TouchpadPrefView		Будь ласка підтвердіть
+Click to focus	SettingsView		Натиснути для фокусу
+Acceleration	TouchpadPrefView		Прискорення
+Mouse speed	SettingsView		Швидкість миші
+Accept first click	SettingsView		Прийняти перший клік
+OK	TouchpadPrefView		ОК
+Horizontal scrolling	TouchpadPrefView		Горизонтальна прокрутка
+Delay until key repeat	KeyboardView		Затримка до повторення клавіші
+Input	System name		Input
+Mouse acceleration	SettingsView		Прискорення миші
+Defaults	TouchpadPrefView		За замовчуванням
+1-Button	SettingsView		1 кнопка
+Short	KeyboardView		Меньше
+Revert	InputMouse		Без змін
+Slow	KeyboardView		Меньше
+Key repeat rate	KeyboardView		Швидкість повторення
+2-Button	SettingsView		2 кнопки
+Click to focus and raise	SettingsView		Натиснути для фокусу та підняти
+Vertical	TouchpadPrefView		Вертикальний
+Horizontal	TouchpadPrefView		Горизонтальний
+Focus mode:	SettingsView		Режим фокусу:
+Focus follows mouse	SettingsView		Фокус слідує за мишею
+Double-click test area	SettingsView		Тестова область подвійного натискання
+Sensitivity	TouchpadPrefView		Чутливість
+3-Button	SettingsView		3 кнопки
+Revert	TouchpadPrefView		Без змін

@@ -3,7 +3,7 @@ Partially download messages larger than	ProtocolConfigView		Şu boyuttan büyük
 Password:	ProtocolConfigView		Parola:
 Remove mail from server when deleted	ProtocolConfigView		E-postalar silindiğinde sunucudan da sil
 Mail server:	ProtocolConfigView		E-posta sunucusu
-Select…	MailKit		Seç...
+Select…	MailKit		Seç…
 Connection type:	ProtocolConfigView		Bağlantı türü:
 KB	ProtocolConfigView	kilo byte	KB
 Leave mail on server	ProtocolConfigView		E-postaları sunucuda bırak

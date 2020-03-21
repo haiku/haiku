@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	2363461024
+1	russian	x-vnd.Haiku-HaikuDepot	429905564
 Repository update error	LocalRepositoryUpdateProcess		Ошибка обновления репозитория
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Произошла ошибка при обновлении репозитория: %error%
 User Created	UserLoginWindow		Пользователь создан
@@ -167,6 +167,7 @@ Log in…	MainWindow		Войти…
 You need to be logged into an account before you can rate packages.	MainWindow		Вы должны войти в свою учётную запись перед тем как оценить пакет.
 Client version too old	ServerHelper		Слишком старая версия клиента
 Local repository load error	LocalPkgDataLoadProcess		Ошибка загрузки локального репозитория
+The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		Пользователь не существует или введён неверный пароль. Проверьте свои учётные данные и попробуйте снова.
 9999.99 KiB	PackageListView		9999.99 КБ
 Repeat password:	UserLoginWindow		Повторите пароль:
 All repositories	MainWindow		Все репозитории

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	1066099065
+1	ukrainian	x-vnd.Haiku-libtracker	659027911
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -286,6 +286,7 @@ Error creating link to \"%name\".	FSUtils		Помилка створення п�
 Unknown	FilePermissionsView		Невідомий
 Paste links	ContainerWindow		Вставити посилання
 Restoring: 	StatusWindow		Відновлення: 
+The Tracker must be running to set the default printer.	PoseView		Щоб встановити принтер за замовчуванням потрібен запущений Tracker.
 calculating…	InfoWindow		обчислення…
 Preferred for file	OpenWithWindow		Насамперед для файлу
 OK	AutoMounterSettings		ОК

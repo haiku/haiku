@@ -42,7 +42,7 @@ Retrieving names…	Inquiry panel		Отримую імена…
 Show name	Extended local device view		Показати Ім'я
 Add device to list	Inquiry panel		Додати пристрій до списку
 Remaining %1 seconds	Inquiry panel		Залишилось %1 секунд
-The Bluetooth services are not currently running on this system.	main		Служби Bluetooth все ще не запущені у системі.
+The Bluetooth services are not currently running on this system.	main		Служби Bluetooth не запущені у системі.
 Discoverable	Extended local device view		Видимий
 Authenticate	Extended local device view		Автентифікувати
 Smart phone	Settings view		Смартфон

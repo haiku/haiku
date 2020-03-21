@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	3652134340
+1	french	x-vnd.Haiku-libtracker	3224192596
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -284,6 +284,7 @@ Error creating link to \"%name\".	FSUtils		Erreur à la création du lien vers �
 Unknown	FilePermissionsView		Inconnu
 Paste links	ContainerWindow		Coller les liens
 Restoring: 	StatusWindow		Restauration : 
+The Tracker must be running to set the default printer.	PoseView		Le Tracker doit être lancé pour pouvoir définir l’imprimante par défaut.
 calculating…	InfoWindow		calcul…
 Preferred for file	OpenWithWindow		Préférence pour le fichier
 OK	AutoMounterSettings		OK
@@ -355,6 +356,7 @@ Size:	InfoWindow		Taille :
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		L’élément sélectionné ne peut pas être envoyé à la Corbeille. Voulez vous le supprimer ? (Cette opération est irrémédiable.)
 Copy	ContainerWindow		Copier
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Désolé, un attribut “Caractère” ne peut pas contenir un glyphe multi-octet.
+Open parent	VirtualDirectoryWindow		Ouvrir le parent
 And	FindPanel		Et
 Palette-indexed picture	AttributesView		Image à palette indexée
 multiple disks	FindPanel		disques multiples
@@ -451,6 +453,7 @@ ends with	FindPanel		fini par
 Show Disks icon	SettingsView		Afficher l’icône des disques
 Outline selection rectangle only	SettingsView		Uniquement les contours du rectangle de sélection
 by formula	FindPanel		par formule
+Resize to fit	VirtualDirectoryWindow		Retailler pour ajuster
 Move to Trash	FilePanelPriv		Envoyer à la corbeille
 is	FindPanel		est
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Si vous renommez le dossier système ou son contenu, vous ne pourrez plus démarrer %osName !\n\nÊtes vous sûr de vouloir le faire ?\n\nPour renommer quand-même le dossier système ou son contenu , maintenez la touche Majuscule enfoncée et cliquez sur « renommer ».

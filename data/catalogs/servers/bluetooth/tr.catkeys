@@ -1,0 +1,7 @@
+1	turkish	x-vnd.Haiku-bluetooth_server	3418434903
+Stopping the Bluetooth server failed.	BluetoothReplicant		Bluetooth sunucusu durdurulamadı.
+Bluetooth error	BluetoothReplicant		Bluetooth hatası
+Settings…	BluetoothReplicant		Ayarlar…
+OK	BluetoothReplicant		Tamam
+Error: %status%	BluetoothReplicant		Hata: %status%
+Quit	BluetoothReplicant		Çık

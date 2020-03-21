@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Terminal	2058440251
+1	russian	x-vnd.Haiku-Terminal	2664488407
 Close other tabs	Terminal TermWindow		Закрыть остальные вкладки
 Insert path	Terminal TermView		Вставить путь
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Терминал не смог запустить оболочку. Простите.
@@ -20,7 +20,7 @@ Use default	Terminal SetTitleWindow		По умолчанию
 Close tab	Terminal TermWindow		Закрыть вкладку
 Selected background	Terminal AppearancePrefView		Выделенного фона
 Error!	Terminal getString		Ошибка!
-Set tab title	Terminal TermWindow		Переименовть вкладку
+Set tab title	Terminal TermWindow		Переименовать вкладку
 Appearance	Terminal PrefWindow		Внешний вид
 Encoding:	Terminal AppearancePrefView		Кодировка:
 Create link here	Terminal TermView		Создать ссылку здесь
@@ -72,6 +72,7 @@ Cursor	Terminal AppearancePrefView		Курсора
 Full screen	Terminal TermWindow		На весь экран
 Shell 	Terminal TermWindow		Консоль 
 Midnight	Terminal colors scheme		Полночь
+\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tСимвол '%'.\n\t%<\t-\tНачало секции, которая будет отображена если заполнитель\n\t\t\tпосле начала не пустой.\n\t%>\t-\tНачало секции, которая будет отображена если заполнитель\n\t\t\tмежду предыдущей секцией %< и этой не пустой.\n\t%-\t-\tКонец секции %< или %>.\n\nЛюбой не буквенно-цифровой символ между '%' и буквой формата вставит пробел\nесли значение заполнителя не пустое. Он будет добавлен в секцию %<.
 Tab title:	Terminal TermWindow		Заголовок вкладки:
 Window title:	Terminal TermWindow		Заголовок окна:
 Default	Terminal colors scheme		По умолчанию

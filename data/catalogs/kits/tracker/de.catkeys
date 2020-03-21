@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	5140995
+1	german	x-vnd.Haiku-libtracker	3893037137
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -283,6 +283,7 @@ Error creating link to \"%name\".	FSUtils		Fehler beim Erstellen der Verknüpfun
 Unknown	FilePermissionsView		Unbekannt
 Paste links	ContainerWindow		Verknüpfungen einfügen
 Restoring: 	StatusWindow		Wiederherstellen von:
+The Tracker must be running to set the default printer.	PoseView		Um einen Standarddrucker zu setzen, muss der Tracker laufen.
 calculating…	InfoWindow		Berechnung läuft…
 Preferred for file	OpenWithWindow		Bevorzugt für Datei
 OK	AutoMounterSettings		OK

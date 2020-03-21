@@ -15,7 +15,7 @@ Major class: 	DeviceClass		Основной класс:
 HiFi audio device	DeviceClass		HiFi аудио устройство
 Microphone	DeviceClass		Микрофон
 Capturing	DeviceClass		Захват
-Jacket	DeviceClass		Куртка
+Jacket	DeviceClass		Джекет
 50-67% utilized	DeviceClass		Использовано 50-67%
 Headphones	DeviceClass		Наушники
 Imaging	DeviceClass		Обработка изображений

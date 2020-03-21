@@ -1,0 +1,7 @@
+1	ukrainian	x-vnd.Haiku-libmedia	1584689129
+Cleaning up.	MediaDefs		Очищення.
+Starting media_services.	MediaDefs		Запуск media_services.
+Stopping media_addon_server.	MediaDefs		Зупинка media_addon_server.
+Ready for use.	MediaDefs		Готовий до використання.
+Stopping media server…	MediaDefs		Зупинка медіа-сервера…
+Error occurred starting media services.	MediaDefs		Сталася помилка під час запуску служб медіа.

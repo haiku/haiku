@@ -12,7 +12,7 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Etkin program
 Solarized Dark	Terminal colors scheme		Solmuş Koyu
 Copy	Terminal TermWindow		Kopyala
 Retro	Terminal colors scheme		Eski Moda
-Edit tab title…	Terminal TermWindow		Sekme başlığını düzenle...
+Edit tab title…	Terminal TermWindow		Sekme başlığını düzenle…
 Print	Terminal TermWindow		Yazdır
 Settings	Terminal TermWindow		Ayarlar
 %app% settings	Terminal PrefWindow	window title	%app% Ayarları
@@ -27,7 +27,7 @@ Create link here	Terminal TermView		Burada bağlantı oluştur
 Custom	Terminal AppearancePrefView	Window size	Özel
 Selected text	Terminal AppearancePrefView		Seçili metin
 Change directory	Terminal TermView		Dizini değiştir
-Page setup…	Terminal TermWindow		Sayfa düzeni...
+Page setup…	Terminal TermWindow		Sayfa düzeni…
 Slate	Terminal colors scheme		Arduvaz
 Defaults	Terminal PrefWindow		Öntanımlılar
 Cancel	Terminal TermView		İptal
@@ -39,7 +39,7 @@ Copy link location	Terminal TermView		Bağlantı konumunu kopyala
 Window title:	Terminal AppearancePrefView		Pencere başlığı:
 New tab	Terminal TermWindow		Yeni sekme
 Allow bold text	Terminal AppearancePrefView		Kalın metne izin ver
-Window title…	Terminal TermWindow		Pencere başlığı...
+Window title…	Terminal TermWindow		Pencere başlığı…
 Blue	Terminal colors scheme		Mavi
 Cannot execute \"%command\":\n\t%error	Terminal Shell		\"%command\" çalıştırılamadı:\n\t%error
 Open path	Terminal TermView		Yol aç
@@ -61,7 +61,7 @@ Match case	Terminal FindWindow		BÜYÜK/küçük harf eşleştir
 Find previous	Terminal TermWindow		Öncekini bul
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Sekme başlıklarını belirten dizgi. Aşağıdaki yer tutucular kullanılabilir:\n
 Close	Terminal TermWindow		Kapat
-Save to file…	Terminal PrefWindow		Dosyaya kaydet...
+Save to file…	Terminal PrefWindow		Dosyaya kaydet…
 Background	Terminal AppearancePrefView		Arka plan
 Copy path	Terminal TermView		Yolu kopyala
 Window size	Terminal TermWindow		Pencere boyutu
@@ -79,7 +79,7 @@ Default	Terminal colors scheme		Öntanımlı
 Window size:	Terminal AppearancePrefView		Pencere boyutu:
 Switch Terminals	Terminal TermWindow		Diğer uçbirime geç
 Decrease	Terminal TermWindow		Azalt
-Settings…	Terminal TermWindow		Ayarlar...
+Settings…	Terminal TermWindow		Ayarlar…
 Cancel	Terminal SetTitleWindow		İptal
 Blinking cursor	Terminal AppearancePrefView		Yanıp sönen imleç
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Pencere başlığını belirten dizgi.\nAşağıdaki yer tutucular kullanılabilir:\n
@@ -100,7 +100,7 @@ Color:	Terminal AppearancePrefView		Renk:
 Open link	Terminal TermView		Bağlantıyı aç
 Text	Terminal AppearancePrefView		Metin
 Not found.	Terminal TermWindow		Bulunamadı.
-Find…	Terminal TermWindow		Bul...
+Find…	Terminal TermWindow		Bul…
 No search string was entered.	Terminal TermWindow		Hiçbir arama dizisi girilmedi.
 Text under cursor	Terminal AppearancePrefView		İmleç altındaki metin
 Move here	Terminal TermView		Buraya taşı

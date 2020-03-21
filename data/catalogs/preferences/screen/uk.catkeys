@@ -27,7 +27,7 @@ yes	Screen		так
 Swap displays:	Screen		Поміняти дисплеї:
 %sSerial no.: %s	Screen		%sSerial no.: %s
 8 bits/pixel, 256 colors	Screen		8 бітів/піксель, 256 кольорів
-Revert	Screen		Повернути
+Revert	Screen		Без змін
 always	Screen		завжди
 Confirm changes	Screen		Підтвердити зміни
 Warning	Screen		Увага

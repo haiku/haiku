@@ -1,0 +1,46 @@
+1	turkish	x-vnd.Haiku-Input	2494436940
+Scrolling	TouchpadPrefView		Kaydırma
+Defaults	InputMouse		Öntanımlılar
+Tapping	TouchpadPrefView		Dokunma
+Long	KeyboardView		Uzun
+Normal	SettingsView		Normal
+Cancel	TouchpadPrefView		İptal
+Slow	TouchpadPrefView		Yavaş
+Warp	SettingsView		Büküm
+Instant warp	SettingsView		Anında büküm
+Device List	InputWindow		Aygıt Listesi
+Double-click speed	SettingsView		Çift tıklama hızı
+Typing test area	KeyboardView		Yazma sınama alanı
+Mouse type:	SettingsView		Fare türü:
+Fast	KeyboardView		Hızlı
+Off	TouchpadPrefView		Kapalı
+Fast	TouchpadPrefView		Hızlı
+Please confirm	TouchpadPrefView		Lütfen onaylayın
+Click to focus	SettingsView		Odak için tıkla
+Acceleration	TouchpadPrefView		İvmelenme
+Mouse speed	SettingsView		Fare hızı
+Accept first click	SettingsView		İlk tıklamayı kabul et
+OK	TouchpadPrefView		Tamam
+Horizontal scrolling	TouchpadPrefView		Yatay kaydırma
+Delay until key repeat	KeyboardView		Düğme yinelemesine kadar olan gecikme
+Two finger scrolling	TouchpadPrefView		İki parmak kaydırma
+Input	System name		Girdi
+Mouse acceleration	SettingsView		Fare ivmelenmesi
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Yeni kaydırma alanı çok geniş ve normal fare işlemlerine engel olabilir. Değiştirmek istediğinizden emin misiniz?
+High	TouchpadPrefView		Yüksek
+Defaults	TouchpadPrefView		Öntanımlılar
+1-Button	SettingsView		1 düğmeli
+Short	KeyboardView		Kısa
+Revert	InputMouse		Eski haline döndür
+Slow	KeyboardView		Yavaş
+Key repeat rate	KeyboardView		Düğme yineleme oranı
+2-Button	SettingsView		2 düğmeli
+Click to focus and raise	SettingsView		Odaklayıp öne getirmek için tıkla
+Vertical	TouchpadPrefView		Dikey
+Horizontal	TouchpadPrefView		Yatay
+Focus mode:	SettingsView		Odak kipi:
+Focus follows mouse	SettingsView		Odak, fareden sonra gelir
+Double-click test area	SettingsView		Çift tıklama sınama alanı
+Sensitivity	TouchpadPrefView		Hassaslık
+3-Button	SettingsView		3 düğmeli
+Revert	TouchpadPrefView		Eski haline döndür

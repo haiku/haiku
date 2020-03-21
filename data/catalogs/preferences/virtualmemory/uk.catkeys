@@ -5,7 +5,7 @@ OK	VirtualMemoryApp		ОК
 Use volume:	SettingsWindow		Використати том:
 Turn off	SettingsWindow		Вимкнути
 Changes will take effect upon reboot.	SettingsWindow		Зміни вступлять в силу після перезавантаження.
-Revert	SettingsWindow		Повернути
+Revert	SettingsWindow		Без змін
 Keep enabled	SettingsWindow		Зберегти включення
 The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Параметри у файлі налаштувань хибні. Ви можете завантажити за замовчуванням або вийти.
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tавтор Axel Dörfler\n\tCopyright 2005, Haiku.\n

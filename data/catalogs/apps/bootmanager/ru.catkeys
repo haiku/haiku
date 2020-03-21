@@ -6,7 +6,7 @@ Boot Manager is unable to read the partition table!	BootManagerController		Ме�
 Immediately	DefaultPartitionPage		Без ожидания
 Uninstall Boot Manager	UninstallPage	Title	Удалить Менеджер Загрузки
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Неизвестная файловая система
-Installation of boot menu failed	BootManagerController	Title	Удаление загрузочного меню завершено
+Installation of boot menu failed	BootManagerController	Title	Не удалось установить загрузочное меню
 Backup Master Boot Record	BootManagerController	Title	Сохранить главную загрузочную запись (MBR)
 Cannot access!	DrivesPage	Cannot install	Невозможно получить доступ!
 After one second	DefaultPartitionPage		1 секунда

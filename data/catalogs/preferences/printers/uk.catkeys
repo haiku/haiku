@@ -8,7 +8,7 @@ Connected to:	AddPrinterDialog		Підключений до:
 Make default	PrintersWindow		Зробити основним
 Cyan	TestPageView		Бірюзовий
 Completed	JobListView		Завершено
-Test page	PrintersWindow		Пробна сторінка
+Test page	PrintersWindow		Тестова сторінка
 Transport: %transport% %transport_address%	PrinterListView		Транспорт: %transport% %transport_address%
 Failed	JobListView		Невдало
 Blue	TestPageView		Синій
@@ -34,7 +34,7 @@ Printers	System name		Принтери
 {0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{Черга вільна}=1{1 завдання на черзі}few{# завдання на черзі}other{# завдань на черзі}}
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Принтер: %printer_name%\nДрайвер: %driver%\n
 Green	TestPageView		Зелений
-Print test page	PrintersWindow		Друк пробної сторінки
+Print test page	PrintersWindow		Тестова сторінка
 Restart job	PrintersWindow		Перезапустити завдання
 Driver: %driver%	PrinterListView		Драйвер: %driver%
 Cancel job	PrintersWindow		Скасувати завдання

@@ -2,9 +2,9 @@
 If the application will not quit you may have to kill it.	Team monitor		Якщо Ви не можете вийти з програми, Ви можете знищити її.
 Quit application	Team monitor		Вийти з програми
 Restart the desktop	Team monitor		Перезагрузити робочий стіл
-Force reboot	Team monitor		Перезавантити примусово
-Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Виберіть програму зі списку нижче і натисніть на кнопку 'Знищити програму' або 'Вийти з програми' у випадку її закриття.\n\nУтримуйте CONTROL+ALT+DELETE протягом %ld секунд для перезавантаження.
-Team monitor	Team monitor		Монітор команд
+Force reboot	Team monitor		Перезавантажити примусово
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Виберіть програму зі списку вище і натисніть на кнопку 'Знищити програму' або 'Вийти з програми' у випадку її закриття.\n\nУтримуйте CONTROL+ALT+DELETE протягом %ld секунд для перезавантаження.
+Team monitor	Team monitor		Монітор 'Команд'
 Kill application	Team monitor		Знищити програму
 Cancel	Team monitor		Скасувати
-(This team is a system component)	Team monitor		(Ця команда є системним компонентом)
+(This team is a system component)	Team monitor		(Ця 'команда' є системним компонентом)
