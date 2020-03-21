@@ -534,7 +534,7 @@ WorkerThread::_PerformInstall(partition_id sourcePartitionID,
 	reporter.StartTimer();
 
 	// copy source volume
-	err = engine.CopyFolder(srcDirectory.Path(), targetDirectory.Path(),
+	err = engine.Copy(srcDirectory.Path(), targetDirectory.Path(),
 		fCancelSemaphore);
 	if (err != B_OK)
 		return _InstallationError(err);
@@ -546,7 +546,7 @@ WorkerThread::_PerformInstall(partition_id sourcePartitionID,
 		for (int32 i = 0; i < count; i++) {
 			Package *p = static_cast<Package*>(fPackages->ItemAt(i));
 			BPath packageDir(pkgRootDir.Path(), p->Folder());
-			err = engine.CopyFolder(packageDir.Path(), targetDirectory.Path(),
+			err = engine.Copy(packageDir.Path(), targetDirectory.Path(),
 				fCancelSemaphore);
 			if (err != B_OK)
 				return _InstallationError(err);

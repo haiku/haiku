@@ -32,20 +32,21 @@ public:
 			status_t			CollectTargets(const char* source,
 									sem_id cancelSemaphore = -1);
 
-			status_t			CopyFolder(const char* source,
+			status_t			Copy(const char* source,
 									const char* destination,
-									sem_id cancelSemaphore = -1);
-
-			status_t			CopyFile(const BEntry& entry,
-									const BEntry& destination,
-									sem_id cancelSemaphore = -1);
+									sem_id cancelSemaphore = -1,
+									bool copyAttributes = true);
 
 private:
 			status_t			_CollectCopyInfo(const char* source,
 									int32& level, sem_id cancelSemaphore);
-			status_t			_CopyFolder(const char* source,
-									const char* destination,
-									int32& level, sem_id cancelSemaphore);
+			status_t			_Copy(BEntry& source,
+									BEntry& destination,
+									int32& level, sem_id cancelSemaphore,
+									bool copyAttributes);
+			status_t			_CopyData(const BEntry& entry,
+									const BEntry& destination,
+									sem_id cancelSemaphore = -1);
 
 			status_t			_RemoveFolder(BEntry& entry);
 
