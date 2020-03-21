@@ -226,56 +226,56 @@ CopyEngine::_CollectCopyInfo(const char* _source, int32& level,
 {
 	level++;
 
-	BDirectory source(_source);
+	BEntry source(_source);
 	status_t ret = source.InitCheck();
 	if (ret < B_OK)
 		return ret;
 
-	BEntry entry;
-	while (source.GetNextEntry(&entry) == B_OK) {
-		SemaphoreLocker lock(cancelSemaphore);
-		if (cancelSemaphore >= 0 && !lock.IsLocked()) {
-			// We are supposed to quit
-			return B_CANCELED;
-		}
+	struct stat statInfo;
+	ret = source.GetStat(&statInfo);
+	if (ret < B_OK)
+		return ret;
 
-		struct stat statInfo;
-		entry.GetStat(&statInfo);
+	SemaphoreLocker lock(cancelSemaphore);
+	if (cancelSemaphore >= 0 && !lock.IsLocked()) {
+		// We are supposed to quit
+		return B_CANCELED;
+	}
 
-		BPath sourceEntryPath;
-		status_t ret = entry.GetPath(&sourceEntryPath);
+	if (fEntryFilter != NULL
+		&& !fEntryFilter->ShouldCopyEntry(source,
+			_RelativeEntryPath(_source), statInfo, level)) {
+		// Skip this entry
+		return B_OK;
+	}
+
+	if (cancelSemaphore >= 0)
+		lock.Unlock();
+
+	if (S_ISDIR(statInfo.st_mode)) {
+		BDirectory srcFolder(&source);
+		ret = srcFolder.InitCheck();
 		if (ret < B_OK)
 			return ret;
 
-		if (fEntryFilter != NULL
-			&& !fEntryFilter->ShouldCopyEntry(entry,
-				_RelativeEntryPath(sourceEntryPath.Path()), statInfo, level)) {
-			continue;
-		}
-
-		if (S_ISDIR(statInfo.st_mode)) {
-			// handle recursive directory copy
-			BPath srcFolder;
-			ret = entry.GetPath(&srcFolder);
+		BEntry entry;
+		while (srcFolder.GetNextEntry(&entry) == B_OK) {
+			BPath entryPath;
+			ret = entry.GetPath(&entryPath);
 			if (ret < B_OK)
 				return ret;
 
-			if (cancelSemaphore >= 0)
-				lock.Unlock();
-
-			ret = _CollectCopyInfo(srcFolder.Path(), level, cancelSemaphore);
+			ret = _CollectCopyInfo(entryPath.Path(), level, cancelSemaphore);
 			if (ret < B_OK)
 				return ret;
-		} else if (S_ISLNK(statInfo.st_mode)) {
-			// link, ignore size
-		} else {
-			// file data
-			fBytesToCopy += statInfo.st_size;
 		}
-
-		fItemsToCopy++;
+	} else if (S_ISLNK(statInfo.st_mode)) {
+		// link, ignore size
+	} else {
+		fBytesToCopy += statInfo.st_size;
 	}
 
+	fItemsToCopy++;
 	level--;
 	return B_OK;
 }
