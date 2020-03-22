@@ -193,9 +193,9 @@ PackageSettings::Load(dev_t mountPointDeviceID, ino_t mountPointNodeID,
 
 	// get the mount point relative settings file path
 	const char* settingsFilePath = mountType == PACKAGE_FS_MOUNT_TYPE_HOME
-		? kUserSettingsGlobalDirectory "/packages"
-			+ strlen(kUserConfigDirectory) + 1
-		: kSystemSettingsDirectory "/packages" + strlen(kSystemDirectory) + 1;
+		? &(kUserSettingsGlobalDirectory "/packages")
+			[strlen(kUserConfigDirectory) + 1]
+		: &(kSystemSettingsDirectory "/packages")[strlen(kSystemDirectory) + 1];
 
 	// get an absolute path
 	KPath path;

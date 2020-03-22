@@ -43,7 +43,7 @@ PackageSettingsItem::Load(::Directory* systemDirectory, const char* name)
 {
 	// open the driver settings file
 	const char* settingsFilePath
-		= kSystemSettingsDirectory "/packages" + strlen(kSystemDirectory) + 1;
+		= &(kSystemSettingsDirectory "/packages")[strlen(kSystemDirectory) + 1];
 
 	int fd = open_from(systemDirectory, settingsFilePath, B_READ_ONLY, 0);
 	if (fd < 0)
