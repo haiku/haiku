@@ -1517,36 +1517,14 @@ int nvme_ioqp_submit_cmd(struct nvme_qpair *qpair,
 			 void *buf, size_t len,
 			 nvme_cmd_cb cb_fn, void *cb_arg)
 {
-	struct nvme_ctrlr *ctrlr = qpair->ctrlr;
 	struct nvme_request *req;
 	int ret = ENOMEM;
-
-	pthread_mutex_lock(&ctrlr->lock);
 
 	req = nvme_request_allocate_contig(qpair, buf, len, cb_fn, cb_arg);
 	if (req) {
 		memcpy(&req->cmd, cmd, sizeof(req->cmd));
 		ret = nvme_qpair_submit_request(qpair, req);
 	}
-
-	pthread_mutex_unlock(&ctrlr->lock);
-
-	return ret;
-}
-
-/*
- * Poll for completion of NVMe commands submitted to the
- * specified I/O queue pair.
- */
-unsigned int nvme_ioqp_poll(struct nvme_qpair *qpair,
-			    unsigned int max_completions)
-{
-	struct nvme_ctrlr *ctrlr = qpair->ctrlr;
-	int ret;
-
-	pthread_mutex_lock(&ctrlr->lock);
-	ret = nvme_qpair_poll(qpair, max_completions);
-	pthread_mutex_unlock(&ctrlr->lock);
 
 	return ret;
 }

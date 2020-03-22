@@ -87,7 +87,6 @@ typedef struct {
 
 	struct qpair_info {
 		struct nvme_qpair*	qpair;
-		mutex				mtx;
 	}						qpairs[NVME_MAX_QPAIRS];
 	uint32					qpair_count;
 	uint32					next_qpair;
@@ -238,7 +237,6 @@ nvme_disk_init_device(void* _info, void** _cookie)
 		if (info->qpairs[i].qpair == NULL)
 			break;
 
-		mutex_init(&info->qpairs[i].mtx, "qpair mutex");
 		info->qpair_count++;
 	}
 	if (info->qpair_count == 0) {
@@ -394,13 +392,13 @@ await_status(nvme_disk_driver_info* info, struct nvme_qpair* qpair, status_t& st
 	while (status == EINPROGRESS) {
 		info->interrupt.Add(&entry);
 
-		nvme_ioqp_poll(qpair, 0);
+		nvme_qpair_poll(qpair, 0);
 
 		if (status != EINPROGRESS)
 			return;
 
 		entry.Wait();
-		nvme_ioqp_poll(qpair, 0);
+		nvme_qpair_poll(qpair, 0);
 	}
 }
 
@@ -415,7 +413,6 @@ do_nvme_io(nvme_disk_driver_info* info, off_t rounded_pos, void* buffer,
 	status_t status = EINPROGRESS;
 
 	qpair_info* qpinfo = get_next_qpair(info);
-	mutex_lock(&qpinfo->mtx);
 	int ret = -1;
 	if (write) {
 		ret = nvme_ns_write(info->ns, qpinfo->qpair, buffer,
@@ -426,7 +423,6 @@ do_nvme_io(nvme_disk_driver_info* info, off_t rounded_pos, void* buffer,
 			rounded_pos / block_size, *rounded_len / block_size,
 			(nvme_cmd_cb)disk_io_callback, &status, 0);
 	}
-	mutex_unlock(&qpinfo->mtx);
 	if (ret != 0) {
 		TRACE_ERROR("attempt to queue %s I/O at %" B_PRIdOFF " of %" B_PRIuSIZE
 			" bytes failed!\n", write ? "write" : "read", rounded_pos, *rounded_len);
@@ -573,10 +569,8 @@ nvme_disk_flush(nvme_disk_driver_info* info)
 	status_t status = EINPROGRESS;
 
 	qpair_info* qpinfo = get_next_qpair(info);
-	mutex_lock(&qpinfo->mtx);
 	int ret = nvme_ns_flush(info->ns, qpinfo->qpair,
 		(nvme_cmd_cb)disk_io_callback, &status);
-	mutex_unlock(&qpinfo->mtx);
 	if (ret != 0)
 		return ret;
 

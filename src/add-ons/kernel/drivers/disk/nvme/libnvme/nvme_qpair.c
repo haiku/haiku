@@ -843,6 +843,8 @@ int nvme_qpair_construct(struct nvme_ctrlr *ctrlr, struct nvme_qpair *qpair,
 	nvme_assert(entries != 0, "Invalid number of entries\n");
 	nvme_assert(trackers != 0, "Invalid trackers\n");
 
+	pthread_mutex_init(&qpair->lock, NULL);
+
 	qpair->entries = entries;
 	qpair->trackers = trackers;
 	qpair->qprio = qprio;
@@ -973,9 +975,10 @@ void nvme_qpair_destroy(struct nvme_qpair *qpair)
 	}
 	nvme_request_pool_destroy(qpair);
 
+	pthread_mutex_destroy(&qpair->lock);
 }
 
-bool nvme_qpair_enabled(struct nvme_qpair *qpair)
+static bool nvme_qpair_enabled(struct nvme_qpair *qpair)
 {
 	if (!qpair->enabled && !qpair->ctrlr->resetting)
 		nvme_qpair_enable(qpair);
@@ -1022,6 +1025,8 @@ int nvme_qpair_submit_request(struct nvme_qpair *qpair,
 		return ret;
 	}
 
+	pthread_mutex_lock(&qpair->lock);
+
 	tr = LIST_FIRST(&qpair->free_tr);
 	if (tr == NULL || !qpair->enabled) {
 		/*
@@ -1062,9 +1067,15 @@ int nvme_qpair_submit_request(struct nvme_qpair *qpair,
 	if (ret == 0)
 		nvme_qpair_submit_tracker(qpair, tr);
 
+	pthread_mutex_unlock(&qpair->lock);
+
 	return ret;
 }
 
+/*
+ * Poll for completion of NVMe commands submitted to the
+ * specified I/O queue pair.
+ */
 unsigned int nvme_qpair_poll(struct nvme_qpair *qpair,
 			     unsigned int max_completions)
 {
@@ -1089,6 +1100,8 @@ unsigned int nvme_qpair_poll(struct nvme_qpair *qpair,
 		 * queue doorbells don't wrap around.
 		 */
 		max_completions = qpair->entries - 1;
+
+	pthread_mutex_lock(&qpair->lock);
 
 	while (1) {
 
@@ -1117,11 +1130,15 @@ unsigned int nvme_qpair_poll(struct nvme_qpair *qpair,
 	if (num_completions > 0)
 		nvme_mmio_write_4(qpair->cq_hdbl, qpair->cq_head);
 
+	pthread_mutex_unlock(&qpair->lock);
+
 	return num_completions;
 }
 
 void nvme_qpair_reset(struct nvme_qpair *qpair)
 {
+	pthread_mutex_lock(&qpair->lock);
+
 	qpair->sq_tail = qpair->cq_head = 0;
 
 	/*
@@ -1134,28 +1151,40 @@ void nvme_qpair_reset(struct nvme_qpair *qpair)
 
 	memset(qpair->cmd, 0, qpair->entries * sizeof(struct nvme_cmd));
 	memset(qpair->cpl, 0, qpair->entries * sizeof(struct nvme_cpl));
+
+	pthread_mutex_unlock(&qpair->lock);
 }
 
 void nvme_qpair_enable(struct nvme_qpair *qpair)
 {
+	pthread_mutex_lock(&qpair->lock);
+
 	if (nvme_qpair_is_io_queue(qpair))
 		_nvme_qpair_io_qpair_enable(qpair);
 	else
 		_nvme_qpair_admin_qpair_enable(qpair);
+
+	pthread_mutex_unlock(&qpair->lock);
 }
 
 void nvme_qpair_disable(struct nvme_qpair *qpair)
 {
+	pthread_mutex_lock(&qpair->lock);
+
 	if (nvme_qpair_is_io_queue(qpair))
 		_nvme_qpair_io_qpair_disable(qpair);
 	else
 		_nvme_qpair_admin_qpair_disable(qpair);
+
+	pthread_mutex_unlock(&qpair->lock);
 }
 
 void nvme_qpair_fail(struct nvme_qpair *qpair)
 {
 	struct nvme_tracker *tr;
 	struct nvme_request *req;
+
+	pthread_mutex_lock(&qpair->lock);
 
 	while (!STAILQ_EMPTY(&qpair->queued_req)) {
 
@@ -1182,5 +1211,7 @@ void nvme_qpair_fail(struct nvme_qpair *qpair)
 						   1, true);
 
 	}
+
+	pthread_mutex_unlock(&qpair->lock);
 }
 

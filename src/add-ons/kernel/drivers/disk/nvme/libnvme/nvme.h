@@ -769,7 +769,7 @@ extern int nvme_ioqp_submit_cmd(struct nvme_qpair *qpair,
  *
  * @sa nvme_cmd_cb
  */
-extern unsigned int nvme_ioqp_poll(struct nvme_qpair *qpair,
+extern unsigned int nvme_qpair_poll(struct nvme_qpair *qpair,
 				   unsigned int max_completions);
 
 /**

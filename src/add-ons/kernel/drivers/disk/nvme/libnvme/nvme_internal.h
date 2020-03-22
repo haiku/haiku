@@ -339,6 +339,10 @@ nvme_static_assert((offsetof(struct nvme_tracker, u.sgl) & 7) == 0,
 		   "SGL must be Qword aligned");
 
 struct nvme_qpair {
+	/*
+	 * Guards access to this structure.
+	 */
+	pthread_mutex_t				lock;
 
 	volatile uint32_t	        *sq_tdbl;
 	volatile uint32_t	        *cq_hdbl;
@@ -544,15 +548,14 @@ struct nvme_ctrlr {
 	void				*aer_cb_arg;
 
 	/*
-	 * Guards access to the controller itself, including admin queues.
-	 */
-	pthread_mutex_t			lock;
-
-
-	/*
 	 * Admin queue pair.
 	 */
 	struct nvme_qpair		adminq;
+
+	/*
+	 * Guards access to the controller itself.
+	 */
+	pthread_mutex_t			lock;
 
 	/*
 	 * Identify Controller data.
