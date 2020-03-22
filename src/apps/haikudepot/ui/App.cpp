@@ -1,6 +1,6 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -29,6 +29,7 @@
 #include "ServerHelper.h"
 #include "ServerSettings.h"
 #include "ScreenshotWindow.h"
+#include "StorageUtils.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -42,6 +43,7 @@ App::App()
 	fWindowCount(0),
 	fSettingsRead(false)
 {
+	srand((unsigned int) time(NULL));
 	_CheckPackageDaemonRuns();
 }
 
@@ -82,6 +84,12 @@ App::ReadyToRun()
 
 	BMessage settings;
 	_LoadSettings(settings);
+
+	if (!_CheckTestFile())
+	{
+		Quit();
+		return;
+	}
 
 	fMainWindow = new MainWindow(settings);
 	_ShowWindow(fMainWindow);
@@ -506,3 +514,46 @@ App::_LaunchPackageDaemon()
 	return true;
 }
 
+
+/*! \brief Checks to ensure that a working file is able to be written.
+    \return false if the startup should be stopped and the application should
+            quit.
+*/
+
+bool
+App::_CheckTestFile()
+{
+	BPath testFilePath;
+	BString pathDescription = "???";
+	status_t result = StorageUtils::LocalWorkingFilesPath("testfile.txt",
+		testFilePath, false);
+
+	if (result == B_OK) {
+		pathDescription = testFilePath.Path();
+		result = StorageUtils::CheckCanWriteTo(testFilePath);
+	}
+
+	if (result != B_OK) {
+		StorageUtils::SetWorkingFilesUnavailable();
+
+		BString msg = B_TRANSLATE("This application writes and reads some"
+			" working files on your computer in order to function. It appears"
+			" that there are problems writing a test file at [%TestFilePath%]."
+			" Check that there are no issues with your local disk or"
+			" permissions that might prevent this application from writing"
+			" files into that directory location. You may choose to acknowledge"
+			" this problem and continue, but some functionality may be"
+			" disabled.");
+		msg.ReplaceAll("%TestFilePath%", pathDescription);
+
+		BAlert* alert = new(std::nothrow) BAlert(
+			B_TRANSLATE("Problem with working files"),
+			msg,
+			B_TRANSLATE("Quit"), B_TRANSLATE("Continue"));
+
+		if (alert->Go() == 0)
+			return false;
+	}
+
+	return true;
+}

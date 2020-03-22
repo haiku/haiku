@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -10,12 +10,31 @@
 
 #include <Directory.h>
 #include <File.h>
+#include <FindDirectory.h>
 #include <Entry.h>
 #include <String.h>
 
+#include "HaikuDepotConstants.h"
 #include "Logger.h"
 
 #define FILE_TO_STRING_BUFFER_LEN 64
+
+
+static bool sAreWorkingFilesAvailable = true;
+
+
+/*static*/ bool
+StorageUtils::AreWorkingFilesAvailable()
+{
+	return sAreWorkingFilesAvailable;
+}
+
+
+/*static*/ void
+StorageUtils::SetWorkingFilesUnavailable()
+{
+	sAreWorkingFilesAvailable = false;
+}
 
 
 /* This method will append the contents of the file at the supplied path to the
@@ -90,7 +109,7 @@ StorageUtils::RemoveDirectoryContents(BPath& path)
  */
 
 status_t
-StorageUtils::ExistsObject(BPath& path,
+StorageUtils::ExistsObject(const BPath& path,
 	bool* exists,
 	bool* isDirectory,
 	off_t* size)
@@ -121,4 +140,149 @@ StorageUtils::ExistsObject(BPath& path,
 	}
 
 	return B_OK;
+}
+
+
+/*! This method will check that it is possible to write to the specified file.
+    This may create the file, write some data to it and then read that data
+    back again to be sure.  This can be used as an effective safety measure as
+    the application starts up in order to ensure that the storage systems are
+    in place for the application to startup.
+
+    It is assumed here that the directory containing the test file exists.
+*/
+
+/*static*/ status_t
+StorageUtils::CheckCanWriteTo(const BPath& path)
+{
+	status_t result = B_OK;
+	bool exists = false;
+	uint8 buffer[16];
+
+	// create some random latin letters into the buffer to write.
+	for (int i = 0; i < 16; i++)
+		buffer[i] = 65 + (abs(rand()) % 26);
+
+	if (result == B_OK)
+		result = ExistsObject(path, &exists, NULL, NULL);
+
+	if (result == B_OK && exists) {
+		if (Logger::IsTraceEnabled()) {
+			printf("an object exists at the candidate path "
+				"[%s] - it will be deleted\n", path.Path());
+		}
+
+		if (remove(path.Path()) == 0) {
+			if (Logger::IsTraceEnabled()) {
+				printf("did delete the candidate file [%s]\n", path.Path());
+			}
+		} else {
+			printf("unable to delete the candidate file [%s]\n", path.Path());
+			result = B_ERROR;
+		}
+	}
+
+	if (result == B_OK) {
+		BFile file(path.Path(), O_WRONLY | O_CREAT);
+		if (file.Write(buffer, 16) != 16) {
+			printf("unable to write test data to candidate file [%s]\n",
+				path.Path());
+			result = B_ERROR;
+		}
+	}
+
+	if (result == B_OK) {
+		BFile file(path.Path(), O_RDONLY);
+		uint8 readBuffer[16];
+		if (file.Read(readBuffer, 16) != 16) {
+			printf("unable to read test data from candidate file [%s]\n",
+				path.Path());
+			result = B_ERROR;
+		}
+
+		for (int i = 0; result == B_OK && i < 16; i++) {
+			if (readBuffer[i] != buffer[i]) {
+				printf("mismatched read..write check on candidate file [%s]\n",
+					path.Path());
+				result = B_ERROR;
+			}
+		}
+	}
+
+	return result;
+}
+
+
+/*! As the application runs it will need to store some files into the local
+    disk system.  This method, given a leafname, will write into the supplied
+    path variable, a final path where this leafname should be stored.
+*/
+
+/*static*/ status_t
+StorageUtils::LocalWorkingFilesPath(const BString leaf, BPath& path,
+	bool failOnCreateDirectory)
+{
+	BPath resultPath;
+	status_t result = B_OK;
+
+	if (result == B_OK)
+		result = find_directory(B_USER_CACHE_DIRECTORY, &resultPath);
+
+	if (result == B_OK)
+		result = resultPath.Append(CACHE_DIRECTORY_APP);
+
+	if (result == B_OK) {
+		if (failOnCreateDirectory)
+			result = create_directory(resultPath.Path(), 0777);
+		else
+			create_directory(resultPath.Path(), 0777);
+	}
+
+	if (result == B_OK)
+		result = resultPath.Append(leaf);
+
+	if (result == B_OK)
+		path.SetTo(resultPath.Path());
+	else {
+		path.Unset();
+		fprintf(stdout, "unable to find the user cache file for "
+			"[%s] data; %s\n", leaf.String(), strerror(result));
+	}
+
+	return result;
+}
+
+
+/*static*/ status_t
+StorageUtils::LocalWorkingDirectoryPath(const BString leaf, BPath& path,
+	bool failOnCreateDirectory)
+{
+	BPath resultPath;
+	status_t result = B_OK;
+
+	if (result == B_OK)
+		result = find_directory(B_USER_CACHE_DIRECTORY, &resultPath);
+
+	if (result == B_OK)
+		result = resultPath.Append(CACHE_DIRECTORY_APP);
+
+	if (result == B_OK)
+		result = resultPath.Append(leaf);
+
+	if (result == B_OK) {
+		if (failOnCreateDirectory)
+			result = create_directory(resultPath.Path(), 0777);
+		else
+			create_directory(resultPath.Path(), 0777);
+	}
+
+	if (result == B_OK)
+		path.SetTo(resultPath.Path());
+	else {
+		path.Unset();
+		fprintf(stdout, "unable to find the user cache directory for "
+			"[%s] data; %s\n", leaf.String(), strerror(result));
+	}
+
+	return result;
 }

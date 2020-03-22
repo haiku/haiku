@@ -1,6 +1,6 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2018, Andrew Lindesay <apl@lindesay.co.nz>
+ * Copyright 2018-2020, Andrew Lindesay <apl@lindesay.co.nz>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef APP_H
@@ -35,6 +35,8 @@ private:
 
 			void				_CheckPackageDaemonRuns();
 			bool				_LaunchPackageDaemon();
+
+			bool				_CheckTestFile();
 
 private:
 			MainWindow*			fMainWindow;

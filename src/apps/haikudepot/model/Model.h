@@ -1,12 +1,11 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MODEL_H
 #define MODEL_H
 
-#include <FindDirectory.h>
 #include <Locker.h>
 
 #include "AbstractProcess.h"
@@ -155,8 +154,6 @@ public:
 
 private:
 			void				_AddCategory(const CategoryRef& category);
-			status_t			_LocalDataPath(const BString leaf,
-									BPath& path) const;
 
 			void				_MaybeLogJsonRpcError(
 									const BMessage &responsePayload,
@@ -173,17 +170,6 @@ private:
 									const PackageInfoRef& package,
 									const ScreenshotInfo& info,
 									int32 scaledWidth, bool fromCacheOnly);
-
-			bool				_GetCacheFile(BPath& path, BFile& file,
-									directory_which directory,
-									const char* relativeLocation,
-									const char* fileName,
-									uint32 openMode) const;
-			bool				_GetCacheFile(BPath& path, BFile& file,
-									directory_which directory,
-									const char* relativeLocation,
-									const char* fileName,
-									bool ignoreAge, time_t maxAge) const;
 
 			void				_NotifyAuthorizationChanged();
 			void				_NotifyCategoryListChanged();

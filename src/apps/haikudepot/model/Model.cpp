@@ -1,7 +1,7 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2014, Axel Dörfler <axeld@pinc-software.de>.
- * Copyright 2016-2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -847,36 +847,6 @@ Model::SetAuthorization(const BString& nickname, const BString& passwordClear,
 }
 
 
-status_t
-Model::_LocalDataPath(const BString leaf, BPath& path) const
-{
-	BPath resultPath;
-	status_t result = B_OK;
-
-	if (result == B_OK)
-		result = find_directory(B_USER_CACHE_DIRECTORY, &resultPath);
-
-	if (result == B_OK)
-		result = resultPath.Append("HaikuDepot");
-
-	if (result == B_OK)
-		result = create_directory(resultPath.Path(), 0777);
-
-	if (result == B_OK)
-		result = resultPath.Append(leaf);
-
-	if (result == B_OK)
-		path.SetTo(resultPath.Path());
-	else {
-		path.Unset();
-		fprintf(stdout, "unable to find the user cache file for "
-			"[%s] data; %s\n", leaf.String(), strerror(result));
-	}
-
-	return result;
-}
-
-
 /*! When bulk repository data comes down from the server, it will
     arrive as a json.gz payload.  This is stored locally as a cache
     and this method will provide the on-disk storage location for
@@ -889,7 +859,7 @@ Model::DumpExportRepositoryDataPath(BPath& path) const
 	BString leaf;
 	leaf.SetToFormat("repository-all_%s.json.gz",
 		LanguageModel().PreferredLanguage().Code());
-	return _LocalDataPath(leaf, path);
+	return StorageUtils::LocalWorkingFilesPath(leaf, path);
 }
 
 
@@ -904,37 +874,14 @@ Model::DumpExportReferenceDataPath(BPath& path) const
 	BString leaf;
 	leaf.SetToFormat("reference-all_%s.json.gz",
 		LanguageModel().PreferredLanguage().Code());
-	return _LocalDataPath(leaf, path);
+	return StorageUtils::LocalWorkingFilesPath(leaf, path);
 }
 
 
 status_t
 Model::IconStoragePath(BPath& path) const
 {
-	BPath iconStoragePath;
-	status_t result = B_OK;
-
-	if (result == B_OK)
-		result = find_directory(B_USER_CACHE_DIRECTORY, &iconStoragePath);
-
-	if (result == B_OK)
-		result = iconStoragePath.Append("HaikuDepot");
-
-	if (result == B_OK)
-		result = iconStoragePath.Append("__allicons");
-
-	if (result == B_OK)
-		result = create_directory(iconStoragePath.Path(), 0777);
-
-	if (result == B_OK)
-		path.SetTo(iconStoragePath.Path());
-	else {
-		path.Unset();
-		fprintf(stdout, "unable to find the user cache directory for "
-			"icons; %s\n", strerror(result));
-	}
-
-	return result;
+	return StorageUtils::LocalWorkingDirectoryPath("__allicons", path);
 }
 
 
@@ -945,7 +892,7 @@ Model::DumpExportPkgDataPath(BPath& path,
 	BString leaf;
 	leaf.SetToFormat("pkg-all-%s-%s.json.gz", repositorySourceCode.String(),
 		LanguageModel().PreferredLanguage().Code());
-	return _LocalDataPath(leaf, path);
+	return StorageUtils::LocalWorkingFilesPath(leaf, path);
 }
 
 
@@ -966,15 +913,21 @@ Model::_PopulatePackageScreenshot(const PackageInfoRef& package,
 	// See if there is a cached screenshot
 	BFile screenshotFile;
 	BPath screenshotCachePath;
+
+	status_t result = StorageUtils::LocalWorkingDirectoryPath(
+		"Screenshots", screenshotCachePath);
+
+	if (result != B_OK) {
+		printf("[!] unable to get the screenshot dir - unable to proceed");
+		return;
+	}
+
 	bool fileExists = false;
 	BString screenshotName(info.Code());
 	screenshotName << "@" << scaledWidth;
 	screenshotName << ".png";
 	time_t modifiedTime;
-	if (find_directory(B_USER_CACHE_DIRECTORY, &screenshotCachePath) == B_OK
-		&& screenshotCachePath.Append("HaikuDepot/Screenshots") == B_OK
-		&& create_directory(screenshotCachePath.Path(), 0777) == B_OK
-		&& screenshotCachePath.Append(screenshotName) == B_OK) {
+	if (screenshotCachePath.Append(screenshotName) == B_OK) {
 		// Try opening the file in read-only mode, which will fail if its
 		// not a file or does not exist.
 		fileExists = screenshotFile.SetTo(screenshotCachePath.Path(),

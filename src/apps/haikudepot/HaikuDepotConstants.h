@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef HAIKU_DEPOT_CONSTANTS_H
@@ -80,5 +80,7 @@ enum UserUsageConditionsSelectionMode {
 
 #define ALERT_MSG_LOGS_USER_GUIDE "\nInformation about how to view the logs is " \
 	"available in the HaikuDepot section of the user guide."
+
+#define CACHE_DIRECTORY_APP "HaikuDepot"
 
 #endif // HAIKU_DEPOT_CONSTANTS_H
