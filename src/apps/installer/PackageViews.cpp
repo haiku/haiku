@@ -34,13 +34,13 @@
 #define ICON_ATTRIBUTE "INSTALLER PACKAGE: ICON"
 
 
-Package::Package(const char *folder)
+Package::Package(const BPath &path)
 	:
 	Group(),
 	fSize(0),
 	fIcon(NULL)
 {
-	SetFolder(folder);
+	SetPath(path);
 }
 
 
@@ -62,7 +62,7 @@ Package::PackageFromEntry(BEntry &entry)
 	if (info.InitCheck() != B_OK)
 		return NULL;
 
-	Package *package = new Package(path.Path());
+	Package *package = new Package(path);
 	package->fName = info.Name();
 	package->fDescription = info.Summary();
 

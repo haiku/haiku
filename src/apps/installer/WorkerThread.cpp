@@ -514,12 +514,14 @@ WorkerThread::_PerformInstall(partition_id sourcePartitionID,
 
 	// Collect selected packages also
 	if (fPackages) {
-		BPath pkgRootDir(srcDirectory.Path(), kPackagesDirectoryPath);
 		int32 count = fPackages->CountItems();
 		for (int32 i = 0; i < count; i++) {
 			Package *p = static_cast<Package*>(fPackages->ItemAt(i));
-			BPath packageDir(pkgRootDir.Path(), p->Folder());
-			err = engine.CollectTargets(packageDir.Path(), fCancelSemaphore);
+			const BPath& pkgPath = p->Path();
+			err = pkgPath.InitCheck();
+			if (err != B_OK)
+				return _InstallationError(err);
+			err = engine.CollectTargets(pkgPath.Path(), fCancelSemaphore);
 			if (err != B_OK)
 				return _InstallationError(err);
 		}
@@ -541,12 +543,24 @@ WorkerThread::_PerformInstall(partition_id sourcePartitionID,
 
 	// copy selected packages
 	if (fPackages) {
-		BPath pkgRootDir(srcDirectory.Path(), kPackagesDirectoryPath);
 		int32 count = fPackages->CountItems();
+		// FIXME: find_directory doesn't return the folder in the target volume,
+		// so we are hard coding this for now.
+		BPath targetPkgDir(targetDirectory.Path(), "system/packages");
+		err = targetPkgDir.InitCheck();
+		if (err != B_OK)
+			return _InstallationError(err);
 		for (int32 i = 0; i < count; i++) {
 			Package *p = static_cast<Package*>(fPackages->ItemAt(i));
-			BPath packageDir(pkgRootDir.Path(), p->Folder());
-			err = engine.Copy(packageDir.Path(), targetDirectory.Path(),
+			const BPath& pkgPath = p->Path();
+			err = pkgPath.InitCheck();
+			if (err != B_OK)
+				return _InstallationError(err);
+			BPath targetPath(targetPkgDir.Path(), pkgPath.Leaf());
+			err = targetPath.InitCheck();
+			if (err != B_OK)
+				return _InstallationError(err);
+			err = engine.Copy(pkgPath.Path(), targetPath.Path(),
 				fCancelSemaphore);
 			if (err != B_OK)
 				return _InstallationError(err);

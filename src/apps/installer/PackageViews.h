@@ -12,6 +12,7 @@
 #include <CheckBox.h>
 #include <Entry.h>
 #include <List.h>
+#include <Path.h>
 #include <String.h>
 #include <StringView.h>
 
@@ -31,11 +32,11 @@ private:
 
 class Package : public Group {
 public:
-								Package(const char* folder);
+								Package(const BPath &path);
 	virtual						~Package();
 
-			void				SetFolder(BString folder)
-									{ fFolder = folder; }
+			void				SetPath(const BPath &path)
+									{ fPath = path; }
 			void				SetName(const BString name)
 									{ fName = name; }
 			void				SetDescription(const BString description)
@@ -48,8 +49,8 @@ public:
 									{ fOnByDefault = onByDefault; }
 			void				SetAlwaysOn(bool alwaysOn)
 									{ fAlwaysOn = alwaysOn; }
-			BString				Folder() const
-									{ return fFolder; }
+			BPath				Path() const
+									{ return fPath; }
 			BString				Name() const
 									{ return fName; }
 			BString				Description() const
@@ -68,7 +69,7 @@ public:
 	static	Package*			PackageFromEntry(BEntry &dir);
 
 private:
-			BString				fFolder;
+			BPath				fPath;
 			BString				fName;
 			BString				fDescription;
 			int32				fSize;
