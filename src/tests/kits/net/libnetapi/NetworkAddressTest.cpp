@@ -31,10 +31,12 @@ NetworkAddressTest::TestUnset()
 {
 	BNetworkAddress unset;
 
+	CPPUNIT_ASSERT(unset.InitCheck() == B_OK);
 	CPPUNIT_ASSERT(unset.Family() == AF_UNSPEC);
 	CPPUNIT_ASSERT(unset.Port() == 0);
 
-	BNetworkAddress set(AF_INET, NULL);
+	BNetworkAddress set(AF_INET, "127.0.0.1");
+	CPPUNIT_ASSERT(set.InitCheck() == B_OK);
 	CPPUNIT_ASSERT(set.Family() == AF_INET);
 	CPPUNIT_ASSERT(unset != set);
 
