@@ -89,7 +89,7 @@ DirectWindowInfo::SetState(direct_buffer_state bufferState,
 
 	fBufferInfo->buffer_state = bufferState;
 
-	if (driverState != -1)
+	if ((int)driverState != -1)
 		fBufferInfo->driver_state = driverState;
 
 	if ((bufferState & B_DIRECT_MODE_MASK) != B_DIRECT_STOP) {
