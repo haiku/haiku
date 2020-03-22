@@ -3361,7 +3361,7 @@ dump_area(int argc, char** argv)
 
 		VMAreaHashTable::Iterator it = VMAreaHash::GetIterator();
 		while ((area = it.Next()) != NULL) {
-			if (((mode & 4) != 0 && area->name != NULL
+			if (((mode & 4) != 0
 					&& !strcmp(argv[index], area->name))
 				|| (num != 0 && (((mode & 1) != 0 && (addr_t)area->id == num)
 					|| (((mode & 2) != 0 && area->Base() <= num
