@@ -30,5 +30,4 @@ __wcsxfrm(wchar_t* dest, const wchar_t* src, size_t destSize)
 }
 
 
-extern "C"
 B_DEFINE_WEAK_ALIAS(__wcsxfrm, wcsxfrm);

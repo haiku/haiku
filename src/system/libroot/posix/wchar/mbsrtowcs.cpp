@@ -101,7 +101,6 @@ __mbsnrtowcs(wchar_t* dst, const char** src, size_t nmc, size_t len,
 }
 
 
-extern "C"
 B_DEFINE_WEAK_ALIAS(__mbsnrtowcs, mbsnrtowcs);
 
 
@@ -119,5 +118,4 @@ __mbsrtowcs(wchar_t* dst, const char** src, size_t len, mbstate_t* ps)
 }
 
 
-extern "C"
 B_DEFINE_WEAK_ALIAS(__mbsrtowcs, mbsrtowcs);

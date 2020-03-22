@@ -28,5 +28,4 @@ __wcscoll(const wchar_t* wcs1, const wchar_t* wcs2)
 }
 
 
-extern "C"
 B_DEFINE_WEAK_ALIAS(__wcscoll, wcscoll);

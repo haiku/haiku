@@ -75,5 +75,4 @@ __wcrtomb(char* s, wchar_t wc, mbstate_t* ps)
 }
 
 
-extern "C"
 B_DEFINE_WEAK_ALIAS(__wcrtomb, wcrtomb);

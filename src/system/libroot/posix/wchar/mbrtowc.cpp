@@ -85,5 +85,4 @@ __mbrtowc(wchar_t* pwc, const char* s, size_t n, mbstate_t* ps)
 }
 
 
-extern "C"
 B_DEFINE_WEAK_ALIAS(__mbrtowc, mbrtowc);
