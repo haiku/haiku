@@ -420,7 +420,7 @@ BKeymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey,
 
 	// if dead key, we search for our current offset char in the dead key
 	// offset table string comparison is needed
-	for (int32 i = 0; i < 32; i++) {
+	for (int32 i = 0; i < 32; i += 2) {
 		if (strncmp(&fChars[offset + 1], &fChars[deadKey[i] + 1], *numBytes)
 				== 0) {
 			*numBytes = fChars[deadKey[i + 1]];
@@ -441,7 +441,6 @@ BKeymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey,
 			}
 			return;
 		}
-		i++;
 	}
 
 	// if not found we return the current char mapped
