@@ -227,7 +227,7 @@ next_debugger_command(debugger_command* command, const char* prefix,
 	else
 		command = command->next;
 
-	while (command != NULL && !strncmp(prefix, command->name, prefixLen) == 0)
+	while (command != NULL && strncmp(prefix, command->name, prefixLen) != 0)
 		command = command->next;
 
 	return command;
