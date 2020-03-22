@@ -26,7 +26,7 @@ class DwarfTypeFactory;
 class FunctionID;
 class GlobalTypeCache;
 class GlobalTypeLookup;
-class LocationDescription;
+struct LocationDescription;
 class ObjectID;
 class RegisterMap;
 class Variable;

@@ -16,7 +16,7 @@ class BPopUpMenu;
 class BShelf;
 
 namespace BPrivate {
-	class replicant_data;
+	struct replicant_data;
 	class ShelfContainerViewFilter;
 };
 
@@ -79,7 +79,7 @@ protected:
 
 private:
 	friend class BPrivate::ShelfContainerViewFilter;
-	friend class BPrivate::replicant_data;
+	friend struct BPrivate::replicant_data;
 	friend class Private;
 	friend class BShelf;
 

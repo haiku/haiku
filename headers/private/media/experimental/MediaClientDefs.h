@@ -49,7 +49,7 @@ private:
 
 	friend class BMediaClient;
 	friend class BMediaConnection;
-	friend class media_connection;
+	friend struct media_connection;
 } media_client;
 
 

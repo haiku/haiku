@@ -20,7 +20,7 @@ class _BZombieReplicantView_;
 struct entry_ref;
 
 namespace BPrivate {
-	class replicant_data;
+	struct replicant_data;
 	class ShelfContainerViewFilter;
 };
 
@@ -116,10 +116,10 @@ private:
 									BPoint* location, uint32 uniqueID);
 			BView*				_GetReplicant(BMessage* data, BView* view,
 									const BPoint& point, BDragger*& dragger,
-									BDragger::relation& relation);		
+									BDragger::relation& relation);
 			_BZombieReplicantView_* _CreateZombie(BMessage *data,
 									BDragger *&dragger);
-			
+
 			status_t			_GetProperty(BMessage* message,
 									BMessage* reply);
 	static	void				_GetReplicantData(BMessage* message,
@@ -141,7 +141,7 @@ private:
 			bool				fDisplayZombies;
 			bool				fAllowZombies;
 			bool				fTypeEnforced;
-	
+
 			uint32				_reserved[8];
 };
 

@@ -122,9 +122,9 @@ private:
 private:
 	TCPEndpoint*	fConnectionHashLink;
 	TCPEndpoint*	fEndpointHashLink;
-	friend class EndpointManager;
-	friend class ConnectionHashDefinition;
-	friend class EndpointHashDefinition;
+	friend class	EndpointManager;
+	friend struct	ConnectionHashDefinition;
+	friend class	EndpointHashDefinition;
 
 	mutex			fLock;
 	EndpointManager* fManager;

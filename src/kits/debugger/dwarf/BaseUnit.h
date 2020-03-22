@@ -16,7 +16,7 @@
 
 class AbbreviationTable;
 class DebugInfoEntry;
-class SourceLanguageInfo;
+struct SourceLanguageInfo;
 
 
 enum dwarf_unit_kind {

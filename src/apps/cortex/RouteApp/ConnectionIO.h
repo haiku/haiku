@@ -49,7 +49,7 @@
 
 #include <MediaDefs.h>
 
-class dormant_node_info;
+struct dormant_node_info;
 
 #include "cortex_defs.h"
 __BEGIN_CORTEX_NAMESPACE
@@ -63,16 +63,16 @@ class ConnectionIO :
 
 public:											// *** ctor/dtor
 	virtual ~ConnectionIO();
-	
+
 	ConnectionIO();
-	
+
 	ConnectionIO(
 		const Connection*				con,
 		const NodeManager*			manager,
 		const NodeSetIOContext*	context);
 
 	bool exportValid() const { return m_exportValid; }
-	
+
 public:											// *** operations
 
 	// call when object imported to create the described
@@ -89,16 +89,16 @@ public:											// *** document-type setup
 public:											// *** IPersistent
 
 	// EXPORT:
-	
+
 	void xmlExportBegin(
 		ExportContext&						context) const;
-		
+
 	void xmlExportAttributes(
 		ExportContext&						context) const;
-	
+
 	void xmlExportContent(
 		ExportContext&						context) const;
-	
+
 	void xmlExportEnd(
 		ExportContext&						context) const;
 
@@ -111,16 +111,16 @@ public:											// *** IPersistent
 		const char*								key,
 		const char*								value,
 		ImportContext&						context);
-	
+
 	virtual void xmlImportContent(
 		const char*								data,
 		uint32										length,
 		ImportContext&						context);
-	
+
 	virtual void xmlImportChild(
 		IPersistent*							child,
 		ImportContext&						context);
-			
+
 	virtual void xmlImportComplete(
 		ImportContext&						context);
 
@@ -138,19 +138,19 @@ private:											// *** implementation
 	LiveNodeIO*								m_inputNodeIO;
 
 	BString										m_outputName; // original name if available
-	media_format							m_outputFormat;		
+	media_format							m_outputFormat;
 
-	LiveNodeIO*								m_outputNodeIO;	
+	LiveNodeIO*								m_outputNodeIO;
 
 	BString										m_inputName; // original name if available
-	media_format							m_inputFormat;		
-	
+	media_format							m_inputFormat;
+
 	media_format							m_requestedFormat;
 
 	uint32										m_flags;
 
 	bool											m_exportValid;
-	
+
 	// import state
 	enum import_state_t {
 		IMPORT_NONE,

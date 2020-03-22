@@ -87,7 +87,7 @@ public:
 	virtual status_t			SystemShuttingDown();
 
 private:
-	friend struct KeyboardDevice;
+	friend class KeyboardDevice;
 	// TODO: needed by the control thread to remove a dead device
 	// find a better way...
 

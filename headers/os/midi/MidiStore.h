@@ -10,7 +10,7 @@ struct entry_ref;
 
 class BFile;
 class BList;
-class BMidiEvent;
+struct BMidiEvent;
 
 class BMidiStore : public BMidi {
 public:
@@ -63,14 +63,14 @@ public:
 	uint32 EventAtDelta(uint32 time) const;
 
 	uint32 BeginTime() const;
-		
+
 	void SetTempo(int32 beatsPerMinute);
 	int32 Tempo() const;
 
 private:
 
 	friend class BMidiSynthFile;
-	
+
 	virtual void _ReservedMidiStore1();
 	virtual void _ReservedMidiStore2();
 	virtual void _ReservedMidiStore3();
@@ -126,7 +126,7 @@ private:
 	bool fLooping;
 	bool fPaused;
 	bool fFinished;
-	
+
 	uint32 _reserved2[12];
 };
 

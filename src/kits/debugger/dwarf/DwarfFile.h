@@ -16,7 +16,7 @@
 #include "TypeUnit.h"
 
 
-class AbbreviationEntry;
+struct AbbreviationEntry;
 class AbbreviationTable;
 class BVariant;
 class CfaContext;
@@ -199,7 +199,7 @@ private:
 									const FDEInfoList& infoList) const;
 
 private:
-			friend class 		DwarfFile::ExpressionEvaluationContext;
+			friend struct 		DwarfFile::ExpressionEvaluationContext;
 
 private:
 			char*				fName;

@@ -45,11 +45,11 @@ class DwarfTargetInterface;
 class DwarfType;
 class DwarfTypeContext;
 class DwarfTypedefType;
-class DwarfUnspecifiedType;
+struct DwarfUnspecifiedType;
 class GlobalTypeCache;
 class GlobalTypeLookup;
-class LocationDescription;
-class MemberLocation;
+struct LocationDescription;
+struct MemberLocation;
 class RegisterMap;
 
 

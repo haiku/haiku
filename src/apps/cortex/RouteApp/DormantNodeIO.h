@@ -46,7 +46,7 @@
 #include <String.h>
 #include <Entry.h>
 
-class dormant_node_info;
+struct dormant_node_info;
 
 #include "cortex_defs.h"
 __BEGIN_CORTEX_NAMESPACE
@@ -58,14 +58,14 @@ class DormantNodeIO :
 
 public:											// *** ctor/dtor
 	virtual ~DormantNodeIO();
-	
+
 	DormantNodeIO();
 	DormantNodeIO(
 		NodeRef*								ref,
 		const char*							nodeKey);
 
 	bool exportValid() const { return m_exportValid; }
-	
+
 	const char* nodeKey() const { return m_nodeKey.String(); }
 
 public:											// *** operations
@@ -82,16 +82,16 @@ public:											// *** document-type setup
 public:											// *** IPersistent
 
 	// EXPORT:
-	
+
 	void xmlExportBegin(
 		ExportContext&						context) const;
-		
+
 	void xmlExportAttributes(
 		ExportContext&						context) const;
-	
+
 	void xmlExportContent(
 		ExportContext&						context) const;
-	
+
 	void xmlExportEnd(
 		ExportContext&						context) const;
 
@@ -104,19 +104,19 @@ public:											// *** IPersistent
 		const char*								key,
 		const char*								value,
 		ImportContext&						context);
-	
+
 	virtual void xmlImportContent(
 		const char*								data,
 		uint32										length,
 		ImportContext&						context);
-	
+
 	virtual void xmlImportChild(
 		IPersistent*							child,
 		ImportContext&						context);
-			
+
 	virtual void xmlImportComplete(
 		ImportContext&						context);
-		
+
 private:											// *** implementation
 	// imported data
 	BString										m_nodeKey;
@@ -124,7 +124,7 @@ private:											// *** implementation
 	BString										m_dormantName;
 	int64											m_kinds;
 	int32											m_flavorID;
-	
+
 	int32											m_flags;
 	int32											m_runMode;
 	bigtime_t									m_recordingDelay;
@@ -133,7 +133,7 @@ private:											// *** implementation
 	BEntry										m_entry;
 
 	bool											m_exportValid;
-	
+
 	status_t _matchDormantNode(
 		dormant_node_info*			outInfo);
 };

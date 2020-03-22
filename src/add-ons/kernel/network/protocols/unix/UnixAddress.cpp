@@ -277,7 +277,7 @@ unix_hash_address_pair(const sockaddr *ourAddress, const sockaddr *peerAddress)
 
 
 static status_t
-unix_checksum_address(struct Checksum *checksum, const sockaddr *_address)
+unix_checksum_address(Checksum *checksum, const sockaddr *_address)
 {
 	if (checksum == NULL || _address == NULL)
 		return B_BAD_VALUE;

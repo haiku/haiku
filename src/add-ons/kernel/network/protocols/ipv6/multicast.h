@@ -192,7 +192,7 @@ public:
 
 private:
 	// for g++ 2.95
-	friend class HashDefinition;
+	friend struct HashDefinition;
 
 	Filter *fParent;
 	AddressType fMulticastAddress;

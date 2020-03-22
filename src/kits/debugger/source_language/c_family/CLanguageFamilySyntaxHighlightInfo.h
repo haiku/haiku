@@ -12,7 +12,7 @@
 
 
 namespace CLanguage {
-	class Token;
+	struct Token;
 	class Tokenizer;
 }
 

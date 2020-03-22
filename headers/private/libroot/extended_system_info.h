@@ -16,7 +16,7 @@
 namespace BPrivate {
 
 
-struct KMessage;
+class KMessage;
 
 
 status_t get_extended_team_info(team_id teamID, uint32 flags, KMessage& info);
