@@ -124,9 +124,8 @@ public:
 		g_settings.write_ascii = false;
 		g_settings.settings_touched = false;
 		BPath path;
-		if (find_directory(B_USER_SETTINGS_DIRECTORY, &path)) {
+		if (find_directory(B_USER_SETTINGS_DIRECTORY, &path))
 			path.SetTo("/tmp");
-		}
 		path.Append(str);
 		FILE* f = fopen(path.Path(), "r");
 		/*	parse text settings file -- this should be a library...	*/
@@ -137,17 +136,14 @@ public:
 			while (true) {
 				line[0] = 0;
 				fgets(line, 1024, f);
-				if (!line[0]) {
+				if (!line[0])
 					break;
-				}
 				/* remember: line ends with \n, so printf()s don't have to */
 				ptr = line;
-				while (isspace(*ptr)) {
+				while (isspace(*ptr))
 					ptr++;
-				}
-				if (*ptr == '#' || !*ptr) { /* comment or blank */
+				if (*ptr == '#' || !*ptr) /* comment or blank */
 					continue;
-				}
 				if (sscanf(ptr, "%31[a-zA-Z_0-9] =", name) != 1) {
 					syslog(LOG_ERR,
 						"unknown PPMTranslator "
@@ -155,9 +151,8 @@ public:
 						line);
 				} else {
 					if (!strcmp(name, "color_space")) {
-						while (*ptr != '=') {
+						while (*ptr != '=')
 							ptr++;
-						}
 						ptr++;
 						if (sscanf(ptr, "%d", (int*) &g_settings.out_space)
 							!= 1) {
@@ -167,9 +162,8 @@ public:
 								ptr);
 						}
 					} else if (!strcmp(name, "window_pos")) {
-						while (*ptr != '=') {
+						while (*ptr != '=')
 							ptr++;
-						}
 						ptr++;
 						if (sscanf(ptr, "%f,%f", &g_settings.window_pos.x,
 								&g_settings.window_pos.y)
@@ -180,9 +174,8 @@ public:
 								ptr);
 						}
 					} else if (!strcmp(name, "write_ascii")) {
-						while (*ptr != '=') {
+						while (*ptr != '=')
 							ptr++;
-						}
 						ptr++;
 						int ascii = g_settings.write_ascii;
 						if (sscanf(ptr, "%d", &ascii) != 1) {
@@ -208,9 +201,8 @@ public:
 		/*	No need writing settings if there aren't any	*/
 		if (g_settings.settings_touched) {
 			BPath path;
-			if (find_directory(B_USER_SETTINGS_DIRECTORY, &path)) {
+			if (find_directory(B_USER_SETTINGS_DIRECTORY, &path))
 				path.SetTo("/tmp");
-			}
 			path.Append("PPMTranslator_Settings");
 			FILE* f = fopen(path.Path(), "w");
 			if (f) {
@@ -251,16 +243,15 @@ Identify(BPositionIO* inSource, const translation_format* inFormat,
 {
 	dprintf(("PPMTranslator: Identify()\n"));
 	/* Silence compiler warnings. */
-	inFormat = inFormat;
-	ioExtension = ioExtension;
+	(void)inFormat;
+	(void)ioExtension;
 
 	/* Check that requested format is something we can deal with. */
-	if (outType == 0) {
+	if (outType == 0)
 		outType = B_TRANSLATOR_BITMAP;
-	}
-	if (outType != B_TRANSLATOR_BITMAP && outType != PPM_TYPE) {
+
+	if (outType != B_TRANSLATOR_BITMAP && outType != PPM_TYPE)
 		return B_NO_TRANSLATOR;
-	}
 
 	/* Check header. */
 	int width, rowbytes, height, max;
@@ -268,9 +259,9 @@ Identify(BPositionIO* inSource, const translation_format* inFormat,
 	color_space space;
 	status_t err = read_ppm_header(inSource, &width, &rowbytes, &height, &max,
 		&ascii, &space, &is_ppm, NULL);
-	if (err != B_OK) {
+	if (err != B_OK)
 		return err;
-	}
+
 	/* Stuff info into info struct -- Translation Kit will do "translator" for
 	 * us. */
 	outInfo->group = B_TRANSLATOR_BITMAP;
@@ -305,14 +296,12 @@ Translate(BPositionIO* inSource, const translator_info* /*inInfo*/,
 	inSource->Seek(0, SEEK_SET); /* paranoia */
 	//	inInfo = inInfo;	/* silence compiler warning */
 	/* Check what we're being asked to produce. */
-	if (!outType) {
+	if (!outType)
 		outType = B_TRANSLATOR_BITMAP;
-	}
 	dprintf(("PPMTranslator: outType is '%c%c%c%c'\n", char(outType >> 24),
 		char(outType >> 16), char(outType >> 8), char(outType)));
-	if (outType != B_TRANSLATOR_BITMAP && outType != PPM_TYPE) {
+	if (outType != B_TRANSLATOR_BITMAP && outType != PPM_TYPE)
 		return B_NO_TRANSLATOR;
-	}
 
 	/* Figure out what we've been given (again). */
 	int width, rowbytes, height, max;
@@ -324,9 +313,8 @@ Translate(BPositionIO* inSource, const translator_info* /*inInfo*/,
 	status_t err = read_ppm_header(inSource, &width, &rowbytes, &height, &max,
 		&ascii, &space, &is_ppm, &comment);
 	if (comment != NULL) {
-		if (ioExtension != NULL) {
+		if (ioExtension != NULL)
 			ioExtension->AddString(B_TRANSLATOR_EXT_COMMENT, comment);
-		}
 		free(comment);
 	}
 	if (err < B_OK) {
@@ -338,9 +326,8 @@ Translate(BPositionIO* inSource, const translator_info* /*inInfo*/,
 	bool out_ascii = false;
 	if (outType == PPM_TYPE) {
 		out_ascii = g_settings.write_ascii;
-		if (ioExtension != NULL) {
+		if (ioExtension != NULL)
 			ioExtension->FindBool("ppm /ascii", &out_ascii);
-		}
 	}
 	err = B_OK;
 	/* Figure out which color space to convert to */
@@ -390,9 +377,8 @@ Translate(BPositionIO* inSource, const translator_info* /*inInfo*/,
 		// comment = NULL;
 		const char* fsComment;
 		if ((ioExtension != NULL)
-			&& !ioExtension->FindString(B_TRANSLATOR_EXT_COMMENT, &fsComment)) {
+			&& !ioExtension->FindString(B_TRANSLATOR_EXT_COMMENT, &fsComment))
 			err = write_comment(fsComment, outDestination);
-		}
 		if (err == B_OK) {
 			char data[40];
 			sprintf(data, "%d %d %d\n", width, height, max);
@@ -429,9 +415,8 @@ Translate(BPositionIO* inSource, const translator_info* /*inInfo*/,
 			err = 0;
 		/* header done */
 	}
-	if (err != B_OK) {
+	if (err != B_OK)
 		return err > 0 ? B_IO_ERROR : err;
-	}
 	/* Write data. Luckily, PPM and B_TRANSLATOR_BITMAP both scan from left to
 	 * right, top to bottom. */
 	return copy_data(inSource, outDestination, rowbytes, out_rowbytes, height,
@@ -560,9 +545,8 @@ public:
 		/*	Tell all menu items we're the man.	*/
 		for (int ix = 0; ix < fMenu->CountItems(); ix++) {
 			BMenuItem* i = fMenu->ItemAt(ix);
-			if (i) {
+			if (i)
 				i->SetTarget(msgr);
-			}
 		}
 		fAscii->SetTarget(msgr);
 	}
@@ -634,9 +618,8 @@ MakeConfig(BMessage* ioExtension, BView** outView, BRect* outExtent)
 	v->ResizeTo(v->ExplicitPreferredSize());
 	;
 	*outExtent = v->Bounds();
-	if (ioExtension) {
+	if (ioExtension)
 		v->SetSettings(ioExtension);
-	}
 	return B_OK;
 }
 
@@ -665,9 +648,8 @@ read_ppm_header(BDataIO* inSource, int* width, int* rowbytes, int* height,
 	char ch[2];
 	bool monochrome = false;
 	bool greyscale = false;
-	if (inSource->Read(ch, 2) != 2) {
+	if (inSource->Read(ch, 2) != 2)
 		return B_NO_TRANSLATOR;
-	}
 	/* look for magic number */
 	if (ch[0] != 'P') {
 		/* B_TRANSLATOR_BITMAP magic? */
@@ -779,9 +761,8 @@ read_ppm_header(BDataIO* inSource, int* width, int* rowbytes, int* height,
 								whitespace after max in raw mode */
 			}
 		} else {
-			if (state != scan_white) {
+			if (state != scan_white)
 				return B_NO_TRANSLATOR;
-			}
 			return B_OK; /* header done */
 		}
 	}
@@ -801,9 +782,8 @@ read_bits_header(BDataIO* io, int skipped, int* width, int* rowbytes,
 	/* pre-initialize magic because we might have skipped part of it already */
 	hdr.magic = B_HOST_TO_BENDIAN_INT32(B_TRANSLATOR_BITMAP);
 	char* ptr = (char*) &hdr;
-	if (io->Read(ptr + skipped, rd) != rd) {
+	if (io->Read(ptr + skipped, rd) != rd)
 		return B_NO_TRANSLATOR;
-	}
 	/* swap header values */
 	hdr.magic = B_BENDIAN_TO_HOST_INT32(hdr.magic);
 	hdr.bounds.left = B_BENDIAN_TO_HOST_FLOAT(hdr.bounds.left);
@@ -814,16 +794,14 @@ read_bits_header(BDataIO* io, int skipped, int* width, int* rowbytes,
 	hdr.colors = (color_space) B_BENDIAN_TO_HOST_INT32(hdr.colors);
 	hdr.dataSize = B_BENDIAN_TO_HOST_INT32(hdr.dataSize);
 	/* sanity checking */
-	if (hdr.magic != B_TRANSLATOR_BITMAP) {
+	if (hdr.magic != B_TRANSLATOR_BITMAP)
 		return B_NO_TRANSLATOR;
-	}
 	if (hdr.colors & 0xffff0000) { /* according to <GraphicsDefs.h> this is a
 									  reasonable check. */
 		return B_NO_TRANSLATOR;
 	}
-	if (hdr.rowBytes * (hdr.bounds.Height() + 1) > hdr.dataSize) {
+	if (hdr.rowBytes * (hdr.bounds.Height() + 1) > hdr.dataSize)
 		return B_NO_TRANSLATOR;
-	}
 	/* return information about the data in the stream */
 	*width = (int) hdr.bounds.Width() + 1;
 	*rowbytes = hdr.rowBytes;
@@ -850,9 +828,8 @@ write_comment(const char* str, BDataIO* io)
 			if (err == 2) {
 				err = io->Write(str, ptr - str);
 				if (err == ptr - str) {
-					if (io->Write("\n", 1) == 1) {
+					if (io->Write("\n", 1) == 1)
 						err = 0;
-					}
 				}
 			}
 			str = ptr + 1;
@@ -865,15 +842,13 @@ write_comment(const char* str, BDataIO* io)
 		if (err == 2) {
 			err = io->Write(str, ptr - str);
 			if (err == ptr - str) {
-				if (io->Write("\n", 1) == 1) {
+				if (io->Write("\n", 1) == 1)
 					err = 0;
-				}
 			}
 		}
 	}
-	if (err > 0) {
+	if (err > 0)
 		err = B_IO_ERROR;
-	}
 	return err;
 }
 
@@ -889,9 +864,8 @@ read_ascii_line(BDataIO* in, int max, unsigned char* data, int rowbytes)
 	bool dig = false;
 	while ((err = in->Read(&ch, 1)) == 1) {
 		if (comment) {
-			if ((ch == '\n') || (ch == '\r')) {
+			if ((ch == '\n') || (ch == '\r'))
 				comment = false;
-			}
 		}
 		if (isdigit(ch)) {
 			dig = true;
@@ -908,9 +882,8 @@ read_ascii_line(BDataIO* in, int max, unsigned char* data, int rowbytes)
 				continue;
 			}
 		}
-		if (rowbytes < 1) {
+		if (rowbytes < 1)
 			break;
-		}
 	}
 	if (dig) {
 		*(data++) = val * 255 / max;
@@ -918,9 +891,8 @@ read_ascii_line(BDataIO* in, int max, unsigned char* data, int rowbytes)
 		rowbytes--;
 		dig = false;
 	}
-	if (rowbytes < 1) {
+	if (rowbytes < 1)
 		return B_OK;
-	}
 	return B_IO_ERROR;
 }
 
@@ -938,9 +910,8 @@ write_ascii_line(BDataIO* out, unsigned char* data, int rowbytes)
 			out->Write("\n", 1);
 			linelen = 0;
 		}
-		if (out->Write(buffer, l) != l) {
+		if (out->Write(buffer, l) != l)
 			return B_IO_ERROR;
-		}
 		linelen += l;
 		data += 3;
 	}
@@ -953,9 +924,8 @@ static unsigned char*
 make_scale_data(int max)
 {
 	unsigned char* ptr = (unsigned char*) malloc(max);
-	for (int ix = 0; ix < max; ix++) {
+	for (int ix = 0; ix < max; ix++)
 		ptr[ix] = ix * 255 / max;
-	}
 	return ptr;
 }
 
@@ -963,9 +933,8 @@ make_scale_data(int max)
 static void
 scale_data(unsigned char* scale, unsigned char* data, int bytes)
 {
-	for (int ix = 0; ix < bytes; ix++) {
+	for (int ix = 0; ix < bytes; ix++)
 		data[ix] = scale[data[ix]];
-	}
 }
 
 
@@ -989,9 +958,8 @@ copy_data(BDataIO* in, BDataIO* out, int rowbytes, int out_rowbytes, int height,
 		return B_NO_MEMORY;
 	}
 	unsigned char* scale = NULL;
-	if (max != 255 && in_space != B_GRAY1) {
+	if (max != 255 && in_space != B_GRAY1)
 		scale = make_scale_data(max);
-	}
 	status_t err = B_OK;
 	/*	There is no data format conversion, so we can just copy data.	*/
 	while ((height-- > 0) && !err) {
@@ -999,13 +967,10 @@ copy_data(BDataIO* in, BDataIO* out, int rowbytes, int out_rowbytes, int height,
 			err = read_ascii_line(&inBuffer, max, data, rowbytes);
 		} else {
 			err = inBuffer.Read(data, rowbytes);
-			if (err == rowbytes) {
+			if (err == rowbytes)
 				err = B_OK;
-			}
-			if (scale) { /* for reading PPM that is smaller than 8 bit */
+			if (scale) /* for reading PPM that is smaller than 8 bit */
 				scale_data(scale, data, rowbytes);
-
-			}
 		}
 		if (err == B_OK) {
 			unsigned char* wbuf = data;
@@ -1018,9 +983,8 @@ copy_data(BDataIO* in, BDataIO* out, int rowbytes, int out_rowbytes, int height,
 				err = write_ascii_line(out, wbuf, out_rowbytes);
 			} else if (!err) {
 				err = out->Write(wbuf, out_rowbytes);
-				if (err == out_rowbytes) {
+				if (err == out_rowbytes)
 					err = B_OK;
-				}
 			}
 		}
 	}
