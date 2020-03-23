@@ -452,6 +452,7 @@ rule KernelArchitectureSetup architecture
 			HAIKU_KERNEL_C++FLAGS += -mcmodel=medany ;
 
 		case x86 :
+			HAIKU_KERNEL_PIC_CCFLAGS = -fno-pic ;
 			HAIKU_KERNEL_CCFLAGS += -march=pentium ;
 			HAIKU_KERNEL_C++FLAGS += -march=pentium ;
 
