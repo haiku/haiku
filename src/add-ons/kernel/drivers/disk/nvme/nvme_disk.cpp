@@ -471,7 +471,7 @@ nvme_disk_read(void* cookie, off_t pos, void* buffer, size_t* length)
 				return status;
 		}
 
-		void* offsetBuffer = ((int8*)bounceBuffer) + (pos - rounded_pos);
+		void* offsetBuffer = (void*)((addr_t)bounceBuffer + (pos - rounded_pos));
 		if (IS_USER_ADDRESS(buffer))
 			status = user_memcpy(buffer, offsetBuffer, *length);
 		else
@@ -536,7 +536,7 @@ nvme_disk_write(void* cookie, off_t pos, const void* buffer, size_t* length)
 		}
 
 		// Now we can copy in the actual data to be written.
-		void* offsetBuffer = ((int8*)bounceBuffer) + (pos - rounded_pos);
+		void* offsetBuffer = (void*)((addr_t)bounceBuffer + (pos - rounded_pos));
 		if (IS_USER_ADDRESS(buffer))
 			status = user_memcpy(offsetBuffer, buffer, *length);
 		else
