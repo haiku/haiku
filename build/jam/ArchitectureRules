@@ -379,7 +379,7 @@ rule KernelArchitectureSetup architecture
 
 	HAIKU_KERNEL_CCFLAGS = $(HAIKU_CCFLAGS_$(architecture)) $(ccBaseFlags) ;
 	HAIKU_KERNEL_C++FLAGS = $(HAIKU_C++FLAGS_$(architecture)) $(c++BaseFlags) ;
-	HAIKU_KERNEL_PIC_CCFLAGS = -fno-pic ;
+	HAIKU_KERNEL_PIC_CCFLAGS = ;
 	HAIKU_KERNEL_PIC_LINKFLAGS = ;
 	HAIKU_KERNEL_ADDON_LINKFLAGS = ;
 
@@ -458,7 +458,7 @@ rule KernelArchitectureSetup architecture
 		case x86_64 :
 			# Kernel lives in the top 2GB of the address space, use kernel code
 			# model.
-			HAIKU_KERNEL_PIC_CCFLAGS += -mcmodel=kernel ;
+			HAIKU_KERNEL_PIC_CCFLAGS = -fno-pic -mcmodel=kernel ;
 
 			# Disable the red zone, which cannot be used in kernel code due to
 			# interrupts, and always enable the frame pointer so stack traces
