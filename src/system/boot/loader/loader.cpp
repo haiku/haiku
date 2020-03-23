@@ -55,7 +55,7 @@ static const char *sAddonPaths[] = {
 };
 
 
-int
+static int
 open_maybe_packaged(BootVolume& volume, const char* path, int openMode)
 {
 	if (strncmp(path, kSystemDirectoryPrefix, strlen(kSystemDirectoryPrefix))

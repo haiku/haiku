@@ -21,9 +21,4 @@ void calculate_cpu_conversion_factor(uint8 channel);
 }
 #endif
 
-#include <boot/vfs.h>
-
-void ucode_load(BootVolume& volume);
-
-
 #endif	/* BOOT_ARCH_CPU_H */
