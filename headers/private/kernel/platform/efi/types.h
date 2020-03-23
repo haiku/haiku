@@ -14,9 +14,14 @@
 #define EFIAPI
 #endif
 
+#if UINTPTR_MAX == 0xffffffff
+#define EFI_ERROR_MASK 0x80000000
+#elif UINTPTR_MAX == 0xffffffffffffffff
 #define EFI_ERROR_MASK 0x8000000000000000
+#endif
+
 #define EFI_ERR(x) (EFI_ERROR_MASK | x)
-#define EFI_ERROR(x) (((int64_t)x) < 0)
+#define EFI_ERROR(x) (((ssize_t)x) < 0)
 
 #define EFI_SUCCESS              0
 #define EFI_LOAD_ERROR           EFI_ERR(1)

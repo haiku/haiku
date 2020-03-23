@@ -26,10 +26,10 @@ struct efi_block_io_protocol {
                         bool ExtendedVerification) EFIAPI;
     efi_status (*ReadBlocks)(efi_block_io_protocol* self,
                              uint32_t MediaId, uint64_t LBA,
-                             uint64_t BufferSize, void* Buffer) EFIAPI;
+                             size_t BufferSize, void* Buffer) EFIAPI;
     efi_status (*WriteBlocks)(efi_block_io_protocol* self,
                               uint32_t MediaId, uint64_t LBA,
-                              uint64_t BufferSize, const void* Buffer) EFIAPI;
+                              size_t BufferSize, const void* Buffer) EFIAPI;
     efi_status (*FlushBlocks)(efi_block_io_protocol* self);
 
 
