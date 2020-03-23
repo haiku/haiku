@@ -36,3 +36,8 @@ cpu_init()
 		panic("You need a 6502 or higher in order to boot!\n");
 }
 
+
+extern "C" void
+platform_load_ucode(BootVolume& volume)
+{
+}

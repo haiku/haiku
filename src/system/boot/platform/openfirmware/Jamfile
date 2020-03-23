@@ -12,6 +12,7 @@ UsePrivateHeaders [ FDirName graphics common ] ;
 }
 
 local platform_src =
+	cpu.cpp
 	console.cpp
 	debug.cpp
 	devices.cpp

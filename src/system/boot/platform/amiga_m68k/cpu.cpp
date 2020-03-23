@@ -105,3 +105,9 @@ cpu_init()
 		// ...or not!
 }
 
+
+extern "C" void
+platform_load_ucode(BootVolume& volume)
+{
+}
+
