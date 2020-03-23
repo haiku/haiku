@@ -1660,6 +1660,16 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 						break;
 				}
 				break;
+			case PCI_data_acquisition:
+				switch (subType) {
+					case PCI_data_acquisition_other:
+						_AddPath(*stack, "busses", "i2c");
+						break;
+					default:
+						_AddPath(*stack, "drivers");
+						break;
+				}
+				break;
 			default:
 				if (sRootNode == this) {
 					_AddPath(*stack, "busses/pci");
@@ -1677,6 +1687,7 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 						_AddPath(*stack, "busses");
 					}
 					_AddPath(*stack, "drivers", sGenericContextPath);
+					_AddPath(*stack, "busses/i2c");
 					_AddPath(*stack, "busses/scsi");
 					_AddPath(*stack, "busses/random");
 				}
@@ -1959,6 +1970,9 @@ device_node::Probe(const char* devicePath, uint32 updateCycle)
 				matches = type == PCI_multimedia && subType == PCI_video;
 			} else if (!strcmp(devicePath, "power")) {
 				matches = type == PCI_data_acquisition;
+			} else if (!strcmp(devicePath, "input")) {
+				matches = type == PCI_data_acquisition
+					&& subType == PCI_data_acquisition_other;
 			}
 		} else {
 			// This driver does not support types, but still wants to its
