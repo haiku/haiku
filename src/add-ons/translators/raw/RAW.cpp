@@ -619,10 +619,11 @@ DCRaw::_ParseManufacturerTag(off_t baseOffset)
 			int32 i = 0;
 
 			for (; offset + 22 < tag.length; offset += 22 + i) {
-				tag.tag = fRead.Next<uint32>();
+				uint32 tag32 = fRead.Next<uint32>();
+				tag.tag = (uint16)tag32;
 				fRead.Seek(14, SEEK_CUR);
 				i = fRead.Next<uint32>() - 4;
-				if (tag.tag == 0x76a43207)
+				if (tag32 == 0x76a43207)
 					fMeta.flip = fRead.Next<uint16>();
 				else
 					fRead.Seek(i, SEEK_CUR);
