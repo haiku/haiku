@@ -746,7 +746,7 @@ SudokuView::KeyDown(const char *bytes, int32 /*numBytes*/)
 			break;
 	}
 
-	if (!fShowKeyboardFocus && fShowHintX != ~0UL) {
+	if (!fShowKeyboardFocus && fShowHintX != UINT32_MAX) {
 		// always start at last mouse position, if any
 		fKeyboardX = fShowHintX;
 		fKeyboardY = fShowHintY;
@@ -1145,7 +1145,7 @@ SudokuView::_SetValue(uint32 x, uint32 y, uint32 value)
 		fLastField = x + y * fField->Size();
 	}
 
-	if (value != fValueHintValue && fValueHintValue != ~0UL)
+	if (value != fValueHintValue && fValueHintValue != UINT32_MAX)
 		_SetValueHintValue(value);
 
 	if (wasCompleted != fField->IsValueCompleted(value))
