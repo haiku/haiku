@@ -7,6 +7,7 @@
  */
 
 
+#include <AreaKeeper.h>
 #include <Drivers.h>
 #include <Errors.h>
 #include <KernelExport.h>
@@ -17,7 +18,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "AreaKeeper.h"
 #include "pch_thermal.h"
 
 

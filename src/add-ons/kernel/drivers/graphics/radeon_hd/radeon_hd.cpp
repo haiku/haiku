@@ -13,7 +13,6 @@
 #include "radeon_hd.h"
 #include "sensors.h"
 
-#include "AreaKeeper.h"
 #include "driver.h"
 #include "utility.h"
 
@@ -22,6 +21,7 @@
 #include <string.h>
 #include <errno.h>
 
+#include <AreaKeeper.h>
 #include <boot_item.h>
 #include <driver_settings.h>
 #include <util/kernel_cpp.h>

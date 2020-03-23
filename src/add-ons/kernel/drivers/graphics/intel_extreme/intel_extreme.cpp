@@ -11,12 +11,12 @@
 
 #include "intel_extreme.h"
 
-#include "AreaKeeper.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
 
+#include <AreaKeeper.h>
 #include <boot_item.h>
 #include <driver_settings.h>
 #include <util/kernel_cpp.h>
