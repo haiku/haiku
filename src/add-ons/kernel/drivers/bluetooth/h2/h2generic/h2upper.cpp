@@ -48,7 +48,7 @@ sched_tx_processing(bt_usb_dev* bdev)
 				err = submit_tx_command(bdev, snbuf);
 				if (err != B_OK) {
 					// re-head it
-					list_insert_item_before(&bdev->nbuffersTx[BT_COMMAND], 
+					list_insert_item_before(&bdev->nbuffersTx[BT_COMMAND],
 						list_get_first_item(&bdev->nbuffersTx[BT_COMMAND]),
 						snbuf);
 				}
@@ -140,7 +140,7 @@ send_packet(hci_id hid, bt_packet_t type, net_buffer* nbuf)
 			default:
 				ERROR("%s: Unknown packet type for sending %d\n", __func__,
 					type);
-				// TODO: free the net_buffer -> no, allow upper layer 
+				// TODO: free the net_buffer -> no, allow upper layer
 				// handle it with the given error
 				err = B_BAD_VALUE;
 			break;
