@@ -7,11 +7,17 @@
 
 # get and check the parameters
 if [ $# -lt 3 ]; then
-	echo Usage: $0 '<haiku sourcedir> <buildtools dir> <install dir>' >&2
+	echo Usage: $0 '<haiku sourcedir> <buildtools dir> <install dir>' \
+		'[extra make flags]' >&2
 	exit 1
 fi
 
 set -e
+
+if [ -z "$MAKE" ]; then
+	echo "MAKE undefined. Assuming make."
+	export MAKE=make
+fi
 
 haikuSourceDir=$1
 buildToolsDir=$2/legacy

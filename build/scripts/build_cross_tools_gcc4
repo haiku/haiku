@@ -5,11 +5,21 @@
 # get and check the parameters
 if [ $# -lt 4 ]; then
 	echo Usage: $0 '<machine> <haiku sourcedir> <buildtools dir>' \
-		'<install dir>' >&2
+		'<install dir> [extra make flags]' >&2
 	exit 1
 fi
 
 set -e
+
+if [ -z "$MAKE" ]; then
+	echo "MAKE undefined. Assuming make."
+	export MAKE=make
+fi
+
+if [ -z "$HAIKU_USE_GCC_GRAPHITE" ]; then
+	echo "HAIKU_USE_GCC_GRAPHITE undefined. Assuming false"
+	export HAIKU_USE_GCC_GRAPHITE=0
+fi
 
 haikuMachine=$1
 haikuSourceDir=$2
