@@ -10,8 +10,6 @@
 #include <compat/sys/mutex.h>
 
 
-// these methods are bit unfriendly, a bit too much panic() around
-
 struct mtx Giant;
 struct rw_lock ifnet_rwlock;
 struct mtx gIdStoreLock;
@@ -49,10 +47,13 @@ mtx_sysinit(void *arg)
 void
 mtx_destroy(struct mtx *mutex)
 {
-	if ((mutex->type & MTX_RECURSE) != 0)
+	if ((mutex->type & MTX_RECURSE) != 0) {
 		recursive_lock_destroy(&mutex->u.recursive);
-	else
+	} else if ((mutex->type & MTX_SPIN) != 0) {
+		KASSERT(!B_SPINLOCK_IS_LOCKED(&mutex->u.spinlock.lock), ("spin mutex is locked"));
+	} else {
 		mutex_destroy(&mutex->u.mutex.lock);
+	}
 }
 
 
