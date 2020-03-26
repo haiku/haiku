@@ -29,6 +29,10 @@ public:
 			bool 			IsValid();
 			char*			Name();
 			uint32			BlockSize();
+			xfs_rfsblock_t	TotalBlocks();
+			xfs_rfsblock_t	TotalBlocksWithLog();
+			uint64			FreeBlocks();
+			uint64			UsedBlocks();
 			uint32			Size();
 			void			SwapEndian();
 
@@ -149,6 +153,7 @@ for reverse-mapped B+Trees. I have spare0/1 defined here instead.
 #define XFS_AG_MAGICNUM 0x58414746
 class AGFreeSpace{
 	public:
+			//TODO:
 			void			SwapEndian();
 	private:
 			uint32			magicnum;
@@ -172,7 +177,7 @@ class AGFreeSpace{
 			*/
 
 			uint32			btreeblks;
-}
+};
 
 
 #endif

@@ -7,6 +7,8 @@
 #include "Volume.h"
 
 
+#define XFS_IO_SIZE	65536
+
 struct identify_cookie
 {
 	/*	super_block_struct super_block;
@@ -108,7 +110,20 @@ xfs_unmount(fs_volume *_volume)
 static status_t
 xfs_read_fs_info(fs_volume *_volume, struct fs_info *info)
 {
-	return B_NOT_SUPPORTED;
+	Volume* volume = (Volume*)_volume->private_volume;
+
+	info->flags = B_FS_IS_READONLY
+					| B_FS_HAS_ATTR | B_FS_IS_PERSISTENT;
+
+	info->io_size = XFS_IO_SIZE;
+	info->block_size = volume->SuperBlock().BlockSize();
+	info->total_blocks = volume->SuperBlock().TotalBlocks();
+	info->free_blocks = volume->SuperBlock().FreeBlocks();
+
+	strlcpy(info->volume_name, volume->Name(), sizeof(info->volume_name));
+	strlcpy(info->fsh_name, "xfs", sizeof(info->fsh_name));
+
+	return B_OK;
 }
 
 

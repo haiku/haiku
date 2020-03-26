@@ -11,7 +11,7 @@ XfsSuperBlock::IsValid()
 {
 	if (sb_magicnum != XFS_SB_MAGIC) return false;
 
-	if (BBLOCKSIZE <= sb_blocksize){
+	if (BBLOCKSIZE > sb_blocksize){
 		ERROR("Basic block is less than 512 bytes!");
 		return false;
 	}
@@ -31,6 +31,34 @@ uint32
 XfsSuperBlock::Size()
 {
 	return XFS_SB_MAXSIZE;
+}
+
+
+xfs_rfsblock_t
+XfsSuperBlock::TotalBlocks()
+{
+	return sb_dblocks;
+}
+
+
+xfs_rfsblock_t
+XfsSuperBlock::TotalBlocksWithLog()
+{
+	return TotalBlocks() + sb_logblocks;
+}
+
+
+uint64
+XfsSuperBlock::FreeBlocks()
+{
+	return sb_fdblocks;
+}
+
+
+uint64
+XfsSuperBlock::UsedBlocks()
+{
+	return TotalBlocks() - FreeBlocks();
 }
 
 
