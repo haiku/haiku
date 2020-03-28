@@ -251,6 +251,7 @@ SubInclude HAIKU_TOP src bin consoled ;
 SubInclude HAIKU_TOP src bin desklink ;
 SubInclude HAIKU_TOP src bin fwcontrol ;
 SubInclude HAIKU_TOP src bin hid_decode ;
+SubInclude HAIKU_TOP src bin i2c ;
 SubInclude HAIKU_TOP src bin keymap ;
 SubInclude HAIKU_TOP src bin keystore ;
 SubInclude HAIKU_TOP src bin listdev ;
