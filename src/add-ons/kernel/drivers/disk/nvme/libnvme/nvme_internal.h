@@ -690,9 +690,6 @@ extern int  nvme_qpair_submit_request(struct nvme_qpair *qpair,
 extern void nvme_qpair_reset(struct nvme_qpair *qpair);
 extern void nvme_qpair_fail(struct nvme_qpair *qpair);
 
-extern unsigned int nvme_qpair_poll(struct nvme_qpair *qpair,
-				    unsigned int max_completions);
-
 extern int nvme_request_pool_construct(struct nvme_qpair *qpair);
 
 extern void nvme_request_pool_destroy(struct nvme_qpair *qpair);
