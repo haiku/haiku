@@ -401,7 +401,7 @@ static void nvme_qpair_complete_tracker(struct nvme_qpair *qpair,
 	if (req->cb_fn)
 		req->cb_fn(req->cb_arg, cpl);
 
-	nvme_request_free(req);
+	nvme_request_free_locked(req);
 
 done:
 	tr->req = NULL;
@@ -418,6 +418,8 @@ done:
 	    !qpair->ctrlr->resetting) {
 		req = STAILQ_FIRST(&qpair->queued_req);
 		STAILQ_REMOVE_HEAD(&qpair->queued_req, stailq);
+
+		pthread_mutex_unlock(&qpair->lock);
 		nvme_qpair_submit_request(qpair, req);
 	}
 }
@@ -464,7 +466,7 @@ static void nvme_qpair_manual_complete_request(struct nvme_qpair *qpair,
 	if (req->cb_fn)
 		req->cb_fn(req->cb_arg, &cpl);
 
-	nvme_request_free(req);
+	nvme_request_free_locked(req);
 }
 
 static void nvme_qpair_abort_aers(struct nvme_qpair *qpair)

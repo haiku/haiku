@@ -40,11 +40,15 @@ static struct nvme_request *nvme_alloc_request(struct nvme_qpair *qpair)
 {
 	struct nvme_request *req;
 
+	pthread_mutex_lock(&qpair->lock);
+
 	req = STAILQ_FIRST(&qpair->free_req);
 	if (req) {
 		STAILQ_REMOVE_HEAD(&qpair->free_req, stailq);
 		memset(&req->cmd, 0, sizeof(struct nvme_cmd));
 	}
+
+	pthread_mutex_unlock(&qpair->lock);
 
 	return req;
 }
@@ -169,13 +173,20 @@ struct nvme_request *nvme_request_allocate_null(struct nvme_qpair *qpair,
 	return nvme_request_allocate_contig(qpair, NULL, 0, cb_fn, cb_arg);
 }
 
-void nvme_request_free(struct nvme_request *req)
+void nvme_request_free_locked(struct nvme_request *req)
 {
-	struct nvme_qpair *qpair = req->qpair;
-
 	nvme_assert(req->child_reqs == 0, "Number of child request not 0\n");
 
-	STAILQ_INSERT_HEAD(&qpair->free_req, req, stailq);
+	STAILQ_INSERT_HEAD(&req->qpair->free_req, req, stailq);
+}
+
+void nvme_request_free(struct nvme_request *req)
+{
+	pthread_mutex_lock(&req->qpair->lock);
+
+	nvme_request_free_locked(req);
+
+	pthread_mutex_unlock(&req->qpair->lock);
 }
 
 void nvme_request_add_child(struct nvme_request *parent,

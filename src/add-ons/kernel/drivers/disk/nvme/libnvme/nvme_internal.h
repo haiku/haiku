@@ -708,6 +708,7 @@ nvme_request_allocate_contig(struct nvme_qpair *qpair,
 			     nvme_cmd_cb cb_fn, void *cb_arg);
 
 extern void nvme_request_free(struct nvme_request *req);
+extern void nvme_request_free_locked(struct nvme_request *req);
 
 extern void nvme_request_add_child(struct nvme_request *parent,
 				   struct nvme_request *child);
