@@ -1,0 +1,12 @@
+1	japanese	x-vnd.Haiku-libmedia	1819860668
+Cleaning up.	MediaDefs		クリーンアップしています。
+Starting media_services.	MediaDefs		media_servicesを起動しています。
+Stopping media_addon_server.	MediaDefs		media_addon_serverを停止しています。
+Waiting for media_addon_server to quit.	MediaDefs		media_addon_serverの終了を待っています。
+Telling media_addon_server to quit.	MediaDefs		media_addon_serverに終了を伝えています。
+Ready for use.	MediaDefs		使用できる状態です。
+Stopping media server…	MediaDefs		media serverを停止しています…
+Waiting for media_server to quit.	MediaDefs		media_serverに終了を伝えています。
+Done shutting down.	MediaDefs		シャットダウンが終了しました。
+Error occurred starting media services.	MediaDefs		media servicesの開始中にエラーが発生しました。
+Media Service	MediaDefs		メディアサービス

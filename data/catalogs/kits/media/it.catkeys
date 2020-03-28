@@ -1,0 +1,12 @@
+1	italian	x-vnd.Haiku-libmedia	1819860668
+Cleaning up.	MediaDefs		Pulizia in corso.
+Starting media_services.	MediaDefs		Avvio media_services.
+Stopping media_addon_server.	MediaDefs		Arresto di media_addon_server in corso.
+Waiting for media_addon_server to quit.	MediaDefs		In attesa della chiusura di media_addon_server.
+Telling media_addon_server to quit.	MediaDefs		Richiesta di arresto a media_addon_server.
+Ready for use.	MediaDefs		Pronto all'uso.
+Stopping media server…	MediaDefs		Arresto del media server in corso…
+Waiting for media_server to quit.	MediaDefs		In attesa della chiusura del media_server.
+Done shutting down.	MediaDefs		Arresto completato.
+Error occurred starting media services.	MediaDefs		Si è verificato un errore durante l'avvio dei servizi media.
+Media Service	MediaDefs		Servizio Media

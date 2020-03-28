@@ -1,10 +1,12 @@
-1	portuguese	x-vnd.Haiku-HaikuDepot	2051848200
+1	portuguese	x-vnd.Haiku-HaikuDepot	3252451705
 Repository update error	LocalRepositoryUpdateProcess		Erro na atualização de repositório
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ocorreu um erro ao atualizar o repositório: %error%
+User Created	UserLoginWindow		Utilizador Criado
 Check for updates…	MainWindow		Verificar atualizações…
 Uninstall	PackageManager		Desinstalar
 (%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Desinstalado
+It was not possible to create the new user.	UserLoginWindow		Não foi possível criar o novo utilizador.
 Available packages	MainWindow		Pacotes disponíveis
 Create account	UserLoginWindow		Criar conta
 OK	App		OK
@@ -13,9 +15,11 @@ The response to the captcha was incorrect.	ServerHelper		A resposta ao captcha e
 Develop packages	MainWindow		Pacotes de desenvolvimento
 Rate package…	PackageInfoView		Avaliar pacote…
 Starting the package daemon failed:\n\n%Error%	App		Falhou a inicialização do serviço de pacotes:\n\n%Erro%
+You have successfully authenticated as user %Nickname%.	UserLoginWindow		Iniciou com sucesso a sessão com o utilizador %Nickname%.
 <no info>	PackageInfoView		<sem informação>
 No user ratings available.	PackageInfoView		Não há avaliações de utilizadores disponíveis.
 Downloading package '%name%'	WorkStatusView		A descarregar o pacote '%name%'
+It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Não foi possível extrair a informação de captcha necessária a partir dos dados enviados pelo servidor.
 Rating	PackageListView		Avaliação
 Synchronizing icons	ServerIconExportUpdateProcess		A sincronizar ícones
 Does not start	RatePackageWindow		Não inicia
@@ -36,6 +40,8 @@ Local	LocalPkgDataLoadProcess		Local
 Rate %Package%	RatePackageWindow		Avaliar %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Ocorreu um erro ao inicializar o gestor de pacotes: %message%
 Quit HaikuDepot	App		Sair do HaikuDepot
+An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Ocorreu um erro inesperado '%Message%' com a propriedade  '%Property%'
+A response to the captcha question must be provided.	UserLoginWindow		É necessário fornecer uma resposta à pergunta do captcha.
 Category	FilterView		Categoria
 User rating	RatePackageWindow		Avaliação do utilizador
 Installed packages	MainWindow		Pacotes instalados
@@ -51,12 +57,14 @@ There was a puzzling response from the web service.	UserLoginWindow		A resposta 
 Not logged in	MainWindow		Sem sessão iniciada
 No, quit HaikuDepot	App		Não, sair do HaikuDepot
 Featured packages	FeaturedPackagesView		Pacotes em destaque
+It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Não foi possível comunicar com o servidor para obter uma imagem de captcha necessária para criar um novo utilizador.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		A sua avaliação foi enviada com sucesso. Poderá atualizá-la ou eliminá-la no sítio web HaikuDepot Server.
 Network Error	ServerHelper		Erro de Rede
 Available	PackageListView		Disponível
 Cancel	UserLoginWindow		Cancelar
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		O HaikuDepot requer o serviço de pacotes para funcionar, mas parece que ele não está em execução.\nDeseja iniciá-lo agora?
 Click a package to view information	PackageInfoView		Clique num pacote para visualizar a informação
+The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		A palavra-passe deve ter pelo menos oito caracteres, bem como pelo menos dois algarismos e uma letra maiúscula.
 Contents	PackageInfoView		Conteúdo
 Close	PackageManager		Fechar
 A network transport error has arisen communicating with the HaikuDepot server system: %s	ServerHelper		Ocorreu um erro de transporte de rede ao comunicar com o sistema servidor HaikuDepot: %s
@@ -67,11 +75,14 @@ About	PackageInfoView		Acerca
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# processo} other{# processos}}
 Reboot required	PackageManager		Necessário reiniciar
 Very unstable	RatePackageWindow		Muito instável
+Password:	UserLoginWindow		Palavra-passe:
 All packages	PackageListView		Todos os pacotes
 Network Transport Error	ServerHelper		Erro de Transporte de Rede
+Authorization or security issue.  Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Problema de autorização ou segurança.  Termine e volte a iniciar sessão para verificar que a sua palavra-passe esteja correta, e verifique também se já concordou com as condições de utilização mais recentes.
 Stability	RatePackageWindow		Estabilidade
 Send	RatePackageWindow		Enviar
 Start package daemon	App		Iniciar serviço de pacotes
+The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		A palavra-passe deve ser repetida para diminuir a probabilidade de a introduzir incorretamente.
 The package action could not be scheduled: %Error%	PackageInfoView		A ação do pacote não pôde ser agendada: %Error%
 Cancel	RatePackageWindow		Cancelar
 Inactive	PackageListView		Inativo
@@ -102,11 +113,13 @@ View agreed usage conditions…	MainWindow		Ver condições de utilização acor
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 mais para descarregar)}other{(# mais para descarregar)}}
 Refresh repositories	MainWindow		Atualizar repositórios
 Tools	MainWindow		Ferramentas
+A password is required.	UserLoginWindow		É necessária uma palavra-passe.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Este pacote parece não estar localizado no servidor HaikuDepot, pelo que não é possível criar uma nova avaliação ou editar uma já existente.
 Language	RatePackageWindow		Língua
 Log out	MainWindow		Terminar sessão
 Comment language:	RatePackageWindow		Língua do comentário:
 Status	PackageListView		Estado
+The password has been incorrectly repeated.	UserLoginWindow		A palavra-passe foi repetida incorretamente.
 Update	RatePackageWindow		Atualizar
 OK	ServerHelper		OK
 Language	UserLoginWindow		Língua
@@ -143,5 +156,7 @@ Log in…	MainWindow		Entrar…
 You need to be logged into an account before you can rate packages.	MainWindow		Você precisa de ter sessão iniciada com uma conta antes de poder avaliar pacotes.
 Client version too old	ServerHelper		Versão de cliente demasiado antiga
 Local repository load error	LocalPkgDataLoadProcess		Erro de carga do repositório local
+The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		O utilizador não existe ou foi introduzida uma palavra-passe errada. Verifique as suas credenciais e tente novamente.
 9999.99 KiB	PackageListView		9999.99 KiB
+Repeat password:	UserLoginWindow		Repetir palavra-passe:
 All repositories	MainWindow		Todos os repositórios

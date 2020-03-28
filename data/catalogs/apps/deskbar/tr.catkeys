@@ -16,7 +16,7 @@ Window	PreferencesWindow		Pencere
 Defaults	PreferencesWindow		Öntanımlılar
 Menu	PreferencesWindow		Menü
 Recent documents	DeskbarMenu		Son kullanılan belgeler
-Auto-hide	PreferencesWindow		Otomatik gizle
+Auto-hide	PreferencesWindow		Kendiliğinden gizle
 Always on top	PreferencesWindow		Her zaman üstte
 <Deskbar folder is empty>	DeskbarMenu		<Masaüstü Çubuğu klasörü boş>
 Show all	WindowMenu		Tümünü göster

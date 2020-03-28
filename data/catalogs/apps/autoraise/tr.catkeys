@@ -16,7 +16,7 @@ Normal	AutoRaiseIcon		Normal
 0.5 s	AutoRaiseIcon		0,5 sn
 Deskbar only (touch)	AutoRaiseIcon		Yalnızca Masaüstü Çubuğu (dokunma)
 4 s	AutoRaiseIcon		4 sn
-Focus follows mouse	AutoRaiseIcon		Odak, fareden sonra gelir
+Focus follows mouse	AutoRaiseIcon		Odak fareden sonra gelir
 Deskbar only (over its area)	AutoRaiseIcon		Yalnızca Masaüstü Çubuğu (alanının üzerinde)
 Inactive behaviour	AutoRaiseIcon		Etkin olmayan davranış
 Mode	AutoRaiseIcon		Kip

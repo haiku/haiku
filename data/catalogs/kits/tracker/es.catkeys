@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	257681158
+1	spanish; castilian	x-vnd.Haiku-libtracker	2165842741
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -21,6 +21,7 @@ contains	FindPanel		contiene
 Open	FilePanelPriv		Abrir
 Bitmap icon	AttributesView		Icono de mapa de bits
 You can't replace a folder with one of its sub-folders.	FSUtils		No puedes reemplazar una carpeta por una de sus subcarpetas
+Select…	VirtualDirectoryWindow		Seleccione…
 Name	Default Query Columns		Nombre
 Unmount	ContainerWindow		Desmontar
 Eject when unmounting	AutoMounterSettings		Expulsar al momento de desmontar

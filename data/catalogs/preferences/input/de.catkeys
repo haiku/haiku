@@ -1,0 +1,46 @@
+1	german	x-vnd.Haiku-Input	2494436940
+Scrolling	TouchpadPrefView		Scrollen
+Defaults	InputMouse		Standardwerte
+Tapping	TouchpadPrefView		Klicken
+Long	KeyboardView		Lang
+Normal	SettingsView		Normal
+Cancel	TouchpadPrefView		Abbrechen
+Slow	TouchpadPrefView		Langsam
+Warp	SettingsView		Warp
+Instant warp	SettingsView		Sofortiger Warp
+Device List	InputWindow		Geräteliste
+Double-click speed	SettingsView		Doppelklickgeschwindigkeit
+Typing test area	KeyboardView		Feld für Testeingaben
+Mouse type:	SettingsView		Mausart:
+Fast	KeyboardView		Schnell
+Off	TouchpadPrefView		Aus
+Fast	TouchpadPrefView		Schnell
+Please confirm	TouchpadPrefView		Bitte bestätigen
+Click to focus	SettingsView		Klicken aktiviert Fenster
+Acceleration	TouchpadPrefView		Beschleunigung
+Mouse speed	SettingsView		Geschwindigkeit
+Accept first click	SettingsView		Auf ersten Klick reagieren
+OK	TouchpadPrefView		OK
+Horizontal scrolling	TouchpadPrefView		Horizontales Scrollen
+Delay until key repeat	KeyboardView		Verzögerung bis Tastenwiederholung
+Two finger scrolling	TouchpadPrefView		Zwei-Finger-Scrollen
+Input	System name		Eingabegeräte
+Mouse acceleration	SettingsView		Beschleunigung
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Der neue Scroll-Bereich ist sehr groß und könnte eine normale Mausfunktion beeinträchtigen. Soll die Einstellung wirklich geändert werden?
+High	TouchpadPrefView		Hoch
+Defaults	TouchpadPrefView		Standardwerte
+1-Button	SettingsView		1-Taste
+Short	KeyboardView		Kurz
+Revert	InputMouse		Anfangswerte
+Slow	KeyboardView		Langsam
+Key repeat rate	KeyboardView		Tastenwiederholrate
+2-Button	SettingsView		2-Tasten
+Click to focus and raise	SettingsView		Klicken aktiviert und bringt nach vorn
+Vertical	TouchpadPrefView		Vertikal
+Horizontal	TouchpadPrefView		Horizontal
+Focus mode:	SettingsView		Modus:
+Focus follows mouse	SettingsView		Ohne Klicken aktivieren
+Double-click test area	SettingsView		Testfeld für Doppelklick
+Sensitivity	TouchpadPrefView		Empfindlichkeit
+3-Button	SettingsView		3-Tasten
+Revert	TouchpadPrefView		Anfangswerte

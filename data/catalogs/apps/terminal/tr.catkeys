@@ -108,7 +108,7 @@ Abort	Terminal Shell		İptal
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tEtkin işlemin içinde çalıştığı dizin\n\t\t\tİsteğe bağlı olarak olabilecek en çok yol bileşenlerinin sayısı\n\t\t\tbelirtilebilir. Örneğin en fazla iki bileşen için '%2d'.\n\t%i\t-\tSekme sırası\n\t%e\t-\tSekme kodlaması. UTF-8 için gösterilmez.\n\t%p\t-\tEtkin işlemin adı\n\t%%\t-\t'%' karakteri.
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Aşağıdaki işlemler hâlâ çalışıyor:\n\n\t%1\n\nUçbirim'i kapatırsanız, işlemler sonlandırılacak.
 Set window title	Terminal TermWindow		Pencere başlığını ayarla
-Increase	Terminal TermWindow		Arttır
+Increase	Terminal TermWindow		Artır
 OK	Terminal TermWindow		Tamam
 Close window	Terminal TermWindow		Pencereyi kapat
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Uçbirim\nCopyright 2001-2020 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui ve Takaşi Murai.\n\nKullanım: %s [SEÇENEK] [KABUK]\n

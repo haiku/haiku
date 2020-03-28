@@ -1,0 +1,12 @@
+1	german	x-vnd.Haiku-libmedia	1819860668
+Cleaning up.	MediaDefs		Aufräumarbeiten.
+Starting media_services.	MediaDefs		Starte media_services.
+Stopping media_addon_server.	MediaDefs		Stoppe media_addon_server.
+Waiting for media_addon_server to quit.	MediaDefs		Warte auf Beenden von media_addon_server.
+Telling media_addon_server to quit.	MediaDefs		Versuche media_addon_server zu beenden.
+Ready for use.	MediaDefs		Bereit.
+Stopping media server…	MediaDefs		Stoppe media server…
+Waiting for media_server to quit.	MediaDefs		Warte auf Beenden von media_server.
+Done shutting down.	MediaDefs		Herunterfahren abgeschlossen.
+Error occurred starting media services.	MediaDefs		Beim Start der Mediendienste ist ein Fehler aufgetreten.
+Media Service	MediaDefs		Mediendienst

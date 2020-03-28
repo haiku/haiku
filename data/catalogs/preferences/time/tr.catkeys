@@ -15,7 +15,7 @@ Synchronize again	Time		Yeniden eşitle
 Asia	Time		Asya
 Try all servers	Time		Tüm sunucuları dene
 Time	Time		Tarih ve Saat
-Current time:	Time		Şimdiki zaman:
+Current time:	Time		Geçerli zaman:
 The following error occured while synchronizing:\n%s: %s	Time		Eşitleme sırasında aşağıdaki hatalar oluştu:\n%s: %s
 Europe	Time		Avrupa
 Show day of week	Time		Haftanın gününü göster

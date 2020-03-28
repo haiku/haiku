@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	1066099065
+1	japanese	x-vnd.Haiku-libtracker	659027911
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -286,6 +286,7 @@ Error creating link to \"%name\".	FSUtils		\"%name\"へのリンクの作成時�
 Unknown	FilePermissionsView		不明
 Paste links	ContainerWindow		リンクを貼り付ける
 Restoring: 	StatusWindow		元に戻しています:
+The Tracker must be running to set the default printer.	PoseView		規定のプリンターを設定するにはTrackerが動作している必要があります。
 calculating…	InfoWindow		計算中…
 Preferred for file	OpenWithWindow		関連付けの第一優先
 OK	AutoMounterSettings		OK

@@ -24,7 +24,7 @@ OK	TouchpadPrefView		Tamam
 Horizontal scrolling	TouchpadPrefView		Yatay kaydırma
 Delay until key repeat	KeyboardView		Düğme yinelemesine kadar olan gecikme
 Two finger scrolling	TouchpadPrefView		İki parmak kaydırma
-Input	System name		Girdi
+Input	System name		Girdi Aygıtları
 Mouse acceleration	SettingsView		Fare ivmelenmesi
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Yeni kaydırma alanı çok geniş ve normal fare işlemlerine engel olabilir. Değiştirmek istediğinizden emin misiniz?
 High	TouchpadPrefView		Yüksek
@@ -39,7 +39,7 @@ Click to focus and raise	SettingsView		Odaklayıp öne getirmek için tıkla
 Vertical	TouchpadPrefView		Dikey
 Horizontal	TouchpadPrefView		Yatay
 Focus mode:	SettingsView		Odak kipi:
-Focus follows mouse	SettingsView		Odak, fareden sonra gelir
+Focus follows mouse	SettingsView		Odak fareden sonra gelir
 Double-click test area	SettingsView		Çift tıklama sınama alanı
 Sensitivity	TouchpadPrefView		Hassaslık
 3-Button	SettingsView		3 düğmeli

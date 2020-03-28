@@ -8,7 +8,7 @@ Available packages	MainWindow		Paquets disponibles
 Create account	UserLoginWindow		Créer un compte
 OK	App		OK
 Mostly stable	RatePackageWindow		Plutôt stable
-The response to the captcha was incorrect.	ServerHelper		Réponse incorrecte au captcha.
+The response to the captcha was incorrect.	ServerHelper		Réponse incorrecte au Captcha.
 Develop packages	MainWindow		Paquets de développement
 Rate package…	PackageInfoView		Évaluer le paquet…
 Starting the package daemon failed:\n\n%Error%	App		Le démarrage du serveur de paquets a échoué :\n\n%Error%
@@ -16,7 +16,7 @@ You have successfully authenticated as user %Nickname%.	UserLoginWindow		Vous ê
 <no info>	PackageInfoView		<pas d’info>
 No user ratings available.	PackageInfoView		Aucun avis d’utilisateurs.
 Downloading package '%name%'	WorkStatusView		Téléchargement du paquet « %name% »
-It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Il n'a pas été possible d'extraire les informations captcha nécessaires depuis les données renvoyées par le serveur.
+It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Il n'a pas été possible d'extraire les informations Captcha nécessaires depuis les données renvoyées par le serveur.
 Rating	PackageListView		Évaluation
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronisation des icônes
 Does not start	RatePackageWindow		Ne démarre pas

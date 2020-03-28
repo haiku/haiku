@@ -1,0 +1,18 @@
+1	italian	x-vnd.Haiku-Input	2294922396
+Scrolling	TouchpadPrefView		Scorrimento
+Defaults	InputMouse		Predefiniti
+Cancel	TouchpadPrefView		Annulla
+Device List	InputWindow		Lista Dispositivi
+Typing test area	KeyboardView		Area di test battitura
+Mouse type:	SettingsView		Tipo Mouse:
+Please confirm	TouchpadPrefView		Per favore conferma
+Acceleration	TouchpadPrefView		Accelerazione
+Mouse speed	SettingsView		Velocità del mouse
+OK	TouchpadPrefView		OK
+Two finger scrolling	TouchpadPrefView		Scorrimento con due dita
+Mouse acceleration	SettingsView		Accelerazione del mouse
+Defaults	TouchpadPrefView		Predefiniti
+Key repeat rate	KeyboardView		Velocità ripetizione tasto
+Vertical	TouchpadPrefView		Verticale
+Horizontal	TouchpadPrefView		Orizzontale
+Sensitivity	TouchpadPrefView		Sensibilità
