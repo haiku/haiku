@@ -55,9 +55,6 @@ CopyEngine::CopyEngine(ProgressReporter* reporter, EntryFilter* entryFilter)
 	fBytesWritten(0),
 	fTimeWritten(0),
 
-	fBytesToCopy(0),
-	fItemsToCopy(0),
-
 	fCurrentTargetFolder(NULL),
 	fCurrentItem(NULL),
 
@@ -108,9 +105,6 @@ CopyEngine::ResetTargets(const char* source)
 	fBytesWritten = 0;
 	fTimeWritten = 0;
 
-	fBytesToCopy = 0;
-	fItemsToCopy = 0;
-
 	fCurrentTargetFolder = NULL;
 	fCurrentItem = NULL;
 }
@@ -120,9 +114,12 @@ status_t
 CopyEngine::CollectTargets(const char* source, sem_id cancelSemaphore)
 {
 	int32 level = 0;
-	status_t ret = _CollectCopyInfo(source, level, cancelSemaphore);
+	off_t bytesToCopy = 0;
+	uint64 itemsToCopy = 0;
+	status_t ret = _CollectCopyInfo(source, level, cancelSemaphore, bytesToCopy,
+			itemsToCopy);
 	if (ret == B_OK && fProgressReporter != NULL)
-		fProgressReporter->AddItems(fItemsToCopy, fBytesToCopy);
+		fProgressReporter->AddItems(itemsToCopy, bytesToCopy);
 	return ret;
 }
 
@@ -234,7 +231,7 @@ CopyEngine::_CopyData(const BEntry& _source, const BEntry& _destination,
 
 status_t
 CopyEngine::_CollectCopyInfo(const char* _source, int32& level,
-	sem_id cancelSemaphore)
+	sem_id cancelSemaphore, off_t& bytesToCopy, uint64& itemsToCopy)
 {
 	level++;
 
@@ -277,17 +274,18 @@ CopyEngine::_CollectCopyInfo(const char* _source, int32& level,
 			if (ret < B_OK)
 				return ret;
 
-			ret = _CollectCopyInfo(entryPath.Path(), level, cancelSemaphore);
+			ret = _CollectCopyInfo(entryPath.Path(), level,
+					cancelSemaphore, bytesToCopy, itemsToCopy);
 			if (ret < B_OK)
 				return ret;
 		}
 	} else if (S_ISLNK(statInfo.st_mode)) {
 		// link, ignore size
 	} else {
-		fBytesToCopy += statInfo.st_size;
+		bytesToCopy += statInfo.st_size;
 	}
 
-	fItemsToCopy++;
+	itemsToCopy++;
 	level--;
 	return B_OK;
 }

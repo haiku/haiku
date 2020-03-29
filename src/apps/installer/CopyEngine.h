@@ -39,7 +39,8 @@ public:
 
 private:
 			status_t			_CollectCopyInfo(const char* source,
-									int32& level, sem_id cancelSemaphore);
+									int32& level, sem_id cancelSemaphore,
+									off_t& bytesToCopy, uint64& itemsToCopy);
 			status_t			_Copy(BEntry& source,
 									BEntry& destination,
 									int32& level, sem_id cancelSemaphore,
@@ -102,9 +103,6 @@ private:
 
 			off_t				fBytesWritten;
 			bigtime_t			fTimeWritten;
-
-			off_t				fBytesToCopy;
-			uint64				fItemsToCopy;
 
 			const char*			fCurrentTargetFolder;
 			const char*			fCurrentItem;
