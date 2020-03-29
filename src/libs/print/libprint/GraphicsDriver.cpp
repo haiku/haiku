@@ -166,7 +166,7 @@ GraphicsDriver::_SetupBitmap()
 	fRotatedBitmap = NULL;
 	BRect rect;
 
-	for(fBandCount = 1; fBandCount < 256; fBandCount++) {
+	for (fBandCount = 1; fBandCount < 256; fBandCount++) {
 		if (_NeedRotateBitmapBand()) {
 			fBandWidth  = (fPageWidth + fBandCount - 1) / fBandCount;
 			fBandHeight = fPageHeight;
