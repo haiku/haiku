@@ -13,16 +13,6 @@
 
 
 /*!
-	\file GroupLayoutBuilder.h
-	\ingroup layout
-	\ingroup libbe
-	\brief Provides the BLayoutBuilder::Group<> class.
-
-	\since Haiku R1
-*/
-
-
-/*!
 	\class BLayoutBuilder::Group<>
 	\ingroup layout
 	\ingroup libbe
@@ -136,6 +126,7 @@
 
 
 //! @{
+
 
 /*!
 	\fn ThisBuilder& BLayoutBuilder::Group<ParentBuilder>::Add(BView* view)
@@ -278,7 +269,7 @@
 
 	\param gridLayout The BGridLayout to be added and used to construct the
 		returned GridBuilder.
-	\param weight The weight for \a groupLayout in the BGroupLayout this builder
+	\param weight The weight for \a gridLayout in the BGroupLayout this builder
 		represents.
 
 	\returns a GridBuilder representing \a gridLayout.
@@ -294,7 +285,7 @@
 
 	\param gridView The BGridView to be added and used to construct the
 		returned GridBuilder.
-	\param weight The weight for \a groupLayout in the BGroupLayout this builder
+	\param weight The weight for \a gridView in the BGroupLayout this builder
 		represents.
 
 	\returns a GridBuilder representing \a gridView.

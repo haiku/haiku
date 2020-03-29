@@ -1,0 +1,517 @@
+/*
+ * Copyright 2020 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/LayoutBuilder.h	 rev 49977
+ */
+
+
+/*!
+	\class BLayoutBuilder::Split<>
+	\ingroup layout
+	\ingroup libbe
+	\brief BLayoutBuilder::Base subclass for building BSplitViews.
+
+	\since Haiku R1
+
+	A BSplitView consists of elements, for which in between there are dividers
+	that the user can manipulate to alter the division of space between each of
+	the element.s
+
+	For a detailed view on the properties, see the \link BSplitView class
+	description\endlink.
+*/
+
+
+/*!
+	\typedef BLayoutBuilder::Split<ParentBuilder>::ThisBuilder
+	\brief Shorthand representing the type of \c this.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\typedef BLayoutBuilder::Split<ThisBuilder>::GroupBuilder
+	\brief Shorthand for builders returned by this builder's AddGroup() methods.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\typedef BLayoutBuilder::Split<ThisBuilder>::GridBuilder
+	\brief Shorthand for builders returned by this builder's AddGrid() methods.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\typedef BLayoutBuilder::Split<ThisBuilder>::SplitBuilder
+	\brief Shorthand for builders returned by this builder's AddSplit() methods.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\typedef BLayoutBuilder::Split<ThisBuilder>::CardBuilder
+	\brief Shorthand for builders returned by this builder's AddCards()
+		methods.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\name Constructors
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BLayoutBuilder::Split<ParentBuilder>::Split(orientation orientation,
+		float spacing)
+	\brief Creates a builder for a new BSplitView.
+
+	\param orientation The orientation for the new BSplitView.
+	\param spacing The spacing for the new BSplitView.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BLayoutBuilder::Split<ParentBuilder>::Split(orientation orientation,
+		float spacing)
+	\brief Creates a builder for a new BSplitView.
+
+	\param orientation The orientation for the new BSplitView.
+	\param spacing The spacing for the new BSplitView.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BLayoutBuilder::Split<ParentBuilder>::Split(BSplitView *view)
+	\brief Creates a builder for an existing BSplitView
+
+	\param view The existing view to operate on.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Accessors
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BSplitView* BLayoutBuilder::Split<ParentBuilder>::View() const
+	\brief Get a borrowed pointer to the underlying BSplitView
+
+	\returns A borrowed pointer to the underlying BSplitView
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Split<ParentBuilder>::GetView(
+		BView** _view)
+	\brief Get a borrowed pointer to the underlying view.
+
+	\param[out] _view Location to store the underlying BSplitView as a BView
+		reference.
+
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Split<ParentBuilder>::GetSplitView(
+		BSplitView** _view)
+	\brief Get a borrowed pointer to the underlying view.
+
+	\param[out] _view Location to store the underlying BSplitView reference.
+
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
+*/
+
+
+/*!
+	\fn BLayoutBuilder::Split<ParentBuilder>::operator BSplitView*()
+	\brief Cast this builder into the BSplitView it represents.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Adding BViews and BLayoutItems
+*/
+
+
+//! @{
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Split<ParentBuilder>::Add(BView* view)
+	\brief Add a \a view to the underlying BSplitView.
+
+	The \a view will be added to the right or the bottom of the existing
+	elements.
+
+	\param view The BView to be added. The underlying BSplitView will take
+		ownership of the object.
+
+	\see BSplitView::Add(BView*)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Split<ParentBuilder>::Add(BView* view,
+		float weight)
+	\brief Add a \a view with a \a weight to the underlying BSplitView.
+
+	The \a view will be added to the right or the bottom of the existing
+	elements.
+
+	\param view The BView to be added. The underlying BSplitView will take
+		ownership of the object.
+	\param weight The weight of the view.
+
+	\see BSplitView::Add(BView*, float)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Split<ParentBuilder>::Add(
+		BLayoutItem* item)
+	\brief Add a \a item to the underlying BSplitView.
+
+	The layout item will be added to the right or the bottom of the existing
+	elements.
+
+	\param item The BLayoutItem to be added. The underlying BSplitView will
+		take ownership of the object.
+
+	\see BSplitView::Add(BLayoutItem*)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Split<ParentBuilder>::Add(
+		BLayoutItem* item, float weight)
+	\brief Add an \a item with a \a weight to the underlying BSplitView.
+
+	The layout item will be added to the right or the bottom of the existing
+	elements.
+
+	\param item The BLayoutItem to be added. The underlying BSplitView will
+		take ownership of the object.
+	\param weight The weight of the item.
+
+	\see BSplitView::Add(BLayoutItem*, float)
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Adding BLayouts and their BView Pairs
+
+	A set of methods that add a BLayout or BView subclass and return a
+	BLayoutBuilder::Base subclass representing the newly added object. These
+	methods push a new builder on top of the stack, you will not be using
+	\c this builder again until you call End().
+*/
+
+
+//! @{
+
+
+/*!
+	\fn GroupBuilder BLayoutBuilder::Split<ParentBuilder>::AddGroup(
+		orientation orientation, float spacing, float weight)
+	\brief Construct and add a viewless BGroupLayout, then return a GroupBuilder
+	       representing the newly added layout.
+
+	\param orientation The orientation to use for the new BGroupLayout.
+	\param spacing The spacing to use for the new BGroupLayout.
+	\param weight The weight for the new BGroupLayout in the BGroupLayout this
+	       builder represents.
+
+	\returns A GroupBuilder representing the newly created BGroupLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn GroupBuilder BLayoutBuilder::Split<ParentBuilder>::AddGroup(BGroupView*
+		groupView, float weight)
+	\brief Add BGroupView and return a builder representing the newly added
+	       BGroupView.
+
+	\param groupView The BGroupView to be added.
+	\param weight The weight for \a groupView in the BGroupLayout this builder
+	       represents.
+
+	\returns A GroupBuilder representing \a groupView.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn GroupBuilder BLayoutBuilder::Split<ParentBuilder>::AddGroup(
+		BGroupLayout* groupLayout, float weight)
+	\brief Add a BGroupLayout and return a builder representing the newly added
+	       BGroupLayout.
+
+	\param groupLayout The BGroupLayout to be added.
+	\param weight The weight for \a groupLayout in the BGroupLayout this builder
+		represents.
+
+	\returns A GroupBuilder representing \a groupLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn GridBuilder	BLayoutBuilder::Split<ParentBuilder>::AddGrid(
+		float horizontalSpacing = 0.0f, float verticalSpacing = 0.0f,
+		float weight = 1.0f)
+	\brief Create and add a viewless BGridLayout, then return a builder
+	       representing the newly created BGridLayout.
+
+	\param horizontalSpacing The horizontal spacing for the new BGridLayout.
+	\param verticalSpacing The vertical spacing for the new BGridLayout.
+	\param weight The weight for the new BGridLayout in the BSplitView this
+		builder represents.
+
+	\returns A GridBuilder representing the newly created BGridLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn GridBuilder BLayoutBuilder::Split<ParentBuilder>::AddGrid(
+		BGridLayout* gridLayout, float weight = 1.0f)
+	\brief Add a BGridLayout, then return a builder the newly added BGridLayout.
+
+	\param gridLayout The BGridLayout to be added and used to construct the
+		returned GridBuilder.
+	\param weight The weight for \a gridLayout in the BSplitView this builder
+		represents.
+
+	\returns A GridBuilder representing \a gridLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn GridBuilder	BLayoutBuilder::Split<ParentBuilder>::AddGrid(
+		BGridView* gridView, float weight = 1.0f)
+	\brief Add a BGridView, then return a builder the newly added BGridView.
+
+	\param gridView The BGridView to be added and used to construct the
+		returned GridBuilder.
+	\param weight The weight for \a gridView in the BSplitView this builder
+		represents.
+
+	\returns A GridBuilder representing \a gridView.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn SplitBuilder BLayoutBuilder::Split<ParentBuilder>::AddSplit(
+		orientation orientation, float spacing, float weight)
+	\brief Create and add a new BSplitView with a weight of \c weight, then
+		return a SplitBuilder representing the new BSplitView.
+
+	\param orientation The orientation of the new BSplitView.
+	\param spacing The spacing of the new BSplitView.
+	\param weight The weight, in this BSplitView for the new BSplitView.
+
+	\returns A SplitBuilder representing the new BSplitView.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn SplitBuilder BLayoutBuilder::Split<ParentBuilder>::AddSplit(
+		BSplitView* splitView, float weight = 1.0f)
+	\brief Add a BSplitView to the BSplitView this builder represents and
+		return a SplitBuilder representing the BSplitView.
+
+	\param splitView The BSplitView to be added.
+	\param weight The weight of the BSplitView in the BSplitView this builder
+		represents.
+
+	\returns A SplitBuilder representing the new BSplitView.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn CardBuilder BLayoutBuilder::Split<ParentBuilder>::AddCards(
+		float weight)
+	\brief Add a new BCardLayout to the BSplitView this builder represents and
+		return a CardBuilder representing the new layout.
+
+	\param weight The weight of the BCardLayout in the BSplitView this builder
+		represents.
+
+	\returns A CardBuilder representing the new BCardLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn CardBuilder BLayoutBuilder::Split<ParentBuilder>::AddCards(
+		BCardLayout* cardLayout, float weight)
+	\brief Add an existing BCardLayout to the BSplitView this builder
+		represents and return a CardBuilder representing this layout.
+
+	\param cardLayout The existing layout that will be added to the underlying
+		BSplitView.
+	\param weight The weight of the BCardLayout in the BSplitView this builder
+		represents.
+
+	\returns A CardBuilder representing the new BCardLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn CardBuilder BLayoutBuilder::Split<ParentBuilder>::AddCards(
+		BCardView* cardView, float weight)
+	\brief Add an existing BCardView to the BSplitView this builder
+		represents and return a CardBuilder representing this layout.
+
+	\param cardView The existing view that will be added to the underlying
+		BSplitView.
+	\param weight The weight of the BCardLayout in the BSplitView this builder
+		represents.
+
+	\returns A CardBuilder representing the new BCardLayout.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Collapsability of elements
+*/
+
+
+//! @{
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Split<ParentBuilder>::SetCollapsible(
+		bool collapsible)
+	\copydoc BSplitView::SetCollapsible(bool)
+
+	\see BSplitView::SetCollapsible(bool)
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Split<ParentBuilder>::SetCollapsible(
+		int32 index, bool collapsible)
+	\copydoc BSplitView::SetCollapsible(int32, bool)
+
+	\see BSplitView::SetCollapsible(int32, bool)
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Split<ParentBuilder>::SetCollapsible(
+		int32 first, int32 last, bool collapsible)
+	\copydoc BSplitView::SetCollapsible(int32, int32, bool)
+
+	\see BSplitView::SetCollapsible(int32, int32, bool)
+*/
+
+
+//! @}
+
+
+/*!
+	\name Insets
+*/
+
+
+//! @{
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Split<ParentBuilder>::SetInsets(
+		float left, float top, float right, float bottom)
+	\copydoc BSplitView::SetInsets(float, float, float, float)
+
+	\see BSplitView::SetInsets(float, float, float, float)
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Split<ParentBuilder>::SetInsets(
+		float horizontal, float vertical)
+	\copydoc BSplitView::SetInsets(float, float)
+
+	\see BSplitView::SetInsets(float, float)
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Split<ParentBuilder>::SetInsets(
+		float insets)
+	\copydoc BSplitView::SetInsets(float)
+
+	\see BSplitView::SetInsets(float)
+*/
+
+
+//! @}

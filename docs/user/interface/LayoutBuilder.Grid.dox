@@ -7,8 +7,8 @@
  *
  * Corresponds to:
  *		headers/os/interface/LayoutBuilder.h	 rev 51359
- *		src/kits/interface/LayoutBuilder.cpp	 rev 51359
  */
+
 
 /*!
 	\class BLayoutBuilder::Grid<>

@@ -1,9 +1,12 @@
 /*
- * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Copyright 2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Name, email@email.com
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *
+ * Reviewers:
+ * 		Adrien Destugues, pulkomandy@pulkomandy.tk
  *
  * Corresponds to:
  *		headers/os/interface/SplitView.h	hrev49977
@@ -14,7 +17,8 @@
 /*!
 	\file SplitView.h
 	\ingroup layout
-	\brief Undocumented file.
+	\ingroup libbe
+	\brief Provides the BSplitView class.
 
 	\since Haiku R1
 */
@@ -24,7 +28,50 @@
 	\class BSplitView
 	\ingroup layout
 	\ingroup libbe
-	\brief Undocumented class.
+	\brief A container with two or more sections, with dividers in between,
+		so that a user can manipulate the size of the sections by dragging
+		a slider.
+
+	This container view consists one of more items, that are laid out
+	horizontally or vertically. Between two adjoining items, there is a
+	splitter. This splitter allows the user to change how the space between the
+	individual items is divided.
+
+	The screenshot below shows the BSplitView being used in HaikuDepot. The
+	BSplitView is the main container of the window, in this case with a
+	\ref B_VERTICAL layout. The top part contains the list of packages, and
+	some filter tools. At the bottom are individual package details. In between
+	the two visual elements there is a dotted line, indicating the draggable
+	separator. At the right hand of this separator, above the \b Install
+	button, you can see that the mouse cursor changed into the double arrow,
+	indicating the user that the element is dragable.
+
+	\image html BSplitView_HaikuDepot.png
+
+	Because of the dynamic nature of the size of the sections within the
+	split view, it is best to use this container with the \link layout layout
+	system\endlink. It is fully supported by the layout builder utilities. See
+	the \ref BLayoutBuilder::Split<> documentation for the builder that
+	accompanies this view.
+
+	The container has the following properties:
+	 - \b Insets are the padding for the split view.
+	 - \b Spacing is the spacing between the components.
+	 - \b Orientation is whether the splits are horizontal or vertical.
+	 - \b Splitter \b size is the size of the splitter.
+
+	Specifically for individual elements, the following properties may also
+	be set:
+	 - \b Weight for the weight of the item within the split view (determines
+	   how space is allocated between the items).
+	 - \b Collapsible determines if an element is collapsible, meaning the user
+	   can drag the splitter as such as to hide the item completely. If an item
+	   is not collapsible, at least a part of the item will always be visible
+	   to the user.
+
+	\related The \ref BGroupView essentially has the same properties for
+		organizing the layout items, though it does not offer the functionality
+		for users to change the size of the elements.
 
 	\since Haiku R1
 */
@@ -32,13 +79,10 @@
 
 /*!
 	\fn BSplitView::BSplitView(orientation orientation=B_HORIZONTAL, float spacing=B_USE_DEFAULT_SPACING)
-	\brief Undocumented public method
+	\brief Creates a new split view.
 
-	\param orientation Undocumented
-	\param spacing Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\param orientation The orientation of the splits.
+	\param spacing The spacing in between the elements.
 
 	\since Haiku R1
 */
@@ -46,12 +90,9 @@
 
 /*!
 	\fn BSplitView::BSplitView(BMessage *from)
-	\brief Undocumented public method
+	\brief Unarchive a split view.
 
-	\param from Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\param from The \ref BMessage that contains the split view.
 
 	\since Haiku R1
 */
@@ -59,10 +100,7 @@
 
 /*!
 	\fn virtual virtual BSplitView::~BSplitView()
-	\brief Undocumented public method
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\brief Destructor.
 
 	\since Haiku R1
 */
@@ -70,12 +108,13 @@
 
 /*!
 	\fn void BSplitView::SetInsets(float left, float top, float right, float bottom)
-	\brief Undocumented public method
+	\brief Set the insets between the bounds of the view and the inner
+		elements.
 
-	\param left Undocumented
-	\param top Undocumented
-	\param right Undocumented
-	\param bottom Undocumented
+	\param left The left inset.
+	\param top The top inset.
+	\param right The right inset.
+	\param bottom The bottom inset.
 
 	\since Haiku R1
 */
@@ -83,10 +122,11 @@
 
 /*!
 	\fn void BSplitView::SetInsets(float horizontal, float vertical)
-	\brief Undocumented public method
+	\brief Set the insets between the bounds of the view and the inner
+		elements.
 
-	\param horizontal Undocumented
-	\param vertical Undocumented
+	\param horizontal The left and right inset.
+	\param vertical The top and bottom inset.
 
 	\since Haiku R1
 */
@@ -94,9 +134,10 @@
 
 /*!
 	\fn void BSplitView::SetInsets(float insets)
-	\brief Undocumented public method
+	\brief Set the insets between the bounds of the view and the inner
+		elements.
 
-	\param insets Undocumented
+	\param insets The value for the left, top, right and bottom inset.
 
 	\since Haiku R1
 */
@@ -104,12 +145,15 @@
 
 /*!
 	\fn void BSplitView::GetInsets(float *left, float *top, float *right, float *bottom) const
-	\brief Undocumented public method
+	\brief Get the insets that apply to this view.
 
-	\param left Undocumented
-	\param top Undocumented
-	\param right Undocumented
-	\param bottom Undocumented
+	You may pass \c NULL for any of the parameters, if you do not wish to
+	retrieve their value.
+
+	\param[out] left Will be set to the left inset.
+	\param[out] top Will be set to the top inset.
+	\param[out] right Will be set to the right inset.
+	\param[out] bottom Will be set to the bottom inset.
 
 	\since Haiku R1
 */
@@ -117,10 +161,9 @@
 
 /*!
 	\fn float BSplitView::Spacing() const
-	\brief Undocumented public method
+	\brief Get the spacing between elements in this view.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The spacing between elements as a \c float.
 
 	\since Haiku R1
 */
@@ -128,9 +171,10 @@
 
 /*!
 	\fn void BSplitView::SetSpacing(float spacing)
-	\brief Undocumented public method
+	\brief Set the spacing between elements in this view.
 
-	\param spacing Undocumented
+	\param spacing The desired spacing between elements. This will apply to all
+		elements.
 
 	\since Haiku R1
 */
@@ -138,10 +182,10 @@
 
 /*!
 	\fn orientation BSplitView::Orientation() const
-	\brief Undocumented public method
+	\brief Get the orientation of the elements in this view.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\retval B_HORIZONTAL The elements are ordered left-to-right.
+	\retval B_VERTICAL The elements are ordered top-to-bottom.
 
 	\since Haiku R1
 */
@@ -149,9 +193,9 @@
 
 /*!
 	\fn void BSplitView::SetOrientation(orientation orientation)
-	\brief Undocumented public method
+	\brief Set the orientation of the elements in this view.
 
-	\param orientation Undocumented
+	\param orientation May be \ref B_HORIZONTAL or \ref B_VERTICAL.
 
 	\since Haiku R1
 */
@@ -159,10 +203,9 @@
 
 /*!
 	\fn float BSplitView::SplitterSize() const
-	\brief Undocumented public method
+	\brief Get the size of the splitter(s) in this view.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The size of the splitter(s).
 
 	\since Haiku R1
 */
@@ -170,9 +213,10 @@
 
 /*!
 	\fn void BSplitView::SetSplitterSize(float size)
-	\brief Undocumented public method
+	\brief Set the size of the splitter(s) in this view.
 
-	\param size Undocumented
+	\param size The size as a \c float that will be applied to all splitters
+		in this view.
 
 	\since Haiku R1
 */
@@ -180,10 +224,10 @@
 
 /*!
 	\fn int32 BSplitView::CountItems() const
-	\brief Undocumented public method
+	\brief The number of items in this view.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return Returns the number of items in this view. The splitters themselves
+		are not included in this number.
 
 	\since Haiku R1
 */
@@ -191,12 +235,11 @@
 
 /*!
 	\fn float BSplitView::ItemWeight(int32 index) const
-	\brief Undocumented public method
+	\brief Get the item weight for the item at the \a index.
 
-	\param index Undocumented
+	\param index The index of the item (zero-based).
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The weight of the item, or \c 0.0 if there is no item at \a index.
 
 	\since Haiku R1
 */
@@ -204,12 +247,12 @@
 
 /*!
 	\fn float BSplitView::ItemWeight(BLayoutItem *item) const
-	\brief Undocumented public method
+	\brief Get the item weight for an existing \a item.
 
-	\param item Undocumented
+	\param item An existing layout item object.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return The weight of the \a item, or \c 0.0 if the item is not associated
+		with this view.
 
 	\since Haiku R1
 */
@@ -217,11 +260,15 @@
 
 /*!
 	\fn void BSplitView::SetItemWeight(int32 index, float weight, bool invalidateLayout)
-	\brief Undocumented public method
+	\brief Set the weight of the item at \a index.
 
-	\param index Undocumented
-	\param weight Undocumented
-	\param invalidateLayout Undocumented
+	The weight is relative to all other items in the layout, and determines how
+	the available space is distributed over the items in the layout.
+
+	\param index The index of the item (zero-based).
+	\param weight The weight of the item.
+	\param invalidateLayout When \c true, calls
+		\ref BLayout::InvalidateLayout() to recalculate the layout.
 
 	\since Haiku R1
 */
@@ -229,10 +276,13 @@
 
 /*!
 	\fn void BSplitView::SetItemWeight(BLayoutItem *item, float weight)
-	\brief Undocumented public method
+	\brief Set the weight of the \a item.
 
-	\param item Undocumented
-	\param weight Undocumented
+	The weight is relative to all other items in the layout, and determines how
+	the available space is distributed over the items in the layout.
+
+	\param item The item within this view that the weight applies to.
+	\param weight The weight of the item.
 
 	\since Haiku R1
 */
@@ -240,12 +290,12 @@
 
 /*!
 	\fn bool BSplitView::IsCollapsible(int32 index) const
-	\brief Undocumented public method
+	\brief Get whether the item at \a index is collapsible.
 
-	\param index Undocumented
+	\param index The index of the item (zero-based).
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\retval true The user can collapse the item.
+	\retval false The user cannot collapse the item.
 
 	\since Haiku R1
 */
@@ -253,9 +303,10 @@
 
 /*!
 	\fn void BSplitView::SetCollapsible(bool collapsible)
-	\brief Undocumented public method
+	\brief Set the whether all the layout items in this view are collapsible.
 
-	\param collapsible Undocumented
+	\param collapsible \c true if all items in this layout are collapsible,
+		\c false if they are not.
 
 	\since Haiku R1
 */
@@ -263,10 +314,11 @@
 
 /*!
 	\fn void BSplitView::SetCollapsible(int32 index, bool collapsible)
-	\brief Undocumented public method
+	\brief Set whether the item at \a index is collapsible.
 
-	\param index Undocumented
-	\param collapsible Undocumented
+	\param index The index of the item (zero-based).
+	\param collapsible \c true if the user may collaps the item, \c false if
+		they may not.
 
 	\since Haiku R1
 */
@@ -274,11 +326,14 @@
 
 /*!
 	\fn void BSplitView::SetCollapsible(int32 first, int32 last, bool collapsible)
-	\brief Undocumented public method
+	\brief Set whether the items from \a first to \a last are collapsible.
 
-	\param first Undocumented
-	\param last Undocumented
-	\param collapsible Undocumented
+	\param first The index of the first item that you want the setting to apply
+		to (zero-based).
+	\param last The index of the last item that you want the setting to apply
+		to (zero-based).
+	\param collapsible \c true if the user may collaps the item, \c false if
+		they may not.
 
 	\since Haiku R1
 */
@@ -286,12 +341,12 @@
 
 /*!
 	\fn bool BSplitView::IsItemCollapsed(int32 index) const
-	\brief Undocumented public method
+	\brief Check whether the item at \a index is collapsed.
 
-	\param index Undocumented
+	\param index The index of the item (zero-based).
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\retval true The item is collapsed.
+	\retval false The item is not collapsed.
 
 	\since Haiku R1
 */
@@ -299,10 +354,11 @@
 
 /*!
 	\fn void BSplitView::SetItemCollapsed(int32 index, bool collapsed)
-	\brief Undocumented public method
+	\brief Set whether the item at \a index is displayed as collapsed.
 
-	\param index Undocumented
-	\param collapsed Undocumented
+	\param index The index of the item (zero-based).
+	\param collapsed \c true if the item should be rendered collapsed, \c
+		false if it needs to be visible.
 
 	\since Haiku R1
 */
@@ -310,10 +366,11 @@
 
 /*!
 	\fn void BSplitView::AddChild(BView *child, BView *sibling=NULL)
-	\brief Undocumented public method
+	\brief Add a \a child to the view.
 
-	\param child Undocumented
-	\param sibling Undocumented
+	Passthrough for \ref BView::AddChild(BView *child, BView *sibling). This
+	bypasses the layout system, so only use it when you know what you are
+	doing.
 
 	\since Haiku R1
 */
@@ -321,13 +378,16 @@
 
 /*!
 	\fn bool BSplitView::AddChild(BView *child, float weight)
-	\brief Undocumented public method
+	\brief Add a \a child with a \a weight.
 
-	\param child Undocumented
-	\param weight Undocumented
+	The view will be added at the end of the existing layout items, meaning it
+	will be placed to the right or bottom of existing items.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\param child The view that should be added as a child. The ownership is
+		transferred to this view.
+	\param weight The weight of the item.
+
+	\return \c true when succesfully, \c false if there was an error.
 
 	\since Haiku R1
 */
@@ -335,14 +395,17 @@
 
 /*!
 	\fn bool BSplitView::AddChild(int32 index, BView *child, float weight)
-	\brief Undocumented public method
+	\brief Add a \a child at \a index with a \a weight.
 
-	\param index Undocumented
-	\param child Undocumented
-	\param weight Undocumented
+	\param index The desired position for the \a child. Existing items will be
+		shifted to the right or down based on the orientation. If the index is
+		higher than the number of items, the item will be added after farmost
+		item. The index is zero-based.
+	\param child The view that should be added as a child. The ownership is
+		transferred to this view.
+	\param weight The weight of the item.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return \c true when succesfully, \c false if there was an error.
 
 	\since Haiku R1
 */
@@ -350,12 +413,14 @@
 
 /*!
 	\fn bool BSplitView::AddChild(BLayoutItem *child)
-	\brief Undocumented public method
+	\brief Add a \a child.
 
-	\param child Undocumented
+	The child will be added at the end of the existing layout items, meaning it
+	will be placed to the right or bottom of existing items.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\param child The layout item to add.
+
+	\return \c true when succesfully, \c false if there was an error.
 
 	\since Haiku R1
 */
@@ -363,13 +428,15 @@
 
 /*!
 	\fn bool BSplitView::AddChild(BLayoutItem *child, float weight)
-	\brief Undocumented public method
+	\brief Add a \a child with a \a weight.
 
-	\param child Undocumented
-	\param weight Undocumented
+	The child will be added at the end of the existing layout items, meaning it
+	will be placed to the right or bottom of existing items.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\param child The layout item to add.
+	\param weight The weight of the item.
+
+	\return \c true when succesfully, \c false if there was an error.
 
 	\since Haiku R1
 */
@@ -377,14 +444,16 @@
 
 /*!
 	\fn bool BSplitView::AddChild(int32 index, BLayoutItem *child, float weight)
-	\brief Undocumented public method
+	\brief Add a \a child at \a index with a \a weight.
 
-	\param index Undocumented
-	\param child Undocumented
-	\param weight Undocumented
+	\param index The desired position for the \a child. Existing items will be
+		shifted to the right or down based on the orientation. If the index is
+		higher than the number of items, the item will be added after farmost
+		item. The index is zero-based.
+	\param child The layout item to add.
+	\param weight The weight of the item.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return \c true when succesfully, \c false if there was an error.
 
 	\since Haiku R1
 */
@@ -392,7 +461,7 @@
 
 /*!
 	\fn virtual virtual void BSplitView::AttachedToWindow()
-	\brief Undocumented public method
+	\brief Hook method overridden from BView.
 
 	\since Haiku R1
 */
@@ -400,9 +469,7 @@
 
 /*!
 	\fn virtual virtual void BSplitView::Draw(BRect updateRect)
-	\brief Undocumented public method
-
-	\param updateRect Undocumented
+	\brief Hook method overridden from BView.
 
 	\since Haiku R1
 */
@@ -410,9 +477,7 @@
 
 /*!
 	\fn virtual virtual void BSplitView::DrawAfterChildren(BRect updateRect)
-	\brief Undocumented public method
-
-	\param updateRect Undocumented
+	\brief Hook method overridden from BView.
 
 	\since Haiku R1
 */
@@ -420,9 +485,7 @@
 
 /*!
 	\fn virtual virtual void BSplitView::MouseDown(BPoint where)
-	\brief Undocumented public method
-
-	\param where Undocumented
+	\brief Hook method overridden from BView.
 
 	\since Haiku R1
 */
@@ -430,9 +493,7 @@
 
 /*!
 	\fn virtual virtual void BSplitView::MouseUp(BPoint where)
-	\brief Undocumented public method
-
-	\param where Undocumented
+	\brief Hook method overridden from BView.
 
 	\since Haiku R1
 */
@@ -440,11 +501,7 @@
 
 /*!
 	\fn virtual virtual void BSplitView::MouseMoved(BPoint where, uint32 transit, const BMessage *message)
-	\brief Undocumented public method
-
-	\param where Undocumented
-	\param transit Undocumented
-	\param message Undocumented
+	\brief Hook method overridden from BView.
 
 	\since Haiku R1
 */
@@ -452,9 +509,7 @@
 
 /*!
 	\fn virtual virtual void BSplitView::MessageReceived(BMessage *message)
-	\brief Undocumented public method
-
-	\param message Undocumented
+	\brief Hook method overridden from BView.
 
 	\since Haiku R1
 */
@@ -462,9 +517,7 @@
 
 /*!
 	\fn virtual virtual void BSplitView::SetLayout(BLayout *layout)
-	\brief Undocumented public method
-
-	\param layout Undocumented
+	\brief Hook method overridden from BView.
 
 	\since Haiku R1
 */
@@ -472,27 +525,13 @@
 
 /*!
 	\fn virtual virtual status_t BSplitView::Archive(BMessage *into, bool deep=true) const
-	\brief Undocumented public method
-
-	\param into Undocumented
-	\param deep Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\copydoc BArchivable::Archive()
 */
 
 
 /*!
 	\fn virtual virtual status_t BSplitView::Perform(perform_code d, void *arg)
-	\brief Undocumented public method
-
-	\param d Undocumented
-	\param arg Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\brief Hook method overridden from BView.
 
 	\since Haiku R1
 */
@@ -500,12 +539,7 @@
 
 /*!
 	\fn static static BArchivable* BSplitView::Instantiate(BMessage *from)
-	\brief Undocumented public method
-
-	\param from Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\brief Instantiate the view from the message \a from.
 
 	\since Haiku R1
 */
@@ -513,12 +547,7 @@
 
 /*!
 	\fn virtual virtual status_t BSplitView::AllArchived(BMessage *into) const
-	\brief Undocumented protected method
-
-	\param into Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\brief Hook method overridden from BArchivable.
 
 	\since Haiku R1
 */
@@ -526,12 +555,7 @@
 
 /*!
 	\fn virtual virtual status_t BSplitView::AllUnarchived(const BMessage *from)
-	\brief Undocumented protected method
-
-	\param from Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\brief Hook method overridden from BArchivable.
 
 	\since Haiku R1
 */
@@ -539,12 +563,10 @@
 
 /*!
 	\fn virtual virtual void BSplitView::DrawSplitter(BRect frame, const BRect &updateRect, orientation orientation, bool pressed)
-	\brief Undocumented protected method
+	\brief Hook method called when the splitter needs to be drawn.
 
-	\param frame Undocumented
-	\param updateRect Undocumented
-	\param orientation Undocumented
-	\param pressed Undocumented
+	This method is called in the context of a \ref BView::Draw() operation.
+	Derived classes can override this to draw a splitter.
 
 	\since Haiku R1
 */
