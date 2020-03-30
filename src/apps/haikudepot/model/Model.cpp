@@ -286,19 +286,6 @@ private:
 };
 
 
-class IsFeaturedFilter : public PackageFilter {
-public:
-	IsFeaturedFilter()
-	{
-	}
-
-	virtual bool AcceptsPackage(const PackageInfoRef& package) const
-	{
-		return package.Get() != NULL && package->IsProminent();
-	}
-};
-
-
 static inline bool
 is_source_package(const PackageInfoRef& package)
 {
@@ -338,14 +325,12 @@ Model::Model()
 	fCategoryFilter(PackageFilterRef(new AnyFilter(), true)),
 	fDepotFilter(""),
 	fSearchTermsFilter(PackageFilterRef(new AnyFilter(), true)),
-	fIsFeaturedFilter(),
-	fShowFeaturedPackages(true),
+	fPackageListViewMode(PROMINENT),
 	fShowAvailablePackages(true),
 	fShowInstalledPackages(true),
 	fShowSourcePackages(false),
 	fShowDevelopPackages(false)
 {
-	_UpdateIsFeaturedFilter();
 }
 
 
@@ -399,7 +384,6 @@ Model::MatchesFilter(const PackageInfoRef& package) const
 {
 	return fCategoryFilter->AcceptsPackage(package)
 			&& fSearchTermsFilter->AcceptsPackage(package)
-			&& fIsFeaturedFilter->AcceptsPackage(package)
 			&& (fShowAvailablePackages || package->State() != NONE)
 			&& (fShowInstalledPackages || package->State() != ACTIVATED)
 			&& (fShowSourcePackages || !is_source_package(package))
@@ -443,6 +427,18 @@ Model::SyncDepot(const DepotInfo& depot)
 			fDepots.Replace(i, mergedDepot);
 			return true;
 		}
+	}
+	return false;
+}
+
+
+bool
+Model::HasAnyProminentPackages()
+{
+	for (int32 i = fDepots.CountItems() - 1; i >= 0; i--) {
+		const DepotInfo& existingDepot = fDepots.ItemAtFast(i);
+		if (existingDepot.HasAnyProminentPackages())
+			return true;
 	}
 	return false;
 }
@@ -543,7 +539,6 @@ Model::SetSearchTerms(const BString& searchTerms)
 		filter = new SearchTermsFilter(searchTerms);
 
 	fSearchTermsFilter.SetTo(filter, true);
-	_UpdateIsFeaturedFilter();
 }
 
 
@@ -559,10 +554,9 @@ Model::SearchTerms() const
 
 
 void
-Model::SetShowFeaturedPackages(bool show)
+Model::SetPackageListViewMode(package_list_view_mode mode)
 {
-	fShowFeaturedPackages = show;
-	_UpdateIsFeaturedFilter();
+	fPackageListViewMode = mode;
 }
 
 
@@ -956,16 +950,6 @@ Model::DumpExportPkgDataPath(BPath& path,
 	leaf.SetToFormat("pkg-all-%s-%s.json.gz", repositorySourceCode.String(),
 		LanguageModel().PreferredLanguage().Code());
 	return StorageUtils::LocalWorkingFilesPath(leaf, path);
-}
-
-
-void
-Model::_UpdateIsFeaturedFilter()
-{
-	if (fShowFeaturedPackages && SearchTerms().IsEmpty())
-		fIsFeaturedFilter = PackageFilterRef(new IsFeaturedFilter(), true);
-	else
-		fIsFeaturedFilter = PackageFilterRef(new AnyFilter(), true);
 }
 
 

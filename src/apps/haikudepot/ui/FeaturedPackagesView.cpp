@@ -380,31 +380,89 @@ FeaturedPackagesView::~FeaturedPackagesView()
 }
 
 
+/*! This method will add the package into the list to be displayed.  The
+    insertion will occur in alphabetical order.
+*/
+
 void
 FeaturedPackagesView::AddPackage(const PackageInfoRef& package)
 {
-	// Find insertion index (alphabetical)
-	int32 index = 0;
-	for (int32 i = 0; BLayoutItem* item = fPackageListLayout->ItemAt(i); i++) {
-		PackageView* view = dynamic_cast<PackageView*>(item->View());
-		if (view == NULL)
-			break;
-
-		BString name = view->PackageName();
-		if (name == package->Name()) {
-			// Don't add packages more than once
-			return;
-		}
-
-		BString title = view->PackageTitle();
-		if (title.Compare(package->Title()) < 0)
-			index++;
+	int32 index = _InsertionIndex(package->Name());
+	if (index != -1) {
+		PackageView* view = new PackageView();
+		view->SetPackage(package);
+		fPackageListLayout->AddView(index, view);
 	}
+}
 
-	PackageView* view = new PackageView();
-	view->SetPackage(package);
 
-	fPackageListLayout->AddView(index, view);
+const char*
+FeaturedPackagesView::_PackageNameAtIndex(int32 index) const
+{
+	BLayoutItem* item = fPackageListLayout->ItemAt(index);
+	PackageView* view = dynamic_cast<PackageView*>(item->View());
+	return (view != NULL ? view->PackageName() : NULL);
+		// some of the items in the GroupLayout instance are not of type
+		// PackageView* and it is not immediately clear where they are
+		// coming from.
+
+}
+
+
+int32
+FeaturedPackagesView::_InsertionIndex(const BString& packageName) const
+{
+	int32 count = fPackageListLayout->CountItems();
+	return _InsertionIndexBinary(packageName, 0, count - 1);
+}
+
+int32
+FeaturedPackagesView::_InsertionIndexLinear(const BString& packageName,
+	int32 startIndex, int32 endIndex) const
+{
+	for (int32 i = startIndex; i <= endIndex; i++) {
+		const char* iPackageName = _PackageNameAtIndex(i);
+		if (NULL != iPackageName) {
+			int compare = packageName.Compare(iPackageName);
+			if (compare == 0)
+				return -1;
+			if (compare < 0)
+				return i;
+		}
+	}
+	return endIndex;
+}
+
+/*! This performs a binary search to find the location at which to insert
+    the item.
+*/
+
+int32
+FeaturedPackagesView::_InsertionIndexBinary(const BString& packageName,
+	int32 startIndex, int32 endIndex) const
+{
+	if (startIndex == endIndex)
+		return startIndex;
+
+	int32 endStartSpan = endIndex - startIndex;
+
+	if (endStartSpan < 5)
+		return _InsertionIndexLinear(packageName, startIndex, endIndex);
+
+	int midIndex = startIndex + (endStartSpan / 2);
+	const char *midPackageName = _PackageNameAtIndex(midIndex);
+
+	if (midPackageName == NULL)
+		return _InsertionIndexLinear(packageName, startIndex, endIndex);
+
+	int compare = packageName.Compare(midPackageName);
+
+	if (compare == 0)
+		return -1;
+			// don't want to insert the same package twice.
+	if (compare < 0)
+		return _InsertionIndexBinary(packageName, startIndex, midIndex);
+	return _InsertionIndexBinary(packageName, midIndex, endIndex);
 }
 
 

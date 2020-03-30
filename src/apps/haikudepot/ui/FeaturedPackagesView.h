@@ -31,6 +31,15 @@ public:
 	static	void				CleanupIcons();
 
 private:
+	const	char*			_PackageNameAtIndex(int32 index) const;
+			int32			_InsertionIndex(
+								const BString& packageName) const;
+			int32			_InsertionIndexBinary(const BString& packageName,
+								int32 startIndex, int32 endIndex) const;
+			int32			_InsertionIndexLinear(const BString& packageName,
+								int32 startIndex, int32 endIndex) const;
+
+private:
 			BGroupLayout*		fPackageListLayout;
 			ScrollableGroupView* fContainerView;
 };

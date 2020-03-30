@@ -1178,6 +1178,19 @@ DepotInfo::SyncPackages(const PackageList& otherPackages)
 }
 
 
+bool
+DepotInfo::HasAnyProminentPackages() const
+{
+	int32 count = fPackages.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		const PackageInfoRef& package = fPackages.ItemAtFast(i);
+		if (package->IsProminent())
+			return true;
+	}
+	return false;
+}
+
+
 void
 DepotInfo::SetURL(const BString& URL)
 {

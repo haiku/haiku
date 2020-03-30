@@ -21,9 +21,10 @@ Captcha::Captcha(BMessage* from)
 	fToken(""),
 	fPngImageData(NULL)
 {
-	if (from->FindString(KEY_TOKEN, &fToken) != B_OK)
+	if (from->FindString(KEY_TOKEN, &fToken) != B_OK) {
 		printf("expected key [%s] in the message data when creating a "
 			"Captcha\n", KEY_TOKEN);
+	}
 
 	const void* data;
 	ssize_t len;
@@ -45,8 +46,7 @@ Captcha::Captcha()
 
 Captcha::~Captcha()
 {
-	if (fPngImageData != NULL)
-		delete fPngImageData;
+	delete fPngImageData;
 }
 
 

@@ -68,14 +68,18 @@ enum {
 	MSG_WORK_STATUS_CHANGE					= 'wsch',
 	MSG_WORK_STATUS_CLEAR					= 'wscl',
 
-	MSG_SHOW_FEATURED_PACKAGES				= 'sofp',
+	MSG_CHANGE_PACKAGE_LIST_VIEW_MODE		= 'cplm',
 	MSG_SHOW_AVAILABLE_PACKAGES				= 'savl',
 	MSG_SHOW_INSTALLED_PACKAGES				= 'sins',
 	MSG_SHOW_SOURCE_PACKAGES				= 'ssrc',
 	MSG_SHOW_DEVELOP_PACKAGES				= 'sdvl'
 };
 
-#define KEY_ERROR_STATUS "errorStatus"
+#define KEY_ERROR_STATUS				"errorStatus"
+#define KEY_PACKAGE_LIST_VIEW_MODE		"packageListViewMode"
+
+#define TAB_PROMINENT_PACKAGES	0
+#define TAB_ALL_PACKAGES		1
 
 using namespace BPackageKit;
 using namespace BPackageKit::BManager::BPrivate;
@@ -159,7 +163,7 @@ MainWindow::MainWindow(const BMessage& settings)
 	fPackageListView->AttachWorkStatusView(fWorkStatusView);
 
 	fListTabs = new TabView(BMessenger(this),
-		BMessage(MSG_SHOW_FEATURED_PACKAGES), "list tabs");
+		BMessage(MSG_CHANGE_PACKAGE_LIST_VIEW_MODE), "list tabs");
 	fListTabs->AddTab(fFeaturedPackagesView);
 	fListTabs->AddTab(fPackageListView);
 
@@ -186,27 +190,16 @@ MainWindow::MainWindow(const BMessage& settings)
 
 	fModel.AddListener(fModelListener);
 
-	// Restore settings
 	BMessage columnSettings;
 	if (settings.FindMessage("column settings", &columnSettings) == B_OK)
 		fPackageListView->LoadState(&columnSettings);
 
-	bool showOption;
-	if (settings.FindBool("show featured packages", &showOption) == B_OK)
-		fModel.SetShowFeaturedPackages(showOption);
-	if (settings.FindBool("show available packages", &showOption) == B_OK)
-		fModel.SetShowAvailablePackages(showOption);
-	if (settings.FindBool("show installed packages", &showOption) == B_OK)
-		fModel.SetShowInstalledPackages(showOption);
-	if (settings.FindBool("show develop packages", &showOption) == B_OK)
-		fModel.SetShowDevelopPackages(showOption);
-	if (settings.FindBool("show source packages", &showOption) == B_OK)
-		fModel.SetShowSourcePackages(showOption);
+	_RestoreModelSettings(settings);
 
-	if (fModel.ShowFeaturedPackages())
-		fListTabs->Select(0);
+	if (fModel.PackageListViewMode() == PROMINENT)
+		fListTabs->Select(TAB_PROMINENT_PACKAGES);
 	else
-		fListTabs->Select(1);
+		fListTabs->Select(TAB_ALL_PACKAGES);
 
 	_RestoreNickname(settings);
 	_UpdateAuthorization();
@@ -255,6 +248,7 @@ MainWindow::MainWindow(const BMessage& settings, const PackageInfoRef& package)
 
 	// Restore settings
 	_RestoreNickname(settings);
+	_UpdateAuthorization();
 	_RestoreWindowFrame(settings);
 
 	fPackageInfoView->SetPackage(package);
@@ -375,17 +369,8 @@ MainWindow::MessageReceived(BMessage* message)
 			fFilterView->AdoptModel(fModel);
 			break;
 
-		case MSG_SHOW_FEATURED_PACKAGES:
-			// check to see if we aren't already on the current tab
-			if (fListTabs->Selection() ==
-					(fModel.ShowFeaturedPackages() ? 0 : 1))
-				break;
-			{
-				BAutolock locker(fModel.Lock());
-				fModel.SetShowFeaturedPackages(
-					fListTabs->Selection() == 0);
-			}
-			_AdoptModel();
+		case MSG_CHANGE_PACKAGE_LIST_VIEW_MODE:
+			_HandleChangePackageListViewMode();
 			break;
 
 		case MSG_SHOW_AVAILABLE_PACKAGES:
@@ -661,6 +646,24 @@ MainWindow::MessageReceived(BMessage* message)
 }
 
 
+static const char*
+main_window_package_list_view_mode_str(package_list_view_mode mode)
+{
+	if (mode == PROMINENT)
+		return "PROMINENT";
+	return "ALL";
+}
+
+
+static package_list_view_mode
+main_window_str_to_package_list_view_mode(const BString& str)
+{
+	if (str == "PROMINENT")
+		return PROMINENT;
+	return ALL;
+}
+
+
 void
 MainWindow::StoreSettings(BMessage& settings) const
 {
@@ -673,8 +676,9 @@ MainWindow::StoreSettings(BMessage& settings) const
 
 		settings.AddMessage("column settings", &columnSettings);
 
-		settings.AddBool("show featured packages",
-			fModel.ShowFeaturedPackages());
+		settings.AddString(KEY_PACKAGE_LIST_VIEW_MODE,
+			main_window_package_list_view_mode_str(
+				fModel.PackageListViewMode()));
 		settings.AddBool("show available packages",
 			fModel.ShowAvailablePackages());
 		settings.AddBool("show installed packages",
@@ -852,6 +856,28 @@ MainWindow::_RestoreWindowFrame(const BMessage& settings)
 
 
 void
+MainWindow::_RestoreModelSettings(const BMessage& settings)
+{
+	BString packageListViewMode;
+	if (settings.FindString(KEY_PACKAGE_LIST_VIEW_MODE,
+			&packageListViewMode) == B_OK) {
+		fModel.SetPackageListViewMode(
+			main_window_str_to_package_list_view_mode(packageListViewMode));
+	}
+
+	bool showOption;
+	if (settings.FindBool("show available packages", &showOption) == B_OK)
+		fModel.SetShowAvailablePackages(showOption);
+	if (settings.FindBool("show installed packages", &showOption) == B_OK)
+		fModel.SetShowInstalledPackages(showOption);
+	if (settings.FindBool("show develop packages", &showOption) == B_OK)
+		fModel.SetShowDevelopPackages(showOption);
+	if (settings.FindBool("show source packages", &showOption) == B_OK)
+		fModel.SetShowSourcePackages(showOption);
+}
+
+
+void
 MainWindow::_InitWorkerThreads()
 {
 	fPendingActionsSem = create_sem(0, "PendingPackageActions");
@@ -887,6 +913,9 @@ MainWindow::_InitWorkerThreads()
 void
 MainWindow::_AdoptModel()
 {
+	if (Logger::IsTraceEnabled())
+		printf("adopting model to main window ui");
+
 	{
 		AutoLocker<BLocker> modelLocker(fModel.Lock());
 		fVisiblePackages = fModel.CreatePackageList();
@@ -906,10 +935,10 @@ MainWindow::_AdoptModel()
 	fShowSourcePackagesItem->SetMarked(fModel.ShowSourcePackages());
 	fShowDevelopPackagesItem->SetMarked(fModel.ShowDevelopPackages());
 
-	if (fModel.ShowFeaturedPackages())
-		fListTabs->Select(0);
+	if (fModel.PackageListViewMode() == PROMINENT)
+		fListTabs->Select(TAB_PROMINENT_PACKAGES);
 	else
-		fListTabs->Select(1);
+		fListTabs->Select(TAB_ALL_PACKAGES);
 
 	fFilterView->AdoptModel(fModel);
 }
@@ -971,6 +1000,19 @@ MainWindow::_BulkLoadCompleteReceived(status_t errorStatus)
 	fRefreshRepositoriesItem->SetEnabled(true);
 	_AdoptModel();
 	_UpdateAvailableRepositories();
+
+	// if after loading everything in, it transpires that there are no
+	// featured packages then the featured packages should be disabled
+	// and the user should be switched to the "all packages" view so
+	// that they are not presented with a blank window!
+
+	bool hasProminentPackages = fModel.HasAnyProminentPackages();
+	fListTabs->TabAt(TAB_PROMINENT_PACKAGES)->SetEnabled(hasProminentPackages);
+	if (!hasProminentPackages
+			&& fListTabs->Selection() == TAB_PROMINENT_PACKAGES) {
+		fModel.SetPackageListViewMode(ALL);
+		fListTabs->Select(TAB_ALL_PACKAGES);
+	}
 }
 
 
@@ -1561,5 +1603,28 @@ MainWindow::CoordinatorChanged(ProcessCoordinatorState& coordinatorState)
 	} else {
 		if (Logger::IsInfoEnabled())
 			printf("! unknown process coordinator changed\n");
+	}
+}
+
+
+static package_list_view_mode
+main_window_tab_to_package_list_view_mode(int32 tab)
+{
+	if (tab == TAB_PROMINENT_PACKAGES)
+		return PROMINENT;
+	return ALL;
+}
+
+
+void
+MainWindow::_HandleChangePackageListViewMode()
+{
+	package_list_view_mode tabMode = main_window_tab_to_package_list_view_mode(
+		fListTabs->Selection());
+	package_list_view_mode modelMode = fModel.PackageListViewMode();
+
+	if (tabMode != modelMode) {
+		BAutolock locker(fModel.Lock());
+		fModel.SetPackageListViewMode(tabMode);
 	}
 }

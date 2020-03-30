@@ -20,6 +20,12 @@ class BMessage;
 class BPath;
 
 
+typedef enum package_list_view_mode {
+	PROMINENT,
+	ALL
+} package_list_view_mode;
+
+
 class PackageFilter : public BReferenceable {
 public:
 	virtual						~PackageFilter();
@@ -83,6 +89,7 @@ public:
 									{ return fDepots; }
 			const DepotInfo*	DepotForName(const BString& name) const;
 			bool				SyncDepot(const DepotInfo& depot);
+			bool				HasAnyProminentPackages();
 
 			void				Clear();
 
@@ -102,9 +109,11 @@ public:
 			void				SetSearchTerms(const BString& searchTerms);
 			BString				SearchTerms() const;
 
-			void				SetShowFeaturedPackages(bool show);
-			bool				ShowFeaturedPackages() const
-									{ return fShowFeaturedPackages; }
+			void				SetPackageListViewMode(
+									package_list_view_mode mode);
+			package_list_view_mode
+								PackageListViewMode() const
+									{ return fPackageListViewMode; }
 			void				SetShowAvailablePackages(bool show);
 			bool				ShowAvailablePackages() const
 									{ return fShowAvailablePackages; }
@@ -136,7 +145,8 @@ public:
 									const BString& passwordClear,
 									bool storePassword);
 
-			const WebAppInterface& GetWebAppInterface() const
+			const WebAppInterface&
+								GetWebAppInterface() const
 									{ return fWebAppInterface; }
 
 			void				ReplaceDepotByUrl(
@@ -158,8 +168,6 @@ private:
 			void				_MaybeLogJsonRpcError(
 									const BMessage &responsePayload,
 									const char *sourceDescription) const;
-
-			void				_UpdateIsFeaturedFilter();
 
 	static	int32				_PopulateAllPackagesEntry(void* cookie);
 
@@ -191,9 +199,9 @@ private:
 			PackageFilterRef	fCategoryFilter;
 			BString				fDepotFilter;
 			PackageFilterRef	fSearchTermsFilter;
-			PackageFilterRef	fIsFeaturedFilter;
 
-			bool				fShowFeaturedPackages;
+			package_list_view_mode
+								fPackageListViewMode;
 			bool				fShowAvailablePackages;
 			bool				fShowInstalledPackages;
 			bool				fShowSourcePackages;

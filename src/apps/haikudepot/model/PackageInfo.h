@@ -436,6 +436,8 @@ public:
 
 			void				SyncPackages(const PackageList& packages);
 
+			bool				HasAnyProminentPackages() const;
+
 			void				SetURL(const BString& URL);
 			const BString&		URL() const
 									{ return fURL; }

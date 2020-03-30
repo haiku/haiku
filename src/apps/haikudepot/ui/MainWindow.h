@@ -81,9 +81,10 @@ private:
 			void				_BuildMenu(BMenuBar* menuBar);
 			void				_BuildUserMenu(BMenuBar* menuBar);
 
-			void				_RestoreNickname(const BMessage& settings);
 			const char*			_WindowFrameName() const;
+			void				_RestoreNickname(const BMessage& settings);
 			void				_RestoreWindowFrame(const BMessage& settings);
+			void				_RestoreModelSettings(const BMessage& settings);
 
 			void				_InitWorkerThreads();
 			void				_AdoptModel();
@@ -102,6 +103,8 @@ private:
 									float progress);
 			void				_HandleWorkStatusChangeMessageReceived(
 									const BMessage* message);
+
+			void				_HandleChangePackageListViewMode();
 
 	static	status_t			_RefreshModelThreadWorker(void* arg);
 	static	status_t			_PackageActionWorker(void* arg);
