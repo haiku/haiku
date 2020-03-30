@@ -104,7 +104,7 @@ UserUsageConditionsWindow::UserUsageConditionsWindow(
 	fWorkerIndicator = new BarberPole("fetch data worker indicator");
 	BSize workerIndicatorSize;
 	workerIndicatorSize.SetHeight(20);
-	fWorkerIndicator->SetExplicitMinSize(workerIndicatorSize);
+	fWorkerIndicator->SetExplicitSize(workerIndicatorSize);
 
 	fIntroductionTextView = new BTextView("introduction text view");
 	fIntroductionTextView->AdoptSystemColors();

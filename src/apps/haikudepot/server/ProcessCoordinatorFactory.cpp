@@ -13,6 +13,7 @@
 #include <package/PackageRoster.h>
 
 #include "AbstractServerProcess.h"
+#include "HaikuDepotConstants.h"
 #include "LocalPkgDataLoadProcess.h"
 #include "LocalRepositoryUpdateProcess.h"
 #include "Model.h"
@@ -26,9 +27,26 @@
 #include "ServerRepositoryDataUpdateProcess.h"
 #include "ServerSettings.h"
 #include "StorageUtils.h"
+#include "UserDetailVerifierProcess.h"
 
 
 using namespace BPackageKit;
+
+
+/*static*/ ProcessCoordinator*
+ProcessCoordinatorFactory::CreateUserDetailVerifierCoordinator(
+	UserDetailVerifierListener* userDetailVerifierListener,
+	ProcessCoordinatorListener* processCoordinatorListener,
+	Model* model)
+{
+	ProcessCoordinator* processCoordinator = new ProcessCoordinator(
+		"UserDetailVerifier",
+		processCoordinatorListener);
+	ProcessNode* userDetailVerifier = new ProcessNode(
+		new UserDetailVerifierProcess(model, userDetailVerifierListener));
+	processCoordinator->AddNode(userDetailVerifier);
+	return processCoordinator;
+}
 
 
 /* static */ ProcessCoordinator*
@@ -41,7 +59,8 @@ ProcessCoordinatorFactory::CreateBulkLoadCoordinator(
 	uint32 serverProcessOptions = _CalculateServerProcessOptions();
 	BAutolock locker(model->Lock());
 	ProcessCoordinator* processCoordinator = new ProcessCoordinator(
-		processCoordinatorListener);
+		"BulkLoad",
+		processCoordinatorListener, new BMessage(MSG_BULK_LOAD_DONE));
 
 	ProcessNode *localRepositoryUpdate =
 		new ProcessNode(new LocalRepositoryUpdateProcess(model,

@@ -18,6 +18,8 @@ public:
 	static	BCollator*		GetSharedCollator();
 	static	BString			TimestampToDateTimeString(uint64 millis);
 
+	static	BString			CreateTranslatedIAmMinimumAgeSlug(int minimumAge);
+
 private:
 	static	void			GetCollator(BCollator* collator);
 

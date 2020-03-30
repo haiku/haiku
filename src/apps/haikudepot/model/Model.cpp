@@ -35,6 +35,10 @@
 #define B_TRANSLATION_CONTEXT "Model"
 
 
+#define KEY_STORE_IDENTIFIER_PREFIX "hds.password."
+	// this prefix is added before the nickname in the keystore
+	// so that HDS username/password pairs can be identified.
+
 static const char* kHaikuDepotKeyring = "HaikuDepot";
 
 
@@ -804,20 +808,61 @@ Model::_PopulatePackageChangelog(const PackageInfoRef& package)
 }
 
 
+static void
+model_remove_key_for_user(const BString& nickname)
+{
+	if (nickname.IsEmpty())
+		return;
+	BKeyStore keyStore;
+	BPasswordKey key;
+	BString passwordIdentifier = BString(KEY_STORE_IDENTIFIER_PREFIX)
+		<< nickname;
+	status_t result = keyStore.GetKey(kHaikuDepotKeyring, B_KEY_TYPE_PASSWORD,
+			passwordIdentifier, key);
+
+	switch (result) {
+		case B_OK:
+			result = keyStore.RemoveKey(kHaikuDepotKeyring, key);
+			if (result != B_OK) {
+				printf("! error occurred when removing password for nickname "
+					"[%s] : %s\n", nickname.String(), strerror(result));
+			}
+			break;
+		case B_ENTRY_NOT_FOUND:
+			return;
+		default:
+			printf("! error occurred when finding password for nickname "
+				"[%s] : %s\n", nickname.String(), strerror(result));
+			break;
+	}
+}
+
+
 void
 Model::SetNickname(BString nickname)
 {
 	BString password;
+	BString existingNickname = Nickname();
+
+	// this happens when the user is logging out.  Best to remove the password
+	// stored for the existing user since it is no longer required.
+
+	if (!existingNickname.IsEmpty() && nickname.IsEmpty())
+		model_remove_key_for_user(existingNickname);
+
 	if (nickname.Length() > 0) {
 		BPasswordKey key;
 		BKeyStore keyStore;
-		if (keyStore.GetKey(kHaikuDepotKeyring, B_KEY_TYPE_PASSWORD, nickname,
-				key) == B_OK) {
+		BString passwordIdentifier = BString(KEY_STORE_IDENTIFIER_PREFIX)
+			<< nickname;
+		if (keyStore.GetKey(kHaikuDepotKeyring, B_KEY_TYPE_PASSWORD,
+				passwordIdentifier, key) == B_OK) {
 			password = key.Password();
-		} else {
-			nickname = "";
 		}
+		if (password.IsEmpty())
+			nickname = "";
 	}
+
 	SetAuthorization(nickname, password, false);
 }
 
@@ -833,17 +878,35 @@ void
 Model::SetAuthorization(const BString& nickname, const BString& passwordClear,
 	bool storePassword)
 {
-	if (storePassword && nickname.Length() > 0 && passwordClear.Length() > 0) {
-		BPasswordKey key(passwordClear, B_KEY_PURPOSE_WEB, nickname);
-		BKeyStore keyStore;
-		keyStore.AddKeyring(kHaikuDepotKeyring);
-		keyStore.AddKey(kHaikuDepotKeyring, key);
+	BString existingNickname = Nickname();
+
+	if (storePassword) {
+		// no point continuing to store the password for the previous user.
+
+		if (!existingNickname.IsEmpty())
+			model_remove_key_for_user(existingNickname);
+
+		// adding a key that is already there does not seem to override the
+		// existing key so the old key needs to be removed first.
+
+		if (!nickname.IsEmpty())
+			model_remove_key_for_user(nickname);
+
+		if (!nickname.IsEmpty() && !passwordClear.IsEmpty()) {
+			BString keyIdentifier = BString(KEY_STORE_IDENTIFIER_PREFIX)
+				<< nickname;
+			BPasswordKey key(passwordClear, B_KEY_PURPOSE_WEB, keyIdentifier);
+			BKeyStore keyStore;
+			keyStore.AddKeyring(kHaikuDepotKeyring);
+			keyStore.AddKey(kHaikuDepotKeyring, key);
+		}
 	}
 
 	BAutolock locker(&fLock);
 	fWebAppInterface.SetAuthorization(UserCredentials(nickname, passwordClear));
 
-	_NotifyAuthorizationChanged();
+	if (nickname != existingNickname)
+		_NotifyAuthorizationChanged();
 }
 
 

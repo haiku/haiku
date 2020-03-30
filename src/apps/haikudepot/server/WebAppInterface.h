@@ -100,6 +100,9 @@ public:
 									const BString& code,
 									UserUsageConditions& conditions);
 
+			status_t			AgreeUserUsageConditions(const BString& code,
+									BMessage& responsePayload);
+
 			status_t			RetrieveScreenshot(
 									const BString& code,
 									int32 width, int32 height,

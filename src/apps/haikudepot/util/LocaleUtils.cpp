@@ -9,10 +9,16 @@
 #include <unicode/dtptngen.h>
 #include <unicode/smpdtfmt.h>
 
+#include <Catalog.h>
 #include <Collator.h>
 #include <ICUWrapper.h>
 #include <Locale.h>
 #include <LocaleRoster.h>
+#include <StringFormat.h>
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "LocaleUtils"
 
 
 BCollator* LocaleUtils::sSharedCollator = NULL;
@@ -73,4 +79,21 @@ LocaleUtils::TimestampToDateTimeString(uint64 millis)
 	BStringByteSink converter(&result);
 	icuResult.toUTF8(converter);
 	return result;
+}
+
+
+/*!	This is used in situations where the user is required to confirm that they
+	are as old or older than some minimal age.  This is associated with agreeing
+	to the user usage conditions.
+*/
+
+/*static*/ BString
+LocaleUtils::CreateTranslatedIAmMinimumAgeSlug(int minimumAge)
+{
+	BString slug;
+	static BStringFormat format(B_TRANSLATE("{0, plural,"
+ 		"one{I am at least one year old}"
+		"other{I am # years of age or older}}"));
+	format.Format(slug, minimumAge);
+	return slug;
 }

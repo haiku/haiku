@@ -438,6 +438,37 @@ WebAppInterface::RetrieveUserUsageConditions(const BString& code,
 
 
 status_t
+WebAppInterface::AgreeUserUsageConditions(const BString& code,
+	BMessage& responsePayload)
+{
+	BMallocIO* requestEnvelopeData = new BMallocIO();
+	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
+
+	requestEnvelopeWriter.WriteObjectStart();
+	_WriteStandardJsonRpcEnvelopeValues(requestEnvelopeWriter,
+		"agreeUserUsageConditions");
+
+	requestEnvelopeWriter.WriteObjectName("params");
+	requestEnvelopeWriter.WriteArrayStart();
+	requestEnvelopeWriter.WriteObjectStart();
+	requestEnvelopeWriter.WriteObjectName("userUsageConditionsCode");
+	requestEnvelopeWriter.WriteString(code.String());
+	requestEnvelopeWriter.WriteObjectName("nickname");
+	requestEnvelopeWriter.WriteString(fCredentials.Nickname());
+	requestEnvelopeWriter.WriteObjectEnd();
+	requestEnvelopeWriter.WriteArrayEnd();
+
+	requestEnvelopeWriter.WriteObjectEnd();
+
+	// now fetch this information into an object.
+
+	return _SendJsonRequest("user", requestEnvelopeData,
+		_LengthAndSeekToZero(requestEnvelopeData), NEEDS_AUTHORIZATION,
+		responsePayload);
+}
+
+
+status_t
 WebAppInterface::_RetrieveUserUsageConditionsMeta(const BString& code,
 	BMessage& message)
 {

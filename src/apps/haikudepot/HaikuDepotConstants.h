@@ -6,6 +6,7 @@
 #define HAIKU_DEPOT_CONSTANTS_H
 
 enum {
+	MSG_BULK_LOAD_DONE						= 'mmwd',
 	MSG_MAIN_WINDOW_CLOSED					= 'mwcl',
 	MSG_PACKAGE_SELECTED					= 'pkgs',
 	MSG_PACKAGE_WORKER_BUSY					= 'pkwb',
@@ -23,7 +24,9 @@ enum {
 	MSG_VIEW_LATEST_USER_USAGE_CONDITIONS	= 'vluc',
 	MSG_VIEW_USERS_USER_USAGE_CONDITIONS	= 'vuuc',
 	MSG_USER_USAGE_CONDITIONS_DATA			= 'uucd',
-	MSG_USER_USAGE_CONDITIONS_ERROR			= 'uuce'
+	MSG_USER_USAGE_CONDITIONS_ERROR			= 'uuce',
+	MSG_USER_USAGE_CONDITIONS_NOT_LATEST	= 'uucl',
+	MSG_LOG_OUT								= 'lgot',
 };
 
 
@@ -34,11 +37,11 @@ enum {
 #define RGB_COLOR_WHITE						(rgb_color) { 255, 255, 255, 255 }
 
 
-#define HD_ERROR_BASE					(B_ERRORS_END + 1)
-#define HD_NETWORK_INACCESSIBLE			(HD_ERROR_BASE + 1)
-#define HD_CLIENT_TOO_OLD				(HD_ERROR_BASE + 2)
-#define HD_ERR_NOT_MODIFIED				(HD_ERROR_BASE + 3)
-#define HD_ERR_NO_DATA					(HD_ERROR_BASE + 4)
+#define HD_ERROR_BASE						(B_ERRORS_END + 1)
+#define HD_NETWORK_INACCESSIBLE				(HD_ERROR_BASE + 1)
+#define HD_CLIENT_TOO_OLD					(HD_ERROR_BASE + 2)
+#define HD_ERR_NOT_MODIFIED					(HD_ERROR_BASE + 3)
+#define HD_ERR_NO_DATA						(HD_ERROR_BASE + 4)
 
 
 #define REPOSITORY_NAME_SYSTEM			"system"

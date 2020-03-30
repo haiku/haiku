@@ -13,6 +13,7 @@ class Model;
 class PackageInfoListener;
 class ProcessCoordinator;
 class ProcessCoordinatorListener;
+class UserDetailVerifierListener;
 
 /*! This class is able to create ProcessCoordinators that are loaded-up with
     Processes that together complete some larger job.
@@ -25,6 +26,13 @@ public:
 									ProcessCoordinatorListener*
 										processCoordinatorListener,
 									Model* model, bool forceLocalUpdate);
+
+	static	ProcessCoordinator*	CreateUserDetailVerifierCoordinator(
+									UserDetailVerifierListener*
+										userDetailVerifierListener,
+									ProcessCoordinatorListener*
+										processCoordinatorListener,
+									Model* model);
 private:
 	static	uint32				_CalculateServerProcessOptions();
 

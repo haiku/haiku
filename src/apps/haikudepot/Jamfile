@@ -146,6 +146,7 @@ local applicationSources =
 	ScreenshotWindow.cpp
 	ScrollableGroupView.cpp
 	SharedBitmap.cpp
+	ToLatestUserUsageConditionsWindow.cpp
 	UserCredentials.cpp
 	UserDetail.cpp
 	UserLoginWindow.cpp
@@ -172,6 +173,7 @@ local applicationSources =
 	ServerIconExportUpdateProcess.cpp
 	StandardMetaDataJsonEventListener.cpp
 	StandardMetaData.cpp
+	UserDetailVerifierProcess.cpp
 	WebAppInterface.cpp
 
 	# tar

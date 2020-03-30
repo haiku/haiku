@@ -3,7 +3,7 @@
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2016-2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -47,6 +47,7 @@
 #include "RatePackageWindow.h"
 #include "support.h"
 #include "ScreenshotWindow.h"
+#include "ToLatestUserUsageConditionsWindow.h"
 #include "UserLoginWindow.h"
 #include "UserUsageConditionsWindow.h"
 #include "WorkStatusView.h"
@@ -57,12 +58,10 @@
 
 
 enum {
-	MSG_BULK_LOAD_DONE						= 'mmwd',
 	MSG_REFRESH_REPOS						= 'mrrp',
 	MSG_MANAGE_REPOS						= 'mmrp',
 	MSG_SOFTWARE_UPDATER					= 'mswu',
 	MSG_LOG_IN								= 'lgin',
-	MSG_LOG_OUT								= 'lgot',
 	MSG_AUTHORIZATION_CHANGED				= 'athc',
 	MSG_CATEGORIES_LIST_CHANGED				= 'clic',
 	MSG_PACKAGE_CHANGED						= 'pchd',
@@ -76,6 +75,7 @@ enum {
 	MSG_SHOW_DEVELOP_PACKAGES				= 'sdvl'
 };
 
+#define KEY_ERROR_STATUS "errorStatus"
 
 using namespace BPackageKit;
 using namespace BPackageKit::BManager::BPrivate;
@@ -133,9 +133,12 @@ MainWindow::MainWindow(const BMessage& settings)
 	fLogOutItem(NULL),
 	fUsersUserUsageConditionsMenuItem(NULL),
 	fModelListener(new MainWindowModelListener(BMessenger(this)), true),
-	fBulkLoadProcessCoordinator(NULL),
+	fCoordinator(NULL),
 	fSinglePackageMode(false)
 {
+	if ((fCoordinatorRunningSem = create_sem(1, "ProcessCoordinatorSem")) < B_OK)
+		debugger("unable to create the process coordinator semaphore");
+
 	BMenuBar* menuBar = new BMenuBar("Main Menu");
 	_BuildMenu(menuBar);
 
@@ -144,7 +147,6 @@ MainWindow::MainWindow(const BMessage& settings)
 	set_small_font(userMenuBar);
 	userMenuBar->SetExplicitMaxSize(BSize(B_SIZE_UNSET,
 		menuBar->MaxSize().height));
-	_UpdateAuthorization();
 
 	fFilterView = new FilterView();
 	fFeaturedPackagesView = new FeaturedPackagesView();
@@ -207,6 +209,7 @@ MainWindow::MainWindow(const BMessage& settings)
 		fListTabs->Select(1);
 
 	_RestoreNickname(settings);
+	_UpdateAuthorization();
 	_RestoreWindowFrame(settings);
 
 	atomic_set(&fPackagesToShowListID, 0);
@@ -233,9 +236,12 @@ MainWindow::MainWindow(const BMessage& settings, const PackageInfoRef& package)
 	fLogOutItem(NULL),
 	fUsersUserUsageConditionsMenuItem(NULL),
 	fModelListener(new MainWindowModelListener(BMessenger(this)), true),
-	fBulkLoadProcessCoordinator(NULL),
+	fCoordinator(NULL),
 	fSinglePackageMode(true)
 {
+	if ((fCoordinatorRunningSem = create_sem(1, "ProcessCoordinatorSem")) < B_OK)
+		debugger("unable to create the process coordinator semaphore");
+
 	fFilterView = new FilterView();
 	fPackageListView = new PackageListView(fModel.Lock());
 	fPackageInfoView = new PackageInfoView(fModel.Lock(), this);
@@ -259,6 +265,10 @@ MainWindow::MainWindow(const BMessage& settings, const PackageInfoRef& package)
 
 MainWindow::~MainWindow()
 {
+	_SpinUntilProcessCoordinatorComplete();
+	delete_sem(fCoordinatorRunningSem);
+	fCoordinatorRunningSem = 0;
+
 	BPackageRoster().StopWatching(this);
 
 	delete_sem(fPendingActionsSem);
@@ -290,7 +300,7 @@ MainWindow::QuitRequested()
 
 	be_app->PostMessage(&message);
 
-	_StopBulkLoad();
+	_StopProcessCoordinators();
 
 	return true;
 }
@@ -301,8 +311,14 @@ MainWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MSG_BULK_LOAD_DONE:
-			_BulkLoadCompleteReceived();
+		{
+			int64 errorStatus64;
+			if (message->FindInt64(KEY_ERROR_STATUS, &errorStatus64) == B_OK)
+				_BulkLoadCompleteReceived((status_t) errorStatus64);
+			else
+				printf("! expected [%s] value in message\n", KEY_ERROR_STATUS);
 			break;
+		}
 		case B_SIMPLE_DATA:
 		case B_REFS_RECEIVED:
 			// TODO: ?
@@ -316,6 +332,10 @@ MainWindow::MessageReceived(BMessage* message)
 
 		case MSG_REFRESH_REPOS:
 			_StartBulkLoad(true);
+			break;
+
+		case MSG_WORK_STATUS_CLEAR:
+			_HandleWorkStatusClear();
 			break;
 
 		case MSG_WORK_STATUS_CHANGE:
@@ -347,6 +367,7 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_AUTHORIZATION_CHANGED:
+			_StartUserVerify();
 			_UpdateAuthorization();
 			break;
 
@@ -529,8 +550,10 @@ MainWindow::MessageReceived(BMessage* message)
 					}
 				}
 
-				if (!fSinglePackageMode && (changes & PKG_CHANGED_STATE) != 0)
+				if (!fSinglePackageMode && (changes & PKG_CHANGED_STATE) != 0
+						&& fCoordinator == NULL) {
 					fWorkStatusView->PackageStatusChanged(ref);
+				}
 			}
 			break;
 		}
@@ -616,6 +639,18 @@ MainWindow::MessageReceived(BMessage* message)
 			AutoLocker<BLocker> modelLocker(fModel.Lock());
 			if (!fVisiblePackages.Contains(fPackageInfoView->Package()))
 				fPackageInfoView->Clear();
+			break;
+		}
+
+		case MSG_USER_USAGE_CONDITIONS_NOT_LATEST:
+		{
+			BMessage userDetailMsg;
+			if (message->FindMessage("userDetail", &userDetailMsg) != B_OK) {
+				debugger("expected the [userDetail] data to be carried in the "
+					"message.");
+			}
+			UserDetail userDetail(&userDetailMsg);
+			_HandleUserUsageConditionsNotLatest(userDetail);
 			break;
 		}
 
@@ -905,67 +940,24 @@ MainWindow::_ClearPackage()
 
 
 void
-MainWindow::_StopBulkLoad()
-{
-	AutoLocker<BLocker> lock(&fBulkLoadProcessCoordinatorLock);
-
-	if (fBulkLoadProcessCoordinator != NULL) {
-		printf("will stop full update process coordinator\n");
-		fBulkLoadProcessCoordinator->Stop();
-	}
-}
-
-
-void
 MainWindow::_StartBulkLoad(bool force)
 {
-	AutoLocker<BLocker> lock(&fBulkLoadProcessCoordinatorLock);
-
-	if (fBulkLoadProcessCoordinator == NULL) {
-		fBulkLoadProcessCoordinator
-			= ProcessCoordinatorFactory::CreateBulkLoadCoordinator(
-				this,
-					// PackageInfoListener
-				this,
-					// ProcessCoordinatorListener
-				&fModel, force);
-		fBulkLoadProcessCoordinator->Start();
-		fRefreshRepositoriesItem->SetEnabled(false);
-	}
-}
-
-
-/*! This method is called when there is some change in the bulk load process.
-    A change may mean that a new process has started / stopped etc... or it
-    may mean that the entire coordinator has finished.
-*/
-
-void
-MainWindow::CoordinatorChanged(ProcessCoordinatorState& coordinatorState)
-{
-	AutoLocker<BLocker> lock(&fBulkLoadProcessCoordinatorLock);
-
-	if (fBulkLoadProcessCoordinator == coordinatorState.Coordinator()) {
-		if (!coordinatorState.IsRunning())
-			_BulkLoadProcessCoordinatorFinished(coordinatorState);
-		else {
-			_NotifyWorkStatusChange(coordinatorState.Message(),
-				coordinatorState.Progress());
-				// show the progress to the user.
-		}
-	} else {
-		if (Logger::IsInfoEnabled()) {
-			printf("unknown process coordinator changed\n");
-		}
-	}
+	fRefreshRepositoriesItem->SetEnabled(false);
+	ProcessCoordinator* bulkLoadCoordinator =
+		ProcessCoordinatorFactory::CreateBulkLoadCoordinator(
+			this,
+				// PackageInfoListener
+			this,
+				// ProcessCoordinatorListener
+			&fModel, force);
+	_AddProcessCoordinator(bulkLoadCoordinator);
 }
 
 
 void
-MainWindow::_BulkLoadProcessCoordinatorFinished(
-	ProcessCoordinatorState& coordinatorState)
+MainWindow::_BulkLoadCompleteReceived(status_t errorStatus)
 {
-	if (coordinatorState.ErrorStatus() != B_OK) {
+	if (errorStatus != B_OK) {
 		AppUtils::NotifySimpleError(
 			B_TRANSLATE("Package update error"),
 			B_TRANSLATE("While updating package data, a problem has arisen "
@@ -975,22 +967,25 @@ MainWindow::_BulkLoadProcessCoordinatorFinished(
 				"logs."
 				ALERT_MSG_LOGS_USER_GUIDE));
 	}
-	BMessenger messenger(this);
-	messenger.SendMessage(MSG_BULK_LOAD_DONE);
-	// it is safe to delete the coordinator here because it is already known
-	// that all of the processes have completed and their threads will have
-	// exited safely by this point.
-	delete fBulkLoadProcessCoordinator;
-	fBulkLoadProcessCoordinator = NULL;
+
 	fRefreshRepositoriesItem->SetEnabled(true);
+	_AdoptModel();
+	_UpdateAvailableRepositories();
 }
 
 
 void
-MainWindow::_BulkLoadCompleteReceived()
+MainWindow::_NotifyWorkStatusClear()
 {
-	_AdoptModel();
-	_UpdateAvailableRepositories();
+	BMessage message(MSG_WORK_STATUS_CLEAR);
+	this->PostMessage(&message, this);
+}
+
+
+void
+MainWindow::_HandleWorkStatusClear()
+{
+	fWorkStatusView->SetText("");
 	fWorkStatusView->SetIdle();
 }
 
@@ -1205,6 +1200,21 @@ MainWindow::_OpenLoginWindow(const BMessage& onSuccessMessage)
 
 
 void
+MainWindow::_StartUserVerify()
+{
+	if (!fModel.Nickname().IsEmpty()) {
+		_AddProcessCoordinator(
+			ProcessCoordinatorFactory::CreateUserDetailVerifierCoordinator(
+				this,
+					// UserDetailVerifierListener
+				this,
+					// ProcessCoordinatorListener
+				&fModel) );
+	}
+}
+
+
+void
 MainWindow::_UpdateAuthorization()
 {
 	BString nickname(fModel.Nickname());
@@ -1368,4 +1378,188 @@ MainWindow::_ViewUserUsageConditions(
 	UserUsageConditionsWindow* window = new UserUsageConditionsWindow(
 		fModel, mode);
 	window->Show();
+}
+
+
+void
+MainWindow::UserCredentialsFailed()
+{
+	BString message = B_TRANSLATE("The password previously "
+		"supplied for the user [%Nickname%] is not currently "
+		"valid. The user will be logged-out of this application "
+		"and you should login again with your updated password.");
+	message.ReplaceAll("%Nickname%", fModel.Nickname());
+
+	AppUtils::NotifySimpleError(B_TRANSLATE("Login issue"),
+		message);
+
+	{
+		AutoLocker<BLocker> locker(fModel.Lock());
+		fModel.SetNickname("");
+	}
+}
+
+
+/*! \brief This method is invoked from the UserDetailVerifierProcess on a
+		   background thread.  For this reason it lodges a message into itself
+		   which can then be handled on the main thread.
+*/
+
+void
+MainWindow::UserUsageConditionsNotLatest(const UserDetail& userDetail)
+{
+	BMessage message(MSG_USER_USAGE_CONDITIONS_NOT_LATEST);
+	BMessage detailsMessage;
+	if (userDetail.Archive(&detailsMessage, true) != B_OK
+			|| message.AddMessage("userDetail", &detailsMessage) != B_OK) {
+		printf("!! unable to archive the user detail into a message\n");
+	}
+	else
+		BMessenger(this).SendMessage(&message);
+}
+
+
+void
+MainWindow::_HandleUserUsageConditionsNotLatest(
+	const UserDetail& userDetail)
+{
+	ToLatestUserUsageConditionsWindow* window =
+		new ToLatestUserUsageConditionsWindow(this, fModel, userDetail);
+	window->Show();
+}
+
+
+void
+MainWindow::_AddProcessCoordinator(ProcessCoordinator* item)
+{
+	AutoLocker<BLocker> lock(&fCoordinatorLock);
+
+	if (fCoordinator == NULL) {
+		if (acquire_sem(fCoordinatorRunningSem) != B_OK)
+			debugger("unable to acquire the process coordinator sem");
+		if (Logger::IsInfoEnabled()) {
+			printf("adding and starting a process coordinator [%s]\n",
+				item->Name().String());
+		}
+		fCoordinator = item;
+		fCoordinator->Start();
+	}
+	else {
+		if (Logger::IsInfoEnabled()) {
+			printf("adding process coordinator [%s] to the queue\n",
+				item->Name().String());
+		}
+		fCoordinatorQueue.push(item);
+	}
+}
+
+
+void
+MainWindow::_SpinUntilProcessCoordinatorComplete()
+{
+	while (true) {
+		if (acquire_sem(fCoordinatorRunningSem) != B_OK)
+			debugger("unable to acquire the process coordinator sem");
+		if (release_sem(fCoordinatorRunningSem) != B_OK)
+			debugger("unable to release the process coordinator sem");
+		{
+			AutoLocker<BLocker> lock(&fCoordinatorLock);
+			if (fCoordinator == NULL)
+				return;
+		}
+	}
+}
+
+
+void
+MainWindow::_StopProcessCoordinators()
+{
+	if (Logger::IsInfoEnabled())
+		printf("will stop all process coordinators\n");
+
+	{
+		AutoLocker<BLocker> lock(&fCoordinatorLock);
+
+		while (!fCoordinatorQueue.empty()) {
+			ProcessCoordinator *processCoordinator = fCoordinatorQueue.front();
+			if (Logger::IsInfoEnabled()) {
+				printf("will drop queued process coordinator [%s]\n",
+					processCoordinator->Name().String());
+			}
+			fCoordinatorQueue.pop();
+			delete processCoordinator;
+		}
+
+		if (fCoordinator != NULL) {
+			fCoordinator->Stop();
+		}
+	}
+
+	if (Logger::IsInfoEnabled())
+		printf("will wait until the process coordinator has stopped\n");
+
+	_SpinUntilProcessCoordinatorComplete();
+
+	if (Logger::IsInfoEnabled())
+		printf("did stop all process coordinators\n");
+}
+
+
+/*! This method is called when there is some change in the bulk load process
+	or other process coordinator.
+	A change may mean that a new process has started / stopped etc... or it
+	may mean that the entire coordinator has finished.
+*/
+
+void
+MainWindow::CoordinatorChanged(ProcessCoordinatorState& coordinatorState)
+{
+	AutoLocker<BLocker> lock(&fCoordinatorLock);
+
+	if (fCoordinator == coordinatorState.Coordinator()) {
+		if (!coordinatorState.IsRunning()) {
+			if (release_sem(fCoordinatorRunningSem) != B_OK)
+				debugger("unable to release the process coordinator sem");
+			if (Logger::IsInfoEnabled()) {
+				printf("process coordinator [%s] did complete\n",
+					fCoordinator->Name().String());
+			}
+			// complete the last one that just finished
+			BMessage* message = fCoordinator->Message();
+
+			if (message != NULL) {
+				BMessenger messenger(this);
+				message->AddInt64(KEY_ERROR_STATUS,
+					(int64) fCoordinator->ErrorStatus());
+				messenger.SendMessage(message);
+			}
+
+			delete fCoordinator;
+			fCoordinator = NULL;
+
+			// now schedule the next one.
+			if (!fCoordinatorQueue.empty()) {
+				if (acquire_sem(fCoordinatorRunningSem) != B_OK)
+					debugger("unable to acquire the process coordinator sem");
+				fCoordinator = fCoordinatorQueue.front();
+				if (Logger::IsInfoEnabled()) {
+					printf("starting next process coordinator [%s]\n",
+						fCoordinator->Name().String());
+				}
+				fCoordinatorQueue.pop();
+				fCoordinator->Start();
+			}
+			else {
+				_NotifyWorkStatusClear();
+			}
+		}
+		else {
+			_NotifyWorkStatusChange(coordinatorState.Message(),
+				coordinatorState.Progress());
+				// show the progress to the user.
+		}
+	} else {
+		if (Logger::IsInfoEnabled())
+			printf("! unknown process coordinator changed\n");
+	}
 }

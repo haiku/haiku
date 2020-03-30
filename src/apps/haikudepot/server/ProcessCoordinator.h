@@ -74,7 +74,9 @@ public:
 class ProcessCoordinator : public AbstractProcessListener {
 public:
 								ProcessCoordinator(
-									ProcessCoordinatorListener* listener);
+									const char* name,
+									ProcessCoordinatorListener* listener,
+									BMessage* message = NULL);
 	virtual						~ProcessCoordinator();
 
 			void				AddNode(ProcessNode* nodes);
@@ -91,6 +93,9 @@ public:
 
 			float				Progress();
 
+	const	BString&			Name() const;
+			BMessage*			Message() const;
+
 private:
 			bool				_IsRunning(ProcessNode* node);
 			void				_CoordinateAndCallListener();
@@ -103,11 +108,14 @@ private:
 			void				_StopSuccessorNodesToErroredOrStoppedNodes();
 			void				_StopSuccessorNodes(ProcessNode* node);
 
+private:
+			BString				fName;
 			BLocker				fLock;
 			List<ProcessNode*, true>
 								fNodes;
 			ProcessCoordinatorListener*
 								fListener;
+			BMessage*			fMessage;
 			bool				fWasStopped;
 };
 

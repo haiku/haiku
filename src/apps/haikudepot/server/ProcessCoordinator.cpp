@@ -76,9 +76,13 @@ ProcessCoordinatorState::ErrorStatus() const
 // #pragma mark - ProcessCoordinator implementation
 
 
-ProcessCoordinator::ProcessCoordinator(ProcessCoordinatorListener* listener)
+ProcessCoordinator::ProcessCoordinator(const char* name,
+	ProcessCoordinatorListener* listener,
+	BMessage* message)
 	:
+	fName(name),
 	fListener(listener),
+	fMessage(message),
 	fWasStopped(false)
 {
 }
@@ -92,6 +96,7 @@ ProcessCoordinator::~ProcessCoordinator()
 		node->Process()->SetListener(NULL);
 		delete node;
 	}
+	delete fMessage;
 }
 
 
@@ -147,6 +152,10 @@ ProcessCoordinator::Stop()
 			node->StopProcess();
 		}
 	}
+	if (fListener != NULL) {
+		ProcessCoordinatorState state = _CreateStatus();
+		fListener->CoordinatorChanged(state);
+	}
 }
 
 
@@ -172,6 +181,20 @@ ProcessCoordinator::Progress()
 	if (!fWasStopped)
 		return ((float) _CountNodesCompleted()) / ((float) fNodes.CountItems());
 	return 0.0f;
+}
+
+
+const BString&
+ProcessCoordinator::Name() const
+{
+	return fName;
+}
+
+
+BMessage*
+ProcessCoordinator::Message() const
+{
+	return fMessage;
 }
 
 

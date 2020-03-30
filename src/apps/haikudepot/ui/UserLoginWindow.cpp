@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -29,6 +29,7 @@
 #include "HaikuDepotConstants.h"
 #include "LanguageMenuUtils.h"
 #include "LinkView.h"
+#include "LocaleUtils.h"
 #include "Logger.h"
 #include "Model.h"
 #include "ServerHelper.h"
@@ -942,13 +943,9 @@ UserLoginWindow::_SetUserUsageConditions(
 	fUserUsageConditions = userUsageConditions;
 
 	if (fUserUsageConditions != NULL) {
-		BString minimumAgeString;
-		minimumAgeString.SetToFormat("%" B_PRId8,
-			fUserUsageConditions->MinimumAge());
-		BString label = B_TRANSLATE(
-			"I am %MinimumAgeYears% years of age or older");
-		label.ReplaceAll("%MinimumAgeYears%", minimumAgeString);
-		fConfirmMinimumAgeCheckBox->SetLabel(label);
+		fConfirmMinimumAgeCheckBox->SetLabel(
+    		LocaleUtils::CreateTranslatedIAmMinimumAgeSlug(
+    			fUserUsageConditions->MinimumAge()));
 	} else {
 		fConfirmMinimumAgeCheckBox->SetLabel(PLACEHOLDER_TEXT);
 		fConfirmMinimumAgeCheckBox->SetValue(0);
