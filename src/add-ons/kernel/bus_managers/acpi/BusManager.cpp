@@ -734,6 +734,17 @@ walk_resources(acpi_handle busDeviceHandle, char* method,
 
 
 status_t
+walk_namespace(acpi_handle busDeviceHandle, uint32 objectType,
+	uint32 maxDepth, acpi_walk_callback descendingCallback,
+	acpi_walk_callback ascendingCallback, void* context, void** returnValue)
+{
+	return AcpiWalkNamespace(objectType, busDeviceHandle, maxDepth,
+		(ACPI_WALK_CALLBACK)descendingCallback,
+		(ACPI_WALK_CALLBACK)ascendingCallback, context, returnValue);
+}
+
+
+status_t
 prepare_sleep_state(uint8 state, void (*wakeFunc)(void), size_t size)
 {
 	ACPI_STATUS acpiStatus;
@@ -866,6 +877,7 @@ struct acpi_module_info gACPIModule = {
 	remove_fixed_event_handler,
 	get_next_entry,
 	get_next_object,
+	walk_namespace,
 	get_device,
 	get_device_info,
 	get_object_type,

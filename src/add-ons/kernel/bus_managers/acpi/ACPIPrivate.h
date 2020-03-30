@@ -221,6 +221,10 @@ status_t get_object(const char* path, acpi_object_type** _returnValue);
 status_t get_object_typed(const char* path, acpi_object_type** _returnValue,
 	uint32 object_type);
 status_t ns_handle_to_pathname(acpi_handle targetHandle, acpi_data* buffer);
+status_t walk_namespace(acpi_handle busDeviceHandle, uint32 objectType,
+	uint32 maxDepth, acpi_walk_callback descendingCallback,
+	acpi_walk_callback ascendingCallback, void* context, void** returnValue);
+
 
 status_t evaluate_object(acpi_handle handle, const char* object,
 	acpi_objects* args, acpi_object_type* returnValue, size_t bufferLength);

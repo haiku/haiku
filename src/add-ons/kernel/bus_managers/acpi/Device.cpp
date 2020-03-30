@@ -85,6 +85,16 @@ acpi_walk_resources(acpi_device device, char *method,
 
 
 static status_t
+acpi_walk_namespace(acpi_device device, uint32 objectType, uint32 maxDepth,
+	acpi_walk_callback descendingCallback,
+	acpi_walk_callback ascendingCallback, void* context, void** returnValue)
+{
+	return walk_namespace(device->handle, objectType, maxDepth,
+		descendingCallback, ascendingCallback, context, returnValue);
+}
+
+
+static status_t
 acpi_device_init_driver(device_node *node, void **cookie)
 {
 	ACPI_HANDLE handle = NULL;
@@ -162,6 +172,7 @@ acpi_device_module_info gACPIDeviceModule = {
 	acpi_remove_address_space_handler,
 	acpi_get_object_type,
 	acpi_get_object,
+	acpi_walk_namespace,
 	acpi_evaluate_method,
 	acpi_walk_resources
 };
