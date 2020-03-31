@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2017, Haiku. All rights reserved.
+ * Copyright 2008-2020, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -27,27 +27,27 @@
 <div class="nav">
 <div class="inner">
 <ul class="lang-menu">
-<li class="now"><img src="../images/flags/id.png" alt="" /> Bahasa Indonesia</li>
-<li><a href="../ca/deskbar.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
-<li><a href="../de/deskbar.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
-<li><a href="../en/deskbar.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
-<li><a href="../es/deskbar.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../fr/deskbar.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
-<li><a href="../fur/deskbar.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
-<li><a href="../it/deskbar.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
-<li><a href="../hu/deskbar.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
-<li><a href="../pl/deskbar.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
-<li><a href="../pt_PT/deskbar.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
-<li><a href="../pt_BR/deskbar.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
-<li><a href="../ro/deskbar.html"><img src="../images/flags/ro.png" alt="" />Română</a></li>
-<li><a href="../sk/deskbar.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
-<li><a href="../fi/deskbar.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
-<li><a href="../sv_SE/deskbar.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
-<li><a href="../tr/deskbar.html"><img src="../images/flags/tr.png" alt="" />Türkçe</a></li>
-<li><a href="../zh_CN/deskbar.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
-<li><a href="../ru/deskbar.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
-<li><a href="../uk/deskbar.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
-<li><a href="../jp/deskbar.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li class="now">Bahasa Indonesia&nbsp;<span class="dropdown-caret">&#9660;</span></li>
+<li><a href="../ca/deskbar.html">Català</a></li>
+<li><a href="../de/deskbar.html">Deutsch</a></li>
+<li><a href="../en/deskbar.html">English</a></li>
+<li><a href="../es/deskbar.html">Español</a></li>
+<li><a href="../fr/deskbar.html">Français</a></li>
+<li><a href="../fur/deskbar.html">Furlan</a></li>
+<li><a href="../it/deskbar.html">Italiano</a></li>
+<li><a href="../hu/deskbar.html">Magyar</a></li>
+<li><a href="../pl/deskbar.html">Polski</a></li>
+<li><a href="../pt_PT/deskbar.html">Português</a></li>
+<li><a href="../pt_BR/deskbar.html">Português (Brazil)</a></li>
+<li><a href="../ro/deskbar.html">Română</a></li>
+<li><a href="../sk/deskbar.html">Slovenčina</a></li>
+<li><a href="../fi/deskbar.html">Suomi</a></li>
+<li><a href="../sv_SE/deskbar.html">Svenska</a></li>
+<li><a href="../tr/deskbar.html">Türkçe</a></li>
+<li><a href="../zh_CN/deskbar.html"> 中文 ［中文］</a></li>
+<li><a href="../ru/deskbar.html">Русский</a></li>
+<li><a href="../uk/deskbar.html">Українська</a></li>
+<li><a href="../jp/deskbar.html">日本語</a></li>
 </ul>
 <span>
  «  <a href="tracker-add-ons.html">Tracker Add-Ons</a> 
@@ -73,7 +73,8 @@
 
 <p>The Deskbar is the little panel that by default is located in the upper right corner of the screen. It's Haiku's version of Windows' taskbar with its Start button. It contains the Deskbar menu from where you can start applications and preferences, a tray with a clock and other tools below that and a list of currently running programs at the bottom.</p>
 <img src="images/deskbar-images/positions.png" alt="positions" />
-<p>You can move the Deskbar to any corner or as a bar along the upper or lower border of the screen by gripping the knobbly area on one side of the tray and drag &amp; drop it into the new position. You can also fold it into a more compact layout by drag &amp; dropping the knobbly area onto the Deskbar menu.</p>
+<p>You can move the Deskbar to any corner or as a bar along the upper or lower border of the screen by gripping the knobbly area on one side of the tray (see arrows above) and drag &amp; drop it into the new position.<br />
+You can also fold it into a more compact layout by drag &amp; dropping the knobbly area onto Deskbar's Leaf menu. Being only the height of a regular window tab, even windows that take up the whole screen won't obscure the Deskbar tray with its clock and icons.</p>
 <p>By gripping the other knobbly widget of the tray, you can change the width of the Deskbar by dragging the mouse left or right:</p>
 <img src="images/deskbar-images/width.png" alt="width" />
 <p>A wider Deskbar allows for more icons in the tray on a single row. It also truncates longer application names in the list of running programs less often, especially if you use larger icons.</p>
@@ -125,7 +126,7 @@ You create a link of the <span class="path">menu</span> folder in <span class="p
 <p>Finally, the preferences for the Deskbar window.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="menu">Always on top</span></td><td> </td><td>The Deskbar always stays above all other windows.</td></tr>
-<tr><td><span class="menu">Auto-raise</span></td><td> </td><td>The Deskbar pops to the front if the mouse pointer touches it.</td></tr>
+<tr><td><span class="menu">Auto-raise</span></td><td> </td><td>The Deskbar pops to the front when the mouse pointer touches where the Deskbar meets the screen edge, and is lowered when it leaves the Desktop area.</td></tr>
 <tr><td><span class="menu">Auto-hide</span></td><td> </td><td>The Deskbar is reduced to only a few pixels and only pops up if the mouse pointer touches them.</td></tr>
 </table>
 
@@ -142,9 +143,11 @@ You create a link of the <span class="path">menu</span> folder in <span class="p
 <img src="images/deskbar-images/list-of-apps.png" alt="list-of-apps.png" />
 <p>You can change to a specific running application by clicking on its entry in the Deskbar and choosing (one of) its windows from the submenu. By right-clicking you can <span class="menu">Hide/Show all</span> windows or <span class="menu">Close all</span> and with them the entire application.</p>
 <p>A <span class="key">SHIFT</span> <span class="key">CTRL</span> click on an application hides all its windows, a <span class="key">CTRL</span> click shows them again.</p>
+<p>When using the "expander" setting to show all windows of an application, you can middle-click on a window or app to start a new instance. For example, middle-clicking a running StyledEdit will open a new document window.<br />
+Maybe more useful: while holding <span class="key">SHIFT</span>, a middle-click on a window closes it. Handy when you'd like to close some of many open Tracker windows, for example.</p>
 <div class="box-info">Sometimes an application may hang and even though all its windows are gone, the entry in the list of running applications in the Deskbar just won't disappear. In such a situation you use the Vulcan Death Grip to get rid of it: hold <span class="key">SHIFT</span> <span class="key">CTRL</span> <span class="key">ALT</span> and click on the offending entry in the Deskbar. Fascinating!</div>
 <p>If you activated Expanders in the Deskbar settings, you can expand/collapse the list of windows directly under an application's entry.</p>
-<p>In front of every application's windows is a symbol providing info on its state. A bright symbol means a window is visible, a dark one that it's minimized. Three lines in front of a symbol shows that it's not on the current workspace.</p>
+<p>In front of every application's window is a symbol providing info on its state. A bright symbol means a window is visible, a dark one that it's minimized. Three lines in front of a symbol shows that it's not on the current workspace.</p>
 
 </div>
 </div>

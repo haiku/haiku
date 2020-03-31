@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-20014, Haiku. All rights reserved.
+ * Copyright 2008-20020, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -27,27 +27,27 @@
 <div class="nav">
 <div class="inner">
 <ul class="lang-menu">
-<li class="now"><img src="../../images/flags/pl.png" alt="" /> Polski</li>
-<li><a href="../../id/preferences/keymap.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
-<li><a href="../../ca/preferences/keymap.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
-<li><a href="../../de/preferences/keymap.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
-<li><a href="../../en/preferences/keymap.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
-<li><a href="../../es/preferences/keymap.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../../fr/preferences/keymap.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
-<li><a href="../../fur/preferences/keymap.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
-<li><a href="../../it/preferences/keymap.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
-<li><a href="../../hu/preferences/keymap.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
-<li><a href="../../pt_PT/preferences/keymap.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
-<li><a href="../../pt_BR/preferences/keymap.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
-<li><a href="../../ro/preferences/keymap.html"><img src="../../images/flags/ro.png" alt="" />Română</a></li>
-<li><a href="../../sk/preferences/keymap.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
-<li><a href="../../fi/preferences/keymap.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
-<li><a href="../../sv_SE/preferences/keymap.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
-<li><a href="../../tr/preferences/keymap.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
-<li><a href="../../zh_CN/preferences/keymap.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
-<li><a href="../../ru/preferences/keymap.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
-<li><a href="../../uk/preferences/keymap.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
-<li><a href="../../jp/preferences/keymap.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li class="now">Polski&nbsp;<span class="dropdown-caret">&#9660;</span></li>
+<li><a href="../../id/preferences/keymap.html">Bahasa Indonesia</a></li>
+<li><a href="../../ca/preferences/keymap.html">Català</a></li>
+<li><a href="../../de/preferences/keymap.html">Deutsch</a></li>
+<li><a href="../../en/preferences/keymap.html">English</a></li>
+<li><a href="../../es/preferences/keymap.html">Español</a></li>
+<li><a href="../../fr/preferences/keymap.html">Français</a></li>
+<li><a href="../../fur/preferences/keymap.html">Furlan</a></li>
+<li><a href="../../it/preferences/keymap.html">Italiano</a></li>
+<li><a href="../../hu/preferences/keymap.html">Magyar</a></li>
+<li><a href="../../pt_PT/preferences/keymap.html">Português</a></li>
+<li><a href="../../pt_BR/preferences/keymap.html">Português (Brazil)</a></li>
+<li><a href="../../ro/preferences/keymap.html">Română</a></li>
+<li><a href="../../sk/preferences/keymap.html">Slovenčina</a></li>
+<li><a href="../../fi/preferences/keymap.html">Suomi</a></li>
+<li><a href="../../sv_SE/preferences/keymap.html">Svenska</a></li>
+<li><a href="../../tr/preferences/keymap.html">Türkçe</a></li>
+<li><a href="../../zh_CN/preferences/keymap.html"> 中文 ［中文］</a></li>
+<li><a href="../../ru/preferences/keymap.html">Русский</a></li>
+<li><a href="../../uk/preferences/keymap.html">Українська</a></li>
+<li><a href="../../jp/preferences/keymap.html">日本語</a></li>
 </ul>
 <span>
  «  <a href="keyboard.html">Klawiatura</a> 
@@ -79,7 +79,11 @@ Thus, the Keymap preferences are not only for configuring your local keymap, but
 <tr><td class="onelinetop"><span class="menu">Switch shortcut key...</span></td><td> </td><td>for using the shortcut key in Windows/Linux mode, i.e. <span class="key">CONTROL</span> (normally <span class="key">CTRL</span>) or Haiku mode, i.e. <span class="key">COMMAND</span> (normally <span class="key">ALT</span>).</td></tr>
 </table>
 <p>The lists on the left offer the available pre-configured keymaps of the system, and below that, if available, user-defined maps. You can change a keymap in the keyboard representation: drag &amp; drop one key on another and they switch places.</p>
-<p>Alternatively to this drag &amp; dropping of keys, there's the menu <span class="menu">File | Set modifier keys...</span> that opens this window:</p>
+<p>You can also create an individual mapping by drag &amp; dropping a character from another app onto the key. For example, you could extend your regular keymap with often used currency symbols. Just click on the <span class="key">CONTROL</span> key and drag &amp; drop the pound symbol from CharacterMap onto the 'P' key to get a ₤ when you press <span class="key">CTRL</span> <span class="key">P</span>.
+<br />
+By right-clicking a normal key, the context menu offers to <span class="menu">Remove</span> its mapping. Modifier keys can have alternative mappings, like using <span class="key">CAPS LOCK</span> as <span class="key">CTRL</span> key:</p>
+<img src="../images/prefs-images/keymap-context.png" alt="keymap-context.png" />
+<p>Alternatively to this or drag &amp; dropping of keys, there's the menu <span class="menu">File | Set modifier keys...</span> that opens this window:</p>
 <img src="../images/prefs-images/keymap-modifiers.png" alt="keymap-modifiers.png" />
 <p>Here, you can assign keys to their respective roles or even completely disable the role of a key. You can even assign the same key to different roles, though that's not a good idea most of the time and you'll be warned by a small exclamation mark beside the pop-up menus if you do that.<br />
 Pressing <span class="button">Set modifier keys</span> applies your changes and closes the window.</p>

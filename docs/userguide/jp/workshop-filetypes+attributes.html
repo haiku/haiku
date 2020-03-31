@@ -29,27 +29,27 @@
 <div class="nav">
 <div class="inner">
 <ul class="lang-menu">
-<li class="now"><img src="../images/flags/jp.png" alt="" /> 日本語</li>
-<li><a href="../id/workshop-filetypes+attributes.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
-<li><a href="../ca/workshop-filetypes+attributes.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
-<li><a href="../de/workshop-filetypes+attributes.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
-<li><a href="../en/workshop-filetypes+attributes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
-<li><a href="../es/workshop-filetypes+attributes.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../fr/workshop-filetypes+attributes.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
-<li><a href="../fur/workshop-filetypes+attributes.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
-<li><a href="../it/workshop-filetypes+attributes.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
-<li><a href="../hu/workshop-filetypes+attributes.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
-<li><a href="../pl/workshop-filetypes+attributes.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
-<li><a href="../pt_PT/workshop-filetypes+attributes.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
-<li><a href="../pt_BR/workshop-filetypes+attributes.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
-<li><a href="../ro/workshop-filetypes+attributes.html"><img src="../images/flags/ro.png" alt="" />Română</a></li>
-<li><a href="../sk/workshop-filetypes+attributes.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
-<li><a href="../fi/workshop-filetypes+attributes.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
-<li><a href="../sv_SE/workshop-filetypes+attributes.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
-<li><a href="../tr/workshop-filetypes+attributes.html"><img src="../images/flags/tr.png" alt="" />Türkçe</a></li>
-<li><a href="../zh_CN/workshop-filetypes+attributes.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
-<li><a href="../ru/workshop-filetypes+attributes.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
-<li><a href="../uk/workshop-filetypes+attributes.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li class="now">日本語&nbsp;<span class="dropdown-caret">&#9660;</span></li>
+<li><a href="../id/workshop-filetypes+attributes.html">Bahasa Indonesia</a></li>
+<li><a href="../ca/workshop-filetypes+attributes.html">Català</a></li>
+<li><a href="../de/workshop-filetypes+attributes.html">Deutsch</a></li>
+<li><a href="../en/workshop-filetypes+attributes.html">English</a></li>
+<li><a href="../es/workshop-filetypes+attributes.html">Español</a></li>
+<li><a href="../fr/workshop-filetypes+attributes.html">Français</a></li>
+<li><a href="../fur/workshop-filetypes+attributes.html">Furlan</a></li>
+<li><a href="../it/workshop-filetypes+attributes.html">Italiano</a></li>
+<li><a href="../hu/workshop-filetypes+attributes.html">Magyar</a></li>
+<li><a href="../pl/workshop-filetypes+attributes.html">Polski</a></li>
+<li><a href="../pt_PT/workshop-filetypes+attributes.html">Português</a></li>
+<li><a href="../pt_BR/workshop-filetypes+attributes.html">Português (Brazil)</a></li>
+<li><a href="../ro/workshop-filetypes+attributes.html">Română</a></li>
+<li><a href="../sk/workshop-filetypes+attributes.html">Slovenčina</a></li>
+<li><a href="../fi/workshop-filetypes+attributes.html">Suomi</a></li>
+<li><a href="../sv_SE/workshop-filetypes+attributes.html">Svenska</a></li>
+<li><a href="../tr/workshop-filetypes+attributes.html">Türkçe</a></li>
+<li><a href="../zh_CN/workshop-filetypes+attributes.html"> 中文 ［中文］</a></li>
+<li><a href="../ru/workshop-filetypes+attributes.html">Русский</a></li>
+<li><a href="../uk/workshop-filetypes+attributes.html">Українська</a></li>
 </ul>
 <span>
  «  <a href="queries.html">クエリ</a> 
@@ -60,10 +60,11 @@
 
 <div id="content">
 <div>
+<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Index</td></tr>
+<tr class="heading"><td>インデックス</td></tr>
 <tr class="index"><td>
 	<a href="#preparations">準備</a><br />
 	<a href="#custom-filetype">カスタムファイルタイプの作成</a><br />
@@ -161,19 +162,19 @@
     </ul></li>
 </ul>
 <ul>
-<li><i>表示する (Visible)</i> - このチェックボックスは、Tracker ウィンドウで属性が表示できるかどうか決定します。Tracker は DVD データベースのインターフェースなので、これをチェックし、以下の項目で外観を定義します。<ul>
-    <li><span class="menu">表示形式 (Display as)</span> - 属性の "型" (例. string/integer/float など) に応じて表示するなら、"Default" のままにしてください。ほかのオプションは以下の通りです:
+<li><i>Visible</i> - This checkbox determines if the attribute is visible in a Tracker window at all. Since the Tracker will be the interface to our DVD database, we check it and define its appearance with:
+<ul>
+    <li><span class="menu">Display as</span> - Leave on "Default" if the values are to be displayed according to the attribute's "Type" (e.g. string/integer/float etc.). The other options are:
 	<ul>
-		<li><span class="menu">チェックボックス (Checkbox)</span> - 2 つシンボルのうちどちらかを選ぶ際に使えます。以下の<span class="menu">スペシャル</span>を見てください。</li>
-		<li><span class="menu">経過時間 (Duration)</span> - 整数を 1/60 として表示します。例. "90" は "1:30" と表示されます。</li>
-		<li><span class="menu">評価 (Rating)</span> - 0 から 10 までの星の数で評価を表示します。</li>
+		<li><span class="menu">Checkbox</span> - Can be used to show either one of two symbols, see <span class="menu">Special</span> below.</li>
+		<li><span class="menu">Duration</span> - Shows an integer as 1/60, e.g. "90" becomes "1:30".</li>
+		<li><span class="menu">Rating</span> - Shows a rating between 0 and 10 as star symbols.</li>
 	</ul></li>
-    <li><span class="menu">編集可能 (Editable)</span> - Tracker 上で属性が編集できるかどうか決定します。</li>
-    <li><span class="menu">スペシャル (Special)</span> - チェックボックス表示用に 2 つのシンボルを定義します。たとえば、"xo" は、0 より大きい数に対して "x" を、0 に対して "o" を表示します。</li>
-    <li><span class="menu">幅 (Width)</span> - Tracker ウィンドウの属性行のデフォルト幅。</li>
-    <li><span class="menu">配置 (Alignment)</span> - 属性は左寄せ、中央寄せ、または右寄せで表示できます。</li>
-</ul>
-</li></ul>
+    <li><span class="menu">Editable</span> - Determines if the attribute shall be editable in Tracker.</li>
+    <li><span class="menu">Special</span> - Defines the two symbols used for a checkbox display. For example, "xo" will show a "x" for all values &gt;0 and "o" for 0.</li>
+    <li><span class="menu">Width</span> - The default width of that attributes column in a Tracker window.</li>
+    <li><span class="menu">Alignment</span> - The attribute can be displayed left, center, or right aligned.</li>
+</ul></li></ul>
 <p>では、属性の情報をすべて挿入しましょう。</p>
 <table summary="DVDdb Attributes" cellpadding="10" border="1">
 <tr><th>内部名</th><th>属性のタイプ</th><th>インデックス付け</th><th>説明</th></tr>

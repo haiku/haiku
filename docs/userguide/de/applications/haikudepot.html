@@ -4,11 +4,12 @@
 <head>
 <!-- 
  *
- * Copyright 2013-2019 Haiku. All rights reserved.
+ * Copyright 2013-2020 Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ *		Andrew Lindesay <apl@lindesay.co.nz>
  * Translators:
  *		Humdinger
  *
@@ -29,27 +30,27 @@
 <div class="nav">
 <div class="inner">
 <ul class="lang-menu">
-<li class="now"><img src="../../images/flags/de.png" alt="" /> Deutsch</li>
-<li><a href="../../id/applications/haikudepot.html"><img src="../../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
-<li><a href="../../ca/applications/haikudepot.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
-<li><a href="../../en/applications/haikudepot.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
-<li><a href="../../es/applications/haikudepot.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../../fr/applications/haikudepot.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
-<li><a href="../../fur/applications/haikudepot.html"><img src="../../images/flags/fur.png" alt="" />Furlan</a></li>
-<li><a href="../../it/applications/haikudepot.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
-<li><a href="../../hu/applications/haikudepot.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
-<li><a href="../../pl/applications/haikudepot.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
-<li><a href="../../pt_PT/applications/haikudepot.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
-<li><a href="../../pt_BR/applications/haikudepot.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
-<li><a href="../../ro/applications/haikudepot.html"><img src="../../images/flags/ro.png" alt="" />Română</a></li>
-<li><a href="../../sk/applications/haikudepot.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
-<li><a href="../../fi/applications/haikudepot.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
-<li><a href="../../sv_SE/applications/haikudepot.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
-<li><a href="../../tr/applications/haikudepot.html"><img src="../../images/flags/tr.png" alt="" />Türkçe</a></li>
-<li><a href="../../zh_CN/applications/haikudepot.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
-<li><a href="../../ru/applications/haikudepot.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
-<li><a href="../../uk/applications/haikudepot.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
-<li><a href="../../jp/applications/haikudepot.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li class="now">Deutsch&nbsp;<span class="dropdown-caret">&#9660;</span></li>
+<li><a href="../../id/applications/haikudepot.html">Bahasa Indonesia</a></li>
+<li><a href="../../ca/applications/haikudepot.html">Català</a></li>
+<li><a href="../../en/applications/haikudepot.html">English</a></li>
+<li><a href="../../es/applications/haikudepot.html">Español</a></li>
+<li><a href="../../fr/applications/haikudepot.html">Français</a></li>
+<li><a href="../../fur/applications/haikudepot.html">Furlan</a></li>
+<li><a href="../../it/applications/haikudepot.html">Italiano</a></li>
+<li><a href="../../hu/applications/haikudepot.html">Magyar</a></li>
+<li><a href="../../pl/applications/haikudepot.html">Polski</a></li>
+<li><a href="../../pt_PT/applications/haikudepot.html">Português</a></li>
+<li><a href="../../pt_BR/applications/haikudepot.html">Português (Brazil)</a></li>
+<li><a href="../../ro/applications/haikudepot.html">Română</a></li>
+<li><a href="../../sk/applications/haikudepot.html">Slovenčina</a></li>
+<li><a href="../../fi/applications/haikudepot.html">Suomi</a></li>
+<li><a href="../../sv_SE/applications/haikudepot.html">Svenska</a></li>
+<li><a href="../../tr/applications/haikudepot.html">Türkçe</a></li>
+<li><a href="../../zh_CN/applications/haikudepot.html"> 中文 ［中文］</a></li>
+<li><a href="../../ru/applications/haikudepot.html">Русский</a></li>
+<li><a href="../../uk/applications/haikudepot.html">Українська</a></li>
+<li><a href="../../jp/applications/haikudepot.html">日本語</a></li>
 </ul>
 <span>
  «  <a href="expander.html">Expander</a> 
@@ -69,7 +70,7 @@
                 <a href="#menu">Werkzeuge und Anzeigen</a><br />
                 <a href="#account">Benutzerkonto einrichten</a><br />
                 <a href="#rating">Bewerten und kommentieren</a><br />
-</td></tr>
+                <a href="#logs">Diagnose-Logs</a><br /></td></tr>
 </table>
 
 <h2><img src="../../images/apps-images/haikudepot-icon_64.png" alt="haikudepot-icon_64.png" width="64" height="64" />HaikuDepot</h2>
@@ -155,6 +156,15 @@ Mittels der kleinen Daumen-rauf/runter-Icons rechts, kann man die einzelnen Komm
 <p>Hier bringt man mit dem Mauszeiger die Sterne zum aufleuchten und wählt so eine entsprechende Bewertung. Es lassen sich unterschiedliche Stabilitätsstufen vergeben und die Sprache für den optionalen Kommentar auswählen. Um einen sinnvollen Kommentar abgeben zu können, sollte man die Anwendung schon eine Weile benutzt haben, um ihre Features, Bugs und Eigenheiten kennegelernt zu haben. Außerdem sollte man keine großen Romane schreiben... lieber kurz und bündig und dabei immer höflich bleiben. :)<br />
 Klickt man auf <span class="button">Senden</span> werden die Daten zum Server geschickt. Bevor man seine Änderungen sehen kann, muss man ggf. aus dem <span class="menu">Werkzeuge</span> Menü <span class="menu">Paketquellen aktualisieren</span> anwählen.</p>
 <p>Bewertung und Kommentar lassen sich jederzeit ändern. Die Bewertung lässt auch komplett vor anderen Benutzern verbergen, indem man die Option <span class="menu">Diese Bewertung ist für andere Anwender sichtbar</span> abwählt.</p>
+
+ <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="logs" name="logs">Diagnose-Logs</a></h2>
+<p>HaikuDepot arbeitet während der Nutzung mit lokalen und Netzwerkdiensten zusammen. Dabei können Probleme auftreten, die beim Programmieren der Anwendung nicht vorhergesehen werden konnten. In diesen Fällen können Fehlermeldungen ziemlich unspezisch ausfallen. Um solch einem Problem zuleibe zu rücken, kann HaikuDepot ein Log mit allem was es so tut ausgeben.</p>
+<p>Manche Fehlermeldungen schlagen vor für weitere Informationen ins Log zu sehen oder man wird danach gefragt wenn man ein Ticket im <a href="https://dev.haiku-os.org/">Haiku Bugtracker</a> aufgibt.</p>
+<p>Um das Diagnose-Log sehen zu können, muss Haiku vom <a href="terminal.html">Terminal</a> aus gestartet werden:</p>
+<pre>HaikuDepot -v debug</pre>
+<p>Der Befehl verwendet den Parameter <span class="cli">-v</span> um zu steuern wie ausführlich protokolliert werden soll. Mögliche Werte sind dabei: <span class="cli">off</span>, <span class="cli">info</span>, <span class="cli">debug</span> und <span class="cli">trace</span>. Mit <span class="cli">off</span> wird nur sehr wenig geloggt, während das mit <span class="cli">trace</span> sehr detailliert passiert.</p>
+<p>Sobald HaikuDepot startet und während man die Anwendung benutzt, sieht man im Terminal Text runterscrollen; das ist das Diagnose-Log.</p>
 </div>
 </div>
 

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2019, Haiku. All rights reserved.
+ * Copyright 2008-2020, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,27 +32,27 @@
 <div class="nav">
 <div class="inner">
 <ul class="lang-menu">
-<li class="now"><img src="../images/flags/jp.png" alt="" /> 日本語</li>
-<li><a href="../id/bugreports.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
-<li><a href="../ca/bugreports.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
-<li><a href="../de/bugreports.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
-<li><a href="../en/bugreports.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
-<li><a href="../es/bugreports.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../fr/bugreports.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
-<li><a href="../fur/bugreports.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
-<li><a href="../it/bugreports.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
-<li><a href="../hu/bugreports.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
-<li><a href="../pl/bugreports.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
-<li><a href="../pt_PT/bugreports.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
-<li><a href="../pt_BR/bugreports.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
-<li><a href="../ro/bugreports.html"><img src="../images/flags/ro.png" alt="" />Română</a></li>
-<li><a href="../sk/bugreports.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
-<li><a href="../fi/bugreports.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
-<li><a href="../sv_SE/bugreports.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
-<li><a href="../tr/bugreports.html"><img src="../images/flags/tr.png" alt="" />Türkçe</a></li>
-<li><a href="../zh_CN/bugreports.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
-<li><a href="../ru/bugreports.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
-<li><a href="../uk/bugreports.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li class="now">日本語&nbsp;<span class="dropdown-caret">&#9660;</span></li>
+<li><a href="../id/bugreports.html">Bahasa Indonesia</a></li>
+<li><a href="../ca/bugreports.html">Català</a></li>
+<li><a href="../de/bugreports.html">Deutsch</a></li>
+<li><a href="../en/bugreports.html">English</a></li>
+<li><a href="../es/bugreports.html">Español</a></li>
+<li><a href="../fr/bugreports.html">Français</a></li>
+<li><a href="../fur/bugreports.html">Furlan</a></li>
+<li><a href="../it/bugreports.html">Italiano</a></li>
+<li><a href="../hu/bugreports.html">Magyar</a></li>
+<li><a href="../pl/bugreports.html">Polski</a></li>
+<li><a href="../pt_PT/bugreports.html">Português</a></li>
+<li><a href="../pt_BR/bugreports.html">Português (Brazil)</a></li>
+<li><a href="../ro/bugreports.html">Română</a></li>
+<li><a href="../sk/bugreports.html">Slovenčina</a></li>
+<li><a href="../fi/bugreports.html">Suomi</a></li>
+<li><a href="../sv_SE/bugreports.html">Svenska</a></li>
+<li><a href="../tr/bugreports.html">Türkçe</a></li>
+<li><a href="../zh_CN/bugreports.html"> 中文 ［中文］</a></li>
+<li><a href="../ru/bugreports.html">Русский</a></li>
+<li><a href="../uk/bugreports.html">Українська</a></li>
 </ul>
 <span>
     <a href="../welcome_jp.html" class="uplink">Welcome</a>
@@ -61,9 +61,10 @@
 
 <div id="content">
 <div>
+<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Index</td></tr>
+<tr class="heading"><td>インデックス</td></tr>
 <tr class="index"><td><a href="#account">Trac アカウントを取得する</a><br />
                 <a href="#report">バグレポートの作成</a><br />
                 <a href="#app">アプリケーションのバグ</a><br />
@@ -102,6 +103,7 @@
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="app" name="app">アプリケーションのバグ</a></h2>
 <p>アプリケーションがクラッシュしたときは、レポートを保存するかコアファイルを書き込むかができ (どちらもデスクトップ上に保存されます)。それらはバグレポートに添付できます。または、<a href="../../userguide/jp/applications/debugger.html">デバッガー</a>を起動します。</p>
+<p>If it's not a crashing bug, you may get useful information when starting the application from Terminal. Some applications provide logging and other options when started with certain parameters; try <tt>-h</tt> or <tt>--help</tt> to see if that is the case. As example, see the different logging levels of <a href="../../userguide/jp/applications/haikudepot.html#logs">HaikuDepot</a>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="server" name="server">サーバーのバグ</a></h2>

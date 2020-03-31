@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2017, Haiku. All rights reserved.
+ * Copyright 2008-2020, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -33,27 +33,27 @@
 <div class="nav">
 <div class="inner">
 <ul class="lang-menu">
-<li class="now"><img src="../images/flags/jp.png" alt="" /> 日本語</li>
-<li><a href="../id/deskbar.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
-<li><a href="../ca/deskbar.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
-<li><a href="../de/deskbar.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
-<li><a href="../en/deskbar.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
-<li><a href="../es/deskbar.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../fr/deskbar.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
-<li><a href="../fur/deskbar.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
-<li><a href="../it/deskbar.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
-<li><a href="../hu/deskbar.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
-<li><a href="../pl/deskbar.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
-<li><a href="../pt_PT/deskbar.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
-<li><a href="../pt_BR/deskbar.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
-<li><a href="../ro/deskbar.html"><img src="../images/flags/ro.png" alt="" />Română</a></li>
-<li><a href="../sk/deskbar.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
-<li><a href="../fi/deskbar.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
-<li><a href="../sv_SE/deskbar.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
-<li><a href="../tr/deskbar.html"><img src="../images/flags/tr.png" alt="" />Türkçe</a></li>
-<li><a href="../zh_CN/deskbar.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
-<li><a href="../ru/deskbar.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
-<li><a href="../uk/deskbar.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li class="now">日本語&nbsp;<span class="dropdown-caret">&#9660;</span></li>
+<li><a href="../id/deskbar.html">Bahasa Indonesia</a></li>
+<li><a href="../ca/deskbar.html">Català</a></li>
+<li><a href="../de/deskbar.html">Deutsch</a></li>
+<li><a href="../en/deskbar.html">English</a></li>
+<li><a href="../es/deskbar.html">Español</a></li>
+<li><a href="../fr/deskbar.html">Français</a></li>
+<li><a href="../fur/deskbar.html">Furlan</a></li>
+<li><a href="../it/deskbar.html">Italiano</a></li>
+<li><a href="../hu/deskbar.html">Magyar</a></li>
+<li><a href="../pl/deskbar.html">Polski</a></li>
+<li><a href="../pt_PT/deskbar.html">Português</a></li>
+<li><a href="../pt_BR/deskbar.html">Português (Brazil)</a></li>
+<li><a href="../ro/deskbar.html">Română</a></li>
+<li><a href="../sk/deskbar.html">Slovenčina</a></li>
+<li><a href="../fi/deskbar.html">Suomi</a></li>
+<li><a href="../sv_SE/deskbar.html">Svenska</a></li>
+<li><a href="../tr/deskbar.html">Türkçe</a></li>
+<li><a href="../zh_CN/deskbar.html"> 中文 ［中文］</a></li>
+<li><a href="../ru/deskbar.html">Русский</a></li>
+<li><a href="../uk/deskbar.html">Українська</a></li>
 </ul>
 <span>
  «  <a href="tracker-add-ons.html">Tracker アドオン</a> 
@@ -67,7 +67,7 @@
 <div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Index</td></tr>
+<tr class="heading"><td>インデックス</td></tr>
 <tr class="index"><td>
 	<a href="#deskbar-menu">Deskbar メニュー</a><br />
 	<a href="#tray">トレイ</a><br />
@@ -79,7 +79,8 @@
 
 <p>Deskbar は小さなパネルで、初期設定では画面右上隅に配置されています。これは、Windows でのスタートボタンを備えたタスクバーの Haiku 版です。アプリケーションや設定を開くための Deskbar メニューと、時計やその他のツールを表示するトレイを持ち、実行中のプログラムの一覧をその下に表示します。</p>
 <img src="images/deskbar-images/positions.png" alt="positions" />
-<p>トレイの片側にある凸の部分をつかんで新しい位置にドラッグ＆ドロップすると、画面の四隅、または上下に Deskbar を移動できます。Deskbar メニューに凸の部分をドラッグ＆ドロップすれば、バーを小さく折りたたむこともできます。</p>
+<p>You can move the Deskbar to any corner or as a bar along the upper or lower border of the screen by gripping the knobbly area on one side of the tray (see arrows above) and drag &amp; drop it into the new position.<br />
+You can also fold it into a more compact layout by drag &amp; dropping the knobbly area onto Deskbar's Leaf menu. Being only the height of a regular window tab, even windows that take up the whole screen won't obscure the Deskbar tray with its clock and icons.</p>
 <p>トレイのもう一方の凸の部分をつまんで、マウスを左右に動かすと、Deskbar の幅を変更できます。</p>
 <img src="images/deskbar-images/width.png" alt="width" />
 <p>幅のより広い Deskbar は、トレイ内の 1 行により多くのアイコンを置けます。それほど煩雑ではありませんが、特に大きなアイコンを使用している場合、それはまた、実行中プログラム一覧内の長いアプリケーション名を切り詰めます。</p>
@@ -119,10 +120,10 @@
 </table>
 
 <h4>メニュー (Menu)</h4>
-<p>While the first couple of menu items of the Deskbar are fixed, you can customized the ones below <span class="menu">Shutdown...</span>.<br />
-Here you can set the number of recent documents, folders and applications that are shown in their menu in the Deskbar, or if you want to see them at all.<br />
-The button <span class="button">Edit in Tracker...</span> opens the folder <span class="path">~/config/settings/deskbar/menu/</span>. In it you'll find the files and folders that appear in the Deskbar, by default these are <span class="menu">Applications</span>, <span class="menu">Demos</span>, <span class="menu">Deskbar applets</span>, and <span class="menu">Preferences</span>.<br />
-You can delete or add entries like links to applications, documents or even queries by simply copying/deleting them to/from this folder.</p>
+<p>Deskbar の最初の 2 つのメニューは固定されていますが、ユーザーは、<span class="menu">シャットダウン… (Shutdown...)</span> より下のメニューをカスタマイズできます。<br />
+ここでは、Deskbar メニューに表示する、最近利用したドキュメント、フォルダー、アプリケーションの数を指定できます。または、それらを表示させないかどうかを設定できます。<br />
+<span class="button">Tracker で編集… (Edit in Tracker...)</span>  ボタンは <span class="path">~/config/settings/deskbar/menu/</span> フォルダーを開きます。そこには、Deskbar で表示されるファイルとフォルダーが見つかるでしょう。初期設定では、<span class="menu">アプリケーション (Applications)</span>、<span class="menu">デモ (Demos)</span>、<span class="menu">デスクトップアプレット (Deskbar Applets)</span>、<span class="menu">環境設定 (Preferences)</span> となっています。<br />
+このフォルダーに対してコピー / 削除するだけで、アプリケーションへのリンクやドキュメント、またはクエリのような項目でさえも、追加または削除できます。</p>
 <!-- <p _translation_id="432">It's even easier to simply drag a file, folder or saved query and drop it where you want it into the Deskbar.</p> -->
 <div class="box-info"><p>パッケージからインストールされたプログラムは、自動的に Deskbar メニュー内に項目を作成します。パッケージをインストールするにつれて、それは少し込み入ってくるでしょう。もしユーザーが総合的に管理するのが好きで、自分自身でリンクした (たぶんサブフォルダーに分類された) アプリケーションを見たいだけなら、以下がそのやり方です。<br />
 <span class="path">menu</span> フォルダーのリンクを、<span class="path">~/config/settings/deskbar/</span> 内に作成し、それを <span class="path">menu_entries</span> にリネームします。以上は、ターミナルから以下のように実現できます。</p>
@@ -133,7 +134,7 @@ You can delete or add entries like links to applications, documents or even quer
 <p>最後に、Deskbar ウィンドウの設定があります。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="menu">常に手前に (Always on top)</span></td><td> </td><td>Deskbar は常にほかのすべてのウィンドウより前面にいます。</td></tr>
-<tr><td><span class="menu">マウスオーバーで手前に (Auto-raise)</span></td><td> </td><td>Deskbar にマウスポインターが触れると最前面に移動します。</td></tr>
+<tr><td><span class="menu">マウスオーバーで手前に (Auto-raise)</span></td><td> </td><td>The Deskbar pops to the front when the mouse pointer touches where the Deskbar meets the screen edge, and is lowered when it leaves the Desktop area.</td></tr>
 <tr><td><span class="menu">自動的に隠す (Auto-hide)</span></td><td> </td><td>Deskbar は数ピクセルに縮小し、マウスポインターがタッチした時だけ現れます。</td></tr>
 </table>
 
@@ -150,6 +151,8 @@ You can delete or add entries like links to applications, documents or even quer
 <img src="images/deskbar-images/list-of-apps.png" alt="list-of-apps.png" />
 <p>特定の実行中アプリケーションを変更するには、Deskbar 中のアプリケーションの項目をクリックし、サブメニューからウィンドウの (1 つ) を選びます。右クリックでウィンドウを<span class="menu">隠す / すべて表示 (Hide/Show all)</span>、または<span class="menu">すべて閉じる (Close all)</span> ことができます。アプリケーション全体も同様にできます。</p>
 <p>アプリケーション上で、<span class="key">SHIFT</span> と <span class="key">CTRL</span> を押しながらクリックすると、すべてのウィンドウを隠します。<span class="key">CTRL</span> を押しながらクリックすれば、ウィンドウを再表示します。</p>
+<p>When using the "expander" setting to show all windows of an application, you can middle-click on a window or app to start a new instance. For example, middle-clicking a running StyledEdit will open a new document window.<br />
+Maybe more useful: while holding <span class="key">SHIFT</span>, a middle-click on a window closes it. Handy when you'd like to close some of many open Tracker windows, for example.</p>
 <div class="box-info">時々、アプリケーションが固まり、ウィンドウがすべて消えてしまっても、Deskbar の実行中アプリケーション一覧内から全くアプリケーションが消えないことがあります。そのような場合は、"Vulcan Death Grip" を使って取り除けます。<span class="key">SHIFT</span> <span class="key">CTRL</span> <span class="key">ALT</span> を押しながら、Deskbar 内の問題を起こしている項目をクリックします。素晴らしい!</div>
 <p>Deskbar の設定でエキスパンダーを有効にしているなら、アプリケーションのウィンドウの一覧を展開または折りたためます。</p>
 <p>各アプリケーションウィンドウの前には、その状態を示すシンボルが付いています。明るいシンボルはウィンドウが可視であること、暗いものは最小化されていることを意味します。シンボルの前に引かれている 3 本線は、ウィンドウが現在のワークスペースに存在しないことを示しています。</p>

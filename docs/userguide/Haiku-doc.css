@@ -169,6 +169,12 @@ ul.lang-menu li.now {
 	background-color: inherit;
 }
 
+ul.lang-menu li.now span.dropdown-caret {
+	color: #aaaaaa;
+	position: relative;
+	top: -0.1em;
+}
+
 ul.lang-menu li a {
 	color: black;
 	text-decoration: none;

@@ -9,45 +9,47 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Emir SARI
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Workshop: Wireless networking</title>
+	<title>Çalıştay: Kablosuz ağlar</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Kullanıcı kılavuzu</span></div>
 </div>
 
 <div class="nav">
 <div class="inner">
 <ul class="lang-menu">
-<li class="now"><img src="../images/flags/tr.png" alt="" /> Türkçe</li>
-<li><a href="../id/workshop-wlan.html"><img src="../images/flags/id.png" alt="" />Bahasa Indonesia</a></li>
-<li><a href="../ca/workshop-wlan.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
-<li><a href="../de/workshop-wlan.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
-<li><a href="../en/workshop-wlan.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
-<li><a href="../es/workshop-wlan.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../fr/workshop-wlan.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
-<li><a href="../fur/workshop-wlan.html"><img src="../images/flags/fur.png" alt="" />Furlan</a></li>
-<li><a href="../it/workshop-wlan.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
-<li><a href="../hu/workshop-wlan.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
-<li><a href="../pl/workshop-wlan.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
-<li><a href="../pt_PT/workshop-wlan.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
-<li><a href="../pt_BR/workshop-wlan.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
-<li><a href="../ro/workshop-wlan.html"><img src="../images/flags/ro.png" alt="" />Română</a></li>
-<li><a href="../sk/workshop-wlan.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
-<li><a href="../fi/workshop-wlan.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
-<li><a href="../sv_SE/workshop-wlan.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
-<li><a href="../zh_CN/workshop-wlan.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
-<li><a href="../ru/workshop-wlan.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
-<li><a href="../uk/workshop-wlan.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
-<li><a href="../jp/workshop-wlan.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li class="now">Türkçe&nbsp;<span class="dropdown-caret">&#9660;</span></li>
+<li><a href="../id/workshop-wlan.html">Bahasa Indonesia</a></li>
+<li><a href="../ca/workshop-wlan.html">Català</a></li>
+<li><a href="../de/workshop-wlan.html">Deutsch</a></li>
+<li><a href="../en/workshop-wlan.html">English</a></li>
+<li><a href="../es/workshop-wlan.html">Español</a></li>
+<li><a href="../fr/workshop-wlan.html">Français</a></li>
+<li><a href="../fur/workshop-wlan.html">Furlan</a></li>
+<li><a href="../it/workshop-wlan.html">Italiano</a></li>
+<li><a href="../hu/workshop-wlan.html">Magyar</a></li>
+<li><a href="../pl/workshop-wlan.html">Polski</a></li>
+<li><a href="../pt_PT/workshop-wlan.html">Português</a></li>
+<li><a href="../pt_BR/workshop-wlan.html">Português (Brazil)</a></li>
+<li><a href="../ro/workshop-wlan.html">Română</a></li>
+<li><a href="../sk/workshop-wlan.html">Slovenčina</a></li>
+<li><a href="../fi/workshop-wlan.html">Suomi</a></li>
+<li><a href="../sv_SE/workshop-wlan.html">Svenska</a></li>
+<li><a href="../zh_CN/workshop-wlan.html"> 中文 ［中文］</a></li>
+<li><a href="../ru/workshop-wlan.html">Русский</a></li>
+<li><a href="../uk/workshop-wlan.html">Українська</a></li>
+<li><a href="../jp/workshop-wlan.html">日本語</a></li>
 </ul>
 
 <span>
@@ -59,11 +61,11 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">Bu sayfanın çevrilmesi henüz tamamlanmamıştır. Tamamlanana kadar henüz bitirilmeyen kısımlar İngilizce metni kullanır.</div>
 
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Index</td></tr>
+<tr class="heading"><td>İçindekiler</td></tr>
 <tr class="index"><td>
 	<a href="#gui">Joining a wireless network</a><br />
 	<a href="#commandline">Joining from the command line</a><br />
@@ -72,7 +74,7 @@
 </td></tr>
 </table>
 
-<h1>Workshop: Wireless networking</h1>
+<h1>Çalıştay: Kablosuz ağlar</h1>
 
 <p>Getting the networking to run is essential in today's need for permanent internet connection. As keeping up to date with all the different and ever changing hardware and drivers is quite impossible for a small project, Haiku relies on a <a href="http://www.freebsd.org">FreeBSD</a> compatibility layer for its networking drivers.<br />
 This ensures a massive amount of supported hardware, though probably not 100% of what's out there. See <a href="http://www.freebsd.org/releases/12.0R/hardware.html#wlan">FreeBSD 12.0's release hardware notes</a> for a list of supported models.</p>
@@ -125,9 +127,9 @@ The script will download the needed files and create a zip file that is to be ex
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="workshop-email.html">Workshop: Managing Email</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="applications.html">Applications</a>  »
+ «  <a href="workshop-email.html">Çalıştay: E-posta yönetimi</a> 
+::  <a href="contents.html" class="uplink">İçerik</a> 
+::  <a href="applications.html">Uygulamalar</a>  »
 </span></div>
 </div>
 
