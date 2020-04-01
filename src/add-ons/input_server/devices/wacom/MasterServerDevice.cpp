@@ -52,6 +52,7 @@ MasterServerDevice::MasterServerDevice()
 	get_mouse_acceleration(&fAcceleration);
 	get_click_speed(&fDblClickSpeed);
 	_CalculateAccelerationTable();
+	_SearchDevices();
 }
 
 // destructor
@@ -70,12 +71,7 @@ MasterServerDevice::~MasterServerDevice()
 status_t
 MasterServerDevice::InitCheck()
 {
-	input_device_ref device = { (char *)"Wacom Tablets",
-		B_POINTING_DEVICE, (void*)this };
-	input_device_ref* deviceList[2] = { &device, NULL };
-	RegisterDevices(deviceList);
-
-	return B_OK;
+	return BInputServerDevice::InitCheck();
 }
 
 // SystemShuttingDown
@@ -218,6 +214,10 @@ MasterServerDevice::_AddDevice(const char* path)
 			// start device polling only if we're started
 			if (fActive)
 				device->Start();
+			input_device_ref device = { (char *)"Wacom Tablets",
+				B_POINTING_DEVICE, (void*)this };
+			input_device_ref* deviceList[2] = { &device, NULL };
+			RegisterDevices(deviceList);
 		} else {
 	
 			PRINT(("pointing device not added (%s)\n", path));
