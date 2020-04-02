@@ -11,6 +11,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		SharedLibrary [ MultiArchDefaultGristFiles libgnu.so ] :
 			memmem.c
+			qsort.c
 			xattr.cpp
 			;
 	}
