@@ -588,8 +588,7 @@ BListView::MouseDown(BPoint where)
 		fTrack->was_selected = index >= 0 ? ItemAt(index)->IsSelected() : false;
 		fTrack->try_drag = true;
 
-		MouseDownThread<BListView>::TrackMouse(this,
-			&BListView::_DoneTracking, &BListView::_Track);
+		SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 	}
 
 	if (index >= 0) {
@@ -636,6 +635,14 @@ void
 BListView::MouseUp(BPoint where)
 {
 	BView::MouseUp(where);
+
+	uint32* buttons = 0;
+	GetMouse(&where, buttons);
+
+	if (buttons == 0) {
+		fTrack->try_drag = false;
+		fTrack->is_dragging = false;
+	}
 }
 
 
@@ -643,6 +650,17 @@ void
 BListView::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 {
 	BView::MouseMoved(where, code, dragMessage);
+
+	if (fTrack->item_index >= 0 && fTrack->try_drag) {
+		// initiate a drag if the mouse was moved far enough
+		BPoint offset = where - fTrack->drag_start;
+		float dragDistance = sqrtf(offset.x * offset.x + offset.y * offset.y);
+		if (dragDistance >= 5.0f) {
+			fTrack->try_drag = false;
+			fTrack->is_dragging = InitiateDrag(fTrack->drag_start,
+				fTrack->item_index, fTrack->was_selected);
+		}
+	}
 }
 
 
@@ -1964,29 +1982,5 @@ BListView::_RecalcItemTops(int32 start, int32 end)
 		BListItem *item = ItemAt(i);
 		item->SetTop(top);
 		top += ceilf(item->Height());
-	}
-}
-
-
-void
-BListView::_DoneTracking(BPoint where)
-{
-	fTrack->try_drag = false;
-	fTrack->is_dragging = false;
-}
-
-
-void
-BListView::_Track(BPoint where, uint32)
-{
-	if (fTrack->item_index >= 0 && fTrack->try_drag) {
-		// initiate a drag if the mouse was moved far enough
-		BPoint offset = where - fTrack->drag_start;
-		float dragDistance = sqrtf(offset.x * offset.x + offset.y * offset.y);
-		if (dragDistance >= 5.0f) {
-			fTrack->try_drag = false;
-			fTrack->is_dragging = InitiateDrag(fTrack->drag_start,
-				fTrack->item_index, fTrack->was_selected);
-		}
 	}
 }

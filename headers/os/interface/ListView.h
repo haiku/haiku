@@ -189,9 +189,6 @@ private:
 			bool				_ReplaceItem(int32 index, BListItem* item);
 			void				_RescanSelection(int32 from, int32 to);
 
-			void				_DoneTracking(BPoint where);
-			void				_Track(BPoint where, uint32);
-
 private:
 			BList				fList;
 			list_view_type		fListType;
