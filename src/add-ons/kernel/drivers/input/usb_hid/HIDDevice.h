@@ -34,7 +34,7 @@ public:
 			void				Removed();
 			bool				IsRemoved() const { return fRemoved; }
 
-			status_t			MaybeScheduleTransfer();
+			status_t			MaybeScheduleTransfer(HIDReport*);
 
 			status_t			SendReport(HIDReport *report);
 

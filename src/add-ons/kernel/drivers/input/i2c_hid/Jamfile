@@ -1,15 +1,15 @@
-SubDir HAIKU_TOP src add-ons kernel drivers input usb_hid ;
+SubDir HAIKU_TOP src add-ons kernel drivers input i2c_hid ;
 
-SubDirC++Flags -fno-rtti -DKEYBOARD_SUPPORTS_KDL ;
+SubDirC++Flags -fno-rtti ;
 
 SubDirSysHdrs $(HAIKU_TOP) headers os drivers ;
 SubDirSysHdrs $(HAIKU_TOP) src add-ons kernel drivers input hid_shared ;
-UsePrivateHeaders [ FDirName kernel util ] input drivers device ;
+UsePrivateHeaders [ FDirName kernel util ] input drivers device i2c ;
 UsePrivateKernelHeaders ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel drivers input hid_shared ] ;
 
-KernelAddon usb_hid :
+KernelAddon i2c_hid :
 	DeviceList.cpp
 	Driver.cpp
 	HIDDevice.cpp
@@ -19,8 +19,6 @@ KernelAddon usb_hid :
 	HIDReport.cpp
 	HIDReportItem.cpp
 	HIDWriter.cpp
-
-	QuirkyDevices.cpp
 
 	ProtocolHandler.cpp
 

@@ -263,7 +263,7 @@ HIDDevice::Removed()
 
 
 status_t
-HIDDevice::MaybeScheduleTransfer()
+HIDDevice::MaybeScheduleTransfer(HIDReport*)
 {
 	if (fRemoved)
 		return B_ERROR;

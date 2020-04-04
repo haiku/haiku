@@ -234,7 +234,7 @@ HIDReport::WaitForReport(bigtime_t timeout)
 
 	ConditionVariableEntry conditionVariableEntry;
 	fConditionVariable.Add(&conditionVariableEntry);
-	status_t result = fParser->Device()->MaybeScheduleTransfer();
+	status_t result = fParser->Device()->MaybeScheduleTransfer(this);
 	if (result != B_OK) {
 		TRACE_ALWAYS("scheduling transfer failed\n");
 		conditionVariableEntry.Wait(B_RELATIVE_TIMEOUT, 0);

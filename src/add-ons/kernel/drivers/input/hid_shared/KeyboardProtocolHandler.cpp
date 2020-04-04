@@ -32,6 +32,7 @@
 #define KEYBOARD_HANDLER_COOKIE_FLAG_DEBUGGER	0x02
 
 
+#if KEYBOARD_SUPPORTS_KDL
 static bool sDebugKeyboardFound = false;
 static usb_id sDebugKeyboardPipe = 0;
 static size_t sDebugKeyboardReportSize = 0;
@@ -45,6 +46,7 @@ debug_get_keyboard_config(int argc, char **argv)
 	set_debug_variable("_usbReportSize", (uint64)sDebugKeyboardReportSize);
 	return 0;
 }
+#endif
 
 
 //	#pragma mark -
@@ -105,6 +107,7 @@ KeyboardProtocolHandler::KeyboardProtocolHandler(HIDReport &inputReport,
 		}
 	}
 
+#if KEYBOARD_SUPPORTS_KDL
 	if (!sDebugKeyboardFound && debugUsable) {
 		// It's a keyboard, not just some additional buttons, set up the kernel
 		// debugger info here so that it is ready on panics or crashes that
@@ -115,6 +118,7 @@ KeyboardProtocolHandler::KeyboardProtocolHandler(HIDReport &inputReport,
 		if (outputReport != NULL)
 			sDebugKeyboardFound = true;
 	}
+#endif
 
 	TRACE("keyboard device with %" B_PRIu32 " keys and %" B_PRIu32
 		" modifiers\n", fKeyCount, fModifierCount);
@@ -156,11 +160,13 @@ KeyboardProtocolHandler::KeyboardProtocolHandler(HIDReport &inputReport,
 		}
 	}
 
+#if KEYBOARD_SUPPORTS_KDL
 	if (atomic_add(&sDebuggerCommandAdded, 1) == 0) {
 		add_debugger_command("get_usb_keyboard_config",
 			&debug_get_keyboard_config,
 			"Gets the required config of the USB keyboard");
 	}
+#endif
 }
 
 
@@ -168,10 +174,12 @@ KeyboardProtocolHandler::~KeyboardProtocolHandler()
 {
 	free(fLastKeys);
 
+#if KEYBOARD_SUPPORTS_KDL
 	if (atomic_add(&sDebuggerCommandAdded, -1) == 1) {
 		remove_debugger_command("get_usb_keyboard_config",
 			&debug_get_keyboard_config);
 	}
+#endif
 
 	mutex_destroy(&fLock);
 }
@@ -441,12 +449,16 @@ KeyboardProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 			return B_OK;
 
 		case KB_SET_DEBUG_READER:
+#if KEYBOARD_SUPPORTS_KDL
 			if (fHasDebugReader)
 				return B_BUSY;
 
 			*cookie |= KEYBOARD_HANDLER_COOKIE_FLAG_DEBUGGER;
 			fHasDebugReader = true;
 			return B_OK;
+#else
+			return B_NOT_SUPPORTED;
+#endif
 	}
 
 	TRACE_ALWAYS("keyboard device unhandled control 0x%08" B_PRIx32 "\n", op);
@@ -759,10 +771,12 @@ KeyboardProtocolHandler::_ReadReport(bigtime_t timeout, uint32 *cookie)
 					&& current[i] >= 4 && current[i] <= 29
 					&& (fLastModifiers & ALT_KEYS) != 0) {
 					// Alt-SysReq+letter was pressed
+#if KEYBOARD_SUPPORTS_KDL
 					sDebugKeyboardPipe
 						= fInputReport.Device()->InterruptPipe();
 					sDebugKeyboardReportSize
 						= fInputReport.Parser()->MaxReportSize();
+#endif
 
 					char letter = current[i] - 4 + 'a';
 
