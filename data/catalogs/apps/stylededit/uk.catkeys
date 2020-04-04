@@ -1,6 +1,6 @@
 1	ukrainian	x-vnd.Haiku-StyledEdit	727465241
 Document statistics	Statistics		Статистика документу
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Неможливо повернути, файл не знайдено: \"%s\".
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Неможливо зробити відкат, файл не знайдено: \"%s\".
 Cut	Menus		Вирізати
 Center	Menus		Центр
 Wrap-around search	FindandReplaceWindow		Шукати по всьому документу

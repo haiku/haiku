@@ -13,8 +13,8 @@ No user ratings available.	PackageInfoView		Používateľské hodnotenie nie je 
 Rating	PackageListView		Hodnotenie
 Does not start	RatePackageWindow		Nespúšťa sa
 Show	MainWindow		Zobraziť
-Not specified	RatePackageWindow		Neuvedené
 Unstable but usable	RatePackageWindow		Nestabilný, ale použiteľný
+Not specified	RatePackageWindow		Neuvedené
 Active	PackageListView		Aktívny
 Login or Create account	MainWindow		Prihlásiť sa alebo Vytvoriť účet
 <Package contents not available for remote packages>	PackageContentsView		<Pri vzdialených balíkoch obsah balíka nie je k dispozícii>

@@ -14,8 +14,8 @@ No user ratings available.	PackageInfoView		Felhasználói értékelés nem áll
 Rating	PackageListView		Értékelés
 Does not start	RatePackageWindow		Nem indul el
 Show	MainWindow		Megjelenítés
-Not specified	RatePackageWindow		Nincs megadva
 Unstable but usable	RatePackageWindow		Instabil, de használható
+Not specified	RatePackageWindow		Nincs megadva
 Active	PackageListView		Aktív
 Login or Create account	MainWindow		Belépés vagy fiók létrehozása
 <Package contents not available for remote packages>	PackageContentsView		<Távoli csomagok esetében a csomag tartalma nem érhető el>

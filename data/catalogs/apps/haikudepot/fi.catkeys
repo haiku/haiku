@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	429905564
+1	finnish	x-vnd.Haiku-HaikuDepot	2705631059
 Repository update error	LocalRepositoryUpdateProcess		Tietovaraston päivitysvirhe
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Tietovaraston päivityksen yhteydessä tapahtui virhe: %error%
 User Created	UserLoginWindow		Käyttäjän luoma
@@ -9,8 +9,8 @@ Uninstalled	PackageListView		Poistetut asennukset
 It was not possible to create the new user.	UserLoginWindow		Uuden käyttäjän luominen epäonnistui.
 Available packages	MainWindow		Saatavilla olevat pakkaukset
 Create account	UserLoginWindow		Luo tili
-OK	App		Valmis
 Mostly stable	RatePackageWindow		Äärimmäisen stabiili
+OK	App		Valmis
 The response to the captcha was incorrect.	ServerHelper		Captcha-vastaus oli virheellinen.
 Develop packages	MainWindow		Kehityspaketit
 Rate package…	PackageInfoView		Anna pakkaukselle arvosana...
@@ -25,8 +25,8 @@ Synchronizing icons	ServerIconExportUpdateProcess		Synkronoidaan kuvakkeet
 Does not start	RatePackageWindow		Ei käynnisty
 Show	MainWindow		Näytä
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Pakkausluettelon hankkimisessa tapahtui virhe: %message%
-Not specified	RatePackageWindow		Ei määritelty
 Unstable but usable	RatePackageWindow		Epävakaa, mutta käyttökelpoinen
+Not specified	RatePackageWindow		Ei määritelty
 Active	PackageListView		Käytössä
 Login or Create account	MainWindow		Kirjaudu tai luo tili
 <Package contents not available for remote packages>	PackageContentsView		<Etäpakkausten sisältö ei ole saatavilla>
@@ -112,8 +112,8 @@ Your rating was updated.	RatePackageWindow		Arvosanasi päivitettiin.
 All categories	FilterView		Kaikki luokat
 Repositories	MainWindow		Tietovarastot
 n/a	PackageInfoView		–
-Cancel	MainWindow		Peru
 View agreed usage conditions…	MainWindow		Katso hyväksyttyjä käyttöehtoja…
+Cancel	MainWindow		Peru
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 lisää ladattavaksi)}other{(# lisää ladattavaksi)}}
 Refresh repositories	MainWindow		Virkistä tietovarastoja
 Tools	MainWindow		Työkalut
@@ -134,6 +134,7 @@ The nickname is malformed.  The nickname may only contain digits and lower case 
 Stability:	RatePackageWindow		Stabiilisuus:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Käyttäjäehdot on hyväksyttävä ja on vahvistettava, että uuden käyttäjän luova henkilö täyttää alaikärajavaatimuksen.
 A validation error has occurred	ServerHelper		Tapahtui kelpuutusvirhe
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	MainWindow		Pakkaustietoja päivitettäessä syntyy pulma, joka voi aiheuttaa tietojen vanhentumisen tai puuttumisen sovelluksen näytöltä. Lisätietoja tästä pulmasta saatetaan saada sovelluksen lokitiedostoista.\nTietoja siitä kuinka katsotaan lokitiedostoja on saatavilla HaikuVaraston käyttöohjeesta.
 The nickname is required.	UserLoginWindow		Vaaditaan käyttäjätunnus.
 Source packages	MainWindow		Lähdekoodipakkaukset
 -	no package size		-
@@ -157,6 +158,7 @@ The supplied response to the captcha is incorrect.  A new captcha will be genera
 Captcha error	UserLoginWindow		Captcha-virhe
 Manage repositories…	MainWindow		Hallinnoi tietovarastoja...
 Fetching remote repository data	LocalRepositoryUpdateProcess		Noudetaan etätietovaraston tietoja
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Uuden käyttäjän luomiseen tarvittavien käyttöehtojen lataaminen epäonnistui. Tarkista yksityiskohdat lokitiedostosta ja yritä uudelleen.\nTietoja siitä, kuinka katsotaan lokitiedostoja on saatavilla HaikuVaraston käyttöohjeesta.
 Description	PackageListView		Kuvaus
 Open %DeskbarLink%	PackageManager		Avaa %DeskbarLink%
 User creation error	UserLoginWindow		Käyttäjän luomisen virhe

@@ -6,8 +6,8 @@ Uninstall	PackageManager		Dezinstalare
 Uninstalled	PackageListView		Dezinstalat
 Available packages	MainWindow		Pachete disponibile
 Create account	UserLoginWindow		Creează cont
-OK	App		OK
 Mostly stable	RatePackageWindow		Majoritatea stabile
+OK	App		OK
 The response to the captcha was incorrect.	ServerHelper		Răspunsul la captcha nu a fost corect.
 Develop packages	MainWindow		Dezvoltă pachete
 Rate package…	PackageInfoView		Evaluați pachet…
@@ -20,8 +20,8 @@ Synchronizing icons	ServerIconExportUpdateProcess		Se sincronizează iconițele
 Does not start	RatePackageWindow		Nu pornește
 Show	MainWindow		Arată
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		A apărut o eroare în timpul obținerii listei de pachete: %message%
-Not specified	RatePackageWindow		Nespecificat
 Unstable but usable	RatePackageWindow		Instabil dar utilizabil
+Not specified	RatePackageWindow		Nespecificat
 Active	PackageListView		Activ
 Login or Create account	MainWindow		Autentificare sau Creare cont
 <Package contents not available for remote packages>	PackageContentsView		<Conținutul pachetelor nu este disponibil pentru pachetele de la distanță>

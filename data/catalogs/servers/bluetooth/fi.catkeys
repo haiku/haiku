@@ -1,0 +1,7 @@
+1	finnish	x-vnd.Haiku-bluetooth_server	3418434903
+Stopping the Bluetooth server failed.	BluetoothReplicant		Bluetooth-palvelimen pysäyttäminen epäonnistui.
+Bluetooth error	BluetoothReplicant		Bluetooth-virhe
+Settings…	BluetoothReplicant		Asetukset…
+OK	BluetoothReplicant		Valmis
+Error: %status%	BluetoothReplicant		Virhe: %status%
+Quit	BluetoothReplicant		Poistu

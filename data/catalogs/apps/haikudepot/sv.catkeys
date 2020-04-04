@@ -9,8 +9,8 @@ Uninstalled	PackageListView		Avinstallera
 It was not possible to create the new user.	UserLoginWindow		Det gick inte att skapa den nya användaren.
 Available packages	MainWindow		Tillgängliga paket
 Create account	UserLoginWindow		Skapa konto
-OK	App		OK
 Mostly stable	RatePackageWindow		Mestadels stabil
+OK	App		OK
 The response to the captcha was incorrect.	ServerHelper		Svaret på captchan var inkorrekt.
 Develop packages	MainWindow		Utvecklingspaket
 Rate package…	PackageInfoView		Betygsätt paket...
@@ -25,8 +25,8 @@ Synchronizing icons	ServerIconExportUpdateProcess		Synkroniserar ikoner
 Does not start	RatePackageWindow		Starta inte
 Show	MainWindow		Visa
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Ett fel inträffade vid hämtning av paketlistan: %message%
-Not specified	RatePackageWindow		Inte angivet
 Unstable but usable	RatePackageWindow		Ostabil men kan användas
+Not specified	RatePackageWindow		Inte angivet
 Active	PackageListView		Aktiv
 Login or Create account	MainWindow		Logga in eller skapa konto
 <Package contents not available for remote packages>	PackageContentsView		<Paketinehållet är inte tillgängligt för externa paket>
@@ -112,8 +112,8 @@ Your rating was updated.	RatePackageWindow		Ditt betyg ändrades.
 All categories	FilterView		Alla kategorier
 Repositories	MainWindow		Repositorier
 n/a	PackageInfoView		oviktigt
-Cancel	MainWindow		Avbryt
 View agreed usage conditions…	MainWindow		Visa godkända användarvillkor…
+Cancel	MainWindow		Avbryt
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 kvar att ladda hem)}other{(# kvar att ladda hem)}}
 Refresh repositories	MainWindow		Ladda om repositorier
 Tools	MainWindow		Verktyg

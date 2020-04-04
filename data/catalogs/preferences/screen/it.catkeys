@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Screen	2685901476
+1	italian	x-vnd.Haiku-Screen	133788249
 no	Screen		no
 bits/pixel	Screen		bit/pixel
 15 bits/pixel, 32768 colors	Screen		15 bit/pixel, 32768 colori
@@ -17,6 +17,7 @@ vertically	Screen		verticalmente
 All workspaces	Screen		Tutti gli spazi di lavoro
 Use laptop panel:	Screen		Usa pannello del portatile:
 Could not write VESA mode settings file:\n\t	Screen		Non è stato possibile scrivere le impostazioni della modalità VESA:\n\t
+Display info	Screen		Informazioni display
 Settings will revert in %seconds.	Screen		Le impostazioni saranno ripristinate in %seconds.
 Cancel	Screen		Cancella
 Other…	Screen		Altro…

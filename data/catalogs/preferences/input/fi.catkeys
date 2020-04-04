@@ -1,0 +1,46 @@
+1	finnish	x-vnd.Haiku-Input	2494436940
+Scrolling	TouchpadPrefView		Vieritettään
+Defaults	InputMouse		Oletukset
+Tapping	TouchpadPrefView		Haaroitus
+Long	KeyboardView		Pitkä
+Normal	SettingsView		Normaali
+Cancel	TouchpadPrefView		Peru
+Slow	TouchpadPrefView		Hidas
+Warp	SettingsView		Vääntäminen
+Instant warp	SettingsView		Pikaväännös
+Device List	InputWindow		Laiteluettelo
+Double-click speed	SettingsView		Kaksoisnapsautusnopeus
+Typing test area	KeyboardView		Kirjoitustestausalue
+Mouse type:	SettingsView		Hiirityyppi:
+Fast	KeyboardView		Nopea
+Off	TouchpadPrefView		Pois käytöstä
+Fast	TouchpadPrefView		Nopea
+Please confirm	TouchpadPrefView		Vahvista
+Click to focus	SettingsView		Kohdista napsauttamalla
+Acceleration	TouchpadPrefView		Kiihdytys
+Mouse speed	SettingsView		Hiirinopeus
+Accept first click	SettingsView		Hyväksy ensimmäisellä napsautuksella
+OK	TouchpadPrefView		Valmis
+Horizontal scrolling	TouchpadPrefView		Vaakasuora vieritys
+Delay until key repeat	KeyboardView		Näppäintoiston viive
+Two finger scrolling	TouchpadPrefView		Kaksisormivieritys
+Input	System name		Syöte
+Mouse acceleration	SettingsView		Hiirikiihdytys
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Uusi vieritysalue on hyvin laaja ja se saattaa hidastuttaa normaalia hiiritoimintaa. Haluatko todella muuttaa sen?
+High	TouchpadPrefView		Korkea
+Defaults	TouchpadPrefView		Oletukset
+1-Button	SettingsView		1-painikkeinen
+Short	KeyboardView		Lyhyt
+Revert	InputMouse		Käänteinen
+Slow	KeyboardView		Hidas
+Key repeat rate	KeyboardView		Näppäimen toistonopeus
+2-Button	SettingsView		2-painikkeinen
+Click to focus and raise	SettingsView		Kohdista ja nosta napsauttamalla
+Vertical	TouchpadPrefView		Pystysuora
+Horizontal	TouchpadPrefView		Vaakasuora
+Focus mode:	SettingsView		Kohdistustila:
+Focus follows mouse	SettingsView		Kohdistus seuraa hiirtä
+Double-click test area	SettingsView		Kaksoisnapsautuksen testausalue
+Sensitivity	TouchpadPrefView		Herkkyys
+3-Button	SettingsView		3-painikkeinen
+Revert	TouchpadPrefView		Käänteinen

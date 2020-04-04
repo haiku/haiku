@@ -13,8 +13,8 @@ No user ratings available.	PackageInfoView		Brak ocen użytkowników.
 Rating	PackageListView		Ocena
 Does not start	RatePackageWindow		Nie uruchamia się
 Show	MainWindow		Pokaż
-Not specified	RatePackageWindow		Nieokreślony
 Unstable but usable	RatePackageWindow		Niestabilny, ale używalny
+Not specified	RatePackageWindow		Nieokreślony
 Active	PackageListView		Aktywny
 Login or Create account	MainWindow		Zaloguj lub utwórz konto
 <Package contents not available for remote packages>	PackageContentsView		<Podgląd zawartości nie jest dostępny dla zdalnych pakietów>

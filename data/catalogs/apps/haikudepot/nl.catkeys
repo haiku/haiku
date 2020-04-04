@@ -7,8 +7,8 @@ Uninstall	PackageManager		Verwijderen
 Uninstalled	PackageListView		Verwijderd
 Available packages	MainWindow		Beschikbare pakketten
 Create account	UserLoginWindow		Registreren
-OK	App		OK
 Mostly stable	RatePackageWindow		Meestal stabiel
+OK	App		OK
 The response to the captcha was incorrect.	ServerHelper		De ingevoerde captcha is foutief.
 Develop packages	MainWindow		Ontwikkelaarspakketten
 Rate package…	PackageInfoView		Pakket beoordelen…
@@ -21,8 +21,8 @@ Synchronizing icons	ServerIconExportUpdateProcess		Iconen synchroniseren
 Does not start	RatePackageWindow		Start niet
 Show	MainWindow		Toon
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Een fout is opgetreden bij het ophalen van de pakket lijst: %message%
-Not specified	RatePackageWindow		Niet gespecificeerd
 Unstable but usable	RatePackageWindow		Instabiel maar bruikbaar
+Not specified	RatePackageWindow		Niet gespecificeerd
 Active	PackageListView		Actief
 Login or Create account	MainWindow		Inloggen of registreren
 <Package contents not available for remote packages>	PackageContentsView		<Pakketinhoud niet beschikbaar voor pakketten op afstand>
@@ -97,8 +97,8 @@ Your rating was updated.	RatePackageWindow		Uw beoordeling is bijgewerkt.
 All categories	FilterView		Alle categorieën
 Repositories	MainWindow		Pakketbronnen
 n/a	PackageInfoView		n.v.t.
-Cancel	MainWindow		Annuleren
 View agreed usage conditions…	MainWindow		Afgesproken gebruiksvoorwaarden bekijken ...
+Cancel	MainWindow		Annuleren
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(nog 1 om te downloaden)}other{(# meer om te downloaden)}}
 Refresh repositories	MainWindow		Pakketbronnen verversen
 Tools	MainWindow		Gereedschap

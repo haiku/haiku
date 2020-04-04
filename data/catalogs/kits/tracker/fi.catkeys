@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	1066099065
+1	finnish	x-vnd.Haiku-libtracker	659027911
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -286,6 +286,7 @@ Error creating link to \"%name\".	FSUtils		Virhe luotaessa linkkiä kohteeseen �
 Unknown	FilePermissionsView		Tuntematon
 Paste links	ContainerWindow		Liitä linkit
 Restoring: 	StatusWindow		Palautetaan: 
+The Tracker must be running to set the default printer.	PoseView		Oletustulostimen asettamiseksi Seuraajan on oltava käynnissä.
 calculating…	InfoWindow		lasketaan...
 Preferred for file	OpenWithWindow		Ensisijainen tiedostolle
 OK	AutoMounterSettings		Valmis

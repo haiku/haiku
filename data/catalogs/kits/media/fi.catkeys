@@ -1,0 +1,12 @@
+1	finnish	x-vnd.Haiku-libmedia	1819860668
+Cleaning up.	MediaDefs		Siistitään.
+Starting media_services.	MediaDefs		Käynnistetään media_services-palvelut.
+Stopping media_addon_server.	MediaDefs		Pysäytetään media_addon_server-palvelin.
+Waiting for media_addon_server to quit.	MediaDefs		Odotetaan media_addon_server-palvelimen sulkeutumista.
+Telling media_addon_server to quit.	MediaDefs		Pyydetään media_addon_server-palvelinta sulkeutumaan.
+Ready for use.	MediaDefs		Valmis käyttöön.
+Stopping media server…	MediaDefs		Pysäytetään media-palvelinta…
+Waiting for media_server to quit.	MediaDefs		Odotetaan media_server-palvelimen sulkeutumista.
+Done shutting down.	MediaDefs		Sulkeminen on suoritettu.
+Error occurred starting media services.	MediaDefs		Media-palvelujen käynnistymisessä tapahtui virhe.
+Media Service	MediaDefs		Media-palvelu

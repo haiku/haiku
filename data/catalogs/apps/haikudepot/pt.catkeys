@@ -9,8 +9,8 @@ Uninstalled	PackageListView		Desinstalado
 It was not possible to create the new user.	UserLoginWindow		Não foi possível criar o novo utilizador.
 Available packages	MainWindow		Pacotes disponíveis
 Create account	UserLoginWindow		Criar conta
-OK	App		OK
 Mostly stable	RatePackageWindow		Maioritariamente estável
+OK	App		OK
 The response to the captcha was incorrect.	ServerHelper		A resposta ao captcha estava errada.
 Develop packages	MainWindow		Pacotes de desenvolvimento
 Rate package…	PackageInfoView		Avaliar pacote…
@@ -25,8 +25,8 @@ Synchronizing icons	ServerIconExportUpdateProcess		A sincronizar ícones
 Does not start	RatePackageWindow		Não inicia
 Show	MainWindow		Mostrar
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Ocorreu um erro ao tentar obter a lista de pacotes: %message%
-Not specified	RatePackageWindow		Não especificado
 Unstable but usable	RatePackageWindow		Instável, mas utilizável
+Not specified	RatePackageWindow		Não especificado
 Active	PackageListView		Ativo
 Login or Create account	MainWindow		Iniciar sessão ou Criar conta
 <Package contents not available for remote packages>	PackageContentsView		<Conteúdos do pacote não disponíveis para pacotes remotos>
@@ -108,8 +108,8 @@ Your rating was updated.	RatePackageWindow		A sua avaliação foi atualizada.
 All categories	FilterView		Todas as categorias
 Repositories	MainWindow		Repositórios
 n/a	PackageInfoView		n/d
-Cancel	MainWindow		Cancelar
 View agreed usage conditions…	MainWindow		Ver condições de utilização acordadas…
+Cancel	MainWindow		Cancelar
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 mais para descarregar)}other{(# mais para descarregar)}}
 Refresh repositories	MainWindow		Atualizar repositórios
 Tools	MainWindow		Ferramentas

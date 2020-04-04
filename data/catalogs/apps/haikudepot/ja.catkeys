@@ -9,8 +9,8 @@ Uninstalled	PackageListView		アンインストール済み
 It was not possible to create the new user.	UserLoginWindow		新規ユーザーを作成できませんでした。
 Available packages	MainWindow		使用可能なパッケージ
 Create account	UserLoginWindow		アカウントの作成
-OK	App		OK
 Mostly stable	RatePackageWindow		ほとんど安定
+OK	App		OK
 The response to the captcha was incorrect.	ServerHelper		キャプチャの回答が間違っていました
 Develop packages	MainWindow		開発用パッケージ
 Rate package…	PackageInfoView		パッケージを評価…
@@ -25,8 +25,8 @@ Synchronizing icons	ServerIconExportUpdateProcess		アイコンを同期して�
 Does not start	RatePackageWindow		起動しない
 Show	MainWindow		表示
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		パッケージリストの取得中にエラーが発生しました: %message%
-Not specified	RatePackageWindow		指定なし
 Unstable but usable	RatePackageWindow		不安定であるが使用できる
+Not specified	RatePackageWindow		指定なし
 Active	PackageListView		有効
 Login or Create account	MainWindow		ログインまたはアカウントの作成
 <Package contents not available for remote packages>	PackageContentsView		<リモートパッケージには利用できません>
@@ -112,8 +112,8 @@ Your rating was updated.	RatePackageWindow		評価が更新されました。
 All categories	FilterView		すべての分類
 Repositories	MainWindow		リポジトリ
 n/a	PackageInfoView		利用不可
-Cancel	MainWindow		キャンセル
 View agreed usage conditions…	MainWindow		同意した使用条件を見る…
+Cancel	MainWindow		キャンセル
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 個以上のダウンロード)}other{(# 個以上のダウンロード)}}
 Refresh repositories	MainWindow		リポジトリの更新
 Tools	MainWindow		ツール

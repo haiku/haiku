@@ -1,11 +1,23 @@
-1	ukrainian	x-vnd.mmu.AutoRaise	393947339
+1	ukrainian	x-vnd.mmu.AutoRaise	3954724670
+AutoRaise, (c) 2002, mmu_man\nEnjoy :-)	AutoRaiseIcon		AutoRaise, (c) 2002, mmu_man\nКористуйтесь :-)
 2 s	AutoRaiseIcon		2 с
 OK	AutoRaiseIcon		ОК
+AutoRaise	System name		AutoRaise
 0.2 s	AutoRaiseIcon		0.2 с
 1 s	AutoRaiseIcon		1 с
+Delay	AutoRaiseIcon		Затримка
 5 s	AutoRaiseIcon		5 с
+Active	AutoRaiseIcon		Активний
 0.1 s	AutoRaiseIcon		0.1 с
 Default (all windows)	AutoRaiseIcon		За замовчуванням (всі вікна)
+About AutoRaise…	AutoRaiseIcon		Про AutoRaise…
+Normal	AutoRaiseIcon		Звичайний
 0.5 s	AutoRaiseIcon		0.5 с
+Deskbar only (touch)	AutoRaiseIcon		Тільки Deskbar (touch)
 4 s	AutoRaiseIcon		4 с
+Focus follows mouse	AutoRaiseIcon		Фокус за курсором миші
+Deskbar only (over its area)	AutoRaiseIcon		Тільки Deskbar (over its area)
+Inactive behaviour	AutoRaiseIcon		В пасивному стані
+Mode	AutoRaiseIcon		Режим
+Remove from tray	AutoRaiseIcon		Прибрати з лотка
 3 s	AutoRaiseIcon		3 с

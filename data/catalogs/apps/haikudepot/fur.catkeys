@@ -9,8 +9,8 @@ Uninstalled	PackageListView		Disinstalât
 It was not possible to create the new user.	UserLoginWindow		Nol è stât pussibil creâ il gnûf utent.
 Available packages	MainWindow		Pachets disponibii
 Create account	UserLoginWindow		Cree account
-OK	App		Va ben
 Mostly stable	RatePackageWindow		Pal plui stabil
+OK	App		Va ben
 The response to the captcha was incorrect.	ServerHelper		La rispueste al captcha e jere sbaliade.
 Develop packages	MainWindow		Pachets di svilup
 Rate package…	PackageInfoView		Vote pachet…
@@ -24,8 +24,8 @@ Synchronizing icons	ServerIconExportUpdateProcess		Sincronizazion iconis
 Does not start	RatePackageWindow		No si invie
 Show	MainWindow		Mostre
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Si è verificât un erôr intal otignî la liste dai pachets: %message%
-Not specified	RatePackageWindow		No specificât
 Unstable but usable	RatePackageWindow		Instabil, ma che si pues doprâ
+Not specified	RatePackageWindow		No specificât
 Active	PackageListView		Atîf
 Login or Create account	MainWindow		Jentre o Regjistriti
 <Package contents not available for remote packages>	PackageContentsView		<Contignûts dal pachet no disponibii pai pachets rimots>
@@ -111,8 +111,8 @@ Your rating was updated.	RatePackageWindow		La tô valutazion e je stade inzorna
 All categories	FilterView		Dutis lis categoriis
 Repositories	MainWindow		Dipuesits
 n/a	PackageInfoView		n/d
-Cancel	MainWindow		Anule
 View agreed usage conditions…	MainWindow		Viôt lis cundizions di ûs acetadis…
+Cancel	MainWindow		Anule
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(ancjemò 1 discjariament)}other{(ancjemò # discjariaments)}}
 Refresh repositories	MainWindow		Inzorne dipuesits
 Tools	MainWindow		Struments

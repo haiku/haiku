@@ -14,8 +14,8 @@ No user ratings available.	PackageInfoView		未发现用户评分。
 Rating	PackageListView		评级
 Does not start	RatePackageWindow		未开始
 Show	MainWindow		显示
-Not specified	RatePackageWindow		未指定
 Unstable but usable	RatePackageWindow		不稳定，但是可用
+Not specified	RatePackageWindow		未指定
 Active	PackageListView		激活
 Login or Create account	MainWindow		登录或者新建账户
 <Package contents not available for remote packages>	PackageContentsView		<软件包内容对于远程包不可用>

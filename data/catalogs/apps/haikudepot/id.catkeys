@@ -7,8 +7,8 @@ Uninstall	PackageManager		Hapus
 Uninstalled	PackageListView		Telah dilepas
 Available packages	MainWindow		Paket yang tersedia
 Create account	UserLoginWindow		Membuat akun
-OK	App		OKE
 Mostly stable	RatePackageWindow		Sebagian besar stabil
+OK	App		OKE
 The response to the captcha was incorrect.	ServerHelper		Respons terhadap captcha salah.
 Develop packages	MainWindow		Paket pengembangan
 Rate package…	PackageInfoView		Nilai paket...
@@ -21,8 +21,8 @@ Synchronizing icons	ServerIconExportUpdateProcess		Ikon sinkronisasi
 Does not start	RatePackageWindow		Tidak memulai
 Show	MainWindow		Menunjukkan
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Terjadi kesalahan saat mendapatkan daftar paket:%message%
-Not specified	RatePackageWindow		Tidak ditentukan
 Unstable but usable	RatePackageWindow		Tidak stabil tapi bisa digunakan
+Not specified	RatePackageWindow		Tidak ditentukan
 Active	PackageListView		Aktif
 Login or Create account	MainWindow		Masuk atau Buat akun
 <Package contents not available for remote packages>	PackageContentsView		<Package contents not available for remote packages>
@@ -97,8 +97,8 @@ Your rating was updated.	RatePackageWindow		Peringkat anda telah diperbarui.
 All categories	FilterView		Semua kategori
 Repositories	MainWindow		Repositori
 n/a	PackageInfoView		n/a
-Cancel	MainWindow		Batal
 View agreed usage conditions…	MainWindow		Lihat ketentuan penggunaan yang disepakati…
+Cancel	MainWindow		Batal
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 more to download)}other{(# more to download)}}
 Refresh repositories	MainWindow		Muat-ulang repositori
 Tools	MainWindow		Perkakas

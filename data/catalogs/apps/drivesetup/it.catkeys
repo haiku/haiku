@@ -38,7 +38,7 @@ No disk devices have been recognized.	DiskView		Nessun dispositivo disco è stat
 Attributes	PartitionList		Attributi
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Rimozione della partizione fallita. Nessuna modifica è stata scritta sul disco.
 Change parameters…	MainWindow		Modifica i parametri…
-Format	InitializeParametersPanel		Formato
+Format	InitializeParametersPanel		Formatta
 Could not unmount partition	MainWindow		Impossibile smontare la partizione
 Create	CreateParametersPanel		Crea
 File system	PartitionList		File system

@@ -6,8 +6,8 @@ Uninstall	PackageManager		Désinstaller
 Uninstalled	PackageListView		Désinstallé
 Available packages	MainWindow		Paquets disponibles
 Create account	UserLoginWindow		Créer un compte
-OK	App		OK
 Mostly stable	RatePackageWindow		Plutôt stable
+OK	App		OK
 The response to the captcha was incorrect.	ServerHelper		Réponse incorrecte au Captcha.
 Develop packages	MainWindow		Paquets de développement
 Rate package…	PackageInfoView		Évaluer le paquet…
@@ -22,8 +22,8 @@ Synchronizing icons	ServerIconExportUpdateProcess		Synchronisation des icônes
 Does not start	RatePackageWindow		Ne démarre pas
 Show	MainWindow		Afficher
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Erreur lors de l’obtention de la liste des paquets : %message%
-Not specified	RatePackageWindow		Non spécifié
 Unstable but usable	RatePackageWindow		Instable mais utilisable
+Not specified	RatePackageWindow		Non spécifié
 Active	PackageListView		Actif
 Login or Create account	MainWindow		Se connecter ou créer un compte
 <Package contents not available for remote packages>	PackageContentsView		<Contenu du paquet indisponible pour les paquets distants>

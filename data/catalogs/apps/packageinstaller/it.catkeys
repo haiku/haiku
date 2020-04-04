@@ -37,7 +37,7 @@ Install %name%	PackageView		Installa %name%
 %index% of %total%	PackageInstall		%index% di %total%
 No package selected.	UninstallView		Nessun pacchetto selezionato.
 %name% (%size% free)	PackageView		%name% (%size% liberi)
-Error while installing the package\n	PackageView		È occorso un errore durante l'installazione del pacchetto\n
+Error while installing the package\n	PackageView		Si è verificato un errore durante l'installazione del pacchetto\n
 Finishing installation	PackageInstall		Completamento dell'installazione
 No package available.	PackageInfo		Nessun pacchetto disponibile.
 The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Lo script chiamato '%s' esiste già nel percorso dato.\nSostituisci con quello presente in questo pacchetto o salta?

@@ -9,8 +9,8 @@ Uninstalled	PackageListView		Kaldırıldı
 It was not possible to create the new user.	UserLoginWindow		Yeni kullanıcı oluşturulamadı.
 Available packages	MainWindow		Kullanılabilir paketler
 Create account	UserLoginWindow		Hesap oluştur
-OK	App		Tamam
 Mostly stable	RatePackageWindow		Çoğunlukla kararlı
+OK	App		Tamam
 The response to the captcha was incorrect.	ServerHelper		Captcha yanıtı yanlış.
 Develop packages	MainWindow		Geliştirme paketleri
 Rate package…	PackageInfoView		Paketi derecelendir…
@@ -25,8 +25,8 @@ Synchronizing icons	ServerIconExportUpdateProcess		Simgeler eşitleniyor
 Does not start	RatePackageWindow		Başlamıyor
 Show	MainWindow		Göster
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Paket listesi alınırken bir hata oluştu: %message%
-Not specified	RatePackageWindow		Belirtilmemiş
 Unstable but usable	RatePackageWindow		Kararlı değil fakat kullanılabilir
+Not specified	RatePackageWindow		Belirtilmemiş
 Active	PackageListView		Etkin
 Login or Create account	MainWindow		Giriş yap veya hesap oluştur
 <Package contents not available for remote packages>	PackageContentsView		<Uzaktaki paketler için paket içeriği mevcut değil>
@@ -112,8 +112,8 @@ Your rating was updated.	RatePackageWindow		Derecelendirmeniz güncellendi.
 All categories	FilterView		Tüm kategoriler
 Repositories	MainWindow		Depolar
 n/a	PackageInfoView		yok
-Cancel	MainWindow		İptal
 View agreed usage conditions…	MainWindow		Kabul edilen kullanım koşullarını görüntüle…
+Cancel	MainWindow		İptal
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 tane daha indirilecek)}other{(# tane daha indirilecek)}}
 Refresh repositories	MainWindow		Depoları yenile
 Tools	MainWindow		Araçlar

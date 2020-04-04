@@ -1,5 +1,5 @@
-1	italian	x-vnd.mmu.AutoRaise	628946002
-AutoRaise, (c) 2002, mmu_man\nEnjoy :-)	AutoRaiseIcon		AutoRaise, (c) 2002, mmu_man\nEnjoy :-)
+1	italian	x-vnd.mmu.AutoRaise	3527604525
+AutoRaise, (c) 2002, mmu_man\nEnjoy :-)	AutoRaiseIcon		AutoRaise, (c) 2002, mmu_man\nBuon divertimento :-)
 2 s	AutoRaiseIcon		2 s
 OK	AutoRaiseIcon		OK
 AutoRaise	System name		AutoRaise
@@ -7,11 +7,19 @@ AutoRaise	System name		AutoRaise
 1 s	AutoRaiseIcon		1 s
 Delay	AutoRaiseIcon		Ritardo
 5 s	AutoRaiseIcon		5 s
+Active	AutoRaiseIcon		Attivo
 0.1 s	AutoRaiseIcon		0.1 s
 Default (all windows)	AutoRaiseIcon		Predefinito (tutte le finestre)
+Instant warping (ffm)	AutoRaiseIcon		Warp istantaneo (ffm)
 About AutoRaise…	AutoRaiseIcon		Informazioni su AutoRaise…
 Normal	AutoRaiseIcon		Normale
 0.5 s	AutoRaiseIcon		0.5 s
+Deskbar only (touch)	AutoRaiseIcon		Solo il Deskbar (al tocco)
 4 s	AutoRaiseIcon		4 s
+Focus follows mouse	AutoRaiseIcon		Focus segue il mouse
+Deskbar only (over its area)	AutoRaiseIcon		Solo il Deskbar (al passaggio)
+Inactive behaviour	AutoRaiseIcon		Comportamento inattivo
+Mode	AutoRaiseIcon		Modalità
+Warping (ffm)	AutoRaiseIcon		Warp (ffm)
 Remove from tray	AutoRaiseIcon		Rimuovi dal tray
 3 s	AutoRaiseIcon		3 s
