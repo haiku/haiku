@@ -314,6 +314,7 @@ enum {
 
 #define ACPI_DEVICE_ADDR_ITEM	"acpi/addr"
 #define ACPI_DEVICE_CID_ITEM	"acpi/cid"
+#define ACPI_DEVICE_HANDLE_ITEM	"acpi/handle"
 #define ACPI_DEVICE_HID_ITEM	"acpi/hid"
 #define ACPI_DEVICE_PATH_ITEM	"acpi/path"
 #define ACPI_DEVICE_TYPE_ITEM	"acpi/type"
