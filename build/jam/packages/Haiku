@@ -33,6 +33,7 @@ AddFilesToPackage add-ons kernel busses agp_gart : <agp_gart>intel@x86,x86_64 ;
 AddFilesToPackage add-ons kernel busses ata
 	: generic_ide_pci it8211 legacy_sata silicon_image_3112 highpoint_ide_pci ide_isa@x86 ;
 
+AddFilesToPackage add-ons kernel busses i2c : pch_i2c@x86,x86_64 ;
 AddFilesToPackage add-ons kernel busses random : virtio_rng ;
 AddFilesToPackage add-ons kernel busses scsi : ahci virtio_scsi ;
 AddFilesToPackage add-ons kernel busses usb : <usb>uhci <usb>ohci <usb>ehci
