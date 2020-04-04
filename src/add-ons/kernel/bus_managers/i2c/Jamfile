@@ -1,0 +1,11 @@
+SubDir HAIKU_TOP src add-ons kernel bus_managers i2c ;
+
+UsePrivateHeaders i2c ;
+UsePrivateKernelHeaders ;
+
+KernelAddon i2c :
+	I2CBus.cpp
+	I2CDevice.cpp
+	I2CModule.cpp
+	bus_raw.cpp
+	;
