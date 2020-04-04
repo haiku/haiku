@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src add-ons kernel busses i2c ;
+
+SubDirC++Flags -fno-rtti ;
+
+UsePrivateHeaders i2c ;
+UsePrivateKernelHeaders ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) bus_managers acpi acpica include ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) bus_managers acpi acpica include platform ] ;
+
+KernelAddon pch_i2c :
+	pch_i2c.cpp
+	pch_i2c_acpi.cpp
+	pch_i2c_pci.cpp
+;

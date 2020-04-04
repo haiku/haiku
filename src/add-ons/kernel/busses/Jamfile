@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src add-ons kernel busses ;
 
 SubInclude HAIKU_TOP src add-ons kernel busses ata ;
 SubInclude HAIKU_TOP src add-ons kernel busses agp_gart ;
+SubInclude HAIKU_TOP src add-ons kernel busses i2c ;
 SubInclude HAIKU_TOP src add-ons kernel busses mmc ;
 SubInclude HAIKU_TOP src add-ons kernel busses random ;
 SubInclude HAIKU_TOP src add-ons kernel busses scsi ;

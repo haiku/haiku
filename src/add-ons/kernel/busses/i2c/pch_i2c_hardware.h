@@ -1,0 +1,103 @@
+/*
+ * Copyright 2020, Jérôme Duval, jerome.duval@gmail.com.
+ *
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef _PCH_I2C_HARDWARE_H
+#define _PCH_I2C_HARDWARE_H
+
+
+#define PCH_IC_CON				0x00
+#define PCH_IC_CON_MASTER			0x1
+#define PCH_IC_CON_SPEED_STD		0x2
+#define PCH_IC_CON_SPEED_FAST		0x4
+#define PCH_IC_CON_SPEED_HIGH		0x6
+#define PCH_IC_CON_10BIT_ADDR_MASTER 0x10
+#define PCH_IC_CON_RESTART_EN		0x20
+#define PCH_IC_CON_SLAVE_DISABLE	0x40
+#define PCH_IC_CON_TX_EMPTY_CTRL	0x100
+#define PCH_IC_TAR				0x04
+#define PCH_IC_HS_MADDR			0x08
+#define PCH_IC_DATA_CMD			0x10
+#define PCH_IC_DATA_CMD_READ		(1 << 8)
+#define PCH_IC_DATA_CMD_STOP		(1 << 9)
+#define PCH_IC_DATA_CMD_RESTART		(1 << 10)
+#define PCH_IC_SS_SCL_HCNT		0x14
+#define PCH_IC_SS_SCL_LCNT		0x18
+#define PCH_IC_FS_SCL_HCNT		0x1c
+#define PCH_IC_FS_SCL_LCNT		0x20
+#define PCH_IC_HS_SCL_HCNT		0x24
+#define PCH_IC_HS_SCL_LCNT		0x28
+#define PCH_IC_INTR_STAT		0x2c
+#define PCH_IC_INTR_STAT_RX_UNDER	(1 << 0)
+#define PCH_IC_INTR_STAT_RX_OVER	(1 << 1)
+#define PCH_IC_INTR_STAT_RX_FULL	(1 << 2)
+#define PCH_IC_INTR_STAT_TX_OVER	(1 << 3)
+#define PCH_IC_INTR_STAT_TX_EMPTY	(1 << 4)
+#define PCH_IC_INTR_STAT_RD_REQ		(1 << 5)
+#define PCH_IC_INTR_STAT_TX_ABRT	(1 << 6)
+#define PCH_IC_INTR_STAT_RX_DONE	(1 << 7)
+#define PCH_IC_INTR_STAT_ACTIVITY	(1 << 8)
+#define PCH_IC_INTR_STAT_STOP_DET	(1 << 9)
+#define PCH_IC_INTR_STAT_START_DET	(1 << 10)
+#define PCH_IC_INTR_STAT_GEN_CALL	(1 << 11)
+#define PCH_IC_INTR_STAT_MST_ON_HOLD	(1 << 13)
+
+#define PCH_IC_INTR_MASK		0x30
+#define PCH_IC_RAW_INTR_STAT	0x34
+#define PCH_IC_RX_TL			0x38
+#define PCH_IC_TX_TL			0x3c
+#define PCH_IC_CLR_INTR			0x40
+#define PCH_IC_CLR_RX_UNDER		0x44
+#define PCH_IC_CLR_RX_OVER		0x48
+#define PCH_IC_CLR_TX_OVER		0x4c
+#define PCH_IC_CLR_RD_REQ		0x50
+#define PCH_IC_CLR_TX_ABRT		0x54
+#define PCH_IC_CLR_RX_DONE		0x58
+#define PCH_IC_CLR_ACTIVITY		0x5c
+#define PCH_IC_CLR_STOP_DET		0x60
+#define PCH_IC_CLR_START_DET	0x64
+#define PCH_IC_CLR_GEN_CALL		0x68
+#define PCH_IC_ENABLE			0x6c
+#define PCH_IC_STATUS			0x70
+#define PCH_IC_STATUS_ACTIVITY		0x1
+#define PCH_IC_TXFLR			0x74
+#define PCH_IC_RXFLR			0x78
+#define PCH_IC_SDA_HOLD			0x7c
+#define PCH_IC_TX_ABRT_SOURCE	0x80
+#define PCH_IC_DMA_CR			0x88
+#define PCH_IC_DMA_TDLR			0x8c
+#define PCH_IC_DMA_RDLR			0x90
+#define PCH_IC_ACK_GENERAL_CALL	0x98
+#define PCH_IC_ENABLE_STATUS	0x9c
+#define PCH_IC_FS_SPKLEN		0xa0
+#define PCH_IC_CLR_RESTRART_DET	0xa8
+#define PCH_IC_COMP_PARAM1		0xf4
+#define PCH_IC_COMP_PARAM1_RX(x)	(1 + (((x) >> 8) & 0xff))
+#define PCH_IC_COMP_PARAM1_TX(x)	(1 + (((x) >> 16) & 0xff))
+#define PCH_IC_COMP_VERSION		0xf8
+#define PCH_IC_COMP_VERSION_MIN	0x3131312a
+
+#define PCH_SUP_RESETS			0x204
+#define PCH_SUP_RESETS_FUNC				0x3
+#define PCH_SUP_RESETS_IDMA				0x4
+#define PCH_SUP_ACTIVELTR_VALUE	0x210
+#define PCH_SUP_IDLELTR_VALUE	0x214
+#define PCH_SUP_TX_ACK_COUNT	0x218
+#define PCH_SUP_RX_BYTE_COUNT	0x21c
+#define PCH_SUP_TX_COMPLETE_INTR_STAT	0x220
+#define PCH_SUP_TX_COMPLETE_INTR_CLR	0x224
+#define PCH_SUP_SW_SCRATCH_0	0x228
+#define PCH_SUP_SW_SCRATCH_1	0x22c
+#define PCH_SUP_SW_SCRATCH_2	0x230
+#define PCH_SUP_SW_SCRATCH_3	0x234
+#define PCH_SUP_CLOCK_GATE		0x238
+#define PCH_SUP_REMAP_ADDR_LO	0x240
+#define PCH_SUP_REMAP_ADDR_HI	0x244
+#define PCH_SUP_DEVIDLE_CONTROL	0x24c
+#define PCH_SUP_CAPABLITIES		0x2fc
+#define PCH_SUP_CAPABLITIES_TYPE_MASK	0xf
+#define PCH_SUP_CAPABLITIES_TYPE_SHIFT	4
+
+
+#endif // _PCH_I2C_HARDWARE_H
