@@ -1,0 +1,467 @@
+/*
+ * Copyright 2020 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *
+ * Reviewers:
+ * 		Adrien Destugues, pulkomandy@pulkomandy.tk
+ *
+ * Corresponds to:
+ *		headers/os/interface/LayoutBuilder.h	 rev 49977
+ */
+
+
+/*!
+	\class BLayoutBuilder::Cards<>
+	\ingroup layout
+	\ingroup libbe
+	\brief BLayoutBuilder::Base subclass for building BCardLayouts.
+
+	\since Haiku R1
+
+    The BCardLayout class is a simple BLayout subclass that arranges the
+    items as a stack of cards with only one card being on top and visible to
+    the user.
+
+	For a detailed view on the properties, see the \link BCardLayout class
+	description\endlink.
+*/
+
+
+/*!
+	\typedef BLayoutBuilder::Cards<ParentBuilder>::ThisBuilder
+	\brief Shorthand representing the type of \c this.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\typedef BLayoutBuilder::Cards<ThisBuilder>::GroupBuilder
+	\brief Shorthand for builders returned by this builder's AddGroup() methods.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\typedef BLayoutBuilder::Cards<ThisBuilder>::GridBuilder
+	\brief Shorthand for builders returned by this builder's AddGrid() methods.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\typedef BLayoutBuilder::Cards<ThisBuilder>::SplitBuilder
+	\brief Shorthand for builders returned by this builder's AddSplit() methods.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\typedef BLayoutBuilder::Cards<ThisBuilder>::CardBuilder
+	\brief Shorthand for builders returned by this builder's AddCards()
+		methods.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\name Constructors
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BLayoutBuilder::Cards<ParentBuilder>::Cards()
+	\brief Creates a builder for BCardLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BLayoutBuilder::Cards<ParentBuilder>::Cards(BWindow* window)
+	\brief Creates a new builder for BCardLayout, and attaches it to a
+		\a window.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BLayoutBuilder::Cards<ParentBuilder>::Cards(BView* view)
+	\brief Creates a new builder for BCardLayout, and attaches it to a
+		\a view.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BLayoutBuilder::Cards<ParentBuilder>::Cards(BCardLayout* layout)
+	\brief Creates a builder targeting an existing BCardLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BLayoutBuilder::Cards<ParentBuilder>::Cards(BCardLayout* layout)
+	\brief Creates a builder targeting an existing BCardView.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Accessors
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BCardLayout* BLayoutBuilder::Cards<ParentBuilder>::Layout() const
+	\brief Get a pointer to the underlying BCardLayout
+
+	\returns A pointer to the underlying BCardLayout
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BView* BLayoutBuilder::Cards<ParentBuilder>::View() const
+	\brief Get a pointer to the underlying BView.
+
+	\returns A pointer to the underlying BView
+
+	\since Haiku R1
+*/
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Cards<ParentBuilder>::GetLayout(
+		BCardLayout** _layout)
+	\brief Get a pointer to the underlying view.
+
+	\param[out] _layout Location to store the underlying BCardView reference.
+
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Cards<ParentBuilder>::GetView(
+		BView** _view)
+	\brief Get a pointer to the underlying view.
+
+	\param[out] _view Location to store the underlying BView reference.
+
+	\return The method returns a self reference, so that calls to the builder
+		may be chained.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BLayoutBuilder::Cards<ParentBuilder>::operator BCardLayout*()
+	\brief Cast this builder into the BCardLayout it represents.
+
+	\since Haiku R1
+*/
+
+//! @}
+
+
+/*!
+	\name Adding BViews and BLayoutItems
+*/
+
+
+//! @{
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Cards<ParentBuilder>::Add(BView* view)
+	\brief Add a \a view to the underlying BCardLayout.
+
+	The layout item will be added as a card at the end of the stack.
+
+	\param view The BView to be added. The underlying BCardLayout will take
+		ownership of the object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Cards<ParentBuilder>::Add(
+		BLayoutItem* item)
+	\brief Add a \a item to the underlying BCardLayout.
+
+	The layout item will be added as a card at the end of the stack.
+
+	\param item The BLayoutItem to be added. The underlying BCardLayout will
+		take ownership of the object.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Adding BLayouts and their BView Pairs
+
+	A set of methods that add a BLayout or BView subclass and return a
+	BLayoutBuilder::Base subclass representing the newly added object. These
+	methods push a new builder on top of the stack, you will not be using
+	\c this builder again until you call End().
+*/
+
+
+//! @{
+
+
+/*!
+	\fn GroupBuilder BLayoutBuilder::Cards<ParentBuilder>::AddGroup(
+		orientation orientation, float spacing)
+	\brief Construct and add a viewless BGroupLayout, then return a GroupBuilder
+	       representing the newly added layout.
+
+	\param orientation The orientation to use for the new BGroupLayout.
+	\param spacing The spacing to use for the new BGroupLayout.
+
+	\returns A GroupBuilder representing the newly created BGroupLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn GroupBuilder BLayoutBuilder::Cards<ParentBuilder>::AddGroup(
+		BGroupView* groupView)
+	\brief Add BGroupView and return a builder representing the newly added
+	       BGroupView.
+
+	\param groupView The BGroupView to be added.
+
+	\returns A GroupBuilder representing \a groupView.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn GroupBuilder BLayoutBuilder::Cards<ParentBuilder>::AddGroup(
+		BGroupLayout* groupLayout)
+	\brief Add a BGroupLayout and return a builder representing the newly added
+	       BGroupLayout.
+
+	\param groupLayout The BGroupLayout to be added.
+
+	\returns A GroupBuilder representing \a groupLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn GridBuilder	BLayoutBuilder::Cards<ParentBuilder>::AddGrid(
+		float horizontalSpacing, float verticalSpacing)
+	\brief Create and add a viewless BGridLayout, then return a builder
+	       representing the newly created BGridLayout.
+
+	\param horizontalSpacing The horizontal spacing for the new BGridLayout.
+	\param verticalSpacing The vertical spacing for the new BGridLayout.
+
+	\returns A GridBuilder representing the newly created BGridLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn GridBuilder BLayoutBuilder::Cards<ParentBuilder>::AddGrid(
+		BGridLayout* gridLayout)
+	\brief Add a BGridLayout, then return a builder the newly added BGridLayout.
+
+	\param gridLayout The BGridLayout to be added and used to construct the
+		returned GridBuilder.
+
+	\returns A GridBuilder representing \a gridLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn GridBuilder	BLayoutBuilder::Cards<ParentBuilder>::AddGrid(
+		BGridView* gridView)
+	\brief Add a BGridView, then return a builder the newly added BGridView.
+
+	\param gridView The BGridView to be added and used to construct the
+		returned GridBuilder.
+
+	\returns A GridBuilder representing \a gridView.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn SplitBuilder BLayoutBuilder::Cards<ParentBuilder>::AddSplit(
+		orientation orientation, float spacing)
+	\brief Create and add a new BSplitView with a weight of \c weight, then
+		return a SplitBuilder representing the new BSplitView.
+
+	\param orientation The orientation of the new BSplitView.
+	\param spacing The spacing of the new BSplitView.
+
+	\returns A SplitBuilder representing the new BSplitView.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn SplitBuilder BLayoutBuilder::Cards<ParentBuilder>::AddSplit(
+		BSplitView* splitView)
+	\brief Add a BSplitView to the BSplitView this builder represents and
+		return a SplitBuilder representing the BSplitView.
+
+	\param splitView The BSplitView to be added.
+
+	\returns A SplitBuilder representing the new BSplitView.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn CardBuilder BLayoutBuilder::Cards<ParentBuilder>::AddCards()
+	\brief Add a new BCardLayout as a child of the BCardLayout this builder
+		represents and return a CardBuilder representing the new layout.
+
+	\returns A CardBuilder representing the new BCardLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn CardBuilder BLayoutBuilder::Cards<ParentBuilder>::AddCards(
+		BCardLayout* cardLayout)
+	\brief Add a new BCardLayout as a child of the BCardLayout this builder
+		represents and return a CardBuilder representing the new layout.
+
+	\param cardLayout The existing layout that will be added to the underlying
+		BSplitView.
+
+	\returns A CardBuilder representing the new BCardLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn CardBuilder BLayoutBuilder::Cards<ParentBuilder>::AddCards(
+		BCardView* cardView)
+	\brief Add a new BCardLayout as a child of the BCardLayout this builder
+		represents and return a CardBuilder representing the new layout.
+
+	\param cardView The existing view that will be added to the underlying
+		BSplitView.
+
+	\returns A CardBuilder representing the new BCardLayout.
+
+	\since Haiku R1
+*/
+
+
+
+//! @}
+
+
+/*!
+	\name Setting Explicit Sizes
+*/
+
+
+//! @{
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Cards<ParentBuilder>::SetExplicitMinSize(
+		BSize size)
+	\brief Set the explicit minimum size of the underlying layout item.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Cards<ParentBuilder>::SetExplicitMaxSize(
+		BSize size)
+	\brief Set the explicit maximum size of the underlying layout item.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Cards<ParentBuilder>::SetExplicitPreferredSize(
+		BSize size)
+	\brief Set the explicit preferred size of the underlying layout item.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Cards<ParentBuilder>::SetExplicitAlignment(
+		BAlignment alignment)
+	\brief Set the explicit alignment of the underlying layout item.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Visible Item
+*/
+
+
+//! @{
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Cards<ParentBuilder>::SetVisibleItem(
+		int32 index)
+	\brief Set the current visible item to the item at \a index.
+
+	\see BCardLayout::SetVisibleItem(int32)
+*/
+
+
+//! @}

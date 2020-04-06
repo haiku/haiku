@@ -1,9 +1,12 @@
 /*
- * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Copyright 2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Name, email@email.com
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *
+ * Reviewers:
+ * 		Adrien Destugues, pulkomandy@pulkomandy.tk
  *
  * Corresponds to:
  *		headers/os/interface/CardView.h	hrev49943
@@ -11,12 +14,10 @@
  */
 
 
-
-
 /*!
 	\file CardView.h
 	\ingroup layout
-	\brief Undocumented file.
+	\brief Provides the BCardView class.
 
 	\since Haiku R1
 */
@@ -26,7 +27,19 @@
 	\class BCardView
 	\ingroup layout
 	\ingroup libbe
-	\brief Undocumented class.
+	\brief Container view for a stack of alternating child views.
+
+	This class is a convencience class, that creates a BView with a BCardLayout
+	set up by default.
+
+	The card container holds zero or more child views and organizes them like a
+	stack of cards. Each child view is a card, and only one card can be on top,
+	meaning that it is visible and available for interaction by the user. When
+	there are no cards, or no card is on top, then the system's default gray
+	background is displayed.
+
+	\see BCardLayout for more information on how and when to use this
+		type of container.
 
 	\since Haiku R1
 */
@@ -34,10 +47,7 @@
 
 /*!
 	\fn BCardView::BCardView()
-	\brief Undocumented public method
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\brief Creates a new card view.
 
 	\since Haiku R1
 */
@@ -45,12 +55,9 @@
 
 /*!
 	\fn BCardView::BCardView(const char *name)
-	\brief Undocumented public method
+	\brief Creates a new card view with the given \a name.
 
-	\param name Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\param name The name for the card view.
 
 	\since Haiku R1
 */
@@ -58,33 +65,28 @@
 
 /*!
 	\fn BCardView::BCardView(BMessage *from)
-	\brief Undocumented public method
+	\brief Unarchive a card view.
 
-	\param from Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\param from The \ref BMessage that contains the card view.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn virtual virtual BCardView::~BCardView()
-	\brief Undocumented public method
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\fn virtual BCardView::~BCardView()
+	\brief Destructor
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn virtual virtual void BCardView::SetLayout(BLayout *layout)
-	\brief Undocumented public method
+	\fn virtual void BCardView::SetLayout(BLayout *layout)
+	\brief Adopt a given card \a layout.
 
-	\param layout Undocumented
+	\param layout The layout to set to. This must be a BCardLayout, or a
+		derivative. Any other layout types will be ignored.
 
 	\since Haiku R1
 */
@@ -92,37 +94,25 @@
 
 /*!
 	\fn BCardLayout* BCardView::CardLayout() const
-	\brief Undocumented public method
+	\brief Get a pointer to the underlying BCardLayout.
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
-*/
-
-
-/*!
-	\fn virtual virtual status_t BCardView::Perform(perform_code d, void *arg)
-	\brief Undocumented public method
-
-	\param d Undocumented
-	\param arg Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\return A pointer to the underlying card layout.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn static static BArchivable* BCardView::Instantiate(BMessage *from)
-	\brief Undocumented public method
+	\fn virtual status_t BCardView::Perform(perform_code d, void *arg)
+	\brief Perform some action. (Internal Method)
 
-	\param from Undocumented
+	Reimplemented from BView::Perform()
+*/
 
-	\return Undocumented
-	\retval <value> Undocumented
+
+/*!
+	\fn static BArchivable* BCardView::Instantiate(BMessage *from)
+	\brief Instantiate the view from the message \a from.
 
 	\since Haiku R1
 */

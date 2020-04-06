@@ -72,8 +72,11 @@ BCardLayout::SetVisibleItem(BLayoutItem* item)
 	if (item == fVisibleItem)
 		return;
 
-	if (item != NULL && IndexOfItem(item) < 0)
+	if (item != NULL && IndexOfItem(item) < 0) {
+		debugger("BCardLayout::SetVisibleItem(BLayoutItem*): this item is not "
+			"part of this layout, or the item does not exist.");
 		return;
+	}
 
 	if (fVisibleItem != NULL)
 		fVisibleItem->SetVisible(false);

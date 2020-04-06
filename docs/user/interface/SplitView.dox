@@ -99,7 +99,7 @@
 
 
 /*!
-	\fn virtual virtual BSplitView::~BSplitView()
+	\fn virtual BSplitView::~BSplitView()
 	\brief Destructor.
 
 	\since Haiku R1
@@ -460,7 +460,7 @@
 
 
 /*!
-	\fn virtual virtual void BSplitView::AttachedToWindow()
+	\fn virtual void BSplitView::AttachedToWindow()
 	\brief Hook method overridden from BView.
 
 	\since Haiku R1
@@ -468,7 +468,7 @@
 
 
 /*!
-	\fn virtual virtual void BSplitView::Draw(BRect updateRect)
+	\fn virtual void BSplitView::Draw(BRect updateRect)
 	\brief Hook method overridden from BView.
 
 	\since Haiku R1
@@ -476,7 +476,7 @@
 
 
 /*!
-	\fn virtual virtual void BSplitView::DrawAfterChildren(BRect updateRect)
+	\fn virtual void BSplitView::DrawAfterChildren(BRect updateRect)
 	\brief Hook method overridden from BView.
 
 	\since Haiku R1
@@ -484,7 +484,7 @@
 
 
 /*!
-	\fn virtual virtual void BSplitView::MouseDown(BPoint where)
+	\fn virtual void BSplitView::MouseDown(BPoint where)
 	\brief Hook method overridden from BView.
 
 	\since Haiku R1
@@ -492,7 +492,7 @@
 
 
 /*!
-	\fn virtual virtual void BSplitView::MouseUp(BPoint where)
+	\fn virtual void BSplitView::MouseUp(BPoint where)
 	\brief Hook method overridden from BView.
 
 	\since Haiku R1
@@ -500,7 +500,7 @@
 
 
 /*!
-	\fn virtual virtual void BSplitView::MouseMoved(BPoint where, uint32 transit, const BMessage *message)
+	\fn virtual void BSplitView::MouseMoved(BPoint where, uint32 transit, const BMessage *message)
 	\brief Hook method overridden from BView.
 
 	\since Haiku R1
@@ -508,7 +508,7 @@
 
 
 /*!
-	\fn virtual virtual void BSplitView::MessageReceived(BMessage *message)
+	\fn virtual void BSplitView::MessageReceived(BMessage *message)
 	\brief Hook method overridden from BView.
 
 	\since Haiku R1
@@ -516,7 +516,7 @@
 
 
 /*!
-	\fn virtual virtual void BSplitView::SetLayout(BLayout *layout)
+	\fn virtual void BSplitView::SetLayout(BLayout *layout)
 	\brief Hook method overridden from BView.
 
 	\since Haiku R1
@@ -524,13 +524,13 @@
 
 
 /*!
-	\fn virtual virtual status_t BSplitView::Archive(BMessage *into, bool deep=true) const
+	\fn virtual status_t BSplitView::Archive(BMessage *into, bool deep=true) const
 	\copydoc BArchivable::Archive()
 */
 
 
 /*!
-	\fn virtual virtual status_t BSplitView::Perform(perform_code d, void *arg)
+	\fn virtual status_t BSplitView::Perform(perform_code d, void *arg)
 	\brief Hook method overridden from BView.
 
 	\since Haiku R1
@@ -538,7 +538,7 @@
 
 
 /*!
-	\fn static static BArchivable* BSplitView::Instantiate(BMessage *from)
+	\fn static BArchivable* BSplitView::Instantiate(BMessage *from)
 	\brief Instantiate the view from the message \a from.
 
 	\since Haiku R1
@@ -546,7 +546,7 @@
 
 
 /*!
-	\fn virtual virtual status_t BSplitView::AllArchived(BMessage *into) const
+	\fn virtual status_t BSplitView::AllArchived(BMessage *into) const
 	\brief Hook method overridden from BArchivable.
 
 	\since Haiku R1
@@ -554,7 +554,7 @@
 
 
 /*!
-	\fn virtual virtual status_t BSplitView::AllUnarchived(const BMessage *from)
+	\fn virtual status_t BSplitView::AllUnarchived(const BMessage *from)
 	\brief Hook method overridden from BArchivable.
 
 	\since Haiku R1
@@ -562,7 +562,7 @@
 
 
 /*!
-	\fn virtual virtual void BSplitView::DrawSplitter(BRect frame, const BRect &updateRect, orientation orientation, bool pressed)
+	\fn virtual void BSplitView::DrawSplitter(BRect frame, const BRect &updateRect, orientation orientation, bool pressed)
 	\brief Hook method called when the splitter needs to be drawn.
 
 	This method is called in the context of a \ref BView::Draw() operation.

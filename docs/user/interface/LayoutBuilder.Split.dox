@@ -89,18 +89,6 @@
 
 
 /*!
-	\fn BLayoutBuilder::Split<ParentBuilder>::Split(orientation orientation,
-		float spacing)
-	\brief Creates a builder for a new BSplitView.
-
-	\param orientation The orientation for the new BSplitView.
-	\param spacing The spacing for the new BSplitView.
-
-	\since Haiku R1
-*/
-
-
-/*!
 	\fn BLayoutBuilder::Split<ParentBuilder>::Split(BSplitView *view)
 	\brief Creates a builder for an existing BSplitView
 

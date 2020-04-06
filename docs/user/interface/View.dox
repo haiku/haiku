@@ -4351,6 +4351,9 @@ SetViewColor(Parent()->ViewColor());
 	\fn status_t BView::Perform(perform_code code, void* _data)
 	\brief Perform some action. (Internal Method)
 
+	This method is available to allow classes to be extended while maintaining
+	binary compatibility.
+
 	The following perform codes are recognized:
 		- \c PERFORM_CODE_MIN_SIZE:
 		- \c PERFORM_CODE_MAX_SIZE:

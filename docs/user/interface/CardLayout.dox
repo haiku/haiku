@@ -1,9 +1,12 @@
 /*
- * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Copyright 2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Name, email@email.com
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *
+ * Reviewers:
+ * 		Adrien Destugues, pulkomandy@pulkomandy.tk
  *
  * Corresponds to:
  *		headers/os/interface/CardLayout.h	hrev43514
@@ -13,8 +16,9 @@
 
 /*!
 	\file CardLayout.h
+	\ingroup interface
 	\ingroup layout
-	\brief Undocumented file.
+	\brief Provides the BCardLayout class.
 
 	\since Haiku R1
 */
@@ -24,7 +28,26 @@
 	\class BCardLayout
 	\ingroup layout
 	\ingroup libbe
-	\brief Undocumented class.
+	\brief The BCardLayout class is a simple BLayout subclass that
+		arranges the items as a stack of cards with only one card being on top
+		and visible to the user.
+
+	Once you have set up the items in the container, you can select which one
+	is visible using the SetVisibleItem() methods on this class. When there is
+	no item on top, the system's default grey background is shown.
+
+	This view is useful when you have a number of pre-loaded UI elements, and
+	you want to be able to swap between them quickly, while retaining the
+	underlying state. The container itself will retain a fixed size, so from a
+	visual perspective, it is imperative that the items in the stack have
+	comparable dimensions.
+
+	An example usage is for a configuration wizard, where the user will need to
+	complete a number of steps to perform an action. Because you want to the
+	user to experience all these steps as a smooth flow within one window, you
+	can set up the individual pages as views, and add these as cards to the
+	card layout. Then you tie the \em Next and \em Previous buttons to switch
+	between the visible cards using the BCardLayout::SetVisible() methods.
 
 	\since Haiku R1
 */
@@ -32,10 +55,7 @@
 
 /*!
 	\fn BCardLayout::BCardLayout()
-	\brief Undocumented public method
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\brief Create a new card layout.
 
 	\since Haiku R1
 */
@@ -43,12 +63,13 @@
 
 /*!
 	\fn BCardLayout::BCardLayout(BMessage *from)
-	\brief Undocumented public method
+	\brief Constructs a BCardLayout \a from an archive message.
 
-	\param from Undocumented
+	This method is usually not called directly, if you want to build a
+	check box from an archived message you should call Instantiate() instead
+	because it can handle errors properly.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\param from The \ref BMessage that contains the card layout.
 
 	\since Haiku R1
 */
@@ -56,10 +77,7 @@
 
 /*!
 	\fn virtual virtual BCardLayout::~BCardLayout()
-	\brief Undocumented public method
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\brief Destructor.
 
 	\since Haiku R1
 */
@@ -67,10 +85,10 @@
 
 /*!
 	\fn BLayoutItem* BCardLayout::VisibleItem() const
-	\brief Undocumented public method
+	\brief Get a pointer to the currently visible item.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return This method returns a pointer to the currently visible
+		layout item, or \c NULL if there is no card visible.
 
 	\since Haiku R1
 */
@@ -78,10 +96,9 @@
 
 /*!
 	\fn int32 BCardLayout::VisibleIndex() const
-	\brief Undocumented public method
+	\brief Get the index of the currently visible item.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\return Returns the zero-based index, or -1 if there is no item visible.
 
 	\since Haiku R1
 */
@@ -89,9 +106,12 @@
 
 /*!
 	\fn void BCardLayout::SetVisibleItem(int32 index)
-	\brief Undocumented public method
+	\brief Set the current visible item to the item at \a index.
 
-	\param index Undocumented
+	\param index This is a zero-based index for the item you want to display.
+		If the item does not exist (it is lower than 0 or it is higher than
+		the number of items), no item will be displayed and the view will reset
+		to the default grey background.
 
 	\since Haiku R1
 */
@@ -99,217 +119,153 @@
 
 /*!
 	\fn void BCardLayout::SetVisibleItem(BLayoutItem *item)
-	\brief Undocumented public method
+	\brief Set the current visible item to \a item.
 
-	\param item Undocumented
-
-	\since Haiku R1
-*/
-
-
-/*!
-	\fn virtual virtual BSize BCardLayout::BaseMinSize()
-	\brief Undocumented public method
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\param item A pointer to an item that is already added to this
+		layout. When a reference to an item not on the stack, or \c NULL is
+		passed, then no item will be displayed and the view will reset to the
+		default grey background.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn virtual virtual BSize BCardLayout::BaseMaxSize()
-	\brief Undocumented public method
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\fn virtual BSize BCardLayout::BaseMinSize()
+	\brief Overridden hook method from BAbstractLayout.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn virtual virtual BSize BCardLayout::BasePreferredSize()
-	\brief Undocumented public method
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\fn virtual BSize BCardLayout::BaseMaxSize()
+	\brief Overridden hook method from BAbstractLayout.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn virtual virtual BAlignment BCardLayout::BaseAlignment()
-	\brief Undocumented public method
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\fn virtual BSize BCardLayout::BasePreferredSize()
+	\brief Overridden hook method from BAbstractLayout.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn virtual virtual bool BCardLayout::HasHeightForWidth()
-	\brief Undocumented public method
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\fn virtual BAlignment BCardLayout::BaseAlignment()
+	\brief Overridden hook method from BAbstractLayout.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn virtual virtual void BCardLayout::GetHeightForWidth(float width, float *min, float *max, float *preferred)
-	\brief Undocumented public method
-
-	\param width Undocumented
-	\param min Undocumented
-	\param max Undocumented
-	\param preferred Undocumented
+	\fn virtual bool BCardLayout::HasHeightForWidth()
+	\brief Overridden hook method from BAbstractLayout.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn virtual virtual status_t BCardLayout::Archive(BMessage *into, bool deep=true) const
-	\brief Undocumented public method
-
-	\param into Undocumented
-	\param deep Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\fn virtual void BCardLayout::GetHeightForWidth(float width, float *min, float *max, float *preferred)
+	\brief Overridden hook method from BAbstractLayout.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn virtual virtual status_t BCardLayout::Perform(perform_code d, void *arg)
-	\brief Undocumented public method
+	\fn virtual status_t BCardLayout::Archive(BMessage *into, bool deep=true) const
+	\brief Archive this layout \a into a BMessage.
 
-	\param d Undocumented
-	\param arg Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\param into The message to which to archive into.
+	\param deep When \c true, the children of this layout will also be added.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn static static BArchivable* BCardLayout::Instantiate(BMessage *from)
-	\brief Undocumented public method
-
-	\param from Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\fn virtual status_t BCardLayout::Perform(perform_code d, void *arg)
+	\brief Overridden hook method from BAbstractLayout.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn virtual virtual status_t BCardLayout::AllArchived(BMessage *archive) const
-	\brief Undocumented protected method
-
-	\param archive Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\fn static BArchivable* BCardLayout::Instantiate(BMessage *from)
+	\brief Instantiate a BCardLayout object from message \a from.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn virtual virtual status_t BCardLayout::AllUnarchived(const BMessage *from)
-	\brief Undocumented protected method
-
-	\param from Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\fn virtual status_t BCardLayout::AllArchived(BMessage *archive) const
+	\brief Hook method overridden from BArchivable.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn virtual virtual status_t BCardLayout::ItemArchived(BMessage *into, BLayoutItem *item, int32 index) const
-	\brief Undocumented protected method
-
-	\param into Undocumented
-	\param item Undocumented
-	\param index Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\fn virtual status_t BCardLayout::AllUnarchived(const BMessage *from)
+	\brief Hook method overridden from BArchivable.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn virtual virtual status_t BCardLayout::ItemUnarchived(const BMessage *from, BLayoutItem *item, int32 index)
-	\brief Undocumented protected method
-
-	\param from Undocumented
-	\param item Undocumented
-	\param index Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\fn virtual status_t BCardLayout::ItemArchived(BMessage *into,
+		BLayoutItem *item, int32 index) const
+	\brief Hook method overridden from BArchivable.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn virtual virtual void BCardLayout::LayoutInvalidated(bool children=false)
-	\brief Undocumented protected method
-
-	\param children Undocumented
-
-	\since Haiku R1
-*/
-
-
-/*!
-	\fn virtual virtual void BCardLayout::DoLayout()
-	\brief Undocumented protected method
+	\fn virtual status_t BCardLayout::ItemUnarchived(const BMessage *from,
+		BLayoutItem *item, int32 index)
+	\brief Hook method overridden from BArchivable.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn virtual virtual bool BCardLayout::ItemAdded(BLayoutItem *item, int32 atIndex)
-	\brief Undocumented protected method
-
-	\param item Undocumented
-	\param atIndex Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\fn virtual void BCardLayout::LayoutInvalidated(bool children=false)
+	\brief Hook method overridden from BAbstractLayout.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn virtual virtual void BCardLayout::ItemRemoved(BLayoutItem *item, int32 fromIndex)
-	\brief Undocumented protected method
+	\fn virtual void BCardLayout::DoLayout()
+	\brief Hook method overridden from BAbstractLayout.
 
-	\param item Undocumented
-	\param fromIndex Undocumented
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual bool BCardLayout::ItemAdded(BLayoutItem *item, int32 atIndex)
+	\brief Hook method overridden from BAbstractLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual void BCardLayout::ItemRemoved(BLayoutItem *item, int32 fromIndex)
+	\brief Hook method overridden from BAbstractLayout.
 
 	\since Haiku R1
 */
