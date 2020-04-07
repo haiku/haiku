@@ -2276,10 +2276,11 @@ BPlusTree::Replace(Transaction& transaction, const uint8* key, uint16 keyLength,
 status_t
 BPlusTree::Find(const uint8* key, uint16 keyLength, off_t* _value)
 {
-	if (keyLength < BPLUSTREE_MIN_KEY_LENGTH
-		|| keyLength > BPLUSTREE_MAX_KEY_LENGTH
-		|| key == NULL)
+	if (key == NULL || keyLength < BPLUSTREE_MIN_KEY_LENGTH)
 		RETURN_ERROR(B_BAD_VALUE);
+
+	if (keyLength > BPLUSTREE_MAX_KEY_LENGTH)
+		RETURN_ERROR(B_NAME_TOO_LONG);
 
 	if (fAllowDuplicates)
 		RETURN_ERROR(B_BAD_TYPE);

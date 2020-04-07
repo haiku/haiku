@@ -383,7 +383,7 @@ NodeTest::InitTest1()
 		BDirectory pathDir(dirSuperLink);
 		CPPUNIT_ASSERT( pathDir.InitCheck() == B_OK );
 		BNode node(&pathDir, "");
-		CPPUNIT_ASSERT( node.InitCheck() == B_OK );
+		CPPUNIT_ASSERT(node.InitCheck() == B_ENTRY_NOT_FOUND);
 	}
 	NextSubTest();
 	{
@@ -564,8 +564,8 @@ NodeTest::InitTest2()
 	//
 	NextSubTest();
 	CPPUNIT_ASSERT( pathDir.SetTo(dirSuperLink) == B_OK );
-	CPPUNIT_ASSERT( node.SetTo(&pathDir, "") == B_OK );
-	CPPUNIT_ASSERT( node.InitCheck() == B_OK );
+	CPPUNIT_ASSERT(node.SetTo(&pathDir, "") == B_ENTRY_NOT_FOUND);
+	CPPUNIT_ASSERT(node.InitCheck() == B_ENTRY_NOT_FOUND);
 	//
 	NextSubTest();
 	CPPUNIT_ASSERT( pathDir.SetTo(existingSuperFile) == B_OK );
