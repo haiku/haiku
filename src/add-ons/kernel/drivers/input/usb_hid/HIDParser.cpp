@@ -102,7 +102,7 @@ HIDParser::ParseReportDescriptor(const uint8 *reportDescriptor,
 			}
 		}
 
-		TRACE("got item: type: %s; size: %lu; tag: %u; data: %lu\n",
+		TRACE("got item: type: %s; size: %lu; tag: %u; data: %" B_PRIu32 "\n",
 			item->type == ITEM_TYPE_MAIN ? "main"
 			: item->type == ITEM_TYPE_GLOBAL ? "global"
 			: item->type == ITEM_TYPE_LOCAL ? "local" : "long",

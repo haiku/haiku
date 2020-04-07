@@ -15,6 +15,7 @@
 #include "DeviceList.h"
 
 #define DRIVER_NAME	"usb_hid"
+#define DEVICE_PATH_SUFFIX	"usb"
 
 #define USB_INTERFACE_CLASS_HID			3
 #define USB_INTERFACE_SUBCLASS_HID_BOOT	1

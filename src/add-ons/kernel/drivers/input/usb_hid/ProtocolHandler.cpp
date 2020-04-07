@@ -74,7 +74,7 @@ ProtocolHandler::AddHandlers(HIDDevice &device, ProtocolHandler *&handlerList,
 
 	uint32 appCollectionCount = rootCollection->CountChildrenFlat(
 		COLLECTION_APPLICATION);
-	TRACE("root collection holds %lu application collection%s\n",
+	TRACE("root collection holds %" B_PRIu32 " application collection%s\n",
 		appCollectionCount, appCollectionCount != 1 ? "s" : "");
 
 	for (uint32  i = 0; i < appCollectionCount; i++) {
@@ -110,7 +110,7 @@ ProtocolHandler::AddHandlers(HIDDevice &device, ProtocolHandler *&handlerList,
 		return;
 	}
 
-	TRACE("added %ld handlers for hid device\n", handlerCount);
+	TRACE("added %" B_PRId32 " handlers for hid device\n", handlerCount);
 }
 
 

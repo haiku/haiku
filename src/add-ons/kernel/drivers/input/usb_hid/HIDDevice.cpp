@@ -95,8 +95,8 @@ HIDDevice::HIDDevice(usb_device device, const usb_configuration_info *config,
 				B_USB_HID_DESCRIPTOR_HID << 8, interfaceIndex, descriptorLength,
 				hidDescriptor, &descriptorLength);
 
-			TRACE("get hid descriptor: result: 0x%08lx; length: %lu\n", result,
-				descriptorLength);
+			TRACE("get hid descriptor: result: 0x%08" B_PRIx32 "; length: %lu"
+				"\n", result, descriptorLength);
 			if (result == B_OK) {
 				descriptorLength
 					= hidDescriptor->descriptor_info[0].descriptor_length;
@@ -123,8 +123,8 @@ HIDDevice::HIDDevice(usb_device device, const usb_configuration_info *config,
 			B_USB_HID_DESCRIPTOR_REPORT << 8, interfaceIndex, descriptorLength,
 			reportDescriptor, &descriptorLength);
 
-		TRACE("get report descriptor: result: 0x%08lx; length: %lu\n", result,
-			descriptorLength);
+		TRACE("get report descriptor: result: 0x%08" B_PRIx32 "; length: %"
+			B_PRIuSIZE "\n", result, descriptorLength);
 		if (result != B_OK) {
 			TRACE_ALWAYS("failed tot get report descriptor\n");
 			free(reportDescriptor);

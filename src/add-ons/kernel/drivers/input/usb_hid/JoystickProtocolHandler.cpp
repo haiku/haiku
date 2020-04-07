@@ -25,7 +25,7 @@
 
 JoystickProtocolHandler::JoystickProtocolHandler(HIDReport &report)
 	:
-	ProtocolHandler(report.Device(), "joystick/usb/", 0),
+	ProtocolHandler(report.Device(), "joystick/" DEVICE_PATH_SUFFIX "/", 0),
 	fReport(report),
 	fAxisCount(0),
 	fAxis(NULL),
@@ -110,7 +110,8 @@ JoystickProtocolHandler::JoystickProtocolHandler(HIDReport &report)
 
 	fCurrentValues.initialize(fAxisCount, fHatCount, fMaxButton);
 
-	TRACE("joystick device with %lu buttons, %lu axes and %lu hats\n",
+	TRACE("joystick device with %" B_PRIu32 " buttons, %" B_PRIu32
+		" axes and %" B_PRIu32 " hats\n",
 		fButtonCount, fAxisCount, fHatCount);
 	TRACE("report id: %u\n", report.ID());
 }

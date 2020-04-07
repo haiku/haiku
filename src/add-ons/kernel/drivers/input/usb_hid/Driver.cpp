@@ -228,7 +228,7 @@ usb_hid_device_removed(void *cookie)
 static status_t
 usb_hid_open(const char *name, uint32 flags, void **_cookie)
 {
-	TRACE("open(%s, %lu, %p)\n", name, flags, _cookie);
+	TRACE("open(%s, %" B_PRIu32 ", %p)\n", name, flags, _cookie);
 
 	device_cookie *cookie = new(std::nothrow) device_cookie();
 	if (cookie == NULL)
@@ -262,8 +262,8 @@ usb_hid_read(void *_cookie, off_t position, void *buffer, size_t *numBytes)
 {
 	device_cookie *cookie = (device_cookie *)_cookie;
 
-	TRACE("read(%p, %llu, %p, %p (%lu)\n", cookie, position, buffer, numBytes,
-		numBytes != NULL ? *numBytes : 0);
+	TRACE("read(%p, %" B_PRIu64 ", %p, %p (%lu)\n", cookie, position, buffer,
+		numBytes, numBytes != NULL ? *numBytes : 0);
 	return cookie->handler->Read(&cookie->cookie, position, buffer, numBytes);
 }
 
@@ -274,7 +274,7 @@ usb_hid_write(void *_cookie, off_t position, const void *buffer,
 {
 	device_cookie *cookie = (device_cookie *)_cookie;
 
-	TRACE("write(%p, %llu, %p, %p (%lu)\n", cookie, position, buffer, numBytes,
+	TRACE("write(%p, %" B_PRIu64 ", %p, %p (%lu)\n", cookie, position, buffer, numBytes,
 		numBytes != NULL ? *numBytes : 0);
 	return cookie->handler->Write(&cookie->cookie, position, buffer, numBytes);
 }
@@ -285,7 +285,8 @@ usb_hid_control(void *_cookie, uint32 op, void *buffer, size_t length)
 {
 	device_cookie *cookie = (device_cookie *)_cookie;
 
-	TRACE("control(%p, %lu, %p, %lu)\n", cookie, op, buffer, length);
+	TRACE("control(%p, %" B_PRIu32 ", %p, %" B_PRIuSIZE ")\n", cookie, op,
+		buffer, length);
 	return cookie->handler->Control(&cookie->cookie, op, buffer, length);
 }
 

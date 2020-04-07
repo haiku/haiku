@@ -28,7 +28,8 @@
 TabletProtocolHandler::TabletProtocolHandler(HIDReport &report,
 	HIDReportItem &xAxis, HIDReportItem &yAxis)
 	:
-	ProtocolHandler(report.Device(), "input/tablet/usb/", 0),
+	ProtocolHandler(report.Device(), "input/tablet/" DEVICE_PATH_SUFFIX "/",
+		0),
 	fReport(report),
 
 	fXAxis(xAxis),
@@ -86,7 +87,7 @@ TabletProtocolHandler::TabletProtocolHandler(HIDReport &report,
 	fYTilt = report.FindItem(B_HID_USAGE_PAGE_DIGITIZER,
 		B_HID_UID_DIG_Y_TILT);
 
-	TRACE("tablet device with %lu buttons, %stip, %seraser, "
+	TRACE("tablet device with %" B_PRIu32 " buttons, %stip, %seraser, "
 		"%spressure, and %stilt\n",
 		buttonCount,
 		fTip == NULL ? "no " : "",

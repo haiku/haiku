@@ -73,27 +73,33 @@ HIDReport::AddMainItem(global_item_state &globalState,
 
 	TRACE("\tglobal state:\n");
 	TRACE("\t\tusage_page: 0x%x\n", globalState.usage_page);
-	TRACE("\t\tlogical_minimum: %ld\n", logicalMinimum);
-	TRACE("\t\tlogical_maximum: %ld\n", logicalMaximum);
-	TRACE("\t\tphysical_minimum: %ld\n", physicalMinimum);
-	TRACE("\t\tphysical_maximum: %ld\n", physicalMaximum);
+	TRACE("\t\tlogical_minimum: %" B_PRId32 "\n", logicalMinimum);
+	TRACE("\t\tlogical_maximum: %" B_PRId32 "\n", logicalMaximum);
+	TRACE("\t\tphysical_minimum: %" B_PRId32 "\n", physicalMinimum);
+	TRACE("\t\tphysical_maximum: %" B_PRId32 "\n", physicalMaximum);
 	TRACE("\t\tunit_exponent: %d\n", globalState.unit_exponent);
 	TRACE("\t\tunit: %d\n", globalState.unit);
-	TRACE("\t\treport_size: %lu\n", globalState.report_size);
-	TRACE("\t\treport_count: %lu\n", globalState.report_count);
+	TRACE("\t\treport_size: %" B_PRIu32 "\n", globalState.report_size);
+	TRACE("\t\treport_count: %" B_PRIu32 "\n", globalState.report_count);
 	TRACE("\t\treport_id: %u\n", globalState.report_id);
 
 	TRACE("\tlocal state:\n");
-	TRACE("\t\tusage stack (%lu)\n", localState.usage_stack_used);
+	TRACE("\t\tusage stack (%" B_PRIu32 ")\n", localState.usage_stack_used);
 	for (uint32 i = 0; i < localState.usage_stack_used; i++) {
-		TRACE("\t\t\t0x%08lx\n", localState.usage_stack[i].u.extended);
+		TRACE("\t\t\t0x%08" B_PRIx32 "\n",
+			localState.usage_stack[i].u.extended);
 	}
 
-	TRACE("\t\tusage_minimum: 0x%08lx\n", localState.usage_minimum.u.extended);
-	TRACE("\t\tusage_maximum: 0x%08lx\n", localState.usage_maximum.u.extended);
-	TRACE("\t\tdesignator_index: %lu\n", localState.designator_index);
-	TRACE("\t\tdesignator_minimum: %lu\n", localState.designator_minimum);
-	TRACE("\t\tdesignator_maximum: %lu\n", localState.designator_maximum);
+	TRACE("\t\tusage_minimum: 0x%08" B_PRIx32 "\n",
+		localState.usage_minimum.u.extended);
+	TRACE("\t\tusage_maximum: 0x%08" B_PRIu32 "\n",
+		localState.usage_maximum.u.extended);
+	TRACE("\t\tdesignator_index: %" B_PRIu32 "\n",
+		localState.designator_index);
+	TRACE("\t\tdesignator_minimum: %" B_PRIu32 "\n",
+		localState.designator_minimum);
+	TRACE("\t\tdesignator_maximum: %" B_PRIu32 "\n",
+		localState.designator_maximum);
 	TRACE("\t\tstring_index: %u\n", localState.string_index);
 	TRACE("\t\tstring_minimum: %u\n", localState.string_minimum);
 	TRACE("\t\tstring_maximum: %u\n", localState.string_maximum);

@@ -26,7 +26,7 @@
 MouseProtocolHandler::MouseProtocolHandler(HIDReport &report,
 	HIDReportItem &xAxis, HIDReportItem &yAxis)
 	:
-	ProtocolHandler(report.Device(), "input/mouse/usb/", 0),
+	ProtocolHandler(report.Device(), "input/mouse/" DEVICE_PATH_SUFFIX "/", 0),
 	fReport(report),
 
 	fXAxis(xAxis),
@@ -58,8 +58,8 @@ MouseProtocolHandler::MouseProtocolHandler(HIDReport &report,
 	fHorizontalPan = report.FindItem(B_HID_USAGE_PAGE_CONSUMER,
 		B_HID_UID_CON_AC_PAN);
 
-	TRACE("mouse device with %lu buttons %sand %swheel\n", buttonCount,
-		fHorizontalPan == NULL ? "" : ", horizontal pan ",
+	TRACE("mouse device with %" B_PRIu32 " buttons %sand %swheel\n",
+		buttonCount, fHorizontalPan == NULL ? "" : ", horizontal pan ",
 		fWheel == NULL ? "no " : "");
 	TRACE("report id: %u\n", report.ID());
 }
