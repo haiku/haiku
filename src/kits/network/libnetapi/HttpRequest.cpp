@@ -570,8 +570,8 @@ BHttpRequest::_MakeRequest()
 	bool decompress = false;
 	status_t readError = B_OK;
 	ssize_t bytesRead = 0;
-	ssize_t bytesReceived = 0;
-	ssize_t bytesTotal = 0;
+	off_t bytesReceived = 0;
+	off_t bytesTotal = 0;
 	size_t previousBufferSize = 0;
 	off_t bytesUnpacked = 0;
 	char* inputTempBuffer = new(std::nothrow) char[kHttpBufferSize];
@@ -649,7 +649,7 @@ BHttpRequest::_MakeRequest()
 
 				int32 index = fHeaders.HasHeader("Content-Length");
 				if (index != B_ERROR)
-					bytesTotal = atoi(fHeaders.HeaderAt(index).Value());
+					bytesTotal = atoll(fHeaders.HeaderAt(index).Value());
 				else
 					bytesTotal = -1;
 			}
