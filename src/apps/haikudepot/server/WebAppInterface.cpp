@@ -69,12 +69,12 @@ public:
 			fDownloadIO->Write(data, size);
 	}
 
-	virtual	void DownloadProgress(BUrlRequest* caller, ssize_t bytesReceived,
+	virtual	void DownloadProgress(BUrlRequest* caller, off_t bytesReceived,
 		ssize_t bytesTotal)
 	{
 	}
 
-	virtual void UploadProgress(BUrlRequest* caller, ssize_t bytesSent,
+	virtual void UploadProgress(BUrlRequest* caller, off_t bytesSent,
 		ssize_t bytesTotal)
 	{
 	}
