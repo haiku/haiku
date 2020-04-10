@@ -750,7 +750,7 @@ BHttpRequest::_MakeRequest()
 							bytesReceived - bytesRead, bytesRead);
 					}
 					fListener->DownloadProgress(this, bytesReceived,
-						std::max((ssize_t)0, bytesTotal));
+						std::max((off_t)0, bytesTotal));
 				}
 
 				if (bytesTotal >= 0 && bytesReceived >= bytesTotal)
