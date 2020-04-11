@@ -120,6 +120,10 @@ init_device(device_node* node, void** device_cookie)
 		ERROR("Error while getting I2C devices\n");
 		return status;
 	}
+	if (crs.addr_bas == 0 || crs.addr_len == 0) {
+		TRACE("skipping non configured I2C devices\n");
+		return B_BAD_VALUE;
+	}
 
 	bus->info.base_addr = crs.addr_bas;
 	bus->info.map_size = crs.addr_len;
@@ -187,14 +191,20 @@ supports_device(device_node* parent)
 	}
 	TRACE("found an acpi device hid %s\n", name);
 
-	if (strcmp(name, "INT3442") == 0
+	if (strcmp(name, "INT33C2") == 0
+		|| strcmp(name, "INT33C3") == 0
+		|| strcmp(name, "INT3432") == 0
+		|| strcmp(name, "INT3433") == 0
+		|| strcmp(name, "INT3442") == 0
 		|| strcmp(name, "INT3443") == 0
 		|| strcmp(name, "INT3444") == 0
 		|| strcmp(name, "INT3445") == 0
 		|| strcmp(name, "INT3446") == 0
 		|| strcmp(name, "INT3447") == 0
 		|| strcmp(name, "80860AAC") == 0
-		|| strcmp(name, "80865AAC") == 0) {
+		|| strcmp(name, "80865AAC") == 0
+		|| strcmp(name, "80860F41") == 0
+		|| strcmp(name, "808622C1") == 0) {
 		TRACE("PCH I2C device found! name %s\n", name);
 		return 0.6f;
 	}
