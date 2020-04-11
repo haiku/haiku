@@ -87,9 +87,15 @@ i2c_bus_raw_control(void *_cookie, uint32 op, void *data, size_t length)
 				exec.buffer = buffer;
 			}
 
-			status_t status = bus->ExecCommand(exec.op, exec.addr,
+			status_t status = bus->AcquireBus();
+			if (status != B_OK)
+				return status;
+
+			status = bus->ExecCommand(exec.op, exec.addr,
 				&exec.cmdBuffer, exec.cmdLength, exec.buffer,
 				exec.bufferLength);
+			bus->ReleaseBus();
+
 			if (status != B_OK)
 				return status;
 

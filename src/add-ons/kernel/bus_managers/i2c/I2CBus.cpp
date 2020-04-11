@@ -83,9 +83,28 @@ status_t
 I2CBus::Scan()
 {
 	CALLED();
-
-	fController->scan_bus(fCookie);
+	if (fController->scan_bus != NULL)
+		fController->scan_bus(fCookie);
 	return B_OK;
+}
+
+
+status_t
+I2CBus::AcquireBus()
+{
+	CALLED();
+	if (fController->acquire_bus != NULL)
+		return fController->acquire_bus(fCookie);
+	return B_OK;
+}
+
+
+void
+I2CBus::ReleaseBus()
+{
+	CALLED();
+	if (fController->release_bus != NULL)
+		fController->release_bus(fCookie);
 }
 
 
@@ -127,7 +146,7 @@ i2c_uninit_bus(void *_bus)
 }
 
 
-status_t
+static status_t
 i2c_scan_bus(void *_bus)
 {
 	I2CBus *bus = (I2CBus *)_bus;
@@ -144,6 +163,24 @@ i2c_bus_exec_command(void* _bus, i2c_op op, i2c_addr slaveAddress,
 	I2CBus* bus = (I2CBus*)_bus;
 	return bus->ExecCommand(op, slaveAddress, cmdBuffer, cmdLength,
 		dataBuffer, dataLength);
+}
+
+
+static status_t
+i2c_bus_acquire_bus(void* _bus)
+{
+	CALLED();
+	I2CBus* bus = (I2CBus*)_bus;
+	return bus->AcquireBus();
+}
+
+
+static void
+i2c_bus_release_bus(void* _bus)
+{
+	CALLED();
+	I2CBus* bus = (I2CBus*)_bus;
+	return bus->ReleaseBus();
 }
 
 
@@ -179,6 +216,8 @@ i2c_bus_interface gI2CBusModule = {
 		NULL, // rescan
 	},
 
-	i2c_bus_exec_command
+	i2c_bus_exec_command,
+	i2c_bus_acquire_bus,
+	i2c_bus_release_bus,
 };
 

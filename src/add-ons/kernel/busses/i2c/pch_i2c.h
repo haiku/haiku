@@ -14,6 +14,7 @@ extern "C" {
 }
 
 #include <i2c.h>
+#include <lock.h>
 
 
 //#define TRACE_PCH_I2C
@@ -105,6 +106,7 @@ typedef struct {
 	uint32	flags;
 	int32	error;
 
+	mutex	lock;
 	status_t (*scan_bus)(i2c_bus_cookie cookie);
 } pch_i2c_sim_info;
 

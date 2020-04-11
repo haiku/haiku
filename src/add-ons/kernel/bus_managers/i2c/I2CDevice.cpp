@@ -39,6 +39,21 @@ I2CDevice::ExecCommand(i2c_op op, const void *cmdBuffer,
 }
 
 
+status_t
+I2CDevice::AcquireBus()
+{
+	CALLED();
+	return fBus->AcquireBus();
+}
+
+
+void
+I2CDevice::ReleaseBus()
+{
+	CALLED();
+	fBus->ReleaseBus();
+}
+
 
 static status_t
 i2c_init_device(device_node *node, void **_device)
@@ -102,6 +117,22 @@ i2c_exec_command(i2c_device _device, i2c_op op, const void *cmdBuffer,
 
 
 static status_t
+i2c_acquire_bus(i2c_device _device)
+{
+	I2CDevice *device = (I2CDevice *)_device;
+	return device->AcquireBus();
+}
+
+
+static void
+i2c_release_bus(i2c_device _device)
+{
+	I2CDevice *device = (I2CDevice *)_device;
+	return device->ReleaseBus();
+}
+
+
+static status_t
 std_ops(int32 op, ...)
 {
 	switch (op) {
@@ -140,4 +171,6 @@ i2c_device_interface gI2CDeviceModule = {
 		(void (*)(void *)) i2c_device_removed
 	},
 	i2c_exec_command,
+	i2c_acquire_bus,
+	i2c_release_bus,
 };

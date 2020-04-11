@@ -53,7 +53,8 @@ typedef struct {
 	status_t (*exec_command)(i2c_device cookie, i2c_op op,
 		const void *cmdBuffer, size_t cmdLength, void* dataBuffer,
 		size_t dataLength);
-
+	status_t (*acquire_bus)(i2c_device cookie);
+	void (*release_bus)(i2c_device cookie);
 } i2c_device_interface;
 
 
@@ -76,6 +77,8 @@ typedef struct {
 	status_t (*exec_command)(i2c_bus cookie, i2c_op op, i2c_addr slaveAddress,
 		const void *cmdBuffer, size_t cmdLength, void* dataBuffer,
 		size_t dataLength);
+	status_t (*acquire_bus)(i2c_bus cookie);
+	void (*release_bus)(i2c_bus cookie);
 } i2c_bus_interface;
 
 
@@ -119,12 +122,14 @@ typedef struct {
 
 	status_t (*scan_bus)(i2c_bus_cookie cookie);
 
+	status_t (*acquire_bus)(i2c_bus_cookie cookie);
+	void (*release_bus)(i2c_bus_cookie cookie);
+
 	status_t (*install_interrupt_handler)(i2c_bus_cookie cookie,
 		i2c_intr_cookie intrCookie, interrupt_handler handler, void* data);
 
 	status_t (*uninstall_interrupt_handler)(i2c_bus_cookie cookie,
 		i2c_intr_cookie intrCookie);
-
 } i2c_sim_interface;
 
 

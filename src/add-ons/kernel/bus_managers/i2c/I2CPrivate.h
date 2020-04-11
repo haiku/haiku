@@ -51,6 +51,8 @@ public:
 			status_t			ExecCommand(i2c_op op, const void *cmdBuffer,
 									size_t cmdLength, void* dataBuffer,
 									size_t dataLength);
+			status_t			AcquireBus();
+			void				ReleaseBus();
 
 private:
 			device_node*		fNode;
@@ -73,6 +75,8 @@ public:
 			status_t			RegisterDevice(i2c_addr slaveAddress,
 									char* hid, char** cid,
 									acpi_handle acpiHandle);
+			status_t			AcquireBus();
+			void				ReleaseBus();
 
 private:
 			device_node*		fNode;
