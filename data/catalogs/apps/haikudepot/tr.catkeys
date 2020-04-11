@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	2705631059
+1	turkish	x-vnd.Haiku-HaikuDepot	1648314585
 Repository update error	LocalRepositoryUpdateProcess		Depo güncelleme hatası
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Depo güncellenirken bir hata oluştu: %error%
 User Created	UserLoginWindow		Kullanıcı Oluşturuldu
@@ -27,6 +27,7 @@ Show	MainWindow		Göster
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Paket listesi alınırken bir hata oluştu: %message%
 Unstable but usable	RatePackageWindow		Kararlı değil fakat kullanılabilir
 Not specified	RatePackageWindow		Belirtilmemiş
+This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Bu uygulama çalışabilmek için bilgisayarınızda dosya işlemleri yapmaya gereksinim duyar. Görünüşe göre [%TestFilePath%] konumuna bir sınama dosyası yazımında sorunlar var. Lütfen bu uygulamanın dosya yazmasına engel olabilecek disk veya dosya izinleri  sıkıntıları olup olmadığını denetleyin. Bu sorunu göz ardı edip işlemi sürdürebilirsiniz, ancak bazı işlevler devre dışı kalabilir.
 Active	PackageListView		Etkin
 Login or Create account	MainWindow		Giriş yap veya hesap oluştur
 <Package contents not available for remote packages>	PackageContentsView		<Uzaktaki paketler için paket içeriği mevcut değil>
@@ -117,6 +118,7 @@ Cancel	MainWindow		İptal
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 tane daha indirilecek)}other{(# tane daha indirilecek)}}
 Refresh repositories	MainWindow		Depoları yenile
 Tools	MainWindow		Araçlar
+Continue	App		Sürdür
 A password is required.	UserLoginWindow		Bir parola gerekli.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Bu paket Haiku Depo sunucusunda değil gibi görünüyor, bu yüzden bir derecelendirme yapmak veya mevcut derecelendirmeyi değiştirmek olanaklı değil.
 Language	RatePackageWindow		Dil
@@ -138,6 +140,7 @@ While updating package data, a problem has arisen that may cause data to be outd
 The nickname is required.	UserLoginWindow		Takma ad gerekli.
 Source packages	MainWindow		Kaynak paketleri
 -	no package size		-
+Problem with working files	App		Çalışma dosyaları ile ilgili sorun
 Try again	App		Yeniden dene
 Rate package	RatePackageWindow		Paketi derecelendir
 Unknown	PackageListView		Bilinmeyen
@@ -149,6 +152,7 @@ Screenshot	ScreenshotWindow		Ekran görüntüsü
 HaikuDepot	System name		Haiku Depo
 A reboot is necessary to complete the installation process.	PackageManager		Yükleme işlemini tamamlamak için bilgisayarı yeniden başlatmalısınız.
 View latest usage conditions…	MainWindow		Güncel kullanım koşullarını görüntüle…
+Quit	App		Çık
 Search terms:	FilterView		Arama metni:
 Pending…	PackageListView		Bekliyor…
 Category:	FilterView		Kategori:

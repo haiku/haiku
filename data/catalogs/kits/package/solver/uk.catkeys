@@ -1,6 +1,6 @@
 1	ukrainian	x-vnd.Haiku-libsolvsolver	3404387783
 allow architecture change of %source% to %target%	SolverProblemSolution		дозволити зміну архітектури %source% на %target%
-install %source% from excluded repository	SolverProblemSolution		встановити %source% з виключеного репозиторія
+install %source% from excluded repository	SolverProblemSolution		встановити %source% з виключеного репозитарія
 unspecified problem	SolverProblem		невизначена проблема
 package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		пакет %source% потребує %dependency%, але відсутні провайдери
 package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		пакет %source% має застарілі залежності %dependency% від %target%
@@ -17,7 +17,7 @@ allow downgrade of %source% to %target%	SolverProblemSolution		дозволит�
 dependency problem	SolverProblem		проблема залежностей
 %dependency% is provided by the system	SolverProblem		%dependency% забезпечується системою
 keep %source% despite its inferior architecture	SolverProblemSolution		зберегти %source% незважаючи на більш низьку архітектуру
-%source% does not belong to a distupgrade repository	SolverProblem		%source% не належить до репозиторія distupgrade
+%source% does not belong to a distupgrade repository	SolverProblem		%source% не належить до репозитарія distupgrade
 installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		встановлений пакет %source% виводить з ужитку %dependency% який надав %target%
 allow name change of %source% to %target%	SolverProblemSolution		дозволити заміну назви %source% на %target%
 package %source% conflicts with %dependency% provided by %target%	SolverProblem		пакет %source% конфліктує з %dependency% який надав %target%
@@ -27,7 +27,7 @@ cannot install both %source% and %target%	SolverProblem		неможливо вс
 package %source% is not installable	SolverProblem		пакет %source% не інсталяційний
 problem with installed package %source%	SolverProblem		проблема з встановленим пакетом %source%
 allow deinstallation of %source%	SolverProblemSolution		дозволити деінсталяцію %source%
-keep %source% from excluded repository	SolverProblemSolution		зберегти %source% з виключеного репозиторія
+keep %source% from excluded repository	SolverProblemSolution		зберегти %source% з виключеного репозитарія
 keep old %source%	SolverProblemSolution		зберегти старий %source%
 package %source% conflicts with %dependency% provided by itself	SolverProblem		пакет %source% конфліктує з %dependency% наданими самому собі
 allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		дозволити зміну постачальника з \"%sourceVendor%\" (%source%) на \"%targetVendor%\" (%target%)

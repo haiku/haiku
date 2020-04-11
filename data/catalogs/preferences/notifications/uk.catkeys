@@ -13,7 +13,7 @@ Notifications preflet sample	PrefletWin		Зразок префлета пові�
 Mute notifications from this application	NotificationView		Відключити оповіщення для цієї програми
 pixels	GeneralView		пікселі
 seconds	GeneralView		секунд
-Revert	PrefletWin		Повернути
+Revert	PrefletWin		Без змін
 Applications	PrefletView		Програми
 Timeout:	GeneralView		Таймаут:
 Upper right	GeneralView		Верхній правий

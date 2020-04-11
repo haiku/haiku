@@ -1,6 +1,6 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	2705631059
-Repository update error	LocalRepositoryUpdateProcess		Помилка оновлення репозиторія 
-An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Під час оновлення репозиторія сталася помилка: %error%
+1	ukrainian	x-vnd.Haiku-HaikuDepot	1648314585
+Repository update error	LocalRepositoryUpdateProcess		Помилка оновлення репозитарія 
+An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Під час оновлення репозитарія сталася помилка: %error%
 User Created	UserLoginWindow		Користувача створено
 Check for updates…	MainWindow		Перевірити на обнови…
 Uninstall	PackageManager		Деінсталяція
@@ -27,6 +27,7 @@ Show	MainWindow		Показати
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Під час отримання списку пакетів сталася помилка: %message%
 Unstable but usable	RatePackageWindow		Нестабільний, але використання можливе
 Not specified	RatePackageWindow		Не визначено
+This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Ця програма записує та зчитує деякі робочі файли на Вашому комп’ютері, щоб функціонувати. Здається, що запис тестового файлу до [%TestFilePath%] викликає проблеми. Переконайтеся, що все гаразд з Вашим локальним диском або дозволами, які могли б перешкодити цій програмі записувати файли в згадану папку. Ви можете визнати цю проблему і продовжити, але деякі функції можуть бути відключені.
 Active	PackageListView		Активний
 Login or Create account	MainWindow		Авторизуватись або зареєструватись
 <Package contents not available for remote packages>	PackageContentsView		<Вміст пакету недоступний для відддалених пакетів>
@@ -38,7 +39,7 @@ Server Error	ServerHelper		Помилка сервера
 Name	PackageListView		Ім'я
 Local	LocalPkgDataLoadProcess		Локальний
 Rate %Package%	RatePackageWindow		Оцінити %Package%
-An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Під час запуску диспетчера пакунків сталася помилка: %message%
+An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Під час запуску диспетчера пакетів сталася помилка: %message%
 Quit HaikuDepot	App		Вийти з HaikuDepot
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Несподівана помилка '%Message%' виникла з право власності '%Property%'
 A response to the captcha question must be provided.	UserLoginWindow		Необхідно надати відповідь на питання капчі.
@@ -98,25 +99,26 @@ Downloading:	PackageInfoView		Завантаження:
 Success	UserLoginWindow		Успішно
 Package daemon problem	App		Проблема демона пакета
 (%Votes%)	PackageInfoView		(%Votes%)
-Repository	PackageListView		Репозиторій
+Repository	PackageListView		Репозитарій
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (версія %hd.version%)
 The email is malformed.	UserLoginWindow		Ел. адреса сформована невірно.
 Close	UserLoginWindow		Закрити
 Close	RatePackageWindow		Закрити
-Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Синхронізую дані пакета з репозиторієм '%REPO_NAME%'
+Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Синхронізую дані пакета з репозитарієм '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Переглянути Умови користування
 Size	PackageListView		Розмір
 Your rating:	RatePackageWindow		Ваш рейтинг:
 I am %MinimumAgeYears% years of age or older	UserLoginWindow		Мені вже є %MinimumAgeYears% років
 Your rating was updated.	RatePackageWindow		Ваш рейтинг оновлений.
 All categories	FilterView		Всі категорії
-Repositories	MainWindow		Репозиторії
+Repositories	MainWindow		Репозитарії
 n/a	PackageInfoView		немає
 View agreed usage conditions…	MainWindow		Погоджені Умови користування…
 Cancel	MainWindow		Скасувати
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 більше для завантаження)}other{(# більше для завантаження)}}
-Refresh repositories	MainWindow		Оновити репозиторії
+Refresh repositories	MainWindow		Оновити репозитарії
 Tools	MainWindow		Інструменти
+Continue	App		Продовжити
 A password is required.	UserLoginWindow		Потрібен пароль.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Цей пакет, здається, не знаходиться на HaikuDepot Server, тому неможливо створити нову оцінку або відредагувати існуючу.
 Language	RatePackageWindow		Мова
@@ -128,7 +130,7 @@ Update	RatePackageWindow		Обновити
 OK	ServerHelper		ОК
 Language	UserLoginWindow		Мова
 OK	UserLoginWindow		ОК
-Reading repository data	LocalPkgDataLoadProcess		Отримую дані репозиторію
+Reading repository data	LocalPkgDataLoadProcess		Отримую дані репозитарію
 Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Синхронізую вихідні дані з сервером
 The nickname is malformed.  The nickname may only contain digits and lower case latin characters.  The nickname must be between four and sixteen characters in length.	UserLoginWindow		Псевдонім сформований невірно.  Він може містити лише цифри та малі латинські символи.  Псевдонім повинен бути довжиною від 4 до 16 символів.
 Stability:	RatePackageWindow		Стабільність:
@@ -138,6 +140,7 @@ While updating package data, a problem has arisen that may cause data to be outd
 The nickname is required.	UserLoginWindow		Псевдонім обов'язковий.
 Source packages	MainWindow		Пакети з вихідними текстами
 -	no package size		-
+Problem with working files	App		Проблеми з робочими файлами
 Try again	App		Спробувати знову
 Rate package	RatePackageWindow		Оцінка пакета
 Unknown	PackageListView		Невідомо
@@ -149,6 +152,7 @@ Screenshot	ScreenshotWindow		Знімок екрана
 HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		Для завершення інсталяції потрібне перезавантаження.
 View latest usage conditions…	MainWindow		Переглянути поточні Умови користування…
+Quit	App		Вийти
 Search terms:	FilterView		Умови пошуку:
 Pending…	PackageListView		Очікування…
 Category:	FilterView		Категорія:
@@ -156,8 +160,8 @@ The user %Nickname% has been successfully created in the HaikuDepotServer system
 Authentication failed	UserLoginWindow		Авторизацію призупинено
 The supplied response to the captcha is incorrect.  A new captcha will be generated; try again.	UserLoginWindow		Надана відповідь на капчу неправильна.  Буде створена нова капча; спробуйте ще раз.
 Captcha error	UserLoginWindow		Помилкова капча
-Manage repositories…	MainWindow		Управління репозиторіями…
-Fetching remote repository data	LocalRepositoryUpdateProcess		Отримання даних з віддаленого репозиторія
+Manage repositories…	MainWindow		Управління репозитаріями…
+Fetching remote repository data	LocalRepositoryUpdateProcess		Отримання даних з віддаленого репозитарія
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Виникла помилка при завантаженні Умов використання, необхідних для створення нового користувача. Перевірте журнал для отримання детальної інформації та спробуйте ще раз.\nІнформація про те, як переглянути журнали, доступна в розділі HaikuDepot посібника користувача.
 Description	PackageListView		Опис
 Open %DeskbarLink%	PackageManager		Відкрити %DeskbarLink%
@@ -168,8 +172,8 @@ An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		
 Log in…	MainWindow		Авторизація…
 You need to be logged into an account before you can rate packages.	MainWindow		Для оцінки пакетів спочатку необхідно авторизуватись.
 Client version too old	ServerHelper		Застаріла версія клієнту
-Local repository load error	LocalPkgDataLoadProcess		Помилка при завантаженні сховища
+Local repository load error	LocalPkgDataLoadProcess		Помилка завантаження локального репозитарія
 The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		Користувача не існує або введено неправильний пароль. Перевірте свої облікові дані та повторіть спробу.
 9999.99 KiB	PackageListView		9999.99 KБ
 Repeat password:	UserLoginWindow		Повторіть пароль:
-All repositories	MainWindow		Всі репозиторії
+All repositories	MainWindow		Всі репозитарії

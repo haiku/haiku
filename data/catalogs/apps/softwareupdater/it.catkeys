@@ -7,7 +7,7 @@ Quit	SoftwareUpdaterWindow	Alert button label	Esci
 There were no updates found.	CheckManager		Nessun aggiornamento trovato.
 Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Gli aggiornamenti non sono stati completati, sei sicuro di voler uscire?
 Updates found	SoftwareUpdaterWindow		Aggiornamenti trovati
-Update now	SoftwareUpdaterWindow		Aggiorna ora
+Update now	SoftwareUpdaterWindow		Aggiorna
 For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Per qualche motivo non è possibile riavviare il computer.
 OK	UpdateManager		OK
 Unrecognized argument	SoftwareUpdaterApp	Error message	Argomento non riconosciuto
@@ -17,10 +17,10 @@ New packages to be installed	SoftwareUpdaterWindow	List super item label	Nuovi p
 Packages to be updated	SoftwareUpdaterWindow	List super item label	Pacchetti da aggiornare
 to	SoftwareUpdaterWindow	List item text	a
 Attempting to cancel the updates…	SoftwareUpdaterWindow		Tentativo di cancellazione degli aggiornamenti in corso…
-Contacting software repositories to check for package updates.	CheckManager		Contatta i repository del software per verificare la presenza di aggiornamenti ai pacchetti.
+Contacting software repositories to check for package updates.	CheckManager		Contatto i repository per verificare la presenza di aggiornamenti.
 Available updates found	CheckManager		Aggiornamenti disponibili trovati
 from repository	SoftwareUpdaterWindow	List item text	dal repository
-Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Contatta i repository del software per verificare la presenza di aggiornamenti ai pacchetti.
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Contatto i repository per verificare la presenza di aggiornamenti.
 Cancelling updates	SoftwareUpdaterWindow		Annullamento degli aggiornamenti
 Cancel	SoftwareUpdaterWindow	Alert button label	Annulla
 There were no updates found.	UpdateAction		Nessun aggiornamento trovato.

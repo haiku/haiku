@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	2705631059
+1	japanese	x-vnd.Haiku-HaikuDepot	1648314585
 Repository update error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
 User Created	UserLoginWindow		作成されたユーザー
@@ -27,6 +27,7 @@ Show	MainWindow		表示
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		パッケージリストの取得中にエラーが発生しました: %message%
 Unstable but usable	RatePackageWindow		不安定であるが使用できる
 Not specified	RatePackageWindow		指定なし
+This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		このアプリケーションは動作するためにあなたのコンピューター上のいくつかの作業ファイルを読み書きします。テストファイルの [%TestFilePath%] への書込みに問題があるようです。ローカルディスクに問題がないことや、そのディレクトリにアプリケーションが書込みできない権限になっているかをチェックしてください。この問題を認識して続行することもできますが、いくつかの機能が無効となるかもしれません。
 Active	PackageListView		有効
 Login or Create account	MainWindow		ログインまたはアカウントの作成
 <Package contents not available for remote packages>	PackageContentsView		<リモートパッケージには利用できません>
@@ -117,6 +118,7 @@ Cancel	MainWindow		キャンセル
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 個以上のダウンロード)}other{(# 個以上のダウンロード)}}
 Refresh repositories	MainWindow		リポジトリの更新
 Tools	MainWindow		ツール
+Continue	App		続行
 A password is required.	UserLoginWindow		パスワードが必要です。
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		このパッケージは HaikuDepot Server 上には無いようです。従って新規の評価の作成や既存の評価の更新はできません。
 Language	RatePackageWindow		言語
@@ -138,6 +140,7 @@ While updating package data, a problem has arisen that may cause data to be outd
 The nickname is required.	UserLoginWindow		ニックネームが必要です。
 Source packages	MainWindow		ソースパッケージ
 -	no package size		-
+Problem with working files	App		作業用ファイルに問題があります
 Try again	App		再試行
 Rate package	RatePackageWindow		パッケージを評価
 Unknown	PackageListView		不明
@@ -149,6 +152,7 @@ Screenshot	ScreenshotWindow		スクリーンショット
 HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		インストールプロセスを完了するには再起動が必要です。
 View latest usage conditions…	MainWindow		最新の使用条件を見る…
+Quit	App		終了
 Search terms:	FilterView		検索:
 Pending…	PackageListView		保留中…
 Category:	FilterView		分類:

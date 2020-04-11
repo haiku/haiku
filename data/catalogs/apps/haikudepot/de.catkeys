@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	2705631059
+1	german	x-vnd.Haiku-HaikuDepot	1648314585
 Repository update error	LocalRepositoryUpdateProcess		Fehler bei Paketquellenaktualisierung
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Fehler bei der Aktualisierung der Paketquelle: %error%
 User Created	UserLoginWindow		Benutzerkonto erstellt
@@ -27,6 +27,7 @@ Show	MainWindow		Anzeigen
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Fehler beim Beschaffen der Paketliste: %message%
 Unstable but usable	RatePackageWindow		Instabil aber brauchbar
 Not specified	RatePackageWindow		Keine Angaben
+This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Um richtig zu funktionieren, muss diese Anwendung Arbeitsdateien schreiben bzw. lesen können. Eine Testdatei konnte jedoch nicht nach [%TestFilePath%] geschrieben werden. Bitte prüfen, ob es Probleme mit der lokalen Festplatte gibt oder ob für diesen Ordner nötige Schreibrechte fehlen. Dieses Problem kann zwar ignoriert werden, allerdings wird die Anwendung dann nur eingeschränkt funktionieren.
 Active	PackageListView		Aktiviert
 Login or Create account	MainWindow		Anmelden oder Benutzerkonto anlegen
 <Package contents not available for remote packages>	PackageContentsView		<Der Inhalt kann nur für bereits heruntergeladene Pakete angezeigt werden>
@@ -117,6 +118,7 @@ Cancel	MainWindow		Abbrechen
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 weiterer Download)}other{(# weitere Downloads)}}
 Refresh repositories	MainWindow		Paketquellen aktualisieren
 Tools	MainWindow		Werkzeuge
+Continue	App		Weiter
 A password is required.	UserLoginWindow		Es wird ein Kennwort benötigt.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Dieses Paket scheint nicht auf dem HaikuDepot Server zu sein. Es ist daher nicht möglich eine neue Bewertung abzugeben, bzw. eine bestehende zu ändern.
 Language	RatePackageWindow		Sprache
@@ -138,6 +140,7 @@ While updating package data, a problem has arisen that may cause data to be outd
 The nickname is required.	UserLoginWindow		Der Benutzername wird benötigt.
 Source packages	MainWindow		Quellcode-Pakete
 -	no package size		-
+Problem with working files	App		Problem mit Arbeitsdateien
 Try again	App		Nochmal versuchen
 Rate package	RatePackageWindow		Paket bewerten
 Unknown	PackageListView		Unbekannt
@@ -149,6 +152,7 @@ Screenshot	ScreenshotWindow		Bildschirmfoto
 HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		Um die Installation abzuschließen, muss Haiku neu gestartet werden.
 View latest usage conditions…	MainWindow		Aktuelle Nutzungsbedingungen lesen…
+Quit	App		Beenden
 Search terms:	FilterView		Suchbegriffe:
 Pending…	PackageListView		Ausstehend…
 Category:	FilterView		Kategorie:

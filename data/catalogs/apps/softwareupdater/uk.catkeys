@@ -19,7 +19,7 @@ to	SoftwareUpdaterWindow	List item text	до
 Attempting to cancel the updates…	SoftwareUpdaterWindow		Спроба скасувати оновлення…
 Contacting software repositories to check for package updates.	CheckManager		Встановлюється зв'язок з репозиторіями щоб перевірити наявність оновлень.
 Available updates found	CheckManager		Знайдені доступні оновлення
-from repository	SoftwareUpdaterWindow	List item text	з репозиторія
+from repository	SoftwareUpdaterWindow	List item text	з репозитарія
 Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Встановлюється зв'язок з репозиторіями щоб перевірити наявність оновлень.
 Cancelling updates	SoftwareUpdaterWindow		Оновлення скасовуються
 Cancel	SoftwareUpdaterWindow	Alert button label	Скасувати
