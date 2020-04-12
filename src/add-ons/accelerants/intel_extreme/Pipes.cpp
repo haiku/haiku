@@ -139,11 +139,12 @@ Pipe::Configure(display_mode* mode)
 	read32(INTEL_DISPLAY_A_PIPE_CONTROL + fPipeOffset);
 #endif
 
-	// According to SandyBridge modesetting sequence, pipe must be enabled
-	// before PLL are configured.
-	addr_t pipeReg = INTEL_DISPLAY_A_PIPE_CONTROL + fPipeOffset;
-	write32(pipeReg, read32(pipeReg) | INTEL_PIPE_ENABLED);
-
+	if (gInfo->shared_info->device_type.Generation() >= 6) {
+		// According to SandyBridge modesetting sequence, pipe must be enabled
+		// before PLL are configured.
+		addr_t pipeReg = INTEL_DISPLAY_A_PIPE_CONTROL + fPipeOffset;
+		write32(pipeReg, read32(pipeReg) | INTEL_PIPE_ENABLED);
+	}
 }
 
 
