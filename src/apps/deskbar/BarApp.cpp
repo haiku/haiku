@@ -242,7 +242,7 @@ TBarApp::InitSettings()
 	settings.switcherLoc = fDefaultSettings.switcherLoc = BPoint(5000, 5000);
 	settings.showClock = fDefaultSettings.showClock = true;
 	// applications
-	settings.trackerAlwaysFirst = fDefaultSettings.trackerAlwaysFirst = false;
+	settings.trackerAlwaysFirst = fDefaultSettings.trackerAlwaysFirst = true;
 	settings.sortRunningApps = fDefaultSettings.sortRunningApps = false;
 	settings.superExpando = fDefaultSettings.superExpando = false;
 	settings.expandNewTeams = fDefaultSettings.expandNewTeams = false;
