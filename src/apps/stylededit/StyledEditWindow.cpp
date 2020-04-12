@@ -406,7 +406,7 @@ StyledEditWindow::MessageReceived(BMessage* message)
 			fTextView->GetFontAndColor(&font, &sameProperties);
 			//GetFont seems to return a constant size for font.Size(),
 			//thus not used here (maybe that is a bug)
-			int32 cur_size = font.Size();
+			int32 cur_size = (int32)font.Size();
 
 			for (unsigned int a = 0;
 				a < sizeof(fontSizes)/sizeof(fontSizes[0]); a++) {
@@ -423,7 +423,7 @@ StyledEditWindow::MessageReceived(BMessage* message)
 			BFont font;
 
 			fTextView->GetFontAndColor(&font, &sameProperties);
-			int32 cur_size = font.Size();
+			int32 cur_size = (int32)font.Size();
 
 			for (unsigned int a = 1;
 				a < sizeof(fontSizes)/sizeof(fontSizes[0]); a++) {
