@@ -61,6 +61,19 @@ pch_i2c_scan_parse_callback(ACPI_RESOURCE *res, void *context)
 
 
 static status_t
+acpi_scan_bus(i2c_bus_cookie cookie)
+{
+	CALLED();
+	pch_i2c_acpi_sim_info* bus = (pch_i2c_acpi_sim_info*)cookie;
+
+	bus->acpi->walk_namespace(bus->device, ACPI_TYPE_DEVICE, 1,
+		pch_i2c_scan_bus_callback, NULL, bus, NULL);
+
+	return B_OK;
+}
+
+
+static status_t
 register_child_devices(void* cookie)
 {
 	CALLED();
@@ -110,7 +123,7 @@ init_device(device_node* node, void** device_cookie)
 	bus->acpi = acpi;
 	bus->device = device;
 	bus->info.driver_node = node;
-	//bus->info.scan_bus = acpi_scan_bus;
+	bus->info.scan_bus = acpi_scan_bus;
 
 	// Attach devices for I2C resources
 	struct pch_i2c_crs crs;
