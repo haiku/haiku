@@ -5,6 +5,7 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include <bluetooth/bluetooth_error.h>
 
 #include <bluetooth/HCI/btHCI_command.h>
@@ -215,6 +216,7 @@ struct authentication_t {
 	uint8 param;
 };
 
+
 status_t
 LocalDevice::SetAuthentication(bool authentication)
 {
@@ -424,7 +426,8 @@ LocalDevice::_ReadBufferSize()
 {
 	int8 bt_status = BT_ERROR;
 
-	BluetoothCommand<> BufferSize(OGF_INFORMATIONAL_PARAM, OCF_READ_BUFFER_SIZE);
+	BluetoothCommand<> BufferSize(OGF_INFORMATIONAL_PARAM,
+		OCF_READ_BUFFER_SIZE);
 
 
 	BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
@@ -500,6 +503,7 @@ LocalDevice::_ReadLinkKeys()
 struct pageTimeout_t {
 	uint16 param;
 };
+
 
 status_t
 LocalDevice::_ReadTimeouts()
@@ -624,4 +628,4 @@ LocalDevice::~LocalDevice()
 }
 
 
-}
+} /* end namespace Bluetooth */

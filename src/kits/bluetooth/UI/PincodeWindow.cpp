@@ -3,6 +3,7 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include <stdio.h>
 #include <unistd.h>
 #include <malloc.h>
@@ -35,6 +36,7 @@
 #define V_SEPARATION  10
 #define BD_ADDR_LABEL "BD_ADDR: "
 
+
 static const uint32 skMessageAcceptButton = 'acCp';
 static const uint32 skMessageCancelButton = 'mVch';
 
@@ -45,6 +47,7 @@ namespace Bluetooth {
 #if 0
 #pragma mark -
 #endif
+
 
 PincodeWindow::PincodeWindow(bdaddr_t address, hci_id hid)
 	: BWindow(BRect(800, 200, 900, 300), "Pincode request",
@@ -85,7 +88,8 @@ PincodeWindow::InitUI()
 	fRemoteInfo = new BStringView("bdaddr","BD_ADDR: ");
 
 	// TODO: Pincode cannot be more than 16 bytes
-	fPincodeText = new BTextControl("pincode TextControl", "PIN code:", "5555", NULL);
+	fPincodeText = new BTextControl("pincode TextControl", "PIN code:",
+		"5555", NULL);
 
 	fAcceptButton = new BButton("fAcceptButton", "Pair",
 		new BMessage(skMessageAcceptButton));
@@ -200,4 +204,4 @@ void PincodeWindow::SetBDaddr(BString address)
 }
 
 
-}
+} /* end namespace Bluetooth */

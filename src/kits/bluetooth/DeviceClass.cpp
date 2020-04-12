@@ -20,12 +20,17 @@ void
 DeviceClass::GetServiceClass(BString& serviceClass)
 {
 	CALLED();
-	static const char *services[] = { B_TRANSLATE_MARK("Positioning"), 
-		B_TRANSLATE_MARK("Networking"), B_TRANSLATE_MARK("Rendering"), 
-		B_TRANSLATE_MARK("Capturing"), B_TRANSLATE_MARK("Object transfer"),
-		B_TRANSLATE_MARK("Audio"), B_TRANSLATE_MARK("Telephony"), 
-		B_TRANSLATE_MARK("Information") };
-		
+	static const char *services[] = {
+		B_TRANSLATE_MARK("Positioning"),
+		B_TRANSLATE_MARK("Networking"),
+		B_TRANSLATE_MARK("Rendering"),
+		B_TRANSLATE_MARK("Capturing"),
+		B_TRANSLATE_MARK("Object transfer"),
+		B_TRANSLATE_MARK("Audio"),
+		B_TRANSLATE_MARK("Telephony"),
+		B_TRANSLATE_MARK("Information")
+	};
+
 	if (ServiceClass() != 0) {
 		bool first = true;
 
@@ -50,11 +55,16 @@ void
 DeviceClass::GetMajorDeviceClass(BString& majorClass)
 {
 	CALLED();
-	static const char *major_devices[] = { B_TRANSLATE_MARK("Miscellaneous"), 
-		B_TRANSLATE_MARK("Computer"), B_TRANSLATE_MARK("Phone"), 
-		B_TRANSLATE_MARK("LAN access"), B_TRANSLATE_MARK("Audio/Video"), 
-		B_TRANSLATE_MARK("Peripheral"), B_TRANSLATE_MARK("Imaging"), 
-		B_TRANSLATE_MARK("Uncategorized") };
+	static const char *major_devices[] = {
+		B_TRANSLATE_MARK("Miscellaneous"),
+		B_TRANSLATE_MARK("Computer"),
+		B_TRANSLATE_MARK("Phone"),
+		B_TRANSLATE_MARK("LAN access"),
+		B_TRANSLATE_MARK("Audio/Video"),
+		B_TRANSLATE_MARK("Peripheral"),
+		B_TRANSLATE_MARK("Imaging"),
+		B_TRANSLATE_MARK("Uncategorized")
+	};
 
 	if (MajorDeviceClass() >= sizeof(major_devices) / sizeof(*major_devices))
 		majorClass << B_TRANSLATE("Invalid device class!\n");

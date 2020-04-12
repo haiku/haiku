@@ -1,9 +1,8 @@
 /*
  * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
+
 
 #include <bluetooth/DiscoveryAgent.h>
 #include <bluetooth/DiscoveryListener.h>
@@ -17,6 +16,7 @@
 #include <bluetoothserver_p.h>
 
 #include <Message.h>
+
 
 namespace Bluetooth {
 
@@ -156,4 +156,4 @@ DiscoveryListener::DiscoveryListener()
 	Run();
 }
 
-}
+} /* end namespace Bluetooth */

@@ -4,6 +4,7 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include <bluetooth/DeviceClass.h>
 #include <bluetooth/DiscoveryAgent.h>
 #include <bluetooth/DiscoveryListener.h>
@@ -24,14 +25,17 @@
 
 #include "KitSupport.h"
 
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "RemoteDevice"
 
 
 namespace Bluetooth {
 
+
 // TODO: Check headers for valid/reserved ranges
 static const uint16 invalidConnectionHandle = 0xF000;
+
 
 bool
 RemoteDevice::IsTrustedDevice(void)
@@ -344,4 +348,4 @@ RemoteDevice::GetDeviceClass()
 	return fDeviceClass;
 }
 
-}
+} /* end namespace Bluetooth */

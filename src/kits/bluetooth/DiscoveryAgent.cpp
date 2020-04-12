@@ -3,6 +3,7 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include <bluetooth/bluetooth_error.h>
 #include <bluetooth/DiscoveryAgent.h>
 #include <bluetooth/DiscoveryListener.h>
@@ -17,6 +18,7 @@
 #include <CommandManager.h>
 
 #include "KitSupport.h"
+
 
 namespace Bluetooth {
 
@@ -42,7 +44,8 @@ DiscoveryAgent::StartInquiry(int accessCode, DiscoveryListener* listener)
 
 
 status_t
-DiscoveryAgent::StartInquiry(uint32 accessCode, DiscoveryListener* listener, bigtime_t secs)
+DiscoveryAgent::StartInquiry(uint32 accessCode, DiscoveryListener* listener,
+	bigtime_t secs)
 {
 	CALLED();
     size_t size;
@@ -68,12 +71,14 @@ DiscoveryAgent::StartInquiry(uint32 accessCode, DiscoveryListener* listener, big
 
     request.AddInt32("hci_id", fLocalDevice->ID());
 
-    startInquiryCommand = buildInquiry(accessCode, secs, BT_MAX_RESPONSES, &size);
+    startInquiryCommand = buildInquiry(accessCode, secs, BT_MAX_RESPONSES,
+		&size);
 
     // For stating the inquiry
     request.AddData("raw command", B_ANY_TYPE, startInquiryCommand, size);
-    request.AddInt16("eventExpected",  HCI_EVENT_CMD_STATUS);
-    request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_LINK_CONTROL, OCF_INQUIRY));
+    request.AddInt16("eventExpected", HCI_EVENT_CMD_STATUS);
+    request.AddInt16("opcodeExpected",
+		PACK_OPCODE(OGF_LINK_CONTROL, OCF_INQUIRY));
 
 	// For getting each discovered message
     request.AddInt16("eventExpected",  HCI_EVENT_INQUIRY_RESULT);
@@ -113,7 +118,8 @@ DiscoveryAgent::CancelInquiry(DiscoveryListener* listener)
     cancelInquiryCommand = buildInquiryCancel(&size);
     request.AddData("raw command", B_ANY_TYPE, cancelInquiryCommand, size);
     request.AddInt16("eventExpected",  HCI_EVENT_CMD_STATUS);
-    request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_LINK_CONTROL, OCF_INQUIRY_CANCEL));
+    request.AddInt16("opcodeExpected",
+		PACK_OPCODE(OGF_LINK_CONTROL, OCF_INQUIRY_CANCEL));
 
     if (fMessenger->SendMessage(&request, &reply) == B_OK) {
         if (reply.FindInt8("status", &bt_status ) == B_OK ) {
@@ -148,4 +154,4 @@ DiscoveryAgent::~DiscoveryAgent()
 }
 
 
-}
+} /* End namespace Bluetooth */
