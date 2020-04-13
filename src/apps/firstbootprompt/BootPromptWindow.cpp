@@ -420,7 +420,7 @@ BootPromptWindow::_UpdateKeymapsMenu()
 		item-> SetLabel(B_TRANSLATE_NOCOLLECT_ALL((ref.name),
 		"KeymapNames", NULL));
 		itemsList.AddItem(item);
-		menu->RemoveItem(0);
+		menu->RemoveItem((int32)0);
 	}
 	itemsList.SortItems(compare_void_menu_items);
 	fKeymapsMenuField->Menu()->AddList(&itemsList, 0);
