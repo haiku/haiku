@@ -27,10 +27,30 @@ HyperTextAction::~HyperTextAction()
 
 
 void
-HyperTextAction::MouseOver(HyperTextView* view, BPoint where, BMessage* message)
+HyperTextAction::MouseOver(HyperTextView* view, BPoint where, int32 startOffset,
+	int32 endOffset, BMessage* message)
 {
 	BCursor linkCursor(B_CURSOR_ID_FOLLOW_LINK);
 	view->SetViewCursor(&linkCursor);
+
+	BFont font;
+	view->GetFont(&font);
+	font.SetFace(B_UNDERSCORE_FACE);
+	view->SetFontAndColor(startOffset, endOffset, &font, B_FONT_FACE);
+}
+
+
+void
+HyperTextAction::MouseAway(HyperTextView* view, BPoint where, int32 startOffset,
+	int32 endOffset, BMessage* message)
+{
+	BCursor linkCursor(B_CURSOR_ID_SYSTEM_DEFAULT);
+	view->SetViewCursor(&linkCursor);
+
+	BFont font;
+	view->GetFont(&font);
+	font.SetFace(B_REGULAR_FACE);
+	view->SetFontAndColor(startOffset, endOffset, &font, B_FONT_FACE);
 }
 
 
@@ -90,7 +110,8 @@ public:
 HyperTextView::HyperTextView(const char* name, uint32 flags)
 	:
 	BTextView(name, flags),
-	fActionInfos(new ActionInfoList(100, true))
+	fActionInfos(new ActionInfoList(100, true)),
+	fLastActionInfo(NULL)
 {
 }
 
@@ -99,7 +120,8 @@ HyperTextView::HyperTextView(BRect frame, const char* name, BRect textRect,
 	uint32 resizeMask, uint32 flags)
 	:
 	BTextView(frame, name, textRect, resizeMask, flags),
-	fActionInfos(new ActionInfoList(100, true))
+	fActionInfos(new ActionInfoList(100, true)),
+	fLastActionInfo(NULL)
 {
 }
 
@@ -138,15 +160,37 @@ HyperTextView::MouseMoved(BPoint where, uint32 transit,
 {
 	BMessage* message = Window()->CurrentMessage();
 
-	uint32 buttons;
 	HyperTextAction* action;
-	if (message->FindInt32("buttons", (int32*)&buttons) == B_OK
-		&& buttons == 0 && (action = _ActionAt(where)) != NULL) {
-		action->MouseOver(this, where, message);
-		return;
+	const ActionInfo* actionInfo = _ActionInfoAt(where);
+	if (actionInfo != fLastActionInfo) {
+		// We moved to a different "action" zone, de-highlight the previous one
+		if (fLastActionInfo != NULL) {
+			action = fLastActionInfo->action;
+			if (action != NULL) {
+				action->MouseAway(this, where, fLastActionInfo->startOffset,
+						fLastActionInfo->endOffset, message);
+			}
+		}
+
+		// ... and highlight the new one
+		if (actionInfo != NULL) {
+			action = actionInfo->action;
+			if (action != NULL) {
+				action->MouseOver(this, where, actionInfo->startOffset,
+						actionInfo->endOffset, message);
+			}
+		}
+
+		fLastActionInfo = actionInfo;
 	}
 
-	BTextView::MouseMoved(where, transit, dragMessage);
+	int32 buttons = 0;
+	message->FindInt32("buttons", (int32*)&buttons);
+	if (actionInfo == NULL || buttons != 0) {
+		// This will restore the default mouse pointer, so do it only when not
+		// hovering a link, or when clicking
+		BTextView::MouseMoved(where, transit, dragMessage);
+	}
 }
 
 
@@ -190,8 +234,8 @@ HyperTextView::InsertHyperText(const char* inText, int32 inLength,
 }
 
 
-HyperTextAction*
-HyperTextView::_ActionAt(const BPoint& where) const
+const HyperTextView::ActionInfo*
+HyperTextView::_ActionInfoAt(const BPoint& where) const
 {
 	int32 offset = OffsetAt(where);
 
@@ -199,6 +243,15 @@ HyperTextView::_ActionAt(const BPoint& where) const
 
 	const ActionInfo* action = fActionInfos->BinarySearch(pointer,
 			ActionInfo::CompareEqualIfIntersecting);
+	return action;
+}
+
+
+HyperTextAction*
+HyperTextView::_ActionAt(const BPoint& where) const
+{
+	const ActionInfo* action = _ActionInfoAt(where);
+
 	if (action != NULL) {
 		// verify that the text region was hit
 		BRegion textRegion;

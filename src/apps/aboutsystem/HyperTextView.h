@@ -21,6 +21,10 @@ public:
 	virtual						~HyperTextAction();
 
 	virtual	void				MouseOver(HyperTextView* view, BPoint where,
+									int32 startOffset, int32 endOffset,
+									BMessage* message);
+	virtual	void				MouseAway(HyperTextView* view, BPoint where,
+									int32 startOffset, int32 endOffset,
 									BMessage* message);
 	virtual	void				Clicked(HyperTextView* view, BPoint where,
 									BMessage* message);
@@ -53,12 +57,15 @@ public:
 									int32 inLength, HyperTextAction* action,
 									const text_run_array* inRuns = NULL);
 private:
-			HyperTextAction*	_ActionAt(const BPoint& where) const;
-
 			struct ActionInfo;
 			class ActionInfoList;
 
+			HyperTextAction*	_ActionAt(const BPoint& where) const;
+			const ActionInfo*	_ActionInfoAt(const BPoint& where) const;
+
+private:
 			ActionInfoList*		fActionInfos;
+			const ActionInfo*	fLastActionInfo;
 };
 
 
