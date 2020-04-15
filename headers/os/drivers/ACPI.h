@@ -139,8 +139,8 @@ typedef struct acpi_data {
 
 
 enum {
-	ACPI_ALLOCATE_BUFFER = -1,
-	ACPI_ALLOCATE_LOCAL_BUFFER = -2,
+	ACPI_ALLOCATE_BUFFER = (acpi_size)-1,
+	ACPI_ALLOCATE_LOCAL_BUFFER = (acpi_size)-2,
 };
 
 
@@ -253,7 +253,7 @@ struct acpi_module_info {
 					size_t resultLength);
 
 	status_t	(*get_device_info)(const char *path, char** hid,
-					char** cidList, size_t cidListLength);
+					char** cidList, size_t cidListLength, char** uid);
 	uint32		(*get_object_type)(const char *path);
 	status_t	(*get_object)(const char *path,
 					acpi_object_type **_returnValue);
@@ -318,6 +318,7 @@ enum {
 #define ACPI_DEVICE_HID_ITEM	"acpi/hid"
 #define ACPI_DEVICE_PATH_ITEM	"acpi/path"
 #define ACPI_DEVICE_TYPE_ITEM	"acpi/type"
+#define ACPI_DEVICE_UID_ITEM	"acpi/uid"
 
 
 typedef struct acpi_device_cookie *acpi_device;

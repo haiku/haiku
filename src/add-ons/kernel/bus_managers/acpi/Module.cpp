@@ -86,7 +86,7 @@ acpi_enumerate_child_devices(device_node* node, const char* root)
 			case ACPI_TYPE_PROCESSOR:
 			case ACPI_TYPE_THERMAL:
 			case ACPI_TYPE_DEVICE: {
-				device_attr attrs[15] = {
+				device_attr attrs[16] = {
 					// info about device
 					{ B_DEVICE_BUS, B_STRING_TYPE, { string: "acpi" }},
 
@@ -103,9 +103,10 @@ acpi_enumerate_child_devices(device_node* node, const char* root)
 				uint32 attrCount = 4;
 				char* hid = NULL;
 				char* cidList[8] = { NULL };
+				char* uid = NULL;
 				if (type == ACPI_TYPE_DEVICE) {
-					if (get_device_info(result, &hid, (char**)&cidList, 8)
-						== B_OK) {
+					if (get_device_info(result, &hid, (char**)&cidList, 8,
+						&uid) == B_OK) {
 						if (hid != NULL) {
 							attrs[attrCount].name = ACPI_DEVICE_HID_ITEM;
 							attrs[attrCount].type = B_STRING_TYPE;
@@ -116,6 +117,12 @@ acpi_enumerate_child_devices(device_node* node, const char* root)
 							attrs[attrCount].name = ACPI_DEVICE_CID_ITEM;
 							attrs[attrCount].type = B_STRING_TYPE;
 							attrs[attrCount].value.string = cidList[i];
+							attrCount++;
+						}
+						if (uid != NULL) {
+							attrs[attrCount].name = ACPI_DEVICE_UID_ITEM;
+							attrs[attrCount].type = B_STRING_TYPE;
+							attrs[attrCount].value.string = uid;
 							attrCount++;
 						}
 					}
@@ -131,6 +138,7 @@ acpi_enumerate_child_devices(device_node* node, const char* root)
 				status_t status = gDeviceManager->register_node(node,
 						ACPI_DEVICE_MODULE_NAME, attrs, NULL, &deviceNode);
 				free(hid);
+				free(uid);
 				for (int i = 0; cidList[i] != NULL; i++)
 					free(cidList[i]);
 				if (status != B_OK)
