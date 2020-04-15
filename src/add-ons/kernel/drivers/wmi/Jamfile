@@ -1,0 +1,11 @@
+SubDir HAIKU_TOP src add-ons kernel drivers wmi ;
+
+UsePrivateHeaders wmi ;
+UsePrivateKernelHeaders ;
+
+KernelAddon wmi :
+	WMIACPI.cpp
+	WMIAsus.cpp
+	WMIDevice.cpp
+	;
+
