@@ -79,14 +79,14 @@ The buildtools are needed only for non-Haiku platforms.
 
 Anonymous checkout:
 ```
-git clone https://review.haiku-os.org/haiku.git
-git clone https://review.haiku-os.org/buildtools.git
+git clone --depth 1 https://review.haiku-os.org/haiku.git
+git clone --depth 1 https://review.haiku-os.org/buildtools.git
 ```
 
 If you have commit access:
 ```
-git clone ssh://git.haiku-os.org/haiku
-git clone ssh://git.haiku-os.org/buildtools
+git clone --depth 1 ssh://git.haiku-os.org/haiku
+git clone --depth 1 ssh://git.haiku-os.org/buildtools
 ```
 
 Building Jam
