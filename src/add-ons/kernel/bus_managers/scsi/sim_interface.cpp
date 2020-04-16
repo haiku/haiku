@@ -46,6 +46,9 @@ scsi_controller_added(device_node *parent)
 
 	{
 		device_attr attrs[] = {
+			{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
+				{ string: "SCSI Controller" }},
+
 			// remember who we are
 			// (could use the controller name, but probably some software would choke)
 			// TODO create_id() generates a 32 bit ranged integer but we need only 8 bits

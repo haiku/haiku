@@ -556,6 +556,7 @@ das_register_device(device_node *node)
 
 	// ready to register
 	device_attr attrs[] = {
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "SCSI Disk" }},
 		// tell block_io whether the device is removable
 		{"removable", B_UINT8_TYPE, {ui8: deviceInquiry->removable_medium}},
 		// impose own max block restriction
