@@ -319,9 +319,12 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 
 		case B_PACKAGE_UPDATE:
-			// TODO: We should do a more selective update depending on the
-			// "event", "location", and "change count" fields!
-			_StartBulkLoad(false);
+			// TODO: see ticket #15879
+			// work needs to be done here to selectively update package data in
+			// the running HaikuDepot application when there are changes on the
+			// system.  There is now too much data to just load everything when
+			// there is a change.
+			//_StartBulkLoad(false);
 			break;
 
 		case MSG_REFRESH_REPOS:
