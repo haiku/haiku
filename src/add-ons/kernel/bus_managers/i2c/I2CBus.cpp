@@ -57,6 +57,8 @@ I2CBus::RegisterDevice(i2c_addr slaveAddress, char* hid, char** cid,
 	CALLED();
 
 	device_attr attrs[] = {
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "I2C device" }},
+
 		// connection
 		{ I2C_DEVICE_SLAVE_ADDR_ITEM, B_UINT16_TYPE, { ui16: slaveAddress }},
 

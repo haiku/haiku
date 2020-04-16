@@ -82,7 +82,7 @@ register_child_devices(void* cookie)
 	device_node* node = bus->info.driver_node;
 
 	char prettyName[25];
-	sprintf(prettyName, "PCH I2C Device");
+	sprintf(prettyName, "PCH I2C Controller");
 
 	device_attr attrs[] = {
 		// properties of this controller for i2c bus manager
