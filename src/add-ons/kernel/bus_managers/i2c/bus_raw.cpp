@@ -6,6 +6,8 @@
 
 #include "I2CPrivate.h"
 
+#include <StackOrHeapArray.h>
+
 
 static status_t
 i2c_bus_raw_init(void* driverCookie, void **_cookie)
@@ -64,14 +66,23 @@ i2c_bus_raw_control(void *_cookie, uint32 op, void *data, size_t length)
 		case I2CEXEC:
 		{
 			i2c_ioctl_exec exec;
-			uint8 cmdBuffer[32];
-			uint8 buffer[32];
 			const void*	userCmdBuffer = NULL;
 			void* userBuffer = NULL;
 			if (user_memcpy(&exec, data, sizeof(i2c_ioctl_exec)) != B_OK)
 				return B_BAD_ADDRESS;
+
+			if (exec.cmdBuffer == NULL)
+				exec.cmdLength = 0;
+			if (exec.buffer == NULL)
+				exec.bufferLength = 0;
+			BStackOrHeapArray<uint8, 32> cmdBuffer(exec.cmdLength);
+			BStackOrHeapArray<uint8, 32> buffer(exec.bufferLength);
+			if (!cmdBuffer.IsValid() || !buffer.IsValid())
+				return B_NO_MEMORY;
+
 			if (exec.cmdBuffer != NULL) {
-				if (user_memcpy(cmdBuffer, exec.cmdBuffer, exec.cmdLength)
+				if (!IS_USER_ADDRESS(exec.cmdBuffer)
+					|| user_memcpy(cmdBuffer, exec.cmdBuffer, exec.cmdLength)
 					!= B_OK) {
 					return B_BAD_ADDRESS;
 				}
@@ -79,7 +90,8 @@ i2c_bus_raw_control(void *_cookie, uint32 op, void *data, size_t length)
 				exec.cmdBuffer = cmdBuffer;
 			}
 			if (exec.buffer != NULL) {
-				if (user_memcpy(buffer, exec.buffer, exec.bufferLength)
+				if (!IS_USER_ADDRESS(exec.buffer)
+					|| user_memcpy(buffer, exec.buffer, exec.bufferLength)
 					!= B_OK) {
 					return B_BAD_ADDRESS;
 				}
@@ -92,7 +104,7 @@ i2c_bus_raw_control(void *_cookie, uint32 op, void *data, size_t length)
 				return status;
 
 			status = bus->ExecCommand(exec.op, exec.addr,
-				&exec.cmdBuffer, exec.cmdLength, exec.buffer,
+				exec.cmdBuffer, exec.cmdLength, exec.buffer,
 				exec.bufferLength);
 			bus->ReleaseBus();
 
