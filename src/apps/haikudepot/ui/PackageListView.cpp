@@ -154,6 +154,7 @@ public:
 			void				UpdateRating();
 			void				UpdateSize();
 			void				UpdateRepository();
+			void				UpdateVersion();
 
 			PackageRow*&		NextInHash()
 									{ return fNextInHash; }
@@ -537,7 +538,8 @@ enum {
 	kDescriptionColumn,
 	kSizeColumn,
 	kStatusColumn,
-	kRepositoryColumn
+	kRepositoryColumn,
+	kVersionColumn,
 };
 
 
@@ -572,6 +574,9 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef,
 
 	// Repository
 	UpdateRepository();
+
+	// Version
+	UpdateVersion();
 
 	package.AddListener(fPackageListener);
 }
@@ -644,6 +649,16 @@ PackageRow::UpdateRepository()
 		return;
 
 	SetField(new BStringField(fPackage->DepotName()), kRepositoryColumn);
+}
+
+
+void
+PackageRow::UpdateVersion()
+{
+	if (fPackage.Get() == NULL)
+		return;
+
+	SetField(new BStringField(fPackage->Version().ToString()), kVersionColumn);
 }
 
 
@@ -802,6 +817,9 @@ PackageListView::PackageListView(BLocker* modelLock)
 	SetColumnVisible(kRepositoryColumn, false);
 		// invisible by default
 
+	AddColumn(new PackageColumn(B_TRANSLATE("Version"), 50 * scale,
+		50 * scale, 200 * scale, B_TRUNCATE_MIDDLE), kVersionColumn);
+
 	fItemCountView = new ItemCountView();
 	AddStatusView(fItemCountView);
 }
@@ -863,6 +881,8 @@ PackageListView::MessageReceived(BMessage* message)
 					row->UpdateTitle();
 				if ((changes & PKG_CHANGED_DEPOT) != 0)
 					row->UpdateRepository();
+				if ((changes & PKG_CHANGED_VERSION) != 0)
+					row->UpdateVersion();
 			}
 			break;
 		}
