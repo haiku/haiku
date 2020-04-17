@@ -2,13 +2,13 @@ SubDir HAIKU_TOP src add-ons kernel file_systems ufs2 ;
 
 # set some additional defines
 {
-    local defines =
-        UFS2_DEBUGGER_COMMANDS
-        ;
+	local defines =
+		UFS2_DEBUGGER_COMMANDS
+		;
 
-    defines = [ FDefines $(defines) ] ;
-    SubDirCcFlags $(defines) ;
-    SubDirC++Flags $(defines) ;
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
 }
 
 UsePrivateHeaders [ FDirName kernel util ] ;
@@ -18,19 +18,19 @@ UsePrivateKernelHeaders ;
 DEFINES += DEBUG_APP="\\\"ufs2\\\"" ;
 
 local ufs2Sources =
-    Volume.cpp
-    kernel_cpp.cpp
-    kernel_interface.cpp
-    ;
+	DeviceOpener.cpp
+	Volume.cpp
+	kernel_interface.cpp
+	;
 KernelAddon ufs2 :
-    $(ufs2Sources)
-    :
+	$(ufs2Sources)
+	:
 ;
 
 
-SEARCH on [ FGristFiles $(ufs2Sources) ]
-    = [ FDirName  $(HAIKU_TOP) src add-ons kernel file_systems ufs2 ] ;
+SEARCH on [ FGristFiles DeviceOpener.cpp ]
+	= [ FDirName  $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
 
-SEARCH on [ FGristFiles kernel_cpp.cpp ]
-    = [ FDirName $(HAIKU_TOP src system kernel util ] ;
+#SEARCH on [ FGristFiles kernel_cpp.cpp ]
+#    = [ FDirName $(HAIKU_TOP src system kernel util ] ;
 

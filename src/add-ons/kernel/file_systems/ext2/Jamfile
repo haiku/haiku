@@ -3,29 +3,32 @@ SubDir HAIKU_TOP src add-ons kernel file_systems ext2 ;
 #UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders shared storage ;
+UsePrivateHeaders file_systems ;
 UsePrivateKernelHeaders ;
 
 KernelAddon ext2 :
-	Volume.cpp
-	DataStream.cpp
-	Inode.cpp
 	Attribute.cpp
-	DirectoryIterator.cpp
-	ExtentStream.cpp
-	HTree.cpp
-	HTreeEntryIterator.cpp
-	RevokeManager.cpp
-	HashRevokeManager.cpp
-	Journal.cpp
-	NoJournal.cpp
-	InodeJournal.cpp
-	Transaction.cpp
 	BitmapBlock.cpp
 	BlockAllocator.cpp
-	InodeAllocator.cpp
-	CRCTable.cpp
-
-	kernel_interface.cpp
-
 	crc32.c
+	CRCTable.cpp
+	DataStream.cpp
+	DeviceOpener.cpp
+	DirectoryIterator.cpp
+	ExtentStream.cpp
+	HashRevokeManager.cpp
+	HTree.cpp
+	HTreeEntryIterator.cpp
+	Inode.cpp
+	InodeAllocator.cpp
+	InodeJournal.cpp
+	Journal.cpp
+	kernel_interface.cpp
+	NoJournal.cpp
+	RevokeManager.cpp
+	Transaction.cpp
+	Volume.cpp
 ;
+
+SEARCH on [ FGristFiles DeviceOpener.cpp ]
+	= [ FDirName  $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;

@@ -2,13 +2,18 @@ SubDir HAIKU_TOP src add-ons kernel file_systems exfat ;
 
 UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders shared storage ;
+UsePrivateHeaders file_systems ;
 UsePrivateKernelHeaders ;
 
 KernelAddon exfat :
 	DataStream.cpp
+	DeviceOpener.cpp
 	DirectoryIterator.cpp
 	Inode.cpp
 	kernel_interface.cpp
 	Utility.cpp
 	Volume.cpp
 ;
+
+SEARCH on [ FGristFiles DeviceOpener.cpp ]
+	= [ FDirName  $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;

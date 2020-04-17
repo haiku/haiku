@@ -4,6 +4,8 @@
  */
 #include "Volume.h"
 
+#include "DeviceOpener.h"
+
 //#define TRACE_UFS2
 #ifdef TRACE_UFS2
 #	define TRACE(x...) dprintf("\33[34mufs2:\33[0m " x)
@@ -12,35 +14,6 @@
 #endif
 #   define ERROR(x...) dprintf("\33[34mexfat:\33[0m " x)
 
-class DeviceOpner {
-	public:
-								DeviceOpner(int fd, int mode);
-								DeviceOpner(const char* device, int mode);
-								~DeviceOpner();
-
-				int				Open(const char* device, int mode);
-				int				Open(int fd, int mode);
-				void*			InitCache(off_t numBlocks, uint32 blockSize);
-				void			RemoveCache(bool allowWrites);
-
-				void			Keep();
-
-				int				Device() const { return fDevice; }
-				int				Mode() const { return fMode; }
-				bool			IsReadOnly() const { return _IsReadOnly(fMode); }
-
-				status_t		GetSize(off_t* _size, uint32* _blockSize = NULL);
-
-	private:
-			static	bool		_IsReadOnly(int mode)
-									{ return (mode & O_RWMASK) == O_RDONLY; }
-			static	bool		_IsReadWrite(int mode)
-									{ return (mode & O_RWMASK) == O_RDWR; }
-
-					int			fDevice;
-					int			fMode;
-					void*		fBlockCache;
-};
 
 bool
 ufs2_super_block::IsValid()
@@ -50,6 +23,30 @@ ufs2_super_block::IsValid()
 
 	return true;
 }
+
+
+bool
+Volume::IsValidSuperBlock()
+{
+	return fSuperBlock.IsValid();
+}
+
+
+Volume::Volume(fs_volume *volume)
+    : fFSVolume(volume)
+{
+	fFlags = 0;
+	mutex_init(&fLock, "ufs2 volume");
+	TRACE("Volume::Volume() : Initialising volume");
+}
+
+
+Volume::~Volume()
+{
+	mutex_destroy(&fLock);
+	TRACE("Volume::Destructor : Removing Volume");
+}
+
 
 status_t
 Volume::Identify(int fd, ufs2_super_block *superBlock)
@@ -62,6 +59,57 @@ Volume::Identify(int fd, ufs2_super_block *superBlock)
 		ERROR("invalid superblock! Identify failed!!\n");
 		return B_BAD_VALUE;
 	}
+
+	return B_OK;
+}
+
+
+status_t
+Volume::Mount(const char *deviceName, uint32 flags)
+{
+	TRACE("Mounting volume... Please wait.\n");
+	flags |= B_MOUNT_READ_ONLY;
+	if ((flags & B_MOUNT_READ_ONLY) != 0)
+	{
+		TRACE("Volume is read only\n");
+	}
+	else
+	{
+		TRACE("Volume is read write\n");
+	}
+
+	DeviceOpener opener(deviceName, (flags & B_MOUNT_READ_ONLY) != 0 
+									? O_RDONLY:O_RDWR);
+	fDevice = opener.Device();
+	if (fDevice < B_OK) {
+		ERROR("Could not open device\n");
+		return fDevice;
+	}
+
+	if (opener.IsReadOnly())
+		fFlags |= VOLUME_READ_ONLY;
+
+	status_t status = Identify(fDevice, &fSuperBlock);
+	if (status != B_OK) {
+		ERROR("Invalid super block\n");
+		return status;
+	}
+
+	TRACE("Valid super block\n");
+
+	opener.Keep();
+	return B_OK;
+
+}
+
+
+status_t
+Volume::Unmount()
+{
+	TRACE("Unmounting the volume");
+
+	TRACE("Closing device");
+	close(fDevice);
 
 	return B_OK;
 }

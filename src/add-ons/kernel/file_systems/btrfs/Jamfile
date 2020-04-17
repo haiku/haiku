@@ -21,6 +21,7 @@ KernelAddon btrfs :
 	Chunk.cpp
 	CRCTable.cpp
 	DebugSupport.cpp
+	DeviceOpener.cpp
 	DirectoryIterator.cpp
 	ExtentAllocator.cpp
 	Inode.cpp
@@ -30,6 +31,9 @@ KernelAddon btrfs :
 	kernel_libz.a
 	libuuid_kernel.a
 ;
+
+SEARCH on [ FGristFiles DeviceOpener.cpp ]
+	= [ FDirName  $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
 
 SEARCH on [ FGristFiles DebugSupport.cpp ]
 	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;

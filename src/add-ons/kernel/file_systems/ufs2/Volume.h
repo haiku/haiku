@@ -7,6 +7,10 @@
 
 #include "ufs2.h"
 
+enum volume_flags {
+	VOLUME_READ_ONLY	= 0x0001
+};
+
 class Volume {
 	public:
 										Volume(fs_volume* volume);
@@ -27,7 +31,10 @@ class Volume {
 
 	private:
 				fs_volume*				fFSVolume;
+				int						fDevice;
 				ufs2_super_block		fSuperBlock;
+				mutex					fLock;
+				uint32					fFlags;
 };
 
 #endif	// VOLUME_H
