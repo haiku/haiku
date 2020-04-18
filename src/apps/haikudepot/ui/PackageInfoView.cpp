@@ -54,7 +54,6 @@
 #define B_TRANSLATION_CONTEXT "PackageInfoView"
 
 
-static const rgb_color kLightBlack = (rgb_color) { 60, 60, 60, 255 };
 static const float kContentTint = (B_NO_TINT + B_LIGHTEN_1_TINT) / 2.0f;
 
 
@@ -282,7 +281,7 @@ public:
 		font.SetSize(std::max(9.0f, floorf(font.Size() * 0.92f)));
 		font.SetFamilyAndStyle(family, "Italic");
 		fPublisherView->SetFont(&font);
-		fPublisherView->SetHighColor(kLightBlack);
+		fPublisherView->SetHighUIColor(B_PANEL_TEXT_COLOR, B_LIGHTEN_1_TINT);
 
 		// slightly bigger font
 		GetFont(&font);
@@ -291,7 +290,7 @@ public:
 		// Version info
 		fVersionInfo = new BStringView("package version info", "");
 		fVersionInfo->SetFont(&font);
-		fVersionInfo->SetHighColor(kLightBlack);
+		fVersionInfo->SetHighUIColor(B_PANEL_TEXT_COLOR, B_LIGHTEN_1_TINT);
 
 		// Rating view
 		fRatingView = new TransitReportingRatingView(
@@ -299,14 +298,14 @@ public:
 
 		fAvgRating = new BStringView("package average rating", "");
 		fAvgRating->SetFont(&font);
-		fAvgRating->SetHighColor(kLightBlack);
+		fAvgRating->SetHighUIColor(B_PANEL_TEXT_COLOR, B_LIGHTEN_1_TINT);
 
 		fVoteInfo = new BStringView("package vote info", "");
 		// small font
 		GetFont(&font);
 		font.SetSize(std::max(9.0f, floorf(font.Size() * 0.85f)));
 		fVoteInfo->SetFont(&font);
-		fVoteInfo->SetHighColor(kLightBlack);
+		fVoteInfo->SetHighUIColor(B_PANEL_TEXT_COLOR, B_LIGHTEN_1_TINT);
 
 		// Rate button
 		fRateButton = new TransitReportingButton("rate",
@@ -1284,7 +1283,7 @@ PackageInfoView::PackageInfoView(BLocker* modelLock,
 
 	BStringView* noPackageView = new BStringView("no package view",
 		B_TRANSLATE("Click a package to view information"));
-	noPackageView->SetHighColor(kLightBlack);
+	noPackageView->SetHighUIColor(B_PANEL_TEXT_COLOR, B_LIGHTEN_1_TINT);
 	noPackageView->SetExplicitAlignment(BAlignment(
 		B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER));
 

@@ -29,8 +29,6 @@
 #define B_TRANSLATION_CONTEXT "FeaturedPackagesView"
 
 
-static const rgb_color kLightBlack = (rgb_color){ 60, 60, 60, 255 };
-
 static BitmapRef sInstalledIcon(new(std::nothrow)
 	SharedBitmap(RSRC_INSTALLED), true);
 
