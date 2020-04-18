@@ -1,9 +1,9 @@
 /*
- * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Copyright 2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Name, email@email.com
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  *
  * Corresponds to:
  *		headers/os/interface/AbstractLayoutItem.h	hrev43514
@@ -11,10 +11,17 @@
  */
 
 
+// The AbstractLayoutItem.h and its BAbstractLayoutItem is considered entirely
+// internal, and as such should not appear in the documentation.
+
+
+//! \cond INTERNAL
+
+
 /*!
 	\file AbstractLayoutItem.h
 	\ingroup layout
-	\brief Undocumented file.
+	\brief Provides the BAbstractLayoutItem class.
 
 	\since Haiku R1
 */
@@ -24,7 +31,7 @@
 	\class BAbstractLayoutItem
 	\ingroup layout
 	\ingroup libbe
-	\brief Undocumented class.
+	\brief Internal base class for various layouts.
 
 	\since Haiku R1
 */
@@ -283,3 +290,5 @@
 
 	\since Haiku R1
 */
+
+//! \endcond INTERNAL

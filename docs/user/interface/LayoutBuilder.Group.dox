@@ -1,14 +1,14 @@
 /*
- * Copyright 2011 Haiku, Inc. All rights reserved.
+ * Copyright 2011, 2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		John Scipione, jscipione@gmail.com
  *		Ingo Weinhold, bonefish@cs.tu-berlin.de
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  *
  * Corresponds to:
- *		headers/os/interface/GroupLayoutBuilder.h	 rev 42274
- *		src/kits/interface/GroupLayoutBuilder.cpp	 rev 42274
+ *		headers/os/interface/LayoutBuilder.h	 rev 49977
  */
 
 
@@ -17,6 +17,14 @@
 	\ingroup layout
 	\ingroup libbe
 	\brief BLayoutBuilder::Base subclass for building BGroupLayouts.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\typedef BLayoutBuilder::Group<ParentBuilder>::ThisBuilder
+	\brief Shorthand representing the type of \c this.
 
 	\since Haiku R1
 */
@@ -47,8 +55,9 @@
 
 
 /*!
-	\typedef BLayoutBuilder::Group<ParentBuilder>::ThisBuilder
-	\brief Shorthand representing the type of \c this.
+	\typedef BLayoutBuilder::Group<ThisBuilder>::CardBuilder
+	\brief Shorthand for builders returned by this builder's AddCards()
+		methods.
 
 	\since Haiku R1
 */
@@ -69,7 +78,20 @@
 
 	\note The top BView* in \a window has its ViewColor set to
 	      \c B_PANEL_BACKGROUND_COLOR.
-	\param window Thew BWindow* to attach the newly created BGroupLayout to.
+	\param window The BWindow* to attach the newly created BGroupLayout to.
+	\param orientation The orientation for the new BGroupLayout.
+	\param spacing The spacing for the new BGroupLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BLayoutBuilder::Group<ParentBuilder>::Group(BView* view,
+		orientation orientation, float spacing)
+	\brief Creates a builder targeting an existing \a view.
+
+	\param view The BView* to attach the newly created BGroupLayout to.
 	\param orientation The orientation for the new BGroupLayout.
 	\param spacing The spacing for the new BGroupLayout.
 
@@ -198,13 +220,13 @@
 /*!
 	\fn GroupBuilder BLayoutBuilder::Group<ParentBuilder>::AddGroup(
 		orientation orientation, float spacing, float weight)
-	\brief Construct and add a viewless BGroupLayout, then return a GroupBuilder
-	       representing the newly added layout.
+	\brief Add a new viewless BGroupLayout as a child to the layout that this
+		builder represents and return a GroupBuilder representing the new
+		layout.
 
 	\param orientation The orientation to use for the new BGroupLayout.
 	\param spacing The spacing to use for the new BGroupLayout.
-	\param weight The weight for the new BGroupLayout in the BGroupLayout this
-	       builder represents.
+	\param weight The weight for the new BGroupLayout in this group layout.
 
 	\returns A GroupBuilder representing the newly created BGroupLayout.
 
@@ -215,14 +237,14 @@
 /*!
 	\fn GroupBuilder BLayoutBuilder::Group<ParentBuilder>::AddGroup(BGroupView*
 		groupView, float weight)
-	\brief Add BGroupView and return a builder representing the newly added
-	       BGroupView.
+	\brief Add an existing BGroupView as a child to the layout that this
+		builder represents and return a GroupBuilder representing the layout of
+		the added \a groupView.
 
 	\param groupView The BGroupView to be added.
-	\param weight The weight for \a groupView in the BGroupLayout this builder
-	       represents.
+	\param weight The weight for \a groupView in this group layout.
 
-	\returns A GroupBuilder representing \a groupView.
+	\returns A GroupBuilder representing the layout of the \a groupView.
 
 	\since Haiku R1
 */
@@ -231,25 +253,24 @@
 /*!
 	\fn GroupBuilder BLayoutBuilder::Group<ParentBuilder>::AddGroup(
 		BGroupLayout* groupLayout, float weight)
-	\brief Add a BGroupLayout and return a builder representing the newly added
-	       BGroupLayout.
+	\brief Add an existing BGroupLayout as a child to the layout that this
+		builder represents and return a GroupBuilder to the added layout.
 
 	\param groupLayout The BGroupLayout to be added.
-	\param weight The weight for \a groupLayout in the BGroupLayout this builder
-		represents.
+	\param weight The weight for \a groupLayout in this group layout.
 
-	\returns A GroupBuilder representing \a groupLayout.
+	\returns A GroupBuilder representing the \a groupLayout.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn GridBuilder	BLayoutBuilder::Group<ParentBuilder>::AddGrid(
-		float horizontalSpacing = 0.0f, float verticalSpacing = 0.0f,
-		float weight = 1.0f)
-	\brief Create and add a viewless BGridLayout, then return a builder
-	       representing the newly created BGridLayout.
+	\fn GridBuilder BLayoutBuilder::Group<ParentBuilder>::AddGrid(
+		float horizontalSpacing, float verticalSpacing, float weight)
+	\brief Add a new viewless BGridLayout as a child to the layout that this
+		builder represents and return a GridBuilder representing the new
+		layout.
 
 	\param horizontalSpacing The horizontal spacing for the new BGridLayout.
 	\param verticalSpacing The vertical spacing for the new BGridLayout.
@@ -264,15 +285,15 @@
 
 /*!
 	\fn GridBuilder BLayoutBuilder::Group<ParentBuilder>::AddGrid(
-		BGridLayout* gridLayout, float weight = 1.0f)
-	\brief Add a BGridLayout, then return a builder the newly added BGridLayout.
+		BGridLayout* gridLayout, float weight)
+	\brief Add an existing BGridLayout as a child to the layout that this
+		builder represents and return a GridBuilder to the added layout.
 
-	\param gridLayout The BGridLayout to be added and used to construct the
-		returned GridBuilder.
+	\param gridLayout The BGridLayout to be added.
 	\param weight The weight for \a gridLayout in the BGroupLayout this builder
 		represents.
 
-	\returns a GridBuilder representing \a gridLayout.
+	\returns A GridBuilder representing \a gridLayout.
 
 	\since Haiku R1
 */
@@ -280,15 +301,15 @@
 
 /*!
 	\fn GridBuilder	BLayoutBuilder::Group<ParentBuilder>::AddGrid(
-		BGridView* gridView, float weight = 1.0f)
-	\brief Add a BGridView, then return a builder the newly added BGridView.
+		BGridView* gridView, float weight)
+	\brief Add an existing BGridView as a child to the layout this builder
+		represents and return a GridBuilder representing the layout of the
+		added \a gridView.
 
-	\param gridView The BGridView to be added and used to construct the
-		returned GridBuilder.
-	\param weight The weight for \a gridView in the BGroupLayout this builder
-		represents.
+	\param gridView The BGridView to be added.
+	\param weight The weight for \a gridView in this BGroupLayout.
 
-	\returns a GridBuilder representing \a gridView.
+	\returns A GridBuilder representing the layout of the \a gridView.
 
 	\since Haiku R1
 */
@@ -297,14 +318,14 @@
 /*!
 	\fn SplitBuilder BLayoutBuilder::Group<ParentBuilder>::AddSplit(
 		orientation orientation, float spacing, float weight)
-	\brief Create and add a new BSplitView with a weight of \c weight, then
-		return a SplitBuilder representing the new BSplitView.
+	\brief Add a new BSplitView as a child to the layout that this builder
+		represents and return a SplitBuilder representing the new BSplitView.
 
 	\param orientation The orientation of the new BSplitView.
 	\param spacing The spacing of the new BSplitView.
 	\param weight The weight, in this BGroupLayout for the new BSplitView.
 
-	\returns a SplitBuilder representing the new BSplitView.
+	\returns A SplitBuilder representing the new BSplitView.
 
 	\since Haiku R1
 */
@@ -313,12 +334,61 @@
 /*!
 	\fn SplitBuilder BLayoutBuilder::Group<ParentBuilder>::AddSplit(
 		BSplitView* splitView, float weight = 1.0f)
-	\brief Add a BSplitView to the BGroupLayout this builder represents and
-		return a SplitBuilder representing the BSplitView.
+	\brief Add an existing BSplitView as a child to the layout this builder
+		represents and return a SplitBuilder representing the layout of the
+		added \a splitView.
 
 	\param splitView The BSplitView to be added.
 	\param weight The weight of the BSplitView in the BGroupLayout this builder
 		represents.
+
+	\returns A SplitBuilder representing the \a splitView.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn CardBuilder BLayoutBuilder::Group<ParentBuilder>::AddCards(
+		float weight)
+	\brief Add a new viewless BCardLayout as a child to the layout that this
+		builder represents and return a CardBuilder representing the new layout.
+
+	\param weight The weight of this new layout within the current group layout.
+
+	\returns A CardBuilder representing the new BCardLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn CardBuilder BLayoutBuilder::Group<ParentBuilder>::AddCards(
+		BCardLayout* cardLayout, float weight)
+	\brief Add an existing BCardLayout as a child to the layout that this builder
+		represents and return a CardBuilder representing the added layout.
+
+	\param cardLayout The existing layout to add to the current group layout.
+	\param weight The weight of this new layout within the current group
+		layout.
+
+	\returns A CardBuilder representing the \a cardLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn CardBuilder BLayoutBuilder::Group<ParentBuilder>::AddCards(
+		BCardView* cardView, float weight)
+	\brief Add an existing BCardView as a child to the layout that this builder
+		represents and return a CardBuilder representing the layout of the
+		added BCardView.
+
+	\param cardView The existing BCardView to add to the current group layout.
+	\param weight The weight of this new layout within the current group layout.
+
+	\returns A CardBuilder representing the layout of the \a cardView.
 
 	\since Haiku R1
 */
@@ -339,9 +409,9 @@
 
 /*!
 	\fn ThisBuilder& BLayoutBuilder::Group<ParentBuilder>::AddGlue(
-		float weight = 1.0f)
+		float weight)
 	\brief Add a BSpaceLayoutItem created by BSpaceLayoutItem::CreateGlue()
-		to the BGroupLayout this builder represents.
+		to the builder's layout.
 
 	\param weight The weight of the BSpaceLayoutItem in the BGroupLayout this
 		builder represents
@@ -368,13 +438,82 @@
 
 
 /*!
-	\fn ThisBuilder& BLayoutBuilder::Group<ParentBuilder>::SetInsets(float left,
-		 float top, float right, float bottom)
-	\brief Call the BTwoDimensionalLayout::SetInsets() method on the
-		BGroupLayout this builder represents.
+	\name Insets
+*/
+
+
+//! @{
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Group<ParentBuilder>::SetInsets(
+		float left, float top, float right, float bottom)
+	\copydoc BTwoDimensionalLayout::SetInsets(float, float, float, float)
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Group<ParentBuilder>::SetInsets(
+		float horizontal, float vertical)
+	\copydoc BTwoDimensionalLayout::SetInsets(float, float)
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Group<ParentBuilder>::SetInsets(
+		float insets)
+	\copydoc BTwoDimensionalLayout::SetInsets(float)
+*/
+
+
+//! @}
+
+
+/*!
+	\name Explicit Sizes and Alignment
+*/
+
+
+//! @{
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Group<ParentBuilder>::SetExplicitMinSize(
+		BSize size)
+	\brief Set the explicit minimum size of the underlying layout.
 
 	\since Haiku R1
 */
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Group<ParentBuilder>::SetExplicitMaxSize(
+		BSize size)
+	\brief Set the explicit maximum size of the underlying layout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Group<ParentBuilder>::SetExplicitPreferredSize(
+		BSize size)
+	\brief Set the explicit preferred size of the underlying layout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Group<ParentBuilder>::SetExplicitAlignment(
+		BAlignment alignment)
+	\brief Set the explicit alignment of the underlying layout.
+
+	\since Haiku R1
+*/
+
+
+//! @}
 
 
 /*!
@@ -387,7 +526,7 @@
 
 /*!
 	\fn BGroupLayout* BLayoutBuilder::Group<ParentBuilder>::Layout() const
-	\brief Get the BGroupLayout this builder represents.
+	\brief Get a pointer to the layout this builder represents.
 
 	\since Haiku R1
 */
@@ -395,7 +534,7 @@
 
 /*!
 	\fn BView* BLayoutBuilder::Group<ParentBuilder>::View() const
-	\brief Get the BView this builder's BGroupLayout is attached to.
+	\brief Get a pointer to the BView this builder's layout is attached to.
 
 	\since Haiku R1
 */
@@ -404,9 +543,9 @@
 /*!
 	\fn ThisBuilder& BLayoutBuilder::Group<ParentBuilder>::GetLayout(
 		BGroupLayout** _layout)
-	\brief Get the BGroupLayout this builder represents.
+	\brief Get the layout this builder represents.
 
-	\param[out] _layout The BGroupLayout this builder represents.
+	\param[out] _layout The layout this builder represents.
 
 	\since Haiku R1
 */
@@ -415,9 +554,9 @@
 /*!
 	\fn ThisBuilder& BLayoutBuilder::Group<ParentBuilder>::GetView(
 		BView** _view)
-	\brief Get the BView this builder's BGroupLayout is attached to.
+	\brief Get a pointer to the BView this builder's layout is attached to.
 
-	\param[out] _view The BView this builder's BGroupLayout is attached to.
+	\param[out] _view The BView this builder's layout is attached to.
 
 	\since Haiku R1
 */
@@ -425,7 +564,7 @@
 
 /*!
 	\fn BLayoutBuilder::Group<ParentBuilder>::operator BGroupLayout*()
-	\brief Cast this builder into the BGroupLayout it represents.
+	\brief Cast this builder into the layout object it represents.
 
 	\since Haiku R1
 */

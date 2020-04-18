@@ -32,42 +32,31 @@
 
 /*!
 	\typedef BLayoutBuilder::Cards<ParentBuilder>::ThisBuilder
-	\brief Shorthand representing the type of \c this.
-
-	\since Haiku R1
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::ThisBuilder
 */
 
 
 /*!
-	\typedef BLayoutBuilder::Cards<ThisBuilder>::GroupBuilder
-	\brief Shorthand for builders returned by this builder's AddGroup() methods.
-
-	\since Haiku R1
+	\typedef BLayoutBuilder::Cards<ParentBuilder>::GroupBuilder
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::GroupBuilder
 */
 
 
 /*!
-	\typedef BLayoutBuilder::Cards<ThisBuilder>::GridBuilder
-	\brief Shorthand for builders returned by this builder's AddGrid() methods.
-
-	\since Haiku R1
+	\typedef BLayoutBuilder::Cards<ParentBuilder>::GridBuilder
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::GridBuilder
 */
 
 
 /*!
-	\typedef BLayoutBuilder::Cards<ThisBuilder>::SplitBuilder
-	\brief Shorthand for builders returned by this builder's AddSplit() methods.
-
-	\since Haiku R1
+	\typedef BLayoutBuilder::Cards<ParentBuilder>::SplitBuilder
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::SplitBuilder
 */
 
 
 /*!
 	\typedef BLayoutBuilder::Cards<ThisBuilder>::CardBuilder
-	\brief Shorthand for builders returned by this builder's AddCards()
-		methods.
-
-	\since Haiku R1
+	\copydoc BLayoutBuilder::Group<ThisBuilder>::CardBuilder
 */
 
 
@@ -114,7 +103,7 @@
 
 
 /*!
-	\fn BLayoutBuilder::Cards<ParentBuilder>::Cards(BCardLayout* layout)
+	\fn BLayoutBuilder::Cards<ParentBuilder>::Cards(BCardView* view)
 	\brief Creates a builder targeting an existing BCardView.
 
 	\since Haiku R1
@@ -134,54 +123,32 @@
 
 /*!
 	\fn BCardLayout* BLayoutBuilder::Cards<ParentBuilder>::Layout() const
-	\brief Get a pointer to the underlying BCardLayout
-
-	\returns A pointer to the underlying BCardLayout
-
-	\since Haiku R1
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::Layout()
 */
 
 
 /*!
 	\fn BView* BLayoutBuilder::Cards<ParentBuilder>::View() const
-	\brief Get a pointer to the underlying BView.
-
-	\returns A pointer to the underlying BView
-
-	\since Haiku R1
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::View()
 */
 
 /*!
 	\fn ThisBuilder& BLayoutBuilder::Cards<ParentBuilder>::GetLayout(
 		BCardLayout** _layout)
-	\brief Get a pointer to the underlying view.
-
-	\param[out] _layout Location to store the underlying BCardView reference.
-
-	\return The method returns a self reference, so that calls to the builder
-		may be chained.
-
-	\since Haiku R1
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::GetLayout()
 */
 
 
 /*!
 	\fn ThisBuilder& BLayoutBuilder::Cards<ParentBuilder>::GetView(
 		BView** _view)
-	\brief Get a pointer to the underlying view.
-
-	\param[out] _view Location to store the underlying BView reference.
-
-	\return The method returns a self reference, so that calls to the builder
-		may be chained.
-
-	\since Haiku R1
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::GetView()
 */
 
 
 /*!
 	\fn BLayoutBuilder::Cards<ParentBuilder>::operator BCardLayout*()
-	\brief Cast this builder into the BCardLayout it represents.
+	\brief Cast this builder into the layout object it represents.
 
 	\since Haiku R1
 */
@@ -243,8 +210,8 @@
 /*!
 	\fn GroupBuilder BLayoutBuilder::Cards<ParentBuilder>::AddGroup(
 		orientation orientation, float spacing)
-	\brief Construct and add a viewless BGroupLayout, then return a GroupBuilder
-	       representing the newly added layout.
+	\copybrief GroupBuilder BLayoutBuilder::Group<ParentBuilder>::AddGroup(
+		orientation orientation, float spacing, float weight)
 
 	\param orientation The orientation to use for the new BGroupLayout.
 	\param spacing The spacing to use for the new BGroupLayout.
@@ -258,12 +225,12 @@
 /*!
 	\fn GroupBuilder BLayoutBuilder::Cards<ParentBuilder>::AddGroup(
 		BGroupView* groupView)
-	\brief Add BGroupView and return a builder representing the newly added
-	       BGroupView.
+	\copybrief GroupBuilder BLayoutBuilder::Group<ParentBuilder>::AddGroup(
+		BGroupLayout* groupLayout, float weight)
 
 	\param groupView The BGroupView to be added.
 
-	\returns A GroupBuilder representing \a groupView.
+	\returns A GroupBuilder representing the layout of the \a groupView.
 
 	\since Haiku R1
 */
@@ -272,12 +239,12 @@
 /*!
 	\fn GroupBuilder BLayoutBuilder::Cards<ParentBuilder>::AddGroup(
 		BGroupLayout* groupLayout)
-	\brief Add a BGroupLayout and return a builder representing the newly added
-	       BGroupLayout.
+	\copybrief GroupBuilder BLayoutBuilder::Group<ParentBuilder>::AddGroup(BGroupView*
+		groupView, float weight)
 
 	\param groupLayout The BGroupLayout to be added.
 
-	\returns A GroupBuilder representing \a groupLayout.
+	\returns A GroupBuilder representing the \a groupLayout.
 
 	\since Haiku R1
 */
@@ -286,8 +253,8 @@
 /*!
 	\fn GridBuilder	BLayoutBuilder::Cards<ParentBuilder>::AddGrid(
 		float horizontalSpacing, float verticalSpacing)
-	\brief Create and add a viewless BGridLayout, then return a builder
-	       representing the newly created BGridLayout.
+	\copydoc GridBuilder BLayoutBuilder::Group<ParentBuilder>::AddGrid(
+		float horizontalSpacing, float verticalSpacing, float weight)
 
 	\param horizontalSpacing The horizontal spacing for the new BGridLayout.
 	\param verticalSpacing The vertical spacing for the new BGridLayout.
@@ -301,7 +268,8 @@
 /*!
 	\fn GridBuilder BLayoutBuilder::Cards<ParentBuilder>::AddGrid(
 		BGridLayout* gridLayout)
-	\brief Add a BGridLayout, then return a builder the newly added BGridLayout.
+	\copybrief GridBuilder BLayoutBuilder::Group<ParentBuilder>::AddGrid(
+		BGridLayout* gridLayout, float weight)
 
 	\param gridLayout The BGridLayout to be added and used to construct the
 		returned GridBuilder.
@@ -315,12 +283,13 @@
 /*!
 	\fn GridBuilder	BLayoutBuilder::Cards<ParentBuilder>::AddGrid(
 		BGridView* gridView)
-	\brief Add a BGridView, then return a builder the newly added BGridView.
+	\copybrief GridBuilder	BLayoutBuilder::Group<ParentBuilder>::AddGrid(
+		BGridView* gridView, float weight)
 
 	\param gridView The BGridView to be added and used to construct the
 		returned GridBuilder.
 
-	\returns A GridBuilder representing \a gridView.
+	\returns A GridBuilder representing the layout of the \a gridView.
 
 	\since Haiku R1
 */
@@ -329,8 +298,8 @@
 /*!
 	\fn SplitBuilder BLayoutBuilder::Cards<ParentBuilder>::AddSplit(
 		orientation orientation, float spacing)
-	\brief Create and add a new BSplitView with a weight of \c weight, then
-		return a SplitBuilder representing the new BSplitView.
+	\copybrief SplitBuilder BLayoutBuilder::Group<ParentBuilder>::AddSplit(
+		orientation orientation, float spacing, float weight)
 
 	\param orientation The orientation of the new BSplitView.
 	\param spacing The spacing of the new BSplitView.
@@ -344,12 +313,12 @@
 /*!
 	\fn SplitBuilder BLayoutBuilder::Cards<ParentBuilder>::AddSplit(
 		BSplitView* splitView)
-	\brief Add a BSplitView to the BSplitView this builder represents and
-		return a SplitBuilder representing the BSplitView.
+	\copybrief SplitBuilder BLayoutBuilder::Group<ParentBuilder>::AddSplit(
+		BSplitView* splitView, float weight)
 
 	\param splitView The BSplitView to be added.
 
-	\returns A SplitBuilder representing the new BSplitView.
+	\returns A SplitBuilder representing the \a splitView.
 
 	\since Haiku R1
 */
@@ -357,8 +326,8 @@
 
 /*!
 	\fn CardBuilder BLayoutBuilder::Cards<ParentBuilder>::AddCards()
-	\brief Add a new BCardLayout as a child of the BCardLayout this builder
-		represents and return a CardBuilder representing the new layout.
+	\copybrief CardBuilder BLayoutBuilder::Group<ParentBuilder>::AddCards(
+		float weight)
 
 	\returns A CardBuilder representing the new BCardLayout.
 
@@ -369,13 +338,13 @@
 /*!
 	\fn CardBuilder BLayoutBuilder::Cards<ParentBuilder>::AddCards(
 		BCardLayout* cardLayout)
-	\brief Add a new BCardLayout as a child of the BCardLayout this builder
-		represents and return a CardBuilder representing the new layout.
+	\copybrief CardBuilder BLayoutBuilder::Group<ParentBuilder>::AddCards(
+		BCardLayout* cardLayout, float weight)
 
 	\param cardLayout The existing layout that will be added to the underlying
 		BSplitView.
 
-	\returns A CardBuilder representing the new BCardLayout.
+	\returns A CardBuilder representing the \a cardLayout.
 
 	\since Haiku R1
 */
@@ -384,13 +353,13 @@
 /*!
 	\fn CardBuilder BLayoutBuilder::Cards<ParentBuilder>::AddCards(
 		BCardView* cardView)
-	\brief Add a new BCardLayout as a child of the BCardLayout this builder
-		represents and return a CardBuilder representing the new layout.
+	\copybrief CardBuilder BLayoutBuilder::Group<ParentBuilder>::AddCards(
+		BCardView* cardView, float weight)
 
 	\param cardView The existing view that will be added to the underlying
 		BSplitView.
 
-	\returns A CardBuilder representing the new BCardLayout.
+	\returns A CardBuilder representing the layout of t he \a cardView.
 
 	\since Haiku R1
 */
@@ -401,7 +370,7 @@
 
 
 /*!
-	\name Setting Explicit Sizes
+	\name Explicit Sizes and Alignment
 */
 
 
@@ -411,36 +380,28 @@
 /*!
 	\fn ThisBuilder& BLayoutBuilder::Cards<ParentBuilder>::SetExplicitMinSize(
 		BSize size)
-	\brief Set the explicit minimum size of the underlying layout item.
-
-	\since Haiku R1
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::SetExplicitMinSize()
 */
 
 
 /*!
 	\fn ThisBuilder& BLayoutBuilder::Cards<ParentBuilder>::SetExplicitMaxSize(
 		BSize size)
-	\brief Set the explicit maximum size of the underlying layout item.
-
-	\since Haiku R1
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::SetExplicitMaxSize()
 */
 
 
 /*!
 	\fn ThisBuilder& BLayoutBuilder::Cards<ParentBuilder>::SetExplicitPreferredSize(
 		BSize size)
-	\brief Set the explicit preferred size of the underlying layout item.
-
-	\since Haiku R1
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::SetExplicitPreferredSize()
 */
 
 
 /*!
 	\fn ThisBuilder& BLayoutBuilder::Cards<ParentBuilder>::SetExplicitAlignment(
 		BAlignment alignment)
-	\brief Set the explicit alignment of the underlying layout item.
-
-	\since Haiku R1
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::SetExplicitAlignment()
 */
 
 

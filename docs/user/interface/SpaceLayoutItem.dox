@@ -1,9 +1,9 @@
 /*
- * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Copyright 2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Name, email@email.com
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  *
  * Corresponds to:
  *		headers/os/interface/SpaceLayoutItem.h	hrev43514
@@ -14,7 +14,7 @@
 /*!
 	\file SpaceLayoutItem.h
 	\ingroup layout
-	\brief Undocumented file.
+	\brief Provides the BSpaceLayoutItem class.
 
 	\since Haiku R1
 */
@@ -24,23 +24,52 @@
 	\class BSpaceLayoutItem
 	\ingroup layout
 	\ingroup libbe
-	\brief Undocumented class.
+	\brief An empty layout item that expands into empty space based on its size
+		configuration.
+
+	This class is a specialized layout item, that is used to distribute space
+	within one of the layouts. The layout item can be manually configured, but
+	there are also two default varieties.
+
+	The first variety is the \b glue variety. Glue is an element that expands
+	to the maximum space that is available. Let's say, you have a horizontal
+	BGroupLayout. You want a button on the left, and a button on the right,
+	with empty space in the middle. The middle element can be a glue element.
+	The glue will push the right button all the way to the end of the available
+	space. If the host view gets larger, the glue will expand. You can use the
+	static method BSpaceLayoutItem::CreateGlue() to easily create a glue
+	element.
+
+	Another variety is the \b strut. A is a layout item with no minimum size,
+	and a maximum size. This means that the item might be smaller than the
+	maximum size, but it will never be larger than the maximum size. You can
+	use the static methods BSpaceLayoutItem::CreateVerticalStrut() and
+	BSpaceLayoutItem::CreateHorizontalStrut() to create a strut item.
+
+	The default constructor allows you to create a layout item with custom
+	minimum sizes, maximum sizes, preferred sizes and alignments.
+
+	\see Where applicable, the layout builder classes have convenience methods
+		to add glue or struts. See
+		BLayoutBuilder::Group<ParentBuilder>::AddGlue() or
+		BLayoutBuilder::Group<ParentBuilder>::AddStrut().
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn BSpaceLayoutItem::BSpaceLayoutItem(BSize minSize, BSize maxSize, BSize preferredSize, BAlignment alignment)
-	\brief Undocumented public method
+	\fn BSpaceLayoutItem::BSpaceLayoutItem(BSize minSize, BSize maxSize,
+		BSize preferredSize, BAlignment alignment)
+	\brief Create a space layout item with specific properties.
 
-	\param minSize Undocumented
-	\param maxSize Undocumented
-	\param preferredSize Undocumented
-	\param alignment Undocumented
+	See the CreateGlue(), CreateVerticalStrut() and CreateHorizontalStruct
+	static methods to create common space items.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\param minSize The minimum size for this item.
+	\param maxSize The maximum size for this item.
+	\param preferredSize The preferred size for this item.
+	\param alignment The alignment of this item.
 
 	\since Haiku R1
 */
@@ -48,187 +77,134 @@
 
 /*!
 	\fn BSpaceLayoutItem::BSpaceLayoutItem(BMessage *archive)
-	\brief Undocumented public method
+	\brief Constructs a BSpaceLayoutItem from an \a archive message.
 
-	\param archive Undocumented
+	This method is usually not called directly, if you want to build a
+	space layout item from an archived message you should call Instantiate()
+	instead because it can handle errors properly.
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
-*/
-
-
-/*!
-	\fn virtual virtual BSpaceLayoutItem::~BSpaceLayoutItem()
-	\brief Undocumented public method
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\param archive The \ref BMessage that contains the space layout item.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn virtual virtual BSize BSpaceLayoutItem::MinSize()
-	\brief Undocumented public method
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\fn virtual BSpaceLayoutItem::~BSpaceLayoutItem()
+	\brief Destructor.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn virtual virtual BSize BSpaceLayoutItem::MaxSize()
-	\brief Undocumented public method
-
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\fn virtual BSize BSpaceLayoutItem::MinSize()
+	\copydoc BLayoutItem::MinSize()
 */
 
 
 /*!
-	\fn virtual virtual BSize BSpaceLayoutItem::PreferredSize()
-	\brief Undocumented public method
-
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\fn virtual BSize BSpaceLayoutItem::MaxSize()
+	\copydoc BLayoutItem::MaxSize()
 */
 
 
 /*!
-	\fn virtual virtual BAlignment BSpaceLayoutItem::Alignment()
-	\brief Undocumented public method
-
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\fn virtual BSize BSpaceLayoutItem::PreferredSize()
+	\copydoc BLayoutItem::PreferredSize()
 */
 
 
 /*!
-	\fn virtual virtual void BSpaceLayoutItem::SetExplicitMinSize(BSize size)
-	\brief Undocumented public method
-
-	\param size Undocumented
-
-	\since Haiku R1
+	\fn virtual BAlignment BSpaceLayoutItem::Alignment()
+	\copydoc BLayoutItem::Alignment()
 */
 
 
 /*!
-	\fn virtual virtual void BSpaceLayoutItem::SetExplicitMaxSize(BSize size)
-	\brief Undocumented public method
-
-	\param size Undocumented
-
-	\since Haiku R1
+	\fn virtual void BSpaceLayoutItem::SetExplicitMinSize(BSize size)
+	\copydoc BLayoutItem::SetExplicitMinSize()
 */
 
 
 /*!
-	\fn virtual virtual void BSpaceLayoutItem::SetExplicitPreferredSize(BSize size)
-	\brief Undocumented public method
-
-	\param size Undocumented
-
-	\since Haiku R1
+	\fn virtual void BSpaceLayoutItem::SetExplicitMaxSize(BSize size)
+	\copydoc BLayoutItem::SetExplicitMaxSize()
 */
 
 
 /*!
-	\fn virtual virtual void BSpaceLayoutItem::SetExplicitAlignment(BAlignment alignment)
-	\brief Undocumented public method
+	\fn virtual void BSpaceLayoutItem::SetExplicitPreferredSize(
+		BSize size)
+	\copydoc BLayoutItem::SetExplicitPreferredSize()
+*/
 
-	\param alignment Undocumented
 
-	\since Haiku R1
+/*!
+	\fn virtual void BSpaceLayoutItem::SetExplicitAlignment(
+		BAlignment alignment)
+	\copydoc BLayoutItem::SetExplicitAlignment()
 */
 
 
 /*!
 	\fn virtual virtual bool BSpaceLayoutItem::IsVisible()
-	\brief Undocumented public method
+	\brief Return the current local visibility of this item.
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
-*/
-
-
-/*!
-	\fn virtual virtual void BSpaceLayoutItem::SetVisible(bool visible)
-	\brief Undocumented public method
-
-	\param visible Undocumented
+	The visibility is set explicitly through SetVisible(). By default, the
+	layout item is visible.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn virtual virtual BRect BSpaceLayoutItem::Frame()
-	\brief Undocumented public method
+	\fn virtual void BSpaceLayoutItem::SetVisible(bool visible)
+	\brief Set the visibility of this space layout item.
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
-*/
-
-
-/*!
-	\fn virtual virtual void BSpaceLayoutItem::SetFrame(BRect frame)
-	\brief Undocumented public method
-
-	\param frame Undocumented
+	\param visible The desired visibility of the layout item.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn virtual virtual status_t BSpaceLayoutItem::Archive(BMessage *into, bool deep=true) const
-	\brief Undocumented public method
+	\fn virtual BRect BSpaceLayoutItem::Frame()
+	\copydoc BLayoutItem::Frame()
+*/
 
-	\param into Undocumented
-	\param deep Undocumented
 
-	\return Undocumented
-	\retval <value> Undocumented
+/*!
+	\fn virtual void BSpaceLayoutItem::SetFrame(BRect frame)
+	\copydoc BLayoutItem::SetFrame()
+*/
+
+
+/*!
+	\fn static BSpaceLayoutItem* BSpaceLayoutItem::CreateGlue()
+	\brief Create a layout item that acts like glue.
+
+	This type of space layout item has no minimum size, and expands to the
+	maximum available space in all directions.
+
+	\return Creates a new BSpaceLayoutItem and returns ownership to the caller.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn static static BSpaceLayoutItem* BSpaceLayoutItem::CreateGlue()
-	\brief Undocumented public method
+	\fn static BSpaceLayoutItem* BSpaceLayoutItem::CreateHorizontalStrut(
+		float width)
+	\brief Create a layout item that horizontally expands to a maximum
+		\a width.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	The item has no minimum size, meaning that if the total available width is
+	smaller than the maximum \a width, the strut will use the available space.
 
-	\since Haiku R1
-*/
+	\param width The maximum width.
 
-
-/*!
-	\fn static static BSpaceLayoutItem* BSpaceLayoutItem::CreateHorizontalStrut(float width)
-	\brief Undocumented public method
-
-	\param width Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\return Creates a new BSpaceLayoutItem and returns ownership to the caller.
 
 	\since Haiku R1
 */
@@ -236,25 +212,23 @@
 
 /*!
 	\fn static static BSpaceLayoutItem* BSpaceLayoutItem::CreateVerticalStrut(float height)
-	\brief Undocumented public method
+	\brief Create a layout item that vertically expands to a maximum
+		\a height.
 
-	\param height Undocumented
+	The item has no minimum size, meaning that if the total available height is
+	smaller than the maximum \a width, the strut will use the available space.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\param height The maximum height.
+
+	\return Creates a new BSpaceLayoutItem and returns ownership to the caller.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn static static BArchivable* BSpaceLayoutItem::Instantiate(BMessage *from)
-	\brief Undocumented public method
-
-	\param from Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\fn static BArchivable* BSpaceLayoutItem::Instantiate(BMessage *from)
+	\brief Instantiate the item from the message \a from.
 
 	\since Haiku R1
 */

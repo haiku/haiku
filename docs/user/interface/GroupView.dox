@@ -1,9 +1,9 @@
 /*
- * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Copyright 2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Name, email@email.com
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  *
  * Corresponds to:
  *		headers/os/interface/GroupView.h	hrev45833
@@ -14,7 +14,7 @@
 /*!
 	\file GroupView.h
 	\ingroup interface
-	\brief Undocumented file.
+	\brief Provides the BGroupView class.
 
 	\since Haiku R1
 */
@@ -24,36 +24,38 @@
 	\class BGroupView
 	\ingroup interface
 	\ingroup libbe
-	\brief Undocumented class.
+	\brief Container view for a collection of views organized in a horizontal
+		or vertical row.
+
+	The group has a horizontal or a vertical orientation. By default, the view
+	has the default system grey background.
+
+	\see BGroupLayout for more information on how and when to use this
+		type of container.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn BGroupView::BGroupView(orientation orientation=B_HORIZONTAL, float spacing=B_USE_DEFAULT_SPACING)
-	\brief Undocumented public method
+	\fn BGroupView::BGroupView(orientation orientation, float spacing)
+	\brief Creates a new group view.
 
-	\param orientation Undocumented
-	\param spacing Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\param orientation Set to B_HORIZONTAL or B_VERTICAL.
+	\param spacing The space between the elements in the group.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn BGroupView::BGroupView(const char *name, orientation orientation=B_HORIZONTAL, float spacing=B_USE_DEFAULT_SPACING)
-	\brief Undocumented public method
+	\fn BGroupView::BGroupView(const char *name, orientation orientation,
+		float spacing)
+	\brief Creates a new group view with a \a name.
 
-	\param name Undocumented
-	\param orientation Undocumented
-	\param spacing Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\param name The name for the view.
+	\param orientation Set to B_HORIZONTAL or B_VERTICAL.
+	\param spacing The space between the elements in the group.
 
 	\since Haiku R1
 */
@@ -61,33 +63,32 @@
 
 /*!
 	\fn BGroupView::BGroupView(BMessage *from)
-	\brief Undocumented public method
+	\brief Constructs a BGroupView \a from an archive message.
 
-	\param from Undocumented
+	This method is usually not called directly, if you want to build a
+	group view from an archived message you should call Instantiate() instead
+	because it can handle errors properly.
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
-*/
-
-
-/*!
-	\fn virtual virtual BGroupView::~BGroupView()
-	\brief Undocumented public method
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\param from The \ref BMessage that contains the grid view.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn virtual virtual void BGroupView::SetLayout(BLayout *layout)
-	\brief Undocumented public method
+	\fn virtual BGroupView::~BGroupView()
+	\brief Destructor.
 
-	\param layout Undocumented
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual void BGroupView::SetLayout(BLayout *layout)
+	\brief Adopt a given group \a layout.
+
+	\param layout The layout to set to. This must be a BGroupLayout, or a
+		derivative. Any other layout types will be ignored.
 
 	\since Haiku R1
 */
@@ -95,37 +96,27 @@
 
 /*!
 	\fn BGroupLayout* BGroupView::GroupLayout() const
-	\brief Undocumented public method
+	\brief Get a pointer to the underlying BGroupLayout.
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
-*/
-
-
-/*!
-	\fn virtual virtual status_t BGroupView::Perform(perform_code d, void *arg)
-	\brief Undocumented public method
-
-	\param d Undocumented
-	\param arg Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
+	\return A pointer to the underlying group layout.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn static static BArchivable* BGroupView::Instantiate(BMessage *from)
-	\brief Undocumented public method
+	\fn virtual status_t BGroupView::Perform(perform_code d, void *arg)
+	\brief Perform some action. (Internal Method)
 
-	\param from Undocumented
+	Reimplemented from BView::Perform()
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static BArchivable* BGroupView::Instantiate(BMessage *from)
+	\brief Instantiate the view from the message \a from.
 
 	\since Haiku R1
 */

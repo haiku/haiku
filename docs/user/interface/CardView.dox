@@ -65,7 +65,11 @@
 
 /*!
 	\fn BCardView::BCardView(BMessage *from)
-	\brief Unarchive a card view.
+	\brief Constructs a BCardView \a from an archive message.
+
+	This method is usually not called directly, if you want to build a
+	card view from an archived message you should call Instantiate() instead
+	because it can handle errors properly.
 
 	\param from The \ref BMessage that contains the card view.
 

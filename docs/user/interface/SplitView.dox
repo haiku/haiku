@@ -92,6 +92,10 @@
 	\fn BSplitView::BSplitView(BMessage *from)
 	\brief Unarchive a split view.
 
+	This method is usually not called directly, if you want to build a
+	split view from an archived message you should call Instantiate() instead
+	because it can handle errors properly.
+
 	\param from The \ref BMessage that contains the split view.
 
 	\since Haiku R1

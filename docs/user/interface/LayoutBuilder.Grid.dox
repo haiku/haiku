@@ -1,12 +1,12 @@
 /*
- * Copyright 2017 Haiku, Inc. All rights reserved.
+ * Copyright 2017, 2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Adrien Destugues, pulkomandy@pulkomandy.tk
  *
  * Corresponds to:
- *		headers/os/interface/LayoutBuilder.h	 rev 51359
+ *		headers/os/interface/LayoutBuilder.h	 rev 49977
  */
 
 
@@ -22,6 +22,37 @@
 	columns and rows.
 */
 
+
+/*!
+	\typedef BLayoutBuilder::Grid<ParentBuilder>::ThisBuilder
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::ThisBuilder
+*/
+
+
+/*!
+	\typedef BLayoutBuilder::Grid<ParentBuilder>::GroupBuilder
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::GroupBuilder
+*/
+
+
+/*!
+	\typedef BLayoutBuilder::Grid<ParentBuilder>::GridBuilder
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::GridBuilder
+*/
+
+
+/*!
+	\typedef BLayoutBuilder::Grid<ParentBuilder>::SplitBuilder
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::SplitBuilder
+*/
+
+
+/*!
+	\typedef BLayoutBuilder::Grid<ThisBuilder>::CardBuilder
+	\copydoc BLayoutBuilder::Group<ThisBuilder>::CardBuilder
+*/
+
+
 /*!
 	\name Constructors
 */
@@ -33,13 +64,26 @@
 /*!
 	\fn BLayoutBuilder::Grid<ParentBuilder>::Grid(BWindow *window,
 		float horizontal, float vertical)
-	\brief Creates a new BGroupLayout, and attaches it to a BWindow.
+	\brief Creates a new BGridLayout, and attaches it to a BWindow.
 
 	\note The top BView* in \a window has its ViewColor set to
 	      \c B_PANEL_BACKGROUND_COLOR.
 	\param window Thew BWindow* to attach the newly created BGroupLayout to.
 	\param horizontal The horizontal spacing for the new BGridLayout.
 	\param vertical The vertical spacing for the new BGridLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BLayoutBuilder::Grid<ParentBuilder>::Grid(BView* view,
+		float horizontal, float vertical)
+	\brief Creates a builder targeting an existing \a view.
+
+	\param view The BView* to attach the newly created BGridLayout to.
+	\param horizontal The horizontal spacing for the new BGridLayout.
+	\param vertical The vertical spacing for the new BGroupLayout.
 
 	\since Haiku R1
 */
@@ -83,6 +127,53 @@
 
 	\since Haiku R1
 */
+
+
+//! @}
+
+
+/*!
+	\name Accessors
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BGridLayout* BLayoutBuilder::Grid<ParentBuilder>::Layout() const
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::Layout()
+*/
+
+
+/*!
+	\fn BView* BLayoutBuilder::Grid<ParentBuilder>::View() const
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::View()
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Grid<ParentBuilder>::GetLayout(
+		BGridLayout** _layout)
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::GetLayout()
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Grid<ParentBuilder>::GetView(
+		BView** _view)
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::GetView()
+*/
+
+
+/*!
+	\fn BLayoutBuilder::Grid<ParentBuilder>::operator BGridLayout*()
+	\brief Cast this builder into the layout object it represents.
+
+	\since Haiku R1
+*/
+
+
 //! @}
 
 
@@ -182,6 +273,378 @@
 	of the text area with other items in the layout.
 
 	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Adding BLayouts and their BView Pairs
+
+	A set of methods that add a BLayout or BView subclass and return a
+	BLayoutBuilder::Base subclass representing the newly added object. These
+	methods push a new builder on top of the stack, you will not be using
+	\c this builder again until you call End().
+*/
+
+
+//! @{
+
+
+/*!
+	\fn GroupBuilder BLayoutBuilder::Grid<ParentBuilder>::AddGroup(
+		orientation orientation, float spacing, int32 column, int32 row,
+		int32 columnCount, int32 rowCount)
+	\copybrief GroupBuilder BLayoutBuilder::Group<ParentBuilder>::AddGroup(
+		orientation orientation, float spacing, float weight)
+
+	\param orientation The orientation to use for the new BGroupLayout.
+	\param spacing The spacing to use for the new BGroupLayout.
+	\param column The column number (zero-index) to use.
+	\param row The row number (zero-index) to use.
+	\param columnCount The number of columns to span the new BGroupLayout over.
+	\param rowCount The number of rows to span the new BGroupLayout over.
+
+	\returns A GroupBuilder representing the newly created BGroupLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn GroupBuilder BLayoutBuilder::Grid<ParentBuilder>::AddGroup(
+		BGroupView* groupView, int32 column, int32 row, int32 columnCount,
+		int32 rowCount = 1)
+	\copybrief GroupBuilder BLayoutBuilder::Group<ParentBuilder>::AddGroup(BGroupView*
+		groupView, float weight)
+
+	\param groupView The BGroupView to be added.
+	\param column The column number (zero-index) to use.
+	\param row The row number (zero-index) to use.
+	\param columnCount The number of columns to span the \a groupView over.
+	\param rowCount The number of rows to span the \a groupView over.
+
+	\returns A GroupBuilder representing the layout of the \a groupView.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn GroupBuilder BLayoutBuilder::Grid<ParentBuilder>::AddGroup(
+		BGroupLayout* groupLayout, int32 column, int32 row,
+		int32 columnCount, int32 rowCount)
+	\copybrief GroupBuilder BLayoutBuilder::Group<ParentBuilder>::AddGroup(
+		BGroupLayout* groupLayout, float weight)
+
+	\param groupLayout The BGroupLayout to be added.
+	\param column The column number (zero-index) to use.
+	\param row The row number (zero-index) to use.
+	\param columnCount The number of columns to span the \a groupLayout over.
+	\param rowCount The number of rows to span the \a groupLayout over.
+
+	\returns A GroupBuilder representing the \a groupLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn GridBuilder BLayoutBuilder::Grid<ParentBuilder>::AddGrid(
+		float horizontalSpacing, float verticalSpacing, int32 column,
+		int32 row, int32 columnCount, int32 rowCount)
+	\copydoc GridBuilder BLayoutBuilder::Group<ParentBuilder>::AddGrid(
+		float horizontalSpacing, float verticalSpacing, float weight)
+
+	\param horizontalSpacing The horizontal spacing for the new BGridLayout.
+	\param verticalSpacing The vertical spacing for the new BGridLayout.
+	\param column The column number (zero-index) to use.
+	\param row The row number (zero-index) to use.
+	\param columnCount The number of columns to span the new BGridLayout over.
+	\param rowCount The number of rows to span the new BGridLayout over.
+
+	\returns A GridBuilder representing the newly created BGridLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn GridBuilder BLayoutBuilder::Grid<ParentBuilder>::AddGrid(
+		BGridLayout* gridLayout, int32 column, int32 row, int32 columnCount,
+		int32 rowCount)
+	\copybrief GridBuilder BLayoutBuilder::Group<ParentBuilder>::AddGrid(
+		BGridLayout* gridLayout, float weight)
+
+	\param gridLayout The BGridLayout to be added.
+	\param column The column number (zero-index) to use.
+	\param row The row number (zero-index) to use.
+	\param columnCount The number of columns to span the \a gridLayout over.
+	\param rowCount The number of rows to span the \a gridLayout over.
+
+	\returns A GridBuilder representing \a gridLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn GridBuilder	BLayoutBuilder::Grid<ParentBuilder>::AddGrid(
+		BGridView* gridView, int32 column, int32 row, int32 columnCount,
+		int32 rowCount)
+	\copybrief GridBuilder	BLayoutBuilder::Group<ParentBuilder>::AddGrid(
+		BGridView* gridView, float weight)
+
+	\param gridView The BGridView to be added.
+	\param column The column number (zero-index) to use.
+	\param row The row number (zero-index) to use.
+	\param columnCount The number of columns to span the \a gridView over.
+	\param rowCount The number of rows to span the \a gridView over.
+
+	\returns A GridBuilder representing the layout of the \a gridView.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn SplitBuilder BLayoutBuilder::Grid<ParentBuilder>::AddSplit(
+		orientation orientation, float spacing, int32 column, int32 row,
+		int32 columnCount, int32 rowCount)
+	\copybrief SplitBuilder BLayoutBuilder::Group<ParentBuilder>::AddSplit(
+		orientation orientation, float spacing, float weight)
+
+	\param orientation The orientation of the new BSplitView.
+	\param spacing The spacing of the new BSplitView.
+	\param column The column number (zero-index) to use.
+	\param row The row number (zero-index) to use.
+	\param columnCount The number of columns to span the new BSplitView over.
+	\param rowCount The number of rows to span the new BSplitView over.
+
+	\returns A SplitBuilder representing the new BSplitView.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn SplitBuilder BLayoutBuilder::Grid<ParentBuilder>::AddSplit(
+		BSplitView* splitView, int32 column, int32 row, int32 columnCount,
+		int32 rowCount)
+	\copybrief SplitBuilder BLayoutBuilder::Group<ParentBuilder>::AddSplit(
+		BSplitView* splitView, float weight)
+
+	\param splitView The BSplitView to be added.
+	\param column The column number (zero-index) to use.
+	\param row The row number (zero-index) to use.
+	\param columnCount The number of columns to span the \a splitView over.
+	\param rowCount The number of rows to span the \a splitView over.
+
+	\returns A SplitBuilder representing the \a splitView.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn CardBuilder BLayoutBuilder::Grid<ParentBuilder>::AddCards(
+		int32 column, int32 row, int32 columnCount, int32 rowCount)
+	\copybrief CardBuilder BLayoutBuilder::Group<ParentBuilder>::AddCards(
+		float weight)
+
+	\param column The column number (zero-index) to use.
+	\param row The row number (zero-index) to use.
+	\param columnCount The number of columns to span the new layout over.
+	\param rowCount The number of rows to span the new layout over.
+
+	\returns A CardBuilder representing the new BCardLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn CardBuilder BLayoutBuilder::Grid<ParentBuilder>::AddCards(
+		BCardLayout* cardLayout, int32 column, int32 row, int32 columnCount,
+		int32 rowCount)
+	\copybrief CardBuilder BLayoutBuilder::Group<ParentBuilder>::AddCards(
+		BCardLayout* cardLayout, float weight)
+
+	\param cardLayout The existing layout to add to the current grid layout.
+	\param column The column number (zero-index) to use.
+	\param row The row number (zero-index) to use.
+	\param columnCount The number of columns to span the \a cardLayout over.
+	\param rowCount The number of rows to span the \a cardLayout over.
+
+	\returns A CardBuilder representing the \a cardLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn CardBuilder BLayoutBuilder::Grid<ParentBuilder>::AddCards(
+		BCardView* cardView, int32 column, int32 row, int32 columnCount,
+		int32 rowCount)
+	\copybrief CardBuilder BLayoutBuilder::Group<ParentBuilder>::AddCards(
+		BCardView* cardView, float weight)
+
+	\param cardView The existing BCardView to add to the current grid layout.
+	\param column The column number (zero-index) to use.
+	\param row The row number (zero-index) to use.
+	\param columnCount The number of columns to span the \a cardView over.
+	\param rowCount The number of rows to span the \a cardView over.
+
+	\returns A CardBuilder representing the layout of t he \a cardView.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Adding BSpaceLayoutItems
+
+	A convenience method to add glue to a cell.
+*/
+
+
+//! @{
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Grid<ParentBuilder>::AddGlue(
+		int32 column, int32 row, int32 columnCount, int32 rowCount)
+	\copybrief BLayoutBuilder::Group<ParentBuilder>::AddGlue(float weight)
+
+	\param column The column number (zero-index) for the glue.
+	\param row The row number (zero-index) for the glue.
+	\param columnCount The number of columns to span the glue item over.
+	\param rowCount The number of rows to span the glue item over.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name BGridLayout Properties
+
+	These methods expose some settings of the underlying grid layout.
+*/
+
+
+//! @{
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Grid<ParentBuilder>::SetHorizontalSpacing(
+		float spacing)
+	\copydoc BGridLayout::SetHorizontalSpacing(float spacing)
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Grid<ParentBuilder>::SetVerticalSpacing(
+		float spacing)
+	\copydoc BGridLayout::SetVerticalSpacing(float spacing)
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Grid<ParentBuilder>::SetSpacing(
+		float horizontal, float vertical)
+	\copydoc BGridLayout::SetSpacing(float horizontal, float vertical)
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Grid<ParentBuilder>::SetColumnWeight(
+		int32 column, float weight)
+	\copydoc BGridLayout::SetColumnWeight(int32 column, float weight)
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Grid<ParentBuilder>::SetRowWeight(
+		int32 row, float weight)
+	\copydoc BGridLayout::SetRowWeight(int32 row, float weight)
+*/
+
+
+//! @}
+
+
+/*!
+	\name Insets
+*/
+
+
+//! @{
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Grid<ParentBuilder>::SetInsets(
+		float left, float top, float right, float bottom)
+	\copydoc BTwoDimensionalLayout::SetInsets(float, float, float, float)
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Grid<ParentBuilder>::SetInsets(
+		float horizontal, float vertical)
+	\copydoc BTwoDimensionalLayout::SetInsets(float, float)
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Grid<ParentBuilder>::SetInsets(
+		float insets)
+	\copydoc BTwoDimensionalLayout::SetInsets(float)
+*/
+
+
+//! @}
+
+
+/*!
+	\name Explicit Sizes and Alignment
+*/
+
+
+//! @{
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Grid<ParentBuilder>::SetExplicitMinSize(
+		BSize size)
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::SetExplicitMinSize()
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Grid<ParentBuilder>::SetExplicitMaxSize(
+		BSize size)
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::SetExplicitMaxSize()
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Grid<ParentBuilder>::SetExplicitPreferredSize(
+		BSize size)
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::SetExplicitPreferredSize()
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Grid<ParentBuilder>::SetExplicitAlignment(
+		BAlignment alignment)
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::SetExplicitAlignment()
 */
 
 

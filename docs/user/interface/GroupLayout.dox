@@ -213,3 +213,11 @@
 
 	\since Haiku R1
 */
+
+
+/*!
+	\fn static BArchivable* BGroupLayout::Instantiate(BMessage *from)
+	\brief Instantiate the layout from the message \a from.
+
+	\since Haiku R1
+*/

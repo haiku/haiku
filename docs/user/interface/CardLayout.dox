@@ -66,7 +66,7 @@
 	\brief Constructs a BCardLayout \a from an archive message.
 
 	This method is usually not called directly, if you want to build a
-	check box from an archived message you should call Instantiate() instead
+	card layout from an archived message you should call Instantiate() instead
 	because it can handle errors properly.
 
 	\param from The \ref BMessage that contains the card layout.

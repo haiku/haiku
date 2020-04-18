@@ -1,13 +1,12 @@
 /*
- * Copyright 2010 Haiku, Inc. All rights reserved.
+ * Copyright 2010, 2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Alex Wilson, yourpalal2@gmail.com
  *
  * Corresponds to:
- *		headers/os/interface/LayoutBuilder.h	rev 38207
- *		src/kits/interface/LayoutBuilder.cpp	rev 38207
+ *		headers/os/interface/LayoutBuilder.h	 rev 49977
  */
 
 
@@ -122,3 +121,15 @@ BLayoutBuilder::Group<>(B_HORIZONTAL)
 
 	\since Haiku R1
 */
+
+
+//! \cond INTERNAL
+
+
+/*!
+	\var ParentBuilder* BLayoutBuilder::Base< ParentBuilder >::fParent
+	\brief Internal pointer to the parent of the builder.
+*/
+
+
+//! \endcond

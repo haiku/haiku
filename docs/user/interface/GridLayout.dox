@@ -107,7 +107,7 @@
 
 
 /*!
-	\fn void BGridLayout::SetHorizontalSpacing(float spacing);
+	\fn void BGridLayout::SetHorizontalSpacing(float spacing)
 	\brief Set the spacing between columns for this layout.
 
 	\param spacing The number of pixels of spacing to set.
@@ -258,6 +258,20 @@
 
 
 /*!
+	\fn BLayoutItem* BGridLayout::ItemAt(int32 column, int32 row) const
+	\brief Get a pointer to the item at the requested cell in the grid.
+
+	\param column The column, starting with \c 0 for the leftmost column. Note
+		that the value should be 0 or higher.
+	\param row The row, starting with \c 0 for the topmost row. Note that the
+		value should be 0 or higher.
+
+	\return A pointer to the layout item at these coordinates, or \c NULL if
+		there is no item.
+*/
+
+
+/*!
 	\fn BLayoutItem* BGridLayout::AddView(BView* child)
 	\brief Adds \a child to this layout in the first empty cell available, or
 		in a new column in the first row if there are no emtpy cells.
@@ -312,6 +326,14 @@
 
 	Fails and returns \c NULL if the requested area is occupied, or if internal
 	memory allocations fail.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static BArchivable* BGridLayout::Instantiate(BMessage *from)
+	\brief Instantiate the layout from the message \a from.
 
 	\since Haiku R1
 */

@@ -29,42 +29,31 @@
 
 /*!
 	\typedef BLayoutBuilder::Split<ParentBuilder>::ThisBuilder
-	\brief Shorthand representing the type of \c this.
-
-	\since Haiku R1
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::ThisBuilder
 */
 
 
 /*!
-	\typedef BLayoutBuilder::Split<ThisBuilder>::GroupBuilder
-	\brief Shorthand for builders returned by this builder's AddGroup() methods.
-
-	\since Haiku R1
+	\typedef BLayoutBuilder::Split<ParentBuilder>::GroupBuilder
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::GroupBuilder
 */
 
 
 /*!
-	\typedef BLayoutBuilder::Split<ThisBuilder>::GridBuilder
-	\brief Shorthand for builders returned by this builder's AddGrid() methods.
-
-	\since Haiku R1
+	\typedef BLayoutBuilder::Split<ParentBuilder>::GridBuilder
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::GridBuilder
 */
 
 
 /*!
-	\typedef BLayoutBuilder::Split<ThisBuilder>::SplitBuilder
-	\brief Shorthand for builders returned by this builder's AddSplit() methods.
-
-	\since Haiku R1
+	\typedef BLayoutBuilder::Split<ParentBuilder>::SplitBuilder
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::SplitBuilder
 */
 
 
 /*!
 	\typedef BLayoutBuilder::Split<ThisBuilder>::CardBuilder
-	\brief Shorthand for builders returned by this builder's AddCards()
-		methods.
-
-	\since Haiku R1
+	\copydoc BLayoutBuilder::Group<ThisBuilder>::CardBuilder
 */
 
 
@@ -111,40 +100,29 @@
 
 /*!
 	\fn BSplitView* BLayoutBuilder::Split<ParentBuilder>::View() const
-	\brief Get a borrowed pointer to the underlying BSplitView
-
-	\returns A borrowed pointer to the underlying BSplitView
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::View()
 */
 
 
 /*!
 	\fn ThisBuilder& BLayoutBuilder::Split<ParentBuilder>::GetView(
 		BView** _view)
-	\brief Get a borrowed pointer to the underlying view.
-
-	\param[out] _view Location to store the underlying BSplitView as a BView
-		reference.
-
-	\return The method returns a self reference, so that calls to the builder
-		may be chained.
+	\copydoc BLayoutBuilder::Group<ParentBuilder>::GetView()
 */
 
 
 /*!
 	\fn ThisBuilder& BLayoutBuilder::Split<ParentBuilder>::GetSplitView(
 		BSplitView** _view)
-	\brief Get a borrowed pointer to the underlying view.
+	\brief Get a pointer to the SplitBView this builder is attached to.
 
-	\param[out] _view Location to store the underlying BSplitView reference.
-
-	\return The method returns a self reference, so that calls to the builder
-		may be chained.
+	\param[out] _view The BSplitView this builder' is attached to.
 */
 
 
 /*!
 	\fn BLayoutBuilder::Split<ParentBuilder>::operator BSplitView*()
-	\brief Cast this builder into the BSplitView it represents.
+	\brief Cast this builder into the layout object it represents.
 
 	\since Haiku R1
 */
@@ -249,8 +227,8 @@
 /*!
 	\fn GroupBuilder BLayoutBuilder::Split<ParentBuilder>::AddGroup(
 		orientation orientation, float spacing, float weight)
-	\brief Construct and add a viewless BGroupLayout, then return a GroupBuilder
-	       representing the newly added layout.
+	\copybrief GroupBuilder BLayoutBuilder::Group<ParentBuilder>::AddGroup(
+		orientation orientation, float spacing, float weight)
 
 	\param orientation The orientation to use for the new BGroupLayout.
 	\param spacing The spacing to use for the new BGroupLayout.
@@ -266,14 +244,14 @@
 /*!
 	\fn GroupBuilder BLayoutBuilder::Split<ParentBuilder>::AddGroup(BGroupView*
 		groupView, float weight)
-	\brief Add BGroupView and return a builder representing the newly added
-	       BGroupView.
+	\copybrief GroupBuilder BLayoutBuilder::Group<ParentBuilder>::AddGroup(BGroupView*
+		groupView, float weight)
 
 	\param groupView The BGroupView to be added.
 	\param weight The weight for \a groupView in the BGroupLayout this builder
 	       represents.
 
-	\returns A GroupBuilder representing \a groupView.
+	\returns A GroupBuilder representing the layout of the \a groupView.
 
 	\since Haiku R1
 */
@@ -282,14 +260,14 @@
 /*!
 	\fn GroupBuilder BLayoutBuilder::Split<ParentBuilder>::AddGroup(
 		BGroupLayout* groupLayout, float weight)
-	\brief Add a BGroupLayout and return a builder representing the newly added
-	       BGroupLayout.
+	\copybrief GroupBuilder BLayoutBuilder::Group<ParentBuilder>::AddGroup(
+		BGroupLayout* groupLayout, float weight)
 
 	\param groupLayout The BGroupLayout to be added.
 	\param weight The weight for \a groupLayout in the BGroupLayout this builder
 		represents.
 
-	\returns A GroupBuilder representing \a groupLayout.
+	\returns A GroupBuilder representing the \a groupLayout.
 
 	\since Haiku R1
 */
@@ -299,8 +277,8 @@
 	\fn GridBuilder	BLayoutBuilder::Split<ParentBuilder>::AddGrid(
 		float horizontalSpacing = 0.0f, float verticalSpacing = 0.0f,
 		float weight = 1.0f)
-	\brief Create and add a viewless BGridLayout, then return a builder
-	       representing the newly created BGridLayout.
+	\copydoc GridBuilder BLayoutBuilder::Group<ParentBuilder>::AddGrid(
+		float horizontalSpacing, float verticalSpacing, float weight)
 
 	\param horizontalSpacing The horizontal spacing for the new BGridLayout.
 	\param verticalSpacing The vertical spacing for the new BGridLayout.
@@ -316,14 +294,15 @@
 /*!
 	\fn GridBuilder BLayoutBuilder::Split<ParentBuilder>::AddGrid(
 		BGridLayout* gridLayout, float weight = 1.0f)
-	\brief Add a BGridLayout, then return a builder the newly added BGridLayout.
+	\copybrief GridBuilder BLayoutBuilder::Group<ParentBuilder>::AddGrid(
+		BGridLayout* gridLayout, float weight)
 
 	\param gridLayout The BGridLayout to be added and used to construct the
 		returned GridBuilder.
 	\param weight The weight for \a gridLayout in the BSplitView this builder
 		represents.
 
-	\returns A GridBuilder representing \a gridLayout.
+	\returns A GridBuilder representing the \a gridLayout.
 
 	\since Haiku R1
 */
@@ -332,14 +311,15 @@
 /*!
 	\fn GridBuilder	BLayoutBuilder::Split<ParentBuilder>::AddGrid(
 		BGridView* gridView, float weight = 1.0f)
-	\brief Add a BGridView, then return a builder the newly added BGridView.
+	\copybrief GridBuilder	BLayoutBuilder::Group<ParentBuilder>::AddGrid(
+		BGridView* gridView, float weight)
 
 	\param gridView The BGridView to be added and used to construct the
 		returned GridBuilder.
 	\param weight The weight for \a gridView in the BSplitView this builder
 		represents.
 
-	\returns A GridBuilder representing \a gridView.
+	\returns A GridBuilder representing the layout of the \a gridView.
 
 	\since Haiku R1
 */
@@ -348,8 +328,8 @@
 /*!
 	\fn SplitBuilder BLayoutBuilder::Split<ParentBuilder>::AddSplit(
 		orientation orientation, float spacing, float weight)
-	\brief Create and add a new BSplitView with a weight of \c weight, then
-		return a SplitBuilder representing the new BSplitView.
+	\copybrief SplitBuilder BLayoutBuilder::Group<ParentBuilder>::AddSplit(
+		orientation orientation, float spacing, float weight)
 
 	\param orientation The orientation of the new BSplitView.
 	\param spacing The spacing of the new BSplitView.
@@ -364,14 +344,14 @@
 /*!
 	\fn SplitBuilder BLayoutBuilder::Split<ParentBuilder>::AddSplit(
 		BSplitView* splitView, float weight = 1.0f)
-	\brief Add a BSplitView to the BSplitView this builder represents and
-		return a SplitBuilder representing the BSplitView.
+	\copybrief SplitBuilder BLayoutBuilder::Group<ParentBuilder>::AddSplit(
+		BSplitView* splitView, float weight)
 
 	\param splitView The BSplitView to be added.
 	\param weight The weight of the BSplitView in the BSplitView this builder
 		represents.
 
-	\returns A SplitBuilder representing the new BSplitView.
+	\returns A SplitBuilder representing the \a splitView.
 
 	\since Haiku R1
 */
@@ -380,8 +360,8 @@
 /*!
 	\fn CardBuilder BLayoutBuilder::Split<ParentBuilder>::AddCards(
 		float weight)
-	\brief Add a new BCardLayout to the BSplitView this builder represents and
-		return a CardBuilder representing the new layout.
+	\copybrief CardBuilder BLayoutBuilder::Group<ParentBuilder>::AddCards(
+		float weight)
 
 	\param weight The weight of the BCardLayout in the BSplitView this builder
 		represents.
@@ -395,15 +375,15 @@
 /*!
 	\fn CardBuilder BLayoutBuilder::Split<ParentBuilder>::AddCards(
 		BCardLayout* cardLayout, float weight)
-	\brief Add an existing BCardLayout to the BSplitView this builder
-		represents and return a CardBuilder representing this layout.
+	\copybrief CardBuilder BLayoutBuilder::Group<ParentBuilder>::AddCards(
+		BCardLayout* cardLayout, float weight)
 
 	\param cardLayout The existing layout that will be added to the underlying
 		BSplitView.
 	\param weight The weight of the BCardLayout in the BSplitView this builder
 		represents.
 
-	\returns A CardBuilder representing the new BCardLayout.
+	\returns A CardBuilder representing the \a cardLayout.
 
 	\since Haiku R1
 */
@@ -412,15 +392,15 @@
 /*!
 	\fn CardBuilder BLayoutBuilder::Split<ParentBuilder>::AddCards(
 		BCardView* cardView, float weight)
-	\brief Add an existing BCardView to the BSplitView this builder
-		represents and return a CardBuilder representing this layout.
+	\copybrief CardBuilder BLayoutBuilder::Group<ParentBuilder>::AddCards(
+		BCardView* cardView, float weight)
 
 	\param cardView The existing view that will be added to the underlying
 		BSplitView.
 	\param weight The weight of the BCardLayout in the BSplitView this builder
 		represents.
 
-	\returns A CardBuilder representing the new BCardLayout.
+	\returns A CardBuilder representing the layout of t he \a cardView.
 
 	\since Haiku R1
 */
