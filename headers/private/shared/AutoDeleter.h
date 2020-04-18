@@ -254,6 +254,11 @@ struct FileDescriptorCloser {
 		SetTo(-1);
 	}
 
+	inline int Get()
+	{
+		return fDescriptor;
+	}
+
 	inline int Detach()
 	{
 		int descriptor = fDescriptor;
