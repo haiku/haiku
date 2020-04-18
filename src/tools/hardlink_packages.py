@@ -4,10 +4,11 @@
 # Hardlink only packages used in the build from one directory to another,
 # and updates the RemotePackageRepository file at the same time.
 #
-# Copyright 2017-2019 Augustin Cavalier <waddlesplash>
+# Copyright 2017-2020 Augustin Cavalier <waddlesplash>
 # Distributed under the terms of the MIT License.
 
 import sys, os, subprocess, re, hashlib
+from distutils.version import LooseVersion
 
 if len(sys.argv) != 5:
 	print("usage: hardlink_packages.py [arch] [jam RemotePackageRepository file] "
@@ -68,7 +69,8 @@ with open(args_jamf) as f:
 		greatestVersion = None
 		for pkgVersion in packageVersions:
 			if (pkgVersion.startswith(pkgname + '-') and
-					((greatestVersion == None) or (pkgVersion > greatestVersion))):
+					((greatestVersion == None)
+						or (LooseVersion(pkgVersion) > LooseVersion(greatestVersion)))):
 				greatestVersion = pkgVersion
 		if (greatestVersion == None):
 			print("not found: " + pkg)
