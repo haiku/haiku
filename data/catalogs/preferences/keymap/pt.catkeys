@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-Keymap	3378515930
+1	portuguese	x-vnd.Haiku-Keymap	1075970008
 Key	Modifier keys window	As in a computer keyboard key	Tecla
 Japanese	KeymapNames		Japonês
 US	KeymapNames		US
@@ -58,6 +58,7 @@ Italian	KeymapNames		Italiano
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s Internacional
 Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminum (US)
 Kinesis Ergo Elan International	KeyboardLayoutNames		Kinesis Ergo Elan Internacional
+French (NF Z71-300)	KeymapNames		Francês (NF Z71-300)
 Modifier keys	Modifier keys window		Teclas modificadoras
 ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 Internacional
 Kazakh	KeymapNames		Cazaque
@@ -100,8 +101,11 @@ Role	Modifier keys window	As in the role of a modifier key	Função
 Svorak	KeymapNames		Svorak
 ThinkPad X100e (US)	KeyboardLayoutNames		ThinkPad X100e (US)
 German	KeymapNames		Alemão
+Swiss-German	KeymapNames		Alemão suíço
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Tecla controlo
 Czech	KeymapNames		Checo
+Russian (Udmurt, Komi, Mari)	KeymapNames		Russo (Udmurt, Komi, Mari)
+Thai (TIS-820.2538)	KeymapNames		Tailandês (TIS-820.2538)
 Control:	Modifier keys window	Control key role name	Controlo:
 Generic 105-key International	KeyboardLayoutNames		Genérico Internacional de 105 teclas
 Disabled	Modifier keys window	Do nothing	Desativado
@@ -117,17 +121,23 @@ Revert	Keymap window		Reverter
 CTRL	Keyboard Layout View	Very short for 'control'	CTRL
 Grave trigger	Keymap window		Acento grave
 Menu	Keyboard Layout View	Menu key	Menu
+Faeroese	KeymapNames		Feroês
 Quit	Keymap window		Sair
+Polish (Typewriter)	KeymapNames		Polaco (máquina de escrever)
 French (Mac)	KeymapNames		Francês (Mac)
 User:	Keymap window		Utilizador:
 Apple Aluminium Extended International	KeyboardLayoutNames		Apple Aluminium Internacional Expandido
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Tecla Alt/Opt
 SHIFT	Keyboard Layout View		SHIFT
+Estonian	KeymapNames		Estónio
 Serbian (Latin)	KeymapNames		Sérvio (Latino)
 French	KeymapNames		Francês
 Portuguese	KeymapNames		Português
+Swiss-French	KeymapNames		Francês suíço
 Shift:	Modifier keys window	Shift key role name	Shift:
 Keymap	System name		Disposição do teclado
+Slovene	KeymapNames		Esloveno
+Lithuanian	KeymapNames		Lituano
 Set modifier keys…	Keymap window		Definir teclas modificadoras…
 Switch shortcut keys to Haiku mode	Keymap window		Teclas de atalho em modo Haiku
 Defaults	Keymap window		Predefinições

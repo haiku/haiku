@@ -1,11 +1,23 @@
-1	portuguese	x-vnd.haiku-registrar	1998626824
+1	portuguese	x-vnd.haiku-registrar	2599857937
 Cancel	ShutdownProcess		Cancelar
+OK	ShutdownProcess		OK
 Do you really want to shut down the system?	ShutdownProcess		Tem a certeza de que pretende desligar o computador?
 Shutdown status	ShutdownProcess		Estado do encerramento
 Shut down	ShutdownProcess		Desligar
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		A aplicação \"%appName%\" poderá estar bloqueada num painel modal.
+System is shut down	ShutdownProcess		O sistema está encerrado
 Restart system	ShutdownProcess		Reiniciar sistema
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		A aplicação \"%appName%\" fez abortar o processo de encerramento.
+Asking background applications to quit.	ShutdownProcess		A solicitar o fecho de aplicações em segundo plano.
 Do you really want to restart the system?	ShutdownProcess		Tem a certeza de que pretende reiniciar o computador?
 Restart	ShutdownProcess		Reiniciar
+It's now safe to turn off the computer.	ShutdownProcess		É seguro desligar agora o computador.
 Asking other processes to quit.	ShutdownProcess		A solicitar o encerramento dos outros processos.
+Cancel shutdown	ShutdownProcess		Cancelar encerramento
+Restarting…	ShutdownProcess		A reiniciar…
+%action%?	ShutdownProcess		%action%?
+Tidying things up a bit.	ShutdownProcess		A arrumar um pouco as coisas.
+Kill application	ShutdownProcess		Matar aplicação
 Shutdown aborted	ShutdownProcess		Encerramento interrompido
+Shutting down…	ShutdownProcess		A encerrar…
 Asking \"%appName%\" to quit.	ShutdownProcess		A solicitar o encerramento de \"%appName%\".

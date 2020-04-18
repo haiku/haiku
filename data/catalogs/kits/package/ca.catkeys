@@ -1,0 +1,7 @@
+1	catalan; valencian	x-vnd.Haiku-libpackage	2012114212
+Failed to remove transaction directory	PackageManagerKit		Ha fallat suprimir el directori de transacció.
+Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Ha fallat obtenir la configuració per al repositori \"%s\". S'omet.
+Refreshing repository \"%s\" failed	PackageManagerKit		Ha fallat refrescar el repositori \"%s\".
+Failed to get repository names	PackageManagerKit		Ha fallat obtenir els noms dels repositoris.
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Ha fallat obtenir la cau per al repositori \"%s\". S'omet.
+Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		El paquet %s-%s no té requeriments de coincidència per a la seva base de paquets \"%s\".

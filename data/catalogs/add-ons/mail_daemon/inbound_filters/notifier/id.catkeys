@@ -4,10 +4,10 @@ none	NotifierConfigView		tak satupun
 New mails notification	NotifierFilter		Permberitahuan surel baru
 Alert	NotifierConfigView		Peringatan
 OK	NotifierFilter		OKE
-Central alert	NotifierConfigView		Central alert
+Central alert	NotifierConfigView		Pusat peringatan
 Beep	NotifierConfigView		Bunyi bip
 Central beep	NotifierConfigView		Bunyi utama
-{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{One new message} lainnya {# new messages}}
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{One new message} other{# new messages}}
 New messages	NotifierFilter		Pesan baru
 Method:	NotifierConfigView		Metode:
 Keyboard LEDs	NotifierConfigView		Led papan ketik

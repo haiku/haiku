@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	984805656
+1	friulian	x-vnd.Haiku-libtracker	659027911
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -286,6 +286,7 @@ Error creating link to \"%name\".	FSUtils		Erôr tal creâ il colegament a \"%na
 Unknown	FilePermissionsView		No cognossût
 Paste links	ContainerWindow		Tache colegaments
 Restoring: 	StatusWindow		Ripristinament: 
+The Tracker must be running to set the default printer.	PoseView		Il Tracker al scugne jessi in esecuzion par stabilî la stampadore predefinide.
 calculating…	InfoWindow		daûr a calcolâ…
 Preferred for file	OpenWithWindow		Preferît par file
 OK	AutoMounterSettings		Va ben
@@ -347,6 +348,7 @@ If you alter the system folder or its contents, you won't be able to boot %osNam
 Save	FilePanelPriv		Salve
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Nol è stât pussibil vierzi \"%document\" cu la aplicazion \"%app\" (Librariis che a mancjin: %library). \n
 Finish: %time	StatusWindow		Fin: %time
+Messenger	AttributesView		Messazîr
 after	FindPanel		dopo
 Version	OpenWithWindow		Version
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Cualchidun dai elements selezionâts nol pues jessi spostât te Scovacere. Eliminâju dal dut? (Cheste operazion e sarà permanente.)
@@ -362,6 +364,7 @@ And	FindPanel		E
 Palette-indexed picture	AttributesView		Imagjin cun palete intabelade
 multiple disks	FindPanel		plui discs
 Drawing pattern	AttributesView		Trame
+File offset	AttributesView		Deviazion file
 Name = %name	FindPanel	FindResultTitle	Non = %name
 Subject	Email Query Columns		Ogjet
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Erôr tal copiâ la cartele \"%name\":\n\t%error\n\nContinuâ?
@@ -441,6 +444,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Mi displâs, sal
 Move here	ContainerWindow		Sposte chi
 the config folder	FSUtils		la cartele di configurazion
 Sorry, could not create a new folder.	FSUtils		Nol è stât pussibil creâ une gnove cartele
+Select all	VirtualDirectoryWindow		Selezione dut
 Rename	FSUtils	button label	Cambie non
 Clean up all	ContainerWindow		Met a puest dut
 Add current folder	FilePanelPriv		Zonte cartele atuâl
@@ -452,6 +456,7 @@ ends with	FindPanel		al finìs cun
 Show Disks icon	SettingsView		Mostre icone discs
 Outline selection rectangle only	SettingsView		Dome il retangul di selezion dal contor
 by formula	FindPanel		par formule
+Resize to fit	VirtualDirectoryWindow		Ridimensione par adatâ
 Move to Trash	FilePanelPriv		Sposte te Scovacere
 is	FindPanel		al è
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Se si cambie non ae cartele di sisteme o al so contignût, no si rivarà plui a inviâ %osName!\n\nContinuâ pardabon?\n\nPar cambiâ non distès ae cartele di sisteme o al so contignût, ten fracât il tast Maiusc e fâs clic su \"Cambie non\".

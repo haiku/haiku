@@ -1,0 +1,12 @@
+1	friulian	x-vnd.Haiku-libmedia	1819860668
+Cleaning up.	MediaDefs		Netisie in vore.
+Starting media_services.	MediaDefs		Inviament media_services.
+Stopping media_addon_server.	MediaDefs		Daûr a fermâ media_addon_server.
+Waiting for media_addon_server to quit.	MediaDefs		In spiete che si sieri media_addon_server.
+Telling media_addon_server to quit.	MediaDefs		Daûr a domandâ a media_addon_server di jessî.
+Ready for use.	MediaDefs		Pront par jessi doprât.
+Stopping media server…	MediaDefs		Daûr a fermâ il servidôr multimediâl…
+Waiting for media_server to quit.	MediaDefs		In spiete che si sieri media_server.
+Done shutting down.	MediaDefs		Distudament completât.
+Error occurred starting media services.	MediaDefs		Si è verificât un erôr tal fâ partî i servizis mutlimediâi.
+Media Service	MediaDefs		Servizi multimediâl

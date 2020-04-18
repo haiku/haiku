@@ -1,12 +1,16 @@
-1	catalan; valencian	x-vnd.Haiku-CharacterMap	56063163
+1	catalan; valencian	x-vnd.Haiku-CharacterMap	124574598
 Enclosed alphanumerics	UnicodeBlocks		Alfanumèrics inclosos
 Basic Latin	UnicodeBlocks		Llatí bàsic
+Cyrillic extended C	UnicodeBlocks		Ciríŀlic ampliat - C
 View	CharacterWindow		Visualitza
+Cherokee supplement	UnicodeBlocks		Suplement de Cherokee
 Latin-1 supplement	UnicodeBlocks		Llatí-1 suplementari
 Hebrew	UnicodeBlocks		Hebreu
 Georgian supplement	UnicodeBlocks		Suplement georgià
+Multani	UnicodeBlocks		Multani
 CJK unified ideographs	UnicodeBlocks		Ideogrames unificats CJK
 Modifier tone letters	UnicodeBlocks		Lletres de modificació del to
+Old Hungarian	UnicodeBlocks		Hongarès antic
 Khmer	UnicodeBlocks		Khmer
 Supplementary private use area A	UnicodeBlocks		Àrea d'ús privat suplementari - A
 Hanunoo	UnicodeBlocks		Hanunoo
@@ -25,7 +29,9 @@ Ol Chiki	UnicodeBlocks		Ol Chiki
 Arabic	UnicodeBlocks		Àrab
 Ethiopic extended	UnicodeBlocks		Etíop ampliat
 Arrows	UnicodeBlocks		Fletxes
+Sutton SignWriting	UnicodeBlocks		Escriptura de signes Sutton
 Font	CharacterWindow		Tipus de lletra
+Hatran	UnicodeBlocks		Hatran
 Variation selectors supplement	UnicodeBlocks		Suplement de selectors de variació
 Gujarati	UnicodeBlocks		Gujarati
 Cuneiform	UnicodeBlocks		Cuneiforme
@@ -33,6 +39,7 @@ CJK radicals supplement	UnicodeBlocks		Suplement de radicals CJK
 Balinese	UnicodeBlocks		Balinès
 Cham	UnicodeBlocks		Cham
 Specials	UnicodeBlocks		Especials
+Ahom	UnicodeBlocks		Ahom
 CJK compatibility ideographs	UnicodeBlocks		Idiogrames de compatibilitat CJK
 Phonetic extensions	UnicodeBlocks		Extensions fonètiques
 Khmer symbols	UnicodeBlocks		Símbols Khmer
@@ -91,15 +98,19 @@ Code	CharacterWindow		Codi
 Lepcha	UnicodeBlocks		Lepcha
 Sinhala	UnicodeBlocks		Singalès
 Ancient Greek musical notation	UnicodeBlocks		Notació musical grega antiga
+Early Dynastic Cuneiform	UnicodeBlocks		Cuneiforme dinàstic primerenc
 Geometric shapes	UnicodeBlocks		Formes geomètriques
 Letterlike symbols	UnicodeBlocks		Símbols semblants a lletres
 Hangul Jamo	UnicodeBlocks		Hangul Jamo
 Tamil	UnicodeBlocks		Tàmil
 Currency symbols	UnicodeBlocks		Símbols de moneda
 Combining diacritical marks	UnicodeBlocks		Combinació de marques diacrítiques
+Anatolian hieroglyphs	UnicodeBlocks		Jeroglífics anatolians
 Supplement punctuation	UnicodeBlocks		Puntuació suplementària
 Unified Canadian Aboriginal syllabics	UnicodeBlocks		Sil·labaris aborígens del Canadà unificats
+Marchen	UnicodeBlocks		Marchen
 Ugaritic	UnicodeBlocks		Ugarític
+Tangut	UnicodeBlocks		Tangut
 CJK symbols and punctuation	UnicodeBlocks		Puntuació i símbols CJK
 File	CharacterWindow		Fitxer
 Number forms	UnicodeBlocks		Formes de números
@@ -107,7 +118,9 @@ Cherokee	UnicodeBlocks		Xeroqui
 Tags	UnicodeBlocks		Etiquetes
 Cypriot syllabary	UnicodeBlocks		Conjunt de síl·labes xipriotes
 Counting rod numerals	UnicodeBlocks		Numerals rod per comptar
+Ideographic symbols and punctuation	UnicodeBlocks		Símbols i puntuació ideogràfica
 Latin extended A	UnicodeBlocks		Llatí ampliat A
+Tangut components	UnicodeBlocks		Components de Tangut
 Miscellaneous symbols	UnicodeBlocks		Símbols diversos
 Saurashtra	UnicodeBlocks		Saurashtra
 Optical character recognition	UnicodeBlocks		Reconeixement òptic de caràcters
@@ -122,7 +135,12 @@ Ancient Greek numbers	UnicodeBlocks		Nombres grecs antics
 Vai	UnicodeBlocks		Vai
 Yi Radicals	UnicodeBlocks		Radicals Yi
 Cyrillic extended B	UnicodeBlocks		Ciríŀlic ampliat - B
+Mongolian supplement	UnicodeBlocks		Suplement mongol
+Supplemental Symbols and Pictographs	UnicodeBlocks		Símbols i pictogrames suplementaris
 Quit	CharacterWindow		Surt
+Ancient symbols	UnicodeBlocks		Símbols antics
+Newa	UnicodeBlocks		Newa
+Adlam	UnicodeBlocks		Adlam
 Braille patterns	UnicodeBlocks		Patrons Braille
 New Tai Lue	UnicodeBlocks		Tai Lue nou
 Runic	UnicodeBlocks		Rúnic
@@ -139,6 +157,7 @@ Buhid	UnicodeBlocks		Bugui
 Telugu	UnicodeBlocks		Telugu
 Superscripts and subscripts	UnicodeBlocks		Superíndex i subíndex
 Thai	UnicodeBlocks		Tai
+Osage	UnicodeBlocks		Osage
 Deseret	UnicodeBlocks		Deseret
 Tifinagh	UnicodeBlocks		Tifinagh
 Gurmukhi	UnicodeBlocks		Gurmukhi
@@ -160,6 +179,8 @@ Alphabetic presentation forms	UnicodeBlocks		Formes de presentació alfabètica
 Halfwidth and fullwidth forms	UnicodeBlocks		Formes d'amplada mitja i sencera
 Lydian	UnicodeBlocks		Lidi
 Ethiopic supplement	UnicodeBlocks		Suplement etíop
+Glagolitic supplement	UnicodeBlocks		Suplement glagolític
+CJK unified ideographs extension E	UnicodeBlocks		Extensió d'ideografies unificades per a CJK E
 Latin extended B	UnicodeBlocks		Llatí ampliat B
 Box drawing	UnicodeBlocks		Dibuix de quadres
 Mathematical alphanumeric symbols	UnicodeBlocks		Símbols alfanumèrics matemàtics
@@ -176,4 +197,5 @@ Kannada	UnicodeBlocks		Kannarès
 Copy as escaped byte string	CharacterView		Còpia com a caràcter escapat d'un byte
 Phonetic extensions supplement	UnicodeBlocks		Suplement d'extensions fonètiques
 Domino tiles	UnicodeBlocks		Fitxes del dòmino
+Bhaiksuki	UnicodeBlocks		Bhaiksuki
 Katakana phonetic extensions	UnicodeBlocks		Extensions fonètiques del Katakana

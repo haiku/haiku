@@ -1,14 +1,18 @@
-1	catalan; valencian	x-vnd.Haiku.TextSearch	293043021
+1	catalan; valencian	x-vnd.Haiku.TextSearch	1867528375
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Si us plau trieu els fitxers que voleu triar al Rastrejador.
+%appname% : %path%	GrepWindow		%appname% : %path%
+Failed to start xargs program!	Grepper		No s'ha pogut iniciar el programa xargs!
 Open selection	GrepWindow		Obre la selecció
 Actions	GrepWindow		Accions
 New window	GrepWindow		Finestra nova
 Encoding	GrepWindow		S'està codificant
 OK	GrepWindow		D'acord
+%appname% : %path% : %searchtext%	GrepWindow		%appname%: %path%: %searchtext%
 Close	GrepWindow		Tanca
 Look in sub-folders	GrepWindow		Cerca a les carpetes inferiors
 %s: Not enough room to escape the filename.	Grepper		%s: No hi ha prou espai per codificar el nom del fitxer.
 Follow symbolic links	GrepWindow		Segueix els enllaços simbòlics
+Regular expression	GrepWindow		Expressió regular
 Text files only	GrepWindow		Només els fitxers de text
 Quit	GrepWindow		Surt
 Show files in Tracker	GrepWindow		Mostra els fitxers al Rastrejador
@@ -16,11 +20,15 @@ Please select the files you wish to keep searching.	GrepWindow		Si us plau trieu
 Trim to selection	GrepWindow		Escapça per la selecció
 Set target…	GrepWindow		Seleccioneu la destinació...
 TextSearch	GrepWindow		Cerca un text
+Failed to open input pipe!	Grepper		Ha fallat obrir el conducte d'entrada!
 Search	GrepWindow		Cerca
 Copy text to clipboard	GrepWindow		Copia el text al porta-retalls
 Show lines	GrepWindow		Mostra les línies
+Failed to open errors pipe!	Grepper		Ha fallat obrir el conducte d'errors.
 The unselected files will be removed from the list.	GrepWindow		Els fitxers que no estan seleccionats es suprimiran de la llista.
 Skip folders starting with a dot	GrepWindow		Ignora les carpetes que comencen a un punt
+Open files in code editor	GrepWindow		Obre els fitxers a l’editor de codi.
+Failed to open output pipe!	Grepper		Ha fallat obrir el conducte de sortida!
 Cancel	GrepWindow		Anul·la
 History	GrepWindow		Historial
 File	GrepWindow		Fitxer

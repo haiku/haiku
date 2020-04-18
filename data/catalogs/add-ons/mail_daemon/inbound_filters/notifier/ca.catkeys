@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-NewMailNotification	2600584813
+1	catalan; valencian	x-vnd.Haiku-NewMailNotification	1375000288
 Log window	NotifierConfigView		Finestra d'entrada
 none	NotifierConfigView		cap
 New mails notification	NotifierFilter		Notificació de correu nou
@@ -7,5 +7,8 @@ OK	NotifierFilter		D'acord
 Central alert	NotifierConfigView		Alerta central
 Beep	NotifierConfigView		Bip
 Central beep	NotifierConfigView		Bip central
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{missatge nou} other{# missatges nous}}
 New messages	NotifierFilter		Missatges nous
 Method:	NotifierConfigView		Mètode:
+Keyboard LEDs	NotifierConfigView		LEDs del teclat
+You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		Teniu {0, plural, one{missatge nou} other{# missatges nous}} per a %account.

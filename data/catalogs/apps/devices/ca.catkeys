@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Devices	490380176
+1	catalan; valencian	x-vnd.Haiku-Devices	3345509916
 ACPI bus	DevicesView		Bus ACPI
 Encryption controller	Device		Controlador del xifratge
 Bus Information	Device		Informació del bus
@@ -54,7 +54,9 @@ Device name	DeviceACPI		Nom del dispositiu
 Card Reader	DeviceSCSI		Lector de targetes
 Display controller	Device		Controlador de la pantalla
 Basic information	DevicesView		Informació bàsica
+ACPI Button '%1'	DeviceACPI		Botó d'ACPI %1
 Bus	DevicesView		Bus
+ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Nom del dispositiu
 Disk Drive	DeviceSCSI		Unitat de disc
 Other	DeviceSCSI		Altre

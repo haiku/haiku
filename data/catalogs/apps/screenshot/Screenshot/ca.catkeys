@@ -1,7 +1,11 @@
-1	catalan; valencian	x-vnd.haiku-screenshot	4088965159
+1	catalan; valencian	x-vnd.haiku-screenshot	3958461128
 Include window border	ScreenshotWindow		Inclou la vora de la finestra
 Overwrite	ScreenshotWindow		Sobreescriu
 Save in:	ScreenshotWindow		Desa a:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Error en desar \"%s\":\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Aquest fitxer ja existeix.\n  Segur que voleu sobreescriure'l?
+OK	ScreenshotWindow		D'acord
+The destination path exists but is not a folder.	ScreenshotWindow		El camí de destinació existeix però no és una carpeta.
 Select	ScreenshotWindow		Seleccioneu
 Save as:	ScreenshotWindow		Desa com a:
 seconds	ScreenshotWindow		segons
@@ -15,7 +19,9 @@ overwrite	ScreenshotWindow		sobreescriu
 Settings…	ScreenshotWindow		Paràmetres…
 Choose folder	ScreenshotWindow		Escolliu una carpeta
 Name:	ScreenshotWindow		Nom:
+Choose folder…	ScreenshotWindow		Trieu una carpeta...
 Please select	ScreenshotWindow		Seleccioneu
+Failed to save screenshot	ScreenshotWindow		Ha fallat desar la captura.
 Cancel	ScreenshotWindow		Anul·la
 Delay:	ScreenshotWindow		Retard:
 Copy to clipboard	ScreenshotWindow		Copiar al porta-retalls

@@ -1,0 +1,46 @@
+1	friulian	x-vnd.Haiku-Input	2494436940
+Scrolling	TouchpadPrefView		Scoriment
+Defaults	InputMouse		Predefinîts
+Tapping	TouchpadPrefView		Batuçâ
+Long	KeyboardView		Lunc
+Normal	SettingsView		Normâl
+Cancel	TouchpadPrefView		Anule
+Slow	TouchpadPrefView		Lente
+Warp	SettingsView		Deformazion
+Instant warp	SettingsView		Deformazion istantanie
+Device List	InputWindow		Liste dispositîfs
+Double-click speed	SettingsView		Velocitât dopli-clic
+Typing test area	KeyboardView		Arre di prove batidure
+Mouse type:	SettingsView		Gjenar di mouse:
+Fast	KeyboardView		Svelte
+Off	TouchpadPrefView		Distudât
+Fast	TouchpadPrefView		Svelte
+Please confirm	TouchpadPrefView		Par plasê conferme
+Click to focus	SettingsView		Clic par focalizâ
+Acceleration	TouchpadPrefView		Acelerazion
+Mouse speed	SettingsView		Velocitât dal mouse
+Accept first click	SettingsView		Fâs bon al prin clic
+OK	TouchpadPrefView		VA BEN
+Horizontal scrolling	TouchpadPrefView		Scoriment orizontâl
+Delay until key repeat	KeyboardView		Ritart pe ripetizion dal tast
+Two finger scrolling	TouchpadPrefView		Scoriment cun doi dêts
+Input	System name		Input
+Mouse acceleration	SettingsView		Acelerazion dal mouse
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La gnove aree di scorimetn e je une vore largje e e podarès impedî il normâl funzionament dal mouse. Cambiâle pardabon?
+High	TouchpadPrefView		Alt
+Defaults	TouchpadPrefView		Predefinîts
+1-Button	SettingsView		1-Boton
+Short	KeyboardView		Curt
+Revert	InputMouse		Torne indaûr
+Slow	KeyboardView		Lente
+Key repeat rate	KeyboardView		Velocitât ripetizion tast
+2-Button	SettingsView		2-Botons
+Click to focus and raise	SettingsView		Clic par focalizâ e tirâ sù
+Vertical	TouchpadPrefView		Verticâl
+Horizontal	TouchpadPrefView		Orizontâl
+Focus mode:	SettingsView		Modalitât focalizazion:
+Focus follows mouse	SettingsView		Focalizazion daûr dal mouse
+Double-click test area	SettingsView		Aree di prove dopli-clic
+Sensitivity	TouchpadPrefView		Sensibilitât
+3-Button	SettingsView		3-Botons
+Revert	TouchpadPrefView		Torne indaûr

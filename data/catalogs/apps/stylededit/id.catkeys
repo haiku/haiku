@@ -1,7 +1,11 @@
-1	indonesian	x-vnd.Haiku-StyledEdit	2697854206
+1	indonesian	x-vnd.Haiku-StyledEdit	727465241
 Document statistics	Statistics		Statistik dokumen
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Tidak dapat mengembalikan, file tidak ditemukan: \"%s\".
+Cut	Menus		Potong
 Center	Menus		Tengah
+Wrap-around search	FindandReplaceWindow		Pencarian menyeluruh
 Page setup…	Menus		Pengaturan halaman…
+Untitled 	StyledEditWindow		Tanpa judul 
 OK	Statistics		OKE
 Find	FindandReplaceWindow		Cari
 New	Menus		Baru
@@ -17,6 +21,7 @@ line %d, column %d	StatusView		baris %d, kolom %d
 Words:	Statistics		Kata:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Pemulihan
+Error saving \"%s\":\n%s	SaveAlert		Terjadi kesalahan menyimpan \"%s\":\n%s
 OK	RevertToSavedAlert		OKE
 Unlock file	StatusView		Buka kunci berkas
 Italic	Menus		Miring
@@ -25,38 +30,59 @@ Replace…	Menus		Ganti…
 File	Menus		Berkas
 Bold	Menus		Tebal
 Paste	Menus		Tempel
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Berkas \"%file%\" telah dimodifikasi oleh aplikasi lain, muat ulang?
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Berkas \"%file%\" telah dihapus oleh aplikasi lain, pulihkan?
 Lines:	Statistics		Baris:
+Replace in all windows	FindandReplaceWindow		Ganti di semua jendela
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" memiliki perubahan yang belum disimpan.\nKembalikan ke versi yang terakhir disimpan? 
 Save	SaveAlert		Simpan
+Default	Open_and_SaveAsPanel		Bawaan
 Cancel	RevertToSavedAlert		Batal
 Cancel	FindandReplaceWindow		Batal
 Statistics…	Menus		Statistik…
+Encoding	Open_and_SaveAsPanel		Pengkodean
 Replace all	FindandReplaceWindow		Ganti semua
 Close	Menus		Tutup
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		Galat memuat  \"%s\":\n\tFormat tidak didukung
 Left	Menus		Kiri
+Default	Menus		Bawaan
 OK	SaveAlert		OKE
 Color	Menus		Warna
 Save changes to the document \"%s\"? 	QuitAlert		Simpan perubahan ke dokumen \"%s\"? 
 StyledEdit	System name		StyledEdit
+Find:	FindandReplaceWindow		Temukan:
+Undo typing	QuitAlert		Batalkan pengetikan
 Error loading \"%s\":\n\t%s	LoadAlert		Galat memuat \"%s\":\n\t%s
 Don't save	SaveAlert		Jangan simpan
 Reload…	Menus		Muat ulang…
 Print…	Menus		Cetak…
+Quit	Menus		Berhenti
+Redo typing	QuitAlert		Ulangi mengetik
 Ignore	NodeMonitorAlerts		Abaikan
+Wrap lines	Menus		Bungkus garis
+Text encoding	Menus		Pengkodean teks
 Unable to unlock file\n\t%s	QuitAlert		Tidak dapat buka kunci berkas\n\t%s
 Modified	StatusView		Termodifikasi
 OK	LoadAlert		OKE
 Save	QuitAlert		Simpan
+Case-sensitive	FindandReplaceWindow		bedakan huruf besar-kecil
+Find selection	Menus		Temukan pilihan
 Cancel	SaveAlert		Batal
 Find…	Menus		Cari…
+Revert	RevertToSavedAlert		Pulihkan
 Size	Menus		Ukuran
+Autodetect	Menus		Otodeteksi
+Replace next	Menus		Ganti selanjutnya
 OK	QuitAlert		OKE
 Replace with:	FindandReplaceWindow		Ganti dengan:
+Edit	Menus		Edit
 Open…	Menus		Buka…
 Save as…	Menus		Simpan sebagai…
 Replace	FindandReplaceWindow		Ganti
+Characters:	Statistics		Karakter:
 Don't save	QuitAlert		Jangan simpan
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Berkas ini ditandai hanya baca. Simpan perubahan ke dokumen \"%s\"? 
+Align	Menus		Rata
 Font	Menus		Fon
 Select all	Menus		Pilih semua
 Right	Menus		Kanan

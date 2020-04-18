@@ -1,0 +1,3 @@
+1	catalan; valencian	x-vnd.Haiku-TelnetService	1209067113
+The Telnet server allows you to remotely access your machine with a terminal session using the telnet protocol.\n\nPlease note that it is an insecure and unencrypted connection.	TelnetServiceAddOn		El servidor de Telnet us permet accedir remotament a la màquina amb una sessió de terminal amb el protocol de telnet.\n\nSi us plau, tingueu en compte que és  una connexió no segura i sense encriptació.
+Telnet server	TelnetServiceAddOn		Servidor de Telnet

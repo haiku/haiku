@@ -1,5 +1,50 @@
-1	catalan; valencian	x-vnd.Haiku-ProcessController	159968082
+1	catalan; valencian	x-vnd.Haiku-ProcessController	168752057
+Error saving file	ProcessController		Error en desar el fitxer
+Display priority	ProcessController		Mostra'n la prioritat
+That's no Fun!	ProcessController		No té cap gràcia!
+What do you want to do with the team \"%s\"?	ProcessController		Què voleu fer amb l’equip \"%s\"?
 Your setting file could not be saved!\n(%s)	ProcessController		o ha estat possible desar les vostres preferències!\n(%s)
+Processor %d	ProcessController		Processador %d
+Live in the Deskbar	ProcessController		Viu a la barra d’escriptori
+Kill this team!	ProcessController		Mata aquest equip!
 OK	ProcessController		D'acord
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Podeu executar ProcessController en una finestra o instal·lar-lo a la barra d’escriptori.
+Real-time priority	ProcessController		Prioritat en temps real
+Custom priority	ProcessController		Prioritat personalitzada
+Debug this thread!	ProcessController		Depureu aquest fil!
+Low priority	ProcessController		Prioritat baixa
+Urgent display priority	ProcessController		Prioritat de visualització urgent
+Memory usage	ProcessController		Ús de la memòria
 Ok!	ProcessController		D'acord!
+Normal priority	ProcessController		Prioritat normal
+Restart Deskbar	ProcessController		Reinicia la barra d'escriptori
+About ProcessController…	ProcessController		Quant al ProcessController...
+Usage: %s [-deskbar]\n	ProcessController		Ús: %s [-deskbar]\n
+Please confirm	ProcessController		Si us plau, confirmeu-ho.
+Urgent priority	ProcessController		Prioritat urgent
+What do you want to do with the thread \"%s\"?	ProcessController		Què voleu fer amb el fil \"%s\"?
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001, Georges-Edouard Berenger, berenger@francenet.fr\n
+Idle priority	ProcessController		Prioritat inactiva
+Real-time display priority	ProcessController		Prioritat de visualització en temps real
+Threads and CPU usage	ProcessController		Ús de fils i CPU
+Quit application	ProcessController		Surt de l'aplicació
+Info	ProcessController		Informació
+Kill this thread!	ProcessController		Mata aquest fil!
+This team is already gone…	ProcessController		Aquest equip ja no hi és...
+Gone teams…	ProcessController		Equips desapareguts...
+Quit an application	ProcessController		Surt d'una aplicació
 Cancel	ProcessController		Anul·la
+Install in Deskbar	ProcessController		Instal·la a la barra d'escriptori
+Debug this team!	ProcessController		Depureu aquest equip!
+Low latency	ProcessController		Latència baixa
+ProcessController	System name		Controlador de processos
+Lowest active priority	ProcessController		Prioritat activa més baixa
+Restart Tracker	ProcessController		Reinicia el rastrejador
+System resources & caches…	ProcessController		Recursos i memòria cau del sistema…
+Damned!	ProcessController		Maleït!
+New Terminal	ProcessController		Terminal nou
+Power saving	ProcessController		Estalvi d'energia
+ProcessController is already installed in Deskbar.	ProcessController		El Controlador de processos ja està instal·lat a la barra de l'escriptori.
+This is the last active processor…\nYou can't turn it off!	ProcessController		Aquest és l'últim processador actiu ...\nNo podeu aturar-lo!
+This thread is already gone…	ProcessController		Aquest fil ja no hi és...
+Run in window	ProcessController		Executa en una finestra

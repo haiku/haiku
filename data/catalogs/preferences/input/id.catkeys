@@ -1,0 +1,46 @@
+1	indonesian	x-vnd.Haiku-Input	2494436940
+Scrolling	TouchpadPrefView		Menggulung
+Defaults	InputMouse		Bawaan
+Tapping	TouchpadPrefView		Penyadapan
+Long	KeyboardView		Panjang
+Normal	SettingsView		Normal
+Cancel	TouchpadPrefView		Batalkan
+Slow	TouchpadPrefView		Lambat
+Warp	SettingsView		Melengkung
+Instant warp	SettingsView		Lengkungan instan
+Device List	InputWindow		Daftar perangkat
+Double-click speed	SettingsView		Kecepatan klik dua kali
+Typing test area	KeyboardView		Area tes pengetikan
+Mouse type:	SettingsView		Jenis mouse:
+Fast	KeyboardView		Cepat
+Off	TouchpadPrefView		Mati
+Fast	TouchpadPrefView		Cepat
+Please confirm	TouchpadPrefView		Mohon konfirmasi
+Click to focus	SettingsView		Klik untuk fokus
+Acceleration	TouchpadPrefView		Percepatan
+Mouse speed	SettingsView		Kecepatan mouse
+Accept first click	SettingsView		Terima klik pertama
+OK	TouchpadPrefView		Oke
+Horizontal scrolling	TouchpadPrefView		Pengguliran horizontal
+Delay until key repeat	KeyboardView		Tunda hingga tombol berulang
+Two finger scrolling	TouchpadPrefView		Pengguliran dua jari
+Input	System name		Masukan
+Mouse acceleration	SettingsView		Akselerasi mouse
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Area gulir baru sangat besar dan dapat menghambat operasi mouse normal. Apakah anda benar-benar ingin mengubahnya?
+High	TouchpadPrefView		Tinggi
+Defaults	TouchpadPrefView		Bawaan
+1-Button	SettingsView		1-Tombol
+Short	KeyboardView		Cepat
+Revert	InputMouse		Pulihkan
+Slow	KeyboardView		Lambat
+Key repeat rate	KeyboardView		Rasio pengulangan tombol
+2-Button	SettingsView		2-Tombol
+Click to focus and raise	SettingsView		Klik untuk fokus dan naikkan
+Vertical	TouchpadPrefView		Vertikal
+Horizontal	TouchpadPrefView		Horisontal
+Focus mode:	SettingsView		Mode fokus:
+Focus follows mouse	SettingsView		Fokus mengikuti mouse
+Double-click test area	SettingsView		Area pengujian klik dua kali
+Sensitivity	TouchpadPrefView		Kepekaan
+3-Button	SettingsView		3-Tombol
+Revert	TouchpadPrefView		Pulihkan

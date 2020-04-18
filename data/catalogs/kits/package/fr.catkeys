@@ -1,7 +1,7 @@
 1	french	x-vnd.Haiku-libpackage	2012114212
-Refreshing repository \"%s\" failed	PackageManagerKit		Impossible de rafraîchir le dépôt « %s »
-Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Impossible d’obtenir la configuration pour le dépôt « %s ». Abandon.
-Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Impossible d’obtenir le cache pour le dépôt « %s ». Abandon.
-Failed to get repository names	PackageManagerKit		Impossible d’obtenir les noms des dépôts
 Failed to remove transaction directory	PackageManagerKit		Impossible de supprimer le répertoire de transaction
+Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Impossible d’obtenir la configuration pour le dépôt « %s ». Abandon.
+Refreshing repository \"%s\" failed	PackageManagerKit		Impossible de rafraîchir le dépôt « %s »
+Failed to get repository names	PackageManagerKit		Impossible d’obtenir les noms des dépôts
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Impossible d’obtenir le cache pour le dépôt « %s ». Abandon.
 Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Le paquet %s-%s n’a aucun paquet de base « %s » qui correspond

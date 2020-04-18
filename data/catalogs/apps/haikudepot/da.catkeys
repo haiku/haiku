@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-HaikuDepot	429905564
+1	danish	x-vnd.Haiku-HaikuDepot	3845883642
 Repository update error	LocalRepositoryUpdateProcess		Fejl ved opdatering af softwarekilde
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Der opstod en fejl under opdatering af softwarekilden: %error%
 User Created	UserLoginWindow		Bruger oprettet
@@ -107,7 +107,6 @@ Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProce
 View the usage conditions	UserLoginWindow		Vis anvendelsesbetingelserne
 Size	PackageListView		Størrelse
 Your rating:	RatePackageWindow		Din bedømmelse:
-I am %MinimumAgeYears% years of age or older	UserLoginWindow		Jeg er mindst %MinimumAgeYears% år
 Your rating was updated.	RatePackageWindow		Din bedømmelse blev opdateret.
 All categories	FilterView		Alle kategorier
 Repositories	MainWindow		Softwarekilder

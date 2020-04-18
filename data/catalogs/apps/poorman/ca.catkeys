@@ -1,11 +1,66 @@
-1	catalan; valencian	x-vnd.Haiku-PoorMan	3941525717
+1	catalan; valencian	x-vnd.Haiku-PoorMan	1829050509
+Select web folder	PoorMan		Seleccioneu la carpeta web
+Console logging	PoorMan		Registre de consola
+Create Log File	PoorMan		Crea un fitxer de registre
+File logging	PoorMan		Registre de fitxer
+Website options	PoorMan		Opcions del lloc web
+Log to file	PoorMan		Registra-ho a fitxer
+Shutting down.	PoorMan		M'aturo.
+Error Dir	PoorMan		Error de directori
+Web folder:	PoorMan		Carpeta web:
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Trieu la carpeta que vulgueu publicar al web.\n\nPodeu que PoorMan creï un \"public_html\" predeterminat a la carpeta d'inici.\nO bé seleccioneu una de les vostres carpetes.
+Log To Console	PoorMan		Registra a la consola
+File Name	PoorMan		Nom del fitxer
+Starting up... 	PoorMan		S'inicia... 
+Select	PoorMan		Selecciona
+Logging view	PoorMan		Vista del registre
 Save console as…	PoorMan		Anomena i desa la consola...
 Edit	PoorMan		Edita
 Cancel	PoorMan		Anul·la
+Directory: 	PoorMan		Directori: 
+Hits: %lu	PoorMan		Coincidències: %lu
+Hits: 0	PoorMan		Coincidències: 0
+Shutting down.\n	PoorMan		S'atura.\n
+Select all	PoorMan		Selecciona-ho tot
+Error Server	PoorMan		Error de servidor
+Send file listing if there's no start page	PoorMan		Envia la llista de fitxers si no hi ha cap pàgina inicial.
+Create PoorMan log	PoorMan		Crea el registre de PoorMan
+Max. simultaneous connections:	PoorMan		Màx. connexions simultànies:
+Done	PoorMan		Fet
+Site	PoorMan		Lloc
+Cannot start the server	PoorMan		No es pot iniciar el servidor.
+Create log file	PoorMan		Crea un fitxer de registre
+Create public_html	PoorMan		Crea public_html
+Clear hit counter	PoorMan		Neteja el comptador de coincidències
+Status: Stopped	PoorMan		Estat: interromput
+File	PoorMan		Fitxer
 Settings…	PoorMan		Paràmetres…
+Log To File	PoorMan		Registra a fitxer
+Connections	PoorMan		Connexions
+Controls	PoorMan		Controls
+Log to console	PoorMan		Registra a la consola
+Advanced	PoorMan		Avançat
+Copy	PoorMan		Copia
+Logging	PoorMan		Registre
+PoorMan	System name		PoorMan
+Clear console log	PoorMan		Neteja el registre de la consola
+Run server	PoorMan		Executa el servidor
+Create	PoorMan		Crea
+{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# connexió} other{# connexions}}
+done.\n	PoorMan		fet.\n
 PoorMan settings	PoorMan		Paràmetres del PoorMan
+Console Logging	PoorMan		Registre de consola
+Clear log file	PoorMan		Neteja el fitxer de registre
 Save log console selection	PoorMan		Fesa la selecció del registre de la consola
+File Logging	PoorMan		Registre de fitxer
+Log file name:	PoorMan		Nom del fitxer de registre:
+Status: Running	PoorMan		Estat: s'executa
+Directory: (none)	PoorMan		Directori: (cap)
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		S'ha creat una carpeta web per defecte a \"/ boot/home/public_html.\"\nAssegureu-vos que hi ha un fitxer HTML anomenat \"index.html \" a la carpeta.
+Dir Created	PoorMan		Directori creat
 Save console selections as…	PoorMan		Anomena i desa la selecció de la consola...
+Quit	PoorMan		Surt
 Save log console	PoorMan		Desa el registre de la consola
+Start page:	PoorMan		Pàgina d'inici:
 OK	PoorMan		D'acord
 Website location	PoorMan		Ubicació de la pàgina web

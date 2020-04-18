@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Installer	1520226307
+1	hungarian	x-vnd.Haiku-Installer	2281950717
 Performing installation.	InstallProgress		A telepítés folyamatban…
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Válassza ki a felugró menüből a lemezt melyről telepíteni szeretne, majd kattintson a \"Mehet\" gombra.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		A telepítőablak bezárása előtt kérem, zárja be a Lemezkezelő ablakot!
@@ -27,15 +27,20 @@ Running Boot Manager…\n\nClose Boot Manager to continue with the installation.
 Quit DriveSetup	InstallerWindow		Kilépés a Lemezkezelőből
 Write boot sector	InstallerWindow		Rendszerbetöltő írása
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld/%2ld
+Finishing installation.	InstallProgress		Telepítés befejezése.
 Install from:	InstallerWindow		Honnan:
 Additional disk space required: 0.0 KiB	InstallerWindow		0.0 KiB hely szükséges
+This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Ez egy béta szoftver. Megvan az esélye annak, hogy elvesznek fontos adatok. Gyakran készítsen biztonsági mentéseket! Ön figyelmeztetve volt.\n\n\n
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) A Haiku első indításakor olvassa el az \"Köszöntő\"-t és a \"Felhasználói útmutató\"-t. Ezek megtalálhatóak az Asztalon és a WebPositive könyvjelzői között.\n\n
 ???	InstallerWindow	Unknown currently copied item	???
 Install anyway	InstallProgress		Telepítés folytatása
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Válassza ki a lemezt melyről telepíteni szeretne és válassza ki azt, amelyre telepít. Ha végzett, kattitnson a \"Mehet\" gombra.
 Hide optional packages	InstallerWindow		Választható csomagok elrejtése
 ???	InstallerWindow	Unknown partition name	???
+Have fun and thanks for trying out Haiku!	InstallerApp		Élvezd a szoftvert! Köszönjük, hogy kipróbáltad a Haikut!
 Quit	InstallerApp		Kilépés
+Starting installation.	InstallProgress		Telepítés indítása.
+Error writing boot sector.	InstallProgress		Hiba a boot szektorba írás közben.
 OK	InstallerWindow		Rendben
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Kérjük, zárja be a Rendszerválasztó és a Lemezkezelő ablakait még mielőtt a Telepítő ablakát bezárná.
 Failed to launch Boot Manager	InstallerWindow		Nem sikerült elindítani a Boot Managert

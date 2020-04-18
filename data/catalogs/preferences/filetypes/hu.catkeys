@@ -1,5 +1,6 @@
-1	hungarian	x-vnd.Haiku-FileTypes	734679611
+1	hungarian	x-vnd.Haiku-FileTypes	436017301
 Left	Attribute Window	Attribute column alignment in Tracker	Bal
+Float	Attribute ListView		Lebegőpontos
 Final	Application Types Window		Végleges
 FileTypes request	FileTypes Window		Fájltípusok kérés
 This file type already exists	New File Type Window		Ez a fájltípus már létezik
@@ -31,6 +32,7 @@ Signature:	Application Types Window		Aláírás:
 None	FileTypes Window		Nincs
 Exclusive launch	Application Type Window		Kivételes indítás
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Egy fájltípus eltávolítását nem lehet visszavonni.\nBiztos el akarja távolítani?
+Integer 64 bit	Attribute ListView		64 bites egész szám
 Cancel	New File Type Window		Mégse
 Select same preferred application as	FileType Window		Ugyanazon előnyben részesített program kiválasztása mint
 Cancel	Type List Window		Mégse
@@ -43,10 +45,13 @@ Abort	Application Types Window		Megszakítás
 Save	Application Type Window		Mentés
 %1 application type	Application Type Window		%1 programtípus
 Icon	Application Type Window		Ikon
+Duration	Attribute ListView		Időtartam
 Version:	Application Type Window		Verzió:
 Default application	FileType Window		Alapértelmezett program
 Internal name:	New File Type Window		Belső név:
+Integer 8 bit	Attribute ListView		8 bites egész szám
 Extension:	Extension Window		Kiterjesztés:
+Time	Attribute ListView		Idő
 Extensions:	FileTypes Window		Kiterjesztések:
 Select preferred application	FileType Window		előnyben részesített program kiválasztása
 Description:	FileTypes Window		Leírás:
@@ -66,6 +71,8 @@ Version:	Application Types Window		Verzió:
 Application types	Application Types Window		Programtípusok
 Description:	Application Types Window		Leírás:
 Name:	Application Types Window		Név:
+Rating	Attribute ListView		Értékelés
+duration	Attribute ListView		időtartam
 File could not be opened	Preferred App Menu		A fájl nem nyitható meg
 Args only	Application Type Window		Csak paraméterek
 Could not open \"%s\":\n%s	FileTypes		„%s” nem megnyitható:\n%s
@@ -83,16 +90,21 @@ Type name:	FileTypes Window		Típus neve:
 Visible	Attribute Window		Látható
 Select preferred application	FileTypes Window		Használandó program kiválasztása
 Path:	Application Types Window		Útvonal:
+rating	Attribute ListView		értékelés
 Could not install file type	New File Type Window		A fájltípus nem telepíthető
 Same as…	FileTypes Window		Ugyanaz, mint…
 Golden master	Application Type Window		Végleges kiadás
+Checkbox	Attribute ListView		Jelölőnégyzet
 FileTypes request	Preferred App Menu		Fájltípusok kérés
 no icon	FileTypes Window		nincs ikon
 Single launch	Application Type Window		Egyszer indítható
 %s file type	FileType Window		%s fájltípusok
+Default	Attribute ListView		Alapérték
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Egy szupertípus eltávolítását nem lehet visszavonni.\nMinden fájltípus ami ehhez a szupertípushoz tartozik el fog vészni!\n\nBiztos ezt akarja tenni? A teljes csoport eltávolításához tartsa lenyomva a „Shift” billentyűt és nyomjon az „Eltávolítás” gombra.
+String	Attribute ListView		Szöveg
 Add type	New File Type Window		Típus hozzáadása
 Remove icon	Icon View		Ikon eltávolítása
+Boolean	Attribute ListView		Logikai
 Cancel	Extension Window		Mégse
 Alignment:	Attribute Window		Igazítás:
 Icon	FileType Window		Ikon
@@ -101,6 +113,7 @@ Development	Application Type Window		Fejlesztés
 Golden master	Application Types Window		Végleges verzió
 Add	Extension Window		Hozzáadás
 Open…	FileTypes Window		Megnyitás…
+checkbox	Attribute ListView		jelölőnégyzet
 Could not change file extensions	Extension Window		Nem lehet átállítani a fájlkiterjesztést
 Could not open file	FileType Window		Nem lehetett megnyitni a fájlt
 Choose type	Type List Window		Típus kiválasztása
@@ -118,6 +131,7 @@ Add group	New File Type Window		Csoport hozzáadása
 Cancel	Attribute Window		Mégse
 Gamma	Application Types Window		Gamma
 Supported types	Application Type Window		Támogatott típusok
+Integer 32 bit	Attribute ListView		32 bites egész szám
 Beta	Application Type Window		Béta
 Could not retrieve preferred application of this file	Preferred App Menu		Nem található az ehhez a fájlhoz használandó program
 Application flags	Application Type Window		Program megjelölése
@@ -142,6 +156,7 @@ Extra attributes	FileTypes Window		Extra jellemzők
 Group:	New File Type Window		Csoport:
 Alpha	Application Types Window		Alfa
 Close	Application Type Window		Bezárás
+Integer 16 bit	Attribute ListView		16 bites egész szám
 Extension	Extension Window		Kiterjesztés
 Rule:	FileTypes Window		Szabály:
 FileTypes	System name		Fájltípusok
@@ -153,5 +168,6 @@ Add…	FileTypes Window		Hozzáadás…
 Edit icon…	Icon View		Ikon szerkesztése…
 Internal name:	Attribute Window		Belső név:
 Show recognition rule	FileTypes Window		Felismerési szabály megjelenítése
+Double	Attribute ListView		Dupla
 Move down	FileTypes Window		Mozgatás fel
 Alpha	Application Type Window		Alfa

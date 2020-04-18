@@ -30,7 +30,7 @@ Append	ShortcutsWindow		Afegeix
 Save KeySet as…	ShortcutsWindow		Anomena i desa el conjunt de claus...
 Append KeySet…	ShortcutsWindow		Afegeix un joc de claus...
 *MouseButton 1	ShortcutsWindow		*Botó 1 del ratolí
-*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Múltiple \"*Mou el ratolí a 100% 0\" \"*Botó 1 del ratolí\"
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Múltiple \"*Mou el ratolí a 100 % 0\" \"*Botó 1 del ratolí\"
 OK	ShortcutsWindow		D'acord
 Add new shortcut	ShortcutsWindow		Afegeix una drecera nova
 Shift	ShortcutsSpec	Name for modifier on keyboard	Majúscules

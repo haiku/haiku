@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-MediaPlayer	4235582491
+1	indonesian	x-vnd.Haiku-MediaPlayer	457442808
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Hapus Entri ke Sampah
 Close	MediaPlayer-PlaylistWindow		Tutup
 Volume of background clips	MediaPlayer-SettingsWindow		Volume dari klip latar
@@ -44,55 +44,102 @@ Close	MediaPlayer-Main		Tutup
 Save error	MediaPlayer-PlaylistWindow		Simpan galat
 Attributes	MediaPlayer-Main		Atribut
 Bottom of screen	MediaPlayer-SettingsWindow		Sisi bawah layar
+MediaPlayer settings	MediaPlayer-SettingsWindow		Pengaturan MediaPlayer
 Copyright	MediaPlayer-InfoWin		Hak cipta
+Invalid URL inserted!	MediaPlayer-NetworkStream		URL yang dimasukkan tidak valid!
+Aspect ratio	MediaPlayer-Main		Rasio aspek
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Gagal menyimpan daftar putar.\n\nKesalahan: 
+<no media>	MediaPlayer-InfoWin		<tiada media>
 Hide interface	MediaPlayer-Main		Sembunyikan antarmuka
 Error: 	MediaPlayer-Main		Galat: 
+Video track	MediaPlayer-Main		Trek video
+Playlist…	MediaPlayer-Main		Daftar putar…
+<unnamed media>	MediaPlayer-InfoWin		<media tak bernama>
 Save	MediaPlayer-PlaylistWindow		Simpan
+Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Acak entri
 Cancel	MediaPlayer-NetworkStream		Batal
 Nothing to Play	MediaPlayer-Main		Tidak ada yang dimainkan
 OK	MediaPlayer-SettingsWindow		OKE
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Hapus Entri
 never	MediaPlayer-SettingsWindow		tidak pernah
+Loop audio	MediaPlayer-SettingsWindow		Audio berulang
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Kesalahan internal (pesan cacat). Gagal menyimpan daftar putar.
 Open…	MediaPlayer-PlaylistWindow		Buka…
+Revert	MediaPlayer-SettingsWindow		Pulihkan
 Low volume	MediaPlayer-SettingsWindow		Volume kecil
 Audio	MediaPlayer-Main		Audio
 Quit	MediaPlayer-Main		Keluar
+Redo	MediaPlayer-PlaylistWindow		Ulangi
 Move Entry	MediaPlayer-MovePLItemsCmd		Pindah Entri
+<unknown>	PlaylistItem-author		<tak diketahui>
 Cancel	MediaPlayer-SettingsWindow		Batal
 Large	MediaPlayer-SettingsWindow		Besar
 Import Entry	MediaPlayer-ImportPLItemsCmd		Import entri
 unknown format	MediaPlayer-InfoWin		format tidak dikenal
+Track %d	MediaPlayer-Main		Trek %d
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Semua file tidak dapat dipindahkan ke Sampah.
 Total duration: %s	MediaPlayer-PlaylistWindow		Total durasi: %s
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 Move into trash error	MediaPlayer-RemovePLItemsCmd		Galat pemindahan ke tong sampah
 50% scale	MediaPlayer-Main		Skala 50%
 Drop files to play	MediaPlayer-Main		Jatuhkan berkas untuk memutar
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Salin Entri
+Close window after playing audio	MediaPlayer-SettingsWindow		Tutup jendela setelah memutar audio
+Edit	MediaPlayer-PlaylistWindow		Edit
+Copy Entries	MediaPlayer-CopyPLItemsCmd		Salin Entri
+Always on top	MediaPlayer-Main		Selalu di atas
 Open	MediaPlayer-PlaylistWindow		Buka
 always	MediaPlayer-SettingsWindow		selalu
+Loop video	MediaPlayer-SettingsWindow		Video putar ulang
+Stream URL:	MediaPlayer-NetworkStream		URL strim:
+<unknown>	PlaylistItem-album		<tak diketahui>
 Stream settings	MediaPlayer-Main		Pengaturan aliran
+none	Subtitles menu		tak satupun
+Save Playlist	MediaPlayer-PlaylistWindow		Simpan Daftar putar
+Overlay	MediaPlayer-InfoWin		Hamparan
+2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (layar lebar)
+Rating	MediaPlayer-Main		Peringkat
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Kesalahan internal (kehabisan memori). Gagal menyimpan daftar putar.
 Video	MediaPlayer-Main		Video
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Tidak ada dekoder terinstal untuk menangani format berkas, atau dekoder tersebut mengalami masalah dengan versi spesifik dari format.
+Lock Peaks	MediaPlayer-PeakView		Kunci Puncak
+none	Audio track menu		tidak ada
+Open network stream	MediaPlayer-NetworkStream		Buka aliran jaringan
+Automatically start playing	MediaPlayer-SettingsWindow		Otomatis memainkan saat membuka
 Undo	MediaPlayer-PlaylistWindow		Batalkan
 Display mode	MediaPlayer-InfoWin		Mode tayang
+Bottom of video	MediaPlayer-SettingsWindow		Bagian bawah video
 Small	MediaPlayer-SettingsWindow		Kecil
 Settings…	MediaPlayer-Main		Pengaturan…
 min	MediaPlayer-InfoWin	Minutes	min
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Gagal menyimpan daftar putar:\n\nKesalahan: 
 Video	MediaPlayer-InfoWin		Video
 File info…	MediaPlayer-Main		Info berkas…
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerika)
+<unnamed>	PlaylistItem-name		<anonim>
+Track	Video Track Menu		Trek
 Full screen	MediaPlayer-Main		Layara penuh
 OK	MediaPlayer-NetworkStream		OK
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Kesalahan internal (gagal mengunci). Gagal menyimpan daftar putar.
 100% scale	MediaPlayer-Main		Skala 100%
+<nothing to redo>	MediaPlayer-PlaylistWindow		<tiada untuk diulang>
+Bad URL	MediaPlayer-NetworkStream		URL salah
 Save	MediaPlayer-Main		Simpan
+Close window after playing video	MediaPlayer-SettingsWindow		Tutup jendela setelah memutar video
+Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Skala film dengan halus (mode non-overlay)
 200% scale	MediaPlayer-Main		Skala 200%
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Berkas '%filename' tidak bisa dibuka.\n\n
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Tak satupun yang ingin Anda putar tampak sebagai berkas media.
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Hapus Entri
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Hapus Entri ke Sampah
 Subtitle size:	MediaPlayer-SettingsWindow		Ukuran subtitle:
+No aspect correction	MediaPlayer-Main		Tiada koreksi aspek
 raw video	MediaPlayer-InfoWin		video mentah
+Container	MediaPlayer-InfoWin		Wadah
+none	MediaPlayer-Main		tiada
+Open clips	MediaPlayer-Main		Buka klip
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Beberapa berkas tidak bisa dipindahkan ke tempat sampah.
+<nothing to undo>	MediaPlayer-PlaylistWindow		<tiada yang dibatalkan>
 Save as…	MediaPlayer-PlaylistWindow		Simpan sebagai…
 Error: 	MediaPlayer-RemovePLItemsCmd		Galat: 
 300% scale	MediaPlayer-Main		Skala 300%
@@ -100,6 +147,8 @@ Open	MediaPlayer-Main		Buka
 ask every time	MediaPlayer-SettingsWindow		tanya tiap kali
 (not supported)	MediaPlayer-InfoWin		(tidak didukung)
 Randomize	MediaPlayer-PlaylistWindow		Acak
+%.3f fps	MediaPlayer-InfoWin		%.3f fpd
+Off	Subtitles menu		Mati
 400% scale	MediaPlayer-Main		Skala 400%
 h	MediaPlayer-InfoWin	Hours	h
 OK	MediaPlayer-PlaylistWindow		OK

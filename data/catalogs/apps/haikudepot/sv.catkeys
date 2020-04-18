@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	429905564
+1	swedish	x-vnd.Haiku-HaikuDepot	3845883642
 Repository update error	LocalRepositoryUpdateProcess		Fel vid uppdatering av repositorie
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ett fel inträffade vid uppdatering av repositoriet: %error%
 User Created	UserLoginWindow		Användare skapad
@@ -107,7 +107,6 @@ Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProce
 View the usage conditions	UserLoginWindow		Visa användarvillkor
 Size	PackageListView		Storlek
 Your rating:	RatePackageWindow		Dina betyg:
-I am %MinimumAgeYears% years of age or older	UserLoginWindow		Jag är %MinimumAgeYears% år eller äldre
 Your rating was updated.	RatePackageWindow		Ditt betyg ändrades.
 All categories	FilterView		Alla kategorier
 Repositories	MainWindow		Repositorier

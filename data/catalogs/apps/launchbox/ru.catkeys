@@ -2,7 +2,7 @@
 Set description…	LaunchBox		Изменить описание…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Вы действительно хотите закрыть эту панель?\n(Эта панель не сохранится)
 OK	LaunchBox		ОК
-Ignore double-click	LaunchBox		Игнорировать двойной щелчок
+Ignore double-click	LaunchBox		Игнорировать двойной клик
 Show on all workspaces	LaunchBox		Отображать на всех рабочих столах
 Name Panel	LaunchBox		Название панели
 Autostart	LaunchBox		Автозапуск

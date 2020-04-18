@@ -1,4 +1,5 @@
-1	catalan; valencian	x-vnd.Be-PRNT	823985976
+1	catalan; valencian	x-vnd.Be-PRNT	1465107170
+Test page	TestPageView		Pàgina de prova
 Remove	PrintersWindow		Suprimeix
 Red	TestPageView		Vermell
 Default Printer	PrinterListView		Impressora predeterminada
@@ -7,6 +8,7 @@ Connected to:	AddPrinterDialog		Connectat a:
 Make default	PrintersWindow		Fes-la predeterminada
 Cyan	TestPageView		Cian
 Completed	JobListView		Completada
+Test page	PrintersWindow		Pàgina de prova
 Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
 Failed	JobListView		Ha fallat
 Blue	TestPageView		Blau
@@ -14,9 +16,12 @@ Waiting	JobListView		En espera
 Processing	JobListView		En procés
 Cancel	AddPrinterDialog		Anul·la
 Unknown status	JobListView		Es desconeix l'estat
+Print jobs for %printer_name%	PrintersWindow		Tasques d'impressió per a %printer_name%
+{0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? pàgines}=1{# pàgina}other{# pàgines}}
 Add printer	AddPrinterDialog		Afegeix una impressora
 Printers	PrintersWindow		Impressores
 No printer found!	TransportMenu		No s'ha trobat cap impressora!
+Add…	PrintersWindow		Afegeix...
 Magenta	TestPageView		Magenta
 Transport: %transport% %transport_address%	TestPageView		Transport: %transport% %transport_address%
 Add	AddPrinterDialog		Afegeix
@@ -26,6 +31,7 @@ Yellow	TestPageView		Groc
 Black	TestPageView		Negre
 Printer type:	AddPrinterDialog		Tipus d'impressora:
 Printers	System name		Impressores
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{No hi ha tasques pendents}=1{1 tasca pendent}other{# tasques pendents}}
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Impressora: %printer_name%\nControlador:  %driver%\n
 Green	TestPageView		Verd
 Print test page	PrintersWindow		Imprimeix una pàgina de prova

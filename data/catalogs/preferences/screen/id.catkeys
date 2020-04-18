@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Screen	2685901476
+1	indonesian	x-vnd.Haiku-Screen	133788249
 no	Screen		tidak
 bits/pixel	Screen		bits/piksel
 15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 warna
@@ -17,6 +17,7 @@ vertically	Screen		secara vertikal
 All workspaces	Screen		Semua workspace
 Use laptop panel:	Screen		Memakai panel laptop:
 Could not write VESA mode settings file:\n\t	Screen		Tidak bisa menulis berkas pengaturan mode VESA:\n\t
+Display info	Screen		Info tampilan
 Settings will revert in %seconds.	Screen		Pengaturan akan dipulihkan dalam %seconds.
 Cancel	Screen		Batal
 Other…	Screen		Lainnya...

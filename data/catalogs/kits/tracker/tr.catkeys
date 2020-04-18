@@ -7,7 +7,7 @@ Open with…	ContainerWindow		Birlikte aç…
 Error moving \"%name\" to Trash. (%error)	FSUtils		\"%name\" Çöp'e taşınırken hata (%error)
 Or	FindPanel		veya
 before	FindPanel		önce
-Volume icons	TrackerSettingsWindow		Ses düzeyi simgeleri
+Volume icons	TrackerSettingsWindow		Disk simgeleri
 Ignore case	SelectionWindow		BÜYÜK/küçük harf yoksay
 Current folder	ContainerWindow		Şu anki klasör
 Finish: %time - Over %finishtime left	StatusWindow		Bitiş: %time - Yaklaşık %finishtime kaldı
@@ -82,7 +82,7 @@ Select	InfoWindow		Seç
 OK	OpenWithWindow		Tamam
 Include trash	FindPanel		Çöp'ü içer
 GiB	WidgetAttributeText		GiB
-Clean up	ContainerWindow		Temizle
+Clean up	ContainerWindow		Toparla
 Modified	FindPanel		Değiştirilme
 Select all	QueryContainerWindow		Tümünü seç
 Select…	FilePanelPriv		Seç…
@@ -114,7 +114,7 @@ Edit templates…	TemplatesMenu		Şablonları düzenle…
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used kullanılıyor -- %free kullanılmayan)
 Hide dotfiles	SettingsView		Nokta ile başlayan dosyaları gizle
 Trash	Model		Çöp
-Enable type-ahead filtering	SettingsView		Otomatik tamamlayan süzmeyi etkinleştir
+Enable type-ahead filtering	SettingsView		Hemen bulan süzmeyi etkinleştir
 copy	FSUtils	filename copy	kopyala
 New folder%ld	FSUtils		Yeni klasör%ld
 Location	OpenWithWindow		Konum
@@ -185,7 +185,7 @@ There was a problem trying to save in the folder you specified. Please try anoth
 Desktop	TrackerSettingsWindow		Masaüstü
 Nested *?+.	libtracker		İç içe geçmiş *?+.
 Move	FSUtils	button label	Taşı
-Clean up	DeskWindow		Temizle
+Clean up	DeskWindow		Toparla
 Group	FilePermissionsView		Grup
 Could not find an application to open \"%name\" (%error). 	FSUtils		\"%name\" ögesini açabilecek bir uygulama bulunamadı (%error). 
 Internal error.	libtracker		İç hata.
@@ -265,7 +265,7 @@ Cut	FilePanelPriv		Kes
 Favorites	FilePanelPriv		Favoriler
 Point	AttributesView		Nokta
 home	B_USER_DIRECTORY		ev
-Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		İzleyici Yeni şablonlar
+Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Yeni İzleyici şablonları
 Disk mounting during boot	AutoMounterSettings		Önyükleme sırasında bağlama
 Don't automount	AutoMounterSettings		Otomatik bağlama yok
 Could not find application \"%appname\"	OpenWithWindow		\"%appname\" uygulaması bulunamıyor
@@ -422,7 +422,7 @@ KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		Eski haline döndür
 trash	B_TRASH_DIRECTORY		çöp
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Sistem klasörünü veya içindekileri taşırsanız %osName çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de taşımak istiyorsanız Shift düğmesini basılı tutun ve \"Taşı\"ya basın.
-Close all in workspace	ContainerWindow		Tüm çalışma alanlarında kapat
+Close all in workspace	ContainerWindow		Bu çalışma alanındakini kapat
 Corrupted expression.	libtracker		Hasar görmüş ifade.
 32 x 32	DeskWindow		32 x 32
 Network address	AttributesView		Ağ adresi
@@ -446,7 +446,7 @@ the config folder	FSUtils		yapılandırma klasörü
 Sorry, could not create a new folder.	FSUtils		Üzgünüm, yeni bir klasör oluşturulamadı.
 Select all	VirtualDirectoryWindow		Tümünü seç
 Rename	FSUtils	button label	Yeniden adlandır
-Clean up all	ContainerWindow		Tümünü temizle
+Clean up all	ContainerWindow		Hepsini toparla
 Add current folder	FilePanelPriv		Şu anki klasörü ekle
 Description:	InfoWindow		Açıklama:
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Seçili öge/ögeleri silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
@@ -475,7 +475,7 @@ matches regular expression	SelectionWindow		düzenli ifade ile eşleşir
 Invert selection	ContainerWindow		Seçimi tersine çevir
 Close	VirtualDirectoryWindow		Kapat
 Monochrome picture	AttributesView		Siyah beyaz resim
-Real name	ContainerWindow		Gerçek adı
+Real name	ContainerWindow		Gerçek ad
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		\"%name\" açılamadı. Dosya yanlışlıkla çalıştırılabilir olarak imlenmiş. 
 Go to parent	FilePanelPriv		Üst klasöre git
 Save	FindPanel		Kaydet

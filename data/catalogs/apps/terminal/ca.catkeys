@@ -1,54 +1,117 @@
-1	catalan; valencian	x-vnd.Haiku-Terminal	1361273145
+1	catalan; valencian	x-vnd.Haiku-Terminal	2664488407
 Close other tabs	Terminal TermWindow		Tanca les altres pestanyes
+Insert path	Terminal TermView		Insereix un camí
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		El terminal no ha pogut obrir l'intèrpret de les ordres. Ho sentim.
+Text encoding	Terminal TermWindow		Codificació del text
 OK	Terminal SetTitleWindow		D'acord
 Edit	Terminal TermWindow		Edita
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               imprimeix aquesta ajuda\n  -t,     --title              estableix el títol de la finestra\n  -f,     --fullscreen         inicia la pantalla completa\n  -w,     --working-directory  estableix el directori de treball inicial\n
 Select all	Terminal TermWindow		Selecciona-ho tot
+Confirm exit if active programs exist	Terminal AppearancePrefView		Confirmeu la sortida si existeixen programes actius.
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tEl directori de treball actual del procés actiu a la\n\t\t\tpestanya actual. Opcionalment es pot especificar el nombre màxim\n\t\t\tde components de camí. P. ex: "%2d" per a un màx. de 2 components.\n\t%T\t-\tEl nom de l'aplicació de Terminal per a la configuració de llengua actual.\n\t%e\t-\tLa codificació de la pestanya actual. No es mostra per a UTF-8.\n\t%i\t-\tL'índex de la finestra.\n\t%p\t-\tEl nom del procés actiu a la pestanya actual.\n\t%t\t-\tEl títol de la pestanya actual.
+Solarized Dark	Terminal colors scheme		Fosc solaritzat
 Copy	Terminal TermWindow		Copia
+Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Edita el títol de la pestanya...
+Print	Terminal TermWindow		Imprimeix
 Settings	Terminal TermWindow		Paràmetres
 %app% settings	Terminal PrefWindow	window title	Paràmetres del %app%
+Use default	Terminal SetTitleWindow		Valor per defecte
 Close tab	Terminal TermWindow		Tanca la pestanya
+Selected background	Terminal AppearancePrefView		Fons seleccionat
+Error!	Terminal getString		Error!
+Set tab title	Terminal TermWindow		Establiu el títol de la pestanya
+Appearance	Terminal PrefWindow		Aparença
+Encoding:	Terminal AppearancePrefView		Codificació:
+Create link here	Terminal TermView		Cree l'enllaç aquí
 Custom	Terminal AppearancePrefView	Window size	Personalitzat
+Selected text	Terminal AppearancePrefView		Text seleccionat
 Change directory	Terminal TermView		Canvia la carpeta
+Page setup…	Terminal TermWindow		Configuració de la pàgina...
+Slate	Terminal colors scheme		Pissarra
+Defaults	Terminal PrefWindow		Per defecte
 Cancel	Terminal TermView		Anul·la
+Revert	Terminal PrefWindow		Reverteix
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
+Use selection	Terminal FindWindow		Usa la selecció
 Find next	Terminal TermWindow		Cerca el següent
 Copy link location	Terminal TermView		Copia la ubicació de l'enllaç
 Window title:	Terminal AppearancePrefView		Títol de la finestra:
+New tab	Terminal TermWindow		Pestanya nova
+Allow bold text	Terminal AppearancePrefView		Permet text en negreta
+Window title…	Terminal TermWindow		Títol de la finestra...
 Blue	Terminal colors scheme		Blau
 Cannot execute \"%command\":\n\t%error	Terminal Shell		No ha estat possible executar l'ordre \"%command\":\n\t%error
 Open path	Terminal TermView		Obre el camí
 Terminal	System name		Terminal
+Font size	Terminal TermWindow		Mida de la lletra
 Custom	Terminal colors scheme		Personalitzat
 Really close?	Terminal TermWindow		Esteu segur que voleu sortir?
 OK	Terminal TermApp		D'acord
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		El procés \"%1\" encara s'executa.\nTancar el Terminal matarà el procés.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Opció no reconeguda \"%s\"\n
+Tab title:	Terminal AppearancePrefView		Títol de la pestanya
+Text not found.	Terminal TermWindow		No s'ha trobat el text.
 Find failed	Terminal TermWindow		Ha fallat la cerca
+Match word	Terminal FindWindow		Coincidència de paraules
 Color scheme:	Terminal AppearancePrefView		Esquema de colors:
 New Terminal	Terminal TermWindow		Obre un terminal
 Quit	Terminal TermWindow		Surt
 Match case	Terminal FindWindow		Coincidència de majúscules i minúscules
 Find previous	Terminal TermWindow		Cerca l'anterior
+The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		El patró que especifica els títols de les pestanyes. Es poden usar\nels marcadors de posició següents:
 Close	Terminal TermWindow		Tanca
 Save to file…	Terminal PrefWindow		Desa a un fitxer...
+Background	Terminal AppearancePrefView		Fons
+Copy path	Terminal TermView		Copia'n el camí
+Window size	Terminal TermWindow		Mida de la finestra
+Copy absolute path	Terminal TermView		Copia'n el camí absolut
 Cancel	Terminal TermWindow		Anul·la
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		El procés \"%1\" encara s'executa.\nTancar la pestanya matarà el procés.
 Cursor	Terminal AppearancePrefView		Cursor
+Full screen	Terminal TermWindow		Pantalla completa
+Shell 	Terminal TermWindow		Intèrpret d'ordres 
+Midnight	Terminal colors scheme		Mitjanit
+\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tEl caràcter "%".\n\t%<\t-\tInicia una secció que només es mostrarà si un marcador de posició\n\t\t\tposterior no està buit.\n\t%>\t-\tComença una secció que només es mostrarà si el marcador de posició\n\t\t\tentre una secció %< i aquest no està buit.\n\t%-\t-\tAcaba una secció %< o %>.\n\nQualsevol caràcter no alfanumèric entre % i la lletra de format inserirà només un espai\nsi el valor del marcador de posició no està buit. S’afegirà a la secció %<.
+Tab title:	Terminal TermWindow		Títol de la pestanya:
 Window title:	Terminal TermWindow		Títol de la finestra:
+Default	Terminal colors scheme		Per defecte
+Window size:	Terminal AppearancePrefView		Mida de la finestra:
 Switch Terminals	Terminal TermWindow		Intercanvia els Terminals
+Decrease	Terminal TermWindow		Redueix
 Settings…	Terminal TermWindow		Paràmetres…
 Cancel	Terminal SetTitleWindow		Anul·la
+Blinking cursor	Terminal AppearancePrefView		Cursor que parpelleja
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		El patró que especifica el títol de la finestra. Es poden usar els marcadors\nde posició següents:\n
+Use text:	Terminal FindWindow		Usa text:
 Close active tab	Terminal TermWindow		Tanca la pestanya activa
+Save as default	Terminal TermWindow		Desa com a predeterminat
+Nothing is selected.	Terminal TermWindow		No hi ha res seleccionat.
+Use left Option as Meta key	Terminal AppearancePrefView		Usa l'opció d'esquerra com a tecla Meta.
 Find	Terminal FindWindow		Cerca
+The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		El patró que especifica el títol de la pestanya actual. Es poden usar els\nmarcadors de posició següents:\n
 Professional	Terminal colors scheme		Professional
 Font:	Terminal AppearancePrefView		Tipus de lletra:
 Paste	Terminal TermWindow		Enganxa
+The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		El patró que especifica els títols de les finestres. Es poden usar els\nmarcadors de posició següents:
 Copy here	Terminal TermView		Copia-ho aquí
 Use default shell	Terminal Shell		Usa l'intèrpret d'ordres per omissió
+Color:	Terminal AppearancePrefView		Color:
 Open link	Terminal TermView		Obre l'enllaç
+Text	Terminal AppearancePrefView		Text
 Not found.	Terminal TermWindow		No s'ha trobat.
 Find…	Terminal TermWindow		Cerca…
+No search string was entered.	Terminal TermWindow		No s'ha proporcionat cap cadena de cerca.
+Text under cursor	Terminal AppearancePrefView		Text sota el cursor
 Move here	Terminal TermView		Mou aquí
+Abort	Terminal Shell		Quant a
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tEl directori de treball actual del procés actiu.\n\t\t\tOpcionalment, es pot especificar el nombre màxim de components\n\t\t\tde camí. Per exemple. "%2d" per a un màxim de dos components.\n\t%i\t-\tL’índex de la pestanya.\n\t%e\t-\tLa codificació de la pestanya actual. No mostrat per UTF-8.\n\t%p\t-\tEl nom del procés actiu.\n\t%%\t-\tEl caràcter "%·.
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Els processos següents encara s'executen:\n\n\t%1\n\nSi tanqueu el Terminal, els processos es mataran.
+Set window title	Terminal TermWindow		Establiu el títol de la finestra
 Increase	Terminal TermWindow		Incrementa
 OK	Terminal TermWindow		D'acord
 Close window	Terminal TermWindow		Tanca la finestra
+Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminal del Haiku\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nÚs: %s [OPCIÓ] [SHELL]\n
+Solarized Light	Terminal colors scheme		Llum solaritzada
+Clear all	Terminal TermWindow		Neteja-ho tot
+Search forward	Terminal FindWindow		Cerca endavant

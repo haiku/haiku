@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	1141704418
+1	russian	x-vnd.Haiku-libtracker	659027911
 Created	ContainerWindow		Создан
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
@@ -286,6 +286,7 @@ Error creating link to \"%name\".	FSUtils		Ошибка при создании 
 Unknown	FilePermissionsView		Неизвестно
 Paste links	ContainerWindow		Вставить ссылки
 Restoring: 	StatusWindow		Восстановление: 
+The Tracker must be running to set the default printer.	PoseView		Чтобы установить принтер по умолчанию Tracker должен быть запущен.
 calculating…	InfoWindow		подсчёт…
 Preferred for file	OpenWithWindow		Предпочтительно для файлов
 OK	AutoMounterSettings		ОК
@@ -323,6 +324,7 @@ Would you like to find some other suitable application?	FSUtils		Хотите н
 *+? operand may be empty.	libtracker		*+? операнд может быть пустым.
 (unknown)	AttributesView		(неизвестно)
 Recent folders	FavoritesMenu		Недавние папки
+Signed memory size	AttributesView		Установленный размер памяти
 The specified name is illegal. Please choose another name.	FilePanelPriv		Введённое имя недопустимо. Введите какое-нибудь другое.
 of %items	StatusWindow		из %items
 less than	FindPanel		меньше чем

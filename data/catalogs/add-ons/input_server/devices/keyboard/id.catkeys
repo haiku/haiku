@@ -1,9 +1,9 @@
 1	indonesian	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
 If the application will not quit you may have to kill it.	Team monitor		Jika aplikasi tidak mau keluar anda mungkin harus mematikannya.
-Quit application	Team monitor		Menghentikan aplikasi
-Restart the desktop	Team monitor		Restart desktop
+Quit application	Team monitor		Keluar dari aplikasi
+Restart the desktop	Team monitor		Start ulang desktop
 Force reboot	Team monitor		Paksa restart
-Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Pilih aplikasi dari daftar diatas dan klik satu dari tombol 'matikan aplikasi' dan 'Meninggalkan aplikasi' untuk menutupnya.\n\nTahan CONTROL+ALT+DELETE for %ld detik untuk restart.
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Pilih aplikasi dari daftar diatas dan klik satu dari tombol 'matikan aplikasi' dan 'Meninggalkan aplikasi' untuk menutupnya.\n\nTahan CONTROL+ALT+DELETE selama %ld detik untuk memulai ulang.
 Team monitor	Team monitor		Monitor tim
 Kill application	Team monitor		Matikan aplikasi
 Cancel	Team monitor		Batal

@@ -12,7 +12,7 @@ No effect on running applications	DecorSettingsView		Sense efecte a les aplicaci
 Fixed font:	Font view		Tipus de lletra d'amplada fixa:
 Appearance	System name		Aparença
 Reduce colored edges filter strength:	AntialiasingSettingsView		Redueix el filtre de les vores de color:
-Glyph hinting:	AntialiasingSettingsView		Millora per glifs:
+Glyph hinting:	AntialiasingSettingsView		Millora de glifs:
 Default Haiku ControlLook	DecorSettingsView		Control d'aparença del Haiku per defecte
 Menu item text	Colors tab		Text de l'element del menú
 About decorator	DecorSettingsView		Quant al decorador

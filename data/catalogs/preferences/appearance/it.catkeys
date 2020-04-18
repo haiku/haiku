@@ -16,7 +16,7 @@ Glyph hinting:	AntialiasingSettingsView		Hinting dei glifi:
 Default Haiku ControlLook	DecorSettingsView		ControlLook Haiku Predefinito
 Menu item text	Colors tab		Testo della voce nel menu
 About decorator	DecorSettingsView		Informazioni sul decoratore
-Antialiasing menu	AntialiasingSettingsView		Antialiasing sul menu
+Antialiasing menu	AntialiasingSettingsView		Antialias sul menu
 Success	Colors tab		Successo
 About	DecorSettingsView		Informazioni su
 Shine	Colors tab		Brillantezza
@@ -35,7 +35,7 @@ Antialiasing	APRWindow		Antialiasing
 Menu font:	Font view		Tipo di carattere del menu:
 Bold font:	Font view		Carattere in grassetto:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutori:\n\t%decorAuthors\n\nURL: %decorURL\nLicenza: %decorLic\n\n%decorDesc\n
-Choose Decorator	DecorSettingsView		Scegli decorazione
+Choose Decorator	DecorSettingsView		Scegli il decoratore
 Strong	AntialiasingSettingsView		Forte
 Failure	Colors tab		Insuccesso
 Double:	DecorSettingsView		Doppio:
@@ -45,7 +45,7 @@ Panel background	Colors tab		Sfondo del pannello
 Plain font:	Font view		Tipo di carattere:
 Window tab text	Colors tab		Testo della linguetta sulla finestra
 Navigation pulse	Colors tab		Navigation pulse
-LCD subpixel	AntialiasingSettingsView		Sub-pixel LCD
+LCD subpixel	AntialiasingSettingsView		Componenti LCD
 Window tab	Colors tab		Linguetta della finestra
 Link text	Colors tab		Testo del collegamento
 Tooltip background	Colors tab		Sfondo dei suggerimenti

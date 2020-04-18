@@ -1,11 +1,18 @@
-1	catalan; valencian	x-vnd.Haiku-Pairs	2647083837
-Pairs	System name		Parelles
+1	catalan; valencian	x-vnd.Haiku-Pairs	818003250
+Pairs	System name		Parells
 Quit	PairsWindow		Surt
+Medium	PairsWindow		Mitjà
 Game	PairsWindow		Partida
 Expert (8x8)	PairsWindow		Expert (8x8)
 New	PairsWindow		Nou
+OK	Pairs		D'acord
+Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Els parells no han trobat icones vectorials suficients per començar; necessita almenys %zu, però se n'han trobat %zu.\n
+You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Heu acabat el joc amb {0, plural, one{# clic} other{# clics}}.\n
+Small	PairsWindow		Petit
 Size	PairsWindow		Mida
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tEscrita per Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n
 Quit game	PairsWindow		Deixa la partida
+Large	PairsWindow		Gros
 Beginner (4x4)	PairsWindow		Novell (4x4)
 Intermediate (6x6)	PairsWindow		Nivell mig (6x6)
 New game	PairsWindow		Partida nova

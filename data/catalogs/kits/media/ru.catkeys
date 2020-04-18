@@ -1,0 +1,12 @@
+1	russian	x-vnd.Haiku-libmedia	1819860668
+Cleaning up.	MediaDefs		Подчищаем.
+Starting media_services.	MediaDefs		Запускаем медиа службы.
+Stopping media_addon_server.	MediaDefs		Останавливаем сервер звуковых дополнений.
+Waiting for media_addon_server to quit.	MediaDefs		Ждем завершения сервера звуковых дополнений.
+Telling media_addon_server to quit.	MediaDefs		Говорим media_addon_server завершиться.
+Ready for use.	MediaDefs		Готово к использованию.
+Stopping media server…	MediaDefs		Останавливаем звуковой сервер…
+Waiting for media_server to quit.	MediaDefs		Ждем завершения звукового сервера.
+Done shutting down.	MediaDefs		Выключение медиа служб завершено.
+Error occurred starting media services.	MediaDefs		Произошла ошибка при запуске медиа служб.
+Media Service	MediaDefs		Медиа служба

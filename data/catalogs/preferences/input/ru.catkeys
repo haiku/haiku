@@ -1,0 +1,46 @@
+1	russian	x-vnd.Haiku-Input	2494436940
+Scrolling	TouchpadPrefView		Прокрутка
+Defaults	InputMouse		По умолчанию
+Tapping	TouchpadPrefView		Касание
+Long	KeyboardView		Длинная
+Normal	SettingsView		Обычно
+Cancel	TouchpadPrefView		Отмена
+Slow	TouchpadPrefView		Медленно
+Warp	SettingsView		Перемещение
+Instant warp	SettingsView		Мгновенное перемещение
+Device List	InputWindow		Список устройств
+Double-click speed	SettingsView		Скорость двойного клика
+Typing test area	KeyboardView		Тестовая область
+Mouse type:	SettingsView		Тип мыши:
+Fast	KeyboardView		Быстро
+Off	TouchpadPrefView		Выключить
+Fast	TouchpadPrefView		Быстро
+Please confirm	TouchpadPrefView		Пожалуйста, подтвердите
+Click to focus	SettingsView		Кликнуть для фокусировки окна
+Acceleration	TouchpadPrefView		Ускорение
+Mouse speed	SettingsView		Скорость курсора
+Accept first click	SettingsView		Принимать первый клик
+OK	TouchpadPrefView		ОК
+Horizontal scrolling	TouchpadPrefView		Горизонтальная прокрутка
+Delay until key repeat	KeyboardView		Задержка перед повтором клавиши
+Two finger scrolling	TouchpadPrefView		Прокрутка двумя пальцами
+Input	System name		Ввод
+Mouse acceleration	SettingsView		Ускорение мыши
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Выбранная область прокрутки слишком большая и может затруднить обычные операции с мышью. Вы действительно хотите изменить ее?
+High	TouchpadPrefView		Высокая
+Defaults	TouchpadPrefView		По умолчанию
+1-Button	SettingsView		Однокнопочная
+Short	KeyboardView		Короткая
+Revert	InputMouse		Вернуть
+Slow	KeyboardView		Медленно
+Key repeat rate	KeyboardView		Скорость повтора клавиши
+2-Button	SettingsView		Двухкнопочная
+Click to focus and raise	SettingsView		Кликнуть для фокуса и поднятия окна
+Vertical	TouchpadPrefView		Вертикальная
+Horizontal	TouchpadPrefView		Горизонтальная
+Focus mode:	SettingsView		Режим фокуса:
+Focus follows mouse	SettingsView		Фокус следует за курсором
+Double-click test area	SettingsView		Область для проверки двойного клика
+Sensitivity	TouchpadPrefView		Чувствительность
+3-Button	SettingsView		Трехкнопочная
+Revert	TouchpadPrefView		Вернуть

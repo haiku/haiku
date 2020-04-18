@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-SGITranslator	4153400005
+1	catalan; valencian	x-vnd.Haiku-SGITranslator	129108011
 SGI images	SGITranslator		Imatges SGI
 Use compression:	SGIView		Usa la compressió:
 SGI image translator	SGIView		Traductor d'imatges SGI
@@ -7,5 +7,7 @@ SGITranslator Settings	SGITranslator		Paràmetres del SGITranslator
 SGI Settings	SGIMain		Paràmetres del SGI
 SGI image translator	SGITranslator		Traductor d'imatges SGI
 None	SGIView		Cap
+Version %d.%d.%d, %s	SGIView		Versió %d.%d.%d, %s
+\nbased on GIMP SGI plugin v1.5:\n	SGIView		\nbasat en el connector de GIMP SGI v1.5:\n
 RLE	SGIView		RLE
 written by:\n	SGIView		escrit per:\n

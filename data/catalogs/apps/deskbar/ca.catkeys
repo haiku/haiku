@@ -26,7 +26,7 @@ Restart system	DeskbarMenu		Reinicia el sistema
 Large	PreferencesWindow		Ample
 Auto-raise	PreferencesWindow		Autoelevació
 Recent folders:	PreferencesWindow		Carpetes recents:
-Show application expander	PreferencesWindow		Mostra el desplegador d'aplicacions
+Show application expander	PreferencesWindow		Mostra l'expandidora d'aplicacions
 Close all	WindowMenu		Tanca-ho tot
 Deskbar preferences	PreferencesWindow		Preferències de la barra de l'Escriptori
 Mount	DeskbarMenu		Munta
@@ -41,7 +41,7 @@ About this system	DeskbarMenu		Quant al sistema
 Show calendar…	TimeView		Mostra el calendari...
 Deskbar preferences…	DeskbarMenu		Preferències de la barra de l'Escriptori
 Expand new applications	PreferencesWindow		Desplega les noves aplicacions
-Show replicants	DeskbarMenu		Mostra els replicadors
+Show replicants	DeskbarMenu		Mostra els replicants
 Hide application names	PreferencesWindow		Amaga el nom de les aplicacions
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demostracions
 Icon size	PreferencesWindow		Mida de la icona

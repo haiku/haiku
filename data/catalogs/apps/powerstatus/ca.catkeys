@@ -1,0 +1,46 @@
+1	catalan; valencian	x-vnd.Haiku-PowerStatus	3173765686
+Design capacity low warning: 	PowerStatus		Avís de capacitat de disseny baixa: 
+Show percent	PowerStatus		Mostra'n el percentatge
+Design capacity: 	PowerStatus		Capacitat del disseny: 
+ mW	PowerStatus		 mW
+The battery level is getting low, please plug in the device.	PowerStatus		El nivell de bateria comença a ser baix; si us plau, endolleu el dispositiu.
+Battery low	PowerStatus		Bateria baixa
+Type: 	PowerStatus		Tipus: 
+non-rechargeable	PowerStatus		no recarregable
+Empty battery slot	PowerStatus		Ranura buida de bateria
+ mV	PowerStatus		 mV
+Run in window	PowerStatus		Executa en una finestra
+PowerStatus	System name		Estat de l'energia
+ mWh	PowerStatus		 mWh
+Battery info…	PowerStatus		Informació de la bateria...
+Damaged battery	PowerStatus		Bateria malmesa
+Show time	PowerStatus		Mostra'n el temps
+Last full charge: 	PowerStatus		Darrera càrrega completa: 
+Battery unused	PowerStatus		Bateria no usada
+Extended battery info	PowerStatus		Informació ampliada de la bateria
+ mA	PowerStatus		 mA
+Current rate: 	PowerStatus		Taxa actual:
+discharging	PowerStatus		es descarrega
+Show text label	PowerStatus		Mostra l'etiqueta de text
+About…	PowerStatus		Quant a...
+Model number: 	PowerStatus		Número del model: 
+Install in Deskbar	PowerStatus		Instal·la a la barra d'escriptori
+ mAh	PowerStatus		 mAh
+Capacity: 	PowerStatus		Capacitat: 
+Battery discharging	PowerStatus		La bateria es descarrega.
+Serial number: 	PowerStatus		Número de sèrie: 
+Battery critical	PowerStatus		Bateria crítica
+Capacity granularity 1: 	PowerStatus		Granularitat de la capacitat 1: 
+OEM info: 	PowerStatus		Informació d'OEM: 
+Design voltage: 	PowerStatus		Voltatge de disseny: 
+Battery charging	PowerStatus		La bateria es carrega.
+The battery level is critical, please plug in the device immediately.	PowerStatus		El nivell de la bateria és crític. Si us plau, endolleu el dispositiu immediatament.
+Design capacity warning: 	PowerStatus		Avís de la capacitat de disseny: 
+Quit	PowerStatus		Surt
+rechargeable	PowerStatus		recarregable
+charging	PowerStatus		es carrega
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Podeu executar PowerStatus en una finestra o instal·lar-lo a la barra d’escriptori.
+Show status icon	PowerStatus		Mostra la icona de l'estat
+Capacity granularity 2: 	PowerStatus		Granularitat de la capacitat 2: 
+Technology: 	PowerStatus		Tecnologia: 
+no battery	PowerStatus		sense bateria

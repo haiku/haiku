@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-libtracker	3635622982
+1	portuguese	x-vnd.Haiku-libtracker	659027911
 Created	ContainerWindow		Criado
 Icon	AttributesView		Ícone
 Open and make preferred	OpenWithWindow		Abrir e tornar preferida
@@ -22,6 +22,7 @@ Open	FilePanelPriv		Abrir
 Bitmap icon	AttributesView		Ícone em mapa de bits
 You can't replace a folder with one of its sub-folders.	FSUtils		Não é possível substituir uma pasta com uma das suas subpastas.
 <%ld dates>	AttributesView		<%ld dates>
+Select…	VirtualDirectoryWindow		Selecionar…
 Name	Default Query Columns		Nome
 Unmount	ContainerWindow		Desmontar
 Eject when unmounting	AutoMounterSettings		Ejetar ao desmontar
@@ -285,6 +286,7 @@ Error creating link to \"%name\".	FSUtils		Erro ao criar atalho para \"%name\".
 Unknown	FilePermissionsView		Desconhecido
 Paste links	ContainerWindow		Colar atalhos
 Restoring: 	StatusWindow		A restaurar: 
+The Tracker must be running to set the default printer.	PoseView		O Tracker deve estar em execução para especificar a impressora predefinida.
 calculating…	InfoWindow		a calcular…
 Preferred for file	OpenWithWindow		Preferida para ficheiro
 OK	AutoMounterSettings		OK
@@ -357,6 +359,7 @@ Size:	InfoWindow		Tamanho:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		O item selecionado não pode ser movido para o Lixo. Pretende, em vez disso, apagá-lo diretamente? (Esta operação não poderá ser anulada.)
 Copy	ContainerWindow		Copiar
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Desculpe, o atributo "Caráter" não pode armazenar um pictograma multi-bytes.
+Open parent	VirtualDirectoryWindow		Abrir pasta superior
 And	FindPanel		E
 Palette-indexed picture	AttributesView		Imagem de paleta indexada
 multiple disks	FindPanel		múltiplos discos
@@ -441,6 +444,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Desculpe, não �
 Move here	ContainerWindow		Mover para aqui
 the config folder	FSUtils		a pasta de configuração
 Sorry, could not create a new folder.	FSUtils		Desculpe, não foi possível criar uma nova pasta.
+Select all	VirtualDirectoryWindow		Selecionar tudo
 Rename	FSUtils	button label	Alterar nome
 Clean up all	ContainerWindow		Limpar tudo
 Add current folder	FilePanelPriv		Adicionar a pasta atual
@@ -452,6 +456,7 @@ ends with	FindPanel		termina com
 Show Disks icon	SettingsView		Mostrar ícone Discos
 Outline selection rectangle only	SettingsView		Mostrar apenas contorno do retângulo de seleção
 by formula	FindPanel		por fórmula
+Resize to fit	VirtualDirectoryWindow		Redimensionar para caber
 Move to Trash	FilePanelPriv		Mover para o Lixo
 is	FindPanel		é
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Se alterar o nome da pasta de sistema ou do seu conteúdo, deixará de conseguir arrancar o %osName!\n\nTem a certeza de que pretende fazer isso?\n\nPara alterar de qualquer modo o nome da pasta de sistema ou do seu conteúdo, mantenha premida a tecla  Maiúsculas (Shift) e clique  \"Alterar nome\".
@@ -469,6 +474,7 @@ Default application	InfoWindow		Aplicação predefinida
 Untitled bitmap	PoseView		Mapa de bits sem título
 matches regular expression	SelectionWindow		corresponde à expressão regular
 Invert selection	ContainerWindow		Inverter seleção
+Close	VirtualDirectoryWindow		Fechar
 Monochrome picture	AttributesView		Imagem monocromática
 Real name	ContainerWindow		Nome verdadeiro
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Não foi possível abrir \"%name\". O ficheiro está incorretamente marcado como executável. 
@@ -505,6 +511,7 @@ Delete	PoseView		Apagar
 Media parameter	AttributesView		Parâmetro de média
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se alterar a pasta pessoal, o %osName poderá não funcionar corretamente!\n\nTem a certeza de que quer fazer isso?\n\nPara alterar de qualquer modo a pasta pessoal, mantenha premida a tecla Maiúsculas (Shift) e clique \"Eu sei o que estou a fazer\".
 Sorry, you can't copy items to the Trash.	PoseView		Desculpe, não é possível copiar itens para o Lixo.
+Invert selection	VirtualDirectoryWindow		Inverter seleção
 New folder	FilePanelPriv		Nova pasta
 {0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# item} other{# itens}}
 Name	AttributesView		Nome

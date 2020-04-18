@@ -1,0 +1,12 @@
+1	catalan; valencian	x-vnd.Haiku-libmedia	1819860668
+Cleaning up.	MediaDefs		Es neteja.
+Starting media_services.	MediaDefs		S'inicia media_services.
+Stopping media_addon_server.	MediaDefs		S'atura media_addon_server.
+Waiting for media_addon_server to quit.	MediaDefs		S'espera que acabi media_addon_server.
+Telling media_addon_server to quit.	MediaDefs		S'indica a media_addon_server que surti.
+Ready for use.	MediaDefs		A punt per usar.
+Stopping media server…	MediaDefs		S'atura el servidor multimèdia...
+Waiting for media_server to quit.	MediaDefs		S'espera que acabi media_server.
+Done shutting down.	MediaDefs		S'ha fet l'aturada.
+Error occurred starting media services.	MediaDefs		Error en iniciar els serveis multimèdia.
+Media Service	MediaDefs		Servei multimèdia

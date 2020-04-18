@@ -1,0 +1,12 @@
+1	hungarian	x-vnd.Haiku-libmedia	1819860668
+Cleaning up.	MediaDefs		Rendrakás.
+Starting media_services.	MediaDefs		Médiaszolgáltatások indítása.
+Stopping media_addon_server.	MediaDefs		Média kiegészítő szerver leállítása.
+Waiting for media_addon_server to quit.	MediaDefs		Várakozás a kiegészítő szerver leállására.
+Telling media_addon_server to quit.	MediaDefs		A kiegészítő szerver megkérése a leállásra.
+Ready for use.	MediaDefs		Használatra kész.
+Stopping media server…	MediaDefs		Média szerver leállítása…
+Waiting for media_server to quit.	MediaDefs		Várakozás a média szerver leállására.
+Done shutting down.	MediaDefs		Leállítás kész.
+Error occurred starting media services.	MediaDefs		Hiba történt a médiaszolgáltatások indításakor.
+Media Service	MediaDefs		Média szolgáltatások

@@ -6,7 +6,7 @@ Use volume:	SettingsWindow		Використати том:
 Turn off	SettingsWindow		Вимкнути
 Changes will take effect upon reboot.	SettingsWindow		Зміни вступлять в силу після перезавантаження.
 Revert	SettingsWindow		Без змін
-Keep enabled	SettingsWindow		Зберегти включення
+Keep enabled	SettingsWindow		Залишити ввімкненим
 The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Параметри у файлі налаштувань хибні. Ви можете завантажити за замовчуванням або вийти.
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tавтор Axel Dörfler\n\tCopyright 2005, Haiku.\n
 The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		Розділ, вказаний в файлі налаштувань не знайдено. Ви можете використати завантажувальний розділ або вийти.

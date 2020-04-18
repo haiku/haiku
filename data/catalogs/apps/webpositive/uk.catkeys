@@ -12,7 +12,7 @@ Path	Cookie Manager		Шлях
 of	Download Window	...as in '12kB of 256kB'	з
 Bookmarks	WebPositive Window		Закладки
 Use proxy server to connect to the internet	Settings Window		Використовувати проксі-сервер для під'єднання
-%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url завершене
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url завантажився
 Auto-hide interface in full screen mode	Settings Window		Автоматично ховати інтерфейс в режимі повного екрану
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Сталася помилка під час завантаження папки закладок.\n\nПомилка: %error
 Delete	Cookie Manager		Видалити
@@ -143,7 +143,7 @@ Search page:	Settings Window		Сторінка пошуку:
 Settings	WebPositive Window		Налаштування
 Clear	URL Bar		Очистити
 Loading %url	WebPositive Window		Завантаження %url
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Жебракують філософи при ґанку церкви в Гадячі, ще й шатро їхнє п’яне знаємо.
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Факт ґринджол: бій псюг вщух, з’їм шче яєць.
 Start up:	Settings Window		При старті:
 Confirmation	WebPositive Window		Підтвердження
 Session cookie	Cookie Manager		Сесійний файл cookie

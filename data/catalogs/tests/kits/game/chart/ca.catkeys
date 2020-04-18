@@ -11,7 +11,7 @@ Novas	ChartWindow		Noves
 LineArray	ChartWindow		MatriuDeLinies
  0.6 f/s  (logarythmic scale)	ChartWindow		 0.6 f/s  (escala logarítmica)
 Free motion	ChartWindow		Gir lliure
-(high) 100% 	ChartWindow		(alt) 100% 
+(high) 100% 	ChartWindow		(alt) 100 % 
 Green	ChartWindow		Verd
 Amas	ChartWindow		Amas
 2 threads	ChartWindow		2 fils

@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-HaikuDepot	303554556
+1	spanish; castilian	x-vnd.Haiku-HaikuDepot	3719532634
 Repository update error	LocalRepositoryUpdateProcess		Error de actualización de repositorio
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ocurrió un error al actualizar el repositorio: %error%
 User Created	UserLoginWindow		Usuario creado
@@ -104,7 +104,6 @@ Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProce
 View the usage conditions	UserLoginWindow		Ver las condiciones de uso
 Size	PackageListView		Tamaño
 Your rating:	RatePackageWindow		Su puntuación:
-I am %MinimumAgeYears% years of age or older	UserLoginWindow		Mi edad es de %MinimumAgeYears% años o más
 Your rating was updated.	RatePackageWindow		Su evaluación ha sido actualizada.
 All categories	FilterView		Todas las categorías
 Repositories	MainWindow		Repositorios

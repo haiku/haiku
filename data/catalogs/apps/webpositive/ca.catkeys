@@ -1,0 +1,159 @@
+1	catalan; valencian	x-vnd.Haiku-WebPositive	1879106286
+Authentication required	Authentication Panel		Cal autenticació
+Previous	WebPositive Window		Anterior
+(Finish: %date)	Download Window		(Acabament: %date)
+Open bookmarks confirmation	WebPositive Window		Confirmació d'obertura de marcadors
+Download folder:	Settings Window		Carpeta de baixada:
+Close window	WebPositive Window		Tanca la finestra
+Find:	WebPositive Window		Troba:
+Script console	WebPositive Window		Script de consola
+Fonts	Settings Window		Lletres
+Path	Cookie Manager		Camí
+of	Download Window	...as in '12kB of 256kB'	de
+Bookmarks	WebPositive Window		Marcadors
+Use proxy server to connect to the internet	Settings Window		Useu un servidor intermediari per connectar-vos a Internet.
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url acabat
+Auto-hide interface in full screen mode	Settings Window		Amaga la interfície automàticament en mode de pantalla completa.
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	S'ha produït un error en recuperar la carpeta d'adreces d'interès.\n\nError: %error
+Delete	Cookie Manager		Suprimeix
+(Finish: %date - Over %duration left)	Download Window		(Acabament: %date - Pendent: %duration)
+Open containing folder	Download Window		Obre la carpeta que ho conté
+Find previous	WebPositive Window		Troba'n l'anterior
+Full screen	WebPositive Window		Pantalla completa
+Downloads in progress	WebPositive		Baixada en progrés
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Voleu obrir %addedCount marcadors alhora?
+Copy URL to clipboard	Download Window		Copia l'URL al porta-retalls
+Clone current page	Settings Window		Clona la pàgina actual
+Start page:	Settings Window		Pàgina d'inici:
+Cancel	Download Window		Cancel·la
+Settings	Settings Window		Paràmetres
+Downloads	WebPositive Window		Baixades
+Browse…	Settings Window		Navega...
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Ja hi ha un marcador per a aquesta pàgina (%bookmarkName).
+Resume prior session	Settings Window		Continua la sessió prèvia
+Match case	WebPositive Window		Coincidència de caixa
+Proxy password:	Settings Window		Contrasenya del servidor intermediari:
+Size:	Font Selection view		Mida:
+Page source	WebPositive Window		Font de la pàgina
+Proxy server port:	Settings Window		Port del servidor intermediari:
+Error opening downloads folder	Download Window		Error en obrir la carpeta de baixades
+Show bookmark bar	WebPositive Window		Mostra la barra de marcadors
+Find	WebPositive Window		Troba
+Standard font:	Settings Window		Lletra estàndard:
+Open download error	Download Window		Error d'obrir la baixada
+General	Settings Window		General
+New tabs:	Settings Window		Pestanyes noves:
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url ha fallat
+Open downloads folder	Download Window		Obre la carpeta de baixades
+Proxy server	Settings Window		Servidor intermediari
+Decrease size	WebPositive Window		Redueix-ne la mida
+Default fixed font size:	Settings Window		Mida de lletra fixa per defecte:
+Sans serif font:	Settings Window		Lletra Sans serif:
+Clear	WebPositive Window		Neteja
+Cookies for %s	Cookie Manager		Galetes per a %s
+The download could not be opened.	Download Window		La baixada no s'ha pogut obrir.
+Close	Download Window		Tanca
+WebPositive	System name		WebPositive
+Reload	WebPositive Window		Torna a carregar
+Expiration	Cookie Manager		Venciment
+Download finished	Download Window		Baixada acabada
+Cookie manager	WebPositive Window		Gestor de galetes
+OK	Authentication Panel		D'acord
+Hide password text	Authentication Panel		Amaga el text de la contrasenya.
+Username:	Authentication Panel		Nom d'usuari:
+Name	Cookie Manager		Nom
+Remove finished	Download Window		Supressió acabada
+Earlier	WebPositive Window		Abans
+Edit	WebPositive Window		Edita
+Back	WebPositive Window		Enrere
+Yesterday	WebPositive Window		Ahir
+Quit	WebPositive		Surt
+Download aborted	Download Window		Baixada avortada
+Number of days to keep links in History menu:	Settings Window		Nombre de dies per mantenir els enllaços al menú de l'historial:
+Password:	Authentication Panel		Contrasenya:
+Forward	WebPositive Window		Endavant
+Clear	Console Window		Neteja
+Cut	URL Bar		Retalla
+View	WebPositive Window		Vista
+Paste	URL Bar		Enganxa
+Find next	WebPositive Window		Troba'n el següent
+Open search page	Settings Window		Obre la pàgina de cerca
+Increase size	WebPositive Window		Augmenta'n la mida
+New tab	WebPositive Window		Pestanya nova
+Today	WebPositive Window		Avui
+Open location	WebPositive Window		Obre la ubicació
+New browser window	Download Window		Finestra de navegació nova
+Open	Download Window		Obre
+New window	WebPositive Window		Finestra nova
+New windows:	Settings Window		Finestres noves:
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	La carpeta de baixades no s'ha pogut obrir.\n\nError: %error
+Cancel	Authentication Panel		Cancel·la
+Style:	Font Selection view		Estil:
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	S'ha produït un error en crear el fitxer d'adreces d'interès.\n\nError: %error
+OK	Download Window		D'acord
+Proxy username:	Settings Window		Nom d'usuari del servidor intermediari:
+Manage bookmarks	WebPositive Window		Gestioneu els marcadors
+/s)	Download Window	...as in 'per second'	/s)
+Restart	Download Window		Reinicia
+Serif font:	Settings Window		Lletra Serif:
+Apply	Settings Window		Aplica-ho
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	S'ha produït un error en intentar mostrar la carpeta d'adreces d'interès.\n\nError: %error
+Revert	Settings Window		Reverteix
+Copy	WebPositive Window		Copia
+Default standard font size:	Settings Window		Mida de la lletra estàndard per defecte:
+Bookmark this page	WebPositive Window		Marca aquesta pàgina
+Show tabs if only one page is open	Settings Window		Mostra les pestanyes si només s’obre una pàgina.
+Close tab	WebPositive Window		Tanca la pestanya
+Remove	Download Window		Suprimeix
+About	WebPositive Window		Quant a
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Encara hi ha baixades en curs, realment voleu sortir del WebPositive ara?
+Continue downloads	WebPositive		Continua les baixades
+Proxy server requires authentication	Settings Window		El servidor intermediari requereix autenticació.
+Cancel	Settings Window		Cancel·la
+History	WebPositive Window		Historial
+Reset size	WebPositive Window		Restableix-ne la mida
+Do you really want to clear the browsing history?	WebPositive Window		Realment voleu esborrar l'historial de navegació?
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Troba l'ocurrència següent dels termes de cerca
+Fixed font:	Settings Window		Lletra fixada:
+Quit	WebPositive Window		Surt
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Troba l'ocurrència anterior dels termes de cerca 
+Remember username and password for this site	Authentication Panel		Recorda el nom d’usuari i la contrasenya d’aquest lloc.
+(Finish: %date - %duration left)	Download Window		(Acabament: %date - Pendent: %duration)
+Cookie manager	Cookie Manager		Gestor de galetes
+Show home button	Settings Window		Mostra el botó d'inici.
+Start new session	Settings Window		Inicia una sessió nova
+The cookie jar is empty!	Cookie Manager		El pot de galetes està buit!
+Value	Cookie Manager		Valor
+Remove missing	Download Window		Suprimeix el que falta
+Paste	WebPositive Window		Enganxa
+Double-click or middle-click to open new tab.	Tab Manager		Feu clic doble o feu clic del mig per obrir una pestanya nova.
+Next	WebPositive Window		Següent
+Bookmark error	WebPositive Window		Error de marcador
+OK	WebPositive Window		D'acord
+WebPositive	Download Window		WebPositive
+Zoom text only	WebPositive Window		Amplia només el text
+Save page as…	WebPositive Window		Desa la pàgina com a...
+Page source error	WebPositive Window		Error del codi font de la pàgina
+Auto-hide mouse pointer	Settings Window		Amaga automàticament el punter del ratolí
+Requesting %url	WebPositive Window		Petició: %url
+Flags	Cookie Manager		Banderes
+Window	WebPositive Window		Finestra
+Proxy server address:	Settings Window		Adreça del servidor intermediari:
+Search page:	Settings Window		Cerca a la pàgina:
+Settings	WebPositive Window		Paràmetres
+Clear	URL Bar		Neteja
+Loading %url	WebPositive Window		Es carrega %url
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	La ràpida guineu bruna salta sobre el gos mandrós.
+Start up:	Settings Window		Inicia:
+Confirmation	WebPositive Window		Confirmació
+Session cookie	Cookie Manager		Galeta de la sessió
+Open all	WebPositive Window		Obre-ho tot
+Cut	WebPositive Window		Retalla
+Downloads	Download Window		Baixades
+Open blank page	Settings Window		Obre una pàgina en blanc
+Clear history	WebPositive Window		Neteja'n l'historial
+Cancel	WebPositive Window		Cancel·la
+Bookmark info	WebPositive Window		Informació del marcador
+Script console	Console Window		Script de consola
+Copy	URL Bar		Copia
+Open start page	Settings Window		Obre la pàgina d'inici

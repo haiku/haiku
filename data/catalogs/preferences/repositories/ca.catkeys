@@ -1,0 +1,25 @@
+1	catalan; valencian	x-vnd.Haiku-Repositories	352177594
+Unknown	Constants	Unknown repository name	Desconegut
+Remove all	RepositoriesView	Button label	Suprimeix-ho tot
+Disable	RepositoriesView	Button label	Inhabilita
+Cancel task	TaskTimer	Button label	Cancel·la la tasca
+Changes completed	RepositoriesView	Status view text	Canvis completats
+Details	TaskLooper	Job log details header	Detalls
+Enabled	RepoRow	Tag in the Status column	Habilitat
+Remove	Constants	Button label	Suprimeix
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	S'ha produït un error en habilitar el repositori %url%.
+Remove this repository?	RepositoriesView	Removal alert confirmation message	Suprimeixo aquest repositori?
+The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	La tasca per al repositori %name% està trigant molt a completar-se.
+Completed	TaskLooper	Completed task status message	Completat
+OK	Constants	Button label	D'acord
+Status	RepositoriesView	Column title	Estat
+Name	RepositoriesView	Column title	Nom
+Add	AddRepoWindow	Button label	Afegeix
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Repositoris no ha pogut recuperar els noms dels repositioris habilitats actualment.
+Enable all	RepositoriesView	Button label	Habilita-ho tot
+Aborted	TaskLooper	Aborted task status message	Avortat
+URL	RepositoriesView	Column title	URL
+Enable	RepositoriesView	Button label	Habilita
+Description	TaskLooper	Failed task error description	Descripció
+Failed	TaskLooper	Failed task status message	Ha fallat
+Repositories	System name		Repositoris

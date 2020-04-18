@@ -1,16 +1,17 @@
-1	portuguese	x-vnd.Haiku-Locale	3281534932
+1	portuguese	x-vnd.Haiku-Locale	1488345554
 Available languages	Locale Preflet Window		Idiomas disponíveis
 Negative:	TimeFormatSettings		Negativo:
 already chosen	LanguageListView		escolhida
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Não foi possível encontrar a lista de idiomas! Não pode usar este preflet!
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		A Deskbar e o Tracker precisam de ser reiniciados para esta alteração ter efeito. Deseja reiniciá-los agora?
 Long format:	TimeFormatSettings		Formato longo:
 Currency	TimeFormatSettings		Moeda
 Locale	System name		Localização
 Short format:	TimeFormatSettings		Formato curto:
 Language	Locale Preflet Window		Idioma
 Preferred languages	Locale Preflet Window		Idiomas preferidos
-Use month/day-names from preferred language	TimeFormatSettings		Use mês/dia, os nomes de idioma preferido
-Formatting	Locale Preflet Window		Formatação
+Use month/day-names from preferred language	TimeFormatSettings		Usar nomes de meses e dias do idioma preferido
+Formatting	Locale Preflet Window		Formatos
 Locale	Locale Preflet Window		Localização
 Numbers	TimeFormatSettings		Números
 24 hour	TimeFormatSettings		24 horas

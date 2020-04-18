@@ -1,0 +1,155 @@
+1	catalan; valencian	x-vnd.Haiku-MediaPlayer	1313616492
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Envia l'entrada a la paperera
+Close	MediaPlayer-PlaylistWindow		Tanca
+Volume of background clips	MediaPlayer-SettingsWindow		Volum dels clips de fons
+Use hardware video overlays if available	MediaPlayer-SettingsWindow		Useu superposicions de vídeo de maquinari si estan disponibles.
+Audio	MediaPlayer-InfoWin		Àudio
+Subtitle placement:	MediaPlayer-SettingsWindow		Ubicació dels subtítols:
+MediaPlayer	System name		Reproductor multimèdia
+Audio track	MediaPlayer-Main		Pista d'àudio
+Muted	MediaPlayer-SettingsWindow		Silenci
+OK	MediaPlayer-RemovePLItemsCmd		D'acord
+Open Playlist	MediaPlayer-PlaylistWindow		Obre la llista de reproducció
+Subtitles	MediaPlayer-Main		Subtítols
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% ha tingut un error intern. No s'ha pogut obrir el fitxer.
+DrawBitmap	MediaPlayer-InfoWin		Dibuix de mapa de bits
+File info	MediaPlayer-InfoWin		Informació del fitxer
+raw audio	MediaPlayer-InfoWin		àudio en cru
+Select all	MediaPlayer-PlaylistWindow		Selecciona-ho tot
+New player…	MediaPlayer-Main		Reproductor nou...
+Move Entries	MediaPlayer-MovePLItemsCmd		Mou les entrades
+OK	MediaPlayer-Main		D'acord
+Remove	MediaPlayer-PlaylistWindow		Suprimeix
+<unknown>	MediaPlayer-InfoWin		<desconegut>
+Resume:	MediaPlayer-SettingsWindow		Continua:
+Duration	MediaPlayer-InfoWin		Durada
+Import Entries	MediaPlayer-ImportPLItemsCmd		Importa entrades
+Open network stream	MediaPlayer-Main		Obre el flux de xarxa
+Move file to Trash	MediaPlayer-PlaylistWindow		Mou el fitxer a la paperera
+Open file…	MediaPlayer-Main		Obre un fitxer...
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Escala els controls en mode de pantalla completa.
+View options	MediaPlayer-SettingsWindow		Opcions de visualització
+%d kHz	MediaPlayer-InfoWin		%d kHz
+Full volume	MediaPlayer-SettingsWindow		Volum complet
+<untitled>	PlaylistItem-title		<sense títol>
+Start media server	MediaPlayer-Main		Inicia el servidor de mitjans
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Sembla que el servidor de mitjans no s'està executant.\nVoleu iniciar-lo?
+Location	MediaPlayer-InfoWin		Ubicació
+Medium	MediaPlayer-SettingsWindow		Mitjà
+Play mode	MediaPlayer-SettingsWindow		Mode de reproducció
+Playlist	MediaPlayer-PlaylistWindow		Llista de reproducció
+%d Bit	MediaPlayer-InfoWin		%d Bit
+Track	Audio Track Menu		Pista
+Close	MediaPlayer-Main		Tanca
+Save error	MediaPlayer-PlaylistWindow		Error de desar
+Attributes	MediaPlayer-Main		Atributs
+Bottom of screen	MediaPlayer-SettingsWindow		Part baixa de la pantalla
+MediaPlayer settings	MediaPlayer-SettingsWindow		Paràmetres del Reproductor multimèdia
+Copyright	MediaPlayer-InfoWin		Dret de còpia
+Invalid URL inserted!	MediaPlayer-NetworkStream		URL proporcionat no vàlid!
+Aspect ratio	MediaPlayer-Main		Relació d'aspecte
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Ha fallat desar la llista de reproducció.\n\nError: 
+<no media>	MediaPlayer-InfoWin		<sense mitjans>
+Hide interface	MediaPlayer-Main		Amaga la interfície
+Error: 	MediaPlayer-Main		Error: 
+Video track	MediaPlayer-Main		Pista de vídeo
+Playlist…	MediaPlayer-Main		Llista de reproducció...
+<unnamed media>	MediaPlayer-InfoWin		<mitjans sense nom>
+Save	MediaPlayer-PlaylistWindow		Desa
+Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Entrades aleatòries
+Cancel	MediaPlayer-NetworkStream		Cancel·la
+Nothing to Play	MediaPlayer-Main		Res per reproduir
+OK	MediaPlayer-SettingsWindow		D'acord
+Remove Entries	MediaPlayer-RemovePLItemsCmd		Entrades aleatòries
+never	MediaPlayer-SettingsWindow		mai
+Loop audio	MediaPlayer-SettingsWindow		Bucle d'àudio
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Error intern (missatge amb forma incorrecta). Ha fallat desar la llista de reproducció.
+Open…	MediaPlayer-PlaylistWindow		Obre...
+Revert	MediaPlayer-SettingsWindow		Reveteix
+Low volume	MediaPlayer-SettingsWindow		Volum baix
+Audio	MediaPlayer-Main		Àudio
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Estèreo} other{# Canals}}
+Quit	MediaPlayer-Main		Surt
+Redo	MediaPlayer-PlaylistWindow		Refés
+Move Entry	MediaPlayer-MovePLItemsCmd		Mou l'entrada
+<unknown>	PlaylistItem-author		<desconegut>
+Cancel	MediaPlayer-SettingsWindow		Cancel·la
+Large	MediaPlayer-SettingsWindow		Gros
+Import Entry	MediaPlayer-ImportPLItemsCmd		Importa l'entrada
+unknown format	MediaPlayer-InfoWin		format desconegut
+Track %d	MediaPlayer-Main		Pista %d
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		No s'han pogut moure tots els fitxers a la paperera.
+Total duration: %s	MediaPlayer-PlaylistWindow		Durada total: %s
+%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
+Move into trash error	MediaPlayer-RemovePLItemsCmd		Error de moviment a la paperera
+50% scale	MediaPlayer-Main		Escala de 50 %
+Drop files to play	MediaPlayer-Main		Deixeu anar els fitxers per reproduir.
+Copy Entry	MediaPlayer-CopyPLItemsCmd		Copia l'entrada
+Close window after playing audio	MediaPlayer-SettingsWindow		Tanca la finestra després de reproduir l'àudio.
+Edit	MediaPlayer-PlaylistWindow		Edita
+Copy Entries	MediaPlayer-CopyPLItemsCmd		Copia les entrades
+Always on top	MediaPlayer-Main		Sempre a dalt
+Open	MediaPlayer-PlaylistWindow		Obre
+always	MediaPlayer-SettingsWindow		sempre
+Loop video	MediaPlayer-SettingsWindow		Bucle de vídeo
+Stream URL:	MediaPlayer-NetworkStream		URL del flux:
+<unknown>	PlaylistItem-album		<desconegut>
+Stream settings	MediaPlayer-Main		Paràmetres del flux
+none	Subtitles menu		cap
+Save Playlist	MediaPlayer-PlaylistWindow		Desa la llista de reproducció
+Overlay	MediaPlayer-InfoWin		Superposició
+2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascop)
+Rating	MediaPlayer-Main		Puntuació
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Error intern (sense memòria). Ha fallat desar la llista de reproducció.
+Video	MediaPlayer-Main		Vídeo
+There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		No hi ha cap descodificador instal·lat per gestionar el format de fitxer, o el decodificador té problemes amb la versió específica del format.
+Lock Peaks	MediaPlayer-PeakView		Bloca els pics
+none	Audio track menu		cap
+Open network stream	MediaPlayer-NetworkStream		Obre el flux de xarxa
+Automatically start playing	MediaPlayer-SettingsWindow		Inicia la reproducció automàticament.
+Undo	MediaPlayer-PlaylistWindow		Desfés
+Display mode	MediaPlayer-InfoWin		Mode de pantalla
+Bottom of video	MediaPlayer-SettingsWindow		Part inferior del vídeo
+Small	MediaPlayer-SettingsWindow		Petit
+Settings…	MediaPlayer-Main		Paràmetres...
+min	MediaPlayer-InfoWin	Minutes	min
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Ha fallat desar la llista de reproducció:\n\nError: 
+Video	MediaPlayer-InfoWin		Vídeo
+File info…	MediaPlayer-Main		Informació del fitxer...
+1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americà)
+<unnamed>	PlaylistItem-name		<sense nom>
+Track	Video Track Menu		Pista
+Full screen	MediaPlayer-Main		Pantalla completa
+OK	MediaPlayer-NetworkStream		D'acord
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Error intern (fallada el bloqueig). Ha fallat desar la llista de reproducció.
+100% scale	MediaPlayer-Main		Escala de 100 %
+<nothing to redo>	MediaPlayer-PlaylistWindow		<res per refer>
+Bad URL	MediaPlayer-NetworkStream		URL incorrecte
+Save	MediaPlayer-Main		Desa
+Close window after playing video	MediaPlayer-SettingsWindow		Tanca la finestra després de reproduir el vídeo.
+Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Escala pel·lícules sense problemes (mode sense superposició)
+200% scale	MediaPlayer-Main		Escala de 200 %
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		No s'ha pogut obrir el fitxer %filename.\n\n
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Cap dels fitxers que voleu reproduir sembla un fitxer multimèdia.
+Remove Entry	MediaPlayer-RemovePLItemsCmd		Suprimeix l'entrada
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Suprimeix les entrades de la paperera
+Subtitle size:	MediaPlayer-SettingsWindow		Mida dels subtítols:
+No aspect correction	MediaPlayer-Main		Sense correcció d'aspecte
+raw video	MediaPlayer-InfoWin		vídeo en cru
+Container	MediaPlayer-InfoWin		Contenidor
+none	MediaPlayer-Main		cap
+Open clips	MediaPlayer-Main		Obre clips
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Alguns fitxers no s'han pogut moure a la paperera.
+<nothing to undo>	MediaPlayer-PlaylistWindow		<res per desfer>
+Save as…	MediaPlayer-PlaylistWindow		Desa com a...
+Error: 	MediaPlayer-RemovePLItemsCmd		Error: 
+300% scale	MediaPlayer-Main		Escala de 300 %
+Open	MediaPlayer-Main		Obre
+ask every time	MediaPlayer-SettingsWindow		pregunta-ho cada cop
+(not supported)	MediaPlayer-InfoWin		(no s'admet)
+Randomize	MediaPlayer-PlaylistWindow		Aleatori
+%.3f fps	MediaPlayer-InfoWin		%.3f fps
+Off	Subtitles menu		Desactivat
+400% scale	MediaPlayer-Main		Escala de 400 %
+h	MediaPlayer-InfoWin	Hours	h
+OK	MediaPlayer-PlaylistWindow		D'acord

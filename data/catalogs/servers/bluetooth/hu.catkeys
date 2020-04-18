@@ -1,0 +1,7 @@
+1	hungarian	x-vnd.Haiku-bluetooth_server	3418434903
+Stopping the Bluetooth server failed.	BluetoothReplicant		Sikertelen volt a Bluetooth szerver leállítása.
+Bluetooth error	BluetoothReplicant		Bluetooth hiba
+Settings…	BluetoothReplicant		Beállítások…
+OK	BluetoothReplicant		Rendben
+Error: %status%	BluetoothReplicant		Hiba: %status%
+Quit	BluetoothReplicant		Kilépés

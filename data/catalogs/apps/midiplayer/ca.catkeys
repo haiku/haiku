@@ -1,8 +1,10 @@
-1	catalan; valencian	x-vnd.Haiku-MidiPlayer	471142057
+1	catalan; valencian	x-vnd.Haiku-MidiPlayer	1046133011
+This tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Aquest petit programa\nsap com reproduir milers de\ncançons enganxoses.
 Dungeon	Main Window		Masmorra
 Could not load song	Main Window		No s'ha pogut carregar la cançó
 Igor's lab	Main Window		Laboratori de l'Igor
 Off	Main Window		Desactivat
+Loading instruments…	Scope View		Es carreguen instruments...
 Volume:	Main Window		Volum:
 Closet	Main Window		Armari
 Scope	Main Window		Abast

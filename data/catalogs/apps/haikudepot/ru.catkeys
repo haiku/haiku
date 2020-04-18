@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	429905564
+1	russian	x-vnd.Haiku-HaikuDepot	3798362543
 Repository update error	LocalRepositoryUpdateProcess		Ошибка обновления репозитория
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Произошла ошибка при обновлении репозитория: %error%
 User Created	UserLoginWindow		Пользователь создан
@@ -27,6 +27,7 @@ Show	MainWindow		Показывать
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Произошла ошибка при получении списка пакетов: %message%
 Unstable but usable	RatePackageWindow		Нестабилен, но пригодный для использования
 Not specified	RatePackageWindow		Не указана
+This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Во время работы это приложение записывает и читает некоторые рабочие файлы на вашем компьютере. Похоже есть проблема с записью тестового файла в папку [%TestFilePath%]. Проверьте нет ли каких-то проблем с локальным диском или правами доступа к этой папке. Вы можете продолжить пользоваться этим приложением, но часть функционала будет отключена.
 Active	PackageListView		Активирован
 Login or Create account	MainWindow		Войти или создать учетную запись
 <Package contents not available for remote packages>	PackageContentsView		<Содержимое пакетов недоступно для нелокальных пакетов>
@@ -107,16 +108,16 @@ Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProce
 View the usage conditions	UserLoginWindow		Показать условия использования
 Size	PackageListView		Размер
 Your rating:	RatePackageWindow		Ваш рейтинг:
-I am %MinimumAgeYears% years of age or older	UserLoginWindow		Мне полных %MinimumAgeYears% лет или больше
 Your rating was updated.	RatePackageWindow		Ваш рейтинг был обновлен.
 All categories	FilterView		Все категории
 Repositories	MainWindow		Репозитории
 n/a	PackageInfoView		н/д
 View agreed usage conditions…	MainWindow		Показать согласованные условия использования…
-Cancel	MainWindow		Отменить
+Cancel	MainWindow		Отмена
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(осталось загрузить 1 пакет)}few{(осталось загрузить # пакета)}other{(осталось загрузить # пакетов)}}
 Refresh repositories	MainWindow		Обновить репозитории
 Tools	MainWindow		Инструменты
+Continue	App		Продолжить
 A password is required.	UserLoginWindow		Требуется пароль.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Похоже, что этого пакета нет на сервере HaikuDepot из-за чего создать новый рейтинг или изменить существующий невозможно.
 Language	RatePackageWindow		Язык
@@ -148,6 +149,7 @@ Screenshot	ScreenshotWindow		Снимок экрана
 HaikuDepot	System name		Склад
 A reboot is necessary to complete the installation process.	PackageManager		Для завершения установки требуется перезагрузка.
 View latest usage conditions…	MainWindow		Показать последние условия использования…
+Quit	App		Выйти
 Search terms:	FilterView		Условия поиска:
 Pending…	PackageListView		Ожидание…
 Category:	FilterView		Категория:

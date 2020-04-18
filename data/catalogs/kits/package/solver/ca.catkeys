@@ -1,0 +1,38 @@
+1	catalan; valencian	x-vnd.Haiku-libsolvsolver	3404387783
+allow architecture change of %source% to %target%	SolverProblemSolution		permet el canvi d'arquitectura de %source% a %target%
+install %source% from excluded repository	SolverProblemSolution		instal·la %source% des del repositori exclòs
+unspecified problem	SolverProblem		problema sense especificar
+package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		el paquet %source% requereix %dependency%, però no se'n pot instal·lar cap dels proveïdors
+package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		el paquet %source% deixa obsolet implícitament %dependency%, proporcionat per %target%
+nothing provides requested %dependency%	SolverProblem		res no proporciona %dependency%
+do not keep %source% installed	SolverProblemSolution		no mantinguis %source% instal·lat
+do not deinstall \"%selection%\"	SolverProblemSolution		no desinstal·lis \"%selection%\"
+install %source% despite its inferior architecture	SolverProblemSolution		instal·la %source% malgrat l'arquitectura inferior
+conflicting requests	SolverProblem		peticions conflictives
+do not install the most recent version of \"%selection%\"	SolverProblemSolution		no instal·lis la versió més recent de \"%selection%\"
+allow replacement of %source% with %target%	SolverProblemSolution		permet reemplaçar %source% amb %target%
+package %source% obsoletes %dependency% provided by %target%	SolverProblem		el paquet %source% deixa obsolet %dependency%, proporcionat per %target%
+do not forbid installation of %source%	SolverProblemSolution		no prohibeixis la instal·lació de %source%
+allow downgrade of %source% to %target%	SolverProblemSolution		permet la degradació de %source% a %target%
+dependency problem	SolverProblem		problema de dependència
+%dependency% is provided by the system	SolverProblem		%dependency% és proporcionat pel sistema
+keep %source% despite its inferior architecture	SolverProblemSolution		mantén %source% malgrat l'arquitectura inferior
+%source% does not belong to a distupgrade repository	SolverProblem		%source% no pertany a un repositori d'actualització de distribució
+installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		el paquet instal·lat %source% deixa obsolet %dependency%, proporcionat per %target%
+allow name change of %source% to %target%	SolverProblemSolution		permet el canvi de nom de %source% a %target%
+package %source% conflicts with %dependency% provided by %target%	SolverProblem		el paquet %source% té conflicte amb %dependency%, proporcionat per %target%
+do something	SolverProblemSolution		fes-hi alguna cosa
+install %selection% despite its old version	SolverProblemSolution		instal·la %selection% malgrat la versió antiga
+cannot install both %source% and %target%	SolverProblem		no es poden instal·lar els dos: %source% i %target%
+package %source% is not installable	SolverProblem		el paquet %source% no és instal·lable
+problem with installed package %source%	SolverProblem		problema amb el paquet instal·lat %source%
+allow deinstallation of %source%	SolverProblemSolution		permet la desinstal·lació de %source%
+keep %source% from excluded repository	SolverProblemSolution		mantén %source%, del repositori exclòs
+keep old %source%	SolverProblemSolution		mantén l'antic %source%
+package %source% conflicts with %dependency% provided by itself	SolverProblem		el paquet %source% té conflicte amb %dependency%, proporcionat per si mateix
+allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		permet el canvi de proveïdor de \"%sourceVendor%\" (%source%) a \"%targetVendor%\" (%target%)
+do not lock \"%selection%\"	SolverProblemSolution		no bloquis \"%selection%\"
+do not install \"%selection%\"	SolverProblemSolution		no instal·lis \"%selection%\"
+nothing provides %dependency% needed by %source%	SolverProblem		res no proporciona %dependency%, necessari per a %source%
+%source% has inferior architecture	SolverProblem		%source% té una arquitectura inferior
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		no desinstal·lis tots els resolubles \"%selection%\"

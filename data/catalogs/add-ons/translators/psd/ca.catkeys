@@ -1,0 +1,22 @@
+1	catalan; valencian	x-vnd.Haiku-PSDTranslator	3654055550
+Lab	PSDLoader		Lab
+Uncompressed	PSDConfig		Sense compressió
+Indexed	PSDLoader		Indexat
+Grayscale	PSDLoader		Escala de grisos
+Photoshop image translator	PSDConfig		Traductor d'imatges del Photoshop
+Photoshop image translator	PSDTranslator		Traductor d'imatges del Photoshop
+Version %d.%d.%d, %s	PSDConfig		Versió %d.%d.%d, %s
+Photoshop Document (PSD file)	PSDConfig		Document del Photoshop (fitxer PSD)
+Photoshop image	PSDTranslator		Imatge del Photoshop
+RLE	PSDConfig		RLE
+Photoshop Big Document (PSB file)	PSDConfig		Document gros del Photoshop (fitxer PSB)
+RGBA	PSDLoader		RGBA
+Photoshop image (%s)	PSDTranslator		Imatge del Photoshop (%s)
+PSDTranslator Settings	PSDConfig		Paràmetres del Traductor de PSD
+RGB	PSDLoader		RGB
+Bitmap	PSDLoader		Mapa de bits
+CMYK	PSDLoader		CMYK
+Compression: 	PSDConfig		Compressió: 
+Format: 	PSDConfig		Format: 
+Multichannel	PSDLoader		Multicanal
+Duotone	PSDLoader		Bitò

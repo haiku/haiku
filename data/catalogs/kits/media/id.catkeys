@@ -1,0 +1,12 @@
+1	indonesian	x-vnd.Haiku-libmedia	1819860668
+Cleaning up.	MediaDefs		Membersihkan.
+Starting media_services.	MediaDefs		Memulai media_services.
+Stopping media_addon_server.	MediaDefs		Menghentikan media_addon_server.
+Waiting for media_addon_server to quit.	MediaDefs		Menunggu media_addon_server keluar.
+Telling media_addon_server to quit.	MediaDefs		Memberitahu media_addon_server untuk keluar.
+Ready for use.	MediaDefs		Siap digunakan.
+Stopping media server…	MediaDefs		Menghentikan server media…
+Waiting for media_server to quit.	MediaDefs		Menunggu media_server berhenti.
+Done shutting down.	MediaDefs		Selesai dimatikan.
+Error occurred starting media services.	MediaDefs		Terjadi kesalahan saat memulai layanan media.
+Media Service	MediaDefs		Media Service (Layanan Media)

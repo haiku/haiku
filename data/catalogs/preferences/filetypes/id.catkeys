@@ -1,5 +1,6 @@
-1	indonesian	x-vnd.Haiku-FileTypes	734679611
+1	indonesian	x-vnd.Haiku-FileTypes	436017301
 Left	Attribute Window	Attribute column alignment in Tracker	Kiri
+Float	Attribute ListView		Mengambang
 Final	Application Types Window		Final
 FileTypes request	FileTypes Window		Permintaan FileTypes
 This file type already exists	New File Type Window		Jenis file ini sudah ada
@@ -31,6 +32,7 @@ Signature:	Application Types Window		Tanda tangan:
 None	FileTypes Window		Tak satupun
 Exclusive launch	Application Type Window		Peluncuran eksklusif
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Menghapus jenis berkas tidak dapat dipulihkan.\nApakah Anda yakin ingin menghapusnya?
+Integer 64 bit	Attribute ListView		Integer 64 bit
 Cancel	New File Type Window		Batal
 Select same preferred application as	FileType Window		Pilih aplikasi yang sama disukai sebagai
 Cancel	Type List Window		Batal
@@ -43,10 +45,13 @@ Abort	Application Types Window		Batal
 Save	Application Type Window		Simpan
 %1 application type	Application Type Window		%1 tipe aplikasi
 Icon	Application Type Window		Ikon
+Duration	Attribute ListView		Durasi
 Version:	Application Type Window		Versi:
 Default application	FileType Window		Aplikasi standar
 Internal name:	New File Type Window		Nama internal:
+Integer 8 bit	Attribute ListView		Integer 8 bit
 Extension:	Extension Window		Tambahan:
+Time	Attribute ListView		Waktu
 Extensions:	FileTypes Window		Ekstensi:
 Select preferred application	FileType Window		Pilih aplikasi yang disukai
 Description:	FileTypes Window		Keterangan:
@@ -66,6 +71,8 @@ Version:	Application Types Window		Versi:
 Application types	Application Types Window		Jenis aplikasi
 Description:	Application Types Window		Keterangan:
 Name:	Application Types Window		Nama:
+Rating	Attribute ListView		Peringkat
+duration	Attribute ListView		durasi
 File could not be opened	Preferred App Menu		Berkas tidak dapat dibuka
 Args only	Application Type Window		Hanya args
 Could not open \"%s\":\n%s	FileTypes		tidak bisa membuka \"%s\":\n%s
@@ -83,16 +90,21 @@ Type name:	FileTypes Window		Nama tipe:
 Visible	Attribute Window		Terlihat
 Select preferred application	FileTypes Window		Pilih aplikasi yang disukai
 Path:	Application Types Window		Lokasi:
+rating	Attribute ListView		peringkat
 Could not install file type	New File Type Window		Tidak bisa menginstal jenis file
 Same as…	FileTypes Window		Sama seperti…
 Golden master	Application Type Window		Master emas
+Checkbox	Attribute ListView		Kotak centang
 FileTypes request	Preferred App Menu		Permintaan FileType
 no icon	FileTypes Window		tidak ada ikon
 Single launch	Application Type Window		Peluncuran tunggal
 %s file type	FileType Window		%s tipe berkas
+Default	Attribute ListView		Bawaan
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Menghapus tipe super tidak dapat dipulihkan.\nSemua jenis file yang termasuk dalam tipe super akan hilang!\n\nApakah Anda yakin ingin melakukan ini? Untuk menghapus seluruh kelompok, tahan tombol Shift dan tekan \"Remove\".
+String	Attribute ListView		String
 Add type	New File Type Window		Tambah tipe
 Remove icon	Icon View		Hapus ikon
+Boolean	Attribute ListView		Boolean
 Cancel	Extension Window		Batal
 Alignment:	Attribute Window		Penjajaran:
 Icon	FileType Window		Ikon
@@ -101,6 +113,7 @@ Development	Application Type Window		Pengembangan
 Golden master	Application Types Window		Master emas
 Add	Extension Window		Tambah
 Open…	FileTypes Window		Buka…
+checkbox	Attribute ListView		kotak centang
 Could not change file extensions	Extension Window		Tidak dapat mengubah ektensi berkas
 Could not open file	FileType Window		Tidak dapat membuka berkas
 Choose type	Type List Window		Pilih tipe
@@ -118,6 +131,7 @@ Add group	New File Type Window		Tambah grup
 Cancel	Attribute Window		Batal
 Gamma	Application Types Window		Gama
 Supported types	Application Type Window		Tipe yang didukung
+Integer 32 bit	Attribute ListView		Integer 32 bit
 Beta	Application Type Window		Beta
 Could not retrieve preferred application of this file	Preferred App Menu		Tidak dapat menjalani aplikasi kesukaan dari tipe berkas ini
 Application flags	Application Type Window		Tanda aplikasi
@@ -142,6 +156,7 @@ Extra attributes	FileTypes Window		Atribut tambahan
 Group:	New File Type Window		Grup:
 Alpha	Application Types Window		Alfa
 Close	Application Type Window		Tutup
+Integer 16 bit	Attribute ListView		Integer 16 bit
 Extension	Extension Window		Tambahan
 Rule:	FileTypes Window		Aturan:
 FileTypes	System name		TipeBerkas
@@ -153,5 +168,6 @@ Add…	FileTypes Window		Tambah…
 Edit icon…	Icon View		Edit ikon…
 Internal name:	Attribute Window		Nama internal:
 Show recognition rule	FileTypes Window		Tampilkan aturan pengenalan
+Double	Attribute ListView		Double
 Move down	FileTypes Window		Seret ke bawah
 Alpha	Application Type Window		Alfa

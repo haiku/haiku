@@ -34,7 +34,7 @@ Revert	PreferencesWindow		Reverter
 Small	PreferencesWindow		Pequenos
 Recent applications:	PreferencesWindow		Aplicações recentes:
 Shutdown…	DeskbarMenu		Encerrar…
-Tracker always first	PreferencesWindow		Tracker sempre visível
+Tracker always first	PreferencesWindow		Tracker sempre primeiro
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Preferências
 Recent folders	DeskbarMenu		Pastas recentes
 About this system	DeskbarMenu		Sobre este sistema

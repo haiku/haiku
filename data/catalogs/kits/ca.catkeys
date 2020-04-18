@@ -1,4 +1,5 @@
-1	catalan; valencian	x-vnd.Haiku-libbe	297520911
+1	catalan; valencian	x-vnd.Haiku-libbe	3337473349
+{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte} other{# bytes}}
 All Rights Reserved.	AboutWindow		Tots els drets reservats.
 gold master	AboutWindow		mestre daurat
 Undo	TextView		Desfés
@@ -11,29 +12,31 @@ About %app%	AboutMenuItem		Quant a %app%
 Warning	Dragger		Avís
 Green:	ColorControl		Verd:
 Redo	TextView		Refés
+No pages to print!	PrintJob		No hi ha cap pàgina per imprimir!
 beta	AboutWindow		beta
 OK	ZombieReplicantView		D'acord
 Cut	TextView		Retalla
 %3.2f GiB	StringForSize		%3.2f GiB
-Can't delete this replicant from its original application. Life goes on.	Dragger		No ha estat possible suprimir aquest replicant de la seva aplicació original. Continuem.
+Can't delete this replicant from its original application. Life goes on.	Dragger		No ha estat possible suprimir aquest replicant de la seva aplicació original. La vida continua.
 Error	ZombieReplicantView		Error
 Paste	TextView		Enganxa
 OK	AboutWindow		D'acord
 Special Thanks:	AboutWindow		Agraïments especials:
 %.2f TiB	StringForSize		%.2f TiB
-Remove replicant	Dragger		Suprimeix la replica
+Remove replicant	Dragger		Suprimeix el replicant
 Version	AboutWindow		Versió
 Red:	ColorControl		Vermell:
 <empty>	Menu		<buit>
 Copy	TextView		Copia
+Select all	TextView		Selecciona-ho tot
 alpha	AboutWindow		alfa
 %3.2f MiB	StringForSize		%3.2f MiB
 Error	PrintJob		S'ha produït un error
 About %app%	AboutWindow		Quant a %app%
 About %app…	Dragger		Quan a %app…
 Version history:	AboutWindow		Historial de versions:
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		No eś troba l'aplicació del replicant. No s'ha facilitat cap firma de l'aplicació.\n%error
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		No es troba l'aplicació del replicant. No s'ha proporcionat cap signatura de l'aplicació.\n%error
 %3.2f KiB	StringForSize		%3.2f KiB
 Blue:	ColorControl		Blau:
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		No es possible replicar \"%description\".\n%error
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		No es possible crear el replicant per a \"%description\".\n%error
 Written by:	AboutWindow		Escrit per:

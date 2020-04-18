@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Keymap	3348782469
+1	hungarian	x-vnd.Haiku-Keymap	1075970008
 Key	Modifier keys window	As in a computer keyboard key	Billentyű
 Japanese	KeymapNames		Japán
 US	KeymapNames		Egyesült Államok
@@ -58,6 +58,7 @@ Italian	KeymapNames		Olasz
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s (nemzetközi)
 Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminum (Egyesült Államok)
 Kinesis Ergo Elan International	KeyboardLayoutNames		Kinesis Ergo Elan (nemzetközi)
+French (NF Z71-300)	KeymapNames		Francia (NF Z71-300)
 Modifier keys	Modifier keys window		Módosító billentyű
 ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 (nemzetközi)
 Kazakh	KeymapNames		Kazah

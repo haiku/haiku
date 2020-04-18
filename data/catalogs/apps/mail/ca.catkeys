@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Be-MAIL	2903558745
+1	catalan; valencian	x-vnd.Be-MAIL	1477453861
 Set to Saved	Mail		Marca com a desat
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		El vostre text principal conté %ld caràcters no codificables. Potser amb un conjunt de caràcters diferent funcionaria millor? Premeu Envia per enviar-ho tanmateix (se substituiran per altres els caràcters que no es puguin codificar), o bé trieu Cancel·la per tornar i intentar corregir-ho.
 Text wrapping:	Mail		Ajustament de línia:
@@ -8,10 +8,13 @@ Reply	Mail		Respon
 Next message	Mail		Missatge següent
 Mailing	Mail		Combinació de correu
 Unread	Mail		Sense llegir
+Same sender	Mail		El mateix remitent
 Copy to new	Mail		Copia-ho a un missatge nou
 Save as draft	Mail		Desa-ho com a esborrany
 Encoding:	Mail		Codificació:
 Print	Mail		Imprimeix
+Decrease quote level	Mail		Redueix el nivell de citació
+Encoding	Mail		Codificació
 Default account:	Mail		Compte per omissió:
 Message	Mail		Missatge
 Bcc:	Mail		Bcc:
@@ -30,6 +33,7 @@ Only files can be added as attachments.	Mail		Només es poden afegir fitxers amb
 Close	Mail		Tanca
 Untitled	Mail		Sense títol
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Encara no està desenvolupada la supressió d'adjunts reenviats!\nNo funcionarà correctament.
+Same recipient	Mail		El mateix destinatari
 Previous message	Mail		Missatge anterior
 (Address unavailable)	Mail		(L'adreça no està disponible)
 Mail	System name		Correu electrònic
@@ -81,6 +85,7 @@ Colored quotes:	Mail		Cites acolorides:
 Automatic	Mail		Automàtic
 Open this link	Mail		Obre aquest enllaç
 Auto signature:	Mail		Auto signatura:
+Same subject	Mail		El mateix assumpte
 Send	Mail		Envia
 Open draft	Mail		Obre l'esborrany
 Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Deixa-ho com a 'Nou'
@@ -156,6 +161,9 @@ Beginner	Mail		Principiant
 Send message	Mail		Envia el missatge
 Delete	Mail		Suprimeix
 Put your favorite e-mail queries and query templates in this folder.	Mail		Poseu les vostres consultes correu i plantilles de consultes en aquesta carpeta.
+Spam	Mail		Brossa
 Couldn't open this signature. Sorry.	Mail		Ho sentim. No ha estat possible obrir aquesta signatura.
 Revert	Mail		Reverteix
+Unknown	Mail		Desconegut
+Increase quote level	Mail		Augmenta el nivell de citació
 Add enclosure…	Mail		Afegeix un fitxer...

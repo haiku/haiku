@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libsolvsolver	3599540489
+1	russian	x-vnd.Haiku-libsolvsolver	3404387783
 allow architecture change of %source% to %target%	SolverProblemSolution		разрешить изменение архитектуры пакета с %source% на %target%
 install %source% from excluded repository	SolverProblemSolution		установить пакет %source% из исключённого репозитория
 unspecified problem	SolverProblem		неопределенная проблема
@@ -34,3 +34,5 @@ allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%t
 do not lock \"%selection%\"	SolverProblemSolution		не блокировать пакет \"%selection%\"
 do not install \"%selection%\"	SolverProblemSolution		не устанавливать пакет \"%selection%\"
 nothing provides %dependency% needed by %source%	SolverProblem		ничего не предоставляют %dependency%, необходимый для %source%
+%source% has inferior architecture	SolverProblem		%source% имеет подчинённую архитектуру
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		не удалять все разрешённые \"%selection%\"

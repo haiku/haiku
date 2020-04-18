@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	1648314585
+1	german	x-vnd.Haiku-HaikuDepot	769325367
 Repository update error	LocalRepositoryUpdateProcess		Fehler bei Paketquellenaktualisierung
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Fehler bei der Aktualisierung der Paketquelle: %error%
 User Created	UserLoginWindow		Benutzerkonto erstellt
@@ -108,7 +108,6 @@ Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProce
 View the usage conditions	UserLoginWindow		Nutzungsbedingungen lesen
 Size	PackageListView		Größe
 Your rating:	RatePackageWindow		Eigene Bewertung:
-I am %MinimumAgeYears% years of age or older	UserLoginWindow		Ich bin %MinimumAgeYears% Jahre oder älter
 Your rating was updated.	RatePackageWindow		Die Bewertung wurde aktualisiert.
 All categories	FilterView		Alle Kategorien
 Repositories	MainWindow		Paketquellen

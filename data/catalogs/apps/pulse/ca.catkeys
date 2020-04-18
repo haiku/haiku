@@ -1,9 +1,48 @@
-1	catalan; valencian	x-vnd.Haiku-Pulse	1695459580
+1	catalan; valencian	x-vnd.Haiku-Pulse	139895817
+Normal mode	DeskbarPulseView		Mode normal
+Info	CPUButton		Informació
+Quit	DeskbarPulseView		Surt
+Info	DeskbarPulseView		Informació
+Normal mode	MiniPulseView		Mode normal
+Frame color	ConfigView		Color del marc
+Error	PulseApp		Error
+Bar colors	ConfigView		Colors de la barra
+%.2f GHz	NormalPulseView		%.2f GHz
+Defaults	PrefsWindow		Per defecte
+%ld MHz	NormalPulseView		%ld MHz
+Mini mode	PrefsWindow		Mode mini
+CPU progress bar	NormalPulseView		Barra de progrés de la CPU
+Fade colors	ConfigView		Colors difuminats
+About Pulse…	PulseView		Quant a Pulse…
+Pulse	NormalPulseView		Pulse
+Deskbar mode	NormalPulseView		Mode de la barra d'escriptori
 Remove replicant	CPUButton		Suprimeix el replicant
+You can't disable the last active CPU.	PulseView		No podeu desactivar l'última CPU activa.
+Width of icon:	ConfigView		Amplada de la icona:
+Deskbar mode	MiniPulseView		Mode de la barra d'escriptori
 OK	PulseView		D'acord
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nDe David Ramsey i Arve Hjønnevåg\nRevisada per Daniel Switkin\n
 OK	PrefsWindow		D'acord
+Pulse	PulseApp		Pulse
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Ha fallat suprimir-ho de la barra de l'escriptori.\n%s
 OK	PulseApp		D'acord
+About Pulse…	CPUButton		Quant a Pulse…
+Deskbar mode	PrefsWindow		Mode de la barra de l'escriptori
+Mini mode	DeskbarPulseView		Mode mini
+You can't disable the last active CPU.	CPUButton		No podeu desactivar l'última CPU activa.
 OK	CPUButton		D'acord
+Deskbar	CPUButton		Barra de l'escriptori
 Settings…	PulseView		Paràmetres…
+Deskbar menu	CPUButton		Menú de la barra de l'escriptori
+Mini mode	NormalPulseView		Mode mini
+Quit	MiniPulseView		Surt
+Info	PulseView		Informació
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		Ús: Pulse [--mini] [-w width] [--width=amplada]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]
 OK	DeskbarPulseView		D'acord
+Info	PulseApp		Informació
+Pulse	System name		Pulse
+Active color	ConfigView		Color actiu
+Installing in Deskbar failed\n%s	PulseApp		Ha fallat instal·lar la barra de l'escriptori\n%s
+Idle color	ConfigView		Color inactiu
+Normal mode	PrefsWindow		Mode normal
 Pulse settings	PulseWindow		Paràmetres del Pulse

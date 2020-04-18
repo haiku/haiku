@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.haiku.zip-o-matic	1573273374
+1	catalan; valencian	x-vnd.haiku.zip-o-matic	2032806096
 Drop files here.	file:ZipOMaticWindow.cpp		Deixeu anar els fitxers aquí.
 Filename: %s	file:ZipOMaticWindow.cpp		Nom del fitxer: %s
 Do you want to stop them?	file:ZipOMatic.cpp		Voleu aturar-los?
@@ -9,7 +9,9 @@ Preparing to archive	file:ZipperThread.cpp		S'està preparant per arxivar-ho
 Let them continue	file:ZipOMatic.cpp		Deixa que continuïn
 Continue	file:ZipOMaticWindow.cpp		Continua
 Archive created OK	file:ZipOMaticWindow.cpp		L'arxiu s'ha generat correctament
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# fitxer afegit.} other{# fitxers afegits.}}
 Stop	file:ZipOMaticWindow.cpp		Atura
 Stopped	file:ZipOMaticWindow.cpp		Aturat
 Archive	file:ZipperThread.cpp		Arxiva
 Creating archive: %s	file:ZipOMaticWindow.cpp		S'està creant l'arxiu: %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Teniu {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} en execució.\n\n

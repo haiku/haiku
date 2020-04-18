@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-WebPositive	2763299522
+1	indonesian	x-vnd.Haiku-WebPositive	1879106286
 Authentication required	Authentication Panel		Otentikasi dibutuhkan
 Previous	WebPositive Window		Sebelumnya
 (Finish: %date)	Download Window		(Selesai: %date)
@@ -28,7 +28,9 @@ Start page:	Settings Window		Halaman awal:
 Cancel	Download Window		Batalkan
 Settings	Settings Window		Pengaturan
 Downloads	WebPositive Window		Unduhan
+Browse…	Settings Window		Telusuri…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Bookmark untuk halaman ini (%bookmarkName) sudah ada.
+Resume prior session	Settings Window		Lanjutkan sesi sebelumnya
 Match case	WebPositive Window		Cocok persis
 Proxy password:	Settings Window		Sandi proksi:
 Size:	Font Selection view		Ukuran:
@@ -119,6 +121,7 @@ Remember username and password for this site	Authentication Panel		Ingat nama pe
 (Finish: %date - %duration left)	Download Window		(Selesai: %date - %duration tersisa)
 Cookie manager	Cookie Manager		Manajer kuki
 Show home button	Settings Window		Tampilkan tombol rumah
+Start new session	Settings Window		Mulai sesi baru
 The cookie jar is empty!	Cookie Manager		Tempat kuki kosong!
 Value	Cookie Manager		Nilai
 Remove missing	Download Window		Hapus yang hilang
@@ -141,6 +144,7 @@ Settings	WebPositive Window		Pengaturan
 Clear	URL Bar		Bersihkan
 Loading %url	WebPositive Window		Memuat %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Wibowo naik vespa dari Roxy ke Islamic Center Jakarta ikut program tahfizh Alquran.
+Start up:	Settings Window		Memulai:
 Confirmation	WebPositive Window		Konfirmasi
 Session cookie	Cookie Manager		Sesi kuki
 Open all	WebPositive Window		Buka semua

@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-DriveSetup	639226483
+1	catalan; valencian	x-vnd.Haiku-DriveSetup	1934767996
 Could not unmount partition %s.	MainWindow		No ha estat possible muntar la partició %s.
 Mount all	MainWindow		Munta-ho tot
 Disk	MainWindow		Disc
@@ -6,10 +6,14 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Device	PartitionList		Dispositiu
 Initialize	MainWindow		Inicia
 Could not change the parameters of the selected partition.	MainWindow		No ha estat possible canviar el paràmetres de la partició triada.
+PGP encrypted	Encryption utils		PGP encriptada
 Delete partition	MainWindow		Suprimeix la partició
 Error: 	MainWindow	in any error alert	Error: 
+Removable	PartitionList		Extraïble
+Block size	PartitionList		Mida de bloc
 The panel experienced a problem!	MainWindow		Ho ha hagut un problema amb el tauler!
 Device	DiskView		Dispositiu
+Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Segur que voleu formatar la partició ampliada d'Intel? Si continueu, se sobreescriurà  qualsevol subpartició que contingui. Se us demanarà de nou abans d'escriure canvis al disc.
 Unmount	MainWindow		Desmunta
 Failed to format the partition %s!\n	MainWindow		No ha estat possible formatar la partició %s!\n
 Partition size	CreateParametersPanel		Mida de la partició
@@ -25,13 +29,16 @@ Validation of the given creation parameters failed.	MainWindow		No ha estat poss
 Eject	MainWindow		Expulsa
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Segur que voleu desar els canvis al disc ara?\n\nSi ho feu, es perdran totes les dades del disc %s i no es podran recuperar!
 Surface test (not implemented)	MainWindow		Prova de la superfície (no està implementat)
+Read only	PartitionList		Només de lectura
 The panel could not return successfully.	MainWindow		La finestra a retornat una fallada.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		No ha estat possible canviar el paràmetres de la partició. No s'han desat els canvis al disc.
 Partition %ld	DiskView		Partició %ld
 There's no space on the partition where a child partition could be created.	MainWindow		No hi ha espai a la partició per fer-hi una nova partició.
 No disk devices have been recognized.	DiskView		No s'ha reconegut cap dispositiu de disc.
+Attributes	PartitionList		Atributs
 Failed to delete the partition. No changes have been written to disk.	MainWindow		No ha estat possible suprimir la partició. No s'han desat els canvis al disc.
 Change parameters…	MainWindow		Canvia els paràmetres...
+Format	InitializeParametersPanel		Format
 Could not unmount partition	MainWindow		No ha estat possible muntar la partició
 Create	CreateParametersPanel		Crea
 File system	PartitionList		Sistema de fitxers
@@ -40,42 +47,58 @@ End: %s	Support		Final: %s
 Partition type	PartitionList		Tipus de partició
 Unable to find the selected partition by ID.	MainWindow		No ha estat possible trobar la partició triada a partir del seu identificador.
 The currently selected partition is not empty.	MainWindow		La partició triada no està buida.
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Segur que voleu formatar un disc en cru? (La majoria de persones primer inicialitzen el disc amb un sistema de particions.) Se us demanarà de nou abans d'escriure canvis al disc.
 Wipe (not implemented)	MainWindow		Esborra (no està implementat)
 The currently selected partition does not have a parent partition.	MainWindow		La partició seleccionada ara no té una partició principal.
 Validation of the given initialization parameters failed.	MainWindow		No ha estat possible validar els paràmetres d'iniciació indicats.
+Shared	PartitionList		Compartida
+MIMEs	PartitionList		MIMEs
+BitLocker encrypted	Encryption utils		Encriptat amb BitLocker
 You need to select a partition entry from the list.	MainWindow		Cal que trieu una partició de la llista.
 Offset: %s	Support		Desplaçament: %s
+SafeBoot encrypted	Encryption utils		Encriptat amb SafeBoot
 Volume name	PartitionList		Nom del volum
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Esteu segur que voleu tornar a desar el canvis al disc ara?\n\nSi ho feu totes les dades de la partició no es podran recuperar!
 Change	ChangeParametersPanel		Canvia
 Partition name:	ChangeParametersPanel		Nom de la partició:
+LUKS encrypted	Encryption utils		Encriptat amb LUKS
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Esteu segur que voleu desar tots els canvis al disc ara?\n\nSi ho feu es perdran totes les dades de la partició %s de forma irrecuperable!
 Cancel	AbstractParametersPanel		Anul·la
 Format	MainWindow		Formata
+<empty or unknown>	DiskView		<empty or unknown>
 OK	MainWindow		D'acord
+Open with DiskProbe	MainWindow		Obre amb DiskProbe
 Could not delete the selected partition.	MainWindow		No ha estat possible suprimir la partició triada.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Esteu segur que voleu iniciar el disc triat) Es perdran totes les dades. Encara us preguntarem un cop més abans d'escriure els canvis al disc.\n
 There was an error preparing the disk for modifications.	MainWindow		Hi hagut un error en preparar el disc per les modificacions.
 The disk has been successfully initialized.\n	MainWindow		El disc s'ha iniciat correctament.\n
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Cal forçar el desmuntatge?\n\nNota: Si ho ha alguna aplicació escrivint al volum, desmuntar-la ara podria suposar una pèrdua de dades.\n
 Cancel	MainWindow		Anul·la
+Free space	PartitionList		Espai lliure
+Queries	PartitionList		Consultes
 Force unmount	MainWindow		Força el desmuntatge
 Partition	MainWindow		Partició
 Change parameters	MainWindow		Canvia els paràmetres
 Rescan	MainWindow		Torna a explorar
 There was an error acquiring the partition row.	MainWindow		Hi hagut un error en llegir informació de la partició.
 Failed to initialize the disk %s!\n	MainWindow		No ha estat possible iniciar el disc %s!\n
+Disk system \"%s\" not found!	MainWindow		No s'ha trobat el disc de sistema \"%s\"!
 Delete	MainWindow		Suprimeix
 Partition type:	ChangeParametersPanel		Tipus de partició:
 Parameters	PartitionList		Paràmetres
+Could not acquire partitioning information.	MainWindow		No s'ha pogut obtenir la informació de les particions.
 Cannot delete the selected partition.	MainWindow		No ha estat possible suprimir la partició seleccionada.
 Continue	MainWindow		Continua
 Could not mount partition %s.	MainWindow		No s'ha pogut muntar la partició %s.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Esteu segur que voleu formatar la partició? Encara us preguntarem un cop més abans d'escriure els canvis al disc.
+<empty or unknown>	PartitionList		<empty or unknown>
 The selected disk is read-only.	MainWindow		El disc triat és només de lectura.
 The partition %s is already unmounted.	MainWindow		La partició %s ja està muntada.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Esteu segur que voleu canviar el paràmetres de la partició triada?\n\nEls altres sistemes operatius ja no podran reconèixer la partició!
+Boot	PartitionList		Arrencada
 OK	AbstractParametersPanel		D'acord
+Virtual	PartitionList		Virtual
+Virtual	DiskView		Virtual
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Esteu segur que voleu tornar a desar el canvis al disc ara?\n\nSi ho feu totes les dades del disc no es podran recuperar!
 Select a partition from the list below.	DiskView		Seleccioneu una partició de la llista d'aquí sota.
 Active	PartitionList		Activa

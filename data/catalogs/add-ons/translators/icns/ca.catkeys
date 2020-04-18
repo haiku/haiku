@@ -1,5 +1,7 @@
-1	catalan; valencian	x-vnd.Haiku-ICNSTranslator	2416672857
+1	catalan; valencian	x-vnd.Haiku-ICNSTranslator	660278989
+Valid colors: RGB32, RGBA32	ICNSConfig		Colors vàlids: RGB32, RGBA32
 Version %d.%d.%d, %s	ICNSConfig		Versió %d.%d.%d, %s
 Apple icons	ICNSTranslator		Icones d'Apple
 Apple icon translator	ICNSTranslator		Traductor d'icones d'Apple
+Valid sizes: 16, 32, 48, 128, 256, 512, 1024	ICNSConfig		Mides vàlides: 16, 32, 48, 128, 256, 512, 1024
 Apple icon translator	ICNSConfig		Traductor d'icones d'Apple

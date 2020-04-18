@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-CharacterMap	2309284868
+1	indonesian	x-vnd.Haiku-CharacterMap	124574598
 Enclosed alphanumerics	UnicodeBlocks		Alfanumerik tertutup
 Basic Latin	UnicodeBlocks		Bahasa Latin dasar
 Cyrillic extended C	UnicodeBlocks		Cyrillic extended C
@@ -14,21 +14,34 @@ Old Hungarian	UnicodeBlocks		Old Hungarian
 Khmer	UnicodeBlocks		Khmer
 Supplementary private use area A	UnicodeBlocks		Supplementary private use area A
 Hanunoo	UnicodeBlocks		Hanunoo
+Latin extended additional	UnicodeBlocks		Tambahan latin yang diperluas
+Arabic presentation forms A	UnicodeBlocks		Presentasi Arab bentuk A
+Greek extended	UnicodeBlocks		Yunani diperluas
 Linear B ideograms	UnicodeBlocks		Ideogram B linear
 Devanagari	UnicodeBlocks		Devanagari
 Armenian	UnicodeBlocks		Armenia
+Glagotic	UnicodeBlocks		Glagotik
 Mathematical operators	UnicodeBlocks		Operator matematik
 General punctuation	UnicodeBlocks		Tanda baca umum
 Miscellaneous technical	UnicodeBlocks		Serbaneka teknis
+Vertical forms	UnicodeBlocks		Form vertikal
+Ol Chiki	UnicodeBlocks		Ol Chiki
 Arabic	UnicodeBlocks		Arab
 Ethiopic extended	UnicodeBlocks		Perluasan Ethiopia
 Arrows	UnicodeBlocks		Panah
+Sutton SignWriting	UnicodeBlocks		Sutton SignWriting
 Font	CharacterWindow		Fon
+Hatran	UnicodeBlocks		Hatran
+Variation selectors supplement	UnicodeBlocks		Suplemen penyeleksi variasi
 Gujarati	UnicodeBlocks		Gujarat
 Cuneiform	UnicodeBlocks		Runcing
+CJK radicals supplement	UnicodeBlocks		Suplemen radikal CJK
 Balinese	UnicodeBlocks		Bali
 Cham	UnicodeBlocks		Kamboja
 Specials	UnicodeBlocks		Spesial
+Ahom	UnicodeBlocks		Ahom
+CJK compatibility ideographs	UnicodeBlocks		Ideograf kompatibilitas CJK
+Phonetic extensions	UnicodeBlocks		Ekstensi fonetik
 Khmer symbols	UnicodeBlocks		Simbol Khmer
 Tagbanwa	UnicodeBlocks		Tagbanwa
 Kanbun	UnicodeBlocks		Kanbun
@@ -54,6 +67,7 @@ Clear	CharacterWindow		Bersih
 Sundanese	UnicodeBlocks		Sunda
 Miscellaneous mathematical symbols A	UnicodeBlocks		Simbol matematika lain-lain A
 Cyrillic supplement	UnicodeBlocks		Suplemen Cyrillic
+Small form variants	UnicodeBlocks		Varian bentuk kecil
 IPA extensions	UnicodeBlocks		Ekstensi IPA
 Thaana	UnicodeBlocks		Thaana
 Ogham	UnicodeBlocks		Ogham
@@ -61,12 +75,23 @@ Combining diacritical marks for symbols	UnicodeBlocks		Kombinasi tanda diakritik
 Syloti Nagri	UnicodeBlocks		Syloti Nagri
 Arabic supplement	UnicodeBlocks		Arab suplemen
 Latin extended C	UnicodeBlocks		Latin C diperluas
+Bopomofo extended	UnicodeBlocks		Bopomofo diperluas
+Lycian	UnicodeBlocks		Lycian
+Osmanya	UnicodeBlocks		Osmanya
 Ethiopic	UnicodeBlocks		Ethiopik
 Bengali	UnicodeBlocks		Bengali
+Supplementary private use area B	UnicodeBlocks		Penggunaan pribadi tambahan area B
+CJK unified ideographs extension A	UnicodeBlocks		ekstensi ideograf CJK terpadu A
 Filter:	CharacterWindow		Saring:
 Hangul compatibility Jamo	UnicodeBlocks		Hangul kompatibilitas Jamo
+Ideographic description characters	UnicodeBlocks		Karakter deskripsi ideografis
+Arabic presentation forms B	UnicodeBlocks		Presentasi arab bentuk B
+CJK compatibility forms	UnicodeBlocks		Form kompatibilitas CJK
 Hiragana	UnicodeBlocks		Hiragana
 Tagalog	UnicodeBlocks		Tagalog
+Control pictures	UnicodeBlocks		Kontrol gambar
+Variation selectors	UnicodeBlocks		Selektor variasi
+Linear B syllabary	UnicodeBlocks		Silabus B linier
 Buginese	UnicodeBlocks		Bugis
 Bopomofo	UnicodeBlocks		Bopomofo
 Code	CharacterWindow		Kode
@@ -75,25 +100,102 @@ Sinhala	UnicodeBlocks		Sinhala
 Ancient Greek musical notation	UnicodeBlocks		Notasi musikal Yunani Kuno
 Early Dynastic Cuneiform	UnicodeBlocks		Tulisan runcing awal dinasti 
 Geometric shapes	UnicodeBlocks		Bentuk Geometrik
+Letterlike symbols	UnicodeBlocks		Simbol seperti huruf
+Hangul Jamo	UnicodeBlocks		Hangul Jamo
 Tamil	UnicodeBlocks		Tamil
 Currency symbols	UnicodeBlocks		Simbol mata uang
+Combining diacritical marks	UnicodeBlocks		Menggabungkan tanda diakritik
 Anatolian hieroglyphs	UnicodeBlocks		Hieroglif Anatolia
+Supplement punctuation	UnicodeBlocks		Suplemen tanda baca
+Unified Canadian Aboriginal syllabics	UnicodeBlocks		Silabus Aborigin Kanada yang disatukan
 Marchen	UnicodeBlocks		Marchen
 Ugaritic	UnicodeBlocks		Ugaritik
 Tangut	UnicodeBlocks		Tangut
+CJK symbols and punctuation	UnicodeBlocks		Simbol dan tanda baca CJK
 File	CharacterWindow		Berkas
+Number forms	UnicodeBlocks		Bentuk angka
 Cherokee	UnicodeBlocks		Cherokee
+Tags	UnicodeBlocks		Tag
+Cypriot syllabary	UnicodeBlocks		Silabus Siprus
+Counting rod numerals	UnicodeBlocks		Menghitung angka batang
+Ideographic symbols and punctuation	UnicodeBlocks		Simbol dan tanda baca ideografis
+Latin extended A	UnicodeBlocks		Latin diperluas A
+Tangut components	UnicodeBlocks		Komponen tangut
 Miscellaneous symbols	UnicodeBlocks		Simbol lainnya
+Saurashtra	UnicodeBlocks		Saurashtra
+Optical character recognition	UnicodeBlocks		Pengenalan karakter optis
 Old Persian	UnicodeBlocks		Persia lama
+Combining diacritical marks supplement	UnicodeBlocks		Menggabungkan suplemen tanda diakritik
 Myanmar	UnicodeBlocks		Myanmar
+Latin extended D	UnicodeBlocks		Latin diperluas D
 Byzantine musical symbols	UnicodeBlocks		Simbol musikal Romawi Timur
 Oriya	UnicodeBlocks		Oriya
 Tibetan	UnicodeBlocks		Tibet
 Ancient Greek numbers	UnicodeBlocks		Angka Yunani lama
+Vai	UnicodeBlocks		Vai
+Yi Radicals	UnicodeBlocks		Radikal Yi
+Cyrillic extended B	UnicodeBlocks		Sirilik diperluas B
 Mongolian supplement	UnicodeBlocks		Suplemen mongolia
+Supplemental Symbols and Pictographs	UnicodeBlocks		Simbol dan Piktograf Tambahan
 Quit	CharacterWindow		Keluar
+Ancient symbols	UnicodeBlocks		Simbol kuno
+Newa	UnicodeBlocks		Newa
+Adlam	UnicodeBlocks		Adlam
 Braille patterns	UnicodeBlocks		Pola Braille
+New Tai Lue	UnicodeBlocks		Tai Lue Baru
+Runic	UnicodeBlocks		Runic
+Miscellaneous mathematical symbols B	UnicodeBlocks		Simbol matematika lain-lain B
+Cuneiform numbers and punctuation	UnicodeBlocks		Angka runcing dan tanda baca
+Private use area	UnicodeBlocks		Area penggunaan pribadi
+CJK unified ideographs extension B	UnicodeBlocks		CJK ekstensi ideograf terpadu B
+Phags-pa	UnicodeBlocks		Phags-pa
+Kangxi radicals	UnicodeBlocks		Radikal Kangxi
+Dingbats	UnicodeBlocks		Dingbats
+Tai Xuan Jing symbols	UnicodeBlocks		Simbol Tai Xuan Jing
+Yi syllables	UnicodeBlocks		Suku kata Yi
+Buhid	UnicodeBlocks		Buhid
+Telugu	UnicodeBlocks		Telugu
+Superscripts and subscripts	UnicodeBlocks		Superskrip dan subskrip
+Thai	UnicodeBlocks		Tailand
+Osage	UnicodeBlocks		Osage
+Deseret	UnicodeBlocks		Deseret
+Tifinagh	UnicodeBlocks		Tifinagh
+Gurmukhi	UnicodeBlocks		Gurmukhi
+CharacterMap	System name		CharacterMap
+Lao	UnicodeBlocks		Lao
+Gothic	UnicodeBlocks		Gotik
+Limbu	UnicodeBlocks		Limbu
 Rejang	UnicodeBlocks		Rejang
+Show private blocks	CharacterWindow		Tampilkan blok pribadi
+Phoenician	UnicodeBlocks		Fenisia
 Mongolian	UnicodeBlocks		Mongolia
+Supplemental arrows A	UnicodeBlocks		Panah tambahan A
+Miscellaneous symbols and arrows	UnicodeBlocks		Simbol dan panah lain-lain
+Yijing hexagram symbols	UnicodeBlocks		Simbol hexagram Yijing
+Supplemental mathematical operators	UnicodeBlocks		Operator matematika tambahan
+Enclosed CJK letters and months	UnicodeBlocks		Huruf dan bulan CJK tertutup
+Kayah Li	UnicodeBlocks		Kayah Li
+Alphabetic presentation forms	UnicodeBlocks		Formulir presentasi alfabet
+Halfwidth and fullwidth forms	UnicodeBlocks		Form setengah lebar dan lebar penuh
+Lydian	UnicodeBlocks		Lydian
+Ethiopic supplement	UnicodeBlocks		Suplemen etiopia
+Glagolitic supplement	UnicodeBlocks		Suplemen glagolitik
+CJK unified ideographs extension E	UnicodeBlocks		Ekstensi ideografik terpadu CJK E
+Latin extended B	UnicodeBlocks		Latin diperluas B
+Box drawing	UnicodeBlocks		Gambar kotak
+Mathematical alphanumeric symbols	UnicodeBlocks		Simbol alfanumerik matematika
 Copy character	CharacterView		Salin karakter
 Greek and Coptic	UnicodeBlocks		Yunani dan Koptik
+Carian	UnicodeBlocks		Cari
+Georgian	UnicodeBlocks		Georgia
+Phaistos disc	UnicodeBlocks		Cakram phaistos
+Shavian	UnicodeBlocks		Shavi
+CJK compatibility	UnicodeBlocks		Kompatibilitas CJK
+Malayalam	UnicodeBlocks		Malayalam
+N'Ko	UnicodeBlocks		N'Ko
+Kannada	UnicodeBlocks		Kannada
+Copy as escaped byte string	CharacterView		Salin sebagai string bita escaped
+Phonetic extensions supplement	UnicodeBlocks		Suplemen ekstensi fonetik
+Domino tiles	UnicodeBlocks		Ubin domino
+Bhaiksuki	UnicodeBlocks		Bhaiksuki
+Katakana phonetic extensions	UnicodeBlocks		Ekstensi fonetik Katakana

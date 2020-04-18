@@ -1,10 +1,11 @@
-1	catalan; valencian	x-vnd.Haiku-LaunchBox	990189726
+1	catalan; valencian	x-vnd.Haiku-LaunchBox	1530497419
 Set description…	LaunchBox		Indica la descripció...
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Esteu segur que voleu tancar aquesta barra?\n(No es recordarà la barra)
 OK	LaunchBox		D'acord
 Ignore double-click	LaunchBox		Ignora els clics dobles
 Show on all workspaces	LaunchBox		Mostra-ho a tots els espais de treball
 Name Panel	LaunchBox		Tauler del nom
+Autostart	LaunchBox		Inici automàtic
 Clone	LaunchBox		Clona
 Description for '%3'	LaunchBox		Descripció de '%3'
 Show window border	LaunchBox		Mostra la vora de la finestra
@@ -18,12 +19,14 @@ Add button here	LaunchBox		Afegeix un botó aquí
 Cancel	LaunchBox		Anul·la
 launch popup	LaunchBox		obre la finestra emergent
 Clear button	LaunchBox		Botó de neteja
+Bummer	LaunchBox		Problema
 last chance	LaunchBox		darrera oportunitat
 You can drag an icon here.	LaunchBox		Podeu deixar anar la icona aquí:
 Pad 1	LaunchBox		Barra 1
 Failed to launch '%1'.\n\nError:	LaunchBox		No ha estat possible executar '%1'.\n\nError:
 Settings	LaunchBox		Paràmetres
 Vertical layout	LaunchBox		Disposició vertical:
+Pad	LaunchBox		Barra
 Close	LaunchBox		Tanca
 Remove button	LaunchBox		Elimina el botó
 Quit	LaunchBox		Surt

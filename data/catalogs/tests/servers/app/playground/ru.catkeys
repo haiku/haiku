@@ -5,7 +5,7 @@ Over	Playground		Над
 Quit	Playground		Выход
 Rect	Playground		Прямоугольник
 Select	Playground		Выделение
-Click and drag to draw an object	Playground		Нажмите кнопку мыши и перемещайте курсор для рисования объекта.
+Click and drag to draw an object	Playground		Кликните и перемещайте курсор для рисования объекта.
 Controls	Playground		Управление
 Round rect	Playground		Закругленный прямоугольник
 Alpha:	Playground		Альфа-канал:

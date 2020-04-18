@@ -1,9 +1,11 @@
-1	catalan; valencian	x-vnd.Haiku-Mail	688530788
+1	catalan; valencian	x-vnd.Haiku-Mail	2750130554
 Account settings	AutoConfigWindow		Paràmetres del compte
 \t\t· Outgoing	Config Window		\t\t· Sortint
+An error occurred while creating the config view: %error.	Config Views		S'ha produït un error en crear la vista de configuració: %error.
 E-mail address:	E-Mail		Adreça de correu:
 Create new account	AutoConfigWindow		Obre un compte nou
 While sending and receiving	Config Window		Mentre s'estigui enviant i rebent
+Error!	Config Views		Error!
 Apply	Config Window		Aplica
 Incoming mail filters	Config Views		Filtres del correu entrant
 Outgoing mail filters	Config Views		Filtres del correu de sortida
@@ -17,6 +19,7 @@ Outgoing	E-Mail		Sortint
 Accounts	Config Window		Comptes
 Outgoing	Config Window		Sortint
 Remove	Config Views		Suprimeix
+Show notifications:	Config Window		Mostra les notificacions:
 Settings	Config Window		Paràmetres
 Never	Config Window	show status window	Mai
 Account name:	Config Views		Nom del compte:
@@ -38,6 +41,7 @@ Account settings	Config Views		Configuració del compte
 minutes	Config Window		minuts
 E-mail	System name		Correu electrònic
 Check every	Config Window		Comprova cada
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Creeu un compte nou amb el botó Afegeix.\n\nSuprimiu un compte amb el botó Suprimeix de l’element seleccionat.\n\nSeleccioneu un element de la llista per canviar-ne la configuració.
 Account name:	E-Mail		Nom del compte:
 Edit mailbox menu…	Config Window		Edita el menú de la bústia d'entrada...
 Server Name:	E-Mail		Nom del servidor:

@@ -1,30 +1,88 @@
-1	catalan; valencian	x-vnd.Haiku-StyledEdit	3345279005
+1	catalan; valencian	x-vnd.Haiku-StyledEdit	727465241
+Document statistics	Statistics		Estadístiques del document
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		No es pot revertir: el fitxer no es troba: \"%s\".
 Cut	Menus		Retalla
+Center	Menus		Centrat
+Wrap-around search	FindandReplaceWindow		Cerca cíclica
+Page setup…	Menus		Configuració de la pàgina...
+Untitled 	StyledEditWindow		Sense títol 
 OK	Statistics		D'acord
 Find	FindandReplaceWindow		Cerca
+New	Menus		Nou
+Document	Menus		Document
+Search backwards	FindandReplaceWindow		Cerca enrere
 Find again	Menus		Repeteix la cerca
+Read-only	StatusView		Només de lectura
 Save	Menus		Desa
 Cancel	QuitAlert		Anul·la
+Copy	Menus		Copia
+Reload	NodeMonitorAlerts		Torna a carregar
+line %d, column %d	StatusView		línia %d, columna %d
+Words:	Statistics		Paraules:
+???	LoadAlert		???
+Recover	NodeMonitorAlerts		Recupera
+Error saving \"%s\":\n%s	SaveAlert		Error en desar \"%s\":\n%s
 OK	RevertToSavedAlert		D'acord
+Unlock file	StatusView		Desbloca el fitxer
+Italic	Menus		Cursiva
+Can't undo	Menus		No es pot refer
+Replace…	Menus		Reemplaça...
+File	Menus		Fitxer
+Bold	Menus		Negreta
 Paste	Menus		Enganxa
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		El fitxer \"%file%\" ha estat modificat per una altra aplicació. El torno a carregar?
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		El fitxer \"%file%\" ha estat suprimit per una altra aplicació. El recupero?
+Lines:	Statistics		Línies:
+Replace in all windows	FindandReplaceWindow		Reemplaça-ho a totes les finestres
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" té canvis sense desar.\nVoleu tornar-lo a la darrera versió desada? 
 Save	SaveAlert		Desa
+Default	Open_and_SaveAsPanel		Per defecte
 Cancel	RevertToSavedAlert		Anul·la
 Cancel	FindandReplaceWindow		Anul·la
+Statistics…	Menus		Estadístiques...
+Encoding	Open_and_SaveAsPanel		Codificació
+Replace all	FindandReplaceWindow		Reemplaça-ho tot
 Close	Menus		Tanca
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Error en carregar \"%s\":\n\tFormat no admès.
+Left	Menus		Esquerra
+Default	Menus		Per defecte
 OK	SaveAlert		D'acord
+Color	Menus		Color
 Save changes to the document \"%s\"? 	QuitAlert		Voleu desar els canvis al document \"%s\"? 
 StyledEdit	System name		Editor dels Estils
 Find:	FindandReplaceWindow		Cerca:
+Undo typing	QuitAlert		Desfés el tecleig
+Error loading \"%s\":\n\t%s	LoadAlert		Error en carregar \"%s\":\n\t%s
 Don't save	SaveAlert		No ho desis
+Reload…	Menus		Torna a carregar...
+Print…	Menus		Imprimeix...
+Quit	Menus		Surt
+Redo typing	QuitAlert		Refés el tecleig
+Ignore	NodeMonitorAlerts		Ignora-ho
+Wrap lines	Menus		Ajusta les línies
+Text encoding	Menus		Codificació del text
+Unable to unlock file\n\t%s	QuitAlert		No es pot desblocar el fitxer\n\t%s
+Modified	StatusView		Modificat
 OK	LoadAlert		D'acord
 Save	QuitAlert		Desa
+Case-sensitive	FindandReplaceWindow		Distingeix majúscules
 Find selection	Menus		Cerca la selecció
 Cancel	SaveAlert		Anul·la
 Find…	Menus		Cerca…
+Revert	RevertToSavedAlert		Reverteix
+Size	Menus		Mida
+Autodetect	Menus		Detecta-ho automàticament
 Replace next	Menus		Substitueix el següent
 OK	QuitAlert		D'acord
+Replace with:	FindandReplaceWindow		Reemplaça-ho per:
 Edit	Menus		Edita
 Open…	Menus		Obre...
 Save as…	Menus		Anomena i desa…
+Replace	FindandReplaceWindow		Reemplaça
+Characters:	Statistics		Caràcters:
 Don't save	QuitAlert		No ho desis
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Aquest fitxer és només de lectura. Voleu desar els canvis al document \"%s\"? 
+Align	Menus		Alinea
+Font	Menus		Lletra
+Select all	Menus		Selecciona-ho tot
+Right	Menus		Dreta

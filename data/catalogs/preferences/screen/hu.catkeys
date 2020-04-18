@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Screen	2685901476
+1	hungarian	x-vnd.Haiku-Screen	133788249
 no	Screen		nem
 bits/pixel	Screen		bit/pixel
 15 bits/pixel, 32768 colors	Screen		15 bit/pixel, 32768 szín
@@ -17,6 +17,7 @@ vertically	Screen		függőlegesen
 All workspaces	Screen		Minden munkaasztal
 Use laptop panel:	Screen		Használt laptopképernyő:
 Could not write VESA mode settings file:\n\t	Screen		A VESA mód beállítási fájl írása sikertelen:\n\t
+Display info	Screen		Monitor információk
 Settings will revert in %seconds.	Screen		A beállítások módosításai %seconds másodperc múlva visszavonásra kerülnek
 Cancel	Screen		Mégse
 Other…	Screen		Egyéb…

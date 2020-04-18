@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-HaikuDepot	2051848200
+1	dutch; flemish	x-vnd.Haiku-HaikuDepot	1172858982
 Repository update error	LocalRepositoryUpdateProcess		Fout bij updaten softwarebronnen
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Er is een fout opgetreden bij het verversen van de softwarebronnen: %error%
 Check for updates…	MainWindow		Controleer op updates…
@@ -92,7 +92,6 @@ Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProce
 View the usage conditions	UserLoginWindow		Bekijk de gebruiksvoorwaarden
 Size	PackageListView		Grootte
 Your rating:	RatePackageWindow		Uw beoordeling:
-I am %MinimumAgeYears% years of age or older	UserLoginWindow		Ik ben %MinimumAgeYears% jaar of ouder
 Your rating was updated.	RatePackageWindow		Uw beoordeling is bijgewerkt.
 All categories	FilterView		Alle categorieën
 Repositories	MainWindow		Pakketbronnen

@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libtracker	3635622982
+1	indonesian	x-vnd.Haiku-libtracker	659027911
 Created	ContainerWindow		Dibuat
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Buka dan buat sebagai yang disukai
@@ -22,6 +22,7 @@ Open	FilePanelPriv		Buka
 Bitmap icon	AttributesView		Ikon bitmap
 You can't replace a folder with one of its sub-folders.	FSUtils		Anda tidak dapat mengganti folder dengan salah satu sub-folder nya.
 <%ld dates>	AttributesView		<%ld tanggal>
+Select…	VirtualDirectoryWindow		Pilih…
 Name	Default Query Columns		Nama
 Unmount	ContainerWindow		Unmount
 Eject when unmounting	AutoMounterSettings		Keluarkan ketika unmount
@@ -285,6 +286,7 @@ Error creating link to \"%name\".	FSUtils		Terjadi kesalahan saat membuat tautan
 Unknown	FilePermissionsView		Tak diketahui
 Paste links	ContainerWindow		Tempel tautan
 Restoring: 	StatusWindow		Sedang memulihkan: 
+The Tracker must be running to set the default printer.	PoseView		Tracker harus dijalankan untuk mengatur printer default.
 calculating…	InfoWindow		menghitung…
 Preferred for file	OpenWithWindow		Lebih disukai untuk berkas
 OK	AutoMounterSettings		OKE
@@ -357,6 +359,7 @@ Size:	InfoWindow		Ukuran:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Beberapa item yang dipilih tidak dapat dipindahkan ke Sampah. Apakah anda ingin menghapusnya sebagai gantinya? (Operasi ini tidak dapat dipulihkan.)
 Copy	ContainerWindow		Salin
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Maaf, 'Karakter' atribut tidak dapat menyimpan multi-byte glyph.
+Open parent	VirtualDirectoryWindow		Buka orangtua
 And	FindPanel		Dan
 Palette-indexed picture	AttributesView		Gambar dengan palet-terindeks
 multiple disks	FindPanel		disk berganda
@@ -441,6 +444,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Maaf, menyimpan 
 Move here	ContainerWindow		Pindah ke sini
 the config folder	FSUtils		folder konfigurasi
 Sorry, could not create a new folder.	FSUtils		Maaf, tidak bisa membuat folder baru.
+Select all	VirtualDirectoryWindow		Pilih Semua
 Rename	FSUtils	button label	Ubah nama
 Clean up all	ContainerWindow		Bersihkan semua
 Add current folder	FilePanelPriv		Tambah folder ini
@@ -452,6 +456,7 @@ ends with	FindPanel		berakhir dengan
 Show Disks icon	SettingsView		Tampilan ikon disk
 Outline selection rectangle only	SettingsView		Hanya pilih yang dikotak
 by formula	FindPanel		dengan rumus
+Resize to fit	VirtualDirectoryWindow		Ubah ukuran agar pas
 Move to Trash	FilePanelPriv		Buang ke Tong Sampah
 is	FindPanel		adalah
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Jika Anda mengubah nama folder sistem atau isinya, Anda tidak akan bisa boot %osName!\n\nApakah anda yakin melakukan ini?\n\nUntuk tetap mengubah nama folder sistem, tekan kunci Shift dan klik \"Ubah\".
@@ -469,6 +474,7 @@ Default application	InfoWindow		Aplikasi standar
 Untitled bitmap	PoseView		Bitmap tak-berjudul
 matches regular expression	SelectionWindow		cocok dengan ekspresi reguler
 Invert selection	ContainerWindow		Pilihan sebaliknya
+Close	VirtualDirectoryWindow		Tutup
 Monochrome picture	AttributesView		Gambar hitam-putih
 Real name	ContainerWindow		Nama asli
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Tidak bisa membuka \"%name\". File tersebut keliru ditandai sebagai executable. 
@@ -505,6 +511,7 @@ Delete	PoseView		Hapus
 Media parameter	AttributesView		Parameter media
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Jika Anda mengubah folder rumah, %osName mungkin tidak berperilaku dengan semestinya!\n\nApakah Anda yakin ingin melakukan ini?\n\nUntuk tetap mengubah folder rumah jua, tahan tombol Shift dan klik \"Saya tahu apa yang saya lakukan\".
 Sorry, you can't copy items to the Trash.	PoseView		Maaf, Anda tidak dapat menyalin item ke tempat sampah.
+Invert selection	VirtualDirectoryWindow		Pilihan sebaliknya
 New folder	FilePanelPriv		Folder baru
 {0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# item} other{# items}}
 Name	AttributesView		Nama

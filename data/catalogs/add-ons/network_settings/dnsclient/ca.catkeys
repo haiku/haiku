@@ -1,0 +1,10 @@
+1	catalan; valencian	x-vnd.Haiku-DNSClientService	2825577357
+DNS settings	DNSClientServiceAddOn		Paràmetres de DNS
+Move down	DNSSettingsView		Mou avall
+DNS settings	DNSSettingsView		Paràmetres de DNS
+Remove	DNSSettingsView		Suprimeix
+Domain:	DNSSettingsView		Domini:
+Add	DNSSettingsView		Afegeix
+Server:	DNSSettingsView		Servidor:
+Move up	DNSSettingsView		Mou amunt
+Apply	DNSSettingsView		Aplica-ho

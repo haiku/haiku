@@ -1,2 +1,13 @@
-1	catalan; valencian	x-vnd.Be-WORK	856810269
+1	catalan; valencian	x-vnd.Be-WORK	3927737357
+Quit	Workspaces		Surt
+Invalid argument: %s\n	Workspaces		Argument no vàlid: %s\n
+Change workspace count…	Workspaces		Canvia el recompte de l'espai de treball...
+Always on top	Workspaces		Sempre a dalt
+Show window border	Workspaces		Mostra la vora de la finestra
+Show window tab	Workspaces		Mostra la pestanya de la finestra
+Auto-raise	Workspaces		Apuja-ho automàticament
 Remove replicant	Workspaces		Suprimeix el replicant
+Live in the Deskbar	Workspaces		Viu a la barra d’escriptori
+Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Ús: %s [opcions] [espai de treball]\nen què \"opcions\" són les següents:\n  --notitle\t\tbarra de títol suprimida, es mantenen la vora i el canvi de mida\n  --noborder\t\títol, vora i canvi de mida suprimides\n  --avoidfocus\t\timpedeix que la finestra sigui l'objectiu dels esdeveniments del teclat\n  --alwaysontop\t\tmantén la finestra a dalt\n  --notmovable\t\tla finestra no es pot moure\n  --autoraise\t\tapuja automàticament la finestra de l’espai de treball quan es troba a la vora de la pantalla\n  --help\t\tmostra aquesta ajuda i surt\ni \"espai de treball\" és el número de l'espai de treball al qual canviar (0-31)\n
+Switch on mouse wheel	Workspaces		Activa la rodeta del ratolí
+Workspaces	System name		Espais de treball

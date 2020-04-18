@@ -1,9 +1,10 @@
-1	catalan; valencian	x-vnd.Haiku-DiskProbe	1806743923
+1	catalan; valencian	x-vnd.Haiku-DiskProbe	2944605311
 Raw editor	AttributeWindow		Editor de dades en brut
 Remove	AttributeWindow		Suprimeix
 Close	ProbeView		Tanca
 Boolean value:	TypeEditors		Valor booleà:
 File	ProbeView		Fitxer
+Block size	ProbeView	Menu item. This is in the same menu window than 'Base' and 'Font size'	Mida de bloc
 MIME type editor	TypeEditors		Editor del tipus MIME
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadecimal
 16 bit unsigned value:	TypeEditors		Valor de 16 bits sense signe:
@@ -14,7 +15,7 @@ Text	TypeEditors	This is the type of editor	Text
 File offset: 	ProbeView		Desplaçament del fitxer: 
 Add	ProbeView		Afegeix
 64 bit signed value:	TypeEditors		Valor de 64 bits amb signe:
-Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Esteu segur que voleu suprimir l'atribut \"%s\" del fitxer \"%s\"?\n\nNo es possible desfer aquesta acció.
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Segur que voleu suprimir l'atribut \"%s\" del fitxer \"%s\"?\n\nNo es pot desfer aquesta acció.
 No type editor available	AttributeWindow		No hi ha cap editor de tipus de lletra disponible
 Print…	ProbeView		Imprimeix...
 New…	FileWindow		Nou...

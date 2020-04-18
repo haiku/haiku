@@ -1,8 +1,64 @@
-1	catalan; valencian	x-vnd.Haiku-PackageInstaller	291262722
+1	catalan; valencian	x-vnd.Haiku-PackageInstaller	2472572058
+Package description	UninstallView		Descripció del paquet
+none	PackageView		cap
 Continue	PackageInstall		Continua
+Running post-installation scripts	PackageInstall		S'executen scripts de postinstal·lació.
+Package installer	PackageView		Instal·lador de paquets
+All existing files will be skipped?	PackageView		Tots els fitxers existents s'ometran?
+Replace	PackageView		Reemplaça
+All existing files will be replaced?	PackageView		Tots els fitxers existents es reemplaçaran?
+Other…	PackageView		Altres...
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		L'enllaç simbòlic anomenat "%s" ja existeix al camí indicat.\nVoleu reemplaçar l'enllaç pel d'aquest paquet o el voleu ometre?
+Stop	PackageStatus		Atura
+Install to:	PackageView		Instal·la a:
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Sembla que el paquet indicat ja està instal·lat al sistema. Voleu desinstal·lar l’existent i continuar la instal·lació?
+Skip all	PackageView		Omet-ho tot
+The installation of the package has been aborted.	PackageView		La instal·lació del paquet s'ha cancel·lat.
+No installation type selected	PackageView		No s'ha seleccionat cap tipus d'instal·lació.
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Voleu recordar aquesta decisió per a la resta d’aquesta instal·lació?\n
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		El paquet seleccionat no s'ha suprimit del sistema. És possible que el fitxer d'informació del paquet instal·lat es pugui haver corromput.
+Install…	UninstallView		Instal·la...
+The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		L'element anomenat "%s" ja existeix al camí indicat.\nVoleu reemplaçar l’element pel d’aquest paquet o ometre'l?
+Installing files and folders	PackageInstall		S'instal·len fitxers i carpetes
+Installed packages	UninstallWindow		Paquets instal·lats
+Remove	UninstallView		Suprimeix
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		No s'ha pogut instal·lar el paquet sol·licitat al sistema. Pot ser que tingueu un problema amb el fitxer del paquet de destinació. Consulteu aquest problema amb el distribuïdor de paquets.
 OK	UninstallView		D'acord
 Accept	PackageTextViewer		Accepta
+Abort	PackageView		Avorta
+Disclaimer	PackageTextViewer		Exempció de responsabilitat
+Preparing package	PackageInstall		Es prepara el paquet.
+The package you requested has been successfully installed on your system.	PackageView		El paquet que heu sol·licitat s'ha instal·lat correctament al sistema.
+Installation progress	PackageView		Progrés de la instal·lació
+Decline	PackageTextViewer		Rebutja
 Continue	PackageTextViewer		Continua
+Installing package	PackageStatus		S'instal·la el paquet
+Install %name%	PackageView		Instal·la %name%
+%index% of %total%	PackageInstall		%index% de %total%
+No package selected.	UninstallView		No hi ha cap paquet seleccionat.
+%name% (%size% free)	PackageView		%name% (%size% lliure)
+Error while installing the package\n	PackageView		Error mentre s'instal·lava el paquet\n
+Finishing installation	PackageInstall		S'acaba la instal·lació.
+No package available.	PackageInfo		No hi ha cap paquet disponible.
+The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		L'script anomenat "%s" ja existeix al camí indicat.\nVoleu reemplaar l'script pel d'aquest paquet o el voleu ometre?
+Installation type:	PackageView		Tipus d'instal·lació:
+The package you selected has been successfully removed from your system.	UninstallView		El paquet que heu seleccionat s'ha suprimit correctament del sistema.
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Sembla que no hi ha coincidència de mida de fitxer al fitxer del paquets. El paquet podria estar danyat o s'ha modificat després crear-lo. Encara voleu continuar?
+%name% (%size%)	PackageView		%name% (%size%)
+Abort	PackageInstall		Avorta
+The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		El fitxer anomenat "%s" ja existeix al camí indicat.\nVoleu reemplaçar el fitxer pel d'aquest paquet o ometre'l?
+Replace all	PackageView		Reemplaça-ho tot
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		El fitxer de paquet no es pot llegir.\nUna de les possibles raons pot ser que el fitxer sol·licitat no sigui un paquet .pkg vàlid de BeOS.
 Continue	PackageInfo		Continua
+No package selected.	PackageInfo		No hi ha cap paquet seleccionat.
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Error! \"%s\" no és un camí vàlid.\n
+The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		El directori anomenat "%s" ja existeix al camí indicat.\nVoleu reemplaçar el directori pel d'aquest paquet o ometre'l?
+LegacyPackageInstaller	System name		Instal·lador de paquets de llegat
+Ask again	PackageView		Torna-ho a preguntar.
+Begin	PackageView		Comença
 OK	PackageView		D'acord
+Abort	PackageInfo		Avorta
+Done	PackageInstall		Fet
 Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Error (%s)! No ha estat possible obrir \"%s\".\n
+Skip	PackageView		Omet
+Image not loaded correctly	PackageImageViewer		La imatge no s'ha carregat correctament.

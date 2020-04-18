@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Input	486640654
+1	ukrainian	x-vnd.Haiku-Input	2494436940
 Scrolling	TouchpadPrefView		Прокрутка
 Defaults	InputMouse		За замовчуванням
 Tapping	TouchpadPrefView		Дотик
@@ -6,6 +6,8 @@ Long	KeyboardView		Більше
 Normal	SettingsView		Звичайний
 Cancel	TouchpadPrefView		Скасувати
 Slow	TouchpadPrefView		Повільно
+Warp	SettingsView		Фокус
+Instant warp	SettingsView		Негайний фокус
 Device List	InputWindow		Список пристроїв
 Double-click speed	SettingsView		Швидкість подвійного натискання
 Typing test area	KeyboardView		Область перевірки натискання
@@ -25,6 +27,7 @@ Two finger scrolling	TouchpadPrefView		Прокрутка двома пальц�
 Input	System name		Input
 Mouse acceleration	SettingsView		Прискорення миші
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Нова область прокрутки дуже велика і може перешкоджати нормальній роботі миші. Ви дійсно хочете це змінити?
+High	TouchpadPrefView		Висока
 Defaults	TouchpadPrefView		За замовчуванням
 1-Button	SettingsView		1 кнопка
 Short	KeyboardView		Меньше

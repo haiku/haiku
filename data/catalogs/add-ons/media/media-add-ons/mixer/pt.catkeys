@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-mixer.media_addon	154028649
+1	portuguese	x-vnd.Haiku-mixer.media_addon	2089886300
 Input gain controls represent	AudioMixer		Controles de ganho de entrada representam
 Linear interpolation	AudioMixer		Interpolação linear
 Virtual output channels	AudioMixer		Canais de saída virtuais
@@ -16,4 +16,5 @@ dB	AudioMixer		dB
 Gain controls	AudioMixer		Controlos de ganho
 Input mapping	AudioMixer		Mapeamento de entrada
 Mute	AudioMixer		Silenciar
+Setup	AudioMixer		Configurar
 Gain	AudioMixer		Ganho

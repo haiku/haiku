@@ -1,0 +1,55 @@
+1	catalan; valencian	x-vnd.Haiku-Network	3039697761
+Ethernet device	InterfaceListItem		Dispositiu d'Ethernet
+Link speed:	IntefaceView		Velocitat d'enllaç:
+disconnected	IntefaceView		desconnectat
+IP Address:	IntefaceAddressView		Adreça IP:
+WPA	WPA protected network		WPA
+Network:	IntefaceView		Xarxa:
+Received:	IntefaceView		Rebut:
+New…	NetworkWindow		Nou...
+no link	InterfaceListItem		sense enllaç
+Other	NetworkWindow		Altres
+Sent:	IntefaceView		Enviat:
+Gateway:	IntefaceAddressView		Passarel·la:
+The netmask defines your local network	IntefaceAddressView		La màscara de xarxa defineix la xarxa local.
+Your IP address	IntefaceAddressView		La vostra adreça IP
+DHCP	IntefaceAddressView		DHCP
+Netmask:	IntefaceAddressView		Màscara de xarxa:
+EAP	EAP protected network		EAP
+Services	NetworkWindow		Serveis
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Ha fallat la instal·lació de l'estat de xarxa a la barra d'escriptori: %s
+Revert	NetworkWindow		Reverteix
+off	ServiceListItem		inactiu
+WEP	WEP protected network		WEP
+<no wireless networks found>	IntefaceView		<no s'ha trobat cap xarxa sense fil>
+Enable	IntefaceView		Habilita
+connected	IntefaceView		connectat
+Apply	IntefaceAddressView		Aplica-ho
+Disable	ServiceView		Inhabilita
+WPA2	WPA2 protected network		WPA2
+Show network status in Deskbar	NetworkWindow		Mostra l'estat de la xarxa a la barra d'escriptori
+Mode:	IntefaceAddressView		Mode:
+connected	InterfaceListItem		connectat
+OK	NetworkWindow		D'acord
+Static	IntefaceAddressView		Estàtica
+launch error	NetworkWindow		error de llançament
+Renegotiate	IntefaceView		Renegocia
+MAC address:	IntefaceView		Adreça MAC:
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+disabled	InterfaceListItem		inhabilitat
+Dial-up connection	InterfaceListItem		Connexió de marcació
+on	ServiceListItem		actiu
+The method for obtaining an IP address	IntefaceAddressView		El mètode per obtenir una adreça IP.
+disconnected	InterfaceListItem		desconnectat
+Automatic	IntefaceAddressView		Automàtic
+Choose automatically	IntefaceView		Tria-ho automàticament
+Status:	IntefaceView		Estat:
+Disable	IntefaceView		Inhabilita
+Manage…	NetworkWindow		Gestiona...
+open	Open network		obre
+Network	NetworkWindow		Xarxa
+Your gateway to the internet	IntefaceAddressView		La vostra passarel·la a Internet
+Enable	ServiceView		Habilita
+Wireless device	InterfaceListItem		Dispositiu sense fil
+Disabled	IntefaceAddressView		Inhabilitat
+VPN connection	InterfaceListItem		Connexió d'XPV

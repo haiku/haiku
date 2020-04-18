@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	2705631059
+1	finnish	x-vnd.Haiku-HaikuDepot	1826641841
 Repository update error	LocalRepositoryUpdateProcess		Tietovaraston päivitysvirhe
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Tietovaraston päivityksen yhteydessä tapahtui virhe: %error%
 User Created	UserLoginWindow		Käyttäjän luoma
@@ -107,7 +107,6 @@ Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProce
 View the usage conditions	UserLoginWindow		Katso käyttöehtoja
 Size	PackageListView		Koko
 Your rating:	RatePackageWindow		Arvosanasi:
-I am %MinimumAgeYears% years of age or older	UserLoginWindow		Olen iältäni %MinimumAgeYears% vuotias tai vanhempi
 Your rating was updated.	RatePackageWindow		Arvosanasi päivitettiin.
 All categories	FilterView		Kaikki luokat
 Repositories	MainWindow		Tietovarastot

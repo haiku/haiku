@@ -1,2 +1,7 @@
-1	hungarian	x-vnd.Haiku-libpackage	734986035
+1	hungarian	x-vnd.Haiku-libpackage	2012114212
 Failed to remove transaction directory	PackageManagerKit		A tranzakció könyvtárának eltávolítása nem sikerült.
+Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Nem sikerült a beállítások betöltése a gyűjteményhez: \"%s\". Kihagyás.
+Refreshing repository \"%s\" failed	PackageManagerKit		Gyűjtemény frissítése sikertelen: \"%s\"
+Failed to get repository names	PackageManagerKit		Nem sikerült lekérdezni a gyűjtemény neveket.
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Nem sikerült gyorsítótárazni a gyűjteményt: \"%s\". Kihagyás.
+Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		%s-%s nevű csomag nem felel meg az alapcsomag (\"%s\") igényeinek.

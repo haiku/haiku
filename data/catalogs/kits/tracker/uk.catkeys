@@ -177,7 +177,7 @@ Preferences…	ContainerWindow		Налаштування…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Неможливо відкрити \"%document\" бо програма \"%app\" у смітнику. 
 Work Phone	Person Query Columns		Робочий телефон
 Close	ContainerWindow		Закрити
-Get info	ContainerWindow		Отримати інфо
+Get info	ContainerWindow		Дивитись інфо
 MIME Type	AttributesView		Тип MIME
 Show folder location in title tab	SettingsView		Показати розташування папки в заголовку
 There was an error resolving the link.	Tracker		Виникла проблема при відкритті посилання.
@@ -291,7 +291,7 @@ calculating…	InfoWindow		обчислення…
 Preferred for file	OpenWithWindow		Насамперед для файлу
 OK	AutoMounterSettings		ОК
 copying	FSUtils		копіювання
-Get info	FilePanelPriv		Отримати інфо
+Get info	FilePanelPriv		Дивитись інфо
 MIME String	AttributesView		Рядок MIME
 Delete	ContainerWindow		Видалити
 Execute	FilePermissionsView		Виконати

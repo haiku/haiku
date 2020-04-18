@@ -1,6 +1,27 @@
-1	catalan; valencian	x-vnd.Haiku.TV	2671773716
+1	catalan; valencian	x-vnd.Haiku.TV	1995288111
+No menu	MainWin		Sense menú
+No border	MainWin		Sense vora
+force 704 x 576, display aspect 4:3	MainWin		força 704 x 576, aspecte de la pantalla 4:3
+Error, connecting to interface failed:\n\n	MainWin		Ha fallat la connexió a la interfície:\n\n
+force 544 x 576, display aspect 4:3	MainWin		força 544 x 576, aspecte de la pantalla 4:3
+Full screen	MainWin		Pantalla completa
+Scale to native size	MainWin		Escala a la mida nativa
+unknown	MainWin		desconegut
 Next channel	MainWin		Següent canal
+Keep aspect ratio	MainWin		Mantén la relació d'aspecte
+DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
+Always on top	MainWin		Sempre a dalt
+Debug	MainWin		Depuració
+Interface	MainWin		Interfície
+force 720 x 576, display aspect 4:3	MainWin		força 720 x 576, aspecte de pantalla 4:3
+Quit	MainWin		Surt
+Channel	MainWin		Canal
 Previous channel	MainWin		Canal anterior
 OK	MainWin		D'acord
+TV	MainWin		TV
 Settings	MainWin		Paràmetres
+TV	System name		TV
 Settings…	MainWin		Paràmetres…
+None	MainWin		Cap
+Error, interface is busy:\n\n	MainWin		Error, la interfície està ocupada:\n\n
+pixel aspect ratio	MainWin		relació d'aspecte de píxel

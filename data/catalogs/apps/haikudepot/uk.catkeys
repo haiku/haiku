@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	1648314585
+1	ukrainian	x-vnd.Haiku-HaikuDepot	769325367
 Repository update error	LocalRepositoryUpdateProcess		Помилка оновлення репозитарія 
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Під час оновлення репозитарія сталася помилка: %error%
 User Created	UserLoginWindow		Користувача створено
@@ -108,7 +108,6 @@ Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProce
 View the usage conditions	UserLoginWindow		Переглянути Умови користування
 Size	PackageListView		Розмір
 Your rating:	RatePackageWindow		Ваш рейтинг:
-I am %MinimumAgeYears% years of age or older	UserLoginWindow		Мені вже є %MinimumAgeYears% років
 Your rating was updated.	RatePackageWindow		Ваш рейтинг оновлений.
 All categories	FilterView		Всі категорії
 Repositories	MainWindow		Репозитарії

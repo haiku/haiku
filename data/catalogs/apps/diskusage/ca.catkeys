@@ -1,5 +1,7 @@
-1	catalan; valencian	x-vnd.Haiku-DiskUsage	4268917316
+1	catalan; valencian	x-vnd.Haiku-DiskUsage	2951688400
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% a {0, plural, one{# fitxer} other{# fitxers}}
 Scanning %refName%	Scanner		S'està escanejant %refName%
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d fitxers
 Size	Info Window		Mida
 Rescan	Pie View		Torna a escanejar
 Kind	Info Window		Tipus
@@ -16,5 +18,6 @@ Modified	Info Window		Modificat
 Abort	Status View		Anul·la
 Open with	Pie View		Obre amb
 Open	Pie View		Obre
+{0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# fitxer} other{# fitxers}}
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
 Free on %refName%	Scanner		Lliure a %refName%

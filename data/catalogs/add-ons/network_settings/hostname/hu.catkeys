@@ -1,0 +1,5 @@
+1	hungarian	x-vnd.Haiku-Hostname	1423335302
+Hostname settings	HostnameAddOn		Számítógép nevének megadása
+Apply	HostnameView		Alkalmaz
+Hostname settings	HostnameView		Számítógép nevének megadása
+Hostname:	HostnameView		Számítógép neve:
