@@ -171,7 +171,7 @@ public:
 		ConvertFromParent(&parentBounds);
 		bounds = bounds & parentBounds;
 
-		if (bounds.Contains(where) && Window()->IsActive()) {
+		if (bounds.Contains(where) && Window()->IsActive() && !IsHidden()) {
 			BMessage message(MSG_PACKAGE_SELECTED);
 			message.AddString("name", PackageName());
 			Window()->PostMessage(&message);
