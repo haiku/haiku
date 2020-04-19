@@ -65,20 +65,20 @@ if [ IsOptionalHaikuImagePackageAdded BeOSCompatibility ] {
 
 # Development
 if [ IsOptionalHaikuImagePackageAdded Development ] {
-	# autotools and perl
-	AddHaikuImageDisabledPackages autoconf automake perl texinfo ;
+	# autotools
+	AddHaikuImageDisabledPackages autoconf automake texinfo ;
 	AddHaikuImageSourcePackages autoconf automake texinfo ;
 
 	# some other build tools
-	AddHaikuImageDisabledPackages pkgconfig scons ;
+	AddHaikuImageDisabledPackages pkgconfig ;
 	AddHaikuImageSourcePackages pkgconfig ;
 
 	# devel packages for some of the base set
 	local architectureObject ;
 	for architectureObject in [ MultiArchSubDirSetup ] {
 		on $(architectureObject) {
-			AddHaikuImageDisabledPackages curl_devel glu_devel jpeg_devel
-				libpng16_devel zlib_devel ;
+			AddHaikuImageDisabledPackages curl_devel openssl_devel nghttp2_devel
+				libjpeg_turbo_devel libpng16_devel zlib_devel ;
 		}
 	}
 }
@@ -90,8 +90,8 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ] {
 	local architectureObject ;
 	for architectureObject in [ MultiArchSubDirSetup ] {
 		on $(architectureObject) {
-			AddHaikuImageDisabledPackages binutils gcc ;
-			AddHaikuImageSourcePackages binutils gcc ;
+			AddHaikuImageDisabledPackages binutils gcc mpc gmp mpfr ;
+			AddHaikuImageSourcePackages binutils gcc mpc gmp mpfr ;
 		}
 	}
 
@@ -125,7 +125,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ]
 
 # Git
 if [ IsOptionalHaikuImagePackageAdded Git ] {
-	AddHaikuImageSystemPackages git git_daemon ;
+	AddHaikuImageSystemPackages git git_daemon perl ;
 	AddHaikuImageSourcePackages git ;
 }
 
