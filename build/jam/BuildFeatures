@@ -551,8 +551,7 @@ if [ IsPackageAvailable tiff4_devel ] {
 
 
 # openexr
-if [ IsPackageAvailable openexr_devel ]
-	&& [ IsPackageAvailable ilmbase_devel ] {
+if [ IsPackageAvailable openexr_devel ] {
 	ExtractBuildFeatureArchives openexr :
 		file: base openexr
 			runtime: lib
@@ -561,23 +560,6 @@ if [ IsPackageAvailable openexr_devel ]
 			libraries:
 				$(developLibDir)/libIlmImf.so
 				$(developLibDir)/libIlmImfUtil.so
-			headers: $(developHeadersDir) $(developHeadersDir)/OpenEXR
-		;
-
-	EnableBuildFeatures openexr ;
-} else {
-	unavailableBuildFeatures += openexr ;
-}
-
-
-# ilmbase
-if [ IsPackageAvailable ilmbase_devel ] {
-	ExtractBuildFeatureArchives ilmbase :
-		file: base ilmbase
-			runtime: lib
-		file: devel ilmbase_devel
-			depends: base
-			libraries:
 				$(developLibDir)/libHalf.so
 				$(developLibDir)/libIex.so
 				$(developLibDir)/libIexMath.so
@@ -586,9 +568,9 @@ if [ IsPackageAvailable ilmbase_devel ] {
 			headers: $(developHeadersDir) $(developHeadersDir)/OpenEXR
 		;
 
-	EnableBuildFeatures ilmbase ;
+	EnableBuildFeatures openexr ;
 } else {
-	unavailableBuildFeatures += ilmbase ;
+	unavailableBuildFeatures += openexr ;
 }
 
 

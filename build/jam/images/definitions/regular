@@ -124,7 +124,7 @@ SYSTEM_ADD_ONS_ACCELERANTS += [ FFilterByBuildFeatures
 
 SYSTEM_ADD_ONS_TRANSLATORS += [ FFilterByBuildFeatures
 	BMPTranslator
-	EXRTranslator@ilmbase,openexr
+	EXRTranslator@openexr
 	GIFTranslator
 	HVIFTranslator
 	ICOTranslator ICNSTranslator@libicns

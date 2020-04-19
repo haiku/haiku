@@ -8,11 +8,9 @@ local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		UseBuildFeatureHeaders openexr ;
-		UseBuildFeatureHeaders ilmbase ;
 		Includes [ FGristFiles ConfigView.cpp EXRTranslator.cpp EXRGamma.cpp
 			IStreamWrapper.cpp ]
-			: [ BuildFeatureAttribute openexr : headers ]
-			  [ BuildFeatureAttribute ilmbase : headers ] ;
+			: [ BuildFeatureAttribute openexr : headers ] ;
 
 		Translator [ MultiArchDefaultGristFiles EXRTranslator ] :
 			main.cpp
@@ -20,9 +18,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			EXRGamma.cpp
 			EXRTranslator.cpp
 			IStreamWrapper.cpp
-			: be translation textencoding [ TargetLibstdc++ ] 
+			: be translation textencoding [ TargetLibstdc++ ]
 			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
-			[ BuildFeatureAttribute ilmbase : libraries ]
 			[ BuildFeatureAttribute openexr : libraries ]
 			localestub
 			: true

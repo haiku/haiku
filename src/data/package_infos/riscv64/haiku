@@ -97,13 +97,6 @@ requires {
 #ifdef HAIKU_BUILD_FEATURE_RISCV64_LIBWEBP_ENABLED
 	lib:libwebp
 #endif
-#ifdef HAIKU_BUILD_FEATURE_RISCV64_ILMBASE_ENABLED
-	lib:libhalf
-	lib:libiex
-	lib:libiexmath
-	lib:libilmthread
-	lib:libimath
-#endif
 #ifdef HAIKU_BUILD_FEATURE_RISCV64_OPENEXR_ENABLED
 	lib:libilmimf
 	lib:libilmimfutil
