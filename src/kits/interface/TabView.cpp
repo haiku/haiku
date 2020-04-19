@@ -724,11 +724,11 @@ BTabView::MouseDown(BPoint where)
 
 	int32 selection = Selection();
 	int32 numTabs = CountTabs();
-	if (buttons & B_BACK_MOUSE_BUTTON) {
+	if (buttons & B_MOUSE_BUTTON(4)) {
 		// The "back" mouse button moves to previous tab
 		if (selection > 0 && numTabs > 1)
 			Select(Selection() - 1);
-	} else if (buttons & B_FORWARD_MOUSE_BUTTON) {
+	} else if (buttons & B_MOUSE_BUTTON(5)) {
 		// The "forward" mouse button moves to next tab
 		if (selection < numTabs - 1)
 			Select(Selection() + 1);
