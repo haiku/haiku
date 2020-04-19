@@ -1,5 +1,6 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -14,10 +15,12 @@
 
 BitmapView::BitmapView(const char* name)
 	:
-	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
+	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE
+		| B_TRANSPARENT_BACKGROUND),
 	fBitmap(NULL),
 	fScaleBitmap(true)
 {
+	 SetViewColor(B_TRANSPARENT_COLOR);
 }
 
 
@@ -27,17 +30,9 @@ BitmapView::~BitmapView()
 
 
 void
-BitmapView::AllAttached()
-{
-	AdoptParentColors();
-}
-
-
-void
 BitmapView::Draw(BRect updateRect)
 {
 	BRect bounds(Bounds());
-	DrawBackground(bounds, updateRect);
 
 	if (fBitmap == NULL)
 		return;
@@ -165,11 +160,4 @@ BitmapView::SetScaleBitmap(bool scaleBitmap)
 	fScaleBitmap = scaleBitmap;
 
 	Invalidate();
-}
-
-
-void
-BitmapView::DrawBackground(BRect& bounds, BRect updateRect)
-{
-	FillRect(updateRect, B_SOLID_LOW);
 }
