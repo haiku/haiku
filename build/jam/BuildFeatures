@@ -440,11 +440,11 @@ if [ IsPackageAvailable jasper_devel ] {
 
 
 # jpeg
-if [ IsPackageAvailable jpeg_devel ] {
+if [ IsPackageAvailable libjpeg_turbo_devel ] {
 	ExtractBuildFeatureArchives jpeg :
-		file: base jpeg
+		file: base libjpeg_turbo
 			runtime: lib
-		file: devel jpeg_devel
+		file: devel libjpeg_turbo_devel
 			depends: base
 			library: $(developLibDir)/libjpeg.so
 			headers: $(developHeadersDir)
