@@ -6,7 +6,8 @@ set -o errexit
 # outputDir
 # tmpDir
 # addBuildCompatibilityLibDir
-# systemPackages - lists of the hpkg packages copied/updated
+# systemPackages - lists of the hpkg packages copied/updated into /system/packages
+# otherPackages - lists of the hpkg packages copied/updated into other (optional) places
 # repositories - all repository files
 # downloadDir
 # The following are only for image types:
@@ -305,13 +306,29 @@ if [ -n "$resolvePackageDependencies" ]; then
 	packageUrls=`$getPackageDependencies $repositories -- $systemPackages`
 	for packageUrl in $packageUrls; do
 		packageFileName=`basename $packageUrl`
+		if [ "$otherPackages" != "${otherPackages#*$packageFileName}" ]; then
+			echo "ERROR: $packageFileName is a dependency of a package installed in /system/packages," \
+				"but it is in another (i.e. unactivated) package directory!"
+			exit 1
+		fi
 		packageFilePath="$downloadDir/$packageFileName"
 		downloadFile $packageUrl "$packageFilePath"
 		$cp "${sPrefix}$packageFilePath" "${tPrefix}system/packages"
 		systemPackages="$systemPackages $packageFilePath"
 	done
-fi
 
+	# validate dependencies of optional packages
+	packageUrls=`$getPackageDependencies $repositories -- $systemPackages $otherPackages`
+	packageFileNames=""
+	for packageUrl in $packageUrls; do
+		packageFileNames="$packageFileNames `basename $packageUrl`"
+	done
+	if [ ! -z "$packageFileNames" ]; then
+		echo "ERROR: Some of the unactivated (i.e. optional) packages have the following unmet dependencies:"
+		echo $packageFileNames
+		exit 1
+	fi
+fi
 
 # install default settings for packages
 for packageFile in $systemPackages; do

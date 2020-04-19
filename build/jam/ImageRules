@@ -887,13 +887,20 @@ rule AddPackagesAndRepositoryVariablesToContainerScript script : container
 		: $(HAIKU_UPDATE_ALL_PACKAGES) ;
 
 	# Add variable "systemPackages" with the packages copied/updated.
-	local allPackages = [ on $(container) return $(HAIKU_PACKAGES_IN_IMAGE) ] ;
+	local systemPackages = [ on $(container) return $(HAIKU_SYSTEM_PACKAGES_IN_IMAGE) ] ;
 	if $(updateOnly) && ! [ IncludeAllTargetsInContainer $(container) ] {
-		allPackages = [ FilterContainerUpdateTargets $(allPackages)
+		systemPackages = [ FilterContainerUpdateTargets $(systemPackages)
 			: [ on $(container) return $(HAIKU_INCLUDE_IN_CONTAINER_VAR) ] ] ;
 	}
+	AddTargetVariableToScript $(script) : $(systemPackages) : systemPackages ;
 
-	AddTargetVariableToScript $(script) : $(allPackages) : systemPackages ;
+	# Add variable "otherPackages" with the packages copied/updated.
+	local otherPackages = [ on $(container) return $(HAIKU_OTHER_PACKAGES_IN_IMAGE) ] ;
+	if $(updateOnly) && ! [ IncludeAllTargetsInContainer $(container) ] {
+		otherPackages = [ FilterContainerUpdateTargets $(otherPackages)
+			: [ on $(container) return $(HAIKU_INCLUDE_IN_CONTAINER_VAR) ] ] ;
+	}
+	AddTargetVariableToScript $(script) : $(otherPackages) : otherPackages ;
 
 	# Generate the repository package lists and add variables for the
 	# repositories.
@@ -1036,9 +1043,16 @@ rule AddPackageFilesToHaikuImage location : packages : flags
 	#		info
 
 	packages = [ FFilterByBuildFeatures $(packages) ] ;
-	HAIKU_PACKAGES_IN_IMAGE on $(HAIKU_IMAGE_CONTAINER_NAME)
-		= [ on $(HAIKU_IMAGE_CONTAINER_NAME) return $(HAIKU_PACKAGES_IN_IMAGE) ]
-			$(packages) ;
+
+	if $(location[1]) = system && $(location[2]) = packages && ! $(location[3]) {
+		HAIKU_SYSTEM_PACKAGES_IN_IMAGE on $(HAIKU_IMAGE_CONTAINER_NAME)
+			= [ on $(HAIKU_IMAGE_CONTAINER_NAME) return $(HAIKU_SYSTEM_PACKAGES_IN_IMAGE) ]
+				$(packages) ;
+	} else {
+		HAIKU_OTHER_PACKAGES_IN_IMAGE on $(HAIKU_IMAGE_CONTAINER_NAME)
+			= [ on $(HAIKU_IMAGE_CONTAINER_NAME) return $(HAIKU_OTHER_PACKAGES_IN_IMAGE) ]
+				$(packages) ;
+	}
 
 	if nameFromMetaInfo in $(flags) {
 		AddFilesToHaikuImage $(location) : $(packages)
@@ -1570,7 +1584,7 @@ rule BuildCDBootImage image : bootfloppy : bootefi : extrafiles
 	Depends $(image) : $(bootefi) ;
 	Depends $(image) : $(extrafiles) ;
 	BOOTIMG on $(image) = $(bootfloppy) ;
-	
+
 	if $(HAIKU_NIGHTLY_BUILD) = 1 {
 		VOLID on $(image) = haiku-nightly-$(TARGET_ARCH) ;
 	} else {
