@@ -90,7 +90,7 @@ requires {
 	lib:libjpeg
 #endif
 #ifdef HAIKU_BUILD_FEATURE_X86_64_LIBPNG_ENABLED
-	lib:libpng >= 16.0
+	lib:libpng16
 #endif
 #ifdef HAIKU_BUILD_FEATURE_X86_64_TIFF_ENABLED
 	lib:libtiff >= 5.2
