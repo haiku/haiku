@@ -364,8 +364,6 @@ BSecureSocket::Private::_CreateContext()
 	// broken stuff (https://wiki.openssl.org/index.php/SSL/TLS_Client)
 	SSL_CTX_set_cipher_list(sContext, "HIGH:!aNULL:!PSK:!SRP:!MD5:!RC4");
 
-	SSL_CTX_set_ecdh_auto(sContext, 1);
-
 	// Setup certificate verification
 	BPath certificateStore;
 	find_directory(B_SYSTEM_DATA_DIRECTORY, &certificateStore);

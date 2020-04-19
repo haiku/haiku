@@ -124,8 +124,11 @@ BCertificate::Subject() const
 BString
 BCertificate::SignatureAlgorithm() const
 {
-	int algorithmIdentifier = OBJ_obj2nid(
-		fPrivate->fX509->cert_info->key->algor->algorithm);
+	int algorithmIdentifier;
+	if (!X509_get_signature_info(fPrivate->fX509, NULL, &algorithmIdentifier,
+			NULL, NULL)) {
+		return BString("invalid");
+	}
 
 	if (algorithmIdentifier == NID_undef)
 		return BString("undefined");

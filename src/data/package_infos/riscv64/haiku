@@ -109,8 +109,8 @@ requires {
 	lib:libilmimfutil
 #endif
 #ifdef HAIKU_BUILD_FEATURE_RISCV64_OPENSSL_ENABLED
-	lib:libssl >= 1.0.0
-	lib:libcrypto >= 1.0.0
+	lib:libssl
+	lib:libcrypto
 #endif
 #ifdef HAIKU_BUILD_FEATURE_RISCV64_FFMPEG_ENABLED
 	lib:libavcodec >= 58
