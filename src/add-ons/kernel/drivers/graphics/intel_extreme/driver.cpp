@@ -105,6 +105,9 @@ const struct supported_device {
 	{0x0d26, INTEL_MODEL_HASM, "Haswell Mobile"},
 	{0x0a16, INTEL_MODEL_HASM, "Haswell Mobile"},
 
+#if 0
+	// The driver does not make any attempt to handle this modern hardware.
+	// Better let VESA/UEFI do it.
 	{0x0155, INTEL_MODEL_VLV, "ValleyView Desktop"},
 	{0x0f30, INTEL_MODEL_VLVM, "ValleyView Mobile"},
 	{0x0f31, INTEL_MODEL_VLVM, "ValleyView Mobile"},
@@ -129,6 +132,7 @@ const struct supported_device {
 	{0x1926, INTEL_MODEL_SKYM, "Skylake GT3"},
 	{0x192a, INTEL_MODEL_SKYS, "Skylake GT3"},
 	{0x192b, INTEL_MODEL_SKY,  "Skylake GT3"},
+#endif
 };
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
