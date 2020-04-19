@@ -23,11 +23,11 @@ AddHaikuImageSystemPackages [ FFilterByBuildFeatures
 	bash bc coreutils curl freetype icu libsolv zlib zstd
 
 	regular_image @{
-		bzip2 ctags diffutils expat ffmpeg findutils gawk glu grep gutenprint8
-		gzip ilmbase jasper jpeg
-		less libedit libicns libpcap libpng16 libwebp
+		bzip2 diffutils expat ffmpeg findutils gawk glu grep gutenprint8
+		gzip
+		lame less libedit libicns
 		mesa mesa_devel mesa_swpipe@!gcc2 mesa_swrast@gcc2
-		netcat openexr
+		netcat
 		sed sharutils
 		tar tcpdump unzip wget which zip
 	}@
@@ -36,7 +36,7 @@ AddHaikuImageSourcePackages [ FFilterByBuildFeatures
 	bash bc coreutils
 
 	regular_image @{
-		ctags expat ffmpeg findutils gawk grep gutenprint8
+		expat ffmpeg findutils gawk grep gutenprint8
 		gzip
 		less libicns
 		sed sharutils
