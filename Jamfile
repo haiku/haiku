@@ -38,7 +38,7 @@ AddHaikuImageSourcePackages [ FFilterByBuildFeatures
 	regular_image @{
 		expat ffmpeg findutils gawk grep gutenprint8
 		gzip
-		less libicns
+		lame less libicns
 		sed sharutils
 		tar wget which
 	}@

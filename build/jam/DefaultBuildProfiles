@@ -82,8 +82,7 @@ rule DefineDefaultBuildProfiles
 			AddHaikuImageSystemPackages
 				bepdf
 				keymapswitcher
-				llvm
-				man
+				mandoc
 				nano
 				noto
 				noto_sans_cjk_jp
@@ -103,7 +102,6 @@ rule DefineDefaultBuildProfiles
 				;
 			AddHaikuImageSourcePackages
 				bepdf
-				man
 				nano
 				p7zip
 				gcc
@@ -139,7 +137,7 @@ rule DefineDefaultBuildProfiles
 			HAIKU_NIGHTLY_BUILD = 1 ;
 
 			AddHaikuImageSystemPackages
-				man
+				mandoc
 				nano
 				noto
 				openssh
@@ -154,7 +152,6 @@ rule DefineDefaultBuildProfiles
 				gcc2 @{ xz_utils_x86@secondary_x86 }@
 				;
 			AddHaikuImageSourcePackages
-				man
 				nano
 				p7zip
 				gcc
