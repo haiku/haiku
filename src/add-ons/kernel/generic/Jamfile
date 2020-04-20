@@ -6,4 +6,5 @@ SubInclude HAIKU_TOP src add-ons kernel generic dpc ;
 SubInclude HAIKU_TOP src add-ons kernel generic locked_pool ;
 SubInclude HAIKU_TOP src add-ons kernel generic mpu401 ;
 SubInclude HAIKU_TOP src add-ons kernel generic scsi_periph ;
+SubInclude HAIKU_TOP src add-ons kernel generic smbios ;
 SubInclude HAIKU_TOP src add-ons kernel generic tty ;
