@@ -262,7 +262,7 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame,
 	}
 
 	fRatingActiveCheckBox = new BCheckBox("rating active",
-		B_TRANSLATE("Other users can see this rating"),
+		B_TRANSLATE("This rating is visible to other users"),
 		new BMessage(MSG_RATING_ACTIVE_CHANGED));
 	// Hide the check mark by default, it will be made visible when
 	// the user already made a rating and it is loaded
