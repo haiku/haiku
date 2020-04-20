@@ -104,7 +104,6 @@ rule DefineDefaultBuildProfiles
 				bepdf
 				nano
 				p7zip
-				gcc
 				;
 
 			local architectureObject ;
@@ -154,7 +153,6 @@ rule DefineDefaultBuildProfiles
 			AddHaikuImageSourcePackages
 				nano
 				p7zip
-				gcc
 				;
 
 			AddOptionalHaikuImagePackages Development Git ;
