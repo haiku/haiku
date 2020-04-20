@@ -69,7 +69,7 @@ ServerHelper::AlertServerJsonRpcError(BMessage* responseEnvelopeMessage)
 			break;
 		case ERROR_CODE_AUTHORIZATIONFAILURE:
 		case ERROR_CODE_AUTHORIZATIONRULECONFLICT:
-			alertText = B_TRANSLATE("Authorization or security issue.  Logout"
+			alertText = B_TRANSLATE("Authorization or security issue. Logout"
 				" and log back in again to check that your password is correct"
 				" and also check that you have agreed to the latest usage"
 				" conditions.");
@@ -175,8 +175,8 @@ ServerHelper::AlertClientTooOld(BMessage* message)
 
 	alertText.SetToFormat(
 		B_TRANSLATE("This application is too old to communicate with the "
-			" HaikuDepot server system.  Obtain a newer version of HaikuDepot "
-			" by updating your Haiku system.  The minimum version of "
+			" HaikuDepot server system. Obtain a newer version of HaikuDepot "
+			" by updating your Haiku system. The minimum version of "
 			" HaikuDepot required is \"%s\"."), minimumVersion.String());
 
 	BAlert* alert = new BAlert(

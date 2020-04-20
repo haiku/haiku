@@ -1143,15 +1143,15 @@ UserLoginWindow::_CreateAlertTextFromValidationFailure(
 
 	if (property == "nickname" && message == "notunique") {
 		return B_TRANSLATE("The nickname must be unique, but the supplied "
-			"nickname is already taken.  Choose a different nickname.");
+			"nickname is already taken. Choose a different nickname.");
 	}
 
 	if (property == "nickname" && message == "required")
 		return B_TRANSLATE("The nickname is required.");
 
 	if (property == "nickname" && message == "malformed") {
-		return B_TRANSLATE("The nickname is malformed.  The nickname may only "
-			"contain digits and lower case latin characters.  The nickname "
+		return B_TRANSLATE("The nickname is malformed. The nickname may only "
+			"contain digits and lower case latin characters. The nickname "
 			"must be between four and sixteen characters in length.");
 	}
 
@@ -1186,7 +1186,7 @@ UserLoginWindow::_CreateAlertTextFromValidationFailure(
 
 	if (property == "captchaResponse" && message == "captchabadresponse") {
 		return B_TRANSLATE("The supplied response to the captcha is "
-			"incorrect.  A new captcha will be generated; try again.");
+			"incorrect. A new captcha will be generated; try again.");
 	}
 
 	BString result = B_TRANSLATE("An unexpected error '%Message%' has arisen "
@@ -1305,8 +1305,8 @@ UserLoginWindow::_HandleCreateAccountSuccess(
 	const UserCredentials& credentials)
 {
 	BString message = B_TRANSLATE("The user %Nickname% has been successfully "
-		"created in the HaikuDepotServer system.  You can administer your user "
-		"details by using the web interface.  You are now logged-in as this "
+		"created in the HaikuDepotServer system. You can administer your user "
+		"details by using the web interface. You are now logged-in as this "
 		"new user.");
 	message.ReplaceAll("%Nickname%", credentials.Nickname());
 
