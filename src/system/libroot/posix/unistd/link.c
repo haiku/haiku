@@ -34,7 +34,12 @@ readlinkat(int fd, const char *path, char *buffer, size_t bufferSize)
 	if (linkLen < bufferSize)
 		buffer[linkLen] = '\0';
 
-	return linkLen;
+	// _kern_read_link() returns the length of the link, but readlinkat() is
+	// supposed to return the number of bytes placed into buffer. If the
+	// buffer is larger than the link contents, then linkLen is the number
+	// of bytes written to the buffer. Otherwise, bufferSize bytes will have
+	// been written.
+	return min_c(linkLen, bufferSize);
 }
 
 

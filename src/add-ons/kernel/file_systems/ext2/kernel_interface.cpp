@@ -5,6 +5,7 @@
  */
 
 
+#include <algorithm>
 #include <dirent.h>
 #include <util/kernel_cpp.h>
 #include <string.h>
@@ -1298,13 +1299,22 @@ ext2_read_link(fs_volume *_volume, fs_vnode *_node, char *buffer,
 	if (!inode->IsSymLink())
 		return B_BAD_VALUE;
 
-	if (inode->Size() < (off_t)*_bufferSize)
-		*_bufferSize = inode->Size();
+	if (inode->Size() > EXT2_SHORT_SYMLINK_LENGTH) {
+		status_t result = inode->ReadAt(0, reinterpret_cast<uint8*>(buffer),
+			_bufferSize);
+		if (result != B_OK)
+			return result;
+	} else {
+		size_t bytesToCopy = std::min(static_cast<size_t>(inode->Size()),
+			*_bufferSize);
 
-	if (inode->Size() > EXT2_SHORT_SYMLINK_LENGTH)
-		return inode->ReadAt(0, (uint8 *)buffer, _bufferSize);
+		status_t result = user_memcpy(buffer, inode->Node().symlink,
+			bytesToCopy);
+		if (result != B_OK)
+			return result;
+	}
 
-	memcpy(buffer, inode->Node().symlink, *_bufferSize);
+	*_bufferSize = inode->Size();
 	return B_OK;
 }
 

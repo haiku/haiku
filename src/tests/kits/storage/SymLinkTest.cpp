@@ -285,7 +285,7 @@ SymLinkTest::InitTest1()
 		BDirectory pathDir(dirSuperLink);
 		CPPUNIT_ASSERT( pathDir.InitCheck() == B_OK );
 		BSymLink link(&pathDir, "");
-		CPPUNIT_ASSERT( link.InitCheck() == B_OK );
+		CPPUNIT_ASSERT(link.InitCheck() == B_ENTRY_NOT_FOUND);
 	}
 	NextSubTest();
 	{
@@ -467,8 +467,8 @@ SymLinkTest::InitTest2()
 	//
 	NextSubTest();
 	CPPUNIT_ASSERT( pathDir.SetTo(dirSuperLink) == B_OK );
-	CPPUNIT_ASSERT( link.SetTo(&pathDir, "") == B_OK );
-	CPPUNIT_ASSERT( link.InitCheck() == B_OK );
+	CPPUNIT_ASSERT(link.SetTo(&pathDir, "") == B_ENTRY_NOT_FOUND);
+	CPPUNIT_ASSERT(link.InitCheck() == B_ENTRY_NOT_FOUND);
 	//
 	NextSubTest();
 	CPPUNIT_ASSERT( pathDir.SetTo(existingSuperFile) == B_OK );
@@ -556,9 +556,19 @@ SymLinkTest::ReadLinkTest()
 	NextSubTest();
 	char smallBuffer[2];
 	CPPUNIT_ASSERT( link.SetTo(dirLink) == B_OK );
-	CPPUNIT_ASSERT( link.ReadLink(smallBuffer, sizeof(smallBuffer))
-					== (ssize_t)strlen(dirLink) );
-	CPPUNIT_ASSERT( strncmp(smallBuffer, existingDir, sizeof(smallBuffer)) == 0 );
+	ssize_t linkLength = link.ReadLink(smallBuffer, sizeof(smallBuffer));
+	CPPUNIT_ASSERT(linkLength == static_cast<ssize_t>(strlen(existingDir)));
+	CPPUNIT_ASSERT_EQUAL('/', smallBuffer[0]);
+	CPPUNIT_ASSERT_EQUAL('\0', smallBuffer[1]);
+
+	// Invoke with one extra byte of length to ensure that the result is NULL
+	// terminated.
+	NextSubTest();
+	buffer[17] = 'x';
+	CPPUNIT_ASSERT(link.ReadLink(buffer, 18));
+	CPPUNIT_ASSERT_EQUAL('\0', buffer[17]);
+	CPPUNIT_ASSERT_EQUAL(strcmp(buffer, "/tmp/existing-dir"), 0);
+
 	// bad args
 	NextSubTest();
 	CPPUNIT_ASSERT( link.SetTo(fileLink) == B_OK );

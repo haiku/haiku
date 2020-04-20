@@ -576,6 +576,10 @@ netfs_read_link(void *ns, void *_node, char *buffer, size_t *bufferSize)
 	Node* node = (Node*)_node;
 	PRINT("netfs_read_link(%p, %p, %p, %lu)\n", ns, node, buffer,
 		*bufferSize);
+
+	// TODO: If this were to be implemented (which it isn't, it currently just
+	// returns B_BAD_VALUE) then this will need to be changed to return the
+	// length of the node and not the number of bytes read into buffer.
 	status_t error = node->GetVolume()->ReadLink(node, buffer, *bufferSize,
 		bufferSize);
 	PRINT("netfs_read_link() done: (%" B_PRIx32 ", %lu)\n", error,

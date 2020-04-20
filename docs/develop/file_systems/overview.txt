@@ -6,6 +6,38 @@ Filesystem drivers are in src/add-ons/kernel/file_system
 A filesystem usually relies on an underlying block device, but that's not
 required. For example, NFS is a network filesystem, so it doesn't need one.
 
+Implementation notes
+--------------------
+Each filesystem driver must define a few structures which act as the
+interface between the VFS and the filesystem implementation. These
+structures contain function pointers, some of which are optional,
+which should point to functions defined by the implementer that
+perform the appropriate filesystem peration as defined by the
+documentation.
+
+See docs/user/drivers/fs_interface.dox for more detailed documentation
+of this interface.
+
+It's important to note that while there may be some similarities in
+the interface with that of other operations systems, one should not
+make any assumptions about the desired behavior based soley on the
+function prototypes defined in fs_interface.h.
+
+The following is a list of notes calling out some potential mistakes.
+
+# fs_vnode_ops.read_symlink
+
+Defining this function means that the filesystem driver supports
+symbolic links, and the function that f_vnode_ops.read_symlink points
+to should read the contents of a symlink from the specified node.
+
+This may seem similar to the posix function readlink(), but it is
+slightly different. Unlike readlink(), which returns the number of
+bytes copied into the output buffer, fs_vnode_ops.read_symlink is
+expected to always return the length of the symlink contents, even if
+the provided buffer is not large enough to contain the entire symlink
+contents.
+
 Development tools
 -----------------
 

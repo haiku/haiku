@@ -113,10 +113,16 @@
 
 	The string written to the buffer is guaranteed to be \c NULL terminated.
 
+	This function does not return the number of bytes written into
+	the provided buffer. It returns the length of the symlink's
+	contents, even if that contents does not fit within the
+	provided buffer. If the buffer cannot contain the entire
+	contents then it will be truncated to \a size.
+
 	\param buffer The buffer to read the symlink's contents into.
 	\param size The size of \a buffer.
 
-	\return The number of bytes written into the buffer or an error code.
+	\return The length of the symlink's contents or an error code.
 	\retval B_BAD_VALUE \a buf was \c NULL or the object didn't refer to a
 	        symbolic link.
 	\retval B_FILE_ERROR The object was not initialized.

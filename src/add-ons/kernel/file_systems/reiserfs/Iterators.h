@@ -226,6 +226,8 @@ public:
 	uint32 GetObjectID() const { return fItemIterator.GetObjectID(); }
 	uint64 GetOffset() const { return fItemIterator.GetOffset(); }
 
+	off_t StreamSize() const { return fStreamSize; }
+
 	status_t ReadAt(off_t position, void *buffer, size_t bufferSize,
 					size_t *bytesRead);
 

@@ -1592,21 +1592,21 @@ bfs_read_link(fs_volume* _volume, fs_vnode* _node, char* buffer,
 		RETURN_ERROR(B_BAD_VALUE);
 
 	if ((inode->Flags() & INODE_LONG_SYMLINK) != 0) {
-		if ((uint64)inode->Size() < (uint64)*_bufferSize)
-			*_bufferSize = inode->Size();
-
 		status_t status = inode->ReadAt(0, (uint8*)buffer, _bufferSize);
 		if (status < B_OK)
 			RETURN_ERROR(status);
 
+		*_bufferSize = inode->Size();
 		return B_OK;
 	}
 
-	size_t linkLen = strlen(inode->Node().short_symlink);
-	if (linkLen < *_bufferSize)
-		*_bufferSize = linkLen;
+	size_t linkLength = strlen(inode->Node().short_symlink);
 
-	return user_memcpy(buffer, inode->Node().short_symlink, *_bufferSize);
+	size_t bytesToCopy = min_c(linkLength, *_bufferSize);
+
+	*_bufferSize = linkLength;
+
+	return user_memcpy(buffer, inode->Node().short_symlink, bytesToCopy);
 }
 
 

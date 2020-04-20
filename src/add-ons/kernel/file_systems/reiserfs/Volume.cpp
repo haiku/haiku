@@ -406,37 +406,6 @@ Volume::FindDirEntry(VNode *dir, const char *entryName, VNode *foundNode,
 	return error;
 }
 
-// ReadObject
-/*!	\brief Reads data from an object.
-
-	For subsequent reads better use a StreamReader.
-
-	\param node The object to be read from.
-	\param offset The file offset at which to start with reading.
-	\param buffer The buffer into which the data shall be written.
-	\param bufferSize The number of bytes to be read.
-	\param bytesRead Pointer to a size_t to be set to the number of bytes
-		   actually read.
-	\return \c B_OK, if everything went fine.
-*/
-status_t
-Volume::ReadObject(VNode *node, off_t offset, void *buffer, size_t bufferSize,
-				   size_t *bytesRead)
-{
-	status_t error = (node && buffer && bytesRead && offset >= 0
-					  ? B_OK : B_BAD_VALUE);
-	// read files or symlinks only
-	if (error == B_OK && !(node->IsFile() || node->IsSymlink()))
-		error = B_BAD_VALUE;
-	// let a StreamReader do the actual work
-	if (error == B_OK) {
-		StreamReader reader(fTree, node->GetDirID(), node->GetObjectID());
-		error = reader.InitCheck();
-		if (error == B_OK)
-			error = reader.ReadAt(offset, buffer, bufferSize, bytesRead);
-	}
-	return error;
-}
 
 // ReadLink
 /*!	\brief Reads a symlink.
@@ -447,15 +416,30 @@ Volume::ReadObject(VNode *node, off_t offset, void *buffer, size_t bufferSize,
 	\param node The symlink to be read from.
 	\param buffer The buffer into which the data shall be written.
 	\param bufferSize The number of bytes to be read.
-	\param bytesRead Pointer to a size_t to be set to the number of bytes
-		   actually read.
+	\param linkLength Pointer to a size_t to be set to the length of the link.
 	\return \c B_OK, if everything went fine.
 */
 status_t
 Volume::ReadLink(VNode *node, char *buffer, size_t bufferSize,
-				 size_t *bytesRead)
+				 size_t *linkLength)
 {
-	return ReadObject(node, 0, buffer, bufferSize, bytesRead);
+	if (node == NULL || linkLength == NULL)
+		return B_BAD_VALUE;
+
+	if (!node->IsSymlink())
+		return B_BAD_VALUE;
+
+	StreamReader reader(fTree, node->GetDirID(), node->GetObjectID());
+	status_t result = reader.InitCheck();
+	if (result != B_OK)
+		return result;
+
+	size_t bytesCopied = bufferSize;
+	result = reader.ReadAt(0, buffer, bufferSize, &bytesCopied);
+
+	*linkLength = reader.StreamSize();
+
+	return result;
 }
 
 // FindEntry

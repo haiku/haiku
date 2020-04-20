@@ -489,7 +489,17 @@ btrfs_read_link(fs_volume* _volume, fs_vnode* _node, char* buffer,
 	size_t* _bufferSize)
 {
 	Inode* inode = (Inode*)_node->private_node;
-	return inode->ReadAt(0, (uint8*)buffer, _bufferSize);
+
+	if (!inode->IsSymLink())
+		return B_BAD_VALUE;
+
+	status_t result = inode->ReadAt(0, reinterpret_cast<uint8*>(buffer),
+		_bufferSize);
+	if (result != B_OK)
+		return result;
+
+	*_bufferSize = inode->Size();
+	return B_OK;
 }
 
 

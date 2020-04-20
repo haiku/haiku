@@ -1070,19 +1070,28 @@ _kern_read_link(int fd, const char *path, char *buffer, size_t *_bufferSize)
 	if (error != B_OK)
 		return error;
 
-	// readlink
 	ssize_t bytesRead = readlink(realPath.c_str(), buffer, *_bufferSize);
 	if (bytesRead < 0)
 		return errno;
 
-	if (*_bufferSize > 0) {
-		if ((size_t)bytesRead == *_bufferSize)
-			bytesRead--;
-
+	// On Haiku _kern_read_link will return the length of the link, *not*
+	// the number of bytes written to the buffer parameter. To emulate that
+	// here, we use readlink() to read the links contents, and then if it is
+	// possible that the link contents didn't fit in buffer, we'll fall back
+	// to lstat() to get the full length of the link.
+	if (static_cast<size_t>(bytesRead) < *_bufferSize) {
 		buffer[bytesRead] = '\0';
-	}
+		*_bufferSize = bytesRead;
+	} else {
+		// The number of bytes copied by readlink() tells us that the entire
+		// link might not have fit into buffer. Fall back to getting the full
+		// length of the link using lstat.
+		struct stat linkStat;
+		if (lstat(realPath.c_str(), &linkStat) != 0)
+			return errno;
 
-	*_bufferSize = bytesRead;
+		*_bufferSize = linkStat.st_size;
+	}
 
 	return B_OK;
 }

@@ -961,8 +961,8 @@
 	to hold the complete string, only the first \c *_bufferSize bytes of the
 	string shall be written to the buffer; the buffer shall not be
 	null-terminated in this case. Furthermore the variable \a _bufferSize
-	points to shall be set to the length of the string written to the buffer,
-	not including any terminating null character (if written).
+	shall be set to the length of the symlink contents, even if the entire
+	contents did not fit in the provided \a buffer.
 
 	\param volume The volume object.
 	\param link The node object.
@@ -970,8 +970,7 @@
 		written to.
 	\param _bufferSize Pointer to a pre-allocated variable containing the size
 		of the buffer supplied to the function. Upon successful completion the
-		hook shall store the number of bytes actually written into the buffer
-		in the variable.
+		hook shall store the length of the symlink contents.
 	\retval B_OK Everything went fine.
 	\retval B_BAD_VALUE \a link does not identify a symbolic link.
 */

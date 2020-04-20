@@ -94,11 +94,10 @@ BSymLink::ReadLink(char* buffer, size_t size)
 	if (result < B_OK)
 		return result;
 
-	// null-terminate
-	if (linkLen >= size)
-		return B_BUFFER_OVERFLOW;
-
-	buffer[linkLen] = '\0';
+	if (linkLen < size)
+		buffer[linkLen] = '\0';
+	else if (size > 0)
+		buffer[size - 1] = '\0';
 
 	return linkLen;
 }
