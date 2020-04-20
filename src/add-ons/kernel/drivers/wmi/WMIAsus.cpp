@@ -19,6 +19,8 @@
 #define ASUS_WMI_METHODID_DSTS		0x53545344
 #define ASUS_WMI_METHODID_DEVS		0x53564544
 
+
+#define ASUS_WMI_DEVID_ALS_ENABLE		0x00050001
 #define ASUS_WMI_DEVID_BRIGHTNESS		0x00050012
 #define ASUS_WMI_DEVID_KBD_BACKLIGHT	0x00050021
 
@@ -37,12 +39,14 @@ private:
 	static	void				_NotifyHandler(acpi_handle handle,
 									uint32 notify, void *context);
 			void				_Notify(acpi_handle handle, uint32 notify);
+			status_t			_EnableAls(uint32 enable);
 private:
 			device_node*		fNode;
 			wmi_device_interface* wmi;
 			wmi_device			wmi_cookie;
 			uint32				fDstsID;
 			const char*			fEventGuidString;
+			bool				fEnableALS;
 };
 
 
@@ -51,7 +55,8 @@ WMIAsus::WMIAsus(device_node *node)
 	:
 	fNode(node),
 	fDstsID(ASUS_WMI_METHODID_DSTS),
-	fEventGuidString(NULL)
+	fEventGuidString(NULL),
+	fEnableALS(false)
 {
 	CALLED();
 
@@ -77,6 +82,13 @@ WMIAsus::WMIAsus(device_node *node)
 		TRACE("_SFUN: %x\n", value);
 	}
 
+	// some ASUS laptops need to be ALS forced
+	fEnableALS =
+		gSMBios->match_vendor_product("ASUSTeK COMPUTER INC.", "UX430UAR");
+	if (fEnableALS && _EnableAls(1) == B_OK) {
+		TRACE("ALSC enabled\n");
+	}
+
 	// install event handler
 	if (wmi->install_event_handler(wmi_cookie, ACPI_ASUS_WMI_EVENT_GUID,
 		_NotifyHandler, this) == B_OK) {
@@ -87,6 +99,11 @@ WMIAsus::WMIAsus(device_node *node)
 
 WMIAsus::~WMIAsus()
 {
+	// for ALS
+	if (fEnableALS && _EnableAls(0) == B_OK) {
+		TRACE("ALSC disabled\n");
+	}
+
 	if (fEventGuidString != NULL)
 		wmi->remove_event_handler(wmi_cookie, fEventGuidString);
 }
@@ -116,6 +133,14 @@ WMIAsus::_EvaluateMethod(uint32 methodId, uint32 arg0, uint32 arg1,
 		*returnValue = result;
 
 	return B_OK;
+}
+
+
+status_t
+WMIAsus::_EnableAls(uint32 enable)
+{
+	CALLED();
+	return _SetDevState(ASUS_WMI_DEVID_ALS_ENABLE, enable, NULL);
 }
 
 

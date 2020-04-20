@@ -17,6 +17,7 @@
 
 
 device_manager_info *gDeviceManager;
+smbios_module_info *gSMBios;
 
 
 acpi_status wmi_acpi_adr_space_handler(uint32 function,
@@ -453,9 +454,9 @@ wmi_acpi_register_child_devices(void *cookie)
 }
 
 
-
 module_dependency module_dependencies[] = {
 	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&gDeviceManager },
+	{ SMBIOS_MODULE_NAME, (module_info**)&gSMBios },
 	{}
 };
 

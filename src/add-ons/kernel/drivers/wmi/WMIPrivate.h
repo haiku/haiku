@@ -12,6 +12,7 @@
 #include <string.h>
 
 #include <lock.h>
+#include <smbios.h>
 #include <util/AutoLock.h>
 #include <wmi.h>
 
@@ -43,6 +44,7 @@ class WMIDevice;
 
 
 extern device_manager_info *gDeviceManager;
+extern smbios_module_info *gSMBios;
 extern wmi_device_interface gWMIDeviceModule;
 extern driver_module_info gWMIAsusDriverModule;
 
