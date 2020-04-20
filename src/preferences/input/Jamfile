@@ -23,6 +23,7 @@ DoCatalogs Input :
 	:
 	Input.cpp
 	InputDeviceView.cpp
+	InputKeyboard.cpp
 	InputMouse.cpp
 	InputTouchpadPref.cpp
 	InputTouchpadPrefView.cpp
