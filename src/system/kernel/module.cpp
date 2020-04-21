@@ -624,6 +624,11 @@ search_module(const char* name, module_image** _moduleImage)
 
 	TRACE(("search_module(%s)\n", name));
 
+	if (gKernelStartup) {
+		panic("search_module called during kernel startup! name: \"%s\"", name);
+		return NULL;
+	}
+
 	for (i = kNumModulePaths; i-- > 0;) {
 		if (sDisableUserAddOns && i >= kFirstNonSystemModulePath)
 			continue;
