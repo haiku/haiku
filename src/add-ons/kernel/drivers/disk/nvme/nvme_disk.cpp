@@ -389,6 +389,7 @@ static void
 await_status(nvme_disk_driver_info* info, struct nvme_qpair* qpair, status_t& status)
 {
 	ConditionVariableEntry entry;
+	int timeouts = 0;
 	while (status == EINPROGRESS) {
 		info->interrupt.Add(&entry);
 
@@ -397,7 +398,19 @@ await_status(nvme_disk_driver_info* info, struct nvme_qpair* qpair, status_t& st
 		if (status != EINPROGRESS)
 			return;
 
-		entry.Wait();
+		if (entry.Wait(B_RELATIVE_TIMEOUT, 5 * 1000 * 1000) != B_OK) {
+			// This should never happen, as we are woken up on every interrupt
+			// no matter the qpair or transfer within; so if it does occur,
+			// that probably means the controller stalled or something.
+
+			TRACE_ERROR("timed out waiting for interrupt!\n");
+			if (timeouts++ >= 3) {
+				nvme_qpair_fail(qpair);
+				status = B_TIMED_OUT;
+				return;
+			}
+		}
+
 		nvme_qpair_poll(qpair, 0);
 	}
 }
