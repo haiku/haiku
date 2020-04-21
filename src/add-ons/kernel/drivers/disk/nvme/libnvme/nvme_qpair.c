@@ -1037,10 +1037,11 @@ int nvme_qpair_submit_request(struct nvme_qpair *qpair,
 	pthread_mutex_lock(&qpair->lock);
 
 	tr = LIST_FIRST(&qpair->free_tr);
-	if (tr == NULL || !qpair->enabled) {
+	if (tr == NULL || !qpair->enabled || !STAILQ_EMPTY(&qpair->queued_req)) {
 		/*
-		 * No tracker is available, or the qpair is disabled due
-		 * to an in-progress controller-level reset.
+		 * No tracker is available, the qpair is disabled due
+		 * to an in-progress controller-level reset, or
+		 * there are already queued requests.
 		 *
 		 * Put the request on the qpair's request queue to be
 		 * processed when a tracker frees up via a command
@@ -1048,6 +1049,9 @@ int nvme_qpair_submit_request(struct nvme_qpair *qpair,
 		 */
 		STAILQ_INSERT_TAIL(&qpair->queued_req, req, stailq);
 		pthread_mutex_unlock(&qpair->lock);
+
+		if (tr)
+			nvme_qpair_submit_queued_requests(qpair);
 		return 0;
 	}
 
