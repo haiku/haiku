@@ -136,6 +136,8 @@ main(stage2_args *args)
 			// set up kernel args version info
 			gKernelArgs.kernel_args_size = sizeof(kernel_args);
 			gKernelArgs.version = CURRENT_KERNEL_ARGS_VERSION;
+			if (gKernelArgs.ucode_data == NULL)
+				gKernelArgs.kernel_args_size = kernel_args_size_v1;
 
 			// clone the boot_volume KMessage into kernel accessible memory
 			// note, that we need to 8-byte align the buffer and thus allocate
