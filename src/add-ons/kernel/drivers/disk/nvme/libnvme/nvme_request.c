@@ -67,7 +67,7 @@ static void nvme_request_cb_complete_child(void *child_arg,
 	if (parent->child_reqs == 0) {
 		if (parent->cb_fn)
 			parent->cb_fn(parent->cb_arg, &parent->parent_status);
-		nvme_request_free(parent);
+		nvme_request_free_locked(parent);
 	}
 }
 
