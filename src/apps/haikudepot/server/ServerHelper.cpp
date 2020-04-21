@@ -174,9 +174,9 @@ ServerHelper::AlertClientTooOld(BMessage* message)
 		minimumVersion = "???";
 
 	alertText.SetToFormat(
-		B_TRANSLATE("This application is too old to communicate with the "
-			" HaikuDepot server system. Obtain a newer version of HaikuDepot "
-			" by updating your Haiku system. The minimum version of "
+		B_TRANSLATE("This application is too old to communicate with the"
+			" HaikuDepot server system. Obtain a newer version of HaikuDepot"
+			" by updating your Haiku system. The minimum version of"
 			" HaikuDepot required is \"%s\"."), minimumVersion.String());
 
 	BAlert* alert = new BAlert(

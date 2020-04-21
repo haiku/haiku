@@ -251,6 +251,7 @@ DoCatalogs HaikuDepot :
 	App.cpp
 	FeaturedPackagesView.cpp
 	FilterView.cpp
+	LocaleUtils.cpp
 	LocalPkgDataLoadProcess.cpp
 	LocalRepositoryUpdateProcess.cpp
 	MainWindow.cpp
