@@ -408,20 +408,27 @@ done:
 
 	LIST_REMOVE(tr, list);
 	LIST_INSERT_HEAD(&qpair->free_tr, tr, list);
+}
+
+static void nvme_qpair_submit_queued_requests(struct nvme_qpair *qpair)
+{
+	pthread_mutex_lock(&qpair->lock);
 
 	/*
 	 * If the controller is in the middle of a reset, don't
-	 * try to submit queued requests here - let the reset logic
+	 * try to submit queued requests - let the reset logic
 	 * handle that instead.
 	 */
-	if (!STAILQ_EMPTY(&qpair->queued_req) &&
-	    !qpair->ctrlr->resetting) {
-		req = STAILQ_FIRST(&qpair->queued_req);
+	while (!STAILQ_EMPTY(&qpair->queued_req) && !qpair->ctrlr->resetting) {
+		struct nvme_request *req = STAILQ_FIRST(&qpair->queued_req);
 		STAILQ_REMOVE_HEAD(&qpair->queued_req, stailq);
 
 		pthread_mutex_unlock(&qpair->lock);
 		nvme_qpair_submit_request(qpair, req);
+		pthread_mutex_lock(&qpair->lock);
 	}
+
+	pthread_mutex_unlock(&qpair->lock);
 }
 
 static void nvme_qpair_manual_complete_tracker(struct nvme_qpair *qpair,
@@ -1040,6 +1047,7 @@ int nvme_qpair_submit_request(struct nvme_qpair *qpair,
 		 * completion or when the controller reset is completed.
 		 */
 		STAILQ_INSERT_TAIL(&qpair->queued_req, req, stailq);
+		pthread_mutex_unlock(&qpair->lock);
 		return 0;
 	}
 
@@ -1133,6 +1141,9 @@ unsigned int nvme_qpair_poll(struct nvme_qpair *qpair,
 		nvme_mmio_write_4(qpair->cq_hdbl, qpair->cq_head);
 
 	pthread_mutex_unlock(&qpair->lock);
+
+	if (!STAILQ_EMPTY(&qpair->queued_req))
+		nvme_qpair_submit_queued_requests(qpair);
 
 	return num_completions;
 }
