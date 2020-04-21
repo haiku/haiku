@@ -81,10 +81,10 @@ phys_addr_t
 nvme_mem_vtophys(void* vaddr)
 {
 	physical_entry entry;
-	status_t status = get_memory_map((void*)vaddr, 1, &entry, 1);
+	status_t status = get_memory_map((void*)vaddr, 0, &entry, 1);
 	if (status != B_OK) {
-		panic("nvme: get_memory_map failed for %p, error %08" B_PRIx32 "\n",
-			(void*)vaddr, status);
+		panic("nvme: get_memory_map failed for %p: %s\n",
+			(void*)vaddr, strerror(status));
 		return NVME_VTOPHYS_ERROR;
 	}
 
