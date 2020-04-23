@@ -62,9 +62,6 @@ delete_unrhdr(struct unrhdr* idStore)
 
 	mtx_lock(idStore->storeMutex);
 
-	KASSERT(idStore->idBuffer->root_size == 0,
-		("ID-Store: %s: some ids are still in use..", __func__));
-
 	radix_bitmap_destroy(idStore->idBuffer);
 	mtx_unlock(idStore->storeMutex);
 
