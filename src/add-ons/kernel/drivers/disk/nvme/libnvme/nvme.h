@@ -302,6 +302,14 @@ struct nvme_ctrlr_stat {
 	bool			log_pages[256];
 
 	/**
+	 * Whether SGL is supported by the controller.
+	 *
+	 * Note that this does not mean all SGL requests will fail;
+	 * many are convertible into standard (PRP) requests by libnvme.
+	 */
+	bool			sgl_supported;
+
+	/**
 	 * All the features supported.
 	 */
 	bool			features[256];

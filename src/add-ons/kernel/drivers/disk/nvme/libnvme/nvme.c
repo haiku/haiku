@@ -286,6 +286,8 @@ int nvme_ctrlr_stat(struct nvme_ctrlr *ctrlr, struct nvme_ctrlr_stat *cstat)
 	/* Maximum transfer size */
 	cstat->max_xfer_size = ctrlr->max_xfer_size;
 
+	cstat->sgl_supported = (ctrlr->flags & NVME_CTRLR_SGL_SUPPORTED);
+
 	memcpy(&cstat->features, &ctrlr->feature_supported,
 	       sizeof(ctrlr->feature_supported));
 	memcpy(&cstat->log_pages, &ctrlr->log_page_supported,
