@@ -961,6 +961,9 @@ fail:
 
 void nvme_qpair_destroy(struct nvme_qpair *qpair)
 {
+	if (!qpair->ctrlr)
+		return; // Not initialized.
+
 	if (nvme_qpair_is_admin_queue(qpair))
 		_nvme_qpair_admin_qpair_destroy(qpair);
 
@@ -977,6 +980,8 @@ void nvme_qpair_destroy(struct nvme_qpair *qpair)
 		qpair->tr = NULL;
 	}
 	nvme_request_pool_destroy(qpair);
+
+	qpair->ctrlr = NULL;
 
 	pthread_mutex_destroy(&qpair->lock);
 }
