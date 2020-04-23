@@ -13,8 +13,8 @@
 
 #define pthread_mutex_t				mutex
 #undef PTHREAD_MUTEX_INITIALIZER
-#define PTHREAD_MUTEX_INITIALIZER	MUTEX_INITIALIZER(__FILE__)
-#define pthread_mutex_init(mtx, attr) mutex_init(mtx, __FILE__)
+#define PTHREAD_MUTEX_INITIALIZER	MUTEX_INITIALIZER(__FUNCTION__)
+#define pthread_mutex_init(mtx, attr) mutex_init(mtx, __FUNCTION__)
 #define pthread_mutex_destroy		mutex_destroy
 #define pthread_mutex_lock			mutex_lock
 #define pthread_mutex_unlock		mutex_unlock
