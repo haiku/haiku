@@ -819,7 +819,7 @@ extern int nvme_ns_data(struct nvme_ns *ns,
  *
  * @param ns		Namespace handle
  * @param qpair		I/O queue pair handle
- * @param buffer	Data buffer
+ * @param buffer	Physically contiguous data buffer
  * @param lba		Starting LBA to read from
  * @param lba_count	Number of LBAs to read
  * @param cb_fn		Completion callback
@@ -903,7 +903,7 @@ extern int nvme_ns_write_zeroes(struct nvme_ns *ns, struct nvme_qpair *qpair,
  *
  * @param ns		Namespace handle
  * @param qpair		I/O queue pair handle
- * @param buffer	Data buffer
+ * @param buffer	Physically contiguous data buffer
  * @param lba		Starting LBA to read from
  * @param lba_count	Number of LBAs to read
  * @param cb_fn		Completion callback
