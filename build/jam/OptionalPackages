@@ -66,8 +66,8 @@ if [ IsOptionalHaikuImagePackageAdded BeOSCompatibility ] {
 # Development
 if [ IsOptionalHaikuImagePackageAdded Development ] {
 	# autotools
-	AddHaikuImageDisabledPackages autoconf automake texinfo ;
-	AddHaikuImageSourcePackages autoconf automake texinfo ;
+	AddHaikuImageDisabledPackages autoconf automake perl texinfo ;
+	AddHaikuImageSourcePackages autoconf automake perl texinfo ;
 
 	# some other build tools
 	AddHaikuImageDisabledPackages pkgconfig ;
@@ -119,6 +119,8 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ]
 			:
 			nameFromMetaInfo
 			;
+		AddHaikuImageDisabledPackages make mkdepend ;
+		AddHaikuImageSourcePackages make ;
 	}
 }
 
