@@ -121,7 +121,6 @@ SharedLibrary libtestappserver.so :
 	DrawState.cpp
 	$(font_src)
 	GlobalSubpixelSettings.cpp
-	HashTable.cpp
 	IntPoint.cpp
 	IntRect.cpp
 	MultiLocker.cpp
