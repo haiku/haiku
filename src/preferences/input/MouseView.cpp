@@ -36,12 +36,13 @@ static const int32 kMouseDownWidth = 72;
 static const int32 kMouseDownHeight = 35;
 
 #define W kMouseDownWidth / 100
-static const int32 kButtonOffsets[][6] = {
+static const int32 kButtonOffsets[][7] = {
 	{ 0, 100 * W },
 	{ 0, 50 * W, 100 * W },
 	{ 0, 35 * W, 65 * W, 100 * W },
-	{ 0, 27 * W, 54 * W, 81 * W, 100 * W },
-	{ 0, 23 * W, 46 * W, 69 * W, 84 * W, 100 * W }
+	{ 0, 25 * W, 50 * W, 75 * W, 100 * W },
+	{ 0, 20 * W, 40 * W, 60 * W, 80 * W, 100 * W },
+	{ 0, 19 * W, 34 * W, 50 * W, 66 * W, 82 * W, 100 * W }
 };
 #undef W
 
@@ -191,7 +192,7 @@ MouseView::MouseDown(BPoint where)
 		BMessage message(kMsgMouseMap);
 		message.AddInt32("button", button);
 
-		for (int i = 1; i < 6; i++) {
+		for (int i = 1; i < 7; i++) {
 			char tmp[2];
 			sprintf(tmp, "%d", i);
 			menu.AddItem(new BMenuItem(tmp, new BMessage(message)));

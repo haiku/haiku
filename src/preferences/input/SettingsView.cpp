@@ -79,6 +79,7 @@ SettingsView::SettingsView(MouseSettings& settings)
 	fTypeMenu->AddOption(B_TRANSLATE("3-Button"), 3);
 	fTypeMenu->AddOption(B_TRANSLATE("4-Button"), 4);
 	fTypeMenu->AddOption(B_TRANSLATE("5-Button"), 5);
+	fTypeMenu->AddOption(B_TRANSLATE("6-Button"), 6);
 
 	// Create the "Double-click speed slider...
 	fClickSpeedSlider = new BSlider("double_click_speed",
