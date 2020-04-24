@@ -66,8 +66,8 @@ if [ IsOptionalHaikuImagePackageAdded BeOSCompatibility ] {
 # Development
 if [ IsOptionalHaikuImagePackageAdded Development ] {
 	# autotools
-	AddHaikuImageDisabledPackages autoconf automake perl texinfo ;
-	AddHaikuImageSourcePackages autoconf automake perl texinfo ;
+	AddHaikuImageDisabledPackages autoconf automake texinfo ;
+	AddHaikuImageSourcePackages autoconf automake texinfo ;
 
 	# some other build tools
 	AddHaikuImageDisabledPackages pkgconfig ;
