@@ -483,19 +483,22 @@ ViewHWInterface::SetMode(const display_mode& mode)
 		// has not been created either, but we need one to display
 		// a real BWindow in the test environment.
 		// be_app->Run() needs to be called in another thread
-		BApplication* app = new BApplication(
-			"application/x-vnd.Haiku-test-app_server");
-		app->Unlock();
 
-		thread_id appThread = spawn_thread(run_app_thread, "app thread",
-			B_NORMAL_PRIORITY, app);
-		if (appThread >= B_OK)
-			ret = resume_thread(appThread);
-		else
-			ret = appThread;
+		if (be_app == NULL) {
+			BApplication* app = new BApplication(
+				"application/x-vnd.Haiku-test-app_server");
+			app->Unlock();
 
-		if (ret < B_OK)
-			return ret;
+			thread_id appThread = spawn_thread(run_app_thread, "app thread",
+				B_NORMAL_PRIORITY, app);
+			if (appThread >= B_OK)
+				ret = resume_thread(appThread);
+			else
+				ret = appThread;
+
+			if (ret < B_OK)
+				return ret;
+		}
 
 		fWindow = new CardWindow(frame.OffsetToCopy(BPoint(50.0, 50.0)));
 

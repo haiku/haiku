@@ -134,16 +134,16 @@ ScreenManager::AcquireScreens(ScreenOwner* owner, int32* wishList,
 		}
 	}
 
-#if TEST_MODE == 0
 	if (added == 0 && target != NULL) {
 		// there's a specific target screen we want to initialize
 		// TODO: right now we only support remote screens, but we could
 		// also target specific accelerants to support other graphics cards
 		HWInterface* interface;
-		/*if (strncmp(target, "vnc:", 4) == 0)
-			interface = new(nothrow) VNCHWInterface(target);
-		else*/
-			interface = new(nothrow) RemoteHWInterface(target);
+#ifdef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+		interface = new(nothrow) ViewHWInterface();
+#else
+		interface = new(nothrow) RemoteHWInterface(target);
+#endif
 		if (interface != NULL) {
 			screen_item* item = _AddHWInterface(interface);
 			if (item != NULL && list.AddItem(item->screen)) {
@@ -152,7 +152,6 @@ ScreenManager::AcquireScreens(ScreenOwner* owner, int32* wishList,
 			}
 		}
 	}
-#endif // TEST_MODE == 0
 
 	return added > 0 ? B_OK : B_ENTRY_NOT_FOUND;
 }
