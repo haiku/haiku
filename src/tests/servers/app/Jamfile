@@ -46,6 +46,7 @@ SEARCH_SOURCE += $(appServerDir) ;
 SEARCH_SOURCE += [ FDirName $(appServerDir) decorator ] ;
 SEARCH_SOURCE += [ FDirName $(appServerDir) drawing ] ;
 SEARCH_SOURCE += [ FDirName $(appServerDir) drawing Painter ] ;
+SEARCH_SOURCE += [ FDirName $(appServerDir) drawing interface remote ] ;
 SEARCH_SOURCE += [ FDirName $(appServerDir) font ] ;
 
 SharedLibrary libhwinterface.so :
@@ -54,6 +55,14 @@ SharedLibrary libhwinterface.so :
 	HWInterface.cpp
 	RGBColor.cpp
 	UpdateQueue.cpp
+
+	NetReceiver.cpp
+	NetSender.cpp
+	RemoteDrawingEngine.cpp
+	RemoteEventStream.cpp
+	RemoteHWInterface.cpp
+	RemoteMessage.cpp
+	StreamingRingBuffer.cpp
 
 	: # will depend on libtestappserver.so
 ;
@@ -69,6 +78,7 @@ for flag in [ on libhwinterface.so return $(LINKFLAGS) ] {
 	hwinterfaceLinkFlags += $(flag) ;
 }
 LINKFLAGS on libhwinterface.so = $(hwinterfaceLinkFlags) ;
+LINKFLAGS on libhwinterface.so += -lnetwork -lbnetapi ;
 
 # libhwinterfaceimpl.so needs to link against libbe *first*, but simply
 # adding it to the library list would add it to LINKLIBS which is always
