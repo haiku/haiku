@@ -30,7 +30,8 @@
 
 
 // Double brackets to satisfy a compiler warning
-const pattern kCheckered = { { 0xcc, 0xcc, 0x33, 0x33, 0xcc, 0xcc, 0x33, 0x33 } };
+const pattern kCheckered =
+	{ { 0xcc, 0xcc, 0x33, 0x33, 0xcc, 0xcc, 0x33, 0x33 } };
 
 // Get a clever message from fortune
 BString *get_message()
@@ -201,7 +202,8 @@ Message::Draw(BView *view, int32 frame)
 	BFont font;
 	offscreen.GetFont(&font);
 	font.SetFace(B_BOLD_FACE);
-	font.SetFamilyAndStyle(fFontFamilies.ItemAt(rand() % fFontFamilies.CountItems())->val, NULL);
+	font.SetFamilyAndStyle(
+		fFontFamilies.ItemAt(rand() % fFontFamilies.CountItems())->val, NULL);
 	offscreen.SetFont(&font);
 
 	// Get the message
@@ -266,7 +268,8 @@ Message::Draw(BView *view, int32 frame)
 		int longestLine = 0;
 		int32 count = get_lines(origMessage, lines, &longestLine);
 
-		float stringWidth = font.StringWidth(lines.StringAt(longestLine).String());
+		float stringWidth =
+			font.StringWidth(lines.StringAt(longestLine).String());
 		BRect box(0, 0, stringWidth + 20, (lineHeight * count) + 20);
 		box.OffsetTo((width - box.Width()) / 2, height - box.Height() - 40);
 
@@ -292,4 +295,3 @@ Message::Draw(BView *view, int32 frame)
 	view->DrawBitmap(&buffer);
 	buffer.RemoveChild(&offscreen);
 }
-
