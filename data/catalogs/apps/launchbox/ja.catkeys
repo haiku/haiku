@@ -2,7 +2,7 @@
 Set description…	LaunchBox		説明を作成…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		このパッドを閉じてよろしいですか?\n(パッドは記憶されません。)
 OK	LaunchBox		OK
-Ignore double-click	LaunchBox		ダブルクリックを無視する
+Ignore double-click	LaunchBox		ダブルクリックを無視
 Show on all workspaces	LaunchBox		すべてのワークスペースに表示
 Name Panel	LaunchBox		名前パネル
 Autostart	LaunchBox		自動的に起動
@@ -10,7 +10,7 @@ Clone	LaunchBox		複製
 Description for '%3'	LaunchBox		'%3' の説明
 Show window border	LaunchBox		ウィンドウ枠を表示
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nアプリケーション (シグネチャ '%2') の起動に失敗しました。\n\nエラー:
-Failed to launch 'something', error in Pad data.	LaunchBox		'something' の起動に失敗しました。パッドデータ中にエラーがあります。
+Failed to launch 'something', error in Pad data.	LaunchBox		'something' の起動に失敗しました。パッドデータにエラーがあります。
 LaunchBox	System name		ランチャー
 Auto-raise	LaunchBox		自動的に前面へ
 Icon size	LaunchBox		アイコンサイズ

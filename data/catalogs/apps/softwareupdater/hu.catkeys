@@ -1,5 +1,5 @@
-1	hungarian	x-vnd.haiku-softwareupdater	818772601
-Updating version	SoftwareUpdaterWindow	List item text	Verzió frissítése
+1	hungarian	x-vnd.haiku-softwareupdater	510129571
+Updating version	SoftwareUpdaterWindow	List item text	Új verzió: 
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Kattints ide {0, plural, one{# friss csomag} other{# friss csomag}} telepítéséhez.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Eltávolítandó csomagok
 No active network connection was found	UpdateManager	Error message	Nincs aktív hálózati kapcsolat.
@@ -16,18 +16,42 @@ No updates available	UpdateAction		Nincs elérhető frissítés
 New packages to be installed	SoftwareUpdaterWindow	List super item label	Újonnan telepítendő csomagok
 Packages to be updated	SoftwareUpdaterWindow	List super item label	Frissítendő csomagok
 Attempting to cancel the updates…	SoftwareUpdaterWindow		Frissítés megszakítása…
+Contacting software repositories to check for package updates.	CheckManager		Kapcsolódás a tárolókhoz frissítések kereséséhez.
 Available updates found	CheckManager		Frissítések érhetők el
-from repository	SoftwareUpdaterWindow	List item text	tárolóból
+from repository	SoftwareUpdaterWindow	List item text	tároló: 
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Kapcsolódás a tárolókhoz frissítések kereséséhez.
 Cancelling updates	SoftwareUpdaterWindow		Frissítések megszakítása
-Cancel	SoftwareUpdaterWindow	Alert button label	Megszakít
+Cancel	SoftwareUpdaterWindow	Alert button label	Mégse
+There were no updates found.	UpdateAction		Nem találtam frissíteni valót.
+OK	SoftwareUpdaterWindow		Rendben
 The following changes will be made:	SoftwareUpdaterWindow		Elvégzendő változtatások:
+SoftwareUpdater	System name		Frissítéskezelő
+No active network connection was found.\n	CheckManager		Nincs internetkapcsolat.\n
 Applying changes	UpdateManager		Változtatások alkalmazása
+Full sync	SoftwareUpdaterWindow	Alert button label	Teljes szinkronizálás
 Quit	SoftwareUpdaterWindow	Button label	Kilépés
+Updates have been successfully installed.	UpdateManager		Sikeresen befejeződött a frissítés.
+Exception occurred while updating packages : %s\n	UpdateAction		Hiba történt a csomag frissítése közben: %s\n
+A reboot is necessary to complete the update process.	UpdateManager		Újraindítás szükséges a frissítés befejezéséhez.
+Exception occurred while checking for updates: %s\n	CheckAction		Hiba történt a frissítések ellenőrzésekor: %s\n
 Packages are being updated	UpdateManager		Frissítendő csomagok
-Cancel	SoftwareUpdaterWindow		Megszakít
+Cancel	SoftwareUpdaterWindow		Mégse
+Don't quit	SoftwareUpdaterWindow		Ne lépjen ki
 Checking for updates	SoftwareUpdaterWindow		Frissítések keresése
+Updates completed	UpdateManager		Sikeres frissítés
+Reboot	SoftwareUpdaterWindow		Újraindítás
+Show more details	SoftwareUpdaterWindow		Részletek
+Installing version	SoftwareUpdaterWindow	List item text	Telepítendő verzió: 
 Checking for updates	CheckManager		Frissítések ellenörzése
 No remote repositories are available	UpdateManager	Error message	Egyetlen távoli tároló sem érhető el
+Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, one{frissítés} other{frissítés}} elérhető
+Reboot	SoftwareUpdaterWindow	Button label	Újraindítás
+Update	SoftwareUpdaterWindow	Alert button label	Frissítés
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Tároló megnyitása
 Updates did not complete	UpdateAction		Frissítés nem fejeződött be
+Invalid update type, cannot continue with updates	UpdateAction		Érvénytelen frissítés, nem folytatható tovább
+Uninstalling version	SoftwareUpdaterWindow	List item text	Eltávolítandó verzió: 
+%i of %i	UpdateManager	Do not translate %i	%i / %i
 Quit	SoftwareUpdaterWindow		Kilépés
+No updates available	CheckManager		Nincs elérhető frissítés
 Downloading packages	UpdateManager		Csomagok letöltése

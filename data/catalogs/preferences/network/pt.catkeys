@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-Network	3039697761
+1	portuguese	x-vnd.Haiku-Network	115295218
 Ethernet device	InterfaceListItem		Dispositivo Ethernet
 Link speed:	IntefaceView		Velocidade de ligação:
 disconnected	IntefaceView		desligado
@@ -17,7 +17,7 @@ DHCP	IntefaceAddressView		DHCP
 Netmask:	IntefaceAddressView		Máscara de sub-rede:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Serviços
-Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		A instalação do NetworkStatus na Deskbar falhou: %s
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		A instalação do Estado da Rede na Deskbar falhou: %s
 Revert	NetworkWindow		Reverter
 off	ServiceListItem		desligado
 WEP	WEP protected network		WEP
@@ -47,7 +47,6 @@ Status:	IntefaceView		Estado:
 Disable	IntefaceView		Desativar
 Manage…	NetworkWindow		Gerir…
 open	Open network		aberto
-Network	NetworkWindow		Rede
 Your gateway to the internet	IntefaceAddressView		A sua porta de ligação à Internet
 Enable	ServiceView		Ativar
 Wireless device	InterfaceListItem		Dispositivo sem fios

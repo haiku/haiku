@@ -31,8 +31,8 @@ High	TouchpadPrefView		Alta
 Defaults	TouchpadPrefView		Predefinições
 1-Button	SettingsView		1 Botão
 Short	KeyboardView		Curto
-Revert	InputMouse		Reverter
 Slow	KeyboardView		Lenta
+Revert	InputMouse		Reverter
 Key repeat rate	KeyboardView		Taxa de repetição de tecla
 2-Button	SettingsView		2 Botões
 Click to focus and raise	SettingsView		Clique para adquirir foco e ativar

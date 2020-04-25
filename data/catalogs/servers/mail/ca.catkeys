@@ -1,16 +1,19 @@
-1	catalan; valencian	x-vnd.Be-POST	825141276
+1	catalan; valencian	x-vnd.Be-POST	2949558073
 No new messages	MailDaemon		No hi ha missatges nous
 No new messages	DeskbarView		No hi ha cap missatge nou
 Shutdown mail services	DeskbarView		Atura els serveis del correu
 Mail status	MailDaemon		Estat del correu
-Fetching mail for %name	Notifier		S'està recollint el correu per a %name
+Fetching mail for %name	Notifier		S'obté el correu per a %name
+{0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# missatge nou} other{# missatges nous}}
+{0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# missatge nou} other{# missatges nous}} per a %name\n
 Create new message…	DeskbarView		Missatge nou...
-Send pending mails	DeskbarView		S'estàn enviant els correus pendents
+Send pending mails	DeskbarView		Envia els missatges pendents
 Settings…	DeskbarView		Paràmetres...
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Un missatge nou} other{# missatges nous}}
 New Messages	MailDaemon		Missatges nous
 <no accounts>	DeskbarView		<no hi ha cap compte>
 Mail status	Notifier		Estat del correu
 Check for mails only	DeskbarView		Comprova només si hi ha correu
 Check for mail now	DeskbarView		Comprova ara si hi ha correu
-Sending mail for %name	Notifier		S'està enviat un missatge per a %name
+Sending mail for %name	Notifier		S'envia un missatge per a %name
 Mail daemon status log	MailDaemon		Registre de l'estat del dimoni de correu

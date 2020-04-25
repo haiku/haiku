@@ -2,4 +2,4 @@
 Warning	NotificationWindow		Advertiment
 Notification	NotificationWindow		Avís
 OK	NotificationWindow		D'acord
-Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		No ha estat possible iniciar la configuració general del monitor.\nS'han desactivat els canvis del filtre en temps real.
+Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		No s'ha pogut iniciar la configuració general del monitor.\nS'han inhabilitat els canvis del filtre en temps real.

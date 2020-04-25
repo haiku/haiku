@@ -1,7 +1,7 @@
 1	japanese	x-vnd.Haiku-TGATranslator	3075011211
 Save with RLE compression	TGAView		保存時に RLE 圧縮を行う
 Targa image (%d bits truecolor)	TGATranslator		Targa イメージ (%d ビット トゥルーカラー)
-Ignore TGA alpha channel	TGAView		TGA のαチャンネルを無視する
+Ignore TGA alpha channel	TGAView		TGA のαチャンネルを無視
 Targa image (%d bits colormap)	TGATranslator		Targa イメージ (%d ビット カラーマップ)
 TGA image translator	TGAView		TGA イメージトランスレーター
 Targa image (%d bits RLE colormap)	TGATranslator		Targa イメージ (%d ビット RLE カラーマップ)

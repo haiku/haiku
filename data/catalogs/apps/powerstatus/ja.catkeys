@@ -39,7 +39,7 @@ Design capacity warning: 	PowerStatus		設計容量警告:
 Quit	PowerStatus		終了
 rechargeable	PowerStatus		再充電可能
 charging	PowerStatus		充電中
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		PowerStatus をウィンドウモードで起動することや、 Deskbar 中にインストールすることができます。
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		PowerStatus をウィンドウモードで起動することや、 Deskbar にインストールすることができます。
 Show status icon	PowerStatus		状態アイコンを表示
 Capacity granularity 2: 	PowerStatus		容量精度 2:
 Technology: 	PowerStatus		テクノロジー:

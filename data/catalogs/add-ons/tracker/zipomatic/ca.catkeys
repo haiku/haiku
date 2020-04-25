@@ -5,7 +5,7 @@ Do you want to stop them?	file:ZipOMatic.cpp		Voleu aturar-los?
 Error creating archive	file:ZipOMaticWindow.cpp		S'ha produït un error en crear l'arxiu
 Stop them	file:ZipOMatic.cpp		Atura'ls
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Esteu segur que no voleu generar aquest fitxer?
-Preparing to archive	file:ZipperThread.cpp		S'està preparant per arxivar-ho
+Preparing to archive	file:ZipperThread.cpp		Es prepara l'arxivament
 Let them continue	file:ZipOMatic.cpp		Deixa que continuïn
 Continue	file:ZipOMaticWindow.cpp		Continua
 Archive created OK	file:ZipOMaticWindow.cpp		L'arxiu s'ha generat correctament
@@ -13,5 +13,5 @@ Archive created OK	file:ZipOMaticWindow.cpp		L'arxiu s'ha generat correctament
 Stop	file:ZipOMaticWindow.cpp		Atura
 Stopped	file:ZipOMaticWindow.cpp		Aturat
 Archive	file:ZipperThread.cpp		Arxiva
-Creating archive: %s	file:ZipOMaticWindow.cpp		S'està creant l'arxiu: %s
+Creating archive: %s	file:ZipOMaticWindow.cpp		Es crea l'arxiu: %s
 You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Teniu {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} en execució.\n\n

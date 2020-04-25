@@ -1,7 +1,7 @@
 1	turkish	x-vnd.Haiku-Keymap	1075970008
 Key	Modifier keys window	As in a computer keyboard key	Düğme
 Japanese	KeymapNames		Japonca
-US	KeymapNames		Birleşik Devletler
+US	KeymapNames		ABD
 PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Brezilya
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
@@ -18,7 +18,7 @@ DEL	Keyboard Layout View		DEL
 United-Kingdom	KeymapNames		Birleşik Krallık
 Turkish (Type-F)	KeymapNames		Türkçe (F)
 Serbian (Cyrillic)	KeymapNames		Sırpça (Kiril)
-Belgian (point)	KeymapNames		Belçika (nokta)
+Belgian (point)	KeymapNames		Flamanca (nokta)
 Finnish	KeymapNames		Fince
 Num lock	Keyboard Layout View		Num lock
 Switch shortcut keys to Windows/Linux mode	Keymap window		Kısayol düğmelerini Windows/Linux kipine geçir
@@ -37,7 +37,7 @@ PRINT	Keyboard Layout View		PRINT
 German (Mac)	KeymapNames		Almanca (Mac)
 Arabic (102)	KeymapNames		Arapça (102)
 ThinkPad	KeyboardLayoutNames		ThinkPad
-Belarusian (Mac)	KeymapNames		Belarusça (Mac)
+Belarusian (Mac)	KeymapNames		Beyaz Rusça (Mac)
 Croatian	KeymapNames		Hırvatça
 PAGE ↑	Keyboard Layout View		PAGE ↑
 Set modifier keys	Modifier keys window		Değiştiren düğmeleri ayarla
@@ -86,7 +86,7 @@ Friulian	KeymapNames		Furlanca
 Left option	Keyboard Layout View		Sol Alt
 END	Keyboard Layout View		END
 Esperanto	KeymapNames		Esperanto
-Belarusian	KeymapNames		Belarusça
+Belarusian	KeymapNames		Beyaz Rusça
 Warning: left and right key roles do not match	Modifier keys window		Uyarı: Sol ve sağ düğme rolleri eşleşmiyor
 Circumflex trigger	Keymap window		Düzeltme imi tetikleyicisi
 Caps lock	Keyboard Layout View		Caps lock
@@ -113,7 +113,7 @@ Select dead keys	Keymap window		Ölü düğmeleri seç
 Russian (Mac)	KeymapNames		Rusça (Mac)
 Right shift	Keyboard Layout View		Sağ Shift
 ESC	Keyboard Layout View		ESC
-Belarusian (Latin)	KeymapNames		Belarusça (Latin)
+Belarusian (Latin)	KeymapNames		Beyaz Rusça (Latin)
 Hebrew	KeymapNames		İbranca
 Layout	Keymap window		Dizilim
 Greek	KeymapNames		Yunanca
@@ -121,7 +121,7 @@ Revert	Keymap window		Eski haline döndür
 CTRL	Keyboard Layout View	Very short for 'control'	CTRL
 Grave trigger	Keymap window		Aksan imi tetikleyicisi
 Menu	Keyboard Layout View	Menu key	Menü
-Faeroese	KeymapNames		Faroe Dili
+Faeroese	KeymapNames		Faroece
 Quit	Keymap window		Çık
 Polish (Typewriter)	KeymapNames		Lehçe (Daktilo)
 French (Mac)	KeymapNames		Fransızca (Mac)
@@ -149,7 +149,7 @@ Switch shortcut keys	Keymap window		Kısayol düğmelerini değiştir
 Right command	Keyboard Layout View		Sağ Command
 NUM LOCK	Keyboard Layout View		NUM LOCK
 MENU	Keyboard Layout View		MENU
-Belgian (comma)	KeymapNames		Belçika (virgül)
+Belgian (comma)	KeymapNames		Flamanca (virgül)
 Norwegian	KeymapNames		Norveççe
 Font	Keymap window		Yazıtipi
 Danish	KeymapNames		Danca
@@ -166,7 +166,7 @@ File	Keymap window		Dosya
 Brazilian (ABNT2)	KeymapNames		Brezilya (ABNT2)
 INS	Keyboard Layout View		INS
 OPTION	Keyboard Layout View		OPTION
-Dutch	KeymapNames		Flemenkçe
+Dutch	KeymapNames		Hollandaca
 Diaeresis trigger	Keymap window		Tını imi tetikleyicisi
 Icelandic	KeymapNames		İzlandaca
 Open…	Keymap window		Aç…

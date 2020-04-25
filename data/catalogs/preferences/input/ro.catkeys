@@ -1,0 +1,46 @@
+1	romanian	x-vnd.Haiku-Input	2494436940
+Scrolling	TouchpadPrefView		Se derulează
+Defaults	InputMouse		Implicite
+Tapping	TouchpadPrefView		Apăsare
+Long	KeyboardView		Lung
+Normal	SettingsView		Normal
+Cancel	TouchpadPrefView		Anulează
+Slow	TouchpadPrefView		Încet
+Warp	SettingsView		Deviere
+Instant warp	SettingsView		Deviere instantă
+Device List	InputWindow		Listă de dispozitive
+Double-click speed	SettingsView		Viteză de clic dublu
+Typing test area	KeyboardView		Zonă de testare de tastare
+Mouse type:	SettingsView		Tip de maus:
+Fast	KeyboardView		Rapid
+Off	TouchpadPrefView		Oprit
+Fast	TouchpadPrefView		Rapid
+Please confirm	TouchpadPrefView		Confirmați
+Click to focus	SettingsView		Dați clic pentru a focaliza
+Acceleration	TouchpadPrefView		Accelerare
+Mouse speed	SettingsView		Viteză maus
+Accept first click	SettingsView		Acceptă primul clic
+OK	TouchpadPrefView		OK
+Horizontal scrolling	TouchpadPrefView		Derulare orizontală
+Delay until key repeat	KeyboardView		Amânare până la repetarea tastei
+Two finger scrolling	TouchpadPrefView		Derulare cu două degete
+Input	System name		Intrare
+Mouse acceleration	SettingsView		Accelerare maus
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Noua zonă de derulare este foarte mare și poate să împiedice operația normală a mausului. Sigur doriți să o modificați?
+High	TouchpadPrefView		Înalt
+Defaults	TouchpadPrefView		Implicite
+1-Button	SettingsView		1-Buton
+Short	KeyboardView		Scund
+Slow	KeyboardView		Încet
+Revert	InputMouse		Revenire
+Key repeat rate	KeyboardView		Rata de repetiție a tastei
+2-Button	SettingsView		2-Buton
+Click to focus and raise	SettingsView		Dați clic pentru a focaliza și a înălța
+Vertical	TouchpadPrefView		Vertical
+Horizontal	TouchpadPrefView		Orizontal
+Focus mode:	SettingsView		Mod de focalizare:
+Focus follows mouse	SettingsView		Focalizarea urmărește mausul
+Double-click test area	SettingsView		Zonă de testare a clicului dublu
+Sensitivity	TouchpadPrefView		Senzitivitate
+3-Button	SettingsView		3-Buton
+Revert	TouchpadPrefView		Revenire

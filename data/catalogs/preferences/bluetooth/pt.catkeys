@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-BluetoothPrefs	671611674
+1	portuguese	x-vnd.Haiku-BluetoothPrefs	4276705900
 Laptop	Settings view		Portátil
 Only from trusted devices	Settings view		Apenas de dispositivos de confiança
 15 secs	Settings view		15 seg.
@@ -17,20 +17,28 @@ Stop bluetooth services…	Window		Parar serviços bluetooth…
 Add…	Remote devices		Adicionar…
 As blocked	Remote devices		Como bloqueados
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Não existe nenhum Bluetooth LocalDevice registado no sistema.
+Policy…	Settings view		Política…
 Revert	Window		Reverter
+Refresh local devices…	Window		Atualizar dispositivos locais…
 Disconnect	Remote devices		Desligar
+Identify us as…	Settings view		Identificar-nos como…
 From all devices	Settings view		Todos os dispositivos
 Defaults	Window		Predefinições
 Start bluetooth services…	Window		Iniciar serviços bluetooth…
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Verifique se a funcionalidade Bluetooth do seu dispositivo remoto está ativada. Clique em "Procurar" para iniciar a busca. O tempo necessário para a obtenção dos nomes é desconhecido, embora não deve demorar mais do que 3 segundos por dispositivo. Seguidamente terá a possibilidade de os adicionar à sua lista principal, a partir da qual os poderá emparelhar.
 Scanning progress	Inquiry panel		Progresso da pesquisa
 Bluetooth	System name		Bluetooth
 Launch now	main		Iniciar agora
 Remove	Remote devices		Remover
+Pick device…	Settings view		Escolher dispositivo…
 Always ask	Settings view		Perguntar sempre
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Com o apoio de:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nAgradecemos às pessoas que ajudaram…\n\nEnviando/doando hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomicamente:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nCom correções:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nRealizando testes:\n - Petter H. Juliussen\nAs pessoas que me deram todo o conhecimento:\n - a equipa da yellowTAB
 Help	Window		Ajuda
 Pair…	Remote devices		Emparelhar…
-Inquiry	Inquiry panel		Consulta
+Retrieving name of %1	Inquiry panel		A obter o nome de %1
+Inquiry	Inquiry panel		Procurar
 Incoming connections policy:	Settings view		Política de ligações de entrada:
+Retrieving names…	Inquiry panel		A obter nomes…
 Show name	Extended local device view		Mostrar nome
 Add device to list	Inquiry panel		Adicionar dispositivo à lista
 Remaining %1 seconds	Inquiry panel		Faltam %1 segundos
@@ -39,7 +47,9 @@ Discoverable	Extended local device view		Detectável
 Authenticate	Extended local device view		Autenticar
 Smart phone	Settings view		Smart phone
 Scanning completed.	Inquiry panel		Pesquisa completa.
-Default inquiry time:	Settings view		Tempo de consulta predefinido:
+Default inquiry time:	Settings view		Tempo de procura predefinido:
 Server	Settings view		Servidor
 Handheld	Settings view		Computador de Bolso
+ packets: 	Device View		 pacotes: 
 About Bluetooth…	Window		Sobre o Bluetooth…
+Starting scan…	Inquiry panel		A iniciar busca…

@@ -1,9 +1,10 @@
-1	dutch; flemish	x-vnd.Haiku-mount_server	819316177
+1	dutch; flemish	x-vnd.Haiku-mount_server	2818767263
 Mount read-only	AutoMounter		Betrek alleen-lezen
 Error mounting volume:\n\n%s	AutoMounter		Fout bij betrekken van gegevensdrager:\n\n%s
 Cancel	AutoMounter		Annuleren
 OK	AutoMounter		Oké
 Unmount error	AutoMounter		Fout bij het onttrekken
+The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		Het bestandssysteem van dit volume is niet het Be-bestandssysteem. Het wordt aangeraden om dit volume als alleen-lezen te betrekken, om onbedoeld dataverlies vanwege fouten in Haiku te voorkomen.
 Mount read/write	AutoMounter		Betrek lezen/schrijven
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		De schijf \"%s\" kon niet worden onttrokken:\n\t%s
 Mounting volume '%s'\n\n	AutoMounter		Betrekken van de gegevensdrager: '%s'\n\n

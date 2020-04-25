@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	769325367
+1	ukrainian	x-vnd.Haiku-HaikuDepot	3586526058
 Repository update error	LocalRepositoryUpdateProcess		Помилка оновлення репозитарія 
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Під час оновлення репозитарія сталася помилка: %error%
 User Created	UserLoginWindow		Користувача створено
@@ -47,9 +47,7 @@ Category	FilterView		Категорія
 User rating	RatePackageWindow		Рейтинг користувача
 Installed packages	MainWindow		Встановлені пакети
 A requested object or an object involved in the request was not found on the server.	ServerHelper		На сервері не знайдено потрібний об'єкт або об'єкт, що міститься у запиті.
-Other users can see this rating	RatePackageWindow		Інші користувачі можуть побачити цю оцінку
 Stable	RatePackageWindow		Стабільний
-This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		Програма застаріла і не може працювати з сервером HaikuDepot. Оновіть HaikuDepot шляхом оновлення системи Haiku. Потрібна версія HaikuDepot, не старіша за \"%s\".
 Fatal error	PackageManager		Критична помилка
 Package action failed	PackageInfoView		Роботу пакету призупинено
 No changelog available.	PackageInfoView		Історія змін недоступна
@@ -79,9 +77,7 @@ Very unstable	RatePackageWindow		Дуже нестабільний
 Password:	UserLoginWindow		Пароль:
 All packages	PackageListView		Всі пакети
 Network Transport Error	ServerHelper		Помилка мережевого транспорта
-Authorization or security issue.  Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Питання авторизаціі або безпеки.   Вийдіть із системи та увійдіть знову, щоб перевірити правильність вашого пароля, а також перевірити, чи погодились Ви з останніми умовами використання.
 Stability	RatePackageWindow		Стабільність
-The nickname must be unique, but the supplied nickname is already taken.  Choose a different nickname.	UserLoginWindow		Псевдонім повинен бути унікальним, вибраний вами вже кимось взятий. Виберіть інший.
 Send	RatePackageWindow		Надіслати
 Start package daemon	App		Запустити демон пакетів
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Пароль потрібно повторити, щоб зменшити ймовірність неправильного введення пароля.
@@ -106,6 +102,7 @@ Close	UserLoginWindow		Закрити
 Close	RatePackageWindow		Закрити
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Синхронізую дані пакета з репозитарієм '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Переглянути Умови користування
+Login issue	MainWindow		Проблема з логуванням
 Size	PackageListView		Розмір
 Your rating:	RatePackageWindow		Ваш рейтинг:
 Your rating was updated.	RatePackageWindow		Ваш рейтинг оновлений.
@@ -125,13 +122,13 @@ Log out	MainWindow		Вийти з системи
 Comment language:	RatePackageWindow		Мова коментарів:
 Status	PackageListView		Стан
 The password has been incorrectly repeated.	UserLoginWindow		Пароль був повторений неправильно.
+The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Пароль, раніше наданий для користувача [%Nickname%], наразі не дійсний. Користувачеві треба завершити сеанс з цією програмою та знову увійти в систему з оновленим паролем.
 Update	RatePackageWindow		Обновити
 OK	ServerHelper		ОК
 Language	UserLoginWindow		Мова
 OK	UserLoginWindow		ОК
 Reading repository data	LocalPkgDataLoadProcess		Отримую дані репозитарію
-Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Синхронізую вихідні дані з сервером
-The nickname is malformed.  The nickname may only contain digits and lower case latin characters.  The nickname must be between four and sixteen characters in length.	UserLoginWindow		Псевдонім сформований невірно.  Він може містити лише цифри та малі латинські символи.  Псевдонім повинен бути довжиною від 4 до 16 символів.
+Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Синхронізація довідкових даних з сервером
 Stability:	RatePackageWindow		Стабільність:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Угода про використання має бути узгоджена та має бути підтверджено, що особа, яка створює користувача, відповідає вимогам мінімального віку.
 A validation error has occurred	ServerHelper		Сталася помилка перевірки достовірності
@@ -155,9 +152,7 @@ Quit	App		Вийти
 Search terms:	FilterView		Умови пошуку:
 Pending…	PackageListView		Очікування…
 Category:	FilterView		Категорія:
-The user %Nickname% has been successfully created in the HaikuDepotServer system.  You can administer your user details by using the web interface.  You are now logged-in as this new user.	UserLoginWindow		Користувача %Nickname% успішно створено в системі HaikuDepotServer.  Ви можете адмініструвати свої дані користувача за допомогою веб-інтерфейсу.  Тепер ви зареєстровані як новий користувач.
 Authentication failed	UserLoginWindow		Авторизацію призупинено
-The supplied response to the captcha is incorrect.  A new captcha will be generated; try again.	UserLoginWindow		Надана відповідь на капчу неправильна.  Буде створена нова капча; спробуйте ще раз.
 Captcha error	UserLoginWindow		Помилкова капча
 Manage repositories…	MainWindow		Управління репозитаріями…
 Fetching remote repository data	LocalRepositoryUpdateProcess		Отримання даних з віддаленого репозитарія

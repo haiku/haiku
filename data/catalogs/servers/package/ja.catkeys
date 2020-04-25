@@ -9,8 +9,8 @@ Package daemon	PackageManager		パッケージデーモン
 install package %s from repository %s\n	PackageResult	Don't change '%s' variables	パッケージ %s をリポジトリ %s からインストール\n
 The following additional package changes have to be made:	PackageResult		以下の追加パッケージの変更が必要です:
 Warning	PackageManager		警告
-Cancel	PackageProblem		キャンセル
+Cancel	PackageProblem		中止
 don't activate package %source%	PackageProblem	don't change '%source%	パッケージ %source% を有効にしないでください
-Cancel	PackageResult		キャンセル
+Cancel	PackageResult		中止
 Retry	PackageProblem		再試行
 Package problems	PackageProblem	Window title	パッケージの問題

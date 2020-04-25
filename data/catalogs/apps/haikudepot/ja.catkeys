@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	769325367
+1	japanese	x-vnd.Haiku-HaikuDepot	3586526058
 Repository update error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
 User Created	UserLoginWindow		作成されたユーザー
@@ -19,7 +19,7 @@ You have successfully authenticated as user %Nickname%.	UserLoginWindow		ユー�
 <no info>	PackageInfoView		<情報無し>
 No user ratings available.	PackageInfoView		ユーザー評価はありません。
 Downloading package '%name%'	WorkStatusView		パッケージ '%name%' をダウンロード中
-It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		サーバーから返信されたデーターから、必要なキャプチャ情報を抽出できませんでした。
+It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		サーバーが返信したデータから、必要なキャプチャ情報を抽出できませんでした。
 Rating	PackageListView		評価
 Synchronizing icons	ServerIconExportUpdateProcess		アイコンを同期しています。
 Does not start	RatePackageWindow		起動しない
@@ -47,9 +47,7 @@ Category	FilterView		分類
 User rating	RatePackageWindow		ユーザーによる評価
 Installed packages	MainWindow		インストール済みパッケージ
 A requested object or an object involved in the request was not found on the server.	ServerHelper		要求されたオブジェクトまたはリクエストに関連するオブジェクトがサーバー上に見つかりませんでした。　　
-Other users can see this rating	RatePackageWindow		ほかのユーザーがこの評価を見ることができます
 Stable	RatePackageWindow		安定
-This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		アプリケーションが古いので、HaikuDepot サーバーシステムと通信できません。Haiku システムを更新して、HaikuDepot の新しいバージョンを入手してください。必要とされる HaikuDepot の最小簿バージョンは、\"%s\" です。
 Fatal error	PackageManager		致命的なエラー
 Package action failed	PackageInfoView		パッケージアクションに失敗しました
 No changelog available.	PackageInfoView		変更記録はありません。
@@ -62,7 +60,7 @@ It was not possible to communicate with the server to obtain a captcha image req
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		評価が正常に更新されました。HaikuDepot Server のウェブサイトで評価を更新または削除できます。
 Network Error	ServerHelper		ネットワークエラー
 Available	PackageListView		利用可能
-Cancel	UserLoginWindow		キャンセル
+Cancel	UserLoginWindow		中止
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot はパッケージデーモンが動作することを必要とします。 そしてそれは動作していないようです。\n今起動しますか?
 Click a package to view information	PackageInfoView		パッケージをクリックして情報を見る
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		パスワードは、最小8文字以上の長さで、少なくとも2つの数字と1つの英大文字を含む必要があります。
@@ -79,18 +77,16 @@ Very unstable	RatePackageWindow		非常に不安定
 Password:	UserLoginWindow		パスワード:
 All packages	PackageListView		すべてのパッケージ
 Network Transport Error	ServerHelper		ネットワークトランスポートエラー
-Authorization or security issue.  Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		認証またはセキュリティの問題。ログアウト後、もう一度ログインして、パスワードが正しいことを確認してください。また、使用条件を承認していることも確認ください。
 Stability	RatePackageWindow		安定度
-The nickname must be unique, but the supplied nickname is already taken.  Choose a different nickname.	UserLoginWindow		ニックネームはユニークである必要がありますが、入力されたニックネームはすでに取られています。別のニックネームを選んでください。
 Send	RatePackageWindow		送信する
 Start package daemon	App		パッケージデーモンを起動
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		間違って入力する可能性を減らすため、パスワードを繰り返す必要があります。
 The package action could not be scheduled: %Error%	PackageInfoView		パッケージアクションを予約できませんでした: %Error%
-Cancel	RatePackageWindow		キャンセル
+Cancel	RatePackageWindow		中止
 Inactive	PackageListView		無効
 Nickname:	UserLoginWindow		ニックネーム:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		リポジトリに関するメタデータを同期中
-There are problems in the supplied data:	UserLoginWindow		入力されたデーターに問題があります:
+There are problems in the supplied data:	UserLoginWindow		入力されたデータに問題があります:
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# アイテム} other{# アイテム}}
 Usage conditions download problem	UserLoginWindow		使用条件のダウンロードで問題
@@ -104,8 +100,9 @@ Repository	PackageListView		リポジトリ
 The email is malformed.	UserLoginWindow		メールアドレスが不正です。
 Close	UserLoginWindow		閉じる
 Close	RatePackageWindow		閉じる
-Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		リポジトリ '%REPO_NAME%' のパッケージデーターを同期中
+Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		リポジトリ '%REPO_NAME%' のパッケージデータを同期中
 View the usage conditions	UserLoginWindow		使用条件を見る
+Login issue	MainWindow		ログインに問題
 Size	PackageListView		サイズ
 Your rating:	RatePackageWindow		評価:
 Your rating was updated.	RatePackageWindow		評価が更新されました。
@@ -113,7 +110,7 @@ All categories	FilterView		すべての分類
 Repositories	MainWindow		リポジトリ
 n/a	PackageInfoView		利用不可
 View agreed usage conditions…	MainWindow		同意した使用条件を見る…
-Cancel	MainWindow		キャンセル
+Cancel	MainWindow		中止
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 個以上のダウンロード)}other{(# 個以上のダウンロード)}}
 Refresh repositories	MainWindow		リポジトリの更新
 Tools	MainWindow		ツール
@@ -125,17 +122,17 @@ Log out	MainWindow		ログアウト
 Comment language:	RatePackageWindow		コメント言語:
 Status	PackageListView		状態
 The password has been incorrectly repeated.	UserLoginWindow		パスワードが間違って再入力されています。
+The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		以前にユーザー [%Nickname%] に提供されたパスワードは現在期限切れです。ユーザーはこのアプリケーションをログアウトして、新しいパスワードで再ログインする必要があります。
 Update	RatePackageWindow		更新
 OK	ServerHelper		OK
 Language	UserLoginWindow		言語
 OK	UserLoginWindow		OK
-Reading repository data	LocalPkgDataLoadProcess		リポジトリのデーターを読み込んでいます
-Synchronizing reference data from server	ServerReferenceDataUpdateProcess		サーバーから参照データーを同期中
-The nickname is malformed.  The nickname may only contain digits and lower case latin characters.  The nickname must be between four and sixteen characters in length.	UserLoginWindow		ニックネームが不正です。ニックネームは数字と英子文字だけが含めます。ニックネームは4から16文字の長さである必要があります。
+Reading repository data	LocalPkgDataLoadProcess		リポジトリのデータを読み込み中
+Synchronizing reference data from server	ServerReferenceDataUpdateProcess		サーバーから参照データを同期中
 Stability:	RatePackageWindow		安定度:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		利用規約に同意する必要があります。次にユーザーを作成する人が最小年齢の要求を満たすか確認しなければなりません。
 A validation error has occurred	ServerHelper		検証エラーが発生しました
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	MainWindow		パッケージデーターの更新中に問題が発生しました。その問題によりデータが期限切れに、つまり、アプリケーションの表示から消えてしまいます。この問題に関する追加のデータは、アプリケーションのログから得られるでしょう。\nログの見方についての情報は、ユーザーガイドのHaikuDepotの章で得られます。
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	MainWindow		パッケージデータの更新中に問題が発生しました。その問題によりデータが期限切れに、つまり、アプリケーションの表示から消えてしまいます。この問題に関する追加のデータは、アプリケーションのログから得られるでしょう。\nログの見方についての情報は、ユーザーガイドのHaikuDepotの章で得られます。
 The nickname is required.	UserLoginWindow		ニックネームが必要です。
 Source packages	MainWindow		ソースパッケージ
 -	no package size		-
@@ -155,9 +152,7 @@ Quit	App		終了
 Search terms:	FilterView		検索:
 Pending…	PackageListView		保留中…
 Category:	FilterView		分類:
-The user %Nickname% has been successfully created in the HaikuDepotServer system.  You can administer your user details by using the web interface.  You are now logged-in as this new user.	UserLoginWindow		ユーザー %Nickname% が、 HaikuDepotServerシステム内に正常に作成されました。Webインターフェースを使って、ユーザーの詳細を管理できます。現在、新規ユーザーとしてログインしています。
 Authentication failed	UserLoginWindow		認証に失敗しました
-The supplied response to the captcha is incorrect.  A new captcha will be generated; try again.	UserLoginWindow		キャプチャへの応答が間違っています。新しいキャプチャが生成されます。もう一度試してください。
 Captcha error	UserLoginWindow		キャプチャエラー
 Manage repositories…	MainWindow		リポジトリの管理…
 Fetching remote repository data	LocalRepositoryUpdateProcess		リモートリポジトリデータを取得中

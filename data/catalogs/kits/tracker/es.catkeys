@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	2165842741
+1	spanish; castilian	x-vnd.Haiku-libtracker	1942691364
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -21,6 +21,7 @@ contains	FindPanel		contiene
 Open	FilePanelPriv		Abrir
 Bitmap icon	AttributesView		Icono de mapa de bits
 You can't replace a folder with one of its sub-folders.	FSUtils		No puedes reemplazar una carpeta por una de sus subcarpetas
+<%ld dates>	AttributesView		<fechas %ld>
 Select…	VirtualDirectoryWindow		Seleccione…
 Name	Default Query Columns		Nombre
 Unmount	ContainerWindow		Desmontar
@@ -433,6 +434,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Lo sentimos, el 
 Move here	ContainerWindow		Mover aquí
 the config folder	FSUtils		la carpeta config
 Sorry, could not create a new folder.	FSUtils		Lo sentimos, no puedes crear una nueva carpeta
+Select all	VirtualDirectoryWindow		Seleccionar todo
 Rename	FSUtils	button label	Renombrar
 Clean up all	ContainerWindow		Limpiar todo
 Add current folder	FilePanelPriv		Añadir carpeta actual
@@ -461,6 +463,7 @@ Default application	InfoWindow		Aplicación predeterminada
 Untitled bitmap	PoseView		Mapa de bits sin título
 matches regular expression	SelectionWindow		coincide con la expresión regular
 Invert selection	ContainerWindow		Invertir selección
+Close	VirtualDirectoryWindow		Cerrar
 Monochrome picture	AttributesView		Imagen monocroma
 Real name	ContainerWindow		Nombre
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		No se puede abrir \"%name\". El archivo está erróneamente marcado como ejecutable
@@ -496,6 +499,7 @@ Cancel	PoseView		Cancelar
 Delete	PoseView		Eliminar
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Si modificas la carpeta home, es posible que %osName no funcione adecuadamente.\n\n¿Estás seguro de que deseas hacer esto?\n\nPara modificar la carpeta home, mantén presionada la tecla Mayúsculas y haz clic en \"Sé lo que estoy haciendo\".
 Sorry, you can't copy items to the Trash.	PoseView		Lo sentimos, No puedes copiar elementos a la papelera
+Invert selection	VirtualDirectoryWindow		Invertir selección
 New folder	FilePanelPriv		Nueva carpeta
 {0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# item} other{# items}}
 Name	AttributesView		Nombre

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Network	943149646
+1	polish	x-vnd.Haiku-Network	2313714399
 Ethernet device	InterfaceListItem		Urządzenie ethernetowe
 Link speed:	IntefaceView		Prędkość połączenia:
 disconnected	IntefaceView		rozłączone
@@ -42,7 +42,6 @@ Status:	IntefaceView		Stan:
 Disable	IntefaceView		Wyłącz
 Manage…	NetworkWindow		Zarządzaj…
 open	Open network		otwarta
-Network	NetworkWindow		Sieć
 Your gateway to the internet	IntefaceAddressView		Twoja brama do Internetu
 Enable	ServiceView		Włącz
 Wireless device	InterfaceListItem		Urządzenie bezprzewodowe

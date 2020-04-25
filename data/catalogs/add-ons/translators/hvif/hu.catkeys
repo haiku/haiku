@@ -2,7 +2,7 @@
 Haiku vector icon translator	HVIFTranslator		Haiku vektoros ikon értelemző
 HVIF icons	HVIFTranslator		HVIF ikon
 Render size:	HVIFView		Renderelt méret
-HVIFTranslator Settings	HVIFTranslator		HVIFÉrtelemző beállítások
+HVIFTranslator Settings	HVIFTranslator		HVIF értelmező beállításai
 Haiku vector icon translator	HVIFView		Haiku vektoros ikon értelemző
 HVIF Settings	HVIFMain		HVIF Beállítások
 Version %d.%d.%d, %s	HVIFView		%d.%d.%d, %s verzió

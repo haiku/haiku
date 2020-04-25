@@ -11,7 +11,7 @@ Novas	ChartWindow		Birden parlayan yıldız
 LineArray	ChartWindow		LineArray
  0.6 f/s  (logarythmic scale)	ChartWindow		 0.6 f/s  (logaritmik ölçü)
 Free motion	ChartWindow		Serbest hareket
-(high) 100% 	ChartWindow		(yüksek) \%100 
+(high) 100% 	ChartWindow		(yüksek) %100 
 Green	ChartWindow		Yeşil
 Amas	ChartWindow		Amas
 2 threads	ChartWindow		2 iş parçacığı

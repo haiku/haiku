@@ -3,7 +3,7 @@ Include window border	ScreenshotWindow		Az ablak keretének belefoglalása a ké
 Overwrite	ScreenshotWindow		Felülírás
 Save in:	ScreenshotWindow		Mentés ide:
 Error saving \"%s\":\n\t%s	ScreenshotWindow		Mentési hiba \"%s\":\n\t%s
-This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		A fájl már létezik.\nBiztosan felül akarja írni?
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		A fájl már létezik.\nBiztosan felül akarod írni?
 OK	ScreenshotWindow		Rendben
 The destination path exists but is not a folder.	ScreenshotWindow		A megadott útvonal létezik, de nem mappa.
 Select	ScreenshotWindow		Kiválasztás
@@ -13,14 +13,14 @@ New screenshot	ScreenshotWindow		Új képernyőkép
 Screenshot	System name		Képernyőkép
 Desktop	ScreenshotWindow		Asztal
 Artwork folder	ScreenshotWindow		Artwork mappa
-Translator Settings	ScreenshotWindow		Fordító beállítások
+Translator Settings	ScreenshotWindow		Beállítások
 Include mouse pointer	ScreenshotWindow		Az egérkurzor belefoglalása a képbe
 overwrite	ScreenshotWindow		felülírás
 Settings…	ScreenshotWindow		Beállítások…
 Choose folder	ScreenshotWindow		Mappa kiválasztása
 Name:	ScreenshotWindow		Név:
 Choose folder…	ScreenshotWindow		Mappa kiválasztása…
-Please select	ScreenshotWindow		Kérjük válasszon
+Please select	ScreenshotWindow		Kérlek válassz
 Failed to save screenshot	ScreenshotWindow		Nem sikerült a képernyőkép mentése.
 Cancel	ScreenshotWindow		Mégse
 Delay:	ScreenshotWindow		Késleltetés:

@@ -1,7 +1,10 @@
-1	hungarian	x-vnd.Haiku-libsolvsolver	627345742
+1	hungarian	x-vnd.Haiku-libsolvsolver	3201338525
 allow architecture change of %source% to %target%	SolverProblemSolution		Architektúra váltás %source% -> %target% engedélyezése.
+install %source% from excluded repository	SolverProblemSolution		%source% telepítése a letiltott tárolóból
 unspecified problem	SolverProblem		meghatározatlan hiba
 nothing provides requested %dependency%	SolverProblem		semmi sem nyújta az igényelt %dependency% függőséget
 conflicting requests	SolverProblem		ellentmondó kérések
 %dependency% is provided by the system	SolverProblem		%dependency% függőséget a rendszer nyújtja
+%source% does not belong to a distupgrade repository	SolverProblem		%source% nem része a tárolónak
 package %source% conflicts with %dependency% provided by %target%	SolverProblem		%source% csomag ütközik a %target% által nyújtott %dependency% függősggel
+keep %source% from excluded repository	SolverProblemSolution		%source% megtartása a letiltott tárolóból

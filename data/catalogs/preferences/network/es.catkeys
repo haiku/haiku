@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Network	3039697761
+1	spanish; castilian	x-vnd.Haiku-Network	115295218
 Ethernet device	InterfaceListItem		Dispositivo Ethernet
 Link speed:	IntefaceView		Velocidad de conexión:
 disconnected	IntefaceView		desconectado
@@ -47,7 +47,6 @@ Status:	IntefaceView		Estado:
 Disable	IntefaceView		Deshabilitar
 Manage…	NetworkWindow		Administrar…
 open	Open network		abierto
-Network	NetworkWindow		Red
 Your gateway to the internet	IntefaceAddressView		Su puerta de enlace a internet
 Enable	ServiceView		Habilitar
 Wireless device	InterfaceListItem		Dispositivo inalámbrico

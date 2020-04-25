@@ -31,8 +31,8 @@ High	TouchpadPrefView		Alto
 Defaults	TouchpadPrefView		Predefiniti
 1-Button	SettingsView		1 Pulsante
 Short	KeyboardView		Corto
-Revert	InputMouse		Annulla modifiche
 Slow	KeyboardView		Lenta
+Revert	InputMouse		Annulla modifiche
 Key repeat rate	KeyboardView		Velocità ripetizione tasto
 2-Button	SettingsView		2 Pulsanti
 Click to focus and raise	SettingsView		Click da il focus e ripristina

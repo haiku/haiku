@@ -1,0 +1,12 @@
+1	spanish; castilian	x-vnd.Haiku-libmedia	1819860668
+Cleaning up.	MediaDefs		Limpiando.
+Starting media_services.	MediaDefs		Iniciando media_services.
+Stopping media_addon_server.	MediaDefs		Deteniendo media_addon_server.
+Waiting for media_addon_server to quit.	MediaDefs		Esperando que media_addon_server se cierre.
+Telling media_addon_server to quit.	MediaDefs		Solicitando a media_addon_server que cierre.
+Ready for use.	MediaDefs		Listo para usar.
+Stopping media server…	MediaDefs		Deteniendo media server…
+Waiting for media_server to quit.	MediaDefs		Esperando que media_server se cierre.
+Done shutting down.	MediaDefs		Apagado finalizado.
+Error occurred starting media services.	MediaDefs		Ha ocurrido un error mientras iniciaba media services.
+Media Service	MediaDefs		Servicio de Medios

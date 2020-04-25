@@ -1,26 +1,26 @@
 1	finnish	x-vnd.Haiku-Media	1682972002
+Couldn't add volume control in Deskbar: %s\n	Media views		Voimakkuussäätimen lisääminen Työpöytäpalkkiin epäonnistui: %s\n
+Restart media services	Media views		Käynnistä mediapalvelut uudelleen
+Quit	Media Window		Lopeta
+<none>	VideoInputMenu	Used when no video input is available	<ei mitään>
+Couldn't remove volume control in Deskbar: %s\n	Media views		Voimakkuussäätimen poistaminen Työpöytäpalkista epäonnistui: %s\n
+Video output:	Media views		Videotuloste:
+Video input:	Media views		Videosyöte:
+Audio output:	Media views		Äänituloste:
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Poistuminen Media-soveluksesta pysäyttää nyt mediapalvelujen käynnistymisen. Tuloksena on todennäköisesti epäluotettava tai poissaoleva mediatoiminnallisuus.
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Yhdistäminen mediapalvelimeen epäonnistui.\nHaluaisitko käynnistää sen nyt ?
+Video settings	Media Window		Videoasetukset
 Audio mixer	Media Window		Äänisekoitin
 Show volume control on Deskbar	Media views		Näytä voimakkuusohjain Työpöytäpalkissa
-Quit	Media Window		Lopeta
-Restart media services	Media views		Käynnistä mediapalvelut uudelleen
-Couldn't add volume control in Deskbar: %s\n	Media views		Voimakkuussäätimen lisääminen Työpöytäpalkkiin epäonnistui: %s\n
 Start media server	Media Window		Käynnistä mediapalvelin
-<none>	VideoInputMenu	Used when no video input is available	<ei mitään>
 Audio settings	Media Window		Ääniasetukset
 Quit anyway	Media Window		Lopeta silti
-Couldn't remove volume control in Deskbar: %s\n	Media views		Voimakkuussäätimen poistaminen Työpöytäpalkista epäonnistui: %s\n
 Media	System name		Media-asetukset
 Warning!	Media Window		Varoitus!
 MIDI Settings	Media Window		MIDI-asetukset
-Video output:	Media views		Videotuloste:
-Audio output:	Media views		Äänituloste:
-Video input:	Media views		Videosyöte:
-Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Poistuminen Media-soveluksesta pysäyttää nyt mediapalvelujen käynnistymisen. Tuloksena on todennäköisesti epäluotettava tai poissaoleva mediatoiminnallisuus.
 Audio input:	Media views		Äänisyöte:
 <none>	Media views		<ei mitään>
-This hardware has no controls.	Media Window		Tässä laitteistossa ei ole ohjaimia.
 Channel:	Media views		Kanava:
+This hardware has no controls.	Media Window		Tässä laitteistossa ei ole ohjaimia.
 Defaults	Media views		Oletukset
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Yhdistäminen mediapalvelimeen epäonnistui.\nHaluaisitko käynnistää sen nyt ?
-Video settings	Media Window		Videoasetukset
 <none>	VideoOutputMenu	Used when no video output is available	<ei mitään>

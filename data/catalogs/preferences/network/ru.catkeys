@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Network	3039697761
+1	russian	x-vnd.Haiku-Network	115295218
 Ethernet device	InterfaceListItem		Ethernet устройство
 Link speed:	IntefaceView		Скорость соединения:
 disconnected	IntefaceView		отключено
@@ -47,7 +47,6 @@ Status:	IntefaceView		Статус:
 Disable	IntefaceView		Отключить
 Manage…	NetworkWindow		Настроить…
 open	Open network		открытая
-Network	NetworkWindow		Сеть
 Your gateway to the internet	IntefaceAddressView		Ваш шлюз в интернет
 Enable	ServiceView		Включить
 Wireless device	InterfaceListItem		Беспроводное устройство

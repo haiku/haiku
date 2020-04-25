@@ -6,7 +6,7 @@ Use hardware video overlays if available	MediaPlayer-SettingsWindow		利用で�
 Audio	MediaPlayer-InfoWin		オーディオ
 Subtitle placement:	MediaPlayer-SettingsWindow		字幕の位置:
 MediaPlayer	System name		メディアプレーヤー
-Audio track	MediaPlayer-Main		音声トラック
+Audio track	MediaPlayer-Main		オーディオトラック
 Muted	MediaPlayer-SettingsWindow		ミュート
 OK	MediaPlayer-RemovePLItemsCmd		OK
 Open Playlist	MediaPlayer-PlaylistWindow		プレイリストを開く
@@ -57,7 +57,7 @@ Playlist…	MediaPlayer-Main		プレイリスト…
 <unnamed media>	MediaPlayer-InfoWin		<名前の無いメディア>
 Save	MediaPlayer-PlaylistWindow		保存
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		項目のランダムな並び替え
-Cancel	MediaPlayer-NetworkStream		取り消し
+Cancel	MediaPlayer-NetworkStream		中止
 Nothing to Play	MediaPlayer-Main		再生するものがありません
 OK	MediaPlayer-SettingsWindow		OK
 Remove Entries	MediaPlayer-RemovePLItemsCmd		項目の削除
@@ -73,7 +73,7 @@ Quit	MediaPlayer-Main		終了
 Redo	MediaPlayer-PlaylistWindow		やり直し
 Move Entry	MediaPlayer-MovePLItemsCmd		項目を移動
 <unknown>	PlaylistItem-author		<不明>
-Cancel	MediaPlayer-SettingsWindow		取り消し
+Cancel	MediaPlayer-SettingsWindow		中止
 Large	MediaPlayer-SettingsWindow		大
 Import Entry	MediaPlayer-ImportPLItemsCmd		項目をインポート
 unknown format	MediaPlayer-InfoWin		不明なフォーマット
@@ -123,7 +123,7 @@ Full screen	MediaPlayer-Main		全画面表示
 OK	MediaPlayer-NetworkStream		OK
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部エラー (ロックに失敗)。プレイリストの保存に失敗しました。
 100% scale	MediaPlayer-Main		100% 表示
-<nothing to redo>	MediaPlayer-PlaylistWindow		<やり直すものがありません>
+<nothing to redo>	MediaPlayer-PlaylistWindow		<やり直しできるものはありません>
 Bad URL	MediaPlayer-NetworkStream		Bad URL
 Save	MediaPlayer-Main		保存
 Close window after playing video	MediaPlayer-SettingsWindow		ビデオ再生終了後、ウィンドウを閉じる
@@ -140,7 +140,7 @@ Container	MediaPlayer-InfoWin		コンテナー
 none	MediaPlayer-Main		無し
 Open clips	MediaPlayer-Main		クリップを開く
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		いくつかのファイルはごみ箱に移動できませんでした。
-<nothing to undo>	MediaPlayer-PlaylistWindow		<元に戻すものがありません>
+<nothing to undo>	MediaPlayer-PlaylistWindow		<元に戻せるものがありません>
 Save as…	MediaPlayer-PlaylistWindow		名前を付けて保存…
 Error: 	MediaPlayer-RemovePLItemsCmd		エラー:
 300% scale	MediaPlayer-Main		300% 表示

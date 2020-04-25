@@ -1,26 +1,26 @@
 1	japanese	x-vnd.Haiku-Media	1682972002
+Couldn't add volume control in Deskbar: %s\n	Media views		音量コントロールを Deskbar に追加できませんでした: %s\n
+Restart media services	Media views		メディアサービスを再起動
+Quit	Media Window		終了
+<none>	VideoInputMenu	Used when no video input is available	<無し>
+Couldn't remove volume control in Deskbar: %s\n	Media views		音量コントロールを Deskbar から削除できませんでした: %s\n
+Video output:	Media views		ビデオ出力:
+Video input:	Media views		ビデオ入力:
+Audio output:	Media views		オーディオ出力:
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		メディアプレファレンスを今終了すると、メディアサービスの再起動を停止します。結果として、メディア機能が少しおかしくなるか利用できなくなります。
+Could not connect to the media server.\nWould you like to start it ?	Media Window		メディアサーバーに接続できませんでした。\nメディアサーバーを起動しますか？
+Video settings	Media Window		ビデオ設定
 Audio mixer	Media Window		オーディオミキサー
 Show volume control on Deskbar	Media views		音量コントロールを Deskbar に表示
-Quit	Media Window		終了
-Restart media services	Media views		メディアサービスを再起動
-Couldn't add volume control in Deskbar: %s\n	Media views		音量コントロールを Deskbar に追加できませんでした: %s\n
 Start media server	Media Window		メディアサーバーの起動
-<none>	VideoInputMenu	Used when no video input is available	<無し>
 Audio settings	Media Window		オーディオ設定
 Quit anyway	Media Window		強制終了
-Couldn't remove volume control in Deskbar: %s\n	Media views		音量コントロールを Deskbar から削除できませんでした: %s\n
 Media	System name		メディア
 Warning!	Media Window		警告
 MIDI Settings	Media Window		MIDI 設定
-Video output:	Media views		ビデオ出力:
-Audio output:	Media views		オーディオ出力:
-Video input:	Media views		ビデオ入力:
-Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		メディアプレファレンスを今終了すると、メディアサービスの再起動を停止します。結果として、メディア機能が少しおかしくなるか利用できなくなります。
 Audio input:	Media views		オーディオ入力:
 <none>	Media views		<無し>
-This hardware has no controls.	Media Window		このハードウェアにはコントロールがありません。
 Channel:	Media views		チャンネル:
+This hardware has no controls.	Media Window		このハードウェアにはコントロールがありません。
 Defaults	Media views		デフォルト
-Could not connect to the media server.\nWould you like to start it ?	Media Window		メディアサーバーに接続できませんでした。\nメディアサーバーを起動しますか？
-Video settings	Media Window		ビデオ設定
 <none>	VideoOutputMenu	Used when no video output is available	<無し>

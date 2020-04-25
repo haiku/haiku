@@ -12,7 +12,7 @@ RLE	PSDConfig		RLE
 Photoshop Big Document (PSB file)	PSDConfig		Photoshop Big dokumentum (PSB fájl)
 RGBA	PSDLoader		RGBA
 Photoshop image (%s)	PSDTranslator		Photoshop-kép (%s)
-PSDTranslator Settings	PSDConfig		PSDTranslator Settings
+PSDTranslator Settings	PSDConfig		PSD értelmező beállításai
 RGB	PSDLoader		RGB
 Bitmap	PSDLoader		Bittérkép
 CMYK	PSDLoader		CMYK

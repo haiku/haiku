@@ -4,7 +4,7 @@ Control mark	Colors tab		Vezérlőelem jelölése
 Off	AntialiasingSettingsView		Ki
 Window border	Colors tab		Ablakkeret
 Inactive window tab	Colors tab		Inaktív ablak füle
-Defaults	APRWindow		Eredeti
+Defaults	APRWindow		Alapértékek
 Shadow	Colors tab		Árnyék
 Document background	Colors tab		Dokumentum háttere
 List background	Colors tab		Lista háttere
@@ -51,7 +51,7 @@ Link text	Colors tab		Hivatkozás szövege
 Tooltip background	Colors tab		Eszköztár háttere
 ControlLook:	DecorSettingsView		Megjelenés:
 Scroll bar thumb	Colors tab		Görgetősáv megjelenése
-Default	DecorSettingsView		Alapértelmezett
+Default	DecorSettingsView		Alapérték
 Link visited	Colors tab		Meglátogatott hivatkozás
 Selected menu item border	Colors tab		Kiválasztott menüelem szegélye
 Tooltip text	Colors tab		Buboréksúgó szövege

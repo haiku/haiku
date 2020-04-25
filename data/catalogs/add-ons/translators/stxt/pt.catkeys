@@ -1,3 +1,8 @@
-1	portuguese	x-vnd.Haiku-STXTTranslator	2143081055
+1	portuguese	x-vnd.Haiku-STXTTranslator	274886668
+Be styled text file	STXTTranslator		Ficheiro de texto com estilos Be
 Plain text file	STXTTranslator		Ficheiro de texto simples
+STXTTranslator Settings	STXTTranslator		Definições do tradutor STXT
+StyledEdit file translator	STXTView		Tradutor de ficheiro StyledEdit
 StyledEdit files	STXTTranslator		Ficheiros do StyledEdit
+StyledEdit file translator	STXTTranslator		Tradutor de ficheiro StyledEdit
+STXT Settings	STXTMain		Definições STXT

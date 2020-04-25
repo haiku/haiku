@@ -13,7 +13,7 @@ Stop	PackageStatus		Atura
 Install to:	PackageView		Instal·la a:
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Sembla que el paquet indicat ja està instal·lat al sistema. Voleu desinstal·lar l’existent i continuar la instal·lació?
 Skip all	PackageView		Omet-ho tot
-The installation of the package has been aborted.	PackageView		La instal·lació del paquet s'ha cancel·lat.
+The installation of the package has been aborted.	PackageView		La instal·lació del paquet s'ha avortat.
 No installation type selected	PackageView		No s'ha seleccionat cap tipus d'instal·lació.
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Voleu recordar aquesta decisió per a la resta d’aquesta instal·lació?\n
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		El paquet seleccionat no s'ha suprimit del sistema. És possible que el fitxer d'informació del paquet instal·lat es pugui haver corromput.

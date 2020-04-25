@@ -2,7 +2,7 @@
 Restore snapshot	SudokuWindow		スナップショットを戻す
 File	SudokuWindow		ファイル
 Mark invalid values	SudokuWindow		正しくない値を表示
-Solve single field	SudokuWindow		1箇所回答を表示
+Solve single field	SudokuWindow		1 箇所回答を表示
 Hard	SudokuWindow		上級
 Start again	SudokuWindow		ゲームをやり直す
 New	SudokuWindow		新規ゲーム

@@ -25,7 +25,7 @@ Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't 
 Copy URL to clipboard	Download Window		URL vágólapra másolása
 Clone current page	Settings Window		Jelenlegi oldal megkettőzése
 Start page:	Settings Window		Nyitó oldal:
-Cancel	Download Window		Mégsem
+Cancel	Download Window		Mégse
 Settings	Settings Window		Beállítások
 Downloads	WebPositive Window		Letöltések
 Browse…	Settings Window		Böngészés…
@@ -87,14 +87,14 @@ Open	Download Window		Megnyitás
 New window	WebPositive Window		Új ablak
 New windows:	Settings Window		Új ablak:
 The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	A Letöltések könyvtár nem nyitható meg.\n\nHiba: %error
-Cancel	Authentication Panel		Mégsem
+Cancel	Authentication Panel		Mégse
 Style:	Font Selection view		Stílus:
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	A Könyvjelzők mappa nem nyitható meg.\n\nHiba: %error
 OK	Download Window		Rendben
 Proxy username:	Settings Window		Proxy felhasználónév:
 Manage bookmarks	WebPositive Window		Könyvjelzők kezelése
 /s)	Download Window	...as in 'per second'	/mp)
-Restart	Download Window		Újrakezdés
+Restart	Download Window		Újraindítás
 Serif font:	Settings Window		Serif betűtípus:
 Apply	Settings Window		Alkalmaz
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	A Könyvjelzők mappa nem nyitható meg.\n\nHiba: %error
@@ -109,7 +109,7 @@ About	WebPositive Window		Névjegy
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Letöltések vannak folyamatban, biztosan bezárjuk a WebPositive-ot?
 Continue downloads	WebPositive		Letöltések folytatása
 Proxy server requires authentication	Settings Window		A proxy szerver azonosítást igényel
-Cancel	Settings Window		Mégsem
+Cancel	Settings Window		Mégse
 History	WebPositive Window		Előzmények
 Reset size	WebPositive Window		Méret visszaállítása
 Do you really want to clear the browsing history?	WebPositive Window		Biztosan törölni akarod az előzményekez?
@@ -152,7 +152,7 @@ Cut	WebPositive Window		Kivág
 Downloads	Download Window		Letöltések
 Open blank page	Settings Window		Üres oldal
 Clear history	WebPositive Window		Előzmények törlése
-Cancel	WebPositive Window		Mégsem
+Cancel	WebPositive Window		Mégse
 Bookmark info	WebPositive Window		Könyvjelző információi
 Script console	Console Window		Script konzol
 Copy	URL Bar		Másolás

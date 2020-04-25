@@ -46,7 +46,7 @@ New tabs:	Settings Window		Yeni sekmeler:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url yüklenemedi
 Open downloads folder	Download Window		İndirilenler klasörünü aç
 Proxy server	Settings Window		Vekil sunucu
-Decrease size	WebPositive Window		Boyutu azalt
+Decrease size	WebPositive Window		Küçült
 Default fixed font size:	Settings Window		Öntanımlı sabit yazıtipi boyutu:
 Sans serif font:	Settings Window		Sans serif yazıtipi:
 Clear	WebPositive Window		Temizle
@@ -78,7 +78,7 @@ View	WebPositive Window		Görünüm
 Paste	URL Bar		Yapıştır
 Find next	WebPositive Window		Sonrakini bul
 Open search page	Settings Window		Arama sayfasını aç
-Increase size	WebPositive Window		Boyutu artır
+Increase size	WebPositive Window		Büyüt
 New tab	WebPositive Window		Yeni sekme
 Today	WebPositive Window		Bugün
 Open location	WebPositive Window		Konum aç
@@ -111,7 +111,7 @@ Continue downloads	WebPositive		İndirmeleri sürdür
 Proxy server requires authentication	Settings Window		Vekil sunucu oturum açma gerektirir
 Cancel	Settings Window		İptal
 History	WebPositive Window		Geçmiş
-Reset size	WebPositive Window		Boyutu sıfırla
+Reset size	WebPositive Window		Orijinal boyut
 Do you really want to clear the browsing history?	WebPositive Window		Tarama geçmişini temizlemek istediğinizden emin misiniz?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Arama dizgisinin bir sonraki oluşumunu bul
 Fixed font:	Settings Window		Sabit yazıtipi
@@ -131,7 +131,7 @@ Next	WebPositive Window		Sonraki
 Bookmark error	WebPositive Window		Yer imi hatası
 OK	WebPositive Window		Tamam
 WebPositive	Download Window		WebPositive
-Zoom text only	WebPositive Window		Yalnızca metni yakınlaştır
+Zoom text only	WebPositive Window		Yalnızca metni büyüt
 Save page as…	WebPositive Window		Sayfayı farklı kaydet…
 Page source error	WebPositive Window		Sayfa kaynağı hatası
 Auto-hide mouse pointer	Settings Window		Fare imlecini kendiliğinden gizle

@@ -1,8 +1,80 @@
-1	catalan; valencian	x-vnd.Haiku-FirstBootPrompt	2649051796
+1	catalan; valencian	x-vnd.Haiku-FirstBootPrompt	2670843542
+Japanese	KeymapNames		Japonès
+US	KeymapNames		EUA
+Esperanto	KeymapNames		Esperanto
+Belarusian	KeymapNames		Bielorús
+Brazilian	KeymapNames		Brasiler
+Dvorak	KeymapNames		Dvorak
+Polish	KeymapNames		Polonès
+Latin-American	KeymapNames		Llatinoamericà
+Ukrainian	KeymapNames		Ucraïnès
+Russian (Yawert)	KeymapNames		Rus (Yawert)
+United-Kingdom	KeymapNames		Regne Unit
+Serbian (Cyrillic)	KeymapNames		Serbi (ciríl·lic)
+Turkish (Type-F)	KeymapNames		Turc (tipus F)
+Bulgarian (Cyrillic)	KeymapNames		Búlgar (ciríl·lic)
+Belgian (point)	KeymapNames		Belga (punt)
+Finnish	KeymapNames		Finès
+Swedish	KeymapNames		Suec
+Svorak	KeymapNames		Svorak
+German	KeymapNames		Alemany
+Swiss-German	KeymapNames		Alemany suís
 Keymap	BootPromptWindow		Mapa de tecles
-Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Gràcies per provar el Haiku! esperem que us agradi!\n\nPodeu triar l'idioma i disposició del teclat preferits a la llista de l'esquerra. S'utilitzaran immediatament. Més endavant els podeu canviar fàcilment quan vulgueu a les preferències de l'Escriptori.\n\nVoleu executar l'instal·lador o continuar i arrencar l'Escriptori?\n
+Spanish (Dvorak)	KeymapNames		Castellà (Dvorak)
+US-International	KeymapNames		EUA internacional
+Czech	KeymapNames		Txec
+Turkish (Type-Q)	KeymapNames		Turc (tipus Q)
+Slovak	KeymapNames		Eslovac
+Russian (Udmurt, Komi, Mari)	KeymapNames		Rus (Udmurt, Komi, Mari)
+Thai (TIS-820.2538)	KeymapNames		Tailandès (TIS-820.2538)
+Colemak	KeymapNames		Colemak
+Dvorak (programmer's)	KeymapNames		Dvorak (programador)
+Russian (Mac)	KeymapNames		Rus (Mac)
+Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Gràcies per provar el Haiku! Esperem que us agradi!\n\nPodeu triar la llengua i la disposició del teclat preferides a la llista de l'esquerra. S'usaran immediatament. Més endavant els podeu canviar fàcilment quan vulgueu a les preferències de l'escriptori.\n\nVoleu executar l'instal·lador o continuar i arrencar l'escriptori?\n
+German (Mac)	KeymapNames		Alemany (Mac)
+Arabic (102)	KeymapNames		Àrab (102)
+Belarusian (Latin)	KeymapNames		Bielorús (llatí)
+Belarusian (Mac)	KeymapNames		Bielorús (Mac)
+Hebrew	KeymapNames		Hebreu
+Greek	KeymapNames		Grec
+Croatian	KeymapNames		Croata
 Run Installer	BootPromptWindow		Executa l'instal·lador
-Language	BootPromptWindow		Idioma
+Faeroese	KeymapNames		Feroès
+Polish (Typewriter)	KeymapNames		Polonès (màquina d'escriure)
+French (Mac)	KeymapNames		Francès (Mac)
+Spanish	KeymapNames		Castellà
+Ukrainian (Mac)	KeymapNames		Ucraïnès (Mac)
+Estonian	KeymapNames		Estonià
+French (Bépo)	KeymapNames		Francès (Bépo)
+Serbian (Latin)	KeymapNames		Serbi (llatí)
+Russian (Typewriter)	KeymapNames		Rus (màquina d'escriure)
+French	KeymapNames		Francès
+Italian	KeymapNames		Italià
+Portuguese	KeymapNames		Portuguès
+Swiss-French	KeymapNames		Francès suís
+Slovene	KeymapNames		Eslovè
+Lithuanian	KeymapNames		Lituà
+French (NF Z71-300)	KeymapNames		Francès (NF Z71-300)
+ISO-9995	KeymapNames		ISO-9995
+Kazakh	KeymapNames		Kazakh
+Language	BootPromptWindow		Llengua
+Lithuanian (Standard)	KeymapNames		Lituà (estàndard)
+Belgian (comma)	KeymapNames		Belga (coma)
 Custom	BootPromptWindow		Personalitzat
+Norwegian	KeymapNames		Noruec
+Danish	KeymapNames		Danès
 Boot to Desktop	BootPromptWindow		Arrenca a l'Escriptori
-Welcome to Haiku!	BootPromptWindow		Benvingut al Haiku!
+Bulgarian (Phonetic)	KeymapNames		Búlgar (fonètic)
+Canadian-French	KeymapNames		Francès canadenc
+Welcome to Haiku!	BootPromptWindow		Benvingut/da al Haiku!
+Russian	KeymapNames		Rus
+Hungarian	KeymapNames		Hongarès
+Irish	KeymapNames		Irlandès
+Romanian	KeymapNames		Romanès
+Macedonian	KeymapNames		Macedoni
+Czech (Mac)	KeymapNames		Txec (Mac)
+Brazilian (ABNT2)	KeymapNames		Brasiler (ABNT2)
+Albanian	KeymapNames		Albanès
+Dutch	KeymapNames		Holandès
+Friulian	KeymapNames		Friülà
+Icelandic	KeymapNames		Islandès

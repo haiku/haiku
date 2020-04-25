@@ -1,14 +1,15 @@
-1	catalan; valencian	x-vnd.Haiku-mount_server	819316177
+1	catalan; valencian	x-vnd.Haiku-mount_server	2818767263
 Mount read-only	AutoMounter		Munta-ho només com a lectura
 Error mounting volume:\n\n%s	AutoMounter		Hi ha hagut un error en muntar el volum:\n\n%s
-Cancel	AutoMounter		Anul·la
+Cancel	AutoMounter		Cancel·la
 OK	AutoMounter		D'acord
 Unmount error	AutoMounter		Error de muntatge
+The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		El sistema de fitxers d’aquest volum no és el sistema de fitxers de Be. És recomanable muntar-lo en mode de només lectura per evitar pèrdues involuntàries de dades a causa d’errors al Haiku.
 Mount read/write	AutoMounter		Munta-ho per a lectura/escriptura
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		No ha estat possible desmuntar el disc \"%s\":\n\t%s
-Mounting volume '%s'\n\n	AutoMounter		S'està muntant el volum '%s'\n\n
+Mounting volume '%s'\n\n	AutoMounter		Es munta el volum "%s"\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		No ha estat possible desmuntar el disc \"%s\":\n\t%s\n\nVoleu forçar el seu desmuntatge?\n\nNota: Si ara mateix hi ha alguna aplicació escrivint al volum, si es desmunta es podrien perdre dades.\n
 Force unmount	AutoMounter		Força el muntatge
 Mount error	AutoMounter		Error de muntatge
-Mounting volume <unnamed volume>\n\n	AutoMounter		S'està muntant el volum <unnamed volume>\n\n
+Mounting volume <unnamed volume>\n\n	AutoMounter		Es munta el volum <unnamed volume>\n\n
 Mount warning	AutoMounter		Avís del muntatge

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	1826641841
+1	finnish	x-vnd.Haiku-HaikuDepot	4252586122
 Repository update error	LocalRepositoryUpdateProcess		Tietovaraston päivitysvirhe
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Tietovaraston päivityksen yhteydessä tapahtui virhe: %error%
 User Created	UserLoginWindow		Käyttäjän luoma
@@ -46,9 +46,7 @@ Category	FilterView		Luokka
 User rating	RatePackageWindow		Käyttäjäarvosanat
 Installed packages	MainWindow		Asennetut paketit
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Pyydettyä objektia tai pyyntöön liittyvää objektia ei löytynyt palvelimelta.
-Other users can see this rating	RatePackageWindow		Muut käyttäjät voivat nähdä tämän arvosanan
 Stable	RatePackageWindow		Vakaa
-This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		Tämä sovellus on liian vanha viestimään HaikuDepot-palvelinjärjestelmän kanssa.  Hanki uudempi HaikuDepot-versio päivittämällä Haiku-järjestelmä.  Vaadittu HaikuDepot-minimiversio on \"%s\".
 Fatal error	PackageManager		Kriittinen virhe
 Package action failed	PackageInfoView		Pakettitoiminta epäonnistui
 No changelog available.	PackageInfoView		Mitään muutoslokia ei ole saatavilla.
@@ -78,9 +76,7 @@ Very unstable	RatePackageWindow		Hyvin epävakaa
 Password:	UserLoginWindow		Salasana:
 All packages	PackageListView		Kaikki pakkaukset
 Network Transport Error	ServerHelper		Verkkosiirron virhe
-Authorization or security issue.  Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Valtuutus- tai turvallisuuspulma.  Kirjaudu ulos ja kirjaudu uudelleen sisään tarkistaaksesi, että salasanasi on oikea ja myös sen tarkistamiseksi, että olet hyväksynyt viimeisimmät käyttäjäehdot.
 Stability	RatePackageWindow		Stabiilisuus
-The nickname must be unique, but the supplied nickname is already taken.  Choose a different nickname.	UserLoginWindow		Käyttäjätunnuksen on oltava uniikki, mutta tarjottu käyttäjätunnus on jo käytössä.  Valitse erilainen käyttäjätunnus.
 Send	RatePackageWindow		Lähetä
 Start package daemon	App		Käynnistä pakkaustaustaprosessi
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Salasana on toistettava sen mahdollisuuden pienentämiseksi, että se on kirjoitettu väärin.
@@ -129,7 +125,6 @@ Language	UserLoginWindow		Kieli
 OK	UserLoginWindow		Valmis
 Reading repository data	LocalPkgDataLoadProcess		Luetaan tietovarastotietoja
 Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Synkronoidaan viitetietoja palvelimelta
-The nickname is malformed.  The nickname may only contain digits and lower case latin characters.  The nickname must be between four and sixteen characters in length.	UserLoginWindow		Käyttäjätunnus on vääränmuotoinen.  Käyttäjätunnus voi sisältää vain numeroita ja pieniä latinalaisia kirjaimia.  Käyttäjätunnuksen pituuden on oltava neljästä kuuteentoista merkkiä.
 Stability:	RatePackageWindow		Stabiilisuus:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Käyttäjäehdot on hyväksyttävä ja on vahvistettava, että uuden käyttäjän luova henkilö täyttää alaikärajavaatimuksen.
 A validation error has occurred	ServerHelper		Tapahtui kelpuutusvirhe
@@ -151,9 +146,7 @@ View latest usage conditions…	MainWindow		Katso viimeisimmät käyttöehdot…
 Search terms:	FilterView		Hakusanat:
 Pending…	PackageListView		Odottaa...
 Category:	FilterView		Luokka:
-The user %Nickname% has been successfully created in the HaikuDepotServer system.  You can administer your user details by using the web interface.  You are now logged-in as this new user.	UserLoginWindow		Käyttäjän %Nickname% luominen onnistui HaikuDepotServer-järjestelmään.  Voit hallinnoida käyttäjätietojen yksityiskohtia webbinäkymää käyttäen.  Olet nyt kirjautunut uutena käyttäjänä.
 Authentication failed	UserLoginWindow		Todennus epäonnistui
-The supplied response to the captcha is incorrect.  A new captcha will be generated; try again.	UserLoginWindow		Tarjottu vastaus captcha-testiin on virheellinen.  Luodaan uusi captcha; yritä uudelleen.
 Captcha error	UserLoginWindow		Captcha-virhe
 Manage repositories…	MainWindow		Hallinnoi tietovarastoja...
 Fetching remote repository data	LocalRepositoryUpdateProcess		Noudetaan etätietovaraston tietoja

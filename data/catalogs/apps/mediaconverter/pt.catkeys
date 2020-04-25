@@ -9,13 +9,13 @@ Error converting '%filename'	MediaConverter		Erro ao converter '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Pasta selecionada não encontrada. A utilizar /boot/home
 Conversion completed	MediaConverter		Conversão concluída
 Audio:	MediaConverter-FileInfo		Áudio:
-MediaConverter+:SaveDirectory	MediaConverter		Conversor de Média: Pasta Para Guardar
+MediaConverter+:SaveDirectory	MediaConverter		Conversor de Multimédia+: Pasta Para Guardar
 Error creating video.	MediaConverter		Erro ao criar o vídeo.
 Cancelling	MediaConverter		A cancelar
 None available	Audio codecs		Nenhum disponível
 No file selected	MediaConverter-FileInfo		Nenhum ficheiro selecionado
 High	MediaConverter		Alta
-{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{O ficheiro não foi reconhecido como sendo um ficheiro de média suportado:} other{# ficheiros não foram reconhecidos como sendo ficheiros de média suportados:}}
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{O ficheiro não foi reconhecido como sendo um ficheiro de multimédia suportado:} other{# ficheiros não foram reconhecidos como sendo ficheiros de multimédia suportados:}}
 File Error	MediaConverter-FileInfo		Erro de Ficheiro
 None available	Video codecs		Nenhum disponível
 Output format	MediaConverter		Formato de saída
@@ -49,12 +49,12 @@ An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo
 Error	MediaConverter		Erro
 File details	MediaConverter		Detalhes do ficheiro
 No audio	Audio codecs list		Sem áudio
-Drop media files onto this window	MediaConverter		Largue ficheiros de média sobre esta janela
+Drop media files onto this window	MediaConverter		Largue ficheiros multimédia sobre esta janela
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# quadro} other{# quadros}}
 Quit	Menu		Sair
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# bytes}}
 Duration:	MediaConverter-FileInfo		Duração:
-MediaConverter	System name		Conversor de Média
+MediaConverter	System name		Conversor de Multimédia
 Error launching: %strError%	MediaConverter		Erro ao iniciar: %strError%
 File format:	MediaConverter		Formato de ficheiro:
 Error writing audio frame %ld	MediaConverter		Erro ao escrever quadro de áudio %ld

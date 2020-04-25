@@ -107,7 +107,7 @@ Previous	Mail		前
 Include file attributes in attachments	Mail		添付ファイルにファイル属性を含む
 Start now	Mail		ただちに起動
 (Name unavailable)	Mail		(名前は利用できません)
-Move to trash	Mail		ごみ箱へ移動する
+Move to trash	Mail		ごみ箱へ移動
 <none>	Mail		<無し>
 %d - Date	Mail		%d - 日付
 Check spelling	Mail		スペルチェック
@@ -160,7 +160,7 @@ An error occurred trying to save this signature.	Mail		署名の保存の際に�
 Beginner	Mail		初心者
 Send message	Mail		メッセージを送信
 Delete	Mail		削除
-Put your favorite e-mail queries and query templates in this folder.	Mail		お気に入りの電子メールクエリーとクエリテンプレートをこのフォルダーに入れてください。
+Put your favorite e-mail queries and query templates in this folder.	Mail		お気に入りの電子メールクエリとクエリテンプレートをこのフォルダーに入れてください。
 Spam	Mail		スパム
 Couldn't open this signature. Sorry.	Mail		この署名を開くことはできませんでした。
 Revert	Mail		元に戻す

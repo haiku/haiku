@@ -165,7 +165,7 @@ There was an error writing the attribute.	WidgetAttributeText		Ocorreu um erro a
 Path	Default Query Columns		Caminho
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Se alterar o nome de %target, %osName poderá não funcionar corretamente!\n\nTem a certeza de que quer fazer isto?
 Could not open \"%name\" (%error). 	FSUtils		Não foi possível abrir \"%name\" (%error). 
-Media parameter group	AttributesView		Grupo de parâmetros de média
+Media parameter group	AttributesView		Grupo de parâmetros de multimédia
 %name info	InfoWindow	InfoWindow Title	Informações de %name
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Se mover a pasta pessoal, o %osName poderá não funcionar corretamente!\n\nTem a certeza de quer quer fazer isto?\n\nPara mover de qualquer modo a pasta pessoal, mantenha premida a tecla Maiúsculas (Shift) e clique \"Mover\".
 Property info	AttributesView		Informação sobre a propriedade
@@ -198,7 +198,7 @@ Icon view	DeskWindow		Vista de ícones
 <%ld rectangles>	AttributesView		<%ld rectângulos>
 Mount settings…	ContainerWindow		Definições de montagem…
 Keywords	Bookmark Query Columns		Palavras-chave
-Media parameter web	AttributesView		Rede de parâmetros de média
+Media parameter web	AttributesView		Rede de parâmetros de multimédia
 Copy more	ContainerWindow		Copiar mais
 by name	FindPanel		por nome
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Desculpe, mas não é possível guardar coisas na raiz do sistema.
@@ -508,7 +508,7 @@ Move to Trash	FSUtils		Mover para o Lixo
 Handles %type	OpenWithWindow		Suporta %tipo
 Cancel	PoseView		Cancelar
 Delete	PoseView		Apagar
-Media parameter	AttributesView		Parâmetro de média
+Media parameter	AttributesView		Parâmetro de multimédia
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se alterar a pasta pessoal, o %osName poderá não funcionar corretamente!\n\nTem a certeza de que quer fazer isso?\n\nPara alterar de qualquer modo a pasta pessoal, mantenha premida a tecla Maiúsculas (Shift) e clique \"Eu sei o que estou a fazer\".
 Sorry, you can't copy items to the Trash.	PoseView		Desculpe, não é possível copiar itens para o Lixo.
 Invert selection	VirtualDirectoryWindow		Inverter seleção

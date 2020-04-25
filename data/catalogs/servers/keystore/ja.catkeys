@@ -9,7 +9,7 @@ Allow once	AppAccessRequestWindow		一度だけ許可する
 Unlock keyring	KeyRequestWindow		キーリングのロック解除
 An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		アプリケーションが以下のキーリングへのアクセスを必要としていますが、パスフレーズでロックされています。パスフレーズを入力してキーリングのロックを解除してください。\nキーリングをロック解除すると、システムがシャットダウンされるまで解除されたままか、または手動で再ロックされます。\nもしこのダイアログをキャンセルすれば、キーリングはロックされたままです。
 Password:	KeyRequestWindow		パスワード:
-Cancel	KeyRequestWindow		キャンセル
+Cancel	KeyRequestWindow		中止
 This application has been updated since it was last granted access.	AppAccessRequestWindow		このアプリケーションは最後の許可されたアクセスのときからアップデートされています。
 Allow always	AppAccessRequestWindow		常に許可する
 Unlock	KeyRequestWindow		ロック解除

@@ -33,7 +33,7 @@ View options	MediaPlayer-SettingsWindow		Megjelenítési beállítások
 Full volume	MediaPlayer-SettingsWindow		Teljes hangerő
 <untitled>	PlaylistItem-title		<névtelen>
 Start media server	MediaPlayer-Main		Médiakiszolgáló indítása
-It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Úgy tűnik a médiakiszolgáló nem fut.\nEl kívánja indítani?
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Úgy tűnik a médiakiszolgáló nem fut.\nEl kívánod indítani?
 Location	MediaPlayer-InfoWin		Útvonal
 Medium	MediaPlayer-SettingsWindow		Közepes
 Play mode	MediaPlayer-SettingsWindow		Lejátszás módja

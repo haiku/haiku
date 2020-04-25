@@ -37,7 +37,7 @@ PRINT	Keyboard Layout View		STAMP
 German (Mac)	KeymapNames		Todesc (Mac)
 Arabic (102)	KeymapNames		Arap (102)
 ThinkPad	KeyboardLayoutNames		ThinkPad
-Belarusian (Mac)	KeymapNames		Bielorus (Mac)
+Belarusian (Mac)	KeymapNames		Bielorùs (Mac)
 Croatian	KeymapNames		Cravuat
 PAGE ↑	Keyboard Layout View		PAGJINE ↑
 Set modifier keys	Modifier keys window		Stabilìs i tascj modificadôrs
@@ -86,7 +86,7 @@ Friulian	KeymapNames		Furlan
 Left option	Keyboard Layout View		Opzion a çampe
 END	Keyboard Layout View		FIN
 Esperanto	KeymapNames		Esperanto
-Belarusian	KeymapNames		Bielorus
+Belarusian	KeymapNames		Bielorùs
 Warning: left and right key roles do not match	Modifier keys window		Atenzion: i rûi dai tascj çampe e drete no corispuindin
 Circumflex trigger	Keymap window		Acent circonflès (^)
 Caps lock	Keyboard Layout View		Bloc Maiusc
@@ -113,8 +113,8 @@ Select dead keys	Keymap window		Selezione tascj muarts
 Russian (Mac)	KeymapNames		Rus (Mac)
 Right shift	Keyboard Layout View		Maiusc a diestre
 ESC	Keyboard Layout View		ESC
-Belarusian (Latin)	KeymapNames		Bielorus (Latin)
-Hebrew	KeymapNames		Ebreu
+Belarusian (Latin)	KeymapNames		Bielorùs (Latin)
+Hebrew	KeymapNames		Ebraic
 Layout	Keymap window		Disposizion
 Greek	KeymapNames		Grêc
 Revert	Keymap window		Torne indaûr
@@ -166,7 +166,7 @@ File	Keymap window		File
 Brazilian (ABNT2)	KeymapNames		Brasilian (ABNT2)
 INS	Keyboard Layout View		INS
 OPTION	Keyboard Layout View		OPZION
-Dutch	KeymapNames		Danês
+Dutch	KeymapNames		Olandês
 Diaeresis trigger	Keymap window		Dieresi (¨)
 Icelandic	KeymapNames		Islandês
 Open…	Keymap window		Vierç…

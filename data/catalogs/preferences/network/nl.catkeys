@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Network	825145315
+1	dutch; flemish	x-vnd.Haiku-Network	2195710068
 Ethernet device	InterfaceListItem		Ethernet-apparaat
 Link speed:	IntefaceView		Verbindingssnelheid:
 disconnected	IntefaceView		niet verbonden
@@ -30,7 +30,6 @@ The method for obtaining an IP address	IntefaceAddressView		De wijze voor het ve
 Automatic	IntefaceAddressView		Automatisch
 Disable	IntefaceView		Uitschakelen
 Manage…	NetworkWindow		Beheren…
-Network	NetworkWindow		Netwerk
 Your gateway to the internet	IntefaceAddressView		Uw gateway naar het internet
 Enable	ServiceView		Inschakelen
 Wireless device	InterfaceListItem		Draadloos apparaat

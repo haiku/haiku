@@ -74,7 +74,7 @@ Control	Keyboard Layout View	Control key	Control:
 Irish	KeymapNames		アイルランド語
 Remove	Keyboard Layout View		削除
 Tilde trigger	Keymap window		チルダのトリガー
-Shift	Keyboard Layout View	Shift key	シフトキー:
+Shift	Keyboard Layout View	Shift key	Shift
 CONTROL	Keyboard Layout View		CONTROL
 Macedonian	KeymapNames		マケドニア語
 Czech (Mac)	KeymapNames		チェコ語 (Mac)
@@ -82,7 +82,7 @@ Left command	Keyboard Layout View		左 Command キー
 Albanian	KeymapNames		アルバニア語
 (Current)	Keymap window		(使用中キーマップ)
 OPT	Keyboard Layout View	Very short for 'option'	OPT
-Friulian	KeymapNames		Friulian
+Friulian	KeymapNames		フリウリ語
 Left option	Keyboard Layout View		左 Option キー
 END	Keyboard Layout View		END
 Esperanto	KeymapNames		エスペラント語

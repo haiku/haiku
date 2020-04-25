@@ -28,7 +28,7 @@ Close	ClosePrompt		Tanca
 Resize to (in 1/72 inches):	PrintOptionsWindow		Canvia'n la mida a (en 1/72 polzades):
 Rating	Menus		Puntuació
 Flip left to right	Menus		Volteja d’esquerra a dreta
-Show caption in full screen mode	Menus		Mostra el títol en mode de pantalla completa.
+Show caption in full screen mode	Menus		Mostra el títol en mode de pantalla completa
 DPI:	PrintOptionsWindow		DPI:
 Open…	Menus		Obre...
 Next file	Menus		Fitxer següent
@@ -36,7 +36,7 @@ Clear selection	Menus		Neteja la selecció
 Close document	ClosePrompt		Tanca el document
 Height: 	PrintOptionsWindow		Alçada: 
 The file '%s' could not be written.	SaveToFile		El fitxer %s no s'ha pogut escriure.
-Cancel	ClosePrompt		Anul·la
+Cancel	ClosePrompt		Cancel·la
 Show tool bar	Menus		Mostra la barra d'eines
 Fit to window	Menus		Ajusta a la finestra
 Print options	PrintOptionsWindow		Opcions d'impressió

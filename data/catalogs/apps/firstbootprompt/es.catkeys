@@ -1,8 +1,80 @@
-1	spanish; castilian	x-vnd.Haiku-FirstBootPrompt	2649051796
+1	spanish; castilian	x-vnd.Haiku-FirstBootPrompt	2670843542
+Japanese	KeymapNames		Japonés
+US	KeymapNames		Estadounidense
+Esperanto	KeymapNames		Esperanto
+Belarusian	KeymapNames		Bielorruso
+Brazilian	KeymapNames		Brasileño
+Dvorak	KeymapNames		Dvorak
+Polish	KeymapNames		Polaco
+Latin-American	KeymapNames		Latinoamericano
+Ukrainian	KeymapNames		Ucraniano
+Russian (Yawert)	KeymapNames		Ruso (Yawert)
+United-Kingdom	KeymapNames		Reino Unido
+Serbian (Cyrillic)	KeymapNames		Serbio (Cirílico)
+Turkish (Type-F)	KeymapNames		Turco (Tipo F)
+Bulgarian (Cyrillic)	KeymapNames		Búlgaro (Cirílico)
+Belgian (point)	KeymapNames		Belga (punto)
+Finnish	KeymapNames		Finés
+Swedish	KeymapNames		Sueco
+Svorak	KeymapNames		Svorak
+German	KeymapNames		Alemán
+Swiss-German	KeymapNames		Suizoalemán
 Keymap	BootPromptWindow		Distribución de teclado
+Spanish (Dvorak)	KeymapNames		Español (Dvorak)
+US-International	KeymapNames		Estados Unidos (Internacional)
+Czech	KeymapNames		Checo
+Turkish (Type-Q)	KeymapNames		Turco (Tipo Q)
+Slovak	KeymapNames		Eslovaco
+Russian (Udmurt, Komi, Mari)	KeymapNames		Ruso (Udmurt, Komi, Mari)
+Thai (TIS-820.2538)	KeymapNames		Tailandés (TIS-820.2538)
+Colemak	KeymapNames		Colemak
+Dvorak (programmer's)	KeymapNames		Dvorak (programador)
+Russian (Mac)	KeymapNames		Ruso (Mac)
 Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	¡Gracias por probar Haiku! ¡Esperamos que le agrade!\n\nPuede seleccionar su idioma y distribución de teclado preferidos de la lista de la izquierda donde podrán utilizarse instantáneamente. Después se pueden cambiar fácilmente ambas configuraciones desde el Escritorio al vuelo. Nota: Traducir aplicaciones y otros componentes de Haiku es un trabajo en proceso continuo. Probablemente se encuentren líneas sin traducir, pero si lo desea, puede unirse al trabajo en https://www.haiku-os.org/.\n\n¿Desea ejecutar el instalador o continuar inicializando el escritorio?\n
+German (Mac)	KeymapNames		Alemán (Mac)
+Arabic (102)	KeymapNames		Árabe (102)
+Belarusian (Latin)	KeymapNames		Bielorruso (Latino)
+Belarusian (Mac)	KeymapNames		Bielorruso (Mac)
+Hebrew	KeymapNames		Hebreo
+Greek	KeymapNames		Griego
+Croatian	KeymapNames		Croata
 Run Installer	BootPromptWindow		Ejecutar instalador
+Faeroese	KeymapNames		Faroés
+Polish (Typewriter)	KeymapNames		Polaco (máquina de escribir)
+French (Mac)	KeymapNames		Francés (Mac)
+Spanish	KeymapNames		Español
+Ukrainian (Mac)	KeymapNames		Ucraniano (Mac)
+Estonian	KeymapNames		Estonio
+French (Bépo)	KeymapNames		Francés (Bépo)
+Serbian (Latin)	KeymapNames		Serbio (Latino)
+Russian (Typewriter)	KeymapNames		Ruso (máquina de escribir)
+French	KeymapNames		Francés
+Italian	KeymapNames		Italiano
+Portuguese	KeymapNames		Portugués
+Swiss-French	KeymapNames		Suizofrancés
+Slovene	KeymapNames		Esloveno
+Lithuanian	KeymapNames		Lituano
+French (NF Z71-300)	KeymapNames		Francés (NF Z71-300)
+ISO-9995	KeymapNames		ISO-9995
+Kazakh	KeymapNames		Kazajo
 Language	BootPromptWindow		Idioma
+Lithuanian (Standard)	KeymapNames		Lituano (Estándar)
+Belgian (comma)	KeymapNames		Belga (coma)
 Custom	BootPromptWindow		Personalizado
+Norwegian	KeymapNames		Noruego
+Danish	KeymapNames		Danés
 Boot to Desktop	BootPromptWindow		Arrancar al escritorio
+Bulgarian (Phonetic)	KeymapNames		Búlgaro (Fonético)
+Canadian-French	KeymapNames		Francocanadiense
 Welcome to Haiku!	BootPromptWindow		¡Bienvenido a Haiku!
+Russian	KeymapNames		Ruso
+Hungarian	KeymapNames		Húngaro
+Irish	KeymapNames		Irlandés
+Romanian	KeymapNames		Rumano
+Macedonian	KeymapNames		Macedonio
+Czech (Mac)	KeymapNames		Checo (Mac)
+Brazilian (ABNT2)	KeymapNames		Brasileño (ABNT2)
+Albanian	KeymapNames		Albano
+Dutch	KeymapNames		Neerlandés
+Friulian	KeymapNames		Friuliano
+Icelandic	KeymapNames		Islandés

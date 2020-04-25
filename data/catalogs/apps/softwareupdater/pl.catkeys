@@ -1,7 +1,10 @@
-1	polish	x-vnd.haiku-softwareupdater	1519085449
+1	polish	x-vnd.haiku-softwareupdater	1223025094
+Updating version	SoftwareUpdaterWindow	List item text	Aktualizowanie wersji
+Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pakiety do usunięcia
 No active network connection was found	UpdateManager	Error message	Nie znaleziono aktywnego połączenia sieciowego
 Quit	SoftwareUpdaterWindow	Alert button label	Zakończ
 There were no updates found.	CheckManager		Nie znaleziono żadnych aktualizacji.
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Aktualizacje jeszcze się nie zakończyły, czy na pewno zakończyć?
 Updates found	SoftwareUpdaterWindow		Znaleziono aktualizacje
 Update now	SoftwareUpdaterWindow		Aktualizuj teraz
 OK	UpdateManager		OK
@@ -13,21 +16,30 @@ Contacting software repositories to check for package updates.	CheckManager		Odp
 Available updates found	CheckManager		Znaleziono dostępne aktualizacje
 from repository	SoftwareUpdaterWindow	List item text	z repozytorium
 Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Odpytywanie repozytoriów o dostępne aktualizacje.
+Cancelling updates	SoftwareUpdaterWindow		Anulowanie aktualizacji
 Cancel	SoftwareUpdaterWindow	Alert button label	Anuluj
+There were no updates found.	UpdateAction		Nie znaleziono aktualizacji.
 OK	SoftwareUpdaterWindow		OK
 Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Proszę wybrać jedną z opcji aktualizacji:\n\nZaktualizuj:\n\tAktualizuje wszystkie zainstalowane pakiety.\nPełna synchronizacja:\n\tSynchronizuje zainstalowane pakiety z repozytoriami.
+The following changes will be made:	SoftwareUpdaterWindow		Wykonane zostaną następujące zmiany:
 Fatal error while checking for updates: %s\n	CheckAction		Podczas szukania aktualizacji wystąpił błąd krytyczny: %s\n
 SoftwareUpdater	System name		SoftwareUpdater
 No active network connection was found.\n	CheckManager		Nie znaleziono aktywnego połączenia z siecią.\n
+Applying changes	UpdateManager		Dokonywanie zmian
 Full sync	SoftwareUpdaterWindow	Alert button label	Pełna synchronizacja
 Quit	SoftwareUpdaterWindow	Button label	Zakończ
+Updates have been successfully installed.	UpdateManager		Aktualizacje zostały zainstalowane pomyślnie.
 Exception occurred while updating packages : %s\n	UpdateAction		Podczas aktualizowania pakietów wystąpił wyjątek: %s\n
+A reboot is necessary to complete the update process.	UpdateManager		Ponowne uruchomienie komputera jest wymagane, aby dokończyć aktualizacje.
 Exception occurred while checking for updates: %s\n	CheckAction		Podczas sprawdzania aktualizacji wystąpił wyjątek: %s\n
 Packages are being updated	UpdateManager		Pakiety są aktualizowane
 Cancel	SoftwareUpdaterWindow		Anuluj
 Don't quit	SoftwareUpdaterWindow		Nie zamykaj
+Reboot	SoftwareUpdaterWindow		Uruchom ponownie
 Show more details	SoftwareUpdaterWindow		Wyświetl więcej szczegółów
+Installing version	SoftwareUpdaterWindow	List item text	Instalowanie wersji
 Checking for updates	CheckManager		Wyszukiwanie aktualizacji
+Reboot	SoftwareUpdaterWindow	Button label	Uruchom ponownie
 Update	SoftwareUpdaterWindow	Alert button label	Zaktualizuj
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Otwórz Repozytoria
 Updates did not complete	UpdateAction		Aktualizacje nie zostały ukończone

@@ -21,7 +21,7 @@ Install…	UninstallView		Telepítés…
 Installing files and folders	PackageInstall		Fájlok és mappák telepítése
 Installed packages	UninstallWindow		Telepített csomagok
 Remove	UninstallView		Eltávolítás
-The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		A kért csomag telepítése a rendszerre sikertelen volt. Lehet, hogy ez a cél csomagfájl hibája miatt következett be. Kérjük, vegye fel a kapcsolatot a csomag terjesztőjével.
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		A kért csomag telepítése a rendszerre sikertelen volt. Lehet, hogy ez a cél csomagfájl hibája miatt következett be. Kérlek vedd fel a kapcsolatot a csomag terjesztőjével.
 OK	UninstallView		Rendben
 Accept	PackageTextViewer		Elfogadás
 Abort	PackageView		Megszakítás
@@ -41,7 +41,7 @@ Finishing installation	PackageInstall		Telepítés befejezése
 No package available.	PackageInfo		Nincs elérhető csomag.
 Installation type:	PackageView		Telepítés típusa:
 The package you selected has been successfully removed from your system.	UninstallView		A kijelölt csomagot sikeresen eltávolítottam.
-There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		A fájlméretek a csomagfájlban nem egyeznek. A csomag korrupt lehet, vagy lehet, hogy az elkészítése után módosították. Biztos folytatni kívánja?
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		A fájlméretek a csomagfájlban nem egyeznek. A csomag korrupt lehet, vagy lehet, hogy az elkészítése után módosították. Biztos folytatni kívánod?
 %name% (%size%)	PackageView		%name% (%size%)
 Abort	PackageInstall		Megszakítás
 Replace all	PackageView		Összes cseréje

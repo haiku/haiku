@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-HaikuDepot	3501808858
+1	polish	x-vnd.Haiku-HaikuDepot	3693107605
 Uninstall	PackageManager		Usuń
 (%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Niezainstalowany
@@ -11,6 +11,7 @@ Starting the package daemon failed:\n\n%Error%	App		Uruchamianie demona pakietó
 <no info>	PackageInfoView		<brak informacji>
 No user ratings available.	PackageInfoView		Brak ocen użytkowników.
 Rating	PackageListView		Ocena
+Synchronizing icons	ServerIconExportUpdateProcess		Synchronizowanie ikon
 Does not start	RatePackageWindow		Nie uruchamia się
 Show	MainWindow		Pokaż
 Unstable but usable	RatePackageWindow		Niestabilny, ale używalny
@@ -26,14 +27,15 @@ Rate %Package%	RatePackageWindow		Oceń %Package%
 Quit HaikuDepot	App		Zakończ HaikuDepot
 Category	FilterView		Kategoria
 Installed packages	MainWindow		Zainstalowane pakiety
-Other users can see this rating	RatePackageWindow		Inni użytkownicy będą mogli zobaczyć tę ocenę
 Stable	RatePackageWindow		Stabilny
 Fatal error	PackageManager		Błąd krytyczny
 Package action failed	PackageInfoView		Akcja dla pakietu nie powiodła się
 No changelog available.	PackageInfoView		Dziennik zmian nie jest dostępny.
+Error	App		Błąd
 There was a puzzling response from the web service.	UserLoginWindow		Odebrano dziwną odpowiedź od usługi sieciowej.
 Not logged in	MainWindow		Niezalogowany
 No, quit HaikuDepot	App		Nie, zakończ HaikuDepot
+Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Twoja ocena została pomyślnie wysłana. Możesz ją zmienić lub usunąć na stronie HaikuDepot Server.
 Available	PackageListView		Dostępny
 Cancel	UserLoginWindow		Anuluj
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot wymaga demona pakietów do działania, a ten wydaje się nie być uruchomiony.\nCzy chcesz go uruchomić?
@@ -43,6 +45,7 @@ Close	PackageManager		Zamknij
 Changelog	PackageInfoView		Dziennik zmian
 About	PackageInfoView		O pakiecie
 Very unstable	RatePackageWindow		Bardzo niestabilny
+All packages	PackageListView		Wszystkie pakiety
 Stability	RatePackageWindow		Stabilność
 Send	RatePackageWindow		Wyślij
 Start package daemon	App		Uruchom demona pakietów
@@ -66,6 +69,7 @@ n/a	PackageInfoView		Nie dotyczy
 Cancel	MainWindow		Anuluj
 Refresh repositories	MainWindow		Odśwież repozytoria
 Tools	MainWindow		Narzędzia
+This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Tego pakietu nie znaleziono na HaikuDepot Server, więc dodanie oceny lub edytowanie istniejącej nie jest możliwe.
 Language	RatePackageWindow		Język
 Log out	MainWindow		Wyloguj
 Comment language:	RatePackageWindow		Język komentarza:

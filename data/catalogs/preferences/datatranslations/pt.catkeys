@@ -1,8 +1,9 @@
-1	portuguese	x-vnd.Haiku-DataTranslations	1627321298
+1	portuguese	x-vnd.Haiku-DataTranslations	210050587
 Path:	DataTranslations		Caminho:
 Name:	DataTranslations		Nome:
 DataTranslations - Note	DataTranslations		TraduçãoDeDados - Nota
 Could not install %s:\n%s	DataTranslations		Não foi possível instalar %s:\n%s
+OK	DataTranslations		OK
 Cancel	DataTranslations		Cancelar
 Info:	DataTranslations		Informação:
 DataTranslations - Error	DataTranslations		TraduçãoDeDados - Erro

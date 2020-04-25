@@ -6,7 +6,7 @@ FileTypes request	FileTypes Window		Sol·licitud de Tipus de fitxer
 This file type already exists	New File Type Window		Aquest tipus de fitxer ja existeix
 Preferred application	FileTypes Window		Aplicació preferida
 Launch	Application Types Window		Executa
-Removing uninstalled application types	Application Types Window		S'estan suprimint els tipus d'aplicació desinstal·lats
+Removing uninstalled application types	Application Types Window		Se suprimeixen els tipus d'aplicació desinstal·lats.
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Amplada:
 Same as…	FileType Window	The same TYPE as ...	El mateix que...
 (from super type)	FileTypes Window		(basat en un super tipus)
@@ -16,12 +16,12 @@ Icon	FileTypes Window		Icona
 Add…	Application Type Window		Afegeix…
 Attribute name:	Attribute Window		Nom de l'atribut:
 Long description:	Application Type Window		Descripció llarga:
-Cancel	Preferred App Menu		Anul·la
+Cancel	Preferred App Menu		Cancel·la
 Remove	FileTypes Window		Suprimeix
 The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		L'aplicació \"%s\" no permet fitxers d'aquest tipus.\nEsteu segur que tot i així ela voleu triar?
 Remove	Application Type Window		Suprimeix
 Gamma	Application Type Window		Gama
-Cancel	Application Type Window		Anul·la
+Cancel	Application Type Window		Cancel·la
 Attribute	Attribute Window		Atribut
 Multiple launch	Application Type Window		Instàncies múltiples
 {0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# tipus d'aplicació es pot suprimir} other{# tipus d'aplicacions es poden suprimir}}
@@ -33,15 +33,15 @@ None	FileTypes Window		Cap
 Exclusive launch	Application Type Window		Només una execució
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		No es pot recuperar un tipus de fitxer suprimit.\nEsteu segur que el voleu suprimir?
 Integer 64 bit	Attribute ListView		Enter de 64 bits
-Cancel	New File Type Window		Anul·la
+Cancel	New File Type Window		Cancel·la
 Select same preferred application as	FileType Window		Seleccioneu la mateixa aplicació preferida que
-Cancel	Type List Window		Anul·la
+Cancel	Type List Window		Cancel·la
 Don't save	Application Type Window		No ho desis
 Center	Attribute Window	Attribute column alignment in Tracker	Centre
 Done	Extension Window		Fet
 Development	Application Types Window		Desenvolupament
 Same as…	FileType Window	The same APPLICATION as ...	El mateix que...
-Abort	Application Types Window		Interromp
+Abort	Application Types Window		Avorta
 Save	Application Type Window		Desa
 %1 application type	Application Type Window		Tipus d'aplicació %1
 Icon	Application Type Window		Icona
@@ -85,7 +85,7 @@ Editable	Attribute Window	If Tracker allows to edit this attribute.	Editable
 New resource file…	FileTypes Window		Nou fitxer de recursos...
 [Multiple files] file types	FileType Window		Tipus de fitxer [múltiples fitxers]
 Application type	Application Type Window		Tipus d'aplicació
-Show in Tracker…	Application Types Window		Mostra al Traçador...
+Show in Tracker…	Application Types Window		Mostra-ho al Rastrejador...
 Type name:	FileTypes Window		Nom del tipus:
 Visible	Attribute Window		Visible
 Select preferred application	FileTypes Window		Seleccioneu l'aplicació preferida
@@ -105,7 +105,7 @@ String	Attribute ListView		Cadena
 Add type	New File Type Window		Afegeix un tipus
 Remove icon	Icon View		Suprimeix la icona
 Boolean	Attribute ListView		Booleà
-Cancel	Extension Window		Anul·la
+Cancel	Extension Window		Cancel·la
 Alignment:	Attribute Window		Alineació:
 Icon	FileType Window		Icona
 Signature:	Application Type Window		Signatura:
@@ -121,14 +121,14 @@ Select…	FileTypes Window		Seleccioneu...
 File recognition	FileTypes Window		Reconeixement de fitxers
 Application types…	FileTypes Window		Tipus d'aplicacions...
 Add icon…	Icon View		Afegeix una icona...
-Cancel	FileTypes Window		Anul·la
+Cancel	FileTypes Window		Cancel·la
 Save into resource file…	Application Type Window		Desa-ho al fitxer de recursos...
 Special:	Attribute Window		Especial:
 Type:	Attribute Window		Tipus:
 Could not retrieve application signature	Preferred App Menu		No ha estat possible triar la mateixa aplicació preferida
 Beta	Application Types Window		Beta
 Add group	New File Type Window		Afegeix un grup
-Cancel	Attribute Window		Anul·la
+Cancel	Attribute Window		Cancel·la
 Gamma	Application Types Window		Gama
 Supported types	Application Type Window		Tipus permesos
 Integer 32 bit	Attribute ListView		Enter de 32 bits

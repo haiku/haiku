@@ -8,7 +8,7 @@ Error moving \"%name\" to Trash. (%error)	FSUtils		\"%name\" をごみ箱に移�
 Or	FindPanel		または
 before	FindPanel		以前
 Volume icons	TrackerSettingsWindow		ディスクアイコン
-Ignore case	SelectionWindow		大文字/小文字を区別しない
+Ignore case	SelectionWindow		大文字小文字を区別しない
 Current folder	ContainerWindow		現在のフォルダー
 Finish: %time - Over %finishtime left	StatusWindow		終了: %time - 残り %finishtime 超
 Mount all disks now	AutoMounterSettings		すべてのディスクをただちにマウント
@@ -45,11 +45,11 @@ Trailing \\.	libtracker		行末に \\ があります。
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		%func にて\nfind_directory() が失敗。\nエラー: %error
 Handles any file	OpenWithWindow		すべてのファイルに対応
 save text	FilePanelPriv		テキストを保存
-Raw data	AttributesView		生データー
+Raw data	AttributesView		生データ
 Preparing to move items…	StatusWindow		移動の準備をしています…
 Size	ContainerWindow		サイズ
 Select…	ContainerWindow		選択…
-Show shared volumes on Desktop	SettingsView		共有ディスクをデスクトップに表示する
+Show shared volumes on Desktop	SettingsView		共有ディスクをデスクトップに表示
 <%ld values>	AttributesView		<%ld 個の値>
 Size	PoseView		サイズ
 matches wildcard expression	SelectionWindow		ワイルドカード表現と一致
@@ -106,11 +106,11 @@ Window	ContainerWindow		ウィンドウ
 Remove	FindPanel		削除
 Company	Person Query Columns		会社
 Recent documents	FavoritesMenu		最近開いたドキュメント
-Save as Query template:	FindPanel		クエリ雛型として保存する:
+Save as Query template:	FindPanel		クエリ雛型として保存:
 Edit templates…	TemplatesMenu		テンプレートを編集…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# バイト} other{# バイト}}
-8-bit integer	AttributesView		8ビット整数
-8-bit unsigned integer	AttributesView		8ビット符号なし整数
+8-bit integer	AttributesView		8 ビット整数
+8-bit unsigned integer	AttributesView		8 ビット符号なし整数
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used 使用中 -- %free 使用可能)
 Hide dotfiles	SettingsView		ドットファイルを隠す
 Trash	Model		ごみ箱
@@ -134,7 +134,7 @@ Move to Trash	ContainerWindow		ごみ箱に移動
 All files and folders	FindPanel		すべてのファイルとフォルダー
 Add-ons	ContainerWindow		アドオン
 Too many parenthesis.	libtracker		括弧が多すぎます。
-Increase size	ContainerWindow		サイズを拡大
+Increase size	ContainerWindow		拡大
 \nShould this be fixed?	FSUtils		\n修復しますか？
 URL	Bookmark Query Columns		URL
 Move	PoseView		移動
@@ -156,7 +156,7 @@ Previously mounted disks	AutoMounterSettings		以前にマウントされてい�
 You cannot replace a file with a folder or a symbolic link.	FSUtils		ファイルをフォルダーまたはリンクと置き換えることはできません。
 The target disk does not support creating links.	FSUtils		指定されたディスクはリンクをサポートしていません。
 develop	B_SYSTEM_DEVELOP_DIRECTORY		develop
-64-bit integer	AttributesView		64ビット整数
+64-bit integer	AttributesView		64 ビット整数
 Cut more	ContainerWindow		さらに切り取る
 The Tracker must be running to see Info windows.	PoseView		情報ウィンドウを表示するには、Trackerが実行されている必要があります。
 Tracker preferences	TrackerSettingsWindow		Tracker の設定
@@ -211,7 +211,7 @@ Used space color	SettingsView		使用済容量の色
 Cancel	FSUtils		中止
 Original name	ContainerWindow		元の名前
 Unknown	WidgetAttributeText		不明
-32-bit integer	AttributesView		32ビット整数
+32-bit integer	AttributesView		32 ビット整数
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		指定された名前はすでにフォルダー名として使用されています。別の名前を指定してください。
 48 x 48	ContainerWindow		48 x 48
 Modified	ContainerWindow		更新日時
@@ -231,21 +231,21 @@ Resize to fit	ContainerWindow		最適な表示サイズに変更
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	\"%name\" のリンク先:
 Mount server error	AutoMounterSettings		マウントサーバーエラー
 If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		ホームフォルダーの名前を変更すると、%osNameは正しく動作しなくなるかもしれません!\n\n名前を変更しますか?\n\nそれでもホームフォルダーの名前を変更するなら、シフトキーを押しながら\"名前の変更\"をクリックしてください。
-Boolean	AttributesView		ブール型
+Boolean	AttributesView		ブール値
 Invert selection	FilePanelPriv		選択範囲を反転
 Memory size	AttributesView		メモリーサイズ
 TiB	WidgetAttributeText		TiB
 New folder	TemplatesMenu		新規フォルダー
  (broken)	InfoWindow		 (破損)
 Replace all	FSUtils		すべて置換
-The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		アプリケーション \"%appname\" は開こうとしているドキュメントタイプをサポートしていません。\n進めますか?\n\n アプリケーションがサポートすることがわかっている場合は、アプリケーションの製作元にドキュメントタイプをサポートに加えるように問い合わせてください。
+The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		アプリケーション \"%appname\" は開こうとしているドキュメントタイプをサポートしていません。\n進めますか?\n\nアプリケーションがサポートすることがわかっている場合は、アプリケーションの製作元にドキュメントタイプをサポートに加えるように問い合わせてください。
 Reverse order	ContainerWindow		逆順にする
 Copying: 	StatusWindow		コピー中:
 Show navigator	SettingsView		ツールバーを表示
 Select all	DeskWindow		すべて選択
 Double-precision floating point number	AttributesView		倍精度浮動小数点数
-Decrease size	ContainerWindow		サイズを小さく
-Recent queries	FindPanel		最近のクエリー
+Decrease size	ContainerWindow		縮小
+Recent queries	FindPanel		最近のクエリ
 Mount all	MountMenu		すべてマウント
 128 x 128	DeskWindow		128 x 128
 Size	Default Query Columns		サイズ
@@ -276,7 +276,7 @@ Error %error loading Add-On %name.	ContainerWindow		%nameアドオンの読み�
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		下記の項目:\n\t%name%dest\nを\n\t%name%src\nで置き換えようとしています。\n\n%movemodeの項目と置き換えますか?
 Empty Trash	ContainerWindow		ごみ箱を空にする
 no supporting apps	OpenWithWindow		対応するアプリケーションはありません
-32-bit unsigned integer	AttributesView		32ビット符号なし整数
+32-bit unsigned integer	AttributesView		32 ビット符号なし整数
 Preparing to empty Trash…	StatusWindow		ごみ箱を空にする準備をしています…
 Deleting: 	StatusWindow		削除中:
 the MIME settings	FSUtils		MIME 設定
@@ -295,7 +295,7 @@ Get info	FilePanelPriv		詳細情報…
 MIME String	AttributesView		MIME文字列
 Delete	ContainerWindow		削除
 Execute	FilePermissionsView		実行
-Show volumes on Desktop	SettingsView		ディスクをデスクトップに表示する
+Show volumes on Desktop	SettingsView		ディスクをデスクトップに表示
 no	AttributesView		no
 Recent folders	ContainerWindow		最近開いたフォルダー
 Desktop	Model		デスクトップ
@@ -315,7 +315,7 @@ Select…	QueryContainerWindow		選択…
 Open	ContainerWindow		開く
 Settings…	MountMenu		設定…
 You cannot put the selected item(s) into the trash.	FSUtils		選択した項目をごみ箱に移動できません
-Increase size	DeskWindow		サイズを大きく
+Increase size	DeskWindow		拡大
 starts with	SelectionWindow		指定文字列で始まる
 Any	AttributesView		任意の
 New	DeskWindow		新規作成
@@ -343,7 +343,7 @@ Name	SelectionWindow		名前
 by attribute	FindPanel		属性で検索
  info	InfoWindow		 情報
 Write	FilePermissionsView		書き込み
-<%ld bytes of data>	AttributesView		<%ld バイトのデーター>
+<%ld bytes of data>	AttributesView		<%ld バイトのデータ>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		システムフォルダーやその内容を変更すると、%osName が起動しなくなります!\n\n変更しますか?\n\nそれでもシステムフォルダーやその内容を変更するなら、シフトキーを押したまま\"私はなにをするか理解しています\"をクリックします。
 Save	FilePanelPriv		保存
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		%libraryライブラリがインストールされてないため、\"%app\" を使って \"%document\" を開くことはできませんでした。
@@ -391,7 +391,7 @@ Edit Query template	FindPanel		クエリテンプレートを編集
 Save query as template…	FindPanel		クエリテンプレートとして保存…
 All disks	AutoMounterSettings		全パーティション
 link	FSUtils	filename link	リンク
-16-bit unsigned integer	AttributesView		16ビット符号なし整数
+16-bit unsigned integer	AttributesView		16 ビット符号なし整数
 Proceed	FSUtils		続行
 Edit favorites…	FilePanelPriv		お気に入りの編集…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		フォルダーを同じフォルダーやサブフォルダーに移動できません。
@@ -400,7 +400,7 @@ Fewer options	FindPanel		検索オプションを隠す
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		\"Disks\" ウィンドウ内のディスクアイコンの上に項目をドラッグ＆ドロップしてください。
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		%target を変更すると、%osName は正しく動作しないかもしれません!\n\n変更しますか?
 Sorry, you can't copy items to the Trash.	FSClipBoard		ごみ箱にコピーすることはできません。
-Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		%verbしようとしているものと同じ名前の項目がすでにフォルダーの中に存在します。\n \n%verbして置き換えますか？それとも、一つずつ確認しますか？
+Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		%verbしようとしているものと同じ名前の項目がすでにフォルダー内に存在します。\n \n%verbして置き換えますか？それとも、一つずつ確認しますか？
 When	Email Query Columns		受信日
 Object	AttributesView		オブジェクト
 Paste	FilePanelPriv		貼り付け
@@ -413,9 +413,9 @@ New folder	ContainerWindow		新規フォルダー
 Name	OpenWithWindow		名前
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		\"%name\"を置き換えようとしたら不具合が発生しました。項目は開いた状態か使用中かもしれません。
 Windows	TrackerSettingsWindow		ウィンドウ
-Show space bars on volumes	SettingsView		ディスクの容量グラフを表示する
+Show space bars on volumes	SettingsView		ディスクの容量グラフを表示
 Could not update permissions of file \"%name\". %error	FSUtils		\"%name\"の権限を更新できませんでした。%error
-Decrease size	DeskWindow		サイズを小さく
+Decrease size	DeskWindow		縮小
 Emptying Trash… 	StatusWindow		ごみ箱を空にしています…
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{# 個のファイル} other{# 個のファイル}
 KiB	WidgetAttributeText		KiB
@@ -440,7 +440,7 @@ E-mail	Person Query Columns		電子メール
 Arrange by	ContainerWindow		並べ換え
 Attributes	AttributesView		属性
 Sorry, saving more than one item is not allowed.	FilePanelPriv		2 項目以上は保存できません。
-64-bit unsigned integer	AttributesView		64ビット符号なし整数
+64-bit unsigned integer	AttributesView		64 ビット符号なし整数
 Move here	ContainerWindow		ここに移動
 the config folder	FSUtils		config フォルダー
 Sorry, could not create a new folder.	FSUtils		新規フォルダーを作成できませんでした。
@@ -487,7 +487,7 @@ Expression too long.	libtracker		式が長過ぎます。
 Color	AttributesView		色
 Copy layout	ContainerWindow		レイアウトをコピー
 Duplicate	ContainerWindow		複製
-16-bit integer	AttributesView		16ビット整数
+16-bit integer	AttributesView		16 ビット整数
 Untitled clipping	PoseView		無名クリッピング
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		指定のフォルダーに\"%name\"というファイルがすでに存在します。置き換えますか?
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		\"Disks\" ウィンドウ内のディスクアイコンの上に項目をドラッグ＆ドロップしてください。

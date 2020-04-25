@@ -1,7 +1,10 @@
-1	swedish	x-vnd.Haiku-libpackage	2012114212
+1	swedish	x-vnd.Haiku-libpackage	134767648
+Fetching repository-cache from %url	RefreshRepositoryRequest		Hämtar repository-cache från %url
+Validating checksum for %repositoryName	RefreshRepositoryRequest		Validerar checksum för %repositoryName
 Failed to remove transaction directory	PackageManagerKit		Misslyckades med att ta bort transaktionsmappen
 Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Misslyckades med att hämta konfigurationen för repositoriet \"%s\". Hoppar över.
 Refreshing repository \"%s\" failed	PackageManagerKit		Uppdateringen av repositoriet \"%s\" misslyckades
+Fetching repository checksum from %url	RefreshRepositoryRequest		Hämtar repository checksum från %url
 Failed to get repository names	PackageManagerKit		Misslyckades med att hämta namn på repositorier
 Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Misslyckades med att hämta cache för repositoriet \"%s\". Hoppar över.
 Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Paketet %s-%s har inga matchande beroenden för dess baspaket \"%s\"

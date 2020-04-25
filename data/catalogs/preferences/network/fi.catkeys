@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Network	3039697761
+1	finnish	x-vnd.Haiku-Network	115295218
 Ethernet device	InterfaceListItem		Ethernet-laite
 Link speed:	IntefaceView		Yhteysnopeus:
 disconnected	IntefaceView		katkaistu
@@ -47,7 +47,6 @@ Status:	IntefaceView		Tila:
 Disable	IntefaceView		Poista käytöstä
 Manage…	NetworkWindow		Hallitse...
 open	Open network		avaa
-Network	NetworkWindow		Verkko
 Your gateway to the internet	IntefaceAddressView		Yhdyskäytäväsi internettiin
 Enable	ServiceView		Ota käyttöön
 Wireless device	InterfaceListItem		Langaton laite

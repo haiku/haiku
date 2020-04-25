@@ -1,6 +1,6 @@
 1	hungarian	x-vnd.Haiku-JPEGTranslator	3788699631
 Read	JPEGTranslator		Olvasás
-Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be Bittérkép Formátum (JPEGÉrtelmező)
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be Bittérkép Formátum (JPEG értelmező)
 Show warning messages	JPEGTranslator		Figyelmeztető üzenetek megjelenítése
 Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		A 0 CMYK kód használata 100%-os tintaszintnél
 JPEG Library Error: %s\n	be_jerror		JPEG funkciótár hiba: %s\n

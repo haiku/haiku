@@ -1,0 +1,16 @@
+1	catalan; valencian	x-vnd.haiku-package_daemon	1440586681
+Package changes	PackageResult	Window title	Canvis de paquets
+uninstall package %s\n	PackageResult	Don't change '%s' variable	desinstal·la el paquet %s\n
+ignore problem for now	PackageProblem		ignora el problema de moment
+solution %d:	PackageProblem	Don't change the %d variable	solució %d:
+The following problems have been encountered. Please select a solution for each:	PackageProblem		S'han trobat els problemes següents. Si us plau, seleccioneu una solució per a cada un:
+Apply changes	PackageResult		Aplica els canvis
+Package daemon	PackageManager		Dimoni de paquet
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	instal·la el paquet %s del repositori %s\n
+The following additional package changes have to be made:	PackageResult		Cal fer els canvis de paquets addicionals següents:
+Warning	PackageManager		Avís
+Cancel	PackageProblem		Cancel·la
+don't activate package %source%	PackageProblem	don't change '%source%	no activis el paquet %source%
+Cancel	PackageResult		Cancel·la
+Retry	PackageProblem		Torna-ho a provar
+Package problems	PackageProblem	Window title	Problemes de paquets

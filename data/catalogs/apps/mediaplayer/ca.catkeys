@@ -33,7 +33,7 @@ View options	MediaPlayer-SettingsWindow		Opcions de visualització
 Full volume	MediaPlayer-SettingsWindow		Volum complet
 <untitled>	PlaylistItem-title		<sense títol>
 Start media server	MediaPlayer-Main		Inicia el servidor de mitjans
-It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Sembla que el servidor de mitjans no s'està executant.\nVoleu iniciar-lo?
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Sembla que el servidor de mitjans no s'executa.\nVoleu iniciar-lo?
 Location	MediaPlayer-InfoWin		Ubicació
 Medium	MediaPlayer-SettingsWindow		Mitjà
 Play mode	MediaPlayer-SettingsWindow		Mode de reproducció

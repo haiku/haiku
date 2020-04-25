@@ -1,10 +1,10 @@
-1	catalan; valencian	x-vnd.Be-PSRV	2930356711
+1	catalan; valencian	x-vnd.Be-PSRV	1222926379
 Undefined	ConfigWindow		No definit
 Return the number of available transports	PrintServerApp Scripting		Torna el nombre de transports disponibles
 Return the number of available printers	PrintServerApp Scripting		Torna el nombre d'impressores disponibles
 Get currently available ports/devices	Transport Scripting		Obté els ports i dispositius disponibles en aquest moment
 Retrieve or select the active printer	PrintServerApp Scripting		Recupera o tria la impressora activa
-Cancel	PrintServerApp		Anul·la
+Cancel	PrintServerApp		Cancel·la
 Retrieve a specific printer	PrintServerApp Scripting		Recupera una impressora determinada
 Page %1 to %2	ConfigWindow		Pàgina %1 de %2
 Get name of the printer add-on used for this printer	Printer Scripting		Obté el nom del connector utilitzat amb aquesta impressora
@@ -17,6 +17,7 @@ A printer with that name already exists, but its driver could not be found! Repl
 Yes	PrintServerApp		Sí
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Llibre major
 Would you like to set one up now?	PrintServerApp		El voleu configurar ara?
+Print job setup:	ConfigWindow		Configuració de la tasca d'impressió:
 A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		Vertical
 All pages	ConfigWindow		Totes les pàgines

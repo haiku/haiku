@@ -1,0 +1,7 @@
+1	romanian	x-vnd.Haiku-bluetooth_server	3418434903
+Stopping the Bluetooth server failed.	BluetoothReplicant		Oprirea serverului Bluetooth a eșuat.
+Bluetooth error	BluetoothReplicant		Eroare bluetooth
+Settings…	BluetoothReplicant		Configurări…
+OK	BluetoothReplicant		OK
+Error: %status%	BluetoothReplicant		Eroare: %status%
+Quit	BluetoothReplicant		Ieșire

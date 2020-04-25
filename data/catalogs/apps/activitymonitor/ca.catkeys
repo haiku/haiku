@@ -15,18 +15,18 @@ Apps	DataSource		Aplicacions
 Show legend	ActivityView		Mostra la llegenda
 Text clipboard	DataSource		Porta-retalls per a text
 Settings	ActivityWindow		Paràmetres
-Receiving	DataSource		S'està rebent
+Receiving	DataSource		Es rep
 Settings…	ActivityWindow		Paràmetres...
 Ports	DataSource		Ports
 Page faults	DataSource		Falles de pàgina
-Sending	DataSource		S'està enviant
+Sending	DataSource		S'envia
 Cache	DataSource		Memòria cau
 %.1f faults/s	DataSource		%.1f falles/s
 Update time interval:	SettingsWindow		Interval d'actualització:
 TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		Surt
 Block cache memory	DataSource		Bloca la memòria cau
-Remove graph	ActivityView		Elimina el gràfic
+Remove graph	ActivityView		Suprimeix el gràfic
 %lld sec.	SettingsWindow		%lld seg.
 %lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		Ús de la CPU

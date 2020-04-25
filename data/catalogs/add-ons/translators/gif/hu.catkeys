@@ -5,7 +5,7 @@ Optimal	GIFView		Optimális
 Greyscale	GIFView		Szürkeárnyalatos
 Colors:	GIFView		Színek:
 GIF image translator	GIFTranslator		GIF kép értelemző
-Be Bitmap Format (GIFTranslator)	GIFTranslator		Be Bitmap Formátum (GIFÉrtelemző)
+Be Bitmap Format (GIFTranslator)	GIFTranslator		Be Bitmap Formátum (GIF értelmező)
 GIF image translator	GIFView		GIF kép értelemző
 Palette:	GIFView		Paletta:
 GIF image	GIFTranslator		GIF kép

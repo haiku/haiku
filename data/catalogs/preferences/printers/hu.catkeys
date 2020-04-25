@@ -3,7 +3,7 @@ Test page	TestPageView		Tesztoldal
 Remove	PrintersWindow		Eltávolítás
 Red	TestPageView		Vörös
 Default Printer	PrinterListView		Alapértelmezett nyomtató
-<pick one>	AddPrinterDialog		<válasszon egyet>
+<pick one>	AddPrinterDialog		<válassz egyet>
 Connected to:	AddPrinterDialog		Csatlakozás:
 Make default	PrintersWindow		Legyen alapértelmezett
 Cyan	TestPageView		Cián

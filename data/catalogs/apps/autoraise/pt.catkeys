@@ -1,8 +1,8 @@
 1	portuguese	x-vnd.mmu.AutoRaise	3527604525
-AutoRaise, (c) 2002, mmu_man\nEnjoy :-)	AutoRaiseIcon		AutoRaise, (c) 2002, mmu_man\nAproveite :-)
+AutoRaise, (c) 2002, mmu_man\nEnjoy :-)	AutoRaiseIcon		Elevação Automática, (c) 2002, mmu_man\nAproveite :-)
 2 s	AutoRaiseIcon		2 s
 OK	AutoRaiseIcon		OK
-AutoRaise	System name		AutoRaise
+AutoRaise	System name		ElevaçãoAutomática
 0.2 s	AutoRaiseIcon		0,2 s
 1 s	AutoRaiseIcon		1 s
 Delay	AutoRaiseIcon		Atraso
@@ -11,7 +11,7 @@ Active	AutoRaiseIcon		Ativo
 0.1 s	AutoRaiseIcon		0,1 s
 Default (all windows)	AutoRaiseIcon		Predefinição (todas as janelas)
 Instant warping (ffm)	AutoRaiseIcon		Warping instantâneo (ffm)
-About AutoRaise…	AutoRaiseIcon		Acerca de AutoRaise…
+About AutoRaise…	AutoRaiseIcon		Acerca de ElevaçãoAutomática…
 Normal	AutoRaiseIcon		Normal
 0.5 s	AutoRaiseIcon		0,5 s
 Deskbar only (touch)	AutoRaiseIcon		Deskbar apenas (tocar)

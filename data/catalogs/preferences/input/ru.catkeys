@@ -31,8 +31,8 @@ High	TouchpadPrefView		Высокая
 Defaults	TouchpadPrefView		По умолчанию
 1-Button	SettingsView		Однокнопочная
 Short	KeyboardView		Короткая
-Revert	InputMouse		Вернуть
 Slow	KeyboardView		Медленно
+Revert	InputMouse		Вернуть
 Key repeat rate	KeyboardView		Скорость повтора клавиши
 2-Button	SettingsView		Двухкнопочная
 Click to focus and raise	SettingsView		Кликнуть для фокуса и поднятия окна

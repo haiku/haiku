@@ -1,24 +1,24 @@
 1	dutch; flemish	x-vnd.Haiku-Media	4205337498
+Couldn't add volume control in Deskbar: %s\n	Media views		De volumebesturing kon niet aan Deskbar worden toegevoegd: %s\n
+Restart media services	Media views		Mediaservices herstarten
+Quit	Media Window		Afsluiten
+Couldn't remove volume control in Deskbar: %s\n	Media views		De volumebesturing kon niet van de Deskbar verwijderd worden: %s\n
+Video output:	Media views		Video-output:
+Video input:	Media views		Video-invoer:
+Audio output:	Media views		Audio-output:
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Nu afsluiten van Media zal de herstart van de media-services stopppen. Dit leidt waarschijnlijk tot het onbetrouwbaar of niet functioneren van media-functionaliteit.
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Kon geen verbinding met mediaserver maken.\nWilt u hem starten?
+Video settings	Media Window		Video-instellingen
 Audio mixer	Media Window		Audiomixer
 Show volume control on Deskbar	Media views		Toon volumebediening in Deskbar
-Quit	Media Window		Afsluiten
-Restart media services	Media views		Mediaservices herstarten
-Couldn't add volume control in Deskbar: %s\n	Media views		De volumebesturing kon niet aan Deskbar worden toegevoegd: %s\n
 Start media server	Media Window		Mediaserver starten
 Audio settings	Media Window		Audio-instellingen
 Quit anyway	Media Window		Toch afsluiten
-Couldn't remove volume control in Deskbar: %s\n	Media views		De volumebesturing kon niet van de Deskbar verwijderd worden: %s\n
 Media	System name		Media
 Warning!	Media Window		Waarschuwing!
 MIDI Settings	Media Window		MIDI-instellingen
-Video output:	Media views		Video-output:
-Audio output:	Media views		Audio-output:
-Video input:	Media views		Video-invoer:
-Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Nu afsluiten van Media zal de herstart van de media-services stopppen. Dit leidt waarschijnlijk tot het onbetrouwbaar of niet functioneren van media-functionaliteit.
 Audio input:	Media views		Audio-input:
 <none>	Media views		<geen>
-This hardware has no controls.	Media Window		Deze hardware heeft geen bedieningselementen.
 Channel:	Media views		Kanaal:
+This hardware has no controls.	Media Window		Deze hardware heeft geen bedieningselementen.
 Defaults	Media views		Standaardwaarden
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Kon geen verbinding met mediaserver maken.\nWilt u hem starten?
-Video settings	Media Window		Video-instellingen

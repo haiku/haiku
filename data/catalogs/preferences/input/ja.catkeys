@@ -4,7 +4,7 @@ Defaults	InputMouse		デフォルト
 Tapping	TouchpadPrefView		タップ
 Long	KeyboardView		長い
 Normal	SettingsView		標準
-Cancel	TouchpadPrefView		キャンセル
+Cancel	TouchpadPrefView		中止
 Slow	TouchpadPrefView		遅い
 Warp	SettingsView		ワープ
 Instant warp	SettingsView		インスタントワープ
@@ -29,10 +29,10 @@ Mouse acceleration	SettingsView		マウス加速度
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		新しいスクロール範囲はとても広いので、通常のマウス操作を妨害するかもしれません。本当に変更しますか?
 High	TouchpadPrefView		高い
 Defaults	TouchpadPrefView		デフォルト
-1-Button	SettingsView		1ボタン
+1-Button	SettingsView		1 ボタン
 Short	KeyboardView		短い
-Revert	InputMouse		元に戻す
 Slow	KeyboardView		遅い
+Revert	InputMouse		元に戻す
 Key repeat rate	KeyboardView		キーリピートの速度
 2-Button	SettingsView		2ボタン
 Click to focus and raise	SettingsView		クリックでフォーカスと最前面へ

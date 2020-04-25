@@ -1,8 +1,80 @@
-1	romanian	x-vnd.Haiku-FirstBootPrompt	2649051796
+1	romanian	x-vnd.Haiku-FirstBootPrompt	2670843542
+Japanese	KeymapNames		Japoneză
+US	KeymapNames		US
+Esperanto	KeymapNames		Esperanto
+Belarusian	KeymapNames		Belarusă
+Brazilian	KeymapNames		Braziliană
+Dvorak	KeymapNames		Dvorak
+Polish	KeymapNames		Poloneză
+Latin-American	KeymapNames		Latino-Americană
+Ukrainian	KeymapNames		Ucrainiană
+Russian (Yawert)	KeymapNames		Rusă (Yawert)
+United-Kingdom	KeymapNames		Regatul Unit
+Serbian (Cyrillic)	KeymapNames		Sârbă (Chirilică)
+Turkish (Type-F)	KeymapNames		Turcă (Tip-F)
+Bulgarian (Cyrillic)	KeymapNames		Bulgară (Chirilică)
+Belgian (point)	KeymapNames		Belgiană (punct)
+Finnish	KeymapNames		Finlandeză
+Swedish	KeymapNames		Suedeză
+Svorak	KeymapNames		Svorak
+German	KeymapNames		Germană
+Swiss-German	KeymapNames		Germană Elvețiană
 Keymap	BootPromptWindow		Mapare de tastatură
+Spanish (Dvorak)	KeymapNames		Spaniolă (Dvorak)
+US-International	KeymapNames		Internațional-US
+Czech	KeymapNames		Cehă
+Turkish (Type-Q)	KeymapNames		Turcă (Tip-Q)
+Slovak	KeymapNames		Slovacă
+Russian (Udmurt, Komi, Mari)	KeymapNames		Rusă (Udmurt, Komi, Mari)
+Thai (TIS-820.2538)	KeymapNames		Tailandeză (TIS-820.2538)
+Colemak	KeymapNames		Colemak
+Dvorak (programmer's)	KeymapNames		Dvorak (programatori)
+Russian (Mac)	KeymapNames		Rusă (Mac)
 Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Vă mulțumim că ați încercat Haiku! Sperăm că o să vă placă!\n\nPuteți selecta limba preferată și aranjamentul de tastatură din lista din stânga care vor fi apoi utilizate automat. Puteți schimba ușor mai târziu cele două configurări de pe Desktop.\n\nDoriți să rulați Installer sau continuați să porniți sistemul?\n
+German (Mac)	KeymapNames		Germană (Mac)
+Arabic (102)	KeymapNames		Arabă (102)
+Belarusian (Latin)	KeymapNames		Belarusă (Latină)
+Belarusian (Mac)	KeymapNames		Belarusă (Mac)
+Hebrew	KeymapNames		Ebraică
+Greek	KeymapNames		Greacă
+Croatian	KeymapNames		Croată
 Run Installer	BootPromptWindow		Rulează Installer
+Faeroese	KeymapNames		Feroeză
+Polish (Typewriter)	KeymapNames		Poloneză (Mașină de scris)
+French (Mac)	KeymapNames		Franceză (Mac)
+Spanish	KeymapNames		Spaniolă
+Ukrainian (Mac)	KeymapNames		Ucrainiană (Mac)
+Estonian	KeymapNames		Estoniană
+French (Bépo)	KeymapNames		Franceză (Bépo)
+Serbian (Latin)	KeymapNames		Sârbă (Latină)
+Russian (Typewriter)	KeymapNames		Rusă (Mașină de scris)
+French	KeymapNames		Franceză
+Italian	KeymapNames		Italiană
+Portuguese	KeymapNames		Portugheză
+Swiss-French	KeymapNames		Franceză Elvețiană
+Slovene	KeymapNames		Sloven
+Lithuanian	KeymapNames		Lituaniană
+French (NF Z71-300)	KeymapNames		Franceză (NF Z71-300)
+ISO-9995	KeymapNames		ISO-9995
+Kazakh	KeymapNames		Kazahă
 Language	BootPromptWindow		Limbă
+Lithuanian (Standard)	KeymapNames		Lituaniană (Standard)
+Belgian (comma)	KeymapNames		Belgiană (virgulă)
 Custom	BootPromptWindow		Personalizat
+Norwegian	KeymapNames		Norvegiană
+Danish	KeymapNames		Daneză
 Boot to Desktop	BootPromptWindow		Bootează la Desktop
+Bulgarian (Phonetic)	KeymapNames		Bulgară (Fonetică)
+Canadian-French	KeymapNames		Franceză-Canadiană
 Welcome to Haiku!	BootPromptWindow		Bun venit la Haiku!
+Russian	KeymapNames		Rusă
+Hungarian	KeymapNames		Ungară
+Irish	KeymapNames		Irlandeză
+Romanian	KeymapNames		Română
+Macedonian	KeymapNames		Macedoniană
+Czech (Mac)	KeymapNames		Cehă (Mac)
+Brazilian (ABNT2)	KeymapNames		Braziliană (ABNT2)
+Albanian	KeymapNames		Albaneză
+Dutch	KeymapNames		Olandeză
+Friulian	KeymapNames		Friuliană
+Icelandic	KeymapNames		Islandeză

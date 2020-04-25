@@ -8,7 +8,7 @@ OK	DataTranslations		Rendben
 Cancel	DataTranslations		Mégse
 Info:	DataTranslations		Információk:
 DataTranslations - Error	DataTranslations		Értelmezők -Hiba
-Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Használja ezt a vezérlőpanelt az értelmezők alapértelmezett értékeinek beállításához, amit használniuk kell ha nincs náluk más megadva.
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Használd ezt a vezérlőpanelt az értelmezők alapértelmezett értékeinek beállításához, amit használniuk kell ha nincs más megadva.
 The new translator has been installed successfully.	DataTranslations		Az új fordító sikeresen telepítve.
 An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Egy elem (%name) már létezik az értelmezők mappájában! Kicseréljem a meglévőt?
 DataTranslations	System name		Értelmezők

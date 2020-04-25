@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	3798362543
+1	russian	x-vnd.Haiku-HaikuDepot	1929339528
 Repository update error	LocalRepositoryUpdateProcess		Ошибка обновления репозитория
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Произошла ошибка при обновлении репозитория: %error%
 User Created	UserLoginWindow		Пользователь создан
@@ -47,9 +47,7 @@ Category	FilterView		Все категории
 User rating	RatePackageWindow		Пользовательский рейтинг
 Installed packages	MainWindow		Установленные пакеты
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Запрашиваемый объект или объект, указанный в запросе, не найден на сервере.
-Other users can see this rating	RatePackageWindow		Другие пользователи могут видеть этот рейтинг
 Stable	RatePackageWindow		Стабилен
-This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		Эта версия приложения слишком стара для работы с сервером HaikuDepot. Это можно исправить обновив Haiku. Требуется HaikuDepot как минимум версии \"%s\".
 Fatal error	PackageManager		Неисправимая ошибка
 Package action failed	PackageInfoView		Действие с пакетом не удалось.
 No changelog available.	PackageInfoView		История изменений недоступна.
@@ -79,9 +77,7 @@ Very unstable	RatePackageWindow		Очень нестабилен
 Password:	UserLoginWindow		Пароль:
 All packages	PackageListView		Все пакеты
 Network Transport Error	ServerHelper		Ошибка сетевого транспорта
-Authorization or security issue.  Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Проблема авторизации или системы безопасности. Выйдите и снова войдите в систему, чтобы удостовериться в правильности вашего пароля, а также убедитесь, что вы согласились с последними условиями использования.
 Stability	RatePackageWindow		Стабильность
-The nickname must be unique, but the supplied nickname is already taken.  Choose a different nickname.	UserLoginWindow		Это имя пользователя уже занято. Пожалуйста, выберите другое имя.
 Send	RatePackageWindow		Отправить
 Start package daemon	App		Запустить пакетный демон
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Пожалуйста, повторите пароль, чтобы уменьшить вероятность его неправильного ввода.
@@ -114,7 +110,7 @@ Repositories	MainWindow		Репозитории
 n/a	PackageInfoView		н/д
 View agreed usage conditions…	MainWindow		Показать согласованные условия использования…
 Cancel	MainWindow		Отмена
-{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(осталось загрузить 1 пакет)}few{(осталось загрузить # пакета)}other{(осталось загрузить # пакетов)}}
+{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{( осталось скачать 1 пакет)}few{( осталось скачать # пакета)}other{( осталось скачать # пакетов)}}
 Refresh repositories	MainWindow		Обновить репозитории
 Tools	MainWindow		Инструменты
 Continue	App		Продолжить
@@ -131,7 +127,6 @@ Language	UserLoginWindow		Язык
 OK	UserLoginWindow		OK
 Reading repository data	LocalPkgDataLoadProcess		Чтение данных репозитория
 Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Синхронизация данных с сервером
-The nickname is malformed.  The nickname may only contain digits and lower case latin characters.  The nickname must be between four and sixteen characters in length.	UserLoginWindow		Некорректное имя пользователя. Оно может содержать только цифры и строчные латинские символы. В нём должно быть от четырёх до шестнадцати символов.
 Stability:	RatePackageWindow		Стабильность:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Необходимо принять соглашение об использовании, а также подтвердить, что лицо, создающее пользователя, соответствует минимальному возрасту.
 A validation error has occurred	ServerHelper		Произошла ошибка валидации
@@ -153,9 +148,7 @@ Quit	App		Выйти
 Search terms:	FilterView		Условия поиска:
 Pending…	PackageListView		Ожидание…
 Category:	FilterView		Категория:
-The user %Nickname% has been successfully created in the HaikuDepotServer system.  You can administer your user details by using the web interface.  You are now logged-in as this new user.	UserLoginWindow		Пользователь %Nickname% был успешно создан в системе HaikuDepotServer. Вы можете управлять данными своего пользователя с помощью веб-интерфейса. Вы вошли в систему как этот новый пользователь.
 Authentication failed	UserLoginWindow		Авторизация завершилась неудачно
-The supplied response to the captcha is incorrect.  A new captcha will be generated; try again.	UserLoginWindow		Предоставленный ответ на капчу неверен. Будет сгенерирована новая капча, попробуйте ещё раз.
 Captcha error	UserLoginWindow		Ошибочная капча
 Manage repositories…	MainWindow		Управление репозиториями…
 Fetching remote repository data	LocalRepositoryUpdateProcess		Получение данных удалённого репозитория

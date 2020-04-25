@@ -6,11 +6,11 @@ Muted	MediaReplicant		Silenciado
 OK	MediaReplicant		OK
 Couldn't launch 	MediaReplicant		Não foi possível iniciar 
 Volume	VolumeControl		Volume
-Open MediaPlayer	MediaReplicant		Abrir MediaPlayer
+Open MediaPlayer	MediaReplicant		Abrir Reprodutor de Multimédia
 %d dB	VolumeControl		%d dB
-Media preferences…	MediaReplicant		Preferências de média…
+Media preferences…	MediaReplicant		Preferências de multimédia…
 Options	MediaReplicant		Opções
 Beep	MediaReplicant		Bipe
 Open %name	DeskButton	Don't translate variable %name	Abrir %name
 Control physical output	MediaReplicant		Controlar saída física
-No media server running	VolumeControl		Nenhum servidor de média em execução
+No media server running	VolumeControl		Nenhum servidor de multimédia em execução

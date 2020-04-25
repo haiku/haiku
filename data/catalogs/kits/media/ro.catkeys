@@ -1,0 +1,12 @@
+1	romanian	x-vnd.Haiku-libmedia	1819860668
+Cleaning up.	MediaDefs		Se curăță.
+Starting media_services.	MediaDefs		Se pornește media_services.
+Stopping media_addon_server.	MediaDefs		Se oprește media_addon_server.
+Waiting for media_addon_server to quit.	MediaDefs		Se așteaptă pentru ca media_addon_server să iasă.
+Telling media_addon_server to quit.	MediaDefs		Se spune media_addon_server să iasă.
+Ready for use.	MediaDefs		Gata pentru utilizare.
+Stopping media server…	MediaDefs		Se oprește serverul media…
+Waiting for media_server to quit.	MediaDefs		Se așteaptă pentru media_server să iasă.
+Done shutting down.	MediaDefs		S-a terminat cu oprirea.
+Error occurred starting media services.	MediaDefs		A apărut o eroare la pornirea serviciilor media.
+Media Service	MediaDefs		Serviciu media

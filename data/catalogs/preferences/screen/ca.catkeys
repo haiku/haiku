@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Screen	1388881963
+1	catalan; valencian	x-vnd.Haiku-Screen	133788249
 no	Screen		no
 bits/pixel	Screen		bits/píxel
 15 bits/pixel, 32768 colors	Screen		15 bits/píxel, 32768 colors
@@ -17,7 +17,9 @@ vertically	Screen		verticalment
 All workspaces	Screen		Tots els espais de treball
 Use laptop panel:	Screen		Utilitza la pantalla del portàtil:
 Could not write VESA mode settings file:\n\t	Screen		No ha estat possible desar el fitxer de configuració del mode VESA:\n\t
-Cancel	Screen		Anul·la
+Display info	Screen		Informació de la pantalla
+Settings will revert in %seconds.	Screen		Els paràmetres es revertiran d'aquí a %seconds.
+Cancel	Screen		Cancel·la
 Other…	Screen		Altre…
 Screen	Screen		Pantalla
 Colors:	Screen		Colors:
@@ -27,10 +29,12 @@ Swap displays:	Screen		Intercanvia les pantalles:
 8 bits/pixel, 256 colors	Screen		8 bits/píxels, 256 colors
 Revert	Screen		Reverteix
 always	Screen		sempre
+Confirm changes	Screen		Confirmeu els canvis
 Warning	Screen		Avís
 24 bits/pixel, 16 Million colors	Screen		24 bits/píxel, 16 Milions de colors
 Hz	Screen		Hz
 Workspaces	Screen		Espais de treball
+Brightness:	Screen		Brillantor:
 32 bits/pixel, 16 Million colors	Screen		32 bits/píxel, 16 Milions de colors
 Done	Screen		Fet
 16 bits/pixel, 65536 colors	Screen		16 bits/píxel, 65536 colors
@@ -44,7 +48,7 @@ Columns:	Screen		Columnes:
 Resolution:	Screen		Resolució:
 Apply	Screen		Aplica
 horizontally	Screen		horitzontalment
-disable	Screen		desactiva
+disable	Screen		inhabilita
 Set background…	Screen		Seleccioneu el fons...
 Type or use the left and right arrow keys.	Screen		Escriviu o feu servir les fletxes dreta i esquerra.
 Screen	System name		Pantalla

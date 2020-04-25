@@ -14,7 +14,7 @@ Failed	JobListView		Ha fallat
 Blue	TestPageView		Blau
 Waiting	JobListView		En espera
 Processing	JobListView		En procés
-Cancel	AddPrinterDialog		Anul·la
+Cancel	AddPrinterDialog		Cancel·la
 Unknown status	JobListView		Es desconeix l'estat
 Print jobs for %printer_name%	PrintersWindow		Tasques d'impressió per a %printer_name%
 {0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? pàgines}=1{# pàgina}other{# pàgines}}

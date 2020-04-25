@@ -33,7 +33,7 @@ Kill this thread!	ProcessController		スレッドを強制終了
 This team is already gone…	ProcessController		Team はすでに終了しています…
 Gone teams…	ProcessController		終了した team…
 Quit an application	ProcessController		アプリケーションを終了
-Cancel	ProcessController		取り消し
+Cancel	ProcessController		中止
 Install in Deskbar	ProcessController		Deskbar にインストール
 Debug this team!	ProcessController		スレッドをデバッグ
 Low latency	ProcessController		低遅延モード

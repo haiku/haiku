@@ -19,7 +19,7 @@ Rotate counterclockwise	Menus		Rodar para a esquerda
 High-quality zooming	Menus		Zoom de alta qualidade
 Browse	Menus		Navegar
 Edit	Menus		Editar
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Não foi possível abrir a imagem! Ou um arquivo ou um tradutor de imagem necessário não existe.
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Não foi possível abrir a imagem! Ou não existe o ficheiro, ou um tradutor de imagens para esse formato.
 First page	Menus		Primeira página
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		O documento '%s' (página %d) foi modificado. Você deseja fechar o documento?
 Leave full screen	Menus		Sair do ecrã completo

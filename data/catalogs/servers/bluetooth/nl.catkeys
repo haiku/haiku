@@ -1,0 +1,7 @@
+1	dutch; flemish	x-vnd.Haiku-bluetooth_server	3418434903
+Stopping the Bluetooth server failed.	BluetoothReplicant		Het stoppen van de bluetooth server is mislukt.
+Bluetooth error	BluetoothReplicant		Bluetoothfout
+Settings…	BluetoothReplicant		Instellingen…
+OK	BluetoothReplicant		Okee
+Error: %status%	BluetoothReplicant		Fout: %status%
+Quit	BluetoothReplicant		Afsluiten

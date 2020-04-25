@@ -1,4 +1,12 @@
-1	portuguese	x-vnd.Haiku-TGATranslator	1099738544
+1	portuguese	x-vnd.Haiku-TGATranslator	1162626992
 Save with RLE compression	TGAView		Guardar com compressão RLE
+Targa image (%d bits truecolor)	TGATranslator		Imagem Targa (%d bits truecolor)
+Ignore TGA alpha channel	TGAView		Ignorar canal alfa TGA
+Targa image (%d bits colormap)	TGATranslator		Imagem Targa (%d bits mapa de cores)
+TGA image translator	TGAView		Tradutor de imagens TGA
 Written by the Haiku Translation Kit Team	TGAView		Escrito pela Equipa do Kit de Tradução do Haiku
+TGA images	TGATranslator		Imagens TGA
 Version %d.%d.%d, %s	TGAView		Versão %d.%d.%d, %s
+TGATranslator Settings	TGATranslator		Definições do tradutor TGA
+TGA image translator	TGATranslator		Tradutor de imagens TGA
+TGA Settings	TGAMain		Definições TGA

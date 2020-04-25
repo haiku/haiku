@@ -31,8 +31,8 @@ High	TouchpadPrefView		Korkea
 Defaults	TouchpadPrefView		Oletukset
 1-Button	SettingsView		1-painikkeinen
 Short	KeyboardView		Lyhyt
-Revert	InputMouse		Käänteinen
 Slow	KeyboardView		Hidas
+Revert	InputMouse		Käänteinen
 Key repeat rate	KeyboardView		Näppäimen toistonopeus
 2-Button	SettingsView		2-painikkeinen
 Click to focus and raise	SettingsView		Kohdista ja nosta napsauttamalla

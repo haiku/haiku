@@ -3,8 +3,8 @@ Backgrounds	System name		Háttér
 X:	Main View		X:
 Setting the background image failed:	Main View		Nem sikerült a háttérkép beállítása:
 Resolution: 	Image Filepanel		Felbontás: 
-pick one	Main View		válasszon egyet
-Default	Main View		Alapértelmezés
+pick one	Main View		válassz egyet
+Default	Main View		Alapérték
 Center	Main View		Középre
 Folder: %path	Main View		Mappa: %path
 Manual	Main View		Kézi elhelyezés

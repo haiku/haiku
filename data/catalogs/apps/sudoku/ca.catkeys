@@ -20,8 +20,8 @@ Solve	SudokuWindow		Resol
 HTML	SudokuWindow		HTML
 Advanced	SudokuWindow		Avançat
 Set all hints	SudokuWindow		Estableix totes les millores
-Searching for removable values	SudokuGenerator		S'estan cercant els valors eliminables
-Abort	ProgressWindow		Interromp
+Searching for removable values	SudokuGenerator		Se cerquen els valors suprimibles.
+Abort	ProgressWindow		Avorta
 Could not set Sudoku:\n%s\n	SudokuWindow		No ha estat possible iniciar el Sudoku:\n%s\n
 Help	SudokuWindow		Ajuda
 OK	SudokuWindow		D'acord

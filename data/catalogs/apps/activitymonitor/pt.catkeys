@@ -1,6 +1,6 @@
 1	portuguese	x-vnd.Haiku-ActivityMonitor	1155619009
 P-faults	DataSource		Falhas-P
-Media nodes	DataSource		Nós de média
+Media nodes	DataSource		Nós de multimédia
 Threads	DataSource		Threads
 Always on top	ActivityWindow		Sempre visível
 Add graph	ActivityWindow		Adicionar gráfico

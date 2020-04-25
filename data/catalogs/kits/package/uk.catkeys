@@ -1,7 +1,10 @@
-1	ukrainian	x-vnd.Haiku-libpackage	2012114212
+1	ukrainian	x-vnd.Haiku-libpackage	134767648
+Fetching repository-cache from %url	RefreshRepositoryRequest		Видобування кешу-сховища з %url
+Validating checksum for %repositoryName	RefreshRepositoryRequest		Перевірка контрольної суми для %repositoryName
 Failed to remove transaction directory	PackageManagerKit		Не вдалося видалити каталог транзакцій
 Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Не вдалося отримати конфігурацію для репозитарія \"%s\". Пропустити.
 Refreshing repository \"%s\" failed	PackageManagerKit		Збій оновлення репозитарія \"%s\"
+Fetching repository checksum from %url	RefreshRepositoryRequest		Отримання контрольної суми репозитарія з %url
 Failed to get repository names	PackageManagerKit		Збій отримання назв репозитаріїв
 Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Збій отримання кешу для репозитарія \"%s\". Пропущено.
 Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Пакет %s-%s не вимагає відповідності з базовим \"%s\"

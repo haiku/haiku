@@ -67,7 +67,7 @@ Stop video	CodyCam		Encerrar video
 Last Capture: 	VideoConsumer.cpp		Última Captura: 
 Rate:	CodyCam		Taxa:
 Couldn't find requested directory on server	VideoConsumer.cpp		Não foi possível localizar o diretório solicitado no servidor
-Cannot find the media roster	CodyCam		Não é possível encontrar a lista de média
+Cannot find the media roster	CodyCam		Não é possível encontrar a escala de multimédia
 Type:	CodyCam		Tipo:
 Rename failed	VideoConsumer.cpp		Alteração de nome falhou
 unrecognized upload client specified	CodyCam		ignorado o upload especifique o cliente

@@ -27,7 +27,7 @@ Device: 	ProbeView		Dispositiu:
 Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Base
 Open file…	FileWindow		Obre un fitxer...
 32 bit unsigned pointer:	TypeEditors		Punter de 32 bits sense signe:
-DiskProbe request	DiskProbe		Sol·licitud del Gestor de Discos
+DiskProbe request	DiskProbe		Sol·licitud del Sondeig de discs
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadecimal
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		No ha estat possible escriure al disc:\n%s\n\nSi sortiu es perdran tots els canvis..
 Examine device:	OpenWindow		Navega pel dispositiu:
@@ -38,12 +38,12 @@ Don't save	ProbeView		No el desis
 Undo	ProbeView		Desfés
 Flattened bitmap	TypeEditors		Mapa de bits aplanat
 Block %Ld (0x%Lx)	ProbeView		Bloc %Ld (0x%Lx)
-Cancel	OpenWindow		Anul·la
+Cancel	OpenWindow		Cancel·la
 Unknown format	TypeEditors		Format desconegut
 File: 	ProbeView		Fitxer: 
 Swapped: %Ld (0x%0*Lx)	ProbeView		Intercanviat: %Ld (0x%0*Lx)
 Stop	ProbeView		Atura
-Cancel	ProbeView		Anul·la
+Cancel	ProbeView		Cancel·la
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	No ha estat possible obrir \"%s\":\n%s
 Font size	ProbeView		Mida del tipus de lletra
 Type editor not supported	ProbeView		El tipus de tipus de lletra no és compatible
@@ -51,9 +51,9 @@ Native: 0x%0*Lx	ProbeView		Nadiu: 0x%0*Lx
 Copy	ProbeView		Copia
 Redo	ProbeView		Refés
 Floating-point value:	TypeEditors		Valor de punt flotant:
-Cancel	AttributeWindow		Anul·la
+Cancel	AttributeWindow		Cancel·la
 16 bit signed value:	TypeEditors		Valor de 16 bits sense signe:
-DiskProbe request	AttributeWindow		Sol·licitud del Gestor de Discos
+DiskProbe request	AttributeWindow		Sol·licitud del Sondeig de discs
 Next	ProbeView		Següent
 64 bit signed offset:	TypeEditors		Desplaçament amb signe de 64 bits:
 32 bit signed value:	TypeEditors		Valor de 32 bits sense signe:
@@ -115,7 +115,7 @@ Block	ProbeView		Bloc
 Find again	ProbeView		Cerca de nou
 View	ProbeView	This is the last menubar item 'File Edit Block View'	Visualitza
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	No s'ha pogut llegir la imatge
-DiskProbe request	ProbeView		Sol·licitud del Gestor de Discos
+DiskProbe request	ProbeView		Sol·licitud del Sondeig de discs
 Double precision floating-point value:	TypeEditors		Valor de coma flotant de doble precisió:
 Image	TypeEditors	This is the type of view	Imatge
 Save changes before closing?	ProbeView		Voleu desar els canvis abans de tancar?

@@ -12,7 +12,7 @@ Alpha:	Playground		Alfa:
 Mode:	Playground		Mode:
 Submenu	Playground		Submenú
 Copy	Playground		Copia
-Cancel	Playground		Anul·la
+Cancel	Playground		Cancel·la
 Clear	Playground		Neteja
 Min	Playground		Mínim
 Blend	Playground		Barreja
@@ -25,7 +25,7 @@ Test	Playground		Prova
 Max	Playground		Màx
 Add	Playground		Afegeix
 Playground	System name		Àrea de jocs
-Erase	Playground		Elimina
+Erase	Playground		Esborra
 File	Playground		Fitxer
 Subtract	Playground		Sostreu
 <pick>	Playground		<tria>

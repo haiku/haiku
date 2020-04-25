@@ -24,7 +24,7 @@ discharging	PowerStatus		es descarrega
 Show text label	PowerStatus		Mostra l'etiqueta de text
 About…	PowerStatus		Quant a...
 Model number: 	PowerStatus		Número del model: 
-Install in Deskbar	PowerStatus		Instal·la a la barra d'escriptori
+Install in Deskbar	PowerStatus		Instal·la-ho a la barra d'escriptori
  mAh	PowerStatus		 mAh
 Capacity: 	PowerStatus		Capacitat: 
 Battery discharging	PowerStatus		La bateria es descarrega.
@@ -39,7 +39,7 @@ Design capacity warning: 	PowerStatus		Avís de la capacitat de disseny:
 Quit	PowerStatus		Surt
 rechargeable	PowerStatus		recarregable
 charging	PowerStatus		es carrega
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Podeu executar PowerStatus en una finestra o instal·lar-lo a la barra d’escriptori.
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Podeu executar l'Estat de l'energia en una finestra o instal·lar-lo a la barra d’escriptori.
 Show status icon	PowerStatus		Mostra la icona de l'estat
 Capacity granularity 2: 	PowerStatus		Granularitat de la capacitat 2: 
 Technology: 	PowerStatus		Tecnologia: 

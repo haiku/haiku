@@ -1,9 +1,9 @@
 1	ukrainian	x-vnd.Haiku-hmulti_audio.media_addon	451057402
 Master	MultiAudio		Головний
 SPDIF	MultiAudio		SPDIF
-Gain	MultiAudio		Гучність
+Gain	MultiAudio		Підсилення
 Output 3D center	MultiAudio		Центр 3D вихода
-Extended Setup	MultiAudio		Розширені налаштування
+Extended Setup	MultiAudio		Розширені настройки
 CD	MultiAudio		CD
 Tone control	MultiAudio		Регулятор тембру
 Phone	MultiAudio		Телефон
@@ -18,7 +18,7 @@ Output treble	MultiAudio		Вихід високих
 Mono mix	MultiAudio		Змішування моно
 General	MultiAudio		Загальні
 Input & Output	MultiAudio		Вхід & Вихід
-Enhanced Setup	MultiAudio		Розширені налаштування
+Enhanced Setup	MultiAudio		Поліпшені настройки
 Stereo mix	MultiAudio		Змішування стерео
 Output 3D depth	MultiAudio		Глибина 3D виходу
 Volume	MultiAudio		Гучність
@@ -30,5 +30,5 @@ Mic	MultiAudio		Мікрофон
 Enable	MultiAudio		Увімкнути
 Mute	MultiAudio		Приглушити
 Wave	MultiAudio		Хвиля
-Setup	MultiAudio		Параметри
+Setup	MultiAudio		Настройки
 Level	MultiAudio		Рівень

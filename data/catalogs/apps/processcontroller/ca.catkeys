@@ -8,7 +8,7 @@ Processor %d	ProcessController		Processador %d
 Live in the Deskbar	ProcessController		Viu a la barra d’escriptori
 Kill this team!	ProcessController		Mata aquest equip!
 OK	ProcessController		D'acord
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Podeu executar ProcessController en una finestra o instal·lar-lo a la barra d’escriptori.
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Podeu executar el Controlador de processos en una finestra o instal·lar-lo a la barra d’escriptori.
 Real-time priority	ProcessController		Prioritat en temps real
 Custom priority	ProcessController		Prioritat personalitzada
 Debug this thread!	ProcessController		Depureu aquest fil!
@@ -18,8 +18,8 @@ Memory usage	ProcessController		Ús de la memòria
 Ok!	ProcessController		D'acord!
 Normal priority	ProcessController		Prioritat normal
 Restart Deskbar	ProcessController		Reinicia la barra d'escriptori
-About ProcessController…	ProcessController		Quant al ProcessController...
-Usage: %s [-deskbar]\n	ProcessController		Ús: %s [-deskbar]\n
+About ProcessController…	ProcessController		Quant al Controlador de processos...
+Usage: %s [-deskbar]\n	ProcessController		Ús: %s [-barra d'escriptori]\n
 Please confirm	ProcessController		Si us plau, confirmeu-ho.
 Urgent priority	ProcessController		Prioritat urgent
 What do you want to do with the thread \"%s\"?	ProcessController		Què voleu fer amb el fil \"%s\"?
@@ -33,18 +33,18 @@ Kill this thread!	ProcessController		Mata aquest fil!
 This team is already gone…	ProcessController		Aquest equip ja no hi és...
 Gone teams…	ProcessController		Equips desapareguts...
 Quit an application	ProcessController		Surt d'una aplicació
-Cancel	ProcessController		Anul·la
-Install in Deskbar	ProcessController		Instal·la a la barra d'escriptori
+Cancel	ProcessController		Cancel·la
+Install in Deskbar	ProcessController		Instal·la-ho a la barra d'escriptori
 Debug this team!	ProcessController		Depureu aquest equip!
 Low latency	ProcessController		Latència baixa
 ProcessController	System name		Controlador de processos
 Lowest active priority	ProcessController		Prioritat activa més baixa
-Restart Tracker	ProcessController		Reinicia el rastrejador
+Restart Tracker	ProcessController		Reinicia el Rastrejador
 System resources & caches…	ProcessController		Recursos i memòria cau del sistema…
 Damned!	ProcessController		Maleït!
 New Terminal	ProcessController		Terminal nou
 Power saving	ProcessController		Estalvi d'energia
-ProcessController is already installed in Deskbar.	ProcessController		El Controlador de processos ja està instal·lat a la barra de l'escriptori.
+ProcessController is already installed in Deskbar.	ProcessController		El Controlador de processos ja està instal·lat a la barra d'escriptori.
 This is the last active processor…\nYou can't turn it off!	ProcessController		Aquest és l'últim processador actiu ...\nNo podeu aturar-lo!
 This thread is already gone…	ProcessController		Aquest fil ja no hi és...
 Run in window	ProcessController		Executa en una finestra

@@ -1,7 +1,7 @@
 1	japanese	x-vnd.Haiku-hmulti_audio.media_addon	451057402
 Master	MultiAudio		Master
 SPDIF	MultiAudio		SPDIF
-Gain	MultiAudio		Gain
+Gain	MultiAudio		ゲイン
 Output 3D center	MultiAudio		Output 3D center
 Extended Setup	MultiAudio		高度な設定
 CD	MultiAudio		CD

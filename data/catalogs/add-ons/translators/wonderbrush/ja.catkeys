@@ -3,7 +3,7 @@ Version %d.%d.%d, %s	WonderBrushView		バージョン %d.%d.%d, %s
 WonderBrush image translator	WonderBrushTranslator		WonderBrush イメージトランスレーター
 WBI Settings	WonderBrushTranslator		WBI 設定
 WBI Settings	WonderBrushMain		WBI 設定
-WonderBrush images	WonderBrushTranslator		WonderBrushイメージ
+WonderBrush images	WonderBrushTranslator		WonderBrush イメージ
 WonderBrush image	WonderBrushTranslator		WonderBrush イメージ
 WonderBrush image translator	WonderBrushView		WonderBrush イメージトランスレーター
 written by:	WonderBrushView		作者:

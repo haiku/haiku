@@ -11,16 +11,16 @@ Display balance control for stereo connections	AudioMixer		Показати ре
 To output	AudioMixer		До виходу
 not connected	AudioMixer		не приєднано
 Refuse input format changes	AudioMixer		Відхилити зміни вхідного формату
-Drop/repeat samples	AudioMixer		Пропуск/повтор семплів 
+Drop/repeat samples	AudioMixer		Пропуск/повтор семплів
 Output channel sources	AudioMixer		Джерела вихідного канала
 dB	AudioMixer		дБ
-Gain controls	AudioMixer		Керування підсиленням
+Gain controls	AudioMixer		Регулювання підсилення
 Input mapping	AudioMixer		Перепризначення входу
 Mute	AudioMixer		Заглушити
 Input channel destinations	AudioMixer		Напрямки вхідних каналів
 To master	AudioMixer		До головного
 Master output	AudioMixer		Головний вихід
-Setup	AudioMixer		Встановити
+Setup	AudioMixer		Настройки
 Use non linear gain sliders (like BeOS R5)	AudioMixer		Використовувати нелінійні регулятори підсилення (як у BeOS R5)
 Gain	AudioMixer		Підсилення
 Allow output channel remapping	AudioMixer		Дозволити перепризначення вихідного каналу

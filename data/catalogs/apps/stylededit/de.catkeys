@@ -1,8 +1,9 @@
-1	german	x-vnd.Haiku-StyledEdit	2839922509
+1	german	x-vnd.Haiku-StyledEdit	613799227
 Document statistics	Statistics		Dokument-Statistik
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rückgängig machen unmöglich, die Datei wurde nicht gefunden: \"%s\".
 Cut	Menus		Ausschneiden
 Center	Menus		Zentriert
+Increase size	Menus		Vergrößern
 Wrap-around search	FindandReplaceWindow		Gesamtes Dokument durchsuchen
 Page setup…	Menus		Seite einrichten…
 Untitled 	StyledEditWindow		Unbenannt
@@ -69,6 +70,7 @@ Find selection	Menus		Auswahl suchen
 Cancel	SaveAlert		Abbrechen
 Find…	Menus		Suchen…
 Revert	RevertToSavedAlert		Wiederherstellen
+Decrease size	Menus		Verkleinern
 Size	Menus		Größe
 Autodetect	Menus		Automatisch
 Replace next	Menus		Weiter ersetzen

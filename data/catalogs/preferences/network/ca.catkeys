@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Network	3039697761
+1	catalan; valencian	x-vnd.Haiku-Network	115295218
 Ethernet device	InterfaceListItem		Dispositiu d'Ethernet
 Link speed:	IntefaceView		Velocitat d'enllaç:
 disconnected	IntefaceView		desconnectat
@@ -17,7 +17,7 @@ DHCP	IntefaceAddressView		DHCP
 Netmask:	IntefaceAddressView		Màscara de xarxa:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Serveis
-Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Ha fallat la instal·lació de l'estat de xarxa a la barra d'escriptori: %s
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Ha fallat la instal·lació de l'Estat de xarxa a la barra d'escriptori: %s
 Revert	NetworkWindow		Reverteix
 off	ServiceListItem		inactiu
 WEP	WEP protected network		WEP
@@ -47,7 +47,6 @@ Status:	IntefaceView		Estat:
 Disable	IntefaceView		Inhabilita
 Manage…	NetworkWindow		Gestiona...
 open	Open network		obre
-Network	NetworkWindow		Xarxa
 Your gateway to the internet	IntefaceAddressView		La vostra passarel·la a Internet
 Enable	ServiceView		Habilita
 Wireless device	InterfaceListItem		Dispositiu sense fil

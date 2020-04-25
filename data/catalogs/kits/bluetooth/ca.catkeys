@@ -85,4 +85,4 @@ Combo keyboard/pointing device	DeviceClass		Teclat combinat o dispositiu senyala
 Video conferencing	DeviceClass		Videoconferència
 Peripheral	DeviceClass		Perifèric
 Object transfer	DeviceClass		Transferidor d'objectes
-Set-top box	DeviceClass		Dispositiu extern
+Set-top box	DeviceClass		Descodificador d'Internet

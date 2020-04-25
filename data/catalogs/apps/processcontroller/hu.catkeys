@@ -8,7 +8,7 @@ Processor %d	ProcessController		%d processzor
 Live in the Deskbar	ProcessController		Átrakás az Asztalsávra
 Kill this team!	ProcessController		Szál leállítása!
 OK	ProcessController		Rendben
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Futtathatja a Folyamatkezelőt egy ablakban, vagy feltelepítheti azt az Asztalsávra.
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Futtathatod a Folyamatkezelőt egy ablakban, vagy feltelepítheted azt az Asztalsávra.
 Real-time priority	ProcessController		Valós idejű prioritás
 Custom priority	ProcessController		Egyéni prioritás
 Debug this thread!	ProcessController		Szál hibakeresése!

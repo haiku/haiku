@@ -1,100 +1,162 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	2687270624
+1	hungarian	x-vnd.Haiku-HaikuDepot	2908956481
+Repository update error	LocalRepositoryUpdateProcess		Tároló frissítési hiba
+An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Hiba történt a tároló frissítésekor: %error%
+User Created	UserLoginWindow		Felhasználó létrehozva
 Check for updates…	MainWindow		Frissítések keresése…
 Uninstall	PackageManager		Eltávolítás
 (%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Eltávolítva
+It was not possible to create the new user.	UserLoginWindow		Nem sikerült létrehozni a felhasználót.
 Available packages	MainWindow		Elérhető csomagok
 Create account	UserLoginWindow		Felhasználói fiók létrehozása
 Mostly stable	RatePackageWindow		Nagyrészt stabil
+OK	App		Rendben
+The response to the captcha was incorrect.	ServerHelper		Hibás válasz a captcha-kódra.
 Develop packages	MainWindow		Fejlesztői csomagok
 Rate package…	PackageInfoView		Csomag értékelése…
 Starting the package daemon failed:\n\n%Error%	App		A csomag démon indítása sikertelen:\n\n%Error%
+You have successfully authenticated as user %Nickname%.	UserLoginWindow		Sikeres bejelentkezés %Nickname%.
 <no info>	PackageInfoView		<nincs információ>
 No user ratings available.	PackageInfoView		Felhasználói értékelés nem áll rendelkezésre.
+Downloading package '%name%'	WorkStatusView		Csomag letöltése: '%name%'
+It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Nem sikerült kinyerni a captcha információt az elküldött adatokból.
 Rating	PackageListView		Értékelés
+Synchronizing icons	ServerIconExportUpdateProcess		Ikonok szinkronizálása
 Does not start	RatePackageWindow		Nem indul el
 Show	MainWindow		Megjelenítés
+An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Nem sikerült a csomaglista betöltése: %message%.
 Unstable but usable	RatePackageWindow		Instabil, de használható
 Not specified	RatePackageWindow		Nincs megadva
 Active	PackageListView		Aktív
 Login or Create account	MainWindow		Belépés vagy fiók létrehozása
 <Package contents not available for remote packages>	PackageContentsView		<Távoli csomagok esetében a csomag tartalma nem érhető el>
+{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1 csomag letöltése}other{# csomag letöltése}}
 Ratings	PackageInfoView		Értékelés
 Switch account…	MainWindow		Másik fiók…
 Preferred language:	UserLoginWindow		Előnyben részesített nyelv:
+Server Error	ServerHelper		Kiszolgáló hiba
 Name	PackageListView		Név
+Local	LocalPkgDataLoadProcess		Helyi
 Rate %Package%	RatePackageWindow		%Package% értékelése
+An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Nem sikerült elindítani a csomagkezelőt: %message%.
 Quit HaikuDepot	App		Raktár bezárása
+A response to the captcha question must be provided.	UserLoginWindow		Szükséges a captcha kérdésre válaszolni.
 Category	FilterView		Kategória
+User rating	RatePackageWindow		Felhasználói értékelés
 Installed packages	MainWindow		Telepített csomagok
-Other users can see this rating	RatePackageWindow		A többi felhasználó számára látható az értékelés
 Stable	RatePackageWindow		Stabil
 Fatal error	PackageManager		Végzetes hiba
 Package action failed	PackageInfoView		A csomag telepítése sikertelen
 No changelog available.	PackageInfoView		Nincs módosítás-előzmény
+Error	App		Hiba
 There was a puzzling response from the web service.	UserLoginWindow		A webes szolgáltatás rejtélyes választ adott.
 Not logged in	MainWindow		Nincs bejelentkezve
 No, quit HaikuDepot	App		Nem, a Raktár bezárása.
+Featured packages	FeaturedPackagesView		Kiemelt csomagok
+It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Nem sikerült kapcsolódni a kiszolgálóhoz a captcha kód letöltéséhez.
+Network Error	ServerHelper		Hálózati hiba
 Available	PackageListView		Elérhető
 Cancel	UserLoginWindow		Mégse
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		A Raktárnak szüksége van a csomag démonra a helyes működéshez, de úgy látszik, hogy az nem fut.\nElindíthatom?
-Click a package to view information	PackageInfoView		Válasszon egy csomagot az információk megtekintéséhez
+Click a package to view information	PackageInfoView		Válassz egy csomagot az információk megtekintéséhez
+The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		A jelszónak legalább 8 karakter hosszúnak kell lennie és tartalmaznia kell legalább 2 számot és egy nagybetűt.
 Contents	PackageInfoView		Tartalom
 Close	PackageManager		Bezárás
 Changelog	PackageInfoView		Változásnapló
+Rating not possible	MainWindow		Nem értékelhető
+Package update error	MainWindow		Csomag frissítési hiba
 About	PackageInfoView		Névjegy
+%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# folyamat} other{# folyamat}}
+Reboot required	PackageManager		Újraindítás szükséges
 Very unstable	RatePackageWindow		Nagyon instabil
+Password:	UserLoginWindow		Jelszó:
+All packages	PackageListView		Minden csomag
+Network Transport Error	ServerHelper		Hálózati adatátviteli hiba
 Stability	RatePackageWindow		Stabilitás
 Send	RatePackageWindow		Küldés
 Start package daemon	App		Csomag démon indítása
 The package action could not be scheduled: %Error%	PackageInfoView		A csomaggal történő művelet nem ütemezhető be: %Error%
 Cancel	RatePackageWindow		Mégse
 Inactive	PackageListView		Inaktív
-OK	MainWindow		OK
+Nickname:	UserLoginWindow		Felhasználó:
+Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Meta adatok szinkronizálása
+There are problems in the supplied data:	UserLoginWindow		Hibás adatok lettek megadva:
+OK	MainWindow		Rendben
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# elem} other{# elem}}
+Usage conditions download problem	UserLoginWindow		Hiba történt a felhasználási feltételek letöltésekor
 OK	PackageInfoView		Rendben
 Downloading:	PackageInfoView		Letöltés:
 Success	UserLoginWindow		Sikeres
+Package daemon problem	App		Csomagkezelő hiba
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Tároló
+%hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (verzió: %hd.version%)
+The email is malformed.	UserLoginWindow		Hibás a levél formátuma.
 Close	UserLoginWindow		Bezárás
 Close	RatePackageWindow		Bezárás
+Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Csomagadatok szinkronizálása a tárolóból: '%REPO_NAME%'
+View the usage conditions	UserLoginWindow		Felhasználási feltételek
+Login issue	MainWindow		Belépési hiba
 Size	PackageListView		Méret
 Your rating:	RatePackageWindow		Saját értékelés:
 Your rating was updated.	RatePackageWindow		Az értékelés módosítása sikerült.
 All categories	FilterView		Minden kategória
+Repositories	MainWindow		Tárolók
 n/a	PackageInfoView		nincs értékelve
+View agreed usage conditions…	MainWindow		Jóváhagyott felhasználási feltételek…
 Cancel	MainWindow		Mégse
+{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 letötés)}other{(# letöltés)}}
 Refresh repositories	MainWindow		Tárolók frissítése
 Tools	MainWindow		Eszközök
+Continue	App		Folytatás
+A password is required.	UserLoginWindow		Jelszó szükséges.
 Language	RatePackageWindow		Nyelv
 Log out	MainWindow		Kijelentkezés
 Comment language:	RatePackageWindow		Hozzászólás nyelve:
 Status	PackageListView		Állapot
+The password has been incorrectly repeated.	UserLoginWindow		A megismételt jelszó téves.
+The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		A felhasználó [%Nickname%] előzőleg megadott jelszava évrénytelen. A felhasználó ki lesz léptetve az alkalmazásból majd újra be kell jelentkezni az érvényes jelszóval.
 Update	RatePackageWindow		Frissítés
+OK	ServerHelper		Rendben
 Language	UserLoginWindow		Nyelv
 OK	UserLoginWindow		Rendben
+Reading repository data	LocalPkgDataLoadProcess		Tároló olvasása
+Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Referencia adatok szinkronizálása
 Stability:	RatePackageWindow		Stabilitás:
+A validation error has occurred	ServerHelper		Hitelesítési hiba
+The nickname is required.	UserLoginWindow		Felhasználói név szükséges.
 Source packages	MainWindow		Forráskód csomagok
 -	no package size		-
-Try again	App		Próbálja újra
+Problem with working files	App		Nem tudok a fájlokkal dolgozni
+Try again	App		Próbáld újra
 Rate package	RatePackageWindow		Csomag értékelése
 Unknown	PackageListView		Ismeretlen
+I agree to the usage conditions	UserLoginWindow		Elfogadom a felhasználási feltételeket
 Log in	UserLoginWindow		Bejelentkezés
 Logged in as %User%	MainWindow		Bejelentkezett mint %User%
 Email address:	UserLoginWindow		E-mail cím:
 Screenshot	ScreenshotWindow		Képernyőkép
 HaikuDepot	System name		Raktár
+A reboot is necessary to complete the installation process.	PackageManager		Újraindítás szükséges a telepítés befejezéséhez.
+View latest usage conditions…	MainWindow		Felhasználási feltételek…
+Quit	App		Kilépés
 Search terms:	FilterView		Keresési feltétel:
 Pending…	PackageListView		Folyamatban…
 Category:	FilterView		Kategória:
 Authentication failed	UserLoginWindow		A hitelesítés sikertelen
+Captcha error	UserLoginWindow		Captcha hiba
 Manage repositories…	MainWindow		Csomagtárolók kezelése…
+Fetching remote repository data	LocalRepositoryUpdateProcess		Tároló adatainak letöltése
 Description	PackageListView		Leírás
 Open %DeskbarLink%	PackageManager		%DeskbarLink% megnyitása
+User creation error	UserLoginWindow		Felhasználó létrehozási hiba
 Install	PackageManager		Telepítés
 Input validation	UserLoginWindow		Bevitel érvényesítése
 Log in…	MainWindow		Bejelentkezés…
 You need to be logged into an account before you can rate packages.	MainWindow		Csomag értékelése előtt be kell jelentkezni egy felhasználói fiókba.
+Client version too old	ServerHelper		A kliens túl régi
+Local repository load error	LocalPkgDataLoadProcess		Helyi tároló olvasási hiba
+The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		A felhasználó nem létezik vagy téves jelszó lett megadva. Kérlek ellenőrizd.
 9999.99 KiB	PackageListView		9999.99 KiB
+Repeat password:	UserLoginWindow		Jelszó ismétlése:
 All repositories	MainWindow		Összes tároló

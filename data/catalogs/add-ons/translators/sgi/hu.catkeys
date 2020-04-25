@@ -3,7 +3,7 @@ SGI images	SGITranslator		SGI kép
 Use compression:	SGIView		Tömörítés fajtája:
 SGI image translator	SGIView		SGI kép értelmező
 SGI image	SGITranslator		SGI kép
-SGITranslator Settings	SGITranslator		SGIÉrtelmező beállítások
+SGITranslator Settings	SGITranslator		SGI értelmező beállításai
 SGI Settings	SGIMain		SGI beállítások
 SGI image translator	SGITranslator		SGI kép értelmező
 None	SGIView		Nincs

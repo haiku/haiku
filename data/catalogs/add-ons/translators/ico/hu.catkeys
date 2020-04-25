@@ -10,5 +10,5 @@ Windows icon translator	ICOTranslator		Windows ikon értelemző
 pixels in either direction.	ConfigView		pixel minden irányba
 Write 32 bit images on true color input	ConfigView		32-bites képek írása true color bementre
 Icon	ICOTranslator		Ikon
-ICOTranslator Settings	ConfigView		ICOÉrtelemző beállítások
+ICOTranslator Settings	ConfigView		ICO értelmező beállításai
 Windows icon translator	ConfigView		Windows ikon értelemző

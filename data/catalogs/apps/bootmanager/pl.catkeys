@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-BootManager	3886671855
+1	polish	x-vnd.Haiku-BootManager	867546001
 Old Master Boot Record backup failure	BootManagerController	Title	Wystąpił problem z zapisem kopii zapasowej obecnego Głównego Sektora Rozruchowego
 At least one partition must be selected!	BootManagerController		Co najmniej jedna partycja musi zostać wybrana!
 No space available!	DrivesPage	Cannot install	Brak miejsca!
@@ -16,6 +16,7 @@ Never	DefaultPartitionPage		nieograniczony
 Summary	BootManagerController	Title	Podsumowanie
 An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Wystąpił błąd podczas zapisu menu rozruchowego. MBR może być uszkodzony, natychmiast przywróć go z pliku!
 After three seconds	DefaultPartitionPage		trzy sekundy
+Read only!	DrivesPage	Cannot install	Tylko do odczytu!
 Write boot menu	BootManagerController	Button	Zapisz menu rozruchowe
 OK	BootManagerController	Button	OK
 Uninstall boot manager	BootManagerController	Title	Usuń menedżera rozruchu

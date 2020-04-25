@@ -1,7 +1,10 @@
-1	hungarian	x-vnd.Haiku-libpackage	2012114212
+1	hungarian	x-vnd.Haiku-libpackage	134767648
+Fetching repository-cache from %url	RefreshRepositoryRequest		Tároló adatainak letöltése (%url)
+Validating checksum for %repositoryName	RefreshRepositoryRequest		Ellenőrzőkód érvényesítése a tárolóhoz (%repositoryName)
 Failed to remove transaction directory	PackageManagerKit		A tranzakció könyvtárának eltávolítása nem sikerült.
-Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Nem sikerült a beállítások betöltése a gyűjteményhez: \"%s\". Kihagyás.
-Refreshing repository \"%s\" failed	PackageManagerKit		Gyűjtemény frissítése sikertelen: \"%s\"
-Failed to get repository names	PackageManagerKit		Nem sikerült lekérdezni a gyűjtemény neveket.
-Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Nem sikerült gyorsítótárazni a gyűjteményt: \"%s\". Kihagyás.
+Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Nem sikerült a beállítások betöltése a tárolóhoz: \"%s\". Kihagyás.
+Refreshing repository \"%s\" failed	PackageManagerKit		Sikertelen a tároló \"%s\" frissítése
+Fetching repository checksum from %url	RefreshRepositoryRequest		Tároló ellenőrzőkódjának letöltése (%url)
+Failed to get repository names	PackageManagerKit		Nem sikerült lekérdezni a tárolók neveit.
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Nem sikerült gyorsítótárazni a tárolót: \"%s\". Kihagyás.
 Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		%s-%s nevű csomag nem felel meg az alapcsomag (\"%s\") igényeinek.

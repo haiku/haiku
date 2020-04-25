@@ -22,7 +22,7 @@ Cancel	ExpanderPreferences		Mégse
 Expansion	ExpanderPreferences		Kicsomagolás
 Select	DirectoryFilePanel		Kiválaszt
 The folder was either moved, renamed or not supported.	ExpanderWindow		A mappa át lett helyezve, át lett nevezve vagy nem használható.
-Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		A célmappa nem létezik. Létre szeretné hozni?
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		A célmappa nem létezik. Létre szeretnéd hozni?
 Same directory as source (archive) file	ExpanderPreferences		A mappa amiben a forrásfájl (archívum) van
 Settings	ExpanderMenu		Beállítások
 Settings…	ExpanderMenu		Beállítások…

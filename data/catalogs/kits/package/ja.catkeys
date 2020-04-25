@@ -1,7 +1,10 @@
-1	japanese	x-vnd.Haiku-libpackage	2012114212
+1	japanese	x-vnd.Haiku-libpackage	134767648
+Fetching repository-cache from %url	RefreshRepositoryRequest		リポジトリのキャッシュを %url から取得中
+Validating checksum for %repositoryName	RefreshRepositoryRequest		%repositoryName のチェックサムを確認中
 Failed to remove transaction directory	PackageManagerKit		トランザクションディレクトリの削除に失敗しました
 Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		リポジトリ \"%s\" の設定の取得に失敗しました。スキップします。
 Refreshing repository \"%s\" failed	PackageManagerKit		リポジトリ \"%s\" の更新に失敗しました
+Fetching repository checksum from %url	RefreshRepositoryRequest		リポジトリのチェックサムを %url から取得中
 Failed to get repository names	PackageManagerKit		リポジトリ名の取得に失敗しました
 Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		リポジトリ \"%s\" のキャッシュの取得に失敗しました。スキップします。
 Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		パッケージ %s-%s は、ベースパッケージ \"%s\" が必要とするマッチングを持っていない。

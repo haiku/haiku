@@ -8,10 +8,10 @@ JPEG Library Error: %s\n	be_jerror		JPEG ライブラリエラー: %s\n
 None	JPEGTranslator		無し
 About	JPEGTranslator		JPEG トランスレーターについて
 Version %d.%d.%d	JPEGTranslator		バージョン %d.%d.%d
-Write black-and-white images as RGB24	JPEGTranslator		モノクロイメージをRGB24として書き出す
+Write black-and-white images as RGB24	JPEGTranslator		モノクロイメージを RGB24 として書き出す
 Output smoothing strength	JPEGTranslator		スムージング強度
 Use progressive compression	JPEGTranslator		プログレッシブ圧縮を使用する
-Make file smaller (sligthtly worse quality)	JPEGTranslator		ファイルサイズを小さくする (品質は少し悪くなります)
+Make file smaller (sligthtly worse quality)	JPEGTranslator		ファイルサイズを縮小する (品質は少し悪くなります)
 High	JPEGTranslator		高い
 Read greyscale images as RGB32	JPEGTranslator		グレースケールイメージをRGB32として読み込む
 Output quality	JPEGTranslator		出力品質

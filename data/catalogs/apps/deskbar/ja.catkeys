@@ -44,7 +44,7 @@ Expand new applications	PreferencesWindow		新しいアプリケーションを�
 Show replicants	DeskbarMenu		レプリカントを表示
 Hide application names	PreferencesWindow		アプリケーション名を隠す
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		デモ
-Icon size	PreferencesWindow		アイコンのサイズ
+Icon size	PreferencesWindow		アイコンサイズ
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		デスクトップアプレット
 Hide all	WindowMenu		すべて隠す
 Quit application	WindowMenu		アプリケーションを終了

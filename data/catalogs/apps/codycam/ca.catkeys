@@ -1,13 +1,13 @@
 1	catalan; valencian	x-vnd.Haiku-CodyCam	2593355250
-destination directory expected	CodyCam		cal una carpeta destí
+destination directory expected	CodyCam		s'espera un directori de destinació
 reply: '%s'\n	SftpClient		respón: '%s'\n
 JPEG image	CodyCam		Imatge JPEG
 Remote host has closed the connection.\n	FtpClient		El servidor remot ha tancat la connexió.\n
 image file format expected	CodyCam		s'espera un format de fitxer d'imatge
 Every 30 minutes	CodyCam		Cada 30 minuts
-Capturing Image…	VideoConsumer.cpp		S'està capturant la imatge...
+Capturing Image…	VideoConsumer.cpp		Es captura la imatge...
 Cannot start time source!	CodyCam		No es pot iniciar la font horària!
-Waiting…	CodyCam		S'està esperant...
+Waiting…	CodyCam		Esperant...
 Passive FTP	CodyCam		FTP Passiu
 Every 10 minutes	CodyCam		Cada 10 minuts
 Every minute	CodyCam		Cada minut
@@ -70,7 +70,7 @@ Couldn't find requested directory on server	VideoConsumer.cpp		No s'ha pogut tro
 Cannot find the media roster	CodyCam		No es pot trobar la llista de mitjans.
 Type:	CodyCam		Tipus:
 Rename failed	VideoConsumer.cpp		Ha fallat canviar el nom del fitxer.
-unrecognized upload client specified	CodyCam		no es pot reconèixer el client al que es vol enviar
+unrecognized upload client specified	CodyCam		no es reconeix el client de càrrega especificat
 Server:	CodyCam		Servidor:
 Login:	CodyCam		Entrada:
 File	CodyCam		Fitxer
@@ -82,7 +82,7 @@ Can't find an available connection to the video window	CodyCam		No es pot trobar
 FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		S'ha produït un error en escriure el fitxer de sortida
 Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		No es pot trobar una font de vídeo.\nNecessiteu una càmera web per utilitzar CodyCam.
-Logging in…	VideoConsumer.cpp		S'està entrant...
+Logging in…	VideoConsumer.cpp		S'entra...
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		S'ha produït un error en escriure el fitxer de sortida
 Capture controls	CodyCam		Controls de captura

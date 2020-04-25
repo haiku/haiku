@@ -1,8 +1,9 @@
-1	russian	x-vnd.Haiku-StyledEdit	727465241
+1	russian	x-vnd.Haiku-StyledEdit	2796309255
 Document statistics	Statistics		Статистика документа
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Невозможно вернуть, файл не найден: \"%s\".
 Cut	Menus		Вырезать
 Center	Menus		По центру
+Increase size	Menus		Увеличить размер
 Wrap-around search	FindandReplaceWindow		Поиск по всему документу
 Page setup…	Menus		Настройка печати…
 Untitled 	StyledEditWindow		Новый документ 
@@ -70,6 +71,7 @@ Find selection	Menus		Найти выделенное
 Cancel	SaveAlert		Отмена
 Find…	Menus		Найти…
 Revert	RevertToSavedAlert		Вернуть
+Decrease size	Menus		Уменьшить размер
 Size	Menus		Размер
 Autodetect	Menus		Автоопределение
 Replace next	Menus		Заменить далее

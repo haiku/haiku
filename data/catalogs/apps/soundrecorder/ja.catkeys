@@ -15,7 +15,7 @@ Format:	RecorderWindow		フォーマット:
 Sound List	RecorderWindow		サウンドリスト
 Compression: 	RecorderWindow		圧縮: 
 Rewind	RecorderWindow		巻き戻し
-Sample rate:	RecorderWindow		サンプルレート:
+Sample rate:	RecorderWindow		サンプリングレート: 
 Invalid audio files	RecorderWindow		無効なオーディオファイル
  seconds	RecorderWindow		秒
 OK	RecorderWindow		OK
@@ -25,10 +25,10 @@ Forward	RecorderWindow		送る
 Play	RecorderWindow		再生
 SoundRecorder	System name		サウンドレコーダー
 Channels:	RecorderWindow		チャンネル:
- bits	RecorderWindow		ビット
+ bits	RecorderWindow		 ビット
 None	RecorderWindow		無し
 Record	RecorderWindow		録音
-Sample size: 	RecorderWindow		ビット深度:
+Sample size: 	RecorderWindow		ビット深度: 
 Cannot recognize this file as a media file	RecorderWindow		ファイルをメディアファイルとして認識できません
 Format: 	RecorderWindow		フォーマット:
 File name: 	RecorderWindow		ファイル名:

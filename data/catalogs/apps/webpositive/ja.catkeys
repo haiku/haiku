@@ -25,7 +25,7 @@ Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't 
 Copy URL to clipboard	Download Window		URL をクリップボードにコピー
 Clone current page	Settings Window		現在のページを複製
 Start page:	Settings Window		スタートページ:
-Cancel	Download Window		キャンセル
+Cancel	Download Window		中止
 Settings	Settings Window		設定
 Downloads	WebPositive Window		ダウンロード
 Browse…	Settings Window		ブラウズ…
@@ -87,7 +87,7 @@ Open	Download Window		開く
 New window	WebPositive Window		新規ウィンドウ
 New windows:	Settings Window		新規ウィンドウ:
 The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	ダウンフォードフォルダーを開けませんでした。\n\nエラー: %error
-Cancel	Authentication Panel		キャンセル
+Cancel	Authentication Panel		中止
 Style:	Font Selection view		スタイル:
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	ブックマークファイルの作成時にエラーが発生しました。\n\nエラー: %error
 OK	Download Window		OK
@@ -109,7 +109,7 @@ About	WebPositive Window		このソフトウェアについて
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		まだダウンロードが進行中です。本当に WebPositive をすぐに終了しますか?
 Continue downloads	WebPositive		ダウンロードを続ける
 Proxy server requires authentication	Settings Window		プロキシサーバーは認証を必要とする
-Cancel	Settings Window		キャンセル
+Cancel	Settings Window		中止
 History	WebPositive Window		履歴
 Reset size	WebPositive Window		リセット
 Do you really want to clear the browsing history?	WebPositive Window		閲覧履歴を本当に消去しますか?
@@ -152,7 +152,7 @@ Cut	WebPositive Window		切り取り
 Downloads	Download Window		ダウンロード
 Open blank page	Settings Window		空白のページを表示
 Clear history	WebPositive Window		履歴を消去
-Cancel	WebPositive Window		キャンセル
+Cancel	WebPositive Window		中止
 Bookmark info	WebPositive Window		ブックマーク情報
 Script console	Console Window		スクリプトコンソール
 Copy	URL Bar		コピー

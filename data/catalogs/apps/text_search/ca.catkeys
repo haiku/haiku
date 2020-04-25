@@ -1,11 +1,11 @@
 1	catalan; valencian	x-vnd.Haiku.TextSearch	1867528375
-Please select the files you wish to have selected for you in Tracker.	GrepWindow		Si us plau trieu els fitxers que voleu triar al Rastrejador.
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Si us plau, trieu els fitxers que voleu tenir seleccionats al Rastrejador.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		No s'ha pogut iniciar el programa xargs!
 Open selection	GrepWindow		Obre la selecció
 Actions	GrepWindow		Accions
 New window	GrepWindow		Finestra nova
-Encoding	GrepWindow		S'està codificant
+Encoding	GrepWindow		Codificació
 OK	GrepWindow		D'acord
 %appname% : %path% : %searchtext%	GrepWindow		%appname%: %path%: %searchtext%
 Close	GrepWindow		Tanca
@@ -16,7 +16,7 @@ Regular expression	GrepWindow		Expressió regular
 Text files only	GrepWindow		Només els fitxers de text
 Quit	GrepWindow		Surt
 Show files in Tracker	GrepWindow		Mostra els fitxers al Rastrejador
-Please select the files you wish to keep searching.	GrepWindow		Si us plau trieu els fitxers que voleu seguir cercant.
+Please select the files you wish to keep searching.	GrepWindow		Si us plau, trieu els fitxers que voleu continuar cercant.
 Trim to selection	GrepWindow		Escapça per la selecció
 Set target…	GrepWindow		Seleccioneu la destinació...
 TextSearch	GrepWindow		Cerca un text
@@ -29,7 +29,7 @@ The unselected files will be removed from the list.	GrepWindow		Els fitxers que 
 Skip folders starting with a dot	GrepWindow		Ignora les carpetes que comencen a un punt
 Open files in code editor	GrepWindow		Obre els fitxers a l’editor de codi.
 Failed to open output pipe!	Grepper		Ha fallat obrir el conducte de sortida!
-Cancel	GrepWindow		Anul·la
+Cancel	GrepWindow		Cancel·la
 History	GrepWindow		Historial
 File	GrepWindow		Fitxer
 Case-sensitive	GrepWindow		Distingeix entre majúscules i minúscules

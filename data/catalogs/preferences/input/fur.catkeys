@@ -31,8 +31,8 @@ High	TouchpadPrefView		Alt
 Defaults	TouchpadPrefView		Predefinîts
 1-Button	SettingsView		1-Boton
 Short	KeyboardView		Curt
-Revert	InputMouse		Torne indaûr
 Slow	KeyboardView		Lente
+Revert	InputMouse		Torne indaûr
 Key repeat rate	KeyboardView		Velocitât ripetizion tast
 2-Button	SettingsView		2-Botons
 Click to focus and raise	SettingsView		Clic par focalizâ e tirâ sù

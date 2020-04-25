@@ -27,7 +27,7 @@ A0	ConfigWindow	ISO 216 paper size	A0
 Letter	ConfigWindow	ANSI A (letter), a North American paper size	Letter
 Printer:	ConfigWindow		Nyomtató:
 A2	ConfigWindow	ISO 216 paper size	A2
-Select a printer	ConfigWindow		Válasszon nyomtatót
+Select a printer	ConfigWindow		Válassz nyomtatót
 Show configuration window	PrintServerApp Scripting		Beállításablak megjelenítése
 A4	ConfigWindow	ISO 216 paper size	A4
 Get comments about this printer	Printer Scripting		Megadja a nyomtató megjegyzéseit

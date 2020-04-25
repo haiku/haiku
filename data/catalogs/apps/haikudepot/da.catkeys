@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-HaikuDepot	3845883642
+1	danish	x-vnd.Haiku-HaikuDepot	1976860627
 Repository update error	LocalRepositoryUpdateProcess		Fejl ved opdatering af softwarekilde
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Der opstod en fejl under opdatering af softwarekilden: %error%
 User Created	UserLoginWindow		Bruger oprettet
@@ -46,9 +46,7 @@ Category	FilterView		Kategori
 User rating	RatePackageWindow		Brugerbedømmelse
 Installed packages	MainWindow		Installerede pakker
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Et anmodet objekt eller et objekt som er involveret i anmodningen blev ikke fundet på serveren.
-Other users can see this rating	RatePackageWindow		Andre brugere kan se bedømmelsen
 Stable	RatePackageWindow		Stabil
-This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		Programmet er for gammelt til at kommunikere med HaikuDepot-serversystemet. Hent en nyere version af HaikuDepot ved at opdatere dit Haiku-system. Den laveste version af HaikuDepot som kræves er \"%s\".
 Fatal error	PackageManager		Fatal fejl
 Package action failed	PackageInfoView		Pakkehandling mislykkedes
 No changelog available.	PackageInfoView		Ingen ændringslog tilgængelig.
@@ -78,9 +76,7 @@ Very unstable	RatePackageWindow		Meget ustabil
 Password:	UserLoginWindow		Adgangskode:
 All packages	PackageListView		Alle pakker
 Network Transport Error	ServerHelper		Fejl ved netværkstransport
-Authorization or security issue.  Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Problem med autentifikation eller sikkerhed. Log ud og log ind igen for at tjekke at din adgangskode er korrekt og tjek også at du har accepteret de seneste anvendelsesbetingelser.
 Stability	RatePackageWindow		Stabilitet
-The nickname must be unique, but the supplied nickname is already taken.  Choose a different nickname.	UserLoginWindow		Kaldenavnet skal være unikt, men det angivne kaldenavn findes allerede.  Vælg et andet kaldenavn.
 Send	RatePackageWindow		Send
 Start package daemon	App		Start pakkedæmon
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Adgangskoden skal gentages for at reducere sandsynligheden for at indtaste adgangskoden forkert.
@@ -129,7 +125,6 @@ Language	UserLoginWindow		Sprog
 OK	UserLoginWindow		OK
 Reading repository data	LocalPkgDataLoadProcess		Læser data for softwarekilde
 Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Synkroniserer referencedata fra server
-The nickname is malformed.  The nickname may only contain digits and lower case latin characters.  The nickname must be between four and sixteen characters in length.	UserLoginWindow		Kaldenavnet er udformet forkert. Kaldenavnet må kun indeholde tal og små bogstaver fra a-z. Kaldenavnet skal være 4-6 tegn langt.
 Stability:	RatePackageWindow		Stabilitet:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Anvendelsesaftalen skal accepteres og det skal bekræftes at personen som opretter brugeren opfylder den krævede minimumsalder.
 A validation error has occurred	ServerHelper		Der opstod en fejl ved validering
@@ -150,9 +145,7 @@ View latest usage conditions…	MainWindow		Vis seneste anvendelsesbetingelser�
 Search terms:	FilterView		Søgetermer:
 Pending…	PackageListView		Afventer…
 Category:	FilterView		Kategori:
-The user %Nickname% has been successfully created in the HaikuDepotServer system.  You can administer your user details by using the web interface.  You are now logged-in as this new user.	UserLoginWindow		Det lykkedes at oprette brugeren %Nickname% i HaikuDepotServer-systemet. Du kan administrere dine brugerdetaljer ved at bruge webgrænsefladen. Du er nu logget ind som den nye bruger.
 Authentication failed	UserLoginWindow		Autentifikation mislykkedes
-The supplied response to the captcha is incorrect.  A new captcha will be generated; try again.	UserLoginWindow		Det angivne svar til captcha'en er forkert. Der generes en ny captcha — prøv igen.
 Captcha error	UserLoginWindow		Fejl ved captcha
 Manage repositories…	MainWindow		Håndter softwarekilder…
 Fetching remote repository data	LocalRepositoryUpdateProcess		Henter data for fjernsoftwarekilde

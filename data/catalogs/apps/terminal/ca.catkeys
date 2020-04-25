@@ -30,7 +30,7 @@ Change directory	Terminal TermView		Canvia la carpeta
 Page setup…	Terminal TermWindow		Configuració de la pàgina...
 Slate	Terminal colors scheme		Pissarra
 Defaults	Terminal PrefWindow		Per defecte
-Cancel	Terminal TermView		Anul·la
+Cancel	Terminal TermView		Cancel·la
 Revert	Terminal PrefWindow		Reverteix
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 Use selection	Terminal FindWindow		Usa la selecció
@@ -66,7 +66,7 @@ Background	Terminal AppearancePrefView		Fons
 Copy path	Terminal TermView		Copia'n el camí
 Window size	Terminal TermWindow		Mida de la finestra
 Copy absolute path	Terminal TermView		Copia'n el camí absolut
-Cancel	Terminal TermWindow		Anul·la
+Cancel	Terminal TermWindow		Cancel·la
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		El procés \"%1\" encara s'executa.\nTancar la pestanya matarà el procés.
 Cursor	Terminal AppearancePrefView		Cursor
 Full screen	Terminal TermWindow		Pantalla completa
@@ -80,7 +80,7 @@ Window size:	Terminal AppearancePrefView		Mida de la finestra:
 Switch Terminals	Terminal TermWindow		Intercanvia els Terminals
 Decrease	Terminal TermWindow		Redueix
 Settings…	Terminal TermWindow		Paràmetres…
-Cancel	Terminal SetTitleWindow		Anul·la
+Cancel	Terminal SetTitleWindow		Cancel·la
 Blinking cursor	Terminal AppearancePrefView		Cursor que parpelleja
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		El patró que especifica el títol de la finestra. Es poden usar els marcadors\nde posició següents:\n
 Use text:	Terminal FindWindow		Usa text:
@@ -104,7 +104,7 @@ Find…	Terminal TermWindow		Cerca…
 No search string was entered.	Terminal TermWindow		No s'ha proporcionat cap cadena de cerca.
 Text under cursor	Terminal AppearancePrefView		Text sota el cursor
 Move here	Terminal TermView		Mou aquí
-Abort	Terminal Shell		Quant a
+Abort	Terminal Shell		Avorta
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tEl directori de treball actual del procés actiu.\n\t\t\tOpcionalment, es pot especificar el nombre màxim de components\n\t\t\tde camí. Per exemple. "%2d" per a un màxim de dos components.\n\t%i\t-\tL’índex de la pestanya.\n\t%e\t-\tLa codificació de la pestanya actual. No mostrat per UTF-8.\n\t%p\t-\tEl nom del procés actiu.\n\t%%\t-\tEl caràcter "%·.
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Els processos següents encara s'executen:\n\n\t%1\n\nSi tanqueu el Terminal, els processos es mataran.
 Set window title	Terminal TermWindow		Establiu el títol de la finestra

@@ -57,7 +57,7 @@ Match word	Terminal FindWindow		一致する単語を検索
 Color scheme:	Terminal AppearancePrefView		配色:
 New Terminal	Terminal TermWindow		新しいターミナルを開く
 Quit	Terminal TermWindow		終了
-Match case	Terminal FindWindow		大文字と小文字を区別する
+Match case	Terminal FindWindow		大文字小文字を区別
 Find previous	Terminal TermWindow		前を検索
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		パターンはタブタイトルを定めます。以下のプレースホルダーが\n使えます:
 Close	Terminal TermWindow		閉じる
@@ -78,7 +78,7 @@ Window title:	Terminal TermWindow		ウィンドウタイトル:
 Default	Terminal colors scheme		デフォルト
 Window size:	Terminal AppearancePrefView		ウィンドウサイズ:
 Switch Terminals	Terminal TermWindow		ターミナルを切替える
-Decrease	Terminal TermWindow		小さく
+Decrease	Terminal TermWindow		縮小
 Settings…	Terminal TermWindow		設定…
 Cancel	Terminal SetTitleWindow		中止
 Blinking cursor	Terminal AppearancePrefView		カーソルを点滅させる
@@ -108,7 +108,7 @@ Abort	Terminal Shell		中断
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tThe アクティブなプロセスのカレントワーキングディレクトリ。\n\t\t\tオプションとして、パス要素の最大数を指定できます。\n\t\t\t例 '%2d' は最大 2 つの要素を示します。\n\t%i\t-\tタブのインデックス。\n\t%e\t-\t現在のタブの文字コード。UTF-8 の場合は表示されません。\n\t%p\t-\tアクティブなプロセス名。\n\t%%\t-\t文字 '%'.
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		次のプロセスがまだ実行中です:\n\n\t%1\n\nTerminalを閉じると強制終了されます。
 Set window title	Terminal TermWindow		ウィンドウタイトルを設定
-Increase	Terminal TermWindow		大きく
+Increase	Terminal TermWindow		拡大
 OK	Terminal TermWindow		OK
 Close window	Terminal TermWindow		ウィンドウを閉じる
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n

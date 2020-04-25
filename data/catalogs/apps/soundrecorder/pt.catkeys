@@ -29,7 +29,7 @@ Channels:	RecorderWindow		Canais:
 None	RecorderWindow		Nenhum
 Record	RecorderWindow		Gravar
 Sample size: 	RecorderWindow		Tamanho de amostra: 
-Cannot recognize this file as a media file	RecorderWindow		Não é possível reconhecer este ficheiro como um ficheiro de média
+Cannot recognize this file as a media file	RecorderWindow		Não é possível reconhecer este ficheiro como um ficheiro de multimédia
 Format: 	RecorderWindow		Formato: 
 File name: 	RecorderWindow		Nome do ficheiro: 
 Cannot connect to the selected sound input	RecorderWindow		Não foi possível ligar à entrada de som selecionada
@@ -41,6 +41,6 @@ Cannot find an unused name to use for the new recording	RecorderWindow		Não foi
 Channels: 	RecorderWindow		Canais: 
 Save	RecorderWindow		Guardar
 Sample rate: 	RecorderWindow		Taxa de amostragem: 
-Cannot connect to media server	RecorderWindow		Não é possível ligar ao servidor de média
+Cannot connect to media server	RecorderWindow		Não é possível ligar ao servidor de multimédia
 The file doesn't appear to be an audio file.	RecorderWindow		O ficheiro não parece ser um ficheiro de áudio.
 File name:	RecorderWindow		Nome do ficheiro:

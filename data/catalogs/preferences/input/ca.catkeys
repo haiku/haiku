@@ -31,8 +31,8 @@ High	TouchpadPrefView		Alt
 Defaults	TouchpadPrefView		Per defecte
 1-Button	SettingsView		1 botó
 Short	KeyboardView		Curt
-Revert	InputMouse		Reverteix
 Slow	KeyboardView		Lent
+Revert	InputMouse		Reverteix
 Key repeat rate	KeyboardView		Taxa de repetició de tecla
 2-Button	SettingsView		2 botons
 Click to focus and raise	SettingsView		Clic per al focus i l'alçament

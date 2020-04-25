@@ -1,9 +1,18 @@
-1	portuguese	x-vnd.Haiku-GIFTranslator	3994289790
+1	portuguese	x-vnd.Haiku-GIFTranslator	2873990288
+Websafe	GIFView		Seguro para a Web
 Write interlaced images	GIFView		Escrever imagens entrelaçadas
 Optimal	GIFView		Ótimo
 Greyscale	GIFView		Escala de cinzentos
 Colors:	GIFView		Cores:
+GIF image translator	GIFTranslator		Tradutor de imagens GIF
+GIF image translator	GIFView		Tradutor de imagens GIF
 Palette:	GIFView		Paleta:
+GIF image	GIFTranslator		Imagem GIF
+Write transparent images	GIFView		Escrever imagens com transparência
+GIF images	GIFTranslator		Imagens GIF
+Version %d.%d.%d, %s	GIFView		Versão %d.%d.%d, %s
 Use RGB color	GIFView		Usar cor RGB
+Use dithering	GIFView		Usar pontilhado (dithering)
+GIF Settings	GIFTranslator		Definições GIF
 BeOS system	GIFView		Sistema BeOS
 Automatic (from alpha channel)	GIFView		Automático (a partir do canal alfa)

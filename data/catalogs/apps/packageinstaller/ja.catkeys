@@ -43,7 +43,7 @@ No package available.	PackageInfo		利用できるパッケージがありませ
 The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		スクリプト '%s' がすでにパスに存在します。\nスクリプトをパッケージの物と置換えますか、またはスキップしますか?
 Installation type:	PackageView		インストールタイプ:
 The package you selected has been successfully removed from your system.	UninstallView		選択されたパッケージはシステムから正常に削除されました。
-There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		パッケージファイル中にファイルサイズの不一致があるようです。パッケージが壊れているか、作成後変更されたおそれがあります。インストールを本当に続けますか?
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		パッケージファイルにファイルサイズの不一致があるようです。パッケージが壊れているか、作成後変更されたおそれがあります。インストールを本当に続けますか?
 %name% (%size%)	PackageView		%name% (%size%)
 Abort	PackageInstall		中断
 The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		ファイル '%s' がすでにパスに存在します。\nファイルをパッケージの物と置換えますか、またはスキップしますか?

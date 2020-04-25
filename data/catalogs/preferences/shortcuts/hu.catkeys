@@ -16,7 +16,7 @@ Key	ShortcutsWindow		Billentyű
 Select	ShortcutsWindow		Kiválasztás
 Shortcuts	System name		Parancsgombok
 Quit	ShortcutsWindow		Kilépés
-(Choose application with file requester)	ShortcutsWindow		(A fájlkérővel válasszon programot)
+(Choose application with file requester)	ShortcutsWindow		(A fájlkérővel válassz programot)
 Cancel	ShortcutsWindow		Mégse
 *MoveMouse +20 +0	ShortcutsWindow		*EgérMozgatás +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl

@@ -16,7 +16,7 @@ Rotate	Icon-O-Matic-TransformationBoxStates		Elforgatás
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		Vezérlőpontok eltávolítása
 Shorten	Icon-O-Matic-PropertyNames		Rövidítés
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Útvonal hozzárendelésének törlése
-The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		A szöveg, amit importálni kíván, nagyon hosszú. Biztos importálja?
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		A szöveg amit importálni kívánsz nagyon hosszú. Biztos importálod?
 Paste	Icon-O-Matic-Properties		Beillesztés
 Detect Orient.	Icon-O-Matic-PropertyNames		Tájolás árzékelése
 Click on a shape above	Empty transformers list - 1st line		Kattintson egy alakzatra

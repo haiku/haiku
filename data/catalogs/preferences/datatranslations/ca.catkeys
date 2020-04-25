@@ -5,7 +5,7 @@ DataTranslations - Note	DataTranslations		DataTranslations - Nota
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		L'element '%name' no sembla un Traductor i no serà instal·lat.
 Could not install %s:\n%s	DataTranslations		No ha estat possible instal·lar %s:\n%s
 OK	DataTranslations		D'acord
-Cancel	DataTranslations		Anul·la
+Cancel	DataTranslations		Cancel·la
 Info:	DataTranslations		Informació:
 DataTranslations - Error	DataTranslations		DataTranslations - Error
 Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Utilitzeu aquest tauler de control per indicar els valors predeterminats dels traductors, que es faran servir quan l'aplicació no n'indiqui cap.

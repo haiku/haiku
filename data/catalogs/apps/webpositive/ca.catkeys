@@ -120,7 +120,7 @@ Find previous occurrence of search terms	WebPositive Window	find bar previous bu
 Remember username and password for this site	Authentication Panel		Recorda el nom d’usuari i la contrasenya d’aquest lloc.
 (Finish: %date - %duration left)	Download Window		(Acabament: %date - Pendent: %duration)
 Cookie manager	Cookie Manager		Gestor de galetes
-Show home button	Settings Window		Mostra el botó d'inici.
+Show home button	Settings Window		Mostra el botó d'inici
 Start new session	Settings Window		Inicia una sessió nova
 The cookie jar is empty!	Cookie Manager		El pot de galetes està buit!
 Value	Cookie Manager		Valor

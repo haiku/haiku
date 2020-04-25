@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-WebPositive	2763299522
+1	romanian	x-vnd.Haiku-WebPositive	1879106286
 Authentication required	Authentication Panel		Autentificare necesară
 Previous	WebPositive Window		Anterior
 (Finish: %date)	Download Window		(Terminare: %date)
@@ -28,7 +28,9 @@ Start page:	Settings Window		Pagină de start:
 Cancel	Download Window		Anulează
 Settings	Settings Window		Configurări
 Downloads	WebPositive Window		Descărcări
+Browse…	Settings Window		Navighează…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Un marcaj pentru această pagină (%bookmarkName) există deja.
+Resume prior session	Settings Window		Rezumă sesiunea anterioară
 Match case	WebPositive Window		Majuscule semnificative
 Proxy password:	Settings Window		Parolă proxy:
 Size:	Font Selection view		Dimensiune:
@@ -119,6 +121,7 @@ Remember username and password for this site	Authentication Panel		Memorează nu
 (Finish: %date - %duration left)	Download Window		(Terminare: %date - %duration rămas)
 Cookie manager	Cookie Manager		Manager de cookie
 Show home button	Settings Window		Afișează buton acasă
+Start new session	Settings Window		Începe o sesiune nouă
 The cookie jar is empty!	Cookie Manager		Recipientul de cookie este gol!
 Value	Cookie Manager		Valoare
 Remove missing	Download Window		Elimină cele care lipsesc
@@ -141,6 +144,7 @@ Settings	WebPositive Window		Configurări
 Clear	URL Bar		Eliberare
 Loading %url	WebPositive Window		Se încarcă %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Vând muzică de jazz și haine de bun-gust în New-York și Quebec, la preț fix.
+Start up:	Settings Window		La pornire:
 Confirmation	WebPositive Window		Confirmare
 Session cookie	Cookie Manager		Cookie de sesiune
 Open all	WebPositive Window		Deschide tot

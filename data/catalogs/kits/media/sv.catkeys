@@ -1,0 +1,12 @@
+1	swedish	x-vnd.Haiku-libmedia	1819860668
+Cleaning up.	MediaDefs		Städar upp.
+Starting media_services.	MediaDefs		Startar media_services.
+Stopping media_addon_server.	MediaDefs		Stoppar media_addon_server.
+Waiting for media_addon_server to quit.	MediaDefs		Väntar på att media_addon_server ska avslutas.
+Telling media_addon_server to quit.	MediaDefs		Meddelar media_addon_server att avslutas.
+Ready for use.	MediaDefs		Redo att användas.
+Stopping media server…	MediaDefs		Stoppar mediatjänsten…
+Waiting for media_server to quit.	MediaDefs		Väntar på att media_server ska avslutas.
+Done shutting down.	MediaDefs		Klar med ner stängen.
+Error occurred starting media services.	MediaDefs		Ett fel upstod när mediatjänsten skulle starta.
+Media Service	MediaDefs		Mediatjänst

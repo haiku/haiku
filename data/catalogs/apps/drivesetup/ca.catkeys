@@ -20,7 +20,7 @@ Partition size	CreateParametersPanel		Mida de la partició
 Validation of the given parameters failed.	MainWindow		No ha estat possible validar els paràmetres indicats.
 The partition %s is currently mounted.	MainWindow		La partició %s està muntada en aquest moment.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Esteu segur que voleu formatar la partició \"%s\"? Encara us preguntarem un cop més abans d'escriure els canvis al disc.
-DriveSetup	System name		Gestor dels Discs
+DriveSetup	System name		Gestor de discs
 Mounted at	PartitionList		Muntat a
 Create…	MainWindow		Nova...
 Write changes	MainWindow		Desa els canvis
@@ -63,7 +63,7 @@ Change	ChangeParametersPanel		Canvia
 Partition name:	ChangeParametersPanel		Nom de la partició:
 LUKS encrypted	Encryption utils		Encriptat amb LUKS
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Esteu segur que voleu desar tots els canvis al disc ara?\n\nSi ho feu es perdran totes les dades de la partició %s de forma irrecuperable!
-Cancel	AbstractParametersPanel		Anul·la
+Cancel	AbstractParametersPanel		Cancel·la
 Format	MainWindow		Formata
 <empty or unknown>	DiskView		<empty or unknown>
 OK	MainWindow		D'acord
@@ -73,7 +73,7 @@ Are you sure you want to initialize the selected disk? All data will be lost. Yo
 There was an error preparing the disk for modifications.	MainWindow		Hi hagut un error en preparar el disc per les modificacions.
 The disk has been successfully initialized.\n	MainWindow		El disc s'ha iniciat correctament.\n
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Cal forçar el desmuntatge?\n\nNota: Si ho ha alguna aplicació escrivint al volum, desmuntar-la ara podria suposar una pèrdua de dades.\n
-Cancel	MainWindow		Anul·la
+Cancel	MainWindow		Cancel·la
 Free space	PartitionList		Espai lliure
 Queries	PartitionList		Consultes
 Force unmount	MainWindow		Força el desmuntatge

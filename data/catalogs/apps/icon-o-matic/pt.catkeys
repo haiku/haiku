@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.haiku-icon_o_matic	3470347893
+1	portuguese	x-vnd.haiku-icon_o_matic	301007613
 None	Icon-O-Matic-Properties		Nenhum
 Add empty	Icon-O-Matic-ShapesList		Adicionar vazia
 Opening the icon failed!	Icon-O-Matic-Main		Falhou a abertura do ícone!
@@ -80,6 +80,7 @@ Don't save	Icon-O-Matic-Menu-Settings		Não guardar
 Add shape with path	Icon-O-Matic-Menu-Shape		Adicionar forma com caminho
 Translation X	Icon-O-Matic-PropertyNames		Translação X
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Adicionar Transformadores
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		O Icon-O-Matic poderá não ter interpretado todos os dados do SVG quando este foi carregado. Ao sobrescrever o ficheiro original, essa informação estaria agora perdida.
 Open…	Icon-O-Matic-Menu-File		Abrir…
 Change Color	Icon-O-Matic-SetColorCmd		Alterar Cor
 Multi paste	Icon-O-Matic-Properties		Colagem múltipla

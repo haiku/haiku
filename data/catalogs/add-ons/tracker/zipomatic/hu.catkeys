@@ -1,10 +1,10 @@
 1	hungarian	x-vnd.haiku.zip-o-matic	2032806096
 Drop files here.	file:ZipOMaticWindow.cpp		Húzza ide a fájlokat.
 Filename: %s	file:ZipOMaticWindow.cpp		Fájlnév: „%s”
-Do you want to stop them?	file:ZipOMatic.cpp		Le szeretné állítani?
+Do you want to stop them?	file:ZipOMatic.cpp		Le szeretnéd állítani?
 Error creating archive	file:ZipOMaticWindow.cpp		Hiba az archívum létrehozása közben.
 Stop them	file:ZipOMatic.cpp		Legyen megállítva
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Biztosan le szeretné állítani az archívum létrehozását?
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Biztosan le szeretnéd állítani az archívum létrehozását?
 Preparing to archive	file:ZipperThread.cpp		Archíválás előkészítése
 Let them continue	file:ZipOMatic.cpp		Hadd legyen folytatva
 Continue	file:ZipOMaticWindow.cpp		Folytatás

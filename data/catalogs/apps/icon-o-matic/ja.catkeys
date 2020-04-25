@@ -172,10 +172,10 @@ Swatches	Icon-O-Matic-Menus		見本
 <modify path>	Icon-O-Matic-PathCmd		<パスを修正>
 HVIF Source Code	Icon-O-Matic-SavePanel		HVIF ソースコード
 Icon-O-Matic	System name		Icon-O-Matic
-<nothing to undo>	Icon-O-Matic-Menu-Edit		<取り消せるものはありません>
+<nothing to undo>	Icon-O-Matic-Menu-Edit		<元に戻せるものはありません>
 Add	Icon-O-Matic-StylesList		追加
 Translation Y	Icon-O-Matic-PropertyNames		Y軸移動
-Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		シェイプを固定する
+Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		シェイプを固定
 Scale	Icon-O-Matic-TransformationBoxStates		拡大縮小
 Remove Shape	Icon-O-Matic-RemoveShapesCmd		シェイプを削除
 All	Icon-O-Matic-Properties		すべて
@@ -196,6 +196,6 @@ Export	Icon-O-Matic-Menu-File		エクスポート
 Width	Icon-O-Matic-PropertyNames		幅
 Bummer	Cancel button - error alert		失敗
 Style	Icon-O-Matic-Menus		スタイル
-edit it's properties here.	Empty property list - 3rd line		オブジェクトをクリックしてください。
+edit it's properties here.	Empty property list - 3rd line		ここでプロパティを編集してください。
 Off	Icon-O-Matic-Menu-Settings		オフ
 Edit	Icon-O-Matic-Menus		編集

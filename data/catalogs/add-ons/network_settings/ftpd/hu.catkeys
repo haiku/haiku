@@ -1,3 +1,3 @@
 1	hungarian	x-vnd.Haiku-FTPService	4086152171
 FTP server	FTPServiceAddOn		FTP kiszolgáló
-The FTP server allows you to remotely access the files on your machine using the FTP protocol.\n\nPlease note that it is an insecure and unencrypted connection.	FTPServiceAddOn		Az FTP kiszolgáló lehetővé teszi a számítógép fájljainak távolról való elérését az FTP protokoll segítségével.\n\nKérjük, vegye figyelembe, hogy ez egy nem biztonságos és nem titkosított kapcsolat.
+The FTP server allows you to remotely access the files on your machine using the FTP protocol.\n\nPlease note that it is an insecure and unencrypted connection.	FTPServiceAddOn		Az FTP kiszolgáló lehetővé teszi a számítógép fájljainak távolról való elérését az FTP protokoll segítségével.\n\nKérlek vedd figyelembe, hogy ez egy nem biztonságos és nem titkosított kapcsolat.

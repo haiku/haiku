@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-HaikuDepot	1135431705
+1	slovak	x-vnd.Haiku-HaikuDepot	1763371214
 Uninstall	PackageManager		Odinštalovať
 (%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Odinštalované
@@ -26,7 +26,6 @@ Rate %Package%	RatePackageWindow		Ohodnotiť %Package%
 Quit HaikuDepot	App		Ukončiť HaikuDepot
 Category	FilterView		Kategória
 Installed packages	MainWindow		Nainštalované balíky
-Other users can see this rating	RatePackageWindow		Toto hodnotenie uvidia aj iní používatelia
 Stable	RatePackageWindow		Stabilný
 Fatal error	PackageManager		Kritická chyba
 Package action failed	PackageInfoView		Operácia s balíkom zlyhala

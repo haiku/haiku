@@ -16,13 +16,13 @@ No updates available	UpdateAction		更新はありません
 New packages to be installed	SoftwareUpdaterWindow	List super item label	インストールされる新規パッケージ
 Packages to be updated	SoftwareUpdaterWindow	List super item label	更新されるパッケージ
 to	SoftwareUpdaterWindow	List item text	から
-Attempting to cancel the updates…	SoftwareUpdaterWindow		更新をキャンセルしようとしています…
+Attempting to cancel the updates…	SoftwareUpdaterWindow		更新を中止しようとしています…
 Contacting software repositories to check for package updates.	CheckManager		パッケージの更新確認のため、ソフトウェアリポジトリに接続しています。
 Available updates found	CheckManager		利用可能な更新が見つかりました
 from repository	SoftwareUpdaterWindow	List item text	入手先リポジトリ:
 Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		パッケージの更新確認のため、ソフトウェアリポジトリに接続しています。
-Cancelling updates	SoftwareUpdaterWindow		更新をキャンセルしています
-Cancel	SoftwareUpdaterWindow	Alert button label	キャンセル
+Cancelling updates	SoftwareUpdaterWindow		更新を中止しています
+Cancel	SoftwareUpdaterWindow	Alert button label	中止
 There were no updates found.	UpdateAction		更新はありません。
 OK	SoftwareUpdaterWindow		OK
 Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		以下のオプションから選択してください:\n\nUpdate:\n\tすべてのインストール済パッケージを更新します。\nFull sync:\n\tインストール済パッケージをリポジトリと同期します。
@@ -39,13 +39,13 @@ Exception occurred while updating packages : %s\n	UpdateAction		パッケージ�
 A reboot is necessary to complete the update process.	UpdateManager		更新プロセスを完了するには再起動が必要です。
 Exception occurred while checking for updates: %s\n	CheckAction		更新の確認中に例外が発生しました: %s\n
 Packages are being updated	UpdateManager		パッケージを更新中
-Cancel	SoftwareUpdaterWindow		キャンセル
+Cancel	SoftwareUpdaterWindow		中止
 Don't quit	SoftwareUpdaterWindow		終了しない
 Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		クリックしてソフトウェアの更新を起動してください。いくつかの更新は選択すべき問題の解決策を必要とするでしょう。
 Checking for updates	SoftwareUpdaterWindow		更新を確認しています
 Updates completed	UpdateManager		更新が完了しました
 Reboot	SoftwareUpdaterWindow		再起動
-Show more details	SoftwareUpdaterWindow		詳細を表示する
+Show more details	SoftwareUpdaterWindow		さらに詳細を表示
 Installing version	SoftwareUpdaterWindow	List item text	インストール中のバージョン:
 Checking for updates	CheckManager		更新を確認中
 No remote repositories are available	UpdateManager	Error message	リモートのリポジトリは利用できません。

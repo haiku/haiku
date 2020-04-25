@@ -9,7 +9,7 @@ Mount read/write	AutoMounter		読み書き
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		\"%s\" をマウント解除できませんでした:\n\t%s
 Mounting volume '%s'\n\n	AutoMounter		'%s'パーティションをマウント中\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		\"%s\" をアンマウントできませんでした:\n\t%s\n\n強制的にアンマウントしますか?\n\n警告:アプリケーションがディスクへの書き込み中にアンマウントしますと、データを失う可能性もあるので、ご注意ください。\n
-Force unmount	AutoMounter		強制マウント解除
+Force unmount	AutoMounter		強制的にマウント解除
 Mount error	AutoMounter		マウントエラー
 Mounting volume <unnamed volume>\n\n	AutoMounter		<無名> パーティションをマウント中\n\n
 Mount warning	AutoMounter		マウント警告

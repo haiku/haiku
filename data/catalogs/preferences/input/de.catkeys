@@ -31,8 +31,8 @@ High	TouchpadPrefView		Hoch
 Defaults	TouchpadPrefView		Standardwerte
 1-Button	SettingsView		1-Taste
 Short	KeyboardView		Kurz
-Revert	InputMouse		Anfangswerte
 Slow	KeyboardView		Langsam
+Revert	InputMouse		Anfangswerte
 Key repeat rate	KeyboardView		Tastenwiederholrate
 2-Button	SettingsView		2-Tasten
 Click to focus and raise	SettingsView		Klicken aktiviert und bringt nach vorn

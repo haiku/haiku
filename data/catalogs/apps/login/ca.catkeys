@@ -2,7 +2,7 @@
 Invalid login!	Login View		La identificació no és vàlida!
 Error	Login App		Error
 --edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tExecuta en mode edició al terminal per tal de personalitzar l'escriptori.\n
-Welcome to Haiku	Login Window		Benvingut al Haiku!
+Welcome to Haiku	Login Window		Benvingut/da al Haiku!
 Halt	Login View		Atura
 Login application for Haiku\nUsage:\n	Login App		Aplicació d'identificació del Haiku\nÚs:\n
 --nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tNo ho facis a una finestra modal\n

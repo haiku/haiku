@@ -1,4 +1,6 @@
-1	portuguese	x-vnd.Haiku-BMPTranslator	3988586812
+1	portuguese	x-vnd.Haiku-BMPTranslator	2736902106
 BMP images	BMPTranslator		Imagens BMP
-BMP image translator	BMPView		Tradutor de imagem BMP
+BMPTranslator Settings	BMPTranslator		Definições do Tradutor BMP
+BMP image translator	BMPView		Tradutor de imagens BMP
 Version %d.%d.%d, %s	BMPView		Versão %d.%d.%d, %s
+BMP image translator	BMPTranslator		Tradutor de imagens BMP

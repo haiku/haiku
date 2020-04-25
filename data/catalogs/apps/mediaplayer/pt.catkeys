@@ -3,7 +3,7 @@ Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Eliminar elemento para o L
 Close	MediaPlayer-PlaylistWindow		Fechar
 Audio	MediaPlayer-InfoWin		Áudio
 Subtitle placement:	MediaPlayer-SettingsWindow		Posição das legendas:
-MediaPlayer	System name		MediaPlayer
+MediaPlayer	System name		Reprodutor de Multimédia
 Audio track	MediaPlayer-Main		Faixa de áudio
 Muted	MediaPlayer-SettingsWindow		Mudo
 OK	MediaPlayer-RemovePLItemsCmd		OK
@@ -21,8 +21,8 @@ Move file to Trash	MediaPlayer-PlaylistWindow		Mover ficheiro para o Lixo
 Open file…	MediaPlayer-Main		Abrir ficheiro…
 %d kHz	MediaPlayer-InfoWin		%d kHz
 <untitled>	PlaylistItem-title		<sem título>
-Start media server	MediaPlayer-Main		Iniciar o servidor de média
-It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Parece que o servidor de média não está em execução.\nGostaria de o iniciar?
+Start media server	MediaPlayer-Main		Iniciar o servidor de multimédia
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Parece que o servidor de multimédia não está em execução.\nGostaria de o iniciar?
 Medium	MediaPlayer-SettingsWindow		Médio
 Play mode	MediaPlayer-SettingsWindow		Modo de reprodução
 Playlist	MediaPlayer-PlaylistWindow		Lista de reprodução
@@ -32,16 +32,16 @@ Close	MediaPlayer-Main		Fechar
 Save error	MediaPlayer-PlaylistWindow		Erro ao guardar
 Attributes	MediaPlayer-Main		Atributos
 Bottom of screen	MediaPlayer-SettingsWindow		Fundo do ecrã
-MediaPlayer settings	MediaPlayer-SettingsWindow		Definições do MediaPlayer
+MediaPlayer settings	MediaPlayer-SettingsWindow		Definições do Reprodutor de Multimédia
 Copyright	MediaPlayer-InfoWin		Copyright
 Invalid URL inserted!	MediaPlayer-NetworkStream		URL inválida!
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Ocorreu uma falha ao guardar a lista de reprodução.\n\nErro: 
-<no media>	MediaPlayer-InfoWin		<sem média>
+<no media>	MediaPlayer-InfoWin		<sem multimédia >
 Hide interface	MediaPlayer-Main		Ocultar interface
 Error: 	MediaPlayer-Main		Erro: 
 Video track	MediaPlayer-Main		Faixa de vídeo
 Playlist…	MediaPlayer-Main		Lista de reprodução…
-<unnamed media>	MediaPlayer-InfoWin		<média sem nome>
+<unnamed media>	MediaPlayer-InfoWin		< multimédia sem nome>
 Save	MediaPlayer-PlaylistWindow		Guardar
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Entradas Aleatórias
 Cancel	MediaPlayer-NetworkStream		Cancelar
@@ -98,7 +98,7 @@ Bad URL	MediaPlayer-NetworkStream		URL inválido
 Save	MediaPlayer-Main		Guardar
 Close window after playing video	MediaPlayer-SettingsWindow		Fechar a janela após a reprodução do vídeo
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Não foi possível abrir o ficheiro '%filename'.\n\n
-None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Nenhum dos ficheiros que pretendia reproduzir parece ser de média.
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Nenhum dos ficheiros que pretendia reproduzir parece ser de multimédia.
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Remover Entrada
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Eliminar elementos para o Lixo
 Subtitle size:	MediaPlayer-SettingsWindow		Tamanho das legendas:

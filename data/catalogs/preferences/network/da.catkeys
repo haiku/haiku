@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Network	3039697761
+1	danish	x-vnd.Haiku-Network	115295218
 Ethernet device	InterfaceListItem		Ethernet-enhed
 Link speed:	IntefaceView		Linkhastighed:
 disconnected	IntefaceView		ikke forbundet
@@ -47,7 +47,6 @@ Status:	IntefaceView		Status:
 Disable	IntefaceView		Deaktivér
 Manage…	NetworkWindow		Håndter…
 open	Open network		åben
-Network	NetworkWindow		Netværk
 Your gateway to the internet	IntefaceAddressView		Din indgang til internettet
 Enable	ServiceView		Aktivér
 Wireless device	InterfaceListItem		Trådløs enhed

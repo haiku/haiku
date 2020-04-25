@@ -10,7 +10,7 @@ Written by the Haiku Translation Kit Team	TGAView		a Haiku Translation Kit csapa
 Targa image (%d bits RLE truecolor)	TGATranslator		Targa kép (%d bites RLE truecolor)
 TGA images	TGATranslator		TGA kép
 Version %d.%d.%d, %s	TGAView		Verzió: %d.%d.%d %s
-TGATranslator Settings	TGATranslator		TGAÉrtelmező beállítások
+TGATranslator Settings	TGATranslator		TGA értelmező beállításai
 TGA image translator	TGATranslator		TGA kép értelmező
 Targa image (%d bits RLE gray)	TGATranslator		Targa kép (%d bites RLE szürkeárnyalatos)
 TGA Settings	TGAMain		TGA beállítások

@@ -1,25 +1,25 @@
 1	japanese	x-vnd.mmu.AutoRaise	3527604525
 AutoRaise, (c) 2002, mmu_man\nEnjoy :-)	AutoRaiseIcon		AutoRaise, (c) 2002, mmu_man\nEnjoy :-)
-2 s	AutoRaiseIcon		2秒
+2 s	AutoRaiseIcon		2 秒
 OK	AutoRaiseIcon		OK
 AutoRaise	System name		AutoRaise
-0.2 s	AutoRaiseIcon		0.2秒
-1 s	AutoRaiseIcon		1秒
+0.2 s	AutoRaiseIcon		0.2 秒
+1 s	AutoRaiseIcon		1 秒
 Delay	AutoRaiseIcon		遅延時間
-5 s	AutoRaiseIcon		5秒
+5 s	AutoRaiseIcon		5 秒
 Active	AutoRaiseIcon		有効
-0.1 s	AutoRaiseIcon		0.1秒
+0.1 s	AutoRaiseIcon		0.1 秒
 Default (all windows)	AutoRaiseIcon		デフォルト(すべてのウィンドウ)
 Instant warping (ffm)	AutoRaiseIcon		インスタントワープ(ffm)
 About AutoRaise…	AutoRaiseIcon		AutoRaiseについて…
 Normal	AutoRaiseIcon		標準
-0.5 s	AutoRaiseIcon		0.5秒
+0.5 s	AutoRaiseIcon		0.5 秒
 Deskbar only (touch)	AutoRaiseIcon		Deskbarのみ(タッチ)
-4 s	AutoRaiseIcon		4秒
+4 s	AutoRaiseIcon		4 秒
 Focus follows mouse	AutoRaiseIcon		フォーカスをマウス位置に合わせる
 Deskbar only (over its area)	AutoRaiseIcon		Deskbarのみ(カーソル移動)
 Inactive behaviour	AutoRaiseIcon		無効時の動作
 Mode	AutoRaiseIcon		モード
 Warping (ffm)	AutoRaiseIcon		ワープ(ffm)
 Remove from tray	AutoRaiseIcon		トレイから外す
-3 s	AutoRaiseIcon		3秒
+3 s	AutoRaiseIcon		3 秒

@@ -3,7 +3,7 @@ Sounds	System name		Ljud
 Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Ljud\nSkrivet av\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n Ursprungligen skrivet av Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
 No such file or directory	HEventList		Ingen sådan fil eller katalog
 OK	HWindow		OK
-Other…	HWindow		Andra...
+Other…	HWindow		Välj annan...
 OK	SoundsHApp		OK
 Sound file:	HWindow		Ljudfil:
 This is not an audio file.	HWindow		Detta är ingen ljudfil.

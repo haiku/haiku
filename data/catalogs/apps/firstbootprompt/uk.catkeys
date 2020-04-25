@@ -1,8 +1,80 @@
-1	ukrainian	x-vnd.Haiku-FirstBootPrompt	2649051796
+1	ukrainian	x-vnd.Haiku-FirstBootPrompt	2670843542
+Japanese	KeymapNames		Японська
+US	KeymapNames		US - Амер.
+Esperanto	KeymapNames		Есперанто
+Belarusian	KeymapNames		Бiлоруська
+Brazilian	KeymapNames		Бразiльська
+Dvorak	KeymapNames		Дворак
+Polish	KeymapNames		Польська
+Latin-American	KeymapNames		Латино-американська
+Ukrainian	KeymapNames		Українська
+Russian (Yawert)	KeymapNames		Російська (Yawert)
+United-Kingdom	KeymapNames		Британська
+Serbian (Cyrillic)	KeymapNames		Сербська (Кирилиця)
+Turkish (Type-F)	KeymapNames		Турецька (Type-F)
+Bulgarian (Cyrillic)	KeymapNames		Болгарська (Кирилиця)
+Belgian (point)	KeymapNames		Бельгійська (Крапка)
+Finnish	KeymapNames		Фінська
+Swedish	KeymapNames		Шведська
+Svorak	KeymapNames		Сворак
+German	KeymapNames		Німецька
+Swiss-German	KeymapNames		Швейцарська (Нім.)
 Keymap	BootPromptWindow		Розкладка
+Spanish (Dvorak)	KeymapNames		Іспанська (Дворак)
+US-International	KeymapNames		US-міжнародна
+Czech	KeymapNames		Чеська
+Turkish (Type-Q)	KeymapNames		Турецька (Тип-Q)
+Slovak	KeymapNames		Словацька
+Russian (Udmurt, Komi, Mari)	KeymapNames		Російська(Удмурт., Комі, Марі)
+Thai (TIS-820.2538)	KeymapNames		Тайська (TIS-820.2538)
+Colemak	KeymapNames		Колемак
+Dvorak (programmer's)	KeymapNames		Дворак (для програмістів)
+Russian (Mac)	KeymapNames		Російська (Mac)
 Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Дякуємо за Ваше зацікавлення Haiku. Ми маємо сподівання що вона Вам сподобається!\n\nВи можете вибрати мову за вподобанням і розкладку клавіатури зі списку зліва. Ви можете легко змінити обидва налаштування після загрузки робочого столу, просто на льоту.\n\nВи бажаєте запустити Installer чи продовжити загрузку системи?\n
+German (Mac)	KeymapNames		Німецька (Mac)
+Arabic (102)	KeymapNames		Арабська (102)
+Belarusian (Latin)	KeymapNames		Білоруська (Латина)
+Belarusian (Mac)	KeymapNames		Білоруська (Mac)
+Hebrew	KeymapNames		Іврит
+Greek	KeymapNames		Грецька
+Croatian	KeymapNames		Хорватська
 Run Installer	BootPromptWindow		Запустити Installer
+Faeroese	KeymapNames		Фарерська
+Polish (Typewriter)	KeymapNames		Польська (Typewriter)
+French (Mac)	KeymapNames		Французька (Mac)
+Spanish	KeymapNames		Іспанська
+Ukrainian (Mac)	KeymapNames		Українська (Mac)
+Estonian	KeymapNames		Естонська
+French (Bépo)	KeymapNames		Французька (Bépo)
+Serbian (Latin)	KeymapNames		Сербська (Латина)
+Russian (Typewriter)	KeymapNames		Російська (Typewriter)
+French	KeymapNames		Французька
+Italian	KeymapNames		Італійська
+Portuguese	KeymapNames		Португальська
+Swiss-French	KeymapNames		Швейцарська-Фр.
+Slovene	KeymapNames		Словенська
+Lithuanian	KeymapNames		Литовська
+French (NF Z71-300)	KeymapNames		Французька (NF Z71-300)
+ISO-9995	KeymapNames		ISO-9995
+Kazakh	KeymapNames		Казахська
 Language	BootPromptWindow		Мова
+Lithuanian (Standard)	KeymapNames		Литовська (Standard)
+Belgian (comma)	KeymapNames		Бельгійська (comma)
 Custom	BootPromptWindow		Вибір користувача
+Norwegian	KeymapNames		Норвезька
+Danish	KeymapNames		Датська
 Boot to Desktop	BootPromptWindow		Загрузити робочий стіл
+Bulgarian (Phonetic)	KeymapNames		Болгарська (фонетична)
+Canadian-French	KeymapNames		Канадська-Фр.
 Welcome to Haiku!	BootPromptWindow		Ласкаво просимо в Haiku!
+Russian	KeymapNames		Російська
+Hungarian	KeymapNames		Угорська
+Irish	KeymapNames		Ірландська
+Romanian	KeymapNames		Румунська
+Macedonian	KeymapNames		Македонська
+Czech (Mac)	KeymapNames		Чеська (Mac)
+Brazilian (ABNT2)	KeymapNames		Бразільська (Mac)
+Albanian	KeymapNames		Албанська
+Dutch	KeymapNames		Датська
+Friulian	KeymapNames		Фріуліанська
+Icelandic	KeymapNames		Ісландська

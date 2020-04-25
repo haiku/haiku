@@ -134,7 +134,7 @@ Move to Trash	ContainerWindow		Çöp'e taşı
 All files and folders	FindPanel		Tüm dosyalar ve klasörler
 Add-ons	ContainerWindow		Eklentiler
 Too many parenthesis.	libtracker		Çok fazla parantez.
-Increase size	ContainerWindow		Boyutu artır
+Increase size	ContainerWindow		Büyüt
 \nShould this be fixed?	FSUtils		\nBu düzeltilsin mi?
 URL	Bookmark Query Columns		URL
 Move	PoseView		Taşı
@@ -244,7 +244,7 @@ Copying: 	StatusWindow		Kopyalanıyor:
 Show navigator	SettingsView		Adres çubuğunu göster
 Select all	DeskWindow		Tümünü seç
 Double-precision floating point number	AttributesView		Çifte keskinlikli kayan noktalı sayı
-Decrease size	ContainerWindow		Boyutu azalt
+Decrease size	ContainerWindow		Küçült
 Recent queries	FindPanel		Son sorgular
 Mount all	MountMenu		Tümünü bağla
 128 x 128	DeskWindow		128 x 128
@@ -315,7 +315,7 @@ Select…	QueryContainerWindow		Seç…
 Open	ContainerWindow		Aç
 Settings…	MountMenu		Ayarlar…
 You cannot put the selected item(s) into the trash.	FSUtils		Seçili ögeyi/ögeleri Çöp'e atamazsınız.
-Increase size	DeskWindow		Boyutu artır
+Increase size	DeskWindow		Büyüt
 starts with	SelectionWindow		başlar
 Any	AttributesView		Herhangi biri
 New	DeskWindow		Yeni
@@ -415,7 +415,7 @@ There was a problem trying to replace \"%name\". The item might be open or busy.
 Windows	TrackerSettingsWindow		Pencereler
 Show space bars on volumes	SettingsView		Disklerde doluluk çubuklarını göster
 Could not update permissions of file \"%name\". %error	FSUtils		\"%name\" dosyasının izinleri güncellenemedi. %error
-Decrease size	DeskWindow		Boyutu azalt
+Decrease size	DeskWindow		Küçült
 Emptying Trash… 	StatusWindow		Çöp boşaltılıyor… 
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, other{, # dosya}}
 KiB	WidgetAttributeText		KiB

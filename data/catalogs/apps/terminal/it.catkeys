@@ -18,14 +18,14 @@ Settings	Terminal TermWindow		Impostazioni
 %app% settings	Terminal PrefWindow	window title	Impostazioni %app%
 Use default	Terminal SetTitleWindow		Usa predefinito
 Close tab	Terminal TermWindow		Chiudi scheda
-Selected background	Terminal AppearancePrefView		Seleziona sfondo
+Selected background	Terminal AppearancePrefView		Sfondo selezione
 Error!	Terminal getString		Errore!
 Set tab title	Terminal TermWindow		Imposta titolo scheda
 Appearance	Terminal PrefWindow		Aspetto
 Encoding:	Terminal AppearancePrefView		Codifica:
 Create link here	Terminal TermView		Crea collegamento qui
 Custom	Terminal AppearancePrefView	Window size	Personalizzato
-Selected text	Terminal AppearancePrefView		Seleziona testo
+Selected text	Terminal AppearancePrefView		Testo selezione
 Change directory	Terminal TermView		Cambia directory
 Page setup…	Terminal TermWindow		Imposta pagina…
 Slate	Terminal colors scheme		Ardesia

@@ -1,5 +1,5 @@
 1	hungarian	x-vnd.Haiku-StyledEdit	727465241
-Document statistics	Statistics		Dokumentum statisztika
+Document statistics	Statistics		Statisztika
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nem vonható vissza, a fájl \"%s\" nem található.
 Cut	Menus		Kivágás
 Center	Menus		Középre
@@ -31,12 +31,12 @@ File	Menus		Fájl
 Bold	Menus		Félkövér
 Paste	Menus		Beillesztés
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		A fájlt \"%file"\" egy másik program módosította. Újratöltsem?
-File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		A fájlt \"%file%\" egy másik program törölte. Helyre szeretné állítani?
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		A fájlt \"%file%\" egy másik program törölte. Helyre szeretnéd állítani?
 Lines:	Statistics		Sor:
 Replace in all windows	FindandReplaceWindow		Cserélje minden ablakban
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		A fájlban \"%s\" történt módosítások még nincsenek mentve.\nVissza szeretné állítani a legutóbbi mentett verziót?
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		A fájlban \"%s\" történt módosítások még nincsenek mentve.\nVissza szeretnéd állítani a legutóbbi mentett verziót?
 Save	SaveAlert		Mentés
-Default	Open_and_SaveAsPanel		Alapértelmett
+Default	Open_and_SaveAsPanel		Alapérték
 Cancel	RevertToSavedAlert		Mégse
 Cancel	FindandReplaceWindow		Mégse
 Statistics…	Menus		Statisztika…
@@ -45,7 +45,7 @@ Replace all	FindandReplaceWindow		Mindet cseréli
 Close	Menus		Bezárás
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		Hiba történt \"%s\" betöltése közben:\n\tA formátum nem támogatott
 Left	Menus		Balra
-Default	Menus		Alapértelmett
+Default	Menus		Alapérték
 OK	SaveAlert		Rendben
 Color	Menus		Szín
 Save changes to the document \"%s\"? 	QuitAlert		Menti a dokumentum \"%s\" változtatásait?

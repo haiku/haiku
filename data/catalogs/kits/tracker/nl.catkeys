@@ -1,5 +1,6 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	4062002078
+1	dutch; flemish	x-vnd.Haiku-libtracker	261003893
 Created	ContainerWindow		Gemaakt
+Icon	AttributesView		Icoon
 Open and make preferred	OpenWithWindow		Openen en bevoorkeuren
 Kind	ContainerWindow		Soort
 Open with…	ContainerWindow		Openen met...
@@ -18,18 +19,25 @@ Kind:	InfoWindow		Soort:
 contains	FindPanel		bevat
 32 x 32	ContainerWindow		32 x 32
 Open	FilePanelPriv		Openen
+Bitmap icon	AttributesView		Afbeeldingsicoon
 You can't replace a folder with one of its sub-folders.	FSUtils		U kunt een map niet vervangen door een van zijn submappen.
+<%ld dates>	AttributesView		<%ld datums>
+Select…	VirtualDirectoryWindow		Selecteren…
 Name	Default Query Columns		Naam
 Unmount	ContainerWindow		Onttrekken
 Eject when unmounting	AutoMounterSettings		Uitwerpen bij het ontkoppelen
 Searching for disks to mount…	StatusWindow		Bezig met het zoeken naar schijven om te betrekken...
+Value	AttributesView		Waarde
+Information	InfoWindow		Informatie
 Error emptying Trash	FSUtils		Fout bij het leegmaken van de prullenbak
 Opens with:	InfoWindow		Wordt geopend met:
 Size	QueryPoseView		Grootte
 128 x 128	ContainerWindow		128 x 128
 Disk mount	TrackerSettingsWindow		Schijfbetrekking
+Type	AttributesView		Type
 Prompt	FSUtils		Bevestigen
 Error in regular expression:\n\n'%errstring'	PoseView		Fout in de reguliere expressie:\n\n'%errstring'
+Small bitmap icon	AttributesView		Klein afbeeldingsicoon
 Would you like to find a suitable application to open the file?	FSUtils		Wilt u een geschikte toepassing zoeken om het bestand mee te openen?
 64 x 64	ContainerWindow		64 x64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		U kunt geen map of gelinkt bestand vervangen door een bestand.
@@ -37,10 +45,12 @@ Trailing \\.	libtracker		\\ aan het einde.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		find_directory() in \n%func is mislukt. \nReden: %error
 Handles any file	OpenWithWindow		Behandelt elk bestand
 save text	FilePanelPriv		sla tekst op
+Raw data	AttributesView		Ruwe data
 Preparing to move items…	StatusWindow		Voorbereiden om items te verplaatsen...
 Size	ContainerWindow		Grootte
 Select…	ContainerWindow		Selecteren...
 Show shared volumes on Desktop	SettingsView		Toon gedeelde gegevensdragers op het bureaublad
+<%ld values>	AttributesView		<%ld waarden>
 Size	PoseView		Grootte
 matches wildcard expression	SelectionWindow		komt overeen met wildcardtekens
 96 x 96	ContainerWindow		96 x 96
@@ -50,6 +60,8 @@ You can't move or copy items to read-only volumes.	FSUtils		U kunt items niet na
 Create link	ContainerWindow		Een link maken
 starts with	FindPanel		begint met
 Replace	FSUtils		Vervangen
+?+* follows nothing.	libtracker		?+* volgt niets.
+Rectangle	AttributesView		Rechthoek
 Move to	ContainerWindow		Verplaatsen naar
 Status	Email Query Columns		Status
 New folder	FSUtils		Nieuwe map
@@ -60,6 +72,7 @@ Preparing to delete items…	StatusWindow		Item-verwijdering wordt voorbereid...
 Open %name with:	OpenWithWindow		%name openen met:
 \"%name\" is an unsupported executable.	FSUtils		\"%name\" is in een niet-ondersteund programmaformaat.
 You cannot copy or move the root directory.	FSUtils		U kunt de rootmap niet kopiëren of verplaatsen.
+Plain text	AttributesView		Platte tekst
 Capacity:	InfoWindow		Capaciteit:
 File	ContainerWindow		Bestand
 Relation	OpenWithWindow		Relatie
@@ -77,6 +90,7 @@ preferences	B_PREFERENCES_DIRECTORY		voorkeuren
 Name	Person Query Columns		Naam
 Skip all	FSUtils		Allen overslaan
 Corrupted opcode.	libtracker		Corrupte opcode.
+Atom	AttributesView		Atoom
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed van %TotalSize, %BytesPerSecond/s
 Preparing to restore items…	StatusWindow		Herstel van items wordt voorbereid...
 Mount	ContainerWindow		Betrekken
@@ -84,7 +98,9 @@ Desktop	B_DESKTOP_DIRECTORY		Bureaublad
 Corrupted pointers.	libtracker		Corrupte pointers.
 Link to:	InfoWindow		Link naar:
 Copy here	ContainerWindow		Hierheen kopiëren
+Character	AttributesView		Karakter
 All disks	FindPanel		Alle schijven
+Affine transform	AttributesView		Affiene transformatie
 Window	ContainerWindow		Venster
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Verwijderen
@@ -93,6 +109,8 @@ Recent documents	FavoritesMenu		Recente documenten
 Save as Query template:	FindPanel		Opslaan als zoekopdracht-sjabloon:
 Edit templates…	TemplatesMenu		Wijzig sjablonen...
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
+8-bit integer	AttributesView		8-bit integer
+8-bit unsigned integer	AttributesView		8-bit unsigned integer
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used gebruikt -- %free vrij)
 Hide dotfiles	SettingsView		Verberg dot-bestanden
 Trash	Model		Prullenbak
@@ -120,6 +138,7 @@ Increase size	ContainerWindow		Vermeerder grootte
 \nShould this be fixed?	FSUtils		\nMoet dit opgelost worden?
 URL	Bookmark Query Columns		URL
 Move	PoseView		Verplaatsen
+Floating point number	AttributesView		Decimaal getal
 Cancel	ContainerWindow		Annuleren
 Attributes	ContainerWindow		Eigenschappen
 Error deleting items	FSUtils		Fout bij het verwijderen van items
@@ -137,6 +156,7 @@ Previously mounted disks	AutoMounterSettings		Eerder betrokken schijven
 You cannot replace a file with a folder or a symbolic link.	FSUtils		U kunt een bestand niet vervangen door een map of een link.
 The target disk does not support creating links.	FSUtils		De doelschijf ondersteunt het maken van koppelingen niet.
 develop	B_SYSTEM_DEVELOP_DIRECTORY		develop
+64-bit integer	AttributesView		64-bit integer
 Cut more	ContainerWindow		Knip meer
 The Tracker must be running to see Info windows.	PoseView		Tracker moet actief zijn om Informatie-vensters te kunnen tonen.
 Tracker preferences	TrackerSettingsWindow		Tracker voorkeuren

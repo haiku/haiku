@@ -31,7 +31,7 @@ Choose Protocol	E-Mail		Escolliu un protocol
 Return address:	Config Views		Adreça de retorn:
 Password:	E-Mail		Contrasenya:
 Error retrieving general settings: %s\n	Config Window		S'ha produït un error en recuperar les preferències : %s\n
-The filter could not be moved. Deleting filter.	Config Views		No ha estat possible moure el filtre. Així que s'està suprimint.
+The filter could not be moved. Deleting filter.	Config Views		No s'ha pogut moure el filtre. Se suprimeix.
 OK	Config Views		D'acord
 Revert	Config Window		Reverteix
 Incoming	Config Window		Entrada
@@ -47,7 +47,7 @@ Edit mailbox menu…	Config Window		Edita el menú de la bústia d'entrada...
 Server Name:	E-Mail		Nom del servidor:
 Remove	Config Window		Suprimeix
 Login name:	E-Mail		Nom d'usuari:
-While sending	Config Window		Mentre s'està enviant
+While sending	Config Window		Mentre s'enviava
 OK	Config Window		D'acord
 OK	AutoConfigWindow		D'acord
 Next	AutoConfigWindow		Següent

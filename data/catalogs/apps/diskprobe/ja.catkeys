@@ -112,7 +112,7 @@ Find	FindWindow		検索
 %ld (native)	ProbeView		%ld (ネイティブ)
 Attribute: 	ProbeView		属性:
 Block	ProbeView		ブロック
-Find again	ProbeView		再検索
+Find again	ProbeView		次を検索
 View	ProbeView	This is the last menubar item 'File Edit Block View'	表示
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	イメージを読み込めませんでした
 DiskProbe request	ProbeView		DiskProbe リクエスト

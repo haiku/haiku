@@ -2,7 +2,7 @@
 POP3 authentication failed. The server said:\n	smtp		Ha fallat l'autenticació POP3. El servidor ha respost:\n
 Destination:	ConfigView		Destí:
 Error while logging in to %serv	smtp		S'ha produït un error en registrar al %serv
-Connecting to server…	smtp		S'està connectant al servidor...
+Connecting to server…	smtp		Es connecta al servidor...
 Unencrypted	ConfigView		Sense xifrar
 . The server says:\n	smtp		. El servidor diu:\n
 Error while opening connection to %serv	smtp		S'ha produït un error en obrir la connexió al servidor %serv

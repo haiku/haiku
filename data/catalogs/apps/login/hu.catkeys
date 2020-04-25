@@ -2,7 +2,7 @@
 Invalid login!	Login View		Érvénytelen felhasználónév!
 Error	Login App		Hiba
 --edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tIndítás szerkesztési módban, hogy lehessen szerkeszteni az Asztalt.\n
-Welcome to Haiku	Login Window		Üdvözöljük a Haikuban
+Welcome to Haiku	Login Window		Üdvözöllek a Haikuban
 Halt	Login View		Megszakítás
 Login application for Haiku\nUsage:\n	Login App		A Haiku bejelentkezési programja\nHasználat:\n
 --nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tKikapcsolja az ablak modálisságát\n

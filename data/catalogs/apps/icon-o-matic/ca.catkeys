@@ -33,7 +33,7 @@ Assign Path	Icon-O-Matic-AddPathsCmd		Assigna el camí
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Restableix la transformació
 Transformation	Transformation		Transformació
 Remove	Icon-O-Matic-StylesList		Suprimeix
-Cancel	Icon-O-Matic-Menu-Settings		Anul·la
+Cancel	Icon-O-Matic-Menu-Settings		Cancel·la
 Assign Style	Icon-O-Matic-AssignStyleCmd		Assigna l'estil
 Transformation	Icon-O-Matic-TransformationBoxStates		Transformació
 Closed	Icon-O-Matic-PropertyNames		Tancat
@@ -80,7 +80,7 @@ Save icon	Dialog title		Desa la icona
 Move Paths	Icon-O-Matic-MovePathsCmd		Mou el camins
 Rounding	Icon-O-Matic-PropertyNames		Arrodoniment
 Joins	Icon-O-Matic-PropertyNames		Uneix
-Cancel	Icon-O-Matic-ColorPicker		Anul·la
+Cancel	Icon-O-Matic-ColorPicker		Cancel·la
 Duplicate	Icon-O-Matic-PathsList		Duplica
 Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Suprimeix les formes
 Save	Icon-O-Matic-Menu-Settings		Desa
@@ -103,7 +103,7 @@ Icon-O-Matic might not have interpreted all data from the SVG when it was loaded
 Rotate indices backwards	Icon-O-Matic-PathsList		Gira els índexs enrere
 Overwrite	Icon-O-Matic-SVGExport		Sobreescriu
 Modify Control Point	Icon-O-Matic-ChangePointCmd		Modifica el punt de control
-Cancel	Icon-O-Matic-SVGExport		Anul·la
+Cancel	Icon-O-Matic-SVGExport		Cancel·la
 Open…	Icon-O-Matic-Menu-File		Obre...
 Redo	Icon-O-Matic-Main		Refés
 Change Color	Icon-O-Matic-SetColorCmd		Canvia el Color

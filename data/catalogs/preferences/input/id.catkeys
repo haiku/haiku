@@ -31,8 +31,8 @@ High	TouchpadPrefView		Tinggi
 Defaults	TouchpadPrefView		Bawaan
 1-Button	SettingsView		1-Tombol
 Short	KeyboardView		Cepat
-Revert	InputMouse		Pulihkan
 Slow	KeyboardView		Lambat
+Revert	InputMouse		Pulihkan
 Key repeat rate	KeyboardView		Rasio pengulangan tombol
 2-Button	SettingsView		2-Tombol
 Click to focus and raise	SettingsView		Klik untuk fokus dan naikkan

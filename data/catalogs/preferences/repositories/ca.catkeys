@@ -1,6 +1,11 @@
-1	catalan; valencian	x-vnd.Haiku-Repositories	352177594
+1	catalan; valencian	x-vnd.Haiku-Repositories	1220143449
+This is not a valid URL.	AddRepoWindow	Add URL error message	Aquest no és un URL vàlid.
+Repository URL:	AddRepoWindow	Text box label	URL del repositori:
+There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	S'ha produït un error en refrescar la memòria cau del repositori per a %name%.
+There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	S'ha produït un error en inhabilitar el repositori %name%.
 Unknown	Constants	Unknown repository name	Desconegut
 Remove all	RepositoriesView	Button label	Suprimeix-ho tot
+Enable repositories to use with package management:	RepositoriesView	Label text	Habiliteu els repositoris per usar-los amb la gestió de paquets:
 Disable	RepositoriesView	Button label	Inhabilita
 Cancel task	TaskTimer	Button label	Cancel·la la tasca
 Changes completed	RepositoriesView	Status view text	Canvis completats
@@ -20,6 +25,18 @@ Enable all	RepositoriesView	Button label	Habilita-ho tot
 Aborted	TaskLooper	Aborted task status message	Avortat
 URL	RepositoriesView	Column title	URL
 Enable	RepositoriesView	Button label	Habilita
+Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Error en obtenir la configuració del repositori per a %name%.
 Description	TaskLooper	Failed task error description	Descripció
 Failed	TaskLooper	Failed task status message	Ha fallat
+Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Bones notícies! La tasca del repositori %name% s'ha completat.
+Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Algunes tasques encara s’executen. Aturo aquestes tasques i surto?
+This repository URL already exists.	RepositoriesView	Error message	Aquest URL de repositori ja existeix.
 Repositories	System name		Repositoris
+Changes pending:	RepositoriesView	Status view text	Canvis pendents:
+Remove	RepositoriesView	Button label	Suprimeix
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	Voleu suprimir aquests repositoris?
+Keep trying	TaskTimer	Button label	Continua provant-ho
+Cancel	Constants	Button label	Cancel·la
+Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Només es pot habilitar un URL per cada repositori. Si us plau, canvieu les seleccions.
+Stop and quit	RepositoriesWindow	Button label	Atura i surt
+Disable all	RepositoriesView	Button label	Inhabilita-ho tot

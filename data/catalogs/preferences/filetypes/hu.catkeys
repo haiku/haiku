@@ -10,7 +10,7 @@ Removing uninstalled application types	Application Types Window		Eltávolított 
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Szélesség:
 Same as…	FileType Window	The same TYPE as ...	Ugyanaz, mint…
 (from super type)	FileTypes Window		(szupertípusból)
-Select same preferred application as	FileTypes Window		Használja ugyanazt a programot, mint ehhez:
+Select same preferred application as	FileTypes Window		Használd ugyanazt a programot, mint ehhez:
 Could not change attributes	Attribute Window		Nem lehetett módosítani a jellemzőket
 Icon	FileTypes Window		Ikon
 Add…	Application Type Window		Hozzáadás…
@@ -18,7 +18,7 @@ Attribute name:	Attribute Window		Jellemző neve:
 Long description:	Application Type Window		Hosszú leírás:
 Cancel	Preferred App Menu		Mégse
 Remove	FileTypes Window		Eltávolítás
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		„%s” program nem támogatja ezt a fájltípust.\nBiztosan ehhez rendeli hozzá?
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		„%s” program nem támogatja ezt a fájltípust.\nBiztosan ehhez rendeled hozzá?
 Remove	Application Type Window		Eltávolítás
 Gamma	Application Type Window		Gamma
 Cancel	Application Type Window		Mégse
@@ -31,7 +31,7 @@ Description	FileTypes Window		Leírás
 Signature:	Application Types Window		Aláírás:
 None	FileTypes Window		Nincs
 Exclusive launch	Application Type Window		Kivételes indítás
-Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Egy fájltípus eltávolítását nem lehet visszavonni.\nBiztos el akarja távolítani?
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Egy fájltípus eltávolítását nem lehet visszavonni.\nBiztos el akarod távolítani?
 Integer 64 bit	Attribute ListView		64 bites egész szám
 Cancel	New File Type Window		Mégse
 Select same preferred application as	FileType Window		Ugyanazon előnyben részesített program kiválasztása mint
@@ -100,7 +100,7 @@ no icon	FileTypes Window		nincs ikon
 Single launch	Application Type Window		Egyszer indítható
 %s file type	FileType Window		%s fájltípusok
 Default	Attribute ListView		Alapérték
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Egy szupertípus eltávolítását nem lehet visszavonni.\nMinden fájltípus ami ehhez a szupertípushoz tartozik el fog vészni!\n\nBiztos ezt akarja tenni? A teljes csoport eltávolításához tartsa lenyomva a „Shift” billentyűt és nyomjon az „Eltávolítás” gombra.
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Egy szupertípus eltávolítását nem lehet visszavonni.\nMinden fájltípus ami ehhez a szupertípushoz tartozik el fog vészni!\n\nBiztos ezt akarod tenni? A teljes csoport eltávolításához tartsd lenyomva a „Shift” billentyűt és nyomj az „Eltávolítás” gombra.
 String	Attribute ListView		Szöveg
 Add type	New File Type Window		Típus hozzáadása
 Remove icon	Icon View		Ikon eltávolítása

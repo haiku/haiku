@@ -25,7 +25,7 @@ Cancelling updates	SoftwareUpdaterWindow		Es cancel·len les actualitzacions.
 Cancel	SoftwareUpdaterWindow	Alert button label	Cancel·la
 There were no updates found.	UpdateAction		No s'ha trobat cap actualització.
 OK	SoftwareUpdaterWindow		D'acord
-Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Trieu entre aquestes opcions d’actualització:\n\nActualització:\n\t Actualitza tots els paquets instal·lats.\nSincronització completa:\n\tSincronitza els paquets instal·lats amb els repositoris.
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Si us plau, trieu entre aquestes opcions d’actualització:\n\nActualització:\n\t Actualitza tots els paquets instal·lats.\nSincronització completa:\n\tSincronitza els paquets instal·lats amb els repositoris.
 The following changes will be made:	SoftwareUpdaterWindow		Es faran els canvis següents:
 Argument variables are no longer accepted\n	SoftwareUpdaterApp		Les variables d’argument ja no s’accepten.\n
 Fatal error while checking for updates: %s\n	CheckAction		Error fatal en comprovar les actualitzacions: %s\n

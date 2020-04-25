@@ -1,8 +1,9 @@
-1	swedish	x-vnd.Haiku-StyledEdit	727465241
+1	swedish	x-vnd.Haiku-StyledEdit	2796309255
 Document statistics	Statistics		Dokumentstatistik
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan inte återgå, filen hittades inte: \"%s\".
 Cut	Menus		Klipp ut
 Center	Menus		Mitten
+Increase size	Menus		Öka storleken
 Wrap-around search	FindandReplaceWindow		Fortsätt sökning vid andra änden
 Page setup…	Menus		Sidinställningar...
 Untitled 	StyledEditWindow		Namnlös 
@@ -70,6 +71,7 @@ Find selection	Menus		Sök efter markerad text
 Cancel	SaveAlert		Avbryt
 Find…	Menus		Sök…
 Revert	RevertToSavedAlert		Återställ
+Decrease size	Menus		Minska storleken
 Size	Menus		Storlek
 Autodetect	Menus		Identifiera automatiskt
 Replace next	Menus		Ersätt nästa

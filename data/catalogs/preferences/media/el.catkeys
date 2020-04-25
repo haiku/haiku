@@ -1,20 +1,20 @@
 1	greek, modern (1453-)	x-vnd.Haiku-Media	2605101563
-Audio mixer	Media Window		Μίκτης ήχου
-Show volume control on Deskbar	Media views		Ένδειξη έντασης στο
-Quit	Media Window		Έξοδος
-Restart media services	Media views		Επανεκκίνηση υπηρεσιών πολυμέσων
 Couldn't add volume control in Deskbar: %s\n	Media views		Αδυναμία προσθήκης του εργαλείου έντασης ήχου στη Deskbar: %s\n
-Start media server	Media Window		Εκκίνηση εξυπηρετητή πολυμέσων
-Audio settings	Media Window		Ρυθμίσεις ήχου
+Restart media services	Media views		Επανεκκίνηση υπηρεσιών πολυμέσων
+Quit	Media Window		Έξοδος
 Couldn't remove volume control in Deskbar: %s\n	Media views		Αδυναμία αφαίρεσης του εργαλείου έντασης ήχου από τη Deskbar: %s\n
-Media	System name		Media
 Video output:	Media views		Έξοδος βίντεο:
-Audio output:	Media views		Έξοδος ήχου:
 Video input:	Media views		Είσοδος βίντεο:
-Audio input:	Media views		Είσοδος ήχου:
-<none>	Media views		<κανένα>
-This hardware has no controls.	Media Window		Το υλικό μέρος δεν έχει ελέγχους.
-Channel:	Media views		Κανάλι:
-Defaults	Media views		Προεπιλογές
+Audio output:	Media views		Έξοδος ήχου:
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Αδυναμία σύνδεσης με τον εξυπηρετητή πολυμέσων.\nΘα θέλατε να τον εκκινήσετε;
 Video settings	Media Window		Ρυθμίσεις εικόνας
+Audio mixer	Media Window		Μίκτης ήχου
+Show volume control on Deskbar	Media views		Ένδειξη έντασης στο
+Start media server	Media Window		Εκκίνηση εξυπηρετητή πολυμέσων
+Audio settings	Media Window		Ρυθμίσεις ήχου
+Media	System name		Media
+Audio input:	Media views		Είσοδος ήχου:
+<none>	Media views		<κανένα>
+Channel:	Media views		Κανάλι:
+This hardware has no controls.	Media Window		Το υλικό μέρος δεν έχει ελέγχους.
+Defaults	Media views		Προεπιλογές

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	1332290201
+1	romanian	x-vnd.Haiku-HaikuDepot	3586526058
 Repository update error	LocalRepositoryUpdateProcess		Eroare la actualizarea depozitului
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		A apărut o eroare în timpul reîmprospătării depozitului: %error%
 User Created	UserLoginWindow		Utilizator creat
@@ -47,9 +47,7 @@ Category	FilterView		Categorie
 User rating	RatePackageWindow		Evaluarea utilizatorului
 Installed packages	MainWindow		Pachete instalate
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Un obiect cerut sau un obiect implicat în cerere nu a fost găsit pe server.
-Other users can see this rating	RatePackageWindow		Alți utilizatori pot vedea această evaluare
 Stable	RatePackageWindow		Stabil
-This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		Această aplicație este prea veche pentru a comunica cu  sistemul de servere HaikuDepot.  Obțineți o versiune nouă a HaikuDepot  prin actualizarea sistemului Haiku.  Versiunea minimă a  HaikuDepot necesară este \„%s\”.
 Fatal error	PackageManager		Eroare fatală
 Package action failed	PackageInfoView		Acțiune pachet eșuată
 No changelog available.	PackageInfoView		Nu există jurnal de modificări disponibil.
@@ -79,9 +77,7 @@ Very unstable	RatePackageWindow		Foarte instabil
 Password:	UserLoginWindow		Parolă:
 All packages	PackageListView		Toate pachetele
 Network Transport Error	ServerHelper		Eroare de transport în rețea
-Authorization or security issue.  Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Problemă de securitate sau de autorizare.  Deautentificați-vă și autentificați-vă din nou pentru a verifica dacă parola este corectă și de asemenea verificați dacă ați fost de acord cu ultimele condiții de utilizare.
 Stability	RatePackageWindow		Stabilitate
-The nickname must be unique, but the supplied nickname is already taken.  Choose a different nickname.	UserLoginWindow		Pseudonimul trebuie să fie unic, dar pseudonimul furnizat este deja luat.  Alegeți un alt pseudonim.
 Send	RatePackageWindow		Trimitere
 Start package daemon	App		Pornire demon de pachet
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Parola trebuie să fie repetată pentru a reduce șansa de a introduce parola incorect.
@@ -93,6 +89,7 @@ Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Se
 There are problems in the supplied data:	UserLoginWindow		Sunt probleme cu datele furnizate.
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# element} other{# elemente}}
+Usage conditions download problem	UserLoginWindow		Problemă de descărcare a condițiilor de utilizare
 OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Se descarcă:
 Success	UserLoginWindow		Succes
@@ -100,15 +97,19 @@ Package daemon problem	App		Problemă la serviciul pachetului
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Depozit
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (versiunea %hd.version%)
+The email is malformed.	UserLoginWindow		Emailul este deformat.
 Close	UserLoginWindow		Închidere
 Close	RatePackageWindow		Închidere
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Se sincronizează datele pachetelor pentru depozitul „%REPO_NAME%”
+View the usage conditions	UserLoginWindow		Vizualizați condițiile de utilizare
+Login issue	MainWindow		Problemă de autentificare
 Size	PackageListView		Mărime
 Your rating:	RatePackageWindow		Evaluare:
 Your rating was updated.	RatePackageWindow		Evaluarea a fost actualizată.
 All categories	FilterView		Toate categoriile
 Repositories	MainWindow		Depozite
 n/a	PackageInfoView		n/a
+View agreed usage conditions…	MainWindow		Vizualizați condițiile de utilizare convenite…
 Cancel	MainWindow		Anulează
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 more to download)}other{(# more to download)}}
 Refresh repositories	MainWindow		Actualizare depozite
@@ -121,6 +122,7 @@ Log out	MainWindow		Ieșire
 Comment language:	RatePackageWindow		Limbă comentariu:
 Status	PackageListView		Stare
 The password has been incorrectly repeated.	UserLoginWindow		Parola a fost repetată incorect.
+The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Parola furnizată anterior pentru utilizatorul [%Nickname%] nu este validă în mod curent. Utilizatorul va fi deautentificat din această aplicație și ar trebui să vă autentificați din nou cu parola actualizată.
 Update	RatePackageWindow		Actualizare
 OK	ServerHelper		OK
 Language	UserLoginWindow		Limbă
@@ -128,32 +130,44 @@ OK	UserLoginWindow		OK
 Reading repository data	LocalPkgDataLoadProcess		Se citesc datele depozitului
 Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Se sincronizează datele de referință de la server
 Stability:	RatePackageWindow		Stabilitate:
+The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Trebuie să fiți de acord cu acordul utilizatorului și o confirmare ar trebui să fie făcută cum că persoana care creează utilizatorul îndeplinește vârsta minimă necesară.
 A validation error has occurred	ServerHelper		A apărut o eroare de validare
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	MainWindow		În timpul actualizării datelor de pachete, a apărut o problemă care ar putea cauza datele să fie vechi sau să lipsească din afișajul aplicației. Detalii adiționale în legătură cu această problemă ar putea fi obținute din istoricul aplicației.\nInformații despre cum să vizualizați istoricul sunt disponibile în secțiunea HaikuDepot al ghidului de utilizare.
+The nickname is required.	UserLoginWindow		Pseudonimul este necesar.
 Source packages	MainWindow		Pachete sursă
 -	no package size		-
+Problem with working files	App		Problemă cu fișierele de lucru
 Try again	App		Încearcă din nou
 Rate package	RatePackageWindow		Evaluați pachet
 Unknown	PackageListView		Necunoscut
+I agree to the usage conditions	UserLoginWindow		Sunt de acord cu condițiile de utilizare
 Log in	UserLoginWindow		Autentificare
 Logged in as %User%	MainWindow		Autentificat ca %User%
 Email address:	UserLoginWindow		Adresă email:
 Screenshot	ScreenshotWindow		Captură ecran
 HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		O repornire este necesară pentru a completa procesul de instalare.
+View latest usage conditions…	MainWindow		Vizualizați ultimele condiții de utilizare…
 Quit	App		Ieșire
 Search terms:	FilterView		Termeni de căutat:
 Pending…	PackageListView		În așteptare…
 Category:	FilterView		Categorie:
 Authentication failed	UserLoginWindow		Autentificarea a eșuat
+Captcha error	UserLoginWindow		Eroare captcha
 Manage repositories…	MainWindow		Gestionare depozite...
 Fetching remote repository data	LocalRepositoryUpdateProcess		Se aduc datele depozitului de la distanță
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		O eroare a apărut în timpul descărcării condițiilor de utilizare necesare pentru a crea un utilizator. Verificați istoricul pentru detalii și încercați mai târziu. \nInformații despre cum se poate vizualiza istoricul sunt disponibile în secțiunea HaikuDepot a ghidului de utilizare.
 Description	PackageListView		Descriere
 Open %DeskbarLink%	PackageManager		Deschide %DeskbarLink%
+User creation error	UserLoginWindow		Eroare la crearea utilizatorului
 Install	PackageManager		Instalare
 Input validation	UserLoginWindow		Validare intrare
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		O eroare neașteptată a fost trimisă de la serverul HaikuDepot [%i]
 Log in…	MainWindow		Autentificare…
 You need to be logged into an account before you can rate packages.	MainWindow		Trebuie să fiți autentificat într-un cont înainte de a evalua pachete.
 Client version too old	ServerHelper		Versiunea clientului este prea veche
+Local repository load error	LocalPkgDataLoadProcess		Eroare la încărcarea dosarului local
+The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		Utilizatorul nu există sau a fost furnizată o parolă greșită. Verificați-vă certificările și încercați din nou.
 9999.99 KiB	PackageListView		9999.99 KiB
+Repeat password:	UserLoginWindow		Repetă parola:
 All repositories	MainWindow		Toate depozitele

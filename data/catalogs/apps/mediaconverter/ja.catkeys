@@ -11,7 +11,7 @@ Conversion completed	MediaConverter		変換が完了しました
 Audio:	MediaConverter-FileInfo		オーディオ:
 MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:保存先フォルダー
 Error creating video.	MediaConverter		ビデオの作成に失敗しました。
-Cancelling	MediaConverter		キャンセル中
+Cancelling	MediaConverter		中止中
 None available	Audio codecs		利用できません
 No file selected	MediaConverter-FileInfo		ファイルが選択されていません
 High	MediaConverter		高い
@@ -27,7 +27,7 @@ Error loading a file	MediaConverter		ファイルのロード中にエラーが�
 Encoder parameters	MediaConverter-EncoderWindow		エンコーターパラメーター
 Open…	Menu		開く…
 Audio encoding:	MediaConverter		オーディオエンコーディング
-Audio quality: %3d%%	MediaConverter		音声品質: %3d%%
+Audio quality: %3d%%	MediaConverter		オーディオ品質: %3d%%
 Cancelling…	MediaConverter		中止中…
 Output file '%filename' created	MediaConverter		出力ファイル '%filename' が作成されました
 Output folder	MediaConverter		出力先フォルダー

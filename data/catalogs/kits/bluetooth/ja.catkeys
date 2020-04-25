@@ -8,9 +8,9 @@ Keyboard	DeviceClass		キーボード
 Smart phone	DeviceClass		スマートフォン
 VCR	DeviceClass		ビデオデッキ
 Cellular	DeviceClass		携帯電話
-Audio	DeviceClass		音声
-Audio/Video	DeviceClass		音声/映像
-Car audio	DeviceClass		カー・オーディオ
+Audio	DeviceClass		オーディオ
+Audio/Video	DeviceClass		オーディオ/ビデオ
+Car audio	DeviceClass		カーオーディオ
 Major class: 	DeviceClass		主クラス:
 HiFi audio device	DeviceClass		HiFi オーディオ機器
 Microphone	DeviceClass		マイク

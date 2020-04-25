@@ -26,13 +26,13 @@ Copy text to clipboard	GrepWindow		テキストをクリップボードにコピ
 Show lines	GrepWindow		行を表示
 Failed to open errors pipe!	Grepper		エラーパイプを開けませんでした!
 The unselected files will be removed from the list.	GrepWindow		選択されなかったファイルはリストから除かれます。
-Skip folders starting with a dot	GrepWindow		ドットで始まるフォルダーを無視する
+Skip folders starting with a dot	GrepWindow		ドットで始まるフォルダーを無視
 Open files in code editor	GrepWindow		コードエディターでファイルを開く
 Failed to open output pipe!	Grepper		出力パイプを開けませんでした!
 Cancel	GrepWindow		検索中止
 History	GrepWindow		検索履歴
 File	GrepWindow		ファイル
-Case-sensitive	GrepWindow		大文字と小文字を区別する
+Case-sensitive	GrepWindow		大文字小文字を区別
 Select all	GrepWindow		すべて選択
 %APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME は１つ以上のフォルダーを開けませんでした。
 Settings	GrepWindow		設定

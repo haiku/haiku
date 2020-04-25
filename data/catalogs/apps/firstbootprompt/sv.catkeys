@@ -1,8 +1,80 @@
-1	swedish	x-vnd.Haiku-FirstBootPrompt	2649051796
+1	swedish	x-vnd.Haiku-FirstBootPrompt	2670843542
+Japanese	KeymapNames		Japanska
+US	KeymapNames		US
+Esperanto	KeymapNames		Esperanto
+Belarusian	KeymapNames		Vitryska
+Brazilian	KeymapNames		Brasilianska
+Dvorak	KeymapNames		Dvorak
+Polish	KeymapNames		Polska
+Latin-American	KeymapNames		Latinamerikansk
+Ukrainian	KeymapNames		Ukrainska
+Russian (Yawert)	KeymapNames		Ryska (Yawert)
+United-Kingdom	KeymapNames		Storbritannien
+Serbian (Cyrillic)	KeymapNames		Serbiska (Kyrilliska)
+Turkish (Type-F)	KeymapNames		Turkiska (Typ-F)
+Bulgarian (Cyrillic)	KeymapNames		Bulgariska (Kyrilliska)
+Belgian (point)	KeymapNames		Belgiska (punkt)
+Finnish	KeymapNames		Finska
+Swedish	KeymapNames		Svenska
+Svorak	KeymapNames		Svorak
+German	KeymapNames		Tyska
+Swiss-German	KeymapNames		Schweizisk-Tyska
 Keymap	BootPromptWindow		Tangentbordslayout
+Spanish (Dvorak)	KeymapNames		Spanska (Dvorak)
+US-International	KeymapNames		US-Internationell
+Czech	KeymapNames		Tjeckiska
+Turkish (Type-Q)	KeymapNames		Turkiska (Typ-Q)
+Slovak	KeymapNames		Slovakisk
+Russian (Udmurt, Komi, Mari)	KeymapNames		Ryska (Udmurt, Komi, Mari)
+Thai (TIS-820.2538)	KeymapNames		Thailändska (TIS-820.2538)
+Colemak	KeymapNames		Colemak
+Dvorak (programmer's)	KeymapNames		Dvorak (programmerarnas)
+Russian (Mac)	KeymapNames		Ryska (Mac)
 Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Tack för att du testar Haiku! Vi hoppas att du kommer att gilla det!\n\nDu kan välja ditt föredragna språk och tangentbordslayout från listan till vänster. Du kan enkelt byta båda inställningarna från skrivbordet vid ett senare tillfälle.\n\nVill du starta Installeraren eller gå direkt till skrivbordet?\n
+German (Mac)	KeymapNames		Tyska (Mac)
+Arabic (102)	KeymapNames		Arabiska (102)
+Belarusian (Latin)	KeymapNames		Vitryska (Latin)
+Belarusian (Mac)	KeymapNames		Vitryska (Mac)
+Hebrew	KeymapNames		Hibreiska
+Greek	KeymapNames		Grekiska
+Croatian	KeymapNames		Kroatiska
 Run Installer	BootPromptWindow		Starta Installeraren
+Faeroese	KeymapNames		Färöisk
+Polish (Typewriter)	KeymapNames		Polska (skrivmaskin)
+French (Mac)	KeymapNames		Franska (Mac)
+Spanish	KeymapNames		Spanska
+Ukrainian (Mac)	KeymapNames		Ukrainska (Mac)
+Estonian	KeymapNames		Estländska
+French (Bépo)	KeymapNames		Franska (Bépo)
+Serbian (Latin)	KeymapNames		Serbiska (Latin)
+Russian (Typewriter)	KeymapNames		ryska (skrivmaskin)
+French	KeymapNames		Franska
+Italian	KeymapNames		Italienska
+Portuguese	KeymapNames		Portugisiska
+Swiss-French	KeymapNames		Swiss-Franska
+Slovene	KeymapNames		Slovenska
+Lithuanian	KeymapNames		Litauiska
+French (NF Z71-300)	KeymapNames		Franska (NF Z71-300)
+ISO-9995	KeymapNames		ISO-9995
+Kazakh	KeymapNames		Kazakiska
 Language	BootPromptWindow		Språk
+Lithuanian (Standard)	KeymapNames		Litauiska (Standard)
+Belgian (comma)	KeymapNames		Belgisk (komma)
 Custom	BootPromptWindow		Anpassad
+Norwegian	KeymapNames		Norska
+Danish	KeymapNames		Danska
 Boot to Desktop	BootPromptWindow		Starta skrivbordet
+Bulgarian (Phonetic)	KeymapNames		Bulgariska (fonetiska)
+Canadian-French	KeymapNames		Kanadensisk-Franska
 Welcome to Haiku!	BootPromptWindow		Välkommen till Haiku!
+Russian	KeymapNames		Ryska
+Hungarian	KeymapNames		Ungerska
+Irish	KeymapNames		Irländska
+Romanian	KeymapNames		Rumänska
+Macedonian	KeymapNames		Makedonska
+Czech (Mac)	KeymapNames		Tjeckiska (Mac)
+Brazilian (ABNT2)	KeymapNames		Brasilianska (ABNT2)
+Albanian	KeymapNames		Albanska
+Dutch	KeymapNames		Holländska
+Friulian	KeymapNames		Friuliska
+Icelandic	KeymapNames		Isländska

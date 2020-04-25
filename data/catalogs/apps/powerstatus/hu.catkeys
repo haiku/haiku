@@ -39,7 +39,7 @@ Design capacity warning: 	PowerStatus		Tervezett kapacitás figyelmeztetés:
 Quit	PowerStatus		Kilépés
 rechargeable	PowerStatus		újratölthető
 charging	PowerStatus		töltődik
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Futatthatja az Energiaállapotot egy ablakban, vagy az Asztalsávra telepítheti azt.
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Futtathatod az Energiaállapotot egy ablakban, vagy az Asztalsávra telepítheted azt.
 Show status icon	PowerStatus		Állapotikon megjelenítése
 Capacity granularity 2: 	PowerStatus		Kapacitás granularitás 2: 
 Technology: 	PowerStatus		Technológia:

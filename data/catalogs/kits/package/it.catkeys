@@ -1,7 +1,10 @@
-1	italian	x-vnd.Haiku-libpackage	2012114212
+1	italian	x-vnd.Haiku-libpackage	134767648
+Fetching repository-cache from %url	RefreshRepositoryRequest		Recupero la cache del repository dall'indirizzo %url
+Validating checksum for %repositoryName	RefreshRepositoryRequest		Validazione checksum di %repositoryName
 Failed to remove transaction directory	PackageManagerKit		Errore nella rimozione della cartella delle transazioni
 Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Errore nel recupero della configurazione del repository \"%s\". Saltato.
 Refreshing repository \"%s\" failed	PackageManagerKit		Impossibile aggiornare il repository \"%s\"
+Fetching repository checksum from %url	RefreshRepositoryRequest		Recupero checksum del repository dall'indirizzo %url
 Failed to get repository names	PackageManagerKit		Impossibile ottenere i nomi dei repository
 Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Errore nel recupero della cache per il repository \"%s\". Saltato.
 Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Il pacchetto %s-%s non ha un requisito corrispondente per il suo pacchetto base \"%s\"

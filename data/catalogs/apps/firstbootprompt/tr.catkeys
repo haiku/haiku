@@ -1,8 +1,80 @@
-1	turkish	x-vnd.Haiku-FirstBootPrompt	2649051796
+1	turkish	x-vnd.Haiku-FirstBootPrompt	2670843542
+Japanese	KeymapNames		Japonca
+US	KeymapNames		ABD
+Esperanto	KeymapNames		Esperanto
+Belarusian	KeymapNames		Beyaz Rusça
+Brazilian	KeymapNames		Brezilya
+Dvorak	KeymapNames		Dvorak
+Polish	KeymapNames		Lehçe
+Latin-American	KeymapNames		Latin Amerika
+Ukrainian	KeymapNames		Ukraynaca
+Russian (Yawert)	KeymapNames		Rusça (Yawert)
+United-Kingdom	KeymapNames		Birleşik Krallık
+Serbian (Cyrillic)	KeymapNames		Sırpça (Kiril)
+Turkish (Type-F)	KeymapNames		Türkçe (F)
+Bulgarian (Cyrillic)	KeymapNames		Bulgarca (Kiril)
+Belgian (point)	KeymapNames		Flamanca (nokta)
+Finnish	KeymapNames		Fince
+Swedish	KeymapNames		İsveççe
+Svorak	KeymapNames		Svorak
+German	KeymapNames		Almanca
+Swiss-German	KeymapNames		İsviçre Almancası
 Keymap	BootPromptWindow		Klavye dizilimi
-Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Haiku'yu denediğiniz için teşekkür ederiz! Umarız memnun kalırsınız!\n\nTercih ettiğiniz dili ve klavye dizilimini soldaki listeden seçebilirsiniz. Seçimleriniz anında uygulanacaktır. Arzu ederseniz bu ayarları daha sonra Masaüstü'nden kolaylıkla değiştirebilirsiniz.\n\nKurulumu sürdürmek mi yoksa önce Masaüstü'ne mi geçmek istersiniz?\n
+Spanish (Dvorak)	KeymapNames		İspanyolca (Dvorak)
+US-International	KeymapNames		ABD Uluslararası
+Czech	KeymapNames		Çekçe
+Turkish (Type-Q)	KeymapNames		Türkçe (Q)
+Slovak	KeymapNames		Slovakça
+Russian (Udmurt, Komi, Mari)	KeymapNames		Rusça (Udmurt, Komi, Mari)
+Thai (TIS-820.2538)	KeymapNames		Tay (TIS-820.2538)
+Colemak	KeymapNames		Colemak
+Dvorak (programmer's)	KeymapNames		Dvorak (programcı)
+Russian (Mac)	KeymapNames		Rusça (Mac)
+Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Haiku'yu denediğiniz için teşekkür ederiz! Umarız memnun kalırsınız!\n\nTercih ettiğiniz dili ve klavye dizilimini soldaki listeden seçebilirsiniz. Seçimleriniz anında uygulanacaktır. Arzu ederseniz bu ayarları daha sonra Masaüstü'nden kolaylıkla değiştirebilirsiniz.\n\nDoğrudan Masaüstü'ne geçmek veya kurulumu sürdürmek için aşağıdaki düğmeleri kullanın.?\n
+German (Mac)	KeymapNames		Almanca (Mac)
+Arabic (102)	KeymapNames		Arapça (102)
+Belarusian (Latin)	KeymapNames		Beyaz Rusça (Latin)
+Belarusian (Mac)	KeymapNames		Beyaz Rusça (Mac)
+Hebrew	KeymapNames		İbranca
+Greek	KeymapNames		Yunanca
+Croatian	KeymapNames		Hırvatça
 Run Installer	BootPromptWindow		Kurulumu sürdür
+Faeroese	KeymapNames		Faroece
+Polish (Typewriter)	KeymapNames		Lehçe (Daktilo)
+French (Mac)	KeymapNames		Fransızca (Mac)
+Spanish	KeymapNames		İspanyolca
+Ukrainian (Mac)	KeymapNames		Ukraynaca (Mac)
+Estonian	KeymapNames		Estonca
+French (Bépo)	KeymapNames		Fransızca (Bépo)
+Serbian (Latin)	KeymapNames		Sırpça (Latin)
+Russian (Typewriter)	KeymapNames		Rusça (Daktilo)
+French	KeymapNames		Fransızca
+Italian	KeymapNames		İtalyanca
+Portuguese	KeymapNames		Portekizce
+Swiss-French	KeymapNames		İsviçre Fransızcası
+Slovene	KeymapNames		Slovence
+Lithuanian	KeymapNames		Litvanca
+French (NF Z71-300)	KeymapNames		Fransızca (NF Z71-300)
+ISO-9995	KeymapNames		ISO-9995
+Kazakh	KeymapNames		Kazak
 Language	BootPromptWindow		Dil
+Lithuanian (Standard)	KeymapNames		Litvanca (Standart)
+Belgian (comma)	KeymapNames		Flamanca (virgül)
 Custom	BootPromptWindow		Özel
+Norwegian	KeymapNames		Norveççe
+Danish	KeymapNames		Danca
 Boot to Desktop	BootPromptWindow		Masaüstü'ne geç
+Bulgarian (Phonetic)	KeymapNames		Bulgarca (Fonetik)
+Canadian-French	KeymapNames		Kanada Fransızcası
 Welcome to Haiku!	BootPromptWindow		Haiku'ya hoş geldiniz!
+Russian	KeymapNames		Rusça
+Hungarian	KeymapNames		Macarca
+Irish	KeymapNames		İrlandaca
+Romanian	KeymapNames		Romence
+Macedonian	KeymapNames		Makedonca
+Czech (Mac)	KeymapNames		Çekçe (Mac)
+Brazilian (ABNT2)	KeymapNames		Brezilya (ABNT2)
+Albanian	KeymapNames		Arnavutça
+Dutch	KeymapNames		Hollandaca
+Friulian	KeymapNames		Furlanca
+Icelandic	KeymapNames		İzlandaca

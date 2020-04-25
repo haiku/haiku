@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Keymap	824461838
+1	french	x-vnd.Haiku-Keymap	1240101105
 Key	Modifier keys window	As in a computer keyboard key	Touche
 Japanese	KeymapNames		Japonais
 US	KeymapNames		US
@@ -126,8 +126,10 @@ Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Touche maj
 Russian	KeymapNames		Russe
 Romanian	KeymapNames		Roumain
 Command	Keyboard Layout View	Command key	Commande
+SCROLL	Keyboard Layout View		Défil.
 File	Keymap window		Fichier
 Brazilian (ABNT2)	KeymapNames		Brésilien (ABNT2)
+INS	Keyboard Layout View		Inser.
 Dutch	KeymapNames		Néerlandais
 Diaeresis trigger	Keymap window		Tréma
 Icelandic	KeymapNames		Islandais

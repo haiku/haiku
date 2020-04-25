@@ -8,7 +8,7 @@ Log to file	PoorMan		Naplózás fájlba
 Shutting down.	PoorMan		Leállás.
 Error Dir	PoorMan		Hiba mappa
 Web folder:	PoorMan		Mappa:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Kérem, válassza ki azt a mappát, ahol az oldal fájljai találhatóak.\n\nA SzegényEmber létre tud hozni egy alapértelmezett \"public_html\" mappát a saját mappán belül,\nvagy pedig választhat egyet ehelyett.
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Kérlek válaszd ki azt a mappát, ahol az oldal fájljai találhatóak.\n\nA SzegényEmber létre tud hozni egy alapértelmezett \"public_html\" mappát a saját mappán belül,\nvagy pedig választhatsz egyet helyette.
 Log To Console	PoorMan		Naplózás konzolba
 File Name	PoorMan		Fájlnév
 Starting up... 	PoorMan		Indítás…

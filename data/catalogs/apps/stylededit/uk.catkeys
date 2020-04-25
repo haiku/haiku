@@ -1,8 +1,9 @@
-1	ukrainian	x-vnd.Haiku-StyledEdit	727465241
+1	ukrainian	x-vnd.Haiku-StyledEdit	2796309255
 Document statistics	Statistics		Статистика документу
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Неможливо зробити відкат, файл не знайдено: \"%s\".
 Cut	Menus		Вирізати
 Center	Menus		Центр
+Increase size	Menus		Збільшити розмір
 Wrap-around search	FindandReplaceWindow		Шукати по всьому документу
 Page setup…	Menus		Налаштування сторінки…
 Untitled 	StyledEditWindow		Неназваний 
@@ -70,6 +71,7 @@ Find selection	Menus		Знайти вибране
 Cancel	SaveAlert		Скасувати
 Find…	Menus		Знайти…
 Revert	RevertToSavedAlert		Без змін
+Decrease size	Menus		Зменшити розмір
 Size	Menus		Розмір
 Autodetect	Menus		Автовизначення
 Replace next	Menus		Замінити наступний

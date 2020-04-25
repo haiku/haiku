@@ -31,8 +31,8 @@ High	TouchpadPrefView		Yüksek
 Defaults	TouchpadPrefView		Öntanımlılar
 1-Button	SettingsView		1 düğmeli
 Short	KeyboardView		Kısa
-Revert	InputMouse		Eski haline döndür
 Slow	KeyboardView		Yavaş
+Revert	InputMouse		Eski haline döndür
 Key repeat rate	KeyboardView		Düğme yineleme oranı
 2-Button	SettingsView		2 düğmeli
 Click to focus and raise	SettingsView		Odaklayıp öne getirmek için tıkla

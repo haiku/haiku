@@ -4,10 +4,10 @@ Compression method:	ConfigView		Tömörítés módja:
 WebP image translator	ConfigView		WebP kép értelmező
 Preset	ConfigView		Beállítások
 WebP images	WebPTranslator		WebP kép
-WebPTranslator Settings	ConfigView		WebPÉrtelemző beállítások
+WebPTranslator Settings	ConfigView		WebP értelmező beállításai
 Output quality:	ConfigView		Kimenet minősége:
 ©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
-WebP Settings	main		WebP beállításai
+WebP Settings	main		WebP beállítások
 Text	ConfigView		Szöveg
 Slower but better	ConfigView		Lassabb, de jobb
 WebP image	WebPTranslator		WebP kép
@@ -17,7 +17,7 @@ Low	ConfigView		Alacsony
 High	ConfigView		Magas
 Drawing	ConfigView		Rajz
 Based on libwebp %version%	ConfigView		libwebp %version% alapján
-Default	ConfigView		Eredeti
+Default	ConfigView		Alapérték
 Fast	ConfigView		Gyors
 Photo	ConfigView		Fotó
 Preprocessing filter	ConfigView		Előfeldolgozó szűrő

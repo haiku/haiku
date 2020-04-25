@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-HaikuDepot	1172858982
+1	dutch; flemish	x-vnd.Haiku-HaikuDepot	226610375
 Repository update error	LocalRepositoryUpdateProcess		Fout bij updaten softwarebronnen
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Er is een fout opgetreden bij het verversen van de softwarebronnen: %error%
 Check for updates…	MainWindow		Controleer op updates…
@@ -40,9 +40,7 @@ Category	FilterView		Categorie
 User rating	RatePackageWindow		Beoordeling
 Installed packages	MainWindow		Geïnstalleerde pakketten
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Een gevraagd object of een object verbonden in het verzoek werd niet gevonden op de server.
-Other users can see this rating	RatePackageWindow		Andere gebruikers mogen deze beoordeling zien
 Stable	RatePackageWindow		Stabiel
-This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		De toepassing is te oud om te communiceren met het HaikuDepot server systeel? Vervang deze door een nieuwere versie door het updated van u Haiku systeem. De minimum versie van HaikuDepot vereist is \"%s\".
 Fatal error	PackageManager		Fatale fout
 Package action failed	PackageInfoView		Pakketactie mislukt
 No changelog available.	PackageInfoView		Geen changelog beschikbaar.

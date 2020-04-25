@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-HaikuDepot	769325367
+1	italian	x-vnd.Haiku-HaikuDepot	3586526058
 Repository update error	LocalRepositoryUpdateProcess		Errore nell'aggiornamento del Repository
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificato un errore nell'aggiornamento del repository: %error%
 User Created	UserLoginWindow		Utente Creato
@@ -47,9 +47,7 @@ Category	FilterView		Categoria
 User rating	RatePackageWindow		Valutazione utenti
 Installed packages	MainWindow		Pacchetti installati
 A requested object or an object involved in the request was not found on the server.	ServerHelper		L'elemento richiesto o uno ad esso collegato non è stato trovato sul server.
-Other users can see this rating	RatePackageWindow		Gli altri utenti possono vedere questa valutazione
 Stable	RatePackageWindow		Stabile
-This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		Questa applicazione è troppo vecchia per comunicare con  HaikuDepot.  Recupera una nuova versione di  HaikuDepot  aggiornando Hsiku.  La versione minima di  HaikuDepot richiesta è \"%s\".
 Fatal error	PackageManager		Errore fatale
 Package action failed	PackageInfoView		Azione sul pacchetto non riuscita
 No changelog available.	PackageInfoView		Nessun registro modifiche disponibile.
@@ -79,9 +77,7 @@ Very unstable	RatePackageWindow		Molto instabile
 Password:	UserLoginWindow		Password:
 All packages	PackageListView		Tutti i pacchetti
 Network Transport Error	ServerHelper		Errore di Rete
-Authorization or security issue.  Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Si è verificato un problema di sicurezza.  Effettua il logout e nuovamente il login per verificare che la tua password è corretta e controlla anche di aver accettato l'ultima versione delle condizioni d'uso.
 Stability	RatePackageWindow		Stabilità
-The nickname must be unique, but the supplied nickname is already taken.  Choose a different nickname.	UserLoginWindow		Il soprannome deve essere univoco, ma quello da te inserito risulta già utilizzato.  Per favore, scegline uno differente.
 Send	RatePackageWindow		Invia
 Start package daemon	App		Avvia server dei pacchetti
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		La password deve essere ripetuta affinché la probabilità di inserirla sbagliata sia ridotta.
@@ -106,6 +102,7 @@ Close	UserLoginWindow		Chiudi
 Close	RatePackageWindow		Chiudi
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sincronizzazione dei dati dei pacchetti del repository '%REPO_NAME%' in corso
 View the usage conditions	UserLoginWindow		Vedi le condizioni d'uso
+Login issue	MainWindow		Errore di Autenticazione
 Size	PackageListView		Dimensione
 Your rating:	RatePackageWindow		La tua valutazione:
 Your rating was updated.	RatePackageWindow		La tua valutazione è stata aggiornata.
@@ -125,13 +122,13 @@ Log out	MainWindow		Termina sessione
 Comment language:	RatePackageWindow		Linguaggio commento:
 Status	PackageListView		Stato
 The password has been incorrectly repeated.	UserLoginWindow		La password non è stata ripetuta correttamente.
+The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		La password fornita precedentemente per l'utente [%Nickname%] non è più valida. Questo utenza verrà automaticamente disconnessa dall'applicazione; effettua nuovamente il login con la password aggiornata per procedere.
 Update	RatePackageWindow		Aggiorna
 OK	ServerHelper		OK
 Language	UserLoginWindow		Linguaggi di programmazione
 OK	UserLoginWindow		OK
 Reading repository data	LocalPkgDataLoadProcess		Lettura dati repository
 Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Sincronizzazione dati di riferimento dal server in corso
-The nickname is malformed.  The nickname may only contain digits and lower case latin characters.  The nickname must be between four and sixteen characters in length.	UserLoginWindow		Il nickname inserito non ha un formato corretto.  Il nickname può avere solo numeri e caratteri minuscoli.  Deve, inoltre, essere composto tra i quatteo e i sedici caratteri.
 Stability:	RatePackageWindow		Stabilità:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Le condizioni d'uso devono essere accettate ed è, inoltre, necessario che la persona che sta creando l'utente soddisfi i requisiti minimi d'età.
 A validation error has occurred	ServerHelper		Si è verificato un errore nella validazione
@@ -155,9 +152,7 @@ Quit	App		Chiudi
 Search terms:	FilterView		Termini di ricerca:
 Pending…	PackageListView		In attesa…
 Category:	FilterView		Categoria:
-The user %Nickname% has been successfully created in the HaikuDepotServer system.  You can administer your user details by using the web interface.  You are now logged-in as this new user.	UserLoginWindow		L'utente %Nickname% è stato creato con successo sul server di HaikuDepot.  Puoi gestire i tuoi dati utente attraverso la sua interfaccia web.  Sei loggato come nuovo utente, adesso.
 Authentication failed	UserLoginWindow		Autenticazione non riuscita
-The supplied response to the captcha is incorrect.  A new captcha will be generated; try again.	UserLoginWindow		La risposta fornita al quesito captcha non è corretta.  Un nuovo quesito captcha è stato generato; per favore riprova.
 Captcha error	UserLoginWindow		Errore validazione Captcha
 Manage repositories…	MainWindow		Gestisci repository…
 Fetching remote repository data	LocalRepositoryUpdateProcess		Recupero dati repository remoto

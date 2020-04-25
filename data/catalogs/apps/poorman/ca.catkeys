@@ -8,7 +8,7 @@ Log to file	PoorMan		Registra-ho a fitxer
 Shutting down.	PoorMan		M'aturo.
 Error Dir	PoorMan		Error de directori
 Web folder:	PoorMan		Carpeta web:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Trieu la carpeta que vulgueu publicar al web.\n\nPodeu que PoorMan creï un \"public_html\" predeterminat a la carpeta d'inici.\nO bé seleccioneu una de les vostres carpetes.
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Si us plau, trieu la carpeta que vulgueu publicar al web.\n\nPodeu fer que PoorMan creï un \"public_html\" predeterminat a la carpeta personal.\nO bé seleccioneu una de les vostres carpetes.
 Log To Console	PoorMan		Registra a la consola
 File Name	PoorMan		Nom del fitxer
 Starting up... 	PoorMan		S'inicia... 
@@ -16,11 +16,11 @@ Select	PoorMan		Selecciona
 Logging view	PoorMan		Vista del registre
 Save console as…	PoorMan		Anomena i desa la consola...
 Edit	PoorMan		Edita
-Cancel	PoorMan		Anul·la
+Cancel	PoorMan		Cancel·la
 Directory: 	PoorMan		Directori: 
 Hits: %lu	PoorMan		Coincidències: %lu
 Hits: 0	PoorMan		Coincidències: 0
-Shutting down.\n	PoorMan		S'atura.\n
+Shutting down.\n	PoorMan		M'aturo.\n
 Select all	PoorMan		Selecciona-ho tot
 Error Server	PoorMan		Error de servidor
 Send file listing if there's no start page	PoorMan		Envia la llista de fitxers si no hi ha cap pàgina inicial.

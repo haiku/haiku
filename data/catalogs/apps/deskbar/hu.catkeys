@@ -13,7 +13,7 @@ Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programok
 Find…	DeskbarMenu		Keresés…
 Show clock	Tray		Óra megjelenítése
 Window	PreferencesWindow		Ablak
-Defaults	PreferencesWindow		Eredeti
+Defaults	PreferencesWindow		Alapértékek
 Menu	PreferencesWindow		Menü
 Recent documents	DeskbarMenu		Legutóbb használt fájlok
 Auto-hide	PreferencesWindow		Automatikus elrejtés

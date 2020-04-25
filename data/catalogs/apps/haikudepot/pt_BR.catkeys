@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	1859905157
+1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	2487844666
 Uninstall	PackageManager		Desinstalar
 (%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Não instalado
@@ -26,7 +26,6 @@ Rate %Package%	RatePackageWindow		Avaliar %Package%
 Quit HaikuDepot	App		Fechar o Depósito Haiku
 Category	FilterView		Categoria
 Installed packages	MainWindow		Pacotes instalados
-Other users can see this rating	RatePackageWindow		Outros usuários podem ver esta avaliação
 Stable	RatePackageWindow		Estável
 Fatal error	PackageManager		Erro fatal
 Package action failed	PackageInfoView		Ação do pacote falhou

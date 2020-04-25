@@ -28,8 +28,8 @@ High	TouchpadPrefView		Nagy
 Defaults	TouchpadPrefView		Alapértékek
 1-Button	SettingsView		1. gomb
 Short	KeyboardView		Rövid
-Revert	InputMouse		Visszaállít
 Slow	KeyboardView		Lassú
+Revert	InputMouse		Visszaállít
 Key repeat rate	KeyboardView		Billentyű-ismétlés
 2-Button	SettingsView		2. gomb
 Click to focus and raise	SettingsView		Fókusz és előtérbe hozás kattintásra

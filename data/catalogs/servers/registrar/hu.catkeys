@@ -1,7 +1,7 @@
 1	hungarian	x-vnd.haiku-registrar	2599857937
 Cancel	ShutdownProcess		Mégse
 OK	ShutdownProcess		Rendben
-Do you really want to shut down the system?	ShutdownProcess		Biztos, hogy le kívánja állítani a rendszert?
+Do you really want to shut down the system?	ShutdownProcess		Biztos, hogy le kívánod állítani a rendszert?
 Shutdown status	ShutdownProcess		Leállítás állapota
 Shut down	ShutdownProcess		Leállítás
 The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		A program (%appName%) lehet, hogy blokkolva van egy modális panelen.
@@ -9,9 +9,9 @@ System is shut down	ShutdownProcess		A rendszer leállt
 Restart system	ShutdownProcess		Rendszer újraindítása
 Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Egy program (%appName%) megszakította a rendszer leállítását.
 Asking background applications to quit.	ShutdownProcess		Háttérprogramok megkérése a leállásra.
-Do you really want to restart the system?	ShutdownProcess		Biztos, hogy újra kívánja indítani a rendszert?
+Do you really want to restart the system?	ShutdownProcess		Biztos, hogy újra kívánod indítani a rendszert?
 Restart	ShutdownProcess		Újraindítás
-It's now safe to turn off the computer.	ShutdownProcess		Most már kikapcsolhatja a számítógépet.
+It's now safe to turn off the computer.	ShutdownProcess		Most már kikapcsolhatod a számítógépet.
 Asking other processes to quit.	ShutdownProcess		Folyamatok megkérése a leállásra.
 Cancel shutdown	ShutdownProcess		Leállítás megszakítása
 Restarting…	ShutdownProcess		Újraindulás…

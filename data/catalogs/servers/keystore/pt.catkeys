@@ -1,9 +1,13 @@
-1	portuguese	x-vnd.Haiku-keystore_server	2236939756
+1	portuguese	x-vnd.Haiku-keystore_server	2429996361
+to perform the following action:\n%accessString%\n\n	AppAccessRequestWindow		para realizar a seguinte ação:\n%accessString%\n\n
 This application doesn't yet have the required privileges.	AppAccessRequestWindow		Esta aplicação ainda não dispõe dos privilégios necessários.
 Keyring:	KeyRequestWindow		Porta-chaves:
+requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		solicita acesso ao porta-chaves:\n%keyringName%\n\n
+Application keyring access	AppAccessRequestWindow		Acesso de aplicação ao porta-chaves
 Disallow	AppAccessRequestWindow		Recusar
 Allow once	AppAccessRequestWindow		Permitir uma vez
 Unlock keyring	KeyRequestWindow		Desbloquear porta-chaves
+An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		Uma aplicação pretende aceder ao porta-chaves abaixo, mas está bloqueado com palavra-passe. Por favor, introduza a palavra-base para desbloquear o porta-chaves.\nSe desbloquear o porta-chaves, este permanece desbloqueado até que o sistema seja encerrado ou o porta-chaves seja de novo bloqueado manualmente.\nSe cancelar esta caixa de diálogo, o porta-chaves permanecerá bloqueado.
 Password:	KeyRequestWindow		Palavra-passe:
 Cancel	KeyRequestWindow		Cancelar
 This application has been updated since it was last granted access.	AppAccessRequestWindow		Esta aplicação foi atualizada desde a última vez em que lhe foi concedido acesso.

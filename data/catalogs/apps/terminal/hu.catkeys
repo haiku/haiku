@@ -15,7 +15,7 @@ Edit tab title…	Terminal TermWindow		Lap címének szerkesztése…
 Print	Terminal TermWindow		Nyomtatás
 Settings	Terminal TermWindow		Beállítások
 %app% settings	Terminal PrefWindow	window title	%app% beállítások
-Use default	Terminal SetTitleWindow		Eredeti
+Use default	Terminal SetTitleWindow		Alapérték használata
 Close tab	Terminal TermWindow		Lap bezárása
 Selected background	Terminal AppearancePrefView		Kijelölés háttere
 Error!	Terminal getString		Hiba!
@@ -28,7 +28,7 @@ Selected text	Terminal AppearancePrefView		Kijelölt szöveg
 Change directory	Terminal TermView		Mappa váltása
 Page setup…	Terminal TermWindow		Oldalbeállítás…
 Slate	Terminal colors scheme		Pala
-Defaults	Terminal PrefWindow		Eredeti
+Defaults	Terminal PrefWindow		Alapértékek
 Cancel	Terminal TermView		Mégse
 Revert	Terminal PrefWindow		Visszavonás
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminál
@@ -45,7 +45,7 @@ Open path	Terminal TermView		Útvonal megnyitása
 Terminal	System name		Terminál
 Font size	Terminal TermWindow		Betűméret
 Custom	Terminal colors scheme		Egyéni
-Really close?	Terminal TermWindow		Biztos bezárja?
+Really close?	Terminal TermWindow		Biztos bezárod?
 OK	Terminal TermApp		Rendben
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		A \"%1\" folyamat még fut.\nHa bezárja a Terminált, a folyamat megszakad.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Ismeretlen beállítás: \"%s\"\n
@@ -74,7 +74,7 @@ Midnight	Terminal colors scheme		Éjfél
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\t'%' karakter.\n\t%<\t-\tEgy szakasz kezdete, ami akkor jelenik meg, ha az utána lévő helykitöltő nem üres.\n\t%>\t-\tEgy szakasz kezdete, ami akkor jelenik meg, ha az előző %< szakasz és a jelenlegi nem üres.\n\t%-\t-\tEgy %< vagy %> szakasz vége.\n\n Bármi más karakter a '%' jel és a formázási karakter között csak egy szóközt fog beilleszteni,\n ha a helykitöltő értéke nem üres. A %< szakaszhoz kerül hozzáadásra.
 Tab title:	Terminal TermWindow		Lap címe:
 Window title:	Terminal TermWindow		Ablak címe:
-Default	Terminal colors scheme		Eredeti
+Default	Terminal colors scheme		Alapérték
 Window size:	Terminal AppearancePrefView		Ablak mérete:
 Switch Terminals	Terminal TermWindow		Terminálok közti váltás
 Decrease	Terminal TermWindow		Csökkentés

@@ -16,7 +16,7 @@ Auto-raise	LaunchBox		Autoelevació
 Icon size	LaunchBox		Mida de la icona
 Open containing folder	LaunchBox		Obre la carpeta que el conté
 Add button here	LaunchBox		Afegeix un botó aquí
-Cancel	LaunchBox		Anul·la
+Cancel	LaunchBox		Cancel·la
 launch popup	LaunchBox		obre la finestra emergent
 Clear button	LaunchBox		Botó de neteja
 Bummer	LaunchBox		Problema
@@ -28,9 +28,9 @@ Settings	LaunchBox		Paràmetres
 Vertical layout	LaunchBox		Disposició vertical:
 Pad	LaunchBox		Barra
 Close	LaunchBox		Tanca
-Remove button	LaunchBox		Elimina el botó
+Remove button	LaunchBox		Suprimeix el botó
 Quit	LaunchBox		Surt
 Horizontal layout	LaunchBox		Disposició horitzontal
 New	LaunchBox		Nou
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		No ha estat possible enviar la 'carpeta oberta' al Rastrejador.\n\nError: 
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Ha fallat enviar l'ordre d'obrir la carpeta al Rastrejador.\n\nError: 
 Pad %1	LaunchBox		Barra %1

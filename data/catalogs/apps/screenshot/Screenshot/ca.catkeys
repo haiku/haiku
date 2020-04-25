@@ -20,12 +20,12 @@ Settings…	ScreenshotWindow		Paràmetres…
 Choose folder	ScreenshotWindow		Escolliu una carpeta
 Name:	ScreenshotWindow		Nom:
 Choose folder…	ScreenshotWindow		Trieu una carpeta...
-Please select	ScreenshotWindow		Seleccioneu
+Please select	ScreenshotWindow		Si us plau, seleccioneu-ho.
 Failed to save screenshot	ScreenshotWindow		Ha fallat desar la captura.
-Cancel	ScreenshotWindow		Anul·la
+Cancel	ScreenshotWindow		Cancel·la
 Delay:	ScreenshotWindow		Retard:
 Copy to clipboard	ScreenshotWindow		Copiar al porta-retalls
 screenshot	Screenshot	Base filename of screenshot files	captura
-Home folder	ScreenshotWindow		Carpeta de l'usuari
+Home folder	ScreenshotWindow		Carpeta personal
 Save	ScreenshotWindow		Desa
 Capture active window	ScreenshotWindow		Captura la finestra activa

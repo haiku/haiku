@@ -8,7 +8,7 @@ Frame color	ConfigView		Keret színe
 Error	PulseApp		Hiba
 Bar colors	ConfigView		Sávok színe
 %.2f GHz	NormalPulseView		%.2f GHz
-Defaults	PrefsWindow		Alapértelmezett
+Defaults	PrefsWindow		Alapértékek
 %ld MHz	NormalPulseView		%ld MHz
 Mini mode	PrefsWindow		Mini mód
 CPU progress bar	NormalPulseView		CPU folyamatsáv

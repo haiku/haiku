@@ -17,23 +17,23 @@ About Pulse…	PulseView		Quant a Pulse…
 Pulse	NormalPulseView		Pulse
 Deskbar mode	NormalPulseView		Mode de la barra d'escriptori
 Remove replicant	CPUButton		Suprimeix el replicant
-You can't disable the last active CPU.	PulseView		No podeu desactivar l'última CPU activa.
+You can't disable the last active CPU.	PulseView		No podeu inhabilitar l'última CPU activa.
 Width of icon:	ConfigView		Amplada de la icona:
 Deskbar mode	MiniPulseView		Mode de la barra d'escriptori
 OK	PulseView		D'acord
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nDe David Ramsey i Arve Hjønnevåg\nRevisada per Daniel Switkin\n
 OK	PrefsWindow		D'acord
 Pulse	PulseApp		Pulse
-Removing from Deskbar failed.\n%s	DeskbarPulseView		Ha fallat suprimir-ho de la barra de l'escriptori.\n%s
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Ha fallat suprimir-ho de la barra d'escriptori.\n%s
 OK	PulseApp		D'acord
 About Pulse…	CPUButton		Quant a Pulse…
-Deskbar mode	PrefsWindow		Mode de la barra de l'escriptori
+Deskbar mode	PrefsWindow		Mode de la barra d'escriptori
 Mini mode	DeskbarPulseView		Mode mini
-You can't disable the last active CPU.	CPUButton		No podeu desactivar l'última CPU activa.
+You can't disable the last active CPU.	CPUButton		No podeu inhabilitar l'última CPU activa.
 OK	CPUButton		D'acord
-Deskbar	CPUButton		Barra de l'escriptori
+Deskbar	CPUButton		Barra d'escriptori
 Settings…	PulseView		Paràmetres…
-Deskbar menu	CPUButton		Menú de la barra de l'escriptori
+Deskbar menu	CPUButton		Menú de la barra d'escriptori
 Mini mode	NormalPulseView		Mode mini
 Quit	MiniPulseView		Surt
 Info	PulseView		Informació
@@ -42,7 +42,7 @@ OK	DeskbarPulseView		D'acord
 Info	PulseApp		Informació
 Pulse	System name		Pulse
 Active color	ConfigView		Color actiu
-Installing in Deskbar failed\n%s	PulseApp		Ha fallat instal·lar la barra de l'escriptori\n%s
+Installing in Deskbar failed\n%s	PulseApp		Ha fallat instal·lar-ho a la barra d'escriptori.\n%s
 Idle color	ConfigView		Color inactiu
 Normal mode	PrefsWindow		Mode normal
 Pulse settings	PulseWindow		Paràmetres del Pulse

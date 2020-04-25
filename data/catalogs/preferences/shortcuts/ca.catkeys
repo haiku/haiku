@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Shortcuts	2129039959
+1	catalan; valencian	x-vnd.Haiku-Shortcuts	3834857117
 *MouseUp	ShortcutsWindow		*Ratolí amunt
 Application	ShortcutsWindow		Aplicació
 Option	ShortcutsSpec	Name for modifier on keyboard	Opció
@@ -9,6 +9,7 @@ Don't save	ShortcutsWindow		No ho desis
 *Beep	ShortcutsWindow		*Timbre
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Les Dreceres no ha pogut desar el vostre joc de claus.
 Save	ShortcutsWindow		Desa
+Either	ShortcutsSpec		Qualsevol
 Oh no	ShortcutsWindow		Oh no!
 Key	ShortcutsWindow		Clau
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*Aplicació Envia Missatge/x-vnd.Be-TRAK 'Tfnd'
@@ -16,23 +17,29 @@ Select	ShortcutsWindow		Seleccioneu
 Shortcuts	System name		Dreceres
 Quit	ShortcutsWindow		Surt
 (Choose application with file requester)	ShortcutsWindow		(Trieu una aplicació que demani un fitxer)
-Cancel	ShortcutsWindow		Anul·la
+Cancel	ShortcutsWindow		Cancel·la
 *MoveMouse +20 +0	ShortcutsWindow		*Mou el ratolí +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
+Left	ShortcutsSpec		Esquerra
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Les Dreceres no han pogut analitzar el vostre fitxer del conjunt de claus!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Les Dreceres no han pogut desar el vostre fitxer del conjunt de claus!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Insereix Text \"el vostre text aquí \"
 Remove selected shortcut	ShortcutsWindow		Suprimeix la drecera seleccionada
+Error, NULL state description?	ShortcutsSpec		Error, descripció de l’estat NULL?
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Les Dreceres no han pogut obrir el vostre fitxer del joc de claus!
 Save & apply	ShortcutsWindow		Desa i aplica-ho
 Open	ShortcutsWindow		Obre
 Append	ShortcutsWindow		Afegeix
+Both	ShortcutsSpec		Ambdós
 Save KeySet as…	ShortcutsWindow		Anomena i desa el conjunt de claus...
 Append KeySet…	ShortcutsWindow		Afegeix un joc de claus...
 *MouseButton 1	ShortcutsWindow		*Botó 1 del ratolí
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Múltiple \"*Mou el ratolí a 100 % 0\" \"*Botó 1 del ratolí\"
+Right	ShortcutsSpec		Dreta
 OK	ShortcutsWindow		D'acord
 Add new shortcut	ShortcutsWindow		Afegeix una drecera nova
+(None)	ShortcutsSpec		(Cap)
 Shift	ShortcutsSpec	Name for modifier on keyboard	Majúscules
 Open KeySet…	ShortcutsWindow		Obre un joc de claus...
 File	ShortcutsWindow		Fitxer

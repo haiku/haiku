@@ -1,0 +1,12 @@
+1	dutch; flemish	x-vnd.Haiku-libmedia	1819860668
+Cleaning up.	MediaDefs		Bezig met opruimen.
+Starting media_services.	MediaDefs		Bezig met het starten van media_services.
+Stopping media_addon_server.	MediaDefs		Bezig met het stoppen van media_addon_server.
+Waiting for media_addon_server to quit.	MediaDefs		Bezig met het wachten op het stoppen van de media_addon_server.
+Telling media_addon_server to quit.	MediaDefs		Bezig met het afsluiten van de media_addon_server.
+Ready for use.	MediaDefs		Klaar voor gebruik.
+Stopping media server…	MediaDefs		Bezit met het stoppen van de mediaserver…
+Waiting for media_server to quit.	MediaDefs		Bezig met het wachten op het stoppen van de media_server.
+Done shutting down.	MediaDefs		Klaar met afsluiten.
+Error occurred starting media services.	MediaDefs		Er was een fout bij het starten van de mediadiensten.
+Media Service	MediaDefs		Media Dienst

@@ -1,7 +1,7 @@
 1	italian	x-vnd.Haiku-Keymap	1075970008
 Key	Modifier keys window	As in a computer keyboard key	Tasto
 Japanese	KeymapNames		Giapponese
-US	KeymapNames		US
+US	KeymapNames		Inglese (Stati Uniti)
 PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Brasiliano
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
@@ -15,7 +15,7 @@ Latin-American	KeymapNames		Latino-Americano
 Ukrainian	KeymapNames		Ucraino
 PAGE ↓	Keyboard Layout View		PAGINA ↓
 DEL	Keyboard Layout View		CANC
-United-Kingdom	KeymapNames		Regno Unito
+United-Kingdom	KeymapNames		Inglese (Regno Unito)
 Turkish (Type-F)	KeymapNames		Turco (Type-F)
 Serbian (Cyrillic)	KeymapNames		Serbo (Cirillico)
 Belgian (point)	KeymapNames		Belga (punto)
@@ -25,7 +25,7 @@ Switch shortcut keys to Windows/Linux mode	Keymap window		Modalità tasti di sce
 Option	Keyboard Layout View	Option key	Option
 Spanish (Dvorak)	KeymapNames		Spagnolo (Dvorak)
 Scroll lock	Keyboard Layout View		Blocca scorrimento
-US-International	KeymapNames		US-Internazionale
+US-International	KeymapNames		Inglese Americano (Internazionale)
 Right option	Keyboard Layout View		Option destro
 Turkish (Type-Q)	KeymapNames		Turco (Type-Q)
 Revert	Modifier keys window		Ripristina
@@ -68,7 +68,7 @@ Error: duplicate keys	Modifier keys window		Errore: tasto duplicato
 NUM	Keyboard Layout View	Very short for 'num lock'	NUM
 Bulgarian (Phonetic)	KeymapNames		Bulgaro (Fonetico)
 Kinesis Advantage	KeyboardLayoutNames		Kinesis Advantage
-Canadian-French	KeymapNames		Francese (Canadese)
+Canadian-French	KeymapNames		Francese (Canada)
 Hungarian	KeymapNames		Ungherese
 Control	Keyboard Layout View	Control key	Control
 Irish	KeymapNames		Irlandese

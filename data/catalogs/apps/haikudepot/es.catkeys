@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-HaikuDepot	3719532634
+1	spanish; castilian	x-vnd.Haiku-HaikuDepot	3409841131
 Repository update error	LocalRepositoryUpdateProcess		Error de actualización de repositorio
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ocurrió un error al actualizar el repositorio: %error%
 User Created	UserLoginWindow		Usuario creado
@@ -27,6 +27,7 @@ Show	MainWindow		Mostrar
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Ocurrió un error al obtener el listado de paquetes: %message%
 Unstable but usable	RatePackageWindow		Inestable pero usable
 Not specified	RatePackageWindow		Sin especificar
+This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Para poder funcionar, esta aplicación escribe y lee algunos archivos de trabajo en su ordenador. Parece que hay problemas al escribir un archivo de prueba en [%TestFilePath%]. Compruebe que no hayan problemas en su disco duro o con los permisos que impidan a esta aplicación escribir archivos en esa ubicación de carpeta. Usted puede informarse de este problema y continuar, pero algunas funciones podrían quedar deshabilitadas.
 Active	PackageListView		Activo
 Login or Create account	MainWindow		Ingresar o crear una cuenta
 <Package contents not available for remote packages>	PackageContentsView		<El contenido del paquete no está disponible para paquetes remotos>
@@ -40,14 +41,13 @@ Local	LocalPkgDataLoadProcess		Local
 Rate %Package%	RatePackageWindow		Puntuar %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Ocurrió un error al iniciar el administrador de paquetes: %message%
 Quit HaikuDepot	App		Salir de HaikuDepot
+An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Se ha generado un error inesperado '%Message%' con la propiedad '%Property%'
 A response to the captcha question must be provided.	UserLoginWindow		El captcha debe ser respondido.
 Category	FilterView		Categoría
 User rating	RatePackageWindow		Puntuación del usuario
 Installed packages	MainWindow		Paquetes instalados
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Un objeto requerido o un objeto implicado en el requerimiento no se ha encontrado en el servidor.
-Other users can see this rating	RatePackageWindow		Otros usuarios pueden ver esta puntuación
 Stable	RatePackageWindow		Estable
-This application is too old to communicate with the  HaikuDepot server system.  Obtain a newer version of HaikuDepot  by updating your Haiku system.  The minimum version of  HaikuDepot required is \"%s\".	ServerHelper		Esta aplicación es demasiado antigua para comunicarse con el servidor HaikuDepot. Obtenga una nueva versión de HaikuDepot mediante la actualización de su sistema Haiku. La versión mínima requerida de HaikuDepot es \"%s\".
 Fatal error	PackageManager		Error fatal
 Package action failed	PackageInfoView		La acción del paquete falló
 No changelog available.	PackageInfoView		No hay registro de cambios disponible.
@@ -113,6 +113,7 @@ Cancel	MainWindow		Cancelar
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 more to download)}other{(# more to download)}}
 Refresh repositories	MainWindow		Actualizar repositorios
 Tools	MainWindow		Herramientas
+Continue	App		Continuar
 A password is required.	UserLoginWindow		Se requiere una contraseña.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		No parece que este paquete esté en el servidor de HaikuDepot, por lo que no es posible crear una nueva valoración o modificar una ya existente.
 Language	RatePackageWindow		Idioma
@@ -126,7 +127,6 @@ Language	UserLoginWindow		Idioma
 OK	UserLoginWindow		Aceptar
 Reading repository data	LocalPkgDataLoadProcess		Leyendo datos del repositorio
 Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Sincronizando datos de referencia desde el servidor
-The nickname is malformed.  The nickname may only contain digits and lower case latin characters.  The nickname must be between four and sixteen characters in length.	UserLoginWindow		El nombre de usuario es inválido.  El usuario sólo puede contener números y letras del alfabeto latino en minúsculas.  El usuario debe teer entre cuatro y dieciséis caracteres de longitud.
 Stability:	RatePackageWindow		Estabilidad:
 A validation error has occurred	ServerHelper		Ocurrió un error de validación
 The nickname is required.	UserLoginWindow		El nombre de usuario es requerido.
@@ -143,6 +143,7 @@ Screenshot	ScreenshotWindow		Captura de pantalla
 HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		Es necesario un reinicio para completar el proceso de instalación.
 View latest usage conditions…	MainWindow		Ver las últimas condiciones de uso…
+Quit	App		Salir
 Search terms:	FilterView		Términos de búsqueda
 Pending…	PackageListView		Pendiente…
 Category:	FilterView		Categoría:
@@ -159,4 +160,5 @@ You need to be logged into an account before you can rate packages.	MainWindow		
 Client version too old	ServerHelper		Versión del cliente demasiado antigua
 Local repository load error	LocalPkgDataLoadProcess		Error al cargar repositorio local
 9999.99 KiB	PackageListView		9999.99 KiB
+Repeat password:	UserLoginWindow		Vuelva a ingresar la contraseña:
 All repositories	MainWindow		Todos los repositorios

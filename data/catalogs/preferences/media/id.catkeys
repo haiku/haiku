@@ -1,26 +1,26 @@
 1	indonesian	x-vnd.Haiku-Media	1682972002
+Couldn't add volume control in Deskbar: %s\n	Media views		Tidak dapat menambahkan kontrol volume di Deskbar: %s\n
+Restart media services	Media views		Restart layanan media
+Quit	Media Window		Keluar
+<none>	VideoInputMenu	Used when no video input is available	<tiada>
+Couldn't remove volume control in Deskbar: %s\n	Media views		Tidak dapat menghapus kontrol volume di Deskbar: %s\n
+Video output:	Media views		Keluaran video:
+Video input:	Media views		Input video:
+Audio output:	Media views		Keluaran audio
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Menghentikan Media sekarang akan menghentikan proses restart dari layanan media. Fungsi media cacat atau tidak tersedia adalah mungkin sekali.
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Tidak bisa terhubung ke server media.\nApakah anda ingin memulainya?
+Video settings	Media Window		Pengaturan video
 Audio mixer	Media Window		Mixer audio
 Show volume control on Deskbar	Media views		Tampilkan kontrol volume pada Deskbar
-Quit	Media Window		Keluar
-Restart media services	Media views		Restart layanan media
-Couldn't add volume control in Deskbar: %s\n	Media views		Tidak dapat menambahkan kontrol volume di Deskbar: %s\n
 Start media server	Media Window		Memulai server media
-<none>	VideoInputMenu	Used when no video input is available	<tiada>
 Audio settings	Media Window		Setting audio
 Quit anyway	Media Window		Keluar saja
-Couldn't remove volume control in Deskbar: %s\n	Media views		Tidak dapat menghapus kontrol volume di Deskbar: %s\n
 Media	System name		Media
 Warning!	Media Window		Peringatan!
 MIDI Settings	Media Window		Pengaturan MIDI
-Video output:	Media views		Keluaran video:
-Audio output:	Media views		Keluaran audio
-Video input:	Media views		Input video:
-Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Menghentikan Media sekarang akan menghentikan proses restart dari layanan media. Fungsi media cacat atau tidak tersedia adalah mungkin sekali.
 Audio input:	Media views		Input audio:
 <none>	Media views		<none>
-This hardware has no controls.	Media Window		Hardware ini tidak memiliki pengatur.
 Channel:	Media views		Kanal:
+This hardware has no controls.	Media Window		Hardware ini tidak memiliki pengatur.
 Defaults	Media views		Bawaan
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Tidak bisa terhubung ke server media.\nApakah anda ingin memulainya?
-Video settings	Media Window		Pengaturan video
 <none>	VideoOutputMenu	Used when no video output is available	<tiada>

@@ -2,7 +2,7 @@
 Expand	ExpanderMenu		Expandeix
 Expanding '%s'…	ExpanderWindow		S'expandeix %s…
 Close window when done expanding	ExpanderPreferences		Tanca la finestra un cop feta l'expansió.
-Set destination…	ExpanderMenu		Seleccioneu el destí...
+Set destination…	ExpanderMenu		Establiu-ne la destinació...
 Use:	ExpanderPreferences		Utilitza:
 File expanded	ExpanderWindow		Fitxer expandit
 The destination is read only.	ExpanderWindow		La destinació és només de lectura.
@@ -13,12 +13,12 @@ Select current	DirectoryFilePanel		Tria l'actual
 Source	ExpanderWindow		Origen
 Error when expanding archive	ExpanderWindow		Error en expandir l'arxiu.
 Hide contents	ExpanderWindow		Oculta el contingut
-Cancel	ExpanderWindow		Anul·la
+Cancel	ExpanderWindow		Cancel·la
 Automatically expand files	ExpanderPreferences		Expandeix automàticament els fitxers.
 Continue	ExpanderWindow		Segueix
-Destination folder	ExpanderPreferences		Carpeta de destí
+Destination folder	ExpanderPreferences		Carpeta de destinació
 Other	ExpanderPreferences		Altre
-Cancel	ExpanderPreferences		Anul·la
+Cancel	ExpanderPreferences		Cancel·la
 Expansion	ExpanderPreferences		Descompressió
 Select	DirectoryFilePanel		Seleccioneu
 The folder was either moved, renamed or not supported.	ExpanderWindow		La carpeta s'ha mogut, se n'ha canviat de nom o no és compatible.

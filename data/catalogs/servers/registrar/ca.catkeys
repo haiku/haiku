@@ -1,23 +1,23 @@
 1	catalan; valencian	x-vnd.haiku-registrar	2599857937
-Cancel	ShutdownProcess		Anul·la
+Cancel	ShutdownProcess		Cancel·la
 OK	ShutdownProcess		D'acord
-Do you really want to shut down the system?	ShutdownProcess		Segur que voleu reiniciar el sistema?
-Shutdown status	ShutdownProcess		Situació del tancament
+Do you really want to shut down the system?	ShutdownProcess		Segur que voleu aturar el sistema?
+Shutdown status	ShutdownProcess		Estat de l'aturada
 Shut down	ShutdownProcess		Atura
 The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		L'aplicació \"%appName%\" podria estar bloquejada per un quadre modal.
-System is shut down	ShutdownProcess		S'està apagant el sistema
+System is shut down	ShutdownProcess		S'atura el sistema.
 Restart system	ShutdownProcess		Reinicia el sistema
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		L'aplicació \"%appName%\" ha abortat el procés d'aturada.
-Asking background applications to quit.	ShutdownProcess		S'està demanant que s'aturin a les aplicacions en segon pla.
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		L'aplicació \"%appName%\" ha avortat el procés d'aturada.
+Asking background applications to quit.	ShutdownProcess		Es demana que s'aturin a les aplicacions en segon pla.
 Do you really want to restart the system?	ShutdownProcess		Segur que voleu reiniciar el sistema?
 Restart	ShutdownProcess		Reinicia
-It's now safe to turn off the computer.	ShutdownProcess		Ara és segur apagar l'ordinador.
+It's now safe to turn off the computer.	ShutdownProcess		Ara és segur aturar l'ordinador.
 Asking other processes to quit.	ShutdownProcess		S'esta demanant als altres processos que surtin.
-Cancel shutdown	ShutdownProcess		Anul·la l'aturada
-Restarting…	ShutdownProcess		S'està reiniciant...
+Cancel shutdown	ShutdownProcess		Cancel·la l'aturada
+Restarting…	ShutdownProcess		Es reinicia...
 %action%?	ShutdownProcess		%action%?
-Tidying things up a bit.	ShutdownProcess		S'està fent una mica de neteja.
+Tidying things up a bit.	ShutdownProcess		Es fa una mica de neteja.
 Kill application	ShutdownProcess		Mata l'aplicació
-Shutdown aborted	ShutdownProcess		S'ha aturat el procés d'aturada del sistema
-Shutting down…	ShutdownProcess		S'està aturant...
+Shutdown aborted	ShutdownProcess		S'ha avortat el procés d'aturada del sistema.
+Shutting down…	ShutdownProcess		M'aturo...
 Asking \"%appName%\" to quit.	ShutdownProcess		S'esta demanant a \"%appName%\" que surtin.

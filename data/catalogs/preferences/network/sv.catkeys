@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Network	3039697761
+1	swedish	x-vnd.Haiku-Network	115295218
 Ethernet device	InterfaceListItem		Ethernetenhet
 Link speed:	IntefaceView		Länkhastighet:
 disconnected	IntefaceView		frånkopplad
@@ -47,7 +47,6 @@ Status:	IntefaceView		Status:
 Disable	IntefaceView		Inaktivera
 Manage…	NetworkWindow		Hantera...
 open	Open network		öppna
-Network	NetworkWindow		Nätverk
 Your gateway to the internet	IntefaceAddressView		Din förmedlingsnod till internet
 Enable	ServiceView		Aktivera
 Wireless device	InterfaceListItem		Trådlös enhet

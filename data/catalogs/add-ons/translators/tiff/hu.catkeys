@@ -10,7 +10,7 @@ TIFF Settings	TIFFMain		TIFF beállítások
 TIFF image translator	TIFFTranslator		TIFF kép értelmező
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: nem sikerült a mappát beállítani\n
 Version %d.%d.%d, %s	TIFFView		Verzió: %d.%d.%d %s
-TIFFTranslator Settings	TIFFTranslator		TIFFÉrtelmező beállítások
+TIFFTranslator Settings	TIFFTranslator		TIFF értelmező beállításai
 LZW	TIFFView		LZW
 TIFF images	TIFFTranslator		TIFF kép
 None	TIFFView		Nincs

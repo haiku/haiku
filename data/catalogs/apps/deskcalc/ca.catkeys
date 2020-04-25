@@ -24,7 +24,7 @@ cosh	CalcView		cosh
 ln	CalcView		ln
 Compact	CalcView		Compacte
 Calculating	CalcView		Calculant
-Enable Num Lock on startup	CalcView		Activa la tecla 'Bloq Num' al inici
+Enable Num Lock on startup	CalcView		Habilita la tecla de bloqueig numèric a l'inici.
 4	CalcView		4
 Scientific	CalcView		Científic
 )	CalcView		)

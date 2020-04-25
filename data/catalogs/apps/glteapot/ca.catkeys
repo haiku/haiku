@@ -11,7 +11,7 @@ Quit	TeapotWindow		Surt
 Filled polygons	TeapotWindow		Polígons plens
 Settings	TeapotWindow		Paràmetres
 Fog	TeapotWindow		Boira
-Backface culling	TeapotWindow		Eliminació de cares posteriors
+Backface culling	TeapotWindow		Supressió de cares posteriors
 Z-buffered	TeapotWindow		Z-emmagatzematge intermedi
 File	TeapotWindow		Fitxer
 Perspective	TeapotWindow		Perspectiva

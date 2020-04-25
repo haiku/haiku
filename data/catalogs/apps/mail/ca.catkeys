@@ -66,7 +66,7 @@ draft	B_USER_DIRECTORY/mail/draft		esborrany
 Really delete this signature? This cannot be undone.	Mail		Realment voleu suprimir aquesta signatura? No ho podreu desfer.
 spam	B_USER_DIRECTORY/mail/spam		correu brossa
 Reply to all	Mail		Respon a tots
-Cancel	Mail		Anul·la
+Cancel	Mail		Cancel·la
 Off	Mail		Atura
 Set to %s	Mail		Estableix com a %s
 Signature:	Mail		Signatura:
@@ -94,7 +94,7 @@ Attach attributes:	Mail		Inclou els atributs:
 Find again	Mail		Repeteix la cerca
 Size:	Mail		Mida:
 To:	Mail		A:
-Need Tracker to move items to trash	Mail		Cal el Rastrejador per tal de moure els elements a la parerera
+Need Tracker to move items to trash	Mail		Cal el Rastrejador per moure elements a la paperera.
 The mail_daemon could not be started:\n\t	Mail		No ha estat possible engegar el dimoni del correu:\n\t
 <no account found>	Mail		<no s'ha trobat cap compte>
 Mail couldn't find its dictionary.	Mail		No ha estat possible trobar aquest diccionari.

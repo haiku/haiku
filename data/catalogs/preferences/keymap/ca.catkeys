@@ -8,7 +8,7 @@ ThinkPad (US)	KeyboardLayoutNames		ThinkPad (EUA)
 Right control	Keyboard Layout View		Control dret
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Opció:
-Cancel	Modifier keys window		Anul·la
+Cancel	Modifier keys window		Cancel·la
 Sample and clipboard:	Keymap window		Exemple i porta-retalls:
 Polish	KeymapNames		Polonès
 Latin-American	KeymapNames		Llatinoamericà
@@ -108,7 +108,7 @@ Russian (Udmurt, Komi, Mari)	KeymapNames		Rus (Udmurt, Komi, Mari)
 Thai (TIS-820.2538)	KeymapNames		Tailandès (TIS-820.2538)
 Control:	Modifier keys window	Control key role name	Control:
 Generic 105-key International	KeyboardLayoutNames		Genèric internacional de 105 tecles
-Disabled	Modifier keys window	Do nothing	Desactivat
+Disabled	Modifier keys window	Do nothing	Inhabilitat
 Select dead keys	Keymap window		Trieu les tecles inútils
 Russian (Mac)	KeymapNames		Rus (Mac)
 Right shift	Keyboard Layout View		Maj. de la dreta

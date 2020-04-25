@@ -104,7 +104,7 @@ Removing a super type cannot be reverted.\nAll file types that belong to this su
 String	Attribute ListView		文字列
 Add type	New File Type Window		タイプの追加
 Remove icon	Icon View		アイコンを削除
-Boolean	Attribute ListView		真偽値
+Boolean	Attribute ListView		ブール値
 Cancel	Extension Window		中止
 Alignment:	Attribute Window		配置:
 Icon	FileType Window		アイコン
@@ -169,5 +169,5 @@ Edit icon…	Icon View		アイコンの編集…
 Internal name:	Attribute Window		内部名:
 Show recognition rule	FileTypes Window		認識ルールを表示
 Double	Attribute ListView		倍精度浮動小数点数
-Move down	FileTypes Window		下へ移動
+Move down	FileTypes Window		下へ
 Alpha	Application Type Window		アルファ版

@@ -2,7 +2,7 @@
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		サーバー \"%server%\" に接続できませんでした:\n%error%
 Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		IMAP フォルダーの購読を更新しています、 少しお待ちください…
 Failed to fetch available storage.	IMAPFolderConfig		使用可能な容量を取得できませんでした
-Cancel	IMAPFolderConfig		キャンセル
+Cancel	IMAPFolderConfig		中止
 OK	IMAPFolderConfig		OK
 Server storage: %s / %s used.	IMAPFolderConfig		サーバー容量: %s / %s 使用済。
 No encryption	imap_config		暗号化なし

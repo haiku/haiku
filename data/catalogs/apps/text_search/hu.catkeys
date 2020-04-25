@@ -16,7 +16,7 @@ Regular expression	GrepWindow		Reguláris kifejezés
 Text files only	GrepWindow		Csak szövegfájlokban
 Quit	GrepWindow		Kilépés
 Show files in Tracker	GrepWindow		Fájlok megjelenítése a Nyomkövetőben
-Please select the files you wish to keep searching.	GrepWindow		Kérjük, válassza ki azokat a fájlokat amelyekben folytatni kívánja a keresést.
+Please select the files you wish to keep searching.	GrepWindow		Kérlek válaszd ki azokat a fájlokat amelyekben folytatni kívánod a keresést.
 Trim to selection	GrepWindow		Kijelölés kivágása
 Set target…	GrepWindow		Cél megadása…
 TextSearch	GrepWindow		Szövegkeresés

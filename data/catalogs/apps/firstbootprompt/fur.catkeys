@@ -1,8 +1,80 @@
-1	friulian	x-vnd.Haiku-FirstBootPrompt	2649051796
+1	friulian	x-vnd.Haiku-FirstBootPrompt	2670843542
+Japanese	KeymapNames		Gjaponês
+US	KeymapNames		Statunitens
+Esperanto	KeymapNames		Esperanto
+Belarusian	KeymapNames		Bielorùs
+Brazilian	KeymapNames		Brasilian
+Dvorak	KeymapNames		Dvorak
+Polish	KeymapNames		Polac
+Latin-American	KeymapNames		Latinoamerican
+Ukrainian	KeymapNames		Ucrain
+Russian (Yawert)	KeymapNames		Rus (Yawert)
+United-Kingdom	KeymapNames		Ream-Unît
+Serbian (Cyrillic)	KeymapNames		Serp  (Cirilic)
+Turkish (Type-F)	KeymapNames		Turc (Type-F)
+Bulgarian (Cyrillic)	KeymapNames		Bulgar (Cirilic)
+Belgian (point)	KeymapNames		Belgjic (pont)
+Finnish	KeymapNames		Finlandês
+Swedish	KeymapNames		Svedês
+Svorak	KeymapNames		Svorak
+German	KeymapNames		Todesc
+Swiss-German	KeymapNames		Todesc de Svuizare
 Keymap	BootPromptWindow		Mapadure dai tascj
+Spanish (Dvorak)	KeymapNames		Spagnûl (Dvorak)
+US-International	KeymapNames		Stâts Unîts (internazionâl)
+Czech	KeymapNames		Cec
+Turkish (Type-Q)	KeymapNames		Turc (Gjenar-Q)
+Slovak	KeymapNames		Slovac
+Russian (Udmurt, Komi, Mari)	KeymapNames		Rus (Udmurt, Komi, Mari)
+Thai (TIS-820.2538)	KeymapNames		Tailandês (TIS-820.2538)
+Colemak	KeymapNames		Colemak
+Dvorak (programmer's)	KeymapNames		Dvorak (par programadôrs)
+Russian (Mac)	KeymapNames		Rus (Mac)
 Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Us ringraciin par vê decidût di provâ Haiku! Nus augurin che us plasi!\n\nO podês selezionâ, de liste a çampe, la lenghe e lis impostazions de tastiere, che a podaran jessi dopradis daurman. Daspò o podarês modificâ cun facilitât dal Scritori, dutis dôs lis impostazions.\n\nSi desiderie inviâ l'instaladôr o continuâ l'inviament par lâ sul Scritori?\n
+German (Mac)	KeymapNames		Todesc (Mac)
+Arabic (102)	KeymapNames		Arap (102)
+Belarusian (Latin)	KeymapNames		Bielorùs (Latin)
+Belarusian (Mac)	KeymapNames		Bielorùs (Mac)
+Hebrew	KeymapNames		Ebraic
+Greek	KeymapNames		Grêc
+Croatian	KeymapNames		Cravuat
 Run Installer	BootPromptWindow		Invie instaladôr
+Faeroese	KeymapNames		Faeroês
+Polish (Typewriter)	KeymapNames		Polac (Machine di scrivi)
+French (Mac)	KeymapNames		Francês (Mac)
+Spanish	KeymapNames		Spagnûl
+Ukrainian (Mac)	KeymapNames		Ucrain (Mac)
+Estonian	KeymapNames		Eston
+French (Bépo)	KeymapNames		Francês (Bépo)
+Serbian (Latin)	KeymapNames		Serp (Latin)
+Russian (Typewriter)	KeymapNames		Rus (Machine di scrivi)
+French	KeymapNames		Francês
+Italian	KeymapNames		Talian
+Portuguese	KeymapNames		Portughês
+Swiss-French	KeymapNames		Francês de Svuizare
+Slovene	KeymapNames		Sloven
+Lithuanian	KeymapNames		Lituan
+French (NF Z71-300)	KeymapNames		Francês (NF Z71-300)
+ISO-9995	KeymapNames		ISO-9995
+Kazakh	KeymapNames		Kazac
 Language	BootPromptWindow		Lenghe
+Lithuanian (Standard)	KeymapNames		Lituan (Standard)
+Belgian (comma)	KeymapNames		Belgjic (virgule)
 Custom	BootPromptWindow		Personalizât
+Norwegian	KeymapNames		Norvegjês
+Danish	KeymapNames		Danês
 Boot to Desktop	BootPromptWindow		Invie sul Scritori
+Bulgarian (Phonetic)	KeymapNames		Bulgar (Fonetic)
+Canadian-French	KeymapNames		Francês dal Canadà
 Welcome to Haiku!	BootPromptWindow		Benvignût in Haiku!
+Russian	KeymapNames		Rus
+Hungarian	KeymapNames		Ongjarês
+Irish	KeymapNames		Irlandês
+Romanian	KeymapNames		Rumen
+Macedonian	KeymapNames		Macedon
+Czech (Mac)	KeymapNames		Cec (Mac)
+Brazilian (ABNT2)	KeymapNames		Brasilian (ABNT2)
+Albanian	KeymapNames		Albanês
+Dutch	KeymapNames		Olandês
+Friulian	KeymapNames		Furlan
+Icelandic	KeymapNames		Islandês

@@ -1,5 +1,6 @@
-1	romanian	x-vnd.Haiku-FileTypes	734679611
+1	romanian	x-vnd.Haiku-FileTypes	436017301
 Left	Attribute Window	Attribute column alignment in Tracker	Stânga
+Float	Attribute ListView		Mobil
 Final	Application Types Window		Final
 FileTypes request	FileTypes Window		Cerere TipuriFișier
 This file type already exists	New File Type Window		Acest tip de fișier există deja
@@ -31,6 +32,7 @@ Signature:	Application Types Window		Semnătură:
 None	FileTypes Window		Niciunul
 Exclusive launch	Application Type Window		Pornire exclusivă
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Eliminarea unui tip de fișier nu este reversibilă.\nSigur doriți să îl eliminați?
+Integer 64 bit	Attribute ListView		Întreg pe 64 biți
 Cancel	New File Type Window		Anulează
 Select same preferred application as	FileType Window		Selectează acceași aplicație preferată ca
 Cancel	Type List Window		Anulează
@@ -43,10 +45,13 @@ Abort	Application Types Window		Renunță
 Save	Application Type Window		Salvează
 %1 application type	Application Type Window		%1 tip aplicație
 Icon	Application Type Window		Pictogramă
+Duration	Attribute ListView		Durată
 Version:	Application Type Window		Versiune:
 Default application	FileType Window		Aplicație implicită
 Internal name:	New File Type Window		Nume intern:
+Integer 8 bit	Attribute ListView		Întreg pe 8 biți
 Extension:	Extension Window		Extensie:
+Time	Attribute ListView		Oră
 Extensions:	FileTypes Window		Extensii:
 Select preferred application	FileType Window		Selectează aplicația preferată
 Description:	FileTypes Window		Descriere:
@@ -66,6 +71,8 @@ Version:	Application Types Window		Versiune:
 Application types	Application Types Window		Tipuri de aplicație
 Description:	Application Types Window		Descriere:
 Name:	Application Types Window		Nume:
+Rating	Attribute ListView		Evaluare
+duration	Attribute ListView		durată
 File could not be opened	Preferred App Menu		Fișierul nu a putut fi deschis
 Args only	Application Type Window		Doar arg
 Could not open \"%s\":\n%s	FileTypes		Nu s-a putut deschide \"%s\":\n%s
@@ -83,16 +90,21 @@ Type name:	FileTypes Window		Nume tip:
 Visible	Attribute Window		Vizibil
 Select preferred application	FileTypes Window		Selectează aplicația preferată
 Path:	Application Types Window		Cale:
+rating	Attribute ListView		evaluare
 Could not install file type	New File Type Window		Nu s-a putut instala tipul de fișier
 Same as…	FileTypes Window		La fel ca…
 Golden master	Application Type Window		Principal
+Checkbox	Attribute ListView		Căsuță de bifare
 FileTypes request	Preferred App Menu		Cerere TipuriFișier
 no icon	FileTypes Window		fără pictogramă
 Single launch	Application Type Window		Pornire unică
 %s file type	FileType Window		%s tip fișier
+Default	Attribute ListView		Implicit
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Eliminarea unui tip super nu este reversibilă.\nToate tipurile de fișier care aparțin acestui tip super vor fi pierdute!\n\nSigur doriți să faceți acest lucru? Pentru a elimina un grup întreg, mențineți apăsată tasta Shift și apăsați pe \"Elimină\".
+String	Attribute ListView		Șir
 Add type	New File Type Window		Adaugă tip
 Remove icon	Icon View		Elimină pictogramă
+Boolean	Attribute ListView		Logic
 Cancel	Extension Window		Anulează
 Alignment:	Attribute Window		Aliniere:
 Icon	FileType Window		Pictogramă
@@ -101,6 +113,7 @@ Development	Application Type Window		Dezvoltare
 Golden master	Application Types Window		Versiune principală
 Add	Extension Window		Adaugă
 Open…	FileTypes Window		Deschide…
+checkbox	Attribute ListView		căsuță de bifare
 Could not change file extensions	Extension Window		Nu s-au putut modifica extensiile fișierului
 Could not open file	FileType Window		Nu s-a putut deschide fișierul
 Choose type	Type List Window		Alege tip
@@ -118,6 +131,7 @@ Add group	New File Type Window		Adaugă grup
 Cancel	Attribute Window		Anulează
 Gamma	Application Types Window		Gama
 Supported types	Application Type Window		Tipuri suportate
+Integer 32 bit	Attribute ListView		Întreg pe 32 de biți
 Beta	Application Type Window		Beta
 Could not retrieve preferred application of this file	Preferred App Menu		Nu s-a putut obține aplicația preferată a acestui fișier
 Application flags	Application Type Window		Indicatoare de aplicație
@@ -142,6 +156,7 @@ Extra attributes	FileTypes Window		Atribute suplimentare
 Group:	New File Type Window		Grup:
 Alpha	Application Types Window		Alfa
 Close	Application Type Window		Închide
+Integer 16 bit	Attribute ListView		Întreg pe 16 biți
 Extension	Extension Window		Extensie
 Rule:	FileTypes Window		Regulă:
 FileTypes	System name		TipuriFișier
@@ -153,5 +168,6 @@ Add…	FileTypes Window		Adaugă…
 Edit icon…	Icon View		Editează pictograma…
 Internal name:	Attribute Window		Nume intern:
 Show recognition rule	FileTypes Window		Afișează regula de recunoaștere
+Double	Attribute ListView		Dublu
 Move down	FileTypes Window		Deplasează în jos
 Alpha	Application Type Window		Alfa

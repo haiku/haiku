@@ -1,4 +1,11 @@
-1	portuguese	x-vnd.Haiku-RTFTranslator	3227563720
+1	portuguese	x-vnd.Haiku-RTFTranslator	334451110
 Version %d.%d.%d, %s	ConfigView		Versão %d.%d.%d, %s
 RTF text files	RTFTranslator		Ficheiros de texto RTF
+RTF-Translator Settings	ConfigView		Definições do tradutor RTF
+Rich Text Format (RTF) translator	ConfigView		Tradutor de Rich Text Format (RTF)
+RTF Settings	main		Definições RTF
+RichTextFormat file	RTFTranslator		Ficheiro RichTextFormat
+Be style text file	RTFTranslator		Ficheiro de texto Be style
 Plain text file	RTFTranslator		Ficheiro de texto simples
+Rich Text Format translator	RTFTranslator		Tradutor de Rich Text Format
+Rich Text Format translator v%d.%d.%d %s	RTFTranslator		Tradutor de Rich Text Format (RTF) v%d.%d.%d %s
