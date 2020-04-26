@@ -441,9 +441,10 @@ TimeZoneView::_BuildZoneMenu()
 				zoneIter->second->SetCountry(currentItem->HasCountry()
 					? new(std::nothrow) BCountry(currentItem->Country())
 					: NULL);
-				zoneIter->second->SetTimeZone(currentItem->HasTimeZone()
-					? new(std::nothrow) BTimeZone(currentItem->TimeZone())
-					: NULL);
+				if (currentItem->HasTimeZone()) {
+					zoneIter->second->SetTimeZone(new(std::nothrow)
+						BTimeZone(currentItem->TimeZone()));
+				}
 				zoneIter->second->SetOutlineLevel(1);
 				delete currentItem;
 			}
