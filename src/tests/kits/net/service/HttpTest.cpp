@@ -318,11 +318,18 @@ HttpTest::UploadTest()
 	// the server received it.
 	std::string fileContents;
 	{
-		std::ifstream inputStream(testFilePath);
-		CPPUNIT_ASSERT(inputStream.is_open());
-		fileContents = std::string(
-			std::istreambuf_iterator<char>(inputStream),
-			std::istreambuf_iterator<char>());
+		std::ifstream inputStream(
+			testFilePath.c_str(),
+			std::ios::in | std::ios::binary);
+		CPPUNIT_ASSERT(inputStream);
+
+		inputStream.seekg(0, std::ios::end);
+		fileContents.resize(inputStream.tellg());
+
+		inputStream.seekg(0, std::ios::beg);
+		inputStream.read(&fileContents[0], fileContents.size());
+		inputStream.close();
+
 		CPPUNIT_ASSERT(!fileContents.empty());
 	}
 

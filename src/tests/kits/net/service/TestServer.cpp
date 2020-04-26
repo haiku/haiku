@@ -7,6 +7,7 @@
  */
 #include "TestServer.h"
 
+#include <errno.h>
 #include <netinet/in.h>
 #include <posix/libgen.h>
 #include <sstream>
@@ -208,7 +209,7 @@ status_t ChildProcess::Start(const std::vector<std::string>& args)
 	// If we reach this point we failed to load the Python image.
 	std::ostringstream ostr;
 
-	for (std::vector<std::string>::const_iterator iter = args.cbegin();
+	for (std::vector<std::string>::const_iterator iter = args.begin();
 		 iter != args.end();
 		 ++iter) {
 		ostr << " " << *iter;
