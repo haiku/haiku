@@ -359,6 +359,19 @@ SerialDevice::Service(struct tty *tty, uint32 op, void *buffer, size_t length)
 
 			return true;
 		}
+		case TTYFLUSH:
+		{
+			int directions = *(int*)buffer;
+			uint8 mask = 0;
+			if (directions & TCIFLUSH)
+				mask |= FCR_RX_RST;
+			if (directions & TCOFLUSH)
+				mask |= FCR_TX_RST;
+			// These bits clear themselves when flushing is complete
+			OrReg8(FCR, mask);
+
+			return true;
+		}
 		default:
 			return false;
 	}

@@ -39,6 +39,7 @@ typedef bool (*tty_service_func)(struct tty *tty, uint32 op, void *buffer,
 #define	TTYSETDTR		6	/* bool dataTerminalReady */
 #define TTYSETRTS		7	/* bool requestToSend */
 #define	TTYGETSIGNALS	8	/* call tty_hardware_signal for all bits */
+#define TTYFLUSH		9	/* clear input and/or output buffers */
 
 typedef struct tty_module_info tty_module_info;
 

@@ -274,6 +274,7 @@ SerialDevice::Service(struct tty *tty, uint32 op, void *buffer, size_t length)
 		case TTYOSTART:
 		case TTYOSYNC:
 		case TTYSETBREAK:
+		case TTYFLUSH:
 			TRACE("TTY other\n");
 			return true;
 	}
