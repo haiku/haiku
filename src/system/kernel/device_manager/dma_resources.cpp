@@ -479,7 +479,6 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation,
 		vecOffset = 0;
 	} else {
 		// We do already have physical addresses.
-		locker.Unlock();
 		vecs = buffer->Vecs();
 		segmentCount = min_c(buffer->VecCount() - vecIndex,
 			fRestrictions.max_segment_count);
