@@ -15,7 +15,9 @@
 #include "PrefsWindow.h"
 #include <app/MessageRunner.h>
 
-class DeskbarPulseView : public MiniPulseView {
+
+class DeskbarPulseView : public MiniPulseView 
+{
 	public:
 		DeskbarPulseView(BRect rect);
 		DeskbarPulseView(BMessage *message);
@@ -32,7 +34,6 @@ class DeskbarPulseView : public MiniPulseView {
 		void Remove();
 		void SetMode(bool normal);
 
-		PrefsWindow *prefswindow;
 		Prefs *prefs;
 		BMessageRunner *messagerunner;
 };

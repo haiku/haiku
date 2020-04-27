@@ -67,7 +67,7 @@ ProgressBar::UpdateColors(int32 color, bool fade)
 void
 ProgressBar::AttachedToWindow()
 {
-	Prefs *prefs = ((PulseApp *)be_app)->prefs;
+	Prefs *prefs = ((PulseApp *)be_app)->fPrefs;
 	UpdateColors(prefs->normal_bar_color, prefs->normal_fade_colors);
 }
 
