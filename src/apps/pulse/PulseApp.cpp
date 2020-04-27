@@ -35,10 +35,12 @@
 
 
 PulseApp::PulseApp(int argc, char **argv)
-	: BApplication(APP_SIGNATURE)
+	: BApplication(APP_SIGNATURE),
+	fPrefs(new Prefs()),
+	fRunFromReplicant(false),
+	fIsRunning(false),
+	fPrefsWindow(NULL)
 {
-	prefs = new Prefs();
-
 	int mini = false, deskbar = false, normal = false;
 	uint32 framecolor = 0, activecolor = 0, idlecolor = 0;
 
@@ -84,10 +86,10 @@ PulseApp::PulseApp(int argc, char **argv)
 				}
 				break;
 			case 'w':
-				prefs->deskbar_icon_width = atoi(optarg);
-				if (prefs->deskbar_icon_width < GetMinimumViewWidth())
-					prefs->deskbar_icon_width = GetMinimumViewWidth();
-				else if (prefs->deskbar_icon_width > 50) prefs->deskbar_icon_width = 50;
+				fPrefs->deskbar_icon_width = atoi(optarg);
+				if (fPrefs->deskbar_icon_width < GetMinimumViewWidth())
+					fPrefs->deskbar_icon_width = GetMinimumViewWidth();
+				else if (fPrefs->deskbar_icon_width > 50) fPrefs->deskbar_icon_width = 50;
 				break;
 			case 'h':
 			case '?':
@@ -100,48 +102,47 @@ PulseApp::PulseApp(int argc, char **argv)
 	}
 
 	if (deskbar) {
-		prefs->window_mode = DESKBAR_MODE;
+		fPrefs->window_mode = DESKBAR_MODE;
 		if (activecolor != 0)
-			prefs->deskbar_active_color = activecolor;
+			fPrefs->deskbar_active_color = activecolor;
 		if (idlecolor != 0)
-			prefs->deskbar_idle_color = idlecolor;
+			fPrefs->deskbar_idle_color = idlecolor;
 		if (framecolor != 0)
-			prefs->deskbar_frame_color = framecolor;
+			fPrefs->deskbar_frame_color = framecolor;
 	} else if (mini) {
-		prefs->window_mode = MINI_WINDOW_MODE;
+		fPrefs->window_mode = MINI_WINDOW_MODE;
 		if (activecolor != 0)
-			prefs->mini_active_color = activecolor;
+			fPrefs->mini_active_color = activecolor;
 		if (idlecolor != 0)
-			prefs->mini_idle_color = idlecolor;
+			fPrefs->mini_idle_color = idlecolor;
 		if (framecolor != 0)
-			prefs->mini_frame_color = framecolor;
+			fPrefs->mini_frame_color = framecolor;
 	} else if (normal)
-		prefs->window_mode = NORMAL_WINDOW_MODE;
+		fPrefs->window_mode = NORMAL_WINDOW_MODE;
 
-	prefs->Save();
-	BuildPulse();
+	fPrefs->Save();
+}
+
+
+void
+PulseApp::ReadyToRun()
+{
+	if (!fRunFromReplicant)
+		BuildPulse();
+
+	fIsRunning = true;
 }
 
 
 void
 PulseApp::BuildPulse()
 {
-	// Remove this case for Deskbar add on API
-
-	// If loading the replicant fails, launch the app instead
-	// This allows having the replicant and the app open simultaneously
-	if (prefs->window_mode == DESKBAR_MODE && LoadInDeskbar()) {
-		PostMessage(new BMessage(B_QUIT_REQUESTED));
-		return;
-	} else if (prefs->window_mode == DESKBAR_MODE)
-		prefs->window_mode = NORMAL_WINDOW_MODE;
-
 	PulseWindow *pulseWindow = NULL;
 
-	if (prefs->window_mode == MINI_WINDOW_MODE)
-		pulseWindow = new PulseWindow(prefs->mini_window_rect);
+	if (fPrefs->window_mode == MINI_WINDOW_MODE)
+		pulseWindow = new PulseWindow(fPrefs->mini_window_rect);
 	else
-		pulseWindow = new PulseWindow(prefs->normal_window_rect);
+		pulseWindow = new PulseWindow(fPrefs->normal_window_rect);
 
 	pulseWindow->MoveOnScreen(B_MOVE_IF_PARTIALLY_OFFSCREEN);
 	pulseWindow->Show();
@@ -150,32 +151,75 @@ PulseApp::BuildPulse()
 
 PulseApp::~PulseApp()
 {
-	// Load the replicant after we save our preferences so they don't
-	// get overwritten by DeskbarPulseView's instance
-	prefs->Save();
-	if (prefs->window_mode == DESKBAR_MODE)
-		LoadInDeskbar();
+	fPrefs->Save();
 
-	delete prefs;
+	delete fPrefs;
+}
+
+
+void
+PulseApp::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case PV_PREFERENCES:
+		{
+			// This message can be posted before ReadyToRun from
+			// BRoster::Launch, in that case, take note to not show the main
+			// window but only the preferences
+			if (!fIsRunning)
+				fRunFromReplicant = true;
+			BMessenger from;
+			message->FindMessenger("settingsListener", &from);
+
+
+			if (fPrefsWindow != NULL) {
+				fPrefsWindow->Activate(true);
+				break;
+			}
+			// If the window is already open, bring it to the front
+			if (fPrefsWindow != NULL) {
+				fPrefsWindow->Activate(true);
+				break;
+			}
+			// Otherwise launch a new preferences window
+			PulseApp *pulseapp = (PulseApp *)be_app;
+			fPrefsWindow = new PrefsWindow(pulseapp->fPrefs->prefs_window_rect,
+				B_TRANSLATE("Pulse settings"), &from,
+				pulseapp->fPrefs);
+			if (fRunFromReplicant) {
+				fPrefsWindow->SetFlags(fPrefsWindow->Flags()
+					| B_QUIT_ON_WINDOW_CLOSE);
+			}
+			fPrefsWindow->Show();
+
+			break;
+		}
+
+		case PV_ABOUT:
+			// This message can be posted before ReadyToRun from
+			// BRoster::Launch, in that case, take note to not show the main
+			// window but only the about box
+			if (!fIsRunning)
+				fRunFromReplicant = true;
+			PostMessage(B_ABOUT_REQUESTED);
+			break;
+
+		case PRV_QUIT:
+			fPrefsWindow = NULL;
+			fRunFromReplicant = false;
+			break;
+
+		default:
+			BApplication::MessageReceived(message);
+			break;
+	}
 }
 
 
 void
 PulseApp::AboutRequested()
 {
-	PulseApp::ShowAbout(true);
-}
-
-
-void
-PulseApp::ShowAbout(bool asApplication)
-{
-	// static version to be used in replicant mode
-	BString name;
-	if (asApplication)
-		name = B_TRANSLATE_SYSTEM_NAME("Pulse");
-	else
-		name = B_TRANSLATE("Pulse");
+	BString name = B_TRANSLATE("Pulse");
 
 	BString message = B_TRANSLATE(
 		"%s\n\nBy David Ramsey and Arve Hjønnevåg\n"
@@ -183,6 +227,9 @@ PulseApp::ShowAbout(bool asApplication)
 	message.ReplaceFirst("%s", name);
 	BAlert *alert = new BAlert(B_TRANSLATE("Info"),
 		message.String(), B_TRANSLATE("OK"));
+
+	if (fRunFromReplicant)
+		alert->SetFlags(alert->Flags() | B_QUIT_ON_WINDOW_CLOSE);
 
 	BTextView* view = alert->TextView();
 	BFont font;
@@ -196,6 +243,7 @@ PulseApp::ShowAbout(bool asApplication)
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	// Use the asynchronous version so we don't block the window's thread
 	alert->Go(NULL);
+	fRunFromReplicant = false;
 }
 
 //	#pragma mark -
@@ -259,10 +307,10 @@ LoadInDeskbar()
 	}
 
 	// Must be 16 pixels high, the width is retrieved from the Prefs class
-	int width = pulseapp->prefs->deskbar_icon_width;
+	int width = pulseapp->fPrefs->deskbar_icon_width;
 	int min_width = GetMinimumViewWidth();
 	if (width < min_width) {
-		pulseapp->prefs->deskbar_icon_width = min_width;
+		pulseapp->fPrefs->deskbar_icon_width = min_width;
 		width = min_width;
 	}
 

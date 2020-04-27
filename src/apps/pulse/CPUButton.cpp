@@ -277,7 +277,7 @@ CPUButton::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		case B_ABOUT_REQUESTED: {
-			PulseApp::ShowAbout(false);
+			be_app->PostMessage(B_ABOUT_REQUESTED);
 			break;
 		}
 		case PV_REPLICANT_PULSE: {
@@ -330,7 +330,7 @@ CPUButton::AttachedToWindow()
 		delete prefs;
 	} else {
 		PulseApp *pulseapp = (PulseApp *)be_app;
-		UpdateColors(pulseapp->prefs->normal_bar_color);
+		UpdateColors(pulseapp->fPrefs->normal_bar_color);
 		_AddDragger();
 	}
 

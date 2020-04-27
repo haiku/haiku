@@ -135,6 +135,6 @@ PrefsWindow::MessageReceived(BMessage *message)
 bool
 PrefsWindow::QuitRequested()
 {
-	fTarget.SendMessage(new BMessage(PRV_QUIT));
+	be_app->PostMessage(new BMessage(PRV_QUIT));
 	return true;
 }
