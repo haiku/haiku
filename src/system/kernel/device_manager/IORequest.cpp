@@ -126,6 +126,14 @@ IOBuffer::SetVecs(generic_size_t firstVecOffset, const generic_io_vec* vecs,
 	fLength = length;
 	fPhysical = (flags & B_PHYSICAL_IO_REQUEST) != 0;
 	fUser = !fPhysical && IS_USER_ADDRESS(vecs[0].base);
+
+#if KDEBUG
+	generic_size_t actualLength = 0;
+	for (size_t i = 0; i < fVecCount; i++)
+		actualLength += fVecs[i].length;
+
+	ASSERT(actualLength == fLength);
+#endif
 }
 
 
