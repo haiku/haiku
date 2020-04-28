@@ -112,8 +112,8 @@ IOBuffer::Delete()
 
 
 void
-IOBuffer::SetVecs(generic_size_t firstVecOffset, const generic_io_vec* vecs,
-	uint32 count, generic_size_t length, uint32 flags)
+IOBuffer::SetVecs(generic_size_t firstVecOffset, generic_size_t lastVecSize,
+	const generic_io_vec* vecs, uint32 count, generic_size_t length, uint32 flags)
 {
 	memcpy(fVecs, vecs, sizeof(generic_io_vec) * count);
 
@@ -121,6 +121,8 @@ IOBuffer::SetVecs(generic_size_t firstVecOffset, const generic_io_vec* vecs,
 		fVecs[0].base += firstVecOffset;
 		fVecs[0].length -= firstVecOffset;
 	}
+	if (lastVecSize > 0)
+		fVecs[count - 1].length = lastVecSize;
 
 	fVecCount = count;
 	fLength = length;
@@ -750,8 +752,8 @@ IORequest::Init(off_t offset, generic_addr_t buffer, generic_size_t length,
 
 status_t
 IORequest::Init(off_t offset, generic_size_t firstVecOffset,
-	const generic_io_vec* vecs, size_t count, generic_size_t length, bool write,
-	uint32 flags)
+	generic_size_t lastVecSize, const generic_io_vec* vecs, size_t count,
+	generic_size_t length, bool write, uint32 flags)
 {
 	ASSERT(offset >= 0);
 
@@ -759,7 +761,7 @@ IORequest::Init(off_t offset, generic_size_t firstVecOffset,
 	if (fBuffer == NULL)
 		return B_NO_MEMORY;
 
-	fBuffer->SetVecs(firstVecOffset, vecs, count, length, flags);
+	fBuffer->SetVecs(firstVecOffset, lastVecSize, vecs, count, length, flags);
 
 	fOwner = NULL;
 	fOffset = offset;
@@ -825,8 +827,9 @@ IORequest::CreateSubRequest(off_t parentOffset, off_t offset,
 	if (subRequest == NULL)
 		return B_NO_MEMORY;
 
-	status_t error = subRequest->Init(offset, vecOffset, vecs + startVec,
-		endVec - startVec + 1, length, fIsWrite, fFlags & ~B_DELETE_IO_REQUEST);
+	status_t error = subRequest->Init(offset, vecOffset, remainingLength,
+		vecs + startVec, endVec - startVec + 1, length, fIsWrite,
+		fFlags & ~B_DELETE_IO_REQUEST);
 	if (error != B_OK) {
 		delete subRequest;
 		return error;
