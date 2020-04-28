@@ -21,6 +21,8 @@
 #include <FindDirectory.h>
 #include <File.h>
 #include <FormattingConventions.h>
+#include <IconUtils.h>
+#include <IconView.h>
 #include <LayoutBuilder.h>
 #include <ListView.h>
 #include <Locale.h>
@@ -75,19 +77,10 @@ public:
 		BStringItem(label),
 		fLanguage(language)
 	{
-		fIcon = new(std::nothrow) BBitmap(BRect(0, 0, 15, 15), B_RGBA32);
-		if (fIcon != NULL
-			&& (!fIcon->IsValid()
-				|| BLocaleRoster::Default()->GetFlagIconForLanguage(fIcon,
-					language) != B_OK)) {
-			delete fIcon;
-			fIcon = NULL;
-		}
 	}
 
 	~LanguageItem()
 	{
-		delete fIcon;
 	}
 
 	const char* Language() const
@@ -98,26 +91,10 @@ public:
 	void DrawItem(BView* owner, BRect frame, bool complete)
 	{
 		BStringItem::DrawItem(owner, frame, true/*complete*/);
-
-		// Draw the icon
-		if (fIcon != NULL) {
-			frame.left = frame.right - kFlagWidth;
-			BRect iconFrame(frame);
-			iconFrame.Set(iconFrame.left, iconFrame.top + 1,
-				iconFrame.left + kFlagWidth - 2,
-				iconFrame.top + kFlagWidth - 1);
-
-			owner->SetDrawingMode(B_OP_OVER);
-			owner->DrawBitmap(fIcon, iconFrame);
-			owner->SetDrawingMode(B_OP_COPY);
-		}
 	}
 
 private:
-	static	const int			kFlagWidth = 16;
-
 			BString				fLanguage;
-			BBitmap*			fIcon;
 };
 
 
@@ -166,37 +143,64 @@ BootPromptWindow::BootPromptWindow()
 	fInfoTextView->MakeSelectable(false);
 	fInfoTextView->MakeResizable(false);
 
-	// Carefully designed to not exceed the 640x480 resolution with a 12pt font.
-	float width = fInfoTextView->StringWidth("Thank you for trying out Haiku,"
-		" We hope you like it!") * 1.5;
-	float height = be_plain_font->Size() * 23;
+	BResources* res = BApplication::AppResources();
+	size_t size = 0;
+	const uint8_t* data;
 
-	fInfoTextView->SetExplicitMinSize(BSize(width, height));
+	BBitmap desktopIcon(BRect(0, 0, 23, 23), B_RGBA32);
+	data = (const uint8_t*)res->LoadResource('VICN', "Desktop", &size);
+	BIconUtils::GetVectorIcon(data, size, &desktopIcon);
+
+	BBitmap installerIcon(BRect(0, 0, 23, 23), B_RGBA32);
+	data = (const uint8_t*)res->LoadResource('VICN', "Installer", &size);
+	BIconUtils::GetVectorIcon(data, size, &installerIcon);
 
 	fDesktopButton = new BButton("", new BMessage(MSG_BOOT_DESKTOP));
 	fDesktopButton->SetTarget(be_app);
 	fDesktopButton->MakeDefault(true);
+	fDesktopButton->SetIcon(&desktopIcon);
 
 	fInstallerButton = new BButton("", new BMessage(MSG_RUN_INSTALLER));
 	fInstallerButton->SetTarget(be_app);
+	fInstallerButton->SetIcon(&installerIcon);
+
+	data = (const uint8_t*)res->LoadResource('VICN', "Language", &size);
+	IconView* languageIcon = new IconView(B_LARGE_ICON);
+	languageIcon->SetIcon(data, size, B_LARGE_ICON);
+
+	data = (const uint8_t*)res->LoadResource('VICN', "Keymap", &size);
+	IconView* keymapIcon = new IconView(B_LARGE_ICON);
+	keymapIcon->SetIcon(data, size, B_LARGE_ICON);
 
 	fLanguagesLabelView = new BStringView("languagesLabel", "");
 	fLanguagesLabelView->SetFont(be_bold_font);
 	fLanguagesLabelView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
 		B_SIZE_UNSET));
 
+	fKeymapsMenuLabel = new BStringView("keymapsLabel", "");
+	fKeymapsMenuLabel->SetFont(be_bold_font);
+	fKeymapsMenuLabel->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
+		B_SIZE_UNSET));
+	// Make sure there is enough space to display the text even in verbose
+	// locales, to avoid width changes on language changes
+	float labelWidth = fKeymapsMenuLabel->StringWidth("Disposition du clavier")
+		+ 16;
+	fKeymapsMenuLabel->SetExplicitMinSize(BSize(labelWidth, B_SIZE_UNSET));
+
 	fLanguagesListView = new BListView();
-	fLanguagesListView->SetFlags(
-		fLanguagesListView->Flags() | B_FULL_UPDATE_ON_RESIZE);
-		// Our ListItem rendering depends on the width of the view, so
-		// we need a full update
 	BScrollView* languagesScrollView = new BScrollView("languagesScroll",
 		fLanguagesListView, B_WILL_DRAW, false, true);
 
+	// Carefully designed to not exceed the 640x480 resolution with a 12pt font.
+	float width = 640 - (labelWidth + 96);
+	float height = be_plain_font->Size() * 23;
+	fInfoTextView->SetExplicitMinSize(BSize(width, height));
+	fInfoTextView->SetExplicitMaxSize(BSize(width, B_SIZE_UNSET));
+
 	// Make sure the language list view is always wide enough to show the
-	// largest language, with some extra space
-	fLanguagesListView->SetExplicitSize(
-		BSize(fLanguagesListView->StringWidth("Portuguese (Brazil)") + 32,
+	// largest language
+	fLanguagesListView->SetExplicitMinSize(
+		BSize(fLanguagesListView->StringWidth("Português (Brasil)"),
 		height));
 
 	fKeymapsMenuField = new BMenuField("", "", new BMenu(""));
@@ -206,29 +210,33 @@ BootPromptWindow::BootPromptWindow()
 	_PopulateLanguages();
 	_PopulateKeymaps();
 
-	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
-		.AddGroup(B_HORIZONTAL)
-			.Add(fLanguagesLabelView)
-			.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
-				B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
-		.End()
-		.AddGroup(B_HORIZONTAL)
+	BLayoutBuilder::Group<>(this, B_HORIZONTAL)
+		.SetInsets(B_USE_WINDOW_SPACING)
+		.AddGroup(B_VERTICAL, 0)
+			.SetInsets(0, 0, 0, B_USE_SMALL_SPACING)
+			.AddGroup(B_HORIZONTAL)
+				.Add(languageIcon)
+				.Add(fLanguagesLabelView)
+				.SetInsets(0, 0, 0, B_USE_SMALL_SPACING)
+			.End()
 			.Add(languagesScrollView)
-			.Add(fInfoTextView)
-			.SetInsets(B_USE_WINDOW_SPACING, 0)
-		.End()
-		.AddGroup(B_HORIZONTAL)
+			.AddGroup(B_HORIZONTAL)
+				.Add(keymapIcon)
+				.Add(fKeymapsMenuLabel)
+				.SetInsets(0, B_USE_DEFAULT_SPACING, 0,
+					B_USE_SMALL_SPACING)
+			.End()
 			.Add(fKeymapsMenuField)
-			.AddGlue()
-			.SetInsets(B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
 		.End()
-		.Add(new BSeparatorView(B_HORIZONTAL))
-		.AddGroup(B_HORIZONTAL)
-			.AddGlue()
-			.Add(fInstallerButton)
-			.Add(fDesktopButton)
-			.SetInsets(B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING,
-				B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING)
+		.AddGroup(B_VERTICAL)
+			.SetInsets(0)
+			.Add(fInfoTextView)
+			.AddGroup(B_HORIZONTAL)
+				.SetInsets(0)
+				.AddGlue()
+				.Add(fInstallerButton)
+				.Add(fDesktopButton)
+			.End()
 		.End();
 
 	fLanguagesListView->MakeFocus();
@@ -328,7 +336,7 @@ BootPromptWindow::_UpdateStrings()
 	fInstallerButton->SetLabel(B_TRANSLATE("Run Installer"));
 
 	fLanguagesLabelView->SetText(B_TRANSLATE("Language"));
-	fKeymapsMenuField->SetLabel(B_TRANSLATE("Keymap"));
+	fKeymapsMenuLabel->SetText(B_TRANSLATE("Keymap"));
 	if (fKeymapsMenuField->Menu()->FindMarked() == NULL)
 		fKeymapsMenuField->MenuItem()->SetLabel(B_TRANSLATE("Custom"));
 }

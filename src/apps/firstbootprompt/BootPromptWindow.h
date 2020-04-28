@@ -38,6 +38,7 @@ private:
 private:
 			BTextView*			fInfoTextView;
 			BStringView*		fLanguagesLabelView;
+			BStringView*		fKeymapsMenuLabel;
 			BListView*			fLanguagesListView;
 			BMenuField*			fKeymapsMenuField;
 			BMenuItem*			fDefaultKeymapItem;

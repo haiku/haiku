@@ -1,5 +1,11 @@
-// Author: Michael Wilber
-// Copyright (C) Haiku, uses the MIT license
+/*
+ * Copyright 2004-2020, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
+ *		Michael Wilber
+ */
 
 
 #include "IconView.h"
@@ -9,6 +15,7 @@
 #include <string.h>
 
 #include <Entry.h>
+#include <IconUtils.h>
 #include <Node.h>
 #include <NodeInfo.h>
 
@@ -58,6 +65,40 @@ IconView::SetIcon(const BPath& path, icon_size iconSize)
 	BNodeInfo info(&node);
 
 	status = info.GetTrackerIcon(fIconBitmap, fIconSize);
+	if (status != B_OK)
+		return status;
+
+	if (!fIconBitmap->IsValid())
+		return fIconBitmap->InitCheck();
+
+	_SetSize();
+
+	fDrawIcon = true;
+	Invalidate();
+	return B_OK;
+}
+
+
+status_t
+IconView::SetIcon(const uint8_t* data, size_t size, icon_size iconSize)
+{
+	fDrawIcon = false;
+	
+	if (iconSize != fIconSize) {
+		BBitmap* bitmap = new BBitmap(BRect(iconSize), B_RGBA32);
+		if (bitmap == NULL)
+			return B_NO_MEMORY;
+
+		delete fIconBitmap;
+		fIconBitmap = bitmap;
+		fIconSize = iconSize;
+	}
+
+	status_t status = fIconBitmap->InitCheck();
+	if (status != B_OK)
+		return status;
+
+	status = BIconUtils::GetVectorIcon(data, size, fIconBitmap);
 	if (status != B_OK)
 		return status;
 

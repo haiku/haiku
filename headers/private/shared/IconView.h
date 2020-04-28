@@ -1,5 +1,11 @@
-// Author: Michael Wilber
-// Copyright (C) Haiku, uses the MIT license
+/*
+ * Copyright 2004-2020, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
+ *		Michael Wilber
+ */
 #ifndef ICONVIEW_H
 #define ICONVIEW_H
 
@@ -21,6 +27,8 @@ public:
 
 			void			DrawIcon(bool draw);
 			status_t		SetIcon(const BPath& path,
+								icon_size iconSize = B_LARGE_ICON);
+			status_t		SetIcon(const uint8_t* hvifData, size_t size,
 								icon_size iconSize = B_LARGE_ICON);
 
 private:
