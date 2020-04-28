@@ -19,6 +19,9 @@
 #include <fs/devfs.h>
 #include <bus/PCI.h>
 #include <PCI_x86.h>
+#include <vm/vm.h>
+
+#include "IORequest.h"
 
 extern "C" {
 #include <libnvme/nvme.h>
@@ -202,6 +205,7 @@ nvme_disk_init_device(void* _info, void** _cookie)
 	int err = nvme_ctrlr_stat(info->ctrlr, &cstat);
 	if (err != 0) {
 		TRACE_ERROR("failed to get controller information!\n");
+		nvme_ctrlr_close(info->ctrlr);
 		return err;
 	}
 
@@ -316,6 +320,7 @@ nvme_disk_uninit_device(void* _cookie)
 	nvme_ctrlr_close(info->ctrlr);
 
 	// TODO: Deallocate MSI(-X).
+	// TODO: Deallocate PCI.
 }
 
 
@@ -358,7 +363,7 @@ nvme_disk_free(void* cookie)
 }
 
 
-// #pragma mark - I/O functions
+// #pragma mark - I/O
 
 
 static int32
@@ -371,7 +376,7 @@ nvme_interrupt_handler(void* _info)
 
 
 static qpair_info*
-get_next_qpair(nvme_disk_driver_info* info)
+get_qpair(nvme_disk_driver_info* info)
 {
 	return &info->qpairs[atomic_add((int32*)&info->next_qpair, 1)
 		% info->qpair_count];
@@ -379,7 +384,7 @@ get_next_qpair(nvme_disk_driver_info* info)
 
 
 static void
-disk_io_callback(status_t* status, const struct nvme_cpl* cpl)
+io_finished_callback(status_t* status, const struct nvme_cpl* cpl)
 {
 	*status = nvme_cpl_is_error(cpl) ? B_IO_ERROR : B_OK;
 }
@@ -388,6 +393,8 @@ disk_io_callback(status_t* status, const struct nvme_cpl* cpl)
 static void
 await_status(nvme_disk_driver_info* info, struct nvme_qpair* qpair, status_t& status)
 {
+	CALLED();
+
 	ConditionVariableEntry entry;
 	int timeouts = 0;
 	while (status == EINPROGRESS) {
@@ -416,39 +423,380 @@ await_status(nvme_disk_driver_info* info, struct nvme_qpair* qpair, status_t& st
 }
 
 
-static status_t
-do_nvme_io(nvme_disk_driver_info* info, off_t rounded_pos, void* buffer,
-	size_t* rounded_len, bool write = false)
+struct nvme_io_request {
+	status_t status;
+
+	bool write;
+
+	off_t lba_start;
+	size_t lba_count;
+
+	physical_entry* iovecs;
+	int32 iovec_count;
+
+	int32 iovec_i;
+};
+
+
+void ior_reset_sgl(nvme_io_request* request, uint32_t offset)
 {
-	CALLED();
-	const size_t block_size = info->block_size;
+	request->iovec_i = offset;
+}
 
-	status_t status = EINPROGRESS;
 
-	qpair_info* qpinfo = get_next_qpair(info);
+int ior_next_sge(nvme_io_request* request, uint64_t* address, uint32_t* length)
+{
+	int32 index = request->iovec_i;
+	if (index < 0 || index > request->iovec_count)
+		return -1;
+
+	*address = request->iovecs[index].address;
+	*length = request->iovecs[index].size;
+
+	TRACE("IOV %d: 0x%" B_PRIxPHYSADDR ", %d\n", request->iovec_i, *address, (int)*length);
+
+	request->iovec_i++;
+	return 0;
+}
+
+
+static status_t
+do_nvme_io_request(nvme_disk_driver_info* info, nvme_io_request* request)
+{
+	request->status = EINPROGRESS;
+
+	qpair_info* qpinfo = get_qpair(info);
 	int ret = -1;
-	if (write) {
-		ret = nvme_ns_write(info->ns, qpinfo->qpair, buffer,
-			rounded_pos / block_size, *rounded_len / block_size,
-			(nvme_cmd_cb)disk_io_callback, &status, 0);
+	if (request->write) {
+		ret = nvme_ns_writev(info->ns, qpinfo->qpair, request->lba_start,
+			request->lba_count, (nvme_cmd_cb)io_finished_callback, request,
+			0, (nvme_req_reset_sgl_cb)ior_reset_sgl,
+			(nvme_req_next_sge_cb)ior_next_sge);
 	} else {
-		ret = nvme_ns_read(info->ns, qpinfo->qpair, buffer,
-			rounded_pos / block_size, *rounded_len / block_size,
-			(nvme_cmd_cb)disk_io_callback, &status, 0);
+		ret = nvme_ns_readv(info->ns, qpinfo->qpair, request->lba_start,
+			request->lba_count, (nvme_cmd_cb)io_finished_callback, request,
+			0, (nvme_req_reset_sgl_cb)ior_reset_sgl,
+			(nvme_req_next_sge_cb)ior_next_sge);
 	}
 	if (ret != 0) {
-		TRACE_ERROR("attempt to queue %s I/O at %" B_PRIdOFF " of %" B_PRIuSIZE
-			" bytes failed!\n", write ? "write" : "read", rounded_pos, *rounded_len);
+		TRACE_ERROR("attempt to queue %s I/O at LBA %" B_PRIdOFF " of %" B_PRIuSIZE
+			" blocks failed!\n", request->write ? "write" : "read",
+			request->lba_start, request->lba_count);
+
+		request->lba_count = 0;
 		return ret;
 	}
 
-	await_status(info, qpinfo->qpair, status);
+	await_status(info, qpinfo->qpair, request->status);
+
+	if (request->status != B_OK) {
+		TRACE_ERROR("%s at LBA %" B_PRIdOFF " of %" B_PRIuSIZE
+			" blocks failed!\n", request->write ? "write" : "read",
+			request->lba_start, request->lba_count);
+
+		request->lba_count = 0;
+	}
+	return request->status;
+}
+
+
+static status_t bounce_copy(bool write, int8* buffer, phys_size_t& buffer_offset,
+	phys_size_t& buffer_remaining, int32& vec_i, phys_size_t& vec_offset,
+	physical_entry* iovecs, int32 vec_count)
+{
+	status_t status = B_OK;
+	while (buffer_remaining > 0 && vec_i < vec_count) {
+		phys_size_t len = min_c(iovecs[vec_i].size - vec_offset,
+			buffer_remaining);
+		if (write) {
+			status = vm_memcpy_from_physical(buffer + buffer_offset,
+				iovecs[vec_i].address + vec_offset, len, false);
+		} else {
+			status = vm_memcpy_to_physical(iovecs[vec_i].address + vec_offset,
+				buffer + buffer_offset, len, false);
+		}
+		if (status != B_OK)
+			break;
+
+		vec_offset += len;
+		if (vec_offset == iovecs[vec_i].size) {
+			vec_i++;
+			vec_offset = 0;
+		}
+		buffer_remaining -= len;
+		buffer_offset += len;
+	}
+	return status;
+}
+
+
+static status_t
+nvme_disk_bounced_io(nvme_disk_handle* handle, io_request* request,
+	off_t rounded_pos, phys_size_t rounded_len,
+	physical_entry* iovecs, int32 count)
+{
+	const size_t block_size = handle->info->block_size;
+	const phys_size_t buffer_size = B_PAGE_SIZE,
+		blocks_per_buffer = buffer_size / block_size;
+
+	phys_addr_t phys_buffer;
+	phys_size_t buffer_offset = (request->Offset() - rounded_pos);
+	int8* buffer = (int8*)nvme_mem_alloc_node(buffer_size, buffer_size, 0,
+		&phys_buffer);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
+	status_t status = B_OK;
+	if (request->IsWrite() && request->Offset() != rounded_pos) {
+		// Read in the first block.
+		nvme_io_request first;
+		memset(&first, 0, sizeof(nvme_io_request));
+
+		first.lba_start = rounded_pos / block_size;
+		first.lba_count = 1;
+
+		physical_entry entry;
+		entry.address = phys_buffer;
+		entry.size = block_size;
+		first.iovecs = &entry;
+		first.iovec_count = 1;
+
+		status = do_nvme_io_request(handle->info, &first);
+	}
 
 	if (status != B_OK) {
-		TRACE_ERROR("%s at %" B_PRIdOFF " of %" B_PRIuSIZE " bytes failed!\n",
-			write ? "write" : "read", rounded_pos, *rounded_len);
-		*rounded_len = 0;
+		nvme_free(buffer);
+		return status;
 	}
+
+	nvme_io_request nvme_request;
+	memset(&nvme_request, 0, sizeof(nvme_io_request));
+	physical_entry request_entry;
+	request_entry.address = phys_buffer;
+	nvme_request.iovecs = &request_entry;
+	nvme_request.iovec_count = 1;
+
+	off_t lba_offset = rounded_pos / block_size;
+	phys_size_t lba_remaining = rounded_len / block_size, iovec_offset = 0;
+	int32 iovec = 0;
+	while (lba_remaining > 0 && status == B_OK) {
+		phys_size_t buffer_remaining = buffer_size - buffer_offset;
+		if (request->IsWrite() && lba_remaining <= blocks_per_buffer
+				&& ((rounded_len - request->Length()) - (request->Offset() - rounded_pos)) > 0) {
+			// Read in the last block.
+			nvme_io_request last;
+			memset(&last, 0, sizeof(nvme_io_request));
+
+			last.lba_start = lba_offset + lba_remaining - 1;
+			last.lba_count = 1;
+
+			physical_entry entry;
+			entry.address = phys_buffer + ((lba_remaining - 1) * block_size);
+			entry.size = block_size;
+			last.iovecs = &entry;
+			last.iovec_count = 1;
+
+			status = do_nvme_io_request(handle->info, &last);
+			if (status != B_OK)
+				break;
+		}
+
+		if (request->IsWrite()) {
+			status = bounce_copy(true, buffer, buffer_offset, buffer_remaining,
+				iovec, iovec_offset, iovecs, count);
+			if (status != B_OK)
+				break;
+			request_entry.size = ROUNDUP(buffer_size - buffer_remaining, block_size);
+		} else {
+			request_entry.size = min_c(lba_remaining * block_size, buffer_size);
+		}
+
+		nvme_request.lba_start = lba_offset;
+		nvme_request.lba_count = request_entry.size / block_size;
+
+		status = do_nvme_io_request(handle->info, &nvme_request);
+		if (status != B_OK)
+			break;
+
+		lba_offset += nvme_request.lba_count;
+		lba_remaining -= nvme_request.lba_count;
+
+		if (request->IsRead()) {
+			status = bounce_copy(false, buffer, buffer_offset, buffer_remaining,
+				iovec, iovec_offset, iovecs, count);
+		}
+
+		buffer_offset = 0;
+	}
+
+	// We're done with the bounce buffer.
+	nvme_free(buffer);
+
+	// Determine how much was actually transferred relative to the request.
+	const off_t endOffset = request->Offset() + request->Length(),
+		trueEndOffset = lba_offset * block_size;
+	generic_size_t transferred;
+	if (trueEndOffset >= endOffset)
+		transferred = request->Length();
+	else
+		transferred = trueEndOffset - request->Offset();
+
+	request->SetTransferredBytes(transferred < request->Length(), transferred);
+	return status;
+}
+
+
+static status_t
+nvme_disk_io(void* cookie, io_request* request)
+{
+	CALLED();
+
+	nvme_disk_handle* handle = (nvme_disk_handle*)cookie;
+
+	nvme_io_request nvme_request;
+	memset(&nvme_request, 0, sizeof(nvme_io_request));
+
+	nvme_request.write = request->IsWrite();
+
+	physical_entry* vtophys = NULL;
+	MemoryDeleter vtophysDeleter;
+
+	IOBuffer* buffer = request->Buffer();
+	status_t status = B_OK;
+	if (!buffer->IsPhysical()) {
+		status = buffer->LockMemory(request->TeamID(), request->IsWrite());
+		if (status != B_OK) {
+			TRACE_ERROR("failed to lock memory: %s\n", strerror(status));
+			return status;
+		}
+		// SetStatusAndNotify() takes care of unlocking memory if necessary.
+
+		// This is slightly inefficient, as we could use a BStackOrHeapArray in
+		// the optimal case (few physical entries required), but we would not
+		// know whether or not that was possible until calling get_memory_map()
+		// and then potentially reallocating, which would complicate the logic.
+
+		int32 vtophys_length = (request->Length() / B_PAGE_SIZE) + 2;
+		nvme_request.iovecs = vtophys = (physical_entry*)malloc(sizeof(physical_entry)
+			* vtophys_length);
+		if (vtophys == NULL) {
+			TRACE_ERROR("failed to allocate memory for iovecs\n");
+			request->SetStatusAndNotify(B_NO_MEMORY);
+			return B_NO_MEMORY;
+		}
+		vtophysDeleter.SetTo(vtophys);
+
+		for (size_t i = 0; i < buffer->VecCount(); i++) {
+			generic_io_vec virt = buffer->VecAt(i);
+			uint32 entries = vtophys_length - nvme_request.iovec_count;
+
+			// Avoid copies by going straight into the vtophys array.
+			status = get_memory_map_etc(request->TeamID(), (void*)virt.base,
+				virt.length, vtophys + nvme_request.iovec_count, &entries);
+			if (status == B_BUFFER_OVERFLOW) {
+				TRACE("vtophys array was too small, reallocating\n");
+
+				vtophysDeleter.Detach();
+				vtophys_length *= 2;
+				nvme_request.iovecs = vtophys = (physical_entry*)realloc(vtophys,
+					sizeof(physical_entry) * vtophys_length);
+				vtophysDeleter.SetTo(vtophys);
+				if (vtophys == NULL) {
+					status = B_NO_MEMORY;
+				} else {
+					// Try again, with the larger buffer this time.
+					i--;
+					continue;
+				}
+			}
+			if (status != B_OK) {
+				TRACE_ERROR("I/O get_memory_map failed: %s\n", strerror(status));
+				request->SetStatusAndNotify(status);
+				return status;
+			}
+
+			nvme_request.iovec_count += entries;
+		}
+	} else {
+		nvme_request.iovecs = (physical_entry*)buffer->Vecs();
+		nvme_request.iovec_count = buffer->VecCount();
+	}
+
+	// See if we need to bounce anything other than the first or last vec.
+	const size_t block_size = handle->info->block_size;
+	bool bounceAll = false;
+	for (int32 i = 1; !bounceAll && i < (nvme_request.iovec_count - 1); i++) {
+		if ((nvme_request.iovecs[i].address % B_PAGE_SIZE) != 0)
+			bounceAll = true;
+		if ((nvme_request.iovecs[i].size % B_PAGE_SIZE) != 0)
+			bounceAll = true;
+	}
+
+	// See if we need to bounce due to the first or last vec.
+	if (nvme_request.iovec_count > 1) {
+		physical_entry* entry = &nvme_request.iovecs[0];
+		if (!bounceAll && (((entry->address + entry->size) % B_PAGE_SIZE) != 0
+				|| (entry->size % block_size) != 0))
+			bounceAll = true;
+
+		entry = &nvme_request.iovecs[nvme_request.iovec_count - 1];
+		if (!bounceAll && ((entry->address % B_PAGE_SIZE) != 0
+				|| (entry->size % block_size) != 0))
+			bounceAll = true;
+	}
+
+	// See if we need to bounce due to rounding.
+	const off_t rounded_pos = ROUNDDOWN(request->Offset(), block_size);
+	phys_size_t rounded_len = ROUNDUP(request->Length() + (request->Offset()
+		- rounded_pos), block_size);
+	if (rounded_pos != request->Offset() || rounded_len != request->Length())
+		bounceAll = true;
+
+	if (bounceAll) {
+		// Let the bounced I/O routine take care of everything from here.
+		status = nvme_disk_bounced_io(handle, request, rounded_pos, rounded_len,
+			nvme_request.iovecs, nvme_request.iovec_count);
+		request->SetStatusAndNotify(status);
+		return status;
+	}
+
+	nvme_request.lba_start = rounded_pos / block_size;
+	nvme_request.lba_count = rounded_len / block_size;
+
+	// No bouncing was required.
+	ReadLocker readLocker;
+	if (nvme_request.write)
+		readLocker.SetTo(handle->info->rounded_write_lock, false);
+
+	// Error check before actually doing I/O.
+	if (status != B_OK) {
+		TRACE_ERROR("I/O failed early: %s\n", strerror(status));
+		request->SetStatusAndNotify(status);
+		return status;
+	}
+
+	int32 remaining = nvme_request.iovec_count;
+	while (remaining > 0 && status == B_OK) {
+		nvme_request.iovec_count = min_c(remaining,
+			NVME_MAX_SGL_DESCRIPTORS / 2);
+
+		nvme_request.lba_count = 0;
+		for (int i = 0; i < nvme_request.iovec_count; i++)
+			nvme_request.lba_count += (nvme_request.iovecs[i].size / block_size);
+
+		status = do_nvme_io_request(handle->info, &nvme_request);
+
+		nvme_request.iovecs += nvme_request.iovec_count;
+		remaining -= nvme_request.iovec_count;
+		nvme_request.lba_start += nvme_request.lba_count;
+	}
+
+	if (status != B_OK)
+		TRACE_ERROR("I/O failed: %s\n", strerror(status));
+
+	request->SetTransferredBytes(status != B_OK,
+		(nvme_request.lba_start * block_size) - rounded_pos);
+	request->SetStatusAndNotify(status);
 	return status;
 }
 
@@ -458,43 +806,21 @@ nvme_disk_read(void* cookie, off_t pos, void* buffer, size_t* length)
 {
 	CALLED();
 	nvme_disk_handle* handle = (nvme_disk_handle*)cookie;
-	const size_t block_size = handle->info->block_size;
 
-	// libnvme does transfers in units of device sectors, so if we have to
-	// round either the position or the length, we will need a bounce buffer.
-	const off_t rounded_pos = ROUNDDOWN(pos, block_size);
-	size_t rounded_len = ROUNDUP((*length) + (pos - rounded_pos), block_size);
-	if (rounded_pos != pos || rounded_len != *length
-			|| IS_USER_ADDRESS(buffer)) {
-		void* bounceBuffer = malloc(rounded_len);
-		MemoryDeleter _(bounceBuffer);
-		if (bounceBuffer == NULL) {
-			*length = 0;
-			return B_NO_MEMORY;
-		}
+	const off_t end = (handle->info->capacity * handle->info->block_size);
+	if (pos >= end)
+		return B_BAD_VALUE;
+	if (pos + (off_t)*length > end)
+		*length = end - pos;
 
-		status_t status = do_nvme_io(handle->info, rounded_pos,
-			bounceBuffer, &rounded_len);
-		if (status != B_OK) {
-			// The "rounded_len" will be the actual transferred length, but
-			// of course it will contain the padding.
-			*length = std::min(*length, (size_t)std::max((off_t)0,
-				(off_t)rounded_len - (off_t)(pos - rounded_pos)));
-			if (*length == 0)
-				return status;
-		}
-
-		void* offsetBuffer = (void*)((addr_t)bounceBuffer + (pos - rounded_pos));
-		if (IS_USER_ADDRESS(buffer))
-			status = user_memcpy(buffer, offsetBuffer, *length);
-		else
-			memcpy(buffer, offsetBuffer, *length);
+	IORequest request;
+	status_t status = request.Init(pos, (addr_t)buffer, *length, false, 0);
+	if (status != B_OK)
 		return status;
-	}
 
-	// If we got here, that means the arguments are already rounded to LBAs
-	// and the buffer is a kernel one, so just do the I/O directly.
-	return do_nvme_io(handle->info, pos, buffer, length);
+	status = nvme_disk_io(handle, &request);
+	*length = request.TransferredBytes();
+	return status;
 }
 
 
@@ -503,76 +829,21 @@ nvme_disk_write(void* cookie, off_t pos, const void* buffer, size_t* length)
 {
 	CALLED();
 	nvme_disk_handle* handle = (nvme_disk_handle*)cookie;
-	const size_t block_size = handle->info->block_size;
 
-	const off_t rounded_pos = ROUNDDOWN(pos, block_size);
-	size_t rounded_len = ROUNDUP((*length) + (pos - rounded_pos), block_size);
-	if (rounded_pos != pos || rounded_len != *length
-			|| IS_USER_ADDRESS(buffer)) {
-		void* bounceBuffer = malloc(rounded_len);
-		MemoryDeleter _(bounceBuffer);
-		if (bounceBuffer == NULL) {
-			*length = 0;
-			return B_NO_MEMORY;
-		}
+	const off_t end = (handle->info->capacity * handle->info->block_size);
+	if (pos >= end)
+		return B_BAD_VALUE;
+	if (pos + (off_t)*length > end)
+		*length = end - pos;
 
-		// If we rounded, we must protect against simulaneous writes inside
-		// the rounded blocks, as otherwise data corruption would occur.
-		WriteLocker writeLocker;
-		ReadLocker readLocker;
-		if (rounded_pos != pos || rounded_len != *length)
-			writeLocker.SetTo(handle->info->rounded_write_lock, false);
-		else
-			readLocker.SetTo(handle->info->rounded_write_lock, false);
-
-		// Since we rounded, we need to read in the first and last logical
-		// blocks before we copy our information to the bounce buffer.
-		// TODO: This would be faster if we queued both reads at once!
-		size_t readlen = block_size;
-		status_t status = B_OK;
-		if (rounded_pos != pos) {
-			status = do_nvme_io(handle->info, rounded_pos, bounceBuffer,
-				&readlen);
-			if (status != B_OK) {
-				*length = 0;
-				return status;
-			}
-		}
-		if (rounded_len > block_size) {
-			off_t offset = rounded_len - block_size;
-			status = do_nvme_io(handle->info, rounded_pos + offset,
-				((int8*)bounceBuffer) + offset, &readlen);
-			if (status != B_OK) {
-				*length = 0;
-				return status;
-			}
-		}
-
-		// Now we can copy in the actual data to be written.
-		void* offsetBuffer = (void*)((addr_t)bounceBuffer + (pos - rounded_pos));
-		if (IS_USER_ADDRESS(buffer))
-			status = user_memcpy(offsetBuffer, buffer, *length);
-		else
-			memcpy(offsetBuffer, buffer, *length);
-		if (status != B_OK) {
-			*length = 0;
-			return status;
-		}
-
-		status = do_nvme_io(handle->info, rounded_pos, bounceBuffer,
-			&rounded_len, true);
-		if (status != B_OK) {
-			*length = std::min(*length, (size_t)std::max((off_t)0,
-				(off_t)rounded_len - (off_t)(pos - rounded_pos)));
-		}
+	IORequest request;
+	status_t status = request.Init(pos, (addr_t)buffer, *length, true, 0);
+	if (status != B_OK)
 		return status;
-	}
 
-	ReadLocker _(handle->info->rounded_write_lock);
-
-	// If we got here, that means the arguments are already rounded to LBAs,
-	// so just do the I/O directly.
-	return do_nvme_io(handle->info, pos, (void*)buffer, length, true);
+	status = nvme_disk_io(handle, &request);
+	*length = request.TransferredBytes();
+	return status;
 }
 
 
@@ -581,9 +852,9 @@ nvme_disk_flush(nvme_disk_driver_info* info)
 {
 	status_t status = EINPROGRESS;
 
-	qpair_info* qpinfo = get_next_qpair(info);
+	qpair_info* qpinfo = get_qpair(info);
 	int ret = nvme_ns_flush(info->ns, qpinfo->qpair,
-		(nvme_cmd_cb)disk_io_callback, &status);
+		(nvme_cmd_cb)io_finished_callback, &status);
 	if (ret != 0)
 		return ret;
 
@@ -783,7 +1054,7 @@ struct device_module_info sNvmeDiskDevice = {
 	nvme_disk_free,
 	nvme_disk_read,
 	nvme_disk_write,
-	NULL,
+	nvme_disk_io,
 	nvme_disk_ioctl,
 
 	NULL,	// select
