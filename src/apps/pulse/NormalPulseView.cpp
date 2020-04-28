@@ -169,32 +169,9 @@ NormalPulseView::Draw(BRect rect)
 {
 	PushState();
 
-	// Black frame
-	SetHighColor(0, 0, 0);
-	BRect frame = Bounds();
-	frame.right--;
-	frame.bottom--;
-	StrokeRect(frame);
-
-	// Bevelled edges
-	SetHighColor(255, 255, 255);
-	StrokeLine(BPoint(1, 1), BPoint(frame.right - 1, 1));
-	StrokeLine(BPoint(1, 1), BPoint(1, frame.bottom - 1));
-	SetHighColor(80, 80, 80);
-	StrokeLine(BPoint(frame.right, 1), BPoint(frame.right, frame.bottom));
-	StrokeLine(BPoint(2, frame.bottom), BPoint(frame.right - 1, frame.bottom));
-
-	// Dividing line
-	SetHighColor(96, 96, 96);
-	StrokeLine(BPoint(1, frame.bottom + 1), BPoint(frame.right, frame.bottom + 1));
-	SetHighColor(255, 255, 255);
-	StrokeLine(BPoint(1, frame.bottom + 2), BPoint(frame.right, frame.bottom + 2));
-
 	// Processor picture
 	DrawBitmap(fCpuLogo, BPoint(10, 10));
 
-#if __i386__
-	// Do nothing in the case of non-Intel CPUs - they already have a logo
 	if (!fHasBrandLogo) {
 		SetDrawingMode(B_OP_OVER);
 		SetHighColor(240, 240, 240);
@@ -204,7 +181,6 @@ NormalPulseView::Draw(BRect rect)
 		MovePenTo(10 + (32 - width / 2), 30);
 		DrawString(fVendor);
 	}
-#endif
 
 	// Draw processor type and speed
 	SetDrawingMode(B_OP_OVER);
