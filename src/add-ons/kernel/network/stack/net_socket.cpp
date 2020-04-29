@@ -1054,11 +1054,10 @@ socket_connect(net_socket* socket, const struct sockaddr* address,
 
 
 int
-socket_getpeername(net_socket* _socket, struct sockaddr* address,
+socket_getpeername(net_socket* socket, struct sockaddr* address,
 	socklen_t* _addressLength)
 {
-	net_socket_private* socket = (net_socket_private*)_socket;
-	if (!socket->is_connected || socket->peer.ss_len == 0)
+	if (socket->peer.ss_len == 0)
 		return ENOTCONN;
 
 	memcpy(address, &socket->peer, min_c(*_addressLength, socket->peer.ss_len));
