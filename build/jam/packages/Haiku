@@ -47,7 +47,7 @@ AddFilesToPackage add-ons kernel debugger
 AddFilesToPackage add-ons kernel file_systems : $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToPackage add-ons kernel generic
 	: ata_adapter bios@x86,x86_64 dpc
-		locked_pool mpu401 scsi_periph <module>tty ;
+		locked_pool mpu401 scsi_periph smbios@x86,x86_64 <module>tty ;
 AddFilesToPackage add-ons kernel partitioning_systems
 	: amiga_rdb@m68k apple@ppc efi_gpt intel session ;
 AddFilesToPackage add-ons kernel interrupt_controllers : openpic@ppc ;
@@ -59,6 +59,7 @@ if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
 }
 
 # drivers
+AddNewDriversToPackage 				: wmi@x86,x86_64 ;
 AddNewDriversToPackage disk			: nvme_disk@x86,x86_64 ;
 AddNewDriversToPackage disk scsi	: scsi_cd scsi_disk ;
 AddNewDriversToPackage disk virtual : virtio_block ram_disk ;
