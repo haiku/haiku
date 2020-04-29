@@ -64,7 +64,17 @@ namespace BPrivate {
 static const char* kLanguageKeymapMappings[] = {
 	// While there is a "Dutch" keymap, it apparently has not been widely
 	// adopted, and the US-International keymap is common
-	"Dutch", "US-International"
+	"Dutch", "US-International",
+
+	// Cyrillic keymaps are not usable alone, as latin alphabet is required to
+	// use Terminal. So we stay in US international until the user has a chance
+	// to set up KeymapSwitcher. TODO enable KeymapSwitcher automatically.
+	"Belarussian", "US-International",
+	"Russian", "US-International",
+	"Ukrainian", "US-International",
+
+	// Turkish has two layouts, we must pick one
+	"Turkish", "Turkish (Type-Q)",
 };
 static const size_t kLanguageKeymapMappingsSize
 	= sizeof(kLanguageKeymapMappings) / sizeof(kLanguageKeymapMappings[0]);
