@@ -103,7 +103,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 	}
 }
 
-DoCatalogs libbe.so
+DoCatalogs libmedia.so
 	: x-vnd.Haiku-libmedia
 	:
 	MediaDefs.cpp
