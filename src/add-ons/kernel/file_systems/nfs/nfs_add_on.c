@@ -2254,6 +2254,7 @@ fs_readlink(fs_volume *_volume, fs_vnode *_node, char *buf, size_t *bufsize)
 	struct XDRInPacket reply;
 	fs_nspace *ns;
 	fs_node *node;
+	status_t result;
 
 	ns = _volume->private_volume;
 	node = _node->private_node;
@@ -2290,7 +2291,7 @@ fs_readlink(fs_volume *_volume, fs_vnode *_node, char *buf, size_t *bufsize)
 
 	length = XDRInPacketGetDynamic(&reply, data);
 
-	status_t result = user_memcpy(buf, data, min_c(length, *bufsize));
+	result = user_memcpy(buf, data, min_c(length, *bufsize));
 	*bufsize = length;
 
 	XDRInPacketDestroy(&reply);
