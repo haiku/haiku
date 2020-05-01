@@ -155,7 +155,7 @@ main(int argc, const char* const* argv)
 				if (package->Repository() != &installedRepository) {
 					const BRepositoryInfo& info
 						= repositoryInfos[package->Repository()];
-					BString url = info.URL();
+					BString url = info.BaseURL();
 					url << "/packages/" << package->Info().CanonicalFileName();
 					printf("%s\n", url.String());
 				}

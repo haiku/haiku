@@ -85,10 +85,10 @@ BRepositoryConfig::Store(const BEntry& entry) const
 	configString << "# This URL is an identifier for the repository that is "
 		"consistent across mirrors\n";
 
-	if (fURL.IsEmpty())
+	if (fIdentifier.IsEmpty())
 		configString << "# " << KEY_URL << "=???\n";
 	else
-		configString << KEY_URL << "=" << fURL << "\n";
+		configString << KEY_URL << "=" << fIdentifier << "\n";
 	configString << "\n";
 	configString << KEY_PRIORITY << "=" << fPriority << "\n";
 
@@ -123,14 +123,14 @@ BRepositoryConfig::SetTo(const BEntry& entry)
 	if (result != B_OK)
 		return result;
 
-	const char* url = NULL;
+	const char* identifier = NULL;
 	const char* version = driverSettings.GetParameterValue(KEY_CONFIG_VERSION);
 	const char *baseUrlKey = KEY_BASE_URL;
 
 	if (version == NULL || atoi(version) < 2)
 		baseUrlKey = KEY_BASE_URL_LEGACY;
 	else
-		url = driverSettings.GetParameterValue(KEY_URL);
+		identifier = driverSettings.GetParameterValue(KEY_URL);
 
 	const char* baseUrl = driverSettings.GetParameterValue(baseUrlKey);
 	const char* priorityString = driverSettings.GetParameterValue(KEY_PRIORITY);
@@ -142,7 +142,7 @@ BRepositoryConfig::SetTo(const BEntry& entry)
 	fBaseURL = baseUrl;
 	fPriority = priorityString == NULL
 		? kUnsetPriority : atoi(priorityString);
-	fURL = url == NULL ? "" : url;
+	fIdentifier = identifier == NULL ? "" : identifier;
 
 	BPath userSettingsPath;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &userSettingsPath) == B_OK) {
@@ -172,9 +172,9 @@ BRepositoryConfig::BaseURL() const
 
 
 const BString&
-BRepositoryConfig::URL() const
+BRepositoryConfig::Identifier() const
 {
-	return fURL;
+	return fIdentifier;
 }
 
 
@@ -223,9 +223,9 @@ BRepositoryConfig::SetBaseURL(const BString& baseURL)
 
 
 void
-BRepositoryConfig::SetURL(const BString& URL)
+BRepositoryConfig::SetIdentifier(const BString& identifier)
 {
-	fURL = URL;
+	fIdentifier = identifier;
 }
 
 

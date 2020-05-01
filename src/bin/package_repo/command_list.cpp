@@ -70,7 +70,7 @@ struct RepositoryContentListHandler : BRepositoryContentHandler {
 		printf("\tname: %s\n", repositoryInfo.Name().String());
 		printf("\tsummary: %s\n", repositoryInfo.Summary().String());
 		printf("\tbase-url: %s\n", repositoryInfo.BaseURL().String());
-		printf("\turl: %s\n", repositoryInfo.URL().String());
+		printf("\tidentifier: %s\n", repositoryInfo.Identifier().String());
 		printf("\tvendor: %s\n", repositoryInfo.Vendor().String());
 		printf("\tpriority: %u\n", repositoryInfo.Priority());
 		printf("\tarchitecture: %s\n",

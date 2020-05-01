@@ -104,7 +104,7 @@ ListReposCommand::Execute(int argc, const char* const* argv)
 			repoConfig.IsUserSpecific() ? "[User]" : "      ",
 			repoConfig.Name().String());
 		printf("\t\tbase-url:  %s\n", repoConfig.BaseURL().String());
-		printf("\t\turl:       %s\n", repoConfig.URL().String());
+		printf("\t\tidentifier: %s\n", repoConfig.Identifier().String());
 		printf("\t\tpriority:  %u\n", repoConfig.Priority());
 
 		if (verbose) {
@@ -121,8 +121,8 @@ ListReposCommand::Execute(int argc, const char* const* argv)
 					repoCache.CountPackages());
 				printf("\t\tbase-url:  %s\n",
 					repoCache.Info().BaseURL().String());
-				printf("\t\turl:  %s\n",
-					repoCache.Info().URL().String());
+				printf("\t\tidentifier:  %s\n",
+					repoCache.Info().Identifier().String());
 				printf("\t\torig-prio: %u\n", repoCache.Info().Priority());
 			} else
 				printf("\t\t<no repository cache found>\n");
