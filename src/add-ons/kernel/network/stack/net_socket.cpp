@@ -829,6 +829,11 @@ socket_connected(net_socket* _socket)
 
 	TRACE("socket_connected(%p)\n", socket);
 
+	if (socket->parent == NULL) {
+		socket->is_connected = true;
+		return B_OK;
+	}
+
 	BReference<net_socket_private> parent = socket->parent.GetReference();
 	if (parent.Get() == NULL)
 		return B_BAD_VALUE;

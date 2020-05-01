@@ -384,7 +384,10 @@ UdpDomainSupport::ConnectEndpoint(UdpEndpoint *endpoint,
 
 	// we need to activate no matter whether or not we have just disconnected,
 	// as calling connect() always triggers an implicit bind():
-	return _BindEndpoint(endpoint, *endpoint->LocalAddress());
+	status_t status = _BindEndpoint(endpoint, *endpoint->LocalAddress());
+	if (status == B_OK)
+		gSocketModule->set_connected(endpoint->Socket());
+	return status;
 }
 
 
