@@ -34,7 +34,7 @@ public:
 
 			const BString&		Name() const;
 			const BString&		BaseURL() const;
-			const BString&		URL() const;
+			const BString&		Identifier() const;
 			const BString&		Vendor() const;
 			const BString&		Summary() const;
 			uint8				Priority() const;
@@ -44,7 +44,7 @@ public:
 
 			void				SetName(const BString& name);
 			void				SetBaseURL(const BString& url);
-			void				SetURL(const BString& url);
+			void				SetIdentifier(const BString& url);
 			void				SetVendor(const BString& vendor);
 			void				SetSummary(const BString& summary);
 			void				SetPriority(uint8 priority);
@@ -61,6 +61,7 @@ public:
 
 	static	const char* const	kNameField;
 	static	const char* const	kURLField;
+	static	const char* const	kIdentifierField;
 	static	const char* const	kBaseURLField;
 	static	const char* const	kVendorField;
 	static	const char*	const	kSummaryField;
@@ -79,9 +80,10 @@ private:
 			BString				fName;
 			BString				fBaseURL;
 				// This is the URL to a single mirror.  This field is optional.
-			BString				fURL;
-				// This is an identifier for the repository that applies
-				// across mirrors.
+			BString				fIdentifier;
+				// This is an identifier in the form of an URI for the
+				// repository, that applies across mirrors. Good choices of
+				// URI schemes are tag: and uuid:, for example.
 			BString				fVendor;
 			BString				fSummary;
 			uint8				fPriority;

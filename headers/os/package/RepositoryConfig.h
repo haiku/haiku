@@ -28,7 +28,7 @@ public:
 
 			const BString&		Name() const;
 			const BString&		BaseURL() const;
-			const BString&		URL() const;
+			const BString&		Identifier() const;
 			uint8				Priority() const;
 			bool				IsUserSpecific() const;
 
@@ -38,7 +38,7 @@ public:
 
 			void				SetName(const BString& name);
 			void				SetBaseURL(const BString& url);
-			void				SetURL(const BString& url);
+			void				SetIdentifier(const BString& url);
 			void				SetPriority(uint8 priority);
 			void				SetIsUserSpecific(bool isUserSpecific);
 
@@ -52,9 +52,9 @@ private:
 			BString				fBaseURL;
 				// this URL is the URL that can be used to access the data of
 				// the repository - it points to a single mirror.
-			BString				fURL;
-				// this URL is actually an identifier for the repository
-				// that is consistent across mirrors.
+			BString				fIdentifier;
+				// an identifier for the repository that is consistent across
+				// mirrors. Usually a tag: or uuid: URI.
 			uint8				fPriority;
 			bool				fIsUserSpecific;
 

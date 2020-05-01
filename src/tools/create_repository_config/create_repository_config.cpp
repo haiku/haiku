@@ -70,9 +70,11 @@ main(int argc, const char* const* argv)
 		"failed to read repository info file \"%s\"", infoPath);
 
 	if (baseUrl == NULL) {
-		if (repoInfo.BaseURL().IsEmpty())
-			baseUrl = repoInfo.URL();
-		else
+		if (repoInfo.BaseURL().IsEmpty()) {
+			// legacy (pre-beta1) repositories may have a single "URL"
+			// field acting both as baseURL and identifier.
+			baseUrl = repoInfo.Identifier();
+		} else
 			baseUrl = repoInfo.BaseURL();
 	}
 
@@ -80,7 +82,7 @@ main(int argc, const char* const* argv)
 	BPackageKit::BRepositoryConfig repoConfig;
 	repoConfig.SetName(repoInfo.Name());
 	repoConfig.SetBaseURL(baseUrl);
-	repoConfig.SetURL(repoInfo.URL());
+	repoConfig.SetIdentifier(repoInfo.Identifier());
 	repoConfig.SetPriority(repoInfo.Priority());
 	DIE_ON_ERROR(repoConfig.Store(configPath),
 		"failed to write repository config file \"%s\"", configPath);

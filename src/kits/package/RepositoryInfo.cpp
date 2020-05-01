@@ -29,6 +29,7 @@ const uint8 BRepositoryInfo::kDefaultPriority	= 50;
 
 const char* const BRepositoryInfo::kNameField			= "name";
 const char* const BRepositoryInfo::kURLField			= "url";
+const char* const BRepositoryInfo::kIdentifierField		= "identifier";
 const char* const BRepositoryInfo::kBaseURLField		= "baseUrl";
 const char* const BRepositoryInfo::kVendorField			= "vendor";
 const char* const BRepositoryInfo::kSummaryField		= "summary";
@@ -91,7 +92,10 @@ BRepositoryInfo::Archive(BMessage* data, bool deep) const
 
 	if ((result = data->AddString(kNameField, fName)) != B_OK)
 		return result;
-	if ((result = data->AddString(kURLField, fURL)) != B_OK)
+	// Field in the archive is named "url" for backward compatility reasons.
+	// We can change this when everyone has updated to a version of Haiku
+	// with support for reading the "identifier" field.
+	if ((result = data->AddString(kURLField, fIdentifier)) != B_OK)
 		return result;
 	if ((result = data->AddString(kVendorField, fVendor)) != B_OK)
 		return result;
@@ -153,9 +157,9 @@ BRepositoryInfo::BaseURL() const
 
 
 const BString&
-BRepositoryInfo::URL() const
+BRepositoryInfo::Identifier() const
 {
-	return fURL;
+	return fIdentifier;
 }
 
 
@@ -209,9 +213,9 @@ BRepositoryInfo::SetName(const BString& name)
 
 
 void
-BRepositoryInfo::SetURL(const BString& url)
+BRepositoryInfo::SetIdentifier(const BString& identifier)
 {
-	fURL = url;
+	fIdentifier = identifier;
 }
 
 
@@ -275,14 +279,16 @@ BRepositoryInfo::_SetTo(const BMessage* data)
 	if (data == NULL)
 		return B_BAD_VALUE;
 
-	data->FindString(kBaseURLField, &fBaseURL);
-		// optional value for historical reasons
-
 	status_t result;
 	if ((result = data->FindString(kNameField, &fName)) != B_OK)
 		return result;
-	if ((result = data->FindString(kURLField, &fURL)) != B_OK)
-		return result;
+	if ((result = data->FindString(kIdentifierField, &fIdentifier)) != B_OK) {
+		// Handle the "url" field as well (it is still the one we generate).
+		// Later on when everyone is using this code we can switch the writing
+		// side to use the "identifier" field with its correct name.
+		if ((result = data->FindString(kURLField, &fIdentifier)) != B_OK)
+			return result;
+	}
 	if ((result = data->FindString(kVendorField, &fVendor)) != B_OK)
 		return result;
 	if ((result = data->FindString(kSummaryField, &fSummary)) != B_OK)
@@ -294,6 +300,17 @@ BRepositoryInfo::_SetTo(const BMessage* data)
 		return result;
 	if (fArchitecture == B_PACKAGE_ARCHITECTURE_ANY)
 		return B_BAD_DATA;
+
+	// Old packages had no base-url field, the "url" field acted both as an
+	// identifier and locator for the repository.
+	data->FindString(kBaseURLField, &fBaseURL);
+	if (fBaseURL.Length() == 0) {
+		fBaseURL = fIdentifier;
+		// In that case make sure the identifier is indeed an http URL
+		// (in the new format, the protocol is not required to be http anymore)
+		if (!fBaseURL.StartsWith("http"))
+			return B_BAD_DATA;
+	}
 
 	const char* licenseName;
 	const char* licenseText;
@@ -341,7 +358,10 @@ BRepositoryInfo::_SetTo(const BEntry& entry)
 		&unload_driver_settings);
 
 	const char* name = get_driver_parameter(settingsHandle, "name", NULL, NULL);
-	const char* url = get_driver_parameter(settingsHandle, "url", NULL, NULL);
+	const char* identifier = get_driver_parameter(settingsHandle, "identifier", NULL, NULL);
+	// Also handle the old name if the new one isn't found
+	if (identifier == NULL || *identifier == '\0')
+		identifier = get_driver_parameter(settingsHandle, "url", NULL, NULL);
 	const char* baseUrl = get_driver_parameter(settingsHandle, "baseurl", NULL, NULL);
 	const char* vendor
 		= get_driver_parameter(settingsHandle, "vendor", NULL, NULL);
@@ -352,7 +372,8 @@ BRepositoryInfo::_SetTo(const BEntry& entry)
 	const char* architectureString
 		= get_driver_parameter(settingsHandle, "architecture", NULL, NULL);
 
-	if (name == NULL || *name == '\0' || url == NULL || *url == '\0'
+	if (name == NULL || *name == '\0'
+		|| identifier == NULL || *identifier == '\0'
 		|| vendor == NULL || *vendor == '\0'
 		|| summary == NULL || *summary == '\0'
 		|| priorityString == NULL || *priorityString == '\0'
@@ -368,7 +389,7 @@ BRepositoryInfo::_SetTo(const BEntry& entry)
 
 	fName = name;
 	fBaseURL = baseUrl;
-	fURL = url;
+	fIdentifier = identifier;
 	fVendor = vendor;
 	fSummary = summary;
 	fPriority = atoi(priorityString);

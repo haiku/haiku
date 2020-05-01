@@ -67,7 +67,7 @@ ActivateRepositoryConfigJob::Execute()
 	BRepositoryConfig repoConfig;
 	repoConfig.SetName(repoInfo.Name());
 	repoConfig.SetBaseURL(fRepositoryBaseURL);
-	repoConfig.SetURL(repoInfo.URL());
+	repoConfig.SetIdentifier(repoInfo.Identifier());
 	repoConfig.SetPriority(repoInfo.Priority());
 
 	if (fRepositoryBaseURL.IsEmpty()) {

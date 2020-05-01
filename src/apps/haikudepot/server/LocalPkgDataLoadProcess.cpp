@@ -110,12 +110,12 @@ LocalPkgDataLoadProcess::RunInternal()
  			repoName, &repoConfig);
 
  		if (getRepositoryConfigStatus == B_OK) {
- 			depotInfo.SetURL(repoConfig.URL());
+ 			depotInfo.SetURL(repoConfig.Identifier());
 
  			if (Logger::IsDebugEnabled()) {
  				printf("[%s] local repository [%s] info;\n"
  					" * url [%s]\n", Name(), repoName.String(),
- 					repoConfig.URL().String());
+ 					repoConfig.Identifier().String());
  			}
  		} else {
  			printf("[%s] unable to obtain the repository config for local "
@@ -220,7 +220,7 @@ LocalPkgDataLoadProcess::RunInternal()
 
  			for (it = depots.begin(); it != depots.end(); it++) {
  				if (RepositoryUrlUtils::EqualsNormalized(
- 					it->URL(), remoteRepository->Config().URL())) {
+ 					it->URL(), remoteRepository->Config().Identifier())) {
  					break;
  				}
  			}
