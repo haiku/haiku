@@ -1036,25 +1036,27 @@ _user_sendto(int socket, const void *data, size_t length, int flags,
 	if (data == NULL || !IS_USER_ADDRESS(data))
 		return B_BAD_ADDRESS;
 
-	// TODO: If this is a connection-mode socket, the address parameter is
-	// supposed to be ignored.
-	if (userAddress == NULL || addressLength <= 0
+	if (addressLength <= 0
 			|| addressLength > MAX_SOCKET_ADDRESS_LENGTH) {
 		return B_BAD_VALUE;
 	}
 
 	// copy address from userland
 	char address[MAX_SOCKET_ADDRESS_LENGTH];
-	if (!IS_USER_ADDRESS(userAddress)
+	if (userAddress != NULL) {
+		if (!IS_USER_ADDRESS(userAddress)
 			|| user_memcpy(address, userAddress, addressLength) != B_OK) {
-		return B_BAD_ADDRESS;
+			return B_BAD_ADDRESS;
+		}
+	} else {
+		addressLength = 0;
 	}
 
 	// sendto()
 	SyscallRestartWrapper<ssize_t> result;
 
 	return result = common_sendto(socket, data, length, flags,
-		(sockaddr*)address, addressLength, false);
+		userAddress != NULL ? (sockaddr*)address : NULL, addressLength, false);
 }
 
 
