@@ -328,13 +328,12 @@ BootPromptWindow::_UpdateStrings()
 
 	fInfoTextView->SetText(B_TRANSLATE_COMMENT(
 		"Thank you for trying out Haiku! We hope you'll like it!\n\n"
-		"You can select your preferred language and keyboard "
-		"layout from the list on the left which will then be used instantly. "
-		"You can easily change both settings from the Desktop later on on "
-		"the fly.\n\n"
+		"Select your preferred language and keymap from the list on "
+		"the left which will then be used instantly. Both settings can be "
+		"changed from the Desktop later on on the fly.\n\n"
 
 		"Do you wish to run the Installer or continue booting to the "
-		"Desktop?\n",
+		"Desktop?",
 
 		"For other languages, a note could be added: \""
 		"Note: Localization of Haiku applications and other components is "
