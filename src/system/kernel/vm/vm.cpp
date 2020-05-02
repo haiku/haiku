@@ -739,6 +739,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		}
 
 		secondCache->Lock();
+		secondCache->temporary = cache->temporary;
 
 		// Transfer the concerned pages from the first cache.
 		secondCache->MovePageRange(cache, secondBase - area->Base()
