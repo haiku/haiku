@@ -88,7 +88,9 @@ private:
 									fClientInstallationInterface;
 
 			SoftwareUpdaterWindow*	fStatusWindow;
+			BMessenger				fStatusWindowMessenger;
 			ProblemWindow*			fProblemWindow;
+			BMessenger				fProblemWindowMessenger;
 			uint32					fCurrentStep;
 			bool					fChangesConfirmed;
 			bool					fNewDownloadStarted;

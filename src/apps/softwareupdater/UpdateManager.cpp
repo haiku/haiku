@@ -45,26 +45,20 @@ UpdateManager::UpdateManager(BPackageInstallationLocation location,
 	BPackageManager(location, &fClientInstallationInterface, this),
 	BPackageManager::UserInteractionHandler(),
 	fClientInstallationInterface(),
-	fStatusWindow(NULL),
+	fStatusWindow(new SoftwareUpdaterWindow()),
+	fStatusWindowMessenger(fStatusWindow),
+	fProblemWindow(NULL),
+	fProblemWindowMessenger(),
 	fCurrentStep(ACTION_STEP_INIT),
 	fChangesConfirmed(false),
 	fVerbose(verbose)
 {
-	fStatusWindow = new SoftwareUpdaterWindow();
 	_SetCurrentStep(ACTION_STEP_START);
 }
 
 
 UpdateManager::~UpdateManager()
 {
-	if (fStatusWindow != NULL) {
-		fStatusWindow->Lock();
-		fStatusWindow->Quit();
-	}
-	if (fProblemWindow != NULL) {
-		fProblemWindow->Lock();
-		fProblemWindow->Quit();
-	}
 }
 
 
@@ -92,11 +86,10 @@ update_type
 UpdateManager::GetUpdateType()
 {
 	int32 action = USER_SELECTION_NEEDED;
-	BMessenger messenger(fStatusWindow);
-	if (messenger.IsValid()) {
+	if (fStatusWindowMessenger.IsValid()) {
 		BMessage message(kMsgGetUpdateType);
 		BMessage reply;
-		messenger.SendMessage(&message, &reply);
+		fStatusWindowMessenger.SendMessage(&message, &reply);
 		reply.FindInt32(kKeyAlertResult, &action);
 	}
 	return (update_type)action;
@@ -110,11 +103,10 @@ UpdateManager::CheckRepositories()
 	if (fVerbose)
 		printf("Remote repositories available: %" B_PRId32 "\n", count);
 	if (count == 0) {
-		BMessenger messenger(fStatusWindow);
-		if (messenger.IsValid()) {
+		if (fStatusWindowMessenger.IsValid()) {
 			BMessage message(kMsgNoRepositories);
 			BMessage reply;
-			messenger.SendMessage(&message, &reply);
+			fStatusWindowMessenger.SendMessage(&message, &reply);
 			int32 result;
 			reply.FindInt32(kKeyAlertResult, &result);
 			if (result == 1)
@@ -159,8 +151,10 @@ UpdateManager::FinalUpdate(const char* header, const char* text)
 void
 UpdateManager::HandleProblems()
 {
-	if (fProblemWindow == NULL)
+	if (fProblemWindow == NULL) {
 		fProblemWindow = new ProblemWindow;
+		fProblemWindowMessenger.SetTo(fProblemWindow);
+	}
 
 	ProblemWindow::SolverPackageSet installPackages;
 	ProblemWindow::SolverPackageSet uninstallPackages;
