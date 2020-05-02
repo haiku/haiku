@@ -732,8 +732,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		// Create a new cache for the second area.
 		VMCache* secondCache;
 		error = VMCacheFactory::CreateAnonymousCache(secondCache, false, 0, 0,
-			dynamic_cast<VMAnonymousNoSwapCache*>(cache) == NULL,
-			VM_PRIORITY_USER);
+			dynamic_cast<VMAnonymousNoSwapCache*>(cache) == NULL, priority);
 		if (error != B_OK) {
 			addressSpace->ShrinkAreaTail(area, oldSize, allocationFlags);
 			return error;
