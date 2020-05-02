@@ -1248,6 +1248,9 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 
 	error = avcodec_receive_frame(fCodecContext, fRawDecodedPicture);
 
+	if (error == AVERROR_EOF)
+		return B_LAST_BUFFER_ERROR;
+
 	if (error == AVERROR(EAGAIN)) {
 		do {
 			status_t loadingChunkStatus

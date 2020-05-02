@@ -395,17 +395,18 @@ StreamBase::FrameRate() const
 			frameRate = (double)fStream->codecpar->sample_rate;
 			break;
 		case AVMEDIA_TYPE_VIDEO:
-			if (fStream->avg_frame_rate.den && fStream->avg_frame_rate.num)
-				frameRate = av_q2d(fStream->avg_frame_rate);
-			else if (fStream->r_frame_rate.den && fStream->r_frame_rate.num)
-				frameRate = av_q2d(fStream->r_frame_rate);
-			else if (fStream->time_base.den && fStream->time_base.num)
+		{
+			AVRational frame_rate = av_guess_frame_rate(NULL, fStream, NULL);
+			if (frame_rate.den != 0 && frame_rate.num != 0)
+				frameRate = av_q2d(frame_rate);
+			else if (fStream->time_base.den != 0 && fStream->time_base.num != 0)
 				frameRate = 1 / av_q2d(fStream->time_base);
 
 			// TODO: Fix up interlaced video for real
 			if (frameRate == 50.0f)
 				frameRate = 25.0f;
 			break;
+		}
 		default:
 			break;
 	}
