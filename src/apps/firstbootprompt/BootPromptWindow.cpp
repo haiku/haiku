@@ -69,7 +69,7 @@ static const char* kLanguageKeymapMappings[] = {
 	// Cyrillic keymaps are not usable alone, as latin alphabet is required to
 	// use Terminal. So we stay in US international until the user has a chance
 	// to set up KeymapSwitcher. TODO enable KeymapSwitcher automatically.
-	"Belarussian", "US-International",
+	"Belarusian", "US-International",
 	"Russian", "US-International",
 	"Ukrainian", "US-International",
 
