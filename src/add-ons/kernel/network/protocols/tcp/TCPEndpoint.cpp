@@ -1217,10 +1217,9 @@ TCPEndpoint::_MarkEstablished()
 	fState = ESTABLISHED;
 	T(State(this));
 
-	if (gSocketModule->has_parent(socket)) {
-		gSocketModule->set_connected(socket);
+	gSocketModule->set_connected(socket);
+	if (gSocketModule->has_parent(socket))
 		release_sem_etc(fAcceptSemaphore, 1, B_DO_NOT_RESCHEDULE);
-	}
 
 	fSendCondition.NotifyAll();
 	gSocketModule->notify(socket, B_SELECT_WRITE, fSendQueue.Free());
